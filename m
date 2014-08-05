@@ -1,48 +1,90 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f176.google.com ([209.85.212.176]:59754 "EHLO
-	mail-wi0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753099AbaHFPC1 (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Wed, 6 Aug 2014 11:02:27 -0400
-Received: by mail-wi0-f176.google.com with SMTP id bs8so9019828wib.9
-        for <linux-wpan@vger.kernel.org>; Wed, 06 Aug 2014 08:02:26 -0700 (PDT)
-Received: from omega (p20030064A9783292E2CB4EFFFE1BB546.dip0.t-ipconnect.de. [2003:64:a978:3292:e2cb:4eff:fe1b:b546])
-        by mx.google.com with ESMTPSA id fs17sm3075665wjc.6.2014.08.06.08.02.25
-        for <linux-wpan@vger.kernel.org>
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 06 Aug 2014 08:02:25 -0700 (PDT)
-Date: Wed, 6 Aug 2014 17:02:20 +0200
+Received: from mail-wg0-f42.google.com ([74.125.82.42]:41561 "EHLO
+	mail-wg0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753048AbaHEMPZ (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Tue, 5 Aug 2014 08:15:25 -0400
+Date: Tue, 5 Aug 2014 14:15:18 +0200
 From: Alexander Aring <alex.aring@gmail.com>
-Message-ID: <20140806150216.GA30195@omega>
+Message-ID: <20140805121516.GB14196@omega>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-Subject: linux-wpan github repos updated
-To: linux-wpan@vger.kernel.org
+Subject: IPv6 over IEEE 802.15.4 aka 6LoWPAN - Neighbor discovery issue
+To: davem@davemloft.net
+Cc: kuznet@ms2.inr.ac.ru, jmorris@namei.org, yoshfuji@linux-ipv6.org, kaber@trash.net, netdev@vger.kernel.org, linux-wpan@vger.kernel.org
 
 Hi,
 
-I will send pull request to bluetooth-next branch the next days so I
-updated the github repos to base on bluetooth-next instead net-next.
+The IEEE 802.15.4 is a WPAN PHY/MAC layer. On top of this Layer we can use
+6LoWPAN as upper layer. 6LoWPAN is an adaption layer for IPv6 over IEEE
+802.15.4.
 
-Please check if you pending patches will apply on this repository.
+Because 6LoWPAN is an adaption we should not change anything in net/ipv6, but
+there exist an issue with the 802.15.4 mac addresses and neighbor discovery.
 
-Patches for "net/6lowpan" should be go into bluetooth-next repository.
+The 802.15.4 has two kinds of mac addresses with a different length.
 
-Why bluetooth-next?
+These are:
 
-The generic 6LoWPAN stuff is used by bluetooth and 802.15.4, that's why
-it's better to base on bluetooth to have the 6lowpan generic code in
-both branches most up-to-date.
+Short addresses are 16 bit long and contain some special addresses like
+0xffff (broadcast) and 0xfffe (difficult to explain, it's simple not
+available).
 
-I also accept all patches for linux-wpan-next only. We don't have a
-right strategie at the moment and all people should always use
-linux-wpan-next as kernel source. Simple: it makes no sense to send
-patches into bluetooth if the complete stack is in an unusable state
-and we don't have much users at current mainline kernel.
+Extended addresses are 64 bit long and have no special address ranges. It's an
+EUI-64 which should not be 00..00 or ff..ff [0].                           
+                                                                           
+There exist no mapping between extended and short addresses. The global problem
+that the neighbor discovery cache handle the address length with a static addr_len
+value from net_device, this value should not be changed during runtime.
 
-But this really depends on the fix, is it a compile error then this
-should be fixed really fast and in the necessary branches.
+
+To handle 6LoWPAN over IEEE 802.15.4 correctly we need to indicate that the neighbor
+discovery stores an extended or short address.
+
+We need this information at two places. The first is the daddr pointer of
+create callback of header_ops. The other place is creating of ICMPv6 neighbor
+discovery ICMPv6 messages.
+The source/target link-layer addresses headers for extended and short addresses should
+follow description of [1].            
+                                      
+The second place is:                  
+In the create callback of header_ops, we replace the IPv6 header with the 6LoWPAN
+header, that's why we need this information in the create callback also. We need this
+information also for generating MAC header. For the sending part.
+                                                           
+                                                           
+Furthermore there exists a neighbor discovery "optimization" which do a separate
+handling for extended and short addresses also. I don't take a closer look but
+it introduce new option types [3] and maybe we can do all 6LoWPAN stuff there.
+                                                                       
+For now, we don't want to use rfc6775 and simple use the normal IPv6 neighbor
+discovery. This need nd messages like [1].                             
+
+I currently searching for a good solution that the neighbor discovery cache can
+handle short and extended addresses WITHOUT touching net/ipv6 branch. 
+
+
+My idea:
+
+Let addr_len to extended_address_length + 1. In the last byte we have a bit which
+indicate that is it a short address. If this bit isn't set we have an extended
+address. 
+
+If we do that, we need some conversions about generating the ICMPv6 messages according
+to [1]. We can solve that with some hooks in net/ipv6/ndisc.c like the ndisc_mc_map
+function for mapping mac multicast addresses.
+
+Another idea to avoid hooks in net/ipv6/ndisc.c  is to parse and rebuild the ICMPv6
+header while replacing IPv6 with the 6LoWPAN header.
+
+
+Please I need help and I need a solution which is also acceptable for mainline.
 
 - Alex
+
+[0] http://standards.ieee.org/develop/regauth/tut/eui64.pdf
+[1] http://tools.ietf.org/html/rfc4944#section-8
+[2] http://tools.ietf.org/html/rfc6775
+[3] http://tools.ietf.org/html/rfc6775#section-12
