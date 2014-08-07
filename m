@@ -1,44 +1,77 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f174.google.com ([209.85.212.174]:59141 "EHLO
-	mail-wi0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754383AbaHGGeL (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Thu, 7 Aug 2014 02:34:11 -0400
-Received: by mail-wi0-f174.google.com with SMTP id d1so10024686wiv.7
-        for <linux-wpan@vger.kernel.org>; Wed, 06 Aug 2014 23:34:10 -0700 (PDT)
-Date: Thu, 7 Aug 2014 08:34:05 +0200
+Received: from mail-wi0-f177.google.com ([209.85.212.177]:57061 "EHLO
+	mail-wi0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932077AbaHGN0N (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Thu, 7 Aug 2014 09:26:13 -0400
+Date: Thu, 7 Aug 2014 15:26:09 +0200
 From: Alexander Aring <alex.aring@gmail.com>
-Message-ID: <20140807063400.GA17337@omega>
-References: <53E2F959.6020904@gmail.com>
+Message-ID: <20140807132606.GB17452@omega>
+References: <CAMuHMdXnGXGqy7B2-wujVxUPA9+3ZfYhcdKb6_jpDV4P7_KMxw@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <53E2F959.6020904@gmail.com>
+In-Reply-To: <CAMuHMdXnGXGqy7B2-wujVxUPA9+3ZfYhcdKb6_jpDV4P7_KMxw@mail.gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-Subject: Re: wpan-next: git pull conflict
-To: Varka Bhadram <varkabhadram@gmail.com>
-Cc: linux-zigbee-devel <linux-zigbee-devel@lists.sourceforge.net>, linux-wpan@vger.kernel.org
+Subject: Re: Modular 6LoWPAN? (was: Re: 6lowpan: introduce new net/6lowpan
+ directory)
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: linux-bluetooth@vger.kernel.org, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-wpan@vger.kernel.org
 
-Hi Varka,
+On Thu, Aug 07, 2014 at 02:37:38PM +0200, Geert Uytterhoeven wrote:
+> Hi Alexander,
+> 
+> On Wed, Aug 6, 2014 at 6:46 PM, Linux Kernel Mailing List
+> <linux-kernel@vger.kernel.org> wrote:
+> > Gitweb:     http://git.kernel.org/linus/;a=commit;h=2c6bed7cfcd3f594ed9e4d6919fa2ebea2243d19
+> > Commit:     2c6bed7cfcd3f594ed9e4d6919fa2ebea2243d19
+> > Parent:     6c53823ae0e10e723131055e1e65dd6a328a228e
+> > Refname:    refs/heads/master
+> > Author:     Alexander Aring <alex.aring@gmail.com>
+> > AuthorDate: Fri Jul 11 10:24:18 2014 +0200
+> > Committer:  Marcel Holtmann <marcel@holtmann.org>
+> > CommitDate: Sat Jul 12 01:53:30 2014 +0200
+> >
+> >     6lowpan: introduce new net/6lowpan directory
+> >
+> >     This patch moves generic code which is used by bluetooth and ieee802154
+> >     6lowpan to a new net/6lowpan directory. This directory contains generic
+> >     6LoWPAN code which is shared between bluetooth and ieee802154 MAC-Layer.
+> >
+> >     This is the IPHC - "IPv6 Header Compression" format at the moment. Which
+> >     is described by RFC 6282 [0]. The BLTE 6LoWPAN draft describes that the
+> >     IPHC is the same format like IEEE 802.15.4, see [1].
+> >
+> >     Futuremore we can put more code into this directory which is shared
+> >     between BLTE and IEEE 802.15.4 6LoWPAN like RFC 6775 or the routing
+> >     protocol RPL RFC 6550.
+> >
+> >     To avoid naming conflicts I renamed 6lowpan-y to ieee802154_6lowpan-y
+> >     in net/ieee802154/Makefile.
+> >
+> >     [0] http://tools.ietf.org/html/rfc6282
+> >     [1] http://tools.ietf.org/html/draft-ietf-6lowpan-btle-12#section-3.2
+> >     [2] http://tools.ietf.org/html/rfc6775
+> >     [3] http://tools.ietf.org/html/rfc6550
+> >
+> >     Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+> >     Acked-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+> >     Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> 
+> > --- /dev/null
+> > +++ b/net/6lowpan/Kconfig
+> > @@ -0,0 +1,6 @@
+> > +config 6LOWPAN
+> > +       bool "6LoWPAN Support"
+> 
+> Is there any specific reason 6LOWPAN is bool instead of tristate?
+> IPV6 can be modular.
+> 
+Indeed this can be modular. I see no special reason why it should not be
+tristate. Sorry, that I didn't see this. Can you please send patches to
+change it?
 
-yea I notice about that I did a force update and the github repos base
-on bluetooth-next and bluetooth now.
-
-You need to rebase your work on these repositories, sorry.
-
-Do you have patches on top of the old repo? If not, then simple do also
-a force "git reset ...".
-
-If yes, create a branch and do git cherry-pick from the necessary
-commits.
-
-Sorry. :-(
-
-Do you also know the new mailinglist?
-
-http://vger.kernel.org/vger-lists.html#linux-wpan
-
-I didn't send it to the zigbee one.
-
+Thanks.
 
 - Alex
+
