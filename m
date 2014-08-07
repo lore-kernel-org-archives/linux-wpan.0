@@ -1,79 +1,81 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from blu004-omc4s22.hotmail.com ([65.55.111.161]:57315 "EHLO
-	BLU004-OMC4S22.hotmail.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751832AbaHNGt5 (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>);
-	Thu, 14 Aug 2014 02:49:57 -0400
-Message-ID: <BLU437-SMTP995AAA001DD048D561AB10F7E80@phx.gbl>
-Date: Thu, 14 Aug 2014 08:49:52 +0200
-From: Cristiano <cristiano_dealti@hotmail.com>
+Received: from mail-we0-f170.google.com ([74.125.82.170]:38088 "EHLO
+	mail-we0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754057AbaHGJdP (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Thu, 7 Aug 2014 05:33:15 -0400
+Received: by mail-we0-f170.google.com with SMTP id w62so3914050wes.15
+        for <linux-wpan@vger.kernel.org>; Thu, 07 Aug 2014 02:33:14 -0700 (PDT)
+Date: Thu, 7 Aug 2014 11:33:08 +0200
+From: Alexander Aring <alex.aring@gmail.com>
+Message-ID: <20140807093305.GA17452@omega>
+References: <53E34185.1040304@xsilon.com>
 MIME-Version: 1.0
-References: <BLU437-SMTP953B598AADB36D1E05A85AF7EB0@phx.gbl> <20140813204803.GC19527@omega> <BLU437-SMTP12A2EB954408C4FD54C241F7EB0@phx.gbl> <20140814004013.GA2127@omega>
-In-Reply-To: <20140814004013.GA2127@omega>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <53E34185.1040304@xsilon.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-Subject: Re: [Linux-zigbee-devel] Old wiki updated but issues pinging fake
- nodes with relatively large payloads (> 93 octets)
-To: Alexander Aring <alex.aring@gmail.com>
-Cc: linux-zigbee-devel <linux-zigbee-devel@lists.sourceforge.net>, linux-wpan@vger.kernel.org
+Subject: Re: Latest wpan-next doesn't compile
+To: Martin Townsend <martin.townsend@xsilon.com>
+Cc: linux-wpan@vger.kernel.org
 
-Thanks,
-     The merge conflicts were related to the 802.11 (WiFi) stack.
+Hi,
 
-Maybe the issue is specific to the fakelb driver. I don't have any 
-supported SPI radio at the moment.
-I need to find one.
+On Thu, Aug 07, 2014 at 10:06:13AM +0100, Martin Townsend wrote:
+> Hi Alex,
+> 
+> I'm getting the following error when trying to compile linux-wpan-next (commit id cad114ae7eceafc4252cd5b1ecbd4bdbcdc901f0)
+> 
+> | drivers/of/platform.c: In function 'of_dma_configure':
+> | drivers/of/platform.c:170:16: error: 'struct pdev_archdata' has no member named 'dma_mask'
+> |   pdev->archdata.dma_mask = 0xffffffffUL;
+> |                 ^
+> | make[2]: *** [drivers/of/platform.o] Error 1
+> | make[1]: *** [drivers/of] Error 2
+> | make[1]: *** Waiting for unfinished jobs....
+> |   CC      net/sched/sch_mq.o
 
-I have the avr raven kit which I used with Contiki and other stuff which 
-is not supported.
+no, but this isn't our problem. Our branch is based on bluetooth-next.
+It could be that this fix is already solved in other repository, if you
+want to fix it you need to find out if it already fix and create some
+patch.
 
-Regards,
-   Cristiano
+I will show you a how to which I would do that:
 
-On 08/14/2014 02:40 AM, Alexander Aring wrote:
-> On Wed, Aug 13, 2014 at 11:42:46PM +0200, Cristiano wrote:
->> Thanks Alex,
->>    Yes the two commits:
->>
->> http://git.kernel.org/cgit/linux/kernel/git/davem/net-next.git/commit/?id=eb06481d69c60f6f9318e935053dce13fe3e8951
->> and
->> http://git.kernel.org/cgit/linux/kernel/git/davem/net-next.git/commit/?id=51263fffadee28c99152fb78a2d41e3d10c9b0b5
->>
->>
->> are in my kernel tree.
->>
-> ok. Sorry, was just a try.
->
->> I merged the rpi kernel with net-next maybe one week ago, just before 3.16
->> was released.
->> Merging them was quite easy. I had three small conflicts, related to the
->> 802.11 stack.
->>
-> Do you mean 802.11 or 802.15.4? :-)
->
->> I will try net-next on qemu.
->>
-> ok.
->
->> What ARCH/platform are you compiling the kernel for?
->>
-> I have two beaglebones white and each of them has a atben (at86rf231) via
-> spi conntected.
->
-> Another setup are two atusb sticks which I use in two qemu vm's.
->
-> Additional I have some contiki nodes which laying in my room around.
-> There I have the avr raven development kit and some Feuerwhere msp430
-> nodes (I ported it to contiki, there is no mainline support for the
-> Feuerwhere nodes).
->
-> I never used the fakelb driver. Mhhh, I dropped this driver now and I
-> will add a rework of this after doing the mac802154 like mac80211
-> stuff.
->
-> - Alex
->
->
+1) check current next tree (sometimes there exists also special repos
+like for bluetooth, check https://git.kernel.org/cgit/linux/kernel/):
 
+https://git.kernel.org/cgit/linux/kernel/git/next/linux-next.git/log/drivers/of/platform.c
+
+this shows the log of this file.
+
+"of/platform: Fix microblaze build failure" - sounds like a build issue.
+Click on it you get:
+
+https://git.kernel.org/cgit/linux/kernel/git/next/linux-next.git/commit/drivers/of/platform.c?id=e1319ea5db6dee48b7fa3a5822c3940dc649ee6a
+
+so, it's already fixed.
+
+The linux-wpan-next branch is based on bluetooth-next and we are a
+little far behind on everything which isn't the net branch.
+
+2)
+If 1) doesn't show any fix then ask on the mailinglist.
+
+./scripts/get_maintainer.pl -f drivers/of/platform.c
+
+Grant Likely <grant.likely@linaro.org> (maintainer:OPEN FIRMWARE AND...)      
+Rob Herring <robh+dt@kernel.org> (maintainer:OPEN FIRMWARE AND...)
+devicetree@vger.kernel.org (open list:OPEN FIRMWARE AND...)
+linux-kernel@vger.kernel.org (open list)
+
+there you can find the necessary people which working on this branch.
+
+
+
+So now if you want to fix it for your working branch, then add in your
+git remotes the linux-next repository and run "git cherry-pick
+e1319ea5db6dee48b7fa3a5822c3940dc649ee6a", but please don't send patches
+for this fix to me then. ;)
+
+- Alex
