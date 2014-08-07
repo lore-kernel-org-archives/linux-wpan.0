@@ -1,53 +1,44 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-pd0-f170.google.com ([209.85.192.170]:60752 "EHLO
-	mail-pd0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754817AbaHFIeL (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Wed, 6 Aug 2014 04:34:11 -0400
-Message-ID: <53E1E828.2050706@gmail.com>
-Date: Wed, 06 Aug 2014 14:02:40 +0530
-From: Varka Bhadram <varkabhadram@gmail.com>
+Received: from mail-wi0-f174.google.com ([209.85.212.174]:59141 "EHLO
+	mail-wi0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754383AbaHGGeL (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Thu, 7 Aug 2014 02:34:11 -0400
+Received: by mail-wi0-f174.google.com with SMTP id d1so10024686wiv.7
+        for <linux-wpan@vger.kernel.org>; Wed, 06 Aug 2014 23:34:10 -0700 (PDT)
+Date: Thu, 7 Aug 2014 08:34:05 +0200
+From: Alexander Aring <alex.aring@gmail.com>
+Message-ID: <20140807063400.GA17337@omega>
+References: <53E2F959.6020904@gmail.com>
 MIME-Version: 1.0
-References: <20140805121516.GB14196@omega> <53E1B912.5000508@gmail.com> <20140806071025.GA29810@omega> <53E1D60F.3090602@gmail.com> <20140806074715.GA31022@omega>
-In-Reply-To: <20140806074715.GA31022@omega>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <53E2F959.6020904@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-Subject: Re: IPv6 over IEEE 802.15.4 aka 6LoWPAN - Neighbor discovery issue
-To: Alexander Aring <alex.aring@gmail.com>
-Cc: davem@davemloft.net, kuznet@ms2.inr.ac.ru, jmorris@namei.org, yoshfuji@linux-ipv6.org, kaber@trash.net, netdev@vger.kernel.org, linux-wpan@vger.kernel.org
+Subject: Re: wpan-next: git pull conflict
+To: Varka Bhadram <varkabhadram@gmail.com>
+Cc: linux-zigbee-devel <linux-zigbee-devel@lists.sourceforge.net>, linux-wpan@vger.kernel.org
 
-On 08/06/2014 01:17 PM, Alexander Aring wrote:
->>>> Handing of RS (Router Solicitation) and RA (Router Advertisement) will take care
->>>> by radvd (Router Advertisement Daemon) in Linux. We added the ABRO and 6CO option
->>>> support in radvd. You can find the implementation in [1].
->>>>
->>>>
->>>> [1]: https://github.com/reubenhwk/radvd/blob/master/send.c#L536
->>>>
->>> I see you use the ContextID there, then you need the CID value from
->>> 6LoWPAN header there. I am very interest for patches which introduce
->>> context based address compression and make it also available in
->>> userspace to handle the ContextID with radvd.
->> Right now we providing the contextID from user space through radvd.conf.
->>
->> Context based implementation is not supported so we are only using the
->> context identifier from user space.
->>
-> A static CID value in radvd.conf? Sorry, I don't know how this can be
-> working without very limitations of use.
+Hi Varka,
 
-Actually we have to get the CID from the 6LoWPAN packet and we have to
-update or store the CID based information into a separate table.
+yea I notice about that I did a force update and the github repos base
+on bluetooth-next and bluetooth now.
 
-For each and every CID we are going to have the its own info.
+You need to rebase your work on these repositories, sorry.
 
-If CID is changed we have to increment the *version* field in ABRO option
-and sends RA message. This support is future work if we have the CID based
-compression.
+Do you have patches on top of the old repo? If not, then simple do also
+a force "git reset ...".
+
+If yes, create a branch and do git cherry-pick from the necessary
+commits.
+
+Sorry. :-(
+
+Do you also know the new mailinglist?
+
+http://vger.kernel.org/vger-lists.html#linux-wpan
+
+I didn't send it to the zigbee one.
 
 
--- 
-Regards,
-Varka Bhadram.
-
+- Alex
