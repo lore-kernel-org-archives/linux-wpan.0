@@ -1,10 +1,10 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-pd0-f180.google.com ([209.85.192.180]:44372 "EHLO
-	mail-pd0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756008AbaHHLme (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Fri, 8 Aug 2014 07:42:34 -0400
-Message-ID: <53E4B74F.6050602@gmail.com>
-Date: Fri, 08 Aug 2014 17:11:03 +0530
+Received: from mail-pd0-f182.google.com ([209.85.192.182]:40242 "EHLO
+	mail-pd0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755969AbaHHLtL (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Fri, 8 Aug 2014 07:49:11 -0400
+Message-ID: <53E4B8DD.9020007@gmail.com>
+Date: Fri, 08 Aug 2014 17:17:41 +0530
 From: Varka Bhadram <varkabhadram@gmail.com>
 MIME-Version: 1.0
 References: <1407497303-6795-1-git-send-email-varkabhadram@gmail.com> <20140808113833.GA18109@omega>
@@ -40,9 +40,12 @@ On 08/08/2014 05:08 PM, Alexander Aring wrote:
 >>   L:	linux-zigbee-devel@lists.sourceforge.net (moderated for non-subscribers)
 > what's about to remove this mailinglist? It's the deprecated one. :-)
 
-Ohhh.. sorry for that..
+I generated this against net-next tree... Its not applying on bluetooth-next.
 
+In bluetooth-next IEEE-802.15.4 MAINTAINERS not updated. May be they have not
+net/net-next.
 
+On which tree we have to do this..?
 
 -- 
 Regards,
