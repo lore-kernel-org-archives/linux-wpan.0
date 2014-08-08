@@ -1,56 +1,85 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from metis.ext.pengutronix.de ([92.198.50.35]:53110 "EHLO
-	metis.ext.pengutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755216AbaHHLAu (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Fri, 8 Aug 2014 07:00:50 -0400
-Message-ID: <53E4ADD8.8090006@pengutronix.de>
-Date: Fri, 08 Aug 2014 13:00:40 +0200
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-MIME-Version: 1.0
+Received: from mail-wi0-f177.google.com ([209.85.212.177]:44093 "EHLO
+	mail-wi0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756339AbaHHLQq (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Fri, 8 Aug 2014 07:16:46 -0400
+Date: Fri, 8 Aug 2014 13:16:39 +0200
+From: Alexander Aring <alex.aring@gmail.com>
+Message-ID: <20140808111637.GA17088@omega>
 References: <1407495439-5906-1-git-send-email-varkabhadram@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 In-Reply-To: <1407495439-5906-1-git-send-email-varkabhadram@gmail.com>
-Content-Type: multipart/signed; micalg=pgp-sha1;
- protocol="application/pgp-signature";
- boundary="14TOSQXni36NTIT9MtLUvXNNNJ8rHIeuG"
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 Subject: Re: [PATCH bluetooth-next] MAINTAINERS: add mailing list
-To: varkabhadram@gmail.com, linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Cc: Varka Bhadram <varkab@cdac.in>
+To: varkabhadram@gmail.com
+Cc: linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org, Varka Bhadram <varkab@cdac.in>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---14TOSQXni36NTIT9MtLUvXNNNJ8rHIeuG
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Hi Varka,
 
-On 08/08/2014 12:57 PM, varkabhadram@gmail.com wrote:
+On Fri, Aug 08, 2014 at 04:27:19PM +0530, varkabhadram@gmail.com wrote:
 > From: Varka Bhadram <varkab@cdac.in>
->=20
+> 
 > adds the mailing list address for bluetooth generic 6lowpan and
 > 802.15.4 subsystems
+> 
+> Signed-off-by: Varka Bhadram <varkab@cdac.in>
+> ---
+>  MAINTAINERS |    2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 05e5450..59a4108 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -154,6 +154,7 @@ F:	drivers/scsi/53c700*
+>  M:	Alexander Aring <alex.aring@gmail.com>
+>  L:	linux-zigbee-devel@lists.sourceforge.net (moderated for non-subscribers)
+>  L:	linux-bluetooth@vger.kernel.org
+> +L:	linux-wpan@vger.kernel.org
+>  S:	Maintained
+>  F:	net/6lowpan/
+>  F:	include/net/6lowpan.h
+> @@ -4561,6 +4562,7 @@ F:	drivers/idle/i7300_idle.c
+>  IEEE 802.15.4 SUBSYSTEM
+>  M:	Alexander Aring <alex.aring@gmail.com>
+>  L:	linux-zigbee-devel@lists.sourceforge.net (moderated for non-subscribers)
+> +L:	linux-wpan@vger.kernel.org
+>  W:	http://apps.sourceforge.net/trac/linux-zigbee
+>  T:	git git://git.kernel.org/pub/scm/linux/kernel/git/lowpan/lowpan.git
+>  S:	Maintained
 
-What about removing the linux-zigbee-devel@lists.sourceforge.net?
+ah, okay. Seems that both entries are in bluetooth-next now, so we can
+do this.
 
-Marc
+Please drop the old linux zigbee one and replace the "T:" entry in
+IEEE 802.15.4 SUBSYSTEM into:
 
---=20
-Pengutronix e.K.                  | Marc Kleine-Budde           |
-Industrial Linux Solutions        | Phone: +49-231-2826-924     |
-Vertretung West/Dortmund          | Fax:   +49-5121-206917-5555 |
-Amtsgericht Hildesheim, HRA 2686  | http://www.pengutronix.de   |
+git git://github.com/linux-wpan/linux-wpan-next.git
+
+also add a "W:" entry for the website:
+
+https://github.com/linux-wpan
 
 
---14TOSQXni36NTIT9MtLUvXNNNJ8rHIeuG
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+and there are several files missing in IEEE 802.15.4 SUBSYSTEM. I want
+to do this all of these things in one patch. Please add these missing
+files like:
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
+Documentation/networking/ieee802154.txt
+include/** <-- search for 802154 stuff
 
-iEYEARECAAYFAlPkrdwACgkQjTAFq1RaXHPsVACglbIDqAuHtD54V/CVjqT8Kjg1
-vY4An37hvet2r+ilRUDuTVeq5D9qZJry
-=PxDC
------END PGP SIGNATURE-----
 
---14TOSQXni36NTIT9MtLUvXNNNJ8rHIeuG--
+
+Marcel, maybe we should add:
+
+T: git git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git
+
+in 6LOWPAN_GENERIC. Do you agree with that?
+
+
+Thanks.
+
+- Alex
