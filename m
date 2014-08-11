@@ -1,59 +1,38 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wg0-f43.google.com ([74.125.82.43]:51762 "EHLO
-	mail-wg0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752308AbaHKLac (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Mon, 11 Aug 2014 07:30:32 -0400
-From: Alexander Aring <alex.aring@gmail.com>
-Date: Mon, 11 Aug 2014 13:25:08 +0200
-Message-Id: <1407756310-26592-3-git-send-email-alex.aring@gmail.com>
-In-Reply-To: <1407756310-26592-1-git-send-email-alex.aring@gmail.com>
-References: <1407756310-26592-1-git-send-email-alex.aring@gmail.com>
+Received: from senator.holtmann.net ([87.106.208.187]:58157 "EHLO
+	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754590AbaHKTRe (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Mon, 11 Aug 2014 15:17:34 -0400
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1407756310-26592-3-git-send-email-alex.aring@gmail.com>
+Date: Mon, 11 Aug 2014 12:18:04 -0700
+Content-Transfer-Encoding: 7bit
+Message-Id: <7A093622-CCE7-42B3-97A9-26851E637674@holtmann.org>
+References: <1407756310-26592-1-git-send-email-alex.aring@gmail.com> <1407756310-26592-3-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-Subject: [PATCH 2/4] mac802154: common error path
-To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org, linux-wpan@vger.kernel.org, kernel@pengutronix.de, Varka Bhadram <varkab@cdac.in>, Alexander Aring <alex.aring@gmail.com>
+Subject: Re: [PATCH 2/4] mac802154: common error path
+To: Alexander Aring <alex.aring@gmail.com>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>, linux-wpan@vger.kernel.org, kernel@pengutronix.de, Varka Bhadram <varkab@cdac.in>
 
-From: Varka Bhadram <varkab@cdac.in>
+Hi Alex,
 
-By introducing label fail, making the common error path for
-mac802154_llsec_decrypt() and packet type default case.
+> From: Varka Bhadram <varkab@cdac.in>
+> 
+> By introducing label fail, making the common error path for
+> mac802154_llsec_decrypt() and packet type default case.
+> 
+> Signed-off-by: Varka Bhadram <varkab@cdac.in>
+> Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+> ---
+> net/mac802154/wpan.c | 10 ++++++----
+> 1 file changed, 6 insertions(+), 4 deletions(-)
 
-Signed-off-by: Varka Bhadram <varkab@cdac.in>
-Signed-off-by: Alexander Aring <alex.aring@gmail.com>
----
- net/mac802154/wpan.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+patch has been applied to bluetooth-next tree.
 
-diff --git a/net/mac802154/wpan.c b/net/mac802154/wpan.c
-index 3c3069f..ce17570 100644
---- a/net/mac802154/wpan.c
-+++ b/net/mac802154/wpan.c
-@@ -472,8 +472,7 @@ mac802154_subif_frame(struct mac802154_sub_if_data *sdata, struct sk_buff *skb,
- 	rc = mac802154_llsec_decrypt(&sdata->sec, skb);
- 	if (rc) {
- 		pr_debug("decryption failed: %i\n", rc);
--		kfree_skb(skb);
--		return NET_RX_DROP;
-+		goto fail;
- 	}
- 
- 	sdata->dev->stats.rx_packets++;
-@@ -485,9 +484,12 @@ mac802154_subif_frame(struct mac802154_sub_if_data *sdata, struct sk_buff *skb,
- 	default:
- 		pr_warn("ieee802154: bad frame received (type = %d)\n",
- 			mac_cb(skb)->type);
--		kfree_skb(skb);
--		return NET_RX_DROP;
-+		goto fail;
- 	}
-+
-+fail:
-+	kfree_skb(skb);
-+	return NET_RX_DROP;
- }
- 
- static void mac802154_print_addr(const char *name,
--- 
-2.0.3
+Regards
+
+Marcel
 
