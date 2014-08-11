@@ -1,32 +1,34 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wg0-f46.google.com ([74.125.82.46]:61437 "EHLO
-	mail-wg0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752920AbaHKLjI (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Mon, 11 Aug 2014 07:39:08 -0400
-Date: Mon, 11 Aug 2014 13:39:02 +0200
-From: Alexander Aring <alex.aring@gmail.com>
-Message-ID: <20140811113900.GA24354@omega>
-References: <1407756310-26592-1-git-send-email-alex.aring@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1407756310-26592-1-git-send-email-alex.aring@gmail.com>
+Received: from senator.holtmann.net ([87.106.208.187]:51643 "EHLO
+	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751595AbaHKTXm convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Mon, 11 Aug 2014 15:23:42 -0400
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20140811113900.GA24354@omega>
+Date: Mon, 11 Aug 2014 12:24:15 -0700
+Content-Transfer-Encoding: 8BIT
+Message-Id: <726D299E-45F1-4D51-8AB9-FEF53D30DEFF@holtmann.org>
+References: <1407756310-26592-1-git-send-email-alex.aring@gmail.com> <20140811113900.GA24354@omega>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 Subject: Re: pull-request: wpan-next 2014-08-11
-To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org, linux-wpan@vger.kernel.org, kernel@pengutronix.de
+To: Alexander Aring <alex.aring@gmail.com>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>, linux-wpan@vger.kernel.org, kernel@pengutronix.de
 
-Hi Marcel,
+Hi Alex,
 
-On Mon, Aug 11, 2014 at 01:25:06PM +0200, Alexander Aring wrote:
-> Hi Marcel,
+>> this is a pull request for the bluetooth-next tree. The pull request contains
+>> some cleanup patches for mac802154 and the ieee802154 6lowpan part.
 > 
-> this is a pull request for the bluetooth-next tree. The pull request contains
-> some cleanup patches for mac802154 and the ieee802154 6lowpan part.
+> I fight with my git setup and this was a complete fail.
+> 
+> Sorry, for the noise.
 
-I fight with my git setup and this was a complete fail.
+no problem. And I am totally fine if you just send patch series using git send-email. I can as easily apply them as a pull request.
 
-Sorry, for the noise.
+Regards
 
-- Alex
+Marcel
+
