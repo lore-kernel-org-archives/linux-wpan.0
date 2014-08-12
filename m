@@ -1,60 +1,97 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-la0-f49.google.com ([209.85.215.49]:64311 "EHLO
-	mail-la0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751809AbaHLNOf (ORCPT
+Received: from mail-la0-f46.google.com ([209.85.215.46]:62485 "EHLO
+	mail-la0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751890AbaHLNOf (ORCPT
 	<rfc822;linux-wpan@vger.kernel.org>); Tue, 12 Aug 2014 09:14:35 -0400
-Received: by mail-la0-f49.google.com with SMTP id hz20so7933120lab.36
-        for <linux-wpan@vger.kernel.org>; Tue, 12 Aug 2014 06:14:33 -0700 (PDT)
+Received: by mail-la0-f46.google.com with SMTP id b8so7988104lan.33
+        for <linux-wpan@vger.kernel.org>; Tue, 12 Aug 2014 06:14:34 -0700 (PDT)
 From: Alexander Aring <alex.aring@gmail.com>
-Date: Tue, 12 Aug 2014 15:14:06 +0200
-Message-Id: <1407849255-11500-3-git-send-email-alex.aring@gmail.com>
+Date: Tue, 12 Aug 2014 15:14:07 +0200
+Message-Id: <1407849255-11500-4-git-send-email-alex.aring@gmail.com>
 In-Reply-To: <1407849255-11500-1-git-send-email-alex.aring@gmail.com>
 References: <1407849255-11500-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-Subject: [PATCH wpan-next 02/11] mac802154: rename ieee802154_dev.c to main.c
+Subject: [PATCH wpan-next 03/11] mac802154: remove not functional monitor device
 To: linux-wpan@vger.kernel.org
 Cc: Alexander Aring <alex.aring@gmail.com>
 
-This file contains hw functionality which is similar to the
-net/mac80211/main.c file.
-
-This patch is part of getting wireless feeling into the ieee802154
-implementation.
+This is broken in many ways, drop the current monitor device support and
+later we will implement a new implement for this.
 
 Signed-off-by: Alexander Aring <alex.aring@gmail.com>
 ---
- net/mac802154/Makefile         |   2 +-
- net/mac802154/ieee802154_dev.c | 415 -----------------------------------------
- net/mac802154/main.c           | 411 ++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 412 insertions(+), 416 deletions(-)
- delete mode 100644 net/mac802154/ieee802154_dev.c
- create mode 100644 net/mac802154/main.c
+ include/linux/nl802154.h  |   1 -
+ net/mac802154/Makefile    |   2 +-
+ net/mac802154/mac802154.h |   3 --
+ net/mac802154/main.c      |   5 --
+ net/mac802154/monitor.c   | 117 ----------------------------------------------
+ net/mac802154/rx.c        |   1 -
+ net/mac802154/tx.c        |   2 -
+ 7 files changed, 1 insertion(+), 130 deletions(-)
+ delete mode 100644 net/mac802154/monitor.c
 
+diff --git a/include/linux/nl802154.h b/include/linux/nl802154.h
+index 20163b9..fe775e3 100644
+--- a/include/linux/nl802154.h
++++ b/include/linux/nl802154.h
+@@ -174,7 +174,6 @@ enum {
+ 	__IEEE802154_DEV_INVALID = -1,
+ 
+ 	IEEE802154_DEV_WPAN,
+-	IEEE802154_DEV_MONITOR,
+ 
+ 	__IEEE802154_DEV_MAX,
+ };
 diff --git a/net/mac802154/Makefile b/net/mac802154/Makefile
-index 9723d6f..1ecbc47 100644
+index 1ecbc47..5f54676 100644
 --- a/net/mac802154/Makefile
 +++ b/net/mac802154/Makefile
 @@ -1,5 +1,5 @@
  obj-$(CONFIG_MAC802154)	+= mac802154.o
--mac802154-objs		:= ieee802154_dev.o rx.o tx.o mac_cmd.o mib.o \
-+mac802154-objs		:= main.o rx.o tx.o mac_cmd.o mib.o \
- 			   monitor.o wpan.o llsec.o
+ mac802154-objs		:= main.o rx.o tx.o mac_cmd.o mib.o \
+-			   monitor.o wpan.o llsec.o
++			   wpan.o llsec.o
  
  ccflags-y += -D__CHECK_ENDIAN__
-diff --git a/net/mac802154/ieee802154_dev.c b/net/mac802154/ieee802154_dev.c
+diff --git a/net/mac802154/mac802154.h b/net/mac802154/mac802154.h
+index 6375a39..1c4fb8f 100644
+--- a/net/mac802154/mac802154.h
++++ b/net/mac802154/mac802154.h
+@@ -113,9 +113,6 @@ extern struct ieee802154_mlme_ops mac802154_mlme_wpan;
+ int mac802154_slave_open(struct net_device *dev);
+ int mac802154_slave_close(struct net_device *dev);
+ 
+-void mac802154_monitors_rx(struct mac802154_priv *priv, struct sk_buff *skb);
+-void mac802154_monitor_setup(struct net_device *dev);
+-
+ void mac802154_wpans_rx(struct mac802154_priv *priv, struct sk_buff *skb);
+ void mac802154_wpan_setup(struct net_device *dev);
+ 
+diff --git a/net/mac802154/main.c b/net/mac802154/main.c
+index 645a994..1e68e49 100644
+--- a/net/mac802154/main.c
++++ b/net/mac802154/main.c
+@@ -161,11 +161,6 @@ mac802154_add_iface(struct wpan_phy *phy, const char *name, int type)
+ 	int err = -ENOMEM;
+ 
+ 	switch (type) {
+-	case IEEE802154_DEV_MONITOR:
+-		dev = alloc_netdev(sizeof(struct mac802154_sub_if_data),
+-				   name, NET_NAME_UNKNOWN,
+-				   mac802154_monitor_setup);
+-		break;
+ 	case IEEE802154_DEV_WPAN:
+ 		dev = alloc_netdev(sizeof(struct mac802154_sub_if_data),
+ 				   name, NET_NAME_UNKNOWN,
+diff --git a/net/mac802154/monitor.c b/net/mac802154/monitor.c
 deleted file mode 100644
-index adb3f76..0000000
---- a/net/mac802154/ieee802154_dev.c
+index a68230e..0000000
+--- a/net/mac802154/monitor.c
 +++ /dev/null
-@@ -1,415 +0,0 @@
+@@ -1,117 +0,0 @@
 -/*
-- * Copyright (C) 2007-2012 Siemens AG
-- *
-- * Written by:
-- * Alexander Smirnov <alex.bluesman.smirnov@gmail.com>
-- *
-- * Based on the code from 'linux-zigbee.sourceforge.net' project.
+- * Copyright 2007, 2008, 2009 Siemens AG
 - *
 - * This program is free software; you can redistribute it and/or modify
 - * it under the terms of the GNU General Public License version 2
@@ -68,818 +105,133 @@ index adb3f76..0000000
 - * You should have received a copy of the GNU General Public License along
 - * with this program; if not, write to the Free Software Foundation, Inc.,
 - * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+- *
+- * Written by:
+- * Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+- * Sergey Lapin <slapin@ossfans.org>
+- * Maxim Gorbachyov <maxim.gorbachev@siemens.com>
+- * Alexander Smirnov <alex.bluesman.smirnov@gmail.com>
 - */
 -
--#include <linux/kernel.h>
--#include <linux/module.h>
 -#include <linux/netdevice.h>
+-#include <linux/skbuff.h>
+-#include <linux/if_arp.h>
+-#include <linux/crc-ccitt.h>
 -
--#include <net/netlink.h>
--#include <linux/nl802154.h>
+-#include <net/ieee802154.h>
 -#include <net/mac802154.h>
--#include <net/ieee802154_netdev.h>
--#include <net/route.h>
+-#include <net/netlink.h>
 -#include <net/wpan-phy.h>
+-#include <linux/nl802154.h>
 -
 -#include "mac802154.h"
 -
--int mac802154_slave_open(struct net_device *dev)
--{
--	struct mac802154_sub_if_data *priv = netdev_priv(dev);
--	struct mac802154_sub_if_data *subif;
--	struct mac802154_priv *ipriv = priv->hw;
--	int res = 0;
--
--	ASSERT_RTNL();
--
--	if (priv->type == IEEE802154_DEV_WPAN) {
--		mutex_lock(&priv->hw->slaves_mtx);
--		list_for_each_entry(subif, &priv->hw->slaves, list) {
--			if (subif != priv && subif->type == priv->type &&
--			    subif->running) {
--				mutex_unlock(&priv->hw->slaves_mtx);
--				return -EBUSY;
--			}
--		}
--		mutex_unlock(&priv->hw->slaves_mtx);
--	}
--
--	mutex_lock(&priv->hw->slaves_mtx);
--	priv->running = true;
--	mutex_unlock(&priv->hw->slaves_mtx);
--
--	if (ipriv->open_count++ == 0) {
--		res = ipriv->ops->start(&ipriv->hw);
--		WARN_ON(res);
--		if (res)
--			goto err;
--	}
--
--	if (ipriv->ops->ieee_addr) {
--		__le64 addr = ieee802154_devaddr_from_raw(dev->dev_addr);
--
--		res = ipriv->ops->ieee_addr(&ipriv->hw, addr);
--		WARN_ON(res);
--		if (res)
--			goto err;
--		mac802154_dev_set_ieee_addr(dev);
--	}
--
--	netif_start_queue(dev);
--	return 0;
--err:
--	priv->hw->open_count--;
--
--	return res;
--}
--
--int mac802154_slave_close(struct net_device *dev)
--{
--	struct mac802154_sub_if_data *priv = netdev_priv(dev);
--	struct mac802154_priv *ipriv = priv->hw;
--
--	ASSERT_RTNL();
--
--	netif_stop_queue(dev);
--
--	mutex_lock(&priv->hw->slaves_mtx);
--	priv->running = false;
--	mutex_unlock(&priv->hw->slaves_mtx);
--
--	if (!--ipriv->open_count)
--		ipriv->ops->stop(&ipriv->hw);
--
--	return 0;
--}
--
--static int
--mac802154_netdev_register(struct wpan_phy *phy, struct net_device *dev)
+-static netdev_tx_t mac802154_monitor_xmit(struct sk_buff *skb,
+-					  struct net_device *dev)
 -{
 -	struct mac802154_sub_if_data *priv;
--	struct mac802154_priv *ipriv;
--	int err;
--
--	ipriv = wpan_phy_priv(phy);
+-	u8 chan, page;
 -
 -	priv = netdev_priv(dev);
--	priv->dev = dev;
--	priv->hw = ipriv;
 -
--	dev->needed_headroom = ipriv->hw.extra_tx_headroom;
+-	/* FIXME: locking */
+-	chan = priv->hw->phy->current_channel;
+-	page = priv->hw->phy->current_page;
 -
--	SET_NETDEV_DEV(dev, &ipriv->phy->dev);
+-	if (chan == MAC802154_CHAN_NONE) /* not initialized */
+-		return NETDEV_TX_OK;
 -
--	mutex_lock(&ipriv->slaves_mtx);
--	if (!ipriv->running) {
--		mutex_unlock(&ipriv->slaves_mtx);
--		return -ENODEV;
--	}
--	mutex_unlock(&ipriv->slaves_mtx);
+-	if (WARN_ON(page >= WPAN_NUM_PAGES) ||
+-	    WARN_ON(chan >= WPAN_NUM_CHANNELS))
+-		return NETDEV_TX_OK;
 -
--	err = register_netdev(dev);
--	if (err < 0)
--		return err;
+-	skb->skb_iif = dev->ifindex;
+-	dev->stats.tx_packets++;
+-	dev->stats.tx_bytes += skb->len;
 -
--	rtnl_lock();
--	mutex_lock(&ipriv->slaves_mtx);
--	list_add_tail_rcu(&priv->list, &ipriv->slaves);
--	mutex_unlock(&ipriv->slaves_mtx);
--	rtnl_unlock();
--
--	return 0;
+-	return mac802154_tx(priv->hw, skb, page, chan);
 -}
 -
--static void
--mac802154_del_iface(struct wpan_phy *phy, struct net_device *dev)
+-
+-void mac802154_monitors_rx(struct mac802154_priv *priv, struct sk_buff *skb)
 -{
+-	struct sk_buff *skb2;
 -	struct mac802154_sub_if_data *sdata;
+-	u16 crc = crc_ccitt(0, skb->data, skb->len);
+-	u8 *data;
 -
--	ASSERT_RTNL();
+-	rcu_read_lock();
+-	list_for_each_entry_rcu(sdata, &priv->slaves, list) {
+-		if (sdata->type != IEEE802154_DEV_MONITOR ||
+-		    !netif_running(sdata->dev))
+-			continue;
 -
--	sdata = netdev_priv(dev);
+-		skb2 = skb_clone(skb, GFP_ATOMIC);
+-		skb2->dev = sdata->dev;
+-		skb2->pkt_type = PACKET_HOST;
+-		data = skb_put(skb2, 2);
+-		data[0] = crc & 0xff;
+-		data[1] = crc >> 8;
 -
--	BUG_ON(sdata->hw->phy != phy);
--
--	mutex_lock(&sdata->hw->slaves_mtx);
--	list_del_rcu(&sdata->list);
--	mutex_unlock(&sdata->hw->slaves_mtx);
--
--	synchronize_rcu();
--	unregister_netdevice(sdata->dev);
--}
--
--static struct net_device *
--mac802154_add_iface(struct wpan_phy *phy, const char *name, int type)
--{
--	struct net_device *dev;
--	int err = -ENOMEM;
--
--	switch (type) {
--	case IEEE802154_DEV_MONITOR:
--		dev = alloc_netdev(sizeof(struct mac802154_sub_if_data),
--				   name, NET_NAME_UNKNOWN,
--				   mac802154_monitor_setup);
--		break;
--	case IEEE802154_DEV_WPAN:
--		dev = alloc_netdev(sizeof(struct mac802154_sub_if_data),
--				   name, NET_NAME_UNKNOWN,
--				   mac802154_wpan_setup);
--		break;
--	default:
--		dev = NULL;
--		err = -EINVAL;
--		break;
+-		netif_rx_ni(skb2);
 -	}
--	if (!dev)
--		goto err;
--
--	err = mac802154_netdev_register(phy, dev);
--	if (err)
--		goto err_free;
--
--	dev_hold(dev); /* we return an incremented device refcount */
--	return dev;
--
--err_free:
--	free_netdev(dev);
--err:
--	return ERR_PTR(err);
+-	rcu_read_unlock();
 -}
 -
--static int mac802154_set_txpower(struct wpan_phy *phy, int db)
+-static const struct net_device_ops mac802154_monitor_ops = {
+-	.ndo_open		= mac802154_slave_open,
+-	.ndo_stop		= mac802154_slave_close,
+-	.ndo_start_xmit		= mac802154_monitor_xmit,
+-};
+-
+-void mac802154_monitor_setup(struct net_device *dev)
 -{
--	struct mac802154_priv *priv = wpan_phy_priv(phy);
+-	struct mac802154_sub_if_data *priv;
 -
--	return priv->ops->set_txpower(&priv->hw, db);
+-	dev->addr_len		= 0;
+-	dev->hard_header_len	= 0;
+-	dev->needed_tailroom	= 2; /* room for FCS */
+-	dev->mtu		= IEEE802154_MTU;
+-	dev->tx_queue_len	= 10;
+-	dev->type		= ARPHRD_IEEE802154_MONITOR;
+-	dev->flags		= IFF_NOARP | IFF_BROADCAST;
+-	dev->watchdog_timeo	= 0;
+-
+-	dev->destructor		= free_netdev;
+-	dev->netdev_ops		= &mac802154_monitor_ops;
+-	dev->ml_priv		= &mac802154_mlme_reduced;
+-
+-	priv = netdev_priv(dev);
+-	priv->type = IEEE802154_DEV_MONITOR;
+-
+-	priv->chan = MAC802154_CHAN_NONE; /* not initialized */
+-	priv->page = 0;
 -}
+diff --git a/net/mac802154/rx.c b/net/mac802154/rx.c
+index 574290d..48f1523 100644
+--- a/net/mac802154/rx.c
++++ b/net/mac802154/rx.c
+@@ -74,7 +74,6 @@ mac802154_subif_rx(struct ieee802154_hw *hw, struct sk_buff *skb, u8 lqi)
+ 		skb_trim(skb, skb->len - 2); /* CRC */
+ 	}
+ 
+-	mac802154_monitors_rx(priv, skb);
+ 	mac802154_wpans_rx(priv, skb);
+ 
+ 	return;
+diff --git a/net/mac802154/tx.c b/net/mac802154/tx.c
+index fdf4c0e6..bacb6ce 100644
+--- a/net/mac802154/tx.c
++++ b/net/mac802154/tx.c
+@@ -92,8 +92,6 @@ netdev_tx_t mac802154_tx(struct mac802154_priv *priv, struct sk_buff *skb,
+ 		goto err_tx;
+ 	}
+ 
+-	mac802154_monitors_rx(mac802154_to_priv(&priv->hw), skb);
 -
--static int mac802154_set_lbt(struct wpan_phy *phy, bool on)
--{
--	struct mac802154_priv *priv = wpan_phy_priv(phy);
--
--	return priv->ops->set_lbt(&priv->hw, on);
--}
--
--static int mac802154_set_cca_mode(struct wpan_phy *phy, u8 mode)
--{
--	struct mac802154_priv *priv = wpan_phy_priv(phy);
--
--	return priv->ops->set_cca_mode(&priv->hw, mode);
--}
--
--static int mac802154_set_cca_ed_level(struct wpan_phy *phy, s32 level)
--{
--	struct mac802154_priv *priv = wpan_phy_priv(phy);
--
--	return priv->ops->set_cca_ed_level(&priv->hw, level);
--}
--
--static int mac802154_set_csma_params(struct wpan_phy *phy, u8 min_be,
--				     u8 max_be, u8 retries)
--{
--	struct mac802154_priv *priv = wpan_phy_priv(phy);
--
--	return priv->ops->set_csma_params(&priv->hw, min_be, max_be, retries);
--}
--
--static int mac802154_set_frame_retries(struct wpan_phy *phy, s8 retries)
--{
--	struct mac802154_priv *priv = wpan_phy_priv(phy);
--
--	return priv->ops->set_frame_retries(&priv->hw, retries);
--}
--
--struct ieee802154_hw *
--ieee802154_alloc_hw(size_t priv_data_len, struct ieee802154_ops *ops)
--{
--	struct wpan_phy *phy;
--	struct mac802154_priv *priv;
--	size_t priv_size;
--
--	if (!ops || !ops->xmit || !ops->ed || !ops->start ||
--	    !ops->stop || !ops->set_channel) {
--		pr_err("undefined IEEE802.15.4 device operations\n");
--		return NULL;
--	}
--
--	/* Ensure 32-byte alignment of our private data and hw private data.
--	 * We use the wpan_phy priv data for both our mac802154_priv and for
--	 * the driver's private data
--	 *
--	 * in memory it'll be like this:
--	 *
--	 * +-----------------------+
--	 * | struct wpan_phy       |
--	 * +-----------------------+
--	 * | struct mac802154_priv |
--	 * +-----------------------+
--	 * | driver's private data |
--	 * +-----------------------+
--	 *
--	 * Due to ieee802154 layer isn't aware of driver and MAC structures,
--	 * so lets allign them here.
--	 */
--
--	priv_size = ALIGN(sizeof(*priv), NETDEV_ALIGN) + priv_data_len;
--
--	phy = wpan_phy_alloc(priv_size);
--	if (!phy) {
--		pr_err("failure to allocate master IEEE802.15.4 device\n");
--		return NULL;
--	}
--
--	priv = wpan_phy_priv(phy);
--	priv->phy = phy;
--	priv->hw.phy = priv->phy;
--	priv->hw.priv = (char *)priv + ALIGN(sizeof(*priv), NETDEV_ALIGN);
--	priv->ops = ops;
--
--	INIT_LIST_HEAD(&priv->slaves);
--	mutex_init(&priv->slaves_mtx);
--
--	return &priv->hw;
--}
--EXPORT_SYMBOL(ieee802154_alloc_hw);
--
--void ieee802154_free_hw(struct ieee802154_hw *hw)
--{
--	struct mac802154_priv *priv = mac802154_to_priv(hw);
--
--	BUG_ON(!list_empty(&priv->slaves));
--
--	mutex_destroy(&priv->slaves_mtx);
--
--	wpan_phy_free(priv->phy);
--}
--EXPORT_SYMBOL(ieee802154_free_hw);
--
--int ieee802154_register_hw(struct ieee802154_hw *hw)
--{
--	struct mac802154_priv *priv = mac802154_to_priv(hw);
--	int rc = -ENOSYS;
--
--	if (hw->flags & IEEE802154_HW_TXPOWER) {
--		if (!priv->ops->set_txpower)
--			goto out;
--
--		priv->phy->set_txpower = mac802154_set_txpower;
--	}
--
--	if (hw->flags & IEEE802154_HW_LBT) {
--		if (!priv->ops->set_lbt)
--			goto out;
--
--		priv->phy->set_lbt = mac802154_set_lbt;
--	}
--
--	if (hw->flags & IEEE802154_HW_CCA_MODE) {
--		if (!priv->ops->set_cca_mode)
--			goto out;
--
--		priv->phy->set_cca_mode = mac802154_set_cca_mode;
--	}
--
--	if (hw->flags & IEEE802154_HW_CCA_ED_LEVEL) {
--		if (!priv->ops->set_cca_ed_level)
--			goto out;
--
--		priv->phy->set_cca_ed_level = mac802154_set_cca_ed_level;
--	}
--
--	if (hw->flags & IEEE802154_HW_CSMA_PARAMS) {
--		if (!priv->ops->set_csma_params)
--			goto out;
--
--		priv->phy->set_csma_params = mac802154_set_csma_params;
--	}
--
--	if (hw->flags & IEEE802154_HW_FRAME_RETRIES) {
--		if (!priv->ops->set_frame_retries)
--			goto out;
--
--		priv->phy->set_frame_retries = mac802154_set_frame_retries;
--	}
--
--	priv->dev_workqueue =
--		create_singlethread_workqueue(wpan_phy_name(priv->phy));
--	if (!priv->dev_workqueue) {
--		rc = -ENOMEM;
--		goto out;
--	}
--
--	wpan_phy_set_dev(priv->phy, priv->hw.parent);
--
--	priv->phy->add_iface = mac802154_add_iface;
--	priv->phy->del_iface = mac802154_del_iface;
--
--	rc = wpan_phy_register(priv->phy);
--	if (rc < 0)
--		goto out_wq;
--
--	rtnl_lock();
--
--	mutex_lock(&priv->slaves_mtx);
--	priv->running = MAC802154_DEVICE_RUN;
--	mutex_unlock(&priv->slaves_mtx);
--
--	rtnl_unlock();
--
--	return 0;
--
--out_wq:
--	destroy_workqueue(priv->dev_workqueue);
--out:
--	return rc;
--}
--EXPORT_SYMBOL(ieee802154_register_hw);
--
--void ieee802154_unregister_hw(struct ieee802154_hw *hw)
--{
--	struct mac802154_priv *priv = mac802154_to_priv(hw);
--	struct mac802154_sub_if_data *sdata, *next;
--
--	flush_workqueue(priv->dev_workqueue);
--	destroy_workqueue(priv->dev_workqueue);
--
--	rtnl_lock();
--
--	mutex_lock(&priv->slaves_mtx);
--	priv->running = MAC802154_DEVICE_STOPPED;
--	mutex_unlock(&priv->slaves_mtx);
--
--	list_for_each_entry_safe(sdata, next, &priv->slaves, list) {
--		mutex_lock(&sdata->hw->slaves_mtx);
--		list_del(&sdata->list);
--		mutex_unlock(&sdata->hw->slaves_mtx);
--
--		unregister_netdevice(sdata->dev);
--	}
--
--	rtnl_unlock();
--
--	wpan_phy_unregister(priv->phy);
--}
--EXPORT_SYMBOL(ieee802154_unregister_hw);
--
--MODULE_DESCRIPTION("IEEE 802.15.4 implementation");
--MODULE_LICENSE("GPL v2");
-diff --git a/net/mac802154/main.c b/net/mac802154/main.c
-new file mode 100644
-index 0000000..645a994
---- /dev/null
-+++ b/net/mac802154/main.c
-@@ -0,0 +1,411 @@
-+/*
-+ * Copyright (C) 2007-2012 Siemens AG
-+ *
-+ * Written by:
-+ * Alexander Smirnov <alex.bluesman.smirnov@gmail.com>
-+ *
-+ * Based on the code from 'linux-zigbee.sourceforge.net' project.
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2
-+ * as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ */
-+
-+#include <linux/kernel.h>
-+#include <linux/module.h>
-+#include <linux/netdevice.h>
-+
-+#include <net/netlink.h>
-+#include <linux/nl802154.h>
-+#include <net/mac802154.h>
-+#include <net/ieee802154_netdev.h>
-+#include <net/route.h>
-+#include <net/wpan-phy.h>
-+
-+#include "mac802154.h"
-+
-+int mac802154_slave_open(struct net_device *dev)
-+{
-+	struct mac802154_sub_if_data *priv = netdev_priv(dev);
-+	struct mac802154_sub_if_data *subif;
-+	struct mac802154_priv *ipriv = priv->hw;
-+	int res = 0;
-+
-+	ASSERT_RTNL();
-+
-+	if (priv->type == IEEE802154_DEV_WPAN) {
-+		mutex_lock(&priv->hw->slaves_mtx);
-+		list_for_each_entry(subif, &priv->hw->slaves, list) {
-+			if (subif != priv && subif->type == priv->type &&
-+			    subif->running) {
-+				mutex_unlock(&priv->hw->slaves_mtx);
-+				return -EBUSY;
-+			}
-+		}
-+		mutex_unlock(&priv->hw->slaves_mtx);
-+	}
-+
-+	mutex_lock(&priv->hw->slaves_mtx);
-+	priv->running = true;
-+	mutex_unlock(&priv->hw->slaves_mtx);
-+
-+	if (ipriv->open_count++ == 0) {
-+		res = ipriv->ops->start(&ipriv->hw);
-+		WARN_ON(res);
-+		if (res)
-+			goto err;
-+	}
-+
-+	if (ipriv->ops->ieee_addr) {
-+		__le64 addr = ieee802154_devaddr_from_raw(dev->dev_addr);
-+
-+		res = ipriv->ops->ieee_addr(&ipriv->hw, addr);
-+		WARN_ON(res);
-+		if (res)
-+			goto err;
-+		mac802154_dev_set_ieee_addr(dev);
-+	}
-+
-+	netif_start_queue(dev);
-+	return 0;
-+err:
-+	priv->hw->open_count--;
-+
-+	return res;
-+}
-+
-+int mac802154_slave_close(struct net_device *dev)
-+{
-+	struct mac802154_sub_if_data *priv = netdev_priv(dev);
-+	struct mac802154_priv *ipriv = priv->hw;
-+
-+	ASSERT_RTNL();
-+
-+	netif_stop_queue(dev);
-+
-+	mutex_lock(&priv->hw->slaves_mtx);
-+	priv->running = false;
-+	mutex_unlock(&priv->hw->slaves_mtx);
-+
-+	if (!--ipriv->open_count)
-+		ipriv->ops->stop(&ipriv->hw);
-+
-+	return 0;
-+}
-+
-+static int
-+mac802154_netdev_register(struct wpan_phy *phy, struct net_device *dev)
-+{
-+	struct mac802154_sub_if_data *priv;
-+	struct mac802154_priv *ipriv;
-+	int err;
-+
-+	ipriv = wpan_phy_priv(phy);
-+
-+	priv = netdev_priv(dev);
-+	priv->dev = dev;
-+	priv->hw = ipriv;
-+
-+	dev->needed_headroom = ipriv->hw.extra_tx_headroom;
-+
-+	SET_NETDEV_DEV(dev, &ipriv->phy->dev);
-+
-+	mutex_lock(&ipriv->slaves_mtx);
-+	if (!ipriv->running) {
-+		mutex_unlock(&ipriv->slaves_mtx);
-+		return -ENODEV;
-+	}
-+	mutex_unlock(&ipriv->slaves_mtx);
-+
-+	err = register_netdev(dev);
-+	if (err < 0)
-+		return err;
-+
-+	rtnl_lock();
-+	mutex_lock(&ipriv->slaves_mtx);
-+	list_add_tail_rcu(&priv->list, &ipriv->slaves);
-+	mutex_unlock(&ipriv->slaves_mtx);
-+	rtnl_unlock();
-+
-+	return 0;
-+}
-+
-+static void
-+mac802154_del_iface(struct wpan_phy *phy, struct net_device *dev)
-+{
-+	struct mac802154_sub_if_data *sdata;
-+
-+	ASSERT_RTNL();
-+
-+	sdata = netdev_priv(dev);
-+
-+	BUG_ON(sdata->hw->phy != phy);
-+
-+	mutex_lock(&sdata->hw->slaves_mtx);
-+	list_del_rcu(&sdata->list);
-+	mutex_unlock(&sdata->hw->slaves_mtx);
-+
-+	synchronize_rcu();
-+	unregister_netdevice(sdata->dev);
-+}
-+
-+static struct net_device *
-+mac802154_add_iface(struct wpan_phy *phy, const char *name, int type)
-+{
-+	struct net_device *dev;
-+	int err = -ENOMEM;
-+
-+	switch (type) {
-+	case IEEE802154_DEV_MONITOR:
-+		dev = alloc_netdev(sizeof(struct mac802154_sub_if_data),
-+				   name, NET_NAME_UNKNOWN,
-+				   mac802154_monitor_setup);
-+		break;
-+	case IEEE802154_DEV_WPAN:
-+		dev = alloc_netdev(sizeof(struct mac802154_sub_if_data),
-+				   name, NET_NAME_UNKNOWN,
-+				   mac802154_wpan_setup);
-+		break;
-+	default:
-+		dev = NULL;
-+		err = -EINVAL;
-+		break;
-+	}
-+	if (!dev)
-+		goto err;
-+
-+	err = mac802154_netdev_register(phy, dev);
-+	if (err)
-+		goto err_free;
-+
-+	dev_hold(dev); /* we return an incremented device refcount */
-+	return dev;
-+
-+err_free:
-+	free_netdev(dev);
-+err:
-+	return ERR_PTR(err);
-+}
-+
-+static int mac802154_set_txpower(struct wpan_phy *phy, int db)
-+{
-+	struct mac802154_priv *priv = wpan_phy_priv(phy);
-+
-+	return priv->ops->set_txpower(&priv->hw, db);
-+}
-+
-+static int mac802154_set_lbt(struct wpan_phy *phy, bool on)
-+{
-+	struct mac802154_priv *priv = wpan_phy_priv(phy);
-+
-+	return priv->ops->set_lbt(&priv->hw, on);
-+}
-+
-+static int mac802154_set_cca_mode(struct wpan_phy *phy, u8 mode)
-+{
-+	struct mac802154_priv *priv = wpan_phy_priv(phy);
-+
-+	return priv->ops->set_cca_mode(&priv->hw, mode);
-+}
-+
-+static int mac802154_set_cca_ed_level(struct wpan_phy *phy, s32 level)
-+{
-+	struct mac802154_priv *priv = wpan_phy_priv(phy);
-+
-+	return priv->ops->set_cca_ed_level(&priv->hw, level);
-+}
-+
-+static int mac802154_set_csma_params(struct wpan_phy *phy, u8 min_be,
-+				     u8 max_be, u8 retries)
-+{
-+	struct mac802154_priv *priv = wpan_phy_priv(phy);
-+
-+	return priv->ops->set_csma_params(&priv->hw, min_be, max_be, retries);
-+}
-+
-+static int mac802154_set_frame_retries(struct wpan_phy *phy, s8 retries)
-+{
-+	struct mac802154_priv *priv = wpan_phy_priv(phy);
-+
-+	return priv->ops->set_frame_retries(&priv->hw, retries);
-+}
-+
-+struct ieee802154_hw *
-+ieee802154_alloc_hw(size_t priv_data_len, struct ieee802154_ops *ops)
-+{
-+	struct wpan_phy *phy;
-+	struct mac802154_priv *priv;
-+	size_t priv_size;
-+
-+	if (!ops || !ops->xmit || !ops->ed || !ops->start ||
-+	    !ops->stop || !ops->set_channel) {
-+		pr_err("undefined IEEE802.15.4 device operations\n");
-+		return NULL;
-+	}
-+
-+	/* Ensure 32-byte alignment of our private data and hw private data.
-+	 * We use the wpan_phy priv data for both our mac802154_priv and for
-+	 * the driver's private data
-+	 *
-+	 * in memory it'll be like this:
-+	 *
-+	 * +-----------------------+
-+	 * | struct wpan_phy       |
-+	 * +-----------------------+
-+	 * | struct mac802154_priv |
-+	 * +-----------------------+
-+	 * | driver's private data |
-+	 * +-----------------------+
-+	 *
-+	 * Due to ieee802154 layer isn't aware of driver and MAC structures,
-+	 * so lets allign them here.
-+	 */
-+
-+	priv_size = ALIGN(sizeof(*priv), NETDEV_ALIGN) + priv_data_len;
-+
-+	phy = wpan_phy_alloc(priv_size);
-+	if (!phy) {
-+		pr_err("failure to allocate master IEEE802.15.4 device\n");
-+		return NULL;
-+	}
-+
-+	priv = wpan_phy_priv(phy);
-+	priv->phy = phy;
-+	priv->hw.phy = priv->phy;
-+	priv->hw.priv = (char *)priv + ALIGN(sizeof(*priv), NETDEV_ALIGN);
-+	priv->ops = ops;
-+
-+	INIT_LIST_HEAD(&priv->slaves);
-+	mutex_init(&priv->slaves_mtx);
-+
-+	return &priv->hw;
-+}
-+EXPORT_SYMBOL(ieee802154_alloc_hw);
-+
-+void ieee802154_free_hw(struct ieee802154_hw *hw)
-+{
-+	struct mac802154_priv *priv = mac802154_to_priv(hw);
-+
-+	BUG_ON(!list_empty(&priv->slaves));
-+
-+	mutex_destroy(&priv->slaves_mtx);
-+
-+	wpan_phy_free(priv->phy);
-+}
-+EXPORT_SYMBOL(ieee802154_free_hw);
-+
-+int ieee802154_register_hw(struct ieee802154_hw *hw)
-+{
-+	struct mac802154_priv *priv = mac802154_to_priv(hw);
-+	int rc = -ENOSYS;
-+
-+	if (hw->flags & IEEE802154_HW_TXPOWER) {
-+		if (!priv->ops->set_txpower)
-+			goto out;
-+
-+		priv->phy->set_txpower = mac802154_set_txpower;
-+	}
-+
-+	if (hw->flags & IEEE802154_HW_LBT) {
-+		if (!priv->ops->set_lbt)
-+			goto out;
-+
-+		priv->phy->set_lbt = mac802154_set_lbt;
-+	}
-+
-+	if (hw->flags & IEEE802154_HW_CCA_MODE) {
-+		if (!priv->ops->set_cca_mode)
-+			goto out;
-+
-+		priv->phy->set_cca_mode = mac802154_set_cca_mode;
-+	}
-+
-+	if (hw->flags & IEEE802154_HW_CCA_ED_LEVEL) {
-+		if (!priv->ops->set_cca_ed_level)
-+			goto out;
-+
-+		priv->phy->set_cca_ed_level = mac802154_set_cca_ed_level;
-+	}
-+
-+	if (hw->flags & IEEE802154_HW_CSMA_PARAMS) {
-+		if (!priv->ops->set_csma_params)
-+			goto out;
-+
-+		priv->phy->set_csma_params = mac802154_set_csma_params;
-+	}
-+
-+	if (hw->flags & IEEE802154_HW_FRAME_RETRIES) {
-+		if (!priv->ops->set_frame_retries)
-+			goto out;
-+
-+		priv->phy->set_frame_retries = mac802154_set_frame_retries;
-+	}
-+
-+	priv->dev_workqueue =
-+		create_singlethread_workqueue(wpan_phy_name(priv->phy));
-+	if (!priv->dev_workqueue) {
-+		rc = -ENOMEM;
-+		goto out;
-+	}
-+
-+	wpan_phy_set_dev(priv->phy, priv->hw.parent);
-+
-+	priv->phy->add_iface = mac802154_add_iface;
-+	priv->phy->del_iface = mac802154_del_iface;
-+
-+	rc = wpan_phy_register(priv->phy);
-+	if (rc < 0)
-+		goto out_wq;
-+
-+	rtnl_lock();
-+
-+	mutex_lock(&priv->slaves_mtx);
-+	priv->running = MAC802154_DEVICE_RUN;
-+	mutex_unlock(&priv->slaves_mtx);
-+
-+	rtnl_unlock();
-+
-+	return 0;
-+
-+out_wq:
-+	destroy_workqueue(priv->dev_workqueue);
-+out:
-+	return rc;
-+}
-+EXPORT_SYMBOL(ieee802154_register_hw);
-+
-+void ieee802154_unregister_hw(struct ieee802154_hw *hw)
-+{
-+	struct mac802154_priv *priv = mac802154_to_priv(hw);
-+	struct mac802154_sub_if_data *sdata, *next;
-+
-+	flush_workqueue(priv->dev_workqueue);
-+	destroy_workqueue(priv->dev_workqueue);
-+
-+	rtnl_lock();
-+
-+	mutex_lock(&priv->slaves_mtx);
-+	priv->running = MAC802154_DEVICE_STOPPED;
-+	mutex_unlock(&priv->slaves_mtx);
-+
-+	list_for_each_entry_safe(sdata, next, &priv->slaves, list) {
-+		mutex_lock(&sdata->hw->slaves_mtx);
-+		list_del(&sdata->list);
-+		mutex_unlock(&sdata->hw->slaves_mtx);
-+
-+		unregister_netdevice(sdata->dev);
-+	}
-+
-+	rtnl_unlock();
-+
-+	wpan_phy_unregister(priv->phy);
-+}
-+EXPORT_SYMBOL(ieee802154_unregister_hw);
-+
-+MODULE_DESCRIPTION("IEEE 802.15.4 implementation");
-+MODULE_LICENSE("GPL v2");
+ 	if (!(priv->hw.flags & IEEE802154_HW_OMIT_CKSUM)) {
+ 		u16 crc = crc_ccitt(0, skb->data, skb->len);
+ 		u8 *data = skb_put(skb, 2);
 -- 
 2.0.3
 
