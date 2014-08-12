@@ -1,482 +1,314 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-la0-f46.google.com ([209.85.215.46]:57363 "EHLO
-	mail-la0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752246AbaHLNOl (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Tue, 12 Aug 2014 09:14:41 -0400
-Received: by mail-la0-f46.google.com with SMTP id b8so7988188lan.33
-        for <linux-wpan@vger.kernel.org>; Tue, 12 Aug 2014 06:14:39 -0700 (PDT)
+Received: from mail-la0-f42.google.com ([209.85.215.42]:59258 "EHLO
+	mail-la0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752303AbaHLNOm (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Tue, 12 Aug 2014 09:14:42 -0400
+Received: by mail-la0-f42.google.com with SMTP id pv20so7917483lab.1
+        for <linux-wpan@vger.kernel.org>; Tue, 12 Aug 2014 06:14:40 -0700 (PDT)
 From: Alexander Aring <alex.aring@gmail.com>
-Date: Tue, 12 Aug 2014 15:14:12 +0200
-Message-Id: <1407849255-11500-9-git-send-email-alex.aring@gmail.com>
+Date: Tue, 12 Aug 2014 15:14:13 +0200
+Message-Id: <1407849255-11500-10-git-send-email-alex.aring@gmail.com>
 In-Reply-To: <1407849255-11500-1-git-send-email-alex.aring@gmail.com>
 References: <1407849255-11500-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-Subject: [PATCH wpan-next 08/11] mac802154: rename mac802154.h to ieee802154_i.h
+Subject: [PATCH wpan-next 09/11] mac802154: rename hw subif_data variable to local
 To: linux-wpan@vger.kernel.org
 Cc: Alexander Aring <alex.aring@gmail.com>
 
-This patch name the mac802154.h INTERNAL header to ieee802154_i.h like
-wireless stack. This avoids confusing with the not internal header
-net/mac802154.h header.
+This patch renames the hw attribute in struct ieee802154_sub_if_data to
+local. This avoid confusing with the struct ieee802154_hw hw; inside of
+local struct.
 
 This patch is part of getting wireless feeling into the ieee802154
 implementation.
 
 Signed-off-by: Alexander Aring <alex.aring@gmail.com>
 ---
- net/mac802154/ieee802154_i.h | 167 ++++++++++++++++++++++++++++++++++++++++++
- net/mac802154/llsec.c        |   2 +-
- net/mac802154/mac802154.h    | 169 -------------------------------------------
- net/mac802154/mac_cmd.c      |   2 +-
- net/mac802154/main.c         |   2 +-
- net/mac802154/mib.c          |   2 +-
- net/mac802154/rx.c           |   2 +-
- net/mac802154/tx.c           |   2 +-
- net/mac802154/wpan.c         |   2 +-
- 9 files changed, 174 insertions(+), 176 deletions(-)
- create mode 100644 net/mac802154/ieee802154_i.h
- delete mode 100644 net/mac802154/mac802154.h
+ net/mac802154/ieee802154_i.h |  2 +-
+ net/mac802154/mac_cmd.c      |  2 +-
+ net/mac802154/main.c         | 34 +++++++++++++++++-----------------
+ net/mac802154/mib.c          | 38 +++++++++++++++++++-------------------
+ net/mac802154/wpan.c         | 12 ++++++------
+ 5 files changed, 44 insertions(+), 44 deletions(-)
 
 diff --git a/net/mac802154/ieee802154_i.h b/net/mac802154/ieee802154_i.h
-new file mode 100644
-index 0000000..e7a1b11
---- /dev/null
+index e7a1b11..2f0d995 100644
+--- a/net/mac802154/ieee802154_i.h
 +++ b/net/mac802154/ieee802154_i.h
-@@ -0,0 +1,167 @@
-+/*
-+ * Copyright (C) 2007-2012 Siemens AG
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2
-+ * as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * Written by:
-+ * Pavel Smolenskiy <pavel.smolenskiy@gmail.com>
-+ * Maxim Gorbachyov <maxim.gorbachev@siemens.com>
-+ * Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
-+ * Alexander Smirnov <alex.bluesman.smirnov@gmail.com>
-+ */
-+#ifndef __IEEE802154_I_H
-+#define __IEEE802154_I_H
-+
-+#include <linux/mutex.h>
-+#include <net/mac802154.h>
-+#include <net/ieee802154_netdev.h>
-+
-+#include "llsec.h"
-+
-+struct ieee802154_local;
-+
-+/* Slave interface definition.
-+ *
-+ * Slaves represent typical network interfaces available from userspace.
-+ * Each ieee802154 device/transceiver may have several slaves and able
-+ * to be associated with several networks at the same time.
-+ */
-+struct ieee802154_sub_if_data {
-+	struct list_head list; /* the ieee802154_priv->slaves list */
-+
-+	struct ieee802154_local *hw;
-+	struct net_device *dev;
-+
-+	int type;
-+	bool running;
-+
-+	spinlock_t mib_lock;
-+
-+	__le16 pan_id;
-+	__le16 short_addr;
-+	__le64 extended_addr;
-+
-+	u8 chan;
-+	u8 page;
-+
-+	struct ieee802154_mac_params mac_params;
-+
-+	/* MAC BSN field */
-+	u8 bsn;
-+	/* MAC DSN field */
-+	u8 dsn;
-+
-+	/* protects sec from concurrent access by netlink. access by
-+	 * encrypt/decrypt/header_create safe without additional protection.
-+	 */
-+	struct mutex sec_mtx;
-+
-+	struct mac802154_llsec sec;
-+};
-+
-+/* mac802154 device private data */
-+struct ieee802154_local {
-+	struct ieee802154_hw hw;
-+	struct ieee802154_ops *ops;
-+
-+	/* ieee802154 phy */
-+	struct wpan_phy *phy;
-+
-+	int open_count;
-+
-+	/* As in mac80211 slaves list is modified:
-+	 * 1) under the RTNL
-+	 * 2) protected by slaves_mtx;
-+	 * 3) in an RCU manner
-+	 *
-+	 * So atomic readers can use any of this protection methods.
-+	 */
-+	struct list_head	slaves;
-+	struct mutex		slaves_mtx;
-+
-+	/* This one is used for scanning and other jobs not to be interfered
-+	 * with serial driver.
-+	 */
-+	struct workqueue_struct	*dev_workqueue;
-+
-+	/* SoftMAC device is registered and running. One can add subinterfaces.
-+	 * This flag should be modified under slaves_mtx and RTNL, so you can
-+	 * read them using any of protection methods.
-+	 */
-+	bool running;
-+};
-+
-+#define	MAC802154_DEVICE_STOPPED	0x00
-+#define MAC802154_DEVICE_RUN		0x01
-+
-+#define mac802154_to_priv(_hw)	container_of(_hw, struct ieee802154_local, hw)
-+
-+#define MAC802154_CHAN_NONE		0xff /* No channel is assigned */
-+
-+extern struct ieee802154_reduced_mlme_ops mac802154_mlme_reduced;
-+extern struct ieee802154_mlme_ops mac802154_mlme_wpan;
-+
-+int mac802154_slave_open(struct net_device *dev);
-+int mac802154_slave_close(struct net_device *dev);
-+
-+void mac802154_wpans_rx(struct ieee802154_local *local, struct sk_buff *skb);
-+void mac802154_wpan_setup(struct net_device *dev);
-+
-+netdev_tx_t mac802154_tx(struct ieee802154_local *local, struct sk_buff *skb,
-+			 u8 page, u8 chan);
-+
-+/* MIB callbacks */
-+void mac802154_dev_set_short_addr(struct net_device *dev, __le16 val);
-+__le16 mac802154_dev_get_short_addr(const struct net_device *dev);
-+void mac802154_dev_set_ieee_addr(struct net_device *dev);
-+__le16 mac802154_dev_get_pan_id(const struct net_device *dev);
-+void mac802154_dev_set_pan_id(struct net_device *dev, __le16 val);
-+void mac802154_dev_set_page_channel(struct net_device *dev, u8 page, u8 chan);
-+u8 mac802154_dev_get_dsn(const struct net_device *dev);
-+
-+int mac802154_set_mac_params(struct net_device *dev,
-+			     const struct ieee802154_mac_params *params);
-+void mac802154_get_mac_params(struct net_device *dev,
-+			      struct ieee802154_mac_params *params);
-+
-+int mac802154_get_params(struct net_device *dev,
-+			 struct ieee802154_llsec_params *params);
-+int mac802154_set_params(struct net_device *dev,
-+			 const struct ieee802154_llsec_params *params,
-+			 int changed);
-+
-+int mac802154_add_key(struct net_device *dev,
-+		      const struct ieee802154_llsec_key_id *id,
-+		      const struct ieee802154_llsec_key *key);
-+int mac802154_del_key(struct net_device *dev,
-+		      const struct ieee802154_llsec_key_id *id);
-+
-+int mac802154_add_dev(struct net_device *dev,
-+		      const struct ieee802154_llsec_device *llsec_dev);
-+int mac802154_del_dev(struct net_device *dev, __le64 dev_addr);
-+
-+int mac802154_add_devkey(struct net_device *dev,
-+			 __le64 device_addr,
-+			 const struct ieee802154_llsec_device_key *key);
-+int mac802154_del_devkey(struct net_device *dev,
-+			 __le64 device_addr,
-+			 const struct ieee802154_llsec_device_key *key);
-+
-+int mac802154_add_seclevel(struct net_device *dev,
-+			   const struct ieee802154_llsec_seclevel *sl);
-+int mac802154_del_seclevel(struct net_device *dev,
-+			   const struct ieee802154_llsec_seclevel *sl);
-+
-+void mac802154_lock_table(struct net_device *dev);
-+void mac802154_get_table(struct net_device *dev,
-+			 struct ieee802154_llsec_table **t);
-+void mac802154_unlock_table(struct net_device *dev);
-+
-+#endif /* __IEEE802154_I_H */
-diff --git a/net/mac802154/llsec.c b/net/mac802154/llsec.c
-index 4570581..26f8761 100644
---- a/net/mac802154/llsec.c
-+++ b/net/mac802154/llsec.c
-@@ -20,7 +20,7 @@
- #include <net/ieee802154.h>
- #include <crypto/algapi.h>
+@@ -36,7 +36,7 @@ struct ieee802154_local;
+ struct ieee802154_sub_if_data {
+ 	struct list_head list; /* the ieee802154_priv->slaves list */
  
--#include "mac802154.h"
-+#include "ieee802154_i.h"
- #include "llsec.h"
- 
- static void llsec_key_put(struct mac802154_llsec_key *key);
-diff --git a/net/mac802154/mac802154.h b/net/mac802154/mac802154.h
-deleted file mode 100644
-index 9fe20cd..0000000
---- a/net/mac802154/mac802154.h
-+++ /dev/null
-@@ -1,169 +0,0 @@
--/*
-- * Copyright (C) 2007-2012 Siemens AG
-- *
-- * This program is free software; you can redistribute it and/or modify
-- * it under the terms of the GNU General Public License version 2
-- * as published by the Free Software Foundation.
-- *
-- * This program is distributed in the hope that it will be useful,
-- * but WITHOUT ANY WARRANTY; without even the implied warranty of
-- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- * GNU General Public License for more details.
-- *
-- * You should have received a copy of the GNU General Public License along
-- * with this program; if not, write to the Free Software Foundation, Inc.,
-- * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-- *
-- * Written by:
-- * Pavel Smolenskiy <pavel.smolenskiy@gmail.com>
-- * Maxim Gorbachyov <maxim.gorbachev@siemens.com>
-- * Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
-- * Alexander Smirnov <alex.bluesman.smirnov@gmail.com>
-- */
--#ifndef MAC802154_H
--#define MAC802154_H
--
--#include <linux/mutex.h>
--#include <net/mac802154.h>
--#include <net/ieee802154_netdev.h>
--
--#include "llsec.h"
--
--/* mac802154 device private data */
--struct ieee802154_local {
--	struct ieee802154_hw hw;
--	struct ieee802154_ops *ops;
--
--	/* ieee802154 phy */
--	struct wpan_phy *phy;
--
--	int open_count;
--
--	/* As in mac80211 slaves list is modified:
--	 * 1) under the RTNL
--	 * 2) protected by slaves_mtx;
--	 * 3) in an RCU manner
--	 *
--	 * So atomic readers can use any of this protection methods.
--	 */
--	struct list_head	slaves;
--	struct mutex		slaves_mtx;
--
--	/* This one is used for scanning and other jobs not to be interfered
--	 * with serial driver.
--	 */
--	struct workqueue_struct	*dev_workqueue;
--
--	/* SoftMAC device is registered and running. One can add subinterfaces.
--	 * This flag should be modified under slaves_mtx and RTNL, so you can
--	 * read them using any of protection methods.
--	 */
--	bool running;
--};
--
--#define	MAC802154_DEVICE_STOPPED	0x00
--#define MAC802154_DEVICE_RUN		0x01
--
--/* Slave interface definition.
-- *
-- * Slaves represent typical network interfaces available from userspace.
-- * Each ieee802154 device/transceiver may have several slaves and able
-- * to be associated with several networks at the same time.
-- */
--struct ieee802154_sub_if_data {
--	struct list_head list; /* the ieee802154_priv->slaves list */
--
 -	struct ieee802154_local *hw;
--	struct net_device *dev;
--
--	int type;
--	bool running;
--
--	spinlock_t mib_lock;
--
--	__le16 pan_id;
--	__le16 short_addr;
--	__le64 extended_addr;
--
--	u8 chan;
--	u8 page;
--
--	struct ieee802154_mac_params mac_params;
--
--	/* MAC BSN field */
--	u8 bsn;
--	/* MAC DSN field */
--	u8 dsn;
--
--	/* protects sec from concurrent access by netlink. access by
--	 * encrypt/decrypt/header_create safe without additional protection.
--	 */
--	struct mutex sec_mtx;
--
--	struct mac802154_llsec sec;
--};
--
--#define mac802154_to_priv(_hw)	container_of(_hw, struct ieee802154_local, hw)
--
--#define MAC802154_CHAN_NONE		0xff /* No channel is assigned */
--
--extern struct ieee802154_reduced_mlme_ops mac802154_mlme_reduced;
--extern struct ieee802154_mlme_ops mac802154_mlme_wpan;
--
--int mac802154_slave_open(struct net_device *dev);
--int mac802154_slave_close(struct net_device *dev);
--
--void mac802154_wpans_rx(struct ieee802154_local *local, struct sk_buff *skb);
--void mac802154_wpan_setup(struct net_device *dev);
--
--netdev_tx_t mac802154_tx(struct ieee802154_local *local, struct sk_buff *skb,
--			 u8 page, u8 chan);
--
--/* MIB callbacks */
--void mac802154_dev_set_short_addr(struct net_device *dev, __le16 val);
--__le16 mac802154_dev_get_short_addr(const struct net_device *dev);
--void mac802154_dev_set_ieee_addr(struct net_device *dev);
--__le16 mac802154_dev_get_pan_id(const struct net_device *dev);
--void mac802154_dev_set_pan_id(struct net_device *dev, __le16 val);
--void mac802154_dev_set_page_channel(struct net_device *dev, u8 page, u8 chan);
--u8 mac802154_dev_get_dsn(const struct net_device *dev);
--
--int mac802154_set_mac_params(struct net_device *dev,
--			     const struct ieee802154_mac_params *params);
--void mac802154_get_mac_params(struct net_device *dev,
--			      struct ieee802154_mac_params *params);
--
--int mac802154_get_params(struct net_device *dev,
--			 struct ieee802154_llsec_params *params);
--int mac802154_set_params(struct net_device *dev,
--			 const struct ieee802154_llsec_params *params,
--			 int changed);
--
--int mac802154_add_key(struct net_device *dev,
--		      const struct ieee802154_llsec_key_id *id,
--		      const struct ieee802154_llsec_key *key);
--int mac802154_del_key(struct net_device *dev,
--		      const struct ieee802154_llsec_key_id *id);
--
--int mac802154_add_dev(struct net_device *dev,
--		      const struct ieee802154_llsec_device *llsec_dev);
--int mac802154_del_dev(struct net_device *dev, __le64 dev_addr);
--
--int mac802154_add_devkey(struct net_device *dev,
--			 __le64 device_addr,
--			 const struct ieee802154_llsec_device_key *key);
--int mac802154_del_devkey(struct net_device *dev,
--			 __le64 device_addr,
--			 const struct ieee802154_llsec_device_key *key);
--
--int mac802154_add_seclevel(struct net_device *dev,
--			   const struct ieee802154_llsec_seclevel *sl);
--int mac802154_del_seclevel(struct net_device *dev,
--			   const struct ieee802154_llsec_seclevel *sl);
--
--void mac802154_lock_table(struct net_device *dev);
--void mac802154_get_table(struct net_device *dev,
--			 struct ieee802154_llsec_table **t);
--void mac802154_unlock_table(struct net_device *dev);
--
--#endif /* MAC802154_H */
++	struct ieee802154_local *local;
+ 	struct net_device *dev;
+ 
+ 	int type;
 diff --git a/net/mac802154/mac_cmd.c b/net/mac802154/mac_cmd.c
-index 08a6161..9dfa8ff 100644
+index 9dfa8ff..2abbc39 100644
 --- a/net/mac802154/mac_cmd.c
 +++ b/net/mac802154/mac_cmd.c
-@@ -31,7 +31,7 @@
- #include <net/mac802154.h>
- #include <net/nl802154.h>
+@@ -83,7 +83,7 @@ static struct wpan_phy *mac802154_get_phy(const struct net_device *dev)
  
--#include "mac802154.h"
-+#include "ieee802154_i.h"
+ 	BUG_ON(dev->type != ARPHRD_IEEE802154);
  
- static int mac802154_mlme_start_req(struct net_device *dev,
- 				    struct ieee802154_addr *addr,
+-	return to_phy(get_device(&sdata->hw->phy->dev));
++	return to_phy(get_device(&sdata->local->phy->dev));
+ }
+ 
+ static struct ieee802154_llsec_ops mac802154_llsec_ops = {
 diff --git a/net/mac802154/main.c b/net/mac802154/main.c
-index eb17dbc..9d90892 100644
+index 9d90892..6641707 100644
 --- a/net/mac802154/main.c
 +++ b/net/mac802154/main.c
-@@ -27,7 +27,7 @@
- #include <net/route.h>
- #include <net/wpan-phy.h>
- 
--#include "mac802154.h"
-+#include "ieee802154_i.h"
- 
- int mac802154_slave_open(struct net_device *dev)
+@@ -33,26 +33,26 @@ int mac802154_slave_open(struct net_device *dev)
  {
+ 	struct ieee802154_sub_if_data *sdata = netdev_priv(dev);
+ 	struct ieee802154_sub_if_data *subif;
+-	struct ieee802154_local *local = sdata->hw;
++	struct ieee802154_local *local = sdata->local;
+ 	int res = 0;
+ 
+ 	ASSERT_RTNL();
+ 
+ 	if (sdata->type == NL802154_IFTYPE_NODE) {
+-		mutex_lock(&sdata->hw->slaves_mtx);
+-		list_for_each_entry(subif, &sdata->hw->slaves, list) {
++		mutex_lock(&sdata->local->slaves_mtx);
++		list_for_each_entry(subif, &sdata->local->slaves, list) {
+ 			if (subif != sdata && subif->type == sdata->type &&
+ 			    subif->running) {
+-				mutex_unlock(&sdata->hw->slaves_mtx);
++				mutex_unlock(&sdata->local->slaves_mtx);
+ 				return -EBUSY;
+ 			}
+ 		}
+-		mutex_unlock(&sdata->hw->slaves_mtx);
++		mutex_unlock(&sdata->local->slaves_mtx);
+ 	}
+ 
+-	mutex_lock(&sdata->hw->slaves_mtx);
++	mutex_lock(&sdata->local->slaves_mtx);
+ 	sdata->running = true;
+-	mutex_unlock(&sdata->hw->slaves_mtx);
++	mutex_unlock(&sdata->local->slaves_mtx);
+ 
+ 	if (local->open_count++ == 0) {
+ 		res = local->ops->start(&local->hw);
+@@ -74,7 +74,7 @@ int mac802154_slave_open(struct net_device *dev)
+ 	netif_start_queue(dev);
+ 	return 0;
+ err:
+-	sdata->hw->open_count--;
++	sdata->local->open_count--;
+ 
+ 	return res;
+ }
+@@ -82,15 +82,15 @@ err:
+ int mac802154_slave_close(struct net_device *dev)
+ {
+ 	struct ieee802154_sub_if_data *sdata = netdev_priv(dev);
+-	struct ieee802154_local *local = sdata->hw;
++	struct ieee802154_local *local = sdata->local;
+ 
+ 	ASSERT_RTNL();
+ 
+ 	netif_stop_queue(dev);
+ 
+-	mutex_lock(&sdata->hw->slaves_mtx);
++	mutex_lock(&sdata->local->slaves_mtx);
+ 	sdata->running = false;
+-	mutex_unlock(&sdata->hw->slaves_mtx);
++	mutex_unlock(&sdata->local->slaves_mtx);
+ 
+ 	if (!--local->open_count)
+ 		local->ops->stop(&local->hw);
+@@ -109,7 +109,7 @@ mac802154_netdev_register(struct wpan_phy *phy, struct net_device *dev)
+ 
+ 	sdata = netdev_priv(dev);
+ 	sdata->dev = dev;
+-	sdata->hw = local;
++	sdata->local = local;
+ 
+ 	dev->needed_headroom = local->hw.extra_tx_headroom;
+ 
+@@ -144,11 +144,11 @@ mac802154_del_iface(struct wpan_phy *phy, struct net_device *dev)
+ 
+ 	sdata = netdev_priv(dev);
+ 
+-	BUG_ON(sdata->hw->phy != phy);
++	BUG_ON(sdata->local->phy != phy);
+ 
+-	mutex_lock(&sdata->hw->slaves_mtx);
++	mutex_lock(&sdata->local->slaves_mtx);
+ 	list_del_rcu(&sdata->list);
+-	mutex_unlock(&sdata->hw->slaves_mtx);
++	mutex_unlock(&sdata->local->slaves_mtx);
+ 
+ 	synchronize_rcu();
+ 	unregister_netdevice(sdata->dev);
+@@ -389,9 +389,9 @@ void ieee802154_unregister_hw(struct ieee802154_hw *hw)
+ 	mutex_unlock(&local->slaves_mtx);
+ 
+ 	list_for_each_entry_safe(sdata, next, &local->slaves, list) {
+-		mutex_lock(&sdata->hw->slaves_mtx);
++		mutex_lock(&sdata->local->slaves_mtx);
+ 		list_del(&sdata->list);
+-		mutex_unlock(&sdata->hw->slaves_mtx);
++		mutex_unlock(&sdata->local->slaves_mtx);
+ 
+ 		unregister_netdevice(sdata->dev);
+ 	}
 diff --git a/net/mac802154/mib.c b/net/mac802154/mib.c
-index 40c9952..c8fee8d 100644
+index c8fee8d..62dc94c 100644
 --- a/net/mac802154/mib.c
 +++ b/net/mac802154/mib.c
-@@ -27,7 +27,7 @@
- #include <net/ieee802154_netdev.h>
- #include <net/wpan-phy.h>
+@@ -46,7 +46,7 @@ static struct ieee802154_local *mac802154_slave_get_priv(struct net_device *dev)
  
--#include "mac802154.h"
-+#include "ieee802154_i.h"
+ 	BUG_ON(dev->type != ARPHRD_IEEE802154);
  
- struct phy_chan_notify_work {
- 	struct work_struct work;
-diff --git a/net/mac802154/rx.c b/net/mac802154/rx.c
-index 5389fb7..730e56d 100644
---- a/net/mac802154/rx.c
-+++ b/net/mac802154/rx.c
-@@ -30,7 +30,7 @@
- #include <net/mac802154.h>
- #include <net/ieee802154_netdev.h>
+-	return sdata->hw;
++	return sdata->local;
+ }
  
--#include "mac802154.h"
-+#include "ieee802154_i.h"
+ static void hw_addr_notify(struct work_struct *work)
+@@ -76,7 +76,7 @@ static void set_hw_addr_filt(struct net_device *dev, unsigned long changed)
+ 	INIT_WORK(&work->work, hw_addr_notify);
+ 	work->dev = dev;
+ 	work->changed = changed;
+-	queue_work(sdata->hw->dev_workqueue, &work->work);
++	queue_work(sdata->local->dev_workqueue, &work->work);
+ }
  
- /* The IEEE 802.15.4 standard defines 4 MAC packet types:
-  * - beacon frame
-diff --git a/net/mac802154/tx.c b/net/mac802154/tx.c
-index 192b0dd..23735dd 100644
---- a/net/mac802154/tx.c
-+++ b/net/mac802154/tx.c
-@@ -29,7 +29,7 @@
- #include <net/mac802154.h>
- #include <net/wpan-phy.h>
+ void mac802154_dev_set_short_addr(struct net_device *dev, __le16 val)
+@@ -89,9 +89,9 @@ void mac802154_dev_set_short_addr(struct net_device *dev, __le16 val)
+ 	sdata->short_addr = val;
+ 	spin_unlock_bh(&sdata->mib_lock);
  
--#include "mac802154.h"
-+#include "ieee802154_i.h"
+-	if ((sdata->hw->ops->set_hw_addr_filt) &&
+-	    (sdata->hw->hw.hw_filt.short_addr != sdata->short_addr)) {
+-		sdata->hw->hw.hw_filt.short_addr = sdata->short_addr;
++	if ((sdata->local->ops->set_hw_addr_filt) &&
++	    (sdata->local->hw.hw_filt.short_addr != sdata->short_addr)) {
++		sdata->local->hw.hw_filt.short_addr = sdata->short_addr;
+ 		set_hw_addr_filt(dev, IEEE802515_AFILT_SADDR_CHANGED);
+ 	}
+ }
+@@ -113,7 +113,7 @@ __le16 mac802154_dev_get_short_addr(const struct net_device *dev)
+ void mac802154_dev_set_ieee_addr(struct net_device *dev)
+ {
+ 	struct ieee802154_sub_if_data *sdata = netdev_priv(dev);
+-	struct ieee802154_local *local = sdata->hw;
++	struct ieee802154_local *local = sdata->local;
  
- /* IEEE 802.15.4 transceivers can sleep during the xmit session, so process
-  * packets through the workqueue.
+ 	sdata->extended_addr = ieee802154_devaddr_from_raw(dev->dev_addr);
+ 
+@@ -148,9 +148,9 @@ void mac802154_dev_set_pan_id(struct net_device *dev, __le16 val)
+ 	sdata->pan_id = val;
+ 	spin_unlock_bh(&sdata->mib_lock);
+ 
+-	if ((sdata->hw->ops->set_hw_addr_filt) &&
+-	    (sdata->hw->hw.hw_filt.pan_id != sdata->pan_id)) {
+-		sdata->hw->hw.hw_filt.pan_id = sdata->pan_id;
++	if ((sdata->local->ops->set_hw_addr_filt) &&
++	    (sdata->local->hw.hw_filt.pan_id != sdata->pan_id)) {
++		sdata->local->hw.hw_filt.pan_id = sdata->pan_id;
+ 		set_hw_addr_filt(dev, IEEE802515_AFILT_PANID_CHANGED);
+ 	}
+ }
+@@ -172,15 +172,15 @@ static void phy_chan_notify(struct work_struct *work)
+ 	struct ieee802154_sub_if_data *sdata = netdev_priv(nw->dev);
+ 	int res;
+ 
+-	mutex_lock(&sdata->hw->phy->pib_lock);
++	mutex_lock(&sdata->local->phy->pib_lock);
+ 	res = local->ops->set_channel(&local->hw, sdata->page, sdata->chan);
+ 	if (res) {
+ 		pr_debug("set_channel failed\n");
+ 	} else {
+-		sdata->hw->phy->current_channel = sdata->chan;
+-		sdata->hw->phy->current_page = sdata->page;
++		sdata->local->phy->current_channel = sdata->chan;
++		sdata->local->phy->current_page = sdata->page;
+ 	}
+-	mutex_unlock(&sdata->hw->phy->pib_lock);
++	mutex_unlock(&sdata->local->phy->pib_lock);
+ 
+ 	kfree(nw);
+ }
+@@ -197,10 +197,10 @@ void mac802154_dev_set_page_channel(struct net_device *dev, u8 page, u8 chan)
+ 	sdata->chan = chan;
+ 	spin_unlock_bh(&sdata->mib_lock);
+ 
+-	mutex_lock(&sdata->hw->phy->pib_lock);
+-	if (sdata->hw->phy->current_channel != sdata->chan ||
+-	    sdata->hw->phy->current_page != sdata->page) {
+-		mutex_unlock(&sdata->hw->phy->pib_lock);
++	mutex_lock(&sdata->local->phy->pib_lock);
++	if (sdata->local->phy->current_channel != sdata->chan ||
++	    sdata->local->phy->current_page != sdata->page) {
++		mutex_unlock(&sdata->local->phy->pib_lock);
+ 
+ 		work = kzalloc(sizeof(*work), GFP_ATOMIC);
+ 		if (!work)
+@@ -208,9 +208,9 @@ void mac802154_dev_set_page_channel(struct net_device *dev, u8 page, u8 chan)
+ 
+ 		INIT_WORK(&work->work, phy_chan_notify);
+ 		work->dev = dev;
+-		queue_work(sdata->hw->dev_workqueue, &work->work);
++		queue_work(sdata->local->dev_workqueue, &work->work);
+ 	} else {
+-		mutex_unlock(&sdata->hw->phy->pib_lock);
++		mutex_unlock(&sdata->local->phy->pib_lock);
+ 	}
+ }
+ 
 diff --git a/net/mac802154/wpan.c b/net/mac802154/wpan.c
-index 663f89d..d2fc40b 100644
+index d2fc40b..f350218 100644
 --- a/net/mac802154/wpan.c
 +++ b/net/mac802154/wpan.c
-@@ -33,7 +33,7 @@
- #include <net/ieee802154.h>
- #include <net/wpan-phy.h>
- 
--#include "mac802154.h"
-+#include "ieee802154_i.h"
- 
- static int mac802154_wpan_update_llsec(struct net_device *dev)
+@@ -129,9 +129,9 @@ int mac802154_set_mac_params(struct net_device *dev,
  {
+ 	struct ieee802154_sub_if_data *sdata = netdev_priv(dev);
+ 
+-	mutex_lock(&sdata->hw->slaves_mtx);
++	mutex_lock(&sdata->local->slaves_mtx);
+ 	sdata->mac_params = *params;
+-	mutex_unlock(&sdata->hw->slaves_mtx);
++	mutex_unlock(&sdata->local->slaves_mtx);
+ 
+ 	return 0;
+ }
+@@ -141,16 +141,16 @@ void mac802154_get_mac_params(struct net_device *dev,
+ {
+ 	struct ieee802154_sub_if_data *sdata = netdev_priv(dev);
+ 
+-	mutex_lock(&sdata->hw->slaves_mtx);
++	mutex_lock(&sdata->local->slaves_mtx);
+ 	*params = sdata->mac_params;
+-	mutex_unlock(&sdata->hw->slaves_mtx);
++	mutex_unlock(&sdata->local->slaves_mtx);
+ }
+ 
+ static int mac802154_wpan_open(struct net_device *dev)
+ {
+ 	int rc;
+ 	struct ieee802154_sub_if_data *sdata = netdev_priv(dev);
+-	struct wpan_phy *phy = sdata->hw->phy;
++	struct wpan_phy *phy = sdata->local->phy;
+ 
+ 	rc = mac802154_slave_open(dev);
+ 	if (rc < 0)
+@@ -343,7 +343,7 @@ mac802154_wpan_xmit(struct sk_buff *skb, struct net_device *dev)
+ 	dev->stats.tx_packets++;
+ 	dev->stats.tx_bytes += skb->len;
+ 
+-	return mac802154_tx(sdata->hw, skb, page, chan);
++	return mac802154_tx(sdata->local, skb, page, chan);
+ }
+ 
+ static struct header_ops mac802154_header_ops = {
 -- 
 2.0.3
 
