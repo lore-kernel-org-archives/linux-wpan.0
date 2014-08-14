@@ -1,95 +1,90 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.17.13]:50971 "EHLO
-	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751861AbaHNHh1 (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Thu, 14 Aug 2014 03:37:27 -0400
-Message-ID: <53EC6734.6050503@xsilon.com>
-Date: Thu, 14 Aug 2014 08:37:24 +0100
-From: Martin Townsend <martin.townsend@xsilon.com>
-MIME-Version: 1.0
+Received: from mail-we0-f169.google.com ([74.125.82.169]:58064 "EHLO
+	mail-we0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751078AbaHNH7K (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Thu, 14 Aug 2014 03:59:10 -0400
+Received: by mail-we0-f169.google.com with SMTP id u56so726588wes.14
+        for <linux-wpan@vger.kernel.org>; Thu, 14 Aug 2014 00:59:08 -0700 (PDT)
+Date: Thu, 14 Aug 2014 09:59:02 +0200
+From: Alexander Aring <alex.aring@gmail.com>
+Message-ID: <20140814075900.GA19177@omega>
 References: <1407849255-11500-1-git-send-email-alex.aring@gmail.com>
-In-Reply-To: <1407849255-11500-1-git-send-email-alex.aring@gmail.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+ <53EC6734.6050503@xsilon.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <53EC6734.6050503@xsilon.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-Subject: Re: [PATCH wpan-next 00/11] ieee802154: mac802154: wireless transformation
-To: Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org
+Subject: Re: [PATCH wpan-next 00/11] ieee802154: mac802154: wireless
+ transformation
+To: Martin Townsend <martin.townsend@xsilon.com>
+Cc: linux-wpan@vger.kernel.org
 
-Hi Alex,
+Hi,
 
-Looks good to me.  The monitor devices work fine for us on both our wireless and plc interfaces using tcpdump.  Out of interest, in  what way are they broken?
+On Thu, Aug 14, 2014 at 08:37:24AM +0100, Martin Townsend wrote:
+> Hi Alex,
+> 
+> Looks good to me.  The monitor devices work fine for us on both our wireless and plc interfaces using tcpdump.  Out of interest, in  what way are they broken?
+> 
 
-- Martin.
+Okay, in my setup I can't set any channels to the monitor interface. It's
+only working if I set some channel hardcoded and the remove of the
+monitor interface is also broken.
 
-On 12/08/14 14:14, Alexander Aring wrote:
-> Hi,
->
-> this is the first part to make the mac802154/ieee802154 implementation like
-> wireless. There is much things do to but at around 10 patches I will send
-> a complete patch series of my work to make the review easier.
->
-> This patch renames more variables/structs like it's also available in wireless.
-> I think this was done also in the current implementation but all variables
-> was renamed and now I get confuse about priv/ipriv (I call it priv variable hell)
-> and netdev/ieee802154_dev.
->
-> We rename the ieee802154_dev to ieee802154_hw, like a ieee80211_hw.
->
-> The mac802154_priv is now ieee802154_local, like a ieee80211_local.
-> The mac802154_sub_if_data is now ieee802154_sub_if_data.
->
-> Also change the variables name to this so there should never be a variable priv
-> and you don't know if it's a mac802154_sub_if_data or mac802154_priv. That's
-> confusing me so much sometimes. Now it's also clear to see mutliple dereferencing.
-> Please send patches for this, if you like.
->
-> The next step is the frame parsing like wireless and interface registration like
-> wireless.
->
->
-> The last one replace the receiving workqueue with a tasklet, which is also used
-> in wireless. This have a less overhead and I removed a kmalloc call in this hot
-> path.
->
-> - Alex
->
-> Alexander Aring (11):
->   ieee802154: rename ieee802154_dev to ieee802154_hw
->   mac802154: rename ieee802154_dev.c to main.c
->   mac802154: remove not functional monitor device
->   ieee802154: add new interface types
->   nl802154: add missing endif comment
->   mac802154: rename mac802154_priv to ieee802154_local
->   mac802154: rename mac802154_sub_if_data to ieee802154_sub_if_data
->   mac802154: rename mac802154.h to ieee802154_i.h
->   mac802154: rename hw subif_data variable to local
->   mac802154: use hw_to_local
->   mac802154: rx: use tasklet instead workqueue
->
->  drivers/net/ieee802154/at86rf230.c |  90 ++++----
->  drivers/net/ieee802154/cc2520.c    |  50 ++---
->  drivers/net/ieee802154/mrf24j40.c  |  48 ++--
->  include/linux/nl802154.h           |  15 +-
->  include/net/mac802154.h            |  46 ++--
->  net/ieee802154/nl-phy.c            |   4 +-
->  net/mac802154/Makefile             |   4 +-
->  net/mac802154/ieee802154_dev.c     | 415 -----------------------------------
->  net/mac802154/ieee802154_i.h       | 178 +++++++++++++++
->  net/mac802154/llsec.c              |   2 +-
->  net/mac802154/mac802154.h          | 172 ---------------
->  net/mac802154/mac_cmd.c            |   6 +-
->  net/mac802154/main.c               | 435 +++++++++++++++++++++++++++++++++++++
->  net/mac802154/mib.c                | 207 +++++++++---------
->  net/mac802154/monitor.c            | 117 ----------
->  net/mac802154/rx.c                 |  60 ++---
->  net/mac802154/tx.c                 |  42 ++--
->  net/mac802154/wpan.c               | 145 +++++++------
->  18 files changed, 958 insertions(+), 1078 deletions(-)
->  delete mode 100644 net/mac802154/ieee802154_dev.c
->  create mode 100644 net/mac802154/ieee802154_i.h
->  delete mode 100644 net/mac802154/mac802154.h
->  create mode 100644 net/mac802154/main.c
->  delete mode 100644 net/mac802154/monitor.c
->
 
+I gave up to understand how it works. If you see [0] you will see:
+
+dev->ml_priv            = &mac802154_mlme_reduced;
+
+The mac802154_mlme_reduced struct is defined at [1]. It has only the 
+
+.get_phy = mac802154_get_phy,
+
+assign.
+
+But mac802154_get_phy has a assertion on:
+
+BUG_ON(dev->type != ARPHRD_IEEE802154);
+
+Back to [0] you will see:
+
+dev->type               = ARPHRD_IEEE802154_MONITOR;
+
+which doesn't fit together with a
+
+BUG_ON(dev->type != ARPHRD_IEEE802154);
+
+I never hit this BUG_ON and really doesn't know what's going on there,
+I want to implement a MONITOR interface like 80211. :-)
+
+
+
+Nevertheless I gave up to understand what going on there and I can't
+also set channels. Also removing the monitor interface with iz doesn't
+work (I think there was some deadlock).
+
+A monitor device should be going into the promiscous mode of a device.
+But we also don't support this. Okay if you device doesn't has a
+hardware filter, it's like to have a promiscous mode. But sometimes
+promiscous mode also doesn't care about CRC or something else. A monitor
+device should also be able to show broken packets.
+
+I drop this interface type because it really bypass only the mac802154
+stack and nothing else. I don't want to say "we don't need a MONITOR
+interface type", but this is for my opinion in an not useful state.
+
+
+
+And really I don't want to insert something mainline which breaks any
+existing support (monitor, fakelb, crypto, ...). I can't do a deletion of
+net/mac802154 (ieee802154) and simple add a new one, but deleting of
+subsubsystems like montior, fakelb and add a rework of this should not
+make any problems.
+
+- Alex
+
+[0] http://lxr.free-electrons.com/source/net/mac802154/monitor.c
+[1] http://lxr.free-electrons.com/source/net/mac802154/mac_cmd.c#L105
+[2] http://lxr.free-electrons.com/source/net/mac802154/mac_cmd.c#L80
