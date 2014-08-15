@@ -1,170 +1,133 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f173.google.com ([209.85.212.173]:43368 "EHLO
-	mail-wi0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752973AbaHOKaD (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Fri, 15 Aug 2014 06:30:03 -0400
-Received: by mail-wi0-f173.google.com with SMTP id f8so655105wiw.0
-        for <linux-wpan@vger.kernel.org>; Fri, 15 Aug 2014 03:30:02 -0700 (PDT)
+Received: from mail-wg0-f43.google.com ([74.125.82.43]:41587 "EHLO
+	mail-wg0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753418AbaHOKaE (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Fri, 15 Aug 2014 06:30:04 -0400
+Received: by mail-wg0-f43.google.com with SMTP id l18so2157283wgh.2
+        for <linux-wpan@vger.kernel.org>; Fri, 15 Aug 2014 03:30:03 -0700 (PDT)
 From: Alexander Aring <alex.aring@gmail.com>
-Date: Fri, 15 Aug 2014 12:29:43 +0200
-Message-Id: <1408098592-13412-4-git-send-email-alex.aring@gmail.com>
+Date: Fri, 15 Aug 2014 12:29:44 +0200
+Message-Id: <1408098592-13412-5-git-send-email-alex.aring@gmail.com>
 In-Reply-To: <1408098592-13412-1-git-send-email-alex.aring@gmail.com>
 References: <1408098592-13412-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-Subject: [PATCH wpan-next 03/12] mac802154: add netdev qeue helpers
+Subject: [PATCH wpan-next 04/12] mac802154: tx: remove kmalloc in xmit hotpath
 To: linux-wpan@vger.kernel.org
 Cc: Alexander Aring <alex.aring@gmail.com>
 
-This patch adds a new file net/mac802154/util.c which contains utility
-functions for drivers, etc.
-
-This file contains functions to start and stop queues for all virtual
-interfaces, this is useful for asynchronous handling in driver level.
-In future the ieee802154_xmit_complete function should be contain a
-delay for interfame spacing time, for now we don't provide this
-information inside the mac layer.
+This patch removes the kmalloc allocation for workqueue data. This patch
+replace the kmalloc and use the control block of skb. The control block
+have enough space and isn't use by any other layer in this case.
 
 Signed-off-by: Alexander Aring <alex.aring@gmail.com>
 ---
- include/net/mac802154.h |  4 ++++
- net/mac802154/Makefile  |  2 +-
- net/mac802154/tx.c      | 14 ++-----------
- net/mac802154/util.c    | 55 +++++++++++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 62 insertions(+), 13 deletions(-)
- create mode 100644 net/mac802154/util.c
+ net/mac802154/tx.c | 51 ++++++++++++++++++++++++---------------------------
+ 1 file changed, 24 insertions(+), 27 deletions(-)
 
-diff --git a/include/net/mac802154.h b/include/net/mac802154.h
-index 311e595..fd3abbf 100644
---- a/include/net/mac802154.h
-+++ b/include/net/mac802154.h
-@@ -196,4 +196,8 @@ void ieee802154_rx_irqsafe(struct ieee802154_hw *hw, struct sk_buff *skb,
- 
- void ieee802154_rx(struct ieee802154_hw *hw, struct sk_buff *skb);
- 
-+void ieee802154_wake_queue(struct ieee802154_hw *hw);
-+void ieee802154_stop_queue(struct ieee802154_hw *hw);
-+void ieee802154_xmit_complete(struct ieee802154_hw *hw, struct sk_buff *skb);
-+
- #endif /* NET_MAC802154_H */
-diff --git a/net/mac802154/Makefile b/net/mac802154/Makefile
-index d7030d4..2e497d0 100644
---- a/net/mac802154/Makefile
-+++ b/net/mac802154/Makefile
-@@ -1,5 +1,5 @@
- obj-$(CONFIG_MAC802154)	+= mac802154.o
- mac802154-objs		:= main.o rx.o tx.o mac_cmd.o mib.o \
--			   iface.o llsec.o
-+			   iface.o llsec.o util.o
- 
- ccflags-y += -D__CHECK_ENDIAN__
 diff --git a/net/mac802154/tx.c b/net/mac802154/tx.c
-index 5f165ec..d99e4f5 100644
+index d99e4f5..b6776ee 100644
 --- a/net/mac802154/tx.c
 +++ b/net/mac802154/tx.c
-@@ -45,7 +45,6 @@ struct xmit_work {
+@@ -34,7 +34,7 @@
+ /* IEEE 802.15.4 transceivers can sleep during the xmit session, so process
+  * packets through the workqueue.
+  */
+-struct xmit_work {
++struct wpan_xmit_cb {
+ 	struct sk_buff *skb;
+ 	struct work_struct work;
+ 	struct ieee802154_local *local;
+@@ -42,43 +42,46 @@ struct xmit_work {
+ 	u8 page;
+ };
+ 
++static struct wpan_xmit_cb *wpan_xmit_cb(struct sk_buff *skb)
++{
++	return (struct wpan_xmit_cb *)skb->cb;
++}
++
  static void mac802154_xmit_worker(struct work_struct *work)
  {
- 	struct xmit_work *xw = container_of(work, struct xmit_work, work);
--	struct ieee802154_sub_if_data *sdata;
+-	struct xmit_work *xw = container_of(work, struct xmit_work, work);
++	struct wpan_xmit_cb *cb = container_of(work, struct wpan_xmit_cb, work);
++	struct ieee802154_local *local = cb->local;
++	struct sk_buff *skb = cb->skb;
  	int res;
  
- 	mutex_lock(&xw->local->phy->pib_lock);
-@@ -71,12 +70,7 @@ out:
- 	mutex_unlock(&xw->local->phy->pib_lock);
+-	mutex_lock(&xw->local->phy->pib_lock);
+-	if (xw->local->phy->current_channel != xw->chan ||
+-	    xw->local->phy->current_page != xw->page) {
+-		res = xw->local->ops->set_channel(&xw->local->hw,
+-						  xw->page,
+-						  xw->chan);
++	mutex_lock(&local->phy->pib_lock);
++	if (local->phy->current_channel != cb->chan ||
++	    local->phy->current_page != cb->page) {
++		res = local->ops->set_channel(&local->hw, cb->page, cb->chan);
+ 		if (res) {
+ 			pr_debug("set_channel failed\n");
+ 			goto out;
+ 		}
+ 
+-		xw->local->phy->current_channel = xw->chan;
+-		xw->local->phy->current_page = xw->page;
++		local->phy->current_channel = cb->chan;
++		local->phy->current_page = cb->page;
+ 	}
+ 
+-	res = xw->local->ops->xmit(&xw->local->hw, xw->skb);
++	res = local->ops->xmit(&cb->local->hw, skb);
+ 	if (res)
+ 		pr_debug("transmission failed\n");
+ 
+ out:
+-	mutex_unlock(&xw->local->phy->pib_lock);
++	mutex_unlock(&local->phy->pib_lock);
  
  	/* Restart the netif queue on each sub_if_data object. */
--	rcu_read_lock();
--	list_for_each_entry_rcu(sdata, &xw->local->interfaces, list)
--		netif_wake_queue(sdata->dev);
--	rcu_read_unlock();
+ 	ieee802154_xmit_complete(&local->hw, skb);
 -
--	dev_kfree_skb(xw->skb);
-+	ieee802154_xmit_complete(&local->hw, skb);
- 
- 	kfree(xw);
+-	kfree(xw);
  }
-@@ -85,7 +79,6 @@ static netdev_tx_t mac802154_tx(struct ieee802154_local *local,
+ 
+ static netdev_tx_t mac802154_tx(struct ieee802154_local *local,
  				struct sk_buff *skb, u8 page, u8 chan)
  {
- 	struct xmit_work *work;
--	struct ieee802154_sub_if_data *sdata;
+-	struct xmit_work *work;
++	struct wpan_xmit_cb *cb = wpan_xmit_cb(skb);
  
  	if (!(local->phy->channels_supported[page] & (1 << chan))) {
  		WARN_ON(1);
-@@ -110,10 +103,7 @@ static netdev_tx_t mac802154_tx(struct ieee802154_local *local,
- 	}
+@@ -96,22 +99,16 @@ static netdev_tx_t mac802154_tx(struct ieee802154_local *local,
+ 	if (skb_cow_head(skb, local->hw.extra_tx_headroom))
+ 		goto err_tx;
  
+-	work = kzalloc(sizeof(*work), GFP_ATOMIC);
+-	if (!work) {
+-		kfree_skb(skb);
+-		return NETDEV_TX_BUSY;
+-	}
+-
  	/* Stop the netif queue on each sub_if_data object. */
--	rcu_read_lock();
--	list_for_each_entry_rcu(sdata, &local->interfaces, list)
--		netif_stop_queue(sdata->dev);
--	rcu_read_unlock();
-+	ieee802154_stop_queue(&local->hw);
+ 	ieee802154_stop_queue(&local->hw);
  
- 	INIT_WORK(&work->work, mac802154_xmit_worker);
- 	work->skb = skb;
-diff --git a/net/mac802154/util.c b/net/mac802154/util.c
-new file mode 100644
-index 0000000..117e4ef
---- /dev/null
-+++ b/net/mac802154/util.c
-@@ -0,0 +1,55 @@
-+/* This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2
-+ * as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * Authors:
-+ * Alexander Aring <aar@pengutronix.de>
-+ *
-+ * Based on: net/mac80211/util.c
-+ */
-+
-+#include "ieee802154_i.h"
-+
-+void ieee802154_wake_queue(struct ieee802154_hw *hw)
-+{
-+	struct ieee802154_local *local = hw_to_local(hw);
-+	struct ieee802154_sub_if_data *sdata;
-+
-+	rcu_read_lock();
-+	list_for_each_entry_rcu(sdata, &local->interfaces, list) {
-+		if (!sdata->dev)
-+			continue;
-+
-+		netif_wake_queue(sdata->dev);
-+	}
-+	rcu_read_unlock();
-+}
-+EXPORT_SYMBOL(ieee802154_wake_queue);
-+
-+void ieee802154_stop_queue(struct ieee802154_hw *hw)
-+{
-+	struct ieee802154_local *local = hw_to_local(hw);
-+	struct ieee802154_sub_if_data *sdata;
-+
-+	rcu_read_lock();
-+	list_for_each_entry_rcu(sdata, &local->interfaces, list) {
-+		if (!sdata->dev)
-+			continue;
-+
-+		netif_stop_queue(sdata->dev);
-+	}
-+	rcu_read_unlock();
-+}
-+EXPORT_SYMBOL(ieee802154_stop_queue);
-+
-+void ieee802154_xmit_complete(struct ieee802154_hw *hw, struct sk_buff *skb)
-+{
-+	ieee802154_wake_queue(hw);
-+	consume_skb(skb);
-+}
-+EXPORT_SYMBOL(ieee802154_xmit_complete);
+-	INIT_WORK(&work->work, mac802154_xmit_worker);
+-	work->skb = skb;
+-	work->local = local;
+-	work->page = page;
+-	work->chan = chan;
++	INIT_WORK(&cb->work, mac802154_xmit_worker);
++	cb->skb = skb;
++	cb->local = local;
++	cb->page = page;
++	cb->chan = chan;
+ 
+-	queue_work(local->dev_workqueue, &work->work);
++	queue_work(local->dev_workqueue, &cb->work);
+ 
+ 	return NETDEV_TX_OK;
+ 
 -- 
 2.0.3
 
