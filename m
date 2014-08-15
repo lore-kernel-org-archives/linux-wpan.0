@@ -1,155 +1,63 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mailgw1.uni-kl.de ([131.246.120.220]:38123 "EHLO
-	mailgw1.uni-kl.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750846AbaHOO4P (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Fri, 15 Aug 2014 10:56:15 -0400
-Received: from itwm2.itwm.fhg.de (itwm2.itwm.fhg.de [131.246.191.3])
-	by mailgw1.uni-kl.de (8.14.4/8.14.4/Debian-7) with ESMTP id s7FEshLD002581
-	(version=TLSv1/SSLv3 cipher=ECDHE-RSA-AES256-SHA bits=256 verify=NOT)
-	for <linux-wpan@vger.kernel.org>; Fri, 15 Aug 2014 16:54:44 +0200
-Message-ID: <9210baeb113a002cd095647bdde4808b.squirrel@webmail.itwm.fhg.de>
-In-Reply-To: <1408098592-13412-5-git-send-email-alex.aring@gmail.com>
+Received: from mail-wg0-f42.google.com ([74.125.82.42]:65339 "EHLO
+	mail-wg0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751452AbaHOO7r (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Fri, 15 Aug 2014 10:59:47 -0400
+Received: by mail-wg0-f42.google.com with SMTP id l18so2367962wgh.1
+        for <linux-wpan@vger.kernel.org>; Fri, 15 Aug 2014 07:59:46 -0700 (PDT)
+Date: Fri, 15 Aug 2014 16:59:44 +0200
+From: Alexander Aring <alex.aring@gmail.com>
+Message-ID: <20140815145942.GB14922@omega>
 References: <1408098592-13412-1-git-send-email-alex.aring@gmail.com>
-    <1408098592-13412-5-git-send-email-alex.aring@gmail.com>
-Date: Fri, 15 Aug 2014 16:56:08 +0200
-From: "Phoebe Buckheister" <phoebe.buckheister@itwm.fraunhofer.de>
+ <1408098592-13412-5-git-send-email-alex.aring@gmail.com>
+ <9210baeb113a002cd095647bdde4808b.squirrel@webmail.itwm.fhg.de>
 MIME-Version: 1.0
-Content-Type: text/plain;charset=utf-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <9210baeb113a002cd095647bdde4808b.squirrel@webmail.itwm.fhg.de>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 Subject: Re: [PATCH wpan-next 04/12] mac802154: tx: remove kmalloc in xmit
  hotpath
-To: Alexander Aring <alex.aring@gmail.com>
+To: Phoebe Buckheister <phoebe.buckheister@itwm.fraunhofer.de>
 Cc: linux-wpan@vger.kernel.org
 
-> This patch removes the kmalloc allocation for workqueue data. This patch
-> replace the kmalloc and use the control block of skb. The control block
-> have enough space and isn't use by any other layer in this case.
->
-> Signed-off-by: Alexander Aring <alex.aring@gmail.com>
-> ---
->  net/mac802154/tx.c | 51
-> ++++++++++++++++++++++++---------------------------
->  1 file changed, 24 insertions(+), 27 deletions(-)
->
-> diff --git a/net/mac802154/tx.c b/net/mac802154/tx.c
-> index d99e4f5..b6776ee 100644
-> --- a/net/mac802154/tx.c
-> +++ b/net/mac802154/tx.c
-> @@ -34,7 +34,7 @@
->  /* IEEE 802.15.4 transceivers can sleep during the xmit session, so
-> process
->   * packets through the workqueue.
->   */
-> -struct xmit_work {
-> +struct wpan_xmit_cb {
->  	struct sk_buff *skb;
->  	struct work_struct work;
->  	struct ieee802154_local *local;
-> @@ -42,43 +42,46 @@ struct xmit_work {
->  	u8 page;
->  };
->
-> +static struct wpan_xmit_cb *wpan_xmit_cb(struct sk_buff *skb)
-> +{
+On Fri, Aug 15, 2014 at 04:56:08PM +0200, Phoebe Buckheister wrote:
+> > This patch removes the kmalloc allocation for workqueue data. This patch
+> > replace the kmalloc and use the control block of skb. The control block
+> > have enough space and isn't use by any other layer in this case.
+> >
+> > Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+> > ---
+> >  net/mac802154/tx.c | 51
+> > ++++++++++++++++++++++++---------------------------
+> >  1 file changed, 24 insertions(+), 27 deletions(-)
+> >
+> > diff --git a/net/mac802154/tx.c b/net/mac802154/tx.c
+> > index d99e4f5..b6776ee 100644
+> > --- a/net/mac802154/tx.c
+> > +++ b/net/mac802154/tx.c
+> > @@ -34,7 +34,7 @@
+> >  /* IEEE 802.15.4 transceivers can sleep during the xmit session, so
+> > process
+> >   * packets through the workqueue.
+> >   */
+> > -struct xmit_work {
+> > +struct wpan_xmit_cb {
+> >  	struct sk_buff *skb;
+> >  	struct work_struct work;
+> >  	struct ieee802154_local *local;
+> > @@ -42,43 +42,46 @@ struct xmit_work {
+> >  	u8 page;
+> >  };
+> >
+> > +static struct wpan_xmit_cb *wpan_xmit_cb(struct sk_buff *skb)
+> > +{
+> 
+> Do add a BUILD_BUG_ON(sizeof(struct wpan_xmit_cb) > sizeof(skb->cb)) to
+> make sure the struct will *always* fit, even if we choose to resize it for
+> whatever reason.
 
-Do add a BUILD_BUG_ON(sizeof(struct wpan_xmit_cb) > sizeof(skb->cb)) to
-make sure the struct will *always* fit, even if we choose to resize it for
-whatever reason.
+Ok, thanks. I also add a inline to this function. Thanks.
 
-> +	return (struct wpan_xmit_cb *)skb->cb;
-> +}
-> +
->  static void mac802154_xmit_worker(struct work_struct *work)
->  {
-> -	struct xmit_work *xw = container_of(work, struct xmit_work, work);
-> +	struct wpan_xmit_cb *cb = container_of(work, struct wpan_xmit_cb, work);
-> +	struct ieee802154_local *local = cb->local;
-> +	struct sk_buff *skb = cb->skb;
->  	int res;
->
-> -	mutex_lock(&xw->local->phy->pib_lock);
-> -	if (xw->local->phy->current_channel != xw->chan ||
-> -	    xw->local->phy->current_page != xw->page) {
-> -		res = xw->local->ops->set_channel(&xw->local->hw,
-> -						  xw->page,
-> -						  xw->chan);
-> +	mutex_lock(&local->phy->pib_lock);
-> +	if (local->phy->current_channel != cb->chan ||
-> +	    local->phy->current_page != cb->page) {
-> +		res = local->ops->set_channel(&local->hw, cb->page, cb->chan);
->  		if (res) {
->  			pr_debug("set_channel failed\n");
->  			goto out;
->  		}
->
-> -		xw->local->phy->current_channel = xw->chan;
-> -		xw->local->phy->current_page = xw->page;
-> +		local->phy->current_channel = cb->chan;
-> +		local->phy->current_page = cb->page;
->  	}
->
-> -	res = xw->local->ops->xmit(&xw->local->hw, xw->skb);
-> +	res = local->ops->xmit(&cb->local->hw, skb);
->  	if (res)
->  		pr_debug("transmission failed\n");
->
->  out:
-> -	mutex_unlock(&xw->local->phy->pib_lock);
-> +	mutex_unlock(&local->phy->pib_lock);
->
->  	/* Restart the netif queue on each sub_if_data object. */
->  	ieee802154_xmit_complete(&local->hw, skb);
-> -
-> -	kfree(xw);
->  }
->
->  static netdev_tx_t mac802154_tx(struct ieee802154_local *local,
->  				struct sk_buff *skb, u8 page, u8 chan)
->  {
-> -	struct xmit_work *work;
-> +	struct wpan_xmit_cb *cb = wpan_xmit_cb(skb);
->
->  	if (!(local->phy->channels_supported[page] & (1 << chan))) {
->  		WARN_ON(1);
-> @@ -96,22 +99,16 @@ static netdev_tx_t mac802154_tx(struct
-> ieee802154_local *local,
->  	if (skb_cow_head(skb, local->hw.extra_tx_headroom))
->  		goto err_tx;
->
-> -	work = kzalloc(sizeof(*work), GFP_ATOMIC);
-> -	if (!work) {
-> -		kfree_skb(skb);
-> -		return NETDEV_TX_BUSY;
-> -	}
-> -
->  	/* Stop the netif queue on each sub_if_data object. */
->  	ieee802154_stop_queue(&local->hw);
->
-> -	INIT_WORK(&work->work, mac802154_xmit_worker);
-> -	work->skb = skb;
-> -	work->local = local;
-> -	work->page = page;
-> -	work->chan = chan;
-> +	INIT_WORK(&cb->work, mac802154_xmit_worker);
-> +	cb->skb = skb;
-> +	cb->local = local;
-> +	cb->page = page;
-> +	cb->chan = chan;
->
-> -	queue_work(local->dev_workqueue, &work->work);
-> +	queue_work(local->dev_workqueue, &cb->work);
->
->  	return NETDEV_TX_OK;
->
-> --
-> 2.0.3
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-wpan" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
-
-
+- Alex
