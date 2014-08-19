@@ -1,40 +1,43 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wg0-f42.google.com ([74.125.82.42]:63480 "EHLO
-	mail-wg0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752239AbaHSQUY (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Tue, 19 Aug 2014 12:20:24 -0400
-Received: by mail-wg0-f42.google.com with SMTP id l18so6542005wgh.1
-        for <linux-wpan@vger.kernel.org>; Tue, 19 Aug 2014 09:20:23 -0700 (PDT)
+Received: from mail-wg0-f50.google.com ([74.125.82.50]:47213 "EHLO
+	mail-wg0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751990AbaHSJDP (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Tue, 19 Aug 2014 05:03:15 -0400
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH wpan] at86rf230: add missing enable_irq on irq handler
-Date: Tue, 19 Aug 2014 18:20:08 +0200
-Message-Id: <1408465208-25655-1-git-send-email-alex.aring@gmail.com>
+Subject: [PATCH bluetooth 0/5] mac802154: ieee802154: stable patches
+Date: Tue, 19 Aug 2014 11:02:58 +0200
+Message-Id: <1408438983-13892-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org
-Cc: Alexander Aring <alex.aring@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: marcel@holtmann.org, linux-wpan@vger.kernel.org, kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-This patch adds a missing enable_irq in the at86rf230 irq handler.
-If the read of irq status register failed the irq is disabled and we need
-to enable the irq on failure.
+Hi Marcel,
 
-Signed-off-by: Alexander Aring <alex.aring@gmail.com>
----
- drivers/net/ieee802154/at86rf230.c | 1 +
- 1 file changed, 1 insertion(+)
+these patches contains patches for the bluetooth branch.
 
-diff --git a/drivers/net/ieee802154/at86rf230.c b/drivers/net/ieee802154/at86rf230.c
-index c9d2a75..948c5d4 100644
---- a/drivers/net/ieee802154/at86rf230.c
-+++ b/drivers/net/ieee802154/at86rf230.c
-@@ -908,6 +908,7 @@ static irqreturn_t at86rf230_isr(int irq, void *data)
- 	ctx->msg.complete = at86rf230_irq_status;
- 	rc = spi_async(lp->spi, &ctx->msg);
- 	if (rc) {
-+		enable_irq(lp->spi->irq);
- 		at86rf230_async_error(lp, ctx, rc);
- 		return IRQ_NONE;
- 	}
+This series includes memory leak fixes and an errno value fix.
+Also there are two patches for sending and receiving 1280 6LoWPAN packets,
+which makes the IEEE 802.15.4 6LoWPAN stack more RFC compliant.
+
+- Alex
+
+Alexander Aring (2):
+  ieee802154: 6lowpan_rtnl: fix correct errno value
+  ieee802154: 6lowpan: ensure of sending 1280 packets
+
+Martin Townsend (3):
+  mac802154: fixed potential skb leak with mac802154_parse_frame_start
+  ieee802154: mac802154: handle the reserved dest mode by dropping the
+    packet
+  ieee802154: 6lowpan: ensure MTU of 1280 for 6lowpan
+
+ include/net/netns/ieee802154_6lowpan.h |  1 -
+ net/ieee802154/6lowpan_rtnl.c          |  4 ++--
+ net/ieee802154/reassembly.c            | 13 +++----------
+ net/mac802154/wpan.c                   |  6 +++++-
+ 4 files changed, 10 insertions(+), 14 deletions(-)
+
 -- 
-2.0.4
+2.0.3
 
