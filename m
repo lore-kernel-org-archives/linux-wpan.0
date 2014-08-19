@@ -1,43 +1,41 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wg0-f50.google.com ([74.125.82.50]:47213 "EHLO
-	mail-wg0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751990AbaHSJDP (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Tue, 19 Aug 2014 05:03:15 -0400
+Received: from mail-wi0-f181.google.com ([209.85.212.181]:51414 "EHLO
+	mail-wi0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752007AbaHSJDQ (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Tue, 19 Aug 2014 05:03:16 -0400
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH bluetooth 0/5] mac802154: ieee802154: stable patches
-Date: Tue, 19 Aug 2014 11:02:58 +0200
-Message-Id: <1408438983-13892-1-git-send-email-alex.aring@gmail.com>
+Subject: [PATCH bluetooth 1/5] mac802154: fixed potential skb leak with mac802154_parse_frame_start
+Date: Tue, 19 Aug 2014 11:02:59 +0200
+Message-Id: <1408438983-13892-2-git-send-email-alex.aring@gmail.com>
+In-Reply-To: <1408438983-13892-1-git-send-email-alex.aring@gmail.com>
+References: <1408438983-13892-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org, linux-wpan@vger.kernel.org, kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
+Cc: marcel@holtmann.org, linux-wpan@vger.kernel.org, kernel@pengutronix.de, Martin Townsend <martin.townsend@xsilon.com>, Alexander Aring <alex.aring@gmail.com>
 
-Hi Marcel,
+From: Martin Townsend <martin.townsend@xsilon.com>
 
-these patches contains patches for the bluetooth branch.
+This patch fix a memory leak if received frame was not able to parse.
 
-This series includes memory leak fixes and an errno value fix.
-Also there are two patches for sending and receiving 1280 6LoWPAN packets,
-which makes the IEEE 802.15.4 6LoWPAN stack more RFC compliant.
+Signed-off-by: Martin Townsend <martin.townsend@xsilon.com>
+Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+---
+ net/mac802154/wpan.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-- Alex
-
-Alexander Aring (2):
-  ieee802154: 6lowpan_rtnl: fix correct errno value
-  ieee802154: 6lowpan: ensure of sending 1280 packets
-
-Martin Townsend (3):
-  mac802154: fixed potential skb leak with mac802154_parse_frame_start
-  ieee802154: mac802154: handle the reserved dest mode by dropping the
-    packet
-  ieee802154: 6lowpan: ensure MTU of 1280 for 6lowpan
-
- include/net/netns/ieee802154_6lowpan.h |  1 -
- net/ieee802154/6lowpan_rtnl.c          |  4 ++--
- net/ieee802154/reassembly.c            | 13 +++----------
- net/mac802154/wpan.c                   |  6 +++++-
- 4 files changed, 10 insertions(+), 14 deletions(-)
-
+diff --git a/net/mac802154/wpan.c b/net/mac802154/wpan.c
+index 3c3069f..4c13323 100644
+--- a/net/mac802154/wpan.c
++++ b/net/mac802154/wpan.c
+@@ -573,6 +573,7 @@ void mac802154_wpans_rx(struct mac802154_priv *priv, struct sk_buff *skb)
+ 	ret = mac802154_parse_frame_start(skb, &hdr);
+ 	if (ret) {
+ 		pr_debug("got invalid frame\n");
++		kfree_skb(skb);
+ 		return;
+ 	}
+ 
 -- 
 2.0.3
 
