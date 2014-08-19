@@ -1,102 +1,54 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wg0-f52.google.com ([74.125.82.52]:61525 "EHLO
-	mail-wg0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752128AbaHSREB (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Tue, 19 Aug 2014 13:04:01 -0400
-From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCHv2 bluetooth 5/5] ieee802154: 6lowpan: ensure MTU of 1280 for 6lowpan
-Date: Tue, 19 Aug 2014 19:03:32 +0200
-Message-Id: <1408467812-30483-6-git-send-email-alex.aring@gmail.com>
+Received: from senator.holtmann.net ([87.106.208.187]:33981 "EHLO
+	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753289AbaHSRUv (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Tue, 19 Aug 2014 13:20:51 -0400
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
+Subject: Re: [PATCHv2 bluetooth 0/5] mac802154: ieee802154: stable patches
+From: Marcel Holtmann <marcel@holtmann.org>
 In-Reply-To: <1408467812-30483-1-git-send-email-alex.aring@gmail.com>
+Date: Tue, 19 Aug 2014 12:20:36 -0500
+Content-Transfer-Encoding: 7bit
+Message-Id: <36287626-7FA7-459F-BB4F-B6E94E517694@holtmann.org>
 References: <1408467812-30483-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org, linux-wpan@vger.kernel.org, kernel@pengutronix.de, Martin Townsend <martin.townsend@xsilon.com>, Alexander Aring <alex.aring@gmail.com>
+To: Alexander Aring <alex.aring@gmail.com>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>, linux-wpan@vger.kernel.org, kernel@pengutronix.de
 
-From: Martin Townsend <martin.townsend@xsilon.com>
+Hi Alex,
 
-This patch drops the userspace accessable sysfs entry for the maximum
-datagram size of a 6LoWPAN fragment packet.
+> these patches contains patches for the bluetooth branch.
+> 
+> This series includes memory leak fixes and an errno value fix.
+> Also there are two patches for sending and receiving 1280 6LoWPAN packets,
+> which makes the IEEE 802.15.4 6LoWPAN stack more RFC compliant.
+> 
+> - Alex
+> 
+> changes v2:
+> - remove ieee802154_lowpan in lowpan_frag_rcv to avoid compiler warning
+> 
+> Alexander Aring (2):
+>  ieee802154: 6lowpan_rtnl: fix correct errno value
+>  ieee802154: 6lowpan: ensure of sending 1280 packets
+> 
+> Martin Townsend (3):
+>  mac802154: fixed potential skb leak with mac802154_parse_frame_start
+>  ieee802154: mac802154: handle the reserved dest mode by dropping the
+>    packet
+>  ieee802154: 6lowpan: ensure MTU of 1280 for 6lowpan
+> 
+> include/net/netns/ieee802154_6lowpan.h |  1 -
+> net/ieee802154/6lowpan_rtnl.c          |  4 ++--
+> net/ieee802154/reassembly.c            | 15 +++------------
+> net/mac802154/wpan.c                   |  6 +++++-
+> 4 files changed, 10 insertions(+), 16 deletions(-)
 
-A fragment should not have a datagram size value greater than 1280 byte.
-Instead of make this value configurable, we accept 1280 datagram size
-fragment packets only.
+I have applied this series to bluetooth tree now.
 
-Signed-off-by: Martin Townsend <martin.townsend@xsilon.com>
-Signed-off-by: Alexander Aring <alex.aring@gmail.com>
----
- include/net/netns/ieee802154_6lowpan.h |  1 -
- net/ieee802154/reassembly.c            | 15 +++------------
- 2 files changed, 3 insertions(+), 13 deletions(-)
+Regards
 
-diff --git a/include/net/netns/ieee802154_6lowpan.h b/include/net/netns/ieee802154_6lowpan.h
-index e207096..8170f8d 100644
---- a/include/net/netns/ieee802154_6lowpan.h
-+++ b/include/net/netns/ieee802154_6lowpan.h
-@@ -16,7 +16,6 @@ struct netns_sysctl_lowpan {
- struct netns_ieee802154_lowpan {
- 	struct netns_sysctl_lowpan sysctl;
- 	struct netns_frags	frags;
--	int			max_dsize;
- };
- 
- #endif
-diff --git a/net/ieee802154/reassembly.c b/net/ieee802154/reassembly.c
-index ffec6ce..32755cb 100644
---- a/net/ieee802154/reassembly.c
-+++ b/net/ieee802154/reassembly.c
-@@ -355,8 +355,6 @@ int lowpan_frag_rcv(struct sk_buff *skb, const u8 frag_type)
- 	struct net *net = dev_net(skb->dev);
- 	struct lowpan_frag_info *frag_info = lowpan_cb(skb);
- 	struct ieee802154_addr source, dest;
--	struct netns_ieee802154_lowpan *ieee802154_lowpan =
--		net_ieee802154_lowpan(net);
- 	int err;
- 
- 	source = mac_cb(skb)->source;
-@@ -366,8 +364,10 @@ int lowpan_frag_rcv(struct sk_buff *skb, const u8 frag_type)
- 	if (err < 0)
- 		goto err;
- 
--	if (frag_info->d_size > ieee802154_lowpan->max_dsize)
-+	if (frag_info->d_size > IPV6_MIN_MTU) {
-+		net_warn_ratelimited("lowpan_frag_rcv: datagram size exceeds MTU\n");
- 		goto err;
-+	}
- 
- 	fq = fq_find(net, frag_info, &source, &dest);
- 	if (fq != NULL) {
-@@ -415,13 +415,6 @@ static struct ctl_table lowpan_frags_ns_ctl_table[] = {
- 		.mode		= 0644,
- 		.proc_handler	= proc_dointvec_jiffies,
- 	},
--	{
--		.procname	= "6lowpanfrag_max_datagram_size",
--		.data		= &init_net.ieee802154_lowpan.max_dsize,
--		.maxlen		= sizeof(int),
--		.mode		= 0644,
--		.proc_handler	= proc_dointvec
--	},
- 	{ }
- };
- 
-@@ -458,7 +451,6 @@ static int __net_init lowpan_frags_ns_sysctl_register(struct net *net)
- 		table[1].data = &ieee802154_lowpan->frags.low_thresh;
- 		table[1].extra2 = &ieee802154_lowpan->frags.high_thresh;
- 		table[2].data = &ieee802154_lowpan->frags.timeout;
--		table[3].data = &ieee802154_lowpan->max_dsize;
- 
- 		/* Don't export sysctls to unprivileged users */
- 		if (net->user_ns != &init_user_ns)
-@@ -533,7 +525,6 @@ static int __net_init lowpan_frags_init_net(struct net *net)
- 	ieee802154_lowpan->frags.high_thresh = IPV6_FRAG_HIGH_THRESH;
- 	ieee802154_lowpan->frags.low_thresh = IPV6_FRAG_LOW_THRESH;
- 	ieee802154_lowpan->frags.timeout = IPV6_FRAG_TIMEOUT;
--	ieee802154_lowpan->max_dsize = 0xFFFF;
- 
- 	inet_frags_init_net(&ieee802154_lowpan->frags);
- 
--- 
-2.0.4
+Marcel
 
