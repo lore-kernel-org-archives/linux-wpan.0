@@ -1,14 +1,14 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f177.google.com ([209.85.212.177]:35166 "EHLO
-	mail-wi0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753100AbaHTXSZ (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Wed, 20 Aug 2014 19:18:25 -0400
-Received: by mail-wi0-f177.google.com with SMTP id ho1so7626705wib.4
-        for <linux-wpan@vger.kernel.org>; Wed, 20 Aug 2014 16:18:23 -0700 (PDT)
+Received: from mail-wg0-f47.google.com ([74.125.82.47]:62637 "EHLO
+	mail-wg0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753100AbaHTXS0 (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Wed, 20 Aug 2014 19:18:26 -0400
+Received: by mail-wg0-f47.google.com with SMTP id b13so8288709wgh.6
+        for <linux-wpan@vger.kernel.org>; Wed, 20 Aug 2014 16:18:24 -0700 (PDT)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH wpan-tools 5/8] nl802154: update to current header file
-Date: Thu, 21 Aug 2014 01:17:54 +0200
-Message-Id: <1408576677-28149-6-git-send-email-alex.aring@gmail.com>
+Subject: [PATCH wpan-tools 6/8] phy: initial commit for phy pib handling
+Date: Thu, 21 Aug 2014 01:17:55 +0200
+Message-Id: <1408576677-28149-7-git-send-email-alex.aring@gmail.com>
 In-Reply-To: <1408576677-28149-1-git-send-email-alex.aring@gmail.com>
 References: <1408576677-28149-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
@@ -16,76 +16,106 @@ List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
 Cc: Alexander Aring <alex.aring@gmail.com>
 
+This patch adds src/phy.c file. In this file should be the
+implement the phy pib handling of the IEEE 802.15.4 standard.
+
+In this patch we add handling to set channel and page according
+channel/page number.
+
 Signed-off-by: Alexander Aring <alex.aring@gmail.com>
 ---
- src/nl802154.h | 26 +++++++++++++++-----------
- 1 file changed, 15 insertions(+), 11 deletions(-)
+ src/Makefile.am |  3 ++-
+ src/phy.c       | 67 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 69 insertions(+), 1 deletion(-)
+ create mode 100644 src/phy.c
 
-diff --git a/src/nl802154.h b/src/nl802154.h
-index c1f2f13..51d08b0 100644
---- a/src/nl802154.h
-+++ b/src/nl802154.h
-@@ -18,18 +18,14 @@
-  *
-  */
+diff --git a/src/Makefile.am b/src/Makefile.am
+index 9b42fc1..ef7e846 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -4,7 +4,8 @@ bin_PROGRAMS = \
+ iwpan_SOURCES = \
+ 	iwpan.c \
+ 	sections.c \
+-	interface.c
++	interface.c \
++	phy.c
  
--#ifndef __LINUX_NL802154_H
--#define __LINUX_NL802154_H
-+#ifndef NL802154_H
-+#define NL802154_H
- 
- #define NL802154_GENL_NAME "nl802154"
- 
--/* commands */
--/* REQ should be responded with CONF
-- * and INDIC with RESP
-- */
- enum nl802154_commands {
- /* don't change the order or add anything between, this is ABI! */
--/* Currently we don't shipping this file via uapi, ignore the above one */
-+/* currently we don't shipping this file via uapi, ignore the above one */
- 	NL802154_CMD_UNSPEC,
- 
- 	NL802154_CMD_GET_WPAN_PHY,		/* can dump */
-@@ -42,6 +38,11 @@ enum nl802154_commands {
- 	NL802154_CMD_NEW_INTERFACE,
- 	NL802154_CMD_DEL_INTERFACE,
- 
-+	NL802154_CMD_SET_PAGE,
-+	NL802154_CMD_SET_CHANNEL,
+ iwpan_CFLAGS = $(AM_CFLAGS) $(LIBNL3_CFLAGS)
+ iwpan_LDADD = $(LIBNL3_LIBS)
+diff --git a/src/phy.c b/src/phy.c
+new file mode 100644
+index 0000000..33365dd
+--- /dev/null
++++ b/src/phy.c
+@@ -0,0 +1,67 @@
++#include <net/if.h>
++#include <errno.h>
++#include <string.h>
++#include <stdbool.h>
 +
-+	NL802154_CMD_SET_PAN_ID,
++#include <netlink/genl/genl.h>
++#include <netlink/genl/family.h>
++#include <netlink/genl/ctrl.h>
++#include <netlink/msg.h>
++#include <netlink/attr.h>
 +
- 	/* add new commands above here */
- 
- 	/* used to define NL802154_CMD_MAX below */
-@@ -51,7 +52,7 @@ enum nl802154_commands {
- 
- enum nl802154_attrs {
- /* don't change the order or add anything between, this is ABI! */
--/* Currently we don't shipping this file via uapi, ignore the above one */
-+/* currently we don't shipping this file via uapi, ignore the above one */
- 	NL802154_ATTR_UNSPEC,
- 
- 	NL802154_ATTR_WPAN_PHY,
-@@ -61,11 +62,14 @@ enum nl802154_attrs {
- 	NL802154_ATTR_IFNAME,
- 	NL802154_ATTR_IFTYPE,
- 
--	NL802154_ATTR_GENERATION,
-+	NL802154_ATTR_WPAN_DEV,
- 
--	NL802154_ATTR_SUPPORTED_COMMANDS,
-+	NL802154_ATTR_IFACE_SOCKET_OWNER,
- 
--	NL802154_ATTR_WPAN_DEV,
-+	NL802154_ATTR_PAGE,
-+	NL802154_ATTR_CHANNEL,
++#include "nl802154.h"
++#include "iwpan.h"
 +
-+	NL802154_ATTR_PAN_ID,
- 
- 	/* add attributes here, update the policy in nl802154.c */
- 
++static int handle_page_set(struct nl802154_state *state,
++			   struct nl_cb *cb,
++			   struct nl_msg *msg,
++			   int argc, char **argv,
++			   enum id_input id)
++{
++	unsigned long page;
++	char *end;
++
++	if (argc < 1)
++		return 1;
++
++	/* PAGE */
++	page = strtoul(argv[0], &end, 10);
++	if (*end != '\0')
++		return 1;
++
++	NLA_PUT_U8(msg, NL802154_ATTR_PAGE, page);
++
++	return 0;
++
++nla_put_failure:
++	return -ENOBUFS;
++}
++COMMAND(set, page, "<page>",
++	NL802154_CMD_SET_PAGE, 0, CIB_PHY, handle_page_set, NULL);
++
++static int handle_channel_set(struct nl802154_state *state,
++			      struct nl_cb *cb,
++			      struct nl_msg *msg,
++			      int argc, char **argv,
++			      enum id_input id)
++{
++	unsigned long channel;
++	char *end;
++
++	if (argc < 1)
++		return 1;
++
++	/* CHANNEL */
++	channel = strtoul(argv[0], &end, 10);
++	if (*end != '\0')
++		return 1;
++
++	NLA_PUT_U8(msg, NL802154_ATTR_CHANNEL, channel);
++
++	return 0;
++
++nla_put_failure:
++	return -ENOBUFS;
++}
++COMMAND(set, channel, "<channel>",
++	NL802154_CMD_SET_CHANNEL, 0, CIB_PHY, handle_channel_set, NULL);
 -- 
 2.0.4
 
