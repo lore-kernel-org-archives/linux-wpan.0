@@ -1,53 +1,52 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.126.131]:54093 "EHLO
-	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S965030AbaH0Utz (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Wed, 27 Aug 2014 16:49:55 -0400
-Message-ID: <53FE446D.6040805@xsilon.com>
-Date: Wed, 27 Aug 2014 21:49:49 +0100
-From: Martin Townsend <martin.townsend@xsilon.com>
+Received: from mail-wg0-f51.google.com ([74.125.82.51]:34153 "EHLO
+	mail-wg0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751297AbaH1Ern (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Thu, 28 Aug 2014 00:47:43 -0400
+Date: Thu, 28 Aug 2014 06:47:35 +0200
+From: Alexander Aring <alex.aring@gmail.com>
+Subject: Re: [PATCH v2 bluetooth-next] Simplify lowpan receive path so skb is
+ freed in lowpan_rcv when dropped.
+Message-ID: <20140828044733.GA27453@omega>
+References: <53DCE75C.2030305@xsilon.com>
+ <20140821083945.GA29484@omega>
+ <3DF0C18C-4A97-4A00-AB0F-9E01F72CE967@holtmann.org>
+ <53FE446D.6040805@xsilon.com>
 MIME-Version: 1.0
-Subject: Re: [PATCH v2 bluetooth-next] Simplify lowpan receive path so skb
- is freed in lowpan_rcv when dropped.
-References: <53DCE75C.2030305@xsilon.com> <20140821083945.GA29484@omega> <3DF0C18C-4A97-4A00-AB0F-9E01F72CE967@holtmann.org>
-In-Reply-To: <3DF0C18C-4A97-4A00-AB0F-9E01F72CE967@holtmann.org>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <53FE446D.6040805@xsilon.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Marcel Holtmann <marcel@holtmann.org>, Alexander Aring <alex.aring@gmail.com>
-Cc: linux-zigbee-devel@lists.sourceforge.net, linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org
+To: Martin Townsend <martin.townsend@xsilon.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, linux-zigbee-devel@lists.sourceforge.net, linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org
 
-On 21/08/14 14:24, Marcel Holtmann wrote:
-> Hi Alex,
->
->> this patch wasn't able to apply and now it doesn't apply either (because
->> lot of other changes). I thought you will resend a v3 and then I will
->> care about reviewing. Then putting Acked-by, then Marcel will put it on
->> the right repositories.
->>
->> If you can, describe the changes in the commit msg (please note the 80
->> line width there).
->>
->> This patch is also something for bluetooth (not bluetooth-next), it's a
->> bug fix. But this depends how Marcel will dealing with this issue. It's
->> a bugfix with a huge change of lines. I would base it on bluetooth,
->> because it's a bug fix.
-> simplifying something is not for -stable or a bug fix. If there is a memory leak, then fix that memory leak first in a separate patch. The rules are pretty clear here. Only bug fixes after the merge window has closed.
->
-> Regards
->
-> Marcel
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-wpan" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Hi Martin,
 
-Hi,
+On Wed, Aug 27, 2014 at 09:49:49PM +0100, Martin Townsend wrote:
+> Hi,
+> 
+> I'll respin and include the memory leak fix and this patch and a couple of
+> others I have and send as a series to bluetooth.  What bluetooth git
+> repository should I base the series on?
 
-I'll respin and include the memory leak fix and this patch and a couple 
-of others I have and send as a series to bluetooth.  What bluetooth git 
-repository should I base the series on?
+Okay,
 
-- Martin.
+net-next is open. That means the merge window has closed. Fix the memory
+leak in a separate patch based on bluetooth at first of your series. New
+features based on bluetooth-next, if these depends on each other write
+this after the "---" in your commit msg.
+
+
+There is also a third solution to send bug fixes to -stable, for the
+stable kernel release. Forget the -stable releases, there is too much
+stuff which don't work and the code differs too much. In future we can
+do that.
+
+
+What bluetooth and bluetooth-next means is:
+
+bluetooth	- current kernel release
+bluetooth-next	- next kernel release
+
+- Alex
