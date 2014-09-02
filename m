@@ -1,47 +1,38 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f177.google.com ([209.85.212.177]:64313 "EHLO
-	mail-wi0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751295AbaIBH0c (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Tue, 2 Sep 2014 03:26:32 -0400
-Date: Tue, 2 Sep 2014 09:26:28 +0200
-From: Alexander Aring <alex.aring@gmail.com>
-Subject: Re: 6lowpan status
-Message-ID: <20140902072627.GB25800@omega>
-References: <1409567774.3120.57.camel@jrissane-mobl.ger.corp.intel.com>
- <20140901113835.GA21564@omega>
- <1409638090.3120.71.camel@jrissane-mobl.ger.corp.intel.com>
- <20140902071214.GA25800@omega>
+Received: from mout.kundenserver.de ([212.227.17.13]:52497 "EHLO
+	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750752AbaIBOV5 (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Tue, 2 Sep 2014 10:21:57 -0400
+Message-ID: <5405D284.7020606@xsilon.com>
+Date: Tue, 02 Sep 2014 15:21:56 +0100
+From: Simon Vincent <simon.vincent@xsilon.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20140902071214.GA25800@omega>
+Subject: 6lowpan raw socket problems
+References: <1409567774.3120.57.camel@jrissane-mobl.ger.corp.intel.com> <20140901113835.GA21564@omega> <1409638090.3120.71.camel@jrissane-mobl.ger.corp.intel.com> <20140902071214.GA25800@omega> <20140902072627.GB25800@omega>
+In-Reply-To: <20140902072627.GB25800@omega>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-Cc: linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org
+To: linux-wpan@vger.kernel.org
 
-> > > 
-> > > The 802.15.4 mac layer has some neighbor discovery issues which are not
-> > > solved currently. It's about two kinds of mac addresses, for bluetooth
-> > > it should be fine. A small description about this problem is here [1].
-> > > 
-> > > We need some way to trigger 6LoWPAN/Layer 2 data across the IPv6 layer
-> > > and this isn't easy. Everything what we do on runtime decisions makes
-> > > the IPv6 stack slower and we should avoid that.
-> > 
-> > Yep, agreed.
-> > 
-> 
-> That's the big challenge to make an acceptable mainline solution. :-)
-> 
-> At the end it should be acked by IPv6 community, they should scream if a
-> solution makes runtime decisions which slower down the stack too much.
-> 
+I am having problems with raw sockets on a 6lowpan 802.15.4 interface. 
+The code works correctly on an ethernet ipv6 interface but not on a 
+6lowpan interface. In the 6lowpan interface I receive packets but I find 
+the src and dest addresses are incorrect.
 
-btw. I need L2 data in the neighbor discovery cache to handle the "two
-kinds mac addresses". I will try to find a way after the rework of the mac
-layer. This was discussed at [0].
+I open the socket like this:
+socket(AF_INET6, SOCK_RAW, IPPROTO_ICMPV6);
 
-- Alex
+Add options for IPV6_RECVPKTINFO, IPV6_CHECKSUM, IPV6_RECVHOPLIMIT.
 
-[0] http://marc.info/?l=linux-netdev&m=140724093516806&w=2
+I then receive a packet using recvmsg and attempt to get the source 
+address. The source address is rubbish. Also trying to get the 
+destination address from IPV6_PKTINFO using CMSG_FIRSTHDR results in 
+rubbish.
+
+Can anyone explain why? Is there something different I have to do when 
+using 802.15.4 and 6lowpan?
+
+Regards
+Simon
