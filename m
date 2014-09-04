@@ -1,77 +1,117 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f178.google.com ([209.85.212.178]:43189 "EHLO
-	mail-wi0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756122AbaIDIEJ (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Thu, 4 Sep 2014 04:04:09 -0400
-Received: by mail-wi0-f178.google.com with SMTP id r20so565760wiv.11
-        for <linux-wpan@vger.kernel.org>; Thu, 04 Sep 2014 01:04:08 -0700 (PDT)
+Received: from mail-wg0-f45.google.com ([74.125.82.45]:55997 "EHLO
+	mail-wg0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756516AbaIDIEM (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Thu, 4 Sep 2014 04:04:12 -0400
+Received: by mail-wg0-f45.google.com with SMTP id k14so9752306wgh.16
+        for <linux-wpan@vger.kernel.org>; Thu, 04 Sep 2014 01:04:10 -0700 (PDT)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH wpan-tools 0/6] wpan-tools: new netlink interfaces calls
-Date: Thu,  4 Sep 2014 10:03:48 +0200
-Message-Id: <1409817834-14660-1-git-send-email-alex.aring@gmail.com>
+Subject: [PATCH wpan-tools 1/6] nl_updates: initial commit of nl_updates
+Date: Thu,  4 Sep 2014 10:03:49 +0200
+Message-Id: <1409817834-14660-2-git-send-email-alex.aring@gmail.com>
+In-Reply-To: <1409817834-14660-1-git-send-email-alex.aring@gmail.com>
+References: <1409817834-14660-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
 Cc: Alexander Aring <alex.aring@gmail.com>
 
-Hi all,
+This patch adds a nl_updates header file to handle signed integer types
+via netlink.
 
-this patch series adds support for new netlink interfaces. For all
-new users on this mailinglist. This is the new userspace tool for the
-wpan rework [0] branch.
+These types are support mainline at linux kernel but not supported by
+current netlink library, this is a workaround to add these types.
 
-I removed the mib lock in the rework. Now you can only set the pan_id or
-short address (don't implement the setting of short address now) when the
-netdevice is _down_.
+It's protected by an ifdef, so it's safe when new netlink libraries will
+add these functions.
 
-Then we don't need the the mib lock anymore. It's protected by RTNL if
-netdevice is down. When it's up it's a read only variable and we can
-use the variable in hot path like tx/rx without locking. (This is like
-setting and use of dev_addr of an netdev device).
-
-I disabled the af802154 and security layer for now, but I will add this later
-at the end of the rework.
-
-I also detected that our cca_mode handling is a driver specific netlink call.
-This is... not good. :-) And this is the current mainline behaviour...
-
-In the rework I added enums for the 802.15.4 CCA_MODE numbers and now the
-at86rf231 makes a mapping from 802.15.4 specifc CCA_MODE to driver cca_mode(
-which is the register value).
-
-I need to begin to write more text about the new behaviour, is there anybody
-outside who already test something?
-
-We don't have the multiple phy layer, I dropped them. This was needed for the
-channel hoping. We need some new idea to provide a channel hoping logic, or
-simple but the logic for this in userspace. (You can change the channel while
-netdev is up).
-
-There are several other netlink interfaces (setting short_address,setting energy
-detection value of phy)
-
-The energy detection level is not part of the 802.15.4 pib, so this will be
-a direct call to the driver (not saving any value of this in the pib).
-
-- Alex
-
-[0] https://github.com/linux-wpan/linux-wpan-next/tree/wpan_rework_rfc
-
-Alexander Aring (6):
-  nl_updates: initial commit of nl_updates
-  phy: add support for tx power pib attribute
-  phy: add support for setting cca_mode
-  mac: add support for setting max_frame_retries
-  mac: initial support for setting csma params
-  phy: add support for cca mode 3 and/or handling
-
- src/mac.c        | 113 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- src/nl802154.h   |  20 ++++++++++
- src/nl_updates.h |  75 ++++++++++++++++++++++++++++++++++++
- src/phy.c        |  67 +++++++++++++++++++++++++++++++++
- 4 files changed, 275 insertions(+)
+Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+---
+ src/nl_updates.h | 75 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 75 insertions(+)
  create mode 100644 src/nl_updates.h
 
+diff --git a/src/nl_updates.h b/src/nl_updates.h
+new file mode 100644
+index 0000000..066d5bb
+--- /dev/null
++++ b/src/nl_updates.h
+@@ -0,0 +1,75 @@
++/*
++ *   lib/nl_updates.h - Updates to libnl which are not synced from kernel yet
++ *   Copyright (C) 2012-2013 Jiri Pirko <jiri@resnulli.us>
++ *
++ *   This library is free software; you can redistribute it and/or
++ *   modify it under the terms of the GNU Lesser General Public
++ *   License as published by the Free Software Foundation; either
++ *   version 2.1 of the License, or (at your option) any later version.
++ *
++ *   This library is distributed in the hope that it will be useful,
++ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *   Lesser General Public License for more details.
++ *
++ *   You should have received a copy of the GNU Lesser General Public
++ *   License along with this library; if not, write to the Free Software
++ *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
++ */
++
++#ifndef _NL_UPDATES_H_
++#define _NL_UPDATES_H_
++
++#ifndef NLA_BINARY
++#define NLA_BINARY 11
++#endif
++
++#ifndef NLA_S8
++/*
++ * Presume that libnl will add all types and relevant puts/gets at once
++ * so check only for NLA_S8.
++ */
++#define NLA_S8 12
++#define NLA_S16 13
++#define NLA_S32 14
++#define NLA_S64 15
++
++/**
++ * Add 8 bit signed integer attribute to netlink message.
++ * @arg msg		Netlink message.
++ * @arg attrtype	Attribute type.
++ * @arg value		Numeric value.
++ */
++#define NLA_PUT_S8(msg, attrtype, value) \
++	NLA_PUT_TYPE(msg, int8_t, attrtype, value)
++
++/**
++ * Add 16 bit signed integer attribute to netlink message.
++ * @arg msg		Netlink message.
++ * @arg attrtype	Attribute type.
++ * @arg value		Numeric value.
++ */
++#define NLA_PUT_S16(msg, attrtype, value) \
++	NLA_PUT_TYPE(msg, int16_t, attrtype, value)
++
++/**
++ * Add 32 bit signed integer attribute to netlink message.
++ * @arg msg		Netlink message.
++ * @arg attrtype	Attribute type.
++ * @arg value		Numeric value.
++ */
++#define NLA_PUT_S32(msg, attrtype, value) \
++	NLA_PUT_TYPE(msg, int32_t, attrtype, value)
++
++/**
++ * Add 64 bit signed integer attribute to netlink message.
++ * @arg msg		Netlink message.
++ * @arg attrtype	Attribute type.
++ * @arg value		Numeric value.
++ */
++#define NLA_PUT_S64(msg, attrtype, value) \
++	NLA_PUT_TYPE(msg, int64_t, attrtype, value)
++
++#endif
++
++#endif /* _NL_UPDATES_H_ */
 -- 
 2.1.0
 
