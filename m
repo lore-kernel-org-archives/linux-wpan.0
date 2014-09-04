@@ -1,52 +1,77 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wg0-f47.google.com ([74.125.82.47]:38412 "EHLO
-	mail-wg0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751358AbaH1FTy (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Thu, 28 Aug 2014 01:19:54 -0400
-Date: Thu, 28 Aug 2014 07:19:50 +0200
+Received: from mail-wi0-f178.google.com ([209.85.212.178]:43189 "EHLO
+	mail-wi0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756122AbaIDIEJ (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Thu, 4 Sep 2014 04:04:09 -0400
+Received: by mail-wi0-f178.google.com with SMTP id r20so565760wiv.11
+        for <linux-wpan@vger.kernel.org>; Thu, 04 Sep 2014 01:04:08 -0700 (PDT)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: Re: [PATCH v2 bluetooth-next] Simplify lowpan receive path so skb is
- freed in lowpan_rcv when dropped.
-Message-ID: <20140828051950.GB27453@omega>
-References: <53DCE75C.2030305@xsilon.com>
- <20140821083945.GA29484@omega>
- <3DF0C18C-4A97-4A00-AB0F-9E01F72CE967@holtmann.org>
- <53FE446D.6040805@xsilon.com>
- <20140828044733.GA27453@omega>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20140828044733.GA27453@omega>
+Subject: [PATCH wpan-tools 0/6] wpan-tools: new netlink interfaces calls
+Date: Thu,  4 Sep 2014 10:03:48 +0200
+Message-Id: <1409817834-14660-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Martin Townsend <martin.townsend@xsilon.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, linux-zigbee-devel@lists.sourceforge.net, linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org
+To: linux-wpan@vger.kernel.org
+Cc: Alexander Aring <alex.aring@gmail.com>
 
-On Thu, Aug 28, 2014 at 06:47:33AM +0200, Alexander Aring wrote:
-> Hi Martin,
-> 
-> On Wed, Aug 27, 2014 at 09:49:49PM +0100, Martin Townsend wrote:
-> > Hi,
-> > 
-> > I'll respin and include the memory leak fix and this patch and a couple of
-> > others I have and send as a series to bluetooth.  What bluetooth git
-> > repository should I base the series on?
-> 
-> Okay,
-> 
-> net-next is open. That means the merge window has closed. Fix the memory
-> leak in a separate patch based on bluetooth at first of your series. New
-> features based on bluetooth-next, if these depends on each other write
-> this after the "---" in your commit msg.
-> 
+Hi all,
 
-here I mean if a bluetooth-next (new feature) depends on bluetooth (bug
-fix), then write it in the new feature commit msg after the "---" lines.
+this patch series adds support for new netlink interfaces. For all
+new users on this mailinglist. This is the new userspace tool for the
+wpan rework [0] branch.
 
-The rest will do the maintainer, some or later it will be in the
-repository of bluetooth-next.
+I removed the mib lock in the rework. Now you can only set the pan_id or
+short address (don't implement the setting of short address now) when the
+netdevice is _down_.
 
+Then we don't need the the mib lock anymore. It's protected by RTNL if
+netdevice is down. When it's up it's a read only variable and we can
+use the variable in hot path like tx/rx without locking. (This is like
+setting and use of dev_addr of an netdev device).
 
-Marcel, this is okay for you?
+I disabled the af802154 and security layer for now, but I will add this later
+at the end of the rework.
+
+I also detected that our cca_mode handling is a driver specific netlink call.
+This is... not good. :-) And this is the current mainline behaviour...
+
+In the rework I added enums for the 802.15.4 CCA_MODE numbers and now the
+at86rf231 makes a mapping from 802.15.4 specifc CCA_MODE to driver cca_mode(
+which is the register value).
+
+I need to begin to write more text about the new behaviour, is there anybody
+outside who already test something?
+
+We don't have the multiple phy layer, I dropped them. This was needed for the
+channel hoping. We need some new idea to provide a channel hoping logic, or
+simple but the logic for this in userspace. (You can change the channel while
+netdev is up).
+
+There are several other netlink interfaces (setting short_address,setting energy
+detection value of phy)
+
+The energy detection level is not part of the 802.15.4 pib, so this will be
+a direct call to the driver (not saving any value of this in the pib).
 
 - Alex
+
+[0] https://github.com/linux-wpan/linux-wpan-next/tree/wpan_rework_rfc
+
+Alexander Aring (6):
+  nl_updates: initial commit of nl_updates
+  phy: add support for tx power pib attribute
+  phy: add support for setting cca_mode
+  mac: add support for setting max_frame_retries
+  mac: initial support for setting csma params
+  phy: add support for cca mode 3 and/or handling
+
+ src/mac.c        | 113 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/nl802154.h   |  20 ++++++++++
+ src/nl_updates.h |  75 ++++++++++++++++++++++++++++++++++++
+ src/phy.c        |  67 +++++++++++++++++++++++++++++++++
+ 4 files changed, 275 insertions(+)
+ create mode 100644 src/nl_updates.h
+
+-- 
+2.1.0
+
