@@ -1,14 +1,14 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wg0-f48.google.com ([74.125.82.48]:37411 "EHLO
-	mail-wg0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755934AbaIDJd0 (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Thu, 4 Sep 2014 05:33:26 -0400
-Received: by mail-wg0-f48.google.com with SMTP id n12so9825806wgh.7
-        for <linux-wpan@vger.kernel.org>; Thu, 04 Sep 2014 02:33:24 -0700 (PDT)
+Received: from mail-wg0-f52.google.com ([74.125.82.52]:43816 "EHLO
+	mail-wg0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753578AbaIDJd2 (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Thu, 4 Sep 2014 05:33:28 -0400
+Received: by mail-wg0-f52.google.com with SMTP id m15so9760734wgh.23
+        for <linux-wpan@vger.kernel.org>; Thu, 04 Sep 2014 02:33:26 -0700 (PDT)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCHv2 wpan-tools 4/6] mac: add support for setting max_frame_retries
-Date: Thu,  4 Sep 2014 11:32:52 +0200
-Message-Id: <1409823174-22491-5-git-send-email-alex.aring@gmail.com>
+Subject: [PATCHv2 wpan-tools 5/6] mac: initial support for setting csma params
+Date: Thu,  4 Sep 2014 11:32:53 +0200
+Message-Id: <1409823174-22491-6-git-send-email-alex.aring@gmail.com>
 In-Reply-To: <1409823174-22491-1-git-send-email-alex.aring@gmail.com>
 References: <1409823174-22491-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
@@ -18,72 +18,124 @@ Cc: Alexander Aring <alex.aring@gmail.com>
 
 Signed-off-by: Alexander Aring <alex.aring@gmail.com>
 ---
- src/mac.c      | 29 +++++++++++++++++++++++++++++
- src/nl802154.h |  4 ++++
- 2 files changed, 33 insertions(+)
+ src/mac.c      | 84 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/nl802154.h |  8 ++++++
+ 2 files changed, 92 insertions(+)
 
 diff --git a/src/mac.c b/src/mac.c
-index 5fa1111..d882f96 100644
+index d882f96..afaac2d 100644
 --- a/src/mac.c
 +++ b/src/mac.c
-@@ -9,6 +9,7 @@
- #include <netlink/msg.h>
- #include <netlink/attr.h>
- 
-+#include "nl_extras.h"
- #include "nl802154.h"
- #include "iwpan.h"
- 
-@@ -38,3 +39,31 @@ nla_put_failure:
- }
- COMMAND(set, pan_id, "<pan_id>",
- 	NL802154_CMD_SET_PAN_ID, 0, CIB_NETDEV, handle_pan_id_set, NULL);
+@@ -67,3 +67,87 @@ nla_put_failure:
+ COMMAND(set, max_frame_retries, "<retries>",
+ 	NL802154_CMD_SET_MAX_FRAME_RETRIES, 0, CIB_NETDEV,
+ 	handle_max_frame_retries_set, NULL);
 +
-+static int handle_max_frame_retries_set(struct nl802154_state *state,
-+					struct nl_cb *cb,
-+					struct nl_msg *msg,
-+					int argc, char **argv,
-+					enum id_input id)
++static int handle_max_be(struct nl802154_state *state,
++			 struct nl_cb *cb,
++			 struct nl_msg *msg,
++			 int argc, char **argv,
++			 enum id_input id)
 +{
-+	long retries;
++	unsigned long max_be;
 +	char *end;
 +
 +	if (argc < 1)
 +		return 1;
 +
-+	/* RETRIES */
-+	retries = strtol(argv[0], &end, 0);
++	/* MAX_BE */
++	max_be = strtoul(argv[0], &end, 0);
 +	if (*end != '\0')
 +		return 1;
 +
-+	NLA_PUT_S8(msg, NL802154_ATTR_MAX_FRAME_RETRIES, retries);
++	NLA_PUT_U8(msg, NL802154_ATTR_MAX_BE, max_be);
 +
 +	return 0;
 +
 +nla_put_failure:
 +	return -ENOBUFS;
 +}
-+COMMAND(set, max_frame_retries, "<retries>",
-+	NL802154_CMD_SET_MAX_FRAME_RETRIES, 0, CIB_NETDEV,
-+	handle_max_frame_retries_set, NULL);
++COMMAND(set, max_be, "<max_be>",
++	NL802154_CMD_SET_MAX_BE, 0, CIB_NETDEV,
++	handle_max_be, NULL);
++
++static int handle_max_csma_backoffs(struct nl802154_state *state,
++				    struct nl_cb *cb,
++				    struct nl_msg *msg,
++				    int argc, char **argv,
++				    enum id_input id)
++{
++	unsigned long backoffs;
++	char *end;
++
++	if (argc < 1)
++		return 1;
++
++	/* BACKOFFS */
++	backoffs = strtoul(argv[0], &end, 0);
++	if (*end != '\0')
++		return 1;
++
++	NLA_PUT_U8(msg, NL802154_ATTR_MAX_CSMA_BACKOFFS, backoffs);
++
++	return 0;
++
++nla_put_failure:
++	return -ENOBUFS;
++}
++COMMAND(set, max_csma_backoffs, "<backoffs>",
++	NL802154_CMD_SET_MAX_CSMA_BACKOFFS, 0, CIB_NETDEV,
++	handle_max_csma_backoffs, NULL);
++
++static int handle_min_be(struct nl802154_state *state,
++			 struct nl_cb *cb,
++			 struct nl_msg *msg,
++			 int argc, char **argv,
++			 enum id_input id)
++{
++	unsigned long min_be;
++	char *end;
++
++	if (argc < 1)
++		return 1;
++
++	/* MIN_BE */
++	min_be = strtoul(argv[0], &end, 0);
++	if (*end != '\0')
++		return 1;
++
++	NLA_PUT_U8(msg, NL802154_ATTR_MIN_BE, min_be);
++
++	return 0;
++
++nla_put_failure:
++	return -ENOBUFS;
++}
++COMMAND(set, min_be, "<min_be>",
++	NL802154_CMD_SET_MIN_BE, 0, CIB_NETDEV,
++	handle_min_be, NULL);
 diff --git a/src/nl802154.h b/src/nl802154.h
-index 762fc38..a23c34f 100644
+index a23c34f..963feda 100644
 --- a/src/nl802154.h
 +++ b/src/nl802154.h
-@@ -46,6 +46,8 @@ enum nl802154_commands {
- 	NL802154_CMD_SET_TX_POWER,
- 	NL802154_CMD_SET_CCA_MODE,
+@@ -48,6 +48,10 @@ enum nl802154_commands {
  
-+	NL802154_CMD_SET_MAX_FRAME_RETRIES,
+ 	NL802154_CMD_SET_MAX_FRAME_RETRIES,
+ 
++	NL802154_CMD_SET_MAX_BE,
++	NL802154_CMD_SET_MAX_CSMA_BACKOFFS,
++	NL802154_CMD_SET_MIN_BE,
 +
  	/* add new commands above here */
  
  	/* used to define NL802154_CMD_MAX below */
-@@ -78,6 +80,8 @@ enum nl802154_attrs {
+@@ -82,6 +86,10 @@ enum nl802154_attrs {
  
- 	NL802154_ATTR_CCA_MODE,
+ 	NL802154_ATTR_MAX_FRAME_RETRIES,
  
-+	NL802154_ATTR_MAX_FRAME_RETRIES,
++	NL802154_ATTR_MAX_BE,
++	NL802154_ATTR_MAX_CSMA_BACKOFFS,
++	NL802154_ATTR_MIN_BE,
 +
  	/* add attributes here, update the policy in nl802154.c */
  
