@@ -1,66 +1,92 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wg0-f42.google.com ([74.125.82.42]:51509 "EHLO
-	mail-wg0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755095AbaIDJBa (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Thu, 4 Sep 2014 05:01:30 -0400
-Received: by mail-wg0-f42.google.com with SMTP id b13so9733619wgh.25
-        for <linux-wpan@vger.kernel.org>; Thu, 04 Sep 2014 02:01:25 -0700 (PDT)
-Received: from omega (p20030064A92EF5F3E2CB4EFFFE1BB546.dip0.t-ipconnect.de. [2003:64:a92e:f5f3:e2cb:4eff:fe1b:b546])
-        by mx.google.com with ESMTPSA id hy9sm18674935wjb.27.2014.09.04.02.01.25
-        for <linux-wpan@vger.kernel.org>
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 04 Sep 2014 02:01:25 -0700 (PDT)
-Date: Thu, 4 Sep 2014 11:01:20 +0200
+Received: from mail-wi0-f181.google.com ([209.85.212.181]:49117 "EHLO
+	mail-wi0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756547AbaIDIEM (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Thu, 4 Sep 2014 04:04:12 -0400
+Received: by mail-wi0-f181.google.com with SMTP id e4so567780wiv.14
+        for <linux-wpan@vger.kernel.org>; Thu, 04 Sep 2014 01:04:10 -0700 (PDT)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: Re: [PATCH wpan-tools 1/6] nl_updates: initial commit of nl_updates
-Message-ID: <20140904090119.GA18523@omega>
+Subject: [PATCH wpan-tools 2/6] phy: add support for tx power pib attribute
+Date: Thu,  4 Sep 2014 10:03:50 +0200
+Message-Id: <1409817834-14660-3-git-send-email-alex.aring@gmail.com>
+In-Reply-To: <1409817834-14660-1-git-send-email-alex.aring@gmail.com>
 References: <1409817834-14660-1-git-send-email-alex.aring@gmail.com>
- <1409817834-14660-2-git-send-email-alex.aring@gmail.com>
- <20140904080609.GA13752@omega>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20140904080609.GA13752@omega>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
+Cc: Alexander Aring <alex.aring@gmail.com>
 
-On Thu, Sep 04, 2014 at 10:06:09AM +0200, Alexander Aring wrote:
-> On Thu, Sep 04, 2014 at 10:03:49AM +0200, Alexander Aring wrote:
-> > This patch adds a nl_updates header file to handle signed integer types
-> > via netlink.
-> > 
-> > These types are support mainline at linux kernel but not supported by
-> > current netlink library, this is a workaround to add these types.
-> > 
-> > It's protected by an ifdef, so it's safe when new netlink libraries will
-> > add these functions.
-> > 
-> > Signed-off-by: Alexander Aring <alex.aring@gmail.com>
-> > ---
-> >  src/nl_updates.h | 75 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-> >  1 file changed, 75 insertions(+)
-> >  create mode 100644 src/nl_updates.h
-> > 
-> > diff --git a/src/nl_updates.h b/src/nl_updates.h
-> > new file mode 100644
-> > index 0000000..066d5bb
-> > --- /dev/null
-> > +++ b/src/nl_updates.h
-> > @@ -0,0 +1,75 @@
-> > +/*
-> > + *   lib/nl_updates.h - Updates to libnl which are not synced from kernel yet
-> > + *   Copyright (C) 2012-2013 Jiri Pirko <jiri@resnulli.us>
-> > + *
-> > + *   This library is free software; you can redistribute it and/or
-> > + *   modify it under the terms of the GNU Lesser General Public
-> 
-> oh, I can't use this code it's LGPL. Sorry. I will remove it now, grml.
-> 
+Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+---
+ src/nl802154.h |  4 ++++
+ src/phy.c      | 28 ++++++++++++++++++++++++++++
+ 2 files changed, 32 insertions(+)
 
-I will reimplement it to avoid any of license issues. What should I say
-about it? It should be the same code like this one, I also will follow
-the coding style of netlink and grab the necessary values from kernel
-interface.
+diff --git a/src/nl802154.h b/src/nl802154.h
+index 51d08b0..1af09ac 100644
+--- a/src/nl802154.h
++++ b/src/nl802154.h
+@@ -43,6 +43,8 @@ enum nl802154_commands {
+ 
+ 	NL802154_CMD_SET_PAN_ID,
+ 
++	NL802154_CMD_SET_TX_POWER,
++
+ 	/* add new commands above here */
+ 
+ 	/* used to define NL802154_CMD_MAX below */
+@@ -71,6 +73,8 @@ enum nl802154_attrs {
+ 
+ 	NL802154_ATTR_PAN_ID,
+ 
++	NL802154_ATTR_TX_POWER,
++
+ 	/* add attributes here, update the policy in nl802154.c */
+ 
+ 	__NL802154_ATTR_AFTER_LAST,
+diff --git a/src/phy.c b/src/phy.c
+index 33365dd..811fc35 100644
+--- a/src/phy.c
++++ b/src/phy.c
+@@ -9,6 +9,7 @@
+ #include <netlink/msg.h>
+ #include <netlink/attr.h>
+ 
++#include "nl_updates.h"
+ #include "nl802154.h"
+ #include "iwpan.h"
+ 
+@@ -65,3 +66,30 @@ nla_put_failure:
+ }
+ COMMAND(set, channel, "<channel>",
+ 	NL802154_CMD_SET_CHANNEL, 0, CIB_PHY, handle_channel_set, NULL);
++
++static int handle_tx_power_set(struct nl802154_state *state,
++			       struct nl_cb *cb,
++			       struct nl_msg *msg,
++			       int argc, char **argv,
++			       enum id_input id)
++{
++	long dbm;
++	char *end;
++
++	if (argc < 1)
++		return 1;
++
++	/* TX_POWER */
++	dbm = strtol(argv[0], &end, 10);
++	if (*end != '\0')
++		return 1;
++
++	NLA_PUT_S8(msg, NL802154_ATTR_TX_POWER, dbm);
++
++	return 0;
++
++nla_put_failure:
++	return -ENOBUFS;
++}
++COMMAND(set, tx_power, "<dBm>",
++	NL802154_CMD_SET_TX_POWER, 0, CIB_PHY, handle_tx_power_set, NULL);
+-- 
+2.1.0
 
-- Alex
