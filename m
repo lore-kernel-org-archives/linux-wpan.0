@@ -1,78 +1,41 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f170.google.com ([209.85.212.170]:52678 "EHLO
-	mail-wi0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755945AbaIDJd2 (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Thu, 4 Sep 2014 05:33:28 -0400
-Received: by mail-wi0-f170.google.com with SMTP id cc10so7252062wib.5
-        for <linux-wpan@vger.kernel.org>; Thu, 04 Sep 2014 02:33:27 -0700 (PDT)
-From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCHv2 wpan-tools 6/6] phy: add support for cca mode 3 and/or handling
-Date: Thu,  4 Sep 2014 11:32:54 +0200
-Message-Id: <1409823174-22491-7-git-send-email-alex.aring@gmail.com>
-In-Reply-To: <1409823174-22491-1-git-send-email-alex.aring@gmail.com>
-References: <1409823174-22491-1-git-send-email-alex.aring@gmail.com>
+Received: from mail-la0-f52.google.com ([209.85.215.52]:65422 "EHLO
+	mail-la0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753125AbaIHJH3 convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Mon, 8 Sep 2014 05:07:29 -0400
+Received: by mail-la0-f52.google.com with SMTP id b8so5686534lan.11
+        for <linux-wpan@vger.kernel.org>; Mon, 08 Sep 2014 02:07:27 -0700 (PDT)
+MIME-Version: 1.0
+Date: Mon, 8 Sep 2014 11:07:27 +0200
+Message-ID: <CAMyBxbYwTSigRyFD+qvfW0RZHXBmdqWP9XCym3U1HKdqWooTxw@mail.gmail.com>
+Subject: Serial-driver
+From: =?UTF-8?Q?Thomas_K=C3=BChnel?= <kuehnelth@googlemail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
-Cc: Alexander Aring <alex.aring@gmail.com>
 
-Signed-off-by: Alexander Aring <alex.aring@gmail.com>
----
- src/nl802154.h |  1 +
- src/phy.c      | 16 ++++++++++++++--
- 2 files changed, 15 insertions(+), 2 deletions(-)
+Hi,
 
-diff --git a/src/nl802154.h b/src/nl802154.h
-index 963feda..904bebb 100644
---- a/src/nl802154.h
-+++ b/src/nl802154.h
-@@ -83,6 +83,7 @@ enum nl802154_attrs {
- 	NL802154_ATTR_TX_POWER,
- 
- 	NL802154_ATTR_CCA_MODE,
-+	NL802154_ATTR_CCA_MODE3_AND,
- 
- 	NL802154_ATTR_MAX_FRAME_RETRIES,
- 
-diff --git a/src/phy.c b/src/phy.c
-index 7f9411c..93dea82 100644
---- a/src/phy.c
-+++ b/src/phy.c
-@@ -100,7 +100,7 @@ static int handle_cca_mode_set(struct nl802154_state *state,
- 			       int argc, char **argv,
- 			       enum id_input id)
- {
--	unsigned long cca_mode;
-+	unsigned long cca_mode, cca_mode3_and;
- 	char *end;
- 
- 	if (argc < 1)
-@@ -111,6 +111,18 @@ static int handle_cca_mode_set(struct nl802154_state *state,
- 	if (*end != '\0')
- 		return 1;
- 
-+	if (cca_mode == 3) {
-+		if (argc < 2)
-+			return 1;
-+
-+		/* CCA_MODE */
-+		cca_mode3_and = strtoul(argv[1], &end, 10);
-+		if (*end != '\0')
-+			return 1;
-+
-+		NLA_PUT_U8(msg, NL802154_ATTR_CCA_MODE3_AND, cca_mode3_and);
-+	}
-+
- 	NLA_PUT_U8(msg, NL802154_ATTR_CCA_MODE, cca_mode);
- 
- 	return 0;
-@@ -118,5 +130,5 @@ static int handle_cca_mode_set(struct nl802154_state *state,
- nla_put_failure:
- 	return -ENOBUFS;
- }
--COMMAND(set, cca_mode, "<mode>",
-+COMMAND(set, cca_mode, "<mode|3 <1|0>>",
- 	NL802154_CMD_SET_CCA_MODE, 0, CIB_PHY, handle_cca_mode_set, NULL);
--- 
-2.1.0
+I own a RaspBee[1] Transceiver, that I wanted to use on the Raspberry
+Pi. On the wiki I noticed the page about the serial driver[2] which
+sounded promising. So I used the patch[3] with some small changes to
+make it work with the current net-next kernel and wrote my own
+firmware for the RaspBee[4]. The firmware uses the µRacoli library for
+I/O and network communication, so it should also work on other devices
+supported by the library.
 
+So my actual question is, why is the serial driver not part of
+net-next? Was it just never sent to the mailing list for review or are
+there any problems that need to be fixed first?
+
+
+Thanks,
+
+Thomas
+
+[1] http://www.dresden-elektronik.de/funktechnik/solutions/wireless-light-control/raspbee/?L=1
+[2] http://linux-zigbee.sourceforge.net/cgi-bin/trac.cgi/wiki/SerialV1
+[3] https://gist.github.com/jpizarrom/a07d833a124835e171c2
+[4] https://github.com/kuehnelth/raspbee-linux802154
