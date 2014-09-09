@@ -1,80 +1,87 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.17.10]:63287 "EHLO
-	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755200AbaIIJ2s (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Tue, 9 Sep 2014 05:28:48 -0400
-Message-ID: <540EC844.2040008@xsilon.com>
-Date: Tue, 09 Sep 2014 10:28:36 +0100
-From: Martin Townsend <martin.townsend@xsilon.com>
+Received: from mail-we0-f170.google.com ([74.125.82.170]:53593 "EHLO
+	mail-we0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932314AbaIIJq6 (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Tue, 9 Sep 2014 05:46:58 -0400
+Date: Tue, 9 Sep 2014 11:46:54 +0200
+From: Alexander Aring <alex.aring@gmail.com>
+Subject: Re: [PATCH v2 bluetooth-next] Simplify lowpan receive path so skb is
+ freed in lowpan_rcv when dropped.
+Message-ID: <20140909094652.GC4545@omega>
+References: <53DCE75C.2030305@xsilon.com>
+ <20140821083945.GA29484@omega>
+ <3DF0C18C-4A97-4A00-AB0F-9E01F72CE967@holtmann.org>
+ <53FE446D.6040805@xsilon.com>
+ <20140908104008.GB6981@omega>
+ <540DF1AE.2070709@xsilon.com>
+ <20140908183652.GA633@omega>
+ <20140908185519.GB633@omega>
+ <540EC844.2040008@xsilon.com>
 MIME-Version: 1.0
-Subject: Re: [PATCH v2 bluetooth-next] Simplify lowpan receive path so skb
- is freed in lowpan_rcv when dropped.
-References: <53DCE75C.2030305@xsilon.com> <20140821083945.GA29484@omega> <3DF0C18C-4A97-4A00-AB0F-9E01F72CE967@holtmann.org> <53FE446D.6040805@xsilon.com> <20140908104008.GB6981@omega> <540DF1AE.2070709@xsilon.com> <20140908183652.GA633@omega> <20140908185519.GB633@omega>
-In-Reply-To: <20140908185519.GB633@omega>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+In-Reply-To: <540EC844.2040008@xsilon.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>
+To: Martin Townsend <martin.townsend@xsilon.com>
 Cc: Marcel Holtmann <marcel@holtmann.org>, linux-zigbee-devel@lists.sourceforge.net, linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org
 
-Hi Alex,
+Hi Martin,
 
-On 08/09/14 19:55, Alexander Aring wrote:
-> Hi Martin,
->
-> On Mon, Sep 08, 2014 at 08:36:52PM +0200, Alexander Aring wrote:
->> Hi Martin,
->>
->> On Mon, Sep 08, 2014 at 07:13:02PM +0100, Martin Townsend wrote:
->> ...
->>>>> Hi,
->>>>>
->>>>> I'll respin and include the memory leak fix and this patch and a couple of
->>>>> others I have and send as a series to bluetooth.  What bluetooth git
->>>>> repository should I base the series on?
->>>>>
->>>> What's the state about to fix this bad issue? :-)
->>>>
->>>> I didn't saw any new patches because of this.
->>>>
->>>> - Alex
->>>> --
->>>> To unsubscribe from this list: send the line "unsubscribe linux-wpan" in
->>>> the body of a message to majordomo@vger.kernel.org
->>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>> Sorry for the delay, been on hols for a few days, I will create the patches
->>> tomorrow if I get time.
->>>
->>> I have also implemented Generic Header Compression[0] which is still in
->>> draft at the moment but I can't imagine it will change much before being
->>> released.  I'm going to integrate it into our linux repository this week.
->>> Would you be interested in putting it in linux-wpan or linux-wpan-next or
->>> would you prefer to wait until it gets it RFC status?
->>>
->> no, for me it's okay to have this mainline. I heard that a draft becomes
->> no RFC when nobody implements it.
->>
-> I thought more about that, you mean the receiving part only? So the
-> uncompression. The point is that we don't have no interface for an user
-> that can decide if he like to use UDP compression like RFC 6282 or UDP
-> compression like GHC. This is only relevant for the transmit part. So
-> compression is optionally. (We should have some interface to make this
-> configurable by user -> adding this to the nhc layer, later).
-I've implemented compression and decompression. You are right in that we need a mechanism of configuring what gets compressed by what method.
-> On the uncompression part, means the receiving part we can support both.
-> UDP RFC 6282 or UDP like GHC, the next header id value should be
-> different there. That means currently we can receive every packets but
-> transmit only RFC6282 compression formats.
->
-> So for receiving this, it's okay. But for compression, since we don't
-> have some interface to make this configurable we should use RFC 6282.
-So I will ensure UDP is compressed by 6282.  Then I was going to start out by just compressing ICMPv6 with GHC and monitor how much data is saved by using GHC.  Later on we will implement a mechanism of configuring what gets compressed and by which compression method.
+On Tue, Sep 09, 2014 at 10:28:36AM +0100, Martin Townsend wrote:
+...
+> > I thought more about that, you mean the receiving part only? So the
+> > uncompression. The point is that we don't have no interface for an user
+> > that can decide if he like to use UDP compression like RFC 6282 or UDP
+> > compression like GHC. This is only relevant for the transmit part. So
+> > compression is optionally. (We should have some interface to make this
+> > configurable by user -> adding this to the nhc layer, later).
+> I've implemented compression and decompression. You are right in that we need a mechanism of configuring what gets compressed by what method.
 
-The GHC spec states that a device indicates it's GHC capability using a 6LoWPAN Capability Indication Option (6CIO), this is an ND option.  As far as I can see there is no type assigned yet by IANA so I was wondering if we should have this as an experimental configuration item in the kernel?
->
-> Same opinion here? We can talk about that point.
->
-> - Alex
+ok. But how we deal with that currently with GHC UDP and UDP RFC6282
+compression. We can't not support both compression methods. 
 
-- Martin
+btw. how we should call it now? Uncompression or decompression, I can
+also name the callbacks to decompression. I am not a native speaker so
+I will ask you which is better now. :-)
+
+> > On the uncompression part, means the receiving part we can support both.
+> > UDP RFC 6282 or UDP like GHC, the next header id value should be
+> > different there. That means currently we can receive every packets but
+> > transmit only RFC6282 compression formats.
+> >
+> > So for receiving this, it's okay. But for compression, since we don't
+> > have some interface to make this configurable we should use RFC 6282.
+> So I will ensure UDP is compressed by 6282.  Then I was going to start out by just compressing ICMPv6 with GHC and monitor how much data is saved by using GHC.  Later on we will implement a mechanism of configuring what gets compressed and by which compression method.
+
+Okay, you mean that you will leave UDP compression by 6282 but insert a
+receive handling (decompression) for UDP GHC?
+
+RFC6282 doesn't describe any compression/decompression(or uncompression)
+format for ICMPv6, so we could handle there compression and
+uncompression. I understand now you did it that way, or?
+
+About the mechanism by user:
+
+There are several ways about to do it from userspace. I know now sysfs
+or netlink. Do you have already some idea how you want to make this
+configurable by user?
+
+
+btw.
+This reminds me a little bit like setting led trigger type, (blink,
+heartbeat, mmc, net, etc...). This is done by sysfs. 
+
+> 
+> The GHC spec states that a device indicates it's GHC capability using a 6LoWPAN Capability Indication Option (6CIO), this is an ND option.  As far as I can see there is no type assigned yet by IANA so I was wondering if we should have this as an experimental configuration item in the kernel?
+
+Yes, please make a bool into net/6lowpan/Kconfig and add support for
+drafts only if selected. 
+
+In code you simple need to use "if (IS_ENABLED(CONFIG_FOO))" to
+registration the nhc format into the nhc framework/layer or not.
+
+Replace FOO with a propber 6LOWPAN_NHC_DRAFTS or something else. You can
+write in the help what exactly this means.
+
+- Alex
