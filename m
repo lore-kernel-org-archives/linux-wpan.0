@@ -1,51 +1,46 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mga14.intel.com ([192.55.52.115]:56160 "EHLO mga14.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753482AbaILJSZ (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-	Fri, 12 Sep 2014 05:18:25 -0400
-Message-ID: <1410513480.7977.107.camel@jrissane-mobl.ger.corp.intel.com>
-Subject: Re: [PATCH][linux-bluetooth 2/3] 6lowpan: Move skb delivery from
- IPHC.
-From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-Date: Fri, 12 Sep 2014 12:18:00 +0300
-In-Reply-To: <20140911102555.GC20686@omega>
-References: <1410357968-27051-1-git-send-email-martin.townsend@xsilon.com>
-	 <1410357968-27051-4-git-send-email-martin.townsend@xsilon.com>
-	 <20140911081808.GA19675@omega> <54115C94.2050308@xsilon.com>
-	 <20140911090144.GC19675@omega> <54116C6D.3090004@xsilon.com>
-	 <20140911095355.GB20686@omega> <54117579.1070905@xsilon.com>
-	 <20140911102555.GC20686@omega>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Received: from senator.holtmann.net ([87.106.208.187]:49795 "EHLO
+	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752623AbaIKOKy convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Thu, 11 Sep 2014 10:10:54 -0400
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
+Subject: Re: [PATCH][linux-bluetooth 2/3] 6lowpan: Move skb delivery from IPHC.
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20140911081808.GA19675@omega>
+Date: Thu, 11 Sep 2014 07:11:31 -0700
+Content-Transfer-Encoding: 8BIT
+Message-Id: <1C268090-606B-45BF-8B47-7A3B35886F10@holtmann.org>
+References: <1410357968-27051-1-git-send-email-martin.townsend@xsilon.com> <1410357968-27051-4-git-send-email-martin.townsend@xsilon.com> <20140911081808.GA19675@omega>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: Alexander Aring <alex.aring@gmail.com>
-Cc: Martin Townsend <martin.townsend@xsilon.com>, Martin Townsend <mtownsend1973@gmail.com>, linux-zigbee-devel@lists.sourceforge.net, linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org, marcel@holtmann.org
+Cc: Martin Townsend <mtownsend1973@gmail.com>, linux-zigbee-devel@lists.sourceforge.net, linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org, Martin Townsend <martin.townsend@xsilon.com>
 
 Hi Alex,
 
-On to, 2014-09-11 at 12:25 +0200, Alexander Aring wrote:
-> Hi Martin,
+>> Passing the skb from 6lowpan up to the higher layers is not a
+>> function of IPHC.  By moving it out of IPHC we also remove the
+>> need to support error code returns with NET_RX codes.
+>> It also makes the lowpan_rcv function more extendable as we
+>> can support more compression schemes.
+>> 
 > 
-> On Thu, Sep 11, 2014 at 11:12:09AM +0100, Martin Townsend wrote:
-> > Hi Alex,
-> > 
-
-> > I would also be grateful for any testing by bluetooth developers as I can't physically test the code changes I have made to the bluetooth 6lowpan code.
-> > 
+> I will ack this. But please sperate this patch in two. First renaming
+> the function namens and then removing deliver callback.
 > 
-> I know what you mean...
+> btw. The correct tag is bluetooth not linux-bluetooth, or bluetooth-next.
 > 
-> I cc Jukka Rissanen, he implemented the 6lowpan stuff for bluetooth. I also
-> wanted that he becomes maintainer for 6LOWPAN_GENETIC too to review
-> the bluetooth side. Jukka what's about that... to be maintainer?
+> 
+> 
+> Also this doesn't fix anything? Then this is for bluetooth-next. I know
+> this depends on the Patch 1/3. Marcel, do you have any a nice solution
+> about this, that we can deal with huge fixes in bluetooth and new features
+> for bluetooth-next. Or simple wait when it's merged?
 
-Sure, I can be the maintainer of the BT 6LoWPAN side. I will send patch
-for MAINTAINERS file shortly.
+we need to get it into wireless first and pulled by davem. After that I can ask John to pull wireless tree back into wireless-next.
 
+Regards
 
-Cheers,
-Jukka
-
+Marcel
 
