@@ -1,31 +1,45 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-we0-f182.google.com ([74.125.82.182]:47721 "EHLO
+Received: from mail-we0-f182.google.com ([74.125.82.182]:43047 "EHLO
 	mail-we0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753966AbaIOK2b (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Mon, 15 Sep 2014 06:28:31 -0400
-Date: Mon, 15 Sep 2014 12:28:17 +0200
-From: Alexander Aring <alex.aring@gmail.com>
-Subject: Re: [PATCH] MAINTAINERS: add maintainer for generic 6LoWPAN
-Message-ID: <20140915102815.GA13603@omega>
-References: <1410768216-12414-1-git-send-email-jukka.rissanen@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1410768216-12414-1-git-send-email-jukka.rissanen@linux.intel.com>
+	with ESMTP id S1751576AbaILJex (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Fri, 12 Sep 2014 05:34:53 -0400
+From: Martin Townsend <mtownsend1973@gmail.com>
+Subject: [PATCH v2 bluetooth] Fix lowpan_rcv
+Date: Fri, 12 Sep 2014 10:34:38 +0100
+Message-Id: <1410514480-9070-1-git-send-email-martin.townsend@xsilon.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-Cc: linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org
+To: linux-zigbee-devel@lists.sourceforge.net, linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org
+Cc: marcel@holtmann.org, alex.aring@gmail.com, Martin Townsend <martin.townsend@xsilon.com>
 
-On Mon, Sep 15, 2014 at 11:03:36AM +0300, Jukka Rissanen wrote:
-> Add Jukka to 6LoWPAN maintainer list. He will concentrate on
-> generic and bluetooth part of 6LoWPAN stack.
-> 
-> Signed-off-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+This series aims to fix incorrect return values in lowpan_rcv
+To achieve this it also refactors the receive path to
+  1) free skb only from lowpan_rcv and not functions that it calls
+  2) move skb delivery from IPHC
 
-Acked-by: Alexander Aring <alex.aring@gmail.com>
+I have only compile tested the changes for bluetooth as I don't have any HW
+available so would be grateful for any testing from the Bluetooth developers.
+I have done some minimal testing for IEEE802.15.4
 
-next time also cc linux-wpan for generic 6lowpan foo, please.
-And I see no tag, please Marcel queue it into the right branch for you.
+Signed-off-by: Martin Townsend <martin.townsend@xsilon.com>
+---
 
-- Alex
+v1 -> v2:
+* combined first two patches into one.
+* split out renaming of process_data into a new patch
+* re-use err in lowpan_process_data and remove err_ret local variable.
+* removed third patch as applies to linux-wpan
+
+
+Martin Townsend (1):
+  6lowpan: fix incorrect return values in lowpan_rcv
+
+ include/net/6lowpan.h         |  4 +--
+ net/6lowpan/iphc.c            | 73 ++++++++++++++++++-------------------------
+ net/bluetooth/6lowpan.c       | 26 +++++++++------
+ net/ieee802154/6lowpan_rtnl.c | 44 +++++++++++++++-----------
+ 4 files changed, 75 insertions(+), 72 deletions(-)
+
+-- 
+1.9.1
+
