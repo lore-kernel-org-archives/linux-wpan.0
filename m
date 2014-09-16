@@ -1,51 +1,67 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wg0-f45.google.com ([74.125.82.45]:48243 "EHLO
-	mail-wg0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752654AbaIYHjk (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Thu, 25 Sep 2014 03:39:40 -0400
-Date: Thu, 25 Sep 2014 09:39:36 +0200
-From: Alexander Aring <alex.aring@gmail.com>
+Received: from mout.kundenserver.de ([212.227.126.131]:61954 "EHLO
+	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754971AbaIPTi2 (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Tue, 16 Sep 2014 15:38:28 -0400
+Message-ID: <541891B0.3010101@xsilon.com>
+Date: Tue, 16 Sep 2014 20:38:24 +0100
+From: Martin Townsend <martin.townsend@xsilon.com>
+MIME-Version: 1.0
 Subject: Re: [PATCH v4 bluetooth] 6lowpan: fix incorrect return values in
  lowpan_rcv
-Message-ID: <20140925073936.GB25208@omega>
-References: <20140916173806.GC6104@omega>
- <54188817.80707@xsilon.com>
- <20140916193723.GD6104@omega>
- <54189522.9090405@xsilon.com>
- <20140916200754.GE6104@omega>
- <54189B6E.5080905@xsilon.com>
- <20140916203032.GG6104@omega>
- <20140925055504.GA24765@omega>
- <5423C36D.20606@xsilon.com>
- <20140925073143.GA25208@omega>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20140925073143.GA25208@omega>
+References: <20140916121844.GA5349@omega> <54182C6B.6090801@xsilon.com> <20140916123421.GA5576@omega> <54182FB8.4080103@xsilon.com> <20140916124832.GB5576@omega> <1410873619.4860.20.camel@jrissane-mobl.ger.corp.intel.com> <20140916133206.GA6104@omega> <1410875570.4860.23.camel@jrissane-mobl.ger.corp.intel.com> <20140916140459.GB6104@omega> <54184CDB.9050200@xsilon.com> <20140916173806.GC6104@omega>
+In-Reply-To: <20140916173806.GC6104@omega>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Martin Townsend <martin.townsend@xsilon.com>
+To: Alexander Aring <alex.aring@gmail.com>
 Cc: Jukka Rissanen <jukka.rissanen@linux.intel.com>, Martin Townsend <mtownsend1973@gmail.com>, linux-zigbee-devel@lists.sourceforge.net, linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org, marcel@holtmann.org
 
-Martin,
+Hi Alex,
 
-On Thu, Sep 25, 2014 at 09:31:43AM +0200, Alexander Aring wrote:
-> On Thu, Sep 25, 2014 at 08:25:33AM +0100, Martin Townsend wrote:
-> > Hi Alex,
-> > 
-> > I'm not keen on handling kfree_skb inside of lowpan_process_data for reasons already stated in a previous email.  I'll have a rethink to see if there's another way of handling this.  One idea I'm investigating is pskb_expand_head, this doesn't create a new sk_buff but adds room to the head and/or tail which seems perfect for decompression.  There must only be a reference count of 1, so we would need to make a copy if this is the case before passing to decompression, I can't think why there would be more than 1 reference as the packet will only have passed through the 802.15.4 layer and only 6LoWPAN can decompress it.   If it's cloned for monitoring then this would be a problem.
-> > Any thoughts on this?
-> > 
-> 
-> For me it doesn't matter if kfree_skb is inside of lowpan_process_data
-> or not. Go ahead and send fixes for this, I will only review if there
-> are still issues which are not solved by your patch.
-> 
-> Don't know what you exactly mean with "monitoring" now.
-> 
-For me it's only important to know that you still working on this issue.
-If you still working on it, all seems to be fine.
+Another idea that just occured to me is to use the control buffer (cb) 
+in the skb to store the (de)compress_status variable.  This should be 
+possible as it is only valid for this layer.  Then process_data (or 
+iphc_header_decompress as I like to think of it now) will only ever 
+return an skb pointer; either the same one passed in (no copy_expand) or 
+more likely a new one (as we will skb_copy_expand to make room for 
+decompression).  On failure process_data or functions called by this set 
+the decompress status variable in skb->cb for lowpan_rcv to check.
 
-Thanks, for your effort.
+- Martin.
 
-- Alex
+On 16/09/14 18:38, Alexander Aring wrote:
+> Hi Martin,
+>
+> On Tue, Sep 16, 2014 at 03:44:43PM +0100, Martin Townsend wrote:
+>> I would like to keep freeing skb's out of process_data as process_data will become something like iphc_decompress_hdr and it would be good if that's all it did.  Otherwise I feel we are going to put a constraint on all future header decompression routines in that they must free the skb on error.  I think it would be better to defer this so on error you might want to try something else with the skb, maybe not but at least the option is there.
+>> So how about
+>>
+>>          struct sk_buff * ret_skb;
+>>          switch (skb->data[0] & 0xe0) {
+>>          case LOWPAN_DISPATCH_IPHC:    /* ipv6 datagram */
+>>              ret_skb = process_data(skb, &hdr);
+>>              if (IS_ERR(ret_skb))
+>>                  goto drop_skb;
+>>              else
+>>                  skb = ret_skb;
+>>              break;
+>>
+>> I know we currently have 3 calls to process_data so it will look fairly ugly in this patch but in my next patch to fix lowpan_rcv to handle uncompressed IPv6 packets that are fragmented there will only be one call to process_data so it won't look so bad.  You could even wrap it in a macro but I'm not a fan of this as they can obfuscate the code a bit.
+>>
+>> Thoughts?
+>>
+> sorry, I can't follow how this solve the issue if the "parameter skb" is
+> already consumed or not. If process_data returns a error before
+> parameter consume, then we should run kfree_skb(parameter_skb), if it's
+> afterwards we should do nothing. Point is we don't know that there. I
+> suppose if we do consume_skb and refcount reach 0 the parameter_skb
+> becomes a dangling pointer.
+>
+> - Alex
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-wpan" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
