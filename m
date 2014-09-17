@@ -1,77 +1,98 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.17.24]:51558 "EHLO
-	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754720AbaIQNaZ (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Wed, 17 Sep 2014 09:30:25 -0400
-Message-ID: <54198CEE.7000906@xsilon.com>
-Date: Wed, 17 Sep 2014 14:30:22 +0100
-From: Simon Vincent <simon.vincent@xsilon.com>
-MIME-Version: 1.0
+Received: from mail-wg0-f41.google.com ([74.125.82.41]:58260 "EHLO
+	mail-wg0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755516AbaIQN6H (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Wed, 17 Sep 2014 09:58:07 -0400
+Received: by mail-wg0-f41.google.com with SMTP id k14so1443453wgh.0
+        for <linux-wpan@vger.kernel.org>; Wed, 17 Sep 2014 06:58:03 -0700 (PDT)
+Date: Wed, 17 Sep 2014 15:57:59 +0200
+From: Alexander Aring <alex.aring@gmail.com>
 Subject: Re: 6lowpan raw socket problems
-References: <1409638090.3120.71.camel@jrissane-mobl.ger.corp.intel.com> <20140902071214.GA25800@omega> <20140902072627.GB25800@omega> <5405D284.7020606@xsilon.com> <20140902144327.GA15189@omega> <5405D961.4060006@xsilon.com> <20140902153742.GC15189@omega> <5405EB08.5040006@xsilon.com> <20140902162630.GD15189@omega> <5406123E.2080100@xsilon.com> <20140908104326.GC6981@omega>
-In-Reply-To: <20140908104326.GC6981@omega>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Message-ID: <20140917135757.GB14100@omega>
+References: <20140902072627.GB25800@omega>
+ <5405D284.7020606@xsilon.com>
+ <20140902144327.GA15189@omega>
+ <5405D961.4060006@xsilon.com>
+ <20140902153742.GC15189@omega>
+ <5405EB08.5040006@xsilon.com>
+ <20140902162630.GD15189@omega>
+ <5406123E.2080100@xsilon.com>
+ <20140908104326.GC6981@omega>
+ <54198CEE.7000906@xsilon.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <54198CEE.7000906@xsilon.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>
+To: Simon Vincent <simon.vincent@xsilon.com>
 Cc: linux-wpan@vger.kernel.org
 
-I have been looking into this issue again and it looks like RPL packets 
-cause the problem. It looks a bit like the header is not decompressed 
-correctly.
+Hi Simon,
 
-When I send a RPL packet I can see lowpan_header_compress is called 
-which compresses the header. I can not find where the header is 
-decompressed when the packet is received. By the time the packet gets to 
-rawv6_recvmsg the src and dest addresses in the header are corrupt.
+On Wed, Sep 17, 2014 at 02:30:22PM +0100, Simon Vincent wrote:
+> I have been looking into this issue again and it looks like RPL packets
+> cause the problem. It looks a bit like the header is not decompressed
+> correctly.
+> 
 
-Is this expected?
+You mean now IPv6 header here? I think yes, there should no other header
+compression running for this case currently.
 
-Regards
+> When I send a RPL packet I can see lowpan_header_compress is called which
+> compresses the header. I can not find where the header is decompressed when
+> the packet is received. By the time the packet gets to rawv6_recvmsg the src
+> and dest addresses in the header are corrupt.
+> 
 
-Simon
+Okay, you say here issues with source and destination addresses. I have
+no idea now what's going on your side.
 
-On 08/09/14 11:43, Alexander Aring wrote:
-> On Tue, Sep 02, 2014 at 07:53:50PM +0100, Martin Townsend wrote:
->> On 02/09/14 17:26, Alexander Aring wrote:
->>> On Tue, Sep 02, 2014 at 05:06:32PM +0100, Simon Vincent wrote:
->>>> This is not a problem. There is a fix elsewhere for that.
->>>>
->>>> I am using local-link addresses.
->>>>
->>>> I am seeing funny things like:
->>>> lowpan0: received packet from fe80::203:9a00:41:c864 ->
->>>> 7707:ffff:300:0:9a:300:7b3b:3a1a
->>>>
->>>> Src address fe80::203:9a00:41:c864 does not exist on the network and
->>>> destination address 7707:ffff:300:0:9a:300:7b3b:3a1a does not.
->>>>
->>> Where do you capture this? You know that wireshark on a lowpan interface
->>> is broken?
->>>
->>> - Alex
->>> --
->>> To unsubscribe from this list: send the line "unsubscribe linux-wpan" in
->>> the body of a message to majordomo@vger.kernel.org
->>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->> Hi Alex,
->>
->> I'm working with Simon and these are from printf statements, we've stepped
->> through the code and seen the same problem.
->>
->> It would be nice to have a better testing environment, you mentioned that
->> you have a virtual setup, does this allow for multiple nodes sending
->> receiving packets like the contiki one? if so do you have instructions on
->> how to setup?
->>
-> for testing you could use fakelb or tony's serial virtual interface [0].
-> I didn't test both of them, but we need some testing interface of
-> course.
->
-> The virtual serial interface require the serial driver.
->
-> Sorry for my late reply.
->
-> [0] https://github.com/tcheneau/virtual-ieee802154-serial
+I need more information which types of addresses you use. Which kind of
+address compression methods, note we don't support stateful address
+compression but you are welcome to send patches. :-)
 
+My idea is now, enable some more debug information while running
+decompress/compress methods.
+
+At [0], you could add "#define DEBUG" then you see more information
+about the compression/uncompression while receiving/transmit. Don't know
+if you already know about that.
+
+Very simple is also to check if DAC or SAC bit in iphc1 is set. If this
+is set you used stateful compression, which is not supported (should
+occur a warning).
+
+I don't know right your setup if you use linux<->linux this should never
+happen. Other question is also, do you use short addresses? Handling of
+short addresses, except the broadcast address is currently also not
+supported. :-(
+
+I can also not say that there is more bugs than this, Werner Almesberger
+detected some issue about ICMPv6 payload size. Some issue with ICMPv6 payload
+which are lesser than 4 bytes was filtered by kernel. That was wrong for
+RPL... there was some crazy issue [1]. What I here want to say is, that
+probaly IPv6 implementation can't also deal with it, it's hard to debug
+I know. Use a little bit ctags for stepping into the code and instrument
+some printk foo, more or later you will find it. :)
+
+Sorry but I can't currently look more into this issue. Maybe simple add
+the "#define DEBUG" into [1], then write some mail which information
+from dmesg.
+
+> Is this expected?
+> 
+
+No, normally all things should run fine. Otherwise you detect a bug. :-)
+
+And of course you are also welcome to send patches for it. I know there
+was some guy/girl which said the traffic class compression is broken,
+but this is currently hard understandable code, need some time to
+decrypt it, maybe a full rework for traffic class compression/decompress
+is needed. Maybe some cases for traffic class will break your address
+compression/decompression, overwriting some 6LoWPAN inline data.
+
+- Alex
+
+[0] https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/net/6lowpan/iphc.c?id=refs/tags/v3.17-rc5#n51
+[1] https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/?id=d1c53c8e870cdedb6fc9550f41c558bab45b5219
