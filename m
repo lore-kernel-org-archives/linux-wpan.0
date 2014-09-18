@@ -1,76 +1,44 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.17.24]:56653 "EHLO
-	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756071AbaIRHqz (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Thu, 18 Sep 2014 03:46:55 -0400
-Date: Thu, 18 Sep 2014 08:46:55 +0100
+Received: from mail-we0-f169.google.com ([74.125.82.169]:39729 "EHLO
+	mail-we0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753534AbaIRIdI (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Thu, 18 Sep 2014 04:33:08 -0400
+Received: by mail-we0-f169.google.com with SMTP id w61so509501wes.28
+        for <linux-wpan@vger.kernel.org>; Thu, 18 Sep 2014 01:33:06 -0700 (PDT)
+Date: Thu, 18 Sep 2014 10:33:01 +0200
+From: Alexander Aring <alex.aring@gmail.com>
 Subject: Re: 6lowpan raw socket problems
-From: Simon Vincent <simon.vincent@xsilon.com>
+Message-ID: <20140918083259.GA3774@omega>
+References: <0MXovv-1XrSix456F-00WrKR@mrelayeu.kundenserver.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: base64
-Message-Id: <0MXovv-1XrSix456F-00WrKR@mrelayeu.kundenserver.de>
+Content-Disposition: inline
+In-Reply-To: <0MXovv-1XrSix456F-00WrKR@mrelayeu.kundenserver.de>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>
+To: Simon Vincent <simon.vincent@xsilon.com>
 Cc: linux-wpan@vger.kernel.org
 
-SSB0aGluayB3aGF0IGlzIGhhcHBlbmluZyBpcyBzaW1pbGFyIHRvIHlvdXIgdGhlb3J5LiBUaGUg
-cGFja2V0cyBhcmUgZ2V0dGluZyBzZW50IHRvIHRoZSA4MDIuMTUuNCBkcml2ZXIgYW5kIHRoZSBj
-b21wcmVzcyBoZWFkZXIgZnVuY3Rpb24gYnV0IGFzIHdlIGhhdmUgdGhlIHJhdyBzb2NrZXQgcmVj
-dm1zZyB0aGUgcGFja2V0IGlzIGFsc28gc2VudCBpbnRlcm5hbGx5IHRvIHRoaXMgc29ja2V0LiAK
-VGhpcyBpcyBiZWNhdXNlIGEgcmF3IHNvY2tldCByZWNlaXZlcyBhbGwgbWVzc2FnZXMgdGhhdCBh
-cmUgc2VudCBhbmQgcmVjZWl2ZWQuIApJdCBkb2VzIGFwcGVhciB0byBiZSBhIGNvbXBsZXggcHJv
-YmxlbS4gSSBqdXN0IG5lZWQgdG8gcHJvdmUgdGhhdCB0aGlzIGlzIHdoYXQgaXMgaGFwcGVuaW5n
-IGJ5IGluc2VydGluZyBtb3JlIGRlYnVnLgoKU2ltb24KCk9uIDE3IFNlcCAyMDE0IDE3OjE3LCBB
-bGV4YW5kZXIgQXJpbmcgPGFsZXguYXJpbmdAZ21haWwuY29tPiB3cm90ZToKPgo+IEhpLCAKPgo+
-IE9uIFdlZCwgU2VwIDE3LCAyMDE0IGF0IDA2OjAzOjUzUE0gKzAyMDAsIEFsZXhhbmRlciBBcmlu
-ZyB3cm90ZTogCj4gPiBPbiBXZWQsIFNlcCAxNywgMjAxNCBhdCAwNDozMzo0OVBNICswMTAwLCBT
-aW1vbiBWaW5jZW50IHdyb3RlOiAKPiA+ID4gSGkgQWxleCwgCj4gPiA+IAo+ID4gPiBJdCBsb29r
-cyBsaWtlIHRoZSBwcm9ibGVtIGlzIGludGVybmFsIHRvIExpbnV4LiBJIGFtIHJ1bm5pbmcgb24g
-YSBzaW5nbGUgCj4gPiA+IExpbnV4IGJveCwgb3V0cHV0dGluZyBhIFJQTCBtZXNzYWdlIHdoaWNo
-IGlzIHB1dCBvbnRvIGEgODAyMTU0IGZha2VsYiAKPiA+ID4gZHJpdmVyLiBUaGUgUlBMIG1lc3Nh
-Z2UgaXMgYWxzbyBwaWNrZWQgdXAgYnkgdGhlIGNvZGUgaW4gbXkgYXBwbGljYXRpb24gdGhhdCAK
-PiA+ID4gaXMgbGlzdGVuaW5nIG9uIGEgUkFXIHNvY2tldC4gVGhpcyBpcyB3aGVyZSB0aGUgY29y
-cnVwdCBhZGRyZXNzZXMgYXJlIHNlZW4uIAo+ID4gPiAKPiA+ID4gQWxsIGFkZHJlc3NlcyBhcmUg
-bG9jYWwgbGluay4gU2hvcnQgYWRkcmVzc2luZyBpcyB1c2VkIGZvciB0aGUgYnJvYWRjYXN0IAo+
-ID4gPiBhZGRyZXNzIG9ubHkuIEkgYW0gbm90IHVzaW5nIHN0YXRlZnVsIGNvbXByZXNzaW9uLiAK
-PiA+ID4gCj4gPiA+IElzIHRoZSBzYW1lIGJ1ZmZlciB1c2VkIGZvciB0aGUgNmxvd3BhbiBhbmQg
-aXB2NiBvciBpcyBhIGNvcHkgdGFrZW4gdG8gZG8gCj4gPiA+IHRoZSBpcHY2IGhlYWRlciBjb21w
-cmVzc2lvbj8gSWYgc28gdGhlIG1lc3NhZ2UgaXMgb3V0cHV0IG9uIHRoZSA4MDIxNTQgYnV0IAo+
-ID4gPiBmaXJzdCB0aGUgaXB2NiBoZWFkZXIgaXMgY29tcHJlc3NlZC4gVGhlIG1lc3NhZ2UgaXMg
-YWxzbyBwYXNzZWQgdG8gbXkgUkFXIAo+ID4gPiBpcHY2IHNvY2tldCBmcm9tIHRoZSBpcHY2IGxh
-eWVyIHVzaW5nIHRoZSBzYW1lIGJ1ZmZlciB3aGljaCBub3cgY29udGFpbnMgdGhlIAo+ID4gPiBj
-b21wcmVzc2VkIGhlYWRlcj8gCj4gPiA+IAo+ID4gPiAKPiA+ID7CoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgIHwtLS0+wqDCoCByZWN2bXNnIFJBVyBza3QgCj4gPiA+IHNl
-bmRtc2cgUkFXIHNrdCAtLS0+fCAKPiA+ID7CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgIHwtLS0+wqDCoCA2bG93cGFuLzgwMi4xNS40IAo+ID4gPiAKPiA+ID4gTXkgZGVi
-dWcgY2FuIHNlZSB0aGUgaGVhZGVyIGdldHRpbmcgY29tcHJlc3NlZCBhdCB0aGUgNmxvd3BhbiBs
-YXllciBidXQgCj4gPiAKPiA+IDwtLS0gY29tcHJlc3NlZCBtZWFucyB0eCB3b3JraW5nIGFuZCBu
-byByeC4gCj4gPiAKPiA+ID4gdGhlcmUgaXMgbm8gcmVjZWl2ZSBkZWJ1ZyB0cmlnZ2VyZWQgc28g
-dGhlIFJBVyBzb2NrZXQgaXMgZ2V0dGluZyB0aGUgbWVzc2FnZSAKPiA+ID4gZnJvbSB0aGUgaXB2
-NiBsYXllci4gCj4gPiA+IAo+ID4gCj4gPiBtaGhoLCBJIGhhdmUgYSB0aGVvcnkuIFRoZSBsaW51
-eCBuZXR3b3JraW5nIHN0YWNrIGlzIHRvbyBjbGV2ZXIuIEl0IHNlZSdzIAo+ID4gdGhhdCB0aGVz
-ZSBhZGRyZXNzZXMgYXJlIG9uIHRoZSBfc2FtZV8gSE9TVCBhbmQgcnVubmluZyBpdCBvbmx5IG9u
-ZSBzb21lIAo+ID4gbG9vcGJhY2sgaW50ZXJmYWNlcy4gSXQncyBsaWtlIHBpbmc2IDo6MSBvbiBh
-IGxvd3BhbiBpbnRlcmZhY2UsIGlmIHlvdSAKPiA+IHdhbnQgdG8gZG8gdGhhdCwgd2UgbmV2ZXIg
-cmVwbGFjZSB0aGUgSVB2NiBoZWFkZXIgd2l0aCBhbiA2TG9XUEFOIGhlYWRlciAKPiA+IGJlY2F1
-c2UgdGhlIGN1cnJlbnQgYmVoYXZpb3VyIGRvZXNuJ3Qgc2VuZCBpdCB0byB0aGUgbG93ZXIgbGF5
-ZXJzLiAKPiA+IEluIHRoaXMgY2FzZSAibGludXggbmV0d29ya2luZyBzdGFjayIgc2VlJ3MgImFo
-aGggdGhlIHNhbWUgaG9zdCAtPiBkb2luZyAKPiA+IG1hZ2ljIG9wdGltaXphdGlvbiIuIFRoZW4g
-dGhlIElQdjYgc3RhY2sgZG9lc24ndCBjYWxsIHRoZSBuZWNlc3NhcnkgCj4gPiBjYWxsYmFja3Mg
-dG8gZG8gNkxvV1BBTiBtYWdpYy4gCj4gPiAKPiA+IFBsZWFzZSBpbnN0cnVtZW50IHNvbWUgZHJp
-dmVyIGxheWVyIG9mIGZha2VsYiBkcml2ZXIgWzFdIHRoZW4gd2UgY2FuIGNoZWNrIAo+ID4gdGhp
-cyB0aGVvcnksIFdoZW4geW91IGluc3RydW1lbnQgc29tZSBwcmludGsncyBhdCBkcml2ZXIgbGF5
-ZXIgd2UgY2FuIAo+ID4gc2VlIGlmIHlvdXIgZnJhbWVzIGV2ZXIgcmVhY2hlZCB0aGUgbG93ZXIg
-bGF5ZXIuIEkgYW0gcmlnaHQgbm90IHN1cmUgaWYgCj4gPiB0aGlzIGNvdWxkIGJlIHRydWUsIEkg
-bmV2ZXIgdGVzdGVkIHNvIG11Y2ggdGhlIGZha2VsYiBkcml2ZXIuIAo+ID4gCj4gPiBBbHNvIHBs
-ZWFzZSBpbnN0cnVtZW50IHRoaXMgZnVuY3Rpb24gWzBdLCBpdCdzIG5lY2Vzc2FyeSB0byBydW4g
-Cj4gPiBkZWNvbXByZXNzaW9uIHdoZW4gcmVjZWl2aW5nLiBJZiBteSB0aGVvcnkgaXMgdHJ1ZSwg
-dGhlbiBpdCdzIGEgCj4gPiBjb21wbGljYXRlZCBpc3N1ZSBhbmQgZG9uJ3Qga25vdyByaWdodCBu
-b3cgYSBlYXN5IHdvcmthcm91bmQuIAo+ID4gCj4KPiBJIGFsc28gcmVtZW1iZXJlZCBhbiBvdGhl
-ciBndXkvZ2lybCB3aGljaCBoYWQgc29tZSBpc3N1ZXMgd2l0aCA2bG93cGFuIAo+IGFuZCBmYWtl
-bGIgZHJpdmVyLCBidXQgSSBkaWQgYSBxdWljayB0ZXN0IGFuZCBpdCB3b3JrZWQgZm9yIG1lLiAK
-Pgo+IFdoaWNoIGtlcm5lbCB2ZXJzaW9uIGRvIHlvdSB1c2luZywgbmV0LW5leHQga2VybmVsPyAK
-Pgo+IC0gQWxleCAK
+On Thu, Sep 18, 2014 at 08:46:55AM +0100, Simon Vincent wrote:
+> I think what is happening is similar to your theory. The packets are getting sent to the 802.15.4 driver and the compress header function but as we have the raw socket recvmsg the packet is also sent internally to this socket. 
+> This is because a raw socket receives all messages that are sent and received. 
+> It does appear to be a complex problem. I just need to prove that this is what is happening by inserting more debug.
+> 
+mh, ok. Good to know that there is maybe such issue with the fakelb
+driver and 6LoWPAN. Maybe there exists some netdev flag setting or
+something else to avoid this.
 
+You could describe this problem at netdev@vger.kernel.org and maybe the
+guys knows a solution.
+
+At the moment we use's some callbacks for replacing IPv6 with 6LoWPAN
+header which was not made to make this there. This seems to be a global
+architecture problem of the 6LoWPAN stack.
+
+Or we need a another fakelb driver solution, I remember the tun/tap
+interfaces which allow to send/recv packets from/to userspace. They need
+to have similar issues when they have two interfaces and link-local
+addresses. I don't know how they deal with that. This idea is just a shoot
+into the dark. ;-)
+
+- Alex
