@@ -1,79 +1,71 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f177.google.com ([209.85.212.177]:34799 "EHLO
-	mail-wi0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753345AbaIOMCS (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Mon, 15 Sep 2014 08:02:18 -0400
-Received: by mail-wi0-f177.google.com with SMTP id em10so4058973wid.4
-        for <linux-wpan@vger.kernel.org>; Mon, 15 Sep 2014 05:02:09 -0700 (PDT)
-Date: Mon, 15 Sep 2014 14:01:59 +0200
-From: Alexander Aring <alex.aring@gmail.com>
-Subject: Re: Promiscuous patches
-Message-ID: <20140915120158.GA15047@omega>
-References: <5412F199.7010803@xsilon.com>
- <20140914234551.GA7009@omega>
- <20140914235607.GB7009@omega>
- <20140915115618.GC13603@omega>
+Received: from mout.kundenserver.de ([212.227.17.13]:64129 "EHLO
+	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754604AbaIRI5N (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Thu, 18 Sep 2014 04:57:13 -0400
+Message-ID: <541A9E65.3090300@xsilon.com>
+Date: Thu, 18 Sep 2014 09:57:09 +0100
+From: Martin Townsend <martin.townsend@xsilon.com>
 MIME-Version: 1.0
+Subject: Re: Promiscuous patches
+References: <5412F199.7010803@xsilon.com> <20140914234551.GA7009@omega>
+In-Reply-To: <20140914234551.GA7009@omega>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20140915115618.GC13603@omega>
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Martin Townsend <martin.townsend@xsilon.com>
+To: Alexander Aring <alex.aring@gmail.com>
 Cc: linux-wpan@vger.kernel.org
 
-On Mon, Sep 15, 2014 at 01:56:18PM +0200, Alexander Aring wrote:
-> On Mon, Sep 15, 2014 at 01:56:07AM +0200, Alexander Aring wrote:
-> > On Mon, Sep 15, 2014 at 01:45:51AM +0200, Alexander Aring wrote:
-> > > Hi Martin,
-> > > 
-> > > On Fri, Sep 12, 2014 at 02:14:01PM +0100, Martin Townsend wrote:
-> > > > Hi Alex,
-> > > > 
-> > > > You sent me a patch not long ago to allow automatic setting of promiscous mode.  I seem to have lost this patch, could you resend as I want to look into it.
-> > > > 
-> > > 
-> > > some of my old branch [0].
-> > > 
-> > > btw.
-> > > 
-> > > I added to the rework now the promiscous mode and decided to not enable
-> > > this mode while setting promiscous mode flag.
-> > > 
-> > > It's now setted by doing a ifup of a monitor interface. See [1].
-> > > 
-> > > Maybe you will change it like this (it's better) but there are so many
-> > > issue to think about (Disable promiscous if netif on non MONITOR
-> > > interfaces etc...).
-> > > 
-> > > And also you can't have NODE and MONITOR running because it's phy mac
-> > > sublayer attribute.
-> > > 
-> > 
-> > I mean with mac sublayer here, some timing critical mac operations/algorithmn
-> > done by phy's. Like AACK/ARET, CSMA, etc handling. I don't beleieve that we can
-> > ever handle these timing ciriticals inside mac802154.
-> > 
-> > So we have multiple interfaces but one phy. :-)
-> > 
-> > One phy means we need to check the constraints that these parameters are
-> > always the same on each interface.
-> > 
-> > On phy pib handling we don't need that. This is no MAC algorithmn, it's
-> > only physical changes to the phy rf handling and for the rework we don't
-> > have the multiple phy handling anymore.
-> > 
-> 
-> grml s/promiscous/promiscuous everywhere. I need to remember that.
-> Sorry.
-> 
-> I will fix it on the branch.
-> 
+Hi Alex,
 
-Seems to be a common error, "grep -r promiscous .":
+Thanks for the links, I needed this to get wireshark working again as we now have address filtering support in HW.
 
-./drivers/net/ethernet/wiznet/w5100.c:#define   S0_MR_MACRAW		  0x04 /* MAC RAW mode (promiscous) */
-./drivers/net/ethernet/wiznet/w5300.c:#define   S0_MR_MACRAW		  0x0004  /* MAC RAW mode (promiscous) */
-./drivers/net/wireless/ath/ath10k/htt.h:	/* Non-data in promiscous mode */
+The code looks good and using the net device op for detecting a rx flag change looks good to me.  A couple of thoughts.
+1) Maybe you could remove the HW flag for promiscuous? just let the driver implement the set_promiscuous_mode driver ops function if the HW supports it or leave it NULL if it doesn't
+2) I had to implement the ndo_change_rx_flags net device ops in wpan.c not monitor.c.  For remote wireshark captures that we do we use tcpdump -i wpan0 on the boards.  Are we doing something wrong here? Your code seems to suggest that we should bring up a separate monitor interface?
 
-- Alex
+- Martin.
+
+
+
+On 15/09/14 00:45, Alexander Aring wrote:
+> Hi Martin,
+>
+> On Fri, Sep 12, 2014 at 02:14:01PM +0100, Martin Townsend wrote:
+>> Hi Alex,
+>>
+>> You sent me a patch not long ago to allow automatic setting of promiscous mode.  I seem to have lost this patch, could you resend as I want to look into it.
+>>
+> some of my old branch [0].
+>
+> btw.
+>
+> I added to the rework now the promiscous mode and decided to not enable
+> this mode while setting promiscous mode flag.
+>
+> It's now setted by doing a ifup of a monitor interface. See [1].
+>
+> Maybe you will change it like this (it's better) but there are so many
+> issue to think about (Disable promiscous if netif on non MONITOR
+> interfaces etc...).
+>
+> And also you can't have NODE and MONITOR running because it's phy mac
+> sublayer attribute.
+>
+> I will cc linux-wpan, hope it's okay.
+>
+> In next days I will draw some fancy architecture graphic about the
+> rework. To understand what I really did there. (I also have no idea
+> about to implement it 100% right, I do experiments and then think about
+> it "how we can do that in a better way") and very important in a way
+> where we could easily handle/add _new features_.
+>
+> If anybody has questions about this implementation I would be very happy
+> to answer them. :-)
+>
+> - Alex
+>
+> [0] https://github.com/linux-wpan/linux-wpan-next/commits/alex/wip
+> [1] https://github.com/linux-wpan/linux-wpan-next/blob/d5d62172f69ecf8db4dce77e790403e532687662/net/mac802154/iface.c#L42
+
