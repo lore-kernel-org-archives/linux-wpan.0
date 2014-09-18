@@ -1,58 +1,76 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-pd0-f171.google.com ([209.85.192.171]:52957 "EHLO
-	mail-pd0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752039AbaISK3B (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Fri, 19 Sep 2014 06:29:01 -0400
-Message-ID: <541C04DA.5030707@gmail.com>
-Date: Fri, 19 Sep 2014 15:56:34 +0530
-From: Varka Bhadram <varkabhadram@gmail.com>
+Received: from mout.kundenserver.de ([212.227.17.24]:56653 "EHLO
+	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756071AbaIRHqz (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Thu, 18 Sep 2014 03:46:55 -0400
+Date: Thu, 18 Sep 2014 08:46:55 +0100
+Subject: Re: 6lowpan raw socket problems
+From: Simon Vincent <simon.vincent@xsilon.com>
 MIME-Version: 1.0
-Subject: Re: [PATCH bluetooth-next v2 0/3] cleanup for mrf24j40 driver
-References: <1411101911-12462-1-git-send-email-varkab@cdac.in> <20140919090611.GA17051@omega> <541BF7F4.4020508@gmail.com> <20140919094052.GA19085@omega> <541BFAEB.5050102@gmail.com> <20140919094830.GB19085@omega>
-In-Reply-To: <20140919094830.GB19085@omega>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: base64
+Message-Id: <0MXovv-1XrSix456F-00WrKR@mrelayeu.kundenserver.de>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: Alexander Aring <alex.aring@gmail.com>
-Cc: linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org, alan@signal11.us, Varka Bhadram <varkab@cdac.in>
+Cc: linux-wpan@vger.kernel.org
 
-On 09/19/2014 03:18 PM, Alexander Aring wrote:
-> On Fri, Sep 19, 2014 at 03:14:11PM +0530, Varka Bhadram wrote:
->> On 09/19/2014 03:11 PM, Alexander Aring wrote:
->>> On Fri, Sep 19, 2014 at 03:01:32PM +0530, Varka Bhadram wrote:
->>>> Hi Alex,
->>>>
->>>> On 09/19/2014 02:36 PM, Alexander Aring wrote:
->>>>> Hi Varka,
->>>>>
->>>>> nice to read you again. :-) I already thought that I was maybe a little
->>>>> bit too harsh to you for explaining changing dev->add_len during runtime
->>>>> will occur in unexcept behaviour. Sorry.
->>>> For dev->addr_len, i think David asked a question.. Isn't it..?
->>>>
->>> yes, I didn't answer. I decide now to put this issue at the last item of
->>> my todo queue. If you like you can try it. I will answer him that I do
->>> other things right now and this issue is more complex.
->>>
->>>
->>> Also you did the cc2520 driver, you can add you as maintainer for this
->>> driver. I have such devices here but on contiki nodes.
->>>
->> You mean to say that i need to add an entry in MAINTAINER file or ..?
->>
-> not need, only if you like. I have no idea about the cc2520 driver.
->
-> If there cames patches in, I can only look for syntax and according
-> interaction with mac802154 stack.
-
-Ya.. I can be maintainer for CC2520 driver.
-
-I will look into the cc2520 driver patches.
-
-Thanks
-
--- 
-Regards,
-Varka Bhadram.
+SSB0aGluayB3aGF0IGlzIGhhcHBlbmluZyBpcyBzaW1pbGFyIHRvIHlvdXIgdGhlb3J5LiBUaGUg
+cGFja2V0cyBhcmUgZ2V0dGluZyBzZW50IHRvIHRoZSA4MDIuMTUuNCBkcml2ZXIgYW5kIHRoZSBj
+b21wcmVzcyBoZWFkZXIgZnVuY3Rpb24gYnV0IGFzIHdlIGhhdmUgdGhlIHJhdyBzb2NrZXQgcmVj
+dm1zZyB0aGUgcGFja2V0IGlzIGFsc28gc2VudCBpbnRlcm5hbGx5IHRvIHRoaXMgc29ja2V0LiAK
+VGhpcyBpcyBiZWNhdXNlIGEgcmF3IHNvY2tldCByZWNlaXZlcyBhbGwgbWVzc2FnZXMgdGhhdCBh
+cmUgc2VudCBhbmQgcmVjZWl2ZWQuIApJdCBkb2VzIGFwcGVhciB0byBiZSBhIGNvbXBsZXggcHJv
+YmxlbS4gSSBqdXN0IG5lZWQgdG8gcHJvdmUgdGhhdCB0aGlzIGlzIHdoYXQgaXMgaGFwcGVuaW5n
+IGJ5IGluc2VydGluZyBtb3JlIGRlYnVnLgoKU2ltb24KCk9uIDE3IFNlcCAyMDE0IDE3OjE3LCBB
+bGV4YW5kZXIgQXJpbmcgPGFsZXguYXJpbmdAZ21haWwuY29tPiB3cm90ZToKPgo+IEhpLCAKPgo+
+IE9uIFdlZCwgU2VwIDE3LCAyMDE0IGF0IDA2OjAzOjUzUE0gKzAyMDAsIEFsZXhhbmRlciBBcmlu
+ZyB3cm90ZTogCj4gPiBPbiBXZWQsIFNlcCAxNywgMjAxNCBhdCAwNDozMzo0OVBNICswMTAwLCBT
+aW1vbiBWaW5jZW50IHdyb3RlOiAKPiA+ID4gSGkgQWxleCwgCj4gPiA+IAo+ID4gPiBJdCBsb29r
+cyBsaWtlIHRoZSBwcm9ibGVtIGlzIGludGVybmFsIHRvIExpbnV4LiBJIGFtIHJ1bm5pbmcgb24g
+YSBzaW5nbGUgCj4gPiA+IExpbnV4IGJveCwgb3V0cHV0dGluZyBhIFJQTCBtZXNzYWdlIHdoaWNo
+IGlzIHB1dCBvbnRvIGEgODAyMTU0IGZha2VsYiAKPiA+ID4gZHJpdmVyLiBUaGUgUlBMIG1lc3Nh
+Z2UgaXMgYWxzbyBwaWNrZWQgdXAgYnkgdGhlIGNvZGUgaW4gbXkgYXBwbGljYXRpb24gdGhhdCAK
+PiA+ID4gaXMgbGlzdGVuaW5nIG9uIGEgUkFXIHNvY2tldC4gVGhpcyBpcyB3aGVyZSB0aGUgY29y
+cnVwdCBhZGRyZXNzZXMgYXJlIHNlZW4uIAo+ID4gPiAKPiA+ID4gQWxsIGFkZHJlc3NlcyBhcmUg
+bG9jYWwgbGluay4gU2hvcnQgYWRkcmVzc2luZyBpcyB1c2VkIGZvciB0aGUgYnJvYWRjYXN0IAo+
+ID4gPiBhZGRyZXNzIG9ubHkuIEkgYW0gbm90IHVzaW5nIHN0YXRlZnVsIGNvbXByZXNzaW9uLiAK
+PiA+ID4gCj4gPiA+IElzIHRoZSBzYW1lIGJ1ZmZlciB1c2VkIGZvciB0aGUgNmxvd3BhbiBhbmQg
+aXB2NiBvciBpcyBhIGNvcHkgdGFrZW4gdG8gZG8gCj4gPiA+IHRoZSBpcHY2IGhlYWRlciBjb21w
+cmVzc2lvbj8gSWYgc28gdGhlIG1lc3NhZ2UgaXMgb3V0cHV0IG9uIHRoZSA4MDIxNTQgYnV0IAo+
+ID4gPiBmaXJzdCB0aGUgaXB2NiBoZWFkZXIgaXMgY29tcHJlc3NlZC4gVGhlIG1lc3NhZ2UgaXMg
+YWxzbyBwYXNzZWQgdG8gbXkgUkFXIAo+ID4gPiBpcHY2IHNvY2tldCBmcm9tIHRoZSBpcHY2IGxh
+eWVyIHVzaW5nIHRoZSBzYW1lIGJ1ZmZlciB3aGljaCBub3cgY29udGFpbnMgdGhlIAo+ID4gPiBj
+b21wcmVzc2VkIGhlYWRlcj8gCj4gPiA+IAo+ID4gPiAKPiA+ID7CoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgIHwtLS0+wqDCoCByZWN2bXNnIFJBVyBza3QgCj4gPiA+IHNl
+bmRtc2cgUkFXIHNrdCAtLS0+fCAKPiA+ID7CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgIHwtLS0+wqDCoCA2bG93cGFuLzgwMi4xNS40IAo+ID4gPiAKPiA+ID4gTXkgZGVi
+dWcgY2FuIHNlZSB0aGUgaGVhZGVyIGdldHRpbmcgY29tcHJlc3NlZCBhdCB0aGUgNmxvd3BhbiBs
+YXllciBidXQgCj4gPiAKPiA+IDwtLS0gY29tcHJlc3NlZCBtZWFucyB0eCB3b3JraW5nIGFuZCBu
+byByeC4gCj4gPiAKPiA+ID4gdGhlcmUgaXMgbm8gcmVjZWl2ZSBkZWJ1ZyB0cmlnZ2VyZWQgc28g
+dGhlIFJBVyBzb2NrZXQgaXMgZ2V0dGluZyB0aGUgbWVzc2FnZSAKPiA+ID4gZnJvbSB0aGUgaXB2
+NiBsYXllci4gCj4gPiA+IAo+ID4gCj4gPiBtaGhoLCBJIGhhdmUgYSB0aGVvcnkuIFRoZSBsaW51
+eCBuZXR3b3JraW5nIHN0YWNrIGlzIHRvbyBjbGV2ZXIuIEl0IHNlZSdzIAo+ID4gdGhhdCB0aGVz
+ZSBhZGRyZXNzZXMgYXJlIG9uIHRoZSBfc2FtZV8gSE9TVCBhbmQgcnVubmluZyBpdCBvbmx5IG9u
+ZSBzb21lIAo+ID4gbG9vcGJhY2sgaW50ZXJmYWNlcy4gSXQncyBsaWtlIHBpbmc2IDo6MSBvbiBh
+IGxvd3BhbiBpbnRlcmZhY2UsIGlmIHlvdSAKPiA+IHdhbnQgdG8gZG8gdGhhdCwgd2UgbmV2ZXIg
+cmVwbGFjZSB0aGUgSVB2NiBoZWFkZXIgd2l0aCBhbiA2TG9XUEFOIGhlYWRlciAKPiA+IGJlY2F1
+c2UgdGhlIGN1cnJlbnQgYmVoYXZpb3VyIGRvZXNuJ3Qgc2VuZCBpdCB0byB0aGUgbG93ZXIgbGF5
+ZXJzLiAKPiA+IEluIHRoaXMgY2FzZSAibGludXggbmV0d29ya2luZyBzdGFjayIgc2VlJ3MgImFo
+aGggdGhlIHNhbWUgaG9zdCAtPiBkb2luZyAKPiA+IG1hZ2ljIG9wdGltaXphdGlvbiIuIFRoZW4g
+dGhlIElQdjYgc3RhY2sgZG9lc24ndCBjYWxsIHRoZSBuZWNlc3NhcnkgCj4gPiBjYWxsYmFja3Mg
+dG8gZG8gNkxvV1BBTiBtYWdpYy4gCj4gPiAKPiA+IFBsZWFzZSBpbnN0cnVtZW50IHNvbWUgZHJp
+dmVyIGxheWVyIG9mIGZha2VsYiBkcml2ZXIgWzFdIHRoZW4gd2UgY2FuIGNoZWNrIAo+ID4gdGhp
+cyB0aGVvcnksIFdoZW4geW91IGluc3RydW1lbnQgc29tZSBwcmludGsncyBhdCBkcml2ZXIgbGF5
+ZXIgd2UgY2FuIAo+ID4gc2VlIGlmIHlvdXIgZnJhbWVzIGV2ZXIgcmVhY2hlZCB0aGUgbG93ZXIg
+bGF5ZXIuIEkgYW0gcmlnaHQgbm90IHN1cmUgaWYgCj4gPiB0aGlzIGNvdWxkIGJlIHRydWUsIEkg
+bmV2ZXIgdGVzdGVkIHNvIG11Y2ggdGhlIGZha2VsYiBkcml2ZXIuIAo+ID4gCj4gPiBBbHNvIHBs
+ZWFzZSBpbnN0cnVtZW50IHRoaXMgZnVuY3Rpb24gWzBdLCBpdCdzIG5lY2Vzc2FyeSB0byBydW4g
+Cj4gPiBkZWNvbXByZXNzaW9uIHdoZW4gcmVjZWl2aW5nLiBJZiBteSB0aGVvcnkgaXMgdHJ1ZSwg
+dGhlbiBpdCdzIGEgCj4gPiBjb21wbGljYXRlZCBpc3N1ZSBhbmQgZG9uJ3Qga25vdyByaWdodCBu
+b3cgYSBlYXN5IHdvcmthcm91bmQuIAo+ID4gCj4KPiBJIGFsc28gcmVtZW1iZXJlZCBhbiBvdGhl
+ciBndXkvZ2lybCB3aGljaCBoYWQgc29tZSBpc3N1ZXMgd2l0aCA2bG93cGFuIAo+IGFuZCBmYWtl
+bGIgZHJpdmVyLCBidXQgSSBkaWQgYSBxdWljayB0ZXN0IGFuZCBpdCB3b3JrZWQgZm9yIG1lLiAK
+Pgo+IFdoaWNoIGtlcm5lbCB2ZXJzaW9uIGRvIHlvdSB1c2luZywgbmV0LW5leHQga2VybmVsPyAK
+Pgo+IC0gQWxleCAK
 
