@@ -1,210 +1,96 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.17.24]:52800 "EHLO
-	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751350AbaIVJjQ (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Mon, 22 Sep 2014 05:39:16 -0400
-From: Simon Vincent <simon.vincent@xsilon.com>
-Subject: [PATCH linux-wpan v3] ieee802154: 6lowpan: ensure header compression does not corrupt ipv6 header
-Date: Mon, 22 Sep 2014 10:38:47 +0100
-Message-Id: <1411378727-10461-1-git-send-email-simon.vincent@xsilon.com>
+Received: from mail-wi0-f177.google.com ([209.85.212.177]:53625 "EHLO
+	mail-wi0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750914AbaIVJ6X (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Mon, 22 Sep 2014 05:58:23 -0400
+Received: by mail-wi0-f177.google.com with SMTP id q5so2613096wiv.4
+        for <linux-wpan@vger.kernel.org>; Mon, 22 Sep 2014 02:58:22 -0700 (PDT)
+Date: Mon, 22 Sep 2014 11:58:19 +0200
+From: Alexander Aring <alex.aring@gmail.com>
+Subject: Re: [PATCH linux-wpan v3] ieee802154: 6lowpan: ensure header
+ compression does not corrupt ipv6 header
+Message-ID: <20140922095817.GB21350@omega>
+References: <1411378727-10461-1-git-send-email-simon.vincent@xsilon.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1411378727-10461-1-git-send-email-simon.vincent@xsilon.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org, alex.aring@gmail.com
-Cc: simon.vincent@xsilon.com, jukka.rissanen@linux.intel.com, marcel@holtmann.org
+To: Simon Vincent <simon.vincent@xsilon.com>
+Cc: linux-wpan@vger.kernel.org, jukka.rissanen@linux.intel.com, marcel@holtmann.org
 
-The 6lowpan ipv6 header compression was causing problems for other interfaces
-that expected a ipv6 header to still be in place, as we were replacing the
-ipv6 header with a compressed version. This happened if you sent a packet to a
-multicast address as the packet would be output on 802.15.4, ethernet, and also
-be sent to the loopback interface. The skb data was shared between these
-interfaces so all interfaces ended up with a compressed ipv6 header.
-The solution is to ensure that before we do any header compression we are not
-sharing the skb or skb data with any other interface. If we are then we must
-take a copy of the skb and skb data before modifying the ipv6 header.
-The only place we can copy the skb is inside the xmit function so we don't
-leave dangling references to skb.
-This patch moves all the header compression to inside the xmit function. Very
-little code has been changed it has mostly been moved from lowpan_header_create
-to lowpan_xmit. At the top of the xmit function we now check if the skb is
-shared and if so copy it. In lowpan_header_create all we do now is store the
-source and destination addresses for use later when we compress the header.
+Hi Simon,
 
-Signed-off-by: Simon Vincent <simon.vincent@xsilon.com>
----
- net/ieee802154/6lowpan_rtnl.c | 125 ++++++++++++++++++++++++++++++------------
- 1 file changed, 89 insertions(+), 36 deletions(-)
+So last but not least, I run checkpatch on it, you should always run
+checkpatch before sending patches. And also pass the argument "--strict"
+on checkpatch.
 
-diff --git a/net/ieee802154/6lowpan_rtnl.c b/net/ieee802154/6lowpan_rtnl.c
-index 6591d27..2aeb6ee 100644
---- a/net/ieee802154/6lowpan_rtnl.c
-+++ b/net/ieee802154/6lowpan_rtnl.c
-@@ -71,6 +71,21 @@ struct lowpan_dev_record {
- 	struct list_head list;
- };
- 
-+/* don't save pan id, it's intra pan */
-+struct lowpan_addr {
-+	__le16 mode;
-+	union lowpan_addr_u {
-+		/* IPv6 needs big endian here */
-+		__be64 extended_addr;
-+		__be16 short_addr;
-+	} u;
-+};
-+
-+struct lowpan_addr_info {
-+	struct lowpan_addr daddr;
-+	struct lowpan_addr saddr;
-+};
-+
- static inline struct
- lowpan_dev_info *lowpan_dev_info(const struct net_device *dev)
- {
-@@ -85,14 +100,21 @@ static inline void lowpan_address_flip(u8 *src, u8 *dest)
- 		(dest)[IEEE802154_ADDR_LEN - i - 1] = (src)[i];
- }
- 
-+static inline struct
-+lowpan_addr_info *lowpan_skb_priv(const struct sk_buff *skb)
-+{
-+	WARN_ON_ONCE(skb_headroom(skb) < sizeof(struct lowpan_addr_info));
-+	return (struct lowpan_addr_info *)(skb->data -
-+			sizeof(struct lowpan_addr_info));
-+}
-+
- static int lowpan_header_create(struct sk_buff *skb, struct net_device *dev,
- 				unsigned short type, const void *_daddr,
- 				const void *_saddr, unsigned int len)
- {
- 	const u8 *saddr = _saddr;
- 	const u8 *daddr = _daddr;
--	struct ieee802154_addr sa, da;
--	struct ieee802154_mac_cb *cb = mac_cb_init(skb);
-+	struct lowpan_addr_info *info;
- 
- 	/* TODO:
- 	 * if this package isn't ipv6 one, where should it be routed?
-@@ -106,41 +128,17 @@ static int lowpan_header_create(struct sk_buff *skb, struct net_device *dev,
- 	raw_dump_inline(__func__, "saddr", (unsigned char *)saddr, 8);
- 	raw_dump_inline(__func__, "daddr", (unsigned char *)daddr, 8);
- 
--	lowpan_header_compress(skb, dev, type, daddr, saddr, len);
--
--	/* NOTE1: I'm still unsure about the fact that compression and WPAN
--	 * header are created here and not later in the xmit. So wait for
--	 * an opinion of net maintainers.
--	 */
--	/* NOTE2: to be absolutely correct, we must derive PANid information
--	 * from MAC subif of the 'dev' and 'real_dev' network devices, but
--	 * this isn't implemented in mainline yet, so currently we assign 0xff
--	 */
--	cb->type = IEEE802154_FC_TYPE_DATA;
--
--	/* prepare wpan address data */
--	sa.mode = IEEE802154_ADDR_LONG;
--	sa.pan_id = ieee802154_mlme_ops(dev)->get_pan_id(dev);
--	sa.extended_addr = ieee802154_devaddr_from_raw(saddr);
--
--	/* intra-PAN communications */
--	da.pan_id = sa.pan_id;
--
--	/* if the destination address is the broadcast address, use the
--	 * corresponding short address
--	 */
--	if (lowpan_is_addr_broadcast(daddr)) {
--		da.mode = IEEE802154_ADDR_SHORT;
--		da.short_addr = cpu_to_le16(IEEE802154_ADDR_BROADCAST);
--	} else {
--		da.mode = IEEE802154_ADDR_LONG;
--		da.extended_addr = ieee802154_devaddr_from_raw(daddr);
--	}
-+	info = lowpan_skb_priv(skb);
- 
--	cb->ackreq = !lowpan_is_addr_broadcast(daddr);
-+	/* TODO: Currently we only support extended_addr */
-+	info->daddr.mode = IEEE802154_ADDR_LONG;
+Example:
+./scripts/checkpatch.pl --strict 0001-ieee802154-6lowpan-ensure-header-compression-does-no.patch
+
+ERROR: trailing whitespace
+#119: FILE: net/ieee802154/6lowpan_rtnl.c:135:
++^Imemcpy(&info->daddr.u.extended_addr, daddr, $
+
+CHECK: Alignment should match open parenthesis
+#120: FILE: net/ieee802154/6lowpan_rtnl.c:136:
 +	memcpy(&info->daddr.u.extended_addr, daddr, 
 +		sizeof(info->daddr.u.extended_addr));
-+	info->saddr.mode = IEEE802154_ADDR_LONG;
+
+ERROR: trailing whitespace
+#122: FILE: net/ieee802154/6lowpan_rtnl.c:138:
++^Imemcpy(&info->saddr.u.extended_addr, saddr, $
+
+CHECK: Alignment should match open parenthesis
+#123: FILE: net/ieee802154/6lowpan_rtnl.c:139:
 +	memcpy(&info->saddr.u.extended_addr, saddr, 
 +		sizeof(info->daddr.u.extended_addr));
- 
--	return dev_hard_header(skb, lowpan_dev_info(dev)->real_dev,
--			type, (void *)&da, (void *)&sa, 0);
-+	return 0;
- }
- 
- static int lowpan_give_skb_to_devices(struct sk_buff *skb,
-@@ -338,13 +336,68 @@ err:
- 	return rc;
- }
- 
-+static int lowpan_header(struct sk_buff *skb, struct net_device *dev)
-+{
-+	struct ieee802154_addr sa, da;
-+	struct ieee802154_mac_cb *cb = mac_cb_init(skb);
-+	struct lowpan_addr_info info;
-+	void *daddr, *saddr;
-+
-+	memcpy(&info, lowpan_skb_priv(skb), sizeof(info));
-+
-+	/* TODO: Currently we only support extended_addr */
-+	daddr = &info.daddr.u.extended_addr;
-+	saddr = &info.saddr.u.extended_addr;
-+
-+	lowpan_header_compress(skb, dev, ETH_P_IPV6, daddr, saddr, skb->len);
-+
-+	cb->type = IEEE802154_FC_TYPE_DATA;
-+
-+	/* prepare wpan address data */
-+	sa.mode = IEEE802154_ADDR_LONG;
-+	sa.pan_id = ieee802154_mlme_ops(dev)->get_pan_id(dev);
-+	sa.extended_addr = ieee802154_devaddr_from_raw(saddr);
-+
-+	/* intra-PAN communications */
-+	da.pan_id = sa.pan_id;
-+
-+	/* if the destination address is the broadcast address, use the
-+	 * corresponding short address
-+	 */
-+	if (lowpan_is_addr_broadcast((const u8 *)daddr)) {
-+		da.mode = IEEE802154_ADDR_SHORT;
-+		da.short_addr = cpu_to_le16(IEEE802154_ADDR_BROADCAST);
-+		cb->ackreq = false;
-+	} else {
-+		da.mode = IEEE802154_ADDR_LONG;
-+		da.extended_addr = ieee802154_devaddr_from_raw(daddr);
-+		cb->ackreq = true;
-+	}
-+
-+	return dev_hard_header(skb, lowpan_dev_info(dev)->real_dev,
-+			ETH_P_IPV6, (void *)&da, (void *)&sa, 0);
-+}
-+
- static netdev_tx_t lowpan_xmit(struct sk_buff *skb, struct net_device *dev)
- {
- 	struct ieee802154_hdr wpan_hdr;
--	int max_single;
-+	int max_single, ret;
- 
- 	pr_debug("package xmit\n");
- 
-+	/* We must take a copy of the skb before we modify/replace the ipv6
-+	 * header as the header could be used elsewhere
-+	 */
-+	skb = skb_unshare(skb, GFP_ATOMIC);
-+	if (!skb)
-+		return NET_XMIT_DROP;
-+
-+	ret = lowpan_header(skb, dev);
-+	if (ret < 0) {
-+		kfree_skb(skb);
-+		return NET_XMIT_DROP;
-+	}
-+
- 	if (ieee802154_hdr_peek(skb, &wpan_hdr) < 0) {
- 		kfree_skb(skb);
- 		return NET_XMIT_DROP;
--- 
-1.9.1
 
+
+Nevertheless you need to fix this please, we can talk about warning but not
+about errors.
+
+
+When you are finish it looks okay for me, I wait a little bit and will apply
+it tomorrow. Then I am sure that other people had some time for reviewing.
+
+If somebody have other review issues then you need to work again over
+it, sorry.
+
+On Mon, Sep 22, 2014 at 10:38:47AM +0100, Simon Vincent wrote:
+> The 6lowpan ipv6 header compression was causing problems for other interfaces
+> that expected a ipv6 header to still be in place, as we were replacing the
+> ipv6 header with a compressed version. This happened if you sent a packet to a
+> multicast address as the packet would be output on 802.15.4, ethernet, and also
+> be sent to the loopback interface. The skb data was shared between these
+> interfaces so all interfaces ended up with a compressed ipv6 header.
+> The solution is to ensure that before we do any header compression we are not
+> sharing the skb or skb data with any other interface. If we are then we must
+> take a copy of the skb and skb data before modifying the ipv6 header.
+> The only place we can copy the skb is inside the xmit function so we don't
+> leave dangling references to skb.
+> This patch moves all the header compression to inside the xmit function. Very
+> little code has been changed it has mostly been moved from lowpan_header_create
+> to lowpan_xmit. At the top of the xmit function we now check if the skb is
+> shared and if so copy it. In lowpan_header_create all we do now is store the
+> source and destination addresses for use later when we compress the header.
+> 
+> Signed-off-by: Simon Vincent <simon.vincent@xsilon.com>
+> ---
+
+Doesn't matter now but after these "---" normally we write what was the
+changes since v1..v2 and v2..v3. This will be ignored by applying. Only
+notes for reviewing. Sorry I forgot this at the last review step.
+
+Thanks.
+
+
+
+Also we are not sure that place things into skb_headroom works _always_.
+We knowing now that the current behaviour makes trouble... so doesn't
+matter currently if we are 100% sure that these buffer will never
+overwritten. I mean "it's better than the current behaviour and I detected
+no issues with that currently".
+
+- Alex
