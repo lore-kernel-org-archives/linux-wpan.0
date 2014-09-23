@@ -1,62 +1,66 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from out3-smtp.messagingengine.com ([66.111.4.27]:57437 "EHLO
-	out3-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751070AbaIWDwM (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>);
-	Mon, 22 Sep 2014 23:52:12 -0400
-Received: from compute2.internal (compute2.nyi.internal [10.202.2.42])
-	by gateway2.nyi.internal (Postfix) with ESMTP id 32581209BB
-	for <linux-wpan@vger.kernel.org>; Mon, 22 Sep 2014 23:52:12 -0400 (EDT)
-Message-ID: <5420EE4F.5000007@signal11.us>
-Date: Mon, 22 Sep 2014 23:51:43 -0400
-From: Alan Ott <alan@signal11.us>
-MIME-Version: 1.0
+Received: from mail-we0-f171.google.com ([74.125.82.171]:38568 "EHLO
+	mail-we0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753075AbaIWHTl (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Tue, 23 Sep 2014 03:19:41 -0400
+Received: by mail-we0-f171.google.com with SMTP id k48so4078551wev.2
+        for <linux-wpan@vger.kernel.org>; Tue, 23 Sep 2014 00:19:40 -0700 (PDT)
+Date: Tue, 23 Sep 2014 09:19:34 +0200
+From: Alexander Aring <alex.aring@gmail.com>
 Subject: Re: [PATCH wpan-next] ieee802154: mrf24j40: support for external
  rx/tx
-References: <1410759338-21663-1-git-send-email-wmack@componentsw.com> <20140916070156.GB1244@omega> <541899D8.4020101@componentsw.com> <20140916202000.GF6104@omega>
-In-Reply-To: <20140916202000.GF6104@omega>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Message-ID: <20140923071932.GA11396@omega>
+References: <1410759338-21663-1-git-send-email-wmack@componentsw.com>
+ <20140916070156.GB1244@omega>
+ <541899D8.4020101@componentsw.com>
+ <20140916202000.GF6104@omega>
+ <5420EE4F.5000007@signal11.us>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <5420EE4F.5000007@signal11.us>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>, Walter Mack <wmack@componentsw.com>
-Cc: linux-wpan@vger.kernel.org, simon.vincent@xsilon.com
+To: Alan Ott <alan@signal11.us>
+Cc: Walter Mack <wmack@componentsw.com>, linux-wpan@vger.kernel.org, simon.vincent@xsilon.com
 
-On 09/16/2014 04:20 PM, Alexander Aring wrote:
-> Hi Walter,
->
-> On Tue, Sep 16, 2014 at 01:13:12PM -0700, Walter Mack wrote:
->> Alex,
->>
->> this is not a question of chip revisions. Chips with the same revision can
->> be used in designs with or without the external transmitter/receiver. Its
->> just that the chip has to be set up to be compatible with the design.
->>
-> ah, ok. Dunno, I will wait on alan's opinion. If I don't heard anything in one
-> week I will apply it.
+Hi,
 
-Did Simon's patch get applied? I couldn't see it in any of the obvious 
-places when I looked the other day.
+On Mon, Sep 22, 2014 at 11:51:43PM -0400, Alan Ott wrote:
+> On 09/16/2014 04:20 PM, Alexander Aring wrote:
+> >Hi Walter,
+> >
+> >On Tue, Sep 16, 2014 at 01:13:12PM -0700, Walter Mack wrote:
+> >>Alex,
+> >>
+> >>this is not a question of chip revisions. Chips with the same revision can
+> >>be used in designs with or without the external transmitter/receiver. Its
+> >>just that the chip has to be set up to be compatible with the design.
+> >>
+> >ah, ok. Dunno, I will wait on alan's opinion. If I don't heard anything in one
+> >week I will apply it.
+> 
+> Did Simon's patch get applied? I couldn't see it in any of the obvious
+> places when I looked the other day.
+> 
 
->
-> Maybe alan wants also add a device tree support for this driver and then we could
-> make a dt property/platform data for that. But for now, I am also fine with module
-> parameter solution... because we don't have a dt support right now.
->
+no, I finally wait for your Acked-by: .... otherwise I will not apply.
+That's indicate for me that this patch is okay for you and came into
+mainline. There are also pending patches from Varka, if you don't reply
+on it, I will not apply it. Should I always simple apply the patches
+if you don't response? It's better for me that I see a "Acked-by" from you.
 
-I don't like this as a module parameter. That's not what module params 
-are really designed for. It's better as DT so that it can be turned on 
-and off for the individual devices, not system-wide.
+Simon's patch state:
+You had some reviewing notes at Simon's patch. I think Simon doesn't
+response to this yet. I didn't see any new versions of this.
 
-mrf24j40 loads up fine under DT. There just isn't anything to configure 
-(so far) other than the SPI.
 
-Are there any other known boards which use the external amplifier 
-besides the MB and MC (and MD and ME, which are the same as the MB and MC)?
 
-Alex, I'm not sure how this fits with Simon's patch, as I haven't 
-investigated it fully. I'd expect both implementations to be the same, 
-but they're not.
+For DT example you can take a look into at86rf230 driver or cc2520. I
+mean examples to add some DT properties. Also if you want to make this
+driver dt enabled then you need a documentation in:
 
-Alan.
+Documentation/devicetree/bindings/net/ieee802154/$DRIVERNAME.txt
 
+
+- Alex
