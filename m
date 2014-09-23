@@ -1,78 +1,62 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wg0-f43.google.com ([74.125.82.43]:56342 "EHLO
-	mail-wg0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754524AbaIVRCG (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Mon, 22 Sep 2014 13:02:06 -0400
-Received: by mail-wg0-f43.google.com with SMTP id y10so3287387wgg.26
-        for <linux-wpan@vger.kernel.org>; Mon, 22 Sep 2014 10:02:04 -0700 (PDT)
-Date: Mon, 22 Sep 2014 19:02:02 +0200
-From: Alexander Aring <alex.aring@gmail.com>
+Received: from mga09.intel.com ([134.134.136.24]:28246 "EHLO mga09.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750818AbaIWJO2 (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+	Tue, 23 Sep 2014 05:14:28 -0400
+Message-ID: <1411463634.4860.65.camel@jrissane-mobl.ger.corp.intel.com>
 Subject: Re: [PATCH linux-wpan v4] ieee802154: 6lowpan: ensure header
  compression does not corrupt ipv6 header
-Message-ID: <20140922170201.GB7282@omega>
-References: <1411401123-7790-1-git-send-email-simon.vincent@xsilon.com>
- <20140922162148.GA7282@omega>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+Date: Tue, 23 Sep 2014 12:13:54 +0300
 In-Reply-To: <20140922162148.GA7282@omega>
+References: <1411401123-7790-1-git-send-email-simon.vincent@xsilon.com>
+	 <20140922162148.GA7282@omega>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Simon Vincent <simon.vincent@xsilon.com>
-Cc: linux-wpan@vger.kernel.org, jukka.rissanen@linux.intel.com, marcel@holtmann.org
+To: Alexander Aring <alex.aring@gmail.com>
+Cc: Simon Vincent <simon.vincent@xsilon.com>, linux-wpan@vger.kernel.org, marcel@holtmann.org
 
-On Mon, Sep 22, 2014 at 06:21:48PM +0200, Alexander Aring wrote:
-> Hi Simon,
-> 
+Hi Alex,
+
+On ma, 2014-09-22 at 18:21 +0200, Alexander Aring wrote:
+
 > grml, I overlooked something the last version. But I will fix it while
-> applying if all seems to be okay for all other guys/girls.
-> 
-> On Mon, Sep 22, 2014 at 04:52:03PM +0100, Simon Vincent wrote:
-> > The 6lowpan ipv6 header compression was causing problems for other interfaces
-> > that expected a ipv6 header to still be in place, as we were replacing the
-> > ipv6 header with a compressed version. This happened if you sent a packet to a
-> > multicast address as the packet would be output on 802.15.4, ethernet, and also
-> > be sent to the loopback interface. The skb data was shared between these
-> > interfaces so all interfaces ended up with a compressed ipv6 header.
-> > The solution is to ensure that before we do any header compression we are not
-> > sharing the skb or skb data with any other interface. If we are then we must
-> > take a copy of the skb and skb data before modifying the ipv6 header.
-> > The only place we can copy the skb is inside the xmit function so we don't
-> > leave dangling references to skb.
-> > This patch moves all the header compression to inside the xmit function. Very
-> > little code has been changed it has mostly been moved from lowpan_header_create
-> > to lowpan_xmit. At the top of the xmit function we now check if the skb is
-> > shared and if so copy it. In lowpan_header_create all we do now is store the
-> > source and destination addresses for use later when we compress the header.
-> > 
-> > Signed-off-by: Simon Vincent <simon.vincent@xsilon.com>
-> > ---
-> > 
-> > v4 - fixed patch style checks
-> > 
-> > 
-> >  net/ieee802154/6lowpan_rtnl.c | 125 ++++++++++++++++++++++++++++++------------
-> >  1 file changed, 89 insertions(+), 36 deletions(-)
-> > 
-> > diff --git a/net/ieee802154/6lowpan_rtnl.c b/net/ieee802154/6lowpan_rtnl.c
-> > index 6591d27..ca7ef0e 100644
-> > --- a/net/ieee802154/6lowpan_rtnl.c
-> > +++ b/net/ieee802154/6lowpan_rtnl.c
-> > @@ -71,6 +71,21 @@ struct lowpan_dev_record {
-> >  	struct list_head list;
-> >  };
 > >  
-> > +/* don't save pan id, it's intra pan */
-> > +struct lowpan_addr {
-> > +	__le16 mode;
+> > -	cb->ackreq = !lowpan_is_addr_broadcast(daddr);
+> > +	/* TODO: Currently we only support extended_addr */
+> > +	info->daddr.mode = IEEE802154_ADDR_LONG;
 > 
-> In the rework I made this __le16 because this value comes directly from
-> mac header and contain the masked frame control fields for the
+> now IEEE802154_ADDR_LONG is no little endian value copied from mac
+> header. Somewhere else converted the little endian value to an host understandable
+> enum/define number. For the rework I will remove this value. We should never
+> ever convert this value for parsing.
+> 
+> We use it only for af_802154 and userspace specification what addresses
+> should be used. But the above one to make this __le16 is incorrect. For
+> userspace we should create some enums for declaring different address
+> types. Then we can use this for 802.15.4 sockets.
 
-sorry, this is sending part. So correct would no parsing, just set the
-value at begin of generation of mac header to the frame control field.
-So we never need to convert this value again.
+BTW, at some point we might want to change the IEEE802154_ADDR_LONG in
+net/6lowpan/iphc.c to more generic. Now this IEEE 802154 specific enum
+needs to be mentioned in net/bluetooth/6lowpan.c which looks quite
+confusing.
 
-This is also for parsing at receiving side, then we just copy this value.
+> 
+> I will fix it while applying when all things are okay, it's only to
+> replace the __le16 to u8.
+> 
+> 
+> And I also know that 6LoWPAN GENERIC need this value for determined is EUI64
+> or short. I don't forget this one, wasn't full finished at rework
+> branch.
+> 
+> - Alex
 
-- Alex
+
+Cheers,
+Jukka
+
+
