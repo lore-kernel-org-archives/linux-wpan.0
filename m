@@ -1,77 +1,214 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wg0-f46.google.com ([74.125.82.46]:63627 "EHLO
-	mail-wg0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751872AbaIXKWI (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Wed, 24 Sep 2014 06:22:08 -0400
+Received: from mail-we0-f182.google.com ([74.125.82.182]:44554 "EHLO
+	mail-we0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754111AbaIXKWK (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Wed, 24 Sep 2014 06:22:10 -0400
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH bluetooth-next 3/4] mrf24j40: use pr_* / dev_* instead of printk()
-Date: Wed, 24 Sep 2014 12:21:32 +0200
-Message-Id: <1411554093-14976-4-git-send-email-alex.aring@gmail.com>
+Subject: [PATCH bluetooth-next 4/4] ieee802154: 6lowpan: ensure header compression does not corrupt ipv6 header
+Date: Wed, 24 Sep 2014 12:21:33 +0200
+Message-Id: <1411554093-14976-5-git-send-email-alex.aring@gmail.com>
 In-Reply-To: <1411554093-14976-1-git-send-email-alex.aring@gmail.com>
 References: <1411554093-14976-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org, linux-wpan@vger.kernel.org, kernel@pengutronix.de, Varka Bhadram <varkabhadram@gmail.com>, Varka Bhadram <varkab@cdac.in>, Alexander Aring <alex.aring@gmail.com>
+Cc: marcel@holtmann.org, linux-wpan@vger.kernel.org, kernel@pengutronix.de, Simon Vincent <simon.vincent@xsilon.com>, Alexander Aring <alex.aring@gmail.com>
 
-From: Varka Bhadram <varkabhadram@gmail.com>
+From: Simon Vincent <simon.vincent@xsilon.com>
 
-Replace printk() with dev_*() pr_*().
+The 6lowpan ipv6 header compression was causing problems for other interfaces
+that expected a ipv6 header to still be in place, as we were replacing the
+ipv6 header with a compressed version. This happened if you sent a packet to a
+multicast address as the packet would be output on 802.15.4, ethernet, and also
+be sent to the loopback interface. The skb data was shared between these
+interfaces so all interfaces ended up with a compressed ipv6 header.
+The solution is to ensure that before we do any header compression we are not
+sharing the skb or skb data with any other interface. If we are then we must
+take a copy of the skb and skb data before modifying the ipv6 header.
+The only place we can copy the skb is inside the xmit function so we don't
+leave dangling references to skb.
+This patch moves all the header compression to inside the xmit function. Very
+little code has been changed it has mostly been moved from lowpan_header_create
+to lowpan_xmit. At the top of the xmit function we now check if the skb is
+shared and if so copy it. In lowpan_header_create all we do now is store the
+source and destination addresses for use later when we compress the header.
 
-Signed-off-by: Varka Bhadram <varkab@cdac.in>
-Acked-by: Alan Ott <alan@signal11.us>
+Signed-off-by: Simon Vincent <simon.vincent@xsilon.com>
 Signed-off-by: Alexander Aring <alex.aring@gmail.com>
 ---
- drivers/net/ieee802154/mrf24j40.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+ net/ieee802154/6lowpan_rtnl.c | 125 ++++++++++++++++++++++++++++++------------
+ 1 file changed, 89 insertions(+), 36 deletions(-)
 
-diff --git a/drivers/net/ieee802154/mrf24j40.c b/drivers/net/ieee802154/mrf24j40.c
-index 2c617e3..07e0b88 100644
---- a/drivers/net/ieee802154/mrf24j40.c
-+++ b/drivers/net/ieee802154/mrf24j40.c
-@@ -323,8 +323,8 @@ static int mrf24j40_read_rx_buf(struct mrf24j40 *devrec,
- #ifdef DEBUG
- 	print_hex_dump(KERN_DEBUG, "mrf24j40 rx: ",
- 		DUMP_PREFIX_OFFSET, 16, 1, data, *len, 0);
--	printk(KERN_DEBUG "mrf24j40 rx: lqi: %02hhx rssi: %02hhx\n",
--		lqi_rssi[0], lqi_rssi[1]);
-+	pr_debug("mrf24j40 rx: lqi: %02hhx rssi: %02hhx\n",
-+		 lqi_rssi[0], lqi_rssi[1]);
- #endif
+diff --git a/net/ieee802154/6lowpan_rtnl.c b/net/ieee802154/6lowpan_rtnl.c
+index 5e788cd..78cb206 100644
+--- a/net/ieee802154/6lowpan_rtnl.c
++++ b/net/ieee802154/6lowpan_rtnl.c
+@@ -71,20 +71,42 @@ struct lowpan_dev_record {
+ 	struct list_head list;
+ };
  
- out:
-@@ -385,7 +385,7 @@ err:
- static int mrf24j40_ed(struct ieee802154_dev *dev, u8 *level)
++/* don't save pan id, it's intra pan */
++struct lowpan_addr {
++	u8 mode;
++	union lowpan_addr_u {
++		/* IPv6 needs big endian here */
++		__be64 extended_addr;
++		__be16 short_addr;
++	} u;
++};
++
++struct lowpan_addr_info {
++	struct lowpan_addr daddr;
++	struct lowpan_addr saddr;
++};
++
+ static inline struct
+ lowpan_dev_info *lowpan_dev_info(const struct net_device *dev)
  {
- 	/* TODO: */
--	printk(KERN_WARNING "mrf24j40: ed not implemented\n");
-+	pr_warn("mrf24j40: ed not implemented\n");
- 	*level = 0;
- 	return 0;
+ 	return netdev_priv(dev);
  }
-@@ -483,10 +483,10 @@ static int mrf24j40_filter(struct ieee802154_dev *dev,
- 			write_short_reg(devrec, REG_EADR0 + i, addr[i]);
  
- #ifdef DEBUG
--		printk(KERN_DEBUG "Set long addr to: ");
-+		pr_debug("Set long addr to: ");
- 		for (i = 0; i < 8; i++)
--			printk("%02hhx ", addr[7 - i]);
--		printk(KERN_DEBUG "\n");
-+			pr_debug("%02hhx ", addr[7 - i]);
-+		pr_debug("\n");
- #endif
- 	}
++static inline struct
++lowpan_addr_info *lowpan_skb_priv(const struct sk_buff *skb)
++{
++	WARN_ON_ONCE(skb_headroom(skb) < sizeof(struct lowpan_addr_info));
++	return (struct lowpan_addr_info *)(skb->data -
++			sizeof(struct lowpan_addr_info));
++}
++
+ static int lowpan_header_create(struct sk_buff *skb, struct net_device *dev,
+ 				unsigned short type, const void *_daddr,
+ 				const void *_saddr, unsigned int len)
+ {
+ 	const u8 *saddr = _saddr;
+ 	const u8 *daddr = _daddr;
+-	struct ieee802154_addr sa, da;
+-	struct ieee802154_mac_cb *cb = mac_cb_init(skb);
++	struct lowpan_addr_info *info;
  
-@@ -702,7 +702,7 @@ static int mrf24j40_probe(struct spi_device *spi)
- 	int ret = -ENOMEM;
- 	struct mrf24j40 *devrec;
+ 	/* TODO:
+ 	 * if this package isn't ipv6 one, where should it be routed?
+@@ -98,41 +120,17 @@ static int lowpan_header_create(struct sk_buff *skb, struct net_device *dev,
+ 	raw_dump_inline(__func__, "saddr", (unsigned char *)saddr, 8);
+ 	raw_dump_inline(__func__, "daddr", (unsigned char *)daddr, 8);
  
--	printk(KERN_INFO "mrf24j40: probe(). IRQ: %d\n", spi->irq);
-+	dev_info(&spi->dev, "probe(). IRQ: %d\n", spi->irq);
+-	lowpan_header_compress(skb, dev, type, daddr, saddr, len);
+-
+-	/* NOTE1: I'm still unsure about the fact that compression and WPAN
+-	 * header are created here and not later in the xmit. So wait for
+-	 * an opinion of net maintainers.
+-	 */
+-	/* NOTE2: to be absolutely correct, we must derive PANid information
+-	 * from MAC subif of the 'dev' and 'real_dev' network devices, but
+-	 * this isn't implemented in mainline yet, so currently we assign 0xff
+-	 */
+-	cb->type = IEEE802154_FC_TYPE_DATA;
+-
+-	/* prepare wpan address data */
+-	sa.mode = IEEE802154_ADDR_LONG;
+-	sa.pan_id = ieee802154_mlme_ops(dev)->get_pan_id(dev);
+-	sa.extended_addr = ieee802154_devaddr_from_raw(saddr);
+-
+-	/* intra-PAN communications */
+-	da.pan_id = sa.pan_id;
+-
+-	/* if the destination address is the broadcast address, use the
+-	 * corresponding short address
+-	 */
+-	if (lowpan_is_addr_broadcast(daddr)) {
+-		da.mode = IEEE802154_ADDR_SHORT;
+-		da.short_addr = cpu_to_le16(IEEE802154_ADDR_BROADCAST);
+-	} else {
+-		da.mode = IEEE802154_ADDR_LONG;
+-		da.extended_addr = ieee802154_devaddr_from_raw(daddr);
+-	}
++	info = lowpan_skb_priv(skb);
  
- 	devrec = devm_kzalloc(&spi->dev, sizeof(struct mrf24j40), GFP_KERNEL);
- 	if (!devrec)
+-	cb->ackreq = !lowpan_is_addr_broadcast(daddr);
++	/* TODO: Currently we only support extended_addr */
++	info->daddr.mode = IEEE802154_ADDR_LONG;
++	memcpy(&info->daddr.u.extended_addr, daddr,
++	       sizeof(info->daddr.u.extended_addr));
++	info->saddr.mode = IEEE802154_ADDR_LONG;
++	memcpy(&info->saddr.u.extended_addr, saddr,
++	       sizeof(info->daddr.u.extended_addr));
+ 
+-	return dev_hard_header(skb, lowpan_dev_info(dev)->real_dev,
+-			type, (void *)&da, (void *)&sa, 0);
++	return 0;
+ }
+ 
+ static int lowpan_give_skb_to_devices(struct sk_buff *skb,
+@@ -330,13 +328,68 @@ err:
+ 	return rc;
+ }
+ 
++static int lowpan_header(struct sk_buff *skb, struct net_device *dev)
++{
++	struct ieee802154_addr sa, da;
++	struct ieee802154_mac_cb *cb = mac_cb_init(skb);
++	struct lowpan_addr_info info;
++	void *daddr, *saddr;
++
++	memcpy(&info, lowpan_skb_priv(skb), sizeof(info));
++
++	/* TODO: Currently we only support extended_addr */
++	daddr = &info.daddr.u.extended_addr;
++	saddr = &info.saddr.u.extended_addr;
++
++	lowpan_header_compress(skb, dev, ETH_P_IPV6, daddr, saddr, skb->len);
++
++	cb->type = IEEE802154_FC_TYPE_DATA;
++
++	/* prepare wpan address data */
++	sa.mode = IEEE802154_ADDR_LONG;
++	sa.pan_id = ieee802154_mlme_ops(dev)->get_pan_id(dev);
++	sa.extended_addr = ieee802154_devaddr_from_raw(saddr);
++
++	/* intra-PAN communications */
++	da.pan_id = sa.pan_id;
++
++	/* if the destination address is the broadcast address, use the
++	 * corresponding short address
++	 */
++	if (lowpan_is_addr_broadcast((const u8 *)daddr)) {
++		da.mode = IEEE802154_ADDR_SHORT;
++		da.short_addr = cpu_to_le16(IEEE802154_ADDR_BROADCAST);
++		cb->ackreq = false;
++	} else {
++		da.mode = IEEE802154_ADDR_LONG;
++		da.extended_addr = ieee802154_devaddr_from_raw(daddr);
++		cb->ackreq = true;
++	}
++
++	return dev_hard_header(skb, lowpan_dev_info(dev)->real_dev,
++			ETH_P_IPV6, (void *)&da, (void *)&sa, 0);
++}
++
+ static netdev_tx_t lowpan_xmit(struct sk_buff *skb, struct net_device *dev)
+ {
+ 	struct ieee802154_hdr wpan_hdr;
+-	int max_single;
++	int max_single, ret;
+ 
+ 	pr_debug("package xmit\n");
+ 
++	/* We must take a copy of the skb before we modify/replace the ipv6
++	 * header as the header could be used elsewhere
++	 */
++	skb = skb_unshare(skb, GFP_ATOMIC);
++	if (!skb)
++		return NET_XMIT_DROP;
++
++	ret = lowpan_header(skb, dev);
++	if (ret < 0) {
++		kfree_skb(skb);
++		return NET_XMIT_DROP;
++	}
++
+ 	if (ieee802154_hdr_peek(skb, &wpan_hdr) < 0) {
+ 		kfree_skb(skb);
+ 		return NET_XMIT_DROP;
 -- 
 2.1.0
 
