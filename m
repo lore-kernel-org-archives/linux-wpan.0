@@ -1,97 +1,84 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f181.google.com ([209.85.212.181]:47081 "EHLO
-	mail-wi0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753785AbaIZIGU (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Fri, 26 Sep 2014 04:06:20 -0400
-Received: by mail-wi0-f181.google.com with SMTP id z2so10982031wiv.2
-        for <linux-wpan@vger.kernel.org>; Fri, 26 Sep 2014 01:06:19 -0700 (PDT)
+Received: from mail-wg0-f41.google.com ([74.125.82.41]:46662 "EHLO
+	mail-wg0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753982AbaIZIGW (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Fri, 26 Sep 2014 04:06:22 -0400
+Received: by mail-wg0-f41.google.com with SMTP id k14so9251935wgh.12
+        for <linux-wpan@vger.kernel.org>; Fri, 26 Sep 2014 01:06:21 -0700 (PDT)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH wpan-tools 0/3] mac: info: interface: add basic support
-Date: Fri, 26 Sep 2014 10:06:06 +0200
-Message-Id: <1411718769-1986-1-git-send-email-alex.aring@gmail.com>
+Subject: [PATCH wpan-tools 1/3] mac: add support for setting lbt mode
+Date: Fri, 26 Sep 2014 10:06:07 +0200
+Message-Id: <1411718769-1986-2-git-send-email-alex.aring@gmail.com>
+In-Reply-To: <1411718769-1986-1-git-send-email-alex.aring@gmail.com>
+References: <1411718769-1986-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
 Cc: Alexander Aring <alex.aring@gmail.com>
 
-Hi,
+Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+---
+ src/mac.c      | 27 +++++++++++++++++++++++++++
+ src/nl802154.h |  4 ++++
+ 2 files changed, 31 insertions(+)
 
-this patch series add support for setting lbt mode and dump phy parameters and
-mac interface parameters.
-
-Each interface "could" have different mac parameters, because the mac sublayer
-means mac algorithmn which are done by phy. These parameters need to be the same
-on each interface. There are couple of mac sublayer parameters like ARET, CSMA,
-promiscuous mode, etc... These parameters will be changed if an interface will
-comming up, otherwise it's there but not running. Solution to run this device
-with different parameter is first down all others interfaces and then up the interface
-with the different parameters. (Difficult to explain maybe it's clear when you play a
-little bit with that).
-
-PHY settings will directly set registers to the driver. There is no mac functionality.
-Only physical changes in radio frequency handling.
-
-dump example for phy pib:
-
-root@DistroKit:~ iwpan phy
-wpan_phy phy0
-supported channels:
-        page 0: 11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26 
-current_page: 0
-current_channel: 26
-cca_mode: 1
-tx_power: 3
-
-dump example for mac pib:
-
-phy#0
-        Interface mon0
-                ifindex 5
-                wpan_dev 0x2
-                extended_addr 0x0000000000000000
-                short_addr 0xffff
-                pan_id 0xffff
-                type monitor
-                max_frame_retries 3
-                max_be 5
-                max_csma_backoffs 4
-                min_be 3
-                lbt 0
-        Interface wpan0
-                ifindex 2
-                wpan_dev 0x1
-                extended_addr 0xaaaaaaaaaaaaaaaa
-                short_addr 0xffff
-                pan_id 0xabcd
-                type node
-                max_frame_retries 3
-                max_be 5
-                max_csma_backoffs 4
-                min_be 3
-                lbt 0
-
-I know there are a lot of other pib values. I don't forget these but it need
-time to support it. I am still getting a state in the rework like mainline state.
-
-Also it looks a little bit ugly but we can still change it for the wpan-tools. :-)
-
-- Alex
-
-Alexander Aring (3):
-  mac: add support for setting lbt mode
-  info: add support to dump phy pib
-  interface: add dump for iface mac parameters
-
- src/Makefile.am |   1 +
- src/info.c      | 108 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- src/interface.c | 101 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- src/iwpan.h     |   3 ++
- src/mac.c       |  27 ++++++++++++++
- src/nl802154.h  |  13 +++++++
- src/nl_extras.h |   5 +++
- 7 files changed, 258 insertions(+)
- create mode 100644 src/info.c
-
+diff --git a/src/mac.c b/src/mac.c
+index 1d12a04..a6c456f 100644
+--- a/src/mac.c
++++ b/src/mac.c
+@@ -178,3 +178,30 @@ nla_put_failure:
+ COMMAND(set, min_be, "<min_be>",
+ 	NL802154_CMD_SET_MIN_BE, 0, CIB_NETDEV,
+ 	handle_min_be, NULL);
++
++static int handle_lbt_mode(struct nl802154_state *state,
++			   struct nl_cb *cb,
++			   struct nl_msg *msg,
++			   int argc, char **argv,
++			   enum id_input id)
++{
++	unsigned long mode;
++	char *end;
++
++	if (argc < 1)
++		return 1;
++
++	/* LBT_MODE */
++	mode = strtoul(argv[0], &end, 0);
++	if (*end != '\0')
++		return 1;
++
++	NLA_PUT_U8(msg, NL802154_ATTR_LBT_MODE, mode);
++
++	return 0;
++
++nla_put_failure:
++	return -ENOBUFS;
++}
++COMMAND(set, lbt, "<1|0>",
++	NL802154_CMD_SET_LBT_MODE, 0, CIB_NETDEV, handle_lbt_mode, NULL);
+diff --git a/src/nl802154.h b/src/nl802154.h
+index ce6ae2a..a30e9c0 100644
+--- a/src/nl802154.h
++++ b/src/nl802154.h
+@@ -54,6 +54,8 @@ enum nl802154_commands {
+ 	NL802154_CMD_SET_MAX_CSMA_BACKOFFS,
+ 	NL802154_CMD_SET_MIN_BE,
+ 
++	NL802154_CMD_SET_LBT_MODE,
++
+ 	/* add new commands above here */
+ 
+ 	/* used to define NL802154_CMD_MAX below */
+@@ -95,6 +97,8 @@ enum nl802154_attrs {
+ 	NL802154_ATTR_MAX_CSMA_BACKOFFS,
+ 	NL802154_ATTR_MIN_BE,
+ 
++	NL802154_ATTR_LBT_MODE,
++
+ 	/* add attributes here, update the policy in nl802154.c */
+ 
+ 	__NL802154_ATTR_AFTER_LAST,
 -- 
 2.1.0
 
