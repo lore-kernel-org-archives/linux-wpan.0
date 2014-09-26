@@ -1,67 +1,97 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.126.131]:61954 "EHLO
-	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754971AbaIPTi2 (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Tue, 16 Sep 2014 15:38:28 -0400
-Message-ID: <541891B0.3010101@xsilon.com>
-Date: Tue, 16 Sep 2014 20:38:24 +0100
-From: Martin Townsend <martin.townsend@xsilon.com>
-MIME-Version: 1.0
-Subject: Re: [PATCH v4 bluetooth] 6lowpan: fix incorrect return values in
- lowpan_rcv
-References: <20140916121844.GA5349@omega> <54182C6B.6090801@xsilon.com> <20140916123421.GA5576@omega> <54182FB8.4080103@xsilon.com> <20140916124832.GB5576@omega> <1410873619.4860.20.camel@jrissane-mobl.ger.corp.intel.com> <20140916133206.GA6104@omega> <1410875570.4860.23.camel@jrissane-mobl.ger.corp.intel.com> <20140916140459.GB6104@omega> <54184CDB.9050200@xsilon.com> <20140916173806.GC6104@omega>
-In-Reply-To: <20140916173806.GC6104@omega>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Received: from mail-wi0-f181.google.com ([209.85.212.181]:47081 "EHLO
+	mail-wi0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753785AbaIZIGU (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Fri, 26 Sep 2014 04:06:20 -0400
+Received: by mail-wi0-f181.google.com with SMTP id z2so10982031wiv.2
+        for <linux-wpan@vger.kernel.org>; Fri, 26 Sep 2014 01:06:19 -0700 (PDT)
+From: Alexander Aring <alex.aring@gmail.com>
+Subject: [PATCH wpan-tools 0/3] mac: info: interface: add basic support
+Date: Fri, 26 Sep 2014 10:06:06 +0200
+Message-Id: <1411718769-1986-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>
-Cc: Jukka Rissanen <jukka.rissanen@linux.intel.com>, Martin Townsend <mtownsend1973@gmail.com>, linux-zigbee-devel@lists.sourceforge.net, linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org, marcel@holtmann.org
+To: linux-wpan@vger.kernel.org
+Cc: Alexander Aring <alex.aring@gmail.com>
 
-Hi Alex,
+Hi,
 
-Another idea that just occured to me is to use the control buffer (cb) 
-in the skb to store the (de)compress_status variable.  This should be 
-possible as it is only valid for this layer.  Then process_data (or 
-iphc_header_decompress as I like to think of it now) will only ever 
-return an skb pointer; either the same one passed in (no copy_expand) or 
-more likely a new one (as we will skb_copy_expand to make room for 
-decompression).  On failure process_data or functions called by this set 
-the decompress status variable in skb->cb for lowpan_rcv to check.
+this patch series add support for setting lbt mode and dump phy parameters and
+mac interface parameters.
 
-- Martin.
+Each interface "could" have different mac parameters, because the mac sublayer
+means mac algorithmn which are done by phy. These parameters need to be the same
+on each interface. There are couple of mac sublayer parameters like ARET, CSMA,
+promiscuous mode, etc... These parameters will be changed if an interface will
+comming up, otherwise it's there but not running. Solution to run this device
+with different parameter is first down all others interfaces and then up the interface
+with the different parameters. (Difficult to explain maybe it's clear when you play a
+little bit with that).
 
-On 16/09/14 18:38, Alexander Aring wrote:
-> Hi Martin,
->
-> On Tue, Sep 16, 2014 at 03:44:43PM +0100, Martin Townsend wrote:
->> I would like to keep freeing skb's out of process_data as process_data will become something like iphc_decompress_hdr and it would be good if that's all it did.  Otherwise I feel we are going to put a constraint on all future header decompression routines in that they must free the skb on error.  I think it would be better to defer this so on error you might want to try something else with the skb, maybe not but at least the option is there.
->> So how about
->>
->>          struct sk_buff * ret_skb;
->>          switch (skb->data[0] & 0xe0) {
->>          case LOWPAN_DISPATCH_IPHC:    /* ipv6 datagram */
->>              ret_skb = process_data(skb, &hdr);
->>              if (IS_ERR(ret_skb))
->>                  goto drop_skb;
->>              else
->>                  skb = ret_skb;
->>              break;
->>
->> I know we currently have 3 calls to process_data so it will look fairly ugly in this patch but in my next patch to fix lowpan_rcv to handle uncompressed IPv6 packets that are fragmented there will only be one call to process_data so it won't look so bad.  You could even wrap it in a macro but I'm not a fan of this as they can obfuscate the code a bit.
->>
->> Thoughts?
->>
-> sorry, I can't follow how this solve the issue if the "parameter skb" is
-> already consumed or not. If process_data returns a error before
-> parameter consume, then we should run kfree_skb(parameter_skb), if it's
-> afterwards we should do nothing. Point is we don't know that there. I
-> suppose if we do consume_skb and refcount reach 0 the parameter_skb
-> becomes a dangling pointer.
->
-> - Alex
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-wpan" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+PHY settings will directly set registers to the driver. There is no mac functionality.
+Only physical changes in radio frequency handling.
+
+dump example for phy pib:
+
+root@DistroKit:~ iwpan phy
+wpan_phy phy0
+supported channels:
+        page 0: 11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26 
+current_page: 0
+current_channel: 26
+cca_mode: 1
+tx_power: 3
+
+dump example for mac pib:
+
+phy#0
+        Interface mon0
+                ifindex 5
+                wpan_dev 0x2
+                extended_addr 0x0000000000000000
+                short_addr 0xffff
+                pan_id 0xffff
+                type monitor
+                max_frame_retries 3
+                max_be 5
+                max_csma_backoffs 4
+                min_be 3
+                lbt 0
+        Interface wpan0
+                ifindex 2
+                wpan_dev 0x1
+                extended_addr 0xaaaaaaaaaaaaaaaa
+                short_addr 0xffff
+                pan_id 0xabcd
+                type node
+                max_frame_retries 3
+                max_be 5
+                max_csma_backoffs 4
+                min_be 3
+                lbt 0
+
+I know there are a lot of other pib values. I don't forget these but it need
+time to support it. I am still getting a state in the rework like mainline state.
+
+Also it looks a little bit ugly but we can still change it for the wpan-tools. :-)
+
+- Alex
+
+Alexander Aring (3):
+  mac: add support for setting lbt mode
+  info: add support to dump phy pib
+  interface: add dump for iface mac parameters
+
+ src/Makefile.am |   1 +
+ src/info.c      | 108 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/interface.c | 101 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/iwpan.h     |   3 ++
+ src/mac.c       |  27 ++++++++++++++
+ src/nl802154.h  |  13 +++++++
+ src/nl_extras.h |   5 +++
+ 7 files changed, 258 insertions(+)
+ create mode 100644 src/info.c
+
+-- 
+2.1.0
 
