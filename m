@@ -1,42 +1,58 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from senator.holtmann.net ([87.106.208.187]:53464 "EHLO
-	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751711AbaJETHj (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Sun, 5 Oct 2014 15:07:39 -0400
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
-Subject: Re: [PATCH bluetooth-next 0/2] mac802154: ieee802154: typo and routing fixes
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1412533392-4072-1-git-send-email-alex.aring@gmail.com>
-Date: Sun, 5 Oct 2014 21:07:45 +0200
-Content-Transfer-Encoding: 7bit
-Message-Id: <2CDEF1A8-BB53-4EC3-A1FC-A77B28001264@holtmann.org>
-References: <1412533392-4072-1-git-send-email-alex.aring@gmail.com>
+Received: from mail-wi0-f173.google.com ([209.85.212.173]:53480 "EHLO
+	mail-wi0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751128AbaJAMKc (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Wed, 1 Oct 2014 08:10:32 -0400
+From: Martin Townsend <mtownsend1973@gmail.com>
+Subject: [PATCH v4 bluetooth] Fix lowpan_rcv
+Date: Wed,  1 Oct 2014 13:10:21 +0100
+Message-Id: <1412165422-31063-1-git-send-email-martin.townsend@xsilon.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>, linux-wpan@vger.kernel.org, kernel@pengutronix.de
+To: linux-zigbee-devel@lists.sourceforge.net, linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org
+Cc: marcel@holtmann.org, alex.aring@gmail.com, Martin Townsend <martin.townsend@xsilon.com>
 
-Hi Alex,
+This series aims to fix incorrect return values in lowpan_rcv
+To achieve this it also refactors the receive path to
+  1) free skb only from lowpan_rcv and not functions that it calls
+  2) move skb delivery from IPHC
 
-> this patches series contains a tirivial typo in mac802154 Kconfig entry and
-> drop PACKET_OTHERHOST skb's before parsing 6lowpan header.
-> 
-> - Alex
-> 
-> Julien Catalano (1):
->  trivial: net/mac802154: Fix Kconfig typo
-> 
-> Simon Vincent (1):
->  ieee802154: 6lowpan: Drop PACKET_OTHERHOST skbs in 6lowpan
-> 
-> net/ieee802154/6lowpan_rtnl.c | 3 +++
-> net/mac802154/Kconfig         | 2 +-
-> 2 files changed, 4 insertions(+), 1 deletion(-)
+I have only compile tested the changes for bluetooth as I don't have any HW
+available so would be grateful for any testing from the Bluetooth developers.
+I have done some minimal testing for IEEE802.15.4
 
-both patches have been applied to bluetooth-next tree.
+Signed-off-by: Martin Townsend <martin.townsend@xsilon.com>
+---
 
-Regards
+v1 -> v2:
+* combined first two patches into one.
+* split out renaming of process_data into a new patch
+* re-use err in lowpan_process_data and remove err_ret local variable.
+* removed third patch as applies to linux-wpan
 
-Marcel
+v2 -> v3: (Updated from Alexander Aring's Review) 
+* re-use err hadn't been included in patch.
+* fixed some 'goto drop' cases in lowpan_rcv that should be 'goto drop skb'
+* handle error codes when returning from lowpan_frag_rcv.
+* Refactored lowpan_give_skb_to_devices so it consumes or free's skb and then
+  only returns NET_RX status codes.
+
+v3 -> v4: (Updated from Jukka Rissanen and Alexander Aring's Reviews)
+* Removed use of double skb pointer in decompress routines in favour of using
+  pskb_expand_head to obtain more headroom.  Requires an uncloned skb so the
+  calling functions now ensure this.
+* prefer consume_skb on non error conditions.
+* removed spurious setting of ret in lowpan_rcv
+
+Martin Townsend (1):
+  6lowpan: fix incorrect return values in lowpan_rcv
+
+ include/net/6lowpan.h         |  9 +++--
+ net/6lowpan/iphc.c            | 92 ++++++++++++++++---------------------------
+ net/bluetooth/6lowpan.c       | 52 ++++++++++++++++--------
+ net/ieee802154/6lowpan_rtnl.c | 66 ++++++++++++++++++++-----------
+ 4 files changed, 117 insertions(+), 102 deletions(-)
+
+-- 
+1.9.1
 
