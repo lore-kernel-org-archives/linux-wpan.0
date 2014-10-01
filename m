@@ -1,66 +1,32 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wg0-f51.google.com ([74.125.82.51]:63699 "EHLO
-	mail-wg0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751056AbaJAGIV (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Wed, 1 Oct 2014 02:08:21 -0400
-Date: Wed, 1 Oct 2014 08:08:14 +0200
-From: Alexander Aring <alex.aring@gmail.com>
+Received: from shards.monkeyblade.net ([149.20.54.216]:54858 "EHLO
+	shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750981AbaJAGDb (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Wed, 1 Oct 2014 02:03:31 -0400
+Date: Wed, 01 Oct 2014 02:03:30 -0400 (EDT)
+Message-Id: <20141001.020330.1107419144608142662.davem@davemloft.net>
 Subject: Re: [PATCH 1/1 net-next] ieee802154: fix __init functions
-Message-ID: <20141001060812.GA23043@omega>
+From: David Miller <davem@davemloft.net>
+In-Reply-To: <1412141266-12258-1-git-send-email-fabf@skynet.be>
 References: <1412141266-12258-1-git-send-email-fabf@skynet.be>
- <56FE06A5-5C2A-42E4-B01A-15EB36BAADE5@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <56FE06A5-5C2A-42E4-B01A-15EB36BAADE5@holtmann.org>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Fabian Frederick <fabf@skynet.be>, linux-kernel <linux-kernel@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>, linux-wpan@vger.kernel.org, netdev@vger.kernel.org
+To: fabf@skynet.be
+Cc: linux-kernel@vger.kernel.org, alex.aring@gmail.com, linux-wpan@vger.kernel.org, netdev@vger.kernel.org
 
-Hi,
+From: Fabian Frederick <fabf@skynet.be>
+Date: Wed,  1 Oct 2014 07:27:46 +0200
 
-On Wed, Oct 01, 2014 at 07:34:39AM +0200, Marcel Holtmann wrote:
-> Hi Fabian,
+> Commit 3243acd37fd9
+> ("ieee802154: add __init to lowpan_frags_sysctl_register")
 > 
-> > Commit 3243acd37fd9
-> > ("ieee802154: add __init to lowpan_frags_sysctl_register")
-> > 
-> > added __init to lowpan_frags_ns_sysctl_register instead of
-> > lowpan_frags_sysctl_register
-> > 
-> > Suggested-by: Alexander Aring <alex.aring@gmail.com>
-> > Signed-off-by: Fabian Frederick <fabf@skynet.be>
-> > ---
-> > net/ieee802154/reassembly.c | 4 ++--
-> > 1 file changed, 2 insertions(+), 2 deletions(-)
+> added __init to lowpan_frags_ns_sysctl_register instead of
+> lowpan_frags_sysctl_register
 > 
-> when trying to apply this to bluetooth-next kernel, I am getting this:
-> 
-> Applying: ieee802154: fix __init functions
-> error: patch failed: net/ieee802154/reassembly.c:498
-> error: net/ieee802154/reassembly.c: patch does not apply
-> Patch failed at 0001 ieee802154: fix __init functions
-> 
+> Suggested-by: Alexander Aring <alex.aring@gmail.com>
+> Signed-off-by: Fabian Frederick <fabf@skynet.be>
 
-Fabian:
-thanks.
-
-
-Marcel:
-this is a patch for a fix which is already in net-next. Please don't
-apply, see [0].
-
-
-Marcel and David:
-Now, we have chaos who will apply now patches for ieee802154. I thought
-I apply ieee802154 patches to the wpan-next tree and then send it to
-bluetooth-next. Please don't change this patchflow.
-
-Okay, I know sometimes people change the inet_frag api, then it should
-go into net/net-next.
-
-
-- Alex
-
-[0] http://marc.info/?l=linux-netdev&m=141213852806003&w=2
+Applied, thanks for sorting this out.
