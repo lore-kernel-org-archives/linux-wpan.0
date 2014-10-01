@@ -1,29 +1,51 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from shards.monkeyblade.net ([149.20.54.216]:54168 "EHLO
-	shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750716AbaJAElt convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Wed, 1 Oct 2014 00:41:49 -0400
-Date: Wed, 01 Oct 2014 00:41:45 -0400 (EDT)
-Message-Id: <20141001.004145.666953186448073320.davem@davemloft.net>
-Subject: Re: [PATCH 1/1 linux-next] ieee802154: add __init to
- lowpan_frags_sysctl_register
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <1016857334.83918.1412138209231.open-xchange@webmail.nmp.skynet.be>
-References: <1412109249-7432-1-git-send-email-fabf@skynet.be>
-	<20141001002459.GA1007@omega>
-	<1016857334.83918.1412138209231.open-xchange@webmail.nmp.skynet.be>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8BIT
+Received: from mailrelay001.isp.belgacom.be ([195.238.6.51]:49620 "EHLO
+	mailrelay001.isp.belgacom.be" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751798AbaJAF1w (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Wed, 1 Oct 2014 01:27:52 -0400
+From: Fabian Frederick <fabf@skynet.be>
+Subject: [PATCH 1/1 net-next] ieee802154: fix __init functions
+Date: Wed,  1 Oct 2014 07:27:46 +0200
+Message-Id: <1412141266-12258-1-git-send-email-fabf@skynet.be>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: fabf@skynet.be
-Cc: alex.aring@gmail.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, linux-wpan@vger.kernel.org
+To: linux-kernel@vger.kernel.org
+Cc: Fabian Frederick <fabf@skynet.be>, Alexander Aring <alex.aring@gmail.com>, "David S. Miller" <davem@davemloft.net>, linux-wpan@vger.kernel.org, netdev@vger.kernel.org
 
-From: Fabian Frederick <fabf@skynet.be>
-Date: Wed, 1 Oct 2014 06:36:49 +0200 (CEST)
+Commit 3243acd37fd9
+("ieee802154: add __init to lowpan_frags_sysctl_register")
 
->     I didn't see _ns_ . I'll send the right fix based on wpan-next.
+added __init to lowpan_frags_ns_sysctl_register instead of
+lowpan_frags_sysctl_register
 
-You'll have to send it to me, because I applied your patch already
-to net-next.
+Suggested-by: Alexander Aring <alex.aring@gmail.com>
+Signed-off-by: Fabian Frederick <fabf@skynet.be>
+---
+ net/ieee802154/reassembly.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/net/ieee802154/reassembly.c b/net/ieee802154/reassembly.c
+index 30ec608..7cfcd68 100644
+--- a/net/ieee802154/reassembly.c
++++ b/net/ieee802154/reassembly.c
+@@ -498,7 +498,7 @@ static void lowpan_frags_sysctl_unregister(void)
+ 	unregister_net_sysctl_table(lowpan_ctl_header);
+ }
+ #else
+-static inline int __init lowpan_frags_ns_sysctl_register(struct net *net)
++static inline int lowpan_frags_ns_sysctl_register(struct net *net)
+ {
+ 	return 0;
+ }
+@@ -507,7 +507,7 @@ static inline void lowpan_frags_ns_sysctl_unregister(struct net *net)
+ {
+ }
+ 
+-static inline int lowpan_frags_sysctl_register(void)
++static inline int __init lowpan_frags_sysctl_register(void)
+ {
+ 	return 0;
+ }
+-- 
+1.9.3
+
