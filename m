@@ -1,52 +1,28 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wg0-f48.google.com ([74.125.82.48]:36737 "EHLO
-	mail-wg0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750992AbaJAAiU (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Tue, 30 Sep 2014 20:38:20 -0400
-Received: by mail-wg0-f48.google.com with SMTP id l18so115585wgh.19
-        for <linux-wpan@vger.kernel.org>; Tue, 30 Sep 2014 17:38:19 -0700 (PDT)
-Date: Wed, 1 Oct 2014 02:38:16 +0200
-From: Alexander Aring <alex.aring@gmail.com>
-Subject: Re: Problems with fakeserial
-Message-ID: <20141001003814.GB1007@omega>
-References: <542ACF52.3030807@xsilon.com>
+Received: from mout.kundenserver.de ([212.227.17.13]:58886 "EHLO
+	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750780AbaJAIFI (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Wed, 1 Oct 2014 04:05:08 -0400
+Message-ID: <542BB5B1.5010705@xsilon.com>
+Date: Wed, 01 Oct 2014 09:05:05 +0100
+From: Martin Townsend <martin.townsend@xsilon.com>
 MIME-Version: 1.0
+Subject: Re: Problems with fakeserial
+References: <542ACF52.3030807@xsilon.com> <20141001003814.GB1007@omega>
+In-Reply-To: <20141001003814.GB1007@omega>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <542ACF52.3030807@xsilon.com>
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Martin Townsend <martin.townsend@xsilon.com>
+To: Alexander Aring <alex.aring@gmail.com>
 Cc: linux-wpan@vger.kernel.org
 
-Hi Martin,
+Hi Alex,
 
-first, the serial things came never into mainline. I like the idea to
-abstract a serial protocol above the 802.15.4 layer which run as
-firmware on several devices. But the serial driver never came into mainline.
+Do you know where I can find the serial driver module?
 
-On Tue, Sep 30, 2014 at 04:42:10PM +0100, Martin Townsend wrote:
-> Hi,
-> 
-> I'm trying to use the virtual-ieee802154-serial code but when I use izattach I get the following error msg:
-> 
-> root@10:/etc/init.d# izattach /dev/fakeserial0
-> ioctl: TIOCSETD: Invalid argument
-> 
+- Martin.
 
-Do you ported and loaded the serial driver module? I also need to say
-that I never tested the serial driver or virtual-ieee802154-serial
-stuff. Maybe simple original author Tony Cheneau [0]. Maybe he has time
-to help here a little bit.
+On 01/10/14 01:38, Alexander Aring wrote:
+> Do you ported and loaded the serial driver module? 
 
-> I've tried ensuring the baud rates match and still get the same error.
-> 
-> I'm using the following git repos for the userspace tools, is this still correct?
-> git://git.code.sf.net/p/linux-zigbee/linux-zigbee
-> 
-
-Yes, sad but should be correct.
-
-- Alex
-
-[0] tony.cheneau@amnesiak.org
