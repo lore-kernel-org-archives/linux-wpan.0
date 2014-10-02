@@ -1,12 +1,12 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.17.24]:56049 "EHLO
+Received: from mout.kundenserver.de ([212.227.17.24]:49466 "EHLO
 	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751157AbaJFJiB (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Mon, 6 Oct 2014 05:38:01 -0400
+	with ESMTP id S1751331AbaJBJ4a (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Thu, 2 Oct 2014 05:56:30 -0400
 From: Simon Vincent <simon.vincent@xsilon.com>
 Subject: [PATCH linux-wpan v3] ieee802154: mrf24j40: Add support for MRF24J40MC
-Date: Mon,  6 Oct 2014 10:37:36 +0100
-Message-Id: <1412588256-30218-1-git-send-email-simon.vincent@xsilon.com>
+Date: Thu,  2 Oct 2014 10:55:58 +0100
+Message-Id: <1412243758-6901-1-git-send-email-simon.vincent@xsilon.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
@@ -61,7 +61,7 @@ index 07e0b88..ff3ca07 100644
 +		/* Enable external amplifier.
 +		 * From MRF24J40MC datasheet section 1.3: Operation.
 +		 */
-+		read_long_reg(devrec, REG_TESTMODE, &val);
++		write_long_reg(devrec, REG_TESTMODE, &val);
 +		val |= 0x7; /* Configure GPIO 0-2 to control amplifier */
 +		write_long_reg(devrec, REG_TESTMODE, val);
 +
