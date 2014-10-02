@@ -1,54 +1,82 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from senator.holtmann.net ([87.106.208.187]:52765 "EHLO
-	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752397AbaJFM4S convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Mon, 6 Oct 2014 08:56:18 -0400
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
-Subject: Re: [PATCH wpan-next 1/3] ieee802154: 6lowpan: fix byteorder for frag tag
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20141006112246.GB10024@omega>
-Date: Mon, 6 Oct 2014 14:56:26 +0200
-Content-Transfer-Encoding: 8BIT
-Message-Id: <6A8AA715-1BEA-4929-8DC0-D0086EFE77E2@holtmann.org>
-References: <1412586052-27299-1-git-send-email-alex.aring@gmail.com> <A134B4A0-64A0-4E34-8F54-DBAFDC11EB22@holtmann.org> <20141006112246.GB10024@omega>
+Received: from mail-wi0-f172.google.com ([209.85.212.172]:50146 "EHLO
+	mail-wi0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750998AbaJBK1W (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Thu, 2 Oct 2014 06:27:22 -0400
+Received: by mail-wi0-f172.google.com with SMTP id n3so3412977wiv.17
+        for <linux-wpan@vger.kernel.org>; Thu, 02 Oct 2014 03:27:21 -0700 (PDT)
+Date: Thu, 2 Oct 2014 12:27:19 +0200
+From: Alexander Aring <alex.aring@gmail.com>
+Subject: Re: [Linux-zigbee-devel] Linux WPAN sources for ZigBee porting
+Message-ID: <20141002102717.GB19732@omega>
+References: <CAAdqeRSU=irjdpERicLhZ=cT_cBBfsDEXWeVr7V4z0=OgB2xYw@mail.gmail.com>
+ <20141002084013.GA18438@omega>
+ <CAAdqeRQu3-uYVHP-OE7eT839btnf8VmuaEuTr9kx3M_pRMXTWg@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAAdqeRQu3-uYVHP-OE7eT839btnf8VmuaEuTr9kx3M_pRMXTWg@mail.gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>
-Cc: linux-wpan@vger.kernel.org
+To: Evgeniy Eksarevsky <eexarevsky@gmail.com>
+Cc: linux-zigbee-devel@lists.sourceforge.net, linux-wpan@vger.kernel.org
 
-Hi Alex,
+Hi,
 
->>> This patch fix byteorder issues with fragment tag of generation 802.15.4
->>> 6LoWPAN fragment header.
->>> 
->>> net/ieee802154/6lowpan_rtnl.c:278:54: warning restricted __be16 degrades to integer
->>> net/ieee802154/6lowpan_rtnl.c:278:18: warning: incorrect type in assignment (different base types)
->>> net/ieee802154/6lowpan_rtnl.c:278:18:    expected restricted __be16 [usertype] frag_tag
->>> net/ieee802154/6lowpan_rtnl.c:278:18:    got unsigned short
->>> 
->>> Signed-off-by: Alexander Aring <alex.aring@gmail.com>
->>> Reported-by: Marcel Holtmann <marcel@holtmann.org>
->>> ---
->>> net/ieee802154/6lowpan_rtnl.c | 9 +++++----
->>> 1 file changed, 5 insertions(+), 4 deletions(-)
->> 
->> patch has been applied to bluetooth-next tree.
->> 
+> >
+> >> Just now I am trying to define which MAC features required by ZigBee exist
+> >> and which are missing.
+> >
+> > many.
 > 
-> mhhh, I thought I should apply these patches to wpan-next three. That's
-> why it's tagged with "wpan-next" and sent to linux-wpan only.
+> I know... For now it looks like not using Linux wpan is simpler than use it.
 > 
-> Just for global review and such things...
+
+correct.
+
+> >
+> >>
+> >> Which WPAN sources I need to look into?
+> >> Is it official Linux kernel?
+> >> Is it in https://github.com/linux-wpan/linux-wpan-next ?
+> >
+> > Yes it is.
+> >
+> > master: things which should be mainline.
+> > testing: patches for integrating process.
 > 
-> Then I will send it with a bunch of patches to linux-bluetooth (I should
-> change that to send pull-requests to you).
+> ok, thanks.
+> 
+> >
+> >> Which branch?
+> >>
+> >> Is serial protocol v.2 already implemented?
+> >
+> > No, also v1 isn't mainline.
+> 
+> Yes, I already found a patch for v1.
+> What i definitely need from the serial protocol is ability to do indirect send.
+> 
 
-if you want to send pull requests to me that is fine as well. Right now I take patches into bluetooth-next so that they get global exposure and we get them into wireless-next on a regular basis.
+indirect send?
 
-I am totally fine with just applying patches one by one. That is no extra work for me. I just want to get them into the tree so that they will make it into wireless-next early on.
+> >
+> >> What do you think about its modification if it will be necessary for
+> >> ZigBee? It will be, for sure...
+> >>
+> >
+> > mac802.15.4 isn't in an useable state. I am currently try to change it
+> > look in the rework branch.
+> 
+> wpan_rework_rfc?
+> 
 
-Regards
+Yes, but it's not in a mainline state. I disabled for integrating
+process the 802.15.4 address family. For ZigBee userspace stuff you need
+definitely af802154. I could give you the advice to make everything on
+802.15.4 RAW sockets. DGRAM sockets are only for data frames and the userspace
+API will be changed eventually.
 
-Marcel
+For af802154 you can use current mainline state.
 
+- Alex
