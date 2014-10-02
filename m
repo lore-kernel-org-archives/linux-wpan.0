@@ -1,50 +1,47 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mga14.intel.com ([192.55.52.115]:59937 "EHLO mga14.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750919AbaJBJnI (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-	Thu, 2 Oct 2014 05:43:08 -0400
-Message-ID: <1412242985.13121.11.camel@jrissane-mobl.ger.corp.intel.com>
+Received: from mail-wg0-f47.google.com ([74.125.82.47]:40483 "EHLO
+	mail-wg0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750919AbaJBJyg (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Thu, 2 Oct 2014 05:54:36 -0400
+Received: by mail-wg0-f47.google.com with SMTP id x13so2670787wgg.18
+        for <linux-wpan@vger.kernel.org>; Thu, 02 Oct 2014 02:54:35 -0700 (PDT)
+Date: Thu, 2 Oct 2014 11:54:32 +0200
+From: Alexander Aring <alex.aring@gmail.com>
 Subject: Re: [PATCH linux-wpan 0/3] Fix handling of skbs of type
  PACKET_OTHERHOST
-From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-Date: Thu, 02 Oct 2014 12:43:05 +0300
-In-Reply-To: <542D1C80.9050807@xsilon.com>
+Message-ID: <20141002095430.GE3850@omega>
 References: <1412240206-6098-1-git-send-email-simon.vincent@xsilon.com>
-	 <20141002092804.GC3850@omega> <542D1C80.9050807@xsilon.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+ <20141002092804.GC3850@omega>
+ <542D1C80.9050807@xsilon.com>
+ <1412242985.13121.11.camel@jrissane-mobl.ger.corp.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1412242985.13121.11.camel@jrissane-mobl.ger.corp.intel.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Simon Vincent <simon.vincent@xsilon.com>
-Cc: Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org, varkabhadram@gmail.com
+To: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+Cc: Simon Vincent <simon.vincent@xsilon.com>, linux-wpan@vger.kernel.org, varkabhadram@gmail.com
 
-Hi Simon,
+Jukka,
 
-On to, 2014-10-02 at 10:36 +0100, Simon Vincent wrote:
-> I will add this patch when I rebase on bluetooth-next.
-
-and thanks for doing that.
-
+On Thu, Oct 02, 2014 at 12:43:05PM +0300, Jukka Rissanen wrote:
+> Hi Simon,
 > 
-> On 02/10/14 10:28, Alexander Aring wrote:
-> > On Thu, Oct 02, 2014 at 09:56:43AM +0100, Simon Vincent wrote:
-> >> This series of patches fix the cases where the pkt_type is overriden
-> >> resulting in skbs of type PACKET_OTHERHOST getting set to PACKET_HOST.
-> >> Also it drops packets of PACKET_OTHERHOST type in the 6lowpan layer
-> >> as there is not point processing them as they are dropped at the next
-> >> layer.
-> > Please don't forget:
-> >
-> > $ grep -r -n "PACKET_HOST" net/bluetooth/6lowpan.c
-> >
-> > 276:		local_skb->pkt_type = PACKET_HOST;
-> >
-> > - Alex
+> On to, 2014-10-02 at 10:36 +0100, Simon Vincent wrote:
+> > I will add this patch when I rebase on bluetooth-next.
+> 
+> and thanks for doing that.
 > 
 
+I see now, that the bluetooth layer never sets this value. I don't know
+how bluetooth deal with that. But you need to set PACKET_HOST if packet
+belongs to you, OTHERHOST if packets belongs not to you, or
+PACKET_BROADCAST if packet belongs to you, but is a broadcast.
 
-Cheers,
-Jukka
+Also for PACKET_MULTICAST, if bluetooth support MULTICAST frames.
 
 
+I think you need handling for this in bluetooth 6lowpan layer.
+
+- Alex
