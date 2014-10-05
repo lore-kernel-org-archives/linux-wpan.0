@@ -1,45 +1,42 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f175.google.com ([209.85.212.175]:35230 "EHLO
-	mail-wi0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751797AbaJESXa (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Sun, 5 Oct 2014 14:23:30 -0400
-From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH bluetooth-next 2/2] ieee802154: 6lowpan: Drop PACKET_OTHERHOST skbs in 6lowpan
-Date: Sun,  5 Oct 2014 20:23:12 +0200
-Message-Id: <1412533392-4072-3-git-send-email-alex.aring@gmail.com>
+Received: from senator.holtmann.net ([87.106.208.187]:53464 "EHLO
+	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751711AbaJETHj (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Sun, 5 Oct 2014 15:07:39 -0400
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
+Subject: Re: [PATCH bluetooth-next 0/2] mac802154: ieee802154: typo and routing fixes
+From: Marcel Holtmann <marcel@holtmann.org>
 In-Reply-To: <1412533392-4072-1-git-send-email-alex.aring@gmail.com>
+Date: Sun, 5 Oct 2014 21:07:45 +0200
+Content-Transfer-Encoding: 7bit
+Message-Id: <2CDEF1A8-BB53-4EC3-A1FC-A77B28001264@holtmann.org>
 References: <1412533392-4072-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org, linux-wpan@vger.kernel.org, kernel@pengutronix.de, Simon Vincent <simon.vincent@xsilon.com>, Alexander Aring <alex.aring@gmail.com>
+To: Alexander Aring <alex.aring@gmail.com>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>, linux-wpan@vger.kernel.org, kernel@pengutronix.de
 
-From: Simon Vincent <simon.vincent@xsilon.com>
+Hi Alex,
 
-There is no point processing pkts which are PACKET_OTHERHOST
-in 6lowpan as they are discarded as soon as they reach the
-ipv6 layer. Therefore we should drop them in the 6lowpan layer.
+> this patches series contains a tirivial typo in mac802154 Kconfig entry and
+> drop PACKET_OTHERHOST skb's before parsing 6lowpan header.
+> 
+> - Alex
+> 
+> Julien Catalano (1):
+>  trivial: net/mac802154: Fix Kconfig typo
+> 
+> Simon Vincent (1):
+>  ieee802154: 6lowpan: Drop PACKET_OTHERHOST skbs in 6lowpan
+> 
+> net/ieee802154/6lowpan_rtnl.c | 3 +++
+> net/mac802154/Kconfig         | 2 +-
+> 2 files changed, 4 insertions(+), 1 deletion(-)
 
-Signed-off-by: Simon Vincent <simon.vincent@xsilon.com>
-Signed-off-by: Alexander Aring <alex.aring@gmail.com>
----
- net/ieee802154/6lowpan_rtnl.c | 3 +++
- 1 file changed, 3 insertions(+)
+both patches have been applied to bluetooth-next tree.
 
-diff --git a/net/ieee802154/6lowpan_rtnl.c b/net/ieee802154/6lowpan_rtnl.c
-index 4413629..56252ee 100644
---- a/net/ieee802154/6lowpan_rtnl.c
-+++ b/net/ieee802154/6lowpan_rtnl.c
-@@ -515,6 +515,9 @@ static int lowpan_rcv(struct sk_buff *skb, struct net_device *dev,
- 	if (!netif_running(dev))
- 		goto drop_skb;
- 
-+	if (skb->pkt_type == PACKET_OTHERHOST)
-+		goto drop_skb;
-+
- 	if (dev->type != ARPHRD_IEEE802154)
- 		goto drop_skb;
- 
--- 
-2.1.2
+Regards
+
+Marcel
 
