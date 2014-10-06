@@ -1,84 +1,74 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.17.24]:61638 "EHLO
-	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751397AbaJFJl5 (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Mon, 6 Oct 2014 05:41:57 -0400
-Message-ID: <543263E0.4060009@xsilon.com>
-Date: Mon, 06 Oct 2014 10:41:52 +0100
-From: Simon Vincent <simon.vincent@xsilon.com>
-MIME-Version: 1.0
-Subject: Re: [PATCH linux-wpan v3] ieee802154: mrf24j40: Add support for MRF24J40MC
-References: <1412243758-6901-1-git-send-email-simon.vincent@xsilon.com> <5431B934.9050304@signal11.us>
-In-Reply-To: <5431B934.9050304@signal11.us>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
+Received: from mail-wi0-f172.google.com ([209.85.212.172]:54806 "EHLO
+	mail-wi0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752378AbaJFJBq (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Mon, 6 Oct 2014 05:01:46 -0400
+Received: by mail-wi0-f172.google.com with SMTP id n3so3837438wiv.17
+        for <linux-wpan@vger.kernel.org>; Mon, 06 Oct 2014 02:01:44 -0700 (PDT)
+From: Alexander Aring <alex.aring@gmail.com>
+Subject: [PATCH wpan-next 1/3] ieee802154: 6lowpan: fix byteorder for frag tag
+Date: Mon,  6 Oct 2014 11:00:50 +0200
+Message-Id: <1412586052-27299-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alan Ott <alan@signal11.us>, linux-wpan@vger.kernel.org
+To: linux-wpan@vger.kernel.org
+Cc: marcel@holtmann.org, Alexander Aring <alex.aring@gmail.com>
 
+This patch fix byteorder issues with fragment tag of generation 802.15.4
+6LoWPAN fragment header.
 
-On 05/10/14 22:33, Alan Ott wrote:
-> On 10/02/2014 05:55 AM, Simon Vincent wrote:
->> The MRF24J40MC module has an external amplifier which should be
->> enabled. The TX power has to be lowered to meet FCC regs.
->>
->> Signed-off-by: Simon Vincent <simon.vincent@xsilon.com>
->> ---
->> v2 -> v3:
->> * Added extra code comments and removed check of spi return values.
->>
->>   drivers/net/ieee802154/mrf24j40.c | 32 
->> ++++++++++++++++++++++++++++++--
->>   1 file changed, 30 insertions(+), 2 deletions(-)
->>
->> diff --git a/drivers/net/ieee802154/mrf24j40.c 
->> b/drivers/net/ieee802154/mrf24j40.c
->> index 07e0b88..ff3ca07 100644
->> --- a/drivers/net/ieee802154/mrf24j40.c
->> +++ b/drivers/net/ieee802154/mrf24j40.c
->> @@ -43,6 +43,8 @@
->>   #define REG_TXSTBL   0x2E  /* TX Stabilization */
->>   #define REG_INTSTAT  0x31  /* Interrupt Status */
->>   #define REG_INTCON   0x32  /* Interrupt Control */
->> +#define REG_GPIO     0x33  /* GPIO */
->> +#define REG_TRISGPIO 0x34  /* GPIO direction */
->>   #define REG_RFCTL    0x36  /* RF Control Mode Register */
->>   #define REG_BBREG1   0x39  /* Baseband Registers */
->>   #define REG_BBREG2   0x3A  /* */
->> @@ -63,6 +65,7 @@
->>   #define REG_SLPCON1    0x220
->>   #define REG_WAKETIMEL  0x222  /* Wake-up Time Match Value Low */
->>   #define REG_WAKETIMEH  0x223  /* Wake-up Time Match Value High */
->> +#define REG_TESTMODE   0x22F  /* Test mode */
->>   #define REG_RX_FIFO    0x300  /* Receive FIFO */
->>
->>   /* Device configuration: Only channels 11-26 on page 0 are 
->> supported. */
->> @@ -75,6 +78,8 @@
->>   #define RX_FIFO_SIZE 144 /* From datasheet */
->>   #define SET_CHANNEL_DELAY_US 192 /* From datasheet */
->>
->> +enum mrf24j40_modules { MRF24J40, MRF24J40MA, MRF24J40MC };
->> +
->>   /* Device Private Data */
->>   struct mrf24j40 {
->>       struct spi_device *spi;
->> @@ -691,6 +696,28 @@ static int mrf24j40_hw_init(struct mrf24j40 
->> *devrec)
->>       if (ret)
->>           goto err_ret;
->>
->> +    if (spi_get_device_id(devrec->spi)->driver_data == MRF24J40MC) {
->> +        /* Enable external amplifier.
->> +         * From MRF24J40MC datasheet section 1.3: Operation.
->> +         */
->> +        write_long_reg(devrec, REG_TESTMODE, &val);
->
-> This compiles? I think you want read_*() here. I'm surprised the 
-> write_*() compiles with a pointer parameter given the kernel's 
-> warning/error settings.
->
-Sorry I had picked up on this during testing but I must have sent the 
-wrong patch. I have sent a v4 patch now with this corrected.
+net/ieee802154/6lowpan_rtnl.c:278:54: warning restricted __be16 degrades to integer
+net/ieee802154/6lowpan_rtnl.c:278:18: warning: incorrect type in assignment (different base types)
+net/ieee802154/6lowpan_rtnl.c:278:18:    expected restricted __be16 [usertype] frag_tag
+net/ieee802154/6lowpan_rtnl.c:278:18:    got unsigned short
 
-Simon
+Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+Reported-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ net/ieee802154/6lowpan_rtnl.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/net/ieee802154/6lowpan_rtnl.c b/net/ieee802154/6lowpan_rtnl.c
+index 4413629..8631206 100644
+--- a/net/ieee802154/6lowpan_rtnl.c
++++ b/net/ieee802154/6lowpan_rtnl.c
+@@ -63,7 +63,7 @@ static LIST_HEAD(lowpan_devices);
+ struct lowpan_dev_info {
+ 	struct net_device	*real_dev; /* real WPAN device ptr */
+ 	struct mutex		dev_list_mtx; /* mutex for list ops */
+-	__be16			fragment_tag;
++	u16			fragment_tag;
+ };
+ 
+ struct lowpan_dev_record {
+@@ -275,7 +275,8 @@ lowpan_xmit_fragmented(struct sk_buff *skb, struct net_device *dev,
+ 
+ 	dgram_size = lowpan_uncompress_size(skb, &dgram_offset) -
+ 		     skb->mac_len;
+-	frag_tag = lowpan_dev_info(dev)->fragment_tag++;
++	frag_tag = htons(lowpan_dev_info(dev)->fragment_tag);
++	lowpan_dev_info(dev)->fragment_tag++;
+ 
+ 	frag_hdr[0] = LOWPAN_DISPATCH_FRAG1 | ((dgram_size >> 8) & 0x07);
+ 	frag_hdr[1] = dgram_size & 0xff;
+@@ -294,7 +295,7 @@ lowpan_xmit_fragmented(struct sk_buff *skb, struct net_device *dev,
+ 				  frag_len + skb_network_header_len(skb));
+ 	if (rc) {
+ 		pr_debug("%s unable to send FRAG1 packet (tag: %d)",
+-			 __func__, frag_tag);
++			 __func__, ntohs(frag_tag));
+ 		goto err;
+ 	}
+ 
+@@ -315,7 +316,7 @@ lowpan_xmit_fragmented(struct sk_buff *skb, struct net_device *dev,
+ 					  frag_len);
+ 		if (rc) {
+ 			pr_debug("%s unable to send a FRAGN packet. (tag: %d, offset: %d)\n",
+-				 __func__, frag_tag, skb_offset);
++				 __func__, ntohs(frag_tag), skb_offset);
+ 			goto err;
+ 		}
+ 	} while (skb_unprocessed > frag_cap);
+-- 
+2.1.2
+
