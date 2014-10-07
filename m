@@ -1,47 +1,41 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from senator.holtmann.net ([87.106.208.187]:47846 "EHLO
-	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753198AbaJGLQD convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Tue, 7 Oct 2014 07:16:03 -0400
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
-Subject: Re: [PATCH bluetooth-next 0/9] at86rf230: various fixes and cleanups
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1412671113-26675-1-git-send-email-alex.aring@gmail.com>
-Date: Tue, 7 Oct 2014 13:16:13 +0200
-Content-Transfer-Encoding: 8BIT
-Message-Id: <300D854B-CE6D-46AE-91D8-E9313F081D6C@holtmann.org>
-References: <1412671113-26675-1-git-send-email-alex.aring@gmail.com>
+Received: from mail-wi0-f178.google.com ([209.85.212.178]:61580 "EHLO
+	mail-wi0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755158AbaJGTwi (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Tue, 7 Oct 2014 15:52:38 -0400
+From: Martin Townsend <mtownsend1973@gmail.com>
+Subject: [PATCH v2 bluetooth-next] 6lowpan: Use pskb_expand_head in IPHC decompression.
+Date: Tue,  7 Oct 2014 20:52:28 +0100
+Message-Id: <1412711549-24653-1-git-send-email-martin.townsend@xsilon.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>
-Cc: linux-wpan@vger.kernel.org, m.olbrich@pengutronix.de
+To: linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org
+Cc: marcel@holtmann.org, alex.aring@gmail.com, jukka.rissanen@linux.intel.com, Martin Townsend <martin.townsend@xsilon.com>
 
-Hi Alex,
+This patch aims to reduce the amount of copying in the receive path when
+decompressing by checking for headroom and calling pskb_expand_head if required.
+Another benefit of this is that the skb pointer passed to the decompression
+routine will be the same skb after decompression.  This will be a step towards
+freeing the skb within the receive function and not within all the error paths
+of the decompression routine.
 
-> this series fix a race condition when switching to RX_AACK_ON and irq is
-> enabled. Also contains correct handling of enable_irq if the irq was disabled
-> before. Additional we fix the handling of lifs/sifs timing in ARET mode.
-> 
-> - Alex
-> 
-> Alexander Aring (9):
->  at86rf230: fix errno on tx timeout handling
->  at86rf230: add missing error handling
->  at86rf230: correct aret lifs and sifs handling
->  at86rf230: correct at86rf2xx lifs timings
->  at86rf230: squash unnecessary dereferencing
->  at86rf230: add missing enable_irq
->  at86rf230: fix race condition
->  at86rf230: fix enable_irq handling on async spi
->  at86rf230: remove unnecessary print of async error
-> 
-> drivers/net/ieee802154/at86rf230.c | 180 +++++++++++++++++++------------------
-> 1 file changed, 92 insertions(+), 88 deletions(-)
+Bluetooth and 802.15.4 have been changed to ensure that only one reference
+to the skb exists before calling the decompression routine as this is a
+requirement of pskb_expand_head.
 
-all 9 patches have been applied to bluetooth-next tree.
+v1 -> v2
+Use const int for new headroom size.
+Remove blank line.
+Use skb_unshare instead of skb_copy_expand. 
 
-Regards
+Martin Townsend (1):
+  6lowpan: Use pskb_expand_head in IPHC decompression.
 
-Marcel
+ net/6lowpan/iphc.c            | 53 ++++++++++++++++++++++---------------------
+ net/bluetooth/6lowpan.c       | 19 ++++++++++++----
+ net/ieee802154/6lowpan_rtnl.c | 13 +++++++++++
+ 3 files changed, 55 insertions(+), 30 deletions(-)
+
+-- 
+1.9.1
 
