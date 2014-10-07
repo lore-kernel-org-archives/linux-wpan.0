@@ -1,41 +1,43 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f172.google.com ([209.85.212.172]:50468 "EHLO
-	mail-wi0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751447AbaJGIjp (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Tue, 7 Oct 2014 04:39:45 -0400
-Received: by mail-wi0-f172.google.com with SMTP id n3so7049776wiv.5
-        for <linux-wpan@vger.kernel.org>; Tue, 07 Oct 2014 01:39:44 -0700 (PDT)
+Received: from mail-wi0-f180.google.com ([209.85.212.180]:65146 "EHLO
+	mail-wi0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752762AbaJGIjq (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Tue, 7 Oct 2014 04:39:46 -0400
+Received: by mail-wi0-f180.google.com with SMTP id em10so7077142wid.13
+        for <linux-wpan@vger.kernel.org>; Tue, 07 Oct 2014 01:39:45 -0700 (PDT)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH bluetooth-next 0/9] at86rf230: various fixes and cleanups
-Date: Tue,  7 Oct 2014 10:38:24 +0200
-Message-Id: <1412671113-26675-1-git-send-email-alex.aring@gmail.com>
+Subject: [PATCH bluetooth-next 1/9] at86rf230: fix errno on tx timeout handling
+Date: Tue,  7 Oct 2014 10:38:25 +0200
+Message-Id: <1412671113-26675-2-git-send-email-alex.aring@gmail.com>
+In-Reply-To: <1412671113-26675-1-git-send-email-alex.aring@gmail.com>
+References: <1412671113-26675-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
 Cc: m.olbrich@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-Hi,
+The rc variable is zero if we get a timeout. Instead of pass the rc
+variable to the async error handling function which try to recover the
+phy, we use a static -ETIMEOUT errno.
 
-this series fix a race condition when switching to RX_AACK_ON and irq is
-enabled. Also contains correct handling of enable_irq if the irq was disabled
-before. Additional we fix the handling of lifs/sifs timing in ARET mode.
+Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+---
+ drivers/net/ieee802154/at86rf230.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-- Alex
-
-Alexander Aring (9):
-  at86rf230: fix errno on tx timeout handling
-  at86rf230: add missing error handling
-  at86rf230: correct aret lifs and sifs handling
-  at86rf230: correct at86rf2xx lifs timings
-  at86rf230: squash unnecessary dereferencing
-  at86rf230: add missing enable_irq
-  at86rf230: fix race condition
-  at86rf230: fix enable_irq handling on async spi
-  at86rf230: remove unnecessary print of async error
-
- drivers/net/ieee802154/at86rf230.c | 180 +++++++++++++++++++------------------
- 1 file changed, 92 insertions(+), 88 deletions(-)
-
+diff --git a/drivers/net/ieee802154/at86rf230.c b/drivers/net/ieee802154/at86rf230.c
+index c9d2a75..6857038 100644
+--- a/drivers/net/ieee802154/at86rf230.c
++++ b/drivers/net/ieee802154/at86rf230.c
+@@ -995,7 +995,7 @@ at86rf230_xmit(struct ieee802154_dev *dev, struct sk_buff *skb)
+ 	rc = wait_for_completion_interruptible_timeout(&lp->tx_complete,
+ 						       msecs_to_jiffies(lp->data->t_tx_timeout));
+ 	if (!rc) {
+-		at86rf230_async_error(lp, ctx, rc);
++		at86rf230_async_error(lp, ctx, -ETIMEDOUT);
+ 		return -ETIMEDOUT;
+ 	}
+ 
 -- 
 2.1.2
 
