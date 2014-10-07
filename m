@@ -1,32 +1,36 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-la0-f42.google.com ([209.85.215.42]:42895 "EHLO
-	mail-la0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753994AbaJHILD (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Wed, 8 Oct 2014 04:11:03 -0400
-Date: Wed, 8 Oct 2014 10:10:54 +0200
-From: Alexander Aring <alex.aring@gmail.com>
-Subject: Re: [PATCH v3 bluetooth-next] 6lowpan: Use pskb_expand_head in IPHC
- decompression.
-Message-ID: <20141008081052.GA15625@omega>
-References: <1412753745-6469-1-git-send-email-martin.townsend@xsilon.com>
- <1412753745-6469-2-git-send-email-martin.townsend@xsilon.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1412753745-6469-2-git-send-email-martin.townsend@xsilon.com>
+Received: from mail-wi0-f179.google.com ([209.85.212.179]:53474 "EHLO
+	mail-wi0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754299AbaJGPe2 (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Tue, 7 Oct 2014 11:34:28 -0400
+From: Martin Townsend <mtownsend1973@gmail.com>
+Subject: [PATCH bluetooth-next] 6lowpan: Use pskb_expand_head in IPHC decompression.
+Date: Tue,  7 Oct 2014 16:33:56 +0100
+Message-Id: <1412696037-25111-1-git-send-email-martin.townsend@xsilon.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Martin Townsend <mtownsend1973@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org, marcel@holtmann.org, jukka.rissanen@linux.intel.com, Martin Townsend <martin.townsend@xsilon.com>
+To: linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org
+Cc: marcel@holtmann.org, alex.aring@gmail.com, jukka.rissanen@linux.intel.com, Martin Townsend <martin.townsend@xsilon.com>
 
-On Wed, Oct 08, 2014 at 08:35:45AM +0100, Martin Townsend wrote:
-> Currently there are potentially 2 skb_copy_expand calls in IPHC
-> decompression.  This patch replaces this with one call to
-> pskb_expand_head.  It also checks to see if there is enough headroom
-> first to ensure it's only done if necessary.
-> As pskb_expand_head must only have one reference the calling code
-> now ensures this.
-> 
-> Signed-off-by: Martin Townsend <martin.townsend@xsilon.com>
+This patch aims to reduce the amount of copying in the receive path when
+decompressing by checking for headroom and calling pskb_expand_head if required.
+Another benefit of this is that the skb pointer passed to the decompression
+routine will be the same skb after decompression.  This will be a step towards
+freeing the skb within the receive function and not within all the error paths
+of the decompression routine.
 
-Acked-by: Alexander Aring <alex.aring@gmail.com>
+Bluetooth and 802.15.4 have been changed to ensure that only one reference
+to the skb exists before calling the decompression routine as this is a
+requirement of pskb_expand_head.
+
+Martin Townsend (1):
+  6lowpan: Use pskb_expand_head in IPHC decompression.
+
+ net/6lowpan/iphc.c            | 53 ++++++++++++++++++++++---------------------
+ net/bluetooth/6lowpan.c       | 19 ++++++++++++----
+ net/ieee802154/6lowpan_rtnl.c | 13 +++++++++++
+ 3 files changed, 55 insertions(+), 30 deletions(-)
+
+-- 
+1.9.1
+
