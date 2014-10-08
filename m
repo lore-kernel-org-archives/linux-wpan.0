@@ -1,192 +1,134 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.126.130]:56490 "EHLO
-	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754494AbaJGPh3 (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Tue, 7 Oct 2014 11:37:29 -0400
-Message-ID: <543408B2.1070309@xsilon.com>
-Date: Tue, 07 Oct 2014 16:37:22 +0100
-From: Martin Townsend <martin.townsend@xsilon.com>
-MIME-Version: 1.0
+Received: from mga03.intel.com ([134.134.136.65]:18930 "EHLO mga03.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1755743AbaJHKYz (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+	Wed, 8 Oct 2014 06:24:55 -0400
+Message-ID: <1412763863.2705.22.camel@jrissane-mobl.ger.corp.intel.com>
 Subject: Re: [PATCH bluetooth-next] 6lowpan: Use pskb_expand_head in IPHC
  decompression.
-References: <1412696037-25111-1-git-send-email-martin.townsend@xsilon.com> <1412696037-25111-2-git-send-email-martin.townsend@xsilon.com>
-In-Reply-To: <1412696037-25111-2-git-send-email-martin.townsend@xsilon.com>
-Content-Type: text/plain; charset=windows-1252
+From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+Date: Wed, 08 Oct 2014 13:24:23 +0300
+In-Reply-To: <543408B2.1070309@xsilon.com>
+References: <1412696037-25111-1-git-send-email-martin.townsend@xsilon.com>
+	 <1412696037-25111-2-git-send-email-martin.townsend@xsilon.com>
+	 <543408B2.1070309@xsilon.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org
-Cc: marcel@holtmann.org, alex.aring@gmail.com, jukka.rissanen@linux.intel.com
+To: Martin Townsend <martin.townsend@xsilon.com>
+Cc: linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org, marcel@holtmann.org, alex.aring@gmail.com
 
-I should also mention this has only been compile tested as I currently don't have a way of testing it easily.  So I would appreciate any testing on real HW.
+Hi Martin,
 
- Jukka, I would be very interested to see if you see that locking error message you were seeing previously.
+tried to v2 of the patch and still see oops but not with the locking at
+this time. I had kmemleak activated in my kernel in this run.
 
-- Martin.
+On ti, 2014-10-07 at 16:37 +0100, Martin Townsend wrote:
+> I should also mention this has only been compile tested as I currently don't have a way of testing it easily.  So I would appreciate any testing on real HW.
+> 
+>  Jukka, I would be very interested to see if you see that locking error message you were seeing previously.
+> 
+> - Martin.
+> 
 
 
-On 07/10/14 16:33, Martin Townsend wrote:
-> Currently there are potentially 2 skb_copy_expand calls in IPHC
-> decompression.  This patch replaces this with one call to
-> pskb_expand_head.  It also checks to see if there is enough headroom
-> first to ensure it's only done if necessary.
-> As pskb_expand_head must only have one reference the calling code
-> now ensures this.
->
-> Signed-off-by: Martin Townsend <martin.townsend@xsilon.com>
-> ---
->  net/6lowpan/iphc.c            | 53 ++++++++++++++++++++++---------------------
->  net/bluetooth/6lowpan.c       | 19 ++++++++++++----
->  net/ieee802154/6lowpan_rtnl.c | 13 +++++++++++
->  3 files changed, 55 insertions(+), 30 deletions(-)
->
-> diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
-> index 142eef5..fa8f348 100644
-> --- a/net/6lowpan/iphc.c
-> +++ b/net/6lowpan/iphc.c
-> @@ -174,30 +174,22 @@ static int uncompress_context_based_src_addr(struct sk_buff *skb,
->  static int skb_deliver(struct sk_buff *skb, struct ipv6hdr *hdr,
->  		       struct net_device *dev, skb_delivery_cb deliver_skb)
->  {
-> -	struct sk_buff *new;
->  	int stat;
->  
-> -	new = skb_copy_expand(skb, sizeof(struct ipv6hdr), skb_tailroom(skb),
-> -			      GFP_ATOMIC);
-> -	kfree_skb(skb);
-> -
-> -	if (!new)
-> -		return -ENOMEM;
-> -
-> -	skb_push(new, sizeof(struct ipv6hdr));
-> -	skb_reset_network_header(new);
-> -	skb_copy_to_linear_data(new, hdr, sizeof(struct ipv6hdr));
-> +	skb_push(skb, sizeof(struct ipv6hdr));
-> +	skb_reset_network_header(skb);
-> +	skb_copy_to_linear_data(skb, hdr, sizeof(struct ipv6hdr));
->  
-> -	new->protocol = htons(ETH_P_IPV6);
-> -	new->pkt_type = PACKET_HOST;
-> -	new->dev = dev;
-> +	skb->protocol = htons(ETH_P_IPV6);
-> +	skb->pkt_type = PACKET_HOST;
-> +	skb->dev = dev;
->  
->  	raw_dump_table(__func__, "raw skb data dump before receiving",
-> -		       new->data, new->len);
-> +		       skb->data, skb->len);
->  
-> -	stat = deliver_skb(new, dev);
-> +	stat = deliver_skb(skb, dev);
->  
-> -	kfree_skb(new);
-> +	kfree_skb(skb);
->  
->  	return stat;
->  }
-> @@ -460,7 +452,6 @@ int lowpan_process_data(struct sk_buff *skb, struct net_device *dev,
->  	/* UDP data uncompression */
->  	if (iphc0 & LOWPAN_IPHC_NH_C) {
->  		struct udphdr uh;
-> -		struct sk_buff *new;
->  
->  		if (uncompress_udp_header(skb, &uh))
->  			goto drop;
-> @@ -468,14 +459,15 @@ int lowpan_process_data(struct sk_buff *skb, struct net_device *dev,
->  		/* replace the compressed UDP head by the uncompressed UDP
->  		 * header
->  		 */
-> -		new = skb_copy_expand(skb, sizeof(struct udphdr),
-> -				      skb_tailroom(skb), GFP_ATOMIC);
-> -		kfree_skb(skb);
-> -
-> -		if (!new)
-> -			return -ENOMEM;
-> -
-> -		skb = new;
-> +		if (skb_headroom(skb) < sizeof(struct udphdr) + sizeof(hdr)) {
-> +			int n = sizeof(struct udphdr) + sizeof(hdr);
-> +
-> +			err = pskb_expand_head(skb, n, 0, GFP_ATOMIC);
-> +			if (unlikely(err)) {
-> +				kfree_skb(skb);
-> +				return err;
-> +			}
-> +		}
->  
->  		skb_push(skb, sizeof(struct udphdr));
->  		skb_reset_transport_header(skb);
-> @@ -485,6 +477,15 @@ int lowpan_process_data(struct sk_buff *skb, struct net_device *dev,
->  			       (u8 *)&uh, sizeof(uh));
->  
->  		hdr.nexthdr = UIP_PROTO_UDP;
-> +	} else {
-> +		if (skb_headroom(skb) < sizeof(hdr)) {
-> +			err = pskb_expand_head(skb, sizeof(hdr), 0, GFP_ATOMIC);
-> +
-> +			if (unlikely(err)) {
-> +				kfree_skb(skb);
-> +				return err;
-> +			}
-> +		}
->  	}
->  
->  	hdr.payload_len = htons(skb->len);
-> diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-> index c2e0d14..ab51e16 100644
-> --- a/net/bluetooth/6lowpan.c
-> +++ b/net/bluetooth/6lowpan.c
-> @@ -343,13 +343,24 @@ static int recv_pkt(struct sk_buff *skb, struct net_device *dev,
->  		kfree_skb(local_skb);
->  		kfree_skb(skb);
->  	} else {
-> +		/* Decompression may use pskb_expand_head, ensure skb unique */
-> +		if (skb_cloned(skb)) {
-> +			struct sk_buff *new;
-> +			int new_headroom = sizeof(struct ipv6hdr) +
-> +					   sizeof(struct udphdr);
-> +
-> +			new = skb_copy_expand(skb, new_headroom,
-> +					      skb_tailroom(skb), GFP_ATOMIC);
-> +			if (!new)
-> +				goto drop;
-> +			consume_skb(skb);
-> +			skb = new;
-> +		}
-> +
->  		switch (skb->data[0] & 0xe0) {
->  		case LOWPAN_DISPATCH_IPHC:	/* ipv6 datagram */
-> -			local_skb = skb_clone(skb, GFP_ATOMIC);
-> -			if (!local_skb)
-> -				goto drop;
->  
-> -			ret = process_data(local_skb, dev, chan);
-> +			ret = process_data(skb, dev, chan);
->  			if (ret != NET_RX_SUCCESS)
->  				goto drop;
->  
-> diff --git a/net/ieee802154/6lowpan_rtnl.c b/net/ieee802154/6lowpan_rtnl.c
-> index c7e07b8..2ccea84 100644
-> --- a/net/ieee802154/6lowpan_rtnl.c
-> +++ b/net/ieee802154/6lowpan_rtnl.c
-> @@ -537,6 +537,19 @@ static int lowpan_rcv(struct sk_buff *skb, struct net_device *dev,
->  		if (ret == NET_RX_DROP)
->  			goto drop;
->  	} else {
-> +		/* Decompression may use pskb_expand_head, ensure skb unique */
-> +		if (skb_cloned(skb)) {
-> +			struct sk_buff *new;
-> +			int new_headroom = sizeof(struct ipv6hdr) +
-> +					   sizeof(struct udphdr);
-> +
-> +			new = skb_copy_expand(skb, new_headroom,
-> +					      skb_tailroom(skb), GFP_ATOMIC);
-> +			if (!new)
-> +				goto drop_skb;
-> +			consume_skb(skb);
-> +			skb = new;
-> +		}
->  		switch (skb->data[0] & 0xe0) {
->  		case LOWPAN_DISPATCH_IPHC:	/* ipv6 datagram */
->  			ret = process_data(skb, &hdr);
+[  243.774232] kmemleak: Cannot insert 0xf45bde40 into the object search
+tree (overlaps existing)
+[  243.775060] CPU: 0 PID: 0 Comm: swapper/0 Not tainted
+3.17.0-rc1-bt6lowpan #1
+[  243.775060] Hardware name: innotek GmbH VirtualBox/VirtualBox, BIOS
+VirtualBox 12/01/2006
+[  243.775060]  f45bde40 00000000 f600bb74 c18821c1 e716a0c8 f600bba8
+c116abac c1ae324c
+[  243.775060]  f45bde40 00200282 e716a0f4 00000010 00000010 e716a134
+00000000 f45bde40
+[  243.775060]  f6001c00 f6001c00 f600bbd4 c187f10c 00000020 f600bbd4
+00200246 f47805c0
+[  243.775060] Call Trace:
+[  243.775060]  [<c18821c1>] dump_stack+0x4b/0x75
+[  243.775060]  [<c116abac>] create_object+0x22c/0x280
+[  243.775060]  [<c187f10c>] kmemleak_alloc+0x3c/0xb0
+[  243.775060]  [<c115e693>] kmem_cache_alloc+0x1a3/0x290
+[  243.775060]  [<c1761ea0>] ? skb_clone+0x40/0xa0
+[  243.775060]  [<c1761ea0>] skb_clone+0x40/0xa0
+[  243.775060]  [<c179a15b>] netlink_broadcast_filtered+0x25b/0x310
+[  243.775060]  [<c179a23e>] netlink_broadcast+0x2e/0x40
+[  243.775060]  [<c179c68e>] nlmsg_notify+0xbe/0xd0
+[  243.775060]  [<c178064f>] rtnl_notify+0x3f/0x60
+[  243.775060]  [<c1828382>] inet6_rt_notify+0xe2/0x150
+[  243.775060]  [<c182a228>] fib6_add+0x388/0x7c0
+[  243.775060]  [<c1825533>] ip6_ins_rt+0x53/0x70
+[  243.775060]  [<c1825828>] ip6_pol_route.isra.42+0x2d8/0x3e0
+[  243.775060]  [<c1825963>] ip6_pol_route_input+0x33/0x40
+[  243.775060]  [<c1825930>] ? ip6_pol_route.isra.42+0x3e0/0x3e0
+[  243.775060]  [<c184aba9>] fib6_rule_action+0x79/0x1a0
+[  243.775060]  [<c178d0a7>] fib_rules_lookup+0x117/0x1a0
+[  243.775060]  [<c178cf90>] ? fib_rules_net_init+0x30/0x30
+[  243.775060]  [<c184aedb>] fib6_rule_lookup+0x3b/0x70
+[  243.775060]  [<c1825930>] ? ip6_pol_route.isra.42+0x3e0/0x3e0
+[  243.775060]  [<c1825106>] ip6_route_input_lookup.isra.39+0x46/0x50
+[  243.775060]  [<c1825930>] ? ip6_pol_route.isra.42+0x3e0/0x3e0
+[  243.775060]  [<c1825a4d>] ip6_route_input+0x9d/0xb0
+[  243.775060]  [<c18187f7>] ip6_rcv_finish+0x147/0x1d0
+[  243.775060]  [<c18197c6>] ipv6_rcv+0x686/0xa10
+[  243.775060]  [<c17716cb>] ? __netif_receive_skb_core+0x4ab/0x7b0
+[  243.775060]  [<c17716cb>] __netif_receive_skb_core+0x4ab/0x7b0
+[  243.775060]  [<c1771279>] ? __netif_receive_skb_core+0x59/0x7b0
+[  243.775060]  [<c17719eb>] __netif_receive_skb+0x1b/0x70
+[  243.775060]  [<c177300f>] process_backlog+0x9f/0x140
+[  243.775060]  [<c1772e48>] net_rx_action+0x128/0x250
+[  243.775060]  [<c104fd84>] __do_softirq+0xd4/0x300
+[  243.775060]  [<c104fcb0>] ? __local_bh_enable_ip+0xf0/0xf0
+[  243.775060]  [<c10049fc>] do_softirq_own_stack+0x2c/0x40
+[  243.775060]  <IRQ>  [<c1050136>] irq_exit+0x86/0xb0
+[  243.775060]  [<c188bd98>] smp_apic_timer_interrupt+0x38/0x50
+[  243.775060]  [<c188b6ce>] apic_timer_interrupt+0x32/0x38
+[  243.775060]  [<c107007b>] ? resched_cpu+0x7b/0x80
+[  243.775060]  [<c10be4ea>] ? tick_nohz_idle_enter+0x4a/0x80
+[  243.775060]  [<c10848d5>] cpu_startup_entry+0x35/0x370
+[  243.775060]  [<c10718bb>] ? preempt_count_add+0x4b/0xa0
+[  243.775060]  [<c187dbd1>] rest_init+0xa1/0xb0
+[  243.775060]  [<c1c93aa1>] start_kernel+0x386/0x38b
+[  243.775060]  [<c1c932ab>] i386_start_kernel+0x79/0x7d
+[  243.775060] kmemleak: Kernel memory leak detector disabled
+[  243.775060] kmemleak: Object 0xf45bde40 (size 192):
+[  243.775060] kmemleak:   comm "softirq", pid 0, jiffies 4294911070
+[  243.775060] kmemleak:   min_count = 1
+[  243.775060] kmemleak:   count = 0
+[  243.775060] kmemleak:   flags = 0x1
+[  243.775060] kmemleak:   checksum = 0
+[  243.775060] kmemleak:   backtrace:
+[  243.775060]      [<c187f10c>] kmemleak_alloc+0x3c/0xb0
+[  243.775060]      [<c115e693>] kmem_cache_alloc+0x1a3/0x290
+[  243.775060]      [<c17635e1>] __alloc_skb+0x41/0x1c0
+[  243.775060]      [<c18282f5>] inet6_rt_notify+0x55/0x150
+[  243.775060]      [<c182a228>] fib6_add+0x388/0x7c0
+[  243.775060]      [<c1825533>] ip6_ins_rt+0x53/0x70
+[  243.775060]      [<c1825828>] ip6_pol_route.isra.42+0x2d8/0x3e0
+[  243.775060]      [<c1825963>] ip6_pol_route_input+0x33/0x40
+[  243.775060]      [<c184aba9>] fib6_rule_action+0x79/0x1a0
+[  243.775060]      [<c178d0a7>] fib_rules_lookup+0x117/0x1a0
+[  243.775060]      [<c184aedb>] fib6_rule_lookup+0x3b/0x70
+[  243.775060]      [<c1825106>] ip6_route_input_lookup.isra.39
++0x46/0x50
+[  243.775060]      [<c1825a4d>] ip6_route_input+0x9d/0xb0
+[  243.775060]      [<c18187f7>] ip6_rcv_finish+0x147/0x1d0
+[  243.775060]      [<c18197c6>] ipv6_rcv+0x686/0xa10
+[  243.775060]      [<c17716cb>] __netif_receive_skb_core+0x4ab/0x7b0
+[  244.044145] BUG: unable to handle kernel NULL pointer dereference at
+0000006c
+[  244.044227] IP: [<c115ffc0>] __kmalloc_track_caller+0xb0/0x2b0
+[  244.044227] *pde = 00000000 
+[  244.044227] Oops: 0000 [#1] PREEMPT SMP 
+[  244.044227] Modules linked in: bluetooth_6lowpan 6lowpan rfcomm bnep
+ecb btusb bluetooth nfc rfkill snd_intel8x0 parport_pc ohci_pci
+snd_ac97_codec ac97_bus parport
+
+
+
+Cheers,
+Jukka
+
 
