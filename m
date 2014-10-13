@@ -1,13 +1,13 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f178.google.com ([209.85.212.178]:32799 "EHLO
-	mail-wi0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751710AbaJMRLV (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Mon, 13 Oct 2014 13:11:21 -0400
-Date: Mon, 13 Oct 2014 19:11:14 +0200
+Received: from mail-wi0-f175.google.com ([209.85.212.175]:53697 "EHLO
+	mail-wi0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752471AbaJMRWd (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Mon, 13 Oct 2014 13:22:33 -0400
+Date: Mon, 13 Oct 2014 19:22:29 +0200
 From: Alexander Aring <alex.aring@gmail.com>
 Subject: Re: [PATCH v6 bluetooth-next] 6lowpan: Use skb_cow in IPHC
  decompression.
-Message-ID: <20141013171111.GA25249@omega>
+Message-ID: <20141013172229.GB25249@omega>
 References: <1413194456-26351-1-git-send-email-martin.townsend@xsilon.com>
  <1413194456-26351-2-git-send-email-martin.townsend@xsilon.com>
  <1413200959.2705.90.camel@jrissane-mobl.ger.corp.intel.com>
@@ -15,10 +15,11 @@ References: <1413194456-26351-1-git-send-email-martin.townsend@xsilon.com>
  <1413211468.2705.104.camel@jrissane-mobl.ger.corp.intel.com>
  <543BE816.80304@xsilon.com>
  <1413212954.2705.106.camel@jrissane-mobl.ger.corp.intel.com>
+ <20141013171111.GA25249@omega>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1413212954.2705.106.camel@jrissane-mobl.ger.corp.intel.com>
+In-Reply-To: <20141013171111.GA25249@omega>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: Jukka Rissanen <jukka.rissanen@linux.intel.com>
@@ -26,23 +27,69 @@ Cc: Martin Townsend <martin.townsend@xsilon.com>, Martin Townsend <mtownsend1973
 
 Hi Jukka,
 
-On Mon, Oct 13, 2014 at 06:09:14PM +0300, Jukka Rissanen wrote:
-> Hi Martin,
+sorry.
+
+I was a little too fast here, because I am sure now this should solve your
+lockdep issue.
+
+On Mon, Oct 13, 2014 at 07:11:11PM +0200, Alexander Aring wrote:
+> Hi Jukka,
 > 
-> On ma, 2014-10-13 at 15:56 +0100, Martin Townsend wrote:
-> > Hi Jukka,
+> On Mon, Oct 13, 2014 at 06:09:14PM +0300, Jukka Rissanen wrote:
+> > Hi Martin,
 > > 
-> > Does this patch help?
+> > On ma, 2014-10-13 at 15:56 +0100, Martin Townsend wrote:
+> > > Hi Jukka,
+> > > 
+> > > Does this patch help?
+> > 
+> > Unfortunately no, I still see inconsistent lock state. It would probably
+> > have been too easy :)
+> > 
 > 
-> Unfortunately no, I still see inconsistent lock state. It would probably
-> have been too easy :)
+> I remeber something, I think 802.15.4 had similar issues long time ago.
+> 
+s/remeber/remember/
+
+> The fix was 20e7c4e80dcd01dad5e6c8b32455228b8fe9c619 ("6lowpan: fix
+> lockdep splats"). Please check that, you need something like that!
 > 
 
-I remeber something, I think 802.15.4 had similar issues long time ago.
+Something like that:
 
-The fix was 20e7c4e80dcd01dad5e6c8b32455228b8fe9c619 ("6lowpan: fix
-lockdep splats"). Please check that, you need something like that!
+diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+index 4ebc806..02fd21a 100644
+--- a/net/bluetooth/6lowpan.c
++++ b/net/bluetooth/6lowpan.c
+@@ -642,7 +642,27 @@ static netdev_tx_t bt_xmit(struct sk_buff *skb, struct net_device *netdev)
+        return err < 0 ? NET_XMIT_DROP : err;
+ }
+ 
++static struct lock_class_key bt_tx_busylock;
++static struct lock_class_key bt_netdev_xmit_lock_key;
++
++static void bt_set_lockdep_class_one(struct net_device *dev,
++                                    struct netdev_queue *txq,
++                                    void *_unused)
++{
++       lockdep_set_class(&txq->_xmit_lock,
++                         &bt_netdev_xmit_lock_key);
++}
++
++
++static int bt_dev_init(struct net_device *dev)
++{
++       netdev_for_each_tx_queue(dev, bt_set_lockdep_class_one, NULL);
++       dev->qdisc_tx_busylock = &bt_tx_busylock;
++       return 0;
++}
++
+ static const struct net_device_ops netdev_ops = {
++       .ndo_init               = bt_dev_init,
+        .ndo_start_xmit         = bt_xmit,
+ };
+
 
 - Alex
 
-[0] 
+[0] https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/?id=20e7c4e80dcd01dad5e6c8b32455228b8fe9c619
