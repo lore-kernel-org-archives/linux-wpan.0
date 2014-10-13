@@ -1,73 +1,126 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f181.google.com ([209.85.212.181]:45127 "EHLO
-	mail-wi0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753136AbaJMJlF (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Mon, 13 Oct 2014 05:41:05 -0400
-Date: Mon, 13 Oct 2014 11:41:00 +0200
+Received: from mail-wg0-f50.google.com ([74.125.82.50]:65313 "EHLO
+	mail-wg0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752372AbaJMIdZ (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Mon, 13 Oct 2014 04:33:25 -0400
+Received: by mail-wg0-f50.google.com with SMTP id a1so8024032wgh.33
+        for <linux-wpan@vger.kernel.org>; Mon, 13 Oct 2014 01:33:24 -0700 (PDT)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: Re: [PATCH v5 bluetooth-next] 6lowpan: Use pskb_expand_head in IPHC
- decompression.
-Message-ID: <20141013094058.GB20544@omega>
-References: <1412840794-17283-1-git-send-email-martin.townsend@xsilon.com>
- <1412840794-17283-2-git-send-email-martin.townsend@xsilon.com>
- <20141011073620.GA28500@omega>
- <543B90FA.2060603@xsilon.com>
- <20141013085538.GA20544@omega>
- <543B9B4C.1010303@xsilon.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <543B9B4C.1010303@xsilon.com>
+Subject: [PATCH bluetooth-next 1/2] ieee802154: 6lowpan: improve packet registration
+Date: Mon, 13 Oct 2014 10:33:06 +0200
+Message-Id: <1413189187-27123-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Martin Townsend <martin.townsend@xsilon.com>
-Cc: Martin Townsend <mtownsend1973@gmail.com>, linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org, marcel@holtmann.org, jukka.rissanen@linux.intel.com
+To: linux-wpan@vger.kernel.org
+Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-On Mon, Oct 13, 2014 at 10:28:44AM +0100, Martin Townsend wrote:
-...
-> >> If it's ok with everyone I'll change pskb_expand_head to skb_cow or skb_cow_head and leave the bluetooth code as it is with this v5 patch.
-> > For me it's confusing, you do that on skb, but we never used skb
-> > afterwards (maybe on freeing) but we use local_skb, the local_skb should
-> > always be cloned because we running skb_clone before.
-> skb_clone does ensure that the skb isn't shared anymore so I think it will be safe to remove the skb_share_check.  Or I can move it to the start of the function like we do for 802.15.4?
+This patch improves the packet registration handling. Instead of
+registration with module init we have a open count variable and
+registration the lowpan packet handler when it's needed.
 
-We need to clarify the following points:
+The open count variable should be protected by RTNL.
 
-skb_is_shared:
+Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+---
+ net/ieee802154/6lowpan_rtnl.c | 30 ++++++++++++++++++------------
+ 1 file changed, 18 insertions(+), 12 deletions(-)
 
-It's used twice in some packet handler functions or elsewhere.
+diff --git a/net/ieee802154/6lowpan_rtnl.c b/net/ieee802154/6lowpan_rtnl.c
+index c7e07b8..da78fae 100644
+--- a/net/ieee802154/6lowpan_rtnl.c
++++ b/net/ieee802154/6lowpan_rtnl.c
+@@ -58,6 +58,7 @@
+ #include "reassembly.h"
+ 
+ static LIST_HEAD(lowpan_devices);
++static int lowpan_open_count;
+ 
+ /* private device info */
+ struct lowpan_dev_info {
+@@ -571,11 +572,17 @@ drop:
+ 	return NET_RX_DROP;
+ }
+ 
++static struct packet_type lowpan_packet_type = {
++	.type = htons(ETH_P_IEEE802154),
++	.func = lowpan_rcv,
++};
++
+ static int lowpan_newlink(struct net *src_net, struct net_device *dev,
+ 			  struct nlattr *tb[], struct nlattr *data[])
+ {
+ 	struct net_device *real_dev;
+ 	struct lowpan_dev_record *entry;
++	int ret;
+ 
+ 	pr_debug("adding new link\n");
+ 
+@@ -610,9 +617,14 @@ static int lowpan_newlink(struct net *src_net, struct net_device *dev,
+ 	list_add_tail(&entry->list, &lowpan_devices);
+ 	mutex_unlock(&lowpan_dev_info(dev)->dev_list_mtx);
+ 
+-	register_netdevice(dev);
++	ret = register_netdevice(dev);
++	if (ret >= 0) {
++		if (!lowpan_open_count)
++			dev_add_pack(&lowpan_packet_type);
++		lowpan_open_count++;
++	}
+ 
+-	return 0;
++	return ret;
+ }
+ 
+ static void lowpan_dellink(struct net_device *dev, struct list_head *head)
+@@ -623,6 +635,10 @@ static void lowpan_dellink(struct net_device *dev, struct list_head *head)
+ 
+ 	ASSERT_RTNL();
+ 
++	lowpan_open_count--;
++	if (!lowpan_open_count)
++		dev_remove_pack(&lowpan_packet_type);
++
+ 	mutex_lock(&lowpan_dev_info(dev)->dev_list_mtx);
+ 	list_for_each_entry_safe(entry, tmp, &lowpan_devices, list) {
+ 		if (entry->ldev == dev) {
+@@ -685,11 +701,6 @@ static struct notifier_block lowpan_dev_notifier = {
+ 	.notifier_call = lowpan_device_event,
+ };
+ 
+-static struct packet_type lowpan_packet_type = {
+-	.type = htons(ETH_P_IEEE802154),
+-	.func = lowpan_rcv,
+-};
+-
+ static int __init lowpan_init_module(void)
+ {
+ 	int err = 0;
+@@ -702,8 +713,6 @@ static int __init lowpan_init_module(void)
+ 	if (err < 0)
+ 		goto out_frag;
+ 
+-	dev_add_pack(&lowpan_packet_type);
+-
+ 	err = register_netdevice_notifier(&lowpan_dev_notifier);
+ 	if (err < 0)
+ 		goto out_pack;
+@@ -711,7 +720,6 @@ static int __init lowpan_init_module(void)
+ 	return 0;
+ 
+ out_pack:
+-	dev_remove_pack(&lowpan_packet_type);
+ 	lowpan_netlink_fini();
+ out_frag:
+ 	lowpan_net_frag_exit();
+@@ -723,8 +731,6 @@ static void __exit lowpan_cleanup_module(void)
+ {
+ 	lowpan_netlink_fini();
+ 
+-	dev_remove_pack(&lowpan_packet_type);
+-
+ 	lowpan_net_frag_exit();
+ 
+ 	unregister_netdevice_notifier(&lowpan_dev_notifier);
+-- 
+2.1.2
 
-now a skb_clone:
-
-A skb clone is only a copy of struct sk_buff, so we can safely run
-skb_pull and skb_push, skb->dev = foo. Simple for modify skb attributes.
-
-now a skb_copy:
-
-It's a complete private copy with private data buffer which allow us to
-make skb->data[#] = foobar;
-
-
-
-Now skb_share_check do:
-
-if skb_is_shared true, then make a clone. This doesn't allow to
-manipulate the data, but skb_cow make a copy of the private data so this
-is okay for IPHC call. Means after skb_cow, we have something like
-skb_copy, but skb_cow should be faster. ;-)
-
-Also skb_share_check checks if skb_is_shared is false, then we don't
-need a skb_clone, because it's not shared, then we are allow to
-manipulate skb attributes, because nobody else use it.
-
-
-
-I would add skb_share_check at beginning of this function like 802.15.4
-but the IPV6 DISPATCH of bluetooth do a complete copy of the data buffer
-which seems not necessary, but this is another issue and maybe I think
-that the IPV6 DISPATCH value isn't needed by bluetooth 6lowpan. <-- But I
-am not sure about this. I also can't see that bluetooth 6lowpan runs
-skb_pull for the one byte dispatch value. Jukka need to check that, if
-he has time and feel like to doing it.
-
-- Alex
