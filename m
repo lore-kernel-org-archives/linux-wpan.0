@@ -1,41 +1,37 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from senator.holtmann.net ([87.106.208.187]:56279 "EHLO
-	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751939AbaJQOP4 convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Fri, 17 Oct 2014 10:15:56 -0400
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.0 \(1990.1\))
-Subject: Re: [PATCH v6 bluetooth-next] 6lowpan: Use skb_cow in IPHC decompression.
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1413194456-26351-2-git-send-email-martin.townsend@xsilon.com>
-Date: Fri, 17 Oct 2014 16:15:52 +0200
-Content-Transfer-Encoding: 8BIT
-Message-Id: <934EB47B-5CAD-453A-AD44-0B84CED3C2C3@holtmann.org>
-References: <1413194456-26351-1-git-send-email-martin.townsend@xsilon.com> <1413194456-26351-2-git-send-email-martin.townsend@xsilon.com>
+Received: from mail-wg0-f45.google.com ([74.125.82.45]:39169 "EHLO
+	mail-wg0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751143AbaJRHJ1 (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Sat, 18 Oct 2014 03:09:27 -0400
+From: Martin Townsend <mtownsend1973@gmail.com>
+Subject: [PATCH bluetooth-next 0/5] Move skb delivery out of IPHC.
+Date: Sat, 18 Oct 2014 08:09:08 +0100
+Message-Id: <1413616153-7562-1-git-send-email-mtownsend1973@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Martin Townsend <mtownsend1973@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org, alex.aring@gmail.com, jukka.rissanen@linux.intel.com, Martin Townsend <martin.townsend@xsilon.com>
+To: linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org
+Cc: marcel@holtmann.org, alex.aring@gmail.com, jukka.rissanen@linux.intel.com, Martin Townsend <mtownsend1973@gmail.com>
 
-Hi Martin,
+This series moves skb delivery out of IPHC and into the receive routines of
+both bluetooth and 802.15.4.  The reason is that we need to support more
+(de)compression schemes in the future.  It also means that calling 
+lowpan_process_data now only returns error codes or 0 for success so 
+this has been cleaned up.  The final patch then renames occurences of
+lowpan_process_data and process_data to something more meaningful.
 
-> Currently there are potentially 2 skb_copy_expand calls in IPHC
-> decompression.  This patch replaces this with one call to
-> skb_cow which will check to see if there is enough headroom
-> first to ensure it's only done if necessary and will handle
-> alignment issues for cache.
-> As skb_cow uses pskb_expand_head we ensure the skb isn't shared from
-> bluetooth and ieee802.15.4 code that use the IPHC decompression.
-> 
-> Signed-off-by: Martin Townsend <martin.townsend@xsilon.com>
-> ---
-> net/6lowpan/iphc.c      | 47 +++++++++++++++++++++--------------------------
-> net/bluetooth/6lowpan.c |  4 ++++
-> 2 files changed, 25 insertions(+), 26 deletions(-)
+Martin Townsend (5):
+  Remove skb_deliver from IPHC.
+  Fix process_data return values
+  Use consume_skb when packet processed successfully.
+  Remove unused skb_delivery_cb typedef.
+  Rename process_data and lowpan_process_data.
 
-patch has been applied to bluetooth-next tree.
+ include/net/6lowpan.h         | 12 ++++++------
+ net/6lowpan/iphc.c            | 42 ++++++++++++------------------------------
+ net/bluetooth/6lowpan.c       | 29 ++++++++++++++++++++---------
+ net/ieee802154/6lowpan_rtnl.c | 34 +++++++++++++++-------------------
+ 4 files changed, 53 insertions(+), 64 deletions(-)
 
-Regards
-
-Marcel
+-- 
+1.9.1
 
