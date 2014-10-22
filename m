@@ -1,44 +1,45 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f180.google.com ([209.85.212.180]:45732 "EHLO
-	mail-wi0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751479AbaJVIiN (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Wed, 22 Oct 2014 04:38:13 -0400
-Received: by mail-wi0-f180.google.com with SMTP id em10so652274wid.7
-        for <linux-wpan@vger.kernel.org>; Wed, 22 Oct 2014 01:38:12 -0700 (PDT)
-Date: Wed, 22 Oct 2014 11:01:37 +0200
-From: Alexander Aring <alex.aring@gmail.com>
-Subject: Re: [Linux-zigbee-devel] Questions about the Zigbee in Linux
-Message-ID: <20141022090135.GA2721@x61s.guest.pengutronix.de>
+Received: from mga14.intel.com ([192.55.52.115]:3740 "EHLO mga14.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750862AbaJVIpL (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+	Wed, 22 Oct 2014 04:45:11 -0400
+From: "Zhang, Baoli" <baoli.zhang@intel.com>
+Subject: RE: [Linux-zigbee-devel] Questions about the Zigbee in Linux
+Date: Wed, 22 Oct 2014 08:42:42 +0000
+Message-ID: <EBA0C22CC7D5724C87D7C17A60FEE9EE46E2CB@SHSMSX101.ccr.corp.intel.com>
 References: <EBA0C22CC7D5724C87D7C17A60FEE9EE46D85E@SHSMSX101.ccr.corp.intel.com>
  <20141022082919.GA1603@x61s.guest.pengutronix.de>
  <EBA0C22CC7D5724C87D7C17A60FEE9EE46E22D@SHSMSX101.ccr.corp.intel.com>
+ <20141022090135.GA2721@x61s.guest.pengutronix.de>
+In-Reply-To: <20141022090135.GA2721@x61s.guest.pengutronix.de>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <EBA0C22CC7D5724C87D7C17A60FEE9EE46E22D@SHSMSX101.ccr.corp.intel.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: "Zhang, Baoli" <baoli.zhang@intel.com>
+To: Alexander Aring <alex.aring@gmail.com>
 Cc: "linux-zigbee-devel@lists.sourceforge.net" <linux-zigbee-devel@lists.sourceforge.net>, "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>
 
-On Wed, Oct 22, 2014 at 08:27:34AM +0000, Zhang, Baoli wrote:
-> Hi,
-> 
-> Great, thanks Alexander.
-> 
-> I also don't see the RPL implementation.....not integrated? Or not implemented?
-> 
-
-there exist a couple of tries for kernelspace and userspace RPL.
-Some names are: simpleRPL, linux-rpl, lot's of other which I don't know
-the name anymore.
-
-For me it is important to get a working 802.15.4/6LoWPAN implementation at
-first. But currently there exist no general RPL implementation, some people
-tried to implement a userspace solution.
-
-It would be really nice to have it, but we also detect some critical 6LoWPAN
-bugs which indicates that multicast, etc... was always broken before. :)
-
-
-- Alex
+WWVzLCBJIGFsc28gc2VlIHRoZSBzaW1wbGVSUEwgYW5kIHNvbWUgb3RoZXIgaW1wbGVtZWF0aW9u
+LCBidXQgaXQncyBzdHJhbmdlIHRoYXQgdGhlcmUgaXMgbm8gZ2VuZXJhbCBvbmUuIFRoYW5rcyBm
+b3IgeW91ciBleHBsYW5hdGlvbi4NCg0KSSBhbHNvIHNlZSB0aGUgaW50ZXItb3BlcmF0aW9uIGlz
+c3VlIGJldHdlZW4gY29udGlraSBhbmQgbGludXggc29sdXRpb24uLi4uLm1heWJlIHRoYXQncyBh
+bm90aGVyIGNoYWxsZW5nZS4NCg0KLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCkZyb206IEFs
+ZXhhbmRlciBBcmluZyBbbWFpbHRvOmFsZXguYXJpbmdAZ21haWwuY29tXSANClNlbnQ6IFdlZG5l
+c2RheSwgT2N0b2JlciAyMiwgMjAxNCA1OjAyIFBNDQpUbzogWmhhbmcsIEJhb2xpDQpDYzogbGlu
+dXgtemlnYmVlLWRldmVsQGxpc3RzLnNvdXJjZWZvcmdlLm5ldDsgbGludXgtd3BhbkB2Z2VyLmtl
+cm5lbC5vcmcNClN1YmplY3Q6IFJlOiBbTGludXgtemlnYmVlLWRldmVsXSBRdWVzdGlvbnMgYWJv
+dXQgdGhlIFppZ2JlZSBpbiBMaW51eA0KDQpPbiBXZWQsIE9jdCAyMiwgMjAxNCBhdCAwODoyNzoz
+NEFNICswMDAwLCBaaGFuZywgQmFvbGkgd3JvdGU6DQo+IEhpLA0KPiANCj4gR3JlYXQsIHRoYW5r
+cyBBbGV4YW5kZXIuDQo+IA0KPiBJIGFsc28gZG9uJ3Qgc2VlIHRoZSBSUEwgaW1wbGVtZW50YXRp
+b24uLi4uLm5vdCBpbnRlZ3JhdGVkPyBPciBub3QgaW1wbGVtZW50ZWQ/DQo+IA0KDQp0aGVyZSBl
+eGlzdCBhIGNvdXBsZSBvZiB0cmllcyBmb3Iga2VybmVsc3BhY2UgYW5kIHVzZXJzcGFjZSBSUEwu
+DQpTb21lIG5hbWVzIGFyZTogc2ltcGxlUlBMLCBsaW51eC1ycGwsIGxvdCdzIG9mIG90aGVyIHdo
+aWNoIEkgZG9uJ3Qga25vdyB0aGUgbmFtZSBhbnltb3JlLg0KDQpGb3IgbWUgaXQgaXMgaW1wb3J0
+YW50IHRvIGdldCBhIHdvcmtpbmcgODAyLjE1LjQvNkxvV1BBTiBpbXBsZW1lbnRhdGlvbiBhdCBm
+aXJzdC4gQnV0IGN1cnJlbnRseSB0aGVyZSBleGlzdCBubyBnZW5lcmFsIFJQTCBpbXBsZW1lbnRh
+dGlvbiwgc29tZSBwZW9wbGUgdHJpZWQgdG8gaW1wbGVtZW50IGEgdXNlcnNwYWNlIHNvbHV0aW9u
+Lg0KDQpJdCB3b3VsZCBiZSByZWFsbHkgbmljZSB0byBoYXZlIGl0LCBidXQgd2UgYWxzbyBkZXRl
+Y3Qgc29tZSBjcml0aWNhbCA2TG9XUEFOIGJ1Z3Mgd2hpY2ggaW5kaWNhdGVzIHRoYXQgbXVsdGlj
+YXN0LCBldGMuLi4gd2FzIGFsd2F5cyBicm9rZW4gYmVmb3JlLiA6KQ0KDQoNCi0gQWxleA0K
