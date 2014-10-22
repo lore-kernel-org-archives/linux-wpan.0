@@ -1,46 +1,45 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f174.google.com ([209.85.212.174]:54734 "EHLO
-	mail-wi0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753362AbaJVIGA (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Wed, 22 Oct 2014 04:06:00 -0400
-Received: by mail-wi0-f174.google.com with SMTP id r20so594107wiv.1
-        for <linux-wpan@vger.kernel.org>; Wed, 22 Oct 2014 01:05:58 -0700 (PDT)
-Date: Wed, 22 Oct 2014 10:29:21 +0200
-From: Alexander Aring <alex.aring@gmail.com>
-Subject: Re: [Linux-zigbee-devel] Questions about the Zigbee in Linux
-Message-ID: <20141022082919.GA1603@x61s.guest.pengutronix.de>
+Received: from mga02.intel.com ([134.134.136.20]:31015 "EHLO mga02.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754344AbaJVI3J (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+	Wed, 22 Oct 2014 04:29:09 -0400
+From: "Zhang, Baoli" <baoli.zhang@intel.com>
+Subject: RE: [Linux-zigbee-devel] Questions about the Zigbee in Linux
+Date: Wed, 22 Oct 2014 08:27:34 +0000
+Message-ID: <EBA0C22CC7D5724C87D7C17A60FEE9EE46E22D@SHSMSX101.ccr.corp.intel.com>
 References: <EBA0C22CC7D5724C87D7C17A60FEE9EE46D85E@SHSMSX101.ccr.corp.intel.com>
+ <20141022082919.GA1603@x61s.guest.pengutronix.de>
+In-Reply-To: <20141022082919.GA1603@x61s.guest.pengutronix.de>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <EBA0C22CC7D5724C87D7C17A60FEE9EE46D85E@SHSMSX101.ccr.corp.intel.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: "Zhang, Baoli" <baoli.zhang@intel.com>
-Cc: "linux-zigbee-devel@lists.sourceforge.net" <linux-zigbee-devel@lists.sourceforge.net>, linux-wpan@vger.kernel.org
+To: Alexander Aring <alex.aring@gmail.com>
+Cc: "linux-zigbee-devel@lists.sourceforge.net" <linux-zigbee-devel@lists.sourceforge.net>, "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>
 
-Hi,
-
-On Wed, Oct 22, 2014 at 07:40:37AM +0000, Zhang, Baoli wrote:
-> Hi All,
-> 
-> I am trying to setup the 6LoWPAN network based on Linux, can anybody let me know if the latest Zigbee code had been merged into Linux kernel mainline?
-
-don't call it "linux-zigbee", we are now "linux-wpan".
-
-> 
-> In the ZigBee sourceforget portal, I can only see the lowpan-tools, where are the other source?  Thanks in advance.
-> 
-
-this is the old repository. We moved the mailinglist to linux-wpan [0].
-
-For latest mainline support, check linux-wpan-next [1] and lowpan-tools
-[2].
-
-Little how to is available at [3], this is the old linux-zigbee trac
-wiki. We don't have a newer one now.
-
-[0] http://vger.kernel.org/vger-lists.html#linux-wpan
-[1] https://github.com/linux-wpan/linux-wpan-next
-[2] https://github.com/linux-wpan/lowpan-tools
-[3] http://linux-zigbee.sourceforge.net/cgi-bin/trac.cgi
+SGksDQoNCkdyZWF0LCB0aGFua3MgQWxleGFuZGVyLg0KDQpJIGFsc28gZG9uJ3Qgc2VlIHRoZSBS
+UEwgaW1wbGVtZW50YXRpb24uLi4uLm5vdCBpbnRlZ3JhdGVkPyBPciBub3QgaW1wbGVtZW50ZWQ/
+DQoNCkJSL0Jhb2xpDQoNCi0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQpGcm9tOiBBbGV4YW5k
+ZXIgQXJpbmcgW21haWx0bzphbGV4LmFyaW5nQGdtYWlsLmNvbV0gDQpTZW50OiBXZWRuZXNkYXks
+IE9jdG9iZXIgMjIsIDIwMTQgNDoyOSBQTQ0KVG86IFpoYW5nLCBCYW9saQ0KQ2M6IGxpbnV4LXpp
+Z2JlZS1kZXZlbEBsaXN0cy5zb3VyY2Vmb3JnZS5uZXQ7IGxpbnV4LXdwYW5Admdlci5rZXJuZWwu
+b3JnDQpTdWJqZWN0OiBSZTogW0xpbnV4LXppZ2JlZS1kZXZlbF0gUXVlc3Rpb25zIGFib3V0IHRo
+ZSBaaWdiZWUgaW4gTGludXgNCg0KSGksDQoNCk9uIFdlZCwgT2N0IDIyLCAyMDE0IGF0IDA3OjQw
+OjM3QU0gKzAwMDAsIFpoYW5nLCBCYW9saSB3cm90ZToNCj4gSGkgQWxsLA0KPiANCj4gSSBhbSB0
+cnlpbmcgdG8gc2V0dXAgdGhlIDZMb1dQQU4gbmV0d29yayBiYXNlZCBvbiBMaW51eCwgY2FuIGFu
+eWJvZHkgbGV0IG1lIGtub3cgaWYgdGhlIGxhdGVzdCBaaWdiZWUgY29kZSBoYWQgYmVlbiBtZXJn
+ZWQgaW50byBMaW51eCBrZXJuZWwgbWFpbmxpbmU/DQoNCmRvbid0IGNhbGwgaXQgImxpbnV4LXpp
+Z2JlZSIsIHdlIGFyZSBub3cgImxpbnV4LXdwYW4iLg0KDQo+IA0KPiBJbiB0aGUgWmlnQmVlIHNv
+dXJjZWZvcmdldCBwb3J0YWwsIEkgY2FuIG9ubHkgc2VlIHRoZSBsb3dwYW4tdG9vbHMsIHdoZXJl
+IGFyZSB0aGUgb3RoZXIgc291cmNlPyAgVGhhbmtzIGluIGFkdmFuY2UuDQo+IA0KDQp0aGlzIGlz
+IHRoZSBvbGQgcmVwb3NpdG9yeS4gV2UgbW92ZWQgdGhlIG1haWxpbmdsaXN0IHRvIGxpbnV4LXdw
+YW4gWzBdLg0KDQpGb3IgbGF0ZXN0IG1haW5saW5lIHN1cHBvcnQsIGNoZWNrIGxpbnV4LXdwYW4t
+bmV4dCBbMV0gYW5kIGxvd3Bhbi10b29scyBbMl0uDQoNCkxpdHRsZSBob3cgdG8gaXMgYXZhaWxh
+YmxlIGF0IFszXSwgdGhpcyBpcyB0aGUgb2xkIGxpbnV4LXppZ2JlZSB0cmFjIHdpa2kuIFdlIGRv
+bid0IGhhdmUgYSBuZXdlciBvbmUgbm93Lg0KDQpbMF0gaHR0cDovL3ZnZXIua2VybmVsLm9yZy92
+Z2VyLWxpc3RzLmh0bWwjbGludXgtd3Bhbg0KWzFdIGh0dHBzOi8vZ2l0aHViLmNvbS9saW51eC13
+cGFuL2xpbnV4LXdwYW4tbmV4dA0KWzJdIGh0dHBzOi8vZ2l0aHViLmNvbS9saW51eC13cGFuL2xv
+d3Bhbi10b29scw0KWzNdIGh0dHA6Ly9saW51eC16aWdiZWUuc291cmNlZm9yZ2UubmV0L2NnaS1i
+aW4vdHJhYy5jZ2kNCg==
