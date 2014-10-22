@@ -1,45 +1,44 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mga14.intel.com ([192.55.52.115]:3740 "EHLO mga14.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750862AbaJVIpL (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-	Wed, 22 Oct 2014 04:45:11 -0400
-From: "Zhang, Baoli" <baoli.zhang@intel.com>
-Subject: RE: [Linux-zigbee-devel] Questions about the Zigbee in Linux
-Date: Wed, 22 Oct 2014 08:42:42 +0000
-Message-ID: <EBA0C22CC7D5724C87D7C17A60FEE9EE46E2CB@SHSMSX101.ccr.corp.intel.com>
+Received: from mail-wg0-f45.google.com ([74.125.82.45]:52808 "EHLO
+	mail-wg0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751105AbaJVItv (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Wed, 22 Oct 2014 04:49:51 -0400
+Received: by mail-wg0-f45.google.com with SMTP id m15so3179217wgh.28
+        for <linux-wpan@vger.kernel.org>; Wed, 22 Oct 2014 01:49:50 -0700 (PDT)
+Date: Wed, 22 Oct 2014 11:13:18 +0200
+From: Alexander Aring <alex.aring@gmail.com>
+Subject: Re: [Linux-zigbee-devel] Questions about the Zigbee in Linux
+Message-ID: <20141022091316.GB2721@x61s.guest.pengutronix.de>
 References: <EBA0C22CC7D5724C87D7C17A60FEE9EE46D85E@SHSMSX101.ccr.corp.intel.com>
  <20141022082919.GA1603@x61s.guest.pengutronix.de>
  <EBA0C22CC7D5724C87D7C17A60FEE9EE46E22D@SHSMSX101.ccr.corp.intel.com>
  <20141022090135.GA2721@x61s.guest.pengutronix.de>
-In-Reply-To: <20141022090135.GA2721@x61s.guest.pengutronix.de>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ <EBA0C22CC7D5724C87D7C17A60FEE9EE46E2CB@SHSMSX101.ccr.corp.intel.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <EBA0C22CC7D5724C87D7C17A60FEE9EE46E2CB@SHSMSX101.ccr.corp.intel.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>
+To: "Zhang, Baoli" <baoli.zhang@intel.com>
 Cc: "linux-zigbee-devel@lists.sourceforge.net" <linux-zigbee-devel@lists.sourceforge.net>, "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>
 
-WWVzLCBJIGFsc28gc2VlIHRoZSBzaW1wbGVSUEwgYW5kIHNvbWUgb3RoZXIgaW1wbGVtZWF0aW9u
-LCBidXQgaXQncyBzdHJhbmdlIHRoYXQgdGhlcmUgaXMgbm8gZ2VuZXJhbCBvbmUuIFRoYW5rcyBm
-b3IgeW91ciBleHBsYW5hdGlvbi4NCg0KSSBhbHNvIHNlZSB0aGUgaW50ZXItb3BlcmF0aW9uIGlz
-c3VlIGJldHdlZW4gY29udGlraSBhbmQgbGludXggc29sdXRpb24uLi4uLm1heWJlIHRoYXQncyBh
-bm90aGVyIGNoYWxsZW5nZS4NCg0KLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCkZyb206IEFs
-ZXhhbmRlciBBcmluZyBbbWFpbHRvOmFsZXguYXJpbmdAZ21haWwuY29tXSANClNlbnQ6IFdlZG5l
-c2RheSwgT2N0b2JlciAyMiwgMjAxNCA1OjAyIFBNDQpUbzogWmhhbmcsIEJhb2xpDQpDYzogbGlu
-dXgtemlnYmVlLWRldmVsQGxpc3RzLnNvdXJjZWZvcmdlLm5ldDsgbGludXgtd3BhbkB2Z2VyLmtl
-cm5lbC5vcmcNClN1YmplY3Q6IFJlOiBbTGludXgtemlnYmVlLWRldmVsXSBRdWVzdGlvbnMgYWJv
-dXQgdGhlIFppZ2JlZSBpbiBMaW51eA0KDQpPbiBXZWQsIE9jdCAyMiwgMjAxNCBhdCAwODoyNzoz
-NEFNICswMDAwLCBaaGFuZywgQmFvbGkgd3JvdGU6DQo+IEhpLA0KPiANCj4gR3JlYXQsIHRoYW5r
-cyBBbGV4YW5kZXIuDQo+IA0KPiBJIGFsc28gZG9uJ3Qgc2VlIHRoZSBSUEwgaW1wbGVtZW50YXRp
-b24uLi4uLm5vdCBpbnRlZ3JhdGVkPyBPciBub3QgaW1wbGVtZW50ZWQ/DQo+IA0KDQp0aGVyZSBl
-eGlzdCBhIGNvdXBsZSBvZiB0cmllcyBmb3Iga2VybmVsc3BhY2UgYW5kIHVzZXJzcGFjZSBSUEwu
-DQpTb21lIG5hbWVzIGFyZTogc2ltcGxlUlBMLCBsaW51eC1ycGwsIGxvdCdzIG9mIG90aGVyIHdo
-aWNoIEkgZG9uJ3Qga25vdyB0aGUgbmFtZSBhbnltb3JlLg0KDQpGb3IgbWUgaXQgaXMgaW1wb3J0
-YW50IHRvIGdldCBhIHdvcmtpbmcgODAyLjE1LjQvNkxvV1BBTiBpbXBsZW1lbnRhdGlvbiBhdCBm
-aXJzdC4gQnV0IGN1cnJlbnRseSB0aGVyZSBleGlzdCBubyBnZW5lcmFsIFJQTCBpbXBsZW1lbnRh
-dGlvbiwgc29tZSBwZW9wbGUgdHJpZWQgdG8gaW1wbGVtZW50IGEgdXNlcnNwYWNlIHNvbHV0aW9u
-Lg0KDQpJdCB3b3VsZCBiZSByZWFsbHkgbmljZSB0byBoYXZlIGl0LCBidXQgd2UgYWxzbyBkZXRl
-Y3Qgc29tZSBjcml0aWNhbCA2TG9XUEFOIGJ1Z3Mgd2hpY2ggaW5kaWNhdGVzIHRoYXQgbXVsdGlj
-YXN0LCBldGMuLi4gd2FzIGFsd2F5cyBicm9rZW4gYmVmb3JlLiA6KQ0KDQoNCi0gQWxleA0K
+Hi,
+
+On Wed, Oct 22, 2014 at 08:42:42AM +0000, Zhang, Baoli wrote:
+> Yes, I also see the simpleRPL and some other implemeation, but it's strange that there is no general one. Thanks for your explanation.
+> 
+> I also see the inter-operation issue between contiki and linux solution.....maybe that's another challenge.
+> 
+
+we are mostly RFC complaint... depends on what you want to do. Ping
+works, but I know some "special" rare issues, where we need a better
+solution for it to be rfc complaint. Or something we need to support
+like stateful address compression...
+
+Simple ping or UDP application with contiki should work, but depends on
+what you try to using. Some people reports about multicast issues, the
+last one was of course a bug in 6LoWPAN. I think I need more test cases
+for multicast, to make a globaloverview that all things working fine there.
+
+- Alex
