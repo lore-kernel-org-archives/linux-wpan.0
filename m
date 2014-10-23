@@ -1,70 +1,54 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f176.google.com ([209.85.212.176]:49092 "EHLO
-	mail-wi0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752865AbaJWKHR (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Thu, 23 Oct 2014 06:07:17 -0400
-Date: Thu, 23 Oct 2014 12:30:43 +0200
-From: Alexander Aring <alex.aring@gmail.com>
-Subject: Re: [PATCH v3 bluetooth-next 0/4] 6lowpan: Move skb delivery out of
- IPHC
-Message-ID: <20141023103023.GA12549@x61s.guest.pengutronix.de>
-References: <1413967190-28890-1-git-send-email-martin.townsend@xsilon.com>
- <20141023094355.GA11768@x61s.guest.pengutronix.de>
- <5448CFA8.3020604@xsilon.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <5448CFA8.3020604@xsilon.com>
+Received: from mail-wi0-f181.google.com ([209.85.212.181]:62627 "EHLO
+	mail-wi0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755769AbaJWNMh (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Thu, 23 Oct 2014 09:12:37 -0400
+From: Martin Townsend <mtownsend1973@gmail.com>
+Subject: [PATCH v3 bluetooth-next 0/4] 6lowpan: Move skb delivery out of IPHC
+Date: Thu, 23 Oct 2014 14:12:24 +0100
+Message-Id: <1414069948-29731-1-git-send-email-martin.townsend@xsilon.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Martin Townsend <martin.townsend@xsilon.com>
-Cc: Martin Townsend <mtownsend1973@gmail.com>, linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org, marcel@holtmann.org, jukka.rissanen@linux.intel.com
+To: linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org
+Cc: marcel@holtmann.org, alex.aring@gmail.com, jukka.rissanen@linux.intel.com, Martin Townsend <martin.townsend@xsilon.com>
 
-Hi Martin,
+This series moves skb delivery out of IPHC and into the receive routines of
+both bluetooth and 802.15.4.  The reason is that we need to support more
+(de)compression schemes in the future.  It also means that calling 
+lowpan_process_data now only returns error codes or 0 for success so 
+this has been cleaned up.  The final patch then renames occurences of
+lowpan_process_data and process_data to something more meaningful.
 
-On Thu, Oct 23, 2014 at 10:51:36AM +0100, Martin Townsend wrote:
-> Hi Alex,
-> 
-> Looks like the SKB is now non-linear which causes the skb_put to assert.  Maybe skb_linearlize will help[0]
-> 
-> I'll also take a look.
+v1 -> v2
 
-yes, I did also take a fast look at:
+* Handle freeing of skb in lowpan_give_skb_to_devices for 802.15.14
+* Added another skb_consume in bluetooth code for uncompressed IPv6 headers
+* Added missing skb_consume for local_skb for bluetooth in compreesed IPv6 header
+  path
+* Combine patch 4 into 1.
 
-"kernel BUG at net/core/skbuff.c:1275!"
+v2 -> v3
 
-But why occurs this now? I think you didn't change anything in this
-behaviour in the sequence of skb_put, etc...
+* Ensure error codes aren't returned in the bluetooth skb delivery function.
+* In lowpan_give_skb_to_devices return NET_RX_DROP when the first call to
+  netif_rx fails.
 
+v3 -> v4
 
+* Fixed incorrect frag return handling due to refactoring skb_deliver.
 
-I know now why this happens, maybe I can't test it currently fast.
+Martin Townsend (4):
+  6lowpan: remove skb_deliver from IPHC
+  6lowpan: fix process_data return values
+  bluetooth:6lowpan: use consume_skb when packet processed successfully
+  ieee802154: 6lowpan: rename process_data and lowpan_process_data
 
-In file net/ieee802154/6lowpan_rtnl.c at function "lowpan_rcv"
+ include/net/6lowpan.h         | 12 ++++-----
+ net/6lowpan/iphc.c            | 42 +++++++++----------------------
+ net/bluetooth/6lowpan.c       | 36 ++++++++++++++++++---------
+ net/ieee802154/6lowpan_rtnl.c | 58 +++++++++++++++++++++++++++----------------
+ 4 files changed, 78 insertions(+), 70 deletions(-)
 
-case LOWPAN_DISPATCH_FRAG1:     /* first fragment header */
-	ret = lowpan_frag_rcv(skb, LOWPAN_DISPATCH_FRAG1);
-	if (ret == 1) {
-		ret = iphc_decompress(skb, &hdr);
-		if (ret < 0) 
-			goto drop;
-	}
-	break;
-case LOWPAN_DISPATCH_FRAGN:     /* next fragments headers */
-	ret = lowpan_frag_rcv(skb, LOWPAN_DISPATCH_FRAGN);
-	if (ret == 1) {
-		ret = iphc_decompress(skb, &hdr);
-		if (ret < 0) 
-			goto drop;
-	}
-	break;
+-- 
+1.9.1
 
-later you do _ALWAYS_ a "lowpan_give_skb_to_devices". But you changed
-now the behaviour, because in case of LOWPAN_DISPATCH_FRAG1 or
-LOWPAN_DISPATCH_FRAGN should lowpan_give_skb_to_devices only called when
-lowpan_frag_rcv returns 1 and after iphc_decompress.
-
-I think that's your problem. Always call lowpan_give_skb_to_devices
-seems to be 100% wrong.
-
-- Alex
