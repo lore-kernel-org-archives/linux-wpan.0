@@ -1,176 +1,100 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f173.google.com ([209.85.212.173]:48934 "EHLO
-	mail-wi0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754524AbaJVIlE (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Wed, 22 Oct 2014 04:41:04 -0400
-From: Martin Townsend <mtownsend1973@gmail.com>
-Subject: [PATCH v3 bluetooth-next 4/4] ieee802154: 6lowpan: rename process_data and lowpan_process_data
-Date: Wed, 22 Oct 2014 09:39:50 +0100
-Message-Id: <1413967190-28890-5-git-send-email-martin.townsend@xsilon.com>
-In-Reply-To: <1413967190-28890-1-git-send-email-martin.townsend@xsilon.com>
+Received: from mail-wg0-f49.google.com ([74.125.82.49]:59782 "EHLO
+	mail-wg0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751803AbaJWJUc (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Thu, 23 Oct 2014 05:20:32 -0400
+Date: Thu, 23 Oct 2014 11:43:58 +0200
+From: Alexander Aring <alex.aring@gmail.com>
+Subject: Re: [PATCH v3 bluetooth-next 0/4] 6lowpan: Move skb delivery out of
+ IPHC
+Message-ID: <20141023094355.GA11768@x61s.guest.pengutronix.de>
 References: <1413967190-28890-1-git-send-email-martin.townsend@xsilon.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1413967190-28890-1-git-send-email-martin.townsend@xsilon.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org
-Cc: marcel@holtmann.org, alex.aring@gmail.com, jukka.rissanen@linux.intel.com, Martin Townsend <mtownsend1973@gmail.com>
+To: Martin Townsend <mtownsend1973@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org, marcel@holtmann.org, jukka.rissanen@linux.intel.com, Martin Townsend <martin.townsend@xsilon.com>
 
-From: Martin Townsend <mtownsend1973@gmail.com>
+Hi Martin,
 
-As we have decouple decompression from data delivery we can now rename all
-occurences of process_data in receive path.
+On Wed, Oct 22, 2014 at 09:39:46AM +0100, Martin Townsend wrote:
+> This series moves skb delivery out of IPHC and into the receive routines of
+> both bluetooth and 802.15.4.  The reason is that we need to support more
+> (de)compression schemes in the future.  It also means that calling 
+> lowpan_process_data now only returns error codes or 0 for success so 
+> this has been cleaned up.  The final patch then renames occurences of
+> lowpan_process_data and process_data to something more meaningful.
+> 
+With this series and running fragmented 6LoWPAN packet on 802.15.4 a BUG()
+occurs.
 
-Signed-off-by: Martin Townsend <mtownsend1973@gmail.com>
----
- include/net/6lowpan.h         | 10 ++++++----
- net/6lowpan/iphc.c            | 12 +++++++-----
- net/bluetooth/6lowpan.c       | 15 ++++++++-------
- net/ieee802154/6lowpan_rtnl.c | 15 ++++++++-------
- 4 files changed, 29 insertions(+), 23 deletions(-)
+I can't bisect this issue and take a deeper look into this now. I have at
+weekend more time for this. Can you try a simple fragmented ping like "ping6
+$IP -s 127"? Do you get a similar issue?
 
-diff --git a/include/net/6lowpan.h b/include/net/6lowpan.h
-index abfa359..dc03d77 100644
---- a/include/net/6lowpan.h
-+++ b/include/net/6lowpan.h
-@@ -372,10 +372,12 @@ lowpan_uncompress_size(const struct sk_buff *skb, u16 *dgram_offset)
- 	return skb->len + uncomp_header - ret;
- }
- 
--int lowpan_process_data(struct sk_buff *skb, struct net_device *dev,
--		const u8 *saddr, const u8 saddr_type, const u8 saddr_len,
--		const u8 *daddr, const u8 daddr_type, const u8 daddr_len,
--		u8 iphc0, u8 iphc1);
-+int
-+lowpan_header_decompress(struct sk_buff *skb, struct net_device *dev,
-+			 const u8 *saddr, const u8 saddr_type,
-+			 const u8 saddr_len, const u8 *daddr,
-+			 const u8 daddr_type, const u8 daddr_len,
-+			 u8 iphc0, u8 iphc1);
- int lowpan_header_compress(struct sk_buff *skb, struct net_device *dev,
- 			unsigned short type, const void *_daddr,
- 			const void *_saddr, unsigned int len);
-diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
-index 45714fe..73a7065 100644
---- a/net/6lowpan/iphc.c
-+++ b/net/6lowpan/iphc.c
-@@ -301,10 +301,12 @@ err:
- /* TTL uncompression values */
- static const u8 lowpan_ttl_values[] = { 0, 1, 64, 255 };
- 
--int lowpan_process_data(struct sk_buff *skb, struct net_device *dev,
--			const u8 *saddr, const u8 saddr_type, const u8 saddr_len,
--			const u8 *daddr, const u8 daddr_type, const u8 daddr_len,
--			u8 iphc0, u8 iphc1)
-+int
-+lowpan_header_decompress(struct sk_buff *skb, struct net_device *dev,
-+			 const u8 *saddr, const u8 saddr_type,
-+			 const u8 saddr_len, const u8 *daddr,
-+			 const u8 daddr_type, const u8 daddr_len,
-+			 u8 iphc0, u8 iphc1)
- {
- 	struct ipv6hdr hdr = {};
- 	u8 tmp, num_context = 0;
-@@ -480,7 +482,7 @@ drop:
- 	kfree_skb(skb);
- 	return -EINVAL;
- }
--EXPORT_SYMBOL_GPL(lowpan_process_data);
-+EXPORT_SYMBOL_GPL(lowpan_header_decompress);
- 
- static u8 lowpan_compress_addr_64(u8 **hc_ptr, u8 shift,
- 				  const struct in6_addr *ipaddr,
-diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-index 40e2cec..aa6ebbf 100644
---- a/net/bluetooth/6lowpan.c
-+++ b/net/bluetooth/6lowpan.c
-@@ -257,8 +257,8 @@ static int give_skb_to_upper(struct sk_buff *skb, struct net_device *dev)
- 	return netif_rx(skb_cp);
- }
- 
--static int process_data(struct sk_buff *skb, struct net_device *netdev,
--			struct l2cap_chan *chan)
-+static int iphc_decompress(struct sk_buff *skb, struct net_device *netdev,
-+			   struct l2cap_chan *chan)
- {
- 	const u8 *saddr, *daddr;
- 	u8 iphc0, iphc1;
-@@ -287,10 +287,11 @@ static int process_data(struct sk_buff *skb, struct net_device *netdev,
- 	if (lowpan_fetch_skb_u8(skb, &iphc1))
- 		goto drop;
- 
--	return lowpan_process_data(skb, netdev,
--				   saddr, IEEE802154_ADDR_LONG, EUI64_ADDR_LEN,
--				   daddr, IEEE802154_ADDR_LONG, EUI64_ADDR_LEN,
--				   iphc0, iphc1);
-+	return lowpan_header_decompress(skb, netdev,
-+					saddr, IEEE802154_ADDR_LONG,
-+					EUI64_ADDR_LEN, daddr,
-+					IEEE802154_ADDR_LONG, EUI64_ADDR_LEN,
-+					iphc0, iphc1);
- 
- drop:
- 	kfree_skb(skb);
-@@ -346,7 +347,7 @@ static int recv_pkt(struct sk_buff *skb, struct net_device *dev,
- 			if (!local_skb)
- 				goto drop;
- 
--			ret = process_data(local_skb, dev, chan);
-+			ret = iphc_decompress(local_skb, dev, chan);
- 			if (ret < 0)
- 				goto drop;
- 
-diff --git a/net/ieee802154/6lowpan_rtnl.c b/net/ieee802154/6lowpan_rtnl.c
-index 83a0731..e033f13 100644
---- a/net/ieee802154/6lowpan_rtnl.c
-+++ b/net/ieee802154/6lowpan_rtnl.c
-@@ -163,7 +163,8 @@ static int lowpan_give_skb_to_devices(struct sk_buff *skb,
- 	return stat;
- }
- 
--static int process_data(struct sk_buff *skb, const struct ieee802154_hdr *hdr)
-+static int
-+iphc_decompress(struct sk_buff *skb, const struct ieee802154_hdr *hdr)
- {
- 	u8 iphc0, iphc1;
- 	struct ieee802154_addr_sa sa, da;
-@@ -193,9 +194,9 @@ static int process_data(struct sk_buff *skb, const struct ieee802154_hdr *hdr)
- 	else
- 		dap = &da.hwaddr;
- 
--	return lowpan_process_data(skb, skb->dev, sap, sa.addr_type,
--				   IEEE802154_ADDR_LEN, dap, da.addr_type,
--				   IEEE802154_ADDR_LEN, iphc0, iphc1);
-+	return lowpan_header_decompress(skb, skb->dev, sap, sa.addr_type,
-+					IEEE802154_ADDR_LEN, dap, da.addr_type,
-+					IEEE802154_ADDR_LEN, iphc0, iphc1);
- 
- drop:
- 	kfree_skb(skb);
-@@ -537,14 +538,14 @@ static int lowpan_rcv(struct sk_buff *skb, struct net_device *dev,
- 	} else {
- 		switch (skb->data[0] & 0xe0) {
- 		case LOWPAN_DISPATCH_IPHC:	/* ipv6 datagram */
--			ret = process_data(skb, &hdr);
-+			ret = iphc_decompress(skb, &hdr);
- 			if (ret < 0)
- 				goto drop;
- 			break;
- 		case LOWPAN_DISPATCH_FRAG1:	/* first fragment header */
- 			ret = lowpan_frag_rcv(skb, LOWPAN_DISPATCH_FRAG1);
- 			if (ret == 1) {
--				ret = process_data(skb, &hdr);
-+				ret = iphc_decompress(skb, &hdr);
- 				if (ret < 0)
- 					goto drop;
- 			}
-@@ -552,7 +553,7 @@ static int lowpan_rcv(struct sk_buff *skb, struct net_device *dev,
- 		case LOWPAN_DISPATCH_FRAGN:	/* next fragments headers */
- 			ret = lowpan_frag_rcv(skb, LOWPAN_DISPATCH_FRAGN);
- 			if (ret == 1) {
--				ret = process_data(skb, &hdr);
-+				ret = iphc_decompress(skb, &hdr);
- 				if (ret < 0)
- 					goto drop;
- 			}
--- 
-1.9.1
+[   73.250963] ------------[ cut here ]------------
+[   73.255840] kernel BUG at net/core/skbuff.c:1275!
+[   73.260770] Internal error: Oops - BUG: 0 [#1] ARM
+[   73.265791] Modules linked in: autofs4
+[   73.269753] CPU: 0 PID: 39 Comm: kworker/u2:1 Tainted: G        W      3.17.0-rc1-118898-g89f5047 #5
+[   73.279347] Workqueue: wpan-phy0 mac802154_rx_worker
+[   73.284557] task: cf20e2c0 ti: cf2d8000 task.ti: cf2d8000
+[   73.290223] PC is at skb_put+0x18/0x50
+[   73.294153] LR is at 0x7fffff00
+[   73.297448] pc : [<c041000c>]    lr : [<7fffff00>]    psr: 20000013
+[   73.297448] sp : cf2d9c48  ip : cf50e71a  fp : cf5aba00
+[   73.309467] r10: cf2d9c84  r9 : cf2d9c83  r8 : cf4ab000
+[   73.314939] r7 : 80000000  r6 : cf5aba00  r5 : cf5aba00  r4 : cf5aba00
+[   73.321774] r3 : 00000000  r2 : c0410700  r1 : 80000000  r0 : cf5aba00
+[   73.328612] Flags: nzCv  IRQs on  FIQs on  Mode SVC_32  ISA ARM  Segment kernel
+[   73.336267] Control: 10c5387d  Table: 8f408019  DAC: 00000015
+[   73.342283] Process kworker/u2:1 (pid: 39, stack limit = 0xcf2d8240)
+[   73.348937] Stack: (0xcf2d9c48 to 0xcf2da000)
+[   73.353510] 9c40:                   00000000 cf5aba00 cf5aba00 c0410700 cf2d9c84 cf5aba00
+[   73.362081] 9c60: cf596bd0 cf5aba00 00000000 cf4ab000 cf5aba00 c0000dc0 cf5aba00 c058bc78
+[   73.370651] 9c80: 0020e2c0 00000000 cf2d9c90 cf2d9ca0 abcdf303 000000f3 aaaaaaaa aaaaaaaa
+[   73.379222] 9ca0: abcd0003 00000000 aaaaaabb aaaaaaaa cf5aba00 cf5aba00 cf4ab000 cf5aba00
+[   73.387792] 9cc0: 00000000 0000f600 cf4ab000 c0821ba8 00000000 c058b208 00000000 c005eb18
+[   73.396363] 9ce0: c08645fc 60000013 00000000 cf2d8000 c0f8cc61 00000002 abcd0003 00000000
+[   73.404932] 9d00: aaaaaaaa aaaaaaaa abcd0003 00000000 aaaaaabb aaaaaaaa 00000000 00000000
+[   73.413503] 9d20: c0865c40 cf5abb80 c0821b68 c08646e0 c08644fc cf5abb80 00000000 c041ac5c
+[   73.422074] 9d40: 00000000 00000000 c041a86c 00000002 00000003 00000040 c0865c40 cf5abb80
+[   73.430644] 9d60: cf20e2c0 c0864510 00000001 c0865c40 cf5abb80 00000000 c0865c14 c0865bd4
+[   73.439215] 9d80: 00000040 c0865c40 c0865bc8 c041c1dc cf20e2c0 c0865bc0 0000012c 00000040
+[   73.447787] 9da0: c0865bc0 c0865bc8 ffffa76e c041bb20 c086714c ffffa76e c041ba6c 00000008
+[   73.456357] 9dc0: cf2d8020 cf2d8000 c0867140 00000100 c0867100 c086714c 00000004 c00366b0
+[   73.464927] 9de0: cf20e2c0 cf2d8038 00000003 40000003 0000000a 04208060 00000000 ffffa76d
+[   73.473497] 9e00: 20000013 60000013 aaaaaaaa cf5abb80 cf4ab520 cf4ab538 cf2d8030 00000001
+[   73.482067] 9e20: 00000000 c00368a0 00000000 c041b518 00000000 c058e14c 00000000 00000000
+[   73.490638] 9e40: c058df74 c005eb18 cf320a9c cf4ab520 cff8cc61 cf320a9c abcdf303 000000f3
+[   73.499208] 9e60: aaaaaaaa aaaaaaaa abcd0003 00000000 aaaaaabb aaaaaaaa 00000001 cf320a9c
+[   73.507780] 9e80: 00000000 cf5abb80 cf5abb80 cf320a60 cd9e1200 cf2d9ec8 cf03ea00 c058c7ec
+[   73.516351] 9ea0: cf2d4d40 cd9e1204 cf036400 c0045fc4 00000001 00000000 c0045f4c 60000093
+[   73.524921] 9ec0: 00000000 00000000 c1082b28 c0bb9980 00000000 c0765727 cf20e2c0 cf2d4d40
+[   73.533492] 9ee0: cf036400 cf036400 c0832920 cf036430 cf2d8000 cf2d4d58 00000000 c0046b64
+[   73.542063] 9f00: cf2d4d40 cf20e2c0 00000000 cf2d2400 00000000 cf2d4d40 c004688c 00000000
+[   73.550633] 9f20: 00000000 00000000 00000000 c004a0a0 c0831550 00000000 cf20e2c0 cf2d4d40
+[   73.559202] 9f40: 00000000 00000001 dead4ead ffffffff ffffffff c086769c 00000000 00000000
+[   73.567772] 9f60: c07038f4 cf2d9f64 cf2d9f64 00000000 00000001 dead4ead ffffffff ffffffff
+[   73.576342] 9f80: c086769c 00000000 00000000 c07038f4 cf2d9f90 cf2d9f90 cf2d9fac cf2d2400
+[   73.584910] 9fa0: c0049fcc 00000000 00000000 c000db88 00000000 00000000 00000000 00000000
+[   73.593479] 9fc0: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+[   73.602048] 9fe0: 00000000 00000000 00000000 00000000 00000013 00000000 fefffbae bf3baaae
+[   73.610626] [<c041000c>] (skb_put) from [<c0410700>] (skb_try_coalesce+0x6c/0x32c)
+[   73.618564] [<c0410700>] (skb_try_coalesce) from [<c058bc78>] (lowpan_frag_rcv+0x668/0x7a8)
+[   73.627318] [<c058bc78>] (lowpan_frag_rcv) from [<c058b208>] (lowpan_rcv+0xc8/0x1f0)
+[   73.635441] [<c058b208>] (lowpan_rcv) from [<c041ac5c>] (__netif_receive_skb_core+0x43c/0x56c)
+[   73.644470] [<c041ac5c>] (__netif_receive_skb_core) from [<c041c1dc>] (process_backlog+0x78/0x110)
+[   73.653860] [<c041c1dc>] (process_backlog) from [<c041bb20>] (net_rx_action+0xb4/0x18c)
+[   73.662267] [<c041bb20>] (net_rx_action) from [<c00366b0>] (__do_softirq+0x104/0x264)
+[   73.670478] [<c00366b0>] (__do_softirq) from [<c00368a0>] (do_softirq+0x44/0x6c)
+[   73.678233] [<c00368a0>] (do_softirq) from [<c041b518>] (netif_rx_ni+0x20/0x2c)
+[   73.685900] [<c041b518>] (netif_rx_ni) from [<c058e14c>] (mac802154_wpans_rx+0x208/0x260)
+[   73.694472] [<c058e14c>] (mac802154_wpans_rx) from [<c058c7ec>] (mac802154_rx_worker+0x7c/0x94)
+[   73.703594] [<c058c7ec>] (mac802154_rx_worker) from [<c0045fc4>] (process_one_work+0x23c/0x3cc)
+[   73.712712] [<c0045fc4>] (process_one_work) from [<c0046b64>] (worker_thread+0x2d8/0x438)
 
+- Alex
