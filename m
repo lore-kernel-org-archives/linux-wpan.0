@@ -1,88 +1,58 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-lb0-f172.google.com ([209.85.217.172]:36792 "EHLO
-	mail-lb0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751149AbaJ0M3n (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Mon, 27 Oct 2014 08:29:43 -0400
-Received: by mail-lb0-f172.google.com with SMTP id n15so1768282lbi.3
-        for <linux-wpan@vger.kernel.org>; Mon, 27 Oct 2014 05:29:42 -0700 (PDT)
-Date: Mon, 27 Oct 2014 13:29:35 +0100
-From: Alexander Aring <alex.aring@gmail.com>
-Subject: Re: [PATCH bluetooth-next 04/16] mac802154: rx: warn if ieee80211_rx
- call from irq
-Message-ID: <20141027122932.GA24691@omega>
-References: <1414410189-20092-1-git-send-email-alex.aring@gmail.com>
- <1414410189-20092-5-git-send-email-alex.aring@gmail.com>
- <544E364E.5090702@pengutronix.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <544E364E.5090702@pengutronix.de>
+Received: from mail-wg0-f44.google.com ([74.125.82.44]:40163 "EHLO
+	mail-wg0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751899AbaJWOlL (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Thu, 23 Oct 2014 10:41:11 -0400
+From: Martin Townsend <mtownsend1973@gmail.com>
+Subject: [PATCH v5 bluetooth-next 0/4] 6lowpan: Move skb delivery out of IPHC
+Date: Thu, 23 Oct 2014 15:40:52 +0100
+Message-Id: <1414075256-9448-1-git-send-email-martin.townsend@xsilon.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Marc Kleine-Budde <mkl@pengutronix.de>
-Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de
+To: linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org
+Cc: marcel@holtmann.org, alex.aring@gmail.com, jukka.rissanen@linux.intel.com, Martin Townsend <martin.townsend@xsilon.com>
 
-Hi Marc,
+This series moves skb delivery out of IPHC and into the receive routines of
+both bluetooth and 802.15.4.  The reason is that we need to support more
+(de)compression schemes in the future.  It also means that calling 
+lowpan_process_data now only returns error codes or 0 for success so 
+this has been cleaned up.  The final patch then renames occurences of
+lowpan_process_data and process_data to something more meaningful.
 
-On Mon, Oct 27, 2014 at 01:10:54PM +0100, Marc Kleine-Budde wrote:
-> On 10/27/2014 12:42 PM, Alexander Aring wrote:
-> > This patch adds a warning if the ieee80211_rx function is called from an
-> > irq context which should never happen.
-> 
-> do you mean hard and/or softirq here?
-> 
+v1 -> v2
 
-Comment for in_softirq() is "in_softirq - Are we currently processing
-softirq or have bh disabled?"
+* Handle freeing of skb in lowpan_give_skb_to_devices for 802.15.14
+* Added another skb_consume in bluetooth code for uncompressed IPv6 headers
+* Added missing skb_consume for local_skb for bluetooth in compreesed IPv6 header
+  path
+* Combine patch 4 into 1.
 
-Then we checking is (softirq_count() == 0) if true then print warning.
+v2 -> v3
 
-in_softirq is declared as:
+* Ensure error codes aren't returned in the bluetooth skb delivery function.
+* In lowpan_give_skb_to_devices return NET_RX_DROP when the first call to
+  netif_rx fails.
 
-#define in_softirq()            (softirq_count())
+v3 -> v4
 
-So (softirq_count() == 0) is identically with (!in_softirq()).
+* Fixed incorrect frag return handling due to refactoring skb_deliver.
 
-Translating the "deMorgan law" to the above sentence:
+v4 -> v5
 
-We print a warning when we are not in a softirq context and have bh
-enabled.
+* Removed unnecessary break statements in lowpan_rcv
 
-So we need to be in a softirq context or bh enabled.
+Martin Townsend (4):
+  6lowpan: remove skb_deliver from IPHC
+  6lowpan: fix process_data return values
+  bluetooth:6lowpan: use consume_skb when packet processed successfully
+  ieee802154: 6lowpan: rename process_data and lowpan_process_data
 
-> > 
-> > Signed-off-by: Alexander Aring <alex.aring@gmail.com>
-> > ---
-> >  net/mac802154/rx.c | 2 ++
-> >  1 file changed, 2 insertions(+)
-> > 
-> > diff --git a/net/mac802154/rx.c b/net/mac802154/rx.c
-> > index 2851a3f..c4df321 100644
-> > --- a/net/mac802154/rx.c
-> > +++ b/net/mac802154/rx.c
-> > @@ -61,6 +61,8 @@ fail:
-> >  
-> >  void ieee802154_rx(struct ieee802154_hw *hw, struct sk_buff *skb)
-> >  {
-> > +	WARN_ON_ONCE(softirq_count() == 0);
-> > +
-> 
-> better use in_irq() or in_softirq(), see:
-> 
-> http://lxr.free-electrons.com/source/include/linux/preempt_mask.h#L64
-> 
+ include/net/6lowpan.h         | 12 ++++-----
+ net/6lowpan/iphc.c            | 42 +++++++++---------------------
+ net/bluetooth/6lowpan.c       | 36 +++++++++++++++++---------
+ net/ieee802154/6lowpan_rtnl.c | 60 ++++++++++++++++++++++++++-----------------
+ 4 files changed, 78 insertions(+), 72 deletions(-)
 
-Okay, maybe want to fix that also in:
+-- 
+1.9.1
 
-http://lxr.free-electrons.com/source/net/mac80211/rx.c#L3347
-
-
-
-btw. I will also fix in this patch s/80211/802154/ at several places. I
-should do a grep before.
-
-Are you sure we can use in_irq here? I would change it to:
-
-WARN_ON_ONCE(!in_softirq());
-
-- Alex
