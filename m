@@ -1,49 +1,250 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-lb0-f178.google.com ([209.85.217.178]:37911 "EHLO
-	mail-lb0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751191AbaJYSzF (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Sat, 25 Oct 2014 14:55:05 -0400
-Received: by mail-lb0-f178.google.com with SMTP id f15so139374lbj.37
-        for <linux-wpan@vger.kernel.org>; Sat, 25 Oct 2014 11:55:03 -0700 (PDT)
+Received: from mail-la0-f48.google.com ([209.85.215.48]:48015 "EHLO
+	mail-la0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750884AbaJYSjI (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Sat, 25 Oct 2014 14:39:08 -0400
+Received: by mail-la0-f48.google.com with SMTP id gi9so4039692lab.21
+        for <linux-wpan@vger.kernel.org>; Sat, 25 Oct 2014 11:39:06 -0700 (PDT)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH bluetooth-next 5/7] ieee802154: move wpan-class.c to core.c
-Date: Sat, 25 Oct 2014 09:25:03 +0200
-Message-Id: <1414221905-19422-6-git-send-email-alex.aring@gmail.com>
+Subject: [PATCH bluetooth-next 6/7] ieee802154: move ieee802154 header
+Date: Sat, 25 Oct 2014 09:25:04 +0200
+Message-Id: <1414221905-19422-7-git-send-email-alex.aring@gmail.com>
 In-Reply-To: <1414221905-19422-1-git-send-email-alex.aring@gmail.com>
 References: <1414221905-19422-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
-Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
+Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>, Alan Ott <alan@signal11.us>
 
-Like the wireless core.c file this file contains function for phy
-allocation and freeing. Move this file to core.c to get similar
-behaviour.
+This patch moves the ieee802154 header into include/linux instead
+include/net. Similar like wireless which have the ieee80211 header
+inside of include/linux.
 
 Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+Cc: Alan Ott <alan@signal11.us>
 ---
- net/ieee802154/Makefile                 | 2 +-
- net/ieee802154/{wpan-class.c => core.c} | 0
- 2 files changed, 1 insertion(+), 1 deletion(-)
- rename net/ieee802154/{wpan-class.c => core.c} (100%)
+ drivers/net/ieee802154/at86rf230.c  | 2 +-
+ drivers/net/ieee802154/cc2520.c     | 2 +-
+ drivers/net/ieee802154/fakehard.c   | 2 +-
+ drivers/net/ieee802154/mrf24j40.c   | 2 +-
+ include/{net => linux}/ieee802154.h | 0
+ include/net/ieee802154_netdev.h     | 2 +-
+ net/ieee802154/6lowpan_rtnl.c       | 2 +-
+ net/ieee802154/dgram.c              | 2 +-
+ net/ieee802154/header_ops.c         | 3 ++-
+ net/ieee802154/nl-mac.c             | 2 +-
+ net/mac802154/iface.c               | 2 +-
+ net/mac802154/llsec.c               | 2 +-
+ net/mac802154/mac_cmd.c             | 2 +-
+ net/mac802154/monitor.c             | 2 +-
+ 14 files changed, 14 insertions(+), 13 deletions(-)
+ rename include/{net => linux}/ieee802154.h (100%)
 
-diff --git a/net/ieee802154/Makefile b/net/ieee802154/Makefile
-index 3914b1e..e58c4cb 100644
---- a/net/ieee802154/Makefile
-+++ b/net/ieee802154/Makefile
-@@ -2,7 +2,7 @@ obj-$(CONFIG_IEEE802154) += ieee802154.o af_802154.o
- obj-$(CONFIG_IEEE802154_6LOWPAN) += ieee802154_6lowpan.o
+diff --git a/drivers/net/ieee802154/at86rf230.c b/drivers/net/ieee802154/at86rf230.c
+index 795ac11..a433d20 100644
+--- a/drivers/net/ieee802154/at86rf230.c
++++ b/drivers/net/ieee802154/at86rf230.c
+@@ -29,8 +29,8 @@
+ #include <linux/regmap.h>
+ #include <linux/skbuff.h>
+ #include <linux/of_gpio.h>
++#include <linux/ieee802154.h>
  
- ieee802154_6lowpan-y := 6lowpan_rtnl.o reassembly.o
--ieee802154-y := netlink.o nl-mac.o nl-phy.o nl_policy.o wpan-class.o \
-+ieee802154-y := netlink.o nl-mac.o nl-phy.o nl_policy.o core.o \
-                 header_ops.o
- af_802154-y := af_ieee802154.o raw.o dgram.o
+-#include <net/ieee802154.h>
+ #include <net/mac802154.h>
+ #include <net/cfg802154.h>
  
-diff --git a/net/ieee802154/wpan-class.c b/net/ieee802154/core.c
+diff --git a/drivers/net/ieee802154/cc2520.c b/drivers/net/ieee802154/cc2520.c
+index f1770cf..32b3c88 100644
+--- a/drivers/net/ieee802154/cc2520.c
++++ b/drivers/net/ieee802154/cc2520.c
+@@ -21,10 +21,10 @@
+ #include <linux/skbuff.h>
+ #include <linux/pinctrl/consumer.h>
+ #include <linux/of_gpio.h>
++#include <linux/ieee802154.h>
+ 
+ #include <net/mac802154.h>
+ #include <net/cfg802154.h>
+-#include <net/ieee802154.h>
+ 
+ #define	SPI_COMMAND_BUFFER	3
+ #define	HIGH			1
+diff --git a/drivers/net/ieee802154/fakehard.c b/drivers/net/ieee802154/fakehard.c
+index 1460bf5..8be05ad 100644
+--- a/drivers/net/ieee802154/fakehard.c
++++ b/drivers/net/ieee802154/fakehard.c
+@@ -25,10 +25,10 @@
+ #include <linux/netdevice.h>
+ #include <linux/skbuff.h>
+ #include <linux/if_arp.h>
++#include <linux/ieee802154.h>
+ 
+ #include <net/af_ieee802154.h>
+ #include <net/ieee802154_netdev.h>
+-#include <net/ieee802154.h>
+ #include <net/nl802154.h>
+ #include <net/cfg802154.h>
+ 
+diff --git a/drivers/net/ieee802154/mrf24j40.c b/drivers/net/ieee802154/mrf24j40.c
+index bea7349..56a6959 100644
+--- a/drivers/net/ieee802154/mrf24j40.c
++++ b/drivers/net/ieee802154/mrf24j40.c
+@@ -18,9 +18,9 @@
+ #include <linux/spi/spi.h>
+ #include <linux/interrupt.h>
+ #include <linux/module.h>
++#include <linux/ieee802154.h>
+ #include <net/cfg802154.h>
+ #include <net/mac802154.h>
+-#include <net/ieee802154.h>
+ 
+ /* MRF24J40 Short Address Registers */
+ #define REG_RXMCR    0x00  /* Receive MAC control */
+diff --git a/include/net/ieee802154.h b/include/linux/ieee802154.h
 similarity index 100%
-rename from net/ieee802154/wpan-class.c
-rename to net/ieee802154/core.c
+rename from include/net/ieee802154.h
+rename to include/linux/ieee802154.h
+diff --git a/include/net/ieee802154_netdev.h b/include/net/ieee802154_netdev.h
+index f874206..5e62d75 100644
+--- a/include/net/ieee802154_netdev.h
++++ b/include/net/ieee802154_netdev.h
+@@ -23,10 +23,10 @@
+ #ifndef IEEE802154_NETDEVICE_H
+ #define IEEE802154_NETDEVICE_H
+ 
+-#include <net/ieee802154.h>
+ #include <net/af_ieee802154.h>
+ #include <linux/netdevice.h>
+ #include <linux/skbuff.h>
++#include <linux/ieee802154.h>
+ 
+ struct ieee802154_sechdr {
+ #if defined(__LITTLE_ENDIAN_BITFIELD)
+diff --git a/net/ieee802154/6lowpan_rtnl.c b/net/ieee802154/6lowpan_rtnl.c
+index 0c1a49b..1779a08 100644
+--- a/net/ieee802154/6lowpan_rtnl.c
++++ b/net/ieee802154/6lowpan_rtnl.c
+@@ -49,8 +49,8 @@
+ #include <linux/module.h>
+ #include <linux/moduleparam.h>
+ #include <linux/netdevice.h>
++#include <linux/ieee802154.h>
+ #include <net/af_ieee802154.h>
+-#include <net/ieee802154.h>
+ #include <net/ieee802154_netdev.h>
+ #include <net/6lowpan.h>
+ #include <net/ipv6.h>
+diff --git a/net/ieee802154/dgram.c b/net/ieee802154/dgram.c
+index 71e99a0..3d58bef 100644
+--- a/net/ieee802154/dgram.c
++++ b/net/ieee802154/dgram.c
+@@ -23,9 +23,9 @@
+ #include <linux/if_arp.h>
+ #include <linux/list.h>
+ #include <linux/slab.h>
++#include <linux/ieee802154.h>
+ #include <net/sock.h>
+ #include <net/af_ieee802154.h>
+-#include <net/ieee802154.h>
+ #include <net/ieee802154_netdev.h>
+ 
+ #include <asm/ioctls.h>
+diff --git a/net/ieee802154/header_ops.c b/net/ieee802154/header_ops.c
+index c09294e..a051b69 100644
+--- a/net/ieee802154/header_ops.c
++++ b/net/ieee802154/header_ops.c
+@@ -14,8 +14,9 @@
+  * Phoebe Buckheister <phoebe.buckheister@itwm.fraunhofer.de>
+  */
+ 
++#include <linux/ieee802154.h>
++
+ #include <net/mac802154.h>
+-#include <net/ieee802154.h>
+ #include <net/ieee802154_netdev.h>
+ 
+ static int
+diff --git a/net/ieee802154/nl-mac.c b/net/ieee802154/nl-mac.c
+index a9c8e3e..fb6866d 100644
+--- a/net/ieee802154/nl-mac.c
++++ b/net/ieee802154/nl-mac.c
+@@ -22,6 +22,7 @@
+ #include <linux/kernel.h>
+ #include <linux/if_arp.h>
+ #include <linux/netdevice.h>
++#include <linux/ieee802154.h>
+ #include <net/netlink.h>
+ #include <net/genetlink.h>
+ #include <net/sock.h>
+@@ -29,7 +30,6 @@
+ #include <linux/export.h>
+ #include <net/af_ieee802154.h>
+ #include <net/nl802154.h>
+-#include <net/ieee802154.h>
+ #include <net/ieee802154_netdev.h>
+ #include <net/cfg802154.h>
+ 
+diff --git a/net/mac802154/iface.c b/net/mac802154/iface.c
+index 5a60407..03eedc3 100644
+--- a/net/mac802154/iface.c
++++ b/net/mac802154/iface.c
+@@ -20,13 +20,13 @@
+ #include <linux/netdevice.h>
+ #include <linux/module.h>
+ #include <linux/if_arp.h>
++#include <linux/ieee802154.h>
+ 
+ #include <net/rtnetlink.h>
+ #include <linux/nl802154.h>
+ #include <net/af_ieee802154.h>
+ #include <net/mac802154.h>
+ #include <net/ieee802154_netdev.h>
+-#include <net/ieee802154.h>
+ #include <net/cfg802154.h>
+ 
+ #include "ieee802154_i.h"
+diff --git a/net/mac802154/llsec.c b/net/mac802154/llsec.c
+index 26f8761..fa0d523 100644
+--- a/net/mac802154/llsec.c
++++ b/net/mac802154/llsec.c
+@@ -17,7 +17,7 @@
+ #include <linux/err.h>
+ #include <linux/bug.h>
+ #include <linux/completion.h>
+-#include <net/ieee802154.h>
++#include <linux/ieee802154.h>
+ #include <crypto/algapi.h>
+ 
+ #include "ieee802154_i.h"
+diff --git a/net/mac802154/mac_cmd.c b/net/mac802154/mac_cmd.c
+index f118ea0..ad09d54 100644
+--- a/net/mac802154/mac_cmd.c
++++ b/net/mac802154/mac_cmd.c
+@@ -20,8 +20,8 @@
+ 
+ #include <linux/skbuff.h>
+ #include <linux/if_arp.h>
++#include <linux/ieee802154.h>
+ 
+-#include <net/ieee802154.h>
+ #include <net/ieee802154_netdev.h>
+ #include <net/cfg802154.h>
+ #include <net/mac802154.h>
+diff --git a/net/mac802154/monitor.c b/net/mac802154/monitor.c
+index ca1dedd..ca82c72 100644
+--- a/net/mac802154/monitor.c
++++ b/net/mac802154/monitor.c
+@@ -21,8 +21,8 @@
+ #include <linux/skbuff.h>
+ #include <linux/if_arp.h>
+ #include <linux/crc-ccitt.h>
++#include <linux/ieee802154.h>
+ 
+-#include <net/ieee802154.h>
+ #include <net/mac802154.h>
+ #include <net/netlink.h>
+ #include <net/cfg802154.h>
 -- 
 2.1.2
 
