@@ -1,42 +1,69 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-lb0-f173.google.com ([209.85.217.173]:41973 "EHLO
-	mail-lb0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752602AbaJYDZl (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Fri, 24 Oct 2014 23:25:41 -0400
-Received: by mail-lb0-f173.google.com with SMTP id 10so3438990lbg.4
-        for <linux-wpan@vger.kernel.org>; Fri, 24 Oct 2014 20:25:39 -0700 (PDT)
-From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH bluetooth-next 6/6] ieee802154: wpan-class: fix trailing semicolon
-Date: Sat, 25 Oct 2014 05:25:12 +0200
-Message-Id: <1414207512-10281-7-git-send-email-alex.aring@gmail.com>
+Received: from senator.holtmann.net ([87.106.208.187]:44943 "EHLO
+	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752293AbaJYT0c (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Sat, 25 Oct 2014 15:26:32 -0400
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.0 \(1990.1\))
+Subject: Re: [PATCH bluetooth-next 0/6] ieee802154: trivial fixes
+From: Marcel Holtmann <marcel@holtmann.org>
 In-Reply-To: <1414207512-10281-1-git-send-email-alex.aring@gmail.com>
+Date: Fri, 24 Oct 2014 23:29:11 -0700
+Content-Transfer-Encoding: 7bit
+Message-Id: <C61DED89-59F2-4CD5-BEB6-763070872D12@holtmann.org>
 References: <1414207512-10281-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org
-Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
+To: Alexander Aring <alex.aring@gmail.com>
+Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de
 
-This patch removes an unnecessary tailing semicolon after macro
-define. Otherwise we get a trailing semicolon while using this macro.
+Hi Alex,
 
-Signed-off-by: Alexander Aring <alex.aring@gmail.com>
----
- net/ieee802154/wpan-class.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> This patch series contains checkpatch fixes and typos for the
+> ieee802154/mac802154 branch.
+> 
+> Alexander Aring (6):
+>  ieee802154: mac802154: remove FSF address
+>  ieee802154: ieee802154_dev: fix align typo
+>  mac802154: fix typo IEEE802515 to IEEE802154
+>  ieee802154: wpan-phy: change to __aligned(size)
+>  ieee802154: wpan-phy: use blank line after function
+>  ieee802154: wpan-class: fix trailing semicolon
+> 
+> drivers/net/ieee802154/at86rf230.c | 12 ++++--------
+> drivers/net/ieee802154/cc2520.c    |  8 ++++----
+> drivers/net/ieee802154/fakelb.c    |  4 ----
+> drivers/net/ieee802154/mrf24j40.c  | 12 ++++--------
+> include/linux/nl802154.h           |  4 ----
+> include/net/af_ieee802154.h        |  4 ----
+> include/net/ieee802154.h           |  4 ----
+> include/net/ieee802154_netdev.h    |  4 ----
+> include/net/mac802154.h            | 11 ++++-------
+> include/net/nl802154.h             |  4 ----
+> include/net/wpan-phy.h             |  7 ++-----
+> net/ieee802154/af802154.h          |  4 ----
+> net/ieee802154/af_ieee802154.c     |  4 ----
+> net/ieee802154/dgram.c             |  4 ----
+> net/ieee802154/ieee802154.h        |  4 ----
+> net/ieee802154/netlink.c           |  4 ----
+> net/ieee802154/nl-mac.c            |  4 ----
+> net/ieee802154/nl-phy.c            |  4 ----
+> net/ieee802154/nl_policy.c         |  4 ----
+> net/ieee802154/raw.c               |  4 ----
+> net/ieee802154/wpan-class.c        |  6 +-----
+> net/mac802154/ieee802154_dev.c     |  6 +-----
+> net/mac802154/mac802154.h          |  4 ----
+> net/mac802154/mac_cmd.c            |  4 ----
+> net/mac802154/mib.c                | 10 +++-------
+> net/mac802154/monitor.c            |  4 ----
+> net/mac802154/rx.c                 |  4 ----
+> net/mac802154/tx.c                 |  4 ----
+> net/mac802154/wpan.c               |  4 ----
+> 29 files changed, 23 insertions(+), 133 deletions(-)
 
-diff --git a/net/ieee802154/wpan-class.c b/net/ieee802154/wpan-class.c
-index 9a2dfab..e4c6fb3 100644
---- a/net/ieee802154/wpan-class.c
-+++ b/net/ieee802154/wpan-class.c
-@@ -33,7 +33,7 @@ static ssize_t name ## _show(struct device *dev,			\
- 	mutex_unlock(&phy->pib_lock);					\
- 	return ret;							\
- }									\
--static DEVICE_ATTR_RO(name);
-+static DEVICE_ATTR_RO(name)
- 
- #define MASTER_SHOW(field, format_string)				\
- 	MASTER_SHOW_COMPLEX(field, format_string, phy->field)
--- 
-2.1.2
+all 6 patches have been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
 
