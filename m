@@ -1,70 +1,48 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-lb0-f169.google.com ([209.85.217.169]:57618 "EHLO
-	mail-lb0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751617AbaJYSdV (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Sat, 25 Oct 2014 14:33:21 -0400
-Received: by mail-lb0-f169.google.com with SMTP id 10so4007045lbg.28
-        for <linux-wpan@vger.kernel.org>; Sat, 25 Oct 2014 11:33:19 -0700 (PDT)
+Received: from mail-la0-f44.google.com ([209.85.215.44]:54016 "EHLO
+	mail-la0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751120AbaJYS7m (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Sat, 25 Oct 2014 14:59:42 -0400
+Received: by mail-la0-f44.google.com with SMTP id hs14so4093493lab.31
+        for <linux-wpan@vger.kernel.org>; Sat, 25 Oct 2014 11:59:41 -0700 (PDT)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCHv2 bluetooth-next 0/7] ieee802154: file movements
-Date: Sat, 25 Oct 2014 09:40:58 +0200
-Message-Id: <1414222865-1692-1-git-send-email-alex.aring@gmail.com>
+Subject: [PATCHv2 bluetooth-next 1/7] mac802154: move ieee802154_dev.c to main.c
+Date: Sat, 25 Oct 2014 09:40:59 +0200
+Message-Id: <1414222865-1692-2-git-send-email-alex.aring@gmail.com>
+In-Reply-To: <1414222865-1692-1-git-send-email-alex.aring@gmail.com>
+References: <1414222865-1692-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
 Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-This series contains file movements patches inside the 802.15.4 subsystem.
-The series contains necessary movements to get a similar architecture like
-mac80211 and wireless subsystem.
+The ieee802154_dev functionality contains various function for
+allocation and registration of an ieee802154_dev. This is equal to the
+net/mac80211/main.c file. This patch rename the ieee802154_dev.c to
+main.c to have the same behaviour.
 
-changes since v2:
- - rename mutal inclusion define while moving ieee802154 header to
-   include/linux/. From NET_IEEE802154_H to LINUX_IEEE802154_H.
+Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+---
+ net/mac802154/Makefile                     | 2 +-
+ net/mac802154/{ieee802154_dev.c => main.c} | 0
+ 2 files changed, 1 insertion(+), 1 deletion(-)
+ rename net/mac802154/{ieee802154_dev.c => main.c} (100%)
 
-Alexander Aring (7):
-  mac802154: move ieee802154_dev.c to main.c
-  mac802154: move mac802154.h to ieee802154_i.h
-  mac802154: move wpan.c to iface.c
-  ieee802154: move wpan-phy.h to cfg802154.h
-  ieee802154: move wpan-class.c to core.c
-  ieee802154: move ieee802154 header
-  MAINTAINERS: add missing headers in 802.15.4
-
- MAINTAINERS                                   | 7 +++++++
- drivers/net/ieee802154/at86rf230.c            | 4 ++--
- drivers/net/ieee802154/cc2520.c               | 4 ++--
- drivers/net/ieee802154/fakehard.c             | 4 ++--
- drivers/net/ieee802154/fakelb.c               | 2 +-
- drivers/net/ieee802154/mrf24j40.c             | 4 ++--
- include/{net => linux}/ieee802154.h           | 8 +++-----
- include/net/{wpan-phy.h => cfg802154.h}       | 7 ++++---
- include/net/ieee802154_netdev.h               | 2 +-
- net/ieee802154/6lowpan_rtnl.c                 | 2 +-
- net/ieee802154/Makefile                       | 2 +-
- net/ieee802154/{wpan-class.c => core.c}       | 2 +-
- net/ieee802154/dgram.c                        | 2 +-
- net/ieee802154/header_ops.c                   | 3 ++-
- net/ieee802154/nl-mac.c                       | 4 ++--
- net/ieee802154/nl-phy.c                       | 2 +-
- net/mac802154/Makefile                        | 4 ++--
- net/mac802154/{mac802154.h => ieee802154_i.h} | 6 +++---
- net/mac802154/{wpan.c => iface.c}             | 6 +++---
- net/mac802154/llsec.c                         | 4 ++--
- net/mac802154/mac_cmd.c                       | 6 +++---
- net/mac802154/{ieee802154_dev.c => main.c}    | 4 ++--
- net/mac802154/mib.c                           | 4 ++--
- net/mac802154/monitor.c                       | 6 +++---
- net/mac802154/rx.c                            | 2 +-
- net/mac802154/tx.c                            | 4 ++--
- 26 files changed, 56 insertions(+), 49 deletions(-)
- rename include/{net => linux}/ieee802154.h (98%)
- rename include/net/{wpan-phy.h => cfg802154.h} (97%)
- rename net/ieee802154/{wpan-class.c => core.c} (99%)
- rename net/mac802154/{mac802154.h => ieee802154_i.h} (98%)
- rename net/mac802154/{wpan.c => iface.c} (99%)
- rename net/mac802154/{ieee802154_dev.c => main.c} (99%)
-
+diff --git a/net/mac802154/Makefile b/net/mac802154/Makefile
+index 9723d6f..1ecbc47 100644
+--- a/net/mac802154/Makefile
++++ b/net/mac802154/Makefile
+@@ -1,5 +1,5 @@
+ obj-$(CONFIG_MAC802154)	+= mac802154.o
+-mac802154-objs		:= ieee802154_dev.o rx.o tx.o mac_cmd.o mib.o \
++mac802154-objs		:= main.o rx.o tx.o mac_cmd.o mib.o \
+ 			   monitor.o wpan.o llsec.o
+ 
+ ccflags-y += -D__CHECK_ENDIAN__
+diff --git a/net/mac802154/ieee802154_dev.c b/net/mac802154/main.c
+similarity index 100%
+rename from net/mac802154/ieee802154_dev.c
+rename to net/mac802154/main.c
 -- 
 2.1.2
 
