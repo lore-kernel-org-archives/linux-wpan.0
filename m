@@ -1,69 +1,66 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from senator.holtmann.net ([87.106.208.187]:44943 "EHLO
-	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752293AbaJYT0c (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Sat, 25 Oct 2014 15:26:32 -0400
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.0 \(1990.1\))
-Subject: Re: [PATCH bluetooth-next 0/6] ieee802154: trivial fixes
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1414207512-10281-1-git-send-email-alex.aring@gmail.com>
-Date: Fri, 24 Oct 2014 23:29:11 -0700
-Content-Transfer-Encoding: 7bit
-Message-Id: <C61DED89-59F2-4CD5-BEB6-763070872D12@holtmann.org>
-References: <1414207512-10281-1-git-send-email-alex.aring@gmail.com>
+Received: from mail-lb0-f171.google.com ([209.85.217.171]:42389 "EHLO
+	mail-lb0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752037AbaJYVQw (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Sat, 25 Oct 2014 17:16:52 -0400
+Received: by mail-lb0-f171.google.com with SMTP id z11so634553lbi.16
+        for <linux-wpan@vger.kernel.org>; Sat, 25 Oct 2014 14:16:50 -0700 (PDT)
+From: Alexander Aring <alex.aring@gmail.com>
+Subject: [PATCH bluetooth-next 0/7] ieee802154: file movements
+Date: Sat, 25 Oct 2014 09:24:58 +0200
+Message-Id: <1414221905-19422-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>
-Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de
+To: linux-wpan@vger.kernel.org
+Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-Hi Alex,
+This series contains file movements patches inside the 802.15.4 subsystem.
+The series contains necessary movements to get a similar architecture like
+mac80211 and wireless subsystem.
 
-> This patch series contains checkpatch fixes and typos for the
-> ieee802154/mac802154 branch.
-> 
-> Alexander Aring (6):
->  ieee802154: mac802154: remove FSF address
->  ieee802154: ieee802154_dev: fix align typo
->  mac802154: fix typo IEEE802515 to IEEE802154
->  ieee802154: wpan-phy: change to __aligned(size)
->  ieee802154: wpan-phy: use blank line after function
->  ieee802154: wpan-class: fix trailing semicolon
-> 
-> drivers/net/ieee802154/at86rf230.c | 12 ++++--------
-> drivers/net/ieee802154/cc2520.c    |  8 ++++----
-> drivers/net/ieee802154/fakelb.c    |  4 ----
-> drivers/net/ieee802154/mrf24j40.c  | 12 ++++--------
-> include/linux/nl802154.h           |  4 ----
-> include/net/af_ieee802154.h        |  4 ----
-> include/net/ieee802154.h           |  4 ----
-> include/net/ieee802154_netdev.h    |  4 ----
-> include/net/mac802154.h            | 11 ++++-------
-> include/net/nl802154.h             |  4 ----
-> include/net/wpan-phy.h             |  7 ++-----
-> net/ieee802154/af802154.h          |  4 ----
-> net/ieee802154/af_ieee802154.c     |  4 ----
-> net/ieee802154/dgram.c             |  4 ----
-> net/ieee802154/ieee802154.h        |  4 ----
-> net/ieee802154/netlink.c           |  4 ----
-> net/ieee802154/nl-mac.c            |  4 ----
-> net/ieee802154/nl-phy.c            |  4 ----
-> net/ieee802154/nl_policy.c         |  4 ----
-> net/ieee802154/raw.c               |  4 ----
-> net/ieee802154/wpan-class.c        |  6 +-----
-> net/mac802154/ieee802154_dev.c     |  6 +-----
-> net/mac802154/mac802154.h          |  4 ----
-> net/mac802154/mac_cmd.c            |  4 ----
-> net/mac802154/mib.c                | 10 +++-------
-> net/mac802154/monitor.c            |  4 ----
-> net/mac802154/rx.c                 |  4 ----
-> net/mac802154/tx.c                 |  4 ----
-> net/mac802154/wpan.c               |  4 ----
-> 29 files changed, 23 insertions(+), 133 deletions(-)
+Alexander Aring (7):
+  mac802154: move ieee802154_dev.c to main.c
+  mac802154: move mac802154.h to ieee802154_i.h
+  mac802154: move wpan.c to iface.c
+  ieee802154: move wpan-phy.h to cfg802154.h
+  ieee802154: move wpan-class.c to core.c
+  ieee802154: move ieee802154 header
+  MAINTAINERS: add missing headers in 802.15.4
 
-all 6 patches have been applied to bluetooth-next tree.
+ MAINTAINERS                                   | 7 +++++++
+ drivers/net/ieee802154/at86rf230.c            | 4 ++--
+ drivers/net/ieee802154/cc2520.c               | 4 ++--
+ drivers/net/ieee802154/fakehard.c             | 4 ++--
+ drivers/net/ieee802154/fakelb.c               | 2 +-
+ drivers/net/ieee802154/mrf24j40.c             | 4 ++--
+ include/{net => linux}/ieee802154.h           | 0
+ include/net/{wpan-phy.h => cfg802154.h}       | 7 ++++---
+ include/net/ieee802154_netdev.h               | 2 +-
+ net/ieee802154/6lowpan_rtnl.c                 | 2 +-
+ net/ieee802154/Makefile                       | 2 +-
+ net/ieee802154/{wpan-class.c => core.c}       | 2 +-
+ net/ieee802154/dgram.c                        | 2 +-
+ net/ieee802154/header_ops.c                   | 3 ++-
+ net/ieee802154/nl-mac.c                       | 4 ++--
+ net/ieee802154/nl-phy.c                       | 2 +-
+ net/mac802154/Makefile                        | 4 ++--
+ net/mac802154/{mac802154.h => ieee802154_i.h} | 6 +++---
+ net/mac802154/{wpan.c => iface.c}             | 6 +++---
+ net/mac802154/llsec.c                         | 4 ++--
+ net/mac802154/mac_cmd.c                       | 6 +++---
+ net/mac802154/{ieee802154_dev.c => main.c}    | 4 ++--
+ net/mac802154/mib.c                           | 4 ++--
+ net/mac802154/monitor.c                       | 6 +++---
+ net/mac802154/rx.c                            | 2 +-
+ net/mac802154/tx.c                            | 4 ++--
+ 26 files changed, 53 insertions(+), 44 deletions(-)
+ rename include/{net => linux}/ieee802154.h (100%)
+ rename include/net/{wpan-phy.h => cfg802154.h} (97%)
+ rename net/ieee802154/{wpan-class.c => core.c} (99%)
+ rename net/mac802154/{mac802154.h => ieee802154_i.h} (98%)
+ rename net/mac802154/{wpan.c => iface.c} (99%)
+ rename net/mac802154/{ieee802154_dev.c => main.c} (99%)
 
-Regards
-
-Marcel
+-- 
+2.1.2
 
