@@ -1,71 +1,79 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from senator.holtmann.net ([87.106.208.187]:32867 "EHLO
-	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751336AbaJZQ0J convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Sun, 26 Oct 2014 12:26:09 -0400
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.0 \(1990.1\))
-Subject: Re: [PATCHv2 bluetooth-next 00/15] ieee802154: rework transmit handling
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1414312635-19396-1-git-send-email-alex.aring@gmail.com>
-Date: Sun, 26 Oct 2014 09:26:03 -0700
-Content-Transfer-Encoding: 8BIT
-Message-Id: <97746F45-6173-41C7-B06D-D903119E5A16@holtmann.org>
-References: <1414312635-19396-1-git-send-email-alex.aring@gmail.com>
+Received: from mail-la0-f44.google.com ([209.85.215.44]:54206 "EHLO
+	mail-la0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751504AbaJZRQY (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Sun, 26 Oct 2014 13:16:24 -0400
+Received: by mail-la0-f44.google.com with SMTP id hs14so4728951lab.31
+        for <linux-wpan@vger.kernel.org>; Sun, 26 Oct 2014 10:16:23 -0700 (PDT)
+From: Alexander Aring <alex.aring@gmail.com>
+Subject: [PATCH bluetooth-next] mac802154: tx: make worker information static
+Date: Sun, 26 Oct 2014 18:15:34 +0100
+Message-Id: <1414343734-7367-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>
-Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de
+To: linux-wpan@vger.kernel.org
+Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-Hi Alex,
+This patch moves the worker information struct out of skb control block.
+Instead control block we declare it static inside of tx.c file. We can do
+that, because the worker can't be used twice at the same time. It's
+protected by stop and wake netdev queue.
 
-> This series contains patches for reworking tx handling.
-> Also add a workaround to hold the xmit context when sending frames.
-> Additional add support for asynchronous xmit handling and change the
-> at86rf230 to do a asynchronous xmit handling.
-> 
-> Moving functions and renaming are necessary for the mac80211 naming
-> convention.
-> 
-> changes since v2:
-> - remove whitespace in PATCH 14/15
->   ("mac802154: tx: add comment at sync xmit callback")
-> 
-> Alexander Aring (15):
->  mac802154: tx: move xmit callback to tx file
->  mac802154: tx: remove kmalloc in xmit hotpath
->  mac802154: tx: squash multiple dereferencing
->  mac802154: tx: remove xmit channel context switch
->  mac802154: add netdev qeue helpers
->  mac802154: tx: use queue helpers in xmit worker
->  mac802154: tx: fix error handling while xmit
->  mac802154: tx: add support for xmit_async callback
->  mac802154: tx: don't allow if down while sync tx
->  mac802154: tx: use netdev print helpers
->  mac802154: tx: cleanup crc calculation
->  mac802154: tx: move stats tx increment
->  mac802154: tx: change naming convention
->  mac802154: tx: add comment at sync xmit callback
->  at86rf230: asynchronous xmit handling
-> 
-> drivers/net/ieee802154/at86rf230.c |  42 +++++------
-> drivers/net/ieee802154/cc2520.c    |   2 +-
-> drivers/net/ieee802154/fakelb.c    |   2 +-
-> drivers/net/ieee802154/mrf24j40.c  |   2 +-
-> include/net/mac802154.h            |  28 +++++--
-> net/mac802154/Makefile             |   2 +-
-> net/mac802154/ieee802154_i.h       |   7 +-
-> net/mac802154/iface.c              |  37 +---------
-> net/mac802154/main.c               |   4 +-
-> net/mac802154/monitor.c            |  29 +-------
-> net/mac802154/tx.c                 | 145 ++++++++++++++++++++++---------------
-> net/mac802154/util.c               |  55 ++++++++++++++
-> 12 files changed, 193 insertions(+), 162 deletions(-)
-> create mode 100644 net/mac802154/util.c
+This patch fix an issue that the "struct ieee802154_xmit_cb" doesn't fit
+into the skb control block on some kernel configuartion reported by
+kbuild test robot.
 
-all 15 patches have been applied to bluetooth-next tree.
+It was introduced by commit fe24371d6645b766c59ec664c59d0a9c310ad455
+("mac802154: tx: remove kmalloc in xmit hotpath").
 
-Regards
+Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+---
+ net/mac802154/tx.c | 17 +++++------------
+ 1 file changed, 5 insertions(+), 12 deletions(-)
 
-Marcel
+diff --git a/net/mac802154/tx.c b/net/mac802154/tx.c
+index 74882c7..fe2e17e 100644
+--- a/net/mac802154/tx.c
++++ b/net/mac802154/tx.c
+@@ -37,13 +37,7 @@ struct ieee802154_xmit_cb {
+ 	struct ieee802154_local *local;
+ };
+ 
+-static inline struct ieee802154_xmit_cb *
+-ieee802154_xmit_cb(const struct sk_buff *skb)
+-{
+-	BUILD_BUG_ON(sizeof(skb->cb) < sizeof(struct ieee802154_xmit_cb));
+-
+-	return (struct ieee802154_xmit_cb *)skb->cb;
+-}
++static struct ieee802154_xmit_cb ieee802154_xmit_cb;
+ 
+ static void ieee802154_xmit_worker(struct work_struct *work)
+ {
+@@ -84,7 +78,6 @@ err_tx:
+ static netdev_tx_t
+ ieee802154_tx(struct ieee802154_local *local, struct sk_buff *skb)
+ {
+-	struct ieee802154_xmit_cb *cb = ieee802154_xmit_cb(skb);
+ 	struct net_device *dev = skb->dev;
+ 	int ret;
+ 
+@@ -113,11 +106,11 @@ ieee802154_tx(struct ieee802154_local *local, struct sk_buff *skb)
+ 		dev->stats.tx_packets++;
+ 		dev->stats.tx_bytes += skb->len;
+ 	} else {
+-		INIT_WORK(&cb->work, ieee802154_xmit_worker);
+-		cb->skb = skb;
+-		cb->local = local;
++		INIT_WORK(&ieee802154_xmit_cb.work, ieee802154_xmit_worker);
++		ieee802154_xmit_cb.skb = skb;
++		ieee802154_xmit_cb.local = local;
+ 
+-		queue_work(local->workqueue, &cb->work);
++		queue_work(local->workqueue, &ieee802154_xmit_cb.work);
+ 	}
+ 
+ 	return NETDEV_TX_OK;
+-- 
+2.1.2
 
