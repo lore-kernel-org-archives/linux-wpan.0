@@ -1,14 +1,14 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-lb0-f181.google.com ([209.85.217.181]:48164 "EHLO
-	mail-lb0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751071AbaJZIha (ORCPT
+Received: from mail-lb0-f173.google.com ([209.85.217.173]:48216 "EHLO
+	mail-lb0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751057AbaJZIha (ORCPT
 	<rfc822;linux-wpan@vger.kernel.org>); Sun, 26 Oct 2014 04:37:30 -0400
-Received: by mail-lb0-f181.google.com with SMTP id l4so4413801lbv.12
-        for <linux-wpan@vger.kernel.org>; Sun, 26 Oct 2014 01:37:28 -0700 (PDT)
+Received: by mail-lb0-f173.google.com with SMTP id 10so4320637lbg.4
+        for <linux-wpan@vger.kernel.org>; Sun, 26 Oct 2014 01:37:29 -0700 (PDT)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCHv2 bluetooth-next 04/15] mac802154: tx: remove xmit channel context switch
-Date: Sun, 26 Oct 2014 09:37:04 +0100
-Message-Id: <1414312635-19396-5-git-send-email-alex.aring@gmail.com>
+Subject: [PATCHv2 bluetooth-next 05/15] mac802154: add netdev qeue helpers
+Date: Sun, 26 Oct 2014 09:37:05 +0100
+Message-Id: <1414312635-19396-6-git-send-email-alex.aring@gmail.com>
 In-Reply-To: <1414312635-19396-1-git-send-email-alex.aring@gmail.com>
 References: <1414312635-19396-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
@@ -16,159 +16,104 @@ List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
 Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-This patch removes the channel hopping feature before xmit. There are
-several issues to provide a real channel hopping (timing requirements,
-etc...).
-
-We don't have any known kernelspace protocol which really use this
-feature. And I don't know an real user of this feature.
-We simply drop this feature now.
-
-This patch removes also the hold of pib lock which isn't needed by any
-real driver xmit callback implementation.
+This patch adds a new file net/mac802154/util.c which contains utility
+functions for drivers, etc. This file contains functions to start and
+stop queues for all virtual interfaces, this is useful for asynchronous
+handling by driver level.
 
 Signed-off-by: Alexander Aring <alex.aring@gmail.com>
 ---
- include/net/mac802154.h |  3 +--
- net/mac802154/tx.c      | 58 ++++---------------------------------------------
- 2 files changed, 5 insertions(+), 56 deletions(-)
+ include/net/mac802154.h |  4 ++++
+ net/mac802154/Makefile  |  2 +-
+ net/mac802154/util.c    | 55 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 60 insertions(+), 1 deletion(-)
+ create mode 100644 net/mac802154/util.c
 
 diff --git a/include/net/mac802154.h b/include/net/mac802154.h
-index b07d431..ba8ddff 100644
+index ba8ddff..29af5c3 100644
 --- a/include/net/mac802154.h
 +++ b/include/net/mac802154.h
-@@ -113,8 +113,7 @@ struct ieee802154_hw {
-  *	  skb cntains the buffer starting from the IEEE 802.15.4 header.
-  *	  The low-level driver should send the frame based on available
-  *	  configuration.
-- *	  This function should return zero or negative errno. Called with
-- *	  pib_lock held.
-+ *	  This function should return zero or negative errno.
-  *
-  * ed:    Handler that 802.15.4 module calls for Energy Detection.
-  *	  This function should place the value for detected energy
-diff --git a/net/mac802154/tx.c b/net/mac802154/tx.c
-index d0ceb46..be8deae 100644
---- a/net/mac802154/tx.c
-+++ b/net/mac802154/tx.c
-@@ -34,8 +34,6 @@ struct wpan_xmit_cb {
- 	struct sk_buff *skb;
- 	struct work_struct work;
- 	struct ieee802154_local *local;
--	u8 chan;
--	u8 page;
- };
+@@ -190,4 +190,8 @@ void ieee802154_unregister_hw(struct ieee802154_hw *hw);
+ void ieee802154_rx_irqsafe(struct ieee802154_hw *hw, struct sk_buff *skb,
+ 			   u8 lqi);
  
- static inline struct wpan_xmit_cb *wpan_xmit_cb(const struct sk_buff *skb)
-@@ -53,26 +51,10 @@ static void mac802154_xmit_worker(struct work_struct *work)
- 	struct sk_buff *skb = cb->skb;
- 	int res;
++void ieee802154_wake_queue(struct ieee802154_hw *hw);
++void ieee802154_stop_queue(struct ieee802154_hw *hw);
++void ieee802154_xmit_complete(struct ieee802154_hw *hw, struct sk_buff *skb);
++
+ #endif /* NET_MAC802154_H */
+diff --git a/net/mac802154/Makefile b/net/mac802154/Makefile
+index 203f42d..e68deba 100644
+--- a/net/mac802154/Makefile
++++ b/net/mac802154/Makefile
+@@ -1,5 +1,5 @@
+ obj-$(CONFIG_MAC802154)	+= mac802154.o
+ mac802154-objs		:= main.o rx.o tx.o mac_cmd.o mib.o \
+-			   monitor.o iface.o llsec.o
++			   monitor.o iface.o llsec.o util.o
  
--	mutex_lock(&local->phy->pib_lock);
--	if (local->phy->current_channel != cb->chan ||
--	    local->phy->current_page != cb->page) {
--		res = local->ops->set_channel(&local->hw, cb->page, cb->chan);
--		if (res) {
--			pr_debug("set_channel failed\n");
--			goto out;
--		}
--
--		local->phy->current_channel = cb->chan;
--		local->phy->current_page = cb->page;
--	}
--
- 	res = local->ops->xmit(&local->hw, skb);
- 	if (res)
- 		pr_debug("transmission failed\n");
- 
--out:
--	mutex_unlock(&local->phy->pib_lock);
--
- 	/* Restart the netif queue on each sub_if_data object. */
- 	rcu_read_lock();
- 	list_for_each_entry_rcu(sdata, &local->interfaces, list)
-@@ -82,17 +64,12 @@ out:
- 	dev_kfree_skb(skb);
- }
- 
--static netdev_tx_t mac802154_tx(struct ieee802154_local *local,
--				struct sk_buff *skb, u8 page, u8 chan)
-+static netdev_tx_t
-+mac802154_tx(struct ieee802154_local *local, struct sk_buff *skb)
- {
- 	struct ieee802154_sub_if_data *sdata;
- 	struct wpan_xmit_cb *cb = wpan_xmit_cb(skb);
- 
--	if (!(local->phy->channels_supported[page] & (1 << chan))) {
--		WARN_ON(1);
--		goto err_tx;
--	}
--
- 	mac802154_monitors_rx(local, skb);
- 
- 	if (!(local->hw.flags & IEEE802154_HW_OMIT_CKSUM)) {
-@@ -115,8 +92,6 @@ static netdev_tx_t mac802154_tx(struct ieee802154_local *local,
- 	INIT_WORK(&cb->work, mac802154_xmit_worker);
- 	cb->skb = skb;
- 	cb->local = local;
--	cb->page = page;
--	cb->chan = chan;
- 
- 	queue_work(local->workqueue, &cb->work);
- 
-@@ -130,44 +105,19 @@ err_tx:
- netdev_tx_t mac802154_monitor_xmit(struct sk_buff *skb, struct net_device *dev)
- {
- 	struct ieee802154_sub_if_data *sdata = IEEE802154_DEV_TO_SUB_IF(dev);
--	u8 chan, page;
--
--	/* FIXME: locking */
--	chan = sdata->local->phy->current_channel;
--	page = sdata->local->phy->current_page;
--
--	if (chan == MAC802154_CHAN_NONE) /* not initialized */
--		return NETDEV_TX_OK;
--
--	if (WARN_ON(page >= WPAN_NUM_PAGES) ||
--	    WARN_ON(chan >= WPAN_NUM_CHANNELS))
--		return NETDEV_TX_OK;
- 
- 	skb->skb_iif = dev->ifindex;
- 	dev->stats.tx_packets++;
- 	dev->stats.tx_bytes += skb->len;
- 
--	return mac802154_tx(sdata->local, skb, page, chan);
-+	return mac802154_tx(sdata->local, skb);
- }
- 
- netdev_tx_t mac802154_wpan_xmit(struct sk_buff *skb, struct net_device *dev)
- {
- 	struct ieee802154_sub_if_data *sdata = IEEE802154_DEV_TO_SUB_IF(dev);
--	u8 chan, page;
- 	int rc;
- 
--	spin_lock_bh(&sdata->mib_lock);
--	chan = sdata->chan;
--	page = sdata->page;
--	spin_unlock_bh(&sdata->mib_lock);
--
--	if (chan == MAC802154_CHAN_NONE ||
--	    page >= WPAN_NUM_PAGES ||
--	    chan >= WPAN_NUM_CHANNELS) {
--		kfree_skb(skb);
--		return NETDEV_TX_OK;
--	}
--
- 	rc = mac802154_llsec_encrypt(&sdata->sec, skb);
- 	if (rc) {
- 		pr_warn("encryption failed: %i\n", rc);
-@@ -179,5 +129,5 @@ netdev_tx_t mac802154_wpan_xmit(struct sk_buff *skb, struct net_device *dev)
- 	dev->stats.tx_packets++;
- 	dev->stats.tx_bytes += skb->len;
- 
--	return mac802154_tx(sdata->local, skb, page, chan);
-+	return mac802154_tx(sdata->local, skb);
- }
+ ccflags-y += -D__CHECK_ENDIAN__
+diff --git a/net/mac802154/util.c b/net/mac802154/util.c
+new file mode 100644
+index 0000000..117e4ef
+--- /dev/null
++++ b/net/mac802154/util.c
+@@ -0,0 +1,55 @@
++/* This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2
++ * as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * Authors:
++ * Alexander Aring <aar@pengutronix.de>
++ *
++ * Based on: net/mac80211/util.c
++ */
++
++#include "ieee802154_i.h"
++
++void ieee802154_wake_queue(struct ieee802154_hw *hw)
++{
++	struct ieee802154_local *local = hw_to_local(hw);
++	struct ieee802154_sub_if_data *sdata;
++
++	rcu_read_lock();
++	list_for_each_entry_rcu(sdata, &local->interfaces, list) {
++		if (!sdata->dev)
++			continue;
++
++		netif_wake_queue(sdata->dev);
++	}
++	rcu_read_unlock();
++}
++EXPORT_SYMBOL(ieee802154_wake_queue);
++
++void ieee802154_stop_queue(struct ieee802154_hw *hw)
++{
++	struct ieee802154_local *local = hw_to_local(hw);
++	struct ieee802154_sub_if_data *sdata;
++
++	rcu_read_lock();
++	list_for_each_entry_rcu(sdata, &local->interfaces, list) {
++		if (!sdata->dev)
++			continue;
++
++		netif_stop_queue(sdata->dev);
++	}
++	rcu_read_unlock();
++}
++EXPORT_SYMBOL(ieee802154_stop_queue);
++
++void ieee802154_xmit_complete(struct ieee802154_hw *hw, struct sk_buff *skb)
++{
++	ieee802154_wake_queue(hw);
++	consume_skb(skb);
++}
++EXPORT_SYMBOL(ieee802154_xmit_complete);
 -- 
 2.1.2
 
