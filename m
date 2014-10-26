@@ -1,14 +1,14 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-lb0-f169.google.com ([209.85.217.169]:43894 "EHLO
-	mail-lb0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751213AbaJZIQy (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Sun, 26 Oct 2014 04:16:54 -0400
-Received: by mail-lb0-f169.google.com with SMTP id 10so4296164lbg.14
-        for <linux-wpan@vger.kernel.org>; Sun, 26 Oct 2014 01:16:52 -0700 (PDT)
+Received: from mail-lb0-f175.google.com ([209.85.217.175]:61653 "EHLO
+	mail-lb0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751191AbaJZIQz (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Sun, 26 Oct 2014 04:16:55 -0400
+Received: by mail-lb0-f175.google.com with SMTP id u10so4399745lbd.34
+        for <linux-wpan@vger.kernel.org>; Sun, 26 Oct 2014 01:16:54 -0700 (PDT)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH bluetooth-next 11/15] mac802154: tx: cleanup crc calculation
-Date: Sun, 26 Oct 2014 09:15:48 +0100
-Message-Id: <1414311352-908-12-git-send-email-alex.aring@gmail.com>
+Subject: [PATCH bluetooth-next 12/15] mac802154: tx: move stats tx increment
+Date: Sun, 26 Oct 2014 09:15:49 +0100
+Message-Id: <1414311352-908-13-git-send-email-alex.aring@gmail.com>
 In-Reply-To: <1414311352-908-1-git-send-email-alex.aring@gmail.com>
 References: <1414311352-908-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
@@ -16,29 +16,87 @@ List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
 Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
+This patch moves the stats increment of successful transmitted packets
+in the right place when the skb was really successful transmitted.
+
 Signed-off-by: Alexander Aring <alex.aring@gmail.com>
 ---
- net/mac802154/tx.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ net/mac802154/tx.c | 16 ++++++++++------
+ 1 file changed, 10 insertions(+), 6 deletions(-)
 
 diff --git a/net/mac802154/tx.c b/net/mac802154/tx.c
-index d39c7d9..70fd226 100644
+index 70fd226..fe105d4 100644
 --- a/net/mac802154/tx.c
 +++ b/net/mac802154/tx.c
-@@ -84,11 +84,9 @@ mac802154_tx(struct ieee802154_local *local, struct sk_buff *skb)
+@@ -49,12 +49,13 @@ static void mac802154_xmit_worker(struct work_struct *work)
+ 	struct wpan_xmit_cb *cb = container_of(work, struct wpan_xmit_cb, work);
+ 	struct ieee802154_local *local = cb->local;
+ 	struct sk_buff *skb = cb->skb;
++	struct net_device *dev = skb->dev;
+ 	int res;
+ 
+ 	rtnl_lock();
+ 
+ 	/* check if ifdown occurred while schedule */
+-	if (!netif_running(skb->dev))
++	if (!netif_running(dev))
+ 		goto err_tx;
+ 
+ 	res = local->ops->xmit_sync(&local->hw, skb);
+@@ -63,6 +64,9 @@ static void mac802154_xmit_worker(struct work_struct *work)
+ 
+ 	ieee802154_xmit_complete(&local->hw, skb);
+ 
++	dev->stats.tx_packets++;
++	dev->stats.tx_bytes += skb->len;
++
+ 	rtnl_unlock();
+ 
+ 	return;
+@@ -72,13 +76,14 @@ err_tx:
+ 	ieee802154_wake_queue(&local->hw);
+ 	rtnl_unlock();
+ 	kfree_skb(skb);
+-	netdev_dbg(skb->dev, "transmission failed\n");
++	netdev_dbg(dev, "transmission failed\n");
+ }
+ 
+ static netdev_tx_t
+ mac802154_tx(struct ieee802154_local *local, struct sk_buff *skb)
+ {
+ 	struct wpan_xmit_cb *cb = wpan_xmit_cb(skb);
++	struct net_device *dev = skb->dev;
+ 	int ret;
+ 
  	mac802154_monitors_rx(local, skb);
+@@ -102,6 +107,9 @@ mac802154_tx(struct ieee802154_local *local, struct sk_buff *skb)
+ 			ieee802154_wake_queue(&local->hw);
+ 			goto err_tx;
+ 		}
++
++		dev->stats.tx_packets++;
++		dev->stats.tx_bytes += skb->len;
+ 	} else {
+ 		INIT_WORK(&cb->work, mac802154_xmit_worker);
+ 		cb->skb = skb;
+@@ -122,8 +130,6 @@ netdev_tx_t mac802154_monitor_xmit(struct sk_buff *skb, struct net_device *dev)
+ 	struct ieee802154_sub_if_data *sdata = IEEE802154_DEV_TO_SUB_IF(dev);
  
- 	if (!(local->hw.flags & IEEE802154_HW_OMIT_CKSUM)) {
--		u16 crc = crc_ccitt(0, skb->data, skb->len);
--		u8 *data = skb_put(skb, 2);
-+		__le16 crc = cpu_to_le16(crc_ccitt(0, skb->data, skb->len));
+ 	skb->skb_iif = dev->ifindex;
+-	dev->stats.tx_packets++;
+-	dev->stats.tx_bytes += skb->len;
  
--		data[0] = crc & 0xff;
--		data[1] = crc >> 8;
-+		memcpy(skb_put(skb, 2), &crc, 2);
+ 	return mac802154_tx(sdata->local, skb);
+ }
+@@ -141,8 +147,6 @@ netdev_tx_t mac802154_wpan_xmit(struct sk_buff *skb, struct net_device *dev)
  	}
  
- 	if (skb_cow_head(skb, local->hw.extra_tx_headroom))
+ 	skb->skb_iif = dev->ifindex;
+-	dev->stats.tx_packets++;
+-	dev->stats.tx_bytes += skb->len;
+ 
+ 	return mac802154_tx(sdata->local, skb);
+ }
 -- 
 2.1.2
 
