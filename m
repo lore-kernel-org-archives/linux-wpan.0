@@ -1,14 +1,14 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-la0-f51.google.com ([209.85.215.51]:62009 "EHLO
-	mail-la0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751108AbaJZIQs (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Sun, 26 Oct 2014 04:16:48 -0400
-Received: by mail-la0-f51.google.com with SMTP id q1so1279767lam.10
-        for <linux-wpan@vger.kernel.org>; Sun, 26 Oct 2014 01:16:46 -0700 (PDT)
+Received: from mail-la0-f46.google.com ([209.85.215.46]:44887 "EHLO
+	mail-la0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750907AbaJZIQt (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Sun, 26 Oct 2014 04:16:49 -0400
+Received: by mail-la0-f46.google.com with SMTP id gi9so4505137lab.33
+        for <linux-wpan@vger.kernel.org>; Sun, 26 Oct 2014 01:16:47 -0700 (PDT)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH bluetooth-next 05/15] mac802154: add netdev qeue helpers
-Date: Sun, 26 Oct 2014 09:15:42 +0100
-Message-Id: <1414311352-908-6-git-send-email-alex.aring@gmail.com>
+Subject: [PATCH bluetooth-next 06/15] mac802154: tx: use queue helpers in xmit worker
+Date: Sun, 26 Oct 2014 09:15:43 +0100
+Message-Id: <1414311352-908-7-git-send-email-alex.aring@gmail.com>
 In-Reply-To: <1414311352-908-1-git-send-email-alex.aring@gmail.com>
 References: <1414311352-908-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
@@ -16,104 +16,58 @@ List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
 Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-This patch adds a new file net/mac802154/util.c which contains utility
-functions for drivers, etc. This file contains functions to start and
-stop queues for all virtual interfaces, this is useful for asynchronous
-handling by driver level.
+This patch uses the queue utility helpers inside the xmit worker of
+mac802154 subsystem.
 
 Signed-off-by: Alexander Aring <alex.aring@gmail.com>
 ---
- include/net/mac802154.h |  4 ++++
- net/mac802154/Makefile  |  2 +-
- net/mac802154/util.c    | 55 +++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 60 insertions(+), 1 deletion(-)
- create mode 100644 net/mac802154/util.c
+ net/mac802154/tx.c | 14 ++------------
+ 1 file changed, 2 insertions(+), 12 deletions(-)
 
-diff --git a/include/net/mac802154.h b/include/net/mac802154.h
-index ba8ddff..29af5c3 100644
---- a/include/net/mac802154.h
-+++ b/include/net/mac802154.h
-@@ -190,4 +190,8 @@ void ieee802154_unregister_hw(struct ieee802154_hw *hw);
- void ieee802154_rx_irqsafe(struct ieee802154_hw *hw, struct sk_buff *skb,
- 			   u8 lqi);
+diff --git a/net/mac802154/tx.c b/net/mac802154/tx.c
+index be8deae..8e2f429 100644
+--- a/net/mac802154/tx.c
++++ b/net/mac802154/tx.c
+@@ -47,7 +47,6 @@ static void mac802154_xmit_worker(struct work_struct *work)
+ {
+ 	struct wpan_xmit_cb *cb = container_of(work, struct wpan_xmit_cb, work);
+ 	struct ieee802154_local *local = cb->local;
+-	struct ieee802154_sub_if_data *sdata;
+ 	struct sk_buff *skb = cb->skb;
+ 	int res;
  
-+void ieee802154_wake_queue(struct ieee802154_hw *hw);
-+void ieee802154_stop_queue(struct ieee802154_hw *hw);
-+void ieee802154_xmit_complete(struct ieee802154_hw *hw, struct sk_buff *skb);
-+
- #endif /* NET_MAC802154_H */
-diff --git a/net/mac802154/Makefile b/net/mac802154/Makefile
-index 203f42d..e68deba 100644
---- a/net/mac802154/Makefile
-+++ b/net/mac802154/Makefile
-@@ -1,5 +1,5 @@
- obj-$(CONFIG_MAC802154)	+= mac802154.o
- mac802154-objs		:= main.o rx.o tx.o mac_cmd.o mib.o \
--			   monitor.o iface.o llsec.o
-+			   monitor.o iface.o llsec.o util.o
+@@ -56,18 +55,12 @@ static void mac802154_xmit_worker(struct work_struct *work)
+ 		pr_debug("transmission failed\n");
  
- ccflags-y += -D__CHECK_ENDIAN__
-diff --git a/net/mac802154/util.c b/net/mac802154/util.c
-new file mode 100644
-index 0000000..117e4ef
---- /dev/null
-+++ b/net/mac802154/util.c
-@@ -0,0 +1,55 @@
-+/* This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2
-+ * as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * Authors:
-+ * Alexander Aring <aar@pengutronix.de>
-+ *
-+ * Based on: net/mac80211/util.c
-+ */
-+
-+#include "ieee802154_i.h"
-+
-+void ieee802154_wake_queue(struct ieee802154_hw *hw)
-+{
-+	struct ieee802154_local *local = hw_to_local(hw);
-+	struct ieee802154_sub_if_data *sdata;
-+
-+	rcu_read_lock();
-+	list_for_each_entry_rcu(sdata, &local->interfaces, list) {
-+		if (!sdata->dev)
-+			continue;
-+
-+		netif_wake_queue(sdata->dev);
-+	}
-+	rcu_read_unlock();
-+}
-+EXPORT_SYMBOL(ieee802154_wake_queue);
-+
-+void ieee802154_stop_queue(struct ieee802154_hw *hw)
-+{
-+	struct ieee802154_local *local = hw_to_local(hw);
-+	struct ieee802154_sub_if_data *sdata;
-+
-+	rcu_read_lock();
-+	list_for_each_entry_rcu(sdata, &local->interfaces, list) {
-+		if (!sdata->dev)
-+			continue;
-+
-+		netif_stop_queue(sdata->dev);
-+	}
-+	rcu_read_unlock();
-+}
-+EXPORT_SYMBOL(ieee802154_stop_queue);
-+
-+void ieee802154_xmit_complete(struct ieee802154_hw *hw, struct sk_buff *skb)
-+{
-+	ieee802154_wake_queue(hw);
-+	consume_skb(skb);
-+}
-+EXPORT_SYMBOL(ieee802154_xmit_complete);
+ 	/* Restart the netif queue on each sub_if_data object. */
+-	rcu_read_lock();
+-	list_for_each_entry_rcu(sdata, &local->interfaces, list)
+-		netif_wake_queue(sdata->dev);
+-	rcu_read_unlock();
+-
+-	dev_kfree_skb(skb);
++	ieee802154_xmit_complete(&local->hw, skb);
+ }
+ 
+ static netdev_tx_t
+ mac802154_tx(struct ieee802154_local *local, struct sk_buff *skb)
+ {
+-	struct ieee802154_sub_if_data *sdata;
+ 	struct wpan_xmit_cb *cb = wpan_xmit_cb(skb);
+ 
+ 	mac802154_monitors_rx(local, skb);
+@@ -84,10 +77,7 @@ mac802154_tx(struct ieee802154_local *local, struct sk_buff *skb)
+ 		goto err_tx;
+ 
+ 	/* Stop the netif queue on each sub_if_data object. */
+-	rcu_read_lock();
+-	list_for_each_entry_rcu(sdata, &local->interfaces, list)
+-		netif_stop_queue(sdata->dev);
+-	rcu_read_unlock();
++	ieee802154_stop_queue(&local->hw);
+ 
+ 	INIT_WORK(&cb->work, mac802154_xmit_worker);
+ 	cb->skb = skb;
 -- 
 2.1.2
 
