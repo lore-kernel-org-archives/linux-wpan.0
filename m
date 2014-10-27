@@ -1,14 +1,14 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wg0-f42.google.com ([74.125.82.42]:38097 "EHLO
-	mail-wg0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752467AbaJ0QOP (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Mon, 27 Oct 2014 12:14:15 -0400
-Received: by mail-wg0-f42.google.com with SMTP id k14so4108171wgh.25
-        for <linux-wpan@vger.kernel.org>; Mon, 27 Oct 2014 09:14:14 -0700 (PDT)
+Received: from mail-wi0-f178.google.com ([209.85.212.178]:35848 "EHLO
+	mail-wi0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752538AbaJ0QOQ (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Mon, 27 Oct 2014 12:14:16 -0400
+Received: by mail-wi0-f178.google.com with SMTP id q5so6926815wiv.11
+        for <linux-wpan@vger.kernel.org>; Mon, 27 Oct 2014 09:14:15 -0700 (PDT)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCHv2 bluetooth-next 06/16] mac802154: tx: remove monitor receive while xmit
-Date: Mon, 27 Oct 2014 17:13:33 +0100
-Message-Id: <1414426423-24856-7-git-send-email-alex.aring@gmail.com>
+Subject: [PATCHv2 bluetooth-next 07/16] mac802154: rx: rename remove mac802154_subif_rx
+Date: Mon, 27 Oct 2014 17:13:34 +0100
+Message-Id: <1414426423-24856-8-git-send-email-alex.aring@gmail.com>
 In-Reply-To: <1414426423-24856-1-git-send-email-alex.aring@gmail.com>
 References: <1414426423-24856-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
@@ -16,61 +16,48 @@ List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
 Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-This removes the call of monitor receive funktion when any interface
-type call xmit. There exist no such use case that a monitor interface
-should receive the actual sending frame. One use case could be that a
-wpan interface and monitor interface could be running at the same time
-on one phy. Then the monitor interface receives the wpan frames also.
-Furthermore we adding support for promiscous mode setting. With
-promiscous mode setting we can't run a wpan and monitor interface at the
-same time.
+This patch removes the mac802154_subif_rx function and do the necessary
+calls inside of ieee802154_rx function. The ieee802154_rx is small
+enough to move the functionality inside this function.
 
 Signed-off-by: Alexander Aring <alex.aring@gmail.com>
 ---
- net/mac802154/ieee802154_i.h | 1 -
- net/mac802154/rx.c           | 3 ++-
- net/mac802154/tx.c           | 2 --
- 3 files changed, 2 insertions(+), 4 deletions(-)
+ net/mac802154/rx.c | 12 +++---------
+ 1 file changed, 3 insertions(+), 9 deletions(-)
 
-diff --git a/net/mac802154/ieee802154_i.h b/net/mac802154/ieee802154_i.h
-index be2f2f6..ac907d9 100644
---- a/net/mac802154/ieee802154_i.h
-+++ b/net/mac802154/ieee802154_i.h
-@@ -126,7 +126,6 @@ extern struct ieee802154_mlme_ops mac802154_mlme_wpan;
- int mac802154_slave_open(struct net_device *dev);
- int mac802154_slave_close(struct net_device *dev);
- 
--void mac802154_monitors_rx(struct ieee802154_local *local, struct sk_buff *skb);
- void mac802154_monitor_setup(struct net_device *dev);
- netdev_tx_t
- ieee802154_monitor_start_xmit(struct sk_buff *skb, struct net_device *dev);
 diff --git a/net/mac802154/rx.c b/net/mac802154/rx.c
-index d8498c5..04f3d61 100644
+index 04f3d61..246a60e 100644
 --- a/net/mac802154/rx.c
 +++ b/net/mac802154/rx.c
-@@ -216,7 +216,8 @@ mac802154_wpans_rx(struct ieee802154_local *local, struct sk_buff *skb)
- 		kfree_skb(skb);
+@@ -242,11 +242,12 @@ mac802154_monitors_rx(struct ieee802154_local *local, struct sk_buff *skb)
+ 	rcu_read_unlock();
  }
  
--void mac802154_monitors_rx(struct ieee802154_local *local, struct sk_buff *skb)
-+static void
-+mac802154_monitors_rx(struct ieee802154_local *local, struct sk_buff *skb)
+-static void
+-mac802154_subif_rx(struct ieee802154_hw *hw, struct sk_buff *skb)
++void ieee802154_rx(struct ieee802154_hw *hw, struct sk_buff *skb)
  {
- 	struct sk_buff *skb2;
- 	struct ieee802154_sub_if_data *sdata;
-diff --git a/net/mac802154/tx.c b/net/mac802154/tx.c
-index 31e51e4..e857673 100644
---- a/net/mac802154/tx.c
-+++ b/net/mac802154/tx.c
-@@ -82,8 +82,6 @@ ieee802154_tx(struct ieee802154_local *local, struct sk_buff *skb)
- 	struct net_device *dev = skb->dev;
- 	int ret;
+ 	struct ieee802154_local *local = hw_to_local(hw);
  
--	mac802154_monitors_rx(local, skb);
++	WARN_ON_ONCE(softirq_count() == 0);
++
+ 	skb->protocol = htons(ETH_P_IEEE802154);
+ 	skb_reset_mac_header(skb);
+ 
+@@ -273,13 +274,6 @@ mac802154_subif_rx(struct ieee802154_hw *hw, struct sk_buff *skb)
+ fail:
+ 	kfree_skb(skb);
+ }
 -
- 	if (!(local->hw.flags & IEEE802154_HW_OMIT_CKSUM)) {
- 		u16 crc = crc_ccitt(0, skb->data, skb->len);
+-void ieee802154_rx(struct ieee802154_hw *hw, struct sk_buff *skb)
+-{
+-	WARN_ON_ONCE(softirq_count() == 0);
+-
+-	mac802154_subif_rx(hw, skb);
+-}
+ EXPORT_SYMBOL(ieee802154_rx);
  
+ void
 -- 
 2.1.2
 
