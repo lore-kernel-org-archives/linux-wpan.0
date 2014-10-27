@@ -1,55 +1,73 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f175.google.com ([209.85.212.175]:50033 "EHLO
-	mail-wi0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753635AbaJ0QOJ (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Mon, 27 Oct 2014 12:14:09 -0400
-Received: by mail-wi0-f175.google.com with SMTP id h11so4852021wiw.8
-        for <linux-wpan@vger.kernel.org>; Mon, 27 Oct 2014 09:14:08 -0700 (PDT)
+Received: from mail-wi0-f173.google.com ([209.85.212.173]:55087 "EHLO
+	mail-wi0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752442AbaJ0QOL (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Mon, 27 Oct 2014 12:14:11 -0400
+Received: by mail-wi0-f173.google.com with SMTP id ex7so6856966wid.6
+        for <linux-wpan@vger.kernel.org>; Mon, 27 Oct 2014 09:14:10 -0700 (PDT)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCHv2 bluetooth-next 01/16] mac802154: tx: use put_unaligned_le16 for copy crc
-Date: Mon, 27 Oct 2014 17:13:28 +0100
-Message-Id: <1414426423-24856-2-git-send-email-alex.aring@gmail.com>
+Subject: [PATCHv2 bluetooth-next 02/16] ieee802154: drivers: use dev_alloc_skb
+Date: Mon, 27 Oct 2014 17:13:29 +0100
+Message-Id: <1414426423-24856-3-git-send-email-alex.aring@gmail.com>
 In-Reply-To: <1414426423-24856-1-git-send-email-alex.aring@gmail.com>
 References: <1414426423-24856-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
-Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
+Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>, Alan Ott <alan@signal11.us>
 
-This patch replaces the memcpy with a put_unaligned_le16. The placement
-of crc inside of PSDU can also be unaligned. With memcpy this can fail
-on some architectures.
+This patch change the allocation of skb inside the ieee802154 driver
+layer to dev_alloc_skb. This changes also the gfp mask to GFP_ATOMIC
+which is needed for upcomming change that the receiving is done by a
+tasklet and not a workqueue anymore.
 
 Signed-off-by: Alexander Aring <alex.aring@gmail.com>
-Reported-by: Marcel Holtmann <marcel@holtmann.org>
+Cc: Alan Ott <alan@signal11.us>
 ---
- net/mac802154/tx.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ drivers/net/ieee802154/at86rf230.c | 2 +-
+ drivers/net/ieee802154/cc2520.c    | 2 +-
+ drivers/net/ieee802154/mrf24j40.c  | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/net/mac802154/tx.c b/net/mac802154/tx.c
-index fe2e17e..31e51e4 100644
---- a/net/mac802154/tx.c
-+++ b/net/mac802154/tx.c
-@@ -20,6 +20,7 @@
- #include <linux/netdevice.h>
- #include <linux/if_arp.h>
- #include <linux/crc-ccitt.h>
-+#include <asm/unaligned.h>
+diff --git a/drivers/net/ieee802154/at86rf230.c b/drivers/net/ieee802154/at86rf230.c
+index 0669783..e4fbcaa 100644
+--- a/drivers/net/ieee802154/at86rf230.c
++++ b/drivers/net/ieee802154/at86rf230.c
+@@ -811,7 +811,7 @@ at86rf230_rx(struct at86rf230_local *lp,
+ 	memcpy(rx_local_buf, data, len);
+ 	enable_irq(lp->spi->irq);
  
- #include <net/rtnetlink.h>
- #include <net/ieee802154_netdev.h>
-@@ -84,9 +85,9 @@ ieee802154_tx(struct ieee802154_local *local, struct sk_buff *skb)
- 	mac802154_monitors_rx(local, skb);
+-	skb = alloc_skb(IEEE802154_MTU, GFP_ATOMIC);
++	skb = dev_alloc_skb(IEEE802154_MTU);
+ 	if (!skb) {
+ 		dev_vdbg(&lp->spi->dev, "failed to allocate sk_buff\n");
+ 		return;
+diff --git a/drivers/net/ieee802154/cc2520.c b/drivers/net/ieee802154/cc2520.c
+index f6f07f4..a31b5b6 100644
+--- a/drivers/net/ieee802154/cc2520.c
++++ b/drivers/net/ieee802154/cc2520.c
+@@ -524,7 +524,7 @@ static int cc2520_rx(struct cc2520_private *priv)
+ 	if (len < 2 || len > IEEE802154_MTU)
+ 		return -EINVAL;
  
- 	if (!(local->hw.flags & IEEE802154_HW_OMIT_CKSUM)) {
--		__le16 crc = cpu_to_le16(crc_ccitt(0, skb->data, skb->len));
-+		u16 crc = crc_ccitt(0, skb->data, skb->len);
+-	skb = alloc_skb(len, GFP_KERNEL);
++	skb = dev_alloc_skb(len);
+ 	if (!skb)
+ 		return -ENOMEM;
  
--		memcpy(skb_put(skb, 2), &crc, 2);
-+		put_unaligned_le16(crc, skb_put(skb, 2));
- 	}
+diff --git a/drivers/net/ieee802154/mrf24j40.c b/drivers/net/ieee802154/mrf24j40.c
+index 3d775af..7abb237 100644
+--- a/drivers/net/ieee802154/mrf24j40.c
++++ b/drivers/net/ieee802154/mrf24j40.c
+@@ -544,7 +544,7 @@ static int mrf24j40_handle_rx(struct mrf24j40 *devrec)
+ 	val |= 4; /* SET RXDECINV */
+ 	write_short_reg(devrec, REG_BBREG1, val);
  
- 	if (skb_cow_head(skb, local->hw.extra_tx_headroom))
+-	skb = alloc_skb(len, GFP_KERNEL);
++	skb = dev_alloc_skb(len);
+ 	if (!skb) {
+ 		ret = -ENOMEM;
+ 		goto out;
 -- 
 2.1.2
 
