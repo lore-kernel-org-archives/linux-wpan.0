@@ -1,143 +1,78 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wg0-f51.google.com ([74.125.82.51]:34887 "EHLO
-	mail-wg0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751646AbaJ0QO0 (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Mon, 27 Oct 2014 12:14:26 -0400
-Received: by mail-wg0-f51.google.com with SMTP id b13so6070193wgh.10
-        for <linux-wpan@vger.kernel.org>; Mon, 27 Oct 2014 09:14:25 -0700 (PDT)
-From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCHv2 bluetooth-next 16/16] mac802154: rx: change naming convention
-Date: Mon, 27 Oct 2014 17:13:43 +0100
-Message-Id: <1414426423-24856-17-git-send-email-alex.aring@gmail.com>
+Received: from senator.holtmann.net ([87.106.208.187]:49807 "EHLO
+	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750707AbaJ0RMz convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Mon, 27 Oct 2014 13:12:55 -0400
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.0 \(1990.1\))
+Subject: Re: [PATCHv2 bluetooth-next 00/16] ieee802154: rework receive handling
+From: Marcel Holtmann <marcel@holtmann.org>
 In-Reply-To: <1414426423-24856-1-git-send-email-alex.aring@gmail.com>
+Date: Mon, 27 Oct 2014 10:11:41 -0700
+Content-Transfer-Encoding: 8BIT
+Message-Id: <58EC006E-0390-4A83-8672-4AFECE114C48@holtmann.org>
 References: <1414426423-24856-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org
-Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
+To: Alexander Aring <alex.aring@gmail.com>
+Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de
 
-This patch changes the naming convention of mac802154 rx file. It should
-be more named like mac80211 stack. Furthermore we introduce a new frame
-parsing implementation which is much similar the mac80211
-implementation.
+Hi Alex,
 
-Signed-off-by: Alexander Aring <alex.aring@gmail.com>
----
- net/mac802154/rx.c | 33 +++++++++++++++++----------------
- 1 file changed, 17 insertions(+), 16 deletions(-)
+> This patch serie improves and cleanups the receive handling.
+> Instead workqueue we use a tasklet now for parsing frames.
+> The first patch is a fix for using put_unaligned_le16 to copy
+> checksum in skb data which was reported by Marcel Holtmann.
+> 
+> Other patches are cleanups for preparing further patches to
+> introduce a frame parsing like mac80211. We don't change
+> the printout function to netdev_foo now because the most
+> code will be replaced by the new frame parsing implementation.
+> 
+> changes since v2:
+> - correct ieee802154 instead ieee80211 in patch 04/16 ("mac802154: rx:
+>   document ieee802154_rx() context requirement")
+> - reword complete commit message of patch 04/16 ("mac802154: rx: document
+>   ieee802154_rx() context requirement")
+> - fix && instead || in patch 13/16 ("ieee802154: add valid psdu length helper")
+> - make patch 13/16 ("ieee802154: add valid psdu length helper") more human
+>   readable to check start at first end then end interval. Instead end <-> start
+>   checking.
+> 
+> Alexander Aring (16):
+>  mac802154: tx: use put_unaligned_le16 for copy crc
+>  ieee802154: drivers: use dev_alloc_skb
+>  mac802154: rx: use tasklet instead workqueue
+>  mac802154: rx: document ieee802154_rx() context requirement
+>  mac802154: rx: move receive handling into rx.c
+>  mac802154: tx: remove monitor receive while xmit
+>  mac802154: rx: rename remove mac802154_subif_rx
+>  mac802154: rx: move skb->protocol setting
+>  mac802154: rx: add CHECKSUM_UNNECESSARY
+>  mac802154: rx: add monitor pkt_type information
+>  mac802154: rx: move skb_reset_mac_header
+>  mac802154: rx: move rcu locking
+>  ieee802154: add valid psdu length helper
+>  at86rf230: use ieee802154_is_valid_psdu_len helper
+>  at86rf230: improve receive handling
+>  mac802154: rx: change naming convention
+> 
+> drivers/net/ieee802154/at86rf230.c |  32 ++---
+> drivers/net/ieee802154/cc2520.c    |   2 +-
+> drivers/net/ieee802154/mrf24j40.c  |   2 +-
+> include/linux/ieee802154.h         |  11 ++
+> include/net/mac802154.h            |   1 +
+> net/mac802154/ieee802154_i.h       |   9 +-
+> net/mac802154/iface.c              | 186 -------------------------
+> net/mac802154/main.c               |  30 ++++
+> net/mac802154/monitor.c            |  27 ----
+> net/mac802154/rx.c                 | 279 +++++++++++++++++++++++++++++++------
+> net/mac802154/tx.c                 |   7 +-
+> 11 files changed, 296 insertions(+), 290 deletions(-)
 
-diff --git a/net/mac802154/rx.c b/net/mac802154/rx.c
-index 689bb7f..86394be 100644
---- a/net/mac802154/rx.c
-+++ b/net/mac802154/rx.c
-@@ -29,7 +29,7 @@
- 
- #include "ieee802154_i.h"
- 
--static int mac802154_process_data(struct net_device *dev, struct sk_buff *skb)
-+static int ieee802154_deliver_skb(struct net_device *dev, struct sk_buff *skb)
- {
- 	skb->ip_summed = CHECKSUM_UNNECESSARY;
- 	skb->protocol = htons(ETH_P_IEEE802154);
-@@ -38,8 +38,8 @@ static int mac802154_process_data(struct net_device *dev, struct sk_buff *skb)
- }
- 
- static int
--mac802154_subif_frame(struct ieee802154_sub_if_data *sdata, struct sk_buff *skb,
--		      const struct ieee802154_hdr *hdr)
-+ieee802154_subif_frame(struct ieee802154_sub_if_data *sdata,
-+		       struct sk_buff *skb, const struct ieee802154_hdr *hdr)
- {
- 	__le16 span, sshort;
- 	int rc;
-@@ -103,7 +103,7 @@ mac802154_subif_frame(struct ieee802154_sub_if_data *sdata, struct sk_buff *skb,
- 
- 	switch (mac_cb(skb)->type) {
- 	case IEEE802154_FC_TYPE_DATA:
--		return mac802154_process_data(sdata->dev, skb);
-+		return ieee802154_deliver_skb(sdata->dev, skb);
- 	default:
- 		pr_warn("ieee802154: bad frame received (type = %d)\n",
- 			mac_cb(skb)->type);
-@@ -115,8 +115,8 @@ fail:
- 	return NET_RX_DROP;
- }
- 
--static void mac802154_print_addr(const char *name,
--				 const struct ieee802154_addr *addr)
-+static void
-+ieee802154_print_addr(const char *name, const struct ieee802154_addr *addr)
- {
- 	if (addr->mode == IEEE802154_ADDR_NONE)
- 		pr_debug("%s not present\n", name);
-@@ -132,8 +132,8 @@ static void mac802154_print_addr(const char *name,
- 	}
- }
- 
--static int mac802154_parse_frame_start(struct sk_buff *skb,
--				       struct ieee802154_hdr *hdr)
-+static int
-+ieee802154_parse_frame_start(struct sk_buff *skb, struct ieee802154_hdr *hdr)
- {
- 	int hlen;
- 	struct ieee802154_mac_cb *cb = mac_cb_init(skb);
-@@ -153,8 +153,8 @@ static int mac802154_parse_frame_start(struct sk_buff *skb,
- 	cb->ackreq = hdr->fc.ack_request;
- 	cb->secen = hdr->fc.security_enabled;
- 
--	mac802154_print_addr("destination", &hdr->dest);
--	mac802154_print_addr("source", &hdr->source);
-+	ieee802154_print_addr("destination", &hdr->dest);
-+	ieee802154_print_addr("source", &hdr->source);
- 
- 	cb->source = hdr->source;
- 	cb->dest = hdr->dest;
-@@ -192,13 +192,14 @@ static int mac802154_parse_frame_start(struct sk_buff *skb,
- }
- 
- static void
--mac802154_wpans_rx(struct ieee802154_local *local, struct sk_buff *skb)
-+__ieee802154_rx_handle_packet(struct ieee802154_local *local,
-+			      struct sk_buff *skb)
- {
- 	int ret;
- 	struct ieee802154_sub_if_data *sdata;
- 	struct ieee802154_hdr hdr;
- 
--	ret = mac802154_parse_frame_start(skb, &hdr);
-+	ret = ieee802154_parse_frame_start(skb, &hdr);
- 	if (ret) {
- 		pr_debug("got invalid frame\n");
- 		kfree_skb(skb);
-@@ -210,7 +211,7 @@ mac802154_wpans_rx(struct ieee802154_local *local, struct sk_buff *skb)
- 		    !netif_running(sdata->dev))
- 			continue;
- 
--		mac802154_subif_frame(sdata, skb, &hdr);
-+		ieee802154_subif_frame(sdata, skb, &hdr);
- 		skb = NULL;
- 		break;
- 	}
-@@ -220,7 +221,7 @@ mac802154_wpans_rx(struct ieee802154_local *local, struct sk_buff *skb)
- }
- 
- static void
--mac802154_monitors_rx(struct ieee802154_local *local, struct sk_buff *skb)
-+ieee802154_monitors_rx(struct ieee802154_local *local, struct sk_buff *skb)
- {
- 	struct sk_buff *skb2;
- 	struct ieee802154_sub_if_data *sdata;
-@@ -271,8 +272,8 @@ void ieee802154_rx(struct ieee802154_hw *hw, struct sk_buff *skb)
- 
- 	rcu_read_lock();
- 
--	mac802154_monitors_rx(local, skb);
--	mac802154_wpans_rx(local, skb);
-+	ieee802154_monitors_rx(local, skb);
-+	__ieee802154_rx_handle_packet(local, skb);
- 
- 	rcu_read_unlock();
- 
--- 
-2.1.2
+all 16 patches have been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
 
