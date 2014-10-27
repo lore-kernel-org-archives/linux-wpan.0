@@ -1,14 +1,14 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-la0-f49.google.com ([209.85.215.49]:65164 "EHLO
-	mail-la0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751951AbaJ0Lnj (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Mon, 27 Oct 2014 07:43:39 -0400
-Received: by mail-la0-f49.google.com with SMTP id ge10so446862lab.36
-        for <linux-wpan@vger.kernel.org>; Mon, 27 Oct 2014 04:43:38 -0700 (PDT)
+Received: from mail-lb0-f171.google.com ([209.85.217.171]:36485 "EHLO
+	mail-lb0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752171AbaJ0Lnm (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Mon, 27 Oct 2014 07:43:42 -0400
+Received: by mail-lb0-f171.google.com with SMTP id z11so2119753lbi.16
+        for <linux-wpan@vger.kernel.org>; Mon, 27 Oct 2014 04:43:40 -0700 (PDT)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH bluetooth-next 03/16] mac802154: rx: use tasklet instead workqueue
-Date: Mon, 27 Oct 2014 12:42:56 +0100
-Message-Id: <1414410189-20092-4-git-send-email-alex.aring@gmail.com>
+Subject: [PATCH bluetooth-next 05/16] mac802154: rx: move receive handling into rx.c
+Date: Mon, 27 Oct 2014 12:42:58 +0100
+Message-Id: <1414410189-20092-6-git-send-email-alex.aring@gmail.com>
 In-Reply-To: <1414410189-20092-1-git-send-email-alex.aring@gmail.com>
 References: <1414410189-20092-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
@@ -16,209 +16,498 @@ List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
 Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-Tasklets have much less overhead than workqueues. This patch also
-removes the heap allocation for the worker on receiving path.
-Like mac80211 we should prefer use a tasklet here instead a workqueue to
-getting fast out of interrupt context when ieee802154_rx_irqsafe is
-called by driver. Like wireless inside the tasklet context we should
-call netif_receive_skb instead netif_rx_ni anymore.
+This patch removes all relevant receiving functions inclusive frame
+parsing into rx file. Like mac80211 we should implement the complete
+receive handling and parsing in this file.
 
 Signed-off-by: Alexander Aring <alex.aring@gmail.com>
 ---
- include/net/mac802154.h      |  1 +
- net/mac802154/ieee802154_i.h |  7 +++++++
- net/mac802154/iface.c        |  2 +-
- net/mac802154/main.c         | 30 +++++++++++++++++++++++++++
- net/mac802154/rx.c           | 48 ++++++++------------------------------------
- 5 files changed, 47 insertions(+), 41 deletions(-)
+ net/mac802154/ieee802154_i.h |   1 -
+ net/mac802154/iface.c        | 186 -------------------------------------
+ net/mac802154/monitor.c      |  27 ------
+ net/mac802154/rx.c           | 214 +++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 214 insertions(+), 214 deletions(-)
 
-diff --git a/include/net/mac802154.h b/include/net/mac802154.h
-index 942dd53..4c4642e 100644
---- a/include/net/mac802154.h
-+++ b/include/net/mac802154.h
-@@ -202,6 +202,7 @@ void ieee802154_free_hw(struct ieee802154_hw *hw);
- int ieee802154_register_hw(struct ieee802154_hw *hw);
- void ieee802154_unregister_hw(struct ieee802154_hw *hw);
- 
-+void ieee802154_rx(struct ieee802154_hw *hw, struct sk_buff *skb);
- void ieee802154_rx_irqsafe(struct ieee802154_hw *hw, struct sk_buff *skb,
- 			   u8 lqi);
- 
 diff --git a/net/mac802154/ieee802154_i.h b/net/mac802154/ieee802154_i.h
-index ef29c10..603509a 100644
+index 603509a..be2f2f6 100644
 --- a/net/mac802154/ieee802154_i.h
 +++ b/net/mac802154/ieee802154_i.h
-@@ -55,11 +55,18 @@ struct ieee802154_local {
- 	 * read them using any of protection methods.
- 	 */
- 	bool running;
-+
-+	struct tasklet_struct tasklet;
-+	struct sk_buff_head skb_queue;
- };
+@@ -131,7 +131,6 @@ void mac802154_monitor_setup(struct net_device *dev);
+ netdev_tx_t
+ ieee802154_monitor_start_xmit(struct sk_buff *skb, struct net_device *dev);
  
- #define	MAC802154_DEVICE_STOPPED	0x00
- #define MAC802154_DEVICE_RUN		0x01
- 
-+enum {
-+	IEEE802154_RX_MSG        = 1,
-+};
-+
- /* Slave interface definition.
-  *
-  * Slaves represent typical network interfaces available from userspace.
+-void mac802154_wpans_rx(struct ieee802154_local *local, struct sk_buff *skb);
+ void mac802154_wpan_setup(struct net_device *dev);
+ netdev_tx_t
+ ieee802154_subif_start_xmit(struct sk_buff *skb, struct net_device *dev);
 diff --git a/net/mac802154/iface.c b/net/mac802154/iface.c
-index be45dc9..311f60c 100644
+index 311f60c..7e4bffc 100644
 --- a/net/mac802154/iface.c
 +++ b/net/mac802154/iface.c
-@@ -376,7 +376,7 @@ void mac802154_wpan_setup(struct net_device *dev)
+@@ -373,189 +373,3 @@ void mac802154_wpan_setup(struct net_device *dev)
  
- static int mac802154_process_data(struct net_device *dev, struct sk_buff *skb)
- {
--	return netif_rx_ni(skb);
-+	return netif_receive_skb(skb);
+ 	mac802154_llsec_init(&sdata->sec);
  }
+-
+-static int mac802154_process_data(struct net_device *dev, struct sk_buff *skb)
+-{
+-	return netif_receive_skb(skb);
+-}
+-
+-static int
+-mac802154_subif_frame(struct ieee802154_sub_if_data *sdata, struct sk_buff *skb,
+-		      const struct ieee802154_hdr *hdr)
+-{
+-	__le16 span, sshort;
+-	int rc;
+-
+-	pr_debug("getting packet via slave interface %s\n", sdata->dev->name);
+-
+-	spin_lock_bh(&sdata->mib_lock);
+-
+-	span = sdata->pan_id;
+-	sshort = sdata->short_addr;
+-
+-	switch (mac_cb(skb)->dest.mode) {
+-	case IEEE802154_ADDR_NONE:
+-		if (mac_cb(skb)->dest.mode != IEEE802154_ADDR_NONE)
+-			/* FIXME: check if we are PAN coordinator */
+-			skb->pkt_type = PACKET_OTHERHOST;
+-		else
+-			/* ACK comes with both addresses empty */
+-			skb->pkt_type = PACKET_HOST;
+-		break;
+-	case IEEE802154_ADDR_LONG:
+-		if (mac_cb(skb)->dest.pan_id != span &&
+-		    mac_cb(skb)->dest.pan_id != cpu_to_le16(IEEE802154_PANID_BROADCAST))
+-			skb->pkt_type = PACKET_OTHERHOST;
+-		else if (mac_cb(skb)->dest.extended_addr == sdata->extended_addr)
+-			skb->pkt_type = PACKET_HOST;
+-		else
+-			skb->pkt_type = PACKET_OTHERHOST;
+-		break;
+-	case IEEE802154_ADDR_SHORT:
+-		if (mac_cb(skb)->dest.pan_id != span &&
+-		    mac_cb(skb)->dest.pan_id != cpu_to_le16(IEEE802154_PANID_BROADCAST))
+-			skb->pkt_type = PACKET_OTHERHOST;
+-		else if (mac_cb(skb)->dest.short_addr == sshort)
+-			skb->pkt_type = PACKET_HOST;
+-		else if (mac_cb(skb)->dest.short_addr ==
+-			  cpu_to_le16(IEEE802154_ADDR_BROADCAST))
+-			skb->pkt_type = PACKET_BROADCAST;
+-		else
+-			skb->pkt_type = PACKET_OTHERHOST;
+-		break;
+-	default:
+-		spin_unlock_bh(&sdata->mib_lock);
+-		pr_debug("invalid dest mode\n");
+-		kfree_skb(skb);
+-		return NET_RX_DROP;
+-	}
+-
+-	spin_unlock_bh(&sdata->mib_lock);
+-
+-	skb->dev = sdata->dev;
+-
+-	rc = mac802154_llsec_decrypt(&sdata->sec, skb);
+-	if (rc) {
+-		pr_debug("decryption failed: %i\n", rc);
+-		goto fail;
+-	}
+-
+-	sdata->dev->stats.rx_packets++;
+-	sdata->dev->stats.rx_bytes += skb->len;
+-
+-	switch (mac_cb(skb)->type) {
+-	case IEEE802154_FC_TYPE_DATA:
+-		return mac802154_process_data(sdata->dev, skb);
+-	default:
+-		pr_warn("ieee802154: bad frame received (type = %d)\n",
+-			mac_cb(skb)->type);
+-		goto fail;
+-	}
+-
+-fail:
+-	kfree_skb(skb);
+-	return NET_RX_DROP;
+-}
+-
+-static void mac802154_print_addr(const char *name,
+-				 const struct ieee802154_addr *addr)
+-{
+-	if (addr->mode == IEEE802154_ADDR_NONE)
+-		pr_debug("%s not present\n", name);
+-
+-	pr_debug("%s PAN ID: %04x\n", name, le16_to_cpu(addr->pan_id));
+-	if (addr->mode == IEEE802154_ADDR_SHORT) {
+-		pr_debug("%s is short: %04x\n", name,
+-			 le16_to_cpu(addr->short_addr));
+-	} else {
+-		u64 hw = swab64((__force u64) addr->extended_addr);
+-
+-		pr_debug("%s is hardware: %8phC\n", name, &hw);
+-	}
+-}
+-
+-static int mac802154_parse_frame_start(struct sk_buff *skb,
+-				       struct ieee802154_hdr *hdr)
+-{
+-	int hlen;
+-	struct ieee802154_mac_cb *cb = mac_cb_init(skb);
+-
+-	hlen = ieee802154_hdr_pull(skb, hdr);
+-	if (hlen < 0)
+-		return -EINVAL;
+-
+-	skb->mac_len = hlen;
+-
+-	pr_debug("fc: %04x dsn: %02x\n", le16_to_cpup((__le16 *)&hdr->fc),
+-		 hdr->seq);
+-
+-	cb->type = hdr->fc.type;
+-	cb->ackreq = hdr->fc.ack_request;
+-	cb->secen = hdr->fc.security_enabled;
+-
+-	mac802154_print_addr("destination", &hdr->dest);
+-	mac802154_print_addr("source", &hdr->source);
+-
+-	cb->source = hdr->source;
+-	cb->dest = hdr->dest;
+-
+-	if (hdr->fc.security_enabled) {
+-		u64 key;
+-
+-		pr_debug("seclevel %i\n", hdr->sec.level);
+-
+-		switch (hdr->sec.key_id_mode) {
+-		case IEEE802154_SCF_KEY_IMPLICIT:
+-			pr_debug("implicit key\n");
+-			break;
+-
+-		case IEEE802154_SCF_KEY_INDEX:
+-			pr_debug("key %02x\n", hdr->sec.key_id);
+-			break;
+-
+-		case IEEE802154_SCF_KEY_SHORT_INDEX:
+-			pr_debug("key %04x:%04x %02x\n",
+-				 le32_to_cpu(hdr->sec.short_src) >> 16,
+-				 le32_to_cpu(hdr->sec.short_src) & 0xffff,
+-				 hdr->sec.key_id);
+-			break;
+-
+-		case IEEE802154_SCF_KEY_HW_INDEX:
+-			key = swab64((__force u64) hdr->sec.extended_src);
+-			pr_debug("key source %8phC %02x\n", &key,
+-				 hdr->sec.key_id);
+-			break;
+-		}
+-	}
+-
+-	return 0;
+-}
+-
+-void mac802154_wpans_rx(struct ieee802154_local *local, struct sk_buff *skb)
+-{
+-	int ret;
+-	struct ieee802154_sub_if_data *sdata;
+-	struct ieee802154_hdr hdr;
+-
+-	ret = mac802154_parse_frame_start(skb, &hdr);
+-	if (ret) {
+-		pr_debug("got invalid frame\n");
+-		kfree_skb(skb);
+-		return;
+-	}
+-
+-	rcu_read_lock();
+-	list_for_each_entry_rcu(sdata, &local->interfaces, list) {
+-		if (sdata->type != IEEE802154_DEV_WPAN ||
+-		    !netif_running(sdata->dev))
+-			continue;
+-
+-		mac802154_subif_frame(sdata, skb, &hdr);
+-		skb = NULL;
+-		break;
+-	}
+-	rcu_read_unlock();
+-
+-	if (skb)
+-		kfree_skb(skb);
+-}
+diff --git a/net/mac802154/monitor.c b/net/mac802154/monitor.c
+index 5758322..dfdedc2 100644
+--- a/net/mac802154/monitor.c
++++ b/net/mac802154/monitor.c
+@@ -18,9 +18,7 @@
+  */
  
- static int
-diff --git a/net/mac802154/main.c b/net/mac802154/main.c
-index 3c0a824..4c484bb 100644
---- a/net/mac802154/main.c
-+++ b/net/mac802154/main.c
-@@ -222,6 +222,29 @@ static int mac802154_set_frame_retries(struct wpan_phy *phy, s8 retries)
- 	return local->ops->set_frame_retries(&local->hw, retries);
- }
- 
-+static void ieee802154_tasklet_handler(unsigned long data)
-+{
-+	struct ieee802154_local *local = (struct ieee802154_local *)data;
-+	struct sk_buff *skb;
-+
-+	while ((skb = skb_dequeue(&local->skb_queue))) {
-+		switch (skb->pkt_type) {
-+		case IEEE802154_RX_MSG:
-+			/* Clear skb->pkt_type in order to not confuse kernel
-+			 * netstack.
-+			 */
-+			skb->pkt_type = 0;
-+			ieee802154_rx(&local->hw, skb);
-+			break;
-+		default:
-+			WARN(1, "mac80211: Packet is of unknown type %d\n",
-+			     skb->pkt_type);
-+			kfree_skb(skb);
-+			break;
-+		}
-+	}
-+}
-+
- struct ieee802154_hw *
- ieee802154_alloc_hw(size_t priv_data_len, struct ieee802154_ops *ops)
- {
-@@ -270,6 +293,12 @@ ieee802154_alloc_hw(size_t priv_data_len, struct ieee802154_ops *ops)
- 	INIT_LIST_HEAD(&local->interfaces);
- 	mutex_init(&local->iflist_mtx);
- 
-+	tasklet_init(&local->tasklet,
-+		     ieee802154_tasklet_handler,
-+		     (unsigned long)local);
-+
-+	skb_queue_head_init(&local->skb_queue);
-+
- 	return &local->hw;
- }
- EXPORT_SYMBOL(ieee802154_alloc_hw);
-@@ -371,6 +400,7 @@ void ieee802154_unregister_hw(struct ieee802154_hw *hw)
- 	struct ieee802154_local *local = hw_to_local(hw);
- 	struct ieee802154_sub_if_data *sdata, *next;
- 
-+	tasklet_kill(&local->tasklet);
- 	flush_workqueue(local->workqueue);
- 	destroy_workqueue(local->workqueue);
- 
-diff --git a/net/mac802154/rx.c b/net/mac802154/rx.c
-index 53c9e0c..2851a3f 100644
---- a/net/mac802154/rx.c
-+++ b/net/mac802154/rx.c
-@@ -19,7 +19,6 @@
- 
- #include <linux/kernel.h>
- #include <linux/module.h>
--#include <linux/workqueue.h>
  #include <linux/netdevice.h>
- #include <linux/crc-ccitt.h>
+-#include <linux/skbuff.h>
+ #include <linux/if_arp.h>
+-#include <linux/crc-ccitt.h>
+ #include <linux/ieee802154.h>
  
-@@ -28,30 +27,11 @@
+ #include <net/mac802154.h>
+@@ -30,31 +28,6 @@
  
  #include "ieee802154_i.h"
  
--/* The IEEE 802.15.4 standard defines 4 MAC packet types:
-- * - beacon frame
-- * - MAC command frame
-- * - acknowledgement frame
-- * - data frame
-- *
-- * and only the data frame should be pushed to the upper layers, other types
-- * are just internal MAC layer management information. So only data packets
-- * are going to be sent to the networking queue, all other will be processed
-- * right here by using the device workqueue.
-- */
--struct rx_work {
--	struct sk_buff *skb;
--	struct work_struct work;
--	struct ieee802154_hw *hw;
--	u8 lqi;
--};
+-void mac802154_monitors_rx(struct ieee802154_local *local, struct sk_buff *skb)
+-{
+-	struct sk_buff *skb2;
+-	struct ieee802154_sub_if_data *sdata;
+-	u16 crc = crc_ccitt(0, skb->data, skb->len);
+-	u8 *data;
 -
+-	rcu_read_lock();
+-	list_for_each_entry_rcu(sdata, &local->interfaces, list) {
+-		if (sdata->type != IEEE802154_DEV_MONITOR ||
+-		    !netif_running(sdata->dev))
+-			continue;
+-
+-		skb2 = skb_clone(skb, GFP_ATOMIC);
+-		skb2->dev = sdata->dev;
+-		skb2->pkt_type = PACKET_HOST;
+-		data = skb_put(skb2, 2);
+-		data[0] = crc & 0xff;
+-		data[1] = crc >> 8;
+-
+-		netif_rx_ni(skb2);
+-	}
+-	rcu_read_unlock();
+-}
+-
+ static const struct net_device_ops mac802154_monitor_ops = {
+ 	.ndo_open		= mac802154_slave_open,
+ 	.ndo_stop		= mac802154_slave_close,
+diff --git a/net/mac802154/rx.c b/net/mac802154/rx.c
+index c4df321..d8498c5 100644
+--- a/net/mac802154/rx.c
++++ b/net/mac802154/rx.c
+@@ -24,9 +24,223 @@
+ 
+ #include <net/mac802154.h>
+ #include <net/ieee802154_netdev.h>
++#include <net/rtnetlink.h>
++#include <linux/nl802154.h>
+ 
+ #include "ieee802154_i.h"
+ 
++static int mac802154_process_data(struct net_device *dev, struct sk_buff *skb)
++{
++	return netif_receive_skb(skb);
++}
++
++static int
++mac802154_subif_frame(struct ieee802154_sub_if_data *sdata, struct sk_buff *skb,
++		      const struct ieee802154_hdr *hdr)
++{
++	__le16 span, sshort;
++	int rc;
++
++	pr_debug("getting packet via slave interface %s\n", sdata->dev->name);
++
++	spin_lock_bh(&sdata->mib_lock);
++
++	span = sdata->pan_id;
++	sshort = sdata->short_addr;
++
++	switch (mac_cb(skb)->dest.mode) {
++	case IEEE802154_ADDR_NONE:
++		if (mac_cb(skb)->dest.mode != IEEE802154_ADDR_NONE)
++			/* FIXME: check if we are PAN coordinator */
++			skb->pkt_type = PACKET_OTHERHOST;
++		else
++			/* ACK comes with both addresses empty */
++			skb->pkt_type = PACKET_HOST;
++		break;
++	case IEEE802154_ADDR_LONG:
++		if (mac_cb(skb)->dest.pan_id != span &&
++		    mac_cb(skb)->dest.pan_id != cpu_to_le16(IEEE802154_PANID_BROADCAST))
++			skb->pkt_type = PACKET_OTHERHOST;
++		else if (mac_cb(skb)->dest.extended_addr == sdata->extended_addr)
++			skb->pkt_type = PACKET_HOST;
++		else
++			skb->pkt_type = PACKET_OTHERHOST;
++		break;
++	case IEEE802154_ADDR_SHORT:
++		if (mac_cb(skb)->dest.pan_id != span &&
++		    mac_cb(skb)->dest.pan_id != cpu_to_le16(IEEE802154_PANID_BROADCAST))
++			skb->pkt_type = PACKET_OTHERHOST;
++		else if (mac_cb(skb)->dest.short_addr == sshort)
++			skb->pkt_type = PACKET_HOST;
++		else if (mac_cb(skb)->dest.short_addr ==
++			  cpu_to_le16(IEEE802154_ADDR_BROADCAST))
++			skb->pkt_type = PACKET_BROADCAST;
++		else
++			skb->pkt_type = PACKET_OTHERHOST;
++		break;
++	default:
++		spin_unlock_bh(&sdata->mib_lock);
++		pr_debug("invalid dest mode\n");
++		kfree_skb(skb);
++		return NET_RX_DROP;
++	}
++
++	spin_unlock_bh(&sdata->mib_lock);
++
++	skb->dev = sdata->dev;
++
++	rc = mac802154_llsec_decrypt(&sdata->sec, skb);
++	if (rc) {
++		pr_debug("decryption failed: %i\n", rc);
++		goto fail;
++	}
++
++	sdata->dev->stats.rx_packets++;
++	sdata->dev->stats.rx_bytes += skb->len;
++
++	switch (mac_cb(skb)->type) {
++	case IEEE802154_FC_TYPE_DATA:
++		return mac802154_process_data(sdata->dev, skb);
++	default:
++		pr_warn("ieee802154: bad frame received (type = %d)\n",
++			mac_cb(skb)->type);
++		goto fail;
++	}
++
++fail:
++	kfree_skb(skb);
++	return NET_RX_DROP;
++}
++
++static void mac802154_print_addr(const char *name,
++				 const struct ieee802154_addr *addr)
++{
++	if (addr->mode == IEEE802154_ADDR_NONE)
++		pr_debug("%s not present\n", name);
++
++	pr_debug("%s PAN ID: %04x\n", name, le16_to_cpu(addr->pan_id));
++	if (addr->mode == IEEE802154_ADDR_SHORT) {
++		pr_debug("%s is short: %04x\n", name,
++			 le16_to_cpu(addr->short_addr));
++	} else {
++		u64 hw = swab64((__force u64)addr->extended_addr);
++
++		pr_debug("%s is hardware: %8phC\n", name, &hw);
++	}
++}
++
++static int mac802154_parse_frame_start(struct sk_buff *skb,
++				       struct ieee802154_hdr *hdr)
++{
++	int hlen;
++	struct ieee802154_mac_cb *cb = mac_cb_init(skb);
++
++	hlen = ieee802154_hdr_pull(skb, hdr);
++	if (hlen < 0)
++		return -EINVAL;
++
++	skb->mac_len = hlen;
++
++	pr_debug("fc: %04x dsn: %02x\n", le16_to_cpup((__le16 *)&hdr->fc),
++		 hdr->seq);
++
++	cb->type = hdr->fc.type;
++	cb->ackreq = hdr->fc.ack_request;
++	cb->secen = hdr->fc.security_enabled;
++
++	mac802154_print_addr("destination", &hdr->dest);
++	mac802154_print_addr("source", &hdr->source);
++
++	cb->source = hdr->source;
++	cb->dest = hdr->dest;
++
++	if (hdr->fc.security_enabled) {
++		u64 key;
++
++		pr_debug("seclevel %i\n", hdr->sec.level);
++
++		switch (hdr->sec.key_id_mode) {
++		case IEEE802154_SCF_KEY_IMPLICIT:
++			pr_debug("implicit key\n");
++			break;
++
++		case IEEE802154_SCF_KEY_INDEX:
++			pr_debug("key %02x\n", hdr->sec.key_id);
++			break;
++
++		case IEEE802154_SCF_KEY_SHORT_INDEX:
++			pr_debug("key %04x:%04x %02x\n",
++				 le32_to_cpu(hdr->sec.short_src) >> 16,
++				 le32_to_cpu(hdr->sec.short_src) & 0xffff,
++				 hdr->sec.key_id);
++			break;
++
++		case IEEE802154_SCF_KEY_HW_INDEX:
++			key = swab64((__force u64)hdr->sec.extended_src);
++			pr_debug("key source %8phC %02x\n", &key,
++				 hdr->sec.key_id);
++			break;
++		}
++	}
++
++	return 0;
++}
++
++static void
++mac802154_wpans_rx(struct ieee802154_local *local, struct sk_buff *skb)
++{
++	int ret;
++	struct ieee802154_sub_if_data *sdata;
++	struct ieee802154_hdr hdr;
++
++	ret = mac802154_parse_frame_start(skb, &hdr);
++	if (ret) {
++		pr_debug("got invalid frame\n");
++		kfree_skb(skb);
++		return;
++	}
++
++	rcu_read_lock();
++	list_for_each_entry_rcu(sdata, &local->interfaces, list) {
++		if (sdata->type != IEEE802154_DEV_WPAN ||
++		    !netif_running(sdata->dev))
++			continue;
++
++		mac802154_subif_frame(sdata, skb, &hdr);
++		skb = NULL;
++		break;
++	}
++	rcu_read_unlock();
++
++	if (skb)
++		kfree_skb(skb);
++}
++
++void mac802154_monitors_rx(struct ieee802154_local *local, struct sk_buff *skb)
++{
++	struct sk_buff *skb2;
++	struct ieee802154_sub_if_data *sdata;
++	u16 crc = crc_ccitt(0, skb->data, skb->len);
++	u8 *data;
++
++	rcu_read_lock();
++	list_for_each_entry_rcu(sdata, &local->interfaces, list) {
++		if (sdata->type != IEEE802154_DEV_MONITOR ||
++		    !netif_running(sdata->dev))
++			continue;
++
++		skb2 = skb_clone(skb, GFP_ATOMIC);
++		skb2->dev = sdata->dev;
++		skb2->pkt_type = PACKET_HOST;
++		data = skb_put(skb2, 2);
++		data[0] = crc & 0xff;
++		data[1] = crc >> 8;
++
++		netif_rx_ni(skb2);
++	}
++	rcu_read_unlock();
++}
++
  static void
--mac802154_subif_rx(struct ieee802154_hw *hw, struct sk_buff *skb, u8 lqi)
-+mac802154_subif_rx(struct ieee802154_hw *hw, struct sk_buff *skb)
+ mac802154_subif_rx(struct ieee802154_hw *hw, struct sk_buff *skb)
  {
- 	struct ieee802154_local *local = hw_to_local(hw);
- 
--	mac_cb(skb)->lqi = lqi;
- 	skb->protocol = htons(ETH_P_IEEE802154);
- 	skb_reset_mac_header(skb);
- 
-@@ -79,32 +59,20 @@ fail:
- 	kfree_skb(skb);
- }
- 
--static void mac802154_rx_worker(struct work_struct *work)
-+void ieee802154_rx(struct ieee802154_hw *hw, struct sk_buff *skb)
- {
--	struct rx_work *rw = container_of(work, struct rx_work, work);
--
--	mac802154_subif_rx(rw->hw, rw->skb, rw->lqi);
--	kfree(rw);
-+	mac802154_subif_rx(hw, skb);
- }
-+EXPORT_SYMBOL(ieee802154_rx);
- 
- void
- ieee802154_rx_irqsafe(struct ieee802154_hw *hw, struct sk_buff *skb, u8 lqi)
- {
- 	struct ieee802154_local *local = hw_to_local(hw);
--	struct rx_work *work;
- 
--	if (!skb)
--		return;
--
--	work = kzalloc(sizeof(*work), GFP_ATOMIC);
--	if (!work)
--		return;
--
--	INIT_WORK(&work->work, mac802154_rx_worker);
--	work->skb = skb;
--	work->hw = hw;
--	work->lqi = lqi;
--
--	queue_work(local->workqueue, &work->work);
-+	mac_cb(skb)->lqi = lqi;
-+	skb->pkt_type = IEEE802154_RX_MSG;
-+	skb_queue_tail(&local->skb_queue, skb);
-+	tasklet_schedule(&local->tasklet);
- }
- EXPORT_SYMBOL(ieee802154_rx_irqsafe);
 -- 
 2.1.2
 
