@@ -1,14 +1,14 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wg0-f41.google.com ([74.125.82.41]:44076 "EHLO
-	mail-wg0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752538AbaJ0QOS (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Mon, 27 Oct 2014 12:14:18 -0400
-Received: by mail-wg0-f41.google.com with SMTP id b13so6065255wgh.0
-        for <linux-wpan@vger.kernel.org>; Mon, 27 Oct 2014 09:14:17 -0700 (PDT)
+Received: from mail-wi0-f182.google.com ([209.85.212.182]:58253 "EHLO
+	mail-wi0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752467AbaJ0QOU (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Mon, 27 Oct 2014 12:14:20 -0400
+Received: by mail-wi0-f182.google.com with SMTP id d1so3363809wiv.15
+        for <linux-wpan@vger.kernel.org>; Mon, 27 Oct 2014 09:14:18 -0700 (PDT)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCHv2 bluetooth-next 09/16] mac802154: rx: add CHECKSUM_UNNECESSARY
-Date: Mon, 27 Oct 2014 17:13:36 +0100
-Message-Id: <1414426423-24856-10-git-send-email-alex.aring@gmail.com>
+Subject: [PATCHv2 bluetooth-next 10/16] mac802154: rx: add monitor pkt_type information
+Date: Mon, 27 Oct 2014 17:13:37 +0100
+Message-Id: <1414426423-24856-11-git-send-email-alex.aring@gmail.com>
 In-Reply-To: <1414426423-24856-1-git-send-email-alex.aring@gmail.com>
 References: <1414426423-24856-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
@@ -16,31 +16,24 @@ List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
 Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-This patch adds CHECKSUM_UNNECESSARY to skb->ip_summed before delivery.
-There exist no transceiver with IP checksum functionality.
+This patch adds a PACKET_OTHERHOST setting when a monitor interface
+receives a skb. All receiving skb's to the monitor interface should
+be PACKET_OTHERHOST.
 
 Signed-off-by: Alexander Aring <alex.aring@gmail.com>
 ---
- net/mac802154/rx.c | 2 ++
- 1 file changed, 2 insertions(+)
+ net/mac802154/rx.c | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/net/mac802154/rx.c b/net/mac802154/rx.c
-index c4066b5..14eecac 100644
+index 14eecac..f7f09b4 100644
 --- a/net/mac802154/rx.c
 +++ b/net/mac802154/rx.c
-@@ -31,6 +31,7 @@
- 
- static int mac802154_process_data(struct net_device *dev, struct sk_buff *skb)
- {
-+	skb->ip_summed = CHECKSUM_UNNECESSARY;
- 	skb->protocol = htons(ETH_P_IEEE802154);
- 
- 	return netif_receive_skb(skb);
-@@ -226,6 +227,7 @@ mac802154_monitors_rx(struct ieee802154_local *local, struct sk_buff *skb)
- 	u16 crc = crc_ccitt(0, skb->data, skb->len);
+@@ -228,6 +228,7 @@ mac802154_monitors_rx(struct ieee802154_local *local, struct sk_buff *skb)
  	u8 *data;
  
-+	skb->ip_summed = CHECKSUM_UNNECESSARY;
+ 	skb->ip_summed = CHECKSUM_UNNECESSARY;
++	skb->pkt_type = PACKET_OTHERHOST;
  	skb->protocol = htons(ETH_P_IEEE802154);
  
  	rcu_read_lock();
