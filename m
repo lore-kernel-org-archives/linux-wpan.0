@@ -1,76 +1,192 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-lb0-f179.google.com ([209.85.217.179]:41716 "EHLO
-	mail-lb0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750825AbaJ2FjM (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Wed, 29 Oct 2014 01:39:12 -0400
-Received: by mail-lb0-f179.google.com with SMTP id w7so1850551lbi.38
-        for <linux-wpan@vger.kernel.org>; Tue, 28 Oct 2014 22:39:11 -0700 (PDT)
-Date: Wed, 29 Oct 2014 06:39:08 +0100
+Received: from mail-la0-f46.google.com ([209.85.215.46]:41161 "EHLO
+	mail-la0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750786AbaJ1RV6 (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Tue, 28 Oct 2014 13:21:58 -0400
+Received: by mail-la0-f46.google.com with SMTP id hs14so1070510lab.33
+        for <linux-wpan@vger.kernel.org>; Tue, 28 Oct 2014 10:21:56 -0700 (PDT)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: Re: [PATCH bluetooth-next 01/17] mac802154: monitor: merge into
- iface implementation
-Message-ID: <20141029053906.GB4709@omega>
+Subject: [PATCH bluetooth-next 02/17] mac802154: main: move open and close into iface
+Date: Tue, 28 Oct 2014 18:21:17 +0100
+Message-Id: <1414516892-4107-3-git-send-email-alex.aring@gmail.com>
+In-Reply-To: <1414516892-4107-1-git-send-email-alex.aring@gmail.com>
 References: <1414516892-4107-1-git-send-email-alex.aring@gmail.com>
- <1414516892-4107-2-git-send-email-alex.aring@gmail.com>
- <5450617B.8030700@gmail.com>
- <545063CD.9030806@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <545063CD.9030806@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Varka Bhadram <varkabhadram@gmail.com>
-Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de
+To: linux-wpan@vger.kernel.org
+Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-Hi Varka,
+These functions can be static inside the iface file, because it's not
+used anywhere else. This patch moves these functions into iface file.
 
-On Wed, Oct 29, 2014 at 09:19:33AM +0530, Varka Bhadram wrote:
-> On 10/29/2014 09:09 AM, Varka Bhadram wrote:
-> >On 10/28/2014 10:51 PM, Alexander Aring wrote:
-> >>This patch removes the monitor implementation file and put all monitor
-> >>stuff into iface file. It's now small enough to put all necessary
-> >>handling into iface.
-> >>
-> >>Signed-off-by: Alexander Aring <alex.aring@gmail.com>
-> >>---
-> >>  net/mac802154/Makefile  |  2 +-
-> >>  net/mac802154/iface.c   | 30 +++++++++++++++++++++++++
-> >>  net/mac802154/monitor.c | 59
-> >>-------------------------------------------------
-> >>  3 files changed, 31 insertions(+), 60 deletions(-)
-> >>  delete mode 100644 net/mac802154/monitor.c
-> >>
-> >Hi Alex,
-> >
-> >Doing nice work,changing the code view same as mac80211.
-> >
-> >But What ever you do in previous patches you are undoing, like moving some
-> >of the
-> >code to iface file from their to main file like that... Please correct me
-> >if I am wrong.
-> >
-> >
-> Good to have the cover-letter for all these changes...
-> 
+Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+---
+ net/mac802154/ieee802154_i.h |  3 ---
+ net/mac802154/iface.c        | 59 ++++++++++++++++++++++++++++++++++++++++++++
+ net/mac802154/main.c         | 59 --------------------------------------------
+ 3 files changed, 59 insertions(+), 62 deletions(-)
 
-I tried to grab me one file and then doing all stuff which is in my
-rework branch. First tx file then rx file, now with iface sending trivial
-patches has ended here.
+diff --git a/net/mac802154/ieee802154_i.h b/net/mac802154/ieee802154_i.h
+index ac907d9..4408c46 100644
+--- a/net/mac802154/ieee802154_i.h
++++ b/net/mac802154/ieee802154_i.h
+@@ -123,9 +123,6 @@ IEEE802154_DEV_TO_SUB_IF(const struct net_device *dev)
+ extern struct ieee802154_reduced_mlme_ops mac802154_mlme_reduced;
+ extern struct ieee802154_mlme_ops mac802154_mlme_wpan;
+ 
+-int mac802154_slave_open(struct net_device *dev);
+-int mac802154_slave_close(struct net_device *dev);
+-
+ void mac802154_monitor_setup(struct net_device *dev);
+ netdev_tx_t
+ ieee802154_monitor_start_xmit(struct sk_buff *skb, struct net_device *dev);
+diff --git a/net/mac802154/iface.c b/net/mac802154/iface.c
+index dafb2c3..0b21413 100644
+--- a/net/mac802154/iface.c
++++ b/net/mac802154/iface.c
+@@ -142,6 +142,46 @@ void mac802154_get_mac_params(struct net_device *dev,
+ 	mutex_unlock(&sdata->local->iflist_mtx);
+ }
+ 
++static int mac802154_slave_open(struct net_device *dev)
++{
++	struct ieee802154_sub_if_data *sdata = IEEE802154_DEV_TO_SUB_IF(dev);
++	struct ieee802154_sub_if_data *subif;
++	struct ieee802154_local *local = sdata->local;
++	int res = 0;
++
++	ASSERT_RTNL();
++
++	if (sdata->type == IEEE802154_DEV_WPAN) {
++		mutex_lock(&sdata->local->iflist_mtx);
++		list_for_each_entry(subif, &sdata->local->interfaces, list) {
++			if (subif != sdata && subif->type == sdata->type &&
++			    subif->running) {
++				mutex_unlock(&sdata->local->iflist_mtx);
++				return -EBUSY;
++			}
++		}
++		mutex_unlock(&sdata->local->iflist_mtx);
++	}
++
++	mutex_lock(&sdata->local->iflist_mtx);
++	sdata->running = true;
++	mutex_unlock(&sdata->local->iflist_mtx);
++
++	if (local->open_count++ == 0) {
++		res = local->ops->start(&local->hw);
++		WARN_ON(res);
++		if (res)
++			goto err;
++	}
++
++	netif_start_queue(dev);
++	return 0;
++err:
++	sdata->local->open_count--;
++
++	return res;
++}
++
+ static int mac802154_wpan_open(struct net_device *dev)
+ {
+ 	int rc;
+@@ -201,6 +241,25 @@ out:
+ 	return rc;
+ }
+ 
++static int mac802154_slave_close(struct net_device *dev)
++{
++	struct ieee802154_sub_if_data *sdata = IEEE802154_DEV_TO_SUB_IF(dev);
++	struct ieee802154_local *local = sdata->local;
++
++	ASSERT_RTNL();
++
++	netif_stop_queue(dev);
++
++	mutex_lock(&sdata->local->iflist_mtx);
++	sdata->running = false;
++	mutex_unlock(&sdata->local->iflist_mtx);
++
++	if (!--local->open_count)
++		local->ops->stop(&local->hw);
++
++	return 0;
++}
++
+ static int mac802154_set_header_security(struct ieee802154_sub_if_data *sdata,
+ 					 struct ieee802154_hdr *hdr,
+ 					 const struct ieee802154_mac_cb *cb)
+diff --git a/net/mac802154/main.c b/net/mac802154/main.c
+index ff0de0f..2c6d772 100644
+--- a/net/mac802154/main.c
++++ b/net/mac802154/main.c
+@@ -29,65 +29,6 @@
+ 
+ #include "ieee802154_i.h"
+ 
+-int mac802154_slave_open(struct net_device *dev)
+-{
+-	struct ieee802154_sub_if_data *sdata = IEEE802154_DEV_TO_SUB_IF(dev);
+-	struct ieee802154_sub_if_data *subif;
+-	struct ieee802154_local *local = sdata->local;
+-	int res = 0;
+-
+-	ASSERT_RTNL();
+-
+-	if (sdata->type == IEEE802154_DEV_WPAN) {
+-		mutex_lock(&sdata->local->iflist_mtx);
+-		list_for_each_entry(subif, &sdata->local->interfaces, list) {
+-			if (subif != sdata && subif->type == sdata->type &&
+-			    subif->running) {
+-				mutex_unlock(&sdata->local->iflist_mtx);
+-				return -EBUSY;
+-			}
+-		}
+-		mutex_unlock(&sdata->local->iflist_mtx);
+-	}
+-
+-	mutex_lock(&sdata->local->iflist_mtx);
+-	sdata->running = true;
+-	mutex_unlock(&sdata->local->iflist_mtx);
+-
+-	if (local->open_count++ == 0) {
+-		res = local->ops->start(&local->hw);
+-		WARN_ON(res);
+-		if (res)
+-			goto err;
+-	}
+-
+-	netif_start_queue(dev);
+-	return 0;
+-err:
+-	sdata->local->open_count--;
+-
+-	return res;
+-}
+-
+-int mac802154_slave_close(struct net_device *dev)
+-{
+-	struct ieee802154_sub_if_data *sdata = IEEE802154_DEV_TO_SUB_IF(dev);
+-	struct ieee802154_local *local = sdata->local;
+-
+-	ASSERT_RTNL();
+-
+-	netif_stop_queue(dev);
+-
+-	mutex_lock(&sdata->local->iflist_mtx);
+-	sdata->running = false;
+-	mutex_unlock(&sdata->local->iflist_mtx);
+-
+-	if (!--local->open_count)
+-		local->ops->stop(&local->hw);
+-
+-	return 0;
+-}
+-
+ static int
+ mac802154_netdev_register(struct wpan_phy *phy, struct net_device *dev)
+ {
+-- 
+2.1.2
 
-You are right cover-letters looks much ugly and patches contains too much changes
-sometimes.
-
-I want that all these changes are contain in the upcomming kernel release.
-I will try to improve my cover-letter in the next series. For me wrtiting a
-commit msg is more difficult than writing code and there will comming
-much patches which will do many change.
-
-The current code base for this branch is very bad and when we don't
-doing anything here in this structual architecture then this branch will
-die. For me it was already died when I cames mainline.
-
-I can't simple send a patch which removes all 802.15.4 code and adding a
-new implementation. We need to do this in small steps.
-
-- Alex
