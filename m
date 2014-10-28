@@ -1,56 +1,42 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.126.187]:58037 "EHLO
+Received: from mout.kundenserver.de ([212.227.17.10]:49167 "EHLO
 	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758164AbaJ3KSi (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Thu, 30 Oct 2014 06:18:38 -0400
-Message-ID: <5452107B.8010805@xsilon.com>
-Date: Thu, 30 Oct 2014 10:18:35 +0000
-From: Simon Vincent <simon.vincent@xsilon.com>
+	with ESMTP id S1754429AbaJ1Vn5 (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Tue, 28 Oct 2014 17:43:57 -0400
+Message-ID: <54500E1B.20805@xsilon.com>
+Date: Tue, 28 Oct 2014 21:43:55 +0000
+From: Martin Townsend <martin.townsend@xsilon.com>
 MIME-Version: 1.0
-Subject: Re: problems with udp header compression
-References: <5452081F.5090706@xsilon.com>
-In-Reply-To: <5452081F.5090706@xsilon.com>
+Subject: skb free patches
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org
+To: Alexander Aring <alex.aring@gmail.com>
+Cc: linux-wpan@vger.kernel.org
 
-This appears to be because if you use a RAW socket with IPPROTO_RAW the 
-ipv6 stack passes it straight through and the skb transport_header, 
-network_header offset are not set.
+Hi Alex,
 
-Putting the following at the top of compress_udp_header fixes the 
-problem but I am not sure it is safe.
-if (skb->transport_header == skb->network_header){
-         skb_set_transport_header(skb,sizeof(struct ipv6hdr));
-     }
+I've prepared the patches for freeing skb outside of the decompress 
+routines but now I'm unsure whether this is the best thing to do.
+
+Plus side
+it makes the decompression routine neater, no goto's, just return an 
+error code.
+Centralises the freeing of the skb.
+Easier to maintain, future decompression routines don't have to worry 
+about making sure all error paths have freed the skb.
+
+Negative side
+Decompression routines musn't reallocate the skb, ie make a copy. The 
+skb pointer that is passed in must still be valid on return otherwise we 
+get a double free.  I think skb_cow is ok as it calls pskb_expand_head 
+which just makes more room in the data but if a routine was to use 
+skb_copy then I think we would be in trouble.
+
+Maybe decompression routines should only be using routines like skb_cow 
+as they are more effecient.  What are your thoughts before I send the 
+series?
 
 
-Simon
--
-On 30/10/14 09:42, Simon Vincent wrote:
-> I think I have stumbled across a bug in the udp header compression or 
-> possibly in a higher layer of the network stack.
->
-> If I send a UDP message using a RAW socket[0] the src and dest port 
-> numbers get corrupted on 802.15.4 devices. This does not occur on 
-> ethernet.
->
-> If I print out the udp source and destination ports in 
-> compress_udp_header they are incorrect. The function udp_hdr is not 
-> pointing at the udp header but actually the ip6 header.
->
-> If I send a UDP message using a normal UDP socket I do not have this 
-> problem.
->
-> Any ideas?
->
-> Simon
->
-> [0] - socket(AF_INET6, SOCK_RAW, IPPROTO_RAW);
-> -- 
-> To unsubscribe from this list: send the line "unsubscribe linux-wpan" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
+- Martin.
