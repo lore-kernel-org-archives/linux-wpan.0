@@ -1,131 +1,244 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-pa0-f43.google.com ([209.85.220.43]:42515 "EHLO
-	mail-pa0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752071AbaJ2IPm (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Wed, 29 Oct 2014 04:15:42 -0400
-Received: by mail-pa0-f43.google.com with SMTP id eu11so2680950pac.16
-        for <linux-wpan@vger.kernel.org>; Wed, 29 Oct 2014 01:15:42 -0700 (PDT)
-Message-ID: <5450A17F.9070209@gmail.com>
-Date: Wed, 29 Oct 2014 13:42:47 +0530
-From: Varka Bhadram <varkabhadram@gmail.com>
-MIME-Version: 1.0
-Subject: Re: [PATCH bluetooth-next 07/17] mac802154: remove might_sleep from
- driver layer
-References: <1414516892-4107-1-git-send-email-alex.aring@gmail.com> <1414516892-4107-8-git-send-email-alex.aring@gmail.com> <5450601D.8040608@gmail.com> <20141029055303.GC4709@omega> <545081E1.8000508@gmail.com> <20141029061306.GE4709@omega> <5450A102.60004@gmail.com>
-In-Reply-To: <5450A102.60004@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Received: from mail-la0-f54.google.com ([209.85.215.54]:42500 "EHLO
+	mail-la0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751695AbaJ1RWF (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Tue, 28 Oct 2014 13:22:05 -0400
+Received: by mail-la0-f54.google.com with SMTP id gm9so1055811lab.27
+        for <linux-wpan@vger.kernel.org>; Tue, 28 Oct 2014 10:22:03 -0700 (PDT)
+From: Alexander Aring <alex.aring@gmail.com>
+Subject: [PATCH bluetooth-next 08/17] mac802154: remove driver ops in wpan-phy
+Date: Tue, 28 Oct 2014 18:21:23 +0100
+Message-Id: <1414516892-4107-9-git-send-email-alex.aring@gmail.com>
+In-Reply-To: <1414516892-4107-1-git-send-email-alex.aring@gmail.com>
+References: <1414516892-4107-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>
-Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de
+To: linux-wpan@vger.kernel.org
+Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-On 10/29/2014 01:40 PM, Varka Bhadram wrote:
-> On 10/29/2014 11:43 AM, Alexander Aring wrote:
->> Hi Varka,
->>
->> On Wed, Oct 29, 2014 at 11:27:53AM +0530, Varka Bhadram wrote:
->>> On 10/29/2014 11:23 AM, Alexander Aring wrote:
->>>> Hi Varka,
->>>>
->>>> On Wed, Oct 29, 2014 at 09:03:49AM +0530, Varka Bhadram wrote:
->>>>> On 10/28/2014 10:51 PM, Alexander Aring wrote:
->>>>>> This patch removes all might_sleep calls from driver layer. This
->>>>>> handling is already done by mac802154 layer.
->>>>>>
->>>>>> Signed-off-by: Alexander Aring <alex.aring@gmail.com>
->>>>>> ---
->>>>>>   drivers/net/ieee802154/at86rf230.c | 3 ---
->>>>>>   drivers/net/ieee802154/cc2520.c    | 1 -
->>>>>>   drivers/net/ieee802154/fakelb.c    | 4 ----
->>>>>>   3 files changed, 8 deletions(-)
->>>>>>
->>>>> For CC2520 driver
->>>>>
->>>> I would Cc you here if you stand in the MAINTAINERS file for cc2520
->>>> driver. I asked you some months ago if you like to be there. I didn't
->>>> saw any patches for that. I thought it's out of interest by you 
->>>> that you
->>>> want to be maintainer for this driver.  When these changes are very 
->>>> trivial
->>>> like this one, it's okay for you when Marcel simple apply these 
->>>> patches
->>>> without any ack? I already told him that we don't need to wait of 
->>>> Alan's
->>>> ack for the mrf24j40 driver.
->>>>
->>>> Nevertheless if you want to add really a Acked here and we need to 
->>>> wait
->>>> then please insert you in the MAINTAINERS file. When I run
->>>> get_maintainers it's currently me who is maintainer for the cc2520 
->>>> driver.
->>>>
->>>> If you want to take care of this driver, please see my improvements 
->>>> and
->>>> fixes for the at86rf230. I am sure you could also take some code 
->>>> for the
->>>> cc2520 from it. Also I would be very happy for async xmit handling or
->>>> regmap support. Most of the cc2520 code is lowlevel spi api calls.
->>>>
->>>> - Alex
->>> I think i clarified you that i want to be the CC2520 driver maintainer.
->>>
->>> I asked you to submit the patche for MAINTAINER file, you told that its
->>> not required.
->>>
->> I looked up the conversion:
->>
->> You:
->>
->> "You mean to say that i need to add an entry in MAINTAINER file or ..?"
->>
->> Me:
->>
->> "not need, only if you like. I have no idea about the cc2520 driver."
->>
->> need != required. For me this sentence is more... you really don't need
->> that do be maintainer of this if you don't like that. But if you like to
->> be maintainer, then send a patch.
->
-> I will send a patch for the MAINTAINER.
->
->>> If i run get_maintainer on the cc2520 driver , my name is there for 
->>> the commit_signer
->>>
->> This is because get_maintainers lookups the last commits.
->>
->> I run "./scripts/get_maintainer.pl -f drivers/net/ieee802154/cc2520.c"
->> on my own.
->>
->> Output is:
->>
->> Alexander Aring <alex.aring@gmail.com> (maintainer:IEEE 802.15.4 SUB...)
->> Grant Likely <grant.likely@linaro.org> (maintainer:OPEN FIRMWARE AND...)
->> Rob Herring <robh+dt@kernel.org> (maintainer:OPEN FIRMWARE AND...)
->> linux-wpan@vger.kernel.org (open list:IEEE 802.15.4 SUB...)
->> netdev@vger.kernel.org (open list:NETWORKING DRIVERS)
->> linux-kernel@vger.kernel.org (open list)
->> devicetree@vger.kernel.org (open list:OPEN FIRMWARE AND...)
->>
->>
->> there is no Varka here.
->
-> Ok.. I will update.
->
->>> I will improve this driver regmap suuport.
->>>
->> ok.
->>
->> - Alex
->
-> Thanks...
->
-Put cc to me incase of cc2520  driver changes.
+This patch removes the driver ops callbacks inside of wpan_phy struct.
+It was used to check if a phy supports this driver ops call. We do this
+now via hardware flags.
 
-Wait for my Ack on those changes.
+Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+---
+ include/net/cfg802154.h |  8 -----
+ net/ieee802154/nl-mac.c | 19 ++---------
+ net/mac802154/iface.c   | 12 +++----
+ net/mac802154/main.c    | 85 -------------------------------------------------
+ 4 files changed, 8 insertions(+), 116 deletions(-)
 
-
+diff --git a/include/net/cfg802154.h b/include/net/cfg802154.h
+index 5c67467..440b9be 100644
+--- a/include/net/cfg802154.h
++++ b/include/net/cfg802154.h
+@@ -57,14 +57,6 @@ struct wpan_phy {
+ 					const char *name, int type);
+ 	void (*del_iface)(struct wpan_phy *phy, struct net_device *dev);
+ 
+-	int (*set_txpower)(struct wpan_phy *phy, int db);
+-	int (*set_lbt)(struct wpan_phy *phy, bool on);
+-	int (*set_cca_mode)(struct wpan_phy *phy, u8 cca_mode);
+-	int (*set_cca_ed_level)(struct wpan_phy *phy, int level);
+-	int (*set_csma_params)(struct wpan_phy *phy, u8 min_be, u8 max_be,
+-			       u8 retries);
+-	int (*set_frame_retries)(struct wpan_phy *phy, s8 retries);
+-
+ 	char priv[0] __aligned(NETDEV_ALIGN);
+ };
+ 
+diff --git a/net/ieee802154/nl-mac.c b/net/ieee802154/nl-mac.c
+index fb6866d..abd0f31 100644
+--- a/net/ieee802154/nl-mac.c
++++ b/net/ieee802154/nl-mac.c
+@@ -664,20 +664,6 @@ int ieee802154_set_macparams(struct sk_buff *skb, struct genl_info *info)
+ 
+ 	phy = ops->get_phy(dev);
+ 
+-	if ((!phy->set_lbt && info->attrs[IEEE802154_ATTR_LBT_ENABLED]) ||
+-	    (!phy->set_cca_mode && info->attrs[IEEE802154_ATTR_CCA_MODE]) ||
+-	    (!phy->set_cca_ed_level &&
+-	     info->attrs[IEEE802154_ATTR_CCA_ED_LEVEL]) ||
+-	    (!phy->set_csma_params &&
+-	     (info->attrs[IEEE802154_ATTR_CSMA_RETRIES] ||
+-	      info->attrs[IEEE802154_ATTR_CSMA_MIN_BE] ||
+-	      info->attrs[IEEE802154_ATTR_CSMA_MAX_BE])) ||
+-	    (!phy->set_frame_retries &&
+-	     info->attrs[IEEE802154_ATTR_FRAME_RETRIES])) {
+-		rc = -EOPNOTSUPP;
+-		goto out_phy;
+-	}
+-
+ 	ops->get_mac_params(dev, &params);
+ 
+ 	if (info->attrs[IEEE802154_ATTR_TXPOWER])
+@@ -708,10 +694,9 @@ int ieee802154_set_macparams(struct sk_buff *skb, struct genl_info *info)
+ 
+ 	wpan_phy_put(phy);
+ 	dev_put(dev);
+-	return rc;
+ 
+-out_phy:
+-	wpan_phy_put(phy);
++	return 0;
++
+ out:
+ 	dev_put(dev);
+ 	return rc;
+diff --git a/net/mac802154/iface.c b/net/mac802154/iface.c
+index 025cd5a..300877a 100644
+--- a/net/mac802154/iface.c
++++ b/net/mac802154/iface.c
+@@ -196,32 +196,32 @@ static int mac802154_wpan_open(struct net_device *dev)
+ 
+ 	mutex_lock(&phy->pib_lock);
+ 
+-	if (phy->set_txpower) {
++	if (local->hw.flags & IEEE802154_HW_TXPOWER) {
+ 		rc = drv_set_tx_power(local, sdata->mac_params.transmit_power);
+ 		if (rc < 0)
+ 			goto out;
+ 	}
+ 
+-	if (phy->set_lbt) {
++	if (local->hw.flags & IEEE802154_HW_LBT) {
+ 		rc = drv_set_lbt_mode(local, sdata->mac_params.lbt);
+ 		if (rc < 0)
+ 			goto out;
+ 	}
+ 
+-	if (phy->set_cca_mode) {
++	if (local->hw.flags & IEEE802154_HW_CCA_MODE) {
+ 		rc = drv_set_cca_mode(local, sdata->mac_params.cca_mode);
+ 		if (rc < 0)
+ 			goto out;
+ 	}
+ 
+-	if (phy->set_cca_ed_level) {
++	if (local->hw.flags & IEEE802154_HW_CCA_ED_LEVEL) {
+ 		rc = drv_set_cca_ed_level(local,
+ 					  sdata->mac_params.cca_ed_level);
+ 		if (rc < 0)
+ 			goto out;
+ 	}
+ 
+-	if (phy->set_csma_params) {
++	if (local->hw.flags & IEEE802154_HW_CSMA_PARAMS) {
+ 		rc = drv_set_csma_params(local, sdata->mac_params.min_be,
+ 					 sdata->mac_params.max_be,
+ 					 sdata->mac_params.csma_retries);
+@@ -229,7 +229,7 @@ static int mac802154_wpan_open(struct net_device *dev)
+ 			goto out;
+ 	}
+ 
+-	if (phy->set_frame_retries) {
++	if (local->hw.flags & IEEE802154_HW_FRAME_RETRIES) {
+ 		rc = drv_set_max_frame_retries(local,
+ 					       sdata->mac_params.frame_retries);
+ 		if (rc < 0)
+diff --git a/net/mac802154/main.c b/net/mac802154/main.c
+index 24ecc09..9fa9514 100644
+--- a/net/mac802154/main.c
++++ b/net/mac802154/main.c
+@@ -121,49 +121,6 @@ err:
+ 	return ERR_PTR(err);
+ }
+ 
+-static int mac802154_set_txpower(struct wpan_phy *phy, int db)
+-{
+-	struct ieee802154_local *local = wpan_phy_priv(phy);
+-
+-	return drv_set_tx_power(local, db);
+-}
+-
+-static int mac802154_set_lbt(struct wpan_phy *phy, bool on)
+-{
+-	struct ieee802154_local *local = wpan_phy_priv(phy);
+-
+-	return drv_set_lbt_mode(local, on);
+-}
+-
+-static int mac802154_set_cca_mode(struct wpan_phy *phy, u8 mode)
+-{
+-	struct ieee802154_local *local = wpan_phy_priv(phy);
+-
+-	return drv_set_cca_mode(local, mode);
+-}
+-
+-static int mac802154_set_cca_ed_level(struct wpan_phy *phy, s32 level)
+-{
+-	struct ieee802154_local *local = wpan_phy_priv(phy);
+-
+-	return drv_set_cca_ed_level(local, level);
+-}
+-
+-static int mac802154_set_csma_params(struct wpan_phy *phy, u8 min_be,
+-				     u8 max_be, u8 retries)
+-{
+-	struct ieee802154_local *local = wpan_phy_priv(phy);
+-
+-	return drv_set_csma_params(local, min_be, max_be, retries);
+-}
+-
+-static int mac802154_set_frame_retries(struct wpan_phy *phy, s8 retries)
+-{
+-	struct ieee802154_local *local = wpan_phy_priv(phy);
+-
+-	return drv_set_max_frame_retries(local, retries);
+-}
+-
+ static void ieee802154_tasklet_handler(unsigned long data)
+ {
+ 	struct ieee802154_local *local = (struct ieee802154_local *)data;
+@@ -262,48 +219,6 @@ int ieee802154_register_hw(struct ieee802154_hw *hw)
+ 	struct ieee802154_local *local = hw_to_local(hw);
+ 	int rc = -ENOSYS;
+ 
+-	if (hw->flags & IEEE802154_HW_TXPOWER) {
+-		if (!local->ops->set_txpower)
+-			goto out;
+-
+-		local->phy->set_txpower = mac802154_set_txpower;
+-	}
+-
+-	if (hw->flags & IEEE802154_HW_LBT) {
+-		if (!local->ops->set_lbt)
+-			goto out;
+-
+-		local->phy->set_lbt = mac802154_set_lbt;
+-	}
+-
+-	if (hw->flags & IEEE802154_HW_CCA_MODE) {
+-		if (!local->ops->set_cca_mode)
+-			goto out;
+-
+-		local->phy->set_cca_mode = mac802154_set_cca_mode;
+-	}
+-
+-	if (hw->flags & IEEE802154_HW_CCA_ED_LEVEL) {
+-		if (!local->ops->set_cca_ed_level)
+-			goto out;
+-
+-		local->phy->set_cca_ed_level = mac802154_set_cca_ed_level;
+-	}
+-
+-	if (hw->flags & IEEE802154_HW_CSMA_PARAMS) {
+-		if (!local->ops->set_csma_params)
+-			goto out;
+-
+-		local->phy->set_csma_params = mac802154_set_csma_params;
+-	}
+-
+-	if (hw->flags & IEEE802154_HW_FRAME_RETRIES) {
+-		if (!local->ops->set_frame_retries)
+-			goto out;
+-
+-		local->phy->set_frame_retries = mac802154_set_frame_retries;
+-	}
+-
+ 	local->workqueue =
+ 		create_singlethread_workqueue(wpan_phy_name(local->phy));
+ 	if (!local->workqueue) {
 -- 
-Regards,
-Varka Bhadram.
+2.1.2
 
