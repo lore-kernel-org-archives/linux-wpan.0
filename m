@@ -1,14 +1,14 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-la0-f54.google.com ([209.85.215.54]:35425 "EHLO
-	mail-la0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751662AbaJ1RWK (ORCPT
+Received: from mail-lb0-f173.google.com ([209.85.217.173]:55449 "EHLO
+	mail-lb0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752104AbaJ1RWK (ORCPT
 	<rfc822;linux-wpan@vger.kernel.org>); Tue, 28 Oct 2014 13:22:10 -0400
-Received: by mail-la0-f54.google.com with SMTP id gm9so1022330lab.41
-        for <linux-wpan@vger.kernel.org>; Tue, 28 Oct 2014 10:22:07 -0700 (PDT)
+Received: by mail-lb0-f173.google.com with SMTP id l4so1028084lbv.32
+        for <linux-wpan@vger.kernel.org>; Tue, 28 Oct 2014 10:22:08 -0700 (PDT)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH bluetooth-next 12/17] mac802154: add synchronization handling
-Date: Tue, 28 Oct 2014 18:21:27 +0100
-Message-Id: <1414516892-4107-13-git-send-email-alex.aring@gmail.com>
+Subject: [PATCH bluetooth-next 13/17] mac802154: iface: remove assign to zero
+Date: Tue, 28 Oct 2014 18:21:28 +0100
+Message-Id: <1414516892-4107-14-git-send-email-alex.aring@gmail.com>
 In-Reply-To: <1414516892-4107-1-git-send-email-alex.aring@gmail.com>
 References: <1414516892-4107-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
@@ -16,42 +16,55 @@ List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
 Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-This patch adds synchronization handling in start and stop driver ops
-calls. This patch is mostly grab from mac80211 which was introduced by
-commit ea77f12f2cc0f31168f2e0259e65a22202ac4dc2 ("mac80211: remove
-tasklet enable/disable"). This is to be sure that we don't run into same
-issues.
+These variables should already be zero, so we remove the extra assign to
+zero.
 
 Signed-off-by: Alexander Aring <alex.aring@gmail.com>
 ---
- net/mac802154/driver-ops.h | 7 +++++++
- 1 file changed, 7 insertions(+)
+ net/mac802154/iface.c | 6 ------
+ 1 file changed, 6 deletions(-)
 
-diff --git a/net/mac802154/driver-ops.h b/net/mac802154/driver-ops.h
-index bb3ee03..4b820cf 100644
---- a/net/mac802154/driver-ops.h
-+++ b/net/mac802154/driver-ops.h
-@@ -30,6 +30,7 @@ static inline int drv_start(struct ieee802154_local *local)
- 	might_sleep();
+diff --git a/net/mac802154/iface.c b/net/mac802154/iface.c
+index e10fd78..2423aa7 100644
+--- a/net/mac802154/iface.c
++++ b/net/mac802154/iface.c
+@@ -409,7 +409,6 @@ void mac802154_wpan_setup(struct net_device *dev)
+ 	dev->tx_queue_len	= 300;
+ 	dev->type		= ARPHRD_IEEE802154;
+ 	dev->flags		= IFF_NOARP | IFF_BROADCAST;
+-	dev->watchdog_timeo	= 0;
  
- 	local->started = true;
-+	smp_mb();
+ 	dev->destructor		= mac802154_wpan_free;
+ 	dev->netdev_ops		= &mac802154_wpan_ops;
+@@ -419,7 +418,6 @@ void mac802154_wpan_setup(struct net_device *dev)
+ 	sdata->type = IEEE802154_DEV_WPAN;
  
- 	return local->ops->start(&local->hw);
+ 	sdata->chan = MAC802154_CHAN_NONE;
+-	sdata->page = 0;
+ 
+ 	spin_lock_init(&sdata->mib_lock);
+ 	mutex_init(&sdata->sec_mtx);
+@@ -444,14 +442,11 @@ void mac802154_monitor_setup(struct net_device *dev)
+ {
+ 	struct ieee802154_sub_if_data *sdata;
+ 
+-	dev->addr_len		= 0;
+-	dev->hard_header_len	= 0;
+ 	dev->needed_tailroom	= 2; /* room for FCS */
+ 	dev->mtu		= IEEE802154_MTU;
+ 	dev->tx_queue_len	= 10;
+ 	dev->type		= ARPHRD_IEEE802154_MONITOR;
+ 	dev->flags		= IFF_NOARP | IFF_BROADCAST;
+-	dev->watchdog_timeo	= 0;
+ 
+ 	dev->destructor		= free_netdev;
+ 	dev->netdev_ops		= &mac802154_monitor_ops;
+@@ -461,5 +456,4 @@ void mac802154_monitor_setup(struct net_device *dev)
+ 	sdata->type = IEEE802154_DEV_MONITOR;
+ 
+ 	sdata->chan = MAC802154_CHAN_NONE; /* not initialized */
+-	sdata->page = 0;
  }
-@@ -40,6 +41,12 @@ static inline void drv_stop(struct ieee802154_local *local)
- 
- 	local->ops->stop(&local->hw);
- 
-+	/* sync away all work on the tasklet before clearing started */
-+	tasklet_disable(&local->tasklet);
-+	tasklet_enable(&local->tasklet);
-+
-+	barrier();
-+
- 	local->started = false;
- }
- 
 -- 
 2.1.2
 
