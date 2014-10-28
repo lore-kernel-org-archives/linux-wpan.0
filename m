@@ -1,45 +1,241 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-pd0-f181.google.com ([209.85.192.181]:35579 "EHLO
-	mail-pd0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752232AbaJ2Dfl (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Tue, 28 Oct 2014 23:35:41 -0400
-Received: by mail-pd0-f181.google.com with SMTP id y10so2076429pdj.40
-        for <linux-wpan@vger.kernel.org>; Tue, 28 Oct 2014 20:35:41 -0700 (PDT)
-Message-ID: <54505FDF.80900@gmail.com>
-Date: Wed, 29 Oct 2014 09:02:47 +0530
-From: Varka Bhadram <varkabhadram@gmail.com>
-MIME-Version: 1.0
-Subject: Re: [PATCH bluetooth-next 04/17] mac802154: ops: declare channel
- and page as u8
-References: <1414516892-4107-1-git-send-email-alex.aring@gmail.com> <1414516892-4107-5-git-send-email-alex.aring@gmail.com>
-In-Reply-To: <1414516892-4107-5-git-send-email-alex.aring@gmail.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
+Received: from mail-la0-f53.google.com ([209.85.215.53]:48867 "EHLO
+	mail-la0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751660AbaJ1RWB (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Tue, 28 Oct 2014 13:22:01 -0400
+Received: by mail-la0-f53.google.com with SMTP id mc6so1028930lab.40
+        for <linux-wpan@vger.kernel.org>; Tue, 28 Oct 2014 10:22:00 -0700 (PDT)
+From: Alexander Aring <alex.aring@gmail.com>
+Subject: [PATCH bluetooth-next 05/17] mac802154: introduce driver-ops header
+Date: Tue, 28 Oct 2014 18:21:20 +0100
+Message-Id: <1414516892-4107-6-git-send-email-alex.aring@gmail.com>
+In-Reply-To: <1414516892-4107-1-git-send-email-alex.aring@gmail.com>
+References: <1414516892-4107-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org
-Cc: kernel@pengutronix.de, Alan Ott <alan@signal11.us>
+To: linux-wpan@vger.kernel.org
+Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-On 10/28/2014 10:51 PM, Alexander Aring wrote:
-> The range of channel and page fits into an unsigned byte range. This
-> patch changes the set_channel parameter definitions for channel and
-> page to u8.
->
-> Signed-off-by: Alexander Aring <alex.aring@gmail.com>
-> Cc: Alan Ott <alan@signal11.us>
-> ---
->   drivers/net/ieee802154/at86rf230.c | 8 ++++----
->   drivers/net/ieee802154/cc2520.c    | 2 +-
->   drivers/net/ieee802154/fakelb.c    | 2 +-
->   drivers/net/ieee802154/mrf24j40.c  | 3 +--
->   include/net/mac802154.h            | 5 ++---
->   5 files changed, 9 insertions(+), 11 deletions(-)
->
-For cc2520 driver change
+This patch introduce a driver-ops header file with function wrappers to
+call the driver ops. These wrappers checking on right context
+information and warn if optional driver ops are called when these aren't
+implemented. This behaviour is like mac80211 driver-ops header file,
+just without function tracing calls.
 
-Acked-by: Varka Bhadram <varkabhadram@gmail.com>
+Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+---
+ net/mac802154/driver-ops.h | 202 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 202 insertions(+)
+ create mode 100644 net/mac802154/driver-ops.h
 
+diff --git a/net/mac802154/driver-ops.h b/net/mac802154/driver-ops.h
+new file mode 100644
+index 0000000..bf7980b
+--- /dev/null
++++ b/net/mac802154/driver-ops.h
+@@ -0,0 +1,202 @@
++#ifndef __MAC802154_DRVIER_OPS
++#define __MAC802154_DRIVER_OPS
++
++#include <linux/types.h>
++#include <linux/rtnetlink.h>
++
++#include <net/mac802154.h>
++
++#include "ieee802154_i.h"
++
++static inline int
++drv_xmit_async(struct ieee802154_local *local, struct sk_buff *skb)
++{
++	return local->ops->xmit_async(&local->hw, skb);
++}
++
++static inline int
++drv_xmit_sync(struct ieee802154_local *local, struct sk_buff *skb)
++{
++	/* don't allow other operations while sync xmit */
++	ASSERT_RTNL();
++
++	might_sleep();
++
++	return local->ops->xmit_sync(&local->hw, skb);
++}
++
++static inline int drv_start(struct ieee802154_local *local)
++{
++	might_sleep();
++
++	return local->ops->start(&local->hw);
++}
++
++static inline void drv_stop(struct ieee802154_local *local)
++{
++	might_sleep();
++
++	local->ops->stop(&local->hw);
++}
++
++static inline int drv_set_channel(struct ieee802154_local *local,
++				  const u8 page, const u8 channel)
++{
++	might_sleep();
++
++	return local->ops->set_channel(&local->hw, page, channel);
++}
++
++static inline int drv_set_tx_power(struct ieee802154_local *local,
++				   const s8 dbm)
++{
++	might_sleep();
++
++	if (!local->ops->set_txpower) {
++		WARN_ON(1);
++		return -EOPNOTSUPP;
++	}
++
++	return local->ops->set_txpower(&local->hw, dbm);
++}
++
++static inline int drv_set_cca_mode(struct ieee802154_local *local,
++				   const u8 cca_mode)
++{
++	might_sleep();
++
++	if (!local->ops->set_cca_mode) {
++		WARN_ON(1);
++		return -EOPNOTSUPP;
++	}
++
++	return local->ops->set_cca_mode(&local->hw, cca_mode);
++}
++
++static inline int drv_set_lbt_mode(struct ieee802154_local *local,
++				   const bool mode)
++{
++	might_sleep();
++
++	if (!local->ops->set_lbt) {
++		WARN_ON(1);
++		return -EOPNOTSUPP;
++	}
++
++	return local->ops->set_lbt(&local->hw, mode);
++}
++
++static inline int drv_set_cca_ed_level(struct ieee802154_local *local,
++				       const s32 ed_level)
++{
++	might_sleep();
++
++	if (!local->ops->set_cca_ed_level) {
++		WARN_ON(1);
++		return -EOPNOTSUPP;
++	}
++
++	return local->ops->set_cca_ed_level(&local->hw, ed_level);
++}
++
++static inline int drv_set_pan_id(struct ieee802154_local *local,
++				 const __le16 pan_id)
++{
++	struct ieee802154_hw_addr_filt filt;
++
++	might_sleep();
++
++	if (!local->ops->set_hw_addr_filt) {
++		WARN_ON(1);
++		return -EOPNOTSUPP;
++	}
++
++	filt.pan_id = pan_id;
++
++	return local->ops->set_hw_addr_filt(&local->hw, &filt,
++					    IEEE802154_AFILT_PANID_CHANGED);
++}
++
++static inline int drv_set_extended_addr(struct ieee802154_local *local,
++					const __le64 extended_addr)
++{
++	struct ieee802154_hw_addr_filt filt;
++
++	might_sleep();
++
++	if (!local->ops->set_hw_addr_filt) {
++		WARN_ON(1);
++		return -EOPNOTSUPP;
++	}
++
++	filt.ieee_addr = extended_addr;
++
++	return local->ops->set_hw_addr_filt(&local->hw, &filt,
++					    IEEE802154_AFILT_IEEEADDR_CHANGED);
++}
++
++static inline int drv_set_short_addr(struct ieee802154_local *local,
++				     const __le16 short_addr)
++{
++	struct ieee802154_hw_addr_filt filt;
++
++	might_sleep();
++
++	if (!local->ops->set_hw_addr_filt) {
++		WARN_ON(1);
++		return -EOPNOTSUPP;
++	}
++
++	filt.short_addr = short_addr;
++
++	return local->ops->set_hw_addr_filt(&local->hw, &filt,
++					    IEEE802154_AFILT_SADDR_CHANGED);
++}
++
++static inline int drv_set_pan_coord(struct ieee802154_local *local,
++				    const bool is_coord)
++{
++	struct ieee802154_hw_addr_filt filt;
++
++	might_sleep();
++
++	if (!local->ops->set_hw_addr_filt) {
++		WARN_ON(1);
++		return -EOPNOTSUPP;
++	}
++
++	filt.pan_coord = is_coord;
++
++	return local->ops->set_hw_addr_filt(&local->hw, &filt,
++					    IEEE802154_AFILT_PANC_CHANGED);
++}
++
++static inline int drv_set_csma_params(struct ieee802154_local *local,
++				      u8 min_be, u8 max_be,
++				      u8 max_csma_backoffs)
++{
++	might_sleep();
++
++	if (!local->ops->set_csma_params) {
++		WARN_ON(1);
++		return -EOPNOTSUPP;
++	}
++
++	return local->ops->set_csma_params(&local->hw, min_be, max_be,
++					   max_csma_backoffs);
++}
++
++static inline int drv_set_max_frame_retries(struct ieee802154_local *local,
++					    s8 max_frame_retries)
++{
++	might_sleep();
++
++	if (!local->ops->set_frame_retries) {
++		WARN_ON(1);
++		return -EOPNOTSUPP;
++	}
++
++	return local->ops->set_frame_retries(&local->hw, max_frame_retries);
++}
++
++#endif /* __MAC802154_DRVIER_OPS */
 -- 
-Regards,
-Varka Bhadram.
+2.1.2
 
