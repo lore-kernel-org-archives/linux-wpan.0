@@ -1,91 +1,84 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wg0-f45.google.com ([74.125.82.45]:46445 "EHLO
-	mail-wg0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756101AbaJ2Ufx (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Wed, 29 Oct 2014 16:35:53 -0400
-Received: by mail-wg0-f45.google.com with SMTP id x12so2777402wgg.32
-        for <linux-wpan@vger.kernel.org>; Wed, 29 Oct 2014 13:35:52 -0700 (PDT)
+Received: from mail-wg0-f52.google.com ([74.125.82.52]:57865 "EHLO
+	mail-wg0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756619AbaJ2Ufz (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Wed, 29 Oct 2014 16:35:55 -0400
+Received: by mail-wg0-f52.google.com with SMTP id b13so2192069wgh.11
+        for <linux-wpan@vger.kernel.org>; Wed, 29 Oct 2014 13:35:54 -0700 (PDT)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH bluetooth-next 04/17] mac802154: add hardware address filter flag
-Date: Wed, 29 Oct 2014 21:34:31 +0100
-Message-Id: <1414614884-20243-5-git-send-email-alex.aring@gmail.com>
+Subject: [PATCH bluetooth-next 05/17] mac802154: add support for promiscuous mode
+Date: Wed, 29 Oct 2014 21:34:32 +0100
+Message-Id: <1414614884-20243-6-git-send-email-alex.aring@gmail.com>
 In-Reply-To: <1414614884-20243-1-git-send-email-alex.aring@gmail.com>
 References: <1414614884-20243-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
-Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>, Alan Ott <alan@signal11.us>, Varka Bhadram <varkabhadram@gmail.com>
+Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-Overdue introduction for address filtering hardware flag. Furthermore we
-will check and set address filtering on interface up. This patch
-prepares that we can check if an transceiver supports address filtering
-option. Currently all mainline driver supports hardware address filtering.
+This patch adds a new driver operation to bring the transceiver into
+promiscuous mode.
 
 Signed-off-by: Alexander Aring <alex.aring@gmail.com>
-Cc: Alan Ott <alan@signal11.us>
-Cc: Varka Bhadram <varkabhadram@gmail.com>
 ---
- drivers/net/ieee802154/at86rf230.c | 3 ++-
- drivers/net/ieee802154/cc2520.c    | 3 ++-
- drivers/net/ieee802154/mrf24j40.c  | 3 ++-
- include/net/mac802154.h            | 2 ++
- 4 files changed, 8 insertions(+), 3 deletions(-)
+ include/net/mac802154.h    |  7 +++++++
+ net/mac802154/driver-ops.h | 13 +++++++++++++
+ 2 files changed, 20 insertions(+)
 
-diff --git a/drivers/net/ieee802154/at86rf230.c b/drivers/net/ieee802154/at86rf230.c
-index 0054588..622c1b6 100644
---- a/drivers/net/ieee802154/at86rf230.c
-+++ b/drivers/net/ieee802154/at86rf230.c
-@@ -1387,7 +1387,8 @@ at86rf230_detect_device(struct at86rf230_local *lp)
- 
- 	lp->hw->extra_tx_headroom = 0;
- 	lp->hw->flags = IEEE802154_HW_OMIT_CKSUM | IEEE802154_HW_AACK |
--			IEEE802154_HW_TXPOWER | IEEE802154_HW_ARET;
-+			IEEE802154_HW_TXPOWER | IEEE802154_HW_ARET |
-+			IEEE802154_HW_AFILT;
- 
- 	switch (part) {
- 	case 2:
-diff --git a/drivers/net/ieee802154/cc2520.c b/drivers/net/ieee802154/cc2520.c
-index c56d10c..340671b 100644
---- a/drivers/net/ieee802154/cc2520.c
-+++ b/drivers/net/ieee802154/cc2520.c
-@@ -654,7 +654,8 @@ static int cc2520_register(struct cc2520_private *priv)
- 
- 	/* We do support only 2.4 Ghz */
- 	priv->hw->phy->channels_supported[0] = 0x7FFF800;
--	priv->hw->flags = IEEE802154_HW_OMIT_CKSUM | IEEE802154_HW_AACK;
-+	priv->hw->flags = IEEE802154_HW_OMIT_CKSUM | IEEE802154_HW_AACK |
-+			  IEEE802154_HW_AFILT;
- 
- 	dev_vdbg(&priv->spi->dev, "registered cc2520\n");
- 	ret = ieee802154_register_hw(priv->hw);
-diff --git a/drivers/net/ieee802154/mrf24j40.c b/drivers/net/ieee802154/mrf24j40.c
-index 52b3d31..a200fa1 100644
---- a/drivers/net/ieee802154/mrf24j40.c
-+++ b/drivers/net/ieee802154/mrf24j40.c
-@@ -751,7 +751,8 @@ static int mrf24j40_probe(struct spi_device *spi)
- 	devrec->hw->priv = devrec;
- 	devrec->hw->parent = &devrec->spi->dev;
- 	devrec->hw->phy->channels_supported[0] = CHANNEL_MASK;
--	devrec->hw->flags = IEEE802154_HW_OMIT_CKSUM|IEEE802154_HW_AACK;
-+	devrec->hw->flags = IEEE802154_HW_OMIT_CKSUM | IEEE802154_HW_AACK |
-+			    IEEE802154_HW_AFILT;
- 
- 	dev_dbg(printdev(devrec), "registered mrf24j40\n");
- 	ret = ieee802154_register_hw(devrec->hw);
 diff --git a/include/net/mac802154.h b/include/net/mac802154.h
-index c5d7938..2f523fc 100644
+index 2f523fc..166ef6c5 100644
 --- a/include/net/mac802154.h
 +++ b/include/net/mac802154.h
-@@ -90,6 +90,8 @@ struct ieee802154_hw {
- #define IEEE802154_HW_CSMA_PARAMS	0x00000040
- /* Indicates that transceiver will support ARET frame retries setting. */
+@@ -92,6 +92,8 @@ struct ieee802154_hw {
  #define IEEE802154_HW_FRAME_RETRIES	0x00000080
-+/* Indicates that transceiver will support hardware address filter setting. */
-+#define IEEE802154_HW_AFILT		0x00000100
+ /* Indicates that transceiver will support hardware address filter setting. */
+ #define IEEE802154_HW_AFILT		0x00000100
++/* Indicates that transceiver will support promiscuous mode setting. */
++#define IEEE802154_HW_PROMISCUOUS	0x00000200
  
  /* This groups the most common CSMA support fields into one. */
  #define IEEE802154_HW_CSMA		(IEEE802154_HW_CCA_MODE | \
+@@ -173,6 +175,9 @@ struct ieee802154_hw {
+  * set_frame_retries
+  *	  Sets the retransmission attempt limit. Called with pib_lock held.
+  *	  Returns either zero, or negative errno.
++ *
++ * set_promiscuous_mode
++ *	  Enables or disable promiscuous mode.
+  */
+ struct ieee802154_ops {
+ 	struct module	*owner;
+@@ -197,6 +202,8 @@ struct ieee802154_ops {
+ 					   u8 min_be, u8 max_be, u8 retries);
+ 	int		(*set_frame_retries)(struct ieee802154_hw *hw,
+ 					     s8 retries);
++	int             (*set_promiscuous_mode)(struct ieee802154_hw *hw,
++						const bool on);
+ };
+ 
+ /* Basic interface to register ieee802154 hwice */
+diff --git a/net/mac802154/driver-ops.h b/net/mac802154/driver-ops.h
+index 4b820cf..dfd29ff 100644
+--- a/net/mac802154/driver-ops.h
++++ b/net/mac802154/driver-ops.h
+@@ -210,4 +210,17 @@ static inline int drv_set_max_frame_retries(struct ieee802154_local *local,
+ 	return local->ops->set_frame_retries(&local->hw, max_frame_retries);
+ }
+ 
++static inline int drv_set_promiscuous_mode(struct ieee802154_local *local,
++					   const bool on)
++{
++	might_sleep();
++
++	if (!local->ops->set_promiscuous_mode) {
++		WARN_ON(1);
++		return -EOPNOTSUPP;
++	}
++
++	return local->ops->set_promiscuous_mode(&local->hw, on);
++}
++
+ #endif /* __MAC802154_DRVIER_OPS */
 -- 
 2.1.2
 
