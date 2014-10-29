@@ -1,159 +1,75 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-pa0-f52.google.com ([209.85.220.52]:35072 "EHLO
-	mail-pa0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750858AbaJ2DzM (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Tue, 28 Oct 2014 23:55:12 -0400
-Received: by mail-pa0-f52.google.com with SMTP id fa1so2236841pad.25
-        for <linux-wpan@vger.kernel.org>; Tue, 28 Oct 2014 20:55:12 -0700 (PDT)
-Message-ID: <54506471.40007@gmail.com>
-Date: Wed, 29 Oct 2014 09:22:17 +0530
-From: Varka Bhadram <varkabhadram@gmail.com>
+Received: from mail-la0-f47.google.com ([209.85.215.47]:44991 "EHLO
+	mail-la0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752516AbaJ2FW5 (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Wed, 29 Oct 2014 01:22:57 -0400
+Received: by mail-la0-f47.google.com with SMTP id gd6so708430lab.34
+        for <linux-wpan@vger.kernel.org>; Tue, 28 Oct 2014 22:22:56 -0700 (PDT)
+Date: Wed, 29 Oct 2014 06:22:50 +0100
+From: Alexander Aring <alex.aring@gmail.com>
+Subject: Re: [PATCH bluetooth-next 14/17] mac802154: remove channel
+ attributes from sdata
+Message-ID: <20141029052247.GA4709@omega>
+References: <1414516892-4107-1-git-send-email-alex.aring@gmail.com>
+ <1414516892-4107-15-git-send-email-alex.aring@gmail.com>
+ <54506471.40007@gmail.com>
 MIME-Version: 1.0
-Subject: Re: [PATCH bluetooth-next 14/17] mac802154: remove channel attributes
- from sdata
-References: <1414516892-4107-1-git-send-email-alex.aring@gmail.com> <1414516892-4107-15-git-send-email-alex.aring@gmail.com>
-In-Reply-To: <1414516892-4107-15-git-send-email-alex.aring@gmail.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <54506471.40007@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org
-Cc: kernel@pengutronix.de
+To: Varka Bhadram <varkabhadram@gmail.com>
+Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de
 
-On 10/28/2014 10:51 PM, Alexander Aring wrote:
-> These channel attributes was part of "channel context switch while xmit"
-> which was removed by commit dc67c6b30f36d57b70b70547a30e7a8432540c6f
-> ("mac802154: tx: remove xmit channel context switch"). This patch
-> removes these unnecessary variables and use the current_page and
-> current_channel by wpan_phy struct now.
->
-> Signed-off-by: Alexander Aring <alex.aring@gmail.com>
-> ---
->   net/mac802154/ieee802154_i.h |  3 ---
->   net/mac802154/iface.c        |  4 ----
->   net/mac802154/mib.c          | 55 ++++++++------------------------------------
->   3 files changed, 9 insertions(+), 53 deletions(-)
->
-> diff --git a/net/mac802154/ieee802154_i.h b/net/mac802154/ieee802154_i.h
-> index bf0b5f6..46c9fe7 100644
-> --- a/net/mac802154/ieee802154_i.h
-> +++ b/net/mac802154/ieee802154_i.h
-> @@ -85,9 +85,6 @@ struct ieee802154_sub_if_data {
->   	__le16 short_addr;
->   	__le64 extended_addr;
->   
-> -	u8 chan;
-> -	u8 page;
-> -
->   	struct ieee802154_mac_params mac_params;
->   
->   	/* MAC BSN field */
-> diff --git a/net/mac802154/iface.c b/net/mac802154/iface.c
-> index 2423aa7..1c0274e 100644
-> --- a/net/mac802154/iface.c
-> +++ b/net/mac802154/iface.c
-> @@ -417,8 +417,6 @@ void mac802154_wpan_setup(struct net_device *dev)
->   	sdata = IEEE802154_DEV_TO_SUB_IF(dev);
->   	sdata->type = IEEE802154_DEV_WPAN;
->   
-> -	sdata->chan = MAC802154_CHAN_NONE;
-> -
->   	spin_lock_init(&sdata->mib_lock);
->   	mutex_init(&sdata->sec_mtx);
->   
-> @@ -454,6 +452,4 @@ void mac802154_monitor_setup(struct net_device *dev)
->   
->   	sdata = IEEE802154_DEV_TO_SUB_IF(dev);
->   	sdata->type = IEEE802154_DEV_MONITOR;
-> -
-> -	sdata->chan = MAC802154_CHAN_NONE; /* not initialized */
->   }
-> diff --git a/net/mac802154/mib.c b/net/mac802154/mib.c
-> index 3fbc217..0184fce 100644
-> --- a/net/mac802154/mib.c
-> +++ b/net/mac802154/mib.c
-> @@ -26,11 +26,6 @@
->   #include "ieee802154_i.h"
->   #include "driver-ops.h"
->   
-> -struct phy_chan_notify_work {
-> -	struct work_struct work;
-> -	struct net_device *dev;
-> -};
-> -
->   struct hw_addr_filt_notify_work {
->   	struct work_struct work;
->   	struct net_device *dev;
-> @@ -161,54 +156,22 @@ u8 mac802154_dev_get_dsn(const struct net_device *dev)
->   	return sdata->dsn++;
->   }
->   
-> -static void phy_chan_notify(struct work_struct *work)
-> -{
-> -	struct phy_chan_notify_work *nw = container_of(work,
-> -					  struct phy_chan_notify_work, work);
-> -	struct net_device *dev = nw->dev;
-> -	struct ieee802154_local *local = mac802154_slave_get_priv(dev);
-> -	struct ieee802154_sub_if_data *sdata = IEEE802154_DEV_TO_SUB_IF(dev);
-> -	int res;
-> -
-> -	mutex_lock(&sdata->local->phy->pib_lock);
-> -	res = drv_set_channel(local, sdata->page, sdata->chan);
-> -	if (res) {
-> -		pr_debug("set_channel failed\n");
-> -	} else {
-> -		sdata->local->phy->current_channel = sdata->chan;
-> -		sdata->local->phy->current_page = sdata->page;
-> -	}
-> -	mutex_unlock(&sdata->local->phy->pib_lock);
-> -
-> -	kfree(nw);
-> -}
-> -
->   void mac802154_dev_set_page_channel(struct net_device *dev, u8 page, u8 chan)
->   {
->   	struct ieee802154_sub_if_data *sdata = IEEE802154_DEV_TO_SUB_IF(dev);
-> -	struct phy_chan_notify_work *work;
-> +	struct ieee802154_local *local = sdata->local;
-> +	int res;
->   
->   	BUG_ON(dev->type != ARPHRD_IEEE802154);
->   
-> -	spin_lock_bh(&sdata->mib_lock);
-> -	sdata->page = page;
-> -	sdata->chan = chan;
-> -	spin_unlock_bh(&sdata->mib_lock);
-> -
-> -	mutex_lock(&sdata->local->phy->pib_lock);
-> -	if (sdata->local->phy->current_channel != sdata->chan ||
-> -	    sdata->local->phy->current_page != sdata->page) {
-> -		mutex_unlock(&sdata->local->phy->pib_lock);
-> -
-> -		work = kzalloc(sizeof(*work), GFP_ATOMIC);
-> -		if (!work)
-> -			return;
-> -
-> -		INIT_WORK(&work->work, phy_chan_notify);
-> -		work->dev = dev;
-> -		queue_work(sdata->local->workqueue, &work->work);
-> +	res = drv_set_channel(local, page, chan);
-> +	if (res) {
-> +		pr_debug("set_channel failed\n");
+Hi Varka,
 
-Why don't we use netdev_dbg() here...?
+On Wed, Oct 29, 2014 at 09:22:17AM +0530, Varka Bhadram wrote:
+> On 10/28/2014 10:51 PM, Alexander Aring wrote:
+...
+> >-	    sdata->local->phy->current_page != sdata->page) {
+> >-		mutex_unlock(&sdata->local->phy->pib_lock);
+> >-
+> >-		work = kzalloc(sizeof(*work), GFP_ATOMIC);
+> >-		if (!work)
+> >-			return;
+> >-
+> >-		INIT_WORK(&work->work, phy_chan_notify);
+> >-		work->dev = dev;
+> >-		queue_work(sdata->local->workqueue, &work->work);
+> >+	res = drv_set_channel(local, page, chan);
+> >+	if (res) {
+> >+		pr_debug("set_channel failed\n");
+> 
+> Why don't we use netdev_dbg() here...?
+> 
+> >  	} else {
 
->   	} else {
-> -		mutex_unlock(&sdata->local->phy->pib_lock);
-> +		mutex_lock(&local->phy->pib_lock);
-> +		local->phy->current_channel = chan;
-> +		local->phy->current_page = page;
-> +		mutex_unlock(&local->phy->pib_lock);
->   	}
->   }
->   
+because there comming more patches and I am not at the finally cleanup.
+This code will be part of the deprecated netlink interface. I don't want
+to fix anything here. It should only work for the things which we
+support in the official userspace software and that is. Channel setting,
+interface add/del and setting address filter.
 
+I don't want to send a patch series which contains more than 20 patches.
 
--- 
-Regards,
-Varka Bhadram.
+This patch I could also add an another patch for removing the worker
+here and I really don't have an idea why we have a worker here. This
+channel setting patch is more a rework. In further all phy settings are
+directly  calls to the driver. MAC settings are stored at each interface
+and setted by a open/close or rather ifup and ifdown.
 
+There will come a new netlink interface which use the framework like
+wireless. The old one will also be functional but we will remove it some
+or later.
+
+> >-		mutex_unlock(&sdata->local->phy->pib_lock);
+> >+		mutex_lock(&local->phy->pib_lock);
+> >+		local->phy->current_channel = chan;
+> >+		local->phy->current_page = page;
+> >+		mutex_unlock(&local->phy->pib_lock);
+> >  	}
+> >  }
+> 
+
+- Alex
