@@ -1,85 +1,70 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wg0-f46.google.com ([74.125.82.46]:39075 "EHLO
-	mail-wg0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756798AbaJ2UgJ (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Wed, 29 Oct 2014 16:36:09 -0400
-Received: by mail-wg0-f46.google.com with SMTP id x13so2783343wgg.33
-        for <linux-wpan@vger.kernel.org>; Wed, 29 Oct 2014 13:36:08 -0700 (PDT)
-From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH bluetooth-next 17/17] mac802154: add basic support for monitor
-Date: Wed, 29 Oct 2014 21:34:44 +0100
-Message-Id: <1414614884-20243-18-git-send-email-alex.aring@gmail.com>
+Received: from senator.holtmann.net ([87.106.208.187]:56848 "EHLO
+	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757077AbaJ2WJl convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Wed, 29 Oct 2014 18:09:41 -0400
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.0 \(1990.1\))
+Subject: Re: [PATCH bluetooth-next 00/17] ieee802154: fix checksum and monitor handling
+From: Marcel Holtmann <marcel@holtmann.org>
 In-Reply-To: <1414614884-20243-1-git-send-email-alex.aring@gmail.com>
+Date: Wed, 29 Oct 2014 15:09:37 -0700
+Content-Transfer-Encoding: 8BIT
+Message-Id: <F5521A3F-19FE-4CA4-AB5E-7E824E5372CC@holtmann.org>
 References: <1414614884-20243-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org
-Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
+To: Alexander Aring <alex.aring@gmail.com>
+Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de
 
-This patch adds basic support for monitor mode. Also change the open
-call that we set the transceiver mac setting on an interface up. Futher
-patches will add a better handling while interface up an interface.
+Hi Alex,
 
-Signed-off-by: Alexander Aring <alex.aring@gmail.com>
----
- net/mac802154/ieee802154_i.h |  1 +
- net/mac802154/iface.c        | 12 +++++++++++-
- 2 files changed, 12 insertions(+), 1 deletion(-)
+> This patch series fix checksum and monitor handling. The checksum handling
+> is currently a little bit weird, because all driver drops the checksum while
+> delivering. In monitor mode we want to see the received checksum. This patch
+> series contains various patches to fix the checksum handling and add basic
+> support for real monitor mode with promiscuous mode setting.
+> 
+> The checksum handling is now in some state which should work also for monitor
+> interfaces. There exist a better way to add runtime changeable flags to handle
+> crc calculation via hardware or software. Also flags like if the monitor
+> interface receiving is with or without checksum. This is only to introduce some
+> behaviour which should working.
+> 
+> Alexander Aring (17):
+>  mac802154: main: remove unnecessary include
+>  mac802154: remove tab after define
+>  mac802154: add IEEE802154_HW_ARET hw flag
+>  mac802154: add hardware address filter flag
+>  mac802154: add support for promiscuous mode
+>  at86rf230: add support for promiscuous mode
+>  mac802154: separate omit tx/rx flags
+>  mac802154: rx: remove unnecessary parameter
+>  mac802154: rx: simplify crc receive handling
+>  mac802154: rx: add software checksum filtering check
+>  mac802154: rx: remove override pkt_type set to PACKET_HOST
+>  mac802154: rx: use netif_receive_skb
+>  mac802154: rx: add rx stats incrementation
+>  mac802154: rx: monitor receive cleanup
+>  mac802154: rx: add error handling after skb_clone
+>  at86rf230: deliver with checksum
+>  mac802154: add basic support for monitor
+> 
+> drivers/net/ieee802154/at86rf230.c | 35 +++++++++++++++++++--
+> drivers/net/ieee802154/cc2520.c    |  3 +-
+> drivers/net/ieee802154/mrf24j40.c  |  3 +-
+> include/net/mac802154.h            | 40 ++++++++++++++++++------
+> net/mac802154/driver-ops.h         | 13 ++++++++
+> net/mac802154/ieee802154_i.h       |  1 +
+> net/mac802154/iface.c              | 12 ++++++-
+> net/mac802154/main.c               |  1 -
+> net/mac802154/rx.c                 | 64 +++++++++++++++++++++-----------------
+> net/mac802154/tx.c                 |  2 +-
+> 10 files changed, 127 insertions(+), 47 deletions(-)
 
-diff --git a/net/mac802154/ieee802154_i.h b/net/mac802154/ieee802154_i.h
-index 7cebc98..1086a9d 100644
---- a/net/mac802154/ieee802154_i.h
-+++ b/net/mac802154/ieee802154_i.h
-@@ -84,6 +84,7 @@ struct ieee802154_sub_if_data {
- 	__le16 pan_id;
- 	__le16 short_addr;
- 	__le64 extended_addr;
-+	bool promisuous_mode;
- 
- 	struct ieee802154_mac_params mac_params;
- 
-diff --git a/net/mac802154/iface.c b/net/mac802154/iface.c
-index c0bf5f9..f7a6f83 100644
---- a/net/mac802154/iface.c
-+++ b/net/mac802154/iface.c
-@@ -196,6 +196,12 @@ static int mac802154_wpan_open(struct net_device *dev)
- 
- 	mutex_lock(&phy->pib_lock);
- 
-+	if (local->hw.flags & IEEE802154_HW_PROMISCUOUS) {
-+		rc = drv_set_promiscuous_mode(local, sdata->promisuous_mode);
-+		if (rc < 0)
-+			goto out;
-+	}
-+
- 	if (local->hw.flags & IEEE802154_HW_TXPOWER) {
- 		rc = drv_set_tx_power(local, sdata->mac_params.transmit_power);
- 		if (rc < 0)
-@@ -382,7 +388,7 @@ static const struct net_device_ops mac802154_wpan_ops = {
- };
- 
- static const struct net_device_ops mac802154_monitor_ops = {
--	.ndo_open		= mac802154_slave_open,
-+	.ndo_open		= mac802154_wpan_open,
- 	.ndo_stop		= mac802154_slave_close,
- 	.ndo_start_xmit		= ieee802154_monitor_start_xmit,
- };
-@@ -434,6 +440,8 @@ void mac802154_wpan_setup(struct net_device *dev)
- 	sdata->pan_id = cpu_to_le16(IEEE802154_PANID_BROADCAST);
- 	sdata->short_addr = cpu_to_le16(IEEE802154_ADDR_BROADCAST);
- 
-+	sdata->promisuous_mode = false;
-+
- 	mac802154_llsec_init(&sdata->sec);
- }
- 
-@@ -453,4 +461,6 @@ void mac802154_monitor_setup(struct net_device *dev)
- 
- 	sdata = IEEE802154_DEV_TO_SUB_IF(dev);
- 	sdata->type = IEEE802154_DEV_MONITOR;
-+
-+	sdata->promisuous_mode = true;
- }
--- 
-2.1.2
+all 17 patches have been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
 
