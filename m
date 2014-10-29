@@ -1,18 +1,18 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-pa0-f54.google.com ([209.85.220.54]:48068 "EHLO
-	mail-pa0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755671AbaJ2INt (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Wed, 29 Oct 2014 04:13:49 -0400
-Received: by mail-pa0-f54.google.com with SMTP id rd3so2640407pab.41
-        for <linux-wpan@vger.kernel.org>; Wed, 29 Oct 2014 01:13:48 -0700 (PDT)
-Message-ID: <5450A102.60004@gmail.com>
-Date: Wed, 29 Oct 2014 13:40:42 +0530
+Received: from mail-pa0-f43.google.com ([209.85.220.43]:42515 "EHLO
+	mail-pa0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752071AbaJ2IPm (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Wed, 29 Oct 2014 04:15:42 -0400
+Received: by mail-pa0-f43.google.com with SMTP id eu11so2680950pac.16
+        for <linux-wpan@vger.kernel.org>; Wed, 29 Oct 2014 01:15:42 -0700 (PDT)
+Message-ID: <5450A17F.9070209@gmail.com>
+Date: Wed, 29 Oct 2014 13:42:47 +0530
 From: Varka Bhadram <varkabhadram@gmail.com>
 MIME-Version: 1.0
 Subject: Re: [PATCH bluetooth-next 07/17] mac802154: remove might_sleep from
  driver layer
-References: <1414516892-4107-1-git-send-email-alex.aring@gmail.com> <1414516892-4107-8-git-send-email-alex.aring@gmail.com> <5450601D.8040608@gmail.com> <20141029055303.GC4709@omega> <545081E1.8000508@gmail.com> <20141029061306.GE4709@omega>
-In-Reply-To: <20141029061306.GE4709@omega>
+References: <1414516892-4107-1-git-send-email-alex.aring@gmail.com> <1414516892-4107-8-git-send-email-alex.aring@gmail.com> <5450601D.8040608@gmail.com> <20141029055303.GC4709@omega> <545081E1.8000508@gmail.com> <20141029061306.GE4709@omega> <5450A102.60004@gmail.com>
+In-Reply-To: <5450A102.60004@gmail.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
@@ -20,95 +20,110 @@ List-ID: <linux-wpan.vger.kernel.org>
 To: Alexander Aring <alex.aring@gmail.com>
 Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de
 
-On 10/29/2014 11:43 AM, Alexander Aring wrote:
-> Hi Varka,
->
-> On Wed, Oct 29, 2014 at 11:27:53AM +0530, Varka Bhadram wrote:
->> On 10/29/2014 11:23 AM, Alexander Aring wrote:
->>> Hi Varka,
->>>
->>> On Wed, Oct 29, 2014 at 09:03:49AM +0530, Varka Bhadram wrote:
->>>> On 10/28/2014 10:51 PM, Alexander Aring wrote:
->>>>> This patch removes all might_sleep calls from driver layer. This
->>>>> handling is already done by mac802154 layer.
->>>>>
->>>>> Signed-off-by: Alexander Aring <alex.aring@gmail.com>
->>>>> ---
->>>>>   drivers/net/ieee802154/at86rf230.c | 3 ---
->>>>>   drivers/net/ieee802154/cc2520.c    | 1 -
->>>>>   drivers/net/ieee802154/fakelb.c    | 4 ----
->>>>>   3 files changed, 8 deletions(-)
->>>>>
->>>> For CC2520 driver
+On 10/29/2014 01:40 PM, Varka Bhadram wrote:
+> On 10/29/2014 11:43 AM, Alexander Aring wrote:
+>> Hi Varka,
+>>
+>> On Wed, Oct 29, 2014 at 11:27:53AM +0530, Varka Bhadram wrote:
+>>> On 10/29/2014 11:23 AM, Alexander Aring wrote:
+>>>> Hi Varka,
 >>>>
->>> I would Cc you here if you stand in the MAINTAINERS file for cc2520
->>> driver. I asked you some months ago if you like to be there. I didn't
->>> saw any patches for that. I thought it's out of interest by you that you
->>> want to be maintainer for this driver.  When these changes are very trivial
->>> like this one, it's okay for you when Marcel simple apply these patches
->>> without any ack? I already told him that we don't need to wait of Alan's
->>> ack for the mrf24j40 driver.
+>>>> On Wed, Oct 29, 2014 at 09:03:49AM +0530, Varka Bhadram wrote:
+>>>>> On 10/28/2014 10:51 PM, Alexander Aring wrote:
+>>>>>> This patch removes all might_sleep calls from driver layer. This
+>>>>>> handling is already done by mac802154 layer.
+>>>>>>
+>>>>>> Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+>>>>>> ---
+>>>>>>   drivers/net/ieee802154/at86rf230.c | 3 ---
+>>>>>>   drivers/net/ieee802154/cc2520.c    | 1 -
+>>>>>>   drivers/net/ieee802154/fakelb.c    | 4 ----
+>>>>>>   3 files changed, 8 deletions(-)
+>>>>>>
+>>>>> For CC2520 driver
+>>>>>
+>>>> I would Cc you here if you stand in the MAINTAINERS file for cc2520
+>>>> driver. I asked you some months ago if you like to be there. I didn't
+>>>> saw any patches for that. I thought it's out of interest by you 
+>>>> that you
+>>>> want to be maintainer for this driver.  When these changes are very 
+>>>> trivial
+>>>> like this one, it's okay for you when Marcel simple apply these 
+>>>> patches
+>>>> without any ack? I already told him that we don't need to wait of 
+>>>> Alan's
+>>>> ack for the mrf24j40 driver.
+>>>>
+>>>> Nevertheless if you want to add really a Acked here and we need to 
+>>>> wait
+>>>> then please insert you in the MAINTAINERS file. When I run
+>>>> get_maintainers it's currently me who is maintainer for the cc2520 
+>>>> driver.
+>>>>
+>>>> If you want to take care of this driver, please see my improvements 
+>>>> and
+>>>> fixes for the at86rf230. I am sure you could also take some code 
+>>>> for the
+>>>> cc2520 from it. Also I would be very happy for async xmit handling or
+>>>> regmap support. Most of the cc2520 code is lowlevel spi api calls.
+>>>>
+>>>> - Alex
+>>> I think i clarified you that i want to be the CC2520 driver maintainer.
 >>>
->>> Nevertheless if you want to add really a Acked here and we need to wait
->>> then please insert you in the MAINTAINERS file. When I run
->>> get_maintainers it's currently me who is maintainer for the cc2520 driver.
+>>> I asked you to submit the patche for MAINTAINER file, you told that its
+>>> not required.
 >>>
->>> If you want to take care of this driver, please see my improvements and
->>> fixes for the at86rf230. I am sure you could also take some code for the
->>> cc2520 from it. Also I would be very happy for async xmit handling or
->>> regmap support. Most of the cc2520 code is lowlevel spi api calls.
+>> I looked up the conversion:
+>>
+>> You:
+>>
+>> "You mean to say that i need to add an entry in MAINTAINER file or ..?"
+>>
+>> Me:
+>>
+>> "not need, only if you like. I have no idea about the cc2520 driver."
+>>
+>> need != required. For me this sentence is more... you really don't need
+>> that do be maintainer of this if you don't like that. But if you like to
+>> be maintainer, then send a patch.
+>
+> I will send a patch for the MAINTAINER.
+>
+>>> If i run get_maintainer on the cc2520 driver , my name is there for 
+>>> the commit_signer
 >>>
->>> - Alex
->> I think i clarified you that i want to be the CC2520 driver maintainer.
+>> This is because get_maintainers lookups the last commits.
 >>
->> I asked you to submit the patche for MAINTAINER file, you told that its
->> not required.
+>> I run "./scripts/get_maintainer.pl -f drivers/net/ieee802154/cc2520.c"
+>> on my own.
 >>
-> I looked up the conversion:
->
-> You:
->
-> "You mean to say that i need to add an entry in MAINTAINER file or ..?"
->
-> Me:
->
-> "not need, only if you like. I have no idea about the cc2520 driver."
->
-> need != required. For me this sentence is more... you really don't need
-> that do be maintainer of this if you don't like that. But if you like to
-> be maintainer, then send a patch.
-
-I will send a patch for the MAINTAINER.
-
->> If i run get_maintainer on the cc2520 driver , my name is there for the commit_signer
+>> Output is:
 >>
-> This is because get_maintainers lookups the last commits.
->
-> I run "./scripts/get_maintainer.pl -f drivers/net/ieee802154/cc2520.c"
-> on my own.
->
-> Output is:
->
-> Alexander Aring <alex.aring@gmail.com> (maintainer:IEEE 802.15.4 SUB...)
-> Grant Likely <grant.likely@linaro.org> (maintainer:OPEN FIRMWARE AND...)
-> Rob Herring <robh+dt@kernel.org> (maintainer:OPEN FIRMWARE AND...)
-> linux-wpan@vger.kernel.org (open list:IEEE 802.15.4 SUB...)
-> netdev@vger.kernel.org (open list:NETWORKING DRIVERS)
-> linux-kernel@vger.kernel.org (open list)
-> devicetree@vger.kernel.org (open list:OPEN FIRMWARE AND...)
->
->
-> there is no Varka here.
-
-Ok.. I will update.
-
->> I will improve this driver regmap suuport.
+>> Alexander Aring <alex.aring@gmail.com> (maintainer:IEEE 802.15.4 SUB...)
+>> Grant Likely <grant.likely@linaro.org> (maintainer:OPEN FIRMWARE AND...)
+>> Rob Herring <robh+dt@kernel.org> (maintainer:OPEN FIRMWARE AND...)
+>> linux-wpan@vger.kernel.org (open list:IEEE 802.15.4 SUB...)
+>> netdev@vger.kernel.org (open list:NETWORKING DRIVERS)
+>> linux-kernel@vger.kernel.org (open list)
+>> devicetree@vger.kernel.org (open list:OPEN FIRMWARE AND...)
 >>
-> ok.
+>>
+>> there is no Varka here.
 >
-> - Alex
+> Ok.. I will update.
+>
+>>> I will improve this driver regmap suuport.
+>>>
+>> ok.
+>>
+>> - Alex
+>
+> Thanks...
+>
+Put cc to me incase of cc2520  driver changes.
 
-Thanks...
+Wait for my Ack on those changes.
+
 
 -- 
 Regards,
