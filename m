@@ -1,14 +1,14 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f178.google.com ([209.85.212.178]:57263 "EHLO
-	mail-wi0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751680AbaKBDTT (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Sat, 1 Nov 2014 23:19:19 -0400
-Received: by mail-wi0-f178.google.com with SMTP id q5so3944006wiv.17
-        for <linux-wpan@vger.kernel.org>; Sat, 01 Nov 2014 20:19:18 -0700 (PDT)
+Received: from mail-wi0-f169.google.com ([209.85.212.169]:43379 "EHLO
+	mail-wi0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752119AbaKBDTU (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Sat, 1 Nov 2014 23:19:20 -0400
+Received: by mail-wi0-f169.google.com with SMTP id n3so3769872wiv.4
+        for <linux-wpan@vger.kernel.org>; Sat, 01 Nov 2014 20:19:19 -0700 (PDT)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH bluetooth-next 08/16] ieee802154: don't allow to change addr while netif_running
-Date: Sun,  2 Nov 2014 04:18:39 +0100
-Message-Id: <1414898327-20759-9-git-send-email-alex.aring@gmail.com>
+Subject: [PATCH bluetooth-next 09/16] mac802154: add helper for converting dev_addr
+Date: Sun,  2 Nov 2014 04:18:40 +0100
+Message-Id: <1414898327-20759-10-git-send-email-alex.aring@gmail.com>
 In-Reply-To: <1414898327-20759-1-git-send-email-alex.aring@gmail.com>
 References: <1414898327-20759-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
@@ -16,47 +16,35 @@ List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
 Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-This patch changes the actual behaviour for setting address attributes.
-We should not change addresses while netif_running is true. Furthermore
-when netif_running is running the address attributes becomes read only
-and we can remove locking mechanism in receive and transmit hothpaths
-of 802.15.4 subsystem.
+This patch adds a helper for converting the dev_addr attribute in
+netdevice to __le64 type. The dev_addr attribute is a char pointer
+and contains the extended address in big endian byte order.
 
 Signed-off-by: Alexander Aring <alex.aring@gmail.com>
 ---
- net/ieee802154/nl-mac.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+ include/net/mac802154.h | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/net/ieee802154/nl-mac.c b/net/ieee802154/nl-mac.c
-index abd0f31..cc2919d 100644
---- a/net/ieee802154/nl-mac.c
-+++ b/net/ieee802154/nl-mac.c
-@@ -477,7 +477,7 @@ int ieee802154_start_req(struct sk_buff *skb, struct genl_info *info)
- 	u8 channel, bcn_ord, sf_ord;
- 	u8 page;
- 	int pan_coord, blx, coord_realign;
--	int ret = -EOPNOTSUPP;
-+	int ret = -EBUSY;
+diff --git a/include/net/mac802154.h b/include/net/mac802154.h
+index 8f1de68..c17acbd 100644
+--- a/include/net/mac802154.h
++++ b/include/net/mac802154.h
+@@ -214,6 +214,15 @@ struct ieee802154_ops {
+ 						const bool on);
+ };
  
- 	if (!info->attrs[IEEE802154_ATTR_COORD_PAN_ID] ||
- 	    !info->attrs[IEEE802154_ATTR_COORD_SHORT_ADDR] ||
-@@ -493,9 +493,15 @@ int ieee802154_start_req(struct sk_buff *skb, struct genl_info *info)
- 	dev = ieee802154_nl_get_dev(info);
- 	if (!dev)
- 		return -ENODEV;
--	if (!ieee802154_mlme_ops(dev)->start_req)
++/**
++ * ieee802154_netdev_to_extended_addr - convert __be64 u8 pointer to __le64
++ * @dev_addr: big endian address pointer like netdevice dev_addr attribute
++ */
++static inline __le64 ieee802154_netdev_to_extended_addr(const u8 *dev_addr)
++{
++	return (__le64)swab64(*((__be64 *)dev_addr));
++}
 +
-+	if (netif_running(dev))
- 		goto out;
- 
-+	if (!ieee802154_mlme_ops(dev)->start_req) {
-+		ret = -EOPNOTSUPP;
-+		goto out;
-+	}
-+
- 	addr.mode = IEEE802154_ADDR_SHORT;
- 	addr.short_addr = nla_get_shortaddr(
- 			info->attrs[IEEE802154_ATTR_COORD_SHORT_ADDR]);
+ /* Basic interface to register ieee802154 hwice */
+ struct ieee802154_hw *
+ ieee802154_alloc_hw(size_t priv_data_len, const struct ieee802154_ops *ops);
 -- 
 2.1.3
 
