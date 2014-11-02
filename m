@@ -1,67 +1,39 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wg0-f41.google.com ([74.125.82.41]:62450 "EHLO
-	mail-wg0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751074AbaKBOdz (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Sun, 2 Nov 2014 09:33:55 -0500
-Date: Sun, 2 Nov 2014 15:33:48 +0100
+Received: from mail-wi0-f172.google.com ([209.85.212.172]:52642 "EHLO
+	mail-wi0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751760AbaKBUnX (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Sun, 2 Nov 2014 15:43:23 -0500
+Received: by mail-wi0-f172.google.com with SMTP id bs8so4973842wib.5
+        for <linux-wpan@vger.kernel.org>; Sun, 02 Nov 2014 12:43:21 -0800 (PST)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: IEEE 802.15.4 - Realization interframe spacing time after each
- ndo_start_xmit
-Message-ID: <20141102143345.GA15591@omega>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Subject: [PATCH bluetooth-next 0/6] ieee802154: solve make C=2 warnings
+Date: Sun,  2 Nov 2014 21:43:00 +0100
+Message-Id: <1414960986-7051-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: netdev@vger.kernel.org
-Cc: linux-wpan@vger.kernel.org
+To: linux-wpan@vger.kernel.org
+Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-Hi,
+This patch series fixes warning when building with "make C=2". This was
+reported by Marcel Holtmann which told me to run "make C=2" and solve
+these warnings. Most of the issues was forgotten includes and byte ordering
+handling.
 
-the IEEE 802.15.4 standard describes an interframe spacing time.
+Alexander Aring (6):
+  ieee802154: add missing ULL definition
+  ieee802154: fix byteorder issues
+  mac802154: fix byteorder issues
+  ieee802154: sysfs: add missing include
+  mac802154: cfg: add missing include
+  ieee802154: remove unnecessary functions
 
-This spacing time describes that after each transmit we need to wait
-some microseconds before we doing the next transmit.
+ include/linux/ieee802154.h |  4 +++-
+ include/net/mac802154.h    |  6 +++---
+ net/ieee802154/sysfs.c     |  1 +
+ net/mac802154/cfg.c        |  1 +
+ net/mac802154/iface.c      | 22 ----------------------
+ 5 files changed, 8 insertions(+), 26 deletions(-)
 
-The current workaround is a udelay in driver layer for the at86rf230
-driver. [0]
+-- 
+2.1.3
 
-This is a very terrible solution and I need some better one. If I don't
-do this wait time I got fragmentation issues at 6LoWPAN layer.
-
-To do a interframe spacing time depends on payload. If the payload is
-below 18 bytes we need to wait the "sifs - short interframe spacing time".
-If the payload is above or equal 18 bytes we need to wait "lifs - long
-interframe spacing time".
-
-Also some transceiver do the interframe spacing time on transceiver level.
-For example the at86rf230 do the interframe spacing time on his own when
-max_frame_retries parameter is above 1. (Then automatic retransmission
-is activated).
-
-I need some solution which I can turn on/off at runtime while running
-'ieee802154_xmit_complete". The function "ieee802154_xmit_complete" will
-consume the skb and wake the netdev queue again. 
-
-
-
-Possible better solution would be:
-
-Better solution would be to take some timestamps after each transmit
-complete and wait "if necessary" the calculated lifs/sifs delta time
-inside of "ndo_start_xmit" - means before doing next transmit. If we see
-in "ndo_start_xmit" that we need some time because the next transmit is
-inside the lifs/sifs time of the last transmit we wait the delta time
-of last completed transmit timestamp and now to hold the lifs/sifs
-timing contraints. But I don't feeling well to do a "udelay" inside of
-ndo_start_xmit.
-
-
-
-I would be grateful for any suggestion how we can deal which such
-interframe spacing time. Maybe there exist already some other L2 layer
-which have already a solution for something like that.
-
-- Alex
-
-[0] http://git.kernel.org/cgit/linux/kernel/git/bluetooth/bluetooth-next.git/tree/drivers/net/ieee802154/at86rf230.c?id=fe58d016e396fc685364b5a1743faf83c1fb8103#n722
