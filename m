@@ -1,69 +1,69 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f170.google.com ([209.85.212.170]:57443 "EHLO
-	mail-wi0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752950AbaKAT1r (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Sat, 1 Nov 2014 15:27:47 -0400
-Received: by mail-wi0-f170.google.com with SMTP id q5so3440423wiv.1
-        for <linux-wpan@vger.kernel.org>; Sat, 01 Nov 2014 12:27:45 -0700 (PDT)
-Date: Sat, 1 Nov 2014 20:27:43 +0100
+Received: from mail-wg0-f46.google.com ([74.125.82.46]:49369 "EHLO
+	mail-wg0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751602AbaKBD0O (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Sat, 1 Nov 2014 23:26:14 -0400
+Received: by mail-wg0-f46.google.com with SMTP id x13so8887319wgg.19
+        for <linux-wpan@vger.kernel.org>; Sat, 01 Nov 2014 20:26:13 -0700 (PDT)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: Re: [Linux-zigbee-devel] Cannot get MRFs talking. Not sure what I've
- done wrong.
-Message-ID: <20141101192740.GC31204@omega>
-References: <01C25E88-7F4B-4669-9BB6-AED08C4B66EE@elephantheadsoft.com>
- <20141101084719.GA31204@omega>
- <A4A370F0-05B7-4FCC-83BA-2633D54680E0@elephantheadsoft.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <A4A370F0-05B7-4FCC-83BA-2633D54680E0@elephantheadsoft.com>
+Subject: [PATCH bluetooth-next 00/16] ieee802154: introduce cfg802154 and address filter handling
+Date: Sun,  2 Nov 2014 04:18:31 +0100
+Message-Id: <1414898327-20759-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: "Dr. Aditya Nagrath PhD" <anagrath@elephantheadsoft.com>
-Cc: linux-zigbee-devel@lists.sourceforge.net, linux-wpan@vger.kernel.org
+To: linux-wpan@vger.kernel.org
+Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-On Sat, Nov 01, 2014 at 10:40:39AM -0600, Dr. Aditya Nagrath PhD wrote:
-> Hi,
-> 
-> Apologize for leaving out version information.  
-> I am using kernel:
-> Linux beaglebone 3.8.13-bone50 #1 SMP Tue May 13 13:24:52 UTC 2014 armv7l GNU/Linux
-> 
+This series introduce basic cfg802154 handling and add cfg802154 ops for
+deprecated interface add/del netlink operations. Also reparing handling
+with default channels and change handling for setup hardware address filter.
+While change handling for setup hardware address filter this patch series
+adds a function to validate the extended address while setting the extended
+address over netdev_ops parameter.
 
-can you try to use bleeding edge kernel? [0]
+Alexander Aring (16):
+  at86rf230: fix page parameter constraints
+  ieee802154: remove default channel settings
+  at86rf230: add default channel settings
+  cfg802154: introduce cfg802154_registered_device
+  mac802154: introduce mac802154_config_ops
+  ieee802154: add helper wpan_phy_to_rdev function
+  cfg802154: convert deprecated iface add and del
+  ieee802154: don't allow to change addr while netif_running
+  mac802154: add helper for converting dev_addr
+  mac802154: set extended address filter on ifup
+  mac802154: set short address filter on ifup
+  mac802154: set panid address filter on ifup
+  mac802154: move phy settings into netlink receive
+  ieee802154: add extended address validation helper
+  mac802154: iface: add validation for extended address
+  ieee802154: 6lowpan: remove set of mac address
 
-> 
-> I had to compile the libn1 and tools to get this far since there was a crash in iz add.  These are the versions that I downloaded and compiled.
-> drwxr-xr-x 11 debian admin 4096 Oct 28  2014 libnl-3.2.25
-> drwxr-xr-x 11 debian admin 4096 Oct 28  2014 lowpan-tools-0.3.1
-> 
+ drivers/net/ieee802154/at86rf230.c |  5 ++-
+ include/linux/ieee802154.h         | 14 ++++++++
+ include/net/cfg802154.h            | 17 ++++++---
+ include/net/mac802154.h            |  9 +++++
+ net/ieee802154/6lowpan_rtnl.c      | 14 --------
+ net/ieee802154/core.c              | 42 +++++++++++++---------
+ net/ieee802154/core.h              | 26 ++++++++++++++
+ net/ieee802154/nl-mac.c            | 10 ++++--
+ net/ieee802154/nl-phy.c            | 19 ++++------
+ net/ieee802154/rdev-ops.h          | 23 ++++++++++++
+ net/ieee802154/sysfs.c             | 15 ++++++--
+ net/mac802154/Makefile             |  2 +-
+ net/mac802154/cfg.c                | 36 +++++++++++++++++++
+ net/mac802154/cfg.h                |  9 +++++
+ net/mac802154/ieee802154_i.h       |  5 ++-
+ net/mac802154/iface.c              | 27 ++++++++-------
+ net/mac802154/mac_cmd.c            | 22 +++++++++++-
+ net/mac802154/main.c               | 11 +++---
+ net/mac802154/mib.c                | 71 --------------------------------------
+ 19 files changed, 229 insertions(+), 148 deletions(-)
+ create mode 100644 net/ieee802154/core.h
+ create mode 100644 net/ieee802154/rdev-ops.h
+ create mode 100644 net/mac802154/cfg.c
+ create mode 100644 net/mac802154/cfg.h
 
-this looks fine.
+-- 
+2.1.3
 
-> and just to confirm that they updated:
-> root@beaglebone:~# iz --version
-> iz: /lib/arm-linux-gnueabihf/libnl-genl-3.so.200: no version information available (required by iz)
-> iz: /lib/arm-linux-gnueabihf/libnl-3.so.200: no version information available (required by iz)
-
-mhhh, I didn't get such warning.
-
-> iz 0.3.1
-> 
-> Appreciate your help Alex.  Right now I’m under water as well so I understand your pain.  Let me know if I can help in anyway
-> 
-
-Just try a bleeding edge kernel and try again. Then we can see what's
-going on there. Also set a eui-64 address (extended address) before
-running "iz set". You can do that by "ip link set $WPAN_INTERFACE address $EXTENDED_ADDR".
-
-exmaples for variables:
-
-WPAN_INTERFACE="wpan0"
-EXTENDED_ADDR="aa:aa:aa:aa:aa:aa:aa:aa"
-
-Please do these steps while $WPAN_INTERFACE is down.
-
-- Alex
-
-[0] http://git.kernel.org/cgit/linux/kernel/git/bluetooth/bluetooth-next.git
