@@ -1,14 +1,14 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f176.google.com ([209.85.212.176]:62589 "EHLO
-	mail-wi0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752119AbaKBDTX (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Sat, 1 Nov 2014 23:19:23 -0400
-Received: by mail-wi0-f176.google.com with SMTP id h11so3992320wiw.9
-        for <linux-wpan@vger.kernel.org>; Sat, 01 Nov 2014 20:19:22 -0700 (PDT)
+Received: from mail-wg0-f43.google.com ([74.125.82.43]:54786 "EHLO
+	mail-wg0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751206AbaKBDTY (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Sat, 1 Nov 2014 23:19:24 -0400
+Received: by mail-wg0-f43.google.com with SMTP id y10so5964083wgg.2
+        for <linux-wpan@vger.kernel.org>; Sat, 01 Nov 2014 20:19:23 -0700 (PDT)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH bluetooth-next 12/16] mac802154: set panid address filter on ifup
-Date: Sun,  2 Nov 2014 04:18:43 +0100
-Message-Id: <1414898327-20759-13-git-send-email-alex.aring@gmail.com>
+Subject: [PATCH bluetooth-next 13/16] mac802154: move phy settings into netlink receive
+Date: Sun,  2 Nov 2014 04:18:44 +0100
+Message-Id: <1414898327-20759-14-git-send-email-alex.aring@gmail.com>
 In-Reply-To: <1414898327-20759-1-git-send-email-alex.aring@gmail.com>
 References: <1414898327-20759-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
@@ -16,102 +16,99 @@ List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
 Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-This patch moves the setting of hardware panid address filtering
-inside of interface up instead doing it it directly inside of netlink
-interface. The netlink call which can only be called when netif isn't
-running sets only the necessary panid value in sdata. After an
-interface up the address filter will be set with this value.
+All PHY attributes should be directly set to the transceiver after netlink.
+MAC attributes should be set by interface up. Currently the macparams
+netlink cmd contains mixed attributes of phy and mac settings. This patch
+moves all phy settings to the netlink receive function for setting macparams.
+This is the only way which doesn't change the userspace API and keep the
+deprecated netlink interface alive.
 
 Signed-off-by: Alexander Aring <alex.aring@gmail.com>
 ---
- net/mac802154/iface.c |  4 ++++
- net/mac802154/mib.c   | 51 ---------------------------------------------------
- 2 files changed, 4 insertions(+), 51 deletions(-)
+ net/mac802154/iface.c   | 19 -------------------
+ net/mac802154/mac_cmd.c | 21 +++++++++++++++++++++
+ 2 files changed, 21 insertions(+), 19 deletions(-)
 
 diff --git a/net/mac802154/iface.c b/net/mac802154/iface.c
-index 1bae29d..5f94c70 100644
+index 5f94c70..eaad665 100644
 --- a/net/mac802154/iface.c
 +++ b/net/mac802154/iface.c
-@@ -205,6 +205,10 @@ static int mac802154_wpan_open(struct net_device *dev)
+@@ -218,31 +218,12 @@ static int mac802154_wpan_open(struct net_device *dev)
+ 			goto out;
  	}
  
- 	if (local->hw.flags & IEEE802154_HW_AFILT) {
-+		rc = drv_set_pan_id(local, sdata->pan_id);
-+		if (rc < 0)
-+			goto out;
-+
- 		rc = drv_set_extended_addr(local, sdata->extended_addr);
+-	if (local->hw.flags & IEEE802154_HW_TXPOWER) {
+-		rc = drv_set_tx_power(local, sdata->mac_params.transmit_power);
+-		if (rc < 0)
+-			goto out;
+-	}
+-
+ 	if (local->hw.flags & IEEE802154_HW_LBT) {
+ 		rc = drv_set_lbt_mode(local, sdata->mac_params.lbt);
  		if (rc < 0)
  			goto out;
-diff --git a/net/mac802154/mib.c b/net/mac802154/mib.c
-index 755befd..6fa7491 100644
---- a/net/mac802154/mib.c
-+++ b/net/mac802154/mib.c
-@@ -26,51 +26,6 @@
- #include "ieee802154_i.h"
- #include "driver-ops.h"
+ 	}
  
--struct hw_addr_filt_notify_work {
--	struct work_struct work;
--	struct net_device *dev;
--	unsigned long changed;
--};
+-	if (local->hw.flags & IEEE802154_HW_CCA_MODE) {
+-		rc = drv_set_cca_mode(local, sdata->mac_params.cca_mode);
+-		if (rc < 0)
+-			goto out;
+-	}
 -
--static struct ieee802154_local *mac802154_slave_get_priv(struct net_device *dev)
--{
--	struct ieee802154_sub_if_data *sdata = IEEE802154_DEV_TO_SUB_IF(dev);
+-	if (local->hw.flags & IEEE802154_HW_CCA_ED_LEVEL) {
+-		rc = drv_set_cca_ed_level(local,
+-					  sdata->mac_params.cca_ed_level);
+-		if (rc < 0)
+-			goto out;
+-	}
 -
--	BUG_ON(dev->type != ARPHRD_IEEE802154);
--
--	return sdata->local;
--}
--
--static void hw_addr_notify(struct work_struct *work)
--{
--	struct hw_addr_filt_notify_work *nw = container_of(work,
--			struct hw_addr_filt_notify_work, work);
--	struct ieee802154_local *local = mac802154_slave_get_priv(nw->dev);
--	int res;
--
--	res = local->ops->set_hw_addr_filt(&local->hw, &local->hw.hw_filt,
--					   nw->changed);
--	if (res)
--		pr_debug("failed changed mask %lx\n", nw->changed);
--
--	kfree(nw);
--}
--
--static void set_hw_addr_filt(struct net_device *dev, unsigned long changed)
--{
--	struct ieee802154_sub_if_data *sdata = IEEE802154_DEV_TO_SUB_IF(dev);
--	struct hw_addr_filt_notify_work *work;
--
--	work = kzalloc(sizeof(*work), GFP_ATOMIC);
--	if (!work)
--		return;
--
--	INIT_WORK(&work->work, hw_addr_notify);
--	work->dev = dev;
--	work->changed = changed;
--	queue_work(sdata->local->workqueue, &work->work);
--}
--
- void mac802154_dev_set_short_addr(struct net_device *dev, __le16 val)
+ 	if (local->hw.flags & IEEE802154_HW_CSMA_PARAMS) {
+ 		rc = drv_set_csma_params(local, sdata->mac_params.min_be,
+ 					 sdata->mac_params.max_be,
+diff --git a/net/mac802154/mac_cmd.c b/net/mac802154/mac_cmd.c
+index 90c1ad8..9c2d6f6 100644
+--- a/net/mac802154/mac_cmd.c
++++ b/net/mac802154/mac_cmd.c
+@@ -28,6 +28,7 @@
+ #include <net/nl802154.h>
+ 
+ #include "ieee802154_i.h"
++#include "driver-ops.h"
+ 
+ static int mac802154_mlme_start_req(struct net_device *dev,
+ 				    struct ieee802154_addr *addr,
+@@ -85,11 +86,31 @@ static int mac802154_set_mac_params(struct net_device *dev,
+ 				    const struct ieee802154_mac_params *params)
  {
  	struct ieee802154_sub_if_data *sdata = IEEE802154_DEV_TO_SUB_IF(dev);
-@@ -119,12 +74,6 @@ void mac802154_dev_set_pan_id(struct net_device *dev, __le16 val)
- 	spin_lock_bh(&sdata->mib_lock);
- 	sdata->pan_id = val;
- 	spin_unlock_bh(&sdata->mib_lock);
--
--	if ((sdata->local->ops->set_hw_addr_filt) &&
--	    (sdata->local->hw.hw_filt.pan_id != sdata->pan_id)) {
--		sdata->local->hw.hw_filt.pan_id = sdata->pan_id;
--		set_hw_addr_filt(dev, IEEE802154_AFILT_PANID_CHANGED);
--	}
++	struct ieee802154_local *local = sdata->local;
++	int ret;
+ 
+ 	mutex_lock(&sdata->local->iflist_mtx);
+ 	sdata->mac_params = *params;
+ 	mutex_unlock(&sdata->local->iflist_mtx);
+ 
++	if (local->hw.flags & IEEE802154_HW_TXPOWER) {
++		ret = drv_set_tx_power(local, params->transmit_power);
++		if (ret < 0)
++			return ret;
++	}
++
++	if (local->hw.flags & IEEE802154_HW_CCA_MODE) {
++		ret = drv_set_cca_mode(local, params->cca_mode);
++		if (ret < 0)
++			return ret;
++	}
++
++	if (local->hw.flags & IEEE802154_HW_CCA_ED_LEVEL) {
++		ret = drv_set_cca_ed_level(local, params->cca_ed_level);
++		if (ret < 0)
++			return ret;
++	}
++
+ 	return 0;
  }
  
- u8 mac802154_dev_get_dsn(const struct net_device *dev)
 -- 
 2.1.3
 
