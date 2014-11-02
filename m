@@ -1,63 +1,77 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f176.google.com ([209.85.212.176]:42190 "EHLO
-	mail-wi0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752132AbaKBDT1 (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Sat, 1 Nov 2014 23:19:27 -0400
-Received: by mail-wi0-f176.google.com with SMTP id h11so3992352wiw.9
-        for <linux-wpan@vger.kernel.org>; Sat, 01 Nov 2014 20:19:26 -0700 (PDT)
-From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH bluetooth-next 16/16] ieee802154: 6lowpan: remove set of mac address
-Date: Sun,  2 Nov 2014 04:18:47 +0100
-Message-Id: <1414898327-20759-17-git-send-email-alex.aring@gmail.com>
+Received: from senator.holtmann.net ([87.106.208.187]:52750 "EHLO
+	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751717AbaKBDwo convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Sat, 1 Nov 2014 23:52:44 -0400
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.0 \(1990.1\))
+Subject: Re: [PATCH bluetooth-next 00/16] ieee802154: introduce cfg802154 and address filter handling
+From: Marcel Holtmann <marcel@holtmann.org>
 In-Reply-To: <1414898327-20759-1-git-send-email-alex.aring@gmail.com>
+Date: Sat, 1 Nov 2014 20:52:39 -0700
+Content-Transfer-Encoding: 8BIT
+Message-Id: <9DB5FF14-1971-490B-90F1-E5B8E87DD372@holtmann.org>
 References: <1414898327-20759-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org
-Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
+To: Alexander Aring <alex.aring@gmail.com>
+Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de
 
-Currently the ieee802154 6lowpan interface operates on wpan interfaces
-only. Setting the wpan mac address over 6lowpan interface is complex and
-maybe we can't never do this. This patch removes the set of mac address
-handling in ieee802154 6lowpan interface for now.
+Hi Alex,
 
-Signed-off-by: Alexander Aring <alex.aring@gmail.com>
----
- net/ieee802154/6lowpan_rtnl.c | 14 --------------
- 1 file changed, 14 deletions(-)
+> This series introduce basic cfg802154 handling and add cfg802154 ops for
+> deprecated interface add/del netlink operations. Also reparing handling
+> with default channels and change handling for setup hardware address filter.
+> While change handling for setup hardware address filter this patch series
+> adds a function to validate the extended address while setting the extended
+> address over netdev_ops parameter.
+> 
+> Alexander Aring (16):
+>  at86rf230: fix page parameter constraints
+>  ieee802154: remove default channel settings
+>  at86rf230: add default channel settings
+>  cfg802154: introduce cfg802154_registered_device
+>  mac802154: introduce mac802154_config_ops
+>  ieee802154: add helper wpan_phy_to_rdev function
+>  cfg802154: convert deprecated iface add and del
+>  ieee802154: don't allow to change addr while netif_running
+>  mac802154: add helper for converting dev_addr
+>  mac802154: set extended address filter on ifup
+>  mac802154: set short address filter on ifup
+>  mac802154: set panid address filter on ifup
+>  mac802154: move phy settings into netlink receive
+>  ieee802154: add extended address validation helper
+>  mac802154: iface: add validation for extended address
+>  ieee802154: 6lowpan: remove set of mac address
+> 
+> drivers/net/ieee802154/at86rf230.c |  5 ++-
+> include/linux/ieee802154.h         | 14 ++++++++
+> include/net/cfg802154.h            | 17 ++++++---
+> include/net/mac802154.h            |  9 +++++
+> net/ieee802154/6lowpan_rtnl.c      | 14 --------
+> net/ieee802154/core.c              | 42 +++++++++++++---------
+> net/ieee802154/core.h              | 26 ++++++++++++++
+> net/ieee802154/nl-mac.c            | 10 ++++--
+> net/ieee802154/nl-phy.c            | 19 ++++------
+> net/ieee802154/rdev-ops.h          | 23 ++++++++++++
+> net/ieee802154/sysfs.c             | 15 ++++++--
+> net/mac802154/Makefile             |  2 +-
+> net/mac802154/cfg.c                | 36 +++++++++++++++++++
+> net/mac802154/cfg.h                |  9 +++++
+> net/mac802154/ieee802154_i.h       |  5 ++-
+> net/mac802154/iface.c              | 27 ++++++++-------
+> net/mac802154/mac_cmd.c            | 22 +++++++++++-
+> net/mac802154/main.c               | 11 +++---
+> net/mac802154/mib.c                | 71 --------------------------------------
+> 19 files changed, 229 insertions(+), 148 deletions(-)
+> create mode 100644 net/ieee802154/core.h
+> create mode 100644 net/ieee802154/rdev-ops.h
+> create mode 100644 net/mac802154/cfg.c
+> create mode 100644 net/mac802154/cfg.h
 
-diff --git a/net/ieee802154/6lowpan_rtnl.c b/net/ieee802154/6lowpan_rtnl.c
-index 519a654..659f7b2 100644
---- a/net/ieee802154/6lowpan_rtnl.c
-+++ b/net/ieee802154/6lowpan_rtnl.c
-@@ -206,19 +206,6 @@ drop:
- 	return -EINVAL;
- }
- 
--static int lowpan_set_address(struct net_device *dev, void *p)
--{
--	struct sockaddr *sa = p;
--
--	if (netif_running(dev))
--		return -EBUSY;
--
--	/* TODO: validate addr */
--	memcpy(dev->dev_addr, sa->sa_data, dev->addr_len);
--
--	return 0;
--}
--
- static struct sk_buff*
- lowpan_alloc_frag(struct sk_buff *skb, int size,
- 		  const struct ieee802154_hdr *master_hdr)
-@@ -474,7 +461,6 @@ static int lowpan_dev_init(struct net_device *dev)
- static const struct net_device_ops lowpan_netdev_ops = {
- 	.ndo_init		= lowpan_dev_init,
- 	.ndo_start_xmit		= lowpan_xmit,
--	.ndo_set_mac_address	= lowpan_set_address,
- };
- 
- static struct ieee802154_mlme_ops lowpan_mlme = {
--- 
-2.1.3
+all 16 patches have been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
 
