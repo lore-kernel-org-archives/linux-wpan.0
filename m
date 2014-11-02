@@ -1,64 +1,47 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wg0-f41.google.com ([74.125.82.41]:46665 "EHLO
-	mail-wg0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752329AbaKBUn3 (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Sun, 2 Nov 2014 15:43:29 -0500
-Received: by mail-wg0-f41.google.com with SMTP id k14so9801673wgh.14
-        for <linux-wpan@vger.kernel.org>; Sun, 02 Nov 2014 12:43:28 -0800 (PST)
-From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH bluetooth-next 6/6] ieee802154: remove unnecessary functions
-Date: Sun,  2 Nov 2014 21:43:06 +0100
-Message-Id: <1414960986-7051-7-git-send-email-alex.aring@gmail.com>
+Received: from senator.holtmann.net ([87.106.208.187]:51198 "EHLO
+	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750810AbaKBUwz (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Sun, 2 Nov 2014 15:52:55 -0500
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.0 \(1990.1\))
+Subject: Re: [PATCH bluetooth-next 0/6] ieee802154: solve make C=2 warnings
+From: Marcel Holtmann <marcel@holtmann.org>
 In-Reply-To: <1414960986-7051-1-git-send-email-alex.aring@gmail.com>
+Date: Sun, 2 Nov 2014 12:52:48 -0800
+Content-Transfer-Encoding: 7bit
+Message-Id: <F15716CA-9248-4BA6-83DD-BB6FEEDD3E4D@holtmann.org>
 References: <1414960986-7051-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org
-Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
+To: Alexander Aring <alex.aring@gmail.com>
+Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de
 
-This patch fixes commit c7420c367d63a7e1414e010afb52c3837fd9134e
-("mac802154: move mac_params functions into mac_cmd"). The mac_params
-functions wasn't deleted by this commit.
+Hi Alex,
 
-Signed-off-by: Alexander Aring <alex.aring@gmail.com>
-Reported-by: Marcel Holtmann <marcel@holtmann.org>
----
- net/mac802154/iface.c | 22 ----------------------
- 1 file changed, 22 deletions(-)
+> This patch series fixes warning when building with "make C=2". This was
+> reported by Marcel Holtmann which told me to run "make C=2" and solve
+> these warnings. Most of the issues was forgotten includes and byte ordering
+> handling.
+> 
+> Alexander Aring (6):
+>  ieee802154: add missing ULL definition
+>  ieee802154: fix byteorder issues
+>  mac802154: fix byteorder issues
+>  ieee802154: sysfs: add missing include
+>  mac802154: cfg: add missing include
+>  ieee802154: remove unnecessary functions
+> 
+> include/linux/ieee802154.h |  4 +++-
+> include/net/mac802154.h    |  6 +++---
+> net/ieee802154/sysfs.c     |  1 +
+> net/mac802154/cfg.c        |  1 +
+> net/mac802154/iface.c      | 22 ----------------------
+> 5 files changed, 8 insertions(+), 26 deletions(-)
 
-diff --git a/net/mac802154/iface.c b/net/mac802154/iface.c
-index ceedf3e..0c9d00c 100644
---- a/net/mac802154/iface.c
-+++ b/net/mac802154/iface.c
-@@ -127,28 +127,6 @@ static int mac802154_wpan_mac_addr(struct net_device *dev, void *p)
- 	return mac802154_wpan_update_llsec(dev);
- }
- 
--int mac802154_set_mac_params(struct net_device *dev,
--			     const struct ieee802154_mac_params *params)
--{
--	struct ieee802154_sub_if_data *sdata = IEEE802154_DEV_TO_SUB_IF(dev);
--
--	mutex_lock(&sdata->local->iflist_mtx);
--	sdata->mac_params = *params;
--	mutex_unlock(&sdata->local->iflist_mtx);
--
--	return 0;
--}
--
--void mac802154_get_mac_params(struct net_device *dev,
--			      struct ieee802154_mac_params *params)
--{
--	struct ieee802154_sub_if_data *sdata = IEEE802154_DEV_TO_SUB_IF(dev);
--
--	mutex_lock(&sdata->local->iflist_mtx);
--	*params = sdata->mac_params;
--	mutex_unlock(&sdata->local->iflist_mtx);
--}
--
- static int mac802154_slave_open(struct net_device *dev)
- {
- 	struct ieee802154_sub_if_data *sdata = IEEE802154_DEV_TO_SUB_IF(dev);
--- 
-2.1.3
+all 6 patches have been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
 
