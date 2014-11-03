@@ -1,65 +1,40 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wg0-f54.google.com ([74.125.82.54]:36430 "EHLO
-	mail-wg0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750745AbaKBFp1 (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Sun, 2 Nov 2014 01:45:27 -0400
-From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH bluetooth-next] netdevice: add ieee802154_ptr to net_device
-Date: Sun,  2 Nov 2014 06:44:54 +0100
-Message-Id: <1414907094-9623-1-git-send-email-alex.aring@gmail.com>
+Received: from shards.monkeyblade.net ([149.20.54.216]:47608 "EHLO
+	shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751906AbaKCRU0 (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Mon, 3 Nov 2014 12:20:26 -0500
+Date: Mon, 03 Nov 2014 12:20:24 -0500 (EST)
+Message-Id: <20141103.122024.541066618529355652.davem@davemloft.net>
+Subject: Re: [PATCH bluetooth-next] netdevice: add ieee802154_ptr to
+ net_device
+From: David Miller <davem@davemloft.net>
+In-Reply-To: <1414907094-9623-1-git-send-email-alex.aring@gmail.com>
+References: <1414907094-9623-1-git-send-email-alex.aring@gmail.com>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org
-Cc: kernel@pengutronix.de, netdev@vger.kernel.org, linux-wireless@vger.kernel.org, Alexander Aring <alex.aring@gmail.com>, "David S. Miller" <davem@davemloft.net>
+To: alex.aring@gmail.com
+Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de, netdev@vger.kernel.org, linux-wireless@vger.kernel.org
 
-This patch adds an ieee802154_ptr to the net_device structure.
-Furthermore the 802.15.4 subsystem will introduce a nl802154 framework
-which is similar like the nl80211 framework and a wpan_dev structure.
-The wpan_dev structure will hold additional net_device attributes like
-address options which are 802.15.4 specific. In the upcoming nl802154
-implementation we will introduce a NL802154_FLAG_NEED_WPAN_DEV like
-NL80211_FLAG_NEED_WDEV. For this flag an ieee802154_ptr in net_device is
-needed. Additional we can access the wpan_dev attributes in upper layers
-like IEEE 802.15.4 6LoWPAN easily. Current solution is a complicated
-callback interface and getting these values over subif data structure
-in mac802154.
+From: Alexander Aring <alex.aring@gmail.com>
+Date: Sun,  2 Nov 2014 06:44:54 +0100
 
-Signed-off-by: Alexander Aring <alex.aring@gmail.com>
-Cc: David S. Miller <davem@davemloft.net>
----
-Another option would be to combine ieee80211_ptr and ieee802154_ptr in
-an union. These pointer can't be used twice at the same time and the
-union solution will not make the struct net_device bigger.
+> This patch adds an ieee802154_ptr to the net_device structure.
+> Furthermore the 802.15.4 subsystem will introduce a nl802154 framework
+> which is similar like the nl80211 framework and a wpan_dev structure.
+> The wpan_dev structure will hold additional net_device attributes like
+> address options which are 802.15.4 specific. In the upcoming nl802154
+> implementation we will introduce a NL802154_FLAG_NEED_WPAN_DEV like
+> NL80211_FLAG_NEED_WDEV. For this flag an ieee802154_ptr in net_device is
+> needed. Additional we can access the wpan_dev attributes in upper layers
+> like IEEE 802.15.4 6LoWPAN easily. Current solution is a complicated
+> callback interface and getting these values over subif data structure
+> in mac802154.
+> 
+> Signed-off-by: Alexander Aring <alex.aring@gmail.com>
 
-My working repository is bluetooth-next. Marcel will apply all 802.15.4
-changes. That's why this patch should go into bluetooth-next. Then I can
-send new patches which depends on this patch for introducing wpan_dev and
-nl802154.
+No objections, and you can merge this via the bluetooth tree:
 
- include/linux/netdevice.h | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index 74fd5d3..c9bcf33 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -57,6 +57,8 @@ struct device;
- struct phy_device;
- /* 802.11 specific */
- struct wireless_dev;
-+/* 802.15.4 specific */
-+struct wpan_dev;
- 
- void netdev_set_default_ethtool_ops(struct net_device *dev,
- 				    const struct ethtool_ops *ops);
-@@ -1572,6 +1574,7 @@ struct net_device {
- 	struct inet6_dev __rcu	*ip6_ptr;
- 	void			*ax25_ptr;
- 	struct wireless_dev	*ieee80211_ptr;
-+	struct wpan_dev		*ieee802154_ptr;
- 
- /*
-  * Cache lines mostly used on receive path (including eth_type_trans())
--- 
-2.1.3
-
+Acked-by: David S. Miller <davem@davemloft.net>
