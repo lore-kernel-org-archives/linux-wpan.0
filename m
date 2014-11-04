@@ -1,26 +1,31 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mga01.intel.com ([192.55.52.88]:63869 "EHLO mga01.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753722AbaKDOJo (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-	Tue, 4 Nov 2014 09:09:44 -0500
-Message-ID: <1415110033.2918.23.camel@jrissane-mobl.ger.corp.intel.com>
+Received: from mail-la0-f46.google.com ([209.85.215.46]:56348 "EHLO
+	mail-la0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751510AbaKDObv (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Tue, 4 Nov 2014 09:31:51 -0500
+Date: Tue, 4 Nov 2014 15:31:46 +0100
+From: Alexander Aring <alex.aring@gmail.com>
 Subject: Re: [PATCH bluetooth-next] ieee802154: 6lowpan: fix udp header
  compression when using raw skts
-From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-Date: Tue, 04 Nov 2014 16:07:13 +0200
-In-Reply-To: <1415108633-32358-1-git-send-email-simon.vincent@xsilon.com>
+Message-ID: <20141104143144.GD643@omega>
 References: <1415108633-32358-1-git-send-email-simon.vincent@xsilon.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1415108633-32358-1-git-send-email-simon.vincent@xsilon.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: Simon Vincent <simon.vincent@xsilon.com>
-Cc: alex.aring@gmail.com, linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Cc: linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org
 
 Hi Simon,
 
-On ti, 2014-11-04 at 13:43 +0000, Simon Vincent wrote:
+there is a typo in the subject s/skts/skbs/
+
+Also remove the 'ieee802154:" tag. Just "6lowpan:" here, because this is
+a patch for the generic 6lowpan branch.
+
+On Tue, Nov 04, 2014 at 01:43:53PM +0000, Simon Vincent wrote:
 > If you use RAW sockets the transport header offset is not set by the
 > ipv6 stack so when we get to the udp header compression it does not
 > compress the right part of the packet.
@@ -48,20 +53,34 @@ On ti, 2014-11-04 at 13:43 +0000, Simon Vincent wrote:
 > +	/* In the case of RAW sockets the transport header is not set by
 > +	* the ip6 stack so we must set it ourselves
 > +	*/
+
+There are missing spaces. '*' should be in the same line position.
+
 > +	if (skb->transport_header == skb->network_header)
 > +		skb_set_transport_header(skb, sizeof(struct ipv6hdr));
 > +
+
+okay, this should set on every next header compression. We have
+currently UDP only. For the next header compression layer we should move
+this handling somewhere else where it always checks on this.
+Nevertheless this solution is okay for now.
+
+
+The next header compression mainline patches:
+
+When I will find some time or somebody else can send it mainline and grab the
+base code from [0]. I would be very happy if somebody can do this work
+for me. I am working on the 802.15.4 subsystem currently. Isn't perfect
+right now and there was also some review notes.
+
+So if anybody wants to do that, please raise your hand.
+
 > +	uh = udp_hdr(skb);
 > +
 >  	if (((ntohs(uh->source) & LOWPAN_NHC_UDP_4BIT_MASK) ==
 >  	     LOWPAN_NHC_UDP_4BIT_PORT) &&
 >  	    ((ntohs(uh->dest) & LOWPAN_NHC_UDP_4BIT_MASK) ==
 
+- Alex
 
-Acked-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-
-
-Cheers,
-Jukka
-
-
+[0] https://github.com/linux-wpan/linux-wpan-next/commits/nhc_layer
