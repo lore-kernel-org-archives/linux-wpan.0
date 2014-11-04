@@ -1,12 +1,12 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.126.187]:63316 "EHLO
+Received: from mout.kundenserver.de ([212.227.126.131]:55354 "EHLO
 	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751732AbaKDOsc (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Tue, 4 Nov 2014 09:48:32 -0500
+	with ESMTP id S1751510AbaKDP35 (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Tue, 4 Nov 2014 10:29:57 -0500
 From: Simon Vincent <simon.vincent@xsilon.com>
-Subject: [PATCHv2 bluetooth-next] 6lowpan: fix udp header compression when using raw sockets
-Date: Tue,  4 Nov 2014 14:48:23 +0000
-Message-Id: <1415112503-2053-1-git-send-email-simon.vincent@xsilon.com>
+Subject: [PATCHv3 bluetooth-next] 6lowpan: fix udp header compression when using raw sockets
+Date: Tue,  4 Nov 2014 15:29:51 +0000
+Message-Id: <1415114991-3687-1-git-send-email-simon.vincent@xsilon.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: alex.aring@gmail.com
@@ -21,6 +21,7 @@ header offset.
 
 Signed-off-by: Simon Vincent <simon.vincent@xsilon.com>
 ---
+v3 fixed indentation
  net/6lowpan/iphc.c | 10 +++++++++-
  1 file changed, 9 insertions(+), 1 deletion(-)
 
