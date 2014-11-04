@@ -1,67 +1,52 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f172.google.com ([209.85.212.172]:44608 "EHLO
-	mail-wi0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751160AbaKDOTn (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Tue, 4 Nov 2014 09:19:43 -0500
-Received: by mail-wi0-f172.google.com with SMTP id bs8so9539461wib.5
-        for <linux-wpan@vger.kernel.org>; Tue, 04 Nov 2014 06:19:41 -0800 (PST)
-Date: Tue, 4 Nov 2014 15:19:39 +0100
-From: Alexander Aring <alex.aring@gmail.com>
-Subject: Re: skb free patches
-Message-ID: <20141104141936.GC643@omega>
-References: <54500E1B.20805@xsilon.com>
- <5458D90B.70206@xsilon.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <5458D90B.70206@xsilon.com>
+Received: from mout.kundenserver.de ([212.227.126.131]:51072 "EHLO
+	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753930AbaKDNoB (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Tue, 4 Nov 2014 08:44:01 -0500
+From: Simon Vincent <simon.vincent@xsilon.com>
+Subject: [PATCH bluetooth-next] ieee802154: 6lowpan: fix udp header compression when using raw skts
+Date: Tue,  4 Nov 2014 13:43:53 +0000
+Message-Id: <1415108633-32358-1-git-send-email-simon.vincent@xsilon.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Martin Townsend <martin.townsend@xsilon.com>
-Cc: linux-wpan@vger.kernel.org
+To: alex.aring@gmail.com
+Cc: linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org, Simon Vincent <simon.vincent@xsilon.com>
 
-Hi Martin,
+If you use RAW sockets the transport header offset is not set by the
+ipv6 stack so when we get to the udp header compression it does not
+compress the right part of the packet.
 
-sorry, I didn't notice this mail.
+This patch adds a check for this scenario and sets the transport
+header offset.
 
-On Tue, Nov 04, 2014 at 01:47:55PM +0000, Martin Townsend wrote:
-> Hi Alex,
-> 
-> Any thoughts on this?
-> 
+Signed-off-by: Simon Vincent <simon.vincent@xsilon.com>
+---
+ net/6lowpan/iphc.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-go ahead and just send patches. For the future I want to change the
-802.15.4 6LoWPAN to a common solution. We should do it like 802.15.4
-parsing. Not like current mainline, we should do it like frame parsing
-in the rework branch [0]. I stole this kind of frame parsing mechanism
-from mac80211. For adaptation in 6LoWPAN just replace the 802.15.4 frame
-type to the 6LoWPAN dispatch value and you will get something like this
-[1].
+diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
+index 73a7065..305bf2b 100644
+--- a/net/6lowpan/iphc.c
++++ b/net/6lowpan/iphc.c
+@@ -512,9 +512,17 @@ static u8 lowpan_compress_addr_64(u8 **hc_ptr, u8 shift,
+ 
+ static void compress_udp_header(u8 **hc_ptr, struct sk_buff *skb)
+ {
+-	struct udphdr *uh = udp_hdr(skb);
++	struct udphdr *uh;
+ 	u8 tmp;
+ 
++	/* In the case of RAW sockets the transport header is not set by
++	* the ip6 stack so we must set it ourselves
++	*/
++	if (skb->transport_header == skb->network_header)
++		skb_set_transport_header(skb, sizeof(struct ipv6hdr));
++
++	uh = udp_hdr(skb);
++
+ 	if (((ntohs(uh->source) & LOWPAN_NHC_UDP_4BIT_MASK) ==
+ 	     LOWPAN_NHC_UDP_4BIT_PORT) &&
+ 	    ((ntohs(uh->dest) & LOWPAN_NHC_UDP_4BIT_MASK) ==
+-- 
+1.9.1
 
-Nevertheless your solution to have a kfree_skb outside of
-iphc_decompress is welcome here. Because the CALL_RXH function returns
-on failure 'RX_DROP_UNUSABLE' and hits the handler result function [3]
-which runs kfree_skb there.
-
-
-For now to prepare this outside I will ack this patch. But we are not
-alone anymore this needs also an ack from Jukka Rissanen. Check out:
-
-./scripts/get_maintainer.pl -f net/6lowpan
-
-This architecture change need to be acked from both L2 branches which
-use 6LoWPAN. Please tag your patch with "6lowpan: $MY_GREAT_CHANGE" and
-send it to linux-wpan and linux-bluetooth mailinglist, you can get all
-cc members with:
-
-./scripts/get_maintainer.pl -f net/6lowpan
-
-or
-
-./scripts/get_maintainer.pl $MY_GREAT_PACH_FILE
-
-- Alex
-
-[0] https://github.com/linux-wpan/linux-wpan-next/blob/wpan_rework_rfc/net/mac802154/rx.c
-[1] https://github.com/linux-wpan/linux-wpan-next/blob/wpan_rework_rfc/net/ieee802154/6lowpan/rx.c#L174
-[3] https://github.com/linux-wpan/linux-wpan-next/blob/wpan_rework_rfc/net/ieee802154/6lowpan/rx.c#L27
