@@ -1,14 +1,14 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f177.google.com ([209.85.212.177]:62673 "EHLO
-	mail-wi0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751240AbaKETwO (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Wed, 5 Nov 2014 14:52:14 -0500
-Received: by mail-wi0-f177.google.com with SMTP id ex7so3057943wid.16
-        for <linux-wpan@vger.kernel.org>; Wed, 05 Nov 2014 11:52:12 -0800 (PST)
+Received: from mail-wi0-f179.google.com ([209.85.212.179]:54853 "EHLO
+	mail-wi0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751676AbaKETwP (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Wed, 5 Nov 2014 14:52:15 -0500
+Received: by mail-wi0-f179.google.com with SMTP id h11so3082847wiw.6
+        for <linux-wpan@vger.kernel.org>; Wed, 05 Nov 2014 11:52:14 -0800 (PST)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH bluetooth-next 06/18] ieee802154: rework interface registration
-Date: Wed,  5 Nov 2014 20:51:17 +0100
-Message-Id: <1415217089-24919-7-git-send-email-alex.aring@gmail.com>
+Subject: [PATCH bluetooth-next 07/18] ieee802154: remove mlme get_phy callback
+Date: Wed,  5 Nov 2014 20:51:18 +0100
+Message-Id: <1415217089-24919-8-git-send-email-alex.aring@gmail.com>
 In-Reply-To: <1415217089-24919-1-git-send-email-alex.aring@gmail.com>
 References: <1415217089-24919-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
@@ -16,298 +16,162 @@ List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
 Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-This patch meld mac802154_netdev_register into ieee802154_if_add
-function. Also we have now only one alloc_netdev call with one interface
-setup routine "ieee802154_if_setup" instead two different one for each
-interface type. This patch checks via runtime the interface type and do
-different handling now. Additional we add the wpan_dev struct in
-ieee802154_sub_if_data and set the new ieee802154_ptr while netdev
-registration. This behaviour is very similar the mac80211 netdev
-registration functionality.
+This patch removes the get_phy callback from mlme ops structure. Instead
+we doing a dereference via ieee802154_ptr dev pointer. For backwards
+compatibility we need to run get_device after dereference wpan_phy via
+ieee802154_ptr.
 
 Signed-off-by: Alexander Aring <alex.aring@gmail.com>
 ---
- include/net/cfg802154.h      |   4 ++
- net/mac802154/cfg.c          |   8 ++-
- net/mac802154/ieee802154_i.h |   4 ++
- net/mac802154/iface.c        | 158 +++++++++++++++++++++----------------------
- 4 files changed, 92 insertions(+), 82 deletions(-)
+ include/net/ieee802154_netdev.h | 12 ------------
+ net/ieee802154/6lowpan_rtnl.c   |  8 --------
+ net/ieee802154/nl-mac.c         |  6 ++++--
+ net/ieee802154/nl-phy.c         |  3 ++-
+ net/mac802154/iface.c           |  1 -
+ net/mac802154/mac_cmd.c         | 14 --------------
+ 6 files changed, 6 insertions(+), 38 deletions(-)
 
-diff --git a/include/net/cfg802154.h b/include/net/cfg802154.h
-index 29c6de5..57333f1 100644
---- a/include/net/cfg802154.h
-+++ b/include/net/cfg802154.h
-@@ -65,6 +65,10 @@ struct wpan_phy {
- 	char priv[0] __aligned(NETDEV_ALIGN);
+diff --git a/include/net/ieee802154_netdev.h b/include/net/ieee802154_netdev.h
+index 5e62d75..83bb8a73 100644
+--- a/include/net/ieee802154_netdev.h
++++ b/include/net/ieee802154_netdev.h
+@@ -423,8 +423,6 @@ struct ieee802154_mlme_ops {
+ 
+ 	/* The fields below are required. */
+ 
+-	struct wpan_phy *(*get_phy)(const struct net_device *dev);
+-
+ 	/*
+ 	 * FIXME: these should become the part of PIB/MIB interface.
+ 	 * However we still don't have IB interface of any kind
+@@ -434,16 +432,6 @@ struct ieee802154_mlme_ops {
+ 	u8 (*get_dsn)(const struct net_device *dev);
  };
  
-+struct wpan_dev {
-+	struct wpan_phy *wpan_phy;
-+};
-+
- #define to_phy(_dev)	container_of(_dev, struct wpan_phy, dev)
- 
- struct wpan_phy *
-diff --git a/net/mac802154/cfg.c b/net/mac802154/cfg.c
-index 0a08f66..d2c4e8f 100644
---- a/net/mac802154/cfg.c
-+++ b/net/mac802154/cfg.c
-@@ -13,6 +13,7 @@
-  * Based on: net/mac80211/cfg.c
-  */
- 
-+#include <net/rtnetlink.h>
- #include <net/cfg802154.h>
- 
- #include "ieee802154_i.h"
-@@ -23,8 +24,13 @@ ieee802154_add_iface_deprecated(struct wpan_phy *wpan_phy,
- 				const char *name, int type)
+-/* The IEEE 802.15.4 standard defines 2 type of the devices:
+- * - FFD - full functionality device
+- * - RFD - reduce functionality device
+- *
+- * So 2 sets of mlme operations are needed
+- */
+-struct ieee802154_reduced_mlme_ops {
+-	struct wpan_phy *(*get_phy)(const struct net_device *dev);
+-};
+-
+ static inline struct ieee802154_mlme_ops *
+ ieee802154_mlme_ops(const struct net_device *dev)
  {
- 	struct ieee802154_local *local = wpan_phy_priv(wpan_phy);
-+	struct net_device *dev;
- 
--	return ieee802154_if_add(local, name, NULL, type);
-+	rtnl_lock();
-+	dev = ieee802154_if_add(local, name, NULL, type);
-+	rtnl_unlock();
-+
-+	return dev;
+diff --git a/net/ieee802154/6lowpan_rtnl.c b/net/ieee802154/6lowpan_rtnl.c
+index 659f7b2..a96b64c 100644
+--- a/net/ieee802154/6lowpan_rtnl.c
++++ b/net/ieee802154/6lowpan_rtnl.c
+@@ -407,13 +407,6 @@ static netdev_tx_t lowpan_xmit(struct sk_buff *skb, struct net_device *dev)
+ 	}
  }
  
- static void ieee802154_del_iface_deprecated(struct wpan_phy *wpan_phy,
-diff --git a/net/mac802154/ieee802154_i.h b/net/mac802154/ieee802154_i.h
-index 3ad8540..748dc5a 100644
---- a/net/mac802154/ieee802154_i.h
-+++ b/net/mac802154/ieee802154_i.h
-@@ -20,6 +20,7 @@
- #define __IEEE802154_I_H
+-static struct wpan_phy *lowpan_get_phy(const struct net_device *dev)
+-{
+-	struct net_device *real_dev = lowpan_dev_info(dev)->real_dev;
+-
+-	return ieee802154_mlme_ops(real_dev)->get_phy(real_dev);
+-}
+-
+ static __le16 lowpan_get_pan_id(const struct net_device *dev)
+ {
+ 	struct net_device *real_dev = lowpan_dev_info(dev)->real_dev;
+@@ -465,7 +458,6 @@ static const struct net_device_ops lowpan_netdev_ops = {
  
- #include <linux/mutex.h>
-+#include <net/cfg802154.h>
- #include <net/mac802154.h>
- #include <net/ieee802154_netdev.h>
+ static struct ieee802154_mlme_ops lowpan_mlme = {
+ 	.get_pan_id = lowpan_get_pan_id,
+-	.get_phy = lowpan_get_phy,
+ 	.get_short_addr = lowpan_get_short_addr,
+ 	.get_dsn = lowpan_get_dsn,
+ };
+diff --git a/net/ieee802154/nl-mac.c b/net/ieee802154/nl-mac.c
+index 91a1855..7127b9d 100644
+--- a/net/ieee802154/nl-mac.c
++++ b/net/ieee802154/nl-mac.c
+@@ -94,8 +94,9 @@ static int ieee802154_nl_fill_iface(struct sk_buff *msg, u32 portid,
+ 		goto out;
  
-@@ -73,11 +74,14 @@ enum ieee802154_sdata_state_bits {
- struct ieee802154_sub_if_data {
- 	struct list_head list; /* the ieee802154_priv->slaves list */
+ 	ops = ieee802154_mlme_ops(dev);
+-	phy = ops->get_phy(dev);
++	phy = dev->ieee802154_ptr->wpan_phy;
+ 	BUG_ON(!phy);
++	get_device(&phy->dev);
  
-+	struct wpan_dev wpan_dev;
-+
- 	struct ieee802154_local *local;
- 	struct net_device *dev;
+ 	short_addr = ops->get_short_addr(dev);
+ 	pan_id = ops->get_pan_id(dev);
+@@ -493,7 +494,8 @@ int ieee802154_set_macparams(struct sk_buff *skb, struct genl_info *info)
+ 	    !info->attrs[IEEE802154_ATTR_FRAME_RETRIES])
+ 		goto out;
  
- 	int type;
- 	unsigned long state;
-+	char name[IFNAMSIZ];
+-	phy = ops->get_phy(dev);
++	phy = dev->ieee802154_ptr->wpan_phy;
++	get_device(&phy->dev);
  
- 	spinlock_t mib_lock;
+ 	ops->get_mac_params(dev, &params);
  
+diff --git a/net/ieee802154/nl-phy.c b/net/ieee802154/nl-phy.c
+index 397ca126..80a946d 100644
+--- a/net/ieee802154/nl-phy.c
++++ b/net/ieee802154/nl-phy.c
+@@ -287,8 +287,9 @@ int ieee802154_del_iface(struct sk_buff *skb, struct genl_info *info)
+ 	if (!dev)
+ 		return -ENODEV;
+ 
+-	phy = ieee802154_mlme_ops(dev)->get_phy(dev);
++	phy = dev->ieee802154_ptr->wpan_phy;
+ 	BUG_ON(!phy);
++	get_device(&phy->dev);
+ 
+ 	rc = -EINVAL;
+ 	/* phy name is optional, but should be checked if it's given */
 diff --git a/net/mac802154/iface.c b/net/mac802154/iface.c
-index 78cb381..f9ed608 100644
+index f9ed608..2e2638e 100644
 --- a/net/mac802154/iface.c
 +++ b/net/mac802154/iface.c
-@@ -381,30 +381,23 @@ static void mac802154_wpan_free(struct net_device *dev)
- 	free_netdev(dev);
+@@ -428,7 +428,6 @@ ieee802154_setup_sdata(struct ieee802154_sub_if_data *sdata, int type)
+ 	case IEEE802154_DEV_MONITOR:
+ 		sdata->dev->destructor = free_netdev;
+ 		sdata->dev->netdev_ops = &mac802154_monitor_ops;
+-		sdata->dev->ml_priv = &mac802154_mlme_reduced;
+ 		sdata->promisuous_mode = true;
+ 		break;
+ 	default:
+diff --git a/net/mac802154/mac_cmd.c b/net/mac802154/mac_cmd.c
+index e1ad83e..00b2b21 100644
+--- a/net/mac802154/mac_cmd.c
++++ b/net/mac802154/mac_cmd.c
+@@ -67,15 +67,6 @@ static int mac802154_mlme_start_req(struct net_device *dev,
+ 	return rc;
  }
  
--void mac802154_wpan_setup(struct net_device *dev)
-+static void ieee802154_if_setup(struct net_device *dev)
- {
--	struct ieee802154_sub_if_data *sdata;
--
- 	dev->addr_len		= IEEE802154_ADDR_LEN;
- 	memset(dev->broadcast, 0xff, IEEE802154_ADDR_LEN);
- 
- 	dev->hard_header_len	= MAC802154_FRAME_HARD_HEADER_LEN;
--	dev->header_ops		= &mac802154_header_ops;
- 	dev->needed_tailroom	= 2 + 16; /* FCS + MIC */
- 	dev->mtu		= IEEE802154_MTU;
- 	dev->tx_queue_len	= 300;
--	dev->type		= ARPHRD_IEEE802154;
- 	dev->flags		= IFF_NOARP | IFF_BROADCAST;
-+}
- 
--	dev->destructor		= mac802154_wpan_free;
--	dev->netdev_ops		= &mac802154_wpan_ops;
--	dev->ml_priv		= &mac802154_mlme_wpan;
--
--	sdata = IEEE802154_DEV_TO_SUB_IF(dev);
--	sdata->type = IEEE802154_DEV_WPAN;
--
--	spin_lock_init(&sdata->mib_lock);
--	mutex_init(&sdata->sec_mtx);
-+static int
-+ieee802154_setup_sdata(struct ieee802154_sub_if_data *sdata, int type)
-+{
-+	/* set some type-dependent values */
-+	sdata->type = type;
- 
- 	get_random_bytes(&sdata->bsn, 1);
- 	get_random_bytes(&sdata->dsn, 1);
-@@ -419,54 +412,28 @@ void mac802154_wpan_setup(struct net_device *dev)
- 	sdata->pan_id = cpu_to_le16(IEEE802154_PANID_BROADCAST);
- 	sdata->short_addr = cpu_to_le16(IEEE802154_ADDR_BROADCAST);
- 
--	sdata->promisuous_mode = false;
--
--	mac802154_llsec_init(&sdata->sec);
--}
--
--void mac802154_monitor_setup(struct net_device *dev)
--{
--	struct ieee802154_sub_if_data *sdata;
--
--	dev->needed_tailroom	= 2; /* room for FCS */
--	dev->mtu		= IEEE802154_MTU;
--	dev->tx_queue_len	= 10;
--	dev->type		= ARPHRD_IEEE802154_MONITOR;
--	dev->flags		= IFF_NOARP | IFF_BROADCAST;
--
--	dev->destructor		= free_netdev;
--	dev->netdev_ops		= &mac802154_monitor_ops;
--	dev->ml_priv		= &mac802154_mlme_reduced;
--
--	sdata = IEEE802154_DEV_TO_SUB_IF(dev);
--	sdata->type = IEEE802154_DEV_MONITOR;
--
--	sdata->promisuous_mode = true;
--}
--
--static int
--mac802154_netdev_register(struct ieee802154_local *local,
--			  struct net_device *dev)
+-static struct wpan_phy *mac802154_get_phy(const struct net_device *dev)
 -{
 -	struct ieee802154_sub_if_data *sdata = IEEE802154_DEV_TO_SUB_IF(dev);
--	int err;
 -
--	sdata->dev = dev;
--	sdata->local = local;
+-	BUG_ON(dev->type != ARPHRD_IEEE802154);
 -
--	dev->needed_headroom = local->hw.extra_tx_headroom;
+-	return to_phy(get_device(&sdata->local->phy->dev));
+-}
 -
--	SET_NETDEV_DEV(dev, &local->phy->dev);
-+	switch (type) {
-+	case IEEE802154_DEV_WPAN:
-+		sdata->dev->header_ops = &mac802154_header_ops;
-+		sdata->dev->destructor = mac802154_wpan_free;
-+		sdata->dev->netdev_ops = &mac802154_wpan_ops;
-+		sdata->dev->ml_priv = &mac802154_mlme_wpan;
-+		sdata->promisuous_mode = false;
- 
--	err = register_netdev(dev);
--	if (err < 0)
--		return err;
-+		spin_lock_init(&sdata->mib_lock);
-+		mutex_init(&sdata->sec_mtx);
- 
--	rtnl_lock();
--	mutex_lock(&local->iflist_mtx);
--	list_add_tail_rcu(&sdata->list, &local->interfaces);
--	mutex_unlock(&local->iflist_mtx);
--	rtnl_unlock();
-+		mac802154_llsec_init(&sdata->sec);
-+		break;
-+	case IEEE802154_DEV_MONITOR:
-+		sdata->dev->destructor = free_netdev;
-+		sdata->dev->netdev_ops = &mac802154_monitor_ops;
-+		sdata->dev->ml_priv = &mac802154_mlme_reduced;
-+		sdata->promisuous_mode = true;
-+		break;
-+	default:
-+		BUG();
-+	}
- 
- 	return 0;
- }
-@@ -475,38 +442,67 @@ struct net_device *
- ieee802154_if_add(struct ieee802154_local *local, const char *name,
- 		  struct wpan_dev **new_wpan_dev, int type)
+ static int mac802154_set_mac_params(struct net_device *dev,
+ 				    const struct ieee802154_mac_params *params)
  {
--	struct net_device *dev;
--	int err = -ENOMEM;
-+	struct net_device *ndev = NULL;
-+	struct ieee802154_sub_if_data *sdata = NULL;
-+	int ret = -ENOMEM;
-+
-+	ASSERT_RTNL();
-+
-+	ndev = alloc_netdev(sizeof(*sdata), name, NET_NAME_UNKNOWN,
-+			    ieee802154_if_setup);
-+	if (!ndev)
-+		return ERR_PTR(-ENOMEM);
-+
-+	ndev->needed_headroom = local->hw.extra_tx_headroom;
-+
-+	ret = dev_alloc_name(ndev, ndev->name);
-+	if (ret < 0)
-+		goto err;
+@@ -134,12 +125,7 @@ static struct ieee802154_llsec_ops mac802154_llsec_ops = {
+ 	.unlock_table = mac802154_unlock_table,
+ };
  
- 	switch (type) {
--	case IEEE802154_DEV_MONITOR:
--		dev = alloc_netdev(sizeof(struct ieee802154_sub_if_data),
--				   name, NET_NAME_UNKNOWN,
--				   mac802154_monitor_setup);
--		break;
- 	case IEEE802154_DEV_WPAN:
--		dev = alloc_netdev(sizeof(struct ieee802154_sub_if_data),
--				   name, NET_NAME_UNKNOWN,
--				   mac802154_wpan_setup);
-+		ndev->type = ARPHRD_IEEE802154;
- 		break;
--	default:
--		dev = NULL;
--		err = -EINVAL;
-+	case IEEE802154_DEV_MONITOR:
-+		ndev->type = ARPHRD_IEEE802154_MONITOR;
- 		break;
-+	default:
-+		ret = -EINVAL;
-+		goto err;
- 	}
--	if (!dev)
-+
-+	/* TODO check this */
-+	SET_NETDEV_DEV(ndev, &local->phy->dev);
-+	sdata = netdev_priv(ndev);
-+	ndev->ieee802154_ptr = &sdata->wpan_dev;
-+	memcpy(sdata->name, ndev->name, IFNAMSIZ);
-+	sdata->dev = ndev;
-+	sdata->wpan_dev.wpan_phy = local->hw.phy;
-+	sdata->local = local;
-+
-+	/* setup type-dependent data */
-+	ret = ieee802154_setup_sdata(sdata, type);
-+	if (ret)
- 		goto err;
- 
--	err = mac802154_netdev_register(local, dev);
--	if (err)
--		goto err_free;
-+	if (ndev) {
-+		ret = register_netdevice(ndev);
-+		if (ret < 0)
-+			goto err;
-+	}
-+
-+	mutex_lock(&local->iflist_mtx);
-+	list_add_tail_rcu(&sdata->list, &local->interfaces);
-+	mutex_unlock(&local->iflist_mtx);
- 
--	return dev;
-+	if (new_wpan_dev)
-+		*new_wpan_dev = &sdata->wpan_dev;
-+
-+	return ndev;
- 
--err_free:
--	free_netdev(dev);
- err:
--	return ERR_PTR(err);
-+	free_netdev(ndev);
-+	return ERR_PTR(ret);
- }
- 
- void ieee802154_if_remove(struct ieee802154_sub_if_data *sdata)
+-struct ieee802154_reduced_mlme_ops mac802154_mlme_reduced = {
+-	.get_phy = mac802154_get_phy,
+-};
+-
+ struct ieee802154_mlme_ops mac802154_mlme_wpan = {
+-	.get_phy = mac802154_get_phy,
+ 	.start_req = mac802154_mlme_start_req,
+ 	.get_pan_id = mac802154_dev_get_pan_id,
+ 	.get_short_addr = mac802154_dev_get_short_addr,
 -- 
 2.1.3
 
