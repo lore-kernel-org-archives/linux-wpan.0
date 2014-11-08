@@ -1,91 +1,55 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from smtp1.unipi.it ([131.114.21.19]:58884 "EHLO smtp.unipi.it"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1752718AbaKGNWb (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-	Fri, 7 Nov 2014 08:22:31 -0500
-Message-ID: <545CC793.4020607@iet.unipi.it>
-Date: Fri, 07 Nov 2014 14:22:27 +0100
-From: Carlo Vallati <carlo.vallati@iet.unipi.it>
-MIME-Version: 1.0
-Subject: Re: 6lowpan with external radio
-References: <CAGnRvuo+4fpbn6TTzFujaJ_agf+sCZxV1T5a9hmmZ4z29OCEHA@mail.gmail.com> <CD68F300-602D-4CDA-AD92-FEE5F393AB17@holtmann.org> <CAGnRvuqOcBoDfh899hwB56Hizex7i3q1OasaFJbDBckYiwwPag@mail.gmail.com> <20141106165425.GA32499@omega> <CAGnRvupKzAbVpdokD3ix9fex0ZaTMtDH9dGZJpKWY2iyjw8_9A@mail.gmail.com> <20141106170830.GB32499@omega> <CAP0sMCzn-cRSDi7GoeLPFKH868vdW+DJsC_ak-eZwT+GEbwwiA@mail.gmail.com> <20141106182403.GA2321@omega> <20141106193445.GD2321@omega>
-In-Reply-To: <20141106193445.GD2321@omega>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Received: from mail-wi0-f178.google.com ([209.85.212.178]:36606 "EHLO
+	mail-wi0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753725AbaKHRA6 (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Sat, 8 Nov 2014 12:00:58 -0500
+Received: by mail-wi0-f178.google.com with SMTP id bs8so7058104wib.17
+        for <linux-wpan@vger.kernel.org>; Sat, 08 Nov 2014 09:00:57 -0800 (PST)
+From: Alexander Aring <alex.aring@gmail.com>
+Subject: [PATCH wpan-tools 1/5] phy: remove split dump feature
+Date: Sat,  8 Nov 2014 18:00:46 +0100
+Message-Id: <1415466050-2630-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>
-Cc: Henning Rogge <hrogge@gmail.com>, Marcel Holtmann <marcel@holtmann.org>, linux-wpan@vger.kernel.org
+To: linux-wpan@vger.kernel.org
+Cc: Alexander Aring <alex.aring@gmail.com>
 
-On 11/06/2014 08:34 PM, Alexander Aring wrote:
-> Hi Carlo,
->
-> On Thu, Nov 06, 2014 at 07:24:03PM +0100, Alexander Aring wrote:
->> On Thu, Nov 06, 2014 at 06:55:11PM +0100, Carlo Vallati wrote:
->>> Hi,
->>> you can also take a look at this work in progress of mine [0] in which I'm
->>> implementing a driver for the Xbee s1 cards.
->>> The implementation is still a work in progress, so it has only the basic TX
->>> and RX operations and it includes the latest subsystem changes (at least
->>> the version included in the 3.16 kernel).
->>> The driver communicates with the Xbee s1 card using a serial protocol to
->>> receive/send raw data, while most of the 802.15.4 are implemented in
->>> hardware (for this reason its structure follows the fakehard.c driver).
->>>
->>
->> well, I removed now any HardMAC functionality because it never had any
->> functionality. For example [0].
->>
->> This was used by the fakehard driver but there was no real netlink
->> interface which used these calls. HardMAC driver is another topic for
->> the future.
->>
->
-> this will not mean that I don't accept HardMAC drivers. I do now a
-> rework of this branch which looks very similar like wireless/mac80211
-> afterwards.
+This patch removes the split dump feature. We don't use this right now
+in kernelspace and was copy&pasted from iw tool.
 
-I really do understand that. Although I had some experience with 
-mac80211 driver, it took me a while to understand the structure of the 
-802154 driver. A rework is more than welcome!
+Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+---
+ src/info.c | 9 +--------
+ 1 file changed, 1 insertion(+), 8 deletions(-)
 
->
-> The HardMAC functionality should be look like wireless. This
-> means a cfg802154 implementation inside driver layer. Also netdev
-> allocation/registration etc.. is inside driver layer. cfg802154 is just
-> a callback structure for the netlink 802.15.4 calls.
->
-> Really the current mainline HardMAC functionality was in some broken
-> state which never had any functionality.
-
-
-Yes I understand. As the support for HardMAC will be defined and 
-included again I'll align my work and then you can evaluate it for 
-inclusion (in case you think can be of interest).
-
->
->
-> I hope you are not too frustrated now. :-)
-
-No problem, I needed to write the driver anyway to run some experiments :-)
-
->
-> - Alex
->
-
-
+diff --git a/src/info.c b/src/info.c
+index 6bbe3f0..50a7bba 100644
+--- a/src/info.c
++++ b/src/info.c
+@@ -79,8 +79,6 @@ static int print_phy_handler(struct nl_msg *msg, void *arg)
+ 	return 0;
+ }
+ 
+-static bool nl802154_has_split_wiphy = false;
+-
+ static int handle_info(struct nl802154_state *state,
+ 		       struct nl_cb *cb,
+ 		       struct nl_msg *msg,
+@@ -88,13 +86,8 @@ static int handle_info(struct nl802154_state *state,
+ 		       enum id_input id)
+ {
+ 	char *feat_args[] = { "features", "-q" };
+-	int err;
+ 
+-	err = handle_cmd(state, CIB_NONE, 2, feat_args);
+-	if (!err && nl802154_has_split_wiphy) {
+-		nla_put_flag(msg, NL802154_ATTR_SPLIT_WPAN_PHY_DUMP);
+-		nlmsg_hdr(msg)->nlmsg_flags |= NLM_F_DUMP;
+-	}
++	handle_cmd(state, CIB_NONE, 2, feat_args);
+ 
+ 	nl_cb_set(cb, NL_CB_VALID, NL_CB_CUSTOM, print_phy_handler, NULL);
+ 
 -- 
--------------------------------------
-Carlo Vallati, PhD
-Post Doc Researcher
-Computer Networking Group
-Dipartimento di Ingegneria dell'Informazione
-Università di Pisa
-Via Diotisalvi 2, 56122 Pisa - Italy
-Ph. : (+39) 050-2217.572 (direct) .599 (switch)
-Fax : (+39) 050-2217.600
-Skype: warner83
-E-mail: carlo.vallati@iet.unipi.it
-http://www.iet.unipi.it/c.vallati/
+2.1.3
 
------------------------------------------------
