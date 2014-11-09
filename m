@@ -1,14 +1,14 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wg0-f47.google.com ([74.125.82.47]:54199 "EHLO
-	mail-wg0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751760AbaKIHh1 (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Sun, 9 Nov 2014 02:37:27 -0500
-Received: by mail-wg0-f47.google.com with SMTP id a1so6584213wgh.20
-        for <linux-wpan@vger.kernel.org>; Sat, 08 Nov 2014 23:37:26 -0800 (PST)
+Received: from mail-wg0-f44.google.com ([74.125.82.44]:54957 "EHLO
+	mail-wg0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751758AbaKIHh2 (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Sun, 9 Nov 2014 02:37:28 -0500
+Received: by mail-wg0-f44.google.com with SMTP id x12so6616056wgg.3
+        for <linux-wpan@vger.kernel.org>; Sat, 08 Nov 2014 23:37:27 -0800 (PST)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH bluetooth-next 03/15] ieee802154: rename wpan_phy_alloc
-Date: Sun,  9 Nov 2014 08:36:47 +0100
-Message-Id: <1415518619-4370-4-git-send-email-alex.aring@gmail.com>
+Subject: [PATCH bluetooth-next 04/15] ieee802154: add cfg802154_registered_device list
+Date: Sun,  9 Nov 2014 08:36:48 +0100
+Message-Id: <1415518619-4370-5-git-send-email-alex.aring@gmail.com>
 In-Reply-To: <1415518619-4370-1-git-send-email-alex.aring@gmail.com>
 References: <1415518619-4370-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
@@ -16,64 +16,102 @@ List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
 Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-This patch renames the wpan_phy_alloc function to wpan_phy_new. This
-naming convention is like wireless and "wiphy_new" function.
+This patch adds a new cfg802154_rdev_list to remember all registered
+cfg802154_registered_device structs. This is needed to prepare the
+upcomming nl802154 framework.
 
 Signed-off-by: Alexander Aring <alex.aring@gmail.com>
 ---
- include/net/cfg802154.h | 2 +-
- net/ieee802154/core.c   | 4 ++--
- net/mac802154/main.c    | 2 +-
- 3 files changed, 4 insertions(+), 4 deletions(-)
+ net/ieee802154/core.c | 45 ++++++++++++++++++++++++++++++++++++++++++++-
+ net/ieee802154/core.h |  1 +
+ 2 files changed, 45 insertions(+), 1 deletion(-)
 
-diff --git a/include/net/cfg802154.h b/include/net/cfg802154.h
-index ac8dd3b..72c4723 100644
---- a/include/net/cfg802154.h
-+++ b/include/net/cfg802154.h
-@@ -88,7 +88,7 @@ struct wpan_dev {
- #define to_phy(_dev)	container_of(_dev, struct wpan_phy, dev)
- 
- struct wpan_phy *
--wpan_phy_alloc(const struct cfg802154_ops *ops, size_t priv_size);
-+wpan_phy_new(const struct cfg802154_ops *ops, size_t priv_size);
- static inline void wpan_phy_set_dev(struct wpan_phy *phy, struct device *dev)
- {
- 	phy->dev.parent = dev;
 diff --git a/net/ieee802154/core.c b/net/ieee802154/core.c
-index d1cd0ed..a3aa23f 100644
+index a3aa23f..11a1d2e 100644
 --- a/net/ieee802154/core.c
 +++ b/net/ieee802154/core.c
-@@ -70,7 +70,7 @@ int wpan_phy_for_each(int (*fn)(struct wpan_phy *phy, void *data),
- EXPORT_SYMBOL(wpan_phy_for_each);
+@@ -18,11 +18,16 @@
+ #include <linux/device.h>
  
- struct wpan_phy *
--wpan_phy_alloc(const struct cfg802154_ops *ops, size_t priv_size)
-+wpan_phy_new(const struct cfg802154_ops *ops, size_t priv_size)
+ #include <net/cfg802154.h>
++#include <net/rtnetlink.h>
+ 
+ #include "ieee802154.h"
+ #include "sysfs.h"
+ #include "core.h"
+ 
++/* RCU-protected (and RTNL for writers) */
++static LIST_HEAD(cfg802154_rdev_list);
++static int cfg802154_rdev_list_generation;
++
+ static int wpan_phy_match(struct device *dev, const void *data)
  {
- 	static atomic_t wpan_phy_counter = ATOMIC_INIT(0);
- 	struct cfg802154_registered_device *rdev;
-@@ -105,7 +105,7 @@ wpan_phy_alloc(const struct cfg802154_ops *ops, size_t priv_size)
- 
- 	return &rdev->wpan_phy;
- }
--EXPORT_SYMBOL(wpan_phy_alloc);
-+EXPORT_SYMBOL(wpan_phy_new);
+ 	return !strcmp(dev_name(dev), (const char *)data);
+@@ -109,13 +114,51 @@ EXPORT_SYMBOL(wpan_phy_new);
  
  int wpan_phy_register(struct wpan_phy *phy)
  {
-diff --git a/net/mac802154/main.c b/net/mac802154/main.c
-index 7d0ff7f..234084d 100644
---- a/net/mac802154/main.c
-+++ b/net/mac802154/main.c
-@@ -86,7 +86,7 @@ ieee802154_alloc_hw(size_t priv_data_len, const struct ieee802154_ops *ops)
+-	return device_add(&phy->dev);
++	struct cfg802154_registered_device *rdev = wpan_phy_to_rdev(phy);
++	int ret;
++
++	rtnl_lock();
++	ret = device_add(&phy->dev);
++	if (ret) {
++		rtnl_unlock();
++		return ret;
++	}
++
++	list_add_rcu(&rdev->list, &cfg802154_rdev_list);
++	cfg802154_rdev_list_generation++;
++
++	/* TODO phy registered lock */
++	rtnl_unlock();
++
++	/* TODO nl802154 phy notify */
++
++	return 0;
+ }
+ EXPORT_SYMBOL(wpan_phy_register);
  
- 	priv_size = ALIGN(sizeof(*local), NETDEV_ALIGN) + priv_data_len;
+ void wpan_phy_unregister(struct wpan_phy *phy)
+ {
++	struct cfg802154_registered_device *rdev = wpan_phy_to_rdev(phy);
++
++	/* TODO open count */
++
++	rtnl_lock();
++	/* TODO nl802154 phy notify */
++	/* TODO phy registered lock */
++
++	/* TODO WARN_ON wpan_dev_list */
++
++	/* First remove the hardware from everywhere, this makes
++	 * it impossible to find from userspace.
++	 */
++	list_del_rcu(&rdev->list);
++	synchronize_rcu();
++
++	cfg802154_rdev_list_generation++;
++
+ 	device_del(&phy->dev);
++
++	rtnl_unlock();
+ }
+ EXPORT_SYMBOL(wpan_phy_unregister);
  
--	phy = wpan_phy_alloc(&mac802154_config_ops, priv_size);
-+	phy = wpan_phy_new(&mac802154_config_ops, priv_size);
- 	if (!phy) {
- 		pr_err("failure to allocate master IEEE802.15.4 device\n");
- 		return NULL;
+diff --git a/net/ieee802154/core.h b/net/ieee802154/core.h
+index fea60b3..38887cb2 100644
+--- a/net/ieee802154/core.h
++++ b/net/ieee802154/core.h
+@@ -5,6 +5,7 @@
+ 
+ struct cfg802154_registered_device {
+ 	const struct cfg802154_ops *ops;
++	struct list_head list;
+ 
+ 	/* wpan_phy index, internal only */
+ 	int wpan_phy_idx;
 -- 
 2.1.3
 
