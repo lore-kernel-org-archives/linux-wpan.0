@@ -1,136 +1,73 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wg0-f50.google.com ([74.125.82.50]:62464 "EHLO
-	mail-wg0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754997AbaKLCiE (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Tue, 11 Nov 2014 21:38:04 -0500
-Received: by mail-wg0-f50.google.com with SMTP id z12so12981406wgg.9
-        for <linux-wpan@vger.kernel.org>; Tue, 11 Nov 2014 18:38:03 -0800 (PST)
-From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH bluetooth-next 18/18] ieee820154: add lbt setting support
-Date: Wed, 12 Nov 2014 03:37:05 +0100
-Message-Id: <1415759825-8309-19-git-send-email-alex.aring@gmail.com>
+Received: from senator.holtmann.net ([87.106.208.187]:48976 "EHLO
+	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S933252AbaKLEMp convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Tue, 11 Nov 2014 23:12:45 -0500
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.0 \(1990.1\))
+Subject: Re: [PATCH bluetooth-next 00/18] ieee802154: iface handling and new nl802154 commands
+From: Marcel Holtmann <marcel@holtmann.org>
 In-Reply-To: <1415759825-8309-1-git-send-email-alex.aring@gmail.com>
+Date: Wed, 12 Nov 2014 13:12:37 +0900
+Content-Transfer-Encoding: 8BIT
+Message-Id: <6E069464-4789-4F07-9E01-EAB1C123578D@holtmann.org>
 References: <1415759825-8309-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org
-Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
+To: Alexander Aring <alex.aring@gmail.com>
+Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de
 
-This patch adds support for setting listen before transmit mode via
-nl802154 framework.
+Hi Alex,
 
-Signed-off-by: Alexander Aring <alex.aring@gmail.com>
----
- include/net/cfg802154.h   |  2 ++
- net/ieee802154/nl802154.c | 25 +++++++++++++++++++++++++
- net/ieee802154/rdev-ops.h |  7 +++++++
- net/mac802154/cfg.c       | 16 ++++++++++++++++
- 4 files changed, 50 insertions(+)
+> This patch series contains iface handling cleanup patches and mostly trivial
+> patches to support several netlink commands. Also removing the constraints
+> checks for 802.15.4 parameters from driver layer. This should be handled by
+> nl802154 layer now. The old netlink interface should be deprecated now and
+> these constraints checks are not supported anymore by the old netlink interface.
+> Some of the current driver never checked on these constraints so we don't fix
+> the old netlink interface anymore to check on "global" 802.15.4 constraints.
+> 
+> All users should use the wpan-tools from [0] now. Some cmd's are not supported
+> already like interface deletion or adding, but will be supported in near future.
+> 
+> [0] https://github.com/linux-wpan/wpan-tools/archive/wpan-tools-0.1.tar.gz
+> 
+> Alexander Aring (18):
+>  mac820154: move interface unregistration into iface
+>  mac820154: rename sdata next to tmp
+>  mac820154: move mutex locks out of loop
+>  mac802154: add wpan_phy priv id
+>  mac802154: change module description
+>  mac802154: add ifname change notifier
+>  ieee802154: cleanup cfg802154 intendation
+>  ieee820154: add channel set support
+>  ieee820154: remove valid page and channel checks
+>  ieee820154: add pan_id setting support
+>  ieee820154: add short_addr setting support
+>  ieee820154: add backoff exponent setting support
+>  at86rf230: remove invalid backoff exponent check
+>  ieee820154: add max csma backoffs setting support
+>  at86rf230: remove invalid max csma backoffs check
+>  ieee820154: add max frame retries setting support
+>  at86rf230: remove invalid max frame retries check
+>  ieee820154: add lbt setting support
+> 
+> drivers/net/ieee802154/at86rf230.c |  20 +---
+> drivers/net/ieee802154/fakelb.c    |   3 -
+> include/linux/ieee802154.h         |   4 +
+> include/net/cfg802154.h            |  28 ++++-
+> net/ieee802154/nl802154.c          | 214 +++++++++++++++++++++++++++++++++++++
+> net/ieee802154/rdev-ops.h          |  55 ++++++++++
+> net/mac802154/cfg.c                | 136 +++++++++++++++++++++++
+> net/mac802154/ieee802154_i.h       |   7 ++
+> net/mac802154/iface.c              |  48 +++++++++
+> net/mac802154/main.c               |  28 +++--
+> net/mac802154/util.c               |   3 +
+> 11 files changed, 513 insertions(+), 33 deletions(-)
 
-diff --git a/include/net/cfg802154.h b/include/net/cfg802154.h
-index 5c3bc12..fa0a9e5 100644
---- a/include/net/cfg802154.h
-+++ b/include/net/cfg802154.h
-@@ -51,6 +51,8 @@ struct cfg802154_ops {
- 	int	(*set_max_frame_retries)(struct wpan_phy *wpan_phy,
- 					 struct wpan_dev *wpan_dev,
- 					 s8 max_frame_retries);
-+	int	(*set_lbt_mode)(struct wpan_phy *wpan_phy,
-+				struct wpan_dev *wpan_dev, bool mode);
- };
- 
- struct wpan_phy {
-diff --git a/net/ieee802154/nl802154.c b/net/ieee802154/nl802154.c
-index 0e272c6..ccdf33e 100644
---- a/net/ieee802154/nl802154.c
-+++ b/net/ieee802154/nl802154.c
-@@ -691,6 +691,23 @@ nl802154_set_max_frame_retries(struct sk_buff *skb, struct genl_info *info)
- 	return rdev_set_max_frame_retries(rdev, wpan_dev, max_frame_retries);
- }
- 
-+static int nl802154_set_lbt_mode(struct sk_buff *skb, struct genl_info *info)
-+{
-+	struct cfg802154_registered_device *rdev = info->user_ptr[0];
-+	struct net_device *dev = info->user_ptr[1];
-+	struct wpan_dev *wpan_dev = dev->ieee802154_ptr;
-+	bool mode;
-+
-+	if (netif_running(dev))
-+		return -EBUSY;
-+
-+	if (!info->attrs[NL802154_ATTR_LBT_MODE])
-+		return -EINVAL;
-+
-+	mode = !!nla_get_u8(info->attrs[NL802154_ATTR_LBT_MODE]);
-+	return rdev_set_lbt_mode(rdev, wpan_dev, mode);
-+}
-+
- #define NL802154_FLAG_NEED_WPAN_PHY	0x01
- #define NL802154_FLAG_NEED_NETDEV	0x02
- #define NL802154_FLAG_NEED_RTNL		0x04
-@@ -849,6 +866,14 @@ static const struct genl_ops nl802154_ops[] = {
- 		.internal_flags = NL802154_FLAG_NEED_NETDEV |
- 				  NL802154_FLAG_NEED_RTNL,
- 	},
-+	{
-+		.cmd = NL802154_CMD_SET_LBT_MODE,
-+		.doit = nl802154_set_lbt_mode,
-+		.policy = nl802154_policy,
-+		.flags = GENL_ADMIN_PERM,
-+		.internal_flags = NL802154_FLAG_NEED_NETDEV |
-+				  NL802154_FLAG_NEED_RTNL,
-+	},
- };
- 
- /* initialisation/exit functions */
-diff --git a/net/ieee802154/rdev-ops.h b/net/ieee802154/rdev-ops.h
-index f9171aa..a78f700 100644
---- a/net/ieee802154/rdev-ops.h
-+++ b/net/ieee802154/rdev-ops.h
-@@ -68,4 +68,11 @@ rdev_set_max_frame_retries(struct cfg802154_registered_device *rdev,
- 						max_frame_retries);
- }
- 
-+static inline int
-+rdev_set_lbt_mode(struct cfg802154_registered_device *rdev,
-+		  struct wpan_dev *wpan_dev, const bool mode)
-+{
-+	return rdev->ops->set_lbt_mode(&rdev->wpan_phy, wpan_dev, mode);
-+}
-+
- #endif /* __CFG802154_RDEV_OPS */
-diff --git a/net/mac802154/cfg.c b/net/mac802154/cfg.c
-index a8f6eaa..5d669d8 100644
---- a/net/mac802154/cfg.c
-+++ b/net/mac802154/cfg.c
-@@ -155,6 +155,21 @@ static int ieee802154_set_max_frame_retries(struct wpan_phy *wpan_phy,
- 	return 0;
- }
- 
-+static int ieee802154_set_lbt_mode(struct wpan_phy *wpan_phy,
-+				   struct wpan_dev *wpan_dev,
-+				   const bool mode)
-+{
-+	struct ieee802154_local *local = wpan_phy_priv(wpan_phy);
-+
-+	ASSERT_RTNL();
-+
-+	if (!(local->hw.flags & IEEE802154_HW_LBT))
-+		return -EOPNOTSUPP;
-+
-+	wpan_dev->lbt = mode;
-+	return 0;
-+}
-+
- const struct cfg802154_ops mac802154_config_ops = {
- 	.add_virtual_intf_deprecated = ieee802154_add_iface_deprecated,
- 	.del_virtual_intf_deprecated = ieee802154_del_iface_deprecated,
-@@ -164,4 +179,5 @@ const struct cfg802154_ops mac802154_config_ops = {
- 	.set_backoff_exponent = ieee802154_set_backoff_exponent,
- 	.set_max_csma_backoffs = ieee802154_set_max_csma_backoffs,
- 	.set_max_frame_retries = ieee802154_set_max_frame_retries,
-+	.set_lbt_mode = ieee802154_set_lbt_mode,
- };
--- 
-2.1.3
+all 18 patches have been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
 
