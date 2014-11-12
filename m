@@ -1,73 +1,65 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from senator.holtmann.net ([87.106.208.187]:54053 "EHLO
-	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751413AbaKISwY convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Sun, 9 Nov 2014 13:52:24 -0500
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.0 \(1990.1\))
-Subject: Re: [PATCH bluetooth-next 00/15] ieee802154: introduce nl802154 framework
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1415518619-4370-1-git-send-email-alex.aring@gmail.com>
-Date: Sun, 9 Nov 2014 10:52:19 -0800
-Content-Transfer-Encoding: 8BIT
-Message-Id: <D7A626B9-7D35-4E88-8F0C-B12D7AB93F49@holtmann.org>
-References: <1415518619-4370-1-git-send-email-alex.aring@gmail.com>
+Received: from mail-wi0-f172.google.com ([209.85.212.172]:58717 "EHLO
+	mail-wi0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754920AbaKLCho (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Tue, 11 Nov 2014 21:37:44 -0500
+Received: by mail-wi0-f172.google.com with SMTP id bs8so3497400wib.5
+        for <linux-wpan@vger.kernel.org>; Tue, 11 Nov 2014 18:37:43 -0800 (PST)
+From: Alexander Aring <alex.aring@gmail.com>
+Subject: [PATCH bluetooth-next 00/18] ieee802154: iface handling and new nl802154 commands
+Date: Wed, 12 Nov 2014 03:36:47 +0100
+Message-Id: <1415759825-8309-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>
-Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de
+To: linux-wpan@vger.kernel.org
+Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-Hi Alex,
+This patch series contains iface handling cleanup patches and mostly trivial
+patches to support several netlink commands. Also removing the constraints
+checks for 802.15.4 parameters from driver layer. This should be handled by
+nl802154 layer now. The old netlink interface should be deprecated now and
+these constraints checks are not supported anymore by the old netlink interface.
+Some of the current driver never checked on these constraints so we don't fix
+the old netlink interface anymore to check on "global" 802.15.4 constraints.
 
-> This patch series introduce the nl802154 framework. Code was mostly grabbed
-> from wireless nl80211 implementation. Furthermore we should add some net
-> namespace handling like wireless. I added some TODO comment for the things
-> which we doesn't handled right now like wireless nl80211. Also add some
-> cleanups and fixes for the deprecated netlink interface.
-> 
-> Alexander Aring (15):
->  mac802154: move mac pib attributes into wpan_dev
->  mac802154: remove mac_params in sdata
->  ieee802154: rename wpan_phy_alloc
->  ieee802154: add cfg802154_registered_device list
->  ieee802154: add iftype to wpan_dev
->  ieee802154: add wpan_dev_list
->  ieee802154: sysfs add wpan_phy index and name
->  ieee802154: add new nl802154 header
->  ieee802154: add nl802154 framework
->  ieee802154: add wpan_phy dump support
->  ieee802154: add wpan_dev dump support
->  mac820154: don't set monitor dev_addr
->  ieee802154: netlink add rtnl lock
->  ieee802154: fix iface dump with lowpan
->  mac802154: protect address changes via ioctl
-> 
-> MAINTAINERS                  |   1 +
-> include/net/cfg802154.h      |  33 ++-
-> include/net/nl802154.h       | 122 ++++++++
-> net/ieee802154/Makefile      |   2 +-
-> net/ieee802154/core.c        | 166 ++++++++++-
-> net/ieee802154/core.h        |  17 ++
-> net/ieee802154/ieee802154.h  |   2 +-
-> net/ieee802154/netlink.c     |   2 +-
-> net/ieee802154/nl-mac.c      |  23 +-
-> net/ieee802154/nl802154.c    | 675 +++++++++++++++++++++++++++++++++++++++++++
-> net/ieee802154/nl802154.h    |   7 +
-> net/ieee802154/sysfs.c       |  24 ++
-> net/mac802154/ieee802154_i.h |  12 -
-> net/mac802154/iface.c        |  84 +++---
-> net/mac802154/mac_cmd.c      |  36 ++-
-> net/mac802154/main.c         |   2 +-
-> net/mac802154/mib.c          |  10 +-
-> net/mac802154/rx.c           |   7 +-
-> 18 files changed, 1148 insertions(+), 77 deletions(-)
-> create mode 100644 include/net/nl802154.h
-> create mode 100644 net/ieee802154/nl802154.c
-> create mode 100644 net/ieee802154/nl802154.h
+All users should use the wpan-tools from [0] now. Some cmd's are not supported
+already like interface deletion or adding, but will be supported in near future.
 
-all 15 patches have been applied to bluetooth-next tree.
+[0] https://github.com/linux-wpan/wpan-tools/archive/wpan-tools-0.1.tar.gz
 
-Regards
+Alexander Aring (18):
+  mac820154: move interface unregistration into iface
+  mac820154: rename sdata next to tmp
+  mac820154: move mutex locks out of loop
+  mac802154: add wpan_phy priv id
+  mac802154: change module description
+  mac802154: add ifname change notifier
+  ieee802154: cleanup cfg802154 intendation
+  ieee820154: add channel set support
+  ieee820154: remove valid page and channel checks
+  ieee820154: add pan_id setting support
+  ieee820154: add short_addr setting support
+  ieee820154: add backoff exponent setting support
+  at86rf230: remove invalid backoff exponent check
+  ieee820154: add max csma backoffs setting support
+  at86rf230: remove invalid max csma backoffs check
+  ieee820154: add max frame retries setting support
+  at86rf230: remove invalid max frame retries check
+  ieee820154: add lbt setting support
 
-Marcel
+ drivers/net/ieee802154/at86rf230.c |  20 +---
+ drivers/net/ieee802154/fakelb.c    |   3 -
+ include/linux/ieee802154.h         |   4 +
+ include/net/cfg802154.h            |  28 ++++-
+ net/ieee802154/nl802154.c          | 214 +++++++++++++++++++++++++++++++++++++
+ net/ieee802154/rdev-ops.h          |  55 ++++++++++
+ net/mac802154/cfg.c                | 136 +++++++++++++++++++++++
+ net/mac802154/ieee802154_i.h       |   7 ++
+ net/mac802154/iface.c              |  48 +++++++++
+ net/mac802154/main.c               |  28 +++--
+ net/mac802154/util.c               |   3 +
+ 11 files changed, 513 insertions(+), 33 deletions(-)
+
+-- 
+2.1.3
 
