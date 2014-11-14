@@ -1,57 +1,60 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from senator.holtmann.net ([87.106.208.187]:44669 "EHLO
-	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753588AbaKMDxY convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Wed, 12 Nov 2014 22:53:24 -0500
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.0 \(1990.1\))
-Subject: Re: [PATCH bluetooth-next 0/2] ieee802154: introduce new interframe spacing time handling
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1415818317-26487-1-git-send-email-alex.aring@gmail.com>
-Date: Thu, 13 Nov 2014 12:53:16 +0900
-Content-Transfer-Encoding: 8BIT
-Message-Id: <AB806B01-2A01-42C7-B0F7-8AF391AB7E33@holtmann.org>
-References: <1415818317-26487-1-git-send-email-alex.aring@gmail.com>
+Received: from mail.ispras.ru ([83.149.199.45]:33038 "EHLO mail.ispras.ru"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S933574AbaKNXMJ (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+	Fri, 14 Nov 2014 18:12:09 -0500
+From: Alexey Khoroshilov <khoroshilov@ispras.ru>
+Subject: [PATCH] ieee802154: fix error handling in ieee802154fake_probe()
+Date: Sat, 15 Nov 2014 02:11:59 +0300
+Message-Id: <1416006719-3450-1-git-send-email-khoroshilov@ispras.ru>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>
-Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de
+To: Alexander Aring <alex.aring@gmail.com>, "David S . Miller" <davem@davemloft.net>
+Cc: Alexey Khoroshilov <khoroshilov@ispras.ru>, linux-wpan@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, ldv-project@linuxtesting.org
 
-Hi Alex,
+In case of any failure ieee802154fake_probe() just calls unregister_netdev().
+But it does not look safe to unregister netdevice before it was registered.
 
-> This patch series contains patches for introducing and use of interframe
-> spacing time handling. The interframe spacing time handling depends on
-> transceiver if it's done at transceiver level or need to be done at SoftMAC
-> (mac802154) level. On the at86rf2xx transceiver this is done at transceiver
-> when max frame retries is above 0.
-> 
-> The mac802154 solution is to run a hrtimer which start at complete function.
-> When the timer expires we wake the queue again. This stops the transmit queue
-> after a transmit for a specific time.
-> 
-> Currently all drivers except the at86rf230 cares about interframe spacing time.
-> I think nobody hit the issue because the latency of workqueue. If we don't making
-> interframe spacing time with async xmit handler we run into fragmentation issues
-> while 802.15.4 6LoWPAN.
-> 
-> Alexander Aring (2):
->  mac802154: add interframe spacing time handling
->  at86rf230: remove interframe spacing time workaround
-> 
-> drivers/net/ieee802154/at86rf230.c | 60 +++++++++++++++++++++++---------------
-> include/linux/ieee802154.h         |  3 ++
-> include/net/cfg802154.h            |  8 +++++
-> include/net/mac802154.h            |  3 +-
-> net/mac802154/ieee802154_i.h       |  4 +++
-> net/mac802154/iface.c              |  2 ++
-> net/mac802154/main.c               | 17 +++++++++++
-> net/mac802154/tx.c                 |  2 +-
-> net/mac802154/util.c               | 32 ++++++++++++++++++--
-> 9 files changed, 103 insertions(+), 28 deletions(-)
+The patch implements straightforward resource deallocation in case of
+failure in ieee802154fake_probe().
 
-both patches have been applied to bluetooth-next tree.
+Found by Linux Driver Verification project (linuxtesting.org).
 
-Regards
+Signed-off-by: Alexey Khoroshilov <khoroshilov@ispras.ru>
+---
+ drivers/net/ieee802154/fakehard.c | 13 ++++++++-----
+ 1 file changed, 8 insertions(+), 5 deletions(-)
 
-Marcel
+diff --git a/drivers/net/ieee802154/fakehard.c b/drivers/net/ieee802154/fakehard.c
+index 9ce854f43917..6cbc56ad9ff4 100644
+--- a/drivers/net/ieee802154/fakehard.c
++++ b/drivers/net/ieee802154/fakehard.c
+@@ -377,17 +377,20 @@ static int ieee802154fake_probe(struct platform_device *pdev)
+ 
+ 	err = wpan_phy_register(phy);
+ 	if (err)
+-		goto out;
++		goto err_phy_reg;
+ 
+ 	err = register_netdev(dev);
+-	if (err < 0)
+-		goto out;
++	if (err)
++		goto err_netdev_reg;
+ 
+ 	dev_info(&pdev->dev, "Added ieee802154 HardMAC hardware\n");
+ 	return 0;
+ 
+-out:
+-	unregister_netdev(dev);
++err_netdev_reg:
++	wpan_phy_unregister(phy);
++err_phy_reg:
++	free_netdev(dev);
++	wpan_phy_free(phy);
+ 	return err;
+ }
+ 
+-- 
+1.9.1
 
