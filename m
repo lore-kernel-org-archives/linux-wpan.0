@@ -1,60 +1,44 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail.ispras.ru ([83.149.199.45]:33038 "EHLO mail.ispras.ru"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S933574AbaKNXMJ (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-	Fri, 14 Nov 2014 18:12:09 -0500
-From: Alexey Khoroshilov <khoroshilov@ispras.ru>
-Subject: [PATCH] ieee802154: fix error handling in ieee802154fake_probe()
-Date: Sat, 15 Nov 2014 02:11:59 +0300
-Message-Id: <1416006719-3450-1-git-send-email-khoroshilov@ispras.ru>
+Received: from mail-wi0-f171.google.com ([209.85.212.171]:35647 "EHLO
+	mail-wi0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752003AbaKOHQO (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Sat, 15 Nov 2014 02:16:14 -0500
+Date: Sat, 15 Nov 2014 08:16:06 +0100
+From: Alexander Aring <alex.aring@gmail.com>
+Subject: Re: [PATCH] ieee802154: fix error handling in ieee802154fake_probe()
+Message-ID: <20141115071603.GA3481@omega>
+References: <1416006719-3450-1-git-send-email-khoroshilov@ispras.ru>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1416006719-3450-1-git-send-email-khoroshilov@ispras.ru>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>, "David S . Miller" <davem@davemloft.net>
-Cc: Alexey Khoroshilov <khoroshilov@ispras.ru>, linux-wpan@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, ldv-project@linuxtesting.org
+To: Alexey Khoroshilov <khoroshilov@ispras.ru>
+Cc: "David S . Miller" <davem@davemloft.net>, linux-wpan@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, ldv-project@linuxtesting.org
 
-In case of any failure ieee802154fake_probe() just calls unregister_netdev().
-But it does not look safe to unregister netdevice before it was registered.
+Hi,
 
-The patch implements straightforward resource deallocation in case of
-failure in ieee802154fake_probe().
+On Sat, Nov 15, 2014 at 02:11:59AM +0300, Alexey Khoroshilov wrote:
+> In case of any failure ieee802154fake_probe() just calls unregister_netdev().
+> But it does not look safe to unregister netdevice before it was registered.
+> 
+> The patch implements straightforward resource deallocation in case of
+> failure in ieee802154fake_probe().
+> 
+> Found by Linux Driver Verification project (linuxtesting.org).
+> 
 
-Found by Linux Driver Verification project (linuxtesting.org).
+Thanks for the patch! But I already delete the whole fakehard driver.
+The patch to remove this driver is already in net-next.
 
-Signed-off-by: Alexey Khoroshilov <khoroshilov@ispras.ru>
----
- drivers/net/ieee802154/fakehard.c | 13 ++++++++-----
- 1 file changed, 8 insertions(+), 5 deletions(-)
+There was too many issues with the fake hardMAC drivers and we don't
+really supported a "real" hardMAC transceiver. For my rework to grab the
+good things from wireless implementation and put 802.15.4 functionality
+on it I simple delete the whole driver and _maybe_ add a new one with
+the new introduced interfaces for possible hardMAC functionality.
 
-diff --git a/drivers/net/ieee802154/fakehard.c b/drivers/net/ieee802154/fakehard.c
-index 9ce854f43917..6cbc56ad9ff4 100644
---- a/drivers/net/ieee802154/fakehard.c
-+++ b/drivers/net/ieee802154/fakehard.c
-@@ -377,17 +377,20 @@ static int ieee802154fake_probe(struct platform_device *pdev)
- 
- 	err = wpan_phy_register(phy);
- 	if (err)
--		goto out;
-+		goto err_phy_reg;
- 
- 	err = register_netdev(dev);
--	if (err < 0)
--		goto out;
-+	if (err)
-+		goto err_netdev_reg;
- 
- 	dev_info(&pdev->dev, "Added ieee802154 HardMAC hardware\n");
- 	return 0;
- 
--out:
--	unregister_netdev(dev);
-+err_netdev_reg:
-+	wpan_phy_unregister(phy);
-+err_phy_reg:
-+	free_netdev(dev);
-+	wpan_phy_free(phy);
- 	return err;
- }
- 
--- 
-1.9.1
+This patch could go into bluetooth(net)/stable but I don't think that
+there are many users for this driver.
 
+- Alex
