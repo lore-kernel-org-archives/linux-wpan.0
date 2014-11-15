@@ -1,44 +1,50 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f171.google.com ([209.85.212.171]:35647 "EHLO
-	mail-wi0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752003AbaKOHQO (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Sat, 15 Nov 2014 02:16:14 -0500
-Date: Sat, 15 Nov 2014 08:16:06 +0100
-From: Alexander Aring <alex.aring@gmail.com>
+Received: from senator.holtmann.net ([87.106.208.187]:52082 "EHLO
+	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751120AbaKOH6g convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Sat, 15 Nov 2014 02:58:36 -0500
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.0 \(1990.1\))
 Subject: Re: [PATCH] ieee802154: fix error handling in ieee802154fake_probe()
-Message-ID: <20141115071603.GA3481@omega>
-References: <1416006719-3450-1-git-send-email-khoroshilov@ispras.ru>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1416006719-3450-1-git-send-email-khoroshilov@ispras.ru>
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20141115071603.GA3481@omega>
+Date: Sat, 15 Nov 2014 16:58:28 +0900
+Content-Transfer-Encoding: 8BIT
+Message-Id: <B1D43522-B042-4D92-8F8A-D2AD89A3F0F9@holtmann.org>
+References: <1416006719-3450-1-git-send-email-khoroshilov@ispras.ru> <20141115071603.GA3481@omega>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexey Khoroshilov <khoroshilov@ispras.ru>
-Cc: "David S . Miller" <davem@davemloft.net>, linux-wpan@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, ldv-project@linuxtesting.org
+To: Alexander Aring <alex.aring@gmail.com>, "David S. Miller" <davem@davemloft.net>
+Cc: Alexey Khoroshilov <khoroshilov@ispras.ru>, linux-wpan@vger.kernel.org, Network Development <netdev@vger.kernel.org>, linux-kernel <linux-kernel@vger.kernel.org>, ldv-project@linuxtesting.org
 
-Hi,
+Hi Alex,
 
-On Sat, Nov 15, 2014 at 02:11:59AM +0300, Alexey Khoroshilov wrote:
-> In case of any failure ieee802154fake_probe() just calls unregister_netdev().
-> But it does not look safe to unregister netdevice before it was registered.
+>> In case of any failure ieee802154fake_probe() just calls unregister_netdev().
+>> But it does not look safe to unregister netdevice before it was registered.
+>> 
+>> The patch implements straightforward resource deallocation in case of
+>> failure in ieee802154fake_probe().
+>> 
+>> Found by Linux Driver Verification project (linuxtesting.org).
+>> 
 > 
-> The patch implements straightforward resource deallocation in case of
-> failure in ieee802154fake_probe().
+> Thanks for the patch! But I already delete the whole fakehard driver.
+> The patch to remove this driver is already in net-next.
 > 
-> Found by Linux Driver Verification project (linuxtesting.org).
+> There was too many issues with the fake hardMAC drivers and we don't
+> really supported a "real" hardMAC transceiver. For my rework to grab the
+> good things from wireless implementation and put 802.15.4 functionality
+> on it I simple delete the whole driver and _maybe_ add a new one with
+> the new introduced interfaces for possible hardMAC functionality.
 > 
+> This patch could go into bluetooth(net)/stable but I don't think that
+> there are many users for this driver.
 
-Thanks for the patch! But I already delete the whole fakehard driver.
-The patch to remove this driver is already in net-next.
+I am not sure that this is worth it then.
 
-There was too many issues with the fake hardMAC drivers and we don't
-really supported a "real" hardMAC transceiver. For my rework to grab the
-good things from wireless implementation and put 802.15.4 functionality
-on it I simple delete the whole driver and _maybe_ add a new one with
-the new introduced interfaces for possible hardMAC functionality.
+Dave, do you want to just take it via net-stable tree? We currently have no urgent bluetooth-stable tree patches pending.
 
-This patch could go into bluetooth(net)/stable but I don't think that
-there are many users for this driver.
+Regards
 
-- Alex
+Marcel
+
