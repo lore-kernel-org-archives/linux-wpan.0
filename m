@@ -1,14 +1,14 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wg0-f42.google.com ([74.125.82.42]:36813 "EHLO
-	mail-wg0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751049AbaKQHVZ (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Mon, 17 Nov 2014 02:21:25 -0500
-Received: by mail-wg0-f42.google.com with SMTP id z12so5930765wgg.29
-        for <linux-wpan@vger.kernel.org>; Sun, 16 Nov 2014 23:21:24 -0800 (PST)
+Received: from mail-wg0-f54.google.com ([74.125.82.54]:39370 "EHLO
+	mail-wg0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751185AbaKQHV0 (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Mon, 17 Nov 2014 02:21:26 -0500
+Received: by mail-wg0-f54.google.com with SMTP id y10so2523152wgg.41
+        for <linux-wpan@vger.kernel.org>; Sun, 16 Nov 2014 23:21:25 -0800 (PST)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH bluetooth-next 01/13] mac802154: remove unused prototypes
-Date: Mon, 17 Nov 2014 08:20:43 +0100
-Message-Id: <1416208855-8623-2-git-send-email-alex.aring@gmail.com>
+Subject: [PATCH bluetooth-next 02/13] at86rf230: fix commentation for symbol duration
+Date: Mon, 17 Nov 2014 08:20:44 +0100
+Message-Id: <1416208855-8623-3-git-send-email-alex.aring@gmail.com>
 In-Reply-To: <1416208855-8623-1-git-send-email-alex.aring@gmail.com>
 References: <1416208855-8623-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
@@ -16,41 +16,32 @@ List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
 Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-This patch removes some prototypes which are not used anymore.
+This patch fix an copy&paste issue in the comment of setting symbol
+duration. These comments are more correct according the at86rf212 datasheet
+now.
 
 Signed-off-by: Alexander Aring <alex.aring@gmail.com>
 ---
- net/mac802154/ieee802154_i.h | 6 ------
- 1 file changed, 6 deletions(-)
+ drivers/net/ieee802154/at86rf230.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/net/mac802154/ieee802154_i.h b/net/mac802154/ieee802154_i.h
-index c5b2310..593339a 100644
---- a/net/mac802154/ieee802154_i.h
-+++ b/net/mac802154/ieee802154_i.h
-@@ -120,14 +120,10 @@ ieee802154_sdata_running(struct ieee802154_sub_if_data *sdata)
- 	return test_bit(SDATA_STATE_RUNNING, &sdata->state);
- }
+diff --git a/drivers/net/ieee802154/at86rf230.c b/drivers/net/ieee802154/at86rf230.c
+index 7278e18..1c01356 100644
+--- a/drivers/net/ieee802154/at86rf230.c
++++ b/drivers/net/ieee802154/at86rf230.c
+@@ -1043,10 +1043,10 @@ at86rf212_set_channel(struct at86rf230_local *lp, u8 page, u8 channel)
+ 		}
+ 	} else {
+ 		if (page == 0)
+-			/* SUB:0 and BPSK:1 -> BPSK-20 */
++			/* SUB:0 and BPSK:1 -> OQPSK-100/200/400 */
+ 			lp->hw->phy->symbol_duration = 40;
+ 		else
+-			/* SUB:1 and BPSK:1 -> BPSK-20 */
++			/* SUB:1 and BPSK:1 -> OQPSK-250/500/1000 */
+ 			lp->hw->phy->symbol_duration = 16;
+ 	}
  
--extern struct ieee802154_reduced_mlme_ops mac802154_mlme_reduced;
- extern struct ieee802154_mlme_ops mac802154_mlme_wpan;
- 
--void mac802154_monitor_setup(struct net_device *dev);
- netdev_tx_t
- ieee802154_monitor_start_xmit(struct sk_buff *skb, struct net_device *dev);
--
--void mac802154_wpan_setup(struct net_device *dev);
- netdev_tx_t
- ieee802154_subif_start_xmit(struct sk_buff *skb, struct net_device *dev);
- enum hrtimer_restart ieee802154_xmit_ifs_timer(struct hrtimer *timer);
-@@ -176,8 +172,6 @@ void mac802154_unlock_table(struct net_device *dev);
- /* interface handling */
- int ieee802154_iface_init(void);
- void ieee802154_iface_exit(void);
--struct net_device *
--mac802154_add_iface(struct wpan_phy *phy, const char *name, int type);
- void ieee802154_if_remove(struct ieee802154_sub_if_data *sdata);
- struct net_device *
- ieee802154_if_add(struct ieee802154_local *local, const char *name,
 -- 
 2.1.3
 
