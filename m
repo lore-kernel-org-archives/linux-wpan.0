@@ -1,78 +1,53 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wg0-f43.google.com ([74.125.82.43]:34231 "EHLO
-	mail-wg0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750716AbaKPUGf (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Sun, 16 Nov 2014 15:06:35 -0500
-Received: by mail-wg0-f43.google.com with SMTP id l18so1802849wgh.30
-        for <linux-wpan@vger.kernel.org>; Sun, 16 Nov 2014 12:06:34 -0800 (PST)
+Received: from mail-wg0-f52.google.com ([74.125.82.52]:42881 "EHLO
+	mail-wg0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751049AbaKQHVY (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Mon, 17 Nov 2014 02:21:24 -0500
+Received: by mail-wg0-f52.google.com with SMTP id a1so353578wgh.25
+        for <linux-wpan@vger.kernel.org>; Sun, 16 Nov 2014 23:21:23 -0800 (PST)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH wpan-tools 2/2] interface: mac: fix byteorder issues
-Date: Sun, 16 Nov 2014 21:05:58 +0100
-Message-Id: <1416168358-28088-2-git-send-email-alex.aring@gmail.com>
-In-Reply-To: <1416168358-28088-1-git-send-email-alex.aring@gmail.com>
-References: <1416168358-28088-1-git-send-email-alex.aring@gmail.com>
+Subject: [PATCH bluetooth-next 00/13] ieee802154: cleanups, nl802154 iface handling and byteorder fixes
+Date: Mon, 17 Nov 2014 08:20:42 +0100
+Message-Id: <1416208855-8623-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
-Cc: Alexander Aring <alex.aring@gmail.com>
+Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-The kernel except and delivers little endian byteorder. This patch fix
-the current handling with byteorder.
+This patch series contains various cleanups and adding new nl802154 commands
+for supporting interface handling. At least we fix some byteorder issues.
+The nl802154 interface uses little endian byteorder now. This is the same
+byteorder like 802.15.4 MAC layer. The nl802154 interface is new, so we should
+fix the byteorder issue now.
 
-Signed-off-by: Alexander Aring <alex.aring@gmail.com>
----
- src/interface.c | 12 ++++++------
- src/mac.c       |  4 ++--
- 2 files changed, 8 insertions(+), 8 deletions(-)
+Alexander Aring (13):
+  mac802154: remove unused prototypes
+  at86rf230: fix commentation for symbol duration
+  mac802154: remove const for non pointer in driver-ops
+  mac802154: remove const for non pointer in cfg ops
+  mac802154: remove const for non pointer in rdev-ops
+  mac802154: remove deprecated linux-zigbee info
+  mac802154: use new nl802154 iftype types
+  mac802154: remove wpan_dev parameter in if_add
+  ieee802154: add new interface command
+  ieee802154: setting extended address while iface add
+  ieee802154: add del interface command
+  ieee802154: rename and move WPAN_NUM_ defines
+  ieee802154: fix byteorder for short address and panid
 
-diff --git a/src/interface.c b/src/interface.c
-index 0ac9c5a..095753b 100644
---- a/src/interface.c
-+++ b/src/interface.c
-@@ -201,15 +201,15 @@ static int print_iface_handler(struct nl_msg *msg, void *arg)
- 	if (tb_msg[NL802154_ATTR_WPAN_DEV])
- 		printf("%s\twpan_dev 0x%llx\n", indent,
- 		       (unsigned long long)nla_get_u64(tb_msg[NL802154_ATTR_WPAN_DEV]));
--	/* TODO byteorder? */
- 	if (tb_msg[NL802154_ATTR_EXTENDED_ADDR])
--		printf("%s\textended_addr 0x%016llx\n", indent, nla_get_u64(tb_msg[NL802154_ATTR_EXTENDED_ADDR]));
--	/* TODO byteorder? */
-+		printf("%s\textended_addr 0x%016llx\n", indent,
-+		       le64toh(nla_get_u64(tb_msg[NL802154_ATTR_EXTENDED_ADDR])));
- 	if (tb_msg[NL802154_ATTR_SHORT_ADDR])
--		printf("%s\tshort_addr 0x%04x\n", indent, nla_get_u16(tb_msg[NL802154_ATTR_SHORT_ADDR]));
--	/* TODO byteorder? */
-+		printf("%s\tshort_addr 0x%04x\n", indent,
-+		       le16toh(nla_get_u16(tb_msg[NL802154_ATTR_SHORT_ADDR])));
- 	if (tb_msg[NL802154_ATTR_PAN_ID])
--		printf("%s\tpan_id 0x%04x\n", indent, nla_get_u16(tb_msg[NL802154_ATTR_PAN_ID]));
-+		printf("%s\tpan_id 0x%04x\n", indent,
-+		       le16toh(nla_get_u16(tb_msg[NL802154_ATTR_PAN_ID])));
- 	if (tb_msg[NL802154_ATTR_IFTYPE])
- 		printf("%s\ttype %s\n", indent, iftype_name(nla_get_u32(tb_msg[NL802154_ATTR_IFTYPE])));
- 	if (!wpan_phy && tb_msg[NL802154_ATTR_WPAN_PHY])
-diff --git a/src/mac.c b/src/mac.c
-index 3f2dfc8..703d09f 100644
---- a/src/mac.c
-+++ b/src/mac.c
-@@ -30,7 +30,7 @@ static int handle_pan_id_set(struct nl802154_state *state,
- 	if (*end != '\0')
- 		return 1;
- 
--	NLA_PUT_U16(msg, NL802154_ATTR_PAN_ID, pan_id);
-+	NLA_PUT_U16(msg, NL802154_ATTR_PAN_ID, htole16(pan_id));
- 
- 	return 0;
- 
-@@ -57,7 +57,7 @@ static int handle_short_addr_set(struct nl802154_state *state,
- 	if (*end != '\0')
- 		return 1;
- 
--	NLA_PUT_U16(msg, NL802154_ATTR_SHORT_ADDR, short_addr);
-+	NLA_PUT_U16(msg, NL802154_ATTR_SHORT_ADDR, htole16(short_addr));
- 
- 	return 0;
- 
+ drivers/net/ieee802154/at86rf230.c |  4 +-
+ include/linux/ieee802154.h         |  3 ++
+ include/net/cfg802154.h            | 21 +++++-----
+ net/ieee802154/nl802154.c          | 80 +++++++++++++++++++++++++++++++++++---
+ net/ieee802154/rdev-ops.h          | 33 ++++++++++------
+ net/mac802154/cfg.c                | 69 ++++++++++++++++++++++----------
+ net/mac802154/driver-ops.h         | 46 ++++++++++------------
+ net/mac802154/ieee802154_i.h       | 15 +++----
+ net/mac802154/iface.c              | 31 ++++++++-------
+ net/mac802154/main.c               |  7 ++--
+ net/mac802154/rx.c                 |  7 ++--
+ 11 files changed, 211 insertions(+), 105 deletions(-)
+
 -- 
 2.1.3
 
