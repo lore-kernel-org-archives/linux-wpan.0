@@ -1,14 +1,14 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wg0-f44.google.com ([74.125.82.44]:56324 "EHLO
-	mail-wg0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751185AbaKQHV1 (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Mon, 17 Nov 2014 02:21:27 -0500
-Received: by mail-wg0-f44.google.com with SMTP id x12so24025062wgg.17
-        for <linux-wpan@vger.kernel.org>; Sun, 16 Nov 2014 23:21:26 -0800 (PST)
+Received: from mail-wi0-f173.google.com ([209.85.212.173]:38426 "EHLO
+	mail-wi0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751318AbaKQHV2 (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Mon, 17 Nov 2014 02:21:28 -0500
+Received: by mail-wi0-f173.google.com with SMTP id r20so1617698wiv.0
+        for <linux-wpan@vger.kernel.org>; Sun, 16 Nov 2014 23:21:27 -0800 (PST)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH bluetooth-next 03/13] mac802154: remove const for non pointer in driver-ops
-Date: Mon, 17 Nov 2014 08:20:45 +0100
-Message-Id: <1416208855-8623-4-git-send-email-alex.aring@gmail.com>
+Subject: [PATCH bluetooth-next 04/13] mac802154: remove const for non pointer in cfg ops
+Date: Mon, 17 Nov 2014 08:20:46 +0100
+Message-Id: <1416208855-8623-5-git-send-email-alex.aring@gmail.com>
 In-Reply-To: <1416208855-8623-1-git-send-email-alex.aring@gmail.com>
 References: <1416208855-8623-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
@@ -17,146 +17,99 @@ To: linux-wpan@vger.kernel.org
 Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
 This patches removes the const keyword in variables which are non
-pointers. There is no sense to declare call by value parameters as const.
+pointers. There is no sense to declare call by value parameters as
+const.
 
 Signed-off-by: Alexander Aring <alex.aring@gmail.com>
 Reported-by: Marc Kleine-Budde <mkl@pengutronix.de>
 ---
- net/mac802154/driver-ops.h | 46 +++++++++++++++++++++-------------------------
- 1 file changed, 21 insertions(+), 25 deletions(-)
+ net/mac802154/cfg.c | 32 +++++++++++++++++---------------
+ 1 file changed, 17 insertions(+), 15 deletions(-)
 
-diff --git a/net/mac802154/driver-ops.h b/net/mac802154/driver-ops.h
-index dfd29ff..f21e864 100644
---- a/net/mac802154/driver-ops.h
-+++ b/net/mac802154/driver-ops.h
-@@ -50,16 +50,15 @@ static inline void drv_stop(struct ieee802154_local *local)
- 	local->started = false;
+diff --git a/net/mac802154/cfg.c b/net/mac802154/cfg.c
+index 5d669d8..2b3610c 100644
+--- a/net/mac802154/cfg.c
++++ b/net/mac802154/cfg.c
+@@ -43,8 +43,7 @@ static void ieee802154_del_iface_deprecated(struct wpan_phy *wpan_phy,
  }
  
--static inline int drv_set_channel(struct ieee802154_local *local,
--				  const u8 page, const u8 channel)
-+static inline int
-+drv_set_channel(struct ieee802154_local *local, u8 page, u8 channel)
+ static int
+-ieee802154_set_channel(struct wpan_phy *wpan_phy, const u8 page,
+-		       const u8 channel)
++ieee802154_set_channel(struct wpan_phy *wpan_phy, u8 page, u8 channel)
  {
- 	might_sleep();
- 
- 	return local->ops->set_channel(&local->hw, page, channel);
+ 	struct ieee802154_local *local = wpan_phy_priv(wpan_phy);
+ 	int ret;
+@@ -64,8 +63,9 @@ ieee802154_set_channel(struct wpan_phy *wpan_phy, const u8 page,
+ 	return ret;
  }
  
--static inline int drv_set_tx_power(struct ieee802154_local *local,
--				   const s8 dbm)
-+static inline int drv_set_tx_power(struct ieee802154_local *local, s8 dbm)
+-static int ieee802154_set_pan_id(struct wpan_phy *wpan_phy,
+-				 struct wpan_dev *wpan_dev, const u16 pan_id)
++static int
++ieee802154_set_pan_id(struct wpan_phy *wpan_phy, struct wpan_dev *wpan_dev,
++		      u16 pan_id)
  {
- 	might_sleep();
+ 	ASSERT_RTNL();
  
-@@ -71,8 +70,7 @@ static inline int drv_set_tx_power(struct ieee802154_local *local,
- 	return local->ops->set_txpower(&local->hw, dbm);
- }
- 
--static inline int drv_set_cca_mode(struct ieee802154_local *local,
--				   const u8 cca_mode)
-+static inline int drv_set_cca_mode(struct ieee802154_local *local, u8 cca_mode)
+@@ -86,7 +86,7 @@ static int ieee802154_set_pan_id(struct wpan_phy *wpan_phy,
+ static int
+ ieee802154_set_backoff_exponent(struct wpan_phy *wpan_phy,
+ 				struct wpan_dev *wpan_dev,
+-				const u8 min_be, const u8 max_be)
++				u8 min_be, u8 max_be)
  {
- 	might_sleep();
+ 	struct ieee802154_local *local = wpan_phy_priv(wpan_phy);
  
-@@ -84,8 +82,7 @@ static inline int drv_set_cca_mode(struct ieee802154_local *local,
- 	return local->ops->set_cca_mode(&local->hw, cca_mode);
+@@ -102,7 +102,7 @@ ieee802154_set_backoff_exponent(struct wpan_phy *wpan_phy,
+ 
+ static int
+ ieee802154_set_short_addr(struct wpan_phy *wpan_phy, struct wpan_dev *wpan_dev,
+-			  const u16 short_addr)
++			  u16 short_addr)
+ {
+ 	ASSERT_RTNL();
+ 
+@@ -125,9 +125,10 @@ ieee802154_set_short_addr(struct wpan_phy *wpan_phy, struct wpan_dev *wpan_dev,
+ 	return 0;
  }
  
--static inline int drv_set_lbt_mode(struct ieee802154_local *local,
+-static int ieee802154_set_max_csma_backoffs(struct wpan_phy *wpan_phy,
+-					    struct wpan_dev *wpan_dev,
+-					    const u8 max_csma_backoffs)
++static int
++ieee802154_set_max_csma_backoffs(struct wpan_phy *wpan_phy,
++				 struct wpan_dev *wpan_dev,
++				 u8 max_csma_backoffs)
+ {
+ 	struct ieee802154_local *local = wpan_phy_priv(wpan_phy);
+ 
+@@ -140,9 +141,10 @@ static int ieee802154_set_max_csma_backoffs(struct wpan_phy *wpan_phy,
+ 	return 0;
+ }
+ 
+-static int ieee802154_set_max_frame_retries(struct wpan_phy *wpan_phy,
+-					    struct wpan_dev *wpan_dev,
+-					    const s8 max_frame_retries)
++static int
++ieee802154_set_max_frame_retries(struct wpan_phy *wpan_phy,
++				 struct wpan_dev *wpan_dev,
++				 s8 max_frame_retries)
+ {
+ 	struct ieee802154_local *local = wpan_phy_priv(wpan_phy);
+ 
+@@ -155,9 +157,9 @@ static int ieee802154_set_max_frame_retries(struct wpan_phy *wpan_phy,
+ 	return 0;
+ }
+ 
+-static int ieee802154_set_lbt_mode(struct wpan_phy *wpan_phy,
+-				   struct wpan_dev *wpan_dev,
 -				   const bool mode)
-+static inline int drv_set_lbt_mode(struct ieee802154_local *local, bool mode)
++static int
++ieee802154_set_lbt_mode(struct wpan_phy *wpan_phy, struct wpan_dev *wpan_dev,
++			bool mode)
  {
- 	might_sleep();
- 
-@@ -97,8 +94,8 @@ static inline int drv_set_lbt_mode(struct ieee802154_local *local,
- 	return local->ops->set_lbt(&local->hw, mode);
- }
- 
--static inline int drv_set_cca_ed_level(struct ieee802154_local *local,
--				       const s32 ed_level)
-+static inline int
-+drv_set_cca_ed_level(struct ieee802154_local *local, s32 ed_level)
- {
- 	might_sleep();
- 
-@@ -110,8 +107,7 @@ static inline int drv_set_cca_ed_level(struct ieee802154_local *local,
- 	return local->ops->set_cca_ed_level(&local->hw, ed_level);
- }
- 
--static inline int drv_set_pan_id(struct ieee802154_local *local,
--				 const __le16 pan_id)
-+static inline int drv_set_pan_id(struct ieee802154_local *local, __le16 pan_id)
- {
- 	struct ieee802154_hw_addr_filt filt;
- 
-@@ -128,8 +124,8 @@ static inline int drv_set_pan_id(struct ieee802154_local *local,
- 					    IEEE802154_AFILT_PANID_CHANGED);
- }
- 
--static inline int drv_set_extended_addr(struct ieee802154_local *local,
--					const __le64 extended_addr)
-+static inline int
-+drv_set_extended_addr(struct ieee802154_local *local, __le64 extended_addr)
- {
- 	struct ieee802154_hw_addr_filt filt;
- 
-@@ -146,8 +142,8 @@ static inline int drv_set_extended_addr(struct ieee802154_local *local,
- 					    IEEE802154_AFILT_IEEEADDR_CHANGED);
- }
- 
--static inline int drv_set_short_addr(struct ieee802154_local *local,
--				     const __le16 short_addr)
-+static inline int
-+drv_set_short_addr(struct ieee802154_local *local, __le16 short_addr)
- {
- 	struct ieee802154_hw_addr_filt filt;
- 
-@@ -164,8 +160,8 @@ static inline int drv_set_short_addr(struct ieee802154_local *local,
- 					    IEEE802154_AFILT_SADDR_CHANGED);
- }
- 
--static inline int drv_set_pan_coord(struct ieee802154_local *local,
--				    const bool is_coord)
-+static inline int
-+drv_set_pan_coord(struct ieee802154_local *local, bool is_coord)
- {
- 	struct ieee802154_hw_addr_filt filt;
- 
-@@ -182,9 +178,9 @@ static inline int drv_set_pan_coord(struct ieee802154_local *local,
- 					    IEEE802154_AFILT_PANC_CHANGED);
- }
- 
--static inline int drv_set_csma_params(struct ieee802154_local *local,
--				      u8 min_be, u8 max_be,
--				      u8 max_csma_backoffs)
-+static inline int
-+drv_set_csma_params(struct ieee802154_local *local, u8 min_be, u8 max_be,
-+		    u8 max_csma_backoffs)
- {
- 	might_sleep();
- 
-@@ -197,8 +193,8 @@ static inline int drv_set_csma_params(struct ieee802154_local *local,
- 					   max_csma_backoffs);
- }
- 
--static inline int drv_set_max_frame_retries(struct ieee802154_local *local,
--					    s8 max_frame_retries)
-+static inline int
-+drv_set_max_frame_retries(struct ieee802154_local *local, s8 max_frame_retries)
- {
- 	might_sleep();
- 
-@@ -210,8 +206,8 @@ static inline int drv_set_max_frame_retries(struct ieee802154_local *local,
- 	return local->ops->set_frame_retries(&local->hw, max_frame_retries);
- }
- 
--static inline int drv_set_promiscuous_mode(struct ieee802154_local *local,
--					   const bool on)
-+static inline int
-+drv_set_promiscuous_mode(struct ieee802154_local *local, bool on)
- {
- 	might_sleep();
+ 	struct ieee802154_local *local = wpan_phy_priv(wpan_phy);
  
 -- 
 2.1.3
