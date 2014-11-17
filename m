@@ -1,61 +1,35 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from senator.holtmann.net ([87.106.208.187]:54413 "EHLO
-	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751322AbaKQIz6 convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Mon, 17 Nov 2014 03:55:58 -0500
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.0 \(1990.1\))
-Subject: Re: [PATCH bluetooth-next 00/13] ieee802154: cleanups, nl802154 iface handling and byteorder fixes
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1416208855-8623-1-git-send-email-alex.aring@gmail.com>
-Date: Mon, 17 Nov 2014 17:55:47 +0900
-Content-Transfer-Encoding: 8BIT
-Message-Id: <FFFEDEC3-7883-4A03-8447-46AAD22CC81B@holtmann.org>
-References: <1416208855-8623-1-git-send-email-alex.aring@gmail.com>
+Received: from mail-pa0-f54.google.com ([209.85.220.54]:38917 "EHLO
+	mail-pa0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751861AbaKQJSs (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Mon, 17 Nov 2014 04:18:48 -0500
+Received: by mail-pa0-f54.google.com with SMTP id hz1so10767295pad.27
+        for <linux-wpan@vger.kernel.org>; Mon, 17 Nov 2014 01:18:48 -0800 (PST)
+Received: from [10.244.10.187] ([196.12.45.164])
+        by mx.google.com with ESMTPSA id w5sm34557859pds.25.2014.11.17.01.18.45
+        for <linux-wpan@vger.kernel.org>
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 17 Nov 2014 01:18:46 -0800 (PST)
+Message-ID: <5469BCA9.10401@gmail.com>
+Date: Mon, 17 Nov 2014 14:45:21 +0530
+From: Varka Bhadram <varkabhadram@gmail.com>
+MIME-Version: 1.0
+Subject: Power Management support for IEEE-802.15.4 drivers
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>
-Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de
+To: linux-wpan - ML <linux-wpan@vger.kernel.org>
 
-Hi Alex,
+Hi,
 
-> This patch series contains various cleanups and adding new nl802154 commands
-> for supporting interface handling. At least we fix some byteorder issues.
-> The nl802154 interface uses little endian byteorder now. This is the same
-> byteorder like 802.15.4 MAC layer. The nl802154 interface is new, so we should
-> fix the byteorder issue now.
-> 
-> Alexander Aring (13):
->  mac802154: remove unused prototypes
->  at86rf230: fix commentation for symbol duration
->  mac802154: remove const for non pointer in driver-ops
->  mac802154: remove const for non pointer in cfg ops
->  mac802154: remove const for non pointer in rdev-ops
->  mac802154: remove deprecated linux-zigbee info
->  mac802154: use new nl802154 iftype types
->  mac802154: remove wpan_dev parameter in if_add
->  ieee802154: add new interface command
->  ieee802154: setting extended address while iface add
->  ieee802154: add del interface command
->  ieee802154: rename and move WPAN_NUM_ defines
->  ieee802154: fix byteorder for short address and panid
-> 
-> drivers/net/ieee802154/at86rf230.c |  4 +-
-> include/linux/ieee802154.h         |  3 ++
-> include/net/cfg802154.h            | 21 +++++-----
-> net/ieee802154/nl802154.c          | 80 +++++++++++++++++++++++++++++++++++---
-> net/ieee802154/rdev-ops.h          | 33 ++++++++++------
-> net/mac802154/cfg.c                | 69 ++++++++++++++++++++++----------
-> net/mac802154/driver-ops.h         | 46 ++++++++++------------
-> net/mac802154/ieee802154_i.h       | 15 +++----
-> net/mac802154/iface.c              | 31 ++++++++-------
-> net/mac802154/main.c               |  7 ++--
-> net/mac802154/rx.c                 |  7 ++--
-> 11 files changed, 211 insertions(+), 105 deletions(-)
+None of IEEE-802.15.4 driver implements Power Management. But the devices like AT86RF230
+and CC2520 work with different power modes.
 
-all 13 patches have been applied to bluetooth-next tree.
+Where (means probe()/start()/..) can we add these functionalities like resume() / suspend()
+for the devices..?
 
-Regards
-
-Marcel
+-- 
+Thanks and Regards,
+Varka Bhadram.
 
