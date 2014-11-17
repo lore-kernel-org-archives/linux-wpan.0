@@ -1,159 +1,61 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f182.google.com ([209.85.212.182]:52034 "EHLO
-	mail-wi0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751482AbaKQHVi (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Mon, 17 Nov 2014 02:21:38 -0500
-Received: by mail-wi0-f182.google.com with SMTP id h11so8055543wiw.3
-        for <linux-wpan@vger.kernel.org>; Sun, 16 Nov 2014 23:21:36 -0800 (PST)
-From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH bluetooth-next 13/13] ieee802154: fix byteorder for short address and panid
-Date: Mon, 17 Nov 2014 08:20:55 +0100
-Message-Id: <1416208855-8623-14-git-send-email-alex.aring@gmail.com>
+Received: from senator.holtmann.net ([87.106.208.187]:54413 "EHLO
+	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751322AbaKQIz6 convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Mon, 17 Nov 2014 03:55:58 -0500
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.0 \(1990.1\))
+Subject: Re: [PATCH bluetooth-next 00/13] ieee802154: cleanups, nl802154 iface handling and byteorder fixes
+From: Marcel Holtmann <marcel@holtmann.org>
 In-Reply-To: <1416208855-8623-1-git-send-email-alex.aring@gmail.com>
+Date: Mon, 17 Nov 2014 17:55:47 +0900
+Content-Transfer-Encoding: 8BIT
+Message-Id: <FFFEDEC3-7883-4A03-8447-46AAD22CC81B@holtmann.org>
 References: <1416208855-8623-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org
-Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
+To: Alexander Aring <alex.aring@gmail.com>
+Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de
 
-This patch changes the byteorder handling for short and panid handling.
-We now except to get little endian in nl802154 for these attributes.
+Hi Alex,
 
-Signed-off-by: Alexander Aring <alex.aring@gmail.com>
----
- include/net/cfg802154.h   |  4 ++--
- net/ieee802154/nl802154.c |  8 ++++----
- net/ieee802154/rdev-ops.h |  4 ++--
- net/mac802154/cfg.c       | 14 +++++++-------
- 4 files changed, 15 insertions(+), 15 deletions(-)
+> This patch series contains various cleanups and adding new nl802154 commands
+> for supporting interface handling. At least we fix some byteorder issues.
+> The nl802154 interface uses little endian byteorder now. This is the same
+> byteorder like 802.15.4 MAC layer. The nl802154 interface is new, so we should
+> fix the byteorder issue now.
+> 
+> Alexander Aring (13):
+>  mac802154: remove unused prototypes
+>  at86rf230: fix commentation for symbol duration
+>  mac802154: remove const for non pointer in driver-ops
+>  mac802154: remove const for non pointer in cfg ops
+>  mac802154: remove const for non pointer in rdev-ops
+>  mac802154: remove deprecated linux-zigbee info
+>  mac802154: use new nl802154 iftype types
+>  mac802154: remove wpan_dev parameter in if_add
+>  ieee802154: add new interface command
+>  ieee802154: setting extended address while iface add
+>  ieee802154: add del interface command
+>  ieee802154: rename and move WPAN_NUM_ defines
+>  ieee802154: fix byteorder for short address and panid
+> 
+> drivers/net/ieee802154/at86rf230.c |  4 +-
+> include/linux/ieee802154.h         |  3 ++
+> include/net/cfg802154.h            | 21 +++++-----
+> net/ieee802154/nl802154.c          | 80 +++++++++++++++++++++++++++++++++++---
+> net/ieee802154/rdev-ops.h          | 33 ++++++++++------
+> net/mac802154/cfg.c                | 69 ++++++++++++++++++++++----------
+> net/mac802154/driver-ops.h         | 46 ++++++++++------------
+> net/mac802154/ieee802154_i.h       | 15 +++----
+> net/mac802154/iface.c              | 31 ++++++++-------
+> net/mac802154/main.c               |  7 ++--
+> net/mac802154/rx.c                 |  7 ++--
+> 11 files changed, 211 insertions(+), 105 deletions(-)
 
-diff --git a/include/net/cfg802154.h b/include/net/cfg802154.h
-index 228f1f7..7f713ac 100644
---- a/include/net/cfg802154.h
-+++ b/include/net/cfg802154.h
-@@ -40,9 +40,9 @@ struct cfg802154_ops {
- 				    struct wpan_dev *wpan_dev);
- 	int	(*set_channel)(struct wpan_phy *wpan_phy, u8 page, u8 channel);
- 	int	(*set_pan_id)(struct wpan_phy *wpan_phy,
--			      struct wpan_dev *wpan_dev, u16 pan_id);
-+			      struct wpan_dev *wpan_dev, __le16 pan_id);
- 	int	(*set_short_addr)(struct wpan_phy *wpan_phy,
--				  struct wpan_dev *wpan_dev, u16 short_addr);
-+				  struct wpan_dev *wpan_dev, __le16 short_addr);
- 	int	(*set_backoff_exponent)(struct wpan_phy *wpan_phy,
- 					struct wpan_dev *wpan_dev, u8 min_be,
- 					u8 max_be);
-diff --git a/net/ieee802154/nl802154.c b/net/ieee802154/nl802154.c
-index b82b016..8896477 100644
---- a/net/ieee802154/nl802154.c
-+++ b/net/ieee802154/nl802154.c
-@@ -627,7 +627,7 @@ static int nl802154_set_pan_id(struct sk_buff *skb, struct genl_info *info)
- 	struct cfg802154_registered_device *rdev = info->user_ptr[0];
- 	struct net_device *dev = info->user_ptr[1];
- 	struct wpan_dev *wpan_dev = dev->ieee802154_ptr;
--	u16 pan_id;
-+	__le16 pan_id;
- 
- 	/* conflict here while tx/rx calls */
- 	if (netif_running(dev))
-@@ -640,7 +640,7 @@ static int nl802154_set_pan_id(struct sk_buff *skb, struct genl_info *info)
- 	if (!info->attrs[NL802154_ATTR_PAN_ID])
- 		return -EINVAL;
- 
--	pan_id = nla_get_u16(info->attrs[NL802154_ATTR_PAN_ID]);
-+	pan_id = nla_get_le16(info->attrs[NL802154_ATTR_PAN_ID]);
- 
- 	return rdev_set_pan_id(rdev, wpan_dev, pan_id);
- }
-@@ -650,7 +650,7 @@ static int nl802154_set_short_addr(struct sk_buff *skb, struct genl_info *info)
- 	struct cfg802154_registered_device *rdev = info->user_ptr[0];
- 	struct net_device *dev = info->user_ptr[1];
- 	struct wpan_dev *wpan_dev = dev->ieee802154_ptr;
--	u16 short_addr;
-+	__le16 short_addr;
- 
- 	/* conflict here while tx/rx calls */
- 	if (netif_running(dev))
-@@ -663,7 +663,7 @@ static int nl802154_set_short_addr(struct sk_buff *skb, struct genl_info *info)
- 	if (!info->attrs[NL802154_ATTR_SHORT_ADDR])
- 		return -EINVAL;
- 
--	short_addr = nla_get_u16(info->attrs[NL802154_ATTR_SHORT_ADDR]);
-+	short_addr = nla_get_le16(info->attrs[NL802154_ATTR_SHORT_ADDR]);
- 
- 	return rdev_set_short_addr(rdev, wpan_dev, short_addr);
- }
-diff --git a/net/ieee802154/rdev-ops.h b/net/ieee802154/rdev-ops.h
-index 40ffbc0..aff54fb 100644
---- a/net/ieee802154/rdev-ops.h
-+++ b/net/ieee802154/rdev-ops.h
-@@ -43,14 +43,14 @@ rdev_set_channel(struct cfg802154_registered_device *rdev, u8 page, u8 channel)
- 
- static inline int
- rdev_set_pan_id(struct cfg802154_registered_device *rdev,
--		struct wpan_dev *wpan_dev, u16 pan_id)
-+		struct wpan_dev *wpan_dev, __le16 pan_id)
- {
- 	return rdev->ops->set_pan_id(&rdev->wpan_phy, wpan_dev, pan_id);
- }
- 
- static inline int
- rdev_set_short_addr(struct cfg802154_registered_device *rdev,
--		    struct wpan_dev *wpan_dev, u16 short_addr)
-+		    struct wpan_dev *wpan_dev, __le16 short_addr)
- {
- 	return rdev->ops->set_short_addr(&rdev->wpan_phy, wpan_dev, short_addr);
- }
-diff --git a/net/mac802154/cfg.c b/net/mac802154/cfg.c
-index 7def262..c035708 100644
---- a/net/mac802154/cfg.c
-+++ b/net/mac802154/cfg.c
-@@ -88,7 +88,7 @@ ieee802154_set_channel(struct wpan_phy *wpan_phy, u8 page, u8 channel)
- 
- static int
- ieee802154_set_pan_id(struct wpan_phy *wpan_phy, struct wpan_dev *wpan_dev,
--		      u16 pan_id)
-+		      __le16 pan_id)
- {
- 	ASSERT_RTNL();
- 
-@@ -99,10 +99,10 @@ ieee802154_set_pan_id(struct wpan_phy *wpan_phy, struct wpan_dev *wpan_dev,
- 	 *
- 	 * This could useful to simple deassociate an device.
- 	 */
--	if (pan_id == IEEE802154_PAN_ID_BROADCAST)
-+	if (pan_id == cpu_to_le16(IEEE802154_PAN_ID_BROADCAST))
- 		return -EINVAL;
- 
--	wpan_dev->pan_id = cpu_to_le16(pan_id);
-+	wpan_dev->pan_id = pan_id;
- 	return 0;
- }
- 
-@@ -125,7 +125,7 @@ ieee802154_set_backoff_exponent(struct wpan_phy *wpan_phy,
- 
- static int
- ieee802154_set_short_addr(struct wpan_phy *wpan_phy, struct wpan_dev *wpan_dev,
--			  u16 short_addr)
-+			  __le16 short_addr)
- {
- 	ASSERT_RTNL();
- 
-@@ -140,11 +140,11 @@ ieee802154_set_short_addr(struct wpan_phy *wpan_phy, struct wpan_dev *wpan_dev,
- 	 * I think we should allow to set these settings but
- 	 * don't allow to allow socket communication with it.
- 	 */
--	if (short_addr == IEEE802154_ADDR_SHORT_UNSPEC ||
--	    short_addr == IEEE802154_ADDR_SHORT_BROADCAST)
-+	if (short_addr == cpu_to_le16(IEEE802154_ADDR_SHORT_UNSPEC) ||
-+	    short_addr == cpu_to_le16(IEEE802154_ADDR_SHORT_BROADCAST))
- 		return -EINVAL;
- 
--	wpan_dev->short_addr = cpu_to_le16(short_addr);
-+	wpan_dev->short_addr = short_addr;
- 	return 0;
- }
- 
--- 
-2.1.3
+all 13 patches have been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
 
