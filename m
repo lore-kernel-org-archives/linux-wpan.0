@@ -1,35 +1,34 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-pa0-f54.google.com ([209.85.220.54]:38917 "EHLO
-	mail-pa0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751861AbaKQJSs (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Mon, 17 Nov 2014 04:18:48 -0500
-Received: by mail-pa0-f54.google.com with SMTP id hz1so10767295pad.27
-        for <linux-wpan@vger.kernel.org>; Mon, 17 Nov 2014 01:18:48 -0800 (PST)
-Received: from [10.244.10.187] ([196.12.45.164])
-        by mx.google.com with ESMTPSA id w5sm34557859pds.25.2014.11.17.01.18.45
-        for <linux-wpan@vger.kernel.org>
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 17 Nov 2014 01:18:46 -0800 (PST)
-Message-ID: <5469BCA9.10401@gmail.com>
-Date: Mon, 17 Nov 2014 14:45:21 +0530
-From: Varka Bhadram <varkabhadram@gmail.com>
+Received: from mail-la0-f45.google.com ([209.85.215.45]:41332 "EHLO
+	mail-la0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753848AbaKRSV3 (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Tue, 18 Nov 2014 13:21:29 -0500
 MIME-Version: 1.0
-Subject: Power Management support for IEEE-802.15.4 drivers
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+From: "Luis R. Rodriguez" <mcgrof@do-not-panic.com>
+Date: Tue, 18 Nov 2014 10:21:05 -0800
+Message-ID: <CAB=NE6Wwec_sq4muj7kshhyLJttcf1CytTPWkjc_+Ub3dqn0tw@mail.gmail.com>
+Subject: [ANN] Kernel integration now merged on backports
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan - ML <linux-wpan@vger.kernel.org>
+To: "backports@vger.kernel.org" <backports@vger.kernel.org>
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, linux-wireless <linux-wireless@vger.kernel.org>, linux-media@vger.kernel.org, linux-bluetooth <linux-bluetooth@vger.kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, linux-wpan@vger.kernel.org
 
-Hi,
+Full kernel integration is now merged as part of Linux
+backports-20141114. I've written a bit about it [0] [1], what we need
+now are users and developer to give this a good spin as we wind down
+for the v3.19 release, which will be the first release that will
+support kernel integration down to any kernel >= 3.0 -- for now you
+can use the backports-20141114 tag which uses as base supported
+drivers from next-20141114. What this will mean is that you can opt in
+to integrate any device driver we support from any future backports
+release into any of >= 3.0 kernel with full kconfig support, enabling
+you to build everything as built-in. For all this you won't be using
+the packaged releases [2], instead you'll use the git tree directly as
+documented.
 
-None of IEEE-802.15.4 driver implements Power Management. But the devices like AT86RF230
-and CC2520 work with different power modes.
+[0] http://www.do-not-panic.com/2014/11/automating-backport-kernel-integration.html
+[1] https://backports.wiki.kernel.org/index.php/Documentation/integration
+[2] https://backports.wiki.kernel.org/index.php/Documentation/packaging
 
-Where (means probe()/start()/..) can we add these functionalities like resume() / suspend()
-for the devices..?
-
--- 
-Thanks and Regards,
-Varka Bhadram.
-
+  Luis
