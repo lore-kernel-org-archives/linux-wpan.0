@@ -1,14 +1,14 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wg0-f53.google.com ([74.125.82.53]:65535 "EHLO
-	mail-wg0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755084AbaKUQfR (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Fri, 21 Nov 2014 11:35:17 -0500
-Received: by mail-wg0-f53.google.com with SMTP id l18so6958249wgh.40
-        for <linux-wpan@vger.kernel.org>; Fri, 21 Nov 2014 08:35:11 -0800 (PST)
-Date: Fri, 21 Nov 2014 17:35:05 +0100
+Received: from mail-wi0-f182.google.com ([209.85.212.182]:63441 "EHLO
+	mail-wi0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755353AbaKURLH (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Fri, 21 Nov 2014 12:11:07 -0500
+Received: by mail-wi0-f182.google.com with SMTP id h11so9580273wiw.9
+        for <linux-wpan@vger.kernel.org>; Fri, 21 Nov 2014 09:11:05 -0800 (PST)
+Date: Fri, 21 Nov 2014 18:10:58 +0100
 From: Alexander Aring <alex.aring@gmail.com>
 Subject: Re: Unused function mac802154_header_parse()
-Message-ID: <20141121163502.GC20364@omega>
+Message-ID: <20141121171055.GE20364@omega>
 References: <546F62C1.6010500@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
@@ -18,8 +18,6 @@ Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: Varka Bhadram <varkabhadram@gmail.com>
 Cc: linux-wpan - ML <linux-wpan@vger.kernel.org>
-
-Hi,
 
 On Fri, Nov 21, 2014 at 09:35:21PM +0530, Varka Bhadram wrote:
 > Hi,
@@ -32,39 +30,24 @@ On Fri, Nov 21, 2014 at 09:35:21PM +0530, Varka Bhadram wrote:
 > Am i missing anything.?
 > 
 
-Parsing frames are completely done at [0]. With call of
-"netif_receive_skb(skb);" the frame is deliverd into packet layer.
+For the dev_parse_header usage:
 
-Currently there exist several issues with parsing frames which I don't
-will explain now.
+`grep -r -n "dev_parse_header" net`:
 
+net/packet/af_packet.c:1823:	sll->sll_halen = dev_parse_header(skb, sll->sll_addr);
+net/packet/af_packet.c:2030:	sll->sll_halen = dev_parse_header(skb, sll->sll_addr);
 
-
-Now the header_ops structure:
-
-These callbacks are many used by arp or ndisc. For me there exist no
-reason why a wpan interface implements such functionallity. The lowpan
-interface needs these callbacks. For the rework I removed dev_hard_header
-calls for 802154 upper layers. Not for the lowpan interface.
-
-What we now doing inside the 802154 layer is to use dev_hard_header and pass
-additional parameters over skb->cb, but we don't need that for the wpan interface.
-
-At lowpan interface the ndisc IPv6 cache will tell us the destination
-address, that's why need this there.
-
-For af802154: this is currently a complete weird implementation.
+This is used by the packet layer at several places.
 
 
-For more documentation about that the header_ops callback structure
-does, read the implementation for ethernet. [1]
 
+I need to dig more into this. It seems that these callback structure are
+optional because dev_hard_header and dev_parse_header header return 0 if
+they are not implemented.
 
-Sorry I am busy right now and it's also not easy to doing some new
-mechanism into the frame parsing/mac header generation because it's used
-everywhere.
+Also it seems that when af_packet uses dev_hard_header header it could
+be that the control block information is overwritten by packet_skb_cb.
+So it's _maybe_ a bug to add additional parameters over control block
+information for the header_create callback.
 
 - Alex
-
-[0] http://git.kernel.org/cgit/linux/kernel/git/bluetooth/bluetooth-next.git/tree/net/mac802154/rx.c?id=24ccb9f4f7a3a5a867bbc880019cdb4b41176b63#n196
-[1] http://lxr.free-electrons.com/source/net/ethernet/eth.c#L345
