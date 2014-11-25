@@ -1,76 +1,27 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-pd0-f179.google.com ([209.85.192.179]:38174 "EHLO
-	mail-pd0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751290AbaKYEiz (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Mon, 24 Nov 2014 23:38:55 -0500
-Received: by mail-pd0-f179.google.com with SMTP id w10so11221062pde.10
-        for <linux-wpan@vger.kernel.org>; Mon, 24 Nov 2014 20:38:55 -0800 (PST)
-From: Varka Bhadram <varkabhadram@gmail.com>
-Subject: [PATCH bluetooth-next] ieee802154: fix spelling mistakes
-Date: Tue, 25 Nov 2014 10:04:57 +0530
-Message-Id: <1416890097-3643-1-git-send-email-varkab@cdac.in>
-In-Reply-To: <n>
+Received: from mail-wi0-f177.google.com ([209.85.212.177]:39150 "EHLO
+	mail-wi0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750898AbaKYIyS (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Tue, 25 Nov 2014 03:54:18 -0500
+Received: by mail-wi0-f177.google.com with SMTP id l15so607586wiw.16
+        for <linux-wpan@vger.kernel.org>; Tue, 25 Nov 2014 00:54:17 -0800 (PST)
+Date: Tue, 25 Nov 2014 09:54:11 +0100
+From: Alexander Aring <alex.aring@gmail.com>
+Subject: Re: [PATCH bluetooth-next] ieee802154: fix spelling mistakes
+Message-ID: <20141125085407.GA12678@omega>
 References: <n>
+ <1416890097-3643-1-git-send-email-varkab@cdac.in>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1416890097-3643-1-git-send-email-varkab@cdac.in>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org
-Cc: alex.aring@gmail.com, Varka Bhadram <varkab@cdac.in>
+To: Varka Bhadram <varkabhadram@gmail.com>
+Cc: linux-wpan@vger.kernel.org, Varka Bhadram <varkab@cdac.in>
 
+On Tue, Nov 25, 2014 at 10:04:57AM +0530, Varka Bhadram wrote:
+> 
+> Signed-off-by: Varka Bhadram <varkab@cdac.in>
 
-Signed-off-by: Varka Bhadram <varkab@cdac.in>
----
- net/ieee802154/6lowpan_rtnl.c |    2 +-
- net/ieee802154/netlink.c      |    2 +-
- net/ieee802154/nl-mac.c       |    2 +-
- net/ieee802154/nl-phy.c       |    2 +-
- 4 files changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/net/ieee802154/6lowpan_rtnl.c b/net/ieee802154/6lowpan_rtnl.c
-index 290e14f..16f5e91 100644
---- a/net/ieee802154/6lowpan_rtnl.c
-+++ b/net/ieee802154/6lowpan_rtnl.c
-@@ -597,7 +597,7 @@ static int lowpan_newlink(struct net *src_net, struct net_device *dev,
- 
- 	entry->ldev = dev;
- 
--	/* Set the lowpan harware address to the wpan hardware address. */
-+	/* Set the lowpan hardware address to the wpan hardware address. */
- 	memcpy(dev->dev_addr, real_dev->dev_addr, IEEE802154_ADDR_LEN);
- 
- 	mutex_lock(&lowpan_dev_info(dev)->dev_list_mtx);
-diff --git a/net/ieee802154/netlink.c b/net/ieee802154/netlink.c
-index 63ee7d6..6ad0da3 100644
---- a/net/ieee802154/netlink.c
-+++ b/net/ieee802154/netlink.c
-@@ -1,5 +1,5 @@
- /*
-- * Netlink inteface for IEEE 802.15.4 stack
-+ * Netlink interface for IEEE 802.15.4 stack
-  *
-  * Copyright 2007, 2008 Siemens AG
-  *
-diff --git a/net/ieee802154/nl-mac.c b/net/ieee802154/nl-mac.c
-index fe77f0c..1f085ed 100644
---- a/net/ieee802154/nl-mac.c
-+++ b/net/ieee802154/nl-mac.c
-@@ -1,5 +1,5 @@
- /*
-- * Netlink inteface for IEEE 802.15.4 stack
-+ * Netlink interface for IEEE 802.15.4 stack
-  *
-  * Copyright 2007, 2008 Siemens AG
-  *
-diff --git a/net/ieee802154/nl-phy.c b/net/ieee802154/nl-phy.c
-index 80a946d..6246354 100644
---- a/net/ieee802154/nl-phy.c
-+++ b/net/ieee802154/nl-phy.c
-@@ -1,5 +1,5 @@
- /*
-- * Netlink inteface for IEEE 802.15.4 stack
-+ * Netlink interface for IEEE 802.15.4 stack
-  *
-  * Copyright 2007, 2008 Siemens AG
-  *
--- 
-1.7.9.5
-
+Acked-by: Alexander Aring <alex.aring@gmail.com>
