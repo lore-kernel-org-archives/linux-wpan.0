@@ -1,27 +1,35 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f177.google.com ([209.85.212.177]:39150 "EHLO
-	mail-wi0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750898AbaKYIyS (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Tue, 25 Nov 2014 03:54:18 -0500
-Received: by mail-wi0-f177.google.com with SMTP id l15so607586wiw.16
-        for <linux-wpan@vger.kernel.org>; Tue, 25 Nov 2014 00:54:17 -0800 (PST)
-Date: Tue, 25 Nov 2014 09:54:11 +0100
-From: Alexander Aring <alex.aring@gmail.com>
+Received: from senator.holtmann.net ([87.106.208.187]:60707 "EHLO
+	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750731AbaKZFCT (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Wed, 26 Nov 2014 00:02:19 -0500
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
 Subject: Re: [PATCH bluetooth-next] ieee802154: fix spelling mistakes
-Message-ID: <20141125085407.GA12678@omega>
-References: <n>
- <1416890097-3643-1-git-send-email-varkab@cdac.in>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+From: Marcel Holtmann <marcel@holtmann.org>
 In-Reply-To: <1416890097-3643-1-git-send-email-varkab@cdac.in>
+Date: Wed, 26 Nov 2014 14:02:12 +0900
+Content-Transfer-Encoding: 7bit
+Message-Id: <5AE35E91-5160-499B-96C4-0934DBDDB0CB@holtmann.org>
+References: <n> <1416890097-3643-1-git-send-email-varkab@cdac.in>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: Varka Bhadram <varkabhadram@gmail.com>
-Cc: linux-wpan@vger.kernel.org, Varka Bhadram <varkab@cdac.in>
+Cc: linux-wpan@vger.kernel.org, Alexander Aring <alex.aring@gmail.com>, Varka Bhadram <varkab@cdac.in>
 
-On Tue, Nov 25, 2014 at 10:04:57AM +0530, Varka Bhadram wrote:
-> 
+Hi Varka,
+
 > Signed-off-by: Varka Bhadram <varkab@cdac.in>
+> ---
+> net/ieee802154/6lowpan_rtnl.c |    2 +-
+> net/ieee802154/netlink.c      |    2 +-
+> net/ieee802154/nl-mac.c       |    2 +-
+> net/ieee802154/nl-phy.c       |    2 +-
+> 4 files changed, 4 insertions(+), 4 deletions(-)
 
-Acked-by: Alexander Aring <alex.aring@gmail.com>
+patch has been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
+
