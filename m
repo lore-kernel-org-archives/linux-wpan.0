@@ -1,34 +1,41 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f171.google.com ([209.85.212.171]:34681 "EHLO
-	mail-wi0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753293AbaKYNTQ (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Tue, 25 Nov 2014 08:19:16 -0500
-Received: by mail-wi0-f171.google.com with SMTP id bs8so9082720wib.10
-        for <linux-wpan@vger.kernel.org>; Tue, 25 Nov 2014 05:19:15 -0800 (PST)
-Date: Tue, 25 Nov 2014 14:19:12 +0100
-From: Alexander Aring <alex.aring@gmail.com>
+Received: from senator.holtmann.net ([87.106.208.187]:60572 "EHLO
+	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750731AbaKZFCP convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Wed, 26 Nov 2014 00:02:15 -0500
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
 Subject: Re: [PATCH bluetooth-next] mac802154: remove unnecessary if statement
-Message-ID: <20141125131909.GB12678@omega>
-References: <1416913483-19314-1-git-send-email-varkab@cdac.in>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+From: Marcel Holtmann <marcel@holtmann.org>
 In-Reply-To: <1416913483-19314-1-git-send-email-varkab@cdac.in>
+Date: Wed, 26 Nov 2014 14:02:07 +0900
+Content-Transfer-Encoding: 8BIT
+Message-Id: <194E43DA-FC22-4AB0-8D61-C7F146DDEF03@holtmann.org>
+References: <1416913483-19314-1-git-send-email-varkab@cdac.in>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: Varka Bhadram <varkabhadram@gmail.com>
-Cc: linux-wpan@vger.kernel.org, Varka Bhadram <varkab@cdac.in>
+Cc: linux-wpan@vger.kernel.org, alex.aring@gmail.com, Varka Bhadram <varkab@cdac.in>
 
-On Tue, Nov 25, 2014 at 04:34:43PM +0530, Varka Bhadram wrote:
+Hi Varka,
+
 > Removes unnecessary if statement check for net device. Error check performed
 > after alloc_netdev().
 > 
 > 	ndev = alloc_netdev(sizeof(*sdata) + local->hw.vif_data_size, name,
 > 			    NET_NAME_UNKNOWN, ieee802154_if_setup);
->         if (!ndev)
->                 return ERR_PTR(-ENOMEM);
+>        if (!ndev)
+>                return ERR_PTR(-ENOMEM);
 > 	..
 > 
 > Signed-off-by: Varka Bhadram <varkab@cdac.in>
+> ---
+> net/mac802154/iface.c |    8 +++-----
+> 1 file changed, 3 insertions(+), 5 deletions(-)
 
-Acked-by: Alexander Aring <alex.aring@gmail.com>
+patch has been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
+
