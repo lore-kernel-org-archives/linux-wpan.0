@@ -1,35 +1,42 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from senator.holtmann.net ([87.106.208.187]:60707 "EHLO
-	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750731AbaKZFCT (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Wed, 26 Nov 2014 00:02:19 -0500
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
-Subject: Re: [PATCH bluetooth-next] ieee802154: fix spelling mistakes
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1416890097-3643-1-git-send-email-varkab@cdac.in>
-Date: Wed, 26 Nov 2014 14:02:12 +0900
-Content-Transfer-Encoding: 7bit
-Message-Id: <5AE35E91-5160-499B-96C4-0934DBDDB0CB@holtmann.org>
-References: <n> <1416890097-3643-1-git-send-email-varkab@cdac.in>
+Received: from mail-wi0-f182.google.com ([209.85.212.182]:61988 "EHLO
+	mail-wi0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750833AbaK2OZx (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Sat, 29 Nov 2014 09:25:53 -0500
+From: Alexander Aring <alex.aring@gmail.com>
+Subject: [PATCH bluetooth-next 0/2] 6lowpan: introduce nhc framework
+Date: Sat, 29 Nov 2014 15:24:40 +0100
+Message-Id: <1417271082-10068-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Varka Bhadram <varkabhadram@gmail.com>
-Cc: linux-wpan@vger.kernel.org, Alexander Aring <alex.aring@gmail.com>, Varka Bhadram <varkab@cdac.in>
+To: linux-bluetooth@vger.kernel.org
+Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>, Jukka Rissanen <jukka.rissanen@linux.intel.com>, Martin Townsend <mtownsend1973@gmail.com>
 
-Hi Varka,
+This patch series introduce the next header compression framework. Currently
+we support udp compression/uncompression only. This framework allow to add new
+next header compression formats easily.
 
-> Signed-off-by: Varka Bhadram <varkab@cdac.in>
-> ---
-> net/ieee802154/6lowpan_rtnl.c |    2 +-
-> net/ieee802154/netlink.c      |    2 +-
-> net/ieee802154/nl-mac.c       |    2 +-
-> net/ieee802154/nl-phy.c       |    2 +-
-> 4 files changed, 4 insertions(+), 4 deletions(-)
+If somebody wants to add a new header compression format and some information
+are missing while calling compression and uncompression callbacks. Please
+feel free to make framework changes according these callbacks.
 
-patch has been applied to bluetooth-next tree.
+Cc: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+Cc: Martin Townsend <mtownsend1973@gmail.com>
 
-Regards
+Alexander Aring (2):
+  6lowpan: add generic nhc layer interface
+  6lowpan: add udp compression via nhc layer
 
-Marcel
+ net/6lowpan/Makefile  |   5 +-
+ net/6lowpan/iphc.c    | 188 +++++++-------------------------------------------
+ net/6lowpan/nhc.c     | 183 ++++++++++++++++++++++++++++++++++++++++++++++++
+ net/6lowpan/nhc.h     | 132 +++++++++++++++++++++++++++++++++++
+ net/6lowpan/nhc_udp.c | 173 ++++++++++++++++++++++++++++++++++++++++++++++
+ 5 files changed, 516 insertions(+), 165 deletions(-)
+ create mode 100644 net/6lowpan/nhc.c
+ create mode 100644 net/6lowpan/nhc.h
+ create mode 100644 net/6lowpan/nhc_udp.c
+
+-- 
+2.1.3
 
