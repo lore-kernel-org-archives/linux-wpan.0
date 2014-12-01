@@ -1,80 +1,205 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from senator.holtmann.net ([87.106.208.187]:34260 "EHLO
-	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751717AbaKEUyW convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Wed, 5 Nov 2014 15:54:22 -0500
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.0 \(1990.1\))
-Subject: Re: [PATCH bluetooth-next 00/18] ieee802154: interface registration and perm address support
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1415217089-24919-1-git-send-email-alex.aring@gmail.com>
-Date: Wed, 5 Nov 2014 12:54:13 -0800
-Content-Transfer-Encoding: 8BIT
-Message-Id: <3CFF3A03-9C65-48B7-B4E0-C165B8929835@holtmann.org>
-References: <1415217089-24919-1-git-send-email-alex.aring@gmail.com>
+Received: from mail-wg0-f50.google.com ([74.125.82.50]:62132 "EHLO
+	mail-wg0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753437AbaLAOew (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Mon, 1 Dec 2014 09:34:52 -0500
+Date: Mon, 1 Dec 2014 15:34:45 +0100
+From: Alexander Aring <alex.aring@gmail.com>
+Subject: Re: [PATCHv2 bluetooth-next 1/2] 6lowpan: add generic nhc layer
+ interface
+Message-ID: <20141201143441.GA996@omega>
+References: <1417295683-22682-1-git-send-email-alex.aring@gmail.com>
+ <1417295683-22682-2-git-send-email-alex.aring@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1417295683-22682-2-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>
-Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de, Varka Bhadram <varkabhadram@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de, Jukka Rissanen <jukka.rissanen@linux.intel.com>, Martin Townsend <mtownsend1973@gmail.com>
 
-Hi Alex,
-
-> This patch series contains various changes to make the 802.15.4 implementation
-> similar like wireless/mac80211 implementation. Mainly changes are a complete
-> rework for interface registration handling and supporting for perm address.
-> The perm address can be set by driver layer and is the default "unique"
-> extended address for the wpan_phy. Also we have now a default interface
-> registration. This means a driver registrate a default wpan interface while
-> registration the wpan_phy. No extra interface add handling via userspace tool is
-> needed anymore.
+On Sat, Nov 29, 2014 at 10:14:42PM +0100, Alexander Aring wrote:
+> This patch adds a generic next header compression layer interface. There
+> exists various methods to do a header compression after 6LoWPAN header
+> to save payload. This introduce a generic nhc header which allow a
+> simple adding of a new header compression format instead of a static
+> implementation inside the 6LoWPAN header compression and uncompression
+> function.
 > 
-> Cc: Varka Bhadram <varkabhadram@gmail.com>
+> Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+> Cc: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+> Cc: Martin Townsend <mtownsend1973@gmail.com>
+> ---
+>  net/6lowpan/Makefile |   2 +-
+>  net/6lowpan/nhc.c    | 175 +++++++++++++++++++++++++++++++++++++++++++++++++++
+>  net/6lowpan/nhc.h    | 130 ++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 306 insertions(+), 1 deletion(-)
+>  create mode 100644 net/6lowpan/nhc.c
+>  create mode 100644 net/6lowpan/nhc.h
 > 
-> Alexander Aring (18):
->  ieee802154: rework wpan_phy index assignment
->  ieee802154: remove nl802154 unused functions
->  mac802154: move interface del handling in iface
->  mac802154: move interface add handling in iface
->  mac802154: move dev_hold out of ieee802154_if_add
->  ieee802154: rework interface registration
->  ieee802154: remove mlme get_phy callback
->  mac802154: add default interface registration
->  mac802154: add ieee802154_vif struct
->  ieee802154: add IEEE802154_EXTENDED_ADDR_LEN
->  ieee802154: add ieee802154_random_extended_addr
->  mac802154: add ieee802154_le64_to_be64
->  mac802154: cleanup ieee802154_netdev_to_extended_addr
->  mac802154: add support for perm_extended_addr
->  at86rf230: generate random perm extended address
->  at86rf230: add force slotted operation bit
->  mac802154: use IEEE802154_EXTENDED_ADDR_LEN
->  mac802154: fix typo promisuous to promiscuous
-> 
-> MAINTAINERS                        |   1 -
-> drivers/net/ieee802154/at86rf230.c |  10 ++
-> drivers/net/ieee802154/cc2520.c    |   1 +
-> include/linux/ieee802154.h         |  16 +++
-> include/net/cfg802154.h            |   7 +-
-> include/net/ieee802154_netdev.h    |  12 ---
-> include/net/mac802154.h            |  32 +++++-
-> include/net/nl802154.h             | 122 -----------------------
-> net/ieee802154/6lowpan_rtnl.c      |   8 --
-> net/ieee802154/core.c              |  30 +++---
-> net/ieee802154/core.h              |   3 +
-> net/ieee802154/nl-mac.c            | 193 ++-----------------------------------
-> net/ieee802154/nl-phy.c            |   4 +-
-> net/mac802154/cfg.c                |  14 ++-
-> net/mac802154/ieee802154_i.h       |  14 ++-
-> net/mac802154/iface.c              | 148 +++++++++++++++++++++-------
-> net/mac802154/mac_cmd.c            |  20 ----
-> net/mac802154/main.c               |  95 +++---------------
-> net/mac802154/rx.c                 |   4 +-
-> 19 files changed, 237 insertions(+), 497 deletions(-)
-> delete mode 100644 include/net/nl802154.h
+> diff --git a/net/6lowpan/Makefile b/net/6lowpan/Makefile
+> index 415886b..4215602 100644
+> --- a/net/6lowpan/Makefile
+> +++ b/net/6lowpan/Makefile
+> @@ -1,3 +1,3 @@
+>  obj-$(CONFIG_6LOWPAN) := 6lowpan.o
+>  
+> -6lowpan-y := iphc.o
+> +6lowpan-y := iphc.o nhc.o
+> diff --git a/net/6lowpan/nhc.c b/net/6lowpan/nhc.c
+> new file mode 100644
+> index 0000000..f64b244
+> --- /dev/null
+> +++ b/net/6lowpan/nhc.c
+> @@ -0,0 +1,175 @@
+> +/*
+> + *	6LoWPAN next header compression
+> + *
+> + *
+> + *	Authors:
+> + *	Alexander Aring		<aar@pengutronix.de>
+> + *
+> + *	This program is free software; you can redistribute it and/or
+> + *	modify it under the terms of the GNU General Public License
+> + *	as published by the Free Software Foundation; either version
+> + *	2 of the License, or (at your option) any later version.
+> + */
+> +
+> +#include <linux/netdevice.h>
+> +
+> +#include <net/ipv6.h>
+> +
+> +#include "nhc.h"
+> +
+> +static struct rb_root rb_root = RB_ROOT;
+> +static struct lowpan_nhc *lowpan_nexthdr_nhcs[NEXTHDR_MAX];
+> +
+> +static int lowpan_nhc_insert(struct lowpan_nhc *nhc)
+> +{
+> +	struct rb_node **new = &rb_root.rb_node, *parent = NULL;
+> +
+> +	/* Figure out where to put new node */
+> +	while (*new) {
+> +		struct lowpan_nhc *this = container_of(*new, struct lowpan_nhc,
+> +						       node);
+> +		int result, len_dif, len;
+> +
+> +		len_dif = nhc->idlen - this->idlen;
+> +
+> +		if (nhc->idlen < this->idlen)
+> +			len = nhc->idlen;
+> +		else
+> +			len = this->idlen;
+> +
+> +		result = memcmp(nhc->id, this->id, len);
+> +		if (!result)
+> +			result = len_dif;
+> +
+> +		parent = *new;
+> +		if (result < 0)
+> +			new = &((*new)->rb_left);
+> +		else if (result > 0)
+> +			new = &((*new)->rb_right);
+> +		else
+> +			return -EEXIST;
+> +	}
+> +
+> +	/* Add new node and rebalance tree. */
+> +	rb_link_node(&nhc->node, parent, new);
+> +	rb_insert_color(&nhc->node, &rb_root);
+> +
+> +	return 0;
+> +}
+> +
+> +static void lowpan_nhc_remove(struct lowpan_nhc *nhc)
+> +{
+> +	rb_erase(&nhc->node, &rb_root);
+> +}
+> +
+> +struct lowpan_nhc *lowpan_nhc_by_nhcid(const struct sk_buff *skb)
+> +{
+> +	struct rb_node *node = rb_root.rb_node;
+> +	const u8 *nhcid_skb_ptr = skb->data;
+> +
+> +	while (node) {
+> +		struct lowpan_nhc *nhc = container_of(node, struct lowpan_nhc,
+> +						      node);
+> +		u8 nhcid_skb_ptr_masked[LOWPAN_NHC_MAX_ID_LEN];
+> +		int result, i;
+> +
+> +		if (nhcid_skb_ptr + nhc->idlen > skb->data + skb->len)
+> +			return NULL;
+> +
+> +		/* copy and mask afterwards the nhid value from skb */
+> +		memcpy(nhcid_skb_ptr_masked, nhcid_skb_ptr, nhc->idlen);
+> +		for (i = 0; i < nhc->idlen; i++)
+> +			nhcid_skb_ptr_masked[i] &= nhc->idmask[i];
+> +
+> +		result = memcmp(nhcid_skb_ptr_masked, nhc->id, nhc->idlen);
+> +		if (result < 0)
+> +			node = node->rb_left;
+> +		else if (result > 0)
+> +			node = node->rb_right;
+> +		else
+> +			return nhc;
+> +	}
+> +
+> +	return NULL;
+> +}
+> +
+> +struct lowpan_nhc *lowpan_nhc_by_nexthdr(u8 nexthdr)
+> +{
+> +	return lowpan_nexthdr_nhcs[nexthdr];
+> +}
+> +
+> +int lowpan_nhc_do_compression(struct lowpan_nhc *nhc, struct sk_buff *skb,
+> +			      u8 **hc_ptr, u8 *iphc0)
+> +{
+> +	int ret;
+> +
+> +	if (!nhc)
+> +		return 0;
+> +
+> +	ret = nhc->compress(skb, hc_ptr);
+> +	if (ret == 0)
+> +		*iphc0 |= LOWPAN_IPHC_NH_C;
+> +
+> +	return ret;
+> +}
+> +
+> +int lowpan_nhc_do_uncompression(struct sk_buff *skb, struct ipv6hdr *hdr)
+> +{
+> +	struct lowpan_nhc *nhc;
+> +	/* default dropping if nothing found */
+> +	int ret = 0;
+> +
 
-all 18 patches have been applied to bluetooth-next tree.
+this should be ret = -ENOENT; 
 
-Regards
+To avoid sending garbage to next higher layer. I changed this is here
+from -EINVAL to 0. Sorry some mistake is happend here, now it's real
+dropped afterwards.
 
-Marcel
+> +	nhc = lowpan_nhc_by_nhcid(skb);
+> +	if (nhc) {
+> +		ret = nhc->uncompress(skb, sizeof(*hdr) + nhc->nexthdrlen);
+> +		if (ret == 0) {
+> +			hdr->nexthdr = nhc->nexthdr;
+> +			skb_reset_transport_header(skb);
+> +			raw_dump_table(__func__, "raw transport header dump",
+> +				       skb_transport_header(skb),
+> +				       nhc->nexthdrlen);
+> +		} else if (ret == -ENOTSUPP) {
+> +			netdev_warn(skb->dev, "received %s which is not supported for uncompression.\n",
+> +				    nhc->name);
+> +		}
+> +	} else {
+> +		netdev_warn(skb->dev, "received nhc which is not supported. Dropping.\n");
+> +	}
+> +
+> +	return ret;
+> +}
+> +
 
+- Alex
