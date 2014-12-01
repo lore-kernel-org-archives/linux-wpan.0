@@ -1,205 +1,156 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wg0-f50.google.com ([74.125.82.50]:62132 "EHLO
-	mail-wg0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753437AbaLAOew (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Mon, 1 Dec 2014 09:34:52 -0500
-Date: Mon, 1 Dec 2014 15:34:45 +0100
-From: Alexander Aring <alex.aring@gmail.com>
-Subject: Re: [PATCHv2 bluetooth-next 1/2] 6lowpan: add generic nhc layer
- interface
-Message-ID: <20141201143441.GA996@omega>
+Received: from mga02.intel.com ([134.134.136.20]:41652 "EHLO mga02.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752835AbaLAMdZ (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+	Mon, 1 Dec 2014 07:33:25 -0500
+Message-ID: <1417437183.2703.45.camel@jrissane-mobl.ger.corp.intel.com>
+Subject: Re: [PATCHv2 bluetooth-next 0/2] 6lowpan: introduce nhc framework
+From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+Date: Mon, 01 Dec 2014 14:33:03 +0200
+In-Reply-To: <1417295683-22682-1-git-send-email-alex.aring@gmail.com>
 References: <1417295683-22682-1-git-send-email-alex.aring@gmail.com>
- <1417295683-22682-2-git-send-email-alex.aring@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1417295683-22682-2-git-send-email-alex.aring@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de, Jukka Rissanen <jukka.rissanen@linux.intel.com>, Martin Townsend <mtownsend1973@gmail.com>
+To: Alexander Aring <alex.aring@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org, kernel@pengutronix.de, Martin Townsend <mtownsend1973@gmail.com>, Marcel Holtmann <marcel@holtmann.org>
 
-On Sat, Nov 29, 2014 at 10:14:42PM +0100, Alexander Aring wrote:
-> This patch adds a generic next header compression layer interface. There
-> exists various methods to do a header compression after 6LoWPAN header
-> to save payload. This introduce a generic nhc header which allow a
-> simple adding of a new header compression format instead of a static
-> implementation inside the 6LoWPAN header compression and uncompression
-> function.
+Hi Alex,
+
+On la, 2014-11-29 at 22:14 +0100, Alexander Aring wrote:
+> This patch series introduce the next header compression framework. Currently
+> we support udp compression/uncompression only. This framework allow to add new
+> next header compression formats easily.
 > 
-> Signed-off-by: Alexander Aring <alex.aring@gmail.com>
-> Cc: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-> Cc: Martin Townsend <mtownsend1973@gmail.com>
-> ---
->  net/6lowpan/Makefile |   2 +-
->  net/6lowpan/nhc.c    | 175 +++++++++++++++++++++++++++++++++++++++++++++++++++
->  net/6lowpan/nhc.h    | 130 ++++++++++++++++++++++++++++++++++++++
->  3 files changed, 306 insertions(+), 1 deletion(-)
->  create mode 100644 net/6lowpan/nhc.c
->  create mode 100644 net/6lowpan/nhc.h
+> If somebody wants to add a new header compression format and some information
+> are missing while calling compression and uncompression callbacks. Please
+> feel free to make framework changes according these callbacks.
 > 
-> diff --git a/net/6lowpan/Makefile b/net/6lowpan/Makefile
-> index 415886b..4215602 100644
-> --- a/net/6lowpan/Makefile
-> +++ b/net/6lowpan/Makefile
-> @@ -1,3 +1,3 @@
->  obj-$(CONFIG_6LOWPAN) := 6lowpan.o
->  
-> -6lowpan-y := iphc.o
-> +6lowpan-y := iphc.o nhc.o
-> diff --git a/net/6lowpan/nhc.c b/net/6lowpan/nhc.c
-> new file mode 100644
-> index 0000000..f64b244
-> --- /dev/null
-> +++ b/net/6lowpan/nhc.c
-> @@ -0,0 +1,175 @@
-> +/*
-> + *	6LoWPAN next header compression
-> + *
-> + *
-> + *	Authors:
-> + *	Alexander Aring		<aar@pengutronix.de>
-> + *
-> + *	This program is free software; you can redistribute it and/or
-> + *	modify it under the terms of the GNU General Public License
-> + *	as published by the Free Software Foundation; either version
-> + *	2 of the License, or (at your option) any later version.
-> + */
-> +
-> +#include <linux/netdevice.h>
-> +
-> +#include <net/ipv6.h>
-> +
-> +#include "nhc.h"
-> +
-> +static struct rb_root rb_root = RB_ROOT;
-> +static struct lowpan_nhc *lowpan_nexthdr_nhcs[NEXTHDR_MAX];
-> +
-> +static int lowpan_nhc_insert(struct lowpan_nhc *nhc)
-> +{
-> +	struct rb_node **new = &rb_root.rb_node, *parent = NULL;
-> +
-> +	/* Figure out where to put new node */
-> +	while (*new) {
-> +		struct lowpan_nhc *this = container_of(*new, struct lowpan_nhc,
-> +						       node);
-> +		int result, len_dif, len;
-> +
-> +		len_dif = nhc->idlen - this->idlen;
-> +
-> +		if (nhc->idlen < this->idlen)
-> +			len = nhc->idlen;
-> +		else
-> +			len = this->idlen;
-> +
-> +		result = memcmp(nhc->id, this->id, len);
-> +		if (!result)
-> +			result = len_dif;
-> +
-> +		parent = *new;
-> +		if (result < 0)
-> +			new = &((*new)->rb_left);
-> +		else if (result > 0)
-> +			new = &((*new)->rb_right);
-> +		else
-> +			return -EEXIST;
-> +	}
-> +
-> +	/* Add new node and rebalance tree. */
-> +	rb_link_node(&nhc->node, parent, new);
-> +	rb_insert_color(&nhc->node, &rb_root);
-> +
-> +	return 0;
-> +}
-> +
-> +static void lowpan_nhc_remove(struct lowpan_nhc *nhc)
-> +{
-> +	rb_erase(&nhc->node, &rb_root);
-> +}
-> +
-> +struct lowpan_nhc *lowpan_nhc_by_nhcid(const struct sk_buff *skb)
-> +{
-> +	struct rb_node *node = rb_root.rb_node;
-> +	const u8 *nhcid_skb_ptr = skb->data;
-> +
-> +	while (node) {
-> +		struct lowpan_nhc *nhc = container_of(node, struct lowpan_nhc,
-> +						      node);
-> +		u8 nhcid_skb_ptr_masked[LOWPAN_NHC_MAX_ID_LEN];
-> +		int result, i;
-> +
-> +		if (nhcid_skb_ptr + nhc->idlen > skb->data + skb->len)
-> +			return NULL;
-> +
-> +		/* copy and mask afterwards the nhid value from skb */
-> +		memcpy(nhcid_skb_ptr_masked, nhcid_skb_ptr, nhc->idlen);
-> +		for (i = 0; i < nhc->idlen; i++)
-> +			nhcid_skb_ptr_masked[i] &= nhc->idmask[i];
-> +
-> +		result = memcmp(nhcid_skb_ptr_masked, nhc->id, nhc->idlen);
-> +		if (result < 0)
-> +			node = node->rb_left;
-> +		else if (result > 0)
-> +			node = node->rb_right;
-> +		else
-> +			return nhc;
-> +	}
-> +
-> +	return NULL;
-> +}
-> +
-> +struct lowpan_nhc *lowpan_nhc_by_nexthdr(u8 nexthdr)
-> +{
-> +	return lowpan_nexthdr_nhcs[nexthdr];
-> +}
-> +
-> +int lowpan_nhc_do_compression(struct lowpan_nhc *nhc, struct sk_buff *skb,
-> +			      u8 **hc_ptr, u8 *iphc0)
-> +{
-> +	int ret;
-> +
-> +	if (!nhc)
-> +		return 0;
-> +
-> +	ret = nhc->compress(skb, hc_ptr);
-> +	if (ret == 0)
-> +		*iphc0 |= LOWPAN_IPHC_NH_C;
-> +
-> +	return ret;
-> +}
-> +
-> +int lowpan_nhc_do_uncompression(struct sk_buff *skb, struct ipv6hdr *hdr)
-> +{
-> +	struct lowpan_nhc *nhc;
-> +	/* default dropping if nothing found */
-> +	int ret = 0;
-> +
+> Note:
+> 
+> If building 6lowpan_udp as module please make sure it's loaded before running
+> rfc6282 udp connection. If it's not loaded we send 6lowpan with raw udp header
+> and next header compression bit isn't set. Nevertheless if you use rfc6282
+> connection and 6lowpan_udp isn't loaded following will be printed:
+> 
+> "ieee802154 wpan-phy0 wpan0: received nhc which is not supported. Dropping."
+> 
+> changes since v2:
+>  - make udp nhc as module as suggested by Marcel Holtmann
+>  - fix comment header in nhc_udp.c
+> 
+> I didn't make the lowpan_nhc declaration "const" because this will occur
+> issues with rb_node, id and idmask array. Which will manipulated during
+> runtime.
+> 
 
-this should be ret = -ENOENT; 
 
-To avoid sending garbage to next higher layer. I changed this is here
-from -EINVAL to 0. Sorry some mistake is happend here, now it's real
-dropped afterwards.
+Tested it between two BT 6lowpan connections. If both ends load the
+6lowpan_udp module, then no issues. If only the other end has loaded the
+module, the other end (receiving end) crashed.
 
-> +	nhc = lowpan_nhc_by_nhcid(skb);
-> +	if (nhc) {
-> +		ret = nhc->uncompress(skb, sizeof(*hdr) + nhc->nexthdrlen);
-> +		if (ret == 0) {
-> +			hdr->nexthdr = nhc->nexthdr;
-> +			skb_reset_transport_header(skb);
-> +			raw_dump_table(__func__, "raw transport header dump",
-> +				       skb_transport_header(skb),
-> +				       nhc->nexthdrlen);
-> +		} else if (ret == -ENOTSUPP) {
-> +			netdev_warn(skb->dev, "received %s which is not supported for uncompression.\n",
-> +				    nhc->name);
-> +		}
-> +	} else {
-> +		netdev_warn(skb->dev, "received nhc which is not supported. Dropping.\n");
-> +	}
-> +
-> +	return ret;
-> +}
-> +
 
-- Alex
+[  132.417733] (NULL net_device): received nhc which is not supported.
+Dropping.
+[  132.722432] skbuff: skb_under_panic: text:d19cb60c len:55 put:40
+head:cd923000 data:cd922fec tail:0xcd923023 end:0xcd923740 dev:<NULL>
+[  133.536256] ------------[ cut here ]------------
+[  133.537233] kernel BUG at 3.16+gitAUTOINC
++f6af675ef5-r215/linux/net/core/skbuff.c:100!
+[  133.537233] invalid opcode: 0000 [#1] PREEMPT SMP 
+[  133.537233] Modules linked in: bluetooth_6lowpan 6lowpan nfc ecb
+btusb bluetooth rfkill snd_intel8x0 ohci_pci snd_ac97_codec ac97_bus
+parport_pc parport uvesafb
+[  133.537233] CPU: 0 PID: 327 Comm: kworker/u3:0 Not tainted
+3.17.0-bt6lowpan #1
+[  133.537233] Hardware name: innotek GmbH VirtualBox/VirtualBox, BIOS
+VirtualBox 12/01/2006
+[  133.537233] Workqueue: hci0 hci_rx_work [bluetooth]
+[  133.537233] task: c0170000 ti: cc7d0000 task.ti: cc7d0000
+[  133.537233] EIP: 0060:[<c1779838>] EFLAGS: 00010292 CPU: 0
+[  133.537233] EIP is at skb_panic+0x68/0x70
+[  133.537233] EAX: 0000007a EBX: cd923000 ECX: 00000000 EDX: 00000001
+[  133.537233] ESI: c1b2a11b EDI: 00000004 EBP: cc7d1c18 ESP: cc7d1be8
+[  133.537233]  DS: 007b ES: 007b FS: 00d8 GS: 0000 SS: 0068
+[  133.537233] CR0: 8005003b CR2: b76d9000 CR3: 0e1e5000 CR4: 000006d0
+[  133.537233] Stack:
+[  133.537233]  c1ba8748 c1982e68 d19cb60c 00000037 00000028 cd923000
+cd922fec cd923023
+[  133.537233]  cd923740 c1b2a11b cd914300 00000003 cc7d1c24 c1779881
+c1982e68 cc7d1c94
+[  133.537233]  d19cb60c c0304c48 00000003 00000008 cc7d1c40 00000003
+017d1c64 00000003
+[  133.537233] Call Trace:
+[  133.537233]  [<d19cb60c>] ? lowpan_header_decompress+0x26c/0x980
+[6lowpan]
+[  133.537233]  [<c1779881>] skb_push+0x41/0x50
+[  133.537233]  [<d19cb60c>] lowpan_header_decompress+0x26c/0x980
+[6lowpan]
+[  133.537233]  [<d19daeb4>] chan_recv_cb+0x244/0x3f0
+[bluetooth_6lowpan]
+[  133.537233]  [<d1738711>] l2cap_data_channel+0x8e1/0x980 [bluetooth]
+[  133.537233]  [<c10772d9>] ? sched_clock_local+0x49/0x180
+[  133.537233]  [<d173aa8f>] l2cap_recv_frame+0xbf/0x2ee0 [bluetooth]
+[  133.537233]  [<c100a7a8>] ? sched_clock+0x8/0x10
+[  133.537233]  [<c10772d9>] ? sched_clock_local+0x49/0x180
+[  133.537233]  [<c100a7a8>] ? sched_clock+0x8/0x10
+[  133.537233]  [<c10772d9>] ? sched_clock_local+0x49/0x180
+[  133.537233]  [<c107770f>] ? sched_clock_cpu+0x10f/0x160
+[  133.537233]  [<c10729cb>] ? get_parent_ip+0xb/0x40
+[  133.537233]  [<c1072a4b>] ? preempt_count_add+0x4b/0xa0
+[  133.537233]  [<c13e0112>] ? debug_smp_processor_id+0x12/0x20
+[  133.537233]  [<c108e584>] ? get_lock_stats+0x24/0x40
+[  133.537233]  [<c1090a34>] ? mark_held_locks+0x64/0x90
+[  133.537233]  [<c189dbfd>] ? __mutex_unlock_slowpath+0xcd/0x1b0
+[  133.537233]  [<c13e012f>] ? __this_cpu_preempt_check+0xf/0x20
+[  133.537233]  [<c1090b54>] ? trace_hardirqs_on_caller+0xf4/0x240
+[  133.537233]  [<c108e326>] ? trace_hardirqs_off_caller+0xb6/0x160
+[  133.537233]  [<d173ee19>] l2cap_recv_acldata+0x2f9/0x340 [bluetooth]
+[  133.537233]  [<d1709a93>] ? hci_rx_work+0x113/0x4a0 [bluetooth]
+[  133.537233]  [<d1709ce9>] hci_rx_work+0x369/0x4a0 [bluetooth]
+[  133.537233]  [<d1709a93>] ? hci_rx_work+0x113/0x4a0 [bluetooth]
+[  133.537233]  [<c1063203>] process_one_work+0x1b3/0x4e0
+[  133.537233]  [<c1063163>] ? process_one_work+0x113/0x4e0
+[  133.537233]  [<c10638c9>] worker_thread+0x39/0x440
+[  133.537233]  [<c1063890>] ? init_pwq+0xc0/0xc0
+[  133.537233]  [<c1067ce8>] kthread+0xa8/0xc0
+[  133.537233]  [<c1090cab>] ? trace_hardirqs_on+0xb/0x10
+[  133.537233]  [<c18a1741>] ret_from_kernel_thread+0x21/0x30
+[  133.537233]  [<c1067c40>] ? kthread_create_on_node+0x160/0x160
+[  133.537233] Code: 98 a8 00 00 00 89 54 24 10 89 5c 24 14 8b 40 5c 89
+4c 24 08 c7 04 24 48 87 ba c1 89 44 24 0c 8b 45 08 89 44 24 04 e8 b0 db
+11 00 <0f> 0b 8d b6 00 00 00 00 55 89 e5 83 ec 04 3e 8d 74 26 00 89 c1
+[  133.537233] EIP: [<c1779838>] skb_panic+0x68/0x70 SS:ESP
+0068:cc7d1be8
+
+
+Just wondering about how it works now. If the device does not have
+6lowpan_nhc module loaded, then UDP compressed packets are dropped. This
+feels wrong and is a kind of regression to the previous way of working,
+at least we need to auto-load the compression module.
+
+How the system works if there would be another way to compress UDP
+packets. User would need to know somehow what kind of packets it is
+suppose to send/receive and load corresponding module. I wonder if this
+kind of knowledge is really possible in practice. Should we always
+support the NHC defined in https://tools.ietf.org/html/rfc6282 and then
+have a way to load correct compression "plugin" if we get a packet with
+different compression scheme.
+
+If the system does not support https://tools.ietf.org/html/rfc6775 (like
+at the moment) there is no way to figure out what compression system the
+other end is using/supporting. In this respect, it would be nice if the
+current way of working would be automatically supported and user would
+not need to remember to select 6lowpan_nhc option when building the
+kernel.
+
+I like the way to support different compression algorithms, it just
+needs some fine tuning.
+
+
+Cheers,
+Jukka
+
+
