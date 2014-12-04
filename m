@@ -1,12 +1,12 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from proxima.lasnet.de ([78.47.171.185]:33588 "EHLO
+Received: from proxima.lasnet.de ([78.47.171.185]:33587 "EHLO
 	proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753176AbaLDK6Q (ORCPT
+	with ESMTP id S1752992AbaLDK6Q (ORCPT
 	<rfc822;linux-wpan@vger.kernel.org>); Thu, 4 Dec 2014 05:58:16 -0500
 From: Stefan Schmidt <s.schmidt@samsung.com>
-Subject: [PATCH bluetooth-next 3/5] net/ieee802154: Remove and add extra blank lines as needed.
-Date: Thu,  4 Dec 2014 11:51:59 +0100
-Message-Id: <1417690321-19450-3-git-send-email-s.schmidt@samsung.com>
+Subject: [PATCH bluetooth-next 4/5] net/mac802154: Remove extra blank lines.
+Date: Thu,  4 Dec 2014 11:52:00 +0100
+Message-Id: <1417690321-19450-4-git-send-email-s.schmidt@samsung.com>
 In-Reply-To: <1417690321-19450-1-git-send-email-s.schmidt@samsung.com>
 References: <1417690321-19450-1-git-send-email-s.schmidt@samsung.com>
 Sender: linux-wpan-owner@vger.kernel.org
@@ -14,189 +14,139 @@ List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
 Cc: Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt <s.schmidt@samsung.com>
 
-Some have been missing and some have been needed. Just cosmetics.
-
 Signed-off-by: Stefan Schmidt <s.schmidt@samsung.com>
 ---
- net/ieee802154/6lowpan_rtnl.c  |  1 -
- net/ieee802154/af_ieee802154.c |  4 ++--
- net/ieee802154/dgram.c         |  1 -
- net/ieee802154/netlink.c       |  1 -
- net/ieee802154/nl-mac.c        | 14 --------------
- net/ieee802154/nl-phy.c        |  1 -
- net/ieee802154/raw.c           |  1 -
- 7 files changed, 2 insertions(+), 21 deletions(-)
+ net/mac802154/llsec.c | 15 ---------------
+ net/mac802154/mib.c   |  6 ------
+ 2 files changed, 21 deletions(-)
 
-diff --git a/net/ieee802154/6lowpan_rtnl.c b/net/ieee802154/6lowpan_rtnl.c
-index 16f5e91..27eaa65 100644
---- a/net/ieee802154/6lowpan_rtnl.c
-+++ b/net/ieee802154/6lowpan_rtnl.c
-@@ -439,7 +439,6 @@ static void lowpan_set_lockdep_class_one(struct net_device *dev,
- 			  &lowpan_netdev_xmit_lock_key);
+diff --git a/net/mac802154/llsec.c b/net/mac802154/llsec.c
+index fa0d523..4a661f7 100644
+--- a/net/mac802154/llsec.c
++++ b/net/mac802154/llsec.c
+@@ -75,8 +75,6 @@ void mac802154_llsec_destroy(struct mac802154_llsec *sec)
+ 	}
  }
  
 -
- static int lowpan_dev_init(struct net_device *dev)
+-
+ int mac802154_llsec_get_params(struct mac802154_llsec *sec,
+ 			       struct ieee802154_llsec_params *params)
  {
- 	netdev_for_each_tx_queue(dev, lowpan_set_lockdep_class_one, NULL);
-diff --git a/net/ieee802154/af_ieee802154.c b/net/ieee802154/af_ieee802154.c
-index 26da1e1..d0a1282 100644
---- a/net/ieee802154/af_ieee802154.c
-+++ b/net/ieee802154/af_ieee802154.c
-@@ -99,6 +99,7 @@ static int ieee802154_sock_release(struct socket *sock)
- 	}
+@@ -117,8 +115,6 @@ int mac802154_llsec_set_params(struct mac802154_llsec *sec,
  	return 0;
  }
-+
- static int ieee802154_sock_sendmsg(struct kiocb *iocb, struct socket *sock,
- 				   struct msghdr *msg, size_t len)
- {
-@@ -231,7 +232,6 @@ static const struct proto_ops ieee802154_dgram_ops = {
- #endif
- };
  
 -
- /* Create a socket. Initialise the socket, blank the addresses
-  * set the state.
-  */
-@@ -320,7 +320,6 @@ drop:
- 	return NET_RX_DROP;
+-
+ static struct mac802154_llsec_key*
+ llsec_key_alloc(const struct ieee802154_llsec_key *template)
+ {
+@@ -294,8 +290,6 @@ int mac802154_llsec_key_del(struct mac802154_llsec *sec,
+ 	return -ENOENT;
  }
  
 -
- static struct packet_type ieee802154_packet_type = {
- 	.type = htons(ETH_P_IEEE802154),
- 	.func = ieee802154_rcv,
-@@ -354,6 +353,7 @@ err_dgram:
- out:
+-
+ static bool llsec_dev_use_shortaddr(__le16 short_addr)
+ {
+ 	return short_addr != cpu_to_le16(IEEE802154_ADDR_UNDEF) &&
+@@ -411,8 +405,6 @@ int mac802154_llsec_dev_del(struct mac802154_llsec *sec, __le64 device_addr)
+ 	return 0;
+ }
+ 
+-
+-
+ static struct mac802154_llsec_device_key*
+ llsec_devkey_find(struct mac802154_llsec_device *dev,
+ 		  const struct ieee802154_llsec_key_id *key)
+@@ -475,8 +467,6 @@ int mac802154_llsec_devkey_del(struct mac802154_llsec *sec,
+ 	return 0;
+ }
+ 
+-
+-
+ static struct mac802154_llsec_seclevel*
+ llsec_find_seclevel(const struct mac802154_llsec *sec,
+ 		    const struct ieee802154_llsec_seclevel *sl)
+@@ -532,8 +522,6 @@ int mac802154_llsec_seclevel_del(struct mac802154_llsec *sec,
+ 	return 0;
+ }
+ 
+-
+-
+ static int llsec_recover_addr(struct mac802154_llsec *sec,
+ 			      struct ieee802154_addr *addr)
+ {
+@@ -609,7 +597,6 @@ found:
+ 	return llsec_key_get(key);
+ }
+ 
+-
+ static void llsec_geniv(u8 iv[16], __le64 addr,
+ 			const struct ieee802154_sechdr *sec)
+ {
+@@ -786,8 +773,6 @@ fail:
  	return rc;
  }
-+
- static void __exit af_ieee802154_remove(void)
- {
- 	dev_remove_pack(&ieee802154_packet_type);
-diff --git a/net/ieee802154/dgram.c b/net/ieee802154/dgram.c
-index 3d58bef..8db240b 100644
---- a/net/ieee802154/dgram.c
-+++ b/net/ieee802154/dgram.c
-@@ -154,7 +154,6 @@ static int dgram_ioctl(struct sock *sk, int cmd, unsigned long arg)
- 		spin_unlock_bh(&sk->sk_receive_queue.lock);
- 		return put_user(amount, (int __user *)arg);
+ 
+-
+-
+ static struct mac802154_llsec_device*
+ llsec_lookup_dev(struct mac802154_llsec *sec,
+ 		 const struct ieee802154_addr *addr)
+diff --git a/net/mac802154/mib.c b/net/mac802154/mib.c
+index 3596b29..5cf019a 100644
+--- a/net/mac802154/mib.c
++++ b/net/mac802154/mib.c
+@@ -104,7 +104,6 @@ void mac802154_dev_set_page_channel(struct net_device *dev, u8 page, u8 chan)
  	}
--
- 	}
- 
- 	return -ENOIOCTLCMD;
-diff --git a/net/ieee802154/netlink.c b/net/ieee802154/netlink.c
-index 3cdfa78..fa14647 100644
---- a/net/ieee802154/netlink.c
-+++ b/net/ieee802154/netlink.c
-@@ -147,7 +147,6 @@ static const struct genl_multicast_group ieee802154_mcgrps[] = {
- 	[IEEE802154_BEACON_MCGRP] = { .name = IEEE802154_MCAST_BEACON_NAME, },
- };
+ }
  
 -
- int __init ieee802154_nl_init(void)
+ int mac802154_get_params(struct net_device *dev,
+ 			 struct ieee802154_llsec_params *params)
  {
- 	return genl_register_family_with_ops_groups(&nl802154_family,
-diff --git a/net/ieee802154/nl-mac.c b/net/ieee802154/nl-mac.c
-index 1f085ed..cd91949 100644
---- a/net/ieee802154/nl-mac.c
-+++ b/net/ieee802154/nl-mac.c
-@@ -346,7 +346,6 @@ int ieee802154_start_req(struct sk_buff *skb, struct genl_info *info)
- 	else
- 		page = 0;
- 
--
- 	if (addr.short_addr == cpu_to_le16(IEEE802154_ADDR_BROADCAST)) {
- 		ieee802154_nl_start_confirm(dev, IEEE802154_NO_SHORT_ADDRESS);
- 		dev_put(dev);
-@@ -397,7 +396,6 @@ int ieee802154_scan_req(struct sk_buff *skb, struct genl_info *info)
- 	else
- 		page = 0;
- 
--
- 	ret = ieee802154_mlme_ops(dev)->scan_req(dev, type, channels,
- 						 page, duration);
- 
-@@ -548,8 +546,6 @@ out:
- 	return rc;
+@@ -136,7 +135,6 @@ int mac802154_set_params(struct net_device *dev,
+ 	return res;
  }
  
 -
--
- static int
- ieee802154_llsec_parse_key_id(struct genl_info *info,
- 			      struct ieee802154_llsec_key_id *desc)
-@@ -765,8 +761,6 @@ out:
- 	return rc;
+ int mac802154_add_key(struct net_device *dev,
+ 		      const struct ieee802154_llsec_key_id *id,
+ 		      const struct ieee802154_llsec_key *key)
+@@ -168,7 +166,6 @@ int mac802154_del_key(struct net_device *dev,
+ 	return res;
  }
  
 -
--
- struct llsec_dump_data {
- 	struct sk_buff *skb;
- 	int s_idx, s_idx2;
-@@ -843,8 +837,6 @@ ieee802154_nl_llsec_change(struct sk_buff *skb, struct genl_info *info,
- 	return rc;
- }
- 
--
--
- static int
- ieee802154_llsec_parse_key(struct genl_info *info,
- 			   struct ieee802154_llsec_key *key)
-@@ -989,8 +981,6 @@ int ieee802154_llsec_dump_keys(struct sk_buff *skb, struct netlink_callback *cb)
- 	return ieee802154_llsec_dump_table(skb, cb, llsec_iter_keys);
- }
- 
--
--
- static int
- llsec_parse_dev(struct genl_info *info,
- 		struct ieee802154_llsec_device *dev)
-@@ -1121,8 +1111,6 @@ int ieee802154_llsec_dump_devs(struct sk_buff *skb, struct netlink_callback *cb)
- 	return ieee802154_llsec_dump_table(skb, cb, llsec_iter_devs);
- }
- 
--
--
- static int llsec_add_devkey(struct net_device *dev, struct genl_info *info)
+ int mac802154_add_dev(struct net_device *dev,
+ 		      const struct ieee802154_llsec_device *llsec_dev)
  {
- 	struct ieee802154_mlme_ops *ops = ieee802154_mlme_ops(dev);
-@@ -1237,8 +1225,6 @@ int ieee802154_llsec_dump_devkeys(struct sk_buff *skb,
- 	return ieee802154_llsec_dump_table(skb, cb, llsec_iter_devkeys);
+@@ -198,7 +195,6 @@ int mac802154_del_dev(struct net_device *dev, __le64 dev_addr)
+ 	return res;
  }
  
 -
--
- static int
- llsec_parse_seclevel(struct genl_info *info,
- 		     struct ieee802154_llsec_seclevel *sl)
-diff --git a/net/ieee802154/nl-phy.c b/net/ieee802154/nl-phy.c
-index 6246354..7baf98b 100644
---- a/net/ieee802154/nl-phy.c
-+++ b/net/ieee802154/nl-phy.c
-@@ -94,7 +94,6 @@ int ieee802154_list_phy(struct sk_buff *skb, struct genl_info *info)
- 	if (name[nla_len(info->attrs[IEEE802154_ATTR_PHY_NAME]) - 1] != '\0')
- 		return -EINVAL; /* phy name should be null-terminated */
- 
--
- 	phy = wpan_phy_find(name);
- 	if (!phy)
- 		return -ENODEV;
-diff --git a/net/ieee802154/raw.c b/net/ieee802154/raw.c
-index 3ffcf4a..f0c61e5 100644
---- a/net/ieee802154/raw.c
-+++ b/net/ieee802154/raw.c
-@@ -221,7 +221,6 @@ static int raw_rcv_skb(struct sock *sk, struct sk_buff *skb)
- 	return NET_RX_SUCCESS;
+ int mac802154_add_devkey(struct net_device *dev,
+ 			 __le64 device_addr,
+ 			 const struct ieee802154_llsec_device_key *key)
+@@ -231,7 +227,6 @@ int mac802154_del_devkey(struct net_device *dev,
+ 	return res;
  }
  
 -
- void ieee802154_raw_deliver(struct net_device *dev, struct sk_buff *skb)
+ int mac802154_add_seclevel(struct net_device *dev,
+ 			   const struct ieee802154_llsec_seclevel *sl)
  {
- 	struct sock *sk;
+@@ -262,7 +257,6 @@ int mac802154_del_seclevel(struct net_device *dev,
+ 	return res;
+ }
+ 
+-
+ void mac802154_lock_table(struct net_device *dev)
+ {
+ 	struct ieee802154_sub_if_data *sdata = IEEE802154_DEV_TO_SUB_IF(dev);
 -- 
 1.9.3
 
