@@ -1,55 +1,38 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mga01.intel.com ([192.55.52.88]:38183 "EHLO mga01.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751874AbaLELPU (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-	Fri, 5 Dec 2014 06:15:20 -0500
-Message-ID: <1417778102.32209.2.camel@jrissane-mobl.ger.corp.intel.com>
-Subject: Re: [PATCH bluetooth-next 1/5] net/6lowpan: Remove FSF address from
- GPL statement.
-From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-Date: Fri, 05 Dec 2014 13:15:02 +0200
-In-Reply-To: <1417690321-19450-1-git-send-email-s.schmidt@samsung.com>
-References: <1417690321-19450-1-git-send-email-s.schmidt@samsung.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Received: from mail-pa0-f43.google.com ([209.85.220.43]:46047 "EHLO
+	mail-pa0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751401AbaLELx0 (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Fri, 5 Dec 2014 06:53:26 -0500
+Received: by mail-pa0-f43.google.com with SMTP id kx10so561315pab.30
+        for <linux-wpan@vger.kernel.org>; Fri, 05 Dec 2014 03:53:26 -0800 (PST)
+From: Varka Bhadram <varkabhadram@gmail.com>
+Subject: [PATCH bluetooth-next 1/2] mac802154: use goto label on failure
+Date: Fri,  5 Dec 2014 17:19:09 +0530
+Message-Id: <1417780150-4033-1-git-send-email-varkab@cdac.in>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Stefan Schmidt <s.schmidt@samsung.com>
-Cc: linux-wpan@vger.kernel.org, Alexander Aring <alex.aring@gmail.com>
+To: linux-wpan@vger.kernel.org
+Cc: alex.aring@gmail.com, Varka Bhadram <varkab@cdac.in>
 
-On to, 2014-12-04 at 11:51 +0100, Stefan Schmidt wrote:
-> This might change and we already deliver a copy of the license with
-> the kernel. This was already removed form the ieee802154 code but
-> missed here.
-> 
-> Signed-off-by: Stefan Schmidt <s.schmidt@samsung.com>
-> CC: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-> ---
->  net/6lowpan/iphc.c | 3 ---
->  1 file changed, 3 deletions(-)
-> 
-> diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
-> index aced97d..32ffec6 100644
-> --- a/net/6lowpan/iphc.c
-> +++ b/net/6lowpan/iphc.c
-> @@ -15,9 +15,6 @@
->   * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
->   * GNU General Public License for more details.
->   *
-> - * You should have received a copy of the GNU General Public License along
-> - * with this program; if not, write to the Free Software Foundation, Inc.,
-> - * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
->   */
->  
->  /* Jon's code is based on 6lowpan implementation for Contiki which is:
+Signed-off-by: Varka Bhadram <varkab@cdac.in>
+---
+ net/mac802154/rx.c |    3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-
-Acked-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-
-
-Cheers,
-Jukka
-
-
+diff --git a/net/mac802154/rx.c b/net/mac802154/rx.c
+index 041dbd5..c0d67b2 100644
+--- a/net/mac802154/rx.c
++++ b/net/mac802154/rx.c
+@@ -85,8 +85,7 @@ ieee802154_subif_frame(struct ieee802154_sub_if_data *sdata,
+ 	default:
+ 		spin_unlock_bh(&sdata->mib_lock);
+ 		pr_debug("invalid dest mode\n");
+-		kfree_skb(skb);
+-		return NET_RX_DROP;
++		goto fail;
+ 	}
+ 
+ 	spin_unlock_bh(&sdata->mib_lock);
+-- 
+1.7.9.5
 
