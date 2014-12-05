@@ -1,38 +1,40 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-pa0-f43.google.com ([209.85.220.43]:46047 "EHLO
-	mail-pa0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751401AbaLELx0 (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Fri, 5 Dec 2014 06:53:26 -0500
-Received: by mail-pa0-f43.google.com with SMTP id kx10so561315pab.30
-        for <linux-wpan@vger.kernel.org>; Fri, 05 Dec 2014 03:53:26 -0800 (PST)
+Received: from mail-pa0-f46.google.com ([209.85.220.46]:57300 "EHLO
+	mail-pa0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751401AbaLELx3 (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Fri, 5 Dec 2014 06:53:29 -0500
+Received: by mail-pa0-f46.google.com with SMTP id lj1so565085pab.19
+        for <linux-wpan@vger.kernel.org>; Fri, 05 Dec 2014 03:53:29 -0800 (PST)
 From: Varka Bhadram <varkabhadram@gmail.com>
-Subject: [PATCH bluetooth-next 1/2] mac802154: use goto label on failure
-Date: Fri,  5 Dec 2014 17:19:09 +0530
-Message-Id: <1417780150-4033-1-git-send-email-varkab@cdac.in>
+Subject: [PATCH bluetooth-next 2/2] cc2520: adds terminating newline
+Date: Fri,  5 Dec 2014 17:19:10 +0530
+Message-Id: <1417780150-4033-2-git-send-email-varkab@cdac.in>
+In-Reply-To: <1417780150-4033-1-git-send-email-varkab@cdac.in>
+References: <1417780150-4033-1-git-send-email-varkab@cdac.in>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
 Cc: alex.aring@gmail.com, Varka Bhadram <varkab@cdac.in>
 
+
 Signed-off-by: Varka Bhadram <varkab@cdac.in>
 ---
- net/mac802154/rx.c |    3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ drivers/net/ieee802154/cc2520.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/mac802154/rx.c b/net/mac802154/rx.c
-index 041dbd5..c0d67b2 100644
---- a/net/mac802154/rx.c
-+++ b/net/mac802154/rx.c
-@@ -85,8 +85,7 @@ ieee802154_subif_frame(struct ieee802154_sub_if_data *sdata,
- 	default:
- 		spin_unlock_bh(&sdata->mib_lock);
- 		pr_debug("invalid dest mode\n");
--		kfree_skb(skb);
--		return NET_RX_DROP;
-+		goto fail;
- 	}
+diff --git a/drivers/net/ieee802154/cc2520.c b/drivers/net/ieee802154/cc2520.c
+index ccbb082..f9df9fa 100644
+--- a/drivers/net/ieee802154/cc2520.c
++++ b/drivers/net/ieee802154/cc2520.c
+@@ -858,7 +858,7 @@ static int cc2520_probe(struct spi_device *spi)
+ 	pinctrl = devm_pinctrl_get_select_default(&spi->dev);
+ 	if (IS_ERR(pinctrl))
+ 		dev_warn(&spi->dev,
+-			 "pinctrl pins are not configured");
++			 "pinctrl pins are not configured\n");
  
- 	spin_unlock_bh(&sdata->mib_lock);
+ 	pdata = cc2520_get_platform_data(spi);
+ 	if (!pdata) {
 -- 
 1.7.9.5
 
