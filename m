@@ -1,63 +1,55 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wg0-f41.google.com ([74.125.82.41]:49021 "EHLO
-	mail-wg0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751761AbaLaSjn (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Wed, 31 Dec 2014 13:39:43 -0500
-Received: by mail-wg0-f41.google.com with SMTP id y19so22366264wgg.14
-        for <linux-wpan@vger.kernel.org>; Wed, 31 Dec 2014 10:39:42 -0800 (PST)
+Received: from mail-wg0-f54.google.com ([74.125.82.54]:53834 "EHLO
+	mail-wg0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750912AbaLGPIY (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Sun, 7 Dec 2014 10:08:24 -0500
+Received: by mail-wg0-f54.google.com with SMTP id l2so4394246wgh.41
+        for <linux-wpan@vger.kernel.org>; Sun, 07 Dec 2014 07:08:22 -0800 (PST)
+Received: from omega (p20030064A92813F3E2CB4EFFFE1BB546.dip0.t-ipconnect.de. [2003:64:a928:13f3:e2cb:4eff:fe1b:b546])
+        by mx.google.com with ESMTPSA id n3sm6086223wiw.5.2014.12.07.07.08.21
+        for <linux-wpan@vger.kernel.org>
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Sun, 07 Dec 2014 07:08:22 -0800 (PST)
+Date: Sun, 7 Dec 2014 16:08:17 +0100
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH bluetooth-next 6/6] ieee802154: handle config as menuconfig
-Date: Wed, 31 Dec 2014 19:39:13 +0100
-Message-Id: <1420051153-8673-7-git-send-email-alex.aring@gmail.com>
-In-Reply-To: <1420051153-8673-1-git-send-email-alex.aring@gmail.com>
-References: <1420051153-8673-1-git-send-email-alex.aring@gmail.com>
+Subject: [ANNOUNCE] wpan-tools 0.3 released
+Message-ID: <20141207150814.GA9532@omega>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
-Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-This patch handles the IEEE802154 Kconfig entry as menuconfig.
-Furthermore we move this entry out of "Network Options" and put it into
-"Networking" where the other networking subsystems are. This requires a
-menuconfig entry like all other networking subsystems.
+Hi,
 
-Signed-off-by: Alexander Aring <alex.aring@gmail.com>
----
- net/ieee802154/Kconfig | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+I'm happy to announce that I've just released wpan-tools 0.3.
+This is our first "real" release, the new kernel 3.18 will contain the
+nl802154 interface. The old netlink interface will be removed soon and is
+deprecated now. At the moment you can still use both userspace tools, but
+I don't recommend the lowpan-tools.
 
-diff --git a/net/ieee802154/Kconfig b/net/ieee802154/Kconfig
-index 98a190d..9ea0af4 100644
---- a/net/ieee802154/Kconfig
-+++ b/net/ieee802154/Kconfig
-@@ -1,4 +1,4 @@
--config IEEE802154
-+menuconfig IEEE802154
- 	tristate "IEEE Std 802.15.4 Low-Rate Wireless Personal Area Networks support"
- 	---help---
- 	  IEEE Std 802.15.4 defines a low data rate, low power and low
-@@ -10,9 +10,10 @@ config IEEE802154
- 	  Say Y here to compile LR-WPAN support into the kernel or say M to
- 	  compile it as modules.
- 
-+if IEEE802154
-+
- config IEEE802154_SOCKET
- 	tristate "IEEE 802.15.4 socket interface"
--	depends on IEEE802154
- 	default y
- 	---help---
- 	  Socket interface for IEEE 802.15.4. Contains DGRAM sockets interface
-@@ -21,6 +22,8 @@ config IEEE802154_SOCKET
- 
- config IEEE802154_6LOWPAN
- 	tristate "6lowpan support over IEEE 802.15.4"
--	depends on IEEE802154 && 6LOWPAN
-+	depends on 6LOWPAN
- 	---help---
- 	  IPv6 compression over IEEE 802.15.4.
-+
-+endif
--- 
-2.2.0
+New release will be found now under:
 
+http://wpan.cakelab.org/releases/
+
+Github has no option to make releases with "make distcheck" that's why I
+will upload it to this location.
+
+Below you can see the shortlog from 0.2 to 0.3 version. Only some fixes
+to make a release with "make distcheck" possible.
+
+Thanks to all contributors.
+
+- Alex
+
+Alexander Aring (4):
+  iwpan: use autoconf version defines
+  configure: fix CLFAGS definition
+  configure: change archive generation
+  configure: version bump
+
+Stefan Schmidt (3):
+  configure: Fail if libnl3 dependency is not found
+  build: add header files to SOURCES
+  configure: do not use check-news for now
