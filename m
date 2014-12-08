@@ -1,84 +1,340 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f180.google.com ([209.85.212.180]:54819 "EHLO
-	mail-wi0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932209AbaLHPvp (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Mon, 8 Dec 2014 10:51:45 -0500
+Received: from mail-wi0-f179.google.com ([209.85.212.179]:50613 "EHLO
+	mail-wi0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932213AbaLHPvw (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Mon, 8 Dec 2014 10:51:52 -0500
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCHv3 bluetooth-next 0/3] 6lowpan: introduce nhc framework
-Date: Mon,  8 Dec 2014 16:50:35 +0100
-Message-Id: <1418053838-8692-1-git-send-email-alex.aring@gmail.com>
+Subject: [PATCHv3 bluetooth-next 1/3] 6lowpan: add generic nhc layer interface
+Date: Mon,  8 Dec 2014 16:50:36 +0100
+Message-Id: <1418053838-8692-2-git-send-email-alex.aring@gmail.com>
+In-Reply-To: <1418053838-8692-1-git-send-email-alex.aring@gmail.com>
+References: <1418053838-8692-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>, Jukka Rissanen <jukka.rissanen@linux.intel.com>, Martin Townsend <mtownsend1973@gmail.com>, Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>, Jukka Rissanen <jukka.rissanen@linux.intel.com>, Martin Townsend <mtownsend1973@gmail.com>
 
-This patch series introduce the next header compression framework. Currently
-we support udp compression/uncompression only. This framework allow to add new
-next header compression formats easily.
+This patch adds a generic next header compression layer interface. There
+exists various methods to do a header compression after 6LoWPAN header
+to save payload. This introduce a generic nhc header which allow a
+simple adding of a new header compression format instead of a static
+implementation inside the 6LoWPAN header compression and uncompression
+function.
 
-If somebody wants to add a new header compression format and some information
-are missing while calling compression and uncompression callbacks. Please
-feel free to make framework changes according these callbacks.
-
-changes since v2:
- - make udp nhc as module as suggested by Marcel Holtmann
- - fix comment header in nhc_udp.c
-
-I didn't make the lowpan_nhc declaration "const" because this will occur
-issues with rb_node, id and idmask array. Which will manipulated during
-runtime.
-
-changes since v3:
- - add patch 3/3 for other known rfc6282 ipv6 extension headers compression
-   formats
- - add request_modules for loading nhc default compression format modules.
-   Which was suggested by Jukka Rissanen. Thanks, this is really working.
- - Add rtnl_lock for lowpan_nhc_add and del since we have no synced
-   request_modules call this could make trouble.
- - Move some handling out of nhc_do_compression and uncompression function.
-   The complete handling is now inside of iphc.c and nhc_do_compression and
-   uncompression functions is only a wrapper call for the callback.
- - rework some menuentries for Kconfig and compression format, they are
-   grouped by rfc now.
- - move some generic handling like "skb_pull(skb, nhc->nexthdrlen);" into
-   iphc.c. It would be great if we have something also for uncompression
-   for the skb_cow. But this isn't possible right now.
- - change warning if nhc was not found to "was not found" instead isn't
-   implemented. It isn't implemented if callbacks are NULL now.
- - small cleanups.
-
+Signed-off-by: Alexander Aring <alex.aring@gmail.com>
 Cc: Jukka Rissanen <jukka.rissanen@linux.intel.com>
 Cc: Martin Townsend <mtownsend1973@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>
-
-Alexander Aring (3):
-  6lowpan: add generic nhc layer interface
-  6lowpan: add udp compression via nhc layer
-  6lowpan: nhc: add other known rfc6282 compressions
-
- net/6lowpan/Kconfig             |  60 ++++++++++-
- net/6lowpan/Makefile            |  13 ++-
- net/6lowpan/iphc.c              | 223 +++++++++++-----------------------------
- net/6lowpan/nhc.c               | 140 +++++++++++++++++++++++++
- net/6lowpan/nhc.h               | 142 +++++++++++++++++++++++++
- net/6lowpan/nhc_rfc6282_dest.c  |  27 +++++
- net/6lowpan/nhc_rfc6282_frag.c  |  26 +++++
- net/6lowpan/nhc_rfc6282_hop.c   |  26 +++++
- net/6lowpan/nhc_rfc6282_ipv6.c  |  26 +++++
- net/6lowpan/nhc_rfc6282_mobil.c |  26 +++++
- net/6lowpan/nhc_rfc6282_route.c |  26 +++++
- net/6lowpan/nhc_rfc6282_udp.c   | 156 ++++++++++++++++++++++++++++
- 12 files changed, 724 insertions(+), 167 deletions(-)
+---
+ net/6lowpan/Makefile |   2 +-
+ net/6lowpan/nhc.c    | 140 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ net/6lowpan/nhc.h    | 142 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 283 insertions(+), 1 deletion(-)
  create mode 100644 net/6lowpan/nhc.c
  create mode 100644 net/6lowpan/nhc.h
- create mode 100644 net/6lowpan/nhc_rfc6282_dest.c
- create mode 100644 net/6lowpan/nhc_rfc6282_frag.c
- create mode 100644 net/6lowpan/nhc_rfc6282_hop.c
- create mode 100644 net/6lowpan/nhc_rfc6282_ipv6.c
- create mode 100644 net/6lowpan/nhc_rfc6282_mobil.c
- create mode 100644 net/6lowpan/nhc_rfc6282_route.c
- create mode 100644 net/6lowpan/nhc_rfc6282_udp.c
 
+diff --git a/net/6lowpan/Makefile b/net/6lowpan/Makefile
+index 415886b..4215602 100644
+--- a/net/6lowpan/Makefile
++++ b/net/6lowpan/Makefile
+@@ -1,3 +1,3 @@
+ obj-$(CONFIG_6LOWPAN) := 6lowpan.o
+ 
+-6lowpan-y := iphc.o
++6lowpan-y := iphc.o nhc.o
+diff --git a/net/6lowpan/nhc.c b/net/6lowpan/nhc.c
+new file mode 100644
+index 0000000..8c4438c
+--- /dev/null
++++ b/net/6lowpan/nhc.c
+@@ -0,0 +1,140 @@
++/*
++ *	6LoWPAN next header compression
++ *
++ *
++ *	Authors:
++ *	Alexander Aring		<aar@pengutronix.de>
++ *
++ *	This program is free software; you can redistribute it and/or
++ *	modify it under the terms of the GNU General Public License
++ *	as published by the Free Software Foundation; either version
++ *	2 of the License, or (at your option) any later version.
++ */
++
++#include <linux/netdevice.h>
++
++#include <net/ipv6.h>
++
++#include "nhc.h"
++
++static struct rb_root rb_root = RB_ROOT;
++static struct lowpan_nhc *lowpan_nexthdr_nhcs[NEXTHDR_MAX];
++
++static int lowpan_nhc_insert(struct lowpan_nhc *nhc)
++{
++	struct rb_node **new = &rb_root.rb_node, *parent = NULL;
++
++	/* Figure out where to put new node */
++	while (*new) {
++		struct lowpan_nhc *this = container_of(*new, struct lowpan_nhc,
++						       node);
++		int result, len_dif, len;
++
++		len_dif = nhc->idlen - this->idlen;
++
++		if (nhc->idlen < this->idlen)
++			len = nhc->idlen;
++		else
++			len = this->idlen;
++
++		result = memcmp(nhc->id, this->id, len);
++		if (!result)
++			result = len_dif;
++
++		parent = *new;
++		if (result < 0)
++			new = &((*new)->rb_left);
++		else if (result > 0)
++			new = &((*new)->rb_right);
++		else
++			return -EEXIST;
++	}
++
++	/* Add new node and rebalance tree. */
++	rb_link_node(&nhc->node, parent, new);
++	rb_insert_color(&nhc->node, &rb_root);
++
++	return 0;
++}
++
++static void lowpan_nhc_remove(struct lowpan_nhc *nhc)
++{
++	rb_erase(&nhc->node, &rb_root);
++}
++
++struct lowpan_nhc *lowpan_nhc_by_nhcid(const struct sk_buff *skb)
++{
++	struct rb_node *node = rb_root.rb_node;
++	const u8 *nhcid_skb_ptr = skb->data;
++
++	while (node) {
++		struct lowpan_nhc *nhc = container_of(node, struct lowpan_nhc,
++						      node);
++		u8 nhcid_skb_ptr_masked[LOWPAN_NHC_MAX_ID_LEN];
++		int result, i;
++
++		if (nhcid_skb_ptr + nhc->idlen > skb->data + skb->len)
++			return NULL;
++
++		/* copy and mask afterwards the nhid value from skb */
++		memcpy(nhcid_skb_ptr_masked, nhcid_skb_ptr, nhc->idlen);
++		for (i = 0; i < nhc->idlen; i++)
++			nhcid_skb_ptr_masked[i] &= nhc->idmask[i];
++
++		result = memcmp(nhcid_skb_ptr_masked, nhc->id, nhc->idlen);
++		if (result < 0)
++			node = node->rb_left;
++		else if (result > 0)
++			node = node->rb_right;
++		else
++			return nhc;
++	}
++
++	return NULL;
++}
++
++struct lowpan_nhc *lowpan_nhc_by_nexthdr(u8 nexthdr)
++{
++	return lowpan_nexthdr_nhcs[nexthdr];
++}
++
++int lowpan_nhc_add(struct lowpan_nhc *nhc)
++{
++	int ret;
++
++	if (!nhc->idlen || !nhc->idsetup)
++		return -EINVAL;
++
++	WARN_ONCE(nhc->idlen > LOWPAN_NHC_MAX_ID_LEN,
++		  "LOWPAN_NHC_MAX_ID_LEN should be updated to %d.\n",
++		  nhc->idlen);
++
++	nhc->idsetup(nhc);
++
++	rtnl_lock();
++	if (lowpan_nexthdr_nhcs[nhc->nexthdr]) {
++		ret = -EEXIST;
++		goto out;
++	}
++
++	ret = lowpan_nhc_insert(nhc);
++	if (ret < 0)
++		goto out;
++
++	lowpan_nexthdr_nhcs[nhc->nexthdr] = nhc;
++out:
++	rtnl_unlock();
++	return ret;
++}
++EXPORT_SYMBOL(lowpan_nhc_add);
++
++void lowpan_nhc_del(struct lowpan_nhc *nhc)
++{
++	rtnl_lock();
++	lowpan_nhc_remove(nhc);
++	lowpan_nexthdr_nhcs[nhc->nexthdr] = NULL;
++
++	synchronize_net();
++	rtnl_unlock();
++}
++EXPORT_SYMBOL(lowpan_nhc_del);
+diff --git a/net/6lowpan/nhc.h b/net/6lowpan/nhc.h
+new file mode 100644
+index 0000000..7141b94
+--- /dev/null
++++ b/net/6lowpan/nhc.h
+@@ -0,0 +1,142 @@
++#ifndef __6LOWPAN_NHC_H
++#define __6LOWPAN_NHC_H
++
++#include <linux/skbuff.h>
++#include <linux/rbtree.h>
++#include <linux/module.h>
++
++#include <net/6lowpan.h>
++#include <net/ipv6.h>
++
++#define LOWPAN_NHC_MAX_ID_LEN	1
++
++/**
++ * LOWPAN_NHC - helper macro to generate nh id fields and lowpan_nhc struct
++ *
++ * @__nhc: variable name of the lowpan_nhc struct.
++ * @_name: const char * of common header compression name.
++ * @_nexthdr: ipv6 nexthdr field for the header compression.
++ * @_nexthdrlen: ipv6 nexthdr len for the reserved space.
++ * @_idsetup: callback to setup id and mask values.
++ * @_idlen: len for the next header id and mask, should be always the same.
++ * @_uncompress: callback for uncompression call.
++ * @_compress: callback for compression call.
++ */
++#define LOWPAN_NHC(__nhc, _name, _nexthdr,	\
++		   _hdrlen, _idsetup, _idlen,	\
++		   _uncompress, _compress)	\
++static u8 __nhc##_val[_idlen];			\
++static u8 __nhc##_mask[_idlen];			\
++static struct lowpan_nhc __nhc = {		\
++	.name		= _name,		\
++	.nexthdr	= _nexthdr,		\
++	.nexthdrlen	= _hdrlen,		\
++	.id		= __nhc##_val,		\
++	.idmask		= __nhc##_mask,		\
++	.idlen		= _idlen,		\
++	.idsetup	= _idsetup,		\
++	.uncompress	= _uncompress,		\
++	.compress	= _compress,		\
++}
++
++#define module_lowpan_nhc(__nhc)		\
++static int __init __nhc##_init(void)		\
++{						\
++	return lowpan_nhc_add(&(__nhc));	\
++}						\
++module_init(__nhc##_init);			\
++static void __exit __nhc##_exit(void)		\
++{						\
++	lowpan_nhc_del(&(__nhc));		\
++}						\
++module_exit(__nhc##_exit);
++
++/**
++ * struct lowpan_nhc - hold 6lowpan next hdr compression ifnformation
++ *
++ * @node: holder for the rbtree.
++ * @name: name of the specific next header compression
++ * @nexthdr: next header value of the protocol which should be compressed.
++ * @nexthdrlen: ipv6 nexthdr len for the reserved space.
++ * @id: array for nhc id. Note this need to be in network byteorder.
++ * @mask: array for nhc id mask. Note this need to be in network byteorder.
++ * @len: the length of the next header id and mask.
++ * @setup: callback to setup fill the next header id value and mask.
++ * @compress: callback to do the header compression.
++ * @uncompress: callback to do the header uncompression.
++ */
++struct lowpan_nhc {
++	struct rb_node	node;
++	const char	*name;
++	const u8	nexthdr;
++	const size_t	nexthdrlen;
++	u8		*id;
++	u8		*idmask;
++	const size_t	idlen;
++
++	void		(*idsetup)(struct lowpan_nhc *nhc);
++	int		(*uncompress)(struct sk_buff *skb, size_t needed);
++	int		(*compress)(struct sk_buff *skb, u8 **hc_ptr);
++};
++
++/**
++ * lowpan_nhc_by_nhcid - returns the 6lowpan nhc by nhcid
++ *
++ * @skb: skb with skb->data which is pointed to 6lowpan nhc id.
++ */
++struct lowpan_nhc *lowpan_nhc_by_nhcid(const struct sk_buff *skb);
++
++/**
++ * lowpan_nhc_by_nexthdr - return the 6lowpan nhc by ipv6 nexthdr.
++ *
++ * @nexthdr: ipv6 nexthdr value.
++ */
++struct lowpan_nhc *lowpan_nhc_by_nexthdr(u8 nexthdr);
++
++/**
++ * lowpan_nhc_do_compression - calling compress callback for nhc
++ *
++ * @nhc: 6LoWPAN nhc context, get by lowpan_nhc_by_ functions.
++ * @skb: skb of 6LoWPAN header to read nhc and replace header.
++ * @hc_ptr: pointer for 6LoWPAN header which should increment at the end of
++ *	    replaced header.
++ */
++static inline int
++lowpan_nhc_do_compression(struct lowpan_nhc *nhc, struct sk_buff *skb,
++			  u8 **hc_ptr)
++{
++	return nhc->compress(skb, hc_ptr);
++}
++
++/**
++ * lowpan_nhc_do_uncompression - calling uncompress callback for nhc
++ *
++ * @nhc: 6LoWPAN nhc context, get by lowpan_nhc_by_ functions.
++ * @skb: skb of 6LoWPAN header, skb->data should be pointed to nhc id value.
++ */
++static inline int
++lowpan_nhc_do_uncompression(struct lowpan_nhc *nhc, struct sk_buff *skb)
++{
++	return nhc->uncompress(skb, sizeof(struct ipv6hdr) + nhc->nexthdrlen);
++}
++
++/**
++ * lowpan_nhc_add - register a next header compression to framework
++ *
++ * @nhc: nhc which should be add.
++ */
++int lowpan_nhc_add(struct lowpan_nhc *nhc);
++
++/**
++ * lowpan_nhc_del - delete a next header compression from framework
++ *
++ * @nhc: nhc which should be delete.
++ */
++void lowpan_nhc_del(struct lowpan_nhc *nhc);
++
++/**
++ * lowpan_nhc_init - adding all default nhcs
++ */
++void lowpan_nhc_init(void);
++
++#endif /* __6LOWPAN_NHC_H */
 -- 
 2.1.3
 
