@@ -1,47 +1,51 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from senator.holtmann.net ([87.106.208.187]:37951 "EHLO
-	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751759AbaLRXVJ convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Thu, 18 Dec 2014 18:21:09 -0500
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
-Subject: Re: [PATCH bluetooth-next 0/6] Various coding style cleanups and typo fixes
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1418384733-315-1-git-send-email-s.schmidt@samsung.com>
-Date: Fri, 19 Dec 2014 00:21:06 +0100
-Content-Transfer-Encoding: 8BIT
-Message-Id: <28EE2AA3-C53B-4BC7-A2B6-8BBEADBBE51F@holtmann.org>
-References: <1418384733-315-1-git-send-email-s.schmidt@samsung.com>
+Received: from mail-wi0-f177.google.com ([209.85.212.177]:48039 "EHLO
+	mail-wi0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756199AbaLJOde (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Wed, 10 Dec 2014 09:33:34 -0500
+Received: by mail-wi0-f177.google.com with SMTP id l15so5343543wiw.16
+        for <linux-wpan@vger.kernel.org>; Wed, 10 Dec 2014 06:33:33 -0800 (PST)
+From: Alexander Aring <alex.aring@gmail.com>
+Subject: [PATCH bluetooth-next 0/4] ieee802154: rework cca settings
+Date: Wed, 10 Dec 2014 15:33:10 +0100
+Message-Id: <1418221994-17976-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Stefan Schmidt <s.schmidt@samsung.com>
-Cc: linux-wpan@vger.kernel.org, Alexander Aring <alex.aring@gmail.com>
+To: linux-wpan@vger.kernel.org
+Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-Hi Stefan,
+Hi,
 
-> Just some smaller cleanups while going through the codebase. I'm aware that the
-> 3.19 merge window is already open. If you feel these are .20 material feel free to
-> stick them in a branch or let me know when you want me to re-submit them.
-> 
-> regards
-> Stefan Schmidt
-> 
-> Stefan Schmidt (6):
->  ieee802154/at86rf230: Remove unneeded blank lines
->  ieee802154/at86rf230: Align to opening parenthesis
->  ieee802154/at86rf230: Fix typo unkown -> unknown
->  ieee802154/cc2520: Remove extra blank lines
->  ieee802154/mrf24j40: Fix typo begining -> beginning
->  ieee802154/mrf24j40: Fix alignment of parenthesis
-> 
-> drivers/net/ieee802154/at86rf230.c | 12 +++++-------
-> drivers/net/ieee802154/cc2520.c    |  2 --
-> drivers/net/ieee802154/mrf24j40.c  |  6 +++---
-> 3 files changed, 8 insertions(+), 12 deletions(-)
+this patch changes the CCA setting handling. I know this will completely
+broken the deprecated netlink call for cca setting. This call is driver
+specific and we need to change that. Since this interface is deprecated
+we don't care about this now. Also the official userspace tool software
+"lowpan-tools" doesn't support this netlink interface.
 
-all 6 patches have been applied to bluetooth-next tree.
+I will send later patches for wpan-tools to support the new cca setting.
 
-Regards
+- Alex
 
-Marcel
+Alexander Aring (4):
+  nl802154: introduce cca mode enums
+  ieee802154: rework cca setting
+  nl802154: introduce support for cca settings
+  at86rf230: add reset state cca handling
+
+ drivers/net/ieee802154/at86rf230.c | 32 ++++++++++++++++++++++++--
+ include/net/cfg802154.h            | 10 ++++++++-
+ include/net/ieee802154_netdev.h    |  4 +++-
+ include/net/mac802154.h            |  5 ++++-
+ include/net/nl802154.h             | 45 ++++++++++++++++++++++++++++++++++++-
+ net/ieee802154/nl-mac.c            |  4 ++--
+ net/ieee802154/nl802154.c          | 46 +++++++++++++++++++++++++++++++++++---
+ net/ieee802154/rdev-ops.h          |  7 ++++++
+ net/ieee802154/sysfs.c             |  2 +-
+ net/mac802154/cfg.c                | 21 +++++++++++++++++
+ net/mac802154/driver-ops.h         |  5 +++--
+ net/mac802154/mac_cmd.c            |  6 ++---
+ 12 files changed, 170 insertions(+), 17 deletions(-)
+
+-- 
+2.1.3
 
