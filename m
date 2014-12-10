@@ -1,14 +1,14 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wg0-f50.google.com ([74.125.82.50]:62813 "EHLO
-	mail-wg0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757373AbaLJOdg (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Wed, 10 Dec 2014 09:33:36 -0500
-Received: by mail-wg0-f50.google.com with SMTP id a1so3771540wgh.37
-        for <linux-wpan@vger.kernel.org>; Wed, 10 Dec 2014 06:33:35 -0800 (PST)
+Received: from mail-wg0-f48.google.com ([74.125.82.48]:55495 "EHLO
+	mail-wg0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757390AbaLJOdh (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Wed, 10 Dec 2014 09:33:37 -0500
+Received: by mail-wg0-f48.google.com with SMTP id y19so3774860wgg.7
+        for <linux-wpan@vger.kernel.org>; Wed, 10 Dec 2014 06:33:36 -0800 (PST)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH bluetooth-next 2/4] ieee802154: rework cca setting
-Date: Wed, 10 Dec 2014 15:33:12 +0100
-Message-Id: <1418221994-17976-3-git-send-email-alex.aring@gmail.com>
+Subject: [PATCH bluetooth-next 3/4] nl802154: introduce support for cca settings
+Date: Wed, 10 Dec 2014 15:33:13 +0100
+Message-Id: <1418221994-17976-4-git-send-email-alex.aring@gmail.com>
 In-Reply-To: <1418221994-17976-1-git-send-email-alex.aring@gmail.com>
 References: <1418221994-17976-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
@@ -16,240 +16,188 @@ List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
 Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-The current cca setting handle is a driver specific call. We need to
-introduce some 802.15.4 specific layer and mapping 802.15.4 cca modes to
-driver specific ones inside the 802.15.4 driver. This patch will add
-such 802.15.4 layer and mapping the cca settings to driver specific ones.
+This patch adds support for setting cca parameters via nl802154.
 
 Signed-off-by: Alexander Aring <alex.aring@gmail.com>
 ---
- drivers/net/ieee802154/at86rf230.c | 30 ++++++++++++++++++++++++++++--
- include/net/cfg802154.h            |  7 ++++++-
- include/net/ieee802154_netdev.h    |  4 +++-
- include/net/mac802154.h            |  5 ++++-
- net/ieee802154/nl-mac.c            |  4 ++--
- net/ieee802154/nl802154.c          |  2 +-
- net/ieee802154/sysfs.c             |  2 +-
- net/mac802154/driver-ops.h         |  5 +++--
- net/mac802154/mac_cmd.c            |  6 +++---
- 9 files changed, 51 insertions(+), 14 deletions(-)
+ include/net/cfg802154.h   |  3 +++
+ include/net/nl802154.h    |  2 +-
+ net/ieee802154/nl802154.c | 46 +++++++++++++++++++++++++++++++++++++++++++---
+ net/ieee802154/rdev-ops.h |  7 +++++++
+ net/mac802154/cfg.c       | 21 +++++++++++++++++++++
+ 5 files changed, 75 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/ieee802154/at86rf230.c b/drivers/net/ieee802154/at86rf230.c
-index 1c01356..1ac46ba 100644
---- a/drivers/net/ieee802154/at86rf230.c
-+++ b/drivers/net/ieee802154/at86rf230.c
-@@ -1146,11 +1146,37 @@ at86rf230_set_lbt(struct ieee802154_hw *hw, bool on)
- }
- 
- static int
--at86rf230_set_cca_mode(struct ieee802154_hw *hw, u8 mode)
-+at86rf230_set_cca_mode(struct ieee802154_hw *hw,
-+		       const struct wpan_phy_cca *cca)
- {
- 	struct at86rf230_local *lp = hw->priv;
-+	u8 val;
- 
--	return at86rf230_write_subreg(lp, SR_CCA_MODE, mode);
-+	/* mapping 802.15.4 to driver spec */
-+	switch (cca->mode) {
-+	case NL802154_CCA_ENERGY:
-+		val = 1;
-+		break;
-+	case NL802154_CCA_CARRIER:
-+		val = 2;
-+		break;
-+	case NL802154_CCA_ENERGY_CARRIER:
-+		switch (cca->opt) {
-+		case NL802154_CCA_OPT_ENERGY_CARRIER_AND:
-+			val = 3;
-+			break;
-+		case NL802154_CCA_OPT_ENERGY_CARRIER_OR:
-+			val = 0;
-+			break;
-+		default:
-+			return -EINVAL;
-+		}
-+		break;
-+	default:
-+		return -EINVAL;
-+	}
-+
-+	return at86rf230_write_subreg(lp, SR_CCA_MODE, val);
- }
- 
- static int
 diff --git a/include/net/cfg802154.h b/include/net/cfg802154.h
-index 7f713ac..6ee2618 100644
+index 6ee2618..eeda676 100644
 --- a/include/net/cfg802154.h
 +++ b/include/net/cfg802154.h
-@@ -56,6 +56,11 @@ struct cfg802154_ops {
- 				struct wpan_dev *wpan_dev, bool mode);
- };
+@@ -25,6 +25,7 @@
+ #include <net/nl802154.h>
  
-+struct wpan_phy_cca {
-+	enum nl802154_cca_modes mode;
-+	enum nl802154_cca_opts opt;
-+};
-+
- struct wpan_phy {
- 	struct mutex pib_lock;
+ struct wpan_phy;
++struct wpan_phy_cca;
  
-@@ -76,7 +81,7 @@ struct wpan_phy {
- 	u8 current_page;
- 	u32 channels_supported[IEEE802154_MAX_PAGE + 1];
- 	s8 transmit_power;
--	u8 cca_mode;
-+	struct wpan_phy_cca cca;
+ struct cfg802154_ops {
+ 	struct net_device * (*add_virtual_intf_deprecated)(struct wpan_phy *wpan_phy,
+@@ -39,6 +40,8 @@ struct cfg802154_ops {
+ 	int	(*del_virtual_intf)(struct wpan_phy *wpan_phy,
+ 				    struct wpan_dev *wpan_dev);
+ 	int	(*set_channel)(struct wpan_phy *wpan_phy, u8 page, u8 channel);
++	int	(*set_cca_mode)(struct wpan_phy *wpan_phy,
++				const struct wpan_phy_cca *cca);
+ 	int	(*set_pan_id)(struct wpan_phy *wpan_phy,
+ 			      struct wpan_dev *wpan_dev, __le16 pan_id);
+ 	int	(*set_short_addr)(struct wpan_phy *wpan_phy,
+diff --git a/include/net/nl802154.h b/include/net/nl802154.h
+index 86c1b2f..f8b5bc9 100644
+--- a/include/net/nl802154.h
++++ b/include/net/nl802154.h
+@@ -82,7 +82,7 @@ enum nl802154_attrs {
+ 	NL802154_ATTR_TX_POWER,
  
- 	__le64 perm_extended_addr;
+ 	NL802154_ATTR_CCA_MODE,
+-	NL802154_ATTR_CCA_MODE3_AND,
++	NL802154_ATTR_CCA_OPT,
+ 	NL802154_ATTR_CCA_ED_LEVEL,
  
-diff --git a/include/net/ieee802154_netdev.h b/include/net/ieee802154_netdev.h
-index 83bb8a73..94a2970 100644
---- a/include/net/ieee802154_netdev.h
-+++ b/include/net/ieee802154_netdev.h
-@@ -28,6 +28,8 @@
- #include <linux/skbuff.h>
- #include <linux/ieee802154.h>
- 
-+#include <net/cfg802154.h>
-+
- struct ieee802154_sechdr {
- #if defined(__LITTLE_ENDIAN_BITFIELD)
- 	u8 level:3,
-@@ -337,7 +339,7 @@ struct ieee802154_mac_params {
- 	s8 frame_retries;
- 
- 	bool lbt;
--	u8 cca_mode;
-+	struct wpan_phy_cca cca;
- 	s32 cca_ed_level;
- };
- 
-diff --git a/include/net/mac802154.h b/include/net/mac802154.h
-index c823d91..8506478 100644
---- a/include/net/mac802154.h
-+++ b/include/net/mac802154.h
-@@ -20,6 +20,8 @@
- #include <linux/ieee802154.h>
- #include <linux/skbuff.h>
- 
-+#include <net/cfg802154.h>
-+
- /* General MAC frame format:
-  *  2 bytes: Frame Control
-  *  1 byte:  Sequence Number
-@@ -212,7 +214,8 @@ struct ieee802154_ops {
- 					    unsigned long changed);
- 	int		(*set_txpower)(struct ieee802154_hw *hw, int db);
- 	int		(*set_lbt)(struct ieee802154_hw *hw, bool on);
--	int		(*set_cca_mode)(struct ieee802154_hw *hw, u8 mode);
-+	int		(*set_cca_mode)(struct ieee802154_hw *hw,
-+					const struct wpan_phy_cca *cca);
- 	int		(*set_cca_ed_level)(struct ieee802154_hw *hw,
- 					    s32 level);
- 	int		(*set_csma_params)(struct ieee802154_hw *hw,
-diff --git a/net/ieee802154/nl-mac.c b/net/ieee802154/nl-mac.c
-index cd91949..3c902e9 100644
---- a/net/ieee802154/nl-mac.c
-+++ b/net/ieee802154/nl-mac.c
-@@ -121,7 +121,7 @@ static int ieee802154_nl_fill_iface(struct sk_buff *msg, u32 portid,
- 			       params.transmit_power) ||
- 		    nla_put_u8(msg, IEEE802154_ATTR_LBT_ENABLED, params.lbt) ||
- 		    nla_put_u8(msg, IEEE802154_ATTR_CCA_MODE,
--			       params.cca_mode) ||
-+			       params.cca.mode) ||
- 		    nla_put_s32(msg, IEEE802154_ATTR_CCA_ED_LEVEL,
- 				params.cca_ed_level) ||
- 		    nla_put_u8(msg, IEEE802154_ATTR_CSMA_RETRIES,
-@@ -516,7 +516,7 @@ int ieee802154_set_macparams(struct sk_buff *skb, struct genl_info *info)
- 		params.lbt = nla_get_u8(info->attrs[IEEE802154_ATTR_LBT_ENABLED]);
- 
- 	if (info->attrs[IEEE802154_ATTR_CCA_MODE])
--		params.cca_mode = nla_get_u8(info->attrs[IEEE802154_ATTR_CCA_MODE]);
-+		params.cca.mode = nla_get_u8(info->attrs[IEEE802154_ATTR_CCA_MODE]);
- 
- 	if (info->attrs[IEEE802154_ATTR_CCA_ED_LEVEL])
- 		params.cca_ed_level = nla_get_s32(info->attrs[IEEE802154_ATTR_CCA_ED_LEVEL]);
+ 	NL802154_ATTR_MAX_FRAME_RETRIES,
 diff --git a/net/ieee802154/nl802154.c b/net/ieee802154/nl802154.c
-index 8896477..1efbe42 100644
+index 1efbe42..a25b9bb 100644
 --- a/net/ieee802154/nl802154.c
 +++ b/net/ieee802154/nl802154.c
-@@ -291,7 +291,7 @@ static int nl802154_send_wpan_phy(struct cfg802154_registered_device *rdev,
+@@ -209,7 +209,8 @@ static const struct nla_policy nl802154_policy[NL802154_ATTR_MAX+1] = {
  
- 	/* cca mode */
- 	if (nla_put_u8(msg, NL802154_ATTR_CCA_MODE,
--		       rdev->wpan_phy.cca_mode))
-+		       rdev->wpan_phy.cca.mode))
+ 	[NL802154_ATTR_TX_POWER] = { .type = NLA_S8, },
+ 
+-	[NL802154_ATTR_CCA_MODE] = { .type = NLA_U8, },
++	[NL802154_ATTR_CCA_MODE] = { .type = NLA_U32, },
++	[NL802154_ATTR_CCA_OPT] = { .type = NLA_U32, },
+ 
+ 	[NL802154_ATTR_SUPPORTED_CHANNEL] = { .type = NLA_U32, },
+ 
+@@ -290,10 +291,16 @@ static int nl802154_send_wpan_phy(struct cfg802154_registered_device *rdev,
  		goto nla_put_failure;
  
+ 	/* cca mode */
+-	if (nla_put_u8(msg, NL802154_ATTR_CCA_MODE,
+-		       rdev->wpan_phy.cca.mode))
++	if (nla_put_u32(msg, NL802154_ATTR_CCA_MODE,
++			rdev->wpan_phy.cca.mode))
+ 		goto nla_put_failure;
+ 
++	if (rdev->wpan_phy.cca.mode == NL802154_CCA_ENERGY_CARRIER) {
++		if (nla_put_u32(msg, NL802154_ATTR_CCA_OPT,
++				rdev->wpan_phy.cca.opt))
++			goto nla_put_failure;
++	}
++
  	if (nla_put_s8(msg, NL802154_ATTR_TX_POWER,
-diff --git a/net/ieee802154/sysfs.c b/net/ieee802154/sysfs.c
-index 1613b9c..dff55c2 100644
---- a/net/ieee802154/sysfs.c
-+++ b/net/ieee802154/sysfs.c
-@@ -68,7 +68,7 @@ static DEVICE_ATTR_RO(name)
- MASTER_SHOW(current_channel, "%d");
- MASTER_SHOW(current_page, "%d");
- MASTER_SHOW(transmit_power, "%d +- 1 dB");
--MASTER_SHOW(cca_mode, "%d");
-+MASTER_SHOW_COMPLEX(cca_mode, "%d", phy->cca.mode);
- 
- static ssize_t channels_supported_show(struct device *dev,
- 				       struct device_attribute *attr,
-diff --git a/net/mac802154/driver-ops.h b/net/mac802154/driver-ops.h
-index f21e864..98180a9 100644
---- a/net/mac802154/driver-ops.h
-+++ b/net/mac802154/driver-ops.h
-@@ -70,7 +70,8 @@ static inline int drv_set_tx_power(struct ieee802154_local *local, s8 dbm)
- 	return local->ops->set_txpower(&local->hw, dbm);
+ 		       rdev->wpan_phy.transmit_power))
+ 		goto nla_put_failure;
+@@ -622,6 +629,31 @@ static int nl802154_set_channel(struct sk_buff *skb, struct genl_info *info)
+ 	return rdev_set_channel(rdev, page, channel);
  }
  
--static inline int drv_set_cca_mode(struct ieee802154_local *local, u8 cca_mode)
-+static inline int drv_set_cca_mode(struct ieee802154_local *local,
-+				   const struct wpan_phy_cca *cca)
++static int nl802154_set_cca_mode(struct sk_buff *skb, struct genl_info *info)
++{
++	struct cfg802154_registered_device *rdev = info->user_ptr[0];
++	struct wpan_phy_cca cca;
++
++	if (!info->attrs[NL802154_ATTR_CCA_MODE])
++		return -EINVAL;
++
++	cca.mode = nla_get_u32(info->attrs[NL802154_ATTR_CCA_MODE]);
++	/* checking 802.15.4 constraints */
++	if (cca.mode < NL802154_CCA_ENERGY || cca.mode > NL802154_CCA_ATTR_MAX)
++		return -EINVAL;
++
++	if (cca.mode == NL802154_CCA_ENERGY_CARRIER) {
++		if (!info->attrs[NL802154_ATTR_CCA_OPT])
++			return -EINVAL;
++
++		cca.opt = nla_get_u32(info->attrs[NL802154_ATTR_CCA_OPT]);
++		if (cca.opt > NL802154_CCA_OPT_ATTR_MAX)
++			return -EINVAL;
++	}
++
++	return rdev_set_cca_mode(rdev, &cca);
++}
++
+ static int nl802154_set_pan_id(struct sk_buff *skb, struct genl_info *info)
  {
- 	might_sleep();
- 
-@@ -79,7 +80,7 @@ static inline int drv_set_cca_mode(struct ieee802154_local *local, u8 cca_mode)
- 		return -EOPNOTSUPP;
- 	}
- 
--	return local->ops->set_cca_mode(&local->hw, cca_mode);
-+	return local->ops->set_cca_mode(&local->hw, cca);
+ 	struct cfg802154_registered_device *rdev = info->user_ptr[0];
+@@ -895,6 +927,14 @@ static const struct genl_ops nl802154_ops[] = {
+ 				  NL802154_FLAG_NEED_RTNL,
+ 	},
+ 	{
++		.cmd = NL802154_CMD_SET_CCA_MODE,
++		.doit = nl802154_set_cca_mode,
++		.policy = nl802154_policy,
++		.flags = GENL_ADMIN_PERM,
++		.internal_flags = NL802154_FLAG_NEED_WPAN_PHY |
++				  NL802154_FLAG_NEED_RTNL,
++	},
++	{
+ 		.cmd = NL802154_CMD_SET_PAN_ID,
+ 		.doit = nl802154_set_pan_id,
+ 		.policy = nl802154_policy,
+diff --git a/net/ieee802154/rdev-ops.h b/net/ieee802154/rdev-ops.h
+index aff54fb..7c46732 100644
+--- a/net/ieee802154/rdev-ops.h
++++ b/net/ieee802154/rdev-ops.h
+@@ -42,6 +42,13 @@ rdev_set_channel(struct cfg802154_registered_device *rdev, u8 page, u8 channel)
  }
  
- static inline int drv_set_lbt_mode(struct ieee802154_local *local, bool mode)
-diff --git a/net/mac802154/mac_cmd.c b/net/mac802154/mac_cmd.c
-index 6aacb18..bdccb4e 100644
---- a/net/mac802154/mac_cmd.c
-+++ b/net/mac802154/mac_cmd.c
-@@ -81,7 +81,7 @@ static int mac802154_set_mac_params(struct net_device *dev,
+ static inline int
++rdev_set_cca_mode(struct cfg802154_registered_device *rdev,
++		  const struct wpan_phy_cca *cca)
++{
++	return rdev->ops->set_cca_mode(&rdev->wpan_phy, cca);
++}
++
++static inline int
+ rdev_set_pan_id(struct cfg802154_registered_device *rdev,
+ 		struct wpan_dev *wpan_dev, __le16 pan_id)
+ {
+diff --git a/net/mac802154/cfg.c b/net/mac802154/cfg.c
+index c035708..7d31da5 100644
+--- a/net/mac802154/cfg.c
++++ b/net/mac802154/cfg.c
+@@ -87,6 +87,26 @@ ieee802154_set_channel(struct wpan_phy *wpan_phy, u8 page, u8 channel)
+ }
  
- 	/* PHY */
- 	wpan_dev->wpan_phy->transmit_power = params->transmit_power;
--	wpan_dev->wpan_phy->cca_mode = params->cca_mode;
-+	wpan_dev->wpan_phy->cca = params->cca;
- 	wpan_dev->wpan_phy->cca_ed_level = params->cca_ed_level;
- 
- 	/* MAC */
-@@ -98,7 +98,7 @@ static int mac802154_set_mac_params(struct net_device *dev,
- 	}
- 
- 	if (local->hw.flags & IEEE802154_HW_CCA_MODE) {
--		ret = drv_set_cca_mode(local, params->cca_mode);
-+		ret = drv_set_cca_mode(local, &params->cca);
- 		if (ret < 0)
- 			return ret;
- 	}
-@@ -122,7 +122,7 @@ static void mac802154_get_mac_params(struct net_device *dev,
- 
- 	/* PHY */
- 	params->transmit_power = wpan_dev->wpan_phy->transmit_power;
--	params->cca_mode = wpan_dev->wpan_phy->cca_mode;
-+	params->cca = wpan_dev->wpan_phy->cca;
- 	params->cca_ed_level = wpan_dev->wpan_phy->cca_ed_level;
- 
- 	/* MAC */
+ static int
++ieee802154_set_cca_mode(struct wpan_phy *wpan_phy,
++			const struct wpan_phy_cca *cca)
++{
++	struct ieee802154_local *local = wpan_phy_priv(wpan_phy);
++	int ret;
++
++	ASSERT_RTNL();
++
++	/* check if phy support this setting */
++	if (!(local->hw.flags & IEEE802154_HW_CCA_MODE))
++		return -EOPNOTSUPP;
++
++	ret = drv_set_cca_mode(local, cca);
++	if (!ret)
++		wpan_phy->cca = *cca;
++
++	return ret;
++}
++
++static int
+ ieee802154_set_pan_id(struct wpan_phy *wpan_phy, struct wpan_dev *wpan_dev,
+ 		      __le16 pan_id)
+ {
+@@ -201,6 +221,7 @@ const struct cfg802154_ops mac802154_config_ops = {
+ 	.add_virtual_intf = ieee802154_add_iface,
+ 	.del_virtual_intf = ieee802154_del_iface,
+ 	.set_channel = ieee802154_set_channel,
++	.set_cca_mode = ieee802154_set_cca_mode,
+ 	.set_pan_id = ieee802154_set_pan_id,
+ 	.set_short_addr = ieee802154_set_short_addr,
+ 	.set_backoff_exponent = ieee802154_set_backoff_exponent,
 -- 
 2.1.3
 
