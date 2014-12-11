@@ -1,92 +1,222 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wg0-f47.google.com ([74.125.82.47]:57386 "EHLO
-	mail-wg0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751927AbaLJMFG (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Wed, 10 Dec 2014 07:05:06 -0500
-Date: Wed, 10 Dec 2014 13:04:56 +0100
+Received: from mail-wg0-f44.google.com ([74.125.82.44]:58337 "EHLO
+	mail-wg0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753905AbaLKHDB (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Thu, 11 Dec 2014 02:03:01 -0500
+Received: by mail-wg0-f44.google.com with SMTP id b13so5562193wgh.3
+        for <linux-wpan@vger.kernel.org>; Wed, 10 Dec 2014 23:03:00 -0800 (PST)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: Re: [PATCHv3 bluetooth-next 3/3] 6lowpan: nhc: add other known
- rfc6282 compressions
-Message-ID: <20141210120453.GA24018@omega>
-References: <1418053838-8692-1-git-send-email-alex.aring@gmail.com>
- <1418053838-8692-4-git-send-email-alex.aring@gmail.com>
- <1418124496.32209.47.camel@jrissane-mobl.ger.corp.intel.com>
- <20141209115250.GA32681@omega>
- <1418133949.32209.58.camel@jrissane-mobl.ger.corp.intel.com>
- <20141209184250.GB32681@omega>
- <1418202242.32209.65.camel@jrissane-mobl.ger.corp.intel.com>
- <1418212574.32209.78.camel@jrissane-mobl.ger.corp.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1418212574.32209.78.camel@jrissane-mobl.ger.corp.intel.com>
+Subject: [PATCH wpan-tools] phy: sync cca handling with mainline
+Date: Thu, 11 Dec 2014 08:02:52 +0100
+Message-Id: <1418281372-19873-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-Cc: linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org, kernel@pengutronix.de, Martin Townsend <mtownsend1973@gmail.com>
+To: linux-wpan@vger.kernel.org
+Cc: Alexander Aring <alex.aring@gmail.com>
 
-Hi Jukka,
+This patch updates the nl802154 header with current mainline and making
+changes according to cca current mainline handling.
 
-On Wed, Dec 10, 2014 at 01:56:14PM +0200, Jukka Rissanen wrote:
-> 
-> Found the problem, in bt 6lowpan the skb that was freed was still used
-> by network stack. I will send a patch for this soon.
-> 
+Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+---
+ src/info.c     | 23 +++++++++++------
+ src/nl802154.h | 78 ++++++++++++++++++++++++++++++++++++++++++++--------------
+ src/phy.c      | 14 ++++++-----
+ 3 files changed, 84 insertions(+), 31 deletions(-)
 
-ok.
+diff --git a/src/info.c b/src/info.c
+index 50a7bba..83f2e3e 100644
+--- a/src/info.c
++++ b/src/info.c
+@@ -20,7 +20,7 @@ static int print_phy_handler(struct nl_msg *msg, void *arg)
+ 	int64_t phy_id = -1;
+ 	bool print_name = true;
+ 	struct nlattr *nl_page;
+-	unsigned long cca_mode;
++	enum nl802154_cca_modes cca_mode;
+ 
+ 	nla_parse(tb_msg, NL802154_ATTR_MAX, genlmsg_attrdata(gnlh, 0),
+ 		  genlmsg_attrlen(gnlh, 0), NULL);
+@@ -62,13 +62,22 @@ static int print_phy_handler(struct nl_msg *msg, void *arg)
+ 		printf("current_channel: %d\n", nla_get_u8(tb_msg[NL802154_ATTR_CHANNEL]));
+ 
+ 	if (tb_msg[NL802154_ATTR_CCA_MODE]) {
+-		cca_mode = nla_get_u8(tb_msg[NL802154_ATTR_CCA_MODE]);
++		cca_mode = nla_get_u32(tb_msg[NL802154_ATTR_CCA_MODE]);
+ 		printf("cca_mode: %d", cca_mode);
+-		if (cca_mode == 3) {
+-			if (nla_get_u8(tb_msg[NL802154_ATTR_CCA_MODE3_AND]))
+-				printf(" AND ");
+-			else
+-				printf(" OR ");
++		if (cca_mode == NL802154_CCA_ENERGY_CARRIER) {
++			enum nl802154_cca_opts cca_opt;
++
++			cca_opt = nla_get_u32(tb_msg[NL802154_ATTR_CCA_OPT]);
++			switch (cca_opt) {
++			case NL802154_CCA_OPT_ENERGY_CARRIER_AND:
++				printf(" logical and ");
++				break;
++			case NL802154_CCA_OPT_ENERGY_CARRIER_OR:
++				printf(" logical or ");
++				break;
++			default:
++				printf(" logical op mode unkown ");
++			}
+ 		}
+ 		printf("\n");
+ 	}
+diff --git a/src/nl802154.h b/src/nl802154.h
+index 0f86ef8..f8b5bc9 100644
+--- a/src/nl802154.h
++++ b/src/nl802154.h
+@@ -1,26 +1,24 @@
++#ifndef __NL802154_H
++#define __NL802154_H
+ /*
+- * nl802154.h
++ * 802.15.4 netlink interface public header
+  *
+- * Copyright (C) 2007, 2008, 2009 Siemens AG
++ * Copyright 2014 Alexander Aring <aar@pengutronix.de>
+  *
+- * This program is free software; you can redistribute it and/or modify
+- * it under the terms of the GNU General Public License version 2
+- * as published by the Free Software Foundation.
++ * Permission to use, copy, modify, and/or distribute this software for any
++ * purpose with or without fee is hereby granted, provided that the above
++ * copyright notice and this permission notice appear in all copies.
+  *
+- * This program is distributed in the hope that it will be useful,
+- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- * GNU General Public License for more details.
+- *
+- * You should have received a copy of the GNU General Public License along
+- * with this program; if not, write to the Free Software Foundation, Inc.,
+- * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
++ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
++ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
++ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
++ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
++ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
++ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
++ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+  *
+  */
+ 
+-#ifndef NL802154_H
+-#define NL802154_H
+-
+ #define NL802154_GENL_NAME "nl802154"
+ 
+ enum nl802154_commands {
+@@ -84,7 +82,7 @@ enum nl802154_attrs {
+ 	NL802154_ATTR_TX_POWER,
+ 
+ 	NL802154_ATTR_CCA_MODE,
+-	NL802154_ATTR_CCA_MODE3_AND,
++	NL802154_ATTR_CCA_OPT,
+ 	NL802154_ATTR_CCA_ED_LEVEL,
+ 
+ 	NL802154_ATTR_MAX_FRAME_RETRIES,
+@@ -109,6 +107,7 @@ enum nl802154_attrs {
+ };
+ 
+ enum nl802154_iftype {
++	/* for backwards compatibility TODO */
+ 	NL802154_IFTYPE_UNSPEC = -1,
+ 
+ 	NL802154_IFTYPE_NODE,
+@@ -120,4 +119,47 @@ enum nl802154_iftype {
+ 	NL802154_IFTYPE_MAX = NUM_NL802154_IFTYPES - 1
+ };
+ 
+-#endif /* NL802154_H */
++/**
++ * enum nl802154_cca_modes - cca modes
++ *
++ * @__NL802154_CCA_INVALID: cca mode number 0 is reserved
++ * @NL802154_CCA_ENERGY: Energy above threshold
++ * @NL802154_CCA_CARRIER: Carrier sense only
++ * @NL802154_CCA_ENERGY_CARRIER: Carrier sense with energy above threshold
++ * @NL802154_CCA_ALOHA: CCA shall always report an idle medium
++ * @NL802154_CCA_UWB_SHR: UWB preamble sense based on the SHR of a frame
++ * @NL802154_CCA_UWB_MULTIPEXED: UWB preamble sense based on the packet with
++ *	the multiplexed preamble
++ * @__NL802154_CCA_ATTR_AFTER_LAST: Internal
++ * @NL802154_CCA_ATTR_MAX: Maximum CCA attribute number
++ */
++enum nl802154_cca_modes {
++	__NL802154_CCA_INVALID,
++	NL802154_CCA_ENERGY,
++	NL802154_CCA_CARRIER,
++	NL802154_CCA_ENERGY_CARRIER,
++	NL802154_CCA_ALOHA,
++	NL802154_CCA_UWB_SHR,
++	NL802154_CCA_UWB_MULTIPEXED,
++
++	/* keep last */
++	__NL802154_CCA_ATTR_AFTER_LAST,
++	NL802154_CCA_ATTR_MAX = __NL802154_CCA_ATTR_AFTER_LAST - 1
++};
++
++/**
++ * enum nl802154_cca_opts - additional options for cca modes
++ *
++ * @NL802154_CCA_OPT_ENERGY_CARRIER_OR: NL802154_CCA_ENERGY_CARRIER with OR
++ * @NL802154_CCA_OPT_ENERGY_CARRIER_AND: NL802154_CCA_ENERGY_CARRIER with AND
++ */
++enum nl802154_cca_opts {
++	NL802154_CCA_OPT_ENERGY_CARRIER_AND,
++	NL802154_CCA_OPT_ENERGY_CARRIER_OR,
++
++	/* keep last */
++	__NL802154_CCA_OPT_ATTR_AFTER_LAST,
++	NL802154_CCA_OPT_ATTR_MAX = __NL802154_CCA_OPT_ATTR_AFTER_LAST - 1
++};
++
++#endif /* __NL802154_H */
+diff --git a/src/phy.c b/src/phy.c
+index 8379786..2e25013 100644
+--- a/src/phy.c
++++ b/src/phy.c
+@@ -80,7 +80,7 @@ static int handle_cca_mode_set(struct nl802154_state *state,
+ 			       int argc, char **argv,
+ 			       enum id_input id)
+ {
+-	unsigned long cca_mode, cca_mode3_and;
++	enum nl802154_cca_modes cca_mode;
+ 	char *end;
+ 
+ 	if (argc < 1)
+@@ -91,19 +91,21 @@ static int handle_cca_mode_set(struct nl802154_state *state,
+ 	if (*end != '\0')
+ 		return 1;
+ 
+-	if (cca_mode == 3) {
++	if (cca_mode == NL802154_CCA_ENERGY_CARRIER) {
++		enum nl802154_cca_opts cca_opt;
++
+ 		if (argc < 2)
+ 			return 1;
+ 
+-		/* CCA_MODE */
+-		cca_mode3_and = strtoul(argv[1], &end, 10);
++		/* CCA_OPT */
++		cca_opt = strtoul(argv[1], &end, 10);
+ 		if (*end != '\0')
+ 			return 1;
+ 
+-		NLA_PUT_U8(msg, NL802154_ATTR_CCA_MODE3_AND, cca_mode3_and);
++		NLA_PUT_U32(msg, NL802154_ATTR_CCA_OPT, cca_opt);
+ 	}
+ 
+-	NLA_PUT_U8(msg, NL802154_ATTR_CCA_MODE, cca_mode);
++	NLA_PUT_U32(msg, NL802154_ATTR_CCA_MODE, cca_mode);
+ 
+ 	return 0;
+ 
+-- 
+2.1.3
 
-> > 
-> > > 
-> > > > > 
-> > > > > Do this please on one node, the other node should send some 6LoWPAN IPHC
-> > > > > packets to check if the error handling working there.
-> > > > > 
-> > > > > 
-> > > > > 
-> > > > > 
-> > > > > 
-> > > > > Another issue is that I see that skb->dev isn't set before calling
-> > > > > lowpan_header_decompress. Because inside your log is a "NULL":
-> > > > > 
-> > > > > (NULL net_device): received unknown nhc id which was not found.
-> > > > > 
-> > > > > Can you change that? That skb->dev is set to before calling
-> > > > > lowpan_header_decompress.
-> > > > 
-> > > > I am setting the skb->dev after the call to lowpan_header_decompress().
-> > > > And anyway the skb->dev is only used when printing the err.
-> > > > Actually should we replace the skb->dev in lowpan_header_decompress()
-> > > > with plain dev as that is given to the function as a parameter. 
-> > > > 
-> > > 
-> > > Ok, how we introduce this now? You wanna add this do the patch series for
-> > > fixing the above issue, or should I add it to my patch series for
-> > > introduce nhc framework?
-> > 
-> > I am fine with either. If you have time, please go ahead and send a
-> > patch or I can do it also after figuring what is causing the crash.
-> 
-> After second though, can you do the change as actually what I had in
-> mind was to change the
-> 
->       netdev_warn(skb->dev, ...)
-> to
->       netdev_warn(dev, ...)
-> 
-> and that code is part of patch 2 of your patchset.
-> 
-> Another thing I noticed is that we need to rate limit the output as now
-> it might be that the warning is printed for every udp packet which is
-> way too much.
-> 
-
-ok. Or maybe simple remove the output, or make it only visable on
-debugging. I don't really know what's the best notice for use that the
-packet was dropping because invalid/unsupported packets.
-
-I will do it to ratelimit and add patches for the netdev_warn(dev, ...)
-thing. Currently I am working a little bit on the 802154 branch again.
-
-I will start this work when you are done with the above fix.
-
-- Alex
