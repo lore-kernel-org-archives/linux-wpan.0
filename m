@@ -1,42 +1,37 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wg0-f52.google.com ([74.125.82.52]:38278 "EHLO
-	mail-wg0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S966399AbaLLOPb (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Fri, 12 Dec 2014 09:15:31 -0500
-Received: by mail-wg0-f52.google.com with SMTP id x12so9205633wgg.39
-        for <linux-wpan@vger.kernel.org>; Fri, 12 Dec 2014 06:15:29 -0800 (PST)
-Date: Fri, 12 Dec 2014 15:15:24 +0100
+Received: from mail-wi0-f174.google.com ([209.85.212.174]:51411 "EHLO
+	mail-wi0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S966399AbaLLOVz (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Fri, 12 Dec 2014 09:21:55 -0500
+Received: by mail-wi0-f174.google.com with SMTP id h11so2633918wiw.13
+        for <linux-wpan@vger.kernel.org>; Fri, 12 Dec 2014 06:21:53 -0800 (PST)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: Re: [PATCH wpan-misc] website: inital commit
-Message-ID: <20141212141521.GA381@omega>
-References: <1418392049-11101-1-git-send-email-alex.aring@gmail.com>
- <1418392049-11101-2-git-send-email-alex.aring@gmail.com>
- <548AF6D5.6030806@datenfreihafen.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <548AF6D5.6030806@datenfreihafen.org>
+Subject: [PATCH wpan-misc 1/2] website: fix milestone table name
+Date: Fri, 12 Dec 2014 15:21:45 +0100
+Message-Id: <1418394106-12799-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Stefan Schmidt <stefan@datenfreihafen.org>
-Cc: linux-wpan@vger.kernel.org
+To: linux-wpan@vger.kernel.org
+Cc: Alexander Aring <alex.aring@gmail.com>
 
-On Fri, Dec 12, 2014 at 03:08:21PM +0100, Stefan Schmidt wrote:
-> Hello.
-> 
-> On 12/12/14 14:47, Alexander Aring wrote:
-> > +Rework
-> > +~~~~~~
-> > +
-> > +Currently a rework of 802.15.4 subsystem is in progress.
-> > +
-> > +The rework will contains a new netlink API and a general handling about frame creation and parsing.
-> > +
-> > +.Supported 802.15.4 Hardware
-> 
-> Better give this table a different name. :)
-> 
+Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+---
+ website/index.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-ok, I will fix that in the next series. Thanks.
+diff --git a/website/index.txt b/website/index.txt
+index a7ab4bb..5a3252b 100644
+--- a/website/index.txt
++++ b/website/index.txt
+@@ -114,7 +114,7 @@ Currently a rework of 802.15.4 subsystem is in progress.
+ 
+ The rework will contains a new netlink API and a general handling about frame creation and parsing.
+ 
+-.Supported 802.15.4 Hardware
++.Milestones
+ [options="header"]
+ |=======================================
+ |Milestone        | Description | state
+-- 
+2.1.3
 
-- Alex
