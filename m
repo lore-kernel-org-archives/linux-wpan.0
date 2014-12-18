@@ -1,42 +1,57 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wg0-f47.google.com ([74.125.82.47]:60896 "EHLO
-	mail-wg0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757373AbaLJOdi (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Wed, 10 Dec 2014 09:33:38 -0500
-Received: by mail-wg0-f47.google.com with SMTP id n12so3785671wgh.20
-        for <linux-wpan@vger.kernel.org>; Wed, 10 Dec 2014 06:33:37 -0800 (PST)
-From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH bluetooth-next 4/4] at86rf230: add reset state cca handling
-Date: Wed, 10 Dec 2014 15:33:14 +0100
-Message-Id: <1418221994-17976-5-git-send-email-alex.aring@gmail.com>
+Received: from senator.holtmann.net ([87.106.208.187]:38069 "EHLO
+	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751759AbaLRXVM convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Thu, 18 Dec 2014 18:21:12 -0500
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
+Subject: Re: [PATCH bluetooth-next 0/4] ieee802154: rework cca settings
+From: Marcel Holtmann <marcel@holtmann.org>
 In-Reply-To: <1418221994-17976-1-git-send-email-alex.aring@gmail.com>
+Date: Fri, 19 Dec 2014 00:21:09 +0100
+Content-Transfer-Encoding: 8BIT
+Message-Id: <DE72037B-F4B1-4E7A-8F7B-67A3112751D4@holtmann.org>
 References: <1418221994-17976-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org
-Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
+To: Alexander Aring <alex.aring@gmail.com>
+Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de
 
-This patch adds the default cca setting after device reset for at86rf230
-driver.
+Hi Alex,
 
-Signed-off-by: Alexander Aring <alex.aring@gmail.com>
----
- drivers/net/ieee802154/at86rf230.c | 2 ++
- 1 file changed, 2 insertions(+)
+> this patch changes the CCA setting handling. I know this will completely
+> broken the deprecated netlink call for cca setting. This call is driver
+> specific and we need to change that. Since this interface is deprecated
+> we don't care about this now. Also the official userspace tool software
+> "lowpan-tools" doesn't support this netlink interface.
+> 
+> I will send later patches for wpan-tools to support the new cca setting.
+> 
+> - Alex
+> 
+> Alexander Aring (4):
+>  nl802154: introduce cca mode enums
+>  ieee802154: rework cca setting
+>  nl802154: introduce support for cca settings
+>  at86rf230: add reset state cca handling
+> 
+> drivers/net/ieee802154/at86rf230.c | 32 ++++++++++++++++++++++++--
+> include/net/cfg802154.h            | 10 ++++++++-
+> include/net/ieee802154_netdev.h    |  4 +++-
+> include/net/mac802154.h            |  5 ++++-
+> include/net/nl802154.h             | 45 ++++++++++++++++++++++++++++++++++++-
+> net/ieee802154/nl-mac.c            |  4 ++--
+> net/ieee802154/nl802154.c          | 46 +++++++++++++++++++++++++++++++++++---
+> net/ieee802154/rdev-ops.h          |  7 ++++++
+> net/ieee802154/sysfs.c             |  2 +-
+> net/mac802154/cfg.c                | 21 +++++++++++++++++
+> net/mac802154/driver-ops.h         |  5 +++--
+> net/mac802154/mac_cmd.c            |  6 ++---
+> 12 files changed, 170 insertions(+), 17 deletions(-)
 
-diff --git a/drivers/net/ieee802154/at86rf230.c b/drivers/net/ieee802154/at86rf230.c
-index 1ac46ba..0626e7d 100644
---- a/drivers/net/ieee802154/at86rf230.c
-+++ b/drivers/net/ieee802154/at86rf230.c
-@@ -1441,6 +1441,8 @@ at86rf230_detect_device(struct at86rf230_local *lp)
- 			IEEE802154_HW_TXPOWER | IEEE802154_HW_ARET |
- 			IEEE802154_HW_AFILT | IEEE802154_HW_PROMISCUOUS;
- 
-+	lp->hw->phy->cca.mode = NL802154_CCA_ENERGY;
-+
- 	switch (part) {
- 	case 2:
- 		chip = "at86rf230";
--- 
-2.1.3
+all 4 patches have been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
 
