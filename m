@@ -1,41 +1,50 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wg0-f47.google.com ([74.125.82.47]:55814 "EHLO
-	mail-wg0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751460AbaLOJ02 (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Mon, 15 Dec 2014 04:26:28 -0500
-Received: by mail-wg0-f47.google.com with SMTP id n12so13893890wgh.6
-        for <linux-wpan@vger.kernel.org>; Mon, 15 Dec 2014 01:26:26 -0800 (PST)
-From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCHv2 bluetooth-next 5/5] at86rf230: remove unnecessary assign
-Date: Mon, 15 Dec 2014 10:25:57 +0100
-Message-Id: <1418635557-6670-6-git-send-email-alex.aring@gmail.com>
+Received: from senator.holtmann.net ([87.106.208.187]:37816 "EHLO
+	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751714AbaLRXVF (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Thu, 18 Dec 2014 18:21:05 -0500
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
+Subject: Re: [PATCHv2 bluetooth-next 0/5] at86rf230: cleanups
+From: Marcel Holtmann <marcel@holtmann.org>
 In-Reply-To: <1418635557-6670-1-git-send-email-alex.aring@gmail.com>
+Date: Fri, 19 Dec 2014 00:21:03 +0100
+Content-Transfer-Encoding: 7bit
+Message-Id: <E1E567FF-2353-4C25-9391-A88C78291E76@holtmann.org>
 References: <1418635557-6670-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org
-Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
+To: Alexander Aring <alex.aring@gmail.com>
+Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de
 
-The attribute extra_tx_headroom should already be zero.
+Hi Alex,
 
-Signed-off-by: Alexander Aring <alex.aring@gmail.com>
-Reviewed-by: Stefan Schmidt <s.schmidt@samsung.com>
----
- drivers/net/ieee802154/at86rf230.c | 1 -
- 1 file changed, 1 deletion(-)
+> This patch series contains various cleanups for the at86rf230.
+> Except patch 3/5 which contains a fix for a rarely error handling.
+> Because this error handling is very rarely and should only happens
+> if something is wrong with the spi controller, it's okay to fix it
+> in next.
+> 
+> - Alex
+> 
+> changes since v2:
+> - make patch 1/5 "at86rf230: remove if branch" more human readable.
+> 
+> Alexander Aring (5):
+>  at86rf230: remove if branch
+>  at86rf230: make at86rf230_async_error inline
+>  at86rf230: fix context pointer handling
+>  at86rf230: cleanup check on trac status
+>  at86rf230: remove unnecessary assign
+> 
+> drivers/net/ieee802154/at86rf230.c | 18 ++++++------------
+> 1 file changed, 6 insertions(+), 12 deletions(-)
 
-diff --git a/drivers/net/ieee802154/at86rf230.c b/drivers/net/ieee802154/at86rf230.c
-index 9f61748..577b24e 100644
---- a/drivers/net/ieee802154/at86rf230.c
-+++ b/drivers/net/ieee802154/at86rf230.c
-@@ -1405,7 +1405,6 @@ at86rf230_detect_device(struct at86rf230_local *lp)
- 		return -EINVAL;
- 	}
- 
--	lp->hw->extra_tx_headroom = 0;
- 	lp->hw->flags = IEEE802154_HW_TX_OMIT_CKSUM | IEEE802154_HW_AACK |
- 			IEEE802154_HW_TXPOWER | IEEE802154_HW_ARET |
- 			IEEE802154_HW_AFILT | IEEE802154_HW_PROMISCUOUS;
--- 
-2.1.3
+I applied patches 1-3 and 5 to bluetooth-next tree.
+
+The patch 4 does not apply and so please re-send a new version.
+
+Regards
+
+Marcel
 
