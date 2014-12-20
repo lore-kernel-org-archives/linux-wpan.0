@@ -1,35 +1,55 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from senator.holtmann.net ([87.106.208.187]:50912 "EHLO
-	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751570AbaL3GRs convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Tue, 30 Dec 2014 01:17:48 -0500
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
-Subject: Re: [PATCH 3/3] net: ieee802154: don't use devm_pinctrl_get_select_default() in probe
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1419286616-9893-3-git-send-email-wsa@the-dreams.de>
-Date: Mon, 29 Dec 2014 22:17:43 -0800
-Content-Transfer-Encoding: 8BIT
-Message-Id: <6FEBBFCF-765F-4324-A9B1-92E47826F24A@holtmann.org>
-References: <1419286616-9893-1-git-send-email-wsa@the-dreams.de> <1419286616-9893-3-git-send-email-wsa@the-dreams.de>
+Received: from mail-wg0-f41.google.com ([74.125.82.41]:42787 "EHLO
+	mail-wg0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750973AbaLTOF3 (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Sat, 20 Dec 2014 09:05:29 -0500
+Received: by mail-wg0-f41.google.com with SMTP id y19so3470913wgg.14
+        for <linux-wpan@vger.kernel.org>; Sat, 20 Dec 2014 06:05:26 -0800 (PST)
+From: Alexander Aring <alex.aring@gmail.com>
+Subject: [PATCH bluetooth-next 0/5] ieee802154: structural directory changes
+Date: Sat, 20 Dec 2014 15:04:55 +0100
+Message-Id: <1419084300-29069-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Wolfram Sang <wsa@the-dreams.de>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-gpio@vger.kernel.org, Varka Bhadram <varkabhadram@gmail.com>, Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org, netdev@vger.kernel.org
+To: linux-wpan@vger.kernel.org
+Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-Hi Wolfram,
+This patch series contains structural changes according the ieee802154
+directory. The current situation is that this directory contains stuff
+about ieee802154 6lowpan, ieee802154 address family and netlink interface.
+This patch series introduce now sub directories for 6lowpan and af802154
+implementation to getting a better overview about these implementations.
+The ieee802154 directory contains stuff for nl802154, netlink and sysfs
+only.
 
-> Since commit ab78029ecc34 (drivers/pinctrl: grab default handles from device
-> core), we can rely on device core for setting the default pins.
-> 
-> Signed-off-by: Wolfram Sang <wsa@the-dreams.de>
-> ---
-> drivers/net/ieee802154/cc2520.c | 7 -------
-> 1 file changed, 7 deletions(-)
+Alexander Aring (5):
+  ieee802154: create af802154 sub-directory
+  ieee802154: af802154: rename internal header
+  ieee802154: af802154: rename af_ieee802154 to core
+  ieee802154: create 6lowpan sub-directory
+  ieee802154: 6lowpan: rename internal header
 
-patch has been applied to bluetooth-next tree.
+ net/ieee802154/{reassembly.h => 6lowpan/6lowpan_i.h} | 6 +++---
+ net/ieee802154/{ => 6lowpan}/6lowpan_rtnl.c          | 2 +-
+ net/ieee802154/6lowpan/Makefile                      | 3 +++
+ net/ieee802154/{ => 6lowpan}/reassembly.c            | 2 +-
+ net/ieee802154/Makefile                              | 6 ++----
+ net/ieee802154/af802154/Makefile                     | 3 +++
+ net/ieee802154/{af802154.h => af802154/af802154_i.h} | 6 +++---
+ net/ieee802154/{af_ieee802154.c => af802154/core.c}  | 2 +-
+ net/ieee802154/{ => af802154}/dgram.c                | 2 +-
+ net/ieee802154/{ => af802154}/raw.c                  | 2 +-
+ 10 files changed, 19 insertions(+), 15 deletions(-)
+ rename net/ieee802154/{reassembly.h => 6lowpan/6lowpan_i.h} (85%)
+ rename net/ieee802154/{ => 6lowpan}/6lowpan_rtnl.c (99%)
+ create mode 100644 net/ieee802154/6lowpan/Makefile
+ rename net/ieee802154/{ => 6lowpan}/reassembly.c (99%)
+ create mode 100644 net/ieee802154/af802154/Makefile
+ rename net/ieee802154/{af802154.h => af802154/af802154_i.h} (93%)
+ rename net/ieee802154/{af_ieee802154.c => af802154/core.c} (99%)
+ rename net/ieee802154/{ => af802154}/dgram.c (99%)
+ rename net/ieee802154/{ => af802154}/raw.c (99%)
 
-Regards
-
-Marcel
+-- 
+2.2.0
 
