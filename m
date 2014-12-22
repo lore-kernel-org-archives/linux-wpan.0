@@ -1,38 +1,59 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from senator.holtmann.net ([87.106.208.187]:50844 "EHLO
-	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751374AbaL3GRp (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Tue, 30 Dec 2014 01:17:45 -0500
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
-Subject: Re: [PATCH bluetooth-next 0/3] Fixes and cleanup for CC2520
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1419569020-5410-1-git-send-email-varkab@cdac.in>
-Date: Mon, 29 Dec 2014 22:17:40 -0800
-Content-Transfer-Encoding: 7bit
-Message-Id: <4A7EA6DD-461D-4681-8FAA-2231796BC257@holtmann.org>
-References: <1419569020-5410-1-git-send-email-varkab@cdac.in>
+Received: from sauhun.de ([89.238.76.85]:53783 "EHLO pokefinder.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1755726AbaLVWRh (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+	Mon, 22 Dec 2014 17:17:37 -0500
+From: Wolfram Sang <wsa@the-dreams.de>
+Subject: [PATCH 3/3] net: ieee802154: don't use devm_pinctrl_get_select_default() in probe
+Date: Mon, 22 Dec 2014 23:16:55 +0100
+Message-Id: <1419286616-9893-3-git-send-email-wsa@the-dreams.de>
+In-Reply-To: <1419286616-9893-1-git-send-email-wsa@the-dreams.de>
+References: <1419286616-9893-1-git-send-email-wsa@the-dreams.de>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Varka Bhadram <varkabhadram@gmail.com>
-Cc: linux-wpan@vger.kernel.org, Alexander Aring <alex.aring@gmail.com>, Varka Bhadram <varkab@cdac.in>
+To: linux-kernel@vger.kernel.org
+Cc: linux-gpio@vger.kernel.org, Wolfram Sang <wsa@the-dreams.de>, Varka Bhadram <varkabhadram@gmail.com>, Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org, netdev@vger.kernel.org
 
-Hi Varka,
+Since commit ab78029ecc34 (drivers/pinctrl: grab default handles from device
+core), we can rely on device core for setting the default pins.
 
-> This series will introduce some cleanup code and fix for having
-> zero perm_extended_addr address.
-> 
-> Varka Bhadram (3):
->  cc2520: use devm_kzalloc(.., sizeof(*pointer), ..) pattern
->  cc2520: remove 'ret' goto label
->  cc2520: fix zero perm_extended_addr address
-> 
-> drivers/net/ieee802154/cc2520.c |   18 ++++++------------
-> 1 file changed, 6 insertions(+), 12 deletions(-)
+Signed-off-by: Wolfram Sang <wsa@the-dreams.de>
+---
+ drivers/net/ieee802154/cc2520.c | 7 -------
+ 1 file changed, 7 deletions(-)
 
-all 3 patches have been applied to bluetooth-next tree.
-
-Regards
-
-Marcel
+diff --git a/drivers/net/ieee802154/cc2520.c b/drivers/net/ieee802154/cc2520.c
+index c2b7da3da183..033473448d9f 100644
+--- a/drivers/net/ieee802154/cc2520.c
++++ b/drivers/net/ieee802154/cc2520.c
+@@ -19,7 +19,6 @@
+ #include <linux/workqueue.h>
+ #include <linux/interrupt.h>
+ #include <linux/skbuff.h>
+-#include <linux/pinctrl/consumer.h>
+ #include <linux/of_gpio.h>
+ #include <linux/ieee802154.h>
+ 
+@@ -841,7 +840,6 @@ done:
+ static int cc2520_probe(struct spi_device *spi)
+ {
+ 	struct cc2520_private *priv;
+-	struct pinctrl *pinctrl;
+ 	struct cc2520_platform_data *pdata;
+ 	int ret;
+ 
+@@ -854,11 +852,6 @@ static int cc2520_probe(struct spi_device *spi)
+ 
+ 	spi_set_drvdata(spi, priv);
+ 
+-	pinctrl = devm_pinctrl_get_select_default(&spi->dev);
+-	if (IS_ERR(pinctrl))
+-		dev_warn(&spi->dev,
+-			 "pinctrl pins are not configured\n");
+-
+ 	pdata = cc2520_get_platform_data(spi);
+ 	if (!pdata) {
+ 		dev_err(&spi->dev, "no platform data\n");
+-- 
+2.1.3
 
