@@ -1,45 +1,63 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wg0-f46.google.com ([74.125.82.46]:58150 "EHLO
-	mail-wg0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755351AbaLWKa4 (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Tue, 23 Dec 2014 05:30:56 -0500
-Received: by mail-wg0-f46.google.com with SMTP id x13so8734921wgg.33
-        for <linux-wpan@vger.kernel.org>; Tue, 23 Dec 2014 02:30:55 -0800 (PST)
-From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH bluetooth-next 3/3] ieee802154: 6lowpan: rename to core
-Date: Tue, 23 Dec 2014 11:30:11 +0100
-Message-Id: <1419330611-29410-4-git-send-email-alex.aring@gmail.com>
+Received: from mail-la0-f53.google.com ([209.85.215.53]:48933 "EHLO
+	mail-la0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754798AbaLWKjE (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Tue, 23 Dec 2014 05:39:04 -0500
+Received: by mail-la0-f53.google.com with SMTP id gm9so5407867lab.12
+        for <linux-wpan@vger.kernel.org>; Tue, 23 Dec 2014 02:39:02 -0800 (PST)
+MIME-Version: 1.0
 In-Reply-To: <1419330611-29410-1-git-send-email-alex.aring@gmail.com>
 References: <1419330611-29410-1-git-send-email-alex.aring@gmail.com>
+Date: Tue, 23 Dec 2014 16:09:02 +0530
+Message-ID: <CAEUmHyYKMHmZ8aJWnMe7fOrOh8AxswtL0=TJpXeiy6YevresDw@mail.gmail.com>
+Subject: Re: [PATCH bluetooth-next 0/3] ieee802154: 6lowpan: separate
+ receive/transmit functionality
+From: Varka Bhadram <varkabhadram@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org
-Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
+To: Alexander Aring <alex.aring@gmail.com>
+Cc: linux-wpan - ML <linux-wpan@vger.kernel.org>, kernel@pengutronix.de
 
-This patch renames the 6lowpan_rtnl.c file to core.c. 6lowpan_rtnl.c
-contains functionality to put all 802.15.4 6LoWPAN functionality
-together. This is just keeping the same name convention like af802154.
+Hi Alex,
 
-Signed-off-by: Alexander Aring <alex.aring@gmail.com>
----
- net/ieee802154/6lowpan/Makefile                   | 2 +-
- net/ieee802154/6lowpan/{6lowpan_rtnl.c => core.c} | 0
- 2 files changed, 1 insertion(+), 1 deletion(-)
- rename net/ieee802154/6lowpan/{6lowpan_rtnl.c => core.c} (100%)
+On Tue, Dec 23, 2014 at 4:00 PM, Alexander Aring <alex.aring@gmail.com> wrote:
+> Hi,
+>
+> this patch series based on "ieee802154: structural directory changes" and
+> contains splitting of receive/transmit functionality in separate tx and rx
+> files. At least we rename the 6lowpan_rtnl to core which contains core
+> functionality for 802.15.4 6LoWPAN.
+>
+> Alexander Aring (3):
+>   ieee802154: 6lowpan: move receive functionality
+>   ieee802154: 6lowpan: move transmit functionality
+>   ieee802154: 6lowpan: rename to core
+>
+Nice work. By this change we can easily identify the Tx and Rx part separately.
 
-diff --git a/net/ieee802154/6lowpan/Makefile b/net/ieee802154/6lowpan/Makefile
-index 7f11c13..2f1b75a 100644
---- a/net/ieee802154/6lowpan/Makefile
-+++ b/net/ieee802154/6lowpan/Makefile
-@@ -1,3 +1,3 @@
- obj-y += ieee802154_6lowpan.o
- 
--ieee802154_6lowpan-y := 6lowpan_rtnl.o rx.o reassembly.o tx.o
-+ieee802154_6lowpan-y := core.o rx.o reassembly.o tx.o
-diff --git a/net/ieee802154/6lowpan/6lowpan_rtnl.c b/net/ieee802154/6lowpan/core.c
-similarity index 100%
-rename from net/ieee802154/6lowpan/6lowpan_rtnl.c
-rename to net/ieee802154/6lowpan/core.c
+Reviewed-by: Varka Bhadram <varkabhadram@gmail.com>
+
+>  net/ieee802154/6lowpan/6lowpan_i.h    |  31 ++
+>  net/ieee802154/6lowpan/6lowpan_rtnl.c | 729 ----------------------------------
+>  net/ieee802154/6lowpan/Makefile       |   2 +-
+>  net/ieee802154/6lowpan/core.c         | 304 ++++++++++++++
+>  net/ieee802154/6lowpan/rx.c           | 171 ++++++++
+>  net/ieee802154/6lowpan/tx.c           | 271 +++++++++++++
+>  6 files changed, 778 insertions(+), 730 deletions(-)
+>  delete mode 100644 net/ieee802154/6lowpan/6lowpan_rtnl.c
+>  create mode 100644 net/ieee802154/6lowpan/core.c
+>  create mode 100644 net/ieee802154/6lowpan/rx.c
+>  create mode 100644 net/ieee802154/6lowpan/tx.c
+>
+> --
+> 2.2.0
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-wpan" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
 -- 
-2.2.0
-
+Thanks and Regards,
+Varka Bhadram.
