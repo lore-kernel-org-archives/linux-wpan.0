@@ -1,44 +1,43 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from senator.holtmann.net ([87.106.208.187]:38575 "EHLO
-	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751355AbaLSXPP convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Fri, 19 Dec 2014 18:15:15 -0500
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
-Subject: Re: [PATCHv2 bluetooth-next 0/2] mac802154: iface: better concurrent iface handling
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1419029159-21554-1-git-send-email-alex.aring@gmail.com>
-Date: Sat, 20 Dec 2014 00:15:10 +0100
-Content-Transfer-Encoding: 8BIT
-Message-Id: <337AA17F-6261-48CC-95FC-32FAFF0EB8E5@holtmann.org>
-References: <1419029159-21554-1-git-send-email-alex.aring@gmail.com>
+Received: from mail-wi0-f173.google.com ([209.85.212.173]:62777 "EHLO
+	mail-wi0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750798AbaLWKav (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Tue, 23 Dec 2014 05:30:51 -0500
+Received: by mail-wi0-f173.google.com with SMTP id r20so10415497wiv.6
+        for <linux-wpan@vger.kernel.org>; Tue, 23 Dec 2014 02:30:50 -0800 (PST)
+From: Alexander Aring <alex.aring@gmail.com>
+Subject: [PATCH bluetooth-next 0/3] ieee802154: 6lowpan: separate receive/transmit functionality
+Date: Tue, 23 Dec 2014 11:30:08 +0100
+Message-Id: <1419330611-29410-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>
-Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de
+To: linux-wpan@vger.kernel.org
+Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-Hi Alex,
+Hi,
 
-> This patch series contains changes for a better multiple iface handling.
-> We have only one phy with several mac parameters like csma, aret, etc.
-> Currently it could be that one interface can overwrite these parameters
-> while ifup when another interface is currently running. To avoid that
-> we compare each parameter and check if differs, if not we allow to ifup
-> the interface.
-> 
-> changes since v2:
-> - fix mixed comments and variable declaration.
-> 
-> Alexander Aring (2):
->  mac802154: iface: check concurrent ifaces
->  ieee802154: iface: move multiple node type check
-> 
-> net/mac802154/iface.c | 100 +++++++++++++++++++++++++++++++++++++++++++-------
-> 1 file changed, 86 insertions(+), 14 deletions(-)
+this patch series based on "ieee802154: structural directory changes" and
+contains splitting of receive/transmit functionality in separate tx and rx
+files. At least we rename the 6lowpan_rtnl to core which contains core
+functionality for 802.15.4 6LoWPAN.
 
-both patches have been applied to bluetooth-next tree.
+Alexander Aring (3):
+  ieee802154: 6lowpan: move receive functionality
+  ieee802154: 6lowpan: move transmit functionality
+  ieee802154: 6lowpan: rename to core
 
-Regards
+ net/ieee802154/6lowpan/6lowpan_i.h    |  31 ++
+ net/ieee802154/6lowpan/6lowpan_rtnl.c | 729 ----------------------------------
+ net/ieee802154/6lowpan/Makefile       |   2 +-
+ net/ieee802154/6lowpan/core.c         | 304 ++++++++++++++
+ net/ieee802154/6lowpan/rx.c           | 171 ++++++++
+ net/ieee802154/6lowpan/tx.c           | 271 +++++++++++++
+ 6 files changed, 778 insertions(+), 730 deletions(-)
+ delete mode 100644 net/ieee802154/6lowpan/6lowpan_rtnl.c
+ create mode 100644 net/ieee802154/6lowpan/core.c
+ create mode 100644 net/ieee802154/6lowpan/rx.c
+ create mode 100644 net/ieee802154/6lowpan/tx.c
 
-Marcel
+-- 
+2.2.0
 
