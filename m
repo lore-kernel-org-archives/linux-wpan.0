@@ -1,40 +1,38 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-pa0-f49.google.com ([209.85.220.49]:60133 "EHLO
-	mail-pa0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750969AbaLZEsK (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Thu, 25 Dec 2014 23:48:10 -0500
-Received: by mail-pa0-f49.google.com with SMTP id eu11so12472372pac.8
-        for <linux-wpan@vger.kernel.org>; Thu, 25 Dec 2014 20:48:10 -0800 (PST)
-From: Varka Bhadram <varkabhadram@gmail.com>
-Subject: [PATCH bluetooth-next 3/3] cc2520: fix zero perm_extended_addr address
-Date: Fri, 26 Dec 2014 10:13:40 +0530
-Message-Id: <1419569020-5410-4-git-send-email-varkab@cdac.in>
+Received: from senator.holtmann.net ([87.106.208.187]:50844 "EHLO
+	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751374AbaL3GRp (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Tue, 30 Dec 2014 01:17:45 -0500
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
+Subject: Re: [PATCH bluetooth-next 0/3] Fixes and cleanup for CC2520
+From: Marcel Holtmann <marcel@holtmann.org>
 In-Reply-To: <1419569020-5410-1-git-send-email-varkab@cdac.in>
+Date: Mon, 29 Dec 2014 22:17:40 -0800
+Content-Transfer-Encoding: 7bit
+Message-Id: <4A7EA6DD-461D-4681-8FAA-2231796BC257@holtmann.org>
 References: <1419569020-5410-1-git-send-email-varkab@cdac.in>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org
-Cc: alex.aring@gmail.com, Varka Bhadram <varkab@cdac.in>
+To: Varka Bhadram <varkabhadram@gmail.com>
+Cc: linux-wpan@vger.kernel.org, Alexander Aring <alex.aring@gmail.com>, Varka Bhadram <varkab@cdac.in>
 
-It will remove the bug of havine zero perm_extended_addr address.
+Hi Varka,
 
-Signed-off-by: Varka Bhadram <varkab@cdac.in>
----
- drivers/net/ieee802154/cc2520.c |    1 +
- 1 file changed, 1 insertion(+)
+> This series will introduce some cleanup code and fix for having
+> zero perm_extended_addr address.
+> 
+> Varka Bhadram (3):
+>  cc2520: use devm_kzalloc(.., sizeof(*pointer), ..) pattern
+>  cc2520: remove 'ret' goto label
+>  cc2520: fix zero perm_extended_addr address
+> 
+> drivers/net/ieee802154/cc2520.c |   18 ++++++------------
+> 1 file changed, 6 insertions(+), 12 deletions(-)
 
-diff --git a/drivers/net/ieee802154/cc2520.c b/drivers/net/ieee802154/cc2520.c
-index 8344260..29bf329 100644
---- a/drivers/net/ieee802154/cc2520.c
-+++ b/drivers/net/ieee802154/cc2520.c
-@@ -651,6 +651,7 @@ static int cc2520_register(struct cc2520_private *priv)
- 	priv->hw->parent = &priv->spi->dev;
- 	priv->hw->extra_tx_headroom = 0;
- 	priv->hw->vif_data_size = sizeof(*priv);
-+	ieee802154_random_extended_addr(&priv->hw->phy->perm_extended_addr);
- 
- 	/* We do support only 2.4 Ghz */
- 	priv->hw->phy->channels_supported[0] = 0x7FFF800;
--- 
-1.7.9.5
+all 3 patches have been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
 
