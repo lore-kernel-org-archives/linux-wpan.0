@@ -1,14 +1,14 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f180.google.com ([209.85.212.180]:34451 "EHLO
-	mail-wi0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751748AbaLaSjm (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Wed, 31 Dec 2014 13:39:42 -0500
-Received: by mail-wi0-f180.google.com with SMTP id n3so25935117wiv.1
-        for <linux-wpan@vger.kernel.org>; Wed, 31 Dec 2014 10:39:41 -0800 (PST)
+Received: from mail-wg0-f41.google.com ([74.125.82.41]:49021 "EHLO
+	mail-wg0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751761AbaLaSjn (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Wed, 31 Dec 2014 13:39:43 -0500
+Received: by mail-wg0-f41.google.com with SMTP id y19so22366264wgg.14
+        for <linux-wpan@vger.kernel.org>; Wed, 31 Dec 2014 10:39:42 -0800 (PST)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH bluetooth-next 5/6] ieee802154: rename af_ieee802154.c to socket.c
-Date: Wed, 31 Dec 2014 19:39:12 +0100
-Message-Id: <1420051153-8673-6-git-send-email-alex.aring@gmail.com>
+Subject: [PATCH bluetooth-next 6/6] ieee802154: handle config as menuconfig
+Date: Wed, 31 Dec 2014 19:39:13 +0100
+Message-Id: <1420051153-8673-7-git-send-email-alex.aring@gmail.com>
 In-Reply-To: <1420051153-8673-1-git-send-email-alex.aring@gmail.com>
 References: <1420051153-8673-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
@@ -16,33 +16,48 @@ List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
 Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-This patch renames the "af_ieee802154.c" to "socket.c". This is just a
-cleanup to have a short name for it which describes the implementationm
-stuff more human understandable.
+This patch handles the IEEE802154 Kconfig entry as menuconfig.
+Furthermore we move this entry out of "Network Options" and put it into
+"Networking" where the other networking subsystems are. This requires a
+menuconfig entry like all other networking subsystems.
 
 Signed-off-by: Alexander Aring <alex.aring@gmail.com>
 ---
- net/ieee802154/Makefile                      | 2 +-
- net/ieee802154/{af_ieee802154.c => socket.c} | 0
- 2 files changed, 1 insertion(+), 1 deletion(-)
- rename net/ieee802154/{af_ieee802154.c => socket.c} (100%)
+ net/ieee802154/Kconfig | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/net/ieee802154/Makefile b/net/ieee802154/Makefile
-index e6ddfcd..88bde78 100644
---- a/net/ieee802154/Makefile
-+++ b/net/ieee802154/Makefile
-@@ -5,6 +5,6 @@ obj-$(CONFIG_IEEE802154_6LOWPAN) += ieee802154_6lowpan.o
- ieee802154_6lowpan-y := 6lowpan_rtnl.o reassembly.o
- ieee802154-y := netlink.o nl-mac.o nl-phy.o nl_policy.o core.o \
-                 header_ops.o sysfs.o nl802154.o
--ieee802154_socket-y := af_ieee802154.o
-+ieee802154_socket-y := socket.o
+diff --git a/net/ieee802154/Kconfig b/net/ieee802154/Kconfig
+index 98a190d..9ea0af4 100644
+--- a/net/ieee802154/Kconfig
++++ b/net/ieee802154/Kconfig
+@@ -1,4 +1,4 @@
+-config IEEE802154
++menuconfig IEEE802154
+ 	tristate "IEEE Std 802.15.4 Low-Rate Wireless Personal Area Networks support"
+ 	---help---
+ 	  IEEE Std 802.15.4 defines a low data rate, low power and low
+@@ -10,9 +10,10 @@ config IEEE802154
+ 	  Say Y here to compile LR-WPAN support into the kernel or say M to
+ 	  compile it as modules.
  
- ccflags-y += -D__CHECK_ENDIAN__
-diff --git a/net/ieee802154/af_ieee802154.c b/net/ieee802154/socket.c
-similarity index 100%
-rename from net/ieee802154/af_ieee802154.c
-rename to net/ieee802154/socket.c
++if IEEE802154
++
+ config IEEE802154_SOCKET
+ 	tristate "IEEE 802.15.4 socket interface"
+-	depends on IEEE802154
+ 	default y
+ 	---help---
+ 	  Socket interface for IEEE 802.15.4. Contains DGRAM sockets interface
+@@ -21,6 +22,8 @@ config IEEE802154_SOCKET
+ 
+ config IEEE802154_6LOWPAN
+ 	tristate "6lowpan support over IEEE 802.15.4"
+-	depends on IEEE802154 && 6LOWPAN
++	depends on 6LOWPAN
+ 	---help---
+ 	  IPv6 compression over IEEE 802.15.4.
++
++endif
 -- 
 2.2.0
 
