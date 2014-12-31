@@ -1,14 +1,14 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f177.google.com ([209.85.212.177]:51202 "EHLO
-	mail-wi0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751747AbaLaSjl (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Wed, 31 Dec 2014 13:39:41 -0500
-Received: by mail-wi0-f177.google.com with SMTP id l15so25918159wiw.10
-        for <linux-wpan@vger.kernel.org>; Wed, 31 Dec 2014 10:39:40 -0800 (PST)
+Received: from mail-wi0-f180.google.com ([209.85.212.180]:34451 "EHLO
+	mail-wi0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751748AbaLaSjm (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Wed, 31 Dec 2014 13:39:42 -0500
+Received: by mail-wi0-f180.google.com with SMTP id n3so25935117wiv.1
+        for <linux-wpan@vger.kernel.org>; Wed, 31 Dec 2014 10:39:41 -0800 (PST)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH bluetooth-next 4/6] ieee802154: socket: fix checkpatch issue
-Date: Wed, 31 Dec 2014 19:39:11 +0100
-Message-Id: <1420051153-8673-5-git-send-email-alex.aring@gmail.com>
+Subject: [PATCH bluetooth-next 5/6] ieee802154: rename af_ieee802154.c to socket.c
+Date: Wed, 31 Dec 2014 19:39:12 +0100
+Message-Id: <1420051153-8673-6-git-send-email-alex.aring@gmail.com>
 In-Reply-To: <1420051153-8673-1-git-send-email-alex.aring@gmail.com>
 References: <1420051153-8673-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
@@ -16,29 +16,33 @@ List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
 Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-This patch solves the following checkpatch issue:
-
-CHECK: Comparison to NULL could be written "skb"
-+		if (skb != NULL) {
+This patch renames the "af_ieee802154.c" to "socket.c". This is just a
+cleanup to have a short name for it which describes the implementationm
+stuff more human understandable.
 
 Signed-off-by: Alexander Aring <alex.aring@gmail.com>
 ---
- net/ieee802154/af_ieee802154.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/ieee802154/Makefile                      | 2 +-
+ net/ieee802154/{af_ieee802154.c => socket.c} | 0
+ 2 files changed, 1 insertion(+), 1 deletion(-)
+ rename net/ieee802154/{af_ieee802154.c => socket.c} (100%)
 
-diff --git a/net/ieee802154/af_ieee802154.c b/net/ieee802154/af_ieee802154.c
-index 64beb0b..2878d8c 100644
---- a/net/ieee802154/af_ieee802154.c
-+++ b/net/ieee802154/af_ieee802154.c
-@@ -560,7 +560,7 @@ static int dgram_ioctl(struct sock *sk, int cmd, unsigned long arg)
- 		amount = 0;
- 		spin_lock_bh(&sk->sk_receive_queue.lock);
- 		skb = skb_peek(&sk->sk_receive_queue);
--		if (skb != NULL) {
-+		if (skb) {
- 			/* We will only return the amount
- 			 * of this packet since that is all
- 			 * that will be read.
+diff --git a/net/ieee802154/Makefile b/net/ieee802154/Makefile
+index e6ddfcd..88bde78 100644
+--- a/net/ieee802154/Makefile
++++ b/net/ieee802154/Makefile
+@@ -5,6 +5,6 @@ obj-$(CONFIG_IEEE802154_6LOWPAN) += ieee802154_6lowpan.o
+ ieee802154_6lowpan-y := 6lowpan_rtnl.o reassembly.o
+ ieee802154-y := netlink.o nl-mac.o nl-phy.o nl_policy.o core.o \
+                 header_ops.o sysfs.o nl802154.o
+-ieee802154_socket-y := af_ieee802154.o
++ieee802154_socket-y := socket.o
+ 
+ ccflags-y += -D__CHECK_ENDIAN__
+diff --git a/net/ieee802154/af_ieee802154.c b/net/ieee802154/socket.c
+similarity index 100%
+rename from net/ieee802154/af_ieee802154.c
+rename to net/ieee802154/socket.c
 -- 
 2.2.0
 
