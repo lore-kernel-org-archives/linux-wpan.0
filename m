@@ -1,60 +1,49 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from senator.holtmann.net ([87.106.208.187]:33238 "EHLO
-	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752377AbbACAuO convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Fri, 2 Jan 2015 19:50:14 -0500
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
-Subject: Re: [PATCH bluetooth-next 0/6] ieee802154: kconfig entries and socket handling
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1420051153-8673-1-git-send-email-alex.aring@gmail.com>
-Date: Fri, 2 Jan 2015 16:50:10 -0800
-Content-Transfer-Encoding: 8BIT
-Message-Id: <B49116CA-F068-4B9B-AF44-9502A1605CE3@holtmann.org>
-References: <1420051153-8673-1-git-send-email-alex.aring@gmail.com>
+Received: from mail-wi0-f176.google.com ([209.85.212.176]:38736 "EHLO
+	mail-wi0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750783AbbABOt6 (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Fri, 2 Jan 2015 09:49:58 -0500
+Received: by mail-wi0-f176.google.com with SMTP id ex7so27827222wid.15
+        for <linux-wpan@vger.kernel.org>; Fri, 02 Jan 2015 06:49:56 -0800 (PST)
+From: Alexander Aring <alex.aring@gmail.com>
+Subject: [PATCH bluetooth-next] mac802154: fix kbuild test robot warning
+Date: Fri,  2 Jan 2015 15:49:41 +0100
+Message-Id: <1420210181-9228-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>
-Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de
+To: linux-wpan@vger.kernel.org
+Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-Hi Alex,
+This patch fixs the following kbuild test robot warning:
 
-> this patch series contains some cleanups to put all related socket handling
-> functionality into one file. Also updates the Kconfig menu entries to
-> preparing a movement out of "Networking Options".
-> 
-> The last series contains patches to create an af802154 subdirectory. I removed
-> this way and but all things of af802154 (socket handling) into one file.
-> After this series I will send the still the 6lowpan changes to put it into
-> a 6lowpan subdirectory.
-> 
-> - Alex
-> 
-> Alexander Aring (6):
->  ieee802154: handle socket functionality as module
->  ieee802154: socket: change module name
->  ieee802154: socket: put handling into one file
->  ieee802154: socket: fix checkpatch issue
->  ieee802154: rename af_ieee802154.c to socket.c
->  ieee802154: handle config as menuconfig
-> 
-> net/ieee802154/Kconfig         |   16 +-
-> net/ieee802154/Makefile        |    5 +-
-> net/ieee802154/af802154.h      |   33 --
-> net/ieee802154/af_ieee802154.c |  369 -------------
-> net/ieee802154/dgram.c         |  549 --------------------
-> net/ieee802154/raw.c           |  270 ----------
-> net/ieee802154/socket.c        | 1125 ++++++++++++++++++++++++++++++++++++++++
-> 7 files changed, 1142 insertions(+), 1225 deletions(-)
-> delete mode 100644 net/ieee802154/af802154.h
-> delete mode 100644 net/ieee802154/af_ieee802154.c
-> delete mode 100644 net/ieee802154/dgram.c
-> delete mode 100644 net/ieee802154/raw.c
-> create mode 100644 net/ieee802154/socket.c
+coccinelle warnings: (new ones prefixed by >>)
 
-all 6 patches have been applied to bluetooth-next tree.
+>> net/mac802154/cfg.c:53:1-3: WARNING: PTR_ERR_OR_ZERO can be used
 
-Regards
+Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+---
+To return net_device here is for supporting still the deprecated functionality.
+When we remove the old netlink interface we will change the return type to int.
 
-Marcel
+ net/mac802154/cfg.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
+
+diff --git a/net/mac802154/cfg.c b/net/mac802154/cfg.c
+index 7d31da5..5d9f68c 100644
+--- a/net/mac802154/cfg.c
++++ b/net/mac802154/cfg.c
+@@ -51,10 +51,7 @@ ieee802154_add_iface(struct wpan_phy *phy, const char *name,
+ 	struct net_device *err;
+ 
+ 	err = ieee802154_if_add(local, name, type, extended_addr);
+-	if (IS_ERR(err))
+-		return PTR_ERR(err);
+-
+-	return 0;
++	return PTR_ERR_OR_ZERO(err);
+ }
+ 
+ static int
+-- 
+2.2.1
 
