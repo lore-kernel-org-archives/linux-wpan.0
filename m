@@ -1,67 +1,60 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f174.google.com ([209.85.212.174]:35440 "EHLO
-	mail-wi0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751537AbaLOIf2 (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Mon, 15 Dec 2014 03:35:28 -0500
-Received: by mail-wi0-f174.google.com with SMTP id h11so8060405wiw.1
-        for <linux-wpan@vger.kernel.org>; Mon, 15 Dec 2014 00:35:26 -0800 (PST)
-Date: Mon, 15 Dec 2014 09:35:21 +0100
-From: Alexander Aring <alex.aring@gmail.com>
-Subject: Re: [ANNOUNCE] wpan-tools 0.3 released
-Message-ID: <20141215083519.GA7153@omega>
-References: <20141207150814.GA9532@omega>
- <548487CF.4060009@fid4.com>
- <20141207171311.GB9532@omega>
- <20141207171903.GC9532@omega>
- <5484C900.2020402@fid4.com>
- <20141207215452.GB20260@omega>
- <5489B215.20707@fid4.com>
- <243b01d015e9$45bfdef0$d13f9cd0$@samsung.com>
- <20141213085537.GA31962@omega>
- <250601d01841$3a514590$aef3d0b0$@samsung.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <250601d01841$3a514590$aef3d0b0$@samsung.com>
+Received: from senator.holtmann.net ([87.106.208.187]:33238 "EHLO
+	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752377AbbACAuO convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Fri, 2 Jan 2015 19:50:14 -0500
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.1 \(1993\))
+Subject: Re: [PATCH bluetooth-next 0/6] ieee802154: kconfig entries and socket handling
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1420051153-8673-1-git-send-email-alex.aring@gmail.com>
+Date: Fri, 2 Jan 2015 16:50:10 -0800
+Content-Transfer-Encoding: 8BIT
+Message-Id: <B49116CA-F068-4B9B-AF44-9502A1605CE3@holtmann.org>
+References: <1420051153-8673-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Stefan Schmidt <s.schmidt@samsung.com>
-Cc: "'Michael C. Cambria'" <mcc@fid4.com>, linux-wpan@vger.kernel.org
+To: Alexander Aring <alex.aring@gmail.com>
+Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de
 
-On Mon, Dec 15, 2014 at 08:29:21AM +0000, Stefan Schmidt wrote:
-> >My idea is now, you have these sensor node (don't know if they are good
-> >to use) and the USB Stick. The RAVEN USB stick works like atusb but with
-> >a bigger mcu (more ram etc...) maybe you get this wireless kit and I
-> >think you could easy port the atusb firmware to this raven usb stick,
-> >just an idea. With dfu (I know you already an expert in dfu and the
-> >ported atusb firmware (maybe with tweaks because it contains a bigger
-> >mcu).
-> >
-> >Just an idea, I have one of the avr raven usb stick and they are much
-> >common as the atusb stick.
-> >
-> >For me the idea to have an atusb firmware for the avr raven usb stick
-> >sounds great. Maybe you will start the project "Most used open source
-> >firmware for 802.15.4 USB dongles". ;-)
+Hi Alex,
+
+> this patch series contains some cleanups to put all related socket handling
+> functionality into one file. Also updates the Kconfig menu entries to
+> preparing a movement out of "Networking Options".
 > 
-> The idea is interesting but for now I would like to focus on the Linux side
-> of things. Firmware hacking is not at the top of my list. :)
+> The last series contains patches to create an af802154 subdirectory. I removed
+> this way and but all things of af802154 (socket handling) into one file.
+> After this series I will send the still the 6lowpan changes to put it into
+> a 6lowpan subdirectory.
 > 
+> - Alex
+> 
+> Alexander Aring (6):
+>  ieee802154: handle socket functionality as module
+>  ieee802154: socket: change module name
+>  ieee802154: socket: put handling into one file
+>  ieee802154: socket: fix checkpatch issue
+>  ieee802154: rename af_ieee802154.c to socket.c
+>  ieee802154: handle config as menuconfig
+> 
+> net/ieee802154/Kconfig         |   16 +-
+> net/ieee802154/Makefile        |    5 +-
+> net/ieee802154/af802154.h      |   33 --
+> net/ieee802154/af_ieee802154.c |  369 -------------
+> net/ieee802154/dgram.c         |  549 --------------------
+> net/ieee802154/raw.c           |  270 ----------
+> net/ieee802154/socket.c        | 1125 ++++++++++++++++++++++++++++++++++++++++
+> 7 files changed, 1142 insertions(+), 1225 deletions(-)
+> delete mode 100644 net/ieee802154/af802154.h
+> delete mode 100644 net/ieee802154/af_ieee802154.c
+> delete mode 100644 net/ieee802154/dgram.c
+> delete mode 100644 net/ieee802154/raw.c
+> create mode 100644 net/ieee802154/socket.c
 
-oh, I can help you with firmware hacking. Just we both have atusb and
-avr raven sticks. But too many things need to be done.
+all 6 patches have been applied to bluetooth-next tree.
 
-I think with the avr raven sticks we get an huge increment of users for
-this stack.
+Regards
 
-Okay here's the deal:
+Marcel
 
-I wait until you finished the atusb firmware hacking, then I will check
-how possible it is to port the atusb to the raven stick. Maybe I can
-comibine it with some course at my university so I have _really_ time
-for it.
-
-I could try it to market it as "master project", but seems that is not
-science enough. (And I would be fast done with that.)
-
-- Alex
