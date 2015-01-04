@@ -1,67 +1,63 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f171.google.com ([209.85.212.171]:40319 "EHLO
-	mail-wi0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932569AbbAFTpE (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Tue, 6 Jan 2015 14:45:04 -0500
-Received: by mail-wi0-f171.google.com with SMTP id bs8so6048388wib.16
-        for <linux-wpan@vger.kernel.org>; Tue, 06 Jan 2015 11:45:02 -0800 (PST)
-Date: Tue, 6 Jan 2015 20:44:56 +0100
+Received: from mail-wg0-f43.google.com ([74.125.82.43]:61254 "EHLO
+	mail-wg0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752647AbbADQLJ (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Sun, 4 Jan 2015 11:11:09 -0500
+Received: by mail-wg0-f43.google.com with SMTP id k14so8554327wgh.16
+        for <linux-wpan@vger.kernel.org>; Sun, 04 Jan 2015 08:11:08 -0800 (PST)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: Re: [ANNOUNCE] wpan-tools 0.3 released
-Message-ID: <20150106194453.GB10133@omega>
-References: <20141207150814.GA9532@omega>
- <548487CF.4060009@fid4.com>
- <20141207171311.GB9532@omega>
- <20141207171903.GC9532@omega>
- <5484C900.2020402@fid4.com>
- <20141207215452.GB20260@omega>
- <5489B215.20707@fid4.com>
- <20141211163116.GA21527@omega>
- <CAFUtXGwgjGRikSS3tkzb++A9RCP4vgez2JQQLzbAGxLK06d6Hw@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAFUtXGwgjGRikSS3tkzb++A9RCP4vgez2JQQLzbAGxLK06d6Hw@mail.gmail.com>
+Subject: [PATCH bluetooth-next 0/5] ieee802154: structural directory changes
+Date: Sun,  4 Jan 2015 17:10:52 +0100
+Message-Id: <1420387857-32029-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Maciej Wasilak <wasilak@gmail.com>
-Cc: "Michael C. Cambria" <mcc@fid4.com>, linux-wpan@vger.kernel.org
+To: linux-wpan@vger.kernel.org
+Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-Hi,
+This patch series contains patches to create a 6lowpan sub-directory inside
+ieee802154. At least we handle receive and transmit functionality in separate
+files.
 
-Hi,
+This series based on previous the previous series:
 
-On Tue, Jan 06, 2015 at 08:18:25PM +0100, Maciej Wasilak wrote:
-...
-> 
-> I can create lowpan interface without problems (sudo ip link add link
-> wpan0 name lowpan0 type lowpan). It sends valid 6LoWPAN packets (I use
-> external sniffer), but pan_id remains 0xffff.
-> 
-> When I use old linux-wpan-next branch and old lowpan-tools, problem
-> doesn't occur.
-> 
+"ieee802154: 6lowpan: separate receive/transmit functionality" and
+"ieee802154: structural directory changes".
 
-Which wpan-tools version do you use? Can you please try the newest
-version which can be found at [0].
-
-I did some changes according the new nl802154 uapi header, means enum
-structural changes. Sorry about that, I suppose that's your problem.
-
-Can you please try to update your wpan-tools or simple use the actual
-one at [1].
-
-If this doesn't help I don't know why you have this issue. The ifdown of
-your wpan interface should fix the -EBUSY issue.
-
-
-btw:
-We return -EBUSY because the address filter is set on an interface up,
-while interface up it's not easy to deal address filtering changes, also
-we can remove some hotpath locks because these values are readonly at
-tx/rx paths. These locks are still there and will be removed later.
+I changed PATCH 1/5 "ieee802154: create 6lowpan sub-directory" only to source
+the "net/ieee802154/6lowpan/Kconfig" file. Furthermore there will more options
+like debugfs etc... available for ieee802154 6lowpan functionality.
 
 - Alex
 
-[0] http://wpan.cakelab.org/releases/
-[1] https://github.com/linux-wpan/wpan-tools
+Alexander Aring (5):
+  ieee802154: create 6lowpan sub-directory
+  ieee802154: 6lowpan: rename internal header
+  ieee802154: 6lowpan: move receive functionality
+  ieee802154: 6lowpan: move transmit functionality
+  ieee802154: 6lowpan: rename to core
+
+ net/ieee802154/6lowpan/6lowpan_i.h        |  72 +++
+ net/ieee802154/6lowpan/Kconfig            |   5 +
+ net/ieee802154/6lowpan/Makefile           |   3 +
+ net/ieee802154/6lowpan/core.c             | 304 +++++++++++++
+ net/ieee802154/{ => 6lowpan}/reassembly.c |   2 +-
+ net/ieee802154/6lowpan/rx.c               | 171 +++++++
+ net/ieee802154/6lowpan/tx.c               | 271 +++++++++++
+ net/ieee802154/6lowpan_rtnl.c             | 729 ------------------------------
+ net/ieee802154/Kconfig                    |   6 +-
+ net/ieee802154/Makefile                   |   3 +-
+ net/ieee802154/reassembly.h               |  41 --
+ 11 files changed, 829 insertions(+), 778 deletions(-)
+ create mode 100644 net/ieee802154/6lowpan/6lowpan_i.h
+ create mode 100644 net/ieee802154/6lowpan/Kconfig
+ create mode 100644 net/ieee802154/6lowpan/Makefile
+ create mode 100644 net/ieee802154/6lowpan/core.c
+ rename net/ieee802154/{ => 6lowpan}/reassembly.c (99%)
+ create mode 100644 net/ieee802154/6lowpan/rx.c
+ create mode 100644 net/ieee802154/6lowpan/tx.c
+ delete mode 100644 net/ieee802154/6lowpan_rtnl.c
+ delete mode 100644 net/ieee802154/reassembly.h
+
+-- 
+2.2.1
+
