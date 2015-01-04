@@ -1,14 +1,14 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f176.google.com ([209.85.212.176]:42322 "EHLO
-	mail-wi0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752647AbbADQLM (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Sun, 4 Jan 2015 11:11:12 -0500
-Received: by mail-wi0-f176.google.com with SMTP id ex7so1930121wid.3
-        for <linux-wpan@vger.kernel.org>; Sun, 04 Jan 2015 08:11:11 -0800 (PST)
+Received: from mail-we0-f173.google.com ([74.125.82.173]:38419 "EHLO
+	mail-we0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752647AbbADQLO (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Sun, 4 Jan 2015 11:11:14 -0500
+Received: by mail-we0-f173.google.com with SMTP id q58so6715794wes.18
+        for <linux-wpan@vger.kernel.org>; Sun, 04 Jan 2015 08:11:13 -0800 (PST)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH bluetooth-next 2/5] ieee802154: 6lowpan: rename internal header
-Date: Sun,  4 Jan 2015 17:10:54 +0100
-Message-Id: <1420387857-32029-3-git-send-email-alex.aring@gmail.com>
+Subject: [PATCH bluetooth-next 3/5] ieee802154: 6lowpan: move receive functionality
+Date: Sun,  4 Jan 2015 17:10:55 +0100
+Message-Id: <1420387857-32029-4-git-send-email-alex.aring@gmail.com>
 In-Reply-To: <1420387857-32029-1-git-send-email-alex.aring@gmail.com>
 References: <1420387857-32029-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
@@ -16,66 +16,466 @@ List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
 Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-This patch renames the internal header for af802154. This naming
-convention is like ieee802154_i.h in mac802154 and avoids naming
-confusing with the global af802154 header. Furthermore this header
-contains more ieee802154 specific definitions.
+This patch moves all relevant receive functionality into a separate rx.c
+file. We can simple separate this functionality like we did it in mac802154.
 
 Signed-off-by: Alexander Aring <alex.aring@gmail.com>
 ---
- net/ieee802154/6lowpan/{reassembly.h => 6lowpan_i.h} | 6 +++---
- net/ieee802154/6lowpan/6lowpan_rtnl.c                | 2 +-
- net/ieee802154/6lowpan/reassembly.c                  | 2 +-
- 3 files changed, 5 insertions(+), 5 deletions(-)
- rename net/ieee802154/6lowpan/{reassembly.h => 6lowpan_i.h} (85%)
+ net/ieee802154/6lowpan/6lowpan_i.h    |  25 +++++
+ net/ieee802154/6lowpan/6lowpan_rtnl.c | 169 +--------------------------------
+ net/ieee802154/6lowpan/Makefile       |   2 +-
+ net/ieee802154/6lowpan/rx.c           | 171 ++++++++++++++++++++++++++++++++++
+ 4 files changed, 200 insertions(+), 167 deletions(-)
+ create mode 100644 net/ieee802154/6lowpan/rx.c
 
-diff --git a/net/ieee802154/6lowpan/reassembly.h b/net/ieee802154/6lowpan/6lowpan_i.h
-similarity index 85%
-rename from net/ieee802154/6lowpan/reassembly.h
-rename to net/ieee802154/6lowpan/6lowpan_i.h
-index 836b16f..edbe803 100644
---- a/net/ieee802154/6lowpan/reassembly.h
+diff --git a/net/ieee802154/6lowpan/6lowpan_i.h b/net/ieee802154/6lowpan/6lowpan_i.h
+index edbe803..29ec61b 100644
+--- a/net/ieee802154/6lowpan/6lowpan_i.h
 +++ b/net/ieee802154/6lowpan/6lowpan_i.h
-@@ -1,5 +1,5 @@
--#ifndef __IEEE802154_6LOWPAN_REASSEMBLY_H__
--#define __IEEE802154_6LOWPAN_REASSEMBLY_H__
-+#ifndef __IEEE802154_6LOWPAN_I_H__
-+#define __IEEE802154_6LOWPAN_I_H__
+@@ -1,6 +1,8 @@
+ #ifndef __IEEE802154_6LOWPAN_I_H__
+ #define __IEEE802154_6LOWPAN_I_H__
  
++#include <linux/list.h>
++
  #include <net/inet_frag.h>
  
-@@ -38,4 +38,4 @@ int lowpan_frag_rcv(struct sk_buff *skb, const u8 frag_type);
+ struct lowpan_create_arg {
+@@ -34,8 +36,31 @@ static inline u32 ieee802154_addr_hash(const struct ieee802154_addr *a)
+ 	}
+ }
+ 
++struct lowpan_dev_record {
++	struct net_device *ldev;
++	struct list_head list;
++};
++
++/* private device info */
++struct lowpan_dev_info {
++	struct net_device	*real_dev; /* real WPAN device ptr */
++	struct mutex		dev_list_mtx; /* mutex for list ops */
++	u16			fragment_tag;
++};
++
++static inline struct
++lowpan_dev_info *lowpan_dev_info(const struct net_device *dev)
++{
++	return netdev_priv(dev);
++}
++
++extern struct list_head lowpan_devices;
++
+ int lowpan_frag_rcv(struct sk_buff *skb, const u8 frag_type);
  void lowpan_net_frag_exit(void);
  int lowpan_net_frag_init(void);
  
--#endif /* __IEEE802154_6LOWPAN_REASSEMBLY_H__ */
-+#endif /* __IEEE802154_6LOWPAN_I_H__ */
++void lowpan_rx_init(void);
++void lowpan_rx_exit(void);
++
+ #endif /* __IEEE802154_6LOWPAN_I_H__ */
 diff --git a/net/ieee802154/6lowpan/6lowpan_rtnl.c b/net/ieee802154/6lowpan/6lowpan_rtnl.c
-index 27eaa65..1918c43 100644
+index 1918c43..9dce20e 100644
 --- a/net/ieee802154/6lowpan/6lowpan_rtnl.c
 +++ b/net/ieee802154/6lowpan/6lowpan_rtnl.c
-@@ -55,7 +55,7 @@
- #include <net/6lowpan.h>
- #include <net/ipv6.h>
+@@ -57,21 +57,9 @@
  
--#include "reassembly.h"
-+#include "6lowpan_i.h"
+ #include "6lowpan_i.h"
  
- static LIST_HEAD(lowpan_devices);
+-static LIST_HEAD(lowpan_devices);
++LIST_HEAD(lowpan_devices);
  static int lowpan_open_count;
-diff --git a/net/ieee802154/6lowpan/reassembly.c b/net/ieee802154/6lowpan/reassembly.c
-index 9d980ed..f46e4d1 100644
---- a/net/ieee802154/6lowpan/reassembly.c
-+++ b/net/ieee802154/6lowpan/reassembly.c
-@@ -28,7 +28,7 @@
- #include <net/ipv6.h>
- #include <net/inet_frag.h>
  
--#include "reassembly.h"
+-/* private device info */
+-struct lowpan_dev_info {
+-	struct net_device	*real_dev; /* real WPAN device ptr */
+-	struct mutex		dev_list_mtx; /* mutex for list ops */
+-	u16			fragment_tag;
+-};
+-
+-struct lowpan_dev_record {
+-	struct net_device *ldev;
+-	struct list_head list;
+-};
+-
+ /* don't save pan id, it's intra pan */
+ struct lowpan_addr {
+ 	u8 mode;
+@@ -88,12 +76,6 @@ struct lowpan_addr_info {
+ };
+ 
+ static inline struct
+-lowpan_dev_info *lowpan_dev_info(const struct net_device *dev)
+-{
+-	return netdev_priv(dev);
+-}
+-
+-static inline struct
+ lowpan_addr_info *lowpan_skb_priv(const struct sk_buff *skb)
+ {
+ 	WARN_ON_ONCE(skb_headroom(skb) < sizeof(struct lowpan_addr_info));
+@@ -134,74 +116,6 @@ static int lowpan_header_create(struct sk_buff *skb, struct net_device *dev,
+ 	return 0;
+ }
+ 
+-static int lowpan_give_skb_to_devices(struct sk_buff *skb,
+-				      struct net_device *dev)
+-{
+-	struct lowpan_dev_record *entry;
+-	struct sk_buff *skb_cp;
+-	int stat = NET_RX_SUCCESS;
+-
+-	skb->protocol = htons(ETH_P_IPV6);
+-	skb->pkt_type = PACKET_HOST;
+-
+-	rcu_read_lock();
+-	list_for_each_entry_rcu(entry, &lowpan_devices, list)
+-		if (lowpan_dev_info(entry->ldev)->real_dev == skb->dev) {
+-			skb_cp = skb_copy(skb, GFP_ATOMIC);
+-			if (!skb_cp) {
+-				kfree_skb(skb);
+-				rcu_read_unlock();
+-				return NET_RX_DROP;
+-			}
+-
+-			skb_cp->dev = entry->ldev;
+-			stat = netif_rx(skb_cp);
+-			if (stat == NET_RX_DROP)
+-				break;
+-		}
+-	rcu_read_unlock();
+-
+-	consume_skb(skb);
+-
+-	return stat;
+-}
+-
+-static int
+-iphc_decompress(struct sk_buff *skb, const struct ieee802154_hdr *hdr)
+-{
+-	u8 iphc0, iphc1;
+-	struct ieee802154_addr_sa sa, da;
+-	void *sap, *dap;
+-
+-	raw_dump_table(__func__, "raw skb data dump", skb->data, skb->len);
+-	/* at least two bytes will be used for the encoding */
+-	if (skb->len < 2)
+-		return -EINVAL;
+-
+-	if (lowpan_fetch_skb_u8(skb, &iphc0))
+-		return -EINVAL;
+-
+-	if (lowpan_fetch_skb_u8(skb, &iphc1))
+-		return -EINVAL;
+-
+-	ieee802154_addr_to_sa(&sa, &hdr->source);
+-	ieee802154_addr_to_sa(&da, &hdr->dest);
+-
+-	if (sa.addr_type == IEEE802154_ADDR_SHORT)
+-		sap = &sa.short_addr;
+-	else
+-		sap = &sa.hwaddr;
+-
+-	if (da.addr_type == IEEE802154_ADDR_SHORT)
+-		dap = &da.short_addr;
+-	else
+-		dap = &da.hwaddr;
+-
+-	return lowpan_header_decompress(skb, skb->dev, sap, sa.addr_type,
+-					IEEE802154_ADDR_LEN, dap, da.addr_type,
+-					IEEE802154_ADDR_LEN, iphc0, iphc1);
+-}
+-
+ static struct sk_buff*
+ lowpan_alloc_frag(struct sk_buff *skb, int size,
+ 		  const struct ieee802154_hdr *master_hdr)
+@@ -485,83 +399,6 @@ static int lowpan_validate(struct nlattr *tb[], struct nlattr *data[])
+ 	return 0;
+ }
+ 
+-static int lowpan_rcv(struct sk_buff *skb, struct net_device *dev,
+-		      struct packet_type *pt, struct net_device *orig_dev)
+-{
+-	struct ieee802154_hdr hdr;
+-	int ret;
+-
+-	skb = skb_share_check(skb, GFP_ATOMIC);
+-	if (!skb)
+-		goto drop;
+-
+-	if (!netif_running(dev))
+-		goto drop_skb;
+-
+-	if (skb->pkt_type == PACKET_OTHERHOST)
+-		goto drop_skb;
+-
+-	if (dev->type != ARPHRD_IEEE802154)
+-		goto drop_skb;
+-
+-	if (ieee802154_hdr_peek_addrs(skb, &hdr) < 0)
+-		goto drop_skb;
+-
+-	/* check that it's our buffer */
+-	if (skb->data[0] == LOWPAN_DISPATCH_IPV6) {
+-		/* Pull off the 1-byte of 6lowpan header. */
+-		skb_pull(skb, 1);
+-		return lowpan_give_skb_to_devices(skb, NULL);
+-	} else {
+-		switch (skb->data[0] & 0xe0) {
+-		case LOWPAN_DISPATCH_IPHC:	/* ipv6 datagram */
+-			ret = iphc_decompress(skb, &hdr);
+-			if (ret < 0)
+-				goto drop_skb;
+-
+-			return lowpan_give_skb_to_devices(skb, NULL);
+-		case LOWPAN_DISPATCH_FRAG1:	/* first fragment header */
+-			ret = lowpan_frag_rcv(skb, LOWPAN_DISPATCH_FRAG1);
+-			if (ret == 1) {
+-				ret = iphc_decompress(skb, &hdr);
+-				if (ret < 0)
+-					goto drop_skb;
+-
+-				return lowpan_give_skb_to_devices(skb, NULL);
+-			} else if (ret == -1) {
+-				return NET_RX_DROP;
+-			} else {
+-				return NET_RX_SUCCESS;
+-			}
+-		case LOWPAN_DISPATCH_FRAGN:	/* next fragments headers */
+-			ret = lowpan_frag_rcv(skb, LOWPAN_DISPATCH_FRAGN);
+-			if (ret == 1) {
+-				ret = iphc_decompress(skb, &hdr);
+-				if (ret < 0)
+-					goto drop_skb;
+-
+-				return lowpan_give_skb_to_devices(skb, NULL);
+-			} else if (ret == -1) {
+-				return NET_RX_DROP;
+-			} else {
+-				return NET_RX_SUCCESS;
+-			}
+-		default:
+-			break;
+-		}
+-	}
+-
+-drop_skb:
+-	kfree_skb(skb);
+-drop:
+-	return NET_RX_DROP;
+-}
+-
+-static struct packet_type lowpan_packet_type = {
+-	.type = htons(ETH_P_IEEE802154),
+-	.func = lowpan_rcv,
+-};
+-
+ static int lowpan_newlink(struct net *src_net, struct net_device *dev,
+ 			  struct nlattr *tb[], struct nlattr *data[])
+ {
+@@ -607,7 +444,7 @@ static int lowpan_newlink(struct net *src_net, struct net_device *dev,
+ 	ret = register_netdevice(dev);
+ 	if (ret >= 0) {
+ 		if (!lowpan_open_count)
+-			dev_add_pack(&lowpan_packet_type);
++			lowpan_rx_init();
+ 		lowpan_open_count++;
+ 	}
+ 
+@@ -624,7 +461,7 @@ static void lowpan_dellink(struct net_device *dev, struct list_head *head)
+ 
+ 	lowpan_open_count--;
+ 	if (!lowpan_open_count)
+-		dev_remove_pack(&lowpan_packet_type);
++		lowpan_rx_exit();
+ 
+ 	mutex_lock(&lowpan_dev_info(dev)->dev_list_mtx);
+ 	list_for_each_entry_safe(entry, tmp, &lowpan_devices, list) {
+diff --git a/net/ieee802154/6lowpan/Makefile b/net/ieee802154/6lowpan/Makefile
+index 936959b..8e83971 100644
+--- a/net/ieee802154/6lowpan/Makefile
++++ b/net/ieee802154/6lowpan/Makefile
+@@ -1,3 +1,3 @@
+ obj-y += ieee802154_6lowpan.o
+ 
+-ieee802154_6lowpan-y := 6lowpan_rtnl.o reassembly.o
++ieee802154_6lowpan-y := 6lowpan_rtnl.o rx.o reassembly.o
+diff --git a/net/ieee802154/6lowpan/rx.c b/net/ieee802154/6lowpan/rx.c
+new file mode 100644
+index 0000000..4be1d28
+--- /dev/null
++++ b/net/ieee802154/6lowpan/rx.c
+@@ -0,0 +1,171 @@
++/* This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2
++ * as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ */
++
++#include <linux/if_arp.h>
++
++#include <net/6lowpan.h>
++#include <net/ieee802154_netdev.h>
++
 +#include "6lowpan_i.h"
- 
- static const char lowpan_frags_cache_name[] = "lowpan-frags";
- 
++
++static int lowpan_give_skb_to_devices(struct sk_buff *skb,
++				      struct net_device *dev)
++{
++	struct lowpan_dev_record *entry;
++	struct sk_buff *skb_cp;
++	int stat = NET_RX_SUCCESS;
++
++	skb->protocol = htons(ETH_P_IPV6);
++	skb->pkt_type = PACKET_HOST;
++
++	rcu_read_lock();
++	list_for_each_entry_rcu(entry, &lowpan_devices, list)
++		if (lowpan_dev_info(entry->ldev)->real_dev == skb->dev) {
++			skb_cp = skb_copy(skb, GFP_ATOMIC);
++			if (!skb_cp) {
++				kfree_skb(skb);
++				rcu_read_unlock();
++				return NET_RX_DROP;
++			}
++
++			skb_cp->dev = entry->ldev;
++			stat = netif_rx(skb_cp);
++			if (stat == NET_RX_DROP)
++				break;
++		}
++	rcu_read_unlock();
++
++	consume_skb(skb);
++
++	return stat;
++}
++
++static int
++iphc_decompress(struct sk_buff *skb, const struct ieee802154_hdr *hdr)
++{
++	u8 iphc0, iphc1;
++	struct ieee802154_addr_sa sa, da;
++	void *sap, *dap;
++
++	raw_dump_table(__func__, "raw skb data dump", skb->data, skb->len);
++	/* at least two bytes will be used for the encoding */
++	if (skb->len < 2)
++		return -EINVAL;
++
++	if (lowpan_fetch_skb_u8(skb, &iphc0))
++		return -EINVAL;
++
++	if (lowpan_fetch_skb_u8(skb, &iphc1))
++		return -EINVAL;
++
++	ieee802154_addr_to_sa(&sa, &hdr->source);
++	ieee802154_addr_to_sa(&da, &hdr->dest);
++
++	if (sa.addr_type == IEEE802154_ADDR_SHORT)
++		sap = &sa.short_addr;
++	else
++		sap = &sa.hwaddr;
++
++	if (da.addr_type == IEEE802154_ADDR_SHORT)
++		dap = &da.short_addr;
++	else
++		dap = &da.hwaddr;
++
++	return lowpan_header_decompress(skb, skb->dev, sap, sa.addr_type,
++					IEEE802154_ADDR_LEN, dap, da.addr_type,
++					IEEE802154_ADDR_LEN, iphc0, iphc1);
++}
++
++static int lowpan_rcv(struct sk_buff *skb, struct net_device *dev,
++		      struct packet_type *pt, struct net_device *orig_dev)
++{
++	struct ieee802154_hdr hdr;
++	int ret;
++
++	skb = skb_share_check(skb, GFP_ATOMIC);
++	if (!skb)
++		goto drop;
++
++	if (!netif_running(dev))
++		goto drop_skb;
++
++	if (skb->pkt_type == PACKET_OTHERHOST)
++		goto drop_skb;
++
++	if (dev->type != ARPHRD_IEEE802154)
++		goto drop_skb;
++
++	if (ieee802154_hdr_peek_addrs(skb, &hdr) < 0)
++		goto drop_skb;
++
++	/* check that it's our buffer */
++	if (skb->data[0] == LOWPAN_DISPATCH_IPV6) {
++		/* Pull off the 1-byte of 6lowpan header. */
++		skb_pull(skb, 1);
++		return lowpan_give_skb_to_devices(skb, NULL);
++	} else {
++		switch (skb->data[0] & 0xe0) {
++		case LOWPAN_DISPATCH_IPHC:	/* ipv6 datagram */
++			ret = iphc_decompress(skb, &hdr);
++			if (ret < 0)
++				goto drop_skb;
++
++			return lowpan_give_skb_to_devices(skb, NULL);
++		case LOWPAN_DISPATCH_FRAG1:	/* first fragment header */
++			ret = lowpan_frag_rcv(skb, LOWPAN_DISPATCH_FRAG1);
++			if (ret == 1) {
++				ret = iphc_decompress(skb, &hdr);
++				if (ret < 0)
++					goto drop_skb;
++
++				return lowpan_give_skb_to_devices(skb, NULL);
++			} else if (ret == -1) {
++				return NET_RX_DROP;
++			} else {
++				return NET_RX_SUCCESS;
++			}
++		case LOWPAN_DISPATCH_FRAGN:	/* next fragments headers */
++			ret = lowpan_frag_rcv(skb, LOWPAN_DISPATCH_FRAGN);
++			if (ret == 1) {
++				ret = iphc_decompress(skb, &hdr);
++				if (ret < 0)
++					goto drop_skb;
++
++				return lowpan_give_skb_to_devices(skb, NULL);
++			} else if (ret == -1) {
++				return NET_RX_DROP;
++			} else {
++				return NET_RX_SUCCESS;
++			}
++		default:
++			break;
++		}
++	}
++
++drop_skb:
++	kfree_skb(skb);
++drop:
++	return NET_RX_DROP;
++}
++
++static struct packet_type lowpan_packet_type = {
++	.type = htons(ETH_P_IEEE802154),
++	.func = lowpan_rcv,
++};
++
++void lowpan_rx_init(void)
++{
++	dev_add_pack(&lowpan_packet_type);
++}
++
++void lowpan_rx_exit(void)
++{
++	dev_remove_pack(&lowpan_packet_type);
++}
 -- 
 2.2.1
 
