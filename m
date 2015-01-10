@@ -1,75 +1,52 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mailout1.w1.samsung.com ([210.118.77.11]:23005 "EHLO
-	mailout1.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751107AbbAMK7C (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Tue, 13 Jan 2015 05:59:02 -0500
-Received: from eucpsbgm2.samsung.com (unknown [203.254.199.245])
- by mailout1.w1.samsung.com
- (Oracle Communications Messaging Server 7u4-24.01(7.0.4.24.0) 64bit (built Nov
- 17 2011)) with ESMTP id <0NI400763417MO40@mailout1.w1.samsung.com> for
- linux-wpan@vger.kernel.org; Tue, 13 Jan 2015 11:03:07 +0000 (GMT)
-Received: from vwssch ([106.210.244.197])
- by eusync3.samsung.com (Oracle Communications Messaging Server 7u4-23.01
- (7.0.4.23.0) 64bit (built Aug 10 2011))
- with ESMTPA id <0NI400BVQ3TOMU60@eusync3.samsung.com> for
- linux-wpan@vger.kernel.org; Tue, 13 Jan 2015 10:58:59 +0000 (GMT)
-From: Stefan Schmidt <s.schmidt@samsung.com>
-References: <CAAkG1NMMQ_tXj-1zvJTSxvb8GVrYSSPkT8_vWd8BLqCZTy8N1Q@mail.gmail.com>
-In-reply-to: <CAAkG1NMMQ_tXj-1zvJTSxvb8GVrYSSPkT8_vWd8BLqCZTy8N1Q@mail.gmail.com>
-Subject: Re: AT86RF230 IRQ flags mismatch with the bcm2708_spi driver
-Date: Tue, 13 Jan 2015 10:58:37 +0000
-Message-id: <06bb01d02f1f$e250eb70$a6f2c250$@samsung.com>
-MIME-version: 1.0
-Content-type: text/plain; format=flowed; charset=utf-8
-Content-transfer-encoding: 7bit
-Content-language: en-gb
+Received: from mail-we0-f174.google.com ([74.125.82.174]:55064 "EHLO
+	mail-we0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750755AbbAJWex (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Sat, 10 Jan 2015 17:34:53 -0500
+From: Alexander Aring <alex.aring@gmail.com>
+Subject: [RFC bluetooth-next 0/2] ieee802154: socket: fix buffer overflow
+Date: Sat, 10 Jan 2015 23:33:24 +0100
+Message-Id: <1420929206-5771-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org
+To: linux-bluetooth@vger.kernel.org
+Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de, marcel@holtmann.org, werner@almesberger.net, mkl@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-Hello.
+Hi,
 
-On 13/01/15 11:36, Rohit Kulkarni wrote:
-> Hi everyone,
->
-> I'm trying to connect the at86rf212b to a raspberry pi model b+ using
-> SPI. I'm using the raspberry kernel 3.18.1 from here. (My working
-> snapshot is from a couple weeks ago)
+this is some critical bug fix here and I don't know how do deal with that now.
+I don't know if you can "get root" by this security issue. But the socket interface
+can be simple loaded by user via module-autoloading while using the address family.
+Maybe there is no security issue and the buffers are cutted off. I don't know, but
+there is definitely something wrong here.
 
-Do you have special requirements to use the raspberry pi kernel? The 
-mainline kernel should support the basic functionality and it would be 
-easier to get help from kernel community.
+In my opinion af_ieee802154 should go to stable (bluetooth), but this will break
+the complete userspace interface for every application. I think there are no many
+users so I will simple send
 
-> To start with, I had trouble registering the at86rf212b device. I did
-> a bit of troubleshooting and found that the at86rf230 driver and the
-> bcm2708_spi driver do not use the same flags when getting the IRQ
-> (IRQ_SPI / 80) and hence the driver would fail loading with the
-> "genirq: Flags mismatch" error. I "fixed" this by changing the
-> bcm2708_spi driver to also use IRQF_SHARED and IRQF_TRIGGER_RISING
-> flags that the at86rf230 driver uses when requesting the IRQ_SPI. This
-> causes the device to be successfully registered and the new phy shows
-> up with "iz list". Even "iz add" seems to work well!
->
-> Any attempt to query the newly registered wpan device after this step
-> just hangs the kernel. Even a simple "ifconfig" gets stuck forever.
-> I'm guessing that my changes to the bcm2708_spi driver are incorrect
-> and hence the hung kernel. But I'm way out of my comfort zone here and
-> I'd appreciate any help on how to proceed here.
->
-> Btw, I tried using the wpan-tools instead of the linux-zigbee tools. I
-> have been able to build the tools but trying to run any "iwpan cmd"
-> only prints "nl802154 not found". Again, I'm only guessing that this
-> has to do with me running raspberry pi's kernel instead of the
-> recommended net-next kernel. Right now I don't care much about this as
-> long as the linux-zigbee tools can get me started.
+Patch 1/2 "af_ieee802154: fix struct ieee802154_addr_sa size"
 
-As you are using a 3.18 kernel it is missing the netlink changes that 
-you would need for wpan-tools.
+to bluetooth. This is a RFC to talk about this issue and if somebody knows a better
+way please tell that here. Note also all userspace applications need to be updated
+after this patch. I really don't know how to deal with such issue and CC here a lot
+of well known linux hackers and would be glad if I get any suggestions about that.
 
-I would recommend to use the mainline kernel on your Pi to avoid dealing 
-with the rpi kernel specifics. Maybe not what you want to hear.
+Or maybe I should go to the netdev mailinglist with this issue.
 
-regards
-Stefan Schmidt
+- Alex
 
+Cc: Marcel Holtmann <marcel@holtmann.org>
+Cc: Werner Almesberger <werner@almesberger.net>
+Cc: Marc Kleine-Budde <mkl@pengutronix.de>
+
+Alexander Aring (2):
+  af_ieee802154: fix struct ieee802154_addr_sa size
+  ieee802154: socket: add BUILD_BUG_ON for cast check
+
+ include/net/af_ieee802154.h | 2 +-
+ net/ieee802154/socket.c     | 3 +++
+ 2 files changed, 4 insertions(+), 1 deletion(-)
+
+-- 
+2.2.1
 
