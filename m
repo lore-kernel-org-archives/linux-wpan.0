@@ -1,55 +1,70 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f173.google.com ([209.85.212.173]:46728 "EHLO
-	mail-wi0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753131AbbANOQF (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Wed, 14 Jan 2015 09:16:05 -0500
-Received: by mail-wi0-f173.google.com with SMTP id hi2so5619786wib.0
-        for <linux-wpan@vger.kernel.org>; Wed, 14 Jan 2015 06:16:04 -0800 (PST)
-Received: from omega (p20030064A91100BCE2CB4EFFFE1BB546.dip0.t-ipconnect.de. [2003:64:a911:bc:e2cb:4eff:fe1b:b546])
-        by mx.google.com with ESMTPSA id eu8sm2923995wib.21.2015.01.14.06.16.03
-        for <linux-wpan@vger.kernel.org>
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 14 Jan 2015 06:16:03 -0800 (PST)
-Date: Wed, 14 Jan 2015 15:16:01 +0100
+Received: from mail-we0-f169.google.com ([74.125.82.169]:55222 "EHLO
+	mail-we0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754156AbbAPMCk (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Fri, 16 Jan 2015 07:02:40 -0500
+Date: Fri, 16 Jan 2015 13:02:35 +0100
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: Re: 802.15.4 6LoWPAN fragmentation is broken
-Message-ID: <20150114141600.GB19961@omega>
-References: <20150113112016.GA14472@omega>
+Subject: fq_codel with 802.15.4 6LoWPAN fragmentation issue
+Message-ID: <20150116120232.GD10068@omega>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20150113112016.GA14472@omega>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org
+To: netdev@vger.kernel.org
+Cc: linux-wpan@vger.kernel.org, stephen@networkplumber.org, jukka.rissanen@linux.intel.com
 
 Hi,
 
-On Tue, Jan 13, 2015 at 12:20:16PM +0100, Alexander Aring wrote:
-> Hi,
-> 
-> I notice some issue with fragmentation code.
-> 
-> There is some magic number like:
-> 
-> ping6 2001::1 -s 2145
-> 
-> with a payload of 2144 it works. It seems that all payloads above
-> 2144 are broken. I will try to bisect this issue. I see this issue also
-> in net-next. I suppose it's something with the inet_frag API.
-> 
-> 
-> ... so don't worry I already working on it.
-> 
+when using "fq_codel" as network scheduler, I noticed an issue with IEEE
+802.15.4 6LoWPAN fragmentation. The issue is that high payloads IPv6
+packets are dropped.
 
-Status update to this:
+I detected the issue on the sending side which segments the 6LoWPAN
+packet into several fragments.
 
-I detected that systemd changed the default net scheduler to fq_codel. [0]
-With fq_codel seems that 6LoWPAN fragmentation is broken.
+In the IEEE 802.15.4 6LoWPAN fragmentation we have a 6LoWPAN interface
+(MTU 1280) on top of an IEEE 802.15.4 interface (MTU 127). The 6LoWPAN
+fragmentation algorithm creates in the "ndo_start_xmit" netdev_ops
+callback function of the 6LoWPAN interface new sk_buffs for the
+underlaying IEEE 802.15.4 interface (as skb->dev) and sends them via a
+dev_queue_xmit.
 
-For now: please don't use this scheduler. I will try to find out why we have
-fragmentation issues with fq_codel.
+IEEE 802.15.4 is a very slow connection and after each transmit there is
+an "interframe spacing time" which depends on frequency setting. In my
+testcase, that's about ~500 us for a payload above 18 bytes. This is
+done by calling netif_stop_queue for the interface and start a timer
+after each transmitted frame according to the interframe spacing time.
+When the timer fires, it wakes the queue again by calling
+netif_wake_queue.
+
+Now: What I am noticed with fq_codel is that the code at [0] will drop
+high payloaded IPv6 packets. Of course, if we have an IPv6 packet of
+more than 1280 bytes payload we have a fragmentation (IPv6
+fragmentation) over a fragmentation (802.15.4 6LoWPAN fragmentation).
+
+When I increase the "params->interval" parameter I can send a "longer"
+IPv6 packet depending how much I increase the "params->interval"
+parameter.
+
+I assume that the "params->interval" which defaults to MS2TIME(100) is
+too small. I further assume that at the beginning of fragmentation the
+interval measurement starts "vars->first_above_time = now +
+params->interval;" (line 247 at [0]) and while sending several fragments
+with the above mentioned interframe spacing time, the sending takes too
+long and the skb will be dropped.
+
+My questions are:
+
+- What's the best way to deal with something like that?
+
+- Is there a way to set the "params->interval" _per interface_? So I can
+  change the default parameter to a suitable value in the "ndo_init"
+  callback of the 6LoWPAN interface.
+
+Thanks in advance.
 
 - Alex
 
-[0] http://cgit.freedesktop.org/systemd/systemd/commit/?id=e6c253e363dee77ef7e5c5f44c4ca55cded3fd47
+[0] http://lxr.free-electrons.com/source/include/net/codel.h#L248
