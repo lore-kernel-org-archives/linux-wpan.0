@@ -1,42 +1,53 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-we0-f177.google.com ([74.125.82.177]:54373 "EHLO
-	mail-we0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753705AbbATKgV (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Tue, 20 Jan 2015 05:36:21 -0500
-Received: by mail-we0-f177.google.com with SMTP id l61so14533951wev.8
-        for <linux-wpan@vger.kernel.org>; Tue, 20 Jan 2015 02:36:20 -0800 (PST)
-From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH wpan-tools 2/2] interface: remove twice phy information
-Date: Tue, 20 Jan 2015 11:35:40 +0100
-Message-Id: <1421750140-24760-2-git-send-email-alex.aring@gmail.com>
-In-Reply-To: <1421750140-24760-1-git-send-email-alex.aring@gmail.com>
+Received: from mailout1.w1.samsung.com ([210.118.77.11]:37488 "EHLO
+	mailout1.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753800AbbATLFn (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Tue, 20 Jan 2015 06:05:43 -0500
+Received: from eucpsbgm2.samsung.com (unknown [203.254.199.245])
+ by mailout1.w1.samsung.com
+ (Oracle Communications Messaging Server 7u4-24.01(7.0.4.24.0) 64bit (built Nov
+ 17 2011)) with ESMTP id <0NIH00ABO30CY550@mailout1.w1.samsung.com> for
+ linux-wpan@vger.kernel.org; Tue, 20 Jan 2015 11:09:48 +0000 (GMT)
+From: Stefan Schmidt <s.schmidt@samsung.com>
 References: <1421750140-24760-1-git-send-email-alex.aring@gmail.com>
+In-reply-to: <1421750140-24760-1-git-send-email-alex.aring@gmail.com>
+Subject: Re: [PATCH wpan-tools 1/2] treewide: shorten commands
+Date: Tue, 20 Jan 2015 11:05:26 +0000
+Message-id: <006b01d034a0$ff2e9900$fd8bcb00$@samsung.com>
+MIME-version: 1.0
+Content-type: text/plain; format=flowed; charset=us-ascii
+Content-transfer-encoding: 7bit
+Content-language: en-gb
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org
-Cc: Alexander Aring <alex.aring@gmail.com>
+To: 'Alexander Aring' <alex.aring@gmail.com>, linux-wpan@vger.kernel.org
 
-The phy information is already shown in a previous printout and this
-code seems that it was never be functional.
+Hello.
 
-Signed-off-by: Alexander Aring <alex.aring@gmail.com>
----
- src/interface.c | 2 --
- 1 file changed, 2 deletions(-)
+On 20/01/15 11:35, Alexander Aring wrote:
+> This patch shorten all commands. I had the idea to make a similarity
+> from PIB/MIB values according the 802.15.4 names convention but this is
+> bad for fast shell hacking. Mainly I remove the underscore and some
+> additional information which are not necessary like "_addr" in
+> "short_addr" and "extended_addr" and such things.
+>
+> Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+> ---
+>   src/info.c      | 10 +++++-----
+>   src/interface.c | 20 ++++++++++----------
+>   src/mac.c       | 10 +++++-----
+>   src/phy.c       |  6 +++---
+>   4 files changed, 23 insertions(+), 23 deletions(-)
 
-diff --git a/src/interface.c b/src/interface.c
-index 9e59f15..559a104 100644
---- a/src/interface.c
-+++ b/src/interface.c
-@@ -212,8 +212,6 @@ static int print_iface_handler(struct nl_msg *msg, void *arg)
- 		       le16toh(nla_get_u16(tb_msg[NL802154_ATTR_PAN_ID])));
- 	if (tb_msg[NL802154_ATTR_IFTYPE])
- 		printf("%s\ttype %s\n", indent, iftype_name(nla_get_u32(tb_msg[NL802154_ATTR_IFTYPE])));
--	if (!wpan_phy && tb_msg[NL802154_ATTR_WPAN_PHY])
--		printf("%s\tWPANphy %d\n", indent, nla_get_u32(tb_msg[NL802154_ATTR_WPAN_PHY]));
- 	if (tb_msg[NL802154_ATTR_MAX_FRAME_RETRIES])
- 		printf("%s\tframeretries %d\n", indent, nla_get_s8(tb_msg[NL802154_ATTR_MAX_FRAME_RETRIES]));
- 	if (tb_msg[NL802154_ATTR_MIN_BE])
--- 
-2.2.2
+Hmm, it feels like you are going overboard with shorting things here. 
+Why is the reason behind it? Just less typing? Shell auto completion 
+would handle this. :)
+
+I mean it is up to you but with this you might break scripts that are 
+already out there and I think the current  commands are quite fine. 
+Cutting out the underscores makes some of these hard to read imho.
+
+regards
+Stefan Schmidt
+
 
