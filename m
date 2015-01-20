@@ -1,20 +1,19 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mailout4.w1.samsung.com ([210.118.77.14]:54755 "EHLO
-	mailout4.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752375AbbATUaa (ORCPT
+Received: from mailout3.w1.samsung.com ([210.118.77.13]:57354 "EHLO
+	mailout3.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752787AbbATUaa (ORCPT
 	<rfc822;linux-wpan@vger.kernel.org>); Tue, 20 Jan 2015 15:30:30 -0500
-Received: from eucpsbgm1.samsung.com (unknown [203.254.199.244])
- by mailout4.w1.samsung.com
+Received: from eucpsbgm2.samsung.com (unknown [203.254.199.245])
+ by mailout3.w1.samsung.com
  (Oracle Communications Messaging Server 7u4-24.01(7.0.4.24.0) 64bit (built Nov
- 17 2011)) with ESMTP id <0NIH00HP8T5H5N20@mailout4.w1.samsung.com> for
- linux-wpan@vger.kernel.org; Tue, 20 Jan 2015 20:34:29 +0000 (GMT)
+ 17 2011)) with ESMTP id <0NIH004MTT5KIQ20@mailout3.w1.samsung.com> for
+ linux-wpan@vger.kernel.org; Tue, 20 Jan 2015 20:34:32 +0000 (GMT)
 From: Stefan Schmidt <s.schmidt@samsung.com>
 References: <1421784155-2670-1-git-send-email-alex.aring@gmail.com>
- <1421784155-2670-2-git-send-email-alex.aring@gmail.com>
-In-reply-to: <1421784155-2670-2-git-send-email-alex.aring@gmail.com>
-Subject: Re: [PATCHv2 wpan-tools 2/2] info: remove unused features argument
-Date: Tue, 20 Jan 2015 20:30:08 +0000
-Message-id: <00af01d034ef$e2595dc0$a70c1940$@samsung.com>
+In-reply-to: <1421784155-2670-1-git-send-email-alex.aring@gmail.com>
+Subject: Re: [PATCHv2 wpan-tools 1/2] interface: remove twice phy information
+Date: Tue, 20 Jan 2015 20:30:10 +0000
+Message-id: <00b001d034ef$e350dd20$a9f29760$@samsung.com>
 MIME-version: 1.0
 Content-type: text/plain; format=flowed; charset=us-ascii
 Content-transfer-encoding: 7bit
@@ -26,30 +25,32 @@ To: 'Alexander Aring' <alex.aring@gmail.com>, linux-wpan@vger.kernel.org
 Hello.
 
 On 20/01/15 21:02, Alexander Aring wrote:
-> This patch removes an unused argument string for the phy information
-> call. This is copied from the original iw tool. If we need really such
-> argument then we can add this later again.
+> The phy information is already shown in a previous printout and this
+> code seems that it was never be functional.
 >
 > Signed-off-by: Alexander Aring <alex.aring@gmail.com>
 > ---
->   src/info.c | 4 ----
->   1 file changed, 4 deletions(-)
+>   src/interface.c | 2 --
+>   1 file changed, 2 deletions(-)
 >
-> diff --git a/src/info.c b/src/info.c
-> index 83f2e3e..e155470 100644
-> --- a/src/info.c
-> +++ b/src/info.c
-> @@ -94,10 +94,6 @@ static int handle_info(struct nl802154_state *state,
->   		       int argc, char **argv,
->   		       enum id_input id)
->   {
-> -	char *feat_args[] = { "features", "-q" };
-> -
-> -	handle_cmd(state, CIB_NONE, 2, feat_args);
-> -
->   	nl_cb_set(cb, NL_CB_VALID, NL_CB_CUSTOM, print_phy_handler, NULL);
+> diff --git a/src/interface.c b/src/interface.c
+> index 095753b..904b96e 100644
+> --- a/src/interface.c
+> +++ b/src/interface.c
+> @@ -212,8 +212,6 @@ static int print_iface_handler(struct nl_msg *msg,
+> void *arg)
 >
->   	return 0;
+> le16toh(nla_get_u16(tb_msg[NL802154_ATTR_PAN_ID])));
+>   	if (tb_msg[NL802154_ATTR_IFTYPE])
+>   		printf("%s\ttype %s\n", indent,
+> iftype_name(nla_get_u32(tb_msg[NL802154_ATTR_IFTYPE])));
+> -	if (!wpan_phy && tb_msg[NL802154_ATTR_WPAN_PHY])
+> -		printf("%s\twpan_phy %d\n", indent,
+> nla_get_u32(tb_msg[NL802154_ATTR_WPAN_PHY]));
+>   	if (tb_msg[NL802154_ATTR_MAX_FRAME_RETRIES])
+>   		printf("%s\tmax_frame_retries %d\n", indent,
+> nla_get_s8(tb_msg[NL802154_ATTR_MAX_FRAME_RETRIES]));
+>   	if (tb_msg[NL802154_ATTR_MIN_BE])
 >
 
 Reviewed-by: Stefan Schmidt <s.schmidt@samsung.com>
