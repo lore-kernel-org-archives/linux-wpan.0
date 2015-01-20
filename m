@@ -1,40 +1,45 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-we0-f177.google.com ([74.125.82.177]:56849 "EHLO
-	mail-we0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751844AbbATUDH (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Tue, 20 Jan 2015 15:03:07 -0500
-Received: by mail-we0-f177.google.com with SMTP id l61so18524549wev.8
-        for <linux-wpan@vger.kernel.org>; Tue, 20 Jan 2015 12:03:06 -0800 (PST)
+Received: from mail-wi0-f170.google.com ([209.85.212.170]:45790 "EHLO
+	mail-wi0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751941AbbATUDI (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Tue, 20 Jan 2015 15:03:08 -0500
+Received: by mail-wi0-f170.google.com with SMTP id em10so8847754wid.1
+        for <linux-wpan@vger.kernel.org>; Tue, 20 Jan 2015 12:03:07 -0800 (PST)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCHv2 wpan-tools 1/2] interface: remove twice phy information
-Date: Tue, 20 Jan 2015 21:02:34 +0100
-Message-Id: <1421784155-2670-1-git-send-email-alex.aring@gmail.com>
+Subject: [PATCHv2 wpan-tools 2/2] info: remove unused features argument
+Date: Tue, 20 Jan 2015 21:02:35 +0100
+Message-Id: <1421784155-2670-2-git-send-email-alex.aring@gmail.com>
+In-Reply-To: <1421784155-2670-1-git-send-email-alex.aring@gmail.com>
+References: <1421784155-2670-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
 Cc: Alexander Aring <alex.aring@gmail.com>
 
-The phy information is already shown in a previous printout and this
-code seems that it was never be functional.
+This patch removes an unused argument string for the phy information
+call. This is copied from the original iw tool. If we need really such
+argument then we can add this later again.
 
 Signed-off-by: Alexander Aring <alex.aring@gmail.com>
 ---
- src/interface.c | 2 --
- 1 file changed, 2 deletions(-)
+ src/info.c | 4 ----
+ 1 file changed, 4 deletions(-)
 
-diff --git a/src/interface.c b/src/interface.c
-index 095753b..904b96e 100644
---- a/src/interface.c
-+++ b/src/interface.c
-@@ -212,8 +212,6 @@ static int print_iface_handler(struct nl_msg *msg, void *arg)
- 		       le16toh(nla_get_u16(tb_msg[NL802154_ATTR_PAN_ID])));
- 	if (tb_msg[NL802154_ATTR_IFTYPE])
- 		printf("%s\ttype %s\n", indent, iftype_name(nla_get_u32(tb_msg[NL802154_ATTR_IFTYPE])));
--	if (!wpan_phy && tb_msg[NL802154_ATTR_WPAN_PHY])
--		printf("%s\twpan_phy %d\n", indent, nla_get_u32(tb_msg[NL802154_ATTR_WPAN_PHY]));
- 	if (tb_msg[NL802154_ATTR_MAX_FRAME_RETRIES])
- 		printf("%s\tmax_frame_retries %d\n", indent, nla_get_s8(tb_msg[NL802154_ATTR_MAX_FRAME_RETRIES]));
- 	if (tb_msg[NL802154_ATTR_MIN_BE])
+diff --git a/src/info.c b/src/info.c
+index 83f2e3e..e155470 100644
+--- a/src/info.c
++++ b/src/info.c
+@@ -94,10 +94,6 @@ static int handle_info(struct nl802154_state *state,
+ 		       int argc, char **argv,
+ 		       enum id_input id)
+ {
+-	char *feat_args[] = { "features", "-q" };
+-
+-	handle_cmd(state, CIB_NONE, 2, feat_args);
+-
+ 	nl_cb_set(cb, NL_CB_VALID, NL_CB_CUSTOM, print_phy_handler, NULL);
+ 
+ 	return 0;
 -- 
 2.2.2
 
