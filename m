@@ -1,61 +1,50 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mailout3.w1.samsung.com ([210.118.77.13]:57354 "EHLO
-	mailout3.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752787AbbATUaa (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Tue, 20 Jan 2015 15:30:30 -0500
-Received: from eucpsbgm2.samsung.com (unknown [203.254.199.245])
- by mailout3.w1.samsung.com
- (Oracle Communications Messaging Server 7u4-24.01(7.0.4.24.0) 64bit (built Nov
- 17 2011)) with ESMTP id <0NIH004MTT5KIQ20@mailout3.w1.samsung.com> for
- linux-wpan@vger.kernel.org; Tue, 20 Jan 2015 20:34:32 +0000 (GMT)
-From: Stefan Schmidt <s.schmidt@samsung.com>
-References: <1421784155-2670-1-git-send-email-alex.aring@gmail.com>
-In-reply-to: <1421784155-2670-1-git-send-email-alex.aring@gmail.com>
-Subject: Re: [PATCHv2 wpan-tools 1/2] interface: remove twice phy information
-Date: Tue, 20 Jan 2015 20:30:10 +0000
-Message-id: <00b001d034ef$e350dd20$a9f29760$@samsung.com>
-MIME-version: 1.0
-Content-type: text/plain; format=flowed; charset=us-ascii
-Content-transfer-encoding: 7bit
-Content-language: en-gb
+Received: from mail-wg0-f48.google.com ([74.125.82.48]:52231 "EHLO
+	mail-wg0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751985AbbATU6M (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Tue, 20 Jan 2015 15:58:12 -0500
+Received: by mail-wg0-f48.google.com with SMTP id x12so8666734wgg.7
+        for <linux-wpan@vger.kernel.org>; Tue, 20 Jan 2015 12:58:11 -0800 (PST)
+From: Alexander Aring <alex.aring@gmail.com>
+Subject: [RFC bluetooth-next 0/4] ieee802154: UAPI changes
+Date: Tue, 20 Jan 2015 21:57:38 +0100
+Message-Id: <1421787462-24042-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: 'Alexander Aring' <alex.aring@gmail.com>, linux-wpan@vger.kernel.org
+To: linux-wpan@vger.kernel.org
+Cc: Alexander Aring <alex.aring@gmail.com>
 
-Hello.
+Hi,
 
-On 20/01/15 21:02, Alexander Aring wrote:
-> The phy information is already shown in a previous printout and this
-> code seems that it was never be functional.
->
-> Signed-off-by: Alexander Aring <alex.aring@gmail.com>
-> ---
->   src/interface.c | 2 --
->   1 file changed, 2 deletions(-)
->
-> diff --git a/src/interface.c b/src/interface.c
-> index 095753b..904b96e 100644
-> --- a/src/interface.c
-> +++ b/src/interface.c
-> @@ -212,8 +212,6 @@ static int print_iface_handler(struct nl_msg *msg,
-> void *arg)
->
-> le16toh(nla_get_u16(tb_msg[NL802154_ATTR_PAN_ID])));
->   	if (tb_msg[NL802154_ATTR_IFTYPE])
->   		printf("%s\ttype %s\n", indent,
-> iftype_name(nla_get_u32(tb_msg[NL802154_ATTR_IFTYPE])));
-> -	if (!wpan_phy && tb_msg[NL802154_ATTR_WPAN_PHY])
-> -		printf("%s\twpan_phy %d\n", indent,
-> nla_get_u32(tb_msg[NL802154_ATTR_WPAN_PHY]));
->   	if (tb_msg[NL802154_ATTR_MAX_FRAME_RETRIES])
->   		printf("%s\tmax_frame_retries %d\n", indent,
-> nla_get_s8(tb_msg[NL802154_ATTR_MAX_FRAME_RETRIES]));
->   	if (tb_msg[NL802154_ATTR_MIN_BE])
->
+this patch series contains various UAPI changes. It's a RFC for now, to be sure
+nobody will scream when I send real patches for this.
 
-Reviewed-by: Stefan Schmidt <s.schmidt@samsung.com>
+In my opnion patch "ieee802154: 6lowpan: fix ARPHRD to ARPHRD_6LOWPAN" is the
+is the most important part of this series. I know this issue a long time
+and some already used application really checks on this, but we need to change that.
 
-regards
-Stefan Schmidt
+Patch "ieee802154: change wpan-phy name to phy" will change that you will not type
+"wpan-phy0" anymore on iwpan phy settings. After this patch it's "phy0" only. This
+makes the handling similar like iw.
 
+Patch "ieee802154: remove deprecated sysfs entries" will breaks some scripts if
+somebody really use these sysfs entries.
+
+So I would like her others opinions according to these changes.
+
+- Alex
+
+Alexander Aring (4):
+  ieee802154: set wpan netdev devtype
+  ieee802154: 6lowpan: fix ARPHRD to ARPHRD_6LOWPAN
+  ieee802154: change wpan-phy name to phy
+  ieee802154: remove deprecated sysfs entries
+
+ net/ieee802154/6lowpan/core.c |  2 +-
+ net/ieee802154/core.c         | 13 ++++++++++--
+ net/ieee802154/sysfs.c        | 49 -------------------------------------------
+ 3 files changed, 12 insertions(+), 52 deletions(-)
+
+-- 
+2.2.2
 
