@@ -1,76 +1,56 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wg0-f49.google.com ([74.125.82.49]:40338 "EHLO
-	mail-wg0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753667AbbAUUYs (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Wed, 21 Jan 2015 15:24:48 -0500
-Received: by mail-wg0-f49.google.com with SMTP id l18so16303354wgh.8
-        for <linux-wpan@vger.kernel.org>; Wed, 21 Jan 2015 12:24:47 -0800 (PST)
-Received: from omega (p20030064A941E81CE2CB4EFFFE1BB546.dip0.t-ipconnect.de. [2003:64:a941:e81c:e2cb:4eff:fe1b:b546])
-        by mx.google.com with ESMTPSA id g2sm1200053wjn.11.2015.01.21.12.24.46
-        for <linux-wpan@vger.kernel.org>
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 21 Jan 2015 12:24:46 -0800 (PST)
-Date: Wed, 21 Jan 2015 21:24:44 +0100
+Received: from mail-wg0-f51.google.com ([74.125.82.51]:37696 "EHLO
+	mail-wg0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752245AbbATU6Z (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Tue, 20 Jan 2015 15:58:25 -0500
+Received: by mail-wg0-f51.google.com with SMTP id l18so15022269wgh.10
+        for <linux-wpan@vger.kernel.org>; Tue, 20 Jan 2015 12:58:24 -0800 (PST)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: Re: [RFC bluetooth-next 2/4] ieee802154: 6lowpan: fix ARPHRD to
- ARPHRD_6LOWPAN
-Message-ID: <20150121202442.GB664@omega>
+Subject: [RFC bluetooth-next 3/4] ieee802154: change wpan-phy name to phy
+Date: Tue, 20 Jan 2015 21:57:41 +0100
+Message-Id: <1421787462-24042-4-git-send-email-alex.aring@gmail.com>
+In-Reply-To: <1421787462-24042-1-git-send-email-alex.aring@gmail.com>
 References: <1421787462-24042-1-git-send-email-alex.aring@gmail.com>
- <1421787462-24042-3-git-send-email-alex.aring@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1421787462-24042-3-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
+Cc: Alexander Aring <alex.aring@gmail.com>
 
-Hi,
+Currently the wpan_phy under /sys/class/ieee802154/ is named as
+"wpan-phy#", this patch will change the name to phy. This will
+introduce the same naming convention like wireless.
 
-On Tue, Jan 20, 2015 at 09:57:40PM +0100, Alexander Aring wrote:
-> Currently there exists two interface types with ARPHRD_IEEE802154. These
-> are the 802.15.4 interfaces and 802.15.4 6LoWPAN interfaces. This is
-> more a bug because some userspace applications checks on this value like
-> wireshark. This occurs that wireshark will always try to parse a lowpan
-> interface as 802.15.4 frames. With ARPHRD_6LOWPAN wireshark will parse
-> it as IPv6 frames which is correct.
-> 
-> Much applications checks on this value to readout the EUI64 mac address
-> which should be the same for ARPHRD_6LOWPAN. BTLE 6LoWPAN and ieee802154
-> 6LoWPAN will share now the same ARPHRD.
-> 
-> Signed-off-by: Alexander Aring <alex.aring@gmail.com>
-> ---
->  net/ieee802154/6lowpan/core.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/net/ieee802154/6lowpan/core.c b/net/ieee802154/6lowpan/core.c
-> index 055fbb7..9dbe0d69 100644
-> --- a/net/ieee802154/6lowpan/core.c
-> +++ b/net/ieee802154/6lowpan/core.c
-> @@ -113,7 +113,7 @@ static void lowpan_setup(struct net_device *dev)
->  {
->  	dev->addr_len		= IEEE802154_ADDR_LEN;
->  	memset(dev->broadcast, 0xff, IEEE802154_ADDR_LEN);
-> -	dev->type		= ARPHRD_IEEE802154;
-> +	dev->type		= ARPHRD_6LOWPAN;
->  	/* Frame Control + Sequence Number + Address fields + Security Header */
->  	dev->hard_header_len	= 2 + 1 + 20 + 14;
->  	dev->needed_tailroom	= 2; /* FCS */
-> -- 
-> 2.2.2
-> 
+Note: wpan-tools users will not type "wpan-phy#" anymore, just a simple
+      "phy#" is enough.
 
-A little list of applications which need to update afterwards this patch:
+Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+---
+ net/ieee802154/core.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
- - radvd [0]
- - unstrung [1]
+diff --git a/net/ieee802154/core.c b/net/ieee802154/core.c
+index b99971f..005df61 100644
+--- a/net/ieee802154/core.c
++++ b/net/ieee802154/core.c
+@@ -25,6 +25,9 @@
+ #include "sysfs.h"
+ #include "core.h"
+ 
++/* name for sysfs, %d is appended */
++#define PHY_NAME "phy"
++
+ /* RCU-protected (and RTNL for writers) */
+ LIST_HEAD(cfg802154_rdev_list);
+ int cfg802154_rdev_list_generation;
+@@ -122,7 +125,7 @@ wpan_phy_new(const struct cfg802154_ops *ops, size_t priv_size)
+ 
+ 	INIT_LIST_HEAD(&rdev->wpan_dev_list);
+ 	device_initialize(&rdev->wpan_phy.dev);
+-	dev_set_name(&rdev->wpan_phy.dev, "wpan-phy%d", rdev->wpan_phy_idx);
++	dev_set_name(&rdev->wpan_phy.dev, PHY_NAME "%d", rdev->wpan_phy_idx);
+ 
+ 	rdev->wpan_phy.dev.class = &wpan_phy_class;
+ 	rdev->wpan_phy.dev.platform_data = rdev;
+-- 
+2.2.2
 
-
-I know this will break the above software, but we need really to do this
-step. Any complaints here according to this patch?
-
-- Alex
-
-[0] https://github.com/reubenhwk/radvd/blob/master/device-linux.c#L82
-[1] https://github.com/mcr/unstrung/blob/5e7c4060730ab4f81ddcd75657d87ec78da91bd6/lib/libndmgmt/netlink.cpp#L358
