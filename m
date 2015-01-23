@@ -1,59 +1,62 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-la0-f42.google.com ([209.85.215.42]:58427 "EHLO
-	mail-la0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752031AbbAWJq7 (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Fri, 23 Jan 2015 04:46:59 -0500
+Received: from mail-wg0-f42.google.com ([74.125.82.42]:48600 "EHLO
+	mail-wg0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753748AbbAWJsd (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Fri, 23 Jan 2015 04:48:33 -0500
 MIME-Version: 1.0
-In-Reply-To: <1422005800-13442-1-git-send-email-md.jamalmohiuddin@gmail.com>
+In-Reply-To: <CAEUmHybQkyR7_TqOstDFcU=7iohL8E8ZaQYSNPiZC+MCi=hLmA@mail.gmail.com>
 References: <1422005800-13442-1-git-send-email-md.jamalmohiuddin@gmail.com>
-Date: Fri, 23 Jan 2015 15:16:58 +0530
-Message-ID: <CAEUmHybQkyR7_TqOstDFcU=7iohL8E8ZaQYSNPiZC+MCi=hLmA@mail.gmail.com>
+	<CAEUmHybQkyR7_TqOstDFcU=7iohL8E8ZaQYSNPiZC+MCi=hLmA@mail.gmail.com>
+Date: Fri, 23 Jan 2015 15:18:31 +0530
+Message-ID: <CAP8vtK+UQZ=fNZPeOFc-7zLNhcUDTRfbUa-JQQ70x6A8q=Xi7A@mail.gmail.com>
 Subject: Re: [PATCH] net: ieee802154: cc2520: fix coding style issue
-From: Varka Bhadram <varkabhadram@gmail.com>
+From: Jamal Mohammad <md.jamalmohiuddin@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Mohammad Jamal <md.jamalmohiuddin@gmail.com>
+To: Varka Bhadram <varkabhadram@gmail.com>
 Cc: Alexander Aring <alex.aring@gmail.com>, linux-wpan - ML <linux-wpan@vger.kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 
-Hi Mohammad Jamal,
-
-On Fri, Jan 23, 2015 at 3:06 PM, Mohammad Jamal
-<md.jamalmohiuddin@gmail.com> wrote:
-> This patch solves the coding style issue warning
-> by replacing the shifting operations by BIT macro
+On Fri, Jan 23, 2015 at 3:16 PM, Varka Bhadram <varkabhadram@gmail.com> wrote:
+> Hi Mohammad Jamal,
 >
-> Signed-off-by: Mohammad Jamal <md.jamalmohiuddin@gmail.com>
-> ---
->  drivers/net/ieee802154/cc2520.c |    6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+> On Fri, Jan 23, 2015 at 3:06 PM, Mohammad Jamal
+> <md.jamalmohiuddin@gmail.com> wrote:
+>> This patch solves the coding style issue warning
+>> by replacing the shifting operations by BIT macro
+>>
+>> Signed-off-by: Mohammad Jamal <md.jamalmohiuddin@gmail.com>
+>> ---
+>>  drivers/net/ieee802154/cc2520.c |    6 +++---
+>>  1 file changed, 3 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/drivers/net/ieee802154/cc2520.c b/drivers/net/ieee802154/cc2520.c
+>> index dd129be..b9b2a49 100644
+>> --- a/drivers/net/ieee802154/cc2520.c
+>> +++ b/drivers/net/ieee802154/cc2520.c
+>> @@ -45,9 +45,9 @@
+>>  #define        CC2520_FREG_MASK        0x3F
+>>
+>>  /* status byte values */
+>> -#define        CC2520_STATUS_XOSC32M_STABLE    (1 << 7)
+>> -#define        CC2520_STATUS_RSSI_VALID        (1 << 6)
+>> -#define        CC2520_STATUS_TX_UNDERFLOW      (1 << 3)
+>> +#define        CC2520_STATUS_XOSC32M_STABLE    BIT(7)
+>> +#define        CC2520_STATUS_RSSI_VALID        BIT(6)
+>> +#define        CC2520_STATUS_TX_UNDERFLOW      BIT(3)
+>>
+>>  /* IEEE-802.15.4 defined constants (2.4 GHz logical channels) */
+>>  #define        CC2520_MINCHANNEL               11
+>> --
+>> 1.7.9.5
+>>
 >
-> diff --git a/drivers/net/ieee802154/cc2520.c b/drivers/net/ieee802154/cc2520.c
-> index dd129be..b9b2a49 100644
-> --- a/drivers/net/ieee802154/cc2520.c
-> +++ b/drivers/net/ieee802154/cc2520.c
-> @@ -45,9 +45,9 @@
->  #define        CC2520_FREG_MASK        0x3F
+> Please work on bluetooth-next[1] tree and also include
+> 'bluetooth-next' tag for the patch.
 >
->  /* status byte values */
-> -#define        CC2520_STATUS_XOSC32M_STABLE    (1 << 7)
-> -#define        CC2520_STATUS_RSSI_VALID        (1 << 6)
-> -#define        CC2520_STATUS_TX_UNDERFLOW      (1 << 3)
-> +#define        CC2520_STATUS_XOSC32M_STABLE    BIT(7)
-> +#define        CC2520_STATUS_RSSI_VALID        BIT(6)
-> +#define        CC2520_STATUS_TX_UNDERFLOW      BIT(3)
+> [1]: http://git.kernel.org/cgit/linux/kernel/git/bluetooth/bluetooth-next.git/
 >
->  /* IEEE-802.15.4 defined constants (2.4 GHz logical channels) */
->  #define        CC2520_MINCHANNEL               11
 > --
-> 1.7.9.5
->
-
-Please work on bluetooth-next[1] tree and also include
-'bluetooth-next' tag for the patch.
-
-[1]: http://git.kernel.org/cgit/linux/kernel/git/bluetooth/bluetooth-next.git/
-
--- 
-Thanks and Regards,
-Varka Bhadram.
+> Thanks and Regards,
+> Varka Bhadram.
+OK , i will send u the patch once i clone the bluetooth-next tree.
