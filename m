@@ -1,75 +1,42 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-we0-f181.google.com ([74.125.82.181]:55500 "EHLO
-	mail-we0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750898AbbAWMoz (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Fri, 23 Jan 2015 07:44:55 -0500
-MIME-Version: 1.0
-In-Reply-To: <54C2409A.6020506@cogentembedded.com>
-References: <1422005180-13230-1-git-send-email-md.jamalmohiuddin@gmail.com>
-	<54C2409A.6020506@cogentembedded.com>
-Date: Fri, 23 Jan 2015 18:14:54 +0530
-Message-ID: <CAP8vtKJnGE3=UM+XV5DgMvTXNGXFsX_D-c0u7nDoYhTXVJaR4Q@mail.gmail.com>
-Subject: Re: [PATCH] net: ieee802154: cc2520: Fix coding style issues
-From: Jamal Mohammad <md.jamalmohiuddin@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Received: from mail-pd0-f176.google.com ([209.85.192.176]:46944 "EHLO
+	mail-pd0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752651AbbAWI3m (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Fri, 23 Jan 2015 03:29:42 -0500
+Received: by mail-pd0-f176.google.com with SMTP id y10so7239482pdj.7
+        for <linux-wpan@vger.kernel.org>; Fri, 23 Jan 2015 00:29:41 -0800 (PST)
+Received: from cdac.hyderabad.cdac.in ([196.12.45.164])
+        by mx.google.com with ESMTPSA id i4sm1122761pdl.11.2015.01.23.00.29.39
+        for <linux-wpan@vger.kernel.org>
+        (version=TLSv1.1 cipher=ECDHE-RSA-RC4-SHA bits=128/128);
+        Fri, 23 Jan 2015 00:29:40 -0800 (PST)
+From: Varka Bhadram <varkabhadram@gmail.com>
+Subject: [PATCH wpan-misc] website: fix name for Table:2
+Date: Fri, 23 Jan 2015 13:55:26 +0530
+Message-Id: <1422001526-14559-1-git-send-email-varkab@cdac.in>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Sergei Shtylyov <sergei.shtylyov@cogentembedded.com>
-Cc: Varka Bhadram <varkabhadram@gmail.com>, Alexander Aring <alex.aring@gmail.com>, linux-wpan - ML <linux-wpan@vger.kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To: linux-wpan@vger.kernel.org
 
-On Fri, Jan 23, 2015 at 6:07 PM, Sergei Shtylyov
-<sergei.shtylyov@cogentembedded.com> wrote:
-> Hello.
->
-> On 1/23/2015 12:26 PM, Mohammad Jamal wrote:
->
->> This patch solves the coding style issues such as space after ,
->
->
->    s/after/before/?
->
->> and removes the blank lines
->
->
->   Extra blank lines, you mean?
->
->> Signed-off-by: Mohammad Jamal <md.jamalmohiuddin@gmail.com>
->> ---
->>   drivers/net/ieee802154/cc2520.c |    6 ++----
->>   1 file changed, 2 insertions(+), 4 deletions(-)
->
->
->> diff --git a/drivers/net/ieee802154/cc2520.c
->> b/drivers/net/ieee802154/cc2520.c
->> index f9df9fa..dd129be 100644
->> --- a/drivers/net/ieee802154/cc2520.c
->> +++ b/drivers/net/ieee802154/cc2520.c
->
-> [...]
->>
->> @@ -551,14 +550,14 @@ cc2520_ed(struct ieee802154_hw *hw, u8 *level)
->>         u8 rssi;
->>         int ret;
->>
->> -       ret = cc2520_read_register(priv , CC2520_RSSISTAT, &status);
->> +       ret = cc2520_read_register(priv, CC2520_RSSISTAT, &status);
->>         if (ret)
->>                 return ret;
->>
->>         if (status != RSSI_VALID)
->>                 return -EINVAL;
->>
->> -       ret = cc2520_read_register(priv , CC2520_RSSI, &rssi);
->> +       ret = cc2520_read_register(priv, CC2520_RSSI, &rssi);
->
-> [...]
->
-> WBR, Sergei
->
 
-Sorry for that,
+Signed-off-by: Varka Bhadram <varkab@cdac.in>
+---
+ website/index.txt |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-i actually have cloned and linus torvalds git and when i ran
-checkpatch.pl i have found some warnings. so this patch was removing
-those warnings...as bhadram told that these warnings are already
-removed in bluetooth-next tree...so this patch any how fails....
+diff --git a/website/index.txt b/website/index.txt
+index 4ccb218..c9e58d2 100644
+--- a/website/index.txt
++++ b/website/index.txt
+@@ -116,7 +116,7 @@ Currently a rework of 802.15.4 subsystem is in progress.
+ 
+ The rework will contains a new netlink API and a general handling about frame creation and parsing.
+ 
+-.Supported 802.15.4 Hardware
++.Work status
+ [options="header"]
+ |=======================================
+ |Milestone        | Description | state
+-- 
+1.7.9.5
+
