@@ -1,41 +1,42 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wg0-f41.google.com ([74.125.82.41]:61119 "EHLO
-	mail-wg0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753038AbbAVV2t (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Thu, 22 Jan 2015 16:28:49 -0500
-Received: by mail-wg0-f41.google.com with SMTP id a1so4180927wgh.0
-        for <linux-wpan@vger.kernel.org>; Thu, 22 Jan 2015 13:28:48 -0800 (PST)
-From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH wpan-misc 2/2] website: add RZUSBstick information
-Date: Thu, 22 Jan 2015 22:28:22 +0100
-Message-Id: <1421962102-20901-2-git-send-email-alex.aring@gmail.com>
-In-Reply-To: <1421962102-20901-1-git-send-email-alex.aring@gmail.com>
-References: <1421962102-20901-1-git-send-email-alex.aring@gmail.com>
+Received: from mail-pd0-f173.google.com ([209.85.192.173]:35955 "EHLO
+	mail-pd0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752031AbbAWJlV (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Fri, 23 Jan 2015 04:41:21 -0500
+From: Mohammad Jamal <md.jamalmohiuddin@gmail.com>
+Subject: [PATCH] net: ieee802154: cc2520: fix coding style issue
+Date: Fri, 23 Jan 2015 15:06:40 +0530
+Message-Id: <1422005800-13442-1-git-send-email-md.jamalmohiuddin@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org
-Cc: Alexander Aring <alex.aring@gmail.com>
+To: varkabhadram@gmail.com, alex.aring@gmail.com, linux-wpan@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Mohammad Jamal <md.jamalmohiuddin@gmail.com>
 
-This patch adds information for RZUSBstick stick, that somebody already
-working on this to porting the atusb firmware to this stick.
+This patch solves the coding style issue warning
+by replacing the shifting operations by BIT macro
 
-Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+Signed-off-by: Mohammad Jamal <md.jamalmohiuddin@gmail.com>
 ---
- website/index.txt | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/net/ieee802154/cc2520.c |    6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/website/index.txt b/website/index.txt
-index 2b4c367..ef9c778 100644
---- a/website/index.txt
-+++ b/website/index.txt
-@@ -39,6 +39,7 @@ Supported Hardware
- |at86rf212b  |yes              |at86rf230  | SPI | http://www.digikey.com/product-search/en?x=0&y=0&lang=en&site=us&keywords=ATZB-212B-XPRO[digikey]
- |cc2520      |yes              |cc2520     | SPI |
- |atusb       |not mainline yet |atusb      | USB | http://downloads.qi-hardware.com/people/werner/wpan/web/[atusb] Out of stock. Mailto linux-wpan and Werner to produce maybe new ones. Or contact http://en.qi-hardware.com/wiki/Main_Page[qi-hardware].
-+|RZUSBstick  |no, WIP          |atusb      | USB |
- |=============================================================
+diff --git a/drivers/net/ieee802154/cc2520.c b/drivers/net/ieee802154/cc2520.c
+index dd129be..b9b2a49 100644
+--- a/drivers/net/ieee802154/cc2520.c
++++ b/drivers/net/ieee802154/cc2520.c
+@@ -45,9 +45,9 @@
+ #define	CC2520_FREG_MASK	0x3F
  
- How-To's
+ /* status byte values */
+-#define	CC2520_STATUS_XOSC32M_STABLE	(1 << 7)
+-#define	CC2520_STATUS_RSSI_VALID	(1 << 6)
+-#define	CC2520_STATUS_TX_UNDERFLOW	(1 << 3)
++#define	CC2520_STATUS_XOSC32M_STABLE	BIT(7)
++#define	CC2520_STATUS_RSSI_VALID	BIT(6)
++#define	CC2520_STATUS_TX_UNDERFLOW	BIT(3)
+ 
+ /* IEEE-802.15.4 defined constants (2.4 GHz logical channels) */
+ #define	CC2520_MINCHANNEL		11
 -- 
-2.2.2
+1.7.9.5
 
