@@ -1,61 +1,41 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-pd0-f169.google.com ([209.85.192.169]:40430 "EHLO
-	mail-pd0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752303AbbAZOFo (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Mon, 26 Jan 2015 09:05:44 -0500
-Message-ID: <54C649B2.6020902@gmail.com>
-Date: Mon, 26 Jan 2015 19:35:38 +0530
-From: Varka Bhadram <varkabhadram@gmail.com>
-MIME-Version: 1.0
-Subject: Re: [PATCH bluetooth-next] ieee802154: cc2520: Fix space before ,
- coding style issue
-References: <1422021327-18815-1-git-send-email-md.jamalmohiuddin@gmail.com>
-In-Reply-To: <1422021327-18815-1-git-send-email-md.jamalmohiuddin@gmail.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
+Received: from mail-pd0-f171.google.com ([209.85.192.171]:64535 "EHLO
+	mail-pd0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752249AbbAWODI (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Fri, 23 Jan 2015 09:03:08 -0500
+From: Mohammad Jamal <md.jamalmohiuddin@gmail.com>
+Subject: [PATCH bluetooth-next] ieee802154: cc2520: Replace shift operations by BIT macro
+Date: Fri, 23 Jan 2015 19:28:29 +0530
+Message-Id: <1422021509-18877-1-git-send-email-md.jamalmohiuddin@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Mohammad Jamal <md.jamalmohiuddin@gmail.com>, alex.aring@gmail.com, linux-wpan@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+To: varkabhadram@gmail.com, alex.aring@gmail.com, linux-wpan@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Mohammad Jamal <md.jamalmohiuddin@gmail.com>
 
-Hi Jamal,
+This patch replaces the shifting operations by BIT macro
 
-On Friday 23 January 2015 07:25 PM, Mohammad Jamal wrote:
-> This patch removes the warnings (space before , ) shown by
-> checkpatch.pl
+Signed-off-by: Mohammad Jamal <md.jamalmohiuddin@gmail.com>
+---
+ drivers/net/ieee802154/cc2520.c |    6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-Thanks for the patch.
-
-Acked-by: Varka Bhadram <varkabhadram@gmail.com>
-
->
-> Signed-off-by: Mohammad Jamal <md.jamalmohiuddin@gmail.com>
-> ---
->   drivers/net/ieee802154/cc2520.c |    4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/drivers/net/ieee802154/cc2520.c b/drivers/net/ieee802154/cc2520.c
-> index a43c8ac..665a3db 100644
-> --- a/drivers/net/ieee802154/cc2520.c
-> +++ b/drivers/net/ieee802154/cc2520.c
-> @@ -549,14 +549,14 @@ cc2520_ed(struct ieee802154_hw *hw, u8 *level)
->   	u8 rssi;
->   	int ret;
->   
-> -	ret = cc2520_read_register(priv , CC2520_RSSISTAT, &status);
-> +	ret = cc2520_read_register(priv, CC2520_RSSISTAT, &status);
->   	if (ret)
->   		return ret;
->   
->   	if (status != RSSI_VALID)
->   		return -EINVAL;
->   
-> -	ret = cc2520_read_register(priv , CC2520_RSSI, &rssi);
-> +	ret = cc2520_read_register(priv, CC2520_RSSI, &rssi);
->   	if (ret)
->   		return ret;
->   
-
+diff --git a/drivers/net/ieee802154/cc2520.c b/drivers/net/ieee802154/cc2520.c
+index 665a3db..181b349 100644
+--- a/drivers/net/ieee802154/cc2520.c
++++ b/drivers/net/ieee802154/cc2520.c
+@@ -44,9 +44,9 @@
+ #define	CC2520_FREG_MASK	0x3F
+ 
+ /* status byte values */
+-#define	CC2520_STATUS_XOSC32M_STABLE	(1 << 7)
+-#define	CC2520_STATUS_RSSI_VALID	(1 << 6)
+-#define	CC2520_STATUS_TX_UNDERFLOW	(1 << 3)
++#define	CC2520_STATUS_XOSC32M_STABLE	BIT(7)
++#define	CC2520_STATUS_RSSI_VALID	BIT(6)
++#define	CC2520_STATUS_TX_UNDERFLOW	BIT(3)
+ 
+ /* IEEE-802.15.4 defined constants (2.4 GHz logical channels) */
+ #define	CC2520_MINCHANNEL		11
 -- 
-Thanks and Regards,
-Varka Bhadram.
+1.7.9.5
 
