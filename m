@@ -1,78 +1,78 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f175.google.com ([209.85.212.175]:40431 "EHLO
-	mail-wi0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755236AbbA1UuI (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Wed, 28 Jan 2015 15:50:08 -0500
-Received: by mail-wi0-f175.google.com with SMTP id fb4so15064261wid.2
-        for <linux-wpan@vger.kernel.org>; Wed, 28 Jan 2015 12:50:07 -0800 (PST)
-Message-ID: <54C8FB16.6040006@6wind.com>
-Date: Wed, 28 Jan 2015 16:07:02 +0100
+Received: from 33.106-14-84.ripe.coltfrance.com ([84.14.106.33]:41155 "EHLO
+	proxy.6wind.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755183AbbAZVfE (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Mon, 26 Jan 2015 16:35:04 -0500
 From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Reply-To: nicolas.dichtel@6wind.com
-MIME-Version: 1.0
-Subject: Re: [PATCH net 1/2] caif: remove wrong dev_net_set() call
-References: <1422307694-10079-1-git-send-email-nicolas.dichtel@6wind.com> <1422307694-10079-2-git-send-email-nicolas.dichtel@6wind.com>
-In-Reply-To: <1422307694-10079-2-git-send-email-nicolas.dichtel@6wind.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Subject: [PATCH net 2/2] vxlan: setup the right link netns in newlink hdlr
+Date: Mon, 26 Jan 2015 22:28:14 +0100
+Message-Id: <1422307694-10079-3-git-send-email-nicolas.dichtel@6wind.com>
+In-Reply-To: <1422307694-10079-1-git-send-email-nicolas.dichtel@6wind.com>
+References: <1422307694-10079-1-git-send-email-nicolas.dichtel@6wind.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: netdev@vger.kernel.org
-Cc: davem@davemloft.net, arvid.brodin@alten.se, alex.aring@gmail.com, linux-wpan@vger.kernel.org, Dmitry Tarnyagin <abi.dmitryt@gmail.com>
+Cc: davem@davemloft.net, dmitry.tarnyagin@lockless.no, arvid.brodin@alten.se, alex.aring@gmail.com, linux-wpan@vger.kernel.org, Nicolas Dichtel <nicolas.dichtel@6wind.com>
 
-Removing bouncing email addresses (dmitry.tarnyagin@lockless.no and
-sjur.brandeland@stericsson.com)
-CC: Dmitry Tarnyagin <abi.dmitryt@gmail.com>
+Rename the netns to src_net to avoid confusion with the netns where the
+interface stands. The user may specify IFLA_NET_NS_[PID|FD] to create
+a x-netns netndevice: IFLA_NET_NS_[PID|FD] points to the netns where the
+netdevice stands and src_net to the link netns.
 
-Dmitry, please also have a look to
-http://permalink.gmane.org/gmane.linux.network/347942
+Note that before commit f01ec1c017de ("vxlan: add x-netns support"), it was
+possible to create a x-netns vxlan netdevice, but the netdevice was not
+operational.
 
+Fixes: f01ec1c017de ("vxlan: add x-netns support")
+Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+---
+ drivers/net/vxlan.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-Thank you,
-Nicolas
-
-Le 26/01/2015 22:28, Nicolas Dichtel a écrit :
-> src_net points to the netns where the netlink message has been received. This
-> netns may be different from the netns where the interface is created (because
-> the user may add IFLA_NET_NS_[PID|FD]). In this case, src_net is the link netns.
->
-> It seems wrong to override the netns in the newlink() handler because if it
-> was not already src_net, it means that the user explicitly asks to create the
-> netdevice in another netns.
->
-> CC: Sjur Brændeland <sjur.brandeland@stericsson.com>
-> CC: Dmitry Tarnyagin <dmitry.tarnyagin@lockless.no>
-> Fixes: 8391c4aab1aa ("caif: Bugfixes in CAIF netdevice for close and flow control")
-> Fixes: c41254006377 ("caif-hsi: Add rtnl support")
-> Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-> ---
->   drivers/net/caif/caif_hsi.c | 1 -
->   net/caif/chnl_net.c         | 1 -
->   2 files changed, 2 deletions(-)
->
-> diff --git a/drivers/net/caif/caif_hsi.c b/drivers/net/caif/caif_hsi.c
-> index 5e40a8b68cbe..b3b922adc0e4 100644
-> --- a/drivers/net/caif/caif_hsi.c
-> +++ b/drivers/net/caif/caif_hsi.c
-> @@ -1415,7 +1415,6 @@ static int caif_hsi_newlink(struct net *src_net, struct net_device *dev,
->
->   	cfhsi = netdev_priv(dev);
->   	cfhsi_netlink_parms(data, cfhsi);
-> -	dev_net_set(cfhsi->ndev, src_net);
->
->   	get_ops = symbol_get(cfhsi_get_ops);
->   	if (!get_ops) {
-> diff --git a/net/caif/chnl_net.c b/net/caif/chnl_net.c
-> index 4589ff67bfa9..67a4a36febd1 100644
-> --- a/net/caif/chnl_net.c
-> +++ b/net/caif/chnl_net.c
-> @@ -470,7 +470,6 @@ static int ipcaif_newlink(struct net *src_net, struct net_device *dev,
->   	ASSERT_RTNL();
->   	caifdev = netdev_priv(dev);
->   	caif_netlink_parms(data, &caifdev->conn_req);
-> -	dev_net_set(caifdev->netdev, src_net);
->
->   	ret = register_netdevice(dev);
->   	if (ret)
->
+diff --git a/drivers/net/vxlan.c b/drivers/net/vxlan.c
+index 7fbd89fbe107..a8c755dcab14 100644
+--- a/drivers/net/vxlan.c
++++ b/drivers/net/vxlan.c
+@@ -2432,10 +2432,10 @@ static void vxlan_sock_work(struct work_struct *work)
+ 	dev_put(vxlan->dev);
+ }
+ 
+-static int vxlan_newlink(struct net *net, struct net_device *dev,
++static int vxlan_newlink(struct net *src_net, struct net_device *dev,
+ 			 struct nlattr *tb[], struct nlattr *data[])
+ {
+-	struct vxlan_net *vn = net_generic(net, vxlan_net_id);
++	struct vxlan_net *vn = net_generic(src_net, vxlan_net_id);
+ 	struct vxlan_dev *vxlan = netdev_priv(dev);
+ 	struct vxlan_rdst *dst = &vxlan->default_dst;
+ 	__u32 vni;
+@@ -2445,7 +2445,7 @@ static int vxlan_newlink(struct net *net, struct net_device *dev,
+ 	if (!data[IFLA_VXLAN_ID])
+ 		return -EINVAL;
+ 
+-	vxlan->net = dev_net(dev);
++	vxlan->net = src_net;
+ 
+ 	vni = nla_get_u32(data[IFLA_VXLAN_ID]);
+ 	dst->remote_vni = vni;
+@@ -2481,7 +2481,7 @@ static int vxlan_newlink(struct net *net, struct net_device *dev,
+ 	if (data[IFLA_VXLAN_LINK] &&
+ 	    (dst->remote_ifindex = nla_get_u32(data[IFLA_VXLAN_LINK]))) {
+ 		struct net_device *lowerdev
+-			 = __dev_get_by_index(net, dst->remote_ifindex);
++			 = __dev_get_by_index(src_net, dst->remote_ifindex);
+ 
+ 		if (!lowerdev) {
+ 			pr_info("ifindex %d does not exist\n", dst->remote_ifindex);
+@@ -2557,7 +2557,7 @@ static int vxlan_newlink(struct net *net, struct net_device *dev,
+ 	    nla_get_u8(data[IFLA_VXLAN_UDP_ZERO_CSUM6_RX]))
+ 		vxlan->flags |= VXLAN_F_UDP_ZERO_CSUM6_RX;
+ 
+-	if (vxlan_find_vni(net, vni, use_ipv6 ? AF_INET6 : AF_INET,
++	if (vxlan_find_vni(src_net, vni, use_ipv6 ? AF_INET6 : AF_INET,
+ 			   vxlan->dst_port)) {
+ 		pr_info("duplicate VNI %u\n", vni);
+ 		return -EEXIST;
+-- 
+2.2.2
 
