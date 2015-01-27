@@ -1,78 +1,103 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from 33.106-14-84.ripe.coltfrance.com ([84.14.106.33]:41155 "EHLO
-	proxy.6wind.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755183AbbAZVfE (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Mon, 26 Jan 2015 16:35:04 -0500
-From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Subject: [PATCH net 2/2] vxlan: setup the right link netns in newlink hdlr
-Date: Mon, 26 Jan 2015 22:28:14 +0100
-Message-Id: <1422307694-10079-3-git-send-email-nicolas.dichtel@6wind.com>
-In-Reply-To: <1422307694-10079-1-git-send-email-nicolas.dichtel@6wind.com>
+Received: from mail-wi0-f171.google.com ([209.85.212.171]:47665 "EHLO
+	mail-wi0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753717AbbA0Jej (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Tue, 27 Jan 2015 04:34:39 -0500
+Date: Tue, 27 Jan 2015 10:34:28 +0100
+From: Alexander Aring <alex.aring@gmail.com>
+Subject: Re: [PATCH net 0/2] netns: audit netdevice creation with
+ IFLA_NET_NS_[PID|FD]
+Message-ID: <20150127093425.GA2698@omega>
 References: <1422307694-10079-1-git-send-email-nicolas.dichtel@6wind.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1422307694-10079-1-git-send-email-nicolas.dichtel@6wind.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net, dmitry.tarnyagin@lockless.no, arvid.brodin@alten.se, alex.aring@gmail.com, linux-wpan@vger.kernel.org, Nicolas Dichtel <nicolas.dichtel@6wind.com>
+To: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, dmitry.tarnyagin@lockless.no, arvid.brodin@alten.se, linux-wpan@vger.kernel.org
 
-Rename the netns to src_net to avoid confusion with the netns where the
-interface stands. The user may specify IFLA_NET_NS_[PID|FD] to create
-a x-netns netndevice: IFLA_NET_NS_[PID|FD] points to the netns where the
-netdevice stands and src_net to the link netns.
+Hi,
 
-Note that before commit f01ec1c017de ("vxlan: add x-netns support"), it was
-possible to create a x-netns vxlan netdevice, but the netdevice was not
-operational.
+On Mon, Jan 26, 2015 at 10:28:12PM +0100, Nicolas Dichtel wrote:
+> 
+> When one of these attributes is set, the netdevice is created into the netns
+> pointed by IFLA_NET_NS_[PID|FD] (see the call to rtnl_create_link() in
+> rtnl_newlink()). Let's call this netns the dest_net. After this creation, if the
+> newlink handler exists, it is called with a netns argument that points to the
+> netns where the netlink message has been received (called src_net in the code)
+> which is the link netns.
+> Hence, with one of these attributes, it's possible to create a x-netns
+> netdevice.
+> 
+> Here is the result of my code review:
+> - all ip tunnels (sit, ipip, ip6_tunnels, gre[tap][v6], ip_vti[6]) does not
+>   really allows to use this feature: the netdevice is created in the dest_net
+>   and the src_net is completely ignored in the newlink handler.
+> - VLAN properly handles this x-netns creation.
+> - bridge ignores src_net, which seems fine (NETIF_F_NETNS_LOCAL is set).
+> - CAIF subsystem is not clear for me (I don't know how it works), but it seems
+>   to wrongly use src_net. Patch #1 tries to fix this, but it was done only by
+>   code review (and only compile-tested), so please carefully review it. I may
+>   miss something.
+> - HSR subsystem uses src_net to parse IFLA_HSR_SLAVE[1|2], but the netdevice has
+>   the flag NETIF_F_NETNS_LOCAL, so the question is: does this netdevice really
+>   supports x-netns? If not, the newlink handler should use the dest_net instead
+>   of src_net, I can provide the patch.
+> - ieee802154 uses also src_net and does not have NETIF_F_NETNS_LOCAL. Same
+>   question: does this netdevice really supports x-netns?
 
-Fixes: f01ec1c017de ("vxlan: add x-netns support")
-Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
----
- drivers/net/vxlan.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+I am not sure if I understand exactly what you mean. First of all, I
+didn't test anything about net namespaces for the ieee802154 branch.
+In 802.15.4 branch we have two interfaces: wpan and 6LoWPAN.
 
-diff --git a/drivers/net/vxlan.c b/drivers/net/vxlan.c
-index 7fbd89fbe107..a8c755dcab14 100644
---- a/drivers/net/vxlan.c
-+++ b/drivers/net/vxlan.c
-@@ -2432,10 +2432,10 @@ static void vxlan_sock_work(struct work_struct *work)
- 	dev_put(vxlan->dev);
- }
- 
--static int vxlan_newlink(struct net *net, struct net_device *dev,
-+static int vxlan_newlink(struct net *src_net, struct net_device *dev,
- 			 struct nlattr *tb[], struct nlattr *data[])
- {
--	struct vxlan_net *vn = net_generic(net, vxlan_net_id);
-+	struct vxlan_net *vn = net_generic(src_net, vxlan_net_id);
- 	struct vxlan_dev *vxlan = netdev_priv(dev);
- 	struct vxlan_rdst *dst = &vxlan->default_dst;
- 	__u32 vni;
-@@ -2445,7 +2445,7 @@ static int vxlan_newlink(struct net *net, struct net_device *dev,
- 	if (!data[IFLA_VXLAN_ID])
- 		return -EINVAL;
- 
--	vxlan->net = dev_net(dev);
-+	vxlan->net = src_net;
- 
- 	vni = nla_get_u32(data[IFLA_VXLAN_ID]);
- 	dst->remote_vni = vni;
-@@ -2481,7 +2481,7 @@ static int vxlan_newlink(struct net *net, struct net_device *dev,
- 	if (data[IFLA_VXLAN_LINK] &&
- 	    (dst->remote_ifindex = nla_get_u32(data[IFLA_VXLAN_LINK]))) {
- 		struct net_device *lowerdev
--			 = __dev_get_by_index(net, dst->remote_ifindex);
-+			 = __dev_get_by_index(src_net, dst->remote_ifindex);
- 
- 		if (!lowerdev) {
- 			pr_info("ifindex %d does not exist\n", dst->remote_ifindex);
-@@ -2557,7 +2557,7 @@ static int vxlan_newlink(struct net *net, struct net_device *dev,
- 	    nla_get_u8(data[IFLA_VXLAN_UDP_ZERO_CSUM6_RX]))
- 		vxlan->flags |= VXLAN_F_UDP_ZERO_CSUM6_RX;
- 
--	if (vxlan_find_vni(net, vni, use_ipv6 ? AF_INET6 : AF_INET,
-+	if (vxlan_find_vni(src_net, vni, use_ipv6 ? AF_INET6 : AF_INET,
- 			   vxlan->dst_port)) {
- 		pr_info("duplicate VNI %u\n", vni);
- 		return -EEXIST;
--- 
-2.2.2
+After running "grep -r "src_net" net" I found this is used in:
 
+net/ieee802154/6lowpan/core.c [0]
+
+This file handles the IEEE 802.15.4 6LoWPAN interface to offering a
+IPv6 interface with an IEEE 802.15.4 6LoWPAN adaption layer.
+
+To the codeline "dev_get_by_index(src_net, nla_get_u32(tb[IFLA_LINK]));".
+By calling "ip link add link wpan0 name lowpan0 type lowpan" the
+lowpan_newlink function will be called and we need to find the wpan interface
+(returned as real_dev in this case).
+
+Namespace setting in wpan interface:
+
+Currently we don't use any net namespace settings there, also we don't
+change the net namespace. The default net namespace for a wpan shoule be
+"init_net".
+
+So this line could be also written as (I found also some others code which search
+the wpan interface in &init_net):
+
+diff --git a/net/ieee802154/6lowpan/core.c b/net/ieee802154/6lowpan/core.c
+index 9dbe0d69..495c6ad 100644
+--- a/net/ieee802154/6lowpan/core.c
++++ b/net/ieee802154/6lowpan/core.c
+@@ -151,7 +151,7 @@ static int lowpan_newlink(struct net *src_net, struct net_device *dev,
+        if (!tb[IFLA_LINK])
+                return -EINVAL;
+        /* find and hold real wpan device */
+-       real_dev = dev_get_by_index(src_net, nla_get_u32(tb[IFLA_LINK]));
++       real_dev = dev_get_by_index(&init_net, nla_get_u32(tb[IFLA_LINK]));
+        if (!real_dev)
+                return -ENODEV;
+        if (real_dev->type != ARPHRD_IEEE802154) {
+
+
+
+The above code is for finding the wpan interface (the real 802.15.4 L2 interface).
+For the IEEE 802.15.4 6LoWPAN interface the whole IPv6 implementation is
+used. This interface will be created inside function "newlink".
+
+Running "grep -r "src_net" net/ipv6" reports me alot uses of "src_net".
+Don't know if this information is really necessary.
+
+Should I set now the NETIF_F_NETNS_LOCAL for both interface types?
+
+- Alex
+
+[0] http://git.kernel.org/cgit/linux/kernel/git/davem/net-next.git/tree/net/ieee802154/6lowpan/core.c#n154
