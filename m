@@ -1,42 +1,38 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from spam1.webland.se ([91.207.112.90]:56923 "EHLO spam1.webland.se"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753978AbbA3UFc (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-	Fri, 30 Jan 2015 15:05:32 -0500
-Message-ID: <54CBE2EF.7050003@alten.se>
-Date: Fri, 30 Jan 2015 21:00:47 +0100
-From: Arvid Brodin <arvid.brodin@alten.se>
+Received: from mail-wg0-f53.google.com ([74.125.82.53]:55250 "EHLO
+	mail-wg0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754346AbbA1Ug6 (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Wed, 28 Jan 2015 15:36:58 -0500
+Date: Wed, 28 Jan 2015 21:36:54 +0100
+From: Alexander Aring <alex.aring@gmail.com>
+Subject: Re: [PATCH bluetooth-next v2] ieee802154: fix netns settings
+Message-ID: <20150128203645.GB30188@omega>
+References: <alex.aring@gmail.com>
+ <1422457112-4377-1-git-send-email-nicolas.dichtel@6wind.com>
 MIME-Version: 1.0
-Subject: Re: [PATCH net 0/2] netns: audit netdevice creation with IFLA_NET_NS_[PID|FD]
-References: <1422307694-10079-1-git-send-email-nicolas.dichtel@6wind.com>
-In-Reply-To: <1422307694-10079-1-git-send-email-nicolas.dichtel@6wind.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1422457112-4377-1-git-send-email-nicolas.dichtel@6wind.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Nicolas Dichtel <nicolas.dichtel@6wind.com>, netdev@vger.kernel.org
-Cc: davem@davemloft.net, dmitry.tarnyagin@lockless.no, alex.aring@gmail.com, linux-wpan@vger.kernel.org
+To: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, linux-wpan@vger.kernel.org, marcel@holtmann.org
 
-On 2015-01-26 22:28, Nicolas Dichtel wrote:
-*snip*
-> - HSR subsystem uses src_net to parse IFLA_HSR_SLAVE[1|2], but the netdevice has
->   the flag NETIF_F_NETNS_LOCAL, so the question is: does this netdevice really
->   supports x-netns? If not, the newlink handler should use the dest_net instead
->   of src_net, I can provide the patch.
-*snip*
+On Wed, Jan 28, 2015 at 03:58:32PM +0100, Nicolas Dichtel wrote:
+> 6LoWPAN currently doesn't supports x-netns and works only in init_net.
+> 
+> With this patch, we ensure that:
+>  - the wpan interface cannot be moved to another netns;
+>  - the 6lowpan interface cannot be moved to another netns;
+>  - the wpan interface is in the same netns than the 6lowpan interface;
+>  - the 6lowpan interface is in init_net.
+> 
+> Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
 
-As the author of the HSR driver, I'd like to answer this question, but unfortunately 
-I don't know what x-netns is. Neither Google nor Documentation/ has been particularly
-helpful.
+Acked-by: Alexander Aring <alex.aring@gmail.com>
 
-Care to elaborate? (Maybe this is a moot point now that the patch has been accepted,
-but I'd still like to understand, if you have the time to explain.)
+Marcel, can you please queue this for bluetooth-next?
 
-(Pretty much all I know about network namespaces is from this article: 
-http://lwn.net/Articles/580893/.)
+Thanks.
 
-
--- 
-Arvid Brodin | Consultant (Linux)
-ALTEN | Knarrarnäsgatan 7 | SE-164 40 Kista | Sweden
-arvid.brodin@alten.se | www.alten.se/en/
+- Alex
