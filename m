@@ -1,83 +1,33 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-we0-f173.google.com ([74.125.82.173]:48498 "EHLO
-	mail-we0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753338AbbA0JYr (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Tue, 27 Jan 2015 04:24:47 -0500
-Received: by mail-we0-f173.google.com with SMTP id w62so13727432wes.4
-        for <linux-wpan@vger.kernel.org>; Tue, 27 Jan 2015 01:24:46 -0800 (PST)
+Received: from mail-wi0-f171.google.com ([209.85.212.171]:33605 "EHLO
+	mail-wi0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755219AbbA1U5k (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Wed, 28 Jan 2015 15:57:40 -0500
+Received: by mail-wi0-f171.google.com with SMTP id l15so15118029wiw.4
+        for <linux-wpan@vger.kernel.org>; Wed, 28 Jan 2015 12:57:39 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CAFUtXGxTKk-vNM_1Zh6cTCqSNuqBaT1aTMWYAV2pwvbqxi_+yA@mail.gmail.com>
-References: <CAAkG1NOO3ScSHG7x+LgU6Min8OP-vcihwXwmLH7JSzGeVw8tyQ@mail.gmail.com>
-	<20150120194407.GB18226@omega>
-	<CAAkG1NNuA0vp1A6brVbHw0Co1qL5rAVCPBT=+t+cBZULveBhiw@mail.gmail.com>
-	<CAFUtXGw2_+6CCX69RKxv0BueCx5mhddBt3k7yDXzoHcF-r9+Pw@mail.gmail.com>
-	<54bf9983.07f4440a.7103.0a2e@mx.google.com>
-	<20150121154634.GA664@omega>
-	<CAAkG1NNNTLaH0TgEupLm3yVEU6wwXPBR38mpMrPfb-bu7wUAPg@mail.gmail.com>
-	<20150122205920.GA18612@omega>
-	<CAFUtXGwkG7p-LLjRdV5fKrCLQMMVJzMDqBtG4Dt148xAKAm-XQ@mail.gmail.com>
-	<20150122222013.GB18612@omega>
-	<20150123075902.GA11163@omega>
-	<CAFUtXGxTKk-vNM_1Zh6cTCqSNuqBaT1aTMWYAV2pwvbqxi_+yA@mail.gmail.com>
-Date: Tue, 27 Jan 2015 14:54:45 +0530
-Message-ID: <CAAkG1NN3hTb+R8o=G+rwGDUO9mjvy4DyV0E3=+V_wjef6fASng@mail.gmail.com>
-Subject: Re: Device or resource busy
+Date: Wed, 28 Jan 2015 15:27:10 +0530
+Message-ID: <CAAkG1NMPUEg1jo=a84vndiScGQkox8SZHzRsVQ9EAP=-12sEag@mail.gmail.com>
+Subject: Sample code for 6Lo tx/rx
 From: Rohit Kulkarni <rmkulkar@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Maciej Wasilak <wasilak@gmail.com>
-Cc: Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org
+To: linux-wpan@vger.kernel.org
 
 Hi,
 
-That worked for me too!
+I was wondering if there is any example code that can tx/rx over a
+6LoWPAN "node" interface. I've looked through the Unstrung code for
+some examples but it uses ICMP all over. I'd really appreciate if
+someone had any code samples for sending udp data over wpan. I tried
+creating a SOCK_DGRAM socket over AF_IEEE802154 and got the "Protocol
+not supported" error. Creating a SOCK_RAW worked but my life would be
+much easier if I could start using DGRAMs :-) (One of the earlier
+emails on the list mentioned DGRAMs over 6LoWPAN!).
 
-Thanks a lot Alex, Maciej!
+Also, I've never used RAW sockets before, so any help with RAW sockets
+over wpan (if DGRAM is not really an option) will also be a huge help!
 
+Thanks!
 -Rohit
-
-On Sun, Jan 25, 2015 at 5:06 PM, Maciej Wasilak <wasilak@gmail.com> wrote:
-> Hello,
->
-> 2015-01-23 8:59 GMT+01:00 Alexander Aring <alex.aring@gmail.com>:
->>> Do you are sure that there is no daemon running or something else which
->>> automatically ifup the interface again if you want to set it down? Maybe
->>> just mv the /etc/$NETWORKING_STUFF into a separate directory and try again.
->
-> After your pointers I've found the answer on one of the forums - the
-> problem is caused by ifplugd service, which automatically brings up
-> wpan0 interface after it is brought down.
-> It seems that in previous branch (linux-wpan-next) this problem didn't
-> exist, because wpan0 interface had to be manually created (and ifplugd
-> didn't mess with it).
->
-> Solution 1 (blunt): killall ifplugd
->
-> Solution 2: edit /etc/default/ifplugd
->
-> My working /etc/default/ifplugd below:
-> ____
->
-> # This file may be changed either manually or by running dpkg-reconfigure.
-> #
-> # N.B.: dpkg-reconfigure deletes everything from this file except for
-> # the assignments to variables INTERFACES, HOTPLUG_INTERFACES, ARGS and
-> # SUSPEND_ACTION.  When run it uses the current values of those variables
-> # as their default values, thus preserving the administrator's changes.
-> #
-> # This file is sourced by both the init script /etc/init.d/ifplugd and
-> # the udev script /lib/udev/ifplugd.agent to give default values.
-> # The init script starts ifplugd for all interfaces listed in
-> # INTERFACES, and the udev script starts ifplugd for all interfaces
-> # listed in HOTPLUG_INTERFACES. The special value all starts one
-> # ifplugd for all interfaces being present.
-> INTERFACES="eth0"
-> HOTPLUG_INTERFACES="eth0"
-> ARGS="-q -f -u0 -d10 -w -I"
-> SUSPEND_ACTION="stop"
->
-> Thank you very much for your help!!!
->
-> Regards
-> Maciek
