@@ -1,84 +1,71 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from metis.ext.pengutronix.de ([92.198.50.35]:35857 "EHLO
-	metis.ext.pengutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751829AbbBKMR6 (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Wed, 11 Feb 2015 07:17:58 -0500
-Message-ID: <54DB486E.4080905@pengutronix.de>
-Date: Wed, 11 Feb 2015 13:17:50 +0100
-From: Marc Kleine-Budde <mkl@pengutronix.de>
+Received: from mail-wi0-f176.google.com ([209.85.212.176]:53848 "EHLO
+	mail-wi0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751887AbbBKMgK (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Wed, 11 Feb 2015 07:36:10 -0500
+Received: by mail-wi0-f176.google.com with SMTP id h11so3315115wiw.3
+        for <linux-wpan@vger.kernel.org>; Wed, 11 Feb 2015 04:36:09 -0800 (PST)
+Date: Wed, 11 Feb 2015 13:36:03 +0100
+From: Alexander Aring <alex.aring@gmail.com>
+Subject: Re: [PATCH bluetooth-next 2/3] ieee802154: cleanup
+ ieee802154_be64_to_le64
+Message-ID: <20150211123556.GA7351@omega>
+References: <1423606461-16945-1-git-send-email-alex.aring@gmail.com>
+ <1423606461-16945-3-git-send-email-alex.aring@gmail.com>
+ <54DB486E.4080905@pengutronix.de>
 MIME-Version: 1.0
-Subject: Re: [PATCH bluetooth-next 2/3] ieee802154: cleanup ieee802154_be64_to_le64
-References: <1423606461-16945-1-git-send-email-alex.aring@gmail.com> <1423606461-16945-3-git-send-email-alex.aring@gmail.com>
-In-Reply-To: <1423606461-16945-3-git-send-email-alex.aring@gmail.com>
-Content-Type: multipart/signed; micalg=pgp-sha512;
- protocol="application/pgp-signature";
- boundary="hne489WG9TPkKv19VxCe1qtULkbikp0uf"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <54DB486E.4080905@pengutronix.de>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org
-Cc: kernel@pengutronix.de
+To: Marc Kleine-Budde <mkl@pengutronix.de>
+Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---hne489WG9TPkKv19VxCe1qtULkbikp0uf
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Wed, Feb 11, 2015 at 01:17:50PM +0100, Marc Kleine-Budde wrote:
+> On 02/10/2015 11:14 PM, Alexander Aring wrote:
+> > This patch cleanups the ieee802154_be64_to_le64 function. This patch
+> > removes an unnecessary temporary variable.
+> > 
+> > Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+> > ---
+> >  include/net/mac802154.h | 4 +---
+> >  1 file changed, 1 insertion(+), 3 deletions(-)
+> > 
+> > diff --git a/include/net/mac802154.h b/include/net/mac802154.h
+> > index 8506478..a4dcefe 100644
+> > --- a/include/net/mac802154.h
+> > +++ b/include/net/mac802154.h
+> > @@ -233,9 +233,7 @@ struct ieee802154_ops {
+> >   */
+> >  static inline void ieee802154_be64_to_le64(void *le64_dst, const void *be64_src)
+> >  {
+> > -	__le64 tmp = (__force __le64)swab64p(be64_src);
+> > -
+> > -	memcpy(le64_dst, &tmp, IEEE802154_EXTENDED_ADDR_LEN);
+> > +	*((__le64 *)le64_dst) = (__force __le64)swab64p(be64_src);
+> 
+> I assume the compiler optimizes the memcpy, due to the constant length
+> argument. It the dst always 64 bit aligned?
 
-On 02/10/2015 11:14 PM, Alexander Aring wrote:
-> This patch cleanups the ieee802154_be64_to_le64 function. This patch
-> removes an unnecessary temporary variable.
->=20
-> Signed-off-by: Alexander Aring <alex.aring@gmail.com>
-> ---
->  include/net/mac802154.h | 4 +---
->  1 file changed, 1 insertion(+), 3 deletions(-)
->=20
-> diff --git a/include/net/mac802154.h b/include/net/mac802154.h
-> index 8506478..a4dcefe 100644
-> --- a/include/net/mac802154.h
-> +++ b/include/net/mac802154.h
-> @@ -233,9 +233,7 @@ struct ieee802154_ops {
->   */
->  static inline void ieee802154_be64_to_le64(void *le64_dst, const void =
-*be64_src)
->  {
-> -	__le64 tmp =3D (__force __le64)swab64p(be64_src);
-> -
-> -	memcpy(le64_dst, &tmp, IEEE802154_EXTENDED_ADDR_LEN);
-> +	*((__le64 *)le64_dst) =3D (__force __le64)swab64p(be64_src);
+should be. I can't check this, but dst and src should always 64 bit long.
+(Otherwise the programmer do something wrong).
 
-I assume the compiler optimizes the memcpy, due to the constant length
-argument. It the dst always 64 bit aligned?
+It's just byte swapping a little endian 64 bit value to big endian 64
+bit value. Because mac header is little and the most netdev core api
+uses big endian. These function are some helper function to transfer
+__le64 to __be64. Sometimes the __le64 and __be64 are implementated as
+arrays so I do this over some void pointers, like [0].
 
-Marc
+At [0] you see the assigned MAC PIB extended addr (saved as __le64)
+which is set to the netdevice dev_addr array (assumes big endian).
 
---=20
-Pengutronix e.K.                  | Marc Kleine-Budde           |
-Industrial Linux Solutions        | Phone: +49-231-2826-924     |
-Vertretung West/Dortmund          | Fax:   +49-5121-206917-5555 |
-Amtsgericht Hildesheim, HRA 2686  | http://www.pengutronix.de   |
+The swab64p is an architecture optimized byte swapping function.
 
+Do you think that this patch will decrease the perfomance of this function?
+I know the casts looks a little bit ugly but swab64p isn't made for
+"endianness swapping" and assumes u64 as parameter (pointer) and result.
 
---hne489WG9TPkKv19VxCe1qtULkbikp0uf
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+- Alex
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCgAGBQJU20huAAoJECte4hHFiupUZCIP/jV1Ct5TAQfblw6f1iaxJAyR
-LKDswVcy7J7UHnJhhPVthItZooqsY36Yy5Iz+MN1mkUiy7G520mDej0fMDBfpuea
-0Ij4dPJxoMhJUgCNxLaQ0L94pb5Cz5gl7osqBMR1vaYXU/OhDEbm7eFBlSYuPpgV
-Uj8nxEUHo+5O8EZyvVWX5dVjUGsTJ1tHynM4Xo1ikCIQCuvjDDZ2QWJE9RiEeAO5
-oPcxFGjF+C7hGe4fr6GpunsEFDF2aY2VJtU7R68xbyao8qwecTiE9VZ8ni/HrogC
-Bqge6CNpRd7qRiO0TNDY488kMB3kF1LYkk/eBp+j5p2FB9Ao84PZN6M+eThWwF8R
-cYzTZK1f++dW51NjsAjGyJKyM0psGgeGbpmDyF/DyQ7J5LPqoWXWtX/OYWVZbAwS
-x0H5V4KVTMXMBTDWaj0Q28UVrIap9RiFiqZm0kde1m+TdaRVODSanwRAOxxYTQBM
-Lc8soFKy4i1VViijwX0yCr6yrIROPt/Zy3gb9wjBbTNyVnn8ot6H2CI/LrM2Y7Bv
-eDW4dg3JIJGNBLeGvazSLgQyb2QRdHHkUT30f+n5gzecbtoijpoGBmP0BffXxL12
-fuj7EaktI8iE/tGnM8K2BL6GyLpqWNEK2wE6g7zOxzlAr5NW6z1SzM1EuCgcV99V
-zBg7nk1ZI7Pia8GpDdGe
-=WD1Z
------END PGP SIGNATURE-----
-
---hne489WG9TPkKv19VxCe1qtULkbikp0uf--
+[0] http://git.kernel.org/cgit/linux/kernel/git/bluetooth/bluetooth-next.git/tree/net/mac802154/iface.c#n558
