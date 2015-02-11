@@ -1,44 +1,36 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-we0-f177.google.com ([74.125.82.177]:51002 "EHLO
-	mail-we0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752103AbbBJWO5 (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Tue, 10 Feb 2015 17:14:57 -0500
-Received: by mail-we0-f177.google.com with SMTP id l61so36482047wev.8
-        for <linux-wpan@vger.kernel.org>; Tue, 10 Feb 2015 14:14:56 -0800 (PST)
+Received: from mail-wi0-f169.google.com ([209.85.212.169]:40359 "EHLO
+	mail-wi0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752727AbbBKOdr (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Wed, 11 Feb 2015 09:33:47 -0500
+Received: by mail-wi0-f169.google.com with SMTP id em10so756587wid.0
+        for <linux-wpan@vger.kernel.org>; Wed, 11 Feb 2015 06:33:46 -0800 (PST)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH bluetooth-next 3/3] ieee802154: cleanup ieee802154_le64_to_be64
-Date: Tue, 10 Feb 2015 23:14:21 +0100
-Message-Id: <1423606461-16945-4-git-send-email-alex.aring@gmail.com>
-In-Reply-To: <1423606461-16945-1-git-send-email-alex.aring@gmail.com>
-References: <1423606461-16945-1-git-send-email-alex.aring@gmail.com>
+Subject: [PATCH wpan-misc] website: add aliexpress cc2420
+Date: Wed, 11 Feb 2015 15:33:40 +0100
+Message-Id: <1423665220-21113-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
-Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
-
-This patch cleanups the ieee802154_le64_to_be64 function. This patch
-removes an unnecessary temporary variable.
+Cc: Alexander Aring <alex.aring@gmail.com>
 
 Signed-off-by: Alexander Aring <alex.aring@gmail.com>
 ---
- include/net/mac802154.h | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ website/index.txt | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/include/net/mac802154.h b/include/net/mac802154.h
-index a4dcefe..1362eb5 100644
---- a/include/net/mac802154.h
-+++ b/include/net/mac802154.h
-@@ -243,9 +243,7 @@ static inline void ieee802154_be64_to_le64(void *le64_dst, const void *be64_src)
-  */
- static inline void ieee802154_le64_to_be64(void *be64_dst, const void *le64_src)
- {
--	__be64 tmp = (__force __be64)swab64p(le64_src);
--
--	memcpy(be64_dst, &tmp, IEEE802154_EXTENDED_ADDR_LEN);
-+	*((__be64 *)be64_dst) = (__force __be64)swab64p(le64_src);
- }
- 
- /* Basic interface to register ieee802154 hwice */
+diff --git a/website/index.txt b/website/index.txt
+index 7331534..3eb455b 100644
+--- a/website/index.txt
++++ b/website/index.txt
+@@ -38,6 +38,7 @@ Supported Hardware
+ |at86rf212   |yes              |at86rf230  | SPI |
+ |at86rf212b  |yes              |at86rf230  | SPI | http://www.digikey.com/product-search/en?x=0&y=0&lang=en&site=us&keywords=ATZB-212B-XPRO[digikey]
+ |cc2520      |yes              |cc2520     | SPI |
++|cc2420      |no               |           | SPI | http://de.aliexpress.com/store/product/ZIGBEE-networking-technology-Wi-Fi-CC2420-wireless-transceiver-modules-including-antenna/1383438_2036388706.html[aliexpress]
+ |atusb       |not mainline yet |atusb      | USB | http://downloads.qi-hardware.com/people/werner/wpan/web/[atusb] Out of stock. Mailto linux-wpan and Werner to produce maybe new ones. Or contact http://en.qi-hardware.com/wiki/Main_Page[qi-hardware].
+ |RZUSBstick  |no, WIP          |atusb      | USB |
+ |=============================================================
 -- 
-2.2.2
+2.3.0
 
