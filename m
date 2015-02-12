@@ -1,44 +1,48 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f179.google.com ([209.85.212.179]:44496 "EHLO
-	mail-wi0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752620AbbBKNje (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Wed, 11 Feb 2015 08:39:34 -0500
-Received: by mail-wi0-f179.google.com with SMTP id hi2so4990700wib.0
-        for <linux-wpan@vger.kernel.org>; Wed, 11 Feb 2015 05:39:33 -0800 (PST)
-From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCHv2 bluetooth-next 3/3] ieee802154: cleanup ieee802154_le64_to_be64
-Date: Wed, 11 Feb 2015 14:39:17 +0100
-Message-Id: <1423661957-3485-4-git-send-email-alex.aring@gmail.com>
+Received: from senator.holtmann.net ([87.106.208.187]:56309 "EHLO
+	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752246AbbBLUim convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Thu, 12 Feb 2015 15:38:42 -0500
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2070.6\))
+Subject: Re: [PATCHv2 bluetooth-next 0/3] ieee802154: small cleanups
+From: Marcel Holtmann <marcel@holtmann.org>
 In-Reply-To: <1423661957-3485-1-git-send-email-alex.aring@gmail.com>
+Date: Thu, 12 Feb 2015 12:37:58 -0800
+Content-Transfer-Encoding: 8BIT
+Message-Id: <EE5E14A8-9FDC-4721-96B1-AC085FB86D6A@holtmann.org>
 References: <1423661957-3485-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org
-Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
+To: Alexander Aring <alex.aring@gmail.com>
+Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de
 
-This patch cleanups the ieee802154_le64_to_be64 function. This patch
-removes an unnecessary temporary variable.
+Hi Alex,
 
-Signed-off-by: Alexander Aring <alex.aring@gmail.com>
----
- include/net/mac802154.h | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+> this patch series contains some small cleanups. THe first patch do a more
+> correct checking on valid psdu len, this is necessary e.g. in at86rf230
+> promiscous mode frame length checking to avoid an access out of mpdu buffer.
+> The last two patches simple remove some unnecessary temporary variable.
+> 
+> - Alex
+> 
+> changes since v2:
+> 
+> - use __put_unaligned_memmove64 for handle unaligned pointer access
+>  in Patch 2/3 and 3/3.
+> 
+> Alexander Aring (3):
+>  ieee802154: correct ieee802154_is_valid_psdu_len
+>  ieee802154: cleanup ieee802154_be64_to_le64
+>  ieee802154: cleanup ieee802154_le64_to_be64
+> 
+> include/linux/ieee802154.h | 12 ++++++++++--
+> include/net/mac802154.h    |  9 +++------
+> 2 files changed, 13 insertions(+), 8 deletions(-)
 
-diff --git a/include/net/mac802154.h b/include/net/mac802154.h
-index c5c6445..fb4e8a3d 100644
---- a/include/net/mac802154.h
-+++ b/include/net/mac802154.h
-@@ -244,9 +244,7 @@ static inline void ieee802154_be64_to_le64(void *le64_dst, const void *be64_src)
-  */
- static inline void ieee802154_le64_to_be64(void *be64_dst, const void *le64_src)
- {
--	__be64 tmp = (__force __be64)swab64p(le64_src);
--
--	memcpy(be64_dst, &tmp, IEEE802154_EXTENDED_ADDR_LEN);
-+	__put_unaligned_memmove64(swab64p(le64_src), be64_dst);
- }
- 
- /* Basic interface to register ieee802154 hwice */
--- 
-2.3.0
+all 3 patches have been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
 
