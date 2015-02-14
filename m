@@ -1,31 +1,44 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-we0-f174.google.com ([74.125.82.174]:55351 "EHLO
-	mail-we0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754252AbbBNWmr (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Sat, 14 Feb 2015 17:42:47 -0500
-Date: Sat, 14 Feb 2015 23:42:43 +0100
+Received: from mail-wi0-f181.google.com ([209.85.212.181]:34579 "EHLO
+	mail-wi0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754362AbbBNW6D (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Sat, 14 Feb 2015 17:58:03 -0500
+Received: by mail-wi0-f181.google.com with SMTP id r20so19263661wiv.2
+        for <linux-wpan@vger.kernel.org>; Sat, 14 Feb 2015 14:58:01 -0800 (PST)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: Re: [PATCHv5 bluetooth-next 0/3] 6lowpan: introduce nhc framework
-Message-ID: <20150214224240.GB18210@omega>
-References: <1420818179-18585-1-git-send-email-alex.aring@gmail.com>
- <E16CAA62-8C4A-4034-A531-A13EF1E26771@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <E16CAA62-8C4A-4034-A531-A13EF1E26771@holtmann.org>
+Subject: [PATCH bluetooth-next] at86rf230: assign wait_for_completion_timeout to appropriately typed var
+Date: Sat, 14 Feb 2015 23:57:48 +0100
+Message-Id: <1423954668-21406-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org, kernel@pengutronix.de, Jukka Rissanen <jukka.rissanen@linux.intel.com>, Martin Townsend <mtownsend1973@gmail.com>, Stefan Schmidt <s.schmidt@samsung.com>
+To: linux-wpan@vger.kernel.org
+Cc: kernel@pengutronix.de, Nicholas Mc Guire <hofrat@osadl.org>, Alexander Aring <alex.aring@gmail.com>
 
-Hi Marcel,
+From: Nicholas Mc Guire <hofrat@osadl.org>
 
-On Sat, Feb 14, 2015 at 02:10:33PM -0800, Marcel Holtmann wrote:
-...
-> 
-> all 3 patches have been applied to bluetooth-next tree.
-> 
+return type of wait_for_completion_timeout is unsigned long not int.
+As rc is used here only for wait_for_completion_timeout the type is simply
+changed to unsigned long.
 
-thanks for fixing the format string issue!
+Signed-off-by: Nicholas Mc Guire <hofrat@osadl.org>
+Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+---
+ drivers/net/ieee802154/at86rf230.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-- Alex
+diff --git a/drivers/net/ieee802154/at86rf230.c b/drivers/net/ieee802154/at86rf230.c
+index 7b051ea..cbfc8c5 100644
+--- a/drivers/net/ieee802154/at86rf230.c
++++ b/drivers/net/ieee802154/at86rf230.c
+@@ -689,7 +689,7 @@ at86rf230_sync_state_change_complete(void *context)
+ static int
+ at86rf230_sync_state_change(struct at86rf230_local *lp, unsigned int state)
+ {
+-	int rc;
++	unsigned long rc;
+ 
+ 	at86rf230_async_state_change(lp, &lp->state, state,
+ 				     at86rf230_sync_state_change_complete,
+-- 
+2.3.0
+
