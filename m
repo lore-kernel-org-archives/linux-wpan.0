@@ -1,71 +1,68 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f181.google.com ([209.85.212.181]:49548 "EHLO
-	mail-wi0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752453AbbBWQGY (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Mon, 23 Feb 2015 11:06:24 -0500
-Received: by mail-wi0-f181.google.com with SMTP id r20so18441963wiv.2
-        for <linux-wpan@vger.kernel.org>; Mon, 23 Feb 2015 08:06:23 -0800 (PST)
-Date: Mon, 23 Feb 2015 17:06:17 +0100
+Received: from mail-wi0-f179.google.com ([209.85.212.179]:34638 "EHLO
+	mail-wi0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752186AbbBWRci (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Mon, 23 Feb 2015 12:32:38 -0500
+Received: by mail-wi0-f179.google.com with SMTP id hi2so19320382wib.0
+        for <linux-wpan@vger.kernel.org>; Mon, 23 Feb 2015 09:32:36 -0800 (PST)
+Date: Mon, 23 Feb 2015 18:32:33 +0100
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: Re: [PATCH bluetooth-next] at86rf230: add support for setting
- external xtal
-Message-ID: <20150223160614.GA16372@omega>
-References: <1424703950-4066-1-git-send-email-alex.aring@gmail.com>
- <54EB4302.9090006@pengutronix.de>
- <20150223151329.GC704@omega>
- <20150223154104.GA15550@omega>
- <54EB4D27.9000800@pengutronix.de>
+Subject: Re: [Linux-zigbee-devel] mac802154 development
+Message-ID: <20150223173228.GB16372@omega>
+References: <02E1EC3037481742A4C5830E984A9E9AA474DF@SRV-DE08.ddel.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <54EB4D27.9000800@pengutronix.de>
+In-Reply-To: <02E1EC3037481742A4C5830E984A9E9AA474DF@SRV-DE08.ddel.de>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Marc Kleine-Budde <mkl@pengutronix.de>
-Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de
+To: "Ludwig, Mike" <ml@dresden-elektronik.de>
+Cc: "linux-zigbee-devel@lists.sourceforge.net" <linux-zigbee-devel@lists.sourceforge.net>, linux-wpan@vger.kernel.org
 
-On Mon, Feb 23, 2015 at 04:54:15PM +0100, Marc Kleine-Budde wrote:
-> On 02/23/2015 04:41 PM, Alexander Aring wrote:
-> > Marc,
-> > 
-> > On Mon, Feb 23, 2015 at 04:13:29PM +0100, Alexander Aring wrote:
-> >> On Mon, Feb 23, 2015 at 04:10:58PM +0100, Marc Kleine-Budde wrote:
-> >>> On 02/23/2015 04:05 PM, Alexander Aring wrote:
-> >>>> This patch adds support for setting external xtal. This is recommended
-> > ...
-> >>>>  	rc = at86rf230_read_subreg(lp, SR_DVDD_OK, &dvdd);
-> >>>>  	if (rc)
-> >>>>  		return rc;
-> >>>> @@ -1392,6 +1403,16 @@ at86rf230_get_pdata(struct spi_device *spi)
-> >>>>  	pdata->rstn = of_get_named_gpio(spi->dev.of_node, "reset-gpio", 0);
-> >>>>  	pdata->slp_tr = of_get_named_gpio(spi->dev.of_node, "sleep-gpio", 0);
-> >>>>  
-> >>>> +	pdata->xtal = of_property_read_bool(spi->dev.of_node, "external-xtal");
-> >>>
-> >>> The platform data should be considered read only by the driver. Better
-> >>> put the information into your per-driver private data struct.
-> >>>
-> >>
-> >> ah, yes you are completely right here. Sorry :)
-> >>
-> > 
-> > I am not sure if this is okay here in that case. For non devicetree this
-> > code will never touched and I grab this code from some i2c driver like
-> > [0].
-> > 
-> > They also use the platform-data for setting the devicetree properties.
-> 
-> That doesn't make it better.
-> 
-> > The only thing which I can see now is the check if (xtal > 0xF) which is
-> > not available on non devicetree settings... but I can also remove this
-> > check, somebody should make something complete wrong if this value is
-> > above 0xF and regmap should mask this value.
-> 
-> IMHO this driver has been poorly converted to DT. The usual way would be
-> to add data to at86rf230_local.
+Hi,
 
-Okay, then I will do that and fix the other things and never use another
-code for an example. (except the can branch) ;-)
+please DON'T use the sourceforge mailinglist. We have linux-wpan now
+[1]. 
+
+On Mon, Feb 23, 2015 at 04:38:29PM +0000, Ludwig, Mike wrote:
+> Hi,
+> 
+> I'm currently trying to get a grip on the IEEE 802.15.4 stack in mainline and bluetooth-next. I do succeed in using the fakehard.ko and fakelb.ko to add a wpan-phy for MAC or 6LoWPAN operations. However, doing real stuff on the MAC seems still broken as already mentioned here (Re: [Linux-zigbee-devel] 802.15.4 scan, scan_req and ieee802154_nl_scan_confirm()<http://www.spinics.net/lists/linux-wpan/msg00365.html>). That is, a scan - which would be the first step in network establishment - still fails
+
+yes you are right any mlme ops was never "right" implemented. What you
+see there is only some callbacks structures to make them available for
+HardMAC drivers. (Then you need only to implement the interface and not
+the real algorithm). That's my assumptation what the previous
+maintainers did there.
+
+> 
+> As far as I can tell the status of the MAC in bluetooth-next has not changed since this post. I guess the rework is still in progress.
+
+Yes the rework is still in progress and the MLME ops state isn't changed
+yet. The rework will do some things more "generic" so we have the chance
+to implement MLME ops.
+
+The rework also contains various changes to grab some good things from
+wireless stack but with 802.15.4 functionality.
+
+> Are there may some preliminary rework results (without any support), that could be tested? My intention would be to test the kernel implementation against the current lowpan-tools, or is there anything blocking this?
+> 
+
+You need the wpan-tools which is based on iw now. See [0].
+
+> I finally would like to establish a WPAN with linux being either  coordinator or device for plain IEEE 802.15.4 and 6LoWPAN communication using some simple modules (e.g. Atmel based Transceiver or SoC). I would hope this to be possible with the lowpan-tools but welcome any new tools there as well.
+> 
+
+See [0], but we also have no coordinator support. The further plans are
+to add a "coordinator" interface type.
+
+> I would welcome any hints on getting closer to this. Thanks a lot in advance.
+> 
+> Best regards
+> 
+> 
 
 - Alex
+
+[0] http://wpan.cakelab.org/
+[1] http://vger.kernel.org/vger-lists.html#linux-wpan
