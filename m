@@ -1,122 +1,132 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-we0-f171.google.com ([74.125.82.171]:38625 "EHLO
-	mail-we0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752379AbbBWT35 (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Mon, 23 Feb 2015 14:29:57 -0500
-Received: by wesw55 with SMTP id w55so20817761wes.5
-        for <linux-wpan@vger.kernel.org>; Mon, 23 Feb 2015 11:29:56 -0800 (PST)
+Received: from mail-wg0-f48.google.com ([74.125.82.48]:38616 "EHLO
+	mail-wg0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752408AbbBWT37 (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Mon, 23 Feb 2015 14:29:59 -0500
+Received: by wgha1 with SMTP id a1so840213wgh.5
+        for <linux-wpan@vger.kernel.org>; Mon, 23 Feb 2015 11:29:58 -0800 (PST)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCHv2 bluetooth-next 1/2] at86rf230: copy pdata to driver allocated space
-Date: Mon, 23 Feb 2015 20:29:43 +0100
-Message-Id: <1424719784-15012-1-git-send-email-alex.aring@gmail.com>
+Subject: [PATCHv2 bluetooth-next 2/2] at86rf230: add support for external xtal
+Date: Mon, 23 Feb 2015 20:29:44 +0100
+Message-Id: <1424719784-15012-2-git-send-email-alex.aring@gmail.com>
+In-Reply-To: <1424719784-15012-1-git-send-email-alex.aring@gmail.com>
+References: <1424719784-15012-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
 Cc: kernel@pengutronix.de, mkl@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-This patch copies the platform data in driver allocated space at first.
-With this change we ensure that we access the allocated platform data as
-readonly space.
+This patch adds support for setting external xtal. This is recommended
+by the at86rf230 transceivers to reduce power consuming and for a better
+clock source.
 
 Signed-off-by: Alexander Aring <alex.aring@gmail.com>
-Reported-by: Marc Kleine-Budde <mkl@pengutronix.de>
 ---
- drivers/net/ieee802154/at86rf230.c | 49 ++++++++++++++++++--------------------
- 1 file changed, 23 insertions(+), 26 deletions(-)
+ .../bindings/net/ieee802154/at86rf230.txt          |  6 ++++++
+ drivers/net/ieee802154/at86rf230.c                 | 23 ++++++++++++++++++++--
+ include/linux/spi/at86rf230.h                      |  2 ++
+ 3 files changed, 29 insertions(+), 2 deletions(-)
 
+diff --git a/Documentation/devicetree/bindings/net/ieee802154/at86rf230.txt b/Documentation/devicetree/bindings/net/ieee802154/at86rf230.txt
+index d3bbdded..4d47c2e 100644
+--- a/Documentation/devicetree/bindings/net/ieee802154/at86rf230.txt
++++ b/Documentation/devicetree/bindings/net/ieee802154/at86rf230.txt
+@@ -11,6 +11,10 @@ Required properties:
+ Optional properties:
+   - reset-gpio:		GPIO spec for the rstn pin
+   - sleep-gpio:		GPIO spec for the slp_tr pin
++  - external-xtal:	boolean to use external xtal if present
++  - xtal-trim:		u8 value to fine tuning the internal capacitance
++			arrays of xtal pins. This value should not above 0x0F
++			and only present when external-xtal is enabled
+ 
+ Example:
+ 
+@@ -20,4 +24,6 @@ Example:
+ 		reg = <0>;
+ 		interrupts = <19 1>;
+ 		interrupt-parent = <&gpio3>;
++		external-xtal;
++		xtal-trim = /bits/ 8 <0x06>;
+ 	};
 diff --git a/drivers/net/ieee802154/at86rf230.c b/drivers/net/ieee802154/at86rf230.c
-index cbfc8c5..c495f23 100644
+index c495f23..1853f1e 100644
 --- a/drivers/net/ieee802154/at86rf230.c
 +++ b/drivers/net/ieee802154/at86rf230.c
-@@ -1377,24 +1377,21 @@ static int at86rf230_hw_init(struct at86rf230_local *lp)
- 	return at86rf230_write_subreg(lp, SR_SLOTTED_OPERATION, 0);
- }
+@@ -72,6 +72,7 @@ struct at86rf230_state_change {
  
--static struct at86rf230_platform_data *
--at86rf230_get_pdata(struct spi_device *spi)
-+static int at86rf230_get_pdata(struct spi_device *spi,
-+			       struct at86rf230_platform_data *cfg)
- {
--	struct at86rf230_platform_data *pdata;
-+	if (!IS_ENABLED(CONFIG_OF) || !spi->dev.of_node) {
-+		if (!spi->dev.platform_data)
-+			return -ENOENT;
+ struct at86rf230_local {
+ 	struct spi_device *spi;
++	struct at86rf230_platform_data cfg;
  
--	if (!IS_ENABLED(CONFIG_OF) || !spi->dev.of_node)
--		return spi->dev.platform_data;
--
--	pdata = devm_kzalloc(&spi->dev, sizeof(*pdata), GFP_KERNEL);
--	if (!pdata)
--		goto done;
-+		memcpy(cfg, spi->dev.platform_data, sizeof(*cfg));
-+		return 0;
+ 	struct ieee802154_hw *hw;
+ 	struct at86rf2xx_chip_data *data;
+@@ -1362,6 +1363,17 @@ static int at86rf230_hw_init(struct at86rf230_local *lp)
+ 	usleep_range(lp->data->t_sleep_cycle,
+ 		     lp->data->t_sleep_cycle + 100);
+ 
++	if (lp->cfg.xtal) {
++		rc = at86rf230_write_subreg(lp, SR_XTAL_TRIM,
++					    lp->cfg.xtal_trim);
++		if (rc)
++			return rc;
++
++		rc = at86rf230_write_subreg(lp, SR_XTAL_MODE, 0x5);
++		if (rc)
++			return rc;
 +	}
++
+ 	rc = at86rf230_read_subreg(lp, SR_DVDD_OK, &dvdd);
+ 	if (rc)
+ 		return rc;
+@@ -1380,18 +1392,24 @@ static int at86rf230_hw_init(struct at86rf230_local *lp)
+ static int at86rf230_get_pdata(struct spi_device *spi,
+ 			       struct at86rf230_platform_data *cfg)
+ {
++	int ret = 0;
++
+ 	if (!IS_ENABLED(CONFIG_OF) || !spi->dev.of_node) {
+ 		if (!spi->dev.platform_data)
+ 			return -ENOENT;
  
--	pdata->rstn = of_get_named_gpio(spi->dev.of_node, "reset-gpio", 0);
--	pdata->slp_tr = of_get_named_gpio(spi->dev.of_node, "sleep-gpio", 0);
-+	cfg->rstn = of_get_named_gpio(spi->dev.of_node, "reset-gpio", 0);
-+	cfg->slp_tr = of_get_named_gpio(spi->dev.of_node, "sleep-gpio", 0);
+ 		memcpy(cfg, spi->dev.platform_data, sizeof(*cfg));
+-		return 0;
++		return ret;
+ 	}
  
--	spi->dev.platform_data = pdata;
--done:
--	return pdata;
-+	return 0;
+ 	cfg->rstn = of_get_named_gpio(spi->dev.of_node, "reset-gpio", 0);
+ 	cfg->slp_tr = of_get_named_gpio(spi->dev.of_node, "sleep-gpio", 0);
++	cfg->xtal = of_property_read_bool(spi->dev.of_node, "external-xtal");
++	if (cfg->xtal)
++		ret = of_property_read_u8(spi->dev.of_node, "xtal-trim",
++					  &cfg->xtal_trim);
+ 
+-	return 0;
++	return ret;
  }
  
  static int
-@@ -1501,7 +1498,7 @@ at86rf230_setup_spi_messages(struct at86rf230_local *lp)
+@@ -1545,6 +1563,7 @@ static int at86rf230_probe(struct spi_device *spi)
+ 	lp = hw->priv;
+ 	lp->hw = hw;
+ 	lp->spi = spi;
++	lp->cfg = cfg;
+ 	hw->parent = &spi->dev;
+ 	hw->vif_data_size = sizeof(*lp);
+ 	ieee802154_random_extended_addr(&hw->phy->perm_extended_addr);
+diff --git a/include/linux/spi/at86rf230.h b/include/linux/spi/at86rf230.h
+index cd519a1..632ad90 100644
+--- a/include/linux/spi/at86rf230.h
++++ b/include/linux/spi/at86rf230.h
+@@ -22,6 +22,8 @@ struct at86rf230_platform_data {
+ 	int rstn;
+ 	int slp_tr;
+ 	int dig2;
++	bool xtal;
++	u8 xtal_trim;
+ };
  
- static int at86rf230_probe(struct spi_device *spi)
- {
--	struct at86rf230_platform_data *pdata;
-+	struct at86rf230_platform_data cfg;
- 	struct ieee802154_hw *hw;
- 	struct at86rf230_local *lp;
- 	unsigned int status;
-@@ -1512,32 +1509,32 @@ static int at86rf230_probe(struct spi_device *spi)
- 		return -EINVAL;
- 	}
- 
--	pdata = at86rf230_get_pdata(spi);
--	if (!pdata) {
--		dev_err(&spi->dev, "no platform_data\n");
--		return -EINVAL;
-+	rc = at86rf230_get_pdata(spi, &cfg);
-+	if (rc < 0) {
-+		dev_err(&spi->dev, "failed to parse platform_data: %d\n", rc);
-+		return rc;
- 	}
- 
--	if (gpio_is_valid(pdata->rstn)) {
--		rc = devm_gpio_request_one(&spi->dev, pdata->rstn,
-+	if (gpio_is_valid(cfg.rstn)) {
-+		rc = devm_gpio_request_one(&spi->dev, cfg.rstn,
- 					   GPIOF_OUT_INIT_HIGH, "rstn");
- 		if (rc)
- 			return rc;
- 	}
- 
--	if (gpio_is_valid(pdata->slp_tr)) {
--		rc = devm_gpio_request_one(&spi->dev, pdata->slp_tr,
-+	if (gpio_is_valid(cfg.slp_tr)) {
-+		rc = devm_gpio_request_one(&spi->dev, cfg.slp_tr,
- 					   GPIOF_OUT_INIT_LOW, "slp_tr");
- 		if (rc)
- 			return rc;
- 	}
- 
- 	/* Reset */
--	if (gpio_is_valid(pdata->rstn)) {
-+	if (gpio_is_valid(cfg.rstn)) {
- 		udelay(1);
--		gpio_set_value(pdata->rstn, 0);
-+		gpio_set_value(cfg.rstn, 0);
- 		udelay(1);
--		gpio_set_value(pdata->rstn, 1);
-+		gpio_set_value(cfg.rstn, 1);
- 		usleep_range(120, 240);
- 	}
- 
+ #endif
 -- 
 2.3.0
 
