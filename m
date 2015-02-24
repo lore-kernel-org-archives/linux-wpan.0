@@ -1,14 +1,14 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f176.google.com ([209.85.212.176]:59250 "EHLO
-	mail-wi0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752538AbbBXKLU (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Tue, 24 Feb 2015 05:11:20 -0500
-Received: by mail-wi0-f176.google.com with SMTP id h11so24151426wiw.3
-        for <linux-wpan@vger.kernel.org>; Tue, 24 Feb 2015 02:11:19 -0800 (PST)
+Received: from mail-wi0-f169.google.com ([209.85.212.169]:38326 "EHLO
+	mail-wi0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752503AbbBXKLV (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Tue, 24 Feb 2015 05:11:21 -0500
+Received: by mail-wi0-f169.google.com with SMTP id em10so25982052wid.0
+        for <linux-wpan@vger.kernel.org>; Tue, 24 Feb 2015 02:11:20 -0800 (PST)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCHv3 bluetooth-next 1/2] at86rf230: copy pdata to driver allocated space
-Date: Tue, 24 Feb 2015 11:11:04 +0100
-Message-Id: <1424772665-25857-2-git-send-email-alex.aring@gmail.com>
+Subject: [PATCHv3 bluetooth-next 2/2] at86rf230: add support for external xtal trim
+Date: Tue, 24 Feb 2015 11:11:05 +0100
+Message-Id: <1424772665-25857-3-git-send-email-alex.aring@gmail.com>
 In-Reply-To: <1424772665-25857-1-git-send-email-alex.aring@gmail.com>
 References: <1424772665-25857-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
@@ -16,109 +16,98 @@ List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
 Cc: kernel@pengutronix.de, mkl@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-This patch copies the platform data in driver allocated space at first.
-With this change we ensure that we access the allocated platform data as
-readonly space.
+This patch adds support for setting the xtal trim register. Some at86rf2xx
+transceiver boards needs fine tuning the xtal capacitor.
 
 Signed-off-by: Alexander Aring <alex.aring@gmail.com>
-Reported-by: Marc Kleine-Budde <mkl@pengutronix.de>
 ---
- drivers/net/ieee802154/at86rf230.c | 49 ++++++++++++++++++--------------------
- 1 file changed, 23 insertions(+), 26 deletions(-)
+ .../devicetree/bindings/net/ieee802154/at86rf230.txt         |  3 +++
+ drivers/net/ieee802154/at86rf230.c                           | 12 ++++++++++++
+ include/linux/spi/at86rf230.h                                |  1 +
+ 3 files changed, 16 insertions(+)
 
+diff --git a/Documentation/devicetree/bindings/net/ieee802154/at86rf230.txt b/Documentation/devicetree/bindings/net/ieee802154/at86rf230.txt
+index d3bbdded..1ae5100 100644
+--- a/Documentation/devicetree/bindings/net/ieee802154/at86rf230.txt
++++ b/Documentation/devicetree/bindings/net/ieee802154/at86rf230.txt
+@@ -11,6 +11,8 @@ Required properties:
+ Optional properties:
+   - reset-gpio:		GPIO spec for the rstn pin
+   - sleep-gpio:		GPIO spec for the slp_tr pin
++  - xtal-trim:		u8 value for fine tuning the internal capacitance
++			arrays of xtal pins: 0 = +0 pF, 0xf = +4.5 pF
+ 
+ Example:
+ 
+@@ -20,4 +22,5 @@ Example:
+ 		reg = <0>;
+ 		interrupts = <19 1>;
+ 		interrupt-parent = <&gpio3>;
++		xtal-trim = /bits/ 8 <0x06>;
+ 	};
 diff --git a/drivers/net/ieee802154/at86rf230.c b/drivers/net/ieee802154/at86rf230.c
-index cbfc8c5..c495f23 100644
+index c495f23..e74b3cc 100644
 --- a/drivers/net/ieee802154/at86rf230.c
 +++ b/drivers/net/ieee802154/at86rf230.c
-@@ -1377,24 +1377,21 @@ static int at86rf230_hw_init(struct at86rf230_local *lp)
- 	return at86rf230_write_subreg(lp, SR_SLOTTED_OPERATION, 0);
- }
+@@ -72,6 +72,7 @@ struct at86rf230_state_change {
  
--static struct at86rf230_platform_data *
--at86rf230_get_pdata(struct spi_device *spi)
-+static int at86rf230_get_pdata(struct spi_device *spi,
-+			       struct at86rf230_platform_data *cfg)
- {
--	struct at86rf230_platform_data *pdata;
-+	if (!IS_ENABLED(CONFIG_OF) || !spi->dev.of_node) {
-+		if (!spi->dev.platform_data)
-+			return -ENOENT;
- 
--	if (!IS_ENABLED(CONFIG_OF) || !spi->dev.of_node)
--		return spi->dev.platform_data;
--
--	pdata = devm_kzalloc(&spi->dev, sizeof(*pdata), GFP_KERNEL);
--	if (!pdata)
--		goto done;
-+		memcpy(cfg, spi->dev.platform_data, sizeof(*cfg));
-+		return 0;
-+	}
- 
--	pdata->rstn = of_get_named_gpio(spi->dev.of_node, "reset-gpio", 0);
--	pdata->slp_tr = of_get_named_gpio(spi->dev.of_node, "sleep-gpio", 0);
-+	cfg->rstn = of_get_named_gpio(spi->dev.of_node, "reset-gpio", 0);
-+	cfg->slp_tr = of_get_named_gpio(spi->dev.of_node, "sleep-gpio", 0);
- 
--	spi->dev.platform_data = pdata;
--done:
--	return pdata;
-+	return 0;
- }
- 
- static int
-@@ -1501,7 +1498,7 @@ at86rf230_setup_spi_messages(struct at86rf230_local *lp)
- 
- static int at86rf230_probe(struct spi_device *spi)
- {
--	struct at86rf230_platform_data *pdata;
+ struct at86rf230_local {
+ 	struct spi_device *spi;
 +	struct at86rf230_platform_data cfg;
+ 
  	struct ieee802154_hw *hw;
- 	struct at86rf230_local *lp;
- 	unsigned int status;
-@@ -1512,32 +1509,32 @@ static int at86rf230_probe(struct spi_device *spi)
- 		return -EINVAL;
- 	}
+ 	struct at86rf2xx_chip_data *data;
+@@ -1362,6 +1363,10 @@ static int at86rf230_hw_init(struct at86rf230_local *lp)
+ 	usleep_range(lp->data->t_sleep_cycle,
+ 		     lp->data->t_sleep_cycle + 100);
  
--	pdata = at86rf230_get_pdata(spi);
--	if (!pdata) {
--		dev_err(&spi->dev, "no platform_data\n");
--		return -EINVAL;
-+	rc = at86rf230_get_pdata(spi, &cfg);
-+	if (rc < 0) {
-+		dev_err(&spi->dev, "failed to parse platform_data: %d\n", rc);
++	rc = at86rf230_write_subreg(lp, SR_XTAL_TRIM, lp->cfg.xtal_trim);
++	if (rc)
 +		return rc;
- 	}
++
+ 	rc = at86rf230_read_subreg(lp, SR_DVDD_OK, &dvdd);
+ 	if (rc)
+ 		return rc;
+@@ -1380,6 +1385,8 @@ static int at86rf230_hw_init(struct at86rf230_local *lp)
+ static int at86rf230_get_pdata(struct spi_device *spi,
+ 			       struct at86rf230_platform_data *cfg)
+ {
++	int ret;
++
+ 	if (!IS_ENABLED(CONFIG_OF) || !spi->dev.of_node) {
+ 		if (!spi->dev.platform_data)
+ 			return -ENOENT;
+@@ -1390,6 +1397,10 @@ static int at86rf230_get_pdata(struct spi_device *spi,
  
--	if (gpio_is_valid(pdata->rstn)) {
--		rc = devm_gpio_request_one(&spi->dev, pdata->rstn,
-+	if (gpio_is_valid(cfg.rstn)) {
-+		rc = devm_gpio_request_one(&spi->dev, cfg.rstn,
- 					   GPIOF_OUT_INIT_HIGH, "rstn");
- 		if (rc)
- 			return rc;
- 	}
+ 	cfg->rstn = of_get_named_gpio(spi->dev.of_node, "reset-gpio", 0);
+ 	cfg->slp_tr = of_get_named_gpio(spi->dev.of_node, "sleep-gpio", 0);
++	ret = of_property_read_u8(spi->dev.of_node, "xtal-trim",
++				  &cfg->xtal_trim);
++	if (ret < 0 && ret != -EINVAL)
++		return ret;
  
--	if (gpio_is_valid(pdata->slp_tr)) {
--		rc = devm_gpio_request_one(&spi->dev, pdata->slp_tr,
-+	if (gpio_is_valid(cfg.slp_tr)) {
-+		rc = devm_gpio_request_one(&spi->dev, cfg.slp_tr,
- 					   GPIOF_OUT_INIT_LOW, "slp_tr");
- 		if (rc)
- 			return rc;
- 	}
+ 	return 0;
+ }
+@@ -1545,6 +1556,7 @@ static int at86rf230_probe(struct spi_device *spi)
+ 	lp = hw->priv;
+ 	lp->hw = hw;
+ 	lp->spi = spi;
++	lp->cfg = cfg;
+ 	hw->parent = &spi->dev;
+ 	hw->vif_data_size = sizeof(*lp);
+ 	ieee802154_random_extended_addr(&hw->phy->perm_extended_addr);
+diff --git a/include/linux/spi/at86rf230.h b/include/linux/spi/at86rf230.h
+index cd519a1..b63fe6f 100644
+--- a/include/linux/spi/at86rf230.h
++++ b/include/linux/spi/at86rf230.h
+@@ -22,6 +22,7 @@ struct at86rf230_platform_data {
+ 	int rstn;
+ 	int slp_tr;
+ 	int dig2;
++	u8 xtal_trim;
+ };
  
- 	/* Reset */
--	if (gpio_is_valid(pdata->rstn)) {
-+	if (gpio_is_valid(cfg.rstn)) {
- 		udelay(1);
--		gpio_set_value(pdata->rstn, 0);
-+		gpio_set_value(cfg.rstn, 0);
- 		udelay(1);
--		gpio_set_value(pdata->rstn, 1);
-+		gpio_set_value(cfg.rstn, 1);
- 		usleep_range(120, 240);
- 	}
- 
+ #endif
 -- 
 2.3.0
 
