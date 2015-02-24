@@ -1,140 +1,80 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f169.google.com ([209.85.212.169]:40771 "EHLO
-	mail-wi0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751848AbbBXPzO (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Tue, 24 Feb 2015 10:55:14 -0500
-Received: by mail-wi0-f169.google.com with SMTP id em10so28161908wid.0
-        for <linux-wpan@vger.kernel.org>; Tue, 24 Feb 2015 07:55:13 -0800 (PST)
-From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCHv4 bluetooth-next 2/2] at86rf230: add support for external xtal trim
-Date: Tue, 24 Feb 2015 16:55:01 +0100
-Message-Id: <1424793301-29931-3-git-send-email-alex.aring@gmail.com>
+Received: from senator.holtmann.net ([87.106.208.187]:44730 "EHLO
+	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752516AbbBXQSB convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Tue, 24 Feb 2015 11:18:01 -0500
+Content-Type: text/plain; charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2070.6\))
+Subject: Re: [PATCHv4 bluetooth-next 0/2] at86rf230: add support for xtal trim register
+From: Marcel Holtmann <marcel@holtmann.org>
 In-Reply-To: <1424793301-29931-1-git-send-email-alex.aring@gmail.com>
+Date: Tue, 24 Feb 2015 08:17:53 -0800
+Content-Transfer-Encoding: 8BIT
+Message-Id: <EF479A57-17F1-423B-82B2-53C5A26148C4@holtmann.org>
 References: <1424793301-29931-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org
-Cc: kernel@pengutronix.de, mkl@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
+To: Alexander Aring <alex.aring@gmail.com>
+Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de, mkl@pengutronix.de, Werner Almesberger <werner@almesberger.net>, Thomas Stilwell <stilwellt@openlabs.co>
 
-This patch adds support for setting the xtal trim register. Some at86rf2xx
-transceiver boards needs fine tuning the xtal capacitor.
+Hi Alex,
 
-Signed-off-by: Alexander Aring <alex.aring@gmail.com>
----
- .../devicetree/bindings/net/ieee802154/at86rf230.txt  |  3 +++
- drivers/net/ieee802154/at86rf230.c                    | 19 +++++++++++++++----
- include/linux/spi/at86rf230.h                         |  1 +
- 3 files changed, 19 insertions(+), 4 deletions(-)
+> I want to clarify how xtal_trim value is calculated now.
+> 
+> First of all the xtal_mode set to 0x5 will require a 16 Mhz clock signal at
+> pin 26. I don't have such at86rf2xx board which can do that, so I don't want
+> to support it right now.
+> 
+> IMPORTANT:
+> The xtal_mode for external frequency differs per at86rf2xx transceiver. For
+> at86rf230/at86rf231 it's 0x4. For at86rf233 it's 0x5. (Thanks Werner
+> Almesberger who pointed this out). That doesn't matter right now, because we
+> don't change the "normal" mode.
+> 
+> 
+> The xtal_trim is only necesarry for external crystal, when xtal_mode == 0xF.
+> The xtal_trim value is calculated by:
+> 
+> CL = capacitor of used crystal
+> CX = connected capacitors at xtal pins
+> CPAR = in all at86rf2xx datasheets this is a constant value 3 pF,
+>       but this is different on each board setup. You need to fine
+>       tuning this value via CTRIM.
+> CTRIM = variable capacitor setting. Resolution is 0.3 pF range is
+>        0 pF upto 4.5 pF.
+> 
+> CL = 0.5 * (CX + CTRIM + CPAR)
+> 
+> 
+> Examples:
+> 
+> On atben [0]:
+> 
+> CL = 8 pF
+> CX = 12 pF
+> CPAR = 3 pF (We assume the magic constant from datasheet)
+> CTRIM = 0.9 pF
+> 
+> (12+0.9+3)/2 = 7.95 which is nearly at 8 pF
+> 
+> openlabs [1]:
+> 
+> CL = 16 pF
+> CX = 22 pF
+> CPAR = 3 pF (We assume the magic constant from datasheet)
+> CTRIM = 4.5 pF
+> 
+> (22+4.5+3)/2 = 14.75 which is the nearest value to 16 pF
+> 
+> For more information it's the section "Integrated Oscillator Setup" inside
+> the at86rf2xx datasheets. (In my case 8111C–MCU Wireless–09/09).
+> 
+> For a better calculation of the CPAR value, Werner Almesberger developed some
+> diagnostic tool [2], which I don't tried out yet.
 
-diff --git a/Documentation/devicetree/bindings/net/ieee802154/at86rf230.txt b/Documentation/devicetree/bindings/net/ieee802154/at86rf230.txt
-index d3bbdded..1ae5100 100644
---- a/Documentation/devicetree/bindings/net/ieee802154/at86rf230.txt
-+++ b/Documentation/devicetree/bindings/net/ieee802154/at86rf230.txt
-@@ -11,6 +11,8 @@ Required properties:
- Optional properties:
-   - reset-gpio:		GPIO spec for the rstn pin
-   - sleep-gpio:		GPIO spec for the slp_tr pin
-+  - xtal-trim:		u8 value for fine tuning the internal capacitance
-+			arrays of xtal pins: 0 = +0 pF, 0xf = +4.5 pF
- 
- Example:
- 
-@@ -20,4 +22,5 @@ Example:
- 		reg = <0>;
- 		interrupts = <19 1>;
- 		interrupt-parent = <&gpio3>;
-+		xtal-trim = /bits/ 8 <0x06>;
- 	};
-diff --git a/drivers/net/ieee802154/at86rf230.c b/drivers/net/ieee802154/at86rf230.c
-index 9888b7f..266e67e 100644
---- a/drivers/net/ieee802154/at86rf230.c
-+++ b/drivers/net/ieee802154/at86rf230.c
-@@ -1315,7 +1315,7 @@ static struct at86rf2xx_chip_data at86rf212_data = {
- 	.get_desense_steps = at86rf212_get_desens_steps
- };
- 
--static int at86rf230_hw_init(struct at86rf230_local *lp)
-+static int at86rf230_hw_init(struct at86rf230_local *lp, u8 xtal_trim)
- {
- 	int rc, irq_type, irq_pol = IRQ_ACTIVE_HIGH;
- 	unsigned int dvdd;
-@@ -1362,6 +1362,10 @@ static int at86rf230_hw_init(struct at86rf230_local *lp)
- 	usleep_range(lp->data->t_sleep_cycle,
- 		     lp->data->t_sleep_cycle + 100);
- 
-+	rc = at86rf230_write_subreg(lp, SR_XTAL_TRIM, xtal_trim);
-+	if (rc)
-+		return rc;
-+
- 	rc = at86rf230_read_subreg(lp, SR_DVDD_OK, &dvdd);
- 	if (rc)
- 		return rc;
-@@ -1378,9 +1382,11 @@ static int at86rf230_hw_init(struct at86rf230_local *lp)
- }
- 
- static int
--at86rf230_get_pdata(struct spi_device *spi, int *rstn, int *slp_tr)
-+at86rf230_get_pdata(struct spi_device *spi, int *rstn, int *slp_tr,
-+		    u8 *xtal_trim)
- {
- 	struct at86rf230_platform_data *pdata = spi->dev.platform_data;
-+	int ret;
- 
- 	if (!IS_ENABLED(CONFIG_OF) || !spi->dev.of_node) {
- 		if (!pdata)
-@@ -1388,11 +1394,15 @@ at86rf230_get_pdata(struct spi_device *spi, int *rstn, int *slp_tr)
- 
- 		*rstn = pdata->rstn;
- 		*slp_tr = pdata->slp_tr;
-+		*xtal_trim = pdata->xtal_trim;
- 		return 0;
- 	}
- 
- 	*rstn = of_get_named_gpio(spi->dev.of_node, "reset-gpio", 0);
- 	*slp_tr = of_get_named_gpio(spi->dev.of_node, "sleep-gpio", 0);
-+	ret = of_property_read_u8(spi->dev.of_node, "xtal-trim", xtal_trim);
-+	if (ret < 0 && ret != -EINVAL)
-+		return ret;
- 
- 	return 0;
- }
-@@ -1505,13 +1515,14 @@ static int at86rf230_probe(struct spi_device *spi)
- 	struct at86rf230_local *lp;
- 	unsigned int status;
- 	int rc, irq_type, rstn, slp_tr;
-+	u8 xtal_trim;
- 
- 	if (!spi->irq) {
- 		dev_err(&spi->dev, "no IRQ specified\n");
- 		return -EINVAL;
- 	}
- 
--	rc = at86rf230_get_pdata(spi, &rstn, &slp_tr);
-+	rc = at86rf230_get_pdata(spi, &rstn, &slp_tr, &xtal_trim);
- 	if (rc < 0) {
- 		dev_err(&spi->dev, "failed to parse platform_data: %d\n", rc);
- 		return rc;
-@@ -1570,7 +1581,7 @@ static int at86rf230_probe(struct spi_device *spi)
- 
- 	spi_set_drvdata(spi, lp);
- 
--	rc = at86rf230_hw_init(lp);
-+	rc = at86rf230_hw_init(lp, xtal_trim);
- 	if (rc)
- 		goto free_dev;
- 
-diff --git a/include/linux/spi/at86rf230.h b/include/linux/spi/at86rf230.h
-index cd519a1..b63fe6f 100644
---- a/include/linux/spi/at86rf230.h
-+++ b/include/linux/spi/at86rf230.h
-@@ -22,6 +22,7 @@ struct at86rf230_platform_data {
- 	int rstn;
- 	int slp_tr;
- 	int dig2;
-+	u8 xtal_trim;
- };
- 
- #endif
--- 
-2.3.0
+don't you want to put this kind of information either in the commit message of the patch or actually as comment in the source code. If you keep it in the cover letter, then this will not be part of the source tree in any form or shape.
+
+Regards
+
+Marcel
 
