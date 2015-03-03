@@ -1,56 +1,64 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wg0-f45.google.com ([74.125.82.45]:42404 "EHLO
-	mail-wg0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756618AbbCCW15 (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Tue, 3 Mar 2015 17:27:57 -0500
-Received: by wggz12 with SMTP id z12so5814904wgg.9
-        for <linux-wpan@vger.kernel.org>; Tue, 03 Mar 2015 14:27:56 -0800 (PST)
-From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH bluetooth-next 3/3] ieee802154: add IEEE802154_FCS_LEN
-Date: Tue,  3 Mar 2015 23:27:35 +0100
-Message-Id: <1425421655-21420-4-git-send-email-alex.aring@gmail.com>
-In-Reply-To: <1425421655-21420-1-git-send-email-alex.aring@gmail.com>
-References: <1425421655-21420-1-git-send-email-alex.aring@gmail.com>
+Received: from metis.ext.pengutronix.de ([92.198.50.35]:43895 "EHLO
+	metis.ext.pengutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755320AbbCCWb4 (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Tue, 3 Mar 2015 17:31:56 -0500
+Message-ID: <54F63654.2020701@pengutronix.de>
+Date: Tue, 03 Mar 2015 23:31:48 +0100
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+MIME-Version: 1.0
+Subject: Re: [PATCH bluetooth-next 3/3] ieee802154: add IEEE802154_FCS_LEN
+References: <1425421655-21420-1-git-send-email-alex.aring@gmail.com> <1425421655-21420-4-git-send-email-alex.aring@gmail.com>
+In-Reply-To: <1425421655-21420-4-git-send-email-alex.aring@gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha512;
+ protocol="application/pgp-signature";
+ boundary="EmkQmBVPEob9KpGqsP1GnriJ06qPUjFFL"
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org
-Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
+To: Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org
+Cc: kernel@pengutronix.de
 
-This patch adds a IEEE802154_FCS_LEN for the frame check sequence also
-called CRC which is inside the MFR (MAC Footer).
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--EmkQmBVPEob9KpGqsP1GnriJ06qPUjFFL
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Alexander Aring <alex.aring@gmail.com>
----
- include/linux/ieee802154.h | 1 +
- net/mac802154/util.c       | 3 ++-
- 2 files changed, 3 insertions(+), 1 deletion(-)
+On 03/03/2015 11:27 PM, Alexander Aring wrote:
+> This patch adds a IEEE802154_FCS_LEN for the frame check sequence also
+> called CRC which is inside the MFR (MAC Footer).
 
-diff --git a/include/linux/ieee802154.h b/include/linux/ieee802154.h
-index f26682e..8872ca1 100644
---- a/include/linux/ieee802154.h
-+++ b/include/linux/ieee802154.h
-@@ -30,6 +30,7 @@
- #define IEEE802154_MTU			127
- #define IEEE802154_ACK_PSDU_LEN		5
- #define IEEE802154_MIN_PSDU_LEN		9
-+#define IEEE802154_FCS_LEN		2
- 
- #define IEEE802154_PAN_ID_BROADCAST	0xffff
- #define IEEE802154_ADDR_SHORT_BROADCAST	0xffff
-diff --git a/net/mac802154/util.c b/net/mac802154/util.c
-index dad966c..150bf80 100644
---- a/net/mac802154/util.c
-+++ b/net/mac802154/util.c
-@@ -72,7 +72,8 @@ void ieee802154_xmit_complete(struct ieee802154_hw *hw, struct sk_buff *skb,
- 		 * part of skb->len.
- 		 */
- 		if (hw->flags & IEEE802154_HW_TX_OMIT_CKSUM)
--			max_sifs_size = IEEE802154_MAX_SIFS_FRAME_SIZE - 2;
-+			max_sifs_size = IEEE802154_MAX_SIFS_FRAME_SIZE -
-+					IEEE802154_FCS_LEN;
- 		else
- 			max_sifs_size = IEEE802154_MAX_SIFS_FRAME_SIZE;
- 
--- 
-2.3.0
+I think you can sqaush patch 3 into 2.
 
+Marc
+
+--=20
+Pengutronix e.K.                  | Marc Kleine-Budde           |
+Industrial Linux Solutions        | Phone: +49-231-2826-924     |
+Vertretung West/Dortmund          | Fax:   +49-5121-206917-5555 |
+Amtsgericht Hildesheim, HRA 2686  | http://www.pengutronix.de   |
+
+
+--EmkQmBVPEob9KpGqsP1GnriJ06qPUjFFL
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCgAGBQJU9jZXAAoJECte4hHFiupUrNsQAKIsSWgcZg6FB10QdoXchoy/
+bOPXFkSF/dahbuNyz58htugu81z1QbBhxB0V1F8qDlkL8QBFBx4g8PFAyyaf7JL2
+K4mxBlpZ+4+B2Gl66FtrmZuESXW2hSZpQov8RREV9kyBNpEGPvdbdh9/l6+LZIz3
+jdeemAKfkIsGU2SwLO0DzsNe8NqoogeBeCPBTsYZqvIGtaHWnknmFr39KqPVBbYQ
+H0uWu/mj9bctO0Sah5lDs8BQ8o5I8xa8E4WD7v4DIEuvwhVm9HEHkY12puZNJxJq
+3VLIGwbrbBUADuOasrJ8MK4yIS3hx1JXV9jO3FYuIcE8nDpZAJ8fjNffydYOx7nD
+9FR2CFCe1v5Ws5PV/N1XJFdvfkdIABT/BnmAGHfMTC49QRbMZcLZdI/EheKSmgUQ
+v81wnBNCmMPEZhkryjuhfrVTslrHwIMXlTRGRpxIaMUI4OzWJ1/rQHLgZ/KtKhK1
+CiN/VAXneUCEZkcqP7PViPH8VUngn+HbEcSTe/qR22ysQrZggb4rj1VX8/XYcB8Q
+VllZSlT4ActUsoK9m/HwCywEpwvrJG3CiNGdTCEuwhCsZjo2jrB8GYuxLhVQTd+c
+bIo/XpJLVMOzZN0RA4fSvwxspSC5F07gIfMAwarmsxLjjXLd7B5jnFYXmLKx0KNy
+QO6QKZWmFcg5cGxWypBu
+=qn46
+-----END PGP SIGNATURE-----
+
+--EmkQmBVPEob9KpGqsP1GnriJ06qPUjFFL--
