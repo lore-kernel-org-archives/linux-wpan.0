@@ -1,40 +1,55 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f175.google.com ([209.85.212.175]:41049 "EHLO
-	mail-wi0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755715AbbCCW1v (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Tue, 3 Mar 2015 17:27:51 -0500
-Received: by widex7 with SMTP id ex7so26332305wid.0
-        for <linux-wpan@vger.kernel.org>; Tue, 03 Mar 2015 14:27:50 -0800 (PST)
+Received: from mail-wg0-f41.google.com ([74.125.82.41]:33438 "EHLO
+	mail-wg0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755787AbbCCW1x (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Tue, 3 Mar 2015 17:27:53 -0500
+Received: by wghb13 with SMTP id b13so42980222wgh.0
+        for <linux-wpan@vger.kernel.org>; Tue, 03 Mar 2015 14:27:52 -0800 (PST)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH bluetooth-next 0/3] ieee802154: correct sifs handling and new defines
-Date: Tue,  3 Mar 2015 23:27:32 +0100
-Message-Id: <1425421655-21420-1-git-send-email-alex.aring@gmail.com>
+Subject: [PATCH bluetooth-next 1/3] mac802154: correct max sifs size handling
+Date: Tue,  3 Mar 2015 23:27:33 +0100
+Message-Id: <1425421655-21420-2-git-send-email-alex.aring@gmail.com>
+In-Reply-To: <1425421655-21420-1-git-send-email-alex.aring@gmail.com>
+References: <1425421655-21420-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
 Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-Hi,
+This patch fix the max sifs size correction when the
+IEEE802154_HW_TX_OMIT_CKSUM flag is set. With this flag the sk_buff
+doesn't contain the CRC, because the transceiver will add the CRC
+while transmit.
 
-this series corrects the interframe spacing time when
-IEEE802154_HW_TX_OMIT_CKSUM phy flag is set. This flag is set when the
-transceiver sets the crc on his own.
+Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+---
+ net/mac802154/util.c | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
 
-Also I add some defines from 802.15.4 standard. There is still some magic
-values for IEEE802154_FCS_LEN everywhere in mac802154 implementation. We
-should replace these values with IEEE802154_FCS_LEN later.
-
-- Alex
-
-Alexander Aring (3):
-  mac802154: correct max sifs size handling
-  ieee802154: add IEEE802154_MAX_SIFS_FRAME_SIZE
-  ieee802154: add IEEE802154_FCS_LEN
-
- include/linux/ieee802154.h |  2 ++
- net/mac802154/util.c       | 13 ++++++++++++-
- 2 files changed, 14 insertions(+), 1 deletion(-)
-
+diff --git a/net/mac802154/util.c b/net/mac802154/util.c
+index 5fc9790..04e13d9 100644
+--- a/net/mac802154/util.c
++++ b/net/mac802154/util.c
+@@ -65,8 +65,18 @@ void ieee802154_xmit_complete(struct ieee802154_hw *hw, struct sk_buff *skb,
+ {
+ 	if (ifs_handling) {
+ 		struct ieee802154_local *local = hw_to_local(hw);
++		u8 max_sifs_size;
+ 
+-		if (skb->len > 18)
++		/* If transceiver sets CRC on his own we need to use lifs
++		 * threshold len above 16 otherwise 18, because it's not
++		 * part of skb->len.
++		 */
++		if (hw->flags & IEEE802154_HW_TX_OMIT_CKSUM)
++			max_sifs_size = 16;
++		else
++			max_sifs_size = 18;
++
++		if (skb->len > max_sifs_size)
+ 			hrtimer_start(&local->ifs_timer,
+ 				      ktime_set(0, hw->phy->lifs_period * NSEC_PER_USEC),
+ 				      HRTIMER_MODE_REL);
 -- 
 2.3.0
 
