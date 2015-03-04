@@ -1,80 +1,74 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f179.google.com ([209.85.212.179]:42772 "EHLO
-	mail-wi0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1759291AbbCDUUI (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Wed, 4 Mar 2015 15:20:08 -0500
-Received: by wiwh11 with SMTP id h11so33456218wiw.1
-        for <linux-wpan@vger.kernel.org>; Wed, 04 Mar 2015 12:20:07 -0800 (PST)
-From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCHv3 bluetooth-next] mac802154: correct max sifs size handling
-Date: Wed,  4 Mar 2015 21:19:59 +0100
-Message-Id: <1425500399-18438-2-git-send-email-alex.aring@gmail.com>
-In-Reply-To: <1425500399-18438-1-git-send-email-alex.aring@gmail.com>
+Received: from metis.ext.pengutronix.de ([92.198.50.35]:39618 "EHLO
+	metis.ext.pengutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755309AbbCDUYt (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Wed, 4 Mar 2015 15:24:49 -0500
+Message-ID: <54F76A0B.1000903@pengutronix.de>
+Date: Wed, 04 Mar 2015 21:24:43 +0100
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+MIME-Version: 1.0
+Subject: Re: [PATCHv3 bluetooth-next] ieee802154: correct sifs
+ handling and new defines
 References: <1425500399-18438-1-git-send-email-alex.aring@gmail.com>
+In-Reply-To: <1425500399-18438-1-git-send-email-alex.aring@gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha512;
+ protocol="application/pgp-signature";
+ boundary="kam9XG9QcN1Gi0mv815BPPMEnd2W8qSsh"
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org
-Cc: kernel@pengutronix.de, mkl@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
+To: Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org
+Cc: kernel@pengutronix.de
 
-This patch fix the max sifs size correction when the
-IEEE802154_HW_TX_OMIT_CKSUM flag is set. With this flag the sk_buff
-doesn't contain the CRC, because the transceiver will add the CRC
-while transmit.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--kam9XG9QcN1Gi0mv815BPPMEnd2W8qSsh
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Also add some defines for the max sifs frame size value and frame check
-sequence according to 802.15.4 standard.
+On 03/04/2015 09:19 PM, Alexander Aring wrote:
+> Hi,
+>=20
+> this series corrects the interframe spacing time when
+> IEEE802154_HW_TX_OMIT_CKSUM phy flag is set. This flag is set when the
+> transceiver sets the crc on his own.
+>=20
+> Also I add some defines from 802.15.4 standard. There is still some mag=
+ic
+> values for IEEE802154_FCS_LEN everywhere in mac802154 implementation. W=
+e
+> should replace these values with IEEE802154_FCS_LEN later.
 
-Signed-off-by: Alexander Aring <alex.aring@gmail.com>
----
- include/linux/ieee802154.h |  2 ++
- net/mac802154/util.c       | 13 ++++++++++++-
- 2 files changed, 14 insertions(+), 1 deletion(-)
+Acked-by: Marc Kleine-Budde <mkl@pengutronix.de>
 
-diff --git a/include/linux/ieee802154.h b/include/linux/ieee802154.h
-index 40b0ab9..8872ca1 100644
---- a/include/linux/ieee802154.h
-+++ b/include/linux/ieee802154.h
-@@ -30,6 +30,7 @@
- #define IEEE802154_MTU			127
- #define IEEE802154_ACK_PSDU_LEN		5
- #define IEEE802154_MIN_PSDU_LEN		9
-+#define IEEE802154_FCS_LEN		2
- 
- #define IEEE802154_PAN_ID_BROADCAST	0xffff
- #define IEEE802154_ADDR_SHORT_BROADCAST	0xffff
-@@ -39,6 +40,7 @@
- 
- #define IEEE802154_LIFS_PERIOD		40
- #define IEEE802154_SIFS_PERIOD		12
-+#define IEEE802154_MAX_SIFS_FRAME_SIZE	18
- 
- #define IEEE802154_MAX_CHANNEL		26
- #define IEEE802154_MAX_PAGE		31
-diff --git a/net/mac802154/util.c b/net/mac802154/util.c
-index 5fc9790..150bf80 100644
---- a/net/mac802154/util.c
-+++ b/net/mac802154/util.c
-@@ -65,8 +65,19 @@ void ieee802154_xmit_complete(struct ieee802154_hw *hw, struct sk_buff *skb,
- {
- 	if (ifs_handling) {
- 		struct ieee802154_local *local = hw_to_local(hw);
-+		u8 max_sifs_size;
- 
--		if (skb->len > 18)
-+		/* If transceiver sets CRC on his own we need to use lifs
-+		 * threshold len above 16 otherwise 18, because it's not
-+		 * part of skb->len.
-+		 */
-+		if (hw->flags & IEEE802154_HW_TX_OMIT_CKSUM)
-+			max_sifs_size = IEEE802154_MAX_SIFS_FRAME_SIZE -
-+					IEEE802154_FCS_LEN;
-+		else
-+			max_sifs_size = IEEE802154_MAX_SIFS_FRAME_SIZE;
-+
-+		if (skb->len > max_sifs_size)
- 			hrtimer_start(&local->ifs_timer,
- 				      ktime_set(0, hw->phy->lifs_period * NSEC_PER_USEC),
- 				      HRTIMER_MODE_REL);
--- 
-2.3.0
+Marc
 
+--=20
+Pengutronix e.K.                  | Marc Kleine-Budde           |
+Industrial Linux Solutions        | Phone: +49-231-2826-924     |
+Vertretung West/Dortmund          | Fax:   +49-5121-206917-5555 |
+Amtsgericht Hildesheim, HRA 2686  | http://www.pengutronix.de   |
+
+
+--kam9XG9QcN1Gi0mv815BPPMEnd2W8qSsh
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCgAGBQJU92oOAAoJECte4hHFiupUHHcP/iGgjvZjzahq4XywpHhH92df
+TjcM33Bv45yMHUbQ3cRbPsDWBXO37nx+GZ43P+GWWo1hZxZAAhOkyf28UoevtBjZ
+UpgjFgjXODXfmtv16UVTlpf5tyRKHr2c/v6aqB/n7wbuFILvH6gUmln7MEuY/0Y/
+GEsDg2SZg/bn9R+ogbaumAWI8m82d0DKxPlWlv/0u8sgFO+iYLp6m8dJGH3gNYQo
+1v0tNKD/hY4GwSiiMWDpyMaSXjcVewfH6TiHX6bYxR1zmrcs8S+OzL3lI+n76A1r
+g8HFZsN6CLKV5wIkpkE2v5320f55+Fq32Ss8ydI/GnLQfUJnnh50Gn/KawMF4rqn
+wFr5GhqLNLATmIh1cLrF4pBoaxQ9buMcoupSY4Ec+41QflPkFhE6lSZMlA1gqp60
+hR8+RzFIfTwaM4PJenvxg1uSncjZ/HrMBXpBUex7Keis5Ehbf4DOpq02sj71wiav
+guyQ0QOSrAyjJv5GJp6Pg+b2EVd9GZtB4BjyfHddOyM6OJnxI0mjPLvQkG/n9r6k
+4PVOLG2EyrAWjNLIiHqEIENm1eIe96W8dM9oQ09rdjDpG0AqZSmxhonNweqo9OVy
+ODGKxrnjjKM70mg5LVIJnd0g8cIugKaFaQWnCmlB3fBtz+rJOBCndDs7G/bUlTuo
+1JiIfYad+jnWZrDWNI6I
+=IhH8
+-----END PGP SIGNATURE-----
+
+--kam9XG9QcN1Gi0mv815BPPMEnd2W8qSsh--
