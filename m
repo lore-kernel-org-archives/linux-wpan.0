@@ -1,38 +1,44 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from senator.holtmann.net ([87.106.208.187]:60151 "EHLO
-	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750793AbbCNQNf (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Sat, 14 Mar 2015 12:13:35 -0400
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2070.6\))
-Subject: Re: [PATCH bluetooth-next] at86rf230: init xtal_trim with zero
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1425762427-8081-1-git-send-email-alex.aring@gmail.com>
-Date: Sat, 14 Mar 2015 09:13:31 -0700
-Content-Transfer-Encoding: 7bit
-Message-Id: <A45F30E7-6AFD-4BEC-81B6-0DEA162BEFB1@holtmann.org>
-References: <1425762427-8081-1-git-send-email-alex.aring@gmail.com>
+Received: from mail-we0-f173.google.com ([74.125.82.173]:36491 "EHLO
+	mail-we0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755387AbbCDUUI (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Wed, 4 Mar 2015 15:20:08 -0500
+Received: by wesq59 with SMTP id q59so11780044wes.3
+        for <linux-wpan@vger.kernel.org>; Wed, 04 Mar 2015 12:20:06 -0800 (PST)
+From: Alexander Aring <alex.aring@gmail.com>
+Subject: [PATCHv3 bluetooth-next] ieee802154: correct sifs handling and new defines
+Date: Wed,  4 Mar 2015 21:19:58 +0100
+Message-Id: <1425500399-18438-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>
-Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de
+To: linux-wpan@vger.kernel.org
+Cc: kernel@pengutronix.de, mkl@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-Hi Alex,
+Hi,
 
-> This patch initialize xtal_trim value to zero. The xtal_trim property is
-> an optional device tree value. Currently if no xtal_trim property is
-> given the xtal_trim value can be contain random data, because it's a
-> stack variable. This patch init the xtal_trim value to zero which is
-> also the default value after reset for at86rf230 transceivers.
-> 
-> Signed-off-by: Alexander Aring <alex.aring@gmail.com>
-> ---
-> drivers/net/ieee802154/at86rf230.c | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
+this series corrects the interframe spacing time when
+IEEE802154_HW_TX_OMIT_CKSUM phy flag is set. This flag is set when the
+transceiver sets the crc on his own.
 
-patch has been applied to bluetooth-next tree.
+Also I add some defines from 802.15.4 standard. There is still some magic
+values for IEEE802154_FCS_LEN everywhere in mac802154 implementation. We
+should replace these values with IEEE802154_FCS_LEN later.
 
-Regards
+- Alex
 
-Marcel
+changes since v3:
+ - squash patch 2 into 1, which was suggested by Marc Kleine-Budde.
+
+changes since v2:
+ - squash patch 3 into 2, which was suggested by Marc Kleine-Budde.
+
+Alexander Aring (1):
+  mac802154: correct max sifs size handling
+
+ include/linux/ieee802154.h |  2 ++
+ net/mac802154/util.c       | 13 ++++++++++++-
+ 2 files changed, 14 insertions(+), 1 deletion(-)
+
+-- 
+2.3.0
 
