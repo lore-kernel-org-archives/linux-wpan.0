@@ -1,67 +1,67 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f175.google.com ([209.85.212.175]:35510 "EHLO
-	mail-wi0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1759220AbbCDLZI (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Wed, 4 Mar 2015 06:25:08 -0500
-Received: by wivz2 with SMTP id z2so10507032wiv.0
-        for <linux-wpan@vger.kernel.org>; Wed, 04 Mar 2015 03:25:06 -0800 (PST)
-From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCHv2 bluetooth-next 2/2] ieee802154: replace magic numbers by standard defines
-Date: Wed,  4 Mar 2015 12:24:50 +0100
-Message-Id: <1425468290-24525-3-git-send-email-alex.aring@gmail.com>
-In-Reply-To: <1425468290-24525-1-git-send-email-alex.aring@gmail.com>
-References: <1425468290-24525-1-git-send-email-alex.aring@gmail.com>
+Received: from metis.ext.pengutronix.de ([92.198.50.35]:52587 "EHLO
+	metis.ext.pengutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755437AbbCDLbt (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Wed, 4 Mar 2015 06:31:49 -0500
+Message-ID: <54F6ED17.8090805@pengutronix.de>
+Date: Wed, 04 Mar 2015 12:31:35 +0100
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+MIME-Version: 1.0
+Subject: Re: [PATCHv2 bluetooth-next 2/2] ieee802154: replace magic
+ numbers by standard defines
+References: <1425468290-24525-1-git-send-email-alex.aring@gmail.com> <1425468290-24525-3-git-send-email-alex.aring@gmail.com>
+In-Reply-To: <1425468290-24525-3-git-send-email-alex.aring@gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha512;
+ protocol="application/pgp-signature";
+ boundary="k7Qbhc7VbShdL5RLNrtujcNbdOm87pTu6"
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org
-Cc: kernel@pengutronix.de, mkl@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
+To: Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org
+Cc: kernel@pengutronix.de
 
-This patch adds a define for the max sifs frame size value and frame check
-sequence according to 802.15.4 standard.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--k7Qbhc7VbShdL5RLNrtujcNbdOm87pTu6
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Alexander Aring <alex.aring@gmail.com>
----
- include/linux/ieee802154.h | 2 ++
- net/mac802154/util.c       | 5 +++--
- 2 files changed, 5 insertions(+), 2 deletions(-)
+On 03/04/2015 12:24 PM, Alexander Aring wrote:
+> This patch adds a define for the max sifs frame size value and frame ch=
+eck
+> sequence according to 802.15.4 standard.
 
-diff --git a/include/linux/ieee802154.h b/include/linux/ieee802154.h
-index 40b0ab9..8872ca1 100644
---- a/include/linux/ieee802154.h
-+++ b/include/linux/ieee802154.h
-@@ -30,6 +30,7 @@
- #define IEEE802154_MTU			127
- #define IEEE802154_ACK_PSDU_LEN		5
- #define IEEE802154_MIN_PSDU_LEN		9
-+#define IEEE802154_FCS_LEN		2
- 
- #define IEEE802154_PAN_ID_BROADCAST	0xffff
- #define IEEE802154_ADDR_SHORT_BROADCAST	0xffff
-@@ -39,6 +40,7 @@
- 
- #define IEEE802154_LIFS_PERIOD		40
- #define IEEE802154_SIFS_PERIOD		12
-+#define IEEE802154_MAX_SIFS_FRAME_SIZE	18
- 
- #define IEEE802154_MAX_CHANNEL		26
- #define IEEE802154_MAX_PAGE		31
-diff --git a/net/mac802154/util.c b/net/mac802154/util.c
-index 04e13d9..150bf80 100644
---- a/net/mac802154/util.c
-+++ b/net/mac802154/util.c
-@@ -72,9 +72,10 @@ void ieee802154_xmit_complete(struct ieee802154_hw *hw, struct sk_buff *skb,
- 		 * part of skb->len.
- 		 */
- 		if (hw->flags & IEEE802154_HW_TX_OMIT_CKSUM)
--			max_sifs_size = 16;
-+			max_sifs_size = IEEE802154_MAX_SIFS_FRAME_SIZE -
-+					IEEE802154_FCS_LEN;
- 		else
--			max_sifs_size = 18;
-+			max_sifs_size = IEEE802154_MAX_SIFS_FRAME_SIZE;
- 
- 		if (skb->len > max_sifs_size)
- 			hrtimer_start(&local->ifs_timer,
--- 
-2.3.0
+and now squash 2 into 1 :) It make no sense to first add magic numbers
+and then replace them.
 
+Marc
+
+--=20
+Pengutronix e.K.                  | Marc Kleine-Budde           |
+Industrial Linux Solutions        | Phone: +49-231-2826-924     |
+Vertretung West/Dortmund          | Fax:   +49-5121-206917-5555 |
+Amtsgericht Hildesheim, HRA 2686  | http://www.pengutronix.de   |
+
+
+--k7Qbhc7VbShdL5RLNrtujcNbdOm87pTu6
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCgAGBQJU9u0iAAoJECte4hHFiupUdNEP/0FayyvdEfXWkA29v4Y/tjcw
+c6s5b3eyrK/hffvUdXX6UlvETWOpb9QZ66QUpUmtr3vO98YV8i4q5zIaYjXqTqxD
+VIUYAVxanwqQGeas8zjPiQ6YfER2vBbW73IT4oSXCLvhs7S+gjQInrsIxUetn1EF
+m1YbA7lIjboYpITIudqVJ0+yv8ZRvdezjbps7IJauGdzix95B/bp1A5sInzYIANp
+ms9cXvySUjLKRlE9IX097rcNyutYKswhGkOoY80JBcto2kJxvmoj0CV/p8vcB8sd
+enYRASCUL/S3cvbVqjqqlflY0mK6qnFE3+I5GX3a6jk9365DEnKluHPYaGcb/7Cf
+pQyCIgjf0OTVcfKzxj0LHmAsvbYI/z8Azt2DFS40JCwS97Y1yVjCnVHMCQCncRWq
+mzNaOWAG5Yuys6f+4sBcsSTCjkd8pb5a+Oj/WW+uIoCgK/tqydSzx+FlsJdob/8+
+eAFv74aYcRg62YP+AmNu66i60d8MrkWtc4ajMkC9B6hAWXOy6ZNEglrYL9YkX+Hs
+bQrPM8pfFdGiofZoxHIPs3/TBurXWbrevfHjRWVMd8YFCEYc2vkt+4BM83TW/dOj
+e5T1GA2JM+5gXb2yrewsERk+9rxejyx2h8/XK0OlB9HMJg8qlYJjrH+DSMQqwwOH
+hKRjswyZutSWCzJRsSUq
+=KiJK
+-----END PGP SIGNATURE-----
+
+--k7Qbhc7VbShdL5RLNrtujcNbdOm87pTu6--
