@@ -1,22 +1,23 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
 Received: from mail3-relais-sop.national.inria.fr ([192.134.164.104]:28339
 	"EHLO mail3-relais-sop.national.inria.fr" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1752267AbbCKREQ (ORCPT
+	by vger.kernel.org with ESMTP id S1752639AbbCKREq (ORCPT
 	<rfc822;linux-wpan@vger.kernel.org>);
-	Wed, 11 Mar 2015 13:04:16 -0400
+	Wed, 11 Mar 2015 13:04:46 -0400
 From: Julia Lawall <Julia.Lawall@lip6.fr>
-Subject: [PATCH 0/15] don't export static symbol
-Date: Wed, 11 Mar 2015 17:56:22 +0100
-Message-Id: <1426092997-30605-1-git-send-email-Julia.Lawall@lip6.fr>
+Subject: [PATCH 13/15] ieee802154: don't export static symbol
+Date: Wed, 11 Mar 2015 17:56:35 +0100
+Message-Id: <1426092997-30605-14-git-send-email-Julia.Lawall@lip6.fr>
+In-Reply-To: <1426092997-30605-1-git-send-email-Julia.Lawall@lip6.fr>
+References: <1426092997-30605-1-git-send-email-Julia.Lawall@lip6.fr>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-arm-kernel@lists.infradead.org
-Cc: kernel-janitors@vger.kernel.org, linux-edac@vger.kernel.org, linux-scsi@vger.kernel.org, linux-wireless@vger.kernel.org, linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org, linux-nfs@vger.kernel.org, netdev@vger.kernel.org, linux-rdma@vger.kernel.org, linux-media@vger.kernel.org, alsa-devel@alsa-project.org, linux-wpan@vger.kernel.org, target-devel@vger.kernel.org
+To: Alexander Aring <alex.aring@gmail.com>
+Cc: kernel-janitors@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, linux-wpan@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, daniel@iogearbox.net
 
-These patches remove EXPORT_SYMBOL or EXPORT_SYMBOL_GPL declarations on
-static functions.
+From: Julia Lawall <Julia.Lawall@lip6.fr>
 
-This was done using the following semantic patch:
+The semantic patch that fixes this problem is as follows:
 (http://coccinelle.lip6.fr/)
 
 // <smpl>
@@ -33,12 +34,23 @@ declarer name EXPORT_SYMBOL;
 @@
 
 -EXPORT_SYMBOL(f);
-
-@@
-identifier r.f;
-declarer name EXPORT_SYMBOL_GPL;
-@@
-
--EXPORT_SYMBOL_GPL(f);
 // </smpl>
+
+Signed-off-by: Julia Lawall <Julia.Lawall@lip6.fr>
+
+---
+ net/ieee802154/nl-mac.c |    1 -
+ 1 file changed, 1 deletion(-)
+
+diff -u -p a/net/ieee802154/nl-mac.c b/net/ieee802154/nl-mac.c
+--- a/net/ieee802154/nl-mac.c
++++ b/net/ieee802154/nl-mac.c
+@@ -76,7 +76,6 @@ nla_put_failure:
+ 	nlmsg_free(msg);
+ 	return -ENOBUFS;
+ }
+-EXPORT_SYMBOL(ieee802154_nl_start_confirm);
+ 
+ static int ieee802154_nl_fill_iface(struct sk_buff *msg, u32 portid,
+ 				    u32 seq, int flags, struct net_device *dev)
 
