@@ -1,73 +1,72 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from metis.ext.pengutronix.de ([92.198.50.35]:44540 "EHLO
-	metis.ext.pengutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750874AbbCMH3I (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Fri, 13 Mar 2015 03:29:08 -0400
-Message-ID: <550291B1.5070102@pengutronix.de>
-Date: Fri, 13 Mar 2015 08:28:49 +0100
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-MIME-Version: 1.0
+Received: from mail-we0-f175.google.com ([74.125.82.175]:41572 "EHLO
+	mail-we0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750963AbbCMK1E (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Fri, 13 Mar 2015 06:27:04 -0400
+Received: by wesw62 with SMTP id w62so22263962wes.8
+        for <linux-wpan@vger.kernel.org>; Fri, 13 Mar 2015 03:27:03 -0700 (PDT)
+Date: Fri, 13 Mar 2015 11:26:56 +0100
+From: Alexander Aring <alex.aring@gmail.com>
 Subject: Re: [Linux-zigbee-devel] Can I get the patches for 3.10 kernel
-References: <CALw2d_OcB4XQhxC5KsQY_BsuE85jb_+VrkiRRciCz3hunyXs1Q@mail.gmail.com>	<54F718AB.9020701@pengutronix.de>	<CAAkeqgWqiDO_7_vULKugtm1h20BykOZvqiUcbMMhYg7rWzremQ@mail.gmail.com>	<CALw2d_Mveq3nKV4eOpkN90HJ3K1hMid3yTq8c++sKW8szzA_EA@mail.gmail.com>	<54F82234.7060704@pengutronix.de> <CALw2d_PPaKYSs16MNiBF71bRchdOyYzAAuhDp1fwatCErSVthA@mail.gmail.com>
-In-Reply-To: <CALw2d_PPaKYSs16MNiBF71bRchdOyYzAAuhDp1fwatCErSVthA@mail.gmail.com>
-Content-Type: multipart/signed; micalg=pgp-sha512;
- protocol="application/pgp-signature";
- boundary="NwK6dKkigJrUVivCEcGcqjhaj6dQgbTf2"
+Message-ID: <20150313102653.GA7491@omega>
+References: <CALw2d_OcB4XQhxC5KsQY_BsuE85jb_+VrkiRRciCz3hunyXs1Q@mail.gmail.com>
+ <54F718AB.9020701@pengutronix.de>
+ <CAAkeqgWqiDO_7_vULKugtm1h20BykOZvqiUcbMMhYg7rWzremQ@mail.gmail.com>
+ <CALw2d_Mveq3nKV4eOpkN90HJ3K1hMid3yTq8c++sKW8szzA_EA@mail.gmail.com>
+ <54F82234.7060704@pengutronix.de>
+ <CALw2d_PPaKYSs16MNiBF71bRchdOyYzAAuhDp1fwatCErSVthA@mail.gmail.com>
+ <550291B1.5070102@pengutronix.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <550291B1.5070102@pengutronix.de>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Sujith H <hari.sujith@gmail.com>
-Cc: Andrey Yurovsky <yurovsky@gmail.com>, linux-wpan@vger.kernel.org
+To: Marc Kleine-Budde <mkl@pengutronix.de>
+Cc: Sujith H <hari.sujith@gmail.com>, Andrey Yurovsky <yurovsky@gmail.com>, linux-wpan@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---NwK6dKkigJrUVivCEcGcqjhaj6dQgbTf2
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Fri, Mar 13, 2015 at 08:28:49AM +0100, Marc Kleine-Budde wrote:
+> On 03/13/2015 04:47 AM, Sujith H wrote:
+> >     I don't think there's a ready to go patchset available, that ports the
+> >     latest and greatest features to such an old kernel. I think you have to
+> >     do it yourself or get some commercial support.
+> 
+> > The getting started guide points to creation of 3 nodes followed by
+> > assigning ipv6 address and pinging between different interfaces/nodes
+> > with the IP.
+> > Is my understanding correct?
+> 
+> I don't know, I've never used getting stated guide. Probably others can
+> comment.
 
-On 03/13/2015 04:47 AM, Sujith H wrote:
->     I don't think there's a ready to go patchset available, that ports =
-the
->     latest and greatest features to such an old kernel. I think you hav=
-e to
->     do it yourself or get some commercial support.
+If you use kernel version 3.18 or below:
 
-> The getting started guide points to creation of 3 nodes followed by
-> assigning ipv6 address and pinging between different interfaces/nodes
-> with the IP.
-> Is my understanding correct?
-
-I don't know, I've never used getting stated guide. Probably others can
-comment.
-
-Marc
-
---=20
-Pengutronix e.K.                  | Marc Kleine-Budde           |
-Industrial Linux Solutions        | Phone: +49-231-2826-924     |
-Vertretung West/Dortmund          | Fax:   +49-5121-206917-5555 |
-Amtsgericht Hildesheim, HRA 2686  | http://www.pengutronix.de   |
+You need the old lowpan-tools and the Getting Started guide from
+sourceforge trac wiki. [0]
 
 
---NwK6dKkigJrUVivCEcGcqjhaj6dQgbTf2
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+If you use kernel version 3.19 or above:
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
+Don't use the Getting Started guide from obsolete sourceforge trac wiki
+and some notes in current mainline Documentation/networking/ieee802154.txt
 
-iQIcBAEBCgAGBQJVApG4AAoJECte4hHFiupUmBEP/AxdUA3v027GTpsUn1d6Vf/1
-7rT2935JcDkjjDY1X86HUR8R+TDBY1rhuhCG138x0cudK0xGgV7PZ4o9mevy73za
-4xPfUs49xLvprVBEMxdXPhot2eabpQW0fis1JCE60BwfSyFpuoBBa+n2B5sQyjey
-tAkgWcfEjz14ZIW7LUQodLzc5FFcBont6WBIfWJvKDQiwXUMWHBZWTpkiNq3nb7k
-bPgWubaj0XvqwruQo6W4Sq68ext+vW4njS6vNyuhHXogf4UzIuhDYZHo7yhembji
-MeUjObnYtDJrrNL5AwA6OFlSZwCv9keU+OIsdUH0u5HV4LTPPVL3UUqnRTAxeHKo
-wYr2mRQ08Td9lJhkYUt65ac5K5ynuU2MjDp1sLSq2rQtmGGpwrE/8eyva1GNa7Ct
-OvnlKFS5FSmbI2gs6LIZEEKNpSzY4+Gr2PJHzpE03lW3SoEkny8jX7JyeRoCKNRC
-pk2hGUaedcFc787Ffs9srywufosLGrf9qdeMRFuRGyxJAP10aVJDItmSYvnuq/V7
-XXIGoY9m145Z7NYCbbUoxr+ljGAvJpCCUgtnFSNfsfP3NVX5ZY9iTZKwVpRDeqju
-Xr8XQTIKuLPutAjo0VzLooOgVYg3tqQfqzCaqZxMUNVSH7p7ay/LGvPnOQSPe7hE
-tOVSNQGyXU6BKFk5J7Lk
-=rQLb
------END PGP SIGNATURE-----
+The ieee802154.txt needs some update, patches are welcome.
 
---NwK6dKkigJrUVivCEcGcqjhaj6dQgbTf2--
+Instead use [1]. Sure this documentation can also improved, patches are
+welcome. You can send patches for the website via wpan-misc repository. [2]
+Please tag the patches then with "wpan-misc".
+
+
+
+btw. for the 6lowpan_pending patches branch:
+
+This was an experimental branch. There was also issues while bringing
+mainline which was pointed out by David Miller. Maybe you can simple
+search for the patch series on netdev archives for making 6lowpan
+fragmentation handling better.
+
+- Alex
+
+[0] http://linux-zigbee.sourceforge.net/cgi-bin/trac.cgi/wiki/GettingStarted-0.2
+[1] http://wpan.cakelab.org/
+[2] https://github.com/linux-wpan/wpan-misc
