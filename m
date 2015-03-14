@@ -1,26 +1,24 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wg0-f42.google.com ([74.125.82.42]:44708 "EHLO
-	mail-wg0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751360AbbCKSRP (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Wed, 11 Mar 2015 14:17:15 -0400
-Date: Wed, 11 Mar 2015 19:17:04 +0100
-From: Alexander Aring <alex.aring@gmail.com>
+Received: from senator.holtmann.net ([87.106.208.187]:60106 "EHLO
+	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750874AbbCNQNe (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Sat, 14 Mar 2015 12:13:34 -0400
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2070.6\))
 Subject: Re: [PATCH 13/15] ieee802154: don't export static symbol
-Message-ID: <20150311181700.GA23342@omega>
-References: <1426092997-30605-1-git-send-email-Julia.Lawall@lip6.fr>
- <1426092997-30605-14-git-send-email-Julia.Lawall@lip6.fr>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+From: Marcel Holtmann <marcel@holtmann.org>
 In-Reply-To: <1426092997-30605-14-git-send-email-Julia.Lawall@lip6.fr>
+Date: Sat, 14 Mar 2015 09:13:26 -0700
+Content-Transfer-Encoding: 7bit
+Message-Id: <9174D8D8-5176-4B98-8A3D-DE09B9C42612@holtmann.org>
+References: <1426092997-30605-1-git-send-email-Julia.Lawall@lip6.fr> <1426092997-30605-14-git-send-email-Julia.Lawall@lip6.fr>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Julia Lawall <Julia.Lawall@lip6.fr>
-Cc: kernel-janitors@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, linux-wpan@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, daniel@iogearbox.net, marcel@holtmann.org
+To: Julia Lawall <julia.lawall@lip6.fr>
+Cc: Alexander Aring <alex.aring@gmail.com>, kernel-janitors@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, linux-wpan@vger.kernel.org, netdev <netdev@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, daniel@iogearbox.net
 
-On Wed, Mar 11, 2015 at 05:56:35PM +0100, Julia Lawall wrote:
-> From: Julia Lawall <Julia.Lawall@lip6.fr>
-> 
+Hi Julia,
+
 > The semantic patch that fixes this problem is as follows:
 > (http://coccinelle.lip6.fr/)
 > 
@@ -41,11 +39,14 @@ On Wed, Mar 11, 2015 at 05:56:35PM +0100, Julia Lawall wrote:
 > // </smpl>
 > 
 > Signed-off-by: Julia Lawall <Julia.Lawall@lip6.fr>
+> 
+> ---
+> net/ieee802154/nl-mac.c |    1 -
+> 1 file changed, 1 deletion(-)
 
-Acked-by: Alexander Aring <alex.aring@gmail.com>
+patch has been applied to bluetooth-next tree.
 
-Marcel can you please queue this into bluetooth-next, or even bluetooth?
+Regards
 
-Thanks.
+Marcel
 
-- Alex
