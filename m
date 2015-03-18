@@ -1,159 +1,61 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-we0-f179.google.com ([74.125.82.179]:33078 "EHLO
-	mail-we0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755939AbbCRLlK (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Wed, 18 Mar 2015 07:41:10 -0400
-Received: by weop45 with SMTP id p45so30002214weo.0
-        for <linux-wpan@vger.kernel.org>; Wed, 18 Mar 2015 04:41:08 -0700 (PDT)
-From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH bluetooth-next 2/2] nl802154: add set interface cmd
-Date: Wed, 18 Mar 2015 12:40:22 +0100
-Message-Id: <1426678822-26644-3-git-send-email-alex.aring@gmail.com>
-In-Reply-To: <1426678822-26644-1-git-send-email-alex.aring@gmail.com>
+Received: from mail-pd0-f178.google.com ([209.85.192.178]:35483 "EHLO
+	mail-pd0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755523AbbCRL7y (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Wed, 18 Mar 2015 07:59:54 -0400
+Received: by pdbop1 with SMTP id op1so41226943pdb.2
+        for <linux-wpan@vger.kernel.org>; Wed, 18 Mar 2015 04:59:54 -0700 (PDT)
+Message-ID: <550968A4.5050908@gmail.com>
+Date: Wed, 18 Mar 2015 17:29:32 +0530
+From: Varka Bhadram <varkabhadram@gmail.com>
+MIME-Version: 1.0
+Subject: Re: [PATCH bluetooth-next 0/2] nl802154: implement new SET commands
 References: <1426678822-26644-1-git-send-email-alex.aring@gmail.com>
+In-Reply-To: <1426678822-26644-1-git-send-email-alex.aring@gmail.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org
-Cc: kernel@pengutronix.de, mkl@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
+To: Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org
+Cc: kernel@pengutronix.de, mkl@pengutronix.de
 
-This patch introduce the NL802154_CMD_SET_INTERFACE command which
-handles setting of all wpan interface mac attributes. This will reduce
-the complexity of several netlink commands for each attributes and
-userspace applications are easier to implement.
+Hi Alex,
 
-Signed-off-by: Alexander Aring <alex.aring@gmail.com>
----
- net/ieee802154/nl802154.c | 110 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 110 insertions(+)
+On 03/18/2015 05:10 PM, Alexander Aring wrote:
 
-diff --git a/net/ieee802154/nl802154.c b/net/ieee802154/nl802154.c
-index 111e9a1..b1d8e51 100644
---- a/net/ieee802154/nl802154.c
-+++ b/net/ieee802154/nl802154.c
-@@ -603,6 +603,108 @@ static int nl802154_get_interface(struct sk_buff *skb, struct genl_info *info)
- 	return genlmsg_reply(msg, info);
- }
- 
-+static int nl802154_set_interface(struct sk_buff *skb, struct genl_info *info)
-+{
-+	struct cfg802154_registered_device *rdev = info->user_ptr[0];
-+	struct net_device *dev = info->user_ptr[1];
-+	struct wpan_dev *wpan_dev = dev->ieee802154_ptr;
-+	int ret;
-+
-+	if (info->attrs[NL802154_ATTR_PAN_ID]) {
-+		__le16 pan_id;
-+
-+		if (wpan_dev->iftype == NL802154_IFTYPE_MONITOR)
-+			return -EINVAL;
-+
-+		if (netif_running(dev))
-+			return -EBUSY;
-+
-+		pan_id = nla_get_le16(info->attrs[NL802154_ATTR_PAN_ID]);
-+		ret = rdev_set_pan_id(rdev, wpan_dev, pan_id);
-+		if (ret < 0)
-+			return ret;
-+	}
-+
-+	if (info->attrs[NL802154_ATTR_SHORT_ADDR]) {
-+		__le16 short_addr;
-+
-+		if (wpan_dev->iftype == NL802154_IFTYPE_MONITOR)
-+			return -EINVAL;
-+
-+		if (netif_running(dev))
-+			return -EBUSY;
-+
-+		short_addr = nla_get_le16(info->attrs[NL802154_ATTR_SHORT_ADDR]);
-+
-+		ret = rdev_set_short_addr(rdev, wpan_dev, short_addr);
-+		if (ret < 0)
-+			return ret;
-+	}
-+
-+	if (info->attrs[NL802154_ATTR_MAX_FRAME_RETRIES]) {
-+		s8 max_frame_retries;
-+
-+		if (netif_running(dev))
-+			return -EBUSY;
-+
-+		max_frame_retries = nla_get_s8(
-+				info->attrs[NL802154_ATTR_MAX_FRAME_RETRIES]);
-+		if (max_frame_retries < -1 || max_frame_retries > 7)
-+			return -EINVAL;
-+
-+		ret = rdev_set_max_frame_retries(rdev, wpan_dev,
-+						 max_frame_retries);
-+		if (ret < 0)
-+			return ret;
-+	}
-+
-+	if (info->attrs[NL802154_ATTR_MIN_BE] &&
-+	    info->attrs[NL802154_ATTR_MAX_BE]) {
-+		u8 min_be, max_be;
-+
-+		if (netif_running(dev))
-+			return -EBUSY;
-+
-+		min_be = nla_get_u8(info->attrs[NL802154_ATTR_MIN_BE]);
-+		max_be = nla_get_u8(info->attrs[NL802154_ATTR_MAX_BE]);
-+		if (max_be < 3 || max_be > 8 || min_be > max_be)
-+			return -EINVAL;
-+
-+		ret = rdev_set_backoff_exponent(rdev, wpan_dev, min_be, max_be);
-+		if (ret < 0)
-+			return ret;
-+	}
-+
-+	if (info->attrs[NL802154_ATTR_MAX_CSMA_BACKOFFS]) {
-+		u8 max_csma_backoffs;
-+
-+		if (netif_running(dev))
-+			return -EBUSY;
-+
-+		max_csma_backoffs = nla_get_u8(
-+				info->attrs[NL802154_ATTR_MAX_CSMA_BACKOFFS]);
-+		if (max_csma_backoffs > 5)
-+			return -EINVAL;
-+
-+		ret = rdev_set_max_csma_backoffs(rdev, wpan_dev,
-+						 max_csma_backoffs);
-+		if (ret < 0)
-+			return ret;
-+	}
-+
-+	if (info->attrs[NL802154_ATTR_LBT_MODE]) {
-+		bool mode;
-+
-+		if (netif_running(dev))
-+			return -EBUSY;
-+
-+		mode = !!nla_get_u8(info->attrs[NL802154_ATTR_LBT_MODE]);
-+		return rdev_set_lbt_mode(rdev, wpan_dev, mode);
-+	}
-+
-+	return 0;
-+}
-+
- static int nl802154_new_interface(struct sk_buff *skb, struct genl_info *info)
- {
- 	struct cfg802154_registered_device *rdev = info->user_ptr[0];
-@@ -965,6 +1067,14 @@ static const struct genl_ops nl802154_ops[] = {
- 				  NL802154_FLAG_NEED_RTNL,
- 	},
- 	{
-+		.cmd = NL802154_CMD_SET_INTERFACE,
-+		.doit = nl802154_set_interface,
-+		.policy = nl802154_policy,
-+		.flags = GENL_ADMIN_PERM,
-+		.internal_flags = NL802154_FLAG_NEED_NETDEV |
-+				  NL802154_FLAG_NEED_RTNL,
-+	},
-+	{
- 		.cmd = NL802154_CMD_DEL_INTERFACE,
- 		.doit = nl802154_del_interface,
- 		.policy = nl802154_policy,
+> Hi,
+>
+> this patch-series implement the already existed SET commands of an interface
+> and a wpan-phy. Currently we have one CMD for each setting which was a mistake
+> by me to implement it in this way. So we aren't currently a "real" UAPI header
+> for nl802154 and it's still under development. I decide now to change to
+> implement these setting in this way now. Currently I let these commands in
+> coexistens with the old commands but _NOTE_ I will remove the other commands
+> from the nl802154 later.
+>
+> So please use the new commands. When these patches are mainline I also want to
+> release a new wpan-tools release which use this new interface. Then everybody
+> has some time to change to the new wpan-tools release. After this "time" I will
+
+Its better to send the patches along with wpan-tools, so that we can do the testing..
+
+> remove the obsolete nl802154 commands from the header. This means older
+> wpan-tools releases doesn't work any more with new kernels. Also this means
+> newer wpan-tools releases doesn't work with older kernels. That will end in
+> some kind of chaos and I will note this on the website.
+>
+> This beahviour to do it in only one command is much easier to handle in
+> userspace, like clicking an "apply button".
+>
+> - Alex
+>
+> Alexander Aring (2):
+>    nl802154: add set wpan phy cmd
+>    nl802154: add set interface cmd
+>
+>   net/ieee802154/nl802154.c | 162 ++++++++++++++++++++++++++++++++++++++++++++++
+>   1 file changed, 162 insertions(+)
+>
 -- 
-2.3.3
+Varka Bhadram
 
