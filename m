@@ -1,49 +1,49 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-we0-f177.google.com ([74.125.82.177]:32949 "EHLO
-	mail-we0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754471AbbCRMIf (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Wed, 18 Mar 2015 08:08:35 -0400
-Received: by weop45 with SMTP id p45so30610527weo.0
-        for <linux-wpan@vger.kernel.org>; Wed, 18 Mar 2015 05:08:34 -0700 (PDT)
-Date: Wed, 18 Mar 2015 13:08:31 +0100
+Received: from mail-we0-f174.google.com ([74.125.82.174]:33332 "EHLO
+	mail-we0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932249AbbCRN1S (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Wed, 18 Mar 2015 09:27:18 -0400
+Received: by weop45 with SMTP id p45so32349338weo.0
+        for <linux-wpan@vger.kernel.org>; Wed, 18 Mar 2015 06:27:17 -0700 (PDT)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: Re: [PATCH bluetooth-next 0/2] nl802154: implement new SET commands
-Message-ID: <20150318120831.GC8079@omega>
-References: <1426678822-26644-1-git-send-email-alex.aring@gmail.com>
- <550968A4.5050908@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <550968A4.5050908@gmail.com>
+Subject: [PATCH wpan-tools 0/2] mac: phy: change to new nl802154 cmds
+Date: Wed, 18 Mar 2015 14:27:07 +0100
+Message-Id: <1426685229-31900-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Varka Bhadram <varkabhadram@gmail.com>
-Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de, mkl@pengutronix.de
+To: linux-wpan@vger.kernel.org
+Cc: Alexander Aring <alex.aring@gmail.com>
 
-Hi Varka,
+Hi,
 
-On Wed, Mar 18, 2015 at 05:29:32PM +0530, Varka Bhadram wrote:
-> Hi Alex,
-> 
-> On 03/18/2015 05:10 PM, Alexander Aring wrote:
-> 
-> >Hi,
-> >
-> >this patch-series implement the already existed SET commands of an interface
-> >and a wpan-phy. Currently we have one CMD for each setting which was a mistake
-> >by me to implement it in this way. So we aren't currently a "real" UAPI header
-> >for nl802154 and it's still under development. I decide now to change to
-> >implement these setting in this way now. Currently I let these commands in
-> >coexistens with the old commands but _NOTE_ I will remove the other commands
-> >from the nl802154 later.
-> >
-> >So please use the new commands. When these patches are mainline I also want to
-> >release a new wpan-tools release which use this new interface. Then everybody
-> >has some time to change to the new wpan-tools release. After this "time" I will
-> 
-> Its better to send the patches along with wpan-tools, so that we can do the testing..
-> 
+this patch series contains patches to change all netlink phy and mac settings
+into one phy/interface command. I will applu this series mainline to wpan-tools
+and make a new release when the corresponding kernel nl802154 are mainline.
 
-of course, I will do.
+There is one maybe _some_ cleaner solution to make something like:
+
+#include <linux/version.h>
+
+#if LINUX_VERSION_CODE <= KERNEL_VERSION(foo)
+...
+#else
+...
+#endif
+
+this would rescue newer wpan-tools with older kernels. But requires the right
+kernel-headers while cross-compiling and such things. I don't think that this
+is really necessary here now. We make a simple cut now.
 
 - Alex
+
+Alexander Aring (2):
+  phy: use NL802154_CMD_SET_WPAN_PHY
+  mac: use NL802154_CMD_SET_INTERFACE
+
+ src/mac.c | 12 ++++++------
+ src/phy.c |  8 ++++----
+ 2 files changed, 10 insertions(+), 10 deletions(-)
+
+-- 
+2.3.3
+
