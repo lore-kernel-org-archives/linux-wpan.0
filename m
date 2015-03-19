@@ -1,41 +1,39 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from senator.holtmann.net ([87.106.208.187]:53524 "EHLO
-	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932994AbbCRQwd convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Wed, 18 Mar 2015 12:52:33 -0400
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2070.6\))
-Subject: Re: [PATCHv3 bluetooth-next 0/2] Add CC2591 Support
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1426623946-6651-1-git-send-email-bradjc5@gmail.com>
-Date: Wed, 18 Mar 2015 09:52:27 -0700
-Content-Transfer-Encoding: 8BIT
-Message-Id: <87177423-5B27-4636-A31A-5B0E672FCE18@holtmann.org>
-References: <1426623946-6651-1-git-send-email-bradjc5@gmail.com>
+Received: from mx1.polytechnique.org ([129.104.30.34]:58572 "EHLO
+	mx1.polytechnique.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751381AbbCSNX4 (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Thu, 19 Mar 2015 09:23:56 -0400
+From: Nicolas Iooss <nicolas.iooss_linux@m4x.org>
+Subject: [PATCH] mac802154: fix typo in header guard
+Date: Thu, 19 Mar 2015 21:23:40 +0800
+Message-Id: <1426771420-29979-1-git-send-email-nicolas.iooss_linux@m4x.org>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Brad Campbell <bradjc5@gmail.com>
-Cc: linux-wpan@vger.kernel.org, alex.aring@gmail.com
+To: alex.aring@gmail.com, linux-wpan@vger.kernel.org
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Nicolas Iooss <nicolas.iooss_linux@m4x.org>
 
-Hi Brad,
+Signed-off-by: Nicolas Iooss <nicolas.iooss_linux@m4x.org>
+Fixes: b6eea9ca354a ("mac802154: introduce driver-ops header")
+---
+ net/mac802154/driver-ops.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-> I fixed the two issues that Alex pointed out and updated the
-> commit message.
-> 
-> Brad
-> 
-> Brad Campbell (2):
->  cc2520: Do not store platform_data in spi_device
->  cc2520: Add support for CC2591 amplifier.
-> 
-> .../devicetree/bindings/net/ieee802154/cc2520.txt  |   4 +
-> drivers/net/ieee802154/cc2520.c                    | 150 +++++++++++++--------
-> include/linux/spi/cc2520.h                         |   1 +
-> 3 files changed, 98 insertions(+), 57 deletions(-)
-
-both patches have been applied to bluetooth-next tree.
-
-Regards
-
-Marcel
+diff --git a/net/mac802154/driver-ops.h b/net/mac802154/driver-ops.h
+index 98180a9fff4a..a0533357b9ea 100644
+--- a/net/mac802154/driver-ops.h
++++ b/net/mac802154/driver-ops.h
+@@ -1,4 +1,4 @@
+-#ifndef __MAC802154_DRVIER_OPS
++#ifndef __MAC802154_DRIVER_OPS
+ #define __MAC802154_DRIVER_OPS
+ 
+ #include <linux/types.h>
+@@ -220,4 +220,4 @@ drv_set_promiscuous_mode(struct ieee802154_local *local, bool on)
+ 	return local->ops->set_promiscuous_mode(&local->hw, on);
+ }
+ 
+-#endif /* __MAC802154_DRVIER_OPS */
++#endif /* __MAC802154_DRIVER_OPS */
+-- 
+2.3.3
 
