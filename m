@@ -1,132 +1,114 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-pd0-f175.google.com ([209.85.192.175]:35476 "EHLO
-	mail-pd0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750967AbbCTHW6 (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Fri, 20 Mar 2015 03:22:58 -0400
-Received: by pdbop1 with SMTP id op1so100772091pdb.2
-        for <linux-wpan@vger.kernel.org>; Fri, 20 Mar 2015 00:22:57 -0700 (PDT)
+Received: from mail-pa0-f49.google.com ([209.85.220.49]:35513 "EHLO
+	mail-pa0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751092AbbCTHXC (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Fri, 20 Mar 2015 03:23:02 -0400
+Received: by pagj4 with SMTP id j4so9426674pag.2
+        for <linux-wpan@vger.kernel.org>; Fri, 20 Mar 2015 00:23:01 -0700 (PDT)
 From: Varka Bhadram <varkabhadram@gmail.com>
-Subject: [PATCH bluetooth-next 1/3] ieee802154: add set transmit power support
-Date: Fri, 20 Mar 2015 12:52:18 +0530
-Message-Id: <1426836141-21528-1-git-send-email-varkab@cdac.in>
+Subject: [PATCH bluetooth-next 2/3] cc2520: add set transmit power support
+Date: Fri, 20 Mar 2015 12:52:19 +0530
+Message-Id: <1426836141-21528-2-git-send-email-varkab@cdac.in>
+In-Reply-To: <1426836141-21528-1-git-send-email-varkab@cdac.in>
+References: <1426836141-21528-1-git-send-email-varkab@cdac.in>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
 Cc: alex.aring@gmail.com, Varka Bhadram <varkab@cdac.in>
 
-This patch adds transmission power setting support to nl802154.
-
 Signed-off-by: Varka Bhadram <varkab@cdac.in>
 ---
- include/net/cfg802154.h   |    1 +
- net/ieee802154/nl802154.c |   20 ++++++++++++++++++++
- net/ieee802154/rdev-ops.h |    7 +++++++
- net/mac802154/cfg.c       |   19 +++++++++++++++++++
- 4 files changed, 47 insertions(+)
+ drivers/net/ieee802154/cc2520.c |   56 ++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 55 insertions(+), 1 deletion(-)
 
-diff --git a/include/net/cfg802154.h b/include/net/cfg802154.h
-index eeda676..b163d4e 100644
---- a/include/net/cfg802154.h
-+++ b/include/net/cfg802154.h
-@@ -57,6 +57,7 @@ struct cfg802154_ops {
- 					 s8 max_frame_retries);
- 	int	(*set_lbt_mode)(struct wpan_phy *wpan_phy,
- 				struct wpan_dev *wpan_dev, bool mode);
-+	int	(*set_tx_power)(struct wpan_phy *wpan_phy, s8 power);
- };
+diff --git a/drivers/net/ieee802154/cc2520.c b/drivers/net/ieee802154/cc2520.c
+index f833b8b..f96cc50 100644
+--- a/drivers/net/ieee802154/cc2520.c
++++ b/drivers/net/ieee802154/cc2520.c
+@@ -53,6 +53,17 @@
+ #define	CC2520_MAXCHANNEL		26
+ #define	CC2520_CHANNEL_SPACING		5
  
- struct wpan_phy_cca {
-diff --git a/net/ieee802154/nl802154.c b/net/ieee802154/nl802154.c
-index a4daf91..8288fcb 100644
---- a/net/ieee802154/nl802154.c
-+++ b/net/ieee802154/nl802154.c
-@@ -794,6 +794,18 @@ static int nl802154_set_lbt_mode(struct sk_buff *skb, struct genl_info *info)
- 	return rdev_set_lbt_mode(rdev, wpan_dev, mode);
- }
- 
-+static int nl802154_set_tx_power(struct sk_buff *skb, struct genl_info *info)
-+{
-+	struct cfg802154_registered_device *rdev = info->user_ptr[0];
-+	s8 power;
++/* Tx power values */
++#define CC2520_TXPOWER_0		0x03 /* -18dbm */
++#define CC2520_TXPOWER_1		0x2c /* -7dbm */
++#define CC2520_TXPOWER_2		0x88 /* -4dbm */
++#define CC2520_TXPOWER_3		0x81 /* -2dbm */
++#define CC2520_TXPOWER_4		0x32 /* 0dbm */
++#define CC2520_TXPOWER_5		0x13 /* 1dbm */
++#define CC2520_TXPOWER_6		0xab /* 2dbm */
++#define CC2520_TXPOWER_7		0xf2 /* 3dbm */
++#define CC2520_TXPOWER_8		0xf7 /* 5dbm */
 +
-+	if (!info->attrs[NL802154_ATTR_TX_POWER])
-+		return -EINVAL;
-+
-+	power = nla_get_s8(info->attrs[NL802154_ATTR_TX_POWER]);
-+	return rdev_set_tx_power(rdev, power);
-+}
-+
- #define NL802154_FLAG_NEED_WPAN_PHY	0x01
- #define NL802154_FLAG_NEED_NETDEV	0x02
- #define NL802154_FLAG_NEED_RTNL		0x04
-@@ -984,6 +996,14 @@ static const struct genl_ops nl802154_ops[] = {
- 		.internal_flags = NL802154_FLAG_NEED_NETDEV |
- 				  NL802154_FLAG_NEED_RTNL,
- 	},
-+	{
-+		.cmd = NL802154_CMD_SET_TX_POWER,
-+		.doit = nl802154_set_tx_power,
-+		.policy = nl802154_policy,
-+		.flags = GENL_ADMIN_PERM,
-+		.internal_flags = NL802154_FLAG_NEED_WPAN_PHY |
-+				  NL802154_FLAG_NEED_RTNL,
-+	},
- };
- 
- /* initialisation/exit functions */
-diff --git a/net/ieee802154/rdev-ops.h b/net/ieee802154/rdev-ops.h
-index 7c46732..3de05a8 100644
---- a/net/ieee802154/rdev-ops.h
-+++ b/net/ieee802154/rdev-ops.h
-@@ -91,6 +91,13 @@ rdev_set_lbt_mode(struct cfg802154_registered_device *rdev,
- 		  struct wpan_dev *wpan_dev, bool mode)
- {
- 	return rdev->ops->set_lbt_mode(&rdev->wpan_phy, wpan_dev, mode);
-+
- }
- 
-+static inline int
-+rdev_set_tx_power(struct cfg802154_registered_device *rdev,
-+		  u8 power)
-+{
-+	return rdev->ops->set_tx_power(&rdev->wpan_phy, power);
-+}
- #endif /* __CFG802154_RDEV_OPS */
-diff --git a/net/mac802154/cfg.c b/net/mac802154/cfg.c
-index 5d9f68c..dde26f1 100644
---- a/net/mac802154/cfg.c
-+++ b/net/mac802154/cfg.c
-@@ -212,6 +212,24 @@ ieee802154_set_lbt_mode(struct wpan_phy *wpan_phy, struct wpan_dev *wpan_dev,
+ /* command strobes */
+ #define	CC2520_CMD_SNOP			0x00
+ #define	CC2520_CMD_IBUFLD		0x02
+@@ -628,6 +639,48 @@ cc2520_filter(struct ieee802154_hw *hw,
  	return 0;
  }
  
 +static int
-+ieee802154_set_tx_power(struct wpan_phy *wpan_phy, s8 power)
++cc2520_set_txpower(struct ieee802154_hw *hw, int db)
 +{
-+	struct ieee802154_local *local = wpan_phy_priv(wpan_phy);
-+	int ret;
++	struct cc2520_private *priv = hw->priv;
++	u8 power;
 +
-+	ASSERT_RTNL();
++	switch (db) {
++	case 5:
++		power = CC2520_TXPOWER_8;
++		break;
++	case 3:
++		power = CC2520_TXPOWER_7;
++		break;
++	case 2:
++		power = CC2520_TXPOWER_6;
++		break;
++	case 1:
++		power = CC2520_TXPOWER_5;
++		break;
++	case 0:
++		power = CC2520_TXPOWER_4;
++		break;
++	case -2:
++		power = CC2520_TXPOWER_3;
++		break;
++	case -4:
++		power = CC2520_TXPOWER_2;
++		break;
++	case -7:
++		power = CC2520_TXPOWER_1;
++		break;
++	case -18:
++		power = CC2520_TXPOWER_0;
++		break;
++	default:
++		dev_err(&priv->spi->dev, "invalid tx power setting\n");
++		return -EINVAL;
++	}
 +
-+	if (!(local->hw.flags & IEEE802154_HW_TXPOWER))
-+		return -EOPNOTSUPP;
-+
-+	ret = drv_set_tx_power(local, power);
-+	if (!ret)
-+		wpan_phy->transmit_power = power;
-+
-+	return ret;
++	return cc2520_write_register(priv, CC2520_TXPOWER, power);
 +}
 +
- const struct cfg802154_ops mac802154_config_ops = {
- 	.add_virtual_intf_deprecated = ieee802154_add_iface_deprecated,
- 	.del_virtual_intf_deprecated = ieee802154_del_iface_deprecated,
-@@ -225,4 +243,5 @@ const struct cfg802154_ops mac802154_config_ops = {
- 	.set_max_csma_backoffs = ieee802154_set_max_csma_backoffs,
- 	.set_max_frame_retries = ieee802154_set_max_frame_retries,
- 	.set_lbt_mode = ieee802154_set_lbt_mode,
-+	.set_tx_power = ieee802154_set_tx_power,
+ static const struct ieee802154_ops cc2520_ops = {
+ 	.owner = THIS_MODULE,
+ 	.start = cc2520_start,
+@@ -636,6 +689,7 @@ static const struct ieee802154_ops cc2520_ops = {
+ 	.ed = cc2520_ed,
+ 	.set_channel = cc2520_set_channel,
+ 	.set_hw_addr_filt = cc2520_filter,
++	.set_txpower = cc2520_set_txpower,
  };
+ 
+ static int cc2520_register(struct cc2520_private *priv)
+@@ -655,7 +709,7 @@ static int cc2520_register(struct cc2520_private *priv)
+ 	/* We do support only 2.4 Ghz */
+ 	priv->hw->phy->channels_supported[0] = 0x7FFF800;
+ 	priv->hw->flags = IEEE802154_HW_OMIT_CKSUM | IEEE802154_HW_AACK |
+-			  IEEE802154_HW_AFILT;
++			  IEEE802154_HW_AFILT | IEEE802154_HW_TXPOWER;
+ 
+ 	dev_vdbg(&priv->spi->dev, "registered cc2520\n");
+ 	ret = ieee802154_register_hw(priv->hw);
 -- 
 1.7.9.5
 
