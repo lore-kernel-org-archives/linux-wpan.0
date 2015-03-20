@@ -1,120 +1,122 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mailout1.w1.samsung.com ([210.118.77.11]:63034 "EHLO
-	mailout1.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751361AbbCTJUV (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Fri, 20 Mar 2015 05:20:21 -0400
-Received: from eucpsbgm2.samsung.com (unknown [203.254.199.245])
- by mailout1.w1.samsung.com
- (Oracle Communications Messaging Server 7u4-24.01(7.0.4.24.0) 64bit (built Nov
- 17 2011)) with ESMTP id <0NLI00DZ97GP5F30@mailout1.w1.samsung.com> for
- linux-wpan@vger.kernel.org; Fri, 20 Mar 2015 09:24:25 +0000 (GMT)
-From: Stefan Schmidt <s.schmidt@samsung.com>
+Received: from mail-wg0-f46.google.com ([74.125.82.46]:36842 "EHLO
+	mail-wg0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751093AbbCTQDK (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Fri, 20 Mar 2015 12:03:10 -0400
+Received: by wgra20 with SMTP id a20so93034126wgr.3
+        for <linux-wpan@vger.kernel.org>; Fri, 20 Mar 2015 09:03:09 -0700 (PDT)
+Date: Fri, 20 Mar 2015 17:03:06 +0100
+From: Alexander Aring <alex.aring@gmail.com>
+Subject: Re: [PATCH bluetooth-next 2/3] cc2520: add set transmit power support
+Message-ID: <20150320160302.GD3952@omega>
 References: <1426836141-21528-1-git-send-email-varkab@cdac.in>
  <1426836141-21528-2-git-send-email-varkab@cdac.in>
-In-reply-to: <1426836141-21528-2-git-send-email-varkab@cdac.in>
-Subject: Re: [PATCH bluetooth-next 2/3] cc2520: add set transmit power support
-Date: Fri, 20 Mar 2015 09:19:56 +0000
-Message-id: <105301d062ef$08380820$18a81860$@samsung.com>
-MIME-version: 1.0
-Content-type: text/plain; format=flowed; charset=us-ascii
-Content-transfer-encoding: 7bit
-Content-language: en-gb
+ <105301d062ef$08380820$18a81860$@samsung.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <105301d062ef$08380820$18a81860$@samsung.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: 'Varka Bhadram' <varkabhadram@gmail.com>, linux-wpan@vger.kernel.org
-Cc: alex.aring@gmail.com, 'Varka Bhadram' <varkab@cdac.in>
+To: Stefan Schmidt <s.schmidt@samsung.com>
+Cc: 'Varka Bhadram' <varkabhadram@gmail.com>, linux-wpan@vger.kernel.org, 'Varka Bhadram' <varkab@cdac.in>
 
-Hello.
+On Fri, Mar 20, 2015 at 09:19:56AM +0000, Stefan Schmidt wrote:
+> Hello.
+> 
+> On 20/03/15 08:22, Varka Bhadram wrote:
+> >Signed-off-by: Varka Bhadram <varkab@cdac.in>
+> >---
+> >  drivers/net/ieee802154/cc2520.c |   56
+> >++++++++++++++++++++++++++++++++++++++-
+> >  1 file changed, 55 insertions(+), 1 deletion(-)
+> >
+> >diff --git a/drivers/net/ieee802154/cc2520.c
+> >b/drivers/net/ieee802154/cc2520.c
+> >index f833b8b..f96cc50 100644
+> >--- a/drivers/net/ieee802154/cc2520.c
+> >+++ b/drivers/net/ieee802154/cc2520.c
+> >@@ -53,6 +53,17 @@
+> >  #define	CC2520_MAXCHANNEL		26
+> >  #define	CC2520_CHANNEL_SPACING		5
+> >
 
-On 20/03/15 08:22, Varka Bhadram wrote:
-> Signed-off-by: Varka Bhadram <varkab@cdac.in>
-> ---
->   drivers/net/ieee802154/cc2520.c |   56
-> ++++++++++++++++++++++++++++++++++++++-
->   1 file changed, 55 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/net/ieee802154/cc2520.c
-> b/drivers/net/ieee802154/cc2520.c
-> index f833b8b..f96cc50 100644
-> --- a/drivers/net/ieee802154/cc2520.c
-> +++ b/drivers/net/ieee802154/cc2520.c
-> @@ -53,6 +53,17 @@
->   #define	CC2520_MAXCHANNEL		26
->   #define	CC2520_CHANNEL_SPACING		5
->
-> +/* Tx power values */
-> +#define CC2520_TXPOWER_0		0x03 /* -18dbm */
-> +#define CC2520_TXPOWER_1		0x2c /* -7dbm */
-> +#define CC2520_TXPOWER_2		0x88 /* -4dbm */
-> +#define CC2520_TXPOWER_3		0x81 /* -2dbm */
-> +#define CC2520_TXPOWER_4		0x32 /* 0dbm */
-> +#define CC2520_TXPOWER_5		0x13 /* 1dbm */
-> +#define CC2520_TXPOWER_6		0xab /* 2dbm */
-> +#define CC2520_TXPOWER_7		0xf2 /* 3dbm */
-> +#define CC2520_TXPOWER_8		0xf7 /* 5dbm */
-> +
->   /* command strobes */
->   #define	CC2520_CMD_SNOP			0x00
->   #define	CC2520_CMD_IBUFLD		0x02
-> @@ -628,6 +639,48 @@ cc2520_filter(struct ieee802154_hw *hw,
->   	return 0;
->   }
->
-> +static int
-> +cc2520_set_txpower(struct ieee802154_hw *hw, int db)
-> +{
-> +	struct cc2520_private *priv = hw->priv;
-> +	u8 power;
-> +
-> +	switch (db) {
-> +	case 5:
-> +		power = CC2520_TXPOWER_8;
-> +		break;
-> +	case 3:
-> +		power = CC2520_TXPOWER_7;
-> +		break;
-> +	case 2:
-> +		power = CC2520_TXPOWER_6;
-> +		break;
-> +	case 1:
-> +		power = CC2520_TXPOWER_5;
-> +		break;
-> +	case 0:
-> +		power = CC2520_TXPOWER_4;
-> +		break;
-> +	case -2:
-> +		power = CC2520_TXPOWER_3;
-> +		break;
-> +	case -4:
-> +		power = CC2520_TXPOWER_2;
-> +		break;
-> +	case -7:
-> +		power = CC2520_TXPOWER_1;
-> +		break;
-> +	case -18:
-> +		power = CC2520_TXPOWER_0;
-> +		break;
-> +	default:
-> +		dev_err(&priv->spi->dev, "invalid tx power setting\n");
-> +		return -EINVAL;
-> +	}
-> +
-> +	return cc2520_write_register(priv, CC2520_TXPOWER, power);
-> +}
-> +
+...
 
-Thanks for working on the power setting API.
+> >+}
+> >+
+> 
+> Thanks for working on the power setting API.
+> 
 
-One thing I find problematic here is that the user has to know the 
-values it can set for the db level beforehand and these values can 
-change for different transceivers. Which makes these nl call hardware 
-depended.
+agree.
 
-We should at least have a way to query what db levels are available or 
-better see if we can harmonize the setting over different drivers and 
-transceivers.
+> One thing I find problematic here is that the user has to know the values it
+> can set for the db level beforehand and these values can change for
+> different transceivers. Which makes these nl call hardware depended.
+> 
+> We should at least have a way to query what db levels are available or
+> better see if we can harmonize the setting over different drivers and
+> transceivers.
+> 
 
-regards
-Stefan Schmidt
+agree, here too. But we also need that for the current others phy
+settings like cca modes. There exist also MAC settings like
+MIN_BE/MAX_BE (csma backoffs) which cannot support every phy. (I also
+saw transceivers like mrf24j40 [0] which can set MIN_BE only. I suppose
+that MAX_BE is always be 802.15.4 default).
+
+Back to the txpower setting, what I previous mention in another mail is
+that for transceivers which supports mutliple bands/modulations the supported
+txpower dbm values differs. For example the at86rf212 [1]. This means
+that we need some mechanism to handle that.
+
+I imagine the following scenario.
+
+1. Somebody wants to know all txpower settings for all bands.
+
+   Then we need some big array which is filled at probe time.
 
 
+
+2. Somebody wants to know all txpower settings of the current
+   page/channel setting.
+
+   This would be much easier, I found two solutions:
+
+     1. add some supported_txpower array, which is updated while channel
+        /page setting. (Also for reset values while probing).
+
+     2. have a driver callback which will fill some dbm values and the driver
+        decide of the current channel/page settings how this array is filled.
+
+   I would prefer the 1. solution because that's similar like the PHY
+   PIB handles the channels_supported array, then we have something like
+   txpower_supported.
+
+
+The point is we can support such feature later, currently the only one
+way is to do try and error and look if -EINVAL is returned. :D
+
+btw:
+All phy settings are direct calls to the driver layer, but for mac
+settings this is more problematic, because we only can decide if the phy
+supports the setting on an interface up. This sucks! This means you set
+some value which is 802.15.4 complaint and is successful on interface
+down. Then an interface up will return -EINVAL and you don't know why.
+:-/
+
+That's why we need also something like "csma_backoffs_supported" thing
+(array/flag/I don't know, better flags) and check this while setting
+the backoffs while interface down.
+
+The good thing is, we don't have such transceiver currently. The
+at86rf230 supports all 802.15.4 values and (sometimes) beyond.
+
+All MAC settings which is handled by phy need such checking and
+supported array.
+
+- Alex
+
+[0] http://ww1.microchip.com/downloads/en/DeviceDoc/39776C.pdf
+[1] http://www.atmel.com/images/doc8168.pdf
