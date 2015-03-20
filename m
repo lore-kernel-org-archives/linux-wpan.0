@@ -1,70 +1,48 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-pd0-f175.google.com ([209.85.192.175]:34712 "EHLO
-	mail-pd0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751935AbbCWDek (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Sun, 22 Mar 2015 23:34:40 -0400
-Received: by pdbni2 with SMTP id ni2so173815226pdb.1
-        for <linux-wpan@vger.kernel.org>; Sun, 22 Mar 2015 20:34:39 -0700 (PDT)
-Message-ID: <550F89BF.8050405@gmail.com>
-Date: Mon, 23 Mar 2015 09:04:23 +0530
+Received: from mail-pa0-f42.google.com ([209.85.220.42]:35595 "EHLO
+	mail-pa0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751310AbbCTHXF (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Fri, 20 Mar 2015 03:23:05 -0400
+Received: by pagj4 with SMTP id j4so9428154pag.2
+        for <linux-wpan@vger.kernel.org>; Fri, 20 Mar 2015 00:23:04 -0700 (PDT)
 From: Varka Bhadram <varkabhadram@gmail.com>
-MIME-Version: 1.0
-Subject: Re: [PATCH bluetooth-next 2/3] cc2520: add set transmit power support
-References: <1426836141-21528-1-git-send-email-varkab@cdac.in> <1426836141-21528-2-git-send-email-varkab@cdac.in> <20150320153019.GB3952@omega>
-In-Reply-To: <20150320153019.GB3952@omega>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Subject: [PATCH bluetooth-next 3/3] cc2520: fix in updated register settings
+Date: Fri, 20 Mar 2015 12:52:20 +0530
+Message-Id: <1426836141-21528-3-git-send-email-varkab@cdac.in>
+In-Reply-To: <1426836141-21528-1-git-send-email-varkab@cdac.in>
+References: <1426836141-21528-1-git-send-email-varkab@cdac.in>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>
-Cc: linux-wpan@vger.kernel.org, Varka Bhadram <varkab@cdac.in>
+To: linux-wpan@vger.kernel.org
+Cc: alex.aring@gmail.com, Varka Bhadram <varkab@cdac.in>
 
-On 03/20/2015 09:00 PM, Alexander Aring wrote:
-> Hi,
->
-> On Fri, Mar 20, 2015 at 12:52:19PM +0530, Varka Bhadram wrote:
->> Signed-off-by: Varka Bhadram <varkab@cdac.in>
->> ---
->>   drivers/net/ieee802154/cc2520.c |   56 ++++++++++++++++++++++++++++++++++++++-
->>   1 file changed, 55 insertions(+), 1 deletion(-)
->>
->> diff --git a/drivers/net/ieee802154/cc2520.c b/drivers/net/ieee802154/cc2520.c
->> index f833b8b..f96cc50 100644
->> --- a/drivers/net/ieee802154/cc2520.c
->> +++ b/drivers/net/ieee802154/cc2520.c
->> @@ -53,6 +53,17 @@
->>   #define	CC2520_MAXCHANNEL		26
->>   #define	CC2520_CHANNEL_SPACING		5
->>   
->> +/* Tx power values */
->> +#define CC2520_TXPOWER_0		0x03 /* -18dbm */
->> +#define CC2520_TXPOWER_1		0x2c /* -7dbm */
->> +#define CC2520_TXPOWER_2		0x88 /* -4dbm */
->> +#define CC2520_TXPOWER_3		0x81 /* -2dbm */
->> +#define CC2520_TXPOWER_4		0x32 /* 0dbm */
->> +#define CC2520_TXPOWER_5		0x13 /* 1dbm */
->> +#define CC2520_TXPOWER_6		0xab /* 2dbm */
->> +#define CC2520_TXPOWER_7		0xf2 /* 3dbm */
->> +#define CC2520_TXPOWER_8		0xf7 /* 5dbm */
->> +
->>   /* command strobes */
->>   #define	CC2520_CMD_SNOP			0x00
->>   #define	CC2520_CMD_IBUFLD		0x02
->> @@ -628,6 +639,48 @@ cc2520_filter(struct ieee802154_hw *hw,
->>   	return 0;
->>   }
->>   
->> +static int
->> +cc2520_set_txpower(struct ieee802154_hw *hw, int db)
->> +{
-> our netlink attribute is s8, maybe we should fix the mac layer at first
-> and change the int to s8.
+This patch fix the updated register settings for transmit power.
 
-Ok. I will look into that.
+As per the datasheet [section 28.1 Register Settings Update]
+the transmit power register value has to be updated to 0x32 (0 dBm)
+from the default value.
 
-> - Alex
+CC2520_TXPOWER_4 indicates the value 0x32 (0 dBm).
 
+Signed-off-by: Varka Bhadram <varkab@cdac.in>
+---
+ drivers/net/ieee802154/cc2520.c |    3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
+diff --git a/drivers/net/ieee802154/cc2520.c b/drivers/net/ieee802154/cc2520.c
+index f96cc50..d9135ec 100644
+--- a/drivers/net/ieee802154/cc2520.c
++++ b/drivers/net/ieee802154/cc2520.c
+@@ -860,7 +860,8 @@ static int cc2520_hw_init(struct cc2520_private *priv)
+ 		if (ret)
+ 			goto err_ret;
+ 	} else {
+-		ret = cc2520_write_register(priv, CC2520_TXPOWER, 0xF7);
++		ret = cc2520_write_register(priv, CC2520_TXPOWER,
++					    CC2520_TXPOWER_4);
+ 		if (ret)
+ 			goto err_ret;
+ 
 -- 
-Varka Bhadram
+1.7.9.5
 
