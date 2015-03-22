@@ -1,34 +1,29 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wg0-f53.google.com ([74.125.82.53]:34234 "EHLO
-	mail-wg0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753423AbbCaSDM (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Tue, 31 Mar 2015 14:03:12 -0400
-Received: by wgbdm7 with SMTP id dm7so28175108wgb.1
-        for <linux-wpan@vger.kernel.org>; Tue, 31 Mar 2015 11:03:11 -0700 (PDT)
-Date: Tue, 31 Mar 2015 20:03:05 +0200
-From: Alexander Aring <alex.aring@gmail.com>
-Subject: Re: [PATCH wpan-tools] gitignore: add object files
-Message-ID: <20150331180259.GA4348@omega>
-References: <1426736478-6140-1-git-send-email-varkab@cdac.in>
+Received: from rcdn-iport-3.cisco.com ([173.37.86.74]:21871 "EHLO
+	rcdn-iport-3.cisco.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751791AbbCVPiC convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Sun, 22 Mar 2015 11:38:02 -0400
+Received: from xhc-rcd-x02.cisco.com (xhc-rcd-x02.cisco.com [173.37.183.76])
+	by rcdn-core-7.cisco.com (8.14.5/8.14.5) with ESMTP id t2MFSaea024354
+	(version=TLSv1/SSLv3 cipher=AES128-SHA bits=128 verify=FAIL)
+	for <linux-wpan@vger.kernel.org>; Sun, 22 Mar 2015 15:28:36 GMT
+From: "Ralph Droms (rdroms)" <rdroms@cisco.com>
+Subject: hardware recommendation
+Date: Sun, 22 Mar 2015 15:28:36 +0000
+Message-ID: <8575BDE3-5617-49A9-AF9C-D0C9359E074E@cisco.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <B10A1EB3DF1DD146B2C09B1549C3235C@emea.cisco.com>
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1426736478-6140-1-git-send-email-varkab@cdac.in>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Varka Bhadram <varkabhadram@gmail.com>
-Cc: linux-wpan@vger.kernel.org, Varka Bhadram <varkab@cdac.in>
+To: "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>
 
-Hi Varka,
+What hardware - radio board, interface, Linux platform - are recommended for the 802.15.4 stack in the bluetooth-next kernel?
 
-On Thu, Mar 19, 2015 at 09:11:18AM +0530, Varka Bhadram wrote:
-> 
-> Signed-off-by: Varka Bhadram <varkab@cdac.in>
+- Ralph
 
-thanks. Patch applied to wpan-tools and sorry for the latency.
+BTW, is this list archived?  Where?
 
-I think then we don't need to have the object files at [0] anymore.
 
-- Alex
-
-[0] https://github.com/linux-wpan/wpan-tools/blob/master/src/.gitignore
