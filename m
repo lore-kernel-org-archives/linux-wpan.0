@@ -1,14 +1,14 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f169.google.com ([209.85.212.169]:35676 "EHLO
-	mail-wi0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752135AbbCWPqH (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Mon, 23 Mar 2015 11:46:07 -0400
-Received: by wibdy8 with SMTP id dy8so51129641wib.0
-        for <linux-wpan@vger.kernel.org>; Mon, 23 Mar 2015 08:46:06 -0700 (PDT)
+Received: from mail-we0-f174.google.com ([74.125.82.174]:33275 "EHLO
+	mail-we0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752608AbbCWPqI (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Mon, 23 Mar 2015 11:46:08 -0400
+Received: by weop45 with SMTP id p45so141281826weo.0
+        for <linux-wpan@vger.kernel.org>; Mon, 23 Mar 2015 08:46:07 -0700 (PDT)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCHv2 bluetooth-next 2/4] nl802154: add set interface cmd
-Date: Mon, 23 Mar 2015 16:45:39 +0100
-Message-Id: <1427125541-28708-3-git-send-email-alex.aring@gmail.com>
+Subject: [PATCHv2 bluetooth-next 3/4] ieee802154: move mac pib defaults
+Date: Mon, 23 Mar 2015 16:45:40 +0100
+Message-Id: <1427125541-28708-4-git-send-email-alex.aring@gmail.com>
 In-Reply-To: <1427125541-28708-1-git-send-email-alex.aring@gmail.com>
 References: <1427125541-28708-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
@@ -16,144 +16,104 @@ List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
 Cc: kernel@pengutronix.de, mkl@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-This patch introduce the NL802154_CMD_SET_INTERFACE command which
-handles setting of all wpan interface mac attributes. This will reduce
-the complexity of several netlink commands for each attributes and
-userspace applications are easier to implement.
+This patch moves the mac pib defaults setting out of SoftMAC layer. This
+will prepare for possible HardMAC drivers that these values are 802.15.4
+defaults while netdev registration.
 
 Signed-off-by: Alexander Aring <alex.aring@gmail.com>
 ---
- net/ieee802154/nl802154.c | 110 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 110 insertions(+)
+ net/ieee802154/core.c | 30 ++++++++++++++++++++++++++++++
+ net/mac802154/iface.c | 15 ---------------
+ 2 files changed, 30 insertions(+), 15 deletions(-)
 
-diff --git a/net/ieee802154/nl802154.c b/net/ieee802154/nl802154.c
-index c12c07f..e2f50ba 100644
---- a/net/ieee802154/nl802154.c
-+++ b/net/ieee802154/nl802154.c
-@@ -603,6 +603,108 @@ static int nl802154_get_interface(struct sk_buff *skb, struct genl_info *info)
- 	return genlmsg_reply(msg, info);
+diff --git a/net/ieee802154/core.c b/net/ieee802154/core.c
+index 2ee00e8..7a107b0 100644
+--- a/net/ieee802154/core.c
++++ b/net/ieee802154/core.c
+@@ -211,6 +211,35 @@ cfg802154_update_iface_num(struct cfg802154_registered_device *rdev,
+ 	rdev->num_running_ifaces += num;
  }
  
-+static int nl802154_set_interface(struct sk_buff *skb, struct genl_info *info)
++static void
++cfg802154_reset_mac_pib(struct wpan_dev *wpan_dev)
 +{
-+	struct cfg802154_registered_device *rdev = info->user_ptr[0];
-+	struct net_device *dev = info->user_ptr[1];
-+	struct wpan_dev *wpan_dev = dev->ieee802154_ptr;
-+	int ret;
++	get_random_bytes(&wpan_dev->bsn, 1);
++	get_random_bytes(&wpan_dev->dsn, 1);
 +
-+	if (info->attrs[NL802154_ATTR_PAN_ID]) {
-+		__le16 pan_id;
++	/* defaults per 802.15.4-2011 */
++	wpan_dev->min_be = 3;
++	wpan_dev->max_be = 5;
++	wpan_dev->csma_retries = 4;
++	/* for compatibility, actual default is 3 */
++	wpan_dev->frame_retries = -1;
 +
-+		if (wpan_dev->iftype == NL802154_IFTYPE_MONITOR)
-+			return -EINVAL;
++	wpan_dev->pan_id = cpu_to_le16(IEEE802154_PAN_ID_BROADCAST);
++	wpan_dev->short_addr = cpu_to_le16(IEEE802154_ADDR_SHORT_BROADCAST);
 +
-+		if (netif_running(dev))
-+			return -EBUSY;
-+
-+		pan_id = nla_get_le16(info->attrs[NL802154_ATTR_PAN_ID]);
-+		ret = rdev_set_pan_id(rdev, wpan_dev, pan_id);
-+		if (ret < 0)
-+			return ret;
++	/* normally false, but monitors are always in promiscuous_mode */
++	switch (wpan_dev->iftype) {
++	case NL802154_IFTYPE_NODE:
++		wpan_dev->promiscuous_mode = false;
++		break;
++	case NL802154_IFTYPE_MONITOR:
++		wpan_dev->promiscuous_mode = true;
++		break;
++	default:
++		BUG();
 +	}
-+
-+	if (info->attrs[NL802154_ATTR_SHORT_ADDR]) {
-+		__le16 short_addr;
-+
-+		if (wpan_dev->iftype == NL802154_IFTYPE_MONITOR)
-+			return -EINVAL;
-+
-+		if (netif_running(dev))
-+			return -EBUSY;
-+
-+		short_addr = nla_get_le16(info->attrs[NL802154_ATTR_SHORT_ADDR]);
-+
-+		ret = rdev_set_short_addr(rdev, wpan_dev, short_addr);
-+		if (ret < 0)
-+			return ret;
-+	}
-+
-+	if (info->attrs[NL802154_ATTR_MAX_FRAME_RETRIES]) {
-+		s8 max_frame_retries;
-+
-+		if (netif_running(dev))
-+			return -EBUSY;
-+
-+		max_frame_retries = nla_get_s8(
-+				info->attrs[NL802154_ATTR_MAX_FRAME_RETRIES]);
-+		if (max_frame_retries < -1 || max_frame_retries > 7)
-+			return -EINVAL;
-+
-+		ret = rdev_set_max_frame_retries(rdev, wpan_dev,
-+						 max_frame_retries);
-+		if (ret < 0)
-+			return ret;
-+	}
-+
-+	if (info->attrs[NL802154_ATTR_MIN_BE] &&
-+	    info->attrs[NL802154_ATTR_MAX_BE]) {
-+		u8 min_be, max_be;
-+
-+		if (netif_running(dev))
-+			return -EBUSY;
-+
-+		min_be = nla_get_u8(info->attrs[NL802154_ATTR_MIN_BE]);
-+		max_be = nla_get_u8(info->attrs[NL802154_ATTR_MAX_BE]);
-+		if (max_be < 3 || max_be > 8 || min_be > max_be)
-+			return -EINVAL;
-+
-+		ret = rdev_set_backoff_exponent(rdev, wpan_dev, min_be, max_be);
-+		if (ret < 0)
-+			return ret;
-+	}
-+
-+	if (info->attrs[NL802154_ATTR_MAX_CSMA_BACKOFFS]) {
-+		u8 max_csma_backoffs;
-+
-+		if (netif_running(dev))
-+			return -EBUSY;
-+
-+		max_csma_backoffs = nla_get_u8(
-+				info->attrs[NL802154_ATTR_MAX_CSMA_BACKOFFS]);
-+		if (max_csma_backoffs > 5)
-+			return -EINVAL;
-+
-+		ret = rdev_set_max_csma_backoffs(rdev, wpan_dev,
-+						 max_csma_backoffs);
-+		if (ret < 0)
-+			return ret;
-+	}
-+
-+	if (info->attrs[NL802154_ATTR_LBT_MODE]) {
-+		bool mode;
-+
-+		if (netif_running(dev))
-+			return -EBUSY;
-+
-+		mode = !!nla_get_u8(info->attrs[NL802154_ATTR_LBT_MODE]);
-+		return rdev_set_lbt_mode(rdev, wpan_dev, mode);
-+	}
-+
-+	return 0;
 +}
 +
- static int nl802154_new_interface(struct sk_buff *skb, struct genl_info *info)
+ static int cfg802154_netdev_notifier_call(struct notifier_block *nb,
+ 					  unsigned long state, void *ptr)
  {
- 	struct cfg802154_registered_device *rdev = info->user_ptr[0];
-@@ -964,6 +1066,14 @@ static const struct genl_ops nl802154_ops[] = {
- 				  NL802154_FLAG_NEED_RTNL,
- 	},
- 	{
-+		.cmd = NL802154_CMD_SET_INTERFACE,
-+		.doit = nl802154_set_interface,
-+		.policy = nl802154_policy,
-+		.flags = GENL_ADMIN_PERM,
-+		.internal_flags = NL802154_FLAG_NEED_NETDEV |
-+				  NL802154_FLAG_NEED_RTNL,
-+	},
-+	{
- 		.cmd = NL802154_CMD_DEL_INTERFACE,
- 		.doit = nl802154_del_interface,
- 		.policy = nl802154_policy,
+@@ -234,6 +263,7 @@ static int cfg802154_netdev_notifier_call(struct notifier_block *nb,
+ 		rdev->devlist_generation++;
+ 
+ 		wpan_dev->netdev = dev;
++		cfg802154_reset_mac_pib(wpan_dev);
+ 		break;
+ 	case NETDEV_DOWN:
+ 		cfg802154_update_iface_num(rdev, wpan_dev->iftype, -1);
+diff --git a/net/mac802154/iface.c b/net/mac802154/iface.c
+index 6fb6bdf..9b8e264 100644
+--- a/net/mac802154/iface.c
++++ b/net/mac802154/iface.c
+@@ -487,19 +487,6 @@ ieee802154_setup_sdata(struct ieee802154_sub_if_data *sdata,
+ 	sdata->vif.type = type;
+ 	sdata->wpan_dev.iftype = type;
+ 
+-	get_random_bytes(&wpan_dev->bsn, 1);
+-	get_random_bytes(&wpan_dev->dsn, 1);
+-
+-	/* defaults per 802.15.4-2011 */
+-	wpan_dev->min_be = 3;
+-	wpan_dev->max_be = 5;
+-	wpan_dev->csma_retries = 4;
+-	/* for compatibility, actual default is 3 */
+-	wpan_dev->frame_retries = -1;
+-
+-	wpan_dev->pan_id = cpu_to_le16(IEEE802154_PANID_BROADCAST);
+-	wpan_dev->short_addr = cpu_to_le16(IEEE802154_ADDR_BROADCAST);
+-
+ 	switch (type) {
+ 	case NL802154_IFTYPE_NODE:
+ 		ieee802154_be64_to_le64(&wpan_dev->extended_addr,
+@@ -509,7 +496,6 @@ ieee802154_setup_sdata(struct ieee802154_sub_if_data *sdata,
+ 		sdata->dev->destructor = mac802154_wpan_free;
+ 		sdata->dev->netdev_ops = &mac802154_wpan_ops;
+ 		sdata->dev->ml_priv = &mac802154_mlme_wpan;
+-		wpan_dev->promiscuous_mode = false;
+ 
+ 		spin_lock_init(&sdata->mib_lock);
+ 		mutex_init(&sdata->sec_mtx);
+@@ -519,7 +505,6 @@ ieee802154_setup_sdata(struct ieee802154_sub_if_data *sdata,
+ 	case NL802154_IFTYPE_MONITOR:
+ 		sdata->dev->destructor = free_netdev;
+ 		sdata->dev->netdev_ops = &mac802154_monitor_ops;
+-		wpan_dev->promiscuous_mode = true;
+ 		break;
+ 	default:
+ 		BUG();
 -- 
 2.3.3
 
