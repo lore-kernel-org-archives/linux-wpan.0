@@ -1,88 +1,60 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from rcdn-iport-3.cisco.com ([173.37.86.74]:22354 "EHLO
-	rcdn-iport-3.cisco.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750742AbbCZEl0 convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Thu, 26 Mar 2015 00:41:26 -0400
-From: "Ralph Droms (rdroms)" <rdroms@cisco.com>
+Received: from mail-wi0-f172.google.com ([209.85.212.172]:37084 "EHLO
+	mail-wi0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750845AbbCZJGd (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Thu, 26 Mar 2015 05:06:33 -0400
+Received: by wiaa2 with SMTP id a2so12753760wia.0
+        for <linux-wpan@vger.kernel.org>; Thu, 26 Mar 2015 02:06:31 -0700 (PDT)
+Date: Thu, 26 Mar 2015 10:06:25 +0100
+From: Alexander Aring <alex.aring@gmail.com>
 Subject: Re: hardware recommendation
-Date: Thu, 26 Mar 2015 04:41:24 +0000
-Message-ID: <4E57CCC9-A879-457C-9471-9A83BA417CE5@cisco.com>
+Message-ID: <20150326090622.GA5394@omega>
 References: <8575BDE3-5617-49A9-AF9C-D0C9359E074E@cisco.com>
  <20150323075818.GA4069@omega>
-In-Reply-To: <20150323075818.GA4069@omega>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <A2E288A2A0C50947A7485EB969E5F262@emea.cisco.com>
-Content-Transfer-Encoding: 8BIT
+ <4E57CCC9-A879-457C-9471-9A83BA417CE5@cisco.com>
+ <CAFUtXGzGeMmbSNtbP2xdjr6uitzFwPZCb3Yo-GV2+2gV3uz6+w@mail.gmail.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAFUtXGzGeMmbSNtbP2xdjr6uitzFwPZCb3Yo-GV2+2gV3uz6+w@mail.gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>
-Cc: "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>
+To: Maciej Wasilak <wasilak@gmail.com>
+Cc: "Ralph Droms (rdroms)" <rdroms@cisco.com>, "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>
 
+Hi,
 
-> On Mar 23, 2015, at 2:58 AM 3/23/15, Alexander Aring <alex.aring@gmail.com> wrote:
+On Thu, Mar 26, 2015 at 07:44:26AM +0100, Maciej Wasilak wrote:
+> Dear Ralph,
 > 
-> Hi Ralph,
+> I confirm it's possible to use USB and Ethernet on RaspberryPi with
+> bluetooth-next. You have to enable kernel options:
 > 
-> welcome back.
+> CONFIG_USB_DWC2_HOST
+> CONFIG_USB_DWC2_PLATFORM
+>
+CONFIG_USB_NET_SMSC95XX
 
-Thanks!
-
-> 
-> On Sun, Mar 22, 2015 at 03:28:36PM +0000, Ralph Droms (rdroms) wrote:
->> What hardware - radio board, interface, Linux platform - are recommended for the 802.15.4 stack in the bluetooth-next kernel?
->> 
-> 
-> See [0].
-> 
-> Radio board:
-> 
->  - I would advice a 2.4 Ghz at86rf231 or at86rf233 [1].
->     Supports async xmit handling and has the most supported hardware
->     flags. Driver is at86rf230.
-
-OK.
-
-> 
-> Interface:
->  - What you mean with interface? Bus Interface? -> SPI. Or netlink
->    interface? -> nl802154 with wpan-tools. Don't understand the
->    question.
-
-Bus interface.
-
-> 
-> Linux platform:
->  - I think you mean some architecture -> ARM. Then the platform, some
->    board: The transceiver at [1] was made for RPi which works well on
->    my side. But the RPi has a lack of mainline support. You have no
->    USB, this means you have also no ethernet. If you don't need
->    ethernet, then I would use a simple RPi. If you need ethernet I
->    would advice to make some adapter board to add the [1] on a
->    beaglebone [2], which have a good mainline support. This require
->    some hardware hacking skills.
-
-[1] + Raspberry Pi is the sort of combination I was asking about.  But, I'd also like to have Ethernet as well.  I have a couple of BeagleBoard XMs; I ordered a couple of [1]s and I'll try to hack up an adapter.
-
-
-
->    Note: for RPi I also support you have no other support e.g. HDMI
->    output or something else. SPI with RPi works mainline perfectly.
-> 
->> - Ralph
->> 
->> BTW, is this list archived?  Where?
->> 
-> 
-> Over google I detected that spinics archive this mailinglist [3] (but
-> doesn't include the early days).
-> 
-> - Alex
-> 
-> [0] http://wpan.cakelab.org/
-> [1] http://openlabs.co/store/Raspberry-Pi-802.15.4-radio
-> [2] http://beagleboard.org/
-> [3] http://www.spinics.net/lists/linux-wpan/
+> These options may not be enabled by default in bcm2835 config.
 > 
 
+I test it and can confirm that it does do "more" reaction on probing.
+I get now:
+
+[    1.822208] usbcore: registered new interface driver smsc95xx
+...
+[    2.151861] dwc2 20980000.usb: 256 invalid for host_nperio_tx_fifo_size. Check HW configuration.
+[    2.160701] dwc2 20980000.usb: 512 invalid for host_perio_tx_fifo_size. Check HW configuration.
+[    4.251299] dwc2 20980000.usb: dwc2_core_reset() HANG! Soft Reset GRSTCTL=80000001
+[    4.258922] dwc2 20980000.usb: dwc2_core_init(): Reset failed, aborting
+[    4.265577] dwc2 20980000.usb: dwc2_hcd_init() FAILED, returning -16
+[    4.271977] dwc2: probe of 20980000.usb failed with error -16
+
+
+Don't know why I get it, I use the current mainline dts files for the RPi.
+Maybe somebody can help me here?
+
+Nevetheless I think it's hurts to use an Ethernet PHY which is connected
+via USB. Additional I have no good experience with RPi and USB. :-/
+
+- Alex
