@@ -1,34 +1,34 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-pd0-f182.google.com ([209.85.192.182]:33025 "EHLO
-	mail-pd0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752722AbbCSDlo (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Wed, 18 Mar 2015 23:41:44 -0400
-Received: by pdnc3 with SMTP id c3so62918813pdn.0
-        for <linux-wpan@vger.kernel.org>; Wed, 18 Mar 2015 20:41:43 -0700 (PDT)
-From: Varka Bhadram <varkabhadram@gmail.com>
-Subject: [PATCH wpan-tools] gitignore: add object files
-Date: Thu, 19 Mar 2015 09:11:18 +0530
-Message-Id: <1426736478-6140-1-git-send-email-varkab@cdac.in>
+Received: from mail-wg0-f53.google.com ([74.125.82.53]:34234 "EHLO
+	mail-wg0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753423AbbCaSDM (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Tue, 31 Mar 2015 14:03:12 -0400
+Received: by wgbdm7 with SMTP id dm7so28175108wgb.1
+        for <linux-wpan@vger.kernel.org>; Tue, 31 Mar 2015 11:03:11 -0700 (PDT)
+Date: Tue, 31 Mar 2015 20:03:05 +0200
+From: Alexander Aring <alex.aring@gmail.com>
+Subject: Re: [PATCH wpan-tools] gitignore: add object files
+Message-ID: <20150331180259.GA4348@omega>
+References: <1426736478-6140-1-git-send-email-varkab@cdac.in>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1426736478-6140-1-git-send-email-varkab@cdac.in>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org
-Cc: Varka Bhadram <varkab@cdac.in>
+To: Varka Bhadram <varkabhadram@gmail.com>
+Cc: linux-wpan@vger.kernel.org, Varka Bhadram <varkab@cdac.in>
 
+Hi Varka,
 
-Signed-off-by: Varka Bhadram <varkab@cdac.in>
----
- .gitignore |    1 +
- 1 file changed, 1 insertion(+)
+On Thu, Mar 19, 2015 at 09:11:18AM +0530, Varka Bhadram wrote:
+> 
+> Signed-off-by: Varka Bhadram <varkab@cdac.in>
 
-diff --git a/.gitignore b/.gitignore
-index 522b35c..ef71c6a 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -1,3 +1,4 @@
-+*.o
- tags
- TAGS
- Makefile
--- 
-1.7.9.5
+thanks. Patch applied to wpan-tools and sorry for the latency.
 
+I think then we don't need to have the object files at [0] anymore.
+
+- Alex
+
+[0] https://github.com/linux-wpan/wpan-tools/blob/master/src/.gitignore
