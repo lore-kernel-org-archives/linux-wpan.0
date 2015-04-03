@@ -1,84 +1,57 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wg0-f49.google.com ([74.125.82.49]:33365 "EHLO
-	mail-wg0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752036AbbDCOpK (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Fri, 3 Apr 2015 10:45:10 -0400
-Received: by wgin8 with SMTP id n8so23291428wgi.0
-        for <linux-wpan@vger.kernel.org>; Fri, 03 Apr 2015 07:45:09 -0700 (PDT)
-Date: Fri, 3 Apr 2015 16:45:02 +0200
-From: Alexander Aring <alex.aring@gmail.com>
+Received: from photon.sigxcpu.org ([95.142.169.183]:51885 "EHLO
+	photon.sigxcpu.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751495AbbDCScz (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Fri, 3 Apr 2015 14:32:55 -0400
+Date: Fri, 3 Apr 2015 20:27:44 +0200
+From: Guido =?iso-8859-1?Q?G=FCnther?= <agx@sigxcpu.org>
 Subject: Re: 6lowpan on a RPi using at86rf233
-Message-ID: <20150403144459.GA773@omega>
+Message-ID: <20150403182744.GA8360@bogon.m.sigxcpu.org>
 References: <20150403143647.GA6266@bogon.m.sigxcpu.org>
+ <20150403144459.GA773@omega>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20150403143647.GA6266@bogon.m.sigxcpu.org>
+In-Reply-To: <20150403144459.GA773@omega>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Guido =?utf-8?Q?G=C3=BCnther?= <agx@sigxcpu.org>
+To: Alexander Aring <alex.aring@gmail.com>
 Cc: linux-wpan@vger.kernel.org
 
-On Fri, Apr 03, 2015 at 04:36:47PM +0200, Guido GÃ¼nther wrote:
-> Hi,
-> I'm trying to get 6lowpan to work using bluetooth-next on the above
-> hardware[1]. I'm currently using bluetooth-next as of
-> baf880a96859cca79208122e555e7efeabd16e4d . When I do a:
+On Fri, Apr 03, 2015 at 04:45:02PM +0200, Alexander Aring wrote:
+> On Fri, Apr 03, 2015 at 04:36:47PM +0200, Guido Günther wrote:
+> > Hi,
+> > I'm trying to get 6lowpan to work using bluetooth-next on the above
+> > hardware[1]. I'm currently using bluetooth-next as of
+> > baf880a96859cca79208122e555e7efeabd16e4d . When I do a:
+> > 
+> >    iwpan dev wpan0 set pan_id 0xbeef
+> > 
+> > I get:
+> > 
+> >    command failed: Device or resource busy (-16)
+> > 
 > 
->    iwpan dev wpan0 set pan_id 0xbeef
-> 
-> I get:
-> 
->    command failed: Device or resource busy (-16)
-> 
+> you can set the pan_id when you interface is down only.
 
-you can set the pan_id when you interface is down only.
+There was an ifplugd on the pi which continued to up the device -
+damnit. Sorry for the noise. I can now ping the two devices but am
+seeing massive packet loss:
 
-> or in detail:
-> 
-> #  src/iwpan --debug dev wpan0 set pan_id 0xbeef
-> -- Debug: Sent Message:
-> --------------------------   BEGIN NETLINK MESSAGE ---------------------------
->   [HEADER] 16 octets
->     .nlmsg_len = 36
->     .nlmsg_type = 21 <0x15>
->     .nlmsg_flags = 5 <REQUEST,ACK>
->     .nlmsg_seq = 1428071645
->     .nlmsg_pid = 2760
->   [PAYLOAD] 20 octets
->     0a 00 00 00 08 00 03 00 05 00 00 00 06 00 09 00 ef be ..................
->     00 00                                                 ..
-> ---------------------------  END NETLINK MESSAGE   ---------------------------
-> -- Debug: Received Message:
-> --------------------------   BEGIN NETLINK MESSAGE ---------------------------
->   [HEADER] 16 octets
->     .nlmsg_len = 56
->     .nlmsg_type = 2 <ERROR>
->     .nlmsg_flags = 0 <>
->     .nlmsg_seq = 1428071645
->     .nlmsg_pid = 2760
->   [ERRORMSG] 20 octets
->     .error = -16 "Device or resource busy"
->   [ORIGINAL MESSAGE] 16 octets
->     .nlmsg_len = 16
->     .nlmsg_type = 21 <0x15>
->     .nlmsg_flags = 5 <REQUEST,ACK>
->     .nlmsg_seq = 1428071645
->     .nlmsg_pid = 2760
-> ---------------------------  END NETLINK MESSAGE   ---------------------------
-> 
-> This looks similar to
-> 
->    http://www.spinics.net/lists/linux-wpan/msg01290.html
-> 
-> but I'm running wpan-tools master already.
-> 
-> Before digging deeper it'd be great to know if these version should work together or if
-> another kernel tree should be used otherwise I'll sprink some pr_debugs().
-> Cheers,
->  -- Guido
-> 
-> [1] https://honk.sigxcpu.org/piki/hw/rpi6lowpan/
+    # ping6 -s 20   -I lowpan0  fe80::f836:9287:905c:a684 
+    PING fe80::f836:9287:905c:a684(fe80::f836:9287:905c:a684) from fe80::cb23:b779:742d:4fd2 lowpan0: 20 data bytes
+    28 bytes from fe80::f836:9287:905c:a684: icmp_seq=3 ttl=64 time=27.7 ms
+    28 bytes from fe80::f836:9287:905c:a684: icmp_seq=4 ttl=64 time=12.7 ms
+    28 bytes from fe80::f836:9287:905c:a684: icmp_seq=5 ttl=64 time=12.7 ms
+    ^C
+    --- fe80::f836:9287:905c:a684 ping statistics ---
+    16 packets transmitted, 3 received, 81% packet loss, time 15017ms
 
-- Alex
+Will need to dig into this again.
+
+Thaks a lot for the hint!
+Cheers,
+ -- Guido
+
+
