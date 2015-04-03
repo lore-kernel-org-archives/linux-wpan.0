@@ -1,40 +1,89 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f176.google.com ([209.85.212.176]:37904 "EHLO
-	mail-wi0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S965418AbbDWMIj (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Thu, 23 Apr 2015 08:08:39 -0400
-Received: by wiun10 with SMTP id n10so89918275wiu.1
-        for <linux-wpan@vger.kernel.org>; Thu, 23 Apr 2015 05:08:39 -0700 (PDT)
-Date: Thu, 23 Apr 2015 14:08:36 +0200
+Received: from mail-wi0-f173.google.com ([209.85.212.173]:37612 "EHLO
+	mail-wi0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753255AbbDCTN0 (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Fri, 3 Apr 2015 15:13:26 -0400
+Received: by wiaa2 with SMTP id a2so148253105wia.0
+        for <linux-wpan@vger.kernel.org>; Fri, 03 Apr 2015 12:13:24 -0700 (PDT)
+Date: Fri, 3 Apr 2015 21:13:22 +0200
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: Re: First kernel patch - checkpatch for at86rf230.c, false-positives?
-Message-ID: <20150423120835.GC9284@omega>
-References: <CAG9Fz+uvR29TX4-MavSqA=MPkUhsn7n0HnaDzh4PDAmrMvrsVQ@mail.gmail.com>
- <20150423100918.GA9284@omega>
- <CAG9Fz+usxJ-9ME2VoODfO1W2usMophATuYD5Nxer_w9TXj9Rag@mail.gmail.com>
- <20150423111553.GB9284@omega>
- <CAG9Fz+tcYsL_iUp7eLHWMB8B9Qrmi7C4HG6ROffyxQzhJo8BNQ@mail.gmail.com>
+Subject: Re: at86rf233 on BeagleBone Black
+Message-ID: <20150403191320.GD773@omega>
+References: <551EDFCA.3070905@fid4.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CAG9Fz+tcYsL_iUp7eLHWMB8B9Qrmi7C4HG6ROffyxQzhJo8BNQ@mail.gmail.com>
+In-Reply-To: <551EDFCA.3070905@fid4.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Christoffer Holmstedt <christoffer.holmstedt@gmail.com>
+To: "Michael C. Cambria" <mcc@fid4.com>
 Cc: linux-wpan@vger.kernel.org
 
-On Thu, Apr 23, 2015 at 01:48:05PM +0200, Christoffer Holmstedt wrote:
-> Yea, "breaking the ice" is what I need. So something like
-> "TRX_STATE_MASK (0x1f)"?
+On Fri, Apr 03, 2015 at 02:45:30PM -0400, Michael C. Cambria wrote:
+> 
+> Hi Alex,
+> 
+> Do you happen to have the pin mapping & device tree overlay needed for the
+> Openlabs at86rf233 [0] to run on BeagleBone Black (BBB)?
+> 
+> I only have a few Pi's but do have a few spare BBB I could use. I'd rather
+> not experiment an ruin either the BBB or at86rf233 if this information is
+> known.
+> 
 
-yes or cleanup the style issue "tabs after define" in the SR/RG defines.
-It's simple a search & replace in your editor with s/define\t/define /
-in that range (that's how I fix it). I will remove it then in my branch.
+What I can give you are my dts entries for the BeagleBone (white),
+pinout should be the same:
 
-... or running aspell on that file, I am sure I did several typos there.
-That's what others linux developers also do, running some automatic code
-checkers (also aspell), but there exist more outside cppcheck, rats,
-spare etc. (Normally the maintainer should run this before each patch
-and I try to do that).
+&am33xx_pinmux {
+	spi1_pins: pinmux_spi1_pins {
+		pinctrl-single,pins = <
+			0x190 0x33      /* mcasp0_aclkx.spi1_sclk, INPUT_PULLUP | MODE3 (special mode input for clock) */
+			0x194 0x33      /* mcasp0_fsx.spi1_d0, INPUT_PULLUP | MODE3 */
+			0x198 0x13      /* mcasp0_axr0.spi1_d1, OUTPUT_PULLUP | MODE3 */
+			0x19c 0x13      /* mcasp0_ahclkr.spi1_cs0, OUTPUT_PULLUP | MODE3 */
+			0x1a4 0x2f      /* mcasp0_fsr.gpio3_19, INPUT, PULL DISABLED | MODE7 */
+		>;
+	};
+};
+
+&spi1 {
+	status = "okay";
+	pinctrl-names = "default";
+	pinctrl-0 = <&spi1_pins>;
+	at86rf231@0 {
+		compatible = "atmel,at86rf231";
+		spi-max-frequency = <7500000>;
+		reg = <0>;
+		interrupts = <19 4>;
+		interrupt-parent = <&gpio3>;
+		reset-gpio = $YOUR_GPIO
+		xtal-trim = /bits/ 8 <0xF>;
+	};
+};
+
+I also changed the "xtal-trim" value. Now it's fit with the openlabs
+transceivers.
+
+So you can see how my transceiver (I use the atben which have no reset pin)
+is connected to my BeagleBone. Check [0] to get pins for interrupt and
+reset pin.
+
+I did the reset pin optional, please don't do that... normally then we
+need to run a reset of phy settings if the at86rf233 have no reset pin
+which is much unlikely (Okay, the atben have no reset pins...). I did
+not implement such a PHY reset handling yet. So please use some free gpio.
+This means you need to replace _maybe_ the interrupts and
+interrupt-parent property. What you really need to change is the
+$YOUR_GPIO property to something like [0] (fast googling which use the
+dt naming stuff).
+
+I mean something like:
+
+reset-gpio = <&gpio3 21 1>;
+
+depends on you adaptation from openlabs at86rf233 to a BBB.
 
 - Alex
+
+[0] http://blog.savoirfairelinux.com/wp-content/uploads/2013/11/beaglebone_pins-table.png
+[1] https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/Documentation/devicetree/bindings/gpio/gpio.txt
