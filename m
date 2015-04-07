@@ -1,72 +1,120 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f179.google.com ([209.85.212.179]:36895 "EHLO
-	mail-wi0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753986AbbDGNkn (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Tue, 7 Apr 2015 09:40:43 -0400
-Received: by wiaa2 with SMTP id a2so19208658wia.0
-        for <linux-wpan@vger.kernel.org>; Tue, 07 Apr 2015 06:40:42 -0700 (PDT)
-Date: Tue, 7 Apr 2015 15:40:39 +0200
+Received: from mail-wi0-f173.google.com ([209.85.212.173]:35576 "EHLO
+	mail-wi0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753785AbbDGLuJ (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Tue, 7 Apr 2015 07:50:09 -0400
+Received: by widdi4 with SMTP id di4so14167625wid.0
+        for <linux-wpan@vger.kernel.org>; Tue, 07 Apr 2015 04:50:08 -0700 (PDT)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: Re: [PATCHv3 bluetooth-next 2/4] nl802154: add set interface cmd
-Message-ID: <20150407134034.GE16415@omega>
+Subject: [PATCHv3 bluetooth-next 3/4] ieee802154: move mac pib defaults
+Date: Tue,  7 Apr 2015 13:49:52 +0200
+Message-Id: <1428407393-16005-4-git-send-email-alex.aring@gmail.com>
+In-Reply-To: <1428407393-16005-1-git-send-email-alex.aring@gmail.com>
 References: <1428407393-16005-1-git-send-email-alex.aring@gmail.com>
- <1428407393-16005-3-git-send-email-alex.aring@gmail.com>
- <20150407135902.2b885270@zoidberg>
- <20150407122149.GA16415@omega>
- <20150407142930.662c0f92@zoidberg>
- <20150407125949.GB16415@omega>
- <20150407150232.75e3df70@zoidberg>
- <20150407132459.GD16415@omega>
- <20150407153213.2a063405@zoidberg>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20150407153213.2a063405@zoidberg>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Phoebe Buckheister <phoebe.buckheister@itwm.fraunhofer.de>
-Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de, mkl@pengutronix.de
+To: linux-wpan@vger.kernel.org
+Cc: kernel@pengutronix.de, mkl@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-On Tue, Apr 07, 2015 at 03:32:13PM +0200, Phoebe Buckheister wrote:
-> 
-> Eh? No.
-> 
+This patch moves the mac pib defaults setting out of SoftMAC layer. This
+will prepare for possible HardMAC drivers that these values are 802.15.4
+defaults while netdev registration. Currently the SoftMAC layer is the wrong
+place to do the settings of pib defaults.
 
-Okay. :-)
+Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+---
+ net/ieee802154/core.c | 30 ++++++++++++++++++++++++++++++
+ net/mac802154/iface.c | 15 ---------------
+ 2 files changed, 30 insertions(+), 15 deletions(-)
 
-> struct wpan_phy_support {
-> 	bool lbt, aack;
+diff --git a/net/ieee802154/core.c b/net/ieee802154/core.c
+index 2ee00e8..7a107b0 100644
+--- a/net/ieee802154/core.c
++++ b/net/ieee802154/core.c
+@@ -211,6 +211,35 @@ cfg802154_update_iface_num(struct cfg802154_registered_device *rdev,
+ 	rdev->num_running_ifaces += num;
+ }
+ 
++static void
++cfg802154_reset_mac_pib(struct wpan_dev *wpan_dev)
++{
++	get_random_bytes(&wpan_dev->bsn, 1);
++	get_random_bytes(&wpan_dev->dsn, 1);
++
++	/* defaults per 802.15.4-2011 */
++	wpan_dev->min_be = 3;
++	wpan_dev->max_be = 5;
++	wpan_dev->csma_retries = 4;
++	/* for compatibility, actual default is 3 */
++	wpan_dev->frame_retries = -1;
++
++	wpan_dev->pan_id = cpu_to_le16(IEEE802154_PAN_ID_BROADCAST);
++	wpan_dev->short_addr = cpu_to_le16(IEEE802154_ADDR_SHORT_BROADCAST);
++
++	/* normally false, but monitors are always in promiscuous_mode */
++	switch (wpan_dev->iftype) {
++	case NL802154_IFTYPE_NODE:
++		wpan_dev->promiscuous_mode = false;
++		break;
++	case NL802154_IFTYPE_MONITOR:
++		wpan_dev->promiscuous_mode = true;
++		break;
++	default:
++		BUG();
++	}
++}
++
+ static int cfg802154_netdev_notifier_call(struct notifier_block *nb,
+ 					  unsigned long state, void *ptr)
+ {
+@@ -234,6 +263,7 @@ static int cfg802154_netdev_notifier_call(struct notifier_block *nb,
+ 		rdev->devlist_generation++;
+ 
+ 		wpan_dev->netdev = dev;
++		cfg802154_reset_mac_pib(wpan_dev);
+ 		break;
+ 	case NETDEV_DOWN:
+ 		cfg802154_update_iface_num(rdev, wpan_dev->iftype, -1);
+diff --git a/net/mac802154/iface.c b/net/mac802154/iface.c
+index 38b56f9..3f6a3fe 100644
+--- a/net/mac802154/iface.c
++++ b/net/mac802154/iface.c
+@@ -479,19 +479,6 @@ ieee802154_setup_sdata(struct ieee802154_sub_if_data *sdata,
+ 	sdata->vif.type = type;
+ 	sdata->wpan_dev.iftype = type;
+ 
+-	get_random_bytes(&wpan_dev->bsn, 1);
+-	get_random_bytes(&wpan_dev->dsn, 1);
+-
+-	/* defaults per 802.15.4-2011 */
+-	wpan_dev->min_be = 3;
+-	wpan_dev->max_be = 5;
+-	wpan_dev->csma_retries = 4;
+-	/* for compatibility, actual default is 3 */
+-	wpan_dev->frame_retries = -1;
+-
+-	wpan_dev->pan_id = cpu_to_le16(IEEE802154_PANID_BROADCAST);
+-	wpan_dev->short_addr = cpu_to_le16(IEEE802154_ADDR_BROADCAST);
+-
+ 	switch (type) {
+ 	case NL802154_IFTYPE_NODE:
+ 		ieee802154_be64_to_le64(&wpan_dev->extended_addr,
+@@ -501,7 +488,6 @@ ieee802154_setup_sdata(struct ieee802154_sub_if_data *sdata,
+ 		sdata->dev->destructor = mac802154_wpan_free;
+ 		sdata->dev->netdev_ops = &mac802154_wpan_ops;
+ 		sdata->dev->ml_priv = &mac802154_mlme_wpan;
+-		wpan_dev->promiscuous_mode = false;
+ 
+ 		spin_lock_init(&sdata->mib_lock);
+ 		mutex_init(&sdata->sec_mtx);
+@@ -511,7 +497,6 @@ ieee802154_setup_sdata(struct ieee802154_sub_if_data *sdata,
+ 	case NL802154_IFTYPE_MONITOR:
+ 		sdata->dev->destructor = free_netdev;
+ 		sdata->dev->netdev_ops = &mac802154_monitor_ops;
+-		wpan_dev->promiscuous_mode = true;
+ 		break;
+ 	default:
+ 		BUG();
+-- 
+2.3.5
 
-for aack I would use max and min for frame_retries (need to be signed
-integer) and the same logik like max_frame_retries parameter in driver
-ops. So if s8 max_frame_retries and min_frame_retries -1 then we don't
-support aack handling. 
-
-> 	u16 min_be, max_be;
-
-I think for the backoff exponents we need something like:
-
-min_minbe and max_minbe
-
-and
-
-min_maxbe and max_maxbe
-
-sounds a little bit ugly, but some transceivers can't change the maxbe
-value.
-
-> 	u32 pages;
-> 	u32 channels[32];
-
-This is already combined in channels_supported array for pages and channels.
-
-> };
-> 
-> or something like that. A complete description of PHY capabilities, we
-> might even export that to userspace somehow?
-> 
-
-yes, of course. I think we should implement then a nested nl attribute for
-wpan_phy_supported things while wpan_phy dump.
-
-- Alex
