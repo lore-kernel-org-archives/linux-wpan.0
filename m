@@ -1,69 +1,99 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f171.google.com ([209.85.212.171]:37101 "EHLO
-	mail-wi0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753785AbbDGLuF (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Tue, 7 Apr 2015 07:50:05 -0400
-Received: by wiaa2 with SMTP id a2so15274767wia.0
-        for <linux-wpan@vger.kernel.org>; Tue, 07 Apr 2015 04:50:04 -0700 (PDT)
+Received: from mail-wi0-f179.google.com ([209.85.212.179]:33078 "EHLO
+	mail-wi0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753738AbbDGLuI (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Tue, 7 Apr 2015 07:50:08 -0400
+Received: by wiax7 with SMTP id x7so8899585wia.0
+        for <linux-wpan@vger.kernel.org>; Tue, 07 Apr 2015 04:50:06 -0700 (PDT)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCHv3 bluetooth-next 0/4] ieee802154: nl802154 SET commands and pib defaults
-Date: Tue,  7 Apr 2015 13:49:49 +0200
-Message-Id: <1428407393-16005-1-git-send-email-alex.aring@gmail.com>
+Subject: [PATCHv3 bluetooth-next 1/4] nl802154: add set wpan phy cmd
+Date: Tue,  7 Apr 2015 13:49:50 +0200
+Message-Id: <1428407393-16005-2-git-send-email-alex.aring@gmail.com>
+In-Reply-To: <1428407393-16005-1-git-send-email-alex.aring@gmail.com>
+References: <1428407393-16005-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
 Cc: kernel@pengutronix.de, mkl@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-Hi,
+This patch adds NL802154_CMD_SET_WPAN_PHY command to set all wpan phy
+attributes instead of doing separate commands. This will introduce an
+easilier wpan phy settings handling in userspace application with nl802154.
 
-this patch-series implement the already existed SET commands of an interface
-and a wpan-phy. Currently we have one CMD for each setting which was a mistake
-by me to implement it in this way. So we aren't currently a "real" UAPI header
-for nl802154 and it's still under development. I decide now to change to
-implement these setting in this way now. Currently I let these commands in
-coexists with the old commands but _NOTE_ I will remove the other commands
-from the nl802154 later.
+Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+---
+ net/ieee802154/nl802154.c | 51 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 51 insertions(+)
 
-So please use the new commands. When these patches are mainline I also want to
-release a new wpan-tools release which use this new interface. Then everybody
-has some time to change to the new wpan-tools release. After this "time" I will
-remove the obsolete nl802154 commands from the header. This means older
-wpan-tools releases doesn't work any more with new kernels. Also this means
-newer wpan-tools releases doesn't work with older kernels. That will end in
-some kind of chaos and I will note this on the website.
-
-This behaviour to do it in only one command is much easier to handle in
-userspace, like clicking an "apply button".
-
-
-Also this patch series contains two patches for move the MAC PIB defaults
-setting out of SoftMAC layer. Additional we set the max frame retries
-parameter to 3 which is a real 802.15.4 default. Some transceivers doesn't
-support ARET settings. If these transceivers doesn't support it, we assume
-the 802.15.4 default.
-
-- Alex
-
-changes since v2:
- - remove ".done = nl802154_dump_wpan_phy_done" of patch 1/2.
- - add other movements for mac pib defaults which is needed for cfg802154
-   crypto layer.
-
-changes since v3:
- - some cleanups in the patch commit msgs, mostly I want to resend this series
-   only.
-
-Alexander Aring (4):
-  nl802154: add set wpan phy cmd
-  nl802154: add set interface cmd
-  ieee802154: move mac pib defaults
-  ieee802154: set aret handling according to 802.15.4
-
- net/ieee802154/core.c     |  29 +++++++++
- net/ieee802154/nl802154.c | 161 ++++++++++++++++++++++++++++++++++++++++++++++
- net/mac802154/iface.c     |  15 -----
- 3 files changed, 190 insertions(+), 15 deletions(-)
-
+diff --git a/net/ieee802154/nl802154.c b/net/ieee802154/nl802154.c
+index a4daf91..c12c07f 100644
+--- a/net/ieee802154/nl802154.c
++++ b/net/ieee802154/nl802154.c
+@@ -437,6 +437,49 @@ static int nl802154_get_wpan_phy(struct sk_buff *skb, struct genl_info *info)
+ 	return genlmsg_reply(msg, info);
+ }
+ 
++static int nl802154_set_wpan_phy(struct sk_buff *skb, struct genl_info *info)
++{
++	struct cfg802154_registered_device *rdev = info->user_ptr[0];
++	int ret;
++
++	if (info->attrs[NL802154_ATTR_PAGE] &&
++	    info->attrs[NL802154_ATTR_CHANNEL]) {
++		u8 channel, page;
++
++		page = nla_get_u8(info->attrs[NL802154_ATTR_PAGE]);
++		channel = nla_get_u8(info->attrs[NL802154_ATTR_CHANNEL]);
++		if (page > IEEE802154_MAX_PAGE ||
++		    channel > IEEE802154_MAX_CHANNEL)
++			return -EINVAL;
++
++		ret = rdev_set_channel(rdev, page, channel);
++		if (ret < 0)
++			return ret;
++	}
++
++	if (info->attrs[NL802154_ATTR_CCA_MODE]) {
++		struct wpan_phy_cca cca;
++
++		cca.mode = nla_get_u32(info->attrs[NL802154_ATTR_CCA_MODE]);
++		if (cca.mode < NL802154_CCA_ENERGY ||
++		    cca.mode > NL802154_CCA_ATTR_MAX)
++			return -EINVAL;
++
++		if (cca.mode == NL802154_CCA_ENERGY_CARRIER) {
++			if (!info->attrs[NL802154_ATTR_CCA_OPT])
++				return -EINVAL;
++
++			cca.opt = nla_get_u32(info->attrs[NL802154_ATTR_CCA_OPT]);
++			if (cca.opt > NL802154_CCA_OPT_ATTR_MAX)
++				return -EINVAL;
++		}
++
++		return rdev_set_cca_mode(rdev, &cca);
++	}
++
++	return 0;
++}
++
+ static inline u64 wpan_dev_id(struct wpan_dev *wpan_dev)
+ {
+ 	return (u64)wpan_dev->identifier |
+@@ -896,6 +939,14 @@ static const struct genl_ops nl802154_ops[] = {
+ 				  NL802154_FLAG_NEED_RTNL,
+ 	},
+ 	{
++		.cmd = NL802154_CMD_SET_WPAN_PHY,
++		.doit = nl802154_set_wpan_phy,
++		.policy = nl802154_policy,
++		.flags = GENL_ADMIN_PERM,
++		.internal_flags = NL802154_FLAG_NEED_WPAN_PHY |
++				  NL802154_FLAG_NEED_RTNL,
++	},
++	{
+ 		.cmd = NL802154_CMD_GET_INTERFACE,
+ 		.doit = nl802154_get_interface,
+ 		.dumpit = nl802154_dump_interface,
 -- 
 2.3.5
 
