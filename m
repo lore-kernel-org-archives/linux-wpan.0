@@ -1,27 +1,21 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f174.google.com ([209.85.212.174]:37328 "EHLO
-	mail-wi0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751237AbbDLKk4 (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Sun, 12 Apr 2015 06:40:56 -0400
-Received: by widdi4 with SMTP id di4so23642532wid.0
-        for <linux-wpan@vger.kernel.org>; Sun, 12 Apr 2015 03:40:55 -0700 (PDT)
-Received: from omega (p20030064A93D96E6E2CB4EFFFE1BB546.dip0.t-ipconnect.de. [2003:64:a93d:96e6:e2cb:4eff:fe1b:b546])
-        by mx.google.com with ESMTPSA id o6sm1660628wiz.24.2015.04.12.03.40.54
-        for <linux-wpan@vger.kernel.org>
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 12 Apr 2015 03:40:54 -0700 (PDT)
-Date: Sun, 12 Apr 2015 12:40:49 +0200
-From: Alexander Aring <alex.aring@gmail.com>
+Received: from photon.sigxcpu.org ([95.142.169.183]:54875 "EHLO
+	photon.sigxcpu.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751855AbbDLRb4 (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Sun, 12 Apr 2015 13:31:56 -0400
+Date: Sun, 12 Apr 2015 19:31:20 +0200
+From: Guido =?iso-8859-1?Q?G=FCnther?= <agx@sigxcpu.org>
 Subject: Re: [PATCHv2 wpan-misc] website: add opentask section in developing
-Message-ID: <20150412104046.GA3847@omega>
+Message-ID: <20150412173120.GA11631@bogon.m.sigxcpu.org>
 References: <1428833788-3391-1-git-send-email-alex.aring@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <1428833788-3391-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org
+To: Alexander Aring <alex.aring@gmail.com>
+Cc: linux-wpan@vger.kernel.org
 
 On Sun, Apr 12, 2015 at 12:16:28PM +0200, Alexander Aring wrote:
 > This patch adds an open task section in developing. So maybe if somebody
@@ -58,13 +52,24 @@ On Sun, Apr 12, 2015 at 12:16:28PM +0200, Alexander Aring wrote:
 > +** trace functionality for rdev/driver_ops http://git.kernel.org/cgit/linux/kernel/git/bluetooth/bluetooth-next.git/tree/net/wireless/rdev-ops.h[rdev-ops.h] and
 > +http://git.kernel.org/cgit/linux/kernel/git/bluetooth/bluetooth-next.git/tree/net/mac80211/driver-ops.h[driver-ops.h]
 > +** Whatever you want and find
+> +* rework
+> +** missing features in nl802154, crypto etc.
+> +** new frame parsing style in mac802154 and ieee802154 based on mac80211 frame parsing design. Draft is https://github.com/linux-wpan/linux-wpan-next/blob/wpan_rework_rfc/net/mac802154/rx.c[mac802154 rx] and
+> +https://github.com/linux-wpan/linux-wpan-next/blob/wpan_rework_rfc/net/ieee802154/6lowpan/rx.c[6LoWPAN]. Crypto need to be done at first, otherwise I can't test it.
+> +** remove cb context from dev_hard_header and introduce generic header generation functions like https://github.com/linux-wpan/linux-wpan-next/blob/wpan_rework_rfc/net/ieee802154/header_ops.c#L80[header_ops]. Here too, crypto need to be done at first.
+> +* systemd
+> +** add basic functionality for nl802154 and 6lowpan setup in systemd-networkd
+> +* network-manager
+> +* devicetree extended addr setting, draft is here http://www.spinics.net/lists/linux-wpan/msg01503.html[ieee802154: add usual way to get extended address via device tree]
+> +* RPL? - not our job, need to go through ipv6 netdev community, but we should do something to have a "started" mainline solution.
+> +* cleanup/fix 802.15.4 af raw/dgram socket code. We should use bluetooth socket code as example.
+> +
 
-Another idea here is to have some command like "iw station dump" ->
-"iwpan node dump" which contains all "neighbors" (some table entries
-which expires after xx time) and their addresses, lqi value, etc.
+ACK, very helpful.
 
-This could be useful to offer some "generic interface" for upcomming
-metric routing strategies, or whatever you want to do with these
-information.
+As a follow up I'd be nice to know what's missing on the interop side
+(e.g. to talk to contiki or what else exists) - in case anybody knows
+this already.
 
-- Alex
+Cheers,
+ -- Guido
