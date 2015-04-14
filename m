@@ -1,51 +1,40 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wg0-f42.google.com ([74.125.82.42]:35927 "EHLO
-	mail-wg0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753210AbbDMJqo (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Mon, 13 Apr 2015 05:46:44 -0400
-Received: by wgsk9 with SMTP id k9so74559469wgs.3
-        for <linux-wpan@vger.kernel.org>; Mon, 13 Apr 2015 02:46:43 -0700 (PDT)
+Received: from mail-wi0-f172.google.com ([209.85.212.172]:34014 "EHLO
+	mail-wi0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753337AbbDNLte (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Tue, 14 Apr 2015 07:49:34 -0400
+Date: Tue, 14 Apr 2015 13:49:22 +0200
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCHv2 bluetooth-next] mac802154: fix ieee802154_register_hw error handling
-Date: Mon, 13 Apr 2015 11:46:32 +0200
-Message-Id: <1428918392-19840-1-git-send-email-alex.aring@gmail.com>
+Subject: creating infrastructure for generic 6LoWPAN branch
+Message-ID: <20150414114917.GA2179@omega>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org
-Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: linux-wpan@vger.kernel.org, jukka.rissanen@linux.intel.com, kernel@pengutronix.de
 
-Currently if ieee802154_if_add failed, we don't unregister the wpan phy
-which was registered before. This patch adds a correct error handling
-for unregister the wpan phy when ieee802154_if_add failed.
+Hi,
 
-Signed-off-by: Alexander Aring <alex.aring@gmail.com>
----
- - fix typo 's/registrated/registered/' in commit msg
+I was thinking about to create some infrastructure to handle generic
+6LoWPAN development things, which is shared between bluetooth and
+802.15.4. I mean everything which is in "net/6lowpan" and things which
+are 6LoWPAN "specific/related/mostly used in 6LoWPAN" and works in L3 and
+upper layers.
 
- net/mac802154/main.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+What we should need is some kind of website which contains a ToDo list
+of everything which is outside there and what we currently support. I
+mean a general information site for "6LoWPAN" implementation inside
+Linux kernel.
 
-diff --git a/net/mac802154/main.c b/net/mac802154/main.c
-index 8500378..beece7b 100644
---- a/net/mac802154/main.c
-+++ b/net/mac802154/main.c
-@@ -166,13 +166,15 @@ int ieee802154_register_hw(struct ieee802154_hw *hw)
- 	if (IS_ERR(dev)) {
- 		rtnl_unlock();
- 		rc = PTR_ERR(dev);
--		goto out_wq;
-+		goto out_phy;
- 	}
- 
- 	rtnl_unlock();
- 
- 	return 0;
- 
-+out_phy:
-+	wpan_phy_unregister(local->phy);
- out_wq:
- 	destroy_workqueue(local->workqueue);
- out:
--- 
-2.3.5
+Additionally we need some repository which contains some userspace tools
+for handling generic 6LoWPAN things like userspace configuration tool
+for the 6LoWPAN nhc layer. These tools can be used then for all 6LoWPAN
+implementations (BTLE/802.15.4 at the moment). That was one idea which
+was discussed while bringing nhc layer mainline.
 
+Any ideas where we should host this site, do we really need this or
+any others suggestions?
+
+- Alex
