@@ -1,64 +1,52 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from metis.ext.pengutronix.de ([92.198.50.35]:51092 "EHLO
-	metis.ext.pengutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753381AbbDNLwc (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Tue, 14 Apr 2015 07:52:32 -0400
-Message-ID: <552CFF73.9070004@pengutronix.de>
-Date: Tue, 14 Apr 2015 13:52:19 +0200
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-MIME-Version: 1.0
+Received: from mga09.intel.com ([134.134.136.24]:34990 "EHLO mga09.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751205AbbDNM2J (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+	Tue, 14 Apr 2015 08:28:09 -0400
+Message-ID: <1429014486.2837.81.camel@linux.intel.com>
 Subject: Re: creating infrastructure for generic 6LoWPAN branch
-References: <20150414114917.GA2179@omega>
+From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+Date: Tue, 14 Apr 2015 15:28:06 +0300
 In-Reply-To: <20150414114917.GA2179@omega>
-Content-Type: multipart/signed; micalg=pgp-sha512;
- protocol="application/pgp-signature";
- boundary="eVo5LXKOLn4U2IM5edmbOsAu5vDRpFbUL"
+References: <20150414114917.GA2179@omega>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>, linux-bluetooth@vger.kernel.org
-Cc: jukka.rissanen@linux.intel.com, linux-wpan@vger.kernel.org, kernel@pengutronix.de
+To: Alexander Aring <alex.aring@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org, kernel@pengutronix.de
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---eVo5LXKOLn4U2IM5edmbOsAu5vDRpFbUL
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Hi Alex,
 
-On 04/14/2015 01:49 PM, Alexander Aring wrote:
+On ti, 2015-04-14 at 13:49 +0200, Alexander Aring wrote:
+> Hi,
+> 
+> I was thinking about to create some infrastructure to handle generic
+> 6LoWPAN development things, which is shared between bluetooth and
+> 802.15.4. I mean everything which is in "net/6lowpan" and things which
+> are 6LoWPAN "specific/related/mostly used in 6LoWPAN" and works in L3 and
+> upper layers.
+> 
+> What we should need is some kind of website which contains a ToDo list
+> of everything which is outside there and what we currently support. I
+> mean a general information site for "6LoWPAN" implementation inside
+> Linux kernel.
+> 
+> Additionally we need some repository which contains some userspace tools
+> for handling generic 6LoWPAN things like userspace configuration tool
+> for the 6LoWPAN nhc layer. These tools can be used then for all 6LoWPAN
+> implementations (BTLE/802.15.4 at the moment). That was one idea which
+> was discussed while bringing nhc layer mainline.
+> 
 > Any ideas where we should host this site, do we really need this or
 > any others suggestions?
 
-On kernel.org there's a wiki system (and of course git).
-
-Go, get some signatures under you gpg key! :D
-Marc
-
---=20
-Pengutronix e.K.                  | Marc Kleine-Budde           |
-Industrial Linux Solutions        | Phone: +49-231-2826-924     |
-Vertretung West/Dortmund          | Fax:   +49-5121-206917-5555 |
-Amtsgericht Hildesheim, HRA 2686  | http://www.pengutronix.de   |
+As Marc suggested, the kernel.org wiki would be a good choice. And all
+the userspace tools could be there also.
 
 
---eVo5LXKOLn4U2IM5edmbOsAu5vDRpFbUL
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Cheers,
+Jukka
 
------BEGIN PGP SIGNATURE-----
 
-iQIcBAEBCgAGBQJVLP9zAAoJECte4hHFiupUJbUP/jhLw6LTSE74PuMIFu3ujr+R
-m8uL008lMSKaLQ1fvNUX7z9zhq0CDRc3fNxBOoYHgVcxcW1OLAgdlJOMez4C8ccL
-IjqcLAl1aVEqnxJskjPWBezWVbqaq21Fb+kE+Ju0WnrfGJHG4/YHZ/kubNumx4VT
-ZeYZil4wIiwzxOJvMCmkDty4LFYbcDxivHqos2HsjB6jkeUx5siOSzm1DtSDIUfH
-sJT2RhyQ9R0jBOyoo+yOMQqxrFoE/1uGWcmd8l3V8uLU4dj72/k7J5tx0SbL7yPF
-X1RX3fLnQYkRjZ/+VPMY7BGZW2z0iFSHceCBkmXXeCp09acazm1FNj9R2s/IiyHh
-bp+UDtYAokADMvFePviTFhoT7FePvKtRiZvxzD/8iDoPXDIg9JQIwfPW7pi2JqkN
-1KxV7iHFkUQ8jFcXDzPhblRsJlhXixtQh1r0jZsg5d2VjUBsGRtcyDZVlrwmkxW3
-kgbImbCp2tIP9WeId0ah4e6kM+/DtVmo7RvJbFErVGxM6sKzdHd/slO0n6GZqCvh
-bKtwI7VKGPPvmfU2B80mz/BljGeca4l9UJ60CsLHkkIMIIY8IByZAF6UliDd5XUG
-KC6ZR98vfpvNQkjaQTOWwj1aXtVxbyOrNjnOJlZi6KJuVMZFAbZKC+/7zLxPe7uS
-ZbpzhaUkNEeE9tHdzP22
-=bdyt
------END PGP SIGNATURE-----
-
---eVo5LXKOLn4U2IM5edmbOsAu5vDRpFbUL--
