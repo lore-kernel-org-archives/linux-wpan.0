@@ -1,82 +1,50 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f181.google.com ([209.85.212.181]:34726 "EHLO
-	mail-wi0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751275AbbDQV4F (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Fri, 17 Apr 2015 17:56:05 -0400
-Received: by widjs5 with SMTP id js5so42751271wid.1
-        for <linux-wpan@vger.kernel.org>; Fri, 17 Apr 2015 14:56:03 -0700 (PDT)
-Date: Fri, 17 Apr 2015 23:56:01 +0200
-From: Alexander Aring <alex.aring@gmail.com>
-Subject: Re: [joao.p.taveira@gmail.com: Re: [Roll] Looking for Linux
- implementation of RPL for interop testing]
-Message-ID: <20150417215600.GB847@omega>
-References: <20150417214036.GA847@omega>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20150417214036.GA847@omega>
+Received: from m12-14.163.com ([220.181.12.14]:53937 "EHLO m12-14.163.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1757357AbbDPMRI (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+	Thu, 16 Apr 2015 08:17:08 -0400
+From: weiyj_lk@163.com
+Subject: [PATCH] mac802154: llsec: fix return value check in llsec_key_alloc()
+Date: Thu, 16 Apr 2015 20:16:34 +0800
+Message-Id: <1429186594-20372-1-git-send-email-weiyj_lk@163.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org
-Cc: joao.p.taveira@gmail.com
+To: Alexander Aring <alex.aring@gmail.com>, Marcel Holtmann <marcel@holtmann.org>, "David S. Miller" <davem@davemloft.net>
+Cc: Wei Yongjun <yongjun_wei@trendmicro.com.cn>, linux-wpan@vger.kernel.org, netdev@vger.kernel.org
 
-Hi,
+From: Wei Yongjun <yongjun_wei@trendmicro.com.cn>
 
-now I will comment some things about the mail here in linux-wpan.
+In case of error, the functions crypto_alloc_aead() and crypto_alloc_blkcipher()
+returns ERR_PTR() and never returns NULL. The NULL test in the return value check
+should be replaced with IS_ERR().
 
-On Fri, Apr 17, 2015 at 11:40:36PM +0200, Alexander Aring wrote:
-...
-> 
-> Still on MRHOF, I contact linux-zigbee/linux-wpan group to get some
-> information about roadmap about MAC802154 and I was told that it was too
-> soon to know what and how things would be. I think there was a merge from
-> linux zigbee to linux-wpan, but in the meanwhile, it was agreed between
-> linux groups to merge wpan with bluetooth.
-> 
+Signed-off-by: Wei Yongjun <yongjun_wei@trendmicro.com.cn>
+---
+ net/mac802154/llsec.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-There was no linux-wpan before, we renamed from zigbee to wpan because
-we _can't_ name it zigbee, see [0]. This was the first important thing
-which was needed to change after now maintainership.
+diff --git a/net/mac802154/llsec.c b/net/mac802154/llsec.c
+index dcf7395..5b2be12 100644
+--- a/net/mac802154/llsec.c
++++ b/net/mac802154/llsec.c
+@@ -134,7 +134,7 @@ llsec_key_alloc(const struct ieee802154_llsec_key *template)
+ 	for (i = 0; i < ARRAY_SIZE(key->tfm); i++) {
+ 		key->tfm[i] = crypto_alloc_aead("ccm(aes)", 0,
+ 						CRYPTO_ALG_ASYNC);
+-		if (!key->tfm[i])
++		if (IS_ERR(key->tfm[i]))
+ 			goto err_tfm;
+ 		if (crypto_aead_setkey(key->tfm[i], template->key,
+ 				       IEEE802154_LLSEC_KEY_SIZE))
+@@ -144,7 +144,7 @@ llsec_key_alloc(const struct ieee802154_llsec_key *template)
+ 	}
+ 
+ 	key->tfm0 = crypto_alloc_blkcipher("ctr(aes)", 0, CRYPTO_ALG_ASYNC);
+-	if (!key->tfm0)
++	if (IS_ERR(key->tfm0))
+ 		goto err_tfm;
+ 
+ 	if (crypto_blkcipher_setkey(key->tfm0, template->key,
 
-To send everything into bluebooth-next this is just because Marcel
-(bluebooth maintainer) was very friendly and offered to apply everything
-which is for linux-wpan into bluebooth-next. This behaviour should be
-changed if the stack implementation is in a more useable state.
-
-Since there exist a BTLE 6LoWPAN draft, the BTLE 6LoWPAN and 802.15.4
-6LoWPAN implementation shared the IPHC format.
-
-> As last resort on ETX and MRHOF on linux and to see it working, I just
-> tried to use nd6 timers as indication on link quality on linux side.
-> Basically, when some neighbour moved to state REACHABLE would count as a
-> good packet delivered. When a neighbour moved to state FAILED would count
-> as several non-acked packets. Assuming that nodes wouldn't send too many
-> packets, neighbours would move frequently to IDLE state. On each packet
-> exchange this would make state to move to REACHABLE and count as good
-> packet. Using RPL linux as root, this metric would be more or less
-> acceptable but I didn't like the idea of different metrics. Anyway, I was
-> able to get correct behaviour from MRHOF from linux nodes (even with a
-> strange metric).
-> 
-> Since 4thQ 2014, I had no time available to work on this. I think I already
-> know how to get ETX working. I'll see linux-wpan/linux-bluebooth current
-> status and I hope to continue what I was doing back then.
-> 
-
-cool. Since there exists also BTLE 6LoWPAN a RPL implementation is good
-to have for both subsystems (bt/802.15.4).
-
-> About the blog which talks about tests to RPL Linux implementation, I just
-> want to say that I wasn't contact about it before the post.
-> 
-
-I would say, you need to do your things mainline. Maybe simple write a
-mail to netdev@vger.kernel.org and talk about your plans for implement
-your stuff, I think you will 100% get some response to that. Then send
-patches to netdev so we have your RPL implementation mainline. To get
-stuff mainline is the most important thing. If you need help to getting
-patches stuff mainline, I can offer you my help if you want.
-
-- Alex
-
-[0] https://docs.zigbee.org/zigbee-docs/dcn/05-3739.pdf
