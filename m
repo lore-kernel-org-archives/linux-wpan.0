@@ -1,71 +1,63 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wg0-f44.google.com ([74.125.82.44]:36540 "EHLO
-	mail-wg0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751130AbbDQKcq (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Fri, 17 Apr 2015 06:32:46 -0400
-Received: by wgsk9 with SMTP id k9so108544944wgs.3
-        for <linux-wpan@vger.kernel.org>; Fri, 17 Apr 2015 03:32:45 -0700 (PDT)
-Date: Fri, 17 Apr 2015 12:32:42 +0200
+Received: from mail-wi0-f180.google.com ([209.85.212.180]:37701 "EHLO
+	mail-wi0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751148AbbDQK14 (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Fri, 17 Apr 2015 06:27:56 -0400
+Received: by widdi4 with SMTP id di4so15436875wid.0
+        for <linux-wpan@vger.kernel.org>; Fri, 17 Apr 2015 03:27:55 -0700 (PDT)
+Date: Fri, 17 Apr 2015 12:27:53 +0200
 From: Alexander Aring <alex.aring@gmail.com>
 Subject: Re: [PATCH] ieee802154: Add trace events for rdev->ops
-Message-ID: <20150417103241.GC3288@omega>
+Message-ID: <20150417102749.GB3288@omega>
 References: <20150412120733.GA6181@bogon.m.sigxcpu.org>
- <20150417100355.GA3288@omega>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20150417100355.GA3288@omega>
+In-Reply-To: <20150412120733.GA6181@bogon.m.sigxcpu.org>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: Guido =?utf-8?Q?G=C3=BCnther?= <agx@sigxcpu.org>
 Cc: linux-wpan@vger.kernel.org
 
-On Fri, Apr 17, 2015 at 12:03:55PM +0200, Alexander Aring wrote:
-> Hi,
-> 
-> On Sun, Apr 12, 2015 at 02:07:33PM +0200, Guido Günther wrote:
-> > This is based on the rdev->ops tracing code from net/wireless/.
-> > 
-> 
-> this patch looks good. I tested it with trace-cmd:
-> 
-> 1. trace-cmd record -e cfg802154:802154_rdev_set_pan_id
-> 
-> 2. iwpan dev wpan0 set pan_id 0xbeaa
-> 
-> 3. trace-cmd report
-> 
-> result:
-> 
-> version = 6
-> cpus=1
->            iwpan-1266  [000]   892.921639: 802154_rdev_set_pan_id: phy0, wpan_dev(1), pan id: 0xbeaa
-> 
-> also test it with channel and it works pretty well. (I am not a
-> trace-cmd export at the moment, my previous use-case was enough to use
-> the raw ftrace interface).
-> 
-> 
-> I looked again for the byteorder handling and detected that trace-cmd has
-> a cfg802154 plugin [0]. It looks like the plugin is there, to doing
+On Sun, Apr 12, 2015 at 02:07:33PM +0200, Guido Günther wrote:
+...
+> +DECLARE_EVENT_CLASS(802154_le16_template,
+> +	TP_PROTO(struct wpan_phy *wpan_phy, struct wpan_dev *wpan_dev,
+> +		 __le16 le16arg),
+> +	TP_ARGS(wpan_phy, wpan_dev, le16arg),
+> +	TP_STRUCT__entry(
+> +		WPAN_PHY_ENTRY
+> +		WPAN_DEV_ENTRY
+> +		__field(__le16, le16arg)
+> +	),
+> +	TP_fast_assign(
+> +		WPAN_PHY_ASSIGN;
+> +		WPAN_DEV_ASSIGN;
+> +		__entry->le16arg = __le16_to_cpu(le16arg);
 
-s/cfg802154/cfg80211/
+When "__entry->le16arg" is type of "__le16" which is given by
+"__field(__le16, le16arg)". Then translation of __le16_to_cpu is here
+wrong because __le16_to_cpu return u16.
 
-> byteorder translation in userspace instead kernelspace.
-> 
-> Looking into "__le16_to_cpup" stuff in wireless trace.h show something
-> like [1].
-> 
-> Do you think we can do this in the same way? Then we need some
-> plugin_cfg802154 in trace-cmd tool.
-> 
+> +	),
+> +	TP_printk(WPAN_PHY_PR_FMT ", " WPAN_DEV_PR_FMT ", pan id: 0x%04x",
+> +		  WPAN_PHY_PR_ARG, WPAN_DEV_PR_ARG, __entry->le16arg)
 
-Please read the other mail which I also mark an issue and we should move
-the byteorder translation into the format string argument. I suppose, what
-wireless do with the cfg80211 plugin is to printout the handling of function
-__le16_to_cpup (in our case __le16_to_cpu) more correct. So we need
-both, translation byteorder in kernelspace (for the __le16 parameter)
-and (to show the __le16_to_cpu in userspace correct).
+When then we need to do the translation here. The format string requires
+a host byte-order type. So it's __le16_to_cpu(__entry->le16arg), I don't
+know why sparse (the C=2) doesn't report about that.
+
+This is like wireless it does at [0], but with a pointer. When wireless
+do that in kernelspace, then I have no idea why there is a cfg80211
+plugin which doing byte order translation at [1]. I think this not for
+parsing the argument, it's for correct handling of handling the display
+of __le16_to_cpup (We use __le16_to_cpu here).
+
+Then we need a cfg802154 plugin in trace_cmd for handling "__le16_to_cpu"
+correct.
 
 - Alex
+
+[0] http://lxr.free-electrons.com/source/net/wireless/trace.h?v=3.19#L2160
+[1] http://git.kernel.org/cgit/linux/kernel/git/rostedt/trace-cmd.git/tree/plugin_cfg80211.c
