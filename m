@@ -1,67 +1,60 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from photon.sigxcpu.org ([95.142.169.183]:54641 "EHLO
-	photon.sigxcpu.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754609AbbDTSgm (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Mon, 20 Apr 2015 14:36:42 -0400
-Date: Mon, 20 Apr 2015 20:36:40 +0200
-From: Guido =?iso-8859-1?Q?G=FCnther?= <agx@sigxcpu.org>
-Subject: Re: [PATCH] ieee802154: Add trace events for rdev->ops
-Message-ID: <20150420183639.GB5248@bogon.m.sigxcpu.org>
-References: <20150412120733.GA6181@bogon.m.sigxcpu.org>
- <20150417102749.GB3288@omega>
+Received: from mail-pd0-f177.google.com ([209.85.192.177]:36365 "EHLO
+	mail-pd0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750744AbbDQLuT (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Fri, 17 Apr 2015 07:50:19 -0400
+Received: by pdea3 with SMTP id a3so125957273pde.3
+        for <linux-wpan@vger.kernel.org>; Fri, 17 Apr 2015 04:50:19 -0700 (PDT)
+Message-ID: <5530F366.4030407@gmail.com>
+Date: Fri, 17 Apr 2015 17:19:58 +0530
+From: Varka Bhadram <varkabhadram@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+Subject: Re: [PATCH] ieee802154: Add trace events for rdev->ops
+References: <20150412120733.GA6181@bogon.m.sigxcpu.org>
+In-Reply-To: <20150412120733.GA6181@bogon.m.sigxcpu.org>
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20150417102749.GB3288@omega>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>
+To: =?windows-1252?Q?Guido_G=FCnther?= <agx@sigxcpu.org>, Alexander Aring <alex.aring@gmail.com>
 Cc: linux-wpan@vger.kernel.org
 
-Hi Alexander,
-On Fri, Apr 17, 2015 at 12:27:53PM +0200, Alexander Aring wrote:
-> On Sun, Apr 12, 2015 at 02:07:33PM +0200, Guido Günther wrote:
-> ...
-> > +DECLARE_EVENT_CLASS(802154_le16_template,
-> > +	TP_PROTO(struct wpan_phy *wpan_phy, struct wpan_dev *wpan_dev,
-> > +		 __le16 le16arg),
-> > +	TP_ARGS(wpan_phy, wpan_dev, le16arg),
-> > +	TP_STRUCT__entry(
-> > +		WPAN_PHY_ENTRY
-> > +		WPAN_DEV_ENTRY
-> > +		__field(__le16, le16arg)
-> > +	),
-> > +	TP_fast_assign(
-> > +		WPAN_PHY_ASSIGN;
-> > +		WPAN_DEV_ASSIGN;
-> > +		__entry->le16arg = __le16_to_cpu(le16arg);
-> 
-> When "__entry->le16arg" is type of "__le16" which is given by
-> "__field(__le16, le16arg)". Then translation of __le16_to_cpu is here
-> wrong because __le16_to_cpu return u16.
-> 
-> > +	),
-> > +	TP_printk(WPAN_PHY_PR_FMT ", " WPAN_DEV_PR_FMT ", pan id: 0x%04x",
-> > +		  WPAN_PHY_PR_ARG, WPAN_DEV_PR_ARG, __entry->le16arg)
-> 
-> When then we need to do the translation here. The format string requires
-> a host byte-order type. So it's __le16_to_cpu(__entry->le16arg), I don't
-> know why sparse (the C=2) doesn't report about that.
-> 
-> This is like wireless it does at [0], but with a pointer. When wireless
-> do that in kernelspace, then I have no idea why there is a cfg80211
-> plugin which doing byte order translation at [1]. I think this not for
-> parsing the argument, it's for correct handling of handling the display
-> of __le16_to_cpup (We use __le16_to_cpu here).
+On 04/12/2015 05:37 PM, Guido Günther wrote:
+> This is based on the rdev->ops tracing code from net/wireless/.
 
-Agreed. If we want to keep this le until it's printed we should delay conversion
-up to the format string.
+Instead of writing the above commit message its better to write
+what exactly this code is for and how can we use this from
+the user space (if possible with commands).
 
-> Then we need a cfg802154 plugin in trace_cmd for handling "__le16_to_cpu"
-> correct.
+If you want to write your above commit message put it in trace.c/h file 
 
-I think this is only needed you don't use the kernel's built in printing
-so this could be done as a follow up once this is in.
-Cheers,
- -- Guido
+> Signed-off-by: Guido Günther <agx@sigxcpu.org>
+> ---
+>  net/ieee802154/Makefile   |   4 +-
+>  net/ieee802154/rdev-ops.h |  77 ++++++++++++---
+>  net/ieee802154/trace.c    |   7 ++
+>  net/ieee802154/trace.h    | 243 ++++++++++++++++++++++++++++++++++++++++++++++
+>  4 files changed, 319 insertions(+), 12 deletions(-)
+>  create mode 100644 net/ieee802154/trace.c
+>  create mode 100644 net/ieee802154/trace.h
+>
+> diff --git a/net/ieee802154/Makefile b/net/ieee802154/Makefile
+> index 05dab29..4adfd4d 100644
+> --- a/net/ieee802154/Makefile
+> +++ b/net/ieee802154/Makefile
+> @@ -3,7 +3,9 @@ obj-$(CONFIG_IEEE802154_SOCKET) += ieee802154_socket.o
+>  obj-y += 6lowpan/
+>  
+>  ieee802154-y := netlink.o nl-mac.o nl-phy.o nl_policy.o core.o \
+> -                header_ops.o sysfs.o nl802154.o
+> +                header_ops.o sysfs.o nl802154.o trace.o
+>  ieee802154_socket-y := socket.o
+>  
+> +CFLAGS_trace.o := -I$(src)
+
+What is this for..? 
+
+
+-- 
+Varka Bhadram
+
