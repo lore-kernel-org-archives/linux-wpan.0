@@ -1,43 +1,84 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wg0-f48.google.com ([74.125.82.48]:35109 "EHLO
-	mail-wg0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751350AbbDTSuM (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Mon, 20 Apr 2015 14:50:12 -0400
-Received: by wgyo15 with SMTP id o15so189476250wgy.2
-        for <linux-wpan@vger.kernel.org>; Mon, 20 Apr 2015 11:50:11 -0700 (PDT)
-Date: Mon, 20 Apr 2015 20:50:08 +0200
+Received: from mail-wi0-f170.google.com ([209.85.212.170]:34083 "EHLO
+	mail-wi0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751482AbbDUHKF (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Tue, 21 Apr 2015 03:10:05 -0400
+Received: by wicmx19 with SMTP id mx19so56635264wic.1
+        for <linux-wpan@vger.kernel.org>; Tue, 21 Apr 2015 00:10:04 -0700 (PDT)
+Date: Tue, 21 Apr 2015 09:09:53 +0200
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: Re: [PATCH] ieee802154: Add trace events for rdev->ops
-Message-ID: <20150420185005.GD707@omega>
-References: <20150412120733.GA6181@bogon.m.sigxcpu.org>
- <5530F366.4030407@gmail.com>
- <20150420183555.GA5248@bogon.m.sigxcpu.org>
+Subject: Re: Network adaptor for the liux 802.15.4 stack
+Message-ID: <20150421070750.GA1118@omega>
+References: <CANG3NKzjqL=5_-PdXQOSciD04TYOU7hAJ5jpamMbkuHPbH=QuQ@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20150420183555.GA5248@bogon.m.sigxcpu.org>
+In-Reply-To: <CANG3NKzjqL=5_-PdXQOSciD04TYOU7hAJ5jpamMbkuHPbH=QuQ@mail.gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Guido =?utf-8?Q?G=C3=BCnther?= <agx@sigxcpu.org>
-Cc: Varka Bhadram <varkabhadram@gmail.com>, linux-wpan@vger.kernel.org
+To: Kristoffer =?utf-8?Q?=C3=96dmark?= <kristofferodmark90@gmail.com>
+Cc: werner@almesberger.net, linux-wpan@vger.kernel.org
 
-On Mon, Apr 20, 2015 at 08:35:55PM +0200, Guido Günther wrote:
-> On Fri, Apr 17, 2015 at 05:19:58PM +0530, Varka Bhadram wrote:
-> > On 04/12/2015 05:37 PM, Guido Günther wrote:
-> > > This is based on the rdev->ops tracing code from net/wireless/.
-> > 
-> > Instead of writing the above commit message its better to write
-> > what exactly this code is for and how can we use this from
-> > the user space (if possible with commands).
-> 
-> Adjusted in v2.
+Hi,
+
+On Mon, Apr 20, 2015 at 11:09:49PM +0200, Kristoffer Ödmark wrote:
+> Hi, I am developing a device that can send and recieve 802.15.4 frames
+> to a computer over usb.
 > 
 
-or you can steal it from 14e8a3c47e808772a5ba8118ef1f9a8d604dbbe5
-("cfg80211: add tracing to rdev-ops").
+okay. First, I already answered a similar question, please see [0].
 
-Or refer this commit in your commit message, but keeping style then
-$ID ("$MSG").
+> Since you seem to have done a lot of work with this kind of thing, is
+> there someway that i can create  a virtual interface, much like the
+> TUN/TAP interfaces that are available for us right now?
+> 
+
+So you want to have some special "driver" which can accept frames from
+userspace to redirect them in the kernelspace to the driver and the
+interface is type of a WPAN interface.
+
+This doesn't exist right now, maybe you can setup such enviornment with
+the serial driver (I think this is what Tony Cheanau did at [1]). See
+[2] - right side, I think then you need to remove the green box and you
+have your /dev/fakeserial0 device, but this methods required the serial
+driver which isn't mainline yet. The interface at /dev/fakeserial0 would
+be the serial protocol then, see my other mail for usb dongles at [0].
+
+> What would i have to do to get my raw serialized 802.15.4 frames into
+> the linux-zigbee stack? I watched your talk about that on youtube.
+> Originally i was going to use the contiki solution, but since the
+> stack in linux seems to be pretty okay thanks to you i would prefer
+> that way.
+> 
+
+I would say you need to decide if "atusb" or "serial" based firmware for
+your usb dongle device. If you have already a serial connection then I
+think you already decide to use the serial protocol, which you can see
+mostly see how it works at serial driver [3].
+
+For atusb, your firmware need to speak the "atusb" protocol which is simple
+if the transceiver is a at86rf2xx based. The atusb driver isn't mainline
+yet but in a good state. (Means better than serial).
+
+
+For serial communication you need to speak the serial protocol on firmware
+and port the serial driver to newer kernel release.
+
+Maybe you can also generate some crazy setup which do a adaptation from
+/dev/ttyUSB0 to /dev/fakeserial0 in userspace, then you could use your already
+existing serial protocol from /dev/ttyUSB0 and translate it to /dev/fakeserial0.
+If you don't have access to the firmware, then this would be the only choice
+for you.
+
+
+The bad messages this is not all mainline and you need to port it, if
+you do that I would be very happy about to see patches. I cc here Werner
+Almesberger, the creator of atusb.
 
 - Alex
+
+[0] http://www.spinics.net/lists/linux-wpan/msg01591.html
+[1] https://github.com/tcheneau/virtual-ieee802154-serial
+[2] https://github.com/tcheneau/virtual-ieee802154-serial/blob/master/figures/fakeserial-architecture.png
+[3] https://github.com/linux-wpan/linux-wpan-next/commit/546618171de2be30236aab86f3ee323b425e2bf5
