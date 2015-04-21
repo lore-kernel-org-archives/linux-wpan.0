@@ -1,138 +1,61 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wg0-f42.google.com ([74.125.82.42]:33726 "EHLO
-	mail-wg0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750878AbbD3JrV (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Thu, 30 Apr 2015 05:47:21 -0400
-Received: by wgin8 with SMTP id n8so55996921wgi.0
-        for <linux-wpan@vger.kernel.org>; Thu, 30 Apr 2015 02:47:20 -0700 (PDT)
-From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH wpan-next 2/2] ieee802154: move validation check out of softmac
-Date: Thu, 30 Apr 2015 11:47:12 +0200
-Message-Id: <1430387232-24878-2-git-send-email-alex.aring@gmail.com>
-In-Reply-To: <1430387232-24878-1-git-send-email-alex.aring@gmail.com>
-References: <1430387232-24878-1-git-send-email-alex.aring@gmail.com>
+Received: from mail-lb0-f179.google.com ([209.85.217.179]:35897 "EHLO
+	mail-lb0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751717AbbDUPzg (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Tue, 21 Apr 2015 11:55:36 -0400
+Received: by lbbqq2 with SMTP id qq2so159088447lbb.3
+        for <linux-wpan@vger.kernel.org>; Tue, 21 Apr 2015 08:55:35 -0700 (PDT)
+MIME-Version: 1.0
+Date: Tue, 21 Apr 2015 11:55:35 -0400
+Message-ID: <CAHwW560VTApCL2a4c8uOMC2u-bWzenTf0vwH0pbeLZ3xNLuCOA@mail.gmail.com>
+Subject: atusb availability
+From: Geoff Chapman <geoff.chapman@mmbresearch.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
-Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
+Cc: werner@almesberger.net
 
-This patch moves the value validation out of softmac layer. We need
-to be sure now that this value is accepted by the transceiver/mac802154 or
-"possible" hardmac drivers before calling rdev-ops.
+Hello Mr. Almesberger,
 
-Signed-off-by: Alexander Aring <alex.aring@gmail.com>
----
- net/ieee802154/nl802154.c | 28 +++++++++++++++++++++++++++-
- net/mac802154/cfg.c       | 29 -----------------------------
- 2 files changed, 27 insertions(+), 30 deletions(-)
+My name is Geoff Chapman, and I am working on project to setup a
+simple 6loWPAN network between two laptops running Linux.  I am very
+interested in your work on the atusb device detailed at [0], and would
+like to use the device in my project.  On each laptop, I would like to
+use one of your atusb devices to implement the 802.15.4 MAC/PHY, while
+using the 6loWPAN stack in the linux kernel. I picture something like
+the following setup for each laptop:
 
-diff --git a/net/ieee802154/nl802154.c b/net/ieee802154/nl802154.c
-index c01f4bb..d750d97 100644
---- a/net/ieee802154/nl802154.c
-+++ b/net/ieee802154/nl802154.c
-@@ -625,7 +625,8 @@ static int nl802154_set_channel(struct sk_buff *skb, struct genl_info *info)
- 	channel = nla_get_u8(info->attrs[NL802154_ATTR_CHANNEL]);
- 
- 	/* check 802.15.4 constraints */
--	if (page > IEEE802154_MAX_PAGE || channel > IEEE802154_MAX_CHANNEL)
-+	if (page > IEEE802154_MAX_PAGE || channel > IEEE802154_MAX_CHANNEL ||
-+	    !(rdev->wpan_phy.channels_supported[page] & BIT(channel)))
- 		return -EINVAL;
- 
- 	return rdev_set_channel(rdev, page, channel);
-@@ -674,6 +675,16 @@ static int nl802154_set_pan_id(struct sk_buff *skb, struct genl_info *info)
- 
- 	pan_id = nla_get_le16(info->attrs[NL802154_ATTR_PAN_ID]);
- 
-+	/* TODO
-+	 * I am not sure about to check here on broadcast pan_id.
-+	 * Broadcast is a valid setting, comment from 802.15.4:
-+	 * If this value is 0xffff, the device is not associated.
-+	 *
-+	 * This could useful to simple deassociate an device.
-+	 */
-+	if (pan_id == cpu_to_le16(IEEE802154_PAN_ID_BROADCAST))
-+		return -EINVAL;
-+
- 	return rdev_set_pan_id(rdev, wpan_dev, pan_id);
- }
- 
-@@ -695,6 +706,21 @@ static int nl802154_set_short_addr(struct sk_buff *skb, struct genl_info *info)
- 
- 	short_addr = nla_get_le16(info->attrs[NL802154_ATTR_SHORT_ADDR]);
- 
-+	/* TODO
-+	 * I am not sure about to check here on broadcast short_addr.
-+	 * Broadcast is a valid setting, comment from 802.15.4:
-+	 * A value of 0xfffe indicates that the device has
-+	 * associated but has not been allocated an address. A
-+	 * value of 0xffff indicates that the device does not
-+	 * have a short address.
-+	 *
-+	 * I think we should allow to set these settings but
-+	 * don't allow to allow socket communication with it.
-+	 */
-+	if (short_addr == cpu_to_le16(IEEE802154_ADDR_SHORT_UNSPEC) ||
-+	    short_addr == cpu_to_le16(IEEE802154_ADDR_SHORT_BROADCAST))
-+		return -EINVAL;
-+
- 	return rdev_set_short_addr(rdev, wpan_dev, short_addr);
- }
- 
-diff --git a/net/mac802154/cfg.c b/net/mac802154/cfg.c
-index 70be9c7..c636015 100644
---- a/net/mac802154/cfg.c
-+++ b/net/mac802154/cfg.c
-@@ -73,10 +73,6 @@ ieee802154_set_channel(struct wpan_phy *wpan_phy, u8 page, u8 channel)
- 
- 	ASSERT_RTNL();
- 
--	/* check if phy support this setting */
--	if (!(wpan_phy->channels_supported[page] & BIT(channel)))
--		return -EINVAL;
--
- 	ret = drv_set_channel(local, page, channel);
- 	if (!ret) {
- 		wpan_phy->current_page = page;
-@@ -112,16 +108,6 @@ ieee802154_set_pan_id(struct wpan_phy *wpan_phy, struct wpan_dev *wpan_dev,
- {
- 	ASSERT_RTNL();
- 
--	/* TODO
--	 * I am not sure about to check here on broadcast pan_id.
--	 * Broadcast is a valid setting, comment from 802.15.4:
--	 * If this value is 0xffff, the device is not associated.
--	 *
--	 * This could useful to simple deassociate an device.
--	 */
--	if (pan_id == cpu_to_le16(IEEE802154_PAN_ID_BROADCAST))
--		return -EINVAL;
--
- 	wpan_dev->pan_id = pan_id;
- 	return 0;
- }
-@@ -149,21 +135,6 @@ ieee802154_set_short_addr(struct wpan_phy *wpan_phy, struct wpan_dev *wpan_dev,
- {
- 	ASSERT_RTNL();
- 
--	/* TODO
--	 * I am not sure about to check here on broadcast short_addr.
--	 * Broadcast is a valid setting, comment from 802.15.4:
--	 * A value of 0xfffe indicates that the device has
--	 * associated but has not been allocated an address. A
--	 * value of 0xffff indicates that the device does not
--	 * have a short address.
--	 *
--	 * I think we should allow to set these settings but
--	 * don't allow to allow socket communication with it.
--	 */
--	if (short_addr == cpu_to_le16(IEEE802154_ADDR_SHORT_UNSPEC) ||
--	    short_addr == cpu_to_le16(IEEE802154_ADDR_SHORT_BROADCAST))
--		return -EINVAL;
--
- 	wpan_dev->short_addr = short_addr;
- 	return 0;
- }
--- 
-2.3.6
 
+Linux Laptop:
+
+        | Application Layer |
+                       |
+                socket API
+                       |
+        |  6LoWPAN stack |
+                       |
+                       |
+                       <-----------------USB---------------> atusb
+device implementing 802.15.4 MAC/PHY (ATMega32U2 + at86rf233)
+
+
+I have tried purchasing two atusb devices at [1] without any luck, as
+they no longer sell the devices.
+I have two questions:
+
+1. Do you have any atusb devices available for purchase?
+2. If you have none for purchase, do you have the schematics available
+that I can use to wire-up my own atusb device?  The schematic link on
+your site [2] seems to be broken.
+
+[0] http://downloads.qi-hardware.com/people/werner/wpan/web/
+[1] http://pulster.eu/index.html?d__atusb__NanoNote_wireless_card__atusb_1185.htm
+[2] http://projects.qi-hardware.com/schhist/atusb/
+
+I would greatly appreciate any assistance or advice you could give me.
+Thank-you very much for your time.
+
+Sincerely,
+
+--Geoff
