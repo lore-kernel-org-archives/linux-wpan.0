@@ -1,82 +1,194 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f169.google.com ([209.85.212.169]:33289 "EHLO
-	mail-wi0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1031607AbbD2JHb (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Wed, 29 Apr 2015 05:07:31 -0400
-Received: by wief7 with SMTP id f7so35263324wie.0
-        for <linux-wpan@vger.kernel.org>; Wed, 29 Apr 2015 02:07:29 -0700 (PDT)
-Date: Wed, 29 Apr 2015 11:07:21 +0200
+Received: from mail-wi0-f181.google.com ([209.85.212.181]:37517 "EHLO
+	mail-wi0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1030309AbbDWQsl (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Thu, 23 Apr 2015 12:48:41 -0400
+Received: by widdi4 with SMTP id di4so99345360wid.0
+        for <linux-wpan@vger.kernel.org>; Thu, 23 Apr 2015 09:48:40 -0700 (PDT)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: Re: [RFC bluetooth-next 09/15] ieee802154: add support for get tx
- powers
-Message-ID: <20150429090717.GA1170@omega>
+Subject: [RFC bluetooth-next 10/15] ieee802154: add support for get cca ed levels
+Date: Thu, 23 Apr 2015 18:47:49 +0200
+Message-Id: <1429807674-24849-11-git-send-email-alex.aring@gmail.com>
+In-Reply-To: <1429807674-24849-1-git-send-email-alex.aring@gmail.com>
 References: <1429807674-24849-1-git-send-email-alex.aring@gmail.com>
- <1429807674-24849-10-git-send-email-alex.aring@gmail.com>
- <20150427134932.64e5325a@zoidberg>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20150427134932.64e5325a@zoidberg>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Phoebe Buckheister <phoebe.buckheister@itwm.fraunhofer.de>
-Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de
+To: linux-wpan@vger.kernel.org
+Cc: kernel@pengutronix.de, phoebe.buckheister@itwm.fraunhofer.de, Alexander Aring <alex.aring@gmail.com>
 
-Hi Phoebe,
+This patch adds support for get cca energy detection levels. The driver
+needs to implement a driver ops callback which can iterate over each
+transmit power level index. This callback can return zero for successful
+iteration, 1 for ending the iteration, 2 for continue the iteration
+which an index increment and values below 0 zero if failed.
 
-On Mon, Apr 27, 2015 at 01:49:32PM +0200, Phoebe Buckheister wrote:
-> On Thu, 23 Apr 2015 18:47:48 +0200
-> Alexander Aring <alex.aring@gmail.com> wrote:
-> 
-...
-> > +	int		(*get_tx_powers)(struct ieee802154_hw
-> > *hw, s8 *dbm,
-> > +					 u32 idx);
-> 
-> I suggest you use mBm instead of dBm here, while you're at it anyway.
-> Especially since one of your later patches will add incorrect values
-> because dBm isn't accurate enough for what the transceiver support
-> (rf230, TX power +3.4dBm). This would also make the value-2 return you
-> have right now unnecessary.
-> 
+Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+---
+ include/net/cfg802154.h    |  2 ++
+ include/net/mac802154.h    |  9 +++++++++
+ net/ieee802154/rdev-ops.h  | 12 ++++++++++++
+ net/ieee802154/trace.h     | 31 +++++++++++++++++++++++++++++++
+ net/mac802154/cfg.c        | 11 +++++++++++
+ net/mac802154/driver-ops.h | 12 ++++++++++++
+ 6 files changed, 77 insertions(+)
 
-The 802.15.4 standard describes in the phy pib for tx power:
+diff --git a/include/net/cfg802154.h b/include/net/cfg802154.h
+index 89995dd..7d44dcc 100644
+--- a/include/net/cfg802154.h
++++ b/include/net/cfg802154.h
+@@ -43,6 +43,8 @@ struct cfg802154_ops {
+ 	int	(*set_cca_mode)(struct wpan_phy *wpan_phy,
+ 				const struct wpan_phy_cca *cca);
+ 	int	(*get_tx_powers)(struct wpan_phy *wpan_phy, s8 *dbm, u32 idx);
++	int	(*get_cca_ed_levels)(struct wpan_phy *wpan_phy, s32 *dbm,
++				     u32 idx);
+ 	int	(*set_pan_id)(struct wpan_phy *wpan_phy,
+ 			      struct wpan_dev *wpan_dev, __le16 pan_id);
+ 	int	(*set_short_addr)(struct wpan_phy *wpan_phy,
+diff --git a/include/net/mac802154.h b/include/net/mac802154.h
+index c489946..009e64c 100644
+--- a/include/net/mac802154.h
++++ b/include/net/mac802154.h
+@@ -182,6 +182,13 @@ struct ieee802154_hw {
+  *	  returned for skipping dbm but increment idx value, this can be useful
+  *	  for register to dbm array mapping.
+  *
++ * get_cca_ed_levels
++ *	  Get cca ed levels in dBm for cca mode 3. Called when rtnl lock is
++ *	  held. Parameter idx descibes the index of cca ed levels which is
++ *	  supported. Returns either zero or negative errno. One should be
++ *	  returned to break the iteration of cca ed levels setting. Two should
++ *	  be returned for skipping dbm but increment idx value.
++ *
+  * set_lbt
+  *	  Enables or disables listen before talk on the device. Called with
+  *	  pib_lock held.
+@@ -224,6 +231,8 @@ struct ieee802154_ops {
+ 	int		(*set_txpower)(struct ieee802154_hw *hw, s8 dbm);
+ 	int		(*get_tx_powers)(struct ieee802154_hw *hw, s8 *dbm,
+ 					 u32 idx);
++	int		(*get_cca_ed_levels)(struct ieee802154_hw *hw,
++					     s32 *dbm, u32 idx);
+ 	int		(*set_lbt)(struct ieee802154_hw *hw, bool on);
+ 	int		(*set_cca_mode)(struct ieee802154_hw *hw,
+ 					const struct wpan_phy_cca *cca);
+diff --git a/net/ieee802154/rdev-ops.h b/net/ieee802154/rdev-ops.h
+index d944a7a..5d2666f 100644
+--- a/net/ieee802154/rdev-ops.h
++++ b/net/ieee802154/rdev-ops.h
+@@ -71,6 +71,18 @@ rdev_set_cca_mode(struct cfg802154_registered_device *rdev,
+ }
+ 
+ static inline int
++rdev_get_cca_ed_levels(struct cfg802154_registered_device *rdev, s32 *dbm,
++		       u32 idx)
++{
++	int ret;
++
++	trace_802154_rdev_get_cca_ed_levels(&rdev->wpan_phy, idx);
++	ret = rdev->ops->get_cca_ed_levels(&rdev->wpan_phy, dbm, idx);
++	trace_802154_rdev_return_int_cca_ed_levels(&rdev->wpan_phy, ret, dbm);
++	return ret;
++}
++
++static inline int
+ rdev_get_tx_powers(struct cfg802154_registered_device *rdev, s8 *dbm, u32 idx)
+ {
+ 	int ret;
+diff --git a/net/ieee802154/trace.h b/net/ieee802154/trace.h
+index 94ac3b9..c06b57f 100644
+--- a/net/ieee802154/trace.h
++++ b/net/ieee802154/trace.h
+@@ -108,6 +108,37 @@ TRACE_EVENT(802154_rdev_set_cca_mode,
+ 		  WPAN_CCA_PR_ARG)
+ );
+ 
++TRACE_EVENT(802154_rdev_get_cca_ed_levels,
++	TP_PROTO(struct wpan_phy *wpan_phy, u32 idx),
++	TP_ARGS(wpan_phy, idx),
++	TP_STRUCT__entry(
++		WPAN_PHY_ENTRY
++		__field(u32, idx)
++	),
++	TP_fast_assign(
++		WPAN_PHY_ASSIGN;
++		__entry->idx = idx;
++	),
++	TP_printk(WPAN_PHY_PR_FMT ", idx: %d", WPAN_PHY_PR_ARG, __entry->idx)
++);
++
++TRACE_EVENT(802154_rdev_return_int_cca_ed_levels,
++	TP_PROTO(struct wpan_phy *wpan_phy, int ret, s32 *dbm),
++	TP_ARGS(wpan_phy, ret, dbm),
++	TP_STRUCT__entry(
++		WPAN_PHY_ENTRY
++		__field(int, ret)
++		__field(s32, dbm)
++	),
++	TP_fast_assign(
++		WPAN_PHY_ASSIGN;
++		__entry->ret = ret;
++		__entry->dbm = *dbm;
++	),
++	TP_printk(WPAN_PHY_PR_FMT ", returned: %d, dbm: %d", WPAN_PHY_PR_ARG,
++		  __entry->ret, __entry->dbm)
++);
++
+ TRACE_EVENT(802154_rdev_get_tx_powers,
+ 	TP_PROTO(struct wpan_phy *wpan_phy, u32 idx),
+ 	TP_ARGS(wpan_phy, idx),
+diff --git a/net/mac802154/cfg.c b/net/mac802154/cfg.c
+index 2b80a77..e5234ab 100644
+--- a/net/mac802154/cfg.c
++++ b/net/mac802154/cfg.c
+@@ -103,6 +103,16 @@ ieee802154_set_cca_mode(struct wpan_phy *wpan_phy,
+ }
+ 
+ static int
++ieee802154_get_cca_ed_levels(struct wpan_phy *wpan_phy, s32 *dbm, u32 idx)
++{
++	struct ieee802154_local *local = wpan_phy_priv(wpan_phy);
++
++	ASSERT_RTNL();
++
++	return drv_get_cca_ed_levels(local, dbm, idx);
++}
++
++static int
+ ieee802154_get_tx_powers(struct wpan_phy *wpan_phy, s8 *dbm, u32 idx)
+ {
+ 	struct ieee802154_local *local = wpan_phy_priv(wpan_phy);
+@@ -203,6 +213,7 @@ const struct cfg802154_ops mac802154_config_ops = {
+ 	.set_channel = ieee802154_set_channel,
+ 	.set_cca_mode = ieee802154_set_cca_mode,
+ 	.get_tx_powers = ieee802154_get_tx_powers,
++	.get_cca_ed_levels = ieee802154_get_cca_ed_levels,
+ 	.set_pan_id = ieee802154_set_pan_id,
+ 	.set_short_addr = ieee802154_set_short_addr,
+ 	.set_backoff_exponent = ieee802154_set_backoff_exponent,
+diff --git a/net/mac802154/driver-ops.h b/net/mac802154/driver-ops.h
+index 08e2b09..323da5c 100644
+--- a/net/mac802154/driver-ops.h
++++ b/net/mac802154/driver-ops.h
+@@ -120,6 +120,18 @@ drv_set_cca_ed_level(struct ieee802154_local *local, s32 ed_level)
+ 	return local->ops->set_cca_ed_level(&local->hw, ed_level);
+ }
+ 
++static inline int
++drv_get_cca_ed_levels(struct ieee802154_local *local, s32 *dbm, u32 idx)
++{
++	might_sleep();
++
++	/* if not implemented indicate a empty list */
++	if (!local->ops->get_tx_powers)
++		return 1;
++
++	return local->ops->get_cca_ed_levels(&local->hw, dbm, idx);
++}
++
+ static inline int drv_set_pan_id(struct ieee802154_local *local, __le16 pan_id)
+ {
+ 	struct ieee802154_hw_addr_filt filt;
+-- 
+2.3.6
 
-attr: phyTXPower
-type: signed integer
-range: -
-describtion: The transmit power of the device in dBm.
-
-I mentioned in my previous mail that this doesn't repsonse the reality
-because there are transceivers outside which supports tx power in dbm
-which are not signed integer, like +3.4 dbm.
-
-Nevertheless I would say forget that what the PIB says, we do what the
-reality does now. (In my previous mail I was another opinion because the
-current type is s8). I think we should not do that now, because we get
-trouble later, this is what you mentioned now and I agree.
-
-
-Plan to implement the mbm:
-
-1. change current tx power to S32 instead s8.
-   I gave it a try phy dump with iwpan still works, (not ends in a
-   critical error), so I will change it.
-
-2. the kernelside use mbm everywhere the userspace side kann convert the
-   dbm values to mbm then with a calculation "dbm = mbm / 100" and
-   "mbm = dbm * 100".
-
-   Some helper marcos like:
-   #define DBM_TO_MBM(gain) ((int)(((float)gain) * 100))
-   #define MBM_TO_DBM(gain) ((float)(gain) / 100)
-
-Examples
-   MBM    | DBM
-   +230   | +2.3
-   -280   | -2.8
-   ...    | ....
-
-Thanks, for the review.
-
-- Alex
