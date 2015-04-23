@@ -1,90 +1,89 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f181.google.com ([209.85.212.181]:38146 "EHLO
+Received: from mail-wi0-f181.google.com ([209.85.212.181]:37293 "EHLO
 	mail-wi0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1031365AbbD2HfW (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Wed, 29 Apr 2015 03:35:22 -0400
-Received: by wiun10 with SMTP id n10so55450694wiu.1
-        for <linux-wpan@vger.kernel.org>; Wed, 29 Apr 2015 00:35:21 -0700 (PDT)
+	with ESMTP id S1030224AbbDWQsa (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Thu, 23 Apr 2015 12:48:30 -0400
+Received: by widdi4 with SMTP id di4so99339444wid.0
+        for <linux-wpan@vger.kernel.org>; Thu, 23 Apr 2015 09:48:28 -0700 (PDT)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCHv2 wpan-next 6/6] at86rf230: add slp_tr support to start tx
-Date: Wed, 29 Apr 2015 09:34:53 +0200
-Message-Id: <1430292893-5752-7-git-send-email-alex.aring@gmail.com>
-In-Reply-To: <1430292893-5752-1-git-send-email-alex.aring@gmail.com>
-References: <1430292893-5752-1-git-send-email-alex.aring@gmail.com>
+Subject: [RFC bluetooth-next 00/15] ieee802154: add support for phy capabilities
+Date: Thu, 23 Apr 2015 18:47:39 +0200
+Message-Id: <1429807674-24849-1-git-send-email-alex.aring@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
-Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
+Cc: kernel@pengutronix.de, phoebe.buckheister@itwm.fraunhofer.de, Alexander Aring <alex.aring@gmail.com>
 
-This patch adds support for one of the slp_tr gpio use cases which
-indicates the TX_START command without doing some spi bus traffic.
+Hi,
 
-Signed-off-by: Alexander Aring <alex.aring@gmail.com>
-Reviewed-by: Varka Bhadram <varkabhadram@gmail.com>
----
- drivers/net/ieee802154/at86rf230.c | 27 +++++++++++++++++++++------
- 1 file changed, 21 insertions(+), 6 deletions(-)
+this patch series contains support for phy capabilities. The phy capabilities
+can be used to check the setting parameters in nl802154 before we calling the
+according rdev-ops to send them into SoftMAC/Driver(HardMAC) layer. This avoids
+that we know before sending them to these layers that we know a "-EINVAL" before,
+this can be used to check all setting parameters in one setting commands like [0].
+Additional we can now dump the capabilities into userspace so users know what the
+phy is supported.
 
-diff --git a/drivers/net/ieee802154/at86rf230.c b/drivers/net/ieee802154/at86rf230.c
-index 05ef56d..67d00fb 100644
---- a/drivers/net/ieee802154/at86rf230.c
-+++ b/drivers/net/ieee802154/at86rf230.c
-@@ -85,6 +85,7 @@ struct at86rf230_local {
- 	struct ieee802154_hw *hw;
- 	struct at86rf2xx_chip_data *data;
- 	struct regmap *regmap;
-+	int slp_tr;
- 
- 	struct completion state_complete;
- 	struct at86rf230_state_change state;
-@@ -339,6 +340,14 @@ at86rf230_write_subreg(struct at86rf230_local *lp,
- 	return regmap_update_bits(lp->regmap, addr, mask, data << shift);
- }
- 
-+static inline void
-+at86rf230_slp_tr_rising_edge(struct at86rf230_local *lp)
-+{
-+	gpio_set_value(lp->slp_tr, 1);
-+	udelay(1);
-+	gpio_set_value(lp->slp_tr, 0);
-+}
-+
- static bool
- at86rf230_reg_writeable(struct device *dev, unsigned int reg)
- {
-@@ -940,13 +949,18 @@ at86rf230_write_frame_complete(void *context)
- 	u8 *buf = ctx->buf;
- 	int rc;
- 
--	buf[0] = (RG_TRX_STATE & CMD_REG_MASK) | CMD_REG | CMD_WRITE;
--	buf[1] = STATE_BUSY_TX;
- 	ctx->trx.len = 2;
--	ctx->msg.complete = NULL;
--	rc = spi_async(lp->spi, &ctx->msg);
--	if (rc)
--		at86rf230_async_error(lp, ctx, rc);
-+
-+	if (gpio_is_valid(lp->slp_tr)) {
-+		at86rf230_slp_tr_rising_edge(lp);
-+	} else {
-+		buf[0] = (RG_TRX_STATE & CMD_REG_MASK) | CMD_REG | CMD_WRITE;
-+		buf[1] = STATE_BUSY_TX;
-+		ctx->msg.complete = NULL;
-+		rc = spi_async(lp->spi, &ctx->msg);
-+		if (rc)
-+			at86rf230_async_error(lp, ctx, rc);
-+	}
- }
- 
- static void
-@@ -1680,6 +1694,7 @@ static int at86rf230_probe(struct spi_device *spi)
- 	lp = hw->priv;
- 	lp->hw = hw;
- 	lp->spi = spi;
-+	lp->slp_tr = slp_tr;
- 	hw->parent = &spi->dev;
- 	hw->vif_data_size = sizeof(*lp);
- 	ieee802154_random_extended_addr(&hw->phy->perm_extended_addr);
+The initial values for phy capabilities is that if the driver supports the according
+handling then the full range of 802.15.4 is supported like csma parameters or
+max frame retries. If the driver doesn't support the setting of these we assume the
+802.15.4 standard values which cannot be changed. (If the phy supports that in any
+way then the driver is broken and need to support that, we assume that the phy
+doing 802.15.4 defaults). This case is for mac parameters. In case of that the driver
+supports the according settings like CSMA/frame retries _but_ not the full range of
+the 802.15.4 then the driver can overwrite this behaviour by changing the capabilities.
+
+For phy parameters, if the driver doesn't set anything, then there is also no
+possibility to change these values from userspace, this is also a lack of support
+inside the driver then.
+
+At least this patch series also includes a rework of setting/reporting
+tx_powers/cca_ed_levels values.
+
+
+Note: this patch series based on the ("ieee802154: Add trace events for rdev->ops") by
+Guido Günther <agx@sigxcpu.org>.
+
+- Alex
+
+[0] http://www.spinics.net/lists/linux-wpan/msg01603.html
+
+Alexander Aring (15):
+  nl802154: cleanup invalid argument handling
+  at86rf230: remove tabs after define
+  ieee802154: move validation check out of softmac
+  mac802154: check for really changes
+  mac802154: remove check if operation is supported
+  ieee802154: introduce wpan_phy_supported
+  ieee802154: add several phy supported handling
+  ieee802154: add iftypes capability
+  ieee802154: add support for get tx powers
+  ieee802154: add support for get cca ed levels
+  at86rf230: set cca_modes supported flags
+  at86rf230: add reset states of tx power level
+  at86rf230: rework tx power support
+  at86rf230: rework tx cca energy detection level
+  nl802154: add support for dump phy capabilities
+
+ drivers/net/ieee802154/at86rf230.c | 442 ++++++++++++++++++++++---------------
+ drivers/net/ieee802154/cc2520.c    |   2 +-
+ drivers/net/ieee802154/fakelb.c    |  30 +--
+ drivers/net/ieee802154/mrf24j40.c  |   2 +-
+ include/net/cfg802154.h            |  43 +++-
+ include/net/mac802154.h            |  19 ++
+ include/net/nl802154.h             |  79 +++++++
+ net/ieee802154/nl-phy.c            |   4 +-
+ net/ieee802154/nl802154.c          | 198 +++++++++++++++--
+ net/ieee802154/rdev-ops.h          |  23 ++
+ net/ieee802154/trace.h             |  62 ++++++
+ net/mac802154/cfg.c                |  85 ++++---
+ net/mac802154/driver-ops.h         |  24 ++
+ net/mac802154/main.c               |  32 +++
+ 14 files changed, 787 insertions(+), 258 deletions(-)
+
 -- 
 2.3.6
 
