@@ -1,14 +1,14 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wg0-f49.google.com ([74.125.82.49]:33114 "EHLO
-	mail-wg0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1030231AbbDWQsd (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Thu, 23 Apr 2015 12:48:33 -0400
-Received: by wgin8 with SMTP id n8so24785167wgi.0
-        for <linux-wpan@vger.kernel.org>; Thu, 23 Apr 2015 09:48:32 -0700 (PDT)
+Received: from mail-wg0-f44.google.com ([74.125.82.44]:33136 "EHLO
+	mail-wg0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1030242AbbDWQse (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Thu, 23 Apr 2015 12:48:34 -0400
+Received: by wgin8 with SMTP id n8so24785647wgi.0
+        for <linux-wpan@vger.kernel.org>; Thu, 23 Apr 2015 09:48:33 -0700 (PDT)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [RFC bluetooth-next 03/15] ieee802154: move validation check out of softmac
-Date: Thu, 23 Apr 2015 18:47:42 +0200
-Message-Id: <1429807674-24849-4-git-send-email-alex.aring@gmail.com>
+Subject: [RFC bluetooth-next 04/15] mac802154: check for really changes
+Date: Thu, 23 Apr 2015 18:47:43 +0200
+Message-Id: <1429807674-24849-5-git-send-email-alex.aring@gmail.com>
 In-Reply-To: <1429807674-24849-1-git-send-email-alex.aring@gmail.com>
 References: <1429807674-24849-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
@@ -16,123 +16,126 @@ List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
 Cc: kernel@pengutronix.de, phoebe.buckheister@itwm.fraunhofer.de, Alexander Aring <alex.aring@gmail.com>
 
-This patch moves the value validation out of softmac layer. after
-calling rdev-ops we need to be sure now that this value is accepted by
-the transceiver/mac802154 or "possible" hardmac drivers.
+This patch adds check if the value is really changed inside pib/mib.
+If a transceiver do support only one value for e.g. max_be then this
+will also handle that the driver layer doesn't need to care about
+handling to set one value only.
 
 Signed-off-by: Alexander Aring <alex.aring@gmail.com>
 ---
- net/ieee802154/nl802154.c | 28 +++++++++++++++++++++++++++-
- net/mac802154/cfg.c       | 29 -----------------------------
- 2 files changed, 27 insertions(+), 30 deletions(-)
+ include/net/cfg802154.h | 12 ++++++++++++
+ net/mac802154/cfg.c     | 26 ++++++++++++++++++++++++++
+ 2 files changed, 38 insertions(+)
 
-diff --git a/net/ieee802154/nl802154.c b/net/ieee802154/nl802154.c
-index 9de427d..e19f218 100644
---- a/net/ieee802154/nl802154.c
-+++ b/net/ieee802154/nl802154.c
-@@ -625,7 +625,8 @@ static int nl802154_set_channel(struct sk_buff *skb, struct genl_info *info)
- 	channel = nla_get_u8(info->attrs[NL802154_ATTR_CHANNEL]);
+diff --git a/include/net/cfg802154.h b/include/net/cfg802154.h
+index eeda676..4fec61d 100644
+--- a/include/net/cfg802154.h
++++ b/include/net/cfg802154.h
+@@ -64,6 +64,18 @@ struct wpan_phy_cca {
+ 	enum nl802154_cca_opts opt;
+ };
  
- 	/* check 802.15.4 constraints */
--	if (page > IEEE802154_MAX_PAGE || channel > IEEE802154_MAX_CHANNEL)
-+	if (page > IEEE802154_MAX_PAGE || channel > IEEE802154_MAX_CHANNEL ||
-+	    !(rdev->wpan_phy.channels_supported[page] & BIT(channel)))
- 		return -EINVAL;
- 
- 	return rdev_set_channel(rdev, page, channel);
-@@ -674,6 +675,16 @@ static int nl802154_set_pan_id(struct sk_buff *skb, struct genl_info *info)
- 
- 	pan_id = nla_get_le16(info->attrs[NL802154_ATTR_PAN_ID]);
- 
-+	/* TODO
-+	 * I am not sure about to check here on broadcast pan_id.
-+	 * Broadcast is a valid setting, comment from 802.15.4:
-+	 * If this value is 0xffff, the device is not associated.
-+	 *
-+	 * This could useful to simple deassociate an device.
-+	 */
-+	if (pan_id == cpu_to_le16(IEEE802154_PAN_ID_BROADCAST))
-+		return -EINVAL;
++static inline bool
++wpan_phy_cca_cmp(const struct wpan_phy_cca *a, const struct wpan_phy_cca *b)
++{
++	if (a->mode != b->mode)
++		return false;
 +
- 	return rdev_set_pan_id(rdev, wpan_dev, pan_id);
- }
- 
-@@ -695,6 +706,21 @@ static int nl802154_set_short_addr(struct sk_buff *skb, struct genl_info *info)
- 
- 	short_addr = nla_get_le16(info->attrs[NL802154_ATTR_SHORT_ADDR]);
- 
-+	/* TODO
-+	 * I am not sure about to check here on broadcast short_addr.
-+	 * Broadcast is a valid setting, comment from 802.15.4:
-+	 * A value of 0xfffe indicates that the device has
-+	 * associated but has not been allocated an address. A
-+	 * value of 0xffff indicates that the device does not
-+	 * have a short address.
-+	 *
-+	 * I think we should allow to set these settings but
-+	 * don't allow to allow socket communication with it.
-+	 */
-+	if (short_addr == cpu_to_le16(IEEE802154_ADDR_SHORT_UNSPEC) ||
-+	    short_addr == cpu_to_le16(IEEE802154_ADDR_SHORT_BROADCAST))
-+		return -EINVAL;
++	if (a->mode == NL802154_CCA_ENERGY_CARRIER)
++		return a->opt == b->opt;
 +
- 	return rdev_set_short_addr(rdev, wpan_dev, short_addr);
- }
++	return true;
++}
++
+ struct wpan_phy {
+ 	struct mutex pib_lock;
  
 diff --git a/net/mac802154/cfg.c b/net/mac802154/cfg.c
-index 5d9f68c..e53aec9 100644
+index e53aec9..b6a986a 100644
 --- a/net/mac802154/cfg.c
 +++ b/net/mac802154/cfg.c
-@@ -70,10 +70,6 @@ ieee802154_set_channel(struct wpan_phy *wpan_phy, u8 page, u8 channel)
+@@ -70,6 +70,10 @@ ieee802154_set_channel(struct wpan_phy *wpan_phy, u8 page, u8 channel)
  
  	ASSERT_RTNL();
  
--	/* check if phy support this setting */
--	if (!(wpan_phy->channels_supported[page] & BIT(channel)))
--		return -EINVAL;
--
++	if (wpan_phy->current_page == page &&
++	    wpan_phy->current_channel == channel)
++		return 0;
++
  	ret = drv_set_channel(local, page, channel);
  	if (!ret) {
  		wpan_phy->current_page = page;
-@@ -109,16 +105,6 @@ ieee802154_set_pan_id(struct wpan_phy *wpan_phy, struct wpan_dev *wpan_dev,
+@@ -88,6 +92,9 @@ ieee802154_set_cca_mode(struct wpan_phy *wpan_phy,
+ 
+ 	ASSERT_RTNL();
+ 
++	if (wpan_phy_cca_cmp(&wpan_phy->cca, cca))
++		return 0;
++
+ 	/* check if phy support this setting */
+ 	if (!(local->hw.flags & IEEE802154_HW_CCA_MODE))
+ 		return -EOPNOTSUPP;
+@@ -105,6 +112,9 @@ ieee802154_set_pan_id(struct wpan_phy *wpan_phy, struct wpan_dev *wpan_dev,
  {
  	ASSERT_RTNL();
  
--	/* TODO
--	 * I am not sure about to check here on broadcast pan_id.
--	 * Broadcast is a valid setting, comment from 802.15.4:
--	 * If this value is 0xffff, the device is not associated.
--	 *
--	 * This could useful to simple deassociate an device.
--	 */
--	if (pan_id == cpu_to_le16(IEEE802154_PAN_ID_BROADCAST))
--		return -EINVAL;
--
++	if (wpan_dev->pan_id == pan_id)
++		return 0;
++
  	wpan_dev->pan_id = pan_id;
  	return 0;
  }
-@@ -146,21 +132,6 @@ ieee802154_set_short_addr(struct wpan_phy *wpan_phy, struct wpan_dev *wpan_dev,
+@@ -118,6 +128,10 @@ ieee802154_set_backoff_exponent(struct wpan_phy *wpan_phy,
+ 
+ 	ASSERT_RTNL();
+ 
++	if (wpan_dev->min_be == min_be &&
++	    wpan_dev->max_be == max_be)
++		return 0;
++
+ 	if (!(local->hw.flags & IEEE802154_HW_CSMA_PARAMS))
+ 		return -EOPNOTSUPP;
+ 
+@@ -132,6 +146,9 @@ ieee802154_set_short_addr(struct wpan_phy *wpan_phy, struct wpan_dev *wpan_dev,
  {
  	ASSERT_RTNL();
  
--	/* TODO
--	 * I am not sure about to check here on broadcast short_addr.
--	 * Broadcast is a valid setting, comment from 802.15.4:
--	 * A value of 0xfffe indicates that the device has
--	 * associated but has not been allocated an address. A
--	 * value of 0xffff indicates that the device does not
--	 * have a short address.
--	 *
--	 * I think we should allow to set these settings but
--	 * don't allow to allow socket communication with it.
--	 */
--	if (short_addr == cpu_to_le16(IEEE802154_ADDR_SHORT_UNSPEC) ||
--	    short_addr == cpu_to_le16(IEEE802154_ADDR_SHORT_BROADCAST))
--		return -EINVAL;
--
++	if (wpan_dev->short_addr == short_addr)
++		return 0;
++
  	wpan_dev->short_addr = short_addr;
  	return 0;
  }
+@@ -145,6 +162,9 @@ ieee802154_set_max_csma_backoffs(struct wpan_phy *wpan_phy,
+ 
+ 	ASSERT_RTNL();
+ 
++	if (wpan_dev->csma_retries == max_csma_backoffs)
++		return 0;
++
+ 	if (!(local->hw.flags & IEEE802154_HW_CSMA_PARAMS))
+ 		return -EOPNOTSUPP;
+ 
+@@ -161,6 +181,9 @@ ieee802154_set_max_frame_retries(struct wpan_phy *wpan_phy,
+ 
+ 	ASSERT_RTNL();
+ 
++	if (wpan_dev->frame_retries == max_frame_retries)
++		return 0;
++
+ 	if (!(local->hw.flags & IEEE802154_HW_FRAME_RETRIES))
+ 		return -EOPNOTSUPP;
+ 
+@@ -176,6 +199,9 @@ ieee802154_set_lbt_mode(struct wpan_phy *wpan_phy, struct wpan_dev *wpan_dev,
+ 
+ 	ASSERT_RTNL();
+ 
++	if (wpan_dev->lbt == mode)
++		return 0;
++
+ 	if (!(local->hw.flags & IEEE802154_HW_LBT))
+ 		return -EOPNOTSUPP;
+ 
 -- 
 2.3.6
 
