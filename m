@@ -1,92 +1,100 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f181.google.com ([209.85.212.181]:37659 "EHLO
-	mail-wi0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754652AbbDYGrd (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Sat, 25 Apr 2015 02:47:33 -0400
-Received: by widdi4 with SMTP id di4so40974856wid.0
-        for <linux-wpan@vger.kernel.org>; Fri, 24 Apr 2015 23:47:32 -0700 (PDT)
-Date: Sat, 25 Apr 2015 08:47:29 +0200
-From: Alexander Aring <alex.aring@gmail.com>
-Subject: Re: [RFC bluetooth-next 15/15] nl802154: add support for dump phy
- capabilities
-Message-ID: <20150425064728.GB3395@omega>
-References: <1429807674-24849-1-git-send-email-alex.aring@gmail.com>
- <1429807674-24849-16-git-send-email-alex.aring@gmail.com>
- <5539C9DF.1050501@gmail.com>
+Received: from mail-pa0-f50.google.com ([209.85.220.50]:34855 "EHLO
+	mail-pa0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754167AbbDXDiY (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Thu, 23 Apr 2015 23:38:24 -0400
+Received: by pabtp1 with SMTP id tp1so36196095pab.2
+        for <linux-wpan@vger.kernel.org>; Thu, 23 Apr 2015 20:38:24 -0700 (PDT)
+Message-ID: <5539BA9B.4090903@gmail.com>
+Date: Fri, 24 Apr 2015 09:08:03 +0530
+From: Varka Bhadram <varkabhadram@gmail.com>
 MIME-Version: 1.0
+Subject: Re: [RFC bluetooth-next 00/15] ieee802154: add support for phy capabilities
+References: <1429807674-24849-1-git-send-email-alex.aring@gmail.com>
+In-Reply-To: <1429807674-24849-1-git-send-email-alex.aring@gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <5539C9DF.1050501@gmail.com>
+Content-Transfer-Encoding: 8bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Varka Bhadram <varkabhadram@gmail.com>
-Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de, phoebe.buckheister@itwm.fraunhofer.de
+To: Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org
+Cc: kernel@pengutronix.de, phoebe.buckheister@itwm.fraunhofer.de
 
-On Fri, Apr 24, 2015 at 10:13:11AM +0530, Varka Bhadram wrote:
-> On 04/23/2015 10:17 PM, Alexander Aring wrote:
-> 
-> > This patch add support to nl802154 to dump all phy capabilities which is
-> > inside the wpan_phy_supported struct. Also we introduce a new method to
-> > dumping supported channels. The new method will offer a easier interface
-> > and has lesser netlink traffic.
-> >
-> > Signed-off-by: Alexander Aring <alex.aring@gmail.com>
-> > ---
-> >  include/net/nl802154.h    |  57 ++++++++++++++++++++
-> >  net/ieee802154/nl802154.c | 131 +++++++++++++++++++++++++++++++++++++++++++++-
-> >  2 files changed, 187 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/include/net/nl802154.h b/include/net/nl802154.h
-> > index 0552771..8c49714 100644
-> > --- a/include/net/nl802154.h
-> > +++ b/include/net/nl802154.h
-> > @@ -100,6 +100,8 @@ enum nl802154_attrs {
-> >  
-> >  	NL802154_ATTR_EXTENDED_ADDR,
-> >  
-> > +	NL802154_ATTR_WPAN_PHY_CAPS,
-> > +
-> >  	/* add attributes here, update the policy in nl802154.c */
-> >  
-> >  	__NL802154_ATTR_AFTER_LAST,
-> > @@ -120,6 +122,61 @@ enum nl802154_iftype {
-> >  };
-> >  
-> >  /**
-> > + * enum nl802154_wpan_phy_capability_attr - capability attributes
-> > + *
-> 
-> instead of capability attributes also add wpan phy in-front of it. 
-> 
-> * wpan phy capability attributes *
-> 
-> > + * @__NL802154_CAP_ATTR_INVALID: attribute number 0 is reserved
-> > + * @NL802154_CAP_ATTR_CHANNELS: a nested attribute for nl802154_channel_attr
-> > + * @NL802154_CAP_ATTR_TX_POWERS: a nested attribute for
-> > + *	nl802154_wpan_phy_tx_power
-> > + * @NL802154_CAP_ATTR_MIN_CCA_ED_LEVEL: minimum value for cca_ed_level
-> > + * @NL802154_CAP_ATTR_MAX_CCA_ED_LEVEL: maxmimum value for cca_ed_level
-> > + * @NL802154_CAP_ATTR_CCA_MODES: nl802154_cca_modes flags
-> > + * @NL802154_CAP_ATTR_CCA_OPTS: nl802154_cca_opts flags
-> > + * @NL802154_CAP_ATTR_MIN_MINBE: minimum of minbe value
-> > + * @NL802154_CAP_ATTR_MAX_MINBE: maximum of minbe value
-> > + * @NL802154_CAP_ATTR_MIN_MAXBE: minimum of maxbe value
-> > + * @NL802154_CAP_ATTR_MAX_MINBE: maximum of maxbe value
-> > + * @NL802154_CAP_ATTR_MIN_CSMA_BACKOFFS: minimum of csma backoff value
-> > + * @NL802154_CAP_ATTR_MAX_CSMA_BACKOFFS: maximum of csma backoffs value
-> > + * @NL802154_CAP_ATTR_MIN_FRAME_RETRIES: minimum of frame retries value
-> > + * @NL802154_CAP_ATTR_MAX_FRAME_RETRIES: maximum of frame retries value
-> > + * @NL802154_CAP_ATTR_IFTYPES: nl802154_iftype flags
-> > + * @NL802154_CAP_ATTR_LBT: nl802154_supported_bool_states flags
-> > + * @NL802154_CAP_ATTR_MAX: highest cap attribute currently defined
-> > + * @__NL802154_CAP_ATTR_AFTER_LAST: internal use
-> > + */
-> > +enum nl802154_capability_attr {
-> 
-> enum name mismatch. should be *nl802154_wpan_phy_capability_attr*. 
-> 
+On 04/23/2015 10:17 PM, Alexander Aring wrote:
+> Hi,
+>
+> this patch series contains support for phy capabilities. The phy capabilities
+> can be used to check the setting parameters in nl802154 before we calling the
+> according rdev-ops to send them into SoftMAC/Driver(HardMAC) layer. This avoids
+> that we know before sending them to these layers that we know a "-EINVAL" before,
+> this can be used to check all setting parameters in one setting commands like [0].
+> Additional we can now dump the capabilities into userspace so users know what the
+> phy is supported.
+>
+> The initial values for phy capabilities is that if the driver supports the according
+> handling then the full range of 802.15.4 is supported like csma parameters or
+> max frame retries. If the driver doesn't support the setting of these we assume the
+> 802.15.4 standard values which cannot be changed. (If the phy supports that in any
+> way then the driver is broken and need to support that, we assume that the phy
+> doing 802.15.4 defaults). This case is for mac parameters. In case of that the driver
+> supports the according settings like CSMA/frame retries _but_ not the full range of
+> the 802.15.4 then the driver can overwrite this behaviour by changing the capabilities.
+>
+> For phy parameters, if the driver doesn't set anything, then there is also no
+> possibility to change these values from userspace, this is also a lack of support
+> inside the driver then.
+>
+> At least this patch series also includes a rework of setting/reporting
+> tx_powers/cca_ed_levels values.
+>
+>
+> Note: this patch series based on the ("ieee802154: Add trace events for rdev->ops") by
+> Guido Günther <agx@sigxcpu.org>.
+>
+> - Alex
+>
+> [0] http://www.spinics.net/lists/linux-wpan/msg01603.html
+>
+> Alexander Aring (15):
+>   nl802154: cleanup invalid argument handling
+>   at86rf230: remove tabs after define
+>   ieee802154: move validation check out of softmac
+>   mac802154: check for really changes
+>   mac802154: remove check if operation is supported
+>   ieee802154: introduce wpan_phy_supported
+>   ieee802154: add several phy supported handling
+>   ieee802154: add iftypes capability
+>   ieee802154: add support for get tx powers
+>   ieee802154: add support for get cca ed levels
+>   at86rf230: set cca_modes supported flags
+>   at86rf230: add reset states of tx power level
+>   at86rf230: rework tx power support
+>   at86rf230: rework tx cca energy detection level
+>   nl802154: add support for dump phy capabilities
+>
+>  drivers/net/ieee802154/at86rf230.c | 442 ++++++++++++++++++++++---------------
+>  drivers/net/ieee802154/cc2520.c    |   2 +-
+>  drivers/net/ieee802154/fakelb.c    |  30 +--
+>  drivers/net/ieee802154/mrf24j40.c  |   2 +-
+>  include/net/cfg802154.h            |  43 +++-
+>  include/net/mac802154.h            |  19 ++
+>  include/net/nl802154.h             |  79 +++++++
+>  net/ieee802154/nl-phy.c            |   4 +-
+>  net/ieee802154/nl802154.c          | 198 +++++++++++++++--
+>  net/ieee802154/rdev-ops.h          |  23 ++
+>  net/ieee802154/trace.h             |  62 ++++++
+>  net/mac802154/cfg.c                |  85 ++++---
+>  net/mac802154/driver-ops.h         |  24 ++
+>  net/mac802154/main.c               |  32 +++
+>  14 files changed, 787 insertions(+), 258 deletions(-)
+>
+Good your work around phy capabilities for wpan. 
 
-ok, thanks. This header very important to be correct, otherwise users
-getting angry. :-)
+I would suggest to split this series into two.
+One for the cleanup for at86rf230 and other for
+the adding phy capabilities. Review will also be
+easy for us.
 
-- Alex
+
+-- 
+Varka Bhadram
+
