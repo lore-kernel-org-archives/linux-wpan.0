@@ -1,115 +1,137 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-pa0-f47.google.com ([209.85.220.47]:34489 "EHLO
-	mail-pa0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753082AbbDXFMN (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Fri, 24 Apr 2015 01:12:13 -0400
-Received: by pacyx8 with SMTP id yx8so38188835pac.1
-        for <linux-wpan@vger.kernel.org>; Thu, 23 Apr 2015 22:12:13 -0700 (PDT)
-Message-ID: <5539D098.1000203@gmail.com>
-Date: Fri, 24 Apr 2015 10:41:52 +0530
-From: Varka Bhadram <varkabhadram@gmail.com>
+Received: from mail-wi0-f173.google.com ([209.85.212.173]:33958 "EHLO
+	mail-wi0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752681AbbDYKGi (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Sat, 25 Apr 2015 06:06:38 -0400
+Received: by wicmx19 with SMTP id mx19so50641965wic.1
+        for <linux-wpan@vger.kernel.org>; Sat, 25 Apr 2015 03:06:37 -0700 (PDT)
+Date: Sat, 25 Apr 2015 12:06:34 +0200
+From: Alexander Aring <alex.aring@gmail.com>
+Subject: Re: [RFC bluetooth-next 00/15] ieee802154: add support for phy
+ capabilities
+Message-ID: <20150425100633.GD3395@omega>
+References: <1429807674-24849-1-git-send-email-alex.aring@gmail.com>
+ <5539BA9B.4090903@gmail.com>
+ <5539D098.1000203@gmail.com>
 MIME-Version: 1.0
-Subject: Re: [RFC bluetooth-next 00/15] ieee802154: add support for phy capabilities
-References: <1429807674-24849-1-git-send-email-alex.aring@gmail.com> <5539BA9B.4090903@gmail.com>
-In-Reply-To: <5539BA9B.4090903@gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+In-Reply-To: <5539D098.1000203@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org
-Cc: kernel@pengutronix.de, phoebe.buckheister@itwm.fraunhofer.de
+To: Varka Bhadram <varkabhadram@gmail.com>
+Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de, phoebe.buckheister@itwm.fraunhofer.de
 
-On 04/24/2015 09:08 AM, Varka Bhadram wrote:
+On Fri, Apr 24, 2015 at 10:41:52AM +0530, Varka Bhadram wrote:
+...
+> May be this is not the right place to ask this question.
+> 
 
-> On 04/23/2015 10:17 PM, Alexander Aring wrote:
->> Hi,
->>
->> this patch series contains support for phy capabilities. The phy capabilities
->> can be used to check the setting parameters in nl802154 before we calling the
->> according rdev-ops to send them into SoftMAC/Driver(HardMAC) layer. This avoids
->> that we know before sending them to these layers that we know a "-EINVAL" before,
->> this can be used to check all setting parameters in one setting commands like [0].
->> Additional we can now dump the capabilities into userspace so users know what the
->> phy is supported.
->>
->> The initial values for phy capabilities is that if the driver supports the according
->> handling then the full range of 802.15.4 is supported like csma parameters or
->> max frame retries. If the driver doesn't support the setting of these we assume the
->> 802.15.4 standard values which cannot be changed. (If the phy supports that in any
->> way then the driver is broken and need to support that, we assume that the phy
->> doing 802.15.4 defaults). This case is for mac parameters. In case of that the driver
->> supports the according settings like CSMA/frame retries _but_ not the full range of
->> the 802.15.4 then the driver can overwrite this behaviour by changing the capabilities.
->>
->> For phy parameters, if the driver doesn't set anything, then there is also no
->> possibility to change these values from userspace, this is also a lack of support
->> inside the driver then.
->>
->> At least this patch series also includes a rework of setting/reporting
->> tx_powers/cca_ed_levels values.
->>
->>
->> Note: this patch series based on the ("ieee802154: Add trace events for rdev->ops") by
->> Guido Günther <agx@sigxcpu.org>.
->>
->> - Alex
->>
->> [0] http://www.spinics.net/lists/linux-wpan/msg01603.html
->>
->> Alexander Aring (15):
->>   nl802154: cleanup invalid argument handling
->>   at86rf230: remove tabs after define
->>   ieee802154: move validation check out of softmac
->>   mac802154: check for really changes
->>   mac802154: remove check if operation is supported
->>   ieee802154: introduce wpan_phy_supported
->>   ieee802154: add several phy supported handling
->>   ieee802154: add iftypes capability
->>   ieee802154: add support for get tx powers
->>   ieee802154: add support for get cca ed levels
->>   at86rf230: set cca_modes supported flags
->>   at86rf230: add reset states of tx power level
->>   at86rf230: rework tx power support
->>   at86rf230: rework tx cca energy detection level
->>   nl802154: add support for dump phy capabilities
->>
->>  drivers/net/ieee802154/at86rf230.c | 442 ++++++++++++++++++++++---------------
->>  drivers/net/ieee802154/cc2520.c    |   2 +-
->>  drivers/net/ieee802154/fakelb.c    |  30 +--
->>  drivers/net/ieee802154/mrf24j40.c  |   2 +-
->>  include/net/cfg802154.h            |  43 +++-
->>  include/net/mac802154.h            |  19 ++
->>  include/net/nl802154.h             |  79 +++++++
->>  net/ieee802154/nl-phy.c            |   4 +-
->>  net/ieee802154/nl802154.c          | 198 +++++++++++++++--
->>  net/ieee802154/rdev-ops.h          |  23 ++
->>  net/ieee802154/trace.h             |  62 ++++++
->>  net/mac802154/cfg.c                |  85 ++++---
->>  net/mac802154/driver-ops.h         |  24 ++
->>  net/mac802154/main.c               |  32 +++
->>  14 files changed, 787 insertions(+), 258 deletions(-)
->>
-> Good your work around phy capabilities for wpan. 
->
-> I would suggest to split this series into two.
-> One for the cleanup for at86rf230 and other for
-> the adding phy capabilities. Review will also be
-> easy for us.
->
->
-May be this is not the right place to ask this question.
+creating a new mail to linux-wpan next time? And of course you can ask
+this here.
 
-Do you think that patch at [0] required to us..?
+> Do you think that patch at [0] required to us..?
+> 
 
-That will be useful multi-queue environment. Even though
-its better to have this feature.
+no.
 
-If you agree include this, patch is on the way.. 
+> That will be useful multi-queue environment. Even though
+> its better to have this feature.
+> 
 
-[0]: https://git.kernel.org/cgit/linux/kernel/git/jberg/mac80211-next.git/commit/?h=fast-xmit&id=084d8536fc4f1581f975c1a5fcacd4384555bdcf
+Note about tx multi-queue environment:
 
-Thanks
+Wireless (802.11) != 802.15.4
 
--- 
-Varka Bhadram
+802.11 follows different strategies like 802.15.4 follows [0]. "was
+chartered to investigate a low data rate solution...", of course
+low-power and such things. I would not say that performance isn't
+important for us. (I also like to remove several shift operation in the
+current frame parsing) What I am think is that a multiqueue environment
+gives us not a big benefit.
 
+Maybe I am wrong here, you can implement it and give some benchmark
+tests if you want.
+
+
+Another thing is that the multiqueue in wireless do implement a
+priority queue (that's what I understand). So we need to have somewhere
+option which sets this priority somewhere. [1]
+
+mac802154 do that for different types of content in the payload like
+video or audio streaming. They have some priority enums defined at [2].
+Every queue has then a own priority.
+
+You see that with multiqueue inside mac80211 they want to improve
+different payload content like video which is a use case of the 802.11
+standard. For example streaming videos with 802.15.4, you can forget that.
+But then we have other things like "low energy".
+
+This is why there is no general "IoT" wireless standard outside, each have
+their benefit depends on your use case. If you want to stream videos and call
+it "IoT - Application" then 802.15.4 is not what you want. I did a fast
+googling and found [3], you see different wireless standards compared with 
+Range and data rate.
+
+
+To detect a priority for _maybe_ implement such multiqueue handling in
+802.15.4 then this could be dine by set it in some sockopt of 802.15.4 sockets
+or grab it from DCSP field of IPv6 header, like wireless it also does [1] - 
+"DSCP (RFC 2474):" for 6LoWPAN then. But general this would be a benefit if you
+have a lot of other _lower_ priority traffic.
+
+
+
+It also could be that a wireless driver/transceiver can support
+put frame in "transceiver queue" when current one is transmitted at the moment.
+I don't know if something exists at the moment, the at86rf2xx have only
+one frame buffer which cannot be overwritten while transmit (or can but
+then it need to handle real time, I think we can't never support that
+inside linux).
+
+
+
+
+Now note about patch ("mac80211: use per-CPU TX/RX statistics")
+084d8536fc4f1581f975c1a5fcacd4384555bdcf:
+
+First I don't apply something like that if we doesn't have multiqueue tx queue
+(if it really increase perfomance), because this patch fix something
+which only happen in multiqueue tx queue handling.
+
+Second: This patch is because there is an issue about increment the tx
+stats on netdev while using multiqueue. So far I understand this is
+because the incrementation is not an atomic operation, so this patch to
+a per cpu operation to be sure that this operation "to increment the tx
+stats" can be run on one cpu. So before this patch mulitple queues was
+running and increment these values at the same time which result in some
+inconsistent behaviour.
+
+
+> If you agree include this, patch is on the way.. 
+> 
+
+no. In short:
+
+1. We don't have multple tx queues (and I don't think that we can get
+   much benefits from it).
+
+2. The patch ("mac80211: use per-CPU TX/RX statistics")
+   084d8536fc4f1581f975c1a5fcacd4384555bdcf solved an issue when multiple
+   queues increments the counter on multicore architecture. We don't have
+   this issue because we have only one queue which we stop and wake before
+   transmit and while tx completion. The incrementation is protected by
+   this handling.
+
+
+You should provide patches for an useful case of multiple tx queues with
+benchmark results. Then we need to care about "locking", this is what
+your wireless patch fix does.
+
+- Alex
+
+[0] http://www.ieee802.org/15/pub/TG4.html
+[1] https://wireless.wiki.kernel.org/en/developers/documentation/mac80211/queues
+[2] http://lxr.free-electrons.com/source/include/net/mac80211.h#L102
+[3] http://blogs.freescale.com/wp-content/uploads/2014/11/post-10893-image-4-todays-wireless-landscape.jpg
+[4] 
