@@ -1,15 +1,15 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wg0-f52.google.com ([74.125.82.52]:33999 "EHLO
-	mail-wg0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S933028AbbD1Ks1 (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Tue, 28 Apr 2015 06:48:27 -0400
-Received: by wgso17 with SMTP id o17so146828150wgs.1
-        for <linux-wpan@vger.kernel.org>; Tue, 28 Apr 2015 03:48:25 -0700 (PDT)
-Date: Tue, 28 Apr 2015 12:48:23 +0200
+Received: from mail-wg0-f41.google.com ([74.125.82.41]:33422 "EHLO
+	mail-wg0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1030214AbbD1O3t (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Tue, 28 Apr 2015 10:29:49 -0400
+Received: by wgin8 with SMTP id n8so153495725wgi.0
+        for <linux-wpan@vger.kernel.org>; Tue, 28 Apr 2015 07:29:47 -0700 (PDT)
+Date: Tue, 28 Apr 2015 16:29:38 +0200
 From: Alexander Aring <alex.aring@gmail.com>
 Subject: Re: [PATCH bluetooth-next] cfg802154: pass name_assign_type to
  rdev_add_virtual_intf()
-Message-ID: <20150428104819.GC700@omega>
+Message-ID: <20150428142932.GA758@omega>
 References: <1430210890-1701-1-git-send-email-varkab@cdac.in>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
@@ -30,8 +30,13 @@ On Tue, Apr 28, 2015 at 02:18:10PM +0530, Varka Bhadram wrote:
 >  o NET_NAME_ENUM: Default interface name provided by kernel
 >  o NET_NAME_USER: Interface name provided by user.
 > 
-> Signed-off-by: Varka Bhadram <varkab@cdac.in>
 
-Acked-by: Alexander Aring <alex.aring@gmail.com>
+grml, this patch is fine but it doesn't apply when we have the
+("ieee802154: Add trace events for rdev->ops") commit applied before. I
+reanimate the linux-wpan-next master branch now.
+
+Can you please rebase your patch on this [0]?
 
 - Alex
+
+[0] https://github.com/linux-wpan/linux-wpan-next/commits/master
