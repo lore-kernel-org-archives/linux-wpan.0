@@ -1,39 +1,60 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wg0-f53.google.com ([74.125.82.53]:34212 "EHLO
-	mail-wg0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S964788AbbEAQE5 (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Fri, 1 May 2015 12:04:57 -0400
-Received: by wgso17 with SMTP id o17so94562170wgs.1
-        for <linux-wpan@vger.kernel.org>; Fri, 01 May 2015 09:04:56 -0700 (PDT)
-From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH wpan-misc 2/2] website: add new opentask entries
-Date: Fri,  1 May 2015 18:04:48 +0200
-Message-Id: <1430496288-17239-2-git-send-email-alex.aring@gmail.com>
-In-Reply-To: <1430496288-17239-1-git-send-email-alex.aring@gmail.com>
-References: <1430496288-17239-1-git-send-email-alex.aring@gmail.com>
+Received: from photon.sigxcpu.org ([95.142.169.183]:42851 "EHLO
+	photon.sigxcpu.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750917AbbECNvf (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Sun, 3 May 2015 09:51:35 -0400
+Date: Sun, 3 May 2015 15:51:31 +0200
+From: Guido =?iso-8859-1?Q?G=FCnther?= <agx@sigxcpu.org>
+Subject: Re: [PATCH wpan-next 1/2] nl802154: cleanup invalid argument handling
+Message-ID: <20150503135131.GB19980@bogon.m.sigxcpu.org>
+References: <1430387232-24878-1-git-send-email-alex.aring@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1430387232-24878-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org
-Cc: Alexander Aring <alex.aring@gmail.com>
+To: Alexander Aring <alex.aring@gmail.com>
+Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de
 
-Signed-off-by: Alexander Aring <alex.aring@gmail.com>
----
- website/index.txt | 2 ++
- 1 file changed, 2 insertions(+)
+On Thu, Apr 30, 2015 at 11:47:11AM +0200, Alexander Aring wrote:
+> This patch cleanups the -EINVAL cases by combining them in one
+> condition.
+> 
+> Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+> ---
+>  net/ieee802154/nl802154.c | 12 ++++--------
+>  1 file changed, 4 insertions(+), 8 deletions(-)
+> 
+> diff --git a/net/ieee802154/nl802154.c b/net/ieee802154/nl802154.c
+> index f3c12f6..c01f4bb 100644
+> --- a/net/ieee802154/nl802154.c
+> +++ b/net/ieee802154/nl802154.c
+> @@ -668,10 +668,8 @@ static int nl802154_set_pan_id(struct sk_buff *skb, struct genl_info *info)
+>  		return -EBUSY;
+>  
+>  	/* don't change address fields on monitor */
+> -	if (wpan_dev->iftype == NL802154_IFTYPE_MONITOR)
+> -		return -EINVAL;
+> -
+> -	if (!info->attrs[NL802154_ATTR_PAN_ID])
+> +	if (wpan_dev->iftype == NL802154_IFTYPE_MONITOR ||
+> +	    !info->attrs[NL802154_ATTR_PAN_ID])
+>  		return -EINVAL;
+>  
+>  	pan_id = nla_get_le16(info->attrs[NL802154_ATTR_PAN_ID]);
+> @@ -691,10 +689,8 @@ static int nl802154_set_short_addr(struct sk_buff *skb, struct genl_info *info)
+>  		return -EBUSY;
+>  
+>  	/* don't change address fields on monitor */
+> -	if (wpan_dev->iftype == NL802154_IFTYPE_MONITOR)
+> -		return -EINVAL;
+> -
+> -	if (!info->attrs[NL802154_ATTR_SHORT_ADDR])
+> +	if (wpan_dev->iftype == NL802154_IFTYPE_MONITOR ||
+> +	    !info->attrs[NL802154_ATTR_SHORT_ADDR])
+>  		return -EINVAL;
+>  
+>  	short_addr = nla_get_le16(info->attrs[NL802154_ATTR_SHORT_ADDR]);
 
-diff --git a/website/index.txt b/website/index.txt
-index e6e2427..7cede5d 100644
---- a/website/index.txt
-+++ b/website/index.txt
-@@ -147,6 +147,8 @@ https://github.com/linux-wpan/linux-wpan-next/blob/wpan_rework_rfc/net/ieee80215
- * devicetree extended addr setting, draft is here http://www.spinics.net/lists/linux-wpan/msg01503.html[ieee802154: add usual way to get extended address via device tree]
- * RPL? - not our job, need to go through ipv6 netdev community, but we should do something to have a "started" mainline solution.
- * cleanup/fix 802.15.4 af raw/dgram socket code. We should use bluetooth socket code as example.
-+* In wireless exists a "station dump", we need something similar "node dump" with all neighbour nodes and their last LQI value, addresses, etc. information.
-+* A wpan-phy is an own device class, we need pm suspend handling like in wireless http://lxr.free-electrons.com/source/net/wireless/sysfs.c#L154[callbacks which are in #ifdef CONFIG_PM].
- 
- Rework
- ~~~~~~
--- 
-2.3.6
-
+ACK
