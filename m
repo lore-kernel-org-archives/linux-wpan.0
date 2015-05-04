@@ -1,49 +1,36 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from senator.holtmann.net ([87.106.208.187]:52713 "EHLO
-	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1161037AbbE2NmD convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Fri, 29 May 2015 09:42:03 -0400
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
-Subject: Re: [PATCHv2 bluetooth-next 0/4] Atusb driver improvements
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1432889488-28420-1-git-send-email-stefan@osg.samsung.com>
-Date: Fri, 29 May 2015 15:41:50 +0200
-Content-Transfer-Encoding: 8BIT
-Message-Id: <F7D32BA7-A9DC-41A9-886A-EF1F0C91C148@holtmann.org>
-References: <1432889488-28420-1-git-send-email-stefan@osg.samsung.com>
+Received: from mail-wi0-f177.google.com ([209.85.212.177]:38340 "EHLO
+	mail-wi0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751662AbbEDSfW (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Mon, 4 May 2015 14:35:22 -0400
+Received: by wiun10 with SMTP id n10so119800841wiu.1
+        for <linux-wpan@vger.kernel.org>; Mon, 04 May 2015 11:35:21 -0700 (PDT)
+Date: Mon, 4 May 2015 20:35:18 +0200
+From: Alexander Aring <alex.aring@gmail.com>
+Subject: for all openlabs tranceiver users
+Message-ID: <20150504183515.GD2385@omega.Speedport_W_921V_1_37_000>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Stefan Schmidt <stefan@osg.samsung.com>
-Cc: linux-wpan@vger.kernel.org, Alexander Aring <alex.aring@gmail.com>
+To: linux-wpan@vger.kernel.org
+Cc: stilwellt@openlabs.co
 
-Hi Stefan,
+Hi,
 
-> Some patches to let the atusb driver catchup a bit with newer stack features.
-> Namely we now support tx power and promiscuous mode setting. The first patch
-> adds some infrastructure for this by adding a function to write parts of a
-> register.
-> 
-> The last patch adds me as the maintainer for the driver. Alex suggested that
-> I should do this and as I have the device, working on the firmware as well
-> and are motivated to enhance it I think its a good idea.
-> 
-> Changes in v2:
-> 	Fix checkpatch complains pointed out by Varka Bhadram
-> 
-> Stefan Schmidt (4):
->  ieee802154/atusb: Add function for partial register writes
->  ieee802154/atusb: Add .set_txpower operation to the driver
->  ieee802154/atusb: Add .set_promiscuous_mode driver operation
->  MAINTAINERS: Add myself as maintainer for the atusb driver
-> 
-> MAINTAINERS                    |   8 ++++
-> drivers/net/ieee802154/atusb.c | 101 +++++++++++++++++++++++++++++++++--------
-> 2 files changed, 90 insertions(+), 19 deletions(-)
+maybe you read the other mail about the RPi and openlabs transceiver
+module.
 
-all 4 patches have been applied to bluetooth-next tree.
+at86rf233 datasheet says 7.5 Mhz is the highest clock, but since the RPi
+clock can run at 7.35 Mhz I expierence issues with the openlabs transceiver.
 
-Regards
+Set the max spi clock to 6 Mhz solved this issue. Please update the
+device tree according to that value.
 
-Marcel
+I tested two different transceivers with the same issue at 7.35 Mhz spi
+clock.
 
+Thanks.
+
+- Alex
