@@ -1,27 +1,23 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f176.google.com ([209.85.212.176]:33236 "EHLO
-	mail-wi0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751084AbbEDJVp (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Mon, 4 May 2015 05:21:45 -0400
-Received: by wief7 with SMTP id f7so73092534wie.0
-        for <linux-wpan@vger.kernel.org>; Mon, 04 May 2015 02:21:44 -0700 (PDT)
+Received: from mail-wi0-f182.google.com ([209.85.212.182]:37781 "EHLO
+	mail-wi0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751036AbbEDJXU (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Mon, 4 May 2015 05:23:20 -0400
+Received: by widdi4 with SMTP id di4so103398015wid.0
+        for <linux-wpan@vger.kernel.org>; Mon, 04 May 2015 02:23:19 -0700 (PDT)
 MIME-Version: 1.0
 In-Reply-To: <20150504084432.GA2385@omega.Speedport_W_921V_1_37_000>
 References: <CAG9Fz+sU3k2U03szspUF3oKnZOSrJrs=aG1Tgs=dnxxJ74=-3Q@mail.gmail.com>
 	<20150504084432.GA2385@omega.Speedport_W_921V_1_37_000>
-Date: Mon, 4 May 2015 11:21:43 +0200
-Message-ID: <CAG9Fz+uGthm9-dRXgoC+hPXFPSW4krwUYkBEohY4f7GM_6qWtg@mail.gmail.com>
+Date: Mon, 4 May 2015 11:23:19 +0200
+Message-ID: <CAG9Fz+vc9C_gnL-FR+7D72bxGg_jNpRkc8z_5mgiBwBZoPmuug@mail.gmail.com>
 Subject: Re: Open task "missing enums", latest standard and where to put enums?
 From: Christoffer Holmstedt <christoffer.holmstedt@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org, Alexander Aring <alex.aring@gmail.com>
-
-Thank you Alexander for that comprehensive answer, I will look in to it.
---
-Christoffer Holmstedt
-
+To: Alexander Aring <alex.aring@gmail.com>
+Cc: linux-wpan@vger.kernel.org
 
 2015-05-04 10:44 GMT+02:00 Alexander Aring <alex.aring@gmail.com>:
 > Hi,
@@ -211,3 +207,9 @@ Christoffer Holmstedt
 > [0] https://github.com/linux-wpan/wpan-tools/blob/master/src/interface.c#L21
 > [1] http://lxr.free-electrons.com/source/include/net/nl802154.h#L136
 > [2] https://github.com/linux-wpan/linux-wpan-next/blob/wpan_rework_rfc/include/net/ieee802154.h#L178
+
+Thank you Alexander for that comprehensive answer, I will look in to it.
+
+Sorry for top posting in previous email.
+--
+Christoffer Holmstedt
