@@ -1,85 +1,97 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f181.google.com ([209.85.212.181]:36024 "EHLO
+Received: from mail-wi0-f181.google.com ([209.85.212.181]:34331 "EHLO
 	mail-wi0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750977AbbEDS0T (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Mon, 4 May 2015 14:26:19 -0400
-Received: by wizk4 with SMTP id k4so131680424wiz.1
-        for <linux-wpan@vger.kernel.org>; Mon, 04 May 2015 11:26:17 -0700 (PDT)
-Date: Mon, 4 May 2015 20:26:14 +0200
+	with ESMTP id S1751183AbbEFLnU (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Wed, 6 May 2015 07:43:20 -0400
+Received: by wicmx19 with SMTP id mx19so123086579wic.1
+        for <linux-wpan@vger.kernel.org>; Wed, 06 May 2015 04:43:19 -0700 (PDT)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: Re: corrupted data on bcm2835 spi controller
-Message-ID: <20150504182613.GC2385@omega.Speedport_W_921V_1_37_000>
-References: <20150504165720.GB2385@omega.Speedport_W_921V_1_37_000>
- <124B99F4-221A-41EA-89BF-13D201E81104@martin.sperl.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <124B99F4-221A-41EA-89BF-13D201E81104@martin.sperl.org>
+Subject: [PATCHv2 wpan-tools 1/2] treewide: change transmit power to mbm
+Date: Wed,  6 May 2015 13:43:06 +0200
+Message-Id: <1430912587-17824-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Martin Sperl <kernel@martin.sperl.org>
-Cc: linux-wpan@vger.kernel.org, agx@sigxcpu.org, swarren@wwwdotorg.org, lee@kernel.org, linux-rpi-kernel@lists.infradead.org
+To: linux-wpan@vger.kernel.org
+Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-On Mon, May 04, 2015 at 07:30:06PM +0200, Martin Sperl wrote:
-> 
-> > On 04.05.2015, at 18:57, Alexander Aring <alex.aring@gmail.com> wrote:
-> > 
-> > My last test shows many corrupted data and I bisected this issue on
-> > commit 210b49231af6a3ede5de3c90850dbf1134a855c2 ("spi: bcm2835: clock
-> > divider can be a multiple of 2").
-> > 
-> > After reverting this commit by running:
-> > 
-> > git revert 210b49231af6a3ede5de3c90850dbf1134a855c2
-> > 
-> > there is no corrupted data anymore.
-> > 
-> > 
-> > My spi device-tree entry for the at86rf230 driver is the following:
-> > 
-> > &spi {
-> >        status = "okay";
-> >        at86rf233@0 {
-> >                compatible = "atmel,at86rf233";
-> >                spi-max-frequency = <7500000>;
-> >                reg = <0>;
-> >                interrupts = <23 4>;
-> >                interrupt-parent = <&gpio>;
-> >                reset-gpio = <&gpio 24 1>;
-> >                sleep-gpio = <&gpio 25 1>;
-> >                xtal-trim = /bits/ 8 <0x0F>;
-> >        };
-> > };
-> 
-> Does it show when you set spi-max-frequency to 6MHz, 5MHz or to 4MHz?
-> 
+This patch changes the transmit power nl802154 setting variable to
+handle as a mbm values instead dbm.
 
-with 6 Mhz it works fine.
+Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+---
+ src/info.c      | 2 +-
+ src/iwpan.h     | 5 +++++
+ src/nl_extras.h | 5 +++++
+ src/phy.c       | 4 ++--
+ 4 files changed, 13 insertions(+), 3 deletions(-)
 
-> Note that without that patch you are actually running at 3.91MHz
-> spi-bus speed (clock divider of 64) with this patch you run at 
-> 7.35 MHz (clock divider of 34).
-> 
-> Datasheet for the chip shows that 7.5MHz is the max for spi clock,
-> maybe  the device is having issues at this high frequency already.
-> 
+diff --git a/src/info.c b/src/info.c
+index e155470..c52d304 100644
+--- a/src/info.c
++++ b/src/info.c
+@@ -83,7 +83,7 @@ static int print_phy_handler(struct nl_msg *msg, void *arg)
+ 	}
+ 
+ 	if (tb_msg[NL802154_ATTR_TX_POWER])
+-		printf("tx_power: %d\n", nla_get_s8(tb_msg[NL802154_ATTR_TX_POWER]));
++		printf("tx_power: %.2g\n", MBM_TO_DBM(nla_get_s32(tb_msg[NL802154_ATTR_TX_POWER])));
+ 
+ 	return 0;
+ }
+diff --git a/src/iwpan.h b/src/iwpan.h
+index 867bb18..2c309fc 100644
+--- a/src/iwpan.h
++++ b/src/iwpan.h
+@@ -107,6 +107,11 @@ struct cmd {
+ #define DECLARE_SECTION(_name)						\
+ 	extern struct cmd __section ## _ ## _name;
+ 
++#define DBM_TO_MBM(gain)						\
++	((int)(((float)gain) * 100))
++#define MBM_TO_DBM(gain)						\
++	((float)(gain) / 100)
++
+ int handle_cmd(struct nl802154_state *state, enum id_input idby,
+ 	       int argc, char **argv);
+ 
+diff --git a/src/nl_extras.h b/src/nl_extras.h
+index a591461..9d841aa 100644
+--- a/src/nl_extras.h
++++ b/src/nl_extras.h
+@@ -28,6 +28,11 @@ static inline int8_t nla_get_s8(struct nlattr *nla)
+ #define NLA_PUT_S32(n, attrtype, value) \
+ 	NLA_PUT_TYPE(n, int32_t, attrtype, value)
+ 
++static inline int32_t nla_get_s32(struct nlattr *nla)
++{
++	return *(int32_t *) nla_data(nla);
++}
++
+ #endif /* NLA_S32 */
+ 
+ #ifndef NLA_S64
+diff --git a/src/phy.c b/src/phy.c
+index 2e25013..ee0e7ad 100644
+--- a/src/phy.c
++++ b/src/phy.c
+@@ -64,7 +64,7 @@ static int handle_tx_power_set(struct nl802154_state *state,
+ 	if (*end != '\0')
+ 		return 1;
+ 
+-	NLA_PUT_S8(msg, NL802154_ATTR_TX_POWER, dbm);
++	NLA_PUT_S32(msg, NL802154_ATTR_TX_POWER, DBM_TO_MBM(dbm));
+ 
+ 	return 0;
+ 
+@@ -132,7 +132,7 @@ static int handle_cca_ed_level(struct nl802154_state *state,
+ 	if (*end != '\0')
+ 		return 1;
+ 
+-	NLA_PUT_S32(msg, NL802154_ATTR_CCA_ED_LEVEL, level);
++	NLA_PUT_S32(msg, NL802154_ATTR_CCA_ED_LEVEL, DBM_TO_MBM(level));
+ 
+ 	return 0;
+ 
+-- 
+2.3.7
 
-yes, that should be the issue.
-
-> One more question: is the wireless reception worse or are there
-> issues talking to the chip itself (spi errors in dmesg).
-> 
-
-The wireless connection was worse, there was no spi errors which was
-reported by dmesg.
-
-> Maybe with the higher SPI-clock frequencies more high-frequent
-> noise is produced due to the PCB-layout which negatively impacts 
-> wireless reception/transmission.
-> 
-
-Yes seems so, I will report that.
-
-Thanks.
-
-- Alex
