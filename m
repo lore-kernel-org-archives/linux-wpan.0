@@ -1,14 +1,14 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f175.google.com ([209.85.212.175]:35834 "EHLO
-	mail-wi0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752316AbbEFLlM (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Wed, 6 May 2015 07:41:12 -0400
-Received: by widdi4 with SMTP id di4so198260414wid.0
-        for <linux-wpan@vger.kernel.org>; Wed, 06 May 2015 04:41:10 -0700 (PDT)
+Received: from mail-wi0-f180.google.com ([209.85.212.180]:38197 "EHLO
+	mail-wi0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752348AbbEFLlN (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Wed, 6 May 2015 07:41:13 -0400
+Received: by wiun10 with SMTP id n10so18805141wiu.1
+        for <linux-wpan@vger.kernel.org>; Wed, 06 May 2015 04:41:11 -0700 (PDT)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCHv2 wpan-next 05/16] ieee802154: add several phy supported handling
-Date: Wed,  6 May 2015 13:40:17 +0200
-Message-Id: <1430912428-17284-6-git-send-email-alex.aring@gmail.com>
+Subject: [PATCHv2 wpan-next 06/16] mac802154: check for really changes
+Date: Wed,  6 May 2015 13:40:18 +0200
+Message-Id: <1430912428-17284-7-git-send-email-alex.aring@gmail.com>
 In-Reply-To: <1430912428-17284-1-git-send-email-alex.aring@gmail.com>
 References: <1430912428-17284-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
@@ -16,202 +16,126 @@ List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
 Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-This patch adds support for phy supported handling for all other already
-existing handling 802.15.4 functionality. We assume now a fully 802.15.4
-complaint transceiver at phy allocation. If a transceiver can support
-802.15.4 default values only, then the values should be overwirtten by
-values the transceiver supports. If the transceiver doesn't set the
-according hardware flags, we assume the 802.15.4 defaults now which
-cannot be changed.
+This patch adds check if the value is really changed inside pib/mib.
+If a transceiver do support only one value for e.g. max_be then this
+will also handle that the driver layer doesn't need to care about
+handling to set one value only.
 
 Signed-off-by: Alexander Aring <alex.aring@gmail.com>
-Suggested-by: Phoebe Buckheister <phoebe.buckheister@itwm.fraunhofer.de>
 ---
- include/net/cfg802154.h   | 24 +++++++++++++++++++++++-
- include/net/nl802154.h    | 22 ++++++++++++++++++++++
- net/ieee802154/nl802154.c | 22 +++++++++++++++++-----
- net/mac802154/main.c      | 26 ++++++++++++++++++++++++++
- 4 files changed, 88 insertions(+), 6 deletions(-)
+ include/net/cfg802154.h | 12 ++++++++++++
+ net/mac802154/cfg.c     | 26 ++++++++++++++++++++++++++
+ 2 files changed, 38 insertions(+)
 
 diff --git a/include/net/cfg802154.h b/include/net/cfg802154.h
-index 1941d7a..e53242a 100644
+index e53242a..de00e5c 100644
 --- a/include/net/cfg802154.h
 +++ b/include/net/cfg802154.h
-@@ -61,8 +61,30 @@ struct cfg802154_ops {
- 				struct wpan_dev *wpan_dev, bool mode);
+@@ -92,6 +92,18 @@ struct wpan_phy_cca {
+ 	enum nl802154_cca_opts opt;
  };
  
 +static inline bool
-+wpan_phy_supported_bool(bool b, enum nl802154_supported_bool_states st)
++wpan_phy_cca_cmp(const struct wpan_phy_cca *a, const struct wpan_phy_cca *b)
 +{
-+	switch (st) {
-+	case NL802154_SUPPORTED_BOOL_TRUE:
-+		return b;
-+	case NL802154_SUPPORTED_BOOL_FALSE:
-+		return !b;
-+	case NL802154_SUPPORTED_BOOL_BOTH:
-+		return true;
-+	default:
-+		WARN_ON(1);
-+	}
++	if (a->mode != b->mode)
++		return false;
 +
-+	return false;
++	if (a->mode == NL802154_CCA_ENERGY_CARRIER)
++		return a->opt == b->opt;
++
++	return true;
 +}
 +
- struct wpan_phy_supported {
--	u32 channels[IEEE802154_MAX_PAGE + 1];
-+	u32 channels[IEEE802154_MAX_PAGE + 1],
-+	    cca_modes, cca_opts;
-+	enum nl802154_supported_bool_states lbt;
-+	u8 min_minbe, max_minbe, min_maxbe, max_maxbe,
-+	   min_csma_backoffs, max_csma_backoffs;
-+	s8 min_frame_retries, max_frame_retries;
- };
+ struct wpan_phy {
+ 	struct mutex pib_lock;
  
- struct wpan_phy_cca {
-diff --git a/include/net/nl802154.h b/include/net/nl802154.h
-index f8b5bc9..0552771 100644
---- a/include/net/nl802154.h
-+++ b/include/net/nl802154.h
-@@ -162,4 +162,26 @@ enum nl802154_cca_opts {
- 	NL802154_CCA_OPT_ATTR_MAX = __NL802154_CCA_OPT_ATTR_AFTER_LAST - 1
- };
+diff --git a/net/mac802154/cfg.c b/net/mac802154/cfg.c
+index c636015..45c4dc3 100644
+--- a/net/mac802154/cfg.c
++++ b/net/mac802154/cfg.c
+@@ -73,6 +73,10 @@ ieee802154_set_channel(struct wpan_phy *wpan_phy, u8 page, u8 channel)
  
-+/**
-+ * enum nl802154_supported_bool_states - bool states for bool capability entry
-+ *
-+ * @NL802154_SUPPORTED_BOOL_FALSE: indicates to set false
-+ * @NL802154_SUPPORTED_BOOL_TRUE: indicates to set true
-+ * @__NL802154_SUPPORTED_BOOL_INVALD: reserved
-+ * @NL802154_SUPPORTED_BOOL_BOTH: indicates to set true and false
-+ * @__NL802154_SUPPORTED_BOOL_AFTER_LAST: Internal
-+ * @NL802154_SUPPORTED_BOOL_MAX: highest value for bool states
-+ */
-+enum nl802154_supported_bool_states {
-+	NL802154_SUPPORTED_BOOL_FALSE,
-+	NL802154_SUPPORTED_BOOL_TRUE,
-+	/* to handle them in a mask */
-+	__NL802154_SUPPORTED_BOOL_INVALD,
-+	NL802154_SUPPORTED_BOOL_BOTH,
+ 	ASSERT_RTNL();
+ 
++	if (wpan_phy->current_page == page &&
++	    wpan_phy->current_channel == channel)
++		return 0;
 +
-+	/* keep last */
-+	__NL802154_SUPPORTED_BOOL_AFTER_LAST,
-+	NL802154_SUPPORTED_BOOL_MAX = __NL802154_SUPPORTED_BOOL_AFTER_LAST - 1
-+};
+ 	ret = drv_set_channel(local, page, channel);
+ 	if (!ret) {
+ 		wpan_phy->current_page = page;
+@@ -91,6 +95,9 @@ ieee802154_set_cca_mode(struct wpan_phy *wpan_phy,
+ 
+ 	ASSERT_RTNL();
+ 
++	if (wpan_phy_cca_cmp(&wpan_phy->cca, cca))
++		return 0;
 +
- #endif /* __NL802154_H */
-diff --git a/net/ieee802154/nl802154.c b/net/ieee802154/nl802154.c
-index d271879..fa0c404 100644
---- a/net/ieee802154/nl802154.c
-+++ b/net/ieee802154/nl802154.c
-@@ -642,7 +642,9 @@ static int nl802154_set_cca_mode(struct sk_buff *skb, struct genl_info *info)
+ 	/* check if phy support this setting */
+ 	if (!(local->hw.flags & IEEE802154_HW_CCA_MODE))
+ 		return -EOPNOTSUPP;
+@@ -108,6 +115,9 @@ ieee802154_set_pan_id(struct wpan_phy *wpan_phy, struct wpan_dev *wpan_dev,
+ {
+ 	ASSERT_RTNL();
  
- 	cca.mode = nla_get_u32(info->attrs[NL802154_ATTR_CCA_MODE]);
- 	/* checking 802.15.4 constraints */
--	if (cca.mode < NL802154_CCA_ENERGY || cca.mode > NL802154_CCA_ATTR_MAX)
-+	if (cca.mode < NL802154_CCA_ENERGY ||
-+	    cca.mode > NL802154_CCA_ATTR_MAX ||
-+	    !(rdev->wpan_phy.supported.cca_modes & BIT(cca.mode)))
- 		return -EINVAL;
- 
- 	if (cca.mode == NL802154_CCA_ENERGY_CARRIER) {
-@@ -650,7 +652,8 @@ static int nl802154_set_cca_mode(struct sk_buff *skb, struct genl_info *info)
- 			return -EINVAL;
- 
- 		cca.opt = nla_get_u32(info->attrs[NL802154_ATTR_CCA_OPT]);
--		if (cca.opt > NL802154_CCA_OPT_ATTR_MAX)
-+		if (cca.opt > NL802154_CCA_OPT_ATTR_MAX ||
-+		    !(rdev->wpan_phy.supported.cca_opts & BIT(cca.opt)))
- 			return -EINVAL;
- 	}
- 
-@@ -744,7 +747,11 @@ nl802154_set_backoff_exponent(struct sk_buff *skb, struct genl_info *info)
- 	max_be = nla_get_u8(info->attrs[NL802154_ATTR_MAX_BE]);
- 
- 	/* check 802.15.4 constraints */
--	if (max_be < 3 || max_be > 8 || min_be > max_be)
-+	if (min_be < rdev->wpan_phy.supported.min_minbe ||
-+	    min_be > rdev->wpan_phy.supported.max_minbe ||
-+	    max_be < rdev->wpan_phy.supported.min_maxbe ||
-+	    max_be > rdev->wpan_phy.supported.max_maxbe ||
-+	    min_be > max_be)
- 		return -EINVAL;
- 
- 	return rdev_set_backoff_exponent(rdev, wpan_dev, min_be, max_be);
-@@ -769,7 +776,8 @@ nl802154_set_max_csma_backoffs(struct sk_buff *skb, struct genl_info *info)
- 			info->attrs[NL802154_ATTR_MAX_CSMA_BACKOFFS]);
- 
- 	/* check 802.15.4 constraints */
--	if (max_csma_backoffs > 5)
-+	if (max_csma_backoffs < rdev->wpan_phy.supported.min_csma_backoffs ||
-+	    max_csma_backoffs > rdev->wpan_phy.supported.max_csma_backoffs)
- 		return -EINVAL;
- 
- 	return rdev_set_max_csma_backoffs(rdev, wpan_dev, max_csma_backoffs);
-@@ -793,7 +801,8 @@ nl802154_set_max_frame_retries(struct sk_buff *skb, struct genl_info *info)
- 			info->attrs[NL802154_ATTR_MAX_FRAME_RETRIES]);
- 
- 	/* check 802.15.4 constraints */
--	if (max_frame_retries < -1 || max_frame_retries > 7)
-+	if (max_frame_retries < rdev->wpan_phy.supported.min_frame_retries ||
-+	    max_frame_retries > rdev->wpan_phy.supported.max_frame_retries)
- 		return -EINVAL;
- 
- 	return rdev_set_max_frame_retries(rdev, wpan_dev, max_frame_retries);
-@@ -813,6 +822,9 @@ static int nl802154_set_lbt_mode(struct sk_buff *skb, struct genl_info *info)
- 		return -EINVAL;
- 
- 	mode = !!nla_get_u8(info->attrs[NL802154_ATTR_LBT_MODE]);
-+	if (!wpan_phy_supported_bool(mode, rdev->wpan_phy.supported.lbt))
-+		return -EINVAL;
++	if (wpan_dev->pan_id == pan_id)
++		return 0;
 +
- 	return rdev_set_lbt_mode(rdev, wpan_dev, mode);
+ 	wpan_dev->pan_id = pan_id;
+ 	return 0;
  }
+@@ -121,6 +131,10 @@ ieee802154_set_backoff_exponent(struct wpan_phy *wpan_phy,
  
-diff --git a/net/mac802154/main.c b/net/mac802154/main.c
-index 68b9667..8834fa7 100644
---- a/net/mac802154/main.c
-+++ b/net/mac802154/main.c
-@@ -107,6 +107,15 @@ ieee802154_alloc_hw(size_t priv_data_len, const struct ieee802154_ops *ops)
+ 	ASSERT_RTNL();
  
- 	skb_queue_head_init(&local->skb_queue);
- 
-+	/* init supported flags with 802.15.4 default ranges */
-+	phy->supported.max_minbe = 8;
-+	phy->supported.min_maxbe = 3;
-+	phy->supported.max_maxbe = 8;
-+	phy->supported.min_frame_retries = -1;
-+	phy->supported.max_frame_retries = 7;
-+	phy->supported.max_csma_backoffs = 5;
-+	phy->supported.lbt = NL802154_SUPPORTED_BOOL_FALSE;
++	if (wpan_dev->min_be == min_be &&
++	    wpan_dev->max_be == max_be)
++		return 0;
 +
- 	return &local->hw;
+ 	if (!(local->hw.flags & IEEE802154_HW_CSMA_PARAMS))
+ 		return -EOPNOTSUPP;
+ 
+@@ -135,6 +149,9 @@ ieee802154_set_short_addr(struct wpan_phy *wpan_phy, struct wpan_dev *wpan_dev,
+ {
+ 	ASSERT_RTNL();
+ 
++	if (wpan_dev->short_addr == short_addr)
++		return 0;
++
+ 	wpan_dev->short_addr = short_addr;
+ 	return 0;
  }
- EXPORT_SYMBOL(ieee802154_alloc_hw);
-@@ -155,6 +164,23 @@ int ieee802154_register_hw(struct ieee802154_hw *hw)
+@@ -148,6 +165,9 @@ ieee802154_set_max_csma_backoffs(struct wpan_phy *wpan_phy,
  
- 	ieee802154_setup_wpan_phy_pib(local->phy);
+ 	ASSERT_RTNL();
  
-+	if (!(hw->flags & IEEE802154_HW_CSMA_PARAMS)) {
-+		local->phy->supported.min_csma_backoffs = 4;
-+		local->phy->supported.max_csma_backoffs = 4;
-+		local->phy->supported.min_maxbe = 5;
-+		local->phy->supported.max_maxbe = 5;
-+		local->phy->supported.min_minbe = 3;
-+		local->phy->supported.max_minbe = 3;
-+	}
++	if (wpan_dev->csma_retries == max_csma_backoffs)
++		return 0;
 +
-+	if (!(hw->flags & IEEE802154_HW_FRAME_RETRIES)) {
-+		/* TODO should be 3, but our default value is -1 which means
-+		 * no ARET handling.
-+		 */
-+		local->phy->supported.min_frame_retries = -1;
-+		local->phy->supported.max_frame_retries = -1;
-+	}
+ 	if (!(local->hw.flags & IEEE802154_HW_CSMA_PARAMS))
+ 		return -EOPNOTSUPP;
+ 
+@@ -164,6 +184,9 @@ ieee802154_set_max_frame_retries(struct wpan_phy *wpan_phy,
+ 
+ 	ASSERT_RTNL();
+ 
++	if (wpan_dev->frame_retries == max_frame_retries)
++		return 0;
 +
- 	rc = wpan_phy_register(local->phy);
- 	if (rc < 0)
- 		goto out_wq;
+ 	if (!(local->hw.flags & IEEE802154_HW_FRAME_RETRIES))
+ 		return -EOPNOTSUPP;
+ 
+@@ -179,6 +202,9 @@ ieee802154_set_lbt_mode(struct wpan_phy *wpan_phy, struct wpan_dev *wpan_dev,
+ 
+ 	ASSERT_RTNL();
+ 
++	if (wpan_dev->lbt == mode)
++		return 0;
++
+ 	if (!(local->hw.flags & IEEE802154_HW_LBT))
+ 		return -EOPNOTSUPP;
+ 
 -- 
 2.3.7
 
