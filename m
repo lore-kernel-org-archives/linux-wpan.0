@@ -1,14 +1,14 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wg0-f42.google.com ([74.125.82.42]:35782 "EHLO
-	mail-wg0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752318AbbEFLlN (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Wed, 6 May 2015 07:41:13 -0400
-Received: by wgyo15 with SMTP id o15so8388552wgy.2
-        for <linux-wpan@vger.kernel.org>; Wed, 06 May 2015 04:41:12 -0700 (PDT)
+Received: from mail-wi0-f169.google.com ([209.85.212.169]:37016 "EHLO
+	mail-wi0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752362AbbEFLlP (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Wed, 6 May 2015 07:41:15 -0400
+Received: by widdi4 with SMTP id di4so18827658wid.0
+        for <linux-wpan@vger.kernel.org>; Wed, 06 May 2015 04:41:13 -0700 (PDT)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCHv2 wpan-next 07/16] mac802154: remove check if operation is supported
-Date: Wed,  6 May 2015 13:40:19 +0200
-Message-Id: <1430912428-17284-8-git-send-email-alex.aring@gmail.com>
+Subject: [PATCHv2 wpan-next 08/16] ieee802154: add iftypes capability
+Date: Wed,  6 May 2015 13:40:20 +0200
+Message-Id: <1430912428-17284-9-git-send-email-alex.aring@gmail.com>
 In-Reply-To: <1430912428-17284-1-git-send-email-alex.aring@gmail.com>
 References: <1430912428-17284-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
@@ -16,99 +16,66 @@ List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
 Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-This patch removes the check if operation is supported by driver layer.
-This is done now by capabilities flags, if these are valid then the
-driver should support the operation, otherwise a WARN_ON occurs.
+This patch adds capability flags for supported interface types.
 
 Signed-off-by: Alexander Aring <alex.aring@gmail.com>
 ---
- net/mac802154/cfg.c | 24 ------------------------
- 1 file changed, 24 deletions(-)
+ include/net/cfg802154.h   | 2 +-
+ net/ieee802154/nl802154.c | 3 ++-
+ net/mac802154/main.c      | 6 ++++++
+ 3 files changed, 9 insertions(+), 2 deletions(-)
 
-diff --git a/net/mac802154/cfg.c b/net/mac802154/cfg.c
-index 45c4dc3..d5290ea 100644
---- a/net/mac802154/cfg.c
-+++ b/net/mac802154/cfg.c
-@@ -98,10 +98,6 @@ ieee802154_set_cca_mode(struct wpan_phy *wpan_phy,
- 	if (wpan_phy_cca_cmp(&wpan_phy->cca, cca))
- 		return 0;
+diff --git a/include/net/cfg802154.h b/include/net/cfg802154.h
+index de00e5c..387db39 100644
+--- a/include/net/cfg802154.h
++++ b/include/net/cfg802154.h
+@@ -80,7 +80,7 @@ wpan_phy_supported_bool(bool b, enum nl802154_supported_bool_states st)
  
--	/* check if phy support this setting */
--	if (!(local->hw.flags & IEEE802154_HW_CCA_MODE))
--		return -EOPNOTSUPP;
--
- 	ret = drv_set_cca_mode(local, cca);
- 	if (!ret)
- 		wpan_phy->cca = *cca;
-@@ -127,17 +123,12 @@ ieee802154_set_backoff_exponent(struct wpan_phy *wpan_phy,
- 				struct wpan_dev *wpan_dev,
- 				u8 min_be, u8 max_be)
- {
--	struct ieee802154_local *local = wpan_phy_priv(wpan_phy);
--
- 	ASSERT_RTNL();
+ struct wpan_phy_supported {
+ 	u32 channels[IEEE802154_MAX_PAGE + 1],
+-	    cca_modes, cca_opts;
++	    cca_modes, cca_opts, iftypes;
+ 	enum nl802154_supported_bool_states lbt;
+ 	u8 min_minbe, max_minbe, min_maxbe, max_maxbe,
+ 	   min_csma_backoffs, max_csma_backoffs;
+diff --git a/net/ieee802154/nl802154.c b/net/ieee802154/nl802154.c
+index fa0c404..00b646d 100644
+--- a/net/ieee802154/nl802154.c
++++ b/net/ieee802154/nl802154.c
+@@ -575,7 +575,8 @@ static int nl802154_new_interface(struct sk_buff *skb, struct genl_info *info)
  
- 	if (wpan_dev->min_be == min_be &&
- 	    wpan_dev->max_be == max_be)
- 		return 0;
+ 	if (info->attrs[NL802154_ATTR_IFTYPE]) {
+ 		type = nla_get_u32(info->attrs[NL802154_ATTR_IFTYPE]);
+-		if (type > NL802154_IFTYPE_MAX)
++		if (type > NL802154_IFTYPE_MAX ||
++		    !(rdev->wpan_phy.supported.iftypes & BIT(type)))
+ 			return -EINVAL;
+ 	}
  
--	if (!(local->hw.flags & IEEE802154_HW_CSMA_PARAMS))
--		return -EOPNOTSUPP;
--
- 	wpan_dev->min_be = min_be;
- 	wpan_dev->max_be = max_be;
- 	return 0;
-@@ -161,16 +152,11 @@ ieee802154_set_max_csma_backoffs(struct wpan_phy *wpan_phy,
- 				 struct wpan_dev *wpan_dev,
- 				 u8 max_csma_backoffs)
- {
--	struct ieee802154_local *local = wpan_phy_priv(wpan_phy);
--
- 	ASSERT_RTNL();
+diff --git a/net/mac802154/main.c b/net/mac802154/main.c
+index 8834fa7..f3c0a46 100644
+--- a/net/mac802154/main.c
++++ b/net/mac802154/main.c
+@@ -116,6 +116,9 @@ ieee802154_alloc_hw(size_t priv_data_len, const struct ieee802154_ops *ops)
+ 	phy->supported.max_csma_backoffs = 5;
+ 	phy->supported.lbt = NL802154_SUPPORTED_BOOL_FALSE;
  
- 	if (wpan_dev->csma_retries == max_csma_backoffs)
- 		return 0;
- 
--	if (!(local->hw.flags & IEEE802154_HW_CSMA_PARAMS))
--		return -EOPNOTSUPP;
--
- 	wpan_dev->csma_retries = max_csma_backoffs;
- 	return 0;
++	/* always supported */
++	phy->supported.iftypes = BIT(NL802154_IFTYPE_NODE);
++
+ 	return &local->hw;
  }
-@@ -180,16 +166,11 @@ ieee802154_set_max_frame_retries(struct wpan_phy *wpan_phy,
- 				 struct wpan_dev *wpan_dev,
- 				 s8 max_frame_retries)
- {
--	struct ieee802154_local *local = wpan_phy_priv(wpan_phy);
--
- 	ASSERT_RTNL();
+ EXPORT_SYMBOL(ieee802154_alloc_hw);
+@@ -181,6 +184,9 @@ int ieee802154_register_hw(struct ieee802154_hw *hw)
+ 		local->phy->supported.max_frame_retries = -1;
+ 	}
  
- 	if (wpan_dev->frame_retries == max_frame_retries)
- 		return 0;
- 
--	if (!(local->hw.flags & IEEE802154_HW_FRAME_RETRIES))
--		return -EOPNOTSUPP;
--
- 	wpan_dev->frame_retries = max_frame_retries;
- 	return 0;
- }
-@@ -198,16 +179,11 @@ static int
- ieee802154_set_lbt_mode(struct wpan_phy *wpan_phy, struct wpan_dev *wpan_dev,
- 			bool mode)
- {
--	struct ieee802154_local *local = wpan_phy_priv(wpan_phy);
--
- 	ASSERT_RTNL();
- 
- 	if (wpan_dev->lbt == mode)
- 		return 0;
- 
--	if (!(local->hw.flags & IEEE802154_HW_LBT))
--		return -EOPNOTSUPP;
--
- 	wpan_dev->lbt = mode;
- 	return 0;
- }
++	if (hw->flags & IEEE802154_HW_PROMISCUOUS)
++		local->phy->supported.iftypes |= BIT(NL802154_IFTYPE_MONITOR);
++
+ 	rc = wpan_phy_register(local->phy);
+ 	if (rc < 0)
+ 		goto out_wq;
 -- 
 2.3.7
 
