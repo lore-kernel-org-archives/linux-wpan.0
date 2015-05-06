@@ -1,14 +1,14 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f169.google.com ([209.85.212.169]:37016 "EHLO
-	mail-wi0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752362AbbEFLlP (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Wed, 6 May 2015 07:41:15 -0400
-Received: by widdi4 with SMTP id di4so18827658wid.0
-        for <linux-wpan@vger.kernel.org>; Wed, 06 May 2015 04:41:13 -0700 (PDT)
+Received: from mail-wg0-f51.google.com ([74.125.82.51]:36697 "EHLO
+	mail-wg0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752366AbbEFLlQ (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Wed, 6 May 2015 07:41:16 -0400
+Received: by wgiu9 with SMTP id u9so8366847wgi.3
+        for <linux-wpan@vger.kernel.org>; Wed, 06 May 2015 04:41:15 -0700 (PDT)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCHv2 wpan-next 08/16] ieee802154: add iftypes capability
-Date: Wed,  6 May 2015 13:40:20 +0200
-Message-Id: <1430912428-17284-9-git-send-email-alex.aring@gmail.com>
+Subject: [PATCHv2 wpan-next 09/16] ieee802154: add support for get tx powers
+Date: Wed,  6 May 2015 13:40:21 +0200
+Message-Id: <1430912428-17284-10-git-send-email-alex.aring@gmail.com>
 In-Reply-To: <1430912428-17284-1-git-send-email-alex.aring@gmail.com>
 References: <1430912428-17284-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
@@ -16,66 +16,178 @@ List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
 Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-This patch adds capability flags for supported interface types.
+This patch adds support for get transmit power levels. The driver needs
+to implement a driver ops callback which can iterate over each transmit
+power level index. This callback can return zero for successful
+iteration, 1 for ending the iteration, 2 for continue the iteration
+which an index increment and values below 0 zero if failed.
 
 Signed-off-by: Alexander Aring <alex.aring@gmail.com>
 ---
- include/net/cfg802154.h   | 2 +-
- net/ieee802154/nl802154.c | 3 ++-
- net/mac802154/main.c      | 6 ++++++
- 3 files changed, 9 insertions(+), 2 deletions(-)
+ include/net/cfg802154.h    |  1 +
+ include/net/mac802154.h    | 10 +++++++++-
+ net/ieee802154/rdev-ops.h  | 11 +++++++++++
+ net/ieee802154/trace.h     | 31 +++++++++++++++++++++++++++++++
+ net/mac802154/cfg.c        | 11 +++++++++++
+ net/mac802154/driver-ops.h | 12 ++++++++++++
+ 6 files changed, 75 insertions(+), 1 deletion(-)
 
 diff --git a/include/net/cfg802154.h b/include/net/cfg802154.h
-index de00e5c..387db39 100644
+index 387db39..6758e61 100644
 --- a/include/net/cfg802154.h
 +++ b/include/net/cfg802154.h
-@@ -80,7 +80,7 @@ wpan_phy_supported_bool(bool b, enum nl802154_supported_bool_states st)
- 
- struct wpan_phy_supported {
- 	u32 channels[IEEE802154_MAX_PAGE + 1],
--	    cca_modes, cca_opts;
-+	    cca_modes, cca_opts, iftypes;
- 	enum nl802154_supported_bool_states lbt;
- 	u8 min_minbe, max_minbe, min_maxbe, max_maxbe,
- 	   min_csma_backoffs, max_csma_backoffs;
-diff --git a/net/ieee802154/nl802154.c b/net/ieee802154/nl802154.c
-index fa0c404..00b646d 100644
---- a/net/ieee802154/nl802154.c
-+++ b/net/ieee802154/nl802154.c
-@@ -575,7 +575,8 @@ static int nl802154_new_interface(struct sk_buff *skb, struct genl_info *info)
- 
- 	if (info->attrs[NL802154_ATTR_IFTYPE]) {
- 		type = nla_get_u32(info->attrs[NL802154_ATTR_IFTYPE]);
--		if (type > NL802154_IFTYPE_MAX)
-+		if (type > NL802154_IFTYPE_MAX ||
-+		    !(rdev->wpan_phy.supported.iftypes & BIT(type)))
- 			return -EINVAL;
- 	}
- 
-diff --git a/net/mac802154/main.c b/net/mac802154/main.c
-index 8834fa7..f3c0a46 100644
---- a/net/mac802154/main.c
-+++ b/net/mac802154/main.c
-@@ -116,6 +116,9 @@ ieee802154_alloc_hw(size_t priv_data_len, const struct ieee802154_ops *ops)
- 	phy->supported.max_csma_backoffs = 5;
- 	phy->supported.lbt = NL802154_SUPPORTED_BOOL_FALSE;
- 
-+	/* always supported */
-+	phy->supported.iftypes = BIT(NL802154_IFTYPE_NODE);
-+
- 	return &local->hw;
+@@ -44,6 +44,7 @@ struct cfg802154_ops {
+ 	int	(*set_channel)(struct wpan_phy *wpan_phy, u8 page, u8 channel);
+ 	int	(*set_cca_mode)(struct wpan_phy *wpan_phy,
+ 				const struct wpan_phy_cca *cca);
++	int	(*get_tx_powers)(struct wpan_phy *wpan_phy, s32 *mbm, u32 idx);
+ 	int	(*set_pan_id)(struct wpan_phy *wpan_phy,
+ 			      struct wpan_dev *wpan_dev, __le16 pan_id);
+ 	int	(*set_short_addr)(struct wpan_phy *wpan_phy,
+diff --git a/include/net/mac802154.h b/include/net/mac802154.h
+index 3b76aab..be8d3de 100644
+--- a/include/net/mac802154.h
++++ b/include/net/mac802154.h
+@@ -174,6 +174,12 @@ struct ieee802154_hw {
+  *	  Set radio transmit power in mBm. Called with pib_lock held.
+  *	  Returns either zero, or negative errno.
+  *
++ * get_txpowers:
++ *	  Get radio transmit powers in mBm. Called when rtnl lock is held.
++ *	  Parameter idx descibes the index of transmit power which is supported.
++ *	  Returns either zero or negative errno. One should be returned for
++ *	  indicate to break the iteration of tx power settings.
++ *
+  * set_lbt
+  *	  Enables or disables listen before talk on the device. Called with
+  *	  pib_lock held.
+@@ -213,7 +219,9 @@ struct ieee802154_ops {
+ 	int		(*set_hw_addr_filt)(struct ieee802154_hw *hw,
+ 					    struct ieee802154_hw_addr_filt *filt,
+ 					    unsigned long changed);
+-	int		(*set_txpower)(struct ieee802154_hw *hw, s32 dbm);
++	int		(*set_txpower)(struct ieee802154_hw *hw, s32 mbm);
++	int		(*get_tx_powers)(struct ieee802154_hw *hw, s32 *mbm,
++					 u32 idx);
+ 	int		(*set_lbt)(struct ieee802154_hw *hw, bool on);
+ 	int		(*set_cca_mode)(struct ieee802154_hw *hw,
+ 					const struct wpan_phy_cca *cca);
+diff --git a/net/ieee802154/rdev-ops.h b/net/ieee802154/rdev-ops.h
+index 7b5a9dd..8fc1afe 100644
+--- a/net/ieee802154/rdev-ops.h
++++ b/net/ieee802154/rdev-ops.h
+@@ -75,6 +75,17 @@ rdev_set_cca_mode(struct cfg802154_registered_device *rdev,
  }
- EXPORT_SYMBOL(ieee802154_alloc_hw);
-@@ -181,6 +184,9 @@ int ieee802154_register_hw(struct ieee802154_hw *hw)
- 		local->phy->supported.max_frame_retries = -1;
- 	}
  
-+	if (hw->flags & IEEE802154_HW_PROMISCUOUS)
-+		local->phy->supported.iftypes |= BIT(NL802154_IFTYPE_MONITOR);
+ static inline int
++rdev_get_tx_powers(struct cfg802154_registered_device *rdev, s32 *mbm, u32 idx)
++{
++	int ret;
 +
- 	rc = wpan_phy_register(local->phy);
- 	if (rc < 0)
- 		goto out_wq;
++	trace_802154_rdev_get_tx_powers(&rdev->wpan_phy, idx);
++	ret = rdev->ops->get_tx_powers(&rdev->wpan_phy, mbm, idx);
++	trace_802154_rdev_return_int_mbm(&rdev->wpan_phy, ret, mbm);
++	return ret;
++}
++
++static inline int
+ rdev_set_pan_id(struct cfg802154_registered_device *rdev,
+ 		struct wpan_dev *wpan_dev, __le16 pan_id)
+ {
+diff --git a/net/ieee802154/trace.h b/net/ieee802154/trace.h
+index 5ac25eb..3c54b5e 100644
+--- a/net/ieee802154/trace.h
++++ b/net/ieee802154/trace.h
+@@ -108,6 +108,37 @@ TRACE_EVENT(802154_rdev_set_cca_mode,
+ 		  WPAN_CCA_PR_ARG)
+ );
+ 
++TRACE_EVENT(802154_rdev_get_tx_powers,
++	TP_PROTO(struct wpan_phy *wpan_phy, u32 idx),
++	TP_ARGS(wpan_phy, idx),
++	TP_STRUCT__entry(
++		WPAN_PHY_ENTRY
++		__field(u32, idx)
++	),
++	TP_fast_assign(
++		WPAN_PHY_ASSIGN;
++		__entry->idx = idx;
++	),
++	TP_printk(WPAN_PHY_PR_FMT ", idx: %d", WPAN_PHY_PR_ARG, __entry->idx)
++);
++
++TRACE_EVENT(802154_rdev_return_int_mbm,
++	TP_PROTO(struct wpan_phy *wpan_phy, int ret, s32 *mbm),
++	TP_ARGS(wpan_phy, ret, mbm),
++	TP_STRUCT__entry(
++		WPAN_PHY_ENTRY
++		__field(int, ret)
++		__field(s32, mbm)
++	),
++	TP_fast_assign(
++		WPAN_PHY_ASSIGN;
++		__entry->ret = ret;
++		__entry->mbm = *mbm;
++	),
++	TP_printk(WPAN_PHY_PR_FMT ", returned: %d, mbm: %d", WPAN_PHY_PR_ARG,
++		  __entry->ret, __entry->mbm)
++);
++
+ DECLARE_EVENT_CLASS(802154_le16_template,
+ 	TP_PROTO(struct wpan_phy *wpan_phy, struct wpan_dev *wpan_dev,
+ 		 __le16 le16arg),
+diff --git a/net/mac802154/cfg.c b/net/mac802154/cfg.c
+index d5290ea..4228069 100644
+--- a/net/mac802154/cfg.c
++++ b/net/mac802154/cfg.c
+@@ -106,6 +106,16 @@ ieee802154_set_cca_mode(struct wpan_phy *wpan_phy,
+ }
+ 
+ static int
++ieee802154_get_tx_powers(struct wpan_phy *wpan_phy, s32 *mbm, u32 idx)
++{
++	struct ieee802154_local *local = wpan_phy_priv(wpan_phy);
++
++	ASSERT_RTNL();
++
++	return drv_get_tx_powers(local, mbm, idx);
++}
++
++static int
+ ieee802154_set_pan_id(struct wpan_phy *wpan_phy, struct wpan_dev *wpan_dev,
+ 		      __le16 pan_id)
+ {
+@@ -195,6 +205,7 @@ const struct cfg802154_ops mac802154_config_ops = {
+ 	.del_virtual_intf = ieee802154_del_iface,
+ 	.set_channel = ieee802154_set_channel,
+ 	.set_cca_mode = ieee802154_set_cca_mode,
++	.get_tx_powers = ieee802154_get_tx_powers,
+ 	.set_pan_id = ieee802154_set_pan_id,
+ 	.set_short_addr = ieee802154_set_short_addr,
+ 	.set_backoff_exponent = ieee802154_set_backoff_exponent,
+diff --git a/net/mac802154/driver-ops.h b/net/mac802154/driver-ops.h
+index caecd5f..27a59dc 100644
+--- a/net/mac802154/driver-ops.h
++++ b/net/mac802154/driver-ops.h
+@@ -70,6 +70,18 @@ static inline int drv_set_tx_power(struct ieee802154_local *local, s32 mbm)
+ 	return local->ops->set_txpower(&local->hw, mbm);
+ }
+ 
++static inline int
++drv_get_tx_powers(struct ieee802154_local *local, s32 *mbm, u32 idx)
++{
++	might_sleep();
++
++	/* if not implemented indicate a empty list */
++	if (!local->ops->get_tx_powers)
++		return 1;
++
++	return local->ops->get_tx_powers(&local->hw, mbm, idx);
++}
++
+ static inline int drv_set_cca_mode(struct ieee802154_local *local,
+ 				   const struct wpan_phy_cca *cca)
+ {
 -- 
 2.3.7
 
