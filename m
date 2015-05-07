@@ -1,44 +1,35 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f177.google.com ([209.85.212.177]:33837 "EHLO
-	mail-wi0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753681AbbEHQsk (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Fri, 8 May 2015 12:48:40 -0400
-Received: by wicmx19 with SMTP id mx19so40589378wic.1
-        for <linux-wpan@vger.kernel.org>; Fri, 08 May 2015 09:48:39 -0700 (PDT)
-Date: Fri, 8 May 2015 18:48:36 +0200
-From: Alexander Aring <alex.aring@gmail.com>
-Subject: Re: netlink 802154
-Message-ID: <20150508164831.GB15416@omega>
-References: <554CE644.50801@sssup.it>
+Received: from sssup.it ([193.205.80.95]:37507 "EHLO sssup.it"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751021AbbEGQtp (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+	Thu, 7 May 2015 12:49:45 -0400
+Received: from [10.30.2.205] (account m.petracca@sssup.it [10.30.2.205] verified)
+  by sssup.it (CommuniGate Pro SMTP 5.3.15)
+  with ESMTPSA id 101563530 for linux-wpan@vger.kernel.org; Thu, 07 May 2015 18:49:44 +0200
+Message-ID: <554B97A8.2040802@sssup.it>
+Date: Thu, 07 May 2015 18:49:44 +0200
+From: Matteo Petracca <matteo.petracca@sssup.it>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <554CE644.50801@sssup.it>
+Subject: Error in including IEEE802154.h
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Matteo Petracca <matteo.petracca@sssup.it>
-Cc: linux-wpan@vger.kernel.org
+To: linux-wpan@vger.kernel.org
 
-Hi,
+Dear all,
+I gave a program in kernel 3.8.17 in which I successfully include
+ieee802154.h by simply witing:
 
-On Fri, May 08, 2015 at 06:37:24PM +0200, Matteo Petracca wrote:
-> Dear all,
-> I would like to write a user space application using the new nl802154.
-> Do you have any example?
-> 
+#include <ieee802154.h>
 
-General example would be [0]. Also you can search for stuff to talk with
-nl80211, which should be the same. We have different enums defines, but
-making a general netlink communication should be the same.
+In my BeagleBone now I have just upgraded the kernel to 4.0.1,
+and compiling the same code I get:
 
+fatal error: ieee802154.h: No such file or directory
 
+Any hint?
 
-BIG WARNING:
+Best,
+Matteo
 
-this interface is still in development. We currently not guarantee that
-the interface is always the same! I will try to do my best for backwards
-compatibility.
-
-- Alex
-
-[0] https://github.com/linux-wpan/wpan-tools
