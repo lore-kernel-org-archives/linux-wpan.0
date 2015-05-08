@@ -1,130 +1,214 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wg0-f52.google.com ([74.125.82.52]:35411 "EHLO
-	mail-wg0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753214AbbEHSYv (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Fri, 8 May 2015 14:24:51 -0400
-Received: by wgyo15 with SMTP id o15so79976049wgy.2
-        for <linux-wpan@vger.kernel.org>; Fri, 08 May 2015 11:24:50 -0700 (PDT)
+Received: from mail-wg0-f50.google.com ([74.125.82.50]:35442 "EHLO
+	mail-wg0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751167AbbEHSYx (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Fri, 8 May 2015 14:24:53 -0400
+Received: by wgyo15 with SMTP id o15so79976885wgy.2
+        for <linux-wpan@vger.kernel.org>; Fri, 08 May 2015 11:24:52 -0700 (PDT)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCHv3 bluetooth-next 05/17] ieee802154: change cca ed level to mbm
-Date: Fri,  8 May 2015 20:24:16 +0200
-Message-Id: <1431109468-4891-6-git-send-email-alex.aring@gmail.com>
+Subject: [PATCHv3 bluetooth-next 06/17] ieee802154: introduce wpan_phy_supported
+Date: Fri,  8 May 2015 20:24:17 +0200
+Message-Id: <1431109468-4891-7-git-send-email-alex.aring@gmail.com>
 In-Reply-To: <1431109468-4891-1-git-send-email-alex.aring@gmail.com>
 References: <1431109468-4891-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
-Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
+Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>, Varka Bhadram <varkabhadram@gmail.com>, Alan Ott <alan@signal11.us>
 
-This patch change the handling of cca energy detection level from dbm to
-mbm. This prepares to handle floating point cca energy detection levels
-values. The old netlink 802.15.4 will convert the dbm value to mbm for
-handling backward compatibility.
+This patch introduce the wpan_phy_supported struct for wpan_phy. There
+is currently no way to check if a transceiver can handle IEEE 802.15.4
+complaint values. With this struct we can check before if the
+transceiver supports these values before sending to driver layer.
 
 Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+Suggested-by: Phoebe Buckheister <phoebe.buckheister@itwm.fraunhofer.de>
+Cc: Varka Bhadram <varkabhadram@gmail.com>
+Cc: Alan Ott <alan@signal11.us>
 ---
- drivers/net/ieee802154/at86rf230.c | 3 ++-
- include/net/cfg802154.h            | 1 +
- include/net/mac802154.h            | 5 ++---
- net/ieee802154/nl-mac.c            | 4 ++--
- net/mac802154/driver-ops.h         | 4 ++--
- 5 files changed, 9 insertions(+), 8 deletions(-)
+ drivers/net/ieee802154/at86rf230.c |  8 ++++----
+ drivers/net/ieee802154/cc2520.c    |  2 +-
+ drivers/net/ieee802154/fakelb.c    | 30 +++++++++++++++---------------
+ drivers/net/ieee802154/mrf24j40.c  |  2 +-
+ include/net/cfg802154.h            |  6 +++++-
+ net/ieee802154/nl-phy.c            |  4 ++--
+ net/ieee802154/nl802154.c          |  4 ++--
+ 7 files changed, 30 insertions(+), 26 deletions(-)
 
 diff --git a/drivers/net/ieee802154/at86rf230.c b/drivers/net/ieee802154/at86rf230.c
-index 3a303e4..e68d45e 100644
+index e68d45e..151d57f 100644
 --- a/drivers/net/ieee802154/at86rf230.c
 +++ b/drivers/net/ieee802154/at86rf230.c
-@@ -1268,9 +1268,10 @@ at86rf23x_get_desens_steps(struct at86rf230_local *lp, s32 level)
- }
+@@ -1579,7 +1579,7 @@ at86rf230_detect_device(struct at86rf230_local *lp)
+ 	case 3:
+ 		chip = "at86rf231";
+ 		lp->data = &at86rf231_data;
+-		lp->hw->phy->channels_supported[0] = 0x7FFF800;
++		lp->hw->phy->supported.channels[0] = 0x7FFF800;
+ 		lp->hw->phy->current_channel = 11;
+ 		lp->hw->phy->symbol_duration = 16;
+ 		break;
+@@ -1587,15 +1587,15 @@ at86rf230_detect_device(struct at86rf230_local *lp)
+ 		chip = "at86rf212";
+ 		lp->data = &at86rf212_data;
+ 		lp->hw->flags |= IEEE802154_HW_LBT;
+-		lp->hw->phy->channels_supported[0] = 0x00007FF;
+-		lp->hw->phy->channels_supported[2] = 0x00007FF;
++		lp->hw->phy->supported.channels[0] = 0x00007FF;
++		lp->hw->phy->supported.channels[2] = 0x00007FF;
+ 		lp->hw->phy->current_channel = 5;
+ 		lp->hw->phy->symbol_duration = 25;
+ 		break;
+ 	case 11:
+ 		chip = "at86rf233";
+ 		lp->data = &at86rf233_data;
+-		lp->hw->phy->channels_supported[0] = 0x7FFF800;
++		lp->hw->phy->supported.channels[0] = 0x7FFF800;
+ 		lp->hw->phy->current_channel = 13;
+ 		lp->hw->phy->symbol_duration = 16;
+ 		break;
+diff --git a/drivers/net/ieee802154/cc2520.c b/drivers/net/ieee802154/cc2520.c
+index f833b8b..84b28a0 100644
+--- a/drivers/net/ieee802154/cc2520.c
++++ b/drivers/net/ieee802154/cc2520.c
+@@ -653,7 +653,7 @@ static int cc2520_register(struct cc2520_private *priv)
+ 	ieee802154_random_extended_addr(&priv->hw->phy->perm_extended_addr);
  
- static int
--at86rf230_set_cca_ed_level(struct ieee802154_hw *hw, s32 level)
-+at86rf230_set_cca_ed_level(struct ieee802154_hw *hw, s32 mbm)
- {
- 	struct at86rf230_local *lp = hw->priv;
-+	s32 level = mbm / 100;
+ 	/* We do support only 2.4 Ghz */
+-	priv->hw->phy->channels_supported[0] = 0x7FFF800;
++	priv->hw->phy->supported.channels[0] = 0x7FFF800;
+ 	priv->hw->flags = IEEE802154_HW_OMIT_CKSUM | IEEE802154_HW_AACK |
+ 			  IEEE802154_HW_AFILT;
  
- 	if (level < lp->data->rssi_base_val || level > 30)
- 		return -EINVAL;
+diff --git a/drivers/net/ieee802154/fakelb.c b/drivers/net/ieee802154/fakelb.c
+index dc2bfb6..91bbf03 100644
+--- a/drivers/net/ieee802154/fakelb.c
++++ b/drivers/net/ieee802154/fakelb.c
+@@ -149,35 +149,35 @@ static int fakelb_add_one(struct device *dev, struct fakelb_priv *fake)
+ 	priv->hw = hw;
+ 
+ 	/* 868 MHz BPSK	802.15.4-2003 */
+-	hw->phy->channels_supported[0] |= 1;
++	hw->phy->supported.channels[0] |= 1;
+ 	/* 915 MHz BPSK	802.15.4-2003 */
+-	hw->phy->channels_supported[0] |= 0x7fe;
++	hw->phy->supported.channels[0] |= 0x7fe;
+ 	/* 2.4 GHz O-QPSK 802.15.4-2003 */
+-	hw->phy->channels_supported[0] |= 0x7FFF800;
++	hw->phy->supported.channels[0] |= 0x7FFF800;
+ 	/* 868 MHz ASK 802.15.4-2006 */
+-	hw->phy->channels_supported[1] |= 1;
++	hw->phy->supported.channels[1] |= 1;
+ 	/* 915 MHz ASK 802.15.4-2006 */
+-	hw->phy->channels_supported[1] |= 0x7fe;
++	hw->phy->supported.channels[1] |= 0x7fe;
+ 	/* 868 MHz O-QPSK 802.15.4-2006 */
+-	hw->phy->channels_supported[2] |= 1;
++	hw->phy->supported.channels[2] |= 1;
+ 	/* 915 MHz O-QPSK 802.15.4-2006 */
+-	hw->phy->channels_supported[2] |= 0x7fe;
++	hw->phy->supported.channels[2] |= 0x7fe;
+ 	/* 2.4 GHz CSS 802.15.4a-2007 */
+-	hw->phy->channels_supported[3] |= 0x3fff;
++	hw->phy->supported.channels[3] |= 0x3fff;
+ 	/* UWB Sub-gigahertz 802.15.4a-2007 */
+-	hw->phy->channels_supported[4] |= 1;
++	hw->phy->supported.channels[4] |= 1;
+ 	/* UWB Low band 802.15.4a-2007 */
+-	hw->phy->channels_supported[4] |= 0x1e;
++	hw->phy->supported.channels[4] |= 0x1e;
+ 	/* UWB High band 802.15.4a-2007 */
+-	hw->phy->channels_supported[4] |= 0xffe0;
++	hw->phy->supported.channels[4] |= 0xffe0;
+ 	/* 750 MHz O-QPSK 802.15.4c-2009 */
+-	hw->phy->channels_supported[5] |= 0xf;
++	hw->phy->supported.channels[5] |= 0xf;
+ 	/* 750 MHz MPSK 802.15.4c-2009 */
+-	hw->phy->channels_supported[5] |= 0xf0;
++	hw->phy->supported.channels[5] |= 0xf0;
+ 	/* 950 MHz BPSK 802.15.4d-2009 */
+-	hw->phy->channels_supported[6] |= 0x3ff;
++	hw->phy->supported.channels[6] |= 0x3ff;
+ 	/* 950 MHz GFSK 802.15.4d-2009 */
+-	hw->phy->channels_supported[6] |= 0x3ffc00;
++	hw->phy->supported.channels[6] |= 0x3ffc00;
+ 
+ 	INIT_LIST_HEAD(&priv->list);
+ 	priv->fake = fake;
+diff --git a/drivers/net/ieee802154/mrf24j40.c b/drivers/net/ieee802154/mrf24j40.c
+index fba2dfd..f2a1bd1 100644
+--- a/drivers/net/ieee802154/mrf24j40.c
++++ b/drivers/net/ieee802154/mrf24j40.c
+@@ -750,7 +750,7 @@ static int mrf24j40_probe(struct spi_device *spi)
+ 
+ 	devrec->hw->priv = devrec;
+ 	devrec->hw->parent = &devrec->spi->dev;
+-	devrec->hw->phy->channels_supported[0] = CHANNEL_MASK;
++	devrec->hw->phy->supported.channels[0] = CHANNEL_MASK;
+ 	devrec->hw->flags = IEEE802154_HW_OMIT_CKSUM | IEEE802154_HW_AACK |
+ 			    IEEE802154_HW_AFILT;
+ 
 diff --git a/include/net/cfg802154.h b/include/net/cfg802154.h
-index b5b3f9f..9ced2c9 100644
+index 9ced2c9..1941d7a 100644
 --- a/include/net/cfg802154.h
 +++ b/include/net/cfg802154.h
-@@ -91,6 +91,7 @@ struct wpan_phy {
+@@ -61,6 +61,10 @@ struct cfg802154_ops {
+ 				struct wpan_dev *wpan_dev, bool mode);
+ };
  
- 	__le64 perm_extended_addr;
- 
-+	/* current cca ed threshold in mBm */
- 	s32 cca_ed_level;
- 
- 	/* PHY depended MAC PIB values */
-diff --git a/include/net/mac802154.h b/include/net/mac802154.h
-index e863a85..71e2456 100644
---- a/include/net/mac802154.h
-+++ b/include/net/mac802154.h
-@@ -184,7 +184,7 @@ struct ieee802154_hw {
-  *	  Returns either zero, or negative errno.
-  *
-  * set_cca_ed_level
-- *	  Sets the CCA energy detection threshold in dBm. Called with pib_lock
-+ *	  Sets the CCA energy detection threshold in mBm. Called with pib_lock
-  *	  held.
-  *	  Returns either zero, or negative errno.
-  *
-@@ -217,8 +217,7 @@ struct ieee802154_ops {
- 	int		(*set_lbt)(struct ieee802154_hw *hw, bool on);
- 	int		(*set_cca_mode)(struct ieee802154_hw *hw,
- 					const struct wpan_phy_cca *cca);
--	int		(*set_cca_ed_level)(struct ieee802154_hw *hw,
--					    s32 level);
-+	int		(*set_cca_ed_level)(struct ieee802154_hw *hw, s32 mbm);
- 	int		(*set_csma_params)(struct ieee802154_hw *hw,
- 					   u8 min_be, u8 max_be, u8 retries);
- 	int		(*set_frame_retries)(struct ieee802154_hw *hw,
-diff --git a/net/ieee802154/nl-mac.c b/net/ieee802154/nl-mac.c
-index 4ba2e13..cdc1cc3 100644
---- a/net/ieee802154/nl-mac.c
-+++ b/net/ieee802154/nl-mac.c
-@@ -122,7 +122,7 @@ static int ieee802154_nl_fill_iface(struct sk_buff *msg, u32 portid,
- 		    nla_put_u8(msg, IEEE802154_ATTR_CCA_MODE,
- 			       params.cca.mode) ||
- 		    nla_put_s32(msg, IEEE802154_ATTR_CCA_ED_LEVEL,
--				params.cca_ed_level) ||
-+				params.cca_ed_level / 100) ||
- 		    nla_put_u8(msg, IEEE802154_ATTR_CSMA_RETRIES,
- 			       params.csma_retries) ||
- 		    nla_put_u8(msg, IEEE802154_ATTR_CSMA_MIN_BE,
-@@ -519,7 +519,7 @@ int ieee802154_set_macparams(struct sk_buff *skb, struct genl_info *info)
- 		params.cca.mode = nla_get_u8(info->attrs[IEEE802154_ATTR_CCA_MODE]);
- 
- 	if (info->attrs[IEEE802154_ATTR_CCA_ED_LEVEL])
--		params.cca_ed_level = nla_get_s32(info->attrs[IEEE802154_ATTR_CCA_ED_LEVEL]);
-+		params.cca_ed_level = nla_get_s32(info->attrs[IEEE802154_ATTR_CCA_ED_LEVEL]) * 100;
- 
- 	if (info->attrs[IEEE802154_ATTR_CSMA_RETRIES])
- 		params.csma_retries = nla_get_u8(info->attrs[IEEE802154_ATTR_CSMA_RETRIES]);
-diff --git a/net/mac802154/driver-ops.h b/net/mac802154/driver-ops.h
-index d289ae3..caecd5f 100644
---- a/net/mac802154/driver-ops.h
-+++ b/net/mac802154/driver-ops.h
-@@ -96,7 +96,7 @@ static inline int drv_set_lbt_mode(struct ieee802154_local *local, bool mode)
- }
- 
- static inline int
--drv_set_cca_ed_level(struct ieee802154_local *local, s32 ed_level)
-+drv_set_cca_ed_level(struct ieee802154_local *local, s32 mbm)
- {
- 	might_sleep();
- 
-@@ -105,7 +105,7 @@ drv_set_cca_ed_level(struct ieee802154_local *local, s32 ed_level)
- 		return -EOPNOTSUPP;
++struct wpan_phy_supported {
++	u32 channels[IEEE802154_MAX_PAGE + 1];
++};
++
+ struct wpan_phy_cca {
+ 	enum nl802154_cca_modes mode;
+ 	enum nl802154_cca_opts opt;
+@@ -84,7 +88,7 @@ struct wpan_phy {
+ 	 */
+ 	u8 current_channel;
+ 	u8 current_page;
+-	u32 channels_supported[IEEE802154_MAX_PAGE + 1];
++	struct wpan_phy_supported supported;
+ 	/* current transmit_power in mBm */
+ 	s32 transmit_power;
+ 	struct wpan_phy_cca cca;
+diff --git a/net/ieee802154/nl-phy.c b/net/ieee802154/nl-phy.c
+index 346c666..cbc0d09 100644
+--- a/net/ieee802154/nl-phy.c
++++ b/net/ieee802154/nl-phy.c
+@@ -56,8 +56,8 @@ static int ieee802154_nl_fill_phy(struct sk_buff *msg, u32 portid,
+ 	    nla_put_u8(msg, IEEE802154_ATTR_CHANNEL, phy->current_channel))
+ 		goto nla_put_failure;
+ 	for (i = 0; i < 32; i++) {
+-		if (phy->channels_supported[i])
+-			buf[pages++] = phy->channels_supported[i] | (i << 27);
++		if (phy->supported.channels[i])
++			buf[pages++] = phy->supported.channels[i] | (i << 27);
  	}
+ 	if (pages &&
+ 	    nla_put(msg, IEEE802154_ATTR_CHANNEL_PAGE_LIST,
+diff --git a/net/ieee802154/nl802154.c b/net/ieee802154/nl802154.c
+index f3185c7..d271879 100644
+--- a/net/ieee802154/nl802154.c
++++ b/net/ieee802154/nl802154.c
+@@ -248,7 +248,7 @@ nl802154_send_wpan_phy_channels(struct cfg802154_registered_device *rdev,
  
--	return local->ops->set_cca_ed_level(&local->hw, ed_level);
-+	return local->ops->set_cca_ed_level(&local->hw, mbm);
- }
+ 	for (page = 0; page <= IEEE802154_MAX_PAGE; page++) {
+ 		if (nla_put_u32(msg, NL802154_ATTR_SUPPORTED_CHANNEL,
+-				rdev->wpan_phy.channels_supported[page]))
++				rdev->wpan_phy.supported.channels[page]))
+ 			return -ENOBUFS;
+ 	}
+ 	nla_nest_end(msg, nl_page);
+@@ -626,7 +626,7 @@ static int nl802154_set_channel(struct sk_buff *skb, struct genl_info *info)
  
- static inline int drv_set_pan_id(struct ieee802154_local *local, __le16 pan_id)
+ 	/* check 802.15.4 constraints */
+ 	if (page > IEEE802154_MAX_PAGE || channel > IEEE802154_MAX_CHANNEL ||
+-	    !(rdev->wpan_phy.channels_supported[page] & BIT(channel)))
++	    !(rdev->wpan_phy.supported.channels[page] & BIT(channel)))
+ 		return -EINVAL;
+ 
+ 	return rdev_set_channel(rdev, page, channel);
 -- 
 2.3.7
 
