@@ -1,27 +1,33 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wg0-f41.google.com ([74.125.82.41]:36018 "EHLO
-	mail-wg0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752878AbbEHMOK (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Fri, 8 May 2015 08:14:10 -0400
-Received: by wgiu9 with SMTP id u9so70681037wgi.3
-        for <linux-wpan@vger.kernel.org>; Fri, 08 May 2015 05:14:09 -0700 (PDT)
+Received: from mout.kundenserver.de ([212.227.17.10]:64404 "EHLO
+	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752994AbbEHMQN (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Fri, 8 May 2015 08:16:13 -0400
+Message-ID: <554CA909.5030201@xsilon.com>
+Date: Fri, 08 May 2015 13:16:09 +0100
+From: Martin Townsend <martin.townsend@xsilon.com>
 MIME-Version: 1.0
-Date: Fri, 8 May 2015 14:14:09 +0200
-Message-ID: <CAG9Fz+vGLZAu++Vj8iV-+9jUvBR7hXohPm1Ydt=S=PKSxyC9VQ@mail.gmail.com>
-Subject: CHIP - 9 dollar computer on Kickstarter
-From: Christoffer Holmstedt <christoffer.holmstedt@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Subject: HW Address Filter
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org
+To: Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org
 
-Not sure if this is appropiate on this mailing list but wanted to
-share this one with you as it is cheaper than the RPi+Openlabs
-solution. The CHIP+Openlabs board would be 19$. I haven't backed it
-yet but thinking about it.
+Hi Alex,
 
-https://www.kickstarter.com/projects/1598272670/chip-the-worlds-first-9-computer
+In my driver I have a set_hw_addr_filt ieee802154_ops but it doesn't seem to get called.  I setup the interface using
 
-Regards
--- 
-Christoffer Holmstedt
+iwpan phy phy0 interface add wpan0 type node 00:03:9a:00:00:00:01:2c
+iwpan dev wpan0 set pan_id 0x0777
+iwpan dev wpan0 set short_addr 0x012c
+iwpan phy phy0 set channel 0 11
+ip link add link wpan0 name lowpan0 type lowpan
+ifconfig lowpan0 up
+ifconfig wpan0 up
+
+
+I thought the first 3 lines would trigger the setting up of the HW address filter or do I need to do something else?
+
+- Martin.
+
