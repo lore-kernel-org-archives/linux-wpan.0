@@ -1,41 +1,53 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wg0-f41.google.com ([74.125.82.41]:33533 "EHLO
-	mail-wg0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751469AbbEJUtO (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Sun, 10 May 2015 16:49:14 -0400
-Received: by wgin8 with SMTP id n8so112023295wgi.0
-        for <linux-wpan@vger.kernel.org>; Sun, 10 May 2015 13:49:13 -0700 (PDT)
-From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH bluetooth-next] at86rf230: fix callback for aret handling
-Date: Sun, 10 May 2015 22:48:55 +0200
-Message-Id: <1431290935-5400-1-git-send-email-alex.aring@gmail.com>
+Received: from sssup.it ([193.205.80.95]:36486 "EHLO sssup.it"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750778AbbEIOl2 (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+	Sat, 9 May 2015 10:41:28 -0400
+Received: from [5.170.86.146] (account m.petracca@sssup.it HELO [192.168.0.101])
+  by sssup.it (CommuniGate Pro SMTP 5.3.15)
+  with ESMTPSA id 101612939 for linux-wpan@vger.kernel.org; Sat, 09 May 2015 16:41:26 +0200
+Message-ID: <554E1C92.7040306@sssup.it>
+Date: Sat, 09 May 2015 16:41:22 +0200
+From: Matteo Petracca <matteo.petracca@sssup.it>
+MIME-Version: 1.0
+Subject: Ieee802154 socket problem with SIOCGIFADDR
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
-Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-This patch fix the complete callback for going into aret on. Currently
-we starting after a state change into aret on again a state change into
-aret on which is not necessary.
+Dear all,
+I am working on a BeagleboneBlack with transceiver at86rf233.
 
-Signed-off-by: Alexander Aring <alex.aring@gmail.com>
----
- drivers/net/ieee802154/at86rf230.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+When using ieee802154 sockets in my code I have:
 
-diff --git a/drivers/net/ieee802154/at86rf230.c b/drivers/net/ieee802154/at86rf230.c
-index 67d00fb..63f7e6e 100644
---- a/drivers/net/ieee802154/at86rf230.c
-+++ b/drivers/net/ieee802154/at86rf230.c
-@@ -1010,7 +1010,7 @@ at86rf230_xmit_start(void *context)
- 		if (lp->is_tx_from_off) {
- 			lp->is_tx_from_off = false;
- 			at86rf230_async_state_change(lp, ctx, STATE_TX_ARET_ON,
--						     at86rf230_xmit_tx_on,
-+						     at86rf230_write_frame,
- 						     false);
- 		} else {
- 			at86rf230_async_state_change(lp, ctx, STATE_TX_ON,
--- 
-2.3.7
+ret = ioctl(socketfd, SIOCGIFADDR, &ifr);
+
+and everything works fine with kernel 3.8.13.
+
+In kernel 4.0.1 the request fails with the following kernel messages:
+
+[  846.038365] RTNL: assertion failed at net/mac802154/iface.c (65)
+[  846.044629] CPU: 0 PID: 2350 Comm: test Not tainted 4.0.1-bone1 #1
+[  846.044653] Hardware name: Generic AM33XX (Flattened Device Tree)
+[  846.044747] [<c0011f35>] (unwind_backtrace) from [<c00101b5>] 
+(show_stack+0x11/0x14)
+[  846.044876] [<c00101b5>] (show_stack) from [<bf8502f3>] 
+(mac802154_wpan_ioctl+0xb6/0x100 [mac802154])
+[  846.044972] [<bf8502f3>] (mac802154_wpan_ioctl [mac802154]) from 
+[<bf8b738f>] (ieee802154_sock_ioctl+0xf6/0x14c [ieee802154_socket])
+[  846.045044] [<bf8b738f>] (ieee802154_sock_ioctl [ieee802154_socket]) 
+from [<c05195fb>] (sock_ioctl+0xd3/0x1bc)
+[  846.045094] [<c05195fb>] (sock_ioctl) from [<c00fca4d>] 
+(do_vfs_ioctl+0x2cd/0x400)
+[  846.045133] [<c00fca4d>] (do_vfs_ioctl) from [<c00fcbcd>] 
+(SyS_ioctl+0x4d/0x58)
+[  846.045172] [<c00fcbcd>] (SyS_ioctl) from [<c000d641>] 
+(ret_fast_syscall+0x1/0x44)
+
+Do you have any idea how to solve the problem?
+
+Best,
+Matteo
 
