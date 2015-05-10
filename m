@@ -1,94 +1,53 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f176.google.com ([209.85.212.176]:33577 "EHLO
-	mail-wi0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752883AbbELKdJ (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Tue, 12 May 2015 06:33:09 -0400
-Received: by wief7 with SMTP id f7so108427929wie.0
-        for <linux-wpan@vger.kernel.org>; Tue, 12 May 2015 03:33:08 -0700 (PDT)
-Date: Tue, 12 May 2015 12:33:05 +0200
+Received: from mail-wi0-f180.google.com ([209.85.212.180]:36144 "EHLO
+	mail-wi0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751534AbbEJUlH (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Sun, 10 May 2015 16:41:07 -0400
+Received: by wizk4 with SMTP id k4so83660615wiz.1
+        for <linux-wpan@vger.kernel.org>; Sun, 10 May 2015 13:41:06 -0700 (PDT)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: Re: Ieee802154 socket problem with SIOCGIFADDR
-Message-ID: <20150512103301.GD733@omega>
-References: <554E1C92.7040306@sssup.it>
- <20150509164227.GA694@omega>
- <5550DC2D.5060909@sssup.it>
- <20150511175141.GA7965@omega>
- <5551BAB9.9000101@sssup.it>
- <20150512083917.GC733@omega>
- <5551CC74.60702@sssup.it>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <5551CC74.60702@sssup.it>
+Subject: [PATCH bluetooth-next 0/3] mac802154: remove pib/mib locks
+Date: Sun, 10 May 2015 22:40:53 +0200
+Message-Id: <1431290456-25524-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Matteo Petracca <matteo.petracca@sssup.it>
-Cc: linux-wpan@vger.kernel.org
+To: linux-wpan@vger.kernel.org
+Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-On Tue, May 12, 2015 at 11:48:36AM +0200, Matteo Petracca wrote:
-> You were right, I did not remove the Assertion.
-> 
-> Now the patch is all there and the modules are
-> updated.
-> 
-> What happens now is a strange behaviour, booting
-> the system I just turn on the wpan interface putting
-> as panid 0xaaaa:
-> 
-> ifconfig wpan0 up
-> 
-> the device starts to read from the network, and this is
-> what I have in output with dmesg is:
-> 
-> [  131.445285] ieee802154: bad frame received (type = 3)
-> [  133.777933] ieee802154: bad frame received (type = 3)
-> [  136.110635] ieee802154: bad frame received (type = 3)
-> [  148.318471] ieee802154: bad frame received (type = 3)
-> [  150.651288] ieee802154: bad frame received (type = 3)
-> [  152.984910] ieee802154: bad frame received (type = 3)
-> [  165.195277] ieee802154: bad frame received (type = 3)
-> [  167.527936] ieee802154: bad frame received (type = 3)
-> [  169.860422] ieee802154: bad frame received (type = 3)
-> [  182.071635] ieee802154: bad frame received (type = 3)
-> [  184.406857] ieee802154: bad frame received (type = 3)
-> [  186.739487] ieee802154: bad frame received (type = 3)
-> [  198.947054] ieee802154: bad frame received (type = 3)
-> [  201.279710] ieee802154: bad frame received (type = 3)
-> [  203.612262] ieee802154: bad frame received (type = 3)
-> [  215.819843] ieee802154: bad frame received (type = 3)
-> [  218.155852] ieee802154: bad frame received (type = 3)
-> [  220.488465] ieee802154: bad frame received (type = 3)
-> 
-> Moreover SIOCGIFADDR still does not work.
-> 
+This patch series removes the pib/mib lock inside the mac802154 subsystem.
+The new locking mechanism will use the rtnl lock to ensure that other
+operations like ifdown/ifup can't happend while setting pib/mib values.
 
-This is a behaviour because we have lack of support to parse mac_cmd
-frames [0]. And I see now I already told you that! [1]
+Note: the new locking strategy depends on context, on most mib values while
+interface up the mib attributes are readonly, this will allow us less
+complexity and locking stuff while frame parsing.
 
-The current parsing mechanism is very dataframes specfic there is an 
-draft for reworking this frame parsing style and do it like mac80211
-(which have a lot of more frametypes than 802.15.4). See [2]:
-"new frame parsing style in mac802154 and ieee802154 based on mac80211
-frame parsing design. Draft is mac802154 rx and 6LoWPAN. Crypto need to
-be done at first, otherwise I can’t test it."
-
-Nevertheless it needs time to supporting it, you could simple add a case
-that the frame is delivered to userspace, but then this frame could not
-valid 802.15.4 frametype and you need to check that again in userspace.
-
-I also noticed that the raw socket don't put the mac header into payload
-(which should it do), see [3] (that's something which already told you).
-
-and yes, the 802.15.4 sockets needs a complete rework/cleanup. This is
-an opentask section at [4], we should orient us at bluetooth socket
-code.
+I tried my best to change the old netlink interface according to that, but
+I believe there is no real locking "strategy" in the old netlink calls
+and it's hard to understand how it works.
 
 - Alex
 
-[0] http://git.kernel.org/cgit/linux/kernel/git/bluetooth/bluetooth-next.git/tree/net/mac802154/rx.c#n104
-[1] http://www.spinics.net/lists/linux-wpan/msg01623.html
-[2] http://wpan.cakelab.org/
-[3] http://www.spinics.net/lists/linux-wpan/msg01623.html
-[4] http://wpan.cakelab.org/
+Alexander Aring (3):
+  mac802154: fix hold rtnl while ioctl
+  mac802154: remove pib lock
+  mac802154: remove mib lock
+
+ include/net/cfg802154.h         |  2 --
+ include/net/ieee802154_netdev.h | 10 -------
+ net/ieee802154/6lowpan/core.c   | 28 ------------------
+ net/ieee802154/6lowpan/tx.c     |  2 +-
+ net/ieee802154/core.c           |  2 --
+ net/ieee802154/nl-mac.c         | 14 ++++++---
+ net/ieee802154/nl-phy.c         |  6 ++--
+ net/ieee802154/socket.c         | 12 ++++----
+ net/mac802154/ieee802154_i.h    |  9 ------
+ net/mac802154/iface.c           | 25 +++++-----------
+ net/mac802154/mac_cmd.c         | 10 +++----
+ net/mac802154/mib.c             | 63 ++---------------------------------------
+ net/mac802154/rx.c              |  5 ----
+ 13 files changed, 32 insertions(+), 156 deletions(-)
+
+-- 
+2.3.7
 
