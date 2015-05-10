@@ -1,62 +1,41 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f180.google.com ([209.85.212.180]:38662 "EHLO
-	mail-wi0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750820AbbEIQrb (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Sat, 9 May 2015 12:47:31 -0400
-Received: by wiun10 with SMTP id n10so56719134wiu.1
-        for <linux-wpan@vger.kernel.org>; Sat, 09 May 2015 09:47:30 -0700 (PDT)
-Date: Sat, 9 May 2015 18:47:27 +0200
+Received: from mail-wg0-f41.google.com ([74.125.82.41]:33533 "EHLO
+	mail-wg0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751469AbbEJUtO (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Sun, 10 May 2015 16:49:14 -0400
+Received: by wgin8 with SMTP id n8so112023295wgi.0
+        for <linux-wpan@vger.kernel.org>; Sun, 10 May 2015 13:49:13 -0700 (PDT)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: Re: IEEE802154 MRF24J40
-Message-ID: <20150509164724.GB694@omega>
-References: <CAGduivyV4_ckSnJrnrpefD600Z0caE60dAK-QgxtyXg1WnAk7A@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAGduivyV4_ckSnJrnrpefD600Z0caE60dAK-QgxtyXg1WnAk7A@mail.gmail.com>
+Subject: [PATCH bluetooth-next] at86rf230: fix callback for aret handling
+Date: Sun, 10 May 2015 22:48:55 +0200
+Message-Id: <1431290935-5400-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Maxime Hadjinlian <maxime.hadjinlian@gmail.com>
-Cc: linux-wpan@vger.kernel.org
+To: linux-wpan@vger.kernel.org
+Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-Hi,
+This patch fix the complete callback for going into aret on. Currently
+we starting after a state change into aret on again a state change into
+aret on which is not necessary.
 
-On Sat, May 09, 2015 at 05:12:20PM +0200, Maxime Hadjinlian wrote:
-> Hi Alex,
-> 
-> I am currently trying to play with an MRF24J40 with the latests
-> kernel, and I can't figure out how could I obtain the lqi and rssi
-> value for each datagram received.
-> 
-> I can see in the driver that they are indeed received from the SPI
-> link and I can follow along up to 'ieee802154_rx_irqsafe' (in
-> net/mac802154/rx.c) where the lqi is added to the skb buffer but I
-> don't seem to get them in my userspace application when I use
-> recvfrom.
-> 
-> Did I miss something or is this a missing feature/bug ?
-> 
+Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+---
+ drivers/net/ieee802154/at86rf230.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-this is a missing feature and the lqi values of the
-ieee802154_rx_irqsafe function is currently garabage.
+diff --git a/drivers/net/ieee802154/at86rf230.c b/drivers/net/ieee802154/at86rf230.c
+index 67d00fb..63f7e6e 100644
+--- a/drivers/net/ieee802154/at86rf230.c
++++ b/drivers/net/ieee802154/at86rf230.c
+@@ -1010,7 +1010,7 @@ at86rf230_xmit_start(void *context)
+ 		if (lp->is_tx_from_off) {
+ 			lp->is_tx_from_off = false;
+ 			at86rf230_async_state_change(lp, ctx, STATE_TX_ARET_ON,
+-						     at86rf230_xmit_tx_on,
++						     at86rf230_write_frame,
+ 						     false);
+ 		} else {
+ 			at86rf230_async_state_change(lp, ctx, STATE_TX_ON,
+-- 
+2.3.7
 
-The idea to implement such use case is like in wireless a:
-
-"iw dev wlan# station dump"
-
-in our tool
-
-"iwpan dev wpan node dump"
-
-which reports all received neighbor nodes by extended/short address and
-their lqi, rssi value.
-
-This is a opentask entry at [0].
-
-The list of neighbors is stored so far I know as rhashtable in kernel
-(that's how wireless it does and we should use the same just with
-802.15.4 functionality).
-
-- Alex
-
-[0] http://wpan.cakelab.org/
