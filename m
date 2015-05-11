@@ -1,48 +1,52 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from senator.holtmann.net ([87.106.208.187]:33075 "EHLO
-	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750856AbbE3KaD convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Sat, 30 May 2015 06:30:03 -0400
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
-Subject: Re: [PATCH bluetooth-next 0/5] fixes and cleanups for cc2520
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1432877218-12537-1-git-send-email-varkab@cdac.in>
-Date: Sat, 30 May 2015 12:29:49 +0200
-Content-Transfer-Encoding: 8BIT
-Message-Id: <FCDD0B93-505A-4555-BAA7-A2621329CBFF@holtmann.org>
-References: <1432877218-12537-1-git-send-email-varkab@cdac.in>
+Received: from mail-ig0-f176.google.com ([209.85.213.176]:35087 "EHLO
+	mail-ig0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751886AbbEKVyk (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Mon, 11 May 2015 17:54:40 -0400
+Received: by igbyr2 with SMTP id yr2so84304616igb.0
+        for <linux-wpan@vger.kernel.org>; Mon, 11 May 2015 14:54:40 -0700 (PDT)
+MIME-Version: 1.0
+Date: Mon, 11 May 2015 23:54:40 +0200
+Message-ID: <CAOoq=dTEMhzkjRYhkoz1H_F4FGg1eYGKis-LZR0p5LX-2-ZMYA@mail.gmail.com>
+Subject: cc2520 issue
+From: Karol Poczesny <kpoczesny@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Varka Bhadram <varkabhadram@gmail.com>
-Cc: linux-wpan@vger.kernel.org, Brad Campbell <bradjc5@gmail.com>, Varka Bhadram <varkab@cdac.in>
+To: linux-wpan@vger.kernel.org
 
-Hi Varka,
+Hello all,
 
-> This series mainly related to tx power settings with or without
-> CC2591 amplifier.
-> 
-> 
-> Hi Brad Campbell,
-> 	I added you in CC. Please test these changes with CC2591.
-> 
-> --
-> Varka Bhadram
-> 
-> Varka Bhadram (5):
->  cc2520: fix in default tx power setting
->  cc2520: fix CC2591 handling
->  cc2520: add set transmit power setting support
->  cc2520: update initial transmit power value
->  cc2520: update current channel
-> 
-> drivers/net/ieee802154/cc2520.c |  124 +++++++++++++++++++++++++++++++++++----
-> include/linux/spi/cc2520.h      |    1 -
-> 2 files changed, 114 insertions(+), 11 deletions(-)
+I have tested simple ping communication between two devices:
+1.) Raspberry Pi with at86rf233 transceiver - (openlab module)
+and
+2.) Raspberry Pi with CC2520 transceiver - my own radio board.
 
-all 5 patches have been applied to bluetooth-next tree.
+I am able to run the interface and start transmit frames for both nodes,
+but only node with at86rf233 respond.
 
-Regards
+Node with CC2520 can send e.g ping message but cannot answer for ping from
+at86rf233 node and ignore any other requests.
 
-Marcel
+I had checked my radio board - I complied my system with debug in cc2520.c
+and received this:
 
+...
+[ 661.896458] cc2520 spi32766.0: SFD for RX
+[ 937.179079] cc2520 spi32766.0: SFD for RX
+
+so - I received SFD interrupt for RX this function is processed and it
+seems that received packet stuck somewhere on Rx path.
+
+I'm going to track this anomaly but maybe someone had similar problem.
+Maybe there are some issues related with configuration cc2520 + RPi?
+Somebody tested this configuration ?
+
+I use pretty old kernel version (3.17.0-rc1+) and old userspace tool - iz
+on both sides. Configuration is this same as on openlab web.
+
+Solution is described on my blog:
+[0] http://zanaster.blogspot.com/2015/05/rpi-6lowpan-solution-with-cc2520.html
+
+Best,
+Karol
