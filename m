@@ -1,85 +1,78 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-pa0-f48.google.com ([209.85.220.48]:35325 "EHLO
-	mail-pa0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752001AbbELDsY (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Mon, 11 May 2015 23:48:24 -0400
-Received: by pabtp1 with SMTP id tp1so129340423pab.2
-        for <linux-wpan@vger.kernel.org>; Mon, 11 May 2015 20:48:24 -0700 (PDT)
-Message-ID: <555177F2.7060502@gmail.com>
-Date: Tue, 12 May 2015 09:18:02 +0530
-From: Varka Bhadram <varkabhadram@gmail.com>
-MIME-Version: 1.0
+Received: from mx02.posteo.de ([89.146.194.165]:36353 "EHLO mx02.posteo.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S934415AbbEMOqg convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Wed, 13 May 2015 10:46:36 -0400
+Date: Wed, 13 May 2015 16:46:33 +0200
+From: Johann Fischer <johann_fischer@posteo.de>
 Subject: Re: cc2520 issue
-References: <CAOoq=dTEMhzkjRYhkoz1H_F4FGg1eYGKis-LZR0p5LX-2-ZMYA@mail.gmail.com> <5551768F.1000206@gmail.com>
-In-Reply-To: <5551768F.1000206@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Message-ID: <20150513164633.10c4d992@ws-entwicklun-18.phytec>
+In-Reply-To: <CAOoq=dTEMhzkjRYhkoz1H_F4FGg1eYGKis-LZR0p5LX-2-ZMYA@mail.gmail.com>
+References: <CAOoq=dTEMhzkjRYhkoz1H_F4FGg1eYGKis-LZR0p5LX-2-ZMYA@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8BIT
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: Karol Poczesny <kpoczesny@gmail.com>, linux-wpan@vger.kernel.org
 
-On 05/12/2015 09:12 AM, Varka Bhadram wrote:
-> Hi Karol Poczesny,
->
-> On 05/12/2015 03:24 AM, Karol Poczesny wrote:
->
->> Hello all,
->>
->> I have tested simple ping communication between two devices:
->> 1.) Raspberry Pi with at86rf233 transceiver - (openlab module)
->> and
->> 2.) Raspberry Pi with CC2520 transceiver - my own radio board.
-> I used BeagleBoneBlack with cc2520. It worked for me. Able to communicate
-> with TinyOS nodes.
->
->> I am able to run the interface and start transmit frames for both nodes,
->> but only node with at86rf233 respond.
->>
->> Node with CC2520 can send e.g ping message but cannot answer for ping from
->> at86rf233 node and ignore any other requests.
->>
->> I had checked my radio board - I complied my system with debug in cc2520.c
->> and received this:
->>
->> ...
->> [ 661.896458] cc2520 spi32766.0: SFD for RX
->> [ 937.179079] cc2520 spi32766.0: SFD for RX
-> It will just a debug message that will indicate a packet has received. After a packet
-> has received cc2520 will generate SFD interrupt. 
->
->> so - I received SFD interrupt for RX this function is processed and it
->> seems that received packet stuck somewhere on Rx path.
-> Can you please enable the debug for mac802154 and see whether the packet is going
-> to the upper layers or not..?
->
->> I'm going to track this anomaly but maybe someone had similar problem.
->> Maybe there are some issues related with configuration cc2520 + RPi?
->> Somebody tested this configuration ?
->>
->> I use pretty old kernel version (3.17.0-rc1+) and old userspace tool - iz
->> on both sides. Configuration is this same as on openlab web.
-> Use the latest bluetooth-next [0] tree. And this iz tools are now deprecated
-> with the new kernel versions. Use the iwpan [1] tools (similar to iw for wireless). 
+Hi Karol,
 
-iwpan/wpan-tools
+> Hello all,
+> 
+> I have tested simple ping communication between two devices:
+> 1.) Raspberry Pi with at86rf233 transceiver - (openlab module)
+> and
+> 2.) Raspberry Pi with CC2520 transceiver - my own radio board.
+> 
+> I am able to run the interface and start transmit frames for both
+> nodes, but only node with at86rf233 respond.
+> 
+> Node with CC2520 can send e.g ping message but cannot answer for ping
+> from at86rf233 node and ignore any other requests.
+> 
 
-[0]: git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git
-[1]: https://github.com/linux-wpan/wpan-tools
+As I see, you used a reference Design with 2450BM15B0002 Balun?
 
->> Solution is described on my blog:
->> [0] http://zanaster.blogspot.com/2015/05/rpi-6lowpan-solution-with-cc2520.html
-> Nice. 
->
->> Best,
->> Karol
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-wpan" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> Thanks,
->
+I use also TI's reference design with the Balun and have the same
+problems. Original TI CC2520EM 2.1 Board functions fine.
+I use Kernel 3.19.0.
+
+The problem appears only after immediately switching from tx to 
+rx mode. (e.g. ping6). Just send or receive is fine.
+
+ From our adapters about 40% do not work properly. This behavior depends
+on temperature and the channel (frequency).
+
+I have also observed the SPI and GPIO communication. 
+If I remember correctly, it was the transceiver, which had simple not
+received the packages. I will examine SPI and GPIO communication this
+week (if I have time :-)).
+
+> I had checked my radio board - I complied my system with debug in
+> cc2520.c and received this:
+> 
+> ...
+> [ 661.896458] cc2520 spi32766.0: SFD for RX
+> [ 937.179079] cc2520 spi32766.0: SFD for RX
+> 
+> so - I received SFD interrupt for RX this function is processed and it
+> seems that received packet stuck somewhere on Rx path.
+> 
+> I'm going to track this anomaly but maybe someone had similar problem.
+> Maybe there are some issues related with configuration cc2520 + RPi?
+> Somebody tested this configuration ?
+> 
+> I use pretty old kernel version (3.17.0-rc1+) and old userspace tool
+> - iz on both sides. Configuration is this same as on openlab web.
+> 
+> Solution is described on my blog:
+> [0]
+> http://zanaster.blogspot.com/2015/05/rpi-6lowpan-solution-with-cc2520.html
+> 
+> Best,
+> Karol
 
 
 -- 
-Varka Bhadram
-
+Johann Fischer
