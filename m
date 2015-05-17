@@ -1,14 +1,14 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wg0-f43.google.com ([74.125.82.43]:33062 "EHLO
-	mail-wg0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751527AbbEQTpn (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Sun, 17 May 2015 15:45:43 -0400
-Received: by wgjc11 with SMTP id c11so3903208wgj.0
-        for <linux-wpan@vger.kernel.org>; Sun, 17 May 2015 12:45:42 -0700 (PDT)
+Received: from mail-wi0-f173.google.com ([209.85.212.173]:33274 "EHLO
+	mail-wi0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751561AbbEQTpo (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Sun, 17 May 2015 15:45:44 -0400
+Received: by wicmx19 with SMTP id mx19so74555401wic.0
+        for <linux-wpan@vger.kernel.org>; Sun, 17 May 2015 12:45:43 -0700 (PDT)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH bluetooth-next 09/34] mac802154: remove check if operation is supported
-Date: Sun, 17 May 2015 21:44:45 +0200
-Message-Id: <1431891910-32231-10-git-send-email-alex.aring@gmail.com>
+Subject: [PATCH bluetooth-next 10/34] cfg802154: introduce wpan phy flags
+Date: Sun, 17 May 2015 21:44:46 +0200
+Message-Id: <1431891910-32231-11-git-send-email-alex.aring@gmail.com>
 In-Reply-To: <1431891910-32231-1-git-send-email-alex.aring@gmail.com>
 References: <1431891910-32231-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
@@ -16,99 +16,215 @@ List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
 Cc: kernel@pengutronix.de, marcel@holtmann.org, Alexander Aring <alex.aring@gmail.com>
 
-This patch removes the check if operation is supported by driver layer.
-This is done now by capabilities flags, if these are valid then the
-driver should support the operation, otherwise a WARN_ON occurs.
+This patch introduce a flag property for the wpan phy structure.
+The current flag settings in ieee802154_hw are accessable in mac802154
+layer only which is okay for flags which indicates MAC handling which
+are done by phy. For real PHY layer settings like cca mode, transmit
+power, cca energy detection level.
+
+The difference between these flags are that the MAC handling flags are
+only handled in mac802154/HardMac layer e.g. on an interface up. The phy
+settings are direct netlink calls from nl802154 into the driver layer
+and the nl802154 need to have a chance to check if the driver supports
+this handling before sending to the next layer.
+
+We also check now on PHY flags while dumping and setting pib attributes.
+In comparing with MIB attributes the 802.15.4 gives us an default value
+which we assume when a transceiver implement less functionality. In case
+of MIB settings the nl802154 layer doesn't need to check on the
+ieee802154_hw flags then.
 
 Signed-off-by: Alexander Aring <alex.aring@gmail.com>
 ---
- net/mac802154/cfg.c | 24 ------------------------
- 1 file changed, 24 deletions(-)
+ drivers/net/ieee802154/at86rf230.c |  9 +++++++--
+ include/net/cfg802154.h            | 16 ++++++++++++++++
+ include/net/mac802154.h            | 29 +++++++----------------------
+ net/ieee802154/nl802154.c          | 27 +++++++++++++++++----------
+ net/mac802154/mac_cmd.c            |  6 +++---
+ 5 files changed, 50 insertions(+), 37 deletions(-)
 
-diff --git a/net/mac802154/cfg.c b/net/mac802154/cfg.c
-index 45c4dc3..d5290ea 100644
---- a/net/mac802154/cfg.c
-+++ b/net/mac802154/cfg.c
-@@ -98,10 +98,6 @@ ieee802154_set_cca_mode(struct wpan_phy *wpan_phy,
- 	if (wpan_phy_cca_cmp(&wpan_phy->cca, cca))
- 		return 0;
+diff --git a/drivers/net/ieee802154/at86rf230.c b/drivers/net/ieee802154/at86rf230.c
+index 151d57f..b0ffd1c 100644
+--- a/drivers/net/ieee802154/at86rf230.c
++++ b/drivers/net/ieee802154/at86rf230.c
+@@ -1566,8 +1566,13 @@ at86rf230_detect_device(struct at86rf230_local *lp)
+ 	}
  
--	/* check if phy support this setting */
--	if (!(local->hw.flags & IEEE802154_HW_CCA_MODE))
--		return -EOPNOTSUPP;
--
- 	ret = drv_set_cca_mode(local, cca);
- 	if (!ret)
- 		wpan_phy->cca = *cca;
-@@ -127,17 +123,12 @@ ieee802154_set_backoff_exponent(struct wpan_phy *wpan_phy,
- 				struct wpan_dev *wpan_dev,
- 				u8 min_be, u8 max_be)
- {
--	struct ieee802154_local *local = wpan_phy_priv(wpan_phy);
--
- 	ASSERT_RTNL();
+ 	lp->hw->flags = IEEE802154_HW_TX_OMIT_CKSUM | IEEE802154_HW_AACK |
+-			IEEE802154_HW_TXPOWER | IEEE802154_HW_ARET |
+-			IEEE802154_HW_AFILT | IEEE802154_HW_PROMISCUOUS;
++			IEEE802154_HW_CSMA_PARAMS |
++			IEEE802154_HW_FRAME_RETRIES | IEEE802154_HW_AFILT |
++			IEEE802154_HW_PROMISCUOUS;
++
++	lp->hw->phy->flags = WPAN_PHY_FLAG_TXPOWER |
++			     WPAN_PHY_FLAG_CCA_ED_LEVEL |
++			     WPAN_PHY_FLAG_CCA_MODE;
  
- 	if (wpan_dev->min_be == min_be &&
- 	    wpan_dev->max_be == max_be)
- 		return 0;
+ 	lp->hw->phy->cca.mode = NL802154_CCA_ENERGY;
  
--	if (!(local->hw.flags & IEEE802154_HW_CSMA_PARAMS))
--		return -EOPNOTSUPP;
--
- 	wpan_dev->min_be = min_be;
- 	wpan_dev->max_be = max_be;
- 	return 0;
-@@ -161,16 +152,11 @@ ieee802154_set_max_csma_backoffs(struct wpan_phy *wpan_phy,
- 				 struct wpan_dev *wpan_dev,
- 				 u8 max_csma_backoffs)
- {
--	struct ieee802154_local *local = wpan_phy_priv(wpan_phy);
--
- 	ASSERT_RTNL();
- 
- 	if (wpan_dev->csma_retries == max_csma_backoffs)
- 		return 0;
- 
--	if (!(local->hw.flags & IEEE802154_HW_CSMA_PARAMS))
--		return -EOPNOTSUPP;
--
- 	wpan_dev->csma_retries = max_csma_backoffs;
- 	return 0;
+diff --git a/include/net/cfg802154.h b/include/net/cfg802154.h
+index 37abc16..a12c6c52 100644
+--- a/include/net/cfg802154.h
++++ b/include/net/cfg802154.h
+@@ -106,6 +106,20 @@ wpan_phy_cca_cmp(const struct wpan_phy_cca *a, const struct wpan_phy_cca *b)
+ 	return true;
  }
-@@ -180,16 +166,11 @@ ieee802154_set_max_frame_retries(struct wpan_phy *wpan_phy,
- 				 struct wpan_dev *wpan_dev,
- 				 s8 max_frame_retries)
- {
--	struct ieee802154_local *local = wpan_phy_priv(wpan_phy);
--
- 	ASSERT_RTNL();
  
- 	if (wpan_dev->frame_retries == max_frame_retries)
- 		return 0;
++/**
++ * @WPAN_PHY_FLAG_TRANSMIT_POWER: Indicates that transceiver will support
++ *	transmit power setting.
++ * @WPAN_PHY_FLAG_CCA_ED_LEVEL: Indicates that transceiver will support cca ed
++ *	level setting.
++ * @WPAN_PHY_FLAG_CCA_MODE: Indicates that transceiver will support cca mode
++ *	setting.
++ */
++enum wpan_phy_flags {
++	WPAN_PHY_FLAG_TXPOWER		= BIT(1),
++	WPAN_PHY_FLAG_CCA_ED_LEVEL	= BIT(2),
++	WPAN_PHY_FLAG_CCA_MODE		= BIT(3),
++};
++
+ struct wpan_phy {
+ 	struct mutex pib_lock;
  
--	if (!(local->hw.flags & IEEE802154_HW_FRAME_RETRIES))
--		return -EOPNOTSUPP;
--
- 	wpan_dev->frame_retries = max_frame_retries;
- 	return 0;
- }
-@@ -198,16 +179,11 @@ static int
- ieee802154_set_lbt_mode(struct wpan_phy *wpan_phy, struct wpan_dev *wpan_dev,
- 			bool mode)
- {
--	struct ieee802154_local *local = wpan_phy_priv(wpan_phy);
--
- 	ASSERT_RTNL();
+@@ -117,6 +131,8 @@ struct wpan_phy {
+ 	 */
+ 	const void *privid;
  
- 	if (wpan_dev->lbt == mode)
- 		return 0;
++	u32 flags;
++
+ 	/*
+ 	 * This is a PIB according to 802.15.4-2011.
+ 	 * We do not provide timing-related variables, as they
+diff --git a/include/net/mac802154.h b/include/net/mac802154.h
+index 71e2456..9605c7f 100644
+--- a/include/net/mac802154.h
++++ b/include/net/mac802154.h
+@@ -89,41 +89,26 @@ struct ieee802154_hw {
+ #define IEEE802154_HW_TX_OMIT_CKSUM	0x00000001
+ /* Indicates that receiver will autorespond with ACK frames. */
+ #define IEEE802154_HW_AACK		0x00000002
+-/* Indicates that transceiver will support transmit power setting. */
+-#define IEEE802154_HW_TXPOWER		0x00000004
+ /* Indicates that transceiver will support listen before transmit. */
+-#define IEEE802154_HW_LBT		0x00000008
+-/* Indicates that transceiver will support cca mode setting. */
+-#define IEEE802154_HW_CCA_MODE		0x00000010
+-/* Indicates that transceiver will support cca ed level setting. */
+-#define IEEE802154_HW_CCA_ED_LEVEL	0x00000020
++#define IEEE802154_HW_LBT		0x00000004
+ /* Indicates that transceiver will support csma (max_be, min_be, csma retries)
+  * settings. */
+-#define IEEE802154_HW_CSMA_PARAMS	0x00000040
++#define IEEE802154_HW_CSMA_PARAMS	0x00000008
+ /* Indicates that transceiver will support ARET frame retries setting. */
+-#define IEEE802154_HW_FRAME_RETRIES	0x00000080
++#define IEEE802154_HW_FRAME_RETRIES	0x00000010
+ /* Indicates that transceiver will support hardware address filter setting. */
+-#define IEEE802154_HW_AFILT		0x00000100
++#define IEEE802154_HW_AFILT		0x00000020
+ /* Indicates that transceiver will support promiscuous mode setting. */
+-#define IEEE802154_HW_PROMISCUOUS	0x00000200
++#define IEEE802154_HW_PROMISCUOUS	0x00000040
+ /* Indicates that receiver omits FCS. */
+-#define IEEE802154_HW_RX_OMIT_CKSUM	0x00000400
++#define IEEE802154_HW_RX_OMIT_CKSUM	0x00000080
+ /* Indicates that receiver will not filter frames with bad checksum. */
+-#define IEEE802154_HW_RX_DROP_BAD_CKSUM	0x00000800
++#define IEEE802154_HW_RX_DROP_BAD_CKSUM	0x00000100
  
--	if (!(local->hw.flags & IEEE802154_HW_LBT))
--		return -EOPNOTSUPP;
+ /* Indicates that receiver omits FCS and xmitter will add FCS on it's own. */
+ #define IEEE802154_HW_OMIT_CKSUM	(IEEE802154_HW_TX_OMIT_CKSUM | \
+ 					 IEEE802154_HW_RX_OMIT_CKSUM)
+ 
+-/* This groups the most common CSMA support fields into one. */
+-#define IEEE802154_HW_CSMA		(IEEE802154_HW_CCA_MODE | \
+-					 IEEE802154_HW_CCA_ED_LEVEL | \
+-					 IEEE802154_HW_CSMA_PARAMS)
 -
- 	wpan_dev->lbt = mode;
- 	return 0;
- }
+-/* This groups the most common ARET support fields into one. */
+-#define IEEE802154_HW_ARET		(IEEE802154_HW_CSMA | \
+-					 IEEE802154_HW_FRAME_RETRIES)
+-
+ /* struct ieee802154_ops - callbacks from mac802154 to the driver
+  *
+  * This structure contains various callbacks that the driver may
+diff --git a/net/ieee802154/nl802154.c b/net/ieee802154/nl802154.c
+index fa0c404..40fb0be 100644
+--- a/net/ieee802154/nl802154.c
++++ b/net/ieee802154/nl802154.c
+@@ -291,19 +291,23 @@ static int nl802154_send_wpan_phy(struct cfg802154_registered_device *rdev,
+ 		goto nla_put_failure;
+ 
+ 	/* cca mode */
+-	if (nla_put_u32(msg, NL802154_ATTR_CCA_MODE,
+-			rdev->wpan_phy.cca.mode))
+-		goto nla_put_failure;
+-
+-	if (rdev->wpan_phy.cca.mode == NL802154_CCA_ENERGY_CARRIER) {
+-		if (nla_put_u32(msg, NL802154_ATTR_CCA_OPT,
+-				rdev->wpan_phy.cca.opt))
++	if (rdev->wpan_phy.flags & WPAN_PHY_FLAG_CCA_MODE) {
++		if (nla_put_u32(msg, NL802154_ATTR_CCA_MODE,
++				rdev->wpan_phy.cca.mode))
+ 			goto nla_put_failure;
++
++		if (rdev->wpan_phy.cca.mode == NL802154_CCA_ENERGY_CARRIER) {
++			if (nla_put_u32(msg, NL802154_ATTR_CCA_OPT,
++					rdev->wpan_phy.cca.opt))
++				goto nla_put_failure;
++		}
+ 	}
+ 
+-	if (nla_put_s32(msg, NL802154_ATTR_TX_POWER,
+-			rdev->wpan_phy.transmit_power))
+-		goto nla_put_failure;
++	if (rdev->wpan_phy.flags & WPAN_PHY_FLAG_TXPOWER) {
++		if (nla_put_s32(msg, NL802154_ATTR_TX_POWER,
++				rdev->wpan_phy.transmit_power))
++			goto nla_put_failure;
++	}
+ 
+ finish:
+ 	genlmsg_end(msg, hdr);
+@@ -637,6 +641,9 @@ static int nl802154_set_cca_mode(struct sk_buff *skb, struct genl_info *info)
+ 	struct cfg802154_registered_device *rdev = info->user_ptr[0];
+ 	struct wpan_phy_cca cca;
+ 
++	if (rdev->wpan_phy.flags & WPAN_PHY_FLAG_CCA_MODE)
++		return -EOPNOTSUPP;
++
+ 	if (!info->attrs[NL802154_ATTR_CCA_MODE])
+ 		return -EINVAL;
+ 
+diff --git a/net/mac802154/mac_cmd.c b/net/mac802154/mac_cmd.c
+index bdccb4e..6dcbb3b 100644
+--- a/net/mac802154/mac_cmd.c
++++ b/net/mac802154/mac_cmd.c
+@@ -91,19 +91,19 @@ static int mac802154_set_mac_params(struct net_device *dev,
+ 	wpan_dev->frame_retries = params->frame_retries;
+ 	wpan_dev->lbt = params->lbt;
+ 
+-	if (local->hw.flags & IEEE802154_HW_TXPOWER) {
++	if (local->hw.phy->flags & WPAN_PHY_FLAG_TXPOWER) {
+ 		ret = drv_set_tx_power(local, params->transmit_power);
+ 		if (ret < 0)
+ 			return ret;
+ 	}
+ 
+-	if (local->hw.flags & IEEE802154_HW_CCA_MODE) {
++	if (local->hw.phy->flags & WPAN_PHY_FLAG_CCA_MODE) {
+ 		ret = drv_set_cca_mode(local, &params->cca);
+ 		if (ret < 0)
+ 			return ret;
+ 	}
+ 
+-	if (local->hw.flags & IEEE802154_HW_CCA_ED_LEVEL) {
++	if (local->hw.phy->flags & WPAN_PHY_FLAG_CCA_ED_LEVEL) {
+ 		ret = drv_set_cca_ed_level(local, params->cca_ed_level);
+ 		if (ret < 0)
+ 			return ret;
 -- 
 2.3.7
 
