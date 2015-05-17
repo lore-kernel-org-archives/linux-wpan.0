@@ -1,14 +1,14 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f172.google.com ([209.85.212.172]:34960 "EHLO
-	mail-wi0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751464AbbEQTpf (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Sun, 17 May 2015 15:45:35 -0400
-Received: by wicmx19 with SMTP id mx19so54333740wic.0
-        for <linux-wpan@vger.kernel.org>; Sun, 17 May 2015 12:45:34 -0700 (PDT)
+Received: from mail-wi0-f176.google.com ([209.85.212.176]:36574 "EHLO
+	mail-wi0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751472AbbEQTpg (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Sun, 17 May 2015 15:45:36 -0400
+Received: by wizk4 with SMTP id k4so54324092wiz.1
+        for <linux-wpan@vger.kernel.org>; Sun, 17 May 2015 12:45:35 -0700 (PDT)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH bluetooth-next 02/34] ieee802154: move validation check out of softmac
-Date: Sun, 17 May 2015 21:44:38 +0200
-Message-Id: <1431891910-32231-3-git-send-email-alex.aring@gmail.com>
+Subject: [PATCH bluetooth-next 03/34] ieee802154: change transmit power to s32
+Date: Sun, 17 May 2015 21:44:39 +0200
+Message-Id: <1431891910-32231-4-git-send-email-alex.aring@gmail.com>
 In-Reply-To: <1431891910-32231-1-git-send-email-alex.aring@gmail.com>
 References: <1431891910-32231-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
@@ -16,123 +16,96 @@ List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
 Cc: kernel@pengutronix.de, marcel@holtmann.org, Alexander Aring <alex.aring@gmail.com>
 
-This patch moves the value validation out of softmac layer. We need
-to be sure now that this value is accepted by the transceiver/mac802154 or
-"possible" hardmac drivers before calling rdev-ops.
+This patch change the transmit power from s8 to s32. This prepares to store a
+mbm value instead dbm inside the transmit power variable. The old
+interface keep the a s8 dbm value, which should be backward compatibility
+when assign s8 to s32.
 
 Signed-off-by: Alexander Aring <alex.aring@gmail.com>
 ---
- net/ieee802154/nl802154.c | 28 +++++++++++++++++++++++++++-
- net/mac802154/cfg.c       | 29 -----------------------------
- 2 files changed, 27 insertions(+), 30 deletions(-)
+ drivers/net/ieee802154/at86rf230.c | 2 +-
+ include/net/cfg802154.h            | 2 +-
+ include/net/mac802154.h            | 2 +-
+ net/ieee802154/nl802154.c          | 6 +++---
+ net/mac802154/driver-ops.h         | 2 +-
+ 5 files changed, 7 insertions(+), 7 deletions(-)
 
+diff --git a/drivers/net/ieee802154/at86rf230.c b/drivers/net/ieee802154/at86rf230.c
+index 67d00fb..02b6bb7 100644
+--- a/drivers/net/ieee802154/at86rf230.c
++++ b/drivers/net/ieee802154/at86rf230.c
+@@ -1194,7 +1194,7 @@ at86rf230_set_hw_addr_filt(struct ieee802154_hw *hw,
+ }
+ 
+ static int
+-at86rf230_set_txpower(struct ieee802154_hw *hw, s8 db)
++at86rf230_set_txpower(struct ieee802154_hw *hw, s32 db)
+ {
+ 	struct at86rf230_local *lp = hw->priv;
+ 
+diff --git a/include/net/cfg802154.h b/include/net/cfg802154.h
+index 6ea16c8..47804cd 100644
+--- a/include/net/cfg802154.h
++++ b/include/net/cfg802154.h
+@@ -85,7 +85,7 @@ struct wpan_phy {
+ 	u8 current_channel;
+ 	u8 current_page;
+ 	u32 channels_supported[IEEE802154_MAX_PAGE + 1];
+-	s8 transmit_power;
++	s32 transmit_power;
+ 	struct wpan_phy_cca cca;
+ 
+ 	__le64 perm_extended_addr;
+diff --git a/include/net/mac802154.h b/include/net/mac802154.h
+index 7df28a4..400e4e8 100644
+--- a/include/net/mac802154.h
++++ b/include/net/mac802154.h
+@@ -213,7 +213,7 @@ struct ieee802154_ops {
+ 	int		(*set_hw_addr_filt)(struct ieee802154_hw *hw,
+ 					    struct ieee802154_hw_addr_filt *filt,
+ 					    unsigned long changed);
+-	int		(*set_txpower)(struct ieee802154_hw *hw, s8 dbm);
++	int		(*set_txpower)(struct ieee802154_hw *hw, s32 dbm);
+ 	int		(*set_lbt)(struct ieee802154_hw *hw, bool on);
+ 	int		(*set_cca_mode)(struct ieee802154_hw *hw,
+ 					const struct wpan_phy_cca *cca);
 diff --git a/net/ieee802154/nl802154.c b/net/ieee802154/nl802154.c
-index c01f4bb..d750d97 100644
+index d750d97..f3185c7 100644
 --- a/net/ieee802154/nl802154.c
 +++ b/net/ieee802154/nl802154.c
-@@ -625,7 +625,8 @@ static int nl802154_set_channel(struct sk_buff *skb, struct genl_info *info)
- 	channel = nla_get_u8(info->attrs[NL802154_ATTR_CHANNEL]);
+@@ -207,7 +207,7 @@ static const struct nla_policy nl802154_policy[NL802154_ATTR_MAX+1] = {
+ 	[NL802154_ATTR_PAGE] = { .type = NLA_U8, },
+ 	[NL802154_ATTR_CHANNEL] = { .type = NLA_U8, },
  
- 	/* check 802.15.4 constraints */
--	if (page > IEEE802154_MAX_PAGE || channel > IEEE802154_MAX_CHANNEL)
-+	if (page > IEEE802154_MAX_PAGE || channel > IEEE802154_MAX_CHANNEL ||
-+	    !(rdev->wpan_phy.channels_supported[page] & BIT(channel)))
- 		return -EINVAL;
+-	[NL802154_ATTR_TX_POWER] = { .type = NLA_S8, },
++	[NL802154_ATTR_TX_POWER] = { .type = NLA_S32, },
  
- 	return rdev_set_channel(rdev, page, channel);
-@@ -674,6 +675,16 @@ static int nl802154_set_pan_id(struct sk_buff *skb, struct genl_info *info)
+ 	[NL802154_ATTR_CCA_MODE] = { .type = NLA_U32, },
+ 	[NL802154_ATTR_CCA_OPT] = { .type = NLA_U32, },
+@@ -301,8 +301,8 @@ static int nl802154_send_wpan_phy(struct cfg802154_registered_device *rdev,
+ 			goto nla_put_failure;
+ 	}
  
- 	pan_id = nla_get_le16(info->attrs[NL802154_ATTR_PAN_ID]);
+-	if (nla_put_s8(msg, NL802154_ATTR_TX_POWER,
+-		       rdev->wpan_phy.transmit_power))
++	if (nla_put_s32(msg, NL802154_ATTR_TX_POWER,
++			rdev->wpan_phy.transmit_power))
+ 		goto nla_put_failure;
  
-+	/* TODO
-+	 * I am not sure about to check here on broadcast pan_id.
-+	 * Broadcast is a valid setting, comment from 802.15.4:
-+	 * If this value is 0xffff, the device is not associated.
-+	 *
-+	 * This could useful to simple deassociate an device.
-+	 */
-+	if (pan_id == cpu_to_le16(IEEE802154_PAN_ID_BROADCAST))
-+		return -EINVAL;
-+
- 	return rdev_set_pan_id(rdev, wpan_dev, pan_id);
+ finish:
+diff --git a/net/mac802154/driver-ops.h b/net/mac802154/driver-ops.h
+index a053335..57c1bdb 100644
+--- a/net/mac802154/driver-ops.h
++++ b/net/mac802154/driver-ops.h
+@@ -58,7 +58,7 @@ drv_set_channel(struct ieee802154_local *local, u8 page, u8 channel)
+ 	return local->ops->set_channel(&local->hw, page, channel);
  }
  
-@@ -695,6 +706,21 @@ static int nl802154_set_short_addr(struct sk_buff *skb, struct genl_info *info)
- 
- 	short_addr = nla_get_le16(info->attrs[NL802154_ATTR_SHORT_ADDR]);
- 
-+	/* TODO
-+	 * I am not sure about to check here on broadcast short_addr.
-+	 * Broadcast is a valid setting, comment from 802.15.4:
-+	 * A value of 0xfffe indicates that the device has
-+	 * associated but has not been allocated an address. A
-+	 * value of 0xffff indicates that the device does not
-+	 * have a short address.
-+	 *
-+	 * I think we should allow to set these settings but
-+	 * don't allow to allow socket communication with it.
-+	 */
-+	if (short_addr == cpu_to_le16(IEEE802154_ADDR_SHORT_UNSPEC) ||
-+	    short_addr == cpu_to_le16(IEEE802154_ADDR_SHORT_BROADCAST))
-+		return -EINVAL;
-+
- 	return rdev_set_short_addr(rdev, wpan_dev, short_addr);
- }
- 
-diff --git a/net/mac802154/cfg.c b/net/mac802154/cfg.c
-index 70be9c7..c636015 100644
---- a/net/mac802154/cfg.c
-+++ b/net/mac802154/cfg.c
-@@ -73,10 +73,6 @@ ieee802154_set_channel(struct wpan_phy *wpan_phy, u8 page, u8 channel)
- 
- 	ASSERT_RTNL();
- 
--	/* check if phy support this setting */
--	if (!(wpan_phy->channels_supported[page] & BIT(channel)))
--		return -EINVAL;
--
- 	ret = drv_set_channel(local, page, channel);
- 	if (!ret) {
- 		wpan_phy->current_page = page;
-@@ -112,16 +108,6 @@ ieee802154_set_pan_id(struct wpan_phy *wpan_phy, struct wpan_dev *wpan_dev,
+-static inline int drv_set_tx_power(struct ieee802154_local *local, s8 dbm)
++static inline int drv_set_tx_power(struct ieee802154_local *local, s32 dbm)
  {
- 	ASSERT_RTNL();
+ 	might_sleep();
  
--	/* TODO
--	 * I am not sure about to check here on broadcast pan_id.
--	 * Broadcast is a valid setting, comment from 802.15.4:
--	 * If this value is 0xffff, the device is not associated.
--	 *
--	 * This could useful to simple deassociate an device.
--	 */
--	if (pan_id == cpu_to_le16(IEEE802154_PAN_ID_BROADCAST))
--		return -EINVAL;
--
- 	wpan_dev->pan_id = pan_id;
- 	return 0;
- }
-@@ -149,21 +135,6 @@ ieee802154_set_short_addr(struct wpan_phy *wpan_phy, struct wpan_dev *wpan_dev,
- {
- 	ASSERT_RTNL();
- 
--	/* TODO
--	 * I am not sure about to check here on broadcast short_addr.
--	 * Broadcast is a valid setting, comment from 802.15.4:
--	 * A value of 0xfffe indicates that the device has
--	 * associated but has not been allocated an address. A
--	 * value of 0xffff indicates that the device does not
--	 * have a short address.
--	 *
--	 * I think we should allow to set these settings but
--	 * don't allow to allow socket communication with it.
--	 */
--	if (short_addr == cpu_to_le16(IEEE802154_ADDR_SHORT_UNSPEC) ||
--	    short_addr == cpu_to_le16(IEEE802154_ADDR_SHORT_BROADCAST))
--		return -EINVAL;
--
- 	wpan_dev->short_addr = short_addr;
- 	return 0;
- }
 -- 
 2.3.7
 
