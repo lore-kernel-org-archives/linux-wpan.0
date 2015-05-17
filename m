@@ -1,14 +1,14 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f179.google.com ([209.85.212.179]:37806 "EHLO
-	mail-wi0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751789AbbEQTqD (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Sun, 17 May 2015 15:46:03 -0400
-Received: by wibt6 with SMTP id t6so47660542wib.0
-        for <linux-wpan@vger.kernel.org>; Sun, 17 May 2015 12:46:02 -0700 (PDT)
+Received: from mail-wg0-f44.google.com ([74.125.82.44]:33833 "EHLO
+	mail-wg0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751776AbbEQTqE (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Sun, 17 May 2015 15:46:04 -0400
+Received: by wguv19 with SMTP id v19so104444981wgu.1
+        for <linux-wpan@vger.kernel.org>; Sun, 17 May 2015 12:46:03 -0700 (PDT)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH bluetooth-next 27/34] fakelb: declare fakelb list static
-Date: Sun, 17 May 2015 21:45:03 +0200
-Message-Id: <1431891910-32231-28-git-send-email-alex.aring@gmail.com>
+Subject: [PATCH bluetooth-next 28/34] fakelb: move lock out of iteration
+Date: Sun, 17 May 2015 21:45:04 +0200
+Message-Id: <1431891910-32231-29-git-send-email-alex.aring@gmail.com>
 In-Reply-To: <1431891910-32231-1-git-send-email-alex.aring@gmail.com>
 References: <1431891910-32231-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
@@ -16,123 +16,51 @@ List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
 Cc: kernel@pengutronix.de, marcel@holtmann.org, Alexander Aring <alex.aring@gmail.com>
 
-This patch moves the fakelb list of all registered phy's in a static
-declaration in the fakelb driver.
+The list need to be protected while iteration which is need when other
+list iterates at the same time over this list.
 
 Signed-off-by: Alexander Aring <alex.aring@gmail.com>
 ---
- drivers/net/ieee802154/fakelb.c | 32 +++++++-------------------------
- 1 file changed, 7 insertions(+), 25 deletions(-)
+ drivers/net/ieee802154/fakelb.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/net/ieee802154/fakelb.c b/drivers/net/ieee802154/fakelb.c
-index 43370fb..c7e7d50 100644
+index c7e7d50..e1c0195 100644
 --- a/drivers/net/ieee802154/fakelb.c
 +++ b/drivers/net/ieee802154/fakelb.c
-@@ -29,21 +29,17 @@
+@@ -193,9 +193,7 @@ err_reg:
  
- static int numlbs = 2;
- static DEFINE_RWLOCK(fakelb_lock);
-+static LIST_HEAD(fakelb_phys);
- 
- struct fakelb_phy {
- 	struct ieee802154_hw *hw;
- 
- 	struct list_head list;
--	struct fakelb_priv *fake;
- 
- 	spinlock_t lock;
- 	bool working;
- };
- 
--struct fakelb_priv {
--	struct list_head list;
--};
--
- static int
- fakelb_hw_ed(struct ieee802154_hw *hw, u8 *level)
+ static void fakelb_del(struct fakelb_phy *phy)
  {
-@@ -82,7 +78,7 @@ fakelb_hw_xmit(struct ieee802154_hw *hw, struct sk_buff *skb)
- 	struct fakelb_phy *phy;
+-	write_lock_bh(&fakelb_lock);
+ 	list_del(&phy->list);
+-	write_unlock_bh(&fakelb_lock);
  
- 	read_lock_bh(&fakelb_lock);
--	list_for_each_entry(phy, &current_phy->fake->list, list) {
-+	list_for_each_entry(phy, &fakelb_phys, list) {
- 		if (current_phy == phy)
- 			continue;
- 
-@@ -132,7 +128,7 @@ static const struct ieee802154_ops fakelb_ops = {
- module_param(numlbs, int, 0);
- MODULE_PARM_DESC(numlbs, " number of pseudo devices");
- 
--static int fakelb_add_one(struct device *dev, struct fakelb_priv *fake)
-+static int fakelb_add_one(struct device *dev)
- {
- 	struct fakelb_phy *phy;
- 	int err;
-@@ -176,9 +172,6 @@ static int fakelb_add_one(struct device *dev, struct fakelb_priv *fake)
- 	/* 950 MHz GFSK 802.15.4d-2009 */
- 	hw->phy->supported.channels[6] |= 0x3ffc00;
- 
--	INIT_LIST_HEAD(&phy->list);
--	phy->fake = fake;
--
- 	spin_lock_init(&phy->lock);
- 
- 	hw->parent = dev;
-@@ -188,7 +181,7 @@ static int fakelb_add_one(struct device *dev, struct fakelb_priv *fake)
- 		goto err_reg;
- 
- 	write_lock_bh(&fakelb_lock);
--	list_add_tail(&phy->list, &fake->list);
-+	list_add_tail(&phy->list, &fakelb_phys);
- 	write_unlock_bh(&fakelb_lock);
- 
- 	return 0;
-@@ -210,41 +203,30 @@ static void fakelb_del(struct fakelb_phy *phy)
- 
- static int fakelb_probe(struct platform_device *pdev)
- {
--	struct fakelb_priv *priv;
- 	struct fakelb_phy *phy, *tmp;
- 	int err = -ENOMEM;
- 	int i;
- 
--	priv = devm_kzalloc(&pdev->dev, sizeof(struct fakelb_priv),
--			    GFP_KERNEL);
--	if (!priv)
--		goto err_alloc;
--
--	INIT_LIST_HEAD(&priv->list);
--
- 	for (i = 0; i < numlbs; i++) {
--		err = fakelb_add_one(&pdev->dev, priv);
-+		err = fakelb_add_one(&pdev->dev);
- 		if (err < 0)
- 			goto err_slave;
- 	}
- 
--	platform_set_drvdata(pdev, priv);
- 	dev_info(&pdev->dev, "added ieee802154 hardware\n");
+ 	ieee802154_unregister_hw(phy->hw);
+ 	ieee802154_free_hw(phy->hw);
+@@ -217,8 +215,10 @@ static int fakelb_probe(struct platform_device *pdev)
  	return 0;
  
  err_slave:
--	list_for_each_entry_safe(phy, tmp, &priv->list, list)
-+	list_for_each_entry_safe(phy, tmp, &fakelb_phys, list)
++	write_lock_bh(&fakelb_lock);
+ 	list_for_each_entry_safe(phy, tmp, &fakelb_phys, list)
  		fakelb_del(phy);
--err_alloc:
++	write_unlock_bh(&fakelb_lock);
  	return err;
  }
  
- static int fakelb_remove(struct platform_device *pdev)
+@@ -226,9 +226,10 @@ static int fakelb_remove(struct platform_device *pdev)
  {
--	struct fakelb_priv *priv = platform_get_drvdata(pdev);
  	struct fakelb_phy *phy, *temp;
  
--	list_for_each_entry_safe(phy, temp, &priv->list, list)
-+	list_for_each_entry_safe(phy, temp, &fakelb_phys, list)
++	write_lock_bh(&fakelb_lock);
+ 	list_for_each_entry_safe(phy, temp, &fakelb_phys, list)
  		fakelb_del(phy);
- 
+-
++	write_unlock_bh(&fakelb_lock);
  	return 0;
+ }
+ 
 -- 
 2.3.7
 
