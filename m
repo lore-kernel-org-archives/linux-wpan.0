@@ -1,61 +1,59 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.126.130]:52637 "EHLO
-	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932153AbbERK5W (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Mon, 18 May 2015 06:57:22 -0400
-Message-ID: <5559C58F.6010607@xsilon.com>
-Date: Mon, 18 May 2015 11:57:19 +0100
-From: Simon Vincent <simon.vincent@xsilon.com>
-MIME-Version: 1.0
+Received: from mail-wi0-f169.google.com ([209.85.212.169]:36214 "EHLO
+	mail-wi0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751230AbbEROAy (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Mon, 18 May 2015 10:00:54 -0400
+Received: by wizk4 with SMTP id k4so80649262wiz.1
+        for <linux-wpan@vger.kernel.org>; Mon, 18 May 2015 07:00:53 -0700 (PDT)
+Date: Mon, 18 May 2015 16:00:47 +0200
+From: Alexander Aring <alex.aring@gmail.com>
 Subject: Re: Kernel crash when using multiple interfaces
-References: <5555EC72.6060302@xsilon.com> <20150515142026.GA11157@omega> <55560A88.1050903@xsilon.com> <20150516153329.GA31491@omega>
-In-Reply-To: <20150516153329.GA31491@omega>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Message-ID: <20150518140045.GA749@omega>
+References: <5555EC72.6060302@xsilon.com>
+ <20150515142026.GA11157@omega>
+ <55560A88.1050903@xsilon.com>
+ <20150516153329.GA31491@omega>
+ <5559C58F.6010607@xsilon.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <5559C58F.6010607@xsilon.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>
+To: Simon Vincent <simon.vincent@xsilon.com>
 Cc: linux-wpan@vger.kernel.org
 
-Hi Alex,
+Hi Simon,
 
-I can confirm your patch still results in the bad paging request.
-Maybe you are not seeing it as you have a slightly different setup.
+On Mon, May 18, 2015 at 11:57:19AM +0100, Simon Vincent wrote:
+> Hi Alex,
+> 
+> I can confirm your patch still results in the bad paging request.
+> Maybe you are not seeing it as you have a slightly different setup.
+> 
+> If I understand correctly you have two virtual phys going to a single wpan
+> interface
+> e.g.
+> phy0 -> wpan0
+> phy1 -> wpan0
+> 
+> My setup is two separate transceivers. Each with its own phy and wpan
+> interface.
+> e.g.
+> phy0 -> wpan0
+> phy1 -> wpan1
+> 
 
-If I understand correctly you have two virtual phys going to a single 
-wpan interface
-e.g.
-phy0 -> wpan0
-phy1 -> wpan0
+ From view of mac802154 layer this setup should be the same. Both running
+two times alloc_hw and register_hw for alloc/register a wpan phy. The
+driver layer is different.
 
-My setup is two separate transceivers. Each with its own phy and wpan 
-interface.
-e.g.
-phy0 -> wpan0
-phy1 -> wpan1
+With your solution to putting the worker resource on the heap then the
+problem is solved?
 
-- Simon
+Can you provide more information about the "bad paging request" issue? A
+stacktrace or something else?
 
-On 16/05/15 16:33, Alexander Aring wrote:
-> Hi Simon,
->
-> On Fri, May 15, 2015 at 04:02:32PM +0100, Simon Vincent wrote:
->> I tried the solution you proposed but it did not work, it resulted in a
->> kernel crash (bad paging request).
->>
-> I can now reproduce your issue when I am using the fakelb driver _with_
-> xmit_sync callback and two vitual phys.
->
-> I tried my patch and it's working fine afterwards, can you please check
-> if the "kernel crash (bad paging request)" isn't another issue or
-> something failed while applying the diff?
->
-> Can you check that again? This issue should be fixed into bluetooth, very
-> ugly bug.
->
-> - Alex
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-wpan" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+I currently have no idea why you have this issue.
 
+- Alex
