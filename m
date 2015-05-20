@@ -1,41 +1,51 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from hmm.wantstofly.org ([148.251.232.15]:50611 "EHLO
-	mail.wantstofly.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750937AbbEST4h (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Tue, 19 May 2015 15:56:37 -0400
-Date: Tue, 19 May 2015 22:49:53 +0300
-From: Lennert Buytenhek <buytenh@wantstofly.org>
-Subject: [PATCH 0/8] ieee802154: Assorted fixes and cleanups.
-Message-ID: <20150519194953.GL11014@wantstofly.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Received: from mail-wi0-f182.google.com ([209.85.212.182]:38243 "EHLO
+	mail-wi0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751502AbbETH0W (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Wed, 20 May 2015 03:26:22 -0400
+Received: by wichy4 with SMTP id hy4so49208007wic.1
+        for <linux-wpan@vger.kernel.org>; Wed, 20 May 2015 00:26:20 -0700 (PDT)
+From: Alexander Aring <alex.aring@gmail.com>
+Subject: [PATCH wpan-tools] info: change dbm format string
+Date: Wed, 20 May 2015 09:26:07 +0200
+Message-Id: <1432106767-1509-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
+Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-Lennert Buytenhek (8):
-  ieee802154 socket: Return EMSGSIZE from raw_sendmsg() if packet too
-    big.
-  Documentation/networking/ieee802154.txt: fix various inaccuracies.
-  ieee802154: Remove ieee802154_reduced_mlme_ops references.
-  ieee802154: Remove 802.15.4/6LoWPAN checks for interface MTU.
-  ieee802154 6lowpan: Don't implement ieee802154_mlme_ops.
-  ieee802154 socket: No need to check for ARPHRD_IEEE802154 in
-    raw_bind().
-  mac802154: mac802154_header_create() optimisation.
-  mac802154: mac802154_mlme_start_req() optimisation.
+This patch changes the dbm format string to %.3g instead %.2g. The
+reason is that it shows not well for a 3-digit number like "-100" is
+shown as "-1e+02". A format string of %.3g will fix that.
 
- Documentation/networking/ieee802154.txt | 25 ++++++++++++-------------
- include/net/ieee802154_netdev.h         |  6 ------
- net/ieee802154/6lowpan/core.c           | 28 ----------------------------
- net/ieee802154/6lowpan/tx.c             |  7 ++++---
- net/ieee802154/nl-mac.c                 | 17 +++--------------
- net/ieee802154/socket.c                 |  8 +-------
- net/mac802154/iface.c                   |  2 +-
- net/mac802154/mac_cmd.c                 | 29 +++++++++++------------------
- 8 files changed, 32 insertions(+), 90 deletions(-)
+Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+Reported-by: Craig Younkins <craig@freshtemp.com>
+---
+ src/info.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
+diff --git a/src/info.c b/src/info.c
+index c749866..b74442d 100644
+--- a/src/info.c
++++ b/src/info.c
+@@ -163,7 +163,7 @@ static int print_phy_handler(struct nl_msg *msg, void *arg)
+ 
+ 			printf("\ttx_powers: ");
+ 			nla_for_each_nested(nl_pwrs, tb_caps[NL802154_CAP_ATTR_TX_POWERS], rem_pwrs)
+-				printf("%.2g,", MBM_TO_DBM(nla_get_s32(nl_pwrs)));
++				printf("%.3g,", MBM_TO_DBM(nla_get_s32(nl_pwrs)));
+ 			/* TODO */
+ 			printf("\b \n");
+ 		}
+@@ -174,7 +174,7 @@ static int print_phy_handler(struct nl_msg *msg, void *arg)
+ 
+ 			printf("\tcca_ed_levels: ");
+ 			nla_for_each_nested(nl_levels, tb_caps[NL802154_CAP_ATTR_CCA_ED_LEVELS], rem_levels)
+-				printf("%.2g,", MBM_TO_DBM(nla_get_s32(nl_levels)));
++				printf("%.3g,", MBM_TO_DBM(nla_get_s32(nl_levels)));
+ 			/* TODO */
+ 			printf("\b \n");
+ 		}
 -- 
-2.1.0
+2.3.7
 
