@@ -1,32 +1,41 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from host.almesberger.net ([204.10.140.10]:39922 "EHLO
-	host.almesberger.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753622AbbETQbk (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Wed, 20 May 2015 12:31:40 -0400
-Date: Wed, 20 May 2015 13:31:25 -0300
-From: Werner Almesberger <werner@almesberger.net>
-Subject: Re: [PATCH atubs-fw 3/4] atusb/fw: Add build system support for
- adding a DFU suffix to the fw file
-Message-ID: <20150520163125.GH10959@ws>
-References: <1432127894-4760-1-git-send-email-stefan@datenfreihafen.org>
- <1432127894-4760-4-git-send-email-stefan@datenfreihafen.org>
+Received: from lists.s-osg.org ([54.187.51.154]:34947 "EHLO lists.s-osg.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754106AbbETQjQ (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+	Wed, 20 May 2015 12:39:16 -0400
+Message-ID: <555CB8B0.7060203@osg.samsung.com>
+Date: Wed, 20 May 2015 18:39:12 +0200
+From: Stefan Schmidt <stefan@osg.samsung.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1432127894-4760-4-git-send-email-stefan@datenfreihafen.org>
+Subject: Re: [PATCH atubs-fw 3/4] atusb/fw: Add build system support for adding
+ a DFU suffix to the fw file
+References: <1432127894-4760-1-git-send-email-stefan@datenfreihafen.org> <1432127894-4760-4-git-send-email-stefan@datenfreihafen.org> <20150520163125.GH10959@ws>
+In-Reply-To: <20150520163125.GH10959@ws>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Stefan Schmidt <stefan@datenfreihafen.org>
+To: Werner Almesberger <werner@almesberger.net>, Stefan Schmidt <stefan@datenfreihafen.org>
 Cc: linux-wpan@vger.kernel.org, alex.aring@gmail.com
 
-Stefan Schmidt wrote:
-> DFU files need to have a valid DFU suffix which provides information
-> about the USB vendor and product ID
+Hello.
 
-Aah, more bureaucracy ! :)
+On 20/05/15 18:31, Werner Almesberger wrote:
+> Stefan Schmidt wrote:
+>> DFU files need to have a valid DFU suffix which provides information
+>> about the USB vendor and product ID
+> Aah, more bureaucracy ! :)
+>
+Yup. :)
 
-> +		dfu-suffix -a $(NAME).dfu -d 0x$(USB_BCD_VERSION) -p 0x$(USB_PRODUCT_ID) -v 0x$(USB_VENDOR_ID)
+Good one is this case though. The suffix add a little crc protection and 
+having the ID to make sure we flash it to the right device also sounds 
+good to me :)
 
-Would be nice to keep wc -L <= 80, though.
+>> +		dfu-suffix -a $(NAME).dfu -d 0x$(USB_BCD_VERSION) -p 0x$(USB_PRODUCT_ID) -v 0x$(USB_VENDOR_ID)
+> Would be nice to keep wc -L <= 80, though.
 
-- Werner
+ok, will change this tomorrow and resend. Going afk now.
+
+regards
+Stefan Schmidt
