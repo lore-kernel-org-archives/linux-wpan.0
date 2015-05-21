@@ -1,169 +1,61 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from proxima.lasnet.de ([78.47.171.185]:45240 "EHLO
-	proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752832AbbETN2S (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Wed, 20 May 2015 09:28:18 -0400
-Message-ID: <555C8A77.3070203@datenfreihafen.org>
-Date: Wed, 20 May 2015 15:21:59 +0200
-From: Stefan Schmidt <stefan@datenfreihafen.org>
+Received: from lists.s-osg.org ([54.187.51.154]:48565 "EHLO lists.s-osg.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754716AbbEUOkS (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+	Thu, 21 May 2015 10:40:18 -0400
+Message-ID: <555DEE4E.4020307@osg.samsung.com>
+Date: Thu, 21 May 2015 16:40:14 +0200
+From: Stefan Schmidt <stefan@osg.samsung.com>
 MIME-Version: 1.0
 Subject: Re: [PATCH atubs-fw 0/4] ATUSB firmware changes towards a 0.2 release
-References: <1432127894-4760-1-git-send-email-stefan@datenfreihafen.org>
-In-Reply-To: <1432127894-4760-1-git-send-email-stefan@datenfreihafen.org>
-Content-Type: multipart/mixed;
- boundary="------------070301060801020204040507"
+References: <1432127894-4760-1-git-send-email-stefan@datenfreihafen.org> <555C8A77.3070203@datenfreihafen.org>
+In-Reply-To: <555C8A77.3070203@datenfreihafen.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org
+To: Stefan Schmidt <stefan@datenfreihafen.org>, linux-wpan@vger.kernel.org
 Cc: alex.aring@gmail.com, werner@almesberger.net
-
-This is a multi-part message in MIME format.
---------------070301060801020204040507
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
 
 Hello.
 
-On 20/05/15 15:18, Stefan Schmidt wrote:
+On 20/05/15 15:21, Stefan Schmidt wrote:
 > Hello.
 >
-> Nothing to be appliad to the kernel but rather the atusb firmware repo. Just
-> sending it here as it is releated to the mainline driver and the device users
-> are reading here.
+> On 20/05/15 15:18, Stefan Schmidt wrote:
+>> Hello.
+>>
+>> Nothing to be appliad to the kernel but rather the atusb firmware repo. Just
+>> sending it here as it is releated to the mainline driver and the device users
+>> are reading here.
+>>
+>> These are the four patches I consider we need to have a working 0.2 release.
+>> The revert might be only needed for my qemu setup with USB passthrough, but
+>> without it I'm not able to get the device to show up in qemu. Thoughts
+>> appreciated.
+>>
+>> Using RX_AACK_ON sounds like a good idea as we loose nothing but work also work
+>> well with nodes using ARET.
+>>
+>> Bumping to version 0.2 and adding the need magic to add a valid DFU suffix to
+>> the firmware file. I will followup with a mail attaching the binary I'm using
+>> right now and I consider the final 0.2 if everyone agrees with these patches.
+>>
+> Binary firmware image attached. Alexander, if you could give that a test
+> it would be appreciated.
 >
-> These are the four patches I consider we need to have a working 0.2 release.
-> The revert might be only needed for my qemu setup with USB passthrough, but
-> without it I'm not able to get the device to show up in qemu. Thoughts
-> appreciated.
->
-> Using RX_AACK_ON sounds like a good idea as we loose nothing but work also work
-> well with nodes using ARET.
->
-> Bumping to version 0.2 and adding the need magic to add a valid DFU suffix to
-> the firmware file. I will followup with a mail attaching the binary I'm using
-> right now and I consider the final 0.2 if everyone agrees with these patches.
->
-Binary firmware image attached. Alexander, if you could give that a test
-it would be appreciated.
+> Everyone else with a atusb please test as well if you have the time.
 
-Everyone else with a atusb please test as well if you have the time.
+The pending patches have been pushed and I tagged the atusb firmware 0.2 
+release in git:
+http://projects.qi-hardware.com/index.php/p/ben-wpan/source/changes/v0.2-atusb-fw/
+
+The firmware binary should be available from the website soon. If you 
+are eager you can get it here:
+http://projects.qi-hardware.com/index.php/p/ben-wpan/source/tree/master/web/releases/atusb-0.2.dfu
+
+If anyone has patches for the firmware pending or upcoming please CC me. 
+I should be able help reviewing, testing and pushing them.
 
 regards
 Stefan Schmidt
-
---------------070301060801020204040507
-Content-Type: application/octet-stream;
- name="atusb-0.2.dfu"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment;
- filename="atusb-0.2.dfu"
-
-DJQ6AAyUwAEMlFcADJRXAAyUVwAMlFcADJRXAAyUVwAMlFcADJRXAAyUVwAMlCgHDJRaBwyU
-VwAMlFcADJRXAAyUVwAMlFcADJTaAAyUVwAMlFcADJRXAAyUVwAMlFcADJRXAAyUVwAMlFcA
-DJRXAAyUVwARJB++z+/U4N6/zb8R4KDgseDg4PbhAsAFkA2SqDmxB9n3FOCo6bHgAcAdkqs0
-sQfh9w6UjgoMlP4KDJQAABS4F7gauBW4GLgbuCaaP5okmg6UXQJHmIXgipXx9wAAR5qF4IqV
-8fcAAA6UcgKD7A6ULwKE4A6ULwIMlDgCiCMR8C6aCJUumAiV+JQumi/vgOeS4CFQgECQQOH3
-AMAAAC6YL++A55LgIVCAQJBA4fcAwAAA688UvoCRYACAYYCTYACA4YCTYACA6ICTYQAQkmEA
-QOBQ4DHi+gE+ljCTVwDkkcoBiA+ZH4gPmR/cARKWLi8ilS9wKjAQ9CBdAcApWqBQv08skwSW
-73DqMBD04F0BwOla3AGgUL9P7JNPX19PSjBRBcn2CJWA4AyUeACI4ICTYAAIlYmxgXAIlSya
-LJgIlR+SD5IPtg+SESSPk5+Tr5O/k4CRmAGQkZkBoJGaAbCRmwEBlqEdsR2Ak5gBkJOZAaCT
-mgGwk5sBv5GvkZ+Rj5EPkA++D5AfkBiVf5KPkp+Sr5K/ks+S35Lvkv+SD5Mfk8+T35Mh4LCb
-FMAmu4CRmAGQkZkBoJGaAbCRmwEBlqEdsR2Ak5gBkJOZAaCTmgGwk5sBgJGYAZCRmQGgkZoB
-sJGbARCRhACAkIUAsJncz5wBrQFg4HDggOCQ4ADhDpTlCnIuky5aAWsBfAEoLTDgQOBQ4GDg
-cOCA4JDgCOAOlOUKJyk5KUopWylsKX0pISuOKZ8p35HPkR+RD5H/kO+Q35DPkL+Qr5CfkI+Q
-f5AIlRCSgACB4ICTgQCAk28ACJUPkx+Tz5Pfkx26gjB58IMwufCBMAnwQMCUsSCVkiNJK0S5
-lbEpI2IrZbkTwJexIJWSI0krR7mYsSkjYitouQnAmrEglZIjSStKuZuxKSNiK2u56AEYLw6U
-WAKP7JfgAZfx9wDAAAASMFHwEzBx8BEwqfSDsYiDhbGJg4SxC8CGsYiDiLGJg4exBcCJsYiD
-i7GJg4qxioMCwIDgAcCB4N+Rz5EfkQ+RCJWB4I27CJUfkg+SD7YPkhEk75L/kg+TH5Mvkz+T
-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
-ESQvkz+TT5Nfk2+Tf5OPk5+Tr5O/k++T/5OAkeEAg/8MwOCRLwTwkTAEMJcJ8AmVDpS/Bofv
-gJPhAP+R75G/ka+Rn5GPkX+Rb5FfkU+RP5EvkQ+QD74PkB+QGJUfkg+SD7YPkhEkL5I/kk+S
-X5Jvkn+Sj5Kfkq+Sv5LPkt+S75L/kg+TH5Mvkz+TT5Nfk2+Tf5OPk5+Tr5O/k++T/5PPk9+T
-zbfetyiX3r/Nv2CQ9ACV48kulODZLivjgi4k4JIuoSyxLHEsMe9DLk3vNC5X7yUuwwEKLALA
-lZWHlQqU4veA/wTBoJLpAICR6ACD/0rA1gEdkhySgJHyAIgwEPQOlH4AgJHxAImDgJHxAIqD
-gJHxACCR8QCQ4JIrnIOLg4CR8QAgkfEAkOCSK56DjYOAkfEAIJHxAJDgkiuYh4+DzgEBlg6U
-qgVYLogjCfTFwImBh/0TwICRNQSQkTYEiStp9OEs8SwA4BDgIOBA4FDgYuBw4IXjlOAOlHIF
-VSAJ9KzAIJLoAICR6ACC/0zA9gGAgZGBAZcJ8KDAgJHyAEgvUOAkgTWBYoFzgSYbNwskFzUH
-DPSSwIFQ1gESlu2R/JETl48/YfCfAS9fP0/WAROWPJMukxKXkJHxAJCD7M8Ulo2RnJEVl+gX
-+QfR9BGWHJIekheW7ZH8kRiXMJcp8BmWjZGckRqXCZXhLPEsAOAQ4CDgQOBQ4GLgcODGAQ6U
-cgW757CT6ACAkegAgf8FwPYBEYIQgjCS6ACAkegAgP9XwNYBjZGckRGXApcJ8EDAFJaMkRSX
-EpYskfQBkIGCG5gXCPSJL5gvmSOJ8NYBEpbtkfyRE5efAS9fP08TljyTLpMSlyCBIJPxAJFQ
-7c/0AZCBiRcZ8NYBHZIckqEUsQQR9IHgAcCB6ICVgJPoAPYBgIGRgYkr4fQHgPCF4C0wl7nw
-1gEZlo2RnJEalwmVEMCAkfAAjn+Ak/AACsBAkugA9gERghCCgJHrAIBigJPrAPvgzw7RHIvg
-iA6RHKqUqygh8Koko5SxLObOKJYPtviU3r8Pvs2/35HPkf+R75G/ka+Rn5GPkX+Rb5FfkU+R
-P5EvkR+RD5H/kO+Q35DPkL+Qr5CfkI+Qf5BvkF+QT5A/kC+QD5APvg+QH5AYleDu8OCAgYFg
-gIOP7JfgAZfx9wDAAAAIlYCR2ACAYoCT2ACJtYN+ib2JtYJgib0JtAD+/c+AkdgAj3eAk9gA
-gJHYAIBogJPYAICR2ACPfYCT2ACAkeAAjn+Ak+AAiOCAk+IADJS/Bs+T35Mfks233reJgw6U
-cgKJgYBoDpQvAoDgDpQvAomDDpQ4AomBD5Dfkc+RCJXvkv+SD5Mfk8+T35OAkSICkJEjApgX
-wfCQ4GHocOAOlKwK7AHHVd1PgeAOlHgAKIEuX+Es8SwD7RngrgFi4HDggOSU4A6UcgWAkScC
-iCN58OEs8SwA5hngIeBE4lLgYuBw4IDklOAOlHIFEJInAt+Rz5EfkQ+R/5DvkAiVDJQiCe+S
-/5IPkx+Tz5OP4A6UCwmD/2DAIJEoAoCRQASQkUEEIiPR8IkrcfThLPEsAOYZ4CHgReJS4GLg
-cOCA5JTgDpRyBQfAgeCAkycCgJElAoCTJAIQkigCPsCJKzHwkJEjAoCRIgKYF7HxDpRyAoDi
-DpQvAof9A8AOlDgCLMCA4A6ULwLILxgWvPeAkSMCkOBh6HDgDpSsCowBB1UdT2HgbA/IAQGW
-DpQ6Ag6UOAL4AcCDgJEjApDgAZZj4HDgDpTRCoCTIwKAkUAEkJFBBIkrEfQOlCIJgeDPkR+R
-D5H/kO+QCJWA4A6UeACAkSICkOABlmPgcOAOlNEKgJMiAgyUIgnPk8gvgeAOlAsJj3GPMdHz
-DpRyAoLsDpQvAowvDpQvAs+RDJQ4As+T35PP79/vIZfR8YHgDpQLCY9whjDB9w6UcgKC7A6U
-LwKE4A6ULwIOlDgCDpRiCQ6UcgKA5g6ULwKAkSkCjl8OlC8CwOCAkSkCyBdJ8Owv8ODmXf1P
-gIEOlC8Cz1/zzw6UOAIOlNcAgeCAkygCgJEmAoCTJQKG4d+Rz5EMlOIJ35HPkQiViStp8ILm
-meCQkyECgJMgAo/gDpQLCYbhDpTiCQnAEJIhAhCSIAKD4A6U4gkQkigCgeAIle+S/5IPkx+T
-QDhRBZj0QJMpAmCTJgLhLPEsBe8Z4CQvSuJS4GHgcOCF45TgDpRyBYHgAcCA4B+RD5H/kO+Q
-CJUQkiECEJIgAhCSKAIQkicCEJIiAhCSIwIQkiQCEJIlAhCSJgIOlHIChOwOlC8CiOIOlC8C
-DJQ4Ag6UlAAOlBACDpRZAIbhkuCQky4EgJMtBA6U5AgOlBAFDpRhAYHghb8VvniUg7eBYIO/
-iJWDt45/g7/4zwAkVScEwAgOWR+ID5kfAJcp8HaVZ5W483EFufeALZUvCJWqG7sbUeEHwKof
-ux+mF7cHEPCmG7cLiB+ZH1qVqfeAlZCVvAHNAQiVl/sHLhb0AJQH0Hf9CdAOlL0KB/wF0D70
-kJWBlZ9PCJVwlWGVf08IlQ+TCDCQ8Jgvhy92L2UvVC9DLzIvIicIUPTPIg8zH0QfVR9mH3cf
-iB+ZHwqVsvcPkQiV+JT/zyoDAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAABkAAACAHoBBAMJBAkCIgACAQCAFAkEAAAB/wAAAAcFgQJAAAAJBAEAAP4BAQASAQAC
-/wAAQLcgQBUBAAAAAQEAAgIJIQ///0AAAQEAABgAV2VkIDIwIE1heSAxNToxOTo1OCBDRVNU
-IDIwMTUAIABAFbcgAAFVRkQQ6C2shQ==
---------------070301060801020204040507--
