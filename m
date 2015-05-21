@@ -1,29 +1,24 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f171.google.com ([209.85.212.171]:34862 "EHLO
-	mail-wi0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756135AbbEUPg3 (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Thu, 21 May 2015 11:36:29 -0400
-Received: by wicmx19 with SMTP id mx19so19211140wic.0
-        for <linux-wpan@vger.kernel.org>; Thu, 21 May 2015 08:36:28 -0700 (PDT)
-Date: Thu, 21 May 2015 17:36:22 +0200
-From: Alexander Aring <alex.aring@gmail.com>
+Received: from senator.holtmann.net ([87.106.208.187]:35322 "EHLO
+	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932273AbbEUPzm convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Thu, 21 May 2015 11:55:42 -0400
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
 Subject: Re: [PATCH bluetooth-next 0/3] ATUSB driver updates
-Message-ID: <20150521153618.GA901@omega>
-References: <1432219897-29528-1-git-send-email-stefan@osg.samsung.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+From: Marcel Holtmann <marcel@holtmann.org>
 In-Reply-To: <1432219897-29528-1-git-send-email-stefan@osg.samsung.com>
+Date: Thu, 21 May 2015 17:55:39 +0200
+Content-Transfer-Encoding: 8BIT
+Message-Id: <73C46C8C-CE77-4F05-884E-8006C6E90047@holtmann.org>
+References: <1432219897-29528-1-git-send-email-stefan@osg.samsung.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: Stefan Schmidt <stefan@osg.samsung.com>
-Cc: linux-wpan@vger.kernel.org
+Cc: linux-wpan@vger.kernel.org, Alexander Aring <alex.aring@gmail.com>
 
-Hi,
+Hi Stefan,
 
-On Thu, May 21, 2015 at 04:51:34PM +0200, Stefan Schmidt wrote:
-> Hello.
-> 
 > Some updates for the atusb driver.
 > 
 > Checking for minimum firmware version now that we have a public release. It
@@ -36,17 +31,17 @@ On Thu, May 21, 2015 at 04:51:34PM +0200, Stefan Schmidt wrote:
 > ed handling for atusb is planned for the future.
 > 
 > Stefan Schmidt (3):
->   ieee802154/atusb: Warn about outdated device firmware.
->   ieee802154/atusb: Mark driver as AACK enabled in hardware.
->   ieee802154/atusb: Set default ed level to 0xbe like the rest of these
->     drivers
+>  ieee802154/atusb: Warn about outdated device firmware.
+>  ieee802154/atusb: Mark driver as AACK enabled in hardware.
+>  ieee802154/atusb: Set default ed level to 0xbe like the rest of these
+>    drivers
 > 
->  drivers/net/ieee802154/atusb.c | 13 ++++++++++---
->  1 file changed, 10 insertions(+), 3 deletions(-)
+> drivers/net/ieee802154/atusb.c | 13 ++++++++++---
+> 1 file changed, 10 insertions(+), 3 deletions(-)
 
-Acked-by: Alexander Aring <alex.aring@gmail.com>
+all 3 patches have been applied to bluetooth-next tree.
 
-on the complete series.
+Regards
 
-- Alex
+Marcel
 
