@@ -1,71 +1,88 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f182.google.com ([209.85.212.182]:38636 "EHLO
-	mail-wi0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752391AbbEMUFz (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Wed, 13 May 2015 16:05:55 -0400
-Received: by wicnf17 with SMTP id nf17so69480704wic.1
-        for <linux-wpan@vger.kernel.org>; Wed, 13 May 2015 13:05:53 -0700 (PDT)
-Date: Wed, 13 May 2015 22:05:51 +0200
-From: Alexander Aring <alex.aring@gmail.com>
-Subject: Re: atusb availability
-Message-ID: <20150513200547.GB820@omega>
-References: <CAHwW560VTApCL2a4c8uOMC2u-bWzenTf0vwH0pbeLZ3xNLuCOA@mail.gmail.com>
- <20150423083052.GA1077@omega>
- <CAHwW563+_YBjKLU7Pm8igBeOmWfUg_VEMhQ9Y-GosTdCPLBGUw@mail.gmail.com>
+Received: from lists.s-osg.org ([54.187.51.154]:53162 "EHLO lists.s-osg.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1757114AbbEVNF4 (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+	Fri, 22 May 2015 09:05:56 -0400
+Message-ID: <555F29B1.4010503@osg.samsung.com>
+Date: Fri, 22 May 2015 15:05:53 +0200
+From: Stefan Schmidt <stefan@osg.samsung.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Subject: Re: atusb availability
+References: <CAHwW560VTApCL2a4c8uOMC2u-bWzenTf0vwH0pbeLZ3xNLuCOA@mail.gmail.com> <20150423083052.GA1077@omega> <CAHwW563+_YBjKLU7Pm8igBeOmWfUg_VEMhQ9Y-GosTdCPLBGUw@mail.gmail.com>
 In-Reply-To: <CAHwW563+_YBjKLU7Pm8igBeOmWfUg_VEMhQ9Y-GosTdCPLBGUw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Geoff Chapman <geoff.chapman@mmbresearch.com>
-Cc: linux-wpan@vger.kernel.org
+To: Geoff Chapman <geoff.chapman@mmbresearch.com>, Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org
 
-On Wed, May 13, 2015 at 01:24:13PM -0400, Geoff Chapman wrote:
+Hello.
+
+On 13/05/15 19:24, Geoff Chapman wrote:
 > Hi Alex,
 > I just wanted to thank-you for your reply, it certainly helped with my
 > understanding.  Initially, I thought the device was a HardMAC device,
 > so thank-you for correcting me on that.  It seems that the device
 > simply implements a USB-to-SPI interface.
-> 
+
+Funny enough our first driver for it was actually a fake spi master 
+driver which did nothing else but connected to the normal at86rf23x 
+driver and transmitted all SPI message over usb to the device. :)
+
+That worked ok-ish but was a performance problem for transmit and 
+receive. Thus this part was moved into the firmware. We kept the way of 
+setting register for configurations like this though.
+
 > I have used the schematics at [0] to build a few boards of my own.  I
 > would like to use the two boards to send data between two laptop
 > computers running linux.
+
+Nice, that you used the same schematics and build your boards!
+
+Do you by any chance have the infrastructure to handle a bigger run of 
+these? We often get asked about such a device for easy hacking with 
+ieee802154 from a laptop or desktop without any SPI connections available.
+
+The run Werner did was around 100 - 120 pieces for atusb IIRC. My best 
+guess would be that there could be interest for another 50-100 depending 
+on the promotions.
+
+Werner did a great job on documenting the whole design to deliver 
+process so most pitfalls should be known and the risk reduced. If you 
+stay with the same chips the firmware and factory testing things are 
+also ready.
+
+I'm not doing hardware myself so I'm not sure how risky this all could 
+be but I see a need for this kind of devices. Especially with good 
+plug'n'play support in the mainline kernel this could have potential. 
+Still not talking thousands here as it will stay a developer/hacker only 
+device.
+
+If you have no time/interest/infrastructure for this but someone else 
+has please speak up here. Going a route through indigogo or kickstarter 
+might also help to determine the interest to have a better idea who big 
+a run should be.
 > The description at [1] indicates that the ATMega firmware implements a
 > "home-brew protocol on top of USB".  My plan is to do the following:
-> 
+>
 > 1. Examine the source ATUSB firmware source code to determine the
 > home-brew protocol.
-
-that should work, this is what we try to do with the rzusbstick [0],
-which have much identically parts like atusb (but atusb is much better
-;-))
-
-Then we just need to port the firmware to the rzusbstick.
-
 > 2. Write some application software in C for the two linux PCs using
 > Netlink sockets to communicate with the devices and transfer data
 > between the two PCs.
-> 
+>
+> I was wondering -- do you think I am on the right track?  Do you have
+> any suggestions?
 
-No netlink sockets, it's simple an IPv6 socket. What you missing here is
-the atusb driver which is not mainline, but I recently send a patch to
-support basic operation for atusb. I hope we getting this driver
-mainline the next days, if you speak the exactly protocols then it
-should work. But _note_ the protocol contains at86rf231 specific
-commands which do a register write, look for function:
+Hmm, you really only want to transmit some data between two linux hosts 
+here, right?
+In that case you can simply use the now mainline atusb driver and its 
+0.2 frimware and tranbsmit your data over the ipv6 sockets we offer with 
+6lowpan.
 
-atusb_write_reg and atusb_read_reg.
+Unless I misunderstood you and you wanted to to something more low level 
+with ieee802165 there would be no need for you to hack on the firmware. 
+You are welcome to if you want, but I see no need for you right now. :)
 
-Then maybe you need to insert runtime decisions when you not using the
-same transceiver. Of course you can send patches for this to make this
-behaviour more generic or runtime change that a different register
-setting is used.
-
-What I mean is that the protocol isn't a generic 802.15.4 protocol for
-all transceivers, but we could make it to somewhat like that. Or you
-make different runtime changes when detecting device type while probing.
-
-- Alex
-
-[0] http://www.atmel.com/tools/rzusbstick.aspx
+regards
+Stefan Schmidt
