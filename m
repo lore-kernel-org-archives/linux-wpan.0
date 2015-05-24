@@ -1,61 +1,168 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from senator.holtmann.net ([87.106.208.187]:53473 "EHLO
-	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757957AbbEWP6t convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Sat, 23 May 2015 11:58:49 -0400
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
-Subject: Re: [PATCHv2 bluetooth-next 0/4] mac802154: remove pib/mib locks and locking fixes
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1432309434-8215-1-git-send-email-alex.aring@gmail.com>
-Date: Sat, 23 May 2015 17:58:42 +0200
-Content-Transfer-Encoding: 8BIT
-Message-Id: <B91719FE-291A-47E3-B803-179BE2E6741A@holtmann.org>
-References: <1432309434-8215-1-git-send-email-alex.aring@gmail.com>
+Received: from mail-pd0-f177.google.com ([209.85.192.177]:33331 "EHLO
+	mail-pd0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751116AbbEXOqv (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Sun, 24 May 2015 10:46:51 -0400
+Received: by pdbqa5 with SMTP id qa5so52907970pdb.0
+        for <linux-wpan@vger.kernel.org>; Sun, 24 May 2015 07:46:50 -0700 (PDT)
+From: Varka Bhadram <varkabhadram@gmail.com>
+Subject: [PATCH v2 bluetooth-next] ieee802154: add set transmit power support
+Date: Sun, 24 May 2015 20:16:33 +0530
+Message-Id: <1432478793-17254-1-git-send-email-varkab@cdac.in>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>
-Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de
+To: linux-wpan@vger.kernel.org
+Cc: alex.aring@gmail.com
 
-Hi Alex,
+This patch adds transmission power setting support for IEEE-802.15.4
+devices via nl802154.
 
-> this patch series contains patches for remove pib and mib lock. We have now
-> a other locking strategie inside this stack which requires at the moment the
-> rtnl lock only. The first patch will hold the rtnl lock which is required to
-> access the mib attributes while calling socket ioctl. The last patch will use
-> atomic operations for incremet the dsn value for dataframes, currently it could
-> be that this value is the same in two contiguous frames which could be occur a
-> wrong ack frame handling in ARET mode.
-> 
-> - Alex
-> 
-> changes since v2:
-> - switch patch 3 and 4.
-> 
-> Alexander Aring (4):
->  mac802154: fix hold rtnl while ioctl
->  mac802154: remove pib lock
->  mac802154: use atomic ops for sequence incrementation
->  mac802154: remove mib lock
-> 
-> include/net/cfg802154.h         |  6 ++--
-> include/net/ieee802154_netdev.h | 10 -------
-> net/ieee802154/6lowpan/core.c   | 28 ------------------
-> net/ieee802154/6lowpan/tx.c     |  2 +-
-> net/ieee802154/core.c           |  2 --
-> net/ieee802154/nl-mac.c         | 14 ++++++---
-> net/ieee802154/nl-phy.c         |  6 ++--
-> net/ieee802154/socket.c         | 12 ++++----
-> net/mac802154/ieee802154_i.h    |  7 -----
-> net/mac802154/iface.c           | 29 ++++++-------------
-> net/mac802154/mac_cmd.c         |  7 ++---
-> net/mac802154/mib.c             | 63 ++---------------------------------------
-> net/mac802154/rx.c              |  5 ----
-> 13 files changed, 34 insertions(+), 157 deletions(-)
+Signed-off-by: Varka Bhadram <varkab@cdac.in>
+---
+ include/net/cfg802154.h   |    1 +
+ net/ieee802154/nl802154.c |   21 +++++++++++++++++++++
+ net/ieee802154/rdev-ops.h |   12 ++++++++++++
+ net/ieee802154/trace.h    |   15 +++++++++++++++
+ net/mac802154/cfg.c       |   19 +++++++++++++++++++
+ 5 files changed, 68 insertions(+)
 
-all 4 patches have been applied to bluetooth-next tree.
-
-Regards
-
-Marcel
+diff --git a/include/net/cfg802154.h b/include/net/cfg802154.h
+index 4de59aa..2e3bb01 100644
+--- a/include/net/cfg802154.h
++++ b/include/net/cfg802154.h
+@@ -44,6 +44,7 @@ struct cfg802154_ops {
+ 	int	(*set_channel)(struct wpan_phy *wpan_phy, u8 page, u8 channel);
+ 	int	(*set_cca_mode)(struct wpan_phy *wpan_phy,
+ 				const struct wpan_phy_cca *cca);
++	int     (*set_tx_power)(struct wpan_phy *wpan_phy, s32 power);
+ 	int	(*set_pan_id)(struct wpan_phy *wpan_phy,
+ 			      struct wpan_dev *wpan_dev, __le16 pan_id);
+ 	int	(*set_short_addr)(struct wpan_phy *wpan_phy,
+diff --git a/net/ieee802154/nl802154.c b/net/ieee802154/nl802154.c
+index 54f4959..42bc3d7 100644
+--- a/net/ieee802154/nl802154.c
++++ b/net/ieee802154/nl802154.c
+@@ -783,6 +783,19 @@ static int nl802154_set_cca_mode(struct sk_buff *skb, struct genl_info *info)
+ 	return rdev_set_cca_mode(rdev, &cca);
+ }
+ 
++static int nl802154_set_tx_power(struct sk_buff *skb, struct genl_info *info)
++{
++	struct cfg802154_registered_device *rdev = info->user_ptr[0];
++	s32 power;
++
++	if (!info->attrs[NL802154_ATTR_TX_POWER])
++		return -EINVAL;
++
++	/* Collecting dBm value and converting to mBm*/
++	power = nla_get_s8(info->attrs[NL802154_ATTR_TX_POWER]) * 100;
++	return rdev_set_tx_power(rdev, power);
++}
++
+ static int nl802154_set_pan_id(struct sk_buff *skb, struct genl_info *info)
+ {
+ 	struct cfg802154_registered_device *rdev = info->user_ptr[0];
+@@ -1094,6 +1107,14 @@ static const struct genl_ops nl802154_ops[] = {
+ 				  NL802154_FLAG_NEED_RTNL,
+ 	},
+ 	{
++		.cmd = NL802154_CMD_SET_TX_POWER,
++		.doit = nl802154_set_tx_power,
++		.policy = nl802154_policy,
++		.flags = GENL_ADMIN_PERM,
++		.internal_flags = NL802154_FLAG_NEED_WPAN_PHY |
++				  NL802154_FLAG_NEED_RTNL,
++	},
++	{
+ 		.cmd = NL802154_CMD_SET_PAN_ID,
+ 		.doit = nl802154_set_pan_id,
+ 		.policy = nl802154_policy,
+diff --git a/net/ieee802154/rdev-ops.h b/net/ieee802154/rdev-ops.h
+index 7b5a9dd..3645611 100644
+--- a/net/ieee802154/rdev-ops.h
++++ b/net/ieee802154/rdev-ops.h
+@@ -75,6 +75,18 @@ rdev_set_cca_mode(struct cfg802154_registered_device *rdev,
+ }
+ 
+ static inline int
++rdev_set_tx_power(struct cfg802154_registered_device *rdev,
++		  s32 power)
++{
++	int ret;
++
++	trace_802154_rdev_set_tx_power(&rdev->wpan_phy, power);
++	ret = rdev->ops->set_tx_power(&rdev->wpan_phy, power);
++	trace_802154_rdev_return_int(&rdev->wpan_phy, ret);
++	return ret;
++}
++
++static inline int
+ rdev_set_pan_id(struct cfg802154_registered_device *rdev,
+ 		struct wpan_dev *wpan_dev, __le16 pan_id)
+ {
+diff --git a/net/ieee802154/trace.h b/net/ieee802154/trace.h
+index 5ac25eb..1f1cecc 100644
+--- a/net/ieee802154/trace.h
++++ b/net/ieee802154/trace.h
+@@ -93,6 +93,21 @@ TRACE_EVENT(802154_rdev_set_channel,
+ 		  __entry->page, __entry->channel)
+ );
+ 
++TRACE_EVENT(802154_rdev_set_tx_power,
++	TP_PROTO(struct wpan_phy *wpan_phy, s32 power),
++	TP_ARGS(wpan_phy, power),
++	TP_STRUCT__entry(
++		WPAN_PHY_ENTRY
++		__field(s32, power)
++	),
++	TP_fast_assign(
++		WPAN_PHY_ASSIGN;
++		__entry->power = power;
++	),
++	TP_printk(WPAN_PHY_PR_FMT ", power: %d", WPAN_PHY_PR_ARG,
++		  __entry->power)
++);
++
+ TRACE_EVENT(802154_rdev_set_cca_mode,
+ 	TP_PROTO(struct wpan_phy *wpan_phy, const struct wpan_phy_cca *cca),
+ 	TP_ARGS(wpan_phy, cca),
+diff --git a/net/mac802154/cfg.c b/net/mac802154/cfg.c
+index d5290ea..ab12fa2 100644
+--- a/net/mac802154/cfg.c
++++ b/net/mac802154/cfg.c
+@@ -106,6 +106,24 @@ ieee802154_set_cca_mode(struct wpan_phy *wpan_phy,
+ }
+ 
+ static int
++ieee802154_set_tx_power(struct wpan_phy *wpan_phy, s32 power)
++{
++	struct ieee802154_local *local = wpan_phy_priv(wpan_phy);
++	int ret;
++
++	ASSERT_RTNL();
++
++	if (wpan_phy->transmit_power == power)
++		return 0;
++
++	ret = drv_set_tx_power(local, power);
++	if (!ret)
++		wpan_phy->transmit_power = power;
++
++	return ret;
++}
++
++static int
+ ieee802154_set_pan_id(struct wpan_phy *wpan_phy, struct wpan_dev *wpan_dev,
+ 		      __le16 pan_id)
+ {
+@@ -195,6 +213,7 @@ const struct cfg802154_ops mac802154_config_ops = {
+ 	.del_virtual_intf = ieee802154_del_iface,
+ 	.set_channel = ieee802154_set_channel,
+ 	.set_cca_mode = ieee802154_set_cca_mode,
++	.set_tx_power = ieee802154_set_tx_power,
+ 	.set_pan_id = ieee802154_set_pan_id,
+ 	.set_short_addr = ieee802154_set_short_addr,
+ 	.set_backoff_exponent = ieee802154_set_backoff_exponent,
+-- 
+1.7.9.5
 
