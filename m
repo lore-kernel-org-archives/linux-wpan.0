@@ -1,42 +1,46 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from senator.holtmann.net ([87.106.208.187]:45801 "EHLO
-	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755708AbbEZQDi (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Tue, 26 May 2015 12:03:38 -0400
+Received: from hmm.wantstofly.org ([148.251.232.15]:52604 "EHLO
+	mail.wantstofly.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751552AbbEYMiZ (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Mon, 25 May 2015 08:38:25 -0400
+Date: Mon, 25 May 2015 15:38:24 +0300
+From: Lennert Buytenhek <buytenh@wantstofly.org>
+Subject: [PATCHv2 bluetooth-next 1/6] ieee802154 socket: Return EMSGSIZE from
+ raw_sendmsg() if packet too big.
+Message-ID: <20150525123824.GJ11340@wantstofly.org>
+References: <cover.1432535597.git.buytenh@wantstofly.org>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
-Subject: Re: [PATCH bluetooth-next] mac802154: Avoid rtnl deadlock in mac802154_wpan_ioctl().
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20150526120610.GT11340@wantstofly.org>
-Date: Tue, 26 May 2015 18:03:34 +0200
-Content-Transfer-Encoding: 7bit
-Message-Id: <009BC842-C8EA-4738-A686-7B27C98A5BB3@holtmann.org>
-References: <20150526120610.GT11340@wantstofly.org>
+Content-Disposition: inline
+In-Reply-To: <cover.1432535597.git.buytenh@wantstofly.org>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Lennert Buytenhek <buytenh@wantstofly.org>
-Cc: linux-wpan@vger.kernel.org
+To: linux-wpan@vger.kernel.org
 
-Hi Lennert,
+The proper return code for trying to send a packet that exceeds the
+outgoing interface's MTU is EMSGSIZE, not EINVAL, so patch ieee802154's
+raw_sendmsg() to do the right thing.  (Its dgram_sendmsg() was already
+returning EMSGSIZE for this case.)
 
-> ->ndo_do_ioctl() can be entered with the rtnl lock already held,
-> for example when sending a wext ioctl to a device (in which case
-> the rtnl lock is taken by wext_ioctl_dispatch()), but
-> mac802154_wpan_ioctl() currently unconditionally takes the rtnl
-> lock on entry, which can cause deadlocks.
-> 
-> To fix this, bail out of mac802154_wpan_ioctl() before taking the
-> rtnl lock if the ioctl cmd is not one of the cmds we implement.
-> 
-> Signed-off-by: Lennert Buytenhek <buytenh@wantstofly.org>
-> Acked-by: Alexander Aring <alex.aring@gmail.com>
-> ---
-> net/mac802154/iface.c | 3 +++
-> 1 file changed, 3 insertions(+)
+Signed-off-by: Lennert Buytenhek <buytenh@wantstofly.org>
+Acked-by: Alexander Aring <alex.aring@gmail.com>
+---
+ net/ieee802154/socket.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-patch has been applied to bluetooth-next tree.
-
-Regards
-
-Marcel
+diff --git a/net/ieee802154/socket.c b/net/ieee802154/socket.c
+index e5cc253..d9fc5cc 100644
+--- a/net/ieee802154/socket.c
++++ b/net/ieee802154/socket.c
+@@ -284,7 +284,7 @@ static int raw_sendmsg(struct sock *sk, struct msghdr *msg, size_t size)
+ 
+ 	if (size > mtu) {
+ 		pr_debug("size = %Zu, mtu = %u\n", size, mtu);
+-		err = -EINVAL;
++		err = -EMSGSIZE;
+ 		goto out_dev;
+ 	}
+ 
+-- 
+2.1.0
 
