@@ -1,41 +1,36 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f174.google.com ([209.85.212.174]:33816 "EHLO
-	mail-wi0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751363AbbEZVLm (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Tue, 26 May 2015 17:11:42 -0400
-Received: by wicmc15 with SMTP id mc15so76417551wic.1
-        for <linux-wpan@vger.kernel.org>; Tue, 26 May 2015 14:11:41 -0700 (PDT)
-From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH bluetooth-next] nl802154: fix cca mode wpan phy flag
-Date: Tue, 26 May 2015 23:11:31 +0200
-Message-Id: <1432674691-2008-1-git-send-email-alex.aring@gmail.com>
+Received: from senator.holtmann.net ([87.106.208.187]:38782 "EHLO
+	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751051AbbEZVqU (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Tue, 26 May 2015 17:46:20 -0400
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
+Subject: Re: [PATCH bluetooth-next] nl802154: fix cca mode wpan phy flag
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1432674691-2008-1-git-send-email-alex.aring@gmail.com>
+Date: Tue, 26 May 2015 23:46:06 +0200
+Content-Transfer-Encoding: 7bit
+Message-Id: <DD1E845A-0D9D-4DBB-8C51-9AD84E9B442D@holtmann.org>
+References: <1432674691-2008-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org
-Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
+To: Alexander Aring <alex.aring@gmail.com>
+Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de
 
-This patch fix the handling to call cca mode setting. If the phy isn't
-flag then the driver doesn't support this setting.
+Hi Alex,
 
-Signed-off-by: Alexander Aring <alex.aring@gmail.com>
-Reported-by: Varka Bhadram <varkabhadram@gmail.com>
----
- net/ieee802154/nl802154.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> This patch fix the handling to call cca mode setting. If the phy isn't
+> flag then the driver doesn't support this setting.
+> 
+> Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+> Reported-by: Varka Bhadram <varkabhadram@gmail.com>
+> ---
+> net/ieee802154/nl802154.c | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/ieee802154/nl802154.c b/net/ieee802154/nl802154.c
-index 54f4959..212a795 100644
---- a/net/ieee802154/nl802154.c
-+++ b/net/ieee802154/nl802154.c
-@@ -757,7 +757,7 @@ static int nl802154_set_cca_mode(struct sk_buff *skb, struct genl_info *info)
- 	struct cfg802154_registered_device *rdev = info->user_ptr[0];
- 	struct wpan_phy_cca cca;
- 
--	if (rdev->wpan_phy.flags & WPAN_PHY_FLAG_CCA_MODE)
-+	if (!(rdev->wpan_phy.flags & WPAN_PHY_FLAG_CCA_MODE))
- 		return -EOPNOTSUPP;
- 
- 	if (!info->attrs[NL802154_ATTR_CCA_MODE])
--- 
-2.4.1
+patch has been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
 
