@@ -1,35 +1,42 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-pd0-f171.google.com ([209.85.192.171]:33445 "EHLO
-	mail-pd0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750902AbbE0KeL (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Wed, 27 May 2015 06:34:11 -0400
-Received: by pdbqa5 with SMTP id qa5so9265742pdb.0
-        for <linux-wpan@vger.kernel.org>; Wed, 27 May 2015 03:34:10 -0700 (PDT)
-Message-ID: <55659D8B.5070509@gmail.com>
-Date: Wed, 27 May 2015 16:03:47 +0530
-From: Varka Bhadram <varkabhadram@gmail.com>
-MIME-Version: 1.0
-Subject: Re: [PATCH wpan-tools 2/3] info: fix tx power printout
-References: <1432722305-22460-1-git-send-email-alex.aring@gmail.com> <1432722305-22460-2-git-send-email-alex.aring@gmail.com>
-In-Reply-To: <1432722305-22460-2-git-send-email-alex.aring@gmail.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
+Received: from mail-wg0-f42.google.com ([74.125.82.42]:35009 "EHLO
+	mail-wg0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752475AbbE0KZZ (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Wed, 27 May 2015 06:25:25 -0400
+Received: by wgme6 with SMTP id e6so5312216wgm.2
+        for <linux-wpan@vger.kernel.org>; Wed, 27 May 2015 03:25:24 -0700 (PDT)
+From: Alexander Aring <alex.aring@gmail.com>
+Subject: [PATCH wpan-tools 3/3] info: add support for cca ed level info
+Date: Wed, 27 May 2015 12:25:05 +0200
+Message-Id: <1432722305-22460-3-git-send-email-alex.aring@gmail.com>
+In-Reply-To: <1432722305-22460-1-git-send-email-alex.aring@gmail.com>
+References: <1432722305-22460-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org
-Cc: kernel@pengutronix.de
+To: linux-wpan@vger.kernel.org
+Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-On 05/27/2015 03:55 PM, Alexander Aring wrote:
+This patch adds support for dumping the current cca ed level value.
 
-> This patch uses the format string "%.3g" instead "%.2g" for current
-> tx power value. This is the same format string like we use to printout
-> all supported tx power values.
->
-> Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+---
+ src/info.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-Reviewed-by: Varka Bhadram <varkabhadram@gmail.com>
-
-
+diff --git a/src/info.c b/src/info.c
+index 79b101e..e8f5dda 100644
+--- a/src/info.c
++++ b/src/info.c
+@@ -94,6 +94,9 @@ static int print_phy_handler(struct nl_msg *msg, void *arg)
+ 		printf("\n");
+ 	}
+ 
++	if (tb_msg[NL802154_ATTR_CCA_ED_LEVEL])
++		printf("cca_ed_level: %.3g\n", MBM_TO_DBM(nla_get_s32(tb_msg[NL802154_ATTR_CCA_ED_LEVEL])));
++
+ 	if (tb_msg[NL802154_ATTR_TX_POWER])
+ 		printf("tx_power: %.3g\n", MBM_TO_DBM(nla_get_s32(tb_msg[NL802154_ATTR_TX_POWER])));
+ 
 -- 
-Varka Bhadram
+2.4.1
 
