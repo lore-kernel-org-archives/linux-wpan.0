@@ -1,38 +1,48 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f182.google.com ([209.85.212.182]:37617 "EHLO
-	mail-wi0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752174AbbE0IAS (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Wed, 27 May 2015 04:00:18 -0400
-Received: by wifw1 with SMTP id w1so11759739wif.0
-        for <linux-wpan@vger.kernel.org>; Wed, 27 May 2015 01:00:16 -0700 (PDT)
-Date: Wed, 27 May 2015 10:00:13 +0200
+Received: from mail-wi0-f178.google.com ([209.85.212.178]:35503 "EHLO
+	mail-wi0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752436AbbE0KZX (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Wed, 27 May 2015 06:25:23 -0400
+Received: by wicmx19 with SMTP id mx19so105968746wic.0
+        for <linux-wpan@vger.kernel.org>; Wed, 27 May 2015 03:25:22 -0700 (PDT)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: Re: [PATCH v3 bluetooth-next] ieee802154: add set transmit power
- support
-Message-ID: <20150527080009.GB712@omega>
-References: <1432655224-7663-1-git-send-email-varkab@cdac.in>
- <20150526211453.GC2954@omega>
- <55653E11.3050700@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <55653E11.3050700@gmail.com>
+Subject: [PATCH wpan-tools 1/3] phy: fix cca ed level parameter parsing
+Date: Wed, 27 May 2015 12:25:03 +0200
+Message-Id: <1432722305-22460-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Varka Bhadram <varkabhadram@gmail.com>
-Cc: linux-wpan@vger.kernel.org
+To: linux-wpan@vger.kernel.org
+Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-On Wed, May 27, 2015 at 09:16:25AM +0530, Varka Bhadram wrote:
-...
-> 
-> I also had same patch in my queue.
-> 
-> Will you add this patch to wpan-tools ?
-> 	or
-> Do you want me to send this patch to ML.?
-> 
+This patch fix the parsing of cca ed level parameter which is now an
+floating point dbm value.
 
-You can do that, I think then it's time for a new release since we have
-capabilities support and tx power setting.
+Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+---
+ src/phy.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-- Alex
+diff --git a/src/phy.c b/src/phy.c
+index 285801c..8adffcc 100644
+--- a/src/phy.c
++++ b/src/phy.c
+@@ -121,14 +121,14 @@ static int handle_cca_ed_level(struct nl802154_state *state,
+ 			       int argc, char **argv,
+ 			       enum id_input id)
+ {
+-	long level;
++	float level;
+ 	char *end;
+ 
+ 	if (argc < 1)
+ 		return 1;
+ 
+ 	/* CCA_ED_LEVEL */
+-	level = strtol(argv[0], &end, 10);
++	level = strtof(argv[0], &end);
+ 	if (*end != '\0')
+ 		return 1;
+ 
+-- 
+2.4.1
+
