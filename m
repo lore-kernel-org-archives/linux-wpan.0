@@ -1,35 +1,32 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-pd0-f169.google.com ([209.85.192.169]:35286 "EHLO
-	mail-pd0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751129AbbE0IwE (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Wed, 27 May 2015 04:52:04 -0400
-Received: by pdea3 with SMTP id a3so5611652pde.2
-        for <linux-wpan@vger.kernel.org>; Wed, 27 May 2015 01:52:04 -0700 (PDT)
-From: Varka Bhadram <varkabhadram@gmail.com>
-Subject: [PATCH bluetooth-next] ieee802154: fix typo for file name
-Date: Wed, 27 May 2015 14:21:06 +0530
-Message-Id: <1432716666-23737-1-git-send-email-varkab@cdac.in>
+Received: from senator.holtmann.net ([87.106.208.187]:58126 "EHLO
+	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751585AbbE0Ldi (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Wed, 27 May 2015 07:33:38 -0400
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
+Subject: Re: [PATCH bluetooth-next] ieee802154: fix typo for file name
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1432716666-23737-1-git-send-email-varkab@cdac.in>
+Date: Wed, 27 May 2015 13:33:36 +0200
+Content-Transfer-Encoding: 7bit
+Message-Id: <F3054D99-2648-47C5-8B60-EBA351DE83BC@holtmann.org>
+References: <1432716666-23737-1-git-send-email-varkab@cdac.in>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org
-Cc: alex.aring@gmail.com, Varka Bhadram <varkab@cdac.in>
+To: Varka Bhadram <varkabhadram@gmail.com>
+Cc: linux-wpan@vger.kernel.org, alex.aring@gmail.com, Varka Bhadram <varkab@cdac.in>
 
+Hi Varka,
 
-Signed-off-by: Varka Bhadram <varkab@cdac.in>
----
- net/ieee802154/trace.h |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> Signed-off-by: Varka Bhadram <varkab@cdac.in>
+> ---
+> net/ieee802154/trace.h |    2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/ieee802154/trace.h b/net/ieee802154/trace.h
-index 5ac25eb..144de54 100644
---- a/net/ieee802154/trace.h
-+++ b/net/ieee802154/trace.h
-@@ -1,4 +1,4 @@
--/* Based on net/wireless/tracing.h */
-+/* Based on net/wireless/trace.h */
- 
- #undef TRACE_SYSTEM
- #define TRACE_SYSTEM cfg802154
--- 
-1.7.9.5
+patch has been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
 
