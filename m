@@ -1,41 +1,36 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wg0-f53.google.com ([74.125.82.53]:35494 "EHLO
-	mail-wg0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750856AbbEXMnf (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Sun, 24 May 2015 08:43:35 -0400
-Received: by wgfl8 with SMTP id l8so53228308wgf.2
-        for <linux-wpan@vger.kernel.org>; Sun, 24 May 2015 05:43:34 -0700 (PDT)
+Received: from mail-wi0-f172.google.com ([209.85.212.172]:37307 "EHLO
+	mail-wi0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751185AbbE0GzM (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Wed, 27 May 2015 02:55:12 -0400
+Received: by wifw1 with SMTP id w1so9857814wif.0
+        for <linux-wpan@vger.kernel.org>; Tue, 26 May 2015 23:55:11 -0700 (PDT)
+Date: Wed, 27 May 2015 08:54:59 +0200
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [RFC bluetooth-next] atusb: add support for at86rf230
-Date: Sun, 24 May 2015 14:43:03 +0200
-Message-Id: <1432471383-5029-1-git-send-email-alex.aring@gmail.com>
+Subject: Re: [RFC bluetooth-next] atusb: add support for at86rf230
+Message-ID: <20150527065454.GA712@omega>
+References: <1432471383-5029-1-git-send-email-alex.aring@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1432471383-5029-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
-Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt <stefan@osg.samsung.com>
+Cc: kernel@pengutronix.de, Stefan Schmidt <stefan@osg.samsung.com>
 
-This patch adds support for the at86rf230 version check which is used
-by the rzusb stick.
+Stefan,
 
-Signed-off-by: Alexander Aring <alex.aring@gmail.com>
-Cc: Stefan Schmidt <stefan@osg.samsung.com>
----
- drivers/net/ieee802154/atusb.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On Sun, May 24, 2015 at 02:43:03PM +0200, Alexander Aring wrote:
+> This patch adds support for the at86rf230 version check which is used
+> by the rzusb stick.
+> 
 
-diff --git a/drivers/net/ieee802154/atusb.c b/drivers/net/ieee802154/atusb.c
-index 1e18774..5b6bb9a 100644
---- a/drivers/net/ieee802154/atusb.c
-+++ b/drivers/net/ieee802154/atusb.c
-@@ -515,7 +515,7 @@ static int atusb_get_and_show_chip(struct atusb *atusb)
- 			man_id_1, man_id_0);
- 		goto fail;
- 	}
--	if (part_num != 3) {
-+	if (part_num != 3 && part_num != 2) {
- 		dev_err(&usb_dev->dev,
- 			"unexpected transceiver, part 0x%02x version 0x%02x\n",
- 			part_num, version_num);
--- 
-2.4.1
+is it okay to apply this patch for mainline for now? Then it's only a
+question to make _better_ patches for the atusb firmware. Werner told me
+that I should remove the a lot of ifdefs or we landing in a ifdef hell
+which is like a well known IoT-OS and that's true. Was a dirty hack.
 
+If it's okay then I will send a patch again.
+
+- Alex
