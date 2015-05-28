@@ -1,48 +1,41 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from senator.holtmann.net ([87.106.208.187]:60806 "EHLO
-	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754010AbbE1QLP (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Thu, 28 May 2015 12:11:15 -0400
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
-Subject: Re: [PATCH,RFC bluetooth-next 1/2] ieee802154: Fix generation of random EUI-64 addresses.
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20150528123832.GD11340@wantstofly.org>
-Date: Thu, 28 May 2015 18:11:13 +0200
-Content-Transfer-Encoding: 7bit
-Message-Id: <89CF4026-B917-42EB-B56A-61A25C7EEA63@holtmann.org>
-References: <20150528123832.GD11340@wantstofly.org>
+Received: from proxima.lasnet.de ([78.47.171.185]:45993 "EHLO
+	proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754869AbbE1Vq7 (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Thu, 28 May 2015 17:46:59 -0400
+From: Stefan Schmidt <stefan@osg.samsung.com>
+Subject: [PATCH bluetooth-next 0/4] Atusb driver improvements
+Date: Thu, 28 May 2015 23:46:43 +0200
+Message-Id: <1432849607-24491-1-git-send-email-stefan@osg.samsung.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Lennert Buytenhek <buytenh@wantstofly.org>
-Cc: linux-wpan@vger.kernel.org
+To: linux-wpan@vger.kernel.org
+Cc: Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt <stefan@osg.samsung.com>
 
-Hi Lennert,
+Hello.
 
-> Currently, ieee802154_random_extended_addr() has a 50% chance of
-> generating a group (multicast) address, while this function is used
-> for generating station addresses (which can't be group addresses)
-> for interfaces that don't have a hardware-provided address.
-> 
-> Also, in case get_random_bytes() generates the EUI-64 address
-> 00:00:00:00:00:00:00:00 (extremely unlikely), which is an invalid
-> address, ieee802154_random_extended_addr() reacts by changing it
-> to 01:00:00:00:00:00:00:00, which is an invalid station address as
-> well, as it is a group address.
-> 
-> This patch changes the address generation procedure to grab eight
-> random bytes, treat that as an EUI-64, and then clear the Group
-> address bit and set the Locally Administered bit, which is in
-> line with how eth_random_addr() generates random EUI-48s.
-> 
-> Signed-off-by: Lennert Buytenhek <buytenh@wantstofly.org>
-> ---
-> include/linux/ieee802154.h | 6 +++---
-> 1 file changed, 3 insertions(+), 3 deletions(-)
+Some patches to let the atusb driver catchup a bit with newer stack features.
+Namely we now support tx power and promiscuous mode setting. The first patch
+adds some infrastructure for this by adding a function to write parts of a
+register.
 
-patch has been applied to bluetooth-next tree.
+The last patch adds me as the maintainer for the driver. Alex suggested that
+I should do this and as I have the device, working on the firmware as well
+and are motivated to enhance it I think its a good idea.
 
-Regards
+Stefan Schmidt (4):
+  ieee802154/atusb: Add function for partial register writes
+  ieee802154/atusb: Add .set_txpower operation to the driver
+  ieee802154/atusb: Add .set_promiscuous_mode driver operation
+  MAINTAINERS: Add myself as maintainer for the atusb driver
 
-Marcel
+ MAINTAINERS                    |   8 ++++
+ drivers/net/ieee802154/atusb.c | 100 +++++++++++++++++++++++++++++++++--------
+ 2 files changed, 89 insertions(+), 19 deletions(-)
+
+regards
+Stefan Schmidt
+
+-- 
+2.1.0
 
