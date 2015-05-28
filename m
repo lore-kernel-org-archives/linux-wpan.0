@@ -1,112 +1,83 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from lists.s-osg.org ([54.187.51.154]:33310 "EHLO lists.s-osg.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752030AbbE2Ib3 (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-	Fri, 29 May 2015 04:31:29 -0400
-Message-ID: <556823DD.5010706@osg.samsung.com>
-Date: Fri, 29 May 2015 10:31:25 +0200
+Received: from proxima.lasnet.de ([78.47.171.185]:45997 "EHLO
+	proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751812AbbE1Vq7 (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Thu, 28 May 2015 17:46:59 -0400
 From: Stefan Schmidt <stefan@osg.samsung.com>
-MIME-Version: 1.0
-Subject: Re: [PATCH bluetooth-next 1/4] ieee802154/atusb: Add function for
- partial register writes
-References: <1432849607-24491-1-git-send-email-stefan@osg.samsung.com> <1432849607-24491-2-git-send-email-stefan@osg.samsung.com> <55680E68.6030001@gmail.com>
-In-Reply-To: <55680E68.6030001@gmail.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
+Subject: [PATCH bluetooth-next 2/4] ieee802154/atusb: Add .set_txpower operation to the driver
+Date: Thu, 28 May 2015 23:46:45 +0200
+Message-Id: <1432849607-24491-3-git-send-email-stefan@osg.samsung.com>
+In-Reply-To: <1432849607-24491-1-git-send-email-stefan@osg.samsung.com>
+References: <1432849607-24491-1-git-send-email-stefan@osg.samsung.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Varka Bhadram <varkabhadram@gmail.com>, linux-wpan@vger.kernel.org
-Cc: Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt <s.schmidt@samsung.com>
+To: linux-wpan@vger.kernel.org
+Cc: Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt <s.schmidt@samsung.com>, Stefan Schmidt <stefan@osg.samsung.com>
 
-Hello.
+From: Stefan Schmidt <s.schmidt@samsung.com>
 
-On 29/05/15 08:59, Varka Bhadram wrote:
-> Hi Stefan,
->
-> I found two checkpatch issues on this patch.. See inline
->
-Thanks for letting me know. Will fix and submit v2.
+Atusb uses the at86rf231 transceiver so we can use the same calculation
+for txpower settings for it.
 
-regards
-Stefan Schmidt
+Signed-off-by: Stefan Schmidt <stefan@osg.samsung.com>
+---
+ drivers/net/ieee802154/atusb.c | 26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
 
-> On 05/29/2015 03:16 AM, Stefan Schmidt wrote:
->
->> From: Stefan Schmidt <s.schmidt@samsung.com>
->>
->> With this function we can set individual bits in the registers if 
->> needed.
->> With the old SR_VALUE macro we could only set one bit in the register
->> which was ok for some scenarios but not for all. With this subreg write
->> function we can now set more bits defined by the mask while not touching
->> the rest.
->>
->> We start using it for the current SR_VALUE use case and will use it more
->> in upcoming patches.
->>
->> Signed-off-by: Stefan Schmidt <stefan@osg.samsung.com>
->> ---
->>   drivers/net/ieee802154/atusb.c | 44 
->> +++++++++++++++++++++++++-----------------
->>   1 file changed, 26 insertions(+), 18 deletions(-)
->>
->> diff --git a/drivers/net/ieee802154/atusb.c 
->> b/drivers/net/ieee802154/atusb.c
->> index 5b6bb9a..93431a5 100644
->> --- a/drivers/net/ieee802154/atusb.c
->> +++ b/drivers/net/ieee802154/atusb.c
->> @@ -58,17 +58,6 @@ struct atusb {
->>       uint8_t tx_ack_seq;        /* current TX ACK sequence number */
->>   };
->>   -/* at86rf230.h defines values as <reg, mask, shift> tuples. We use 
->> the more
->> - * traditional style of having registers and or-able values. SR_REG 
->> extracts
->> - * the register number. SR_VALUE uses the shift to prepare a value 
->> accordingly.
->> - */
->> -
->> -#define __SR_REG(reg, mask, shift)    (reg)
->> -#define SR_REG(sr)            __SR_REG(sr)
->> -
->> -#define __SR_VALUE(reg, mask, shift, val)    ((val) << (shift))
->> -#define SR_VALUE(sr, val)            __SR_VALUE(sr, (val))
->> -
->>   /* ----- USB commands without data 
->> ----------------------------------------- */
->>     /* To reduce the number of error checks in the code, we record 
->> the first error
->> @@ -130,6 +119,29 @@ static int atusb_read_reg(struct atusb *atusb, 
->> uint8_t reg)
->>       return ret >= 0 ? value : ret;
->>   }
->>   +static int atusb_write_subreg(struct atusb *atusb, uint8_t reg, 
->> uint8_t mask,
->> +                  uint8_t shift, uint8_t value)
->> +{
->> +    struct usb_device *usb_dev = atusb->usb_dev;
->> +    uint8_t orig, tmp;
->> +    int ret = 0;
->> +
->> +    dev_dbg(&usb_dev->dev, "atusb_write_subreg: 0x%02x <- 0x%02x\n",
->> +        reg, value);
->
-> CHECK: Alignment should match open parenthesis
-> #56: FILE: drivers/net/ieee802154/atusb.c:130:
-> +    dev_dbg(&usb_dev->dev, "atusb_write_subreg: 0x%02x <- 0x%02x\n",
-> +        reg, value);
->
->> +
->> +    orig = atusb_read_reg(atusb, reg);
->> +
->> +    /* Write the value only into that part of the register which is 
->> allowed
->> +     * by the mask. All other bits stay as before. */
->
-> WARNING: networking block comments put the trailing */ on a separate line
-> #61: FILE: drivers/net/ieee802154/atusb.c:135:
-> +     * by the mask. All other bits stay as before. */
->
-> regards,
->
+diff --git a/drivers/net/ieee802154/atusb.c b/drivers/net/ieee802154/atusb.c
+index 93431a5..531a1d4 100644
+--- a/drivers/net/ieee802154/atusb.c
++++ b/drivers/net/ieee802154/atusb.c
+@@ -452,6 +452,26 @@ static void atusb_stop(struct ieee802154_hw *hw)
+ 	atusb_get_and_clear_error(atusb);
+ }
+ 
++#define ATUSB_MAX_TX_POWERS 0xF
++static const s32 atusb_powers[ATUSB_MAX_TX_POWERS + 1] = {
++	300, 280, 230, 180, 130, 70, 0, -100, -200, -300, -400, -500, -700,
++	-900, -1200, -1700,
++};
++
++static int
++atusb_set_txpower(struct ieee802154_hw *hw, s32 mbm)
++{
++	struct atusb *atusb = hw->priv;
++	u32 i;
++
++	for (i = 0; i < hw->phy->supported.tx_powers_size; i++) {
++		if (hw->phy->supported.tx_powers[i] == mbm)
++			return atusb_write_subreg(atusb, SR_TX_PWR_23X, i);
++	}
++
++	return -EINVAL;
++}
++
+ static struct ieee802154_ops atusb_ops = {
+ 	.owner			= THIS_MODULE,
+ 	.xmit_async		= atusb_xmit,
+@@ -460,6 +480,7 @@ static struct ieee802154_ops atusb_ops = {
+ 	.start			= atusb_start,
+ 	.stop			= atusb_stop,
+ 	.set_hw_addr_filt	= atusb_set_hw_addr_filt,
++	.set_txpower		= atusb_set_txpower,
+ };
+ 
+ /* ----- Firmware and chip version information ----------------------------- */
+@@ -580,9 +601,14 @@ static int atusb_probe(struct usb_interface *interface,
+ 	hw->flags = IEEE802154_HW_TX_OMIT_CKSUM | IEEE802154_HW_AFILT |
+ 		    IEEE802154_HW_AACK;
+ 
++	hw->phy->flags = WPAN_PHY_FLAG_TXPOWER;
++
+ 	hw->phy->current_page = 0;
+ 	hw->phy->current_channel = 11;	/* reset default */
+ 	hw->phy->supported.channels[0] = 0x7FFF800;
++	hw->phy->supported.tx_powers = atusb_powers;
++	hw->phy->supported.tx_powers_size = ARRAY_SIZE(atusb_powers);
++	hw->phy->transmit_power = hw->phy->supported.tx_powers[0];
+ 	ieee802154_random_extended_addr(&hw->phy->perm_extended_addr);
+ 
+ 	atusb_command(atusb, ATUSB_RF_RESET, 0);
+-- 
+2.1.0
 
