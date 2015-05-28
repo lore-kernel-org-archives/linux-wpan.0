@@ -1,51 +1,73 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from hmm.wantstofly.org ([148.251.232.15]:54063 "EHLO
-	mail.wantstofly.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752712AbbE2I17 (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Fri, 29 May 2015 04:27:59 -0400
-Date: Fri, 29 May 2015 11:27:57 +0300
-From: Lennert Buytenhek <buytenh@wantstofly.org>
+Received: from mailgw1.uni-kl.de ([131.246.120.220]:57301 "EHLO
+	mailgw1.uni-kl.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751387AbbE1PNS (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Thu, 28 May 2015 11:13:18 -0400
+Received: from itwm2.itwm.fhg.de (itwm2.itwm.fhg.de [131.246.191.3])
+	by mailgw1.uni-kl.de (8.14.4/8.14.4/Debian-7) with ESMTP id t4SFDGhX012376
+	for <linux-wpan@vger.kernel.org>; Thu, 28 May 2015 17:13:16 +0200
+Date: Thu, 28 May 2015 17:13:15 +0200
+From: Phoebe Buckheister <phoebe.buckheister@itwm.fraunhofer.de>
 Subject: Re: [PATCH,RFC bluetooth-next 1/2] ieee802154: Fix generation of
  random EUI-64 addresses.
-Message-ID: <20150529082757.GP11340@wantstofly.org>
+Message-ID: <20150528171315.0833a387@zoidberg>
+In-Reply-To: <20150528123832.GD11340@wantstofly.org>
 References: <20150528123832.GD11340@wantstofly.org>
- <20150528131714.GD716@omega>
- <20150528133948.GF11340@wantstofly.org>
- <20150528144249.GF716@omega>
- <20150529031958.GL11340@wantstofly.org>
- <5568218F.3070108@osg.samsung.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5568218F.3070108@osg.samsung.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Stefan Schmidt <stefan@osg.samsung.com>
-Cc: Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org
+To: Lennert Buytenhek <buytenh@wantstofly.org>
+Cc: linux-wpan@vger.kernel.org
 
-On Fri, May 29, 2015 at 10:21:35AM +0200, Stefan Schmidt wrote:
+On Thu, 28 May 2015 15:38:32 +0300
+Lennert Buytenhek <buytenh@wantstofly.org> wrote:
 
-> Hello.
-
-Hi!
-
-
-> >>I am currently really unsure and looking in well-known IoT OS, if they
-> >>look on this bit. But I didn't saw anything. Only that the most using
-> >>the same like eth_random_addr address and fill with ff fe bit pattern.
-> >>Maybe to operate with some virtual linux networking ethernet interfaces
-> >>which are connected over slip and tun/tap and such things...
-> >ff fe bit pattern?
+> Currently, ieee802154_random_extended_addr() has a 50% chance of
+> generating a group (multicast) address, while this function is used
+> for generating station addresses (which can't be group addresses)
+> for interfaces that don't have a hardware-provided address.
 > 
-> What they do is mapping a EUI-48 to a EUI-64 following the guidelines from:
+> Also, in case get_random_bytes() generates the EUI-64 address
+> 00:00:00:00:00:00:00:00 (extremely unlikely), which is an invalid
+> address, ieee802154_random_extended_addr() reacts by changing it
+> to 01:00:00:00:00:00:00:00, which is an invalid station address as
+> well, as it is a group address.
 > 
-> https://standards.ieee.org/develop/regauth/tut/eui48.pdf page 4
-> 
-> The two missing octets are filled in with either FF
-> FE or FF FF. The padding happens after the first
-> three bytes with the OUI and the rest of the
-> EUI-48.
+> This patch changes the address generation procedure to grab eight
+> random bytes, treat that as an EUI-64, and then clear the Group
+> address bit and set the Locally Administered bit, which is in
+> line with how eth_random_addr() generates random EUI-48s.
 
-Ah yes, I remember that, I just couldn't figure
-out what the 'ff fe bit pattern' remark was
-referring to -- thanks for clarifying. :)
+Looks good to me. Even if this ends up being uneccessarily strict, we'll
+always have a huge pool of addresses we may generate.
+Note: the standard only says that the address shall be a 64 bit
+universal address (not excluding multicast), but not generating
+multicast EUIs seems like a good idea anyway.
+ 
+> Signed-off-by: Lennert Buytenhek <buytenh@wantstofly.org>
+> ---
+>  include/linux/ieee802154.h | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/include/linux/ieee802154.h b/include/linux/ieee802154.h
+> index 8872ca1..552210d 100644
+> --- a/include/linux/ieee802154.h
+> +++ b/include/linux/ieee802154.h
+> @@ -244,9 +244,9 @@ static inline void
+> ieee802154_random_extended_addr(__le64 *addr) {
+>  	get_random_bytes(addr, IEEE802154_EXTENDED_ADDR_LEN);
+>  
+> -	/* toggle some bit if we hit an invalid extended addr */
+> -	if (!ieee802154_is_valid_extended_addr(*addr))
+> -		((u8 *)addr)[IEEE802154_EXTENDED_ADDR_LEN - 1] ^=
+> 0x01;
+> +	/* clear the group bit, and set the locally administered bit
+> */
+> +	((u8 *)addr)[IEEE802154_EXTENDED_ADDR_LEN - 1] &= ~0x01;
+> +	((u8 *)addr)[IEEE802154_EXTENDED_ADDR_LEN - 1] |= 0x02;
+>  }
+>  
+>  #endif /* LINUX_IEEE802154_H */
+
