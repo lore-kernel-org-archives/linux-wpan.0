@@ -1,27 +1,30 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from hmm.wantstofly.org ([148.251.232.15]:53805 "EHLO
-	mail.wantstofly.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751466AbbE1OMu (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Thu, 28 May 2015 10:12:50 -0400
-Date: Thu, 28 May 2015 17:12:49 +0300
-From: Lennert Buytenhek <buytenh@wantstofly.org>
+Received: from mail-wg0-f48.google.com ([74.125.82.48]:33954 "EHLO
+	mail-wg0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751676AbbE1Om5 (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Thu, 28 May 2015 10:42:57 -0400
+Received: by wgv5 with SMTP id 5so38496598wgv.1
+        for <linux-wpan@vger.kernel.org>; Thu, 28 May 2015 07:42:56 -0700 (PDT)
+Date: Thu, 28 May 2015 16:42:53 +0200
+From: Alexander Aring <alex.aring@gmail.com>
 Subject: Re: [PATCH,RFC bluetooth-next 1/2] ieee802154: Fix generation of
  random EUI-64 addresses.
-Message-ID: <20150528141249.GH11340@wantstofly.org>
+Message-ID: <20150528144249.GF716@omega>
 References: <20150528123832.GD11340@wantstofly.org>
  <20150528131714.GD716@omega>
  <20150528133948.GF11340@wantstofly.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 In-Reply-To: <20150528133948.GF11340@wantstofly.org>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>
+To: Lennert Buytenhek <buytenh@wantstofly.org>
 Cc: linux-wpan@vger.kernel.org
 
 On Thu, May 28, 2015 at 04:39:48PM +0300, Lennert Buytenhek wrote:
-
+> On Thu, May 28, 2015 at 03:17:15PM +0200, Alexander Aring wrote:
+> 
 > > > Currently, ieee802154_random_extended_addr() has a 50% chance of
 > > > generating a group (multicast) address, while this function is used
 > > > for generating station addresses (which can't be group addresses)
@@ -80,6 +83,9 @@ On Thu, May 28, 2015 at 04:39:48PM +0300, Lennert Buytenhek wrote:
 > Universal/Local and Individual/Group address bits, and this is
 > true no matter whether this OUI is part of an EUI-48 or an EUI-64.
 > 
+
+yes this makes sense and one argument to change it to your behaviour.
+
 > Also compare your [0] with this document:
 > 
 > 	http://standards.ieee.org/develop/regauth/tut/eui48.pdf
@@ -93,13 +99,30 @@ On Thu, May 28, 2015 at 04:39:48PM +0300, Lennert Buytenhek wrote:
 > Just the fact that 802.15.4 spec doesn't talk about multicast doesn't
 > suddenly redefine the EUI-64 group bit as just another unicast address
 > bit, in my humble opinion, but this is what Linux is currently doing.
-> 
-> >From a hardware point of view, multicast packets should never be
+>
+
+The 802.15.4 spec doesn't also say any words about that the "extended
+address" is an EUI-64 address. 6LoWPAN RFC says it should handled like a
+EUI-64 [1]. General question is "Is the extended-address in 802.15.4
+really meaning an EUI-64 address?". Sorry for this newbie question, but
+this is what I am asking myself now.
+
+What I see is that the extended-addr is described as "The 64-bit (IEEE)
+address assigned to the device." Which says to me it's an EUI-64, or?
+
+But then this means 0x00..00 and 0xff..ff are also valid, but IPv6 can't
+deal with the 0x00..00.
+
+> From a hardware point of view, multicast packets should never be
 > ACKed, so there is no need for the hardware to be aware of the active
 > multicast addresses on this interface per se.  (We could theoretically
 > pass the multicast address list for the interface to the hardware to
 > allow doing frame filtering in hardware, but this does not affect
 > operational correctness.)
+
+So then we should also add a check of this bit at [0]? Then set the
+ackreq bit to 0 if the bit is set?
+
 > 
 > Whether we should be using EUI-64 group addresses on the "wire" for
 > 802.15.4 for multicast (IPv6) traffic is another question, but using
@@ -107,7 +130,19 @@ On Thu, May 28, 2015 at 04:39:48PM +0300, Lennert Buytenhek wrote:
 > layer doesn't define multicast functionality is wrong from my point
 > of view.
 
-Appendix A in RFC4291 also seems to confirm that the scope/group bits
-are an inherent part of any EUI-64 address:
+When this address is invalid and the MAC layer doesn't use this bit.
+Then we need to care that we drop all frames with the source address
+with this bit. I also don't see that any transceiver with address
+filtering enabled will drop this frame (okay they also don't filter 0x00..00
+and 0xff...ff) frames.
 
-	http://tools.ietf.org/html/rfc4291#page-20
+I am currently really unsure and looking in well-known IoT OS, if they
+look on this bit. But I didn't saw anything. Only that the most using
+the same like eth_random_addr address and fill with ff fe bit pattern.
+Maybe to operate with some virtual linux networking ethernet interfaces
+which are connected over slip and tun/tap and such things...
+
+- Alex
+
+[0] http://lxr.free-electrons.com/source/net/ieee802154/6lowpan/tx.c#L219
+[1] https://tools.ietf.org/html/rfc4944#section-6
