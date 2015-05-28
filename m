@@ -1,12 +1,12 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from proxima.lasnet.de ([78.47.171.185]:45997 "EHLO
+Received: from proxima.lasnet.de ([78.47.171.185]:46001 "EHLO
 	proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751812AbbE1Vq7 (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Thu, 28 May 2015 17:46:59 -0400
+	with ESMTP id S1754879AbbE1VrA (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Thu, 28 May 2015 17:47:00 -0400
 From: Stefan Schmidt <stefan@osg.samsung.com>
-Subject: [PATCH bluetooth-next 2/4] ieee802154/atusb: Add .set_txpower operation to the driver
-Date: Thu, 28 May 2015 23:46:45 +0200
-Message-Id: <1432849607-24491-3-git-send-email-stefan@osg.samsung.com>
+Subject: [PATCH bluetooth-next 3/4] ieee802154/atusb: Add .set_promiscuous_mode driver operation
+Date: Thu, 28 May 2015 23:46:46 +0200
+Message-Id: <1432849607-24491-4-git-send-email-stefan@osg.samsung.com>
 In-Reply-To: <1432849607-24491-1-git-send-email-stefan@osg.samsung.com>
 References: <1432849607-24491-1-git-send-email-stefan@osg.samsung.com>
 Sender: linux-wpan-owner@vger.kernel.org
@@ -16,68 +16,68 @@ Cc: Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt <s.schmidt@samsung.co
 
 From: Stefan Schmidt <s.schmidt@samsung.com>
 
-Atusb uses the at86rf231 transceiver so we can use the same calculation
-for txpower settings for it.
+Allow monitor mode operation with disabled AACK in hardware.
 
 Signed-off-by: Stefan Schmidt <stefan@osg.samsung.com>
 ---
- drivers/net/ieee802154/atusb.c | 26 ++++++++++++++++++++++++++
- 1 file changed, 26 insertions(+)
+ drivers/net/ieee802154/atusb.c | 30 +++++++++++++++++++++++++++++-
+ 1 file changed, 29 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/net/ieee802154/atusb.c b/drivers/net/ieee802154/atusb.c
-index 93431a5..531a1d4 100644
+index 531a1d4..52bcdbc 100644
 --- a/drivers/net/ieee802154/atusb.c
 +++ b/drivers/net/ieee802154/atusb.c
-@@ -452,6 +452,26 @@ static void atusb_stop(struct ieee802154_hw *hw)
- 	atusb_get_and_clear_error(atusb);
+@@ -472,6 +472,33 @@ atusb_set_txpower(struct ieee802154_hw *hw, s32 mbm)
+ 	return -EINVAL;
  }
  
-+#define ATUSB_MAX_TX_POWERS 0xF
-+static const s32 atusb_powers[ATUSB_MAX_TX_POWERS + 1] = {
-+	300, 280, 230, 180, 130, 70, 0, -100, -200, -300, -400, -500, -700,
-+	-900, -1200, -1700,
-+};
-+
 +static int
-+atusb_set_txpower(struct ieee802154_hw *hw, s32 mbm)
++atusb_set_promiscuous_mode(struct ieee802154_hw *hw, const bool on)
 +{
 +	struct atusb *atusb = hw->priv;
-+	u32 i;
++	int ret;
 +
-+	for (i = 0; i < hw->phy->supported.tx_powers_size; i++) {
-+		if (hw->phy->supported.tx_powers[i] == mbm)
-+			return atusb_write_subreg(atusb, SR_TX_PWR_23X, i);
++	if (on) {
++		ret = atusb_write_subreg(atusb, SR_AACK_DIS_ACK, 1);
++		if (ret < 0)
++			return ret;
++
++		ret = atusb_write_subreg(atusb, SR_AACK_PROM_MODE, 1);
++		if (ret < 0)
++			return ret;
++	} else {
++		ret = atusb_write_subreg(atusb, SR_AACK_PROM_MODE, 0);
++		if (ret < 0)
++			return ret;
++
++		ret = atusb_write_subreg(atusb, SR_AACK_DIS_ACK, 0);
++		if (ret < 0)
++			return ret;
 +	}
 +
-+	return -EINVAL;
++	return 0;
 +}
 +
  static struct ieee802154_ops atusb_ops = {
  	.owner			= THIS_MODULE,
  	.xmit_async		= atusb_xmit,
-@@ -460,6 +480,7 @@ static struct ieee802154_ops atusb_ops = {
- 	.start			= atusb_start,
+@@ -481,6 +508,7 @@ static struct ieee802154_ops atusb_ops = {
  	.stop			= atusb_stop,
  	.set_hw_addr_filt	= atusb_set_hw_addr_filt,
-+	.set_txpower		= atusb_set_txpower,
+ 	.set_txpower		= atusb_set_txpower,
++	.set_promiscuous_mode	= atusb_set_promiscuous_mode,
  };
  
  /* ----- Firmware and chip version information ----------------------------- */
-@@ -580,9 +601,14 @@ static int atusb_probe(struct usb_interface *interface,
+@@ -599,7 +627,7 @@ static int atusb_probe(struct usb_interface *interface,
+ 
+ 	hw->parent = &usb_dev->dev;
  	hw->flags = IEEE802154_HW_TX_OMIT_CKSUM | IEEE802154_HW_AFILT |
- 		    IEEE802154_HW_AACK;
+-		    IEEE802154_HW_AACK;
++		    IEEE802154_HW_AACK | IEEE802154_HW_PROMISCUOUS;
  
-+	hw->phy->flags = WPAN_PHY_FLAG_TXPOWER;
-+
- 	hw->phy->current_page = 0;
- 	hw->phy->current_channel = 11;	/* reset default */
- 	hw->phy->supported.channels[0] = 0x7FFF800;
-+	hw->phy->supported.tx_powers = atusb_powers;
-+	hw->phy->supported.tx_powers_size = ARRAY_SIZE(atusb_powers);
-+	hw->phy->transmit_power = hw->phy->supported.tx_powers[0];
- 	ieee802154_random_extended_addr(&hw->phy->perm_extended_addr);
+ 	hw->phy->flags = WPAN_PHY_FLAG_TXPOWER;
  
- 	atusb_command(atusb, ATUSB_RF_RESET, 0);
 -- 
 2.1.0
 
