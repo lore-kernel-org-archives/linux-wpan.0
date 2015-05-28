@@ -1,12 +1,12 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from proxima.lasnet.de ([78.47.171.185]:46001 "EHLO
+Received: from proxima.lasnet.de ([78.47.171.185]:46005 "EHLO
 	proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754879AbbE1VrA (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Thu, 28 May 2015 17:47:00 -0400
+	with ESMTP id S1754817AbbE1VrB (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Thu, 28 May 2015 17:47:01 -0400
 From: Stefan Schmidt <stefan@osg.samsung.com>
-Subject: [PATCH bluetooth-next 3/4] ieee802154/atusb: Add .set_promiscuous_mode driver operation
-Date: Thu, 28 May 2015 23:46:46 +0200
-Message-Id: <1432849607-24491-4-git-send-email-stefan@osg.samsung.com>
+Subject: [PATCH bluetooth-next 4/4] MAINTAINERS: Add myself as maintainer for the atusb driver
+Date: Thu, 28 May 2015 23:46:47 +0200
+Message-Id: <1432849607-24491-5-git-send-email-stefan@osg.samsung.com>
 In-Reply-To: <1432849607-24491-1-git-send-email-stefan@osg.samsung.com>
 References: <1432849607-24491-1-git-send-email-stefan@osg.samsung.com>
 Sender: linux-wpan-owner@vger.kernel.org
@@ -16,68 +16,30 @@ Cc: Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt <s.schmidt@samsung.co
 
 From: Stefan Schmidt <s.schmidt@samsung.com>
 
-Allow monitor mode operation with disabled AACK in hardware.
-
 Signed-off-by: Stefan Schmidt <stefan@osg.samsung.com>
 ---
- drivers/net/ieee802154/atusb.c | 30 +++++++++++++++++++++++++++++-
- 1 file changed, 29 insertions(+), 1 deletion(-)
+ MAINTAINERS | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/drivers/net/ieee802154/atusb.c b/drivers/net/ieee802154/atusb.c
-index 531a1d4..52bcdbc 100644
---- a/drivers/net/ieee802154/atusb.c
-+++ b/drivers/net/ieee802154/atusb.c
-@@ -472,6 +472,33 @@ atusb_set_txpower(struct ieee802154_hw *hw, s32 mbm)
- 	return -EINVAL;
- }
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 5d87ccb..d69a7c1 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1860,6 +1860,14 @@ W:	http://www.attotech.com
+ S:	Supported
+ F:	drivers/scsi/esas2r
  
-+static int
-+atusb_set_promiscuous_mode(struct ieee802154_hw *hw, const bool on)
-+{
-+	struct atusb *atusb = hw->priv;
-+	int ret;
++ATUSB IEEE 802.15.4 RADIO DRIVER
++M:	Stefan Schmidt <stefan@osg.samsung.com>
++L:	linux-wpan@vger.kernel.org
++S:	Maintained
++F:	drivers/net/ieee802154/atusb.c
++F:	drivers/net/ieee802154/atusb.h
++F:	drivers/net/ieee802154/at86rf230.h
 +
-+	if (on) {
-+		ret = atusb_write_subreg(atusb, SR_AACK_DIS_ACK, 1);
-+		if (ret < 0)
-+			return ret;
-+
-+		ret = atusb_write_subreg(atusb, SR_AACK_PROM_MODE, 1);
-+		if (ret < 0)
-+			return ret;
-+	} else {
-+		ret = atusb_write_subreg(atusb, SR_AACK_PROM_MODE, 0);
-+		if (ret < 0)
-+			return ret;
-+
-+		ret = atusb_write_subreg(atusb, SR_AACK_DIS_ACK, 0);
-+		if (ret < 0)
-+			return ret;
-+	}
-+
-+	return 0;
-+}
-+
- static struct ieee802154_ops atusb_ops = {
- 	.owner			= THIS_MODULE,
- 	.xmit_async		= atusb_xmit,
-@@ -481,6 +508,7 @@ static struct ieee802154_ops atusb_ops = {
- 	.stop			= atusb_stop,
- 	.set_hw_addr_filt	= atusb_set_hw_addr_filt,
- 	.set_txpower		= atusb_set_txpower,
-+	.set_promiscuous_mode	= atusb_set_promiscuous_mode,
- };
- 
- /* ----- Firmware and chip version information ----------------------------- */
-@@ -599,7 +627,7 @@ static int atusb_probe(struct usb_interface *interface,
- 
- 	hw->parent = &usb_dev->dev;
- 	hw->flags = IEEE802154_HW_TX_OMIT_CKSUM | IEEE802154_HW_AFILT |
--		    IEEE802154_HW_AACK;
-+		    IEEE802154_HW_AACK | IEEE802154_HW_PROMISCUOUS;
- 
- 	hw->phy->flags = WPAN_PHY_FLAG_TXPOWER;
- 
+ AUDIT SUBSYSTEM
+ M:	Paul Moore <paul@paul-moore.com>
+ M:	Eric Paris <eparis@redhat.com>
 -- 
 2.1.0
 
