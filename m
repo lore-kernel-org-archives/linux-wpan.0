@@ -1,65 +1,41 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mailsender.cdac.in ([196.1.113.117]:49521 "EHLO
-	mailsender.cdac.in" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751556AbbE1Iti (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Thu, 28 May 2015 04:49:38 -0400
-Message-ID: <5566D401.6040004@cdac.in>
-Date: Thu, 28 May 2015 14:08:25 +0530
-From: Varka Bhadram <varkab@cdac.in>
-MIME-Version: 1.0
-Subject: Re: [PATCH bluetooth-next 2/3] cc2520: update initial transmit power
- value
-References: <1432795860-16462-1-git-send-email-varkab@cdac.in> <1432795860-16462-2-git-send-email-varkab@cdac.in> <5566C37A.6060508@gmail.com> <5566CF25.4040206@osg.samsung.com>
-In-Reply-To: <5566CF25.4040206@osg.samsung.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
+Received: from mail-pa0-f43.google.com ([209.85.220.43]:36834 "EHLO
+	mail-pa0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752150AbbE1Gvi (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Thu, 28 May 2015 02:51:38 -0400
+Received: by paza2 with SMTP id a2so16572988paz.3
+        for <linux-wpan@vger.kernel.org>; Wed, 27 May 2015 23:51:37 -0700 (PDT)
+From: Varka Bhadram <varkabhadram@gmail.com>
+Subject: [PATCH bluetooth-next 3/3] cc2520: update current channel
+Date: Thu, 28 May 2015 12:21:00 +0530
+Message-Id: <1432795860-16462-3-git-send-email-varkab@cdac.in>
+In-Reply-To: <1432795860-16462-1-git-send-email-varkab@cdac.in>
+References: <1432795860-16462-1-git-send-email-varkab@cdac.in>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Stefan Schmidt <stefan@osg.samsung.com>, Varka Bhadram <varkabhadram@gmail.com>, linux-wpan@vger.kernel.org
+To: linux-wpan@vger.kernel.org
+Cc: Varka Bhadram <varkab@cdac.in>
 
-Hello,
+This patch updates the current channel to 11. This is the default
+value on reset.
 
-On 05/28/2015 01:47 PM, Stefan Schmidt wrote:
-> Hello.
->
-> On 28/05/15 09:27, Varka Bhadram wrote:
->> On 05/28/2015 12:20 PM, Varka Bhadram wrote:
->>
->>> CC2520 has the default 0dBm transmit power level  on reset.
->>> This patch update initial value of transmit power with 0dBm value.
->>
->> CC2520 has the 0dBm value on reset, but in the driver we are setting
->> tx power value to 5dBm.
->
-> Why?
->
-> In most cases it makes sense to use the same default values the device 
-> uses as reset values. Why did you decide to use a different value here?
->
-Correct. I need to change that.
+Signed-off-by: Varka Bhadram <varkab@cdac.in>
+---
+ drivers/net/ieee802154/cc2520.c |    1 +
+ 1 file changed, 1 insertion(+)
 
-Initially we dont have tx power setting from the user-space.
-So i just hard coded that value (5dBm) at the time of
-hardware initialization.
-
-Now we can set the values from the user-space.
-
-
-Thanks
-
+diff --git a/drivers/net/ieee802154/cc2520.c b/drivers/net/ieee802154/cc2520.c
+index 94347d4..2bc8e86 100644
+--- a/drivers/net/ieee802154/cc2520.c
++++ b/drivers/net/ieee802154/cc2520.c
+@@ -709,6 +709,7 @@ static int cc2520_register(struct cc2520_private *priv)
+ 	priv->hw->phy->supported.tx_powers_size = ARRAY_SIZE(cc2520_powers);
+ 
+ 	priv->hw->phy->transmit_power = priv->hw->phy->supported.tx_powers[4];
++	priv->hw->phy->current_channel = 11;
+ 
+ 	dev_vdbg(&priv->spi->dev, "registered cc2520\n");
+ 	ret = ieee802154_register_hw(priv->hw);
 -- 
-Varka Bhadram
-
-
--------------------------------------------------------------------------------------------------------------------------------
-[ C-DAC is on Social-Media too. Kindly follow us at:
-Facebook: https://www.facebook.com/CDACINDIA & Twitter: @cdacindia ]
-
-This e-mail is for the sole use of the intended recipient(s) and may
-contain confidential and privileged information. If you are not the
-intended recipient, please contact the sender by reply e-mail and destroy
-all copies and the original message. Any unauthorized review, use,
-disclosure, dissemination, forwarding, printing or copying of this email
-is strictly prohibited and appropriate legal action will be taken.
--------------------------------------------------------------------------------------------------------------------------------
+1.7.9.5
 
