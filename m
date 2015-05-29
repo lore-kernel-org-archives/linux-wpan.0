@@ -1,76 +1,83 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from lists.s-osg.org ([54.187.51.154]:33460 "EHLO lists.s-osg.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755565AbbE2J1K (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-	Fri, 29 May 2015 05:27:10 -0400
-Message-ID: <556830EA.2080803@osg.samsung.com>
-Date: Fri, 29 May 2015 11:27:06 +0200
+Received: from proxima.lasnet.de ([78.47.171.185]:48582 "EHLO
+	proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755621AbbE2Ivl (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Fri, 29 May 2015 04:51:41 -0400
 From: Stefan Schmidt <stefan@osg.samsung.com>
-MIME-Version: 1.0
-Subject: Re: [PATCHv2 bluetooth-next 2/4] ieee802154/atusb: Add .set_txpower
- operation to the driver
-References: <1432889488-28420-1-git-send-email-stefan@osg.samsung.com> <1432889488-28420-3-git-send-email-stefan@osg.samsung.com> <20150529091922.GD3709@omega>
-In-Reply-To: <20150529091922.GD3709@omega>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Subject: [PATCHv2 bluetooth-next 3/4] ieee802154/atusb: Add .set_promiscuous_mode driver operation
+Date: Fri, 29 May 2015 10:51:27 +0200
+Message-Id: <1432889488-28420-4-git-send-email-stefan@osg.samsung.com>
+In-Reply-To: <1432889488-28420-1-git-send-email-stefan@osg.samsung.com>
+References: <1432889488-28420-1-git-send-email-stefan@osg.samsung.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>
-Cc: linux-wpan@vger.kernel.org, Stefan Schmidt <s.schmidt@samsung.com>
+To: linux-wpan@vger.kernel.org
+Cc: Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt <s.schmidt@samsung.com>, Stefan Schmidt <stefan@osg.samsung.com>
 
-Hello.
+From: Stefan Schmidt <s.schmidt@samsung.com>
 
-On 29/05/15 11:19, Alexander Aring wrote:
-> On Fri, May 29, 2015 at 10:51:26AM +0200, Stefan Schmidt wrote:
->> From: Stefan Schmidt <s.schmidt@samsung.com>
->>
->> Atusb uses the at86rf231 transceiver so we can use the same calculation
->> for txpower settings for it.
->>
->> Signed-off-by: Stefan Schmidt <stefan@osg.samsung.com>
->> ---
->>   drivers/net/ieee802154/atusb.c | 26 ++++++++++++++++++++++++++
->>   1 file changed, 26 insertions(+)
->>
->> diff --git a/drivers/net/ieee802154/atusb.c b/drivers/net/ieee802154/atusb.c
->> index 95d4220..9805ebe 100644
->> --- a/drivers/net/ieee802154/atusb.c
->> +++ b/drivers/net/ieee802154/atusb.c
->> @@ -453,6 +453,26 @@ static void atusb_stop(struct ieee802154_hw *hw)
->>   	atusb_get_and_clear_error(atusb);
->>   }
->>   
->> +#define ATUSB_MAX_TX_POWERS 0xF
->> +static const s32 atusb_powers[ATUSB_MAX_TX_POWERS + 1] = {
->> +	300, 280, 230, 180, 130, 70, 0, -100, -200, -300, -400, -500, -700,
->> +	-900, -1200, -1700,
->> +};
->> +
->> +static int
->> +atusb_set_txpower(struct ieee802154_hw *hw, s32 mbm)
->> +{
->> +	struct atusb *atusb = hw->priv;
->> +	u32 i;
->> +
->> +	for (i = 0; i < hw->phy->supported.tx_powers_size; i++) {
->> +		if (hw->phy->supported.tx_powers[i] == mbm)
->> +			return atusb_write_subreg(atusb, SR_TX_PWR_23X, i);
->> +	}
->> +
->> +	return -EINVAL;
->> +}
->> +
-> also the mapping looks different in at86rf230. Anyway, it's just a note.
-Yeah, I think we can cross that bridge once we have the initial support 
-for raven. Same for the missing promiscuous mode.
+Allow monitor mode operation with disabled AACK in hardware.
 
-As we will use a different product ID for the aven inside the firmware 
-we can easily detect what hardware we are running on and act accordingly 
-on the driver. Similar to what we already do in the at86rf230 driver for 
-230/233/212.
+Signed-off-by: Stefan Schmidt <stefan@osg.samsung.com>
+---
+ drivers/net/ieee802154/atusb.c | 30 +++++++++++++++++++++++++++++-
+ 1 file changed, 29 insertions(+), 1 deletion(-)
 
-regards
-Stefan Schmidt
-
-> - Alex
+diff --git a/drivers/net/ieee802154/atusb.c b/drivers/net/ieee802154/atusb.c
+index 9805ebe..3d25678 100644
+--- a/drivers/net/ieee802154/atusb.c
++++ b/drivers/net/ieee802154/atusb.c
+@@ -473,6 +473,33 @@ atusb_set_txpower(struct ieee802154_hw *hw, s32 mbm)
+ 	return -EINVAL;
+ }
+ 
++static int
++atusb_set_promiscuous_mode(struct ieee802154_hw *hw, const bool on)
++{
++	struct atusb *atusb = hw->priv;
++	int ret;
++
++	if (on) {
++		ret = atusb_write_subreg(atusb, SR_AACK_DIS_ACK, 1);
++		if (ret < 0)
++			return ret;
++
++		ret = atusb_write_subreg(atusb, SR_AACK_PROM_MODE, 1);
++		if (ret < 0)
++			return ret;
++	} else {
++		ret = atusb_write_subreg(atusb, SR_AACK_PROM_MODE, 0);
++		if (ret < 0)
++			return ret;
++
++		ret = atusb_write_subreg(atusb, SR_AACK_DIS_ACK, 0);
++		if (ret < 0)
++			return ret;
++	}
++
++	return 0;
++}
++
+ static struct ieee802154_ops atusb_ops = {
+ 	.owner			= THIS_MODULE,
+ 	.xmit_async		= atusb_xmit,
+@@ -482,6 +509,7 @@ static struct ieee802154_ops atusb_ops = {
+ 	.stop			= atusb_stop,
+ 	.set_hw_addr_filt	= atusb_set_hw_addr_filt,
+ 	.set_txpower		= atusb_set_txpower,
++	.set_promiscuous_mode	= atusb_set_promiscuous_mode,
+ };
+ 
+ /* ----- Firmware and chip version information ----------------------------- */
+@@ -600,7 +628,7 @@ static int atusb_probe(struct usb_interface *interface,
+ 
+ 	hw->parent = &usb_dev->dev;
+ 	hw->flags = IEEE802154_HW_TX_OMIT_CKSUM | IEEE802154_HW_AFILT |
+-		    IEEE802154_HW_AACK;
++		    IEEE802154_HW_AACK | IEEE802154_HW_PROMISCUOUS;
+ 
+ 	hw->phy->flags = WPAN_PHY_FLAG_TXPOWER;
+ 
+-- 
+2.1.0
 
