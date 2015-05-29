@@ -1,27 +1,24 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f179.google.com ([209.85.212.179]:35155 "EHLO
-	mail-wi0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754645AbbE2JjW (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Fri, 29 May 2015 05:39:22 -0400
-Received: by wicmx19 with SMTP id mx19so11860124wic.0
-        for <linux-wpan@vger.kernel.org>; Fri, 29 May 2015 02:39:20 -0700 (PDT)
-Date: Fri, 29 May 2015 11:39:18 +0200
-From: Alexander Aring <alex.aring@gmail.com>
+Received: from senator.holtmann.net ([87.106.208.187]:52713 "EHLO
+	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1161037AbbE2NmD convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Fri, 29 May 2015 09:42:03 -0400
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
 Subject: Re: [PATCHv2 bluetooth-next 0/4] Atusb driver improvements
-Message-ID: <20150529093914.GE3709@omega>
-References: <1432889488-28420-1-git-send-email-stefan@osg.samsung.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+From: Marcel Holtmann <marcel@holtmann.org>
 In-Reply-To: <1432889488-28420-1-git-send-email-stefan@osg.samsung.com>
+Date: Fri, 29 May 2015 15:41:50 +0200
+Content-Transfer-Encoding: 8BIT
+Message-Id: <F7D32BA7-A9DC-41A9-886A-EF1F0C91C148@holtmann.org>
+References: <1432889488-28420-1-git-send-email-stefan@osg.samsung.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: Stefan Schmidt <stefan@osg.samsung.com>
-Cc: linux-wpan@vger.kernel.org
+Cc: linux-wpan@vger.kernel.org, Alexander Aring <alex.aring@gmail.com>
 
-On Fri, May 29, 2015 at 10:51:24AM +0200, Stefan Schmidt wrote:
-> Hello.
-> 
+Hi Stefan,
+
 > Some patches to let the atusb driver catchup a bit with newer stack features.
 > Namely we now support tx power and promiscuous mode setting. The first patch
 > adds some infrastructure for this by adding a function to write parts of a
@@ -31,9 +28,22 @@ On Fri, May 29, 2015 at 10:51:24AM +0200, Stefan Schmidt wrote:
 > I should do this and as I have the device, working on the firmware as well
 > and are motivated to enhance it I think its a good idea.
 > 
+> Changes in v2:
+> 	Fix checkpatch complains pointed out by Varka Bhadram
+> 
+> Stefan Schmidt (4):
+>  ieee802154/atusb: Add function for partial register writes
+>  ieee802154/atusb: Add .set_txpower operation to the driver
+>  ieee802154/atusb: Add .set_promiscuous_mode driver operation
+>  MAINTAINERS: Add myself as maintainer for the atusb driver
+> 
+> MAINTAINERS                    |   8 ++++
+> drivers/net/ieee802154/atusb.c | 101 +++++++++++++++++++++++++++++++++--------
+> 2 files changed, 90 insertions(+), 19 deletions(-)
 
-Acked-by: Alexander Aring <alex.aring@gmail.com>
+all 4 patches have been applied to bluetooth-next tree.
 
-on the complete series.
+Regards
 
-- Alex
+Marcel
+
