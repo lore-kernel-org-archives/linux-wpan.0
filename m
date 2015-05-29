@@ -1,69 +1,40 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from lists.s-osg.org ([54.187.51.154]:34704 "EHLO lists.s-osg.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1030220AbbE2QZJ (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-	Fri, 29 May 2015 12:25:09 -0400
-Message-ID: <556892E0.6050605@osg.samsung.com>
-Date: Fri, 29 May 2015 18:25:04 +0200
-From: Stefan Schmidt <stefan@osg.samsung.com>
-MIME-Version: 1.0
-Subject: Re: for all openlabs tranceiver users
-References: <20150504183515.GD2385@omega.Speedport_W_921V_1_37_000>
-In-Reply-To: <20150504183515.GD2385@omega.Speedport_W_921V_1_37_000>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Received: from mail-pa0-f41.google.com ([209.85.220.41]:34873 "EHLO
+	mail-pa0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751160AbbE2F2m (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Fri, 29 May 2015 01:28:42 -0400
+Received: by pacwv17 with SMTP id wv17so43205465pac.2
+        for <linux-wpan@vger.kernel.org>; Thu, 28 May 2015 22:28:42 -0700 (PDT)
+From: Varka Bhadram <varkabhadram@gmail.com>
+Subject: [PATCH bluetooth-next 0/5] fixes and cleanups for cc2520
+Date: Fri, 29 May 2015 10:56:53 +0530
+Message-Id: <1432877218-12537-1-git-send-email-varkab@cdac.in>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org
-Cc: stilwellt@openlabs.co
+To: linux-wpan@vger.kernel.org
+Cc: bradjc5@gmail.com, Varka Bhadram <varkab@cdac.in>
 
-Hello.
-
-On 04/05/15 20:35, Alexander Aring wrote:
-> Hi,
->
-> maybe you read the other mail about the RPi and openlabs transceiver
-> module.
->
-> at86rf233 datasheet says 7.5 Mhz is the highest clock, but since the RPi
-> clock can run at 7.35 Mhz I expierence issues with the openlabs transceiver.
->
-> Set the max spi clock to 6 Mhz solved this issue. Please update the
-> device tree according to that value.
->
-> I tested two different transceivers with the same issue at 7.35 Mhz spi
-> clock.
->
-
-Based on this I wanted to update my dts for the RPi B+ with openlabs shield.
-
- From the collected wisdom I now have this:
-
-&spi {
-     status = "okay";
-     at86rf233@0 {
-         compatible = "atmel,at86rf233";
-         spi-max-frequency = <6000000>;
-         reg = <0>;
-         interrupts = <23 4>;
-         interrupt-parent = <&gpio>;
-         reset-gpio = <&gpio 24 1>;
-         sleep-tpio = <&gpio 25 1>;
-         xtal-trim = /bits/ 8 <0x0F>;
-     };
-};
-
-o SPI speed capped at 6 MHz due to problem on the Pi (funny note, I had 
-it running at 0.5 MHz so far :))
-o interrupts changed to <23 4> from <23 1> (edge to lvel trigger change) 
-to avoid the deadlock situation
-o Xtal-trim set to 0x0F which should be +4.5 pF and the right value for 
-the openlabs shield
-
-Anything else I missed?
-
-regards
-Stefan Schmidt
+This series mainly related to tx power settings with or without
+CC2591 amplifier.
 
 
+Hi Brad Campbell,
+	I added you in CC. Please test these changes with CC2591.
+
+--
+Varka Bhadram
+
+Varka Bhadram (5):
+  cc2520: fix in default tx power setting
+  cc2520: fix CC2591 handling
+  cc2520: add set transmit power setting support
+  cc2520: update initial transmit power value
+  cc2520: update current channel
+
+ drivers/net/ieee802154/cc2520.c |  124 +++++++++++++++++++++++++++++++++++----
+ include/linux/spi/cc2520.h      |    1 -
+ 2 files changed, 114 insertions(+), 11 deletions(-)
+
+-- 
+1.7.9.5
 
