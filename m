@@ -1,40 +1,58 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-pa0-f41.google.com ([209.85.220.41]:34873 "EHLO
-	mail-pa0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751160AbbE2F2m (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Fri, 29 May 2015 01:28:42 -0400
-Received: by pacwv17 with SMTP id wv17so43205465pac.2
-        for <linux-wpan@vger.kernel.org>; Thu, 28 May 2015 22:28:42 -0700 (PDT)
+Received: from mail-pa0-f46.google.com ([209.85.220.46]:34360 "EHLO
+	mail-pa0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751393AbbE2F2q (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Fri, 29 May 2015 01:28:46 -0400
+Received: by pabru16 with SMTP id ru16so43212432pab.1
+        for <linux-wpan@vger.kernel.org>; Thu, 28 May 2015 22:28:45 -0700 (PDT)
 From: Varka Bhadram <varkabhadram@gmail.com>
-Subject: [PATCH bluetooth-next 0/5] fixes and cleanups for cc2520
-Date: Fri, 29 May 2015 10:56:53 +0530
-Message-Id: <1432877218-12537-1-git-send-email-varkab@cdac.in>
+Subject: [PATCH bluetooth-next 1/5] cc2520: fix in default tx power setting
+Date: Fri, 29 May 2015 10:56:54 +0530
+Message-Id: <1432877218-12537-2-git-send-email-varkab@cdac.in>
+In-Reply-To: <1432877218-12537-1-git-send-email-varkab@cdac.in>
+References: <1432877218-12537-1-git-send-email-varkab@cdac.in>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
 Cc: bradjc5@gmail.com, Varka Bhadram <varkab@cdac.in>
 
-This series mainly related to tx power settings with or without
-CC2591 amplifier.
+Initially we dont have the tx power settings from the user-space.
+Now we have the support for seeting the tx power level.
 
+So lets use the default tx power setting for the radio.
 
-Hi Brad Campbell,
-	I added you in CC. Please test these changes with CC2591.
+Signed-off-by: Varka Bhadram <varkab@cdac.in>
+Cc: Brad Campbell <bradjc5@gmail.com>
+---
+ drivers/net/ieee802154/cc2520.c |    8 --------
+ 1 file changed, 8 deletions(-)
 
---
-Varka Bhadram
-
-Varka Bhadram (5):
-  cc2520: fix in default tx power setting
-  cc2520: fix CC2591 handling
-  cc2520: add set transmit power setting support
-  cc2520: update initial transmit power value
-  cc2520: update current channel
-
- drivers/net/ieee802154/cc2520.c |  124 +++++++++++++++++++++++++++++++++++----
- include/linux/spi/cc2520.h      |    1 -
- 2 files changed, 114 insertions(+), 11 deletions(-)
-
+diff --git a/drivers/net/ieee802154/cc2520.c b/drivers/net/ieee802154/cc2520.c
+index 84b28a0..ea280d4 100644
+--- a/drivers/net/ieee802154/cc2520.c
++++ b/drivers/net/ieee802154/cc2520.c
+@@ -782,10 +782,6 @@ static int cc2520_hw_init(struct cc2520_private *priv)
+ 	 * http://www.ti.com/lit/an/swra229a/swra229a.pdf
+ 	 */
+ 	if (pdata.amplified) {
+-		ret = cc2520_write_register(priv, CC2520_TXPOWER, 0xF9);
+-		if (ret)
+-			goto err_ret;
+-
+ 		ret = cc2520_write_register(priv, CC2520_AGCCTRL1, 0x16);
+ 		if (ret)
+ 			goto err_ret;
+@@ -806,10 +802,6 @@ static int cc2520_hw_init(struct cc2520_private *priv)
+ 		if (ret)
+ 			goto err_ret;
+ 	} else {
+-		ret = cc2520_write_register(priv, CC2520_TXPOWER, 0xF7);
+-		if (ret)
+-			goto err_ret;
+-
+ 		ret = cc2520_write_register(priv, CC2520_AGCCTRL1, 0x11);
+ 		if (ret)
+ 			goto err_ret;
 -- 
 1.7.9.5
 
