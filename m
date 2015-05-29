@@ -1,45 +1,55 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from proxima.lasnet.de ([78.47.171.185]:48585 "EHLO
-	proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755628AbbE2Ivm (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Fri, 29 May 2015 04:51:42 -0400
-From: Stefan Schmidt <stefan@osg.samsung.com>
-Subject: [PATCHv2 bluetooth-next 4/4] MAINTAINERS: Add myself as maintainer for the atusb driver
-Date: Fri, 29 May 2015 10:51:28 +0200
-Message-Id: <1432889488-28420-5-git-send-email-stefan@osg.samsung.com>
-In-Reply-To: <1432889488-28420-1-git-send-email-stefan@osg.samsung.com>
+Received: from mail-pa0-f53.google.com ([209.85.220.53]:36559 "EHLO
+	mail-pa0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754278AbbE2JDe (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Fri, 29 May 2015 05:03:34 -0400
+Received: by pacux9 with SMTP id ux9so9107112pac.3
+        for <linux-wpan@vger.kernel.org>; Fri, 29 May 2015 02:03:33 -0700 (PDT)
+Message-ID: <55682B4D.4030906@gmail.com>
+Date: Fri, 29 May 2015 14:33:09 +0530
+From: Varka Bhadram <varkabhadram@gmail.com>
+MIME-Version: 1.0
+Subject: Re: [PATCHv2 bluetooth-next 0/4] Atusb driver improvements
 References: <1432889488-28420-1-git-send-email-stefan@osg.samsung.com>
+In-Reply-To: <1432889488-28420-1-git-send-email-stefan@osg.samsung.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org
-Cc: Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt <s.schmidt@samsung.com>, Stefan Schmidt <stefan@osg.samsung.com>
+To: Stefan Schmidt <stefan@osg.samsung.com>, linux-wpan@vger.kernel.org
+Cc: Alexander Aring <alex.aring@gmail.com>
 
-From: Stefan Schmidt <s.schmidt@samsung.com>
+On 05/29/2015 02:21 PM, Stefan Schmidt wrote:
 
-Signed-off-by: Stefan Schmidt <stefan@osg.samsung.com>
----
- MAINTAINERS | 8 ++++++++
- 1 file changed, 8 insertions(+)
+> Hello.
+>
+> Some patches to let the atusb driver catchup a bit with newer stack features.
+> Namely we now support tx power and promiscuous mode setting. The first patch
+> adds some infrastructure for this by adding a function to write parts of a
+> register.
+>
+> The last patch adds me as the maintainer for the driver. Alex suggested that
+> I should do this and as I have the device, working on the firmware as well
+> and are motivated to enhance it I think its a good idea.
+>
+> Changes in v2:
+> 	Fix checkpatch complains pointed out by Varka Bhadram
+>
+> Stefan Schmidt (4):
+>    ieee802154/atusb: Add function for partial register writes
+>    ieee802154/atusb: Add .set_txpower operation to the driver
+>    ieee802154/atusb: Add .set_promiscuous_mode driver operation
+>    MAINTAINERS: Add myself as maintainer for the atusb driver
+>
+>   MAINTAINERS                    |   8 ++++
+>   drivers/net/ieee802154/atusb.c | 101 +++++++++++++++++++++++++++++++++--------
+>   2 files changed, 90 insertions(+), 19 deletions(-)
+>
+> regards
+> Stefan Schmidt
+>
+Reviewed-by: Varka Bhadram <varkabhadram@gmail.com>
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 5d87ccb..d69a7c1 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1860,6 +1860,14 @@ W:	http://www.attotech.com
- S:	Supported
- F:	drivers/scsi/esas2r
- 
-+ATUSB IEEE 802.15.4 RADIO DRIVER
-+M:	Stefan Schmidt <stefan@osg.samsung.com>
-+L:	linux-wpan@vger.kernel.org
-+S:	Maintained
-+F:	drivers/net/ieee802154/atusb.c
-+F:	drivers/net/ieee802154/atusb.h
-+F:	drivers/net/ieee802154/at86rf230.h
-+
- AUDIT SUBSYSTEM
- M:	Paul Moore <paul@paul-moore.com>
- M:	Eric Paris <eparis@redhat.com>
 -- 
-2.1.0
+Varka Bhadram
 
