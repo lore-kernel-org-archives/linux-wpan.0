@@ -1,42 +1,48 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-pa0-f42.google.com ([209.85.220.42]:34741 "EHLO
-	mail-pa0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751407AbbE2F3B (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Fri, 29 May 2015 01:29:01 -0400
-Received: by pabru16 with SMTP id ru16so43220669pab.1
-        for <linux-wpan@vger.kernel.org>; Thu, 28 May 2015 22:29:00 -0700 (PDT)
-From: Varka Bhadram <varkabhadram@gmail.com>
-Subject: [PATCH bluetooth-next 5/5] cc2520: update current channel
-Date: Fri, 29 May 2015 10:56:58 +0530
-Message-Id: <1432877218-12537-6-git-send-email-varkab@cdac.in>
+Received: from senator.holtmann.net ([87.106.208.187]:33075 "EHLO
+	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750856AbbE3KaD convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Sat, 30 May 2015 06:30:03 -0400
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
+Subject: Re: [PATCH bluetooth-next 0/5] fixes and cleanups for cc2520
+From: Marcel Holtmann <marcel@holtmann.org>
 In-Reply-To: <1432877218-12537-1-git-send-email-varkab@cdac.in>
+Date: Sat, 30 May 2015 12:29:49 +0200
+Content-Transfer-Encoding: 8BIT
+Message-Id: <FCDD0B93-505A-4555-BAA7-A2621329CBFF@holtmann.org>
 References: <1432877218-12537-1-git-send-email-varkab@cdac.in>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org
-Cc: bradjc5@gmail.com, Varka Bhadram <varkab@cdac.in>
+To: Varka Bhadram <varkabhadram@gmail.com>
+Cc: linux-wpan@vger.kernel.org, Brad Campbell <bradjc5@gmail.com>, Varka Bhadram <varkab@cdac.in>
 
-This patch updates the current channel to 11. This is the default
-value on reset.
+Hi Varka,
 
-Signed-off-by: Varka Bhadram <varkab@cdac.in>
----
- drivers/net/ieee802154/cc2520.c |    2 ++
- 1 file changed, 2 insertions(+)
+> This series mainly related to tx power settings with or without
+> CC2591 amplifier.
+> 
+> 
+> Hi Brad Campbell,
+> 	I added you in CC. Please test these changes with CC2591.
+> 
+> --
+> Varka Bhadram
+> 
+> Varka Bhadram (5):
+>  cc2520: fix in default tx power setting
+>  cc2520: fix CC2591 handling
+>  cc2520: add set transmit power setting support
+>  cc2520: update initial transmit power value
+>  cc2520: update current channel
+> 
+> drivers/net/ieee802154/cc2520.c |  124 +++++++++++++++++++++++++++++++++++----
+> include/linux/spi/cc2520.h      |    1 -
+> 2 files changed, 114 insertions(+), 11 deletions(-)
 
-diff --git a/drivers/net/ieee802154/cc2520.c b/drivers/net/ieee802154/cc2520.c
-index 2384c28..8141353 100644
---- a/drivers/net/ieee802154/cc2520.c
-+++ b/drivers/net/ieee802154/cc2520.c
-@@ -762,6 +762,8 @@ static int cc2520_register(struct cc2520_private *priv)
- 		priv->hw->phy->transmit_power = priv->hw->phy->supported.tx_powers[0];
- 	}
- 
-+	priv->hw->phy->current_channel = 11;
-+
- 	dev_vdbg(&priv->spi->dev, "registered cc2520\n");
- 	ret = ieee802154_register_hw(priv->hw);
- 	if (ret)
--- 
-1.7.9.5
+all 5 patches have been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
 
