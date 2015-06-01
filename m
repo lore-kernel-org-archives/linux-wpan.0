@@ -1,39 +1,46 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-pa0-f43.google.com ([209.85.220.43]:36674 "EHLO
-	mail-pa0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751475AbbFAEej (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Mon, 1 Jun 2015 00:34:39 -0400
-Received: by pacux9 with SMTP id ux9so60284740pac.3
-        for <linux-wpan@vger.kernel.org>; Sun, 31 May 2015 21:34:38 -0700 (PDT)
-From: Varka Bhadram <varkabhadram@gmail.com>
-Subject: [PATCH bluetooth-next 3/3] ieee802154: trace: fix extended addr format specifier
-Date: Mon,  1 Jun 2015 10:03:58 +0530
-Message-Id: <1433133238-16056-4-git-send-email-varkab@cdac.in>
-In-Reply-To: <1433133238-16056-1-git-send-email-varkab@cdac.in>
-References: <1433133238-16056-1-git-send-email-varkab@cdac.in>
+Received: from box.christofferholmstedt.se ([188.166.68.52]:45672 "EHLO
+	box.christofferholmstedt.se" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751201AbbFAJE0 (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Mon, 1 Jun 2015 05:04:26 -0400
+Received: from authenticated-user (unknown [127.0.0.1])
+	(using TLSv1.2 with cipher DHE-RSA-AES128-SHA (128/128 bits))
+	(No client certificate requested)
+	by box.christofferholmstedt.se (Postfix) with ESMTPSA id 9608B140D95
+	for <linux-wpan@vger.kernel.org>; Mon,  1 Jun 2015 05:04:24 -0400 (EDT)
+Date: Mon, 1 Jun 2015 09:04:15 +0000
+From: Christoffer Holmstedt <christoffer@christofferholmstedt.se>
+Subject: [PATCH wpan-tools] info: fix printf taking the wrong amount of
+ arguments
+Message-ID: <20150601090407.GA2974@raspberrypi>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
-Cc: alex.aring@gmail.com, Varka Bhadram <varkab@cdac.in>
 
-Signed-off-by: Varka Bhadram <varkab@cdac.in>
+Signed-off-by: Christoffer Holmstedt <christoffer@christofferholmstedt.se>
 ---
- net/ieee802154/trace.h |    2 +-
+ src/info.c |    2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/ieee802154/trace.h b/net/ieee802154/trace.h
-index 9b5eefc..dce6794 100644
---- a/net/ieee802154/trace.h
-+++ b/net/ieee802154/trace.h
-@@ -56,7 +56,7 @@ TRACE_EVENT(802154_rdev_add_virtual_intf,
- 		__entry->type = type;
- 		__entry->extended_addr = extended_addr;
- 	),
--	TP_printk(WPAN_PHY_PR_FMT ", virtual intf name: %s, type: %d, extended addr: %llx",
-+	TP_printk(WPAN_PHY_PR_FMT ", virtual intf name: %s, type: %d, extended addr: 0x%llx",
- 		  WPAN_PHY_PR_ARG, __get_str(vir_intf_name), __entry->type,
- 		  __le64_to_cpu(__entry->extended_addr))
- );
+diff --git a/src/info.c b/src/info.c
+index e8f5dda8da94..926a63adecce 100644
+--- a/src/info.c
++++ b/src/info.c
+@@ -54,7 +54,7 @@ static int print_phy_handler(struct nl_msg *msg, void *arg)
+ 				    rem_page) {
+ 			channel = nla_get_u32(nl_page);
+ 			if (channel) {
+-				printf("\tpage %d: ", page, channel);
++				printf("\tpage %d: ", page);
+ 				for (i = 0; i <= 31; i++) {
+ 					if (channel & 0x1)
+ 						printf("%d,", i);
 -- 
-1.7.9.5
+1.7.10.4
 
+
+-- 
+Christoffer Holmstedt
