@@ -1,48 +1,27 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from box.christofferholmstedt.se ([188.166.68.52]:45505 "EHLO
-	box.christofferholmstedt.se" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1750890AbbFAGMx (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Mon, 1 Jun 2015 02:12:53 -0400
-Date: Mon, 1 Jun 2015 08:12:44 +0200
-From: Christoffer Holmstedt <christoffer@christofferholmstedt.se>
-Subject: Re: [RFC wpan-tools] info: add frequency output to channel listing
-Message-ID: <20150601061244.GA3435@probook-6560b>
-References: <20150529121556.GA7422@raspberrypi>
- <20150531122448.GB1476@omega>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20150531122448.GB1476@omega>
+Received: from mail-pd0-f176.google.com ([209.85.192.176]:32940 "EHLO
+	mail-pd0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751203AbbFAEe3 (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Mon, 1 Jun 2015 00:34:29 -0400
+Received: by pdbqa5 with SMTP id qa5so98417395pdb.0
+        for <linux-wpan@vger.kernel.org>; Sun, 31 May 2015 21:34:28 -0700 (PDT)
+From: Varka Bhadram <varkabhadram@gmail.com>
+Subject: [PATCH bluetooth-next 0/3] rdev-ops trace fixes
+Date: Mon,  1 Jun 2015 10:03:55 +0530
+Message-Id: <1433133238-16056-1-git-send-email-varkab@cdac.in>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>
-Cc: linux-wpan@vger.kernel.org
+To: linux-wpan@vger.kernel.org
+Cc: alex.aring@gmail.com, Varka Bhadram <varkab@cdac.in>
 
-On Sun, May 31, 2015 at 02:24:49PM +0200, Alexander Aring wrote:
-> On Fri, May 29, 2015 at 12:16:03PM +0000, Christoffer Holmstedt wrote:
-> >  
-> >  	if (tb_msg[NL802154_ATTR_CHANNEL])
-> > -		printf("current_channel: %d\n", nla_get_u8(tb_msg[NL802154_ATTR_CHANNEL]));
-> > +	{
-> > +		unsigned char curr_channel;
-> > +		curr_channel = nla_get_u8(tb_msg[NL802154_ATTR_CHANNEL]);
-> > +		printf("current_channel: %d (", curr_channel);
-> > +		print_freq(nla_get_u8(tb_msg[NL802154_ATTR_PAGE]), curr_channel);
-> 
-> Also this is problematic, because we don't check before if
-> tb_msg[NL802154_ATTR_PAGE] isn't null.
-> 
-> When you like to use this value there, the easiest way would be:
-> 
-> if (tb_msg[NL802154_ATTR_CHANNEL] && tb_msg[NL802154_ATTR_PAGE])
-> 
-> instead of
-> 
-> if (tb_msg[NL802154_ATTR_CHANNEL]) above.
-> 
-> - Alex
+Varka Bhadram (3):
+  ieee802154: trace: fix name for tx power value
+  ieee802154: trace: fix name for extended address
+  ieee802154: trace: fix extended addr format specifier
 
-Of course, will fix that.
+ net/ieee802154/trace.h |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 -- 
-Christoffer Holmstedt
+1.7.9.5
+
