@@ -1,174 +1,253 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mailsender.cdac.in ([196.1.113.117]:37696 "EHLO
-	mailsender.cdac.in" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751759AbbFBHOn (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Tue, 2 Jun 2015 03:14:43 -0400
-Message-ID: <556D57A3.9040601@cdac.in>
-Date: Tue, 02 Jun 2015 12:43:39 +0530
-From: Varka Bhadram <varkab@cdac.in>
+Received: from box.christofferholmstedt.se ([188.166.68.52]:45718 "EHLO
+	box.christofferholmstedt.se" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751263AbbFANfu (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Mon, 1 Jun 2015 09:35:50 -0400
+Received: from authenticated-user (unknown [127.0.0.1])
+	(using TLSv1.2 with cipher DHE-RSA-AES128-SHA (128/128 bits))
+	(No client certificate requested)
+	by box.christofferholmstedt.se (Postfix) with ESMTPSA id 680BD140D80
+	for <linux-wpan@vger.kernel.org>; Mon,  1 Jun 2015 09:35:46 -0400 (EDT)
+Date: Mon, 1 Jun 2015 15:35:40 +0200
+From: Christoffer Holmstedt <christoffer@christofferholmstedt.se>
+Subject: [PATCH wpan-tools] info: add frequency to channel listing for phy
+ capabilities
+Message-ID: <20150601133534.GA14012@probook-6560b>
 MIME-Version: 1.0
-Subject: Re: [RFC wpan-tools] nl802154: export supported commands
-References: <1433223636-22585-1-git-send-email-varkab@cdac.in> <20150602070622.GA1977@omega>
-In-Reply-To: <20150602070622.GA1977@omega>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>, Varka Bhadram <varkabhadram@gmail.com>
-Cc: linux-wpan@vger.kernel.org
+To: linux-wpan@vger.kernel.org
 
-On 06/02/2015 12:36 PM, Alexander Aring wrote:
+Add the frequency to the channel numbers output when running "iwpan list".
+The frequencies listed are according to chapter 8.1.2 in IEEE 802.15.4-2011.
+The output now looks like this (fake wpan loopback with all channels
+supported):
 
-> On Tue, Jun 02, 2015 at 11:10:36AM +0530, Varka Bhadram wrote:
->> This patch list the supported commands by the radios.
->> Output format is like this.
->> ...
->> Supported commands:
->> 	* new_interface
->> 	* del_interface
->> 	* set_channel
->> 	* set_pan_id
->> 	* set_short_addr
->> 	* set_tx_power
->>
->> Signed-off-by: Varka Bhadram <varkab@cdac.in>
->> ---
->>   src/Makefile.am |    1 +
->>   src/info.c      |    9 +++++++++
->>   src/iwpan.h     |    1 +
->>   src/nl802154.h  |    2 ++
->>   src/util.c      |   35 +++++++++++++++++++++++++++++++++++
->>   5 files changed, 48 insertions(+)
->>   create mode 100644 src/util.c
->>
->> diff --git a/src/Makefile.am b/src/Makefile.am
->> index 2d54576..234ff63 100644
->> --- a/src/Makefile.am
->> +++ b/src/Makefile.am
->> @@ -9,6 +9,7 @@ iwpan_SOURCES = \
->>   	interface.c \
->>   	phy.c \
->>   	mac.c \
->> +	util.c \
->>   	nl_extras.h \
->>   	nl802154.h
->>   
->> diff --git a/src/info.c b/src/info.c
->> index e8f5dda..5b6d3b6 100644
->> --- a/src/info.c
->> +++ b/src/info.c
->> @@ -262,6 +262,15 @@ static int print_phy_handler(struct nl_msg *msg, void *arg)
->>   		}
->>   	}
->>   
->> +	if (tb_msg[NL802154_ATTR_SUPPORTED_COMMANDS]) {
->> +		struct nlattr *nl_cmd;
->> +		int rem_cmd;
->> +
->> +		printf("Supported commands:\n");
->> +		nla_for_each_nested(nl_cmd, tb_msg[NL802154_ATTR_SUPPORTED_COMMANDS], rem_cmd)
->> +		printf("\t* %s\n", command_name(nla_get_u32(nl_cmd)));
-> You will be scared now, but nla_for_each_nested is a for-loop. Please
-> indent the printf right.
+capabilities:
+	iftypes: node
+	channels:
+		page 0:
+			[ 0]  868.3 MHz [ 1]    906 MHz [ 2]    908 MHz
+			[ 3]    910 MHz [ 4]    912 MHz [ 5]    914 MHz
+			[ 6]    916 MHz [ 7]    918 MHz [ 8]    920 MHz
+			[ 9]    922 MHz [10]    924 MHz [11]   2405 MHz
+			[12]   2410 MHz [13]   2415 MHz [14]   2420 MHz
+			[15]   2425 MHz [16]   2430 MHz [17]   2435 MHz
+			[18]   2440 MHz [19]   2445 MHz [20]   2450 MHz
+			[21]   2455 MHz [22]   2460 MHz [23]   2465 MHz
+			[24]   2470 MHz [25]   2475 MHz [26]   2480 MHz
+		page 1:
+			[ 0]  868.3 MHz [ 1]    906 MHz [ 2]    908 MHz
+			[ 3]    910 MHz [ 4]    912 MHz [ 5]    914 MHz
+			[ 6]    916 MHz [ 7]    918 MHz [ 8]    920 MHz
+			[ 9]    922 MHz [10]    924 MHz
+		page 2:
+			[ 0]  868.3 MHz [ 1]    906 MHz [ 2]    908 MHz
+			[ 3]    910 MHz [ 4]    912 MHz [ 5]    914 MHz
+			[ 6]    916 MHz [ 7]    918 MHz [ 8]    920 MHz
+			[ 9]    922 MHz [10]    924 MHz
+		page 3:
+			[ 0]   2412 MHz [ 1]   2417 MHz [ 2]   2422 MHz
+			[ 3]   2427 MHz [ 4]   2432 MHz [ 5]   2437 MHz
+			[ 6]   2442 MHz [ 7]   2447 MHz [ 8]   2452 MHz
+			[ 9]   2457 MHz [10]   2462 MHz [11]   2467 MHz
+			[12]   2472 MHz [13]   2484 MHz
+		page 4:
+			[ 0]  499.2 MHz [ 1] 3494.4 MHz [ 2] 3993.6 MHz
+			[ 3] 4492.8 MHz [ 4] 3993.6 MHz [ 5] 6489.6 MHz
+			[ 6] 6988.8 MHz [ 7] 6489.6 MHz [ 8] 7488.0 MHz
+			[ 9] 7987.2 MHz [10] 8486.4 MHz [11] 7987.2 MHz
+			[12] 8985.6 MHz [13] 9484.8 MHz [14] 9984.0 MHz
+			[15] 9484.8 MHz
+		page 5:
+			[ 0]    780 MHz [ 1]    782 MHz [ 2]    784 MHz
+			[ 3]    786 MHz [ 4]    780 MHz [ 5]    782 MHz
+			[ 6]    784 MHz [ 7]    786 MHz
+		page 6:
+			[ 0]  951.2 MHz [ 1]  951.8 MHz [ 2]  952.4 MHz
+			[ 3]  953.0 MHz [ 4]  953.6 MHz [ 5]  954.2 MHz
+			[ 6]  954.8 MHz [ 7]  955.4 MHz [ 8]  954.4 MHz
+			[ 9]  954.6 MHz [10]  951.1 MHz [11]  951.5 MHz
+			[12]  951.9 MHz [13]  952.3 MHz [14]  952.7 MHz
+			[15]  953.1 MHz [16]  953.5 MHz [17]  953.9 MHz
+			[18]  954.3 MHz [19]  954.7 MHz [20]  955.1 MHz
+			[21]  955.5 MHz
 
-Sure. I will do it.
+Signed-off-by: Christoffer Holmstedt <christoffer@christofferholmstedt.se>
+---
+ src/info.c | 139 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 137 insertions(+), 2 deletions(-)
 
->
->> +	}
->> +
->>   	return 0;
->>   }
->>   
->> diff --git a/src/iwpan.h b/src/iwpan.h
->> index 48c4f03..4f026a2 100644
->> --- a/src/iwpan.h
->> +++ b/src/iwpan.h
->> @@ -119,5 +119,6 @@ DECLARE_SECTION(set);
->>   DECLARE_SECTION(get);
->>   
->>   const char *iftype_name(enum nl802154_iftype iftype);
->> +const char *command_name(enum nl802154_commands cmd);
->>   
->>   #endif /* __IWPAN_H */
->> diff --git a/src/nl802154.h b/src/nl802154.h
->> index 0badebd..6fc231e 100644
->> --- a/src/nl802154.h
->> +++ b/src/nl802154.h
->> @@ -102,6 +102,8 @@ enum nl802154_attrs {
->>   
->>   	NL802154_ATTR_WPAN_PHY_CAPS,
->>   
->> +	NL802154_ATTR_SUPPORTED_COMMANDS,
->> +
->>   	/* add attributes here, update the policy in nl802154.c */
->>   
->>   	__NL802154_ATTR_AFTER_LAST,
->> diff --git a/src/util.c b/src/util.c
->> new file mode 100644
->> index 0000000..6c5fa67
->> --- /dev/null
->> +++ b/src/util.c
->> @@ -0,0 +1,35 @@
->> +#include "iwpan.h"
->> +#include "nl802154.h"
->> +
->> +static const char *commands[NL802154_CMD_MAX + 1] = {
->> +	[NL802154_CMD_UNSPEC] = "unspec",
->> +	[NL802154_CMD_GET_WPAN_PHY] = "get_wpan_phy",
->> +	[NL802154_CMD_SET_WPAN_PHY] = "set_wpan_phy",
->> +	[NL802154_CMD_NEW_WPAN_PHY] = "new_wpan_phy",
->> +	[NL802154_CMD_DEL_WPAN_PHY] = "del_wpan_phy",
->> +	[NL802154_CMD_GET_INTERFACE] = "get_interface",
->> +	[NL802154_CMD_SET_INTERFACE] = "set_interface",
->> +	[NL802154_CMD_NEW_INTERFACE] = "new_interface",
->> +	[NL802154_CMD_DEL_INTERFACE] = "del_interface",
->> +	[NL802154_CMD_SET_CHANNEL] = "set_channel",
->> +	[NL802154_CMD_SET_PAN_ID] = "set_pan_id",
->> +	[NL802154_CMD_SET_SHORT_ADDR] = "set_short_addr",
->> +	[NL802154_CMD_SET_TX_POWER] = "set_tx_power",
->> +	[NL802154_CMD_SET_CCA_MODE] = "set_cca_mode",
->> +	[NL802154_CMD_SET_CCA_ED_LEVEL] = "set_cca_ed_level",
->> +	[NL802154_CMD_SET_MAX_FRAME_RETRIES] = "set_max_frame_retries",
->> +	[NL802154_CMD_SET_BACKOFF_EXPONENT] = "set_backoff_exponent",
->> +	[NL802154_CMD_SET_MAX_CSMA_BACKOFFS] = "set_max_csma_backoffs",
->> +	[NL802154_CMD_SET_LBT_MODE] = "set_lbt_mode",
->> +};
->> +
->> +static char cmdbuf[100];
->> +
->> +const char *command_name(enum nl802154_commands cmd)
->> +{
->> +	if (cmd <= NL802154_CMD_MAX && commands[cmd])
->> +		return commands[cmd];
->> +
->> +	sprintf(cmdbuf, "Unknown command (%d)", cmd);
->> +	return cmdbuf;
->> +}
-> Such file makes only sense when it's used in more than one file. I don't
-> see this at the moment.
->
-> Btw: wireless "iw" used it in two files "info.c" and "event.c".
+diff --git a/src/info.c b/src/info.c
+index e8f5dda8da94..ee3a80838913 100644
+--- a/src/info.c
++++ b/src/info.c
+@@ -23,6 +23,129 @@ static void print_minmax_handler(int min, int max)
+ 	printf("\b \n");
+ }
+ 
++static void print_freq_handler(int channel_page, int channel)
++{
++	float freq = 0;
++
++	switch (channel_page) {
++	case 0:
++		if (channel == 0) {
++			freq = 868.3;
++			printf("%6.1f", freq);
++			break;
++		} else if (channel > 0 && channel < 11) {
++			freq = 906 + 2 * (channel - 1);
++		} else {
++			freq = 2405 + 5 * (channel - 11);
++		}
++		printf("%6.0f", freq);
++		break;
++	case 1:
++		if (channel == 0) {
++			freq = 868.3;
++			printf("%6.1f", freq);
++			break;
++		} else if (channel >= 1 && channel <= 10) {
++			freq = 906 + 2 * (channel - 1);
++		}
++		printf("%6.0f", freq);
++		break;
++	case 2:
++		if (channel == 0) {
++			freq = 868.3;
++			printf("%6.1f", freq);
++			break;
++		} else if (channel >= 1 && channel <= 10) {
++			freq = 906 + 2 * (channel - 1);
++		}
++		printf("%6.0f", freq);
++		break;
++	case 3:
++		if (channel >= 0 && channel <= 12) {
++			freq = 2412 + 5 * channel;
++		} else if (channel == 13) {
++			freq = 2484;
++		}
++		printf("%6.0f", freq);
++		break;
++	case 4:
++		switch (channel) {
++		case 0:
++			freq = 499.2;
++			break;
++		case 1:
++			freq = 3494.4;
++			break;
++		case 2:
++			freq = 3993.6;
++			break;
++		case 3:
++			freq = 4492.8;
++			break;
++		case 4:
++			freq = 3993.6;
++			break;
++		case 5:
++			freq = 6489.6;
++			break;
++		case 6:
++			freq = 6988.8;
++			break;
++		case 7:
++			freq = 6489.6;
++			break;
++		case 8:
++			freq = 7488.0;
++			break;
++		case 9:
++			freq = 7987.2;
++			break;
++		case 10:
++			freq = 8486.4;
++			break;
++		case 11:
++			freq = 7987.2;
++			break;
++		case 12:
++			freq = 8985.6;
++			break;
++		case 13:
++			freq = 9484.8;
++			break;
++		case 14:
++			freq = 9984.0;
++			break;
++		case 15:
++			freq = 9484.8;
++			break;
++		}
++		printf("%6.1f", freq);
++		break;
++	case 5:
++		if (channel >= 0 && channel <= 3) {
++			freq = 780 + 2 * channel;
++		} else if (channel >= 4 && channel <= 7) {
++			freq = 780 + 2 * (channel - 4);
++		}
++		printf("%6.0f", freq);
++		break;
++	case 6:
++		if (channel >= 0 && channel <= 7) {
++			freq = 951.2 + 0.6 * channel;
++		} else if (channel >= 8 && channel <= 9) {
++			freq = 954.4 + 0.2 * (channel - 8);
++		} else if (channel >= 10  && channel <= 21) {
++			freq = 951.1 + 0.4 * (channel - 10);
++		}
++
++		printf("%6.1f", freq);
++		break;
++	default:
++		printf("Unkno.");
++		break;
++	}
++}
++
+ static int print_phy_handler(struct nl_msg *msg, void *arg)
+ {
+ 	struct nlattr *tb_msg[NL802154_ATTR_MAX + 1];
+@@ -145,6 +268,7 @@ static int print_phy_handler(struct nl_msg *msg, void *arg)
+ 		}
+ 
+ 		if (tb_msg[NL802154_CAP_ATTR_CHANNELS]) {
++			int counter = 0;
+ 			int rem_pages;
+ 			struct nlattr *nl_pages;
+ 			printf("\tchannels:\n");
+@@ -152,9 +276,20 @@ static int print_phy_handler(struct nl_msg *msg, void *arg)
+ 					    rem_pages) {
+ 				int rem_channels;
+ 				struct nlattr *nl_channels;
++				counter = 0;
+ 				printf("\t\tpage %d: ", nla_type(nl_pages));
+-				nla_for_each_nested(nl_channels, nl_pages, rem_channels)
+-					printf("%d,", nla_type(nl_channels));
++				nla_for_each_nested(nl_channels, nl_pages, rem_channels) {
++					if (counter % 3 == 0) {
++						printf("\n\t\t\t[%2d] ", nla_type(nl_channels));
++						print_freq_handler(nla_type(nl_pages), nla_type(nl_channels));
++						printf(" MHz ");
++					} else {
++						printf("[%2d] ", nla_type(nl_channels));
++						print_freq_handler(nla_type(nl_pages), nla_type(nl_channels));
++						printf(" MHz ");
++					}
++					counter++;
++				}
+ 				/*  TODO hack use sprintf here */
+ 				printf("\b \b\n");
+ 			}
+-- 
+1.9.1
 
-Ok. In this case where should i put this code (interface.c)?
-
-My assumption is that in the future we may add same
-features that wireless utils is having now.
-
-That is the reason why i created this file  :-).
 
 -- 
-Varka Bhadram
-
-
--------------------------------------------------------------------------------------------------------------------------------
-[ C-DAC is on Social-Media too. Kindly follow us at:
-Facebook: https://www.facebook.com/CDACINDIA & Twitter: @cdacindia ]
-
-This e-mail is for the sole use of the intended recipient(s) and may
-contain confidential and privileged information. If you are not the
-intended recipient, please contact the sender by reply e-mail and destroy
-all copies and the original message. Any unauthorized review, use,
-disclosure, dissemination, forwarding, printing or copying of this email
-is strictly prohibited and appropriate legal action will be taken.
--------------------------------------------------------------------------------------------------------------------------------
-
+Christoffer Holmstedt
