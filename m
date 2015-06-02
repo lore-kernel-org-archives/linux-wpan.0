@@ -1,28 +1,39 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f176.google.com ([209.85.212.176]:34849 "EHLO
-	mail-wi0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755833AbbFBPdZ (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Tue, 2 Jun 2015 11:33:25 -0400
-Received: by wikd7 with SMTP id d7so17415525wik.0
-        for <linux-wpan@vger.kernel.org>; Tue, 02 Jun 2015 08:33:23 -0700 (PDT)
-Date: Tue, 2 Jun 2015 17:33:20 +0200
-From: Alexander Aring <alex.aring@gmail.com>
-Subject: Re: [PATCHv3 bluetooth-next] mac802154: add trace functionality for
- driver ops
-Message-ID: <20150602153319.GE1977@omega>
-References: <1433148746-24727-1-git-send-email-varkab@cdac.in>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Received: from senator.holtmann.net ([87.106.208.187]:59366 "EHLO
+	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1759019AbbFBRWl convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Tue, 2 Jun 2015 13:22:41 -0400
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
+Subject: Re: [PATCHv3 bluetooth-next] mac802154: add trace functionality for driver ops
+From: Marcel Holtmann <marcel@holtmann.org>
 In-Reply-To: <1433148746-24727-1-git-send-email-varkab@cdac.in>
+Date: Tue, 2 Jun 2015 19:22:37 +0200
+Content-Transfer-Encoding: 8BIT
+Message-Id: <9489A94E-11AA-4815-92DA-05516C831F2E@holtmann.org>
+References: <1433148746-24727-1-git-send-email-varkab@cdac.in>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: Varka Bhadram <varkabhadram@gmail.com>
-Cc: linux-wpan@vger.kernel.org, Varka Bhadram <varkab@cdac.in>
+Cc: linux-wpan@vger.kernel.org, alex.aring@gmail.com, Varka Bhadram <varkab@cdac.in>
 
-On Mon, Jun 01, 2015 at 02:22:26PM +0530, Varka Bhadram wrote:
+Hi Varka,
+
 > This patch adds trace events for driver operations.
 > 
 > Signed-off-by: Varka Bhadram <varkab@cdac.in>
+> ---
+> net/mac802154/Makefile     |    4 +-
+> net/mac802154/driver-ops.h |   92 ++++++++++++---
+> net/mac802154/trace.c      |    9 ++
+> net/mac802154/trace.h      |  272 ++++++++++++++++++++++++++++++++++++++++++++
+> 4 files changed, 362 insertions(+), 15 deletions(-)
+> create mode 100644 net/mac802154/trace.c
+> create mode 100644 net/mac802154/trace.h
 
-Acked-by: Alexander Aring <alex.aring@gmail.com>
+patch has been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
+
