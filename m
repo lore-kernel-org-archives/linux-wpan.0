@@ -1,13 +1,15 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from box.christofferholmstedt.se ([188.166.68.52]:45925 "EHLO
-	box.christofferholmstedt.se" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1758451AbbFBJxO (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Tue, 2 Jun 2015 05:53:14 -0400
-Date: Tue, 2 Jun 2015 11:53:10 +0200
-From: Christoffer Holmstedt <christoffer@christofferholmstedt.se>
+Received: from mail-wi0-f171.google.com ([209.85.212.171]:37823 "EHLO
+	mail-wi0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753918AbbFBKPV (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Tue, 2 Jun 2015 06:15:21 -0400
+Received: by wifw1 with SMTP id w1so138336625wif.0
+        for <linux-wpan@vger.kernel.org>; Tue, 02 Jun 2015 03:15:20 -0700 (PDT)
+Date: Tue, 2 Jun 2015 12:15:17 +0200
+From: Alexander Aring <alex.aring@gmail.com>
 Subject: Re: [PATCH wpan-tools] info: add frequency to channel listing for
  phy capabilities
-Message-ID: <20150602095310.GB3273@probook-6560b>
+Message-ID: <20150602101516.GD1977@omega>
 References: <20150601133534.GA14012@probook-6560b>
  <556D2CB8.4070101@gmail.com>
  <20150602060838.GA2744@probook-6560b>
@@ -22,7 +24,7 @@ In-Reply-To: <20150602093451.GF1897@wantstofly.org>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: Lennert Buytenhek <buytenh@wantstofly.org>
-Cc: Alexander Aring <alex.aring@gmail.com>, Varka Bhadram <varkabhadram@gmail.com>, linux-wpan@vger.kernel.org
+Cc: Christoffer Holmstedt <christoffer@christofferholmstedt.se>, Varka Bhadram <varkabhadram@gmail.com>, linux-wpan@vger.kernel.org
 
 On Tue, Jun 02, 2015 at 12:34:51PM +0300, Lennert Buytenhek wrote:
 > On Tue, Jun 02, 2015 at 09:38:27AM +0200, Christoffer Holmstedt wrote:
@@ -59,9 +61,31 @@ On Tue, Jun 02, 2015 at 12:34:51PM +0300, Lennert Buytenhek wrote:
 > 802.15.4k-2013.pdf: channel page 12
 > 802.15.4p-2014.pdf: channel page 13
 
-Yea, I haven't read them yet but I assumed that was the case, will look into
-that. In the meantime I believe v2 can be merged and channel pages 7-13 will
-added in future patches.
+mhhh, I looked into this. At the moment we have a highest channel number
+define (don't asking me where this comes from, was before there) [0]. I
+thought somewhere from the standard, that's why it's inside
+ieee802154.h.
 
--- 
-Christoffer Holmstedt
+I see for example 802.15.4k-2013 that the "phyCurrentChannel" range is
+above of them. e.g. Table 681. Currently we save it in some array file
+and the current channel is a bitfield [1].
+
+So I think if we support it in kernel, we need some more granularity
+representation of the channels/pages, maybe also introduce some enums
+about band identifier information and such things.
+
+I want to note that only.
+
+
+The current nl802154 for asking supported channel/page should be easily
+extendable since we doing for_each_nested stuff there. But Currently there
+is a lack of support for channel/page stuff, the datatype is also "u8" and
+seems also to be something which fits not in there like "current channel
+range: 1-416".
+
+Oh well, that would be fun to change it again. :-)
+
+- Alex
+
+[0] http://lxr.free-electrons.com/source/include/linux/ieee802154.h#L42
+[1] http://lxr.free-electrons.com/source/include/net/cfg802154.h#L85
