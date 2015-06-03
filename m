@@ -1,83 +1,76 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f180.google.com ([209.85.212.180]:33188 "EHLO
-	mail-wi0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751481AbbFCGeq (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Wed, 3 Jun 2015 02:34:46 -0400
-Received: by wiwd19 with SMTP id d19so41102425wiw.0
-        for <linux-wpan@vger.kernel.org>; Tue, 02 Jun 2015 23:34:45 -0700 (PDT)
-Date: Wed, 3 Jun 2015 08:34:39 +0200
-From: Alexander Aring <alex.aring@gmail.com>
-Subject: Re: [PATCH v2 wpan-tools] info: add frequency to channel listing for
- phy capabilities
-Message-ID: <20150603063436.GA731@omega>
-References: <20150602075309.GA5138@probook-6560b>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20150602075309.GA5138@probook-6560b>
+Received: from mail-pa0-f51.google.com ([209.85.220.51]:32973 "EHLO
+	mail-pa0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751469AbbFCDwW (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Tue, 2 Jun 2015 23:52:22 -0400
+Received: by padj3 with SMTP id j3so81324522pad.0
+        for <linux-wpan@vger.kernel.org>; Tue, 02 Jun 2015 20:52:22 -0700 (PDT)
+From: Varka Bhadram <varkabhadram@gmail.com>
+Subject: [PATCH bluetooth-next] cfg802154: fix rdev-ops naming convension and format specifiers
+Date: Wed,  3 Jun 2015 09:21:47 +0530
+Message-Id: <1433303507-10061-1-git-send-email-varkab@cdac.in>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Christoffer Holmstedt <christoffer@christofferholmstedt.se>
-Cc: linux-wpan@vger.kernel.org
+To: linux-wpan@vger.kernel.org
+Cc: alex.aring@gmail.com, Varka Bhadram <varkab@cdac.in>
 
-On Tue, Jun 02, 2015 at 09:53:14AM +0200, Christoffer Holmstedt wrote:
-> Add the frequency to the channel numbers output when running "iwpan list".
-> The frequencies listed are according to chapter 8.1.2 in IEEE 802.15.4-2011.
-> The output now looks like this (fake wpan loopback with all channels
-> supported):
-> 
-> capabilities:
-> 	iftypes: node
-> 	channels:
-> 		page 0:
-> 			[ 0] 868.3 MHz, [ 1]   906 MHz, [ 2]   908 MHz,
-> 			[ 3]   910 MHz, [ 4]   912 MHz, [ 5]   914 MHz,
-> 			[ 6]   916 MHz, [ 7]   918 MHz, [ 8]   920 MHz,
-> 			[ 9]   922 MHz, [10]   924 MHz, [11]  2405 MHz,
-> 			[12]  2410 MHz, [13]  2415 MHz, [14]  2420 MHz,
-> 			[15]  2425 MHz, [16]  2430 MHz, [17]  2435 MHz,
-> 			[18]  2440 MHz, [19]  2445 MHz, [20]  2450 MHz,
-> 			[21]  2455 MHz, [22]  2460 MHz, [23]  2465 MHz,
-> 			[24]  2470 MHz, [25]  2475 MHz, [26]  2480 MHz
-> 		page 1:
-> 			[ 0] 868.3 MHz, [ 1]   906 MHz, [ 2]   908 MHz,
-> 			[ 3]   910 MHz, [ 4]   912 MHz, [ 5]   914 MHz,
-> 			[ 6]   916 MHz, [ 7]   918 MHz, [ 8]   920 MHz,
-> 			[ 9]   922 MHz, [10]   924 MHz
-> 		page 2:
-> 			[ 0] 868.3 MHz, [ 1]   906 MHz, [ 2]   908 MHz,
-> 			[ 3]   910 MHz, [ 4]   912 MHz, [ 5]   914 MHz,
-> 			[ 6]   916 MHz, [ 7]   918 MHz, [ 8]   920 MHz,
-> 			[ 9]   922 MHz, [10]   924 MHz
-> 		page 3:
-> 			[ 0] 2412 MHz, [ 1] 2417 MHz, [ 2] 2422 MHz,
-> 			[ 3] 2427 MHz, [ 4] 2432 MHz, [ 5] 2437 MHz,
-> 			[ 6] 2442 MHz, [ 7] 2447 MHz, [ 8] 2452 MHz,
-> 			[ 9] 2457 MHz, [10] 2462 MHz, [11] 2467 MHz,
-> 			[12] 2472 MHz, [13] 2484 MHz
-> 		page 4:
-> 			[ 0]  499.2 MHz, [ 1] 3494.4 MHz, [ 2] 3993.6 MHz,
-> 			[ 3] 4492.8 MHz, [ 4] 3993.6 MHz, [ 5] 6489.6 MHz,
-> 			[ 6] 6988.8 MHz, [ 7] 6489.6 MHz, [ 8] 7488.0 MHz,
-> 			[ 9] 7987.2 MHz, [10] 8486.4 MHz, [11] 7987.2 MHz,
-> 			[12] 8985.6 MHz, [13] 9484.8 MHz, [14] 9984.0 MHz,
-> 			[15] 9484.8 MHz
-> 		page 5:
-> 			[ 0] 780 MHz, [ 1] 782 MHz, [ 2] 784 MHz,
-> 			[ 3] 786 MHz, [ 4] 780 MHz, [ 5] 782 MHz,
-> 			[ 6] 784 MHz, [ 7] 786 MHz
-> 		page 6:
-> 			[ 0] 951.2 MHz, [ 1] 951.8 MHz, [ 2] 952.4 MHz,
-> 			[ 3] 953.0 MHz, [ 4] 953.6 MHz, [ 5] 954.2 MHz,
-> 			[ 6] 954.8 MHz, [ 7] 955.4 MHz, [ 8] 954.4 MHz,
-> 			[ 9] 954.6 MHz, [10] 951.1 MHz, [11] 951.5 MHz,
-> 			[12] 951.9 MHz, [13] 952.3 MHz, [14] 952.7 MHz,
-> 			[15] 953.1 MHz, [16] 953.5 MHz, [17] 953.9 MHz,
-> 			[18] 954.3 MHz, [19] 954.7 MHz, [20] 955.1 MHz,
-> 			[21] 955.5 MHz
-> 
-> Signed-off-by: Christoffer Holmstedt <christoffer@christofferholmstedt.se>
+This patch make to use the same naming convention that mac802154
+tracing follows and fixes the format specifier for extended addr.
 
-applied. Thanks.
+Signed-off-by: Varka Bhadram <varkab@cdac.in>
+---
+ net/ieee802154/trace.h |   10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-- Alex
+diff --git a/net/ieee802154/trace.h b/net/ieee802154/trace.h
+index 73eb760..9b5f0eb 100644
+--- a/net/ieee802154/trace.h
++++ b/net/ieee802154/trace.h
+@@ -56,7 +56,7 @@ TRACE_EVENT(802154_rdev_add_virtual_intf,
+ 		__entry->type = type;
+ 		__entry->extended_addr = extended_addr;
+ 	),
+-	TP_printk(WPAN_PHY_PR_FMT ", virtual intf name: %s, type: %d, ea %llx",
++	TP_printk(WPAN_PHY_PR_FMT ", virtual intf name: %s, type: %d, extended addr: 0x%llx",
+ 		  WPAN_PHY_PR_ARG, __get_str(vir_intf_name), __entry->type,
+ 		  __le64_to_cpu(__entry->extended_addr))
+ );
+@@ -104,7 +104,7 @@ TRACE_EVENT(802154_rdev_set_tx_power,
+ 		WPAN_PHY_ASSIGN;
+ 		__entry->power = power;
+ 	),
+-	TP_printk(WPAN_PHY_PR_FMT ", power: %d", WPAN_PHY_PR_ARG,
++	TP_printk(WPAN_PHY_PR_FMT ", mbm: %d", WPAN_PHY_PR_ARG,
+ 		  __entry->power)
+ );
+ 
+@@ -134,7 +134,7 @@ TRACE_EVENT(802154_rdev_set_cca_ed_level,
+ 		WPAN_PHY_ASSIGN;
+ 		__entry->ed_level = ed_level;
+ 	),
+-	TP_printk(WPAN_PHY_PR_FMT ", ed_level: %d", WPAN_PHY_PR_ARG,
++	TP_printk(WPAN_PHY_PR_FMT ", ed level: %d", WPAN_PHY_PR_ARG,
+ 		  __entry->ed_level)
+ );
+ 
+@@ -167,7 +167,7 @@ DEFINE_EVENT_PRINT(802154_le16_template, 802154_rdev_set_short_addr,
+ 	TP_PROTO(struct wpan_phy *wpan_phy, struct wpan_dev *wpan_dev,
+ 		 __le16 le16arg),
+ 	TP_ARGS(wpan_phy, wpan_dev, le16arg),
+-	TP_printk(WPAN_PHY_PR_FMT ", " WPAN_DEV_PR_FMT ", sa: 0x%04x",
++	TP_printk(WPAN_PHY_PR_FMT ", " WPAN_DEV_PR_FMT ", short addr: 0x%04x",
+ 		  WPAN_PHY_PR_ARG, WPAN_DEV_PR_ARG,
+ 		  __le16_to_cpu(__entry->le16arg))
+ );
+@@ -190,7 +190,7 @@ TRACE_EVENT(802154_rdev_set_backoff_exponent,
+ 	),
+ 
+ 	TP_printk(WPAN_PHY_PR_FMT ", " WPAN_DEV_PR_FMT
+-		  ", min be: %d, max_be: %d", WPAN_PHY_PR_ARG,
++		  ", min be: %d, max be: %d", WPAN_PHY_PR_ARG,
+ 		  WPAN_DEV_PR_ARG, __entry->min_be, __entry->max_be)
+ );
+ 
+-- 
+1.7.9.5
+
