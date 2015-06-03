@@ -1,39 +1,96 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from senator.holtmann.net ([87.106.208.187]:59366 "EHLO
-	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1759019AbbFBRWl convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Tue, 2 Jun 2015 13:22:41 -0400
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
-Subject: Re: [PATCHv3 bluetooth-next] mac802154: add trace functionality for driver ops
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1433148746-24727-1-git-send-email-varkab@cdac.in>
-Date: Tue, 2 Jun 2015 19:22:37 +0200
-Content-Transfer-Encoding: 8BIT
-Message-Id: <9489A94E-11AA-4815-92DA-05516C831F2E@holtmann.org>
-References: <1433148746-24727-1-git-send-email-varkab@cdac.in>
+Received: from mail-pa0-f42.google.com ([209.85.220.42]:35315 "EHLO
+	mail-pa0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750736AbbFCEJv (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Wed, 3 Jun 2015 00:09:51 -0400
+Received: by padjw17 with SMTP id jw17so75179282pad.2
+        for <linux-wpan@vger.kernel.org>; Tue, 02 Jun 2015 21:09:50 -0700 (PDT)
+From: Varka Bhadram <varkabhadram@gmail.com>
+Subject: [PATCH bluetooth-next] nl802154: export supported commands
+Date: Wed,  3 Jun 2015 09:39:18 +0530
+Message-Id: <1433304558-12628-1-git-send-email-varkab@cdac.in>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Varka Bhadram <varkabhadram@gmail.com>
-Cc: linux-wpan@vger.kernel.org, alex.aring@gmail.com, Varka Bhadram <varkab@cdac.in>
+To: linux-wpan@vger.kernel.org
+Cc: alex.aring@gmail.com, Varka Bhadram <varkab@cdac.in>
 
-Hi Varka,
+This patch will export the supported commands by the devices
+to the user. This is required because user should know supported
+commands by the IEEE-802.15.4 devices. Drivers that are there in
+the mainline are not supporting all the functionalities that the
+core is providing to us.
 
-> This patch adds trace events for driver operations.
-> 
-> Signed-off-by: Varka Bhadram <varkab@cdac.in>
-> ---
-> net/mac802154/Makefile     |    4 +-
-> net/mac802154/driver-ops.h |   92 ++++++++++++---
-> net/mac802154/trace.c      |    9 ++
-> net/mac802154/trace.h      |  272 ++++++++++++++++++++++++++++++++++++++++++++
-> 4 files changed, 362 insertions(+), 15 deletions(-)
-> create mode 100644 net/mac802154/trace.c
-> create mode 100644 net/mac802154/trace.h
+Signed-off-by: Varka Bhadram <varkab@cdac.in>
+---
+ include/net/nl802154.h    |    2 ++
+ net/ieee802154/nl802154.c |   33 +++++++++++++++++++++++++++++++++
+ 2 files changed, 35 insertions(+)
 
-patch has been applied to bluetooth-next tree.
-
-Regards
-
-Marcel
+diff --git a/include/net/nl802154.h b/include/net/nl802154.h
+index 0badebd..6fc231e 100644
+--- a/include/net/nl802154.h
++++ b/include/net/nl802154.h
+@@ -102,6 +102,8 @@ enum nl802154_attrs {
+ 
+ 	NL802154_ATTR_WPAN_PHY_CAPS,
+ 
++	NL802154_ATTR_SUPPORTED_COMMANDS,
++
+ 	/* add attributes here, update the policy in nl802154.c */
+ 
+ 	__NL802154_ATTR_AFTER_LAST,
+diff --git a/net/ieee802154/nl802154.c b/net/ieee802154/nl802154.c
+index 7dbb1f4..29e1ecd 100644
+--- a/net/ieee802154/nl802154.c
++++ b/net/ieee802154/nl802154.c
+@@ -372,7 +372,9 @@ static int nl802154_send_wpan_phy(struct cfg802154_registered_device *rdev,
+ 				  struct sk_buff *msg, u32 portid, u32 seq,
+ 				  int flags)
+ {
++	struct nlattr *nl_cmds;
+ 	void *hdr;
++	int i;
+ 
+ 	hdr = nl802154hdr_put(msg, portid, seq, flags, cmd);
+ 	if (!hdr)
+@@ -431,6 +433,37 @@ static int nl802154_send_wpan_phy(struct cfg802154_registered_device *rdev,
+ 	if (nl802154_put_capabilities(msg, rdev))
+ 		goto nla_put_failure;
+ 
++	nl_cmds = nla_nest_start(msg, NL802154_ATTR_SUPPORTED_COMMANDS);
++	if (!nl_cmds)
++		goto nla_put_failure;
++
++	i = 0;
++#define CMD(op, n)							\
++	do {								\
++		if (rdev->ops->op) {					\
++			i++;						\
++			if (nla_put_u32(msg, i, NL802154_CMD_ ## n))	\
++				goto nla_put_failure;			\
++		}							\
++	} while (0)
++
++	CMD(add_virtual_intf, NEW_INTERFACE);
++	CMD(del_virtual_intf, DEL_INTERFACE);
++	CMD(set_channel, SET_CHANNEL);
++	CMD(set_pan_id, SET_PAN_ID);
++	CMD(set_short_addr, SET_SHORT_ADDR);
++
++	if (rdev->wpan_phy.flags & WPAN_PHY_FLAG_TXPOWER)
++		CMD(set_tx_power, SET_TX_POWER);
++
++	if (rdev->wpan_phy.flags & WPAN_PHY_FLAG_CCA_ED_LEVEL)
++		CMD(set_cca_ed_level, SET_CCA_ED_LEVEL);
++
++	if (rdev->wpan_phy.flags & WPAN_PHY_FLAG_CCA_MODE)
++		CMD(set_cca_mode, SET_CCA_MODE);
++#undef CMD
++	nla_nest_end(msg, nl_cmds);
++
+ finish:
+ 	genlmsg_end(msg, hdr);
+ 	return 0;
+-- 
+1.7.9.5
 
