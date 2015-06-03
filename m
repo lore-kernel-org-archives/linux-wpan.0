@@ -1,72 +1,109 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mailsender.cdac.in ([196.1.113.117]:34864 "EHLO
-	mailsender.cdac.in" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750769AbbFDHMA (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Thu, 4 Jun 2015 03:12:00 -0400
-Message-ID: <556FFA0D.604@cdac.in>
-Date: Thu, 04 Jun 2015 12:41:09 +0530
-From: Varka Bhadram <varkab@cdac.in>
-MIME-Version: 1.0
-Subject: Re: [PATCH wpan-tools] interface: fix interface type info
-References: <1433310698-14691-1-git-send-email-varkab@cdac.in> <20150604070455.GA1232@omega>
-In-Reply-To: <20150604070455.GA1232@omega>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Received: from mail-pa0-f47.google.com ([209.85.220.47]:33048 "EHLO
+	mail-pa0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751477AbbFCLW2 (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Wed, 3 Jun 2015 07:22:28 -0400
+Received: by padj3 with SMTP id j3so5294049pad.0
+        for <linux-wpan@vger.kernel.org>; Wed, 03 Jun 2015 04:22:27 -0700 (PDT)
+From: Varka Bhadram <varkabhadram@gmail.com>
+Subject: [PATCH wpan-tools] nl802154: export supported commands
+Date: Wed,  3 Jun 2015 16:51:54 +0530
+Message-Id: <1433330514-18494-1-git-send-email-varkab@cdac.in>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>, Varka Bhadram <varkabhadram@gmail.com>
-Cc: linux-wpan@vger.kernel.org
+To: linux-wpan@vger.kernel.org
+Cc: Varka Bhadram <varkab@cdac.in>
 
-On 06/04/2015 12:34 PM, Alexander Aring wrote:
-> On Wed, Jun 03, 2015 at 11:21:38AM +0530, Varka Bhadram wrote:
->> Signed-off-by: Varka Bhadram <varkab@cdac.in>
->> ---
->>   src/interface.c |    2 +-
->>   1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/src/interface.c b/src/interface.c
->> index e501763..1c59876 100644
->> --- a/src/interface.c
->> +++ b/src/interface.c
->> @@ -28,7 +28,7 @@ const char *iftype_name(enum nl802154_iftype iftype)
->>   	case NL802154_IFTYPE_COORD:
->>   		return "coordinator";
->>   	default:
->> -		sprintf(modebuf, "Unknown mode (%d)", iftype);
->> +		sprintf(modebuf, "Invalid iftype (%d)", iftype);
->>   		return modebuf;
-> This error message is like iw tool. I don't know how we strict we should
-> make the behaviour like wireless here. I think it's okay to change that.
->
-> But note there is also a "modebuf" and you changed "Unknown mode ..." to
-> "Unknown iftype..." if you want to change it then I would assume to make
-> everything to "iftypeFOOBAR". I mean change "modebuf" to "iftypebuf" or
-> something else.
+This patch list the supported commands by the radios.
+Output format is like this.
+...
+Supported commands:
+	* new_interface
+	* del_interface
+	* set_channel
+	* set_pan_id
+	* set_short_addr
+	* set_tx_power
 
-Yes. Agree with you. This leads to a confusion.
+Signed-off-by: Varka Bhadram <varkab@cdac.in>
+---
+ src/info.c     |   42 ++++++++++++++++++++++++++++++++++++++++++
+ src/nl802154.h |    2 ++
+ 2 files changed, 44 insertions(+)
 
-I will change to *iftypebuf*. V2 is on the way.
-
-Thanks
-
-> I can understand "Unknown mode" is confusing. But to handle now "iftypeFOO"
-> and "modeFOO" is more confusing than before.
->
-> - Alex
-
+diff --git a/src/info.c b/src/info.c
+index cd6b2b7..d14a987 100644
+--- a/src/info.c
++++ b/src/info.c
+@@ -146,6 +146,39 @@ static void print_freq_handler(int channel_page, int channel)
+ 	}
+ }
+ 
++static const char *commands[NL802154_CMD_MAX + 1] = {
++	[NL802154_CMD_UNSPEC] = "unspec",
++	[NL802154_CMD_GET_WPAN_PHY] = "get_wpan_phy",
++	[NL802154_CMD_SET_WPAN_PHY] = "set_wpan_phy",
++	[NL802154_CMD_NEW_WPAN_PHY] = "new_wpan_phy",
++	[NL802154_CMD_DEL_WPAN_PHY] = "del_wpan_phy",
++	[NL802154_CMD_GET_INTERFACE] = "get_interface",
++	[NL802154_CMD_SET_INTERFACE] = "set_interface",
++	[NL802154_CMD_NEW_INTERFACE] = "new_interface",
++	[NL802154_CMD_DEL_INTERFACE] = "del_interface",
++	[NL802154_CMD_SET_CHANNEL] = "set_channel",
++	[NL802154_CMD_SET_PAN_ID] = "set_pan_id",
++	[NL802154_CMD_SET_SHORT_ADDR] = "set_short_addr",
++	[NL802154_CMD_SET_TX_POWER] = "set_tx_power",
++	[NL802154_CMD_SET_CCA_MODE] = "set_cca_mode",
++	[NL802154_CMD_SET_CCA_ED_LEVEL] = "set_cca_ed_level",
++	[NL802154_CMD_SET_MAX_FRAME_RETRIES] = "set_max_frame_retries",
++	[NL802154_CMD_SET_BACKOFF_EXPONENT] = "set_backoff_exponent",
++	[NL802154_CMD_SET_MAX_CSMA_BACKOFFS] = "set_max_csma_backoffs",
++	[NL802154_CMD_SET_LBT_MODE] = "set_lbt_mode",
++};
++
++static char cmdbuf[100];
++
++const char *command_name(enum nl802154_commands cmd)
++{
++	if (cmd <= NL802154_CMD_MAX && commands[cmd])
++		return commands[cmd];
++
++	sprintf(cmdbuf, "Unknown command (%d)", cmd);
++	return cmdbuf;
++}
++
+ static int print_phy_handler(struct nl_msg *msg, void *arg)
+ {
+ 	struct nlattr *tb_msg[NL802154_ATTR_MAX + 1];
+@@ -397,6 +430,15 @@ static int print_phy_handler(struct nl_msg *msg, void *arg)
+ 		}
+ 	}
+ 
++	if (tb_msg[NL802154_ATTR_SUPPORTED_COMMANDS]) {
++		struct nlattr *nl_cmd;
++		int rem_cmd;
++
++		printf("Supported commands:\n");
++		nla_for_each_nested(nl_cmd, tb_msg[NL802154_ATTR_SUPPORTED_COMMANDS], rem_cmd)
++			printf("\t* %s\n", command_name(nla_get_u32(nl_cmd)));
++	}
++
+ 	return 0;
+ }
+ 
+diff --git a/src/nl802154.h b/src/nl802154.h
+index 0badebd..6fc231e 100644
+--- a/src/nl802154.h
++++ b/src/nl802154.h
+@@ -102,6 +102,8 @@ enum nl802154_attrs {
+ 
+ 	NL802154_ATTR_WPAN_PHY_CAPS,
+ 
++	NL802154_ATTR_SUPPORTED_COMMANDS,
++
+ 	/* add attributes here, update the policy in nl802154.c */
+ 
+ 	__NL802154_ATTR_AFTER_LAST,
 -- 
-Varka Bhadram
-
-
--------------------------------------------------------------------------------------------------------------------------------
-[ C-DAC is on Social-Media too. Kindly follow us at:
-Facebook: https://www.facebook.com/CDACINDIA & Twitter: @cdacindia ]
-
-This e-mail is for the sole use of the intended recipient(s) and may
-contain confidential and privileged information. If you are not the
-intended recipient, please contact the sender by reply e-mail and destroy
-all copies and the original message. Any unauthorized review, use,
-disclosure, dissemination, forwarding, printing or copying of this email
-is strictly prohibited and appropriate legal action will be taken.
--------------------------------------------------------------------------------------------------------------------------------
+1.7.9.5
 
