@@ -1,81 +1,68 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f181.google.com ([209.85.212.181]:34391 "EHLO
+Received: from mail-wi0-f181.google.com ([209.85.212.181]:35676 "EHLO
 	mail-wi0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753465AbbFCHsf (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Wed, 3 Jun 2015 03:48:35 -0400
-Received: by wibut5 with SMTP id ut5so92996229wib.1
-        for <linux-wpan@vger.kernel.org>; Wed, 03 Jun 2015 00:48:34 -0700 (PDT)
-Date: Wed, 3 Jun 2015 09:48:32 +0200
+	with ESMTP id S1752571AbbFDHab (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Thu, 4 Jun 2015 03:30:31 -0400
+Received: by wiga1 with SMTP id a1so38053193wig.0
+        for <linux-wpan@vger.kernel.org>; Thu, 04 Jun 2015 00:30:30 -0700 (PDT)
+Date: Thu, 4 Jun 2015 09:30:27 +0200
 From: Alexander Aring <alex.aring@gmail.com>
 Subject: Re: [PATCH bluetooth-next] nl802154: export supported commands
-Message-ID: <20150603074828.GE731@omega>
+Message-ID: <20150604073023.GB13133@omega>
 References: <1433304841-12734-1-git-send-email-varkab@cdac.in>
- <20150603064950.GB731@omega>
- <556EA90D.4080203@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <556EA90D.4080203@gmail.com>
+In-Reply-To: <1433304841-12734-1-git-send-email-varkab@cdac.in>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: Varka Bhadram <varkabhadram@gmail.com>
 Cc: linux-wpan@vger.kernel.org, Varka Bhadram <varkab@cdac.in>
 
-On Wed, Jun 03, 2015 at 12:43:17PM +0530, Varka Bhadram wrote:
-> On 06/03/2015 12:19 PM, Alexander Aring wrote:
+On Wed, Jun 03, 2015 at 09:44:01AM +0530, Varka Bhadram wrote:
+> This patch will export the supported commands by the devices
+> to the user. This is required because user should know supported
+> commands by the IEEE-802.15.4 devices. Drivers that are there in
+> the mainline are not supporting all the functionalities that the
+> core is providing to us.
 > 
-> >Hi,
-> >
-> >On Wed, Jun 03, 2015 at 09:44:01AM +0530, Varka Bhadram wrote:
-> >>This patch will export the supported commands by the devices
-> >>to the user. This is required because user should know supported
-> >>commands by the IEEE-802.15.4 devices. Drivers that are there in
-> >>the mainline are not supporting all the functionalities that the
-> >>core is providing to us.
-> >>
-> >I think this is not the reason why this was implemented. You check here
-> >cfg802154_ops which ends in mac802154 (SoftMAC) OR _possible_ HardMAC drivers.
-> >
-> >If you want to make sure that a driver implement it _and_ really sure
-> >you need to check on ieee802154_ops.
-> >
-> >I suppose the real reason why wireless has this implementation, is
-> >because to check if HardMAC drivers can support a specific command.
-> >This is because every HardMAC driver should implement then the full
-> >cfg802154_ops callback structure. It's simple wrong here to say "to
-> >check if the driver support the functionalities".
+> Signed-off-by: Varka Bhadram <varkab@cdac.in>
+> ---
+>  include/net/nl802154.h    |    2 ++
+>  net/ieee802154/nl802154.c |   36 ++++++++++++++++++++++++++++++++++++
+>  2 files changed, 38 insertions(+)
 > 
-> I found this thread for the reason used in wireless for implementation.
-> 
-> http://www.spinics.net/lists/linux-wireless/msg29923.html
-> 
+> diff --git a/include/net/nl802154.h b/include/net/nl802154.h
+> index 0badebd..6fc231e 100644
+> --- a/include/net/nl802154.h
+> +++ b/include/net/nl802154.h
+> @@ -102,6 +102,8 @@ enum nl802154_attrs {
+>  
+>  	NL802154_ATTR_WPAN_PHY_CAPS,
+>  
+> +	NL802154_ATTR_SUPPORTED_COMMANDS,
+> +
+>  	/* add attributes here, update the policy in nl802154.c */
+>  
 
-Yea, but in this case he means really HardMAC drivers only which
-implements some cfg802154_ops which others doesn't implement.
+for your v2, please also note the comment here "update the policy in
+nl802154.c".
 
-I would split our use cases in two categories: setting phy or mac cmds.
+This means you need to add:
 
+diff --git a/net/ieee802154/nl802154.c b/net/ieee802154/nl802154.c
+index 310a519..a6ae29d 100644
+--- a/net/ieee802154/nl802154.c
++++ b/net/ieee802154/nl802154.c
+@@ -228,6 +228,8 @@ static const struct nla_policy nl802154_policy[NL802154_ATTR_MAX+1] = {
+        [NL802154_ATTR_LBT_MODE] = { .type = NLA_U8, },
+ 
+        [NL802154_ATTR_WPAN_PHY_CAPS] = { .type = NLA_NESTED },
++
++       [NL802154_ATTR_SUPPORTED_COMMANDS] = { .type = NLA_NESTED },
+ };
+ 
+ /* message building helper */
 
-for phy setttings cmds:
-
-You can check if the phy supports the specific CMD. E.g. tx_power,
-before calling the specific cmd. The cmd will not set because you check the
-phy flags.
-
-
-for mac setttings cmds:
-
-This currently makes no sense, because these are all supported by the
-mac802154 layer and we have currently no HardMAC drivers. Each HardMAC
-driver implements the cfg802154_ops and then it could make sense to
-check if the HardMAC driver supports a specific command.
-
-At the moment for mac settings (in case of SoftMAC) it should display
-always the same.
-
-
-
-Nevertheless, I would ack this. This would be useful if somebody wants
-to implement a HardMAC driver.
 
 - Alex
