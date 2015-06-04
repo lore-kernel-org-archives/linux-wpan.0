@@ -1,36 +1,46 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f173.google.com ([209.85.212.173]:34796 "EHLO
-	mail-wi0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752228AbbFIHwH (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Tue, 9 Jun 2015 03:52:07 -0400
-Received: by wibut5 with SMTP id ut5so8878862wib.1
-        for <linux-wpan@vger.kernel.org>; Tue, 09 Jun 2015 00:52:06 -0700 (PDT)
-Date: Tue, 9 Jun 2015 09:52:00 +0200
-From: Alexander Aring <alex.aring@gmail.com>
-Subject: Re: [PATCH] mac802154/iface: remove superfluous WARN_ON call in
- slave_open()
-Message-ID: <20150609075010.GA1402@omega>
-References: <1433794000-10501-1-git-send-email-stefan@osg.samsung.com>
+Received: from box.christofferholmstedt.se ([188.166.68.52]:46286 "EHLO
+	box.christofferholmstedt.se" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751142AbbFDGeX (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Thu, 4 Jun 2015 02:34:23 -0400
+Received: from authenticated-user (unknown [127.0.0.1])
+	(using TLSv1.2 with cipher DHE-RSA-AES128-SHA (128/128 bits))
+	(No client certificate requested)
+	by box.christofferholmstedt.se (Postfix) with ESMTPSA id BE7CF140D79
+	for <linux-wpan@vger.kernel.org>; Thu,  4 Jun 2015 02:34:21 -0400 (EDT)
+Date: Thu, 4 Jun 2015 08:34:16 +0200
+From: Christoffer Holmstedt <christoffer@christofferholmstedt.se>
+Subject: RPi model B - bluetooth-next kernel, shutdown always reboots the RPi
+Message-ID: <20150604063416.GA3045@probook-6560b>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1433794000-10501-1-git-send-email-stefan@osg.samsung.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Stefan Schmidt <stefan@osg.samsung.com>
-Cc: linux-wpan@vger.kernel.org
+To: linux-wpan@vger.kernel.org
 
-On Mon, Jun 08, 2015 at 10:06:40PM +0200, Stefan Schmidt wrote:
-> This call was used before we aligned our code with the wireless code base. We
-> are wanted to handle this in the err: code path. Which would actually not work
-> because the WARN_ON() macro would reset the res value to 0 and thus we would
-> never hit err:. Removing it makes the code do what we actually intend.
-> 
-> Signed-off-by: Stefan Schmidt <stefan@osg.samsung.com>
+I know some of you are using the RPi as well so I start by asking here, perhaps
+linux-rpi-kernel list is the next step. When I run "shutdown -h 0" the RPi
+turns off but in a few seconds U-Boot starts again and boots linux, so I can't
+turn it off from software. The only solution is to pull the plug, which will
+eventually corrupt the SD card so that is not a good long-term solution.
 
-Acked-by: Alexander Aring <alex.aring@gmail.com>
+Others have had simliar problems with kernels 3.8 - 3.12 but back then it was
+something about activity on some GPIO (e.g. SCL) could trigger boot. This is
+not the case now as my problem exists both with the Openlabs board connected
+and disconnected.
 
-Please next time "subsytem: file:" or only "subsytem:" in the subject.
-But not "subsytem/subsubsystem:". Thanks.
+There are a lot of moving parts here, during shutdown Raspbian with 4.1.0-rcX
+kernel doesn't set proper registers perhaps or U-Boot is missing some
+configuration so I'm not sure how to debug this issue.  Installing a fresh
+raspbian installation on the SD card with 3.18 kernel "shutdown -h 0" works
+just fine. As soon as I "install" U-Boot and the blutooth-next kernel it stops
+working.
 
-- Alex
+Any pointers to a solution, debug steps or even a tutorial on how the
+shutdown/boot-up process works is appreciated, because I'm totally lost on this
+one.
+
+Regards
+-- 
+Christoffer Holmstedt
