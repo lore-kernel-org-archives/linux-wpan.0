@@ -1,68 +1,67 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f181.google.com ([209.85.212.181]:35676 "EHLO
-	mail-wi0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752571AbbFDHab (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Thu, 4 Jun 2015 03:30:31 -0400
-Received: by wiga1 with SMTP id a1so38053193wig.0
-        for <linux-wpan@vger.kernel.org>; Thu, 04 Jun 2015 00:30:30 -0700 (PDT)
-Date: Thu, 4 Jun 2015 09:30:27 +0200
-From: Alexander Aring <alex.aring@gmail.com>
-Subject: Re: [PATCH bluetooth-next] nl802154: export supported commands
-Message-ID: <20150604073023.GB13133@omega>
-References: <1433304841-12734-1-git-send-email-varkab@cdac.in>
+Received: from box.christofferholmstedt.se ([188.166.68.52]:46362 "EHLO
+	box.christofferholmstedt.se" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752629AbbFDJVr (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Thu, 4 Jun 2015 05:21:47 -0400
+Received: from authenticated-user (unknown [127.0.0.1])
+	(using TLSv1.2 with cipher DHE-RSA-AES128-SHA (128/128 bits))
+	(No client certificate requested)
+	by box.christofferholmstedt.se (Postfix) with ESMTPSA id 5BE1C140D8C
+	for <linux-wpan@vger.kernel.org>; Thu,  4 Jun 2015 05:21:45 -0400 (EDT)
+Date: Thu, 4 Jun 2015 11:21:35 +0200
+From: Christoffer Holmstedt <christoffer@christofferholmstedt.se>
+Subject: [PATCH wpan-tools 2/2] info: remove old cca options capabilities
+ output
+Message-ID: <20150604092116.GA8053@probook-6560b>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1433304841-12734-1-git-send-email-varkab@cdac.in>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Varka Bhadram <varkabhadram@gmail.com>
-Cc: linux-wpan@vger.kernel.org, Varka Bhadram <varkab@cdac.in>
+To: linux-wpan@vger.kernel.org
 
-On Wed, Jun 03, 2015 at 09:44:01AM +0530, Varka Bhadram wrote:
-> This patch will export the supported commands by the devices
-> to the user. This is required because user should know supported
-> commands by the IEEE-802.15.4 devices. Drivers that are there in
-> the mainline are not supporting all the functionalities that the
-> core is providing to us.
-> 
-> Signed-off-by: Varka Bhadram <varkab@cdac.in>
-> ---
->  include/net/nl802154.h    |    2 ++
->  net/ieee802154/nl802154.c |   36 ++++++++++++++++++++++++++++++++++++
->  2 files changed, 38 insertions(+)
-> 
-> diff --git a/include/net/nl802154.h b/include/net/nl802154.h
-> index 0badebd..6fc231e 100644
-> --- a/include/net/nl802154.h
-> +++ b/include/net/nl802154.h
-> @@ -102,6 +102,8 @@ enum nl802154_attrs {
->  
->  	NL802154_ATTR_WPAN_PHY_CAPS,
->  
-> +	NL802154_ATTR_SUPPORTED_COMMANDS,
-> +
->  	/* add attributes here, update the policy in nl802154.c */
->  
+Signed-off-by: Christoffer Holmstedt <christoffer@christofferholmstedt.se>
+---
+ src/info.c | 23 -----------------------
+ 1 file changed, 23 deletions(-)
 
-for your v2, please also note the comment here "update the policy in
-nl802154.c".
-
-This means you need to add:
-
-diff --git a/net/ieee802154/nl802154.c b/net/ieee802154/nl802154.c
-index 310a519..a6ae29d 100644
---- a/net/ieee802154/nl802154.c
-+++ b/net/ieee802154/nl802154.c
-@@ -228,6 +228,8 @@ static const struct nla_policy nl802154_policy[NL802154_ATTR_MAX+1] = {
-        [NL802154_ATTR_LBT_MODE] = { .type = NLA_U8, },
+diff --git a/src/info.c b/src/info.c
+index d2e88febd20c..97844e1babec 100644
+--- a/src/info.c
++++ b/src/info.c
+@@ -411,29 +411,6 @@ static int print_phy_handler(struct nl_msg *msg, void *arg)
+ 			printf("\n");
+ 		}
  
-        [NL802154_ATTR_WPAN_PHY_CAPS] = { .type = NLA_NESTED },
-+
-+       [NL802154_ATTR_SUPPORTED_COMMANDS] = { .type = NLA_NESTED },
- };
- 
- /* message building helper */
+-		if (tb_caps[NL802154_CAP_ATTR_CCA_OPTS]) {
+-			struct nlattr *nl_cca_opts;
+-			int rem_cca_opts;
+-
+-			printf("\tcca_opts: ");
+-			nla_for_each_nested(nl_cca_opts,
+-					    tb_caps[NL802154_CAP_ATTR_CCA_OPTS],
+-					    rem_cca_opts) {
+-				printf("%d", nla_type(nl_cca_opts));
+-				switch (nla_type(nl_cca_opts)) {
+-				case NL802154_CCA_OPT_ENERGY_CARRIER_AND:
+-				case NL802154_CCA_OPT_ENERGY_CARRIER_OR:
+-					printf("(cca_mode: 3),");
+-					break;
+-				default:
+-					printf("unkown\n");
+-					break;
+-				}
+-			}
+-			/* TODO */
+-			printf("\b \n");
+-		}
+-
+ 		if (tb_caps[NL802154_CAP_ATTR_MIN_MINBE] &&
+ 		    tb_caps[NL802154_CAP_ATTR_MAX_MINBE] &&
+ 		    tb_caps[NL802154_CAP_ATTR_MIN_MAXBE] &&
+-- 
+1.9.1
 
 
-- Alex
+-- 
+Christoffer Holmstedt
