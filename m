@@ -1,46 +1,36 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from box.christofferholmstedt.se ([188.166.68.52]:46286 "EHLO
-	box.christofferholmstedt.se" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751142AbbFDGeX (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Thu, 4 Jun 2015 02:34:23 -0400
-Received: from authenticated-user (unknown [127.0.0.1])
-	(using TLSv1.2 with cipher DHE-RSA-AES128-SHA (128/128 bits))
-	(No client certificate requested)
-	by box.christofferholmstedt.se (Postfix) with ESMTPSA id BE7CF140D79
-	for <linux-wpan@vger.kernel.org>; Thu,  4 Jun 2015 02:34:21 -0400 (EDT)
-Date: Thu, 4 Jun 2015 08:34:16 +0200
-From: Christoffer Holmstedt <christoffer@christofferholmstedt.se>
-Subject: RPi model B - bluetooth-next kernel, shutdown always reboots the RPi
-Message-ID: <20150604063416.GA3045@probook-6560b>
+Received: from mail-wi0-f174.google.com ([209.85.212.174]:34686 "EHLO
+	mail-wi0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750731AbbFDHla (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Thu, 4 Jun 2015 03:41:30 -0400
+Received: by wibut5 with SMTP id ut5so12092886wib.1
+        for <linux-wpan@vger.kernel.org>; Thu, 04 Jun 2015 00:41:29 -0700 (PDT)
+Date: Thu, 4 Jun 2015 09:41:26 +0200
+From: Alexander Aring <alex.aring@gmail.com>
+Subject: Re: RPi model B - bluetooth-next kernel, shutdown always reboots the
+ RPi
+Message-ID: <20150604074123.GC13133@omega>
+References: <20150604063416.GA3045@probook-6560b>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
+In-Reply-To: <20150604063416.GA3045@probook-6560b>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org
+To: Christoffer Holmstedt <christoffer@christofferholmstedt.se>
+Cc: linux-wpan@vger.kernel.org
 
-I know some of you are using the RPi as well so I start by asking here, perhaps
-linux-rpi-kernel list is the next step. When I run "shutdown -h 0" the RPi
-turns off but in a few seconds U-Boot starts again and boots linux, so I can't
-turn it off from software. The only solution is to pull the plug, which will
-eventually corrupt the SD card so that is not a good long-term solution.
+On Thu, Jun 04, 2015 at 08:34:16AM +0200, Christoffer Holmstedt wrote:
+> I know some of you are using the RPi as well so I start by asking here, perhaps
+> linux-rpi-kernel list is the next step. When I run "shutdown -h 0" the RPi
 
-Others have had simliar problems with kernels 3.8 - 3.12 but back then it was
-something about activity on some GPIO (e.g. SCL) could trigger boot. This is
-not the case now as my problem exists both with the Openlabs board connected
-and disconnected.
+Maybe try "halt"? "halt" should shutdown your RPi, means unmounting
+filesystems etc. and stops there (without rebooting) Then it should be
+safe to pull the plug.
 
-There are a lot of moving parts here, during shutdown Raspbian with 4.1.0-rcX
-kernel doesn't set proper registers perhaps or U-Boot is missing some
-configuration so I'm not sure how to debug this issue.  Installing a fresh
-raspbian installation on the SD card with 3.18 kernel "shutdown -h 0" works
-just fine. As soon as I "install" U-Boot and the blutooth-next kernel it stops
-working.
+To poweroff the RPi, the RPi can't do that, it only can reboot itself
+which is solved by some watchdog timeout, I suppose. Maybe there exists
+self-builded solutions somewhere on RPi sites to shutdown the RPi
+somehow (means poweroff).
 
-Any pointers to a solution, debug steps or even a tutorial on how the
-shutdown/boot-up process works is appreciated, because I'm totally lost on this
-one.
-
-Regards
--- 
-Christoffer Holmstedt
+- Alex
