@@ -1,34 +1,34 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from proxima.lasnet.de ([78.47.171.185]:47902 "EHLO
-	proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752830AbbFDNZi (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Thu, 4 Jun 2015 09:25:38 -0400
-From: Stefan Schmidt <stefan@osg.samsung.com>
-Subject: [PATCH wpan-tools 3/3] COPYRIGHT: Add my own copyright due to wpan-ping contribution
-Date: Thu,  4 Jun 2015 15:25:23 +0200
-Message-Id: <1433424323-24099-4-git-send-email-stefan@osg.samsung.com>
-In-Reply-To: <1433424323-24099-1-git-send-email-stefan@osg.samsung.com>
+Received: from mail-wi0-f177.google.com ([209.85.212.177]:37657 "EHLO
+	mail-wi0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932337AbbFEKy0 (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Fri, 5 Jun 2015 06:54:26 -0400
+Received: by wifx6 with SMTP id x6so16465776wif.0
+        for <linux-wpan@vger.kernel.org>; Fri, 05 Jun 2015 03:54:25 -0700 (PDT)
+Date: Fri, 5 Jun 2015 12:54:22 +0200
+From: Alexander Aring <alex.aring@gmail.com>
+Subject: Re: [PATCH wpan-tools 0/3] wpan-ping utility
+Message-ID: <20150605105421.GB30035@omega>
 References: <1433424323-24099-1-git-send-email-stefan@osg.samsung.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1433424323-24099-1-git-send-email-stefan@osg.samsung.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org
-Cc: Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt <stefan@osg.samsung.com>
+To: Stefan Schmidt <stefan@osg.samsung.com>
+Cc: linux-wpan@vger.kernel.org
 
-Signed-off-by: Stefan Schmidt <stefan@osg.samsung.com>
----
- COPYING | 1 +
- 1 file changed, 1 insertion(+)
+On Thu, Jun 04, 2015 at 03:25:20PM +0200, Stefan Schmidt wrote:
+> Hello.
+> 
+> I had something similar around for a while and it proofed useful for some basic
+> testing on the ieee 802154 level. It also can be used to see if we regress for
+> non-6lowpan use cases like short address and ieee802154 sockets.
+> 
+> The only two things missing from my point of view is support for extended
+> addresses and using recvfrom to avoid specifying the client address on server
+> side.
+> 
 
-diff --git a/COPYING b/COPYING
-index 5cd3daa..f579f35 100644
---- a/COPYING
-+++ b/COPYING
-@@ -1,4 +1,5 @@
- Copyright (c) 2014		Alexander Aring
-+Copyright (c) 2015		Stefan Schmidt
- 
- 
- Code is based on iw tool.
--- 
-2.1.0
-
+Applied, thanks.
