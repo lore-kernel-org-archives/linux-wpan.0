@@ -1,34 +1,53 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f177.google.com ([209.85.212.177]:37657 "EHLO
-	mail-wi0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932337AbbFEKy0 (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Fri, 5 Jun 2015 06:54:26 -0400
-Received: by wifx6 with SMTP id x6so16465776wif.0
-        for <linux-wpan@vger.kernel.org>; Fri, 05 Jun 2015 03:54:25 -0700 (PDT)
-Date: Fri, 5 Jun 2015 12:54:22 +0200
+Received: from mail-wg0-f48.google.com ([74.125.82.48]:34720 "EHLO
+	mail-wg0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751750AbbFELnd (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Fri, 5 Jun 2015 07:43:33 -0400
+Received: by wgv5 with SMTP id 5so54767636wgv.1
+        for <linux-wpan@vger.kernel.org>; Fri, 05 Jun 2015 04:43:32 -0700 (PDT)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: Re: [PATCH wpan-tools 0/3] wpan-ping utility
-Message-ID: <20150605105421.GB30035@omega>
-References: <1433424323-24099-1-git-send-email-stefan@osg.samsung.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1433424323-24099-1-git-send-email-stefan@osg.samsung.com>
+Subject: [PATCH wpan-tools] treewide: replace wireless with wpan
+Date: Fri,  5 Jun 2015 13:43:25 +0200
+Message-Id: <1433504605-5242-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Stefan Schmidt <stefan@osg.samsung.com>
-Cc: linux-wpan@vger.kernel.org
+To: linux-wpan@vger.kernel.org
+Cc: Alexander Aring <alex.aring@gmail.com>
 
-On Thu, Jun 04, 2015 at 03:25:20PM +0200, Stefan Schmidt wrote:
-> Hello.
-> 
-> I had something similar around for a while and it proofed useful for some basic
-> testing on the ieee 802154 level. It also can be used to see if we regress for
-> non-6lowpan use cases like short address and ieee802154 sockets.
-> 
-> The only two things missing from my point of view is support for extended
-> addresses and using recvfrom to avoid specifying the client address on server
-> side.
-> 
+This patch replaced several wireless string with wpan. This behaviour
+was simpled copied from wireless iw tool and it hasn't been renamed to
+wpan.
 
-Applied, thanks.
+Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+---
+ src/info.c      | 4 ++--
+ src/interface.c | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/info.c b/src/info.c
+index 2434bef..8afeeb7 100644
+--- a/src/info.c
++++ b/src/info.c
+@@ -459,7 +459,7 @@ static int handle_info(struct nl802154_state *state,
+ }
+ 
+ __COMMAND(NULL, info, "info", NULL, NL802154_CMD_GET_WPAN_PHY, 0, 0, CIB_PHY, handle_info,
+-	  "Show capabilities for the specified wireless device.", NULL);
++	  "Show capabilities for the specified wpan device.", NULL);
+ TOPLEVEL(list, NULL, NL802154_CMD_GET_WPAN_PHY, NLM_F_DUMP, CIB_NONE, handle_info,
+-	 "List all wireless devices and their capabilities.");
++	 "List all wpan devices and their capabilities.");
+ TOPLEVEL(phy, NULL, NL802154_CMD_GET_WPAN_PHY, NLM_F_DUMP, CIB_NONE, handle_info, NULL);
+diff --git a/src/interface.c b/src/interface.c
+index 647247b..c67077b 100644
+--- a/src/interface.c
++++ b/src/interface.c
+@@ -252,4 +252,4 @@ static int handle_dev_dump(struct nl802154_state *state,
+ 	return 0;
+ }
+ TOPLEVEL(dev, NULL, NL802154_CMD_GET_INTERFACE, NLM_F_DUMP, CIB_NONE, handle_dev_dump,
+-	 "List all network interfaces for wireless hardware.");
++	 "List all network interfaces for wpan hardware.");
+-- 
+2.4.1
+
