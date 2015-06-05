@@ -1,67 +1,53 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f173.google.com ([209.85.212.173]:34105 "EHLO
-	mail-wi0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751474AbbFEMTR (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Fri, 5 Jun 2015 08:19:17 -0400
-Received: by wibut5 with SMTP id ut5so19304186wib.1
-        for <linux-wpan@vger.kernel.org>; Fri, 05 Jun 2015 05:19:16 -0700 (PDT)
-Date: Fri, 5 Jun 2015 14:19:13 +0200
-From: Alexander Aring <alex.aring@gmail.com>
-Subject: Re: [PATCH wpan-tools] treewide: replace wireless with wpan
-Message-ID: <20150605121912.GC30035@omega>
-References: <1433504605-5242-1-git-send-email-alex.aring@gmail.com>
- <55718E7E.1060701@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <55718E7E.1060701@gmail.com>
+Received: from proxima.lasnet.de ([78.47.171.185]:54508 "EHLO
+	proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754658AbbFEOYD (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Fri, 5 Jun 2015 10:24:03 -0400
+From: Stefan Schmidt <stefan@osg.samsung.com>
+Subject: [PATCH wpan-misc] website: Update supported hardware table
+Date: Fri,  5 Jun 2015 16:23:54 +0200
+Message-Id: <1433514234-16526-1-git-send-email-stefan@osg.samsung.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Varka Bhadram <varkabhadram@gmail.com>
-Cc: linux-wpan@vger.kernel.org
+To: linux-wpan@vger.kernel.org
+Cc: Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt <stefan@osg.samsung.com>
 
-On Fri, Jun 05, 2015 at 05:26:46PM +0530, Varka Bhadram wrote:
-> Hi,
-> 
-> On 06/05/2015 05:13 PM, Alexander Aring wrote:
-> 
-> >This patch replaced several wireless string with wpan. This behaviour
-> >was simpled copied from wireless iw tool and it hasn't been renamed to
-> >wpan.
-> >
-> >Signed-off-by: Alexander Aring <alex.aring@gmail.com>
-> >---
-> >  src/info.c      | 4 ++--
-> >  src/interface.c | 2 +-
-> >  2 files changed, 3 insertions(+), 3 deletions(-)
-> >
-> >diff --git a/src/info.c b/src/info.c
-> >index 2434bef..8afeeb7 100644
-> >--- a/src/info.c
-> >+++ b/src/info.c
-> >@@ -459,7 +459,7 @@ static int handle_info(struct nl802154_state *state,
-> >  }
-> >  __COMMAND(NULL, info, "info", NULL, NL802154_CMD_GET_WPAN_PHY, 0, 0, CIB_PHY, handle_info,
-> >-	  "Show capabilities for the specified wireless device.", NULL);
-> >+	  "Show capabilities for the specified wpan device.", NULL);
-> >  TOPLEVEL(list, NULL, NL802154_CMD_GET_WPAN_PHY, NLM_F_DUMP, CIB_NONE, handle_info,
-> >-	 "List all wireless devices and their capabilities.");
-> >+	 "List all wpan devices and their capabilities.");
-> >  TOPLEVEL(phy, NULL, NL802154_CMD_GET_WPAN_PHY, NLM_F_DUMP, CIB_NONE, handle_info, NULL);
-> >diff --git a/src/interface.c b/src/interface.c
-> >index 647247b..c67077b 100644
-> >--- a/src/interface.c
-> >+++ b/src/interface.c
-> >@@ -252,4 +252,4 @@ static int handle_dev_dump(struct nl802154_state *state,
-> >  	return 0;
-> >  }
-> >  TOPLEVEL(dev, NULL, NL802154_CMD_GET_INTERFACE, NLM_F_DUMP, CIB_NONE, handle_dev_dump,
-> >-	 "List all network interfaces for wireless hardware.");
-> >+	 "List all network interfaces for wpan hardware.");
-> 
-> We also have some typo in usage:
-> 
+Sort in lexical order, add some more where to buy links and add entries for
+cc2531, mrf24j40 and XBee.
 
-send patches. :-)
+Signed-off-by: Stefan Schmidt <stefan@osg.samsung.com>
+---
+ website/index.txt | 13 ++++++++-----
+ 1 file changed, 8 insertions(+), 5 deletions(-)
 
-- Alex
+diff --git a/website/index.txt b/website/index.txt
+index d8ccbb7..19d1e70 100644
+--- a/website/index.txt
++++ b/website/index.txt
+@@ -35,15 +35,18 @@ Supported Hardware
+ [cols="3,4,2,^2,12",options="header"]
+ |=============================================================
+ |Transceiver |Supported        |Driver     | Bus |Where to buy
++|at86rf212   |yes              |at86rf230  | SPI | http://de.aliexpress.com/item/Wireless-transceiver-module-zigbee-module-belt-at86rf212-mcu-chip-780m-module/1757611944.html[aliexpress]
++|at86rf212b  |yes              |at86rf230  | SPI | http://www.digikey.com/product-search/en?x=0&y=0&lang=en&site=us&keywords=ATZB-212B-XPRO[digikey]
+ |at86rf230   |no               |at86rf230? | SPI |
+ |at86rf231   |yes              |at86rf230  | SPI | http://downloads.qi-hardware.com/people/werner/wpan/web/[atben] Out of stock. Mailto linux-wpan and Werner to produce maybe new ones. Or contact http://en.qi-hardware.com/wiki/Main_Page[qi-hardware].
+ |at86rf233   |yes              |at86rf230  | SPI | http://openlabs.co/store/Raspberry-Pi-802.15.4-radio[openlabs], http://www.digikey.com/product-search/en?x=0&y=0&lang=en&site=us&keywords=ATREB233-XPRO[digikey]
+-|at86rf212   |yes              |at86rf230  | SPI |
+-|at86rf212b  |yes              |at86rf230  | SPI | http://www.digikey.com/product-search/en?x=0&y=0&lang=en&site=us&keywords=ATZB-212B-XPRO[digikey]
+-|cc2520      |yes              |cc2520     | SPI |
+-|cc2420      |no               |           | SPI | http://de.aliexpress.com/store/product/ZIGBEE-networking-technology-Wi-Fi-CC2420-wireless-transceiver-modules-including-antenna/1383438_2036388706.html[aliexpress]
+ |atusb       |yes              |atusb      | USB | http://downloads.qi-hardware.com/people/werner/wpan/web/[atusb] Out of stock. Mailto linux-wpan and Werner to produce maybe new ones. Or contact http://en.qi-hardware.com/wiki/Main_Page[qi-hardware].
+-|RZUSBstick  |no, WIP          |atusb      | USB |
++|cc2420      |no               |           | SPI | http://de.aliexpress.com/store/product/ZIGBEE-networking-technology-Wi-Fi-CC2420-wireless-transceiver-modules-including-antenna/1383438_2036388706.html[aliexpress]
++|cc2520      |yes              |cc2520     | SPI | http://de.aliexpress.com/item/CC2520-wireless-module-ZIGBEE-wireless-sensor-networking-module-with-SMA-external-antenna/1921436550.html[aliexpress]
++|cc2531      |no               |           | USB | http://de.aliexpress.com/item/free-shipping-FOR-ZigBee-CC2531-USB-dongle-protocol-analysis-port-capture-wireless-keyboard-and-mouse/32270975591.html[aliexpress]
++ |mrf24j40   |yes              |mrf24j40   | SPI |  http://de.aliexpress.com/item/MRF24J40MA-I-RM-MRF24J40MA-I-MRF24J40MA-MRF24J40-MICROC-QFN-Import-original/32223258627.html[aliexpress]
++|RZUSBstick  |no, WIP          |atusb      | USB | http://www.element14.com/community/docs/DOC-67532/l/avr-rz-usb-stick-module[element14]
++|Xbee        |no |https://github.com/joaopedrotaveira/linux-rpl/blob/master/mainline-3.12.y/0001-Added-XBee-driver-support.patch[out of tree]| ?? | https://www.sparkfun.com/pages/xbee_guide[sparkfun]
+ |=============================================================
+ 
+ How-To's
+-- 
+2.1.0
+
