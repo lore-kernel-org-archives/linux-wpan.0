@@ -1,74 +1,106 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f180.google.com ([209.85.212.180]:38781 "EHLO
-	mail-wi0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752875AbbFFPbH (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Sat, 6 Jun 2015 11:31:07 -0400
-Received: by wibdq8 with SMTP id dq8so44791526wib.1
-        for <linux-wpan@vger.kernel.org>; Sat, 06 Jun 2015 08:31:06 -0700 (PDT)
+Received: from mail-wi0-f181.google.com ([209.85.212.181]:32770 "EHLO
+	mail-wi0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752451AbbFFPbJ (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Sat, 6 Jun 2015 11:31:09 -0400
+Received: by wiwd19 with SMTP id d19so46689814wiw.0
+        for <linux-wpan@vger.kernel.org>; Sat, 06 Jun 2015 08:31:08 -0700 (PDT)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH bluetooth-next 2/8] mac802154: cleanup address filtering flags
-Date: Sat,  6 Jun 2015 17:30:47 +0200
-Message-Id: <1433604653-9585-3-git-send-email-alex.aring@gmail.com>
+Subject: [PATCH bluetooth-next 3/8] mac802154: remove aack hw flag
+Date: Sat,  6 Jun 2015 17:30:48 +0200
+Message-Id: <1433604653-9585-4-git-send-email-alex.aring@gmail.com>
 In-Reply-To: <1433604653-9585-1-git-send-email-alex.aring@gmail.com>
 References: <1433604653-9585-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
-Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
+Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt <s.schmidt@samsung.com>, Varka Bhadram <varkab@cdac.in>, Alan Ott <alan@signal11.us>
 
-This patch changes the address filtering flags to enums and setting the
-flag values with the BIT macro. Additional this patch changes the
-commenting style for matching usual kernel style.
+This patch removes the hardware auto acknowdledge flag which indicates
+that the transceiver supports this handling. This flag is never
+evaluated inside mac802154 and all transceivers should support this
+handling by default per hardware.
 
+Suggested-by: Lennert Buytenhek <buytenh@wantstofly.org>
+Cc: Stefan Schmidt <s.schmidt@samsung.com>
+Cc: Varka Bhadram <varkab@cdac.in>
+Cc: Alan Ott <alan@signal11.us>
 Signed-off-by: Alexander Aring <alex.aring@gmail.com>
 ---
- include/net/mac802154.h | 31 +++++++++++++++++++++----------
- 1 file changed, 21 insertions(+), 10 deletions(-)
+ drivers/net/ieee802154/at86rf230.c | 2 +-
+ drivers/net/ieee802154/atusb.c     | 2 +-
+ drivers/net/ieee802154/cc2520.c    | 3 +--
+ drivers/net/ieee802154/mrf24j40.c  | 3 +--
+ include/net/mac802154.h            | 2 --
+ 5 files changed, 4 insertions(+), 8 deletions(-)
 
+diff --git a/drivers/net/ieee802154/at86rf230.c b/drivers/net/ieee802154/at86rf230.c
+index 6e20e9c..1bf86d2 100644
+--- a/drivers/net/ieee802154/at86rf230.c
++++ b/drivers/net/ieee802154/at86rf230.c
+@@ -1443,7 +1443,7 @@ at86rf230_detect_device(struct at86rf230_local *lp)
+ 		return -EINVAL;
+ 	}
+ 
+-	lp->hw->flags = IEEE802154_HW_TX_OMIT_CKSUM | IEEE802154_HW_AACK |
++	lp->hw->flags = IEEE802154_HW_TX_OMIT_CKSUM |
+ 			IEEE802154_HW_CSMA_PARAMS |
+ 			IEEE802154_HW_FRAME_RETRIES | IEEE802154_HW_AFILT |
+ 			IEEE802154_HW_PROMISCUOUS;
+diff --git a/drivers/net/ieee802154/atusb.c b/drivers/net/ieee802154/atusb.c
+index 3d25678..80dfc72 100644
+--- a/drivers/net/ieee802154/atusb.c
++++ b/drivers/net/ieee802154/atusb.c
+@@ -628,7 +628,7 @@ static int atusb_probe(struct usb_interface *interface,
+ 
+ 	hw->parent = &usb_dev->dev;
+ 	hw->flags = IEEE802154_HW_TX_OMIT_CKSUM | IEEE802154_HW_AFILT |
+-		    IEEE802154_HW_AACK | IEEE802154_HW_PROMISCUOUS;
++		    IEEE802154_HW_PROMISCUOUS;
+ 
+ 	hw->phy->flags = WPAN_PHY_FLAG_TXPOWER;
+ 
+diff --git a/drivers/net/ieee802154/cc2520.c b/drivers/net/ieee802154/cc2520.c
+index a8bafd6..15f263c 100644
+--- a/drivers/net/ieee802154/cc2520.c
++++ b/drivers/net/ieee802154/cc2520.c
+@@ -746,8 +746,7 @@ static int cc2520_register(struct cc2520_private *priv)
+ 
+ 	/* We do support only 2.4 Ghz */
+ 	priv->hw->phy->supported.channels[0] = 0x7FFF800;
+-	priv->hw->flags = IEEE802154_HW_OMIT_CKSUM | IEEE802154_HW_AACK |
+-			  IEEE802154_HW_AFILT;
++	priv->hw->flags = IEEE802154_HW_OMIT_CKSUM | IEEE802154_HW_AFILT;
+ 
+ 	priv->hw->phy->flags = WPAN_PHY_FLAG_TXPOWER;
+ 
+diff --git a/drivers/net/ieee802154/mrf24j40.c b/drivers/net/ieee802154/mrf24j40.c
+index f2a1bd1..99c7676 100644
+--- a/drivers/net/ieee802154/mrf24j40.c
++++ b/drivers/net/ieee802154/mrf24j40.c
+@@ -751,8 +751,7 @@ static int mrf24j40_probe(struct spi_device *spi)
+ 	devrec->hw->priv = devrec;
+ 	devrec->hw->parent = &devrec->spi->dev;
+ 	devrec->hw->phy->supported.channels[0] = CHANNEL_MASK;
+-	devrec->hw->flags = IEEE802154_HW_OMIT_CKSUM | IEEE802154_HW_AACK |
+-			    IEEE802154_HW_AFILT;
++	devrec->hw->flags = IEEE802154_HW_OMIT_CKSUM | IEEE802154_HW_AFILT;
+ 
+ 	dev_dbg(printdev(devrec), "registered mrf24j40\n");
+ 	ret = ieee802154_register_hw(devrec->hw);
 diff --git a/include/net/mac802154.h b/include/net/mac802154.h
-index 80a9e60..845e4f8 100644
+index 845e4f8..a20ba28 100644
 --- a/include/net/mac802154.h
 +++ b/include/net/mac802154.h
-@@ -31,18 +31,29 @@
-  */
- #define MAC802154_FRAME_HARD_HEADER_LEN		(2 + 1 + 20 + 14)
+@@ -90,8 +90,6 @@ struct ieee802154_hw {
  
--/* The following flags are used to indicate changed address settings from
-+/**
-+ * enum ieee802154_hw_addr_filt_flags - hardware address filtering flags
-+ *
-+ * The following flags are used to indicate changed address settings from
-  * the stack to the hardware.
-+ *
-+ * @IEEE802154_AFILT_SADDR_CHANGED: Indicates that the short address will be
-+ *	change.
-+ *
-+ * @IEEE802154_AFILT_IEEEADDR_CHANGED: Indicates that the extended address
-+ *	will be change.
-+ *
-+ * @IEEE802154_AFILT_PANID_CHANGED: Indicates that the pan id will be change.
-+ *
-+ * @IEEE802154_AFILT_PANC_CHANGED: Indicates that the address filter will
-+ *	do frame address filtering as a pan coordinator.
-  */
--
--/* indicates that the Short Address changed */
--#define IEEE802154_AFILT_SADDR_CHANGED		0x00000001
--/* indicates that the IEEE Address changed */
--#define IEEE802154_AFILT_IEEEADDR_CHANGED	0x00000002
--/* indicates that the PAN ID changed */
--#define IEEE802154_AFILT_PANID_CHANGED		0x00000004
--/* indicates that PAN Coordinator status changed */
--#define IEEE802154_AFILT_PANC_CHANGED		0x00000008
-+enum ieee802154_hw_addr_filt_flags {
-+	IEEE802154_AFILT_SADDR_CHANGED		= BIT(1),
-+	IEEE802154_AFILT_IEEEADDR_CHANGED	= BIT(2),
-+	IEEE802154_AFILT_PANID_CHANGED		= BIT(3),
-+	IEEE802154_AFILT_PANC_CHANGED		= BIT(4),
-+};
- 
- struct ieee802154_hw_addr_filt {
- 	__le16	pan_id;		/* Each independent PAN selects a unique
+ /* Indicates that xmitter will add FCS on it's own. */
+ #define IEEE802154_HW_TX_OMIT_CKSUM	0x00000001
+-/* Indicates that receiver will autorespond with ACK frames. */
+-#define IEEE802154_HW_AACK		0x00000002
+ /* Indicates that transceiver will support listen before transmit. */
+ #define IEEE802154_HW_LBT		0x00000004
+ /* Indicates that transceiver will support csma (max_be, min_be, csma retries)
 -- 
 2.4.1
 
