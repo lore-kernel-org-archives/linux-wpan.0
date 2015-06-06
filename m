@@ -1,33 +1,32 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from proxima.lasnet.de ([78.47.171.185]:54285 "EHLO
-	proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932602AbbFENc1 (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Fri, 5 Jun 2015 09:32:27 -0400
-From: Stefan Schmidt <stefan@osg.samsung.com>
-Subject: [PATCH wpan-tools 3/3] wpan-ping: Add .gitignore to ignore generated files
-Date: Fri,  5 Jun 2015 15:32:12 +0200
-Message-Id: <1433511132-15818-4-git-send-email-stefan@osg.samsung.com>
-In-Reply-To: <1433511132-15818-1-git-send-email-stefan@osg.samsung.com>
+Received: from mail-wi0-f175.google.com ([209.85.212.175]:36462 "EHLO
+	mail-wi0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752555AbbFFIZd (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Sat, 6 Jun 2015 04:25:33 -0400
+Received: by wigg3 with SMTP id g3so6858201wig.1
+        for <linux-wpan@vger.kernel.org>; Sat, 06 Jun 2015 01:25:32 -0700 (PDT)
+Date: Sat, 6 Jun 2015 10:25:29 +0200
+From: Alexander Aring <alex.aring@gmail.com>
+Subject: Re: [PATCH wpan-tools 0/3] wpan-ping fixes
+Message-ID: <20150606082528.GC1051@omega>
 References: <1433511132-15818-1-git-send-email-stefan@osg.samsung.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1433511132-15818-1-git-send-email-stefan@osg.samsung.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org
-Cc: Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt <stefan@osg.samsung.com>
+To: Stefan Schmidt <stefan@osg.samsung.com>
+Cc: linux-wpan@vger.kernel.org
 
-Signed-off-by: Stefan Schmidt <stefan@osg.samsung.com>
----
- wpan-ping/.gitignore | 2 ++
- 1 file changed, 2 insertions(+)
- create mode 100644 wpan-ping/.gitignore
+On Fri, Jun 05, 2015 at 03:32:09PM +0200, Stefan Schmidt wrote:
+> Hello.
+> 
+> Some smaller fixes. wpan-ping no plays nicely in 6LoWPAN networks by settign
+> the dispatch byte to not a 6LoWPAN frame. The other two are just some
+> missing gitignore entries I spotted.
+> 
 
-diff --git a/wpan-ping/.gitignore b/wpan-ping/.gitignore
-new file mode 100644
-index 0000000..0e2e07a
---- /dev/null
-+++ b/wpan-ping/.gitignore
-@@ -0,0 +1,2 @@
-+.deps/
-+wpan-ping
--- 
-2.1.0
+Applied all, thanks.
 
+- Alex
