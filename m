@@ -1,105 +1,109 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f182.google.com ([209.85.212.182]:36388 "EHLO
-	mail-wi0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752483AbbFHREb (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Mon, 8 Jun 2015 13:04:31 -0400
-Received: by wigg3 with SMTP id g3so59348267wig.1
-        for <linux-wpan@vger.kernel.org>; Mon, 08 Jun 2015 10:04:29 -0700 (PDT)
-Date: Mon, 8 Jun 2015 19:04:23 +0200
-From: Alexander Aring <alex.aring@gmail.com>
-Subject: Re: Coverity issues in linux-wpan
-Message-ID: <20150608170422.GA1038@omega>
-References: <55759332.4070700@osg.samsung.com>
+Received: from lists.s-osg.org ([54.187.51.154]:37179 "EHLO lists.s-osg.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753542AbbFHUKR (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+	Mon, 8 Jun 2015 16:10:17 -0400
+Message-ID: <5575F6A4.3090008@osg.samsung.com>
+Date: Mon, 08 Jun 2015 22:10:12 +0200
+From: Stefan Schmidt <stefan@osg.samsung.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <55759332.4070700@osg.samsung.com>
+Subject: Re: Coverity issues in linux-wpan
+References: <55759332.4070700@osg.samsung.com> <20150608170422.GA1038@omega>
+In-Reply-To: <20150608170422.GA1038@omega>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Stefan Schmidt <stefan@osg.samsung.com>
+To: Alexander Aring <alex.aring@gmail.com>
 Cc: linux-wpan@vger.kernel.org
 
-On Mon, Jun 08, 2015 at 03:05:54PM +0200, Stefan Schmidt wrote:
-> Hello.
-> 
-> I gave the currently found coverity issues in the linux-wpan area a look.
-> The analyzing builds are not tracking bluetooth-next but go with Linus tree
-> and get updated from time to time.
-> 
-> As I'm not sure if all people here have access to this (you should request
-> it, its useful) I will cite the reported issues here with some context.
-> 
-> From what I can see 5 issues have been detected. Two in mac802154 and three
-> in our drivers (cc2520 and mrf24j40).
-> 
-> mrf24j40 (CID: 1226982, 1226983)
-> o Return value with error codes gets overridden before returning.
-> o I have a patch for that which I will send right after this mail.
-> 
-> cc2520 (CID: 1230469)
-> o Unchecked return value.
-> o Should we check here as we do in the other cases or not?
-> 
-> 622 if (filt->pan_coord)
-> CID 1230469 (#1 of 2): Unchecked return value (CHECKED_RETURN)
-> <https://scan5.coverity.com:8443/defectInstanceId=22519459&fileInstanceId=73901097&mergedDefectId=1230469>
-> 623 cc2520_write_register(priv, CC2520_FRMFILT0, 0x02);
-> 624 else
-> CID 1230469 (#2 of 2): Unchecked return value (CHECKED_RETURN)10.
-> check_return: Calling cc2520_write_register without checking return value
-> (as is done elsewhere 21 out of 24 times).
-> 625 cc2520_write_register(priv, CC2520_FRMFILT0, 0x00);
-> 
-> mac802154/iface.c (CID: 1268751)
-> o WARN_ON clears the parameter so we can't check for it afterwards to hit
-> the error path
-> 
-> 147 if (!local->open_count) {
-> 148 res = drv_start(local);
-> cond_const: Condition res, taking false branch. Now the value of res is
-> equal to 0.
-> 149 WARN_ON(res);
-> const: At condition res, the value of res must be equal to
-> 0.dead_error_condition: The condition res cannot be true.
-> 150 if (res)
-> CID 1268751 (#1 of 1): Logically dead code (DEADCODE)dead_error_line:
-> Execution cannot reach this statement: goto err;.
-> 151 goto err;
-> 152        }
-> 
+Hello.
 
-Simple remove the WARN_ON or do WARN_ON(1) here, I would remove it.
+On 08/06/15 19:04, Alexander Aring wrote:
+> On Mon, Jun 08, 2015 at 03:05:54PM +0200, Stefan Schmidt wrote:
+>> Hello.
+>>
+>> I gave the currently found coverity issues in the linux-wpan area a look.
+>> The analyzing builds are not tracking bluetooth-next but go with Linus tree
+>> and get updated from time to time.
+>>
+>> As I'm not sure if all people here have access to this (you should request
+>> it, its useful) I will cite the reported issues here with some context.
+>>
+>>  From what I can see 5 issues have been detected. Two in mac802154 and three
+>> in our drivers (cc2520 and mrf24j40).
+>>
+>> mrf24j40 (CID: 1226982, 1226983)
+>> o Return value with error codes gets overridden before returning.
+>> o I have a patch for that which I will send right after this mail.
+>>
+>> cc2520 (CID: 1230469)
+>> o Unchecked return value.
+>> o Should we check here as we do in the other cases or not?
+>>
+>> 622 if (filt->pan_coord)
+>> CID 1230469 (#1 of 2): Unchecked return value (CHECKED_RETURN)
+>> <https://scan5.coverity.com:8443/defectInstanceId=22519459&fileInstanceId=73901097&mergedDefectId=1230469>
+>> 623 cc2520_write_register(priv, CC2520_FRMFILT0, 0x02);
+>> 624 else
+>> CID 1230469 (#2 of 2): Unchecked return value (CHECKED_RETURN)10.
+>> check_return: Calling cc2520_write_register without checking return value
+>> (as is done elsewhere 21 out of 24 times).
+>> 625 cc2520_write_register(priv, CC2520_FRMFILT0, 0x00);
+>>
+>> mac802154/iface.c (CID: 1268751)
+>> o WARN_ON clears the parameter so we can't check for it afterwards to hit
+>> the error path
+>>
+>> 147 if (!local->open_count) {
+>> 148 res = drv_start(local);
+>> cond_const: Condition res, taking false branch. Now the value of res is
+>> equal to 0.
+>> 149 WARN_ON(res);
+>> const: At condition res, the value of res must be equal to
+>> 0.dead_error_condition: The condition res cannot be true.
+>> 150 if (res)
+>> CID 1268751 (#1 of 1): Logically dead code (DEADCODE)dead_error_line:
+>> Execution cannot reach this statement: goto err;.
+>> 151 goto err;
+>> 152        }
+>>
+> Simple remove the WARN_ON or do WARN_ON(1) here, I would remove it.
+>
+> I remember this section [0]. I leave the old beheavior which was not
+> like wireless code. Nevertheless I had some bad feeling when I saw this
+> and doing some code around. This behaviour was always there.
+>
+> Comparing with wireless code, see [2].
+OK, this makes more sense now. I send a patch removing it. That way it 
+works like we intend it.
 
-I remember this section [0]. I leave the old beheavior which was not
-like wireless code. Nevertheless I had some bad feeling when I saw this
-and doing some code around. This behaviour was always there.
+>> mac802154/rx.c (CID: 1260107)
+>> o Coverity thinks hdr.seq might be used unitiliazed in the pr_debug from
+>> ieee802154_parse_frame_start (line 149)
+>> o Setting hdr.seq = 0; here would not hurt but I still wonder how coverity
+>> comes to think that as we pull the first three byte of the header before
+>> which include fc and seq.
+>>
+>> 199 struct ieee802154_sub_if_data *sdata;
+>> 1. var_decl: Declaring variable hdr without initializer.
+>> 200 struct ieee802154_hdr hdr;
+>> 201
+>> CID 1260107 (#1 of 1): Uninitialized scalar variable (UNINIT)2.
+>> uninit_use_in_call: Using uninitialized value hdr.seq when calling
+>> ieee802154_parse_frame_start.
+>> <https://scan5.coverity.com:8443/eventId=22526690-1&modelId=22526690-0&fileInstanceId=73892728&filePath=%2Fnet%2Fmac802154%2Frx.c&fileStart=136&fileEnd=192>
+>> 202 ret = ieee802154_parse_frame_start(skb, &hdr);
+>>
+> I think the hdr.seq should be filled by doing [1].
+>
+Agreed. That is also what I think where the seq should be filled from. 
+No idea why coverity gets this wrong. For now I consider this a false 
+positive and no real issue for us.
 
-Comparing with wireless code, see [2].
+That leaves only the cc2520 report open. Hopefully Varka has some 
+comment on this. We can either assume that ignoring the return in these 
+cases is fine or we add the error handling for them.
 
-> 
-> mac802154/rx.c (CID: 1260107)
-> o Coverity thinks hdr.seq might be used unitiliazed in the pr_debug from
-> ieee802154_parse_frame_start (line 149)
-> o Setting hdr.seq = 0; here would not hurt but I still wonder how coverity
-> comes to think that as we pull the first three byte of the header before
-> which include fc and seq.
-> 
-> 199 struct ieee802154_sub_if_data *sdata;
-> 1. var_decl: Declaring variable hdr without initializer.
-> 200 struct ieee802154_hdr hdr;
-> 201
-> CID 1260107 (#1 of 1): Uninitialized scalar variable (UNINIT)2.
-> uninit_use_in_call: Using uninitialized value hdr.seq when calling
-> ieee802154_parse_frame_start.
-> <https://scan5.coverity.com:8443/eventId=22526690-1&modelId=22526690-0&fileInstanceId=73892728&filePath=%2Fnet%2Fmac802154%2Frx.c&fileStart=136&fileEnd=192>
-> 202 ret = ieee802154_parse_frame_start(skb, &hdr);
-> 
-
-I think the hdr.seq should be filled by doing [1].
-
-
-- Alex
-
-[0] http://lxr.free-electrons.com/source/net/mac802154/ieee802154_dev.c?v=3.18#L63
-[1] http://lxr.free-electrons.com/source/net/ieee802154/header_ops.c#L249
-[2] http://lxr.free-electrons.com/source/net/mac80211/iface.c#L547
+regards
+Stefan Schmidt
