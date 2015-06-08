@@ -1,60 +1,88 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from senator.holtmann.net ([87.106.208.187]:52968 "EHLO
-	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750920AbbFGHPO convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Sun, 7 Jun 2015 03:15:14 -0400
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
-Subject: Re: [PATCH bluetooth-next 0/8] mac802154: several cleanups
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1433604653-9585-1-git-send-email-alex.aring@gmail.com>
-Date: Sun, 7 Jun 2015 09:15:10 +0200
-Content-Transfer-Encoding: 8BIT
-Message-Id: <5A3D8C1C-1FE1-4E2B-8C18-FA11C788244B@holtmann.org>
-References: <1433604653-9585-1-git-send-email-alex.aring@gmail.com>
+Received: from lists.s-osg.org ([54.187.51.154]:36513 "EHLO lists.s-osg.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751582AbbFHNF4 (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+	Mon, 8 Jun 2015 09:05:56 -0400
+Received: from [192.168.2.113] (p4FF836BB.dip0.t-ipconnect.de [79.248.54.187])
+	by lists.s-osg.org (Postfix) with ESMTPSA id B4E64462E8
+	for <linux-wpan@vger.kernel.org>; Mon,  8 Jun 2015 06:05:55 -0700 (PDT)
+Message-ID: <55759332.4070700@osg.samsung.com>
+Date: Mon, 08 Jun 2015 15:05:54 +0200
+From: Stefan Schmidt <stefan@osg.samsung.com>
+MIME-Version: 1.0
+Subject: Coverity issues in linux-wpan
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>
-Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de, Stefan Schmidt <s.schmidt@samsung.com>, Varka Bhadram <varkab@cdac.in>, Alan Ott <alan@signal11.us>, Lennert Buytenhek <buytenh@wantstofly.org>
+To: linux-wpan@vger.kernel.org
 
-Hi Alex,
+Hello.
 
-> this patch series contains various cleanups for mac802154 header. Also
-> I cleanup a little bit the comments for several structs and flag
-> definitions. This also prepares for handling a API documentation
-> generation via docbook. The flags are enums now which is similar like
-> mac80211 handling.
-> 
-> - Alex
-> 
-> Cc: Stefan Schmidt <s.schmidt@samsung.com>
-> Cc: Varka Bhadram <varkab@cdac.in>
-> Cc: Alan Ott <alan@signal11.us>
-> Cc: Lennert Buytenhek <buytenh@wantstofly.org>
-> 
-> Alexander Aring (8):
->  mac802154: remove unneeded vif struct
->  mac802154: cleanup address filtering flags
->  mac802154: remove aack hw flag
->  mac802154: cleanup ieee802154 hardware flags
->  mac802154: remove unused hw_filt attribute
->  mac802154: rearrange attribute in ieee802154_hw
->  mac802154: add missing structure comments
->  mac802154: change pan_coord type to bool
-> 
-> drivers/net/ieee802154/at86rf230.c |   3 +-
-> drivers/net/ieee802154/atusb.c     |   2 +-
-> drivers/net/ieee802154/cc2520.c    |   4 +-
-> drivers/net/ieee802154/mrf24j40.c  |   3 +-
-> include/net/mac802154.h            | 136 ++++++++++++++++++++++++-------------
-> net/mac802154/ieee802154_i.h       |   2 -
-> net/mac802154/iface.c              |   9 ++-
-> net/mac802154/rx.c                 |   4 +-
-> 8 files changed, 97 insertions(+), 66 deletions(-)
+I gave the currently found coverity issues in the linux-wpan area a 
+look. The analyzing builds are not tracking bluetooth-next but go with 
+Linus tree and get updated from time to time.
 
-all 8 patches have been applied to bluetooth-next tree.
+As I'm not sure if all people here have access to this (you should 
+request it, its useful) I will cite the reported issues here with some 
+context.
 
-Regards
+ From what I can see 5 issues have been detected. Two in mac802154 and 
+three in our drivers (cc2520 and mrf24j40).
 
-Marcel
+mrf24j40 (CID: 1226982, 1226983)
+o Return value with error codes gets overridden before returning.
+o I have a patch for that which I will send right after this mail.
 
+cc2520 (CID: 1230469)
+o Unchecked return value.
+o Should we check here as we do in the other cases or not?
+
+622 if (filt->pan_coord)
+CID 1230469 (#1 of 2): Unchecked return value (CHECKED_RETURN)
+<https://scan5.coverity.com:8443/defectInstanceId=22519459&fileInstanceId=73901097&mergedDefectId=1230469>
+623 cc2520_write_register(priv, CC2520_FRMFILT0, 0x02);
+624 else
+CID 1230469 (#2 of 2): Unchecked return value (CHECKED_RETURN)10. 
+check_return: Calling cc2520_write_register without checking return 
+value (as is done elsewhere 21 out of 24 times).
+625 cc2520_write_register(priv, CC2520_FRMFILT0, 0x00);
+
+mac802154/iface.c (CID: 1268751)
+o WARN_ON clears the parameter so we can't check for it afterwards to 
+hit the error path
+
+147 if (!local->open_count) {
+148 res = drv_start(local);
+cond_const: Condition res, taking false branch. Now the value of res is 
+equal to 0.
+149 WARN_ON(res);
+const: At condition res, the value of res must be equal to 
+0.dead_error_condition: The condition res cannot be true.
+150 if (res)
+CID 1268751 (#1 of 1): Logically dead code (DEADCODE)dead_error_line: 
+Execution cannot reach this statement: goto err;.
+151 goto err;
+152        }
+
+
+mac802154/rx.c (CID: 1260107)
+o Coverity thinks hdr.seq might be used unitiliazed in the pr_debug from 
+ieee802154_parse_frame_start (line 149)
+o Setting hdr.seq = 0; here would not hurt but I still wonder how 
+coverity comes to think that as we pull the first three byte of the 
+header before which include fc and seq.
+
+199 struct ieee802154_sub_if_data *sdata;
+1. var_decl: Declaring variable hdr without initializer.
+200 struct ieee802154_hdr hdr;
+201
+CID 1260107 (#1 of 1): Uninitialized scalar variable (UNINIT)2. 
+uninit_use_in_call: Using uninitialized value hdr.seq when calling 
+ieee802154_parse_frame_start.
+<https://scan5.coverity.com:8443/eventId=22526690-1&modelId=22526690-0&fileInstanceId=73892728&filePath=%2Fnet%2Fmac802154%2Frx.c&fileStart=136&fileEnd=192>
+202 ret = ieee802154_parse_frame_start(skb, &hdr);
+
+
+regards
+Stefan Schmidt
