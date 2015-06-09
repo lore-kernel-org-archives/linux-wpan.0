@@ -1,40 +1,88 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from lists.s-osg.org ([54.187.51.154]:38630 "EHLO lists.s-osg.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753773AbbFILut (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-	Tue, 9 Jun 2015 07:50:49 -0400
-Message-ID: <5576D314.1040200@osg.samsung.com>
-Date: Tue, 09 Jun 2015 13:50:44 +0200
+Received: from proxima.lasnet.de ([78.47.171.185]:44850 "EHLO
+	proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753762AbbFIJtf (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Tue, 9 Jun 2015 05:49:35 -0400
 From: Stefan Schmidt <stefan@osg.samsung.com>
-MIME-Version: 1.0
-Subject: Re: [PATCH bluetooth-next] ieee802154/cc2520: check for return values
- in cc2520_filter()
-References: <1433841108-1122-1-git-send-email-stefan@osg.samsung.com> <5576B00C.6020003@gmail.com> <5576B71F.4030905@osg.samsung.com> <20150609100158.GB1402@omega>
-In-Reply-To: <20150609100158.GB1402@omega>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Subject: [PATCHv2 bluetooth-next] ieee802154: cc2520: check for return values in cc2520_filter()
+Date: Tue,  9 Jun 2015 11:49:27 +0200
+Message-Id: <1433843367-1976-1-git-send-email-stefan@osg.samsung.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>
-Cc: Varka Bhadram <varkabhadram@gmail.com>, linux-wpan@vger.kernel.org
+To: linux-wpan@vger.kernel.org
+Cc: Alexander Aring <alex.aring@gmail.com>, Varka Bhadram <varkabhadram@gmail.com>, Stefan Schmidt <stefan@osg.samsung.com>
 
-Hello.
+neither ram nor register write return values have been checked here.
+Checking both now. Assign ret with 0 as all other assignments are inside
+if blocks and might not happen before we return ret.
 
-On 09/06/15 12:02, Alexander Aring wrote:
-> On Tue, Jun 09, 2015 at 11:51:27AM +0200, Stefan Schmidt wrote:
->> Well, imho its not a subsubsystem but rather a simple file. Also using
->> subsytem: file: looks quite alien to me. Anyway, matter of taste, nothing to
->> argue about. Fixed in v2.
->>
-> sorry, I never see foo/bar: things at begin of the subject. I see David
-> Miller on netdev which only mentioned that the usually way is
-> "subsystem:", when somebody complete forgets to add this. For me it doesn't matter
-> if somebody will more specify it like "subsystem: drivers: file:" or
-> "subsystem: file: ..." that's everything fine, but don making a '/' somewhere.
+CID: 1230469
+Signed-off-by: Stefan Schmidt <stefan@osg.samsung.com>
+---
+ drivers/net/ieee802154/cc2520.c | 23 +++++++++++++----------
+ 1 file changed, 13 insertions(+), 10 deletions(-)
 
-I see both forms used regularly when looking through git log. Anyway, if 
-the preferred form is subsystem: drivers: I'm ok with that. Not making 
-any fuzz about it. Maybe I'm just used to the other notation. :)
+diff --git a/drivers/net/ieee802154/cc2520.c b/drivers/net/ieee802154/cc2520.c
+index 15f263c..b6fc295 100644
+--- a/drivers/net/ieee802154/cc2520.c
++++ b/drivers/net/ieee802154/cc2520.c
+@@ -590,22 +590,23 @@ cc2520_filter(struct ieee802154_hw *hw,
+ 	      struct ieee802154_hw_addr_filt *filt, unsigned long changed)
+ {
+ 	struct cc2520_private *priv = hw->priv;
++	int ret = 0;
+ 
+ 	if (changed & IEEE802154_AFILT_PANID_CHANGED) {
+ 		u16 panid = le16_to_cpu(filt->pan_id);
+ 
+ 		dev_vdbg(&priv->spi->dev,
+ 			 "cc2520_filter called for pan id\n");
+-		cc2520_write_ram(priv, CC2520RAM_PANID,
+-				 sizeof(panid), (u8 *)&panid);
++		ret = cc2520_write_ram(priv, CC2520RAM_PANID,
++				       sizeof(panid), (u8 *)&panid);
+ 	}
+ 
+ 	if (changed & IEEE802154_AFILT_IEEEADDR_CHANGED) {
+ 		dev_vdbg(&priv->spi->dev,
+ 			 "cc2520_filter called for IEEE addr\n");
+-		cc2520_write_ram(priv, CC2520RAM_IEEEADDR,
+-				 sizeof(filt->ieee_addr),
+-				 (u8 *)&filt->ieee_addr);
++		ret = cc2520_write_ram(priv, CC2520RAM_IEEEADDR,
++				       sizeof(filt->ieee_addr),
++				       (u8 *)&filt->ieee_addr);
+ 	}
+ 
+ 	if (changed & IEEE802154_AFILT_SADDR_CHANGED) {
+@@ -613,20 +614,22 @@ cc2520_filter(struct ieee802154_hw *hw,
+ 
+ 		dev_vdbg(&priv->spi->dev,
+ 			 "cc2520_filter called for saddr\n");
+-		cc2520_write_ram(priv, CC2520RAM_SHORTADDR,
+-				 sizeof(addr), (u8 *)&addr);
++		ret = cc2520_write_ram(priv, CC2520RAM_SHORTADDR,
++				       sizeof(addr), (u8 *)&addr);
+ 	}
+ 
+ 	if (changed & IEEE802154_AFILT_PANC_CHANGED) {
+ 		dev_vdbg(&priv->spi->dev,
+ 			 "cc2520_filter called for panc change\n");
+ 		if (filt->pan_coord)
+-			cc2520_write_register(priv, CC2520_FRMFILT0, 0x02);
++			ret = cc2520_write_register(priv, CC2520_FRMFILT0,
++						    0x02);
+ 		else
+-			cc2520_write_register(priv, CC2520_FRMFILT0, 0x00);
++			ret = cc2520_write_register(priv, CC2520_FRMFILT0,
++						    0x00);
+ 	}
+ 
+-	return 0;
++	return ret;
+ }
+ 
+ static inline int cc2520_set_tx_power(struct cc2520_private *priv, s32 mbm)
+-- 
+2.1.0
 
-regards
-Stefan Schmidt
