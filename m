@@ -1,61 +1,43 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from box.christofferholmstedt.se ([188.166.68.52]:46472 "EHLO
+Received: from box.christofferholmstedt.se ([188.166.68.52]:47263 "EHLO
 	box.christofferholmstedt.se" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1752282AbbFDMMG (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Thu, 4 Jun 2015 08:12:06 -0400
-Date: Thu, 4 Jun 2015 14:12:02 +0200
-From: Christoffer Holmstedt <christoffer@christofferholmstedt.se>
-Subject: Re: [PATCH wpan-tools 0/2] Update cca mode and options output
-Message-ID: <20150604121202.GE3045@probook-6560b>
+	by vger.kernel.org with ESMTP id S1752526AbbFIOFz (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Tue, 9 Jun 2015 10:05:55 -0400
+Received: from authenticated-user (unknown [127.0.0.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by box.christofferholmstedt.se (Postfix) with ESMTPSA id 6832F140D69
+	for <linux-wpan@vger.kernel.org>; Tue,  9 Jun 2015 10:05:52 -0400 (EDT)
+From: christoffer@christofferholmstedt.se
+Subject: [PATCH v2 wpan-tools 0/2] Update CCA mode and CCA options output
+Date: Tue,  9 Jun 2015 16:05:36 +0200
+Message-Id: <1433858738-25445-1-git-send-email-christoffer@christofferholmstedt.se>
+In-Reply-To: <20150604092001.GA8027@probook-6560b>
 References: <20150604092001.GA8027@probook-6560b>
- <55703BBD.4010903@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <55703BBD.4010903@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Varka Bhadram <varkabhadram@gmail.com>
-Cc: linux-wpan@vger.kernel.org
+To: linux-wpan@vger.kernel.org
 
-On Thu, Jun 04, 2015 at 05:21:25PM +0530, Varka Bhadram wrote:
-> Hi Christoffer Holmstedt,
-> 
-> On 06/04/2015 02:50 PM, Christoffer Holmstedt wrote:
-> 
-> >Earlier cca_modes and cca_opts were printed separately but these two patches
-> >now prints them together so cca_opts are only printed when the specified mode
-> >  is (3).
-> >
-> >Output for "current" mode (only one line is printed for each wpan):
-> >	cca_mode: 1, energy above threshold.
-> >	cca_mode: 2, carrier sense only.
-> >	cca_mode: 3, carrier sense with energy above threshold (logical operator is 'and').
-> >	cca_mode: 3, carrier sense with energy above threshold (logical operator is 'or').
-> >	cca_mode: 3, carrier sense with energy above threshold (logical operator is unknown).
-> >	cca_mode: 4, ALOHA.
-> >	cca_mode: 5, UWB preamble sense based on the SHR of a frame.
-> >	cca_mode: 6, UWB preamble sense based on the packet with the multiplexed preamble.
-> 
-> Do you think that cca_mode number is required overhear..?
-> 
-> What i mean is that:
-> 	The cca mode number 1 indicates that its *energy above threshold*,
-> So what i feel is that printing the number is required.
-> 
-> May be Alex has to tell its preferred or not. I think we can remove the number.
-> 
-...cut...
-> -- 
-> Varka Bhadram
-> 
+This patch series updates the CCA output text when running "iwpan list".
+Instead of the single digits indicating mode the output is now strings
+describing the mode and options.
 
-I was convinced before that I needed it there, but then I tried to make my
-case and I ended up with the conclusion that the user don't need it. Only
-scenario it is needed is when the user wants to change it and it that case the
-number is listed in the capabilities section.
+Changes v1 -> v2:
+* cca_mode number is removed from "current cca_mode", only text is printed as
+an example:
 
-I will remove the number if no one objects.
+	cca_mode: Energy above threshold
+	was
+	cca_mode: 1, Energy above threshold
 
--- 
-Christoffer Holmstedt
+* Changed "enum" to string mapping in print_cca_mode_handler. Instead of
+printing out the strings in the function I return a tempbuf that is formatted
+by the caller.
+
+* Added default value to cca_opt when printing current cca_mode and cca_opt. It
+is set to the "random" value of 99 as the enum only has 2 values, is this a
+proper solution? (or should we use limits.h with MAX_INT perhaps?)
+
+PS. Also configured git send-email so trying it out now to the wpan-list and
+hope it works this time wiht proper In-Reply-To header.
+
