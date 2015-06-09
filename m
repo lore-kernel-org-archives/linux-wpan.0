@@ -1,115 +1,45 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from lists.s-osg.org ([54.187.51.154]:38439 "EHLO lists.s-osg.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753691AbbFIJvc (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-	Tue, 9 Jun 2015 05:51:32 -0400
-Message-ID: <5576B71F.4030905@osg.samsung.com>
-Date: Tue, 09 Jun 2015 11:51:27 +0200
-From: Stefan Schmidt <stefan@osg.samsung.com>
+Received: from mail-wi0-f170.google.com ([209.85.212.170]:37898 "EHLO
+	mail-wi0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751228AbbFIKCF (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Tue, 9 Jun 2015 06:02:05 -0400
+Received: by wibdq8 with SMTP id dq8so10766504wib.1
+        for <linux-wpan@vger.kernel.org>; Tue, 09 Jun 2015 03:02:04 -0700 (PDT)
+Date: Tue, 9 Jun 2015 12:02:02 +0200
+From: Alexander Aring <alex.aring@gmail.com>
+Subject: Re: [PATCH bluetooth-next] ieee802154/cc2520: check for return
+ values in cc2520_filter()
+Message-ID: <20150609100158.GB1402@omega>
+References: <1433841108-1122-1-git-send-email-stefan@osg.samsung.com>
+ <5576B00C.6020003@gmail.com>
+ <5576B71F.4030905@osg.samsung.com>
 MIME-Version: 1.0
-Subject: Re: [PATCH bluetooth-next] ieee802154/cc2520: check for return values
- in cc2520_filter()
-References: <1433841108-1122-1-git-send-email-stefan@osg.samsung.com> <5576B00C.6020003@gmail.com>
-In-Reply-To: <5576B00C.6020003@gmail.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <5576B71F.4030905@osg.samsung.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Varka Bhadram <varkabhadram@gmail.com>, linux-wpan@vger.kernel.org
-Cc: Alexander Aring <alex.aring@gmail.com>
+To: Stefan Schmidt <stefan@osg.samsung.com>
+Cc: Varka Bhadram <varkabhadram@gmail.com>, linux-wpan@vger.kernel.org
 
-Hello.
+On Tue, Jun 09, 2015 at 11:51:27AM +0200, Stefan Schmidt wrote:
+> 
+> Well, imho its not a subsubsystem but rather a simple file. Also using
+> subsytem: file: looks quite alien to me. Anyway, matter of taste, nothing to
+> argue about. Fixed in v2.
+> 
 
-On 09/06/15 11:21, Varka Bhadram wrote:
-> Hi Stefan,
->
-> On 06/09/2015 02:41 PM, Stefan Schmidt wrote:
->
->> neither ram nor register write return values have been checked here. 
->> Checking
->> both now. Assign ret with 0 as all other assignments are inside if 
->> blocks and
->> might not happen before we return ret.
->>
->> CID: 1230469
->> Signed-off-by: Stefan Schmidt <stefan@osg.samsung.com>
->> Cc: Varka Bhadram <varkabhadram@gmail.com>
->> ---
->>   drivers/net/ieee802154/cc2520.c | 21 +++++++++++----------
->>   1 file changed, 11 insertions(+), 10 deletions(-)
->>
->> diff --git a/drivers/net/ieee802154/cc2520.c 
->> b/drivers/net/ieee802154/cc2520.c
->> index 15f263c..54c15e0 100644
->> --- a/drivers/net/ieee802154/cc2520.c
->> +++ b/drivers/net/ieee802154/cc2520.c
->> @@ -590,22 +590,23 @@ cc2520_filter(struct ieee802154_hw *hw,
->>             struct ieee802154_hw_addr_filt *filt, unsigned long changed)
->>   {
->>       struct cc2520_private *priv = hw->priv;
->> +    int ret = 0;
->>         if (changed & IEEE802154_AFILT_PANID_CHANGED) {
->>           u16 panid = le16_to_cpu(filt->pan_id);
->>             dev_vdbg(&priv->spi->dev,
->>                "cc2520_filter called for pan id\n");
->> -        cc2520_write_ram(priv, CC2520RAM_PANID,
->> -                 sizeof(panid), (u8 *)&panid);
->> +        ret = cc2520_write_ram(priv, CC2520RAM_PANID,
->> +                       sizeof(panid), (u8 *)&panid);
->>       }
->>         if (changed & IEEE802154_AFILT_IEEEADDR_CHANGED) {
->>           dev_vdbg(&priv->spi->dev,
->>                "cc2520_filter called for IEEE addr\n");
->> -        cc2520_write_ram(priv, CC2520RAM_IEEEADDR,
->> -                 sizeof(filt->ieee_addr),
->> -                 (u8 *)&filt->ieee_addr);
->> +        ret = cc2520_write_ram(priv, CC2520RAM_IEEEADDR,
->> +                       sizeof(filt->ieee_addr),
->> +                       (u8 *)&filt->ieee_addr);
->>       }
->>         if (changed & IEEE802154_AFILT_SADDR_CHANGED) {
->> @@ -613,20 +614,20 @@ cc2520_filter(struct ieee802154_hw *hw,
->>             dev_vdbg(&priv->spi->dev,
->>                "cc2520_filter called for saddr\n");
->> -        cc2520_write_ram(priv, CC2520RAM_SHORTADDR,
->> -                 sizeof(addr), (u8 *)&addr);
->> +        ret = cc2520_write_ram(priv, CC2520RAM_SHORTADDR,
->> +                       sizeof(addr), (u8 *)&addr);
->>       }
->>         if (changed & IEEE802154_AFILT_PANC_CHANGED) {
->>           dev_vdbg(&priv->spi->dev,
->>                "cc2520_filter called for panc change\n");
->>           if (filt->pan_coord)
->> -            cc2520_write_register(priv, CC2520_FRMFILT0, 0x02);
->> +            ret = cc2520_write_register(priv, CC2520_FRMFILT0, 0x02);
->>           else
->> -            cc2520_write_register(priv, CC2520_FRMFILT0, 0x00);
->> +            ret = cc2520_write_register(priv, CC2520_FRMFILT0, 0x00);
->>       }
->>   -    return 0;
->> +    return ret;
->>   }
->>     static inline int cc2520_set_tx_power(struct cc2520_private 
->> *priv, s32 mbm)
->
-> Thanks for the patch.
->
-> I found two check patch warnings on this patch.
->
+sorry, I never see foo/bar: things at begin of the subject. I see David
+Miller on netdev which only mentioned that the usually way is
+"subsystem:", when somebody complete forgets to add this. For me it doesn't matter
+if somebody will more specify it like "subsystem: drivers: file:" or
+"subsystem: file: ..." that's everything fine, but don making a '/' somewhere.
 
-Both fixed.
+But I see also  people which tags "6lowpan:" only and then it touched
+net/ieee802154/6lowpan only. That's confusing, it should be then
+"ieee802154: 6lowpan:". If it touched the net/6lowpan it should be
+"6lowpan:" only.
 
-> As Alex pointed on other thread that you should use commit message
-> like "subsytem: file:" or only "subsytem:" in the subject.
-> But not "subsytem/subsubsystem:"
->
+I think I need to make some harder rules to check on this.
 
-Well, imho its not a subsubsystem but rather a simple file. Also using 
-subsytem: file: looks quite alien to me. Anyway, matter of taste, 
-nothing to argue about. Fixed in v2.
-
-regards
-Stefan Schmidt
-> Thanks.
->
-
+- Alex
