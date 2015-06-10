@@ -1,32 +1,64 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f181.google.com ([209.85.212.181]:35084 "EHLO
-	mail-wi0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932177AbbFKN2q (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Thu, 11 Jun 2015 09:28:46 -0400
-Received: by wiga1 with SMTP id a1so75494166wig.0
-        for <linux-wpan@vger.kernel.org>; Thu, 11 Jun 2015 06:28:44 -0700 (PDT)
-Date: Thu, 11 Jun 2015 15:28:28 +0200
-From: Alexander Aring <alex.aring@gmail.com>
-Subject: Re: [PATCH v6 wpan-tools] info: update CCA mode and CCA options
- output
-Message-ID: <20150611132825.GA18352@omega>
-References: <20150611101416.GC972@omega>
- <1434025538-11583-1-git-send-email-christoffer@christofferholmstedt.se>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1434025538-11583-1-git-send-email-christoffer@christofferholmstedt.se>
+Received: from box.christofferholmstedt.se ([188.166.68.52]:47495 "EHLO
+	box.christofferholmstedt.se" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1754163AbbFJLSk (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>);
+	Wed, 10 Jun 2015 07:18:40 -0400
+Received: from authenticated-user (unknown [127.0.0.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by box.christofferholmstedt.se (Postfix) with ESMTPSA id 00BED140D8A
+	for <linux-wpan@vger.kernel.org>; Wed, 10 Jun 2015 07:18:38 -0400 (EDT)
+From: Christoffer Holmstedt <christoffer@christofferholmstedt.se>
+Subject: [PATCH v3 wpan-tools 2/3] info: remove old cca options capabilities output
+Date: Wed, 10 Jun 2015 13:18:08 +0200
+Message-Id: <1433935089-27119-3-git-send-email-christoffer@christofferholmstedt.se>
+In-Reply-To: <1433935089-27119-1-git-send-email-christoffer@christofferholmstedt.se>
+References: <20150604092001.GA8027@probook-6560b>
+ <1433935089-27119-1-git-send-email-christoffer@christofferholmstedt.se>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Christoffer Holmstedt <christoffer@christofferholmstedt.se>
-Cc: linux-wpan@vger.kernel.org
+To: linux-wpan@vger.kernel.org
 
-On Thu, Jun 11, 2015 at 02:25:38PM +0200, Christoffer Holmstedt wrote:
-> Instead of printing out CCA mode and CCA options in integers descriptive
-> text is now printed to the user when "iwpan list" is run.
-> 
-> Signed-off-by: Christoffer Holmstedt <christoffer@christofferholmstedt.se>
+Signed-off-by: Christoffer Holmstedt <christoffer@christofferholmstedt.se>
+---
+ src/info.c | 23 -----------------------
+ 1 file changed, 23 deletions(-)
 
-Applied, thanks.
+diff --git a/src/info.c b/src/info.c
+index 364c02f718aa..e70f33da8997 100644
+--- a/src/info.c
++++ b/src/info.c
+@@ -412,29 +412,6 @@ static int print_phy_handler(struct nl_msg *msg, void *arg)
+ 			printf("\n");
+ 		}
+ 
+-		if (tb_caps[NL802154_CAP_ATTR_CCA_OPTS]) {
+-			struct nlattr *nl_cca_opts;
+-			int rem_cca_opts;
+-
+-			printf("\tcca_opts: ");
+-			nla_for_each_nested(nl_cca_opts,
+-					    tb_caps[NL802154_CAP_ATTR_CCA_OPTS],
+-					    rem_cca_opts) {
+-				printf("%d", nla_type(nl_cca_opts));
+-				switch (nla_type(nl_cca_opts)) {
+-				case NL802154_CCA_OPT_ENERGY_CARRIER_AND:
+-				case NL802154_CCA_OPT_ENERGY_CARRIER_OR:
+-					printf("(cca_mode: 3),");
+-					break;
+-				default:
+-					printf("unkown\n");
+-					break;
+-				}
+-			}
+-			/* TODO */
+-			printf("\b \n");
+-		}
+-
+ 		if (tb_caps[NL802154_CAP_ATTR_MIN_MINBE] &&
+ 		    tb_caps[NL802154_CAP_ATTR_MAX_MINBE] &&
+ 		    tb_caps[NL802154_CAP_ATTR_MIN_MAXBE] &&
+-- 
+2.1.4
 
-- Alex
