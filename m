@@ -1,118 +1,54 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from box.christofferholmstedt.se ([188.166.68.52]:47525 "EHLO
+Received: from box.christofferholmstedt.se ([188.166.68.52]:47530 "EHLO
 	box.christofferholmstedt.se" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1754076AbbFJM31 (ORCPT
+	by vger.kernel.org with ESMTP id S1754175AbbFJMjZ (ORCPT
 	<rfc822;linux-wpan@vger.kernel.org>);
-	Wed, 10 Jun 2015 08:29:27 -0400
-Date: Wed, 10 Jun 2015 14:29:16 +0200
+	Wed, 10 Jun 2015 08:39:25 -0400
+Received: from authenticated-user (unknown [127.0.0.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by box.christofferholmstedt.se (Postfix) with ESMTPSA id 24415140D69
+	for <linux-wpan@vger.kernel.org>; Wed, 10 Jun 2015 08:39:23 -0400 (EDT)
 From: Christoffer Holmstedt <christoffer@christofferholmstedt.se>
-Subject: Re: [PATCH v3 wpan-tools 1/3] info: add cca mode descriptive text to
- output
-Message-ID: <20150610122905.GA2235@arazu>
-References: <20150604092001.GA8027@probook-6560b>
- <1433935089-27119-1-git-send-email-christoffer@christofferholmstedt.se>
- <1433935089-27119-2-git-send-email-christoffer@christofferholmstedt.se>
- <20150610121712.GA6647@omega>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Subject: [PATCH wpan-tools] nl802154: fix misspelled enum
+Date: Wed, 10 Jun 2015 14:39:18 +0200
+Message-Id: <1433939958-3168-1-git-send-email-christoffer@christofferholmstedt.se>
 In-Reply-To: <20150610121712.GA6647@omega>
+References: <20150610121712.GA6647@omega>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>
-Cc: linux-wpan@vger.kernel.org
+To: linux-wpan@vger.kernel.org
 
-On Wed, Jun 10, 2015 at 02:17:13PM +0200, Alexander Aring wrote:
-> On Wed, Jun 10, 2015 at 01:18:07PM +0200, Christoffer Holmstedt wrote:
-> > Signed-off-by: Christoffer Holmstedt <christoffer@christofferholmstedt.se>
-> > ---
-> >  src/info.c | 81 ++++++++++++++++++++++++++++++++++++++++++++++++--------------
-> >  1 file changed, 63 insertions(+), 18 deletions(-)
-> > 
-> > diff --git a/src/info.c b/src/info.c
-> > index 2434bef6a87f..364c02f718aa 100644
-> > --- a/src/info.c
-> > +++ b/src/info.c
-> > @@ -146,6 +146,41 @@ static void print_freq_handler(int channel_page, int channel)
-> >  	}
-> >  }
-> >  
-> > +static char cca_mode_buf[100];
-> > +
-> > +const char *print_cca_mode_handler(enum nl802154_cca_modes cca_mode,
-> > +				   enum nl802154_cca_opts cca_opt)
-> > +{
-> > +	switch (cca_mode) {
-> > +	case NL802154_CCA_ENERGY:
-> > +		return "Energy above threshold";
-> > +	case NL802154_CCA_CARRIER:
-> > +		return "Carrier sense only";
-> > +	case NL802154_CCA_ENERGY_CARRIER:
-> > +		switch (cca_opt) {
-> > +		case NL802154_CCA_OPT_ENERGY_CARRIER_AND:
-> > +			return "Carrier sense with energy above threshold (logical operator is 'and')";
-> > +		case NL802154_CCA_OPT_ENERGY_CARRIER_OR:
-> > +			return "Carrier sense with energy above threshold (logical operator is 'or')";
-> > +		default:
-> > +			sprintf(cca_mode_buf,
-> > +				"Unknown CCA option (%d) for CCA mode (%d)",
-> > +				cca_opt,
-> > +				cca_mode);
-> > +			return cca_mode_buf;
-> > +		}
-> > +	case NL802154_CCA_ALOHA:
-> > +		return "ALOHA";
-> > +	case NL802154_CCA_UWB_SHR:
-> > +		return "UWB preamble sense based on the SHR of a frame";
-> > +	case NL802154_CCA_UWB_MULTIPEXED:
-> > +		return "UWB preamble sense based on the packet with the multiplexed preamble";
-> > +	default:
-> > +		sprintf(cca_mode_buf, "Unknown CCA mode (%d)", cca_mode);
-> > +		return cca_mode_buf;
-> > +	}
-> > +}
-> > +
-> >  static const char *commands[NL802154_CMD_MAX + 1] = {
-> >  	[NL802154_CMD_UNSPEC] = "unspec",
-> >  	[NL802154_CMD_GET_WPAN_PHY] = "get_wpan_phy",
-> > @@ -235,23 +270,13 @@ static int print_phy_handler(struct nl_msg *msg, void *arg)
-> >  	}
-> >  
-> >  	if (tb_msg[NL802154_ATTR_CCA_MODE]) {
-> > +		enum nl802154_cca_opts cca_opt = 99;
-> 
-> use:
-> 
-> NL802154_CCA_OPT_ATTR_MAX
+This patch updates nl802154 enum to match the one in bluetooth-next tree from
+commit d446278c408b ("nl802154: fix misspelled enum").
 
-Ok.
+Signed-off-by: Christoffer Holmstedt <christoffer@christofferholmstedt.se>
+---
+ src/nl802154.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-> 
-> should always be invalid. Maybe there exists a better way to evaluate
-> the tb_msg[NL802154_ATTR_CCA_MODE] first when somewhere is a cca_mode
-> which have some option (like cca_mode == 3). I don't know how to do it
-> _exactly_ better now. I am fine with your current solution.
-> 
-> Can you try to add first a patch which updates the nl802154.h from the
-> kernel "just for syncing" and then replace the cca_mode printout. And
-> please fixup patch 2 with 1.
-
-Sure.
-
-> 
-> Then you have:
-> 
-> 1. patch which sync the nl802154 header with the kernel
-> 2. patch which replace the cca modes printout with your implementation.
-> 
-> 
-> Current behaviour would have some state in wpan-tools which we
-> havn't any cca output, this is the case when I apply patch 1 only in your
-> series.
-> 
-> - Alex
-
-Thanks for the feedback.
-
+diff --git a/src/nl802154.h b/src/nl802154.h
+index 6fc231e60920..b0ab530d28cd 100644
+--- a/src/nl802154.h
++++ b/src/nl802154.h
+@@ -187,7 +187,7 @@ enum nl802154_wpan_phy_capability_attr {
+  * @NL802154_CCA_ENERGY_CARRIER: Carrier sense with energy above threshold
+  * @NL802154_CCA_ALOHA: CCA shall always report an idle medium
+  * @NL802154_CCA_UWB_SHR: UWB preamble sense based on the SHR of a frame
+- * @NL802154_CCA_UWB_MULTIPEXED: UWB preamble sense based on the packet with
++ * @NL802154_CCA_UWB_MULTIPLEXED: UWB preamble sense based on the packet with
+  *	the multiplexed preamble
+  * @__NL802154_CCA_ATTR_AFTER_LAST: Internal
+  * @NL802154_CCA_ATTR_MAX: Maximum CCA attribute number
+@@ -199,7 +199,7 @@ enum nl802154_cca_modes {
+ 	NL802154_CCA_ENERGY_CARRIER,
+ 	NL802154_CCA_ALOHA,
+ 	NL802154_CCA_UWB_SHR,
+-	NL802154_CCA_UWB_MULTIPEXED,
++	NL802154_CCA_UWB_MULTIPLEXED,
+ 
+ 	/* keep last */
+ 	__NL802154_CCA_ATTR_AFTER_LAST,
 -- 
-Christoffer Holmstedt
+2.1.4
+
