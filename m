@@ -1,134 +1,93 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f175.google.com ([209.85.212.175]:38821 "EHLO
-	mail-wi0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S933805AbbFJNpf (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Wed, 10 Jun 2015 09:45:35 -0400
-Received: by wibdq8 with SMTP id dq8so48024725wib.1
-        for <linux-wpan@vger.kernel.org>; Wed, 10 Jun 2015 06:45:34 -0700 (PDT)
-Date: Wed, 10 Jun 2015 15:45:31 +0200
-From: Alexander Aring <alex.aring@gmail.com>
+Received: from box.christofferholmstedt.se ([188.166.68.52]:47650 "EHLO
+	box.christofferholmstedt.se" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1750904AbbFKGQl (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>);
+	Thu, 11 Jun 2015 02:16:41 -0400
+Date: Thu, 11 Jun 2015 08:16:33 +0200
+From: Christoffer Holmstedt <christoffer@christofferholmstedt.se>
 Subject: Re: [PATCH v4 wpan-tools] info: update CCA mode and CCA options
  output
-Message-ID: <20150610134530.GC6647@omega>
+Message-ID: <20150611061633.GA2792@arazu>
 References: <20150610121712.GA6647@omega>
  <1433941675-4629-1-git-send-email-christoffer@christofferholmstedt.se>
+ <20150610134530.GC6647@omega>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1433941675-4629-1-git-send-email-christoffer@christofferholmstedt.se>
+In-Reply-To: <20150610134530.GC6647@omega>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Christoffer Holmstedt <christoffer@christofferholmstedt.se>
+To: Alexander Aring <alex.aring@gmail.com>
 Cc: linux-wpan@vger.kernel.org
 
-On Wed, Jun 10, 2015 at 03:07:55PM +0200, Christoffer Holmstedt wrote:
-> Instead of printing out CCA mode and CCA options in integers descriptive
-> text is now printed to the user when "iwpan list" is run.
+On Wed, Jun 10, 2015 at 03:45:31PM +0200, Alexander Aring wrote:
+> On Wed, Jun 10, 2015 at 03:07:55PM +0200, Christoffer Holmstedt wrote:
+> > Instead of printing out CCA mode and CCA options in integers descriptive
+> > text is now printed to the user when "iwpan list" is run.
+> > 
+> > Signed-off-by: Christoffer Holmstedt <christoffer@christofferholmstedt.se>
+> > ---
+> > I think I got all the changes right now as requested.
+> > 
+> > Changes v3 -> v4:
+> > * Sent "nl802154: fix misspelled enum" patch separately (already merged).
+> > * Did a "fixup" of remaining two patches so it is only one now.
+> > * Changed "random" value of 99 to NL802154_CCA_OPT_ATTR_MAX.
+...cut...
+> > +	case NL802154_CCA_UWB_SHR:
+> > +		return "UWB preamble sense based on the SHR of a frame";
+> > +	case NL802154_CCA_UWB_MULTIPLEXED:
+> > +		return "UWB preamble sense based on the packet with the multiplexed preamble";
+> > +	default:
+> > +		sprintf(cca_mode_buf, "Unknown CCA mode (%d)", cca_mode);
+> > +		return cca_mode_buf;
+> > +	}
+> > +}
+> > +
 > 
-> Signed-off-by: Christoffer Holmstedt <christoffer@christofferholmstedt.se>
-> ---
-> I think I got all the changes right now as requested.
+> sorry, I see this now. Why not simple making this return values void of
+> this function and doing instead of:
 > 
-> Changes v3 -> v4:
-> * Sent "nl802154: fix misspelled enum" patch separately (already merged).
-> * Did a "fixup" of remaining two patches so it is only one now.
-> * Changed "random" value of 99 to NL802154_CCA_OPT_ATTR_MAX.
+
+No need to say sorry, I appreciate all the feedback I can get. I hope I can
+return the favor in the future when I know the code base a little bit more.
+
+> return "Carrier sense with energy above threshold (logical operator is
+> 'or')";
 > 
-> Changes v2 -> v3:
-> * Fixed misspelled enum in nl802154
+> a:
 > 
-> Changes v1 -> v2:
-> * cca_mode number is removed from "current cca_mode", only text is printed as
-> an example:
+> sprintf(cca_mode_buf, "%s", "Carrier sense with energy above threshold
+> (logical operator is 'or')");
+> and always use the cca_mode_buf afterwards for printing.
+> Is this possible?
 > 
->         cca_mode: Energy above threshold
->         was
->         cca_mode: 1, Energy above threshold
+Yes it is possible, I just prepared a patch for the change (haven't sent it to
+the list yet), will send it later today. One question first, should the
+declaration of the "cca_mode_buf" (file scope) be put at the top of the file or
+just above the helper function using it?
+
 > 
-> * Changed "enum" to string mapping in print_cca_mode_handler. Instead of
-> printing out the strings in the function I return a tempbuf that is formatted
-> by the caller.
+> Then you can directly use the parameters for baking the cca_mode string,
+> like:
+> sprintf(cca_mode, "mode %d, %s", cca_mode, "cca mode description");
 > 
-> * Added default value to cca_opt when printing current cca_mode and cca_opt. It
-> is set to the "random" value of 99 as the enum only has 2 values, is this a
-> proper solution? (or should we use limits.h with MAX_INT perhaps?)
+> After calling that function you can call:
+> printf("additional stuff %s\n", cca_mode_buf);
 > 
 > 
->  src/info.c | 100 +++++++++++++++++++++++++++++++++++++------------------------
->  1 file changed, 61 insertions(+), 39 deletions(-)
+> The function print_cca_mode_handler should be a helper function only to
+> place the cca description inside the cca_mode_buf and it can be used
+> until the next call of print_cca_mode_handler by printf or something
+> else.
 > 
-> diff --git a/src/info.c b/src/info.c
-> index 2434bef6a87f..9b0780df0262 100644
-> --- a/src/info.c
-> +++ b/src/info.c
-> @@ -146,6 +146,41 @@ static void print_freq_handler(int channel_page, int channel)
->  	}
->  }
->  
-> +static char cca_mode_buf[100];
-> +
-> +const char *print_cca_mode_handler(enum nl802154_cca_modes cca_mode,
-> +				   enum nl802154_cca_opts cca_opt)
-> +{
-> +	switch (cca_mode) {
-> +	case NL802154_CCA_ENERGY:
-> +		return "Energy above threshold";
-> +	case NL802154_CCA_CARRIER:
-> +		return "Carrier sense only";
-> +	case NL802154_CCA_ENERGY_CARRIER:
-> +		switch (cca_opt) {
-> +		case NL802154_CCA_OPT_ENERGY_CARRIER_AND:
-> +			return "Carrier sense with energy above threshold (logical operator is 'and')";
-> +		case NL802154_CCA_OPT_ENERGY_CARRIER_OR:
-> +			return "Carrier sense with energy above threshold (logical operator is 'or')";
-> +		default:
-> +			sprintf(cca_mode_buf,
-> +				"Unknown CCA option (%d) for CCA mode (%d)",
-> +				cca_opt,
-> +				cca_mode);
-> +			return cca_mode_buf;
-> +		}
-> +	case NL802154_CCA_ALOHA:
-> +		return "ALOHA";
-> +	case NL802154_CCA_UWB_SHR:
-> +		return "UWB preamble sense based on the SHR of a frame";
-> +	case NL802154_CCA_UWB_MULTIPLEXED:
-> +		return "UWB preamble sense based on the packet with the multiplexed preamble";
-> +	default:
-> +		sprintf(cca_mode_buf, "Unknown CCA mode (%d)", cca_mode);
-> +		return cca_mode_buf;
-> +	}
-> +}
-> +
+> - Alex
 
-sorry, I see this now. Why not simple making this return values void of
-this function and doing instead of:
+This new solution makes much more sense to me. The first implementation was
+inspired by *iftype_name() from interface.c, perhaps that should be refactored
+as well.
 
-return "Carrier sense with energy above threshold (logical operator is
-'or')";
-
-a:
-
-sprintf(cca_mode_buf, "%s", "Carrier sense with energy above threshold
-(logical operator is 'or')");
-
-
-
-and always use the cca_mode_buf afterwards for printing.
-Is this possible?
-
-
-Then you can directly use the parameters for baking the cca_mode string,
-like:
-sprintf(cca_mode, "mode %d, %s", cca_mode, "cca mode description");
-
-After calling that function you can call:
-printf("additional stuff %s\n", cca_mode_buf);
-
-
-The function print_cca_mode_handler should be a helper function only to
-place the cca description inside the cca_mode_buf and it can be used
-until the next call of print_cca_mode_handler by printf or something
-else.
-
-- Alex
+Regards
+-- 
+Christoffer Holmstedt
