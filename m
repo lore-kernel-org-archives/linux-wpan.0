@@ -1,66 +1,204 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from box.christofferholmstedt.se ([188.166.68.52]:47670 "EHLO
+Received: from box.christofferholmstedt.se ([188.166.68.52]:47679 "EHLO
 	box.christofferholmstedt.se" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751090AbbFKIN7 (ORCPT
+	by vger.kernel.org with ESMTP id S1751136AbbFKIQ6 (ORCPT
 	<rfc822;linux-wpan@vger.kernel.org>);
-	Thu, 11 Jun 2015 04:13:59 -0400
-Date: Thu, 11 Jun 2015 10:13:50 +0200
+	Thu, 11 Jun 2015 04:16:58 -0400
+Received: from authenticated-user (unknown [127.0.0.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by box.christofferholmstedt.se (Postfix) with ESMTPSA id B21F2140D69
+	for <linux-wpan@vger.kernel.org>; Thu, 11 Jun 2015 04:16:56 -0400 (EDT)
 From: Christoffer Holmstedt <christoffer@christofferholmstedt.se>
-Subject: Re: [PATCH v4 wpan-tools] info: update CCA mode and CCA options
- output
-Message-ID: <20150611081350.GA5265@arazu>
-References: <20150610121712.GA6647@omega>
- <1433941675-4629-1-git-send-email-christoffer@christofferholmstedt.se>
- <20150610134530.GC6647@omega>
- <20150611061633.GA2792@arazu>
- <20150611074206.GA972@omega>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20150611074206.GA972@omega>
+Subject: [PATCH v5 wpan-tools] info: update CCA mode and CCA options output
+Date: Thu, 11 Jun 2015 10:16:52 +0200
+Message-Id: <1434010612-6183-1-git-send-email-christoffer@christofferholmstedt.se>
+In-Reply-To: <1433941675-4629-1-git-send-email-christoffer@christofferholmstedt.se>
+References: <1433941675-4629-1-git-send-email-christoffer@christofferholmstedt.se>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>
-Cc: linux-wpan@vger.kernel.org
+To: linux-wpan@vger.kernel.org
 
-On Thu, Jun 11, 2015 at 09:42:10AM +0200, Alexander Aring wrote:
-> On Thu, Jun 11, 2015 at 08:16:33AM +0200, Christoffer Holmstedt wrote:
-> > On Wed, Jun 10, 2015 at 03:45:31PM +0200, Alexander Aring wrote:
-...cut...
-> > > 
-> > > The function print_cca_mode_handler should be a helper function only to
-> > > place the cca description inside the cca_mode_buf and it can be used
-> > > until the next call of print_cca_mode_handler by printf or something
-> > > else.
-> > > 
-> > > - Alex
-> > 
-> > This new solution makes much more sense to me. The first implementation was
-> > inspired by *iftype_name() from interface.c, perhaps that should be refactored
-> > as well.
-> > 
-> 
-> then better maybe would be to leave the return value as "const char *"
-> there and returning the buffer. Just if you need to "bake" some string
-> with an format string, then use the temp buffer and build your string and
-> return the buffer.
-> 
-> If it's just a "const char *" then just 'return "foobar";'  but this
-> isn't your case here because you want to put some numbers in there, for
-> cca handling.
-> 
-> It's just:
-> The return of the temporary buffer allows us to use the helper printout
-> functionality also from another c-file when the buffer is declared as
-> static buffer.
-> 
-> - Alex
+Instead of printing out CCA mode and CCA options in integers descriptive
+text is now printed to the user when "iwpan list" is run.
 
-aah, yes accessing the value from other files.
+Signed-off-by: Christoffer Holmstedt <christoffer@christofferholmstedt.se>
+---
 
-Not sure about the first two paragraphs though...a patch is coming up (separate
-email) for info.c and if needed interface.c can be discussed yet in another
-thread.
+Changes v4 -> v5:
+* Changed print_cca_mode_handler to only alter cca_mode_buf instead of
+returning strings.
 
+Changes v3 -> v4:
+* Sent "nl802154: fix misspelled enum" patch separately (already merged).
+* Did a "fixup" of remaining two patches so it is only one now.
+* Changed "random" value of 99 to NL802154_CCA_OPT_ATTR_MAX.
+
+Changes v2 -> v3:
+* Fixed misspelled enum in nl802154
+
+Changes v1 -> v2:
+* cca_mode number is removed from "current cca_mode", only text is printed as
+an example:
+
+        cca_mode: Energy above threshold
+        was
+        cca_mode: 1, Energy above threshold
+
+* Changed "enum" to string mapping in print_cca_mode_handler. Instead of
+printing out the strings in the function I return a tempbuf that is formatted
+by the caller.
+
+* Added default value to cca_opt when printing current cca_mode and cca_opt. It
+is set to the "random" value of 99 as the enum only has 2 values, is this a
+proper solution? (or should we use limits.h with MAX_INT perhaps?)
+
+
+ src/info.c | 112 ++++++++++++++++++++++++++++++++++++++++---------------------
+ 1 file changed, 73 insertions(+), 39 deletions(-)
+
+diff --git a/src/info.c b/src/info.c
+index 2434bef6a87f..b6a452fb9ccd 100644
+--- a/src/info.c
++++ b/src/info.c
+@@ -146,6 +146,49 @@ static void print_freq_handler(int channel_page, int channel)
+ 	}
+ }
+ 
++static char cca_mode_buf[100];
++
++void print_cca_mode_handler(enum nl802154_cca_modes cca_mode,
++			    enum nl802154_cca_opts cca_opt)
++{
++	switch (cca_mode) {
++	case NL802154_CCA_ENERGY:
++		sprintf(cca_mode_buf,"%s", "Energy above threshold");
++		break;
++	case NL802154_CCA_CARRIER:
++		sprintf(cca_mode_buf,"%s", "Carrier sense only");
++		break;
++	case NL802154_CCA_ENERGY_CARRIER:
++		switch (cca_opt) {
++		case NL802154_CCA_OPT_ENERGY_CARRIER_AND:
++			sprintf(cca_mode_buf,"%s", "Carrier sense with energy above threshold (logical operator is 'and')");
++			break;
++		case NL802154_CCA_OPT_ENERGY_CARRIER_OR:
++			sprintf(cca_mode_buf,"%s", "Carrier sense with energy above threshold (logical operator is 'or')");
++			break;
++		default:
++			sprintf(cca_mode_buf,
++				"Unknown CCA option (%d) for CCA mode (%d)",
++				cca_opt,
++				cca_mode);
++			break;
++		}
++		break;
++	case NL802154_CCA_ALOHA:
++		sprintf(cca_mode_buf,"%s", "ALOHA");
++		break;
++	case NL802154_CCA_UWB_SHR:
++		sprintf(cca_mode_buf,"%s", "UWB preamble sense based on the SHR of a frame");
++		break;
++	case NL802154_CCA_UWB_MULTIPLEXED:
++		sprintf(cca_mode_buf,"%s", "UWB preamble sense based on the packet with the multiplexed preamble");
++		break;
++	default:
++		sprintf(cca_mode_buf, "Unknown CCA mode (%d)", cca_mode);
++		break;
++	}
++}
++
+ static const char *commands[NL802154_CMD_MAX + 1] = {
+ 	[NL802154_CMD_UNSPEC] = "unspec",
+ 	[NL802154_CMD_GET_WPAN_PHY] = "get_wpan_phy",
+@@ -235,23 +278,14 @@ static int print_phy_handler(struct nl_msg *msg, void *arg)
+ 	}
+ 
+ 	if (tb_msg[NL802154_ATTR_CCA_MODE]) {
++		enum nl802154_cca_opts cca_opt = NL802154_CCA_OPT_ATTR_MAX;
++		if (tb_msg[NL802154_ATTR_CCA_OPT])
++			cca_opt = nla_get_u32(tb_msg[NL802154_ATTR_CCA_OPT]);
++
+ 		cca_mode = nla_get_u32(tb_msg[NL802154_ATTR_CCA_MODE]);
+-		printf("cca_mode: %d", cca_mode);
+-		if (cca_mode == NL802154_CCA_ENERGY_CARRIER) {
+-			enum nl802154_cca_opts cca_opt;
+ 
+-			cca_opt = nla_get_u32(tb_msg[NL802154_ATTR_CCA_OPT]);
+-			switch (cca_opt) {
+-			case NL802154_CCA_OPT_ENERGY_CARRIER_AND:
+-				printf(" logical and ");
+-				break;
+-			case NL802154_CCA_OPT_ENERGY_CARRIER_OR:
+-				printf(" logical or ");
+-				break;
+-			default:
+-				printf(" logical op mode unkown ");
+-			}
+-		}
++		print_cca_mode_handler(cca_mode, cca_opt);
++		printf("cca_mode: %s", cca_mode_buf);
+ 		printf("\n");
+ 	}
+ 
+@@ -361,33 +395,33 @@ static int print_phy_handler(struct nl_msg *msg, void *arg)
+ 			printf("\tcca_modes: ");
+ 			nla_for_each_nested(nl_cca_modes,
+ 					    tb_caps[NL802154_CAP_ATTR_CCA_MODES],
+-					    rem_cca_modes)
+-				printf("%d,", nla_type(nl_cca_modes));
+-			/* TODO */
+-			printf("\b \n");
+-		}
+-
+-		if (tb_caps[NL802154_CAP_ATTR_CCA_OPTS]) {
+-			struct nlattr *nl_cca_opts;
+-			int rem_cca_opts;
+-
+-			printf("\tcca_opts: ");
+-			nla_for_each_nested(nl_cca_opts,
+-					    tb_caps[NL802154_CAP_ATTR_CCA_OPTS],
+-					    rem_cca_opts) {
+-				printf("%d", nla_type(nl_cca_opts));
+-				switch (nla_type(nl_cca_opts)) {
+-				case NL802154_CCA_OPT_ENERGY_CARRIER_AND:
+-				case NL802154_CCA_OPT_ENERGY_CARRIER_OR:
+-					printf("(cca_mode: 3),");
+-					break;
+-				default:
+-					printf("unkown\n");
+-					break;
++					    rem_cca_modes) {
++				if (nla_type(nl_cca_modes) != NL802154_CCA_ENERGY_CARRIER) {
++					print_cca_mode_handler(nla_type(nl_cca_modes), 0);
++					printf("\n\t\t(%d) %s",
++							nla_type(nl_cca_modes),
++							cca_mode_buf);
++				} else {
++					if (tb_caps[NL802154_CAP_ATTR_CCA_OPTS]) {
++						struct nlattr *nl_cca_opts;
++						int rem_cca_opts;
++
++						nla_for_each_nested(nl_cca_opts,
++								    tb_caps[NL802154_CAP_ATTR_CCA_OPTS],
++								    rem_cca_opts) {
++							print_cca_mode_handler(
++									nla_type(nl_cca_modes),
++									nla_type(nl_cca_opts));
++							printf("\n\t\t(%d, cca_opt: %d) %s",
++								nla_type(nl_cca_modes),
++								nla_type(nl_cca_opts),
++								cca_mode_buf);
++						}
++					}
+ 				}
+ 			}
+ 			/* TODO */
+-			printf("\b \n");
++			printf("\n");
+ 		}
+ 
+ 		if (tb_caps[NL802154_CAP_ATTR_MIN_MINBE] &&
 -- 
-Christoffer Holmstedt
+2.1.4
+
