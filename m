@@ -1,50 +1,55 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from host.almesberger.net ([204.10.140.10]:54084 "EHLO
-	host.almesberger.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751963AbbFKQOa (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Thu, 11 Jun 2015 12:14:30 -0400
-Date: Thu, 11 Jun 2015 13:14:09 -0300
-From: Werner Almesberger <werner@almesberger.net>
-Subject: Re: Strategy for permament extended/EUI64 address writing and
- updating in atusb
-Message-ID: <20150611161409.GU5054@ws>
-References: <55782D54.2030508@osg.samsung.com>
- <00F27E6C-BEA0-42C5-8AF4-06A3CCEE320F@holtmann.org>
- <20150610152925.GD6647@omega>
- <20150610212351.GS5054@ws>
- <20150611081745.GB972@omega>
- <CB3536CD-EEC2-48C8-8C52-212B3A6BDEC3@holtmann.org>
- <55795759.8060306@osg.samsung.com>
- <20150611124816.GT5054@ws>
- <55798F76.8020708@osg.samsung.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <55798F76.8020708@osg.samsung.com>
+Received: from mail-pd0-f178.google.com ([209.85.192.178]:33801 "EHLO
+	mail-pd0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751480AbbFLDo1 (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Thu, 11 Jun 2015 23:44:27 -0400
+Received: by pdbki1 with SMTP id ki1so15644602pdb.1
+        for <linux-wpan@vger.kernel.org>; Thu, 11 Jun 2015 20:44:26 -0700 (PDT)
+From: Varka Bhadram <varkabhadram@gmail.com>
+Subject: [PATCH bluetooth-next] mac802154: cleanup llsec param flags
+Date: Fri, 12 Jun 2015 09:13:49 +0530
+Message-Id: <1434080629-8641-1-git-send-email-varkab@cdac.in>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Stefan Schmidt <stefan@osg.samsung.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Alexander Aring <alex.aring@gmail.com>, "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>, Phoebe Buckheister <phoebe.buckheister@itwm.fraunhofer.de>
+To: linux-wpan@vger.kernel.org
+Cc: alex.aring@gmail.com, Varka Bhadram <varkab@cdac.in>
 
-Stefan Schmidt wrote:
->    o It read the EUI64 from EEPROM during probe and is no further
-> touching it at all
+This patch changes the setting of llsec param flag with the BIT macro.
 
-That's then functionally equivalent to the "copying to RAM"
-I proposed.
+Signed-off-by: Varka Bhadram <varkab@cdac.in>
+---
+ include/net/ieee802154_netdev.h |   18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
 
->    o Furthermore, after the EEPROM write a mcu_reset() done to
-> re-enumerate on the USB bus
+diff --git a/include/net/ieee802154_netdev.h b/include/net/ieee802154_netdev.h
+index 0a87975..2c10a9f 100644
+--- a/include/net/ieee802154_netdev.h
++++ b/include/net/ieee802154_netdev.h
+@@ -346,15 +346,15 @@ struct ieee802154_mac_params {
+ struct wpan_phy;
+ 
+ enum {
+-	IEEE802154_LLSEC_PARAM_ENABLED = 1 << 0,
+-	IEEE802154_LLSEC_PARAM_FRAME_COUNTER = 1 << 1,
+-	IEEE802154_LLSEC_PARAM_OUT_LEVEL = 1 << 2,
+-	IEEE802154_LLSEC_PARAM_OUT_KEY = 1 << 3,
+-	IEEE802154_LLSEC_PARAM_KEY_SOURCE = 1 << 4,
+-	IEEE802154_LLSEC_PARAM_PAN_ID = 1 << 5,
+-	IEEE802154_LLSEC_PARAM_HWADDR = 1 << 6,
+-	IEEE802154_LLSEC_PARAM_COORD_HWADDR = 1 << 7,
+-	IEEE802154_LLSEC_PARAM_COORD_SHORTADDR = 1 << 8,
++	IEEE802154_LLSEC_PARAM_ENABLED		= BIT(0),
++	IEEE802154_LLSEC_PARAM_FRAME_COUNTER	= BIT(1),
++	IEEE802154_LLSEC_PARAM_OUT_LEVEL	= BIT(2),
++	IEEE802154_LLSEC_PARAM_OUT_KEY		= BIT(3),
++	IEEE802154_LLSEC_PARAM_KEY_SOURCE	= BIT(4),
++	IEEE802154_LLSEC_PARAM_PAN_ID		= BIT(5),
++	IEEE802154_LLSEC_PARAM_HWADDR		= BIT(6),
++	IEEE802154_LLSEC_PARAM_COORD_HWADDR	= BIT(7),
++	IEEE802154_LLSEC_PARAM_COORD_SHORTADDR	= BIT(8),
+ };
+ 
+ struct ieee802154_llsec_ops {
+-- 
+1.7.9.5
 
-I'm just saying that we already have a generic mechanism for
-getting the device to re-enumerate.
-
-> Not compelling at all if you ask me. We have an EEPROM
-> available to store such device properties so we better use it.
-
-While I disagree with any reasoning that one should use the
-EEPROM because it's there, I also think that attaching the
-address to the firmware binary would add too many operational
-complications.
-
-- Werner
