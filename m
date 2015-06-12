@@ -1,32 +1,34 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f175.google.com ([209.85.212.175]:35839 "EHLO
-	mail-wi0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750781AbbFLHMF (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Fri, 12 Jun 2015 03:12:05 -0400
-Received: by wiga1 with SMTP id a1so7974006wig.0
-        for <linux-wpan@vger.kernel.org>; Fri, 12 Jun 2015 00:12:02 -0700 (PDT)
-Date: Fri, 12 Jun 2015 09:11:56 +0200
-From: Alexander Aring <alex.aring@gmail.com>
+Received: from senator.holtmann.net ([87.106.208.187]:44101 "EHLO
+	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932117AbbFLJnX (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Fri, 12 Jun 2015 05:43:23 -0400
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
 Subject: Re: [PATCH bluetooth-next] mac802154: cleanup llsec param flags
-Message-ID: <20150612071152.GA733@omega>
-References: <1434080629-8641-1-git-send-email-varkab@cdac.in>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+From: Marcel Holtmann <marcel@holtmann.org>
 In-Reply-To: <1434080629-8641-1-git-send-email-varkab@cdac.in>
+Date: Fri, 12 Jun 2015 11:43:18 +0200
+Content-Transfer-Encoding: 7bit
+Message-Id: <CF76AC86-ECAA-4933-A054-61FFC42FFD5C@holtmann.org>
+References: <1434080629-8641-1-git-send-email-varkab@cdac.in>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: Varka Bhadram <varkabhadram@gmail.com>
-Cc: linux-wpan@vger.kernel.org, Varka Bhadram <varkab@cdac.in>
+Cc: linux-wpan@vger.kernel.org, alex.aring@gmail.com, Varka Bhadram <varkab@cdac.in>
 
-On Fri, Jun 12, 2015 at 09:13:49AM +0530, Varka Bhadram wrote:
+Hi Varka,
+
 > This patch changes the setting of llsec param flag with the BIT macro.
 > 
 > Signed-off-by: Varka Bhadram <varkab@cdac.in>
+> ---
+> include/net/ieee802154_netdev.h |   18 +++++++++---------
+> 1 file changed, 9 insertions(+), 9 deletions(-)
 
-Acked-by: Alexander Aring <alex.aring@gmail.com>
+patch has been applied to bluetooth-next tree.
 
-doh, see now that I didn't started at BIT(0) in the hw and addr_filt
-flags.
+Regards
 
-- Alex
+Marcel
+
