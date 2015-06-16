@@ -1,183 +1,56 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f177.google.com ([209.85.212.177]:33608 "EHLO
-	mail-wi0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932838AbbFPJH5 (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Tue, 16 Jun 2015 05:07:57 -0400
-Received: by wiwd19 with SMTP id d19so97420802wiw.0
-        for <linux-wpan@vger.kernel.org>; Tue, 16 Jun 2015 02:07:56 -0700 (PDT)
+Received: from mail-wi0-f169.google.com ([209.85.212.169]:35451 "EHLO
+	mail-wi0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932991AbbFPJH7 (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Tue, 16 Jun 2015 05:07:59 -0400
+Received: by wiga1 with SMTP id a1so102404944wig.0
+        for <linux-wpan@vger.kernel.org>; Tue, 16 Jun 2015 02:07:57 -0700 (PDT)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCHv2 bluetooth-next 1/3] at86rf230: fix phy settings while sleeping
-Date: Tue, 16 Jun 2015 11:07:42 +0200
-Message-Id: <1434445664-438-1-git-send-email-alex.aring@gmail.com>
+Subject: [PATCHv2 bluetooth-next 2/3] at86rf230: add recommended csma backoffs settings
+Date: Tue, 16 Jun 2015 11:07:43 +0200
+Message-Id: <1434445664-438-2-git-send-email-alex.aring@gmail.com>
+In-Reply-To: <1434445664-438-1-git-send-email-alex.aring@gmail.com>
+References: <1434445664-438-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
 Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-While in sleep state then we can't access the at86rf2xx registers. This
-patch checks if the transceiver is in sleep state before sending spi
-messages via regmap. Regmap is used on every driver ops callback except
-for receive and xmit handling, but while receive and xmit handling the
-phy should not be inside the sleep state.
+This patch adds support for a new random csma backoffs settings when
+going into sleep state. This is recommended according at86rf2xx
+datasheets.
 
 Signed-off-by: Alexander Aring <alex.aring@gmail.com>
 ---
-change since v2:
- - I detect an issue with cca ed level setting in v1, there was a return in the
-   middle of awake and sleep transceiver. This results that the transceiver
-   wasn't again turn into sleep state afterwards.
-   To avoid such behaviour I moved the awake and sleep into lowlevel register io
-   functions. These functions "could" be called only when the phy is in sleep
-   state.
-
-
- drivers/net/ieee802154/at86rf230.c | 88 +++++++++++++++++++++++++++++---------
- 1 file changed, 68 insertions(+), 20 deletions(-)
+ drivers/net/ieee802154/at86rf230.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
 diff --git a/drivers/net/ieee802154/at86rf230.c b/drivers/net/ieee802154/at86rf230.c
-index 6b31f47..b839bbd 100644
+index b839bbd..7e30a45 100644
 --- a/drivers/net/ieee802154/at86rf230.c
 +++ b/drivers/net/ieee802154/at86rf230.c
-@@ -90,6 +90,7 @@ struct at86rf230_local {
- 	struct at86rf2xx_chip_data *data;
- 	struct regmap *regmap;
- 	int slp_tr;
-+	bool sleep;
- 
- 	struct completion state_complete;
- 	struct at86rf230_state_change state;
-@@ -114,18 +115,66 @@ at86rf230_async_state_change(struct at86rf230_local *lp,
- 			     const u8 state, void (*complete)(void *context),
- 			     const bool irq_enable);
- 
-+static inline void
-+at86rf230_sleep(struct at86rf230_local *lp)
-+{
-+	if (gpio_is_valid(lp->slp_tr)) {
-+		gpio_set_value(lp->slp_tr, 1);
-+		usleep_range(lp->data->t_off_to_sleep,
-+			     lp->data->t_off_to_sleep + 10);
-+		lp->sleep = true;
-+	}
-+}
-+
-+static inline void
-+at86rf230_awake(struct at86rf230_local *lp)
-+{
-+	if (gpio_is_valid(lp->slp_tr)) {
-+		gpio_set_value(lp->slp_tr, 0);
-+		usleep_range(lp->data->t_sleep_to_off,
-+			     lp->data->t_sleep_to_off + 100);
-+		lp->sleep = false;
-+	}
-+}
-+
- static inline int
- __at86rf230_write(struct at86rf230_local *lp,
- 		  unsigned int addr, unsigned int data)
- {
--	return regmap_write(lp->regmap, addr, data);
-+	bool sleep = lp->sleep;
-+	int ret;
-+
-+	/* awake for register setting if sleep */
-+	if (sleep)
-+		at86rf230_awake(lp);
-+
-+	ret = regmap_write(lp->regmap, addr, data);
-+
-+	/* sleep again if was sleeping */
-+	if (sleep)
-+		at86rf230_sleep(lp);
-+
-+	return ret;
- }
- 
- static inline int
- __at86rf230_read(struct at86rf230_local *lp,
- 		 unsigned int addr, unsigned int *data)
- {
--	return regmap_read(lp->regmap, addr, data);
-+	bool sleep = lp->sleep;
-+	int ret;
-+
-+	/* awake for register setting if sleep */
-+	if (sleep)
-+		at86rf230_awake(lp);
-+
-+	ret = regmap_read(lp->regmap, addr, data);
-+
-+	/* sleep again if was sleeping */
-+	if (sleep)
-+		at86rf230_sleep(lp);
-+
-+	return ret;
- }
- 
- static inline int
-@@ -147,7 +196,20 @@ at86rf230_write_subreg(struct at86rf230_local *lp,
- 		       unsigned int addr, unsigned int mask,
- 		       unsigned int shift, unsigned int data)
- {
--	return regmap_update_bits(lp->regmap, addr, mask, data << shift);
-+	bool sleep = lp->sleep;
-+	int ret;
-+
-+	/* awake for register setting if sleep */
-+	if (sleep)
-+		at86rf230_awake(lp);
-+
-+	ret = regmap_update_bits(lp->regmap, addr, mask, data << shift);
-+
-+	/* sleep again if was sleeping */
-+	if (sleep)
-+		at86rf230_sleep(lp);
-+
-+	return ret;
- }
- 
- static inline void
-@@ -873,12 +935,7 @@ at86rf230_start(struct ieee802154_hw *hw)
+@@ -945,10 +945,21 @@ static void
+ at86rf230_stop(struct ieee802154_hw *hw)
  {
  	struct at86rf230_local *lp = hw->priv;
++	u8 csma_seed[2];
  
--	if (gpio_is_valid(lp->slp_tr)) {
--		gpio_set_value(lp->slp_tr, 0);
--		usleep_range(lp->data->t_sleep_to_off,
--			     lp->data->t_sleep_to_off + 100);
--	}
--
-+	at86rf230_awake(lp);
- 	enable_irq(lp->spi->irq);
- 
- 	return at86rf230_sync_state_change(hw->priv, STATE_RX_AACK_ON);
-@@ -892,12 +949,7 @@ at86rf230_stop(struct ieee802154_hw *hw)
  	at86rf230_sync_state_change(hw->priv, STATE_FORCE_TRX_OFF);
  
  	disable_irq(lp->spi->irq);
--
--	if (gpio_is_valid(lp->slp_tr)) {
--		gpio_set_value(lp->slp_tr, 1);
--		usleep_range(lp->data->t_off_to_sleep,
--			     lp->data->t_off_to_sleep + 10);
--	}
-+	at86rf230_sleep(lp);
++
++	/* It's recommended to set random new csma_seeds before sleep state.
++	 * Makes only sense in the stop callback, not doing this inside of
++	 * at86rf230_sleep, this is also used when we don't transmit afterwards
++	 * when calling start callback again.
++	 */
++	get_random_bytes(csma_seed, ARRAY_SIZE(csma_seed));
++	at86rf230_write_subreg(lp, SR_CSMA_SEED_0, csma_seed[0]);
++	at86rf230_write_subreg(lp, SR_CSMA_SEED_1, csma_seed[1]);
++
+ 	at86rf230_sleep(lp);
  }
  
- static int
-@@ -1672,11 +1724,7 @@ static int at86rf230_probe(struct spi_device *spi)
- 	disable_irq(spi->irq);
- 
- 	/* going into sleep by default */
--	if (gpio_is_valid(slp_tr)) {
--		gpio_set_value(slp_tr, 1);
--		usleep_range(lp->data->t_off_to_sleep,
--			     lp->data->t_off_to_sleep + 10);
--	}
-+	at86rf230_sleep(lp);
- 
- 	rc = ieee802154_register_hw(lp->hw);
- 	if (rc)
 -- 
 2.4.1
 
