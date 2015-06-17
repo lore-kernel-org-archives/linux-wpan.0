@@ -1,47 +1,166 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from senator.holtmann.net ([87.106.208.187]:46774 "EHLO
-	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755263AbbFPQ45 convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Tue, 16 Jun 2015 12:56:57 -0400
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
-Subject: Re: [PATCHv2 bluetooth-next 1/3] at86rf230: fix phy settings while sleeping
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1434445664-438-1-git-send-email-alex.aring@gmail.com>
-Date: Tue, 16 Jun 2015 18:56:50 +0200
-Content-Transfer-Encoding: 8BIT
-Message-Id: <D6B0C9EE-E78A-4613-97BD-60F85C96CA4E@holtmann.org>
-References: <1434445664-438-1-git-send-email-alex.aring@gmail.com>
+Received: from mail-wi0-f169.google.com ([209.85.212.169]:34819 "EHLO
+	mail-wi0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753461AbbFQNfo (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Wed, 17 Jun 2015 09:35:44 -0400
+Received: by wiga1 with SMTP id a1so139916087wig.0
+        for <linux-wpan@vger.kernel.org>; Wed, 17 Jun 2015 06:35:43 -0700 (PDT)
+From: Alexander Aring <alex.aring@gmail.com>
+Subject: [PATCH bluetooth-next 1/2] mac802154: iface: fix order while interface up
+Date: Wed, 17 Jun 2015 15:35:17 +0200
+Message-Id: <1434548118-25656-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>
-Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de
+To: linux-wpan@vger.kernel.org
+Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-Hi Alex,
+This patch moves the hardware setting before calling the driver start
+callback which activates the receive handling. The hardware setup
+contains settings like address filtering which should be setup before
+activate the receive handling on the transceiver. These setting are
+protected by ieee802154_check_concurrent_iface check. This means we
+need to set these registers once before calling drv_start and can't
+be overwritten by other interfaces.
 
-> While in sleep state then we can't access the at86rf2xx registers. This
-> patch checks if the transceiver is in sleep state before sending spi
-> messages via regmap. Regmap is used on every driver ops callback except
-> for receive and xmit handling, but while receive and xmit handling the
-> phy should not be inside the sleep state.
-> 
-> Signed-off-by: Alexander Aring <alex.aring@gmail.com>
-> ---
-> change since v2:
-> - I detect an issue with cca ed level setting in v1, there was a return in the
->   middle of awake and sleep transceiver. This results that the transceiver
->   wasn't again turn into sleep state afterwards.
->   To avoid such behaviour I moved the awake and sleep into lowlevel register io
->   functions. These functions "could" be called only when the phy is in sleep
->   state.
-> 
-> 
-> drivers/net/ieee802154/at86rf230.c | 88 +++++++++++++++++++++++++++++---------
-> 1 file changed, 68 insertions(+), 20 deletions(-)
+Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+---
+ net/mac802154/iface.c | 103 +++++++++++++++++++++++++++-----------------------
+ 1 file changed, 55 insertions(+), 48 deletions(-)
 
-patch has been applied to bluetooth-next tree.
-
-Regards
-
-Marcel
+diff --git a/net/mac802154/iface.c b/net/mac802154/iface.c
+index 692731d..0b0cccb 100644
+--- a/net/mac802154/iface.c
++++ b/net/mac802154/iface.c
+@@ -135,6 +135,56 @@ static int mac802154_wpan_mac_addr(struct net_device *dev, void *p)
+ 	return mac802154_wpan_update_llsec(dev);
+ }
+ 
++static int ieee802154_setup_hw(struct ieee802154_sub_if_data *sdata)
++{
++	struct ieee802154_local *local = sdata->local;
++	struct wpan_dev *wpan_dev = &sdata->wpan_dev;
++	int ret;
++
++	if (local->hw.flags & IEEE802154_HW_PROMISCUOUS) {
++		ret = drv_set_promiscuous_mode(local,
++					       wpan_dev->promiscuous_mode);
++		if (ret < 0)
++			return ret;
++	}
++
++	if (local->hw.flags & IEEE802154_HW_AFILT) {
++		ret = drv_set_pan_id(local, wpan_dev->pan_id);
++		if (ret < 0)
++			return ret;
++
++		ret = drv_set_extended_addr(local, wpan_dev->extended_addr);
++		if (ret < 0)
++			return ret;
++
++		ret = drv_set_short_addr(local, wpan_dev->short_addr);
++		if (ret < 0)
++			return ret;
++	}
++
++	if (local->hw.flags & IEEE802154_HW_LBT) {
++		ret = drv_set_lbt_mode(local, wpan_dev->lbt);
++		if (ret < 0)
++			return ret;
++	}
++
++	if (local->hw.flags & IEEE802154_HW_CSMA_PARAMS) {
++		ret = drv_set_csma_params(local, wpan_dev->min_be,
++					  wpan_dev->max_be,
++					  wpan_dev->csma_retries);
++		if (ret < 0)
++			return ret;
++	}
++
++	if (local->hw.flags & IEEE802154_HW_FRAME_RETRIES) {
++		ret = drv_set_max_frame_retries(local, wpan_dev->frame_retries);
++		if (ret < 0)
++			return ret;
++	}
++
++	return 0;
++}
++
+ static int mac802154_slave_open(struct net_device *dev)
+ {
+ 	struct ieee802154_sub_if_data *sdata = IEEE802154_DEV_TO_SUB_IF(dev);
+@@ -146,6 +196,10 @@ static int mac802154_slave_open(struct net_device *dev)
+ 	set_bit(SDATA_STATE_RUNNING, &sdata->state);
+ 
+ 	if (!local->open_count) {
++		res = ieee802154_setup_hw(sdata);
++		if (res)
++			goto err;
++
+ 		res = drv_start(local);
+ 		if (res)
+ 			goto err;
+@@ -239,60 +293,13 @@ static int mac802154_wpan_open(struct net_device *dev)
+ {
+ 	int rc;
+ 	struct ieee802154_sub_if_data *sdata = IEEE802154_DEV_TO_SUB_IF(dev);
+-	struct ieee802154_local *local = sdata->local;
+ 	struct wpan_dev *wpan_dev = &sdata->wpan_dev;
+ 
+ 	rc = ieee802154_check_concurrent_iface(sdata, wpan_dev->iftype);
+ 	if (rc < 0)
+ 		return rc;
+ 
+-	rc = mac802154_slave_open(dev);
+-	if (rc < 0)
+-		return rc;
+-
+-	if (local->hw.flags & IEEE802154_HW_PROMISCUOUS) {
+-		rc = drv_set_promiscuous_mode(local,
+-					      wpan_dev->promiscuous_mode);
+-		if (rc < 0)
+-			goto out;
+-	}
+-
+-	if (local->hw.flags & IEEE802154_HW_AFILT) {
+-		rc = drv_set_pan_id(local, wpan_dev->pan_id);
+-		if (rc < 0)
+-			goto out;
+-
+-		rc = drv_set_extended_addr(local, wpan_dev->extended_addr);
+-		if (rc < 0)
+-			goto out;
+-
+-		rc = drv_set_short_addr(local, wpan_dev->short_addr);
+-		if (rc < 0)
+-			goto out;
+-	}
+-
+-	if (local->hw.flags & IEEE802154_HW_LBT) {
+-		rc = drv_set_lbt_mode(local, wpan_dev->lbt);
+-		if (rc < 0)
+-			goto out;
+-	}
+-
+-	if (local->hw.flags & IEEE802154_HW_CSMA_PARAMS) {
+-		rc = drv_set_csma_params(local, wpan_dev->min_be,
+-					 wpan_dev->max_be,
+-					 wpan_dev->csma_retries);
+-		if (rc < 0)
+-			goto out;
+-	}
+-
+-	if (local->hw.flags & IEEE802154_HW_FRAME_RETRIES) {
+-		rc = drv_set_max_frame_retries(local, wpan_dev->frame_retries);
+-		if (rc < 0)
+-			goto out;
+-	}
+-
+-out:
+-	return rc;
++	return mac802154_slave_open(dev);
+ }
+ 
+ static int mac802154_slave_close(struct net_device *dev)
+-- 
+2.4.1
 
