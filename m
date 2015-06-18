@@ -1,10 +1,10 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.126.187]:64149 "EHLO
+Received: from mout.kundenserver.de ([212.227.17.10]:59932 "EHLO
 	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751547AbbFRLnn (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Thu, 18 Jun 2015 07:43:43 -0400
-Message-ID: <5582AEEC.6040607@xsilon.com>
-Date: Thu, 18 Jun 2015 12:43:40 +0100
+	with ESMTP id S1753463AbbFRPCX (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Thu, 18 Jun 2015 11:02:23 -0400
+Message-ID: <5582DD7B.6090907@xsilon.com>
+Date: Thu, 18 Jun 2015 16:02:19 +0100
 From: Simon Vincent <simon.vincent@xsilon.com>
 MIME-Version: 1.0
 Subject: Re: 802.15.4 security
@@ -17,9 +17,26 @@ List-ID: <linux-wpan.vger.kernel.org>
 To: Phoebe Buckheister <phoebe.buckheister@itwm.fraunhofer.de>
 Cc: "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>
 
-No worries I will fix it.
+I have managed to get security working now in all modes.
+
+I will submit a patch to fix the scatterlist bug.
+
+The other problem I had was the IV was being generated incorrectly. This 
+was because I had used the iwpan tools to set the mac address. This does 
+not set the ieee802154_llsec_params.hwaddr[1] which is used for creating 
+the IV.[2]
+
+I am not sure the best way to fix this issue. Do we need to keep to keep 
+a copy of the pan_id, hwaddr, coord_hwaddr, coord_shortaddr in the 
+llsec_params? It seems like it could easily get missed and not updated 
+if one of these parameters change.
 
 Simon
+
+[1] - 
+http://lxr.free-electrons.com/source/include/net/ieee802154_netdev.h#L308
+[2] - http://lxr.free-electrons.com/source/net/mac802154/llsec.c#L627 
+and http://lxr.free-electrons.com/source/net/mac802154/llsec.c#L656
 
 On 18/06/15 12:40, Phoebe Buckheister wrote:
 > Found the bug for levels 1,2,3:
