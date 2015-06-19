@@ -1,48 +1,32 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from proxima.lasnet.de ([78.47.171.185]:53417 "EHLO
-	proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752686AbbFRIht (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Thu, 18 Jun 2015 04:37:49 -0400
-From: Stefan Schmidt <stefan@osg.samsung.com>
-Subject: [PATCH wpan-tools 3/3] wpan-ping: switch server indicator variable to bool
-Date: Thu, 18 Jun 2015 10:37:36 +0200
-Message-Id: <1434616656-16209-3-git-send-email-stefan@osg.samsung.com>
-In-Reply-To: <1434616656-16209-1-git-send-email-stefan@osg.samsung.com>
+Received: from mail-wi0-f180.google.com ([209.85.212.180]:35931 "EHLO
+	mail-wi0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751731AbbFSHun (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Fri, 19 Jun 2015 03:50:43 -0400
+Received: by wicnd19 with SMTP id nd19so10887305wic.1
+        for <linux-wpan@vger.kernel.org>; Fri, 19 Jun 2015 00:50:42 -0700 (PDT)
+Date: Fri, 19 Jun 2015 09:50:39 +0200
+From: Alexander Aring <alex.aring@gmail.com>
+Subject: Re: [PATCH wpan-tools 1/3] wpan-ping: adjust maximal packet length
+ for extended addresses
+Message-ID: <20150619075038.GB867@omega>
 References: <1434616656-16209-1-git-send-email-stefan@osg.samsung.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1434616656-16209-1-git-send-email-stefan@osg.samsung.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org
-Cc: Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt <stefan@osg.samsung.com>
+To: Stefan Schmidt <stefan@osg.samsung.com>
+Cc: linux-wpan@vger.kernel.org
 
-This is really only true or false so use bool as we do for extended.
+On Thu, Jun 18, 2015 at 10:37:34AM +0200, Stefan Schmidt wrote:
+> This value is to static right now but does its job. It needs to get
+> more flexible based on various things like addressing scheme and link
+> layer crypto in the future.
+> 
+> Signed-off-by: Stefan Schmidt <stefan@osg.samsung.com>
 
-Signed-off-by: Stefan Schmidt <stefan@osg.samsung.com>
----
- wpan-ping/wpan-ping.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Applied all, thanks.
 
-diff --git a/wpan-ping/wpan-ping.c b/wpan-ping/wpan-ping.c
-index 4a159ae..c83a0ad 100644
---- a/wpan-ping/wpan-ping.c
-+++ b/wpan-ping/wpan-ping.c
-@@ -92,7 +92,7 @@ struct config {
- 	uint8_t dst_extended[IEEE802154_ADDR_LEN];
- 	uint8_t src_extended[IEEE802154_ADDR_LEN];
- 	bool extended;
--	char server;
-+	bool server;
- 	char *interface;
- 	struct nl_sock *nl_sock;
- 	int nl802154_id;
-@@ -467,7 +467,7 @@ int main(int argc, char *argv[]) {
- 			conf->extended = true;
- 			break;
- 		case 'd':
--			conf->server = 1;
-+			conf->server = true;
- 			address = optarg;
- 			break;
- 		case 'c':
--- 
-2.4.3
-
+- Alex
