@@ -1,152 +1,108 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f174.google.com ([209.85.212.174]:34527 "EHLO
-	mail-wi0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753943AbbFTNsi (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Sat, 20 Jun 2015 09:48:38 -0400
-Received: by wicnd19 with SMTP id nd19so40838403wic.1
-        for <linux-wpan@vger.kernel.org>; Sat, 20 Jun 2015 06:48:36 -0700 (PDT)
+Received: from mail-wi0-f169.google.com ([209.85.212.169]:36894 "EHLO
+	mail-wi0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751911AbbFUOpw (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Sun, 21 Jun 2015 10:45:52 -0400
+Received: by wicgi11 with SMTP id gi11so54307917wic.0
+        for <linux-wpan@vger.kernel.org>; Sun, 21 Jun 2015 07:45:51 -0700 (PDT)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [RFC bluetooth-next 3/3] mac802154: cfg: add suspend and resume callbacks
-Date: Sat, 20 Jun 2015 15:48:17 +0200
-Message-Id: <1434808097-29824-3-git-send-email-alex.aring@gmail.com>
-In-Reply-To: <1434808097-29824-1-git-send-email-alex.aring@gmail.com>
-References: <1434808097-29824-1-git-send-email-alex.aring@gmail.com>
+Subject: [PATCH bluetooth-next] mac802154: add llsec address update workaround
+Date: Sun, 21 Jun 2015 16:45:20 +0200
+Message-Id: <1434897920-28271-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
-Cc: kernel@pengutronix.de, varkab@cdac.in, Alexander Aring <alex.aring@gmail.com>
+Cc: kernel@pengutronix.de, simon.vincent@xsilon.com, phoebe.buckheister@itwm.fraunhofer.de, Alexander Aring <alex.aring@gmail.com>
 
-This patch introduces suspend and resume callbacks to mac802154. When
-doing suspend we calling the stop driver callback which should stop the
-receiving of frames. A transceiver should go into low-power mode then.
-Calling resume will call the start driver callback, which starts receiving
-again and allow to transmit frames.
+This patch adds a workaround for using the new nl802154 netlink
+interface with the old ieee802154 netlink interface togehter. The
+nl802154 currently supports no access for llsec layer, currently there
+are users outside which are using both interfaces at the same time. This
+patch adds a necessary call when addresses are updated.
 
-This was tested only with the fakelb driver and a qemu vm by doing the
-following commands:
-
-echo "devices" > /sys/power/pm_test
-echo "freeze" > /sys/power/state
-
-while doing some high traffic between two fakelb phys.
-
+Reported-by: Simon Vincent <simon.vincent@xsilon.com>
+Suggested-by: Phoebe Buckheister <phoebe.buckheister@itwm.fraunhofer.de>
 Signed-off-by: Alexander Aring <alex.aring@gmail.com>
 ---
- net/mac802154/cfg.c          | 45 ++++++++++++++++++++++++++++++++++++++++++++
- net/mac802154/ieee802154_i.h |  1 +
- net/mac802154/rx.c           | 10 ++++++++--
- 3 files changed, 54 insertions(+), 2 deletions(-)
+There is surely a better way for getting/setting the address in llsec now,
+this is a workaround for just let it work with the old interface. We will
+see what we can do when nl802154 supports accessing llsec.
+
+ net/mac802154/cfg.c          | 9 +++++++--
+ net/mac802154/ieee802154_i.h | 2 ++
+ net/mac802154/iface.c        | 7 ++++++-
+ 3 files changed, 15 insertions(+), 3 deletions(-)
 
 diff --git a/net/mac802154/cfg.c b/net/mac802154/cfg.c
-index 317c466..544a906 100644
+index 317c466..44db861 100644
 --- a/net/mac802154/cfg.c
 +++ b/net/mac802154/cfg.c
-@@ -44,6 +44,49 @@ static void ieee802154_del_iface_deprecated(struct wpan_phy *wpan_phy,
- 	ieee802154_if_remove(sdata);
- }
- 
-+#ifdef CONFIG_PM
-+static int ieee802154_suspend(struct wpan_phy *wpan_phy)
-+{
-+	struct ieee802154_local *local = wpan_phy_priv(wpan_phy);
-+
-+	if (!local->open_count)
-+		goto suspend;
-+
-+	ieee802154_stop_queue(&local->hw);
-+	synchronize_net();
-+
-+	/* stop hardware - this must stop RX */
-+	ieee802154_stop_device(local);
-+
-+suspend:
-+	local->suspended = true;
-+	return 0;
-+}
-+
-+static int ieee802154_resume(struct wpan_phy *wpan_phy)
-+{
-+	struct ieee802154_local *local = wpan_phy_priv(wpan_phy);
+@@ -145,13 +145,18 @@ static int
+ ieee802154_set_pan_id(struct wpan_phy *wpan_phy, struct wpan_dev *wpan_dev,
+ 		      __le16 pan_id)
+ {
 +	int ret;
 +
-+	/* nothing to do if HW shouldn't run */
-+	if (!local->open_count)
-+		goto wake_up;
+ 	ASSERT_RTNL();
+ 
+ 	if (wpan_dev->pan_id == pan_id)
+ 		return 0;
+ 
+-	wpan_dev->pan_id = pan_id;
+-	return 0;
++	ret = mac802154_wpan_update_llsec(wpan_dev->netdev);
++	if (!ret)
++		wpan_dev->pan_id = pan_id;
 +
-+	/* restart hardware */
-+	ret = drv_start(local);
-+	if (ret)
-+		return ret;
-+
-+wake_up:
-+	ieee802154_wake_queue(&local->hw);
-+	local->suspended = false;
-+	return 0;
-+}
-+#else
-+#define ieee802154_suspend NULL
-+#define ieee802154_resume NULL
-+#endif
-+
++	return ret;
+ }
+ 
  static int
- ieee802154_add_iface(struct wpan_phy *phy, const char *name,
- 		     unsigned char name_assign_type,
-@@ -227,6 +270,8 @@ ieee802154_set_lbt_mode(struct wpan_phy *wpan_phy, struct wpan_dev *wpan_dev,
- const struct cfg802154_ops mac802154_config_ops = {
- 	.add_virtual_intf_deprecated = ieee802154_add_iface_deprecated,
- 	.del_virtual_intf_deprecated = ieee802154_del_iface_deprecated,
-+	.suspend = ieee802154_suspend,
-+	.resume = ieee802154_resume,
- 	.add_virtual_intf = ieee802154_add_iface,
- 	.del_virtual_intf = ieee802154_del_iface,
- 	.set_channel = ieee802154_set_channel,
 diff --git a/net/mac802154/ieee802154_i.h b/net/mac802154/ieee802154_i.h
-index f0d4691..126d792 100644
+index 34755d5..6d4f3cc 100644
 --- a/net/mac802154/ieee802154_i.h
 +++ b/net/mac802154/ieee802154_i.h
-@@ -56,6 +56,7 @@ struct ieee802154_local {
- 	struct hrtimer ifs_timer;
+@@ -167,6 +167,8 @@ void mac802154_get_table(struct net_device *dev,
+ 			 struct ieee802154_llsec_table **t);
+ void mac802154_unlock_table(struct net_device *dev);
  
- 	bool started;
-+	bool suspended;
- 
- 	struct tasklet_struct tasklet;
- 	struct sk_buff_head skb_queue;
-diff --git a/net/mac802154/rx.c b/net/mac802154/rx.c
-index d93ad2d..5a258c1 100644
---- a/net/mac802154/rx.c
-+++ b/net/mac802154/rx.c
-@@ -253,6 +253,9 @@ void ieee802154_rx(struct ieee802154_hw *hw, struct sk_buff *skb)
- 
- 	WARN_ON_ONCE(softirq_count() == 0);
- 
-+	if (local->suspended)
-+		goto drop;
++int mac802154_wpan_update_llsec(struct net_device *dev);
 +
- 	/* TODO: When a transceiver omits the checksum here, we
- 	 * add an own calculated one. This is currently an ugly
- 	 * solution because the monitor needs a crc here.
-@@ -273,8 +276,7 @@ void ieee802154_rx(struct ieee802154_hw *hw, struct sk_buff *skb)
- 		crc = crc_ccitt(0, skb->data, skb->len);
- 		if (crc) {
- 			rcu_read_unlock();
--			kfree_skb(skb);
--			return;
-+			goto drop;
- 		}
- 	}
- 	/* remove crc */
-@@ -283,6 +285,10 @@ void ieee802154_rx(struct ieee802154_hw *hw, struct sk_buff *skb)
- 	__ieee802154_rx_handle_packet(local, skb);
+ /* interface handling */
+ int ieee802154_iface_init(void);
+ void ieee802154_iface_exit(void);
+diff --git a/net/mac802154/iface.c b/net/mac802154/iface.c
+index 8b69824..4760368 100644
+--- a/net/mac802154/iface.c
++++ b/net/mac802154/iface.c
+@@ -30,7 +30,7 @@
+ #include "ieee802154_i.h"
+ #include "driver-ops.h"
  
- 	rcu_read_unlock();
+-static int mac802154_wpan_update_llsec(struct net_device *dev)
++int mac802154_wpan_update_llsec(struct net_device *dev)
+ {
+ 	struct ieee802154_sub_if_data *sdata = IEEE802154_DEV_TO_SUB_IF(dev);
+ 	struct ieee802154_mlme_ops *ops = ieee802154_mlme_ops(dev);
+@@ -471,6 +471,7 @@ ieee802154_setup_sdata(struct ieee802154_sub_if_data *sdata,
+ 		       enum nl802154_iftype type)
+ {
+ 	struct wpan_dev *wpan_dev = &sdata->wpan_dev;
++	int ret;
+ 	u8 tmp;
+ 
+ 	/* set some type-dependent values */
+@@ -505,6 +506,10 @@ ieee802154_setup_sdata(struct ieee802154_sub_if_data *sdata,
+ 		mutex_init(&sdata->sec_mtx);
+ 
+ 		mac802154_llsec_init(&sdata->sec);
++		ret = mac802154_wpan_update_llsec(sdata->dev);
++		if (ret < 0)
++			return ret;
 +
-+	return;
-+drop:
-+	kfree_skb(skb);
- }
- EXPORT_SYMBOL(ieee802154_rx);
- 
+ 		break;
+ 	case NL802154_IFTYPE_MONITOR:
+ 		sdata->dev->destructor = free_netdev;
 -- 
 2.4.1
 
