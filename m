@@ -1,35 +1,40 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from senator.holtmann.net ([87.106.208.187]:42453 "EHLO
-	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751450AbbFWKUG (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Tue, 23 Jun 2015 06:20:06 -0400
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
-Subject: Re: [PATCH bluetooth-next] mac802154: use WARN_ON() macro
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1435039863-27225-1-git-send-email-varkab@cdac.in>
-Date: Tue, 23 Jun 2015 12:19:53 +0200
-Content-Transfer-Encoding: 7bit
-Message-Id: <11C6ECC9-9EA3-414A-A081-C39689D6C207@holtmann.org>
-References: <1435039863-27225-1-git-send-email-varkab@cdac.in>
+Received: from mail-pa0-f44.google.com ([209.85.220.44]:36687 "EHLO
+	mail-pa0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932439AbbFWKeW (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Tue, 23 Jun 2015 06:34:22 -0400
+Received: by paceq1 with SMTP id eq1so4412082pac.3
+        for <linux-wpan@vger.kernel.org>; Tue, 23 Jun 2015 03:34:22 -0700 (PDT)
+From: Varka Bhadram <varkabhadram@gmail.com>
+Subject: [PATCH bluetooth-next] mac802154: remove unused macro
+Date: Tue, 23 Jun 2015 16:03:44 +0530
+Message-Id: <1435055625-14921-1-git-send-email-varkab@cdac.in>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Varka Bhadram <varkabhadram@gmail.com>
-Cc: linux-wpan@vger.kernel.org, alex.aring@gmail.com, Varka Bhadram <varkab@cdac.in>
+To: linux-wpan@vger.kernel.org
+Cc: alex.aring@gmail.com, Varka Bhadram <varkab@cdac.in>
 
-Hi Varka,
+This patch removes the unused macro which was removed
+with the rework of linux-wpan kernel.
 
-> This patch will generate the warning if the required driver ops
-> were not defined. Also it removes unnecessary debug message.
-> 
-> Signed-off-by: Varka Bhadram <varkab@cdac.in>
-> ---
-> net/mac802154/main.c |    6 ++----
-> 1 file changed, 2 insertions(+), 4 deletions(-)
+Signed-off-by: Varka Bhadram <varkab@cdac.in>
+---
+ net/mac802154/ieee802154_i.h |    2 --
+ 1 file changed, 2 deletions(-)
 
-patch has been applied to bluetooth-next tree.
-
-Regards
-
-Marcel
+diff --git a/net/mac802154/ieee802154_i.h b/net/mac802154/ieee802154_i.h
+index 6d4f3cc..ed87463 100644
+--- a/net/mac802154/ieee802154_i.h
++++ b/net/mac802154/ieee802154_i.h
+@@ -94,8 +94,6 @@ struct ieee802154_sub_if_data {
+ 	struct mac802154_llsec sec;
+ };
+ 
+-#define MAC802154_CHAN_NONE		0xff /* No channel is assigned */
+-
+ /* utility functions/constants */
+ extern const void *const mac802154_wpan_phy_privid; /*  for wpan_phy privid */
+ 
+-- 
+1.7.9.5
 
