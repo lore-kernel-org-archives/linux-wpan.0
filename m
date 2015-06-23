@@ -1,11 +1,15 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-pd0-f182.google.com ([209.85.192.182]:36050 "EHLO
-	mail-pd0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754559AbbFWPGm (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Tue, 23 Jun 2015 11:06:42 -0400
-Message-ID: <558975EB.7020805@gmail.com>
-Date: Tue, 23 Jun 2015 20:36:19 +0530
-From: Varka Bhadram <varkabhadram@gmail.com>
+Received: from out5-smtp.messagingengine.com ([66.111.4.29]:33019 "EHLO
+	out5-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S932644AbbFWPIm (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>);
+	Tue, 23 Jun 2015 11:08:42 -0400
+Received: from compute2.internal (compute2.nyi.internal [10.202.2.42])
+	by mailout.nyi.internal (Postfix) with ESMTP id D92EE20C53
+	for <linux-wpan@vger.kernel.org>; Tue, 23 Jun 2015 11:08:41 -0400 (EDT)
+Message-ID: <55897678.40907@signal11.us>
+Date: Tue, 23 Jun 2015 11:08:40 -0400
+From: Alan Ott <alan@signal11.us>
 MIME-Version: 1.0
 Subject: Re: [PATCH 4/6] net: ieee802154: Remove redundant spi driver bus
  initialization
@@ -15,13 +19,10 @@ Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Antonio Borneo <borneo.antonio@gmail.com>, Alan Ott <alan@signal11.us>, Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org, netdev@vger.kernel.org
+To: Antonio Borneo <borneo.antonio@gmail.com>, Alexander Aring <alex.aring@gmail.com>, Varka Bhadram <varkabhadram@gmail.com>, linux-wpan@vger.kernel.org, netdev@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org
 
-Hi Antonio Borneo,
-
-On Tuesday 23 June 2015 08:22 PM, Antonio Borneo wrote:
-
+On 06/23/2015 10:52 AM, Antonio Borneo wrote:
 > In ancient times it was necessary to manually initialize the bus
 > field of an spi_driver to spi_bus_type. These days this is done in
 > spi_register_driver(), so we can drop the manual assignment.
@@ -50,9 +51,6 @@ On Tuesday 23 June 2015 08:22 PM, Antonio Borneo wrote:
 >   		.owner = THIS_MODULE,
 >   		.of_match_table = of_match_ptr(cc2520_of_ids),
 >   	},
-
-Acked-by: Varka Bhadram <varkabhadram@gmail.com>
-
 > diff --git a/drivers/net/ieee802154/mrf24j40.c b/drivers/net/ieee802154/mrf24j40.c
 > index fba2dfd..bc8fb26 100644
 > --- a/drivers/net/ieee802154/mrf24j40.c
@@ -66,7 +64,5 @@ Acked-by: Varka Bhadram <varkabhadram@gmail.com>
 >   	},
 >   	.id_table = mrf24j40_ids,
 
--- 
-Best regards,
-Varka Bhadram.
+Acked-by: Alan Ott <alan@signal11.us>
 
