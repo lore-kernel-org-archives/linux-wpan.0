@@ -1,67 +1,65 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f178.google.com ([209.85.212.178]:36568 "EHLO
-	mail-wi0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751617AbbFXKAX (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Wed, 24 Jun 2015 06:00:23 -0400
-Received: by wicnd19 with SMTP id nd19so130276818wic.1
-        for <linux-wpan@vger.kernel.org>; Wed, 24 Jun 2015 03:00:22 -0700 (PDT)
-Date: Wed, 24 Jun 2015 12:00:16 +0200
+Received: from mail-wg0-f41.google.com ([74.125.82.41]:33205 "EHLO
+	mail-wg0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753368AbbFXOBV (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Wed, 24 Jun 2015 10:01:21 -0400
+Received: by wgck11 with SMTP id k11so37291370wgc.0
+        for <linux-wpan@vger.kernel.org>; Wed, 24 Jun 2015 07:01:20 -0700 (PDT)
+Date: Wed, 24 Jun 2015 16:01:13 +0200
 From: Alexander Aring <alex.aring@gmail.com>
 Subject: Re: The 802.15.4 Security Layer
-Message-ID: <20150624100011.GA21293@omega>
+Message-ID: <20150624140111.GA12381@omega>
 References: <20150618123154.GB6640@omega>
  <5582E6FA.3020101@osg.samsung.com>
  <5582EAAD.1090605@xsilon.com>
  <55831F48.4090905@osg.samsung.com>
  <55897C92.1060207@xsilon.com>
+ <20150624100011.GA21293@omega>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <55897C92.1060207@xsilon.com>
+In-Reply-To: <20150624100011.GA21293@omega>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: Simon Vincent <simon.vincent@xsilon.com>
 Cc: linux-wpan@vger.kernel.org
 
-Hi,
-
-On Tue, Jun 23, 2015 at 04:34:42PM +0100, Simon Vincent wrote:
-> Hi Alex,
+On Wed, Jun 24, 2015 at 12:00:14PM +0200, Alexander Aring wrote:
+> Hi,
 > 
-> Do you have your security/nl802154 work available anywhere I can have a
-> look?
-> I am in the process of getting 802.15.4 security working on our devices. I
-> don't want to implement it using the old interface as I will then have to
-> recode our application when llsec moves over to nl802154.
-
-I think what we do at first is a 1:1 implementation of the old interface
-and the new interface and then look what we can change afterwards if
-needed.
-
-We introduce then some CONFIG_NL802154_EXPERIMENTAL to change the enum
-definition (with security and without). I think then we are somehow
-safe to still change the netlink interface, inside kernelspace, afterwards.
-
-> I have some spare time at the moment to develop/review/test the security
-> layer.
+> On Tue, Jun 23, 2015 at 04:34:42PM +0100, Simon Vincent wrote:
+> > Hi Alex,
+> > 
+> > Do you have your security/nl802154 work available anywhere I can have a
+> > look?
+> > I am in the process of getting 802.15.4 security working on our devices. I
+> > don't want to implement it using the old interface as I will then have to
+> > recode our application when llsec moves over to nl802154.
+> 
+> I think what we do at first is a 1:1 implementation of the old interface
+> and the new interface and then look what we can change afterwards if
+> needed.
+> 
+> We introduce then some CONFIG_NL802154_EXPERIMENTAL to change the enum
+> definition (with security and without). I think then we are somehow
+> safe to still change the netlink interface, inside kernelspace, afterwards.
 > 
 
-Too bad I have at the moment really nothing which you can test/review
-maybe we can do some split working of development tasks, but I don't have
-the overview at the moment to split anything.
+What I meant here is something like [0]. We simple let the config add
+the end of all declaration, if we add something to mainline then we put
+it out of the #ifdef foo. (Above the comments) If we do that then the
+CONFIG_NL802154_EXPERIMENTAL will be broken afterwards and the userspace
+tool need to be updated. Without CONFIG_NL802154_EXPERIMENTAL it should
+always be the same. Just the NL802154_CMD_MAX and NL802154_ATTR_MAX
+will be a lesser value than without CONFIG_NL802154_EXPERIMENTAL. The
+internal nl802154 framework should not react on these definitions then,
+if somebody tries to use CMD's/ATTR's which are inside
+CONFIG_NL802154_EXPERIMENTAL.
 
-For general I would say somebody can do the userspace side and another one
-can do the kernelspace side. At the end we trying to fit anything together.
 
-For me it's _very_ important that the userspace side should not have
-some big mechanism to setup the kernelspace stuff. We should provide
-some config file to setup the most part, instead doing iwpan calls over
-command line.
-
-Phoebe also reported that we need to save the current dump of the whole
-security information in case of a reboot and restore them afterwards
-again. (e.g. the frame counter attribute). This all smells more like a
-daemon which running in the background and deals with some configfiles
-and states (dumping security tables in case of reboot).
+With CONFIG_NL802154_EXPERIMENTAL then the user need to care about to user
+the right userspace nl802154 header in their application.
 
 - Alex
+
+[0] https://github.com/linux-wpan/linux-wpan-next/commit/4522252b9964227d1a3ce0b09c1aa0a6d95c3ba1
