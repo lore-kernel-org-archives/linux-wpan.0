@@ -1,37 +1,38 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from senator.holtmann.net ([87.106.208.187]:48673 "EHLO
-	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753279AbbFXN1s (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Wed, 24 Jun 2015 09:27:48 -0400
+Received: from box.christofferholmstedt.se ([188.166.68.52]:49162 "EHLO
+	box.christofferholmstedt.se" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751414AbbFYJXF (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>);
+	Thu, 25 Jun 2015 05:23:05 -0400
+Received: from authenticated-user (unknown [127.0.0.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by box.christofferholmstedt.se (Postfix) with ESMTPSA id 56B04140D84
+	for <linux-wpan@vger.kernel.org>; Thu, 25 Jun 2015 05:23:02 -0400 (EDT)
+Date: Thu, 25 Jun 2015 11:22:55 +0200
+From: Christoffer Holmstedt <christoffer@christofferholmstedt.se>
+Subject: 802.15.4 bit- and byte-order
+Message-ID: <20150625092255.GA3682@arazu>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
-Subject: Re: [PATCH bluetooth-next 1/3] mac802154: util: add stop_device utility function
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1435138596-25909-1-git-send-email-alex.aring@gmail.com>
-Date: Wed, 24 Jun 2015 15:27:41 +0200
-Content-Transfer-Encoding: 7bit
-Message-Id: <97B7DF66-2BB4-4D32-8004-E238392B3278@holtmann.org>
-References: <1435138596-25909-1-git-send-email-alex.aring@gmail.com>
+Content-Disposition: inline
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>
-Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de, varkab@cdac.in
+To: linux-wpan@vger.kernel.org
 
-Hi Alex,
+I remember there were a discussion a few weeks back concerning bit and byte
+ordering. I'm not sure if there were any conclusion there but a similiar
+discussion just took place on the 6tisch IETF mailing list where they seem to
+have come to a conclusion.
 
-> This patch adds ieee802154_stop_device for preparing a utility function
-> to stop the ieee802154 device.
-> 
-> Signed-off-by: Alexander Aring <alex.aring@gmail.com>
-> ---
-> net/mac802154/ieee802154_i.h | 1 +
-> net/mac802154/iface.c        | 7 ++-----
-> net/mac802154/util.c         | 8 ++++++++
-> 3 files changed, 11 insertions(+), 5 deletions(-)
+I will not copy and paste and try to explain the final conclusion they came to,
+that would probably just introduce more questions ;) ...instead I leave you
+with a link to the first email in the thread.
 
-patch has been applied to bluetooth-next tree.
+https://mailarchive.ietf.org/arch/search/?email_list=6tisch&gbt=1&index=0cQxU9tOmxf5CkPtrULOFyIJbzo
+
+Hope this can help anyone that isn't following that mailing list.
 
 Regards
-
-Marcel
-
+-- 
+Christoffer Holmstedt
