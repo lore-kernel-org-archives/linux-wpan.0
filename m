@@ -1,69 +1,57 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from senator.holtmann.net ([87.106.208.187]:59112 "EHLO
-	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751164AbbGIKDe convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Thu, 9 Jul 2015 06:03:34 -0400
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2102\))
-Subject: Re: [RFC 0/2] Adding stateful compression to IPHC
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1435929818-6044-1-git-send-email-lukasz.duda@nordicsemi.no>
-Date: Thu, 9 Jul 2015 12:03:28 +0200
-Content-Transfer-Encoding: 8BIT
-Message-Id: <A69B5B08-9C5E-432A-9F2F-330F5065B6DD@holtmann.org>
-References: <1435929818-6044-1-git-send-email-lukasz.duda@nordicsemi.no>
+Received: from mail-wg0-f51.google.com ([74.125.82.51]:33453 "EHLO
+	mail-wg0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753168AbbGAIVl (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Wed, 1 Jul 2015 04:21:41 -0400
+Received: by wgck11 with SMTP id k11so29908683wgc.0
+        for <linux-wpan@vger.kernel.org>; Wed, 01 Jul 2015 01:21:40 -0700 (PDT)
+Date: Wed, 1 Jul 2015 10:21:35 +0200
+From: Alexander Aring <alex.aring@gmail.com>
+Subject: Re: ping6 doesn't use at86rf230 driver
+Message-ID: <20150701082130.GA1834@omega>
+References: <CAPpUg6ODFfRpaM9EtL0YY4iHNbgOtgZ4QLVzGpSYkC-zRGY+7w@mail.gmail.com>
+ <20150626080338.GB959@omega>
+ <CAPpUg6PQZ8aYabugqr1jL=yfE1HmWinCzy1JN4LCv1QXbfw6dQ@mail.gmail.com>
+ <CAPpUg6O61HyVEiTXD7r-14dVp-G3thy_YSG06PSUDooDEPHEFw@mail.gmail.com>
+ <20150629080937.GA1674@omega>
+ <55910C2F.3070601@gmail.com>
+ <CAPpUg6Nb0TXj7Xm0WTv+T4K-3BV-VJjsQcCJabd3txg7JHv-pQ@mail.gmail.com>
+ <CAPpUg6NUwAGo402HgJkwcDTyT3HPBAAnSEW7V63zUyv5PHSJ8A@mail.gmail.com>
+ <20150629220929.GB1165@omega>
+ <CAPpUg6N5SAY3fOio7zGnsOPkYytgx5gRgfULO5=6Tz+fcN-9PA@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAPpUg6N5SAY3fOio7zGnsOPkYytgx5gRgfULO5=6Tz+fcN-9PA@mail.gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Lukasz Duda <lukasz.duda@nordicsemi.no>
-Cc: Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org
+To: Baptiste Clenet <bapclenet@gmail.com>
+Cc: Varka Bhadram <varkabhadram@gmail.com>, linux-wpan@vger.kernel.org
 
-Hi Lukasz,
+Hi,
 
-> The following patches introduce support for stateful compression in IPHC.
+On Tue, Jun 30, 2015 at 11:12:36AM +0200, Baptiste Clenet wrote:
+....
 > 
-> Patch #1: Adding stateful compression to 6lowpan module.
-> Patch #2: Enabling use of stateful compression in bluetooth_6lowpan module.
+> root@OpenWrt:/# dmesg | grep at86rf230
+> [   94.820000] at86rf230 spi32766.1: Detected at86rf212 chip version 3
+> [   94.830000] at86rf230 spi32766.1: unexcept state change from 0x00
+> to 0x08. Actual state: 0x00
 > 
-> Usage of stateful compression is described in Patch #1.
+> It detects the chip but yes definitely, there is problem to read the state.
+> Will check the pins
 > 
-> Limitations
-> ===========
-> 
-> - Temporarly use of debugfs to be able to add context table entries.
-> - Current module does not support context time-outs.
-> - No support for multicast addresses stateful compression.
-> 
-> Discussion: Idea on how to make the 6lowpan context tables out of debug mode
-> ============================================================================
-> 
-> The patch provided here is just a temporary solution where the contexts are
-> manually added. The proper way of adding/removing contexts would be to make
-> ndisc.c parse 6CO options and act upon it. Generated Router Advertisement
-> packets with 6CO option (for example from RADVD) will be handled in the
-> ndisc_router_discovery function.
-> 
-> Also, other flags like ARO, ABRO etc. which are specified in RFC6775 need to
-> be handled in the ipv6 module in order to do it in a neat way.
-> Potentially the RFC6775 extensions could potentially also be used by other
-> protocols than BLE and 802.15.4.
-> 
-> There is a need for parsing the 6CO option in ndisc.c which parses Router
-> Advertisement messages. Today the function calls to IPHC (6lowpan module) are
-> quite hard to implement in ndisc.c, as there is no guarantee that the 6lowpan
-> module will be loaded or not. It would make sense to build 6lowpan module
-> as in-build part of IPv6. The features could be compiled in by using #defines.
-> 
-> What do you think about moving 6lowpan as a component of IPv6 and modify ndisc.c
-> to handled 6LoWPAN specific options? Do you see any other solution to make sure
-> that 6CO is parsed and acted upon and still keep 6lowpan as a stand-alone module?
 
-I am not sure that 6LoWPAN long-term should be a compile time option of IPv6. However that is certainly a possibility. If we want to discuss that, then it needs to be a discussion on the netdev mailing list with the netdev folks.
+if you have debugfs support and mounted it, then you could dump all
+register settings by doing something similar like:
 
-Initially the direction was to go for net/6lowpan/ and make 6LoWPAN a subsystem of its own. Making it part of IPv6 would mean this has to move into net/core/ and that needs convincing of the netdev folks.
+cat /sys/kernel/debug/regmap/spi1.0/registers
 
-My viewpoint of 6LoWPAN subsystem was always that besides compression, it actually becomes a full net_device abstraction. So instead of BLE and 802.15.4 allocating net_device on its own, we have something like lowpan_netdev that gets allocated by each subsystem. And then you just provide the framing functions that take the encapsulated frames and transport it over the bearer. Right now we are doing a lot of duplication in each subsystem to support 6LoWPAN. The less it takes to hook up 6LoWPAN to new bearers, the better. Moving the compression into a separate module was just the first step.
+result would be some $REGISTER <-> $VALUE mapping.
 
-Regards
+Note:
 
-Marcel
+One interface of the 802.15.4 phy should be up for this development method,
+because the transceiver isn't in sleep mode then.
 
+- Alex
