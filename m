@@ -1,40 +1,77 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from senator.holtmann.net ([87.106.208.187]:52320 "EHLO
-	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755824AbbGGMPh (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Tue, 7 Jul 2015 08:15:37 -0400
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2102\))
-Subject: Re: [PATCH bluetooth-next 1/2] mac802154: do not export ieee802154_rx()
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1436246443-8243-1-git-send-email-varkabhadram@gmail.com>
-Date: Tue, 7 Jul 2015 14:15:32 +0200
-Content-Transfer-Encoding: 7bit
-Message-Id: <F2B72C20-DF4A-446A-8D3D-DEA63CB2FE70@holtmann.org>
-References: <1436246443-8243-1-git-send-email-varkabhadram@gmail.com>
+Received: from mail.nordicsemi.no ([194.19.86.146]:55757 "EHLO
+	ironport02.nordicsemi.no" rhost-flags-OK-OK-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1754079AbbGCNXm (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Fri, 3 Jul 2015 09:23:42 -0400
+From: Lukasz Duda <lukasz.duda@nordicsemi.no>
+Subject: [RFC 0/2] Adding stateful compression to IPHC
+Date: Fri, 3 Jul 2015 15:23:36 +0200
+Message-ID: <1435929818-6044-1-git-send-email-lukasz.duda@nordicsemi.no>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Varka Bhadram <varkabhadram@gmail.com>
-Cc: linux-wpan@vger.kernel.org, alex.aring@gmail.com
+To: alex.aring@gmail.com
+Cc: linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org
 
-Hi Varka,
+Hi all,
 
-> Right now there are no other users for ieee802154_rx()
-> in kernel. So lets remove EXPORT_SYMBOL() for this.
-> 
-> Also it moves the function prototype from global header
-> file to local header file.
-> 
-> Signed-off-by: Varka Bhadram <varkabhadram@gmail.com>
-> ---
-> include/net/mac802154.h      |   17 -----------------
-> net/mac802154/ieee802154_i.h |    1 +
-> net/mac802154/rx.c           |    1 -
-> 3 files changed, 1 insertion(+), 18 deletions(-)
+The following patches introduce support for stateful compression in IPHC.
+ 
+Patch #1: Adding stateful compression to 6lowpan module.
+Patch #2: Enabling use of stateful compression in bluetooth_6lowpan module.
+ 
+Usage of stateful compression is described in Patch #1.
+ 
+Limitations
+===========
+ 
+- Temporarly use of debugfs to be able to add context table entries.
+- Current module does not support context time-outs.
+- No support for multicast addresses stateful compression.
+ 
+Discussion: Idea on how to make the 6lowpan context tables out of debug mode
+============================================================================
+ 
+The patch provided here is just a temporary solution where the contexts are
+manually added. The proper way of adding/removing contexts would be to make
+ndisc.c parse 6CO options and act upon it. Generated Router Advertisement
+packets with 6CO option (for example from RADVD) will be handled in the
+ndisc_router_discovery function.
+ 
+Also, other flags like ARO, ABRO etc. which are specified in RFC6775 need to
+be handled in the ipv6 module in order to do it in a neat way.
+Potentially the RFC6775 extensions could potentially also be used by other
+protocols than BLE and 802.15.4.
+ 
+There is a need for parsing the 6CO option in ndisc.c which parses Router
+Advertisement messages. Today the function calls to IPHC (6lowpan module) are
+quite hard to implement in ndisc.c, as there is no guarantee that the 6lowpan
+module will be loaded or not. It would make sense to build 6lowpan module
+as in-build part of IPv6. The features could be compiled in by using #defines.
+ 
+What do you think about moving 6lowpan as a component of IPv6 and modify ndisc.c
+to handled 6LoWPAN specific options? Do you see any other solution to make sure
+that 6CO is parsed and acted upon and still keep 6lowpan as a stand-alone module?
 
-patch has been applied to bluetooth-next tree.
+Best regards,
+Lukasz Duda
 
-Regards
+Lukasz Duda (2):
+  6lowpan: Add stateful compression for IPHC
+  Bluetooth: 6lowpan: Enable stateful compression for bluetooth_6lowpan
+    module
 
-Marcel
+ include/net/6lowpan.h   |  37 ++++
+ net/6lowpan/Makefile    |   2 +-
+ net/6lowpan/context.c   | 523 ++++++++++++++++++++++++++++++++++++++++++++++++
+ net/6lowpan/context.h   |  13 ++
+ net/6lowpan/iphc.c      | 259 ++++++++++++++++++++----
+ net/bluetooth/6lowpan.c |   4 +
+ 6 files changed, 795 insertions(+), 43 deletions(-)
+ create mode 100644 net/6lowpan/context.c
+ create mode 100644 net/6lowpan/context.h
+
+-- 
+2.1.4
 
