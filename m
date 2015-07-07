@@ -1,37 +1,38 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from senator.holtmann.net ([87.106.208.187]:53426 "EHLO
-	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756788AbbGGMPz (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Tue, 7 Jul 2015 08:15:55 -0400
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2102\))
-Subject: Re: [PATCH bluetooth-next 2/2] mac802154: fix ieee802154_rx handling
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1436246443-8243-2-git-send-email-varkabhadram@gmail.com>
-Date: Tue, 7 Jul 2015 14:15:51 +0200
-Content-Transfer-Encoding: 7bit
-Message-Id: <E2606742-E344-49EB-8E3B-EC6BAFF42A36@holtmann.org>
-References: <1436246443-8243-1-git-send-email-varkabhadram@gmail.com> <1436246443-8243-2-git-send-email-varkabhadram@gmail.com>
+Received: from mail-wi0-f172.google.com ([209.85.212.172]:36196 "EHLO
+	mail-wi0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754747AbbGGGji (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Tue, 7 Jul 2015 02:39:38 -0400
+Received: by widjy10 with SMTP id jy10so179236692wid.1
+        for <linux-wpan@vger.kernel.org>; Mon, 06 Jul 2015 23:39:36 -0700 (PDT)
+Date: Tue, 7 Jul 2015 08:39:18 +0200
+From: Alexander Aring <alex.aring@gmail.com>
+Subject: Re: [PATCH bluetooth-next 1/2] mac802154: do not export
+ ieee802154_rx()
+Message-ID: <20150707063917.GA1103@omega>
+References: <1436246443-8243-1-git-send-email-varkabhadram@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1436246443-8243-1-git-send-email-varkabhadram@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: Varka Bhadram <varkabhadram@gmail.com>
-Cc: linux-wpan@vger.kernel.org, alex.aring@gmail.com
+Cc: linux-wpan@vger.kernel.org
 
-Hi Varka,
+Hi,
 
-> Instead of passing ieee802154_hw pointer to ieee802154_rx,
-> we can directly pass the ieee802154_local pointer.
+On Tue, Jul 07, 2015 at 10:50:42AM +0530, Varka Bhadram wrote:
+> Right now there are no other users for ieee802154_rx()
+> in kernel. So lets remove EXPORT_SYMBOL() for this.
+> 
+> Also it moves the function prototype from global header
+> file to local header file.
 > 
 > Signed-off-by: Varka Bhadram <varkabhadram@gmail.com>
-> ---
-> net/mac802154/ieee802154_i.h |    2 +-
-> net/mac802154/main.c         |    2 +-
-> net/mac802154/rx.c           |    3 +--
-> 3 files changed, 3 insertions(+), 4 deletions(-)
 
-patch has been applied to bluetooth-next tree.
+Acked-by: Alexander Aring <alex.aring@gmail.com>
 
-Regards
+on the complete serie.
 
-Marcel
-
+- Alex
