@@ -1,54 +1,87 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail.nordicsemi.no ([194.19.86.146]:53212 "EHLO
-	ironport01.nordicsemi.no" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751833AbbGWIJn (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Thu, 23 Jul 2015 04:09:43 -0400
-From: "Duda, Lukasz" <Lukasz.Duda@nordicsemi.no>
-Subject: RE: [RFC v2 4/4] Bluetooth: 6lowpan: Enable stateful compression in
- bluetooth_6lowpan
-Date: Thu, 23 Jul 2015 08:09:39 +0000
-Message-ID: <AB80DA35A7B64E4E98291794926897D9D1D317E1@mbx04.nvlsi.no>
+Received: from mga02.intel.com ([134.134.136.20]:19152 "EHLO mga02.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751428AbbGMNJq (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+	Mon, 13 Jul 2015 09:09:46 -0400
+Message-ID: <1436792982.2896.32.camel@linux.intel.com>
+Subject: Re: [RFC v2 0/4] Adding stateful compression to IPHC
+From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+Date: Mon, 13 Jul 2015 16:09:42 +0300
+In-Reply-To: <1436788233-13960-1-git-send-email-lukasz.duda@nordicsemi.no>
 References: <1436788233-13960-1-git-send-email-lukasz.duda@nordicsemi.no>
- <1436788233-13960-5-git-send-email-lukasz.duda@nordicsemi.no>
- <20150723075523.GA19536@omega>
-In-Reply-To: <20150723075523.GA19536@omega>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>
-Cc: "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>, "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, "Bakke, Glenn Ruben" <Glenn.Ruben.Bakke@nordicsemi.no>
+To: Lukasz Duda <lukasz.duda@nordicsemi.no>
+Cc: alex.aring@gmail.com, linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org
 
-SGkgQXJpbmcsDQoNCj4gT24gTW9uLCBKdWwgMTMsIDIwMTUgYXQgMDE6NTA6MzNQTSArMDIwMCwg
-THVrYXN6IER1ZGEgd3JvdGU6DQo+ID4gQWxsb2NhdGluZyBjb250ZXh0IHRhYmxlIGZvciBzdGF0
-ZWZ1bCBjb21wcmVzc2lvbiB3aGVuIGludGVyZmFjZSBpcw0KPiA+IHNldCB1cC4gUmVtb3Zpbmcg
-Y29udGV4dCB0YWJsZSB3aGVuIGludGVyZmFjZSBpcyBiZWluZyB1bnJlZ2lzdGVyZWQuDQo+ID4N
-Cj4gPiBTaWduZWQtb2ZmLWJ5OiBMdWthc3ogRHVkYSA8bHVrYXN6LmR1ZGFAbm9yZGljc2VtaS5u
-bz4NCj4gPiBTaWduZWQtb2ZmLWJ5OiBHbGVubiBSdWJlbiBCYWtrZSA8Z2xlbm4ucnViZW4uYmFr
-a2VAbm9yZGljc2VtaS5ubz4NCj4gPiAtLS0NCj4gPiAgbmV0L2JsdWV0b290aC82bG93cGFuLmMg
-fCA0ICsrKysNCj4gPiAgMSBmaWxlIGNoYW5nZWQsIDQgaW5zZXJ0aW9ucygrKQ0KPiA+DQo+ID4g
-ZGlmZiAtLWdpdCBhL25ldC9ibHVldG9vdGgvNmxvd3Bhbi5jIGIvbmV0L2JsdWV0b290aC82bG93
-cGFuLmMgaW5kZXgNCj4gPiAyZmI3YjMwLi42MGM3ZTgwIDEwMDY0NA0KPiA+IC0tLSBhL25ldC9i
-bHVldG9vdGgvNmxvd3Bhbi5jDQo+ID4gKysrIGIvbmV0L2JsdWV0b290aC82bG93cGFuLmMNCj4g
-PiBAQCAtODcxLDYgKzg3MSw5IEBAIHN0YXRpYyBpbnQgc2V0dXBfbmV0ZGV2KHN0cnVjdCBsMmNh
-cF9jaGFuICpjaGFuLA0KPiBzdHJ1Y3QgbG93cGFuX2RldiAqKmRldikNCj4gPiAgCSAgICAgICAm
-Y2hhbi0+c3JjLCBjaGFuLT5zcmNfdHlwZSk7DQo+ID4gIAlzZXRfYml0KF9fTElOS19TVEFURV9Q
-UkVTRU5ULCAmbmV0ZGV2LT5zdGF0ZSk7DQo+ID4NCj4gPiArCS8qIEFsbG9jYXRlIGNvbnRleHQg
-dGFibGUgZm9yIHN0YXRlZnVsIGNvbXByZXNzaW9uLiAqLw0KPiA+ICsJbG93cGFuX2NvbnRleHRf
-dGFibGVfYWxsb2MobmV0ZGV2KTsNCj4gPiArDQo+ID4gIAkqZGV2ID0gbmV0ZGV2X3ByaXYobmV0
-ZGV2KTsNCj4gPiAgCSgqZGV2KS0+bmV0ZGV2ID0gbmV0ZGV2Ow0KPiA+ICAJKCpkZXYpLT5oZGV2
-ID0gY2hhbi0+Y29ubi0+aGNvbi0+aGRldjsgQEAgLTE0MTUsNiArMTQxOCw3IEBADQo+IHN0YXRp
-Yw0KPiA+IGludCBkZXZpY2VfZXZlbnQoc3RydWN0IG5vdGlmaWVyX2Jsb2NrICp1bnVzZWQsDQo+
-ID4gIAkJCWlmIChlbnRyeS0+bmV0ZGV2ID09IG5ldGRldikgew0KPiA+ICAJCQkJQlRfREJHKCJV
-bnJlZ2lzdGVyZWQgbmV0ZGV2ICVzICVwIiwNCj4gPiAgCQkJCSAgICAgICBuZXRkZXYtPm5hbWUs
-IG5ldGRldik7DQo+ID4gKwkJCQlsb3dwYW5fY29udGV4dF90YWJsZV9mcmVlKG5ldGRldik7DQo+
-ID4gIAkJCQlsaXN0X2RlbCgmZW50cnktPmxpc3QpOw0KPiA+ICAJCQkJYnJlYWs7DQo+ID4gIAkJ
-CX0NCj4gDQo+IERvbid0IHdlIG5lZWQgc2ltaWxhciBhbGxvY2F0aW9uIGluIG5ldC9pZWVlODAy
-MTU0LzZsb3dwYW4vY29yZS5jID8NCj4gDQo+IC0gQWxleA0KDQpZZXMgd2UgbmVlZCB0aGUgc2Ft
-ZSBmb3IgSUVFRTgwMi4xNS40LiBTaW5jZSBJIGNhbiB0ZXN0IHN0YXRlZnVsIGNvbXByZXNzaW9u
-IGZlYXR1cmUgb25seSB3aXRoIEJULUxFIHJpZ2h0IG5vdywgDQpJIGRlY2lkZWQgdG8gbm90IHRv
-dWNoIHRoaXMgcGFydC4gSG93ZXZlciB0aGlzIGlzIGFuIG9idmlvdXMgZ29hbCB0byBjcmVhdGUg
-Z2VuZXJpYyBzdGF0ZWZ1bCBjb21wcmVzc2lvbiBmb3IgYWxsDQpzZXQgb2YgNkxvV1BBTiBwcm90
-b2NvbHMuDQoNClJlZ2FyZHMsDQrFgXVrYXN6DQo=
+Hi Lukasz,
+
+On ma, 2015-07-13 at 13:50 +0200, Lukasz Duda wrote:
+> Hi all,
+> 
+> Resending the RFC patch set after some clean up.
+> 
+> The following patches introduce support for stateful compression in IPHC.
+> 
+> Patch #1: Introduce debugfs entry for 6lowpan module
+> Patch #2: Add stateful compression component of 6lowpan module
+> Patch #3: Add stateful compression support for iphc.c
+> Patch #4: Enable stateful compression in bluetooth_6lowpan
+> 
+> Usage of stateful compression is described in Patch #2.
+> 
+> Notes
+> =====
+> 
+> RFC v2:
+>     - Splitting patch into smaller incremental patches
+>     - Moving debugfs logic from iphc.c into context.c
+>     - Updating patch set to align with style and coding guideline
+>     
+> RFC v1:
+>     - Initial patch set: http://www.spinics.net/lists/linux-bluetooth/msg62930.html
+> 
+> Limitations
+> ===========
+> 
+> - Temporarly use of debugfs to be able to add context table entries.
+> - Current module does not support context time-outs.
+> - No support for multicast addresses stateful compression.
+> 
+> Discussion: Idea on how to make the 6lowpan context tables out of debug mode
+> ============================================================================
+> 
+> The patch provided here is just a temporary solution where the contexts are
+> manually added. The proper way of adding/removing contexts would be to make
+> ndisc.c parse 6CO options and act upon it. Generated Router Advertisement
+> packets with 6CO option (for example from RADVD) will be handled in the
+> ndisc_router_discovery function.
+> 
+> Also, other flags like ARO, ABRO etc. which are specified in RFC6775 need
+> to be handled in the ipv6 module in order to do it in a neat way.
+> Potentially the RFC6775 extensions could also be used by other protocols
+> than BLE and 802.15.4.
+> 
+> There is a need for parsing the 6CO option in ndisc.c which parses Router
+> Advertisement messages. Today the function calls to IPHC (6lowpan module) are
+> quite hard to implement in ndisc.c, as there is no guarantee that the 6lowpan
+> module will be loaded or not. It would make sense to build 6lowpan module
+> as in-build part of IPv6. The features could be compiled in by using #defines.
+> 
+> What do you think about moving 6lowpan as a component of IPv6 and modify ndisc.c
+> to handled 6LoWPAN specific options? Do you see any other solution to make sure
+> that 6CO is parsed and acted upon and still keep 6lowpan as a stand-alone module?
+
+Have you considered that 6lowpan module could register a callback in
+ipv6 module. When needed, ipv6 could then call the 6lowpan callback if
+needed. This way there would be no need to embed 6lowpan functionality
+to ipv6 module.
+
+
+Cheers,
+Jukka
+
+
