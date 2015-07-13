@@ -1,94 +1,88 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail.nordicsemi.no ([194.19.86.146]:37255 "EHLO
-	ironport02.nordicsemi.no" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1751201AbbGMLug (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>);
-	Mon, 13 Jul 2015 07:50:36 -0400
+Received: from mail.nordicsemi.no ([194.19.86.146]:21936 "EHLO
+	ironport01.nordicsemi.no" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751734AbbGMLuo (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Mon, 13 Jul 2015 07:50:44 -0400
 From: Lukasz Duda <lukasz.duda@nordicsemi.no>
-Subject: [RFC v2 0/4] Adding stateful compression to IPHC 
-Date: Mon, 13 Jul 2015 13:50:29 +0200
-Message-ID: <1436788233-13960-1-git-send-email-lukasz.duda@nordicsemi.no>
+Subject: [RFC v2 1/4] 6lowpan: Introduce debugfs entry for 6lowpan module
+Date: Mon, 13 Jul 2015 13:50:30 +0200
+Message-ID: <1436788233-13960-2-git-send-email-lukasz.duda@nordicsemi.no>
+In-Reply-To: <1436788233-13960-1-git-send-email-lukasz.duda@nordicsemi.no>
+References: <1436788233-13960-1-git-send-email-lukasz.duda@nordicsemi.no>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: alex.aring@gmail.com
-Cc: linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Cc: linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org, Glenn Ruben Bakke <glenn.ruben.bakke@nordicsemi.no>
 
-Hi all,
+Creating "6lowpan" debugfs entry (/sys/kernel/debugfs/6lowpan) for usage
+by 6lowpan module.
 
-Resending the RFC patch set after some clean up.
+Signed-off-by: Lukasz Duda <lukasz.duda@nordicsemi.no>
+Signed-off-by: Glenn Ruben Bakke <glenn.ruben.bakke@nordicsemi.no>
+---
+ include/net/6lowpan.h |  2 ++
+ net/6lowpan/iphc.c    | 13 +++++++++++++
+ 2 files changed, 15 insertions(+)
 
-The following patches introduce support for stateful compression in IPHC.
-
-Patch #1: Introduce debugfs entry for 6lowpan module
-Patch #2: Add stateful compression component of 6lowpan module
-Patch #3: Add stateful compression support for iphc.c
-Patch #4: Enable stateful compression in bluetooth_6lowpan
-
-Usage of stateful compression is described in Patch #2.
-
-Notes
-=====
-
-RFC v2:
-    - Splitting patch into smaller incremental patches
-    - Moving debugfs logic from iphc.c into context.c
-    - Updating patch set to align with style and coding guideline
-    
-RFC v1:
-    - Initial patch set: http://www.spinics.net/lists/linux-bluetooth/msg62930.html
-
-Limitations
-===========
-
-- Temporarly use of debugfs to be able to add context table entries.
-- Current module does not support context time-outs.
-- No support for multicast addresses stateful compression.
-
-Discussion: Idea on how to make the 6lowpan context tables out of debug mode
-============================================================================
-
-The patch provided here is just a temporary solution where the contexts are
-manually added. The proper way of adding/removing contexts would be to make
-ndisc.c parse 6CO options and act upon it. Generated Router Advertisement
-packets with 6CO option (for example from RADVD) will be handled in the
-ndisc_router_discovery function.
-
-Also, other flags like ARO, ABRO etc. which are specified in RFC6775 need
-to be handled in the ipv6 module in order to do it in a neat way.
-Potentially the RFC6775 extensions could also be used by other protocols
-than BLE and 802.15.4.
-
-There is a need for parsing the 6CO option in ndisc.c which parses Router
-Advertisement messages. Today the function calls to IPHC (6lowpan module) are
-quite hard to implement in ndisc.c, as there is no guarantee that the 6lowpan
-module will be loaded or not. It would make sense to build 6lowpan module
-as in-build part of IPv6. The features could be compiled in by using #defines.
-
-What do you think about moving 6lowpan as a component of IPv6 and modify ndisc.c
-to handled 6LoWPAN specific options? Do you see any other solution to make sure
-that 6CO is parsed and acted upon and still keep 6lowpan as a stand-alone module?
-
-Best regards,
-Lukasz Duda
-
-Lukasz Duda (4):
-  6lowpan: Introduce debugfs entry for 6lowpan module
-  6lowpan: Add stateful compression component of 6lowpan module
-  6lowpan: Add stateful compression support for iphc.c
-  Bluetooth: 6lowpan: Enable stateful compression in bluetooth_6lowpan
-
- include/net/6lowpan.h   |  37 ++++
- net/6lowpan/Makefile    |   2 +-
- net/6lowpan/context.c   | 551 ++++++++++++++++++++++++++++++++++++++++++++++++
- net/6lowpan/context.h   |   7 +
- net/6lowpan/iphc.c      | 245 +++++++++++++++++----
- net/bluetooth/6lowpan.c |   4 +
- 6 files changed, 809 insertions(+), 37 deletions(-)
- create mode 100644 net/6lowpan/context.c
- create mode 100644 net/6lowpan/context.h
-
+diff --git a/include/net/6lowpan.h b/include/net/6lowpan.h
+index dc03d77..37ddbdf 100644
+--- a/include/net/6lowpan.h
++++ b/include/net/6lowpan.h
+@@ -197,6 +197,8 @@
+ #define LOWPAN_NHC_UDP_CS_P_11	0xF3 /* source & dest = 0xF0B + 4bit inline */
+ #define LOWPAN_NHC_UDP_CS_C	0x04 /* checksum elided */
+ 
++extern struct dentry *lowpan_debugfs;
++
+ #ifdef DEBUG
+ /* print data in line */
+ static inline void raw_dump_inline(const char *caller, char *msg,
+diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
+index 9055d7b..c845a8a 100644
+--- a/net/6lowpan/iphc.c
++++ b/net/6lowpan/iphc.c
+@@ -50,12 +50,16 @@
+ #include <linux/if_arp.h>
+ #include <linux/module.h>
+ #include <linux/netdevice.h>
++#include <linux/debugfs.h>
+ #include <net/6lowpan.h>
+ #include <net/ipv6.h>
+ #include <net/af_ieee802154.h>
+ 
+ #include "nhc.h"
+ 
++struct dentry *lowpan_debugfs;
++EXPORT_SYMBOL_GPL(lowpan_debugfs);
++
+ /* Uncompress address function for source and
+  * destination address(non-multicast).
+  *
+@@ -613,6 +617,8 @@ EXPORT_SYMBOL_GPL(lowpan_header_compress);
+ 
+ static int __init lowpan_module_init(void)
+ {
++	lowpan_debugfs = debugfs_create_dir("6lowpan", NULL);
++
+ 	request_module_nowait("ipv6");
+ 
+ 	request_module_nowait("nhc_dest");
+@@ -625,6 +631,13 @@ static int __init lowpan_module_init(void)
+ 
+ 	return 0;
+ }
++
++static void __exit lowpan_module_exit(void)
++{
++	debugfs_remove(lowpan_debugfs);
++}
++
+ module_init(lowpan_module_init);
++module_exit(lowpan_module_exit);
+ 
+ MODULE_LICENSE("GPL");
 -- 
 2.1.4
 
