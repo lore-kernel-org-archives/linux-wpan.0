@@ -1,87 +1,94 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:19152 "EHLO mga02.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751428AbbGMNJq (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-	Mon, 13 Jul 2015 09:09:46 -0400
-Message-ID: <1436792982.2896.32.camel@linux.intel.com>
-Subject: Re: [RFC v2 0/4] Adding stateful compression to IPHC
-From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-Date: Mon, 13 Jul 2015 16:09:42 +0300
-In-Reply-To: <1436788233-13960-1-git-send-email-lukasz.duda@nordicsemi.no>
+Received: from mail.nordicsemi.no ([194.19.86.146]:57585 "EHLO
+	ironport02.nordicsemi.no" rhost-flags-OK-OK-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1752141AbbGONmc (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>);
+	Wed, 15 Jul 2015 09:42:32 -0400
+From: "Duda, Lukasz" <Lukasz.Duda@nordicsemi.no>
+Subject: RE: [RFC v2 0/4] Adding stateful compression to IPHC
+Date: Wed, 15 Jul 2015 13:42:28 +0000
+Message-ID: <AB80DA35A7B64E4E98291794926897D9741DE5B8@MBX03.nvlsi.no>
 References: <1436788233-13960-1-git-send-email-lukasz.duda@nordicsemi.no>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+ <1436792982.2896.32.camel@linux.intel.com>
+In-Reply-To: <1436792982.2896.32.camel@linux.intel.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Lukasz Duda <lukasz.duda@nordicsemi.no>
-Cc: alex.aring@gmail.com, linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org
+To: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+Cc: "alex.aring@gmail.com" <alex.aring@gmail.com>, "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>, "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 
-Hi Lukasz,
-
-On ma, 2015-07-13 at 13:50 +0200, Lukasz Duda wrote:
-> Hi all,
-> 
-> Resending the RFC patch set after some clean up.
-> 
-> The following patches introduce support for stateful compression in IPHC.
-> 
-> Patch #1: Introduce debugfs entry for 6lowpan module
-> Patch #2: Add stateful compression component of 6lowpan module
-> Patch #3: Add stateful compression support for iphc.c
-> Patch #4: Enable stateful compression in bluetooth_6lowpan
-> 
-> Usage of stateful compression is described in Patch #2.
-> 
-> Notes
-> =====
-> 
-> RFC v2:
->     - Splitting patch into smaller incremental patches
->     - Moving debugfs logic from iphc.c into context.c
->     - Updating patch set to align with style and coding guideline
->     
-> RFC v1:
->     - Initial patch set: http://www.spinics.net/lists/linux-bluetooth/msg62930.html
-> 
-> Limitations
-> ===========
-> 
-> - Temporarly use of debugfs to be able to add context table entries.
-> - Current module does not support context time-outs.
-> - No support for multicast addresses stateful compression.
-> 
-> Discussion: Idea on how to make the 6lowpan context tables out of debug mode
-> ============================================================================
-> 
-> The patch provided here is just a temporary solution where the contexts are
-> manually added. The proper way of adding/removing contexts would be to make
-> ndisc.c parse 6CO options and act upon it. Generated Router Advertisement
-> packets with 6CO option (for example from RADVD) will be handled in the
-> ndisc_router_discovery function.
-> 
-> Also, other flags like ARO, ABRO etc. which are specified in RFC6775 need
-> to be handled in the ipv6 module in order to do it in a neat way.
-> Potentially the RFC6775 extensions could also be used by other protocols
-> than BLE and 802.15.4.
-> 
-> There is a need for parsing the 6CO option in ndisc.c which parses Router
-> Advertisement messages. Today the function calls to IPHC (6lowpan module) are
-> quite hard to implement in ndisc.c, as there is no guarantee that the 6lowpan
-> module will be loaded or not. It would make sense to build 6lowpan module
-> as in-build part of IPv6. The features could be compiled in by using #defines.
-> 
-> What do you think about moving 6lowpan as a component of IPv6 and modify ndisc.c
-> to handled 6LoWPAN specific options? Do you see any other solution to make sure
-> that 6CO is parsed and acted upon and still keep 6lowpan as a stand-alone module?
-
-Have you considered that 6lowpan module could register a callback in
-ipv6 module. When needed, ipv6 could then call the 6lowpan callback if
-needed. This way there would be no need to embed 6lowpan functionality
-to ipv6 module.
-
-
-Cheers,
-Jukka
-
-
+SGkgSnVra2EsDQoNCj4gSGkgTHVrYXN6LA0KPiANCj4gT24gbWEsIDIwMTUtMDctMTMgYXQgMTM6
+NTAgKzAyMDAsIEx1a2FzeiBEdWRhIHdyb3RlOg0KPiA+IEhpIGFsbCwNCj4gPg0KPiA+IFJlc2Vu
+ZGluZyB0aGUgUkZDIHBhdGNoIHNldCBhZnRlciBzb21lIGNsZWFuIHVwLg0KPiA+DQo+ID4gVGhl
+IGZvbGxvd2luZyBwYXRjaGVzIGludHJvZHVjZSBzdXBwb3J0IGZvciBzdGF0ZWZ1bCBjb21wcmVz
+c2lvbiBpbiBJUEhDLg0KPiA+DQo+ID4gUGF0Y2ggIzE6IEludHJvZHVjZSBkZWJ1Z2ZzIGVudHJ5
+IGZvciA2bG93cGFuIG1vZHVsZQ0KPiA+IFBhdGNoICMyOiBBZGQgc3RhdGVmdWwgY29tcHJlc3Np
+b24gY29tcG9uZW50IG9mIDZsb3dwYW4gbW9kdWxlDQo+ID4gUGF0Y2ggIzM6IEFkZCBzdGF0ZWZ1
+bCBjb21wcmVzc2lvbiBzdXBwb3J0IGZvciBpcGhjLmMNCj4gPiBQYXRjaCAjNDogRW5hYmxlIHN0
+YXRlZnVsIGNvbXByZXNzaW9uIGluIGJsdWV0b290aF82bG93cGFuDQo+ID4NCj4gPiBVc2FnZSBv
+ZiBzdGF0ZWZ1bCBjb21wcmVzc2lvbiBpcyBkZXNjcmliZWQgaW4gUGF0Y2ggIzIuDQo+ID4NCj4g
+PiBOb3Rlcw0KPiA+ID09PT09DQo+ID4NCj4gPiBSRkMgdjI6DQo+ID4gICAgIC0gU3BsaXR0aW5n
+IHBhdGNoIGludG8gc21hbGxlciBpbmNyZW1lbnRhbCBwYXRjaGVzDQo+ID4gICAgIC0gTW92aW5n
+IGRlYnVnZnMgbG9naWMgZnJvbSBpcGhjLmMgaW50byBjb250ZXh0LmMNCj4gPiAgICAgLSBVcGRh
+dGluZyBwYXRjaCBzZXQgdG8gYWxpZ24gd2l0aCBzdHlsZSBhbmQgY29kaW5nIGd1aWRlbGluZQ0K
+PiA+DQo+ID4gUkZDIHYxOg0KPiA+ICAgICAtIEluaXRpYWwgcGF0Y2ggc2V0OiBodHRwOi8vd3d3
+LnNwaW5pY3MubmV0L2xpc3RzL2xpbnV4LQ0KPiBibHVldG9vdGgvbXNnNjI5MzAuaHRtbA0KPiA+
+DQo+ID4gTGltaXRhdGlvbnMNCj4gPiA9PT09PT09PT09PQ0KPiA+DQo+ID4gLSBUZW1wb3Jhcmx5
+IHVzZSBvZiBkZWJ1Z2ZzIHRvIGJlIGFibGUgdG8gYWRkIGNvbnRleHQgdGFibGUgZW50cmllcy4N
+Cj4gPiAtIEN1cnJlbnQgbW9kdWxlIGRvZXMgbm90IHN1cHBvcnQgY29udGV4dCB0aW1lLW91dHMu
+DQo+ID4gLSBObyBzdXBwb3J0IGZvciBtdWx0aWNhc3QgYWRkcmVzc2VzIHN0YXRlZnVsIGNvbXBy
+ZXNzaW9uLg0KPiA+DQo+ID4gRGlzY3Vzc2lvbjogSWRlYSBvbiBob3cgdG8gbWFrZSB0aGUgNmxv
+d3BhbiBjb250ZXh0IHRhYmxlcyBvdXQgb2YgZGVidWcNCj4gbW9kZQ0KPiA+DQo+ID09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQ0KPiA9
+PT09PT09PT09PT09PT09DQo+ID4NCj4gPiBUaGUgcGF0Y2ggcHJvdmlkZWQgaGVyZSBpcyBqdXN0
+IGEgdGVtcG9yYXJ5IHNvbHV0aW9uIHdoZXJlIHRoZSBjb250ZXh0cyBhcmUNCj4gPiBtYW51YWxs
+eSBhZGRlZC4gVGhlIHByb3BlciB3YXkgb2YgYWRkaW5nL3JlbW92aW5nIGNvbnRleHRzIHdvdWxk
+IGJlIHRvDQo+IG1ha2UNCj4gPiBuZGlzYy5jIHBhcnNlIDZDTyBvcHRpb25zIGFuZCBhY3QgdXBv
+biBpdC4gR2VuZXJhdGVkIFJvdXRlciBBZHZlcnRpc2VtZW50DQo+ID4gcGFja2V0cyB3aXRoIDZD
+TyBvcHRpb24gKGZvciBleGFtcGxlIGZyb20gUkFEVkQpIHdpbGwgYmUgaGFuZGxlZCBpbiB0aGUN
+Cj4gPiBuZGlzY19yb3V0ZXJfZGlzY292ZXJ5IGZ1bmN0aW9uLg0KPiA+DQo+ID4gQWxzbywgb3Ro
+ZXIgZmxhZ3MgbGlrZSBBUk8sIEFCUk8gZXRjLiB3aGljaCBhcmUgc3BlY2lmaWVkIGluIFJGQzY3
+NzUgbmVlZA0KPiA+IHRvIGJlIGhhbmRsZWQgaW4gdGhlIGlwdjYgbW9kdWxlIGluIG9yZGVyIHRv
+IGRvIGl0IGluIGEgbmVhdCB3YXkuDQo+ID4gUG90ZW50aWFsbHkgdGhlIFJGQzY3NzUgZXh0ZW5z
+aW9ucyBjb3VsZCBhbHNvIGJlIHVzZWQgYnkgb3RoZXIgcHJvdG9jb2xzDQo+ID4gdGhhbiBCTEUg
+YW5kIDgwMi4xNS40Lg0KPiA+DQo+ID4gVGhlcmUgaXMgYSBuZWVkIGZvciBwYXJzaW5nIHRoZSA2
+Q08gb3B0aW9uIGluIG5kaXNjLmMgd2hpY2ggcGFyc2VzIFJvdXRlcg0KPiA+IEFkdmVydGlzZW1l
+bnQgbWVzc2FnZXMuIFRvZGF5IHRoZSBmdW5jdGlvbiBjYWxscyB0byBJUEhDICg2bG93cGFuIG1v
+ZHVsZSkNCj4gYXJlDQo+ID4gcXVpdGUgaGFyZCB0byBpbXBsZW1lbnQgaW4gbmRpc2MuYywgYXMg
+dGhlcmUgaXMgbm8gZ3VhcmFudGVlIHRoYXQgdGhlDQo+IDZsb3dwYW4NCj4gPiBtb2R1bGUgd2ls
+bCBiZSBsb2FkZWQgb3Igbm90LiBJdCB3b3VsZCBtYWtlIHNlbnNlIHRvIGJ1aWxkIDZsb3dwYW4g
+bW9kdWxlDQo+ID4gYXMgaW4tYnVpbGQgcGFydCBvZiBJUHY2LiBUaGUgZmVhdHVyZXMgY291bGQg
+YmUgY29tcGlsZWQgaW4gYnkgdXNpbmcgI2RlZmluZXMuDQo+ID4NCj4gPiBXaGF0IGRvIHlvdSB0
+aGluayBhYm91dCBtb3ZpbmcgNmxvd3BhbiBhcyBhIGNvbXBvbmVudCBvZiBJUHY2IGFuZA0KPiBt
+b2RpZnkgbmRpc2MuYw0KPiA+IHRvIGhhbmRsZWQgNkxvV1BBTiBzcGVjaWZpYyBvcHRpb25zPyBE
+byB5b3Ugc2VlIGFueSBvdGhlciBzb2x1dGlvbiB0bw0KPiBtYWtlIHN1cmUNCj4gPiB0aGF0IDZD
+TyBpcyBwYXJzZWQgYW5kIGFjdGVkIHVwb24gYW5kIHN0aWxsIGtlZXAgNmxvd3BhbiBhcyBhIHN0
+YW5kLWFsb25lDQo+IG1vZHVsZT8NCj4gDQo+IEhhdmUgeW91IGNvbnNpZGVyZWQgdGhhdCA2bG93
+cGFuIG1vZHVsZSBjb3VsZCByZWdpc3RlciBhIGNhbGxiYWNrIGluDQo+IGlwdjYgbW9kdWxlLiBX
+aGVuIG5lZWRlZCwgaXB2NiBjb3VsZCB0aGVuIGNhbGwgdGhlIDZsb3dwYW4gY2FsbGJhY2sgaWYN
+Cj4gbmVlZGVkLiBUaGlzIHdheSB0aGVyZSB3b3VsZCBiZSBubyBuZWVkIHRvIGVtYmVkIDZsb3dw
+YW4gZnVuY3Rpb25hbGl0eQ0KPiB0byBpcHY2IG1vZHVsZS4NCj4gDQo+IA0KPiBDaGVlcnMsDQo+
+IEp1a2thDQo+IA0KDQpJIGRpZCBjb25zaWRlciB0aGF0IHNvbHV0aW9uIGJ1dCBJIGFzc3VtZSB5
+b3UgdGhpbmsgYWJvdXQgdGhlIHdheSBvZiANCnJlZ2lzdHJhdGlvbiAgdXNlZCBmb3IgTkhDIGNh
+bGxiYWNrcyAoZm9yIGV4YW1wbGUgbmhjX3VkcC5jKSBpbiB0aGUgNmxvd3Bhbg0KbW9kdWxlLg0K
+DQpUaGlzIGNvdWxkIGltcGx5IGEgbmV3IEFQSSBmb3IgbmRpc2MuYyBmb3IgZXhhbXBsZQ0KbmRp
+c2NfcmVnaXN0ZXJfbG93cGFuX2NhbGxiYWNrKCkuIFRoaXMgY2FsbGJhY2sgY2FuIGJlIGlzc3Vl
+ZCBmcm9tIHRoZQ0KNmxvd3BhbiBtb2R1bGUgaW4gb3JkZXIgdG8gcmVnaXN0ZXIgYSBjYWxsYmFj
+ay4NCldoZW4gYW4gUkEgbWVzc2FnZSBjb21lcywgdGhlIHJlZ2lzdGVyZWQgY2FsbGJhY2sgd2ls
+bCBiZSBpc3N1ZWQuDQpTaG91bGQgdGhpcyBiZSBjYWxsZWQgb25seSB3aGVuIGEgc3BlY2lmaWMg
+b3B0aW9uIGlzIGRldGVjdGVkLCBvciBmb3IgYWxsIFJBDQptZXNzYWdlcyBpbiBnZW5lcmFsPw0K
+DQpIb3cgZG8geW91IHNlZSBhIHdheSBvZiBoYW5kbGluZyBhbGwgUkZDNjc3NSBvcHRpb25zIGxp
+a2UgQVJPLERBUixEQUMgZXRjLg0KU2hvdWxkIHRoaXMgYmUgZXh0ZW5kZWQgaW4gbmRpc2MuYyBp
+dHNlbGYsIG9yIHNob3VsZCBpdCBiZSBoYW5kbGVkIHdpdGhpbg0KdGhlIDZsb3dwYW4gbW9kdWxl
+IChlLmcuIGJ5IHVzaW5nIHRoaXMgcmVnaXN0ZXJlZCBsb3dwYW4gY2FsbGJhY2spLiANCkJlY2F1
+c2Ugd2hlbiByZWNlaXZpbmcgTlMgd2l0aCBBUk8gaXQgaXMgZXhwZWN0ZWQgdG8gYW5zd2VyIHdp
+dGggTkEgdGhhdA0KY29udGFpbnMgQVJPIG9wdGlvbiB3aXRoIHJlcGx5IHN0YXR1cy4NCg0KSSBi
+ZWxpZXZlIHRoYXQgdXNpbmcgY2FsbGJhY2tzIGxpa2UgdGhpcyBjb3VsZCBiZSB1c2VkIGZvciBw
+YXJzaW5nIDZDTyANCnZlcnkgd2VsbCB3aGljaCBkb2VzIG5vdCBuZWVkIGFueSBpbnRlcmFjdGlv
+bi4gSG93ZXZlciwgd291bGQgdGhlcmUgYmUgDQphbnkgY2hhbmNlIG9mIGdldHRpbmcgc3VjaCBk
+eW5hbWljIHJlZ2lzdHJhdGlvbiBvZiBjYWxsYmFja3MgaW50byBpcHY2IA0KbW9kdWxlPyBJcyB0
+aGVyZSBhbnkgZXhhbXBsZSB0aGF0IGltcGxlbWVudHMgc3VjaCBzb2x1dGlvbiB0byBzZWUgaG93
+DQppdCB3b3Jrcy4NCg0KQmVzdCByZWdhcmRzLA0KxYF1a2FzeiBEdWRhDQo=
