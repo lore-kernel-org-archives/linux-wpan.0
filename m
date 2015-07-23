@@ -1,39 +1,39 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f182.google.com ([209.85.212.182]:37531 "EHLO
-	mail-wi0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751985AbbGWHsr (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Thu, 23 Jul 2015 03:48:47 -0400
-Date: Thu, 23 Jul 2015 09:48:39 +0200
-From: Alexander Aring <alex.aring@gmail.com>
-Subject: Re: [RFC v2 3/4] 6lowpan: Add stateful compression support for iphc.c
-Message-ID: <20150723074835.GA18161@omega>
+Received: from mail.nordicsemi.no ([194.19.86.146]:21928 "EHLO
+	ironport01.nordicsemi.no" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752038AbbGWIUn (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Thu, 23 Jul 2015 04:20:43 -0400
+From: "Duda, Lukasz" <Lukasz.Duda@nordicsemi.no>
+Subject: RE: [RFC v2 3/4] 6lowpan: Add stateful compression support for
+ iphc.c
+Date: Thu, 23 Jul 2015 08:20:41 +0000
+Message-ID: <AB80DA35A7B64E4E98291794926897D9D1D31C02@mbx04.nvlsi.no>
 References: <1436788233-13960-1-git-send-email-lukasz.duda@nordicsemi.no>
  <1436788233-13960-4-git-send-email-lukasz.duda@nordicsemi.no>
+ <20150723074835.GA18161@omega>
+In-Reply-To: <20150723074835.GA18161@omega>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1436788233-13960-4-git-send-email-lukasz.duda@nordicsemi.no>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Lukasz Duda <lukasz.duda@nordicsemi.no>
-Cc: linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org, Glenn Ruben Bakke <glenn.ruben.bakke@nordicsemi.no>
+To: Alexander Aring <alex.aring@gmail.com>
+Cc: "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>, "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, "Bakke, Glenn Ruben" <Glenn.Ruben.Bakke@nordicsemi.no>
 
-On Mon, Jul 13, 2015 at 01:50:32PM +0200, Lukasz Duda wrote:
-...
->  		} else {
->  			pr_debug("dest address unicast %pI6c\n", &hdr->daddr);
->  			lowpan_push_hc_data(&hc_ptr, hdr->daddr.s6_addr, 16);
-> @@ -619,6 +774,9 @@ static int __init lowpan_module_init(void)
->  {
->  	lowpan_debugfs = debugfs_create_dir("6lowpan", NULL);
->  
-> +	/* Initialize stateful compression. */
-> +	lowpan_context_init();
-> +
-
-Error handling here, too. You need to change lowpan_context_init for
-returning return value from debugfs_create_file then.
-
-The rest will I review when I get it running. :-)
-
-- Alex
+SGkgQWxleCwNCg0KPiBPbiBNb24sIEp1bCAxMywgMjAxNSBhdCAwMTo1MDozMlBNICswMjAwLCBM
+dWthc3ogRHVkYSB3cm90ZToNCj4gLi4uDQo+ID4gIAkJfSBlbHNlIHsNCj4gPiAgCQkJcHJfZGVi
+dWcoImRlc3QgYWRkcmVzcyB1bmljYXN0ICVwSTZjXG4iLCAmaGRyLQ0KPiA+ZGFkZHIpOw0KPiA+
+ICAJCQlsb3dwYW5fcHVzaF9oY19kYXRhKCZoY19wdHIsIGhkci0+ZGFkZHIuczZfYWRkciwNCj4g
+MTYpOyBAQCAtNjE5LDYNCj4gPiArNzc0LDkgQEAgc3RhdGljIGludCBfX2luaXQgbG93cGFuX21v
+ZHVsZV9pbml0KHZvaWQpICB7DQo+ID4gIAlsb3dwYW5fZGVidWdmcyA9IGRlYnVnZnNfY3JlYXRl
+X2RpcigiNmxvd3BhbiIsIE5VTEwpOw0KPiA+DQo+ID4gKwkvKiBJbml0aWFsaXplIHN0YXRlZnVs
+IGNvbXByZXNzaW9uLiAqLw0KPiA+ICsJbG93cGFuX2NvbnRleHRfaW5pdCgpOw0KPiA+ICsNCj4g
+DQo+IEVycm9yIGhhbmRsaW5nIGhlcmUsIHRvby4gWW91IG5lZWQgdG8gY2hhbmdlIGxvd3Bhbl9j
+b250ZXh0X2luaXQgZm9yDQo+IHJldHVybmluZyByZXR1cm4gdmFsdWUgZnJvbSBkZWJ1Z2ZzX2Ny
+ZWF0ZV9maWxlIHRoZW4uDQo+IA0KPiBUaGUgcmVzdCB3aWxsIEkgcmV2aWV3IHdoZW4gSSBnZXQg
+aXQgcnVubmluZy4gOi0pDQo+IA0KPiAtIEFsZXgNCg0KVGhhbmtzIGZvciBjb21tZW50ISANCg0K
+SSBhbSBjZXJ0YWlubHkgZ29pbmcgdG8gYWRkIHRoaXMgY2hlY2sgb24gZGVidWdmc19jcmVhdGUu
+IFRoZSByZWFzb24gYmVpbmcgaXMgdGhhdCBJIHRyaWVkIHRvIGZpdCBpbnRvIC9uZXQvYmx1ZXRv
+b3RoIGNvZGUgcGFydCBhcw0KbXVjaCBhcyBJIGNhbiBhbmQgSSBkaWRuJ3QgZmluZCBzdWNoIGNo
+ZWNrcyB0aGVyZSA6KQ0KDQpSZWdhcmRzLA0KxYF1a2Fzeg0K
