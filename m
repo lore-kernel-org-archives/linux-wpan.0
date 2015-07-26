@@ -1,75 +1,95 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f175.google.com ([209.85.212.175]:35703 "EHLO
-	mail-wi0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755443AbbGZV1m (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Sun, 26 Jul 2015 17:27:42 -0400
-Received: by wibxm9 with SMTP id xm9so87944725wib.0
-        for <linux-wpan@vger.kernel.org>; Sun, 26 Jul 2015 14:27:41 -0700 (PDT)
-Received: from omega (p20030064A9060D45E2CB4EFFFE1BB546.dip0.t-ipconnect.de. [2003:64:a906:d45:e2cb:4eff:fe1b:b546])
-        by smtp.gmail.com with ESMTPSA id d17sm24357073wjs.32.2015.07.26.14.27.41
-        for <linux-wpan@vger.kernel.org>
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 26 Jul 2015 14:27:41 -0700 (PDT)
-Date: Sun, 26 Jul 2015 23:27:48 +0200
-From: Alexander Aring <alex.aring@gmail.com>
+Received: from mailgw1.uni-kl.de ([131.246.120.220]:54687 "EHLO
+	mailgw1.uni-kl.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754103AbbGZV6D (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Sun, 26 Jul 2015 17:58:03 -0400
+Received: from itwm2.itwm.fhg.de (itwm2.itwm.fhg.de [131.246.191.3])
+	by mailgw1.uni-kl.de (8.14.4/8.14.4/Debian-7) with ESMTP id t6QLvwCh021232
+	for <linux-wpan@vger.kernel.org>; Sun, 26 Jul 2015 23:57:59 +0200
+Message-ID: <fd3f0ed5d9348e8daefd1fd289a97bb2.squirrel@webmail.itwm.fhg.de>
+In-Reply-To: <1437945451-8093-3-git-send-email-alex.aring@gmail.com>
+References: <1437945451-8093-1-git-send-email-alex.aring@gmail.com>
+    <1437945451-8093-3-git-send-email-alex.aring@gmail.com>
+Date: Sun, 26 Jul 2015 23:57:57 +0200
 Subject: Re: [RFC bluetooth-next 2/4] at86rf230: use aret mode if ackreq is
  set while xmit
-Message-ID: <20150726212747.GA27366@omega>
-References: <1437945451-8093-1-git-send-email-alex.aring@gmail.com>
- <1437945451-8093-3-git-send-email-alex.aring@gmail.com>
+From: "Phoebe Buckheister" <phoebe.buckheister@itwm.fraunhofer.de>
+Reply-To: phoebe.buckheister@itwm.fraunhofer.de
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1437945451-8093-3-git-send-email-alex.aring@gmail.com>
+Content-Type: text/plain;charset=utf-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org
+To: Alexander Aring <alex.aring@gmail.com>
+Cc: linux-wpan@vger.kernel.org
 
-On Sun, Jul 26, 2015 at 11:17:29PM +0200, Alexander Aring wrote:
+On Sun, July 26, 2015 11:17 pm, Alexander Aring wrote:
 > This patch does a different aret mode handling. We will drop the
 > max_frame_retries "-1" value and check on the ack request bit while
 > xmit. If it's set we doing transmit in aret mode. If it's not set we
 > doing a transmit in normal tx mode.
-> 
+>
 > This allows a mixed aret and non aret mode while interface is up and
 > doesn't depends on the max_frame_retries value inside the mib.
-> 
+>
 > Signed-off-by: Alexander Aring <alex.aring@gmail.com>
 > ---
 >  drivers/net/ieee802154/at86rf230.c | 11 +++++++----
 >  1 file changed, 7 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/net/ieee802154/at86rf230.c b/drivers/net/ieee802154/at86rf230.c
+>
+> diff --git a/drivers/net/ieee802154/at86rf230.c
+> b/drivers/net/ieee802154/at86rf230.c
 > index f7bd9f3..3aac100 100644
 > --- a/drivers/net/ieee802154/at86rf230.c
 > +++ b/drivers/net/ieee802154/at86rf230.c
 > @@ -99,7 +99,6 @@ struct at86rf230_local {
->  
+>
 >  	bool tx_aret;
 >  	unsigned long cal_timeout;
 > -	s8 max_frame_retries;
 >  	bool is_tx;
 >  	bool is_tx_from_off;
 >  	u8 tx_retry;
-> @@ -900,10 +899,17 @@ at86rf230_xmit(struct ieee802154_hw *hw, struct sk_buff *skb)
+> @@ -900,10 +899,17 @@ at86rf230_xmit(struct ieee802154_hw *hw, struct
+> sk_buff *skb)
 >  {
 >  	struct at86rf230_local *lp = hw->priv;
 >  	struct at86rf230_state_change *ctx = &lp->tx;
 > +	__le16 fc;
->  
+>
 >  	lp->tx_skb = skb;
 >  	lp->tx_retry = 0;
->  
+>
 > +	fc = ieee802154_get_fc_from_skb(skb);
 > +	if (ieee802154_is_ackreq(fc))
 > +		lp->tx_aret = true;
 > +	else
 > +		lp->tx_aret = false;
+> +
 
-doh, I should use here:
+ieee802154_get_fc_from_skb returns bool, the if isn't necessary.
 
-lp->tx_aret = ieee802154_is_ackreq(fc);
+>  	/* After 5 minutes in PLL and the same frequency we run again the
+>  	 * calibration loops which is recommended by at86rf2xx datasheets.
+>  	 *
+> @@ -1267,9 +1273,6 @@ at86rf230_set_frame_retries(struct ieee802154_hw
+> *hw, s8 retries)
+>  	struct at86rf230_local *lp = hw->priv;
+>  	int rc = 0;
+>
+> -	lp->tx_aret = retries >= 0;
+> -	lp->max_frame_retries = retries;
+> -
+>  	if (retries >= 0)
+>  		rc = at86rf230_write_subreg(lp, SR_MAX_FRAME_RETRIES, retries);
+>
+> --
+> 2.4.6
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-wpan" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
 
-Anyway it's a RFC only and comments are welcome. ;-)
 
-- Alex
