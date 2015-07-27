@@ -1,71 +1,91 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f171.google.com ([209.85.212.171]:33155 "EHLO
-	mail-wi0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750891AbbG0NGN (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Mon, 27 Jul 2015 09:06:13 -0400
-Received: by wicmv11 with SMTP id mv11so138561704wic.0
-        for <linux-wpan@vger.kernel.org>; Mon, 27 Jul 2015 06:06:12 -0700 (PDT)
+Received: from mail-wi0-f180.google.com ([209.85.212.180]:33176 "EHLO
+	mail-wi0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751131AbbG0NGO (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Mon, 27 Jul 2015 09:06:14 -0400
+Received: by wicmv11 with SMTP id mv11so138562364wic.0
+        for <linux-wpan@vger.kernel.org>; Mon, 27 Jul 2015 06:06:13 -0700 (PDT)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [RFCv2 bluetooth-next 0/6] ieee802154: aret handling changes
-Date: Mon, 27 Jul 2015 15:06:13 +0200
-Message-Id: <1438002379-17294-1-git-send-email-alex.aring@gmail.com>
+Subject: [RFCv2 bluetooth-next 1/6] mac802154: cfg: remove test and set checks
+Date: Mon, 27 Jul 2015 15:06:14 +0200
+Message-Id: <1438002379-17294-2-git-send-email-alex.aring@gmail.com>
+In-Reply-To: <1438002379-17294-1-git-send-email-alex.aring@gmail.com>
+References: <1438002379-17294-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
 Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-Hi,
+This patch removes several checks if a value is really changed. This
+makes only sense if we have another layer call e.g. calling the
+driver_ops which is done by callbacks like "set_channel".
 
-this patch series contains a RFC for changing the max_frame_retries behaviour.
-The current behaviour is that we allow a range from -1 until 7 (802.15.4
-standard describes a range from 0 until 7 only). Nevertheless for historical
-reason we have the "-1" value, which describes no aret handling.
+For MAC settings which need to be set by phy registers (if the phy
+supports that handling) this is set by doing an interface up currently
+and are not direct driver_ops calls, so we remove the checks from these
+configuration callbacks.
 
-The point is when the ack request bit is set inside the mac header the
-transceiver need to handle the ack somehow, this is mostly the aret mode
-which is done by hardware. Instead to having this as mac setting which doesn't
-allow a change during interface up, we simple do this handling per frame
-indicated by the ack request bit.
+Suggested-by: Phoebe Buckheister <phoebe.buckheister@itwm.fraunhofer.de>
+Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+---
+ net/mac802154/cfg.c | 16 ----------------
+ 1 file changed, 16 deletions(-)
 
-Instead of max_frame_retries "-1" value which could be useful for making a
-default ack request bit handling if no information is given if it should be
-set or not, we have now the ack request default entry inside the mib.
-
-This could be useful for the 6LoWPAN stack which have this as default
-behaviour for data frames.
-
-- Alex
-
-changes since v2:
- - add patch "mac802154: cfg: remove test and set checks" because Phoebe
-   notice that in v1 and we did that at several other places. Makes only
-   sense on a followed another layer call like driverops.
- - remove if branch in "at86rf230: use aret mode if ackreq is set while xmit"
-   for check if aret handling is necessary.
- - add patch "at86rf230: remove max_frame_retries -1 check" because previous
-   patch removed the "-1" max_frame_retries handling.
-
-Alexander Aring (6):
-  mac802154: cfg: remove test and set checks
-  ieee802154: add helpers for frame control checks
-  at86rf230: use aret mode if ackreq is set while xmit
-  mac802154: change max_frame_retries behaviour
-  at86rf230: remove max_frame_retries -1 check
-  ieee802154: add ack request default handling
-
- drivers/net/ieee802154/at86rf230.c | 14 +++++---------
- include/linux/ieee802154.h         | 31 +++++++++++++++++++++++++++++++
- include/net/cfg802154.h            |  5 +++++
- include/net/nl802154.h             |  4 ++++
- net/ieee802154/6lowpan/tx.c        |  2 +-
- net/ieee802154/nl802154.c          | 33 +++++++++++++++++++++++++++++++++
- net/ieee802154/rdev-ops.h          | 13 +++++++++++++
- net/ieee802154/trace.h             | 19 +++++++++++++++++++
- net/mac802154/cfg.c                | 27 +++++++++++----------------
- net/mac802154/iface.c              |  3 +--
- net/mac802154/main.c               |  9 +++------
- 11 files changed, 126 insertions(+), 34 deletions(-)
-
+diff --git a/net/mac802154/cfg.c b/net/mac802154/cfg.c
+index f7ba51e..cecfcda 100644
+--- a/net/mac802154/cfg.c
++++ b/net/mac802154/cfg.c
+@@ -209,10 +209,6 @@ ieee802154_set_backoff_exponent(struct wpan_phy *wpan_phy,
+ {
+ 	ASSERT_RTNL();
+ 
+-	if (wpan_dev->min_be == min_be &&
+-	    wpan_dev->max_be == max_be)
+-		return 0;
+-
+ 	wpan_dev->min_be = min_be;
+ 	wpan_dev->max_be = max_be;
+ 	return 0;
+@@ -224,9 +220,6 @@ ieee802154_set_short_addr(struct wpan_phy *wpan_phy, struct wpan_dev *wpan_dev,
+ {
+ 	ASSERT_RTNL();
+ 
+-	if (wpan_dev->short_addr == short_addr)
+-		return 0;
+-
+ 	wpan_dev->short_addr = short_addr;
+ 	return 0;
+ }
+@@ -238,9 +231,6 @@ ieee802154_set_max_csma_backoffs(struct wpan_phy *wpan_phy,
+ {
+ 	ASSERT_RTNL();
+ 
+-	if (wpan_dev->csma_retries == max_csma_backoffs)
+-		return 0;
+-
+ 	wpan_dev->csma_retries = max_csma_backoffs;
+ 	return 0;
+ }
+@@ -252,9 +242,6 @@ ieee802154_set_max_frame_retries(struct wpan_phy *wpan_phy,
+ {
+ 	ASSERT_RTNL();
+ 
+-	if (wpan_dev->frame_retries == max_frame_retries)
+-		return 0;
+-
+ 	wpan_dev->frame_retries = max_frame_retries;
+ 	return 0;
+ }
+@@ -265,9 +252,6 @@ ieee802154_set_lbt_mode(struct wpan_phy *wpan_phy, struct wpan_dev *wpan_dev,
+ {
+ 	ASSERT_RTNL();
+ 
+-	if (wpan_dev->lbt == mode)
+-		return 0;
+-
+ 	wpan_dev->lbt = mode;
+ 	return 0;
+ }
 -- 
 2.4.6
 
