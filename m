@@ -1,14 +1,14 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f180.google.com ([209.85.212.180]:33176 "EHLO
-	mail-wi0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751131AbbG0NGO (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Mon, 27 Jul 2015 09:06:14 -0400
-Received: by wicmv11 with SMTP id mv11so138562364wic.0
-        for <linux-wpan@vger.kernel.org>; Mon, 27 Jul 2015 06:06:13 -0700 (PDT)
+Received: from mail-wi0-f169.google.com ([209.85.212.169]:38651 "EHLO
+	mail-wi0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750931AbbG0NGP (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Mon, 27 Jul 2015 09:06:15 -0400
+Received: by wibxm9 with SMTP id xm9so115790484wib.1
+        for <linux-wpan@vger.kernel.org>; Mon, 27 Jul 2015 06:06:14 -0700 (PDT)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [RFCv2 bluetooth-next 1/6] mac802154: cfg: remove test and set checks
-Date: Mon, 27 Jul 2015 15:06:14 +0200
-Message-Id: <1438002379-17294-2-git-send-email-alex.aring@gmail.com>
+Subject: [RFCv2 bluetooth-next 2/6] ieee802154: add helpers for frame control checks
+Date: Mon, 27 Jul 2015 15:06:15 +0200
+Message-Id: <1438002379-17294-3-git-send-email-alex.aring@gmail.com>
 In-Reply-To: <1438002379-17294-1-git-send-email-alex.aring@gmail.com>
 References: <1438002379-17294-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
@@ -16,76 +16,68 @@ List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
 Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-This patch removes several checks if a value is really changed. This
-makes only sense if we have another layer call e.g. calling the
-driver_ops which is done by callbacks like "set_channel".
+This patch introduce two static inline functions. The first to get the
+frame control field from an sk_buff. The second is for checking on the
+acknowledgment request bit on the frame control field. Later we can
+introduce more functions to check on the frame control fields.
 
-For MAC settings which need to be set by phy registers (if the phy
-supports that handling) this is set by doing an interface up currently
-and are not direct driver_ops calls, so we remove the checks from these
-configuration callbacks.
+These will deprecate the current behaviour which requires a
+host-byteorder conversion and manually bit handling.
 
-Suggested-by: Phoebe Buckheister <phoebe.buckheister@itwm.fraunhofer.de>
 Signed-off-by: Alexander Aring <alex.aring@gmail.com>
 ---
- net/mac802154/cfg.c | 16 ----------------
- 1 file changed, 16 deletions(-)
+ include/linux/ieee802154.h | 31 +++++++++++++++++++++++++++++++
+ 1 file changed, 31 insertions(+)
 
-diff --git a/net/mac802154/cfg.c b/net/mac802154/cfg.c
-index f7ba51e..cecfcda 100644
---- a/net/mac802154/cfg.c
-+++ b/net/mac802154/cfg.c
-@@ -209,10 +209,6 @@ ieee802154_set_backoff_exponent(struct wpan_phy *wpan_phy,
- {
- 	ASSERT_RTNL();
+diff --git a/include/linux/ieee802154.h b/include/linux/ieee802154.h
+index 1dc1f4e..a0b16a5 100644
+--- a/include/linux/ieee802154.h
++++ b/include/linux/ieee802154.h
+@@ -25,6 +25,7 @@
  
--	if (wpan_dev->min_be == min_be &&
--	    wpan_dev->max_be == max_be)
--		return 0;
--
- 	wpan_dev->min_be = min_be;
- 	wpan_dev->max_be = max_be;
- 	return 0;
-@@ -224,9 +220,6 @@ ieee802154_set_short_addr(struct wpan_phy *wpan_phy, struct wpan_dev *wpan_dev,
- {
- 	ASSERT_RTNL();
+ #include <linux/types.h>
+ #include <linux/random.h>
++#include <linux/skbuff.h>
+ #include <asm/byteorder.h>
  
--	if (wpan_dev->short_addr == short_addr)
--		return 0;
--
- 	wpan_dev->short_addr = short_addr;
- 	return 0;
- }
-@@ -238,9 +231,6 @@ ieee802154_set_max_csma_backoffs(struct wpan_phy *wpan_phy,
- {
- 	ASSERT_RTNL();
+ #define IEEE802154_MTU			127
+@@ -205,6 +206,36 @@ enum {
+ 	IEEE802154_SCAN_IN_PROGRESS = 0xfc,
+ };
  
--	if (wpan_dev->csma_retries == max_csma_backoffs)
--		return 0;
--
- 	wpan_dev->csma_retries = max_csma_backoffs;
- 	return 0;
- }
-@@ -252,9 +242,6 @@ ieee802154_set_max_frame_retries(struct wpan_phy *wpan_phy,
- {
- 	ASSERT_RTNL();
- 
--	if (wpan_dev->frame_retries == max_frame_retries)
--		return 0;
--
- 	wpan_dev->frame_retries = max_frame_retries;
- 	return 0;
- }
-@@ -265,9 +252,6 @@ ieee802154_set_lbt_mode(struct wpan_phy *wpan_phy, struct wpan_dev *wpan_dev,
- {
- 	ASSERT_RTNL();
- 
--	if (wpan_dev->lbt == mode)
--		return 0;
--
- 	wpan_dev->lbt = mode;
- 	return 0;
- }
++/* frame control handling */
++#define IEEE802154_FCTL_ACKREQ	0x0020
++
++/**
++ * ieee802154_is_ackreq - check if acknowledgment request bit is set
++ * @fc: frame control bytes in little-endian byteorder
++ */
++static inline bool ieee802154_is_ackreq(__le16 fc)
++{
++	return (fc & cpu_to_le16(IEEE802154_FCTL_ACKREQ));
++}
++
++/**
++ * ieee802154_get_fc_from_skb - get the frame control field from an skb
++ * @skb: skb where the frame control field will be get from
++ */
++static inline __le16 ieee802154_get_fc_from_skb(const struct sk_buff *skb)
++{
++	__le16 fc;
++
++	/* return some invalid fc on failure */
++	if (unlikely(skb->mac_len < 2)) {
++		WARN_ON(1);
++		return cpu_to_le16(0);
++	}
++
++	memcpy(&fc, skb_mac_header(skb), sizeof(fc));
++	return fc;
++}
++
+ /**
+  * ieee802154_is_valid_psdu_len - check if psdu len is valid
+  * available lengths:
 -- 
 2.4.6
 
