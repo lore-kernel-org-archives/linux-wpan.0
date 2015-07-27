@@ -1,15 +1,15 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f174.google.com ([209.85.212.174]:38252 "EHLO
-	mail-wi0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753428AbbG0QfH (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Mon, 27 Jul 2015 12:35:07 -0400
-Received: by wibxm9 with SMTP id xm9so124865619wib.1
-        for <linux-wpan@vger.kernel.org>; Mon, 27 Jul 2015 09:35:05 -0700 (PDT)
-Date: Mon, 27 Jul 2015 18:35:13 +0200
+Received: from mail-wi0-f182.google.com ([209.85.212.182]:38888 "EHLO
+	mail-wi0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753876AbbG0R2H (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Mon, 27 Jul 2015 13:28:07 -0400
+Received: by wibxm9 with SMTP id xm9so126800345wib.1
+        for <linux-wpan@vger.kernel.org>; Mon, 27 Jul 2015 10:28:06 -0700 (PDT)
+Date: Mon, 27 Jul 2015 19:28:17 +0200
 From: Alexander Aring <alex.aring@gmail.com>
 Subject: Re: What is SAM value? "ieee802154 phy0 wpan0: SAM value 0x3 not
  supported"
-Message-ID: <20150727163509.GA794@omega>
+Message-ID: <20150727172816.GB794@omega>
 References: <20150727102121.GC18090@omega>
  <CAPpUg6PnmbCitPQTL9YsJqPptnykRn_Nq-xbCYk1yegGwDToMQ@mail.gmail.com>
  <20150727103822.GD18090@omega>
@@ -29,28 +29,30 @@ List-ID: <linux-wpan.vger.kernel.org>
 To: Baptiste Clenet <bapclenet@gmail.com>
 Cc: Stefan Schmidt <stefan@osg.samsung.com>, linux-wpan@vger.kernel.org
 
-Hi,
+On Mon, Jul 27, 2015 at 05:55:27PM +0200, Baptiste Clenet wrote:
+> 2015-07-27 17:13 GMT+02:00 Baptiste Clenet <bapclenet@gmail.com>:
+> >>> Then forget that and make some at86rf230 driver debug messages. See
+> >>> "print_hex_dump" [0]. Add this add skb->data in at86rf230_xmit and
+> >>> at86rf230_rx_read_frame_complete (but after the skb is filled with data,
+> >>> otherwise it makes no sense).
+> >>>
+> >>> This will allow us to see what's the lowest layer is. If the transmit
+> >>> side looks correct, but receive side looks weird then I suppose
+> >>> something is wrong again with your spi setup.
+> >>>
+> >>> The reason is that we get the lowest dump of the transmitted and
+> >>> received buffer and nobody touched that buffer then.
+> >
+> > I dump the packet in at86rf230_xmit and
+> > at86rf230_rx_read_frame_complete (just before
+> > ieee802154_rx_irqsafe(lp->hw, skb, lqi)). This is wireshark analyse of
+> > the two packets. The first one is correct and comes from the sender,
+> > the second is from the receiver (I manually created the hex dump file)
+> > which is wrong! So something seem to occur when the frame goes to the
+> > transceiver.
 
-please don't send me tcpdumps from interfaces. Instrument the driver,
-which is the lowest level which we have, for dumping the framebuffer at
-before willing at xmit function and on receiving. Don't know exactly
-the function inside at86rf230 driver, I said that previously.
-
-If the transmitted frame and received frame is different, then I don't
-know what's going on there and can't help you. It seems for me that your
-spi functionality is broken.
-
-The reason why you should not dump the wpan/lowpan interface is that the
-data goes through the layers and I will detect if the raw data which
-should be transmitted is correctly received. If not -> something weird
-goes wrong. And again, I would not trust the wpan/lowpan dumps because
-it will goes through layers which "could maybe" manipulate the raw data.
-
-My consideration was look if the "raw" data is correct, because we don't
-do anything which "raw" data. If you send "0xabcd" as frame to some node
-and the receiving node receives "0xefgh" then something goes wrong with
-the transceiver and I don't know why. So please capture the raw data
-with the printk_hex_dump functionality and do a diff afterwards. On
-transmit and receiving side.
+ah, sorry I misunderstood you. So you have capture the raw data for
+transmit and receiving and it differs. Then I have still no idea what's
+wrong on your side. :-)
 
 - Alex
