@@ -1,12 +1,12 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-la0-f41.google.com ([209.85.215.41]:34696 "EHLO
-	mail-la0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753510AbbG0MpH (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Mon, 27 Jul 2015 08:45:07 -0400
-Received: by lafd3 with SMTP id d3so37829050laf.1
-        for <linux-wpan@vger.kernel.org>; Mon, 27 Jul 2015 05:45:05 -0700 (PDT)
+Received: from mail-la0-f43.google.com ([209.85.215.43]:35365 "EHLO
+	mail-la0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753256AbbG0PNg (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Mon, 27 Jul 2015 11:13:36 -0400
+Received: by lahh5 with SMTP id h5so50998792lah.2
+        for <linux-wpan@vger.kernel.org>; Mon, 27 Jul 2015 08:13:35 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20150727124220.GF18090@omega>
+In-Reply-To: <CAPpUg6MDArNF6Rpdv+XgOngFupru+RnEe5ujLgUuMejOmL3Y_w@mail.gmail.com>
 References: <CAPpUg6PO+xLkZLBPp7WCgBoBx78uocJ_WUBez97fbqfiMNMe2w@mail.gmail.com>
 	<CAPpUg6Pzyptjv-5ygaz8TqaZMiASKr7PR2j6mxt1SOuKs9bhsw@mail.gmail.com>
 	<20150727093018.GB18090@omega>
@@ -18,8 +18,9 @@ References: <CAPpUg6PO+xLkZLBPp7WCgBoBx78uocJ_WUBez97fbqfiMNMe2w@mail.gmail.com>
 	<20150727113054.GE18090@omega>
 	<CAPpUg6OLEBfrMx6mA8ZptM-ohqhgbxS-V151hMP4O=61fQMTCw@mail.gmail.com>
 	<20150727124220.GF18090@omega>
-Date: Mon, 27 Jul 2015 14:45:05 +0200
-Message-ID: <CAPpUg6MDArNF6Rpdv+XgOngFupru+RnEe5ujLgUuMejOmL3Y_w@mail.gmail.com>
+	<CAPpUg6MDArNF6Rpdv+XgOngFupru+RnEe5ujLgUuMejOmL3Y_w@mail.gmail.com>
+Date: Mon, 27 Jul 2015 17:13:34 +0200
+Message-ID: <CAPpUg6OZaGXCXi-K8vW01jtrYbD1ZSHdWCK+FSuAKr-WgQWrEg@mail.gmail.com>
 Subject: Re: What is SAM value? "ieee802154 phy0 wpan0: SAM value 0x3 not supported"
 From: Baptiste Clenet <bapclenet@gmail.com>
 Content-Type: text/plain; charset=UTF-8
@@ -28,107 +29,205 @@ List-ID: <linux-wpan.vger.kernel.org>
 To: Alexander Aring <alex.aring@gmail.com>
 Cc: Stefan Schmidt <stefan@osg.samsung.com>, linux-wpan@vger.kernel.org
 
-2015-07-27 14:42 GMT+02:00 Alexander Aring <alex.aring@gmail.com>:
-> On Mon, Jul 27, 2015 at 02:29:09PM +0200, Baptiste Clenet wrote:
->> 2015-07-27 13:30 GMT+02:00 Alexander Aring <alex.aring@gmail.com>:
->> > On Mon, Jul 27, 2015 at 12:52:42PM +0200, Baptiste Clenet wrote:
->> >> 2015-07-27 12:38 GMT+02:00 Alexander Aring <alex.aring@gmail.com>:
->> >> > On Mon, Jul 27, 2015 at 12:31:28PM +0200, Baptiste Clenet wrote:
->> >> >> 2015-07-27 12:21 GMT+02:00 Alexander Aring <alex.aring@gmail.com>:
->> >> >> > On Mon, Jul 27, 2015 at 12:08:18PM +0200, Baptiste Clenet wrote:
->> >> >> > ...
->> >> >> >>
->> >> >> >> Receiving side:
->> >> >> >> [  176.921637] CID flag is set, increase header with one
->> >> >> >> [  176.931640] NH flag is set, next header carried inline: 02
->> >> >> >> [  176.942502] SAC bit is set. Handle context based source address.
->> >> >> >> [  176.954397]
->> >> >> >> [  176.957352] ieee802154 phy0 wpan0: SAM value 0x3 not supported
->> >> >> >>
->> >> >> >
->> >> >> > Yes this is not what it was transmitted before from the other node.
->> >> >> > That's why I would ask for some sniffing device, somewhere in the lower
->> >> >> > layers mac or phy it will fill your frame with garbage.
->> >> >> >
->> >> >> > I can't tell you now if it's the transmitted node or the receiving node.
->> >> >> > You need to debug it there.
->> >> >> Yeah, I agree.
->> >> >>
->> >> >> >
->> >> >> > To ensure the transmitted node don't send garbage I would like to check
->> >> >> > it with some sniffer device. If you see garbage on the sniffer device
->> >> >> > then it's something wrong with the transmitting.
->> >> >> Ok, but I did sniffing with monitor0 on the receiver as I mentioned earlier.
->> >> >> How may I sniff a packet ont the sender? Because I can't set up
->> >> >> lowpan0 on top of monitor0.
->> >> >> How may I sniff on lower layers?
->> >> >>
->> >> >
->> >> > In short:
->> >> >
->> >> > Monitor is just for sniffing, we don't parse any payload data on it. You
->> >> > can't create a lowpan interface on it, please use the L2 interface
->> >> > (wpan0). See [0], you maybe need a third node which running as monitor.
->> >>
->> >> I don't think I've got it, you want me to set up a network of 3 nodes with:
->> >> 1            2             3
->> >> sender   receiver    receiver
->> >> wpan0    wpan0      monitor0
->> >>
->> >> But I will see exactly the same things as earlier.
->> >
->> > You can save the dump (e.g. tshark I think with -w $FILE) somewhere or
->> > doing pipe via ssh, refer [0].
->> OpenWRT doesn't provide tshark.
->> I could use tcpdump instead but there is something I still don't get,
->> sorry. How can I sniff a packet I send? (Sniffing on the sender). If I
->> well-understand, to sniff I need to use monitor0 interface but when I
->> use it I can't use lowpan0 so I can't send ICMP packet and I can't
->> sniff.
+>> Then forget that and make some at86rf230 driver debug messages. See
+>> "print_hex_dump" [0]. Add this add skb->data in at86rf230_xmit and
+>> at86rf230_rx_read_frame_complete (but after the skb is filled with data,
+>> otherwise it makes no sense).
 >>
->
-> This is correct. The transceiver goes into promiscuous mode and in
-> short: you cannot operate as node in the same time then.
->
-> Then forget that and make some at86rf230 driver debug messages. See
-> "print_hex_dump" [0]. Add this add skb->data in at86rf230_xmit and
-> at86rf230_rx_read_frame_complete (but after the skb is filled with data,
-> otherwise it makes no sense).
->
-> This will allow us to see what's the lowest layer is. If the transmit
-> side looks correct, but receive side looks weird then I suppose
-> something is wrong again with your spi setup.
->
-> The reason is that we get the lowest dump of the transmitted and
-> received buffer and nobody touched that buffer then.
->
->> >
->> > I don't know what "But I will see exactly the same things as earlier"
->> it means that the receiver will receive the same things as earlier and
->> I have already given to you the details about the message that
->> Wireshark gave me (which comes from the receiver).
->
-> Now with these sentence it looks like what I said above. The transmit
-> buffer looks correct, but the receive buffer looks completely different.
->
-> You cannot debug in upper layers and then say "It's the same whats was
-> on the air". Please confirm this by debugging the driver layer and
-> dumping the frame buffer on receiving and transmitting, which is the
-> lowest layer which we can debug. (Maybe we should add some debug switch
-> for that in at86rf230 driver).
->
-> If transmit looks correct and the receiving buffer looks completely
-> different than what was transmitted before. Then this is not an issue
-> with mac802154/6LoWPAN stack. Something is broken then with spi/cable
-> connectors/whatever I don't know.
->
-Thank you for the clarification :-). I have the feeling that spi does
-some magic again...
+>> This will allow us to see what's the lowest layer is. If the transmit
+>> side looks correct, but receive side looks weird then I suppose
+>> something is wrong again with your spi setup.
+>>
+>> The reason is that we get the lowest dump of the transmitted and
+>> received buffer and nobody touched that buffer then.
 
-> - Alex
->
-> [0] http://lxr.free-electrons.com/source/include/linux/printk.h#L429
+I dump the packet in at86rf230_xmit and
+at86rf230_rx_read_frame_complete (just before
+ieee802154_rx_irqsafe(lp->hw, skb, lqi)). This is wireshark analyse of
+the two packets. The first one is correct and comes from the sender,
+the second is from the receiver (I manually created the hex dump file)
+which is wrong! So something seem to occur when the frame goes to the
+transceiver.
+Those dump was created with :
+root@OpenWrt:/#ieee802154_rx_irqsafe(lp->hw, skb, lqi);
 
+No.     Time           Source                Destination
+Protocol Length Info
+      1 0.000000000    fe80::335d:7cf9:67f5:1017 ff02::1:ff3e:c7f1
+ICMPv6   64     Neighbor Solicitation for fe80::a8af:ac69:e53e:c7f1
+from 31:5d:7c:f9:67:f5:10:17
+
+Frame 1: 64 bytes on wire (512 bits), 64 bytes captured (512 bits) on
+interface 0
+    Interface id: 0
+    Packet flags: 0x00000000
+        .... .... .... .... .... .... .... ..00 = Direction: Not
+available (0x00000000)
+        .... .... .... .... .... .... ...0 00.. = Reception type: Not
+specified (0)
+        .... .... .... .... .... ...0 000. .... = FCS length: 0
+        .... .... .... .... 0000 000. .... .... = Reserved: 0
+        .... ...0 .... .... .... .... .... .... = CRC error: Not set
+        .... ..0. .... .... .... .... .... .... = Packet too long error: Not set
+        .... .0.. .... .... .... .... .... .... = Packet too short
+error: Not set
+        .... 0... .... .... .... .... .... .... = Wrong interframe gap
+error: Not set
+        ...0 .... .... .... .... .... .... .... = Unaligned frame error: Not set
+        ..0. .... .... .... .... .... .... .... = Start frame
+delimiter error: Not set
+        .0.. .... .... .... .... .... .... .... = Preamble error: Not set
+        0... .... .... .... .... .... .... .... = Symbol error: Not set
+    Encapsulation type: IEEE 802.15.4 Wireless PAN with FCS not present (127)
+    Arrival Time: Jul 25, 2015 00:54:17.000000000 CEST
+    [Time shift for this packet: 0.000000000 seconds]
+    Epoch Time: 1437778457.000000000 seconds
+    [Time delta from previous captured frame: 0.000000000 seconds]
+    [Time delta from previous displayed frame: 0.000000000 seconds]
+    [Time since reference or first frame: 0.000000000 seconds]
+    Frame Number: 1
+    Frame Length: 64 bytes (512 bits)
+    Capture Length: 64 bytes (512 bits)
+    [Frame is marked: False]
+    [Frame is ignored: False]
+    [Protocols in frame: wpan:6lowpan:ipv6:icmpv6]
+    [Number of per-protocol-data: 1]
+    [IEEE 802.15.4 Low-Rate Wireless PAN, key 0]
+    [Coloring Rule Name: ICMP]
+    [Coloring Rule String: icmp || icmpv6]
+
+IEEE 802.15.4 Data, Dst: Broadcast, Src: 31:5d:7cf9:67:f510:17
+    Frame Control Field: Data (0xc841)
+        .... .... .... .001 = Frame Type: Data (0x0001)
+        .... .... .... 0... = Security Enabled: False
+        .... .... ...0 .... = Frame Pending: False
+        .... .... ..0. .... = Acknowledge Request: False
+        .... .... .1.. .... = Intra-PAN: True
+        .... 10.. .... .... = Destination Addressing Mode: Short/16-bit (0x0002)
+        ..00 .... .... .... = Frame Version: 0
+        11.. .... .... .... = Source Addressing Mode: Long/64-bit (0x0003)
+    Sequence Number: 212
+    Destination PAN: 0xbeef
+    Destination: 0xffff
+    Extended Source: 31:5d:7cf9:67:f510:17 (31:5d:7c:f9:67:f5:10:17)
+
+6LoWPAN
+    IPHC Header
+        011. .... = Pattern: IP header compression (0x03)
+        ...1 1... .... .... = Traffic class and flow label: Version,
+traffic class, and flow label compressed (0x0003)
+        .... .0.. .... .... = Next header: Inline
+        .... ..11 .... .... = Hop limit: 255 (0x0003)
+        .... .... 0... .... = Context identifier extension: False
+        .... .... .0.. .... = Source address compression: Stateless
+        .... .... ..11 .... = Source address mode: Compressed (0x0003)
+        .... .... .... 1... = Multicast address compression: True
+        .... .... .... .0.. = Destination address compression: Stateless
+        .... .... .... ..01 = Destination address mode: 48-bits inline (0x0001)
+        [Source context: fe80:: (fe80::)]
+        [Destination context: fe80:: (fe80::)]
+    Next header: ICMPv6 (0x3a)
+    Source: fe80::335d:7cf9:67f5:1017 (fe80::335d:7cf9:67f5:1017)
+    Destination: ff02::1:ff3e:c7f1 (ff02::1:ff3e:c7f1)
+
+Internet Protocol Version 6, Src: fe80::335d:7cf9:67f5:1017
+(fe80::335d:7cf9:67f5:1017), Dst: ff02::1:ff3e:c7f1
+(ff02::1:ff3e:c7f1)
+    0110 .... = Version: 6
+        [0110 .... = This field makes the filter "ip.version == 6" possible: 6]
+    .... 0000 0000 .... .... .... .... .... = Traffic class: 0x00000000
+        .... 0000 00.. .... .... .... .... .... = Differentiated
+Services Field: Default (0x00000000)
+        .... .... ..0. .... .... .... .... .... = ECN-Capable
+Transport (ECT): Not set
+        .... .... ...0 .... .... .... .... .... = ECN-CE: Not set
+    .... .... .... 0000 0000 0000 0000 0000 = Flowlabel: 0x00000000
+    Payload length: 40
+    Next header: ICMPv6 (58)
+    Hop limit: 255
+    Source: fe80::335d:7cf9:67f5:1017 (fe80::335d:7cf9:67f5:1017)
+    Destination: ff02::1:ff3e:c7f1 (ff02::1:ff3e:c7f1)
+    [Source GeoIP: Unknown]
+    [Destination GeoIP: Unknown]
+
+Internet Control Message Protocol v6
+    Type: Neighbor Solicitation (135)
+    Code: 0
+    Checksum: 0x6354 [correct]
+    Reserved: 00000000
+    Target Address: fe80::a8af:ac69:e53e:c7f1 (fe80::a8af:ac69:e53e:c7f1)
+    ICMPv6 Option (Source link-layer address : 31:5d:7c:f9:67:f5:10:17)
+        Type: Source link-layer address (1)
+        Length: 2 (16 bytes)
+        Link-layer address: 31:5d:7cf9:67:f510:17 (31:5d:7c:f9:67:f5:10:17)
+        Padding
+
+
+
+No.     Time           Source                Destination
+Protocol Length Info
+      2 0.000001000    f1:5d:7c:f9:e7:f5:10:f7 Broadcast
+IEEE 802.15.4 66     Data, Dst: Broadcast, Src: f1:5d:7cf9:e7:f510:f7
+
+Frame 2: 66 bytes on wire (528 bits), 66 bytes captured (528 bits) on
+interface 0
+    Interface id: 0
+    Packet flags: 0x00000000
+        .... .... .... .... .... .... .... ..00 = Direction: Not
+available (0x00000000)
+        .... .... .... .... .... .... ...0 00.. = Reception type: Not
+specified (0)
+        .... .... .... .... .... ...0 000. .... = FCS length: 0
+        .... .... .... .... 0000 000. .... .... = Reserved: 0
+        .... ...0 .... .... .... .... .... .... = CRC error: Not set
+        .... ..0. .... .... .... .... .... .... = Packet too long error: Not set
+        .... .0.. .... .... .... .... .... .... = Packet too short
+error: Not set
+        .... 0... .... .... .... .... .... .... = Wrong interframe gap
+error: Not set
+        ...0 .... .... .... .... .... .... .... = Unaligned frame error: Not set
+        ..0. .... .... .... .... .... .... .... = Start frame
+delimiter error: Not set
+        .0.. .... .... .... .... .... .... .... = Preamble error: Not set
+        0... .... .... .... .... .... .... .... = Symbol error: Not set
+    Encapsulation type: IEEE 802.15.4 Wireless PAN with FCS not present (127)
+    Arrival Time: Jul 25, 2015 00:54:17.000001000 CEST
+    [Time shift for this packet: 0.000000000 seconds]
+    Epoch Time: 1437778457.000001000 seconds
+    [Time delta from previous captured frame: 0.000001000 seconds]
+    [Time delta from previous displayed frame: 0.000001000 seconds]
+    [Time since reference or first frame: 0.000001000 seconds]
+    Frame Number: 2
+    Frame Length: 66 bytes (528 bits)
+    Capture Length: 66 bytes (528 bits)
+    [Frame is marked: False]
+    [Frame is ignored: False]
+    [Protocols in frame: wpan:data]
+    [Number of per-protocol-data: 1]
+    [IEEE 802.15.4 Low-Rate Wireless PAN, key 0]
+
+IEEE 802.15.4 Data, Dst: Broadcast, Src: f1:5d:7cf9:e7:f510:f7
+    Frame Control Field: Data (0xc841)
+        .... .... .... .001 = Frame Type: Data (0x0001)
+        .... .... .... 0... = Security Enabled: False
+        .... .... ...0 .... = Frame Pending: False
+        .... .... ..0. .... = Acknowledge Request: False
+        .... .... .1.. .... = Intra-PAN: True
+        .... 10.. .... .... = Destination Addressing Mode: Short/16-bit (0x0002)
+        ..00 .... .... .... = Frame Version: 0
+        11.. .... .... .... = Source Addressing Mode: Long/64-bit (0x0003)
+    Sequence Number: 252
+    Destination PAN: 0xbeef
+    Destination: 0xffff
+    Extended Source: f1:5d:7cf9:e7:f510:f7 (f1:5d:7c:f9:e7:f5:10:f7)
+Data (51 bytes)
+
+0000  fb f9 3a 02 01 ff 3e c7 f1 87 00 63 54 00 00 00   ..:...>....cT...
+0010  00 fe 80 00 00 00 00 00 00 a8 af ac 69 e5 3e c7   ............i.>.
+0020  f1 ff 02 31 dd 7c f9 e7 f5 10 17 00 00 00 00 00   ...1.|..........
+0030  00 5c 4c                                          .\L
+    Data: fbf93a0201ff3ec7f18700635400000000fe800000000000...
+    [Length: 51]
 
 
 -- 
