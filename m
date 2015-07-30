@@ -1,54 +1,35 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from tuna.sandelman.ca ([209.87.249.19]:40094 "EHLO
-	tuna.sandelman.ca" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932257AbbGUQhc (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Tue, 21 Jul 2015 12:37:32 -0400
-From: Michael Richardson <mcr@sandelman.ca>
+Received: from lists.s-osg.org ([54.187.51.154]:54972 "EHLO lists.s-osg.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752574AbbG3OiA (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+	Thu, 30 Jul 2015 10:38:00 -0400
 Subject: Re: testing and building for RPI
-In-Reply-To: <55517906.2060204@gmail.com>
 References: <19096.1431373298@sandelman.ca> <55517906.2060204@gmail.com>
-Date: Tue, 21 Jul 2015 12:37:30 -0400
-Message-ID: <12393.1437496650@sandelman.ca>
+ <12393.1437496650@sandelman.ca>
+From: Stefan Schmidt <stefan@osg.samsung.com>
+Message-ID: <55BA36C3.7000202@osg.samsung.com>
+Date: Thu, 30 Jul 2015 16:37:55 +0200
+MIME-Version: 1.0
+In-Reply-To: <12393.1437496650@sandelman.ca>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Varka Bhadram <varkabhadram@gmail.com>
+To: Michael Richardson <mcr@sandelman.ca>
 Cc: linux-wpan@vger.kernel.org, unstrung-hackers <unstrung-hackers@lists.sandelman.ca>
 
+Hello.
 
-Varka Bhadram <varkabhadram@gmail.com> wrote:
-    > You can directly use linux-wpan-next tree directly, which has the basic
-    > support for RPI. No need to rebase it on rpi kernel.
+On 21/07/15 18:37, Michael Richardson wrote:
+> {BTW: I will be bringing this code base to the ETSI 6lo plugfest in Yokohama
+> in November}
 
-    > Please see the blog: https://honk.sigxcpu.org/piki/hw/rpi6lowpan/
+Really nice to hear that. Is there already a test spec or at least 
+planned what will be covered?
+I guess that would be at IETF 94? https://www.ietf.org/meeting/94/index.html
 
-I finally got back to working on this.
-Some minor edits:
+I would be interested in the results when running running linux-wpan 
+against other implementations.
 
-you copy the kernel to the name rpi.img:
-    scp bluetooth-next/arch/arm/boot/zImage ${TFTP_IP}:/tftpboot/rpi.img
-but you tell the system to load zImage:
-    dhcp ${kernel_addr_r} zImage
-
-According to the manual, I can take my image from a different machine than
-the dhcp server:
-
-U-Boot> dhcp ${kernel_addr_r} 172.30.2.231:zImage
-U-Boot> tftp ${fdt_addr_r} 172.30.2.231:${fdtfile}
-U-Boot> bootz ${kernel_addr_r} - ${fdt_addr_r}
-Bad Linux ARM zImage magic!
-
-I'm still debugging what's going on...
-I think the dhcp did not work correctly, as a md of the ${kernel_addr_r}
-does not match a hexdump of the zImage that I built.
-
-%file arch/arm/boot/zImage
-arch/arm/boot/zImage: Linux kernel ARM boot executable zImage (little-endian)
-
-{BTW: I will be bringing this code base to the ETSI 6lo plugfest in Yokohama
-in November}
-
---
-]               Never tell me the odds!                 | ipv6 mesh networks [
-]   Michael Richardson, Sandelman Software Works        | network architect  [
-]     mcr@sandelman.ca  http://www.sandelman.ca/        |   ruby on rails    [
-
+regards
+Stefan Schmidt
