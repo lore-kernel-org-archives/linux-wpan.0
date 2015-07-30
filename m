@@ -1,139 +1,75 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f178.google.com ([209.85.212.178]:35336 "EHLO
-	mail-wi0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751342AbbGaMiG (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Fri, 31 Jul 2015 08:38:06 -0400
+Received: from mail-wi0-f173.google.com ([209.85.212.173]:35356 "EHLO
+	mail-wi0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754325AbbG3I5J (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Thu, 30 Jul 2015 04:57:09 -0400
+Received: by wibxm9 with SMTP id xm9so234779555wib.0
+        for <linux-wpan@vger.kernel.org>; Thu, 30 Jul 2015 01:57:07 -0700 (PDT)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [RFCv2 bluetooth-next 2/2] 6lowpan: add generic 6lowpan netdev private data
-Date: Fri, 31 Jul 2015 14:38:08 +0200
-Message-Id: <1438346288-14546-3-git-send-email-alex.aring@gmail.com>
-In-Reply-To: <1438346288-14546-1-git-send-email-alex.aring@gmail.com>
-References: <1438346288-14546-1-git-send-email-alex.aring@gmail.com>
+Subject: [RFCv3 bluetooth-next 0/6] ieee802154: aret handling changes
+Date: Thu, 30 Jul 2015 10:55:36 +0200
+Message-Id: <1438246542-17633-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
-Cc: kernel@pengutronix.de, linux-bluetooth@vger.kernel.org, lukasz.duda@nordicsemi.no, jukka.rissanen@linux.intel.com, Alexander Aring <alex.aring@gmail.com>
+Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-This patch introduced the 6lowpan netdev private data struct. We name it
-lowpan_priv and it's placed at the beginning of netdev private data. All
-lowpan interfaces should allocate this room at first of netdev private
-data. 6LoWPAN LL private data can be allocate by additional netdev private
-data, e.g. dev->priv_size should be "sizeof(struct lowpan_priv) +
-sizeof(LL_LOWPAN_PRIVATE_DATA)".
+Hi,
 
-Signed-off-by: Alexander Aring <alex.aring@gmail.com>
----
- include/net/6lowpan.h              | 18 ++++++++++++++++++
- net/bluetooth/6lowpan.c            |  7 +++++--
- net/ieee802154/6lowpan/6lowpan_i.h |  3 ++-
- net/ieee802154/6lowpan/core.c      |  5 ++++-
- 4 files changed, 29 insertions(+), 4 deletions(-)
+this patch series contains a RFC for changing the max_frame_retries behaviour.
+The current behaviour is that we allow a range from -1 until 7 (802.15.4
+standard describes a range from 0 until 7 only). Nevertheless for historical
+reason we have the "-1" value, which describes no aret handling.
 
-diff --git a/include/net/6lowpan.h b/include/net/6lowpan.h
-index dc03d77..a955be2 100644
---- a/include/net/6lowpan.h
-+++ b/include/net/6lowpan.h
-@@ -197,6 +197,24 @@
- #define LOWPAN_NHC_UDP_CS_P_11	0xF3 /* source & dest = 0xF0B + 4bit inline */
- #define LOWPAN_NHC_UDP_CS_C	0x04 /* checksum elided */
- 
-+enum lowpan_ll_types {
-+	LOWPAN_LL_TYPE_BTLE,
-+	LOWPAN_LL_TYPE_IEEE802154,
-+};
-+
-+struct lowpan_priv {
-+	enum lowpan_ll_types ll_type;
-+
-+	/* must be last */
-+	u8 priv[0] __aligned(sizeof(void *));
-+};
-+
-+static inline
-+struct lowpan_priv *lowpan_priv(const struct net_device *dev)
-+{
-+	return netdev_priv(dev);
-+}
-+
- #ifdef DEBUG
- /* print data in line */
- static inline void raw_dump_inline(const char *caller, char *msg,
-diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-index 24ed5b0..eb61121 100644
---- a/net/bluetooth/6lowpan.c
-+++ b/net/bluetooth/6lowpan.c
-@@ -85,7 +85,7 @@ struct lowpan_dev {
- 
- static inline struct lowpan_dev *lowpan_dev(const struct net_device *netdev)
- {
--	return netdev_priv(netdev);
-+	return (struct lowpan_dev *)lowpan_priv(netdev)->priv;
- }
- 
- static inline void peer_add(struct lowpan_dev *dev, struct lowpan_peer *peer)
-@@ -848,7 +848,8 @@ static int setup_netdev(struct l2cap_chan *chan, struct lowpan_dev **dev)
- 	struct net_device *netdev;
- 	int err = 0;
- 
--	netdev = alloc_netdev(sizeof(struct lowpan_dev), IFACE_NAME_TEMPLATE,
-+	netdev = alloc_netdev(sizeof(struct lowpan_priv) +
-+			      sizeof(struct lowpan_dev), IFACE_NAME_TEMPLATE,
- 			      NET_NAME_UNKNOWN, netdev_setup);
- 	if (!netdev)
- 		return -ENOMEM;
-@@ -869,6 +870,8 @@ static int setup_netdev(struct l2cap_chan *chan, struct lowpan_dev **dev)
- 	list_add_rcu(&(*dev)->list, &bt_6lowpan_devices);
- 	spin_unlock(&devices_lock);
- 
-+	lowpan_priv(netdev)->ll_type = LOWPAN_LL_TYPE_BTLE;
-+
- 	err = register_netdev(netdev);
- 	if (err < 0) {
- 		BT_INFO("register_netdev failed %d", err);
-diff --git a/net/ieee802154/6lowpan/6lowpan_i.h b/net/ieee802154/6lowpan/6lowpan_i.h
-index e50f69d..0dd4e46 100644
---- a/net/ieee802154/6lowpan/6lowpan_i.h
-+++ b/net/ieee802154/6lowpan/6lowpan_i.h
-@@ -5,6 +5,7 @@
- 
- #include <net/ieee802154_netdev.h>
- #include <net/inet_frag.h>
-+#include <net/6lowpan.h>
- 
- struct lowpan_create_arg {
- 	u16 tag;
-@@ -52,7 +53,7 @@ struct lowpan_dev_info {
- static inline struct
- lowpan_dev_info *lowpan_dev_info(const struct net_device *dev)
- {
--	return netdev_priv(dev);
-+	return (struct lowpan_dev_info *)lowpan_priv(dev)->priv;
- }
- 
- extern struct list_head lowpan_devices;
-diff --git a/net/ieee802154/6lowpan/core.c b/net/ieee802154/6lowpan/core.c
-index f20a387..ede602c 100644
---- a/net/ieee802154/6lowpan/core.c
-+++ b/net/ieee802154/6lowpan/core.c
-@@ -153,6 +153,8 @@ static int lowpan_newlink(struct net *src_net, struct net_device *dev,
- 	list_add_tail(&entry->list, &lowpan_devices);
- 	mutex_unlock(&lowpan_dev_info(dev)->dev_list_mtx);
- 
-+	lowpan_priv(dev)->ll_type = LOWPAN_LL_TYPE_IEEE802154;
-+
- 	ret = register_netdevice(dev);
- 	if (ret >= 0) {
- 		if (!lowpan_open_count)
-@@ -193,7 +195,8 @@ static void lowpan_dellink(struct net_device *dev, struct list_head *head)
- 
- static struct rtnl_link_ops lowpan_link_ops __read_mostly = {
- 	.kind		= "lowpan",
--	.priv_size	= sizeof(struct lowpan_dev_info),
-+	.priv_size	= sizeof(struct lowpan_priv) +
-+			  sizeof(struct lowpan_dev_info),
- 	.setup		= lowpan_setup,
- 	.newlink	= lowpan_newlink,
- 	.dellink	= lowpan_dellink,
+The point is when the ack request bit is set inside the mac header the
+transceiver need to handle the ack somehow, this is mostly the aret mode
+which is done by hardware. Instead to having this as mac setting which doesn't
+allow a change during interface up, we simple do this handling per frame
+indicated by the ack request bit.
+
+Instead of max_frame_retries "-1" value which could be useful for making a
+default ack request bit handling if no information is given if it should be
+set or not, we have now the ack request default entry inside the mib.
+
+This could be useful for the 6LoWPAN stack which have this as default
+behaviour for data frames.
+
+- Alex
+
+changes since v3:
+ - remove unnecessary brackets inside of ieee802154_is_ackreq
+ - use ieee802154_get_fc_from_skb __get_unaligned_memmove16 instead memcpy
+
+changes since v2:
+ - add patch "mac802154: cfg: remove test and set checks" because Phoebe
+   notice that in v1 and we did that at several other places. Makes only
+   sense on a followed another layer call like driverops.
+ - remove if branch in "at86rf230: use aret mode if ackreq is set while xmit"
+   for check if aret handling is necessary.
+ - add patch "at86rf230: remove max_frame_retries -1 check" because previous
+   patch removed the "-1" max_frame_retries handling.
+
+Alexander Aring (6):
+  mac802154: cfg: remove test and set checks
+  ieee802154: add helpers for frame control checks
+  at86rf230: use aret mode if ackreq is set while xmit
+  mac802154: change max_frame_retries behaviour
+  at86rf230: remove max_frame_retries -1 check
+  ieee802154: add ack request default handling
+
+ drivers/net/ieee802154/at86rf230.c | 14 +++++---------
+ include/linux/ieee802154.h         | 29 +++++++++++++++++++++++++++++
+ include/net/cfg802154.h            |  5 +++++
+ include/net/nl802154.h             |  4 ++++
+ net/ieee802154/6lowpan/tx.c        |  2 +-
+ net/ieee802154/nl802154.c          | 33 +++++++++++++++++++++++++++++++++
+ net/ieee802154/rdev-ops.h          | 13 +++++++++++++
+ net/ieee802154/trace.h             | 19 +++++++++++++++++++
+ net/mac802154/cfg.c                | 27 +++++++++++----------------
+ net/mac802154/iface.c              |  3 +--
+ net/mac802154/main.c               |  9 +++------
+ 11 files changed, 124 insertions(+), 34 deletions(-)
+
 -- 
 2.5.0
 
