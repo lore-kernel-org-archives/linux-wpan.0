@@ -1,46 +1,83 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from senator.holtmann.net ([87.106.208.187]:47492 "EHLO
-	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752226AbbG3MKA (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Thu, 30 Jul 2015 08:10:00 -0400
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2102\))
-Subject: Re: [PATCH bluetooth-next] mac802154: Fix memory corruption with global deferred transmit state.
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20150721144447.GH20876@wantstofly.org>
-Date: Thu, 30 Jul 2015 14:09:57 +0200
+Received: from mga01.intel.com ([192.55.52.88]:52545 "EHLO mga01.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751302AbbGaGbx (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+	Fri, 31 Jul 2015 02:31:53 -0400
+Message-ID: <1438324310.2896.220.camel@linux.intel.com>
+Subject: Re: [PATCH] 6lowpan: Fix extraction of flow label field
+From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+Date: Fri, 31 Jul 2015 09:31:50 +0300
+In-Reply-To: <20150630212208.GA733@omega>
+References: <1435659892-22503-1-git-send-email-lukasz.duda@nordicsemi.no>
+	 <20150630212208.GA733@omega>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
-Message-Id: <32003B6A-42CD-476C-8FDA-B0291EF75D5A@holtmann.org>
-References: <20150721144447.GH20876@wantstofly.org>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Lennert Buytenhek <buytenh@wantstofly.org>
-Cc: linux-wpan@vger.kernel.org, Alexander Aring <alex.aring@gmail.com>
+To: Alexander Aring <alex.aring@gmail.com>
+Cc: Lukasz Duda <lukasz.duda@nordicsemi.no>, linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org, Glenn Ruben Bakke <glenn.ruben.bakke@nordicsemi.no>
 
-Hi Lennert,
-
-> When transmitting a packet via a mac802154 driver that can sleep in
-> its transmit function, mac802154 defers the call to the driver's
-> transmit function to a per-device workqueue.
+On ti, 2015-06-30 at 23:22 +0200, Alexander Aring wrote:
+> On Tue, Jun 30, 2015 at 03:24:52AM -0700, Lukasz Duda wrote:
+> > The lowpan_fetch_skb function is used to fetch the first byte,
+> > which also increments the data pointer in skb structure,
+> > making subsequent array lookup of byte 0 actually being byte 1.
+> > 
+> > To decompress the first byte of the Flow Label when the TF flag is
+> > set to 0x01, the second half of the first byte is needed.
+> > 
+> > The patch fixes the extraction of the Flow Label field.
+> > 
+> > Signed-off-by: Lukasz Duda <lukasz.duda@nordicsemi.no>
+> > Signed-off-by: Glenn Ruben Bakke <glenn.ruben.bakke@nordicsemi.no>
 > 
-> However, mac802154 uses a single global work_struct for this, which
-> means that if you have more than one registered mac802154 interface
-> in the system, and you transmit on more than one of them at the same
-> time, you'll very easily cause memory corruption.
+> Acked-by: Alexander Aring <alex.aring@gmail.com>
+
+Acked-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+
 > 
-> This patch moves the deferred transmit processing state from global
-> variables to struct ieee802154_local, and this seems to fix the memory
-> corruption issue.
+> > ---
+> >  net/6lowpan/iphc.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
+> > index 9055d7b..74e56d7 100644
+> > --- a/net/6lowpan/iphc.c
+> > +++ b/net/6lowpan/iphc.c
+> > @@ -284,7 +284,7 @@ lowpan_header_decompress(struct sk_buff *skb, struct net_device *dev,
+> >  		if (lowpan_fetch_skb(skb, &tmp, sizeof(tmp)))
+> >  			return -EINVAL;
+> >  
+> > -		hdr.flow_lbl[0] = (skb->data[0] & 0x0F) | ((tmp >> 2) & 0x30);
+> > +		hdr.flow_lbl[0] = (tmp & 0x0F) | ((tmp >> 2) & 0x30);
+> >  		memcpy(&hdr.flow_lbl[1], &skb->data[0], 2);
+> >  		skb_pull(skb, 2);
+> >  		break;
 > 
-> Signed-off-by: Lennert Buytenhek <buytenh@wantstofly.org>
-> ---
-> There were patches for this issue on the mailing list, but it
-> doesn't seem that a fix for this issue has been applied yet -- how
-> about this?
+> This code part is really hard to decrypt/understand. Nevertheless for
+> some historical(contiki) reasons we have this situation mainline now
+> and I had no time to cleanup this code. Actual it remembers me on the
+> early state of the iphc code.
+> 
+> I would recommended to cleanup the whole traffic flow decompress/compress
+> part (Maybe also with some magic numbers defines which is used on both sides
+> and some static inline functions). Really don't like the actually stuff there.
+> Anyway thank you for dig into this issue now.
+> 
+> One reason why definitly something goes wrong there is that skb->data[0]
+> information is used for hdr.flow_lbl[1] and hdr.flow_lbl[0] which can't
+> be. I didn't test it yet and trust you that this will do the right
+> behaviour for now. I also have no time that I can write really a testcase
+> for that. What I can say currently is that something is wrong here
+> and your good looks fine for me and makes more sense than the current behaviour.
+> 
+> Thanks.
+> 
+> - Alex
 
-patch has been applied to bluetooth-next tree.
 
-Regards
+Cheers,
+Jukka
 
-Marcel
 
