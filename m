@@ -1,68 +1,31 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f179.google.com ([209.85.212.179]:36952 "EHLO
-	mail-wi0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751031AbbHBLbU (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Sun, 2 Aug 2015 07:31:20 -0400
-Received: by wibud3 with SMTP id ud3so81081952wib.0
-        for <linux-wpan@vger.kernel.org>; Sun, 02 Aug 2015 04:31:19 -0700 (PDT)
+Received: from mail-wi0-f176.google.com ([209.85.212.176]:37281 "EHLO
+	mail-wi0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750981AbbHBLhu (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Sun, 2 Aug 2015 07:37:50 -0400
+Received: by wibud3 with SMTP id ud3so81185219wib.0
+        for <linux-wpan@vger.kernel.org>; Sun, 02 Aug 2015 04:37:49 -0700 (PDT)
+Date: Sun, 2 Aug 2015 13:38:09 +0200
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [RFC 00/16] ieee802154: 6lowpan: cleanup and rework dispatch evaluation
-Date: Sun,  2 Aug 2015 13:31:19 +0200
-Message-Id: <1438515095-24083-1-git-send-email-alex.aring@gmail.com>
+Subject: Re: [RFC 00/16] ieee802154: 6lowpan: cleanup and rework dispatch
+ evaluation
+Message-ID: <20150802113805.GA24183@omega>
+References: <1438515095-24083-1-git-send-email-alex.aring@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1438515095-24083-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
-Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
+Cc: kernel@pengutronix.de
 
 Hi,
 
-this patch series contains a rework of 802.15.4 6LoWPAN receive handling.
-We need to check on some things before which never checked before, like
-is 802.15.4 dataframe, if we can access skb->data[0] (could be that skb->len
-is 0 then), etc.
+sorry my git-send-email setup seems to be broken somehow.
 
-Also various bug fixes like the masking for fragmentation dispatch value which
-is currently wrong.
+The first mail was sent and I got a "Maybe git-send-email is broken?".
 
-I introduced a complete new handling for the dispatch values based on mac80211
-datatype receive handling mechanism.
-
-This patch series based on bluetooth-next with various pending patches, I uploaded
-the branch at:
-
-https://github.com/linux-wpan/linux-wpan-next/commits/802154_6lowpan_cleanup2
-
-so everybody can test it.
+I will try to dig into this issue. Again sorry for the noise.
 
 - Alex
-
-Alexander Aring (16):
-  ieee802154: 6lowpan: change dev vars to wdev and ldev
-  ieee802154: 6lowpan: remove set to zero
-  ieee802154: 6lowpan: remove EXPORT_SYMBOL
-  ieee802154: 6lowpan: remove check on wdev is running
-  ieee802154: 6lowpan: cleanup pull of iphc bytes
-  ieee802154: 6lowpan: trivial checks at first
-  ieee802154: 6lowpan: change skb->dev earlier
-  ieee802154: 6lowpan: change frag return value handling
-  ieee820154: 6lowpan: dispatch evaluation rework
-  ieee802154: 6lowpan: add dispatch evalualtion helpers
-  ieee802154: 6lowpan: fix fragmentation dispatch mask
-  ieee802154: 6lowpan: add generic lowpan header check
-  ieee802154: 6lowpan: add handler for all dispatch values
-  ieee802154: 6lowpan: add check for reserved dispatch
-  ieee802154: 6lowpan: check on valid 802.15.4 frame
-  ieee802154: 6lowpan: remove packet type to host
-
- include/linux/ieee802154.h          |  48 +++++-
- include/net/6lowpan.h               |  18 ++-
- net/ieee802154/6lowpan/6lowpan_i.h  |   5 +-
- net/ieee802154/6lowpan/core.c       |  83 +++++-----
- net/ieee802154/6lowpan/reassembly.c |  15 +-
- net/ieee802154/6lowpan/rx.c         | 312 +++++++++++++++++++++++++++---------
- net/ieee802154/6lowpan/tx.c         |  39 +++--
- 7 files changed, 369 insertions(+), 151 deletions(-)
-
--- 
-2.5.0
-
