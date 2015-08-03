@@ -1,89 +1,73 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from proxima.lasnet.de ([78.47.171.185]:57308 "EHLO
-	proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755281AbbHNPcw (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Fri, 14 Aug 2015 11:32:52 -0400
-Subject: Re: ADF7242 driver ready for mainline inclusion?
-References: <55CC5CF3.5030701@sostec.de>
- <78F369B105E123488216BDB7B6C397DAA4DA4FD8@NWD2MBX7.ad.analog.com>
- <55CD9513.8020508@datenfreihafen.org> <55CDFECD.80907@analog.com>
-From: Stefan Schmidt <stefan@datenfreihafen.org>
-Message-ID: <55CE0A21.3050700@datenfreihafen.org>
-Date: Fri, 14 Aug 2015 17:32:49 +0200
-MIME-Version: 1.0
-In-Reply-To: <55CDFECD.80907@analog.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Received: from mail-wi0-f177.google.com ([209.85.212.177]:35557 "EHLO
+	mail-wi0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752324AbbHCGXk (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Mon, 3 Aug 2015 02:23:40 -0400
+Received: by wibxm9 with SMTP id xm9so106058930wib.0
+        for <linux-wpan@vger.kernel.org>; Sun, 02 Aug 2015 23:23:39 -0700 (PDT)
+From: Alexander Aring <alex.aring@gmail.com>
+Subject: [RFC 00/16] ieee802154: 6lowpan: cleanup and rework dispatch evaluation
+Date: Mon,  3 Aug 2015 08:23:39 +0200
+Message-Id: <1438583035-6287-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: michael.hennerich@analog.com
-Cc: Alexander Aring <alex.aring@gmail.com>, "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>
+To: linux-wpan@vger.kernel.org
+Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-Hello.
+Hi,
 
-On 14/08/15 16:44, Michael Hennerich wrote:
-> On 08/14/2015 09:13 AM, Stefan Schmidt wrote:
->> Hello.
->>
->> On 13/08/15 20:50, Hennerich, Michael wrote:
->>> Hi All,
->>>
->>> I did tis driver a long time ago, when the Linux 802.15.4 support in
->>> general was at its beginning and pretty broken as well.
->>>  From time to time I update this driver - and actually it's pretty
->>> mature - and should apply to mainline without problems.
->>>
->>> There is currently only one minor thing that I wanted to investigate
->>> (some ifdef in the ISR) before submitting the driver mainline.
->> This is great to hear! Looking forward to it. :)
->>> Are you using the ADF7242 in a design already?
->> No. The reason I wrote this is that I have an interest in the linux-wpan
->> subsystem in general and thought the driver would be a good candidate
->> for mainline.
->>
->> I actually searched for some simple ADF7242which I could hook up to SPI
->> + IRQ and maybe some more control lines. So far I only found the
->> official evaluation board which is to expensive for some hobbyist
->> testing.
->
-> Well there is the EVAL-ADF7242-PMOD [1] which uses a PMOD [2] interface
-> basically a cheap 100mil spaced header, with SPI, IRQ and supply.
->
-I see. I have seen that one but was under the impression one needed the
-mother board for this one as well. As it seems it should be easy to just
-hookup the PMOD interface to all kind of boards via SPI, IRQ and some
-more GPIOs.
+this patch series contains a rework of 802.15.4 6LoWPAN receive handling.
+We need to check on some things before which never checked before, like
+is 802.15.4 dataframe, if we can access skb->data[0] (could be that skb->len
+is 0 then), etc.
 
-> If you are really interested testing the driver I can provide you one
-> FOC.
->
+Also various bug fixes like the masking for fragmentation dispatch value which
+is currently wrong. Also we should again check the dispatch value after successful
+reassembly a fragment, we currently assume always a iphc header there. This is wrong
+it could also be a non-compressed header. This can occur if the compressed header is
+larger than lower interface MTU size, we doesn't react on this while transmit which
+is another issue. Nevertheless we also don't reach this case at worst-case compression
+currently.
 
-That is an interesting offer. Alex and myself try to keep a transceiver
-around for every driver we have in tree, if possible. This helps during
-review to test the patches as well as testing our own changes which
-might touch all drivers. Given that Alex does the most work on this
-right now I would propose to provide him with this board.
+I introduced a complete new handling for the dispatch values based on mac80211
+datatype receive handling mechanism.
 
-Alex, does that sound good to you?
+This patch series based on bluetooth-next with various pending patches, I uploaded
+the branch at:
 
->>> Do you have feedback already?
->> The driver interface for ieee802154 has advanced since the it got merged
->> initially. Some of the new things you might want to look into and add
->> support are:
->>
->> o Async transmit (xmit_async)
->> o LBT support (set_lbt)
->> o Set CC mode and ed level (set_cc_mode, set_cca_ed_level)
->> o Support for monitor mode (set_promiscuous_mode)
->>
->> These I found missing when having a brief look over the driver.
->
-> Thanks for the summary!
->
+https://github.com/linux-wpan/linux-wpan-next/commits/802154_6lowpan_cleanup2
 
-These are not really a must to get the driver merged mainline. But if
-you find some time working on it before submitting some of these might
-be easy to add.
+so everybody can test it.
 
-regards
-Stefan Schmidt
+- Alex
+
+Alexander Aring (16):
+  ieee802154: 6lowpan: change dev vars to wdev and ldev
+  ieee802154: 6lowpan: remove set to zero
+  ieee802154: 6lowpan: remove EXPORT_SYMBOL
+  ieee802154: 6lowpan: remove check on wdev is running
+  ieee802154: 6lowpan: cleanup pull of iphc bytes
+  ieee802154: 6lowpan: trivial checks at first
+  ieee802154: 6lowpan: change skb->dev earlier
+  ieee802154: 6lowpan: change frag return value handling
+  ieee820154: 6lowpan: dispatch evaluation rework
+  ieee802154: 6lowpan: add dispatch evalualtion helpers
+  ieee802154: 6lowpan: fix fragmentation dispatch mask
+  ieee802154: 6lowpan: add generic lowpan header check
+  ieee802154: 6lowpan: add handler for all dispatch values
+  ieee802154: 6lowpan: add check for reserved dispatch
+  ieee802154: 6lowpan: check on valid 802.15.4 frame
+  ieee802154: 6lowpan: remove packet type to host
+
+ include/linux/ieee802154.h          |  48 +++++-
+ include/net/6lowpan.h               |  18 ++-
+ net/ieee802154/6lowpan/6lowpan_i.h  |   5 +-
+ net/ieee802154/6lowpan/core.c       |  83 +++++-----
+ net/ieee802154/6lowpan/reassembly.c |  15 +-
+ net/ieee802154/6lowpan/rx.c         | 312 +++++++++++++++++++++++++++---------
+ net/ieee802154/6lowpan/tx.c         |  39 +++--
+ 7 files changed, 369 insertions(+), 151 deletions(-)
+
+-- 
+2.5.0
+
