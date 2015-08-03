@@ -1,96 +1,116 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f179.google.com ([209.85.212.179]:35664 "EHLO
-	mail-wi0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753897AbbHMURh (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Thu, 13 Aug 2015 16:17:37 -0400
-Received: by wicne3 with SMTP id ne3so151919319wic.0
-        for <linux-wpan@vger.kernel.org>; Thu, 13 Aug 2015 13:17:35 -0700 (PDT)
-Date: Thu, 13 Aug 2015 22:17:26 +0200
+Received: from mail-wi0-f176.google.com ([209.85.212.176]:34601 "EHLO
+	mail-wi0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752729AbbHCGYJ (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Mon, 3 Aug 2015 02:24:09 -0400
+Received: by wibud3 with SMTP id ud3so121974065wib.1
+        for <linux-wpan@vger.kernel.org>; Sun, 02 Aug 2015 23:24:08 -0700 (PDT)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: Re: [RFC 14/16] ieee802154: 6lowpan: add check for reserved dispatch
-Message-ID: <20150813201712.GA2732@omega>
+Subject: [RFC 15/16] ieee802154: 6lowpan: check on valid 802.15.4 frame
+Date: Mon,  3 Aug 2015 08:23:54 +0200
+Message-Id: <1438583035-6287-16-git-send-email-alex.aring@gmail.com>
+In-Reply-To: <1438583035-6287-1-git-send-email-alex.aring@gmail.com>
 References: <1438583035-6287-1-git-send-email-alex.aring@gmail.com>
- <1438583035-6287-15-git-send-email-alex.aring@gmail.com>
- <55CB4C1D.8000300@osg.samsung.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <55CB4C1D.8000300@osg.samsung.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Stefan Schmidt <stefan@osg.samsung.com>
-Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de
+To: linux-wpan@vger.kernel.org
+Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-On Wed, Aug 12, 2015 at 03:37:33PM +0200, Stefan Schmidt wrote:
-> Hello.
-> 
-> On 03/08/15 08:23, Alexander Aring wrote:
-> >This patch adds checks for reserved dispatch value by check on all known
-> >dispatch values.
-> >
-> >Signed-off-by: Alexander Aring<alex.aring@gmail.com>
-> >---
-> >  net/ieee802154/6lowpan/rx.c | 12 +++++++++++-
-> >  1 file changed, 11 insertions(+), 1 deletion(-)
-> >
-> >diff --git a/net/ieee802154/6lowpan/rx.c b/net/ieee802154/6lowpan/rx.c
-> >index 146aa14..48869ac 100644
-> >--- a/net/ieee802154/6lowpan/rx.c
-> >+++ b/net/ieee802154/6lowpan/rx.c
-> >@@ -248,6 +248,15 @@ static inline bool lowpan_is_nalp(u8 dispatch)
-> >  	return (dispatch & LOWPAN_DISPATCH_FIRST) == LOWPAN_DISPATCH_NALP;
-> >  }
-> >+static inline bool lowpan_is_reserved(u8 dispatch)
-> >+{
-> >+	return !(lowpan_is_nalp(dispatch) || lowpan_is_iphc(dispatch) ||
-> 
-> OK, this is fishy. First of all you check lowpan_is_nalp here and negate it,
-> but below you are checking without negation.
-> One must be wrong. :)
-> 
-> 
-> >+		 lowpan_is_ipv6(dispatch) || lowpan_is_hc1(dispatch) ||
-> >+		 lowpan_is_bc0(dispatch) || lowpan_is_mesh(dispatch) ||
-> >+		 lowpan_is_esc(dispatch) || lowpan_is_frag1(dispatch) ||
-> >+		 lowpan_is_fragn(dispatch));
-> >+}
-> >+
-> >  /* lowpan_rx_h_check checks on generic 6LoWPAN requirements
-> >   * in MAC and 6LoWPAN header.
-> >   *
-> >@@ -259,7 +268,8 @@ static bool lowpan_rx_h_check(struct sk_buff *skb)
-> >  	if (unlikely(!skb->len))
-> >  		return false;
-> >-	if (lowpan_is_nalp(*skb_network_header(skb)))
-> >+	if (lowpan_is_nalp(*skb_network_header(skb)) ||
-> 
-> Here are you checking it as well. but without negating it.
-> 
+This patch adds frame control checks to check if the received frame is
+something which could contain a 6LoWPAN packet.
 
-yes, I think we should work here with ranges. Not checking all known
-values. (Maybe we can also do some bit magic there then).
+Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+---
+ include/linux/ieee802154.h  | 48 ++++++++++++++++++++++++++++++++++++++++++++-
+ net/ieee802154/6lowpan/rx.c |  9 +++++++++
+ 2 files changed, 56 insertions(+), 1 deletion(-)
 
-Also I should lookup more iana registrations for dispatches. I forget
+diff --git a/include/linux/ieee802154.h b/include/linux/ieee802154.h
+index 4f26c01..5a64fc0 100644
+--- a/include/linux/ieee802154.h
++++ b/include/linux/ieee802154.h
+@@ -208,7 +208,24 @@ enum {
+ };
+ 
+ /* frame control handling */
+-#define IEEE802154_FCTL_ACKREQ	0x0020
++#define IEEE802154_FCTL_FTYPE		0x0003
++#define IEEE802154_FTYPE_DATA		0x0001
++#define IEEE802154_FCTL_ACKREQ		0x0020
++#define IEEE802154_FCTL_INTRA_PAN	0x0040
++#define IEEE802154_FCTL_DADDR		0x0c00
++#define IEEE802154_FCTL_DADDR_NONE	0x0000
++#define IEEE802154_FCTL_SADDR		0xc000
++#define IEEE802154_FCTL_SADDR_NONE	0x0000
++
++/*
++ * ieee802154_is_data - check if type is IEEE802154_FTYPE_DATA
++ * @fc: frame control bytes in little-endian byteorder
++ */
++static inline int ieee802154_is_data(__le16 fc)
++{
++	return (fc & cpu_to_le16(IEEE802154_FCTL_FTYPE)) ==
++		cpu_to_le16(IEEE802154_FTYPE_DATA);
++}
+ 
+ /**
+  * ieee802154_is_ackreq - check if acknowledgment request bit is set
+@@ -220,6 +237,35 @@ static inline bool ieee802154_is_ackreq(__le16 fc)
+ }
+ 
+ /**
++ * ieee802154_is_intra_pan - check if intra pan id communication
++ * @fc: frame control bytes in little-endian byteorder
++ */
++static inline bool ieee802154_is_intra_pan(__le16 fc)
++{
++	return fc & cpu_to_le16(IEEE802154_FCTL_INTRA_PAN);
++}
++
++/**
++ * ieee802154_is_daddr_none - check if daddr mode is none
++ * @fc: frame control bytes in little-endian byteorder
++ */
++static inline bool ieee802154_is_daddr_none(__le16 fc)
++{
++	return (fc & cpu_to_le16(IEEE802154_FCTL_DADDR)) ==
++		cpu_to_le16(IEEE802154_FCTL_DADDR_NONE);
++}
++
++/**
++ * ieee802154_is_saddr_none - check if saddr mode is none
++ * @fc: frame control bytes in little-endian byteorder
++ */
++static inline bool ieee802154_is_saddr_none(__le16 fc)
++{
++	return (fc & cpu_to_le16(IEEE802154_FCTL_SADDR)) ==
++		cpu_to_le16(IEEE802154_FCTL_SADDR_NONE);
++}
++
++/**
+  * ieee802154_get_fc_from_skb - get the frame control field from an skb
+  * @skb: skb where the frame control field will be get from
+  */
+diff --git a/net/ieee802154/6lowpan/rx.c b/net/ieee802154/6lowpan/rx.c
+index 48869ac..b1a9d14 100644
+--- a/net/ieee802154/6lowpan/rx.c
++++ b/net/ieee802154/6lowpan/rx.c
+@@ -264,6 +264,15 @@ static inline bool lowpan_is_reserved(u8 dispatch)
+  */
+ static bool lowpan_rx_h_check(struct sk_buff *skb)
+ {
++	__le16 fc = ieee802154_get_fc_from_skb(skb);
++
++	/* check on ieee802154 conform 6LoWPAN header */
++	if (!ieee802154_is_data(fc) ||
++	    ieee802154_is_daddr_none(fc) ||
++	    ieee802154_is_saddr_none(fc) ||
++	    !ieee802154_is_intra_pan(fc))
++		return false;
++
+ 	/* check for if we can evaluate the dispatch */
+ 	if (unlikely(!skb->len))
+ 		return false;
+-- 
+2.5.0
 
-LOWPAN_DFF
-
-See [0]. But then somebody else should send a patch to introduce some
-"netdev warning message".
-
-btw: we should add some of these warning messages for lowpan_nhc as well.
-[1]. I am fine for introduce just a name and known nhc id for printing
-some warning that we don't support $NAME right now, instead of
-"unknown".
-
-(Also wondering why "11111111 - Unassigned, reserved for extensions" -
-does this mean now that when we have "11111111" an additional nhc id
-byte is there? I don't see anything in rfc6282 which mention that. For
-this reason I had implement the such complicated rbtree lookup mechanism
-because I was not sure about this -> "When we know an additional nhc id
-byte is there". Anyway it's some variable length bitstring and rbtree
-structure should be fit there (I hope).
-
-- Alex
-
-[0] https://www.iana.org/assignments/_6lowpan-parameters/_6lowpan-parameters.xhtml#_6lowpan-parameters-1
-[1] https://www.iana.org/assignments/_6lowpan-parameters/_6lowpan-parameters.xhtml#lowpan_nhc
