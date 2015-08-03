@@ -1,50 +1,71 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from lists.s-osg.org ([54.187.51.154]:57334 "EHLO lists.s-osg.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754310AbbHLMvT (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-	Wed, 12 Aug 2015 08:51:19 -0400
-From: Stefan Schmidt <stefan@osg.samsung.com>
-Subject: Re: [RFC 11/16] ieee802154: 6lowpan: fix fragmentation dispatch mask
+Received: from mail-wi0-f174.google.com ([209.85.212.174]:34534 "EHLO
+	mail-wi0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752703AbbHCGYF (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Mon, 3 Aug 2015 02:24:05 -0400
+Received: by wibud3 with SMTP id ud3so121972376wib.1
+        for <linux-wpan@vger.kernel.org>; Sun, 02 Aug 2015 23:24:04 -0700 (PDT)
+From: Alexander Aring <alex.aring@gmail.com>
+Subject: [RFC 12/16] ieee802154: 6lowpan: add generic lowpan header check
+Date: Mon,  3 Aug 2015 08:23:51 +0200
+Message-Id: <1438583035-6287-13-git-send-email-alex.aring@gmail.com>
+In-Reply-To: <1438583035-6287-1-git-send-email-alex.aring@gmail.com>
 References: <1438583035-6287-1-git-send-email-alex.aring@gmail.com>
- <1438583035-6287-12-git-send-email-alex.aring@gmail.com>
-Message-ID: <55CB4144.5050102@osg.samsung.com>
-Date: Wed, 12 Aug 2015 14:51:16 +0200
-MIME-Version: 1.0
-In-Reply-To: <1438583035-6287-12-git-send-email-alex.aring@gmail.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org
-Cc: kernel@pengutronix.de
+To: linux-wpan@vger.kernel.org
+Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-Hello.
+This patch introduce an earlier check if a 6LoWPAN can be valid. This
+contains at first for checking if the header contains a dispatch byte
+and isn't the nalp dispatch value, which means it isn't a 6LoWPAN
+packet.
 
-On 03/08/15 08:23, Alexander Aring wrote:
-> This patch fix the dispatch fragmentation masking. With "0xe" we also
-> get some reserved dispatch values.
->
-> Signed-off-by: Alexander Aring<alex.aring@gmail.com>
-> ---
->   net/ieee802154/6lowpan/rx.c | 3 ++-
->   1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/net/ieee802154/6lowpan/rx.c b/net/ieee802154/6lowpan/rx.c
-> index b0066b7..595830f 100644
-> --- a/net/ieee802154/6lowpan/rx.c
-> +++ b/net/ieee802154/6lowpan/rx.c
-> @@ -122,7 +122,8 @@ static lowpan_rx_result lowpan_rx_h_frag(struct sk_buff *skb)
->   	      lowpan_is_fragn(*skb_network_header(skb))))
->   		return RX_CONTINUE;
->   
-> -	ret = lowpan_frag_rcv(skb, *skb_network_header(skb) & 0xe0);
-> +	ret = lowpan_frag_rcv(skb, *skb_network_header(skb) &
-> +			      LOWPAN_DISPATCH_FRAG_MASK);
->   	if (ret == 1)
->   		return RX_CONTINUE;
->   
+Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+---
+ net/ieee802154/6lowpan/rx.c | 25 ++++++++++++++++++++++++-
+ 1 file changed, 24 insertions(+), 1 deletion(-)
 
-Reviewed-by: Stefan Schmidt <stefan@osg.samsung.com>
+diff --git a/net/ieee802154/6lowpan/rx.c b/net/ieee802154/6lowpan/rx.c
+index 595830f..62d181a 100644
+--- a/net/ieee802154/6lowpan/rx.c
++++ b/net/ieee802154/6lowpan/rx.c
+@@ -172,11 +172,34 @@ rxh_next:
+ #undef CALL_RXH
+ }
+ 
++static inline bool lowpan_is_nalp(u8 dispatch)
++{
++	return (dispatch & LOWPAN_DISPATCH_FIRST) == LOWPAN_DISPATCH_NALP;
++}
++
++/* lowpan_rx_h_check checks on generic 6LoWPAN requirements
++ * in MAC and 6LoWPAN header.
++ *
++ * Don't manipulate the skb here, it could be shared buffer.
++ */
++static bool lowpan_rx_h_check(struct sk_buff *skb)
++{
++	/* check for if we can evaluate the dispatch */
++	if (unlikely(!skb->len))
++		return false;
++
++	if (lowpan_is_nalp(*skb_network_header(skb)))
++		return false;
++
++	return true;
++}
++
+ static int lowpan_rcv(struct sk_buff *skb, struct net_device *wdev,
+ 		      struct packet_type *pt, struct net_device *orig_wdev)
+ {
+ 	if (skb->pkt_type == PACKET_OTHERHOST ||
+-	    wdev->type != ARPHRD_IEEE802154)
++	    wdev->type != ARPHRD_IEEE802154 ||
++	    !lowpan_rx_h_check(skb))
+ 		return NET_RX_DROP;
+ 
+ 	skb = skb_share_check(skb, GFP_ATOMIC);
+-- 
+2.5.0
 
-regards
-Stefan Schmidt
