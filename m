@@ -1,50 +1,42 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from lists.s-osg.org ([54.187.51.154]:57294 "EHLO lists.s-osg.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751001AbbHLIto (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-	Wed, 12 Aug 2015 04:49:44 -0400
-From: Stefan Schmidt <stefan@osg.samsung.com>
-Subject: Re: [RFC 02/16] ieee802154: 6lowpan: remove set to zero
+Received: from mail-wi0-f181.google.com ([209.85.212.181]:36526 "EHLO
+	mail-wi0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752735AbbHCGXp (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Mon, 3 Aug 2015 02:23:45 -0400
+Received: by wicgj17 with SMTP id gj17so89914818wic.1
+        for <linux-wpan@vger.kernel.org>; Sun, 02 Aug 2015 23:23:44 -0700 (PDT)
+From: Alexander Aring <alex.aring@gmail.com>
+Subject: [RFC 03/16] ieee802154: 6lowpan: remove EXPORT_SYMBOL
+Date: Mon,  3 Aug 2015 08:23:42 +0200
+Message-Id: <1438583035-6287-4-git-send-email-alex.aring@gmail.com>
+In-Reply-To: <1438583035-6287-1-git-send-email-alex.aring@gmail.com>
 References: <1438583035-6287-1-git-send-email-alex.aring@gmail.com>
- <1438583035-6287-3-git-send-email-alex.aring@gmail.com>
-Message-ID: <55CB08A5.505@osg.samsung.com>
-Date: Wed, 12 Aug 2015 10:49:41 +0200
-MIME-Version: 1.0
-In-Reply-To: <1438583035-6287-3-git-send-email-alex.aring@gmail.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org
-Cc: kernel@pengutronix.de
+To: linux-wpan@vger.kernel.org
+Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-Hello.
+This function is used internally inside of ieee802154 6lowpan module
+only and not outside of any other module. We don't need to export this
+function then.
 
-On 03/08/15 08:23, Alexander Aring wrote:
-> Internal mechanism by calling netdev_alloc which use kzalloc already
-> sets these variables to zero. This patch cleanup the setup of net_device.
->
-> Signed-off-by: Alexander Aring<alex.aring@gmail.com>
-> ---
->   net/ieee802154/6lowpan/core.c | 2 --
->   1 file changed, 2 deletions(-)
->
-> diff --git a/net/ieee802154/6lowpan/core.c b/net/ieee802154/6lowpan/core.c
-> index 46efaca..ca331bc 100644
-> --- a/net/ieee802154/6lowpan/core.c
-> +++ b/net/ieee802154/6lowpan/core.c
-> @@ -88,9 +88,7 @@ static void lowpan_setup(struct net_device *ldev)
->   	ldev->hard_header_len	= 2 + 1 + 20 + 14;
->   	ldev->needed_tailroom	= 2; /* FCS */
->   	ldev->mtu		= IPV6_MIN_MTU;
-> -	ldev->tx_queue_len	= 0;
->   	ldev->flags		= IFF_BROADCAST | IFF_MULTICAST;
-> -	ldev->watchdog_timeo	= 0;
->   
->   	ldev->netdev_ops	= &lowpan_netdev_ops;
->   	ldev->header_ops	= &lowpan_header_ops;
+Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+---
+ net/ieee802154/6lowpan/reassembly.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-Reviewed-by: Stefan Schmidt <stefan@osg.samsung.com>
+diff --git a/net/ieee802154/6lowpan/reassembly.c b/net/ieee802154/6lowpan/reassembly.c
+index c9f77f7..cfb8443 100644
+--- a/net/ieee802154/6lowpan/reassembly.c
++++ b/net/ieee802154/6lowpan/reassembly.c
+@@ -387,7 +387,6 @@ err:
+ 	kfree_skb(skb);
+ 	return -1;
+ }
+-EXPORT_SYMBOL(lowpan_frag_rcv);
+ 
+ #ifdef CONFIG_SYSCTL
+ static int zero;
+-- 
+2.5.0
 
-regards
-Stefan Schmidt
