@@ -1,41 +1,105 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-pd0-f180.google.com ([209.85.192.180]:35043 "EHLO
-	mail-pd0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750881AbbHEHju convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Wed, 5 Aug 2015 03:39:50 -0400
-Message-ID: <BLU168-W96900E039F7CBF326825DCD6750@phx.gbl>
-From: LIYONG <sdliyong@gmail.com>
-Subject: [PATCH] cc2520: set the default fifo pin value from platform data
-Date: Wed, 5 Aug 2015 15:39:46 +0800
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: 8BIT
+Received: from lists.s-osg.org ([54.187.51.154]:55974 "EHLO lists.s-osg.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753307AbbHDQ3J (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+	Tue, 4 Aug 2015 12:29:09 -0400
+From: Stefan Schmidt <stefan@osg.samsung.com>
+Subject: Re: [RFCv3 bluetooth-next 1/6] mac802154: cfg: remove test and set
+ checks
+References: <1438246542-17633-1-git-send-email-alex.aring@gmail.com>
+ <1438246542-17633-2-git-send-email-alex.aring@gmail.com>
+Message-ID: <55C0E852.9080909@osg.samsung.com>
+Date: Tue, 4 Aug 2015 18:29:06 +0200
 MIME-Version: 1.0
+In-Reply-To: <1438246542-17633-2-git-send-email-alex.aring@gmail.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: "varkabhadram@gmail.com" <varkabhadram@gmail.com>, "alex.aring@gmail.com" <alex.aring@gmail.com>, "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Cc: YONG LI <sdliyong@gmail.com>
+To: Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org
+Cc: kernel@pengutronix.de
 
-Without the device tree support, the fifo_pin is uninitialized, this
-Patch will set the fifo_pin value based on platform data
+Hello.
 
-Signed-off-by: Yong Li <sdliyong@gmail.com>
----
- drivers/net/ieee802154/cc2520.c | 1 +
- 1 file changed, 1 insertion(+)
+On 30/07/15 10:55, Alexander Aring wrote:
+> This patch removes several checks if a value is really changed. This
+> makes only sense if we have another layer call e.g. calling the
+> driver_ops which is done by callbacks like "set_channel".
+>
+> For MAC settings which need to be set by phy registers (if the phy
+> supports that handling) this is set by doing an interface up currently
+> and are not direct driver_ops calls, so we remove the checks from these
+> configuration callbacks.
+>
+> Suggested-by: Phoebe Buckheister<phoebe.buckheister@itwm.fraunhofer.de>
+> Signed-off-by: Alexander Aring<alex.aring@gmail.com>
+> ---
 
-diff --git a/drivers/net/ieee802154/cc2520.c b/drivers/net/ieee802154/cc2520.c
-index b6fc295..cd1e7ac 100644
---- a/drivers/net/ieee802154/cc2520.c
-+++ b/drivers/net/ieee802154/cc2520.c
-@@ -833,6 +833,7 @@ static int cc2520_get_platform_data(struct spi_device *spi,
-                if (!spi_pdata)
-                        return -ENOENT;
-                *pdata = *spi_pdata;
-+               priv->fifo_pin = pdata->fifo;
-                return 0;
-        }
+I always found these checks comforting so see. But given that we don't 
+really need them and are only double checking here when we already did I 
+think its fine to remove them.
 
---
-2.1.0
+Reviewed-by: Stefan Schmidt <stefan@osg.samsung.com>
 
- 		 	   		  
+regards
+Stefan Schmidt
+
+>   net/mac802154/cfg.c | 16 ----------------
+>   1 file changed, 16 deletions(-)
+>
+> diff --git a/net/mac802154/cfg.c b/net/mac802154/cfg.c
+> index f7ba51e..cecfcda 100644
+> --- a/net/mac802154/cfg.c
+> +++ b/net/mac802154/cfg.c
+> @@ -209,10 +209,6 @@ ieee802154_set_backoff_exponent(struct wpan_phy *wpan_phy,
+>   {
+>   	ASSERT_RTNL();
+>   
+> -	if (wpan_dev->min_be == min_be &&
+> -	    wpan_dev->max_be == max_be)
+> -		return 0;
+> -
+>   	wpan_dev->min_be = min_be;
+>   	wpan_dev->max_be = max_be;
+>   	return 0;
+> @@ -224,9 +220,6 @@ ieee802154_set_short_addr(struct wpan_phy *wpan_phy, struct wpan_dev *wpan_dev,
+>   {
+>   	ASSERT_RTNL();
+>   
+> -	if (wpan_dev->short_addr == short_addr)
+> -		return 0;
+> -
+>   	wpan_dev->short_addr = short_addr;
+>   	return 0;
+>   }
+> @@ -238,9 +231,6 @@ ieee802154_set_max_csma_backoffs(struct wpan_phy *wpan_phy,
+>   {
+>   	ASSERT_RTNL();
+>   
+> -	if (wpan_dev->csma_retries == max_csma_backoffs)
+> -		return 0;
+> -
+>   	wpan_dev->csma_retries = max_csma_backoffs;
+>   	return 0;
+>   }
+> @@ -252,9 +242,6 @@ ieee802154_set_max_frame_retries(struct wpan_phy *wpan_phy,
+>   {
+>   	ASSERT_RTNL();
+>   
+> -	if (wpan_dev->frame_retries == max_frame_retries)
+> -		return 0;
+> -
+>   	wpan_dev->frame_retries = max_frame_retries;
+>   	return 0;
+>   }
+> @@ -265,9 +252,6 @@ ieee802154_set_lbt_mode(struct wpan_phy *wpan_phy, struct wpan_dev *wpan_dev,
+>   {
+>   	ASSERT_RTNL();
+>   
+> -	if (wpan_dev->lbt == mode)
+> -		return 0;
+> -
+>   	wpan_dev->lbt = mode;
+>   	return 0;
+>   }
+
