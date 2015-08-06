@@ -1,78 +1,101 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from lists.s-osg.org ([54.187.51.154]:58999 "EHLO lists.s-osg.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751769AbbHUJLH (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-	Fri, 21 Aug 2015 05:11:07 -0400
-Received: from [192.168.2.22] (pD9F79E8A.dip0.t-ipconnect.de [217.247.158.138])
-	by lists.s-osg.org (Postfix) with ESMTPSA id DCE49462A0
-	for <linux-wpan@vger.kernel.org>; Fri, 21 Aug 2015 02:11:05 -0700 (PDT)
-From: Stefan Schmidt <stefan@osg.samsung.com>
-Subject: wpan-tools 0.5 release
-Message-ID: <55D6EB26.7070902@osg.samsung.com>
-Date: Fri, 21 Aug 2015 11:11:02 +0200
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Received: from mail-wi0-f173.google.com ([209.85.212.173]:35114 "EHLO
+	mail-wi0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751235AbbHFPVf (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Thu, 6 Aug 2015 11:21:35 -0400
+Received: by wibxm9 with SMTP id xm9so27165026wib.0
+        for <linux-wpan@vger.kernel.org>; Thu, 06 Aug 2015 08:21:34 -0700 (PDT)
+From: Alexander Aring <alex.aring@gmail.com>
+Subject: [RFC bluetooth-next 0/2] at86rf230: trac debugfs support (for testing aret changes patch-serie)
+Date: Thu,  6 Aug 2015 17:21:39 +0200
+Message-Id: <1438874501-19971-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>
+To: linux-wpan@vger.kernel.org
+Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-Hello.
+Hi,
 
-It is a pleasure to announce the 0.5 release of wpan-tools.
-Thanks to everyone who contributed!
+this patch series based on:
 
-Downloads and md5sums:
+ "[RFCv5 bluetooth-next 0/4] ieee802154: aret handling changes"
 
-http://wpan.cakelab.org/releases/wpan-tools-0.5.tar.bz2
-6226df405a98c13ec41bf4d1f0777d6b
+and can be used for testing the ARET/NO ARET mode with ARET_ON state only.
+I add support for debugfs to check the trac status statistics.
 
-http://wpan.cakelab.org/releases/wpan-tools-0.5.tar.gz
-c6356f7be4de2e9f2084283b9ed7e1ab
+In the previously patch series I said that the at86rf2xx transceivers
+checks automatically if ack request is set or not in a 802.15.4 frame.
+
+There exists two cases:
+
+1. When the ackrequest bit is set and using STATE_ARET_ON the transceiver
+   will wait for an ack frame after transmit. If ack is received then
+   the transceiver logic is "SUCCESS" otherwise "NO_ACK".
+2. When the ackrequest bit isn't set and using the STATE_ARET_ON the
+   transceiver will not wait for an ack frame and the transceiver logic
+   is "SUCCESS".
+
+The transceiver logic is in this case the error code from transmit
+algorithmn.
+
+To the test (802.15.4 6LoWPAN):
+
+1. Create some imagine 6LoWPAN node by using:
+
+ip -6 neigh add fe80::abcd lladdr 02:01:02:03:04:05:06:07 dev lowpan0
+
+This will create some neighbor discovery entry for some node which isn't
+there in your network. We wan't just test some 802.15.4 unicast addressing.
+This unicast addressing will not answer with an ACK frame, because there is
+no node with this address.
+
+2. Set ackrequest bit to 0 by using:
+
+iwpan dev wpan0 set ackreq_default 0
+
+3. Ping node:
+
+ping6 fe80::abcd%lowpan0
+
+4. Check trac status stats.
+
+You will see that only "SUCCESS" will be increased, which is the behaviour
+on no aret functionality.
+
+5. Do it again but with ackrequest bit to 1 by using:
+
+iwpan dev wpan0 set ackreq_default 1
+
+6. Ping node again.
+
+ping6 fe80::abcd%lowpan0
+
+7. Check the trac status again.
+
+Now, "SUCCESS" isn't increased (it could be for broadcast frames only). But
+now you will see that "NO ACK" is increased which is the trac status that
+no ack frames was received when using aret functionality.
 
 
-Alexander Aring (8):
-       interface: use hexadecimal for print extended addr
-       treewide: change transmit power to mbm
-       info: add support for phy capability dump
-       info: change dbm format string
-       phy: fix cca ed level parameter parsing
-       info: fix tx power printout
-       info: add support for cca ed level info
-       mac: add handling for ackreq default handling
+Some additional notes:
 
-Christoffer Holmstedt (5):
-       info: fix printf taking the wrong amount of arguments
-       info: add frequency to channel listing for phy capabilities
-       info: add frequency output to current channel
-       nl802154: fix misspelled enum
-       info: update CCA mode and CCA options output
+I think the registration of debugfs failed when two at86rf230 will be probed,
+because the debugfs "at86rf230" already exists. Is there some way to add a
+number to it like the name "at86rf230%d"? Or we just leave it as it is, it's
+just a debugging feature and should be disabled then when using two at86rf230
+transceivers.
 
-Guido Günther (1):
-       Use PRIu64 for formatting uint64_t
+- Alex
 
-Stefan Schmidt (15):
-       wpan-ping: Ping utility on IEEE 802.15.4 level
-       wpan-ping: Add README for some basic usage descriptions.
-       COPYRIGHT: Add my own copyright due to wpan-ping contribution
-       wpan-ping: Take 6LoWPAN dispatch byte into account
-       gitignore: use wildcard to ignore object files
-       wpan-ping: Add .gitignore to ignore generated files
-       wpan-ping: adjust maximal packet length for extended addresses
-       wpan-ping: allow usage of extended addressing scheme
-       wpan-ping: switch server indicator variable to bool
-       wpan-ping: Reduce packet recv timeout to 500ms from 2s
-       wpan-ping: unify src and dst address handling
-       wpan-ping: use recvfrom and sendto isntead of connecting the socket
-       build: remove leftover from Makefile.am
-       mac/py: add range checks on arguments to avoid wrong value being set
-       Release 0.5
+Alexander Aring (2):
+  at86rf230: change trac status check behaviour
+  at86rf230: add debugfs support
 
-Varka Bhadram (4):
-       gitignore: add object files
-       phy: convert tx power value
-       nl802154: export supported commands
-       interface: fix interface type info
+ drivers/net/ieee802154/Kconfig     |   7 ++
+ drivers/net/ieee802154/at86rf230.c | 191 ++++++++++++++++++++++++++++++-------
+ drivers/net/ieee802154/at86rf230.h |   8 ++
+ 3 files changed, 169 insertions(+), 37 deletions(-)
 
-regards
-Stefan Schmidt
+-- 
+2.5.0
+
