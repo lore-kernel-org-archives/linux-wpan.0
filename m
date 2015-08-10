@@ -1,132 +1,247 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f177.google.com ([209.85.212.177]:37387 "EHLO
-	mail-wi0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932251AbbHJRSF (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Mon, 10 Aug 2015 13:18:05 -0400
-Received: by wibhh20 with SMTP id hh20so160200204wib.0
-        for <linux-wpan@vger.kernel.org>; Mon, 10 Aug 2015 10:18:04 -0700 (PDT)
+Received: from mail-wi0-f174.google.com ([209.85.212.174]:38243 "EHLO
+	mail-wi0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932438AbbHJRSH (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Mon, 10 Aug 2015 13:18:07 -0400
+Received: by wicja10 with SMTP id ja10so34783304wic.1
+        for <linux-wpan@vger.kernel.org>; Mon, 10 Aug 2015 10:18:06 -0700 (PDT)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH bluetooth-next 6/8] at86rf230: use STATE_TX_ARET mode only
-Date: Mon, 10 Aug 2015 21:15:57 +0200
-Message-Id: <1439234159-11630-7-git-send-email-alex.aring@gmail.com>
+Subject: [PATCH bluetooth-next 7/8] ieee802154: add ack request default handling
+Date: Mon, 10 Aug 2015 21:15:58 +0200
+Message-Id: <1439234159-11630-8-git-send-email-alex.aring@gmail.com>
 In-Reply-To: <1439234159-11630-1-git-send-email-alex.aring@gmail.com>
 References: <1439234159-11630-1-git-send-email-alex.aring@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
 Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-This patch changes the state change behaviour of at86rf230 to always
-TX_ARET mode. According the at86rf2xx datasheets TX_ARET mode doesn't
-mean to be always waiting for ack frames after transmit. The transceiver
-will automatically wait for ack frames or not if the acknowledge request
-bit is set. See section "TX_ARET_ON – Transmit with Automatic Frame
-Retransmission and CSMA-CA Retry".
+This patch introduce a new mib entry which isn't part of 802.15.4 but
+useful as default behaviour to set the ack request bit or not if we
+don't know if the ack request bit should set. This is currently used for
+stacks like IEEE 802.15.4 6LoWPAN.
 
 Reviewed-by: Stefan Schmidt <stefan@osg.samsung.com>
 Signed-off-by: Alexander Aring <alex.aring@gmail.com>
 ---
- drivers/net/ieee802154/at86rf230.c | 52 ++++++++++----------------------------
- 1 file changed, 14 insertions(+), 38 deletions(-)
+ include/net/cfg802154.h     |  5 +++++
+ include/net/nl802154.h      |  4 ++++
+ net/ieee802154/6lowpan/tx.c |  2 +-
+ net/ieee802154/nl802154.c   | 33 +++++++++++++++++++++++++++++++++
+ net/ieee802154/rdev-ops.h   | 13 +++++++++++++
+ net/ieee802154/trace.h      | 19 +++++++++++++++++++
+ net/mac802154/cfg.c         | 11 +++++++++++
+ 7 files changed, 86 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ieee802154/at86rf230.c b/drivers/net/ieee802154/at86rf230.c
-index d0d5bf6..6422caa 100644
---- a/drivers/net/ieee802154/at86rf230.c
-+++ b/drivers/net/ieee802154/at86rf230.c
-@@ -97,9 +97,7 @@ struct at86rf230_local {
+diff --git a/include/net/cfg802154.h b/include/net/cfg802154.h
+index e53b6bf..76b1ffa 100644
+--- a/include/net/cfg802154.h
++++ b/include/net/cfg802154.h
+@@ -63,6 +63,8 @@ struct cfg802154_ops {
+ 					 s8 max_frame_retries);
+ 	int	(*set_lbt_mode)(struct wpan_phy *wpan_phy,
+ 				struct wpan_dev *wpan_dev, bool mode);
++	int	(*set_ackreq_default)(struct wpan_phy *wpan_phy,
++				      struct wpan_dev *wpan_dev, bool ackreq);
+ };
  
- 	struct at86rf230_state_change irq;
+ static inline bool
+@@ -196,6 +198,9 @@ struct wpan_dev {
+ 	bool lbt;
  
--	bool tx_aret;
- 	unsigned long cal_timeout;
--	s8 max_frame_retries;
- 	bool is_tx;
- 	bool is_tx_from_off;
- 	u8 tx_retry;
-@@ -651,7 +649,7 @@ at86rf230_tx_complete(void *context)
+ 	bool promiscuous_mode;
++
++	/* fallback for acknowledgment bit setting */
++	bool ackreq;
+ };
  
- 	enable_irq(ctx->irq);
+ #define to_phy(_dev)	container_of(_dev, struct wpan_phy, dev)
+diff --git a/include/net/nl802154.h b/include/net/nl802154.h
+index b0ab530..cf2713d 100644
+--- a/include/net/nl802154.h
++++ b/include/net/nl802154.h
+@@ -52,6 +52,8 @@ enum nl802154_commands {
  
--	ieee802154_xmit_complete(lp->hw, lp->tx_skb, !lp->tx_aret);
-+	ieee802154_xmit_complete(lp->hw, lp->tx_skb, false);
- }
+ 	NL802154_CMD_SET_LBT_MODE,
  
- static void
-@@ -760,17 +758,10 @@ at86rf230_irq_trx_end(struct at86rf230_local *lp)
- {
- 	if (lp->is_tx) {
- 		lp->is_tx = 0;
--
--		if (lp->tx_aret)
--			at86rf230_async_state_change(lp, &lp->irq,
--						     STATE_FORCE_TX_ON,
--						     at86rf230_tx_trac_status,
--						     true);
--		else
--			at86rf230_async_state_change(lp, &lp->irq,
--						     STATE_RX_AACK_ON,
--						     at86rf230_tx_complete,
--						     true);
-+		at86rf230_async_state_change(lp, &lp->irq,
-+					     STATE_FORCE_TX_ON,
-+					     at86rf230_tx_trac_status,
-+					     true);
++	NL802154_CMD_SET_ACKREQ_DEFAULT,
++
+ 	/* add new commands above here */
+ 
+ 	/* used to define NL802154_CMD_MAX below */
+@@ -104,6 +106,8 @@ enum nl802154_attrs {
+ 
+ 	NL802154_ATTR_SUPPORTED_COMMANDS,
+ 
++	NL802154_ATTR_ACKREQ_DEFAULT,
++
+ 	/* add attributes here, update the policy in nl802154.c */
+ 
+ 	__NL802154_ATTR_AFTER_LAST,
+diff --git a/net/ieee802154/6lowpan/tx.c b/net/ieee802154/6lowpan/tx.c
+index 2597abb..1bf4a30 100644
+--- a/net/ieee802154/6lowpan/tx.c
++++ b/net/ieee802154/6lowpan/tx.c
+@@ -224,7 +224,7 @@ static int lowpan_header(struct sk_buff *skb, struct net_device *dev)
  	} else {
- 		at86rf230_async_read_reg(lp, RG_TRX_STATE, &lp->irq,
- 					 at86rf230_rx_trac_check, true);
-@@ -876,24 +867,16 @@ at86rf230_xmit_start(void *context)
- 	struct at86rf230_state_change *ctx = context;
- 	struct at86rf230_local *lp = ctx->lp;
- 
--	/* In ARET mode we need to go into STATE_TX_ARET_ON after we
--	 * are in STATE_TX_ON. The pfad differs here, so we change
--	 * the complete handler.
--	 */
--	if (lp->tx_aret) {
--		if (lp->is_tx_from_off) {
--			lp->is_tx_from_off = false;
--			at86rf230_async_state_change(lp, ctx, STATE_TX_ARET_ON,
--						     at86rf230_write_frame,
--						     false);
--		} else {
--			at86rf230_async_state_change(lp, ctx, STATE_TX_ON,
--						     at86rf230_xmit_tx_on,
--						     false);
--		}
-+	/* check if we change from off state */
-+	if (lp->is_tx_from_off) {
-+		lp->is_tx_from_off = false;
-+		at86rf230_async_state_change(lp, ctx, STATE_TX_ARET_ON,
-+					     at86rf230_write_frame,
-+					     false);
- 	} else {
- 		at86rf230_async_state_change(lp, ctx, STATE_TX_ON,
--					     at86rf230_write_frame, false);
-+					     at86rf230_xmit_tx_on,
-+					     false);
+ 		da.mode = IEEE802154_ADDR_LONG;
+ 		da.extended_addr = ieee802154_devaddr_from_raw(daddr);
+-		cb->ackreq = wpan_dev->frame_retries >= 0;
++		cb->ackreq = wpan_dev->ackreq;
  	}
+ 
+ 	return dev_hard_header(skb, lowpan_dev_info(dev)->real_dev,
+diff --git a/net/ieee802154/nl802154.c b/net/ieee802154/nl802154.c
+index 68f2401..1b00a14 100644
+--- a/net/ieee802154/nl802154.c
++++ b/net/ieee802154/nl802154.c
+@@ -230,6 +230,8 @@ static const struct nla_policy nl802154_policy[NL802154_ATTR_MAX+1] = {
+ 	[NL802154_ATTR_WPAN_PHY_CAPS] = { .type = NLA_NESTED },
+ 
+ 	[NL802154_ATTR_SUPPORTED_COMMANDS] = { .type = NLA_NESTED },
++
++	[NL802154_ATTR_ACKREQ_DEFAULT] = { .type = NLA_U8 },
+ };
+ 
+ /* message building helper */
+@@ -458,6 +460,7 @@ static int nl802154_send_wpan_phy(struct cfg802154_registered_device *rdev,
+ 	CMD(set_max_csma_backoffs, SET_MAX_CSMA_BACKOFFS);
+ 	CMD(set_max_frame_retries, SET_MAX_FRAME_RETRIES);
+ 	CMD(set_lbt_mode, SET_LBT_MODE);
++	CMD(set_ackreq_default, SET_ACKREQ_DEFAULT);
+ 
+ 	if (rdev->wpan_phy.flags & WPAN_PHY_FLAG_TXPOWER)
+ 		CMD(set_tx_power, SET_TX_POWER);
+@@ -656,6 +659,10 @@ nl802154_send_iface(struct sk_buff *msg, u32 portid, u32 seq, int flags,
+ 	if (nla_put_u8(msg, NL802154_ATTR_LBT_MODE, wpan_dev->lbt))
+ 		goto nla_put_failure;
+ 
++	/* ackreq default behaviour */
++	if (nla_put_u8(msg, NL802154_ATTR_ACKREQ_DEFAULT, wpan_dev->ackreq))
++		goto nla_put_failure;
++
+ 	genlmsg_end(msg, hdr);
+ 	return 0;
+ 
+@@ -1042,6 +1049,24 @@ static int nl802154_set_lbt_mode(struct sk_buff *skb, struct genl_info *info)
+ 	return rdev_set_lbt_mode(rdev, wpan_dev, mode);
  }
  
-@@ -1267,15 +1250,8 @@ static int
- at86rf230_set_frame_retries(struct ieee802154_hw *hw, s8 retries)
- {
- 	struct at86rf230_local *lp = hw->priv;
--	int rc = 0;
--
--	lp->tx_aret = retries >= 0;
--	lp->max_frame_retries = retries;
++static int
++nl802154_set_ackreq_default(struct sk_buff *skb, struct genl_info *info)
++{
++	struct cfg802154_registered_device *rdev = info->user_ptr[0];
++	struct net_device *dev = info->user_ptr[1];
++	struct wpan_dev *wpan_dev = dev->ieee802154_ptr;
++	bool ackreq;
++
++	if (netif_running(dev))
++		return -EBUSY;
++
++	if (!info->attrs[NL802154_ATTR_ACKREQ_DEFAULT])
++		return -EINVAL;
++
++	ackreq = !!nla_get_u8(info->attrs[NL802154_ATTR_ACKREQ_DEFAULT]);
++	return rdev_set_ackreq_default(rdev, wpan_dev, ackreq);
++}
++
+ #define NL802154_FLAG_NEED_WPAN_PHY	0x01
+ #define NL802154_FLAG_NEED_NETDEV	0x02
+ #define NL802154_FLAG_NEED_RTNL		0x04
+@@ -1248,6 +1273,14 @@ static const struct genl_ops nl802154_ops[] = {
+ 		.internal_flags = NL802154_FLAG_NEED_NETDEV |
+ 				  NL802154_FLAG_NEED_RTNL,
+ 	},
++	{
++		.cmd = NL802154_CMD_SET_ACKREQ_DEFAULT,
++		.doit = nl802154_set_ackreq_default,
++		.policy = nl802154_policy,
++		.flags = GENL_ADMIN_PERM,
++		.internal_flags = NL802154_FLAG_NEED_NETDEV |
++				  NL802154_FLAG_NEED_RTNL,
++	},
+ };
  
--	if (retries >= 0)
--		rc = at86rf230_write_subreg(lp, SR_MAX_FRAME_RETRIES, retries);
--
--	return rc;
-+	return at86rf230_write_subreg(lp, SR_MAX_FRAME_RETRIES, retries);
+ /* initialisation/exit functions */
+diff --git a/net/ieee802154/rdev-ops.h b/net/ieee802154/rdev-ops.h
+index 8d5960a..03b3575 100644
+--- a/net/ieee802154/rdev-ops.h
++++ b/net/ieee802154/rdev-ops.h
+@@ -195,4 +195,17 @@ rdev_set_lbt_mode(struct cfg802154_registered_device *rdev,
+ 	return ret;
  }
  
- static int
++static inline int
++rdev_set_ackreq_default(struct cfg802154_registered_device *rdev,
++			struct wpan_dev *wpan_dev, bool ackreq)
++{
++	int ret;
++
++	trace_802154_rdev_set_ackreq_default(&rdev->wpan_phy, wpan_dev,
++					     ackreq);
++	ret = rdev->ops->set_ackreq_default(&rdev->wpan_phy, wpan_dev, ackreq);
++	trace_802154_rdev_return_int(&rdev->wpan_phy, ret);
++	return ret;
++}
++
+ #endif /* __CFG802154_RDEV_OPS */
+diff --git a/net/ieee802154/trace.h b/net/ieee802154/trace.h
+index 4399b7f..9a471e4 100644
+--- a/net/ieee802154/trace.h
++++ b/net/ieee802154/trace.h
+@@ -275,6 +275,25 @@ TRACE_EVENT(802154_rdev_set_lbt_mode,
+ 		WPAN_DEV_PR_ARG, BOOL_TO_STR(__entry->mode))
+ );
+ 
++TRACE_EVENT(802154_rdev_set_ackreq_default,
++	TP_PROTO(struct wpan_phy *wpan_phy, struct wpan_dev *wpan_dev,
++		 bool ackreq),
++	TP_ARGS(wpan_phy, wpan_dev, ackreq),
++	TP_STRUCT__entry(
++		WPAN_PHY_ENTRY
++		WPAN_DEV_ENTRY
++		__field(bool, ackreq)
++	),
++	TP_fast_assign(
++		WPAN_PHY_ASSIGN;
++		WPAN_DEV_ASSIGN;
++		__entry->ackreq = ackreq;
++	),
++	TP_printk(WPAN_PHY_PR_FMT ", " WPAN_DEV_PR_FMT
++		", ackreq default: %s", WPAN_PHY_PR_ARG,
++		WPAN_DEV_PR_ARG, BOOL_TO_STR(__entry->ackreq))
++);
++
+ TRACE_EVENT(802154_rdev_return_int,
+ 	TP_PROTO(struct wpan_phy *wpan_phy, int ret),
+ 	TP_ARGS(wpan_phy, ret),
+diff --git a/net/mac802154/cfg.c b/net/mac802154/cfg.c
+index cecfcda..c865ebb 100644
+--- a/net/mac802154/cfg.c
++++ b/net/mac802154/cfg.c
+@@ -256,6 +256,16 @@ ieee802154_set_lbt_mode(struct wpan_phy *wpan_phy, struct wpan_dev *wpan_dev,
+ 	return 0;
+ }
+ 
++static int
++ieee802154_set_ackreq_default(struct wpan_phy *wpan_phy,
++			      struct wpan_dev *wpan_dev, bool ackreq)
++{
++	ASSERT_RTNL();
++
++	wpan_dev->ackreq = ackreq;
++	return 0;
++}
++
+ const struct cfg802154_ops mac802154_config_ops = {
+ 	.add_virtual_intf_deprecated = ieee802154_add_iface_deprecated,
+ 	.del_virtual_intf_deprecated = ieee802154_del_iface_deprecated,
+@@ -273,4 +283,5 @@ const struct cfg802154_ops mac802154_config_ops = {
+ 	.set_max_csma_backoffs = ieee802154_set_max_csma_backoffs,
+ 	.set_max_frame_retries = ieee802154_set_max_frame_retries,
+ 	.set_lbt_mode = ieee802154_set_lbt_mode,
++	.set_ackreq_default = ieee802154_set_ackreq_default,
+ };
 -- 
 2.5.0
 
