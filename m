@@ -1,84 +1,53 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f180.google.com ([209.85.212.180]:37253 "EHLO
-	mail-wi0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752001AbbHJRR7 (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Mon, 10 Aug 2015 13:17:59 -0400
-Received: by wibhh20 with SMTP id hh20so160196429wib.0
-        for <linux-wpan@vger.kernel.org>; Mon, 10 Aug 2015 10:17:58 -0700 (PDT)
+Received: from mail-wi0-f181.google.com ([209.85.212.181]:34075 "EHLO
+	mail-wi0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752679AbbHJRSA (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Mon, 10 Aug 2015 13:18:00 -0400
+Received: by wicne3 with SMTP id ne3so144599829wic.1
+        for <linux-wpan@vger.kernel.org>; Mon, 10 Aug 2015 10:17:59 -0700 (PDT)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH bluetooth-next 0/8] ieee802154: pending patches
-Date: Mon, 10 Aug 2015 21:15:51 +0200
-Message-Id: <1439234159-11630-1-git-send-email-alex.aring@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Subject: [PATCH bluetooth-next 1/8] 6lowpan: Fix extraction of flow label field
+Date: Mon, 10 Aug 2015 21:15:52 +0200
+Message-Id: <1439234159-11630-2-git-send-email-alex.aring@gmail.com>
+In-Reply-To: <1439234159-11630-1-git-send-email-alex.aring@gmail.com>
+References: <1439234159-11630-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
-Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
+Cc: kernel@pengutronix.de, Lukasz Duda <lukasz.duda@nordicsemi.no>, Glenn Ruben Bakke <glenn.ruben.bakke@nordicsemi.no>, Alexander Aring <alex.aring@gmail.com>
 
-Hi Marcel,
+From: Lukasz Duda <lukasz.duda@nordicsemi.no>
 
-these are currently the pending patches for ieee802154 subsystem.
+The lowpan_fetch_skb function is used to fetch the first byte,
+which also increments the data pointer in skb structure,
+making subsequent array lookup of byte 0 actually being byte 1.
 
-There is one patch which was send before ~ 5 months ago and I dropped
-it again because the there was something wrong in the complete patch series
-and then I forget that fix. Nevertheless it seems that the RIOT people hit it,
-see:
+To decompress the first byte of the Flow Label when the TF flag is
+set to 0x01, the second half of the first byte is needed.
 
-https://github.com/RIOT-OS/RIOT/issues/3588#issuecomment-129509141
+The patch fixes the extraction of the Flow Label field.
 
-I hope the issue is fixed by PATCH "ieee802154: 6lowpan: fix error frag
-handling".
+Acked-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+Signed-off-by: Lukasz Duda <lukasz.duda@nordicsemi.no>
+Signed-off-by: Glenn Ruben Bakke <glenn.ruben.bakke@nordicsemi.no>
+Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+---
+ net/6lowpan/iphc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-One fix from Lukasz Duda which fixes the traffic class decompression
-in 6LoWPAN code. There is indeed something wrong but I think the code needs
-a complete reqwork.
-
-The other patches changes the aret handling in ieee802154 by removing
-the max_frame_retries "-1" value and do the ack handling per frame.
-To set the ackrequest bit for 802.15.4 6LoWPAN frames we introcued
-the ackrequest bit default handling which can set by nl802154.
-
-Note:
-
-There is another pending patch:
-
-"cc2520: set the default fifo pin value from platform data"
-
-but Varka didn't ack it yet, can you please apply this patch when Varka acked
-it, otherwise we will include them for the next "pending patches" series.
-
-- Alex
-
-Alexander Aring (7):
-  ieee802154: 6lowpan: remove multiple lowpan per wpan support
-  mac802154: fix wpan mac setting while lowpan is there
-  mac802154: cfg: remove test and set checks
-  mac802154: change frame_retries behaviour
-  at86rf230: use STATE_TX_ARET mode only
-  ieee802154: add ack request default handling
-  ieee802154: 6lowpan: fix error frag handling
-
-Lukasz Duda (1):
-  6lowpan: Fix extraction of flow label field
-
- drivers/net/ieee802154/at86rf230.c | 52 ++++++++---------------------
- include/net/cfg802154.h            |  8 +++++
- include/net/nl802154.h             |  4 +++
- net/6lowpan/iphc.c                 |  2 +-
- net/ieee802154/6lowpan/6lowpan_i.h |  8 -----
- net/ieee802154/6lowpan/core.c      | 67 +++++++++++---------------------------
- net/ieee802154/6lowpan/rx.c        | 38 +++++----------------
- net/ieee802154/6lowpan/tx.c        |  4 +--
- net/ieee802154/nl802154.c          | 33 +++++++++++++++++++
- net/ieee802154/rdev-ops.h          | 13 ++++++++
- net/ieee802154/trace.h             | 19 +++++++++++
- net/mac802154/cfg.c                | 27 +++++++--------
- net/mac802154/iface.c              | 18 ++++++++--
- net/mac802154/main.c               |  9 ++---
- 14 files changed, 151 insertions(+), 151 deletions(-)
-
+diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
+index 9055d7b..74e56d7 100644
+--- a/net/6lowpan/iphc.c
++++ b/net/6lowpan/iphc.c
+@@ -284,7 +284,7 @@ lowpan_header_decompress(struct sk_buff *skb, struct net_device *dev,
+ 		if (lowpan_fetch_skb(skb, &tmp, sizeof(tmp)))
+ 			return -EINVAL;
+ 
+-		hdr.flow_lbl[0] = (skb->data[0] & 0x0F) | ((tmp >> 2) & 0x30);
++		hdr.flow_lbl[0] = (tmp & 0x0F) | ((tmp >> 2) & 0x30);
+ 		memcpy(&hdr.flow_lbl[1], &skb->data[0], 2);
+ 		skb_pull(skb, 2);
+ 		break;
 -- 
 2.5.0
 
