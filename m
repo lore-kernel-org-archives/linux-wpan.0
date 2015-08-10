@@ -1,82 +1,132 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f175.google.com ([209.85.212.175]:38199 "EHLO
-	mail-wi0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932438AbbHJRSF (ORCPT
+Received: from mail-wi0-f177.google.com ([209.85.212.177]:37387 "EHLO
+	mail-wi0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932251AbbHJRSF (ORCPT
 	<rfc822;linux-wpan@vger.kernel.org>); Mon, 10 Aug 2015 13:18:05 -0400
-Received: by wicja10 with SMTP id ja10so34782025wic.1
-        for <linux-wpan@vger.kernel.org>; Mon, 10 Aug 2015 10:18:03 -0700 (PDT)
+Received: by wibhh20 with SMTP id hh20so160200204wib.0
+        for <linux-wpan@vger.kernel.org>; Mon, 10 Aug 2015 10:18:04 -0700 (PDT)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH bluetooth-next 5/8] mac802154: change frame_retries behaviour
-Date: Mon, 10 Aug 2015 21:15:56 +0200
-Message-Id: <1439234159-11630-6-git-send-email-alex.aring@gmail.com>
+Subject: [PATCH bluetooth-next 6/8] at86rf230: use STATE_TX_ARET mode only
+Date: Mon, 10 Aug 2015 21:15:57 +0200
+Message-Id: <1439234159-11630-7-git-send-email-alex.aring@gmail.com>
 In-Reply-To: <1439234159-11630-1-git-send-email-alex.aring@gmail.com>
 References: <1439234159-11630-1-git-send-email-alex.aring@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
 Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-This patch changes the default minimum value of frame_retries to 0 and
-changes the frame_retries default value to 3 which is also 802.15.4
-default.
-
-We don't use the frame_retries "-1" value as indicator for no-aret mode
-anymore, instead we checking on the ack request bit inside the 802.15.4
-frame control field. This allows a acknowledge handling per frame. This
-checking is done by transceiver or inside xmit callback of driver layer.
-
-If a transceiver doesn't support ARET handling the transmit
-functionality ignores ack frames then, which isn't well but should not
-effect anything of current functionality.
+This patch changes the state change behaviour of at86rf230 to always
+TX_ARET mode. According the at86rf2xx datasheets TX_ARET mode doesn't
+mean to be always waiting for ack frames after transmit. The transceiver
+will automatically wait for ack frames or not if the acknowledge request
+bit is set. See section "TX_ARET_ON – Transmit with Automatic Frame
+Retransmission and CSMA-CA Retry".
 
 Reviewed-by: Stefan Schmidt <stefan@osg.samsung.com>
 Signed-off-by: Alexander Aring <alex.aring@gmail.com>
 ---
- net/mac802154/iface.c | 3 +--
- net/mac802154/main.c  | 9 +++------
- 2 files changed, 4 insertions(+), 8 deletions(-)
+ drivers/net/ieee802154/at86rf230.c | 52 ++++++++++----------------------------
+ 1 file changed, 14 insertions(+), 38 deletions(-)
 
-diff --git a/net/mac802154/iface.c b/net/mac802154/iface.c
-index ff99055..ed26952 100644
---- a/net/mac802154/iface.c
-+++ b/net/mac802154/iface.c
-@@ -498,8 +498,7 @@ ieee802154_setup_sdata(struct ieee802154_sub_if_data *sdata,
- 	wpan_dev->min_be = 3;
- 	wpan_dev->max_be = 5;
- 	wpan_dev->csma_retries = 4;
--	/* for compatibility, actual default is 3 */
--	wpan_dev->frame_retries = -1;
-+	wpan_dev->frame_retries = 3;
+diff --git a/drivers/net/ieee802154/at86rf230.c b/drivers/net/ieee802154/at86rf230.c
+index d0d5bf6..6422caa 100644
+--- a/drivers/net/ieee802154/at86rf230.c
++++ b/drivers/net/ieee802154/at86rf230.c
+@@ -97,9 +97,7 @@ struct at86rf230_local {
  
- 	wpan_dev->pan_id = cpu_to_le16(IEEE802154_PANID_BROADCAST);
- 	wpan_dev->short_addr = cpu_to_le16(IEEE802154_ADDR_BROADCAST);
-diff --git a/net/mac802154/main.c b/net/mac802154/main.c
-index 9e55431..e8cab5b 100644
---- a/net/mac802154/main.c
-+++ b/net/mac802154/main.c
-@@ -111,7 +111,7 @@ ieee802154_alloc_hw(size_t priv_data_len, const struct ieee802154_ops *ops)
- 	phy->supported.max_minbe = 8;
- 	phy->supported.min_maxbe = 3;
- 	phy->supported.max_maxbe = 8;
--	phy->supported.min_frame_retries = -1;
-+	phy->supported.min_frame_retries = 0;
- 	phy->supported.max_frame_retries = 7;
- 	phy->supported.max_csma_backoffs = 5;
- 	phy->supported.lbt = NL802154_SUPPORTED_BOOL_FALSE;
-@@ -177,11 +177,8 @@ int ieee802154_register_hw(struct ieee802154_hw *hw)
+ 	struct at86rf230_state_change irq;
+ 
+-	bool tx_aret;
+ 	unsigned long cal_timeout;
+-	s8 max_frame_retries;
+ 	bool is_tx;
+ 	bool is_tx_from_off;
+ 	u8 tx_retry;
+@@ -651,7 +649,7 @@ at86rf230_tx_complete(void *context)
+ 
+ 	enable_irq(ctx->irq);
+ 
+-	ieee802154_xmit_complete(lp->hw, lp->tx_skb, !lp->tx_aret);
++	ieee802154_xmit_complete(lp->hw, lp->tx_skb, false);
+ }
+ 
+ static void
+@@ -760,17 +758,10 @@ at86rf230_irq_trx_end(struct at86rf230_local *lp)
+ {
+ 	if (lp->is_tx) {
+ 		lp->is_tx = 0;
+-
+-		if (lp->tx_aret)
+-			at86rf230_async_state_change(lp, &lp->irq,
+-						     STATE_FORCE_TX_ON,
+-						     at86rf230_tx_trac_status,
+-						     true);
+-		else
+-			at86rf230_async_state_change(lp, &lp->irq,
+-						     STATE_RX_AACK_ON,
+-						     at86rf230_tx_complete,
+-						     true);
++		at86rf230_async_state_change(lp, &lp->irq,
++					     STATE_FORCE_TX_ON,
++					     at86rf230_tx_trac_status,
++					     true);
+ 	} else {
+ 		at86rf230_async_read_reg(lp, RG_TRX_STATE, &lp->irq,
+ 					 at86rf230_rx_trac_check, true);
+@@ -876,24 +867,16 @@ at86rf230_xmit_start(void *context)
+ 	struct at86rf230_state_change *ctx = context;
+ 	struct at86rf230_local *lp = ctx->lp;
+ 
+-	/* In ARET mode we need to go into STATE_TX_ARET_ON after we
+-	 * are in STATE_TX_ON. The pfad differs here, so we change
+-	 * the complete handler.
+-	 */
+-	if (lp->tx_aret) {
+-		if (lp->is_tx_from_off) {
+-			lp->is_tx_from_off = false;
+-			at86rf230_async_state_change(lp, ctx, STATE_TX_ARET_ON,
+-						     at86rf230_write_frame,
+-						     false);
+-		} else {
+-			at86rf230_async_state_change(lp, ctx, STATE_TX_ON,
+-						     at86rf230_xmit_tx_on,
+-						     false);
+-		}
++	/* check if we change from off state */
++	if (lp->is_tx_from_off) {
++		lp->is_tx_from_off = false;
++		at86rf230_async_state_change(lp, ctx, STATE_TX_ARET_ON,
++					     at86rf230_write_frame,
++					     false);
+ 	} else {
+ 		at86rf230_async_state_change(lp, ctx, STATE_TX_ON,
+-					     at86rf230_write_frame, false);
++					     at86rf230_xmit_tx_on,
++					     false);
  	}
+ }
  
- 	if (!(hw->flags & IEEE802154_HW_FRAME_RETRIES)) {
--		/* TODO should be 3, but our default value is -1 which means
--		 * no ARET handling.
--		 */
--		local->phy->supported.min_frame_retries = -1;
--		local->phy->supported.max_frame_retries = -1;
-+		local->phy->supported.min_frame_retries = 3;
-+		local->phy->supported.max_frame_retries = 3;
- 	}
+@@ -1267,15 +1250,8 @@ static int
+ at86rf230_set_frame_retries(struct ieee802154_hw *hw, s8 retries)
+ {
+ 	struct at86rf230_local *lp = hw->priv;
+-	int rc = 0;
+-
+-	lp->tx_aret = retries >= 0;
+-	lp->max_frame_retries = retries;
  
- 	if (hw->flags & IEEE802154_HW_PROMISCUOUS)
+-	if (retries >= 0)
+-		rc = at86rf230_write_subreg(lp, SR_MAX_FRAME_RETRIES, retries);
+-
+-	return rc;
++	return at86rf230_write_subreg(lp, SR_MAX_FRAME_RETRIES, retries);
+ }
+ 
+ static int
 -- 
 2.5.0
 
