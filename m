@@ -1,14 +1,14 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f180.google.com ([209.85.212.180]:38161 "EHLO
-	mail-wi0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932251AbbHJRSD (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Mon, 10 Aug 2015 13:18:03 -0400
-Received: by wicja10 with SMTP id ja10so34780891wic.1
-        for <linux-wpan@vger.kernel.org>; Mon, 10 Aug 2015 10:18:01 -0700 (PDT)
+Received: from mail-wi0-f181.google.com ([209.85.212.181]:38179 "EHLO
+	mail-wi0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932329AbbHJRSE (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Mon, 10 Aug 2015 13:18:04 -0400
+Received: by wicja10 with SMTP id ja10so34781470wic.1
+        for <linux-wpan@vger.kernel.org>; Mon, 10 Aug 2015 10:18:03 -0700 (PDT)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH bluetooth-next 3/8] mac802154: fix wpan mac setting while lowpan is there
-Date: Mon, 10 Aug 2015 21:15:54 +0200
-Message-Id: <1439234159-11630-4-git-send-email-alex.aring@gmail.com>
+Subject: [PATCH bluetooth-next 4/8] mac802154: cfg: remove test and set checks
+Date: Mon, 10 Aug 2015 21:15:55 +0200
+Message-Id: <1439234159-11630-5-git-send-email-alex.aring@gmail.com>
 In-Reply-To: <1439234159-11630-1-git-send-email-alex.aring@gmail.com>
 References: <1439234159-11630-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
@@ -16,59 +16,77 @@ List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
 Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-If we currently change the mac address inside the wpan interface while
-we have a lowpan interface on top of the wpan interface, the mac address
-setting doesn't reach the lowpan interface. The effect would be that the
-IPv6 lowpan interface has the old SLAAC address and isn't working
-anymore because the lowpan interface use in internal mechanism sometimes
-dev->addr which is the old mac address of the wpan interface.
+This patch removes several checks if a value is really changed. This
+makes only sense if we have another layer call e.g. calling the
+driver_ops which is done by callbacks like "set_channel".
 
-This patch checks if a wpan interface belongs to lowpan interface, if
-yes then we need to check if the lowpan interface is down and change the
-mac address also at the lowpan interface. When the lowpan interface will
-be set up afterwards, it will use the correct SLAAC address which based
-on the updated mac address setting.
+For MAC settings which need to be set by phy registers (if the phy
+supports that handling) this is set by doing an interface up currently
+and are not direct driver_ops calls, so we remove the checks from these
+configuration callbacks.
 
 Reviewed-by: Stefan Schmidt <stefan@osg.samsung.com>
-Tested-by: Stefan Schmidt <stefan@osg.samsung.com>
+Suggested-by: Phoebe Buckheister <phoebe.buckheister@itwm.fraunhofer.de>
 Signed-off-by: Alexander Aring <alex.aring@gmail.com>
 ---
- net/mac802154/iface.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+ net/mac802154/cfg.c | 16 ----------------
+ 1 file changed, 16 deletions(-)
 
-diff --git a/net/mac802154/iface.c b/net/mac802154/iface.c
-index 416de90..ff99055 100644
---- a/net/mac802154/iface.c
-+++ b/net/mac802154/iface.c
-@@ -125,6 +125,14 @@ static int mac802154_wpan_mac_addr(struct net_device *dev, void *p)
- 	if (netif_running(dev))
- 		return -EBUSY;
+diff --git a/net/mac802154/cfg.c b/net/mac802154/cfg.c
+index f7ba51e..cecfcda 100644
+--- a/net/mac802154/cfg.c
++++ b/net/mac802154/cfg.c
+@@ -209,10 +209,6 @@ ieee802154_set_backoff_exponent(struct wpan_phy *wpan_phy,
+ {
+ 	ASSERT_RTNL();
  
-+	/* lowpan need to be down for update
-+	 * SLAAC address after ifup
-+	 */
-+	if (sdata->wpan_dev.lowpan_dev) {
-+		if (netif_running(sdata->wpan_dev.lowpan_dev))
-+			return -EBUSY;
-+	}
-+
- 	ieee802154_be64_to_le64(&extended_addr, addr->sa_data);
- 	if (!ieee802154_is_valid_extended_unicast_addr(extended_addr))
- 		return -EINVAL;
-@@ -132,6 +140,13 @@ static int mac802154_wpan_mac_addr(struct net_device *dev, void *p)
- 	memcpy(dev->dev_addr, addr->sa_data, dev->addr_len);
- 	sdata->wpan_dev.extended_addr = extended_addr;
+-	if (wpan_dev->min_be == min_be &&
+-	    wpan_dev->max_be == max_be)
+-		return 0;
+-
+ 	wpan_dev->min_be = min_be;
+ 	wpan_dev->max_be = max_be;
+ 	return 0;
+@@ -224,9 +220,6 @@ ieee802154_set_short_addr(struct wpan_phy *wpan_phy, struct wpan_dev *wpan_dev,
+ {
+ 	ASSERT_RTNL();
  
-+	/* update lowpan interface mac address when
-+	 * wpan mac has been changed
-+	 */
-+	if (sdata->wpan_dev.lowpan_dev)
-+		memcpy(sdata->wpan_dev.lowpan_dev->dev_addr, dev->dev_addr,
-+		       dev->addr_len);
-+
- 	return mac802154_wpan_update_llsec(dev);
+-	if (wpan_dev->short_addr == short_addr)
+-		return 0;
+-
+ 	wpan_dev->short_addr = short_addr;
+ 	return 0;
  }
+@@ -238,9 +231,6 @@ ieee802154_set_max_csma_backoffs(struct wpan_phy *wpan_phy,
+ {
+ 	ASSERT_RTNL();
  
+-	if (wpan_dev->csma_retries == max_csma_backoffs)
+-		return 0;
+-
+ 	wpan_dev->csma_retries = max_csma_backoffs;
+ 	return 0;
+ }
+@@ -252,9 +242,6 @@ ieee802154_set_max_frame_retries(struct wpan_phy *wpan_phy,
+ {
+ 	ASSERT_RTNL();
+ 
+-	if (wpan_dev->frame_retries == max_frame_retries)
+-		return 0;
+-
+ 	wpan_dev->frame_retries = max_frame_retries;
+ 	return 0;
+ }
+@@ -265,9 +252,6 @@ ieee802154_set_lbt_mode(struct wpan_phy *wpan_phy, struct wpan_dev *wpan_dev,
+ {
+ 	ASSERT_RTNL();
+ 
+-	if (wpan_dev->lbt == mode)
+-		return 0;
+-
+ 	wpan_dev->lbt = mode;
+ 	return 0;
+ }
 -- 
 2.5.0
 
