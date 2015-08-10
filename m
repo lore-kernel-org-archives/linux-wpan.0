@@ -1,14 +1,14 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f181.google.com ([209.85.212.181]:38179 "EHLO
-	mail-wi0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932329AbbHJRSE (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Mon, 10 Aug 2015 13:18:04 -0400
-Received: by wicja10 with SMTP id ja10so34781470wic.1
+Received: from mail-wi0-f175.google.com ([209.85.212.175]:38199 "EHLO
+	mail-wi0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932438AbbHJRSF (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Mon, 10 Aug 2015 13:18:05 -0400
+Received: by wicja10 with SMTP id ja10so34782025wic.1
         for <linux-wpan@vger.kernel.org>; Mon, 10 Aug 2015 10:18:03 -0700 (PDT)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH bluetooth-next 4/8] mac802154: cfg: remove test and set checks
-Date: Mon, 10 Aug 2015 21:15:55 +0200
-Message-Id: <1439234159-11630-5-git-send-email-alex.aring@gmail.com>
+Subject: [PATCH bluetooth-next 5/8] mac802154: change frame_retries behaviour
+Date: Mon, 10 Aug 2015 21:15:56 +0200
+Message-Id: <1439234159-11630-6-git-send-email-alex.aring@gmail.com>
 In-Reply-To: <1439234159-11630-1-git-send-email-alex.aring@gmail.com>
 References: <1439234159-11630-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
@@ -16,77 +16,67 @@ List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
 Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-This patch removes several checks if a value is really changed. This
-makes only sense if we have another layer call e.g. calling the
-driver_ops which is done by callbacks like "set_channel".
+This patch changes the default minimum value of frame_retries to 0 and
+changes the frame_retries default value to 3 which is also 802.15.4
+default.
 
-For MAC settings which need to be set by phy registers (if the phy
-supports that handling) this is set by doing an interface up currently
-and are not direct driver_ops calls, so we remove the checks from these
-configuration callbacks.
+We don't use the frame_retries "-1" value as indicator for no-aret mode
+anymore, instead we checking on the ack request bit inside the 802.15.4
+frame control field. This allows a acknowledge handling per frame. This
+checking is done by transceiver or inside xmit callback of driver layer.
+
+If a transceiver doesn't support ARET handling the transmit
+functionality ignores ack frames then, which isn't well but should not
+effect anything of current functionality.
 
 Reviewed-by: Stefan Schmidt <stefan@osg.samsung.com>
-Suggested-by: Phoebe Buckheister <phoebe.buckheister@itwm.fraunhofer.de>
 Signed-off-by: Alexander Aring <alex.aring@gmail.com>
 ---
- net/mac802154/cfg.c | 16 ----------------
- 1 file changed, 16 deletions(-)
+ net/mac802154/iface.c | 3 +--
+ net/mac802154/main.c  | 9 +++------
+ 2 files changed, 4 insertions(+), 8 deletions(-)
 
-diff --git a/net/mac802154/cfg.c b/net/mac802154/cfg.c
-index f7ba51e..cecfcda 100644
---- a/net/mac802154/cfg.c
-+++ b/net/mac802154/cfg.c
-@@ -209,10 +209,6 @@ ieee802154_set_backoff_exponent(struct wpan_phy *wpan_phy,
- {
- 	ASSERT_RTNL();
+diff --git a/net/mac802154/iface.c b/net/mac802154/iface.c
+index ff99055..ed26952 100644
+--- a/net/mac802154/iface.c
++++ b/net/mac802154/iface.c
+@@ -498,8 +498,7 @@ ieee802154_setup_sdata(struct ieee802154_sub_if_data *sdata,
+ 	wpan_dev->min_be = 3;
+ 	wpan_dev->max_be = 5;
+ 	wpan_dev->csma_retries = 4;
+-	/* for compatibility, actual default is 3 */
+-	wpan_dev->frame_retries = -1;
++	wpan_dev->frame_retries = 3;
  
--	if (wpan_dev->min_be == min_be &&
--	    wpan_dev->max_be == max_be)
--		return 0;
--
- 	wpan_dev->min_be = min_be;
- 	wpan_dev->max_be = max_be;
- 	return 0;
-@@ -224,9 +220,6 @@ ieee802154_set_short_addr(struct wpan_phy *wpan_phy, struct wpan_dev *wpan_dev,
- {
- 	ASSERT_RTNL();
+ 	wpan_dev->pan_id = cpu_to_le16(IEEE802154_PANID_BROADCAST);
+ 	wpan_dev->short_addr = cpu_to_le16(IEEE802154_ADDR_BROADCAST);
+diff --git a/net/mac802154/main.c b/net/mac802154/main.c
+index 9e55431..e8cab5b 100644
+--- a/net/mac802154/main.c
++++ b/net/mac802154/main.c
+@@ -111,7 +111,7 @@ ieee802154_alloc_hw(size_t priv_data_len, const struct ieee802154_ops *ops)
+ 	phy->supported.max_minbe = 8;
+ 	phy->supported.min_maxbe = 3;
+ 	phy->supported.max_maxbe = 8;
+-	phy->supported.min_frame_retries = -1;
++	phy->supported.min_frame_retries = 0;
+ 	phy->supported.max_frame_retries = 7;
+ 	phy->supported.max_csma_backoffs = 5;
+ 	phy->supported.lbt = NL802154_SUPPORTED_BOOL_FALSE;
+@@ -177,11 +177,8 @@ int ieee802154_register_hw(struct ieee802154_hw *hw)
+ 	}
  
--	if (wpan_dev->short_addr == short_addr)
--		return 0;
--
- 	wpan_dev->short_addr = short_addr;
- 	return 0;
- }
-@@ -238,9 +231,6 @@ ieee802154_set_max_csma_backoffs(struct wpan_phy *wpan_phy,
- {
- 	ASSERT_RTNL();
+ 	if (!(hw->flags & IEEE802154_HW_FRAME_RETRIES)) {
+-		/* TODO should be 3, but our default value is -1 which means
+-		 * no ARET handling.
+-		 */
+-		local->phy->supported.min_frame_retries = -1;
+-		local->phy->supported.max_frame_retries = -1;
++		local->phy->supported.min_frame_retries = 3;
++		local->phy->supported.max_frame_retries = 3;
+ 	}
  
--	if (wpan_dev->csma_retries == max_csma_backoffs)
--		return 0;
--
- 	wpan_dev->csma_retries = max_csma_backoffs;
- 	return 0;
- }
-@@ -252,9 +242,6 @@ ieee802154_set_max_frame_retries(struct wpan_phy *wpan_phy,
- {
- 	ASSERT_RTNL();
- 
--	if (wpan_dev->frame_retries == max_frame_retries)
--		return 0;
--
- 	wpan_dev->frame_retries = max_frame_retries;
- 	return 0;
- }
-@@ -265,9 +252,6 @@ ieee802154_set_lbt_mode(struct wpan_phy *wpan_phy, struct wpan_dev *wpan_dev,
- {
- 	ASSERT_RTNL();
- 
--	if (wpan_dev->lbt == mode)
--		return 0;
--
- 	wpan_dev->lbt = mode;
- 	return 0;
- }
+ 	if (hw->flags & IEEE802154_HW_PROMISCUOUS)
 -- 
 2.5.0
 
