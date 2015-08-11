@@ -1,49 +1,35 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-pd0-f175.google.com ([209.85.192.175]:35389 "EHLO
-	mail-pd0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S933326AbbHKDSc (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Mon, 10 Aug 2015 23:18:32 -0400
-Message-ID: <55C9697C.7080906@gmail.com>
-Date: Tue, 11 Aug 2015 08:48:20 +0530
-From: Varka Bhadram <varkabhadram@gmail.com>
-MIME-Version: 1.0
-Subject: Re: [PATCH v2 bluetooth-next] cc2520: set the default fifo pin value
- from platform data
-References: <1439260985-5173-1-git-send-email-sdliyong@gmail.com>
+Received: from senator.holtmann.net ([87.106.208.187]:40573 "EHLO
+	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750710AbbHKEPF (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Tue, 11 Aug 2015 00:15:05 -0400
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2102\))
+Subject: Re: [PATCH v2 bluetooth-next] cc2520: set the default fifo pin value from platform data
+From: Marcel Holtmann <marcel@holtmann.org>
 In-Reply-To: <1439260985-5173-1-git-send-email-sdliyong@gmail.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+Date: Mon, 10 Aug 2015 21:14:56 -0700
 Content-Transfer-Encoding: 7bit
+Message-Id: <4DB1C0CA-7453-4763-91E2-F46565E9A649@holtmann.org>
+References: <1439260985-5173-1-git-send-email-sdliyong@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: sdliyong@gmail.com, alex.aring@gmail.com, linux-wpan@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+To: sdliyong@gmail.com
+Cc: Varka Bhadram <varkabhadram@gmail.com>, Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On 08/11/2015 08:13 AM, sdliyong@gmail.com wrote:
-> From: Yong Li <sdliyong@gmail.com>
->
+Hi Yong,
+
 > When the device tree support is disabled, the fifo_pin is uninitialized,
 > this patch will set the fifo_pin value based on platform data
->
+> 
 > Signed-off-by: Yong Li <sdliyong@gmail.com>
-
-Acked-by: Varka Bhadram <varkabhadram@gmail.com>
-
 > ---
->   drivers/net/ieee802154/cc2520.c | 1 +
->   1 file changed, 1 insertion(+)
->
-> diff --git a/drivers/net/ieee802154/cc2520.c b/drivers/net/ieee802154/cc2520.c
-> index 613dae5..c5b54a1 100644
-> --- a/drivers/net/ieee802154/cc2520.c
-> +++ b/drivers/net/ieee802154/cc2520.c
-> @@ -833,6 +833,7 @@ static int cc2520_get_platform_data(struct spi_device *spi,
->   		if (!spi_pdata)
->   			return -ENOENT;
->   		*pdata = *spi_pdata;
-> +		priv->fifo_pin = pdata->fifo;
->   		return 0;
->   	}
->   
+> drivers/net/ieee802154/cc2520.c | 1 +
+> 1 file changed, 1 insertion(+)
 
--- 
-Varka Bhadram.
+patch has been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
 
