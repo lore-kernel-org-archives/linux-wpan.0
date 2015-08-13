@@ -1,135 +1,77 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from lists.s-osg.org ([54.187.51.154]:60456 "EHLO lists.s-osg.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754676AbbH0N7i (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-	Thu, 27 Aug 2015 09:59:38 -0400
-Subject: Re: [RFC bluetooth-next 19/21] mrf24j40: add tx power support
+Received: from mail-wi0-f179.google.com ([209.85.212.179]:33851 "EHLO
+	mail-wi0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752567AbbHMMXj (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Thu, 13 Aug 2015 08:23:39 -0400
+Received: by wicne3 with SMTP id ne3so256998408wic.1
+        for <linux-wpan@vger.kernel.org>; Thu, 13 Aug 2015 05:23:38 -0700 (PDT)
+From: Alexander Aring <alex.aring@gmail.com>
+Subject: [RFC bluetooth-next 20/21] mrf24j40: add promiscuous mode support
+Date: Thu, 13 Aug 2015 14:22:47 +0200
+Message-Id: <1439468568-22288-21-git-send-email-alex.aring@gmail.com>
+In-Reply-To: <1439468568-22288-1-git-send-email-alex.aring@gmail.com>
 References: <1439468568-22288-1-git-send-email-alex.aring@gmail.com>
- <1439468568-22288-20-git-send-email-alex.aring@gmail.com>
-From: Stefan Schmidt <stefan@osg.samsung.com>
-Message-ID: <55DF17C6.30206@osg.samsung.com>
-Date: Thu, 27 Aug 2015 15:59:34 +0200
-MIME-Version: 1.0
-In-Reply-To: <1439468568-22288-20-git-send-email-alex.aring@gmail.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org
-Cc: kernel@pengutronix.de, alan@signal11.us, jonatan@myeden.se
+To: linux-wpan@vger.kernel.org
+Cc: kernel@pengutronix.de, alan@signal11.us, jonatan@myeden.se, stefan@osg.samsung.com, Alexander Aring <alex.aring@gmail.com>
 
-Hello.
+This patch adds support for promiscuous mode by setting promiscuous (no
+frame filtering), disable automatic ack handling and not filtering
+frames where the crc is invalid.
 
-On 13/08/15 14:22, Alexander Aring wrote:
-> This patch supports setting of transmit power for the mrf24j40ma
-> transceiver only. The mrf24j40mc has some amplifier to change the
-> transmit power, I am currently not sure how the mapping for this
-> amplifier looks like.
->
-> Signed-off-by: Alexander Aring <alex.aring@gmail.com>
-> ---
->   drivers/net/ieee802154/mrf24j40.c | 70 +++++++++++++++++++++++++++++++++++++++
->   1 file changed, 70 insertions(+)
->
-> diff --git a/drivers/net/ieee802154/mrf24j40.c b/drivers/net/ieee802154/mrf24j40.c
-> index 00fd97e..e9a03fd 100644
-> --- a/drivers/net/ieee802154/mrf24j40.c
-> +++ b/drivers/net/ieee802154/mrf24j40.c
-> @@ -863,6 +863,65 @@ static int mrf24j40_set_cca_ed_level(struct ieee802154_hw *hw, s32 mbm)
->   	return -EINVAL;
->   }
->   
-> +static const s32 mrf24j40ma_powers[] = {
-> +	0, -50, -120, -190, -280, -370, -490, -630, -1000, -1050, -1120, -1190,
-> +	-1280, -1370, -1490, -1630, -2000, -2050, -2120, -2190, -2280, -2370,
-> +	-2490, -2630, -3000, -3050, -3120, -3190, -3280, -3370, -3490, -3630,
-> +};
-> +
-> +static int mrf24j40_set_txpower(struct ieee802154_hw *hw, s32 mbm)
-> +{
-> +	struct mrf24j40 *devrec = hw->priv;
-> +	s32 small_scale;
-> +	u8 val;
-> +
-> +	if (0 >= mbm && mbm > -1000) {
-> +		val = 0;
-> +		small_scale = mbm;
-> +	} else if (-1000 >= mbm && mbm > -2000) {
-> +		val = 0x40;
-> +		small_scale = mbm + 1000;
-> +	} else if (-2000 >= mbm && mbm > -3000) {
-> +		val = 0x80;
-> +		small_scale = mbm + 2000;
-> +	} else if (-3000 >= mbm && mbm > -4000) {
-> +		val = 0xc0;
-> +		small_scale = mbm + 3000;
-> +	} else {
-> +		return -EINVAL;
-> +	}
-> +
-> +	switch (small_scale) {
-> +	case 0:
-> +		break;
-> +	case -50:
-> +		val |= 0x08;
-> +		break;
-> +	case -120:
-> +		val |= 0x10;
-> +		break;
-> +	case -190:
-> +		val |= 0x18;
-> +		break;
-> +	case -280:
-> +		val |= 0x20;
-> +		break;
-> +	case -370:
-> +		val |= 0x28;
-> +		break;
-> +	case -490:
-> +		val |= 0x30;
-> +		break;
-> +	case -630:
-> +		val |= 0x38;
-> +		break;
-> +	default:
-> +		return -EINVAL;
-> +	}
-> +
-> +	return regmap_update_bits(devrec->regmap_long, REG_RFCON3, 0xf8, val);
-> +}
-> +
->   static const struct ieee802154_ops mrf24j40_ops = {
->   	.owner = THIS_MODULE,
->   	.xmit_async = mrf24j40_tx,
-> @@ -874,6 +933,7 @@ static const struct ieee802154_ops mrf24j40_ops = {
->   	.set_csma_params = mrf24j40_csma_params,
->   	.set_cca_mode = mrf24j40_set_cca_mode,
->   	.set_cca_ed_level = mrf24j40_set_cca_ed_level,
-> +	.set_txpower = mrf24j40_set_txpower,
->   };
->   
->   static void mrf24j40_intstat_complete(void *context)
-> @@ -1085,6 +1145,16 @@ static void  mrf24j40_phy_setup(struct mrf24j40 *devrec)
->   	devrec->hw->phy->cca_ed_level = -6900;
->   	devrec->hw->phy->supported.cca_ed_levels = mrf24j40_ed_levels;
->   	devrec->hw->phy->supported.cca_ed_levels_size = ARRAY_SIZE(mrf24j40_ed_levels);
-> +
-> +	switch (spi_get_device_id(devrec->spi)->driver_data) {
-> +	case MRF24J40MA:
+Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+---
+ drivers/net/ieee802154/mrf24j40.c | 22 +++++++++++++++++++++-
+ 1 file changed, 21 insertions(+), 1 deletion(-)
 
-Hmm, would these not also be valid for MRF24J40? To me it seems on the 
-the MRF24J40C case would be different here due to the amplifier.
+diff --git a/drivers/net/ieee802154/mrf24j40.c b/drivers/net/ieee802154/mrf24j40.c
+index e9a03fd..560db88 100644
+--- a/drivers/net/ieee802154/mrf24j40.c
++++ b/drivers/net/ieee802154/mrf24j40.c
+@@ -922,6 +922,24 @@ static int mrf24j40_set_txpower(struct ieee802154_hw *hw, s32 mbm)
+ 	return regmap_update_bits(devrec->regmap_long, REG_RFCON3, 0xf8, val);
+ }
+ 
++static int mrf24j40_set_promiscuous_mode(struct ieee802154_hw *hw, bool on)
++{
++	struct mrf24j40 *devrec = hw->priv;
++	int ret;
++
++	if (on) {
++		/* set PROMI, ERRPKT and NOACKRSP */
++		ret = regmap_update_bits(devrec->regmap_short, REG_RXMCR, 0x23,
++					 0x23);
++	} else {
++		/* clear PROMI, ERRPKT and NOACKRSP */
++		ret = regmap_update_bits(devrec->regmap_short, REG_RXMCR, 0x23,
++					 0x00);
++	}
++
++	return ret;
++}
++
+ static const struct ieee802154_ops mrf24j40_ops = {
+ 	.owner = THIS_MODULE,
+ 	.xmit_async = mrf24j40_tx,
+@@ -934,6 +952,7 @@ static const struct ieee802154_ops mrf24j40_ops = {
+ 	.set_cca_mode = mrf24j40_set_cca_mode,
+ 	.set_cca_ed_level = mrf24j40_set_cca_ed_level,
+ 	.set_txpower = mrf24j40_set_txpower,
++	.set_promiscuous_mode = mrf24j40_set_promiscuous_mode,
+ };
+ 
+ static void mrf24j40_intstat_complete(void *context)
+@@ -1178,7 +1197,8 @@ static int mrf24j40_probe(struct spi_device *spi)
+ 	devrec->hw->parent = &spi->dev;
+ 	devrec->hw->phy->supported.channels[0] = CHANNEL_MASK;
+ 	devrec->hw->flags = IEEE802154_HW_TX_OMIT_CKSUM | IEEE802154_HW_AFILT |
+-			    IEEE802154_HW_CSMA_PARAMS;
++			    IEEE802154_HW_CSMA_PARAMS |
++			    IEEE802154_HW_PROMISCUOUS;
+ 
+ 	devrec->hw->phy->flags = WPAN_PHY_FLAG_CCA_MODE |
+ 				 WPAN_PHY_FLAG_CCA_ED_LEVEL;
+-- 
+2.5.0
 
-> +		devrec->hw->phy->supported.tx_powers = mrf24j40ma_powers;
-> +		devrec->hw->phy->supported.tx_powers_size = ARRAY_SIZE(mrf24j40ma_powers);
-> +		devrec->hw->phy->flags |= WPAN_PHY_FLAG_TXPOWER;
-> +		break;
-> +	default:
-> +		break;
-> +	}
->   }
->   
->   static int mrf24j40_probe(struct spi_device *spi)
-
-regards
-Stefan Schmidt
