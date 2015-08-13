@@ -1,104 +1,97 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from lists.s-osg.org ([54.187.51.154]:60651 "EHLO lists.s-osg.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751268AbbH1H6X (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-	Fri, 28 Aug 2015 03:58:23 -0400
-Subject: Re: [RFC bluetooth-next 04/21] mrf24j40: remove spi settings
- overwrite
+Received: from mail-wi0-f176.google.com ([209.85.212.176]:32912 "EHLO
+	mail-wi0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751869AbbHMMXZ (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Thu, 13 Aug 2015 08:23:25 -0400
+Received: by wijp15 with SMTP id p15so256371075wij.0
+        for <linux-wpan@vger.kernel.org>; Thu, 13 Aug 2015 05:23:24 -0700 (PDT)
+From: Alexander Aring <alex.aring@gmail.com>
+Subject: [RFC bluetooth-next 05/21] mrf24j40: add device-tree support
+Date: Thu, 13 Aug 2015 14:22:32 +0200
+Message-Id: <1439468568-22288-6-git-send-email-alex.aring@gmail.com>
+In-Reply-To: <1439468568-22288-1-git-send-email-alex.aring@gmail.com>
 References: <1439468568-22288-1-git-send-email-alex.aring@gmail.com>
- <1439468568-22288-5-git-send-email-alex.aring@gmail.com>
- <55DF0D37.4080508@osg.samsung.com> <20150828075052.GA6297@omega>
-From: Stefan Schmidt <stefan@osg.samsung.com>
-Message-ID: <55E01497.6080807@osg.samsung.com>
-Date: Fri, 28 Aug 2015 09:58:15 +0200
-MIME-Version: 1.0
-In-Reply-To: <20150828075052.GA6297@omega>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>
-Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de, alan@signal11.us, jonatan@myeden.se
+To: linux-wpan@vger.kernel.org
+Cc: kernel@pengutronix.de, alan@signal11.us, jonatan@myeden.se, stefan@osg.samsung.com, Alexander Aring <alex.aring@gmail.com>
 
-Hello.
+This patch adds devicetree support to mrf24j40 with proper devicetree
+compatible strings.
 
-On 28/08/15 09:50, Alexander Aring wrote:
-> Hi,
->
-> On Thu, Aug 27, 2015 at 03:14:31PM +0200, Stefan Schmidt wrote:
->> Hello.
->>
->> On 13/08/15 14:22, Alexander Aring wrote:
->>> This patch removes spi settings while mrf24j40 probing. These settings
->>> cannot be overwrite while device probing where spi controller should be
->>> already configured. These settings need to be setup by device tree or
->>> platform data.
->>>
->>> Signed-off-by: Alexander Aring <alex.aring@gmail.com>
->>> ---
->>>   drivers/net/ieee802154/mrf24j40.c | 4 ----
->>>   1 file changed, 4 deletions(-)
->>>
->>> diff --git a/drivers/net/ieee802154/mrf24j40.c b/drivers/net/ieee802154/mrf24j40.c
->>> index de63cba..d16bef3 100644
->>> --- a/drivers/net/ieee802154/mrf24j40.c
->>> +++ b/drivers/net/ieee802154/mrf24j40.c
->>> @@ -746,10 +746,6 @@ static int mrf24j40_probe(struct spi_device *spi)
->>>   	if (!devrec->buf)
->>>   		goto err_register_device;
->>> -	spi->mode = SPI_MODE_0; /* TODO: Is this appropriate for right here? */
->>> -	if (spi->max_speed_hz > MAX_SPI_SPEED_HZ)
->>> -		spi->max_speed_hz = MAX_SPI_SPEED_HZ;
->>> -
->>>   	mutex_init(&devrec->buffer_mutex);
->>>   	init_completion(&devrec->tx_complete);
->> So far I only have been setting the SPI speed but never the mode via
->> devicetree. Digging for it I found that we can set the various modes easily
->> via devicetree.
->> Documentation/devicetree/bindings/spi/spi-bus.txt
->>
->> - spi-cpol        - (optional) Empty property indicating device requires
->>      		inverse clock polarity (CPOL) mode
->> - spi-cpha        - (optional) Empty property indicating device requires
->>      		shifted clock phase (CPHA) mode
->> - spi-cs-high     - (optional) Empty property indicating device requires
->>      		chip select active high
->> - spi-3wire       - (optional) Empty property indicating device requires
->>      		    3-wire mode.
->> - spi-lsb-first   - (optional) Empty property indicating device requires
->> 		LSB first mode.
->>
->>
->> Platform data could always do that anyway so we are good here.
->>
-> I think, that changing the attribute only, will not change the spi bus
-> controller. This setup was before any spi device will be probed.
->
-> One reason is here because we already access the spi device inside
-> probing of mrf24j40 -> spi need to be setup correctly. It can't be
-> changed again in any device probing, or we need to call some other
-> function that we can tell the spi controller these spi attributes
-> was changed, if possible.
->
-> For the SPI_MODE think, it's mostly SPI_MODE_0 which sets non of these
-> flags. They call it "original MicroWire".
->
-> #define SPI_MODE_0      (0|0)                   /* (original MicroWire) */
+Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+---
+ .../devicetree/bindings/net/ieee802154/mrf24j40.txt  | 20 ++++++++++++++++++++
+ MAINTAINERS                                          |  1 +
+ drivers/net/ieee802154/mrf24j40.c                    |  9 +++++++++
+ 3 files changed, 30 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/net/ieee802154/mrf24j40.txt
 
-Yeah, I can think we can safely remove the SPI_MODE part here.
-> What we could do is to make some
-> "WARN_ON(spi->max_speed_hz > MAX_SPI_SPEED_HZ, "foobar\n");
->
-> if the SPI clock is above maximum.
-
-That sounds like a good idea to me. While it is mentioned in the 
-devicetree binding we are not enforcing it anymore. A warning would be good.
-
-regards
-Stefan Schmidt
-> - Alex
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-wpan" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+diff --git a/Documentation/devicetree/bindings/net/ieee802154/mrf24j40.txt b/Documentation/devicetree/bindings/net/ieee802154/mrf24j40.txt
+new file mode 100644
+index 0000000..a4ed2ef
+--- /dev/null
++++ b/Documentation/devicetree/bindings/net/ieee802154/mrf24j40.txt
+@@ -0,0 +1,20 @@
++* MRF24J40 IEEE 802.15.4 *
++
++Required properties:
++  - compatible:		should be "microchip,mrf24j40", "microchip,mrf24j40ma",
++			or "microchip,mrf24j40mc" depends on your transceiver
++			board
++  - spi-max-frequency:	maximal bus speed, should be set something under or equal
++			10000000
++  - reg:		the chipselect index
++  - interrupts:		the interrupt generated by the device.
++
++Example:
++
++	mrf24j40ma@0 {
++		compatible = "microchip,mrf24j40ma";
++		spi-max-frequency = <8500000>;
++		reg = <0>;
++		interrupts = <19 8>;
++		interrupt-parent = <&gpio3>;
++	};
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 5baa91c..0af4165 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -6816,6 +6816,7 @@ M:	Alan Ott <alan@signal11.us>
+ L:	linux-wpan@vger.kernel.org
+ S:	Maintained
+ F:	drivers/net/ieee802154/mrf24j40.c
++F:	Documentation/devicetree/bindings/net/ieee802154/mrf24j40.txt
+ 
+ MSI LAPTOP SUPPORT
+ M:	"Lee, Chun-Yi" <jlee@suse.com>
+diff --git a/drivers/net/ieee802154/mrf24j40.c b/drivers/net/ieee802154/mrf24j40.c
+index d16bef3..7df80d8 100644
+--- a/drivers/net/ieee802154/mrf24j40.c
++++ b/drivers/net/ieee802154/mrf24j40.c
+@@ -793,6 +793,14 @@ static int mrf24j40_remove(struct spi_device *spi)
+ 	return 0;
+ }
+ 
++static const struct of_device_id mrf24j40_of_match[] = {
++	{ .compatible = "microchip,mrf24j40", .data = (void *)MRF24J40 },
++	{ .compatible = "microchip,mrf24j40ma", .data = (void *)MRF24J40MA },
++	{ .compatible = "microchip,mrf24j40mc", .data = (void *)MRF24J40MC },
++	{ },
++};
++MODULE_DEVICE_TABLE(of, mrf24j40_of_match);
++
+ static const struct spi_device_id mrf24j40_ids[] = {
+ 	{ "mrf24j40", MRF24J40 },
+ 	{ "mrf24j40ma", MRF24J40MA },
+@@ -803,6 +811,7 @@ MODULE_DEVICE_TABLE(spi, mrf24j40_ids);
+ 
+ static struct spi_driver mrf24j40_driver = {
+ 	.driver = {
++		.of_match_table = of_match_ptr(mrf24j40_of_match),
+ 		.name = "mrf24j40",
+ 		.owner = THIS_MODULE,
+ 	},
+-- 
+2.5.0
 
