@@ -1,41 +1,37 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f178.google.com ([209.85.212.178]:36533 "EHLO
-	mail-wi0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750870AbbHLIsM (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Wed, 12 Aug 2015 04:48:12 -0400
-Received: by wicja10 with SMTP id ja10so104454529wic.1
-        for <linux-wpan@vger.kernel.org>; Wed, 12 Aug 2015 01:48:11 -0700 (PDT)
-Date: Wed, 12 Aug 2015 10:48:05 +0200
-From: Alexander Aring <alex.aring@gmail.com>
-Subject: Re: [PATCH wpan-tools] mac: add handling for ackreq default handling
-Message-ID: <20150812084801.GA31881@omega>
-References: <1438772472-9646-1-git-send-email-alex.aring@gmail.com>
+Received: from proxima.lasnet.de ([78.47.171.185]:56665 "EHLO
+	proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750908AbbHMJGz (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Thu, 13 Aug 2015 05:06:55 -0400
+From: Stefan Schmidt <stefan@sostec.de>
+Subject: ADF7242 driver ready for mainline inclusion?
+Message-ID: <55CC5CF3.5030701@sostec.de>
+Date: Thu, 13 Aug 2015 11:01:39 +0200
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1438772472-9646-1-git-send-email-alex.aring@gmail.com>
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org
-Cc: kernel@pengutronix.de
+To: Michael Hennerich <michael.hennerich@analog.com>
+Cc: Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org
 
-I added this change to this patch:
+Hello.
 
-diff --git a/src/info.c b/src/info.c
-index fd75fa0..e00ed3e 100644
---- a/src/info.c
-+++ b/src/info.c
-@@ -212,6 +212,7 @@ static const char *commands[NL802154_CMD_MAX + 1] = {
-        [NL802154_CMD_SET_BACKOFF_EXPONENT] = "set_backoff_exponent",
-        [NL802154_CMD_SET_MAX_CSMA_BACKOFFS] = "set_max_csma_backoffs",
-        [NL802154_CMD_SET_LBT_MODE] = "set_lbt_mode",
-+       [NL802154_CMD_SET_ACKREQ_DEFAULT] = "set_ackreq_default",
- };
- 
- static char cmdbuf[100];
+We have found the ADF7242 driver which lists you as author. :)
 
+Alexander and myself are working on the linux-wpan subsystem which
+handles IEEE 802.15.4. It seems the driver was submitted to the old
+linux-zigbee project (ancestor of linux-wpan, renamed due to not being a
+zigbee stack) but sadly never made it mainline when other parts have
+been merged.
 
-For dumping that we will support "set_ackreq_default" which all current
-SoftMAC transceivers supports.
+Are you still actively working on this driver? Is there an interest from
+your side to get it into mainline? We would be happy to help you with
+reviewing it.
 
-- Alex
+So far I have only found these. Are they up to date?
+http://wiki.analog.com/resources/tools-software/linux-drivers/networking-mac802154/adf7242
+https://github.com/analogdevicesinc/linux/blob/xcomm_zynq/drivers/net/ieee802154/adf7242.c
+
+regards
+Stefan Schmidt
