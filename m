@@ -1,65 +1,117 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f170.google.com ([209.85.212.170]:32824 "EHLO
-	mail-wi0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751869AbbHMMXU (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Thu, 13 Aug 2015 08:23:20 -0400
-Received: by wijp15 with SMTP id p15so256368623wij.0
-        for <linux-wpan@vger.kernel.org>; Thu, 13 Aug 2015 05:23:19 -0700 (PDT)
+Received: from mail-wi0-f172.google.com ([209.85.212.172]:36411 "EHLO
+	mail-wi0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751934AbbHMMXV (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Thu, 13 Aug 2015 08:23:21 -0400
+Received: by wicja10 with SMTP id ja10so149296079wic.1
+        for <linux-wpan@vger.kernel.org>; Thu, 13 Aug 2015 05:23:20 -0700 (PDT)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [RFC bluetooth-next 00/21] mrf24j40: async rx/tx handling and new features
-Date: Thu, 13 Aug 2015 14:22:27 +0200
-Message-Id: <1439468568-22288-1-git-send-email-alex.aring@gmail.com>
+Subject: [RFC bluetooth-next 01/21] mrf24j40: cleanup define identation
+Date: Thu, 13 Aug 2015 14:22:28 +0200
+Message-Id: <1439468568-22288-2-git-send-email-alex.aring@gmail.com>
+In-Reply-To: <1439468568-22288-1-git-send-email-alex.aring@gmail.com>
+References: <1439468568-22288-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
 Cc: kernel@pengutronix.de, alan@signal11.us, jonatan@myeden.se, stefan@osg.samsung.com, Alexander Aring <alex.aring@gmail.com>
 
-Hi,
+This patch replaces the spaces after define by a tab.
 
-this patch series contains some cleanups, devicetree support, rx/tx async
-handling, threaded irq to hardirq, csma params settings, cca mode settings,
-cca energy detection levels, tx power settings and promiscuous mode settings.
+Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+---
+ drivers/net/ieee802154/mrf24j40.c | 76 +++++++++++++++++++--------------------
+ 1 file changed, 38 insertions(+), 38 deletions(-)
 
-Also I add regmap support, the lowlevel spi calls are only used in hotpaths
-for handling receive/transmit and irq handling. There are also some many
-magic numbers, maybe we can introduce some register bits defines.
-
-First I will send this as RFC to get some respone if the patches looks fine
-and acceptable for mainline.
-
-- Alex
-
-Alexander Aring (21):
-  mrf24j40: cleanup define identation
-  mrf24j40: use ieee802154_alloc_hw for private data
-  mrf24j40: calling ieee802154_register_hw at last
-  mrf24j40: remove spi settings overwrite
-  mrf24j40: add device-tree support
-  mrf24j40: add default channel setting
-  mrf24j40: add random extended addr generation
-  mrf24j40: add more register defines
-  mrf24j40: add regmap support
-  mrf24j40: use regmap for register access
-  mrf24j40: change to frame delivery with crc
-  ieee802154: add helpers for frame control checks
-  mrf24j40: rework tx handling to async tx handling
-  mrf24j40: rework rx handling to async rx handling
-  mrf24j40: async interrupt handling
-  mrf24j40: add csma params support
-  mrf24j40: add cca mode support
-  mrf24j40: add cca ed level support
-  mrf24j40: add tx power support
-  mrf24j40: add promiscuous mode support
-  mrf24j40: change irq trigger type behaviour
-
- .../bindings/net/ieee802154/mrf24j40.txt           |   20 +
- MAINTAINERS                                        |    1 +
- drivers/net/ieee802154/Kconfig                     |    1 +
- drivers/net/ieee802154/mrf24j40.c                  | 1342 +++++++++++++-------
- include/linux/ieee802154.h                         |   29 +
- 5 files changed, 969 insertions(+), 424 deletions(-)
- create mode 100644 Documentation/devicetree/bindings/net/ieee802154/mrf24j40.txt
-
+diff --git a/drivers/net/ieee802154/mrf24j40.c b/drivers/net/ieee802154/mrf24j40.c
+index 997724b..2b7fc00 100644
+--- a/drivers/net/ieee802154/mrf24j40.c
++++ b/drivers/net/ieee802154/mrf24j40.c
+@@ -23,46 +23,46 @@
+ #include <net/mac802154.h>
+ 
+ /* MRF24J40 Short Address Registers */
+-#define REG_RXMCR    0x00  /* Receive MAC control */
+-#define REG_PANIDL   0x01  /* PAN ID (low) */
+-#define REG_PANIDH   0x02  /* PAN ID (high) */
+-#define REG_SADRL    0x03  /* Short address (low) */
+-#define REG_SADRH    0x04  /* Short address (high) */
+-#define REG_EADR0    0x05  /* Long address (low) (high is EADR7) */
+-#define REG_TXMCR    0x11  /* Transmit MAC control */
+-#define REG_PACON0   0x16  /* Power Amplifier Control */
+-#define REG_PACON1   0x17  /* Power Amplifier Control */
+-#define REG_PACON2   0x18  /* Power Amplifier Control */
+-#define REG_TXNCON   0x1B  /* Transmit Normal FIFO Control */
+-#define REG_TXSTAT   0x24  /* TX MAC Status Register */
+-#define REG_SOFTRST  0x2A  /* Soft Reset */
+-#define REG_TXSTBL   0x2E  /* TX Stabilization */
+-#define REG_INTSTAT  0x31  /* Interrupt Status */
+-#define REG_INTCON   0x32  /* Interrupt Control */
+-#define REG_GPIO     0x33  /* GPIO */
+-#define REG_TRISGPIO 0x34  /* GPIO direction */
+-#define REG_RFCTL    0x36  /* RF Control Mode Register */
+-#define REG_BBREG1   0x39  /* Baseband Registers */
+-#define REG_BBREG2   0x3A  /* */
+-#define REG_BBREG6   0x3E  /* */
+-#define REG_CCAEDTH  0x3F  /* Energy Detection Threshold */
++#define REG_RXMCR	0x00  /* Receive MAC control */
++#define REG_PANIDL	0x01  /* PAN ID (low) */
++#define REG_PANIDH	0x02  /* PAN ID (high) */
++#define REG_SADRL	0x03  /* Short address (low) */
++#define REG_SADRH	0x04  /* Short address (high) */
++#define REG_EADR0	0x05  /* Long address (low) (high is EADR7) */
++#define REG_TXMCR	0x11  /* Transmit MAC control */
++#define REG_PACON0	0x16  /* Power Amplifier Control */
++#define REG_PACON1	0x17  /* Power Amplifier Control */
++#define REG_PACON2	0x18  /* Power Amplifier Control */
++#define REG_TXNCON	0x1B  /* Transmit Normal FIFO Control */
++#define REG_TXSTAT	0x24  /* TX MAC Status Register */
++#define REG_SOFTRST	0x2A  /* Soft Reset */
++#define REG_TXSTBL	0x2E  /* TX Stabilization */
++#define REG_INTSTAT	0x31  /* Interrupt Status */
++#define REG_INTCON	0x32  /* Interrupt Control */
++#define REG_GPIO	0x33  /* GPIO */
++#define REG_TRISGPIO	0x34  /* GPIO direction */
++#define REG_RFCTL	0x36  /* RF Control Mode Register */
++#define REG_BBREG1	0x39  /* Baseband Registers */
++#define REG_BBREG2	0x3A  /* */
++#define REG_BBREG6	0x3E  /* */
++#define REG_CCAEDTH	0x3F  /* Energy Detection Threshold */
+ 
+ /* MRF24J40 Long Address Registers */
+-#define REG_RFCON0     0x200  /* RF Control Registers */
+-#define REG_RFCON1     0x201
+-#define REG_RFCON2     0x202
+-#define REG_RFCON3     0x203
+-#define REG_RFCON5     0x205
+-#define REG_RFCON6     0x206
+-#define REG_RFCON7     0x207
+-#define REG_RFCON8     0x208
+-#define REG_RSSI       0x210
+-#define REG_SLPCON0    0x211  /* Sleep Clock Control Registers */
+-#define REG_SLPCON1    0x220
+-#define REG_WAKETIMEL  0x222  /* Wake-up Time Match Value Low */
+-#define REG_WAKETIMEH  0x223  /* Wake-up Time Match Value High */
+-#define REG_TESTMODE   0x22F  /* Test mode */
+-#define REG_RX_FIFO    0x300  /* Receive FIFO */
++#define REG_RFCON0	0x200  /* RF Control Registers */
++#define REG_RFCON1	0x201
++#define REG_RFCON2	0x202
++#define REG_RFCON3	0x203
++#define REG_RFCON5	0x205
++#define REG_RFCON6	0x206
++#define REG_RFCON7	0x207
++#define REG_RFCON8	0x208
++#define REG_RSSI	0x210
++#define REG_SLPCON0	0x211  /* Sleep Clock Control Registers */
++#define REG_SLPCON1	0x220
++#define REG_WAKETIMEL	0x222  /* Wake-up Time Match Value Low */
++#define REG_WAKETIMEH	0x223  /* Wake-up Time Match Value High */
++#define REG_TESTMODE	0x22F  /* Test mode */
++#define REG_RX_FIFO	0x300  /* Receive FIFO */
+ 
+ /* Device configuration: Only channels 11-26 on page 0 are supported. */
+ #define MRF24J40_CHAN_MIN 11
 -- 
 2.5.0
 
