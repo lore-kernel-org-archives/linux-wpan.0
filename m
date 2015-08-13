@@ -1,100 +1,65 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from lists.s-osg.org ([54.187.51.154]:60285 "EHLO lists.s-osg.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750725AbbH0J6t (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-	Thu, 27 Aug 2015 05:58:49 -0400
-Subject: Re: [RFC bluetooth-next 0/2] at86rf230: trac debugfs support (for
- testing aret changes patch-serie)
-References: <1438874501-19971-1-git-send-email-alex.aring@gmail.com>
-From: Stefan Schmidt <stefan@osg.samsung.com>
-Message-ID: <55DEDF56.20005@osg.samsung.com>
-Date: Thu, 27 Aug 2015 11:58:46 +0200
-MIME-Version: 1.0
-In-Reply-To: <1438874501-19971-1-git-send-email-alex.aring@gmail.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
+Received: from mail-wi0-f170.google.com ([209.85.212.170]:32824 "EHLO
+	mail-wi0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751869AbbHMMXU (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Thu, 13 Aug 2015 08:23:20 -0400
+Received: by wijp15 with SMTP id p15so256368623wij.0
+        for <linux-wpan@vger.kernel.org>; Thu, 13 Aug 2015 05:23:19 -0700 (PDT)
+From: Alexander Aring <alex.aring@gmail.com>
+Subject: [RFC bluetooth-next 00/21] mrf24j40: async rx/tx handling and new features
+Date: Thu, 13 Aug 2015 14:22:27 +0200
+Message-Id: <1439468568-22288-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org
-Cc: kernel@pengutronix.de
+To: linux-wpan@vger.kernel.org
+Cc: kernel@pengutronix.de, alan@signal11.us, jonatan@myeden.se, stefan@osg.samsung.com, Alexander Aring <alex.aring@gmail.com>
 
-Hello.
+Hi,
 
-On 06/08/15 17:21, Alexander Aring wrote:
-> Hi,
->
-> this patch series based on:
->
->   "[RFCv5 bluetooth-next 0/4] ieee802154: aret handling changes"
->
-> and can be used for testing the ARET/NO ARET mode with ARET_ON state only.
-> I add support for debugfs to check the trac status statistics.
->
-> In the previously patch series I said that the at86rf2xx transceivers
-> checks automatically if ack request is set or not in a 802.15.4 frame.
->
-> There exists two cases:
->
-> 1. When the ackrequest bit is set and using STATE_ARET_ON the transceiver
->     will wait for an ack frame after transmit. If ack is received then
->     the transceiver logic is "SUCCESS" otherwise "NO_ACK".
-> 2. When the ackrequest bit isn't set and using the STATE_ARET_ON the
->     transceiver will not wait for an ack frame and the transceiver logic
->     is "SUCCESS".
->
-> The transceiver logic is in this case the error code from transmit
-> algorithmn.
->
-> To the test (802.15.4 6LoWPAN):
->
-> 1. Create some imagine 6LoWPAN node by using:
->
-> ip -6 neigh add fe80::abcd lladdr 02:01:02:03:04:05:06:07 dev lowpan0
->
-> This will create some neighbor discovery entry for some node which isn't
-> there in your network. We wan't just test some 802.15.4 unicast addressing.
-> This unicast addressing will not answer with an ACK frame, because there is
-> no node with this address.
->
-> 2. Set ackrequest bit to 0 by using:
->
-> iwpan dev wpan0 set ackreq_default 0
->
-> 3. Ping node:
->
-> ping6 fe80::abcd%lowpan0
->
-> 4. Check trac status stats.
->
-> You will see that only "SUCCESS" will be increased, which is the behaviour
-> on no aret functionality.
->
-> 5. Do it again but with ackrequest bit to 1 by using:
->
-> iwpan dev wpan0 set ackreq_default 1
->
-> 6. Ping node again.
->
-> ping6 fe80::abcd%lowpan0
->
-> 7. Check the trac status again.
->
-> Now, "SUCCESS" isn't increased (it could be for broadcast frames only). But
-> now you will see that "NO ACK" is increased which is the trac status that
-> no ack frames was received when using aret functionality.
+this patch series contains some cleanups, devicetree support, rx/tx async
+handling, threaded irq to hardirq, csma params settings, cca mode settings,
+cca energy detection levels, tx power settings and promiscuous mode settings.
 
-I looked over them and had some feedback. Testing is still pending.
+Also I add regmap support, the lowlevel spi calls are only used in hotpaths
+for handling receive/transmit and irq handling. There are also some many
+magic numbers, maybe we can introduce some register bits defines.
 
->
-> Some additional notes:
->
-> I think the registration of debugfs failed when two at86rf230 will be probed,
-> because the debugfs "at86rf230" already exists. Is there some way to add a
-> number to it like the name "at86rf230%d"? Or we just leave it as it is, it's
-> just a debugging feature and should be disabled then when using two at86rf230
-> transceivers.
-I commented on this in the actual patch. Maybe we could re-use the spi 
-dev name here as this one would be unique. Like at86rf2xx-spi-XXX
+First I will send this as RFC to get some respone if the patches looks fine
+and acceptable for mainline.
 
-regards
-Stefan Schmidt
+- Alex
+
+Alexander Aring (21):
+  mrf24j40: cleanup define identation
+  mrf24j40: use ieee802154_alloc_hw for private data
+  mrf24j40: calling ieee802154_register_hw at last
+  mrf24j40: remove spi settings overwrite
+  mrf24j40: add device-tree support
+  mrf24j40: add default channel setting
+  mrf24j40: add random extended addr generation
+  mrf24j40: add more register defines
+  mrf24j40: add regmap support
+  mrf24j40: use regmap for register access
+  mrf24j40: change to frame delivery with crc
+  ieee802154: add helpers for frame control checks
+  mrf24j40: rework tx handling to async tx handling
+  mrf24j40: rework rx handling to async rx handling
+  mrf24j40: async interrupt handling
+  mrf24j40: add csma params support
+  mrf24j40: add cca mode support
+  mrf24j40: add cca ed level support
+  mrf24j40: add tx power support
+  mrf24j40: add promiscuous mode support
+  mrf24j40: change irq trigger type behaviour
+
+ .../bindings/net/ieee802154/mrf24j40.txt           |   20 +
+ MAINTAINERS                                        |    1 +
+ drivers/net/ieee802154/Kconfig                     |    1 +
+ drivers/net/ieee802154/mrf24j40.c                  | 1342 +++++++++++++-------
+ include/linux/ieee802154.h                         |   29 +
+ 5 files changed, 969 insertions(+), 424 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/net/ieee802154/mrf24j40.txt
+
+-- 
+2.5.0
+
