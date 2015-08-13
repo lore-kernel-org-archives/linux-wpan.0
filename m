@@ -1,407 +1,320 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from lists.s-osg.org ([54.187.51.154]:60694 "EHLO lists.s-osg.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751907AbbH1IhO (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-	Fri, 28 Aug 2015 04:37:14 -0400
-Subject: Re: [RFC bluetooth-next 09/21] mrf24j40: add regmap support
+Received: from mail-wi0-f177.google.com ([209.85.212.177]:35072 "EHLO
+	mail-wi0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752522AbbHMMXa (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Thu, 13 Aug 2015 08:23:30 -0400
+Received: by wicne3 with SMTP id ne3so137299044wic.0
+        for <linux-wpan@vger.kernel.org>; Thu, 13 Aug 2015 05:23:29 -0700 (PDT)
+From: Alexander Aring <alex.aring@gmail.com>
+Subject: [RFC bluetooth-next 10/21] mrf24j40: use regmap for register access
+Date: Thu, 13 Aug 2015 14:22:37 +0200
+Message-Id: <1439468568-22288-11-git-send-email-alex.aring@gmail.com>
+In-Reply-To: <1439468568-22288-1-git-send-email-alex.aring@gmail.com>
 References: <1439468568-22288-1-git-send-email-alex.aring@gmail.com>
- <1439468568-22288-10-git-send-email-alex.aring@gmail.com>
-From: Stefan Schmidt <stefan@osg.samsung.com>
-Message-ID: <55E01DB6.1060306@osg.samsung.com>
-Date: Fri, 28 Aug 2015 10:37:10 +0200
-MIME-Version: 1.0
-In-Reply-To: <1439468568-22288-10-git-send-email-alex.aring@gmail.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org
-Cc: kernel@pengutronix.de, alan@signal11.us, jonatan@myeden.se
+To: linux-wpan@vger.kernel.org
+Cc: kernel@pengutronix.de, alan@signal11.us, jonatan@myeden.se, stefan@osg.samsung.com, Alexander Aring <alex.aring@gmail.com>
 
-Hello.
+This patch uses the regmap functions for transceiver register settings
+where it's possible. This means everything except the hotpaths like
+receive/transmit handling.
 
-On 13/08/15 14:22, Alexander Aring wrote:
-> This patch introduce regmap support for short and long address space of
-> mrf24j40. It's only possible to use regmap_read/write/update_bits for
-> long address range. This is because I added lowlevel bus operation
-> because the write operation need to set the 12th bit to mark a register
-> write, but regmap only supports to set bits for register write access in
-> the first byte. We use other regmap register functions than
-> read/write/update_bits, so this should be fine.
->
-> Signed-off-by: Alexander Aring <alex.aring@gmail.com>
-> ---
->   drivers/net/ieee802154/Kconfig    |   1 +
->   drivers/net/ieee802154/mrf24j40.c | 312 ++++++++++++++++++++++++++++++++++++++
->   2 files changed, 313 insertions(+)
->
-> diff --git a/drivers/net/ieee802154/Kconfig b/drivers/net/ieee802154/Kconfig
-> index 1dd5ab8..6a465b2 100644
-> --- a/drivers/net/ieee802154/Kconfig
-> +++ b/drivers/net/ieee802154/Kconfig
-> @@ -36,6 +36,7 @@ config IEEE802154_MRF24J40
->   	tristate "Microchip MRF24J40 transceiver driver"
->   	depends on IEEE802154_DRIVERS && MAC802154
->   	depends on SPI
-> +	select REGMAP_SPI
->   	---help---
->   	  Say Y here to enable the MRF24J20 SPI 802.15.4 wireless
->   	  controller.
-> diff --git a/drivers/net/ieee802154/mrf24j40.c b/drivers/net/ieee802154/mrf24j40.c
-> index 883f2c9..6578f68 100644
-> --- a/drivers/net/ieee802154/mrf24j40.c
-> +++ b/drivers/net/ieee802154/mrf24j40.c
-> @@ -18,6 +18,7 @@
->   #include <linux/spi/spi.h>
->   #include <linux/interrupt.h>
->   #include <linux/module.h>
-> +#include <linux/regmap.h>
->   #include <linux/ieee802154.h>
->   #include <net/cfg802154.h>
->   #include <net/mac802154.h>
-> @@ -149,11 +150,22 @@ struct mrf24j40 {
->   	struct spi_device *spi;
->   	struct ieee802154_hw *hw;
->   
-> +	struct regmap *regmap_short;
-> +	struct regmap *regmap_long;
->   	struct mutex buffer_mutex; /* only used to protect buf */
->   	struct completion tx_complete;
->   	u8 *buf; /* 3 bytes. Used for SPI single-register transfers. */
->   };
->   
-> +/* regmap information for short address register access */
-> +#define MRF24J40_SHORT_WRITE	0x01
-> +#define MRF24J40_SHORT_READ	0x00
-> +#define MRF24J40_SHORT_NUMREGS	0x3F
-> +
-> +/* regmap information for long address register access */
-> +#define MRF24J40_LONG_ACCESS	0x80
-> +#define MRF24J40_LONG_NUMREGS	0x38F
-> +
->   /* Read/Write SPI Commands for Short and Long Address registers. */
->   #define MRF24J40_READSHORT(reg) ((reg) << 1)
->   #define MRF24J40_WRITESHORT(reg) ((reg) << 1 | 1)
-> @@ -165,6 +177,287 @@ struct mrf24j40 {
->   
->   #define printdev(X) (&X->spi->dev)
->   
-> +static bool
-> +mrf24j40_short_reg_writeable(struct device *dev, unsigned int reg)
-> +{
-> +	switch (reg) {
-> +	case REG_RXMCR:
-> +	case REG_PANIDL:
-> +	case REG_PANIDH:
-> +	case REG_SADRL:
-> +	case REG_SADRH:
-> +	case REG_EADR0:
-> +	case REG_EADR1:
-> +	case REG_EADR2:
-> +	case REG_EADR3:
-> +	case REG_EADR4:
-> +	case REG_EADR5:
-> +	case REG_EADR6:
-> +	case REG_EADR7:
-> +	case REG_RXFLUSH:
-> +	case REG_ORDER:
-> +	case REG_TXMCR:
-> +	case REG_ACKTMOUT:
-> +	case REG_ESLOTG1:
-> +	case REG_SYMTICKL:
-> +	case REG_SYMTICKH:
-> +	case REG_PACON0:
-> +	case REG_PACON1:
-> +	case REG_PACON2:
-> +	case REG_TXBCON0:
-> +	case REG_TXNCON:
-> +	case REG_TXG1CON:
-> +	case REG_TXG2CON:
-> +	case REG_ESLOTG23:
-> +	case REG_ESLOTG45:
-> +	case REG_ESLOTG67:
-> +	case REG_TXPEND:
-> +	case REG_WAKECON:
-> +	case REG_FROMOFFSET:
-> +	case REG_TXBCON1:
-> +	case REG_GATECLK:
-> +	case REG_TXTIME:
-> +	case REG_HSYMTMRL:
-> +	case REG_HSYMTMRH:
-> +	case REG_SOFTRST:
-> +	case REG_SECCON0:
-> +	case REG_SECCON1:
-> +	case REG_TXSTBL:
-> +	case REG_RXSR:
-> +	case REG_INTCON:
-> +	case REG_TRISGPIO:
-> +	case REG_GPIO:
-> +	case REG_RFCTL:
-> +	case REG_SLPACK:
-> +	case REG_BBREG0:
-> +	case REG_BBREG1:
-> +	case REG_BBREG2:
-> +	case REG_BBREG3:
-> +	case REG_BBREG4:
-> +	case REG_BBREG6:
-> +	case REG_CCAEDTH:
-> +		return true;
-> +	default:
-> +		return false;
-> +	}
-> +}
-> +
-> +static bool
-> +mrf24j40_short_reg_readable(struct device *dev, unsigned int reg)
-> +{
-> +	bool rc;
-> +
-> +	/* all writeable are also readable */
-> +	rc = mrf24j40_short_reg_writeable(dev, reg);
-> +	if (rc)
-> +		return rc;
-> +
-> +	/* readonly regs */
-> +	switch (reg) {
-> +	case REG_TXSTAT:
-> +	case REG_INTSTAT:
-> +		return true;
-> +	default:
-> +		return false;
-> +	}
-> +}
-> +
-> +static bool
-> +mrf24j40_short_reg_volatile(struct device *dev, unsigned int reg)
-> +{
-> +	/* can be changed during runtime */
-> +	switch (reg) {
-> +	case REG_TXSTAT:
-> +	case REG_INTSTAT:
-> +	case REG_RXFLUSH:
-> +	case REG_TXNCON:
-> +	case REG_SOFTRST:
-> +	case REG_RFCTL:
-> +	case REG_TXBCON0:
-> +	case REG_TXG1CON:
-> +	case REG_TXG2CON:
-> +	case REG_TXBCON1:
-> +	case REG_SECCON0:
-> +	case REG_RXSR:
-> +	case REG_SLPACK:
-> +	case REG_SECCR2:
-> +	case REG_BBREG6:
-> +	/* use them in spi_async and regmap so it's volatile */
-> +	case REG_BBREG1:
-> +		return true;
-> +	default:
-> +		return false;
-> +	}
-> +}
-> +
-> +static bool
-> +mrf24j40_short_reg_precious(struct device *dev, unsigned int reg)
-> +{
-> +	/* don't clear irq line on read */
-> +	switch (reg) {
-> +	case REG_INTSTAT:
-> +		return true;
-> +	default:
-> +		return false;
-> +	}
-> +}
-> +
-> +static const struct regmap_config mrf24j40_short_regmap = {
-> +	.name = "mrf24j40_short",
-> +	.reg_bits = 7,
-> +	.val_bits = 8,
-> +	.pad_bits = 1,
-> +	.write_flag_mask = MRF24J40_SHORT_WRITE,
-> +	.read_flag_mask = MRF24J40_SHORT_READ,
-> +	.cache_type = REGCACHE_RBTREE,
-> +	.max_register = MRF24J40_SHORT_NUMREGS,
-> +	.writeable_reg = mrf24j40_short_reg_writeable,
-> +	.readable_reg = mrf24j40_short_reg_readable,
-> +	.volatile_reg = mrf24j40_short_reg_volatile,
-> +	.precious_reg = mrf24j40_short_reg_precious,
-> +};
-> +
-> +static bool
-> +mrf24j40_long_reg_writeable(struct device *dev, unsigned int reg)
-> +{
-> +	switch (reg) {
-> +	case REG_RFCON0:
-> +	case REG_RFCON1:
-> +	case REG_RFCON2:
-> +	case REG_RFCON3:
-> +	case REG_RFCON5:
-> +	case REG_RFCON6:
-> +	case REG_RFCON7:
-> +	case REG_RFCON8:
-> +	case REG_SLPCAL2:
-> +	case REG_SLPCON0:
-> +	case REG_SLPCON1:
-> +	case REG_WAKETIMEL:
-> +	case REG_WAKETIMEH:
-> +	case REG_REMCNTL:
-> +	case REG_REMCNTH:
-> +	case REG_MAINCNT0:
-> +	case REG_MAINCNT1:
-> +	case REG_MAINCNT2:
-> +	case REG_MAINCNT3:
-> +	case REG_TESTMODE:
-> +	case REG_ASSOEAR0:
-> +	case REG_ASSOEAR1:
-> +	case REG_ASSOEAR2:
-> +	case REG_ASSOEAR3:
-> +	case REG_ASSOEAR4:
-> +	case REG_ASSOEAR5:
-> +	case REG_ASSOEAR6:
-> +	case REG_ASSOEAR7:
-> +	case REG_ASSOSAR0:
-> +	case REG_ASSOSAR1:
-> +	case REG_UNONCE0:
-> +	case REG_UNONCE1:
-> +	case REG_UNONCE2:
-> +	case REG_UNONCE3:
-> +	case REG_UNONCE4:
-> +	case REG_UNONCE5:
-> +	case REG_UNONCE6:
-> +	case REG_UNONCE7:
-> +	case REG_UNONCE8:
-> +	case REG_UNONCE9:
-> +	case REG_UNONCE10:
-> +	case REG_UNONCE11:
-> +	case REG_UNONCE12:
-> +		return true;
-> +	default:
-> +		return false;
-> +	}
-> +}
-> +
-> +static bool
-> +mrf24j40_long_reg_readable(struct device *dev, unsigned int reg)
-> +{
-> +	bool rc;
-> +
-> +	/* all writeable are also readable */
-> +	rc = mrf24j40_long_reg_writeable(dev, reg);
-> +	if (rc)
-> +		return rc;
-> +
-> +	/* readonly regs */
-> +	switch (reg) {
-> +	case REG_SLPCAL0:
-> +	case REG_SLPCAL1:
-> +	case REG_RFSTATE:
-> +	case REG_RSSI:
-> +		return true;
-> +	default:
-> +		return false;
-> +	}
-> +}
-> +
-> +static bool
-> +mrf24j40_long_reg_volatile(struct device *dev, unsigned int reg)
-> +{
-> +	/* can be changed during runtime */
-> +	switch (reg) {
-> +	case REG_SLPCAL0:
-> +	case REG_SLPCAL1:
-> +	case REG_SLPCAL2:
-> +	case REG_RFSTATE:
-> +	case REG_RSSI:
-> +	case REG_MAINCNT3:
-> +		return true;
-> +	default:
-> +		return false;
-> +	}
-> +}
-> +
-> +static const struct regmap_config mrf24j40_long_regmap = {
-> +	.name = "mrf24j40_long",
-> +	.reg_bits = 11,
-> +	.val_bits = 8,
-> +	.pad_bits = 5,
-> +	.write_flag_mask = MRF24J40_LONG_ACCESS,
-> +	.read_flag_mask = MRF24J40_LONG_ACCESS,
-> +	.cache_type = REGCACHE_RBTREE,
-> +	.max_register = MRF24J40_LONG_NUMREGS,
-> +	.writeable_reg = mrf24j40_long_reg_writeable,
-> +	.readable_reg = mrf24j40_long_reg_readable,
-> +	.volatile_reg = mrf24j40_long_reg_volatile,
-> +};
-> +
-> +static int mrf24j40_long_regmap_write(void *context, const void *data,
-> +				      size_t count)
-> +{
-> +	struct spi_device *spi = context;
-> +	u8 buf[3];
-> +
-> +	if (count > 3)
-> +		return -EINVAL;
-> +
-> +	/* regmap supports read/write mask only in frist byte
-> +	 * long write access need to set the 12th bit, so we
-> +	 * make special handling for write.
-> +	 */
-> +	memcpy(buf, data, count);
-> +	buf[1] |= (1 << 4);
-> +
-> +	return spi_write(spi, buf, count);
-> +}
-> +
-> +static int
-> +mrf24j40_long_regmap_read(void *context, const void *reg, size_t reg_size,
-> +			  void *val, size_t val_size)
-> +{
-> +	struct spi_device *spi = context;
-> +
-> +	return spi_write_then_read(spi, reg, reg_size, val, val_size);
-> +}
-> +
-> +static const struct regmap_bus mrf24j40_long_regmap_bus = {
-> +	.write = mrf24j40_long_regmap_write,
-> +	.read = mrf24j40_long_regmap_read,
-> +	.reg_format_endian_default = REGMAP_ENDIAN_BIG,
-> +	.val_format_endian_default = REGMAP_ENDIAN_BIG,
-> +};
-> +
->   static int write_short_reg(struct mrf24j40 *devrec, u8 reg, u8 value)
->   {
->   	int ret;
-> @@ -816,6 +1109,25 @@ static int mrf24j40_probe(struct spi_device *spi)
->   	devrec->hw->phy->supported.channels[0] = CHANNEL_MASK;
->   	devrec->hw->flags = IEEE802154_HW_OMIT_CKSUM | IEEE802154_HW_AFILT;
->   
-> +	devrec->regmap_short = devm_regmap_init_spi(spi,
-> +						    &mrf24j40_short_regmap);
-> +	if (IS_ERR(devrec->regmap_short)) {
-> +		ret = PTR_ERR(devrec->regmap_short);
-> +		dev_err(&spi->dev, "Failed to allocate short register map: %d\n",
-> +			ret);
-> +		goto err_register_device;
-> +	}
-> +
-> +	devrec->regmap_long = devm_regmap_init(&spi->dev,
-> +					       &mrf24j40_long_regmap_bus,
-> +					       spi, &mrf24j40_long_regmap);
-> +	if (IS_ERR(devrec->regmap_long)) {
-> +		ret = PTR_ERR(devrec->regmap_long);
-> +		dev_err(&spi->dev, "Failed to allocate long register map: %d\n",
-> +			ret);
-> +		goto err_register_device;
-> +	}
-> +
->   	devrec->buf = devm_kzalloc(&spi->dev, 3, GFP_KERNEL);
->   	if (!devrec->buf)
->   		goto err_register_device;
+Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+---
+ drivers/net/ieee802154/mrf24j40.c | 147 +++++++++++++-------------------------
+ 1 file changed, 50 insertions(+), 97 deletions(-)
 
+diff --git a/drivers/net/ieee802154/mrf24j40.c b/drivers/net/ieee802154/mrf24j40.c
+index 6578f68..32de5d6 100644
+--- a/drivers/net/ieee802154/mrf24j40.c
++++ b/drivers/net/ieee802154/mrf24j40.c
+@@ -543,35 +543,6 @@ static int read_long_reg(struct mrf24j40 *devrec, u16 reg, u8 *value)
+ 	return ret;
+ }
+ 
+-static int write_long_reg(struct mrf24j40 *devrec, u16 reg, u8 val)
+-{
+-	int ret;
+-	u16 cmd;
+-	struct spi_message msg;
+-	struct spi_transfer xfer = {
+-		.len = 3,
+-		.tx_buf = devrec->buf,
+-		.rx_buf = devrec->buf,
+-	};
+-
+-	spi_message_init(&msg);
+-	spi_message_add_tail(&xfer, &msg);
+-
+-	cmd = MRF24J40_WRITELONG(reg);
+-	mutex_lock(&devrec->buffer_mutex);
+-	devrec->buf[0] = cmd >> 8 & 0xff;
+-	devrec->buf[1] = cmd & 0xff;
+-	devrec->buf[2] = val;
+-
+-	ret = spi_sync(devrec->spi, &msg);
+-	if (ret)
+-		dev_err(printdev(devrec),
+-			"SPI write Failed for long register 0x%hx\n", reg);
+-
+-	mutex_unlock(&devrec->buffer_mutex);
+-	return ret;
+-}
+-
+ /* This function relies on an undocumented write method. Once a write command
+    and address is set, as many bytes of data as desired can be clocked into
+    the device. The datasheet only shows setting one byte at a time. */
+@@ -755,33 +726,23 @@ static int mrf24j40_ed(struct ieee802154_hw *hw, u8 *level)
+ static int mrf24j40_start(struct ieee802154_hw *hw)
+ {
+ 	struct mrf24j40 *devrec = hw->priv;
+-	u8 val;
+-	int ret;
+ 
+ 	dev_dbg(printdev(devrec), "start\n");
+ 
+-	ret = read_short_reg(devrec, REG_INTCON, &val);
+-	if (ret)
+-		return ret;
+-	val &= ~(0x1|0x8); /* Clear TXNIE and RXIE. Enable interrupts */
+-	write_short_reg(devrec, REG_INTCON, val);
+-
+-	return 0;
++	/* Clear TXNIE and RXIE. Enable interrupts */
++	return regmap_update_bits(devrec->regmap_short, REG_INTCON,
++				  0x01 | 0x08, 0x00);
+ }
+ 
+ static void mrf24j40_stop(struct ieee802154_hw *hw)
+ {
+ 	struct mrf24j40 *devrec = hw->priv;
+-	u8 val;
+-	int ret;
+ 
+ 	dev_dbg(printdev(devrec), "stop\n");
+ 
+-	ret = read_short_reg(devrec, REG_INTCON, &val);
+-	if (ret)
+-		return;
+-	val |= 0x1|0x8; /* Set TXNIE and RXIE. Disable Interrupts */
+-	write_short_reg(devrec, REG_INTCON, val);
++	/* Set TXNIE and RXIE. Disable Interrupts */
++	regmap_update_bits(devrec->regmap_short, REG_INTCON, 0x01 | 0x08,
++			   0x01 | 0x08);
+ }
+ 
+ static int mrf24j40_set_channel(struct ieee802154_hw *hw, u8 page, u8 channel)
+@@ -798,20 +759,20 @@ static int mrf24j40_set_channel(struct ieee802154_hw *hw, u8 page, u8 channel)
+ 
+ 	/* Set Channel TODO */
+ 	val = (channel-11) << 4 | 0x03;
+-	write_long_reg(devrec, REG_RFCON0, val);
++	ret = regmap_update_bits(devrec->regmap_long, REG_RFCON0, 0xf0, val);
++	if (ret)
++		return ret;
+ 
+ 	/* RF Reset */
+-	ret = read_short_reg(devrec, REG_RFCTL, &val);
++	ret = regmap_update_bits(devrec->regmap_short, REG_RFCTL, 0x04, 0x04);
+ 	if (ret)
+ 		return ret;
+-	val |= 0x04;
+-	write_short_reg(devrec, REG_RFCTL, val);
+-	val &= ~0x04;
+-	write_short_reg(devrec, REG_RFCTL, val);
+ 
+-	udelay(SET_CHANNEL_DELAY_US); /* per datasheet */
++	ret = regmap_update_bits(devrec->regmap_short, REG_RFCTL, 0x04, 0x00);
++	if (!ret)
++		udelay(SET_CHANNEL_DELAY_US); /* per datasheet */
+ 
+-	return 0;
++	return ret;
+ }
+ 
+ static int mrf24j40_filter(struct ieee802154_hw *hw,
+@@ -829,8 +790,8 @@ static int mrf24j40_filter(struct ieee802154_hw *hw,
+ 		addrh = le16_to_cpu(filt->short_addr) >> 8 & 0xff;
+ 		addrl = le16_to_cpu(filt->short_addr) & 0xff;
+ 
+-		write_short_reg(devrec, REG_SADRH, addrh);
+-		write_short_reg(devrec, REG_SADRL, addrl);
++		regmap_write(devrec->regmap_short, REG_SADRH, addrh);
++		regmap_write(devrec->regmap_short, REG_SADRL, addrl);
+ 		dev_dbg(printdev(devrec),
+ 			"Set short addr to %04hx\n", filt->short_addr);
+ 	}
+@@ -841,7 +802,8 @@ static int mrf24j40_filter(struct ieee802154_hw *hw,
+ 
+ 		memcpy(addr, &filt->ieee_addr, 8);
+ 		for (i = 0; i < 8; i++)
+-			write_short_reg(devrec, REG_EADR0 + i, addr[i]);
++			regmap_write(devrec->regmap_short, REG_EADR0 + i,
++				     addr[i]);
+ 
+ #ifdef DEBUG
+ 		pr_debug("Set long addr to: ");
+@@ -857,8 +819,8 @@ static int mrf24j40_filter(struct ieee802154_hw *hw,
+ 
+ 		panidh = le16_to_cpu(filt->pan_id) >> 8 & 0xff;
+ 		panidl = le16_to_cpu(filt->pan_id) & 0xff;
+-		write_short_reg(devrec, REG_PANIDH, panidh);
+-		write_short_reg(devrec, REG_PANIDL, panidl);
++		regmap_write(devrec->regmap_short, REG_PANIDH, panidh);
++		regmap_write(devrec->regmap_short, REG_PANIDL, panidl);
+ 
+ 		dev_dbg(printdev(devrec), "Set PANID to %04hx\n", filt->pan_id);
+ 	}
+@@ -868,14 +830,14 @@ static int mrf24j40_filter(struct ieee802154_hw *hw,
+ 		u8 val;
+ 		int ret;
+ 
+-		ret = read_short_reg(devrec, REG_RXMCR, &val);
+-		if (ret)
+-			return ret;
+ 		if (filt->pan_coord)
+-			val |= 0x8;
++			val = 0x8;
+ 		else
+-			val &= ~0x8;
+-		write_short_reg(devrec, REG_RXMCR, val);
++			val = 0x0;
++		ret = regmap_update_bits(devrec->regmap_short, REG_RXMCR, 0x8,
++					 val);
++		if (ret)
++			return ret;
+ 
+ 		/* REG_SLOTTED is maintained as default (unslotted/CSMA-CA).
+ 		 * REG_ORDER is maintained as default (no beacon/superframe).
+@@ -976,80 +938,73 @@ out:
+ static int mrf24j40_hw_init(struct mrf24j40 *devrec)
+ {
+ 	int ret;
+-	u8 val;
+ 
+ 	/* Initialize the device.
+ 		From datasheet section 3.2: Initialization. */
+-	ret = write_short_reg(devrec, REG_SOFTRST, 0x07);
++	ret = regmap_write(devrec->regmap_short, REG_SOFTRST, 0x07);
+ 	if (ret)
+ 		goto err_ret;
+ 
+-	ret = write_short_reg(devrec, REG_PACON2, 0x98);
++	ret = regmap_write(devrec->regmap_short, REG_PACON2, 0x98);
+ 	if (ret)
+ 		goto err_ret;
+ 
+-	ret = write_short_reg(devrec, REG_TXSTBL, 0x95);
++	ret = regmap_write(devrec->regmap_short, REG_TXSTBL, 0x95);
+ 	if (ret)
+ 		goto err_ret;
+ 
+-	ret = write_long_reg(devrec, REG_RFCON0, 0x03);
++	ret = regmap_write(devrec->regmap_long, REG_RFCON0, 0x03);
+ 	if (ret)
+ 		goto err_ret;
+ 
+-	ret = write_long_reg(devrec, REG_RFCON1, 0x01);
++	ret = regmap_write(devrec->regmap_long, REG_RFCON1, 0x01);
+ 	if (ret)
+ 		goto err_ret;
+ 
+-	ret = write_long_reg(devrec, REG_RFCON2, 0x80);
++	ret = regmap_write(devrec->regmap_long, REG_RFCON2, 0x80);
+ 	if (ret)
+ 		goto err_ret;
+ 
+-	ret = write_long_reg(devrec, REG_RFCON6, 0x90);
++	ret = regmap_write(devrec->regmap_long, REG_RFCON6, 0x90);
+ 	if (ret)
+ 		goto err_ret;
+ 
+-	ret = write_long_reg(devrec, REG_RFCON7, 0x80);
++	ret = regmap_write(devrec->regmap_long, REG_RFCON7, 0x80);
+ 	if (ret)
+ 		goto err_ret;
+ 
+-	ret = write_long_reg(devrec, REG_RFCON8, 0x10);
++	ret = regmap_write(devrec->regmap_long, REG_RFCON8, 0x10);
+ 	if (ret)
+ 		goto err_ret;
+ 
+-	ret = write_long_reg(devrec, REG_SLPCON1, 0x21);
++	ret = regmap_write(devrec->regmap_long, REG_SLPCON1, 0x21);
+ 	if (ret)
+ 		goto err_ret;
+ 
+-	ret = write_short_reg(devrec, REG_BBREG2, 0x80);
++	ret = regmap_write(devrec->regmap_short, REG_BBREG2, 0x80);
+ 	if (ret)
+ 		goto err_ret;
+ 
+-	ret = write_short_reg(devrec, REG_CCAEDTH, 0x60);
++	ret = regmap_write(devrec->regmap_short, REG_CCAEDTH, 0x60);
+ 	if (ret)
+ 		goto err_ret;
+ 
+-	ret = write_short_reg(devrec, REG_BBREG6, 0x40);
++	ret = regmap_write(devrec->regmap_short, REG_BBREG6, 0x40);
+ 	if (ret)
+ 		goto err_ret;
+ 
+-	ret = write_short_reg(devrec, REG_RFCTL, 0x04);
++	ret = regmap_write(devrec->regmap_short, REG_RFCTL, 0x04);
+ 	if (ret)
+ 		goto err_ret;
+ 
+-	ret = write_short_reg(devrec, REG_RFCTL, 0x0);
++	ret = regmap_write(devrec->regmap_short, REG_RFCTL, 0x0);
+ 	if (ret)
+ 		goto err_ret;
+ 
+ 	udelay(192);
+ 
+ 	/* Set RX Mode. RXMCR<1:0>: 0x0 normal, 0x1 promisc, 0x2 error */
+-	ret = read_short_reg(devrec, REG_RXMCR, &val);
+-	if (ret)
+-		goto err_ret;
+-
+-	val &= ~0x3; /* Clear RX mode (normal) */
+-
+-	ret = write_short_reg(devrec, REG_RXMCR, val);
++	ret = regmap_update_bits(devrec->regmap_short, REG_RXMCR, 0x03, 0x00);
+ 	if (ret)
+ 		goto err_ret;
+ 
+@@ -1057,22 +1012,20 @@ static int mrf24j40_hw_init(struct mrf24j40 *devrec)
+ 		/* Enable external amplifier.
+ 		 * From MRF24J40MC datasheet section 1.3: Operation.
+ 		 */
+-		read_long_reg(devrec, REG_TESTMODE, &val);
+-		val |= 0x7; /* Configure GPIO 0-2 to control amplifier */
+-		write_long_reg(devrec, REG_TESTMODE, val);
++		regmap_update_bits(devrec->regmap_long, REG_TESTMODE, 0x07,
++				   0x07);
+ 
+-		read_short_reg(devrec, REG_TRISGPIO, &val);
+-		val |= 0x8; /* Set GPIO3 as output. */
+-		write_short_reg(devrec, REG_TRISGPIO, val);
++		/* Set GPIO3 as output. */
++		regmap_update_bits(devrec->regmap_short, REG_TRISGPIO, 0x08,
++				   0x08);
+ 
+-		read_short_reg(devrec, REG_GPIO, &val);
+-		val |= 0x8; /* Set GPIO3 HIGH to enable U5 voltage regulator */
+-		write_short_reg(devrec, REG_GPIO, val);
++		/* Set GPIO3 HIGH to enable U5 voltage regulator */
++		regmap_update_bits(devrec->regmap_short, REG_GPIO, 0x08, 0x08);
+ 
+ 		/* Reduce TX pwr to meet FCC requirements.
+ 		 * From MRF24J40MC datasheet section 3.1.1
+ 		 */
+-		write_long_reg(devrec, REG_RFCON3, 0x28);
++		regmap_write(devrec->regmap_long, REG_RFCON3, 0x28);
+ 	}
+ 
+ 	return 0;
+-- 
+2.5.0
 
-I never converted a driver to use regmap myself so my review might not 
-be to deep here. I have then this code working fine for me though.
-
-Reviewed-by: Stefan Schmidt <stefan@osg.samsung.com>
-
-regards
-Stefan Schmidt
