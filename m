@@ -1,57 +1,56 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-bn1on0078.outbound.protection.outlook.com ([157.56.110.78]:54264
-	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1753284AbbHMUYx (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-	Thu, 13 Aug 2015 16:24:53 -0400
-From: "Hennerich, Michael" <Michael.Hennerich@analog.com>
-Subject: RE: ADF7242 driver ready for mainline inclusion?
-Date: Thu, 13 Aug 2015 18:50:18 +0000
-Message-ID: <78F369B105E123488216BDB7B6C397DAA4DA4FD8@NWD2MBX7.ad.analog.com>
+Received: from proxima.lasnet.de ([78.47.171.185]:57112 "EHLO
+	proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751255AbbHNHWA convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Fri, 14 Aug 2015 03:22:00 -0400
+Subject: Re: ADF7242 driver ready for mainline inclusion?
 References: <55CC5CF3.5030701@sostec.de>
-In-Reply-To: <55CC5CF3.5030701@sostec.de>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ <78F369B105E123488216BDB7B6C397DAA4DA4FD8@NWD2MBX7.ad.analog.com>
+From: Stefan Schmidt <stefan@datenfreihafen.org>
+Message-ID: <55CD9513.8020508@datenfreihafen.org>
+Date: Fri, 14 Aug 2015 09:13:23 +0200
 MIME-Version: 1.0
+In-Reply-To: <78F369B105E123488216BDB7B6C397DAA4DA4FD8@NWD2MBX7.ad.analog.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Stefan Schmidt <stefan@sostec.de>
+To: "Hennerich, Michael" <Michael.Hennerich@analog.com>
 Cc: Alexander Aring <alex.aring@gmail.com>, "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>
 
-SGkgQWxsLA0KDQpJIGRpZCB0aXMgZHJpdmVyIGEgbG9uZyB0aW1lIGFnbywgd2hlbiB0aGUgTGlu
-dXggODAyLjE1LjQgc3VwcG9ydCBpbiBnZW5lcmFsIHdhcyBhdCBpdHMgYmVnaW5uaW5nIGFuZCBw
-cmV0dHkgYnJva2VuIGFzIHdlbGwuDQpGcm9tIHRpbWUgdG8gdGltZSBJIHVwZGF0ZSB0aGlzIGRy
-aXZlciAtIGFuZCBhY3R1YWxseSBpdCdzIHByZXR0eSBtYXR1cmUgLSBhbmQgc2hvdWxkIGFwcGx5
-IHRvIG1haW5saW5lIHdpdGhvdXQgcHJvYmxlbXMuDQoNClRoZXJlIGlzIGN1cnJlbnRseSBvbmx5
-IG9uZSBtaW5vciB0aGluZyB0aGF0IEkgd2FudGVkIHRvIGludmVzdGlnYXRlIChzb21lIGlmZGVm
-IGluIHRoZSBJU1IpIGJlZm9yZSBzdWJtaXR0aW5nIHRoZSBkcml2ZXIgbWFpbmxpbmUuDQpBcmUg
-eW91IHVzaW5nIHRoZSBBREY3MjQyIGluIGEgZGVzaWduIGFscmVhZHk/DQpEbyB5b3UgaGF2ZSBm
-ZWVkYmFjayBhbHJlYWR5Pw0KDQpCZXN0IHJlZ2FyZHMsDQpNaWNoYWVsDQoNCi0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0K
-KioqKioqKioqIEFuYWxvZyBEZXZpY2VzIEdtYkggICAgICAgICBtaWNoYWVsLmhlbm5lcmljaEBh
-bmFsb2cuY29tDQoqKiAgKioqKioNCioqICAgICAqKiBXaWxoZWxtLVdhZ2VuZmVsZC1TdHJhc3Nl
-IDYgICAgICAgcGhvbmUgKzQ5LTg5LTc2OTAzLTMyMg0KKiogICoqKioqIEQtODA4MDcgTXVuaWNo
-ICAgICAgICAgICAgICAgICAgICAgIGZheCArNDktODktNzY5MDMtMTU3DQoqKioqKioqKiogR2Vy
-bWFueSAgICAgICAgICAgICAgICAgICAgICAgICAgbW9iaWxlICs0OS0xNzUtMjk1LTAzNDANCg0K
-U2l0eiBkZXIgR2VzZWxsc2NoYWZ0OiBNw7xuY2hlbjsgUmVnaXN0ZXJnZXJpY2h0OiBNw7xuY2hl
-biBIUkIgNDAzNjg7DQpHZXNjaMOkZnRzZsO8aHJlcjogUGV0ZXIgS29sYmVyZywgV2lsbGlhbSBB
-LiBNYXJ0aW4sIE1hcmdhcmV0IEsuIFNlaWYNCg0KDQoNCi0tLS0tT3JpZ2luYWwgTWVzc2FnZS0t
-LS0tDQpGcm9tOiBTdGVmYW4gU2NobWlkdCBbbWFpbHRvOnN0ZWZhbkBzb3N0ZWMuZGVdIA0KU2Vu
-dDogVGh1cnNkYXksIEF1Z3VzdCAxMywgMjAxNSAxMTowMiBBTQ0KVG86IEhlbm5lcmljaCwgTWlj
-aGFlbA0KQ2M6IEFsZXhhbmRlciBBcmluZzsgbGludXgtd3BhbkB2Z2VyLmtlcm5lbC5vcmcNClN1
-YmplY3Q6IEFERjcyNDIgZHJpdmVyIHJlYWR5IGZvciBtYWlubGluZSBpbmNsdXNpb24/DQoNCkhl
-bGxvLg0KDQpXZSBoYXZlIGZvdW5kIHRoZSBBREY3MjQyIGRyaXZlciB3aGljaCBsaXN0cyB5b3Ug
-YXMgYXV0aG9yLiA6KQ0KDQpBbGV4YW5kZXIgYW5kIG15c2VsZiBhcmUgd29ya2luZyBvbiB0aGUg
-bGludXgtd3BhbiBzdWJzeXN0ZW0gd2hpY2ggaGFuZGxlcyBJRUVFIDgwMi4xNS40LiBJdCBzZWVt
-cyB0aGUgZHJpdmVyIHdhcyBzdWJtaXR0ZWQgdG8gdGhlIG9sZCBsaW51eC16aWdiZWUgcHJvamVj
-dCAoYW5jZXN0b3Igb2YgbGludXgtd3BhbiwgcmVuYW1lZCBkdWUgdG8gbm90IGJlaW5nIGEgemln
-YmVlIHN0YWNrKSBidXQgc2FkbHkgbmV2ZXIgbWFkZSBpdCBtYWlubGluZSB3aGVuIG90aGVyIHBh
-cnRzIGhhdmUgYmVlbiBtZXJnZWQuDQoNCkFyZSB5b3Ugc3RpbGwgYWN0aXZlbHkgd29ya2luZyBv
-biB0aGlzIGRyaXZlcj8gSXMgdGhlcmUgYW4gaW50ZXJlc3QgZnJvbSB5b3VyIHNpZGUgdG8gZ2V0
-IGl0IGludG8gbWFpbmxpbmU/IFdlIHdvdWxkIGJlIGhhcHB5IHRvIGhlbHAgeW91IHdpdGggcmV2
-aWV3aW5nIGl0Lg0KDQpTbyBmYXIgSSBoYXZlIG9ubHkgZm91bmQgdGhlc2UuIEFyZSB0aGV5IHVw
-IHRvIGRhdGU/DQpodHRwOi8vd2lraS5hbmFsb2cuY29tL3Jlc291cmNlcy90b29scy1zb2Z0d2Fy
-ZS9saW51eC1kcml2ZXJzL25ldHdvcmtpbmctbWFjODAyMTU0L2FkZjcyNDINCmh0dHBzOi8vZ2l0
-aHViLmNvbS9hbmFsb2dkZXZpY2VzaW5jL2xpbnV4L2Jsb2IveGNvbW1fenlucS9kcml2ZXJzL25l
-dC9pZWVlODAyMTU0L2FkZjcyNDIuYw0KDQpyZWdhcmRzDQpTdGVmYW4gU2NobWlkdA0KDQo=
+Hello.
+
+On 13/08/15 20:50, Hennerich, Michael wrote:
+> Hi All,
+>
+> I did tis driver a long time ago, when the Linux 802.15.4 support in general was at its beginning and pretty broken as well.
+> From time to time I update this driver - and actually it's pretty mature - and should apply to mainline without problems.
+>
+> There is currently only one minor thing that I wanted to investigate (some ifdef in the ISR) before submitting the driver mainline.
+
+This is great to hear! Looking forward to it. :)
+> Are you using the ADF7242 in a design already?
+
+No. The reason I wrote this is that I have an interest in the linux-wpan
+subsystem in general and thought the driver would be a good candidate
+for mainline.
+
+I actually searched for some simple ADF7242which I could hook up to SPI
++ IRQ and maybe some more control lines. So far I only found the
+official evaluation board which is to expensive for some hobbyist testing.
+> Do you have feedback already?
+
+The driver interface for ieee802154 has advanced since the it got merged
+initially. Some of the new things you might want to look into and add
+support are:
+
+o Async transmit (xmit_async)
+o LBT support (set_lbt)
+o Set CC mode and ed level (set_cc_mode, set_cca_ed_level)
+o Support for monitor mode (set_promiscuous_mode)
+
+These I found missing when having a brief look over the driver.
+
+regards
+Stefan Schmidt
+
