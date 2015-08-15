@@ -1,14 +1,14 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f182.google.com ([209.85.212.182]:33360 "EHLO
-	mail-wi0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751896AbbHOJBH (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Sat, 15 Aug 2015 05:01:07 -0400
-Received: by wijp15 with SMTP id p15so37961213wij.0
-        for <linux-wpan@vger.kernel.org>; Sat, 15 Aug 2015 02:01:06 -0700 (PDT)
+Received: from mail-wi0-f178.google.com ([209.85.212.178]:34478 "EHLO
+	mail-wi0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752301AbbHOJBI (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Sat, 15 Aug 2015 05:01:08 -0400
+Received: by wicne3 with SMTP id ne3so37996818wic.1
+        for <linux-wpan@vger.kernel.org>; Sat, 15 Aug 2015 02:01:07 -0700 (PDT)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH bluetooth-next 1/2] ieee802154: 6lowpan: fix packet layer registration
-Date: Sat, 15 Aug 2015 11:00:32 +0200
-Message-Id: <1439629233-4328-2-git-send-email-alex.aring@gmail.com>
+Subject: [PATCH bluetooth-next 2/2] ieee802154: 6lowpan: fix non-lowpan wpan interfaces
+Date: Sat, 15 Aug 2015 11:00:33 +0200
+Message-Id: <1439629233-4328-3-git-send-email-alex.aring@gmail.com>
 In-Reply-To: <1439629233-4328-1-git-send-email-alex.aring@gmail.com>
 References: <1439629233-4328-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
@@ -16,68 +16,39 @@ List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
 Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-This patch fixes 802.15.4 packet layer registration when mutliple
-lowpan interfaces will be added. We need to register the packet layer at
-the first lowpan interface and deregister it at the last interface. This
-done by open_count variable which is protected by rtnl.
-
-Additional do a quiet fix by adding dev_put(real_dev) when netdev
-registration fails, which fix the refcount for the wpan dev.
+We receive all 802.15.4 frames on the packet handler "lowpan_rcv" this
+patch checks if the wpan device belongs to a lowpan interface.
 
 Signed-off-by: Alexander Aring <alex.aring@gmail.com>
 ---
- net/ieee802154/6lowpan/core.c | 22 +++++++++++++++++-----
- 1 file changed, 17 insertions(+), 5 deletions(-)
+ net/ieee802154/6lowpan/rx.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/net/ieee802154/6lowpan/core.c b/net/ieee802154/6lowpan/core.c
-index 180e9f5..27c25ad 100644
---- a/net/ieee802154/6lowpan/core.c
-+++ b/net/ieee802154/6lowpan/core.c
-@@ -52,6 +52,8 @@
+diff --git a/net/ieee802154/6lowpan/rx.c b/net/ieee802154/6lowpan/rx.c
+index d6f5e8e..12e1020 100644
+--- a/net/ieee802154/6lowpan/rx.c
++++ b/net/ieee802154/6lowpan/rx.c
+@@ -67,6 +67,10 @@ static int lowpan_rcv(struct sk_buff *skb, struct net_device *dev,
+ 	struct ieee802154_hdr hdr;
+ 	int ret;
  
- #include "6lowpan_i.h"
- 
-+static int open_count;
++	if (dev->type != ARPHRD_IEEE802154 ||
++	    !dev->ieee802154_ptr->lowpan_dev)
++		goto drop;
 +
- static struct header_ops lowpan_header_ops = {
- 	.create	= lowpan_header_create,
- };
-@@ -141,12 +143,18 @@ static int lowpan_newlink(struct net *src_net, struct net_device *dev,
- 	lowpan_netdev_setup(dev, LOWPAN_LLTYPE_IEEE802154);
+ 	skb = skb_share_check(skb, GFP_ATOMIC);
+ 	if (!skb)
+ 		goto drop;
+@@ -77,9 +81,6 @@ static int lowpan_rcv(struct sk_buff *skb, struct net_device *dev,
+ 	if (skb->pkt_type == PACKET_OTHERHOST)
+ 		goto drop_skb;
  
- 	ret = register_netdevice(dev);
--	if (ret >= 0) {
--		real_dev->ieee802154_ptr->lowpan_dev = dev;
--		lowpan_rx_init();
-+	if (ret < 0) {
-+		dev_put(real_dev);
-+		return ret;
- 	}
+-	if (dev->type != ARPHRD_IEEE802154)
+-		goto drop_skb;
+-
+ 	if (ieee802154_hdr_peek_addrs(skb, &hdr) < 0)
+ 		goto drop_skb;
  
--	return ret;
-+	real_dev->ieee802154_ptr->lowpan_dev = dev;
-+	if (!open_count)
-+		lowpan_rx_init();
-+
-+	open_count++;
-+
-+	return 0;
- }
- 
- static void lowpan_dellink(struct net_device *dev, struct list_head *head)
-@@ -156,7 +164,11 @@ static void lowpan_dellink(struct net_device *dev, struct list_head *head)
- 
- 	ASSERT_RTNL();
- 
--	lowpan_rx_exit();
-+	open_count--;
-+
-+	if (!open_count)
-+		lowpan_rx_exit();
-+
- 	real_dev->ieee802154_ptr->lowpan_dev = NULL;
- 	unregister_netdevice(dev);
- 	dev_put(real_dev);
 -- 
 2.5.0
 
