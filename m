@@ -1,48 +1,37 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from senator.holtmann.net ([87.106.208.187]:46007 "EHLO
-	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750852AbbHOV37 convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Sat, 15 Aug 2015 17:29:59 -0400
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2104\))
-Subject: Re: [PATCH bluetooth-next 0/2] ieee802154: 6lowpan: fixes for multiple interfaces
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1439629233-4328-1-git-send-email-alex.aring@gmail.com>
-Date: Sat, 15 Aug 2015 14:29:55 -0700
-Content-Transfer-Encoding: 8BIT
-Message-Id: <F9971C92-460B-4D87-B6DC-A6F66F669848@holtmann.org>
-References: <1439629233-4328-1-git-send-email-alex.aring@gmail.com>
+Received: from proxima.lasnet.de ([78.47.171.185]:59083 "EHLO
+	proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750847AbbHRIRZ (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Tue, 18 Aug 2015 04:17:25 -0400
+From: Stefan Schmidt <stefan@osg.samsung.com>
+Subject: [PATCH wpan-tools] build: remove leftover from Makefile.am
+Date: Tue, 18 Aug 2015 10:07:23 +0200
+Message-Id: <1439885243-22609-1-git-send-email-stefan@osg.samsung.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>
-Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de
+To: linux-wpan@vger.kernel.org
+Cc: Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt <stefan@osg.samsung.com>
 
-Hi Alex,
+We have no abc folder in src. Looks like this was bootstrapped with some
+Makefile.am from libabc.
 
-> while working on "ieee802154: 6lowpan: cleanup and rework dispatch evaluation",
-> I detected issues which was introduced by removal the multiple interfaces
-> feature _per_ wpan interface. These are:
-> 
-> - multiple registration for the packet handler -> fixed by open_count
-> - check on if the wpan interface has a lowpan interface.
-> 
-> I also detect the missing dev_put while lowpan netdev_registation and
-> take some patches like moving the ARPHRD check earlier, we need to
-> check on this before evaluating the ieee802154_ptr.
-> 
-> - Alex
-> 
-> Alexander Aring (2):
->  ieee802154: 6lowpan: fix packet layer registration
->  ieee802154: 6lowpan: fix non-lowpan wpan interfaces
-> 
-> net/ieee802154/6lowpan/core.c | 22 +++++++++++++++++-----
-> net/ieee802154/6lowpan/rx.c   |  7 ++++---
-> 2 files changed, 21 insertions(+), 8 deletions(-)
+Signed-off-by: Stefan Schmidt <stefan@osg.samsung.com>
+---
+ Makefile.am | 1 -
+ 1 file changed, 1 deletion(-)
 
-both patches have been applied to bluetooth-next tree.
-
-Regards
-
-Marcel
+diff --git a/Makefile.am b/Makefile.am
+index 2584cb2..2261603 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -7,7 +7,6 @@ AM_CPPFLAGS = \
+ 	-include $(top_builddir)/config.h \
+ 	-DSYSCONFDIR=\""$(sysconfdir)"\" \
+ 	-DLIBEXECDIR=\""$(libexecdir)"\" \
+-	-I${top_srcdir}/src/abc \
+ 	-I${top_srcdir}/src
+ 
+ AM_CFLAGS = ${WPAN_TOOLS_CFLAGS} \
+-- 
+2.4.3
 
