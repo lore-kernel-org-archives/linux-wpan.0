@@ -1,27 +1,48 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from lists.s-osg.org ([54.187.51.154]:58502 "EHLO lists.s-osg.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752157AbbHSOPf (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-	Wed, 19 Aug 2015 10:15:35 -0400
-Received: from [192.168.2.22] (pD9F79E8A.dip0.t-ipconnect.de [217.247.158.138])
-	by lists.s-osg.org (Postfix) with ESMTPSA id 4C489462CB
-	for <linux-wpan@vger.kernel.org>; Wed, 19 Aug 2015 07:15:34 -0700 (PDT)
+Received: from proxima.lasnet.de ([78.47.171.185]:59913 "EHLO
+	proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752696AbbHSONf (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Wed, 19 Aug 2015 10:13:35 -0400
 From: Stefan Schmidt <stefan@osg.samsung.com>
-Subject: Upcoming wpan-tools 0.5 release
-Message-ID: <55D48F82.2090005@osg.samsung.com>
-Date: Wed, 19 Aug 2015 16:15:30 +0200
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Subject: [PATCH wpan-tools] mac: range checking for command accepting only 0 or 1
+Date: Wed, 19 Aug 2015 16:13:24 +0200
+Message-Id: <1439993604-8335-1-git-send-email-stefan@osg.samsung.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>
+To: linux-wpan@vger.kernel.org
+Cc: Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt <stefan@osg.samsung.com>
 
-Hello.
+lbt and ackreq_default only accept 0or 1 as arguments which we did not
+acount for so far. Testing invalid arguments and checking teh return
+code uncovered this one.
 
-Just a quick heads up that I will prepare a wpan-tools 0.5 release 
-towards the end of the week. Either Thursday or Friday depending on my 
-workload.
+Signed-off-by: Stefan Schmidt <stefan@osg.samsung.com>
+---
+ src/mac.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-regards
-Stefan Schmidt
+diff --git a/src/mac.c b/src/mac.c
+index 76db58f..26c6fc5 100644
+--- a/src/mac.c
++++ b/src/mac.c
+@@ -175,6 +175,8 @@ static int handle_lbt_mode(struct nl802154_state *state,
+ 	mode = strtoul(argv[0], &end, 0);
+ 	if (*end != '\0')
+ 		return 1;
++	if (mode != 0 && mode != 1)
++		return 1;
+ 
+ 	NLA_PUT_U8(msg, NL802154_ATTR_LBT_MODE, mode);
+ 
+@@ -202,6 +204,8 @@ static int handle_ackreq_default(struct nl802154_state *state,
+ 	ackreq = strtoul(argv[0], &end, 0);
+ 	if (*end != '\0')
+ 		return 1;
++	if (ackreq != 0 && ackreq != 1)
++		return 1;
+ 
+ 	NLA_PUT_U8(msg, NL802154_ATTR_ACKREQ_DEFAULT, ackreq);
+ 
+-- 
+2.4.3
+
