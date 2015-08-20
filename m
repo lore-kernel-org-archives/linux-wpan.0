@@ -1,70 +1,52 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from lists.s-osg.org ([54.187.51.154]:32940 "EHLO lists.s-osg.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751794AbbH3Vvr (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-	Sun, 30 Aug 2015 17:51:47 -0400
-Subject: Re: [RFCv2 bluetooth-next 06/16] ieee802154: 6lowpan: change if
- lowpan dev is running
+Received: from mail-wi0-f180.google.com ([209.85.212.180]:33255 "EHLO
+	mail-wi0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753243AbbHTQvc (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Thu, 20 Aug 2015 12:51:32 -0400
+Received: by wijp15 with SMTP id p15so21302661wij.0
+        for <linux-wpan@vger.kernel.org>; Thu, 20 Aug 2015 09:51:31 -0700 (PDT)
+From: Alexander Aring <alex.aring@gmail.com>
+Subject: [RFCv2 bluetooth-next 07/16] ieee802154: 6lowpan: cleanup pull of iphc bytes
+Date: Thu, 20 Aug 2015 18:47:36 +0200
+Message-Id: <1440089265-23366-8-git-send-email-alex.aring@gmail.com>
+In-Reply-To: <1440089265-23366-1-git-send-email-alex.aring@gmail.com>
 References: <1440089265-23366-1-git-send-email-alex.aring@gmail.com>
- <1440089265-23366-7-git-send-email-alex.aring@gmail.com>
-From: Stefan Schmidt <stefan@osg.samsung.com>
-Message-ID: <55E37AEF.80703@osg.samsung.com>
-Date: Sun, 30 Aug 2015 23:51:43 +0200
-MIME-Version: 1.0
-In-Reply-To: <1440089265-23366-7-git-send-email-alex.aring@gmail.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org
-Cc: kernel@pengutronix.de
+To: linux-wpan@vger.kernel.org
+Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-Hello.
+This patch cleanups the pull of the iphc bytes. We don't need to check
+if the skb->len contains two bytes, this will be checked by
+lowpan_fetch_skb_u8.
 
-On 20/08/15 18:47, Alexander Aring wrote:
-> We don't need to check if the wpan interface is running because the
-> lowpan_rcv is the packet layer receive handler for the wpan interface.
->
-> Instead doing a check if wpan interface is running we should check if
-> the lowpan interface is running before starting 6lowpan adaptation layer.
->
-> Signed-off-by: Alexander Aring <alex.aring@gmail.com>
-> ---
->   net/ieee802154/6lowpan/rx.c | 11 ++++++-----
->   1 file changed, 6 insertions(+), 5 deletions(-)
->
-> diff --git a/net/ieee802154/6lowpan/rx.c b/net/ieee802154/6lowpan/rx.c
-> index b1442f3..c529d9f 100644
-> --- a/net/ieee802154/6lowpan/rx.c
-> +++ b/net/ieee802154/6lowpan/rx.c
-> @@ -65,19 +65,20 @@ static int lowpan_rcv(struct sk_buff *skb, struct net_device *wdev,
->   		      struct packet_type *pt, struct net_device *orig_wdev)
->   {
->   	struct ieee802154_hdr hdr;
-> +	struct net_device *ldev;
->   	int ret;
->   
-> -	if (wdev->type != ARPHRD_IEEE802154 ||
-> -	    !wdev->ieee802154_ptr->lowpan_dev)
-> +	if (wdev->type != ARPHRD_IEEE802154)
-> +		goto drop;
-> +
-> +	ldev = wdev->ieee802154_ptr->lowpan_dev;
-> +	if (!ldev || !netif_running(ldev))
->   		goto drop;
->   
->   	skb = skb_share_check(skb, GFP_ATOMIC);
->   	if (!skb)
->   		goto drop;
->   
-> -	if (!netif_running(wdev))
-> -		goto drop_skb;
-> -
->   	if (skb->pkt_type == PACKET_OTHERHOST)
->   		goto drop_skb;
->   
+Reviewed-by: Stefan Schmidt <stefan@osg.samsung.com>
+Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+---
+ net/ieee802154/6lowpan/rx.c | 9 ++-------
+ 1 file changed, 2 insertions(+), 7 deletions(-)
 
-Signed-off-by: Stefan Schmidt <stefan@osg.samsung.com>
+diff --git a/net/ieee802154/6lowpan/rx.c b/net/ieee802154/6lowpan/rx.c
+index c529d9f..4ddf694 100644
+--- a/net/ieee802154/6lowpan/rx.c
++++ b/net/ieee802154/6lowpan/rx.c
+@@ -33,14 +33,9 @@ iphc_decompress(struct sk_buff *skb, const struct ieee802154_hdr *hdr)
+ 	void *sap, *dap;
+ 
+ 	raw_dump_table(__func__, "raw skb data dump", skb->data, skb->len);
+-	/* at least two bytes will be used for the encoding */
+-	if (skb->len < 2)
+-		return -EINVAL;
+-
+-	if (lowpan_fetch_skb_u8(skb, &iphc0))
+-		return -EINVAL;
+ 
+-	if (lowpan_fetch_skb_u8(skb, &iphc1))
++	if (lowpan_fetch_skb_u8(skb, &iphc0) ||
++	    lowpan_fetch_skb_u8(skb, &iphc1))
+ 		return -EINVAL;
+ 
+ 	ieee802154_addr_to_sa(&sa, &hdr->source);
+-- 
+2.5.0
 
-regards
-Stefan Schmidt
