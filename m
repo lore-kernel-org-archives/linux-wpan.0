@@ -1,74 +1,119 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from lists.s-osg.org ([54.187.51.154]:32956 "EHLO lists.s-osg.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752138AbbH3WA6 (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-	Sun, 30 Aug 2015 18:00:58 -0400
-Subject: Re: [RFCv2 bluetooth-next 13/16] ieee802154: 6lowpan: add check for
- reserved dispatch
+Received: from mail-wi0-f177.google.com ([209.85.212.177]:35824 "EHLO
+	mail-wi0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753255AbbHTQvl (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Thu, 20 Aug 2015 12:51:41 -0400
+Received: by wicne3 with SMTP id ne3so151197016wic.0
+        for <linux-wpan@vger.kernel.org>; Thu, 20 Aug 2015 09:51:40 -0700 (PDT)
+From: Alexander Aring <alex.aring@gmail.com>
+Subject: [RFCv2 bluetooth-next 14/16] ieee802154: 6lowpan: check on valid 802.15.4 frame
+Date: Thu, 20 Aug 2015 18:47:43 +0200
+Message-Id: <1440089265-23366-15-git-send-email-alex.aring@gmail.com>
+In-Reply-To: <1440089265-23366-1-git-send-email-alex.aring@gmail.com>
 References: <1440089265-23366-1-git-send-email-alex.aring@gmail.com>
- <1440089265-23366-14-git-send-email-alex.aring@gmail.com>
-From: Stefan Schmidt <stefan@osg.samsung.com>
-Message-ID: <55E37D16.8010901@osg.samsung.com>
-Date: Mon, 31 Aug 2015 00:00:54 +0200
-MIME-Version: 1.0
-In-Reply-To: <1440089265-23366-14-git-send-email-alex.aring@gmail.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org
-Cc: kernel@pengutronix.de
+To: linux-wpan@vger.kernel.org
+Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-Hello.
+This patch adds frame control checks to check if the received frame is
+something which could contain a 6LoWPAN packet.
 
-On 20/08/15 18:47, Alexander Aring wrote:
-> This patch adds checks for reserved dispatch value. When we have a
-> reserved dispatch value we should drop the skb immediately.
->
-> Signed-off-by: Alexander Aring <alex.aring@gmail.com>
-> ---
->   net/ieee802154/6lowpan/rx.c | 14 +++++++++++++-
->   1 file changed, 13 insertions(+), 1 deletion(-)
->
-> diff --git a/net/ieee802154/6lowpan/rx.c b/net/ieee802154/6lowpan/rx.c
-> index d309d91..f98ebf5 100644
-> --- a/net/ieee802154/6lowpan/rx.c
-> +++ b/net/ieee802154/6lowpan/rx.c
-> @@ -260,6 +260,17 @@ static inline bool lowpan_is_nalp(u8 dispatch)
->   	return (dispatch & LOWPAN_DISPATCH_FIRST) == LOWPAN_DISPATCH_NALP;
->   }
->   
-> +/* Lookup for reserved dispatch values at:
-> + * https://www.iana.org/assignments/_6lowpan-parameters/_6lowpan-parameters.xhtml#_6lowpan-parameters-1
-It might be worth noting down the update date here as well. The do not 
-seem to have a version I can find easily so the update date might be a 
-good idea to help helping looking at it to decide if we should update 
-our code.
+Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+---
+ include/linux/ieee802154.h  | 25 +++++++++++++++++++++++++
+ include/net/mac802154.h     | 15 +++++++++++++++
+ net/ieee802154/6lowpan/rx.c |  8 ++++++++
+ 3 files changed, 48 insertions(+)
 
-> + */
-> +static inline bool lowpan_is_reserved(u8 dispatch)
-> +{
-> +	return ((dispatch >= 0x44 && dispatch <= 0x4F) ||
-> +		(dispatch >= 0x51 && dispatch <= 0x5F) ||
-> +		(dispatch >= 0xc8 && dispatch <= 0xdf) ||
-> +		(dispatch >= 0xe8 && dispatch <= 0xff));
-> +}
-> +
->   /* lowpan_rx_h_check checks on generic 6LoWPAN requirements
->    * in MAC and 6LoWPAN header.
->    *
-> @@ -271,7 +282,8 @@ static inline bool lowpan_rx_h_check(struct sk_buff *skb)
->   	if (unlikely(!skb->len))
->   		return false;
->   
-> -	if (lowpan_is_nalp(*skb_network_header(skb)))
-> +	if (lowpan_is_nalp(*skb_network_header(skb)) ||
-> +	    lowpan_is_reserved(*skb_network_header(skb)))
->   		return false;
->   
->   	return true;
+diff --git a/include/linux/ieee802154.h b/include/linux/ieee802154.h
+index 1dc1f4e..db01492 100644
+--- a/include/linux/ieee802154.h
++++ b/include/linux/ieee802154.h
+@@ -205,6 +205,31 @@ enum {
+ 	IEEE802154_SCAN_IN_PROGRESS = 0xfc,
+ };
+ 
++/* frame control handling */
++#define IEEE802154_FCTL_FTYPE		0x0003
++#define IEEE802154_FCTL_INTRA_PAN	0x0040
++
++#define IEEE802154_FTYPE_DATA		0x0001
++
++/*
++ * ieee802154_is_data - check if type is IEEE802154_FTYPE_DATA
++ * @fc: frame control bytes in little-endian byteorder
++ */
++static inline int ieee802154_is_data(__le16 fc)
++{
++	return (fc & cpu_to_le16(IEEE802154_FCTL_FTYPE)) ==
++		cpu_to_le16(IEEE802154_FTYPE_DATA);
++}
++
++/**
++ * ieee802154_is_intra_pan - check if intra pan id communication
++ * @fc: frame control bytes in little-endian byteorder
++ */
++static inline bool ieee802154_is_intra_pan(__le16 fc)
++{
++	return fc & cpu_to_le16(IEEE802154_FCTL_INTRA_PAN);
++}
++
+ /**
+  * ieee802154_is_valid_psdu_len - check if psdu len is valid
+  * available lengths:
+diff --git a/include/net/mac802154.h b/include/net/mac802154.h
+index b7f9961..32bd7c0 100644
+--- a/include/net/mac802154.h
++++ b/include/net/mac802154.h
+@@ -250,6 +250,21 @@ struct ieee802154_ops {
+ };
+ 
+ /**
++ * ieee802154_get_fc_from_skb - get the frame control field from an skb
++ * @skb: skb where the frame control field will be get from
++ */
++static inline __le16 ieee802154_get_fc_from_skb(const struct sk_buff *skb)
++{
++	/* return some invalid fc on failure */
++	if (unlikely(skb->mac_len < 2)) {
++		WARN_ON(1);
++		return cpu_to_le16(0);
++	}
++
++	return (__force __le16)__get_unaligned_memmove16(skb_mac_header(skb));
++}
++
++/**
+  * ieee802154_be64_to_le64 - copies and convert be64 to le64
+  * @le64_dst: le64 destination pointer
+  * @be64_src: be64 source pointer
+diff --git a/net/ieee802154/6lowpan/rx.c b/net/ieee802154/6lowpan/rx.c
+index f98ebf5..5be996a 100644
+--- a/net/ieee802154/6lowpan/rx.c
++++ b/net/ieee802154/6lowpan/rx.c
+@@ -11,6 +11,7 @@
+ #include <linux/if_arp.h>
+ 
+ #include <net/6lowpan.h>
++#include <net/mac802154.h>
+ #include <net/ieee802154_netdev.h>
+ 
+ #include "6lowpan_i.h"
+@@ -278,6 +279,13 @@ static inline bool lowpan_is_reserved(u8 dispatch)
+  */
+ static inline bool lowpan_rx_h_check(struct sk_buff *skb)
+ {
++	__le16 fc = ieee802154_get_fc_from_skb(skb);
++
++	/* check on ieee802154 conform 6LoWPAN header */
++	if (!ieee802154_is_data(fc) ||
++	    !ieee802154_is_intra_pan(fc))
++		return false;
++
+ 	/* check if we can dereference the dispatch */
+ 	if (unlikely(!skb->len))
+ 		return false;
+-- 
+2.5.0
 
-Signed-off-by: Stefan Schmidt <stefan@osg.samsung.com>
-
-regards
-Stefan Schmidt
