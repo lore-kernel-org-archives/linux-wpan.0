@@ -1,42 +1,42 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from lists.s-osg.org ([54.187.51.154]:60449 "EHLO lists.s-osg.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753117AbbH0Nwe (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-	Thu, 27 Aug 2015 09:52:34 -0400
+Received: from mail-wi0-f179.google.com ([209.85.212.179]:38878 "EHLO
+	mail-wi0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751942AbbH0RoU (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Thu, 27 Aug 2015 13:44:20 -0400
+Received: by wicgk12 with SMTP id gk12so16426536wic.1
+        for <linux-wpan@vger.kernel.org>; Thu, 27 Aug 2015 10:44:19 -0700 (PDT)
+Date: Thu, 27 Aug 2015 19:44:13 +0200
+From: Alexander Aring <alex.aring@gmail.com>
 Subject: Re: [RFC bluetooth-next 18/21] mrf24j40: add cca ed level support
+Message-ID: <20150827174400.GA686@omega>
 References: <1439468568-22288-1-git-send-email-alex.aring@gmail.com>
  <1439468568-22288-19-git-send-email-alex.aring@gmail.com>
-From: Stefan Schmidt <stefan@osg.samsung.com>
-Message-ID: <55DF161E.60405@osg.samsung.com>
-Date: Thu, 27 Aug 2015 15:52:30 +0200
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 In-Reply-To: <1439468568-22288-19-git-send-email-alex.aring@gmail.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org
-Cc: kernel@pengutronix.de, alan@signal11.us, jonatan@myeden.se
+To: linux-wpan@vger.kernel.org
+Cc: kernel@pengutronix.de, alan@signal11.us, jonatan@myeden.se, stefan@osg.samsung.com
 
-Hello.
-
-On 13/08/15 14:22, Alexander Aring wrote:
+On Thu, Aug 13, 2015 at 02:22:45PM +0200, Alexander Aring wrote:
 > This patch supports handling to set the cca energy detection level for
 > the mrf24j40 transceiver.
->
+> 
 > Signed-off-by: Alexander Aring <alex.aring@gmail.com>
 > ---
->   drivers/net/ieee802154/mrf24j40.c | 51 ++++++++++++++++++++++++++++++++++++++-
->   1 file changed, 50 insertions(+), 1 deletion(-)
->
+>  drivers/net/ieee802154/mrf24j40.c | 51 ++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 50 insertions(+), 1 deletion(-)
+> 
 > diff --git a/drivers/net/ieee802154/mrf24j40.c b/drivers/net/ieee802154/mrf24j40.c
 > index 0fc7628..00fd97e 100644
 > --- a/drivers/net/ieee802154/mrf24j40.c
 > +++ b/drivers/net/ieee802154/mrf24j40.c
 > @@ -820,6 +820,49 @@ static int mrf24j40_set_cca_mode(struct ieee802154_hw *hw,
->   				  val << 6);
->   }
->   
+>  				  val << 6);
+>  }
+>  
 > +/* array for representing ed levels */
 > +static const s32 mrf24j40_ed_levels[] = {
 > +	-9000, -8900, -8800, -8700, -8600, -8500, -8400, -8300, -8200, -8100,
@@ -75,48 +75,8 @@ On 13/08/15 14:22, Alexander Aring wrote:
 > +			return regmap_update_bits(devrec->regmap_short,
 > +						  REG_CCAEDTH, 0xff,
 > +						  mrf24j40_ed_levels_map[i][1]);
-> +	}
-> +
-> +	return -EINVAL;
-> +}
-> +
->   static const struct ieee802154_ops mrf24j40_ops = {
->   	.owner = THIS_MODULE,
->   	.xmit_async = mrf24j40_tx,
-> @@ -830,6 +873,7 @@ static const struct ieee802154_ops mrf24j40_ops = {
->   	.set_hw_addr_filt = mrf24j40_filter,
->   	.set_csma_params = mrf24j40_csma_params,
->   	.set_cca_mode = mrf24j40_set_cca_mode,
-> +	.set_cca_ed_level = mrf24j40_set_cca_ed_level,
->   };
->   
->   static void mrf24j40_intstat_complete(void *context)
-> @@ -1037,6 +1081,10 @@ static void  mrf24j40_phy_setup(struct mrf24j40 *devrec)
->   					       BIT(NL802154_CCA_CARRIER) |
->   					       BIT(NL802154_CCA_ENERGY_CARRIER);
->   	devrec->hw->phy->supported.cca_opts = BIT(NL802154_CCA_OPT_ENERGY_CARRIER_AND);
-> +
-> +	devrec->hw->phy->cca_ed_level = -6900;
 
--6900 is the default on chip reset?
+I changed this function from regmap_update_bits to regmap_write, the
+mask is "0xff" here and then regmap_write is enough.
 
-> +	devrec->hw->phy->supported.cca_ed_levels = mrf24j40_ed_levels;
-> +	devrec->hw->phy->supported.cca_ed_levels_size = ARRAY_SIZE(mrf24j40_ed_levels);
->   }
->   
->   static int mrf24j40_probe(struct spi_device *spi)
-> @@ -1062,7 +1110,8 @@ static int mrf24j40_probe(struct spi_device *spi)
->   	devrec->hw->flags = IEEE802154_HW_TX_OMIT_CKSUM | IEEE802154_HW_AFILT |
->   			    IEEE802154_HW_CSMA_PARAMS;
->   
-> -	devrec->hw->phy->flags = WPAN_PHY_FLAG_CCA_MODE;
-> +	devrec->hw->phy->flags = WPAN_PHY_FLAG_CCA_MODE |
-> +				 WPAN_PHY_FLAG_CCA_ED_LEVEL;
->   
->   	mrf24j40_setup_tx_spi_messages(devrec);
->   	mrf24j40_setup_rx_spi_messages(devrec);
-
-Reviewed-by: Stefan Schmidt <stefan@osg.samsung.com>
-
-regards
-Stefan Schmidt
+- Alex
