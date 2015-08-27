@@ -1,112 +1,100 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f181.google.com ([209.85.212.181]:36789 "EHLO
-	mail-wi0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751276AbbH0Ttf (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Thu, 27 Aug 2015 15:49:35 -0400
-Received: by wicgk12 with SMTP id gk12so2174384wic.1
-        for <linux-wpan@vger.kernel.org>; Thu, 27 Aug 2015 12:49:34 -0700 (PDT)
+Received: from mail-wi0-f169.google.com ([209.85.212.169]:33616 "EHLO
+	mail-wi0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751276AbbH0Ttg (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Thu, 27 Aug 2015 15:49:36 -0400
+Received: by wicge2 with SMTP id ge2so3122414wic.0
+        for <linux-wpan@vger.kernel.org>; Thu, 27 Aug 2015 12:49:35 -0700 (PDT)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH bluetooth-next 0/4] at86rf230: trac debugfs support
-Date: Thu, 27 Aug 2015 21:49:16 +0200
-Message-Id: <1440704960-10515-1-git-send-email-alex.aring@gmail.com>
+Subject: [PATCH bluetooth-next 1/4] at86rf230: change trac status check behaviour
+Date: Thu, 27 Aug 2015 21:49:17 +0200
+Message-Id: <1440704960-10515-2-git-send-email-alex.aring@gmail.com>
+In-Reply-To: <1440704960-10515-1-git-send-email-alex.aring@gmail.com>
+References: <1440704960-10515-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
 Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-Hi,
+When transmit is done, indicated by trx_end irq, we do first a force
+state change to TX_ON and then checking the trac status, if the trac
+status is unequal zero we do a state change to TRX_OFF.
 
-this patch series based on:
+This patch changes to the following behaviour, we first check on trac
+status after trx_end occurs and then doing a normal change to TX_ON
+without do the state change to TRX_OFF when trac status is unequal zero.
 
- "[RFCv5 bluetooth-next 0/4] ieee802154: aret handling changes"
+The reasons are that the datasheet doesn't described when the trac
+status register is cleared, we should doing to evaluate the trac status
+at first. The reason to remove the TRX_OFF change if the trac status is
+unequal to zero and it was force is the following paragraph inside The
+at86rf2xx datasheets:
 
-and can be used for testing the ARET/NO ARET mode with ARET_ON state only.
-I add support for debugfs to check the trac status statistics.
+"Using FORCE_PLL_ON to interrupt an TX_ARET transaction, it is
+ recommended to check register bits [7:5] of register address 0x32 for
+ value 0. If this value is different, TRX_CMD sequence FORCE_TRX_OFF shall
+ be used immediately followed by TRX_CMD sequence PLL_ON. This performs a
+ state transition to PLL_ON."
 
-In the previously patch series I said that the at86rf2xx transceivers
-checks automatically if ack request is set or not in a 802.15.4 frame.
+The meaning is here "to interrupt an TX_ARET transaction" in case of
+trx_end interrupt the "TX_ARET transaction" is already done and we don't
+interrupt the "TX_ARET transaction" by doing the change to TX_ON (PLL_ON)
+here. Additional I changed the force change to normal TX_ON which seems to
+work here.
 
-There exists two cases:
+Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+---
+ drivers/net/ieee802154/at86rf230.c | 29 ++++-------------------------
+ 1 file changed, 4 insertions(+), 25 deletions(-)
 
-1. When the ackrequest bit is set and using STATE_ARET_ON the transceiver
-   will wait for an ack frame after transmit. If ack is received then
-   the transceiver logic is "SUCCESS" otherwise "NO_ACK".
-2. When the ackrequest bit isn't set and using the STATE_ARET_ON the
-   transceiver will not wait for an ack frame and the transceiver logic
-   is "SUCCESS".
-
-The transceiver logic is in this case the error code from transmit
-algorithmn.
-
-To the test (802.15.4 6LoWPAN):
-
-1. Create some imagine 6LoWPAN node by using:
-
-ip -6 neigh add fe80::abcd lladdr 02:01:02:03:04:05:06:07 dev lowpan0
-
-This will create some neighbor discovery entry for some node which isn't
-there in your network. We wan't just test some 802.15.4 unicast addressing.
-This unicast addressing will not answer with an ACK frame, because there is
-no node with this address.
-
-2. Set ackrequest bit to 0 by using:
-
-iwpan dev wpan0 set ackreq_default 0
-
-3. Ping node:
-
-ping6 fe80::abcd%lowpan0
-
-4. Check trac status stats.
-
-You will see that only "SUCCESS" will be increased, which is the behaviour
-on no aret functionality.
-
-5. Do it again but with ackrequest bit to 1 by using:
-
-iwpan dev wpan0 set ackreq_default 1
-
-6. Ping node again.
-
-ping6 fe80::abcd%lowpan0
-
-7. Check the trac status again.
-
-Now, "SUCCESS" isn't increased (it could be for broadcast frames only). But
-now you will see that "NO ACK" is increased which is the trac status that
-no ack frames was received when using aret functionality.
-
-
-Some additional notes:
-
-I think the registration of debugfs failed when two at86rf230 will be probed,
-because the debugfs "at86rf230" already exists. Is there some way to add a
-number to it like the name "at86rf230%d"? Or we just leave it as it is, it's
-just a debugging feature and should be disabled then when using two at86rf230
-transceivers.
-
-- Alex
-
-changes since RFC becomes PATCH:
- - remove reserved trac value stats and print warning
- - print warning also on tx when trac status is not defined
- - print warning also on rx when trac status is not defined
- - add spi bus name to the debugfs entry of at86rf230
- - add patch for TRX_OFF for when tx_retries is above threshold
- - add patch for make a more detailed warning about edge triggered
-   irq's.
-
-Alexander Aring (4):
-  at86rf230: change trac status check behaviour
-  at86rf230: interrupt tx with force trx_off
-  at86rf230: add debugfs support
-  at86rf230: detailed edge triggered irq warning
-
- drivers/net/ieee802154/Kconfig     |   7 ++
- drivers/net/ieee802154/at86rf230.c | 195 ++++++++++++++++++++++++++++---------
- drivers/net/ieee802154/at86rf230.h |   8 ++
- 3 files changed, 163 insertions(+), 47 deletions(-)
-
+diff --git a/drivers/net/ieee802154/at86rf230.c b/drivers/net/ieee802154/at86rf230.c
+index 6422caa..39485d0 100644
+--- a/drivers/net/ieee802154/at86rf230.c
++++ b/drivers/net/ieee802154/at86rf230.c
+@@ -667,28 +667,9 @@ at86rf230_tx_trac_check(void *context)
+ {
+ 	struct at86rf230_state_change *ctx = context;
+ 	struct at86rf230_local *lp = ctx->lp;
+-	const u8 *buf = ctx->buf;
+-	const u8 trac = (buf[1] & 0xe0) >> 5;
+ 
+-	/* If trac status is different than zero we need to do a state change
+-	 * to STATE_FORCE_TRX_OFF then STATE_RX_AACK_ON to recover the
+-	 * transceiver.
+-	 */
+-	if (trac)
+-		at86rf230_async_state_change(lp, ctx, STATE_FORCE_TRX_OFF,
+-					     at86rf230_tx_on, true);
+-	else
+-		at86rf230_tx_on(context);
+-}
+-
+-static void
+-at86rf230_tx_trac_status(void *context)
+-{
+-	struct at86rf230_state_change *ctx = context;
+-	struct at86rf230_local *lp = ctx->lp;
+-
+-	at86rf230_async_read_reg(lp, RG_TRX_STATE, ctx,
+-				 at86rf230_tx_trac_check, true);
++	at86rf230_async_state_change(lp, &lp->irq, STATE_TX_ON,
++				     at86rf230_tx_on, true);
+ }
+ 
+ static void
+@@ -758,10 +739,8 @@ at86rf230_irq_trx_end(struct at86rf230_local *lp)
+ {
+ 	if (lp->is_tx) {
+ 		lp->is_tx = 0;
+-		at86rf230_async_state_change(lp, &lp->irq,
+-					     STATE_FORCE_TX_ON,
+-					     at86rf230_tx_trac_status,
+-					     true);
++		at86rf230_async_read_reg(lp, RG_TRX_STATE, &lp->irq,
++					 at86rf230_tx_trac_check, true);
+ 	} else {
+ 		at86rf230_async_read_reg(lp, RG_TRX_STATE, &lp->irq,
+ 					 at86rf230_rx_trac_check, true);
 -- 
 2.5.0
 
