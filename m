@@ -1,107 +1,60 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from lists.s-osg.org ([54.187.51.154]:33240 "EHLO lists.s-osg.org"
+Received: from lists.s-osg.org ([54.187.51.154]:33243 "EHLO lists.s-osg.org"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751609AbbIAHps (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-	Tue, 1 Sep 2015 03:45:48 -0400
-Subject: Re: [RFCv2 bluetooth-next 02/16] ieee802154: 6lowpan: register packet
- layer while open
+	id S1754318AbbIAHwg (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+	Tue, 1 Sep 2015 03:52:36 -0400
+Subject: Re: [RFCv2 bluetooth-next 03/16] ieee802154: 6lowpan: remove check on
+ null
 References: <1440089265-23366-1-git-send-email-alex.aring@gmail.com>
- <1440089265-23366-3-git-send-email-alex.aring@gmail.com>
- <55E37A2C.7080502@osg.samsung.com> <20150901073821.GA1454@omega>
+ <1440089265-23366-4-git-send-email-alex.aring@gmail.com>
+ <55E37A6E.4010603@osg.samsung.com>
 From: Stefan Schmidt <stefan@osg.samsung.com>
-Message-ID: <55E557A9.9070001@osg.samsung.com>
-Date: Tue, 1 Sep 2015 09:45:45 +0200
+Message-ID: <55E55941.5080305@osg.samsung.com>
+Date: Tue, 1 Sep 2015 09:52:33 +0200
 MIME-Version: 1.0
-In-Reply-To: <20150901073821.GA1454@omega>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <55E37A6E.4010603@osg.samsung.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>
-Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de
+To: Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org
+Cc: kernel@pengutronix.de
 
 Hello.
 
-On 01/09/15 09:38, Alexander Aring wrote:
-> On Sun, Aug 30, 2015 at 11:48:28PM +0200, Stefan Schmidt wrote:
->> Hello.
->>
->> On 20/08/15 18:47, Alexander Aring wrote:
->>> This patch moves the open count handling while doing open of a lowpan
->>> interface. We need the packet handler register at first when one lowpan
->>> interface is up.
->> The code itself looks fine, but I have trouble to gte the why from your
->> commit message. Why is this change needed?
->>
-> It's a slightly improvement. There exists a small case when ALL lowpan
-> interfaces are down and the ieee802154_6lowpan module still receives
-> frames. We don't need to receive frames when all lowpan interfaces are
-> down. This will end always in the upcomming (!netif_running(ldev))
-> condition.
+On 30/08/15 23:49, Stefan Schmidt wrote:
+> Hello.
 >
-> Does it sounds useful?
-
-Yes, having this explanation in the commit message would be good.
->>> Signed-off-by: Alexander Aring <alex.aring@gmail.com>
->>> ---
->>>   net/ieee802154/6lowpan/core.c | 28 ++++++++++++++++++----------
->>>   1 file changed, 18 insertions(+), 10 deletions(-)
->>>
->>> diff --git a/net/ieee802154/6lowpan/core.c b/net/ieee802154/6lowpan/core.c
->>> index 3cc76f0..8e9da1d 100644
->>> --- a/net/ieee802154/6lowpan/core.c
->>> +++ b/net/ieee802154/6lowpan/core.c
->>> @@ -76,9 +76,27 @@ static int lowpan_dev_init(struct net_device *ldev)
->>>   	return 0;
->>>   }
->>> +static int lowpan_open(struct net_device *dev)
->>> +{
->>> +	if (!open_count)
->>> +		lowpan_rx_init();
->>> +	open_count++;
->>> +	return 0;
->>> +}
->>> +
->>> +static int lowpan_stop(struct net_device *dev)
->>> +{
->>> +	open_count--;
->>> +	if (!open_count)
->>> +		lowpan_rx_exit();
->>> +	return 0;
->>> +}
->>> +
->>>   static const struct net_device_ops lowpan_netdev_ops = {
->>>   	.ndo_init		= lowpan_dev_init,
->>>   	.ndo_start_xmit		= lowpan_xmit,
->>> +	.ndo_open		= lowpan_open,
->>> +	.ndo_stop		= lowpan_stop,
->>>   };
->>>   static void lowpan_setup(struct net_device *ldev)
->>> @@ -149,11 +167,6 @@ static int lowpan_newlink(struct net *src_net, struct net_device *ldev,
->>>   	}
->>>   	wdev->ieee802154_ptr->lowpan_dev = ldev;
->>> -	if (!open_count)
->>> -		lowpan_rx_init();
->>> -
->>> -	open_count++;
->>> -
->>>   	return 0;
->>>   }
->>> @@ -163,11 +176,6 @@ static void lowpan_dellink(struct net_device *ldev, struct list_head *head)
->>>   	ASSERT_RTNL();
->>> -	open_count--;
->>> -
->>> -	if (!open_count)
->>> -		lowpan_rx_exit();
->>> -
->>>   	wdev->ieee802154_ptr->lowpan_dev = NULL;
->>>   	unregister_netdevice(ldev);
->>>   	dev_put(wdev);
->> Signed-off-by: Stefan Schmidt <stefan@osg.samsung.com>
+> On 20/08/15 18:47, Alexander Aring wrote:
+>> This patch removes one check on null which should be already done by
+>> checking before for ARPHRD_IEEE802154. All ARPHRD_IEEE802154 and
+>> ARPHRD_IEEE802154_MONITOR should have wdev->ieee802154_ptr, where
+>> ARPHRD_IEEE802154 is currently a node interface only.
 >>
-> Why is this a SOB?
+>> Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+>> ---
+>>   net/ieee802154/6lowpan/core.c | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/net/ieee802154/6lowpan/core.c 
+>> b/net/ieee802154/6lowpan/core.c
+>> index 8e9da1d..6607bb4 100644
+>> --- a/net/ieee802154/6lowpan/core.c
+>> +++ b/net/ieee802154/6lowpan/core.c
+>> @@ -214,7 +214,7 @@ static int lowpan_device_event(struct 
+>> notifier_block *unused,
+>>            * also delete possible lowpan interfaces which belongs
+>>            * to the wpan interface.
+>>            */
+>> -        if (wdev->ieee802154_ptr && wdev->ieee802154_ptr->lowpan_dev)
+>> +        if (wdev->ieee802154_ptr->lowpan_dev)
+>> lowpan_dellink(wdev->ieee802154_ptr->lowpan_dev, NULL);
+>>           break;
+>>       default:
+>
+> Signed-off-by: Stefan Schmidt <stefan@osg.samsung.com>
 
-Because it was late and I screwed up. :( Sorry.
+This should also have been
 
 Reviewed-by: Stefan Schmidt <stefan@osg.samsung.com>
 
