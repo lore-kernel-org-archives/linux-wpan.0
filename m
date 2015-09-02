@@ -1,14 +1,14 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f182.google.com ([209.85.212.182]:37471 "EHLO
-	mail-wi0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754455AbbIBMWL (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Wed, 2 Sep 2015 08:22:11 -0400
-Received: by wicfx3 with SMTP id fx3so17119114wic.0
-        for <linux-wpan@vger.kernel.org>; Wed, 02 Sep 2015 05:22:10 -0700 (PDT)
+Received: from mail-wi0-f172.google.com ([209.85.212.172]:35255 "EHLO
+	mail-wi0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754460AbbIBMWM (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Wed, 2 Sep 2015 08:22:12 -0400
+Received: by wicge5 with SMTP id ge5so38850509wic.0
+        for <linux-wpan@vger.kernel.org>; Wed, 02 Sep 2015 05:22:11 -0700 (PDT)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH bluetooth-next 08/16] ieee802154: 6lowpan: trivial checks at first
-Date: Wed,  2 Sep 2015 14:21:23 +0200
-Message-Id: <1441196491-25013-9-git-send-email-alex.aring@gmail.com>
+Subject: [PATCH bluetooth-next 09/16] ieee802154: 6lowpan: earlier skb->dev switch
+Date: Wed,  2 Sep 2015 14:21:24 +0200
+Message-Id: <1441196491-25013-10-git-send-email-alex.aring@gmail.com>
 In-Reply-To: <1441196491-25013-1-git-send-email-alex.aring@gmail.com>
 References: <1441196491-25013-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
@@ -16,39 +16,41 @@ List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
 Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-This patch moves some trivial checks at first before calling
-skb_share_check which could do some memcpy if the buffer is shared.
+We should change the skb->dev pointer earlier to the lowpan interface
+Sometimes we call iphc_decompress which also use some netdev printout
+functionality. This patch will change that the correct interface will be
+displayed in this case, which should be the lowpan interface.
 
 Reviewed-by: Stefan Schmidt <stefan@osg.samsung.com>
 Signed-off-by: Alexander Aring <alex.aring@gmail.com>
 ---
- net/ieee802154/6lowpan/rx.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ net/ieee802154/6lowpan/rx.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/net/ieee802154/6lowpan/rx.c b/net/ieee802154/6lowpan/rx.c
-index 4ddf694..74d8fec 100644
+index 74d8fec..f9cb70b 100644
 --- a/net/ieee802154/6lowpan/rx.c
 +++ b/net/ieee802154/6lowpan/rx.c
-@@ -63,7 +63,8 @@ static int lowpan_rcv(struct sk_buff *skb, struct net_device *wdev,
- 	struct net_device *ldev;
- 	int ret;
+@@ -18,7 +18,6 @@
+ static int lowpan_give_skb_to_device(struct sk_buff *skb,
+ 				     struct net_device *wdev)
+ {
+-	skb->dev = wdev->ieee802154_ptr->lowpan_dev;
+ 	skb->protocol = htons(ETH_P_IPV6);
+ 	skb->pkt_type = PACKET_HOST;
  
--	if (wdev->type != ARPHRD_IEEE802154)
-+	if (wdev->type != ARPHRD_IEEE802154 ||
-+	    skb->pkt_type == PACKET_OTHERHOST)
+@@ -71,9 +70,11 @@ static int lowpan_rcv(struct sk_buff *skb, struct net_device *wdev,
+ 	if (!ldev || !netif_running(ldev))
  		goto drop;
  
- 	ldev = wdev->ieee802154_ptr->lowpan_dev;
-@@ -74,9 +75,6 @@ static int lowpan_rcv(struct sk_buff *skb, struct net_device *wdev,
++	/* Replacing skb->dev and followed rx handlers will manipulate skb. */
+ 	skb = skb_share_check(skb, GFP_ATOMIC);
  	if (!skb)
  		goto drop;
++	skb->dev = ldev;
  
--	if (skb->pkt_type == PACKET_OTHERHOST)
--		goto drop_skb;
--
  	if (ieee802154_hdr_peek_addrs(skb, &hdr) < 0)
  		goto drop_skb;
- 
 -- 
 2.5.1
 
