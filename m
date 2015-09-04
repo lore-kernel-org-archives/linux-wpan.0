@@ -1,32 +1,37 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-pa0-f54.google.com ([209.85.220.54]:33617 "EHLO
-	mail-pa0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751976AbbIOIPF (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Tue, 15 Sep 2015 04:15:05 -0400
-Date: Tue, 15 Sep 2015 13:44:57 +0530
-From: Sudip Mukherjee <sudipm.mukherjee@gmail.com>
-Subject: Re: [PATCH] at86rf230: fix build warning
-Message-ID: <20150915081457.GH9305@sudip-pc>
-References: <1441964764-15611-1-git-send-email-sudipm.mukherjee@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1441964764-15611-1-git-send-email-sudipm.mukherjee@gmail.com>
+Received: from mail-wi0-f175.google.com ([209.85.212.175]:37981 "EHLO
+	mail-wi0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757907AbbIDJRv (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Fri, 4 Sep 2015 05:17:51 -0400
+Received: by wiclk2 with SMTP id lk2so11140523wic.1
+        for <linux-wpan@vger.kernel.org>; Fri, 04 Sep 2015 02:17:50 -0700 (PDT)
+From: Alexander Aring <alex.aring@gmail.com>
+Subject: [PATCH wpan-misc 1/3] website: update rzusbstick firmware
+Date: Fri,  4 Sep 2015 11:17:09 +0200
+Message-Id: <1441358231-22349-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>
-Cc: linux-kernel@vger.kernel.org, linux-wpan@vger.kernel.org, netdev@vger.kernel.org, Stephen Rothwell <sfr@canb.auug.org.au>, Andrew Morton <akpm@linux-foundation.org>
+To: linux-wpan@vger.kernel.org
+Cc: Alexander Aring <alex.aring@gmail.com>
 
-On Fri, Sep 11, 2015 at 03:16:04PM +0530, Sudip Mukherjee wrote:
-> e616a00ce786 ("drivers/net/ieee802154/at86rf230.c: seq_printf() now returns NULL")
-> has removed the usage of the integer "ret" but missed removing the
-> variable. And we were getting a build warning about "unused variable".
-> 
-> Fixes: e616a00ce786 ("drivers/net/ieee802154/at86rf230.c: seq_printf() now returns NULL")
-> Signed-off-by: Sudip Mukherjee <sudip@vectorindia.org>
-> ---
-Please drop this patch. This was against a temporary fix by Stephen on
-linux-next. The commit is not availble now.
+Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+---
+ website/index.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-regards
-sudip
+diff --git a/website/index.txt b/website/index.txt
+index 907af61..9a4794f 100644
+--- a/website/index.txt
++++ b/website/index.txt
+@@ -47,7 +47,7 @@ Supported Hardware
+ |cc2520      |yes              |cc2520     | SPI | http://de.aliexpress.com/item/CC2520-wireless-module-ZIGBEE-wireless-sensor-networking-module-with-SMA-external-antenna/1921436550.html[aliexpress]
+ |cc2531      |no               |           | USB | http://de.aliexpress.com/item/free-shipping-FOR-ZigBee-CC2531-USB-dongle-protocol-analysis-port-capture-wireless-keyboard-and-mouse/32270975591.html[aliexpress]
+  |mrf24j40   |yes              |mrf24j40   | SPI |  http://de.aliexpress.com/item/MRF24J40MA-I-RM-MRF24J40MA-I-MRF24J40MA-MRF24J40-MICROC-QFN-Import-original/32223258627.html[aliexpress]
+-|RZUSBstick  |no, WIP          |atusb      | USB | http://www.element14.com/community/docs/DOC-67532/l/avr-rz-usb-stick-module[element14]
++|RZUSBstick  |experimental, http://wpan.cakelab.org/firmwares/rzusb.bin[WIP]          |atusb      | USB | http://www.element14.com/community/docs/DOC-67532/l/avr-rz-usb-stick-module[element14]
+ |Xbee        |no |https://github.com/joaopedrotaveira/linux-rpl/blob/master/mainline-3.12.y/0001-Added-XBee-driver-support.patch[out of tree]| ?? | https://www.sparkfun.com/pages/xbee_guide[sparkfun]
+ |=============================================================
+ 
+-- 
+2.5.1
+
