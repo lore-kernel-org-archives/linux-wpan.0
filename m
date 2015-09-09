@@ -1,81 +1,40 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-la0-f53.google.com ([209.85.215.53]:35813 "EHLO
-	mail-la0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752147AbbIIPRL (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Wed, 9 Sep 2015 11:17:11 -0400
-Received: by lagj9 with SMTP id j9so9286672lag.2
-        for <linux-wpan@vger.kernel.org>; Wed, 09 Sep 2015 08:17:09 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20150909131315.GA13947@omega>
-References: <CAPpUg6MbD04CcGAkOfs=NB4hS_3nqt-v38edwsXCd1sF-_3R1w@mail.gmail.com>
-	<20150909131315.GA13947@omega>
-Date: Wed, 9 Sep 2015 17:17:09 +0200
-Message-ID: <CAPpUg6O0Pia-xSg6EBJ0ep7MvR4YQ7TTkAs6NS1DvnT02eaKHg@mail.gmail.com>
-Subject: Re: At86rf230 sleep state
-From: Baptiste Clenet <bapclenet@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Received: from mail-wi0-f182.google.com ([209.85.212.182]:36325 "EHLO
+	mail-wi0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751947AbbIITKE (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Wed, 9 Sep 2015 15:10:04 -0400
+Received: by wicgb1 with SMTP id gb1so128246867wic.1
+        for <linux-wpan@vger.kernel.org>; Wed, 09 Sep 2015 12:10:03 -0700 (PDT)
+From: Alexander Aring <alex.aring@gmail.com>
+Subject: [PATCH bluetooth-next 1/2] mac802154: llsec: fix device deletion from list
+Date: Wed,  9 Sep 2015 21:09:39 +0200
+Message-Id: <1441825780-6461-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>
-Cc: linux-wpan@vger.kernel.org
+To: linux-wpan@vger.kernel.org
+Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>, Phoebe Buckheister <phoebe.buckheister@itwm.fraunhofer.de>
 
-2015-09-09 15:13 GMT+02:00 Alexander Aring <alex.aring@gmail.com>:
-> Hi,
->
-> On Wed, Sep 09, 2015 at 02:26:27PM +0200, Baptiste Clenet wrote:
->> Hi,
->>
->> I looked at the at86rf230 driver on bluetooth-next branch and I saw the
->> two functions concerning the sleep state:
->>
->> at86rf230_sleep(struct at86rf230_local *lp)
->>
->> at86rf230_awake(struct at86rf230_local *lp)
->>
->>
->> I'm wondering if the transceiver can wake up from a received frame if
->> it is in SLEEP State? As far as I can see on the datasheet, it is not
->> able to. Am I wrong?
->>
->
-> The transceiver can't. The transceiver need to be inside RX_AACK_ON state
-> (or RX_ON, but we don't use this state).
->
-> What we currently support for powersaving is when the subsystem doesn't
-> use the transceiver then the transceiver goes into SLEEP state.
->
-> This happens when:
->
->  1. After device probing.
->  2. When _ALL_ interfaces which belongs to the transceiver (phy) are
->     down. -> Which is the state after probing. See 1.
->  3. When interfaces are up and you going into pm-suspend mode. (The
->     interfaces are still up, but the transceiver will call "stop"
->     callback before and this is the same like 2. -> It stops rx but when
->     stopping rx you can also go into sleep). When "resume" occurs the
->     subsystem call "start" callback and do a "awake" and acivate rx again.
->
-> Addtional note: we need to awake the transceiver to access registers,
-> there exists "direct or non-direct" nl802154 calls into the driver layer
-> to set registers. This is why we add before and after register access an
-> awake and sleep again. -> but this is very transceiver specifc, there
-> exists also transceiver which has register access while sleeping.
->
+This patch adds a missing list_del when a device description will be
+deleted.
 
-Thank you for the answer! It is what I thought.
+Cc: Phoebe Buckheister <phoebe.buckheister@itwm.fraunhofer.de>
+Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+---
+ net/mac802154/llsec.c | 1 +
+ 1 file changed, 1 insertion(+)
 
->
-> This is currently the stuff we support for powersaving, this has nothing
-> todo with 802.15.4 powersaving stuff like "beacon enabled mode". We
-> currently doesn't support this kind of stuff and I have also no idea how
-> it works and how we can implement this stuff for SoftMAC transceivers.
-> :-)
->
-
-Yes there is still some improvments to do :-)
-> - Alex
-
-
-
+diff --git a/net/mac802154/llsec.c b/net/mac802154/llsec.c
+index 985e939..7799d3c 100644
+--- a/net/mac802154/llsec.c
++++ b/net/mac802154/llsec.c
+@@ -401,6 +401,7 @@ int mac802154_llsec_dev_del(struct mac802154_llsec *sec, __le64 device_addr)
+ 
+ 	hash_del_rcu(&pos->bucket_s);
+ 	hash_del_rcu(&pos->bucket_hw);
++	list_del_rcu(&pos->dev.list);
+ 	call_rcu(&pos->rcu, llsec_dev_free_rcu);
+ 
+ 	return 0;
 -- 
-Baptiste
+2.5.1
+
