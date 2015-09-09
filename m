@@ -1,34 +1,48 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f169.google.com ([209.85.212.169]:35537 "EHLO
-	mail-wi0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752618AbbIRJdm (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Fri, 18 Sep 2015 05:33:42 -0400
-Received: by wicge5 with SMTP id ge5so24599698wic.0
-        for <linux-wpan@vger.kernel.org>; Fri, 18 Sep 2015 02:33:41 -0700 (PDT)
-Date: Fri, 18 Sep 2015 11:33:35 +0200
-From: Alexander Aring <alex.aring@gmail.com>
-Subject: Re: [PATCH wpan-misc 1/3] website: update rzusbstick firmware
-Message-ID: <20150918093333.GA1656@omega>
-References: <1441358231-22349-1-git-send-email-alex.aring@gmail.com>
- <55E968C8.7010305@osg.samsung.com>
- <55F9914C.4030706@osg.samsung.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <55F9914C.4030706@osg.samsung.com>
+Received: from proxima.lasnet.de ([78.47.171.185]:47043 "EHLO
+	proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753400AbbIIP0n (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Wed, 9 Sep 2015 11:26:43 -0400
+From: Stefan Schmidt <stefan@osg.samsung.com>
+Subject: [RFC bluetooth-next 0/4] GHC compression detection
+Date: Wed,  9 Sep 2015 17:26:29 +0200
+Message-Id: <1441812393-32472-1-git-send-email-stefan@osg.samsung.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Stefan Schmidt <stefan@osg.samsung.com>
-Cc: linux-wpan@vger.kernel.org
+To: linux-wpan@vger.kernel.org
+Cc: Alexander Aring <alex.aring@gmail.com>, jukka.rissanen@linux.intel.com, Stefan Schmidt <stefan@osg.samsung.com>
 
-Hi,
+Hello.
 
-On Wed, Sep 16, 2015 at 05:57:00PM +0200, Stefan Schmidt wrote:
-> Hello.
-> 
-> It seems you forgot to push these and re-generate the site.
-> 
+This is a first stab at RFC7400. So far we only hook into the NHC framework to
+detect the three registered GHC types (extension header, UDP and ICMPv6).
+This is aligned with how we detect the NHC frames.
 
-I re-generated the website yesterday.
+TODO items:
+o How to handle reserved and unassigned ranges in the HEADER TYPE?
+o Implement compression/decompresion for GHC UDP
+o Implement compression/decompresion for GHC ICMPv6
+o How to handle 6CIO in IPv6 ND?
 
-- Alex
+Stefan Schmidt (4):
+  6lowpan: clarify Kconfig entries for upcoming GHC support
+  6lowpan: add nhc module for GHC extension header detection
+  6lowpan: add nhc module for GHC UDP detection
+  6lowpan: add nhc module for GHC ICMPv6 detection
+
+ net/6lowpan/Kconfig                | 20 ++++++++++++++++++--
+ net/6lowpan/Makefile               |  5 +++++
+ net/6lowpan/ghc_extension_header.c | 27 +++++++++++++++++++++++++++
+ net/6lowpan/ghc_icmpv6.c           | 27 +++++++++++++++++++++++++++
+ net/6lowpan/ghc_udp.c              | 27 +++++++++++++++++++++++++++
+ 5 files changed, 104 insertions(+), 2 deletions(-)
+ create mode 100644 net/6lowpan/ghc_extension_header.c
+ create mode 100644 net/6lowpan/ghc_icmpv6.c
+ create mode 100644 net/6lowpan/ghc_udp.c
+
+regards
+Stefan Schmidt
+
+-- 
+2.4.3
+
