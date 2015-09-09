@@ -1,37 +1,37 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from senator.holtmann.net ([87.106.208.187]:55462 "EHLO
-	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751052AbbIFDrI (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Sat, 5 Sep 2015 23:47:08 -0400
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2104\))
-Subject: Re: [PATCH bluetooth-next] atusb: add handling for different chipnames
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1441448879-16511-1-git-send-email-alex.aring@gmail.com>
-Date: Sat, 5 Sep 2015 20:47:01 -0700
-Content-Transfer-Encoding: 7bit
-Message-Id: <E754CFA9-548B-4554-886F-E90F3136E3DF@holtmann.org>
-References: <1441448879-16511-1-git-send-email-alex.aring@gmail.com>
+Received: from mail-lb0-f177.google.com ([209.85.217.177]:33387 "EHLO
+	mail-lb0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752441AbbIIM03 (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Wed, 9 Sep 2015 08:26:29 -0400
+Received: by lbcjc2 with SMTP id jc2so4677982lbc.0
+        for <linux-wpan@vger.kernel.org>; Wed, 09 Sep 2015 05:26:27 -0700 (PDT)
+MIME-Version: 1.0
+Date: Wed, 9 Sep 2015 14:26:27 +0200
+Message-ID: <CAPpUg6MbD04CcGAkOfs=NB4hS_3nqt-v38edwsXCd1sF-_3R1w@mail.gmail.com>
+Subject: At86rf230 sleep state
+From: Baptiste Clenet <bapclenet@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>
-Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de, Stefan Schmidt <stefan@osg.samsung.com>
+To: linux-wpan@vger.kernel.org
 
-Hi Alex,
+Hi,
 
-> This patch supports handling for printout different chipnames between
-> atusb and rzusb. The rzusb contains an at86rf230 and atusb an at86rf231
-> transceiver.
-> 
-> Cc: Stefan Schmidt <stefan@osg.samsung.com>
-> Signed-off-by: Alexander Aring <alex.aring@gmail.com>
-> ---
-> drivers/net/ieee802154/atusb.c | 13 +++++++++++--
-> 1 file changed, 11 insertions(+), 2 deletions(-)
+I looked at the at86rf230 driver on bluetooth-next branch and I saw the
+two functions concerning the sleep state:
 
-patch has been applied to bluetooth-next tree.
+at86rf230_sleep(struct at86rf230_local *lp)
 
-Regards
+at86rf230_awake(struct at86rf230_local *lp)
 
-Marcel
 
+I'm wondering if the transceiver can wake up from a received frame if
+it is in SLEEP State? As far as I can see on the datasheet, it is not
+able to. Am I wrong?
+
+Alex Aring?
+
+Cheers,
+
+-- 
+Baptiste
