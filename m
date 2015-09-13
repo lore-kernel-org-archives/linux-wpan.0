@@ -1,83 +1,86 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from proxima.lasnet.de ([78.47.171.185]:47053 "EHLO
-	proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753812AbbIIP0q (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Wed, 9 Sep 2015 11:26:46 -0400
-From: Stefan Schmidt <stefan@osg.samsung.com>
-Subject: [RFC bluetooth-next 4/4] 6lowpan: add nhc module for GHC ICMPv6 detection
-Date: Wed,  9 Sep 2015 17:26:33 +0200
-Message-Id: <1441812393-32472-5-git-send-email-stefan@osg.samsung.com>
-In-Reply-To: <1441812393-32472-1-git-send-email-stefan@osg.samsung.com>
+Received: from mail-wi0-f170.google.com ([209.85.212.170]:35181 "EHLO
+	mail-wi0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752093AbbIMNvy (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Sun, 13 Sep 2015 09:51:54 -0400
+Received: by wicge5 with SMTP id ge5so111764159wic.0
+        for <linux-wpan@vger.kernel.org>; Sun, 13 Sep 2015 06:51:53 -0700 (PDT)
+Date: Sun, 13 Sep 2015 15:51:42 +0200
+From: Alexander Aring <alex.aring@gmail.com>
+Subject: Re: [RFC bluetooth-next 0/4] GHC compression detection
+Message-ID: <20150913135141.GA12307@omega>
 References: <1441812393-32472-1-git-send-email-stefan@osg.samsung.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1441812393-32472-1-git-send-email-stefan@osg.samsung.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org
-Cc: Alexander Aring <alex.aring@gmail.com>, jukka.rissanen@linux.intel.com, Stefan Schmidt <stefan@osg.samsung.com>
+To: Stefan Schmidt <stefan@osg.samsung.com>
+Cc: linux-wpan@vger.kernel.org, jukka.rissanen@linux.intel.com
 
-Signed-off-by: Stefan Schmidt <stefan@osg.samsung.com>
----
- net/6lowpan/Kconfig      |  5 +++++
- net/6lowpan/Makefile     |  1 +
- net/6lowpan/ghc_icmpv6.c | 27 +++++++++++++++++++++++++++
- 3 files changed, 33 insertions(+)
- create mode 100644 net/6lowpan/ghc_icmpv6.c
+Hi,
 
-diff --git a/net/6lowpan/Kconfig b/net/6lowpan/Kconfig
-index 67a786b..a34693d 100644
---- a/net/6lowpan/Kconfig
-+++ b/net/6lowpan/Kconfig
-@@ -69,4 +69,9 @@ config 6LOWPAN_GHC_UDP
- 	default y
- 	---help---
- 
-+config 6LOWPAN_GHC_ICMPV6
-+	tristate "GHC ICMPv6 Support"
-+	default y
-+	---help---
-+
- endif
-diff --git a/net/6lowpan/Makefile b/net/6lowpan/Makefile
-index 4df6334..c1a496b 100644
---- a/net/6lowpan/Makefile
-+++ b/net/6lowpan/Makefile
-@@ -14,3 +14,4 @@ obj-$(CONFIG_6LOWPAN_NHC_UDP) += nhc_udp.o
- #rfc7400 ghcs
- obj-$(CONFIG_6LOWPAN_GHC_EXTENSION_HEADER) += ghc_extension_header.o
- obj-$(CONFIG_6LOWPAN_GHC_UDP) += ghc_udp.o
-+obj-$(CONFIG_6LOWPAN_GHC_ICMPV6) += ghc_icmpv6.o
-diff --git a/net/6lowpan/ghc_icmpv6.c b/net/6lowpan/ghc_icmpv6.c
-new file mode 100644
-index 0000000..378ebfe
---- /dev/null
-+++ b/net/6lowpan/ghc_icmpv6.c
-@@ -0,0 +1,27 @@
-+/*
-+ *	6LoWPAN ICMPv6 compression according to RFC7400
-+ *
-+ *	This program is free software; you can redistribute it and/or
-+ *	modify it under the terms of the GNU General Public License
-+ *	as published by the Free Software Foundation; either version
-+ *	2 of the License, or (at your option) any later version.
-+ */
-+
-+#include "nhc.h"
-+
-+#define LOWPAN_GHC_ICMPV6_IDLEN		1
-+#define LOWPAN_GHC_ICMPV6_ID_0		0xdf
-+#define LOWPAN_GHC_ICMPV6_MASK_0	0xff
-+
-+static void icmpv6_ghid_setup(struct lowpan_nhc *nhc)
-+{
-+	nhc->id[0] = LOWPAN_GHC_ICMPV6_ID_0;
-+	nhc->idmask[0] = LOWPAN_GHC_ICMPV6_MASK_0;
-+}
-+
-+LOWPAN_NHC(ghc_icmpv6, "RFC7400 ICMPv6", NEXTHDR_HOP, 0,
-+	   icmpv6_ghid_setup, LOWPAN_GHC_ICMPV6_IDLEN, NULL, NULL);
-+
-+module_lowpan_nhc(ghc_icmpv6);
-+MODULE_DESCRIPTION("6LoWPAN generic header RFC7400 ICMPv6 compression");
-+MODULE_LICENSE("GPL");
--- 
-2.4.3
+On Wed, Sep 09, 2015 at 05:26:29PM +0200, Stefan Schmidt wrote:
+> Hello.
+> 
+> This is a first stab at RFC7400. So far we only hook into the NHC framework to
+> detect the three registered GHC types (extension header, UDP and ICMPv6).
+> This is aligned with how we detect the NHC frames.
+> 
 
+can we add a "nhc_..." prefix to all module names? Then we have
+something like what netfilter does with "nf_...".
+
+> TODO items:
+> o How to handle reserved and unassigned ranges in the HEADER TYPE?
+
+Maybe it's better to remove the current nhc_id evaluation. I did this
+stuff with rb-tree by knowning RFC6282 only, there was the one
+information given that "nhc id" is a variable length bitfield only. I
+don't know how the "logic" about assign these nhc id's is, if iana has one.
+
+What I see when I look at [0]. Maybe we could grab the same mechanism like
+evaluate 6lowpan dispatch values, by returning RX_CONTINUE if the nhc_id
+doesn't match. Determined by nhc_id length mask and id.
+
+The rb-tree mechanism is MAYBE faster, but this depends on amount of
+registered entries. I don't think there is ever so much many nhc ids
+that a rb-tree give "huge" benefits that we should use a rb-tree now, or
+it making thinks too much complex. :-/
+
+I just stumble over rb-tree's to search a right datastructure for
+matching variable length bitfields -> "strings". Now I am not sure if
+this was a good idea to do this in that way.
+
+These rbtree's are getting also a benefits only when the nhc_id is more
+than one byte long and this also doesn't exist right now. Also the first
+byte need to have one or more subtree's. Means e.g. the first byte need
+to indicate that another bytes follows.
+
+I suppose they will add some nhc_id byte like "1111 1111" which
+indicates one byte will follows. If this will be only one byte, e.g. the
+"1111 1111" then rbtree is surely the wrong datastructure... but maybe
+they will also add some "1111 1110" which also indicates anothers
+subtree of nhc_id's. I don't know it because there is no information
+about that. Maybe iana [0] will say that with "Unassigned, reserved for
+extensions" and it should stand somewhere in RFC6282, but I don't see
+that somewhere inside of RFC6282 which describes "1111 1111". :-/
+
+They describes something about a nhc class:
+
+"(i.e., k one-bits followed by one zero-bit identify the general class
+of NHC, followed by class-specific bit assignments)."
+
+Maybe they meant something that:
+
+"1111 1111" -> BAR nhc classes
+"1111 1110" -> FOO nhc classes
+....        -> ... nhc classes
+
+Then a rbtree _maybe_ gives some benefit but I also think it doesn't
+matter then, because it's simple not a huge amount of entries there.
+
+- Alex
+
+[0] https://www.iana.org/assignments/_6lowpan-parameters/_6lowpan-parameters.xhtml#lowpan_nhc
