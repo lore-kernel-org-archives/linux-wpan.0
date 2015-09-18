@@ -1,75 +1,45 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f175.google.com ([209.85.212.175]:37599 "EHLO
-	mail-wi0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752865AbbI3Qgl (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Wed, 30 Sep 2015 12:36:41 -0400
-From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH radvd] device-linux: replace ARPHRD_IEEE802154 to ARPHRD_6LOWPAN
-Date: Wed, 30 Sep 2015 18:33:08 +0200
-Message-Id: <1443630788-15901-1-git-send-email-alex.aring@gmail.com>
+Received: from proxima.lasnet.de ([78.47.171.185]:51898 "EHLO
+	proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752450AbbIRLxE (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Fri, 18 Sep 2015 07:53:04 -0400
+From: Stefan Schmidt <stefan@osg.samsung.com>
+Subject: [PATCH bluetooth-next 0/4] GHC compression detection
+Date: Fri, 18 Sep 2015 13:52:44 +0200
+Message-Id: <1442577168-23183-1-git-send-email-stefan@osg.samsung.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: radvd-devel-l@litech.org
-Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>, linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org, Oleg Hahm <oliver.hahm@inria.fr>
+To: linux-wpan@vger.kernel.org
+Cc: Alexander Aring <alex.aring@gmail.com>, jukka.rissanen@linux.intel.com, linux-bluetooth@vger.kernel.org, Stefan Schmidt <stefan@osg.samsung.com>
 
-This patch changes the ARPHRD_IEEE802154 to ARPHRD_6LOWPAN. The IEEE
-802.15.4 6lowpan module changed the ARPHRD_IEEE802154 type to
-ARPHRD_6LOWPAN. Nowadays it's use ARPHRD_6LOWPAN which is also used by
-BTLE 6LoWPAN. Both interfaces uses an EUI64 address and the handling to
-get the link-layer address should be the same.
+Hello.
 
-There is no backward compatibility for 802.15.4 6LoWPAN before we
-changed the ARPHRD. Anyway if somebody wants that it should be patched
-manually. When the ARPHRD was ARPHRD_IEEE802154 the 802.15.4 6lowpan was
-anyway in a somehow unusable state.
+This is a first stab at RFC7400. So far we only hook into the NHC framework to
+detect the three registered GHC types (extension header, UDP and ICMPv6).
+This is aligned with how we detect the NHC frames.
 
-Cc: linux-bluetooth@vger.kernel.org
-Cc: linux-wpan@vger.kernel.org
-Cc: Oleg Hahm <oliver.hahm@inria.fr>
-Signed-off-by: Alexander Aring <alex.aring@gmail.com>
----
- device-linux.c | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
+Changes since RFC:
+	o prefixed new files with nhc_ to stay in line with other nhc modules
+	o added linux-bluetooth to CC
 
-diff --git a/device-linux.c b/device-linux.c
-index de83f2e..7301927 100644
---- a/device-linux.c
-+++ b/device-linux.c
-@@ -22,6 +22,10 @@
- #define IPV6_ADDR_LINKLOCAL   0x0020U
- #endif
- 
-+#ifndef ARPHRD_6LOWPAN
-+#define ARPHRD_6LOWPAN	825	/* IPv6 over LoWPAN */
-+#endif
-+
- static char const *hwstr(unsigned short sa_family);
- 
- /*
-@@ -79,12 +83,10 @@ int update_device_info(int sock, struct Interface *iface)
- 		iface->sllao.if_maxmtu = -1;
- 		break;
- #endif				/* ARPHDR_ARCNET */
--#ifdef ARPHRD_IEEE802154
--	case ARPHRD_IEEE802154:
-+	case ARPHRD_6LOWPAN:
- 		iface->sllao.if_hwaddr_len = 64;
- 		iface->sllao.if_prefix_len = 64;
- 		break;
--#endif
- 	default:
- 		iface->sllao.if_hwaddr_len = -1;
- 		iface->sllao.if_prefix_len = -1;
-@@ -382,6 +384,9 @@ static char const *hwstr(unsigned short sa_family)
- 		rc = "ARPHRD_IEEE802154_PHY";
- 		break;
- #endif
-+	case ARPHRD_6LOWPAN:
-+		rc = "ARPHRD_6LOWPAN";
-+		break;
- 	case ARPHRD_VOID:
- 		rc = "ARPHRD_VOID";
- 		break;
+Stefan Schmidt (4):
+  6lowpan: clarify Kconfig entries for upcoming GHC support
+  6lowpan: add nhc module for GHC extension header detection
+  6lowpan: add nhc module for GHC UDP detection
+  6lowpan: add nhc module for GHC ICMPv6 detection
+
+ net/6lowpan/Kconfig                    | 20 ++++++++++++++++++--
+ net/6lowpan/Makefile                   |  5 +++++
+ net/6lowpan/nhc_ghc_extension_header.c | 27 +++++++++++++++++++++++++++
+ net/6lowpan/nhc_ghc_icmpv6.c           | 27 +++++++++++++++++++++++++++
+ net/6lowpan/nhc_ghc_udp.c              | 27 +++++++++++++++++++++++++++
+ 5 files changed, 104 insertions(+), 2 deletions(-)
+ create mode 100644 net/6lowpan/nhc_ghc_extension_header.c
+ create mode 100644 net/6lowpan/nhc_ghc_icmpv6.c
+ create mode 100644 net/6lowpan/nhc_ghc_udp.c
+
+regards
+Stefan Schmidt
+
 -- 
-2.6.0
-
+2.4.3
