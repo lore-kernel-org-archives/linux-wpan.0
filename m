@@ -1,14 +1,14 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f177.google.com ([209.85.212.177]:35693 "EHLO
-	mail-wi0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751906AbbIRJa4 (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Fri, 18 Sep 2015 05:30:56 -0400
-Received: by wicge5 with SMTP id ge5so24500898wic.0
-        for <linux-wpan@vger.kernel.org>; Fri, 18 Sep 2015 02:30:55 -0700 (PDT)
+Received: from mail-wi0-f181.google.com ([209.85.212.181]:35730 "EHLO
+	mail-wi0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751986AbbIRJa6 (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Fri, 18 Sep 2015 05:30:58 -0400
+Received: by wicge5 with SMTP id ge5so24501847wic.0
+        for <linux-wpan@vger.kernel.org>; Fri, 18 Sep 2015 02:30:57 -0700 (PDT)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH bluetooth-next 3/5] ieee802154: introduce wpan_dev_header_ops
-Date: Fri, 18 Sep 2015 11:30:42 +0200
-Message-Id: <1442568644-2158-4-git-send-email-alex.aring@gmail.com>
+Subject: [PATCH bluetooth-next 4/5] ieee802154: change needed headroom/tailroom
+Date: Fri, 18 Sep 2015 11:30:43 +0200
+Message-Id: <1442568644-2158-5-git-send-email-alex.aring@gmail.com>
 In-Reply-To: <1442568644-2158-1-git-send-email-alex.aring@gmail.com>
 References: <1442568644-2158-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
@@ -16,286 +16,243 @@ List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
 Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-The current header_ops callback structure of net device are used mostly
-from 802.15.4 upper-layers. Because this callback structure is a very
-generic one, which is also used by e.g. DGRAM AF_PACKET sockets, we
-can't make this callback structure 802.15.4 specific which is currently
-is.
+This patch cleanups needed_headroom, needed_tailroom and hard_header_len
+fields for wpan and lowpan interfaces.
 
-I saw the smallest "constraint" for calling this callback with
-dev_hard_header/dev_parse_header by AF_PACKET which assign a 8 byte
-array for address void pointers. Currently 802.15.4 specific protocols
-like af802154 and 6LoWPAN will assign the "struct ieee802154_addr" as
-these parameters which is greater than 8 bytes. The current callback
-implementation for header_ops.create assumes always a complete
-"struct ieee802154_addr" which AF_PACKET can't never handled and is
-greater than 8 bytes.
+For wpan interfaces the worst case mac header len should be part of
+needed_headroom, currently this is set as hard_header_len, but
+hard_header_len should be set to the minimum header length which xmit
+call assumes and this is the minimum frame length of 802.15.4.
+The hard_header_len value will check inside send callbacl of AF_PACKET
+raw sockets.
 
-For that reason we introduce now a "generic" create/parse header_ops
-callback which allows handling with intra-pan extended addresses only.
-This allows a small use-case with AF_PACKET to send "somehow" a valid
-dataframe over DGRAM.
-
-To keeping the current dev_hard_header behaviour we introduce a similar
-callback structure "wpan_dev_header_ops" which contains 802.15.4 specific
-upper-layer header creation functionality, which can be called by
-wpan_dev_hard_header.
+For lowpan interfaces, if fragmentation isn't needed the skb will
+call dev_hard_header for 802154 layer and queue it afterwards. This
+happens without new skb allocation, so we need the same headroom and
+tailroom lengths like 802154 inside 802154 6lowpan layer. At least we
+assume as minimum header length an ipv6 header size.
 
 Signed-off-by: Alexander Aring <alex.aring@gmail.com>
 ---
- include/net/cfg802154.h         | 33 +++++++++++++++
- include/net/ieee802154_netdev.h |  9 ----
- net/ieee802154/6lowpan/tx.c     |  8 ++--
- net/ieee802154/socket.c         |  4 +-
- net/mac802154/iface.c           | 91 +++++++++++++++++++++++++++++++++++------
- 5 files changed, 118 insertions(+), 27 deletions(-)
+ include/linux/ieee802154.h    | 11 +++++++++++
+ include/net/6lowpan.h         |  8 ++++++++
+ include/net/mac802154.h       |  8 --------
+ net/6lowpan/nhc.h             |  2 --
+ net/ieee802154/6lowpan/core.c | 14 +++++++++++---
+ net/ieee802154/6lowpan/tx.c   | 12 ++++++++++--
+ net/ieee802154/header_ops.c   |  2 +-
+ net/mac802154/iface.c         | 17 ++++++++++++++---
+ net/mac802154/tx.c            |  3 ---
+ 9 files changed, 55 insertions(+), 22 deletions(-)
 
-diff --git a/include/net/cfg802154.h b/include/net/cfg802154.h
-index 76b1ffa..242273c 100644
---- a/include/net/cfg802154.h
-+++ b/include/net/cfg802154.h
-@@ -167,6 +167,26 @@ struct wpan_phy {
- 	char priv[0] __aligned(NETDEV_ALIGN);
- };
- 
-+struct ieee802154_addr {
-+	u8 mode;
-+	__le16 pan_id;
-+	union {
-+		__le16 short_addr;
-+		__le64 extended_addr;
-+	};
-+};
+diff --git a/include/linux/ieee802154.h b/include/linux/ieee802154.h
+index db01492..205ce4e 100644
+--- a/include/linux/ieee802154.h
++++ b/include/linux/ieee802154.h
+@@ -31,6 +31,17 @@
+ #define IEEE802154_ACK_PSDU_LEN		5
+ #define IEEE802154_MIN_PSDU_LEN		9
+ #define IEEE802154_FCS_LEN		2
++#define IEEE802154_MAX_AUTH_TAG_LEN	16
 +
-+struct wpan_dev_header_ops {
-+	/* TODO create callback currently assumes ieee802154_mac_cb inside
-+	 * skb->cb. This should be changed to give these information as
-+	 * parameter.
-+	 */
-+	int	(*create)(struct sk_buff *skb, struct net_device *dev,
-+			  const struct ieee802154_addr *daddr,
-+			  const struct ieee802154_addr *saddr,
-+			  unsigned int len);
-+};
++/*  General MAC frame format:
++ *  2 bytes: Frame Control
++ *  1 byte:  Sequence Number
++ * 20 bytes: Addressing fields
++ * 14 bytes: Auxiliary Security Header
++ */
++#define IEEE802154_MAX_HEADER_LEN	(2 + 1 + 20 + 14)
++#define IEEE802154_MIN_HEADER_LEN	(IEEE802154_ACK_PSDU_LEN - \
++					 IEEE802154_FCS_LEN)
+ 
+ #define IEEE802154_PAN_ID_BROADCAST	0xffff
+ #define IEEE802154_ADDR_SHORT_BROADCAST	0xffff
+diff --git a/include/net/6lowpan.h b/include/net/6lowpan.h
+index eeae5eb..c17f556 100644
+--- a/include/net/6lowpan.h
++++ b/include/net/6lowpan.h
+@@ -61,6 +61,14 @@
+ #define UIP_PROTO_UDP			17 /* ipv6 next header value for UDP */
+ #define UIP_FRAGH_LEN			8  /* ipv6 fragment header size */
+ 
++#define LOWPAN_NHC_MAX_ID_LEN	1
++/* Max IPHC Header len without IPv6 hdr specific inline data.
++ * Useful for getting the "extra" bytes we need at worst case compression.
++ *
++ * LOWPAN_IPHC + CID + LOWPAN_NHC_MAX_ID_LEN
++ */
++#define LOWPAN_IPHC_MAX_HEADER_LEN	(2 + 1 + LOWPAN_NHC_MAX_ID_LEN)
 +
- struct wpan_dev {
- 	struct wpan_phy *wpan_phy;
- 	int iftype;
-@@ -175,6 +195,8 @@ struct wpan_dev {
- 	struct list_head list;
- 	struct net_device *netdev;
+ /*
+  * ipv6 address based on mac
+  * second bit-flip (Universe/Local) is done according RFC2464
+diff --git a/include/net/mac802154.h b/include/net/mac802154.h
+index 32bd7c0..2c47850 100644
+--- a/include/net/mac802154.h
++++ b/include/net/mac802154.h
+@@ -23,14 +23,6 @@
  
-+	const struct wpan_dev_header_ops *header_ops;
-+
- 	/* lowpan interface, set when the wpan_dev belongs to one lowpan_dev */
- 	struct net_device *lowpan_dev;
+ #include <net/cfg802154.h>
  
-@@ -205,6 +227,17 @@ struct wpan_dev {
- 
- #define to_phy(_dev)	container_of(_dev, struct wpan_phy, dev)
- 
-+static inline int
-+wpan_dev_hard_header(struct sk_buff *skb, struct net_device *dev,
-+		     const struct ieee802154_addr *daddr,
-+		     const struct ieee802154_addr *saddr,
-+		     unsigned int len)
-+{
-+	struct wpan_dev *wpan_dev = dev->ieee802154_ptr;
-+
-+	return wpan_dev->header_ops->create(skb, dev, daddr, saddr, len);
-+}
-+
- struct wpan_phy *
- wpan_phy_new(const struct cfg802154_ops *ops, size_t priv_size);
- static inline void wpan_phy_set_dev(struct wpan_phy *phy, struct device *dev)
-diff --git a/include/net/ieee802154_netdev.h b/include/net/ieee802154_netdev.h
-index 95a71bc..aebb9d8 100644
---- a/include/net/ieee802154_netdev.h
-+++ b/include/net/ieee802154_netdev.h
-@@ -50,15 +50,6 @@ struct ieee802154_sechdr {
- 	};
- };
- 
--struct ieee802154_addr {
--	u8 mode;
--	__le16 pan_id;
--	union {
--		__le16 short_addr;
--		__le64 extended_addr;
--	};
--};
+-/* General MAC frame format:
+- *  2 bytes: Frame Control
+- *  1 byte:  Sequence Number
+- * 20 bytes: Addressing fields
+- * 14 bytes: Auxiliary Security Header
+- */
+-#define MAC802154_FRAME_HARD_HEADER_LEN		(2 + 1 + 20 + 14)
 -
- struct ieee802154_hdr_fc {
- #if defined(__LITTLE_ENDIAN_BITFIELD)
- 	u16 type:3,
+ /**
+  * enum ieee802154_hw_addr_filt_flags - hardware address filtering flags
+  *
+diff --git a/net/6lowpan/nhc.h b/net/6lowpan/nhc.h
+index ed44938..c249f17 100644
+--- a/net/6lowpan/nhc.h
++++ b/net/6lowpan/nhc.h
+@@ -8,8 +8,6 @@
+ #include <net/6lowpan.h>
+ #include <net/ipv6.h>
+ 
+-#define LOWPAN_NHC_MAX_ID_LEN	1
+-
+ /**
+  * LOWPAN_NHC - helper macro to generate nh id fields and lowpan_nhc struct
+  *
+diff --git a/net/ieee802154/6lowpan/core.c b/net/ieee802154/6lowpan/core.c
+index 9f0cfa5..44420ed 100644
+--- a/net/ieee802154/6lowpan/core.c
++++ b/net/ieee802154/6lowpan/core.c
+@@ -104,9 +104,8 @@ static void lowpan_setup(struct net_device *ldev)
+ 	ldev->addr_len		= IEEE802154_ADDR_LEN;
+ 	memset(ldev->broadcast, 0xff, IEEE802154_ADDR_LEN);
+ 	ldev->type		= ARPHRD_6LOWPAN;
+-	/* Frame Control + Sequence Number + Address fields + Security Header */
+-	ldev->hard_header_len	= 2 + 1 + 20 + 14;
+-	ldev->needed_tailroom	= 2; /* FCS */
++	/* We need an ipv6hdr as minimum len when calling xmit */
++	ldev->hard_header_len	= sizeof(struct ipv6hdr);
+ 	ldev->mtu		= IPV6_MIN_MTU;
+ 	ldev->priv_flags	|= IFF_NO_QUEUE;
+ 	ldev->flags		= IFF_BROADCAST | IFF_MULTICAST;
+@@ -156,6 +155,15 @@ static int lowpan_newlink(struct net *src_net, struct net_device *ldev,
+ 	lowpan_dev_info(ldev)->wdev = wdev;
+ 	/* Set the lowpan hardware address to the wpan hardware address. */
+ 	memcpy(ldev->dev_addr, wdev->dev_addr, IEEE802154_ADDR_LEN);
++	/* We need headroom for possible wpan_dev_hard_header call and tailroom
++	 * for encryption/fcs handling. The lowpan interface will replace
++	 * the IPv6 header with 6LoWPAN header. At worst case the 6LoWPAN
++	 * header has LOWPAN_IPHC_MAX_HEADER_LEN more bytes than the IPv6
++	 * header.
++	 */
++	ldev->needed_headroom = LOWPAN_IPHC_MAX_HEADER_LEN +
++				wdev->needed_headroom;
++	ldev->needed_tailroom = wdev->needed_tailroom;
+ 
+ 	lowpan_netdev_setup(ldev, LOWPAN_LLTYPE_IEEE802154);
+ 
 diff --git a/net/ieee802154/6lowpan/tx.c b/net/ieee802154/6lowpan/tx.c
-index 54939d0..6067e06 100644
+index 6067e06..7e0563e 100644
 --- a/net/ieee802154/6lowpan/tx.c
 +++ b/net/ieee802154/6lowpan/tx.c
-@@ -87,8 +87,8 @@ lowpan_alloc_frag(struct sk_buff *skb, int size,
+@@ -10,6 +10,7 @@
+ 
+ #include <net/6lowpan.h>
+ #include <net/ieee802154_netdev.h>
++#include <net/mac802154.h>
+ 
+ #include "6lowpan_i.h"
+ 
+@@ -36,6 +37,13 @@ lowpan_addr_info *lowpan_skb_priv(const struct sk_buff *skb)
+ 			sizeof(struct lowpan_addr_info));
+ }
+ 
++/* This callback will be called from AF_PACKET and IPv6 stack, the AF_PACKET
++ * sockets gives an 8 byte array for addresses only!
++ *
++ * TODO I think AF_PACKET DGRAM (sending/receiving) RAW (sending) makes no
++ * sense here. We should disable it, the right use-case would be AF_INET6
++ * RAW/DGRAM sockets.
++ */
+ int lowpan_header_create(struct sk_buff *skb, struct net_device *ldev,
+ 			 unsigned short type, const void *_daddr,
+ 			 const void *_saddr, unsigned int len)
+@@ -77,13 +85,13 @@ lowpan_alloc_frag(struct sk_buff *skb, int size,
+ 	struct sk_buff *frag;
+ 	int rc;
+ 
+-	frag = alloc_skb(wdev->hard_header_len + wdev->needed_tailroom + size,
++	frag = alloc_skb(wdev->needed_headroom + wdev->needed_tailroom + size,
+ 			 GFP_ATOMIC);
+ 
+ 	if (likely(frag)) {
+ 		frag->dev = wdev;
+ 		frag->priority = skb->priority;
+-		skb_reserve(frag, wdev->hard_header_len);
++		skb_reserve(frag, wdev->needed_headroom);
  		skb_reset_network_header(frag);
  		*mac_cb(frag) = *mac_cb(skb);
  
--		rc = dev_hard_header(frag, wdev, 0, &master_hdr->dest,
--				     &master_hdr->source, size);
-+		rc = wpan_dev_hard_header(frag, wdev, &master_hdr->dest,
-+					  &master_hdr->source, size);
- 		if (rc < 0) {
- 			kfree_skb(frag);
- 			return ERR_PTR(rc);
-@@ -228,8 +228,8 @@ static int lowpan_header(struct sk_buff *skb, struct net_device *ldev,
- 		cb->ackreq = wpan_dev->ackreq;
- 	}
- 
--	return dev_hard_header(skb, lowpan_dev_info(ldev)->wdev, ETH_P_IPV6,
--			       (void *)&da, (void *)&sa, 0);
-+	return wpan_dev_hard_header(skb, lowpan_dev_info(ldev)->wdev, &da, &sa,
-+				    0);
- }
- 
- netdev_tx_t lowpan_xmit(struct sk_buff *skb, struct net_device *ldev)
-diff --git a/net/ieee802154/socket.c b/net/ieee802154/socket.c
-index b6eacf3..be77f21 100644
---- a/net/ieee802154/socket.c
-+++ b/net/ieee802154/socket.c
-@@ -676,8 +676,8 @@ static int dgram_sendmsg(struct sock *sk, struct msghdr *msg, size_t size)
- 	cb->seclevel = ro->seclevel;
- 	cb->seclevel_override = ro->seclevel_override;
- 
--	err = dev_hard_header(skb, dev, ETH_P_IEEE802154, &dst_addr,
--			      ro->bound ? &ro->src_addr : NULL, size);
-+	err = wpan_dev_hard_header(skb, dev, &dst_addr,
-+				   ro->bound ? &ro->src_addr : NULL, size);
- 	if (err < 0)
- 		goto out_skb;
- 
+diff --git a/net/ieee802154/header_ops.c b/net/ieee802154/header_ops.c
+index d8443b0..c7439f0 100644
+--- a/net/ieee802154/header_ops.c
++++ b/net/ieee802154/header_ops.c
+@@ -85,7 +85,7 @@ ieee802154_hdr_push_sechdr(u8 *buf, const struct ieee802154_sechdr *hdr)
+ int
+ ieee802154_hdr_push(struct sk_buff *skb, struct ieee802154_hdr *hdr)
+ {
+-	u8 buf[MAC802154_FRAME_HARD_HEADER_LEN];
++	u8 buf[IEEE802154_MAX_HEADER_LEN];
+ 	int pos = 2;
+ 	int rc;
+ 	struct ieee802154_hdr_fc *fc = &hdr->fc;
 diff --git a/net/mac802154/iface.c b/net/mac802154/iface.c
-index ed26952..8afe26d 100644
+index 8afe26d..b5a0936 100644
 --- a/net/mac802154/iface.c
 +++ b/net/mac802154/iface.c
-@@ -367,12 +367,11 @@ static int mac802154_set_header_security(struct ieee802154_sub_if_data *sdata,
- 	return 0;
- }
+@@ -537,8 +537,18 @@ static void ieee802154_if_setup(struct net_device *dev)
+ 	dev->addr_len		= IEEE802154_EXTENDED_ADDR_LEN;
+ 	memset(dev->broadcast, 0xff, IEEE802154_EXTENDED_ADDR_LEN);
  
--static int mac802154_header_create(struct sk_buff *skb,
--				   struct net_device *dev,
--				   unsigned short type,
--				   const void *daddr,
--				   const void *saddr,
--				   unsigned len)
-+static int ieee802154_header_create(struct sk_buff *skb,
-+				    struct net_device *dev,
-+				    const struct ieee802154_addr *daddr,
-+				    const struct ieee802154_addr *saddr,
-+				    unsigned len)
- {
- 	struct ieee802154_hdr hdr;
- 	struct ieee802154_sub_if_data *sdata = IEEE802154_DEV_TO_SUB_IF(dev);
-@@ -423,24 +422,91 @@ static int mac802154_header_create(struct sk_buff *skb,
- 	return hlen;
- }
- 
-+static const struct wpan_dev_header_ops ieee802154_header_ops = {
-+	.create		= ieee802154_header_create,
-+};
-+
-+/* This header create functionality assumes a 8 byte array for
-+ * source and destination pointer at maximum. To adapt this for
-+ * the 802.15.4 dataframe header we use extended address handling
-+ * here only and intra pan connection. fc fields are mostly fallback
-+ * handling. For provide dev_hard_header for dgram sockets.
-+ */
-+static int mac802154_header_create(struct sk_buff *skb,
-+				   struct net_device *dev,
-+				   unsigned short type,
-+				   const void *daddr,
-+				   const void *saddr,
-+				   unsigned len)
-+{
-+	struct ieee802154_hdr hdr;
-+	struct ieee802154_sub_if_data *sdata = IEEE802154_DEV_TO_SUB_IF(dev);
-+	struct wpan_dev *wpan_dev = &sdata->wpan_dev;
-+	struct ieee802154_mac_cb cb = { };
-+	int hlen;
-+
-+	if (!daddr)
-+		return -EINVAL;
-+
-+	memset(&hdr.fc, 0, sizeof(hdr.fc));
-+	hdr.fc.type = IEEE802154_FC_TYPE_DATA;
-+	hdr.fc.ack_request = wpan_dev->ackreq;
-+	hdr.seq = atomic_inc_return(&dev->ieee802154_ptr->dsn) & 0xFF;
-+
-+	/* TODO currently a workaround to give zero cb block to set
-+	 * security parameters defaults according MIB.
+-	dev->hard_header_len	= MAC802154_FRAME_HARD_HEADER_LEN;
+-	dev->needed_tailroom	= 2 + 16; /* FCS + MIC */
++	/* Let hard_header_len set to IEEE802154_MIN_HEADER_LEN. AF_PACKET
++	 * will not send frames without any payload, but ack frames
++	 * has no payload, so substract one that we can send a 3 bytes
++	 * frame. The xmit callback assumes at least a hard header where two
++	 * bytes fc and sequence field are set.
 +	 */
-+	if (mac802154_set_header_security(sdata, &hdr, &cb) < 0)
-+		return -EINVAL;
-+
-+	hdr.dest.pan_id = wpan_dev->pan_id;
-+	hdr.dest.mode = IEEE802154_ADDR_LONG;
-+	memcpy(&hdr.dest.extended_addr, daddr, IEEE802154_EXTENDED_ADDR_LEN);
-+
-+	hdr.source.pan_id = hdr.dest.pan_id;
-+	hdr.source.mode = IEEE802154_ADDR_LONG;
-+
-+	if (!saddr)
-+		hdr.source.extended_addr = wpan_dev->extended_addr;
-+	else
-+		memcpy(&hdr.source.extended_addr, saddr,
-+		       IEEE802154_EXTENDED_ADDR_LEN);
-+
-+	hlen = ieee802154_hdr_push(skb, &hdr);
-+	if (hlen < 0)
-+		return -EINVAL;
-+
-+	skb_reset_mac_header(skb);
-+	skb->mac_len = hlen;
-+
-+	if (len > ieee802154_max_payload(&hdr))
-+		return -EMSGSIZE;
-+
-+	return hlen;
-+}
-+
- static int
- mac802154_header_parse(const struct sk_buff *skb, unsigned char *haddr)
- {
- 	struct ieee802154_hdr hdr;
--	struct ieee802154_addr *addr = (struct ieee802154_addr *)haddr;
++	dev->hard_header_len	= IEEE802154_MIN_HEADER_LEN - 1;
++	/* The auth_tag header is for security and places in private payload
++	 * room of mac frame which stucks between payload and FCS field.
++	 */
++	dev->needed_tailroom	= IEEE802154_MAX_AUTH_TAG_LEN +
++				  IEEE802154_FCS_LEN;
+ 	dev->mtu		= IEEE802154_MTU;
+ 	dev->tx_queue_len	= 300;
+ 	dev->flags		= IFF_NOARP | IFF_BROADCAST;
+@@ -617,7 +627,8 @@ ieee802154_if_add(struct ieee802154_local *local, const char *name,
+ 	if (!ndev)
+ 		return ERR_PTR(-ENOMEM);
  
- 	if (ieee802154_hdr_peek_addrs(skb, &hdr) < 0) {
- 		pr_debug("malformed packet\n");
- 		return 0;
+-	ndev->needed_headroom = local->hw.extra_tx_headroom;
++	ndev->needed_headroom = local->hw.extra_tx_headroom +
++				IEEE802154_MAX_HEADER_LEN;
+ 
+ 	ret = dev_alloc_name(ndev, ndev->name);
+ 	if (ret < 0)
+diff --git a/net/mac802154/tx.c b/net/mac802154/tx.c
+index 7ed4391..66d7ecb 100644
+--- a/net/mac802154/tx.c
++++ b/net/mac802154/tx.c
+@@ -77,9 +77,6 @@ ieee802154_tx(struct ieee802154_local *local, struct sk_buff *skb)
+ 		put_unaligned_le16(crc, skb_put(skb, 2));
  	}
  
--	*addr = hdr.source;
--	return sizeof(*addr);
-+	if (hdr.source.mode == IEEE802154_ADDR_LONG) {
-+		memcpy(haddr, &hdr.source.extended_addr,
-+		       IEEE802154_EXTENDED_ADDR_LEN);
-+		return IEEE802154_EXTENDED_ADDR_LEN;
-+	}
-+
-+	return 0;
- }
- 
--static struct header_ops mac802154_header_ops = {
--	.create		= mac802154_header_create,
--	.parse		= mac802154_header_parse,
-+static const struct header_ops mac802154_header_ops = {
-+	.create         = mac802154_header_create,
-+	.parse          = mac802154_header_parse,
- };
- 
- static const struct net_device_ops mac802154_wpan_ops = {
-@@ -513,6 +579,7 @@ ieee802154_setup_sdata(struct ieee802154_sub_if_data *sdata,
- 		sdata->dev->netdev_ops = &mac802154_wpan_ops;
- 		sdata->dev->ml_priv = &mac802154_mlme_wpan;
- 		wpan_dev->promiscuous_mode = false;
-+		wpan_dev->header_ops = &ieee802154_header_ops;
- 
- 		mutex_init(&sdata->sec_mtx);
+-	if (skb_cow_head(skb, local->hw.extra_tx_headroom))
+-		goto err_tx;
+-
+ 	/* Stop the netif queue on each sub_if_data object. */
+ 	ieee802154_stop_queue(&local->hw);
  
 -- 
 2.5.2
