@@ -1,14 +1,14 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f180.google.com ([209.85.212.180]:33781 "EHLO
-	mail-wi0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756373AbbIUJZT (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Mon, 21 Sep 2015 05:25:19 -0400
-Received: by wiclk2 with SMTP id lk2so136958983wic.0
-        for <linux-wpan@vger.kernel.org>; Mon, 21 Sep 2015 02:25:18 -0700 (PDT)
+Received: from mail-wi0-f171.google.com ([209.85.212.171]:36215 "EHLO
+	mail-wi0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756375AbbIUJZU (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Mon, 21 Sep 2015 05:25:20 -0400
+Received: by wicgb1 with SMTP id gb1so105780523wic.1
+        for <linux-wpan@vger.kernel.org>; Mon, 21 Sep 2015 02:25:19 -0700 (PDT)
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH bluetooth-next 19/22] mrf24j40: add tx power support
-Date: Mon, 21 Sep 2015 11:24:40 +0200
-Message-Id: <1442827483-27975-20-git-send-email-alex.aring@gmail.com>
+Subject: [PATCH bluetooth-next 20/22] mrf24j40: add promiscuous mode support
+Date: Mon, 21 Sep 2015 11:24:41 +0200
+Message-Id: <1442827483-27975-21-git-send-email-alex.aring@gmail.com>
 In-Reply-To: <1442827483-27975-1-git-send-email-alex.aring@gmail.com>
 References: <1442827483-27975-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
@@ -16,112 +16,63 @@ List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
 Cc: kernel@pengutronix.de, alan@signal11.us, jonatan@myeden.se, stefan@osg.samsung.com, Alexander Aring <alex.aring@gmail.com>
 
-This patch supports setting of transmit power for the mrf24j40ma
-transceiver only. The mrf24j40mc has some amplifier to change the
-transmit power, I am currently not sure how the mapping for this
-amplifier looks like.
+This patch adds support for promiscuous mode by setting promiscuous (no
+frame filtering), disable automatic ack handling and not filtering
+frames where the crc is invalid.
 
+Reviewed-by: Stefan Schmidt <stefan@osg.samsung.com>
 Signed-off-by: Alexander Aring <alex.aring@gmail.com>
 ---
- drivers/net/ieee802154/mrf24j40.c | 71 +++++++++++++++++++++++++++++++++++++++
- 1 file changed, 71 insertions(+)
+ drivers/net/ieee802154/mrf24j40.c | 22 +++++++++++++++++++++-
+ 1 file changed, 21 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/net/ieee802154/mrf24j40.c b/drivers/net/ieee802154/mrf24j40.c
-index c23936e..91687c1 100644
+index 91687c1..146ad57 100644
 --- a/drivers/net/ieee802154/mrf24j40.c
 +++ b/drivers/net/ieee802154/mrf24j40.c
-@@ -864,6 +864,65 @@ static int mrf24j40_set_cca_ed_level(struct ieee802154_hw *hw, s32 mbm)
- 	return -EINVAL;
+@@ -923,6 +923,24 @@ static int mrf24j40_set_txpower(struct ieee802154_hw *hw, s32 mbm)
+ 	return regmap_update_bits(devrec->regmap_long, REG_RFCON3, 0xf8, val);
  }
  
-+static const s32 mrf24j40ma_powers[] = {
-+	0, -50, -120, -190, -280, -370, -490, -630, -1000, -1050, -1120, -1190,
-+	-1280, -1370, -1490, -1630, -2000, -2050, -2120, -2190, -2280, -2370,
-+	-2490, -2630, -3000, -3050, -3120, -3190, -3280, -3370, -3490, -3630,
-+};
-+
-+static int mrf24j40_set_txpower(struct ieee802154_hw *hw, s32 mbm)
++static int mrf24j40_set_promiscuous_mode(struct ieee802154_hw *hw, bool on)
 +{
 +	struct mrf24j40 *devrec = hw->priv;
-+	s32 small_scale;
-+	u8 val;
++	int ret;
 +
-+	if (0 >= mbm && mbm > -1000) {
-+		val = 0;
-+		small_scale = mbm;
-+	} else if (-1000 >= mbm && mbm > -2000) {
-+		val = 0x40;
-+		small_scale = mbm + 1000;
-+	} else if (-2000 >= mbm && mbm > -3000) {
-+		val = 0x80;
-+		small_scale = mbm + 2000;
-+	} else if (-3000 >= mbm && mbm > -4000) {
-+		val = 0xc0;
-+		small_scale = mbm + 3000;
++	if (on) {
++		/* set PROMI, ERRPKT and NOACKRSP */
++		ret = regmap_update_bits(devrec->regmap_short, REG_RXMCR, 0x23,
++					 0x23);
 +	} else {
-+		return -EINVAL;
++		/* clear PROMI, ERRPKT and NOACKRSP */
++		ret = regmap_update_bits(devrec->regmap_short, REG_RXMCR, 0x23,
++					 0x00);
 +	}
 +
-+	switch (small_scale) {
-+	case 0:
-+		break;
-+	case -50:
-+		val |= 0x08;
-+		break;
-+	case -120:
-+		val |= 0x10;
-+		break;
-+	case -190:
-+		val |= 0x18;
-+		break;
-+	case -280:
-+		val |= 0x20;
-+		break;
-+	case -370:
-+		val |= 0x28;
-+		break;
-+	case -490:
-+		val |= 0x30;
-+		break;
-+	case -630:
-+		val |= 0x38;
-+		break;
-+	default:
-+		return -EINVAL;
-+	}
-+
-+	return regmap_update_bits(devrec->regmap_long, REG_RFCON3, 0xf8, val);
++	return ret;
 +}
 +
  static const struct ieee802154_ops mrf24j40_ops = {
  	.owner = THIS_MODULE,
  	.xmit_async = mrf24j40_tx,
-@@ -875,6 +934,7 @@ static const struct ieee802154_ops mrf24j40_ops = {
- 	.set_csma_params = mrf24j40_csma_params,
+@@ -935,6 +953,7 @@ static const struct ieee802154_ops mrf24j40_ops = {
  	.set_cca_mode = mrf24j40_set_cca_mode,
  	.set_cca_ed_level = mrf24j40_set_cca_ed_level,
-+	.set_txpower = mrf24j40_set_txpower,
+ 	.set_txpower = mrf24j40_set_txpower,
++	.set_promiscuous_mode = mrf24j40_set_promiscuous_mode,
  };
  
  static void mrf24j40_intstat_complete(void *context)
-@@ -1088,6 +1148,17 @@ static void  mrf24j40_phy_setup(struct mrf24j40 *devrec)
- 	devrec->hw->phy->cca_ed_level = -6900;
- 	devrec->hw->phy->supported.cca_ed_levels = mrf24j40_ed_levels;
- 	devrec->hw->phy->supported.cca_ed_levels_size = ARRAY_SIZE(mrf24j40_ed_levels);
-+
-+	switch (spi_get_device_id(devrec->spi)->driver_data) {
-+	case MRF24J40:
-+	case MRF24J40MA:
-+		devrec->hw->phy->supported.tx_powers = mrf24j40ma_powers;
-+		devrec->hw->phy->supported.tx_powers_size = ARRAY_SIZE(mrf24j40ma_powers);
-+		devrec->hw->phy->flags |= WPAN_PHY_FLAG_TXPOWER;
-+		break;
-+	default:
-+		break;
-+	}
- }
+@@ -1182,7 +1201,8 @@ static int mrf24j40_probe(struct spi_device *spi)
+ 	devrec->hw->parent = &spi->dev;
+ 	devrec->hw->phy->supported.channels[0] = CHANNEL_MASK;
+ 	devrec->hw->flags = IEEE802154_HW_TX_OMIT_CKSUM | IEEE802154_HW_AFILT |
+-			    IEEE802154_HW_CSMA_PARAMS;
++			    IEEE802154_HW_CSMA_PARAMS |
++			    IEEE802154_HW_PROMISCUOUS;
  
- static int mrf24j40_probe(struct spi_device *spi)
+ 	devrec->hw->phy->flags = WPAN_PHY_FLAG_CCA_MODE |
+ 				 WPAN_PHY_FLAG_CCA_ED_LEVEL;
 -- 
 2.5.2
 
