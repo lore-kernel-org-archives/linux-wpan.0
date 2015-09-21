@@ -1,57 +1,77 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from senator.holtmann.net ([87.106.208.187]:57202 "EHLO
-	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752634AbbIUSpj convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Mon, 21 Sep 2015 14:45:39 -0400
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2104\))
-Subject: Re: [PATCH bluetooth-next] at86rf230: support edge triggered irq
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1442821074-18592-1-git-send-email-alex.aring@gmail.com>
-Date: Mon, 21 Sep 2015 20:45:34 +0200
-Content-Transfer-Encoding: 8BIT
-Message-Id: <042A050F-CF3E-4277-8FF8-E0E435E486F8@holtmann.org>
-References: <1442821074-18592-1-git-send-email-alex.aring@gmail.com>
+Received: from mail-wi0-f179.google.com ([209.85.212.179]:37438 "EHLO
+	mail-wi0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756097AbbIUJY4 (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Mon, 21 Sep 2015 05:24:56 -0400
+Received: by wicfx3 with SMTP id fx3so102098791wic.0
+        for <linux-wpan@vger.kernel.org>; Mon, 21 Sep 2015 02:24:54 -0700 (PDT)
+From: Alexander Aring <alex.aring@gmail.com>
+Subject: [PATCH bluetooth-next 00/22] mrf24j40: async rx/tx handling and new features
+Date: Mon, 21 Sep 2015 11:24:21 +0200
+Message-Id: <1442827483-27975-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>
-Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de
+To: linux-wpan@vger.kernel.org
+Cc: kernel@pengutronix.de, alan@signal11.us, jonatan@myeden.se, stefan@osg.samsung.com, Alexander Aring <alex.aring@gmail.com>
 
-Hi Alex,
+Hi,
 
-> This patch adds support for edge triggered irq types. We remove the
-> locking for irq resources by enable/disable irq and allocate directly
-> some heap buffer at isr. We have still a enable/disable irq path but
-> this is for level-triggered irq's which need to be disabled until
-> spi_async clear the irq line.
-> 
-> There is usually a little race condition between "irq line cleared" and
-> "enable_irq". When in this time a edge triggered irq arrived, we will
-> not recognize this interrupt. This case can't happend at at86rf230. The
-> reason is that we unmask TRX_END irq's only which indicates a transmit
-> or receive completion, which depends on the current state.
-> 
-> On Transmit:
-> 
-> TRX_END arrived and transceiver is in TX_ARET_ON state again, in this
-> state no other TRX_END can happen until we leave the state.
-> 
-> On Receive:
-> 
-> This is protected with the RX_SAFE_MODE bit which leaves the transceiver
-> in RX_AACK_BUSY until we readed the framebuffer. In this state no other
-> TRX_END can happen.
-> 
-> Tested with RPi where I first detected issues between edge/level irq's.
-> 
-> Signed-off-by: Alexander Aring <alex.aring@gmail.com>
-> ---
-> drivers/net/ieee802154/at86rf230.c | 211 ++++++++++++++++---------------------
-> 1 file changed, 89 insertions(+), 122 deletions(-)
+this patch series contains some cleanups, devicetree support, rx/tx async
+handling, threaded irq to hardirq, csma params settings, cca mode settings,
+cca energy detection levels, tx power settings and promiscuous mode settings.
 
-patch has been applied to bluetooth-next tree.
+Also I add regmap support, the lowlevel spi calls are only used in hotpaths
+for handling receive/transmit and irq handling. There are also some many
+magic numbers, maybe we can introduce some register bits defines.
 
-Regards
+- Alex
 
-Marcel
+changes since PATCH:
+
+ - add warning for edge triggered irq's
+ - add patch to replace magic numbers, except hw_init which is specified by
+   datasheet instruction
+ - remove WARN_ON for max_be
+ - fix cca mode setting s/OR/AND
+ - add warning for spi freq is above maximum
+ - let txpower also working for mrf24j40 chips by default
+ - re-add DEBUG things for rssi and lqi value
+ - add several reviewed-by's
+ - use for cca_ed_thres register regmap_write instead update bits with full
+   0xff mask
+
+Alexander Aring (22):
+  mrf24j40: cleanup define identation
+  mrf24j40: use ieee802154_alloc_hw for private data
+  mrf24j40: calling ieee802154_register_hw at last
+  mrf24j40: remove spi settings overwrite
+  mrf24j40: add device-tree support
+  mrf24j40: add default channel setting
+  mrf24j40: add random extended addr generation
+  mrf24j40: add more register defines
+  mrf24j40: add regmap support
+  mrf24j40: use regmap for register access
+  mrf24j40: change to frame delivery with crc
+  ieee802154: add helpers for frame control checks
+  mrf24j40: rework tx handling to async tx handling
+  mrf24j40: rework rx handling to async rx handling
+  mrf24j40: async interrupt handling
+  mrf24j40: add csma params support
+  mrf24j40: add cca mode support
+  mrf24j40: add cca ed level support
+  mrf24j40: add tx power support
+  mrf24j40: add promiscuous mode support
+  mrf24j40: change irq trigger type behaviour
+  mrf24j40: replace magic numbers
+
+ .../bindings/net/ieee802154/mrf24j40.txt           |   20 +
+ MAINTAINERS                                        |    1 +
+ drivers/net/ieee802154/Kconfig                     |    1 +
+ drivers/net/ieee802154/mrf24j40.c                  | 1424 ++++++++++++++------
+ include/linux/ieee802154.h                         |   12 +
+ 5 files changed, 1031 insertions(+), 427 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/net/ieee802154/mrf24j40.txt
+
+-- 
+2.5.2
 
