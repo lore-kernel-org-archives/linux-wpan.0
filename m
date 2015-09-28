@@ -1,28 +1,43 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from shards.monkeyblade.net ([149.20.54.216]:33277 "EHLO
-	shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751291AbbI3ERz (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Wed, 30 Sep 2015 00:17:55 -0400
-Date: Tue, 29 Sep 2015 21:17:54 -0700 (PDT)
-Message-Id: <20150929.211754.1536294056240926621.davem@davemloft.net>
-Subject: Re: [PATCH bluetooth-next 1/4] netlink: add nla_get for le32 and
- le64
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <18B6043F-0D8C-4330-8227-094548D1E9BC@holtmann.org>
+Received: from mail-wi0-f175.google.com ([209.85.212.175]:35440 "EHLO
+	mail-wi0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755392AbbI1HCR (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Mon, 28 Sep 2015 03:02:17 -0400
+From: Alexander Aring <alex.aring@gmail.com>
+Subject: [PATCH bluetooth-next 2/4] nl802154: use nla_get_le64 for get extended addr
+Date: Mon, 28 Sep 2015 09:00:24 +0200
+Message-Id: <1443423626-3609-3-git-send-email-alex.aring@gmail.com>
+In-Reply-To: <1443423626-3609-1-git-send-email-alex.aring@gmail.com>
 References: <1443423626-3609-1-git-send-email-alex.aring@gmail.com>
-	<1443423626-3609-2-git-send-email-alex.aring@gmail.com>
-	<18B6043F-0D8C-4330-8227-094548D1E9BC@holtmann.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: marcel@holtmann.org
-Cc: alex.aring@gmail.com, linux-wpan@vger.kernel.org, kernel@pengutronix.de, netdev@vger.kernel.org, phoebe.buckheister@itwm.fraunhofer.de
+To: linux-wpan@vger.kernel.org
+Cc: kernel@pengutronix.de, netdev@vger.kernel.org, phoebe.buckheister@itwm.fraunhofer.de, Alexander Aring <alex.aring@gmail.com>
 
-From: Marcel Holtmann <marcel@holtmann.org>
-Date: Tue, 29 Sep 2015 18:08:32 +0200
+This patch uses the nla_get_le64 function instead of doing a force
+converting to le64.
 
-> do you have any objections to me taking this change through the bluetooth-next tree?
+Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+---
+ net/ieee802154/nl802154.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-No objections.
+diff --git a/net/ieee802154/nl802154.c b/net/ieee802154/nl802154.c
+index 3f89c0a..51110a6 100644
+--- a/net/ieee802154/nl802154.c
++++ b/net/ieee802154/nl802154.c
+@@ -753,10 +753,8 @@ static int nl802154_new_interface(struct sk_buff *skb, struct genl_info *info)
+ 			return -EINVAL;
+ 	}
+ 
+-	/* TODO add nla_get_le64 to netlink */
+ 	if (info->attrs[NL802154_ATTR_EXTENDED_ADDR])
+-		extended_addr = (__force __le64)nla_get_u64(
+-				info->attrs[NL802154_ATTR_EXTENDED_ADDR]);
++		extended_addr = nla_get_le64(info->attrs[NL802154_ATTR_EXTENDED_ADDR]);
+ 
+ 	if (!rdev->ops->add_virtual_intf)
+ 		return -EOPNOTSUPP;
+-- 
+2.5.3
+
