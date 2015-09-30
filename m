@@ -1,36 +1,99 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from senator.holtmann.net ([87.106.208.187]:51709 "EHLO
-	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751796AbbIXSnw (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Thu, 24 Sep 2015 14:43:52 -0400
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2104\))
-Subject: Re: [PATCH bluetooth-next 1/2] ieee802154: remove unnecessary includes
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1443080231-6416-1-git-send-email-alex.aring@gmail.com>
-Date: Thu, 24 Sep 2015 20:43:48 +0200
-Content-Transfer-Encoding: 7bit
-Message-Id: <A110EBBF-DDF7-4861-A068-04E36CD6704D@holtmann.org>
-References: <1443080231-6416-1-git-send-email-alex.aring@gmail.com>
+Received: from mail-wi0-f178.google.com ([209.85.212.178]:38074 "EHLO
+	mail-wi0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754314AbbI3IUU (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Wed, 30 Sep 2015 04:20:20 -0400
+Received: by wiclk2 with SMTP id lk2so49748263wic.1
+        for <linux-wpan@vger.kernel.org>; Wed, 30 Sep 2015 01:20:19 -0700 (PDT)
+From: Alexander Aring <alex.aring@gmail.com>
+Subject: [PATCH bluetooth-next 1/3] ieee802154: 6lowpan: change datagram var types
+Date: Wed, 30 Sep 2015 10:20:09 +0200
+Message-Id: <1443601211-27790-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>
-Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de
+To: linux-wpan@vger.kernel.org
+Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-Hi Alex,
+This patch changes datagram size variable from u16 type to unsigned int.
+The reason is that an IPv6 header has an MAX_UIN16 payload length, but
+the datagram size is payload + IPv6 header length. This avoids overflows
+at some places.
 
-> This patch removes some unnecessary includes from ieee802154 header,
-> which was introduced by commit b609fb54adfa ("ieee802154: add helpers for
-> frame control checks").
-> 
-> Signed-off-by: Alexander Aring <alex.aring@gmail.com>
-> ---
-> include/linux/ieee802154.h | 3 ---
-> 1 file changed, 3 deletions(-)
+Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+---
+ net/ieee802154/6lowpan/6lowpan_i.h  | 4 ++--
+ net/ieee802154/6lowpan/reassembly.c | 2 +-
+ net/ieee802154/6lowpan/tx.c         | 8 ++++----
+ 3 files changed, 7 insertions(+), 7 deletions(-)
 
-patch has been applied to bluetooth-next tree.
-
-Regards
-
-Marcel
+diff --git a/net/ieee802154/6lowpan/6lowpan_i.h b/net/ieee802154/6lowpan/6lowpan_i.h
+index b4e17a7..10d44d0 100644
+--- a/net/ieee802154/6lowpan/6lowpan_i.h
++++ b/net/ieee802154/6lowpan/6lowpan_i.h
+@@ -18,7 +18,7 @@ typedef unsigned __bitwise__ lowpan_rx_result;
+ 
+ struct lowpan_create_arg {
+ 	u16 tag;
+-	u16 d_size;
++	unsigned int d_size;
+ 	const struct ieee802154_addr *src;
+ 	const struct ieee802154_addr *dst;
+ };
+@@ -29,7 +29,7 @@ struct lowpan_frag_queue {
+ 	struct inet_frag_queue	q;
+ 
+ 	u16			tag;
+-	u16			d_size;
++	unsigned int		d_size;
+ 	struct ieee802154_addr	saddr;
+ 	struct ieee802154_addr	daddr;
+ };
+diff --git a/net/ieee802154/6lowpan/reassembly.c b/net/ieee802154/6lowpan/reassembly.c
+index 12e8cf4..af663cb 100644
+--- a/net/ieee802154/6lowpan/reassembly.c
++++ b/net/ieee802154/6lowpan/reassembly.c
+@@ -37,7 +37,7 @@ static struct inet_frags lowpan_frags;
+ static int lowpan_frag_reasm(struct lowpan_frag_queue *fq,
+ 			     struct sk_buff *prev, struct net_device *ldev);
+ 
+-static unsigned int lowpan_hash_frag(u16 tag, u16 d_size,
++static unsigned int lowpan_hash_frag(u16 tag, unsigned int d_size,
+ 				     const struct ieee802154_addr *saddr,
+ 				     const struct ieee802154_addr *daddr)
+ {
+diff --git a/net/ieee802154/6lowpan/tx.c b/net/ieee802154/6lowpan/tx.c
+index 7e0563e..5ecf8af 100644
+--- a/net/ieee802154/6lowpan/tx.c
++++ b/net/ieee802154/6lowpan/tx.c
+@@ -131,8 +131,8 @@ lowpan_xmit_fragment(struct sk_buff *skb, const struct ieee802154_hdr *wpan_hdr,
+ 
+ static int
+ lowpan_xmit_fragmented(struct sk_buff *skb, struct net_device *ldev,
+-		       const struct ieee802154_hdr *wpan_hdr, u16 dgram_size,
+-		       u16 dgram_offset)
++		       const struct ieee802154_hdr *wpan_hdr,
++		       unsigned int dgram_size, unsigned int dgram_offset)
+ {
+ 	__be16 frag_tag;
+ 	u8 frag_hdr[5];
+@@ -194,7 +194,7 @@ err:
+ }
+ 
+ static int lowpan_header(struct sk_buff *skb, struct net_device *ldev,
+-			 u16 *dgram_size, u16 *dgram_offset)
++			 unsigned int *dgram_size, unsigned int *dgram_offset)
+ {
+ 	struct wpan_dev *wpan_dev = lowpan_dev_info(ldev)->wdev->ieee802154_ptr;
+ 	struct ieee802154_addr sa, da;
+@@ -244,7 +244,7 @@ netdev_tx_t lowpan_xmit(struct sk_buff *skb, struct net_device *ldev)
+ {
+ 	struct ieee802154_hdr wpan_hdr;
+ 	int max_single, ret;
+-	u16 dgram_size, dgram_offset;
++	unsigned int dgram_size, dgram_offset;
+ 
+ 	pr_debug("package xmit\n");
+ 
+-- 
+2.6.0
 
