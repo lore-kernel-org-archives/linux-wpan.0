@@ -1,111 +1,56 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mailout1.ltindia.com ([203.199.60.132]:1035 "EHLO
-	mailout1.ltindia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751839AbbJAKQC (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Thu, 1 Oct 2015 06:16:02 -0400
-From: Anoop Kant <Anoop.Kant@LNTTECHSERVICES.COM>
-Subject: RE: Linux-Bluetoothnext: Ping6 execution for virtual Phy : System
+Received: from mail-wi0-f180.google.com ([209.85.212.180]:35381 "EHLO
+	mail-wi0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751547AbbJAK2Z (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Thu, 1 Oct 2015 06:28:25 -0400
+Received: by wicge5 with SMTP id ge5so22716169wic.0
+        for <linux-wpan@vger.kernel.org>; Thu, 01 Oct 2015 03:28:24 -0700 (PDT)
+Date: Thu, 1 Oct 2015 12:28:17 +0200
+From: Alexander Aring <alex.aring@gmail.com>
+Subject: Re: Linux-Bluetoothnext: Ping6 execution for virtual Phy : System
  freezes
-Date: Thu, 1 Oct 2015 10:15:40 +0000
-Message-ID: <51C7DE700DAED543997957503C74C84501074D1F@POCITMSEXMB05.LntUniverse.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Message-ID: <20151001102815.GA2034@omega>
+References: <51C7DE700DAED543997957503C74C84501074D1F@POCITMSEXMB05.LntUniverse.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <51C7DE700DAED543997957503C74C84501074D1F@POCITMSEXMB05.LntUniverse.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>
+To: Anoop Kant <Anoop.Kant@LNTTECHSERVICES.COM>
 Cc: "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>, "kantanoop@yahoo.com" <kantanoop@yahoo.com>
 
-VGhhbmtzIEFsZXggZm9yIHRoZSBpbmZvcm1hdGlvbiEhDQoNCkkgZXhlY3V0ZWQgdGhlIHN0ZXBz
-IGFzIHByb3ZpZGVkIGluIHByZXZpb3VzIG1haWwuIE15IHN5c3RlbSBnZXRzIGZyZWV6ZSBhZnRl
-ciBlbmFibGluZyBsb3dwYW4wIGludGVyZmFjZS4NCmkuZS4gYWZ0ZXIgZXhlY3V0aW5nIGNvbW1h
-bmQgIC8vIGlwIGxpbmsgc2V0IGxvd3BhbjAgdXAgLy8NCg0KRXZlcnkgdGltZSwgSSBoYXZlIHRv
-IHJlYm9vdCBteSBzeXN0ZW0gdG8gZ2V0IGl0IHVwIGJhY2suDQoNCkZyb20gU3lzbG9nLCBJIHNl
-ZSBiZWxvdyA6IEFtIEkgbWlzc2luZyBzb21ldGhpbmcgPyBBbnkgY2x1ZSBvbiBwcm9iYWJsZSBy
-ZWFzb24gb2YgdGhpcyBpc3N1ZSA/DQoNCg0KT2N0ICAxIDE0OjU3OjQ5IHlvY3RvLUhQLVByb0Jv
-b2stNDQyMHMgQXB0RGFlbW9uOiBJTkZPOiBRdWl0dGluZyBkdWUgdG8gaW5hY3Rpdml0eSBPY3Qg
-IDEgMTQ6NTc6NDkgeW9jdG8tSFAtUHJvQm9vay00NDIwcyBBcHREYWVtb246IElORk86IFF1aXR0
-aW5nIHdhcyByZXF1ZXN0ZWQgT2N0ICAxIDE1OjA4OjM2IHlvY3RvLUhQLVByb0Jvb2stNDQyMHMg
-a2VybmVsOiBbIDExMzcuNTg3NDE3XSBpZWVlODAyMTU0ZmFrZWxiIGllZWU4MDIxNTRmYWtlbGI6
-IGFkZGVkIGllZWU4MDIxNTQgaGFyZHdhcmUNCk9jdCAgMSAxNTowODozNiB5b2N0by1IUC1Qcm9C
-b29rLTQ0MjBzIE5ldHdvcmtNYW5hZ2VyWzEzNzNdOiAgICBTQ1BsdWdpbi1JZnVwZG93bjogZGV2
-aWNlcyBhZGRlZCAocGF0aDogL3N5cy9kZXZpY2VzL3BsYXRmb3JtL2llZWU4MDIxNTRmYWtlbGIv
-aWVlZTgwMjE1NC9waHkxL25ldC93cGFuMSwgaWZhY2U6IHdwYW4xKQ0KT2N0ICAxIDE1OjA4OjM2
-IHlvY3RvLUhQLVByb0Jvb2stNDQyMHMgTmV0d29ya01hbmFnZXJbMTM3M106ICAgIFNDUGx1Z2lu
-LUlmdXBkb3duOiBkZXZpY2UgYWRkZWQgKHBhdGg6IC9zeXMvZGV2aWNlcy9wbGF0Zm9ybS9pZWVl
-ODAyMTU0ZmFrZWxiL2llZWU4MDIxNTQvcGh5MS9uZXQvd3BhbjEsIGlmYWNlOiB3cGFuMSk6IG5v
-IGlmdXBkb3duIGNvbmZpZ3VyYXRpb24gZm91bmQuDQpPY3QgIDEgMTU6MDg6MzYgeW9jdG8tSFAt
-UHJvQm9vay00NDIwcyBOZXR3b3JrTWFuYWdlclsxMzczXTogICAgU0NQbHVnaW4tSWZ1cGRvd246
-IGRldmljZXMgYWRkZWQgKHBhdGg6IC9zeXMvZGV2aWNlcy9wbGF0Zm9ybS9pZWVlODAyMTU0ZmFr
-ZWxiL2llZWU4MDIxNTQvcGh5MC9uZXQvd3BhbjAsIGlmYWNlOiB3cGFuMCkNCg0KDQpPY3QgIDEg
-MTU6MDg6MzYgeW9jdG8tSFAtUHJvQm9vay00NDIwcyBOZXR3b3JrTWFuYWdlclsxMzczXTogICAg
-U0NQbHVnaW4tSWZ1cGRvd246IGRldmljZSBhZGRlZCAocGF0aDogL3N5cy9kZXZpY2VzL3BsYXRm
-b3JtL2llZWU4MDIxNTRmYWtlbGIvaWVlZTgwMjE1NC9waHkwL25ldC93cGFuMCwgaWZhY2U6IHdw
-YW4wKTogbm8gaWZ1cGRvd24gY29uZmlndXJhdGlvbiBmb3VuZC4gPT09PT0+IEVycm9zIGluIGxv
-Z3MNCg0KDQpPY3QgIDEgMTU6MTA6MDYgeW9jdG8tSFAtUHJvQm9vay00NDIwcyBOZXR3b3JrTWFu
-YWdlclsxMzczXTogICAgU0NQbHVnaW4tSWZ1cGRvd246IGRldmljZXMgYWRkZWQgKHBhdGg6IC9z
-eXMvZGV2aWNlcy92aXJ0dWFsL25ldC9sb3dwYW4wLCBpZmFjZTogbG93cGFuMCkNCk9jdCAgMSAx
-NToxMDowNiB5b2N0by1IUC1Qcm9Cb29rLTQ0MjBzIE5ldHdvcmtNYW5hZ2VyWzEzNzNdOiAgICBT
-Q1BsdWdpbi1JZnVwZG93bjogZGV2aWNlIGFkZGVkIChwYXRoOiAvc3lzL2RldmljZXMvdmlydHVh
-bC9uZXQvbG93cGFuMCwgaWZhY2U6IGxvd3BhbjApOiBubyBpZnVwZG93biBjb25maWd1cmF0aW9u
-IGZvdW5kLg0KT2N0ICAxIDE1OjEyOjIxIHlvY3RvLUhQLVByb0Jvb2stNDQyMHMga2VybmVsOiBp
-bWtsb2cgNS44LjYsIGxvZyBzb3VyY2UgPSAvcHJvYy9rbXNnIHN0YXJ0ZWQuDQoNCg0KSSBhcHBy
-ZWNpYXRlIGZvciBhbGwgeW91ciBoZWxwIHRvIGVuYWJsZSBtZSB0byByZWFjaCB0aWxsIHRoaXMg
-cG9pbnQuIFRoYW5rcyBhIGxvdCEhDQoNClJnZHMNCkFub29wDQotLS0tLU9yaWdpbmFsIE1lc3Nh
-Z2UtLS0tLQ0KRnJvbTogQWxleGFuZGVyIEFyaW5nIFttYWlsdG86YWxleC5hcmluZ0BnbWFpbC5j
-b21dDQpTZW50OiAzMCBTZXB0ZW1iZXIgMjAxNSAyMzoyNQ0KVG86IEFub29wIEthbnQNCkNjOiBs
-aW51eC13cGFuQHZnZXIua2VybmVsLm9yZzsga2FudGFub29wQHlhaG9vLmNvbQ0KU3ViamVjdDog
-UmU6IExpbnV4LVdwYW4tTmV4dDogUmVnYXJkaW5nIHVzYWdlIG9mIGZha2VsYiBkcml2ZXINCg0K
-T24gV2VkLCBTZXAgMzAsIDIwMTUgYXQgMTE6MjU6MjNBTSArMDAwMCwgQW5vb3AgS2FudCB3cm90
-ZToNCj4gRGVhciBBbGV4LA0KPg0KPiBHcmVldGluZ3MhIQ0KPg0KPiBUaGFua3MgZm9yIGRldGFp
-bGVkIGluZm9ybWF0aW9uISEgSSB3YXMgYWJsZSB0byBicmluZyB1cCBibHVldG9vdGhfbmV4dC8g
-ZmFrZWxiL2l3cGFuIGFuZCB3cGFuIHBpbmcgdG9vbCBpbiBsaW51eCBtYWNoaW5lIHdpdGggdGhl
-IGluZm9ybWF0aW9uIHByb3ZpZGVkLg0KPg0KPiBGdXJ0aGVyLCBJIGFtIHRyeWluZyB0byBjb21l
-IHVwIHdpdGggdmlydHVhbCBuZXR3b3JrIChmb3IgZWFtcGxlIHBpbmdpbmcgb2YgSVBWNiBwYWNr
-ZXRzIGJldHdlZW4gdHdvIHZpcnR1YWwgbm9kZXMtIHBhY2tldHMgZ29pbmcgdGhvcnVnaCBhbGwg
-dGhlIGxheWVzIGRvd24gdG8gUGh5IGxheWVyIGFuZCBjb21pbmcgYmFjayB0byB0b3AgbGF5ZXIp
-IHVzaW5nIGZha2VsYiBvbiBMSW51eCBtYWNoaW5lIGl0c2VsZi4NCj4NCj4gSSBoYXZlIHNlZW4g
-dGhhdCBmb3IgZWFybGllciB6aWdiZWUtbGludXggLHdlIGhhZCBkZXRhaWxlZCBzdGVwcyB0byBk
-ZW1vbnN0cmF0ZSB0aGUgZnVuY3Rpb25hbGl0eSBvZiB0aGUgc3RhY2sgd2l0aG91dCByZWFsIGhh
-cmR3YXJlLCBhcyBnaXZlbiBhdCBiZWxvdyBwYXRoIDoNCj4NCj4gaHR0cDovL2xpbnV4LXppZ2Jl
-ZS5zb3VyY2Vmb3JnZS5uZXQvY2dpLWJpbi90cmFjLmNnaS93aWtpL0dldHRpbmdTdGFydA0KPiBl
-ZC0wLjINCj4NCg0KRG9uJ3QgdXNlIHRoaXMgaW5mb3JtYXRpb24uIEl0J3Mgb3V0ZGF0ZWQgYW5k
-IGl0J3Mgbm90IGVhc3kgdG8gZGVsZXRlIHNvdXJjZWZvcmdlIHByb2plY3RzLiA6LSkNCg0KPiBE
-byB3ZSBoYXZlIHNvbWV0aGluZyBzaW1pbGFyIGZvciB0aGUgbGF0ZXN0IGJsdWV0b290aC1saW51
-eCBrZXJuZWwgd2hpY2ggY2FuIGhlbHAgbWUgdG8gc2ltdWxhdGUgV1BBTiBuZXR3b3JrIGFuZCB2
-ZXJpZnkgbWVzc2FnaW5nIGluIExJbnV4IG1hY2hpbmUgdXNpbmcgZmFrZWxiIC8gT3IgYW55IGlu
-Zm9ybWF0aW9uIGF2YWlsYWJsZSBpZiBpdCBoYXMgYmVlbiB0cmllZCBieSBzb21lb25lIGVhcmxp
-ZXI/DQo+DQo+IEN1cnJlbnRseSwgSSBhbSBhbmFseXNpbmcgc2FtZSwgc28ganVzdCB0aG91Z2h0
-IHRvIGNoZWNrIGlmIHNvbWUgaW5mb3JtYXRpb24gb24gdGhpcyBhbHJlYWR5IGV4aXN0Lg0KPg0K
-PiBOb3RlIDogU28gZmFyLCBJIGFtIGZvbGxvd2luZyB0aGUgY29tbWFuZHMgaHR0cDovL3dwYW4u
-Y2FrZWxhYi5vcmcvI19ob3dfdG9fODIxN19zIGFuZCByZWFjaGVkIHRpbGwgdGhpcyBwb2ludC4g
-Tm93LCBmdXJ0aGVyIEkgd2FudCB0byBzaW11bGF0ZSBzb21lIG5ldHdvcmsgYWN0aXZpdHkgd2l0
-aGluIExpbnV4IG1hY2hpbmUuDQo+DQoNCklmIHlvdXIgc2V0dXAgcnVucyBmaW5lIHdpdGggYmx1
-ZXRvb3RoX25leHQsIHdwYW4tdG9vbHMgYW5kIGZha2VsYiBpcyBsb2FkZWQuDQoNClRoZW4gaXdw
-YW4gZGV2IHNob3VsZCBzaG93IHR3byBpbnRlcmZhY2VzLg0KDQpPbiBlYWNoIG9mIHRoZW0geW91
-IG5lZWQgdG8gc2V0IHRoZSBwYW5faWQgZS5nLiAiMHhiZWVmIiwgYnV0IG5vdCB0aGUgZGVmYXVs
-dCBvbmUgYW5kIGNyZWF0ZSBvbmUgbG93cGFuIGludGVyZmFjZSBvbiBpdC4gZS5nLjoNCg0KZm9y
-IHBhbl9pZDoNCg0KaXdwYW4gZGV2IHdwYW4wIHNldCBwYW5faWQgMHhiZWVmDQppd3BhbiBkZXYg
-d3BhbjEgc2V0IHBhbl9pZCAweGJlZWYNCg0KZm9yIGxvd3BhbiBpbnRlcmZhY2U6DQoNCmlwIGxp
-bmsgYWRkIGxpbmsgd3BhbjAgbmFtZSBsb3dwYW4wIHR5cGUgbG93cGFuIGlwIGxpbmsgYWRkIGxp
-bmsgd3BhbjEgbmFtZSBsb3dwYW4xIHR5cGUgbG93cGFuDQoNCmludGVyZmFjZSB1cDoNCg0KaXAg
-bGluayBzZXQgd3BhbjAgdXANCmlwIGxpbmsgc2V0IHdwYW4xIHVwDQoNCmlwIGxpbmsgc2V0IGxv
-d3BhbjAgdXANCmlwIGxpbmsgc2V0IGxvd3BhbjEgdXANCg0KZ2V0dGluZyBkZWZhdWx0IGxpbmst
-bG9jYWwgYWRkcmVzczoNCg0KaXAgYQ0KDQpUaGVuIHRoZXJlIHNob3VsZCBzb21ldGhpbmcgbGlr
-ZToNCg0KICAgIGluZXQ2IGZlODA6OmIwMmY6NzZjYzoxOTIzOmRmNTkvNjQgc2NvcGUgbGluaw0K
-ICAgICAgICAgICB2YWxpZF9sZnQgZm9yZXZlciBwcmVmZXJyZWRfbGZ0IGZvcmV2ZXINCg0KZm9y
-IHRoZSBsb3dwYW4wIGludGVyZmFjZSwgdGhlIGFkZHJlc3MgZGlmZmVycyBiZWNhdXNlIGl0J3Mg
-YSByYW5kb20gZ2VuZXJhdGVkIG9uZS4NCg0KcnVuIHBpbmc2DQoNCnBpbmc2IC1JIGxvd3BhbjEg
-ZmU4MDo6YjAyZjo3NmNjOjE5MjM6ZGY1OQ0KDQoNCkkgc3VwcG9zZSBoZXJlIHlvdXIgaW50ZXJm
-YWNlcyBhcmUgbmFtZWQgIndwYW4wIiBhbmQgIndwYW4xIi4NClRoZSAiZmU4MDo6YjAyZjo3NmNj
-OjE5MjM6ZGY1OSIgaXMgdGhlIGFkZHJlc3Mgb2YgbG93cGFuMCBhbmQgdGhpcyBpcyB3aHkgd2Ug
-dXNlIHRoZSAibG93cGFuMSIgaW50ZXJmYWNlIGJ5IGNhbGxpbmc6ICJwaW5nNiAtSSBsb3dwYW4x
-Ii4NCg0KDQpUaGlzIHNob3VsZCBiZSBlbm91Z2ggdG8gcnVuIHNvbWUgcGluZyBiZXR3ZWVuIHRo
-ZSB0d28gdmlydHVhbCBwaHkncy4NCg0KLSBBbGV4DQpMJlQgVGVjaG5vbG9neSBTZXJ2aWNlcyBM
-dGQNCg0Kd3d3LkxudFRlY2hzZXJ2aWNlcy5jb208aHR0cDovL3d3dy5sbnR0ZWNoc2VydmljZXMu
-Y29tLz4NCg0KVGhpcyBFbWFpbCBtYXkgY29udGFpbiBjb25maWRlbnRpYWwgb3IgcHJpdmlsZWdl
-ZCBpbmZvcm1hdGlvbiBmb3IgdGhlIGludGVuZGVkIHJlY2lwaWVudCAocykuIElmIHlvdSBhcmUg
-bm90IHRoZSBpbnRlbmRlZCByZWNpcGllbnQsIHBsZWFzZSBkbyBub3QgdXNlIG9yIGRpc3NlbWlu
-YXRlIHRoZSBpbmZvcm1hdGlvbiwgbm90aWZ5IHRoZSBzZW5kZXIgYW5kIGRlbGV0ZSBpdCBmcm9t
-IHlvdXIgc3lzdGVtLg0K
+On Thu, Oct 01, 2015 at 10:15:40AM +0000, Anoop Kant wrote:
+> Thanks Alex for the information!!
+> 
+> I executed the steps as provided in previous mail. My system gets freeze after enabling lowpan0 interface.
+> i.e. after executing command  // ip link set lowpan0 up //
+> 
+
+mhhh, kernel freeze should never happen and with the below details I
+can't say why you get a freeze.
+
+> Every time, I have to reboot my system to get it up back.
+> 
+> From Syslog, I see below : Am I missing something ? Any clue on probable reason of this issue ?
+> 
+> 
+> Oct  1 14:57:49 yocto-HP-ProBook-4420s AptDaemon: INFO: Quitting due to inactivity Oct  1 14:57:49 yocto-HP-ProBook-4420s AptDaemon: INFO: Quitting was requested Oct  1 15:08:36 yocto-HP-ProBook-4420s kernel: [ 1137.587417] ieee802154fakelb ieee802154fakelb: added ieee802154 hardware
+> Oct  1 15:08:36 yocto-HP-ProBook-4420s NetworkManager[1373]:    SCPlugin-Ifupdown: devices added (path: /sys/devices/platform/ieee802154fakelb/ieee802154/phy1/net/wpan1, iface: wpan1)
+> Oct  1 15:08:36 yocto-HP-ProBook-4420s NetworkManager[1373]:    SCPlugin-Ifupdown: device added (path: /sys/devices/platform/ieee802154fakelb/ieee802154/phy1/net/wpan1, iface: wpan1): no ifupdown configuration found.
+> Oct  1 15:08:36 yocto-HP-ProBook-4420s NetworkManager[1373]:    SCPlugin-Ifupdown: devices added (path: /sys/devices/platform/ieee802154fakelb/ieee802154/phy0/net/wpan0, iface: wpan0)
+> 
+> 
+> Oct  1 15:08:36 yocto-HP-ProBook-4420s NetworkManager[1373]:    SCPlugin-Ifupdown: device added (path: /sys/devices/platform/ieee802154fakelb/ieee802154/phy0/net/wpan0, iface: wpan0): no ifupdown configuration found. =====> Erros in logs
+> 
+> 
+> Oct  1 15:10:06 yocto-HP-ProBook-4420s NetworkManager[1373]:    SCPlugin-Ifupdown: devices added (path: /sys/devices/virtual/net/lowpan0, iface: lowpan0)
+> Oct  1 15:10:06 yocto-HP-ProBook-4420s NetworkManager[1373]:    SCPlugin-Ifupdown: device added (path: /sys/devices/virtual/net/lowpan0, iface: lowpan0): no ifupdown configuration found.
+> Oct  1 15:12:21 yocto-HP-ProBook-4420s kernel: imklog 5.8.6, log source = /proc/kmsg started.
+> 
+
+Can you please try to turn others networking managers for configurations
+off? I will put a test with fakelb and NetworkManager on my todo list
+and will check if I get a kernel freeze too.
+
+- Alex
