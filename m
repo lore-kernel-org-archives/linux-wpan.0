@@ -1,15 +1,13 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f176.google.com ([209.85.212.176]:38428 "EHLO
-	mail-wi0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751016AbbJBHZC (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Fri, 2 Oct 2015 03:25:02 -0400
-Received: by wiclk2 with SMTP id lk2so19093101wic.1
-        for <linux-wpan@vger.kernel.org>; Fri, 02 Oct 2015 00:25:01 -0700 (PDT)
-Date: Fri, 2 Oct 2015 09:24:58 +0200
-From: Alexander Aring <alex.aring@gmail.com>
-Subject: Re: Linux-Bluetoothnext: Ping6 execution for virtual Phy : System
+Received: from mailout1.ltindia.com ([203.199.60.132]:6943 "EHLO
+	mailout1.ltindia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751830AbbJLKr5 (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Mon, 12 Oct 2015 06:47:57 -0400
+From: Anoop Kant <Anoop.Kant@LNTTECHSERVICES.COM>
+Subject: RE: Linux-Bluetoothnext: Ping6 execution for virtual Phy : System
  freezes
-Message-ID: <20151002072453.GB565@omega>
+Date: Mon, 12 Oct 2015 10:47:32 +0000
+Message-ID: <51C7DE700DAED543997957503C74C84501077E08@POCITMSEXMB05.LntUniverse.com>
 References: <51C7DE700DAED543997957503C74C84501074D1F@POCITMSEXMB05.LntUniverse.com>
  <20151001102815.GA2034@omega>
  <51C7DE700DAED543997957503C74C84501074D8A@POCITMSEXMB05.LntUniverse.com>
@@ -19,25 +17,41 @@ References: <51C7DE700DAED543997957503C74C84501074D1F@POCITMSEXMB05.LntUniverse.
  <51C7DE700DAED543997957503C74C84501074E42@POCITMSEXMB05.LntUniverse.com>
  <20151001142513.GA19393@omega>
  <51C7DE700DAED543997957503C74C84501074FF8@POCITMSEXMB05.LntUniverse.com>
+ <20151002072453.GB565@omega>
+In-Reply-To: <20151002072453.GB565@omega>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <51C7DE700DAED543997957503C74C84501074FF8@POCITMSEXMB05.LntUniverse.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Anoop Kant <Anoop.Kant@LNTTECHSERVICES.COM>
-Cc: linux-wpan@vger.kernel.org
+To: Alexander Aring <alex.aring@gmail.com>
+Cc: "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>
 
-On Fri, Oct 02, 2015 at 02:33:25AM +0000, Anoop Kant wrote:
-> Dear Alex,
-> 
-> Can you please tell me git path from where I can try stable version of Bluetooth next on my system and check the behavior?
-> 
-
-https://git.kernel.org/cgit/linux/kernel/git/stable/linux-stable.git/
-
-you can put that in your "git remotes", see [0].
-
-- Alex
-
-[0] https://git-scm.com/book/en/v2/Git-Basics-Working-with-Remotes
+VGhhbmtzIEFsZXguDQpXaXRoIHN0YWJsZSB2ZXJzaW9uLCBJIGRpZCBub3QgZmFjZSBhbnkgaXNz
+dWUgaW4gY29uZmlndXJhdGlvbiBvZiA2bG93cGFuIGludGVyZmFjZXMgZm9yIGZha2UgZGV2aWNl
+cyB3aGVuIHVzZWQgbGludXgtc3RhYmxlIC4NCiBQaW5nNiBhbHNvIHdvcmtlZCBmaW5lIGJldHdl
+ZW4gdmlydHVhbCBkZXZpY2VzLg0KDQpodHRwczovL2dpdC5rZXJuZWwub3JnL2NnaXQvbGludXgv
+a2VybmVsL2dpdC9zdGFibGUvbGludXgtc3RhYmxlLmdpdC8NCg0KUmVnYXJkcywNCkFub29wDQoN
+Ci0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQpGcm9tOiBsaW51eC13cGFuLW93bmVyQHZnZXIu
+a2VybmVsLm9yZyBbbWFpbHRvOmxpbnV4LXdwYW4tb3duZXJAdmdlci5rZXJuZWwub3JnXSBPbiBC
+ZWhhbGYgT2YgQWxleGFuZGVyIEFyaW5nDQpTZW50OiAwMiBPY3RvYmVyIDIwMTUgMTI6NTUNClRv
+OiBBbm9vcCBLYW50DQpDYzogbGludXgtd3BhbkB2Z2VyLmtlcm5lbC5vcmcNClN1YmplY3Q6IFJl
+OiBMaW51eC1CbHVldG9vdGhuZXh0OiBQaW5nNiBleGVjdXRpb24gZm9yIHZpcnR1YWwgUGh5IDog
+U3lzdGVtIGZyZWV6ZXMNCg0KT24gRnJpLCBPY3QgMDIsIDIwMTUgYXQgMDI6MzM6MjVBTSArMDAw
+MCwgQW5vb3AgS2FudCB3cm90ZToNCj4gRGVhciBBbGV4LA0KPg0KPiBDYW4geW91IHBsZWFzZSB0
+ZWxsIG1lIGdpdCBwYXRoIGZyb20gd2hlcmUgSSBjYW4gdHJ5IHN0YWJsZSB2ZXJzaW9uIG9mIEJs
+dWV0b290aCBuZXh0IG9uIG15IHN5c3RlbSBhbmQgY2hlY2sgdGhlIGJlaGF2aW9yPw0KPg0KDQpo
+dHRwczovL2dpdC5rZXJuZWwub3JnL2NnaXQvbGludXgva2VybmVsL2dpdC9zdGFibGUvbGludXgt
+c3RhYmxlLmdpdC8NCg0KeW91IGNhbiBwdXQgdGhhdCBpbiB5b3VyICJnaXQgcmVtb3RlcyIsIHNl
+ZSBbMF0uDQoNCi0gQWxleA0KDQpbMF0gaHR0cHM6Ly9naXQtc2NtLmNvbS9ib29rL2VuL3YyL0dp
+dC1CYXNpY3MtV29ya2luZy13aXRoLVJlbW90ZXMNCi0tDQpUbyB1bnN1YnNjcmliZSBmcm9tIHRo
+aXMgbGlzdDogc2VuZCB0aGUgbGluZSAidW5zdWJzY3JpYmUgbGludXgtd3BhbiIgaW4gdGhlIGJv
+ZHkgb2YgYSBtZXNzYWdlIHRvIG1ham9yZG9tb0B2Z2VyLmtlcm5lbC5vcmcgTW9yZSBtYWpvcmRv
+bW8gaW5mbyBhdCAgaHR0cDovL3ZnZXIua2VybmVsLm9yZy9tYWpvcmRvbW8taW5mby5odG1sDQpM
+JlQgVGVjaG5vbG9neSBTZXJ2aWNlcyBMdGQNCg0Kd3d3LkxudFRlY2hzZXJ2aWNlcy5jb208aHR0
+cDovL3d3dy5sbnR0ZWNoc2VydmljZXMuY29tLz4NCg0KVGhpcyBFbWFpbCBtYXkgY29udGFpbiBj
+b25maWRlbnRpYWwgb3IgcHJpdmlsZWdlZCBpbmZvcm1hdGlvbiBmb3IgdGhlIGludGVuZGVkIHJl
+Y2lwaWVudCAocykuIElmIHlvdSBhcmUgbm90IHRoZSBpbnRlbmRlZCByZWNpcGllbnQsIHBsZWFz
+ZSBkbyBub3QgdXNlIG9yIGRpc3NlbWluYXRlIHRoZSBpbmZvcm1hdGlvbiwgbm90aWZ5IHRoZSBz
+ZW5kZXIgYW5kIGRlbGV0ZSBpdCBmcm9tIHlvdXIgc3lzdGVtLg0K
