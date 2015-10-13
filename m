@@ -1,114 +1,147 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f179.google.com ([209.85.212.179]:38632 "EHLO
-	mail-wi0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752811AbbJMLng (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Tue, 13 Oct 2015 07:43:36 -0400
+Received: from mail-wi0-f175.google.com ([209.85.212.175]:34443 "EHLO
+	mail-wi0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932243AbbJMLnh (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Tue, 13 Oct 2015 07:43:37 -0400
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH bluetooth-next 1/6] mac802154: llsec: use kzfree
-Date: Tue, 13 Oct 2015 13:42:54 +0200
-Message-Id: <1444736579-27826-1-git-send-email-alex.aring@gmail.com>
+Subject: [PATCH bluetooth-next 2/6] bluetooth: 6lowpan: use lowpan dispatch helpers
+Date: Tue, 13 Oct 2015 13:42:55 +0200
+Message-Id: <1444736579-27826-2-git-send-email-alex.aring@gmail.com>
+In-Reply-To: <1444736579-27826-1-git-send-email-alex.aring@gmail.com>
+References: <1444736579-27826-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
 Cc: kernel@pengutronix.de, linux-bluetooth@vger.kernel.org, jukka.rissanen@linux.intel.com, Alexander Aring <alex.aring@gmail.com>
 
-This patch will use kzfree instead kfree for security related
-information which can be offered by acccident.
+This patch adds a check if the dataroom of skb contains a dispatch value
+by checking if skb->len != 0. This patch also change the dispatch
+evaluation by the recently introduced helpers for checking the common
+6LoWPAN dispatch values for IPv6 and IPHC header.
+
+There was also a forgotten else branch which should drop the packet if
+no matching dispatch is available.
 
 Signed-off-by: Alexander Aring <alex.aring@gmail.com>
 ---
- net/mac802154/llsec.c | 20 ++++++++++----------
- 1 file changed, 10 insertions(+), 10 deletions(-)
+Jukka,
 
-diff --git a/net/mac802154/llsec.c b/net/mac802154/llsec.c
-index 7799d3c..a13d02b 100644
---- a/net/mac802154/llsec.c
-+++ b/net/mac802154/llsec.c
-@@ -55,7 +55,7 @@ void mac802154_llsec_destroy(struct mac802154_llsec *sec)
+there seems something wrong or I don't get it. There is a skb_share_check but
+inside the lowpan_is_iphc branch there is a skb_clone again. From my
+understanding skb_share_check will check if the skb (structure) is used
+somewhere else by looking at some refcounts, if yes then clone it.
+
+So after that the skb is always a clone, which means the skb (structure only)
+is not used somewhere else. Also IPHC will manipulate the skb (buffer) as well,
+so we need somewhere to be sure that the buffer isn't shared. There exists a
+function "skb_unshare" which is identically like skb_share_check just for the
+buffer.
+
+It could be that you ensure that the buffer is not shared somewhere else. Anyway
+I think the solution with checking the "refcounts" is a very low cost operation.
+
+btw:
+In case of IPv6 dispatch this is something else, because we move pointers there
+only (adjust skb->headroom with skb->data), not manipulate the buffer, so clone
+is enough there.
+
+ net/bluetooth/6lowpan.c | 57 +++++++++++++++++++++++--------------------------
+ 1 file changed, 27 insertions(+), 30 deletions(-)
+
+diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+index db73b8a..665bf38 100644
+--- a/net/bluetooth/6lowpan.c
++++ b/net/bluetooth/6lowpan.c
+@@ -314,15 +314,17 @@ static int recv_pkt(struct sk_buff *skb, struct net_device *dev,
+ 	if (!netif_running(dev))
+ 		goto drop;
  
- 		msl = container_of(sl, struct mac802154_llsec_seclevel, level);
- 		list_del(&sl->list);
--		kfree(msl);
-+		kzfree(msl);
+-	if (dev->type != ARPHRD_6LOWPAN)
++	if (dev->type != ARPHRD_6LOWPAN || !skb->len)
+ 		goto drop;
+ 
++	skb_reset_network_header(skb);
++
+ 	skb = skb_share_check(skb, GFP_ATOMIC);
+ 	if (!skb)
+ 		goto drop;
+ 
+ 	/* check that it's our buffer */
+-	if (skb->data[0] == LOWPAN_DISPATCH_IPV6) {
++	if (lowpan_is_ipv6(*skb_network_header(skb))) {
+ 		/* Copy the packet so that the IPv6 header is
+ 		 * properly aligned.
+ 		 */
+@@ -334,7 +336,6 @@ static int recv_pkt(struct sk_buff *skb, struct net_device *dev,
+ 		local_skb->protocol = htons(ETH_P_IPV6);
+ 		local_skb->pkt_type = PACKET_HOST;
+ 
+-		skb_reset_network_header(local_skb);
+ 		skb_set_transport_header(local_skb, sizeof(struct ipv6hdr));
+ 
+ 		if (give_skb_to_upper(local_skb, dev) != NET_RX_SUCCESS) {
+@@ -347,38 +348,34 @@ static int recv_pkt(struct sk_buff *skb, struct net_device *dev,
+ 
+ 		consume_skb(local_skb);
+ 		consume_skb(skb);
+-	} else {
+-		switch (skb->data[0] & 0xe0) {
+-		case LOWPAN_DISPATCH_IPHC:	/* ipv6 datagram */
+-			local_skb = skb_clone(skb, GFP_ATOMIC);
+-			if (!local_skb)
+-				goto drop;
++	} else if (lowpan_is_iphc(*skb_network_header(skb))) {
++		local_skb = skb_clone(skb, GFP_ATOMIC);
++		if (!local_skb)
++			goto drop;
+ 
+-			ret = iphc_decompress(local_skb, dev, chan);
+-			if (ret < 0) {
+-				kfree_skb(local_skb);
+-				goto drop;
+-			}
++		ret = iphc_decompress(local_skb, dev, chan);
++		if (ret < 0) {
++			kfree_skb(local_skb);
++			goto drop;
++		}
+ 
+-			local_skb->protocol = htons(ETH_P_IPV6);
+-			local_skb->pkt_type = PACKET_HOST;
+-			local_skb->dev = dev;
++		local_skb->protocol = htons(ETH_P_IPV6);
++		local_skb->pkt_type = PACKET_HOST;
++		local_skb->dev = dev;
+ 
+-			if (give_skb_to_upper(local_skb, dev)
+-					!= NET_RX_SUCCESS) {
+-				kfree_skb(local_skb);
+-				goto drop;
+-			}
++		if (give_skb_to_upper(local_skb, dev)
++				!= NET_RX_SUCCESS) {
++			kfree_skb(local_skb);
++			goto drop;
++		}
+ 
+-			dev->stats.rx_bytes += skb->len;
+-			dev->stats.rx_packets++;
++		dev->stats.rx_bytes += skb->len;
++		dev->stats.rx_packets++;
+ 
+-			consume_skb(local_skb);
+-			consume_skb(skb);
+-			break;
+-		default:
+-			break;
+-		}
++		consume_skb(local_skb);
++		consume_skb(skb);
++	} else {
++		goto drop;
  	}
  
- 	list_for_each_entry_safe(dev, dn, &sec->table.devices, list) {
-@@ -72,7 +72,7 @@ void mac802154_llsec_destroy(struct mac802154_llsec *sec)
- 		mkey = container_of(key->key, struct mac802154_llsec_key, key);
- 		list_del(&key->list);
- 		llsec_key_put(mkey);
--		kfree(key);
-+		kzfree(key);
- 	}
- }
- 
-@@ -161,7 +161,7 @@ err_tfm:
- 		if (key->tfm[i])
- 			crypto_free_aead(key->tfm[i]);
- 
--	kfree(key);
-+	kzfree(key);
- 	return NULL;
- }
- 
-@@ -176,7 +176,7 @@ static void llsec_key_release(struct kref *ref)
- 		crypto_free_aead(key->tfm[i]);
- 
- 	crypto_free_blkcipher(key->tfm0);
--	kfree(key);
-+	kzfree(key);
- }
- 
- static struct mac802154_llsec_key*
-@@ -267,7 +267,7 @@ int mac802154_llsec_key_add(struct mac802154_llsec *sec,
- 	return 0;
- 
- fail:
--	kfree(new);
-+	kzfree(new);
- 	return -ENOMEM;
- }
- 
-@@ -347,10 +347,10 @@ static void llsec_dev_free(struct mac802154_llsec_device *dev)
- 				      devkey);
- 
- 		list_del(&pos->list);
--		kfree(devkey);
-+		kzfree(devkey);
- 	}
- 
--	kfree(dev);
-+	kzfree(dev);
- }
- 
- int mac802154_llsec_dev_add(struct mac802154_llsec *sec,
-@@ -681,7 +681,7 @@ llsec_do_encrypt_auth(struct sk_buff *skb, const struct mac802154_llsec *sec,
- 
- 	rc = crypto_aead_encrypt(req);
- 
--	kfree(req);
-+	kzfree(req);
- 
- 	return rc;
- }
-@@ -881,7 +881,7 @@ llsec_do_decrypt_auth(struct sk_buff *skb, const struct mac802154_llsec *sec,
- 
- 	rc = crypto_aead_decrypt(req);
- 
--	kfree(req);
-+	kzfree(req);
- 	skb_trim(skb, skb->len - authlen);
- 
- 	return rc;
-@@ -921,7 +921,7 @@ llsec_update_devkey_record(struct mac802154_llsec_device *dev,
- 		if (!devkey)
- 			list_add_rcu(&next->devkey.list, &dev->dev.keys);
- 		else
--			kfree(next);
-+			kzfree(next);
- 
- 		spin_unlock_bh(&dev->lock);
- 	}
+ 	return NET_RX_SUCCESS;
 -- 
 2.6.1
 
