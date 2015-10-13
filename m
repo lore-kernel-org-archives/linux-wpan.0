@@ -1,29 +1,46 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f174.google.com ([209.85.212.174]:34652 "EHLO
-	mail-wi0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752024AbbJLQQ1 (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Mon, 12 Oct 2015 12:16:27 -0400
-Date: Mon, 12 Oct 2015 18:15:54 +0200
-From: Alexander Aring <alex.aring@gmail.com>
-Subject: Re: [RFC v2 0/4] Adding stateful compression to IPHC
-Message-ID: <20151012161550.GA571@omega>
+Received: from mail.nordicsemi.no ([194.19.86.146]:27506 "EHLO
+	ironport01.nordicsemi.no" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752359AbbJMIqk (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Tue, 13 Oct 2015 04:46:40 -0400
+From: "Duda, Lukasz" <Lukasz.Duda@nordicsemi.no>
+Subject: RE: [RFC v2 0/4] Adding stateful compression to IPHC
+Date: Tue, 13 Oct 2015 08:36:35 +0000
+Message-ID: <AB80DA35A7B64E4E98291794926897D9F4B48ADE@MBX03.nvlsi.no>
 References: <1436788233-13960-1-git-send-email-lukasz.duda@nordicsemi.no>
+ <20151012161550.GA571@omega>
+In-Reply-To: <20151012161550.GA571@omega>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1436788233-13960-1-git-send-email-lukasz.duda@nordicsemi.no>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Lukasz Duda <lukasz.duda@nordicsemi.no>
-Cc: linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org, martin.gergeleit@hs-rm.de
+To: Alexander Aring <alex.aring@gmail.com>
+Cc: "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>, "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, "martin.gergeleit@hs-rm.de" <martin.gergeleit@hs-rm.de>, "Bakke, Glenn Ruben" <Glenn.Ruben.Bakke@nordicsemi.no>
 
-Hi Lukasz,
-
-do you still working on sateful compression, otherwise I would try to
-implement this stuff based on your work.
-
-When I have something I will keep you in cc for reviewing process.
-
-Thanks.
-
-- Alex
+SGVsbG8gQWxleCwNCg0KRmlyc3Qgb2YgYWxsLCBJIHdhbnQgdG8gdGhhbmsgeW91IGZvciBjaGFu
+Z2VzIHRoYXQgeW91IGhhdmUgZG9uZSBvbg0KNkxvV1BBTiBhcmNoaXRlY3R1cmUuDQoNCkR1ZSB0
+byBhIGxhcmdlIHdvcmtsb2FkIHdlIGhhdmUgbm90IGJlZW4gYWJsZSB0byBkbyBmdXJ0aGVyIHBh
+dGNoZXMNCnRvIHRoZSBTdGF0ZWZ1bCBDb21wcmVzc2lvbiBSRkMuDQoNCldlIHdvdWxkIGJlIG1v
+cmUgdGhhbiBoYXBweSBpZiB5b3Ugd2FudCB0byBjb250aW51ZSBvbiB3aGF0IHdlIHN0YXJ0ZWQu
+DQpXaGlsZSB3ZSBhcmUgYnVzeSBpbiBuZXh0IGZldyB3ZWVrcyB3aXRoIG90aGVyIHByaW9yaXRp
+ZXMsIHdlIHNob3VsZCBzdGlsbA0KYmUgYWJsZSB0byBtYWtlIHRpbWUgZm9yIHJldmlld3MgaWYg
+eW91IHdhbnQgdG8gdGFrZSBvdmVyIHdoZXJlIHdlIGxlZnQuDQoNCk9uZSBub3RlIEkgd291bGQg
+bGlrZSB0byBhZGQgaXMgZnJvbSB0aGUgbGF0ZXN0IEJUTEUgZHJhZnQ6DQooaHR0cHM6Ly90b29s
+cy5pZXRmLm9yZy9odG1sL2RyYWZ0LWlldGYtNmxvLWJ0bGUtMTcjc2VjdGlvbi0zLjIuNCkuDQpU
+aGlzIGRlZmluZXMgc29tZSBkaWZmZXJlbnQgKG5vbiBnZW5lcmljKSBhcHByb2FjaCB3aXRoIHJl
+c3BlY3QgdG8gY29tcHJlc3Npb24NCm9mIElJRCwgdGhhdCBjb21lcyBmcm9tIEFSTyBtZXNzYWdl
+cyAobm90IGltcGxlbWVudGVkIGluIExpbnV4KSBpbnN0ZWFkIG9mDQpNQUMgbGF5ZXIsIHdoaWNo
+IGlzIG5vdCBoYW5kbGVkIGJ5IHRoZSBpbml0aWFsIFN0YXRlZnVsIENvbXByZXNzaW9uIFJGQyB3
+ZQ0KcHJvcG9zZWQuDQoNCkJlc3QgcmVnYXJkcywNCsWBdWthc3oNCg0KPiAtLS0tLU9yaWdpbmFs
+IE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBBbGV4YW5kZXIgQXJpbmcgW21haWx0bzphbGV4LmFyaW5n
+QGdtYWlsLmNvbV0NCj4gU2VudDogTW9uZGF5LCBPY3RvYmVyIDEyLCAyMDE1IDE4OjE2DQo+IFRv
+OiBEdWRhLCBMdWthc3oNCj4gQ2M6IGxpbnV4LXdwYW5Admdlci5rZXJuZWwub3JnOyBsaW51eC1i
+bHVldG9vdGhAdmdlci5rZXJuZWwub3JnOw0KPiBtYXJ0aW4uZ2VyZ2VsZWl0QGhzLXJtLmRlDQo+
+IFN1YmplY3Q6IFJlOiBbUkZDIHYyIDAvNF0gQWRkaW5nIHN0YXRlZnVsIGNvbXByZXNzaW9uIHRv
+IElQSEMNCj4gDQo+IEhpIEx1a2FzeiwNCj4gDQo+IGRvIHlvdSBzdGlsbCB3b3JraW5nIG9uIHNh
+dGVmdWwgY29tcHJlc3Npb24sIG90aGVyd2lzZSBJIHdvdWxkIHRyeSB0bw0KPiBpbXBsZW1lbnQg
+dGhpcyBzdHVmZiBiYXNlZCBvbiB5b3VyIHdvcmsuDQo+IA0KPiBXaGVuIEkgaGF2ZSBzb21ldGhp
+bmcgSSB3aWxsIGtlZXAgeW91IGluIGNjIGZvciByZXZpZXdpbmcgcHJvY2Vzcy4NCj4gDQo+IFRo
+YW5rcy4NCj4gDQo+IC0gQWxleA0K
