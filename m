@@ -1,13 +1,13 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:55293 "EHLO mga02.intel.com"
+Received: from mga03.intel.com ([134.134.136.65]:6929 "EHLO mga03.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752602AbbJMNDa (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-	Tue, 13 Oct 2015 09:03:30 -0400
-Message-ID: <1444741363.7329.104.camel@linux.intel.com>
+	id S1751510AbbJPMib (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+	Fri, 16 Oct 2015 08:38:31 -0400
+Message-ID: <1444999102.3652.8.camel@linux.intel.com>
 Subject: Re: [PATCH bluetooth-next 2/6] bluetooth: 6lowpan: use lowpan
  dispatch helpers
 From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-Date: Tue, 13 Oct 2015 16:02:43 +0300
+Date: Fri, 16 Oct 2015 15:38:22 +0300
 In-Reply-To: <1444736579-27826-2-git-send-email-alex.aring@gmail.com>
 References: <1444736579-27826-1-git-send-email-alex.aring@gmail.com>
 	 <1444736579-27826-2-git-send-email-alex.aring@gmail.com>
@@ -20,6 +20,19 @@ To: Alexander Aring <alex.aring@gmail.com>
 Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de, linux-bluetooth@vger.kernel.org
 
 Hi Alex,
+
+the fixes in this patchset are fine and I verified with real hw that
+everything works ok. The fix in this patch did not fix the skb poison
+overwritten problem I am seeing and that needs more investigation.
+
+
+Acked-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+
+
+Cheers,
+Jukka
+
+
 
 On ti, 2015-10-13 at 13:42 +0200, Alexander Aring wrote:
 > This patch adds a check if the dataroom of skb contains a dispatch value
@@ -47,10 +60,6 @@ On ti, 2015-10-13 at 13:42 +0200, Alexander Aring wrote:
 > 
 > It could be that you ensure that the buffer is not shared somewhere else. Anyway
 > I think the solution with checking the "refcounts" is a very low cost operation.
-
-I just got a kernel log http://ix.io/lng about some skb issue so this
-could be related, I am investigating it.
-
 > 
 > btw:
 > In case of IPv6 dispatch this is something else, because we move pointers there
@@ -154,9 +163,5 @@ could be related, I am investigating it.
 >  	}
 >  
 >  	return NET_RX_SUCCESS;
-
-
-Cheers,
-Jukka
 
 
