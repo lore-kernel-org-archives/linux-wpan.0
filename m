@@ -1,104 +1,53 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wi0-f173.google.com ([209.85.212.173]:36417 "EHLO
-	mail-wi0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751982AbbJTGcL (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Tue, 20 Oct 2015 02:32:11 -0400
-From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH bluetooth-next 6/6] 6lowpan: put mcast compression in an own function
-Date: Tue, 20 Oct 2015 08:31:26 +0200
-Message-Id: <1445322686-2952-7-git-send-email-alex.aring@gmail.com>
+Received: from senator.holtmann.net ([87.106.208.187]:34050 "EHLO
+	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752845AbbJTIGM convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Tue, 20 Oct 2015 04:06:12 -0400
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.0 \(3094\))
+Subject: Re: [PATCH bluetooth-next 0/6] 6lowpan: iphc defines and rework tc and flow label handling
+From: Marcel Holtmann <marcel@holtmann.org>
 In-Reply-To: <1445322686-2952-1-git-send-email-alex.aring@gmail.com>
+Date: Tue, 20 Oct 2015 10:06:09 +0200
+Content-Transfer-Encoding: 8BIT
+Message-Id: <49979CD2-52AD-4767-BC4D-A310386D3C2F@holtmann.org>
 References: <1445322686-2952-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org
-Cc: kernel@pengutronix.de, linux-bluetooth@vger.kernel.org, jukka.rissanen@linux.intel.com, Alexander Aring <alex.aring@gmail.com>
+To: Alexander Aring <alex.aring@gmail.com>
+Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de, linux-bluetooth@vger.kernel.org, jukka.rissanen@linux.intel.com
 
-This patch moves the mcast compression algorithmn to an own function
-like all other compression/decompression methods in iphc.
+Hi Alex,
 
-Signed-off-by: Alexander Aring <alex.aring@gmail.com>
----
- net/6lowpan/iphc.c | 59 +++++++++++++++++++++++++++++-------------------------
- 1 file changed, 32 insertions(+), 27 deletions(-)
+> this patch series based on my previous series "[PATCH bluetooth-next 1/6]
+> mac802154: llsec: use kzfree" and contains changes for iphc defines and
+> reworking the tc/flow label handling.
+> 
+> I tested the tc/flow label handling with fakelb and wireshark. So it should
+> be wrong, when wireshark is wrong also. I hope wireshark has some correct
+> mechanism to handle it. I used "wireshark 1.12.7".
+> 
+> - Alex
+> 
+> Alexander Aring (6):
+>  6lowpan: nhc: move iphc manipulation out of nhc
+>  6lowpan: move IPHC functionality defines
+>  6lowpan: remove lowpan_is_addr_broadcast
+>  6lowpan: iphc: change define values
+>  6lowpan: rework tc and flow label handling
+>  6lowpan: put mcast compression in an own function
+> 
+> include/net/6lowpan.h       | 133 -----------
+> net/6lowpan/iphc.c          | 565 +++++++++++++++++++++++++++++++-------------
+> net/6lowpan/nhc.c           |  13 +-
+> net/6lowpan/nhc.h           |   9 +-
+> net/6lowpan/nhc_udp.c       |  22 +-
+> net/ieee802154/6lowpan/tx.c |   5 +-
+> 6 files changed, 430 insertions(+), 317 deletions(-)
 
-diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
-index e6cdfc9..346b5c1 100644
---- a/net/6lowpan/iphc.c
-+++ b/net/6lowpan/iphc.c
-@@ -708,6 +708,37 @@ static u8 lowpan_iphc_tf_compress(u8 **hc_ptr, const struct ipv6hdr *hdr)
- 	return val;
- }
- 
-+static u8 lowpan_iphc_mcast_addr_compress(u8 **hc_ptr,
-+					  const struct in6_addr *ipaddr)
-+{
-+	u8 val;
-+
-+	if (lowpan_is_mcast_addr_compressable8(ipaddr)) {
-+		pr_debug("compressed to 1 octet\n");
-+		/* use last byte */
-+		lowpan_push_hc_data(hc_ptr, &ipaddr->s6_addr[15], 1);
-+		val = LOWPAN_IPHC_DAM_11;
-+	} else if (lowpan_is_mcast_addr_compressable32(ipaddr)) {
-+		pr_debug("compressed to 4 octets\n");
-+		/* second byte + the last three */
-+		lowpan_push_hc_data(hc_ptr, &ipaddr->s6_addr[1], 1);
-+		lowpan_push_hc_data(hc_ptr, &ipaddr->s6_addr[13], 3);
-+		val = LOWPAN_IPHC_DAM_10;
-+	} else if (lowpan_is_mcast_addr_compressable48(ipaddr)) {
-+		pr_debug("compressed to 6 octets\n");
-+		/* second byte + the last five */
-+		lowpan_push_hc_data(hc_ptr, &ipaddr->s6_addr[1], 1);
-+		lowpan_push_hc_data(hc_ptr, &ipaddr->s6_addr[11], 5);
-+		val = LOWPAN_IPHC_DAM_01;
-+	} else {
-+		pr_debug("using full address\n");
-+		lowpan_push_hc_data(hc_ptr, ipaddr->s6_addr, 16);
-+		val = LOWPAN_IPHC_DAM_00;
-+	}
-+
-+	return val;
-+}
-+
- int lowpan_header_compress(struct sk_buff *skb, const struct net_device *dev,
- 			   const void *daddr, const void *saddr)
- {
-@@ -804,33 +835,7 @@ int lowpan_header_compress(struct sk_buff *skb, const struct net_device *dev,
- 	if (addr_type & IPV6_ADDR_MULTICAST) {
- 		pr_debug("destination address is multicast: ");
- 		iphc1 |= LOWPAN_IPHC_M;
--		if (lowpan_is_mcast_addr_compressable8(&hdr->daddr)) {
--			pr_debug("compressed to 1 octet\n");
--			iphc1 |= LOWPAN_IPHC_DAM_11;
--			/* use last byte */
--			lowpan_push_hc_data(&hc_ptr,
--					    &hdr->daddr.s6_addr[15], 1);
--		} else if (lowpan_is_mcast_addr_compressable32(&hdr->daddr)) {
--			pr_debug("compressed to 4 octets\n");
--			iphc1 |= LOWPAN_IPHC_DAM_10;
--			/* second byte + the last three */
--			lowpan_push_hc_data(&hc_ptr,
--					    &hdr->daddr.s6_addr[1], 1);
--			lowpan_push_hc_data(&hc_ptr,
--					    &hdr->daddr.s6_addr[13], 3);
--		} else if (lowpan_is_mcast_addr_compressable48(&hdr->daddr)) {
--			pr_debug("compressed to 6 octets\n");
--			iphc1 |= LOWPAN_IPHC_DAM_01;
--			/* second byte + the last five */
--			lowpan_push_hc_data(&hc_ptr,
--					    &hdr->daddr.s6_addr[1], 1);
--			lowpan_push_hc_data(&hc_ptr,
--					    &hdr->daddr.s6_addr[11], 5);
--		} else {
--			pr_debug("using full address\n");
--			iphc1 |= LOWPAN_IPHC_DAM_00;
--			lowpan_push_hc_data(&hc_ptr, hdr->daddr.s6_addr, 16);
--		}
-+		iphc1 |= lowpan_iphc_mcast_addr_compress(&hc_ptr, &hdr->daddr);
- 	} else {
- 		if (addr_type & IPV6_ADDR_LINKLOCAL) {
- 			/* TODO: context lookup */
--- 
-2.6.1
+all 6 patches have been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
 
