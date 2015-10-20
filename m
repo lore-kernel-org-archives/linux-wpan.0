@@ -1,35 +1,45 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from senator.holtmann.net ([87.106.208.187]:59235 "EHLO
-	mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753167AbbJTIEH (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Tue, 20 Oct 2015 04:04:07 -0400
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.0 \(3094\))
-Subject: Re: [PATCH bluetooth-next 1/6] mac802154: llsec: use kzfree
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1444736579-27826-1-git-send-email-alex.aring@gmail.com>
-Date: Tue, 20 Oct 2015 10:04:03 +0200
-Content-Transfer-Encoding: 7bit
-Message-Id: <D1CDE8B2-2956-43F1-85F9-4BE4C4690541@holtmann.org>
-References: <1444736579-27826-1-git-send-email-alex.aring@gmail.com>
+Received: from mail-wi0-f174.google.com ([209.85.212.174]:37597 "EHLO
+	mail-wi0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750850AbbJTGcE (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Tue, 20 Oct 2015 02:32:04 -0400
+From: Alexander Aring <alex.aring@gmail.com>
+Subject: [PATCH bluetooth-next 0/6] 6lowpan: iphc defines and rework tc and flow label handling
+Date: Tue, 20 Oct 2015 08:31:20 +0200
+Message-Id: <1445322686-2952-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>
-Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de, linux-bluetooth@vger.kernel.org, jukka.rissanen@linux.intel.com
+To: linux-wpan@vger.kernel.org
+Cc: kernel@pengutronix.de, linux-bluetooth@vger.kernel.org, jukka.rissanen@linux.intel.com, Alexander Aring <alex.aring@gmail.com>
 
-Hi Alex,
+Hi,
 
-> This patch will use kzfree instead kfree for security related
-> information which can be offered by acccident.
-> 
-> Signed-off-by: Alexander Aring <alex.aring@gmail.com>
-> ---
-> net/mac802154/llsec.c | 20 ++++++++++----------
-> 1 file changed, 10 insertions(+), 10 deletions(-)
+this patch series based on my previous series "[PATCH bluetooth-next 1/6]
+mac802154: llsec: use kzfree" and contains changes for iphc defines and
+reworking the tc/flow label handling.
 
-all 6 patches have been applied to bluetooth-next tree.
+I tested the tc/flow label handling with fakelb and wireshark. So it should
+be wrong, when wireshark is wrong also. I hope wireshark has some correct
+mechanism to handle it. I used "wireshark 1.12.7".
 
-Regards
+- Alex
 
-Marcel
+Alexander Aring (6):
+  6lowpan: nhc: move iphc manipulation out of nhc
+  6lowpan: move IPHC functionality defines
+  6lowpan: remove lowpan_is_addr_broadcast
+  6lowpan: iphc: change define values
+  6lowpan: rework tc and flow label handling
+  6lowpan: put mcast compression in an own function
+
+ include/net/6lowpan.h       | 133 -----------
+ net/6lowpan/iphc.c          | 565 +++++++++++++++++++++++++++++++-------------
+ net/6lowpan/nhc.c           |  13 +-
+ net/6lowpan/nhc.h           |   9 +-
+ net/6lowpan/nhc_udp.c       |  22 +-
+ net/ieee802154/6lowpan/tx.c |   5 +-
+ 6 files changed, 430 insertions(+), 317 deletions(-)
+
+-- 
+2.6.1
 
