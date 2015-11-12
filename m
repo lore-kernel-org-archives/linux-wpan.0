@@ -1,60 +1,53 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from lists.s-osg.org ([54.187.51.154]:53713 "EHLO lists.s-osg.org"
+Received: from lists.s-osg.org ([54.187.51.154]:53714 "EHLO lists.s-osg.org"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750765AbbKLIji (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-	Thu, 12 Nov 2015 03:39:38 -0500
-Subject: Re: [PATCH wpan-tools 0/4] Coverity fixes for wpan-ping
-References: <1447191756-15928-1-git-send-email-stefan@osg.samsung.com>
+	id S1752677AbbKLItU (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+	Thu, 12 Nov 2015 03:49:20 -0500
+Received: from [192.168.2.22] (pD9F79E8A.dip0.t-ipconnect.de [217.247.158.138])
+	by lists.s-osg.org (Postfix) with ESMTPSA id 549D5462B3
+	for <linux-wpan@vger.kernel.org>; Thu, 12 Nov 2015 00:49:19 -0800 (PST)
 From: Stefan Schmidt <stefan@osg.samsung.com>
-Message-ID: <56445044.60901@osg.samsung.com>
-Date: Thu, 12 Nov 2015 09:39:32 +0100
+Subject: Automated building infrastructure for wpan-tools now active
+Message-ID: <5644528D.4060305@osg.samsung.com>
+Date: Thu, 12 Nov 2015 09:49:17 +0100
 MIME-Version: 1.0
-In-Reply-To: <1447191756-15928-1-git-send-email-stefan@osg.samsung.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org
-Cc: Alexander Aring <alex.aring@gmail.com>
+To: "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>
 
 Hello.
 
-On 10/11/15 22:42, Stefan Schmidt wrote:
-> Hello.
->
-> I finished setting up Travis CI for builds and Coverity Scan service for wpan-tools on a private
-> GitHub fork. If nobody has a strong opinion against this I would like to set it up on the main repo
-> so we can have a first step towards some automated QA infrastructure.
+I tokk some time to setup an automated build for every push to our 
+wpan-tools repo.
+As we are using GitHub I went with Travis CI which tightly integrates 
+with Github and
+solves the problem for us without running our own hardware.
 
-This is done now. Will send a separate mail with more details about it.
+https://travis-ci.org/linux-wpan/wpan-tools
 
-> But lets first have a look at the results from this first run. As you can see on the our first
-> run revealed 4 defects in 23321 lines of code (after the C preprocessor). With a defect density
-> of 0.17 this is way below industry average which is set to one here. In other words this means
-> we only have 1.7 defects per 10000 lines of code.
->
-> Three of these have been problems in error pathes of the code (leak, no check on return value, etc)
-> and one have been a false positive in the main iwpan.c file. Coverity was not able to understand
-> that we set err in our netlinks callbacks and thought this code bit would never stop as we start
-> with err = 1
->
-> while (err > 0)
-> 	nl_recvmsgs(state->nl_sock, cb);
->
-> I marked it as false positive and fixed the remaining three defects with the patches below.
->
-> Stefan Schmidt (4):
->    wpan-ping: remove unused struct sockaddr_nl variable
->    wpan-ping: check return value for setsockopt
->    wpan-ping: do not try to send data back to origin if we got an error
->      from recvfrom
->    wpan-ping: avoid leaking socket handle on error path
->
->   wpan-ping/wpan-ping.c | 9 +++++++--
->   1 file changed, 7 insertions(+), 2 deletions(-)
->
+For now we only do compile testing with gcc and clang. If someone has an 
+interest to
+extend this let me know.
 
-Pushed these now.
+Another functionality we use from Travis is the automated submit of 
+builds to the
+Coverity Scan service to run a static analysis over our code. This 
+already found some
+small issues which are fixed now.
+
+https://scan.coverity.com/projects/linux-wpan-wpan-tools/
+
+We do only submit pushes to a branch called coverity_scan. This avoids 
+the overkill
+of submitting every push to master and also helps to submit our code 
+before it even
+hits master. You should be able to register at Coverity and request 
+access to our
+defects if you want to see what is going on there. Nothing to do right 
+now but that
+could change. :)
 
 regards
 Stefan Schmidt
