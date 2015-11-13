@@ -1,126 +1,72 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wm0-f52.google.com ([74.125.82.52]:36173 "EHLO
-	mail-wm0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932263AbbKMNeF convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Fri, 13 Nov 2015 08:34:05 -0500
-Received: by wmww144 with SMTP id w144so28875186wmw.1
-        for <linux-wpan@vger.kernel.org>; Fri, 13 Nov 2015 05:34:03 -0800 (PST)
+Received: from tuna.sandelman.ca ([209.87.249.19]:45091 "EHLO
+	tuna.sandelman.ca" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754612AbbKMSNb (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Fri, 13 Nov 2015 13:13:31 -0500
+From: Michael Richardson <mcr@sandelman.ca>
+Subject: LL address and IPv6 address
+In-Reply-To: <CAPpUg6P259rf9NXGpDXqNq2Qragc5Ht9ZvQCSaDGSG1vSWcbZg@mail.gmail.com>
+References: <CAPpUg6NwiRzUMEPGpZa3=Ppg3LF3N7u1=o_sA0+rp5aHt0CC9g@mail.gmail.com> <CAF4BF-TStucwTg5Kp+YAN735RNQUA+aLf1fEPRKW7uSNZXSKYw@mail.gmail.com> <CAPpUg6Pi3Z3fPsDX3EBYhfn96ZLgXxQ5TAYAr7Rk3MKHcoZqxA@mail.gmail.com> <CAPpUg6O65Uyy+rhOdqh-cKK_w-4SqPvi9Ho6AGBFD7xUq4hukw@mail.gmail.com> <20151112085333.GA3045@omega>  <CAPpUg6P259rf9NXGpDXqNq2Qragc5Ht9ZvQCSaDGSG1vSWcbZg@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20151113105430.GA2306@omega>
-References: <CAPpUg6NwiRzUMEPGpZa3=Ppg3LF3N7u1=o_sA0+rp5aHt0CC9g@mail.gmail.com>
-	<CAF4BF-TStucwTg5Kp+YAN735RNQUA+aLf1fEPRKW7uSNZXSKYw@mail.gmail.com>
-	<CAPpUg6Pi3Z3fPsDX3EBYhfn96ZLgXxQ5TAYAr7Rk3MKHcoZqxA@mail.gmail.com>
-	<CAPpUg6O65Uyy+rhOdqh-cKK_w-4SqPvi9Ho6AGBFD7xUq4hukw@mail.gmail.com>
-	<20151112085333.GA3045@omega>
-	<CAPpUg6P259rf9NXGpDXqNq2Qragc5Ht9ZvQCSaDGSG1vSWcbZg@mail.gmail.com>
-	<20151113105430.GA2306@omega>
-Date: Fri, 13 Nov 2015 14:34:03 +0100
-Message-ID: <CAPpUg6N6Hwj89r8R+yhriJfAQ8Mgf19-yVk+2Uvt70FNvMBTPA@mail.gmail.com>
-Subject: Re: 6lowpan socket
-From: Baptiste Clenet <bapclenet@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha1; protocol="application/pgp-signature"
+Date: Fri, 13 Nov 2015 13:04:16 -0500
+Message-ID: <25991.1447437856@sandelman.ca>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>
-Cc: Christopher Friedt <chrisfriedt@gmail.com>, linux-wpan@vger.kernel.org
+To: linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org
 
-2015-11-13 11:54 GMT+01:00 Alexander Aring <alex.aring@gmail.com>:
-> On Fri, Nov 13, 2015 at 11:29:36AM +0100, Baptiste Clenet wrote:
->> 2015-11-12 9:53 GMT+01:00 Alexander Aring <alex.aring@gmail.com>:
->> > Hi Baptiste,
->> >
->> > On Thu, Nov 12, 2015 at 01:14:48AM +0100, Baptiste Clenet wrote:
->> >> From Christopher:
->> >>
->> >> Oh - sorry. 6LowPAN uses IPv6. So it's equivalent to setting up an IPv6 socket.
->> >>
->> >> Just remember to set up routes as appropriate and it should work fine.
->> >>
->> >> Unfortunately, I think vger bounces email from android devices, so my
->> >> message won't make it out on the list.
->> >>
->> >> ©
->> >>
->> >> Sent from my Android
->> >>
->> >> Yeah sure, it's equivalent, it's what I thought. I will search deeper
->> >
->> > I see you as well on the RIOT mailinglist. Do you has these issues with
->> > RIOT?
->> >
->>
->> Yes I'm in both mailing list.
->> The problem was not with Riot but openwrt. It works now, thanks you.
->>
->
-> ok.
->
->> > You can check it with fakelb and bsd-netcat and create/connect udp v6 socket,
->> > if it works with a linux<->linux connection, otherwise something is
->> > wrong with interoperability (which you can might debug via sniffing).
->> >
->> > I know they have recently added the rfc6282 udp nhc compression, see
->> > [0]. We have nhc_udp enabled by default, (receive handling should have
->> > a always possible strategy).
->> >
->> > Usually you can disable UDP NHC by unloading the "nhc_udp" module if you
->> > built it as module. But then you can also not receive anymore other udp
->> > nhc iphc headers.
->> >
->> > To make a fine granularity setting to the nhc strategy, we need a
->> > userspace tool and interface for that.
->> >
->> > - Alex
->> >
->> > [0] https://github.com/RIOT-OS/RIOT/pull/4189
->>
->>
->> Ok for nhc compression, I let the default configuration and it worked.
->>
->
-> You should look for "default configuration" a look into rfc6282. There
-> is a special port-range which can be compressed. Maybe you want to use
-> that. It will be used automatically.
->
->> I'm wondering something else about IPV6, how to change the default
->> IPV6 that the at86rf2XX will trigger?
->> If we change the IPV6 of lowpan0 (with ip -6 addr del ... for
->> instance) and then add the new one, it doesn't affect the reg
->> IEEE_ADDR_0,1,2....
->
-> mac address != ip address.
->
-> with ip -6 addr you mean == ip address.
->
-> with ip link set dev xx address yyy == mac address.
->
->> So I wanted to use iwpan but I can only change the short_addr if I'm not wrong.
->
-> short address is part of mac address which is currently not supported by
-> 802.15.4 6lowpan. This is a bigger issue because the whole ipv6
-> stack/net core api does know only _ONE_ type of mac address and this has
-> only _ONE_ length.
->
-> There exists few ideas to handle that, but we need to talk about which
-> is the right one...
->
->> Which way is the cleanest to edit the IPV6 address of the transceiver?
->> (and it will impact lowpan0) I thought about edit it in the at86rf23XX
->> driver.
->>
->
-> There is a bug one some kernel versions, see [0]. If you want a new mac
-> address, ifdown both wpan/lowpan interface -> then change mac address
-> via ip link set ... (extended address). Then ifup both interfaces again.
-Thanks, it work nicely. Without the patch, lowpan 0 should not exist
-to edit wpan0 mac address, then create lowpan0.
->
-> - Alex
->
-> [0] https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/net/mac802154/iface.c?id=09095fdc9e5d5438051fc4e92867f1aff764cd21
+--=-=-=
+Content-Type: text/plain
 
 
+I hadn't realized until I was trying to communicate LL (fe80::) addresses to
+a plugfest peer that the LL addresses and layer-2 addresses are not stable.
+(no eeprom in at86af23x, most of the OpenMote/Redwire devices that Contiki
+runs on have same issue)
 
--- 
-Baptiste
+Yes, we can set them from /etc/network/interfaces using iwpan, but I'm a bit
+not keen about this as a general solution.
+
+Now, I have some ideas about deploying (802.1AR) certificates that permit a
+node to prove it owns a particular L2 address.  Given that certificate, I
+might as well configure the l2 and short address, etc. directly from the info
+in the certificate.  This solution will suit my needs well, but probably not
+others.
+
+We do not have a kernel command line option to set the LL address, we should,
+but in the specific case of the RPI, that won't help that much, because the
+RPI doesn't use GRUB (nor uboot by default), so the cmdline is hard to
+update.  Does this matter that much; I'm not sure.  Still, I think we should
+have a non-programmatic way to do this, maybe some kind file in /etc,
+or maybe a sensible recommendation for having udev do it.
+
+I also noted that if I tried to change some things, such as panid and l2
+address that it wouldn't work until I rebooted.  Probably there was another
+sequence I could have used, but I didn't figure it out at the time.
+
+Also, as far as I know, we can't operate on more than one panid at the same
+time.  I could imagine that maybe one could create multiple lowpan on top of
+the same wpanX interface, but the panid is actually at the lower level.
+
+--
+]               Never tell me the odds!                 | ipv6 mesh networks [
+]   Michael Richardson, Sandelman Software Works        | network architect  [
+]     mcr@sandelman.ca  http://www.sandelman.ca/        |   ruby on rails    [
+
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iQEVAwUBVkYmHYCLcPvd0N1lAQLFpQf6Au5I0+mV03xKidFLQ6rm7HWFDF2GvXUt
+/BeFyo7m5ygOo2WMzaesQvtYHG7J/BEiqLi6oYK4ehU68r1QLcMF6uKwRhPLDQtF
+DwddnfTzUjl+MQ1s8OhP5eGo6rCYd7eS02tToHogZT3GLNkodMDKlIF0z3Fgnoxr
+NoEkNRdhsqv5f7hvWtegRHdOlLsKxJbqKlivzj8SE+CR9QdGISCAK7n2om3Vbc0t
+1bftG/C2VYl5EmBo7gW4BBiLXdKloSCkNONygRBmq1+46gMT51Bvm4oD1wI8cjGc
+ECIsBZx5r3c61MdHrFu1738pZp59dWlDi8wSPke3wzrGlTr0/BdcRw==
+=kkCY
+-----END PGP SIGNATURE-----
+--=-=-=--
