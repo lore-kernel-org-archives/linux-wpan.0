@@ -1,9 +1,10 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from lists.s-osg.org ([54.187.51.154]:58044 "EHLO lists.s-osg.org"
+Received: from lists.s-osg.org ([54.187.51.154]:58027 "EHLO lists.s-osg.org"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752301AbbKQQTn (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-	Tue, 17 Nov 2015 11:19:43 -0500
-Subject: Re: [PATCH] ieee802154-atusb: Delete an unnecessary check before the
+	id S1751363AbbKQQRr (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+	Tue, 17 Nov 2015 11:17:47 -0500
+From: Stefan Schmidt <stefan@osg.samsung.com>
+Subject: [PATCH] ieee802154-atusb: Delete an unnecessary check before the
  function call "kfree_skb"
 References: <5307CAA2.8060406@users.sourceforge.net>
  <alpine.DEB.2.02.1402212321410.2043@localhost6.localdomain6>
@@ -21,57 +22,46 @@ References: <5307CAA2.8060406@users.sourceforge.net>
  <alpine.DEB.2.02.1402252117150.2047@localhost6.localdomain6>
  <530DD06F.4090703@users.sourceforge.net>
  <alpine.DEB.2.02.1402262129250.2221@localhost6.localdomain6>
- <5317A59D.4@users.sourceforge.net> <5649D2AE.60100@users.sourceforge.net>
- <5649DE40.6030405@osg.samsung.com>
- <FB4ECAF8-4F55-4F5C-AF13-D402BEE9CE74@holtmann.org>
-From: Stefan Schmidt <stefan@osg.samsung.com>
-Message-ID: <564B539B.9080003@osg.samsung.com>
-Date: Tue, 17 Nov 2015 17:19:39 +0100
+ <5317A59D.4@users.sourceforge.net>
+Message-ID: <564B5327.4010307@osg.samsung.com>
+Date: Tue, 17 Nov 2015 17:17:43 +0100
 MIME-Version: 1.0
-In-Reply-To: <FB4ECAF8-4F55-4F5C-AF13-D402BEE9CE74@holtmann.org>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+In-Reply-To: <5317A59D.4@users.sourceforge.net>
+Content-Type: text/plain; charset=iso-8859-15; format=flowed
 Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: SF Markus Elfring <elfring@users.sourceforge.net>, Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org, Network Development <netdev@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, kernel-janitors@vger.kernel.org, Julia Lawall <julia.lawall@lip6.fr>
+To: Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt <stefan@osg.samsung.com>, linux-wpan@vger.kernel.org, netdev@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, kernel-janitors@vger.kernel.org, Julia Lawall <julia.lawall@lip6.fr>
 
-Hello.
+From: Markus Elfring <elfring@users.sourceforge.net>
+Date: Mon, 16 Nov 2015 13:50:23 +0100
 
-On 17/11/15 15:01, Marcel Holtmann wrote:
-> Hi Stefan,
->
->>> The kfree_skb() function tests whether its argument is NULL and then
->>> returns immediately. Thus the test around the call is not needed.
->>>
->>> This issue was detected by using the Coccinelle software.
->>>
->>> Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
->>> ---
->>>   drivers/net/ieee802154/atusb.c | 3 +--
->>>   1 file changed, 1 insertion(+), 2 deletions(-)
->>>
->>> diff --git a/drivers/net/ieee802154/atusb.c b/drivers/net/ieee802154/atusb.c
->>> index 199a94a..b1cd865 100644
->>> --- a/drivers/net/ieee802154/atusb.c
->>> +++ b/drivers/net/ieee802154/atusb.c
->>> @@ -310,8 +310,7 @@ static void atusb_free_urbs(struct atusb *atusb)
->>>   		urb = usb_get_from_anchor(&atusb->idle_urbs);
->>>   		if (!urb)
->>>   			break;
->>> -		if (urb->context)
->>> -			kfree_skb(urb->context);
->>> +		kfree_skb(urb->context);
->>>   		usb_free_urb(urb);
->>>   	}
->>>   }
->> Acked-by: Stefan Schmidt <stefan@osg.samsung.com>
-> for some reason I am missing the original patch, can someone resend it please.
->
+The kfree_skb() function tests whether its argument is NULL and then
+returns immediately. Thus the test around the call is not needed.
 
-Done. Resend the original message from my address but with the From line 
-intact inside the patch. Please check if it really lists Markus as 
-author when applying. Acked-by also resend as reply to the resend patch.
+This issue was detected by using the Coccinelle software.
 
-regards
-Stefan Schmidt
+Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
+---
+  drivers/net/ieee802154/atusb.c | 3 +--
+  1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/drivers/net/ieee802154/atusb.c b/drivers/net/ieee802154/atusb.c
+index 199a94a..b1cd865 100644
+--- a/drivers/net/ieee802154/atusb.c
++++ b/drivers/net/ieee802154/atusb.c
+@@ -310,8 +310,7 @@ static void atusb_free_urbs(struct atusb *atusb)
+  		urb = usb_get_from_anchor(&atusb->idle_urbs);
+  		if (!urb)
+  			break;
+-		if (urb->context)
+-			kfree_skb(urb->context);
++		kfree_skb(urb->context);
+  		usb_free_urb(urb);
+  	}
+  }
+-- 
+2.6.2
+
+--
