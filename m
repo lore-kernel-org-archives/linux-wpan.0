@@ -1,18 +1,18 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from lists.s-osg.org ([54.187.51.154]:55189 "EHLO lists.s-osg.org"
+Received: from lists.s-osg.org ([54.187.51.154]:55197 "EHLO lists.s-osg.org"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752303AbbKYNty (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-	Wed, 25 Nov 2015 08:49:54 -0500
-Subject: Re: [PATCH bluetooth-next 3/4] 6lowpan: add nhc module for GHC UDP
+	id S1754255AbbKYNug (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+	Wed, 25 Nov 2015 08:50:36 -0500
+From: Stefan Schmidt <stefan@osg.samsung.com>
+Subject: Re: [PATCH bluetooth-next 4/4] 6lowpan: add nhc module for GHC ICMPv6
  detection
 References: <1442577168-23183-1-git-send-email-stefan@osg.samsung.com>
- <1442577168-23183-4-git-send-email-stefan@osg.samsung.com>
- <20150918215025.GB6872@omega>
-From: Stefan Schmidt <stefan@osg.samsung.com>
-Message-ID: <5655BC7E.3060106@osg.samsung.com>
-Date: Wed, 25 Nov 2015 14:49:50 +0100
+ <1442577168-23183-5-git-send-email-stefan@osg.samsung.com>
+ <20150918215059.GC6872@omega>
+Message-ID: <5655BCA9.3090609@osg.samsung.com>
+Date: Wed, 25 Nov 2015 14:50:33 +0100
 MIME-Version: 1.0
-In-Reply-To: <20150918215025.GB6872@omega>
+In-Reply-To: <20150918215059.GC6872@omega>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
@@ -22,47 +22,47 @@ Cc: linux-wpan@vger.kernel.org, jukka.rissanen@linux.intel.com, linux-bluetooth@
 
 Hello.
 
-On 18/09/15 23:50, Alexander Aring wrote:
-> On Fri, Sep 18, 2015 at 01:52:47PM +0200, Stefan Schmidt wrote:
->> Signed-off-by: Stefan Schmidt <stefan@osg.samsung.com>
+On 18/09/15 23:51, Alexander Aring wrote:
+> On Fri, Sep 18, 2015 at 01:52:48PM +0200, Stefan Schmidt wrote:
+>> Signed-off-by: Stefan Schmidt<stefan@osg.samsung.com>
 >> ---
->>   net/6lowpan/Kconfig       |  5 +++++
->>   net/6lowpan/Makefile      |  1 +
->>   net/6lowpan/nhc_ghc_udp.c | 27 +++++++++++++++++++++++++++
+>>   net/6lowpan/Kconfig          |  5 +++++
+>>   net/6lowpan/Makefile         |  1 +
+>>   net/6lowpan/nhc_ghc_icmpv6.c | 27 +++++++++++++++++++++++++++
 >>   3 files changed, 33 insertions(+)
->>   create mode 100644 net/6lowpan/nhc_ghc_udp.c
+>>   create mode 100644 net/6lowpan/nhc_ghc_icmpv6.c
 >>
 >> diff --git a/net/6lowpan/Kconfig b/net/6lowpan/Kconfig
->> index f541f50..67a786b 100644
+>> index 67a786b..a34693d 100644
 >> --- a/net/6lowpan/Kconfig
 >> +++ b/net/6lowpan/Kconfig
->> @@ -64,4 +64,9 @@ config 6LOWPAN_GHC_EXTENSION_HEADER
+>> @@ -69,4 +69,9 @@ config 6LOWPAN_GHC_UDP
 >>   	default y
 >>   	---help---
 >>   
->> +config 6LOWPAN_GHC_UDP
->> +	tristate "GHC UDP Support"
+>> +config 6LOWPAN_GHC_ICMPV6
+>> +	tristate "GHC ICMPv6 Support"
 >> +	default y
 >> +	---help---
 >> +
 >>   endif
 >> diff --git a/net/6lowpan/Makefile b/net/6lowpan/Makefile
->> index 2b42bd0..fc65efb 100644
+>> index fc65efb..49256b7f 100644
 >> --- a/net/6lowpan/Makefile
 >> +++ b/net/6lowpan/Makefile
->> @@ -13,3 +13,4 @@ obj-$(CONFIG_6LOWPAN_NHC_UDP) += nhc_udp.o
->>   
+>> @@ -14,3 +14,4 @@ obj-$(CONFIG_6LOWPAN_NHC_UDP) += nhc_udp.o
 >>   #rfc7400 ghcs
 >>   obj-$(CONFIG_6LOWPAN_GHC_EXTENSION_HEADER) += nhc_ghc_extension_header.o
->> +obj-$(CONFIG_6LOWPAN_GHC_UDP) += nhc_ghc_udp.o
->> diff --git a/net/6lowpan/nhc_ghc_udp.c b/net/6lowpan/nhc_ghc_udp.c
+>>   obj-$(CONFIG_6LOWPAN_GHC_UDP) += nhc_ghc_udp.o
+>> +obj-$(CONFIG_6LOWPAN_GHC_ICMPV6) += nhc_ghc_icmpv6.o
+>> diff --git a/net/6lowpan/nhc_ghc_icmpv6.c b/net/6lowpan/nhc_ghc_icmpv6.c
 >> new file mode 100644
->> index 0000000..2675683
+>> index 0000000..378ebfe
 >> --- /dev/null
->> +++ b/net/6lowpan/nhc_ghc_udp.c
+>> +++ b/net/6lowpan/nhc_ghc_icmpv6.c
 >> @@ -0,0 +1,27 @@
 >> +/*
->> + *	6LoWPAN UDP compression according to RFC7400
+>> + *	6LoWPAN ICMPv6 compression according to RFC7400
 >> + *
 >> + *	This program is free software; you can redistribute it and/or
 >> + *	modify it under the terms of the GNU General Public License
@@ -72,36 +72,20 @@ On 18/09/15 23:50, Alexander Aring wrote:
 >> +
 >> +#include "nhc.h"
 >> +
->> +#define LOWPAN_GHC_UDP_IDLEN	1
->> +#define LOWPAN_GHC_UDP_ID_0	0xd0
->> +#define LOWPAN_GHC_UDP_MASK_0	0xf8
+>> +#define LOWPAN_GHC_ICMPV6_IDLEN		1
+>> +#define LOWPAN_GHC_ICMPV6_ID_0		0xdf
+>> +#define LOWPAN_GHC_ICMPV6_MASK_0	0xff
 >> +
->> +static void udp_ghid_setup(struct lowpan_nhc *nhc)
+>> +static void icmpv6_ghid_setup(struct lowpan_nhc *nhc)
 >> +{
->> +	nhc->id[0] = LOWPAN_GHC_UDP_ID_0;
->> +	nhc->idmask[0] = LOWPAN_GHC_UDP_MASK_0;
+>> +	nhc->id[0] = LOWPAN_GHC_ICMPV6_ID_0;
+>> +	nhc->idmask[0] = LOWPAN_GHC_ICMPV6_MASK_0;
 >> +}
 >> +
->> +LOWPAN_NHC(ghc_udp, "RFC7400 UDP", NEXTHDR_HOP, 0,
-> s/NEXTHDR_HOP/NEXTHDR_UDP/
+>> +LOWPAN_NHC(ghc_icmpv6, "RFC7400 ICMPv6", NEXTHDR_HOP, 0,
+> s/NEXTHDR_HOP/NEXTHDR_ICMP/
 
-Fixed in the upcoming patchset.
+Fixed in the new patchset coming later today.
 
->
-> Sadly is that we can't load two modules which contains NEXTHDR_UDP, when
-> another NEXTHDR_UDP is registered. But we should support all nhcid's
-> for receving side.
->
-> Maybe we can simple remove the check if nexthdr for compression
-> (tranmsit side) is already registered, actually this returns -EBUSY. We
-> prior for compression then the first loaded module (which should have a
-> compression method).
-
-At least for GHC we will know what destinations support it once we 
-support the 6LoWPAN Capability Indication Option (6CIO) over ND.
-
-> The real solution would be some configurable netlink framework. :-)
-
-Agreed. This is actually on my list of things to do. Juts no idea when i 
-will come to it.
-
+regards
+Stefan Schmidt
