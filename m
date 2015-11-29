@@ -1,72 +1,115 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from lists.s-osg.org ([54.187.51.154]:58032 "EHLO lists.s-osg.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753953AbbKQQSQ (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-	Tue, 17 Nov 2015 11:18:16 -0500
-Subject: Re: [PATCH] ieee802154-atusb: Delete an unnecessary check before the
- function call "kfree_skb"
-References: <5307CAA2.8060406@users.sourceforge.net>
- <alpine.DEB.2.02.1402212321410.2043@localhost6.localdomain6>
- <530A086E.8010901@users.sourceforge.net>
- <alpine.DEB.2.02.1402231635510.1985@localhost6.localdomain6>
- <530A72AA.3000601@users.sourceforge.net>
- <alpine.DEB.2.02.1402240658210.2090@localhost6.localdomain6>
- <530B5FB6.6010207@users.sourceforge.net>
- <alpine.DEB.2.10.1402241710370.2074@hadrien>
- <530C5E18.1020800@users.sourceforge.net>
- <alpine.DEB.2.10.1402251014170.2080@hadrien>
- <530CD2C4.4050903@users.sourceforge.net>
- <alpine.DEB.2.10.1402251840450.7035@hadrien>
- <530CF8FF.8080600@users.sourceforge.net>
- <alpine.DEB.2.02.1402252117150.2047@localhost6.localdomain6>
- <530DD06F.4090703@users.sourceforge.net>
- <alpine.DEB.2.02.1402262129250.2221@localhost6.localdomain6>
- <5317A59D.4@users.sourceforge.net> <564B5327.4010307@osg.samsung.com>
-From: Stefan Schmidt <stefan@osg.samsung.com>
-Message-ID: <564B5344.1090200@osg.samsung.com>
-Date: Tue, 17 Nov 2015 17:18:12 +0100
-MIME-Version: 1.0
-In-Reply-To: <564B5327.4010307@osg.samsung.com>
-Content-Type: text/plain; charset=iso-8859-15; format=flowed
-Content-Transfer-Encoding: 7bit
+Received: from mail-wm0-f43.google.com ([74.125.82.43]:38232 "EHLO
+	mail-wm0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751428AbbK2LfZ (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Sun, 29 Nov 2015 06:35:25 -0500
+From: Alexander Aring <alex.aring@gmail.com>
+Subject: [RFCv3 bluetooth-next 0/4] 6lowpan: debugfs and stateful compression support
+Date: Sun, 29 Nov 2015 12:34:38 +0100
+Message-Id: <1448796882-316-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org, netdev@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>
-Cc: LKML <linux-kernel@vger.kernel.org>, kernel-janitors@vger.kernel.org, Julia Lawall <julia.lawall@lip6.fr>
+To: linux-wpan@vger.kernel.org
+Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, kernel@pengutronix.de, mcr@sandelman.ca, lukasz.duda@nordicsemi.no, martin.gergeleit@hs-rm.de, Alexander Aring <alex.aring@gmail.com>
 
-Hello.
+Hi,
 
-On 17/11/15 17:17, Stefan Schmidt wrote:
-> From: Markus Elfring <elfring@users.sourceforge.net>
-> Date: Mon, 16 Nov 2015 13:50:23 +0100
->
-> The kfree_skb() function tests whether its argument is NULL and then
-> returns immediately. Thus the test around the call is not needed.
->
-> This issue was detected by using the Coccinelle software.
->
-> Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
-> ---
->  drivers/net/ieee802154/atusb.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
->
-> diff --git a/drivers/net/ieee802154/atusb.c 
-> b/drivers/net/ieee802154/atusb.c
-> index 199a94a..b1cd865 100644
-> --- a/drivers/net/ieee802154/atusb.c
-> +++ b/drivers/net/ieee802154/atusb.c
-> @@ -310,8 +310,7 @@ static void atusb_free_urbs(struct atusb *atusb)
->          urb = usb_get_from_anchor(&atusb->idle_urbs);
->          if (!urb)
->              break;
-> -        if (urb->context)
-> -            kfree_skb(urb->context);
-> +        kfree_skb(urb->context);
->          usb_free_urb(urb);
->      }
->  }
+This patch based on the work of Lukasz Duda. It doesn't contain any interface
+lookup methods since we have a generic private dataroom per 6lowpan interface.
 
-Acked-by: Stefan Schmidt <stefan@osg.samsung.com>
+Also I dropped the list implementation and do a simple array one. It also
+contains support for multicast stateful compression.
 
-regards
-Stefan Schmidt
+To access the context we supporting a complete callback structure for
+operations, the include/net/6lowpan.h header contains static inline functions
+to call these operations. With such behaviour we don't get any module
+dependencies if we need upcomming runtime decisions inside the IPv6 stack.
+The alternative would be to do everything inside static inline functions, but
+there are few different to handling unicast and multicast context id's, so
+it's maybe better to do this as "ops callback structure".
+
+Few things which I am not sure about if it's correct:
+ - I implement the dci multicast context table and dci unicast as different
+   table. I don't know if when I have a context id "6" which is multicast
+   then, I don't can have a unicast context id which is "6". I think they are
+   different and we can indicate which table we need to use by the IPHC M bit
+   (receiving side)  or the multicast address scope (transmit side).
+ - Unicast context prefix length can be shorter than 64 bits. Yes this can be,
+   but if somebody wants to do that he usually means "expand the bits until 64
+   with zeros". I forbid to add prefix below 64 bits for now.
+   Each stateful compression has cases for the IID bits (last 8 byte, use it as
+   inline data/do compression, etc.). When I have a prefix 2000:: with prefix
+   length 16, then I we hit the case of "Any remaining bits are zero." of
+   stateful compression, this means it can be converted by "2000::" prefix
+   length 64, then we don't need to care about that when doing a lookup of
+   context.
+ - I tried to get wireshark know about the available context without success.
+   What I successful get working is tell prefix length exact 64 bits long. I
+   don't know if wireshark do a correct context handling here, but it's also
+   possible to have a prefix length above 64 (In my opinion). E.g. unicast
+   stateful compression in case of SAM/DAM 01:
+   "Bits covered by context information are always used.  Any IID bits not
+    covered by context information are taken directly from the corresponding
+    bits carried in-line.
+
+   This patch series do following handling for this case:
+   1. generate ipv6 address with inline IID data.
+   2. copy the prefix bits from context to the address, which _maybe_ overwrite
+      the IID (last eight bytes) data which was carried as inline data.
+
+   This means, if my context is a full address 2001::1/128, then it will be
+   the case of SAM/DAM = 11, which means the address is fully elided. (Don't
+   care about the IID bits, which will be reconstructed from encapsulating
+   header.
+
+   All others SAM/DAM cases has a similar handling.
+
+   Nevertheless I don't know how I can tell that wireshark, I can tell prefix which
+   are 64 bit's long only.
+
+Any comments are welcome.
+
+- Alex
+
+changes since RFCv3:
+ - add patch for introduce lowpan register/unregister functions
+ - change name from ipv6_addr_prefix_cpy to ipv6_addr_prefix_copy
+ - move depends on DEBUG_FS to Patch 1/4 (reported by Stefan Schmidt)
+ - add "static inline" to lowpan_dev_debugfs_exit if
+   CONFIG_6LOWPAN_DEBUGFS is not defined. (reported by some bot)
+ - change "enum state" to simple bool and keyword "enabled"
+ - change formatstring of prefix-length from "%-03d" to "%-3d", not filled
+   with zeros anymore.
+ - Add LOWPAN_DEBUGFS_CTX_NUM_ARGS to avoid magic numbers.
+ - change name "uninit" to "exit".
+
+changes since RFCv2:
+ - fix cleanup for 6LoWPAN per interface debugfs
+ - add ipv6_addr_prefix_cpy
+ - replace lowpan_iphc_bitcpy with ipv6_addr_prefix_cpy (unicast)
+   replace lowpan_iphc_bitcpy with ipv6_addr_prefix and memcpy (multicast)
+ - add netdev mailinglist into cc
+
+Alexander Aring (4):
+  6lowpan: add lowpan dev register helpers
+  6lowpan: add debugfs support
+  ipv6: add ipv6_addr_prefix_copy
+  6lowpan: iphc: add support for stateful compression
+
+ include/net/6lowpan.h         |  64 +++++-
+ include/net/ipv6.h            |  15 ++
+ net/6lowpan/6lowpan_i.h       |  31 +++
+ net/6lowpan/Kconfig           |   8 +
+ net/6lowpan/Makefile          |   1 +
+ net/6lowpan/core.c            |  74 ++++++-
+ net/6lowpan/debugfs.c         | 166 +++++++++++++++
+ net/6lowpan/iphc.c            | 479 +++++++++++++++++++++++++++++++++++++-----
+ net/bluetooth/6lowpan.c       |   8 +-
+ net/ieee802154/6lowpan/core.c |   6 +-
+ 10 files changed, 783 insertions(+), 69 deletions(-)
+ create mode 100644 net/6lowpan/6lowpan_i.h
+ create mode 100644 net/6lowpan/debugfs.c
+
+-- 
+2.6.1
+
