@@ -1,71 +1,65 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from lists.s-osg.org ([54.187.51.154]:33333 "EHLO lists.s-osg.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750965AbbK0Ma7 (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-	Fri, 27 Nov 2015 07:30:59 -0500
-Subject: Re: [PATCH v2 bluetooth-next 0/7] GHC compression detection
-References: <1448463557-22618-1-git-send-email-stefan@osg.samsung.com>
- <20151127121330.GA28084@omega>
+Received: from proxima.lasnet.de ([78.47.171.185]:40000 "EHLO
+	proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751018AbbK3LV3 (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Mon, 30 Nov 2015 06:21:29 -0500
 From: Stefan Schmidt <stefan@osg.samsung.com>
-Message-ID: <56584CFF.9030306@osg.samsung.com>
-Date: Fri, 27 Nov 2015 13:30:55 +0100
-MIME-Version: 1.0
-In-Reply-To: <20151127121330.GA28084@omega>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Subject: [PATCH wpan-tools 1/4] wpan-ping: hide packet dump behind DEBUG flag
+Date: Mon, 30 Nov 2015 12:21:19 +0100
+Message-Id: <1448882482-20784-1-git-send-email-stefan@osg.samsung.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>
-Cc: linux-wpan@vger.kernel.org, Jukka Rissanen <jukka.rissanen@linux.intel.com>, linux-bluetooth@vger.kernel.org
+To: linux-wpan@vger.kernel.org
+Cc: Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt <stefan@osg.samsung.com>
 
-Hello.
+This was disabled by default and we are now hiding it behind a more generic
+DEBUG flag and keep it off by default.
 
-On 27/11/15 13:13, Alexander Aring wrote:
-> On Wed, Nov 25, 2015 at 03:59:10PM +0100, Stefan Schmidt wrote:
->> Hello.
->>
->> This is a first stab at RFC7400. So far we only hook into the NHC framework to
->> detect the registered GHC types (extension headers, UDP and ICMPv6).
->> This is aligned with how we detect the NHC frames.
->>
-> TODO for next is to make possible that we can load multiple nhc modules
-> for the transmit side. We have a 1(tranmit):n(receive) mapping here, and
-> we should support all nhc's for receive side.
->
-> For tranmsmit side we should have a disable by default and offer a
-> debugfs entry (nhc framework debugfs support) to enable/disable it
-> at runtime. It's a 1:nexhdr mapping, so only one for nexthdr can running
-> at the same time currently. If somebody tries that it should be return
-> -EBUSY.
->
-> I would suggest additional patches:
->
-> 1. Allow to have register everything and disable compression methods of
->     all nhcs by default. The receive handling should always possible,
->     the compression should be disabled by default because other 6LoWPAN
->     stacks may not support e.g. GHC types.
->
->     Maybe we can do a nhc directory for the debugfs interface related entry
->     for that. So the nhc framework offers some support e.g. enable compression
->     for nhc xy.
->
-> 2. Add all you nhc's _after_ all other nhc modules. This will occur that
->     the first ones has a higher priority. Our priority strategy is then
->     like the order of the list. See [0].
->
-> 3. Add "default y" to all nhc's for support receiving always.
->
->
-> That's huge work, but maybe the next steps.
+Signed-off-by: Stefan Schmidt <stefan@osg.samsung.com>
+---
+ wpan-ping/wpan-ping.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-Yes, I will tackle them with the next set. I'm working on the actual 
-compression and decrompression code for GHC at the moment. Once that is 
-working I will tackle the items you listed above and put them together 
-in one patchset.
-> Otherwise it's looking good and let the NHC framework as first known
-> about these next header compressions, so:
->
-> Acked-by: Alexander Aring <alex.aring@gmail.com>
-
-Thanks. I think with your and Jukka's ACK this set would be ready to land.
+diff --git a/wpan-ping/wpan-ping.c b/wpan-ping/wpan-ping.c
+index b454ddb..08211c3 100644
+--- a/wpan-ping/wpan-ping.c
++++ b/wpan-ping/wpan-ping.c
+@@ -49,6 +49,8 @@
+ /* Set the dispatch header to not 6lowpan for compat */
+ #define NOT_A_6LOWPAN_FRAME 0x00
+ 
++#define DEBUG 0
++
+ enum {
+ 	IEEE802154_ADDR_NONE = 0x0,
+ 	IEEE802154_ADDR_SHORT = 0x2,
+@@ -195,6 +197,7 @@ static int get_interface_info(struct config *conf) {
+ 	return 0;
+ }
+ 
++#if DEBUG
+ static void dump_packet(unsigned char *buf, int len) {
+ 	int i;
+ 
+@@ -204,6 +207,7 @@ static void dump_packet(unsigned char *buf, int len) {
+ 	}
+ 	printf("\n");
+ }
++#endif
+ 
+ static int generate_packet(unsigned char *buf, struct config *conf, unsigned int seq_num) {
+ 	int i;
+@@ -347,7 +351,9 @@ static void init_server(struct config *conf, int sd) {
+ 			perror("recvfrom");
+ 			continue;
+ 		}
+-		//dump_packet(buf, len);
++#if DEBUG
++		dump_packet(buf, len);
++#endif
+ 		/* Send same packet back */
+ 		len = sendto(sd, buf, len, 0, (struct sockaddr *)&src, addrlen);
+ 		if (len < 0) {
+-- 
+2.4.3
 
