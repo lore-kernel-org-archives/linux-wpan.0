@@ -1,149 +1,92 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-bn1on0079.outbound.protection.outlook.com ([157.56.110.79]:40960
-	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1753712AbbLGN40 (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-	Mon, 7 Dec 2015 08:56:26 -0500
-Reply-To: <michael.hennerich@analog.com>
+Received: from mail-lb0-f170.google.com ([209.85.217.170]:32974 "EHLO
+	mail-lb0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932399AbbLGOMt (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Mon, 7 Dec 2015 09:12:49 -0500
+Date: Mon, 7 Dec 2015 15:12:44 +0100
+From: Alexander Aring <alex.aring@gmail.com>
 Subject: Re: [PATCH] drivers/net/ieee802154/adf7242: Driver for ADF7242 MAC
  IEEE802154
+Message-ID: <20151207141239.GC20826@omega>
 References: <1449220149-14096-1-git-send-email-michael.hennerich@analog.com>
- <566181E6.9070306@osg.samsung.com> <56657561.70305@osg.samsung.com>
- <56657926.5070604@analog.com> <20151207132506.GA20826@omega>
-From: Michael Hennerich <michael.hennerich@analog.com>
-Message-ID: <56658AE5.9010209@analog.com>
-Date: Mon, 7 Dec 2015 14:34:29 +0100
+ <566181E6.9070306@osg.samsung.com>
+ <56657561.70305@osg.samsung.com>
+ <56657926.5070604@analog.com>
+ <20151207132506.GA20826@omega>
+ <56658AE5.9010209@analog.com>
 MIME-Version: 1.0
-In-Reply-To: <20151207132506.GA20826@omega>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <56658AE5.9010209@analog.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>
-Cc: Stefan Schmidt <stefan@osg.samsung.com>, marcel@holtmann.org, linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org
+To: Michael Hennerich <michael.hennerich@analog.com>
+Cc: Stefan Schmidt <stefan@osg.samsung.com>, marcel@holtmann.org, linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org, chrisfriedt@gmail.com
 
-On 12/07/2015 02:25 PM, Alexander Aring wrote:
-> Hi,
->
-> On Mon, Dec 07, 2015 at 01:18:46PM +0100, Michael Hennerich wrote:
->> On 12/07/2015 01:02 PM, Stefan Schmidt wrote:
->>> Hello.
->>>
->>> I found some time at the weekend hooking it up on my raspberry pi.
->>>
->>> On 04/12/15 13:07, Stefan Schmidt wrote:
->>>> Hello.
->>>>
->>>> On 04/12/15 10:09, michael.hennerich@analog.com wrote:
->>>>
->>>>> The ADF7242 requires an add-on firmware for the automatic IEEE 802.15.4
->>>>> operating modes. The firmware file is currently made available on the
->>>>> ADF7242 wiki page here [1]
->>>>
->>>> Just being curious here. Is there any way to get the firmware source
->>>> and/or compile your own? Its the first hardware for IEEE 802.15.4 I
->>>> have seen that have a special firmware for this which triggers my
->>>> curiosity. :)
->>
->>
->> Unfortunately No - We don't release the firmware assembly code.
->> Or the required compiler.
->>
->>
->>>>
->>>> Anyway, this has not that much to do with the driver review here as it
->>>> can obviously go in with the binary firmware. We just need to make
->>>> sure to also bring the firmware into the linux-firmware repo in time.
->>>>
->>>>> [1]
->>>>> http://wiki.analog.com/resources/tools-software/linux-drivers/networking-mac802154/adf7242
->>>>>
->>>
->>> There are two firmware zip files listed:
->>> ram_lab_7242_2_0_ieee15dot4_full_r5.zip
->>> <https://wiki.analog.com/_media/resources/tools-software/linux-drivers/networking-mac802154/ram_lab_7242_2_0_ieee15dot4_full_r5.zip>
->>>
->>> rom_ram_7242_2_0_ieee15dot4_full_r3.zip
->>> <https://wiki.analog.com/_media/resources/tools-software/linux-drivers/networking-mac802154/rom_ram_7242_2_0_ieee15dot4_full_r3.zip>
->>>
->>>
->>> Both contain a adf7242_firmware.bin file but also some different data
->>> file. Which one is the correct one here? Some explanation would be helpful.
->>
->> Please use the latest R5 release file. I'll remove the old one soon.
->> The older firmware had problems with the back-off exponent randomization.
->>
->>
->>>
->>>
->>>>> [2]
->>>>> http://sourceforge.net/p/linux-zigbee/kernel/ci/devel/tree/drivers/ieee802154/adf7242.c
->>>>>
->>>>>
->>>>> Signed-off-by: Michael Hennerich <michael.hennerich@analog.com>
->>>>> ---
->>>>>   .../devicetree/bindings/net/ieee802154/adf7242.txt |   18 +
->>>>>   drivers/net/ieee802154/Kconfig                     |    5 +
->>>>>   drivers/net/ieee802154/Makefile                    |    1 +
->>>>>   drivers/net/ieee802154/adf7242.c                   | 1183
->>>>> ++++++++++++++++++++
->>>>>   4 files changed, 1207 insertions(+)
->>>>>   create mode 100644
->>>>> Documentation/devicetree/bindings/net/ieee802154/adf7242.txt
->>>>>   create mode 100644 drivers/net/ieee802154/adf7242.c
->>>>>
->>>>> diff --git
->>>>> a/Documentation/devicetree/bindings/net/ieee802154/adf7242.txt
->>>>> b/Documentation/devicetree/bindings/net/ieee802154/adf7242.txt
->>>>> new file mode 100644
->>>>> index 0000000..dea5124
->>>>> --- /dev/null
->>>>> +++ b/Documentation/devicetree/bindings/net/ieee802154/adf7242.txt
->>>>> @@ -0,0 +1,18 @@
->>>>> +* ADF7242 IEEE 802.15.4 *
->>>>> +
->>>>> +Required properties:
->>>>> +  - compatible:        should be "adi,adf7242"
->>>>> +  - spi-max-frequency:    maximal bus speed (12.5 MHz)
->>>>> +  - reg:        the chipselect index
->>>>> +  - interrupts:        the interrupt generated by the device via pin
->>>>> IRQ1.
->>>>> +            IRQ_TYPE_LEVEL_HIGH (4) or IRQ_TYPE_EDGE_FALLING (1)
->>>
->>>
->>> IRQ1 would be pin7 on the interface connector, right? I'm using this one
->>> but I have trouble when transmitting
->>
->> Yes IRQ1 is Pin7 on the PMOD connector.
->>
->>>
->>> adf7242 spi32766.0: Error xmit: Retry count exceeded Status=0x3
->>
->>
->> That's failure NOACK. Is there a node on the same channel/PAN which could
->> response?
->> reading proc/interrupts should show some interrupts in this case...
->>
->
-> Stefan, maybe you testing with the ATUSB firmware which going _not_
-> into RX_AACK_ON. This was one of my lastest changes according to the
-> ATUSB firmware. Please check that, otherwise the atusb doesn't send
-> ack frames if ackrequest bit is set after receiving.
+On Mon, Dec 07, 2015 at 02:34:29PM +0100, Michael Hennerich wrote:
+...
+> >Stefan, maybe you testing with the ATUSB firmware which going _not_
+> >into RX_AACK_ON. This was one of my lastest changes according to the
+> >ATUSB firmware. Please check that, otherwise the atusb doesn't send
+> >ack frames if ackrequest bit is set after receiving.
+> 
+> I was wondering where can I buy the ATUSB?
+> On the pulster page I can't find it.
+> 
 
-I was wondering where can I buy the ATUSB?
-On the pulster page I can't find it.
+They are all out of stock, everywhere. I cc Werner maybe he will bring
+back the atusb again. He do his stuff all open source and a possible
+solution would be a Kickstarter project.
 
-In general why is the framework not requesting ACKs on all non broadcast 
-DATA frames?
+Another option would be:
 
-There is an option if turned on - it'll also request ACks on broadcasts...
+ - Produce your own atusb
+ - I know that "Christopher Friedt" produced some, maybe he will give/sell
+   some. :-) I cc'ed him here.
+ - use the experimental firmware [1] on RZUSBStick [0] support. Basics
+   functionality only and not stable such atusb. I ported the firmware
+   to this stick, it can be used by atusb driver. The transceiver is a
+   different -> at86rf230... and this transceiver we also doesn't
+   support by the at86rf230 because it's too different and a huge
+   errata.
 
--- 
-Greetings,
-Michael
+> In general why is the framework not requesting ACKs on all non broadcast
+> DATA frames?
+> 
+> There is an option if turned on - it'll also request ACks on broadcasts...
 
---
-Analog Devices GmbH      Wilhelm-Wagenfeld-Str. 6      80807 Muenchen
-Sitz der Gesellschaft: Muenchen; Registergericht: Muenchen HRB 40368;
-Geschaeftsfuehrer:Dr.Carsten Suckrow, Thomas Wessel, William A. Martin,
-Margaret Seif
+I suppose you use the af802154 socket family. I didn't touched the code
+and this socket family is full of bugs. We need a replacement for that.
+
+The socket code which I was working is AF_PACKET.
+
+In case of AF_PACKET:
+
+ dgram sockets: extended address and intra_pan communciaton only. The
+                AF_PACKET UAPI doesn't offer more address information.
+		We do a mapping to this currently, other option would be
+		to disable DGRAM on AF_PACKET. It's not possible to send
+		broadcast frames with that.
+		If you need that, something similar like af802154 should
+		be available, but it's currently broken.
+
+ raw sockets:   You can build the mac frame inside userspace with
+                complete control fc and address settings. We don't check
+		this frame if it's valid. This is not a bug.
+
+
+and 6LoWPAN:
+
+6LoWPAN doesn't do that, the check should be at [2]. If it's currently
+broken at your side?
+
+- Alex
+
+[0] http://www.atmel.com/tools/RZUSBSTICK.aspx
+[1] http://alex.my-webspace.org/firmwares/rzusb.bin
+    Note: This is temprorary website, I know wpan.cakelab.org is down
+    currently and I working already to a DNS solution to redirect
+    wpan.cakelab.org -> /alex.my-webspace.org . At the moment it looks
+    like the provide has bugs inside his DNS web-frontend configuration
+    page. ;-)
+[2] http://lxr.free-electrons.com/source/net/ieee802154/6lowpan/tx.c#L220
