@@ -1,230 +1,131 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-bn1bon0060.outbound.protection.outlook.com ([157.56.111.60]:3041
-	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1753374AbbLGMj0 (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-	Mon, 7 Dec 2015 07:39:26 -0500
-Reply-To: <michael.hennerich@analog.com>
+Received: from mail-lb0-f182.google.com ([209.85.217.182]:34810 "EHLO
+	mail-lb0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755774AbbLGNZZ (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Mon, 7 Dec 2015 08:25:25 -0500
+Date: Mon, 7 Dec 2015 14:25:12 +0100
+From: Alexander Aring <alex.aring@gmail.com>
 Subject: Re: [PATCH] drivers/net/ieee802154/adf7242: Driver for ADF7242 MAC
  IEEE802154
+Message-ID: <20151207132506.GA20826@omega>
 References: <1449220149-14096-1-git-send-email-michael.hennerich@analog.com>
- <566181E6.9070306@osg.samsung.com> <56657561.70305@osg.samsung.com>
-From: Michael Hennerich <michael.hennerich@analog.com>
-Message-ID: <56657926.5070604@analog.com>
-Date: Mon, 7 Dec 2015 13:18:46 +0100
+ <566181E6.9070306@osg.samsung.com>
+ <56657561.70305@osg.samsung.com>
+ <56657926.5070604@analog.com>
 MIME-Version: 1.0
-In-Reply-To: <56657561.70305@osg.samsung.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <56657926.5070604@analog.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Stefan Schmidt <stefan@osg.samsung.com>, alex.aring@gmail.com, marcel@holtmann.org
-Cc: linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org
+To: Michael Hennerich <michael.hennerich@analog.com>
+Cc: Stefan Schmidt <stefan@osg.samsung.com>, marcel@holtmann.org, linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org
 
-On 12/07/2015 01:02 PM, Stefan Schmidt wrote:
-> Hello.
->
-> I found some time at the weekend hooking it up on my raspberry pi.
->
-> On 04/12/15 13:07, Stefan Schmidt wrote:
->> Hello.
->>
->> On 04/12/15 10:09, michael.hennerich@analog.com wrote:
->>
->>> The ADF7242 requires an add-on firmware for the automatic IEEE 802.15.4
->>> operating modes. The firmware file is currently made available on the
->>> ADF7242 wiki page here [1]
->>
->> Just being curious here. Is there any way to get the firmware source
->> and/or compile your own? Its the first hardware for IEEE 802.15.4 I
->> have seen that have a special firmware for this which triggers my
->> curiosity. :)
+Hi,
 
+On Mon, Dec 07, 2015 at 01:18:46PM +0100, Michael Hennerich wrote:
+> On 12/07/2015 01:02 PM, Stefan Schmidt wrote:
+> >Hello.
+> >
+> >I found some time at the weekend hooking it up on my raspberry pi.
+> >
+> >On 04/12/15 13:07, Stefan Schmidt wrote:
+> >>Hello.
+> >>
+> >>On 04/12/15 10:09, michael.hennerich@analog.com wrote:
+> >>
+> >>>The ADF7242 requires an add-on firmware for the automatic IEEE 802.15.4
+> >>>operating modes. The firmware file is currently made available on the
+> >>>ADF7242 wiki page here [1]
+> >>
+> >>Just being curious here. Is there any way to get the firmware source
+> >>and/or compile your own? Its the first hardware for IEEE 802.15.4 I
+> >>have seen that have a special firmware for this which triggers my
+> >>curiosity. :)
+> 
+> 
+> Unfortunately No - We don't release the firmware assembly code.
+> Or the required compiler.
+> 
+> 
+> >>
+> >>Anyway, this has not that much to do with the driver review here as it
+> >>can obviously go in with the binary firmware. We just need to make
+> >>sure to also bring the firmware into the linux-firmware repo in time.
+> >>
+> >>>[1]
+> >>>http://wiki.analog.com/resources/tools-software/linux-drivers/networking-mac802154/adf7242
+> >>>
+> >
+> >There are two firmware zip files listed:
+> >ram_lab_7242_2_0_ieee15dot4_full_r5.zip
+> ><https://wiki.analog.com/_media/resources/tools-software/linux-drivers/networking-mac802154/ram_lab_7242_2_0_ieee15dot4_full_r5.zip>
+> >
+> >rom_ram_7242_2_0_ieee15dot4_full_r3.zip
+> ><https://wiki.analog.com/_media/resources/tools-software/linux-drivers/networking-mac802154/rom_ram_7242_2_0_ieee15dot4_full_r3.zip>
+> >
+> >
+> >Both contain a adf7242_firmware.bin file but also some different data
+> >file. Which one is the correct one here? Some explanation would be helpful.
+> 
+> Please use the latest R5 release file. I'll remove the old one soon.
+> The older firmware had problems with the back-off exponent randomization.
+> 
+> 
+> >
+> >
+> >>>[2]
+> >>>http://sourceforge.net/p/linux-zigbee/kernel/ci/devel/tree/drivers/ieee802154/adf7242.c
+> >>>
+> >>>
+> >>>Signed-off-by: Michael Hennerich <michael.hennerich@analog.com>
+> >>>---
+> >>>  .../devicetree/bindings/net/ieee802154/adf7242.txt |   18 +
+> >>>  drivers/net/ieee802154/Kconfig                     |    5 +
+> >>>  drivers/net/ieee802154/Makefile                    |    1 +
+> >>>  drivers/net/ieee802154/adf7242.c                   | 1183
+> >>>++++++++++++++++++++
+> >>>  4 files changed, 1207 insertions(+)
+> >>>  create mode 100644
+> >>>Documentation/devicetree/bindings/net/ieee802154/adf7242.txt
+> >>>  create mode 100644 drivers/net/ieee802154/adf7242.c
+> >>>
+> >>>diff --git
+> >>>a/Documentation/devicetree/bindings/net/ieee802154/adf7242.txt
+> >>>b/Documentation/devicetree/bindings/net/ieee802154/adf7242.txt
+> >>>new file mode 100644
+> >>>index 0000000..dea5124
+> >>>--- /dev/null
+> >>>+++ b/Documentation/devicetree/bindings/net/ieee802154/adf7242.txt
+> >>>@@ -0,0 +1,18 @@
+> >>>+* ADF7242 IEEE 802.15.4 *
+> >>>+
+> >>>+Required properties:
+> >>>+  - compatible:        should be "adi,adf7242"
+> >>>+  - spi-max-frequency:    maximal bus speed (12.5 MHz)
+> >>>+  - reg:        the chipselect index
+> >>>+  - interrupts:        the interrupt generated by the device via pin
+> >>>IRQ1.
+> >>>+            IRQ_TYPE_LEVEL_HIGH (4) or IRQ_TYPE_EDGE_FALLING (1)
+> >
+> >
+> >IRQ1 would be pin7 on the interface connector, right? I'm using this one
+> >but I have trouble when transmitting
+> 
+> Yes IRQ1 is Pin7 on the PMOD connector.
+> 
+> >
+> >adf7242 spi32766.0: Error xmit: Retry count exceeded Status=0x3
+> 
+> 
+> That's failure NOACK. Is there a node on the same channel/PAN which could
+> response?
+> reading proc/interrupts should show some interrupts in this case...
+> 
 
-Unfortunately No - We don't release the firmware assembly code.
-Or the required compiler.
+Stefan, maybe you testing with the ATUSB firmware which going _not_
+into RX_AACK_ON. This was one of my lastest changes according to the
+ATUSB firmware. Please check that, otherwise the atusb doesn't send
+ack frames if ackrequest bit is set after receiving.
 
-
->>
->> Anyway, this has not that much to do with the driver review here as it
->> can obviously go in with the binary firmware. We just need to make
->> sure to also bring the firmware into the linux-firmware repo in time.
->>
->>> [1]
->>> http://wiki.analog.com/resources/tools-software/linux-drivers/networking-mac802154/adf7242
->>>
->
-> There are two firmware zip files listed:
-> ram_lab_7242_2_0_ieee15dot4_full_r5.zip
-> <https://wiki.analog.com/_media/resources/tools-software/linux-drivers/networking-mac802154/ram_lab_7242_2_0_ieee15dot4_full_r5.zip>
->
-> rom_ram_7242_2_0_ieee15dot4_full_r3.zip
-> <https://wiki.analog.com/_media/resources/tools-software/linux-drivers/networking-mac802154/rom_ram_7242_2_0_ieee15dot4_full_r3.zip>
->
->
-> Both contain a adf7242_firmware.bin file but also some different data
-> file. Which one is the correct one here? Some explanation would be helpful.
-
-Please use the latest R5 release file. I'll remove the old one soon.
-The older firmware had problems with the back-off exponent randomization.
-
-
->
->
->>> [2]
->>> http://sourceforge.net/p/linux-zigbee/kernel/ci/devel/tree/drivers/ieee802154/adf7242.c
->>>
->>>
->>> Signed-off-by: Michael Hennerich <michael.hennerich@analog.com>
->>> ---
->>>   .../devicetree/bindings/net/ieee802154/adf7242.txt |   18 +
->>>   drivers/net/ieee802154/Kconfig                     |    5 +
->>>   drivers/net/ieee802154/Makefile                    |    1 +
->>>   drivers/net/ieee802154/adf7242.c                   | 1183
->>> ++++++++++++++++++++
->>>   4 files changed, 1207 insertions(+)
->>>   create mode 100644
->>> Documentation/devicetree/bindings/net/ieee802154/adf7242.txt
->>>   create mode 100644 drivers/net/ieee802154/adf7242.c
->>>
->>> diff --git
->>> a/Documentation/devicetree/bindings/net/ieee802154/adf7242.txt
->>> b/Documentation/devicetree/bindings/net/ieee802154/adf7242.txt
->>> new file mode 100644
->>> index 0000000..dea5124
->>> --- /dev/null
->>> +++ b/Documentation/devicetree/bindings/net/ieee802154/adf7242.txt
->>> @@ -0,0 +1,18 @@
->>> +* ADF7242 IEEE 802.15.4 *
->>> +
->>> +Required properties:
->>> +  - compatible:        should be "adi,adf7242"
->>> +  - spi-max-frequency:    maximal bus speed (12.5 MHz)
->>> +  - reg:        the chipselect index
->>> +  - interrupts:        the interrupt generated by the device via pin
->>> IRQ1.
->>> +            IRQ_TYPE_LEVEL_HIGH (4) or IRQ_TYPE_EDGE_FALLING (1)
->
->
-> IRQ1 would be pin7 on the interface connector, right? I'm using this one
-> but I have trouble when transmitting
-
-Yes IRQ1 is Pin7 on the PMOD connector.
-
->
-> adf7242 spi32766.0: Error xmit: Retry count exceeded Status=0x3
-
-
-That's failure NOACK. Is there a node on the same channel/PAN which 
-could response?
-reading proc/interrupts should show some interrupts in this case...
-
->
-> and I was wondering if this comes from trouble setting the IRQ up
-> correctly. The driver comes up fine, loads the firmware and I can
-> configure it with iwpan. Device tree config looks like this, which is
-> the same SPI port and IRQ I successfully use for two other transceivers:
->
-> &spi {
->      status = "okay";
->      adf7242@0 {
->          compatible = "adi,adf7242";
->          spi-max-frequency = <6000000>;
->          reg = <0>;
->          interrupts = <23 4>;
->          interrupt-parent = <&gpio>;
->      };
-> };
->
->
->>
->>
->>> diff --git a/drivers/net/ieee802154/Makefile
->>> b/drivers/net/ieee802154/Makefile
->>> index cf1d2a6..3a923d3 100644
->>> --- a/drivers/net/ieee802154/Makefile
->>> +++ b/drivers/net/ieee802154/Makefile
->>> @@ -3,3 +3,4 @@ obj-$(CONFIG_IEEE802154_AT86RF230) += at86rf230.o
->>>   obj-$(CONFIG_IEEE802154_MRF24J40) += mrf24j40.o
->>>   obj-$(CONFIG_IEEE802154_CC2520) += cc2520.o
->>>   obj-$(CONFIG_IEEE802154_ATUSB) += atusb.o
->>> +obj-$(CONFIG_IEEE802154_ADF7242) += adf7242.o
->>> diff --git a/drivers/net/ieee802154/adf7242.c
->>> b/drivers/net/ieee802154/adf7242.c
->>> new file mode 100644
->>> index 0000000..48268b1
->>> --- /dev/null
->>> +++ b/drivers/net/ieee802154/adf7242.c
->>> @@ -0,0 +1,1183 @@
->>> +/*
->>> + * Analog Devices ADF7242 Low-Power IEEE 802.15.4 Transceiver
->>> + *
->>> + * Copyright 2009-2015 Analog Devices Inc.
->>> + *
->>
->> Personally I like having a link to the actual data sheet inside the
->> driver header. This makes only sense if it is a stable URI.
->>
->
-> The one I found and looking at is this one:
-> http://www.analog.com/media/en/technical-documentation/data-sheets/ADF7242.pdf
-
-
-This one is pretty static.
-We can also use the short link:
-www.analog.com/ADF7242 which brings you to the product page.
-the datasheet is right below the block diagram.
-
-
->
->
->
->>> +static int adf7242_hw_init(struct adf7242_local *lp)
->>> +{
->>> +    int ret;
->>> +    const struct firmware *fw;
->>> +
->>> +    adf7242_cmd(lp, CMD_RC_RESET);
->>> +    adf7242_cmd(lp, CMD_RC_IDLE);
->>> +
->>> +    /* get ADF7242 addon firmware
->>> +     * build this driver as module
->>
->> Hmm, this brings up the question if the firmware is also fetched if
->> the driver is built into the kernel directly?
->
-> Let me answer this myself here. If you build everything into the kernel
-> you might run into trouble when the drivers is initialised before the fs
-> system is up. That way the driver has no access to the fs and is unable
-> to load the firmware. You can either switch this driver to a module or
-> you can supply the kernel with the needed firmware during compile so it
-> will be inside the kernel binary. Copy the file into the firmware
-> directory inside your kernel tree and use these options:
->
-> CONFIG_EXTRA_FIRMWARE="adf7242_firmware.bin"
-> CONFIG_EXTRA_FIRMWARE_DIR="firmware"
->
-> That way the firmware loading worked for me for a kernel with everything
-> build into big blob.
-
-That's what I do.
-
->
-> regards
-> Stefan Schmidt
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-wpan" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
-
-
--- 
-Greetings,
-Michael
-
---
-Analog Devices GmbH      Wilhelm-Wagenfeld-Str. 6      80807 Muenchen
-Sitz der Gesellschaft: Muenchen; Registergericht: Muenchen HRB 40368;
-Geschaeftsfuehrer:Dr.Carsten Suckrow, Thomas Wessel, William A. Martin,
-Margaret Seif
+- Alex
