@@ -1,132 +1,149 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from lists.s-osg.org ([54.187.51.154]:41185 "EHLO lists.s-osg.org"
+Received: from lists.s-osg.org ([54.187.51.154]:41154 "EHLO lists.s-osg.org"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932855AbbLGPI2 (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-	Mon, 7 Dec 2015 10:08:28 -0500
+	id S932338AbbLGOyv (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+	Mon, 7 Dec 2015 09:54:51 -0500
 Subject: Re: [PATCH] drivers/net/ieee802154/adf7242: Driver for ADF7242 MAC
  IEEE802154
 References: <1449220149-14096-1-git-send-email-michael.hennerich@analog.com>
  <566181E6.9070306@osg.samsung.com> <56657561.70305@osg.samsung.com>
- <56657926.5070604@analog.com> <20151207132506.GA20826@omega>
+ <56657926.5070604@analog.com>
 From: Stefan Schmidt <stefan@osg.samsung.com>
-Message-ID: <5665A0E9.4000505@osg.samsung.com>
-Date: Mon, 7 Dec 2015 16:08:25 +0100
+Message-ID: <56659DB8.9060904@osg.samsung.com>
+Date: Mon, 7 Dec 2015 15:54:48 +0100
 MIME-Version: 1.0
-In-Reply-To: <20151207132506.GA20826@omega>
+In-Reply-To: <56657926.5070604@analog.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>, Michael Hennerich <michael.hennerich@analog.com>
-Cc: marcel@holtmann.org, linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org
+To: michael.hennerich@analog.com, alex.aring@gmail.com, marcel@holtmann.org
+Cc: linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org
 
 Hello.
 
-On 07/12/15 14:25, Alexander Aring wrote:
-> Hi,
->
-> On Mon, Dec 07, 2015 at 01:18:46PM +0100, Michael Hennerich wrote:
->> On 12/07/2015 01:02 PM, Stefan Schmidt wrote:
+On 07/12/15 13:18, Michael Hennerich wrote:
+> On 12/07/2015 01:02 PM, Stefan Schmidt wrote:
+>> Hello.
+>>
+>> I found some time at the weekend hooking it up on my raspberry pi.
+>>
+>> On 04/12/15 13:07, Stefan Schmidt wrote:
 >>> Hello.
 >>>
->>> I found some time at the weekend hooking it up on my raspberry pi.
+>>> On 04/12/15 10:09, michael.hennerich@analog.com wrote:
 >>>
->>> On 04/12/15 13:07, Stefan Schmidt wrote:
->>>> Hello.
->>>>
->>>> On 04/12/15 10:09, michael.hennerich@analog.com wrote:
->>>>
->>>>> The ADF7242 requires an add-on firmware for the automatic IEEE 802.15.4
->>>>> operating modes. The firmware file is currently made available on the
->>>>> ADF7242 wiki page here [1]
->>>> Just being curious here. Is there any way to get the firmware source
->>>> and/or compile your own? Its the first hardware for IEEE 802.15.4 I
->>>> have seen that have a special firmware for this which triggers my
->>>> curiosity. :)
->>
->> Unfortunately No - We don't release the firmware assembly code.
->> Or the required compiler.
->>
->>
->>>> Anyway, this has not that much to do with the driver review here as it
->>>> can obviously go in with the binary firmware. We just need to make
->>>> sure to also bring the firmware into the linux-firmware repo in time.
->>>>
->>>>> [1]
->>>>> http://wiki.analog.com/resources/tools-software/linux-drivers/networking-mac802154/adf7242
->>>>>
->>> There are two firmware zip files listed:
->>> ram_lab_7242_2_0_ieee15dot4_full_r5.zip
->>> <https://wiki.analog.com/_media/resources/tools-software/linux-drivers/networking-mac802154/ram_lab_7242_2_0_ieee15dot4_full_r5.zip>
+>>>> The ADF7242 requires an add-on firmware for the automatic IEEE 
+>>>> 802.15.4
+>>>> operating modes. The firmware file is currently made available on the
+>>>> ADF7242 wiki page here [1]
 >>>
->>> rom_ram_7242_2_0_ieee15dot4_full_r3.zip
->>> <https://wiki.analog.com/_media/resources/tools-software/linux-drivers/networking-mac802154/rom_ram_7242_2_0_ieee15dot4_full_r3.zip>
->>>
->>>
->>> Both contain a adf7242_firmware.bin file but also some different data
->>> file. Which one is the correct one here? Some explanation would be helpful.
->> Please use the latest R5 release file. I'll remove the old one soon.
->> The older firmware had problems with the back-off exponent randomization.
->>
->>
->>>
->>>>> [2]
->>>>> http://sourceforge.net/p/linux-zigbee/kernel/ci/devel/tree/drivers/ieee802154/adf7242.c
->>>>>
->>>>>
->>>>> Signed-off-by: Michael Hennerich <michael.hennerich@analog.com>
->>>>> ---
->>>>>   .../devicetree/bindings/net/ieee802154/adf7242.txt |   18 +
->>>>>   drivers/net/ieee802154/Kconfig                     |    5 +
->>>>>   drivers/net/ieee802154/Makefile                    |    1 +
->>>>>   drivers/net/ieee802154/adf7242.c                   | 1183
->>>>> ++++++++++++++++++++
->>>>>   4 files changed, 1207 insertions(+)
->>>>>   create mode 100644
->>>>> Documentation/devicetree/bindings/net/ieee802154/adf7242.txt
->>>>>   create mode 100644 drivers/net/ieee802154/adf7242.c
->>>>>
->>>>> diff --git
->>>>> a/Documentation/devicetree/bindings/net/ieee802154/adf7242.txt
->>>>> b/Documentation/devicetree/bindings/net/ieee802154/adf7242.txt
->>>>> new file mode 100644
->>>>> index 0000000..dea5124
->>>>> --- /dev/null
->>>>> +++ b/Documentation/devicetree/bindings/net/ieee802154/adf7242.txt
->>>>> @@ -0,0 +1,18 @@
->>>>> +* ADF7242 IEEE 802.15.4 *
->>>>> +
->>>>> +Required properties:
->>>>> +  - compatible:        should be "adi,adf7242"
->>>>> +  - spi-max-frequency:    maximal bus speed (12.5 MHz)
->>>>> +  - reg:        the chipselect index
->>>>> +  - interrupts:        the interrupt generated by the device via pin
->>>>> IRQ1.
->>>>> +            IRQ_TYPE_LEVEL_HIGH (4) or IRQ_TYPE_EDGE_FALLING (1)
->>>
->>> IRQ1 would be pin7 on the interface connector, right? I'm using this one
->>> but I have trouble when transmitting
->> Yes IRQ1 is Pin7 on the PMOD connector.
->>
->>> adf7242 spi32766.0: Error xmit: Retry count exceeded Status=0x3
->>
->> That's failure NOACK. Is there a node on the same channel/PAN which could
->> response?
->> reading proc/interrupts should show some interrupts in this case...
->>
-> Stefan, maybe you testing with the ATUSB firmware which going _not_
-> into RX_AACK_ON.
+>>> Just being curious here. Is there any way to get the firmware source
+>>> and/or compile your own? Its the first hardware for IEEE 802.15.4 I
+>>> have seen that have a special firmware for this which triggers my
+>>> curiosity. :)
+>
+>
+> Unfortunately No - We don't release the firmware assembly code.
+> Or the required compiler.
+>
 
-Nope, turned out it was some stale security setting on a node with an 
-at86rf233 which my testing scripts did not reset. After that is cleaned 
-I can successfully wpan-ping and ping6 from and to the adf7242.
+Fair enough.
 
-> This was one of my lastest changes according to the
-> ATUSB firmware. Please check that, otherwise the atusb doesn't send
-> ack frames if ackrequest bit is set after receiving.
+>
+>>>
+>>> Anyway, this has not that much to do with the driver review here as it
+>>> can obviously go in with the binary firmware. We just need to make
+>>> sure to also bring the firmware into the linux-firmware repo in time.
+>>>
+>>>> [1]
+>>>> http://wiki.analog.com/resources/tools-software/linux-drivers/networking-mac802154/adf7242 
+>>>>
+>>>>
+>>
+>> There are two firmware zip files listed:
+>> ram_lab_7242_2_0_ieee15dot4_full_r5.zip
+>> <https://wiki.analog.com/_media/resources/tools-software/linux-drivers/networking-mac802154/ram_lab_7242_2_0_ieee15dot4_full_r5.zip> 
+>>
+>>
+>> rom_ram_7242_2_0_ieee15dot4_full_r3.zip
+>> <https://wiki.analog.com/_media/resources/tools-software/linux-drivers/networking-mac802154/rom_ram_7242_2_0_ieee15dot4_full_r3.zip> 
+>>
+>>
+>>
+>> Both contain a adf7242_firmware.bin file but also some different data
+>> file. Which one is the correct one here? Some explanation would be 
+>> helpful.
+>
+> Please use the latest R5 release file. I'll remove the old one soon.
+> The older firmware had problems with the back-off exponent randomization.
+>
 
-Right, this is still pending. :/ I added it to my atusb firmware todo 
-list which I hope to have some time tackling during 32C3.
+OK
+
+>
+>>
+>>
+>>>> [2]
+>>>> http://sourceforge.net/p/linux-zigbee/kernel/ci/devel/tree/drivers/ieee802154/adf7242.c 
+>>>>
+>>>>
+>>>>
+>>>> Signed-off-by: Michael Hennerich <michael.hennerich@analog.com>
+>>>> ---
+>>>>   .../devicetree/bindings/net/ieee802154/adf7242.txt |   18 +
+>>>>   drivers/net/ieee802154/Kconfig                     |    5 +
+>>>>   drivers/net/ieee802154/Makefile                    |    1 +
+>>>>   drivers/net/ieee802154/adf7242.c                   | 1183
+>>>> ++++++++++++++++++++
+>>>>   4 files changed, 1207 insertions(+)
+>>>>   create mode 100644
+>>>> Documentation/devicetree/bindings/net/ieee802154/adf7242.txt
+>>>>   create mode 100644 drivers/net/ieee802154/adf7242.c
+>>>>
+>>>> diff --git
+>>>> a/Documentation/devicetree/bindings/net/ieee802154/adf7242.txt
+>>>> b/Documentation/devicetree/bindings/net/ieee802154/adf7242.txt
+>>>> new file mode 100644
+>>>> index 0000000..dea5124
+>>>> --- /dev/null
+>>>> +++ b/Documentation/devicetree/bindings/net/ieee802154/adf7242.txt
+>>>> @@ -0,0 +1,18 @@
+>>>> +* ADF7242 IEEE 802.15.4 *
+>>>> +
+>>>> +Required properties:
+>>>> +  - compatible:        should be "adi,adf7242"
+>>>> +  - spi-max-frequency:    maximal bus speed (12.5 MHz)
+>>>> +  - reg:        the chipselect index
+>>>> +  - interrupts:        the interrupt generated by the device via pin
+>>>> IRQ1.
+>>>> +            IRQ_TYPE_LEVEL_HIGH (4) or IRQ_TYPE_EDGE_FALLING (1)
+>>
+>>
+>> IRQ1 would be pin7 on the interface connector, right? I'm using this one
+>> but I have trouble when transmitting
+>
+> Yes IRQ1 is Pin7 on the PMOD connector.
+>
+
+Good, so my wiring was ok.
+
+>>
+>> adf7242 spi32766.0: Error xmit: Retry count exceeded Status=0x3
+>
+>
+> That's failure NOACK. Is there a node on the same channel/PAN which 
+> could response?
+> reading proc/interrupts should show some interrupts in this case...
+>
+
+Turns out it was a failure on the configuration side of the other node. :/
+I had security enabled on the other node and my reset scripts did not 
+catch this. Disabling it and rebooting the node made it work.
+
+Which means I can confirm that IEEE 802.15.4 (wpan-ping) as well as 
+6LoWPAN (ping6) communication between a at86rf233 and the adf7242 works 
+fine. Nice!
 
 regards
 Stefan Schmidt
