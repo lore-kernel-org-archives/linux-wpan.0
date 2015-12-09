@@ -1,88 +1,161 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wm0-f49.google.com ([74.125.82.49]:34954 "EHLO
-	mail-wm0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754008AbbLIVrd (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Wed, 9 Dec 2015 16:47:33 -0500
+Received: from mail-wm0-f53.google.com ([74.125.82.53]:37086 "EHLO
+	mail-wm0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753227AbbLIVrf (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Wed, 9 Dec 2015 16:47:35 -0500
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH bluetooth-next 07/10] 6lowpan: add nhc module for GHC routing extension header detection
-Date: Wed,  9 Dec 2015 22:46:28 +0100
-Message-Id: <1449697591-15991-8-git-send-email-alex.aring@gmail.com>
+Subject: [PATCH bluetooth-next 08/10] 6lowpan: add lowpan dev register helpers
+Date: Wed,  9 Dec 2015 22:46:29 +0100
+Message-Id: <1449697591-15991-9-git-send-email-alex.aring@gmail.com>
 In-Reply-To: <1449697591-15991-1-git-send-email-alex.aring@gmail.com>
 References: <1449697591-15991-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, kernel@pengutronix.de, Stefan Schmidt <stefan@osg.samsung.com>, Alexander Aring <alex.aring@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>
 
-From: Stefan Schmidt <stefan@osg.samsung.com>
+This patch introduces register and unregister functionality for lowpan
+interfaces. While register a lowpan interface there are several things
+which need to be initialize by the 6lowpan subsystem. Upcoming
+functionality need to register/unregister per interface components e.g.
+debugfs entry.
 
-Acked-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-Signed-off-by: Stefan Schmidt <stefan@osg.samsung.com>
+Reviewed-by: Stefan Schmidt <stefan@osg.samsung.com>
 Signed-off-by: Alexander Aring <alex.aring@gmail.com>
 ---
- net/6lowpan/Kconfig             |  6 ++++++
- net/6lowpan/Makefile            |  1 +
- net/6lowpan/nhc_ghc_ext_route.c | 27 +++++++++++++++++++++++++++
- 3 files changed, 34 insertions(+)
- create mode 100644 net/6lowpan/nhc_ghc_ext_route.c
+ include/net/6lowpan.h         |  7 ++++++-
+ net/6lowpan/core.c            | 33 +++++++++++++++++++++++++++++++--
+ net/bluetooth/6lowpan.c       |  8 +++-----
+ net/ieee802154/6lowpan/core.c |  6 ++----
+ 4 files changed, 42 insertions(+), 12 deletions(-)
 
-diff --git a/net/6lowpan/Kconfig b/net/6lowpan/Kconfig
-index 13abcc5..bcb9d8a 100644
---- a/net/6lowpan/Kconfig
-+++ b/net/6lowpan/Kconfig
-@@ -87,4 +87,10 @@ config 6LOWPAN_GHC_EXT_HDR_FRAG
- 	  6LoWPAN IPv6 fragmentation option generic header compression
- 	  according to RFC7400.
+diff --git a/include/net/6lowpan.h b/include/net/6lowpan.h
+index cf3bc56..730211f 100644
+--- a/include/net/6lowpan.h
++++ b/include/net/6lowpan.h
+@@ -185,7 +185,12 @@ static inline void lowpan_push_hc_data(u8 **hc_ptr, const void *data,
+ 	*hc_ptr += len;
+ }
  
-+config 6LOWPAN_GHC_EXT_HDR_ROUTE
-+	tristate "GHC Routing Options Header Support"
-+	---help---
-+	  6LoWPAN IPv6 routing option generic header compression according
-+	  to RFC7400.
+-void lowpan_netdev_setup(struct net_device *dev, enum lowpan_lltypes lltype);
++int lowpan_register_netdevice(struct net_device *dev,
++			      enum lowpan_lltypes lltype);
++int lowpan_register_netdev(struct net_device *dev,
++			   enum lowpan_lltypes lltype);
++void lowpan_unregister_netdevice(struct net_device *dev);
++void lowpan_unregister_netdev(struct net_device *dev);
+ 
+ /**
+  * lowpan_header_decompress - replace 6LoWPAN header with IPv6 header
+diff --git a/net/6lowpan/core.c b/net/6lowpan/core.c
+index 83b19e0..80fc509 100644
+--- a/net/6lowpan/core.c
++++ b/net/6lowpan/core.c
+@@ -15,7 +15,8 @@
+ 
+ #include <net/6lowpan.h>
+ 
+-void lowpan_netdev_setup(struct net_device *dev, enum lowpan_lltypes lltype)
++int lowpan_register_netdevice(struct net_device *dev,
++			      enum lowpan_lltypes lltype)
+ {
+ 	dev->addr_len = EUI64_ADDR_LEN;
+ 	dev->type = ARPHRD_6LOWPAN;
+@@ -23,8 +24,36 @@ void lowpan_netdev_setup(struct net_device *dev, enum lowpan_lltypes lltype)
+ 	dev->priv_flags |= IFF_NO_QUEUE;
+ 
+ 	lowpan_priv(dev)->lltype = lltype;
 +
- endif
-diff --git a/net/6lowpan/Makefile b/net/6lowpan/Makefile
-index fb3f48d..9e35a5d 100644
---- a/net/6lowpan/Makefile
-+++ b/net/6lowpan/Makefile
-@@ -17,3 +17,4 @@ obj-$(CONFIG_6LOWPAN_GHC_UDP) += nhc_ghc_udp.o
- obj-$(CONFIG_6LOWPAN_GHC_ICMPV6) += nhc_ghc_icmpv6.o
- obj-$(CONFIG_6LOWPAN_GHC_EXT_HDR_DEST) += nhc_ghc_ext_dest.o
- obj-$(CONFIG_6LOWPAN_GHC_EXT_HDR_FRAG) += nhc_ghc_ext_frag.o
-+obj-$(CONFIG_6LOWPAN_GHC_EXT_HDR_ROUTE) += nhc_ghc_ext_route.o
-diff --git a/net/6lowpan/nhc_ghc_ext_route.c b/net/6lowpan/nhc_ghc_ext_route.c
-new file mode 100644
-index 0000000..d7e5bd7
---- /dev/null
-+++ b/net/6lowpan/nhc_ghc_ext_route.c
-@@ -0,0 +1,27 @@
-+/*
-+ *	6LoWPAN Extension Header compression according to RFC7400
-+ *
-+ *	This program is free software; you can redistribute it and/or
-+ *	modify it under the terms of the GNU General Public License
-+ *	as published by the Free Software Foundation; either version
-+ *	2 of the License, or (at your option) any later version.
-+ */
-+
-+#include "nhc.h"
-+
-+#define LOWPAN_GHC_EXT_ROUTE_IDLEN	1
-+#define LOWPAN_GHC_EXT_ROUTE_ID_0	0xb2
-+#define LOWPAN_GHC_EXT_ROUTE_MASK_0	0xfe
-+
-+static void route_ghid_setup(struct lowpan_nhc *nhc)
-+{
-+	nhc->id[0] = LOWPAN_GHC_EXT_ROUTE_ID_0;
-+	nhc->idmask[0] = LOWPAN_GHC_EXT_ROUTE_MASK_0;
++	return register_netdevice(dev);
 +}
++EXPORT_SYMBOL(lowpan_register_netdevice);
 +
-+LOWPAN_NHC(ghc_ext_route, "RFC7400 Routing Extension Header", NEXTHDR_ROUTING,
-+	   0, route_ghid_setup, LOWPAN_GHC_EXT_ROUTE_IDLEN, NULL, NULL);
++int lowpan_register_netdev(struct net_device *dev,
++			   enum lowpan_lltypes lltype)
++{
++	int ret;
 +
-+module_lowpan_nhc(ghc_ext_route);
-+MODULE_DESCRIPTION("6LoWPAN generic header routing extension compression");
-+MODULE_LICENSE("GPL");
++	rtnl_lock();
++	ret = lowpan_register_netdevice(dev, lltype);
++	rtnl_unlock();
++	return ret;
++}
++EXPORT_SYMBOL(lowpan_register_netdev);
++
++void lowpan_unregister_netdevice(struct net_device *dev)
++{
++	unregister_netdevice(dev);
++}
++EXPORT_SYMBOL(lowpan_unregister_netdevice);
++
++void lowpan_unregister_netdev(struct net_device *dev)
++{
++	rtnl_lock();
++	lowpan_unregister_netdevice(dev);
++	rtnl_unlock();
+ }
+-EXPORT_SYMBOL(lowpan_netdev_setup);
++EXPORT_SYMBOL(lowpan_unregister_netdev);
+ 
+ static int __init lowpan_module_init(void)
+ {
+diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+index 9e9cca3..d040365 100644
+--- a/net/bluetooth/6lowpan.c
++++ b/net/bluetooth/6lowpan.c
+@@ -825,9 +825,7 @@ static int setup_netdev(struct l2cap_chan *chan, struct lowpan_dev **dev)
+ 	list_add_rcu(&(*dev)->list, &bt_6lowpan_devices);
+ 	spin_unlock(&devices_lock);
+ 
+-	lowpan_netdev_setup(netdev, LOWPAN_LLTYPE_BTLE);
+-
+-	err = register_netdev(netdev);
++	err = lowpan_register_netdev(netdev, LOWPAN_LLTYPE_BTLE);
+ 	if (err < 0) {
+ 		BT_INFO("register_netdev failed %d", err);
+ 		spin_lock(&devices_lock);
+@@ -890,7 +888,7 @@ static void delete_netdev(struct work_struct *work)
+ 	struct lowpan_dev *entry = container_of(work, struct lowpan_dev,
+ 						delete_netdev);
+ 
+-	unregister_netdev(entry->netdev);
++	lowpan_unregister_netdev(entry->netdev);
+ 
+ 	/* The entry pointer is deleted by the netdev destructor. */
+ }
+@@ -1348,7 +1346,7 @@ static void disconnect_devices(void)
+ 		ifdown(entry->netdev);
+ 		BT_DBG("Unregistering netdev %s %p",
+ 		       entry->netdev->name, entry->netdev);
+-		unregister_netdev(entry->netdev);
++		lowpan_unregister_netdev(entry->netdev);
+ 		kfree(entry);
+ 	}
+ }
+diff --git a/net/ieee802154/6lowpan/core.c b/net/ieee802154/6lowpan/core.c
+index 20c49c7..737c87a 100644
+--- a/net/ieee802154/6lowpan/core.c
++++ b/net/ieee802154/6lowpan/core.c
+@@ -161,9 +161,7 @@ static int lowpan_newlink(struct net *src_net, struct net_device *ldev,
+ 				wdev->needed_headroom;
+ 	ldev->needed_tailroom = wdev->needed_tailroom;
+ 
+-	lowpan_netdev_setup(ldev, LOWPAN_LLTYPE_IEEE802154);
+-
+-	ret = register_netdevice(ldev);
++	ret = lowpan_register_netdevice(ldev, LOWPAN_LLTYPE_IEEE802154);
+ 	if (ret < 0) {
+ 		dev_put(wdev);
+ 		return ret;
+@@ -180,7 +178,7 @@ static void lowpan_dellink(struct net_device *ldev, struct list_head *head)
+ 	ASSERT_RTNL();
+ 
+ 	wdev->ieee802154_ptr->lowpan_dev = NULL;
+-	unregister_netdevice(ldev);
++	lowpan_unregister_netdevice(ldev);
+ 	dev_put(wdev);
+ }
+ 
 -- 
 2.6.1
 
