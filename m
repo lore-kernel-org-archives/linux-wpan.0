@@ -1,90 +1,80 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from [82.165.8.211] ([82.165.8.211]:41280 "EHLO mail.holtmann.org"
-	rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1751033AbbLKK3M convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Fri, 11 Dec 2015 05:29:12 -0500
-Content-Type: text/plain; charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 9.2 \(3112\))
-Subject: Re: [PATCH v5] ieee802154/adf7242: Driver for ADF7242 MAC IEEE802154
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1449829035-9784-1-git-send-email-michael.hennerich@analog.com>
-Date: Fri, 11 Dec 2015 00:28:55 -1000
-Content-Transfer-Encoding: 8BIT
-Message-Id: <6284B877-4413-4E6D-AD3F-56BB7E4812D8@holtmann.org>
-References: <1449829035-9784-1-git-send-email-michael.hennerich@analog.com>
+Received: from lists.s-osg.org ([54.187.51.154]:58673 "EHLO lists.s-osg.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750960AbbLJKOr (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+	Thu, 10 Dec 2015 05:14:47 -0500
+Subject: Re: [PATCH] ieee802154-atusb: Delete an unnecessary check before the
+ function call "kfree_skb"
+References: <5307CAA2.8060406@users.sourceforge.net>
+ <alpine.DEB.2.02.1402212321410.2043@localhost6.localdomain6>
+ <530A086E.8010901@users.sourceforge.net>
+ <alpine.DEB.2.02.1402231635510.1985@localhost6.localdomain6>
+ <530A72AA.3000601@users.sourceforge.net>
+ <alpine.DEB.2.02.1402240658210.2090@localhost6.localdomain6>
+ <530B5FB6.6010207@users.sourceforge.net>
+ <alpine.DEB.2.10.1402241710370.2074@hadrien>
+ <530C5E18.1020800@users.sourceforge.net>
+ <alpine.DEB.2.10.1402251014170.2080@hadrien>
+ <530CD2C4.4050903@users.sourceforge.net>
+ <alpine.DEB.2.10.1402251840450.7035@hadrien>
+ <530CF8FF.8080600@users.sourceforge.net>
+ <alpine.DEB.2.02.1402252117150.2047@localhost6.localdomain6>
+ <530DD06F.4090703@users.sourceforge.net>
+ <alpine.DEB.2.02.1402262129250.2221@localhost6.localdomain6>
+ <5317A59D.4@users.sourceforge.net> <564B5327.4010307@osg.samsung.com>
+ <564B5344.1090200@osg.samsung.com>
+From: Stefan Schmidt <stefan@osg.samsung.com>
+Message-ID: <56695093.8080605@osg.samsung.com>
+Date: Thu, 10 Dec 2015 11:14:43 +0100
+MIME-Version: 1.0
+In-Reply-To: <564B5344.1090200@osg.samsung.com>
+Content-Type: text/plain; charset=iso-8859-15; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: michael.hennerich@analog.com
-Cc: Alexander Aring <alex.aring@gmail.com>, stefan@datenfreihafen.org, linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org
+To: Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org, netdev@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, kernel-janitors@vger.kernel.org, Julia Lawall <julia.lawall@lip6.fr>
 
-Hi Michael,
+Marcel,
 
-> This driver has been sitting in the linux-zigbee[2] repository for a long
-> time. We updated it from time to time and made it available via our
-> github kernel repository. The Linux MAC802.15.4 support has improved a lot
-> since then. Thanks to all! So it’s finally time to upstream this driver.
-> 
-> The ADF7242 requires an add-on firmware for the automatic IEEE 802.15.4
-> operating modes. The firmware file is currently made available on the
-> ADF7242 wiki page here [1]
-> 
-> [1] http://wiki.analog.com/resources/tools-software/linux-drivers/networking-mac802154/adf7242
-> [2] http://sourceforge.net/p/linux-zigbee/kernel/ci/devel/tree/drivers/ieee802154/adf7242.c
-> 
-> Signed-off-by: Michael Hennerich <michael.hennerich@analog.com>
-> Reviewed-by: Stefan Schmidt <stefan@osg.samsung.com>
-> 
-> ---
-> 
-> Changes since v4:
-> 	-Fix compiler warning
-> 	-Reduce xmit timeout to 100ms
-> 
-> Changes since v3:
-> 	-Avoid race condition between xmit and the IRQ handler.
-> 	 If we receive a packet while we prepare a transmission we
-> 	 must not return to CMD_RX. Introduce atomic bitops flags,
-> 	 and drop packets if necessary.
-> 	-Refactor IRQ handling logic accordingly.
-> 	-Disable CSMA_CA status reported for now.
-> 	-For debug purposes adf7242_wait_status() pass line number to called function.
-> 	-Use atomic bitops in start/stop.
-> 	-Decrease xmit timeout to 250ms.
-> 	-Fix error handling path in adf7242_rx().
-> 	-Adf7242_isr() factor out debug code into separate function.
-> 	-Avoid surplus ifdef DEBUG
-> 
-> Changes since v2:
-> 	-Removed unused variable.
-> 	-Removed dead code.
-> 
-> Changes since v1:
-> 	-Add link to the product page/datasheet.
-> 	-Add missing includes.
-> 	-Use defines for magic PA bias values.
-> 	-Unify wait_ready and wait_status functions.
-> 	-Add RC_BUSY error handling using soft reset.
-> 	 Requires some extra cached parameters.
-> 	-Enable adf7242_verify_firmware() only during DEBUG.
-> 	-Fixed some compiler warnings.
-> 	-Removed sysfs status attribute.
-> 	-Added debugfs status file.
-> 	-Enable/Disable IRQ in start/stop.
-> 	-Added missing MAINTAINER entry.
-> 	-Added missing Kconfig help text.
-> ---
-> .../devicetree/bindings/net/ieee802154/adf7242.txt |   18 +
-> MAINTAINERS                                        |    9 +
-> drivers/net/ieee802154/Kconfig                     |   11 +
-> drivers/net/ieee802154/Makefile                    |    1 +
-> drivers/net/ieee802154/adf7242.c                   | 1285 ++++++++++++++++++++
-> 5 files changed, 1324 insertions(+)
-> create mode 100644 Documentation/devicetree/bindings/net/ieee802154/adf7242.txt
-> create mode 100644 drivers/net/ieee802154/adf7242.c
+On 17/11/15 17:18, Stefan Schmidt wrote:
+> Hello.
+>
+> On 17/11/15 17:17, Stefan Schmidt wrote:
+>> From: Markus Elfring <elfring@users.sourceforge.net>
+>> Date: Mon, 16 Nov 2015 13:50:23 +0100
+>>
+>> The kfree_skb() function tests whether its argument is NULL and then
+>> returns immediately. Thus the test around the call is not needed.
+>>
+>> This issue was detected by using the Coccinelle software.
+>>
+>> Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
+>> ---
+>>  drivers/net/ieee802154/atusb.c | 3 +--
+>>  1 file changed, 1 insertion(+), 2 deletions(-)
+>>
+>> diff --git a/drivers/net/ieee802154/atusb.c 
+>> b/drivers/net/ieee802154/atusb.c
+>> index 199a94a..b1cd865 100644
+>> --- a/drivers/net/ieee802154/atusb.c
+>> +++ b/drivers/net/ieee802154/atusb.c
+>> @@ -310,8 +310,7 @@ static void atusb_free_urbs(struct atusb *atusb)
+>>          urb = usb_get_from_anchor(&atusb->idle_urbs);
+>>          if (!urb)
+>>              break;
+>> -        if (urb->context)
+>> -            kfree_skb(urb->context);
+>> +        kfree_skb(urb->context);
+>>          usb_free_urb(urb);
+>>      }
+>>  }
+>
+> Acked-by: Stefan Schmidt <stefan@osg.samsung.com>
 
-patch has been applied to bluetooth-next tree.
 
-Regards
+You got the original patch and my ACK on this one or would you prefer me 
+to resend it again?
 
-Marcel
-
+regards
+Stefan Schmidt
