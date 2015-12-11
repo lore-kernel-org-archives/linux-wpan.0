@@ -1,10 +1,10 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from lists.s-osg.org ([54.187.51.154]:33832 "EHLO lists.s-osg.org"
+Received: from mout.web.de ([212.227.17.12]:52319 "EHLO mout.web.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751991AbbLJWqC (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-	Thu, 10 Dec 2015 17:46:02 -0500
-Subject: Re: [PATCH] ieee802154-atusb: Delete an unnecessary check before the
- function call "kfree_skb"
+	id S1750960AbbLKNH0 (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+	Fri, 11 Dec 2015 08:07:26 -0500
+Subject: Re: ieee802154-atusb: Delete an unnecessary check before the function
+ call "kfree_skb"
 References: <5307CAA2.8060406@users.sourceforge.net>
  <alpine.DEB.2.02.1402212321410.2043@localhost6.localdomain6>
  <530A086E.8010901@users.sourceforge.net>
@@ -24,63 +24,31 @@ References: <5307CAA2.8060406@users.sourceforge.net>
  <5317A59D.4@users.sourceforge.net> <564B5327.4010307@osg.samsung.com>
  <564B5344.1090200@osg.samsung.com> <56695093.8080605@osg.samsung.com>
  <7DCE62A2-DEA0-4ABF-A0D6-4EE00BDFFE95@holtmann.org>
-From: Stefan Schmidt <stefan@osg.samsung.com>
-Message-ID: <566A00A5.8030806@osg.samsung.com>
-Date: Thu, 10 Dec 2015 23:45:57 +0100
+From: SF Markus Elfring <elfring@users.sourceforge.net>
+Message-ID: <566ACA84.6080603@users.sourceforge.net>
+Date: Fri, 11 Dec 2015 14:07:16 +0100
 MIME-Version: 1.0
 In-Reply-To: <7DCE62A2-DEA0-4ABF-A0D6-4EE00BDFFE95@holtmann.org>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Marcel Holtmann <marcel@holtmann.org>
+To: Marcel Holtmann <marcel@holtmann.org>, Stefan Schmidt <stefan@osg.samsung.com>
 Cc: Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org, Network Development <netdev@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, kernel-janitors@vger.kernel.org, Julia Lawall <julia.lawall@lip6.fr>
 
-Hello.
-
-On 10/12/15 19:16, Marcel Holtmann wrote:
-> Hi Stefan,
->
->>>> From: Markus Elfring <elfring@users.sourceforge.net>
->>>> Date: Mon, 16 Nov 2015 13:50:23 +0100
->>>>
->>>> The kfree_skb() function tests whether its argument is NULL and then
->>>> returns immediately. Thus the test around the call is not needed.
->>>>
->>>> This issue was detected by using the Coccinelle software.
->>>>
->>>> Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
->>>> ---
->>>> drivers/net/ieee802154/atusb.c | 3 +--
->>>> 1 file changed, 1 insertion(+), 2 deletions(-)
->>>>
->>>> diff --git a/drivers/net/ieee802154/atusb.c b/drivers/net/ieee802154/atusb.c
->>>> index 199a94a..b1cd865 100644
->>>> --- a/drivers/net/ieee802154/atusb.c
->>>> +++ b/drivers/net/ieee802154/atusb.c
->>>> @@ -310,8 +310,7 @@ static void atusb_free_urbs(struct atusb *atusb)
->>>>          urb = usb_get_from_anchor(&atusb->idle_urbs);
->>>>          if (!urb)
->>>>              break;
->>>> -        if (urb->context)
->>>> -            kfree_skb(urb->context);
->>>> +        kfree_skb(urb->context);
->>>>          usb_free_urb(urb);
->>>>      }
->>>> }
->>> Acked-by: Stefan Schmidt <stefan@osg.samsung.com>
->>
->> You got the original patch and my ACK on this one or would you prefer me to resend it again?
 > this slipped through, but now it does no longer apply.
->
+> 
 > Applying: ieee802154-atusb: Delete an unnecessary check before the function call "kfree_skb"
 > error: patch failed: drivers/net/ieee802154/atusb.c:310
 > error: drivers/net/ieee802154/atusb.c: patch does not apply
 > Patch failed at 0001 ieee802154-atusb: Delete an unnecessary check before the function call "kfree_skb"
 
-Not good. I did another resend, this one applied, compiled and worked 
-fine for me. You will be in the to line.
+How can this hiccup happen?
 
-regards
-Stefan Schmidt
+A command like the following is still working for me on source files
+for the software "Linux next-20151211".
 
+elfring@Sonne:~/Projekte/Linux/next-patched> git apply ~/Projekte/Bau/Linux/scripts/Coccinelle/deletions1/next/20151113/Flicken/0001-ieee802154-atusb-Delete-an-unnecessary-check-before.patch
+
+Regards,
+Markus
