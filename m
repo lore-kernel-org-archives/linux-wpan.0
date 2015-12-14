@@ -1,44 +1,40 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from shards.monkeyblade.net ([149.20.54.216]:60518 "EHLO
-	shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932371AbbLNVLK (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Mon, 14 Dec 2015 16:11:10 -0500
-Date: Mon, 14 Dec 2015 16:11:04 -0500 (EST)
-Message-Id: <20151214.161104.51809961792932420.davem@davemloft.net>
-Subject: Re: [PATCH net-next] ipv6: addrconf: drop ieee802154 specific
- things
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <1450122922-3174-1-git-send-email-alex.aring@gmail.com>
-References: <1450122922-3174-1-git-send-email-alex.aring@gmail.com>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+Received: from mail-wm0-f52.google.com ([74.125.82.52]:38829 "EHLO
+	mail-wm0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932339AbbLNVaw (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Mon, 14 Dec 2015 16:30:52 -0500
+Received: by wmpp66 with SMTP id p66so79070171wmp.1
+        for <linux-wpan@vger.kernel.org>; Mon, 14 Dec 2015 13:30:50 -0800 (PST)
+From: Alexander Aring <alex.aring@gmail.com>
+Subject: [PATCH bluetooth-next] adf7242: remove multiple returns
+Date: Mon, 14 Dec 2015 22:30:44 +0100
+Message-Id: <1450128644-9659-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: alex.aring@gmail.com
-Cc: linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, kernel@pengutronix.de, kuznet@ms2.inr.ac.ru, jmorris@namei.org, yoshfuji@linux-ipv6.org, kaber@trash.net
+To: linux-wpan@vger.kernel.org
+Cc: kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>, Michael Hennerich <michael.hennerich@analog.com>
 
-From: Alexander Aring <alex.aring@gmail.com>
-Date: Mon, 14 Dec 2015 20:55:22 +0100
+This patch removes an unnecessary return inside the adf7242 driver.
 
-> This patch removes ARPHRD_IEEE802154 from addrconf handling. In the
-> earlier days of 802.15.4 6LoWPAN, the interface type was ARPHRD_IEEE802154
-> which introduced several issues, because 802.15.4 interfaces used the
-> same type.
-> 
-> Since commit 965e613d299c ("ieee802154: 6lowpan: fix ARPHRD to
-> ARPHRD_6LOWPAN") we use ARPHRD_6LOWPAN for 6LoWPAN interfaces. This
-> patch will remove ARPHRD_IEEE802154 which is currently deadcode, because
-> ARPHRD_IEEE802154 doesn't reach the minimum 1280 MTU of IPv6.
-> 
-> Also we use 6LoWPAN EUI64 specific defines instead using link-layer
-> constanst from 802.15.4 link-layer header.
-> 
-> Cc: David S. Miller <davem@davemloft.net>
-> Cc: Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>
-> Cc: James Morris <jmorris@namei.org>
-> Cc: Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>
-> Cc: Patrick McHardy <kaber@trash.net>
-> Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+Cc: Michael Hennerich <michael.hennerich@analog.com>
+Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+---
+ drivers/net/ieee802154/adf7242.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-Applied, thank you.
+diff --git a/drivers/net/ieee802154/adf7242.c b/drivers/net/ieee802154/adf7242.c
+index 89154c0..738b373 100644
+--- a/drivers/net/ieee802154/adf7242.c
++++ b/drivers/net/ieee802154/adf7242.c
+@@ -1114,8 +1114,6 @@ static int adf7242_debugfs_init(struct adf7242_local *lp)
+ 					    lp->debugfs_root,
+ 					    adf7242_stats_show);
+ 	return PTR_ERR_OR_ZERO(stats);
+-
+-	return 0;
+ }
+ 
+ static const s32 adf7242_powers[] = {
+-- 
+2.6.1
+
