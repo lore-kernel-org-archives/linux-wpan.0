@@ -1,90 +1,81 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wm0-f46.google.com ([74.125.82.46]:34718 "EHLO
-	mail-wm0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753111AbbLKTtc (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Fri, 11 Dec 2015 14:49:32 -0500
-Date: Fri, 11 Dec 2015 20:49:23 +0100
+Received: from mail-wm0-f52.google.com ([74.125.82.52]:38715 "EHLO
+	mail-wm0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750914AbbLNOIa (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Mon, 14 Dec 2015 09:08:30 -0500
 From: Alexander Aring <alex.aring@gmail.com>
-Subject: Re: [RFCv3 bluetooth-next 4/4] 6lowpan: iphc: add support for
- stateful compression
-Message-ID: <20151211194922.GA26064@omega>
-References: <1448796882-316-1-git-send-email-alex.aring@gmail.com>
- <1448796882-316-5-git-send-email-alex.aring@gmail.com>
- <20151211170541.GA1119@omega>
- <566B1FEE.5030509@osg.samsung.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <566B1FEE.5030509@osg.samsung.com>
+Subject: [RFC radvd 0/2] radvd: 6lowpan 6CO testing patches
+Date: Mon, 14 Dec 2015 15:07:34 +0100
+Message-Id: <1450102056-23107-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Stefan Schmidt <stefan@osg.samsung.com>
-Cc: linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, kernel@pengutronix.de, mcr@sandelman.ca, lukasz.duda@nordicsemi.no, martin.gergeleit@hs-rm.de
+To: linux-wpan@vger.kernel.org
+Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, kernel@pengutronix.de, mcr@sandelman.ca, lukasz.duda@nordicsemi.no, martin.gergeleit@hs-rm.de, Alexander Aring <alex.aring@gmail.com>
 
-On Fri, Dec 11, 2015 at 08:11:42PM +0100, Stefan Schmidt wrote:
-> Hello.
-> 
-> On 11/12/15 18:05, Alexander Aring wrote:
-> >Hi,
-> >
-> >status update here.
-> >
-> >I implemented successful basic 6CO RA messages at sending and
-> >processing inside radvd.
-> >
-> >There might also the question if processing 6CO inside kernel or
-> >userspace? I put the basic functionality inside userspace for now.
-> 
-> How are you feeding the entries your receive back into the kernel? The
-> debugfs interface right now?
-> If we want to go with userspace handling for 6CO we need something better at
-> some point.
-> 
+Hi,
 
-yes. For testing it's fine, I think we should add first support this way. If
-we see it seems to be working well then making better UAPI interface.
+this patch is for testing 6CO fields in RA messages with the help of radvd.
 
-I currently complete ignore the lifetime thing and handle it like
-lifetime is non-zero.
+I tested it with the following configuration and two or more nodes which can
+directly reach each other.
 
-For the lifetime handling, I think we need more than just a "bool", we
-need flags. Because we need indicate "somehow" the "C flag" and if the
-entry is "added" or "not added" (some active/enabled flag). See [0], or
-we do that by check on "::" address/prefix, but I would not do that so far
-nobody says that's an invalid prefix.
+On one node (6LBR, if more 6LBR they need to have the same context
+information!):
 
-Then also the question is if doing the lifetime of a context inside the
-kernel or in userspace (handled by $USERSPACE_PROGRAM, e.g. radvd). I think
-radvd can handle this. See [1]:
+interface lowpan0
+{
+        Adv6LBR on;
+        AdvSendAdvert on;
+        UnicastOnly on;
+        AdvCurHopLimit 255;
 
-The prefix information is timed out as specified in [RFC4861].  When
-the Valid Lifetime for a context table entry expires, the entry is
-placed in a receive-only mode, which is the equivalent of
-receiving a 6CO for that context with C=0.  The entry is held in
-receive-only mode for a period of twice the default Router Lifetime,
-after which the entry is removed.
+        prefix 2001::/64 {
+                AdvOnLink on;
+                AdvAutonomous on;
+                AdvRouterAddr on;
+        };
 
-For this we need the "C" flag and "active" flag (indicate remove). That
-the entry is held could be very simple by a timer in kernel, but
-otherwise $USERSPACE_PROGRAM could also do this job by handle the
-lifetime only in userspace, when lifetime expires -> manipulating the table.
+        lowpanco {
+                ctx 0 {
+                        AdvContextCompressionFlag on;
+                        AdvContextLength 64;
+                        AdvContextPrefix 2001::;
+                        AdvLifeTime 1000;
+                };
+        };
+};
 
-I am not sure what's the best option here is.
+On other nodes:
 
-BTW:
+interface lowpan0
+{
+	Adv6LBR off;
+	AdvSendAdvert off;
+};
 
-One bad news is, that radvd needs now to run under "root" with this
-changes and it seems that it can running without root right before. This
-might be getting a problem when trying to send such feature uptream to
-radvd.
-
-Testing:
-
-I already test the new stateful compression patch (manipulating entries in
-RIOT manually (no RA messages processing on RIOT).
-It works fine under RIOT by manipulating RIOT's context table.
+Then you can see that the assigned global link 2001::/64 address will
+be compressed. Tested with: ping6 and wireshark on $WPAN interface, when
+using 802.15.4 6LoWPAN.
 
 - Alex
 
-[0] https://tools.ietf.org/html/rfc6775#section-5.4.2
-[1] https://tools.ietf.org/html/rfc6775#section-5.4.3
+Alexander Aring (2):
+  device-linux: replace ARPHRD_IEEE802154 to ARPHRD_6LOWPAN
+  radvd: rework 6CO handling
+
+ defaults.h      |  3 +++
+ device-bsd44.c  |  6 ++++++
+ device-linux.c  | 46 +++++++++++++++++++++++++++++++++++++++++++---
+ gram.y          | 55 ++++++++++++++++++++++++++++++++++++++++++++++---------
+ pathnames.h     |  1 +
+ privsep-linux.c | 55 ++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ process.c       | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
+ radvd.c         |  6 ++++++
+ radvd.h         | 21 +++++++++++++++++++--
+ scanner.l       |  4 +++-
+ send.c          | 33 ++++++++++++++++++++++++---------
+ 11 files changed, 253 insertions(+), 25 deletions(-)
+
+-- 
+2.6.1
+
