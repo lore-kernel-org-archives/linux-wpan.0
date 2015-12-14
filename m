@@ -1,81 +1,44 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wm0-f52.google.com ([74.125.82.52]:36708 "EHLO
-	mail-wm0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752892AbbLNTzq (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Mon, 14 Dec 2015 14:55:46 -0500
-From: Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH net-next] ipv6: addrconf: drop ieee802154 specific things
-Date: Mon, 14 Dec 2015 20:55:22 +0100
-Message-Id: <1450122922-3174-1-git-send-email-alex.aring@gmail.com>
+Received: from shards.monkeyblade.net ([149.20.54.216]:60518 "EHLO
+	shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932371AbbLNVLK (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Mon, 14 Dec 2015 16:11:10 -0500
+Date: Mon, 14 Dec 2015 16:11:04 -0500 (EST)
+Message-Id: <20151214.161104.51809961792932420.davem@davemloft.net>
+Subject: Re: [PATCH net-next] ipv6: addrconf: drop ieee802154 specific
+ things
+From: David Miller <davem@davemloft.net>
+In-Reply-To: <1450122922-3174-1-git-send-email-alex.aring@gmail.com>
+References: <1450122922-3174-1-git-send-email-alex.aring@gmail.com>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, kernel@pengutronix.de, Alexander Aring <alex.aring@gmail.com>, "David S . Miller" <davem@davemloft.net>, Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>, James Morris <jmorris@namei.org>, Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>, Patrick McHardy <kaber@trash.net>
+To: alex.aring@gmail.com
+Cc: linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, kernel@pengutronix.de, kuznet@ms2.inr.ac.ru, jmorris@namei.org, yoshfuji@linux-ipv6.org, kaber@trash.net
 
-This patch removes ARPHRD_IEEE802154 from addrconf handling. In the
-earlier days of 802.15.4 6LoWPAN, the interface type was ARPHRD_IEEE802154
-which introduced several issues, because 802.15.4 interfaces used the
-same type.
+From: Alexander Aring <alex.aring@gmail.com>
+Date: Mon, 14 Dec 2015 20:55:22 +0100
 
-Since commit 965e613d299c ("ieee802154: 6lowpan: fix ARPHRD to
-ARPHRD_6LOWPAN") we use ARPHRD_6LOWPAN for 6LoWPAN interfaces. This
-patch will remove ARPHRD_IEEE802154 which is currently deadcode, because
-ARPHRD_IEEE802154 doesn't reach the minimum 1280 MTU of IPv6.
+> This patch removes ARPHRD_IEEE802154 from addrconf handling. In the
+> earlier days of 802.15.4 6LoWPAN, the interface type was ARPHRD_IEEE802154
+> which introduced several issues, because 802.15.4 interfaces used the
+> same type.
+> 
+> Since commit 965e613d299c ("ieee802154: 6lowpan: fix ARPHRD to
+> ARPHRD_6LOWPAN") we use ARPHRD_6LOWPAN for 6LoWPAN interfaces. This
+> patch will remove ARPHRD_IEEE802154 which is currently deadcode, because
+> ARPHRD_IEEE802154 doesn't reach the minimum 1280 MTU of IPv6.
+> 
+> Also we use 6LoWPAN EUI64 specific defines instead using link-layer
+> constanst from 802.15.4 link-layer header.
+> 
+> Cc: David S. Miller <davem@davemloft.net>
+> Cc: Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>
+> Cc: James Morris <jmorris@namei.org>
+> Cc: Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>
+> Cc: Patrick McHardy <kaber@trash.net>
+> Signed-off-by: Alexander Aring <alex.aring@gmail.com>
 
-Also we use 6LoWPAN EUI64 specific defines instead using link-layer
-constanst from 802.15.4 link-layer header.
-
-Cc: David S. Miller <davem@davemloft.net>
-Cc: Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>
-Cc: James Morris <jmorris@namei.org>
-Cc: Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>
-Cc: Patrick McHardy <kaber@trash.net>
-Signed-off-by: Alexander Aring <alex.aring@gmail.com>
----
- net/ipv6/addrconf.c | 8 +++-----
- 1 file changed, 3 insertions(+), 5 deletions(-)
-
-diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
-index 5e9111d..7082fb7 100644
---- a/net/ipv6/addrconf.c
-+++ b/net/ipv6/addrconf.c
-@@ -70,7 +70,7 @@
- #include <net/sock.h>
- #include <net/snmp.h>
- 
--#include <net/af_ieee802154.h>
-+#include <net/6lowpan.h>
- #include <net/firewire.h>
- #include <net/ipv6.h>
- #include <net/protocol.h>
-@@ -1947,9 +1947,9 @@ static void addrconf_leave_anycast(struct inet6_ifaddr *ifp)
- 
- static int addrconf_ifid_eui64(u8 *eui, struct net_device *dev)
- {
--	if (dev->addr_len != IEEE802154_ADDR_LEN)
-+	if (dev->addr_len != EUI64_ADDR_LEN)
- 		return -1;
--	memcpy(eui, dev->dev_addr, 8);
-+	memcpy(eui, dev->dev_addr, EUI64_ADDR_LEN);
- 	eui[0] ^= 2;
- 	return 0;
- }
-@@ -2041,7 +2041,6 @@ static int ipv6_generate_eui64(u8 *eui, struct net_device *dev)
- 	case ARPHRD_IPGRE:
- 		return addrconf_ifid_gre(eui, dev);
- 	case ARPHRD_6LOWPAN:
--	case ARPHRD_IEEE802154:
- 		return addrconf_ifid_eui64(eui, dev);
- 	case ARPHRD_IEEE1394:
- 		return addrconf_ifid_ieee1394(eui, dev);
-@@ -3066,7 +3065,6 @@ static void addrconf_dev_config(struct net_device *dev)
- 	    (dev->type != ARPHRD_FDDI) &&
- 	    (dev->type != ARPHRD_ARCNET) &&
- 	    (dev->type != ARPHRD_INFINIBAND) &&
--	    (dev->type != ARPHRD_IEEE802154) &&
- 	    (dev->type != ARPHRD_IEEE1394) &&
- 	    (dev->type != ARPHRD_TUNNEL6) &&
- 	    (dev->type != ARPHRD_6LOWPAN)) {
--- 
-2.6.1
-
+Applied, thank you.
