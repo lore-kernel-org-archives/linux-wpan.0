@@ -1,105 +1,189 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail.nordicsemi.no ([194.19.86.146]:40622 "EHLO
-	ironport01.nordicsemi.no" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932389AbbLQM0l (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Thu, 17 Dec 2015 07:26:41 -0500
-From: "Duda, Lukasz" <Lukasz.Duda@nordicsemi.no>
-Subject: RE: [RFCv4 bluetooth-next 1/2] 6lowpan: iphc: add support for
+Received: from mail-wm0-f41.google.com ([74.125.82.41]:36996 "EHLO
+	mail-wm0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756506AbbLQNlN (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Thu, 17 Dec 2015 08:41:13 -0500
+Date: Thu, 17 Dec 2015 14:41:05 +0100
+From: Alexander Aring <alex.aring@gmail.com>
+Subject: Re: [RFCv4 bluetooth-next 1/2] 6lowpan: iphc: add support for
  stateful compression
-Date: Thu, 17 Dec 2015 12:26:37 +0000
-Message-ID: <AB80DA35A7B64E4E98291794926897D9011B977941@MBX03.nvlsi.no>
+Message-ID: <20151217134100.GA6260@omega>
 References: <1450101654-22633-1-git-send-email-alex.aring@gmail.com>
  <1450101654-22633-2-git-send-email-alex.aring@gmail.com>
  <AB80DA35A7B64E4E98291794926897D9011B97546F@MBX03.nvlsi.no>
  <20151215110835.GA3774@omega>
-In-Reply-To: <20151215110835.GA3774@omega>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ <AB80DA35A7B64E4E98291794926897D9011B977941@MBX03.nvlsi.no>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <AB80DA35A7B64E4E98291794926897D9011B977941@MBX03.nvlsi.no>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>
+To: "Duda, Lukasz" <Lukasz.Duda@nordicsemi.no>
 Cc: "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>, "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "kernel@pengutronix.de" <kernel@pengutronix.de>, "mcr@sandelman.ca" <mcr@sandelman.ca>, "martin.gergeleit@hs-rm.de" <martin.gergeleit@hs-rm.de>
 
-SGkgQWxleCENCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBBbGV4YW5k
-ZXIgQXJpbmcgW21haWx0bzphbGV4LmFyaW5nQGdtYWlsLmNvbV0NCj4gU2VudDogVHVlc2RheSwg
-RGVjZW1iZXIgMTUsIDIwMTUgMTI6MDkNCj4gVG86IER1ZGEsIEx1a2Fzeg0KPiBDYzogbGludXgt
-d3BhbkB2Z2VyLmtlcm5lbC5vcmc7IGxpbnV4LWJsdWV0b290aEB2Z2VyLmtlcm5lbC5vcmc7DQo+
-IG5ldGRldkB2Z2VyLmtlcm5lbC5vcmc7IGtlcm5lbEBwZW5ndXRyb25peC5kZTsgbWNyQHNhbmRl
-bG1hbi5jYTsNCj4gbWFydGluLmdlcmdlbGVpdEBocy1ybS5kZQ0KPiBTdWJqZWN0OiBSZTogW1JG
-Q3Y0IGJsdWV0b290aC1uZXh0IDEvMl0gNmxvd3BhbjogaXBoYzogYWRkIHN1cHBvcnQgZm9yDQo+
-IHN0YXRlZnVsIGNvbXByZXNzaW9uDQo+IA0KPiBPbiBUdWUsIERlYyAxNSwgMjAxNSBhdCAxMDoy
-OTo1MUFNICswMDAwLCBEdWRhLCBMdWthc3ogd3JvdGU6DQo+ID4gRmlyc3Qgb2YgYWxsIGdyZWF0
-IHdvcmsgZm9yIHlvdXIgc2VyaWVzIG9mIHBhdGNoZXMgb24gNmxvd3BhbiBpbXByb3ZlbWVudHMN
-Cj4gYW5kDQo+ID4gc3RhdGVmdWwgY29tcHJlc3Npb24hDQo+ID4NCj4gPiBJIGhhdmUganVzdCBk
-b25lIHNvbWUgdGVzdGluZyBvZiB0aGlzIHBhdGNoICh3aXRob3V0IFJBRFZEIG1vZGlmaWNhdGlv
-bnMpLA0KPiBhbmQNCj4gPiBJIGNhbiBzaGFyZSBteSBleHBlcmltZW50cyB1c2luZyA2TG9XUEFO
-IG92ZXIgQlQtTEUgYnkgc2VuZGluZyBzaW1wbGUNCj4gSUNNUHY2DQo+ID4gbWVzc2FnZXMuIENv
-bnRleHRzIGZvciBCVExFIGRldmljZSBoYXMgYmVlbiBhZGRlZCBtYW51YWxseS4NCj4gPg0KPiAN
-Cj4gZGlkIHlvdSB0ZXN0IHRoYXQgd2l0aCBsaW51eCA8LT4gbGludXg/IE9yIGxpbnV4IDwtPg0K
-PiAkU09NRV9PVEhFUl82TE9XUEFOX0JUTEVfU1RBQ0suDQo+IA0KPiBJIHRlc3RlZCBpdCBvbiBt
-eSBzaWRlIHdpdGggUklPVCwgaXQgaGFzIDgwMi4xNS40IDZMb1dQQU4gc3VwcG9ydCBhbmQNCj4g
-YWxzbyBtYW5pcHVsYXRlIG1hbnVhbGx5IHRoZSBjb250ZXh0IHRhYmxlLg0KPiANCg0KSSBoYXZl
-IHRlc3RlZCBpdCB3aXRoIG5SRjUyIEJUTEUgZGV2aWNlIGZyb20gTm9yZGljIFNlbWljb25kdWN0
-b3IgDQp3aXRoIElvVCBTREssIGFuZCBMaW51eCBVYnVudHUgd2l0aCBCVExFIERvbmdsZSB0aGF0
-IGFjdHMgYXMgUm91dGVyL01hc3Rlci4NCg0KPiA+IEV4cGVyaW1lbnQgMToNCj4gPg0KPiA+IFJv
-dXRlcjogMjAwMTpkYjg6OjEvNjQgQlRMRTogMjAwMTpkYjg6OjIxMToyMkZGOkZFMzM6NDQ1NS82
-NA0KPiA+IENJRCAxOiAyMDAxOmRiODo6LzY0DQo+ID4NCj4gPiBXb3JrcyBmaW5lLCBJIHNlZSB0
-aGF0IENJRCAxIGlzIHVzZWQgZm9yIGJvdGggYWRkcmVzc2VzLiBSb3V0ZXIgaGFzIDY0IGJpdHMg
-b2YNCj4gPiBJSUQgaW5saW5lIGFuZCBCVExFIG5vZGUgaGFzIDAuDQo+ID4NCj4gPiBFeHBlcmlt
-ZW50IDI6DQo+ID4NCj4gPiBSb3V0ZXI6IDIwMDE6ZGI4OjoxLzY0IEJUTEU6IDIwMDE6ZGI4Ojoy
-MTE6MjJGRjpGRTMzOjQ0NTUvNjQNCj4gPiBDSUQgMzogMjAwMTpkYjg6Oi82NCBDSUQgNTogMjAw
-MTpkYjg6OjEvMTI4DQo+ID4NCj4gPiBXb3JrcyBhbHNvIGZpbmUsIEkgc2VlIHRoYXQgYm90aCBD
-SUQgMyBhbmQgNSBhcmUgdXNlZCwgYXMgd2VsbCBhcyBib3RoIHNpZGVzDQo+ID4gY29tcHJlc3Mg
-aXRzIElJRCBpbiB0aGUgYmVzdCBwb3NzaWJsZSB3YXkuIFNvIHRoZSBwYXRjaCBhcHBlYXJzIHRv
-IHdvcmsgZmluZQ0KPiBvbg0KPiA+IDZMb1dQQU4gb3ZlciBCVC1MRS4NCj4gPg0KPiANCj4gb2su
-DQo+IA0KPiA+DQo+ID4gSG93ZXZlciwgSSBub3RpY2UgdGhhdCB0aGUgZm9sZGVyIGNyZWF0ZWQg
-aW4gdGhlIHN5cy9rZXJuZWwvZGVidWcvNmxvd3Bhbi8NCj4gZm9yDQo+ID4gbXkgYmx1ZXRvb3Ro
-IG5ldHdvcmsgaW50ZXJmYWNlIGlzIGNhbGxlZCAiYnQlZCIuIEFuZCBJIHdvdWxkIGltYWdpbmUg
-dGhpcw0KPiA+IHNob3VsZCBiZSAiYnQwIiwgImJ0MSIsIC4uLiBhbmQgbm90IHRoZSB0ZW1wbGF0
-ZT8NCj4gPg0KPiANCj4gdXJnaCwgdGhpcyBzaG91bGQgbm90IGhhcHBlbi4gSSB1c2UgImRldi0+
-bmFtZSIgZm9yIHRoYXQgYW5kIGRldiBpcyB0aGUNCj4gbmV0ZGV2aWNlIHN0cnVjdHVyZS4gVGhp
-cyBzaG91bGQgYmUgYW4gX3VuaXF1ZV8gaW50ZXJmYWNlIG5hbWUsDQo+IG90aGVyd2lzZSB5b3Ug
-d2lsbCBnZXR0aW5nIHRyb3VibGUgaWYgeW91IGhhdmUgdHdvIGJ0bGUgNmxvd3Bhbg0KPiBpbnRl
-cmZhY2VzLg0KPiANCj4gSSBkaWRuJ3QgcmVhbGl6ZWQgaXQgYmVjYXVzZSBJIGNyZWF0ZSBteSBp
-bnRlcmZhY2Ugd2l0aDoNCj4gDQo+IGlwIGxpbmsgYWRkIGxpbmsgd3BhbjAgbmFtZSBsb3dwYW4w
-IHR5cGUgbG93cGFuDQo+IA0KPiBidXQgc2hvdWxkIGNoYW5nZSBpdCBpbnRvOg0KPiANCj4gaXAg
-bGluayBhZGQgbGluayB3cGFuMCBuYW1lIGxvd3BhbiVkIHR5cGUgbG93cGFuDQo+IA0KPiBJIHJl
-YWxpemVkIHRoYXQgdGhlIGRldi0+bmFtZSB3aWxsIGJlIGNoYW5nZWQgZnJvbSB0ZW1wbGF0ZSBp
-bnRvICJyZWFsIg0KPiBuYW1lIGFmdGVyIHJlZ2lzdGVyaW5nLiBUaGlzIHNob3VsZCBkbyB0aGUg
-am9iOg0KPiANCj4gZGlmZiAtLWdpdCBhL25ldC82bG93cGFuL2NvcmUuYyBiL25ldC82bG93cGFu
-L2NvcmUuYw0KPiBpbmRleCBjN2YwNmY1Li5mYWY2NWJhIDEwMDY0NA0KPiAtLS0gYS9uZXQvNmxv
-d3Bhbi9jb3JlLmMNCj4gKysrIGIvbmV0LzZsb3dwYW4vY29yZS5jDQo+IEBAIC0yOSwxMyArMjks
-MTMgQEAgaW50IGxvd3Bhbl9yZWdpc3Rlcl9uZXRkZXZpY2Uoc3RydWN0IG5ldF9kZXZpY2UNCj4g
-KmRldiwNCj4gDQo+ICAgICAgICAgbG93cGFuX3ByaXYoZGV2KS0+bGx0eXBlID0gbGx0eXBlOw0K
-PiANCj4gLSAgICAgICByZXQgPSBsb3dwYW5fZGV2X2RlYnVnZnNfaW5pdChkZXYpOw0KPiArICAg
-ICAgIHJldCA9IHJlZ2lzdGVyX25ldGRldmljZShkZXYpOw0KPiAgICAgICAgIGlmIChyZXQgPCAw
-KQ0KPiAgICAgICAgICAgICAgICAgcmV0dXJuIHJldDsNCj4gDQo+IC0gICAgICAgcmV0ID0gcmVn
-aXN0ZXJfbmV0ZGV2aWNlKGRldik7DQo+ICsgICAgICAgcmV0ID0gbG93cGFuX2Rldl9kZWJ1Z2Zz
-X2luaXQoZGV2KTsNCj4gICAgICAgICBpZiAocmV0IDwgMCkNCj4gLSAgICAgICAgICAgICAgIGxv
-d3Bhbl9kZXZfZGVidWdmc19leGl0KGRldik7DQo+ICsgICAgICAgICAgICAgICB1bnJlZ2lzdGVy
-X25ldGRldmljZShkZXYpOw0KPiANCj4gICAgICAgICByZXR1cm4gcmV0Ow0KPiAgfQ0KPiANCj4g
-SSB0aGluayBpdCBzaG91bGQgYmUgc2FmZSB0byBkbyB0aGF0IGFmdGVyIHJlZ2lzdGVyaW5nIGJl
-Y2F1c2Ugd2UgaGVsZCB0aGUNCj4gUlROTCBsb2NrLiBBbmQgdGhlIGludGVyZmFjZSBpc24ndCB1
-cCBhZnRlciByZWdpc3RlcmluZy4NCj4gDQoNClRoYW5rcyEgWW91ciBwYXRjaCBoZWxwZWQsIGFu
-ZCBJIGFja2VkIGl0IGluIHNlcGFyYXRlIG1haWwgdGhyZWFkLg0KDQo+ID4gQWxzbywgSSBub3Rp
-Y2UgdGhhdCB0aGUgY29tcHJlc3Npb24gZm9yIEZsb3cgQ29udHJvbCBhbmQgVHJhZmZpYyBMYWJl
-bCBpbiBJUHY2DQo+ID4gaGVhZGVyIGhhcyBiZWVuIG1vZGlmaWVkLCB0aGVzZSBmaWVsZHMgYXJl
-IG5vIGxvbmdlciBjb21wcmVzc2VkIGluIGFueQ0KPiBwYWNrZXRzDQo+ID4gKDBiMTEgdmFsdWUp
-IHRoYXQgY29tZXMgZnJvbSBMaW51eCBLZXJuZWwgKGUuZy4gSUNNUCBFY2hvIFJlcXVlc3QsDQo+
-ID4gUm91dGVyIEFkdmVydGlzZW1lbnQpLCBpbnN0ZWFkIEkgZ2V0IHRocmVlIGV4dHJhIGJ5dGVz
-ICgwYjAxIHZhbHVlKS4NCj4gPiBJIHdvdWxkIGxpa2UgdG8gdW5kZXJzdGFuZCByZWFzb24gZm9y
-IHRoaXMgbW9kaWZpY2F0aW9uIGEgbGl0dGxlIGJldHRlci4NCj4gDQo+IDBiMTEgbWVhbnMgdGhh
-dCB0cmFmZmljIGNsYXNzIGFuZCBmbG93IGxhYmVsIGFyZSB6ZXJvLiBBcmUgeW91IHN1cmUgdGhh
-dA0KPiB0aGVzZSBmaWVsZHMgYXJlIHplcm8gaW5zaWRlIHRoZSBJUHY2IGhlYWRlciB3aGVuIHlv
-dSB0cmFuc21pdA0KPiAiZS5nLiBJQ01QIEVjaG8gUmVxdWVzdCwgUkEiPw0KPiANCj4gQ2FuIHlv
-dSB2ZXJpZnkgdGhpcyBieSBydW5uaW5nIHRjcGR1bXAvd2lyZXNoYXJrPyBPciBpbnN0cnVtZW50
-cyBzb21lDQo+IHByaW50aydzIGF0IFswXSBmb3IgaGRyLT5mbG93X2xibCBhcnJheSBhbmQgaGRy
-LT5wcmlvcml0eT8NCj4gDQo+IC0gQWxleA0KPiANCj4gWzBdIGh0dHA6Ly9seHIuZnJlZS1lbGVj
-dHJvbnMuY29tL3NvdXJjZS9uZXQvNmxvd3Bhbi9pcGhjLmMjTDQyOA0KDQpJIGRpZCBzb21lIG1v
-cmUgbGludXggZGVidWdnaW5nLCBhbmQgaW5kZWVkLCBpdHMgSVB2NiBzdGFjayB0aGF0IGFscmVh
-ZHkgZ2l2ZXMgaXA2aGRyDQp3aXRoIGZsb3cgbGFiZWwgc2V0IHRvIHNvbWUgc3RyYW5nZSBudW1i
-ZXIuIERvIHlvdSBrbm93IG1heWJlIHRoZSByZWFzb24gb2YgdGhpcz8NCk9uIEtlcm5lbCB2ZXJz
-aW9uIDwgNC4yIHRoYXQgZmllbGQgd2FzIGFsd2F5cyBzZXQgdG8gMCwgdGh1cyBiZXR0ZXIgY29t
-cHJlc3Npb24gY2FuDQpiZSBhcHBsaWVkLg0KDQpCZXN0IHJlZ2FyZHMsDQrFgXVrYXN6DQo=
+On Thu, Dec 17, 2015 at 12:26:37PM +0000, Duda, Lukasz wrote:
+> Hi Alex!
+> 
+> > -----Original Message-----
+> > From: Alexander Aring [mailto:alex.aring@gmail.com]
+> > Sent: Tuesday, December 15, 2015 12:09
+> > To: Duda, Lukasz
+> > Cc: linux-wpan@vger.kernel.org; linux-bluetooth@vger.kernel.org;
+> > netdev@vger.kernel.org; kernel@pengutronix.de; mcr@sandelman.ca;
+> > martin.gergeleit@hs-rm.de
+> > Subject: Re: [RFCv4 bluetooth-next 1/2] 6lowpan: iphc: add support for
+> > stateful compression
+> > 
+> > On Tue, Dec 15, 2015 at 10:29:51AM +0000, Duda, Lukasz wrote:
+> > > First of all great work for your series of patches on 6lowpan improvements
+> > and
+> > > stateful compression!
+> > >
+> > > I have just done some testing of this patch (without RADVD modifications),
+> > and
+> > > I can share my experiments using 6LoWPAN over BT-LE by sending simple
+> > ICMPv6
+> > > messages. Contexts for BTLE device has been added manually.
+> > >
+> > 
+> > did you test that with linux <-> linux? Or linux <->
+> > $SOME_OTHER_6LOWPAN_BTLE_STACK.
+> > 
+> > I tested it on my side with RIOT, it has 802.15.4 6LoWPAN support and
+> > also manipulate manually the context table.
+> > 
+> 
+> I have tested it with nRF52 BTLE device from Nordic Semiconductor 
+> with IoT SDK, and Linux Ubuntu with BTLE Dongle that acts as Router/Master.
+> 
+> > > Experiment 1:
+> > >
+> > > Router: 2001:db8::1/64 BTLE: 2001:db8::211:22FF:FE33:4455/64
+> > > CID 1: 2001:db8::/64
+> > >
+> > > Works fine, I see that CID 1 is used for both addresses. Router has 64 bits of
+> > > IID inline and BTLE node has 0.
+> > >
+> > > Experiment 2:
+> > >
+> > > Router: 2001:db8::1/64 BTLE: 2001:db8::211:22FF:FE33:4455/64
+> > > CID 3: 2001:db8::/64 CID 5: 2001:db8::1/128
+> > >
+> > > Works also fine, I see that both CID 3 and 5 are used, as well as both sides
+> > > compress its IID in the best possible way. So the patch appears to work fine
+> > on
+> > > 6LoWPAN over BT-LE.
+> > >
+> > 
+> > ok.
+> > 
+> > >
+> > > However, I notice that the folder created in the sys/kernel/debug/6lowpan/
+> > for
+> > > my bluetooth network interface is called "bt%d". And I would imagine this
+> > > should be "bt0", "bt1", ... and not the template?
+> > >
+> > 
+> > urgh, this should not happen. I use "dev->name" for that and dev is the
+> > netdevice structure. This should be an _unique_ interface name,
+> > otherwise you will getting trouble if you have two btle 6lowpan
+> > interfaces.
+> > 
+> > I didn't realized it because I create my interface with:
+> > 
+> > ip link add link wpan0 name lowpan0 type lowpan
+> > 
+> > but should change it into:
+> > 
+> > ip link add link wpan0 name lowpan%d type lowpan
+> > 
+> > I realized that the dev->name will be changed from template into "real"
+> > name after registering. This should do the job:
+> > 
+> > diff --git a/net/6lowpan/core.c b/net/6lowpan/core.c
+> > index c7f06f5..faf65ba 100644
+> > --- a/net/6lowpan/core.c
+> > +++ b/net/6lowpan/core.c
+> > @@ -29,13 +29,13 @@ int lowpan_register_netdevice(struct net_device
+> > *dev,
+> > 
+> >         lowpan_priv(dev)->lltype = lltype;
+> > 
+> > -       ret = lowpan_dev_debugfs_init(dev);
+> > +       ret = register_netdevice(dev);
+> >         if (ret < 0)
+> >                 return ret;
+> > 
+> > -       ret = register_netdevice(dev);
+> > +       ret = lowpan_dev_debugfs_init(dev);
+> >         if (ret < 0)
+> > -               lowpan_dev_debugfs_exit(dev);
+> > +               unregister_netdevice(dev);
+> > 
+> >         return ret;
+> >  }
+> > 
+> > I think it should be safe to do that after registering because we held the
+> > RTNL lock. And the interface isn't up after registering.
+> > 
+> 
+> Thanks! Your patch helped, and I acked it in separate mail thread.
+> 
+> > > Also, I notice that the compression for Flow Control and Traffic Label in IPv6
+> > > header has been modified, these fields are no longer compressed in any
+> > packets
+> > > (0b11 value) that comes from Linux Kernel (e.g. ICMP Echo Request,
+> > > Router Advertisement), instead I get three extra bytes (0b01 value).
+> > > I would like to understand reason for this modification a little better.
+> > 
+> > 0b11 means that traffic class and flow label are zero. Are you sure that
+> > these fields are zero inside the IPv6 header when you transmit
+> > "e.g. ICMP Echo Request, RA"?
+> > 
+> > Can you verify this by running tcpdump/wireshark? Or instruments some
+> > printk's at [0] for hdr->flow_lbl array and hdr->priority?
+> > 
+> > - Alex
+> > 
+> > [0] http://lxr.free-electrons.com/source/net/6lowpan/iphc.c#L428
+> 
+> I did some more linux debugging, and indeed, its IPv6 stack that already gives ip6hdr
+> with flow label set to some strange number. Do you know maybe the reason of this?
+> On Kernel version < 4.2 that field was always set to 0, thus better compression can
+> be applied.
+> 
+
+I think it depends on ping6 implementation. There exists some of them
+outside, I using "iputils" [0].
+
+Look inside the manpage of iputils:
+
+-F flow label
+ping6 only.  Allocate and set 20 bit flow label (in hex) on echo
+request packets.  If value is zero, kernel allocates random flow label.
+
+This is for "echo request" only and if set it to zero then a random
+one will be used. Anyway you can also try to set some -F "0xdead" and
+look in wireshark if it's (6LoWPAN adaptation/transmitting) was
+correctly.
+
+What I believe when I read "If value is zero, kernel allocates random
+flow label.", then you can't set it to zero from userspace, but I am not
+100% sure, may depends on socket type (which depends on ping6
+implementation).
+
+At least:
+
+It could be that the compression never worked correctly before and
+simple set always flow_lbl compression to zero? Depends on how you test
+it at "Kernel version < 4.2".
+
+Please verify the testing with "Kernel version < 4.2" and check if
+flow_lbl is zero before running 6LoWPAN adaptation with same ping6
+implementation (but may also differs if they do some runtime checks on
+what kernel supports).
+
+- Alex
+
+[0] https://github.com/iputils/iputils
