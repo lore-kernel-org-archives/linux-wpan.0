@@ -1,49 +1,52 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-pf0-f172.google.com ([209.85.192.172]:33553 "EHLO
-	mail-pf0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753552AbbLaPHk (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Thu, 31 Dec 2015 10:07:40 -0500
-Received: by mail-pf0-f172.google.com with SMTP id q63so121214484pfb.0
-        for <linux-wpan@vger.kernel.org>; Thu, 31 Dec 2015 07:07:40 -0800 (PST)
-Subject: Re: [PATCH v3 1/1] ieee802154: cc2520: Check CRC & add promiscuous
+Received: from [82.165.8.211] ([82.165.8.211]:46700 "EHLO mail.holtmann.org"
+	rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1752419AbbLaTGN convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Thu, 31 Dec 2015 14:06:13 -0500
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.2 \(3112\))
+Subject: Re: [PATCH v3 0/1] ieee802154: cc2520: Check CRC & add promiscuous
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1450923581-967-1-git-send-email-bradjc5@gmail.com>
+Date: Thu, 31 Dec 2015 11:06:08 -0800
+Content-Transfer-Encoding: 8BIT
+Message-Id: <7D09DDD7-A61B-4CF1-8D67-DC8E8F5EC2C1@holtmann.org>
 References: <1450923581-967-1-git-send-email-bradjc5@gmail.com>
- <1450923581-967-2-git-send-email-bradjc5@gmail.com>
-From: Varka Bhadram <varkabhadram@gmail.com>
-Message-ID: <568544B7.3010903@gmail.com>
-Date: Thu, 31 Dec 2015 20:37:35 +0530
-MIME-Version: 1.0
-In-Reply-To: <1450923581-967-2-git-send-email-bradjc5@gmail.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Brad Campbell <bradjc5@gmail.com>, Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org
+To: Brad Campbell <bradjc5@gmail.com>
+Cc: Varka Bhadram <varkabhadram@gmail.com>, Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org
 
-Hi Brad Campbell,
+Hi Brad,
 
-On 12/24/2015 7:49 AM, Brad Campbell wrote:
+> Update the patch to disable AUTOCRC and manually set CRC on TX when in
+> promiscuous mode rather than recreating the CRC upon receive.
+> 
+> I've tested that in monitor mode all packets are received with the CRC, and
+> in node mode packets are being filtered as expected.
+> 
+> Changes since v2:
+> - Disable AUTOCRC when in promiscuous mode rather than manually
+> calculating CRC
+> - Add CRC manually for TX when in promiscuous mode
+> - Remove initializing FRMCTRL0 as it is set when promiscuous mode
+> is configured.
+> 
+> Changes since v1:
+> - Add support for promiscuous mode in cc2520
+> - Make frame filtering default
+> - Append CRC to incoming packets for monitors
+> - Actually calculate LQI
+> 
+> Brad Campbell (1):
+>  ieee802154: cc2520: Check CRC & add promiscuous
+> 
+> drivers/net/ieee802154/cc2520.c | 145 +++++++++++++++++++++++++++++++++-------
+> 1 file changed, 122 insertions(+), 23 deletions(-)
 
-> This patch adds checking the "CRC_OK" bit at the end of packets coming
-> from the CC2520 radio. It also adds support for putting the radio in
-> promiscuous mode (in which packets are not dropped if the CRC fails).
-> In promiscuous mode the AUTOCRC flag is cleared so that the driver can
-> pass the received CRC to the monitors.
->
-> The radio now defaults to frame filtering (checking that the destination
-> and PANID in the incoming packet matches the local node). This matches
-> the other 15.4 radios and is what a user would expect to be the default.
->
-> Other changes:
->
-> 1. Adds LQI calculation
-> 2. Makes #defines for relevant bit fields in CC2520 registers
->
-> Signed-off-by: Brad Campbell <bradjc5@gmail.com>
-> ---
->   drivers/net/ieee802154/cc2520.c | 145 +++++++++++++++++++++++++++++++++-------
->   1 file changed, 122 insertions(+), 23 deletions(-)
->
-Looks good to me.
+patch has been applied to bluetooth-next tree.
 
-Acked-by: Varka Bhadram <varkabhadram@gmail.com>
+Regards
+
+Marcel
 
