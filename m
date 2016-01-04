@@ -1,54 +1,37 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail2-relais-roc.national.inria.fr ([192.134.164.83]:55719 "EHLO
-	mail2-relais-roc.national.inria.fr" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S932483AbbLWVtF (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>);
-	Wed, 23 Dec 2015 16:49:05 -0500
-From: Julia Lawall <Julia.Lawall@lip6.fr>
-Subject: [PATCH] mac802154: constify ieee802154_llsec_ops structure
-Date: Wed, 23 Dec 2015 22:36:32 +0100
-Message-Id: <1450906592-9203-1-git-send-email-Julia.Lawall@lip6.fr>
+Received: from mail-wm0-f49.google.com ([74.125.82.49]:33836 "EHLO
+	mail-wm0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751308AbcADOd5 (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Mon, 4 Jan 2016 09:33:57 -0500
+Date: Mon, 4 Jan 2016 15:33:49 +0100
+From: Alexander Aring <alex.aring@gmail.com>
+Subject: Re: [PATCH] mac802154: constify ieee802154_llsec_ops structure
+Message-ID: <20160104143344.GA18317@omega>
+References: <1450906592-9203-1-git-send-email-Julia.Lawall@lip6.fr>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1450906592-9203-1-git-send-email-Julia.Lawall@lip6.fr>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>
-Cc: kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, linux-wpan@vger.kernel.org, "David S. Miller" <davem@davemloft.net>
+To: Julia Lawall <Julia.Lawall@lip6.fr>
+Cc: kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, linux-wpan@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, marcel@holtmann.org
 
-The ieee802154_llsec_ops structure is never modified, so declare it as
-const.
+Hi,
 
-Done with the help of Coccinelle.
+On Wed, Dec 23, 2015 at 10:36:32PM +0100, Julia Lawall wrote:
+> The ieee802154_llsec_ops structure is never modified, so declare it as
+> const.
+> 
+> Done with the help of Coccinelle.
+> 
+> Signed-off-by: Julia Lawall <Julia.Lawall@lip6.fr>
+> 
 
-Signed-off-by: Julia Lawall <Julia.Lawall@lip6.fr>
+Acked-by: Alexander Aring <alex.aring@gmail.com>
 
----
- include/net/ieee802154_netdev.h |    2 +-
- net/mac802154/mac_cmd.c         |    2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+Marcel, can you please apply this on bluetooth-next?
 
-diff --git a/include/net/ieee802154_netdev.h b/include/net/ieee802154_netdev.h
-index a62a051..c4b3160 100644
---- a/include/net/ieee802154_netdev.h
-+++ b/include/net/ieee802154_netdev.h
-@@ -337,7 +337,7 @@ struct ieee802154_mlme_ops {
- 	void (*get_mac_params)(struct net_device *dev,
- 			       struct ieee802154_mac_params *params);
- 
--	struct ieee802154_llsec_ops *llsec;
-+	const struct ieee802154_llsec_ops *llsec;
- };
- 
- static inline struct ieee802154_mlme_ops *
-diff --git a/net/mac802154/mac_cmd.c b/net/mac802154/mac_cmd.c
-index 8606da4..3db1634 100644
---- a/net/mac802154/mac_cmd.c
-+++ b/net/mac802154/mac_cmd.c
-@@ -126,7 +126,7 @@ static void mac802154_get_mac_params(struct net_device *dev,
- 	params->lbt = wpan_dev->lbt;
- }
- 
--static struct ieee802154_llsec_ops mac802154_llsec_ops = {
-+static const struct ieee802154_llsec_ops mac802154_llsec_ops = {
- 	.get_params = mac802154_get_params,
- 	.set_params = mac802154_set_params,
- 	.add_key = mac802154_add_key,
+Thank you.
 
+- Alex
