@@ -1,39 +1,70 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from [82.165.8.211] ([82.165.8.211]:45247 "EHLO mail.holtmann.org"
-	rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1751523AbcADTlQ (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-	Mon, 4 Jan 2016 14:41:16 -0500
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.2 \(3112\))
-Subject: Re: [PATCH] mac802154: constify ieee802154_llsec_ops structure
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1450906592-9203-1-git-send-email-Julia.Lawall@lip6.fr>
-Date: Mon, 4 Jan 2016 11:41:10 -0800
-Content-Transfer-Encoding: 7bit
-Message-Id: <7E0080F5-62E2-475F-A861-7B58DC87131E@holtmann.org>
-References: <1450906592-9203-1-git-send-email-Julia.Lawall@lip6.fr>
+Received: from mail-wm0-f66.google.com ([74.125.82.66]:33096 "EHLO
+	mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757266AbcAJUuo (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Sun, 10 Jan 2016 15:50:44 -0500
+From: Alexander Aring <alex.aring@gmail.com>
+Subject: [PATCH bluetooth-next 0/2] 6lowpan: stateful compression support
+Date: Sun, 10 Jan 2016 21:50:23 +0100
+Message-Id: <1452459025-13884-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Julia Lawall <julia.lawall@lip6.fr>
-Cc: Alexander Aring <alex.aring@gmail.com>, kernel-janitors@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, Network Development <netdev@vger.kernel.org>, linux-wpan@vger.kernel.org, "David S. Miller" <davem@davemloft.net>
+To: linux-wpan@vger.kernel.org
+Cc: linux-bluetooth@vger.kernel.org, kernel@pengutronix.de, mcr@sandelman.ca, lukasz.duda@nordicsemi.no, Alexander Aring <alex.aring@gmail.com>
 
-Hi Julia,
+Hi,
 
-> The ieee802154_llsec_ops structure is never modified, so declare it as
-> const.
-> 
-> Done with the help of Coccinelle.
-> 
-> Signed-off-by: Julia Lawall <Julia.Lawall@lip6.fr>
-> 
-> ---
-> include/net/ieee802154_netdev.h |    2 +-
-> net/mac802154/mac_cmd.c         |    2 +-
-> 2 files changed, 2 insertions(+), 2 deletions(-)
+this contains at first some small fix for the netdev notifier which I deteced
+while hacking 6lowpan stateful compression support.
 
-patch has been applied to bluetooth-next tree.
+I rework the debugfs entry for the stateful compression. Now each context entry
+for a 6LoWPAN contains has his own subdirectory (named as his CID value).
+In this subdirectories there exists the following files for manipulating the
+context entry:
 
-Regards
+ - active: If the context belongs to the table or not.
+ - compression: the compression flag according rfc6775.
+ - prefix: ipv6 prefix in xxxx:xxxx:....:xxxx form.
+ - prefix_lenght: the length of the ipv6 prefix.
 
-Marcel
+This offers a setting per property instead doing remember the full context and
+doing echo "$FULL_CONTEXT_INFORMATION" > ctx_table.
+
+These file should be prepared to move into the sysfs directory when it seems to
+running fine.
+
+There exist one file "show" inside $LOWPAN_IFACE/contexts/. This file is for
+a "pretty-printout" for the current context table. I use the same format-string
+like RIOT-OS, example:
+
+cid|prefix                                     |C
+-------------------------------------------------
+  0|                                 2001::/64 |1
+  1|                                2001::1/128|1
+  2|                                2001::5/128|1
+  7|                                 2002::/64 |1
+
+
+difference here is that RIOT shows the lifetime, but I currently see no sense to
+handle the lifetime in kernelspace.
+
+Also I added support to clean the context table when doing a "ifdown". The reason
+is that IPv6 interface will also drop all address information while doing a
+ifdown and a 6LoWPAN should not use previous context information after ifup again.
+
+- Alex
+
+Alexander Aring (2):
+  6lowpan: iphc: add support for stateful compression
+  ieee802154: 6lowpan: fix return of netdev notifier
+
+ include/net/6lowpan.h         |  31 ++++
+ net/6lowpan/core.c            |  39 +++-
+ net/6lowpan/debugfs.c         | 247 +++++++++++++++++++++++++
+ net/6lowpan/iphc.c            | 420 ++++++++++++++++++++++++++++++++++++------
+ net/ieee802154/6lowpan/core.c |   7 +-
+ 5 files changed, 682 insertions(+), 62 deletions(-)
+
+-- 
+2.6.1
 
