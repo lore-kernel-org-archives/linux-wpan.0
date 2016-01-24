@@ -1,36 +1,38 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:37854 "EHLO
-	metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1756062AbcAYK2r (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>);
-	Mon, 25 Jan 2016 05:28:47 -0500
-From: Alexander Aring <aar@pengutronix.de>
-Subject: 6lowpan: presenting my stateful compression work
-Message-ID: <56A5F8DB.2070000@pengutronix.de>
-Date: Mon, 25 Jan 2016 11:28:43 +0100
+Received: from helcar.hengli.com.au ([209.40.204.226]:37648 "EHLO
+	helcar.hengli.com.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751948AbcAXNLZ (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Sun, 24 Jan 2016 08:11:25 -0500
+Date: Sun, 24 Jan 2016 21:10:21 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: [PATCH 0/26] crypto: Use skcipher and ahash/shash where possible
+Message-ID: <20160124131021.GA31153@gondor.apana.org.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org, devel@driverdev.osuosl.org, dm-devel@redhat.com, linux-wireless@vger.kernel.org, linux-cifs@vger.kernel.org, ecryptfs@vger.kernel.org, linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net, linux-nfs@vger.kernel.org, keyrings@vger.kernel.org, linux-bluetooth@vger.kernel.org, ceph-devel@vger.kernel.org, linux-wpan@vger.kernel.org, linux-afs@lists.infradead.org, drbd-dev@lists.linbit.com, linux-nfc@lists.01.org, open-iscsi@googlegroups.com
 
-Hi,
+Hi:
 
-maybe somebody is in the near and has time to visit me at [0].
-I am be there at 27.01.2016 from 12:45 until 14:15 (MEZ) for doing a
-postersession. The postersession is public, so everybody should be welcome
-to join as visitor.
+The crypto hash interface has been obsolete for many years and
+this series converts all remaining users to shash and ahash as
+appropriate.  Despite the name ahash can be used synchronously
+and is the preferred interface for those dealing with SGs.
 
-Background:
-Currently I try to reach my master degree and need to do some "project".
-I combined it with my work at Pengutronix and implement the stateful
-compression support for Linux 6LoWPAN.
+The blkcipher and ablkcipher interfaces are also being phased out
+and is being replaced with the merged skcipher interface which
+is essentially the same as ablkcipher but without the implicit
+IV generators.  This series converts all users of blkcipher and
+ablkcipher over to skcipher.
 
-You also can get the poster online at [1].
+If you have any objections please shout.  Otherwise I would like
+to take these patches through the cryptodev tree so we can proceed
+with phasing out the obsolete interfaces.
 
-- Alex
-
-[0] https://goo.gl/maps/Vr9frb6sQSq
-[1] http://wpan.cakelab.org/doc/aring_poster.pdf
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
