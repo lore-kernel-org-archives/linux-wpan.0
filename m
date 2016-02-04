@@ -1,53 +1,59 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mx1.snt.utwente.nl ([130.89.149.33]:42871 "EHLO
-	mx1.snt.utwente.nl" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757932AbcBBV0S (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Tue, 2 Feb 2016 16:26:18 -0500
-Received: from bergzand.student.utwente.nl ([130.89.160.191])
-	by mx1.snt.utwente.nl with esmtp (Exim 4.72)
-	(envelope-from <hydrazine@bergzand.net>)
-	id 1aQiSk-000133-OX
-	for linux-wpan@vger.kernel.org; Tue, 02 Feb 2016 22:26:16 +0100
-Received: from localhost (localhost [127.0.0.1])
-	by mail.bergzand.net (Postfix) with ESMTP id 3F7F058CC6
-	for <linux-wpan@vger.kernel.org>; Tue,  2 Feb 2016 22:26:43 +0100 (CET)
-From: Koen Zandberg <koen@bergzand.net>
-Subject: [PATCH bluetooth-next] Fixes kernel oops when unloading the radio module
-Date: Tue,  2 Feb 2016 22:26:04 +0100
-Message-Id: <1454448364-22417-1-git-send-email-koen@bergzand.net>
+Received: from lists.s-osg.org ([54.187.51.154]:54836 "EHLO lists.s-osg.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S965231AbcBDOza (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+	Thu, 4 Feb 2016 09:55:30 -0500
+Subject: Re: [PATCH bluetooth-next] Fixes kernel oops when unloading the radio
+ module
+References: <1454448364-22417-1-git-send-email-koen@bergzand.net>
+From: Stefan Schmidt <stefan@osg.samsung.com>
+Message-ID: <56B3665F.4070503@osg.samsung.com>
+Date: Thu, 4 Feb 2016 15:55:27 +0100
+MIME-Version: 1.0
+In-Reply-To: <1454448364-22417-1-git-send-email-koen@bergzand.net>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org
-Cc: Koen Zandberg <koen@bergzand.net>
+To: Koen Zandberg <koen@bergzand.net>, linux-wpan@vger.kernel.org
 
-Destroying the workqueue before unregistering the net device caused a 
-kernel oops
+Hello.
 
-Signed-off-by: Koen Zandberg <koen@bergzand.net>
----
- net/mac802154/main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Please add a mac802154 as prefix to your subject line to make clear 
+where the patch belongs to.
 
-diff --git a/net/mac802154/main.c b/net/mac802154/main.c
-index e8cab5b..87da85a 100644
---- a/net/mac802154/main.c
-+++ b/net/mac802154/main.c
-@@ -218,7 +218,6 @@ void ieee802154_unregister_hw(struct ieee802154_hw *hw)
- 
- 	tasklet_kill(&local->tasklet);
- 	flush_workqueue(local->workqueue);
--	destroy_workqueue(local->workqueue);
- 
- 	rtnl_lock();
- 
-@@ -226,6 +225,7 @@ void ieee802154_unregister_hw(struct ieee802154_hw *hw)
- 
- 	rtnl_unlock();
- 
-+	destroy_workqueue(local->workqueue);
- 	wpan_phy_unregister(local->phy);
- }
- EXPORT_SYMBOL(ieee802154_unregister_hw);
--- 
-2.4.10
 
+On 02/02/16 22:26, Koen Zandberg wrote:
+> Destroying the workqueue before unregistering the net device caused a
+> kernel oops
+>
+> Signed-off-by: Koen Zandberg <koen@bergzand.net>
+> ---
+>   net/mac802154/main.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/net/mac802154/main.c b/net/mac802154/main.c
+> index e8cab5b..87da85a 100644
+> --- a/net/mac802154/main.c
+> +++ b/net/mac802154/main.c
+> @@ -218,7 +218,6 @@ void ieee802154_unregister_hw(struct ieee802154_hw *hw)
+>   
+>   	tasklet_kill(&local->tasklet);
+>   	flush_workqueue(local->workqueue);
+> -	destroy_workqueue(local->workqueue);
+>   
+>   	rtnl_lock();
+>   
+> @@ -226,6 +225,7 @@ void ieee802154_unregister_hw(struct ieee802154_hw *hw)
+>   
+>   	rtnl_unlock();
+>   
+> +	destroy_workqueue(local->workqueue);
+>   	wpan_phy_unregister(local->phy);
+
+When I look at the cleanup part of ieee802154_register_hw() we call 
+these two in a different order. Should we do the same here or can we be 
+sure that these two are orthogonal and the order do not matter here.
+
+regards
+Stefan Schmidt
