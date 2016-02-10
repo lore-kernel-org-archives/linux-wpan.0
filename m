@@ -1,35 +1,53 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from [82.165.8.211] ([82.165.8.211]:59371 "EHLO mail.holtmann.org"
-	rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1751116AbcBUAUo (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-	Sat, 20 Feb 2016 19:20:44 -0500
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.2 \(3112\))
-Subject: Re: [PATCH bluetooth-next 1/5] MAINTAINERS: update 802.15.4 entries
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1455872354-26032-1-git-send-email-aar@pengutronix.de>
-Date: Sat, 20 Feb 2016 16:20:38 -0800
-Content-Transfer-Encoding: 7bit
-Message-Id: <7D8BFFD7-D205-4127-BA17-DA1C00CE498A@holtmann.org>
-References: <1455872354-26032-1-git-send-email-aar@pengutronix.de>
+Received: from mx1.snt.utwente.nl ([130.89.149.33]:42958 "EHLO
+	mx1.snt.utwente.nl" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752667AbcBJKuH (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Wed, 10 Feb 2016 05:50:07 -0500
+Received: from bergzand.student.utwente.nl ([130.89.160.191])
+	by mx1.snt.utwente.nl with esmtp (Exim 4.84)
+	(envelope-from <hydrazine@bergzand.net>)
+	id 1aTSLT-0000hb-KJ
+	for linux-wpan@vger.kernel.org; Wed, 10 Feb 2016 11:50:05 +0100
+Received: from localhost (localhost [127.0.0.1])
+	by mail.bergzand.net (Postfix) with ESMTP id 17178594D7
+	for <linux-wpan@vger.kernel.org>; Wed, 10 Feb 2016 11:50:38 +0100 (CET)
+From: Koen Zandberg <koen@bergzand.net>
+Subject: [PATCHv2 bluetooth-next] mac802154: Fixes kernel oops when unloading a radio driver
+Date: Wed, 10 Feb 2016 11:49:38 +0100
+Message-Id: <1455101378-2225-1-git-send-email-koen@bergzand.net>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <aar@pengutronix.de>
-Cc: linux-wpan@vger.kernel.org
+To: linux-wpan@vger.kernel.org
+Cc: Koen Zandberg <koen@bergzand.net>
 
-Hi Alex,
+Destroying the workqueue before unregistering the net device caused a
+kernel oops
 
-> This patch updates my e-mail address and other pending information for
-> 802.15.4 subsystem which are not correct anymore.
-> 
-> Signed-off-by: Alexander Aring <aar@pengutronix.de>
-> ---
-> MAINTAINERS | 9 +++++----
-> 1 file changed, 5 insertions(+), 4 deletions(-)
+Signed-off-by: Koen Zandberg <koen@bergzand.net>
+---
+ net/mac802154/main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-all 5 patches have been applied to bluetooth-next tree.
-
-Regards
-
-Marcel
+diff --git a/net/mac802154/main.c b/net/mac802154/main.c
+index e8cab5b..87da85a 100644
+--- a/net/mac802154/main.c
++++ b/net/mac802154/main.c
+@@ -218,7 +218,6 @@ void ieee802154_unregister_hw(struct ieee802154_hw *hw)
+ 
+ 	tasklet_kill(&local->tasklet);
+ 	flush_workqueue(local->workqueue);
+-	destroy_workqueue(local->workqueue);
+ 
+ 	rtnl_lock();
+ 
+@@ -226,6 +225,7 @@ void ieee802154_unregister_hw(struct ieee802154_hw *hw)
+ 
+ 	rtnl_unlock();
+ 
++	destroy_workqueue(local->workqueue);
+ 	wpan_phy_unregister(local->phy);
+ }
+ EXPORT_SYMBOL(ieee802154_unregister_hw);
+-- 
+2.4.10
 
