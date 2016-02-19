@@ -1,54 +1,49 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:60699 "EHLO
+Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:57104 "EHLO
 	metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1752585AbcBSI7Q (ORCPT
+	by vger.kernel.org with ESMTP id S1756148AbcBSI7Q (ORCPT
 	<rfc822;linux-wpan@vger.kernel.org>);
 	Fri, 19 Feb 2016 03:59:16 -0500
 From: Alexander Aring <aar@pengutronix.de>
-Subject: [PATCH bluetooth-next 1/5] MAINTAINERS: update 802.15.4 entries
-Date: Fri, 19 Feb 2016 09:59:10 +0100
-Message-Id: <1455872354-26032-1-git-send-email-aar@pengutronix.de>
+Subject: [PATCH bluetooth-next 2/5] mac802154: fix mac header length check
+Date: Fri, 19 Feb 2016 09:59:11 +0100
+Message-Id: <1455872354-26032-2-git-send-email-aar@pengutronix.de>
+In-Reply-To: <1455872354-26032-1-git-send-email-aar@pengutronix.de>
+References: <1455872354-26032-1-git-send-email-aar@pengutronix.de>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
 Cc: Alexander Aring <aar@pengutronix.de>
 
-This patch updates my e-mail address and other pending information for
-802.15.4 subsystem which are not correct anymore.
+I got report about that sometimes the WARN_ON occurs there which should
+never happen. I came to the conclusion that the mac header is there but
+inside the headroom of skb. The skb->len information doesn't contain the
+information about the headroom length and skb->len is lesser than two.
+
+We check now if the skb_mac_header pointer is set and the room between
+mac header pointer and tail pointer.
 
 Signed-off-by: Alexander Aring <aar@pengutronix.de>
 ---
- MAINTAINERS | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+ include/net/mac802154.h | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index f678c37..a8a01a3 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -151,7 +151,7 @@ S:	Maintained
- F:	drivers/scsi/53c700*
- 
- 6LOWPAN GENERIC (BTLE/IEEE 802.15.4)
--M:	Alexander Aring <alex.aring@gmail.com>
-+M:	Alexander Aring <aar@pengutronix.de>
- M:	Jukka Rissanen <jukka.rissanen@linux.intel.com>
- L:	linux-bluetooth@vger.kernel.org
- L:	linux-wpan@vger.kernel.org
-@@ -5424,10 +5424,11 @@ S:	Supported
- F:	drivers/idle/i7300_idle.c
- 
- IEEE 802.15.4 SUBSYSTEM
--M:	Alexander Aring <alex.aring@gmail.com>
-+M:	Alexander Aring <aar@pengutronix.de>
- L:	linux-wpan@vger.kernel.org
--W:	https://github.com/linux-wpan
--T:	git git://github.com/linux-wpan/linux-wpan-next.git
-+W:	http://wpan.cakelab.org/
-+T:	git git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git
-+T:	git git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git
- S:	Maintained
- F:	net/ieee802154/
- F:	net/mac802154/
+diff --git a/include/net/mac802154.h b/include/net/mac802154.h
+index da574bb..2e3cdd20 100644
+--- a/include/net/mac802154.h
++++ b/include/net/mac802154.h
+@@ -247,8 +247,9 @@ struct ieee802154_ops {
+  */
+ static inline __le16 ieee802154_get_fc_from_skb(const struct sk_buff *skb)
+ {
+-	/* return some invalid fc on failure */
+-	if (unlikely(skb->len < 2)) {
++	/* check if we can fc at skb_mac_header of sk buffer */
++	if (unlikely(!skb_mac_header_was_set(skb) ||
++		     (skb_tail_pointer(skb) - skb_mac_header(skb)) < 2)) {
+ 		WARN_ON(1);
+ 		return cpu_to_le16(0);
+ 	}
 -- 
 2.7.1
 
