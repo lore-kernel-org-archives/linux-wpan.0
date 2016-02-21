@@ -1,19 +1,17 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:52576 "EHLO
-	metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1752463AbcBOWTV (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>);
-	Mon, 15 Feb 2016 17:19:21 -0500
-Subject: Re: [PATCHv2 bluetooth-next] mac802154: Fixes kernel oops when
- unloading a radio driver
-References: <1455101378-2225-1-git-send-email-koen@bergzand.net>
-From: Alexander Aring <aar@pengutronix.de>
-Message-ID: <56C24EE7.6090805@pengutronix.de>
-Date: Mon, 15 Feb 2016 23:19:19 +0100
-MIME-Version: 1.0
+Received: from [82.165.8.211] ([82.165.8.211]:59379 "EHLO mail.holtmann.org"
+	rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1751116AbcBUAWK (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+	Sat, 20 Feb 2016 19:22:10 -0500
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.2 \(3112\))
+Subject: Re: [PATCHv2 bluetooth-next] mac802154: Fixes kernel oops when unloading a radio driver
+From: Marcel Holtmann <marcel@holtmann.org>
 In-Reply-To: <1455101378-2225-1-git-send-email-koen@bergzand.net>
-Content-Type: text/plain; charset=iso-8859-15
+Date: Sat, 20 Feb 2016 16:22:04 -0800
 Content-Transfer-Encoding: 7bit
+Message-Id: <573D0BD2-7216-4F6A-8FAE-EA4540E892B5@holtmann.org>
+References: <1455101378-2225-1-git-send-email-koen@bergzand.net>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: Koen Zandberg <koen@bergzand.net>
@@ -21,10 +19,17 @@ Cc: linux-wpan@vger.kernel.org
 
 Hi Koen,
 
-Am 02/10/2016 um 11:49 AM schrieb Koen Zandberg:
 > Destroying the workqueue before unregistering the net device caused a
 > kernel oops
->
+> 
 > Signed-off-by: Koen Zandberg <koen@bergzand.net>
+> ---
+> net/mac802154/main.c | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Acked-by: Alexander Aring <aar@pengutronix.de>
+patch has been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
+
