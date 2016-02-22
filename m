@@ -1,41 +1,85 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mx1.snt.utwente.nl ([130.89.149.33]:43884 "EHLO
-	mx1.snt.utwente.nl" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751809AbcBVMmX (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Mon, 22 Feb 2016 07:42:23 -0500
-From: Koen Zandberg <koen@bergzand.net>
-Subject: Re: extending driver mrf24j40
-References: <1A88240A-AAAD-4243-A31C-61CBC7E8949F@mlng.net>
- <56C9ADBB.1040608@pengutronix.de> <56C9B125.2030409@bergzand.net>
- <3C6ECFF9-7B13-42A3-8A4B-1258CA1926C5@mlng.net>
-Message-ID: <56CB021B.5040305@bergzand.net>
-Date: Mon, 22 Feb 2016 13:42:03 +0100
-MIME-Version: 1.0
-In-Reply-To: <3C6ECFF9-7B13-42A3-8A4B-1258CA1926C5@mlng.net>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
+Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:50334 "EHLO
+	metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1753590AbcBVIOD (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>);
+	Mon, 22 Feb 2016 03:14:03 -0500
+From: Alexander Aring <aar@pengutronix.de>
+Subject: [PATCHv2 RESEND bluetooth-next 0/2] 6lowpan: stateful compression support
+Date: Mon, 22 Feb 2016 09:13:53 +0100
+Message-Id: <1456128835-29801-1-git-send-email-aar@pengutronix.de>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: smlng <s@mlng.net>
-Cc: Alexander Aring <aar@pengutronix.de>, linux-wpan@vger.kernel.org, Alan Ott <alan@signal11.us>
+To: linux-wpan@vger.kernel.org
+Cc: linux-bluetooth@vger.kernel.org, kernel@pengutronix.de, Alexander Aring <aar@pengutronix.de>
 
-On 22-2-2016 10:09, smlng wrote:
-> Hi all,
->
-> thanks for the replies and input. I'm happy to contribute on the enhancing the mrf24j40 driver and I've some time to spare on that.
->
-> @Koen: briefly said my plan is to _port_ some of the functionality (i.e., reset) from the at86rf230 driver - I know it's a different device but the driver seems to be well written and implements/uses reset, sleep and so on. I think it is a good starting point, or not? Currently I've 1 (maybe 2) mrf24j40ma transceiver(s) at my disposal, and use them with a Raspberry Pi via SPI for testing.
->
-> I'll report back, as soon as I got some of the planned _enhancements_ running, maybe you (@Koen) can review and test them as well?
->
-> Best
->   Sebastian
-Hello,
+Hi,
 
-If you've got any patches that need testing send them this way, I can 
-test them. My test setup consists of three raspberry pi's, all of them 
-with mrf24j40ma radios. Unfortunately I don't have a logic analyser so I 
-can't verify whether reset or wake signals are correctly applied.
+this contains at first some small fix for the netdev notifier which I deteced
+while hacking 6lowpan stateful compression support.
 
-Regards
-Koen
+I rework the debugfs entry for the stateful compression. Now each context entry
+for a 6LoWPAN contains has his own subdirectory (named as his CID value).
+In this subdirectories there exists the following files for manipulating the
+context entry:
+
+ - active: If the context belongs to the table or not.
+ - compression: the compression flag according rfc6775.
+ - prefix: ipv6 prefix in xxxx:xxxx:....:xxxx form.
+ - prefix_length: the length of the ipv6 prefix.
+
+This offers a setting per property instead doing remember the full context and
+doing echo "$FULL_CONTEXT_INFORMATION" > ctx_table.
+
+These files should be prepared to move into the sysfs directory when it seems to
+running fine.
+
+There exist one file "show" inside $LOWPAN_IFACE/contexts/. This file is for
+a "pretty-printout" for the current context table. I use the same format-string
+like RIOT-OS, example:
+
+cid|prefix                                     |C
+-------------------------------------------------
+  0|                                 2001::/64 |1
+  1|                                2001::1/128|1
+  2|                                2001::5/128|1
+  7|                                 2002::/64 |1
+
+
+difference here is that RIOT shows the lifetime, but I currently see no sense to
+handle the lifetime in kernelspace.
+
+Also I added support to clean the context table when doing a "ifdown". The reason
+is that IPv6 interface will also drop all address information while doing a
+ifdown and a 6LoWPAN should not use previous context information after ifup again.
+
+- Alex
+
+changes since v2:
+
+- removes some unnecessary WARN_ONCE for parameter which can't be above of 15
+  by masking with 0xf.
+- remove some "!!" when function returns bool.
+- change naming from compression flag to "compression" instead "C", but leave
+  it in "show" as "C".
+- change that "show" will display "compression" instead "active", reported by
+  Lukasz Duda.
+- remove comment about which was hard to understand. I removed it instead
+  confuse other developers. It should describe that the compression flag
+  indicates to use compression on tx side only if is set. contexts on receive
+  will always be used.
+
+Alexander Aring (2):
+  6lowpan: iphc: add support for stateful compression
+  ieee802154: 6lowpan: fix return of netdev notifier
+
+ include/net/6lowpan.h         |  32 ++++
+ net/6lowpan/core.c            |  39 +++-
+ net/6lowpan/debugfs.c         | 247 +++++++++++++++++++++++++
+ net/6lowpan/iphc.c            | 414 ++++++++++++++++++++++++++++++++++++------
+ net/ieee802154/6lowpan/core.c |   7 +-
+ 5 files changed, 677 insertions(+), 62 deletions(-)
+
+-- 
+2.7.1
+
