@@ -1,41 +1,37 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mailout1.w1.samsung.com ([210.118.77.11]:17415 "EHLO
-	mailout1.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752147AbcBXIc1 (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Wed, 24 Feb 2016 03:32:27 -0500
-From: Andrzej Hajda <a.hajda@samsung.com>
-Subject: [PATCH] 6lowpan: fix error checking code
-Date: Wed, 24 Feb 2016 09:32:13 +0100
-Message-id: <1456302733-7053-1-git-send-email-a.hajda@samsung.com>
+Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:38167 "EHLO
+	metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752792AbcBXKkq (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>);
+	Wed, 24 Feb 2016 05:40:46 -0500
+Subject: Re: [PATCH] 6lowpan: fix error checking code
+References: <1456302733-7053-1-git-send-email-a.hajda@samsung.com>
+From: Alexander Aring <aar@pengutronix.de>
+Message-ID: <56CD88A6.5020904@pengutronix.de>
+Date: Wed, 24 Feb 2016 11:40:38 +0100
+MIME-Version: 1.0
+In-Reply-To: <1456302733-7053-1-git-send-email-a.hajda@samsung.com>
+Content-Type: text/plain; charset=iso-8859-15
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <aar@pengutronix.de>, Jukka Rissanen <jukka.rissanen@linux.intel.com>, linux-wpan@vger.kernel.org
-Cc: Andrzej Hajda <a.hajda@samsung.com>, Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>, Marek Szyprowski <m.szyprowski@samsung.com>, linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Andrzej Hajda <a.hajda@samsung.com>
+Cc: Jukka Rissanen <jukka.rissanen@linux.intel.com>, linux-wpan@vger.kernel.org, Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>, Marek Szyprowski <m.szyprowski@samsung.com>, linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, marcel@holtmann.org
 
-Bool variable 'fail' is always non-negative, it indicates an error if it
-is true.
+Hi,
 
-The problem has been detected using coccinelle script
-scripts/coccinelle/tests/unsigned_lesser_than_zero.cocci
+Am 02/24/2016 um 09:32 AM schrieb Andrzej Hajda:
+> Bool variable 'fail' is always non-negative, it indicates an error if it
+> is true.
+>
+> The problem has been detected using coccinelle script
+> scripts/coccinelle/tests/unsigned_lesser_than_zero.cocci
+>
+> Signed-off-by: Andrzej Hajda <a.hajda@samsung.com>
 
-Signed-off-by: Andrzej Hajda <a.hajda@samsung.com>
----
- net/6lowpan/iphc.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Acked-by: Alexander Aring <aar@pengutronix.de>
 
-diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
-index d2a565c..0fe954f 100644
---- a/net/6lowpan/iphc.c
-+++ b/net/6lowpan/iphc.c
-@@ -482,7 +482,7 @@ static int lowpan_uncompress_multicast_ctx_daddr(struct sk_buff *skb,
- 	ipaddr->s6_addr[0] = 0xFF;
- 	fail = lowpan_fetch_skb(skb, &ipaddr->s6_addr[1], 2);
- 	fail |= lowpan_fetch_skb(skb, &ipaddr->s6_addr[12], 4);
--	if (fail < 0)
-+	if (fail)
- 		return -EIO;
- 
- 	/* take prefix_len and network prefix from the context */
--- 
-1.9.1
+Marcel, can you please apply this patch on bluetooth-next?
+Thanks.
 
+- Alex
