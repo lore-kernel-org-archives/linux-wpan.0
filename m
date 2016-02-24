@@ -1,36 +1,41 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from [82.165.8.211] ([82.165.8.211]:58712 "EHLO mail.holtmann.org"
-	rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1752870AbcBXPQp (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-	Wed, 24 Feb 2016 10:16:45 -0500
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.2 \(3112\))
-Subject: Re: [PATCH bluetooth-next] 6lowpan: iphc: fix stateful multicast compression
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1456311663-11438-1-git-send-email-aar@pengutronix.de>
-Date: Wed, 24 Feb 2016 07:16:40 -0800
-Content-Transfer-Encoding: 7bit
-Message-Id: <1DF53D6E-353F-4CE2-A47F-7CC626D18733@holtmann.org>
-References: <1456311663-11438-1-git-send-email-aar@pengutronix.de>
+Received: from mailout1.w1.samsung.com ([210.118.77.11]:17415 "EHLO
+	mailout1.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752147AbcBXIc1 (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Wed, 24 Feb 2016 03:32:27 -0500
+From: Andrzej Hajda <a.hajda@samsung.com>
+Subject: [PATCH] 6lowpan: fix error checking code
+Date: Wed, 24 Feb 2016 09:32:13 +0100
+Message-id: <1456302733-7053-1-git-send-email-a.hajda@samsung.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <aar@pengutronix.de>
-Cc: linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org, kernel@pengutronix.de
+To: Alexander Aring <aar@pengutronix.de>, Jukka Rissanen <jukka.rissanen@linux.intel.com>, linux-wpan@vger.kernel.org
+Cc: Andrzej Hajda <a.hajda@samsung.com>, Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>, Marek Szyprowski <m.szyprowski@samsung.com>, linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hi Alex,
+Bool variable 'fail' is always non-negative, it indicates an error if it
+is true.
 
-> In case of multicast address we need to set always the LOWPAN_IPHC_M bit
-> and if a destination context identifier was found for a multicast
-> address then we need to set the LOWPAN_IPHC_DAC as well.
-> 
-> Signed-off-by: Alexander Aring <aar@pengutronix.de>
-> ---
-> net/6lowpan/iphc.c | 3 ++-
-> 1 file changed, 2 insertions(+), 1 deletion(-)
+The problem has been detected using coccinelle script
+scripts/coccinelle/tests/unsigned_lesser_than_zero.cocci
 
-patch has been applied to bluetooth-next tree.
+Signed-off-by: Andrzej Hajda <a.hajda@samsung.com>
+---
+ net/6lowpan/iphc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Regards
-
-Marcel
+diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
+index d2a565c..0fe954f 100644
+--- a/net/6lowpan/iphc.c
++++ b/net/6lowpan/iphc.c
+@@ -482,7 +482,7 @@ static int lowpan_uncompress_multicast_ctx_daddr(struct sk_buff *skb,
+ 	ipaddr->s6_addr[0] = 0xFF;
+ 	fail = lowpan_fetch_skb(skb, &ipaddr->s6_addr[1], 2);
+ 	fail |= lowpan_fetch_skb(skb, &ipaddr->s6_addr[12], 4);
+-	if (fail < 0)
++	if (fail)
+ 		return -EIO;
+ 
+ 	/* take prefix_len and network prefix from the context */
+-- 
+1.9.1
 
