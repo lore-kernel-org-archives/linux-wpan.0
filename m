@@ -1,94 +1,78 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wm0-f43.google.com ([74.125.82.43]:37287 "EHLO
-	mail-wm0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757434AbcB1OHL (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Sun, 28 Feb 2016 09:07:11 -0500
-Received: by mail-wm0-f43.google.com with SMTP id p65so14801339wmp.0
-        for <linux-wpan@vger.kernel.org>; Sun, 28 Feb 2016 06:07:11 -0800 (PST)
-Date: Sun, 28 Feb 2016 15:07:04 +0100
-From: Alexander Aring <alex.aring@gmail.com>
-Subject: Re: 802.15.4G support?
-Message-ID: <20160228140659.GA17980@omega>
-References: <CAH+RWqF-3Q8P52PTM9ZqpybEWTCKiubQK0-Y7L=c-3vAMhJfrg@mail.gmail.com>
+Received: from lists.s-osg.org ([54.187.51.154]:52399 "EHLO lists.s-osg.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751976AbcCAIsp (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+	Tue, 1 Mar 2016 03:48:45 -0500
+From: Stefan Schmidt <stefan@osg.samsung.com>
+Subject: Re: Issues about 802.15.4 packet transmission and getting RSSI,LQI
+ info using at86rf233
+References: <CACP_RqzU5LXKd3dMUDvmg08=BaHBxCvTige1MrBzgiPY4jfgYQ@mail.gmail.com>
+Message-ID: <56D5576A.2010406@osg.samsung.com>
+Date: Tue, 1 Mar 2016 09:48:42 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAH+RWqF-3Q8P52PTM9ZqpybEWTCKiubQK0-Y7L=c-3vAMhJfrg@mail.gmail.com>
+In-Reply-To: <CACP_RqzU5LXKd3dMUDvmg08=BaHBxCvTige1MrBzgiPY4jfgYQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Remi Philippe <remi@linqio.com>
-Cc: linux-wpan@vger.kernel.org
+To: Zhengming Shi <zmingshi@gmail.com>
+Cc: "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>
 
-Hi,
+Hello.
 
-On Thu, Feb 25, 2016 at 10:22:45PM +0400, Remi Philippe wrote:
-> Hello,
-> 
-> We’re currently developing a driver for RF215 (dual radio) using
-> 6lowpan and are nearly done with it. We’ve figured out the current MAC
-> and PHY are built for 15.4 and not 15.4g which is a blocking point the
-> sub-ghz module.
-> 
+Sorry for the delay I was on vacation. I suggest you directly address 
+the linux-wpan mailing list for questions as there are more people that 
+might be able to help you.
+I cc'ed the list now. You might want to subscribe to it for discussions 
+about work on linux-wpan.
 
-ok.
+[Resend as vger wants plain text, my fault]
 
-> 
-> It doesn’t look like there is a need for a huge amount of work to get
-> a basic version of it working (key ones we’ve seen are different MTU
-> and also some changes in the header like PHR).
-> 
+On 21/02/16 07:33, Zhengming Shi wrote:
+> Hi, Stefan
+>
+> I'm working on a project about 6lowpan. Now, I'm using Raspberry Pi 
+> 802.15.4 radio (based on at86rf233 chip) on the Raspberry Pi B 1. I 
+> have two RPis, each with a Raspberry Pi 802.15.4 radio hooked up. 
+> Also, Linux kernel (v4.1.15) is installed in RPi.
 
-I took a look into 802.15.4g and you probaly mean with different MTU:
+Great. You might want to try a development kernel if you are seeking the 
+latest development. The bluetooth-next git tree has out latest changes.
+>
+> The two nodes can ping successfully via ping6 and wpan-ping, but now I 
+> want to make the two nodes transmit/receive packets normally. I'm a 
+> newer about it, I want to know if I need to write some codes to 
+> implement it, if not, do you have any suggestions about how to make 
+> it? thank you very much!
 
-aMaxPHYPacketSize:
+The normal way of transfer data over a correctly setup 6lowpan would be 
+the ipv6 socket interface of the Linux kernel. Thanks to the 6lowpan 
+adaptation layer there should be no extra steps involved after setting 
+up your nodes.
 
-	2047 for SUN PHYs
-	127 for all other PHYs
+>
+> Also, I want to get RSSI and LQI info during the node communication. I 
+> saw an issue you released several days ago 
+> (https://github.com/linux-wpan/wpan-tools/issues/6), I want to know 
+> how long the implementation for wpan node dump functionality will be 
+> done.
 
-So we working currently with "127" for aMaxPHYPacketSize. In your case you
-will have "2047".
+There is no timeline for it. We noted this issue down as we know it is 
+missing. So far nobody started to work on it.
 
+> If it cannot be implemented currently, can I get these info (RSSI, 
+> LQI) via other methods? I also saw another similar issue 
+> (http://www.spinics.net/lists/linux-wpan/msg02513.html) on Internet, 
+> it is suggested to '/echo $(( 0x`cat 
+> /sys/kernel/debug/regmap/spi32766.0/registers | sed -ne "s/06: 
+> \(.*\)/\1/p"` & 0x1f ))/', when I tried it via ping6, I found there is 
+> nothing in the directory '/sys/kernel/debug'. If the reason is as the 
+> debug mode is off, if so, how can I start the debug mode? thank you 
+> very much!
+>
 
-Current issue is:
+My first guess would be that you did not mount debugfs. Try doing that 
+first.
 
-We don't handle this parameter as a variable, it's a define see [0]. :-)
-I am fine to change it as variable declaration into PIB [1], then add a
-new PHY FLAG [2] for such "SUN PHY's", while registering [3] the phy, it will
-update specific constants for such phy's e.g. aMaxPHYPacketSize.
-
-
-6LoWPAN:
-
-You want to run 6LoWPAN on it, current the 802.15.4 calculates a lot of
-stuff with the IEEE802154_MTU define, in most cases when using
-fragmentation.
-
-It seems you don't need fragmentation in your case, because you reach
-the 1280 minimum MTU for IPv6. The condition at [4] should be always
-true then.
-
-Another question would be:
-You can run 6LoWPAN on it, but nobody specifies to run 6LoWPAN on such
-"SUN PHY's". I actually don't see that. Everything is specified with 127
-MTU.
-
-I don't want to tell you cannot run 6LoWPAN on it, but does somebody
-need to specify 6LoWPAN for 802.15.4g at first?
-
-> 
-> Before jumping in coding, is anyone on the list already working on
-> this? Or has any starting points.
-> 
-> 
-
-I describe one point above for handling different MTU size. I don't know
-if somebody already working on 802.15.4g support.
-
-- Alex
-
-[0] http://lxr.free-electrons.com/source/include/linux/ieee802154.h#L29
-[1] http://lxr.free-electrons.com/source/include/net/cfg802154.h#L184
-[2] http://lxr.free-electrons.com/source/include/net/mac802154.h#L127
-[3] http://lxr.free-electrons.com/source/net/mac802154/main.c#L150
-[4] http://lxr.free-electrons.com/source/net/ieee802154/6lowpan/tx.c#L285
+regards
+Stefan Schmidt
