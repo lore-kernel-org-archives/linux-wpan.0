@@ -1,46 +1,45 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from tuna.sandelman.ca ([209.87.249.19]:43025 "EHLO
+Received: from tuna.sandelman.ca ([209.87.249.19]:55049 "EHLO
 	tuna.sandelman.ca" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758796AbcCDUaC (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Fri, 4 Mar 2016 15:30:02 -0500
+	with ESMTP id S1752350AbcCGQZR (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Mon, 7 Mar 2016 11:25:17 -0500
 From: Michael Richardson <mcr+ietf@sandelman.ca>
-Subject: big frame support in 802.15.4G
-In-Reply-To: <20160304163749.GA21798@omega>
-References: <CAH+RWqF-3Q8P52PTM9ZqpybEWTCKiubQK0-Y7L=c-3vAMhJfrg@mail.gmail.com> <20160228140659.GA17980@omega> <28981.1457015214@obiwan.sandelman.ca> <20160304083528.GA1525@omega> <24416.1457106776@obiwan.sandelman.ca> <20160304163749.GA21798@omega>
+Subject: Re: [6lo] big frame support in 802.15.4G
+In-Reply-To: <56DC2A0A.6070906@htt-consult.com>
+References: <CAH+RWqF-3Q8P52PTM9ZqpybEWTCKiubQK0-Y7L=c-3vAMhJfrg@mail.gmail.com> <20160228140659.GA17980@omega> <28981.1457015214@obiwan.sandelman.ca> <20160304083528.GA1525@omega> <24416.1457106776@obiwan.sandelman.ca> <20160304163749.GA21798@omega> <18168.1457123400@obiwan.sandelman.ca> <56DC2A0A.6070906@htt-consult.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; boundary="=-=-=";
 	micalg=pgp-sha1; protocol="application/pgp-signature"
-Date: Fri, 04 Mar 2016 15:30:00 -0500
-Message-ID: <18168.1457123400@obiwan.sandelman.ca>
+Date: Mon, 07 Mar 2016 11:25:13 -0500
+Message-ID: <4538.1457367913@obiwan.sandelman.ca>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: 6lo@ietf.org
-Cc: Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org
+To: Robert Moskowitz <rgm-ietf@htt-consult.com>
+Cc: 6lo@ietf.org, Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org
 
 --=-=-=
 Content-Type: text/plain
 
 
-Can 802.15.4g with 2048 byte frames exist in an LLN along with nodes using
-802.15.4-2012 classic 127 byte frames?
+Robert Moskowitz <rgm-ietf@htt-consult.com> wrote:
+    > The difference is in the header bits. A 802.15.4-2011 device would see
+    > the bits set in the header that 4g uses and drop the packet
+    > immediately. Pat would have to pipe in here, and there may be some
+    > issues around super frames and intergap timings that result in
+    > interesting behaviour, better to be avoided.
 
-There are three questions embedded here:
-1) are there radios issues that would prevent this from ever being an issue?
+Right, but the question is:
 
-2) assuming that 15.4g radios can communicate with 15.4 radios, is there
-   something that would permit one 15.4g radio to realize it was talking
-   to another 15.4g radio at the L2 (frame) level?
+1) is it physically possible for a 15.4g device to send both 15.4g
+   frames and 15.4-2011 frames?
+   Another email suggests that this can never happen because frequencies
+   are never the same.  If so, end of problem.
 
-3) if the answer to #2 is no, then is this akin to ethernet with jumbo
-   frames, where the MTU (and fraglettation method) to each destination needs
-   to go into the neighbour cache?
+2) if the answer to question 1 is yes, then 15.4g devices need to know
+   if they are speaking to 15.4-2011 devices, and
+      a) adjust their frame header bits appropriately.
+      b) to 6lowpan fraglettation.
 
-RFC4681 section 4.6.4 specifies an MTU value for the network as a whole
-        in the RA.  https://tools.ietf.org/html/rfc4861#section-4.6.4
-
-I thought that I'd see an option to put the MTU into the NA as well, but
-I don't see that specified, so how can jumbo ethernet work today?
-(maybe that's why it isn't on by default more often...)
 
 --
 Michael Richardson <mcr+IETF@sandelman.ca>, Sandelman Software Works
@@ -55,12 +54,12 @@ Content-Type: application/pgp-signature; name="signature.asc"
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1
 
-iQEVAwUBVtnwRoCLcPvd0N1lAQJ5VQf8C0ptAfSZ0e2lCJRDkh11GZwTZaUS2ncr
-TW5UFB8NoX2VCQUUbHVWMrzFsIFO+lBIQZ+PjyYRBPqZQp9O4cBVVa2VYxNNQbOV
-ThVFdly3StfUpJgDv/0oXkhxnWehgpkWaIXGaElZbkvGp8efUkHmVSt5HrfThfrC
-HcK04QoLKZortI5VHwvwzXhiJHuFWXFj2gBmSCrqCqZChbptMrdUc6GnxB5jY4Au
-XtA9uxp+OLEV3aLgZJSEwOVHlK6hzPenYN8BHUCHdZd41JZcTJ98wAxaYDzlmjSH
-TMh8tCtRcuBg+BJFyim/5Z1y8ICaEFVVyopuWoyiT1ZqDC/pr4t4Jw==
-=JvYD
+iQEVAwUBVt2rZoCLcPvd0N1lAQJ9ygf/Z8BkiLXyMoqNIrW43YiNjjAjaVA94ZnE
++jdgJz1FhoWaWjyLXw64u7dAzjJ4nwaVQit/gJASTHrhcHQKsVQxmsZXyyVM1BzV
+S1KY9nzQsNCjaWRX1OsYhTzOb+VykhcPobLLnzDKNnSEFnIiBTV2bsVCABTq0Pgi
+E9qAOSTjdZiY6NbO3CAd/mFPkkTuiFa87M9KxKBNjh9p0beRx+ZIosGZ8u1XQvXP
+XkhF97btVRQGHWGkFbsY3sRr0uI1ygsOswokJPWdXq7vTAy4jN4EFBtAC5QaRrXp
+Ei6RjT2MNeJDDKUrEWSewkCSCKVg97rNj+peJK0M/uo8yxV8Kt+2Bg==
+=8/La
 -----END PGP SIGNATURE-----
 --=-=-=--
