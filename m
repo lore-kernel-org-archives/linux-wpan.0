@@ -1,77 +1,65 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from lists.s-osg.org ([54.187.51.154]:52444 "EHLO lists.s-osg.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752076AbcCAJP3 (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-	Tue, 1 Mar 2016 04:15:29 -0500
-Subject: Re: 802.15.4G support?
-References: <CAH+RWqF-3Q8P52PTM9ZqpybEWTCKiubQK0-Y7L=c-3vAMhJfrg@mail.gmail.com>
-From: Stefan Schmidt <stefan@osg.samsung.com>
-Message-ID: <56D55DAD.4040103@osg.samsung.com>
-Date: Tue, 1 Mar 2016 10:15:25 +0100
+Received: from tuna.sandelman.ca ([209.87.249.19]:49841 "EHLO
+	tuna.sandelman.ca" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752133AbcCHORp (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Tue, 8 Mar 2016 09:17:45 -0500
+From: Michael Richardson <mcr+ietf@sandelman.ca>
+Subject: Re: [6lo] big frame support in 802.15.4G
+In-Reply-To: <CADrU+dKHiNd2xW0Nd=ZWJCAZQ_PbWXwNFo_V2u4nd7A_ccfwCw@mail.gmail.com>
+References: <20160228140659.GA17980@omega> <28981.1457015214@obiwan.sandelman.ca> <20160304083528.GA1525@omega> <24416.1457106776@obiwan.sandelman.ca> <20160304163749.GA21798@omega> <18168.1457123400@obiwan.sandelman.ca> <56DC2A0A.6070906@htt-consult.com> <4538.1457367913@obiwan.sandelman.ca> <D302EF45.3625F%d.sturek@att.net> <56DDED58.5060500@htt-consult.com> <20160308082207.GA790@omega> <CADrU+dKHiNd2xW0Nd=ZWJCAZQ_PbWXwNFo_V2u4nd7A_ccfwCw@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CAH+RWqF-3Q8P52PTM9ZqpybEWTCKiubQK0-Y7L=c-3vAMhJfrg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha1; protocol="application/pgp-signature"
+Date: Tue, 08 Mar 2016 09:17:44 -0500
+Message-ID: <25003.1457446664@obiwan.sandelman.ca>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Remi Philippe <remi@linqio.com>, linux-wpan@vger.kernel.org
+To: "6lo@ietf.org" <6lo@ietf.org>, robert.cragie@gridmerge.com
+Cc: Alexander Aring <alex.aring@gmail.com>, Robert Moskowitz <rgm-ietf@htt-consult.com>, linux-wpan@vger.kernel.org, Don Sturek <d.sturek@att.net>
 
-Hello.
+--=-=-=
+Content-Type: text/plain
 
-On 25/02/16 19:22, Remi Philippe wrote:
-> Hello,
->
-> We’re currently developing a driver for RF215 (dual radio) using
 
-You mean the at86rf215 here, right?
-http://www.atmel.com/images/atmel-42415-wireless-at86rf215_datasheet.pdf
+Robert Cragie <robert.cragie@gridmerge.com> wrote:
+    > 1) is it physically possible for a 15.4g device to send both 15.4g
+    > frames and 15.4-2011 frames?
 
-> 6lowpan and are nearly done with it.
+    > Yes, in theory. The PHY would have to support both the SUN-O-QPSK and
+    > the O-QPSK PHYs, the intersecting frequencies, rates and spreading mode
+    > and somehow be selectable on Tx and discriminate on Rx (accept both
+    > PPDU formats)
 
-Great. I hope you plan to send it for mainline inclusion. Is is a 
-complete new driver or did you work on extending the at86rf2xx driver to 
-support this chip?
+Thank you for this answer.
 
-> We’ve figured out the current MAC
-> and PHY are built for 15.4 and not 15.4g which is a blocking point the
-> sub-ghz module.
+Alex is trying to make the lowpan code for the Linux kernel more flexible,
+and the question of whether we need to include a way to use different MTUs on
+a per-destination basis has come up, and we had no clear answer.
 
-That is correct. So far nobody did any work on supporting 15.4g  and to 
-answer the question from below I also do not know anyone actually 
-working on it. So you could jump to the coding. :)
->
->
-> It doesn’t look like there is a need for a huge amount of work to get
-> a basic version of it working (key ones we’ve seen are different MTU
-> and also some changes in the header like PHR).
+We now know that this is physically possible; we don't know if chipsets will
+implement this, or whether it SHOULD be possible.
 
-Alex already gave you some hints about handling the different MTU size 
-for SUN phys. The sub GHz frequency bands and channel setting should 
-already be covered in the kernel and wpan-tools. We might miss some 
-corner cases as Alex and myself do not have sub GHz hardware but they 
-should not be that hard to handle.
+This is now a technical policy question for 6lo, in my opinion.
 
-Can you elaborate on the problem with the PHR header?
+--
+Michael Richardson <mcr+IETF@sandelman.ca>, Sandelman Software Works
+ -= IPv6 IoT consulting =-
 
-For the chip with two phy I expect you will just expose two different 
-phy's and we need no special handling for it. Are there any limitation 
-on the chip side like a shared frame buffer or regs which might extra 
-logic in the core?
 
-Are there any other MAC related changes in 15.4g? I briefly looked at it 
-but the abstract of changes has been very vague ("In addition to the
-new PHYs, the amendment also defines those MAC modifications needed to 
-support their implementation.") and reading the whole 252 pages was to 
-much for this morning. :)
 
->
-> Before jumping in coding, is anyone on the list already working on
-> this? Or has any starting points.
 
-Its an area nobody is working on as far as we now. Be our guest here. We 
-are happy to review patches for it.
-Btw, do you happen to know if 15.4g was merged into 2015 edition of the 
-main 15.4 spec or is it still a separate spec?
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
 
-regards
-Stefan Schmidt
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEVAwUBVt7fBYCLcPvd0N1lAQL31gf/XKbV7jzXY/qQaK8wu88X2k59UXhkh0hP
+8RiM+1eJ6YaImOAiR3C1Fn+5/QJzWWWcJwYsYS4PXtTRjQcZyzhRWCxswmpbBO8t
+lGSbuAcGiu+FcMV3hLQZn9cION/6gVKf8VQ8Ckc1+MjuyJ+YRE0fO95FQ9Eo3DBv
+0mZDUamj77dvJTdDUyrXsO29EuljfLdb0lanOPxAk3txrKMaj6XAkEY8foOWUQlC
+OelILL8wqjgUj5knwFObaY3cxe8or1fTzlsvGUojmGrnY280TDrlyqmwpB9VWYUq
+qnrNRz5aCdZ3J31McBdbNpN5bn0af/C1LFdNLJtZjUJnILJDzBpRYw==
+=LTSF
+-----END PGP SIGNATURE-----
+--=-=-=--
