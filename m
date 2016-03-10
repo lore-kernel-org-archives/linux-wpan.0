@@ -1,56 +1,58 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wm0-f47.google.com ([74.125.82.47]:33529 "EHLO
-	mail-wm0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753847AbcCIU1i (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Wed, 9 Mar 2016 15:27:38 -0500
-Received: by mail-wm0-f47.google.com with SMTP id l68so2123064wml.0
-        for <linux-wpan@vger.kernel.org>; Wed, 09 Mar 2016 12:27:38 -0800 (PST)
+Received: from lists.s-osg.org ([54.187.51.154]:44625 "EHLO lists.s-osg.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752221AbcCJQkv (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+	Thu, 10 Mar 2016 11:40:51 -0500
+Subject: Re: [PATCH] mrf24j40: fix security-enabled processing on inbound
+ frames
+References: <56C60EBA.2070707@zopieux.com> <56D4A0C2.5090605@signal11.us>
+From: Stefan Schmidt <stefan@osg.samsung.com>
+Message-ID: <56E1A38F.6050108@osg.samsung.com>
+Date: Thu, 10 Mar 2016 17:40:47 +0100
 MIME-Version: 1.0
-In-Reply-To: <3583.1457550990@obiwan.sandelman.ca>
-References: <CAPpUg6OTHiaWvANusmnty0DW0GRonTgX5uOLfR5cOSgbdnYyqQ@mail.gmail.com>
-	<30027.1457531123@obiwan.sandelman.ca>
-	<CAPpUg6MMTrwOiNC5M-e52zZpNkh58AQ7TC7x2p_fY916CvyHpw@mail.gmail.com>
-	<3583.1457550990@obiwan.sandelman.ca>
-Date: Wed, 9 Mar 2016 21:27:37 +0100
-Message-ID: <CAPpUg6OYkm6watgsSaLgE-_2hKsEGCnR5BjCRkLV-CHpHf7GRg@mail.gmail.com>
-Subject: Re: RPl on Linux
-From: Baptiste Clenet <bapclenet@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <56D4A0C2.5090605@signal11.us>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Michael Richardson <mcr@sandelman.ca>
-Cc: linux-wpan@vger.kernel.org
+To: Alan Ott <alan@signal11.us>, zopieux <web@zopieux.com>, linux-wpan@vger.kernel.org
+Cc: netdev@vger.kernel.org, Alexander Aring <alex.aring@gmail.com>
 
-Nice, I may have a try in the coming months,thank for your reply.
+Hello.
 
-2016-03-09 20:16 GMT+01:00 Michael Richardson <mcr@sandelman.ca>:
+On 29/02/16 20:49, Alan Ott wrote:
+> On 02/18/2016 01:34 PM, zopieux wrote:
+>> Fix the MRF24J40 handling of security-enabled frames so it does not
+>> block upon receiving such frames.
+>>
+>> Signed-off-by: Alexander Aring <aar@pengutronix.de>
+>> Reported-by: Alexandre Macabies <web+oss@zopieux.com>
+>> Tested-by: Alexandre Macabies <web+oss@zopieux.com>
+>> ---
+>> When receiving a security-enabled IEEE 802.15.4 frame, the MRF24J40
+>> triggers a SECIF interrupt that needs to be handled for RX processing
+>> to keep functioning properly.
+>>
+>> This patch enables the SECIF interrupt and makes the MRF ignores all
+>> hardware processing of security-enabled frames, that is handled by the
+>> ieee802154 stack instead.
+>> ---
 >
-> Baptiste Clenet <bapclenet@gmail.com> wrote:
->     >> Baptiste Clenet <bapclenet@gmail.com> wrote: > Thanks for your work
->     >> concerning 6lowpan, 802.15.4 and wpan tools, > that's great!  I'm
->     >> wondering what the status of RPL mesh implementation > on Linux?
->     >>
->     >> There are few implementations, see for instance this article:
->     >> http://www.sixpinetrees.pl/2014/11/linux-rpl-router.html
->     >>
->     >> 1) Mine, which is at http://unstrung.sandelman.ca/ Currently storing
->     >> only; non-storing requires kernel work that is not yet done.
+> The "From" field of the email needs to have your real name in it. This 
+> will be where the "Author" field in git comes from.
 >
->     > Thanks for your answer, I see that you suggest to make it work with
->     > Contiki RPL implementation., a serious competitor to Contiki is RIOT,
->     > have you ever tried your RPL implementation with RIOT RPL?
+> It looks like there are a few separate things happening in this patch. 
+> Maybe they should be broken out in to separate patches. I see:
 >
-> We interoperated with RIOT-OS RPL back at the 6lo interop in November.
-> I haven't yet successfully flashed my own openmote with RIOT-OS (or OpenWSN).
-> [It's a JTAG/bootloader issue that I haven't had time to resolve...]
+> 1. The ieee802154.h part,
+> 2. The TX part,
+> 3. The RX part.
 >
-> --
-> ]               Never tell me the odds!                 | ipv6 mesh networks [
-> ]   Michael Richardson, Sandelman Software Works        | network architect  [
-> ]     mcr@sandelman.ca  http://www.sandelman.ca/        |   ruby on rails    [
+> The patch description only really describes the RX part.
 >
 
+zopieux, could you split the patch as Alan suggested and re-submitted 
+the series?
 
-
--- 
-Baptiste
+regards
+Stefan Schmidt
