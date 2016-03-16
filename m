@@ -1,47 +1,67 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from lists.s-osg.org ([54.187.51.154]:59322 "EHLO lists.s-osg.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751394AbcC3U65 (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-	Wed, 30 Mar 2016 16:58:57 -0400
-Subject: Re: No device found for binding socket ieee802.15.4
-References: <CALqexQVqxwfKxZ=fmtjQPnHcdibVFmFTG4dRZkBwC4aJfLkE5A@mail.gmail.com>
- <20160329083732.GA1114@omega>
- <CALqexQUhA-wTJow59_PkkbnmJz8UWxW2WoCdU=qYHYNQjyMVvQ@mail.gmail.com>
- <56FB8E7F.70106@osg.samsung.com>
- <CALqexQWw4QuPWxTDe8SdHxeOptq6TCf-O4Mq_UL-pDxqUz=h1A@mail.gmail.com>
- <56FC3A38.7030305@osg.samsung.com>
- <CALqexQV2z5wR3y8pUtWeF0eENyo3v6pdak6sm09g7LcPuQ+4cA@mail.gmail.com>
-From: Stefan Schmidt <stefan@osg.samsung.com>
-Message-ID: <56FC3E0D.7060604@osg.samsung.com>
-Date: Wed, 30 Mar 2016 22:58:53 +0200
-MIME-Version: 1.0
-In-Reply-To: <CALqexQV2z5wR3y8pUtWeF0eENyo3v6pdak6sm09g7LcPuQ+4cA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:59265 "EHLO
+	metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1754151AbcCPMw4 (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>);
+	Wed, 16 Mar 2016 08:52:56 -0400
+From: Alexander Aring <aar@pengutronix.de>
+Subject: [PATCH bluetooth-next] 6lowpan: iphc: fix handling of link-local compression
+Date: Wed, 16 Mar 2016 13:52:41 +0100
+Message-Id: <1458132761-24055-1-git-send-email-aar@pengutronix.de>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Adika Bintang Sulaeman <adikabintang78@gmail.com>
-Cc: Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org, jukka.rissanen@linux.intel.com
+To: linux-wpan@vger.kernel.org
+Cc: linux-bluetooth@vger.kernel.org, kernel@pengutronix.de, jukka.rissanen@linux.intel.com, Alexander Aring <aar@pengutronix.de>
 
-Hello.
+This patch fixes handling in case of link-local address compression. A
+IPv6 link-local address is defined as fe80::/10 prefix which is also
+what ipv6_addr_type checks for link-local addresses.
 
-On 30/03/16 22:49, Adika Bintang Sulaeman wrote:
->> I still don't see why you would need to do this. What did you change?
-> Sorry, I think I didn't explain clearly. I forgot to set pan_id and
-> short address. Now the wpan-ping works fine. I tried to create a
-> server program which is based on 802.15.4 and 6LoWPAN, and I imitate
-> the code from wpan-ping. I didn't mean that I literally changed the
-> wpan-ping.
+But IPHC compression for link-local addresses are for fe80::/64 types
+only. This patch adds additional checks for zero padded bits in case of
+link-local address compression to match on a fe80::/64 address only.
 
-OK, that makes more sense now. Without the address being setup this 
-would fail.
+Signed-off-by: Alexander Aring <aar@pengutronix.de>
+---
+ net/6lowpan/iphc.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
->> Its the normal IPv6 socket API of linux.
-> Thank you for your explanation, Stefan Schmidt.
+diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
+index 99bb22a..68c80f3 100644
+--- a/net/6lowpan/iphc.c
++++ b/net/6lowpan/iphc.c
+@@ -148,6 +148,11 @@
+ 	 (((a)->s6_addr16[6]) == 0) &&		\
+ 	 (((a)->s6_addr[14]) == 0))
+ 
++#define lowpan_is_linklocal_zero_padded(a)	\
++	(!(hdr->saddr.s6_addr[1] & 0x3f) &&	\
++	 !hdr->saddr.s6_addr16[1] &&		\
++	 !hdr->saddr.s6_addr32[1])
++
+ #define LOWPAN_IPHC_CID_DCI(cid)	(cid & 0x0f)
+ #define LOWPAN_IPHC_CID_SCI(cid)	((cid & 0xf0) >> 4)
+ 
+@@ -1101,7 +1106,8 @@ int lowpan_header_compress(struct sk_buff *skb, const struct net_device *dev,
+ 							  true);
+ 			iphc1 |= LOWPAN_IPHC_SAC;
+ 		} else {
+-			if (ipv6_saddr_type & IPV6_ADDR_LINKLOCAL) {
++			if (ipv6_saddr_type & IPV6_ADDR_LINKLOCAL &&
++			    lowpan_is_linklocal_zero_padded(hdr->saddr)) {
+ 				iphc1 |= lowpan_compress_addr_64(&hc_ptr,
+ 								 &hdr->saddr,
+ 								 saddr, true);
+@@ -1135,7 +1141,8 @@ int lowpan_header_compress(struct sk_buff *skb, const struct net_device *dev,
+ 							  false);
+ 			iphc1 |= LOWPAN_IPHC_DAC;
+ 		} else {
+-			if (ipv6_daddr_type & IPV6_ADDR_LINKLOCAL) {
++			if (ipv6_daddr_type & IPV6_ADDR_LINKLOCAL &&
++			    lowpan_is_linklocal_zero_padded(hdr->daddr)) {
+ 				iphc1 |= lowpan_compress_addr_64(&hc_ptr,
+ 								 &hdr->daddr,
+ 								 daddr, false);
+-- 
+2.7.3
 
-If you have no specific requirements for the 6LoWPAN part normal 
-client/server code written for the Linux IPv6 socket API should work 
-over the lowpan0 interface.
-
-regards
-Stefan Schmidt
