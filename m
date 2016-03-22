@@ -1,13 +1,13 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:40785 "EHLO
+Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:52442 "EHLO
 	metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1758816AbcCVNPn (ORCPT
+	by vger.kernel.org with ESMTP id S1758847AbcCVNPn (ORCPT
 	<rfc822;linux-wpan@vger.kernel.org>);
 	Tue, 22 Mar 2016 09:15:43 -0400
 From: Alexander Aring <aar@pengutronix.de>
-Subject: [RFC bluetooth-next 09/19] 6lowpan: move eui64 uncompress function
-Date: Tue, 22 Mar 2016 14:15:05 +0100
-Message-Id: <1458652515-7862-10-git-send-email-aar@pengutronix.de>
+Subject: [RFC bluetooth-next 10/19] 6lowpan: add lowpan_is_ll function
+Date: Tue, 22 Mar 2016 14:15:06 +0100
+Message-Id: <1458652515-7862-11-git-send-email-aar@pengutronix.de>
 In-Reply-To: <1458652515-7862-1-git-send-email-aar@pengutronix.de>
 References: <1458652515-7862-1-git-send-email-aar@pengutronix.de>
 Sender: linux-wpan-owner@vger.kernel.org
@@ -15,69 +15,33 @@ List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
 Cc: kernel@pengutronix.de, jukka.rissanen@linux.intel.com, hannes@stressinduktion.org, stefan@osg.samsung.com, mcr@sandelman.ca, werner@almesberger.net, Alexander Aring <aar@pengutronix.de>
 
-This function will be use in later functionality in other branches than
-generic 6lowpan, so we move it to the global 6lowpan header.
+This patch adds the lowpan_is_ll function, which can be used to make a
+special 6lowpan linklayer handling for a specific 6lowpan linklayer
+type.
 
 Signed-off-by: Alexander Aring <aar@pengutronix.de>
 ---
- include/net/6lowpan.h | 16 ++++++++++++++++
- net/6lowpan/iphc.c    | 16 ----------------
- 2 files changed, 16 insertions(+), 16 deletions(-)
+ include/net/6lowpan.h | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
 diff --git a/include/net/6lowpan.h b/include/net/6lowpan.h
-index a0c01f5..04b877c 100644
+index 04b877c..6c09d01 100644
 --- a/include/net/6lowpan.h
 +++ b/include/net/6lowpan.h
-@@ -169,6 +169,22 @@ struct lowpan_802154_cb *lowpan_802154_cb(const struct sk_buff *skb)
- 	return (struct lowpan_802154_cb *)skb->cb;
+@@ -144,6 +144,13 @@ struct lowpan_dev *lowpan_dev(const struct net_device *dev)
+ 	return netdev_priv(dev);
  }
  
-+static inline void lowpan_iphc_uncompress_eui64_lladdr(struct in6_addr *ipaddr,
-+						       const void *lladdr)
++static inline bool lowpan_is_ll(const struct net_device *dev,
++				enum lowpan_lltypes lltype)
 +{
-+	/* fe:80::XXXX:XXXX:XXXX:XXXX
-+	 *        \_________________/
-+	 *              hwaddr
-+	 */
-+	ipaddr->s6_addr[0] = 0xFE;
-+	ipaddr->s6_addr[1] = 0x80;
-+	memcpy(&ipaddr->s6_addr[8], lladdr, EUI64_ADDR_LEN);
-+	/* second bit-flip (Universe/Local)
-+	 * is done according RFC2464
-+	 */
-+	ipaddr->s6_addr[8] ^= 0x02;
++	return (dev->type == ARPHRD_6LOWPAN &&
++		lowpan_dev(dev)->lltype == lltype);
 +}
 +
- #ifdef DEBUG
- /* print data in line */
- static inline void raw_dump_inline(const char *caller, char *msg,
-diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
-index bad4f89..a3ea5f6 100644
---- a/net/6lowpan/iphc.c
-+++ b/net/6lowpan/iphc.c
-@@ -151,22 +151,6 @@
- #define LOWPAN_IPHC_CID_DCI(cid)	(cid & 0x0f)
- #define LOWPAN_IPHC_CID_SCI(cid)	((cid & 0xf0) >> 4)
- 
--static inline void lowpan_iphc_uncompress_eui64_lladdr(struct in6_addr *ipaddr,
--						       const void *lladdr)
--{
--	/* fe:80::XXXX:XXXX:XXXX:XXXX
--	 *        \_________________/
--	 *              hwaddr
--	 */
--	ipaddr->s6_addr[0] = 0xFE;
--	ipaddr->s6_addr[1] = 0x80;
--	memcpy(&ipaddr->s6_addr[8], lladdr, EUI64_ADDR_LEN);
--	/* second bit-flip (Universe/Local)
--	 * is done according RFC2464
--	 */
--	ipaddr->s6_addr[8] ^= 0x02;
--}
--
- static inline void
- lowpan_iphc_uncompress_802154_lladdr(struct in6_addr *ipaddr,
- 				     const void *lladdr)
+ /* private device info */
+ struct lowpan_802154_dev {
+ 	struct net_device	*wdev; /* wpan device ptr */
 -- 
 2.7.4
 
