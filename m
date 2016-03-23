@@ -1,105 +1,61 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from lists.s-osg.org ([54.187.51.154]:53745 "EHLO lists.s-osg.org"
+Received: from lists.s-osg.org ([54.187.51.154]:56715 "EHLO lists.s-osg.org"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754286AbcCNPxF (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-	Mon, 14 Mar 2016 11:53:05 -0400
-Subject: =?UTF-8?Q?Re:_PROBLEM=ef=bc=9athere_exists_a_wrong_return_value_of_?=
- =?UTF-8?Q?function_ieee802154=5fadd=5fiface=28=29?=
-References: <485cdac3.48e1.1535e928b67.Coremail.rucsoftsec@163.com>
- <20160310090957.GA5020@omega> <56E1A330.5060304@osg.samsung.com>
- <20160314093001.GA4947@omega>
+	id S1753113AbcCWSk7 (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+	Wed, 23 Mar 2016 14:40:59 -0400
 From: Stefan Schmidt <stefan@osg.samsung.com>
-Message-ID: <56E6DE5D.5010708@osg.samsung.com>
-Date: Mon, 14 Mar 2016 16:53:01 +0100
+Subject: wpan-tools 0.6 release
+Message-ID: <56F2E337.3040009@osg.samsung.com>
+Date: Wed, 23 Mar 2016 19:40:55 +0100
 MIME-Version: 1.0
-In-Reply-To: <20160314093001.GA4947@omega>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>
-Cc: Zhang Yan <rucsoftsec@163.com>, linux-wpan@vger.kernel.org
+To: "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>
+Cc: c.schoenert@t-online.de, pbrobinson@gmail.com
 
 Hello.
 
-On 14/03/16 10:30, Alexander Aring wrote:
-> On Thu, Mar 10, 2016 at 05:39:12PM +0100, Stefan Schmidt wrote:
->> Hello.
->>
->> Missing a bit context here as the original message never made it to the
->> list.
->>
-> linux-wpan was cc'ed inside the mail, but there was some html stuff
-> there... I don't know why it isn't arrived at linux-wpan.
+It is a pleasure to announce the 0.6 release of wpan-tools.
+Thanks to everyone who contributed!
 
-If it had html in it vger would reject it.
+0.6 is a bug fix release only. Some smaller things all over the place. 
+The important one is a fix to work with libnl  >= 3.2.27 which is 
+getting picked up by more and more distributions.
 
-> Anyway...
->
-> There exists a bugzilla entry for that and John Linville said that I
-> should care about that, see [0].
+Downloads and md5sums:
 
-OK
+http://wpan.cakelab.org/releases/wpan-tools-0.6.tar.bz2
+dd5367fe36ad8269263a29edad073bf7
 
->> On 10/03/16 10:10, Alexander Aring wrote:
->>> Hi,
->>>
->>> I think this is a good time to remove the deprecated netlink interface
->>> for 802.15.4.
->>>
->>> Stefan please say your opinion here. There should be really nobody which
->>> use this interface anymore.
->> My mind haven't really changed on this topic. I understand why you want it
->> removed but given that the general rule of the kernel is to have backward
->> compatibility we can't just remove it. Dropping the old netlink interface
->> breaks userspace compatibility, even if it only is for deprecated tools like
->> lowpan-tools, etc.
->>
->> My take on it is that we live with it. Keeping it around but not extending
->> it. Maybe add a warning to dmesg iwhen some application uses the old
->> interface.
->>
->> Is it more code cleanliness/maintenance or bug reports that urge you to get
->> rid of it?
-> This is one of the smallest problem, I can live with "live with it". But
-> when I need to touch it because "nl802154" and "ieee802154" use the same
-> INTERNAL interface, e.g. llsec. I don't want to handle backwards
-> compatibility for that.
->
-> This complete handling with the damnd backwards compatibility for a
-> interface which is totally broken. (Yes I think [0] is one of the
-> smallest issues). We getting stucked in developing of 802.15.4 to
-> develop a better netlink interface (nl802154).
->
-> The old interface I would describe as:
->
-> - deprecated
-> - broken
-> - there exists no official userspace tool to handle everything, e.g.
->    llsec, txpower, csma, etc...
->
-> I want to remove it otherwise the branch will die again, because stupid
-> handling a broken interface which nobody should use anymore.
->
-> My argument is:
->
-> Don't forget the 802.15.4 branch is still experimental, no maintainer
-> acked this commit [1]. For EXPERIMENTAL things you can be sure that the
-> UAPI interface will not be changed later and I would still say this
-> branch is EXPERIMENTAL.
->
->
-> I also have 3-4 things which we need to change inside the new interface
-> (nl802154), because the deprecated already handle it wrong and I simple
-> copy&pasted it... but it was wrong. Then handling of two UAPI's which
-> need to access the INTERNAL api (cfg802154) will be mostly impossible.
+http://wpan.cakelab.org/releases/wpan-tools-0.6.tar.gz
+05322b1bc2fcdc040d326f0a5017aa4e
 
-You are sold on it and you are doing a lot of work there. Give it a try.
+Carsten Schoenert (1):
+       iwpan: fix small typo, no functional change
 
-Maybe you are lucky and it will just go through and we only have to deal 
-with a few complaints about lowpan-tools no longer working with 4.6/4.7.
-Be prepared though that if everything goes south you might find yourself 
-being yelled at by Linus. :) Just saying.
+Stefan Schmidt (18):
+       wpan-ping: align wpan-ping version with the general wpan-tools 
+version
+       wpan-ping: remove no longer used b option from getopt string
+       wpan-ping: fix usage message and mention -h option
+       wpan-ping: use correct define to fix getopt_long usage
+       wpan-ping: fix segfault for accessing invalid address
+       build: avoid redefinition errors with libnl >= 3.2.27
+       wpan-ping: remove unused struct sockaddr_nl variable
+       wpan-ping: check return value for setsockopt
+       wpan-ping: do not try to send data back to origin if we got an 
+error from recvfrom
+       wpan-ping: avoid leaking socket handle on error path
+       ci build: start to use Travis CI for continuous integration builds
+       ci build: add Coverity Scan service support to pur Travis config
+       wpan-ping: hide packet dump behind DEBUG flag
+       iwpan/wpan-ping: add some missing static attributes
+       wpan-ping: remove unused parameter from init_server()
+       wpan-ping: make sure we do not leak conf during wrong options exit
+       travis: add IRC notification of travis builds to linux-wpan channel
+       Release 0.6
 
 regards
 Stefan Schmidt
