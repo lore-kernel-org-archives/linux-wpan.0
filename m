@@ -1,61 +1,69 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from lists.s-osg.org ([54.187.51.154]:56715 "EHLO lists.s-osg.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753113AbcCWSk7 (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-	Wed, 23 Mar 2016 14:40:59 -0400
-From: Stefan Schmidt <stefan@osg.samsung.com>
-Subject: wpan-tools 0.6 release
-Message-ID: <56F2E337.3040009@osg.samsung.com>
-Date: Wed, 23 Mar 2016 19:40:55 +0100
+Received: from mail-ig0-f180.google.com ([209.85.213.180]:36420 "EHLO
+	mail-ig0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753198AbcC1PVJ (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Mon, 28 Mar 2016 11:21:09 -0400
+Received: by mail-ig0-f180.google.com with SMTP id nk17so54491256igb.1
+        for <linux-wpan@vger.kernel.org>; Mon, 28 Mar 2016 08:21:08 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Date: Mon, 28 Mar 2016 22:21:08 +0700
+Message-ID: <CALqexQURMozJfgAeLsBUaO_zRwSiS7ZHQQubuLS5Eoo8BcbjXg@mail.gmail.com>
+Subject: No device found for binding socket ieee802.15.4
+From: Adika Bintang Sulaeman <adikabintang78@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>
-Cc: c.schoenert@t-online.de, pbrobinson@gmail.com
+To: linux-wpan@vger.kernel.org
 
-Hello.
+Dear all linux-wpan developers and users,
 
-It is a pleasure to announce the 0.6 release of wpan-tools.
-Thanks to everyone who contributed!
+This is my first time exploring 6LoWPAN and I would like to ask you
+some questions. Before getting into questions, these are the devices
+and set up that I use:
+-Raspberry Pi Model B Rev 2
+-Raspbian OS
+-kernel from bluetooth-next ver 4.5.0-rc5+
+-MRF24J40MA Transceiver
 
-0.6 is a bug fix release only. Some smaller things all over the place. 
-The important one is a fix to work with libnl  >= 3.2.27 which is 
-getting picked up by more and more distributions.
+After setting up and installing the wpan-tools, I got my interface
+work by prompting "ip link show" and there is something like:
 
-Downloads and md5sums:
+3: wpan0 <BROADCAST,NOARP> mtu 123 qdisc noop state DOWN mode DEFAULT
+group default qlen 1000
+	link/ieee802.15.4 ee:3b:07:84:64:8c:2a:71 brd ff:ff:ff:ff:ff:ff:ff
 
-http://wpan.cakelab.org/releases/wpan-tools-0.6.tar.bz2
-dd5367fe36ad8269263a29edad073bf7
+The first thing I notice strange is why after the command "sudo ip
+link add link wpan0 name lowpan0 type lowpan" the output in "ip link
+show" is a bit different, especially in link/[825]:
 
-http://wpan.cakelab.org/releases/wpan-tools-0.6.tar.gz
-05322b1bc2fcdc040d326f0a5017aa4e
+7: lowpan0 <BROADCAST,MULTICAST> mtu 1280 qdisc noop state DOWN mode
+DEFAULT group default qlen 1
+	link/[825] ee:3b:07:84:64:8c:2a:71 brd ff:ff:ff:ff:ff:ff:ff
 
-Carsten Schoenert (1):
-       iwpan: fix small typo, no functional change
+So this is the FIRST QUESTION:
+1. Is that normal/ok to have link/[825] instead of link/ieee802.15.4?
 
-Stefan Schmidt (18):
-       wpan-ping: align wpan-ping version with the general wpan-tools 
-version
-       wpan-ping: remove no longer used b option from getopt string
-       wpan-ping: fix usage message and mention -h option
-       wpan-ping: use correct define to fix getopt_long usage
-       wpan-ping: fix segfault for accessing invalid address
-       build: avoid redefinition errors with libnl >= 3.2.27
-       wpan-ping: remove unused struct sockaddr_nl variable
-       wpan-ping: check return value for setsockopt
-       wpan-ping: do not try to send data back to origin if we got an 
-error from recvfrom
-       wpan-ping: avoid leaking socket handle on error path
-       ci build: start to use Travis CI for continuous integration builds
-       ci build: add Coverity Scan service support to pur Travis config
-       wpan-ping: hide packet dump behind DEBUG flag
-       iwpan/wpan-ping: add some missing static attributes
-       wpan-ping: remove unused parameter from init_server()
-       wpan-ping: make sure we do not leak conf during wrong options exit
-       travis: add IRC notification of travis builds to linux-wpan channel
-       Release 0.6
+The second thing I notice strange is after "sudo ip link set wpan0 up"
+for both wpan0 and lowpan0, the "ifconfig" command shows that these
+network interfaces have "Link encap:UNSPEC". If I'm not mistaken, Link
+encap shows the hardware family of the interface, right?
 
-regards
-Stefan Schmidt
+So the SECOND QUESTION is:
+2. Is that normal/ok to have Link encap:UNSPEC? Because this thing
+makes me suspicious about the next problem that I face.
+
+I tried to run wpan-ping daemon from /wpan-tools/wpan-ping by
+prompting "wpan-ping --daemon" but the output is "bind: No such
+device". I tried to make my own code to make a server program which
+listen to this socket interface. But when binding with bind(), I got
+the same error status "No device found".
+
+This leads to my THIRD QUESTION:
+3. Why "no device found" appears? The transceiver is attached, the
+hardware address exists, the interface is up, and I am able to ping
+between two devices using ping6. I am suspicious that the problems
+that I ask you before have caused this problem.
+
+Do you know what's wrong here?
+
+Thank you for your time and help
