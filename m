@@ -1,100 +1,58 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from lists.s-osg.org ([54.187.51.154]:59288 "EHLO lists.s-osg.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751717AbcC3Qnf (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-	Wed, 30 Mar 2016 12:43:35 -0400
-Subject: Re: [PATCH v2 1/3] ieee802154: add security bit check function
-References: <1457633643-12535-1-git-send-email-web+oss@zopieux.com>
- <1457988374-31220-1-git-send-email-web+oss@zopieux.com>
- <56FB9212.3040004@osg.samsung.com> <56FBDD39.1010301@signal11.us>
-From: Stefan Schmidt <stefan@osg.samsung.com>
-Message-ID: <56FC0232.2060707@osg.samsung.com>
-Date: Wed, 30 Mar 2016 18:43:30 +0200
+Received: from mail-ig0-f170.google.com ([209.85.213.170]:34648 "EHLO
+	mail-ig0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751280AbcDCRJX (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Sun, 3 Apr 2016 13:09:23 -0400
+Received: by mail-ig0-f170.google.com with SMTP id sy18so59272683igc.1
+        for <linux-wpan@vger.kernel.org>; Sun, 03 Apr 2016 10:09:22 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <56FBDD39.1010301@signal11.us>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <56FC3E0D.7060604@osg.samsung.com>
+References: <CALqexQVqxwfKxZ=fmtjQPnHcdibVFmFTG4dRZkBwC4aJfLkE5A@mail.gmail.com>
+	<20160329083732.GA1114@omega>
+	<CALqexQUhA-wTJow59_PkkbnmJz8UWxW2WoCdU=qYHYNQjyMVvQ@mail.gmail.com>
+	<56FB8E7F.70106@osg.samsung.com>
+	<CALqexQWw4QuPWxTDe8SdHxeOptq6TCf-O4Mq_UL-pDxqUz=h1A@mail.gmail.com>
+	<56FC3A38.7030305@osg.samsung.com>
+	<CALqexQV2z5wR3y8pUtWeF0eENyo3v6pdak6sm09g7LcPuQ+4cA@mail.gmail.com>
+	<56FC3E0D.7060604@osg.samsung.com>
+Date: Mon, 4 Apr 2016 00:09:22 +0700
+Message-ID: <CALqexQWbd=fq3c9jS87R0_fbOMROEh8uxKavx+4yGf3VUsoj1w@mail.gmail.com>
+Subject: Re: No device found for binding socket ieee802.15.4
+From: Adika Bintang Sulaeman <adikabintang78@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alan Ott <alan@signal11.us>, Alexandre Macabies <web+oss@zopieux.com>, linux-wpan@vger.kernel.org
-Cc: Alexander Aring <aar@pengutronix.de>
+To: Stefan Schmidt <stefan@osg.samsung.com>
+Cc: Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org, jukka.rissanen@linux.intel.com
 
-Hello.
+> If you have no specific requirements for the 6LoWPAN part normal
+> client/server code written for the Linux IPv6 socket API should work
+> over the lowpan0 interface.
 
-On 30/03/16 16:05, Alan Ott wrote:
-> On 03/30/2016 04:45 AM, Stefan Schmidt wrote:
->> Added Alan Ott in CC.
->>
->> Alan, can we get your review on this? Its sit son the list for almost 
->> three weeks now.
->> If you are to busy just say so and we can get the ACK from Alex and 
->> put them in.
->>
->
-> Hi Stefan,
->
-> Sorry I've been slow on this. Thanks for forwarding. I actually went 
-> looking for v2 of this the other day in my inbox and it wasn't there.
+Hi Stefan,
 
-Sorry for pushing this but I wanted to get these patches in a state 
-where they can get applied. With my review and your ack they should be 
-fine now.
+I'm sorry if my question would be too stupid or shallow, I just want
+to make sure because I'm really new to this.
 
->
-> Alexandre, make sure you use scripts/get_maintainer.pl to get the list 
-> of people you should send patches to. It looks like you put me on v1 
-> but left me off v2.
->
+I have run an example from [1] on client-server model using UDP and
+IPv6. To run this example, on the client side I run the command:
 
-Good point!
+"listener <IPv6 of another machine for lowpan interface>%lowpan0
+the-payload-is-here"
 
-> For all three:
-> Acked-by: Alan Ott <alan@signal11.us>
->
+According to [2], <IPv6 address>%<interface's name> notation means the
+machine will try to communicate  to <IPv6 address> machine through the
+<interface's name> interface. Hence, I basically have run
+client/server program with Linux IPv6 over the lowpan0 interface.
+Alexander Aring gave me a good presentation slide [3] and on page 12
+it is clearly written that Linux still uses AF_INET6 for 6LoWPAN.
 
-regards
-Stefan Schmidt
+I just want to make sure whether my approach on making client-server
+model over 6LoWPAN is right. I am not sure because I don't know
+whether the IPv6 header is compressed using 6LoWPAN adaptation layer.
 
-> Alan.
->
->>
->> On 14/03/16 21:46, Alexandre Macabies wrote:
->>> ieee802154_is_secen checks if the 802.15.4 security bit is set in the
->>> frame control field.
->>>
->>> Signed-off-by: Alexander Aring <aar@pengutronix.de>
->>> Signed-off-by: Alexandre Macabies <web+oss@zopieux.com>
->>> Reviewed-by: Stefan Schmidt <stefan@osg.samsung.com>
->>> ---
->>>   include/linux/ieee802154.h | 10 ++++++++++
->>>   1 file changed, 10 insertions(+)
->>>
->>> diff --git a/include/linux/ieee802154.h b/include/linux/ieee802154.h
->>> index d3e4156..56090f1 100644
->>> --- a/include/linux/ieee802154.h
->>> +++ b/include/linux/ieee802154.h
->>> @@ -218,6 +218,7 @@ enum {
->>>   /* frame control handling */
->>>   #define IEEE802154_FCTL_FTYPE        0x0003
->>>   #define IEEE802154_FCTL_ACKREQ        0x0020
->>> +#define IEEE802154_FCTL_SECEN        0x0004
->>>   #define IEEE802154_FCTL_INTRA_PAN    0x0040
->>>     #define IEEE802154_FTYPE_DATA        0x0001
->>> @@ -233,6 +234,15 @@ static inline int ieee802154_is_data(__le16 fc)
->>>   }
->>>     /**
->>> + * ieee802154_is_secen - check if Security bit is set
->>> + * @fc: frame control bytes in little-endian byteorder
->>> + */
->>> +static inline bool ieee802154_is_secen(__le16 fc)
->>> +{
->>> +    return fc & cpu_to_le16(IEEE802154_FCTL_SECEN);
->>> +}
->>> +
->>> +/**
->>>    * ieee802154_is_ackreq - check if acknowledgment request bit is set
->>>    * @fc: frame control bytes in little-endian byteorder
->>>    */
->>
->
+[1] http://beej.us/guide/bgnet/output/html/singlepage/bgnet.html#datagram
+[2] http://veithen.github.io/2013/12/30/how-to-correctly-parse-ipv6-addresses.html
+[3] http://www.netdevconf.org/1.1/proceedings/slides/aring-generic-6lowpan-branch.pdf
 
+Best regards
