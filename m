@@ -1,179 +1,119 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from lists.s-osg.org ([54.187.51.154]:41920 "EHLO lists.s-osg.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750953AbcDKRAP (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-	Mon, 11 Apr 2016 13:00:15 -0400
-Subject: Re: [RFC bluetooth-next 07/19] 6lowpan: iphc: rename add lowpan
- prefix
+Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:54186 "EHLO
+	metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751985AbcDEIUZ (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Tue, 5 Apr 2016 04:20:25 -0400
+Subject: Re: [RFC bluetooth-next 13/19] addrconf: add 802.15.4 short addr
+ slaac
 References: <1458652515-7862-1-git-send-email-aar@pengutronix.de>
- <1458652515-7862-8-git-send-email-aar@pengutronix.de>
- <56F26B4E.80002@osg.samsung.com>
- <79372F03-3CD8-4ABE-B5FD-17459CA4C28C@holtmann.org>
-From: Stefan Schmidt <stefan@osg.samsung.com>
-Message-ID: <570BD81A.40507@osg.samsung.com>
-Date: Mon, 11 Apr 2016 19:00:10 +0200
+ <1458652515-7862-14-git-send-email-aar@pengutronix.de>
+ <56F274E4.2050205@stressinduktion.org>
+From: Alexander Aring <aar@pengutronix.de>
+Message-ID: <57037540.8030305@pengutronix.de>
+Date: Tue, 5 Apr 2016 10:20:16 +0200
 MIME-Version: 1.0
-In-Reply-To: <79372F03-3CD8-4ABE-B5FD-17459CA4C28C@holtmann.org>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+In-Reply-To: <56F274E4.2050205@stressinduktion.org>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Alexander Aring <aar@pengutronix.de>, linux-wpan@vger.kernel.org, kernel@pengutronix.de, jukka.rissanen@linux.intel.com, hannes@stressinduktion.org, mcr@sandelman.ca, werner@almesberger.net
+To: Hannes Frederic Sowa <hannes@stressinduktion.org>, linux-wpan@vger.kernel.org
+Cc: kernel@pengutronix.de, jukka.rissanen@linux.intel.com, stefan@osg.samsung.com, mcr@sandelman.ca, werner@almesberger.net
 
-Hello.
+Hi Hannes,
 
-On 08/04/16 19:36, Marcel Holtmann wrote:
-> Hi Alex,
+thanks for your answer.
+
+Am 03/23/2016 um 11:50 AM schrieb Hannes Frederic Sowa:
+> On 22.03.2016 14:15, Alexander Aring wrote:
+>> This patch adds the autoconfiguration if a valid 802.15.4 short address
+>> is available for 802.15.4 6LoWPAN interfaces.
+>>
+>> Signed-off-by: Alexander Aring <aar@pengutronix.de>
+>> ---
+>>   net/ipv6/addrconf.c | 40 ++++++++++++++++++++++++++++++++++++++++
+>>   1 file changed, 40 insertions(+)
+>>
+>> diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
+>> index 27aed1a..eb3e3fb 100644
+>> --- a/net/ipv6/addrconf.c
+>> +++ b/net/ipv6/addrconf.c
+>> @@ -3058,6 +3058,37 @@ static void ipv6_gen_mode_random_init(struct inet6_dev *idev)
+>>       s->initialized = true;
+>>   }
+>>
+>> +#ifdef CONFIG_IEEE802154_6LOWPAN
+>> +static int addrconf_ifid_ieee802154(u8 *eui, struct net_device *dev)
+>> +{
+>> +    struct wpan_dev *wpan_dev = lowpan_802154_dev(dev)->wdev->ieee802154_ptr;
+>> +
+>> +    /* Set short_addr autoconfiguration if short_addr is present only */
+>> +    if (!ieee802154_is_valid_src_short_addr(wpan_dev->short_addr))
+>> +        return -1;
+>> +
+>> +    /* For either address format, all zero addresses MUST NOT be used */
+>> +    if (wpan_dev->pan_id == cpu_to_le16(0x0000) &&
+>> +        wpan_dev->short_addr == cpu_to_le16(0x0000))
+>> +        return -1;
+>> +
+>> +    /* Alternatively, if no PAN ID is known, 16 zero bits may be used */
+>> +    if (wpan_dev->pan_id == cpu_to_le16(IEEE802154_PAN_ID_BROADCAST))
+>> +        memset(eui, 0, 2);
+>> +    else
+>> +        ieee802154_le16_to_be16(eui, &wpan_dev->pan_id);
+>> +
+>> +    /* The "Universal/Local" (U/L) bit shall be set to zero */
+>> +    eui[0] &= ~2;
+>> +    eui[2] = 0;
+>> +    eui[3] = 0xFF;
+>> +    eui[4] = 0xFE;
+>> +    eui[5] = 0;
+>> +    ieee802154_le16_to_be16(&eui[6], &wpan_dev->short_addr);
+>> +    return 0;
+>> +}
 >
->>> This patch adds a lowpan prefix to each functions which doesn't have
->>> such prefix currently.
->>>
->>> Signed-off-by: Alexander Aring <aar@pengutronix.de>
->>> ---
->>>   net/6lowpan/iphc.c | 56 ++++++++++++++++++++++++++++++------------------------
->>>   1 file changed, 31 insertions(+), 25 deletions(-)
->>>
->>> diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
->>> index 798d5b2..d5a72e3 100644
->>> --- a/net/6lowpan/iphc.c
->>> +++ b/net/6lowpan/iphc.c
->>> @@ -151,8 +151,8 @@
->>>   #define LOWPAN_IPHC_CID_DCI(cid)	(cid & 0x0f)
->>>   #define LOWPAN_IPHC_CID_SCI(cid)	((cid & 0xf0) >> 4)
->>>   -static inline void iphc_uncompress_eui64_lladdr(struct in6_addr *ipaddr,
->>> -						const void *lladdr)
->>> +static inline void lowpan_iphc_uncompress_eui64_lladdr(struct in6_addr *ipaddr,
->>> +						       const void *lladdr)
->>>   {
->>>   	/* fe:80::XXXX:XXXX:XXXX:XXXX
->>>   	 *        \_________________/
->>> @@ -167,8 +167,9 @@ static inline void iphc_uncompress_eui64_lladdr(struct in6_addr *ipaddr,
->>>   	ipaddr->s6_addr[8] ^= 0x02;
->>>   }
->>>   -static inline void iphc_uncompress_802154_lladdr(struct in6_addr *ipaddr,
->>> -						 const void *lladdr)
->>> +static inline void
->>> +lowpan_iphc_uncompress_802154_lladdr(struct in6_addr *ipaddr,
->>> +				     const void *lladdr)
->>>   {
->>>   	const struct ieee802154_addr *addr = lladdr;
->>>   	u8 eui64[EUI64_ADDR_LEN] = { };
->>> @@ -176,7 +177,7 @@ static inline void iphc_uncompress_802154_lladdr(struct in6_addr *ipaddr,
->>>   	switch (addr->mode) {
->>>   	case IEEE802154_ADDR_LONG:
->>>   		ieee802154_le64_to_be64(eui64, &addr->extended_addr);
->>> -		iphc_uncompress_eui64_lladdr(ipaddr, eui64);
->>> +		lowpan_iphc_uncompress_eui64_lladdr(ipaddr, eui64);
->>>   		break;
->>>   	case IEEE802154_ADDR_SHORT:
->>>   		/* fe:80::ff:fe00:XXXX
->>> @@ -296,9 +297,10 @@ lowpan_iphc_ctx_get_by_mcast_addr(const struct net_device *dev,
->>>    *
->>>    * address_mode is the masked value for sam or dam value
->>>    */
->>> -static int uncompress_addr(struct sk_buff *skb, const struct net_device *dev,
->>> -			   struct in6_addr *ipaddr, u8 address_mode,
->>> -			   const void *lladdr)
->>> +static int lowpan_iphc_uncompress_addr(struct sk_buff *skb,
->>> +				       const struct net_device *dev,
->>> +				       struct in6_addr *ipaddr,
->>> +				       u8 address_mode, const void *lladdr)
->>>   {
->>>   	bool fail;
->>>   @@ -329,10 +331,10 @@ static int uncompress_addr(struct sk_buff *skb, const struct net_device *dev,
->>>   		fail = false;
->>>   		switch (lowpan_dev(dev)->lltype) {
->>>   		case LOWPAN_LLTYPE_IEEE802154:
->>> -			iphc_uncompress_802154_lladdr(ipaddr, lladdr);
->>> +			lowpan_iphc_uncompress_802154_lladdr(ipaddr, lladdr);
->>>   			break;
->>>   		default:
->>> -			iphc_uncompress_eui64_lladdr(ipaddr, lladdr);
->>> +			lowpan_iphc_uncompress_eui64_lladdr(ipaddr, lladdr);
->>>   			break;
->>>   		}
->>>   		break;
->>> @@ -355,11 +357,11 @@ static int uncompress_addr(struct sk_buff *skb, const struct net_device *dev,
->>>   /* Uncompress address function for source context
->>>    * based address(non-multicast).
->>>    */
->>> -static int uncompress_ctx_addr(struct sk_buff *skb,
->>> -			       const struct net_device *dev,
->>> -			       const struct lowpan_iphc_ctx *ctx,
->>> -			       struct in6_addr *ipaddr, u8 address_mode,
->>> -			       const void *lladdr)
->>> +static int lowpan_iphc_uncompress_ctx_addr(struct sk_buff *skb,
->>> +					   const struct net_device *dev,
->>> +					   const struct lowpan_iphc_ctx *ctx,
->>> +					   struct in6_addr *ipaddr,
->>> +					   u8 address_mode, const void *lladdr)
->>>   {
->>>   	bool fail;
->>>   @@ -390,10 +392,10 @@ static int uncompress_ctx_addr(struct sk_buff *skb,
->>>   		fail = false;
->>>   		switch (lowpan_dev(dev)->lltype) {
->>>   		case LOWPAN_LLTYPE_IEEE802154:
->>> -			iphc_uncompress_802154_lladdr(ipaddr, lladdr);
->>> +			lowpan_iphc_uncompress_802154_lladdr(ipaddr, lladdr);
->>>   			break;
->>>   		default:
->>> -			iphc_uncompress_eui64_lladdr(ipaddr, lladdr);
->>> +			lowpan_iphc_uncompress_eui64_lladdr(ipaddr, lladdr);
->>>   			break;
->>>   		}
->>>   		ipv6_addr_prefix_copy(ipaddr, &ctx->pfx, ctx->plen);
->>> @@ -660,14 +662,16 @@ int lowpan_header_decompress(struct sk_buff *skb, const struct net_device *dev,
->>>   		}
->>>     		pr_debug("SAC bit is set. Handle context based source address.\n");
->>> -		err = uncompress_ctx_addr(skb, dev, ci, &hdr.saddr,
->>> -					  iphc1 & LOWPAN_IPHC_SAM_MASK, saddr);
->>> +		err = lowpan_iphc_uncompress_ctx_addr(skb, dev, ci, &hdr.saddr,
->>> +						      iphc1 & LOWPAN_IPHC_SAM_MASK,
->>> +						      saddr);
->>>   		spin_unlock_bh(&lowpan_dev(dev)->ctx.lock);
->>>   	} else {
->>>   		/* Source address uncompression */
->>>   		pr_debug("source address stateless compression\n");
->>> -		err = uncompress_addr(skb, dev, &hdr.saddr,
->>> -				      iphc1 & LOWPAN_IPHC_SAM_MASK, saddr);
->>> +		err = lowpan_iphc_uncompress_addr(skb, dev, &hdr.saddr,
->>> +						  iphc1 & LOWPAN_IPHC_SAM_MASK,
->>> +						  saddr);
->>>   	}
->>>     	/* Check on error of previous branch */
->>> @@ -705,13 +709,15 @@ int lowpan_header_decompress(struct sk_buff *skb, const struct net_device *dev,
->>>     		/* Destination address context based uncompression */
->>>   		pr_debug("DAC bit is set. Handle context based destination address.\n");
->>> -		err = uncompress_ctx_addr(skb, dev, ci, &hdr.daddr,
->>> -					  iphc1 & LOWPAN_IPHC_DAM_MASK, daddr);
->>> +		err = lowpan_iphc_uncompress_ctx_addr(skb, dev, ci, &hdr.daddr,
->>> +						      iphc1 & LOWPAN_IPHC_DAM_MASK,
->>> +						      daddr);
->>>   		spin_unlock_bh(&lowpan_dev(dev)->ctx.lock);
->>>   		break;
->>>   	default:
->>> -		err = uncompress_addr(skb, dev, &hdr.daddr,
->>> -				      iphc1 & LOWPAN_IPHC_DAM_MASK, daddr);
->>> +		err = lowpan_iphc_uncompress_addr(skb, dev, &hdr.daddr,
->>> +						  iphc1 & LOWPAN_IPHC_DAM_MASK,
->>> +						  daddr);
->>>   		pr_debug("dest: stateless compression mode %d dest %pI6c\n",
->>>   			 iphc1 & LOWPAN_IPHC_DAM_MASK, &hdr.daddr);
->>>   		break;
->> Reviewed-by: Stefan Schmidt <stefan@osg.samsung.com>
-> if these are good to be merged, then I need a patch series without the RFC designation.
+> static void configure lowpan_addrconf(idev, addr)
+> {
+> > +            if (addrconf_ifid_ieee802154(addr.s6_addr + 8,
+> > +                             idev->dev) == 0)
+> > +                addrconf_add_linklocal(idev, &addr, 0);
+> }
+>
+> #else
+>
+> static void configure lowpan_addrconf(idev, addr)
+> {
+> }
+>
+>> +#endif
+>
+> So we don't need the ifdef in addrconf_addr_gen. I think it pretty much reflects what upstream wants.
+>
+>> +
+>>   static void addrconf_addr_gen(struct inet6_dev *idev, bool prefix_route)
+>>   {
+>>       struct in6_addr addr;
+>> @@ -3088,6 +3119,15 @@ static void addrconf_addr_gen(struct inet6_dev *idev, bool prefix_route)
+>>               addrconf_add_linklocal(idev, &addr, 0);
+>>           else if (prefix_route)
+>>               addrconf_prefix_route(&addr, 64, idev->dev, 0, 0);
+>> +
+>> +        /* 802.15.4 6LoWPAN short address slaac handling */
+>> +        if (lowpan_is_ll(idev->dev, LOWPAN_LLTYPE_IEEE802154)) {
+>> +        }
+>
+> Do you think it makes sense to put this under the label IN_ADDR_GEN_MODE_EUI64? I don't see a real issue with it, maybe it conflicts a little bit with the naming.
+>
+> Otherwise I don't have any issue with the change.
 
-The beginning of the patchset was ready but the ndisc changes might need 
-another RFC round.
-Alex did split out the patches which are ready to be merged and sent 
-them as a separate patchset now to make it easier for you to pick them up.
-See "6lowpan: prepare for 6lowpan ndisc implementation" from today.
+I moved the complete part of generating such address into net/6lowpan/, there we have another
+netdev notifier functionality for 6lowpan interfaces only.
 
-I just finished up reviewed the ones I did not have so far and the whole 
-series is good to go from my point of view.
+I think this stuff is very 802.15.4 specific and it's good when we can move it outside the net/ipv6
+implementation. I just need to add a "EXPORT_SYMBOL(addrconf_add_linklocal);", so I can
+access that function from 6lowpan module.
 
-The rest will follow later.
+For the ndisc parts, I added a ndisc_ops structure and add a net/6lowpan/ndisc.c file.
+I will send a RFCv2 soon.
 
-regards
-Stefan Schmidt
+- Alex
