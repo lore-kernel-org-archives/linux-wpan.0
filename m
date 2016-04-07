@@ -1,39 +1,48 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from ipv4.connman.net ([82.165.8.211]:58730 "EHLO mail.holtmann.org"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S934094AbcDMIoR (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-	Wed, 13 Apr 2016 04:44:17 -0400
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-Subject: Re: [PATCH v3 3/3] mrf24j40: apply the security-enabled bit on secured outbound frames
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1460479982-4955-3-git-send-email-web+oss@zopieux.com>
-Date: Wed, 13 Apr 2016 09:44:07 +0100
+Received: from mx6.haw-public.haw-hamburg.de ([141.22.6.3]:57507 "EHLO
+	mx6.haw-public.haw-hamburg.de" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1750993AbcDGU3t (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Thu, 7 Apr 2016 16:29:49 -0400
+From: Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
+Subject: UDP stress-testing
+Message-ID: <5706C0D7.1040000@haw-hamburg.de>
+Date: Thu, 7 Apr 2016 22:19:35 +0200
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Transfer-Encoding: 7bit
-Message-Id: <A501F341-AA72-4CAF-87CB-285422FD1F48@holtmann.org>
-References: <1457988374-31220-1-git-send-email-web+oss@zopieux.com> <1460479982-4955-1-git-send-email-web+oss@zopieux.com> <1460479982-4955-3-git-send-email-web+oss@zopieux.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexandre Macabies <web+oss@zopieux.com>
-Cc: linux-wpan@vger.kernel.org, Alexander Aring <aar@pengutronix.de>
+To: linux-wpan@vger.kernel.org
 
-Hi Alexandre,
+Dear list,
 
-> We set the TXNSECEN bit of register TXNCON to on when transmitting a
-> security-enabled frame, as described in section 3.12.2 of the MRF
-> datasheet.
-> 
-> Signed-off-by: Alexander Aring <aar@pengutronix.de>
-> Signed-off-by: Alexandre Macabies <web+oss@zopieux.com>
-> Reviewed-by: Stefan Schmidt <stefan@osg.samsung.com>
-> Acked-by: Alan Ott <alan@signal11.us>
-> ---
-> drivers/net/ieee802154/mrf24j40.c | 4 ++++
-> 1 file changed, 4 insertions(+)
+first of all let me say that I'm new to this list. So if I'm completely 
+wrong in my concern please excuse the noise and guide me to the right 
+place. If you can :-)!
 
-patch has been applied to bluetooth-next tree.
+For some experiments I'm trying to send "great" numbers of UDP packets 
+with "great" payloads as fast as possible from a RasPi equipped with the 
+Openlabs transceiver. With another RasPi+transceiver I'm sniffing the 
+traffic. It turns out that just the first x packets are sent out 
+correctly before the outgoing packets come out irregularly. The number 
+of correctly sent packets depends on the UDP payload size and it looks 
+like the problem occurs after ~30-35 kB Bytes (gross) in total have been 
+transmitted (fragmentation overhead included). I already increased the 
+send socket memory to a reasonably high value, without success. But 
+still I assume some buffer problems. Do you have a hint which screw to 
+adjust?
 
-Regards
+BTW: Introducing a delay after each packet to send fixes the problem. 
+But I'd like to do stress-testing...
 
-Marcel
+Best
+Peter
 
+-- 
+Peter Kietzmann
+
+Hamburg University of Applied Sciences
+Dept. Informatik, Internet Technologies Group
+Berliner Tor 7, 20099 Hamburg, Germany
+Fon: +49-40-42875-8426
+Web: http://www.haw-hamburg.de/inet
