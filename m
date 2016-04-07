@@ -1,40 +1,46 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from ipv4.connman.net ([82.165.8.211]:53321 "EHLO mail.holtmann.org"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1752305AbcDHRcX (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-	Fri, 8 Apr 2016 13:32:23 -0400
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-Subject: Re: [PATCH bluetooth-next] 6lowpan: iphc: fix handling of link-local compression
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1458132761-24055-1-git-send-email-aar@pengutronix.de>
-Date: Fri, 8 Apr 2016 10:32:17 -0700
-Content-Transfer-Encoding: 7bit
-Message-Id: <38422A6C-F5B1-4AC7-B793-2CCB5569EC83@holtmann.org>
-References: <1458132761-24055-1-git-send-email-aar@pengutronix.de>
+Received: from mail-pf0-f175.google.com ([209.85.192.175]:33128 "EHLO
+	mail-pf0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755424AbcDGLQQ (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Thu, 7 Apr 2016 07:16:16 -0400
+From: Sudip Mukherjee <sudipm.mukherjee@gmail.com>
+Subject: [PATCH] ieee802154/adf7242: fix memory leak of firmware
+Date: Thu,  7 Apr 2016 16:46:04 +0530
+Message-Id: <1460027764-27428-1-git-send-email-sudipm.mukherjee@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <aar@pengutronix.de>
-Cc: linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org, kernel@pengutronix.de, jukka.rissanen@linux.intel.com
+To: Michael Hennerich <michael.hennerich@analog.com>, Alexander Aring <aar@pengutronix.de>
+Cc: linux-kernel@vger.kernel.org, linux-wpan@vger.kernel.org, netdev@vger.kernel.org, Sudip Mukherjee <sudipm.mukherjee@gmail.com>
 
-Hi Alex,
+If the firmware upload or the firmware verification fails then we
+printed the error message and exited but we missed releasing the
+firmware.
 
-> This patch fixes handling in case of link-local address compression. A
-> IPv6 link-local address is defined as fe80::/10 prefix which is also
-> what ipv6_addr_type checks for link-local addresses.
-> 
-> But IPHC compression for link-local addresses are for fe80::/64 types
-> only. This patch adds additional checks for zero padded bits in case of
-> link-local address compression to match on a fe80::/64 address only.
-> 
-> Signed-off-by: Alexander Aring <aar@pengutronix.de>
-> ---
-> net/6lowpan/iphc.c | 11 +++++++++--
-> 1 file changed, 9 insertions(+), 2 deletions(-)
+Signed-off-by: Sudip Mukherjee <sudip.mukherjee@codethink.co.uk>
+---
+ drivers/net/ieee802154/adf7242.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-patch has been applied to bluetooth-next tree.
-
-Regards
-
-Marcel
+diff --git a/drivers/net/ieee802154/adf7242.c b/drivers/net/ieee802154/adf7242.c
+index 89154c0..91d4531 100644
+--- a/drivers/net/ieee802154/adf7242.c
++++ b/drivers/net/ieee802154/adf7242.c
+@@ -1030,6 +1030,7 @@ static int adf7242_hw_init(struct adf7242_local *lp)
+ 	if (ret) {
+ 		dev_err(&lp->spi->dev,
+ 			"upload firmware failed with %d\n", ret);
++		release_firmware(fw);
+ 		return ret;
+ 	}
+ 
+@@ -1037,6 +1038,7 @@ static int adf7242_hw_init(struct adf7242_local *lp)
+ 	if (ret) {
+ 		dev_err(&lp->spi->dev,
+ 			"verify firmware failed with %d\n", ret);
++		release_firmware(fw);
+ 		return ret;
+ 	}
+ 
+-- 
+1.9.1
 
