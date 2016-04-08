@@ -1,98 +1,48 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mx6.haw-public.haw-hamburg.de ([141.22.6.3]:11152 "EHLO
-	mx6.haw-public.haw-hamburg.de" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751957AbcDHHWf (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Fri, 8 Apr 2016 03:22:35 -0400
+Received: from mail-wm0-f42.google.com ([74.125.82.42]:35115 "EHLO
+	mail-wm0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1758394AbcDHM6Y (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Fri, 8 Apr 2016 08:58:24 -0400
+Received: by mail-wm0-f42.google.com with SMTP id 191so17509369wmq.0
+        for <linux-wpan@vger.kernel.org>; Fri, 08 Apr 2016 05:58:23 -0700 (PDT)
+Date: Fri, 8 Apr 2016 14:58:07 +0200
+From: Alexander Aring <alex.aring@gmail.com>
 Subject: Re: UDP stress-testing
-References: <5706C0D7.1040000@haw-hamburg.de> <20160407204125.GA4736@omega>
-From: Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
-Message-ID: <57075C35.5070206@haw-hamburg.de>
-Date: Fri, 8 Apr 2016 09:22:29 +0200
+Message-ID: <20160408125805.GA2021@omega>
+References: <5706C0D7.1040000@haw-hamburg.de>
+ <20160407204125.GA4736@omega>
+ <57075C35.5070206@haw-hamburg.de>
 MIME-Version: 1.0
-In-Reply-To: <20160407204125.GA4736@omega>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <57075C35.5070206@haw-hamburg.de>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
+To: Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
 Cc: linux-wpan@vger.kernel.org
 
-Hi Alex,
+On Fri, Apr 08, 2016 at 09:22:29AM +0200, Peter Kietzmann wrote:
+...
+> >
+> >3.
+> >
+> >Change tx queue setting:
+> >
+> >ip link set txqueuelen 1000 dev $WPAN_DEV
+> 
+> That was the parameter I was looking for. Increasing this queue it is :-) !
+> 
 
-thanks for your quick reply. It helped a lot! See some comments inline.
+Maybe we should increase the default parameter for the txqueuelen. I
+know there is some science about to calculate bandwidth, payload, etc to
+calculate a good value.
 
-Am 07.04.2016 um 22:41 schrieb Alexander Aring:
-> On Thu, Apr 07, 2016 at 10:19:35PM +0200, Peter Kietzmann wrote:
->> Dear list,
->>
->> first of all let me say that I'm new to this list. So if I'm completely
->> wrong in my concern please excuse the noise and guide me to the right place.
->> If you can :-)!
->>
->> For some experiments I'm trying to send "great" numbers of UDP packets with
->> "great" payloads as fast as possible from a RasPi equipped with the Openlabs
->> transceiver. With another RasPi+transceiver I'm sniffing the traffic. It
->> turns out that just the first x packets are sent out correctly before the
->> outgoing packets come out irregularly. The number of correctly sent packets
->> depends on the UDP payload size and it looks like the problem occurs after
->> ~30-35 kB Bytes (gross) in total have been transmitted (fragmentation
->> overhead included). I already increased the send socket memory to a
->> reasonably high value, without success. But still I assume some buffer
->> problems. Do you have a hint which screw to adjust?
->>
->> BTW: Introducing a delay after each packet to send fixes the problem. But
->> I'd like to do stress-testing...
->
-> 1.
->
-> You cannot be sure that a monitor interface shows all traffic which is
-> on the air. You have at least hardware limitations which begins at
-> "rising IRQ" and ends at "framebuffer readed".
+I know ethernet changed to 1000 because gigabit ethernet is common
+nowadays, before it was 100.
 
-I totally agree. But here it was quite obvious something was going on 
-after some time.
+Our default value is 300 (don't know why, Alan increased it one day), see
+commit e937f583ec3a40cccd480b40d8c6d54751781587.
 
->
-> 2.
->
-> Try to enable ack request bit. This is default disabled because you need
-> to know what you doing when you enable it. Be sure all nodes supports
-> ACK handling before that.
->
-> You can do that with:
->
-> iwpan dev $WPAN_DEV set ackreq_default 1
+It was 10 before and 10 is really too small...
 
-Found out that my sender Pi doesn't support this option. Guess I should 
-update it...
-
->
-> 3.
->
-> Change tx queue setting:
->
-> ip link set txqueuelen 1000 dev $WPAN_DEV
-
-That was the parameter I was looking for. Increasing this queue it is :-) !
-
->
->
->
-> Please reply if that helped you otherwise we will maybe find another
-> tweaks. :-)
->
-> - Alex
->
-
-Again, thanks for your quick help!
-
-Cheers
-Peter
-
--- 
-Peter Kietzmann
-
-Hamburg University of Applied Sciences
-Dept. Informatik, Internet Technologies Group
-Berliner Tor 7, 20099 Hamburg, Germany
-Fon: +49-40-42875-8426
-Web: http://www.haw-hamburg.de/inet
+- Alex
