@@ -1,13 +1,13 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:40698 "EHLO
+Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:55865 "EHLO
 	metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1753842AbcDKJE3 (ORCPT
+	by vger.kernel.org with ESMTP id S1753848AbcDKJE3 (ORCPT
 	<rfc822;linux-wpan@vger.kernel.org>);
 	Mon, 11 Apr 2016 05:04:29 -0400
 From: Alexander Aring <aar@pengutronix.de>
-Subject: [PATCH bluetooth-next 06/11] 6lowpan: move lowpan_802154_dev to 6lowpan
-Date: Mon, 11 Apr 2016 11:04:19 +0200
-Message-Id: <1460365464-12435-7-git-send-email-aar@pengutronix.de>
+Subject: [PATCH bluetooth-next 07/11] 6lowpan: iphc: rename add lowpan prefix
+Date: Mon, 11 Apr 2016 11:04:20 +0200
+Message-Id: <1460365464-12435-8-git-send-email-aar@pengutronix.de>
 In-Reply-To: <1460365464-12435-1-git-send-email-aar@pengutronix.de>
 References: <1460365464-12435-1-git-send-email-aar@pengutronix.de>
 Sender: linux-wpan-owner@vger.kernel.org
@@ -15,63 +15,149 @@ List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
 Cc: kernel@pengutronix.de, jukka.rissanen@linux.intel.com, Alexander Aring <aar@pengutronix.de>
 
-This patch moves the 802.15.4 link layer specific structures to generic
-6lowpan. This is necessary for special 802.15.4 6lowpan handling in
-6lowpan generic layer.
+This patch adds a lowpan prefix to each functions which doesn't have
+such prefix currently.
 
 Reviewed-by: Stefan Schmidt <stefan@osg.samsung.com>
 Signed-off-by: Alexander Aring <aar@pengutronix.de>
 ---
- include/net/6lowpan.h              | 12 ++++++++++++
- net/ieee802154/6lowpan/6lowpan_i.h | 12 ------------
- 2 files changed, 12 insertions(+), 12 deletions(-)
+ net/6lowpan/iphc.c | 56 ++++++++++++++++++++++++++++++------------------------
+ 1 file changed, 31 insertions(+), 25 deletions(-)
 
-diff --git a/include/net/6lowpan.h b/include/net/6lowpan.h
-index f204664..a0c01f5 100644
---- a/include/net/6lowpan.h
-+++ b/include/net/6lowpan.h
-@@ -144,6 +144,18 @@ struct lowpan_dev *lowpan_dev(const struct net_device *dev)
- 	return netdev_priv(dev);
+diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
+index 5fb764e..66b4139 100644
+--- a/net/6lowpan/iphc.c
++++ b/net/6lowpan/iphc.c
+@@ -156,8 +156,8 @@
+ #define LOWPAN_IPHC_CID_DCI(cid)	(cid & 0x0f)
+ #define LOWPAN_IPHC_CID_SCI(cid)	((cid & 0xf0) >> 4)
+ 
+-static inline void iphc_uncompress_eui64_lladdr(struct in6_addr *ipaddr,
+-						const void *lladdr)
++static inline void lowpan_iphc_uncompress_eui64_lladdr(struct in6_addr *ipaddr,
++						       const void *lladdr)
+ {
+ 	/* fe:80::XXXX:XXXX:XXXX:XXXX
+ 	 *        \_________________/
+@@ -172,8 +172,9 @@ static inline void iphc_uncompress_eui64_lladdr(struct in6_addr *ipaddr,
+ 	ipaddr->s6_addr[8] ^= 0x02;
  }
  
-+/* private device info */
-+struct lowpan_802154_dev {
-+	struct net_device	*wdev; /* wpan device ptr */
-+	u16			fragment_tag;
-+};
-+
-+static inline struct
-+lowpan_802154_dev *lowpan_802154_dev(const struct net_device *dev)
-+{
-+	return (struct lowpan_802154_dev *)lowpan_dev(dev)->priv;
-+}
-+
- struct lowpan_802154_cb {
- 	u16 d_tag;
- 	unsigned int d_size;
-diff --git a/net/ieee802154/6lowpan/6lowpan_i.h b/net/ieee802154/6lowpan/6lowpan_i.h
-index b02b74d..5ac7789 100644
---- a/net/ieee802154/6lowpan/6lowpan_i.h
-+++ b/net/ieee802154/6lowpan/6lowpan_i.h
-@@ -47,18 +47,6 @@ static inline u32 ieee802154_addr_hash(const struct ieee802154_addr *a)
+-static inline void iphc_uncompress_802154_lladdr(struct in6_addr *ipaddr,
+-						 const void *lladdr)
++static inline void
++lowpan_iphc_uncompress_802154_lladdr(struct in6_addr *ipaddr,
++				     const void *lladdr)
+ {
+ 	const struct ieee802154_addr *addr = lladdr;
+ 	u8 eui64[EUI64_ADDR_LEN] = { };
+@@ -181,7 +182,7 @@ static inline void iphc_uncompress_802154_lladdr(struct in6_addr *ipaddr,
+ 	switch (addr->mode) {
+ 	case IEEE802154_ADDR_LONG:
+ 		ieee802154_le64_to_be64(eui64, &addr->extended_addr);
+-		iphc_uncompress_eui64_lladdr(ipaddr, eui64);
++		lowpan_iphc_uncompress_eui64_lladdr(ipaddr, eui64);
+ 		break;
+ 	case IEEE802154_ADDR_SHORT:
+ 		/* fe:80::ff:fe00:XXXX
+@@ -301,9 +302,10 @@ lowpan_iphc_ctx_get_by_mcast_addr(const struct net_device *dev,
+  *
+  * address_mode is the masked value for sam or dam value
+  */
+-static int uncompress_addr(struct sk_buff *skb, const struct net_device *dev,
+-			   struct in6_addr *ipaddr, u8 address_mode,
+-			   const void *lladdr)
++static int lowpan_iphc_uncompress_addr(struct sk_buff *skb,
++				       const struct net_device *dev,
++				       struct in6_addr *ipaddr,
++				       u8 address_mode, const void *lladdr)
+ {
+ 	bool fail;
+ 
+@@ -334,10 +336,10 @@ static int uncompress_addr(struct sk_buff *skb, const struct net_device *dev,
+ 		fail = false;
+ 		switch (lowpan_dev(dev)->lltype) {
+ 		case LOWPAN_LLTYPE_IEEE802154:
+-			iphc_uncompress_802154_lladdr(ipaddr, lladdr);
++			lowpan_iphc_uncompress_802154_lladdr(ipaddr, lladdr);
+ 			break;
+ 		default:
+-			iphc_uncompress_eui64_lladdr(ipaddr, lladdr);
++			lowpan_iphc_uncompress_eui64_lladdr(ipaddr, lladdr);
+ 			break;
+ 		}
+ 		break;
+@@ -360,11 +362,11 @@ static int uncompress_addr(struct sk_buff *skb, const struct net_device *dev,
+ /* Uncompress address function for source context
+  * based address(non-multicast).
+  */
+-static int uncompress_ctx_addr(struct sk_buff *skb,
+-			       const struct net_device *dev,
+-			       const struct lowpan_iphc_ctx *ctx,
+-			       struct in6_addr *ipaddr, u8 address_mode,
+-			       const void *lladdr)
++static int lowpan_iphc_uncompress_ctx_addr(struct sk_buff *skb,
++					   const struct net_device *dev,
++					   const struct lowpan_iphc_ctx *ctx,
++					   struct in6_addr *ipaddr,
++					   u8 address_mode, const void *lladdr)
+ {
+ 	bool fail;
+ 
+@@ -395,10 +397,10 @@ static int uncompress_ctx_addr(struct sk_buff *skb,
+ 		fail = false;
+ 		switch (lowpan_dev(dev)->lltype) {
+ 		case LOWPAN_LLTYPE_IEEE802154:
+-			iphc_uncompress_802154_lladdr(ipaddr, lladdr);
++			lowpan_iphc_uncompress_802154_lladdr(ipaddr, lladdr);
+ 			break;
+ 		default:
+-			iphc_uncompress_eui64_lladdr(ipaddr, lladdr);
++			lowpan_iphc_uncompress_eui64_lladdr(ipaddr, lladdr);
+ 			break;
+ 		}
+ 		ipv6_addr_prefix_copy(ipaddr, &ctx->pfx, ctx->plen);
+@@ -665,14 +667,16 @@ int lowpan_header_decompress(struct sk_buff *skb, const struct net_device *dev,
+ 		}
+ 
+ 		pr_debug("SAC bit is set. Handle context based source address.\n");
+-		err = uncompress_ctx_addr(skb, dev, ci, &hdr.saddr,
+-					  iphc1 & LOWPAN_IPHC_SAM_MASK, saddr);
++		err = lowpan_iphc_uncompress_ctx_addr(skb, dev, ci, &hdr.saddr,
++						      iphc1 & LOWPAN_IPHC_SAM_MASK,
++						      saddr);
+ 		spin_unlock_bh(&lowpan_dev(dev)->ctx.lock);
+ 	} else {
+ 		/* Source address uncompression */
+ 		pr_debug("source address stateless compression\n");
+-		err = uncompress_addr(skb, dev, &hdr.saddr,
+-				      iphc1 & LOWPAN_IPHC_SAM_MASK, saddr);
++		err = lowpan_iphc_uncompress_addr(skb, dev, &hdr.saddr,
++						  iphc1 & LOWPAN_IPHC_SAM_MASK,
++						  saddr);
  	}
- }
  
--/* private device info */
--struct lowpan_802154_dev {
--	struct net_device	*wdev; /* wpan device ptr */
--	u16			fragment_tag;
--};
--
--static inline struct
--lowpan_802154_dev *lowpan_802154_dev(const struct net_device *dev)
--{
--	return (struct lowpan_802154_dev *)lowpan_dev(dev)->priv;
--}
--
- int lowpan_frag_rcv(struct sk_buff *skb, const u8 frag_type);
- void lowpan_net_frag_exit(void);
- int lowpan_net_frag_init(void);
+ 	/* Check on error of previous branch */
+@@ -710,13 +714,15 @@ int lowpan_header_decompress(struct sk_buff *skb, const struct net_device *dev,
+ 
+ 		/* Destination address context based uncompression */
+ 		pr_debug("DAC bit is set. Handle context based destination address.\n");
+-		err = uncompress_ctx_addr(skb, dev, ci, &hdr.daddr,
+-					  iphc1 & LOWPAN_IPHC_DAM_MASK, daddr);
++		err = lowpan_iphc_uncompress_ctx_addr(skb, dev, ci, &hdr.daddr,
++						      iphc1 & LOWPAN_IPHC_DAM_MASK,
++						      daddr);
+ 		spin_unlock_bh(&lowpan_dev(dev)->ctx.lock);
+ 		break;
+ 	default:
+-		err = uncompress_addr(skb, dev, &hdr.daddr,
+-				      iphc1 & LOWPAN_IPHC_DAM_MASK, daddr);
++		err = lowpan_iphc_uncompress_addr(skb, dev, &hdr.daddr,
++						  iphc1 & LOWPAN_IPHC_DAM_MASK,
++						  daddr);
+ 		pr_debug("dest: stateless compression mode %d dest %pI6c\n",
+ 			 iphc1 & LOWPAN_IPHC_DAM_MASK, &hdr.daddr);
+ 		break;
 -- 
 2.8.0
 
