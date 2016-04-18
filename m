@@ -1,67 +1,110 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wm0-f50.google.com ([74.125.82.50]:35489 "EHLO
-	mail-wm0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754319AbcDNO7h (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Thu, 14 Apr 2016 10:59:37 -0400
-Received: by mail-wm0-f50.google.com with SMTP id a140so151454883wma.0
-        for <linux-wpan@vger.kernel.org>; Thu, 14 Apr 2016 07:59:36 -0700 (PDT)
-Date: Thu, 14 Apr 2016 16:59:27 +0200
-From: Alexander Aring <alex.aring@gmail.com>
-Subject: Re: UDP stress-testing
-Message-ID: <20160414145921.GA6196@omega>
-References: <5706C0D7.1040000@haw-hamburg.de>
- <20160407204125.GA4736@omega>
- <57075C35.5070206@haw-hamburg.de>
- <11304.1460505658@obiwan.sandelman.ca>
- <20160413082852.GA2428@omega>
- <16058.1460551822@obiwan.sandelman.ca>
- <20160413203440.GA4044@omega>
- <570F5A6E.3010009@haw-hamburg.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <570F5A6E.3010009@haw-hamburg.de>
+Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:47752 "EHLO
+	metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751900AbcDRK7S (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>);
+	Mon, 18 Apr 2016 06:59:18 -0400
+From: Alexander Aring <aar@pengutronix.de>
+Subject: [PATCH bluetooth-next 00/10] 6lowpan: introduce basic 6lowpan-nd
+Date: Mon, 18 Apr 2016 12:58:18 +0200
+Message-Id: <1460977108-4675-1-git-send-email-aar@pengutronix.de>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
-Cc: Michael Richardson <mcr@sandelman.ca>, linux-wpan@vger.kernel.org
+To: linux-wpan@vger.kernel.org
+Cc: kernel@pengutronix.de, marcel@holtmann.org, jukka.rissanen@linux.intel.com, hannes@stressinduktion.org, stefan@osg.samsung.com, mcr@sandelman.ca, werner@almesberger.net, linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, Alexander Aring <aar@pengutronix.de>, "David S . Miller" <davem@davemloft.net>, Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>, James Morris <jmorris@namei.org>, Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>, Patrick McHardy <kaber@trash.net>
 
 Hi,
 
-On Thu, Apr 14, 2016 at 10:53:02AM +0200, Peter Kietzmann wrote:
-> Hi,
-> 
-> thanks for giving this topic some informational background! As it was me
-> triggering that discussion, I just wanted to give my linux-network-newie
-> opinion back to you.
-> 
-> IMO "avoiding invalid fragments" has higher priority than "avoiding latency"
-> for the reason that dropping one fragment means dropping all fragments of an
-> IPv6 packet. Processing 1280B IPv6 packets leads to 14 6LoWPAN fragments
-> which we'd have processed for nothing when dropping one of them fragments.
-> Therefore I like Alex's proposal about queuing 6Lowpan fragments and
-> checking space in the actual xmit queue. However, I currently don't know
-> much about IPv6 fragmentation but probably one thing to be careful about is
-> interaction between 6lo and IPv6 fragmentation and possible amplification
-> effects which could affect the needed txqueue size.
-> 
+this patch series introduces a layer for IPv6 neighbour discovery. At first
+it introduce the "ndisc_ops" to run a different handling for recv/send of
+NA/NS messages. The use case for such ndisc operation is RFC 6775 [0].
+Which describes a different neighbour discovery handling for 6LoWPAN networks.
 
-I think for dealing with the fragments right inside the queue we need to
-use "skb_shinfo(skb)->frag_list".
+I didn't implement RFC 6775 in this patch series, but introduce callback
+structure for replace different functions in ndisc implementation might be
+the right direction.
 
-A kfree_skb will then care about for releasing all other skb's which are
-use for the fragment and I hope this will deal with every others skb's
-which are inside the tx queue.
-I need to dig more into that if using frag_list really fix this issue.
+Another use case would be RFC 7400 [1] which describes a new option field to
+getting capabilities of 6LoWPAN next header compression methods.
 
-In case of IPv6 fragmentation for the wpan interface queue (lowpan
-interface doesn't have any tx queue, dev_queue_xmit will direct call xmit
-of lowpan interface) it's another issue and not easy because we have a
-fragmentation (IPv6) over fragmentation(6LoWPAN) there and notify dropped
-fragments from wpan-interface to the correct ipv6 fragments (in case of
-ipv6 fragmentation) sounds more complicated.
+What I implemented is a necessary functionality to handle short address for
+802.15.4 6LoWPAN networks. The L2-Layer "802.15.4" can have two different
+link-layer addresses which can be used mixed at the same time inside 802.15.4
+networks. To deal with such behaviour in ndisc, it is defined at RFC 4944 [2].
+The bad news is, that I saw different handling of such handling. What Linux
+will do is to add two source/target address information option fields, each
+with different length, if short address is valid (can also not be given).
+Example:
 
-I would try to fix at first the fragmentation for 6LoWPAN fragmentation,
-which is more likely than doing IPv6 fragmentation over 6LoWPAN.
+- WPAN interface address settings
+ - extended addr (must always be there)
+ - short addr (0xfffe or 0xffff -> invalid)
+
+Will add an extended addr to source/target address information option field.
+If short addr is in some valid range, then both address will be added to
+the option fields. Indicated are these different address types by the length
+field (extended -> length=2, short -> length=1), according to [1].
+
+The tested 6LoWPAN implementation (RIOT-OS) allows only one source/target
+option field which is short XOR extended, otherwise it will be dropped.
+There is some lack of information there [2] and I don't know how do deal with
+it right, maybe we need to update the implementation there if it's really
+wrong.
+
+To save such information for each neighbour we use the already implemented
+neighbour private data which some casting strategy for 6LoWPAN and 6LoWPAN
+link-layer specific data e.g. 802.15.4 short address handling.
+
+Additional I implemented to add 6CO to the is_useropt callback in case of
+6LoWPAN interface. The 6CO option will currently parsed in userspace which
+are placed in RA-Messages.
+
+The ndisc_ops are not finished yet, of course we need handling for RS messages
+to place the 802.15.4 short address there as well and then also processing
+of RA messages for the 802.15.4 SLLAO option field.
 
 - Alex
+
+[0] https://tools.ietf.org/html/rfc6775
+[1] https://tools.ietf.org/html/rfc7400#section-3.3
+[2] https://tools.ietf.org/html/rfc4944#section-8
+
+Cc: David S. Miller <davem@davemloft.net>
+Cc: Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>
+Cc: James Morris <jmorris@namei.org>
+Cc: Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>
+Cc: Patrick McHardy <kaber@trash.net>
+
+Alexander Aring (10):
+  6lowpan: add private neighbour data
+  6lowpan: add 802.15.4 short addr slaac
+  6lowpan: remove ipv6 module request
+  ndisc: add addr_len parameter to ndisc_opt_addr_space
+  ndisc: add addr_len parameter to ndisc_opt_addr_data
+  ndisc: add addr_len parameter to ndisc_fill_addr_option
+  ipv6: introduce neighbour discovery ops
+  ipv6: export ndisc functions
+  6lowpan: introduce 6lowpan-nd
+  6lowpan: add support for 802.15.4 short addr handling
+
+ include/linux/netdevice.h     |   6 +-
+ include/net/6lowpan.h         |  24 ++
+ include/net/addrconf.h        |   3 +
+ include/net/ndisc.h           | 101 ++++++-
+ net/6lowpan/6lowpan_i.h       |   2 +
+ net/6lowpan/Makefile          |   2 +-
+ net/6lowpan/core.c            |  50 +++-
+ net/6lowpan/iphc.c            | 167 +++++++++--
+ net/6lowpan/ndisc.c           | 633 ++++++++++++++++++++++++++++++++++++++++++
+ net/bluetooth/6lowpan.c       |   2 +
+ net/ieee802154/6lowpan/core.c |  12 +
+ net/ieee802154/6lowpan/tx.c   | 107 ++++---
+ net/ipv6/addrconf.c           |   7 +-
+ net/ipv6/ndisc.c              | 132 +++++----
+ net/ipv6/route.c              |   4 +-
+ 15 files changed, 1094 insertions(+), 158 deletions(-)
+ create mode 100644 net/6lowpan/ndisc.c
+
+-- 
+2.8.0
+
