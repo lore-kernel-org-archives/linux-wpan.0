@@ -1,29 +1,62 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:54880 "EHLO
+Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:52557 "EHLO
 	metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751340AbcDUK5H (ORCPT
+	by vger.kernel.org with ESMTP id S933037AbcDTJwY (ORCPT
 	<rfc822;linux-wpan@vger.kernel.org>);
-	Thu, 21 Apr 2016 06:57:07 -0400
+	Wed, 20 Apr 2016 05:52:24 -0400
+Subject: drop all fragments inside tx queue if one gets dropped
 From: Alexander Aring <aar@pengutronix.de>
-Subject: radvd 6lowpan branch created
-Message-ID: <7408558c-a0d1-0bde-5a9c-28c3ba2e76aa@pengutronix.de>
-Date: Thu, 21 Apr 2016 12:57:04 +0200
+Message-ID: <57175156.3050501@pengutronix.de>
+Date: Wed, 20 Apr 2016 11:52:22 +0200
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org
-Cc: linux-bluetooth@vger.kernel.org, reubenhwk@gmail.com
+To: netdev@vger.kernel.org
+Cc: linux-wpan@vger.kernel.org
 
 Hi,
 
-I added a radvd fork at linux-wpan github [0]. I pushed a 6lowpan branch
-with my radvd changes which we can hopefully bring upstream some day.
+On linux-wpan we had a discussion about setting the right tx_queue_len
+and came to some issues in 802.15.4 6LoWPAN networks.
 
-I cc radvd maintainer here, do you see any issues to get _basic_ radvd
-6lowpan/6CO support into upstream?
+Our hardware parameters are:
+ 
+ - Bandwidth: 250kb/s
+ - One framebuffer at hardware side for transmit a frame.
+ - MTU - 127 bytes (without mac headers)
+
+To provide 6LoWPAN (IPv6) on such interface, we have two interfaces.
+
+One wpan interface (which works on 802.15.4 layer and has a queue) and
+another lowpan interface (gets IPv6 and queue 6LoWPAN into wpan
+interface, has no queue - it's virtual interface).
+
+If the IPv6 packets needs fragmentation, mostly if payload is 127 bytes.
+We have the following situation:
+
+ - 6lowpan interface gets IPv6 packet:
+   - generate 6LoWPAN fragments
+     - dev_queue_xmit(wpan_dev, frag1)
+     - dev_queue_xmit(wpan_dev, frag2)
+     - dev_queue_xmit(wpan_dev, frag3)
+     - dev_queue_xmit(wpan_dev, ...)
+
+And then a lot of fragments laying inside the tx_queue and waits to
+transfer to the transceiver which has only one framebuffer to transmit
+one frame and waits for tx completion to transfer the next one.
+
+My question is, if qdisc drops some fragment because the queue is full
+or something else. Exists there some way to remove all fragments inside
+the queue? If one fragment will be dropped and all related are still
+inside the queue then we send mostly garbage.
+
+I want to add a behaviour which drops all related fragments for
+6LoWPAN fragmentation at first, if the payload is above 1280 bytes, then
+we have also IPv6 fragmentation on it. In future I also like to remove
+all related 6LoWPAN fragments which are related according to the IPv6
+fragment.
 
 - Alex
 
-[0] https://github.com/linux-wpan/radvd/tree/6lowpan
