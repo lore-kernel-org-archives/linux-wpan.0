@@ -1,37 +1,39 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from proxima.lasnet.de ([78.47.171.185]:44710 "EHLO
-	proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754792AbcDSOiI (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Tue, 19 Apr 2016 10:38:08 -0400
-From: Stefan Schmidt <stefan@osg.samsung.com>
-Subject: [PATCH bluetooth-next 4/4] ieee802154: atusb: update my copyright years for this driver
-Date: Tue, 19 Apr 2016 16:28:55 +0200
-Message-Id: <1461076135-31540-4-git-send-email-stefan@osg.samsung.com>
-In-Reply-To: <1461076135-31540-1-git-send-email-stefan@osg.samsung.com>
+Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:43977 "EHLO
+	metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1750850AbcDTSzo (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>);
+	Wed, 20 Apr 2016 14:55:44 -0400
+Subject: Re: [PATCH bluetooth-next 1/4] ieee802154: atusb: implement
+ .set_csma_params ops callback
 References: <1461076135-31540-1-git-send-email-stefan@osg.samsung.com>
+From: Alexander Aring <aar@pengutronix.de>
+Message-ID: <b02d54d3-7f09-e946-6dbd-316f697fc422@pengutronix.de>
+Date: Wed, 20 Apr 2016 20:55:41 +0200
+MIME-Version: 1.0
+In-Reply-To: <1461076135-31540-1-git-send-email-stefan@osg.samsung.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org
-Cc: Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt <stefan@osg.samsung.com>
+To: Stefan Schmidt <stefan@osg.samsung.com>, linux-wpan@vger.kernel.org
 
-Signed-off-by: Stefan Schmidt <stefan@osg.samsung.com>
----
- drivers/net/ieee802154/atusb.c | 2 ++
- 1 file changed, 2 insertions(+)
 
-diff --git a/drivers/net/ieee802154/atusb.c b/drivers/net/ieee802154/atusb.c
-index 72128b3..52c9051 100644
---- a/drivers/net/ieee802154/atusb.c
-+++ b/drivers/net/ieee802154/atusb.c
-@@ -3,6 +3,8 @@
-  *
-  * Written 2013 by Werner Almesberger <werner@almesberger.net>
-  *
-+ * Copyright (c) 2015 - 2016 Stefan Schmidt <stefan@datenfreihafen.org>
-+ *
-  * This program is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU General Public License as
-  * published by the Free Software Foundation, version 2
--- 
-2.5.0
+Hi,
 
+On 04/19/2016 04:28 PM, Stefan Schmidt wrote:
+> Catching up with the stack here and implement CSMA parameter setting.
+> 
+> Signed-off-by: Stefan Schmidt <stefan@osg.samsung.com>
+
+all patches are fine. I want to remember this settings have no effects
+until atusb has TX_ARET support and drops basic operation mode.
+
+But I am sure you already known that and this will part of next firmware
+version.
+
+Also please care of ed-levels if they are the same on at86rf230, don't
+known yet. There is some calculation with rssi_base_val parameter which
+is on 2.4 Ghz always -91.
+
+- Alex
