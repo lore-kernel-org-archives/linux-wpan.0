@@ -1,115 +1,140 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:60857 "EHLO
+Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:33171 "EHLO
 	metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1754130AbcDTIUJ (ORCPT
+	by vger.kernel.org with ESMTP id S1754495AbcDTIUJ (ORCPT
 	<rfc822;linux-wpan@vger.kernel.org>);
 	Wed, 20 Apr 2016 04:20:09 -0400
 From: Alexander Aring <aar@pengutronix.de>
-Subject: [PATCHv2 bluetooth-next 00/10] 6lowpan: introduce basic 6lowpan-nd
-Date: Wed, 20 Apr 2016 10:19:32 +0200
-Message-Id: <1461140382-4784-1-git-send-email-aar@pengutronix.de>
+Subject: [PATCHv2 bluetooth-next 01/10] 6lowpan: add private neighbour data
+Date: Wed, 20 Apr 2016 10:19:33 +0200
+Message-Id: <1461140382-4784-2-git-send-email-aar@pengutronix.de>
+In-Reply-To: <1461140382-4784-1-git-send-email-aar@pengutronix.de>
+References: <1461140382-4784-1-git-send-email-aar@pengutronix.de>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
-Cc: kernel@pengutronix.de, marcel@holtmann.org, jukka.rissanen@linux.intel.com, hannes@stressinduktion.org, stefan@osg.samsung.com, mcr@sandelman.ca, werner@almesberger.net, linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, Alexander Aring <aar@pengutronix.de>, "David S . Miller" <davem@davemloft.net>, Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>, James Morris <jmorris@namei.org>, Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>, Patrick McHardy <kaber@trash.net>
+Cc: kernel@pengutronix.de, marcel@holtmann.org, jukka.rissanen@linux.intel.com, hannes@stressinduktion.org, stefan@osg.samsung.com, mcr@sandelman.ca, werner@almesberger.net, linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, Alexander Aring <aar@pengutronix.de>, "David S . Miller" <davem@davemloft.net>
 
-Hi,
+This patch will introduce a 6lowpan neighbour private data. Like the
+interface private data we handle private data for generic 6lowpan and
+for link-layer specific 6lowpan.
 
-this patch series introduces a layer for IPv6 neighbour discovery. At first
-it introduce the "ndisc_ops" to run a different handling for recv/send of
-NA/NS messages. The use case for such ndisc operation is RFC 6775 [0].
-Which describes a different neighbour discovery handling for 6LoWPAN networks.
-
-I didn't implement RFC 6775 in this patch series, but introduce callback
-structure for replace different functions in ndisc implementation might be
-the right direction.
-
-Another use case would be RFC 7400 [1] which describes a new option field to
-getting capabilities of 6LoWPAN next header compression methods.
-
-What I implemented is a necessary functionality to handle short address for
-802.15.4 6LoWPAN networks. The L2-Layer "802.15.4" can have two different
-link-layer addresses which can be used mixed at the same time inside 802.15.4
-networks. To deal with such behaviour in ndisc, it is defined at RFC 4944 [2].
-The bad news is, that I saw different handling of such handling. What Linux
-will do is to add two source/target address information option fields, each
-with different length, if short address is valid (can also not be given).
-Example:
-
-- WPAN interface address settings
- - extended addr (must always be there)
- - short addr (0xfffe or 0xffff -> invalid)
-
-Will add an extended addr to source/target address information option field.
-If short addr is in some valid range, then both address will be added to
-the option fields. Indicated are these different address types by the length
-field (extended -> length=2, short -> length=1), according to [1].
-
-The tested 6LoWPAN implementation (RIOT-OS) allows only one source/target
-option field which is short XOR extended, otherwise it will be dropped.
-There is some lack of information there [2] and I don't know how do deal with
-it right, maybe we need to update the implementation there if it's really
-wrong.
-
-To save such information for each neighbour we use the already implemented
-neighbour private data which some casting strategy for 6LoWPAN and 6LoWPAN
-link-layer specific data e.g. 802.15.4 short address handling.
-
-Additional I implemented to add 6CO to the is_useropt callback in case of
-6LoWPAN interface. The 6CO option will currently parsed in userspace which
-are placed in RA-Messages.
-
-The ndisc_ops are not finished yet, of course we need handling for RS messages
-to place the 802.15.4 short address there as well and then also processing
-of RA messages for the 802.15.4 SLLAO option field.
-
-- Alex
-
-[0] https://tools.ietf.org/html/rfc6775
-[1] https://tools.ietf.org/html/rfc7400#section-3.3
-[2] https://tools.ietf.org/html/rfc4944#section-8
+The current first use case if to save the short address for a 802.15.4
+6lowpan neighbour.
 
 Cc: David S. Miller <davem@davemloft.net>
-Cc: Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>
-Cc: James Morris <jmorris@namei.org>
-Cc: Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>
-Cc: Patrick McHardy <kaber@trash.net>
+Signed-off-by: Alexander Aring <aar@pengutronix.de>
+---
+ include/linux/netdevice.h     |  3 +--
+ include/net/6lowpan.h         | 24 ++++++++++++++++++++++++
+ net/bluetooth/6lowpan.c       |  2 ++
+ net/ieee802154/6lowpan/core.c | 12 ++++++++++++
+ 4 files changed, 39 insertions(+), 2 deletions(-)
 
-changes since v2:
- - replace #ifdef CONFIG_IPV6 to #if IS_ENABLED(...)
- - replace #ifdef CONFIG_IEEE802154... to #if IS_ENABLED(...)
- - add more #if IS_ENABLED(CONFIG_IPV6) in ndisc.h
-
-Alexander Aring (10):
-  6lowpan: add private neighbour data
-  6lowpan: add 802.15.4 short addr slaac
-  6lowpan: remove ipv6 module request
-  ndisc: add addr_len parameter to ndisc_opt_addr_space
-  ndisc: add addr_len parameter to ndisc_opt_addr_data
-  ndisc: add addr_len parameter to ndisc_fill_addr_option
-  ipv6: introduce neighbour discovery ops
-  ipv6: export ndisc functions
-  6lowpan: introduce 6lowpan-nd
-  6lowpan: add support for 802.15.4 short addr handling
-
- include/linux/netdevice.h     |   6 +-
- include/net/6lowpan.h         |  24 ++
- include/net/addrconf.h        |   3 +
- include/net/ndisc.h           | 124 ++++++++-
- net/6lowpan/6lowpan_i.h       |   2 +
- net/6lowpan/Makefile          |   2 +-
- net/6lowpan/core.c            |  50 +++-
- net/6lowpan/iphc.c            | 167 +++++++++--
- net/6lowpan/ndisc.c           | 633 ++++++++++++++++++++++++++++++++++++++++++
- net/bluetooth/6lowpan.c       |   2 +
- net/ieee802154/6lowpan/core.c |  12 +
- net/ieee802154/6lowpan/tx.c   | 107 ++++---
- net/ipv6/addrconf.c           |   7 +-
- net/ipv6/ndisc.c              | 132 +++++----
- net/ipv6/route.c              |   4 +-
- 15 files changed, 1117 insertions(+), 158 deletions(-)
- create mode 100644 net/6lowpan/ndisc.c
-
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index 166402a..0052c42 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -1487,8 +1487,7 @@ enum netdev_priv_flags {
+  * 	@perm_addr:		Permanent hw address
+  * 	@addr_assign_type:	Hw address assignment type
+  * 	@addr_len:		Hardware address length
+- * 	@neigh_priv_len;	Used in neigh_alloc(),
+- * 				initialized only in atm/clip.c
++ *	@neigh_priv_len;	Used in neigh_alloc()
+  * 	@dev_id:		Used to differentiate devices that share
+  * 				the same link layer address
+  * 	@dev_port:		Used to differentiate devices that share
+diff --git a/include/net/6lowpan.h b/include/net/6lowpan.h
+index da84cf9..61c6517 100644
+--- a/include/net/6lowpan.h
++++ b/include/net/6lowpan.h
+@@ -98,6 +98,9 @@ static inline bool lowpan_is_iphc(u8 dispatch)
+ #define LOWPAN_PRIV_SIZE(llpriv_size)	\
+ 	(sizeof(struct lowpan_dev) + llpriv_size)
+ 
++#define LOWPAN_NEIGH_PRIV_SIZE(llneigh_priv_size)	\
++	(sizeof(struct lowpan_neigh) + llneigh_priv_size)
++
+ enum lowpan_lltypes {
+ 	LOWPAN_LLTYPE_BTLE,
+ 	LOWPAN_LLTYPE_IEEE802154,
+@@ -141,6 +144,27 @@ struct lowpan_dev {
+ 	u8 priv[0] __aligned(sizeof(void *));
+ };
+ 
++struct lowpan_neigh {
++	/* 6LoWPAN neigh private data */
++	/* must be last */
++	u8 priv[0] __aligned(sizeof(void *));
++};
++
++struct lowpan_802154_neigh {
++	__le16 short_addr;
++};
++
++static inline struct lowpan_neigh *lowpan_neigh(void *neigh_priv)
++{
++	return neigh_priv;
++}
++
++static inline
++struct lowpan_802154_neigh *lowpan_802154_neigh(void *neigh_priv)
++{
++	return (struct lowpan_802154_neigh *)lowpan_neigh(neigh_priv)->priv;
++}
++
+ static inline
+ struct lowpan_dev *lowpan_dev(const struct net_device *dev)
+ {
+diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+index 38e82dd..b7c4efa 100644
+--- a/net/bluetooth/6lowpan.c
++++ b/net/bluetooth/6lowpan.c
+@@ -833,6 +833,8 @@ static int setup_netdev(struct l2cap_chan *chan, struct lowpan_btle_dev **dev)
+ 	list_add_rcu(&(*dev)->list, &bt_6lowpan_devices);
+ 	spin_unlock(&devices_lock);
+ 
++	netdev->neigh_priv_len = LOWPAN_NEIGH_PRIV_SIZE(0);
++
+ 	err = lowpan_register_netdev(netdev, LOWPAN_LLTYPE_BTLE);
+ 	if (err < 0) {
+ 		BT_INFO("register_netdev failed %d", err);
+diff --git a/net/ieee802154/6lowpan/core.c b/net/ieee802154/6lowpan/core.c
+index dd085db..3162632 100644
+--- a/net/ieee802154/6lowpan/core.c
++++ b/net/ieee802154/6lowpan/core.c
+@@ -92,11 +92,21 @@ static int lowpan_stop(struct net_device *dev)
+ 	return 0;
+ }
+ 
++static int lowpan_neigh_construct(struct neighbour *n)
++{
++	struct lowpan_802154_neigh *neigh = lowpan_802154_neigh(neighbour_priv(n));
++
++	/* default no short_addr is available for a neighbour */
++	neigh->short_addr = cpu_to_le16(IEEE802154_ADDR_SHORT_UNSPEC);
++	return 0;
++}
++
+ static const struct net_device_ops lowpan_netdev_ops = {
+ 	.ndo_init		= lowpan_dev_init,
+ 	.ndo_start_xmit		= lowpan_xmit,
+ 	.ndo_open		= lowpan_open,
+ 	.ndo_stop		= lowpan_stop,
++	.ndo_neigh_construct    = lowpan_neigh_construct,
+ };
+ 
+ static void lowpan_setup(struct net_device *ldev)
+@@ -161,6 +171,8 @@ static int lowpan_newlink(struct net *src_net, struct net_device *ldev,
+ 				wdev->needed_headroom;
+ 	ldev->needed_tailroom = wdev->needed_tailroom;
+ 
++	ldev->neigh_priv_len = LOWPAN_NEIGH_PRIV_SIZE(sizeof(struct lowpan_802154_neigh));
++
+ 	ret = lowpan_register_netdevice(ldev, LOWPAN_LLTYPE_IEEE802154);
+ 	if (ret < 0) {
+ 		dev_put(wdev);
 -- 
 2.8.0
 
