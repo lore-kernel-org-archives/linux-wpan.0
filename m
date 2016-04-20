@@ -1,39 +1,34 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:43977 "EHLO
-	metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1750850AbcDTSzo (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>);
-	Wed, 20 Apr 2016 14:55:44 -0400
-Subject: Re: [PATCH bluetooth-next 1/4] ieee802154: atusb: implement
- .set_csma_params ops callback
-References: <1461076135-31540-1-git-send-email-stefan@osg.samsung.com>
-From: Alexander Aring <aar@pengutronix.de>
-Message-ID: <b02d54d3-7f09-e946-6dbd-316f697fc422@pengutronix.de>
-Date: Wed, 20 Apr 2016 20:55:41 +0200
-MIME-Version: 1.0
-In-Reply-To: <1461076135-31540-1-git-send-email-stefan@osg.samsung.com>
+Received: from ipv4.connman.net ([82.165.8.211]:59468 "EHLO mail.holtmann.org"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1751228AbcDTWW5 (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+	Wed, 20 Apr 2016 18:22:57 -0400
 Content-Type: text/plain; charset=windows-1252
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+Subject: Re: [PATCH bluetooth-next 1/4] ieee802154: atusb: implement .set_csma_params ops callback
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <b02d54d3-7f09-e946-6dbd-316f697fc422@pengutronix.de>
+Date: Thu, 21 Apr 2016 00:22:55 +0200
 Content-Transfer-Encoding: 7bit
+Message-Id: <F9DBF1AD-6D1B-48F3-8354-B47C4A9CD43E@holtmann.org>
+References: <1461076135-31540-1-git-send-email-stefan@osg.samsung.com> <b02d54d3-7f09-e946-6dbd-316f697fc422@pengutronix.de>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Stefan Schmidt <stefan@osg.samsung.com>, linux-wpan@vger.kernel.org
+To: Alexander Aring <aar@pengutronix.de>
+Cc: Stefan Schmidt <stefan@osg.samsung.com>, linux-wpan@vger.kernel.org
 
+Hi Alex,
 
-Hi,
-
-On 04/19/2016 04:28 PM, Stefan Schmidt wrote:
-> Catching up with the stack here and implement CSMA parameter setting.
+>> Catching up with the stack here and implement CSMA parameter setting.
+>> 
+>> Signed-off-by: Stefan Schmidt <stefan@osg.samsung.com>
 > 
-> Signed-off-by: Stefan Schmidt <stefan@osg.samsung.com>
+> all patches are fine. I want to remember this settings have no effects
+> until atusb has TX_ARET support and drops basic operation mode.
 
-all patches are fine. I want to remember this settings have no effects
-until atusb has TX_ARET support and drops basic operation mode.
+I have applied all 4 patches to bluetooth-next tree.
 
-But I am sure you already known that and this will part of next firmware
-version.
+Regards
 
-Also please care of ed-levels if they are the same on at86rf230, don't
-known yet. There is some calculation with rssi_base_val parameter which
-is on 2.4 Ghz always -91.
+Marcel
 
-- Alex
