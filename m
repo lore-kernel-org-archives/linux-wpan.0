@@ -1,61 +1,115 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mo4-p00-ob.smtp.rzone.de ([81.169.146.160]:61548 "EHLO
-	mo4-p00-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752394AbcD2RMT convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Fri, 29 Apr 2016 13:12:19 -0400
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-Subject: Re: [riot-devel] RIOT+ULAs: no router entry
-From: smlng <s@mlng.net>
-In-Reply-To: <20160429152458.GA15676@omega>
-Date: Fri, 29 Apr 2016 19:06:05 +0200
-Content-Transfer-Encoding: 8BIT
-Message-Id: <B6491655-6980-4E77-A525-B24749C44129@mlng.net>
-References: <B354489C-54BF-4CAF-8B41-04A946D83478@mlng.net> <20160422102833.GA5671@omega> <7BCB9BD8-C255-458C-83F6-0F7FE69F5C7F@mlng.net> <20160422122816.GA6364@omega> <20160424200528.GA27492@omega> <20160424203128.GA27936@omega> <3CFBDFC0-3AB2-4931-8BCB-B034EBDC0B9C@mlng.net> <20160429152458.GA15676@omega>
+Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:60857 "EHLO
+	metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1754130AbcDTIUJ (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>);
+	Wed, 20 Apr 2016 04:20:09 -0400
+From: Alexander Aring <aar@pengutronix.de>
+Subject: [PATCHv2 bluetooth-next 00/10] 6lowpan: introduce basic 6lowpan-nd
+Date: Wed, 20 Apr 2016 10:19:32 +0200
+Message-Id: <1461140382-4784-1-git-send-email-aar@pengutronix.de>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: RIOT OS kernel developers <devel@riot-os.org>
-Cc: linux-wpan@vger.kernel.org
+To: linux-wpan@vger.kernel.org
+Cc: kernel@pengutronix.de, marcel@holtmann.org, jukka.rissanen@linux.intel.com, hannes@stressinduktion.org, stefan@osg.samsung.com, mcr@sandelman.ca, werner@almesberger.net, linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, Alexander Aring <aar@pengutronix.de>, "David S . Miller" <davem@davemloft.net>, Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>, James Morris <jmorris@namei.org>, Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>, Patrick McHardy <kaber@trash.net>
 
-Hi Alex, and all,
+Hi,
 
-> Am 29.04.2016 um 17:25 schrieb Alexander Aring <alex.aring@gmail.com>:
-> 
-> Routers are indicated by the "forwarding" setting. radvd silent warns
-> about that if this isn't set for interfaces with RA advert is on, so far I
-> know you need to increase the debug level for that.
-> 
-> I simple set:
-> 
-> echo 1 > /proc/sys/net/ipv6/conf/all/forwarding
-> 
-> this will set forwarding for all interfaces.
-> 
-> Some code explaining:
-> 
-> See http://lxr.free-electrons.com/source/net/ipv6/ndisc.c#L838
-> 
-> this is at function when NS is received, the routeri flag will be set when
-> forwarding is enabled.
-> 
-> Maybe this solves all your current issues. :-)
+this patch series introduces a layer for IPv6 neighbour discovery. At first
+it introduce the "ndisc_ops" to run a different handling for recv/send of
+NA/NS messages. The use case for such ndisc operation is RFC 6775 [0].
+Which describes a different neighbour discovery handling for 6LoWPAN networks.
 
-Yep, thanks - that did the trick. 
+I didn't implement RFC 6775 in this patch series, but introduce callback
+structure for replace different functions in ndisc implementation might be
+the right direction.
 
-I wonder why it isn't sufficient to set 'echo 1 > /proc/sys/net/ipv6/conf/lowpan0/forwarding' on that specific lowpan interface? I tried it, but `radvd` still complains (debug level 5) that forwarding is 0. However, it works by enabling it for all IPv6 interfaces as you suggested.
+Another use case would be RFC 7400 [1] which describes a new option field to
+getting capabilities of 6LoWPAN next header compression methods.
 
-> 
->> I'm running latest Raspbian with Kernel 'Linux raspberrypi 4.1.19+' and wpan-tools from github on the RasPi.
->> 
-> 
-> I would better use bluetooth-next, if possible. With all recent patches
-> you could also try to use 6CO in radvd.
+What I implemented is a necessary functionality to handle short address for
+802.15.4 6LoWPAN networks. The L2-Layer "802.15.4" can have two different
+link-layer addresses which can be used mixed at the same time inside 802.15.4
+networks. To deal with such behaviour in ndisc, it is defined at RFC 4944 [2].
+The bad news is, that I saw different handling of such handling. What Linux
+will do is to add two source/target address information option fields, each
+with different length, if short address is valid (can also not be given).
+Example:
 
-mhm, I'm using default Raspbian with RPI-Linux+DTS-overlay 'at86rf233' as it is cause a fast and easy setup - and until now, this was sufficient for my test cases ...
+- WPAN interface address settings
+ - extended addr (must always be there)
+ - short addr (0xfffe or 0xffff -> invalid)
 
-Best,
- Sebastian
+Will add an extended addr to source/target address information option field.
+If short addr is in some valid range, then both address will be added to
+the option fields. Indicated are these different address types by the length
+field (extended -> length=2, short -> length=1), according to [1].
 
-[mail]: s@mlng.net
-[code]: https://github.com/smlng
+The tested 6LoWPAN implementation (RIOT-OS) allows only one source/target
+option field which is short XOR extended, otherwise it will be dropped.
+There is some lack of information there [2] and I don't know how do deal with
+it right, maybe we need to update the implementation there if it's really
+wrong.
+
+To save such information for each neighbour we use the already implemented
+neighbour private data which some casting strategy for 6LoWPAN and 6LoWPAN
+link-layer specific data e.g. 802.15.4 short address handling.
+
+Additional I implemented to add 6CO to the is_useropt callback in case of
+6LoWPAN interface. The 6CO option will currently parsed in userspace which
+are placed in RA-Messages.
+
+The ndisc_ops are not finished yet, of course we need handling for RS messages
+to place the 802.15.4 short address there as well and then also processing
+of RA messages for the 802.15.4 SLLAO option field.
+
+- Alex
+
+[0] https://tools.ietf.org/html/rfc6775
+[1] https://tools.ietf.org/html/rfc7400#section-3.3
+[2] https://tools.ietf.org/html/rfc4944#section-8
+
+Cc: David S. Miller <davem@davemloft.net>
+Cc: Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>
+Cc: James Morris <jmorris@namei.org>
+Cc: Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>
+Cc: Patrick McHardy <kaber@trash.net>
+
+changes since v2:
+ - replace #ifdef CONFIG_IPV6 to #if IS_ENABLED(...)
+ - replace #ifdef CONFIG_IEEE802154... to #if IS_ENABLED(...)
+ - add more #if IS_ENABLED(CONFIG_IPV6) in ndisc.h
+
+Alexander Aring (10):
+  6lowpan: add private neighbour data
+  6lowpan: add 802.15.4 short addr slaac
+  6lowpan: remove ipv6 module request
+  ndisc: add addr_len parameter to ndisc_opt_addr_space
+  ndisc: add addr_len parameter to ndisc_opt_addr_data
+  ndisc: add addr_len parameter to ndisc_fill_addr_option
+  ipv6: introduce neighbour discovery ops
+  ipv6: export ndisc functions
+  6lowpan: introduce 6lowpan-nd
+  6lowpan: add support for 802.15.4 short addr handling
+
+ include/linux/netdevice.h     |   6 +-
+ include/net/6lowpan.h         |  24 ++
+ include/net/addrconf.h        |   3 +
+ include/net/ndisc.h           | 124 ++++++++-
+ net/6lowpan/6lowpan_i.h       |   2 +
+ net/6lowpan/Makefile          |   2 +-
+ net/6lowpan/core.c            |  50 +++-
+ net/6lowpan/iphc.c            | 167 +++++++++--
+ net/6lowpan/ndisc.c           | 633 ++++++++++++++++++++++++++++++++++++++++++
+ net/bluetooth/6lowpan.c       |   2 +
+ net/ieee802154/6lowpan/core.c |  12 +
+ net/ieee802154/6lowpan/tx.c   | 107 ++++---
+ net/ipv6/addrconf.c           |   7 +-
+ net/ipv6/ndisc.c              | 132 +++++----
+ net/ipv6/route.c              |   4 +-
+ 15 files changed, 1117 insertions(+), 158 deletions(-)
+ create mode 100644 net/6lowpan/ndisc.c
+
+-- 
+2.8.0
 
