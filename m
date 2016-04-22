@@ -1,32 +1,58 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from shards.monkeyblade.net ([149.20.54.216]:60791 "EHLO
-	shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932699AbcDYTJk (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Mon, 25 Apr 2016 15:09:40 -0400
-Date: Mon, 25 Apr 2016 15:09:33 -0400 (EDT)
-Message-Id: <20160425.150933.1465492349349273571.davem@davemloft.net>
-Subject: Re: [PATCH net-next 0/9] netlink: align attributes when needed
- (patchset #2)
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <1461572722-6029-1-git-send-email-nicolas.dichtel@6wind.com>
-References: <1461572722-6029-1-git-send-email-nicolas.dichtel@6wind.com>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+Received: from host.76.145.23.62.rev.coltfrance.com ([62.23.145.76]:53650 "EHLO
+	proxy.6wind.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754643AbcDVPlx (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Fri, 22 Apr 2016 11:41:53 -0400
+From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Subject: [PATCH net-next 0/9] netlink: align attributes when needed (patchset #1)
+Date: Fri, 22 Apr 2016 17:31:15 +0200
+Message-Id: <1461339084-3849-1-git-send-email-nicolas.dichtel@6wind.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: nicolas.dichtel@6wind.com
-Cc: netdev@vger.kernel.org, jhs@mojatatu.com, stephen@networkplumber.org, pshelar@nicira.com, aar@pengutronix.de, linux-wpan@vger.kernel.org, wensong@linux-vs.org, horms@verge.net.au, ja@ssi.bg, pablo@netfilter.org, kaber@trash.net, kadlec@blackhole.kfki.hu, lvs-devel@vger.kernel.org, netfilter-devel@vger.kernel.org, johannes@sipsolutions.net, linux-wireless@vger.kernel.org
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net, linux-kernel@vger.kernel.org, linux-wpan@vger.kernel.org, aar@pengutronix.de, pablo@netfilter.org, kaber@trash.net, kadlec@blackhole.kfki.hu, pshelar@nicira.com, kuznet@ms2.inr.ac.ru, jmorris@namei.org, yoshfuji@linux-ipv6.org, netfilter-devel@vger.kernel.org, dev@openvswitch.org, steffen.klassert@secunet.com, herbert@gondor.apana.org.au, bsingharora@gmail.com
 
-From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Date: Mon, 25 Apr 2016 10:25:13 +0200
 
-> This is the continuation (series #2) of the work done to align netlink
-> attributes when these attributes contain some 64-bit fields.
-> 
-> In patch #3, I didn't modify the function ila_encap_nlsize(). I was waiting
-> feedback for this patch: http://patchwork.ozlabs.org/patch/613766/
-> If it's approved, there will be an update to switch nla_total_size() to
-> nla_total_size_64bit() after the merge of net in net-next.
+This is the continuation of the work done to align netlink attributes
+when these attributes contain some 64-bit fields.
 
-Looks good, series applied, thanks!
+David, if the third patch is too big (or maybe the series), I can split it.
+Just tell me what you prefer.
+
+ include/linux/netfilter/ipset/ip_set.h             |  9 ++--
+ include/net/netlink.h                              | 60 ++++++++++++++++------
+ include/net/nl802154.h                             |  6 +++
+ include/uapi/linux/fib_rules.h                     |  1 +
+ include/uapi/linux/l2tp.h                          |  1 +
+ include/uapi/linux/lwtunnel.h                      |  2 +
+ include/uapi/linux/neighbour.h                     |  2 +
+ include/uapi/linux/netfilter/ipset/ip_set.h        |  1 +
+ include/uapi/linux/netfilter/nf_tables.h           |  8 +++
+ include/uapi/linux/netfilter/nfnetlink_acct.h      |  1 +
+ include/uapi/linux/netfilter/nfnetlink_conntrack.h |  3 ++
+ include/uapi/linux/openvswitch.h                   |  1 +
+ include/uapi/linux/tcp_metrics.h                   |  1 +
+ include/uapi/linux/xfrm.h                          |  1 +
+ kernel/taskstats.c                                 | 37 ++-----------
+ lib/nlattr.c                                       |  8 ++-
+ net/core/fib_rules.c                               |  4 +-
+ net/core/neighbour.c                               | 19 +++----
+ net/ieee802154/nl802154.c                          | 13 +++--
+ net/ipv4/ip_tunnel_core.c                          | 10 ++--
+ net/ipv4/tcp_metrics.c                             |  6 ++-
+ net/l2tp/l2tp_netlink.c                            |  3 +-
+ net/netfilter/nf_conntrack_netlink.c               | 18 ++++---
+ net/netfilter/nf_conntrack_proto_dccp.c            |  4 +-
+ net/netfilter/nf_tables_api.c                      | 24 ++++++---
+ net/netfilter/nf_tables_trace.c                    |  5 +-
+ net/netfilter/nfnetlink_acct.c                     |  9 ++--
+ net/netfilter/nft_counter.c                        |  6 ++-
+ net/netfilter/nft_dynset.c                         |  3 +-
+ net/netfilter/nft_limit.c                          |  6 ++-
+ net/openvswitch/flow_netlink.c                     |  5 +-
+ net/xfrm/xfrm_user.c                               | 10 ++--
+ 32 files changed, 178 insertions(+), 109 deletions(-)
+
+Comments are welcomed,
+Regards,
+Nicolas
