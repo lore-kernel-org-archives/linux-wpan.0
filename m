@@ -1,12 +1,12 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from host.76.145.23.62.rev.coltfrance.com ([62.23.145.76]:53665 "EHLO
+Received: from host.76.145.23.62.rev.coltfrance.com ([62.23.145.76]:53664 "EHLO
 	proxy.6wind.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754653AbcDVPl5 (ORCPT
+	with ESMTP id S1754654AbcDVPl5 (ORCPT
 	<rfc822;linux-wpan@vger.kernel.org>); Fri, 22 Apr 2016 11:41:57 -0400
 From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Subject: [PATCH net-next 7/9] libnl: add nla_put_u64_64bit() helper
-Date: Fri, 22 Apr 2016 17:31:22 +0200
-Message-Id: <1461339084-3849-8-git-send-email-nicolas.dichtel@6wind.com>
+Subject: [PATCH net-next 8/9] xfrm: align nlattr properly when needed
+Date: Fri, 22 Apr 2016 17:31:23 +0200
+Message-Id: <1461339084-3849-9-git-send-email-nicolas.dichtel@6wind.com>
 In-Reply-To: <1461339084-3849-1-git-send-email-nicolas.dichtel@6wind.com>
 References: <1461339084-3849-1-git-send-email-nicolas.dichtel@6wind.com>
 Sender: linux-wpan-owner@vger.kernel.org
@@ -14,37 +14,66 @@ List-ID: <linux-wpan.vger.kernel.org>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net, linux-kernel@vger.kernel.org, linux-wpan@vger.kernel.org, aar@pengutronix.de, pablo@netfilter.org, kaber@trash.net, kadlec@blackhole.kfki.hu, pshelar@nicira.com, kuznet@ms2.inr.ac.ru, jmorris@namei.org, yoshfuji@linux-ipv6.org, netfilter-devel@vger.kernel.org, dev@openvswitch.org, steffen.klassert@secunet.com, herbert@gondor.apana.org.au, bsingharora@gmail.com, Nicolas Dichtel <nicolas.dichtel@6wind.com>
 
-With this function, nla_data() is aligned on a 64-bit area.
-
 Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
 ---
- include/net/netlink.h | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ include/uapi/linux/xfrm.h |  1 +
+ net/xfrm/xfrm_user.c      | 10 ++++++----
+ 2 files changed, 7 insertions(+), 4 deletions(-)
 
-diff --git a/include/net/netlink.h b/include/net/netlink.h
-index 113b483b6ee8..e589cb3dccee 100644
---- a/include/net/netlink.h
-+++ b/include/net/netlink.h
-@@ -858,6 +858,19 @@ static inline int nla_put_u64(struct sk_buff *skb, int attrtype, u64 value)
- }
+diff --git a/include/uapi/linux/xfrm.h b/include/uapi/linux/xfrm.h
+index 2cd9e608d0d1..143338978b48 100644
+--- a/include/uapi/linux/xfrm.h
++++ b/include/uapi/linux/xfrm.h
+@@ -302,6 +302,7 @@ enum xfrm_attr_type_t {
+ 	XFRMA_SA_EXTRA_FLAGS,	/* __u32 */
+ 	XFRMA_PROTO,		/* __u8 */
+ 	XFRMA_ADDRESS_FILTER,	/* struct xfrm_address_filter */
++	XFRMA_PAD,
+ 	__XFRMA_MAX
  
- /**
-+ * nla_put_u64_64bit - Add a u64 netlink attribute to a skb and align it
-+ * @skb: socket buffer to add attribute to
-+ * @attrtype: attribute type
-+ * @value: numeric value
-+ * @padattr: attribute type for the padding
-+ */
-+static inline int nla_put_u64_64bit(struct sk_buff *skb, int attrtype,
-+				    u64 value, int padattr)
-+{
-+	return nla_put_64bit(skb, attrtype, sizeof(u64), &value, padattr);
-+}
-+
-+/**
-  * nla_put_be64 - Add a __be64 netlink attribute to a socket buffer and align it
-  * @skb: socket buffer to add attribute to
-  * @attrtype: attribute type
+ #define XFRMA_MAX (__XFRMA_MAX - 1)
+diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
+index 2cc7af858c6f..d516845e16e3 100644
+--- a/net/xfrm/xfrm_user.c
++++ b/net/xfrm/xfrm_user.c
+@@ -809,7 +809,8 @@ static int copy_to_user_state_extra(struct xfrm_state *x,
+ 			goto out;
+ 	}
+ 	if (x->lastused) {
+-		ret = nla_put_u64(skb, XFRMA_LASTUSED, x->lastused);
++		ret = nla_put_u64_64bit(skb, XFRMA_LASTUSED, x->lastused,
++					XFRMA_PAD);
+ 		if (ret)
+ 			goto out;
+ 	}
+@@ -1813,7 +1814,7 @@ static inline size_t xfrm_aevent_msgsize(struct xfrm_state *x)
+ 
+ 	return NLMSG_ALIGN(sizeof(struct xfrm_aevent_id))
+ 	       + nla_total_size(replay_size)
+-	       + nla_total_size(sizeof(struct xfrm_lifetime_cur))
++	       + nla_total_size_64bit(sizeof(struct xfrm_lifetime_cur))
+ 	       + nla_total_size(sizeof(struct xfrm_mark))
+ 	       + nla_total_size(4) /* XFRM_AE_RTHR */
+ 	       + nla_total_size(4); /* XFRM_AE_ETHR */
+@@ -1848,7 +1849,8 @@ static int build_aevent(struct sk_buff *skb, struct xfrm_state *x, const struct
+ 	}
+ 	if (err)
+ 		goto out_cancel;
+-	err = nla_put(skb, XFRMA_LTIME_VAL, sizeof(x->curlft), &x->curlft);
++	err = nla_put_64bit(skb, XFRMA_LTIME_VAL, sizeof(x->curlft), &x->curlft,
++			    XFRMA_PAD);
+ 	if (err)
+ 		goto out_cancel;
+ 
+@@ -2617,7 +2619,7 @@ static inline size_t xfrm_sa_len(struct xfrm_state *x)
+ 		l += nla_total_size(sizeof(x->props.extra_flags));
+ 
+ 	/* Must count x->lastused as it may become non-zero behind our back. */
+-	l += nla_total_size(sizeof(u64));
++	l += nla_total_size_64bit(sizeof(u64));
+ 
+ 	return l;
+ }
 -- 
 2.8.1
 
