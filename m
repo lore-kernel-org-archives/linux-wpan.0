@@ -1,58 +1,73 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from host.76.145.23.62.rev.coltfrance.com ([62.23.145.76]:53650 "EHLO
+Received: from host.76.145.23.62.rev.coltfrance.com ([62.23.145.76]:53663 "EHLO
 	proxy.6wind.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754643AbcDVPlx (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Fri, 22 Apr 2016 11:41:53 -0400
+	with ESMTP id S932469AbcDVPmB (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Fri, 22 Apr 2016 11:42:01 -0400
 From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Subject: [PATCH net-next 0/9] netlink: align attributes when needed (patchset #1)
-Date: Fri, 22 Apr 2016 17:31:15 +0200
-Message-Id: <1461339084-3849-1-git-send-email-nicolas.dichtel@6wind.com>
+Subject: [PATCH net-next 1/9] libnl: fix help of _64bit functions
+Date: Fri, 22 Apr 2016 17:31:16 +0200
+Message-Id: <1461339084-3849-2-git-send-email-nicolas.dichtel@6wind.com>
+In-Reply-To: <1461339084-3849-1-git-send-email-nicolas.dichtel@6wind.com>
+References: <1461339084-3849-1-git-send-email-nicolas.dichtel@6wind.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: netdev@vger.kernel.org
-Cc: davem@davemloft.net, linux-kernel@vger.kernel.org, linux-wpan@vger.kernel.org, aar@pengutronix.de, pablo@netfilter.org, kaber@trash.net, kadlec@blackhole.kfki.hu, pshelar@nicira.com, kuznet@ms2.inr.ac.ru, jmorris@namei.org, yoshfuji@linux-ipv6.org, netfilter-devel@vger.kernel.org, dev@openvswitch.org, steffen.klassert@secunet.com, herbert@gondor.apana.org.au, bsingharora@gmail.com
+Cc: davem@davemloft.net, linux-kernel@vger.kernel.org, linux-wpan@vger.kernel.org, aar@pengutronix.de, pablo@netfilter.org, kaber@trash.net, kadlec@blackhole.kfki.hu, pshelar@nicira.com, kuznet@ms2.inr.ac.ru, jmorris@namei.org, yoshfuji@linux-ipv6.org, netfilter-devel@vger.kernel.org, dev@openvswitch.org, steffen.klassert@secunet.com, herbert@gondor.apana.org.au, bsingharora@gmail.com, Nicolas Dichtel <nicolas.dichtel@6wind.com>
 
+Fix typo and describe 'padattr'.
 
-This is the continuation of the work done to align netlink attributes
-when these attributes contain some 64-bit fields.
+Fixes: 089bf1a6a924 ("libnl: add more helpers to align attributes on 64-bit")
+Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+---
+ lib/nlattr.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-David, if the third patch is too big (or maybe the series), I can split it.
-Just tell me what you prefer.
+diff --git a/lib/nlattr.c b/lib/nlattr.c
+index 2b82f1e2ebc2..fce1e9afc6d9 100644
+--- a/lib/nlattr.c
++++ b/lib/nlattr.c
+@@ -359,10 +359,11 @@ EXPORT_SYMBOL(__nla_reserve);
+  * @skb: socket buffer to reserve room on
+  * @attrtype: attribute type
+  * @attrlen: length of attribute payload
++ * @padattr: attribute type for the padding
+  *
+  * Adds a netlink attribute header to a socket buffer and reserves
+  * room for the payload but does not copy it. It also ensure that this
+- * attribute will be 64-bit aign.
++ * attribute will have a 64-bit aligned nla_data() area.
+  *
+  * The caller is responsible to ensure that the skb provides enough
+  * tailroom for the attribute header and payload.
+@@ -424,10 +425,11 @@ EXPORT_SYMBOL(nla_reserve);
+  * @skb: socket buffer to reserve room on
+  * @attrtype: attribute type
+  * @attrlen: length of attribute payload
++ * @padattr: attribute type for the padding
+  *
+  * Adds a netlink attribute header to a socket buffer and reserves
+  * room for the payload but does not copy it. It also ensure that this
+- * attribute will be 64-bit aign.
++ * attribute will have a 64-bit aligned nla_data() area.
+  *
+  * Returns NULL if the tailroom of the skb is insufficient to store
+  * the attribute header and payload.
+@@ -493,6 +495,7 @@ EXPORT_SYMBOL(__nla_put);
+  * @attrtype: attribute type
+  * @attrlen: length of attribute payload
+  * @data: head of attribute payload
++ * @padattr: attribute type for the padding
+  *
+  * The caller is responsible to ensure that the skb provides enough
+  * tailroom for the attribute header and payload.
+@@ -551,6 +554,7 @@ EXPORT_SYMBOL(nla_put);
+  * @attrtype: attribute type
+  * @attrlen: length of attribute payload
+  * @data: head of attribute payload
++ * @padattr: attribute type for the padding
+  *
+  * Returns -EMSGSIZE if the tailroom of the skb is insufficient to store
+  * the attribute header and payload.
+-- 
+2.8.1
 
- include/linux/netfilter/ipset/ip_set.h             |  9 ++--
- include/net/netlink.h                              | 60 ++++++++++++++++------
- include/net/nl802154.h                             |  6 +++
- include/uapi/linux/fib_rules.h                     |  1 +
- include/uapi/linux/l2tp.h                          |  1 +
- include/uapi/linux/lwtunnel.h                      |  2 +
- include/uapi/linux/neighbour.h                     |  2 +
- include/uapi/linux/netfilter/ipset/ip_set.h        |  1 +
- include/uapi/linux/netfilter/nf_tables.h           |  8 +++
- include/uapi/linux/netfilter/nfnetlink_acct.h      |  1 +
- include/uapi/linux/netfilter/nfnetlink_conntrack.h |  3 ++
- include/uapi/linux/openvswitch.h                   |  1 +
- include/uapi/linux/tcp_metrics.h                   |  1 +
- include/uapi/linux/xfrm.h                          |  1 +
- kernel/taskstats.c                                 | 37 ++-----------
- lib/nlattr.c                                       |  8 ++-
- net/core/fib_rules.c                               |  4 +-
- net/core/neighbour.c                               | 19 +++----
- net/ieee802154/nl802154.c                          | 13 +++--
- net/ipv4/ip_tunnel_core.c                          | 10 ++--
- net/ipv4/tcp_metrics.c                             |  6 ++-
- net/l2tp/l2tp_netlink.c                            |  3 +-
- net/netfilter/nf_conntrack_netlink.c               | 18 ++++---
- net/netfilter/nf_conntrack_proto_dccp.c            |  4 +-
- net/netfilter/nf_tables_api.c                      | 24 ++++++---
- net/netfilter/nf_tables_trace.c                    |  5 +-
- net/netfilter/nfnetlink_acct.c                     |  9 ++--
- net/netfilter/nft_counter.c                        |  6 ++-
- net/netfilter/nft_dynset.c                         |  3 +-
- net/netfilter/nft_limit.c                          |  6 ++-
- net/openvswitch/flow_netlink.c                     |  5 +-
- net/xfrm/xfrm_user.c                               | 10 ++--
- 32 files changed, 178 insertions(+), 109 deletions(-)
-
-Comments are welcomed,
-Regards,
-Nicolas
