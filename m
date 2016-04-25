@@ -1,57 +1,49 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from lists.s-osg.org ([54.187.51.154]:34289 "EHLO lists.s-osg.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751851AbcDUSuE (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-	Thu, 21 Apr 2016 14:50:04 -0400
-Subject: Re: [PATCH bluetooth-next 1/4] ieee802154: atusb: implement
- .set_csma_params ops callback
-References: <1461076135-31540-1-git-send-email-stefan@osg.samsung.com>
- <b02d54d3-7f09-e946-6dbd-316f697fc422@pengutronix.de>
- <5718A4DB.3010300@osg.samsung.com>
-From: Stefan Schmidt <stefan@osg.samsung.com>
-Message-ID: <571920D7.6000502@osg.samsung.com>
-Date: Thu, 21 Apr 2016 20:49:59 +0200
-MIME-Version: 1.0
-In-Reply-To: <5718A4DB.3010300@osg.samsung.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
+Received: from host.76.145.23.62.rev.coltfrance.com ([62.23.145.76]:54398 "EHLO
+	proxy.6wind.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753663AbcDYIZo (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Mon, 25 Apr 2016 04:25:44 -0400
+From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Subject: [PATCH net-next 0/9] netlink: align attributes when needed (patchset #2)
+Date: Mon, 25 Apr 2016 10:25:13 +0200
+Message-Id: <1461572722-6029-1-git-send-email-nicolas.dichtel@6wind.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <aar@pengutronix.de>, linux-wpan@vger.kernel.org
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net, jhs@mojatatu.com, stephen@networkplumber.org, pshelar@nicira.com, aar@pengutronix.de, linux-wpan@vger.kernel.org, wensong@linux-vs.org, horms@verge.net.au, ja@ssi.bg, pablo@netfilter.org, kaber@trash.net, kadlec@blackhole.kfki.hu, lvs-devel@vger.kernel.org, netfilter-devel@vger.kernel.org, johannes@sipsolutions.net, linux-wireless@vger.kernel.org
 
-Hello.
 
-On 21/04/16 12:00, Stefan Schmidt wrote:
-> Hello.
->
-> On 20/04/16 20:55, Alexander Aring wrote:
->> Hi,
->>
->> On 04/19/2016 04:28 PM, Stefan Schmidt wrote:
->>> Catching up with the stack here and implement CSMA parameter setting.
->>>
->>> Signed-off-by: Stefan Schmidt <stefan@osg.samsung.com>
->> all patches are fine. I want to remember this settings have no effects
->> until atusb has TX_ARET support and drops basic operation mode.
->>
->> But I am sure you already known that and this will part of next firmware
->> version.
->
-> Yes, thats what I'm working on right now.
->
->> Also please care of ed-levels if they are the same on at86rf230, don't
->> known yet. There is some calculation with rssi_base_val parameter which
->> is on 2.4 Ghz always -91.
->
-> I will have a look at the 230 ed level table and see if anything 
-> special is needed for it when running atusb with the rzusb dongle.
+This is the continuation (series #2) of the work done to align netlink
+attributes when these attributes contain some 64-bit fields.
 
-I looked it up in the datasheets (231 on page 91ff and for 230 page 50ff).
+In patch #3, I didn't modify the function ila_encap_nlsize(). I was waiting
+feedback for this patch: http://patchwork.ozlabs.org/patch/613766/
+If it's approved, there will be an update to switch nla_total_size() to
+nla_total_size_64bit() after the merge of net in net-next.
 
-Both have 85 ED levels in 1dB steps and the range is 0 - 84 on both as well.
+ include/linux/nl802154.h         |  2 +
+ include/uapi/linux/if_link.h     |  3 ++
+ include/uapi/linux/ila.h         |  1 +
+ include/uapi/linux/ip_vs.h       |  1 +
+ include/uapi/linux/l2tp.h        |  1 +
+ include/uapi/linux/nl80211.h     |  4 ++
+ include/uapi/linux/openvswitch.h |  1 +
+ include/uapi/linux/pkt_sched.h   |  3 ++
+ net/bridge/br_netlink.c          | 62 +++++++++++++++------------
+ net/core/rtnetlink.c             | 36 ++++++++--------
+ net/ieee802154/nl-mac.c          | 17 +++++---
+ net/ieee802154/nl802154.c        |  3 +-
+ net/ipv6/ila/ila_lwt.c           |  3 +-
+ net/ipv6/ila/ila_xlat.c          | 15 ++++---
+ net/l2tp/l2tp_netlink.c          | 80 +++++++++++++++++++++--------------
+ net/netfilter/ipvs/ip_vs_ctl.c   | 36 ++++++++++------
+ net/openvswitch/datapath.c       |  3 +-
+ net/sched/sch_htb.c              |  6 ++-
+ net/sched/sch_netem.c            |  3 +-
+ net/sched/sch_tbf.c              |  6 ++-
+ net/wireless/nl80211.c           | 91 ++++++++++++++++++++++++----------------
+ 21 files changed, 233 insertions(+), 144 deletions(-)
 
-Nothing I can see where 230 and 231 have any difference how we would 
-need to handle them.
-
-regards
-Stefan Schmidt
+Comments are welcomed,
+Regards,
+Nicolas
