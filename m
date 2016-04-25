@@ -1,12 +1,12 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from host.76.145.23.62.rev.coltfrance.com ([62.23.145.76]:54443 "EHLO
+Received: from host.76.145.23.62.rev.coltfrance.com ([62.23.145.76]:54447 "EHLO
 	proxy.6wind.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753663AbcDYIZt (ORCPT
+	with ESMTP id S1754041AbcDYIZt (ORCPT
 	<rfc822;linux-wpan@vger.kernel.org>); Mon, 25 Apr 2016 04:25:49 -0400
 From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Subject: [PATCH net-next 7/9] ieee802154: use nla_put_u64_64bit()
-Date: Mon, 25 Apr 2016 10:25:20 +0200
-Message-Id: <1461572722-6029-8-git-send-email-nicolas.dichtel@6wind.com>
+Subject: [PATCH net-next 8/9] netfilter/ipvs: use nla_put_u64_64bit()
+Date: Mon, 25 Apr 2016 10:25:21 +0200
+Message-Id: <1461572722-6029-9-git-send-email-nicolas.dichtel@6wind.com>
 In-Reply-To: <1461572722-6029-1-git-send-email-nicolas.dichtel@6wind.com>
 References: <1461572722-6029-1-git-send-email-nicolas.dichtel@6wind.com>
 Sender: linux-wpan-owner@vger.kernel.org
@@ -16,95 +16,76 @@ Cc: davem@davemloft.net, jhs@mojatatu.com, stephen@networkplumber.org, pshelar@n
 
 Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
 ---
- include/linux/nl802154.h  |  2 ++
- net/ieee802154/nl-mac.c   | 17 +++++++++++------
- net/ieee802154/nl802154.c |  3 ++-
- 3 files changed, 15 insertions(+), 7 deletions(-)
+ include/uapi/linux/ip_vs.h     |  1 +
+ net/netfilter/ipvs/ip_vs_ctl.c | 36 ++++++++++++++++++++++++------------
+ 2 files changed, 25 insertions(+), 12 deletions(-)
 
-diff --git a/include/linux/nl802154.h b/include/linux/nl802154.h
-index 167342c2ce6b..0f6f6607f592 100644
---- a/include/linux/nl802154.h
-+++ b/include/linux/nl802154.h
-@@ -92,6 +92,8 @@ enum {
- 	IEEE802154_ATTR_LLSEC_DEV_OVERRIDE,
- 	IEEE802154_ATTR_LLSEC_DEV_KEY_MODE,
- 
-+	IEEE802154_ATTR_PAD,
-+
- 	__IEEE802154_ATTR_MAX,
+diff --git a/include/uapi/linux/ip_vs.h b/include/uapi/linux/ip_vs.h
+index 391395c06c7e..22d69894bc92 100644
+--- a/include/uapi/linux/ip_vs.h
++++ b/include/uapi/linux/ip_vs.h
+@@ -435,6 +435,7 @@ enum {
+ 	IPVS_STATS_ATTR_OUTPPS,		/* current out packet rate */
+ 	IPVS_STATS_ATTR_INBPS,		/* current in byte rate */
+ 	IPVS_STATS_ATTR_OUTBPS,		/* current out byte rate */
++	IPVS_STATS_ATTR_PAD,
+ 	__IPVS_STATS_ATTR_MAX,
  };
  
-diff --git a/net/ieee802154/nl-mac.c b/net/ieee802154/nl-mac.c
-index 3503c38954f9..d3cbb3258718 100644
---- a/net/ieee802154/nl-mac.c
-+++ b/net/ieee802154/nl-mac.c
-@@ -34,9 +34,11 @@
- 
- #include "ieee802154.h"
- 
--static int nla_put_hwaddr(struct sk_buff *msg, int type, __le64 hwaddr)
-+static int nla_put_hwaddr(struct sk_buff *msg, int type, __le64 hwaddr,
-+			  int padattr)
- {
--	return nla_put_u64(msg, type, swab64((__force u64)hwaddr));
-+	return nla_put_u64_64bit(msg, type, swab64((__force u64)hwaddr),
-+				 padattr);
- }
- 
- static __le64 nla_get_hwaddr(const struct nlattr *nla)
-@@ -623,7 +625,8 @@ ieee802154_llsec_fill_key_id(struct sk_buff *msg,
- 
- 		if (desc->device_addr.mode == IEEE802154_ADDR_LONG &&
- 		    nla_put_hwaddr(msg, IEEE802154_ATTR_HW_ADDR,
--				   desc->device_addr.extended_addr))
-+				   desc->device_addr.extended_addr,
-+				   IEEE802154_ATTR_PAD))
- 			return -EMSGSIZE;
- 	}
- 
-@@ -638,7 +641,7 @@ ieee802154_llsec_fill_key_id(struct sk_buff *msg,
- 
- 	if (desc->mode == IEEE802154_SCF_KEY_HW_INDEX &&
- 	    nla_put_hwaddr(msg, IEEE802154_ATTR_LLSEC_KEY_SOURCE_EXTENDED,
--			   desc->extended_source))
-+			   desc->extended_source, IEEE802154_ATTR_PAD))
+diff --git a/net/netfilter/ipvs/ip_vs_ctl.c b/net/netfilter/ipvs/ip_vs_ctl.c
+index 404b2a4f4b5b..f35ebc02fa5c 100644
+--- a/net/netfilter/ipvs/ip_vs_ctl.c
++++ b/net/netfilter/ipvs/ip_vs_ctl.c
+@@ -2875,8 +2875,10 @@ static int ip_vs_genl_fill_stats(struct sk_buff *skb, int container_type,
+ 	if (nla_put_u32(skb, IPVS_STATS_ATTR_CONNS, (u32)kstats->conns) ||
+ 	    nla_put_u32(skb, IPVS_STATS_ATTR_INPKTS, (u32)kstats->inpkts) ||
+ 	    nla_put_u32(skb, IPVS_STATS_ATTR_OUTPKTS, (u32)kstats->outpkts) ||
+-	    nla_put_u64(skb, IPVS_STATS_ATTR_INBYTES, kstats->inbytes) ||
+-	    nla_put_u64(skb, IPVS_STATS_ATTR_OUTBYTES, kstats->outbytes) ||
++	    nla_put_u64_64bit(skb, IPVS_STATS_ATTR_INBYTES, kstats->inbytes,
++			      IPVS_STATS_ATTR_PAD) ||
++	    nla_put_u64_64bit(skb, IPVS_STATS_ATTR_OUTBYTES, kstats->outbytes,
++			      IPVS_STATS_ATTR_PAD) ||
+ 	    nla_put_u32(skb, IPVS_STATS_ATTR_CPS, (u32)kstats->cps) ||
+ 	    nla_put_u32(skb, IPVS_STATS_ATTR_INPPS, (u32)kstats->inpps) ||
+ 	    nla_put_u32(skb, IPVS_STATS_ATTR_OUTPPS, (u32)kstats->outpps) ||
+@@ -2900,16 +2902,26 @@ static int ip_vs_genl_fill_stats64(struct sk_buff *skb, int container_type,
+ 	if (!nl_stats)
  		return -EMSGSIZE;
  
- 	return 0;
-@@ -1063,7 +1066,8 @@ ieee802154_nl_fill_dev(struct sk_buff *msg, u32 portid, u32 seq,
- 	    nla_put_shortaddr(msg, IEEE802154_ATTR_PAN_ID, desc->pan_id) ||
- 	    nla_put_shortaddr(msg, IEEE802154_ATTR_SHORT_ADDR,
- 			      desc->short_addr) ||
--	    nla_put_hwaddr(msg, IEEE802154_ATTR_HW_ADDR, desc->hwaddr) ||
-+	    nla_put_hwaddr(msg, IEEE802154_ATTR_HW_ADDR, desc->hwaddr,
-+			   IEEE802154_ATTR_PAD) ||
- 	    nla_put_u32(msg, IEEE802154_ATTR_LLSEC_FRAME_COUNTER,
- 			desc->frame_counter) ||
- 	    nla_put_u8(msg, IEEE802154_ATTR_LLSEC_DEV_OVERRIDE,
-@@ -1167,7 +1171,8 @@ ieee802154_nl_fill_devkey(struct sk_buff *msg, u32 portid, u32 seq,
+-	if (nla_put_u64(skb, IPVS_STATS_ATTR_CONNS, kstats->conns) ||
+-	    nla_put_u64(skb, IPVS_STATS_ATTR_INPKTS, kstats->inpkts) ||
+-	    nla_put_u64(skb, IPVS_STATS_ATTR_OUTPKTS, kstats->outpkts) ||
+-	    nla_put_u64(skb, IPVS_STATS_ATTR_INBYTES, kstats->inbytes) ||
+-	    nla_put_u64(skb, IPVS_STATS_ATTR_OUTBYTES, kstats->outbytes) ||
+-	    nla_put_u64(skb, IPVS_STATS_ATTR_CPS, kstats->cps) ||
+-	    nla_put_u64(skb, IPVS_STATS_ATTR_INPPS, kstats->inpps) ||
+-	    nla_put_u64(skb, IPVS_STATS_ATTR_OUTPPS, kstats->outpps) ||
+-	    nla_put_u64(skb, IPVS_STATS_ATTR_INBPS, kstats->inbps) ||
+-	    nla_put_u64(skb, IPVS_STATS_ATTR_OUTBPS, kstats->outbps))
++	if (nla_put_u64_64bit(skb, IPVS_STATS_ATTR_CONNS, kstats->conns,
++			      IPVS_STATS_ATTR_PAD) ||
++	    nla_put_u64_64bit(skb, IPVS_STATS_ATTR_INPKTS, kstats->inpkts,
++			      IPVS_STATS_ATTR_PAD) ||
++	    nla_put_u64_64bit(skb, IPVS_STATS_ATTR_OUTPKTS, kstats->outpkts,
++			      IPVS_STATS_ATTR_PAD) ||
++	    nla_put_u64_64bit(skb, IPVS_STATS_ATTR_INBYTES, kstats->inbytes,
++			      IPVS_STATS_ATTR_PAD) ||
++	    nla_put_u64_64bit(skb, IPVS_STATS_ATTR_OUTBYTES, kstats->outbytes,
++			      IPVS_STATS_ATTR_PAD) ||
++	    nla_put_u64_64bit(skb, IPVS_STATS_ATTR_CPS, kstats->cps,
++			      IPVS_STATS_ATTR_PAD) ||
++	    nla_put_u64_64bit(skb, IPVS_STATS_ATTR_INPPS, kstats->inpps,
++			      IPVS_STATS_ATTR_PAD) ||
++	    nla_put_u64_64bit(skb, IPVS_STATS_ATTR_OUTPPS, kstats->outpps,
++			      IPVS_STATS_ATTR_PAD) ||
++	    nla_put_u64_64bit(skb, IPVS_STATS_ATTR_INBPS, kstats->inbps,
++			      IPVS_STATS_ATTR_PAD) ||
++	    nla_put_u64_64bit(skb, IPVS_STATS_ATTR_OUTBPS, kstats->outbps,
++			      IPVS_STATS_ATTR_PAD))
+ 		goto nla_put_failure;
+ 	nla_nest_end(skb, nl_stats);
  
- 	if (nla_put_string(msg, IEEE802154_ATTR_DEV_NAME, dev->name) ||
- 	    nla_put_u32(msg, IEEE802154_ATTR_DEV_INDEX, dev->ifindex) ||
--	    nla_put_hwaddr(msg, IEEE802154_ATTR_HW_ADDR, devaddr) ||
-+	    nla_put_hwaddr(msg, IEEE802154_ATTR_HW_ADDR, devaddr,
-+			   IEEE802154_ATTR_PAD) ||
- 	    nla_put_u32(msg, IEEE802154_ATTR_LLSEC_FRAME_COUNTER,
- 			devkey->frame_counter) ||
- 	    ieee802154_llsec_fill_key_id(msg, &devkey->key_id))
-diff --git a/net/ieee802154/nl802154.c b/net/ieee802154/nl802154.c
-index 614072064d03..8035c93dd527 100644
---- a/net/ieee802154/nl802154.c
-+++ b/net/ieee802154/nl802154.c
-@@ -813,7 +813,8 @@ nl802154_send_iface(struct sk_buff *msg, u32 portid, u32 seq, int flags,
- 
- 	if (nla_put_u32(msg, NL802154_ATTR_WPAN_PHY, rdev->wpan_phy_idx) ||
- 	    nla_put_u32(msg, NL802154_ATTR_IFTYPE, wpan_dev->iftype) ||
--	    nla_put_u64(msg, NL802154_ATTR_WPAN_DEV, wpan_dev_id(wpan_dev)) ||
-+	    nla_put_u64_64bit(msg, NL802154_ATTR_WPAN_DEV,
-+			      wpan_dev_id(wpan_dev), NL802154_ATTR_PAD) ||
- 	    nla_put_u32(msg, NL802154_ATTR_GENERATION,
- 			rdev->devlist_generation ^
- 			(cfg802154_rdev_list_generation << 2)))
 -- 
 2.8.1
 
