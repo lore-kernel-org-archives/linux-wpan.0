@@ -1,12 +1,12 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from host.76.145.23.62.rev.coltfrance.com ([62.23.145.76]:54429 "EHLO
+Received: from host.76.145.23.62.rev.coltfrance.com ([62.23.145.76]:54435 "EHLO
 	proxy.6wind.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753878AbcDYIZq (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Mon, 25 Apr 2016 04:25:46 -0400
+	with ESMTP id S1753940AbcDYIZs (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Mon, 25 Apr 2016 04:25:48 -0400
 From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Subject: [PATCH net-next 3/9] ipv6: use nla_put_u64_64bit()
-Date: Mon, 25 Apr 2016 10:25:16 +0200
-Message-Id: <1461572722-6029-4-git-send-email-nicolas.dichtel@6wind.com>
+Subject: [PATCH net-next 4/9] ovs: use nla_put_u64_64bit()
+Date: Mon, 25 Apr 2016 10:25:17 +0200
+Message-Id: <1461572722-6029-5-git-send-email-nicolas.dichtel@6wind.com>
 In-Reply-To: <1461572722-6029-1-git-send-email-nicolas.dichtel@6wind.com>
 References: <1461572722-6029-1-git-send-email-nicolas.dichtel@6wind.com>
 Sender: linux-wpan-owner@vger.kernel.org
@@ -16,63 +16,36 @@ Cc: davem@davemloft.net, jhs@mojatatu.com, stephen@networkplumber.org, pshelar@n
 
 Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
 ---
- include/uapi/linux/ila.h |  1 +
- net/ipv6/ila/ila_lwt.c   |  3 ++-
- net/ipv6/ila/ila_xlat.c  | 15 +++++++++------
- 3 files changed, 12 insertions(+), 7 deletions(-)
+ include/uapi/linux/openvswitch.h | 1 +
+ net/openvswitch/datapath.c       | 3 ++-
+ 2 files changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/include/uapi/linux/ila.h b/include/uapi/linux/ila.h
-index abde7bbd6f3b..cd97951680bf 100644
---- a/include/uapi/linux/ila.h
-+++ b/include/uapi/linux/ila.h
-@@ -14,6 +14,7 @@ enum {
- 	ILA_ATTR_LOCATOR_MATCH,			/* u64 */
- 	ILA_ATTR_IFINDEX,			/* s32 */
- 	ILA_ATTR_DIR,				/* u32 */
-+	ILA_ATTR_PAD,
- 
- 	__ILA_ATTR_MAX,
+diff --git a/include/uapi/linux/openvswitch.h b/include/uapi/linux/openvswitch.h
+index 0358f94af86e..d6be1fb778a5 100644
+--- a/include/uapi/linux/openvswitch.h
++++ b/include/uapi/linux/openvswitch.h
+@@ -519,6 +519,7 @@ enum ovs_flow_attr {
+ 				  * logging should be suppressed. */
+ 	OVS_FLOW_ATTR_UFID,      /* Variable length unique flow identifier. */
+ 	OVS_FLOW_ATTR_UFID_FLAGS,/* u32 of OVS_UFID_F_*. */
++	OVS_FLOW_ATTR_PAD,
+ 	__OVS_FLOW_ATTR_MAX
  };
-diff --git a/net/ipv6/ila/ila_lwt.c b/net/ipv6/ila/ila_lwt.c
-index 2ae3c4fd8aab..9db3621b2126 100644
---- a/net/ipv6/ila/ila_lwt.c
-+++ b/net/ipv6/ila/ila_lwt.c
-@@ -109,7 +109,8 @@ static int ila_fill_encap_info(struct sk_buff *skb,
- {
- 	struct ila_params *p = ila_params_lwtunnel(lwtstate);
  
--	if (nla_put_u64(skb, ILA_ATTR_LOCATOR, (__force u64)p->locator))
-+	if (nla_put_u64_64bit(skb, ILA_ATTR_LOCATOR, (__force u64)p->locator,
-+			      ILA_ATTR_PAD))
- 		goto nla_put_failure;
+diff --git a/net/openvswitch/datapath.c b/net/openvswitch/datapath.c
+index 0cc66a4e492d..22d9a5316304 100644
+--- a/net/openvswitch/datapath.c
++++ b/net/openvswitch/datapath.c
+@@ -754,7 +754,8 @@ static int ovs_flow_cmd_fill_stats(const struct sw_flow *flow,
+ 	ovs_flow_stats_get(flow, &stats, &used, &tcp_flags);
  
- 	return 0;
-diff --git a/net/ipv6/ila/ila_xlat.c b/net/ipv6/ila/ila_xlat.c
-index 0b03533453e4..0e9e579410da 100644
---- a/net/ipv6/ila/ila_xlat.c
-+++ b/net/ipv6/ila/ila_xlat.c
-@@ -418,12 +418,15 @@ static int ila_nl_cmd_del_mapping(struct sk_buff *skb, struct genl_info *info)
+ 	if (used &&
+-	    nla_put_u64(skb, OVS_FLOW_ATTR_USED, ovs_flow_used_time(used)))
++	    nla_put_u64_64bit(skb, OVS_FLOW_ATTR_USED, ovs_flow_used_time(used),
++			      OVS_FLOW_ATTR_PAD))
+ 		return -EMSGSIZE;
  
- static int ila_fill_info(struct ila_map *ila, struct sk_buff *msg)
- {
--	if (nla_put_u64(msg, ILA_ATTR_IDENTIFIER,
--			(__force u64)ila->p.identifier) ||
--	    nla_put_u64(msg, ILA_ATTR_LOCATOR,
--			(__force u64)ila->p.ip.locator) ||
--	    nla_put_u64(msg, ILA_ATTR_LOCATOR_MATCH,
--			(__force u64)ila->p.ip.locator_match) ||
-+	if (nla_put_u64_64bit(msg, ILA_ATTR_IDENTIFIER,
-+			      (__force u64)ila->p.identifier,
-+			      ILA_ATTR_PAD) ||
-+	    nla_put_u64_64bit(msg, ILA_ATTR_LOCATOR,
-+			      (__force u64)ila->p.ip.locator,
-+			      ILA_ATTR_PAD) ||
-+	    nla_put_u64_64bit(msg, ILA_ATTR_LOCATOR_MATCH,
-+			      (__force u64)ila->p.ip.locator_match,
-+			      ILA_ATTR_PAD) ||
- 	    nla_put_s32(msg, ILA_ATTR_IFINDEX, ila->p.ifindex) ||
- 	    nla_put_u32(msg, ILA_ATTR_DIR, ila->p.dir))
- 		return -1;
+ 	if (stats.n_packets &&
 -- 
 2.8.1
 
