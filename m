@@ -1,12 +1,12 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from host.76.145.23.62.rev.coltfrance.com ([62.23.145.76]:54413 "EHLO
+Received: from host.76.145.23.62.rev.coltfrance.com ([62.23.145.76]:54423 "EHLO
 	proxy.6wind.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753796AbcDYIZp (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Mon, 25 Apr 2016 04:25:45 -0400
+	with ESMTP id S1753860AbcDYIZq (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Mon, 25 Apr 2016 04:25:46 -0400
 From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Subject: [PATCH net-next 1/9] rtnl: use nla_put_u64_64bit()
-Date: Mon, 25 Apr 2016 10:25:14 +0200
-Message-Id: <1461572722-6029-2-git-send-email-nicolas.dichtel@6wind.com>
+Subject: [PATCH net-next 2/9] sched: use nla_put_u64_64bit()
+Date: Mon, 25 Apr 2016 10:25:15 +0200
+Message-Id: <1461572722-6029-3-git-send-email-nicolas.dichtel@6wind.com>
 In-Reply-To: <1461572722-6029-1-git-send-email-nicolas.dichtel@6wind.com>
 References: <1461572722-6029-1-git-send-email-nicolas.dichtel@6wind.com>
 Sender: linux-wpan-owner@vger.kernel.org
@@ -16,81 +16,93 @@ Cc: davem@davemloft.net, jhs@mojatatu.com, stephen@networkplumber.org, pshelar@n
 
 Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
 ---
- include/uapi/linux/if_link.h |  1 +
- net/core/rtnetlink.c         | 36 ++++++++++++++++++------------------
- 2 files changed, 19 insertions(+), 18 deletions(-)
+ include/uapi/linux/pkt_sched.h | 3 +++
+ net/sched/sch_htb.c            | 6 ++++--
+ net/sched/sch_netem.c          | 3 ++-
+ net/sched/sch_tbf.c            | 6 ++++--
+ 4 files changed, 13 insertions(+), 5 deletions(-)
 
-diff --git a/include/uapi/linux/if_link.h b/include/uapi/linux/if_link.h
-index ba69d4447249..5fdd3a42e377 100644
---- a/include/uapi/linux/if_link.h
-+++ b/include/uapi/linux/if_link.h
-@@ -666,6 +666,7 @@ enum {
- 	IFLA_VF_STATS_TX_BYTES,
- 	IFLA_VF_STATS_BROADCAST,
- 	IFLA_VF_STATS_MULTICAST,
-+	IFLA_VF_STATS_PAD,
- 	__IFLA_VF_STATS_MAX,
+diff --git a/include/uapi/linux/pkt_sched.h b/include/uapi/linux/pkt_sched.h
+index 8cb18b44968e..1c78c7454c7c 100644
+--- a/include/uapi/linux/pkt_sched.h
++++ b/include/uapi/linux/pkt_sched.h
+@@ -179,6 +179,7 @@ enum {
+ 	TCA_TBF_PRATE64,
+ 	TCA_TBF_BURST,
+ 	TCA_TBF_PBURST,
++	TCA_TBF_PAD,
+ 	__TCA_TBF_MAX,
  };
  
-diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
-index 5ec059d52823..9efc1f34ef3b 100644
---- a/net/core/rtnetlink.c
-+++ b/net/core/rtnetlink.c
-@@ -825,17 +825,17 @@ static inline int rtnl_vfinfo_size(const struct net_device *dev,
- 			 nla_total_size(sizeof(struct ifla_vf_link_state)) +
- 			 nla_total_size(sizeof(struct ifla_vf_rss_query_en)) +
- 			 /* IFLA_VF_STATS_RX_PACKETS */
--			 nla_total_size(sizeof(__u64)) +
-+			 nla_total_size_64bit(sizeof(__u64)) +
- 			 /* IFLA_VF_STATS_TX_PACKETS */
--			 nla_total_size(sizeof(__u64)) +
-+			 nla_total_size_64bit(sizeof(__u64)) +
- 			 /* IFLA_VF_STATS_RX_BYTES */
--			 nla_total_size(sizeof(__u64)) +
-+			 nla_total_size_64bit(sizeof(__u64)) +
- 			 /* IFLA_VF_STATS_TX_BYTES */
--			 nla_total_size(sizeof(__u64)) +
-+			 nla_total_size_64bit(sizeof(__u64)) +
- 			 /* IFLA_VF_STATS_BROADCAST */
--			 nla_total_size(sizeof(__u64)) +
-+			 nla_total_size_64bit(sizeof(__u64)) +
- 			 /* IFLA_VF_STATS_MULTICAST */
--			 nla_total_size(sizeof(__u64)) +
-+			 nla_total_size_64bit(sizeof(__u64)) +
- 			 nla_total_size(sizeof(struct ifla_vf_trust)));
- 		return size;
- 	} else
-@@ -1153,18 +1153,18 @@ static noinline_for_stack int rtnl_fill_vfinfo(struct sk_buff *skb,
- 		nla_nest_cancel(skb, vfinfo);
- 		return -EMSGSIZE;
- 	}
--	if (nla_put_u64(skb, IFLA_VF_STATS_RX_PACKETS,
--			vf_stats.rx_packets) ||
--	    nla_put_u64(skb, IFLA_VF_STATS_TX_PACKETS,
--			vf_stats.tx_packets) ||
--	    nla_put_u64(skb, IFLA_VF_STATS_RX_BYTES,
--			vf_stats.rx_bytes) ||
--	    nla_put_u64(skb, IFLA_VF_STATS_TX_BYTES,
--			vf_stats.tx_bytes) ||
--	    nla_put_u64(skb, IFLA_VF_STATS_BROADCAST,
--			vf_stats.broadcast) ||
--	    nla_put_u64(skb, IFLA_VF_STATS_MULTICAST,
--			vf_stats.multicast))
-+	if (nla_put_u64_64bit(skb, IFLA_VF_STATS_RX_PACKETS,
-+			      vf_stats.rx_packets, IFLA_VF_STATS_PAD) ||
-+	    nla_put_u64_64bit(skb, IFLA_VF_STATS_TX_PACKETS,
-+			      vf_stats.tx_packets, IFLA_VF_STATS_PAD) ||
-+	    nla_put_u64_64bit(skb, IFLA_VF_STATS_RX_BYTES,
-+			      vf_stats.rx_bytes, IFLA_VF_STATS_PAD) ||
-+	    nla_put_u64_64bit(skb, IFLA_VF_STATS_TX_BYTES,
-+			      vf_stats.tx_bytes, IFLA_VF_STATS_PAD) ||
-+	    nla_put_u64_64bit(skb, IFLA_VF_STATS_BROADCAST,
-+			      vf_stats.broadcast, IFLA_VF_STATS_PAD) ||
-+	    nla_put_u64_64bit(skb, IFLA_VF_STATS_MULTICAST,
-+			      vf_stats.multicast, IFLA_VF_STATS_PAD))
- 		return -EMSGSIZE;
- 	nla_nest_end(skb, vfstats);
- 	nla_nest_end(skb, vf);
+@@ -368,6 +369,7 @@ enum {
+ 	TCA_HTB_DIRECT_QLEN,
+ 	TCA_HTB_RATE64,
+ 	TCA_HTB_CEIL64,
++	TCA_HTB_PAD,
+ 	__TCA_HTB_MAX,
+ };
+ 
+@@ -531,6 +533,7 @@ enum {
+ 	TCA_NETEM_RATE,
+ 	TCA_NETEM_ECN,
+ 	TCA_NETEM_RATE64,
++	TCA_NETEM_PAD,
+ 	__TCA_NETEM_MAX,
+ };
+ 
+diff --git a/net/sched/sch_htb.c b/net/sched/sch_htb.c
+index 87b02ed3d5f2..f6bf5818ed4d 100644
+--- a/net/sched/sch_htb.c
++++ b/net/sched/sch_htb.c
+@@ -1122,10 +1122,12 @@ static int htb_dump_class(struct Qdisc *sch, unsigned long arg,
+ 	if (nla_put(skb, TCA_HTB_PARMS, sizeof(opt), &opt))
+ 		goto nla_put_failure;
+ 	if ((cl->rate.rate_bytes_ps >= (1ULL << 32)) &&
+-	    nla_put_u64(skb, TCA_HTB_RATE64, cl->rate.rate_bytes_ps))
++	    nla_put_u64_64bit(skb, TCA_HTB_RATE64, cl->rate.rate_bytes_ps,
++			      TCA_HTB_PAD))
+ 		goto nla_put_failure;
+ 	if ((cl->ceil.rate_bytes_ps >= (1ULL << 32)) &&
+-	    nla_put_u64(skb, TCA_HTB_CEIL64, cl->ceil.rate_bytes_ps))
++	    nla_put_u64_64bit(skb, TCA_HTB_CEIL64, cl->ceil.rate_bytes_ps,
++			      TCA_HTB_PAD))
+ 		goto nla_put_failure;
+ 
+ 	return nla_nest_end(skb, nest);
+diff --git a/net/sched/sch_netem.c b/net/sched/sch_netem.c
+index 9640bb39a5d2..491d6fd6430c 100644
+--- a/net/sched/sch_netem.c
++++ b/net/sched/sch_netem.c
+@@ -994,7 +994,8 @@ static int netem_dump(struct Qdisc *sch, struct sk_buff *skb)
+ 		goto nla_put_failure;
+ 
+ 	if (q->rate >= (1ULL << 32)) {
+-		if (nla_put_u64(skb, TCA_NETEM_RATE64, q->rate))
++		if (nla_put_u64_64bit(skb, TCA_NETEM_RATE64, q->rate,
++				      TCA_NETEM_PAD))
+ 			goto nla_put_failure;
+ 		rate.rate = ~0U;
+ 	} else {
+diff --git a/net/sched/sch_tbf.c b/net/sched/sch_tbf.c
+index c2fbde742f37..83b90b584fae 100644
+--- a/net/sched/sch_tbf.c
++++ b/net/sched/sch_tbf.c
+@@ -472,11 +472,13 @@ static int tbf_dump(struct Qdisc *sch, struct sk_buff *skb)
+ 	if (nla_put(skb, TCA_TBF_PARMS, sizeof(opt), &opt))
+ 		goto nla_put_failure;
+ 	if (q->rate.rate_bytes_ps >= (1ULL << 32) &&
+-	    nla_put_u64(skb, TCA_TBF_RATE64, q->rate.rate_bytes_ps))
++	    nla_put_u64_64bit(skb, TCA_TBF_RATE64, q->rate.rate_bytes_ps,
++			      TCA_TBF_PAD))
+ 		goto nla_put_failure;
+ 	if (tbf_peak_present(q) &&
+ 	    q->peak.rate_bytes_ps >= (1ULL << 32) &&
+-	    nla_put_u64(skb, TCA_TBF_PRATE64, q->peak.rate_bytes_ps))
++	    nla_put_u64_64bit(skb, TCA_TBF_PRATE64, q->peak.rate_bytes_ps,
++			      TCA_TBF_PAD))
+ 		goto nla_put_failure;
+ 
+ 	return nla_nest_end(skb, nest);
 -- 
 2.8.1
 
