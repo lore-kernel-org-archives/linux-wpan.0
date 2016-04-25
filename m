@@ -1,49 +1,96 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from host.76.145.23.62.rev.coltfrance.com ([62.23.145.76]:54398 "EHLO
+Received: from host.76.145.23.62.rev.coltfrance.com ([62.23.145.76]:54413 "EHLO
 	proxy.6wind.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753663AbcDYIZo (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Mon, 25 Apr 2016 04:25:44 -0400
+	with ESMTP id S1753796AbcDYIZp (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Mon, 25 Apr 2016 04:25:45 -0400
 From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Subject: [PATCH net-next 0/9] netlink: align attributes when needed (patchset #2)
-Date: Mon, 25 Apr 2016 10:25:13 +0200
-Message-Id: <1461572722-6029-1-git-send-email-nicolas.dichtel@6wind.com>
+Subject: [PATCH net-next 1/9] rtnl: use nla_put_u64_64bit()
+Date: Mon, 25 Apr 2016 10:25:14 +0200
+Message-Id: <1461572722-6029-2-git-send-email-nicolas.dichtel@6wind.com>
+In-Reply-To: <1461572722-6029-1-git-send-email-nicolas.dichtel@6wind.com>
+References: <1461572722-6029-1-git-send-email-nicolas.dichtel@6wind.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: netdev@vger.kernel.org
-Cc: davem@davemloft.net, jhs@mojatatu.com, stephen@networkplumber.org, pshelar@nicira.com, aar@pengutronix.de, linux-wpan@vger.kernel.org, wensong@linux-vs.org, horms@verge.net.au, ja@ssi.bg, pablo@netfilter.org, kaber@trash.net, kadlec@blackhole.kfki.hu, lvs-devel@vger.kernel.org, netfilter-devel@vger.kernel.org, johannes@sipsolutions.net, linux-wireless@vger.kernel.org
+Cc: davem@davemloft.net, jhs@mojatatu.com, stephen@networkplumber.org, pshelar@nicira.com, aar@pengutronix.de, linux-wpan@vger.kernel.org, wensong@linux-vs.org, horms@verge.net.au, ja@ssi.bg, pablo@netfilter.org, kaber@trash.net, kadlec@blackhole.kfki.hu, lvs-devel@vger.kernel.org, netfilter-devel@vger.kernel.org, johannes@sipsolutions.net, linux-wireless@vger.kernel.org, Nicolas Dichtel <nicolas.dichtel@6wind.com>
 
+Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+---
+ include/uapi/linux/if_link.h |  1 +
+ net/core/rtnetlink.c         | 36 ++++++++++++++++++------------------
+ 2 files changed, 19 insertions(+), 18 deletions(-)
 
-This is the continuation (series #2) of the work done to align netlink
-attributes when these attributes contain some 64-bit fields.
+diff --git a/include/uapi/linux/if_link.h b/include/uapi/linux/if_link.h
+index ba69d4447249..5fdd3a42e377 100644
+--- a/include/uapi/linux/if_link.h
++++ b/include/uapi/linux/if_link.h
+@@ -666,6 +666,7 @@ enum {
+ 	IFLA_VF_STATS_TX_BYTES,
+ 	IFLA_VF_STATS_BROADCAST,
+ 	IFLA_VF_STATS_MULTICAST,
++	IFLA_VF_STATS_PAD,
+ 	__IFLA_VF_STATS_MAX,
+ };
+ 
+diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
+index 5ec059d52823..9efc1f34ef3b 100644
+--- a/net/core/rtnetlink.c
++++ b/net/core/rtnetlink.c
+@@ -825,17 +825,17 @@ static inline int rtnl_vfinfo_size(const struct net_device *dev,
+ 			 nla_total_size(sizeof(struct ifla_vf_link_state)) +
+ 			 nla_total_size(sizeof(struct ifla_vf_rss_query_en)) +
+ 			 /* IFLA_VF_STATS_RX_PACKETS */
+-			 nla_total_size(sizeof(__u64)) +
++			 nla_total_size_64bit(sizeof(__u64)) +
+ 			 /* IFLA_VF_STATS_TX_PACKETS */
+-			 nla_total_size(sizeof(__u64)) +
++			 nla_total_size_64bit(sizeof(__u64)) +
+ 			 /* IFLA_VF_STATS_RX_BYTES */
+-			 nla_total_size(sizeof(__u64)) +
++			 nla_total_size_64bit(sizeof(__u64)) +
+ 			 /* IFLA_VF_STATS_TX_BYTES */
+-			 nla_total_size(sizeof(__u64)) +
++			 nla_total_size_64bit(sizeof(__u64)) +
+ 			 /* IFLA_VF_STATS_BROADCAST */
+-			 nla_total_size(sizeof(__u64)) +
++			 nla_total_size_64bit(sizeof(__u64)) +
+ 			 /* IFLA_VF_STATS_MULTICAST */
+-			 nla_total_size(sizeof(__u64)) +
++			 nla_total_size_64bit(sizeof(__u64)) +
+ 			 nla_total_size(sizeof(struct ifla_vf_trust)));
+ 		return size;
+ 	} else
+@@ -1153,18 +1153,18 @@ static noinline_for_stack int rtnl_fill_vfinfo(struct sk_buff *skb,
+ 		nla_nest_cancel(skb, vfinfo);
+ 		return -EMSGSIZE;
+ 	}
+-	if (nla_put_u64(skb, IFLA_VF_STATS_RX_PACKETS,
+-			vf_stats.rx_packets) ||
+-	    nla_put_u64(skb, IFLA_VF_STATS_TX_PACKETS,
+-			vf_stats.tx_packets) ||
+-	    nla_put_u64(skb, IFLA_VF_STATS_RX_BYTES,
+-			vf_stats.rx_bytes) ||
+-	    nla_put_u64(skb, IFLA_VF_STATS_TX_BYTES,
+-			vf_stats.tx_bytes) ||
+-	    nla_put_u64(skb, IFLA_VF_STATS_BROADCAST,
+-			vf_stats.broadcast) ||
+-	    nla_put_u64(skb, IFLA_VF_STATS_MULTICAST,
+-			vf_stats.multicast))
++	if (nla_put_u64_64bit(skb, IFLA_VF_STATS_RX_PACKETS,
++			      vf_stats.rx_packets, IFLA_VF_STATS_PAD) ||
++	    nla_put_u64_64bit(skb, IFLA_VF_STATS_TX_PACKETS,
++			      vf_stats.tx_packets, IFLA_VF_STATS_PAD) ||
++	    nla_put_u64_64bit(skb, IFLA_VF_STATS_RX_BYTES,
++			      vf_stats.rx_bytes, IFLA_VF_STATS_PAD) ||
++	    nla_put_u64_64bit(skb, IFLA_VF_STATS_TX_BYTES,
++			      vf_stats.tx_bytes, IFLA_VF_STATS_PAD) ||
++	    nla_put_u64_64bit(skb, IFLA_VF_STATS_BROADCAST,
++			      vf_stats.broadcast, IFLA_VF_STATS_PAD) ||
++	    nla_put_u64_64bit(skb, IFLA_VF_STATS_MULTICAST,
++			      vf_stats.multicast, IFLA_VF_STATS_PAD))
+ 		return -EMSGSIZE;
+ 	nla_nest_end(skb, vfstats);
+ 	nla_nest_end(skb, vf);
+-- 
+2.8.1
 
-In patch #3, I didn't modify the function ila_encap_nlsize(). I was waiting
-feedback for this patch: http://patchwork.ozlabs.org/patch/613766/
-If it's approved, there will be an update to switch nla_total_size() to
-nla_total_size_64bit() after the merge of net in net-next.
-
- include/linux/nl802154.h         |  2 +
- include/uapi/linux/if_link.h     |  3 ++
- include/uapi/linux/ila.h         |  1 +
- include/uapi/linux/ip_vs.h       |  1 +
- include/uapi/linux/l2tp.h        |  1 +
- include/uapi/linux/nl80211.h     |  4 ++
- include/uapi/linux/openvswitch.h |  1 +
- include/uapi/linux/pkt_sched.h   |  3 ++
- net/bridge/br_netlink.c          | 62 +++++++++++++++------------
- net/core/rtnetlink.c             | 36 ++++++++--------
- net/ieee802154/nl-mac.c          | 17 +++++---
- net/ieee802154/nl802154.c        |  3 +-
- net/ipv6/ila/ila_lwt.c           |  3 +-
- net/ipv6/ila/ila_xlat.c          | 15 ++++---
- net/l2tp/l2tp_netlink.c          | 80 +++++++++++++++++++++--------------
- net/netfilter/ipvs/ip_vs_ctl.c   | 36 ++++++++++------
- net/openvswitch/datapath.c       |  3 +-
- net/sched/sch_htb.c              |  6 ++-
- net/sched/sch_netem.c            |  3 +-
- net/sched/sch_tbf.c              |  6 ++-
- net/wireless/nl80211.c           | 91 ++++++++++++++++++++++++----------------
- 21 files changed, 233 insertions(+), 144 deletions(-)
-
-Comments are welcomed,
-Regards,
-Nicolas
