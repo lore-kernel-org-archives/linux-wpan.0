@@ -1,36 +1,51 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-pf0-f174.google.com ([209.85.192.174]:33591 "EHLO
-	mail-pf0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752708AbcD0BPD (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Tue, 26 Apr 2016 21:15:03 -0400
+Received: from mail-wm0-f44.google.com ([74.125.82.44]:38466 "EHLO
+	mail-wm0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753203AbcD0H30 (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Wed, 27 Apr 2016 03:29:26 -0400
+Received: by mail-wm0-f44.google.com with SMTP id u206so35704581wme.1
+        for <linux-wpan@vger.kernel.org>; Wed, 27 Apr 2016 00:29:25 -0700 (PDT)
+Reply-To: nicolas.dichtel@6wind.com
 Subject: Re: [PATCH net-next 9/9] taskstats: use the libnl API to align nlattr
  on 64-bit
 References: <1461339084-3849-1-git-send-email-nicolas.dichtel@6wind.com>
  <1461339084-3849-10-git-send-email-nicolas.dichtel@6wind.com>
-From: Balbir Singh <bsingharora@gmail.com>
-Message-ID: <57201287.80002@gmail.com>
-Date: Wed, 27 Apr 2016 11:14:47 +1000
+ <57201287.80002@gmail.com>
+From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Message-ID: <57206A47.2010906@6wind.com>
+Date: Wed, 27 Apr 2016 09:29:11 +0200
 MIME-Version: 1.0
-In-Reply-To: <1461339084-3849-10-git-send-email-nicolas.dichtel@6wind.com>
+In-Reply-To: <57201287.80002@gmail.com>
 Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Nicolas Dichtel <nicolas.dichtel@6wind.com>, netdev@vger.kernel.org
+To: Balbir Singh <bsingharora@gmail.com>, netdev@vger.kernel.org
 Cc: davem@davemloft.net, linux-kernel@vger.kernel.org, linux-wpan@vger.kernel.org, aar@pengutronix.de, pablo@netfilter.org, kaber@trash.net, kadlec@blackhole.kfki.hu, pshelar@nicira.com, kuznet@ms2.inr.ac.ru, jmorris@namei.org, yoshfuji@linux-ipv6.org, netfilter-devel@vger.kernel.org, dev@openvswitch.org, steffen.klassert@secunet.com, herbert@gondor.apana.org.au
 
-
-
-On 23/04/16 01:31, Nicolas Dichtel wrote:
-> Goal of this patch is to use the new libnl API to align netlink attribute
-> when needed.
-> The layout of the netlink message will be a bit different after the patch,
-> because the padattr (TASKSTATS_TYPE_STATS) will be inside the nested
-> attribute instead of before it.
+Le 27/04/2016 03:14, Balbir Singh a écrit :
 > 
-> Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+> 
+> On 23/04/16 01:31, Nicolas Dichtel wrote:
+>> Goal of this patch is to use the new libnl API to align netlink attribute
+>> when needed.
+>> The layout of the netlink message will be a bit different after the patch,
+>> because the padattr (TASKSTATS_TYPE_STATS) will be inside the nested
+>> attribute instead of before it.
+>>
+>> Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+> 
+> The layout will change/break user space -- I've not tested the patch though..
+Sigh.
 
-The layout will change/break user space -- I've not tested the patch though..
+I quote David:
+"All userspace components using netlink should always ignore attributes
+they do not recognize in dumps.
 
-Balbir Singh.
- 
+This is one of the most basic principles of netlink"
+
+Do you have some pointers so I can made some tests?
+
+
+Regards,
+Nicolas
