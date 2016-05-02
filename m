@@ -1,149 +1,106 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from zproxy220.enst-bretagne.fr ([192.108.117.9]:60232 "EHLO
-	zproxy220.enst-bretagne.fr" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751897AbcEMJ5R convert rfc822-to-8bit
-	(ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-	Fri, 13 May 2016 05:57:17 -0400
-Date: Fri, 13 May 2016 11:57:12 +0200 (CEST)
-From: Cyrille PIATTE <cyrille.piatte@telecom-bretagne.eu>
-Message-ID: <218172779.3073409.1463133432930.JavaMail.zimbra@telecom-bretagne.eu>
-In-Reply-To: <D674B1D3-92C5-4AB7-97AE-7151FE175A9B@mlng.net>
-References: <1284257734.3031397.1463123649791.JavaMail.zimbra@telecom-bretagne.eu> <D674B1D3-92C5-4AB7-97AE-7151FE175A9B@mlng.net>
-Subject: Re: issue with the mrf24j40 driver
+Received: from out5-smtp.messagingengine.com ([66.111.4.29]:43083 "EHLO
+	out5-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1755074AbcEBS7S (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Mon, 2 May 2016 14:59:18 -0400
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+	by mailout.nyi.internal (Postfix) with ESMTP id C411820CF5
+	for <linux-wpan@vger.kernel.org>; Mon,  2 May 2016 14:59:17 -0400 (EDT)
+Subject: Re: [PATCHv2 bluetooth-next 01/10] 6lowpan: add private neighbour
+ data
+References: <1461140382-4784-1-git-send-email-aar@pengutronix.de>
+ <1461140382-4784-2-git-send-email-aar@pengutronix.de>
+From: Hannes Frederic Sowa <hannes@stressinduktion.org>
+Message-ID: <c7717a50-7818-f409-1fb4-35e1ec5ebde0@stressinduktion.org>
+Date: Mon, 2 May 2016 20:59:13 +0200
 MIME-Version: 1.0
+In-Reply-To: <1461140382-4784-2-git-send-email-aar@pengutronix.de>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: smlng <s@mlng.net>
-Cc: linux-wpan@vger.kernel.org, alan@signal11.us
+To: Alexander Aring <aar@pengutronix.de>, linux-wpan@vger.kernel.org
+Cc: kernel@pengutronix.de, marcel@holtmann.org, jukka.rissanen@linux.intel.com, stefan@osg.samsung.com, mcr@sandelman.ca, werner@almesberger.net, linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>
 
-Thanks a lot.
-It works. I use exactly what you said.
+Hello,
 
-Best regards,
+On 20.04.2016 10:19, Alexander Aring wrote:
+> This patch will introduce a 6lowpan neighbour private data. Like the
+> interface private data we handle private data for generic 6lowpan and
+> for link-layer specific 6lowpan.
+> 
+> The current first use case if to save the short address for a 802.15.4
+> 6lowpan neighbour.
+> 
+> Cc: David S. Miller <davem@davemloft.net>
+> Signed-off-by: Alexander Aring <aar@pengutronix.de>
+> ---
+>  include/linux/netdevice.h     |  3 +--
+>  include/net/6lowpan.h         | 24 ++++++++++++++++++++++++
+>  net/bluetooth/6lowpan.c       |  2 ++
+>  net/ieee802154/6lowpan/core.c | 12 ++++++++++++
+>  4 files changed, 39 insertions(+), 2 deletions(-)
+> 
+> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+> index 166402a..0052c42 100644
+> --- a/include/linux/netdevice.h
+> +++ b/include/linux/netdevice.h
+> @@ -1487,8 +1487,7 @@ enum netdev_priv_flags {
+>   * 	@perm_addr:		Permanent hw address
+>   * 	@addr_assign_type:	Hw address assignment type
+>   * 	@addr_len:		Hardware address length
+> - * 	@neigh_priv_len;	Used in neigh_alloc(),
+> - * 				initialized only in atm/clip.c
+> + *	@neigh_priv_len;	Used in neigh_alloc()
+>   * 	@dev_id:		Used to differentiate devices that share
+>   * 				the same link layer address
+>   * 	@dev_port:		Used to differentiate devices that share
+> diff --git a/include/net/6lowpan.h b/include/net/6lowpan.h
+> index da84cf9..61c6517 100644
+> --- a/include/net/6lowpan.h
+> +++ b/include/net/6lowpan.h
+> @@ -98,6 +98,9 @@ static inline bool lowpan_is_iphc(u8 dispatch)
+>  #define LOWPAN_PRIV_SIZE(llpriv_size)	\
+>  	(sizeof(struct lowpan_dev) + llpriv_size)
+>  
+> +#define LOWPAN_NEIGH_PRIV_SIZE(llneigh_priv_size)	\
+> +	(sizeof(struct lowpan_neigh) + llneigh_priv_size)
+> +
+>  enum lowpan_lltypes {
+>  	LOWPAN_LLTYPE_BTLE,
+>  	LOWPAN_LLTYPE_IEEE802154,
+> @@ -141,6 +144,27 @@ struct lowpan_dev {
+>  	u8 priv[0] __aligned(sizeof(void *));
+>  };
+>  
+> +struct lowpan_neigh {
+> +	/* 6LoWPAN neigh private data */
+> +	/* must be last */
+> +	u8 priv[0] __aligned(sizeof(void *));
 
-Cyrille Piatte
+Are you sure this declaration is correct? You take its size above, which
+should result in zero. Looks a little bit strange. :)
 
------ Mail original -----
-De: "smlng" <s@mlng.net>
-À: "Cyrille PIATTE" <cyrille.piatte@telecom-bretagne.eu>
-Cc: linux-wpan@vger.kernel.org, alan@signal11.us
-Envoyé: Vendredi 13 Mai 2016 10:15:34
-Objet: Re: issue with the mrf24j40 driver
+> +};
+> +
+> +struct lowpan_802154_neigh {
+> +	__le16 short_addr;
+> +};
+> +
+> +static inline struct lowpan_neigh *lowpan_neigh(void *neigh_priv)
+> +{
+> +	return neigh_priv;
+> +}
+> +
+> +static inline
+> +struct lowpan_802154_neigh *lowpan_802154_neigh(void *neigh_priv)
+> +{
+> +	return (struct lowpan_802154_neigh *)lowpan_neigh(neigh_priv)->priv;
+> +}
 
-Hi Cyrille,
+Can't you remove lowpan_neigh completely and just use 802154_neigh at
+this point?
 
-I have to look a up the details, but I had this module running with a Pi B+. But first I ran into (kind of) similar problems. You may have a look a at my DTS overlay here [1], for comparison; the pinout I used was as follows:
-
-> MRF24J40                       RASPBERRY PI 2, PIN
-> 
-> INT                            P16, BCM 23
-> RST                            P1, 3.3V
-> CS                             P24 (CE0), BCM 8
-> SCK                            P23 SCLK, BCM 11
-> SDO                            P21, MISO, BCM 9
-> SDI                            P19, MOSI, BCM 10
-> 3.3V                           P17, 3.3V
-> GND                            P20, GND
-
-One problem I encountered, was that the MRF is expecting some input voltage (HIGH) on its reset pin, thus I connected it to P1, VCC 3.3 as a workaround. Btw. I used Raspbian with 4.1.19 Linux-Kernel, with the overlay linked in [1].
-
-Hope this helps, best
-
-Sebastian
-
-[1]: https://github.com/RIOT-Makers/wpan-raspbian/wiki/Create-a-generic-Raspbian-image-with-6LoWPAN-support#31-transceiver-specific-device-tree-overlays
-
-> Am 13.05.2016 um 09:14 schrieb Cyrille PIATTE <cyrille.piatte@telecom-bretagne.eu>:
-> 
-> Hello,
-> 
-> I encounter some issues with the mrf24j40 module. I am currently trying to sniff 802.15.4 packets.
-> 
-> I have a mrf24j40ma ( http://www.microchip.com/wwwproducts/en/MRF24J40 ) module which is wired to a raspberry pi 2 (raspbian-jessie with linux kernel 4.1.19)
-> I wired the module as follow :
-> 
-> http://pinout.xyz/pinout/pin1_3v3_power
-> 
-> MRF24J40                       RASPBERRY PI 2
-> 
-> INT                            BCM 22
-> RST                            BCM 25
-> CS                             BCM 8 (CE0)
-> SCK                            BCM 11 (SCLK)
-> SDO                            BCM 9 (MISO)
-> SDI                            BCM 10 (MOSI)
-> 3.3V                           3.3 power (physical 1)
-> GND                            ground (physical 6)
-> 
-> I have modified the /boot/config.txt in which I have appended 'dtoverlay=mrf24j40'. I also have uncommented the line 'dtparam=spi=on'.
-> Here is my code for the overlay :
-> 
-> //-----------------------------------------------------------------------------------------------------------------------------------------------------
-> 
-> /dts-v1/;  /*required header*/
-> /plugin/;  /*signal to the compiler that it needs to generate linkage information (allows unresolved symbols to be patched later)*/
-> 
-> /*node root*/
-> / {
-> 
->    /*list the compatible device drivers and load the first one*/
->        compatible ="bcrm, bcm2835", "bcrm, bcm2836", "bcrm, bcm2708", "bcrm, bcm2709";
-> 
->    /*
->      a fragment apply modifications to a node (defined in the compatible file.dtX loaded)
->      it is composed by a target (the node to modify) and an overlay (the modifications)
->    */
-> 
->        /*modification of the SPI part*/
->        fragment@0 {
->                target = <&spi0>; /* the mrf24j40 module is linked with the spi0 (defined in bcm2XXX.dtX) branch (white wire) */
->                __overlay__ {
->                        #address-cells = <1>;
->                        #size-cells = <0>;
->                        status = "okay";
-> 
->                        mrf24j40@0 {
->                                compatible = "mrf24j40";    /*load the driver*/
->                                reg = <0>;   /*because it is the spi0 ce0 which is linked with the CS (otherwise spi0 ce1 <-> CS and reg = <1>)*/
->                                interrupts = <22 0x1>;
->                                interrupt-parent = <&gpio>;
->                                spi-max-frequency = <5000000>; /*or 1000000*/
->                        };
-> 
->                        spidev@0 {
->                                status = "disabled";
->                        };
-> 
->                        spidev@1 {
->                                status = "disabled";
->                        };
->                };
->        };
-> };
-> 
-> //-----------------------------------------------------------------------------------------------------------------------------------------------------
-> 
-> 
-> When I boot the raspberry pi 2, the modules spi_bcm2835 and mrf24j40 are loaded which is okay (from the overlay). Moreover, both the physical (phy0 with 'iz listphy') and dev (wpan0 with 'iz list') interfaces are present. So I can set up my 802.15.4 network. I use lowpan-tools with 'iz set' to give an address, a pan_id and and a channel to the wpan0 interface. Then I put the interface up ('ifconfig wpan0 up').
-> 
-> I launch wireshark and a device that send 802.15.4 frames (that are detected by other devices with similar configuration in term of address, pan_id and channel, so the issue does not seem to come from here). Wireshark do not display any frame.
-> 
-> Do you have any clues about what may be wrong ?
-> 
-> I thank you in advance for your support.
-> 
-> Best regards,
-> 
-> Cyrille Piatte
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-wpan" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
- Sebastian
-
-[mail]: s@mlng.net
-[code]: https://github.com/smlng
+Bye,
+Hannes
 
