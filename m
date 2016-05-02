@@ -1,237 +1,64 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:48876 "EHLO
-	metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1757979AbcEFKTk (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Fri, 6 May 2016 06:19:40 -0400
-Subject: Re: [PATCHv2 bluetooth-next 07/10] ipv6: introduce neighbour
- discovery ops
+Received: from out5-smtp.messagingengine.com ([66.111.4.29]:48326 "EHLO
+	out5-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1755093AbcEBTjO (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Mon, 2 May 2016 15:39:14 -0400
+Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
+	by mailout.nyi.internal (Postfix) with ESMTP id 61F1920CB0
+	for <linux-wpan@vger.kernel.org>; Mon,  2 May 2016 15:39:13 -0400 (EDT)
+Subject: Re: [PATCHv2 bluetooth-next 08/10] ipv6: export ndisc functions
 References: <1461140382-4784-1-git-send-email-aar@pengutronix.de>
- <1461140382-4784-8-git-send-email-aar@pengutronix.de>
- <5729E9AB.5000301@osg.samsung.com>
- <741404ec-e23e-30a9-c954-83b26ea71d7e@pengutronix.de>
-From: Alexander Aring <aar@pengutronix.de>
-Message-ID: <445d938f-db08-8490-2929-ba94a70c9b82@pengutronix.de>
-Date: Fri, 6 May 2016 12:19:14 +0200
+ <1461140382-4784-9-git-send-email-aar@pengutronix.de>
+From: Hannes Frederic Sowa <hannes@stressinduktion.org>
+Message-ID: <f5d5970d-afed-8a2f-9292-9ccb77f0e0db@stressinduktion.org>
+Date: Mon, 2 May 2016 21:39:08 +0200
 MIME-Version: 1.0
-In-Reply-To: <741404ec-e23e-30a9-c954-83b26ea71d7e@pengutronix.de>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <1461140382-4784-9-git-send-email-aar@pengutronix.de>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Stefan Schmidt <stefan@osg.samsung.com>, linux-wpan@vger.kernel.org
-Cc: kernel@pengutronix.de, marcel@holtmann.org, jukka.rissanen@linux.intel.com, hannes@stressinduktion.org, mcr@sandelman.ca, werner@almesberger.net, linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>, Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>, James Morris <jmorris@namei.org>, Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>, Patrick McHardy <kaber@trash.net>
+To: Alexander Aring <aar@pengutronix.de>, linux-wpan@vger.kernel.org
+Cc: kernel@pengutronix.de, marcel@holtmann.org, jukka.rissanen@linux.intel.com, stefan@osg.samsung.com, mcr@sandelman.ca, werner@almesberger.net, linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>, Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>, James Morris <jmorris@namei.org>, Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>, Patrick McHardy <kaber@trash.net>
 
+On 20.04.2016 10:19, Alexander Aring wrote:
+> This patch exports some neighbour discovery functions which can be used
+> by 6lowpan neighbour discovery ops functionality then.
+> 
+> Cc: David S. Miller <davem@davemloft.net>
+> Cc: Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>
+> Cc: James Morris <jmorris@namei.org>
+> Cc: Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>
+> Cc: Patrick McHardy <kaber@trash.net>
+> Signed-off-by: Alexander Aring <aar@pengutronix.de>
+> ---
+>  include/net/ndisc.h | 16 ++++++++++++++++
+>  net/ipv6/addrconf.c |  1 +
+>  net/ipv6/ndisc.c    | 28 ++++++++++------------------
+>  3 files changed, 27 insertions(+), 18 deletions(-)
+> 
+> diff --git a/include/net/ndisc.h b/include/net/ndisc.h
+> index 14ed016..35a4396 100644
+> --- a/include/net/ndisc.h
+> +++ b/include/net/ndisc.h
+> @@ -53,6 +53,15 @@ enum {
+>  
+>  #include <net/neighbour.h>
+>  
+> +/* Set to 3 to get tracing... */
+> +#define ND_DEBUG 1
+> +
+> +#define ND_PRINTK(val, level, fmt, ...)				\
+> +do {								\
+> +	if (val <= ND_DEBUG)					\
+> +		net_##level##_ratelimited(fmt, ##__VA_ARGS__);	\
+> +} while (0)
+> +
 
-Hi,
+If the debug messages are well thought out, I think we could install
+them always on debug level.
 
-On 05/06/2016 11:47 AM, Alexander Aring wrote:
-> 
-> Hi,
-> 
-> On 05/04/2016 02:23 PM, Stefan Schmidt wrote:
->> Hello.
->>
->> On 20/04/16 10:19, Alexander Aring wrote:
->>> This patch introduces neighbour discovery ops callback structure. The
->>> structure contains at first receive and transmit handling for NS/NA and
->>> userspace option field functionality.
->>>
->>> These callback offers 6lowpan different handling, such as 802.15.4 short
->>> address handling or RFC6775 (Neighbor Discovery Optimization for IPv6 over
->>> 6LoWPANs).
->>>
->>> Cc: David S. Miller<davem@davemloft.net>
->>> Cc: Alexey Kuznetsov<kuznet@ms2.inr.ac.ru>
->>> Cc: James Morris<jmorris@namei.org>
->>> Cc: Hideaki YOSHIFUJI<yoshfuji@linux-ipv6.org>
->>> Cc: Patrick McHardy<kaber@trash.net>
->>> Signed-off-by: Alexander Aring<aar@pengutronix.de>
->>> ---
->>>   include/linux/netdevice.h |  3 ++
->>>   include/net/ndisc.h       | 96 +++++++++++++++++++++++++++++++++++++++++++----
->>>   net/ipv6/addrconf.c       |  1 +
->>>   net/ipv6/ndisc.c          | 71 ++++++++++++++++++++++++-----------
->>>   net/ipv6/route.c          |  2 +-
->>>   5 files changed, 144 insertions(+), 29 deletions(-)
->>>
->>> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
->>> index 0052c42..bc60033 100644
->>> --- a/include/linux/netdevice.h
->>> +++ b/include/linux/netdevice.h
->>> @@ -1677,6 +1677,9 @@ struct net_device {
->>>   #ifdef CONFIG_NET_L3_MASTER_DEV
->>>       const struct l3mdev_ops    *l3mdev_ops;
->>>   #endif
->>> +#if IS_ENABLED(CONFIG_IPV6)
->>> +    const struct ndisc_ops *ndisc_ops;
->>> +#endif
->>>         const struct header_ops *header_ops;
->>>   diff --git a/include/net/ndisc.h b/include/net/ndisc.h
->>> index aac868e..14ed016 100644
->>> --- a/include/net/ndisc.h
->>> +++ b/include/net/ndisc.h
->>> @@ -110,7 +110,8 @@ struct ndisc_options {
->>>     #define NDISC_OPT_SPACE(len) (((len)+2+7)&~7)
->>>   -struct ndisc_options *ndisc_parse_options(u8 *opt, int opt_len,
->>> +struct ndisc_options *ndisc_parse_options(const struct net_device *dev,
->>> +                      u8 *opt, int opt_len,
->>>                         struct ndisc_options *ndopts);
->>>     /*
->>> @@ -173,6 +174,93 @@ static inline struct neighbour *__ipv6_neigh_lookup(struct net_device *dev, cons
->>>       return n;
->>>   }
->>>   +static inline int __ip6_ndisc_is_useropt(struct nd_opt_hdr *opt)
->>
->> Name it __ipv6... instead of __ip6...?
-> 
-> I had ipv6 before, but then I saw ip6... prefixes functionality in
-> ndisc.c and changed it to ip6...., but both seems to be used.
-> 
-> See "ip6_nd_hdr".
-> 
->>> +{
->>> +    return opt->nd_opt_type == ND_OPT_RDNSS ||
->>> +        opt->nd_opt_type == ND_OPT_DNSSL;
->>> +}
->>> +
->>> +#if IS_ENABLED(CONFIG_IPV6)
->>> +struct ndisc_ops {
->>> +    int    (*is_useropt)(struct nd_opt_hdr *opt);
->>> +    void    (*send_na)(struct net_device *dev,
->>> +               const struct in6_addr *daddr,
->>> +               const struct in6_addr *solicited_addr,
->>> +               bool router, bool solicited,
->>> +               bool override, bool inc_opt);
->>> +    void    (*recv_na)(struct sk_buff *skb);
->>> +    void    (*send_ns)(struct net_device *dev,
->>> +               const struct in6_addr *solicit,
->>> +               const struct in6_addr *daddr,
->>> +               const struct in6_addr *saddr);
->>> +    void    (*recv_ns)(struct sk_buff *skb);
->>> +};
->>> +
->>> +static inline int ndisc_is_useropt(const struct net_device *dev,
->>> +                   struct nd_opt_hdr *opt)
->>> +{
->>> +    if (likely(dev->ndisc_ops->is_useropt))
->>> +        return dev->ndisc_ops->is_useropt(opt);
->>> +    else
->>> +        return 0;
->>> +}
->>> +
->>> +static inline void ndisc_send_na(struct net_device *dev,
->>> +                 const struct in6_addr *daddr,
->>> +                 const struct in6_addr *solicited_addr,
->>> +                 bool router, bool solicited, bool override,
->>> +                 bool inc_opt)
->>> +{
->>> +    if (likely(dev->ndisc_ops->send_na))
->>> +        dev->ndisc_ops->send_na(dev, daddr, solicited_addr, router,
->>> +                    solicited, override, inc_opt);
->>> +}
->>> +
->>> +static inline void ndisc_recv_na(struct sk_buff *skb)
->>> +{
->>> +    if (likely(skb->dev->ndisc_ops->recv_na))
->>> +        skb->dev->ndisc_ops->recv_na(skb);
->>> +}
->>> +
->>> +static inline void ndisc_send_ns(struct net_device *dev,
->>> +                 const struct in6_addr *solicit,
->>> +                 const struct in6_addr *daddr,
->>> +                 const struct in6_addr *saddr)
->>> +{
->>> +    if (likely(dev->ndisc_ops->send_ns))
->>> +        dev->ndisc_ops->send_ns(dev, solicit, daddr, saddr);
->>> +}
->>> +
->>> +static inline void ndisc_recv_ns(struct sk_buff *skb)
->>> +{
->>> +    if (likely(skb->dev->ndisc_ops->recv_ns))
->>> +        skb->dev->ndisc_ops->recv_ns(skb);
->>> +}
->>> +#else
->>> +static inline int ndisc_is_useropt(const struct net_device *dev,
->>> +                   struct nd_opt_hdr *opt)
->>> +{
->>> +    return 0;
->>> +}
->>> +
->>> +static inline void ndisc_send_na(struct net_device *dev,
->>> +                 const struct in6_addr *daddr,
->>> +                 const struct in6_addr *solicited_addr,
->>> +                 bool router, bool solicited, bool override,
->>> +                 bool inc_opt) { }
->>> +
->>> +static inline void ndisc_recv_na(struct sk_buff *skb) { }
->>> +
->>> +static inline void ndisc_send_ns(struct net_device *dev,
->>> +                 const struct in6_addr *solicit,
->>> +                 const struct in6_addr *daddr,
->>> +                 const struct in6_addr *saddr) { }
->>> +
->>> +static inline void ndisc_recv_ns(struct sk_buff *skb) { }
->>> +#endif
->>> +
->>> +void ip6_register_ndisc_ops(struct net_device *dev);
->>> +
->>>   int ndisc_init(void);
->>>   int ndisc_late_init(void);
->>>   @@ -181,14 +269,8 @@ void ndisc_cleanup(void);
->>>     int ndisc_rcv(struct sk_buff *skb);
->>>   -void ndisc_send_ns(struct net_device *dev, const struct in6_addr *solicit,
->>> -           const struct in6_addr *daddr, const struct in6_addr *saddr);
->>> -
->>>   void ndisc_send_rs(struct net_device *dev,
->>>              const struct in6_addr *saddr, const struct in6_addr *daddr);
->>> -void ndisc_send_na(struct net_device *dev, const struct in6_addr *daddr,
->>> -           const struct in6_addr *solicited_addr,
->>> -           bool router, bool solicited, bool override, bool inc_opt);
->>>     void ndisc_send_redirect(struct sk_buff *skb, const struct in6_addr *target);
->>>   diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
->>> index 54e18c2..a2ef04b 100644
->>> --- a/net/ipv6/addrconf.c
->>> +++ b/net/ipv6/addrconf.c
->>> @@ -3266,6 +3266,7 @@ static int addrconf_notify(struct notifier_block *this, unsigned long event,
->>>               idev = ipv6_add_dev(dev);
->>>               if (IS_ERR(idev))
->>>                   return notifier_from_errno(PTR_ERR(idev));
->>> +            ip6_register_ndisc_ops(dev);
->>>           }
->>>           break;
->>>   diff --git a/net/ipv6/ndisc.c b/net/ipv6/ndisc.c
->>> index 176c7c4..297080a 100644
->>> --- a/net/ipv6/ndisc.c
->>> +++ b/net/ipv6/ndisc.c
->>> @@ -185,24 +185,25 @@ static struct nd_opt_hdr *ndisc_next_option(struct nd_opt_hdr *cur,
->>>       return cur <= end && cur->nd_opt_type == type ? cur : NULL;
->>>   }
->>>   -static inline int ndisc_is_useropt(struct nd_opt_hdr *opt)
->>> +static inline int ip6_ndisc_is_useropt(struct nd_opt_hdr *opt)
->>>   {
->>> -    return opt->nd_opt_type == ND_OPT_RDNSS ||
->>> -        opt->nd_opt_type == ND_OPT_DNSSL;
->>> +    return __ip6_ndisc_is_useropt(opt);
->>
->> Why putting this check into a different function? It looks like a not needed redirection.
-> 
-> because these IPv6 userspace options are valid in 6LoWPAN-ND and IPv6-ND.
-> 
-> In 6LoWPAN we do:
-> 
-> static inline int lowpan_ndisc_is_useropt(struct nd_opt_hdr *opt)
-> {
->         return __ip6_ndisc_is_useropt(opt) || opt->nd_opt_type == ND_OPT_6CO;
-> }
-> 
-> I don't believe that _any_ IPv6 implementation in userspace can do something
-> with 6CO option fields. For this reason ARPHRD_6LOWPAN should make them
-> valid for userspace only. (btw: the radvd maintainer wants to add some
-> patches for 6CO processing support).
-> 
+There are valid users now, so
 
-Okay, I remove the different function and add an EXPORT_SYMBOL. Then the
-6LoWPAN-ND is_useropt callback can also use this function instead using
-the __ip6_ndisc_is_useropt inline function.
+Acked-by: Hannes Frederic Sowa <hannes@stressinduktion.org>
 
-- Alex
