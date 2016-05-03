@@ -1,146 +1,120 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:56917 "EHLO
-	metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1750734AbcEHKko (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Sun, 8 May 2016 06:40:44 -0400
+Received: from lists.s-osg.org ([54.187.51.154]:57919 "EHLO lists.s-osg.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S933568AbcECSRJ (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+	Tue, 3 May 2016 14:17:09 -0400
+From: Stefan Schmidt <stefan@osg.samsung.com>
 Subject: Re: [PATCHv2 bluetooth-next 04/10] ndisc: add addr_len parameter to
  ndisc_opt_addr_space
 References: <1461140382-4784-1-git-send-email-aar@pengutronix.de>
  <1461140382-4784-5-git-send-email-aar@pengutronix.de>
- <109698cb-18ae-abdb-34a5-1db5a2e8dc6b@stressinduktion.org>
- <800c5c08-c2c8-3b44-d457-cdcf6374f280@pengutronix.de>
- <240084aa-2751-6f24-c07b-662b19a74475@stressinduktion.org>
-From: Alexander Aring <aar@pengutronix.de>
-Message-ID: <cdf01ed0-2cc1-667d-40ef-34dcaddce099@pengutronix.de>
-Date: Sun, 8 May 2016 12:39:40 +0200
+Message-ID: <5728EB1F.9000206@osg.samsung.com>
+Date: Tue, 3 May 2016 20:17:03 +0200
 MIME-Version: 1.0
-In-Reply-To: <240084aa-2751-6f24-c07b-662b19a74475@stressinduktion.org>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1461140382-4784-5-git-send-email-aar@pengutronix.de>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Hannes Frederic Sowa <hannes@stressinduktion.org>, linux-wpan@vger.kernel.org
-Cc: kernel@pengutronix.de, marcel@holtmann.org, jukka.rissanen@linux.intel.com, stefan@osg.samsung.com, mcr@sandelman.ca, werner@almesberger.net, linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>, Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>, James Morris <jmorris@namei.org>, Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>, Patrick McHardy <kaber@trash.net>
+To: Alexander Aring <aar@pengutronix.de>, linux-wpan@vger.kernel.org
+Cc: kernel@pengutronix.de, marcel@holtmann.org, jukka.rissanen@linux.intel.com, hannes@stressinduktion.org, mcr@sandelman.ca, werner@almesberger.net, linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>, Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>, James Morris <jmorris@namei.org>, Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>, Patrick McHardy <kaber@trash.net>
 
-Hi,
+Hello.
 
-On 05/07/2016 12:23 AM, Hannes Frederic Sowa wrote:
-> On 04.05.2016 14:30, Alexander Aring wrote:
->> Hi,
->>
->> On 05/02/2016 09:37 PM, Hannes Frederic Sowa wrote:
->>> On 20.04.2016 10:19, Alexander Aring wrote:
->>>> This patch makes the address length as argument for the
->>>> ndisc_opt_addr_space function. This is necessary to handle addresses
->>>> which don't use dev->addr_len as address length.
->>>
->>> Would it make sense for patch 4, 5 and 6 to add the operation to ndisc_ops?
->>>
->>
->> not sure if I understand this question right,
->>
->> We have now the ndisc_ops where we can could change the send/recv of
->> NS/NA, also is_useropt (for add 6CO RA is userspace option field).
->>
->> In case of 802.15.4 we have two MAC addresses with different length:
->>
->>  - extended address - 8 bytes => EUI64
->>  - short address - 2 bytes
->>
->> Now [0] describes how to make the source/target address option for
->> NS/NA/RS/RA/... to deal with both addresses.
->>
->> The short address is a special case in 802.15.4 and not always
->> available. If available we add both addresses as option field in
->> NS/NA (RS/RA will follow in future, but currently NS/NA only).
->>
->> At this point the understanding of [0] differs in 6LoWPAN
->> implementations.
->>
->> Some people handles it like:
->>
->> Handle the short address/extended address in XOR case of 6LoWPAN
->> interface. The interface has as MAC address the extended XOR short (if
->> available), depends on setting.
->>
->> Then dev->addr_len is 8 XOR 2.
->>
->> Other people (inclusive me) handle it like:
->>
->> Handle the short/extended address in case of OR, but never short address
->> alone. The interface can be accessed by extended address or short
->> address and each neighbour stores both information.
->>
->> The case "short address never alone" means that the extended address is
->> always available and MUST be there.
->>
->> Furthermore, depends on L3 addressing it could be useful to have the
->> possibility to decide if using or short OR extended address as L2 address
->> for do better compressing stuff.
->>
->> ---
->>
->> I implement it as OR case, so we add both addresses when short address
->> is available. Also we drop NS/NA when the short address is given only,
->> in theory we could also react on this and store a "dummy" 0x00..00
->> address for extended address then.
->>
->> Not sure how it need to be handled correctly, for now I implemented how
->> I understand it.
->>
->> In case of the OR case, we need to add two option fields for the
->> address, extended and short. This is why I do the calculation stuff more
->> accessible with different address lengths, so we can use 8 or 2 and not
->> dev->addr_len which stores always the 802.15.4 EUI64 address length.
->>
->> And the answer would be, no it makes no sense because we need to call
->> these functions with 8 (dev->addr_len) and 2 (if short addr is
->> available).
-> 
-> I had to understand the usage in patch 9. It seems you are right, the
-> decision cannot be done based on the protocol alone but based on the
-> context, so we need to pass in different lengths based on the context.
-> Thanks for your explanation.
-> 
-> I would still suggest to not use net_device as an argument but just the
-> type and length to keep the API cleaner, but this is not a strong opinion.
-> 
+On 20/04/16 10:19, Alexander Aring wrote:
+> This patch makes the address length as argument for the
+> ndisc_opt_addr_space function. This is necessary to handle addresses
+> which don't use dev->addr_len as address length.
+>
+> Cc: David S. Miller<davem@davemloft.net>
+> Cc: Alexey Kuznetsov<kuznet@ms2.inr.ac.ru>
+> Cc: James Morris<jmorris@namei.org>
+> Cc: Hideaki YOSHIFUJI<yoshfuji@linux-ipv6.org>
+> Cc: Patrick McHardy<kaber@trash.net>
+> Signed-off-by: Alexander Aring<aar@pengutronix.de>
+> ---
+>   include/net/ndisc.h |  8 ++++----
+>   net/ipv6/ndisc.c    | 10 +++++-----
+>   2 files changed, 9 insertions(+), 9 deletions(-)
+>
+> diff --git a/include/net/ndisc.h b/include/net/ndisc.h
+> index 2d8edaa..ef43e88 100644
+> --- a/include/net/ndisc.h
+> +++ b/include/net/ndisc.h
+> @@ -127,10 +127,10 @@ static inline int ndisc_addr_option_pad(unsigned short type)
+>   	}
+>   }
+>   
+> -static inline int ndisc_opt_addr_space(struct net_device *dev)
+> +static inline int ndisc_opt_addr_space(struct net_device *dev,
+> +				       unsigned char addr_len)
+>   {
+> -	return NDISC_OPT_SPACE(dev->addr_len +
+> -			       ndisc_addr_option_pad(dev->type));
+> +	return NDISC_OPT_SPACE(addr_len + ndisc_addr_option_pad(dev->type));
+>   }
+>   
+>   static inline u8 *ndisc_opt_addr_data(struct nd_opt_hdr *p,
+> @@ -139,7 +139,7 @@ static inline u8 *ndisc_opt_addr_data(struct nd_opt_hdr *p,
+>   	u8 *lladdr = (u8 *)(p + 1);
+>   	int lladdrlen = p->nd_opt_len << 3;
+>   	int prepad = ndisc_addr_option_pad(dev->type);
+> -	if (lladdrlen != ndisc_opt_addr_space(dev))
+> +	if (lladdrlen != ndisc_opt_addr_space(dev, dev->addr_len))
+>   		return NULL;
+>   	return lladdr + prepad;
+>   }
+> diff --git a/net/ipv6/ndisc.c b/net/ipv6/ndisc.c
+> index c245895..69e20e3 100644
+> --- a/net/ipv6/ndisc.c
+> +++ b/net/ipv6/ndisc.c
+> @@ -154,7 +154,7 @@ static void ndisc_fill_addr_option(struct sk_buff *skb, int type, void *data)
+>   {
+>   	int pad   = ndisc_addr_option_pad(skb->dev->type);
+>   	int data_len = skb->dev->addr_len;
+> -	int space = ndisc_opt_addr_space(skb->dev);
+> +	int space = ndisc_opt_addr_space(skb->dev, skb->dev->addr_len);
+>   	u8 *opt = skb_put(skb, space);
+>   
+>   	opt[0] = type;
+> @@ -509,7 +509,7 @@ void ndisc_send_na(struct net_device *dev, const struct in6_addr *daddr,
+>   	if (!dev->addr_len)
+>   		inc_opt = 0;
+>   	if (inc_opt)
+> -		optlen += ndisc_opt_addr_space(dev);
+> +		optlen += ndisc_opt_addr_space(dev, dev->addr_len);
+>   
+>   	skb = ndisc_alloc_skb(dev, sizeof(*msg) + optlen);
+>   	if (!skb)
+> @@ -574,7 +574,7 @@ void ndisc_send_ns(struct net_device *dev, const struct in6_addr *solicit,
+>   	if (ipv6_addr_any(saddr))
+>   		inc_opt = false;
+>   	if (inc_opt)
+> -		optlen += ndisc_opt_addr_space(dev);
+> +		optlen += ndisc_opt_addr_space(dev, dev->addr_len);
+>   
+>   	skb = ndisc_alloc_skb(dev, sizeof(*msg) + optlen);
+>   	if (!skb)
+> @@ -626,7 +626,7 @@ void ndisc_send_rs(struct net_device *dev, const struct in6_addr *saddr,
+>   	}
+>   #endif
+>   	if (send_sllao)
+> -		optlen += ndisc_opt_addr_space(dev);
+> +		optlen += ndisc_opt_addr_space(dev, dev->addr_len);
+>   
+>   	skb = ndisc_alloc_skb(dev, sizeof(*msg) + optlen);
+>   	if (!skb)
+> @@ -1563,7 +1563,7 @@ void ndisc_send_redirect(struct sk_buff *skb, const struct in6_addr *target)
+>   			memcpy(ha_buf, neigh->ha, dev->addr_len);
+>   			read_unlock_bh(&neigh->lock);
+>   			ha = ha_buf;
+> -			optlen += ndisc_opt_addr_space(dev);
+> +			optlen += ndisc_opt_addr_space(dev, dev->addr_len);
+>   		} else
+>   			read_unlock_bh(&neigh->lock);
+>   
 
-yes, I agree. I will try to change it without any dev argument.
+Reviewed-by: Stefan Schmidt<stefan@osg.samsung.com>
 
-The general question would also here, if we just not "simple" support
-for general IPv6 implementation a mapping where:
-
-L2+ (in meaning of one or more) addresses <-> one L3 address
-
-Which means e.g. two ethernet addresses can be mapped to one L3 address.
-I don't know if this makes sense somehow, but I have such use-case for
-802.15.4 but it's even complicated because different address lengths.
-
-Additional to this feature, we add also supporting of multiple L2
-addresses for a net_device with different address lengths.
-
----
-
-I wrote "simple" but it isn't simple, but I suppose the truly mainline
-solution.
-
-What I did in the patch series to store short address in neighbour
-private data, which makes everything 802.15.4 6lowpan specific. We
-currently store the short address as part of 802.15.4 interface type
-in netdev_priv also.
-
-This requires lot of changes which are not easy, also dev_hard_header
-callback does not contain any length information in context when calling
-this function. Btw: 0xffff (short address) in 802.15.4 is the broadcast
-address, which currently works because a workaround by mapping 0xff..ff
-dev->broadcast (8 bytes) to 0xffff short.
-
-Big question is also if it's valid to make such mapping in all link-layers
-e.g. ethernet, because Linux filters multiple target/source link address
-option fields in NS/NA/RS/etc. Anyway could be also some flag if valid
-or not.
-
-I think this more something for future, because it's really big work. :-)
-
-- Alex
+regards
+Stefan Schmidt
