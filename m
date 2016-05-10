@@ -1,92 +1,55 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:45272 "EHLO
-	metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751320AbcEJFoY (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>);
-	Tue, 10 May 2016 01:44:24 -0400
-Subject: Re: How to move wpan interface to another interface?
-References: <D8027A82-319B-4FB7-AB44-C72B827B827E@icloud.com>
-From: Alexander Aring <aar@pengutronix.de>
-Message-ID: <4c748603-4aa4-e498-bfa5-b1580eeb0a28@pengutronix.de>
-Date: Tue, 10 May 2016 07:44:20 +0200
+Received: from mail-wm0-f52.google.com ([74.125.82.52]:35044 "EHLO
+	mail-wm0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751366AbcEJIyx (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Tue, 10 May 2016 04:54:53 -0400
+Received: by mail-wm0-f52.google.com with SMTP id e201so168151970wme.0
+        for <linux-wpan@vger.kernel.org>; Tue, 10 May 2016 01:54:52 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <D8027A82-319B-4FB7-AB44-C72B827B827E@icloud.com>
-Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain;
+ charset=UTF-8
+Subject: Problems with 6lowpan on at91: ping (truncated)
+From: Luca Zulberti <zulberti.luca@gmail.com>
+Date: Tue, 10 May 2016 08:33:44 +0200
+Message-ID: <A9032E6B-3C7B-4221-920E-8A70366FD1FB@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Guangyu Pei <guangyu.pei@icloud.com>, linux-wpan@vger.kernel.org
+To: linux-wpan@vger.kernel.org
+Cc: jukka.rissanen@linux.intel.com, aar@pengutronix.de, giometti@hce-engineering.com
 
+Hi all!
 
-Hi,
+I'm using two boards with an at91 CPU and the at86rf233 xplained pro from Atmel.
+Linux kernel: 4.1.
+SPI max freq: 4MHz
+Xtal-trim line removed.
 
-On 05/10/2016 12:57 AM, Guangyu Pei wrote:
-> Hi,
-> 
-> Command “ip link set wpan0 netns pid” returns “RTNETLINK answers: Invalid argument”. For 802.11, we have “iw phy phy1 set netns pid”. But for iwpan, it seems that there is no such option. I need to run some experiments with fakelb driver and hope that I can move wpan devices to different network namespaces.
-> 
-> Would you please let me know whether there is a workaround or I miss anything?
-> 
+To make the things work i had to remove "xtal-trim = /bits/ <0x0F>" and change the interrupt type in the dts file to be activated on rising edge because after each normally served interrupt routine, the driver goes to read the interrupt register of the chip even if there isn't any interrupt signal on the line, it reads 0x00 and warns about the error.
 
-Netns support doesn't exist mainline now, but I have patches.
+Leaving apart this particular, now i can ping a board from the other, but i have to use a small packet:
+ping6 -s 32 fe80::xxxx%lowpan0
 
-I created them where bluetooth-next was behind net-next for netlink u64
-pad patches. I need to clean them up and send them mainline.
+If i use a higher packet size, the responses from the other board are acquired as "(truncated)". This problem is reflected on other application, like tcp and udp.
 
-kernel:
+Using netcat6 on server:
+nc6 -l -p 8888 -v
 
-https://github.com/linux-wpan/linux-wpan-next/commits/netns
+Using netcat6 on client, sending "Hello":
+nv6 -v fe80::xxxx 8888
+Hello
 
-wpan-tools:
+On server:
+[... connected]
+Hello
+<some characters without sense...>
 
-https://github.com/linux-wpan/wpan-tools/commits/netns
+The TCP connection now is gone. With UDP i can continue to send and receive messages, but the stream has got these characters anyway.
+I've tried to force nc6 using higher and lower mtu, but the error seems to ignore it.
+Also the wpan "max_frame_retries" property seems to be not relevant.
 
-the hwsim starting script from website (updated):
+What should i try?
 
----
+Thanks for your work,
 
-#!/bin/sh
-
-# we need some Private Area Network ID
-panid="0xbeef"
-# number of nodes
-numnodes=6
-
-# include the kernel module for a fake node, tell it to create six
-# nodes
-modprobe fakelb numlbs=$numnodes
-
-# initialize all the nodes
-for i in $(seq 0 `expr $numnodes - 1`);
-do
-	ip netns delete wpan${i}
-	ip netns add wpan${i}
-	PHYNUM=`iwpan dev | grep -B 1 wpan${i} | sed -ne '1 s/phy#\([0-9]\)/\1/p'`
-	iwpan phy${PHYNUM} set netns name wpan${i}
-
-	ip netns exec wpan${i} iwpan dev wpan${i} set pan_id 0xbeef
-	ip netns exec wpan${i} ip link add link wpan${i} name lowpan${i} type lowpan
-	ip netns exec wpan${i} ip link set wpan${i} up
-	ip netns exec wpan${i} ip link set lowpan${i} up
-done
-
----
-
-creates 6 phys and 6 wpan interfaces with a lowpan interface, each
-of them in his own net namespace.
-
-btw: I want to mark fakelb deprecated and add a new implementation of
-fakelb with the name "mac802154_hwsim", I hate it when I told about the
-"fakelb" driver and wireless people told me "do you know hwsim...". It's
-simple the same stuff but somebody named the stuff completely different
-which makes no sense.
-
-I also don't know if we really should add the netns support flag for
-wpan-phy's. This is for HardMAC transceivers only, there exists one
-outside but we currently support SoftMAC transceivers currently only.
-:-)
-
-I hope I could help you and now I try to bring these patches mainline
-since already people want to do experiment like me which is great!
-
-- Alex
+Luca Zulberti.
