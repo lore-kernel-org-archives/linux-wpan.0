@@ -1,72 +1,47 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:48913 "EHLO
+Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:35057 "EHLO
 	metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751372AbcELAPA (ORCPT
+	by vger.kernel.org with ESMTP id S932082AbcEKJoo (ORCPT
 	<rfc822;linux-wpan@vger.kernel.org>);
-	Wed, 11 May 2016 20:15:00 -0400
-Subject: Re: [PATCH bluetooth-next 2/3] ieee802154: add netns support
-References: <1462959859-6669-1-git-send-email-aar@pengutronix.de>
- <1462959859-6669-2-git-send-email-aar@pengutronix.de>
- <57334FAA.4080301@osg.samsung.com>
+	Wed, 11 May 2016 05:44:44 -0400
 From: Alexander Aring <aar@pengutronix.de>
-Message-ID: <94f376f3-6b07-e637-d80b-007168af0eb3@pengutronix.de>
-Date: Thu, 12 May 2016 02:14:57 +0200
-MIME-Version: 1.0
-In-Reply-To: <57334FAA.4080301@osg.samsung.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Subject: [PATCH bluetooth-next 3/3] ieee802154: allow netns create of lowpan interface
+Date: Wed, 11 May 2016 11:44:19 +0200
+Message-Id: <1462959859-6669-3-git-send-email-aar@pengutronix.de>
+In-Reply-To: <1462959859-6669-1-git-send-email-aar@pengutronix.de>
+References: <1462959859-6669-1-git-send-email-aar@pengutronix.de>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Stefan Schmidt <stefan@osg.samsung.com>, linux-wpan@vger.kernel.org
-Cc: kernel@pengutronix.de, Nicolas Dichtel <nicolas.dichtel@6wind.com>
+To: linux-wpan@vger.kernel.org
+Cc: kernel@pengutronix.de, Alexander Aring <aar@pengutronix.de>, Nicolas Dichtel <nicolas.dichtel@6wind.com>
 
-Hi,
+This patch reverts commit f9d1ce8f81eb ("ieee802154: fix netns settings").
+The lowpan interface need to be created inside the net namespace where
+the wpan interface is available. The wpan namespace can be changed only
+by nl802154 before. Without this patch it's not possible to create a
+lowpan interface for a wpan interface which isn't inside init_net
+namespace.
 
-On 05/11/2016 05:28 PM, Stefan Schmidt wrote:
-> Hello.
-> 
-> On 11/05/16 11:44, Alexander Aring wrote:
->> This patch adds netns support for 802.15.4 subsystem. Most parts are
->> copy&pasted from wireless subsystem, it has the identically userspace
->> API.
->>
->> Cc: Nicolas Dichtel <nicolas.dichtel@6wind.com>
->> Signed-off-by: Alexander Aring <aar@pengutronix.de>
->> ---
->>   include/net/cfg802154.h   | 13 +++++++++
->>   include/net/nl802154.h    |  5 ++++
->>   net/ieee802154/core.c     | 70 ++++++++++++++++++++++++++++++++++++++++++++++-
->>   net/ieee802154/core.h     |  2 ++
->>   net/ieee802154/nl802154.c | 54 ++++++++++++++++++++++++++++++++----
->>   5 files changed, 138 insertions(+), 6 deletions(-)
->>
->> diff --git a/include/net/cfg802154.h b/include/net/cfg802154.h
->> index 171cd76..795ca40 100644
->> --- a/include/net/cfg802154.h
->> +++ b/include/net/cfg802154.h
->> @@ -219,9 +219,22 @@ struct wpan_phy {
->>         struct device dev;
->>   +    /* the network namespace this phy lives in currently */
->> +    possible_net_t _net;
->> +
->>       char priv[0] __aligned(NETDEV_ALIGN);
->>   };
->>   +static inline struct net *wpan_phy_net(struct wpan_phy *wpan_phy)
-> 
-> Hmm if you name the setter wpan_phy_net_set() you might ant to name the getter wpan_phy_net_get() and not only wpan_phy_ne().
-> 
+Cc: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Signed-off-by: Alexander Aring <aar@pengutronix.de>
+---
+ net/ieee802154/6lowpan/core.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-Took the naming from wireless stuff, see [0].
+diff --git a/net/ieee802154/6lowpan/core.c b/net/ieee802154/6lowpan/core.c
+index dd085db..096e3db 100644
+--- a/net/ieee802154/6lowpan/core.c
++++ b/net/ieee802154/6lowpan/core.c
+@@ -131,8 +131,7 @@ static int lowpan_newlink(struct net *src_net, struct net_device *ldev,
+ 
+ 	pr_debug("adding new link\n");
+ 
+-	if (!tb[IFLA_LINK] ||
+-	    !net_eq(dev_net(ldev), &init_net))
++	if (!tb[IFLA_LINK])
+ 		return -EINVAL;
+ 	/* find and hold wpan device */
+ 	wdev = dev_get_by_index(dev_net(ldev), nla_get_u32(tb[IFLA_LINK]));
+-- 
+2.8.2
 
-I would highly recommend to make similar naming stuff (but not 1:1 the
-same). It's easier for maintenance changes from wireless which we want
-to add into 802.15.4, the namespace stuff is an example which I think we
-could really do the same.
-
-In this case:
-
-wiphy -> wpan_phy.
-
-- Alex
-
-[0] http://lxr.free-electrons.com/source/include/net/cfg80211.h#L3305
