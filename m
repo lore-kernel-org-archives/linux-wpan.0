@@ -1,89 +1,30 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:38401 "EHLO
-	metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751218AbcEQVup (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>);
-	Tue, 17 May 2016 17:50:45 -0400
-Subject: Re: [PATCH bluetooth-next 3/3] ieee802154: allow netns create of
- lowpan interface
+Received: from mail-wm0-f53.google.com ([74.125.82.53]:37331 "EHLO
+	mail-wm0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932074AbcEKOcl (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Wed, 11 May 2016 10:32:41 -0400
+Received: by mail-wm0-f53.google.com with SMTP id a17so86333326wme.0
+        for <linux-wpan@vger.kernel.org>; Wed, 11 May 2016 07:32:41 -0700 (PDT)
+Reply-To: nicolas.dichtel@6wind.com
+Subject: Re: [PATCH bluetooth-next 1/3] nl802154: move PAD to right position
 References: <1462959859-6669-1-git-send-email-aar@pengutronix.de>
- <1462959859-6669-3-git-send-email-aar@pengutronix.de>
- <16670.1462986892@obiwan.sandelman.ca>
- <ac0713b7-c28c-4edc-c35a-b5afeaf1cbcd@pengutronix.de>
- <5734309F.4040805@6wind.com>
- <2d0ed166-cdbf-abba-ef82-eb5625a6cb34@pengutronix.de>
-From: Alexander Aring <aar@pengutronix.de>
-Message-ID: <d267780d-19b9-0027-5d0b-bb0d20f59d08@pengutronix.de>
-Date: Tue, 17 May 2016 23:50:41 +0200
+From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Message-ID: <57334285.1090606@6wind.com>
+Date: Wed, 11 May 2016 16:32:37 +0200
 MIME-Version: 1.0
-In-Reply-To: <2d0ed166-cdbf-abba-ef82-eb5625a6cb34@pengutronix.de>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <1462959859-6669-1-git-send-email-aar@pengutronix.de>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: nicolas.dichtel@6wind.com, Michael Richardson <mcr@sandelman.ca>
-Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de
+To: Alexander Aring <aar@pengutronix.de>, linux-wpan@vger.kernel.org
+Cc: kernel@pengutronix.de
 
-
-Hi,
-
-On 05/13/2016 02:27 PM, Alexander Aring wrote:
+Le 11/05/2016 11:44, Alexander Aring a Ã©crit :
+> The PAD define should be above the experimental support. We don't care
+> about if we break userspace in experimental stuff but PAD is part of the
+> existing UAPI.
 > 
-> Hi,
-> 
-> On 05/12/2016 09:28 AM, Nicolas Dichtel wrote:
->> Le 12/05/2016 01:34, Alexander Aring a écrit :
->> [snip]
->>> But I don't know how it works when the $PHY isn't visible inside the
->>> namespace where the interface should be changed to. But wireless should
->>> have the same behaviour then, that the macvlan/veth/etc. the corresponding
->>> wireless phy isn't visible in the namespace. Seems there exists some
->>> "parent" device inside one namespace and macvlan/veth can be moved to
->>> other namespaces, but I am not an expert into that. :-)
->> Yes, the virtual interface (macvlan/veth,ip tunnels, vxlan, etc.) is created in
->> the namespace of the physical netns. After, the virtual interface is moved to
->> another netns (with 'ip link set foo netns bar'). This is called x-netns: the
->> upper par of the interface and the link part are not in the same netns.
->> With 'ip -d link' it's possible to show the link netns. There is an nsid which
->> identified the link netns. The nsid is valid only in the current netns (ie the
->> same netns can have another nsid in another netns).
->> Usually, there are explicit boundary in the code when crossing netns (see
->> skb_scrub_packet for example).
->>
->> Example with a gre interface:
->>
->> # create a gre interface in netns1
->> ip netns exec netns1 ip link add dev tun1 type gre local 10.0.0.1 \
->>      remote 10.0.0.2
->> # move it in netns2: the link netns is still in netns1
->> ip netns exec netns1 ip link set tun1 netns netns2
->>
->> or (completely equivalent):
->>
->> # assign a nsid to netns1 in netns2
->> ip exec netns2 ip netns set netns1 1234
->> # create a gre interface in netns2 with its link netns in netns1
->> ip exec netns2 ip link add tun1 link-netnsid 1234 type gre local 10.0.0.1 \
->>      remote 10.0.0.2
-> 
-> Thanks for the explanation.
-> 
-> The current patch series put the whole phy and all the interfaces into
-> one net namespace (like in wireless). The lowpan interface can also be
-> created in non init_net then.
->
-
-I detected today that on non init_net lowpan interfaces will not work with
-our current "pending for real UAPI" solution which is "debugfs".
-
-So this is broken right now, but I don't really care about that for
-setting which will be part of some UAPI netlink/sysfs/etc. later, which
-will be netns aware.
-
-The files in debugfs entries will be not be available, maybe there
-exists also solutions to do this namespace aware.
-
-If somebody wants to test stateful compression with e.g. fakelb, etc.
-init_net is the one namespace which will work only.
-
-- Alex
+> Cc: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+> Signed-off-by: Alexander Aring <aar@pengutronix.de>
+Acked-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
