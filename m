@@ -1,252 +1,109 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:34448 "EHLO
+Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:41249 "EHLO
 	metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1752109AbcEKJq3 (ORCPT
+	by vger.kernel.org with ESMTP id S1751565AbcEKJq3 (ORCPT
 	<rfc822;linux-wpan@vger.kernel.org>);
 	Wed, 11 May 2016 05:46:29 -0400
 From: Alexander Aring <aar@pengutronix.de>
-Subject: [PATCH wpan-tools 1/2] nl802154: update nl802154.h
-Date: Wed, 11 May 2016 11:46:18 +0200
-Message-Id: <1462959979-6755-1-git-send-email-aar@pengutronix.de>
+Subject: [PATCH wpan-tools 2/2] phy: add netns support
+Date: Wed, 11 May 2016 11:46:19 +0200
+Message-Id: <1462959979-6755-2-git-send-email-aar@pengutronix.de>
+In-Reply-To: <1462959979-6755-1-git-send-email-aar@pengutronix.de>
+References: <1462959979-6755-1-git-send-email-aar@pengutronix.de>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
 Cc: kernel@pengutronix.de, Alexander Aring <aar@pengutronix.de>
 
+This patch adds netns support, basically most parts are copy&pasted from
+iw tool, same handling just wpan instead wireless.
+
 Signed-off-by: Alexander Aring <aar@pengutronix.de>
 ---
- src/nl802154.h | 202 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 202 insertions(+)
+ src/phy.c | 66 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 66 insertions(+)
 
-diff --git a/src/nl802154.h b/src/nl802154.h
-index cf2713d..ddcee12 100644
---- a/src/nl802154.h
-+++ b/src/nl802154.h
-@@ -54,8 +54,26 @@ enum nl802154_commands {
+diff --git a/src/phy.c b/src/phy.c
+index 816bdd8..887b610 100644
+--- a/src/phy.c
++++ b/src/phy.c
+@@ -2,6 +2,10 @@
+ #include <errno.h>
+ #include <string.h>
+ #include <stdbool.h>
++#include <sys/param.h>
++#include <sys/types.h>
++#include <sys/stat.h>
++#include <fcntl.h>
  
- 	NL802154_CMD_SET_ACKREQ_DEFAULT,
- 
-+	NL802154_CMD_SET_WPAN_PHY_NETNS,
+ #include <netlink/genl/genl.h>
+ #include <netlink/genl/family.h>
+@@ -144,3 +148,65 @@ nla_put_failure:
+ }
+ COMMAND(set, cca_ed_level, "<level>",
+ 	NL802154_CMD_SET_CCA_ED_LEVEL, 0, CIB_PHY, handle_cca_ed_level, NULL);
 +
- 	/* add new commands above here */
- 
-+#ifdef CONFIG_IEEE802154_NL802154_EXPERIMENTAL
-+	NL802154_CMD_SET_SEC_PARAMS,
-+	NL802154_CMD_GET_SEC_KEY,		/* can dump */
-+	NL802154_CMD_NEW_SEC_KEY,
-+	NL802154_CMD_DEL_SEC_KEY,
-+	NL802154_CMD_GET_SEC_DEV,		/* can dump */
-+	NL802154_CMD_NEW_SEC_DEV,
-+	NL802154_CMD_DEL_SEC_DEV,
-+	NL802154_CMD_GET_SEC_DEVKEY,		/* can dump */
-+	NL802154_CMD_NEW_SEC_DEVKEY,
-+	NL802154_CMD_DEL_SEC_DEVKEY,
-+	NL802154_CMD_GET_SEC_LEVEL,		/* can dump */
-+	NL802154_CMD_NEW_SEC_LEVEL,
-+	NL802154_CMD_DEL_SEC_LEVEL,
-+#endif /* CONFIG_IEEE802154_NL802154_EXPERIMENTAL */
++#ifndef NETNS_RUN_DIR
++#define NETNS_RUN_DIR "/var/run/netns"
++#endif
++int netns_get_fd(const char *name)
++{
++	char pathbuf[MAXPATHLEN];
++	const char *path, *ptr;
 +
- 	/* used to define NL802154_CMD_MAX below */
- 	__NL802154_CMD_AFTER_LAST,
- 	NL802154_CMD_MAX = __NL802154_CMD_AFTER_LAST - 1
-@@ -108,8 +126,25 @@ enum nl802154_attrs {
- 
- 	NL802154_ATTR_ACKREQ_DEFAULT,
- 
-+	NL802154_ATTR_PAD,
++	path = name;
++	ptr = strchr(name, '/');
++	if (!ptr) {
++		snprintf(pathbuf, sizeof(pathbuf), "%s/%s",
++			NETNS_RUN_DIR, name );
++		path = pathbuf;
++	}
++	return open(path, O_RDONLY);
++}
 +
-+	NL802154_ATTR_PID,
-+	NL802154_ATTR_NETNS_FD,
++static int handle_netns(struct nl802154_state *state,
++			struct nl_cb *cb,
++			struct nl_msg *msg,
++			int argc, char **argv,
++			enum id_input id)
++{
++	char *end;
++	int fd;
 +
- 	/* add attributes here, update the policy in nl802154.c */
- 
-+#ifdef CONFIG_IEEE802154_NL802154_EXPERIMENTAL
-+	NL802154_ATTR_SEC_ENABLED,
-+	NL802154_ATTR_SEC_OUT_LEVEL,
-+	NL802154_ATTR_SEC_OUT_KEY_ID,
-+	NL802154_ATTR_SEC_FRAME_COUNTER,
++	if (argc < 1 || !*argv[0])
++		return 1;
 +
-+	NL802154_ATTR_SEC_LEVEL,
-+	NL802154_ATTR_SEC_DEVICE,
-+	NL802154_ATTR_SEC_DEVKEY,
-+	NL802154_ATTR_SEC_KEY,
-+#endif /* CONFIG_IEEE802154_NL802154_EXPERIMENTAL */
++	if (argc == 1) {
++		NLA_PUT_U32(msg, NL802154_ATTR_PID,
++			    strtoul(argv[0], &end, 10));
++		if (*end != '\0') {
++			printf("Invalid parameter: pid(%s)\n", argv[0]);
++			return 1;
++		}
++		return 0;
++	}
 +
- 	__NL802154_ATTR_AFTER_LAST,
- 	NL802154_ATTR_MAX = __NL802154_ATTR_AFTER_LAST - 1
- };
-@@ -247,4 +282,171 @@ enum nl802154_supported_bool_states {
- 	NL802154_SUPPORTED_BOOL_MAX = __NL802154_SUPPORTED_BOOL_AFTER_LAST - 1
- };
- 
-+#ifdef CONFIG_IEEE802154_NL802154_EXPERIMENTAL
++	if (argc != 2 || strcmp(argv[0], "name"))
++		return 1;
 +
-+enum nl802154_dev_addr_modes {
-+	NL802154_DEV_ADDR_NONE,
-+	__NL802154_DEV_ADDR_INVALID,
-+	NL802154_DEV_ADDR_SHORT,
-+	NL802154_DEV_ADDR_EXTENDED,
++	if ((fd = netns_get_fd(argv[1])) >= 0) {
++		NLA_PUT_U32(msg, NL802154_ATTR_NETNS_FD, fd);
++		return 0;
++	} else {
++		printf("Invalid parameter: nsname(%s)\n", argv[0]);
++	}
 +
-+	/* keep last */
-+	__NL802154_DEV_ADDR_AFTER_LAST,
-+	NL802154_DEV_ADDR_MAX = __NL802154_DEV_ADDR_AFTER_LAST - 1
-+};
++	return 1;
 +
-+enum nl802154_dev_addr_attrs {
-+	NL802154_DEV_ADDR_ATTR_UNSPEC,
-+
-+	NL802154_DEV_ADDR_ATTR_PAN_ID,
-+	NL802154_DEV_ADDR_ATTR_MODE,
-+	NL802154_DEV_ADDR_ATTR_SHORT,
-+	NL802154_DEV_ADDR_ATTR_EXTENDED,
-+	NL802154_DEV_ADDR_ATTR_PAD,
-+
-+	/* keep last */
-+	__NL802154_DEV_ADDR_ATTR_AFTER_LAST,
-+	NL802154_DEV_ADDR_ATTR_MAX = __NL802154_DEV_ADDR_ATTR_AFTER_LAST - 1
-+};
-+
-+enum nl802154_key_id_modes {
-+	NL802154_KEY_ID_MODE_IMPLICIT,
-+	NL802154_KEY_ID_MODE_INDEX,
-+	NL802154_KEY_ID_MODE_INDEX_SHORT,
-+	NL802154_KEY_ID_MODE_INDEX_EXTENDED,
-+
-+	/* keep last */
-+	__NL802154_KEY_ID_MODE_AFTER_LAST,
-+	NL802154_KEY_ID_MODE_MAX = __NL802154_KEY_ID_MODE_AFTER_LAST - 1
-+};
-+
-+enum nl802154_key_id_attrs {
-+	NL802154_KEY_ID_ATTR_UNSPEC,
-+
-+	NL802154_KEY_ID_ATTR_MODE,
-+	NL802154_KEY_ID_ATTR_INDEX,
-+	NL802154_KEY_ID_ATTR_IMPLICIT,
-+	NL802154_KEY_ID_ATTR_SOURCE_SHORT,
-+	NL802154_KEY_ID_ATTR_SOURCE_EXTENDED,
-+	NL802154_KEY_ID_ATTR_PAD,
-+
-+	/* keep last */
-+	__NL802154_KEY_ID_ATTR_AFTER_LAST,
-+	NL802154_KEY_ID_ATTR_MAX = __NL802154_KEY_ID_ATTR_AFTER_LAST - 1
-+};
-+
-+enum nl802154_seclevels {
-+	NL802154_SECLEVEL_NONE,
-+	NL802154_SECLEVEL_MIC32,
-+	NL802154_SECLEVEL_MIC64,
-+	NL802154_SECLEVEL_MIC128,
-+	NL802154_SECLEVEL_ENC,
-+	NL802154_SECLEVEL_ENC_MIC32,
-+	NL802154_SECLEVEL_ENC_MIC64,
-+	NL802154_SECLEVEL_ENC_MIC128,
-+
-+	/* keep last */
-+	__NL802154_SECLEVEL_AFTER_LAST,
-+	NL802154_SECLEVEL_MAX = __NL802154_SECLEVEL_AFTER_LAST - 1
-+};
-+
-+enum nl802154_frames {
-+	NL802154_FRAME_BEACON,
-+	NL802154_FRAME_DATA,
-+	NL802154_FRAME_ACK,
-+	NL802154_FRAME_CMD,
-+
-+	/* keep last */
-+	__NL802154_FRAME_AFTER_LAST,
-+	NL802154_FRAME_MAX = __NL802154_FRAME_AFTER_LAST - 1
-+};
-+
-+enum nl802154_cmd_frames {
-+	__NL802154_CMD_FRAME_INVALID,
-+	NL802154_CMD_FRAME_ASSOC_REQUEST,
-+	NL802154_CMD_FRAME_ASSOC_RESPONSE,
-+	NL802154_CMD_FRAME_DISASSOC_NOTIFY,
-+	NL802154_CMD_FRAME_DATA_REQUEST,
-+	NL802154_CMD_FRAME_PAN_ID_CONFLICT_NOTIFY,
-+	NL802154_CMD_FRAME_ORPHAN_NOTIFY,
-+	NL802154_CMD_FRAME_BEACON_REQUEST,
-+	NL802154_CMD_FRAME_COORD_REALIGNMENT,
-+	NL802154_CMD_FRAME_GTS_REQUEST,
-+
-+	/* keep last */
-+	__NL802154_CMD_FRAME_AFTER_LAST,
-+	NL802154_CMD_FRAME_MAX = __NL802154_CMD_FRAME_AFTER_LAST - 1
-+};
-+
-+enum nl802154_seclevel_attrs {
-+	NL802154_SECLEVEL_ATTR_UNSPEC,
-+
-+	NL802154_SECLEVEL_ATTR_LEVELS,
-+	NL802154_SECLEVEL_ATTR_FRAME,
-+	NL802154_SECLEVEL_ATTR_CMD_FRAME,
-+	NL802154_SECLEVEL_ATTR_DEV_OVERRIDE,
-+
-+	/* keep last */
-+	__NL802154_SECLEVEL_ATTR_AFTER_LAST,
-+	NL802154_SECLEVEL_ATTR_MAX = __NL802154_SECLEVEL_ATTR_AFTER_LAST - 1
-+};
-+
-+/* TODO what is this? couldn't find in mib */
-+enum {
-+	NL802154_DEVKEY_IGNORE,
-+	NL802154_DEVKEY_RESTRICT,
-+	NL802154_DEVKEY_RECORD,
-+
-+	/* keep last */
-+	__NL802154_DEVKEY_AFTER_LAST,
-+	NL802154_DEVKEY_MAX = __NL802154_DEVKEY_AFTER_LAST - 1
-+};
-+
-+enum nl802154_dev {
-+	NL802154_DEV_ATTR_UNSPEC,
-+
-+	NL802154_DEV_ATTR_FRAME_COUNTER,
-+	NL802154_DEV_ATTR_PAN_ID,
-+	NL802154_DEV_ATTR_SHORT_ADDR,
-+	NL802154_DEV_ATTR_EXTENDED_ADDR,
-+	NL802154_DEV_ATTR_SECLEVEL_EXEMPT,
-+	NL802154_DEV_ATTR_KEY_MODE,
-+	NL802154_DEV_ATTR_PAD,
-+
-+	/* keep last */
-+	__NL802154_DEV_ATTR_AFTER_LAST,
-+	NL802154_DEV_ATTR_MAX = __NL802154_DEV_ATTR_AFTER_LAST - 1
-+};
-+
-+enum nl802154_devkey {
-+	NL802154_DEVKEY_ATTR_UNSPEC,
-+
-+	NL802154_DEVKEY_ATTR_FRAME_COUNTER,
-+	NL802154_DEVKEY_ATTR_EXTENDED_ADDR,
-+	NL802154_DEVKEY_ATTR_ID,
-+	NL802154_DEVKEY_ATTR_PAD,
-+
-+	/* keep last */
-+	__NL802154_DEVKEY_ATTR_AFTER_LAST,
-+	NL802154_DEVKEY_ATTR_MAX = __NL802154_DEVKEY_ATTR_AFTER_LAST - 1
-+};
-+
-+enum nl802154_key {
-+	NL802154_KEY_ATTR_UNSPEC,
-+
-+	NL802154_KEY_ATTR_ID,
-+	NL802154_KEY_ATTR_USAGE_FRAMES,
-+	NL802154_KEY_ATTR_USAGE_CMDS,
-+	NL802154_KEY_ATTR_BYTES,
-+
-+	/* keep last */
-+	__NL802154_KEY_ATTR_AFTER_LAST,
-+	NL802154_KEY_ATTR_MAX = __NL802154_KEY_ATTR_AFTER_LAST - 1
-+};
-+
-+#define NL802154_KEY_SIZE		16
-+#define NL802154_CMD_FRAME_NR_IDS	256
-+
-+#endif /* CONFIG_IEEE802154_NL802154_EXPERIMENTAL */
-+
- #endif /* __NL802154_H */
++ nla_put_failure:
++	return -ENOBUFS;
++}
++COMMAND(set, netns, "{ <pid> | name <nsname> }",
++	NL802154_CMD_SET_WPAN_PHY_NETNS, 0, CIB_PHY, handle_netns,
++	"Put this wpan device into a different network namespace:\n"
++	"    <pid>    - change network namespace by process id\n"
++	"    <nsname> - change network namespace by name from "NETNS_RUN_DIR"\n"
++	"               or by absolute path (man ip-netns)\n");
 -- 
 2.8.2
 
