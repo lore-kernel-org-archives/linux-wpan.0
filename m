@@ -1,93 +1,59 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:45557 "EHLO
-	metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751767AbcEKXeZ (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>);
-	Wed, 11 May 2016 19:34:25 -0400
+Received: from mail-wm0-f49.google.com ([74.125.82.49]:38896 "EHLO
+	mail-wm0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751872AbcELH2h (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Thu, 12 May 2016 03:28:37 -0400
+Received: by mail-wm0-f49.google.com with SMTP id g17so119796647wme.1
+        for <linux-wpan@vger.kernel.org>; Thu, 12 May 2016 00:28:36 -0700 (PDT)
+Reply-To: nicolas.dichtel@6wind.com
 Subject: Re: [PATCH bluetooth-next 3/3] ieee802154: allow netns create of
  lowpan interface
 References: <1462959859-6669-1-git-send-email-aar@pengutronix.de>
  <1462959859-6669-3-git-send-email-aar@pengutronix.de>
  <16670.1462986892@obiwan.sandelman.ca>
-From: Alexander Aring <aar@pengutronix.de>
-Message-ID: <ac0713b7-c28c-4edc-c35a-b5afeaf1cbcd@pengutronix.de>
-Date: Thu, 12 May 2016 01:34:21 +0200
+ <ac0713b7-c28c-4edc-c35a-b5afeaf1cbcd@pengutronix.de>
+From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Message-ID: <5734309F.4040805@6wind.com>
+Date: Thu, 12 May 2016 09:28:31 +0200
 MIME-Version: 1.0
-In-Reply-To: <16670.1462986892@obiwan.sandelman.ca>
+In-Reply-To: <ac0713b7-c28c-4edc-c35a-b5afeaf1cbcd@pengutronix.de>
 Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Michael Richardson <mcr@sandelman.ca>
-Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de, Nicolas Dichtel <nicolas.dichtel@6wind.com>
+To: Alexander Aring <aar@pengutronix.de>, Michael Richardson <mcr@sandelman.ca>
+Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de
 
+Le 12/05/2016 01:34, Alexander Aring a écrit :
+[snip]
+> But I don't know how it works when the $PHY isn't visible inside the
+> namespace where the interface should be changed to. But wireless should
+> have the same behaviour then, that the macvlan/veth/etc. the corresponding
+> wireless phy isn't visible in the namespace. Seems there exists some
+> "parent" device inside one namespace and macvlan/veth can be moved to
+> other namespaces, but I am not an expert into that. :-)
+Yes, the virtual interface (macvlan/veth,ip tunnels, vxlan, etc.) is created in
+the namespace of the physical netns. After, the virtual interface is moved to
+another netns (with 'ip link set foo netns bar'). This is called x-netns: the
+upper par of the interface and the link part are not in the same netns.
+With 'ip -d link' it's possible to show the link netns. There is an nsid which
+identified the link netns. The nsid is valid only in the current netns (ie the
+same netns can have another nsid in another netns).
+Usually, there are explicit boundary in the code when crossing netns (see
+skb_scrub_packet for example).
 
-Hi,
+Example with a gre interface:
 
-On 05/11/2016 07:14 PM, Michael Richardson wrote:
-> Alexander Aring <aar@pengutronix.de> wrote:
->     > This patch reverts commit f9d1ce8f81eb ("ieee802154: fix netns settings").
->     > The lowpan interface need to be created inside the net namespace where
->     > the wpan interface is available. The wpan namespace can be changed only
->     > by nl802154 before. Without this patch it's not possible to create a
->     > lowpan interface for a wpan interface which isn't inside init_net
->     > namespace.
-> 
-> I know that we can't support multiple lowpan interfaces on a single wpan
-> at this time.  If one could, via a macvlan like way, would we want to
-> put different lowpan interfaces in different netns on top of the same
-> physical radio.
-> 
+# create a gre interface in netns1
+ip netns exec netns1 ip link add dev tun1 type gre local 10.0.0.1 \
+     remote 10.0.0.2
+# move it in netns2: the link netns is still in netns1
+ip netns exec netns1 ip link set tun1 netns netns2
 
-mhh, this patch currently sets the whole phy into a namespace and all
-related interfaces wpan/lowpan can only exists according the namespace
-which the phy belongs to.
+or (completely equivalent):
 
-Running wpan interface in netns A and running the corresponding lowpan
-interface in an another namespace sounds wrong for me, because they should
-known each other.
-
-btw: I tried to use "ip link set $WPAN/$LOWPAN netns $NETNS" doesn't work,
-it returns -EINVAL.
-I think this works only if we set some flags/callbacks, don't know but
-was one of my test cases.
-
-If running iwpan $PHY set netns name $NETNS, the wpan interface will
-unregister(deleting lowpan) and will be registered again (inside
-different namespace).
-
----
-
-(Creating multiple lowpans for one wpan)
-
-This can be done when creating two wpan interfaces according one phy.
-The bad news is, you can't change the mac address stuff and I think this
-isn't what you want. The reason is simple, most hardwares has one
-address filtering setting only. You could have two wpan interfaces with
-different address settings, but then one interface can be in up state only.
-
-To avoid such behaviour, I had in my mind to simple go into promiscuous
-mode if two wpan interfaces are up with different address settings, then
-let do linux do all filtering stuff. I had to avoid that because the
-hardware will not filtering anything anymore and linux need to do more
-"work".
-
-Maybe just go into promiscuous when it's necessary and print some
-WARNING that the device going into promiscuous mode in such setup.
-
-> I'm also ignorant here: can one create macvlan against a physical interface
-> into a netns?
-> 
-
-What I googled is, yes that's possible. But they use "ip link set
-$INTERFACE netns $NETNS" for that, I think we need to implement such
-feature for wpan/lowpan stuff.
-
-But I don't know how it works when the $PHY isn't visible inside the
-namespace where the interface should be changed to. But wireless should
-have the same behaviour then, that the macvlan/veth/etc. the corresponding
-wireless phy isn't visible in the namespace. Seems there exists some
-"parent" device inside one namespace and macvlan/veth can be moved to
-other namespaces, but I am not an expert into that. :-)
-
-- Alex
+# assign a nsid to netns1 in netns2
+ip exec netns2 ip netns set netns1 1234
+# create a gre interface in netns2 with its link netns in netns1
+ip exec netns2 ip link add tun1 link-netnsid 1234 type gre local 10.0.0.1 \
+     remote 10.0.0.2
