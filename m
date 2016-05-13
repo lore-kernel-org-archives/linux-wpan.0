@@ -1,114 +1,98 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:45645 "EHLO
-	metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751434AbcELAqG (ORCPT
+Received: from zproxy220.enst-bretagne.fr ([192.108.117.9]:39152 "EHLO
+	zproxy220.enst-bretagne.fr" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751187AbcEMHWB (ORCPT
 	<rfc822;linux-wpan@vger.kernel.org>);
-	Wed, 11 May 2016 20:46:06 -0400
-From: Alexander Aring <aar@pengutronix.de>
-Subject: [PATCHv2 wpan-tools 2/2] phy: add netns support
-Date: Thu, 12 May 2016 02:45:49 +0200
-Message-Id: <1463013949-6028-2-git-send-email-aar@pengutronix.de>
-In-Reply-To: <1463013949-6028-1-git-send-email-aar@pengutronix.de>
-References: <1463013949-6028-1-git-send-email-aar@pengutronix.de>
+	Fri, 13 May 2016 03:22:01 -0400
+Date: Fri, 13 May 2016 09:14:09 +0200 (CEST)
+From: Cyrille PIATTE <cyrille.piatte@telecom-bretagne.eu>
+Message-ID: <1284257734.3031397.1463123649791.JavaMail.zimbra@telecom-bretagne.eu>
+Subject: issue with the mrf24j40 driver
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
-Cc: kernel@pengutronix.de, Alexander Aring <aar@pengutronix.de>
+Cc: alan@signal11.us
 
-This patch adds netns support, basically most parts are copy&pasted from
-iw tool, same handling just wpan instead wireless.
+Hello,
 
-Reviewed-by: Stefan Schmidt<stefan@osg.samsung.com>
-Signed-off-by: Alexander Aring <aar@pengutronix.de>
----
-changes since v2:
- - add static to handle_netns
- - add Reviewed-by tags
+I encounter some issues with the mrf24j40 module. I am currently trying to sniff 802.15.4 packets.
 
- src/phy.c | 66 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 66 insertions(+)
+I have a mrf24j40ma ( http://www.microchip.com/wwwproducts/en/MRF24J40 ) module which is wired to a raspberry pi 2 (raspbian-jessie with linux kernel 4.1.19)
+I wired the module as follow :
 
-diff --git a/src/phy.c b/src/phy.c
-index 816bdd8..f97900f 100644
---- a/src/phy.c
-+++ b/src/phy.c
-@@ -2,6 +2,10 @@
- #include <errno.h>
- #include <string.h>
- #include <stdbool.h>
-+#include <sys/param.h>
-+#include <sys/types.h>
-+#include <sys/stat.h>
-+#include <fcntl.h>
- 
- #include <netlink/genl/genl.h>
- #include <netlink/genl/family.h>
-@@ -144,3 +148,65 @@ nla_put_failure:
- }
- COMMAND(set, cca_ed_level, "<level>",
- 	NL802154_CMD_SET_CCA_ED_LEVEL, 0, CIB_PHY, handle_cca_ed_level, NULL);
-+
-+#ifndef NETNS_RUN_DIR
-+#define NETNS_RUN_DIR "/var/run/netns"
-+#endif
-+static int netns_get_fd(const char *name)
-+{
-+	char pathbuf[MAXPATHLEN];
-+	const char *path, *ptr;
-+
-+	path = name;
-+	ptr = strchr(name, '/');
-+	if (!ptr) {
-+		snprintf(pathbuf, sizeof(pathbuf), "%s/%s",
-+			NETNS_RUN_DIR, name );
-+		path = pathbuf;
-+	}
-+	return open(path, O_RDONLY);
-+}
-+
-+static int handle_netns(struct nl802154_state *state,
-+			struct nl_cb *cb,
-+			struct nl_msg *msg,
-+			int argc, char **argv,
-+			enum id_input id)
-+{
-+	char *end;
-+	int fd;
-+
-+	if (argc < 1 || !*argv[0])
-+		return 1;
-+
-+	if (argc == 1) {
-+		NLA_PUT_U32(msg, NL802154_ATTR_PID,
-+			    strtoul(argv[0], &end, 10));
-+		if (*end != '\0') {
-+			printf("Invalid parameter: pid(%s)\n", argv[0]);
-+			return 1;
-+		}
-+		return 0;
-+	}
-+
-+	if (argc != 2 || strcmp(argv[0], "name"))
-+		return 1;
-+
-+	if ((fd = netns_get_fd(argv[1])) >= 0) {
-+		NLA_PUT_U32(msg, NL802154_ATTR_NETNS_FD, fd);
-+		return 0;
-+	} else {
-+		printf("Invalid parameter: nsname(%s)\n", argv[0]);
-+	}
-+
-+	return 1;
-+
-+ nla_put_failure:
-+	return -ENOBUFS;
-+}
-+COMMAND(set, netns, "{ <pid> | name <nsname> }",
-+	NL802154_CMD_SET_WPAN_PHY_NETNS, 0, CIB_PHY, handle_netns,
-+	"Put this wpan device into a different network namespace:\n"
-+	"    <pid>    - change network namespace by process id\n"
-+	"    <nsname> - change network namespace by name from "NETNS_RUN_DIR"\n"
-+	"               or by absolute path (man ip-netns)\n");
--- 
-2.8.2
+http://pinout.xyz/pinout/pin1_3v3_power
 
+MRF24J40                       RASPBERRY PI 2
+
+INT                            BCM 22
+RST                            BCM 25
+CS                             BCM 8 (CE0)
+SCK                            BCM 11 (SCLK)
+SDO                            BCM 9 (MISO)
+SDI                            BCM 10 (MOSI)
+3.3V                           3.3 power (physical 1)
+GND                            ground (physical 6)
+
+I have modified the /boot/config.txt in which I have appended 'dtoverlay=mrf24j40'. I also have uncommented the line 'dtparam=spi=on'.
+Here is my code for the overlay :
+
+//-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+/dts-v1/;  /*required header*/
+/plugin/;  /*signal to the compiler that it needs to generate linkage information (allows unresolved symbols to be patched later)*/
+
+/*node root*/
+/ {
+
+    /*list the compatible device drivers and load the first one*/
+        compatible ="bcrm, bcm2835", "bcrm, bcm2836", "bcrm, bcm2708", "bcrm, bcm2709";
+
+    /*
+      a fragment apply modifications to a node (defined in the compatible file.dtX loaded)
+      it is composed by a target (the node to modify) and an overlay (the modifications)
+    */
+
+        /*modification of the SPI part*/
+        fragment@0 {
+                target = <&spi0>; /* the mrf24j40 module is linked with the spi0 (defined in bcm2XXX.dtX) branch (white wire) */
+                __overlay__ {
+                        #address-cells = <1>;
+                        #size-cells = <0>;
+                        status = "okay";
+
+                        mrf24j40@0 {
+                                compatible = "mrf24j40";    /*load the driver*/
+                                reg = <0>;   /*because it is the spi0 ce0 which is linked with the CS (otherwise spi0 ce1 <-> CS and reg = <1>)*/
+                                interrupts = <22 0x1>;
+                                interrupt-parent = <&gpio>;
+                                spi-max-frequency = <5000000>; /*or 1000000*/
+                        };
+
+                        spidev@0 {
+                                status = "disabled";
+                        };
+
+                        spidev@1 {
+                                status = "disabled";
+                        };
+                };
+        };
+};
+
+//-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+When I boot the raspberry pi 2, the modules spi_bcm2835 and mrf24j40 are loaded which is okay (from the overlay). Moreover, both the physical (phy0 with 'iz listphy') and dev (wpan0 with 'iz list') interfaces are present. So I can set up my 802.15.4 network. I use lowpan-tools with 'iz set' to give an address, a pan_id and and a channel to the wpan0 interface. Then I put the interface up ('ifconfig wpan0 up').
+
+I launch wireshark and a device that send 802.15.4 frames (that are detected by other devices with similar configuration in term of address, pan_id and channel, so the issue does not seem to come from here). Wireshark do not display any frame.
+
+Do you have any clues about what may be wrong ?
+
+I thank you in advance for your support.
+
+Best regards,
+
+Cyrille Piatte
