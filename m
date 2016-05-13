@@ -1,21 +1,36 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mo4-p00-ob.smtp.rzone.de ([81.169.146.221]:33168 "EHLO
-	mo4-p00-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750907AbcEMIPp convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Fri, 13 May 2016 04:15:45 -0400
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+Received: from zproxy220.enst-bretagne.fr ([192.108.117.9]:60232 "EHLO
+	zproxy220.enst-bretagne.fr" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751897AbcEMJ5R convert rfc822-to-8bit
+	(ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+	Fri, 13 May 2016 05:57:17 -0400
+Date: Fri, 13 May 2016 11:57:12 +0200 (CEST)
+From: Cyrille PIATTE <cyrille.piatte@telecom-bretagne.eu>
+Message-ID: <218172779.3073409.1463133432930.JavaMail.zimbra@telecom-bretagne.eu>
+In-Reply-To: <D674B1D3-92C5-4AB7-97AE-7151FE175A9B@mlng.net>
+References: <1284257734.3031397.1463123649791.JavaMail.zimbra@telecom-bretagne.eu> <D674B1D3-92C5-4AB7-97AE-7151FE175A9B@mlng.net>
 Subject: Re: issue with the mrf24j40 driver
-From: smlng <s@mlng.net>
-In-Reply-To: <1284257734.3031397.1463123649791.JavaMail.zimbra@telecom-bretagne.eu>
-Date: Fri, 13 May 2016 10:15:34 +0200
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8BIT
-Message-Id: <D674B1D3-92C5-4AB7-97AE-7151FE175A9B@mlng.net>
-References: <1284257734.3031397.1463123649791.JavaMail.zimbra@telecom-bretagne.eu>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Cyrille PIATTE <cyrille.piatte@telecom-bretagne.eu>
+To: smlng <s@mlng.net>
 Cc: linux-wpan@vger.kernel.org, alan@signal11.us
+
+Thanks a lot.
+It works. I use exactly what you said.
+
+Best regards,
+
+Cyrille Piatte
+
+----- Mail original -----
+De: "smlng" <s@mlng.net>
+À: "Cyrille PIATTE" <cyrille.piatte@telecom-bretagne.eu>
+Cc: linux-wpan@vger.kernel.org, alan@signal11.us
+Envoyé: Vendredi 13 Mai 2016 10:15:34
+Objet: Re: issue with the mrf24j40 driver
 
 Hi Cyrille,
 
