@@ -1,39 +1,58 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from shards.monkeyblade.net ([149.20.54.216]:52513 "EHLO
-	shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756148AbcECUHj (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Tue, 3 May 2016 16:07:39 -0400
-Date: Tue, 03 May 2016 16:07:37 -0400 (EDT)
-Message-Id: <20160503.160737.1681209955436308203.davem@davemloft.net>
+Received: from mail-pa0-f47.google.com ([209.85.220.47]:33297 "EHLO
+	mail-pa0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752216AbcEMC7i (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Thu, 12 May 2016 22:59:38 -0400
+Received: by mail-pa0-f47.google.com with SMTP id xk12so35991863pac.0
+        for <linux-wpan@vger.kernel.org>; Thu, 12 May 2016 19:59:38 -0700 (PDT)
 Subject: Re: [PATCHv2 bluetooth-next 00/10] 6lowpan: introduce basic
  6lowpan-nd
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <58926844-0338-4D63-A5B6-DB0EBE903A0E@holtmann.org>
-References: <D212A5BF-A414-403B-A409-1F8C2D279883@holtmann.org>
-	<870fdf5f-82ed-b621-a8d5-625bf9d81d0d@stressinduktion.org>
-	<58926844-0338-4D63-A5B6-DB0EBE903A0E@holtmann.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
+References: <1461140382-4784-1-git-send-email-aar@pengutronix.de>
+ <D212A5BF-A414-403B-A409-1F8C2D279883@holtmann.org>
+From: YOSHIFUJI Hideaki <hideaki.yoshifuji@miraclelinux.com>
+Message-ID: <57354315.2050509@miraclelinux.com>
+Date: Fri, 13 May 2016 11:59:33 +0900
+MIME-Version: 1.0
+In-Reply-To: <D212A5BF-A414-403B-A409-1F8C2D279883@holtmann.org>
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: marcel@holtmann.org
-Cc: hannes@stressinduktion.org, aar@pengutronix.de, linux-wpan@vger.kernel.org, kernel@pengutronix.de, jukka.rissanen@linux.intel.com, stefan@osg.samsung.com, mcr@sandelman.ca, werner@almesberger.net, linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, kuznet@ms2.inr.ac.ru, jmorris@namei.org, yoshfuji@linux-ipv6.org, kaber@trash.net
+To: Marcel Holtmann <marcel@holtmann.org>, Alexander Aring <aar@pengutronix.de>, "David S. Miller" <davem@davemloft.net>
+Cc: hideaki.yoshifuji@miraclelinux.com, linux-wpan@vger.kernel.org, kernel@pengutronix.de, Jukka Rissanen <jukka.rissanen@linux.intel.com>, hannes@stressinduktion.org, Stefan Schmidt <stefan@osg.samsung.com>, mcr@sandelman.ca, Werner Almesberger <werner@almesberger.net>, Linux Bluetooth <linux-bluetooth@vger.kernel.org>, Network Development <netdev@vger.kernel.org>, Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>, James Morris <jmorris@namei.org>, Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>, Patrick McHardy <kaber@trash.net>
 
-From: Marcel Holtmann <marcel@holtmann.org>
-Date: Mon, 2 May 2016 16:17:41 -0700
+Hi,
 
->> My proposal would be that the IPv6 patches go via net-next to reduce
->> merge conflicts with maybe upcoming changes. If they are split up, they
->> seem very much self contained and easy to review. The rest seems to be
->> also very much self contained and can go in via bluetooth-next, then.
->> What do you think?
->
-> I am actually fine with having this all go via net-next. We only
-> have driver patches pending in bluetooth-next for the next merge
-> window. Which means I can just pull net-next back into
-> bluetooth-next at any time.
+Marcel Holtmann wrote:
+> Hi Dave,
+:
+>> include/linux/netdevice.h     |   6 +-
+>> include/net/6lowpan.h         |  24 ++
+>> include/net/addrconf.h        |   3 +
+>> include/net/ndisc.h           | 124 ++++++++-
+>> net/6lowpan/6lowpan_i.h       |   2 +
+>> net/6lowpan/Makefile          |   2 +-
+>> net/6lowpan/core.c            |  50 +++-
+>> net/6lowpan/iphc.c            | 167 +++++++++--
+>> net/6lowpan/ndisc.c           | 633 ++++++++++++++++++++++++++++++++++++++++++
+>> net/bluetooth/6lowpan.c       |   2 +
+>> net/ieee802154/6lowpan/core.c |  12 +
+>> net/ieee802154/6lowpan/tx.c   | 107 ++++---
+>> net/ipv6/addrconf.c           |   7 +-
+>> net/ipv6/ndisc.c              | 132 +++++----
+>> net/ipv6/route.c              |   4 +-
+>> 15 files changed, 1117 insertions(+), 158 deletions(-)
+>> create mode 100644 net/6lowpan/ndisc.c
+> 
+> is there a chance that we get input into this patch set? I wonder also if it would be acceptable to take this through bluetooth-next or should it better go straight into net-next?
 
-Ok, just resubmit the series explicitly targetting net-next then.
+The core idea of introducing ndisc_ops is okay, but I do think this
+series of patches should be refactored; we should not make another
+"copy" of core of ndisc logic.  We can introduce "ops" for each
+option, for example.
 
-Thanks.
+Thank you.
+
+-- 
+Hideaki Yoshifuji <hideaki.yoshifuji@miraclelinux.com>
+Technical Division, MIRACLE LINUX CORPORATION
