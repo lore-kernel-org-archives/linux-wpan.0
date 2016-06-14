@@ -1,210 +1,131 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:37392 "EHLO
+Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:39516 "EHLO
 	metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1423255AbcFMOPO (ORCPT
+	by vger.kernel.org with ESMTP id S1750703AbcFNLxE (ORCPT
 	<rfc822;linux-wpan@vger.kernel.org>);
-	Mon, 13 Jun 2016 10:15:14 -0400
-Subject: Re: RX problems with at86rf230 driver
-References: <CAPzmaigy7TitxRGzML7Ck-ZKQF8EDnNGmRYOg-4WiGgT-s9WkA@mail.gmail.com>
+	Tue, 14 Jun 2016 07:53:04 -0400
 From: Alexander Aring <aar@pengutronix.de>
-Message-ID: <d2dee77a-7d2c-85b4-1edd-3efdcf4e554d@pengutronix.de>
-Date: Mon, 13 Jun 2016 16:15:11 +0200
-MIME-Version: 1.0
-In-Reply-To: <CAPzmaigy7TitxRGzML7Ck-ZKQF8EDnNGmRYOg-4WiGgT-s9WkA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Subject: [PATCHv3 net-next 00/12] 6lowpan: introduce 6lowpan-nd
+Date: Tue, 14 Jun 2016 13:52:27 +0200
+Message-Id: <20160614115239.17788-1-aar@pengutronix.de>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: zulberti.luca@gmail.com
-Cc: linux-wpan@vger.kernel.org, Rodolfo Giometti <giometti@enneenne.com>
-
+To: linux-wpan@vger.kernel.org
+Cc: kernel@pengutronix.de, marcel@holtmann.org, jukka.rissanen@linux.intel.com, hannes@stressinduktion.org, stefan@osg.samsung.com, mcr@sandelman.ca, werner@almesberger.net, linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, Alexander Aring <aar@pengutronix.de>
 
 Hi,
 
-On 06/13/2016 11:57 AM, Luca Zulberti wrote:
-> Hello Alexander,
-> 
-> I'm trying to use the AT86RF233 radio transceiver for 6lowpan purposes.
-> Now I'm using an ieee802154 compatible transmitter to test the monitor
-> functionality of the 6lowpan node.
-> 
-> I've put the following code into the
-> at86rf230_rx_read_frame_complete() of the driver at86rf230.c into
-> kernel 4.7-rc2:
-> 
-> diff --git a/drivers/net/ieee802154/at86rf230.c
-> b/drivers/net/ieee802154/at86rf230.c
-> index 9f10da6..4d616c8 100644
-> --- a/drivers/net/ieee802154/at86rf230.c
-> +++ b/drivers/net/ieee802154/at86rf230.c
-> @@ -711,6 +711,18 @@ at86rf230_rx_read_frame_complete(void *context)
->         u8 len, lqi;
-> 
->         len = buf[1];
-> +
-> +       {
-> +               int i;
-> +               printk("\nSTART RX - spi_len: %d\n", len + 2);
-> +               for (i = 0; i < len + 2; i++) {
-> +                       printk("0x%02x ", buf[i]);
-> +                       if (i % 16 == 15)
-> +                               printk("\n");
-> +               }
-> +               printk("\nEND RX\n");
-> +       }
-> +
->         if (!ieee802154_is_valid_psdu_len(len)) {
->                 dev_vdbg(&lp->spi->dev, "corrupted frame received\n");
->                 len = IEEE802154_MTU;
-> @@ -878,6 +890,18 @@ at86rf230_write_frame(void *context)
->         memcpy(buf + 2, skb->data, skb->len);
->         ctx->trx.len = skb->len + 2;
->         ctx->msg.complete = at86rf230_write_frame_complete;
-> +
-> +       {
-> +                int i, len = buf[1] + 2;
+this patch series introduces the ndisc ops callback structure to add different
+handling for IPv6 neighbour discovery cache functionality. It implements at first
+the two following use-cases:
 
-should be len = buf[1];
+ - 6CO handling as userspace option (For all 6LoWPAN layers, BTLE/802.15.4) [0]
+ - short address handling for 802.15.4 6LoWPAN only [1]
 
-The CRC will be added by transceiver automatically, you don't see it.
+Since my last patch series, I completely changed the whole ndisc_ops callback
+structure to not replace the whole ndisc functionality at recv/send level of
+NS/NA/RS/RA which I send in my previous patch-series "6lowpan: introduce basic
+6lowpan-nd". I changed it now to add different handling in a very low-level way
+of ndisc functionality.
 
-> +                printk("\nSTART TX - spi_len: %d\n", len);
-> +                for (i = 0; i < len; i++) {
-> +                        printk("0x%02x ", buf[i]);
-> +                        if (i % 16 == 15)
-> +                                printk("\n");
-> +               }
-> +                printk("\nEND TX\n");
-> +        }
-> +
->         rc = spi_async(lp->spi, &ctx->msg);
->         if (rc) {
->                 ctx->trx.len = 2;
-> 
-> I've noticed some incompatible data read from the spi.
-> 
-> printk output:
-> 
-> INIZIO RX - spi_len: 13
-> 0x00 0x0b 0x61 0x08 0x0f 0x04 0x16 0x04 0x16 0x01 0x00 0xe3 0xcf
-> FINE RX
-> 
-> INIZIO RX - spi_len: 248
-> 0x20 0xf6 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-> 0x00 0x00 0x00 0x00 0xfd 0xff 0x24 0xf0 0x62 0xff 0x24 0xf0 0x77 0xff 0x24 0xf0
-> 0x41 0xff 0x24 0xf0 0x93 0xff 0x24 0xf0 0x72 0xff 0x24 0xf0 0xd4 0xff 0x24 0xf0
-> 0x11 0xff 0x24 0xf0 0x8e 0xff 0x24 0xf0 0x8a 0xff 0x24 0xf0 0x0f 0xff 0x24 0xf0
-> 0x49 0xff 0x24 0xf0 0xcb 0xff 0x24 0xf0 0x57 0xff 0x24 0xf0 0x30 0xff 0x24 0xf0
-> 0xfb 0xff 0x24 0xf0 0x92 0xff 0x24 0xf0 0xce 0xff 0x24 0xf0 0x8d 0xff 0x24 0xf0
-> 0x15 0xff 0x24 0xf0 0xa5 0xff 0x24 0xf0 0x4e 0xff 0x24 0xf0 0x57 0xff 0x24 0xf0
-> 0x4d 0xff 0x24 0xf0 0x38 0xff 0x24 0xf0 0xf5 0xff 0x24 0xf0 0x41 0xff 0x24 0xf0
-> 0xf9 0xff 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x01 0x00 0x00 0x00 0x00 0x00
-> 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-> 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-> 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-> 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-> 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-> 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-> 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-> FINE RX
-> 
-> INIZIO RX - spi_len: 248
-> 0x00 0x0b 0x61 0x08 0x10 0x04 0x16 0x04 0x16 0x01 0x00 0xde 0x63 0xff 0x20 0xf0
-> 0x43 0xff 0x20 0xf0 0xfd 0xff 0x20 0xf0 0x62 0xff 0x20 0xf0 0x77 0xff 0x20 0xf0
-> 0x41 0xff 0x20 0xf0 0x93 0xff 0x20 0xf0 0x72 0xff 0x20 0xf0 0xd4 0xff 0x20 0xf0
-> 0x11 0xff 0x20 0xf0 0x8e 0xff 0x20 0xf0 0x8a 0xff 0x20 0xf0 0x0f 0xff 0x20 0xf0
-> 0x49 0xff 0x20 0xf0 0xcb 0xff 0x20 0xf0 0x57 0xff 0x20 0xf0 0x30 0xff 0x20 0xf0
-> 0xfb 0xff 0x20 0xf0 0x92 0xff 0x20 0xf0 0xce 0xff 0x20 0xf0 0x8d 0xff 0x20 0xf0
-> 0x15 0xff 0x20 0xf0 0xa5 0xff 0x20 0xf0 0x4e 0xff 0x20 0xf0 0x57 0xff 0x20 0xf0
-> 0x4d 0xff 0x20 0xf0 0x38 0xff 0x20 0xf0 0xf5 0xff 0x20 0xf0 0x41 0xff 0x20 0xf0
-> 0xf9 0xff 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x01 0x00 0x00 0x00 0x00 0x00
-> 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-> 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-> 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-> 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-> 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-> 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-> 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-> FINE RX
-> 
-> The transmitter sends 12 bytes (10 byte of payload and 2 of FCS) as
-> shown in the first output but the driver often reads 248 bytes from
-> the spi buffer which is wrong.
-> In the third output 'spi_len' is 248 even if the second byte of the
-> stream (the PHR) is 11!!!
-> 
+The ndisc_ops don't must be registered to dev->ndisc_ops anymore, if they are not
+set, then no additional ipv6 ndisc handling will be done.
 
-Who send this frame? We never send frames above PHR len 127 which is invalid.
+This patch series now introduce a complete handling of short address for
+802.15.4 6LoWPAN in case of send/recv of NA/NS/RS and RA. In case of RA
+(receive only) and PIO we also need a second prefix + short-address based
+address.
 
-> With a logic analyzer I've checked the data from the at86rf233 and
-> they are correct, however when the driver reads them something goes
-> wrong and invalid data are returned!
-> 
+This callback structure can be used later (I hope) for RFC 6775 [0]. This RFC
+defines some new option fields and messages for 6LoWPAN-ND. This patch series
+does not implement RFC 6775 (except we decide now to handle 6CO in userspace).
 
-mhh, how rx works:
+Additional we can use the current ops for parse/fill ndisc options for kernel
+handled ndisc messages to add 6CIO, see [2].
 
- - IRQ occured
-   - alloc some context space, on heap not on stack. So we don't use
-     here multiple resources for reading framebuffer, etc.
- - read irq status
-   - this will clear the irq flag and new irq's can occur, but this is
-     for RX side safe because RX_SAFE_MODE should be "1".
-     Maybe check better if this bit is really set with regmap, somewhere in
-     "/sys/kernel/debug/regmap/$spi_bus/registers".
-     The RX_SAFE_MODE bit will prevent overwriting framebuffer for new
-     frames until the chipselect will be lost from framebuffer read
-     command.
- - if we are no in TX states (is_tx), then it is a receive and we read
-   the full framebuffer, because RX_SAFE_MODE.
- - check if length is valid 802.15.4 frame and fill and deliver skb.
-
+I tested RA/NS/NA/RS messages with short address which seems to work, what I
+didn't test is the redirect messages since I don't know how to generate them.
+The short address for redirect messages are also some special case here, because
+the short address by a L3 target address lookuped by neighbour cache need to be
+added.
 
 btw:
-That's all, also during this operation should no xmit_async occured. But
-that should be fine, otherwise we should have issues on other boards.
-
-The spi_async stuff is mostly not preemptable, no sleeps, etc.
-Also the spi subsystem will not handle other messages until complete
-handler of spi_async will be returned, otherwise spi_async will return
--EBUSY which should be displayed by [0].
-
-So I think this can't happen. :-)
-
-> It seems to me that the driver returns the previously written data
-> instead of the current read ones maybe due a race condition...
-> 
-> Below is the DTS settings for my board:
-> 
-> spi1: spi@f0004000 {
->    status = "okay";
->    cs-gpios = <&pioA 29 GPIO_ACTIVE_LOW>, <0>, <0>, <0>;
-> 
->    at86rf233@0 {
->            compatible = "atmel,at86rf233";
->            reg = <0>;
->            interrupt-parent = <&pioA>;
->            interrupts = <27 IRQ_TYPE_EDGE_RISING 7>;
-
-maybe try IRQ_ACTIVE_HIGH here, I don't know your wiring maybe you have some
-lossy connection on irq line. If it's a loosy connection and you will
-get multiple irq's it could be that the framebuffer will be readed
-twice, maybe HIGH_LEVEL is better here.
-
-I don't know why you having such issues with at86rf230 driver, the
-IRQ_ACTIVE_HIGH is just a try to change something and looks if works
-better afterwards. :-/
-
-You also said that the data is correct on the logic analyzer but wrong
-in your hexdump, or? Then it looks more like some spi controller issue,
-maybe ask on linux-spi mailinglist [1] and also cc maintainers?
-
-btw:
-I also got reports from RPi2/RPi3 users which has issues with
-at86rf230 driver. But this was with RPi-kernel. I don't get any issues
-when using mainline kernel (on RPi2). One users switched from RPi to
-mainline kernel and the issue with corrupted spi data was gone.
+According to [3] sending redirect messages should be also disabled by default
+on 6lowpan interfaces, but can be activated afterwards. This is maybe
+something for the ipv6_devconf structure. There is a "accept_redirects" but
+no "disable_redirects".
 
 - Alex
 
-[0] http://lxr.free-electrons.com/source/drivers/net/ieee802154/at86rf230.c#L372
-[1] http://vger.kernel.org/vger-lists.html#linux-spi
+[0] https://tools.ietf.org/html/rfc7400
+[1] https://tools.ietf.org/html/rfc6775
+[2] https://tools.ietf.org/html/rfc4944#section-8
+
+changes since RFC:
+ - add lowlevel functions __ndisc_opt_addr_space,
+   __ndisc_opt_addr_data and __ndisc_fill_addr_option for corresponding
+   functions which doesn't requires net_device argument.
+ - move ndisc_ops e.g. ndisc_ops_fill_addr_option function call into the
+   corresponding device argument function ndisc_fill_addr_option.
+   (Introduced a special static inline function for redirect handling).
+ - fix error handling in addrconf_prefix_rcv_add_addr.
+   (Please see, introduce new API handling that second address registration
+    (in case of 802.15.4 6LoWPAN) will still be notified if failed, because
+    dev->addr was successful.
+ - add ieee802154 sub-directory in short address entry for 6lowpan UAPI.
+ - add lowpan_802154_is_valid_src_short_addr, because 802.15.4 6lowpan
+   defines the first bit as multicast (don't know how this can be working
+   at the end, because some hardware addresses will handle such addresses
+   in L2 as unicast. See:
+   https://www.iana.org/assignments/_6lowpan-parameters/_6lowpan-parameters.xhtml#_6lowpan-parameters-2
+
+changes since v2:
+ - Introduce ndisc_ops to have our own implementation for dealing with NS/NA
+   which allows also to support RFC6775 (e.g. ARO).
+ - add handling for handling 6CO as userspace option for RA messages in
+   case of 6LoWPAN interfaces.
+ - change lowpan_is_ll to check on linklayer type only.
+ - added some reviewed-by's.
+ - move short addr slaac to net/6lowpan instead ipv6 handling.
+ - add handling for context based address compression in case for
+   short address as link-layer address.
+ - change strategy to use short address, a short address will always be used
+   when it's available.
+ - Handle override flag in NA messages to update short address information or
+   not.
+
+Alexander Aring (12):
+  6lowpan: add private neighbour data
+  6lowpan: add 802.15.4 short addr slaac
+  6lowpan: remove ipv6 module request
+  ndisc: add __ndisc_opt_addr_space function
+  ndisc: add __ndisc_opt_addr_data function
+  ndisc: add __ndisc_fill_addr_option function
+  addrconf: put prefix address add in an own function
+  ipv6: introduce neighbour discovery ops
+  ipv6: export several functions
+  6lowpan: introduce 6lowpan-nd
+  6lowpan: add support for getting short address
+  6lowpan: add support for 802.15.4 short addr handling
+
+ include/linux/netdevice.h     |   8 +-
+ include/net/6lowpan.h         |  16 +++
+ include/net/addrconf.h        |  10 ++
+ include/net/ndisc.h           | 248 +++++++++++++++++++++++++++++++++++++++---
+ net/6lowpan/6lowpan_i.h       |   4 +
+ net/6lowpan/Makefile          |   2 +-
+ net/6lowpan/core.c            |  50 ++++++++-
+ net/6lowpan/debugfs.c         |  39 +++++++
+ net/6lowpan/iphc.c            | 167 +++++++++++++++++++++++-----
+ net/6lowpan/ndisc.c           | 234 +++++++++++++++++++++++++++++++++++++++
+ net/ieee802154/6lowpan/core.c |  12 ++
+ net/ieee802154/6lowpan/tx.c   | 113 +++++++++----------
+ net/ipv6/addrconf.c           | 218 +++++++++++++++++++++----------------
+ net/ipv6/ndisc.c              | 123 +++++++++++++--------
+ net/ipv6/route.c              |   8 +-
+ 15 files changed, 1004 insertions(+), 248 deletions(-)
+ create mode 100644 net/6lowpan/ndisc.c
+
+-- 
+2.8.3
+
