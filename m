@@ -1,43 +1,57 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:58891 "EHLO
+Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:35269 "EHLO
 	metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1753328AbcFOTVH (ORCPT
+	by vger.kernel.org with ESMTP id S932570AbcFOTVI (ORCPT
 	<rfc822;linux-wpan@vger.kernel.org>);
-	Wed, 15 Jun 2016 15:21:07 -0400
+	Wed, 15 Jun 2016 15:21:08 -0400
 From: Alexander Aring <aar@pengutronix.de>
-Subject: [PATCHv4 net-next 03/12] 6lowpan: remove ipv6 module request
-Date: Wed, 15 Jun 2016 21:20:18 +0200
-Message-Id: <20160615192027.4064-4-aar@pengutronix.de>
+Subject: [PATCHv4 net-next 04/12] ndisc: add __ndisc_opt_addr_space function
+Date: Wed, 15 Jun 2016 21:20:19 +0200
+Message-Id: <20160615192027.4064-5-aar@pengutronix.de>
 In-Reply-To: <20160615192027.4064-1-aar@pengutronix.de>
 References: <20160615192027.4064-1-aar@pengutronix.de>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
-Cc: kernel@pengutronix.de, marcel@holtmann.org, jukka.rissanen@linux.intel.com, hannes@stressinduktion.org, stefan@osg.samsung.com, mcr@sandelman.ca, werner@almesberger.net, linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, Alexander Aring <aar@pengutronix.de>
+Cc: kernel@pengutronix.de, marcel@holtmann.org, jukka.rissanen@linux.intel.com, hannes@stressinduktion.org, stefan@osg.samsung.com, mcr@sandelman.ca, werner@almesberger.net, linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, Alexander Aring <aar@pengutronix.de>, "David S . Miller" <davem@davemloft.net>, Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>, James Morris <jmorris@namei.org>, Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>, Patrick McHardy <kaber@trash.net>
 
-Since we use exported function from ipv6 kernel module we don't need to
-request the module anymore to have ipv6 functionality.
+This patch adds __ndisc_opt_addr_space as low-level function for
+ndisc_opt_addr_space which doesn't depend on net_device parameter.
 
-Acked-by: Hannes Frederic Sowa <hannes@stressinduktion.org>
+Cc: David S. Miller <davem@davemloft.net>
+Cc: Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>
+Cc: James Morris <jmorris@namei.org>
+Cc: Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>
+Cc: Patrick McHardy <kaber@trash.net>
+Acked-by: YOSHIFUJI Hideaki <yoshfuji@linux-ipv6.org>
 Reviewed-by: Stefan Schmidt <stefan@osg.samsung.com>
 Signed-off-by: Alexander Aring <aar@pengutronix.de>
 ---
- net/6lowpan/core.c | 2 --
- 1 file changed, 2 deletions(-)
+ include/net/ndisc.h | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/net/6lowpan/core.c b/net/6lowpan/core.c
-index 801404c..1c7a42b 100644
---- a/net/6lowpan/core.c
-+++ b/net/6lowpan/core.c
-@@ -158,8 +158,6 @@ static int __init lowpan_module_init(void)
- 		return ret;
+diff --git a/include/net/ndisc.h b/include/net/ndisc.h
+index 2d8edaa..4cee826 100644
+--- a/include/net/ndisc.h
++++ b/include/net/ndisc.h
+@@ -127,10 +127,15 @@ static inline int ndisc_addr_option_pad(unsigned short type)
  	}
+ }
  
--	request_module_nowait("ipv6");
--
- 	request_module_nowait("nhc_dest");
- 	request_module_nowait("nhc_fragment");
- 	request_module_nowait("nhc_hop");
++static inline int __ndisc_opt_addr_space(unsigned char addr_len, int pad)
++{
++	return NDISC_OPT_SPACE(addr_len + pad);
++}
++
+ static inline int ndisc_opt_addr_space(struct net_device *dev)
+ {
+-	return NDISC_OPT_SPACE(dev->addr_len +
+-			       ndisc_addr_option_pad(dev->type));
++	return __ndisc_opt_addr_space(dev->addr_len,
++				      ndisc_addr_option_pad(dev->type));
+ }
+ 
+ static inline u8 *ndisc_opt_addr_data(struct nd_opt_hdr *p,
 -- 
 2.8.3
 
