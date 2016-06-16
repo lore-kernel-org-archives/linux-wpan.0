@@ -1,68 +1,38 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:38833 "EHLO
-	metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S932842AbcFOTVL (ORCPT
+Received: from out3-smtp.messagingengine.com ([66.111.4.27]:37996 "EHLO
+	out3-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752605AbcFPKo7 (ORCPT
 	<rfc822;linux-wpan@vger.kernel.org>);
-	Wed, 15 Jun 2016 15:21:11 -0400
-From: Alexander Aring <aar@pengutronix.de>
-Subject: [PATCHv4 net-next 06/12] ndisc: add __ndisc_fill_addr_option function
-Date: Wed, 15 Jun 2016 21:20:21 +0200
-Message-Id: <20160615192027.4064-7-aar@pengutronix.de>
-In-Reply-To: <20160615192027.4064-1-aar@pengutronix.de>
+	Thu, 16 Jun 2016 06:44:59 -0400
+Subject: Re: [PATCHv4 net-next 06/12] ndisc: add __ndisc_fill_addr_option
+ function
 References: <20160615192027.4064-1-aar@pengutronix.de>
+ <20160615192027.4064-7-aar@pengutronix.de>
+From: Hannes Frederic Sowa <hannes@stressinduktion.org>
+Message-ID: <acceee9f-b1bf-8ac4-425f-b53f67651c75@stressinduktion.org>
+Date: Thu, 16 Jun 2016 12:44:55 +0200
+MIME-Version: 1.0
+In-Reply-To: <20160615192027.4064-7-aar@pengutronix.de>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org
-Cc: kernel@pengutronix.de, marcel@holtmann.org, jukka.rissanen@linux.intel.com, hannes@stressinduktion.org, stefan@osg.samsung.com, mcr@sandelman.ca, werner@almesberger.net, linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, Alexander Aring <aar@pengutronix.de>, "David S . Miller" <davem@davemloft.net>, Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>, James Morris <jmorris@namei.org>, Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>, Patrick McHardy <kaber@trash.net>
+To: Alexander Aring <aar@pengutronix.de>, linux-wpan@vger.kernel.org
+Cc: kernel@pengutronix.de, marcel@holtmann.org, jukka.rissanen@linux.intel.com, stefan@osg.samsung.com, mcr@sandelman.ca, werner@almesberger.net, linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>, Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>, James Morris <jmorris@namei.org>, Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>, Patrick McHardy <kaber@trash.net>
 
-This patch adds __ndisc_fill_addr_option as low-level function for
-ndisc_fill_addr_option which doesn't depend on net_device parameter.
+On 15.06.2016 21:20, Alexander Aring wrote:
+> This patch adds __ndisc_fill_addr_option as low-level function for
+> ndisc_fill_addr_option which doesn't depend on net_device parameter.
+> 
+> Cc: David S. Miller <davem@davemloft.net>
+> Cc: Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>
+> Cc: James Morris <jmorris@namei.org>
+> Cc: Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>
+> Cc: Patrick McHardy <kaber@trash.net>
+> Acked-by: YOSHIFUJI Hideaki <yoshfuji@linux-ipv6.org>
+> Reviewed-by: Stefan Schmidt <stefan@osg.samsung.com>
+> Signed-off-by: Alexander Aring <aar@pengutronix.de>
 
-Cc: David S. Miller <davem@davemloft.net>
-Cc: Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>
-Cc: James Morris <jmorris@namei.org>
-Cc: Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>
-Cc: Patrick McHardy <kaber@trash.net>
-Acked-by: YOSHIFUJI Hideaki <yoshfuji@linux-ipv6.org>
-Reviewed-by: Stefan Schmidt <stefan@osg.samsung.com>
-Signed-off-by: Alexander Aring <aar@pengutronix.de>
----
- net/ipv6/ndisc.c | 14 ++++++++++----
- 1 file changed, 10 insertions(+), 4 deletions(-)
+Acked-by: Hannes Frederic Sowa <hannes@stressinduktion.org>
 
-diff --git a/net/ipv6/ndisc.c b/net/ipv6/ndisc.c
-index c245895..a7b9468 100644
---- a/net/ipv6/ndisc.c
-+++ b/net/ipv6/ndisc.c
-@@ -150,11 +150,10 @@ struct neigh_table nd_tbl = {
- };
- EXPORT_SYMBOL_GPL(nd_tbl);
- 
--static void ndisc_fill_addr_option(struct sk_buff *skb, int type, void *data)
-+static void __ndisc_fill_addr_option(struct sk_buff *skb, int type, void *data,
-+				     int data_len, int pad)
- {
--	int pad   = ndisc_addr_option_pad(skb->dev->type);
--	int data_len = skb->dev->addr_len;
--	int space = ndisc_opt_addr_space(skb->dev);
-+	int space = __ndisc_opt_addr_space(data_len, pad);
- 	u8 *opt = skb_put(skb, space);
- 
- 	opt[0] = type;
-@@ -172,6 +171,13 @@ static void ndisc_fill_addr_option(struct sk_buff *skb, int type, void *data)
- 		memset(opt, 0, space);
- }
- 
-+static inline void ndisc_fill_addr_option(struct sk_buff *skb, int type,
-+					  void *data)
-+{
-+	__ndisc_fill_addr_option(skb, type, data, skb->dev->addr_len,
-+				 ndisc_addr_option_pad(skb->dev->type));
-+}
-+
- static struct nd_opt_hdr *ndisc_next_option(struct nd_opt_hdr *cur,
- 					    struct nd_opt_hdr *end)
- {
--- 
-2.8.3
 
