@@ -1,36 +1,52 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from ipv4.connman.net ([82.165.8.211]:57698 "EHLO mail.holtmann.org"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1751033AbcF0GEA (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-	Mon, 27 Jun 2016 02:04:00 -0400
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-Subject: Re: [PATCH bluetooth-next 1/2] 6lowpan: ndisc: fix double read unlock
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20160621082719.9903-1-aar@pengutronix.de>
-Date: Mon, 27 Jun 2016 08:03:54 +0200
-Content-Transfer-Encoding: 7bit
-Message-Id: <2F025960-E3E9-4C4E-BC34-C34C575E756F@holtmann.org>
-References: <20160621082719.9903-1-aar@pengutronix.de>
+Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:54484 "EHLO
+	metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1750864AbcFRIpy (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>);
+	Sat, 18 Jun 2016 04:45:54 -0400
+From: Alexander Aring <aar@pengutronix.de>
+Subject: [PATCH RESEND bluetooth-next 1/3] nl802154: move PAD to right position
+Date: Sat, 18 Jun 2016 10:45:33 +0200
+Message-Id: <20160618084535.4699-1-aar@pengutronix.de>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <aar@pengutronix.de>
-Cc: linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org, kernel@pengutronix.de, dan.carpenter@oracle.com
+To: linux-wpan@vger.kernel.org
+Cc: kernel@pengutronix.de, Alexander Aring <aar@pengutronix.de>, Nicolas Dichtel <nicolas.dichtel@6wind.com>
 
-Hi Alex,
+The PAD define should be above the experimental support. We don't care
+about if we break userspace in experimental stuff but PAD is part of the
+existing UAPI.
 
-> This patch removes a double unlock case to accessing neighbour private
-> data.
-> 
-> Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
-> Signed-off-by: Alexander Aring <aar@pengutronix.de>
-> ---
-> net/6lowpan/ndisc.c | 3 ++-
-> 1 file changed, 2 insertions(+), 1 deletion(-)
+Cc: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Acked-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Reviewed-by: Stefan Schmidt<stefan@osg.samsung.com>
+Signed-off-by: Alexander Aring <aar@pengutronix.de>
+---
+ include/net/nl802154.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-patch has been applied to bluetooth-next tree.
-
-Regards
-
-Marcel
+diff --git a/include/net/nl802154.h b/include/net/nl802154.h
+index fcab4de..7aad2fd 100644
+--- a/include/net/nl802154.h
++++ b/include/net/nl802154.h
+@@ -124,6 +124,8 @@ enum nl802154_attrs {
+ 
+ 	NL802154_ATTR_ACKREQ_DEFAULT,
+ 
++	NL802154_ATTR_PAD,
++
+ 	/* add attributes here, update the policy in nl802154.c */
+ 
+ #ifdef CONFIG_IEEE802154_NL802154_EXPERIMENTAL
+@@ -138,8 +140,6 @@ enum nl802154_attrs {
+ 	NL802154_ATTR_SEC_KEY,
+ #endif /* CONFIG_IEEE802154_NL802154_EXPERIMENTAL */
+ 
+-	NL802154_ATTR_PAD,
+-
+ 	__NL802154_ATTR_AFTER_LAST,
+ 	NL802154_ATTR_MAX = __NL802154_ATTR_AFTER_LAST - 1
+ };
+-- 
+2.8.3
 
