@@ -1,63 +1,44 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from userp1040.oracle.com ([156.151.31.81]:49012 "EHLO
-	userp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752088AbcFUHcg (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Tue, 21 Jun 2016 03:32:36 -0400
-Date: Tue, 21 Jun 2016 10:31:30 +0300
-From: Dan Carpenter <dan.carpenter@oracle.com>
-Subject: re: 6lowpan: introduce 6lowpan-nd
-Message-ID: <20160621073130.GA15560@mwanda>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:43181 "EHLO
+	metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751991AbcFTPCh (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>);
+	Mon, 20 Jun 2016 11:02:37 -0400
+From: Alexander Aring <aar@pengutronix.de>
+Subject: [PATCH bluetooth-next] atusb: don't change csma settings while set channel
+Date: Mon, 20 Jun 2016 17:01:35 +0200
+Message-Id: <20160620150135.13250-1-aar@pengutronix.de>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: aar@pengutronix.de
-Cc: linux-wpan@vger.kernel.org
+To: linux-wpan@vger.kernel.org
+Cc: kernel@pengutronix.de, Alexander Aring <aar@pengutronix.de>, Stefan Schmidt <stefan@osg.samsung.com>
 
-Hello Alexander Aring,
+This patch fixes the behaviour to not overwrite csma settings when
+set channel afterwards.
 
-The patch bbe5f5cefe28: "6lowpan: introduce 6lowpan-nd" from Jun 15,
-2016, leads to the following static checker warning:
+Cc: Stefan Schmidt <stefan@osg.samsung.com>
+Signed-off-by: Alexander Aring <aar@pengutronix.de>
+---
+ drivers/net/ieee802154/atusb.c | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
 
-	net/6lowpan/ndisc.c:139 lowpan_ndisc_opt_addr_space()
-	error: double unlock 'read_lock:&neigh->lock'
+diff --git a/drivers/net/ieee802154/atusb.c b/drivers/net/ieee802154/atusb.c
+index 52c9051..1056ed1 100644
+--- a/drivers/net/ieee802154/atusb.c
++++ b/drivers/net/ieee802154/atusb.c
+@@ -366,11 +366,7 @@ static int atusb_channel(struct ieee802154_hw *hw, u8 page, u8 channel)
+ 	struct atusb *atusb = hw->priv;
+ 	int ret;
+ 
+-	/* This implicitly sets the CCA (Clear Channel Assessment) mode to 0,
+-	 * "Mode 3a, Carrier sense OR energy above threshold".
+-	 * We should probably make this configurable. @@@
+-	 */
+-	ret = atusb_write_reg(atusb, RG_PHY_CC_CCA, channel);
++	ret = atusb_write_subreg(atusb, SR_CHANNEL, channel);
+ 	if (ret < 0)
+ 		return ret;
+ 	msleep(1);	/* @@@ ugly synchronization */
+-- 
+2.9.0
 
-net/6lowpan/ndisc.c
-   116  static int lowpan_ndisc_opt_addr_space(const struct net_device *dev,
-   117                                         u8 icmp6_type, struct neighbour *neigh,
-   118                                         u8 *ha_buf, u8 **ha)
-   119  {
-   120          struct lowpan_802154_neigh *n;
-   121          struct wpan_dev *wpan_dev;
-   122          int addr_space = 0;
-   123  
-   124          if (!lowpan_is_ll(dev, LOWPAN_LLTYPE_IEEE802154))
-   125                  return 0;
-   126  
-   127          switch (icmp6_type) {
-   128          case NDISC_REDIRECT:
-   129                  n = lowpan_802154_neigh(neighbour_priv(neigh));
-   130  
-   131                  read_lock_bh(&neigh->lock);
-   132                  if (lowpan_802154_is_valid_src_short_addr(n->short_addr)) {
-   133                          memcpy(ha_buf, &n->short_addr,
-   134                                 IEEE802154_SHORT_ADDR_LEN);
-   135                          read_unlock_bh(&neigh->lock);
-                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Unlock.
-
-   136                          addr_space += __ndisc_opt_addr_space(IEEE802154_SHORT_ADDR_LEN, 0);
-   137                          *ha = ha_buf;
-   138                  }
-   139                  read_unlock_bh(&neigh->lock);
-                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Second unlock.
-
-   140                  break;
-   141          case NDISC_NEIGHBOUR_ADVERTISEMENT:
-   142          case NDISC_NEIGHBOUR_SOLICITATION:
-   143          case NDISC_ROUTER_SOLICITATION:
-
-regards,
-dan carpenter
