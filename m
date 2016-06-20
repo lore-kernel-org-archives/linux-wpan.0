@@ -1,60 +1,68 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:44397 "EHLO mga09.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751973AbcFTHCE (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-	Mon, 20 Jun 2016 03:02:04 -0400
-Message-ID: <1466405926.31678.115.camel@linux.intel.com>
-Subject: Re: linux-wpan radvd upstream
-From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-Date: Mon, 20 Jun 2016 09:58:46 +0300
-In-Reply-To: <22574127-79b0-9877-769d-1489eb3162e5@pengutronix.de>
-References: <22574127-79b0-9877-769d-1489eb3162e5@pengutronix.de>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:48983 "EHLO
+	metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751954AbcFTKri (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>);
+	Mon, 20 Jun 2016 06:47:38 -0400
+Subject: Re: [RFC 2/4] 6lowpan: Set MAC address lenght according to
+ LOWPAN_LLTYPE
+References: <1466408993-3808-1-git-send-email-patrik.flykt@linux.intel.com>
+ <1466408993-3808-3-git-send-email-patrik.flykt@linux.intel.com>
+From: Alexander Aring <aar@pengutronix.de>
+Message-ID: <776ee1e1-3c13-f75d-3f51-460782e750dc@pengutronix.de>
+Date: Mon, 20 Jun 2016 12:46:12 +0200
+MIME-Version: 1.0
+In-Reply-To: <1466408993-3808-3-git-send-email-patrik.flykt@linux.intel.com>
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <aar@pengutronix.de>, Linux Bluetooth <linux-bluetooth@vger.kernel.org>
-Cc: linux-wpan@vger.kernel.org, reubenhwk@gmail.com
-
-Hi Alex,
-
-On Sat, 2016-06-18 at 11:23 +0200, Alexander Aring wrote:
-> Hi wpan and bluetooth people,
-> 
-> Please review dev branch [0]. The important commit is the rework of
-> the 6CO
-> support which is used by Bluetooth and 802.15.4 6LoWPAN.
-> 
-> Jukka, tell me if support for a common userspace application to
-> sending
-> RA frames is okay for you.
-
-Yes, I am ok with that. It would be really great to have 6co support in
-radvd.
-
-> 
-> I like to send a push request the next days to radvd repository.
-> 
-> btw:
-> 
-> We have now the layer for ndisc stuff and could think about to handle
-> 6CO in userspace.
-> 
-> NOT the sending transmit of RA + 6CO, this isn't kernel job, but
-> processing
-> RA frames with 6CO could be moved to kernel. The kernel take care for
-> context table only (overwrites by administration should always
-> possible).
-> 
-> Anyway, I think we can still change it later if we want to move the
-> handling into kernelspace.
-> 
-> - Alex
-> 
-> [0] https://github.com/linux-wpan/radvd/commits/6lowpan
+To: Patrik Flykt <patrik.flykt@linux.intel.com>, linux-bluetooth@vger.kernel.org, jukka.rissanen@linux.intel.com
+Cc: linux-wpan@vger.kernel.org
 
 
-Cheers,
-Jukka
+Hi,
 
+On 06/20/2016 09:49 AM, Patrik Flykt wrote:
+> Set MAC address length according to the 6LoWPAN link layer in use.
+> Bluetooth Low Energy uses 48 bit addressing while IEEE802.15.4 uses
+> 64 bits.
+> 
+> Signed-off-by: Patrik Flykt <patrik.flykt@linux.intel.com>
+> ---
+>  net/6lowpan/core.c | 11 ++++++++++-
+>  1 file changed, 10 insertions(+), 1 deletion(-)
+> 
+> diff --git a/net/6lowpan/core.c b/net/6lowpan/core.c
+> index 5945f7e..5f9909a 100644
+> --- a/net/6lowpan/core.c
+> +++ b/net/6lowpan/core.c
+> @@ -23,7 +23,16 @@ int lowpan_register_netdevice(struct net_device *dev,
+>  {
+>  	int i, ret;
+>  
+> -	dev->addr_len = EUI64_ADDR_LEN;
+> +	switch (lltype) {
+> +	case LOWPAN_LLTYPE_IEEE802154:
+> +		dev->addr_len = EUI64_ADDR_LEN;
+> +		break;
+
+remove this case.
+
+> +
+> +	case LOWPAN_LLTYPE_BTLE:
+> +		dev->addr_len = ETH_ALEN;
+> +		break;
+> +	}
+> +
+
+I would add here an default branch which does the EUI64 handling. EUI64
+should be the normal case, all others doesn't has a EUI64 and then there
+exists some mechanism to create the EUI64 from e.g. EUI48 address.
+
+Switch case with one case branch makes not really sense, maybe use if
+here.
+
+Also cc linux-wpan for net/6lowpan/ patches.
+
+- Alex
