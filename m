@@ -1,90 +1,76 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:56116 "EHLO
+Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:37195 "EHLO
 	metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1752503AbcF1K2R (ORCPT
+	by vger.kernel.org with ESMTP id S1751946AbcF0WAn (ORCPT
 	<rfc822;linux-wpan@vger.kernel.org>);
-	Tue, 28 Jun 2016 06:28:17 -0400
-Subject: Re: [PATCHv2 bluetooth-next 2/8] ieee802154: add
- ieee802154_skb_src_pan helper
-References: <20160627220037.10108-1-aar@pengutronix.de>
- <20160627220037.10108-3-aar@pengutronix.de>
+	Mon, 27 Jun 2016 18:00:43 -0400
 From: Alexander Aring <aar@pengutronix.de>
-Message-ID: <8447696d-0912-b48c-37c5-22790fc22ae7@pengutronix.de>
-Date: Tue, 28 Jun 2016 12:28:15 +0200
-MIME-Version: 1.0
-In-Reply-To: <20160627220037.10108-3-aar@pengutronix.de>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Subject: [PATCHv2 bluetooth-next 3/8] ieee802154: 6lowpan: fix intra pan id check
+Date: Tue, 28 Jun 2016 00:00:32 +0200
+Message-Id: <20160627220037.10108-4-aar@pengutronix.de>
+In-Reply-To: <20160627220037.10108-1-aar@pengutronix.de>
+References: <20160627220037.10108-1-aar@pengutronix.de>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
-Cc: kernel@pengutronix.de
+Cc: kernel@pengutronix.de, Alexander Aring <aar@pengutronix.de>
 
+The RIOT-OS stack does send intra-pan frames but don't set the intra pan
+flag inside the mac header. It seems this is valid frame addressing but
+inefficient. Anyway this patch adds a new function for intra pan
+addressing, doesn't matter if intra pan flag or source and destination
+are the same. The newly introduction function will be used to check on
+intra pan addressing for 6lowpan.
 
-Hi,
+Signed-off-by: Alexander Aring <aar@pengutronix.de>
+---
+ include/net/mac802154.h     | 19 +++++++++++++++++++
+ net/ieee802154/6lowpan/rx.c |  2 +-
+ 2 files changed, 20 insertions(+), 1 deletion(-)
 
-On 06/28/2016 12:00 AM, Alexander Aring wrote:
-> This patch adds ieee802154_skb_src_pan function to get the pointer
-> address of the source pan id at skb mac pointer.
-> 
-> Signed-off-by: Alexander Aring <aar@pengutronix.de>
-> ---
->  include/linux/ieee802154.h | 13 ++++++++++++
->  include/net/mac802154.h    | 50 ++++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 63 insertions(+)
-> 
-...
->  
->  /**
-> + * ieee802154_skb_src_pan - get the pointer to source pan field
-> + * @fc: mac header frame control field
-> + * @skb: skb where the source pan pointer will be get from
-> + */
-> +static inline unsigned char *ieee802154_skb_src_pan(__le16 fc,
-> +						    const struct sk_buff *skb)
-> +{
-> +	unsigned char *src_pan;
-> +
-> +	switch (ieee802154_saddr_mode(fc)) {
-> +	case cpu_to_le16(IEEE802154_FCTL_ADDR_NONE):
-> +		src_pan = NULL;
-> +		break;
-> +	case cpu_to_le16(IEEE802154_FCTL_SADDR_SHORT):
-> +	case cpu_to_le16(IEEE802154_FCTL_SADDR_EXTENDED):
-> +		src_pan = skb_mac_header(skb) +
-> +			  IEEE802154_FC_LEN +
-> +			  IEEE802154_SEQ_LEN;
-> +
-> +		switch (ieee802154_daddr_mode(fc)) {
-> +		case cpu_to_le16(IEEE802154_FCTL_ADDR_NONE):
+diff --git a/include/net/mac802154.h b/include/net/mac802154.h
+index 5e73c5d..b7f79bd 100644
+--- a/include/net/mac802154.h
++++ b/include/net/mac802154.h
+@@ -337,6 +337,25 @@ static inline unsigned char *ieee802154_skb_src_pan(__le16 fc,
+ }
+ 
+ /**
++ * ieee802154_skb_is_intra_pan_addressing - checks whenever the mac addressing
++ *	is an intra pan communication
++ * @fc: mac header frame control field
++ * @skb: skb where the source and destination pan should be get from
++ */
++static inline bool ieee802154_skb_is_intra_pan_addressing(__le16 fc,
++							  const struct sk_buff *skb)
++{
++	unsigned char *dst_pan = ieee802154_skb_dst_pan(fc, skb),
++		      *src_pan = ieee802154_skb_src_pan(fc, skb);
++
++	/* if one is NULL is no intra pan addressing */
++	if (!dst_pan || !src_pan)
++		return false;
++
++	return !memcmp(dst_pan, src_pan, IEEE802154_PAN_ID_LEN);
++}
++
++/**
+  * ieee802154_be64_to_le64 - copies and convert be64 to le64
+  * @le64_dst: le64 destination pointer
+  * @be64_src: be64 source pointer
+diff --git a/net/ieee802154/6lowpan/rx.c b/net/ieee802154/6lowpan/rx.c
+index ef185dd..649e7d45 100644
+--- a/net/ieee802154/6lowpan/rx.c
++++ b/net/ieee802154/6lowpan/rx.c
+@@ -262,7 +262,7 @@ static inline bool lowpan_rx_h_check(struct sk_buff *skb)
+ 
+ 	/* check on ieee802154 conform 6LoWPAN header */
+ 	if (!ieee802154_is_data(fc) ||
+-	    !ieee802154_is_intra_pan(fc))
++	    !ieee802154_skb_is_intra_pan_addressing(fc, skb))
+ 		return false;
+ 
+ 	/* check if we can dereference the dispatch */
+-- 
+2.9.0
 
-This case is more complicated than it looks like:
-
-If it's intra_pan and there is no destination pan (because daddr is
-none), then the source pan should be NULL. If it's not intra_pan then
-there is no destination address but source address is available with
-own pan id field.
-
-I will fix it in v3.
-
-> +			break;
-> +		case cpu_to_le16(IEEE802154_FCTL_DADDR_SHORT):
-> +			if (!ieee802154_is_intra_pan(fc)) {
-> +				src_pan += IEEE802154_PAN_ID_LEN +
-> +					   IEEE802154_SHORT_ADDR_LEN;
-> +			}
-> +			break;
-> +		case cpu_to_le16(IEEE802154_FCTL_DADDR_EXTENDED):
-> +			if (!ieee802154_is_intra_pan(fc)) {
-> +				src_pan += IEEE802154_PAN_ID_LEN +
-> +					   IEEE802154_EXTENDED_ADDR_LEN;
-> +			}
-> +			break;
-> +		default:
-> +			WARN_ONCE(1, "invalid addr mode detected");
-> +			src_pan = NULL;
-> +			break;
-> +		}
-> +		break;
-
-- Alex
