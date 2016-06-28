@@ -1,134 +1,90 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:36226 "EHLO
+Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:56116 "EHLO
 	metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751875AbcF0WAn (ORCPT
+	by vger.kernel.org with ESMTP id S1752503AbcF1K2R (ORCPT
 	<rfc822;linux-wpan@vger.kernel.org>);
-	Mon, 27 Jun 2016 18:00:43 -0400
-From: Alexander Aring <aar@pengutronix.de>
-Subject: [PATCHv2 bluetooth-next 2/8] ieee802154: add ieee802154_skb_src_pan helper
-Date: Tue, 28 Jun 2016 00:00:31 +0200
-Message-Id: <20160627220037.10108-3-aar@pengutronix.de>
-In-Reply-To: <20160627220037.10108-1-aar@pengutronix.de>
+	Tue, 28 Jun 2016 06:28:17 -0400
+Subject: Re: [PATCHv2 bluetooth-next 2/8] ieee802154: add
+ ieee802154_skb_src_pan helper
 References: <20160627220037.10108-1-aar@pengutronix.de>
+ <20160627220037.10108-3-aar@pengutronix.de>
+From: Alexander Aring <aar@pengutronix.de>
+Message-ID: <8447696d-0912-b48c-37c5-22790fc22ae7@pengutronix.de>
+Date: Tue, 28 Jun 2016 12:28:15 +0200
+MIME-Version: 1.0
+In-Reply-To: <20160627220037.10108-3-aar@pengutronix.de>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
-Cc: kernel@pengutronix.de, Alexander Aring <aar@pengutronix.de>
+Cc: kernel@pengutronix.de
 
-This patch adds ieee802154_skb_src_pan function to get the pointer
-address of the source pan id at skb mac pointer.
 
-Signed-off-by: Alexander Aring <aar@pengutronix.de>
----
- include/linux/ieee802154.h | 13 ++++++++++++
- include/net/mac802154.h    | 50 ++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 63 insertions(+)
+Hi,
 
-diff --git a/include/linux/ieee802154.h b/include/linux/ieee802154.h
-index 91f4665..ddb8901 100644
---- a/include/linux/ieee802154.h
-+++ b/include/linux/ieee802154.h
-@@ -50,6 +50,7 @@
- 
- #define IEEE802154_EXTENDED_ADDR_LEN	8
- #define IEEE802154_SHORT_ADDR_LEN	2
-+#define IEEE802154_PAN_ID_LEN		2
- 
- #define IEEE802154_LIFS_PERIOD		40
- #define IEEE802154_SIFS_PERIOD		12
-@@ -224,12 +225,15 @@ enum {
- #define IEEE802154_FCTL_SECEN		0x0004
- #define IEEE802154_FCTL_INTRA_PAN	0x0040
- #define IEEE802154_FCTL_DADDR		0x0c00
-+#define IEEE802154_FCTL_SADDR		0xc000
- 
- #define IEEE802154_FTYPE_DATA		0x0001
- 
- #define IEEE802154_FCTL_ADDR_NONE	0x0000
- #define IEEE802154_FCTL_DADDR_SHORT	0x0800
- #define IEEE802154_FCTL_DADDR_EXTENDED	0x0c00
-+#define IEEE802154_FCTL_SADDR_SHORT	0x8000
-+#define IEEE802154_FCTL_SADDR_EXTENDED	0xc000
- 
- /*
-  * ieee802154_is_data - check if type is IEEE802154_FTYPE_DATA
-@@ -277,6 +281,15 @@ static inline __le16 ieee802154_daddr_mode(__le16 fc)
- 	return fc & cpu_to_le16(IEEE802154_FCTL_DADDR);
- }
- 
-+/*
-+ * ieee802154_saddr_mode - get saddr mode from fc
-+ * @fc: frame control bytes in little-endian byteorder
-+ */
-+static inline __le16 ieee802154_saddr_mode(__le16 fc)
-+{
-+	return fc & cpu_to_le16(IEEE802154_FCTL_SADDR);
-+}
-+
- /**
-  * ieee802154_is_valid_psdu_len - check if psdu len is valid
-  * available lengths:
-diff --git a/include/net/mac802154.h b/include/net/mac802154.h
-index b3f7cd8..5e73c5d 100644
---- a/include/net/mac802154.h
-+++ b/include/net/mac802154.h
-@@ -287,6 +287,56 @@ static inline unsigned char *ieee802154_skb_dst_pan(__le16 fc,
- }
- 
- /**
-+ * ieee802154_skb_src_pan - get the pointer to source pan field
-+ * @fc: mac header frame control field
-+ * @skb: skb where the source pan pointer will be get from
-+ */
-+static inline unsigned char *ieee802154_skb_src_pan(__le16 fc,
-+						    const struct sk_buff *skb)
-+{
-+	unsigned char *src_pan;
-+
-+	switch (ieee802154_saddr_mode(fc)) {
-+	case cpu_to_le16(IEEE802154_FCTL_ADDR_NONE):
-+		src_pan = NULL;
-+		break;
-+	case cpu_to_le16(IEEE802154_FCTL_SADDR_SHORT):
-+	case cpu_to_le16(IEEE802154_FCTL_SADDR_EXTENDED):
-+		src_pan = skb_mac_header(skb) +
-+			  IEEE802154_FC_LEN +
-+			  IEEE802154_SEQ_LEN;
-+
-+		switch (ieee802154_daddr_mode(fc)) {
-+		case cpu_to_le16(IEEE802154_FCTL_ADDR_NONE):
-+			break;
-+		case cpu_to_le16(IEEE802154_FCTL_DADDR_SHORT):
-+			if (!ieee802154_is_intra_pan(fc)) {
-+				src_pan += IEEE802154_PAN_ID_LEN +
-+					   IEEE802154_SHORT_ADDR_LEN;
-+			}
-+			break;
-+		case cpu_to_le16(IEEE802154_FCTL_DADDR_EXTENDED):
-+			if (!ieee802154_is_intra_pan(fc)) {
-+				src_pan += IEEE802154_PAN_ID_LEN +
-+					   IEEE802154_EXTENDED_ADDR_LEN;
-+			}
-+			break;
-+		default:
-+			WARN_ONCE(1, "invalid addr mode detected");
-+			src_pan = NULL;
-+			break;
-+		}
-+		break;
-+	default:
-+		WARN_ONCE(1, "invalid addr mode detected");
-+		src_pan = NULL;
-+		break;
-+	}
-+
-+	return src_pan;
-+}
-+
-+/**
-  * ieee802154_be64_to_le64 - copies and convert be64 to le64
-  * @le64_dst: le64 destination pointer
-  * @be64_src: be64 source pointer
--- 
-2.9.0
+On 06/28/2016 12:00 AM, Alexander Aring wrote:
+> This patch adds ieee802154_skb_src_pan function to get the pointer
+> address of the source pan id at skb mac pointer.
+> 
+> Signed-off-by: Alexander Aring <aar@pengutronix.de>
+> ---
+>  include/linux/ieee802154.h | 13 ++++++++++++
+>  include/net/mac802154.h    | 50 ++++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 63 insertions(+)
+> 
+...
+>  
+>  /**
+> + * ieee802154_skb_src_pan - get the pointer to source pan field
+> + * @fc: mac header frame control field
+> + * @skb: skb where the source pan pointer will be get from
+> + */
+> +static inline unsigned char *ieee802154_skb_src_pan(__le16 fc,
+> +						    const struct sk_buff *skb)
+> +{
+> +	unsigned char *src_pan;
+> +
+> +	switch (ieee802154_saddr_mode(fc)) {
+> +	case cpu_to_le16(IEEE802154_FCTL_ADDR_NONE):
+> +		src_pan = NULL;
+> +		break;
+> +	case cpu_to_le16(IEEE802154_FCTL_SADDR_SHORT):
+> +	case cpu_to_le16(IEEE802154_FCTL_SADDR_EXTENDED):
+> +		src_pan = skb_mac_header(skb) +
+> +			  IEEE802154_FC_LEN +
+> +			  IEEE802154_SEQ_LEN;
+> +
+> +		switch (ieee802154_daddr_mode(fc)) {
+> +		case cpu_to_le16(IEEE802154_FCTL_ADDR_NONE):
 
+This case is more complicated than it looks like:
+
+If it's intra_pan and there is no destination pan (because daddr is
+none), then the source pan should be NULL. If it's not intra_pan then
+there is no destination address but source address is available with
+own pan id field.
+
+I will fix it in v3.
+
+> +			break;
+> +		case cpu_to_le16(IEEE802154_FCTL_DADDR_SHORT):
+> +			if (!ieee802154_is_intra_pan(fc)) {
+> +				src_pan += IEEE802154_PAN_ID_LEN +
+> +					   IEEE802154_SHORT_ADDR_LEN;
+> +			}
+> +			break;
+> +		case cpu_to_le16(IEEE802154_FCTL_DADDR_EXTENDED):
+> +			if (!ieee802154_is_intra_pan(fc)) {
+> +				src_pan += IEEE802154_PAN_ID_LEN +
+> +					   IEEE802154_EXTENDED_ADDR_LEN;
+> +			}
+> +			break;
+> +		default:
+> +			WARN_ONCE(1, "invalid addr mode detected");
+> +			src_pan = NULL;
+> +			break;
+> +		}
+> +		break;
+
+- Alex
