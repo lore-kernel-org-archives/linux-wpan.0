@@ -1,93 +1,104 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-lf0-f68.google.com ([209.85.215.68]:35808 "EHLO
-	mail-lf0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751932AbcGSFpL (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Tue, 19 Jul 2016 01:45:11 -0400
-Date: Tue, 19 Jul 2016 08:45:01 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-Subject: Re: [RFC bluetooth-next 20/20] 6lowpan: bluetooth: add new
- implementation
-Message-ID: <20160719054501.GA17979@t440s.P-661HNU-F1>
-References: <20160711195044.25343-1-aar@pengutronix.de>
- <20160711195044.25343-21-aar@pengutronix.de>
- <dc82361d-4c3c-8b40-8463-97909c217485@pengutronix.de>
- <CABBYNZL0xFGcW_t-eW9hAL8VOLnp4NYL_iKqChJ8B0srBdEgvQ@mail.gmail.com>
- <11469f72-fa15-5545-387c-ecd051b74897@pengutronix.de>
- <CABBYNZ+A54MQ3uWGjDVXNOwwX3v3VptZz2UQUNV4_KFKPaV==A@mail.gmail.com>
- <190983bc-9467-8ff8-436c-ca1fcdfe001b@pengutronix.de>
+Received: from mail-lf0-f52.google.com ([209.85.215.52]:33249 "EHLO
+	mail-lf0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752618AbcGSIXX (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Tue, 19 Jul 2016 04:23:23 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <190983bc-9467-8ff8-436c-ca1fcdfe001b@pengutronix.de>
+In-Reply-To: <20160719054501.GA17979@t440s.P-661HNU-F1>
+References: <20160711195044.25343-1-aar@pengutronix.de> <20160711195044.25343-21-aar@pengutronix.de>
+ <dc82361d-4c3c-8b40-8463-97909c217485@pengutronix.de> <CABBYNZL0xFGcW_t-eW9hAL8VOLnp4NYL_iKqChJ8B0srBdEgvQ@mail.gmail.com>
+ <11469f72-fa15-5545-387c-ecd051b74897@pengutronix.de> <CABBYNZ+A54MQ3uWGjDVXNOwwX3v3VptZz2UQUNV4_KFKPaV==A@mail.gmail.com>
+ <190983bc-9467-8ff8-436c-ca1fcdfe001b@pengutronix.de> <20160719054501.GA17979@t440s.P-661HNU-F1>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 19 Jul 2016 11:23:20 +0300
+Message-ID: <CABBYNZ+epQ6LPP4PfwXAstim_h5yY78GgbVLEH-i96g6u8p_Dw@mail.gmail.com>
+Subject: Re: [RFC bluetooth-next 20/20] 6lowpan: bluetooth: add new implementation
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <aar@pengutronix.de>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, linux-wpan@vger.kernel.org, kernel@pengutronix.de, kaspar@schleiser.de, Jukka Rissanen <jukka.rissanen@linux.intel.com>, "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, Patrik Flykt <Patrik.Flykt@linux.intel.com>
+To: Alexander Aring <aar@pengutronix.de>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, linux-wpan@vger.kernel.org, kernel@pengutronix.de, kaspar@schleiser.de, Jukka Rissanen <jukka.rissanen@linux.intel.com>, "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, Patrik Flykt <Patrik.Flykt@linux.intel.com>
 
-Hi Alex,
+Hi Alex, Johan,
 
-On Mon, Jul 18, 2016, Alexander Aring wrote:
-> > This is tricky because the even using privacy the address of the
-> > interface is defined by the time the connection is established, but
-> > perhaps there is a way to set this properly on the network interface,
-> > anyway I do agree the making the interface persistent is probably much
-> > more convenient.
-> > 
-> 
-> This is currently something which I don't understand. With "privacy" you
-> mean the LE_PUBLIC and LE_PRIVATE address, the address type?
+On Tue, Jul 19, 2016 at 8:45 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Alex,
+>
+> On Mon, Jul 18, 2016, Alexander Aring wrote:
+>> > This is tricky because the even using privacy the address of the
+>> > interface is defined by the time the connection is established, but
+>> > perhaps there is a way to set this properly on the network interface,
+>> > anyway I do agree the making the interface persistent is probably much
+>> > more convenient.
+>> >
+>>
+>> This is currently something which I don't understand. With "privacy" you
+>> mean the LE_PUBLIC and LE_PRIVATE address, the address type?
+>
+> Might be worth to do a quick read-through of section 1.3 in Vol 6, Part
+> B of the Bluetooth Core specification (v4.2) for a quick overview of LE
+> addresses. On the top-level you have public & random, but random itself
+> is further split into three different sub-types out of which two are
+> considered "private". The third one, a static random address, is
+> considered an identity address the same way a public address is.
 
-Might be worth to do a quick read-through of section 1.3 in Vol 6, Part
-B of the Bluetooth Core specification (v4.2) for a quick overview of LE
-addresses. On the top-level you have public & random, but random itself
-is further split into three different sub-types out of which two are
-considered "private". The third one, a static random address, is
-considered an identity address the same way a public address is.
+The so called privacy, the use of RPA, is actually recommended by RFC 7668:
 
-> I think, we don't need that when we doing an interface register. This is
-> currently one of the big issue which this RFC fixes, the 8 byte vs 6
-> bytes address.
-> 
-> At Interface register we need to know the source address only, which is
-> my opinion the hdev->bdaddr. This address has (in my opinion) nothing
-> todo with the address type.
-> 
-> I can argument here with rfc7668:
-> 
->  "This means that no bit in the IID indicates whether the
->   underlying Bluetooth device address is public or random."
-> 
-> The IID is for autoconfiguration the last 8 bytes of IPv6 address and
-> usually generated by "dev->dev_addr" (dev = struct net_device).
-> Also the "dev->dev_addr" will be used in address options for
-> NS/NA/RS/RA...
-> 
-> In the current implementation the IID generation is mixed with the
-> "dev->addr" (dev as struct net_device) field which is wrong.
-> 
-> In summary:
-> 
-> We don't need to know to wait for connection to setting the
-> "dev->dev_addr" (struct net_device). This field should be "hdev->bdaddr"
-> and hdev should be the hdev which is bounded to the dev(lowpan struct
-> net_device).
-> 
-> I see no issues to create interfaces before, except you saying that
-> "hdev->bdaddr" is unknown.
+https://tools.ietf.org/html/rfc7668#section-3.2.2
 
-hdev->bdaddr tracks the public address of a device, however the
-Bluetooth specification doesn't mandate that all devices have a public
-address, i.e. it can also be all zeroes. In particular, single-mode
-(LE-only) devices may only use a random address and have a static random
-address as their identity address. Maybe it's the identity address that
-you should be using instead of hdev->bdaddr?
+>> I think, we don't need that when we doing an interface register. This is
+>> currently one of the big issue which this RFC fixes, the 8 byte vs 6
+>> bytes address.
+>>
+>> At Interface register we need to know the source address only, which is
+>> my opinion the hdev->bdaddr. This address has (in my opinion) nothing
+>> todo with the address type.
+>>
+>> I can argument here with rfc7668:
+>>
+>>  "This means that no bit in the IID indicates whether the
+>>   underlying Bluetooth device address is public or random."
 
-Right now the identity address isn't stored in any variable, but we do
-have a hci_copy_identity_address() function to fetch it (you'd just
-ignore the addr_type if you don't need that).
+See above the rfc7668 actually recommends using RPAs.
 
-Also note that the identity address isn't necessarily the same as what
-was used to create the connection, so if the connection address is of
-importance we track that in hci_conn->init_addr and hci_conn->resp_addr.
+>> The IID is for autoconfiguration the last 8 bytes of IPv6 address and
+>> usually generated by "dev->dev_addr" (dev = struct net_device).
+>> Also the "dev->dev_addr" will be used in address options for
+>> NS/NA/RS/RA...
+>>
+>> In the current implementation the IID generation is mixed with the
+>> "dev->addr" (dev as struct net_device) field which is wrong.
+>>
+>> In summary:
+>>
+>> We don't need to know to wait for connection to setting the
+>> "dev->dev_addr" (struct net_device). This field should be "hdev->bdaddr"
+>> and hdev should be the hdev which is bounded to the dev(lowpan struct
+>> net_device).
+>>
+>> I see no issues to create interfaces before, except you saying that
+>> "hdev->bdaddr" is unknown.
+>
+> hdev->bdaddr tracks the public address of a device, however the
+> Bluetooth specification doesn't mandate that all devices have a public
+> address, i.e. it can also be all zeroes. In particular, single-mode
+> (LE-only) devices may only use a random address and have a static random
+> address as their identity address. Maybe it's the identity address that
+> you should be using instead of hdev->bdaddr?
+>
+> Right now the identity address isn't stored in any variable, but we do
+> have a hci_copy_identity_address() function to fetch it (you'd just
+> ignore the addr_type if you don't need that).
+>
+> Also note that the identity address isn't necessarily the same as what
+> was used to create the connection, so if the connection address is of
+> importance we track that in hci_conn->init_addr and hci_conn->resp_addr.
 
-Johan
+Following the recommendation of rfc7668 which say the node should
+always change its address when connecting, which means advertise a
+different address, also the router should periodically change is RPA,
+thus the network interface may have to assume different MAC addresses
+which I don't is currently possible or we are back to having the
+interfaces created on demand.
+
+-- 
+Luiz Augusto von Dentz
