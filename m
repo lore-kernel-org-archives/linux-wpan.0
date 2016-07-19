@@ -1,104 +1,101 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-lf0-f52.google.com ([209.85.215.52]:33249 "EHLO
-	mail-lf0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752618AbcGSIXX (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Tue, 19 Jul 2016 04:23:23 -0400
+Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:41747 "EHLO
+	metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751803AbcGSVGN (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>);
+	Tue, 19 Jul 2016 17:06:13 -0400
+Subject: Re: [RFC bluetooth-next 20/20] 6lowpan: bluetooth: add new
+ implementation
+References: <20160711195044.25343-1-aar@pengutronix.de>
+ <20160711195044.25343-21-aar@pengutronix.de>
+ <dc82361d-4c3c-8b40-8463-97909c217485@pengutronix.de>
+ <CABBYNZL0xFGcW_t-eW9hAL8VOLnp4NYL_iKqChJ8B0srBdEgvQ@mail.gmail.com>
+ <11469f72-fa15-5545-387c-ecd051b74897@pengutronix.de>
+ <CABBYNZ+A54MQ3uWGjDVXNOwwX3v3VptZz2UQUNV4_KFKPaV==A@mail.gmail.com>
+ <190983bc-9467-8ff8-436c-ca1fcdfe001b@pengutronix.de>
+ <20160719054501.GA17979@t440s.P-661HNU-F1>
+ <CABBYNZ+epQ6LPP4PfwXAstim_h5yY78GgbVLEH-i96g6u8p_Dw@mail.gmail.com>
+From: Alexander Aring <aar@pengutronix.de>
+Message-ID: <ae47fe95-3599-d3f7-49bf-66c02b067fca@pengutronix.de>
+Date: Tue, 19 Jul 2016 23:05:58 +0200
 MIME-Version: 1.0
-In-Reply-To: <20160719054501.GA17979@t440s.P-661HNU-F1>
-References: <20160711195044.25343-1-aar@pengutronix.de> <20160711195044.25343-21-aar@pengutronix.de>
- <dc82361d-4c3c-8b40-8463-97909c217485@pengutronix.de> <CABBYNZL0xFGcW_t-eW9hAL8VOLnp4NYL_iKqChJ8B0srBdEgvQ@mail.gmail.com>
- <11469f72-fa15-5545-387c-ecd051b74897@pengutronix.de> <CABBYNZ+A54MQ3uWGjDVXNOwwX3v3VptZz2UQUNV4_KFKPaV==A@mail.gmail.com>
- <190983bc-9467-8ff8-436c-ca1fcdfe001b@pengutronix.de> <20160719054501.GA17979@t440s.P-661HNU-F1>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 19 Jul 2016 11:23:20 +0300
-Message-ID: <CABBYNZ+epQ6LPP4PfwXAstim_h5yY78GgbVLEH-i96g6u8p_Dw@mail.gmail.com>
-Subject: Re: [RFC bluetooth-next 20/20] 6lowpan: bluetooth: add new implementation
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <CABBYNZ+epQ6LPP4PfwXAstim_h5yY78GgbVLEH-i96g6u8p_Dw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <aar@pengutronix.de>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, linux-wpan@vger.kernel.org, kernel@pengutronix.de, kaspar@schleiser.de, Jukka Rissanen <jukka.rissanen@linux.intel.com>, "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, Patrik Flykt <Patrik.Flykt@linux.intel.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de, kaspar@schleiser.de, Jukka Rissanen <jukka.rissanen@linux.intel.com>, "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, Patrik Flykt <Patrik.Flykt@linux.intel.com>, carlesgo@entel.upc.edu
 
-Hi Alex, Johan,
 
-On Tue, Jul 19, 2016 at 8:45 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Alex,
->
-> On Mon, Jul 18, 2016, Alexander Aring wrote:
->> > This is tricky because the even using privacy the address of the
->> > interface is defined by the time the connection is established, but
->> > perhaps there is a way to set this properly on the network interface,
->> > anyway I do agree the making the interface persistent is probably much
->> > more convenient.
->> >
+Hi,
+
+On 07/19/2016 10:23 AM, Luiz Augusto von Dentz wrote:
+> Hi Alex, Johan,
+> 
+> On Tue, Jul 19, 2016 at 8:45 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+>> Hi Alex,
 >>
->> This is currently something which I don't understand. With "privacy" you
->> mean the LE_PUBLIC and LE_PRIVATE address, the address type?
->
-> Might be worth to do a quick read-through of section 1.3 in Vol 6, Part
-> B of the Bluetooth Core specification (v4.2) for a quick overview of LE
-> addresses. On the top-level you have public & random, but random itself
-> is further split into three different sub-types out of which two are
-> considered "private". The third one, a static random address, is
-> considered an identity address the same way a public address is.
+...
+> 
+> Following the recommendation of rfc7668 which say the node should
+> always change its address when connecting, which means advertise a
+> different address, also the router should periodically change is RPA,
+> thus the network interface may have to assume different MAC addresses
+> which I don't is currently possible or we are back to having the
+> interfaces created on demand.
+> 
 
-The so called privacy, the use of RPA, is actually recommended by RFC 7668:
+mhhh, I am not a bluetooth expert. What really means "periodically
+change is RPA" and how is this done in the Linux bluetooth?
 
-https://tools.ietf.org/html/rfc7668#section-3.2.2
+When "changing the RPA" happens, does that mean the all connections will
+be lost (unregister interface). Then the previous connections will be
+recreated (register interface) with a complete different MAC address?
 
->> I think, we don't need that when we doing an interface register. This is
->> currently one of the big issue which this RFC fixes, the 8 byte vs 6
->> bytes address.
->>
->> At Interface register we need to know the source address only, which is
->> my opinion the hdev->bdaddr. This address has (in my opinion) nothing
->> todo with the address type.
->>
->> I can argument here with rfc7668:
->>
->>  "This means that no bit in the IID indicates whether the
->>   underlying Bluetooth device address is public or random."
+I think it will be a complete different MAC address and this happens all
+15 minutes.
 
-See above the rfc7668 actually recommends using RPAs.
+"The recommended time interval before randomizing new private address is 15
+ minutes, as determined by timer T_GAP(private_addr_int) in Table 17.1 of
+ the Bluetooth Generic Access Profile [BTCorev4.1]."
 
->> The IID is for autoconfiguration the last 8 bytes of IPv6 address and
->> usually generated by "dev->dev_addr" (dev = struct net_device).
->> Also the "dev->dev_addr" will be used in address options for
->> NS/NA/RS/RA...
->>
->> In the current implementation the IID generation is mixed with the
->> "dev->addr" (dev as struct net_device) field which is wrong.
->>
->> In summary:
->>
->> We don't need to know to wait for connection to setting the
->> "dev->dev_addr" (struct net_device). This field should be "hdev->bdaddr"
->> and hdev should be the hdev which is bounded to the dev(lowpan struct
->> net_device).
->>
->> I see no issues to create interfaces before, except you saying that
->> "hdev->bdaddr" is unknown.
->
-> hdev->bdaddr tracks the public address of a device, however the
-> Bluetooth specification doesn't mandate that all devices have a public
-> address, i.e. it can also be all zeroes. In particular, single-mode
-> (LE-only) devices may only use a random address and have a static random
-> address as their identity address. Maybe it's the identity address that
-> you should be using instead of hdev->bdaddr?
->
-> Right now the identity address isn't stored in any variable, but we do
-> have a hci_copy_identity_address() function to fetch it (you'd just
-> ignore the addr_type if you don't need that).
->
-> Also note that the identity address isn't necessarily the same as what
-> was used to create the connection, so if the connection address is of
-> importance we track that in hci_conn->init_addr and hci_conn->resp_addr.
+If so, then I could understand the reason why recreation of interface.
 
-Following the recommendation of rfc7668 which say the node should
-always change its address when connecting, which means advertise a
-different address, also the router should periodically change is RPA,
-thus the network interface may have to assume different MAC addresses
-which I don't is currently possible or we are back to having the
-interfaces created on demand.
+The only question would for me, how does the bluetooth subsystem handle
+such MAC address update with running l2cap channel connections. I
+suppose it will close all connections, otherwise the current mainline
+solution doesn't work here, because if all channels are disconnected we
+get an interface deregister, so far I understood. Afterwards somehow all
+connection will be re-established under a new interface, or?
 
--- 
-Luiz Augusto von Dentz
+---
+
+Another idea would be stop the interface which allows to change mac
+address. Maybe we can have some event handling here, that the mac
+address will be changed. If so, such event occur change dev->dev_addr
+and open the interface again. stop (ifdown) and open (ifup) with changing
+the mac address should be handled by IPv6 applications.
+
+We need at least to run [0] on mac address changes, this reacts on IFUP
+and CHANGE netdev notifiers. This will generate the SLAAC address, but
+it confuse me somehow to change this address all 15 minutes because the
+MAC address changed. :-/
+
+Deregister and register the interface is a no-go in my opinion and we
+should have another solution. Especially when such deregister/register
+mechanism happens periodically all 15 minutes.
+
+---
+
+I suppose the "RPA" will be the device address which also need to be
+filled in as source/target address option in NS/NA/RS/RA then. It's just
+difficult to deal with that when the address will be changed
+periodically in 15 minutes.
+
+btw: I talked with C. Gomez today, because I am at the IETF. He would
+like to help here to make everything clear and agreed that I cc him here.
+
+- Alex
+
+[0] http://lxr.free-electrons.com/source/net/ipv6/addrconf.c#L3333
