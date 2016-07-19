@@ -1,55 +1,158 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from ipv4.connman.net ([82.165.8.211]:40507 "EHLO mail.holtmann.org"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1753159AbcGTKXG convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Wed, 20 Jul 2016 06:23:06 -0400
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+Received: from mail-lf0-f44.google.com ([209.85.215.44]:36578 "EHLO
+	mail-lf0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752713AbcGSIt7 (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Tue, 19 Jul 2016 04:49:59 -0400
+MIME-Version: 1.0
+In-Reply-To: <190983bc-9467-8ff8-436c-ca1fcdfe001b@pengutronix.de>
+References: <20160711195044.25343-1-aar@pengutronix.de> <20160711195044.25343-21-aar@pengutronix.de>
+ <dc82361d-4c3c-8b40-8463-97909c217485@pengutronix.de> <CABBYNZL0xFGcW_t-eW9hAL8VOLnp4NYL_iKqChJ8B0srBdEgvQ@mail.gmail.com>
+ <11469f72-fa15-5545-387c-ecd051b74897@pengutronix.de> <CABBYNZ+A54MQ3uWGjDVXNOwwX3v3VptZz2UQUNV4_KFKPaV==A@mail.gmail.com>
+ <190983bc-9467-8ff8-436c-ca1fcdfe001b@pengutronix.de>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 19 Jul 2016 11:49:56 +0300
+Message-ID: <CABBYNZK-zzTzy5uUYd1GVgwiNX9MNpAmWpWUbRyAbOqN0fcNdg@mail.gmail.com>
 Subject: Re: [RFC bluetooth-next 20/20] 6lowpan: bluetooth: add new implementation
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20160720073944.GA20780@t440s>
-Date: Wed, 20 Jul 2016 13:22:59 +0300
-Content-Transfer-Encoding: 8BIT
-Message-Id: <D2524A03-DF9F-4AA2-A046-C8FC1AADB1C1@holtmann.org>
-References: <20160711195044.25343-1-aar@pengutronix.de> <20160711195044.25343-21-aar@pengutronix.de> <dc82361d-4c3c-8b40-8463-97909c217485@pengutronix.de> <CABBYNZL0xFGcW_t-eW9hAL8VOLnp4NYL_iKqChJ8B0srBdEgvQ@mail.gmail.com> <11469f72-fa15-5545-387c-ecd051b74897@pengutronix.de> <CABBYNZ+A54MQ3uWGjDVXNOwwX3v3VptZz2UQUNV4_KFKPaV==A@mail.gmail.com> <190983bc-9467-8ff8-436c-ca1fcdfe001b@pengutronix.de> <20160719054501.GA17979@t440s.P-661HNU-F1> <CABBYNZ+epQ6LPP4PfwXAstim_h5yY78GgbVLEH-i96g6u8p_Dw@mail.gmail.com> <ae47fe95-3599-d3f7-49bf-66c02b067fca@pengutronix.de> <20160720073944.GA20780@t440s>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: Alexander Aring <aar@pengutronix.de>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, linux-wpan@vger.kernel.org, kernel@pengutronix.de, kaspar@schleiser.de, Jukka Rissanen <jukka.rissanen@linux.intel.com>, "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, Patrik Flykt <Patrik.Flykt@linux.intel.com>, carlesgo@entel.upc.edu
+To: Alexander Aring <aar@pengutronix.de>
+Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de, kaspar@schleiser.de, Jukka Rissanen <jukka.rissanen@linux.intel.com>, "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, Patrik Flykt <Patrik.Flykt@linux.intel.com>
 
-Hi Johan,
+Hi Alex,
 
->> mhhh, I am not a bluetooth expert. What really means "periodically
->> change is RPA" and how is this done in the Linux bluetooth?
->> 
->> When "changing the RPA" happens, does that mean the all connections will
->> be lost (unregister interface). Then the previous connections will be
->> recreated (register interface) with a complete different MAC address?
-> 
-> Connections aren't lost when the random address is changed. That's why
-> we track the hci_conn->init_addr and hci_conn->resp_addr. The way this
-> is dealt with e.g. the Security Manager protocol is that the connection
-> creation address *is* the address for the remote device throughout the
-> entire connection, no matter what happens to the local and remote random
-> address during the connection. I would expect 6LoWPAN do do something
-> similar.
-> 
-> What was still unclear to me (maybe I missed it in the thread): does the
-> 6LoWPAN for LE spec require using the connection creation address or the
-> identity address? If it would be the latter then that's something that
-> will never change and the whole interface recreation issue goes away.
+On Tue, Jul 19, 2016 at 12:52 AM, Alexander Aring <aar@pengutronix.de> wrote:
+>>> If you have the current debugfs UAPI 1:1 already in some kind of stable
+>>> bluetooth API then I would give you the BIG advice to fix that and let
+>>> me look into that. (As far I know there exists idea's only, no
+>>> implementations).
+>>
+>> There is the patches posted by Patrik implementing the management interface:
+>>
+>> http://www.spinics.net/lists/linux-bluetooth/msg66486.html
+>>
+> Okay, just to be sure here, in the above document:
+>
+> Controller ID = hdev(usually var name, struct hci_dev)->id
+>
+> Interface Index = dev(usualy var name, struct net_device)->idx
+>
+> Is this right? I think so, so my next stuff will base on that.
 
-of course we do not want to leak the identity address if we don't have to. That is why I am thinking that the IPv6 link should always use something close to the link layer address.
+Yep.
 
-The basic assumption should be that when hci0 is powered on, then you get a 6lo network interface. If you power the controller down, then the 6lo interface gets removed.
+>> Note that these commands are per interface index, so you would be able
+>> to have two dongle talking to each other, we could in fact even
+>> automate this to test with 2 virtual controllers.
+>>
+>
+> We have similar automating testing in 802.15.4 6LoWPAN with virtual
+> transceiver drivers.
+>
+> I always looked somehow for some virtual driver in bluetooth, does this
+> exist mainline?
 
-By default, the 6lo interface should not have a single address assigned to it if there are no connections. When a connection is created, then a new address should be assigned to it. If the connection drops, then it should be removed. And of course there needs to be usage counter attached to each address. If two connections use the same address, then it only gets removed once there is no connection with that source address active anymore (meaning it needs some sort of reference counting).
+Take a look at the emulator directory:
 
-With usage of public address or static random address, then most likely only one address on 6lo interface is used. This is not strictly mandated by the spec since you can in theory have one connection with a public address and the other with the static random address. However ignore that fact for a bit since it will just work out when dealing with RPAs anyway. The importance is the link layer address that is used when establishing the connection.
+https://git.kernel.org/cgit/bluetooth/bluez.git/tree/emulator
 
-In case you use RPAs, then every connection will have a new link layer address (we rotate the RPA when disabling advertising). As long as the connection is active, that source address should be represented on 6lo interface. However this is no difference either since per spec each new connection can have a different address from all the existing connections. That is always valid with the link layer.
+>> It is about priorities, we should concentrate in making it work for
+>> simpler cases, besides the RFC don't talk about subnets either.
+>>
+>
+> I don't talking about subnets.
+>
+> I am talking about "make the connect command per interface". Patrik
+> works shows the following:
+>
+> Add Network Command
+> ===================
+>
+>         Command Code:           0x0043
+>         Controller Index:       <controller id>
+>         Command Parameters:     Address (6 Octets)
+>                                 Address_Type (1 Octet)
+>         Return Parameters:      Address (6 Octets)
+>                                 Address_Type (1 Octet)
+>                                 Interface Index (4 Octets)
+>
+>         This command is used to connect to establish a network connection
+>         to a remote BTLE node. A pre-requisite is that LE is supported
+>         by the controller, otherwise this command will return a
+>         "not supported" response.
+>
+>         Possible values for the Address_Type parameter:
+>                 0       Reserved
+>                 1       LE Public
+>                 2       LE Random
+>
+>         This command generates a Command Complete event on success
+>         or failure.
+>
+>         Possible errors:        Busy
+>                                 Refused
+>                                 Invalid Parameters
+>                                 Not Supported
+>                                 Invalid Index
+>                                 Already Connected
+>
+> So far I understand, this is "make the connect command per device", the
+> device in this case is not a "struct net_device" it's "struct hci_dev".
+>
+> In the "possible" future case to having multiple interfaces you cannot
+> say on which interface this connect should be done. With "connect" I
+> mean the l2cap_chan_connect call.
 
-Regards
+And why would we want more than one one net_dev per hci_dev, the
+rfc7668 only talks about star topology:
 
-Marcel
+https://tools.ietf.org/html/rfc7668#section-2.2
 
+Bluetooth currently don't have support for a mesh topology, and anyway
+I don't think the userspace would need to be involved in the selection
+of the netdev since this is beyond the Bluetooth interface. In PAN for
+example we end up doing one netdev per connection and the which the
+userspace managing using a bridge.
+
+> btw:
+> Also I don't know what's now the parameters "Address/Address_Type"
+> source/destination? Is the Input of them equal to the output?
+
+That is always the destination address, and we needs its type to know
+if it is public or private to act accordingly.
+
+>>
+>>> I observed, what I explained above. There exists two "connect" mechanism,
+>>> these are L2 and L3.
+>>>
+>>> With L2 I mean $FIND_OUT_RIGHT_NOT_DEPRECATED_TOOL_IN_BT_UTILITY_DSCHUNGEL
+>>> leadv/lecc stuff. This prepares somehow that you can say
+>>> l2cap_chan_connect in the upper-layer to connect to slaves.
+>>>
+>>> With l2cap_chan_connect I mean L3 connection, which is the same like
+>>> what you doing in L2 for L3. It's also not be a MUST, because you can
+>>> run e.g. above example Node A, B, C, D on L2 and:
+>>>
+>>> BTLE 6LoWPAN: A <-> B
+>>>
+>>> L2CAP_SOCK:   C <-> D
+>>>
+>>> or some other mixed scenario. I think you want to still have such behaviour.
+>>> This would be the same like: A, B, C, D and 6lo0 is connected to A, B.
+>>> Forget the C, D, make with them whatever you want (_maybe_ namespace with
+>>> C, D or l2cap_sock).
+>>
+>> Im not sure where you are going with l2cap_sock here, yes we can make
+>> it connect to different peers but usually each peer assumes a role in
+>> BLE, the central role scans and connect and the peripheral only
+>> advertise. If you do have more than one controller it should be fine
+>> to have multiple network interfaces and then perhaps you can bridge
+>> them together, or not, but this should be controlled via userspace,
+>> the kernel shall only manage the network interface.
+>>
+>
+> Yes, but the kernel needs an UAPI so the user can control it over userspace.
+> See above my "make connect per interface" suggestion.
+
+This is API is for Bluetooth only, it shall not be mixed with network
+interface management.
