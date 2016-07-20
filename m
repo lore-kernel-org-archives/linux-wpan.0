@@ -1,54 +1,62 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from tuna.sandelman.ca ([209.87.249.19]:53914 "EHLO
-	tuna.sandelman.ca" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753489AbcGSNIL (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Tue, 19 Jul 2016 09:08:11 -0400
-From: Michael Richardson <mcr@sandelman.ca>
-Subject: Re: [RFC bluetooth-next 00/20] bluetooth: rework 6lowpan implementation
-In-Reply-To: <20160711195044.25343-1-aar@pengutronix.de>
-References: <20160711195044.25343-1-aar@pengutronix.de>
-MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha1; protocol="application/pgp-signature"
-Date: Tue, 19 Jul 2016 08:58:40 -0400
-Message-ID: <30038.1468933120@obiwan.sandelman.ca>
+Received: from aserp1040.oracle.com ([141.146.126.69]:49945 "EHLO
+	aserp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751662AbcGTIoM (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Wed, 20 Jul 2016 04:44:12 -0400
+From: Vegard Nossum <vegard.nossum@oracle.com>
+Subject: [PATCH] ieee802154: check device type
+Date: Wed, 20 Jul 2016 10:43:11 +0200
+Message-Id: <1469004191-30920-1-git-send-email-vegard.nossum@oracle.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: Alexander Aring <aar@pengutronix.de>
-Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de, luiz.dentz@gmail.com, kaspar@schleiser.de, jukka.rissanen@linux.intel.com, linux-bluetooth@vger.kernel.org, Patrik.Flykt@linux.intel.com
+Cc: linux-wpan@vger.kernel.org, netdev@vger.kernel.org, Vegard Nossum <vegard.nossum@oracle.com>, Lennert Buytenhek <buytenh@wantstofly.org>, Alexander Aring <alex.aring@gmail.com>, Marcel Holtmann <marcel@holtmann.org>, Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>, Sergey Lapin <slapin@ossfans.org>
 
---=-=-=
-Content-Type: text/plain
+I've observed a NULL pointer dereference in ieee802154_del_iface() during
+netlink fuzzing. It's the ->wpan_phy dereference here:
 
+        phy = dev->ieee802154_ptr->wpan_phy;
 
-Alexander Aring <aar@pengutronix.de> wrote:
-    > The issue is "tx credits in L2CAP (bluetooth experts know what I mean
-    > here) will be reach to zero at the same time on both nodes. This occurs
-    > a deadlock
-    > and nobody will transmit anything anymore".
+My bet is that we're not checking that this is an IEEE802154 interface,
+so let's do what ieee802154_nl_get_dev() is doing. (Maybe we should even
+be calling this directly?)
 
-What puts more credits in the bucket?
-Wouldn't it be a successful TX event?
+Cc: Lennert Buytenhek <buytenh@wantstofly.org>
+Cc: Alexander Aring <alex.aring@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>
+Cc: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+Cc: Sergey Lapin <slapin@ossfans.org>
+Signed-off-by: Vegard Nossum <vegard.nossum@oracle.com>
+---
+ net/ieee802154/nl-phy.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
+diff --git a/net/ieee802154/nl-phy.c b/net/ieee802154/nl-phy.c
+index 77d7301..dc2960b 100644
+--- a/net/ieee802154/nl-phy.c
++++ b/net/ieee802154/nl-phy.c
+@@ -286,9 +286,12 @@ int ieee802154_del_iface(struct sk_buff *skb, struct genl_info *info)
+ 	if (name[nla_len(info->attrs[IEEE802154_ATTR_DEV_NAME]) - 1] != '\0')
+ 		return -EINVAL; /* name should be null-terminated */
+ 
++	rc = -ENODEV;
+ 	dev = dev_get_by_name(genl_info_net(info), name);
+ 	if (!dev)
+-		return -ENODEV;
++		return rc;
++	if (dev->type != ARPHRD_IEEE802154)
++		goto out;
+ 
+ 	phy = dev->ieee802154_ptr->wpan_phy;
+ 	BUG_ON(!phy);
+@@ -342,6 +345,7 @@ nla_put_failure:
+ 	nlmsg_free(msg);
+ out_dev:
+ 	wpan_phy_put(phy);
++out:
+ 	if (dev)
+ 		dev_put(dev);
+ 
+-- 
+1.9.1
 
---
-]               Never tell me the odds!                 | ipv6 mesh networks [
-]   Michael Richardson, Sandelman Software Works        | network architect  [
-]     mcr@sandelman.ca  http://www.sandelman.ca/        |   ruby on rails    [
-
-
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
-
-iQEVAwUBV44j/YCLcPvd0N1lAQLmcQf9EOHQe309I+CsDQtD/UtMUpSIuhNjhwhc
-uUTsJozfQUzHErLw7lJnvyCimVhkK78krqfFkDkU76euPIcVRvAI2aWU9MEuqA39
-91F6yUp3e1+tBaPB98trwTLCnUIvSftFEQXQr3wvrIW3130QZBk6PEWZ6lWCdGNv
-hNNYO+fP0yZmepzlTVHe+MQYnyFOZDyfmanU4bD5tcw77onswITvJMh7kd62dCsQ
-9V1cGCYEvGUbPUgHD5ffyEvsxNigaxlZET+4I/qFJpFn6c+TZTVYr5gu1qpadCsE
-jwDT8eKDhhdR/KDGgiQHu3prV5/dGFDJSdOEOMxM3Vuf/4hgZmhTyw==
-=Kwmx
------END PGP SIGNATURE-----
---=-=-=--
