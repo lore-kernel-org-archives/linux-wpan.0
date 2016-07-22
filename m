@@ -1,115 +1,63 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:48894 "EHLO
-	metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751683AbcGYMPD (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>);
-	Mon, 25 Jul 2016 08:15:03 -0400
-From: Alexander Aring <aar@pengutronix.de>
-Subject: [RFC bluetooth-next 4/4] mac802154: iface: remove ioctl functionality
-Date: Mon, 25 Jul 2016 14:14:50 +0200
-Message-Id: <20160725121450.4093-5-aar@pengutronix.de>
-In-Reply-To: <20160725121450.4093-1-aar@pengutronix.de>
-References: <20160725121450.4093-1-aar@pengutronix.de>
+Received: from mx1.redhat.com ([209.132.183.28]:34700 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752638AbcGVRSX (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+	Fri, 22 Jul 2016 13:18:23 -0400
+From: Aristeu Rozanski <arozansk@redhat.com>
+Subject: [PATCH 1/3] mac802154: don't warn on unsupported frames
+Date: Fri, 22 Jul 2016 13:18:14 -0400
+Message-Id: <1469207896-26481-1-git-send-email-arozansk@redhat.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
-Cc: kernel@pengutronix.de, Alexander Aring <aar@pengutronix.de>
+Cc: Alexander Aring <aar@pengutronix.de>, Stefan Schmidt <stefan@osg.samsung.com>, Jukka Rissanen <jukka.rissanen@linux.intel.com>, Aristeu Rozanski <arozansk@redhat.com>
 
-This patch removed deprecated ioctl functionality. This functionality
-offers to set not usual addresses: pan id and short address. When
-setting the short address the user gets the info to not use SIOCSIFADDR
-because it's not recommended.
+Just because we don't support certain types of frames yet doesn't mean
+we have to flood the message log with warnings about "invalid" frames.
 
-This ioctl was a fast solution to offer the setting of pan and short
-address. Nowadays we have nl802154.
-
-Signed-off-by: Alexander Aring <aar@pengutronix.de>
+Signed-off-by: Aristeu Rozanski <arozansk@redhat.com>
 ---
- net/mac802154/iface.c | 64 ---------------------------------------------------
- 1 file changed, 64 deletions(-)
+ net/mac802154/rx.c | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
 
-diff --git a/net/mac802154/iface.c b/net/mac802154/iface.c
-index 9723099..4aed0f7 100644
---- a/net/mac802154/iface.c
-+++ b/net/mac802154/iface.c
-@@ -46,69 +46,6 @@ int mac802154_wpan_update_llsec(struct net_device *dev)
- 	return mac802154_llsec_set_params(&sdata->sec, &params, changed);
- }
+diff --git a/net/mac802154/rx.c b/net/mac802154/rx.c
+index 446e130..d388bf2 100644
+--- a/net/mac802154/rx.c
++++ b/net/mac802154/rx.c
+@@ -82,6 +82,7 @@ ieee802154_subif_frame(struct ieee802154_sub_if_data *sdata,
+ 		break;
+ 	default:
+ 		pr_debug("invalid dest mode\n");
++		sdata->dev->stats.rx_frame_errors++;
+ 		goto fail;
+ 	}
  
--static int
--mac802154_wpan_ioctl(struct net_device *dev, struct ifreq *ifr, int cmd)
--{
--	struct ieee802154_sub_if_data *sdata = IEEE802154_DEV_TO_SUB_IF(dev);
--	struct wpan_dev *wpan_dev = &sdata->wpan_dev;
--	struct sockaddr_ieee802154 *sa =
--		(struct sockaddr_ieee802154 *)&ifr->ifr_addr;
--	int err = -ENOIOCTLCMD;
+@@ -97,15 +98,22 @@ ieee802154_subif_frame(struct ieee802154_sub_if_data *sdata,
+ 		goto fail;
+ 	}
+ 
+-	sdata->dev->stats.rx_packets++;
+-	sdata->dev->stats.rx_bytes += skb->len;
 -
--	if (cmd != SIOCGIFADDR && cmd != SIOCSIFADDR)
--		return err;
--
--	rtnl_lock();
--
--	switch (cmd) {
--	case SIOCGIFADDR:
--	{
--		u16 pan_id, short_addr;
--
--		pan_id = le16_to_cpu(wpan_dev->pan_id);
--		short_addr = le16_to_cpu(wpan_dev->short_addr);
--		if (pan_id == IEEE802154_PANID_BROADCAST ||
--		    short_addr == IEEE802154_ADDR_BROADCAST) {
--			err = -EADDRNOTAVAIL;
--			break;
--		}
--
--		sa->family = AF_IEEE802154;
--		sa->addr.addr_type = IEEE802154_ADDR_SHORT;
--		sa->addr.pan_id = pan_id;
--		sa->addr.short_addr = short_addr;
--
--		err = 0;
--		break;
--	}
--	case SIOCSIFADDR:
--		if (netif_running(dev)) {
--			rtnl_unlock();
--			return -EBUSY;
--		}
--
--		dev_warn(&dev->dev,
--			 "Using DEBUGing ioctl SIOCSIFADDR isn't recommended!\n");
--		if (sa->family != AF_IEEE802154 ||
--		    sa->addr.addr_type != IEEE802154_ADDR_SHORT ||
--		    sa->addr.pan_id == IEEE802154_PANID_BROADCAST ||
--		    sa->addr.short_addr == IEEE802154_ADDR_BROADCAST ||
--		    sa->addr.short_addr == IEEE802154_ADDR_UNDEF) {
--			err = -EINVAL;
--			break;
--		}
--
--		wpan_dev->pan_id = cpu_to_le16(sa->addr.pan_id);
--		wpan_dev->short_addr = cpu_to_le16(sa->addr.short_addr);
--
--		err = mac802154_wpan_update_llsec(dev);
--		break;
--	}
--
--	rtnl_unlock();
--	return err;
--}
--
- static int mac802154_wpan_mac_addr(struct net_device *dev, void *p)
- {
- 	struct ieee802154_sub_if_data *sdata = IEEE802154_DEV_TO_SUB_IF(dev);
-@@ -504,7 +441,6 @@ static const struct net_device_ops mac802154_wpan_ops = {
- 	.ndo_open		= mac802154_wpan_open,
- 	.ndo_stop		= mac802154_slave_close,
- 	.ndo_start_xmit		= ieee802154_subif_start_xmit,
--	.ndo_do_ioctl		= mac802154_wpan_ioctl,
- 	.ndo_set_mac_address	= mac802154_wpan_mac_addr,
- };
+ 	switch (mac_cb(skb)->type) {
++	case IEEE802154_FC_TYPE_BEACON:
++	case IEEE802154_FC_TYPE_ACK:
++	case IEEE802154_FC_TYPE_MAC_CMD:
++		sdata->dev->stats.rx_dropped++;
++		goto fail;
++
+ 	case IEEE802154_FC_TYPE_DATA:
++		sdata->dev->stats.rx_bytes += skb->len;
++		sdata->dev->stats.rx_packets++;
+ 		return ieee802154_deliver_skb(skb);
++
+ 	default:
+ 		pr_warn("ieee802154: bad frame received (type = %d)\n",
+ 			mac_cb(skb)->type);
++		sdata->dev->stats.rx_frame_errors++;
+ 		goto fail;
+ 	}
  
 -- 
-2.9.0
+1.8.3.1
 
