@@ -1,39 +1,31 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:42761 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752355AbcGVRSX (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-	Fri, 22 Jul 2016 13:18:23 -0400
-From: Aristeu Rozanski <arozansk@redhat.com>
-Subject: [PATCH 2/3] mac802154: use rate limited warnings for malformed frames
-Date: Fri, 22 Jul 2016 13:18:15 -0400
-Message-Id: <1469207896-26481-2-git-send-email-arozansk@redhat.com>
-In-Reply-To: <1469207896-26481-1-git-send-email-arozansk@redhat.com>
+Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:33197 "EHLO
+	metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1750786AbcGWMs4 (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>);
+	Sat, 23 Jul 2016 08:48:56 -0400
+Subject: Re: [PATCH 2/3] mac802154: use rate limited warnings for malformed
+ frames
 References: <1469207896-26481-1-git-send-email-arozansk@redhat.com>
+ <1469207896-26481-2-git-send-email-arozansk@redhat.com>
+From: Alexander Aring <aar@pengutronix.de>
+Message-ID: <1cf9e2aa-23bc-1353-d481-b7f98affb831@pengutronix.de>
+Date: Sat, 23 Jul 2016 14:48:52 +0200
+MIME-Version: 1.0
+In-Reply-To: <1469207896-26481-2-git-send-email-arozansk@redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org
-Cc: Alexander Aring <aar@pengutronix.de>, Stefan Schmidt <stefan@osg.samsung.com>, Jukka Rissanen <jukka.rissanen@linux.intel.com>, Aristeu Rozanski <arozansk@redhat.com>
+To: Aristeu Rozanski <arozansk@redhat.com>
+Cc: linux-wpan@vger.kernel.org, Stefan Schmidt <stefan@osg.samsung.com>, Jukka Rissanen <jukka.rissanen@linux.intel.com>
 
-Signed-off-by: Aristeu Rozanski <arozansk@redhat.com>
----
- net/mac802154/rx.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/net/mac802154/rx.c b/net/mac802154/rx.c
-index d388bf2..11dac04 100644
---- a/net/mac802154/rx.c
-+++ b/net/mac802154/rx.c
-@@ -111,8 +111,8 @@ ieee802154_subif_frame(struct ieee802154_sub_if_data *sdata,
- 		return ieee802154_deliver_skb(skb);
- 
- 	default:
--		pr_warn("ieee802154: bad frame received (type = %d)\n",
--			mac_cb(skb)->type);
-+		pr_warn_ratelimited("ieee802154: bad frame received "
-+				    "(type = %d)\n", mac_cb(skb)->type);
- 		sdata->dev->stats.rx_frame_errors++;
- 		goto fail;
- 	}
--- 
-1.8.3.1
+Hi,
 
+On 07/22/2016 07:18 PM, Aristeu Rozanski wrote:
+> Signed-off-by: Aristeu Rozanski <arozansk@redhat.com>
+
+Acked-by: Alexander Aring <aar@pengutronix.de>
+
+- Alex
