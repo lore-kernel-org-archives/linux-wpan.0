@@ -1,136 +1,82 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:38087 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751418AbcGYNie (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-	Mon, 25 Jul 2016 09:38:34 -0400
-Date: Mon, 25 Jul 2016 09:38:32 -0400
-From: Aristeu Rozanski <arozansk@redhat.com>
-Subject: Re: [PATCH 3/3] ieee802154: encrypt frame before
- ieee802154_subif_start_xmit is called
-Message-ID: <20160725133831.GF30145@redhat.com>
+Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:35595 "EHLO
+	metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1750786AbcGWMqf (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>);
+	Sat, 23 Jul 2016 08:46:35 -0400
+Subject: Re: [PATCH 1/3] mac802154: don't warn on unsupported frames
 References: <1469207896-26481-1-git-send-email-arozansk@redhat.com>
- <1469207896-26481-3-git-send-email-arozansk@redhat.com>
- <c4cf7740-21cc-17fc-5588-c46b0500944a@pengutronix.de>
+From: Alexander Aring <aar@pengutronix.de>
+Message-ID: <78726941-7d65-1ece-e203-f1507597978a@pengutronix.de>
+Date: Sat, 23 Jul 2016 14:46:28 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c4cf7740-21cc-17fc-5588-c46b0500944a@pengutronix.de>
+In-Reply-To: <1469207896-26481-1-git-send-email-arozansk@redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <aar@pengutronix.de>
+To: Aristeu Rozanski <arozansk@redhat.com>
 Cc: linux-wpan@vger.kernel.org, Stefan Schmidt <stefan@osg.samsung.com>, Jukka Rissanen <jukka.rissanen@linux.intel.com>
 
-Hi Alexander,
-On Sat, Jul 23, 2016 at 03:43:05PM +0200, Alexander Aring wrote:
-> Please don't use af_802154 raw sockets which are a long time broken, use
-> AF_PACKET raw. See as example [0] which allows to run RIOT-OS native as
-> elf binary in userspace and talk with the 802.15.4 6LoWPAN kernel stuff.
-> Also the AF_PACKET RAW will directly called xmit callback and not
-> dev_queue_xmit -> no qdisc is involved and mostly you like to have that
-> for such kind of sockets.
-> 
-> The socket "af_802154" should be used to doing MAC frames by kernel,
-> AF_PACKET DGRAM sockets has a very limited UAPI for that.
 
-my idea using it was to have the MAC implemented in userspace and use
-raw sockets to interface with existing drivers.
+Hi,
 
-> Unfortunately this will not fix your issues if you sending out raw
-> frames with security bits enabled.
->
-> You found the right issue because the "xmit callback" should not touch
-> the header again. I also had issues by using wireshark, because it
-> doesn't show the encrypted frame.
+On 07/22/2016 07:18 PM, Aristeu Rozanski wrote:
+> Just because we don't support certain types of frames yet doesn't mean
+> we have to flood the message log with warnings about "invalid" frames.
 > 
-> It's the same for rx handling where decryrption should be "somehow" done
-> after the packet-layer.
 
-I haven't notice that yet, still trying to work out sending and
-receiving frames without encryption.
+agree, but this patch introduce a different stats handling right now. :-)
 
-> The issue getting even bigger (and the reason why I didn't solved it)
-> when you think about HardMAC transceivers.
+> Signed-off-by: Aristeu Rozanski <arozansk@redhat.com>
+> ---
+>  net/mac802154/rx.c | 14 +++++++++++---
+>  1 file changed, 11 insertions(+), 3 deletions(-)
 > 
-> HardMAC transceivers do encryption end decryption on transceivers side,
-> so on linux side we have always not encrypted frames. This issue is a
-> whole unsolved issue in out architecture. Maybe we should simple handle
-> then as "not encrypted" but then the MAC headers frame control bits need
-> to show that. Or we tell the userspace, "You have here a HardMAC
-> transceiver and please note there is no control for showing encrypted
-> payload while dumping e.g. in libpcap". I think it's okay to have the
-> frame control secbits sets there, but we need some way to tell the
-> userspace "there is no support for showing encrypted payload" for
-> HardMAC transceivers and security enabled in frames.
-> 
-> I had no idea for that currently, HardMAC transceivers will also
-> introduce some other stuff we need to do. At the moment we ignore
-> "HardMAC" transceivers at some points right now.
-> 
-> I am fine if we fix this behaviour for SoftMAC transceivers side (later
-> we can introduce such flag for UAPI that "encrypted payload not
-> supported").
-> 
-> This will not work if we later add support for running HardMAC and
-> SoftMAC. I tried to fix it on my own (can't find the branch anymore and
-> patches never get into mainline). If I remember correctly, I used a callback
-> but I saw then the better idea would it to move encryption to
-> wpan_dev_hard_header, callback.
-> 
-> Some parameters what for a frame we need and SoftMAC/HardMAC can be
-> doing (something) for that. For HardMAC I need to figure out how this
-> can be working then. At least wireshark/tcpdump will see the mac header
-> so everybody should do the same stuff there.
-> 
-> If both do the same stuff, it's indicate that this is for
-> "net/ieee802154" branch.
-> 
-> Another issue is that wpan_dev_hard_header callback was simpled
-> copy&pasted right now from the global generic "dev_hard_header" callback
-> which had several issues, because it was called by AF_PACKET DGRAM
-> sockets and this had 8 bytes limited parameters for e.g. addresses and
-> the callback had some out-of-bound array access there.
-> 
-> Nevertheless the wpan_dev_hard_header fixed it because it will called by
-> 802.15.4 upper layers only. The bad thing is that skb->cb is still used
-> there, which was a workaround for "dev_hard_header" callback to extend
-> the callback with additional information. This should be removed, since
-> we have our own callback for that where we have control over it and can
-> add more parameters.
-> 
-> Everything is ugly solved and fixing this requires to fix header
-> creation currently. :-) I also don't know if we really needs this
-> callback or simple have creation functions in "net/ieee802154" which
-> will be called by upper layers. HardMAC drivers need to parse the frame
-> then and doing something that these settings for this frame will be done
-> on transceivers side.
-> 
-> It's a big TODO there.
+> diff --git a/net/mac802154/rx.c b/net/mac802154/rx.c
+> index 446e130..d388bf2 100644
+> --- a/net/mac802154/rx.c
+> +++ b/net/mac802154/rx.c
+> @@ -82,6 +82,7 @@ ieee802154_subif_frame(struct ieee802154_sub_if_data *sdata,
+>  		break;
+>  	default:
+>  		pr_debug("invalid dest mode\n");
+> +		sdata->dev->stats.rx_frame_errors++;
+>  		goto fail;
+>  	}
+>  
+> @@ -97,15 +98,22 @@ ieee802154_subif_frame(struct ieee802154_sub_if_data *sdata,
+>  		goto fail;
+>  	}
+>  
+> -	sdata->dev->stats.rx_packets++;
+> -	sdata->dev->stats.rx_bytes += skb->len;
+> -
+>  	switch (mac_cb(skb)->type) {
+> +	case IEEE802154_FC_TYPE_BEACON:
+> +	case IEEE802154_FC_TYPE_ACK:
+> +	case IEEE802154_FC_TYPE_MAC_CMD:
+> +		sdata->dev->stats.rx_dropped++;
+> +		goto fail;
+> +
+>  	case IEEE802154_FC_TYPE_DATA:
+> +		sdata->dev->stats.rx_bytes += skb->len;
+> +		sdata->dev->stats.rx_packets++;
 
-Thanks for the explanation, as someone starting working with this it
-saves me a ton of time! Much appreciated!
+This should be moved into ieee802154_deliver_skb, right before calling
+netif_rx(...);
 
-> Nevertheless it's okay for me to fix that on rx/tx side so the RAW
-> socket are really RAW sockets which sends user generated frames out
-> (also with secbit enabled).
-> 
-> But please fix this for rx/tx side and not in a way which makes the
-> behaviour with future HardMAC transceivers more possible.
-> 
-> For tx side it should be okay to move it to the end of
-> "wpan_dev_hard_header" callback which should be not called by AF_PACKET
-> raw sockets. This should be a simple fix...
-> 
-> For rx side it would be harder. I thought maybe there exists some
-> packet_layer "hook" before starting packet_type->func e.g. [1]
-> 
-> Do encrypt payload, so we don't need to duplicate code much... if such
-> hook doesn't exist then we need out own hook mechanism for
-> packet_type->func callback.
+The reason is because we have for "stats.rx_bytes" and
+"stats.rx_packets" a very clean definition what it means. It means, the
+frames hit a state where it is ready to put it into the packet-layer,
+this is what netif_rx is doing.
 
-I'll take a look on it and see if I can come with an acceptable
-solution.
-Thanks!
+It's okay for me to add support for rx_frame_errors and also rx_dropped
+stuff. But with a very big warning that the meaning of such stats will
+be touched again later if we found some strategie where we we define
+what each stats attribute means. Also there exists subsystems which
+simple ignore these stats, because at userspace side you need always to
+lookup what the definition means and when we run such stats counters and
+when not and some subsystems don't care about that.
 
--- 
-Aristeu
-
+- Alex
