@@ -1,31 +1,32 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:33197 "EHLO
-	metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1750786AbcGWMs4 (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>);
-	Sat, 23 Jul 2016 08:48:56 -0400
-Subject: Re: [PATCH 2/3] mac802154: use rate limited warnings for malformed
- frames
-References: <1469207896-26481-1-git-send-email-arozansk@redhat.com>
- <1469207896-26481-2-git-send-email-arozansk@redhat.com>
-From: Alexander Aring <aar@pengutronix.de>
-Message-ID: <1cf9e2aa-23bc-1353-d481-b7f98affb831@pengutronix.de>
-Date: Sat, 23 Jul 2016 14:48:52 +0200
-MIME-Version: 1.0
+Received: from ipv4.connman.net ([82.165.8.211]:44036 "EHLO mail.holtmann.org"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1751966AbcGXQpF (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+	Sun, 24 Jul 2016 12:45:05 -0400
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+Subject: Re: [PATCH 2/3] mac802154: use rate limited warnings for malformed frames
+From: Marcel Holtmann <marcel@holtmann.org>
 In-Reply-To: <1469207896-26481-2-git-send-email-arozansk@redhat.com>
-Content-Type: text/plain; charset=windows-1252
+Date: Sun, 24 Jul 2016 18:45:02 +0200
 Content-Transfer-Encoding: 7bit
+Message-Id: <21557C17-732A-42F7-89F3-FD846A137711@holtmann.org>
+References: <1469207896-26481-1-git-send-email-arozansk@redhat.com> <1469207896-26481-2-git-send-email-arozansk@redhat.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: Aristeu Rozanski <arozansk@redhat.com>
-Cc: linux-wpan@vger.kernel.org, Stefan Schmidt <stefan@osg.samsung.com>, Jukka Rissanen <jukka.rissanen@linux.intel.com>
+Cc: linux-wpan@vger.kernel.org, Alexander Aring <aar@pengutronix.de>, Stefan Schmidt <stefan@osg.samsung.com>, Jukka Rissanen <jukka.rissanen@linux.intel.com>
 
+Hi Aristeu,
 
-Hi,
-
-On 07/22/2016 07:18 PM, Aristeu Rozanski wrote:
 > Signed-off-by: Aristeu Rozanski <arozansk@redhat.com>
+> ---
+> net/mac802154/rx.c | 4 ++--
+> 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Acked-by: Alexander Aring <aar@pengutronix.de>
+the patch does not apply to bluetooth-next tree.
 
-- Alex
+Regards
+
+Marcel
+
