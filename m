@@ -1,47 +1,44 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:47012 "EHLO
-	metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751418AbcGYOfm (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>);
-	Mon, 25 Jul 2016 10:35:42 -0400
-Subject: Re: Packets not reaching lowpan interface
-References: <CADaJnMajA0y7t7=+vAE6FcSnY3a0_uLg5wpa2ThgRZRj3Qny3w@mail.gmail.com>
- <CADaJnMYdcj0RDR2iZW2FmAzgpS2X7KxE4RkTA5XzY0im12UbDg@mail.gmail.com>
- <25673.1469453292@obiwan.sandelman.ca>
-From: Alexander Aring <aar@pengutronix.de>
-Message-ID: <f36a7c18-b9c2-c3a7-ff68-337701e99726@pengutronix.de>
-Date: Mon, 25 Jul 2016 16:35:38 +0200
-MIME-Version: 1.0
-In-Reply-To: <25673.1469453292@obiwan.sandelman.ca>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Received: from mx1.redhat.com ([209.132.183.28]:36457 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752835AbcGYPqs (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+	Mon, 25 Jul 2016 11:46:48 -0400
+From: Aristeu Rozanski <arozansk@redhat.com>
+Subject: [PATCH v2 1/2] mac802154: don't warn on unsupported frames
+Date: Mon, 25 Jul 2016 11:46:40 -0400
+Message-Id: <1469461601-656-1-git-send-email-arozansk@redhat.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Michael Richardson <mcr@sandelman.ca>
-Cc: Aaron Sowry <aeneby@gmail.com>, linux-wpan@vger.kernel.org
+To: linux-wpan@vger.kernel.org
+Cc: Alexander Aring <aar@pengutronix.de>, Stefan Schmidt <stefan@osg.samsung.com>, Jukka Rissanen <jukka.rissanen@linux.intel.com>, Aristeu Rozanski <arozansk@redhat.com>
 
+Just because we don't support certain types of frames yet doesn't mean
+we have to flood the message log with warnings about "invalid" frames.
 
-Hey Michael,
+v2: get rid of stats update, some of them were wrong, others might change in
+    the future
 
-On 07/25/2016 03:28 PM, Michael Richardson wrote:
-> 
-> Aaron Sowry <aeneby@gmail.com> wrote:
->     > 2) Created a lowpan interface:
-> 
->     > # ip link set wpan0 down
->     > # iwpan phy phy0 set channel 0 26
->     > # iwpan dev wpan0 set pan_id 0x0023
->     > # ip link set wpan0 up
->     > # ip link set lowpan0 up
-> 
-> I think you got everything plumbed up correctly, but I wanted to post for
-> google benefit that by default the wpan0 and wpan1 that come up are virtual
-> interfaces, and wpan2 is the first real radio.
-> 
+Signed-off-by: Aristeu Rozanski <arozansk@redhat.com>
+---
+ net/mac802154/rx.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-this is the case if your system loading fakelb for some reason, or you
-have fakelb as built-in module. Then over linux kernel magic linker
-scripts it will call all "module_init" declarations, if building as
-built-in module.
+diff --git a/net/mac802154/rx.c b/net/mac802154/rx.c
+index 446e130..b978da0 100644
+--- a/net/mac802154/rx.c
++++ b/net/mac802154/rx.c
+@@ -101,6 +101,11 @@ ieee802154_subif_frame(struct ieee802154_sub_if_data *sdata,
+ 	sdata->dev->stats.rx_bytes += skb->len;
+ 
+ 	switch (mac_cb(skb)->type) {
++	case IEEE802154_FC_TYPE_BEACON:
++	case IEEE802154_FC_TYPE_ACK:
++	case IEEE802154_FC_TYPE_MAC_CMD:
++		goto fail;
++
+ 	case IEEE802154_FC_TYPE_DATA:
+ 		return ieee802154_deliver_skb(skb);
+ 	default:
+-- 
+1.8.3.1
 
-- Alex
