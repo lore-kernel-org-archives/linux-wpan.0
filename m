@@ -1,84 +1,57 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:48687 "EHLO
-	metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1750898AbcGYGYc (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>);
-	Mon, 25 Jul 2016 02:24:32 -0400
+Received: from tuna.sandelman.ca ([209.87.249.19]:54034 "EHLO
+	tuna.sandelman.ca" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750935AbcGYN2P (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Mon, 25 Jul 2016 09:28:15 -0400
+From: Michael Richardson <mcr@sandelman.ca>
 Subject: Re: Packets not reaching lowpan interface
-References: <CADaJnMajA0y7t7=+vAE6FcSnY3a0_uLg5wpa2ThgRZRj3Qny3w@mail.gmail.com>
- <CADaJnMYdcj0RDR2iZW2FmAzgpS2X7KxE4RkTA5XzY0im12UbDg@mail.gmail.com>
- <1a77b106-bc45-e5da-e122-d4e0713539d8@pengutronix.de>
- <CADaJnMabq8EE11a-18iaQr7yECRKEMKZsBPUbi65Tdk2F==+6A@mail.gmail.com>
- <83c08f12-b506-c377-07ea-0db40f9ec1a0@pengutronix.de>
- <CADaJnMYGk3Lroa=HYuRfAjLg2O9tcVrzHy2JrApHuJ9stuT=Rg@mail.gmail.com>
-From: Alexander Aring <aar@pengutronix.de>
-Message-ID: <55107c60-4525-3c96-a166-096ef6c51970@pengutronix.de>
-Date: Mon, 25 Jul 2016 08:24:30 +0200
+In-Reply-To: <CADaJnMYdcj0RDR2iZW2FmAzgpS2X7KxE4RkTA5XzY0im12UbDg@mail.gmail.com>
+References: <CADaJnMajA0y7t7=+vAE6FcSnY3a0_uLg5wpa2ThgRZRj3Qny3w@mail.gmail.com> <CADaJnMYdcj0RDR2iZW2FmAzgpS2X7KxE4RkTA5XzY0im12UbDg@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CADaJnMYGk3Lroa=HYuRfAjLg2O9tcVrzHy2JrApHuJ9stuT=Rg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha1; protocol="application/pgp-signature"
+Date: Mon, 25 Jul 2016 09:28:12 -0400
+Message-ID: <25673.1469453292@obiwan.sandelman.ca>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: Aaron Sowry <aeneby@gmail.com>
 Cc: linux-wpan@vger.kernel.org
 
+--=-=-=
+Content-Type: text/plain
 
-Hi,
 
-On 07/25/2016 02:48 AM, Aaron Sowry wrote:
-> Hi,
-> 
->>> "If the PAN identifiers are identical, the intra-PAN subfield of the
->>> frame control field shall be set to 1, and the source PAN identifier
->>> shall be omitted from the transmitted frame."
->>>
->>
->> Yes, the question is here if this is valid or not.
-> 
-> To me it's quite clear given the phrasing quoted above, since the term
-> "shall" has a concrete definition[1] in this context:
-> 
-> "The word 'shall' indicates mandatory requirements strictly to be
-> followed in order to conform to the standard and from which no
-> deviation is permitted ('shall' equals 'is required to')."
-> 
-> Ergo, any packet which has identical SRC/DST PANs in its frame must be
-> invalid, right?
-> 
+Aaron Sowry <aeneby@gmail.com> wrote:
+    > 2) Created a lowpan interface:
 
-Oh yes, then it's invalid. I agree. :-)
+    > # ip link set wpan0 down
+    > # iwpan phy phy0 set channel 0 26
+    > # iwpan dev wpan0 set pan_id 0x0023
+    > # ip link set wpan0 up
+    > # ip link set lowpan0 up
 
-We should really start some rework of the frame parsing stuff.
+I think you got everything plumbed up correctly, but I wanted to post for
+google benefit that by default the wpan0 and wpan1 that come up are virtual
+interfaces, and wpan2 is the first real radio.
 
->> About the intra-pan check, everybody outside (conitki/RIOT-OS) does
->> intra-pan communication, but I heard that it's possible to change
->> destination pan. So we should do intra-pan communication by default but
->> having some option to change destination pan. Maybe _per_ interface or
->> neighbour, etc?
-> 
-> I'm also unsure about this. My understanding is that the main (only?)
-> purpose of the PAN ID is to reduce MAC overhead by allowing usage of
-> the shorter 16-bit addresses, since these addresses should be unique
-> within a PAN. Perhaps all intra-pan traffic should really be using
-> short addresses? I don't think this is required by the spec but it
-> kind of makes sense. I'm not really sure of the details of handling
-> intER-pan traffic, I will need to do some research.
-> 
+--
+]               Never tell me the odds!                 | ipv6 mesh networks [
+]   Michael Richardson, Sandelman Software Works        | network architect  [
+]     mcr@sandelman.ca  http://www.sandelman.ca/        |   ruby on rails    [
 
-You has always the pan given with the short address, in intra-pan and
-non intra-pan communication. There is no lack of non uniqueness.
 
-What I see for pan communication is [0].
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
 
-1.  A destination PAN identifier is included in the frame, and it
-    MUST match the PAN ID of the link in question.
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
 
-I thought this always stands for my link pan-id should be the
-destination pan id. But it also could mean that we need to answer on the
-destination pan id where the link comes from. E.g. save it as neighbour
-attribute in ndisc. I am not sure :-/
-
-- Alex
-
-[0] https://tools.ietf.org/html/rfc4944#section-3
+iQEVAwUBV5YT6oCLcPvd0N1lAQIF4wf/WVDkLPXjvJ/HGpXWfk+Iqor8Q0QQLPhS
+sVTSyjBhTA1JHmwLW3zt6Ks3z3v9sekbgsx4n5FDFpVexJCMdsvFgl2Yml7gEwGo
+ifSk7C63xGLnWNQNH63htEBc70hbX2CeDxz32ac7AzVJxbcS5cQ8fREapHEcKH2O
+g76ukh08ifuJfsgi4/uWXXD6EgEW6V6W/jfXXxRcLQdHIrJSNyfAbrZzGKQRuHux
+4puf/Aeld0MVgVAWNqw5VxmwBfZkvMCkzFp1d/AAXZLTmbY0FazhqFnPyOdTPTdA
+bfR+qj8+sM5tPW1QFSUYa6IqyJjYqBaJ+R4arcTDcWIJhX+CeiHY4g==
+=Jgec
+-----END PGP SIGNATURE-----
+--=-=-=--
