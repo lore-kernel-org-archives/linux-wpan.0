@@ -1,74 +1,116 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from ipv4.connman.net ([82.165.8.211]:32823 "EHLO mail.holtmann.org"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1754086AbcGHLYf convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Fri, 8 Jul 2016 07:24:35 -0400
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-Subject: Re: [PATCHv4 bluetooth-next 0/8] ieee802154: pending/new fixes and cleanup/features
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20160706213231.23058-1-aar@pengutronix.de>
-Date: Fri, 8 Jul 2016 13:24:32 +0200
-Content-Transfer-Encoding: 8BIT
-Message-Id: <E5BF7CD1-19AE-4D4D-A785-C919290411DD@holtmann.org>
-References: <20160706213231.23058-1-aar@pengutronix.de>
+Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:51293 "EHLO
+	metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1757371AbcG1MU5 (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>);
+	Thu, 28 Jul 2016 08:20:57 -0400
+Subject: Re: [PATCH linux-wpan/radvd 6lowpan] device-linux: detect 6LoWPAN
+ lltype for hwaddr length
+References: <20160621144250.31650-1-aar@pengutronix.de>
+From: Alexander Aring <aar@pengutronix.de>
+Message-ID: <21cdff8b-9994-63ec-a9c8-6691b5820302@pengutronix.de>
+Date: Thu, 28 Jul 2016 14:20:53 +0200
+MIME-Version: 1.0
+In-Reply-To: <20160621144250.31650-1-aar@pengutronix.de>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <aar@pengutronix.de>
-Cc: linux-wpan@vger.kernel.org, kernel@pengutronix.de
+To: linux-wpan@vger.kernel.org
+Cc: linux-bluetooth@vger.kernel.org, kernel@pengutronix.de, patrik.flykt@linux.intel.com, jukka.rissanen@linux.intel.com
 
-Hi Alex,
+Hi,
 
-> I currently work on running the RIOT-OS stack in userspace stuff. At first
-> for a testing use-case. While working on that I detected the intra-pan
-> addressing behaviour and non-monitors on fakelb.
+On 06/21/2016 04:42 PM, Alexander Aring wrote:
+> This patch will change the behaviour for 6LoWPAN interface to detect the
+> linklayer type via debugfs. Each L2 interface has a different address
+> length and need to be detected.
 > 
-> I recently posted the first 4 patches and the atusb one. I simple put
-> them now into one patch-series and added Stefan's suggestion, but still
-> not use if these pointer helpers on mac headers are okay for lowlevel
-> functionality.
+> Signed-off-by: Alexander Aring <aar@pengutronix.de>
+> ---
+> We have two choices (or even more):
 > 
-> - Alex
+>  - Add lltype like this patch to detect the hwaddr length
 > 
-> changes since v4:
-> - nothing, it's just a resend
+>  or
 > 
-> changes since v3:
-> - fix intra-pan behaviour in ieee802154_skb_src_pan. If intra-pan is set and
->   source address mode is different than NONE the destination pan id will
->   always used. If not intra-pan is set, then the destination address mode will
->   be evaluated to jump over it.
+>  - Add a UAPI to get the hwaddr length doesn't depend on lltype
 > 
-> changes since v2:
-> - Add new patch [5/8] 6lowpan: ndisc: set invalid unicast short addr to unspec
-> - Add new patch [8/8] fakelb: allow to run as monitor.
-> - split WARN_ON cleanup from "ieee802154: fix skb get fc on big endian" into
->   new separate [7/8] ieee802154: cleanup WARN_ON for fc fetch.
-> - add missing pan_id check in case of non intra-pan and dadder available for
->   ieee802154_skb_src_pan function.
-> - add fix for atusb csma setting which isn't mainline yet.
+> I did the first choice now, because it works like the net core api which
+> also has no UAPI for addr length. To get the address length you need to
+> map it to the netdev type. But this also means that a netdev type should
+> not have different hardware addresses.
 > 
-> Alexander Aring (8):
->  ieee802154: add ieee802154_skb_dst_pan helper
->  ieee802154: add ieee802154_skb_src_pan helper
->  ieee802154: 6lowpan: fix intra pan id check
->  ieee802154: fix skb get fc on big endian
->  6lowpan: ndisc: set invalid unicast short addr to unspec
->  atusb: don't change csma settings while set channel
->  ieee802154: cleanup WARN_ON for fc fetch
->  fakelb: allow to run as monitor
+> In 6LoWPAN this is different, the ARPHRD_6LOWPAN can have different address
+> lengths. Jukka please tell me if this is fine or not, I usually don't want
+> to make things for ARPHRD_6LOWPAN link-layer specific, but we need to add
+> some solution for this.
 > 
-> drivers/net/ieee802154/atusb.c  |   6 +--
-> drivers/net/ieee802154/fakelb.c |   8 +++
-> include/linux/ieee802154.h      |  29 ++++++++++
-> include/net/mac802154.h         | 117 ++++++++++++++++++++++++++++++++++++++--
-> net/6lowpan/ndisc.c             |   7 ++-
-> net/ieee802154/6lowpan/rx.c     |   2 +-
-> 6 files changed, 157 insertions(+), 12 deletions(-)
+> My different UAPI solution is shown above, don't know which is actually
+> better. I think we need for some cases an UAPI to get the link-layer
+> type anyway.
+> 
+> btw: as fallback it use the olf behaviour 64 bit's so if we fix btle 6lowpan
+> to work with dev->addr_len = 6 and introduce the UAPI it will be fixed
+> automatically.
+> 
+> Later we need to move this stuff to sysfs. Debugfs is also not namespace
+> aware and because that it forbids me to make some special testing stuff.
+> 
+>  device-linux.c | 52 +++++++++++++++++++++++++++++++++++++++++++++++++++-
+>  pathnames.h    |  1 +
+>  2 files changed, 52 insertions(+), 1 deletion(-)
+> 
+> diff --git a/device-linux.c b/device-linux.c
+> index 55f8522..3d18071 100644
+> --- a/device-linux.c
+> +++ b/device-linux.c
+> @@ -60,6 +60,42 @@ static uint16_t lowpan_get_short_addr(struct Interface *iface)
 
-all 8 patches have been applied to bluetooth-next tree.
+...
 
-Regards
+>   * this function gets the hardware type and address of an interface,
+>   * determines the link layer token length and checks it against
+>   * the defined prefixes
+> @@ -115,7 +151,21 @@ int update_device_info(int sock, struct Interface *iface)
+>  		break;
+>  #endif				/* ARPHDR_ARCNET */
+>  	case ARPHRD_6LOWPAN:
+> -		iface->sllao.if_hwaddr_len = 64;
+> +		/* hwaddr length differs on each L2 type lets detect them */
+> +		switch (lowpan_get_lltype(iface)) {
+> +		case LOWPAN_LLTYPE_BTLE:
+> +			iface->sllao.if_hwaddr_len = 48;
+> +			break;
+> +		case LOWPAN_LLTYPE_IEEE802154:
+> +			iface->sllao.if_hwaddr_len = 64;
+> +			break;
+> +		default:
+> +			/* TODO change to -1 if 6LoWPAN has better UAPI for that */
+> +			flog(LOG_WARNING, "WARNING, couldn't get 6LoWPAN link-layer type on %s, falling back to 64 bit hwaddr", iface->props.name);
+> +			iface->sllao.if_hwaddr_len = 64;
+> +			break;
+> +		}
+> +
 
-Marcel
 
+I think to solve this issue, the best way currently is to evaluate:
+
+/sys/class/net/$IFNAME/addr_len
+
+which directly told us the dev->addr_len attribute in kernel. The only
+thing that it could be that CONFIG_SYSFS isn't compiled. On 802.15.4 we
+need to have SYSFS because iwpan and phy enumaration [0].
+
+This solution should make radvd working with current mainline version
+which does dev->addr_len == 8 and also with the version when we change
+addr_len to 6.
+
+Or we introduce an UAPI subtype mechanism? Maybe something which is
+already set the NET_DEVTYPE stuff. Don't know I think we should go that
+way, we can later still change it to some subtype (linklayer type)
+evaluation if this information isn't enough for some linklayer types.
+
+- Alex
+
+[0] https://github.com/linux-wpan/wpan-tools/blob/master/src/iwpan.c#L221
