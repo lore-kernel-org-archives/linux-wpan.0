@@ -1,66 +1,53 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:51074 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752215AbcG2PWH (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-	Fri, 29 Jul 2016 11:22:07 -0400
-Date: Fri, 29 Jul 2016 11:22:04 -0400
-From: Don Zickus <dzickus@redhat.com>
+Received: from proxima.lasnet.de ([78.47.171.185]:50055 "EHLO
+	proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752638AbcG3WCd (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Sat, 30 Jul 2016 18:02:33 -0400
 Subject: Re: Looking for boards with an 802.15.4 chip
-Message-ID: <20160729152203.GD181121@redhat.com>
 References: <20160728174051.GB75405@redhat.com>
- <10331.1469740794@obiwan.sandelman.ca>
+From: Stefan Schmidt <stefan@datenfreihafen.org>
+Message-ID: <e65bd287-bfba-c92b-ac64-0e1c758a3e03@datenfreihafen.org>
+Date: Sun, 31 Jul 2016 00:02:29 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <10331.1469740794@obiwan.sandelman.ca>
+In-Reply-To: <20160728174051.GB75405@redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Michael Richardson <mcr@sandelman.ca>
-Cc: aar@pengutronix.de, linux-wpan@vger.kernel.org, linville@redhat.com
+To: Don Zickus <dzickus@redhat.com>, "aar@pengutronix.de" <aar@pengutronix.de>
+Cc: "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>, "linville@redhat.com" <linville@redhat.com>
 
-On Thu, Jul 28, 2016 at 05:19:54PM -0400, Michael Richardson wrote:
+Hello.
+
+On 28.07.2016 19:40, Don Zickus wrote:
+> Hi Alexander,
 > 
-> Don Zickus <dzickus@redhat.com> wrote:
->     > I was wondering what boards/chips folks like yourself use to develop/test
->     > the 802.15.4 work?  I noticed the website  http://wpan.cakelab.org/
->     > mentions
+> I was wondering what boards/chips folks like yourself use to develop/test
+> the 802.15.4 work?  I noticed the website  http://wpan.cakelab.org/ mentions
+> a bunch of boards.  Some of those pointers don't work and the ones that do,
+> show standalone boards that need to be wired up to a SPI bus.
 > 
-> It depends a lot on what you want to do, what pieces you want to hack on,
-> and what devices you want to interoperate with.
+> I assume the SPI bus is easily found on a rPI-like board.  Is it difficult to
+> hook one of them up to an x86 desktop?
 
-Pretty simple.  Just want to see how well the technology works.  With all
-the industry's talk about IoT, we are just trying to set up in our lab
-various technologies that customers may ask us about.  And we want to see
-how well it works with our products. :-)
+You might be able to do this with some USB dongle exposing some GPIOs to
+to the kernel but I never used anything like that. Most of my
+transceivers are connected to Pi's. So it goes down to embedded.
 
-> 
-> The at86rf233 is popular and easily obtainable and Alex is doing lots of work
-> to support it.  Get the openlabs device.  It seems that we might be able
-> to support 6tisch on this device if we try hard enough, but for the moment
-> you are restricted to 1 channel and aloha-only time slots.
+I'm in the lucky position though to have two ATUSB dongles which are
+simple USB dongles and get connected to your x86 systems with ease.
+They work out of the box in mainline since 4.1 and the firmware is open
+source as well. The problem right now is that it is now longer being sold.
 
-Ok, thanks for the suggestion!
+We are working on changing this though. See my mail from a few minutes
+ago to this list about interest for a new ATUSB production batch.
+Right now we would estimate them being on sale again sometime in October
+(the smaller fabs we are using for SMT is on holiday and we also need to
+prepare things in our spare time).
 
-> 
-> Many people are using openmote's connected via USB or via daughter card
-> to an RPI.   The openmote does the 6tisch stuff, but "bridges" (but/wrong
-> term, but have yet to find a better one) the raw 6lowpan packets over USB
-> using a custom encapsulation.  (I'd like to change it to ppp actually)
+If this is to far away, fair enough. If it does not really matter to you
+and you would have an interest to use them please let me know so I can
+better estimate the needed number of devices for the batch.
 
-Interesting so it would be 6lowpan over usb serial?
-
-> 
->     > I assume the SPI bus is easily found on a rPI-like board.  Is it
->     > difficult to hook one of them up to an x86 desktop?
-> 
-> Yes, it's a bit painful since few desktops have easily accessible GPIO
-> pins that you can turn into a SPI bus.  You can add one with a FTDI USB
-> interface easily, but given the cost of an RPI... hard to argue.
-
-Hehe.  Good point.
-
-Thanks for the feedback!  I will probably buy some stuff and start playing
-with it.
-
-Cheers,
-Don
+regards
+Stefan Schmidt
