@@ -1,56 +1,77 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:44168 "EHLO
-	metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1750926AbcHAO3H (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Mon, 1 Aug 2016 10:29:07 -0400
-Subject: Re: [PATCH linux-wpan/radvd 6lowpan] device-linux: detect 6LoWPAN
- lltype for hwaddr length
-References: <20160621144250.31650-1-aar@pengutronix.de>
- <21cdff8b-9994-63ec-a9c8-6691b5820302@pengutronix.de>
-From: Alexander Aring <aar@pengutronix.de>
-Message-ID: <ccc16ce0-8f7e-5e4a-5cd6-fe1ba1e3a30d@pengutronix.de>
-Date: Mon, 1 Aug 2016 16:07:15 +0200
+Received: from mail-qk0-f196.google.com ([209.85.220.196]:34485 "EHLO
+	mail-qk0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751199AbcGaWeg (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Sun, 31 Jul 2016 18:34:36 -0400
+Received: by mail-qk0-f196.google.com with SMTP id s186so4669146qkb.1
+        for <linux-wpan@vger.kernel.org>; Sun, 31 Jul 2016 15:34:36 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <21cdff8b-9994-63ec-a9c8-6691b5820302@pengutronix.de>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <e65bd287-bfba-c92b-ac64-0e1c758a3e03@datenfreihafen.org>
+References: <20160728174051.GB75405@redhat.com> <e65bd287-bfba-c92b-ac64-0e1c758a3e03@datenfreihafen.org>
+From: Marcin K Szczodrak <mszczodrak@gmail.com>
+Date: Sun, 31 Jul 2016 15:34:35 -0700
+Message-ID: <CAP3K90dJt7cbo54dhwXKfTGSJpXt=24S2bRa1NL57uhp1dx8Hg@mail.gmail.com>
+Subject: Re: Looking for boards with an 802.15.4 chip
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org
-Cc: linux-bluetooth@vger.kernel.org, kernel@pengutronix.de, patrik.flykt@linux.intel.com, jukka.rissanen@linux.intel.com
+To: Stefan Schmidt <stefan@datenfreihafen.org>
+Cc: Don Zickus <dzickus@redhat.com>, "aar@pengutronix.de" <aar@pengutronix.de>, "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>, "linville@redhat.com" <linville@redhat.com>
 
+To just get a feeling of how the technology works, OpenThread is one
+way of discovering 15.4 and it's Thread standard. One can use various
+dev boards to run OpenThread, such as Zolertia's RE-Mote or TI's
+CC2538 dev kit. Alternatively, there are also very good kits from
+SiLabs, NXP (Freescale) and Dialog (check OpenThread Sandbox
+Development Platform).
 
-Hi,
+ From a Linux perspective, it might be worth playing with OpenThread
+and wpantund, a user-space 15.4 driver that talks to 15.4 radio chip
+over UART or SPI. In this setup, one could flash 15.4 with OpenThread
+and run wpantund on a Linux host to create a Thread network gateway,
+which typically is used by low-power 15.4 only devices to get outside
+of the Thread network.
 
-On 07/28/2016 02:20 PM, Alexander Aring wrote:
-> Hi,
-> 
-> On 06/21/2016 04:42 PM, Alexander Aring wrote:
-...
-> 
-> I think to solve this issue, the best way currently is to evaluate:
-> 
-> /sys/class/net/$IFNAME/addr_len
-> 
-> which directly told us the dev->addr_len attribute in kernel. The only
-> thing that it could be that CONFIG_SYSFS isn't compiled. On 802.15.4 we
-> need to have SYSFS because iwpan and phy enumaration [0].
-> 
-> This solution should make radvd working with current mainline version
-> which does dev->addr_len == 8 and also with the version when we change
-> addr_len to 6.
+Best,
+Marcin
 
-this doesn't work because the kernel stuff will put the device address
-with U/L bitflip inside the address option. radvd will never do that
-because this should never be the case...
-
-Setting the U/L bit in radvd is a crazy behaviour inside the radvd code for
-support bug compatible version of btle 6lowpan.
-
-I currently try to catch all suggestions from the bluetooth 6lowpan
-rework RFC and making a next round. Then maybe we can finding more
-"issues" about using right dev->addr etc. :-)
-
-Also I want to sent some RFC to fix radvd in upstream for 6LoWPAN.
-
-- Alex
+On Sat, Jul 30, 2016 at 3:02 PM, Stefan Schmidt
+<stefan@datenfreihafen.org> wrote:
+> Hello.
+>
+> On 28.07.2016 19:40, Don Zickus wrote:
+>> Hi Alexander,
+>>
+>> I was wondering what boards/chips folks like yourself use to develop/test
+>> the 802.15.4 work?  I noticed the website  http://wpan.cakelab.org/ mentions
+>> a bunch of boards.  Some of those pointers don't work and the ones that do,
+>> show standalone boards that need to be wired up to a SPI bus.
+>>
+>> I assume the SPI bus is easily found on a rPI-like board.  Is it difficult to
+>> hook one of them up to an x86 desktop?
+>
+> You might be able to do this with some USB dongle exposing some GPIOs to
+> to the kernel but I never used anything like that. Most of my
+> transceivers are connected to Pi's. So it goes down to embedded.
+>
+> I'm in the lucky position though to have two ATUSB dongles which are
+> simple USB dongles and get connected to your x86 systems with ease.
+> They work out of the box in mainline since 4.1 and the firmware is open
+> source as well. The problem right now is that it is now longer being sold.
+>
+> We are working on changing this though. See my mail from a few minutes
+> ago to this list about interest for a new ATUSB production batch.
+> Right now we would estimate them being on sale again sometime in October
+> (the smaller fabs we are using for SMT is on holiday and we also need to
+> prepare things in our spare time).
+>
+> If this is to far away, fair enough. If it does not really matter to you
+> and you would have an interest to use them please let me know so I can
+> better estimate the needed number of devices for the batch.
+>
+> regards
+> Stefan Schmidt
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-wpan" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
