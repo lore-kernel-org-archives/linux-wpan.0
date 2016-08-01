@@ -1,77 +1,64 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-qk0-f196.google.com ([209.85.220.196]:34485 "EHLO
-	mail-qk0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751199AbcGaWeg (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Sun, 31 Jul 2016 18:34:36 -0400
-Received: by mail-qk0-f196.google.com with SMTP id s186so4669146qkb.1
-        for <linux-wpan@vger.kernel.org>; Sun, 31 Jul 2016 15:34:36 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <e65bd287-bfba-c92b-ac64-0e1c758a3e03@datenfreihafen.org>
-References: <20160728174051.GB75405@redhat.com> <e65bd287-bfba-c92b-ac64-0e1c758a3e03@datenfreihafen.org>
-From: Marcin K Szczodrak <mszczodrak@gmail.com>
-Date: Sun, 31 Jul 2016 15:34:35 -0700
-Message-ID: <CAP3K90dJt7cbo54dhwXKfTGSJpXt=24S2bRa1NL57uhp1dx8Hg@mail.gmail.com>
+Received: from ec2-52-27-115-49.us-west-2.compute.amazonaws.com ([52.27.115.49]:36676
+	"EHLO s-opensource.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752967AbcHALiH (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Mon, 1 Aug 2016 07:38:07 -0400
 Subject: Re: Looking for boards with an 802.15.4 chip
-Content-Type: text/plain; charset=UTF-8
+References: <20160728174051.GB75405@redhat.com>
+ <e65bd287-bfba-c92b-ac64-0e1c758a3e03@datenfreihafen.org>
+ <CAP3K90dJt7cbo54dhwXKfTGSJpXt=24S2bRa1NL57uhp1dx8Hg@mail.gmail.com>
+From: Stefan Schmidt <stefan@osg.samsung.com>
+Message-ID: <20665066-ab7f-a5ef-2e67-6767f025b336@osg.samsung.com>
+Date: Mon, 1 Aug 2016 13:36:48 +0200
+MIME-Version: 1.0
+In-Reply-To: <CAP3K90dJt7cbo54dhwXKfTGSJpXt=24S2bRa1NL57uhp1dx8Hg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Stefan Schmidt <stefan@datenfreihafen.org>
+To: Marcin K Szczodrak <mszczodrak@gmail.com>, Stefan Schmidt <stefan@datenfreihafen.org>
 Cc: Don Zickus <dzickus@redhat.com>, "aar@pengutronix.de" <aar@pengutronix.de>, "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>, "linville@redhat.com" <linville@redhat.com>
 
-To just get a feeling of how the technology works, OpenThread is one
-way of discovering 15.4 and it's Thread standard. One can use various
-dev boards to run OpenThread, such as Zolertia's RE-Mote or TI's
-CC2538 dev kit. Alternatively, there are also very good kits from
-SiLabs, NXP (Freescale) and Dialog (check OpenThread Sandbox
-Development Platform).
+Hello.
 
- From a Linux perspective, it might be worth playing with OpenThread
-and wpantund, a user-space 15.4 driver that talks to 15.4 radio chip
-over UART or SPI. In this setup, one could flash 15.4 with OpenThread
-and run wpantund on a Linux host to create a Thread network gateway,
-which typically is used by low-power 15.4 only devices to get outside
-of the Thread network.
+On 01/08/16 00:34, Marcin K Szczodrak wrote:
+> To just get a feeling of how the technology works, OpenThread is one
+> way of discovering 15.4 and it's Thread standard. One can use various
+> dev boards to run OpenThread, such as Zolertia's RE-Mote or TI's
+> CC2538 dev kit. Alternatively, there are also very good kits from
+> SiLabs, NXP (Freescale) and Dialog (check OpenThread Sandbox
+> Development Platform).
+>
+> From a Linux perspective, it might be worth playing with OpenThread
+> and wpantund, a user-space 15.4 driver that talks to 15.4 radio chip
+> over UART or SPI.
 
-Best,
-Marcin
+We are aware of them and I already has some mails with Jonathan from 
+Nestlabs to see how we can work together here.
 
-On Sat, Jul 30, 2016 at 3:02 PM, Stefan Schmidt
-<stefan@datenfreihafen.org> wrote:
-> Hello.
->
-> On 28.07.2016 19:40, Don Zickus wrote:
->> Hi Alexander,
->>
->> I was wondering what boards/chips folks like yourself use to develop/test
->> the 802.15.4 work?  I noticed the website  http://wpan.cakelab.org/ mentions
->> a bunch of boards.  Some of those pointers don't work and the ones that do,
->> show standalone boards that need to be wired up to a SPI bus.
->>
->> I assume the SPI bus is easily found on a rPI-like board.  Is it difficult to
->> hook one of them up to an x86 desktop?
->
-> You might be able to do this with some USB dongle exposing some GPIOs to
-> to the kernel but I never used anything like that. Most of my
-> transceivers are connected to Pi's. So it goes down to embedded.
->
-> I'm in the lucky position though to have two ATUSB dongles which are
-> simple USB dongles and get connected to your x86 systems with ease.
-> They work out of the box in mainline since 4.1 and the firmware is open
-> source as well. The problem right now is that it is now longer being sold.
->
-> We are working on changing this though. See my mail from a few minutes
-> ago to this list about interest for a new ATUSB production batch.
-> Right now we would estimate them being on sale again sometime in October
-> (the smaller fabs we are using for SMT is on holiday and we also need to
-> prepare things in our spare time).
->
-> If this is to far away, fair enough. If it does not really matter to you
-> and you would have an interest to use them please let me know so I can
-> better estimate the needed number of devices for the batch.
->
-> regards
-> Stefan Schmidt
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-wpan" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+In this setup, one could flash 15.4 with OpenThread
+> and run wpantund on a Linux host to create a Thread network gateway,
+> which typically is used by low-power 15.4 only devices to get outside
+> of the Thread network.
+
+What you are describing is the network co-processor setup (NCP). This 
+sadly means that Linux is only aware of the very high level 
+characteristics of the Thread network. IP address range, routes, etc.
+The rest would all be handled in the device firmware. With OpenThread 
+this would be at least open source.
+
+On the other hand the linux-wpan and 6LoWPAN stack we are working on 
+here is capable of handling the PHY and MAC layers as well. Thus we are 
+aiming for a way to run the higher level bits of OpenThread in userspace 
+while having at least 15.4 and 6LoWPAN be dealt with by the existing 
+subsystems. I'm working my way through the code right now to see what is 
+needed on our side to support the OpenThread use cases and what 
+interfaces we would need to offer. I should be able to but some initial 
+thoughts into the wiki by the end of the week maybe.
+
+In my opinion the NCP as well as the native linux use case are both 
+valid and it depends on your idea or project/product what you want to use.
+
+regards
+Stefan Schmidt
