@@ -1,54 +1,63 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:36864 "EHLO
+Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:51899 "EHLO
 	metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S966150AbcHBPAr (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Tue, 2 Aug 2016 11:00:47 -0400
-Subject: Re: [PATCH linux-wpan/radvd for-upstream 2/2] device-linux: get
- address length via sysfs
-References: <20160802143752.12831-1-aar@pengutronix.de>
- <20160802143752.12831-3-aar@pengutronix.de>
+	by vger.kernel.org with ESMTP id S1757008AbcHDNLO (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Thu, 4 Aug 2016 09:11:14 -0400
 From: Alexander Aring <aar@pengutronix.de>
-Message-ID: <daec056f-fcd7-228f-6097-eff7d7137af7@pengutronix.de>
-Date: Tue, 2 Aug 2016 16:59:28 +0200
-MIME-Version: 1.0
-In-Reply-To: <20160802143752.12831-3-aar@pengutronix.de>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Subject: [PATCHv2 linux-wpan/radvd for-upstream 0/2] radvd: upstream patches
+Date: Thu,  4 Aug 2016 15:09:29 +0200
+Message-Id: <20160804130932.4429-1-aar@pengutronix.de>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
-Cc: kernel@pengutronix.de, linux-bluetooth@vger.kernel.org
-
+Cc: kernel@pengutronix.de, linux-bluetooth@vger.kernel.org, Alexander Aring <aar@pengutronix.de>
 
 Hi,
 
-On 08/02/2016 04:37 PM, Alexander Aring wrote:
-> This patch will change the behaviour for 6LoWPAN interface to detect the
-> linklayer address length via sysfs. The usually way to get the address
-> length is via a mapping from ARPHRD device type. This doesn't work for
-> 6LoWPAN interfaces, we need at least some other mechanism. This patch
-> adds the mechanism to read out the sysfs UAPI to get the addr_len
-> attribute of net_device. This will not work if there are two 6LoWPAN
-> link-layer types with the same address length but need different
-> handling in userspace. For that reason I think a linklayer type would be
-> better, this requires a 6lowpan netlink API which doesn't exist right
-> now. So we use this simple way now.
-> 
-> Signed-off-by: Alexander Aring <aar@pengutronix.de>
+this patch series has some overdue updates for radvd upstream version.
+It doesn't contain rework of 6CO handling, since we don't have a stable
+UAPI to provide stateful compression to userspace.
 
-I need to remove this signed off. That's not radvd commit style. :-)
+Anyway radvd has actually 6CO handling which is ?broken? don't know what
+it should do at the moment. 6CO without stateful compression setting
+makes no sense for me. If you like to use 6CO over debugfs use
+linux-wpan/radvd "6lowpan" branch.
 
 ---
 
-After talking shortly with Marcel, RTNL netlink has already the same
-stuff what we can get from sysfs entry here. See [0] kernel and [1]
-userspace.
+I will update the "6lowpan" branch also with Patch 2/2 which adds support
+to get address length via sysfs. This patch will prepare correct handling
+for the new BTLE 6LoWPAN handling to use the correct address and
+address length (not 8 bytes, with U/L bit).
 
-Over RTA_PAYLOAD(tb[IFLA_ADDRESS]) [1], we should be able to get the
-dev->addr_len which is given by [0]... I make now a new version with
-netlink as UAPI mechanism.
+If everything seems fine I will send a pull-request for radvd github
+repository. Please reply if this "hopefully final version" is okay for
+all 6LoWPAN people. Then I will try to get this upstream, at last the
+radvd maintainer need to apply this patch series if this looks okay
+for him.
 
 - Alex
 
-[0] http://lxr.free-electrons.com/source/net/core/rtnetlink.c#L1247
-[1] https://github.com/shemminger/iproute2/blob/master/lib/ll_map.c#L84
+changes since v2:
+
+I need to correct me here, I think the buggy btle 6lowpan implementation
+addr_len == 8 and U/L will work. This is because the U/L bit is part of
+interface device address and radvd will use them. But anyway it's wrong
+and the next step will be to fix BTLE 6LoWPAN mainline.
+
+- change device address length UAPI to netlink
+- correct commit message in PATCH 1/2 - remove the part that all 6LoWPAN
+  types has the same device address length.
+
+Alexander Aring (2):
+  device-linux: replace ARPHRD_IEEE802154 to ARPHRD_6LOWPAN
+  device-linux: get address length via netlink
+
+ device-linux.c | 27 ++++++++++++++++++++-----
+ netlink.c      | 64 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ netlink.h      |  1 +
+ 3 files changed, 87 insertions(+), 5 deletions(-)
+
+-- 
+2.9.2
+
