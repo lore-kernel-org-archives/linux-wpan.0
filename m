@@ -1,80 +1,40 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:58158 "EHLO
+Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:52622 "EHLO
 	metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751680AbcHGPeC (ORCPT
+	by vger.kernel.org with ESMTP id S1751693AbcHGPeC (ORCPT
 	<rfc822;linux-wpan@vger.kernel.org>); Sun, 7 Aug 2016 11:34:02 -0400
 From: Alexander Aring <aar@pengutronix.de>
-Subject: [PATCH wpan-misc 1/5] website: update testing scripts for netns
-Date: Sun,  7 Aug 2016 17:33:20 +0200
-Message-Id: <20160807153324.9642-1-aar@pengutronix.de>
+Subject: [PATCH wpan-misc 2/5] website: remove note about missing short address functionality
+Date: Sun,  7 Aug 2016 17:33:21 +0200
+Message-Id: <20160807153324.9642-2-aar@pengutronix.de>
+In-Reply-To: <20160807153324.9642-1-aar@pengutronix.de>
+References: <20160807153324.9642-1-aar@pengutronix.de>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
 Cc: Alexander Aring <aar@pengutronix.de>
 
-Reviewed-by: Stefan Schmidt<stefan@osg.samsung.com>
 Signed-off-by: Alexander Aring <aar@pengutronix.de>
 ---
- website/index.txt | 30 ++++++++++++++++++------------
- 1 file changed, 18 insertions(+), 12 deletions(-)
+ website/index.txt | 5 -----
+ 1 file changed, 5 deletions(-)
 
 diff --git a/website/index.txt b/website/index.txt
-index 65c6b9c..1438c6e 100644
+index 1438c6e..5d9793a 100644
 --- a/website/index.txt
 +++ b/website/index.txt
-@@ -90,8 +90,13 @@ Setup a 6LowPAN test network
+@@ -81,11 +81,6 @@ ip link add link wpan0 name lowpan0 type lowpan
+ That's it! Now you have some lowpan0 interface with a 6LoWPAN 1280 MTU which runs on top the wpan interface.
+ As default you have a default link-local address based on the MAC (extended address).
+ 
+-Note: we don't support any case of short-addresses right now. This is a complicated issue with the IPv6 neighbour discovery cache.
+-Of course we supporting broadcast frames via short-addresses but nothing more in 802.15.4 6LoWPAN.
+-Only extended address handling is supported right now.
+-
+-
+ Setup a 6LowPAN test network
  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  
- Let's assume you want to setup a 6lowpan test network of six nodes.
-+Each of them will be created in their own net namespace to avoid
-+local IPv6 optimizations. Each netns is named according to the wpan
-+interface which available in the net namespace.
- 
- ---------------------------------------------------------------------
-+#!/bin/sh
-+
- # we need some Private Area Network ID
- panid="0xbeef"
- # number of nodes
-@@ -102,25 +107,26 @@ numnodes=6
- modprobe fakelb numlbs=$numnodes
- 
- # initialize all the nodes
--for i in $(seq 0 $numnodes);
-+for i in $(seq 0 `expr $numnodes - 1`);
- do
--	iwpan dev wpan${i} set pan_id 0xbeef
--	ip link wpan${i} name lowpan${i} type lowpan
--	ip link set wpan${i} up
--	ip link set lowpan${i} up
-+	ip netns delete wpan${i}
-+	ip netns add wpan${i}
-+	PHYNUM=`iwpan dev | grep -B 1 wpan${i} | sed -ne '1 s/phy#\([0-9]\)/\1/p'`
-+	iwpan phy${PHYNUM} set netns name wpan${i}
-+
-+	ip netns exec wpan${i} iwpan dev wpan${i} set pan_id $panid
-+	ip netns exec wpan${i} ip link add link wpan${i} name lowpan${i} type lowpan
-+	ip netns exec wpan${i} ip link set wpan${i} up
-+	ip netns exec wpan${i} ip link set lowpan${i} up
- done
- ---------------------------------------------------------------------
- 
- Now let us send some data over our network:
- 
- ---------------------------------------------------------------------
--wireshark -kSl -i lowpan0 &
--# get the IPv6 address of lowpan1
--lowpan1addr="$(ip addr show lowpan1 | grep inet6 \
--	| sed 's,.*inet6 \([^/]*\).*,\1,')"
--# tell ping6 to ping the IPv6 address of lowpan1 and send it via
--# lowpan0
--ping6 ${lowpan1addr}%lowpan0
-+ip netns exec wpan0 wireshark -kSl -i lowpan0 &
-+# ping all nodes
-+ip netns exec wpan0 ping6 ff02::1%lowpan0
- ---------------------------------------------------------------------
- 
- Now watch wireshark and all the nice ICMP packets there.
 -- 
 2.9.2
 
