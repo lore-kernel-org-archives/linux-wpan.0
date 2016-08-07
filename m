@@ -1,92 +1,54 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:33971 "EHLO
+Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:55411 "EHLO
 	metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S934069AbcHEJTA (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Fri, 5 Aug 2016 05:19:00 -0400
-Subject: Re: [RFC bluetooth-next 00/20] bluetooth: rework 6lowpan
- implementation
-References: <20160711195044.25343-1-aar@pengutronix.de>
- <2D2C7A7559A21B4EAB6B76FE23E27DFA0221FF4FB6@mbx04.nvlsi.no>
+	by vger.kernel.org with ESMTP id S1751674AbcHGPBk (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Sun, 7 Aug 2016 11:01:40 -0400
 From: Alexander Aring <aar@pengutronix.de>
-Message-ID: <74a09ed9-80bd-d216-8036-3c5bd641bd81@pengutronix.de>
-Date: Fri, 5 Aug 2016 11:18:50 +0200
+Subject: thesis - MLE
+Message-ID: <5fb7e439-4b49-a3f7-20f1-dacf2fec694b@pengutronix.de>
+Date: Sun, 7 Aug 2016 17:01:37 +0200
 MIME-Version: 1.0
-In-Reply-To: <2D2C7A7559A21B4EAB6B76FE23E27DFA0221FF4FB6@mbx04.nvlsi.no>
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: "Bakke, Glenn Ruben" <Glenn.Ruben.Bakke@nordicsemi.no>
-Cc: "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>, "kernel@pengutronix.de" <kernel@pengutronix.de>, "luiz.dentz@gmail.com" <luiz.dentz@gmail.com>, "kaspar@schleiser.de" <kaspar@schleiser.de>, "jukka.rissanen@linux.intel.com" <jukka.rissanen@linux.intel.com>, "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, "Patrik.Flykt@linux.intel.com" <Patrik.Flykt@linux.intel.com>
-
+To: "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>
+Cc: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
 
 Hi,
 
-On 08/05/2016 09:15 AM, Bakke, Glenn Ruben wrote:
-> Hi Alex,
-> 
->> -----Original Message-----
->> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
->>
-...
->> --
->> 2.9.0
->>
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->> the body of a message to majordomo@vger.kernel.org More majordomo
->> info at  http://vger.kernel.org/majordomo-info.html
-> 
-> I have tested the patch series with all 20 patches and verified that I can connect to devices and communicate between them over IPv6. Multicast and unicast where tested.
-> The neighbors where manually added with the command "ip -6 neigh". However I did not do a long run or thoroughly test, but did the basic verification.
-> I really liked the way the HCI device was manually selected for the interface, giving me flexibility to choose what connections I wanted on a given HCI device.
-> 
+I will start my master thesis the next days and will try to create a
+userspace application for [0] inside a Linux context and using the
+mainline 802.15.4 subsystem/for testing the mainline 6LoWPAN stuff
+etc. I will not use any UART/SLIP solution for that.
 
-thank you for testing it.
+There exists an implementation outside which is openthread [1]. I will
+try to create a native 802.15.4/6LoWPAN developing environment like I
+did for RIOT-OS [2] with an af802154 driver to speak with 802.15.4 Linux
+interfaces.
 
-The "ip -6 neigh" command for adding neighbours should not be needed,
-why did you do that?
+If anybody is already working on these parts, so please tell me.
+... or better tell me not, because then I can't working on this parts
+anymore in my thesis.
 
-Also the most important information for me would be:
+I added bluetooth mailinglist here because [0] is 6lo working group,
+maybe there comes some TLV's which are bluetooth related soon?
 
-- Did it ever crashed your kernel?
-- Do you also have the tx credits deadlock?
+Don't know I am not an expert for [0], I need to figure out how it's
+working. Seems to require multicast fowarding stuff, but this can be
+replaced later by $better_multicast_routing_protocol. This could be also
+what thread used. Well I need to figure it out, I will not depend my
+work on a better multicast forwarding protocol.
 
-I have locally a RFCv2 where I put now these things which I got from
-this RFC as suggestion, which are:
+Anyway for 802.15.4 I need to implement some kernel parts to calculate
+ETX, which means I need some ack received/non ack received counters or
+something else which can be inserted for the ETX calculation (I need to
+look into that).
 
- - try to solve that dev->dev_addr is set when first connection is
-   there and remove dev_addr when last connection is gone.
-
-   I solved this by creating the interface with address 0...0 at first.
-   If there comes a connection in then the address will be set and the
-   interface comes up.
-
-   If the last connection will be close (for what reason ever) then the
-   interface comes down and the address is 0...0.
-
-   It's not possible to set the interface up when the address is 0...0.
-
-   This behaviour is somewhat better than recreating new interface (in
-   my opinion).
-
- - 6lo%d interface will be created when power on the hci interface and
-   deleted when power off. (That's a suggestion from Marcel, so far I
-   understood it).
-
-   I implemented it now that "6lowpan_enable" need to be set to "1"
-   before setting hci will be powered on. All hci will create an
-   interface then.
-
-   This change has a ?nice? effekt that we don't need to close all
-   connection when doing a interface unregister.
-
- - Changed the "6lowpan_control" per hci, not per interface. Which is
-   more what Partrik's UAPI draft.
-
-These three things did I change now, I just need to create new patches
-and send it to the mailinglist.
-
-But the tx credits deadlock still exists on my side.
+I am sure I will have some fun with that.
 
 - Alex
+
+[0] https://tools.ietf.org/html/draft-kelsey-6lo-mesh-link-establishment-00
+[1] https://github.com/openthread/openthread/blob/master/src/core/thread/mle.cpp
+[2] https://github.com/RIOT-OS/RIOT/pull/5582
