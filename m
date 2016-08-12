@@ -1,17 +1,20 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:52022 "EHLO
+Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:41553 "EHLO
 	metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1752115AbcHHJ50 (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Mon, 8 Aug 2016 05:57:26 -0400
-Subject: Re: Problems about handling duplicate packets when frame retry is
- enabled
+	by vger.kernel.org with ESMTP id S1752372AbcHLQ3F (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>);
+	Fri, 12 Aug 2016 12:29:05 -0400
+Subject: =?UTF-8?Q?Re:_=e7=ad=94=e5=a4=8d:_Problems_about_handling_duplicate?=
+ =?UTF-8?Q?_packets_when_frame_retry_is_enabled?=
 References: <576133E7D398244EA0325FF7CE2A09E5CD55E15B@G08CNEXMBPEKD03.g08.fujitsu.local>
+ <177f2368-0a94-079e-09ec-1093e62e5874@pengutronix.de>
+ <576133E7D398244EA0325FF7CE2A09E5CD55E4B8@G08CNEXMBPEKD03.g08.fujitsu.local>
 From: Alexander Aring <aar@pengutronix.de>
-Message-ID: <177f2368-0a94-079e-09ec-1093e62e5874@pengutronix.de>
-Date: Mon, 8 Aug 2016 11:57:23 +0200
+Message-ID: <af477ae0-0dd1-cc21-86c2-40f99d86a14a@pengutronix.de>
+Date: Fri, 12 Aug 2016 18:29:03 +0200
 MIME-Version: 1.0
-In-Reply-To: <576133E7D398244EA0325FF7CE2A09E5CD55E15B@G08CNEXMBPEKD03.g08.fujitsu.local>
-Content-Type: text/plain; charset=iso-2022-jp
+In-Reply-To: <576133E7D398244EA0325FF7CE2A09E5CD55E4B8@G08CNEXMBPEKD03.g08.fujitsu.local>
+Content-Type: text/plain; charset=gbk
 Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
@@ -21,37 +24,68 @@ Cc: "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>
 
 Hi,
 
-On 08/08/2016 11:11 AM, Xue, Wenqian wrote:
-> Hi, all!
+On 08/11/2016 11:50 AM, Xue, Wenqian wrote:
+> Hi, Alexander,
 > 
-> I’m using two raspberry pis with openlabs 802.15.4 radio hooked up for some experiments (Linux kernel is v4.7). Some stats like RSSI and LQI are collected and recorded by modifying wpan-ping.c. During the tests, I find some problems about handling duplicate packets.
-> 
-> When frame retry is enabled, it is found that the 802.15.4 module/Linux kernel could not discard duplicates, and would send the duplicates to the upper level (wpan-ping level). I check the mac receive code (/net/mac802154/rx.c), the functions __ieee802154_rx_handle_packet() and ieee802154_subif_frame() have no sub-function to handle duplicates. I also see that the similar function has been implemented in /net/mac80211/rx.c, it is the function ieee80211_rx_h_check_dup().
-> The duplicates need to be discarded for our experiments, the results will become more complicated otherwise. I add some codes in the function ieee802154_subif_frame(), the added codes are as below:
-> 
-> //part of codes in the function ieee802154_subif_frame()
-> switch (mac_cb(skb)->type) {
-> case IEEE802154_FC_TYPE_DATA:
-> +if (hdr->seq != sdata->last_seq) {
-> +    sdata->last_seq == hdr->seq;
-> +    return ieee802154_deliver_skb(skb);
-> +} else {
-> +    break;
-> +}
-> default:
-> pr_warn("ieee802154: bad frame received (type = %d)\n", mac_cb(skb)->type);
-> mac_cb(skb)->type);
-> goto fail;
-> //----------------------------------------------------------
-> 
-> The main mechanism to handle duplicates is through the comparison of sequence number between current packet (indicated by seq) and last one (indicated by last_seq). The variable last_seq is defined in the struct sdata. By the modification, the duplicates are indeed no longer received on upper layer. I'm a newbie for linux kernel, I'd like to know if the modification is ok?
-> If there are errors or will lead to any unexpected affects to the kernel, please feel free to point it out, thank you very much!
+> Thank you for your quick reply.
+> I'm not sure if AACK is disabled (how can I know it?), but I'm using node interface not monitor interface.
+>
+
+yea, I should get it before because monitor interfaces doesn't run the
+code which you changed. But monitor interfaces goes into promiscuous
+mode and AACK is disabled there.
+
+> When without kernel modification and setting frame retries=3 for both RPis, lots of error 'sequence number did not match" will occur. While, when with the modification to deal with duplicates, the error will not occur any more. I'm not sure if AACK could discard duplicates automatically.
+> Thank you!
 > 
 
-This smells something that for what reason ever the Linux transceiver cannot
-handle AACK anymore.
+Your modification handles in duplicates in a form which is not
+acceptable. It will simple drop duplicates but how frame retries works
+is the following:
 
-Do you using monitor interfaces for receiving? This could be the reason
-why AACK is disabled.
+1. Node A transmits frame for Node B with ackrequest bit set.
+2. Node B receive that frame and see's "ackrequest bit is set" and
+   sending an ACK back.
+3. If Node A received an ack for the sequence number then no
+   retransmission will occur.
+OR
+3. If Node A doesn't received an ack it will retransmit the frame.
+
+
+On your nodes and if you are really using two at86rf233 transceivers,
+this mechanism is completely done by hardware.
+
+Transmit: ARET
+Receive: AACK
+
+On the receive side it's always imporant that the receiving node
+supports AACK handling if Nodes sending frames with "ackrequest bit"
+set.
+
+---
+
+First, you should sniff somehow the traffic if it's possible, to see
+what's going on the traffic and you see that Node B sends ACKs back, if
+not -> missing AACK handling.
+
+On linux the openlabs transceiver (at86rf233) supports AACK handling...
+don't know if you break it with your changes.
+
+---
+
+Also I detected that the ieee802154 sockets doesn't care about "iwpan
+dev wpan0 set ackreq_default" setting [0]. This socket interface should
+only be used as DGRAM sockets and there is a big TODO to make an
+enhanced version of this socket interface. :-)
+
+But that you have retransmits smells that the [0] is set.
+
+---
+
+I am here totally confused that you don't have AACK handling which the
+at86rf233 supports, do you really using two openlabs with mainline Linux
+kernel? Or do you talking with some contiki/RIOT etc. node?
 
 - Alex
+
+[0] http://lxr.free-electrons.com/source/net/ieee802154/socket.c#L667
