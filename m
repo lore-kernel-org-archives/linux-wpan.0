@@ -1,60 +1,30 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:36430 "EHLO
-	metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1752002AbcHHMKR (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Mon, 8 Aug 2016 08:10:17 -0400
-Subject: Re: [RFCv2 bluetooth-next 00/19] bluetooth: rework 6lowpan
- implementation
-References: <20160807143056.3116-1-aar@pengutronix.de>
-From: Alexander Aring <aar@pengutronix.de>
-Message-ID: <628fdbf2-7600-b176-f896-08f26318048d@pengutronix.de>
-Date: Mon, 8 Aug 2016 14:10:15 +0200
+Received: from mail-qt0-f175.google.com ([209.85.216.175]:35577 "EHLO
+	mail-qt0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753283AbcHPOP5 (ORCPT
+	<rfc822;linux-wpan@vger.kernel.org>); Tue, 16 Aug 2016 10:15:57 -0400
+Received: by mail-qt0-f175.google.com with SMTP id x25so35569213qtx.2
+        for <linux-wpan@vger.kernel.org>; Tue, 16 Aug 2016 07:15:39 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20160807143056.3116-1-aar@pengutronix.de>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+From: Alan Egan <egan.alan.d@googlemail.com>
+Date: Tue, 16 Aug 2016 15:15:38 +0100
+Message-ID: <CA+oDrvyoWaeDK_gcnRdK2cLb2vRiQ1dbaHb7u_0RggjBV2CqNw@mail.gmail.com>
+Subject: 802.15.4g Support (again)
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
-Cc: kernel@pengutronix.de, linux-bluetooth@vger.kernel.org
 
 Hi,
 
-On 08/07/2016 04:30 PM, Alexander Aring wrote:
-> Hi,
-> 
-> This patch series is my second RFC for making btle 6lowpan into the right
-> direction.
-> 
-> I added hopefully all suggestions which I got from RFCv1. The interface address
-> will be assigned when the first l2cap chan connection gets in. This device
-> address will be get by "hci_copy_identity_address" bluetooth API function and
-> I hope this is the right function to get the "RPA device address".
-> 
-> Checkout commit message of Patch 19/19 to see how I used it.
-> 
-> Bad news are, I will start my master thesis shortly so I am not able to work
-> on this patch series anymore.
-> 
+Reading through the mailing list archive, I was wondering if any
+progress had been made on the 802.15.4g support in the kernel? I'm in
+a position where it would be really useful if it existed, so I'm more
+than happy to have a crack at it myself (and it seems some aspects
+have already been discussed and worked out). However, it looks like
+there may already be someone working on it (though the last email
+looks to be around end of March), and I don't want to duplicate work!
 
-and I got the following warnings from bots/persons, I just send it here
-again for the next person who like to work on that or I forget it again
-the next time when I can work on this:
+Cheers,
 
-"ERROR: "baswap" [net/6lowpan/6lowpan.ko] undefined!"
-
-This is because baswap is some compiled function in bluetooth module and
-6lowpan doesn;t depend on that.
-
-Another issue:
-
-net/bluetooth/6lowpan.c:892:0-23: WARNING: lowpan_enabled_fops should be
-defined with DEFINE_DEBUGFS_ATTRIBUTE
-
- Use DEFINE_DEBUGFS_ATTRIBUTE rather than DEFINE_SIMPLE_ATTRIBUTE
-  for debugfs files.
-
-which seems to be also affected in net/6lowpan/debugfs.c and
-net/bluetooth/hci_debugfs.c
-
-- Alex
+Alan
