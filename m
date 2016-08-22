@@ -1,92 +1,36 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from ec2-52-27-115-49.us-west-2.compute.amazonaws.com ([52.27.115.49]:39287
-	"EHLO s-opensource.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752419AbcHJSGv (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Wed, 10 Aug 2016 14:06:51 -0400
-Subject: Re: [PATCH wpan-misc 1/5] website: update testing scripts for netns
-References: <20160807153324.9642-1-aar@pengutronix.de>
-From: Stefan Schmidt <stefan@osg.samsung.com>
-Message-ID: <88d62949-0be7-9807-4721-24d2fe8a2121@osg.samsung.com>
-Date: Wed, 10 Aug 2016 14:08:03 +0200
+Received: from mail-yw0-f171.google.com ([209.85.161.171]:35592 "EHLO
+        mail-yw0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751779AbcHVHue (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 22 Aug 2016 03:50:34 -0400
+Received: by mail-yw0-f171.google.com with SMTP id j12so46715061ywb.2
+        for <linux-wpan@vger.kernel.org>; Mon, 22 Aug 2016 00:50:34 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20160807153324.9642-1-aar@pengutronix.de>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
+From: Tao Liu <liu3tao@gmail.com>
+Date: Mon, 22 Aug 2016 00:50:12 -0700
+Message-ID: <CAF_bZd2CYeuVpmG_Sb4QKVHtpb7q-WxwhCoXr-4yNoZ1CGvRRg@mail.gmail.com>
+Subject: at86rf233 in Raspberry Pi 3
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <aar@pengutronix.de>, linux-wpan@vger.kernel.org
+To: linux-wpan@vger.kernel.org
 
-Hello.
+Dear list,
 
-On 07/08/16 17:33, Alexander Aring wrote:
-> Reviewed-by: Stefan Schmidt<stefan@osg.samsung.com>
-> Signed-off-by: Alexander Aring <aar@pengutronix.de>
-> ---
->  website/index.txt | 30 ++++++++++++++++++------------
->  1 file changed, 18 insertions(+), 12 deletions(-)
->
-> diff --git a/website/index.txt b/website/index.txt
-> index 65c6b9c..1438c6e 100644
-> --- a/website/index.txt
-> +++ b/website/index.txt
-> @@ -90,8 +90,13 @@ Setup a 6LowPAN test network
->  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->
->  Let's assume you want to setup a 6lowpan test network of six nodes.
-> +Each of them will be created in their own net namespace to avoid
-> +local IPv6 optimizations. Each netns is named according to the wpan
-> +interface which available in the net namespace.
->
->  ---------------------------------------------------------------------
-> +#!/bin/sh
-> +
->  # we need some Private Area Network ID
->  panid="0xbeef"
->  # number of nodes
-> @@ -102,25 +107,26 @@ numnodes=6
->  modprobe fakelb numlbs=$numnodes
->
->  # initialize all the nodes
-> -for i in $(seq 0 $numnodes);
-> +for i in $(seq 0 `expr $numnodes - 1`);
->  do
-> -	iwpan dev wpan${i} set pan_id 0xbeef
-> -	ip link wpan${i} name lowpan${i} type lowpan
-> -	ip link set wpan${i} up
-> -	ip link set lowpan${i} up
-> +	ip netns delete wpan${i}
-> +	ip netns add wpan${i}
-> +	PHYNUM=`iwpan dev | grep -B 1 wpan${i} | sed -ne '1 s/phy#\([0-9]\)/\1/p'`
-> +	iwpan phy${PHYNUM} set netns name wpan${i}
-> +
-> +	ip netns exec wpan${i} iwpan dev wpan${i} set pan_id $panid
-> +	ip netns exec wpan${i} ip link add link wpan${i} name lowpan${i} type lowpan
-> +	ip netns exec wpan${i} ip link set wpan${i} up
-> +	ip netns exec wpan${i} ip link set lowpan${i} up
->  done
->  ---------------------------------------------------------------------
->
->  Now let us send some data over our network:
->
->  ---------------------------------------------------------------------
-> -wireshark -kSl -i lowpan0 &
-> -# get the IPv6 address of lowpan1
-> -lowpan1addr="$(ip addr show lowpan1 | grep inet6 \
-> -	| sed 's,.*inet6 \([^/]*\).*,\1,')"
-> -# tell ping6 to ping the IPv6 address of lowpan1 and send it via
-> -# lowpan0
-> -ping6 ${lowpan1addr}%lowpan0
-> +ip netns exec wpan0 wireshark -kSl -i lowpan0 &
-> +# ping all nodes
-> +ip netns exec wpan0 ping6 ff02::1%lowpan0
->  ---------------------------------------------------------------------
->
->  Now watch wireshark and all the nice ICMP packets there.
->
+I am trying make at86rf233 radio from openlabs work with Raspberry Pi
+3. I followed the guide here:
+https://github.com/RIOT-OS/RIOT/wiki/How-to-install-6LoWPAN-Linux-Kernel-on-Raspberry-Pi,
+but it seems do not work well in Raspberry Pi 3.
 
+So far I can
+- see "at86rf230 spi0.0: Detected at86rf233 chip version 1" in dmesg
+- use iwpan command to list wpan0 interface and set pan_id/short_addr/etc.
+- create 6LoWPAN interface
+(http://wpan.cakelab.org/#_setup_a_6lowpan_test_network)
 
+But I cannot ping other Raspberry using wpan-ping tool, and pinging
+through 6LoWPAN interface also failed. Can anyone give me some
+pointers about how to setup at86rf233 for Raspberry Pi 3?
 
-Acked-by: Stefan Schmidt <stefan@osg.samsung.com>
-
-regards
-Stefan Schmidt
+Thanks in advance,
+Tao
