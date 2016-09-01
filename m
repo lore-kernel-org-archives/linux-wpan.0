@@ -1,82 +1,83 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from proxima.lasnet.de ([78.47.171.185]:51407 "EHLO
-	proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753271AbcHALeW (ORCPT
-	<rfc822;linux-wpan@vger.kernel.org>); Mon, 1 Aug 2016 07:34:22 -0400
-Received: from [IPv6:2003:48:914:7082:3252:cbff:fe54:190f] (p20030048091470823252CBFFFE54190F.dip0.t-ipconnect.de [IPv6:2003:48:914:7082:3252:cbff:fe54:190f])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	(Authenticated sender: stefan@datenfreihafen.org)
-	by proxima.lasnet.de (Postfix) with ESMTPSA id E22C4C0224
-	for <linux-wpan@vger.kernel.org>; Mon,  1 Aug 2016 13:27:01 +0200 (CEST)
-Subject: Re: How many devices in an upcoming ATUSB production run?
-References: <3c45f38c-c757-c76c-1f86-c534ac7d0591@datenfreihafen.org>
-From: Stefan Schmidt <stefan@datenfreihafen.org>
-Message-ID: <27a376a9-7d40-5169-52d5-55cca8d5681c@datenfreihafen.org>
-Date: Mon, 1 Aug 2016 13:27:01 +0200
-MIME-Version: 1.0
-In-Reply-To: <3c45f38c-c757-c76c-1f86-c534ac7d0591@datenfreihafen.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:50335 "EHLO
+        metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1751063AbcIAJZG (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 1 Sep 2016 05:25:06 -0400
+From: Alexander Aring <aar@pengutronix.de>
+Subject: [PATCH bluetooth-next] fakelb: fix schedule while atomic
+Date: Thu,  1 Sep 2016 11:24:57 +0200
+Message-Id: <20160901092457.26010-1-aar@pengutronix.de>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>
+To: linux-wpan@vger.kernel.org
+Cc: kernel@pengutronix.de, Alexander Aring <aar@pengutronix.de>
 
-Hello.
+This patch changes the spinlock to mutex for the available fakelb phy
+list. When holding the spinlock the ieee802154_unregister_hw is called
+which holding the rtnl_mutex, in that case we get a "BUG: sleeping function
+called from invalid context" error. We simple change the spinlock to
+mutex which allows to hold the rtnl lock there.
 
-On 30.07.2016 23:51, Stefan Schmidt wrote:
-> Hello.
-> 
-> Ever since the first, and only, batch of ATUSB dongles have been sold
-> out I was looking for someone to get a new batch going to keep this
-> useful development device available.
-> 
-> For newcomers here or people how are not familiar with it. The ATUSB
-> dongle is a small USB device with a AVR micro controller and Atmel 15.4
-> transceiver. The firmware is open source and the kernel driver is
-> working out of the box in mainline from 4.1. This makes is a nice
-> development device if you want test 15.4 on your normal laptop or
-> desktop. Attaching it to a embedded board with USB will also work but if
-> you have GPIO lines available a transceiver module alone might be cheaper.
-> 
-> Back to the topic. Finally the pieces are coming together and we are
-> working towards a new batch of devices! Yay! :)
-> 
-> Right now we are thinking of about 50 pieces. Its a device for a very
-> specific niche after all so its hard to estimate numbers here. If we
-> would to for 100 or more devices the ratio for the one-time setup costs
-> in the fab would obviously be better.
-> 
-> Thus I wanted to tru getting some estimation of what we would really
-> need. What kind of interest is there before we have 99 in stock and only
-> one sold :)
-> 
-> If you would be interested to get 1 or more of them please let me know
-> either here or in private. This would not be an order or such, just
-> shown interest.
-> 
-> The original batch had 120 ATUSB devices and a price tag of 39 EUR for
-> one ATUSB. With a batch of only 50 we are unable to hold this price tag.
-> Right now our hope would be to stay below 50 EUR. These prices are not
-> fixed but our own estimates right now.
-> 
-> If we the interest is high enough and we go with a 100 batch we hope to
-> reduce the price to 45. And just to make this clear, this does not
-> include any money for Werner or me putting time into this or the company
-> making any profit. Its really all for hardware BOM, PCB boards,
-> manufacturing, webshop handling, etc. All involved parties want to
-> enable more people having access to this technology and our stack not
-> making a profit.
-> 
-> http://downloads.qi-hardware.com/people/werner/wpan/web/
-> 
-> Eager so see how much interest is there. :)
+Signed-off-by: Alexander Aring <aar@pengutronix.de>
+---
+I think for the current use case, we don't need any locking anyway, but when
+we add support for runtime add/del phy's then we need it... so I let the lock
+there.
 
-Just to clarify this a bit more. The devices will be available from an
-online shop with invoice and all you need for company ordering.
+ drivers/net/ieee802154/fakelb.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-Especially the shipping part was something I was worried about but the
-company helping us here have done that now for a while.
+diff --git a/drivers/net/ieee802154/fakelb.c b/drivers/net/ieee802154/fakelb.c
+index 0becf0a..ec387ef 100644
+--- a/drivers/net/ieee802154/fakelb.c
++++ b/drivers/net/ieee802154/fakelb.c
+@@ -30,7 +30,7 @@
+ static int numlbs = 2;
+ 
+ static LIST_HEAD(fakelb_phys);
+-static DEFINE_SPINLOCK(fakelb_phys_lock);
++static DEFINE_MUTEX(fakelb_phys_lock);
+ 
+ static LIST_HEAD(fakelb_ifup_phys);
+ static DEFINE_RWLOCK(fakelb_ifup_phys_lock);
+@@ -188,9 +188,9 @@ static int fakelb_add_one(struct device *dev)
+ 	if (err)
+ 		goto err_reg;
+ 
+-	spin_lock(&fakelb_phys_lock);
++	mutex_lock(&fakelb_phys_lock);
+ 	list_add_tail(&phy->list, &fakelb_phys);
+-	spin_unlock(&fakelb_phys_lock);
++	mutex_unlock(&fakelb_phys_lock);
+ 
+ 	return 0;
+ 
+@@ -222,10 +222,10 @@ static int fakelb_probe(struct platform_device *pdev)
+ 	return 0;
+ 
+ err_slave:
+-	spin_lock(&fakelb_phys_lock);
++	mutex_lock(&fakelb_phys_lock);
+ 	list_for_each_entry_safe(phy, tmp, &fakelb_phys, list)
+ 		fakelb_del(phy);
+-	spin_unlock(&fakelb_phys_lock);
++	mutex_unlock(&fakelb_phys_lock);
+ 	return err;
+ }
+ 
+@@ -233,10 +233,10 @@ static int fakelb_remove(struct platform_device *pdev)
+ {
+ 	struct fakelb_phy *phy, *tmp;
+ 
+-	spin_lock(&fakelb_phys_lock);
++	mutex_lock(&fakelb_phys_lock);
+ 	list_for_each_entry_safe(phy, tmp, &fakelb_phys, list)
+ 		fakelb_del(phy);
+-	spin_unlock(&fakelb_phys_lock);
++	mutex_unlock(&fakelb_phys_lock);
+ 	return 0;
+ }
+ 
+-- 
+2.9.3
 
-regards
-Stefan Schmidt
