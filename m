@@ -1,12 +1,12 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from proxima.lasnet.de ([78.47.171.185]:58361 "EHLO
+Received: from proxima.lasnet.de ([78.47.171.185]:58362 "EHLO
         proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754527AbcINMNV (ORCPT
+        with ESMTP id S1755632AbcINMNV (ORCPT
         <rfc822;linux-wpan@vger.kernel.org>); Wed, 14 Sep 2016 08:13:21 -0400
 From: Stefan Schmidt <stefan@osg.samsung.com>
-Subject: [PATCH wpan-tools 1/2] info: remove confusing supported commands printout
-Date: Wed, 14 Sep 2016 14:03:52 +0200
-Message-Id: <1473854633-4391-2-git-send-email-stefan@osg.samsung.com>
+Subject: [PATCH wpan-tools 2/2] info: pretty print tx powers output
+Date: Wed, 14 Sep 2016 14:03:53 +0200
+Message-Id: <1473854633-4391-3-git-send-email-stefan@osg.samsung.com>
 In-Reply-To: <1473854633-4391-1-git-send-email-stefan@osg.samsung.com>
 References: <1473854633-4391-1-git-send-email-stefan@osg.samsung.com>
 Sender: linux-wpan-owner@vger.kernel.org
@@ -14,39 +14,41 @@ List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
 Cc: Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt <stefan@osg.samsung.com>
 
-This is confusing for the user as it used the raw netlink names and might not
-match the help output we print. If we want to query the kernel for available
-commands to display them we need to spent more energy to print it out
-understandable.
+Add unit, some spacing and break lines to make the output easier to understand
+and read.
 
-Fixes #8
+Fixes #7
 
 Signed-off-by: Stefan Schmidt <stefan@osg.samsung.com>
 ---
- src/info.c | 10 ----------
- 1 file changed, 10 deletions(-)
+ src/info.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
 diff --git a/src/info.c b/src/info.c
-index 69f37f9..b06093b 100644
+index b06093b..9261454 100644
 --- a/src/info.c
 +++ b/src/info.c
-@@ -472,16 +472,6 @@ static int print_phy_handler(struct nl_msg *msg, void *arg)
- 			}
- 		}
- 	}
--
--	if (tb_msg[NL802154_ATTR_SUPPORTED_COMMANDS]) {
--		struct nlattr *nl_cmd;
--		int rem_cmd;
--
--		printf("Supported commands:\n");
--		nla_for_each_nested(nl_cmd, tb_msg[NL802154_ATTR_SUPPORTED_COMMANDS], rem_cmd)
--			printf("\t* %s\n", command_name(nla_get_u32(nl_cmd)));
--	}
--
- 	return 0;
- }
+@@ -372,11 +372,18 @@ static int print_phy_handler(struct nl_msg *msg, void *arg)
  
+ 		if (tb_caps[NL802154_CAP_ATTR_TX_POWERS]) {
+ 			int rem_pwrs;
++			int counter = 0;
+ 			struct nlattr *nl_pwrs;
+ 
+ 			printf("\ttx_powers: ");
+-			nla_for_each_nested(nl_pwrs, tb_caps[NL802154_CAP_ATTR_TX_POWERS], rem_pwrs)
+-				printf("%.3g,", MBM_TO_DBM(nla_get_s32(nl_pwrs)));
++			nla_for_each_nested(nl_pwrs, tb_caps[NL802154_CAP_ATTR_TX_POWERS], rem_pwrs) {
++				if (counter % 6 == 0) {
++					printf("\n\t\t\t%.3g dBM, ", MBM_TO_DBM(nla_get_s32(nl_pwrs)));
++				} else {
++					printf("%.3g dBM, ", MBM_TO_DBM(nla_get_s32(nl_pwrs)));
++				}
++				counter++;
++			}
+ 			/* TODO */
+ 			printf("\b \n");
+ 		}
 -- 
 2.5.5
 
