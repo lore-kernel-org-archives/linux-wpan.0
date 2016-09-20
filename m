@@ -1,54 +1,54 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from proxima.lasnet.de ([78.47.171.185]:58362 "EHLO
-        proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755632AbcINMNV (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 14 Sep 2016 08:13:21 -0400
+Received: from ec2-52-27-115-49.us-west-2.compute.amazonaws.com ([52.27.115.49]:56771
+        "EHLO s-opensource.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754192AbcITItk (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 20 Sep 2016 04:49:40 -0400
 From: Stefan Schmidt <stefan@osg.samsung.com>
-Subject: [PATCH wpan-tools 2/2] info: pretty print tx powers output
-Date: Wed, 14 Sep 2016 14:03:53 +0200
-Message-Id: <1473854633-4391-3-git-send-email-stefan@osg.samsung.com>
-In-Reply-To: <1473854633-4391-1-git-send-email-stefan@osg.samsung.com>
-References: <1473854633-4391-1-git-send-email-stefan@osg.samsung.com>
+Subject: wpan-tools 0.7 release
+Message-ID: <c691e759-b0e3-35a4-7dd5-915b3f609e1d@osg.samsung.com>
+Date: Tue, 20 Sep 2016 10:49:35 +0200
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org
-Cc: Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt <stefan@osg.samsung.com>
+To: "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>
+Cc: c.schoenert@t-online.de, pbrobinson@gmail.com
 
-Add unit, some spacing and break lines to make the output easier to understand
-and read.
+Hello.
 
-Fixes #7
+It is a pleasure to announce the 0.7 release of wpan-tools.
+Thanks to everyone who contributed!
 
-Signed-off-by: Stefan Schmidt <stefan@osg.samsung.com>
----
- src/info.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+A smaller release with network namespaces support as the biggest new 
+feature. Combined with some smaller fixes. We are also celebrating our 
+100th commit in the repository.
 
-diff --git a/src/info.c b/src/info.c
-index b06093b..9261454 100644
---- a/src/info.c
-+++ b/src/info.c
-@@ -372,11 +372,18 @@ static int print_phy_handler(struct nl_msg *msg, void *arg)
- 
- 		if (tb_caps[NL802154_CAP_ATTR_TX_POWERS]) {
- 			int rem_pwrs;
-+			int counter = 0;
- 			struct nlattr *nl_pwrs;
- 
- 			printf("\ttx_powers: ");
--			nla_for_each_nested(nl_pwrs, tb_caps[NL802154_CAP_ATTR_TX_POWERS], rem_pwrs)
--				printf("%.3g,", MBM_TO_DBM(nla_get_s32(nl_pwrs)));
-+			nla_for_each_nested(nl_pwrs, tb_caps[NL802154_CAP_ATTR_TX_POWERS], rem_pwrs) {
-+				if (counter % 6 == 0) {
-+					printf("\n\t\t\t%.3g dBM, ", MBM_TO_DBM(nla_get_s32(nl_pwrs)));
-+				} else {
-+					printf("%.3g dBM, ", MBM_TO_DBM(nla_get_s32(nl_pwrs)));
-+				}
-+				counter++;
-+			}
- 			/* TODO */
- 			printf("\b \n");
- 		}
--- 
-2.5.5
+We switched from bzip2 to xz as our extra compression format. You might 
+need to update your packaging scripts. Good old gz is still around.
 
+Downloads and md5sums:
+
+http://wpan.cakelab.org/releases/wpan-tools-0.7.tar.xz
+91f0b640ff66910e977fab6525625624
+
+http://wpan.cakelab.org/releases/wpan-tools-0.7.tar.gz
+06608f69951088844196f79685318aa9
+
+Alexander Aring (2):
+        update nl802154.h
+        phy: add netns support
+
+Stefan Schmidt (9):
+        wpan-ping: ensure the memory for our config struct is initialized.
+        wpan-ping: set more default values for our configuration
+        wpan-ping: clarify help message for address setting
+        info: remove confusing supported commands printout
+        info: pretty print tx powers output
+        info: pretty print ed levels output
+        info: fix typo in tx power and ed level unit
+        build: switch extra dist compressions from bzip2 to xz
+        Release 0.7
+
+regards
+Stefan Schmidt
