@@ -1,75 +1,117 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:47130 "EHLO
+Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:54327 "EHLO
         metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1751041AbcJCMZ5 (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 3 Oct 2016 08:25:57 -0400
-Subject: ANNOUNCE: openthread af802154
+        by vger.kernel.org with ESMTP id S1758790AbcJQIeO (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>);
+        Mon, 17 Oct 2016 04:34:14 -0400
 From: Alexander Aring <aar@pengutronix.de>
-Message-ID: <a6fd880a-0ced-9076-d62e-9bf2412b8802@pengutronix.de>
-Date: Mon, 3 Oct 2016 14:25:54 +0200
+Subject: introduce IPV6_PKTINFO_L2 socket-option?
+Message-ID: <c789cfba-13af-dfe4-5b5d-af179fb43fb6@pengutronix.de>
+Date: Mon, 17 Oct 2016 10:33:46 +0200
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>
-Cc: Martin Gergeleit <martin.gergeleit@hs-rm.de>
+To: Network Development <netdev@vger.kernel.org>
+Cc: "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>, Michael Richardson <mcr@sandelman.ca>, Martin Gergeleit <martin.gergeleit@hs-rm.de>, Linux Bluetooth <linux-bluetooth@vger.kernel.org>, Jukka Rissanen <jukka.rissanen@linux.intel.com>, "kernel@pengutronix.de" <kernel@pengutronix.de>
 
 
-Hi,
+Hi all,
 
-I already talked in openthread-users [0] about af802154 feature in
-openthread.
+I am currently writing some userspace UDP Software for 6LoWPAN
+subsystem. It will use UDP IPv6 sockets, the 6LoWPAN adaptation will be
+done at kernelspace.
 
-I use it in my case to create some virtual setup to let talk a linux
-interface with openthread userspace instance.
+My problem is currently the following:
 
-Code can be found [1].
+I need per recvmsg(2) the used source link-layer address for the
+incoming UDP packet which used a multicast destination address.
 
---- snip
-#!/bin/sh
-rmmod fakelb
-modprobe fakelb numlbs=4
+There is currently no solution to get such information. Michael
+Richardson told about IPV6_RECVPKTINFO and then we thought about to
+introduce an IPV6_PKTINFO_L2 to get such information.
 
-ip link add link wpan0 name lowpan0 type lowpan
-iwpan dev wpan0 set pan_id 0x0000
-ip link set wpan0 up
-ip link set lowpan0 up
+If somebody know already a solution how to get L2 information from
+userspace IPv6 SOCK_DGRAM socket, I would be happy if somebody told me
+the solution. :-)
 
-iwpan dev wpan1 del
-iwpan phy1 interface add ot0 type monitor
+The idea about IPV6_PKTINFO_L2 is to put L2 information in there which
+depends on netdev type (on 6LoWPAN it even depends on sub netdev type of
+6LoWPAN netdev type - sub netdev type will represent the used link-layer).
 
-iwpan dev wpan2 del
-iwpan phy2 interface add ot1 type monitor
+Now, here comes some design question...
 
-ip link set ot0 up
-ip link set ot1 up
+What we put into the IPV6_PKTINFO_L2 which is an attribute of the control
+messages. The socket-option IPV6_PKTINFO_L2 will turn it on/off only
+like all others.
 
-iwpan dev wpan3 del
-iwpan phy3 interface add monitor0 type monitor
+If we only need it for recvmsg(2) then maybe we could simple offer the
+mac-header - which maybe works on all skb's by accessing skb_mac_header
+and skb->mac_len. (btw: on 6LoWPAN this is currently broken and I need
+to fix it). It works only if all IPv6 capable subsystem sets these
+attributes and don't overwrite the mac space with other data (that's the
+bug we have in 6LoWPAN).
 
-ip link set monitor0 up
---- snap
+The point is... it's useful also for sendmsg. Example: 802.15.4 6LoWPAN
+can use two type of mac address: short or extended. On sendmsg you could
+say which one you prefer to use for the L2 source/destination address
+information. I heard from Michael, this is necessary on some protocols
+to prefer extended than short. Currently we use short if short is
+available, because it will produce less payload - which is very fine as
+default handling. But sometimes you must have control over that.
 
-Will create ot0 and ot1 interface which is a monitor interface. It works
-on the same stuff like my raw802154 driver for RIOT-OS [2].
+Another option to implement this is a flag for a neighbour in ndisc
+cache, but this works for destination L2 address then and per-neighbour
+and not per sendmsg(2), so all running processes for the interface will
+be manipulated by that. I think this is not an good option.
 
-You can run openthread on a monitor then with:
+What I am thinking of is to have the control message attribute defined
+per netdev type (in case of 6LoWPAN even link-layer 6LoWPAN netdev type)
+and each link-layer can add what they want to have there. E.g.
 
-AF_PACKET_IFNAME="ot0" ./ot-cli 1
+struct in6_pktinfo_l2_802154 {
+        /* sendmsg and recvmsg */
+        __u8    src[MAX_ADDR_LEN];
+        __u8    dst[MAX_ADDR_LEN];
 
-where AF_PACKET_IFNAME is your 802.15.4 monitor interface.
+        /* recvmsg */
+        __u8    lqi;
+};
 
-I use it only for fakelb driver and don't recommend it to run it on real
-hardware. For my case, I do some MLE experiments. [3] ;-)
+The lqi is here some 802.15.4 L2 information about link quality. Some
+another idea to add there, makes only sense for recvmsg and need to be
+some average if fragmentation was done there. If the link-layer doesn't
+support such handling -EOPNOTSUPP for setting the socket-option on will
+be returned.
 
-For what we can do it also is:
+The src and dst address could maybe the same on all link-layers and
+that's why we could split this attribute maybe in two attributes for
+control message:
 
-Implementing MLME-ops -> openthread support some! :-)
+struct in6_pktinfo_l2 {
+        /* sendmsg and recvmsg */
+        __u8    src[MAX_ADDR_LEN];
+        __u8    dst[MAX_ADDR_LEN];
+};
+
+struct in6_pktinfo_l2_802154 {
+        /* recvmsg */
+        __u8    lqi;
+};
+
+and introduce some IPV6_PKTINFO_L2 and IPV6_PKTINFO_L2_802154_LQI socket
+option to enable/disable these attributes. The addresses which will be
+placed into src and dst depends on used link-layer which need to be
+evaluated somehow before.
+
+I currently must implement the getting of source l2 address information
+and I will try to implement it. For sendmsg side I need to figure out
+how to get the information from socket interface through 6LoWPAN
+implementation - maybe adding new attribute in sk_buff? Don't know yet.
+
+I also want some mainline solution and I don't know if this is the right
+way to implement it to have an acceptable solution for mainline. That's
+why I start this discussion and hope I get some new inputs here.
 
 - Alex
-
-[0] https://groups.google.com/forum/#!topic/openthread-users/BXOk9JfDsqY 
-[1] https://github.com/linux-wpan/openthread/tree/af802154
-[2] https://github.com/RIOT-OS/RIOT/pull/5582
-[3] https://tools.ietf.org/html/draft-ietf-6lo-mesh-link-establishment-00
