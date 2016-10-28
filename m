@@ -1,32 +1,45 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:41722 "EHLO
-        metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S935840AbcJ0OFp (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>);
-        Thu, 27 Oct 2016 10:05:45 -0400
-Subject: Re: [PATCH bluetooth-next] ieee802154: add myself as co-maintainer to
- MAINTAINERS file
-References: <1477406075-19338-1-git-send-email-stefan@osg.samsung.com>
-From: Alexander Aring <aar@pengutronix.de>
-Message-ID: <6e138d82-3ba3-153d-ad58-ddf3be5684eb@pengutronix.de>
-Date: Thu, 27 Oct 2016 15:07:30 +0200
-MIME-Version: 1.0
-In-Reply-To: <1477406075-19338-1-git-send-email-stefan@osg.samsung.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Received: from proxima.lasnet.de ([78.47.171.185]:59532 "EHLO
+        proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S936169AbcJ1Jr1 (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 28 Oct 2016 05:47:27 -0400
+From: Stefan Schmidt <stefan@datenfreihafen.org>
+Subject: [PATCH iproute2] ip: update link types to show 6lowpan and ieee802.15.4 monitor
+Date: Fri, 28 Oct 2016 11:42:03 +0200
+Message-Id: <1477647723-14641-1-git-send-email-stefan@datenfreihafen.org>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Stefan Schmidt <stefan@osg.samsung.com>
-Cc: linux-wpan@vger.kernel.org
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: netdev@vger.kernel.org, linux-wpan@vger.kernel.org, Stefan Schmidt <stefan@datenfreihafen.org>
 
+Both types have been missing here and thus ip always showed
+only the numbers.
 
-Hi,
+Based on a suggestion from Alexander Aring.
 
-On 10/25/2016 04:34 PM, Stefan Schmidt wrote:
-> Going to help Alexander, spread the review and development load.
-> 
-> Signed-off-by: Stefan Schmidt <stefan@osg.samsung.com>
+Signed-off-by: Stefan Schmidt <stefan@datenfreihafen.org>
+---
+ lib/ll_types.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-Acked-by: Alexander Aring <aar@pengutronix.de>
+diff --git a/lib/ll_types.c b/lib/ll_types.c
+index 2c5bf8b..eca617f 100644
+--- a/lib/ll_types.c
++++ b/lib/ll_types.c
+@@ -100,11 +100,13 @@ __PF(IEEE80211,ieee802.11)
+ __PF(IEEE80211_PRISM,ieee802.11/prism)
+ __PF(IEEE80211_RADIOTAP,ieee802.11/radiotap)
+ __PF(IEEE802154, ieee802.15.4)
++__PF(IEEE802154_MONITOR, ieee802.15.4/monitor)
+ __PF(PHONET, phonet)
+ __PF(PHONET_PIPE, phonet_pipe)
+ __PF(CAIF, caif)
+ __PF(IP6GRE, gre6)
+ __PF(NETLINK, netlink)
++__PF(6LOWPAN, 6lowpan)
+ 
+ __PF(NONE, none)
+ __PF(VOID,void)
+-- 
+2.5.5
 
-- Alex
