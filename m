@@ -1,45 +1,39 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from proxima.lasnet.de ([78.47.171.185]:59532 "EHLO
-        proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S936169AbcJ1Jr1 (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Fri, 28 Oct 2016 05:47:27 -0400
-From: Stefan Schmidt <stefan@datenfreihafen.org>
-Subject: [PATCH iproute2] ip: update link types to show 6lowpan and ieee802.15.4 monitor
-Date: Fri, 28 Oct 2016 11:42:03 +0200
-Message-Id: <1477647723-14641-1-git-send-email-stefan@datenfreihafen.org>
+Received: from mail-wm0-f68.google.com ([74.125.82.68]:34299 "EHLO
+        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755269AbcKCPTp (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 3 Nov 2016 11:19:45 -0400
+Received: by mail-wm0-f68.google.com with SMTP id p190so8567981wmp.1
+        for <linux-wpan@vger.kernel.org>; Thu, 03 Nov 2016 08:19:44 -0700 (PDT)
+From: harrymorris12@gmail.com
+Subject: [PATCH v2 0/3] ieee802154: Add support for Cascoda CA8210
+Date: Thu,  3 Nov 2016 15:16:48 +0000
+Message-Id: <20161103151651.7880-1-h.morris@cascoda.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: netdev@vger.kernel.org, linux-wpan@vger.kernel.org, Stefan Schmidt <stefan@datenfreihafen.org>
+To: linux-wpan@vger.kernel.org
+Cc: alex.aring@gmail.com, stefan@osg.samsung.com, Harry Morris <h.morris@cascoda.com>
 
-Both types have been missing here and thus ip always showed
-only the numbers.
+From: Harry Morris <h.morris@cascoda.com>
 
-Based on a suggestion from Alexander Aring.
+This patchset adds a new device driver, documentation and build support for
+Cascoda's CA8210 IEEE 802.15.4 radio transceiver:
+http://www.cascoda.com/products/ca-821x/
 
-Signed-off-by: Stefan Schmidt <stefan@datenfreihafen.org>
----
- lib/ll_types.c | 2 ++
- 1 file changed, 2 insertions(+)
+Harry Morris (3):
+  ieee802154: Add CA8210 IEEE 802.15.4 device driver
+  ieee802154: Add device tree documentation for CA8210
+  ieee802154: Add entry in MAINTAINTERS for CA8210 driver
 
-diff --git a/lib/ll_types.c b/lib/ll_types.c
-index 2c5bf8b..eca617f 100644
---- a/lib/ll_types.c
-+++ b/lib/ll_types.c
-@@ -100,11 +100,13 @@ __PF(IEEE80211,ieee802.11)
- __PF(IEEE80211_PRISM,ieee802.11/prism)
- __PF(IEEE80211_RADIOTAP,ieee802.11/radiotap)
- __PF(IEEE802154, ieee802.15.4)
-+__PF(IEEE802154_MONITOR, ieee802.15.4/monitor)
- __PF(PHONET, phonet)
- __PF(PHONET_PIPE, phonet_pipe)
- __PF(CAIF, caif)
- __PF(IP6GRE, gre6)
- __PF(NETLINK, netlink)
-+__PF(6LOWPAN, 6lowpan)
- 
- __PF(NONE, none)
- __PF(VOID,void)
--- 
-2.5.5
+ .../devicetree/bindings/net/ieee802154/ca8210.txt  |   28 +
+ .../devicetree/bindings/vendor-prefixes.txt        |    1 +
+ MAINTAINERS                                        |    9 +
+ drivers/net/ieee802154/Kconfig                     |   18 +
+ drivers/net/ieee802154/Makefile                    |    1 +
+ drivers/net/ieee802154/ca8210.c                    | 3648 ++++++++++++++++++++
+ 6 files changed, 3705 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/net/ieee802154/ca8210.txt
+ create mode 100644 drivers/net/ieee802154/ca8210.c
 
+--
+2.9.3.windows.1
