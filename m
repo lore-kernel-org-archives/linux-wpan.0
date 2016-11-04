@@ -1,49 +1,62 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wm0-f67.google.com ([74.125.82.67]:35875 "EHLO
-        mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1757970AbcKCPyD (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 3 Nov 2016 11:54:03 -0400
-Received: by mail-wm0-f67.google.com with SMTP id c17so8666583wmc.3
-        for <linux-wpan@vger.kernel.org>; Thu, 03 Nov 2016 08:54:03 -0700 (PDT)
-From: harrymorris12@gmail.com
-Subject: [PATCH v3 3/3] ieee802154: Add entry in MAINTAINTERS for CA8210 driver
-Date: Thu,  3 Nov 2016 15:51:00 +0000
-Message-Id: <20161103155100.8400-4-h.morris@cascoda.com>
-In-Reply-To: <20161103155100.8400-1-h.morris@cascoda.com>
+Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:43338 "EHLO
+        metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S934814AbcKDOYO (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 4 Nov 2016 10:24:14 -0400
+Subject: Re: [PATCH v3 0/3] ieee802154: Add support for Cascoda CA8210
 References: <20161103155100.8400-1-h.morris@cascoda.com>
+From: Alexander Aring <aar@pengutronix.de>
+Message-ID: <5f7971af-26d2-86a3-6117-1484e0886758@pengutronix.de>
+Date: Fri, 4 Nov 2016 15:24:09 +0100
+MIME-Version: 1.0
+In-Reply-To: <20161103155100.8400-1-h.morris@cascoda.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org
-Cc: alex.aring@gmail.com, stefan@osg.samsung.com, Harry Morris <h.morris@cascoda.com>
+To: harrymorris12@gmail.com
+Cc: linux-wpan@vger.kernel.org, alex.aring@gmail.com, stefan@osg.samsung.com, Harry Morris <h.morris@cascoda.com>
 
-From: Harry Morris <h.morris@cascoda.com>
 
-Signed-off-by: Harry Morris <h.morris@cascoda.com>
-Acked-by: Stefan Schmidt <stefan@osg.samsung.com>
----
- MAINTAINERS | 9 +++++++++
- 1 file changed, 9 insertions(+)
+Hi,
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 5e925a2..cb3428f 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -2829,6 +2829,15 @@ W:	http://www.linux-c6x.org/wiki/index.php/Main_Page
- S:	Maintained
- F:	arch/c6x/
- 
-+CA8210 IEEE-802.15.4 RADIO DRIVER
-+M:	Harry Morris <h.morris@cascoda.com>
-+M:	linuxdev@cascoda.com
-+L:	linux-wpan@vger.kernel.org
-+W:	https://github.com/Cascoda/ca8210-linux.git
-+S:	Maintained
-+F:	drivers/net/ieee802154/ca8210.c
-+F:	Documentation/devicetree/bindings/net/ieee802154/ca8210.txt
-+
- CACHEFILES: FS-CACHE BACKEND FOR CACHING ON MOUNTED FILESYSTEMS
- M:	David Howells <dhowells@redhat.com>
- L:	linux-cachefs@redhat.com (moderated for non-subscribers)
--- 
-2.9.3.windows.1
+On 11/03/2016 04:50 PM, harrymorris12@gmail.com wrote:
+> From: Harry Morris <h.morris@cascoda.com>
+> 
+> This patchset adds a new device driver, documentation and build support for
+> Cascoda's CA8210 IEEE 802.15.4 radio transceiver:
+> http://www.cascoda.com/products/ca-821x/
+> 
 
+I never get 1/3 on the linux-wpan mailinglist, I don't see them also on
+[0]. Maybe there is something wrong at your mail configuration? I guess
+the mail is simple too big. Don't know actually what's the size limit
+is...
+
+btw: I see the mail on my other mail account (gmail one, please use
+aar@pengutronix.de) that you use the old "db" values - we switched to
+mbm which is simple 3 dbm == 300 dbm.
+
+This allows fine granularity dbm value -> 802.15.4 spec describes it as
+signed integer, but e.g. at86rf230 also support 1.7 dbm stuff.
+
+E.g.
+
+ca8210_hw->phy->transmit_power = 8;
+
+whould be:
+
+ca8210_hw->phy->transmit_power = 800;
+
+See [1]. Please also check on which seems that this is missing:
+
+lp->hw->phy->supported.cca_ed_levels = at86rf23x_ed_levels;
+lp->hw->phy->supported.cca_ed_levels_size = ARRAY_SIZE(at86rf23x_ed_levels);
+
+the same for tx_powers and tx_powers_size if you support set_tx_power.
+Also begin please with the highest db value at array index [0].
+
+- Alex
+
+[0] http://www.spinics.net/lists/linux-wpan/
+[1] http://lxr.free-electrons.com/source/drivers/net/ieee802154/at86rf230.c#L1609
