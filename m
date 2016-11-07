@@ -1,197 +1,100 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from ec2-52-27-115-49.us-west-2.compute.amazonaws.com ([52.27.115.49]:32805
+Received: from ec2-52-27-115-49.us-west-2.compute.amazonaws.com ([52.27.115.49]:59994
         "EHLO osg.samsung.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1751522AbcKNNlc (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 14 Nov 2016 08:41:32 -0500
-Subject: Re: [PATCH] Add the support for setting wpan-ping interval
-References: <576133E7D398244EA0325FF7CE2A09E5CD56E161@G08CNEXMBPEKD02.g08.fujitsu.local>
+        with ESMTP id S932237AbcKGQLh (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 7 Nov 2016 11:11:37 -0500
 From: Stefan Schmidt <stefan@osg.samsung.com>
-Message-ID: <1c247e23-fde1-5b54-4fd9-b759dc0cd901@osg.samsung.com>
-Date: Mon, 14 Nov 2016 14:41:23 +0100
+Subject: Re: [PATCH bluetooth-next] at86rf230: fix cca ed values for rf233
+References: <20160906075004.15915-1-aar@pengutronix.de>
+Message-ID: <06d2e518-947a-4806-d6d8-497ab77641af@osg.samsung.com>
+Date: Mon, 7 Nov 2016 17:11:17 +0100
 MIME-Version: 1.0
-In-Reply-To: <576133E7D398244EA0325FF7CE2A09E5CD56E161@G08CNEXMBPEKD02.g08.fujitsu.local>
-Content-Type: text/plain; charset=iso-2022-jp; format=flowed; delsp=yes
+In-Reply-To: <20160906075004.15915-1-aar@pengutronix.de>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: "Xue, Wenqian" <xuewenqian@cn.fujitsu.com>, "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>
+To: Alexander Aring <aar@pengutronix.de>, linux-wpan@vger.kernel.org
+Cc: kernel@pengutronix.de
 
 Hello.
 
-Thanks for your patch. Find my comments below.
+On 06/09/16 09:50, Alexander Aring wrote:
+> This patch changes the rssi base value to -94 for at86rf33 transceivers.
 
-On 14/11/16 04:09, Xue, Wenqian wrote:
-> Hi, all
+Small typo here. rf22 instead of rf233. No idea if you want to respin 
+for this.
+
+> The code before assumes a rssi base value of -91 which is for the
+> at86rf231 transceiver only. This change need to update the cca ed
+> threshold mapping table.
 >
-> Below shows my patch for the support to set wpan-ping interval, you can use the command `-I $interval(ms)` to set the interval value (default is 500ms).
-> If you find some errors or unexpected affects on current kernel, please feel free to point it out and give me some advice, thank you all!
+> Signed-off-by: Alexander Aring <aar@pengutronix.de>
+> ---
+> Compile tested only.
 >
-
-Please use git send-email to send patches. That way I can properly  
-review and more important apply and test them here.
-
-Bonus points if you use a wpan-tools prefix in the patch like this:
-
-git format-patch --subject-prefix="PATCH wpan-tools" ...
-
-
-> diff --git a/wpan-ping.c b/wpan-ping.c
-> index 2c63758..4a0f00d 100644
-> --- a/wpan-ping.c
-> +++ b/wpan-ping.c
-> @@ -49,6 +49,7 @@
->  #define IEEE802154_ADDR_LEN 8
->  /* Set the dispatch header to not 6lowpan for compat */
->  #define NOT_A_6LOWPAN_FRAME 0x00
-> +#define DEFAULT_INTERVAL 500
+>  drivers/net/ieee802154/at86rf230.c | 16 +++++++++++-----
+>  1 file changed, 11 insertions(+), 5 deletions(-)
 >
->  #define DEBUG 0
+> diff --git a/drivers/net/ieee802154/at86rf230.c b/drivers/net/ieee802154/at86rf230.c
+> index 9f10da6..0570257 100644
+> --- a/drivers/net/ieee802154/at86rf230.c
+> +++ b/drivers/net/ieee802154/at86rf230.c
+> @@ -990,7 +990,12 @@ at86rf23x_set_channel(struct at86rf230_local *lp, u8 page, u8 channel)
+>  }
 >
-> @@ -96,6 +97,7 @@ struct config {
->  	int nl802154_id;
->  	struct sockaddr_ieee802154 src;
->  	struct sockaddr_ieee802154 dst;
-> +	unsigned short interval;
+>  #define AT86RF2XX_MAX_ED_LEVELS 0xF
+> -static const s32 at86rf23x_ed_levels[AT86RF2XX_MAX_ED_LEVELS + 1] = {
+> +static const s32 at86rf233_ed_levels[AT86RF2XX_MAX_ED_LEVELS + 1] = {
+> +	-9400, -9200, -9000, -8800, -8600, -8400, -8200, -8000, -7800, -7600,
+> +	-7400, -7200, -7000, -6800, -6600, -6400,
+> +};
+> +
+> +static const s32 at86rf231_ed_levels[AT86RF2XX_MAX_ED_LEVELS + 1] = {
+>  	-9100, -8900, -8700, -8500, -8300, -8100, -7900, -7700, -7500, -7300,
+>  	-7100, -6900, -6700, -6500, -6300, -6100,
 >  };
+> @@ -1343,7 +1348,7 @@ static struct at86rf2xx_chip_data at86rf233_data = {
+>  	.t_sleep_to_off = 1000,
+>  	.t_frame = 4096,
+>  	.t_p_ack = 545,
+> -	.rssi_base_val = -91,
+> +	.rssi_base_val = -94,
+>  	.set_channel = at86rf23x_set_channel,
+>  	.set_txpower = at86rf23x_set_txpower,
+>  };
+> @@ -1557,9 +1562,6 @@ at86rf230_detect_device(struct at86rf230_local *lp)
+>  	lp->hw->phy->supported.cca_opts = BIT(NL802154_CCA_OPT_ENERGY_CARRIER_AND) |
+>  		BIT(NL802154_CCA_OPT_ENERGY_CARRIER_OR);
 >
->  extern char *optarg;
-> @@ -109,6 +111,7 @@ static void usage(const char *name) {
->  	"--count | -c number of packets\n"
->  	"--size | -s packet length\n"
->  	"--interface | -i listen on this interface (default wpan0)\n"
-> +	"--interval | -I wait interval milliseconds between sending each packet (default 500ms)\n"
-
-Maybe write: wait interval in milliseconds between sending packets  
-(default 500ms)
-
-
-
->  	"--version | -v print out version\n"
->  	"--help | -h this usage text\n", name);
->  }
-> @@ -232,6 +235,27 @@ static int print_address(char *addr, uint8_t dst_extended[IEEE802154_ADDR_LEN])
->  	return 0;
->  }
+> -	lp->hw->phy->supported.cca_ed_levels = at86rf23x_ed_levels;
+> -	lp->hw->phy->supported.cca_ed_levels_size = ARRAY_SIZE(at86rf23x_ed_levels);
+> -
+>  	lp->hw->phy->cca.mode = NL802154_CCA_ENERGY;
 >
-> +static void sleeping(struct timeval ping_start_time, struct timeval timeout)
-> +{
-> +	struct timeval curr_time;
-> +	long sec, usec, interval_usec, timeout_usec;
-> +	long sleep_usec = 0;
-> +	gettimeofday(&curr_time, NULL);
-> +	sec = curr_time.tv_sec - ping_start_time.tv_sec;
-> +	usec = curr_time.tv_usec - ping_start_time.tv_usec;
-> +	if (usec < 0)
-> +	{
-> +		usec += 1000000;
-> +		sec--;
-> +	}
-> +	interval_usec = sec * 1000000 + usec;
-> +	timeout_usec = timeout.tv_sec * 1000000 + timeout.tv_usec;
-> +	if (interval_usec < timeout_usec){
-> +		sleep_usec = timeout_usec - interval_usec;
-> +		usleep(sleep_usec);
-> +	}
-> +}
-> +
->  static int measure_roundtrip(struct config *conf, int sd) {
->  	unsigned char *buf;
->  	struct timeval start_time, end_time, timeout;
-> @@ -256,9 +280,17 @@ static int measure_roundtrip(struct config *conf, int sd) {
->  			conf->dst.addr.short_addr, conf->dst.addr.pan_id, conf->packet_len);
->  	buf = (unsigned char *)malloc(MAX_PAYLOAD_LEN);
->
-> -	/* 500ms seconds packet receive timeout */
-> -	timeout.tv_sec = 0;
-> -	timeout.tv_usec = 500000;
-> +	/* default 500ms seconds packet receive timeout */
-> +	// timeout.tv_sec = 0;
-> +	// timeout.tv_usec = 500000;
-
-
-Please do not leave commented out code here. You moved the default value  
-into a define and use it accordingly so you can safely remove this here.
-
-> +	if (conf->interval >= 1000){ // when interval is larger than 1s
-
-No C++ style comments please. Use /* */
-
-> +		double intervalD = (conf->interval * 1.0) / 1000;
-
-intervalD as variable name is not very nice. Please choose something else.
-
-> +		timeout.tv_sec = (int)intervalD;
-> +		timeout.tv_usec = (int)((intervalD - timeout.tv_sec) * 1000000);
-> +	} else {
-> +		timeout.tv_sec = 0;
-> +		timeout.tv_usec = conf->interval * 1000;
-> +	}
->  	ret = setsockopt(sd, SOL_SOCKET, SO_RCVTIMEO, (struct timeval *)&timeout,sizeof(struct timeval));
->  	if (ret < 0) {
->  		perror("setsockopt receive timeout");
-> @@ -266,6 +298,7 @@ static int measure_roundtrip(struct config *conf, int sd) {
->
->  	count = 0;
->  	for (i = 0; i < conf->packets; i++) {
-> +		gettimeofday(&ping_start_time, NULL);
->  		generate_packet(buf, conf, i);
->  		seq_num = (buf[2] << 8)| buf[3];
->  		ret = sendto(sd, buf, conf->packet_len, 0, (struct sockaddr *)&conf->dst, sizeof(conf->dst));
-> @@ -309,7 +342,9 @@ static int measure_roundtrip(struct config *conf, int sd) {
->  				fprintf(stdout, "%i bytes from 0x%04x seq=%i time=%.1f ms\n", ret,
->  					conf->dst.addr.short_addr, (int)seq_num, (float)usec/1000);
->  		} else
-> -			fprintf(stderr, "Hit 500 ms packet timeout\n");
-> +			fprintf(stderr, "Hit %d ms packet timeout\n", conf->interval);
-> +		// sleeping
+>  	switch (part) {
+> @@ -1575,6 +1577,8 @@ at86rf230_detect_device(struct at86rf230_local *lp)
+>  		lp->hw->phy->symbol_duration = 16;
+>  		lp->hw->phy->supported.tx_powers = at86rf231_powers;
+>  		lp->hw->phy->supported.tx_powers_size = ARRAY_SIZE(at86rf231_powers);
+> +		lp->hw->phy->supported.cca_ed_levels = at86rf231_ed_levels;
+> +		lp->hw->phy->supported.cca_ed_levels_size = ARRAY_SIZE(at86rf231_ed_levels);
+>  		break;
+>  	case 7:
+>  		chip = "at86rf212";
+> @@ -1598,6 +1602,8 @@ at86rf230_detect_device(struct at86rf230_local *lp)
+>  		lp->hw->phy->symbol_duration = 16;
+>  		lp->hw->phy->supported.tx_powers = at86rf233_powers;
+>  		lp->hw->phy->supported.tx_powers_size = ARRAY_SIZE(at86rf233_powers);
+> +		lp->hw->phy->supported.cca_ed_levels = at86rf233_ed_levels;
+> +		lp->hw->phy->supported.cca_ed_levels_size = ARRAY_SIZE(at86rf233_ed_levels);
+>  		break;
+>  	default:
+>  		chip = "unknown";
 >
 
-C++ comment. See above.
 
-  +		sleeping(ping_start_time, timeout);
->  	}
->
->  	if (count)
-> @@ -456,6 +491,9 @@ int main(int argc, char *argv[]) {
->  	/* Default to 65535 packets being sent */
->  	conf->packets = USHRT_MAX;
->
-> +	/* Default to 500ms for interval value */
-> +	conf->interval = DEFAULT_INTERVAL;
-> +
->  	if (argc < 2) {
->  		usage(argv[0]);
->  		exit(1);
-> @@ -464,9 +502,9 @@ int main(int argc, char *argv[]) {
->  	while (1) {
->  #ifdef _GNU_SOURCE
->  		int opt_idx = -1;
-> -		c = getopt_long(argc, argv, "a:ec:s:i:dvh", perf_long_opts, &opt_idx);
-> +		c = getopt_long(argc, argv, "a:ec:s:i:dvhI:", perf_long_opts, &opt_idx);
->  #else
-> -		c = getopt(argc, argv, "a:ec:s:i:dvh");
-> +		c = getopt(argc, argv, "a:ec:s:i:dvhI:");
->  #endif
->  		if (c == -1)
->  			break;
-> @@ -495,6 +533,9 @@ int main(int argc, char *argv[]) {
->  		case 'i':
->  			conf->interface = optarg;
->  			break;
-> +		case 'I':
-> +			conf->interval = atoi(optarg);
-> +			break;
->  		case 'v':
->  			fprintf(stdout, "wpan-ping " PACKAGE_VERSION "\n");
->  			free(conf);
->
-
-Please change what I mentioned above and resend this patch with git  
-send-email. Write a good commit message and do not forgot the signed-off  
-line (-s for git format-patch can also generate this for you)
-
-The change itself looks ok on a first glance at the code but I need to  
-actual compile and test it.
+Acked-by: Stefan Schmidt <stefan@osg.samsung.com>
 
 regards
 Stefan Schmidt
