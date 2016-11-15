@@ -1,78 +1,165 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from ec2-52-27-115-49.us-west-2.compute.amazonaws.com ([52.27.115.49]:32887
-        "EHLO osg.samsung.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1752197AbcKNOFH (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 14 Nov 2016 09:05:07 -0500
-Subject: Re: [PATCH] ieee802154: check device type
-References: <1469004191-30920-1-git-send-email-vegard.nossum@oracle.com>
- <6daeeb69-fc93-24b3-8218-bc483df65b45@pengutronix.de>
-From: Stefan Schmidt <stefan@osg.samsung.com>
-Message-ID: <1e433587-09be-9cc7-5fd4-55512947bf0e@osg.samsung.com>
-Date: Mon, 14 Nov 2016 15:04:57 +0100
-MIME-Version: 1.0
-In-Reply-To: <6daeeb69-fc93-24b3-8218-bc483df65b45@pengutronix.de>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
+Received: from mo4-p00-ob.smtp.rzone.de ([81.169.146.162]:32367 "EHLO
+        mo4-p00-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932539AbcKONSf (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 15 Nov 2016 08:18:35 -0500
+Received: from Sebastians-Air.lan ([141.22.28.250])
+        by smtp.strato.de (RZmta 39.9 AUTH)
+        with ESMTPSA id c02d87sAFDIV38v
+        (using TLSv1 with cipher ECDHE-RSA-AES256-SHA (curve secp521r1 with 521 ECDH bits, eq. 15360 bits RSA))
+        (Client did not present a certificate)
+        for <linux-wpan@vger.kernel.org>;
+        Tue, 15 Nov 2016 14:18:31 +0100 (CET)
+From: smlng <s@mlng.net>
+Subject: [PATCH bluetooth-next 1/1] drivers: mrf24j40: add support for reset and wake pin
+Date: Tue, 15 Nov 2016 14:18:30 +0100
+Message-Id: <20161115131830.90383-1-s@mlng.net>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <aar@pengutronix.de>, Vegard Nossum <vegard.nossum@oracle.com>
-Cc: linux-wpan@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>, Alexander Aring <alex.aring@gmail.com>Marcel Holtmann <marcel@holtmann.org>, Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>, Sergey Lapin <slapin@ossfans.org>
+To: linux-wpan@vger.kernel.org
 
-Hello Marcel,
+The mrf24j40 requires a high on the RESET pin, otherwise it will reset
+itself over and over. With this patch the driver will ensure that a GPIO
+(if connected) will be set to high during device initialization. Details:
 
-could you apply this to bluetooth-next?
+ - set reset to high on driver probe
+ - make pin configurable via device tree (overlay)
+ - similar to the at86rf233 driver
+ - update devicetree documentation
 
-regards
-Stefan Schmidt
+Signed-off-by: smlng <s@mlng.net>
+---
+ .../bindings/net/ieee802154/mrf24j40.txt           |  4 ++
+ drivers/net/ieee802154/mrf24j40.c                  | 59 ++++++++++++++++++++--
+ include/linux/spi/mrf24j40.h                       |  9 ++++
+ 3 files changed, 69 insertions(+), 3 deletions(-)
+ create mode 100644 include/linux/spi/mrf24j40.h
 
-On 23/07/16 14:21, Alexander Aring wrote:
->
-> Hi,
->
-> On 07/20/2016 10:43 AM, Vegard Nossum wrote:
->> I've observed a NULL pointer dereference in ieee802154_del_iface() during
->> netlink fuzzing. It's the ->wpan_phy dereference here:
->>
->>         phy = dev->ieee802154_ptr->wpan_phy;
->>
->> My bet is that we're not checking that this is an IEEE802154 interface,
->> so let's do what ieee802154_nl_get_dev() is doing. (Maybe we should even
->> be calling this directly?)
->>
->> Cc: Lennert Buytenhek <buytenh@wantstofly.org>
->> Cc: Alexander Aring <alex.aring@gmail.com>
->> Cc: Marcel Holtmann <marcel@holtmann.org>
->> Cc: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
->> Cc: Sergey Lapin <slapin@ossfans.org>
->> Signed-off-by: Vegard Nossum <vegard.nossum@oracle.com>
->
-> Acked-by: Alexander Aring <aar@pengutronix.de>
->
-> thanks for letting us known that this bug exists.
->
-> Unfortunate I don't care much about this code. This code is part of the
-> old UAPI for 802.15.4 subsystems and there are many bugs known.
->
-> Nevertheless I added my ack here and would like that Marcel apply this
-> patch into his bluetooth tree repository.
->
-> The new netlink api exists since 3.19 and highly recommended to don't
-> use the old stuff. The ieee802154 never got out the experimental state,
-> there was a patch [0] which globally remove the experimental Kconfig
-> entry, but no maintainer ever said that this branch isn't in
-> experimental state anymore.
->
-> I will prepare a RFC series to remove all deprecated handling which we
-> have replacements for it, these are:
->
->  - old netlink api
->  - af_802154 raw sockets, will replaced by AF_PACKET RAW
->
-> - Alex
->
-> [0] https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/net/ieee802154/Kconfig?id=f4671a90c418b5aae14b61a9fc9d79c629403ca0
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-wpan" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
+diff --git a/Documentation/devicetree/bindings/net/ieee802154/mrf24j40.txt b/Documentation/devicetree/bindings/net/ieee802154/mrf24j40.txt
+index a4ed2efb5b73..2fabba041e48 100644
+--- a/Documentation/devicetree/bindings/net/ieee802154/mrf24j40.txt
++++ b/Documentation/devicetree/bindings/net/ieee802154/mrf24j40.txt
+@@ -9,6 +9,10 @@ Required properties:
+   - reg:		the chipselect index
+   - interrupts:		the interrupt generated by the device.
+ 
++Optional properties:
++  - reset-gpio:		GPIO spec for the rstn pin
++  - wake-gpio:		GPIO spec for the wake pin
++
+ Example:
+ 
+ 	mrf24j40ma@0 {
+diff --git a/drivers/net/ieee802154/mrf24j40.c b/drivers/net/ieee802154/mrf24j40.c
+index 7b131f8e4093..275b54d6bad3 100644
+--- a/drivers/net/ieee802154/mrf24j40.c
++++ b/drivers/net/ieee802154/mrf24j40.c
+@@ -16,9 +16,11 @@
+  */
+ 
+ #include <linux/spi/spi.h>
++#include <linux/spi/mrf24j40.h>
+ #include <linux/interrupt.h>
+ #include <linux/module.h>
+ #include <linux/regmap.h>
++#include <linux/of_gpio.h>
+ #include <linux/ieee802154.h>
+ #include <linux/irq.h>
+ #include <net/cfg802154.h>
+@@ -1276,16 +1278,67 @@ static void  mrf24j40_phy_setup(struct mrf24j40 *devrec)
+ 	}
+ }
+ 
++static int
++mrf24j40_get_pdata(struct spi_device *spi, int *rstn, int *wake)
++{
++	struct mrf24j40_platform_data *pdata = spi->dev.platform_data;
++
++	if (!IS_ENABLED(CONFIG_OF) || !spi->dev.of_node) {
++		if (!pdata)
++			return -ENOENT;
++
++		*rstn = pdata->rstn;
++		*wake = pdata->wake;
++		return 0;
++	}
++
++	*rstn = of_get_named_gpio(spi->dev.of_node, "reset-gpio", 0);
++	*wake = of_get_named_gpio(spi->dev.of_node, "wake-gpio", 0);
++	return 0;
++}
++
+ static int mrf24j40_probe(struct spi_device *spi)
+ {
+ 	int ret = -ENOMEM, irq_type;
++	int rc, rstn, wake;
+ 	struct ieee802154_hw *hw;
+ 	struct mrf24j40 *devrec;
+ 
+-	dev_info(&spi->dev, "probe(). IRQ: %d\n", spi->irq);
++	if (!spi->irq) {
++		dev_err(&spi->dev, "no IRQ specified\n");
++		return -EINVAL;
++	}
+ 
+-	/* Register with the 802154 subsystem */
++	rc = mrf24j40_get_pdata(spi, &rstn, &wake);
++	if (rc < 0) {
++		dev_err(&spi->dev, "failed to parse platform_data: %d\n", rc);
++		return rc;
++	}
++
++	if (gpio_is_valid(rstn)) {
++		rc = devm_gpio_request_one(&spi->dev, rstn,
++					   GPIOF_OUT_INIT_HIGH, "rstn");
++		if (rc)
++			return rc;
++	}
+ 
++	if (gpio_is_valid(wake)) {
++		rc = devm_gpio_request_one(&spi->dev, wake,
++					   GPIOF_OUT_INIT_LOW, "wake");
++		if (rc)
++			return rc;
++	}
++
++	/* Reset */
++	if (gpio_is_valid(rstn)) {
++		udelay(1);
++		gpio_set_value(rstn, 0);
++		udelay(1);
++		gpio_set_value(rstn, 1);
++		usleep_range(120, 240);
++	}
++
++	/* Register with the 802154 subsystem */
+ 	hw = ieee802154_alloc_hw(sizeof(*devrec), &mrf24j40_ops);
+ 	if (!hw)
+ 		goto err_ret;
+@@ -1350,7 +1403,7 @@ static int mrf24j40_probe(struct spi_device *spi)
+ 		goto err_register_device;
+ 	}
+ 
+-	dev_dbg(printdev(devrec), "registered mrf24j40\n");
++	dev_info(printdev(devrec), "registered mrf24j40\n");
+ 	ret = ieee802154_register_hw(devrec->hw);
+ 	if (ret)
+ 		goto err_register_device;
+diff --git a/include/linux/spi/mrf24j40.h b/include/linux/spi/mrf24j40.h
+new file mode 100644
+index 000000000000..60810194cae9
+--- /dev/null
++++ b/include/linux/spi/mrf24j40.h
+@@ -0,0 +1,9 @@
++#ifndef _SPI_MRF24J40_H
++#define _SPI_MRF24J40_H
++
++struct mrf24j40_platform_data {
++	int rstn;
++	int wake;
++};
++
++#endif /* _SPI_MRF24J40_H */
+-- 
+2.10.2
+
