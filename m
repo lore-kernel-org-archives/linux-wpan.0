@@ -1,198 +1,157 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from ec2-52-27-115-49.us-west-2.compute.amazonaws.com ([52.27.115.49]:39064
-        "EHLO osg.samsung.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1750776AbcKOQKY (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 15 Nov 2016 11:10:24 -0500
-Subject: Re: [PATCH bluetooth-next 1/1] drivers: mrf24j40: add support for
- reset and wake pin
-References: <20161115131830.90383-1-s@mlng.net>
-From: Stefan Schmidt <stefan@osg.samsung.com>
-Message-ID: <206a271b-7fe5-bb13-33a7-687c9956abd3@osg.samsung.com>
-Date: Tue, 15 Nov 2016 17:10:15 +0100
+Received: from cn.fujitsu.com ([59.151.112.132]:34764 "EHLO
+        heian.cn.fujitsu.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1751816AbcKRK0P (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 18 Nov 2016 05:26:15 -0500
+From: xuewenqian <wsn.iot.xwq@cn.fujitsu.com>
+Subject: [PATCH wpan-tools] Add the support to set wpan-ping interval
+Date: Fri, 18 Nov 2016 10:25:34 +0000
+Message-Id: <1479464734-4189-1-git-send-email-wsn.iot.xwq@cn.fujitsu.com>
 MIME-Version: 1.0
-In-Reply-To: <20161115131830.90383-1-s@mlng.net>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: smlng <s@mlng.net>, linux-wpan@vger.kernel.org
-Cc: Alan Ott <alan@signal11.us>
+To: linux-wpan@vger.kernel.org
+Cc: xuewenqian <wsn.iot.xwq@cn.fujitsu.com>
 
-Hello.
+This patch adds the support to set wpan-ping interval, you can use the command `-I $interval(ms)` to set the value (default 500ms).
 
-On 15/11/16 14:18, smlng wrote:
+Signed-off-by: xuewenqian <wsn.iot.xwq@cn.fujitsu.com>
+---
+ wpan-ping/wpan-ping.c |   53 ++++++++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 46 insertions(+), 7 deletions(-)
 
-Please fix your mail from line to have your real name to show up as 
-patch author.
+diff --git a/wpan-ping/wpan-ping.c b/wpan-ping/wpan-ping.c
+index 2c63758..fa4a8f3 100644
+--- a/wpan-ping/wpan-ping.c
++++ b/wpan-ping/wpan-ping.c
+@@ -49,6 +49,7 @@
+ #define IEEE802154_ADDR_LEN 8
+ /* Set the dispatch header to not 6lowpan for compat */
+ #define NOT_A_6LOWPAN_FRAME 0x00
++#define DEFAULT_INTERVAL 500 
+ 
+ #define DEBUG 0
+ 
+@@ -96,6 +97,7 @@ struct config {
+ 	int nl802154_id;
+ 	struct sockaddr_ieee802154 src;
+ 	struct sockaddr_ieee802154 dst;
++	unsigned short interval;
+ };
+ 
+ extern char *optarg;
+@@ -109,6 +111,7 @@ static void usage(const char *name) {
+ 	"--count | -c number of packets\n"
+ 	"--size | -s packet length\n"
+ 	"--interface | -i listen on this interface (default wpan0)\n"
++	"--interval | -I wait interval in milliseconds between sending packets (default 500ms)\n"
+ 	"--version | -v print out version\n"
+ 	"--help | -h this usage text\n", name);
+ }
+@@ -232,9 +235,30 @@ static int print_address(char *addr, uint8_t dst_extended[IEEE802154_ADDR_LEN])
+ 	return 0;
+ }
+ 
++static void sleeping(struct timeval ping_start_time, struct timeval timeout)
++{
++	struct timeval curr_time;
++	long sec, usec, interval_usec, timeout_usec;
++	long sleep_usec = 0;
++	gettimeofday(&curr_time, NULL);
++	sec = curr_time.tv_sec - ping_start_time.tv_sec;
++	usec = curr_time.tv_usec - ping_start_time.tv_usec;
++	if (usec < 0)
++	{
++		usec += 1000000;
++		sec--;
++	}
++	interval_usec = sec * 1000000 + usec;
++	timeout_usec = timeout.tv_sec * 1000000 + timeout.tv_usec;
++	if (interval_usec < timeout_usec){
++		sleep_usec = timeout_usec - interval_usec;
++		usleep(sleep_usec);
++	}
++}
++
+ static int measure_roundtrip(struct config *conf, int sd) {
+ 	unsigned char *buf;
+-	struct timeval start_time, end_time, timeout;
++	struct timeval ping_start_time, start_time, end_time, timeout;
+ 	long sec = 0, usec = 0;
+ 	long sec_max = 0, usec_max = 0;
+ 	long sec_min = 2147483647, usec_min = 2147483647;
+@@ -256,9 +280,15 @@ static int measure_roundtrip(struct config *conf, int sd) {
+ 			conf->dst.addr.short_addr, conf->dst.addr.pan_id, conf->packet_len);
+ 	buf = (unsigned char *)malloc(MAX_PAYLOAD_LEN);
+ 
+-	/* 500ms seconds packet receive timeout */
+-	timeout.tv_sec = 0;
+-	timeout.tv_usec = 500000;
++	/* default 500ms seconds packet receive timeout */
++	if (conf->interval >= 1000){ /* when interval is larger than 1s */
++		double d_interval = (conf->interval * 1.0) / 1000;
++		timeout.tv_sec = (int)d_interval;
++		timeout.tv_usec = (int)((d_interval - timeout.tv_sec) * 1000000);
++	} else {
++		timeout.tv_sec = 0;
++		timeout.tv_usec = conf->interval * 1000;
++	}
+ 	ret = setsockopt(sd, SOL_SOCKET, SO_RCVTIMEO, (struct timeval *)&timeout,sizeof(struct timeval));
+ 	if (ret < 0) {
+ 		perror("setsockopt receive timeout");
+@@ -266,6 +296,7 @@ static int measure_roundtrip(struct config *conf, int sd) {
+ 
+ 	count = 0;
+ 	for (i = 0; i < conf->packets; i++) {
++		gettimeofday(&ping_start_time, NULL);
+ 		generate_packet(buf, conf, i);
+ 		seq_num = (buf[2] << 8)| buf[3];
+ 		ret = sendto(sd, buf, conf->packet_len, 0, (struct sockaddr *)&conf->dst, sizeof(conf->dst));
+@@ -309,7 +340,9 @@ static int measure_roundtrip(struct config *conf, int sd) {
+ 				fprintf(stdout, "%i bytes from 0x%04x seq=%i time=%.1f ms\n", ret,
+ 					conf->dst.addr.short_addr, (int)seq_num, (float)usec/1000);
+ 		} else
+-			fprintf(stderr, "Hit 500 ms packet timeout\n");
++			fprintf(stderr, "Hit %i ms packet timeout\n", conf->interval);
++		/* sleeping */
++		sleeping(ping_start_time, timeout);
+ 	}
+ 
+ 	if (count)
+@@ -456,6 +489,9 @@ int main(int argc, char *argv[]) {
+ 	/* Default to 65535 packets being sent */
+ 	conf->packets = USHRT_MAX;
+ 
++	/* Default to 500ms for interval value */
++	conf->interval = DEFAULT_INTERVAL;
++
+ 	if (argc < 2) {
+ 		usage(argv[0]);
+ 		exit(1);
+@@ -464,9 +500,9 @@ int main(int argc, char *argv[]) {
+ 	while (1) {
+ #ifdef _GNU_SOURCE
+ 		int opt_idx = -1;
+-		c = getopt_long(argc, argv, "a:ec:s:i:dvh", perf_long_opts, &opt_idx);
++		c = getopt_long(argc, argv, "a:ec:s:i:dvhI:", perf_long_opts, &opt_idx);
+ #else
+-		c = getopt(argc, argv, "a:ec:s:i:dvh");
++		c = getopt(argc, argv, "a:ec:s:i:dvhI:");
+ #endif
+ 		if (c == -1)
+ 			break;
+@@ -495,6 +531,9 @@ int main(int argc, char *argv[]) {
+ 		case 'i':
+ 			conf->interface = optarg;
+ 			break;
++		case 'I':
++			conf->interval = atoi(optarg);
++			break;
+ 		case 'v':
+ 			fprintf(stdout, "wpan-ping " PACKAGE_VERSION "\n");
+ 			free(conf);
+-- 
+1.7.10.4
 
-> The mrf24j40 requires a high on the RESET pin, otherwise it will reset
-> itself over and over. With this patch the driver will ensure that a GPIO
-> (if connected) will be set to high during device initialization. Details:
->
->  - set reset to high on driver probe
->  - make pin configurable via device tree (overlay)
->  - similar to the at86rf233 driver
->  - update devicetree documentation
 
-Thanks for taking the time to submit this patch! This looks good to me 
-in general. I cc'ed Alan Ott as the driver maintainer now to see what he 
-thinks about this patch.
 
-What I miss here is a bit of context for the wake pin. The commit 
-message only covers the reset pin handling. What do we do with the wake 
-pin here?
-
-> Signed-off-by: smlng <s@mlng.net>
-
-Same as the from line. Please use your real name for the SOB here.
-
-> ---
->  .../bindings/net/ieee802154/mrf24j40.txt           |  4 ++
->  drivers/net/ieee802154/mrf24j40.c                  | 59 ++++++++++++++++++++--
->  include/linux/spi/mrf24j40.h                       |  9 ++++
->  3 files changed, 69 insertions(+), 3 deletions(-)
->  create mode 100644 include/linux/spi/mrf24j40.h
->
-> diff --git a/Documentation/devicetree/bindings/net/ieee802154/mrf24j40.txt b/Documentation/devicetree/bindings/net/ieee802154/mrf24j40.txt
-> index a4ed2efb5b73..2fabba041e48 100644
-> --- a/Documentation/devicetree/bindings/net/ieee802154/mrf24j40.txt
-> +++ b/Documentation/devicetree/bindings/net/ieee802154/mrf24j40.txt
-> @@ -9,6 +9,10 @@ Required properties:
->    - reg:		the chipselect index
->    - interrupts:		the interrupt generated by the device.
->
-> +Optional properties:
-> +  - reset-gpio:		GPIO spec for the rstn pin
-> +  - wake-gpio:		GPIO spec for the wake pin
-> +
->  Example:
->
->  	mrf24j40ma@0 {
-> diff --git a/drivers/net/ieee802154/mrf24j40.c b/drivers/net/ieee802154/mrf24j40.c
-> index 7b131f8e4093..275b54d6bad3 100644
-> --- a/drivers/net/ieee802154/mrf24j40.c
-> +++ b/drivers/net/ieee802154/mrf24j40.c
-> @@ -16,9 +16,11 @@
->   */
->
->  #include <linux/spi/spi.h>
-> +#include <linux/spi/mrf24j40.h>
->  #include <linux/interrupt.h>
->  #include <linux/module.h>
->  #include <linux/regmap.h>
-> +#include <linux/of_gpio.h>
->  #include <linux/ieee802154.h>
->  #include <linux/irq.h>
->  #include <net/cfg802154.h>
-> @@ -1276,16 +1278,67 @@ static void  mrf24j40_phy_setup(struct mrf24j40 *devrec)
->  	}
->  }
->
-> +static int
-> +mrf24j40_get_pdata(struct spi_device *spi, int *rstn, int *wake)
-> +{
-> +	struct mrf24j40_platform_data *pdata = spi->dev.platform_data;
-> +
-> +	if (!IS_ENABLED(CONFIG_OF) || !spi->dev.of_node) {
-> +		if (!pdata)
-> +			return -ENOENT;
-> +
-> +		*rstn = pdata->rstn;
-> +		*wake = pdata->wake;
-> +		return 0;
-> +	}
-> +
-> +	*rstn = of_get_named_gpio(spi->dev.of_node, "reset-gpio", 0);
-> +	*wake = of_get_named_gpio(spi->dev.of_node, "wake-gpio", 0);
-> +	return 0;
-> +}
-> +
->  static int mrf24j40_probe(struct spi_device *spi)
->  {
->  	int ret = -ENOMEM, irq_type;
-> +	int rc, rstn, wake;
->  	struct ieee802154_hw *hw;
->  	struct mrf24j40 *devrec;
->
-> -	dev_info(&spi->dev, "probe(). IRQ: %d\n", spi->irq);
-
-You removed this line entirely. Was that on purpose? Having the IRQ 
-printed in dmesg might be handy for debugging.
-
-> +	if (!spi->irq) {
-> +		dev_err(&spi->dev, "no IRQ specified\n");
-> +		return -EINVAL;
-> +	}
->
-> -	/* Register with the 802154 subsystem */
-> +	rc = mrf24j40_get_pdata(spi, &rstn, &wake);
-> +	if (rc < 0) {
-> +		dev_err(&spi->dev, "failed to parse platform_data: %d\n", rc);
-> +		return rc;
-> +	}
-> +
-> +	if (gpio_is_valid(rstn)) {
-> +		rc = devm_gpio_request_one(&spi->dev, rstn,
-> +					   GPIOF_OUT_INIT_HIGH, "rstn");
-> +		if (rc)
-> +			return rc;
-> +	}
->
-> +	if (gpio_is_valid(wake)) {
-> +		rc = devm_gpio_request_one(&spi->dev, wake,
-> +					   GPIOF_OUT_INIT_LOW, "wake");
-> +		if (rc)
-> +			return rc;
-> +	}
-> +
-> +	/* Reset */
-> +	if (gpio_is_valid(rstn)) {
-> +		udelay(1);
-> +		gpio_set_value(rstn, 0);
-> +		udelay(1);
-> +		gpio_set_value(rstn, 1);
-> +		usleep_range(120, 240);
-> +	}
-> +
-> +	/* Register with the 802154 subsystem */
->  	hw = ieee802154_alloc_hw(sizeof(*devrec), &mrf24j40_ops);
->  	if (!hw)
->  		goto err_ret;
-> @@ -1350,7 +1403,7 @@ static int mrf24j40_probe(struct spi_device *spi)
->  		goto err_register_device;
->  	}
->
-> -	dev_dbg(printdev(devrec), "registered mrf24j40\n");
-> +	dev_info(printdev(devrec), "registered mrf24j40\n");
-
-Not related to the rest of this patch. The change itself is good though. 
-Maybe combine this with IRQ printout from above and have this as an 
-additional patch?
-
->  	ret = ieee802154_register_hw(devrec->hw);
->  	if (ret)
->  		goto err_register_device;
-> diff --git a/include/linux/spi/mrf24j40.h b/include/linux/spi/mrf24j40.h
-> new file mode 100644
-> index 000000000000..60810194cae9
-> --- /dev/null
-> +++ b/include/linux/spi/mrf24j40.h
-> @@ -0,0 +1,9 @@
-> +#ifndef _SPI_MRF24J40_H
-> +#define _SPI_MRF24J40_H
-> +
-> +struct mrf24j40_platform_data {
-> +	int rstn;
-> +	int wake;
-> +};
-> +
-> +#endif /* _SPI_MRF24J40_H */
->
-
-Just to clarify this. This header file is needed for the usage of 
-platform data, right? If not I would argue that we do not create a 
-header for this in include/spi but have the struct in the driver itself. 
-I vaguely remember that we need this for the usage of pdata.
-
-regards
-Stefan Schmidt
