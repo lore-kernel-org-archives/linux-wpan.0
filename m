@@ -1,12 +1,12 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from proxima.lasnet.de ([78.47.171.185]:47095 "EHLO
+Received: from proxima.lasnet.de ([78.47.171.185]:47098 "EHLO
         proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754751AbcKUUei (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 21 Nov 2016 15:34:38 -0500
+        with ESMTP id S1754751AbcKUUek (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 21 Nov 2016 15:34:40 -0500
 From: Stefan Schmidt <stefan@osg.samsung.com>
-Subject: [PATCH wpan-tools 2/8] examples: af_ieee802154_tx example
-Date: Mon, 21 Nov 2016 21:34:15 +0100
-Message-Id: <1479760461-18947-3-git-send-email-stefan@osg.samsung.com>
+Subject: [PATCH wpan-tools 3/8] examples: af_ieee802154_rx example
+Date: Mon, 21 Nov 2016 21:34:16 +0100
+Message-Id: <1479760461-18947-4-git-send-email-stefan@osg.samsung.com>
 In-Reply-To: <1479760461-18947-1-git-send-email-stefan@osg.samsung.com>
 References: <1479760461-18947-1-git-send-email-stefan@osg.samsung.com>
 Sender: linux-wpan-owner@vger.kernel.org
@@ -14,29 +14,31 @@ List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
 Cc: Alexander Aring <aar@pengutronix.de>, Stefan Schmidt <stefan@osg.samsung.com>
 
-Simple example demonstrating sending plain 802.15.4 frames.
+Show case receiving 802.15.4 frames over the socket.
 
 Signed-off-by: Stefan Schmidt <stefan@osg.samsung.com>
 ---
- examples/Makefile.am        |  2 +
- examples/af_ieee802154_tx.c | 95 +++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 97 insertions(+)
- create mode 100644 examples/af_ieee802154_tx.c
+ examples/Makefile.am        |   3 +-
+ examples/af_ieee802154_rx.c | 111 ++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 113 insertions(+), 1 deletion(-)
+ create mode 100644 examples/af_ieee802154_rx.c
 
 diff --git a/examples/Makefile.am b/examples/Makefile.am
-index 1b6a35e..4ddb3b7 100644
+index 4ddb3b7..1ebedf9 100644
 --- a/examples/Makefile.am
 +++ b/examples/Makefile.am
-@@ -1 +1,3 @@
-+bin_PROGRAMS = af_ieee802154_tx
-+
+@@ -1,3 +1,4 @@
+-bin_PROGRAMS = af_ieee802154_tx
++bin_PROGRAMS = af_ieee802154_tx \
++	       af_ieee802154_rx
+ 
  EXTRA_DIST = README.examples
-diff --git a/examples/af_ieee802154_tx.c b/examples/af_ieee802154_tx.c
+diff --git a/examples/af_ieee802154_rx.c b/examples/af_ieee802154_rx.c
 new file mode 100644
-index 0000000..e85a109
+index 0000000..86ba707
 --- /dev/null
-+++ b/examples/af_ieee802154_tx.c
-@@ -0,0 +1,95 @@
++++ b/examples/af_ieee802154_rx.c
+@@ -0,0 +1,111 @@
 +/*
 + * IEEE 802.15.4 socket example
 + *
@@ -57,7 +59,7 @@ index 0000000..e85a109
 + * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 + */
 +
-+/* gcc af_ieee802154_tx.c -o af_ieee802154_tx */
++/* gcc af_ieee802154_rx.c -o af_ieee802154_rx */
 +
 +#include <sys/types.h>
 +#include <sys/socket.h>
@@ -91,11 +93,11 @@ index 0000000..e85a109
 +};
 +
 +int main(int argc, char *argv[]) {
-+	int sd;
-+	ssize_t len;
-+	struct sockaddr_ieee802154 dst;
++	int ret, sd;
++	struct sockaddr_ieee802154 src, dst;
 +	unsigned char buf[MAX_PACKET_LEN + 1];
-+	/* IEEE 802.15.4 extended send address, adapt to your setup */
++	socklen_t addrlen;
++	/* IEEE 802.15.4 extended address to receive frames on, adapt to your setup */
 +	uint8_t long_addr[IEEE802154_ADDR_LEN] = {0xd6, 0x55, 0x2c, 0xd6, 0xe4, 0x1c, 0xeb, 0x57};
 +
 +	/* Create IEEE 802.15.4 address family socket for the SOCK_DGRAM type */
@@ -105,27 +107,43 @@ index 0000000..e85a109
 +		return 1;
 +	}
 +
-+	/* Prepare destination socket address struct */
-+	memset(&dst, 0, sizeof(dst));
-+	dst.family = AF_IEEE802154;
++	/* Prepare source socket address struct */
++	memset(&src, 0, sizeof(src));
++	src.family = AF_IEEE802154;
 +	/* Used PAN ID is 0x23 here, adapt to your setup */
-+	dst.addr.pan_id = 0x0023;
++	src.addr.pan_id = 0x0023;
 +
 +#if EXTENDED /* IEEE 802.15.4 extended address usage */
-+	dst.addr.addr_type = IEEE802154_ADDR_LONG;
-+	memcpy(&dst.addr.hwaddr, long_addr, IEEE802154_ADDR_LEN);
++	src.addr.addr_type = IEEE802154_ADDR_LONG;
++	memcpy(&src.addr.hwaddr, &long_addr, IEEE802154_ADDR_LEN);
 +#else
-+	dst.addr.addr_type = IEEE802154_ADDR_SHORT;
-+	dst.addr.short_addr = 0x0002;
++	src.addr.addr_type = IEEE802154_ADDR_SHORT;
++	src.addr.short_addr = 0x0002;
 +#endif
 +
-+	sprintf(buf, "Hello world from IEEE 802.15.4 socket example!");
++	/* Bind socket on this side */
++	ret = bind(sd, (struct sockaddr *)&src, sizeof(src));
++	if (ret) {
++		perror("bind");
++		close(sd);
++		return 1;
++	}
 +
-+	/* sendto() is used for implicity in this example, bin()/send() would
-+	 * be an alternative */
-+	len = sendto(sd, buf, strlen(buf), 0, (struct sockaddr *)&dst, sizeof(dst));
-+	if (len < 0) {
-+		perror("sendto");
++	addrlen = sizeof(dst);
++
++	/* Infinite loop receiving 802.15.4 frames and print out */
++	while (1) {
++		ret = recvfrom(sd, buf, MAX_PACKET_LEN, 0, (struct sockaddr *)&dst, &addrlen);
++		if (ret < 0) {
++			perror("recvfrom");
++			continue;
++		}
++		buf[ret] = '\0';
++#if EXTENDED
++		printf("Received (from %s): %s\n", dst.addr.hwaddr, buf);
++#else
++		printf("Received (from %x): %s\n", dst.addr.short_addr, buf);
++#endif
 +	}
 +
 +	shutdown(sd, SHUT_RDWR);
