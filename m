@@ -1,50 +1,60 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from coyote.holtmann.net ([212.227.132.17]:35963 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933453AbcKWTuZ (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 23 Nov 2016 14:50:25 -0500
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.1 \(3251\))
-Subject: Re: [PATCH v4 0/3] ieee802154: Add support for Cascoda CA8210
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20161123102500.5980-1-h.morris@cascoda.com>
-Date: Wed, 23 Nov 2016 20:50:21 +0100
-Content-Transfer-Encoding: 8BIT
-Message-Id: <7B5768E2-33C9-48EF-82C4-5E56516361FD@holtmann.org>
-References: <20161123102500.5980-1-h.morris@cascoda.com>
+Received: from proxima.lasnet.de ([78.47.171.185]:47089 "EHLO
+        proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754480AbcKUUeh (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 21 Nov 2016 15:34:37 -0500
+From: Stefan Schmidt <stefan@osg.samsung.com>
+Subject: [PATCH wpan-tools 0/8] Various example for 802.15.4 and 6LoWPAN socket usage
+Date: Mon, 21 Nov 2016 21:34:13 +0100
+Message-Id: <1479760461-18947-1-git-send-email-stefan@osg.samsung.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: harrymorris12@gmail.com
-Cc: linux-wpan@vger.kernel.org, Alexander Aring <aar@pengutronix.de>, Stefan Schmidt <stefan@osg.samsung.com>, Harry Morris <h.morris@cascoda.com>
+To: linux-wpan@vger.kernel.org
+Cc: Alexander Aring <aar@pengutronix.de>, Stefan Schmidt <stefan@osg.samsung.com>
 
-Hi Harry,
+Hello.
 
-> This patchset adds a new device driver, documentation and build support for
-> Cascoda's CA8210 IEEE 802.15.4 radio transceiver:
-> http://www.cascoda.com/products/ca-821x/
-> 
-> v4:
-> Added allowable tx_powers and cca_ed_levels
-> Changed power units to mbm (tx_power & cca_ed_level) 
-> 
-> Harry Morris (3):
->  ieee802154: Add CA8210 IEEE 802.15.4 device driver
->  ieee802154: Add device tree documentation for CA8210
->  ieee802154: Add entry in MAINTAINTERS for CA8210 driver
-> 
-> .../devicetree/bindings/net/ieee802154/ca8210.txt  |   28 +
-> .../devicetree/bindings/vendor-prefixes.txt        |    1 +
-> MAINTAINERS                                        |    9 +
-> drivers/net/ieee802154/Kconfig                     |   18 +
-> drivers/net/ieee802154/Makefile                    |    1 +
-> drivers/net/ieee802154/ca8210.c                    | 3665 ++++++++++++++++++++
-> 6 files changed, 3722 insertions(+)
-> create mode 100644 Documentation/devicetree/bindings/net/ieee802154/ca8210.txt
-> create mode 100644 drivers/net/ieee802154/ca8210.c
+Needed for a long time, we have here a set of example demonstrating three types
+of socket usage example for the Linux-wpan stack. Covering RX as well as TX side
+for AF_INET6 to show case our 6LoWPAN implementation. For plain IEEE 802.15.4
+usage we demonstrate the AF_IEEE802154 socket and for some more specialized use
+cases AF_PACKET with and example of a constructed frame send from userspace.
 
-can you send a v5 and include me on CC. I am always missing the actual driver patch. I guess it is too large for the mailing list.
+Stefan Schmidt (8):
+  examples: add README with details to the various examples
+  examples: af_ieee802154_tx example
+  examples: af_ieee802154_rx example
+  examples: add af_packet_rx example
+  examples: af_inet6_rx example
+  examples: af_packet_tx example
+  examples: af_inet6_tx example
+  examples: add .gitignore file for examples directory
 
-Regards
+ Makefile.am                 |   3 +-
+ configure.ac                |   1 +
+ examples/.gitignore         |   7 +++
+ examples/Makefile.am        |   8 ++++
+ examples/README.examples    |  34 ++++++++++++++
+ examples/af_ieee802154_rx.c | 111 ++++++++++++++++++++++++++++++++++++++++++++
+ examples/af_ieee802154_tx.c |  95 +++++++++++++++++++++++++++++++++++++
+ examples/af_inet6_rx.c      |  80 +++++++++++++++++++++++++++++++
+ examples/af_inet6_tx.c      |  75 ++++++++++++++++++++++++++++++
+ examples/af_packet_rx.c     |  95 +++++++++++++++++++++++++++++++++++++
+ examples/af_packet_tx.c     | 109 +++++++++++++++++++++++++++++++++++++++++++
+ 11 files changed, 617 insertions(+), 1 deletion(-)
+ create mode 100644 examples/.gitignore
+ create mode 100644 examples/Makefile.am
+ create mode 100644 examples/README.examples
+ create mode 100644 examples/af_ieee802154_rx.c
+ create mode 100644 examples/af_ieee802154_tx.c
+ create mode 100644 examples/af_inet6_rx.c
+ create mode 100644 examples/af_inet6_tx.c
+ create mode 100644 examples/af_packet_rx.c
+ create mode 100644 examples/af_packet_tx.c
 
-Marcel
+regards
+Stefan Schmidt
+
+-- 
+2.5.5
 
