@@ -1,12 +1,12 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from proxima.lasnet.de ([78.47.171.185]:47100 "EHLO
+Received: from proxima.lasnet.de ([78.47.171.185]:47098 "EHLO
         proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754751AbcKUUel (ORCPT
+        with ESMTP id S1754850AbcKUUel (ORCPT
         <rfc822;linux-wpan@vger.kernel.org>); Mon, 21 Nov 2016 15:34:41 -0500
 From: Stefan Schmidt <stefan@osg.samsung.com>
-Subject: [PATCH wpan-tools 4/8] examples: add af_packet_rx example
-Date: Mon, 21 Nov 2016 21:34:17 +0100
-Message-Id: <1479760461-18947-5-git-send-email-stefan@osg.samsung.com>
+Subject: [PATCH wpan-tools 5/8] examples: af_inet6_rx example
+Date: Mon, 21 Nov 2016 21:34:18 +0100
+Message-Id: <1479760461-18947-6-git-send-email-stefan@osg.samsung.com>
 In-Reply-To: <1479760461-18947-1-git-send-email-stefan@osg.samsung.com>
 References: <1479760461-18947-1-git-send-email-stefan@osg.samsung.com>
 Sender: linux-wpan-owner@vger.kernel.org
@@ -14,33 +14,34 @@ List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
 Cc: Alexander Aring <aar@pengutronix.de>, Stefan Schmidt <stefan@osg.samsung.com>
 
-Special use case to get the whole 802.15.4 frame over the socket. Interesting
-for network monitoring, packet generation and network stacks in userspace.
+Simple IPv6 socket to show case the receiving side of our 6LoWPAN
+implementation.
 
 Signed-off-by: Stefan Schmidt <stefan@osg.samsung.com>
 ---
- examples/Makefile.am    |  3 +-
- examples/af_packet_rx.c | 95 +++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 97 insertions(+), 1 deletion(-)
- create mode 100644 examples/af_packet_rx.c
+ examples/Makefile.am   |  3 +-
+ examples/af_inet6_rx.c | 80 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 82 insertions(+), 1 deletion(-)
+ create mode 100644 examples/af_inet6_rx.c
 
 diff --git a/examples/Makefile.am b/examples/Makefile.am
-index 1ebedf9..2d188a7 100644
+index 2d188a7..7cd67d9 100644
 --- a/examples/Makefile.am
 +++ b/examples/Makefile.am
-@@ -1,4 +1,5 @@
+@@ -1,5 +1,6 @@
  bin_PROGRAMS = af_ieee802154_tx \
--	       af_ieee802154_rx
-+	       af_ieee802154_rx \
-+	       af_packet_rx
+ 	       af_ieee802154_rx \
+-	       af_packet_rx
++	       af_packet_rx \
++	       af_inet6_rx
  
  EXTRA_DIST = README.examples
-diff --git a/examples/af_packet_rx.c b/examples/af_packet_rx.c
+diff --git a/examples/af_inet6_rx.c b/examples/af_inet6_rx.c
 new file mode 100644
-index 0000000..9770965
+index 0000000..d512471
 --- /dev/null
-+++ b/examples/af_packet_rx.c
-@@ -0,0 +1,95 @@
++++ b/examples/af_inet6_rx.c
+@@ -0,0 +1,80 @@
 +/*
 + * IEEE 802.15.4 socket example
 + *
@@ -61,75 +62,60 @@ index 0000000..9770965
 + * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 + */
 +
-+/* gcc af_packet_rx.c -o af_packet_rx */
++/* gcc af_inet6_rx.c -o af_inet6_rx */
 +
 +#include <sys/types.h>
 +#include <sys/socket.h>
 +#include <stdio.h>
 +#include <unistd.h>
 +#include <string.h>
-+
-+#include <net/if.h>
-+#include <linux/if_packet.h>
-+
 +#include <arpa/inet.h>
-+#include <sys/ioctl.h>
 +
-+#define IEEE802154_ADDR_LEN 8
-+#define MAX_PACKET_LEN 127
-+
-+#ifndef ETH_P_IEEE802154
-+#define ETH_P_IEEE802154 0x00F6
-+#endif
++#define MAX_PACKET_LEN 2048
 +
 +int main(int argc, char *argv[]) {
-+	int ret, sd, i;
++	int ret, sd;
 +	ssize_t len;
++	struct sockaddr_in6 src, dst;
 +	unsigned char buf[MAX_PACKET_LEN + 1];
-+	struct sockaddr_ll sll;
-+	struct ifreq ifr;
++	socklen_t addrlen;
++	char ipv6[INET6_ADDRSTRLEN];
 +
-+	/* Create AF_PACKET address family socket for the SOCK_RAW type */
-+	sd = socket(PF_PACKET, SOCK_RAW, htons(ETH_P_IEEE802154));
++	/* Create IPv6 address family socket for the SOCK_DGRAM type */
++	sd = socket(PF_INET6, SOCK_DGRAM, 0);
 +	if (sd < 0) {
 +		perror("socket");
 +		return 1;
 +	}
 +
-+	/* Get interface index */
-+	strncpy(ifr.ifr_name, "monitor0", IFNAMSIZ);
-+	ret = ioctl(sd, SIOCGIFINDEX, &ifr);
-+	if (ret < 0) {
-+		perror("ioctl");
-+		close(sd);
-+		return 1;
-+	}
-+
-+	/* Prepare source socket address struct */
-+	memset(&sll, 0, sizeof(sll));
-+	sll.sll_family = AF_PACKET;
-+	sll.sll_ifindex = ifr.ifr_ifindex;
-+	sll.sll_protocol = htons(ETH_P_IEEE802154);
++	/* Prepare source and destination socket address structs */
++	memset(&dst, 0, sizeof(dst));
++	memset(&src, 0, sizeof(src));
++	src.sin6_family = AF_INET6;
++	src.sin6_addr = in6addr_any;
++	/* Port within the compressed port range for potential NHC UDP compression */
++	src.sin6_port = htons(61617);
 +
 +	/* Bind socket on this side */
-+	ret = bind(sd, (struct sockaddr *)&sll, sizeof(sll));
-+	if (ret < 0) {
++	ret = bind(sd, (struct sockaddr *)&src, sizeof(src));
++	if (ret) {
 +		perror("bind");
 +		close(sd);
 +		return 1;
 +	}
 +
++	addrlen = sizeof(dst);
++
++	/* Infinite loop receiving IPv6 packets and print out */
 +	while (1) {
-+		/* Receive and print the whole packet payload, including FCS */
-+		len = recv(sd, buf, MAX_PACKET_LEN, 0);
++		len = recvfrom(sd, buf, MAX_PACKET_LEN, 0, (struct sockaddr *)&dst, &addrlen);
 +		if (len < 0) {
-+			perror("recv");
++			perror("recvfrom");
 +			continue;
 +		}
-+		printf("Received:");
-+		for (i = 0; i < len; i++)
-+			printf(" %x", buf[i]);
-+		printf("\n");
++		buf[len] = '\0';
++		inet_ntop(AF_INET6, &(dst.sin6_addr), ipv6, INET6_ADDRSTRLEN);
++		printf("Received (from %s): %s\n", ipv6, buf);
 +	}
 +
 +	shutdown(sd, SHUT_RDWR);
