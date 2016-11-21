@@ -1,188 +1,97 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from ec2-52-27-115-49.us-west-2.compute.amazonaws.com ([52.27.115.49]:36646
-        "EHLO osg.samsung.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1753387AbcKULg6 (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 21 Nov 2016 06:36:58 -0500
-Subject: Re: [PATCH wpan-tools v2] Add the support to set wpan-ping interval
-References: <1479717774-4485-1-git-send-email-wsn.iot.xwq@cn.fujitsu.com>
-From: Stefan Schmidt <stefan@osg.samsung.com>
-Message-ID: <d686a888-2543-68f5-46ef-e9757e238288@osg.samsung.com>
-Date: Mon, 21 Nov 2016 12:36:49 +0100
-MIME-Version: 1.0
-In-Reply-To: <1479717774-4485-1-git-send-email-wsn.iot.xwq@cn.fujitsu.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
+Received: from mail-pf0-f196.google.com ([209.85.192.196]:35446 "EHLO
+        mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753566AbcKUUae (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 21 Nov 2016 15:30:34 -0500
+From: Bhumika Goyal <bhumirks@gmail.com>
+Subject: [PATCH] net: ieee802154: constify ieee802154_ops structures
+Date: Tue, 22 Nov 2016 02:00:14 +0530
+Message-Id: <1479760214-32624-1-git-send-email-bhumirks@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: wsn.iot.xwq@cn.fujitsu.com, linux-wpan@vger.kernel.org
+To: julia.lawall@lip6.fr, michael.hennerich@analog.com, aar@pengutronix.de, stefan@osg.samsung.com, linux-wpan@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Bhumika Goyal <bhumirks@gmail.com>
 
-Hello.
+Declare the structure ieee802154_ops as const as it is only passed as an
+argument to the function  ieee802154_alloc_hw. This argument is of type
+const struct ieee802154_ops *, so ieee80254_ops structures having this
+property can be declared as const.
+Done using Coccinelle:
 
-On 21/11/16 09:42, wsn.iot.xwq@cn.fujitsu.com wrote:
-> From: xuewenqian <wsn.iot.xwq@cn.fujitsu.com>
->
-> This patch adds the support to set wpan-ping interval, you can use the command `-I $interval(ms)` to set the value (default 500ms).
->
-> Signed-off-by: xuewenqian <wsn.iot.xwq@cn.fujitsu.com>
+@r1 disable optional_qualifier @
+identifier i;
+position p;
+@@
+static struct ieee802154_ops i@p = {...};
 
-The name still looks a bit off here. From your mails I would expect the 
-name to be written: Xue Wenqian
+@ok1@
+identifier r1.i;
+position p;
+expression e1;
+@@
+ieee802154_alloc_hw(e1,&i@p)
 
-Please use this format in the from and Signed-off-by line e.g.
+@bad@
+position p!={r1.p,ok1.p};
+identifier r1.i;
+@@
+i@p
 
-Signed-off-by: Xue Wenqian <wsn.iot.xwq@cn.fujitsu.com>
+@depends on !bad disable optional_qualifier@
+identifier r1.i;
+@@
+static
++const
+struct ieee802154_ops  i={...};
 
-> ---
-> I have added the from line, and fixed the trailing whitespace problem.
+@depends on !bad disable optional_qualifier@
+identifier r1.i;
+@@
++const
+struct ieee802154_ops  i;
 
-Thanks.
+The before and after size details of the affected files are:
 
-> Also I made some revision about the curly braces of added function block.
+   text	   data	    bss	    dec	    hex	filename
+   8669	   1176	     16	   9861	   2685	drivers/net/ieee802154/adf7242.o
+   8805	   1048	     16	   9869	   268d	drivers/net/ieee802154/adf7242.o
 
-There would be one more curly braces change. See my comment below.
+   text	   data	    bss	    dec	    hex	filename
+   7211	   2296	     32	   9539	   2543	drivers/net/ieee802154/atusb.o
+   7339	   2160	     32	   9531	   253b	drivers/net/ieee802154/atusb.o
 
-> To be note, this is my first commit on kernel. If there is any wrong with my commit, please forgive me and point it out, thank you all!
+Signed-off-by: Bhumika Goyal <bhumirks@gmail.com>
+---
+ drivers/net/ieee802154/adf7242.c | 2 +-
+ drivers/net/ieee802154/atusb.c   | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-Its getting nicely into shape now. I think with the changes mentioned 
-here we are ready to get it applied! :)
+diff --git a/drivers/net/ieee802154/adf7242.c b/drivers/net/ieee802154/adf7242.c
+index 9fa7ac9..4ff4c7d 100644
+--- a/drivers/net/ieee802154/adf7242.c
++++ b/drivers/net/ieee802154/adf7242.c
+@@ -874,7 +874,7 @@ static int adf7242_rx(struct adf7242_local *lp)
+ 	return 0;
+ }
+ 
+-static struct ieee802154_ops adf7242_ops = {
++static const struct ieee802154_ops adf7242_ops = {
+ 	.owner = THIS_MODULE,
+ 	.xmit_sync = adf7242_xmit,
+ 	.ed = adf7242_ed,
+diff --git a/drivers/net/ieee802154/atusb.c b/drivers/net/ieee802154/atusb.c
+index 1056ed1..322864a 100644
+--- a/drivers/net/ieee802154/atusb.c
++++ b/drivers/net/ieee802154/atusb.c
+@@ -567,7 +567,7 @@ static void atusb_stop(struct ieee802154_hw *hw)
+ 	return 0;
+ }
+ 
+-static struct ieee802154_ops atusb_ops = {
++static const struct ieee802154_ops atusb_ops = {
+ 	.owner			= THIS_MODULE,
+ 	.xmit_async		= atusb_xmit,
+ 	.ed			= atusb_ed,
+-- 
+1.9.1
 
->
->  wpan-ping/wpan-ping.c |   52 ++++++++++++++++++++++++++++++++++++++++++-------
->  1 file changed, 45 insertions(+), 7 deletions(-)
->
-> diff --git a/wpan-ping/wpan-ping.c b/wpan-ping/wpan-ping.c
-> index 2c63758..9544ad0 100644
-> --- a/wpan-ping/wpan-ping.c
-> +++ b/wpan-ping/wpan-ping.c
-> @@ -49,6 +49,7 @@
->  #define IEEE802154_ADDR_LEN 8
->  /* Set the dispatch header to not 6lowpan for compat */
->  #define NOT_A_6LOWPAN_FRAME 0x00
-> +#define DEFAULT_INTERVAL 500
->
->  #define DEBUG 0
->
-> @@ -96,6 +97,7 @@ struct config {
->  	int nl802154_id;
->  	struct sockaddr_ieee802154 src;
->  	struct sockaddr_ieee802154 dst;
-> +	unsigned short interval;
->  };
->
->  extern char *optarg;
-> @@ -109,6 +111,7 @@ static void usage(const char *name) {
->  	"--count | -c number of packets\n"
->  	"--size | -s packet length\n"
->  	"--interface | -i listen on this interface (default wpan0)\n"
-> +	"--interval | -I wait interval in milliseconds between sending packets (default 500ms)\n"
->  	"--version | -v print out version\n"
->  	"--help | -h this usage text\n", name);
->  }
-> @@ -232,9 +235,29 @@ static int print_address(char *addr, uint8_t dst_extended[IEEE802154_ADDR_LEN])
->  	return 0;
->  }
->
-> +static void sleeping(struct timeval ping_start_time, struct timeval timeout)
-> +{
-
-Please move the curly brace here at the same line as the function.
-
-> +	struct timeval curr_time;
-> +	long sec, usec, interval_usec, timeout_usec;
-> +	long sleep_usec = 0;
-> +	gettimeofday(&curr_time, NULL);
-> +	sec = curr_time.tv_sec - ping_start_time.tv_sec;
-> +	usec = curr_time.tv_usec - ping_start_time.tv_usec;
-> +	if (usec < 0) {
-> +		usec += 1000000;
-> +		sec--;
-> +	}
-> +	interval_usec = sec * 1000000 + usec;
-> +	timeout_usec = timeout.tv_sec * 1000000 + timeout.tv_usec;
-> +	if (interval_usec < timeout_usec) {
-> +		sleep_usec = timeout_usec - interval_usec;
-> +		usleep(sleep_usec);
-> +	}
-> +}
-> +
->  static int measure_roundtrip(struct config *conf, int sd) {
->  	unsigned char *buf;
-> -	struct timeval start_time, end_time, timeout;
-> +	struct timeval ping_start_time, start_time, end_time, timeout;
->  	long sec = 0, usec = 0;
->  	long sec_max = 0, usec_max = 0;
->  	long sec_min = 2147483647, usec_min = 2147483647;
-> @@ -256,9 +279,15 @@ static int measure_roundtrip(struct config *conf, int sd) {
->  			conf->dst.addr.short_addr, conf->dst.addr.pan_id, conf->packet_len);
->  	buf = (unsigned char *)malloc(MAX_PAYLOAD_LEN);
->
-> -	/* 500ms seconds packet receive timeout */
-> -	timeout.tv_sec = 0;
-> -	timeout.tv_usec = 500000;
-> +	/* default 500ms seconds packet receive timeout */
-> +	if (conf->interval >= 1000) { /* when interval is larger than 1s */
-> +		double d_interval = (conf->interval * 1.0) / 1000;
-> +		timeout.tv_sec = (int)d_interval;
-> +		timeout.tv_usec = (int)((d_interval - timeout.tv_sec) * 1000000);
-> +	} else {
-> +		timeout.tv_sec = 0;
-> +		timeout.tv_usec = conf->interval * 1000;
-> +	}
->  	ret = setsockopt(sd, SOL_SOCKET, SO_RCVTIMEO, (struct timeval *)&timeout,sizeof(struct timeval));
->  	if (ret < 0) {
->  		perror("setsockopt receive timeout");
-> @@ -266,6 +295,7 @@ static int measure_roundtrip(struct config *conf, int sd) {
->
->  	count = 0;
->  	for (i = 0; i < conf->packets; i++) {
-> +		gettimeofday(&ping_start_time, NULL);
->  		generate_packet(buf, conf, i);
->  		seq_num = (buf[2] << 8)| buf[3];
->  		ret = sendto(sd, buf, conf->packet_len, 0, (struct sockaddr *)&conf->dst, sizeof(conf->dst));
-> @@ -309,7 +339,9 @@ static int measure_roundtrip(struct config *conf, int sd) {
->  				fprintf(stdout, "%i bytes from 0x%04x seq=%i time=%.1f ms\n", ret,
->  					conf->dst.addr.short_addr, (int)seq_num, (float)usec/1000);
->  		} else
-> -			fprintf(stderr, "Hit 500 ms packet timeout\n");
-> +			fprintf(stderr, "Hit %i ms packet timeout\n", conf->interval);
-> +		/* sleeping */
-> +		sleeping(ping_start_time, timeout);
->  	}
->
->  	if (count)
-> @@ -456,6 +488,9 @@ int main(int argc, char *argv[]) {
->  	/* Default to 65535 packets being sent */
->  	conf->packets = USHRT_MAX;
->
-> +	/* Default to 500ms for interval value */
-> +	conf->interval = DEFAULT_INTERVAL;
-> +
->  	if (argc < 2) {
->  		usage(argv[0]);
->  		exit(1);
-> @@ -464,9 +499,9 @@ int main(int argc, char *argv[]) {
->  	while (1) {
->  #ifdef _GNU_SOURCE
->  		int opt_idx = -1;
-> -		c = getopt_long(argc, argv, "a:ec:s:i:dvh", perf_long_opts, &opt_idx);
-> +		c = getopt_long(argc, argv, "a:ec:s:i:dvhI:", perf_long_opts, &opt_idx);
->  #else
-> -		c = getopt(argc, argv, "a:ec:s:i:dvh");
-> +		c = getopt(argc, argv, "a:ec:s:i:dvhI:");
->  #endif
->  		if (c == -1)
->  			break;
-> @@ -495,6 +530,9 @@ int main(int argc, char *argv[]) {
->  		case 'i':
->  			conf->interface = optarg;
->  			break;
-> +		case 'I':
-> +			conf->interval = atoi(optarg);
-> +			break;
->  		case 'v':
->  			fprintf(stdout, "wpan-ping " PACKAGE_VERSION "\n");
->  			free(conf);
->
-
-regards
-Stefan Schmidt
