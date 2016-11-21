@@ -1,12 +1,12 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from proxima.lasnet.de ([78.47.171.185]:47098 "EHLO
+Received: from proxima.lasnet.de ([78.47.171.185]:47100 "EHLO
         proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754850AbcKUUel (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 21 Nov 2016 15:34:41 -0500
+        with ESMTP id S1754857AbcKUUen (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 21 Nov 2016 15:34:43 -0500
 From: Stefan Schmidt <stefan@osg.samsung.com>
-Subject: [PATCH wpan-tools 5/8] examples: af_inet6_rx example
-Date: Mon, 21 Nov 2016 21:34:18 +0100
-Message-Id: <1479760461-18947-6-git-send-email-stefan@osg.samsung.com>
+Subject: [PATCH wpan-tools 6/8] examples: af_packet_tx example
+Date: Mon, 21 Nov 2016 21:34:19 +0100
+Message-Id: <1479760461-18947-7-git-send-email-stefan@osg.samsung.com>
 In-Reply-To: <1479760461-18947-1-git-send-email-stefan@osg.samsung.com>
 References: <1479760461-18947-1-git-send-email-stefan@osg.samsung.com>
 Sender: linux-wpan-owner@vger.kernel.org
@@ -14,34 +14,33 @@ List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
 Cc: Alexander Aring <aar@pengutronix.de>, Stefan Schmidt <stefan@osg.samsung.com>
 
-Simple IPv6 socket to show case the receiving side of our 6LoWPAN
-implementation.
+The transmit side example for a manually constructed 802.15.4 frame send over
+a socket.
 
 Signed-off-by: Stefan Schmidt <stefan@osg.samsung.com>
 ---
- examples/Makefile.am   |  3 +-
- examples/af_inet6_rx.c | 80 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 82 insertions(+), 1 deletion(-)
- create mode 100644 examples/af_inet6_rx.c
+ examples/Makefile.am    |   1 +
+ examples/af_packet_tx.c | 109 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 110 insertions(+)
+ create mode 100644 examples/af_packet_tx.c
 
 diff --git a/examples/Makefile.am b/examples/Makefile.am
-index 2d188a7..7cd67d9 100644
+index 7cd67d9..efc8a44 100644
 --- a/examples/Makefile.am
 +++ b/examples/Makefile.am
 @@ -1,5 +1,6 @@
  bin_PROGRAMS = af_ieee802154_tx \
  	       af_ieee802154_rx \
--	       af_packet_rx
-+	       af_packet_rx \
-+	       af_inet6_rx
++	       af_packet_tx \
+ 	       af_packet_rx \
+ 	       af_inet6_rx
  
- EXTRA_DIST = README.examples
-diff --git a/examples/af_inet6_rx.c b/examples/af_inet6_rx.c
+diff --git a/examples/af_packet_tx.c b/examples/af_packet_tx.c
 new file mode 100644
-index 0000000..d512471
+index 0000000..82a15f4
 --- /dev/null
-+++ b/examples/af_inet6_rx.c
-@@ -0,0 +1,80 @@
++++ b/examples/af_packet_tx.c
+@@ -0,0 +1,109 @@
 +/*
 + * IEEE 802.15.4 socket example
 + *
@@ -62,60 +61,89 @@ index 0000000..d512471
 + * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 + */
 +
-+/* gcc af_inet6_rx.c -o af_inet6_rx */
++/* gcc af_packet_tx.c -o af_packet_tx */
 +
 +#include <sys/types.h>
 +#include <sys/socket.h>
++#include <sys/ioctl.h>
 +#include <stdio.h>
 +#include <unistd.h>
 +#include <string.h>
++
++#include <net/if.h>
++#include <linux/if_packet.h>
 +#include <arpa/inet.h>
 +
-+#define MAX_PACKET_LEN 2048
++#ifndef ETH_P_IEEE802154
++#define ETH_P_IEEE802154 0x00F6
++#endif
++
++#define MAX_PACKET_LEN 127
 +
 +int main(int argc, char *argv[]) {
 +	int ret, sd;
 +	ssize_t len;
-+	struct sockaddr_in6 src, dst;
++	struct sockaddr_ll sll;
++	struct ifreq ifr;
 +	unsigned char buf[MAX_PACKET_LEN + 1];
-+	socklen_t addrlen;
-+	char ipv6[INET6_ADDRSTRLEN];
 +
-+	/* Create IPv6 address family socket for the SOCK_DGRAM type */
-+	sd = socket(PF_INET6, SOCK_DGRAM, 0);
++	/* Create AF_PACKET address family socket for the SOCK_RAW type */
++	sd = socket(PF_PACKET, SOCK_RAW, htons(ETH_P_IEEE802154));
 +	if (sd < 0) {
 +		perror("socket");
 +		return 1;
 +	}
 +
-+	/* Prepare source and destination socket address structs */
-+	memset(&dst, 0, sizeof(dst));
-+	memset(&src, 0, sizeof(src));
-+	src.sin6_family = AF_INET6;
-+	src.sin6_addr = in6addr_any;
-+	/* Port within the compressed port range for potential NHC UDP compression */
-+	src.sin6_port = htons(61617);
++	/* Using a monitor interface here results in a bad FCS and two missing
++	 * bytes from payload, using the normal IEEE 802.15.4 interface here */
++	strncpy(ifr.ifr_name, "wpan0", IFNAMSIZ);
++	ret = ioctl(sd, SIOCGIFINDEX, &ifr);
++	if (ret < 0) {
++		perror("ioctl");
++		close(sd);
++		return 1;
++	}
++
++	/* Prepare destination socket address struct */
++	memset(&sll, 0, sizeof(sll));
++	sll.sll_family = AF_PACKET;
++	sll.sll_ifindex = ifr.ifr_ifindex;
++	sll.sll_protocol = htons(ETH_P_IEEE802154);
 +
 +	/* Bind socket on this side */
-+	ret = bind(sd, (struct sockaddr *)&src, sizeof(src));
-+	if (ret) {
++	ret = bind(sd, (struct sockaddr *)&sll, sizeof(sll));
++	if (ret < 0) {
 +		perror("bind");
 +		close(sd);
 +		return 1;
 +	}
 +
-+	addrlen = sizeof(dst);
++	/* Construct raw packet payload, length and FCS gets added in the kernel */
++	buf[0] = 0x21; /* Frame Control Field */
++	buf[1] = 0xc8; /* Frame Control Field */
++	buf[2] = 0x8b; /* Sequence number */
++	buf[3] = 0xff; /* Destination PAN ID 0xffff */
++	buf[4] = 0xff; /* Destination PAN ID */
++	buf[5] = 0x02; /* Destination short address 0x0002 */
++	buf[6] = 0x00; /* Destination short address */
++	buf[7] = 0x23; /* Source PAN ID 0x0023 */
++	buf[8] = 0x00; /* */
++	buf[9] = 0x60; /* Source extended address ae:c2:4a:1c:21:16:e2:60 */
++	buf[10] = 0xe2; /* */
++	buf[11] = 0x16; /* */
++	buf[12] = 0x21; /* */
++	buf[13] = 0x1c; /* */
++	buf[14] = 0x4a; /* */
++	buf[15] = 0xc2; /* */
++	buf[16] = 0xae; /* */
++	buf[17] = 0xAA; /* Payload */
++	buf[18] = 0xBB; /* */
++	buf[19] = 0xCC; /* */
 +
-+	/* Infinite loop receiving IPv6 packets and print out */
-+	while (1) {
-+		len = recvfrom(sd, buf, MAX_PACKET_LEN, 0, (struct sockaddr *)&dst, &addrlen);
-+		if (len < 0) {
-+			perror("recvfrom");
-+			continue;
-+		}
-+		buf[len] = '\0';
-+		inet_ntop(AF_INET6, &(dst.sin6_addr), ipv6, INET6_ADDRSTRLEN);
-+		printf("Received (from %s): %s\n", ipv6, buf);
++	/* Send constructed packet over binded interface */
++	len = send(sd, buf, 20, 0);
++	if (len < 0) {
++		perror("send");
 +	}
 +
 +	shutdown(sd, SHUT_RDWR);
