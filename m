@@ -1,12 +1,12 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from proxima.lasnet.de ([78.47.171.185]:47098 "EHLO
+Received: from proxima.lasnet.de ([78.47.171.185]:47100 "EHLO
         proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754751AbcKUUek (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 21 Nov 2016 15:34:40 -0500
+        with ESMTP id S1754751AbcKUUel (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 21 Nov 2016 15:34:41 -0500
 From: Stefan Schmidt <stefan@osg.samsung.com>
-Subject: [PATCH wpan-tools 3/8] examples: af_ieee802154_rx example
-Date: Mon, 21 Nov 2016 21:34:16 +0100
-Message-Id: <1479760461-18947-4-git-send-email-stefan@osg.samsung.com>
+Subject: [PATCH wpan-tools 4/8] examples: add af_packet_rx example
+Date: Mon, 21 Nov 2016 21:34:17 +0100
+Message-Id: <1479760461-18947-5-git-send-email-stefan@osg.samsung.com>
 In-Reply-To: <1479760461-18947-1-git-send-email-stefan@osg.samsung.com>
 References: <1479760461-18947-1-git-send-email-stefan@osg.samsung.com>
 Sender: linux-wpan-owner@vger.kernel.org
@@ -14,31 +14,33 @@ List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
 Cc: Alexander Aring <aar@pengutronix.de>, Stefan Schmidt <stefan@osg.samsung.com>
 
-Show case receiving 802.15.4 frames over the socket.
+Special use case to get the whole 802.15.4 frame over the socket. Interesting
+for network monitoring, packet generation and network stacks in userspace.
 
 Signed-off-by: Stefan Schmidt <stefan@osg.samsung.com>
 ---
- examples/Makefile.am        |   3 +-
- examples/af_ieee802154_rx.c | 111 ++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 113 insertions(+), 1 deletion(-)
- create mode 100644 examples/af_ieee802154_rx.c
+ examples/Makefile.am    |  3 +-
+ examples/af_packet_rx.c | 95 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 97 insertions(+), 1 deletion(-)
+ create mode 100644 examples/af_packet_rx.c
 
 diff --git a/examples/Makefile.am b/examples/Makefile.am
-index 4ddb3b7..1ebedf9 100644
+index 1ebedf9..2d188a7 100644
 --- a/examples/Makefile.am
 +++ b/examples/Makefile.am
-@@ -1,3 +1,4 @@
--bin_PROGRAMS = af_ieee802154_tx
-+bin_PROGRAMS = af_ieee802154_tx \
-+	       af_ieee802154_rx
+@@ -1,4 +1,5 @@
+ bin_PROGRAMS = af_ieee802154_tx \
+-	       af_ieee802154_rx
++	       af_ieee802154_rx \
++	       af_packet_rx
  
  EXTRA_DIST = README.examples
-diff --git a/examples/af_ieee802154_rx.c b/examples/af_ieee802154_rx.c
+diff --git a/examples/af_packet_rx.c b/examples/af_packet_rx.c
 new file mode 100644
-index 0000000..86ba707
+index 0000000..9770965
 --- /dev/null
-+++ b/examples/af_ieee802154_rx.c
-@@ -0,0 +1,111 @@
++++ b/examples/af_packet_rx.c
+@@ -0,0 +1,95 @@
 +/*
 + * IEEE 802.15.4 socket example
 + *
@@ -59,91 +61,75 @@ index 0000000..86ba707
 + * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 + */
 +
-+/* gcc af_ieee802154_rx.c -o af_ieee802154_rx */
++/* gcc af_packet_rx.c -o af_packet_rx */
 +
 +#include <sys/types.h>
 +#include <sys/socket.h>
 +#include <stdio.h>
-+#include <stdint.h>
 +#include <unistd.h>
 +#include <string.h>
 +
++#include <net/if.h>
++#include <linux/if_packet.h>
++
++#include <arpa/inet.h>
++#include <sys/ioctl.h>
++
 +#define IEEE802154_ADDR_LEN 8
 +#define MAX_PACKET_LEN 127
-+#define EXTENDED 1
 +
-+enum {
-+	IEEE802154_ADDR_NONE = 0x0,
-+	IEEE802154_ADDR_SHORT = 0x2,
-+	IEEE802154_ADDR_LONG = 0x3,
-+};
-+
-+struct ieee802154_addr_sa {
-+	int addr_type;
-+	uint16_t pan_id;
-+	union {
-+		uint8_t hwaddr[IEEE802154_ADDR_LEN];
-+		uint16_t short_addr;
-+	};
-+};
-+
-+struct sockaddr_ieee802154 {
-+	sa_family_t family;
-+	struct ieee802154_addr_sa addr;
-+};
++#ifndef ETH_P_IEEE802154
++#define ETH_P_IEEE802154 0x00F6
++#endif
 +
 +int main(int argc, char *argv[]) {
-+	int ret, sd;
-+	struct sockaddr_ieee802154 src, dst;
++	int ret, sd, i;
++	ssize_t len;
 +	unsigned char buf[MAX_PACKET_LEN + 1];
-+	socklen_t addrlen;
-+	/* IEEE 802.15.4 extended address to receive frames on, adapt to your setup */
-+	uint8_t long_addr[IEEE802154_ADDR_LEN] = {0xd6, 0x55, 0x2c, 0xd6, 0xe4, 0x1c, 0xeb, 0x57};
++	struct sockaddr_ll sll;
++	struct ifreq ifr;
 +
-+	/* Create IEEE 802.15.4 address family socket for the SOCK_DGRAM type */
-+	sd = socket(PF_IEEE802154, SOCK_DGRAM, 0);
++	/* Create AF_PACKET address family socket for the SOCK_RAW type */
++	sd = socket(PF_PACKET, SOCK_RAW, htons(ETH_P_IEEE802154));
 +	if (sd < 0) {
 +		perror("socket");
 +		return 1;
 +	}
 +
-+	/* Prepare source socket address struct */
-+	memset(&src, 0, sizeof(src));
-+	src.family = AF_IEEE802154;
-+	/* Used PAN ID is 0x23 here, adapt to your setup */
-+	src.addr.pan_id = 0x0023;
++	/* Get interface index */
++	strncpy(ifr.ifr_name, "monitor0", IFNAMSIZ);
++	ret = ioctl(sd, SIOCGIFINDEX, &ifr);
++	if (ret < 0) {
++		perror("ioctl");
++		close(sd);
++		return 1;
++	}
 +
-+#if EXTENDED /* IEEE 802.15.4 extended address usage */
-+	src.addr.addr_type = IEEE802154_ADDR_LONG;
-+	memcpy(&src.addr.hwaddr, &long_addr, IEEE802154_ADDR_LEN);
-+#else
-+	src.addr.addr_type = IEEE802154_ADDR_SHORT;
-+	src.addr.short_addr = 0x0002;
-+#endif
++	/* Prepare source socket address struct */
++	memset(&sll, 0, sizeof(sll));
++	sll.sll_family = AF_PACKET;
++	sll.sll_ifindex = ifr.ifr_ifindex;
++	sll.sll_protocol = htons(ETH_P_IEEE802154);
 +
 +	/* Bind socket on this side */
-+	ret = bind(sd, (struct sockaddr *)&src, sizeof(src));
-+	if (ret) {
++	ret = bind(sd, (struct sockaddr *)&sll, sizeof(sll));
++	if (ret < 0) {
 +		perror("bind");
 +		close(sd);
 +		return 1;
 +	}
 +
-+	addrlen = sizeof(dst);
-+
-+	/* Infinite loop receiving 802.15.4 frames and print out */
 +	while (1) {
-+		ret = recvfrom(sd, buf, MAX_PACKET_LEN, 0, (struct sockaddr *)&dst, &addrlen);
-+		if (ret < 0) {
-+			perror("recvfrom");
++		/* Receive and print the whole packet payload, including FCS */
++		len = recv(sd, buf, MAX_PACKET_LEN, 0);
++		if (len < 0) {
++			perror("recv");
 +			continue;
 +		}
-+		buf[ret] = '\0';
-+#if EXTENDED
-+		printf("Received (from %s): %s\n", dst.addr.hwaddr, buf);
-+#else
-+		printf("Received (from %x): %s\n", dst.addr.short_addr, buf);
-+#endif
++		printf("Received:");
++		for (i = 0; i < len; i++)
++			printf(" %x", buf[i]);
++		printf("\n");
 +	}
 +
 +	shutdown(sd, SHUT_RDWR);
