@@ -1,49 +1,50 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wj0-f196.google.com ([209.85.210.196]:33401 "EHLO
-        mail-wj0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752256AbcKWKmL (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 23 Nov 2016 05:42:11 -0500
-Received: by mail-wj0-f196.google.com with SMTP id kp2so731174wjc.0
-        for <linux-wpan@vger.kernel.org>; Wed, 23 Nov 2016 02:42:11 -0800 (PST)
-From: harrymorris12@gmail.com
-Subject: [PATCH v4 3/3] ieee802154: Add entry in MAINTAINTERS for CA8210 driver
-Date: Wed, 23 Nov 2016 10:25:00 +0000
-Message-Id: <20161123102500.5980-4-h.morris@cascoda.com>
+Received: from coyote.holtmann.net ([212.227.132.17]:35963 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933453AbcKWTuZ (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 23 Nov 2016 14:50:25 -0500
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.1 \(3251\))
+Subject: Re: [PATCH v4 0/3] ieee802154: Add support for Cascoda CA8210
+From: Marcel Holtmann <marcel@holtmann.org>
 In-Reply-To: <20161123102500.5980-1-h.morris@cascoda.com>
+Date: Wed, 23 Nov 2016 20:50:21 +0100
+Content-Transfer-Encoding: 8BIT
+Message-Id: <7B5768E2-33C9-48EF-82C4-5E56516361FD@holtmann.org>
 References: <20161123102500.5980-1-h.morris@cascoda.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org
-Cc: aar@pengutronix.de, stefan@osg.samsung.com, Harry Morris <h.morris@cascoda.com>
+To: harrymorris12@gmail.com
+Cc: linux-wpan@vger.kernel.org, Alexander Aring <aar@pengutronix.de>, Stefan Schmidt <stefan@osg.samsung.com>, Harry Morris <h.morris@cascoda.com>
 
-From: Harry Morris <h.morris@cascoda.com>
+Hi Harry,
 
-Signed-off-by: Harry Morris <h.morris@cascoda.com>
-Acked-by: Stefan Schmidt <stefan@osg.samsung.com>
----
- MAINTAINERS | 9 +++++++++
- 1 file changed, 9 insertions(+)
+> This patchset adds a new device driver, documentation and build support for
+> Cascoda's CA8210 IEEE 802.15.4 radio transceiver:
+> http://www.cascoda.com/products/ca-821x/
+> 
+> v4:
+> Added allowable tx_powers and cca_ed_levels
+> Changed power units to mbm (tx_power & cca_ed_level) 
+> 
+> Harry Morris (3):
+>  ieee802154: Add CA8210 IEEE 802.15.4 device driver
+>  ieee802154: Add device tree documentation for CA8210
+>  ieee802154: Add entry in MAINTAINTERS for CA8210 driver
+> 
+> .../devicetree/bindings/net/ieee802154/ca8210.txt  |   28 +
+> .../devicetree/bindings/vendor-prefixes.txt        |    1 +
+> MAINTAINERS                                        |    9 +
+> drivers/net/ieee802154/Kconfig                     |   18 +
+> drivers/net/ieee802154/Makefile                    |    1 +
+> drivers/net/ieee802154/ca8210.c                    | 3665 ++++++++++++++++++++
+> 6 files changed, 3722 insertions(+)
+> create mode 100644 Documentation/devicetree/bindings/net/ieee802154/ca8210.txt
+> create mode 100644 drivers/net/ieee802154/ca8210.c
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 5e925a2..cb3428f 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -2829,6 +2829,15 @@ W:	http://www.linux-c6x.org/wiki/index.php/Main_Page
- S:	Maintained
- F:	arch/c6x/
- 
-+CA8210 IEEE-802.15.4 RADIO DRIVER
-+M:	Harry Morris <h.morris@cascoda.com>
-+M:	linuxdev@cascoda.com
-+L:	linux-wpan@vger.kernel.org
-+W:	https://github.com/Cascoda/ca8210-linux.git
-+S:	Maintained
-+F:	drivers/net/ieee802154/ca8210.c
-+F:	Documentation/devicetree/bindings/net/ieee802154/ca8210.txt
-+
- CACHEFILES: FS-CACHE BACKEND FOR CACHING ON MOUNTED FILESYSTEMS
- M:	David Howells <dhowells@redhat.com>
- L:	linux-cachefs@redhat.com (moderated for non-subscribers)
--- 
-2.9.3.windows.1
+can you send a v5 and include me on CC. I am always missing the actual driver patch. I guess it is too large for the mailing list.
+
+Regards
+
+Marcel
 
