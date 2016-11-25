@@ -1,106 +1,35 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from proxima.lasnet.de ([78.47.171.185]:52083 "EHLO
-        proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1757314AbcK3ODl (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 30 Nov 2016 09:03:41 -0500
+Received: from ec2-52-27-115-49.us-west-2.compute.amazonaws.com ([52.27.115.49]:58671
+        "EHLO osg.samsung.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1751515AbcKYKDZ (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 25 Nov 2016 05:03:25 -0500
+Subject: Re: 802.15.4g Support (again)
+References: <CA+oDrvyoWaeDK_gcnRdK2cLb2vRiQ1dbaHb7u_0RggjBV2CqNw@mail.gmail.com>
 From: Stefan Schmidt <stefan@osg.samsung.com>
-Subject: [PATCH bluetooth-next 5/5] docs: ieee802154: update main documentation file
-Date: Wed, 30 Nov 2016 15:03:25 +0100
-Message-Id: <1480514605-30926-6-git-send-email-stefan@osg.samsung.com>
-In-Reply-To: <1480514605-30926-1-git-send-email-stefan@osg.samsung.com>
-References: <1480514605-30926-1-git-send-email-stefan@osg.samsung.com>
+Message-ID: <b1e4ebee-20f5-a781-7f28-edb10844945d@osg.samsung.com>
+Date: Fri, 25 Nov 2016 11:02:07 +0100
+MIME-Version: 1.0
+In-Reply-To: <CA+oDrvyoWaeDK_gcnRdK2cLb2vRiQ1dbaHb7u_0RggjBV2CqNw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: marcel@holtmann.org
-Cc: linux-wpan@vger.kernel.org, Alexander Aring <aar@pengutronix.de>, Stefan Schmidt <stefan@osg.samsung.com>
+To: Alan Egan <egan.alan.d@googlemail.com>, linux-wpan@vger.kernel.org
 
-This updates some out of date documentation and fixes some wrong assumptions as
-well as pure grammar fixes. This file needs to move towards the new kernel doc
-system and getting an overhaul during this work.
+Hello.
 
-Signed-off-by: Stefan Schmidt <stefan@osg.samsung.com>
----
- Documentation/networking/ieee802154.txt | 26 +++++++++++---------------
- 1 file changed, 11 insertions(+), 15 deletions(-)
+On 16/08/16 16:15, Alan Egan wrote:
+> Hi,
+>
+> Reading through the mailing list archive, I was wondering if any
+> progress had been made on the 802.15.4g support in the kernel? I'm in
+> a position where it would be really useful if it existed, so I'm more
+> than happy to have a crack at it myself (and it seems some aspects
+> have already been discussed and worked out). However, it looks like
+> there may already be someone working on it (though the last email
+> looks to be around end of March), and I don't want to duplicate work!
 
-diff --git a/Documentation/networking/ieee802154.txt b/Documentation/networking/ieee802154.txt
-index aa69ccc..c411434 100644
---- a/Documentation/networking/ieee802154.txt
-+++ b/Documentation/networking/ieee802154.txt
-@@ -4,20 +4,20 @@
- 
- Introduction
- ============
--The IEEE 802.15.4 working group focuses on standardization of bottom
--two layers: Medium Access Control (MAC) and Physical (PHY). And there
-+The IEEE 802.15.4 working group focuses on standardization of the bottom
-+two layers: Medium Access Control (MAC) and Physical access (PHY). And there
- are mainly two options available for upper layers:
-  - ZigBee - proprietary protocol from the ZigBee Alliance
-  - 6LoWPAN - IPv6 networking over low rate personal area networks
- 
--The linux-wpan project goal is to provide a complete implementation
-+The goal of the Linux-wpan is to provide a complete implementation
- of the IEEE 802.15.4 and 6LoWPAN protocols. IEEE 802.15.4 is a stack
- of protocols for organizing Low-Rate Wireless Personal Area Networks.
- 
- The stack is composed of three main parts:
-  - IEEE 802.15.4 layer;  We have chosen to use plain Berkeley socket API,
--   the generic Linux networking stack to transfer IEEE 802.15.4 messages
--   and a special protocol over genetlink for configuration/management
-+   the generic Linux networking stack to transfer IEEE 802.15.4 data
-+   messages and a special protocol over netlink for configuration/management
-  - MAC - provides access to shared channel and reliable data delivery
-  - PHY - represents device drivers
- 
-@@ -33,15 +33,13 @@ include/net/af_ieee802154.h header or in the special header
- in the userspace package (see either http://wpan.cakelab.org/ or the
- git tree at https://github.com/linux-wpan/wpan-tools).
- 
--One can use SOCK_RAW for passing raw data towards device xmit function. YMMV.
--
- 
- Kernel side
- =============
- 
- Like with WiFi, there are several types of devices implementing IEEE 802.15.4.
- 1) 'HardMAC'. The MAC layer is implemented in the device itself, the device
--   exports MLME and data API.
-+   exports a management (e.g. MLME) and data API.
- 2) 'SoftMAC' or just radio. These types of devices are just radio transceivers
-    possibly with some kinds of acceleration like automatic CRC computation and
-    comparation, automagic ACK handling, address matching, etc.
-@@ -106,7 +104,7 @@ Fake drivers
- 
- In addition there is a driver available which simulates a real device with
- SoftMAC (fakelb - IEEE 802.15.4 loopback driver) interface. This option
--provides possibility to test and debug stack without usage of real hardware.
-+provides a possibility to test and debug the stack without usage of real hardware.
- 
- See sources in drivers/net/ieee802154 folder for more details.
- 
-@@ -125,17 +123,15 @@ to support the IPv6 minimum MTU requirement [RFC2460], and stateless header
- compression for IPv6 datagrams (LOWPAN_HC1 and LOWPAN_HC2) to reduce the
- relatively large IPv6 and UDP headers down to (in the best case) several bytes.
- 
--In Semptember 2011 the standard update was published - [RFC6282].
-+In September 2011 the standard update was published - [RFC6282].
- It deprecates HC1 and HC2 compression and defines IPHC encoding format which is
- used in this Linux implementation.
- 
- All the code related to 6lowpan you may find in files: net/6lowpan/*
- and net/ieee802154/6lowpan/*
- 
--To setup 6lowpan interface you need (busybox release > 1.17.0):
--1. Add IEEE802.15.4 interface and initialize PANid;
-+To setup a 6LoWPAN interface you need:
-+1. Add IEEE802.15.4 interface and set channel and PAN ID;
- 2. Add 6lowpan interface by command like:
-    # ip link add link wpan0 name lowpan0 type lowpan
--3. Set MAC (if needs):
--   # ip link set lowpan0 address de:ad:be:ef:ca:fe:ba:be
--4. Bring up 'lowpan0' interface
-+3. Bring up 'lowpan0' interface
--- 
-2.5.5
+Did you have a go at this?
 
+regards
+Stefan Schmidt
