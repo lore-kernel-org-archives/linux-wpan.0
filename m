@@ -1,63 +1,68 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from proxima.lasnet.de ([78.47.171.185]:52061 "EHLO
+Received: from proxima.lasnet.de ([78.47.171.185]:52065 "EHLO
         proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753639AbcK3ODh (ORCPT
+        with ESMTP id S1750922AbcK3ODh (ORCPT
         <rfc822;linux-wpan@vger.kernel.org>); Wed, 30 Nov 2016 09:03:37 -0500
 From: Stefan Schmidt <stefan@osg.samsung.com>
-Subject: [GIT pull] pull request for wpan-next 2016-11-30
-Date: Wed, 30 Nov 2016 15:03:20 +0100
-Message-Id: <1480514605-30926-1-git-send-email-stefan@osg.samsung.com>
+Subject: [PATCH bluetooth-next 1/5] ieee802154: check device type
+Date: Wed, 30 Nov 2016 15:03:21 +0100
+Message-Id: <1480514605-30926-2-git-send-email-stefan@osg.samsung.com>
+In-Reply-To: <1480514605-30926-1-git-send-email-stefan@osg.samsung.com>
+References: <1480514605-30926-1-git-send-email-stefan@osg.samsung.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: marcel@holtmann.org
-Cc: linux-wpan@vger.kernel.org, Alexander Aring <aar@pengutronix.de>, Stefan Schmidt <stefan@osg.samsung.com>
+Cc: linux-wpan@vger.kernel.org, Alexander Aring <aar@pengutronix.de>, "vegard.nossum@oracle.com" <vegard.nossum@oracle.com>, Lennert Buytenhek <buytenh@wantstofly.org>, Alexander Aring <alex.aring@gmail.com>, Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>, Sergey Lapin <slapin@ossfans.org>, Stefan Schmidt <stefan@osg.samsung.com>
 
-Hello Marcel,
+From: "vegard.nossum@oracle.com" <vegard.nossum@oracle.com>
 
-find below a pull request for all pending patches we have sitting on the linux-wpan mailing list.
-I pulled them together to have a better chance to still get them into bluetooth-next and net-next
-before the merge window opens. If you have a problem taking them or are not planning to do another
-pull request towards net-next please let me know so I can try my luck with Dave directly. Missing
-the window for things that are on the list for a while would be a pity.
+I've observed a NULL pointer dereference in ieee802154_del_iface() during
+netlink fuzzing. It's the ->wpan_phy dereference here:
 
-The changes itself are non intrusive and sometimes even trivial. There is also no code touching
-bluetooth or the shared 6lowpan subsystems. We have a fix for a potential NULL deref in the
-ieee802154 netlink code, a fix for the ED values of the at86rf2xx driver, some doc update and the
-addition of myself as the co-maintainer for ieee802154 to help Alex.
+        phy = dev->ieee802154_ptr->wpan_phy;
 
-If you are uncomfortable to pull form the GitHub repo the patches are also coming as a re-posted
-patchset in reply to this pull request.
+My bet is that we're not checking that this is an IEEE802154 interface,
+so let's do what ieee802154_nl_get_dev() is doing. (Maybe we should even
+be calling this directly?)
 
-regards
-Stefan Schmidt
+Cc: Lennert Buytenhek <buytenh@wantstofly.org>
+Cc: Alexander Aring <alex.aring@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>
+Cc: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+Cc: Sergey Lapin <slapin@ossfans.org>
+Signed-off-by: Vegard Nossum <vegard.nossum@oracle.com>
+Acked-by: Alexander Aring <aar@pengutronix.de>
+Signed-off-by: Stefan Schmidt <stefan@osg.samsung.com>
+---
+ net/ieee802154/nl-phy.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-The following changes since commit 1ae6d00ad05730bca283dc09e7a9c162c2f22b01:
+diff --git a/net/ieee802154/nl-phy.c b/net/ieee802154/nl-phy.c
+index 77d7301..dc2960b 100644
+--- a/net/ieee802154/nl-phy.c
++++ b/net/ieee802154/nl-phy.c
+@@ -286,9 +286,12 @@ int ieee802154_del_iface(struct sk_buff *skb, struct genl_info *info)
+ 	if (name[nla_len(info->attrs[IEEE802154_ATTR_DEV_NAME]) - 1] != '\0')
+ 		return -EINVAL; /* name should be null-terminated */
+ 
++	rc = -ENODEV;
+ 	dev = dev_get_by_name(genl_info_net(info), name);
+ 	if (!dev)
+-		return -ENODEV;
++		return rc;
++	if (dev->type != ARPHRD_IEEE802154)
++		goto out;
+ 
+ 	phy = dev->ieee802154_ptr->wpan_phy;
+ 	BUG_ON(!phy);
+@@ -342,6 +345,7 @@ int ieee802154_del_iface(struct sk_buff *skb, struct genl_info *info)
+ 	nlmsg_free(msg);
+ out_dev:
+ 	wpan_phy_put(phy);
++out:
+ 	if (dev)
+ 		dev_put(dev);
+ 
+-- 
+2.5.5
 
-  Bluetooth: hci_qca: Use setup_timer Kernel API instead of init_timer (2016-11-27 07:41:05 +0100)
-
-are available in the git repository at:
-
-  https://github.com/linux-wpan/linux-wpan-next.git for-next
-
-for you to fetch changes up to 6bf0d84d13e968b4f8bf0710e0cae785e228dbba:
-
-  docs: ieee802154: update main documentation file (2016-11-30 12:33:07 +0100)
-
-----------------------------------------------------------------
-Alexander Aring (1):
-      at86rf230: fix cca ed values for rf233
-
-Stefan Schmidt (3):
-      ieee802154: add myself as co-maintainer to MAINTAINERS file
-      ieee802154: fakelb: print number of created fake devices during probe
-      docs: ieee802154: update main documentation file
-
-vegard.nossum@oracle.com (1):
-      ieee802154: check device type
-
- Documentation/networking/ieee802154.txt | 26 +++++++++++---------------
- MAINTAINERS                             |  1 +
- drivers/net/ieee802154/at86rf230.c      | 16 +++++++++++-----
- drivers/net/ieee802154/fakelb.c         |  2 +-
- net/ieee802154/nl-phy.c                 |  6 +++++-
- 5 files changed, 29 insertions(+), 22 deletions(-)
