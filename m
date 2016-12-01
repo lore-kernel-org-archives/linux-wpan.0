@@ -1,53 +1,41 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from ec2-52-27-115-49.us-west-2.compute.amazonaws.com ([52.27.115.49]:50877
-        "EHLO osg.samsung.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1753106AbcK3KXP (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 30 Nov 2016 05:23:15 -0500
-Subject: Re: Project Todo list updated
-References: <6e9208bd-cd35-bf0b-e55a-b06b0202c79a@osg.samsung.com>
- <d54f371e-ba02-71dc-6208-228560a51d00@pengutronix.de>
-From: Stefan Schmidt <stefan@osg.samsung.com>
-Message-ID: <c8b12a51-c756-6160-708f-942578403c39@osg.samsung.com>
-Date: Wed, 30 Nov 2016 11:23:11 +0100
+Received: from proxima.lasnet.de ([78.47.171.185]:53029 "EHLO
+        proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750946AbcLAVbr (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 1 Dec 2016 16:31:47 -0500
+Subject: Re: [PATCH iproute2] ip: update link types to show 6lowpan and
+ ieee802.15.4 monitor
+References: <1477647723-14641-1-git-send-email-stefan@datenfreihafen.org>
+From: Stefan Schmidt <stefan@datenfreihafen.org>
+Message-ID: <c088572b-2cab-c32e-76c9-4ffd02942db0@datenfreihafen.org>
+Date: Thu, 1 Dec 2016 22:31:41 +0100
 MIME-Version: 1.0
-In-Reply-To: <d54f371e-ba02-71dc-6208-228560a51d00@pengutronix.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <1477647723-14641-1-git-send-email-stefan@datenfreihafen.org>
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <aar@pengutronix.de>
-Cc: "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>
 
 Hello.
 
-On 30/11/16 10:19, Alexander Aring wrote:
->
->
-> During my thesis I think I found some stuff which I want to bring
-> mainline to the subsystems 802.15.4/6lowpan can deal with some parts.
->
-> Currently I have very hacked solutions for it, but I think I know what I
-> need to make it mainline acceptable. This is:
->
-> 1. 6lowpan netlink interface.
+On 28.10.2016 11:42, Stefan Schmidt wrote:
+> Both types have been missing here and thus ip always showed
+> only the numbers.
+> 
+> Based on a suggestion from Alexander Aring.
+> 
+> Signed-off-by: Stefan Schmidt <stefan@datenfreihafen.org>
 
-What do you mean here? A configuration interface for 6lowpan or 
-something else?
+Did you somehow mangle this patch manually?
 
->
-> 2. L2_PKTINFO for SOCK_RAW/SOCK_DGRAM IPv6 sockets
+Looking at the patch in your git repo it shows no author name but
+instead just my patch was send with git format-patch and git send-email
+as usual and shows the right author. Was there something worn on my side
+or yours? Just checking to avoid it in the future.
 
-Added to the todo list and marked it as being worked on by you.
-
-> 3. iptable 6lowpan stuff/which can also deal with some L2 infos. Really
->    weird mixing L3 and L2 info in rules. :-/ Currently it's hard coded
->    at my side.
-
-Added to the todo list and marked it as being worked on by you.
-
-> 4. node info dump
-
-Marked as being worked on by you.
+http://git.kernel.org/cgit/linux/kernel/git/shemminger/iproute2.git/commit/?id=8ae2c5382bd9d98a8f7ddcb1faad1a978d773909
 
 regards
 Stefan Schmidt
