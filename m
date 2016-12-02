@@ -1,41 +1,52 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from proxima.lasnet.de ([78.47.171.185]:53029 "EHLO
-        proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750946AbcLAVbr (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 1 Dec 2016 16:31:47 -0500
-Subject: Re: [PATCH iproute2] ip: update link types to show 6lowpan and
- ieee802.15.4 monitor
-References: <1477647723-14641-1-git-send-email-stefan@datenfreihafen.org>
-From: Stefan Schmidt <stefan@datenfreihafen.org>
-Message-ID: <c088572b-2cab-c32e-76c9-4ffd02942db0@datenfreihafen.org>
-Date: Thu, 1 Dec 2016 22:31:41 +0100
-MIME-Version: 1.0
-In-Reply-To: <1477647723-14641-1-git-send-email-stefan@datenfreihafen.org>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Received: from coyote.holtmann.net ([212.227.132.17]:43576 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751056AbcLBNyz (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 2 Dec 2016 08:54:55 -0500
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.1 \(3251\))
+Subject: Re: [GIT pull] pull request for wpan-next 2016-11-30
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1480514605-30926-1-git-send-email-stefan@osg.samsung.com>
+Date: Fri, 2 Dec 2016 14:54:52 +0100
+Content-Transfer-Encoding: 8BIT
+Message-Id: <A86C4DDF-1D93-4EAC-9686-F611B156846C@holtmann.org>
+References: <1480514605-30926-1-git-send-email-stefan@osg.samsung.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>
+To: Stefan Schmidt <stefan@osg.samsung.com>
+Cc: linux-wpan@vger.kernel.org, Alexander Aring <aar@pengutronix.de>
 
-Hello.
+Hi Stefan,
 
-On 28.10.2016 11:42, Stefan Schmidt wrote:
-> Both types have been missing here and thus ip always showed
-> only the numbers.
+> find below a pull request for all pending patches we have sitting on the linux-wpan mailing list.
+> I pulled them together to have a better chance to still get them into bluetooth-next and net-next
+> before the merge window opens. If you have a problem taking them or are not planning to do another
+> pull request towards net-next please let me know so I can try my luck with Dave directly. Missing
+> the window for things that are on the list for a while would be a pity.
 > 
-> Based on a suggestion from Alexander Aring.
+> The changes itself are non intrusive and sometimes even trivial. There is also no code touching
+> bluetooth or the shared 6lowpan subsystems. We have a fix for a potential NULL deref in the
+> ieee802154 netlink code, a fix for the ED values of the at86rf2xx driver, some doc update and the
+> addition of myself as the co-maintainer for ieee802154 to help Alex.
 > 
-> Signed-off-by: Stefan Schmidt <stefan@datenfreihafen.org>
+> If you are uncomfortable to pull form the GitHub repo the patches are also coming as a re-posted
+> patchset in reply to this pull request.
+> 
+> regards
+> Stefan Schmidt
+> 
+> The following changes since commit 1ae6d00ad05730bca283dc09e7a9c162c2f22b01:
+> 
+>  Bluetooth: hci_qca: Use setup_timer Kernel API instead of init_timer (2016-11-27 07:41:05 +0100)
+> 
+> are available in the git repository at:
+> 
+>  https://github.com/linux-wpan/linux-wpan-next.git for-next
 
-Did you somehow mangle this patch manually?
+changes have been pulled into bluetooth-next tree.
 
-Looking at the patch in your git repo it shows no author name but
-instead just my patch was send with git format-patch and git send-email
-as usual and shows the right author. Was there something worn on my side
-or yours? Just checking to avoid it in the future.
+Regards
 
-http://git.kernel.org/cgit/linux/kernel/git/shemminger/iproute2.git/commit/?id=8ae2c5382bd9d98a8f7ddcb1faad1a978d773909
+Marcel
 
-regards
-Stefan Schmidt
