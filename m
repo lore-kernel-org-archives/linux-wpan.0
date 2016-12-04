@@ -1,52 +1,59 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from coyote.holtmann.net ([212.227.132.17]:43576 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751056AbcLBNyz (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Fri, 2 Dec 2016 08:54:55 -0500
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.1 \(3251\))
-Subject: Re: [GIT pull] pull request for wpan-next 2016-11-30
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1480514605-30926-1-git-send-email-stefan@osg.samsung.com>
-Date: Fri, 2 Dec 2016 14:54:52 +0100
-Content-Transfer-Encoding: 8BIT
-Message-Id: <A86C4DDF-1D93-4EAC-9686-F611B156846C@holtmann.org>
-References: <1480514605-30926-1-git-send-email-stefan@osg.samsung.com>
+Received: from proxima.lasnet.de ([78.47.171.185]:54378 "EHLO
+        proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750697AbcLDLf0 (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Sun, 4 Dec 2016 06:35:26 -0500
+Received: from [IPv6:2003:48:92f:f35a:3252:cbff:fe54:190f] (p20030048092FF35A3252CBFFFE54190F.dip0.t-ipconnect.de [IPv6:2003:48:92f:f35a:3252:cbff:fe54:190f])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        (Authenticated sender: stefan@datenfreihafen.org)
+        by proxima.lasnet.de (Postfix) with ESMTPSA id 2C19AC51F5
+        for <linux-wpan@vger.kernel.org>; Sun,  4 Dec 2016 12:35:24 +0100 (CET)
+From: Stefan Schmidt <stefan@datenfreihafen.org>
+Subject: ATUSB firmware 0.3 release
+Message-ID: <df8743f2-d14d-b747-f8a2-704c664771f6@datenfreihafen.org>
+Date: Sun, 4 Dec 2016 12:35:23 +0100
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Stefan Schmidt <stefan@osg.samsung.com>
-Cc: linux-wpan@vger.kernel.org, Alexander Aring <aar@pengutronix.de>
+To: "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>
 
-Hi Stefan,
+Hello.
 
-> find below a pull request for all pending patches we have sitting on the linux-wpan mailing list.
-> I pulled them together to have a better chance to still get them into bluetooth-next and net-next
-> before the merge window opens. If you have a problem taking them or are not planning to do another
-> pull request towards net-next please let me know so I can try my luck with Dave directly. Missing
-> the window for things that are on the list for a while would be a pity.
-> 
-> The changes itself are non intrusive and sometimes even trivial. There is also no code touching
-> bluetooth or the shared 6lowpan subsystems. We have a fix for a potential NULL deref in the
-> ieee802154 netlink code, a fix for the ED values of the at86rf2xx driver, some doc update and the
-> addition of myself as the co-maintainer for ieee802154 to help Alex.
-> 
-> If you are uncomfortable to pull form the GitHub repo the patches are also coming as a re-posted
-> patchset in reply to this pull request.
-> 
-> regards
-> Stefan Schmidt
-> 
-> The following changes since commit 1ae6d00ad05730bca283dc09e7a9c162c2f22b01:
-> 
->  Bluetooth: hci_qca: Use setup_timer Kernel API instead of init_timer (2016-11-27 07:41:05 +0100)
-> 
-> are available in the git repository at:
-> 
->  https://github.com/linux-wpan/linux-wpan-next.git for-next
+Since the initial 0.2 firmware release for the ATUSB devices almost 18
+months have been gone by. The firmware and the Kernel driver have been
+working well together so far, but there is always room for improvement.
+The work towards a new firmware release has been going slowly but we
+finally made it.
 
-changes have been pulled into bluetooth-next tree.
+Changelog
+* ATUSB_EUI64_READ/WRITE for permanent EUI64 handling
+* Support to run the firmware on Atmel Raven USB dongles (Alexander Aring)
+* Remove FCS frame check from firmware and leave it to the driver
+* Use extended operation mode for TX for automatic ACK handling
 
-Regards
+You can find the atusb as well as the newly rzusb firmware files
+together with their sha256 checksum here:
 
-Marcel
+http://downloads.qi-hardware.com/people/werner/wpan/web/atusb-0.3.dfu
+d9333788b0eefad3f7796fccea119fe211d5540baa7da82e35406f6b35334417
 
+http://downloads.qi-hardware.com/people/werner/wpan/web/rzusb-0.3.bin
+d642eeb96ac91233960f87936864a25ee0b0e80a88d47e838cf1e15bdb02e7cd
+
+Patches to enable some of the new functionality in the Kernel driver are
+already done and I will post them this week.
+
+If you want to get an official EUI64 permanent address for your own
+ATSUB please contact me with the serial number of your device (printed
+out during driver probe in dmesg) and I will assign you one. All new
+devices will have an EUI64 placed into EEPROM already before shipping.
+
+A note about flashing the rzusb firmware. You need a working JTAG setup
+for this. There is no bootloader on the Raven dongles that would accept
+the firmware over USB.
+
+regards
+Stefan Schmidt
