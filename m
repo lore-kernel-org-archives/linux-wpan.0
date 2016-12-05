@@ -1,72 +1,48 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from ec2-52-27-115-49.us-west-2.compute.amazonaws.com ([52.27.115.49]:39006
-        "EHLO osg.samsung.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S966463AbcLWKqj (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Fri, 23 Dec 2016 05:46:39 -0500
-Subject: Re: [PATCH wpan-tools v2] wpan-ping: Add the filtering function for
- frame receiving
-References: <1482299344-4128-1-git-send-email-wsn.iot.xwq@cn.fujitsu.com>
+Received: from proxima.lasnet.de ([78.47.171.185]:55097 "EHLO
+        proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751080AbcLENzC (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 5 Dec 2016 08:55:02 -0500
 From: Stefan Schmidt <stefan@osg.samsung.com>
-Message-ID: <a44d82e0-9309-7939-9538-6eb7f291681c@osg.samsung.com>
-Date: Fri, 23 Dec 2016 11:46:34 +0100
-MIME-Version: 1.0
-In-Reply-To: <1482299344-4128-1-git-send-email-wsn.iot.xwq@cn.fujitsu.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
+Subject: [PATCH bluetooth-next 0/4] ieee802154: atusb: drivers updates for v0.3 firmware
+Date: Mon,  5 Dec 2016 14:47:16 +0100
+Message-Id: <1480945640-3571-1-git-send-email-stefan@osg.samsung.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: wsn.iot.xwq@cn.fujitsu.com, linux-wpan@vger.kernel.org
-Cc: aar@pengutronix.de
+To: linux-wpan@vger.kernel.org
+Cc: Alexander Aring <aar@pengutronix.de>, Stefan Schmidt <stefan@osg.samsung.com>
 
 Hello.
 
-On 21/12/16 06:49, wsn.iot.xwq@cn.fujitsu.com wrote:
-> From: Xue Wenqian <wsn.iot.xwq@cn.fujitsu.com>
->
-> The filtering for wpan-ping client and server is made by checking frame header.
->
-> Signed-off-by: Xue Wenqian <wsn.iot.xwq@cn.fujitsu.com>
-> ---
->  wpan-ping/wpan-ping.c |   16 +++++++++++-----
->  1 file changed, 11 insertions(+), 5 deletions(-)
->
-> diff --git a/wpan-ping/wpan-ping.c b/wpan-ping/wpan-ping.c
-> index e6df2b4..f825b22 100644
-> --- a/wpan-ping/wpan-ping.c
-> +++ b/wpan-ping/wpan-ping.c
-> @@ -303,6 +303,10 @@ static int measure_roundtrip(struct config *conf, int sd) {
->  		}
->  		gettimeofday(&start_time, NULL);
->  		ret = recv(sd, buf, conf->packet_len, 0);
-> +		if (buf[0] != NOT_A_6LOWPAN_FRAME) {
-> +			printf("Non-wpanping packet was received\n");
-> +			continue;
-> +		}
->  		if (seq_num != ((buf[2] << 8)| buf[3])) {
->  			printf("Sequenze number did not match\n");
->  			continue;
-> @@ -386,11 +390,13 @@ static void init_server(int sd) {
->  #if DEBUG
->  		dump_packet(buf, len);
->  #endif
-> -		/* Send same packet back */
-> -		len = sendto(sd, buf, len, 0, (struct sockaddr *)&src, addrlen);
-> -		if (len < 0) {
-> -			perror("sendto");
-> -			continue;
-> +		if (buf[0] == NOT_A_6LOWPAN_FRAME) {
-> +			/* Send same packet back */
-> +			len = sendto(sd, buf, len, 0, (struct sockaddr *)&src, addrlen);
-> +			if (len < 0) {
-> +				perror("sendto");
-> +				continue;
-> +			}
->  		}
->  	}
->  	free(buf);
->
+With the version 0.3 for the ATUSB firmware finally out of the door here are the
+corresponding kernel driver patches to make use of the new functionality.
 
-Applied and pushed. Thanks!
+While the first to patches are just preparation the last two are useful enhancements. An permanent
+EUI64 address can now be hold in the EEPROM of the ATUSB dongle to survive reboots and allowing a
+unique identification and no need to mess around with generated addresses after each device probe.
+
+All new ATUSB dongles will have a address set in EEPROM already, for devices that are out in the
+wild already you would have to ask me to assign you an official one if you want it. Feel free to do
+so. :)
+
+The last one allows to set the maximal fram reties values now that we support the needed states
+inside the firmware. This finishes the hardware assisted ACK handling on the TX site. RX side was
+working for a long time already.
+
+Stefan Schmidt (4):
+  ieee802154: atusb: sync header file from firmware for new features
+  ieee802154: atusb: store firmware version after retrieval for later
+    use
+  ieee802154: atusb: try to read permanent extended address from device
+  ieee802154: atusb: implement .set_frame_retries ops callback
+
+ drivers/net/ieee802154/atusb.c | 79 ++++++++++++++++++++++++++++++++++++++----
+ drivers/net/ieee802154/atusb.h | 11 ++++--
+ 2 files changed, 80 insertions(+), 10 deletions(-)
 
 regards
 Stefan Schmidt
+
+-- 
+2.5.5
+
