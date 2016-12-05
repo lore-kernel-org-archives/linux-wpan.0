@@ -1,12 +1,12 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from proxima.lasnet.de ([78.47.171.185]:55098 "EHLO
+Received: from proxima.lasnet.de ([78.47.171.185]:55094 "EHLO
         proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751635AbcLENzC (ORCPT
+        with ESMTP id S1751223AbcLENzC (ORCPT
         <rfc822;linux-wpan@vger.kernel.org>); Mon, 5 Dec 2016 08:55:02 -0500
 From: Stefan Schmidt <stefan@osg.samsung.com>
-Subject: [PATCH bluetooth-next 2/4] ieee802154: atusb: store firmware version after retrieval for later use
-Date: Mon,  5 Dec 2016 14:47:18 +0100
-Message-Id: <1480945640-3571-3-git-send-email-stefan@osg.samsung.com>
+Subject: [PATCH bluetooth-next 3/4] ieee802154: atusb: try to read permanent extended address from device
+Date: Mon,  5 Dec 2016 14:47:19 +0100
+Message-Id: <1480945640-3571-4-git-send-email-stefan@osg.samsung.com>
 In-Reply-To: <1480945640-3571-1-git-send-email-stefan@osg.samsung.com>
 References: <1480945640-3571-1-git-send-email-stefan@osg.samsung.com>
 Sender: linux-wpan-owner@vger.kernel.org
@@ -14,56 +14,80 @@ List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
 Cc: Alexander Aring <aar@pengutronix.de>, Stefan Schmidt <stefan@osg.samsung.com>
 
-The firmware versions will be used to enable selective features based on the
-available firmware on the device. Make sure we do not need to fetch it for
-every check but store it after the initial retrieval.
+With version 0.3 the atusb firmware offers an interface to read a permanent
+EUI64 address from the devices EEPROM. This patch checks if the firmware is
+new enough and tries to read out and use the address. If this does not work
+we fall back to the original randomly generated address.
 
 Signed-off-by: Stefan Schmidt <stefan@osg.samsung.com>
 ---
- drivers/net/ieee802154/atusb.c | 20 +++++++++++++++-----
- 1 file changed, 15 insertions(+), 5 deletions(-)
+ drivers/net/ieee802154/atusb.c | 40 +++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 39 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/net/ieee802154/atusb.c b/drivers/net/ieee802154/atusb.c
-index 322864a..9fdea64 100644
+index 9fdea64..3ed34cc 100644
 --- a/drivers/net/ieee802154/atusb.c
 +++ b/drivers/net/ieee802154/atusb.c
-@@ -58,6 +58,11 @@ struct atusb {
- 	struct urb *tx_urb;
- 	struct sk_buff *tx_skb;
- 	uint8_t tx_ack_seq;		/* current TX ACK sequence number */
-+
-+	/* Firmware variable */
-+	unsigned char fw_ver_maj;	/* Firmware major version number */
-+	unsigned char fw_ver_min;	/* Firmware minor version number */
-+	unsigned char fw_hw_type;	/* Firmware hardware type */
- };
+@@ -679,6 +679,43 @@ static int atusb_get_and_show_chip(struct atusb *atusb)
+ 	return -ENODEV;
+ }
  
- /* ----- USB commands without data ----------------------------------------- */
-@@ -594,14 +599,19 @@ static int atusb_get_and_show_revision(struct atusb *atusb)
- 	ret = atusb_control_msg(atusb, usb_rcvctrlpipe(usb_dev, 0),
- 				ATUSB_ID, ATUSB_REQ_FROM_DEV, 0, 0,
- 				buffer, 3, 1000);
--	if (ret >= 0)
-+	if (ret >= 0) {
-+		atusb->fw_ver_maj = buffer[0];
-+		atusb->fw_ver_min = buffer[1];
-+		atusb->fw_hw_type = buffer[2];
++static int atusb_set_extended_addr(struct atusb *atusb)
++{
++	struct usb_device *usb_dev = atusb->usb_dev;
++	unsigned char buffer[IEEE802154_EXTENDED_ADDR_LEN];
++	__le64 extended_addr;
++	u64 addr;
++	int ret;
 +
- 		dev_info(&usb_dev->dev,
- 			 "Firmware: major: %u, minor: %u, hardware type: %u\n",
--			 buffer[0], buffer[1], buffer[2]);
--	if (buffer[0] == 0 && buffer[1] < 2) {
-+			 atusb->fw_ver_maj, atusb->fw_ver_min, atusb->fw_hw_type);
++	/* Firmware versions before 0.3 do not support the EUI64_READ command.
++	 * Just use a random address and be done */
++	if (atusb->fw_ver_maj == 0 && atusb->fw_ver_min < 3) {
++		ieee802154_random_extended_addr(&atusb->hw->phy->perm_extended_addr);
++		return 0;
 +	}
-+	if (atusb->fw_ver_maj == 0 && atusb->fw_ver_min < 2) {
- 		dev_info(&usb_dev->dev,
--			 "Firmware version (%u.%u) is predates our first public release.",
--			 buffer[0], buffer[1]);
-+			 "Firmware version (%u.%u) predates our first public release.",
-+			 atusb->fw_ver_maj, atusb->fw_ver_min);
- 		dev_info(&usb_dev->dev, "Please update to version 0.2 or newer");
- 	}
++
++	/* Firmware is new enough so we fetch the address from EEPROM */
++	ret = atusb_control_msg(atusb, usb_rcvctrlpipe(usb_dev, 0),
++				ATUSB_EUI64_READ, ATUSB_REQ_FROM_DEV, 0, 0,
++				buffer, IEEE802154_EXTENDED_ADDR_LEN, 1000);
++	if (ret < 0)
++		dev_err(&usb_dev->dev, "failed to fetch extended address\n");
++
++	memcpy(&extended_addr, buffer, IEEE802154_EXTENDED_ADDR_LEN);
++	/* Check if read address is not empty and the unicast bit is set correctly */
++	if (!ieee802154_is_valid_extended_unicast_addr(extended_addr)) {
++		dev_info(&usb_dev->dev, "no permanent extended address found, random address set\n");
++		ieee802154_random_extended_addr(&atusb->hw->phy->perm_extended_addr);
++	} else {
++		atusb->hw->phy->perm_extended_addr = extended_addr;
++		addr = swab64((__force u64)atusb->hw->phy->perm_extended_addr);
++		dev_info(&usb_dev->dev, "Read permanent extended address %8phC from device\n",
++			&addr);
++	}
++
++	return ret;
++}
++
+ /* ----- Setup ------------------------------------------------------------- */
  
+ static int atusb_probe(struct usb_interface *interface,
+@@ -738,13 +775,14 @@ static int atusb_probe(struct usb_interface *interface,
+ 	hw->phy->supported.tx_powers = atusb_powers;
+ 	hw->phy->supported.tx_powers_size = ARRAY_SIZE(atusb_powers);
+ 	hw->phy->transmit_power = hw->phy->supported.tx_powers[0];
+-	ieee802154_random_extended_addr(&hw->phy->perm_extended_addr);
+ 	hw->phy->cca_ed_level = hw->phy->supported.cca_ed_levels[7];
+ 
+ 	atusb_command(atusb, ATUSB_RF_RESET, 0);
+ 	atusb_get_and_show_chip(atusb);
+ 	atusb_get_and_show_revision(atusb);
+ 	atusb_get_and_show_build(atusb);
++	atusb_set_extended_addr(atusb);
++
+ 	ret = atusb_get_and_clear_error(atusb);
+ 	if (ret) {
+ 		dev_err(&atusb->usb_dev->dev,
 -- 
 2.5.5
 
