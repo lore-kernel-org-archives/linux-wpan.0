@@ -1,49 +1,53 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wm0-f65.google.com ([74.125.82.65]:33473 "EHLO
-        mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753112AbcLFPsK (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 6 Dec 2016 10:48:10 -0500
-Received: by mail-wm0-f65.google.com with SMTP id u144so22207964wmu.0
-        for <linux-wpan@vger.kernel.org>; Tue, 06 Dec 2016 07:48:10 -0800 (PST)
-From: harrymorris12@gmail.com
-Subject: [PATCH v6 3/3] ieee802154: Add entry in MAINTAINTERS for CA8210 driver
-Date: Tue,  6 Dec 2016 15:47:40 +0000
-Message-Id: <20161206154740.2992-4-h.morris@cascoda.com>
-In-Reply-To: <20161206154740.2992-1-h.morris@cascoda.com>
+Received: from ec2-52-27-115-49.us-west-2.compute.amazonaws.com ([52.27.115.49]:52460
+        "EHLO osg.samsung.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1751590AbcLFVZt (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 6 Dec 2016 16:25:49 -0500
+Subject: Re: [PATCH v6 1/3] ieee802154: Add CA8210 IEEE 802.15.4 device driver
 References: <20161206154740.2992-1-h.morris@cascoda.com>
+ <20161206154740.2992-2-h.morris@cascoda.com>
+From: Stefan Schmidt <stefan@osg.samsung.com>
+Message-ID: <84426f94-8bb6-06d7-c166-b97929afc0ee@osg.samsung.com>
+Date: Tue, 6 Dec 2016 22:25:44 +0100
+MIME-Version: 1.0
+In-Reply-To: <20161206154740.2992-2-h.morris@cascoda.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org
-Cc: aar@pengutronix.de, stefan@osg.samsung.com, marcel@holtmann.org, Harry Morris <h.morris@cascoda.com>
+To: harrymorris12@gmail.com, linux-wpan@vger.kernel.org
+Cc: aar@pengutronix.de, marcel@holtmann.org, Harry Morris <h.morris@cascoda.com>
 
-From: Harry Morris <h.morris@cascoda.com>
+Hello.
 
-Signed-off-by: Harry Morris <h.morris@cascoda.com>
+First of all thanks for going and fixing almost all of the checkpatch 
+warnings. The rest seems ok to stay as is.
+I would expect you made sure that the case where a msleep() could take 
+up to 20ms in cases it is < 20ms are no problems in your driver.
+
+On 06/12/16 16:47, harrymorris12@gmail.com wrote:
+> From: Harry Morris <h.morris@cascoda.com>
+>
+> Add driver source and config for softMAC implementation of Cascoda's CA8210
+> IEEE 802.15.4 transceiver device. The driver mimics a common PHY-only
+> implementation despite the CA8210 being a hardMAC device which exposes a SAP
+> interface to the fully integrated MAC.
+>
+> The chip is a modem-only device with an integrated processor which runs the
+> 802.15.4 MAC. The chip communicates via full-duplex SPI with additional pins
+> for NIRQ and NRESET. The chip can also output its 16MHz clock to a GPIO with a
+> configurable divider.
+>
+> The driver can be configured to implement a debugfs node that provides access
+> to the SAP-based API to drive mechanisms not currently supported by the
+> standard kernel interface.
+>
+> Signed-off-by: Harry Morris <h.morris@cascoda.com>
+
+ From what I can see all my review comments have been addressed over 
+this 7 iterations. Thanks. :-)
+
 Acked-by: Stefan Schmidt <stefan@osg.samsung.com>
----
- MAINTAINERS | 9 +++++++++
- 1 file changed, 9 insertions(+)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 5e925a2..cb3428f 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -2829,6 +2829,15 @@ W:	http://www.linux-c6x.org/wiki/index.php/Main_Page
- S:	Maintained
- F:	arch/c6x/
- 
-+CA8210 IEEE-802.15.4 RADIO DRIVER
-+M:	Harry Morris <h.morris@cascoda.com>
-+M:	linuxdev@cascoda.com
-+L:	linux-wpan@vger.kernel.org
-+W:	https://github.com/Cascoda/ca8210-linux.git
-+S:	Maintained
-+F:	drivers/net/ieee802154/ca8210.c
-+F:	Documentation/devicetree/bindings/net/ieee802154/ca8210.txt
-+
- CACHEFILES: FS-CACHE BACKEND FOR CACHING ON MOUNTED FILESYSTEMS
- M:	David Howells <dhowells@redhat.com>
- L:	linux-cachefs@redhat.com (moderated for non-subscribers)
--- 
-2.9.3.windows.1
-
+regards
+Stefan Schmidt
