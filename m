@@ -1,54 +1,54 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from coyote.holtmann.net ([212.227.132.17]:54645 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751243AbcLHHFD (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 8 Dec 2016 02:05:03 -0500
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.1 \(3251\))
-Subject: Re: [PATCH bluetooth-next 0/4] ieee802154: atusb: drivers updates for
- v0.3 firmware
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1480945640-3571-1-git-send-email-stefan@osg.samsung.com>
-Date: Thu, 8 Dec 2016 08:05:02 +0100
-Content-Transfer-Encoding: 8BIT
-Message-Id: <5025FE69-CB84-44EE-9AB0-DC81F88FED9F@holtmann.org>
-References: <1480945640-3571-1-git-send-email-stefan@osg.samsung.com>
+Received: from mail-wm0-f68.google.com ([74.125.82.68]:36753 "EHLO
+        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751492AbcLFPsH (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 6 Dec 2016 10:48:07 -0500
+Received: by mail-wm0-f68.google.com with SMTP id m203so22236884wma.3
+        for <linux-wpan@vger.kernel.org>; Tue, 06 Dec 2016 07:48:07 -0800 (PST)
+From: harrymorris12@gmail.com
+Subject: [PATCH v6 0/3] ieee802154: Add support for Cascoda CA8210
+Date: Tue,  6 Dec 2016 15:47:37 +0000
+Message-Id: <20161206154740.2992-1-h.morris@cascoda.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Stefan Schmidt <stefan@osg.samsung.com>
-Cc: linux-wpan@vger.kernel.org, Alexander Aring <aar@pengutronix.de>
+To: linux-wpan@vger.kernel.org
+Cc: aar@pengutronix.de, stefan@osg.samsung.com, marcel@holtmann.org, Harry Morris <h.morris@cascoda.com>
 
-Hi Stefan,
+From: Harry Morris <h.morris@cascoda.com>
 
-> With the version 0.3 for the ATUSB firmware finally out of the door here are the
-> corresponding kernel driver patches to make use of the new functionality.
-> 
-> While the first to patches are just preparation the last two are useful enhancements. An permanent
-> EUI64 address can now be hold in the EEPROM of the ATUSB dongle to survive reboots and allowing a
-> unique identification and no need to mess around with generated addresses after each device probe.
-> 
-> All new ATUSB dongles will have a address set in EEPROM already, for devices that are out in the
-> wild already you would have to ask me to assign you an official one if you want it. Feel free to do
-> so. :)
-> 
-> The last one allows to set the maximal fram reties values now that we support the needed states
-> inside the firmware. This finishes the hardware assisted ACK handling on the TX site. RX side was
-> working for a long time already.
-> 
-> Stefan Schmidt (4):
->  ieee802154: atusb: sync header file from firmware for new features
->  ieee802154: atusb: store firmware version after retrieval for later
->    use
->  ieee802154: atusb: try to read permanent extended address from device
->  ieee802154: atusb: implement .set_frame_retries ops callback
-> 
-> drivers/net/ieee802154/atusb.c | 79 ++++++++++++++++++++++++++++++++++++++----
-> drivers/net/ieee802154/atusb.h | 11 ++++--
-> 2 files changed, 80 insertions(+), 10 deletions(-)
+This patchset adds a new device driver, documentation and build support for
+Cascoda's CA8210 IEEE 802.15.4 radio transceiver:
+http://www.cascoda.com/products/ca-821x/
 
-all 4 patches have been applied to bluetooth-next tree.
+v6:
+Kernel style conformance changes
+Additional documentation
+More meaningful register structs/macros
+Removal of old TODOs
+Removal of unnecessary macros
+Check for safe removal of test interface
 
-Regards
+v5:
++Cc: Marcel Holtmann
 
-Marcel
+v4:
+Added allowable tx_powers and cca_ed_levels
+Changed power units to mbm (tx_power & cca_ed_level)
 
+Harry Morris (3):
+  ieee802154: Add CA8210 IEEE 802.15.4 device driver
+  ieee802154: Add device tree documentation for CA8210
+  ieee802154: Add entry in MAINTAINTERS for CA8210 driver
+
+ .../devicetree/bindings/net/ieee802154/ca8210.txt  |   28 +
+ .../devicetree/bindings/vendor-prefixes.txt        |    1 +
+ MAINTAINERS                                        |    9 +
+ drivers/net/ieee802154/Kconfig                     |   21 +
+ drivers/net/ieee802154/Makefile                    |    1 +
+ drivers/net/ieee802154/ca8210.c                    | 3719 ++++++++++++++++++++
+ 6 files changed, 3779 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/net/ieee802154/ca8210.txt
+ create mode 100644 drivers/net/ieee802154/ca8210.c
+
+--
+2.9.3.windows.1
