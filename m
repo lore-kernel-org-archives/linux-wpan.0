@@ -1,69 +1,51 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from cs43706557.123-cloud-server.co.uk ([91.109.11.113]:56359 "EHLO
-        cascoda.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752117AbcLGMAW (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-        Wed, 7 Dec 2016 07:00:22 -0500
-Reply-To: h.morris@cascoda.com
-Subject: Re: [PATCH v6 1/3] ieee802154: Add CA8210 IEEE 802.15.4 device driver
+Received: from coyote.holtmann.net ([212.227.132.17]:43250 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750827AbcLHGj1 (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 8 Dec 2016 01:39:27 -0500
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.1 \(3251\))
+Subject: Re: [PATCH v6 0/3] ieee802154: Add support for Cascoda CA8210
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20161206154740.2992-1-h.morris@cascoda.com>
+Date: Thu, 8 Dec 2016 07:39:24 +0100
+Content-Transfer-Encoding: 8BIT
+Message-Id: <EE6B2599-12C7-4B55-AFA5-E88C6BF8A942@holtmann.org>
 References: <20161206154740.2992-1-h.morris@cascoda.com>
- <20161206154740.2992-2-h.morris@cascoda.com>
- <84426f94-8bb6-06d7-c166-b97929afc0ee@osg.samsung.com>
-From: Harry Morris <h.morris@cascoda.com>
-Message-ID: <74e35a5a-1707-f186-644d-a020b57c185f@cascoda.com>
-Date: Wed, 7 Dec 2016 12:00:06 +0000
-MIME-Version: 1.0
-In-Reply-To: <84426f94-8bb6-06d7-c166-b97929afc0ee@osg.samsung.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Stefan Schmidt <stefan@osg.samsung.com>, linux-wpan@vger.kernel.org
-Cc: harrymorris12@gmail.com, aar@pengutronix.de, marcel@holtmann.org
+To: harrymorris12@gmail.com
+Cc: linux-wpan@vger.kernel.org, Alexander Aring <aar@pengutronix.de>, Stefan Schmidt <stefan@osg.samsung.com>, Harry Morris <h.morris@cascoda.com>
 
-Hi Stefan,
+Hi Harry,
 
-On 06/12/2016 21:25, Stefan Schmidt wrote:
-> Hello.
->
-> First of all thanks for going and fixing almost all of the checkpatch 
-> warnings. The rest seems ok to stay as is.
-> I would expect you made sure that the case where a msleep() could take 
-> up to 20ms in cases it is < 20ms are no problems in your driver.
+> This patchset adds a new device driver, documentation and build support for
+> Cascoda's CA8210 IEEE 802.15.4 radio transceiver:
+> http://www.cascoda.com/products/ca-821x/
+> 
+> v6:
+> Kernel style conformance changes
+> Additional documentation
+> More meaningful register structs/macros
+> Removal of old TODOs
+> Removal of unnecessary macros
+> Check for safe removal of test interface
+> 
+> v5:
+> +Cc: Marcel Holtmann
+> 
+> v4:
+> Added allowable tx_powers and cca_ed_levels
+> Changed power units to mbm (tx_power & cca_ed_level)
+> 
+> Harry Morris (3):
+>  ieee802154: Add CA8210 IEEE 802.15.4 device driver
+>  ieee802154: Add device tree documentation for CA8210
+>  ieee802154: Add entry in MAINTAINTERS for CA8210 driver
 
-Great, and yes those 1ms msleeps are all a part of "Some condition isn't 
-fulfilled yet so wait for <some time> and check again", so if it's a bit 
-longer it's totally fine.
+so I am missing PATCH 1/3 again. How large is it? You need to put me on CC if it does not go via vger.kernel.org.
 
->
-> On 06/12/16 16:47, harrymorris12@gmail.com wrote:
->> From: Harry Morris <h.morris@cascoda.com>
->>
->> Add driver source and config for softMAC implementation of Cascoda's 
->> CA8210
->> IEEE 802.15.4 transceiver device. The driver mimics a common PHY-only
->> implementation despite the CA8210 being a hardMAC device which 
->> exposes a SAP
->> interface to the fully integrated MAC.
->>
->> The chip is a modem-only device with an integrated processor which 
->> runs the
->> 802.15.4 MAC. The chip communicates via full-duplex SPI with 
->> additional pins
->> for NIRQ and NRESET. The chip can also output its 16MHz clock to a 
->> GPIO with a
->> configurable divider.
->>
->> The driver can be configured to implement a debugfs node that 
->> provides access
->> to the SAP-based API to drive mechanisms not currently supported by the
->> standard kernel interface.
->>
->> Signed-off-by: Harry Morris <h.morris@cascoda.com>
->
-> From what I can see all my review comments have been addressed over 
-> this 7 iterations. Thanks. :-)
+Regards
 
-No worries,
+Marcel
 
-Regards,
-Harry
