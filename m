@@ -1,8 +1,8 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from ec2-52-27-115-49.us-west-2.compute.amazonaws.com ([52.27.115.49]:39482
+Received: from ec2-52-27-115-49.us-west-2.compute.amazonaws.com ([52.27.115.49]:40254
         "EHLO osg.samsung.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S932449AbcLIImu (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Fri, 9 Dec 2016 03:42:50 -0500
+        with ESMTP id S932393AbcLILwt (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 9 Dec 2016 06:52:49 -0500
 Subject: Re: [PATCH v6 0/3] ieee802154: Add support for Cascoda CA8210
 References: <20161206154740.2992-1-h.morris@cascoda.com>
  <EE6B2599-12C7-4B55-AFA5-E88C6BF8A942@holtmann.org>
@@ -13,8 +13,8 @@ References: <20161206154740.2992-1-h.morris@cascoda.com>
  <54150f82-d69c-4baa-2a4b-56e094f89013@osg.samsung.com>
  <C365DB7F-B34C-465C-ABCD-FC05F2DAB8E2@holtmann.org>
 From: Stefan Schmidt <stefan@osg.samsung.com>
-Message-ID: <751c9697-5e9d-f2db-2dfb-8c6573d75746@osg.samsung.com>
-Date: Fri, 9 Dec 2016 09:42:44 +0100
+Message-ID: <1367c7d0-5495-02e3-4687-fc8788709184@osg.samsung.com>
+Date: Fri, 9 Dec 2016 12:52:43 +0100
 MIME-Version: 1.0
 In-Reply-To: <C365DB7F-B34C-465C-ABCD-FC05F2DAB8E2@holtmann.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
@@ -96,6 +96,11 @@ On 09/12/16 09:22, Marcel Holtmann wrote:
 > drivers/net/ieee802154/ca8210.c:2878:50: warning: format ‘%d’ expects argument of type ‘int’, but argument 3 has type ‘size_t {aka long unsigned int}’ [-Wformat=]
 >     "userspace requested erroneously long write (%d)\n",
 >                                                   ^
+
+The one above I was able to reproduce when compiling for a 64 bit build 
+(added a x86_64 minnow board build now to my script)
+
+
 > drivers/net/ieee802154/ca8210.c: In function ‘ca8210_register_ext_clock’:
 > drivers/net/ieee802154/ca8210.c:3159:14: error: implicit declaration of function ‘clk_register_fixed_rate’ [-Werror=implicit-function-declaratio]
 >   priv->clk = clk_register_fixed_rate(
@@ -124,13 +129,31 @@ On 09/12/16 09:22, Marcel Holtmann wrote:
 >  static void ca8210_unregister_ext_clock(struct spi_device *spi)
 >              ^~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+None of these showed up here. A #include <linux/clk-provider.h> should 
+fix those imho.
 
-Grr, this should not happen when I send you things. Sorry. One step back.
+Running a make C=1 on the driver does reveal some other small things as 
+well:
 
-Harry, please fix this warnings and errors.
+   CHECK   drivers/net/ieee802154/ca8210.c
+drivers/net/ieee802154/ca8210.c:2235:42: warning: missing braces around 
+initializer
+drivers/net/ieee802154/ca8210.c:2884:39: warning: incorrect type in 
+argument 2 (different address spaces)
+drivers/net/ieee802154/ca8210.c:2884:39:    expected void const 
+[noderef] <asn:1>*from
+drivers/net/ieee802154/ca8210.c:2884:39:    got char const *in_buf
+drivers/net/ieee802154/ca8210.c:3041:27: warning: incorrect type in 
+initializer (incompatible argument 2 (different address spaces))
+drivers/net/ieee802154/ca8210.c:3041:27:    expected long ( *write )( ... )
+drivers/net/ieee802154/ca8210.c:3041:27:    got long ( static [toplevel] 
+*<noident> )( ... )
+drivers/net/ieee802154/ca8210.c:2980:17: warning: dereference of noderef 
+expression
+   CC [M]  drivers/net/ieee802154/ca8210.o
 
-And I will have to see why I did not see them and improve my build tests 
-here to spot them next time.
+Harry, please have a look.
 
 regards
 Stefan Schmidt
+
