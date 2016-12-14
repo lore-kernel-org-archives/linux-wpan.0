@@ -1,94 +1,39 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:44757 "EHLO
-        metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1752956AbcLLNzt (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>);
-        Mon, 12 Dec 2016 08:55:49 -0500
-Subject: Re: Project Todo list updated
-References: <6e9208bd-cd35-bf0b-e55a-b06b0202c79a@osg.samsung.com>
- <d54f371e-ba02-71dc-6208-228560a51d00@pengutronix.de>
- <c8b12a51-c756-6160-708f-942578403c39@osg.samsung.com>
-From: Alexander Aring <aar@pengutronix.de>
-Message-ID: <258cf2b7-93b5-2814-b2cd-7d27a709ba0e@pengutronix.de>
-Date: Mon, 12 Dec 2016 14:55:46 +0100
+Received: from cn.fujitsu.com ([59.151.112.132]:23266 "EHLO
+        heian.cn.fujitsu.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1753141AbcLNHUd (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 14 Dec 2016 02:20:33 -0500
+Date: Wed, 14 Dec 2016 07:20:24 +0000
+From: Xue Wenqian <wsn.iot.xwq@cn.fujitsu.com>
+Subject: [wpan-tools issue]wpan-ping: recv() function for receiving wpan-ping
+ packets
+Message-ID: <20161214072024.GB5190@localhost.localdomain>
+Reply-To: wsn.iot.xwq@cn.fujitsu.com
 MIME-Version: 1.0
-In-Reply-To: <c8b12a51-c756-6160-708f-942578403c39@osg.samsung.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Stefan Schmidt <stefan@osg.samsung.com>
-Cc: "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>
-
+To: linux-wpan@vger.kernel.org
+Cc: stefan@osg.samsung.com
 
 Hi,
 
-On 11/30/2016 11:23 AM, Stefan Schmidt wrote:
-> Hello.
-> 
-> On 30/11/16 10:19, Alexander Aring wrote:
->>
->>
->> During my thesis I think I found some stuff which I want to bring
->> mainline to the subsystems 802.15.4/6lowpan can deal with some parts.
->>
->> Currently I have very hacked solutions for it, but I think I know what I
->> need to make it mainline acceptable. This is:
->>
->> 1. 6lowpan netlink interface.
-> 
-> What do you mean here? A configuration interface for 6lowpan or something else?
-> 
+Recently I find a wpan-ping problem: wpan-ping process is always
+running, when there is another process runing on wpan interface, which
+will also transmit packets via wpan, the non-wpanping packets will also
+be received by recv() of wpan-ping, leading to the "Sequence number did
+not match" problem. It seems that the recv() function can not filter out
+non-wpanping packets.
 
-I thought about to handle at first stateful contexts over netdevice. How
-to solve it currently I don't know.
+To avoid the influences of packets transmitted by another process, I add
+some codes to do the filtering for wpan-ping client and wpan-ping
+server.
 
-There are two possible solutions:
+Do you consider this as a bug for wpan-ping? If yes, I'll submit the
+modification as a new patch for discussion, thank you all!
 
- 1. Own 6LoWPAN netlink
- 2. RTNL netlink
+Best Regards,
+Xue Wenqian
 
-The second one I already use to dump short address over ip -6 neigh... I
-have patches for that somewhere.
 
-So the stateful compression is really something which doesn't has other
-subsystems... According (irc) myeisha suggest to add a nested netlink
-attribute to ROUTE RTNL commands, this would work similar like I already
-do with ip -6 neigh.
-
-If we do it in RTNL then we can add support for that in iproute2 and
-don't need to care about own 6lowpan userspace tool.
-
-Or exists there more what I have not in my mind yet to creating an own
-6lowpan netlink userspace tool.
-
->>
->> 2. L2_PKTINFO for SOCK_RAW/SOCK_DGRAM IPv6 sockets
-> 
-> Added to the todo list and marked it as being worked on by you.
-> 
-
-ok.
-
->> 3. iptable 6lowpan stuff/which can also deal with some L2 infos. Really
->>    weird mixing L3 and L2 info in rules. :-/ Currently it's hard coded
->>    at my side.
-> 
-> Added to the todo list and marked it as being worked on by you.
-> 
-
-ok. But don't know how upstream code would look like. :-/
-
->> 4. node info dump
-> 
-> Marked as being worked on by you.
-> 
-
-ok.
-
-I also teached the fakelb driver "edges" you can create every PHY
-connection "which phy talks to other phy/creating asymmetric
-connections/etc". I think that's a really big improve to testing routing
-stuff for unstrung, etc. Michael Richardson is already interested in.
-
-- Alex
