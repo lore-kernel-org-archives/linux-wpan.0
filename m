@@ -1,56 +1,68 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:57971 "EHLO
-        metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1756112AbcLNQtm (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>);
-        Wed, 14 Dec 2016 11:49:42 -0500
+Received: from ec2-52-27-115-49.us-west-2.compute.amazonaws.com ([52.27.115.49]:36240
+        "EHLO osg.samsung.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1755783AbcLOJSy (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 15 Dec 2016 04:18:54 -0500
 Subject: Re: [wpan-tools issue]wpan-ping: recv() function for receiving
  wpan-ping packets
 References: <20161214072024.GB5190@localhost.localdomain>
-From: Alexander Aring <aar@pengutronix.de>
-Message-ID: <8a0c2fd9-1486-240f-5c78-4f7e5bfeb7cc@pengutronix.de>
-Date: Wed, 14 Dec 2016 17:49:39 +0100
+ <8a0c2fd9-1486-240f-5c78-4f7e5bfeb7cc@pengutronix.de>
+From: Stefan Schmidt <stefan@osg.samsung.com>
+Message-ID: <063d658e-0b05-b15a-d497-8440ba839a32@osg.samsung.com>
+Date: Thu, 15 Dec 2016 10:18:50 +0100
 MIME-Version: 1.0
-In-Reply-To: <20161214072024.GB5190@localhost.localdomain>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <8a0c2fd9-1486-240f-5c78-4f7e5bfeb7cc@pengutronix.de>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: wsn.iot.xwq@cn.fujitsu.com
-Cc: linux-wpan@vger.kernel.org, stefan@osg.samsung.com
+To: Alexander Aring <aar@pengutronix.de>, wsn.iot.xwq@cn.fujitsu.com
+Cc: linux-wpan@vger.kernel.org
 
+Hello.
 
-Hi,
-
-On 12/14/2016 08:20 AM, Xue Wenqian wrote:
+On 14/12/16 17:49, Alexander Aring wrote:
+>
 > Hi,
-> 
-> Recently I find a wpan-ping problem: wpan-ping process is always
-> running, when there is another process runing on wpan interface, which
-> will also transmit packets via wpan, the non-wpanping packets will also
-> be received by recv() of wpan-ping, leading to the "Sequence number did
-> not match" problem. It seems that the recv() function can not filter out
-> non-wpanping packets.
-> 
+>
+> On 12/14/2016 08:20 AM, Xue Wenqian wrote:
+>> Hi,
+>>
+>> Recently I find a wpan-ping problem: wpan-ping process is always
+>> running, when there is another process runing on wpan interface, which
+>> will also transmit packets via wpan, the non-wpanping packets will also
+>> be received by recv() of wpan-ping, leading to the "Sequence number did
+>> not match" problem. It seems that the recv() function can not filter out
+>> non-wpanping packets.
 
-In my opinion:
+That is correct. Especially on the server side we do no filtering at all 
+and just send back the (hopefully) wpan-ping frame.
 
-So the currently known other upper layer protocol is 6LoWPAN. According
-to 6LoWPAN dispatches [0]:
+Please go ahead and send your patch with the filtering you suggest and 
+we can discuss what we can take and what not.
 
-00 xxxxxx       0       NALP
 
-so the wpan-ping dataframe should start with the bit pattern 00.
+>
+> In my opinion:
+>
+> So the currently known other upper layer protocol is 6LoWPAN. According
+> to 6LoWPAN dispatches [0]:
+>
+> 00 xxxxxx       0       NALP
+>
+> so the wpan-ping dataframe should start with the bit pattern 00.
 
-Then for extra stuff the payload should do some checksum stuff, e.g.
-ICMPv6 at tail -> if it doesn't match drop it.
+That is already done. The wpan-ping packet send out from the client 
+already has this set.
 
-Then most frames will be filtered, the rest is the usual header parsing,
-if it doesn't match there -> drop it.
+> Then for extra stuff the payload should do some checksum stuff, e.g.
+> ICMPv6 at tail -> if it doesn't match drop it.
+>
+> Then most frames will be filtered, the rest is the usual header parsing,
+> if it doesn't match there -> drop it.
 
-Wait for original author Stefan, for his opinion... I do here some
-suggestions only.
+As written above nothing is checked or filtered on the server side yet. 
+If there are good suggestions I happily take them in. Let's wait for the 
+patch from Xue to see what he had in mind.
 
-- Alex
-
-[0] https://www.iana.org/assignments/_6lowpan-parameters/_6lowpan-parameters.xhtml
+Stefan Schmidt
