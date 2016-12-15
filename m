@@ -1,14 +1,14 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from ec2-52-27-115-49.us-west-2.compute.amazonaws.com ([52.27.115.49]:36382
+Received: from ec2-52-27-115-49.us-west-2.compute.amazonaws.com ([52.27.115.49]:38412
         "EHLO osg.samsung.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1751334AbcLOJ7O (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 15 Dec 2016 04:59:14 -0500
+        with ESMTP id S1754546AbcLORyP (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 15 Dec 2016 12:54:15 -0500
 Subject: Re: [bug report] ieee802154: atusb: try to read permanent extended
  address from device
 References: <20161212122819.GA10577@elgon.mountain>
 From: Stefan Schmidt <stefan@osg.samsung.com>
-Message-ID: <4acb6291-324a-958e-dc2a-0dc32fedfc3b@osg.samsung.com>
-Date: Thu, 15 Dec 2016 10:35:44 +0100
+Message-ID: <23a48661-3506-55a4-8974-fb384d018797@osg.samsung.com>
+Date: Thu, 15 Dec 2016 18:43:52 +0100
 MIME-Version: 1.0
 In-Reply-To: <20161212122819.GA10577@elgon.mountain>
 Content-Type: text/plain; charset=windows-1252; format=flowed
@@ -80,8 +80,9 @@ On 12/12/16 13:28, Dan Carpenter wrote:
 > drivers/net/ieee802154/atusb.c:126 atusb_read_reg() error: uninitialized symbol 'value'.
 > drivers/net/ieee802154/atusb.c:615 atusb_get_and_show_revision() error: doing dma on the stack (buffer)
 > drivers/net/ieee802154/atusb.c:643 atusb_get_and_show_build() error: doing dma on the stack (build)
+>
 
-Thanks for pointing them out. I will cook up a patch and test it today.
+Just sent a patchset fixing those. Thanks for letting us know.
 
 regards
 Stefan Schmidt
