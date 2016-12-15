@@ -1,108 +1,45 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from proxima.lasnet.de ([78.47.171.185]:60647 "EHLO
+Received: from proxima.lasnet.de ([78.47.171.185]:60652 "EHLO
         proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752075AbcLORlF (ORCPT
+        with ESMTP id S1752132AbcLORlF (ORCPT
         <rfc822;linux-wpan@vger.kernel.org>); Thu, 15 Dec 2016 12:41:05 -0500
 From: Stefan Schmidt <stefan@osg.samsung.com>
-Subject: [PATCH bluetooth-next 1/3] ieee802154: atusb: do not use the stack for buffers to make them DMA able
-Date: Thu, 15 Dec 2016 18:40:14 +0100
-Message-Id: <1481823616-13402-2-git-send-email-stefan@osg.samsung.com>
+Subject: [PATCH bluetooth-next 2/3] ieee802154: atusb: make sure we set a randaom extended address if fetching fails
+Date: Thu, 15 Dec 2016 18:40:15 +0100
+Message-Id: <1481823616-13402-3-git-send-email-stefan@osg.samsung.com>
 In-Reply-To: <1481823616-13402-1-git-send-email-stefan@osg.samsung.com>
 References: <1481823616-13402-1-git-send-email-stefan@osg.samsung.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
-Cc: Alexander Aring <aar@pengutronix.de>, marcel@holtmann.org, dan.carpenter@oracle.com, Stefan Schmidt <stefan@osg.samsung.com>, stable@vger.kernel.org
+Cc: Alexander Aring <aar@pengutronix.de>, marcel@holtmann.org, dan.carpenter@oracle.com, Stefan Schmidt <stefan@osg.samsung.com>
 
- From 4.9 we should really avoid using the stack here as this will not be DMA
-able on various platforms. This changes the buffers already being present in
-time of 4.9 being released. This should go into stable as well.
+In the unlikely case were the firmware is new enough but the actual USB command
+still fails make sure we set a random address and return.
 
-Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
-Cc: stable@vger.kernel.org
 Signed-off-by: Stefan Schmidt <stefan@osg.samsung.com>
 ---
- drivers/net/ieee802154/atusb.c | 31 +++++++++++++++++++++++++++----
- 1 file changed, 27 insertions(+), 4 deletions(-)
+ drivers/net/ieee802154/atusb.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/net/ieee802154/atusb.c b/drivers/net/ieee802154/atusb.c
-index 1253f86..fa3e8c3 100644
+index fa3e8c3..67790f8 100644
 --- a/drivers/net/ieee802154/atusb.c
 +++ b/drivers/net/ieee802154/atusb.c
-@@ -117,13 +117,26 @@ static int atusb_read_reg(struct atusb *atusb, uint8_t reg)
- {
- 	struct usb_device *usb_dev = atusb->usb_dev;
- 	int ret;
-+	uint8_t *buffer;
- 	uint8_t value;
- 
-+	buffer = kmalloc(1, GFP_KERNEL);
-+	if (!buffer)
-+		return -ENOMEM;
-+
- 	dev_dbg(&usb_dev->dev, "atusb: reg = 0x%x\n", reg);
+@@ -737,8 +737,11 @@ static int atusb_set_extended_addr(struct atusb *atusb)
  	ret = atusb_control_msg(atusb, usb_rcvctrlpipe(usb_dev, 0),
- 				ATUSB_REG_READ, ATUSB_REQ_FROM_DEV,
--				0, reg, &value, 1, 1000);
--	return ret >= 0 ? value : ret;
-+				0, reg, buffer, 1, 1000);
-+
-+	if (ret >= 0) {
-+		value = buffer[0];
-+		kfree(buffer);
-+		return value;
-+	} else {
-+		kfree(buffer);
+ 				ATUSB_EUI64_READ, ATUSB_REQ_FROM_DEV, 0, 0,
+ 				buffer, IEEE802154_EXTENDED_ADDR_LEN, 1000);
+-	if (ret < 0)
+-		dev_err(&usb_dev->dev, "failed to fetch extended address\n");
++	if (ret < 0) {
++		dev_err(&usb_dev->dev, "failed to fetch extended address, random address set\n");
++		ieee802154_random_extended_addr(&atusb->hw->phy->perm_extended_addr);
 +		return ret;
 +	}
- }
  
- static int atusb_write_subreg(struct atusb *atusb, uint8_t reg, uint8_t mask,
-@@ -608,9 +621,13 @@ static const struct ieee802154_ops atusb_ops = {
- static int atusb_get_and_show_revision(struct atusb *atusb)
- {
- 	struct usb_device *usb_dev = atusb->usb_dev;
--	unsigned char buffer[3];
-+	unsigned char *buffer;
- 	int ret;
- 
-+	buffer = kmalloc(3, GFP_KERNEL);
-+	if (!buffer)
-+		return -ENOMEM;
-+
- 	/* Get a couple of the ATMega Firmware values */
- 	ret = atusb_control_msg(atusb, usb_rcvctrlpipe(usb_dev, 0),
- 				ATUSB_ID, ATUSB_REQ_FROM_DEV, 0, 0,
-@@ -631,15 +648,20 @@ static int atusb_get_and_show_revision(struct atusb *atusb)
- 		dev_info(&usb_dev->dev, "Please update to version 0.2 or newer");
- 	}
- 
-+	kfree(buffer);
- 	return ret;
- }
- 
- static int atusb_get_and_show_build(struct atusb *atusb)
- {
- 	struct usb_device *usb_dev = atusb->usb_dev;
--	char build[ATUSB_BUILD_SIZE + 1];
-+	char *build;
- 	int ret;
- 
-+	build = kmalloc(ATUSB_BUILD_SIZE + 1, GFP_KERNEL);
-+	if (!build)
-+		return -ENOMEM;
-+
- 	ret = atusb_control_msg(atusb, usb_rcvctrlpipe(usb_dev, 0),
- 				ATUSB_BUILD, ATUSB_REQ_FROM_DEV, 0, 0,
- 				build, ATUSB_BUILD_SIZE, 1000);
-@@ -648,6 +670,7 @@ static int atusb_get_and_show_build(struct atusb *atusb)
- 		dev_info(&usb_dev->dev, "Firmware: build %s\n", build);
- 	}
- 
-+	kfree(build);
- 	return ret;
- }
- 
+ 	memcpy(&extended_addr, buffer, IEEE802154_EXTENDED_ADDR_LEN);
+ 	/* Check if read address is not empty and the unicast bit is set correctly */
 -- 
 2.5.5
 
