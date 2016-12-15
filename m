@@ -1,84 +1,47 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:33735 "EHLO
-        metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S935391AbcLOK36 (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>);
-        Thu, 15 Dec 2016 05:29:58 -0500
-Subject: Re: [wpan-tools issue]wpan-ping: recv() function for receiving
- wpan-ping packets
-References: <20161214072024.GB5190@localhost.localdomain>
- <8a0c2fd9-1486-240f-5c78-4f7e5bfeb7cc@pengutronix.de>
- <063d658e-0b05-b15a-d497-8440ba839a32@osg.samsung.com>
-From: Alexander Aring <aar@pengutronix.de>
-Message-ID: <7c78e9f9-a863-9efb-8b8c-1466b0587cc1@pengutronix.de>
-Date: Thu, 15 Dec 2016 11:29:55 +0100
-MIME-Version: 1.0
-In-Reply-To: <063d658e-0b05-b15a-d497-8440ba839a32@osg.samsung.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Received: from proxima.lasnet.de ([78.47.171.185]:60642 "EHLO
+        proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751202AbcLORlF (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 15 Dec 2016 12:41:05 -0500
+From: Stefan Schmidt <stefan@osg.samsung.com>
+Subject: [PATCH bluetooth-next 0/3] ieee802154: atusb: fixes for buffers to be DMA able
+Date: Thu, 15 Dec 2016 18:40:13 +0100
+Message-Id: <1481823616-13402-1-git-send-email-stefan@osg.samsung.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Stefan Schmidt <stefan@osg.samsung.com>
-Cc: wsn.iot.xwq@cn.fujitsu.com, linux-wpan@vger.kernel.org
+To: linux-wpan@vger.kernel.org
+Cc: Alexander Aring <aar@pengutronix.de>, marcel@holtmann.org, dan.carpenter@oracle.com, Stefan Schmidt <stefan@osg.samsung.com>
 
+Hello.
 
-Hi,
+Here is a set of patches coming up from a report of Dan Carpenter about some
+buffers in atusb are on the stack and that produces a problem with DMA from 4.9
+onwards.
 
-On 12/15/2016 10:18 AM, Stefan Schmidt wrote:
-> Hello.
-> 
-> On 14/12/16 17:49, Alexander Aring wrote:
->>
->> Hi,
->>
->> On 12/14/2016 08:20 AM, Xue Wenqian wrote:
->>> Hi,
->>>
->>> Recently I find a wpan-ping problem: wpan-ping process is always
->>> running, when there is another process runing on wpan interface, which
->>> will also transmit packets via wpan, the non-wpanping packets will also
->>> be received by recv() of wpan-ping, leading to the "Sequence number did
->>> not match" problem. It seems that the recv() function can not filter out
->>> non-wpanping packets.
-> 
-> That is correct. Especially on the server side we do no filtering at all and just send back the (hopefully) wpan-ping frame.
-> 
-> Please go ahead and send your patch with the filtering you suggest and we can discuss what we can take and what not.
-> 
-> 
->>
->> In my opinion:
->>
->> So the currently known other upper layer protocol is 6LoWPAN. According
->> to 6LoWPAN dispatches [0]:
->>
->> 00 xxxxxx       0       NALP
->>
->> so the wpan-ping dataframe should start with the bit pattern 00.
-> 
-> That is already done. The wpan-ping packet send out from the client already has this set.
-> 
+The first patch covers existing code present in released 4.9. I added a stable
+tag for it to make sure it gets into the stable updates. Marcel, I also checked
+that this patch applies cleanly against bluetooth.git as well as bluetooth-next.git.
 
-but do you also check on 00 pattern when receiving?
+The second patch just handles a corner case a bit more cleanly and the third ones
+fixes the buffer on a stack problem for code introduced in the 4.10 merge window
+and should got.
 
-At least you also need to check on ret value if you have seq number
-there [0]. I don't see that.
+Thanks to Dan for reporting this.
 
-With seq + crc, there could be some __packet__ header struct. :-/
-Then check if ret from recv is at least this header long -> otherwise
-drop it.
+Stefan Schmidt (3):
+  ieee802154: atusb: do not use the stack for buffers to make them DMA
+    able
+  ieee802154: atusb: make sure we set a randaom extended address if
+    fetching fails
+  ieee802154: atusb: do not use the stack for address fetching to make
+    it DMA able
 
->> Then for extra stuff the payload should do some checksum stuff, e.g.
->> ICMPv6 at tail -> if it doesn't match drop it.
->>
->> Then most frames will be filtered, the rest is the usual header parsing,
->> if it doesn't match there -> drop it.
-> 
-> As written above nothing is checked or filtered on the server side yet. If there are good suggestions I happily take them in. Let's wait for the patch from Xue to see what he had in mind.
-> 
+ drivers/net/ieee802154/atusb.c | 46 +++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 39 insertions(+), 7 deletions(-)
 
-ok.
+regards
+Stefan Schmidt
 
-- Alex
+-- 
+2.5.5
 
-[0] https://github.com/linux-wpan/wpan-tools/blob/master/wpan-ping/wpan-ping.c#L305
