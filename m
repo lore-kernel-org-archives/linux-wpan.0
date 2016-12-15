@@ -1,47 +1,108 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from proxima.lasnet.de ([78.47.171.185]:60642 "EHLO
+Received: from proxima.lasnet.de ([78.47.171.185]:60647 "EHLO
         proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751202AbcLORlF (ORCPT
+        with ESMTP id S1752075AbcLORlF (ORCPT
         <rfc822;linux-wpan@vger.kernel.org>); Thu, 15 Dec 2016 12:41:05 -0500
 From: Stefan Schmidt <stefan@osg.samsung.com>
-Subject: [PATCH bluetooth-next 0/3] ieee802154: atusb: fixes for buffers to be DMA able
-Date: Thu, 15 Dec 2016 18:40:13 +0100
-Message-Id: <1481823616-13402-1-git-send-email-stefan@osg.samsung.com>
+Subject: [PATCH bluetooth-next 1/3] ieee802154: atusb: do not use the stack for buffers to make them DMA able
+Date: Thu, 15 Dec 2016 18:40:14 +0100
+Message-Id: <1481823616-13402-2-git-send-email-stefan@osg.samsung.com>
+In-Reply-To: <1481823616-13402-1-git-send-email-stefan@osg.samsung.com>
+References: <1481823616-13402-1-git-send-email-stefan@osg.samsung.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
-Cc: Alexander Aring <aar@pengutronix.de>, marcel@holtmann.org, dan.carpenter@oracle.com, Stefan Schmidt <stefan@osg.samsung.com>
+Cc: Alexander Aring <aar@pengutronix.de>, marcel@holtmann.org, dan.carpenter@oracle.com, Stefan Schmidt <stefan@osg.samsung.com>, stable@vger.kernel.org
 
-Hello.
+ From 4.9 we should really avoid using the stack here as this will not be DMA
+able on various platforms. This changes the buffers already being present in
+time of 4.9 being released. This should go into stable as well.
 
-Here is a set of patches coming up from a report of Dan Carpenter about some
-buffers in atusb are on the stack and that produces a problem with DMA from 4.9
-onwards.
+Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
+Cc: stable@vger.kernel.org
+Signed-off-by: Stefan Schmidt <stefan@osg.samsung.com>
+---
+ drivers/net/ieee802154/atusb.c | 31 +++++++++++++++++++++++++++----
+ 1 file changed, 27 insertions(+), 4 deletions(-)
 
-The first patch covers existing code present in released 4.9. I added a stable
-tag for it to make sure it gets into the stable updates. Marcel, I also checked
-that this patch applies cleanly against bluetooth.git as well as bluetooth-next.git.
-
-The second patch just handles a corner case a bit more cleanly and the third ones
-fixes the buffer on a stack problem for code introduced in the 4.10 merge window
-and should got.
-
-Thanks to Dan for reporting this.
-
-Stefan Schmidt (3):
-  ieee802154: atusb: do not use the stack for buffers to make them DMA
-    able
-  ieee802154: atusb: make sure we set a randaom extended address if
-    fetching fails
-  ieee802154: atusb: do not use the stack for address fetching to make
-    it DMA able
-
- drivers/net/ieee802154/atusb.c | 46 +++++++++++++++++++++++++++++++++++-------
- 1 file changed, 39 insertions(+), 7 deletions(-)
-
-regards
-Stefan Schmidt
-
+diff --git a/drivers/net/ieee802154/atusb.c b/drivers/net/ieee802154/atusb.c
+index 1253f86..fa3e8c3 100644
+--- a/drivers/net/ieee802154/atusb.c
++++ b/drivers/net/ieee802154/atusb.c
+@@ -117,13 +117,26 @@ static int atusb_read_reg(struct atusb *atusb, uint8_t reg)
+ {
+ 	struct usb_device *usb_dev = atusb->usb_dev;
+ 	int ret;
++	uint8_t *buffer;
+ 	uint8_t value;
+ 
++	buffer = kmalloc(1, GFP_KERNEL);
++	if (!buffer)
++		return -ENOMEM;
++
+ 	dev_dbg(&usb_dev->dev, "atusb: reg = 0x%x\n", reg);
+ 	ret = atusb_control_msg(atusb, usb_rcvctrlpipe(usb_dev, 0),
+ 				ATUSB_REG_READ, ATUSB_REQ_FROM_DEV,
+-				0, reg, &value, 1, 1000);
+-	return ret >= 0 ? value : ret;
++				0, reg, buffer, 1, 1000);
++
++	if (ret >= 0) {
++		value = buffer[0];
++		kfree(buffer);
++		return value;
++	} else {
++		kfree(buffer);
++		return ret;
++	}
+ }
+ 
+ static int atusb_write_subreg(struct atusb *atusb, uint8_t reg, uint8_t mask,
+@@ -608,9 +621,13 @@ static const struct ieee802154_ops atusb_ops = {
+ static int atusb_get_and_show_revision(struct atusb *atusb)
+ {
+ 	struct usb_device *usb_dev = atusb->usb_dev;
+-	unsigned char buffer[3];
++	unsigned char *buffer;
+ 	int ret;
+ 
++	buffer = kmalloc(3, GFP_KERNEL);
++	if (!buffer)
++		return -ENOMEM;
++
+ 	/* Get a couple of the ATMega Firmware values */
+ 	ret = atusb_control_msg(atusb, usb_rcvctrlpipe(usb_dev, 0),
+ 				ATUSB_ID, ATUSB_REQ_FROM_DEV, 0, 0,
+@@ -631,15 +648,20 @@ static int atusb_get_and_show_revision(struct atusb *atusb)
+ 		dev_info(&usb_dev->dev, "Please update to version 0.2 or newer");
+ 	}
+ 
++	kfree(buffer);
+ 	return ret;
+ }
+ 
+ static int atusb_get_and_show_build(struct atusb *atusb)
+ {
+ 	struct usb_device *usb_dev = atusb->usb_dev;
+-	char build[ATUSB_BUILD_SIZE + 1];
++	char *build;
+ 	int ret;
+ 
++	build = kmalloc(ATUSB_BUILD_SIZE + 1, GFP_KERNEL);
++	if (!build)
++		return -ENOMEM;
++
+ 	ret = atusb_control_msg(atusb, usb_rcvctrlpipe(usb_dev, 0),
+ 				ATUSB_BUILD, ATUSB_REQ_FROM_DEV, 0, 0,
+ 				build, ATUSB_BUILD_SIZE, 1000);
+@@ -648,6 +670,7 @@ static int atusb_get_and_show_build(struct atusb *atusb)
+ 		dev_info(&usb_dev->dev, "Firmware: build %s\n", build);
+ 	}
+ 
++	kfree(build);
+ 	return ret;
+ }
+ 
 -- 
 2.5.5
 
