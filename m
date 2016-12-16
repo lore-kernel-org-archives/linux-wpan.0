@@ -1,344 +1,80 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:57603 "EHLO
+Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:33329 "EHLO
         metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1754513AbcLOUGp (ORCPT
+        by vger.kernel.org with ESMTP id S1752428AbcLPHo6 (ORCPT
         <rfc822;linux-wpan@vger.kernel.org>);
-        Thu, 15 Dec 2016 15:06:45 -0500
-Subject: Re: [PATCH v6 1/3] ieee802154: Add CA8210 IEEE 802.15.4 device driver
-References: <20161206154740.2992-1-h.morris@cascoda.com>
- <20161206154740.2992-2-h.morris@cascoda.com>
- <0aa78be5-7af1-8837-c546-16588646bc32@pengutronix.de>
- <98cb5f50-2e9b-5414-88c0-d8323a547152@cascoda.com>
+        Fri, 16 Dec 2016 02:44:58 -0500
+Subject: Re: Bluetooth 6lowpan ping6 slab corruption
+References: <E3B98393E6037849B63EA428240A65135BC9D5@PGSMSX103.gar.corp.intel.com>
 From: Alexander Aring <aar@pengutronix.de>
-Message-ID: <bd8da1df-25a4-5e1b-61f9-1fc106d042fa@pengutronix.de>
-Date: Thu, 15 Dec 2016 21:06:39 +0100
+Message-ID: <c70d7129-be2d-4764-6f09-1153192c49be@pengutronix.de>
+Date: Fri, 16 Dec 2016 08:44:50 +0100
 MIME-Version: 1.0
-In-Reply-To: <98cb5f50-2e9b-5414-88c0-d8323a547152@cascoda.com>
+In-Reply-To: <E3B98393E6037849B63EA428240A65135BC9D5@PGSMSX103.gar.corp.intel.com>
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: h.morris@cascoda.com
-Cc: harrymorris12@gmail.com, linux-wpan@vger.kernel.org, stefan@osg.samsung.com, marcel@holtmann.org
+Cc: "Wong, Joshua Weng Onn" <joshua.weng.onn.wong@intel.com>, "alex.aring@gmail.com" <alex.aring@gmail.com>, "jukka.rissanen@linux.intel.com" <jukka.rissanen@linux.intel.com>, "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>
 
 
-Hi,
 
-On 12/15/2016 02:52 PM, Harry Morris wrote:
-> Hi Alex,
+On 12/16/2016 07:46 AM, Wong, Joshua Weng Onn wrote:
+> Hi,
 > 
-> On 12/12/2016 14:27, Alexander Aring wrote:
->> All these spi stuff is low-level spi functionality, why not simple use
->> the spi helper functions. E.g. "spi_write_then_read" and I don't mean
->> only just this code, I mean every code here.
->>
->> Low-level is _maybe_ needed if you using async api.
-> As far as I can see, I'm unable to use the helper functions because I need (effectively) manual control of the spi chip select. The way the ca8210 API works I don't know how many bytes I'm reading in total until I read the "command length" byte. So I need to read two bytes, keep the chip select asserted while I process the length and then read the rest of the data. This is the same for the tx path since the ca8210 operates in full duplex mode, so when transmitting I may also be receiving a command that is longer than what I am transmitting so there is a risk of me de-asserting the chip select too early using a helper. Maybe I'm not completely understanding how the helpers work though.
+> I have enabled 6lowpan and bluetooth 6lowpan in the kernel configuration on two systems. Both these systems are running linux and one act as a master and another act as a slave.
+> I am facing a bug while in a bluetooth 6lowpan connection. This happens during a ping6. The kernel version that I am using is 4.1.27 with BlueZ 5.40 on a x86_64 architecture. The kernel reports regarding slab corruption.
 > 
-
-Sorry to say that, but ... this is impossible with the spi subsystem.
-
-I mean it's possible, but if you doing that there exists spi controller
-drivers/hardware stuff which doesn't support it. The cs_change property
-doesn't work on all hardware.
-
-People told me to avoid it, otherwise I could easy implement receive
-handling at at86rf230 driver to not drop cs after framebuffer read.
-Deasserting cs after framebuffer read will drop the framebuffer
-protection there and new frames can overwrite the framebuffer...
-
-We currently always read the whole framebuffer instead first fetching
-the length and then read the length only.
-
-Is something somehow possible in your case? You should be careful using
-cs_change attribute it doesn't work on all hardware.
-
->>> +    msdulen = data_ind[22]; /* msdu_length */
->>> +    if (msdulen > 127) {
->> use ieee802154_is_valid_psdu_len.
->>
->> Also this is psdu_len, in case of monitors -> monitors will filter then
->> minimum ACK frame length only.
-> So the reason for this is that this *is* actually msdu length and not psdu length. What's being received is an MCPS-DATA.indication, so the chip has already performed the is_valid_psdu_len check in its MAC. Truthfully this check is probably completely unnecessary, I just added it in case something gets messed up over the SPI but I've never seen it happen. Maybe it should be removed altogether, I just thought it's a simple check to perform that could easily highlight a big problem.
+> The steps that I have performed are as follows:
+> Slave device:
+> $ modprobe 6lowpan
+> $ modprobe Bluetooth_6lowpan
+> $ echo 1 > /sys/kernel/debug/bluetooth/6lowpan_enable
+> $ hciconfig hci0 leadv 
 > 
-
-ah, ok. If you know what the firmware filters and what not, then
-everything is fine. I did the expierence e.g. at at86rf230 it's simple
-not documented what they filter for length at firmware side...
-
-but you know the firmware so everything fine.
-
->>> +        dev_err(
->>> +            &priv->spi->dev,
->>> +            "received erroneously large msdu length!\n"
->>> +        );
->>> +        kfree_skb(skb);
->>> +        return -EMSGSIZE;
->>> +    }
->>> +    dev_dbg(&priv->spi->dev, "skb buffer length = %d\n", msdulen);
->>> +
->>> +    /* Populate hdr *
->> Doing header parsing below here will not work with monitors, monitors
->> can also receive stuff which are smaller than 29 - I don't know what's
->> already filtered on firmware side.
-> Again the hardware MAC will have already filtered out any frames that are not valid data frames, so the header of the data indication will always be a fixed 29 bytes.
-
-You are sure about this? If you receiving ack frames there will no
-addressing stuff and you will parse the frame here at positions without
-length checking if it's such frame.
-
-I can understand if you saying "ack" frames will never hit the driver,
-but begin to parse frames here... I don't know exactly the "why"?
-
-802.15.4 frame parsing is very complex and we should some one code for
-SoftMAC to do that.
-
->>
->> I see the driver doesn't implement any promiscuousmode functionality,
->> you need to care about that if you will add support for that later.
-> When it comes to promiscuous mode, the psdu is just copied into the msdu of the data indication. So again there will be a fixed 29 byte header on the front, just the contents is meaningless (zeroed). Again this is because the specification doesn't say how promiscuous frames are to be passed out of the MAC.
->>> +    hdr.sec.level = data_ind[29 + msdulen];
->>> +    dev_dbg(&priv->spi->dev, "security level: %#03x\n", hdr.sec.level);
->>> +    if (hdr.sec.level > 0) {
->>> +        hdr.sec.key_id_mode = data_ind[30 + msdulen];
->>> +        memcpy(&hdr.sec.extended_src, &data_ind[31 + msdulen], 8);
->>> +        hdr.sec.key_id = data_ind[39 + msdulen];
->>> +    }
->>> +    hdr.source.mode = data_ind[0];
->>> +    dev_dbg(&priv->spi->dev, "srcAddrMode: %#03x\n", hdr.source.mode);
->>> +    hdr.source.pan_id = *(u16 *)&data_ind[1];
->>> +    dev_dbg(&priv->spi->dev, "srcPanId: %#06x\n", hdr.source.pan_id);
->>> +    memcpy(&hdr.source.extended_addr, &data_ind[3], 8);
->>> +    hdr.dest.mode = data_ind[11];
->>> +    dev_dbg(&priv->spi->dev, "dstAddrMode: %#03x\n", hdr.dest.mode);
->>> +    hdr.dest.pan_id = *(u16 *)&data_ind[12];
->>> +    dev_dbg(&priv->spi->dev, "dstPanId: %#06x\n", hdr.dest.pan_id);
->>> +    memcpy(&hdr.dest.extended_addr, &data_ind[14], 8);
->>> +
->>> +    /* Fill in FC implicitly */
->>> +    hdr.fc.type = 1; /* Data frame */
->>> +    if (hdr.sec.level)
->>> +        hdr.fc.security_enabled = 1;
->>> +    else
->>> +        hdr.fc.security_enabled = 0;
->>> +    if (data_ind[1] != data_ind[12] || data_ind[2] != data_ind[13])
->>> +        hdr.fc.intra_pan = 1;
->>> +    else
->>> +        hdr.fc.intra_pan = 0;
->>> +    hdr.fc.dest_addr_mode = hdr.dest.mode;
->>> +    hdr.fc.source_addr_mode = hdr.source.mode;
->>> +
->>> +    /* Add hdr to front of buffer */
->>> +    hlen = ieee802154_hdr_push(skb, &hdr);
->>> +
->>> +    if (hlen < 0) {
->>> +        dev_crit(&priv->spi->dev, "failed to push mac hdr onto skb!\n");
->>> +        kfree_skb(skb);
->>> +        return hlen;
->>> +    }
->>> +
->>> +    skb_reset_mac_header(skb);
->>> +    skb->mac_len = hlen;
->>> +
->>> +    /* Add <msdulen> bytes of space to the back of the buffer */
->>> +    /* Copy msdu to skb */
->>> +    memcpy(skb_put(skb, msdulen), &data_ind[29], msdulen);
->>> +
->>> +    ieee802154_rx_irqsafe(hw, skb, data_ind[23]/*LQI*/);
->>> +    /* TODO: Set protocol & checksum? */
->>> +    /* TODO: update statistics */
->>> +    return 0;
->>> +}
->>> +
->>> +/**
->>> + * ca8210_net_rx() - Acts upon received SAP commands relevant to the network
->>> + *                   driver
->>> + * @hw:       ieee802154_hw that command was received by
->>> + * @command:  Octet array of received command
->>> + * @len:      length of the received command
->>> + *
->>> + * Called by the spi driver whenever a SAP command is received, this function
->>> + * will ascertain whether the command is of interest to the network driver and
->>> + * take necessary action.
->>> + *
->>> + * Return: 0 or linux error code
->>> + */
->>> +static int ca8210_net_rx(struct ieee802154_hw *hw, u8 *command, size_t len)
->>> +{
->>> +    struct ca8210_priv *priv = hw->priv;
->>> +    unsigned long flags;
->>> +    u8 status;
->>> +
->>> +    dev_dbg(&priv->spi->dev, "ca8210_net_rx(), CmdID = %d\n", command[0]);
->>> +
->>> +    if (command[0] == SPI_MCPS_DATA_INDICATION) {
->>> +        /* Received data */
->>> +        spin_lock_irqsave(&priv->lock, flags);
->>> +        if (command[26] == priv->last_dsn) {
->>> +            dev_dbg(
->>> +                &priv->spi->dev,
->>> +                "DSN %d resend received, ignoring...\n",
->>> +                command[26]
->>> +            );
->>> +            spin_unlock_irqrestore(&priv->lock, flags);
->>> +            return 0;
->>> +        }
->>> +        priv->last_dsn = command[26];
->>> +        spin_unlock_irqrestore(&priv->lock, flags);
->>> +        return ca8210_skb_rx(hw, len - 2, command + 2);
->>> +    } else if (command[0] == SPI_MCPS_DATA_CONFIRM) {
->>> +        status = command[3];
->>> +        if (priv->async_tx_pending) {
->>> +            return ca8210_async_xmit_complete(
->>> +                hw,
->>> +                command[2],
->>> +                status
->>> +            );
->>> +        } else if (priv->sync_tx_pending) {
->>> +            priv->sync_tx_pending = false;
->>> +        }
->>> +    }
->>> +
->>> +    return 0;
->>> +}
->>> +
->>> +/**
->>> + * ca8210_skb_tx() - Transmits a given socket buffer using the ca8210
->>> + * @skb:         Socket buffer to transmit
->>> + * @msduhandle:  Data identifier to pass to the 802.15.4 MAC
->>> + * @priv:        Pointer to private data section of target ca8210
->>> + *
->>> + * Return: 0 or linux error code
->>> + */
->>> +static int ca8210_skb_tx(
->>> +    struct sk_buff      *skb,
->>> +    u8                   msduhandle,
->>> +    struct ca8210_priv  *priv
->>> +)
->>> +{
->>> +    int status;
->>> +    struct ieee802154_hdr header = { 0 };
->>> +    struct secspec secspec;
->>> +    unsigned int mac_len;
->>> +
->>> +    dev_dbg(&priv->spi->dev, "ca8210_skb_tx() called\n");
->>> +
->>> +    /* Get addressing info from skb - ieee802154 layer creates a full
->>> +     * packet
->>> +     */
->>> +    mac_len = ieee802154_hdr_peek_addrs(skb, &header);
->>> +
->> you need at least check if error occurred. Currently we support at least
->> 3 bytes FC + SEQ is there at driver level...
-> Sorry but I'm not sure I understand what you mean, do I need to check for errors in the skb I'm being told to transmit? Over-air error checking is performed by the ca8210 with the use of a frame counter so maybe this doesn't apply to this situation?
-
-I want to say here, it's possible that this transmit function get's at
-least 3 bytes from userspace. Parsing addresses will fail here, because
-the header is too small -> it will transmit random data.
-
+> Master device:
+> $ modprobe 6lowpan
+> $ modprobe bluetooth_6lowpan
+> $ echo 1 > /sys/kernel/debug/bluetooth/6lowpan_enable
+> $ hcitool lescan << to obtain slave BT ADDR
+> $ echo "connect <remote_BT_MAC> 1" > /sys/kernel/debug/bluetooth/6lowpan_control
+> $ ifconfig (look for bt0 interface) << to obtain IPv6 address of slave device
+> $ ping6 -I bt0 <IPV6_ADDR>     <<<<------ The console message starts to appear here during ping6
 > 
->>> +/**
->>> + * ca8210_xmit_sync() - Synchronously transmits a given socket buffer using the
->>> + *                      ca8210
->>> + * @hw:   ieee802154_hw of ca8210 to transmit from
->>> + * @skb:  Socket buffer to transmit
->>> + *
->>> + * Transmits the buffer and does not return until a confirmation of the exchange
->>> + * is received from the ca8210.
->>> + *
->>> + * Return: 0 or linux error code
->>> + */
->>> +static int ca8210_xmit_sync(struct ieee802154_hw *hw, struct sk_buff *skb)
->>> +{
->>> +    struct ca8210_priv *priv = hw->priv;
->>> +    int status;
->>> +
->>> +    dev_dbg(&priv->spi->dev, "calling ca8210_xmit_sync()\n");
->>> +
->>> +    status = ca8210_skb_tx(skb, priv->nextmsduhandle++, priv);
->>> +    if (status)
->>> +        return status;
->>> +
->>> +    priv->sync_tx_pending = true;
->>> +
->>> +    while (priv->sync_tx_pending)
->>> +        msleep(1);
->>> +
->>> +    return 0;
->>> +}
->>> +
->>> +/**
->>> + * ca8210_xmit_async() - Asynchronously transmits a given socket buffer using
->>> + *                       the ca8210
->>> + * @hw:   ieee802154_hw of ca8210 to transmit from
->>> + * @skb:  Socket buffer to transmit
->>> + *
->>> + * Hands the transmission of the buffer off to a workqueue and returns
->>> + * immediately.
->>> + *
->>> + * Return: 0 or linux error code
->>> + */
->>> +static int ca8210_xmit_async(struct ieee802154_hw *hw, struct sk_buff *skb)
->>> +{
->>> +    struct ca8210_priv *priv = hw->priv;
->>> +
->>> +    dev_dbg(&priv->spi->dev, "calling ca8210_xmit_async()\n");
->>> +
->>> +    priv->tx_skb = skb;
->>> +    queue_work(priv->async_tx_workqueue, &priv->async_tx_work);
->>> +
->>> +    return 0;
->>> +}
->>> +
->> Okay, both sync and async are here implemented for that the callbacks
->> are never made for.
->>
->> The above sync function looks like an synced operation around a async
->> operation, because you wait until it's finished.
->>
->> More bad, you use busy-waiting there, look for "wait_for_completion" in
->> linux kernel.
->>
->> Nevertheless, the sync operation will not be used when async is defined,
->> so sync operation is useless here.
->>
->> THe idea of async is that the Linux kernel doesn't do _anything_ until a
->> tx complete irq reports "tx is done" and wake the tx queue again. This
->> will not happen if you queue it to a workqueue again... which makes the
->> whole stuff synced again.
->>
->> If we one day have MLME-OPS it needs a synced xmit functionality ->
->> which will use xmit_async then - because we can and need transmit stuff
->> synced. But NOT for dataplane -> dataframes, these frames should be
->> synced completely undepended from linux kernel. The kernel doesn't wait
->> until it's done -> hardware will report it when it's done.
->>
->> The issue will begin when we have synced xmit above async
->> functionality... Then we have a workqueue above a workqueue which is bad.
-> Okay so I've probably misunderstood how the sync and async functions should be implemented, sorry about that. I am still a bit confused though.
-> Regarding async, you say I shouldn't use a workqueue, but the context is atomic right? So if I follow my transmission path directly it will call spi_sync which can sleep. Does this mean that I *have* to use spi_async() instead? That would be a shame since it will make transmission a lot more complicated because I have to perform multiple spi exchanges to read the correct length.
+> The output of the console message:
+> 
+> [  794.985623] Slab corruption (Tainted: G     U         ): skbuff_head_cache start=ffff8801f568f700, len=232
+> [  795.008755] 050: 00 00 00 00 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b  ....kkkkkkkkkkkk
+> [  795.029380] Prev obj: start=ffff8801f568f600, len=232
+> [  795.044743] 000: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+> [  795.061310] 010: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+> [  795.076752] Next obj: start=ffff8801f568f800, len=232
+> [  795.088448] 000: 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b  kkkkkkkkkkkkkkkk
+> [  795.102365] 010: 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b 6b  kkkkkkkkkkkkkkkk
+> 
+> The 6lowpan connection between the two devices is connected.
+> I observed that the console message appears once when the master initiates the connection to the slave and nothing happens after that.
+> Once I start doing the ping6 from master to slave, the same message appears again. This same set of message continues to be printed every 5 seconds or so.
+> This also persists when ping6 is done from the slave to the master. 
+> 
+> Do you know what could possibly cause this issue?
+> 
+> Please let me know if you require further information.
 > 
 
-Yes, async is the right way to do it.
+In short:
 
-What the callback of netdevice xmit_do is "send the frame out" queue
-this into a workqueue will delay it and drop the context of netdevice
-xmit_do function...
+BTLE 6LoWPAN is broken. Patch-Series which needs some love to fix some
+issues (mostly races/L2 address handling with L3 stuff, use ndisc stuff,
+still exists open question which L2 address should be used) exists at
+[0].
 
-You should use async in xmit_do and irq handling.
+Maybe YOU want to bring it mainline -> I have no time currently to do that.
+Of maybe you can test it and tell me your expierence. :-)
 
-> Would it maybe be better just to implement xmit_sync and not xmit_async? Is that acceptable since it's to be deprecated? Using wait_for_completion definitely seems like a good idea though, thanks for pointing that out.
-> The reason why it looks async is because of the use of the management entity primitives - the transmission path is sending an MCPS-DATA.request command and then waiting for an MCPS-DATA.confirm to come back from the chip, confirming successful transmission. Just sending the request to the chip does not guarantee that the frame was or will be transmitted.
-
-We don't need a confirmation that the frame was transmitted here. This
-is what the netdev do_xmit is for.
-
-To handle timeout -> there exists some watchdog handler if no "tx done"
-irq will be occured or the netdevice is somehow stucked.
-
-At least at the "tx_done" irq we need some way to get knowledge about if
-there was an ack or not... but this is future work.
+If you want still to use the current code, I recommend to disable SMP...
+but races still exists. Also update the kernel version to a recent one.
 
 - Alex
 
-[0] http://lxr.free-electrons.com/source/include/linux/spi/spi.h#L678
+[0] http://www.spinics.net/lists/linux-wpan/msg04124.html
