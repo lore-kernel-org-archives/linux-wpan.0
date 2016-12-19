@@ -1,26 +1,24 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-qk0-f179.google.com ([209.85.220.179]:35942 "EHLO
-        mail-qk0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754071AbcLOUPt (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 15 Dec 2016 15:15:49 -0500
-Received: by mail-qk0-f179.google.com with SMTP id n21so69305037qka.3
-        for <linux-wpan@vger.kernel.org>; Thu, 15 Dec 2016 12:15:29 -0800 (PST)
-Subject: Re: [PATCH 8/8] Makefile: drop -D__CHECK_ENDIAN__ from cflags
-References: <1481778865-27667-1-git-send-email-mst@redhat.com>
- <1481778865-27667-9-git-send-email-mst@redhat.com>
-From: Arend Van Spriel <arend.vanspriel@broadcom.com>
-Message-ID: <5186291e-90ed-3070-72ad-d6f78fd1a410@broadcom.com>
-Date: Thu, 15 Dec 2016 21:15:23 +0100
-MIME-Version: 1.0
+Received: from paleale.coelho.fi ([176.9.41.70]:45316 "EHLO
+        farmhouse.coelho.fi" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1753483AbcLSJJJ (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 19 Dec 2016 04:09:09 -0500
+Message-ID: <1482138490.26174.7.camel@coelho.fi>
+From: Luca Coelho <luca@coelho.fi>
+Date: Mon, 19 Dec 2016 11:08:10 +0200
 In-Reply-To: <1481778865-27667-9-git-send-email-mst@redhat.com>
-Content-Type: text/plain; charset=windows-1252
+References: <1481778865-27667-1-git-send-email-mst@redhat.com>
+         <1481778865-27667-9-git-send-email-mst@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH 8/8] Makefile: drop -D__CHECK_ENDIAN__ from cflags
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: "Michael S. Tsirkin" <mst@redhat.com>, linux-kernel@vger.kernel.org
-Cc: Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan <gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>, Wolfgang Grandegger <wg@grandegger.com>, Marc Kleine-Budde <mkl@pengutronix.de>, Vince Bridgers <vbridger@opensource.altera.com>, Jay Cliburn <jcliburn@gmail.com>, Chris Snook <chris.snook@gmail.com>, "Luis R. Rodriguez" <mcgrof@do-not-panic.com>, Kalle Valo <kvalo@codeaurora.org>, Maya Erez <qca_merez@qca.qualcomm.com>, Franky Lin <franky.lin@broadcom.com>, Hante Meuleman <hante.meuleman@broadcom.com>, Stanislaw Gruszka <sgruszka@redhat.com>, Johannes Berg <johannes.berg@intel.com>, Emmanuel Grumbach <emmanuel.grumbach@intel.com>, Luca Coelho <luciano.coelho@intel.com>, Intel Linux Wireless <linuxwifi@intel.com>, Jakub Kicinski <kubakici@wp.pl>, Larry Finger <Larry.Finger@lwfinger.net>, Chaoming Li <chaoming_li@realsil.com.cn>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "David S. Miller" <davem@davemloft.net>, Alexander Aring <aar@pengutronix.de>, Stefan Schmidt <stefan@osg.samsung.com>, Matthias Brugger <matthias.bgg@gmail.com>, linux-bluetooth@vger.kernel.org, linux-can@vger.kernel.org, netdev@vger.kernel.org, nios2-dev@lists.rocketboards.org, linux-wireless@vger.kernel.org, wil6210@qca.qualcomm.com, brcm80211-dev-list.pdl@broadcom.com, devel@driverdev.osuosl.org, linux-wpan@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
+Cc: Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan <gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>, Wolfgang Grandegger <wg@grandegger.com>, Marc Kleine-Budde <mkl@pengutronix.de>, Vince Bridgers <vbridger@opensource.altera.com>, Jay Cliburn <jcliburn@gmail.com>, Chris Snook <chris.snook@gmail.com>, "Luis R. Rodriguez" <mcgrof@do-not-panic.com>, Kalle Valo <kvalo@codeaurora.org>, Maya Erez <qca_merez@qca.qualcomm.com>, Arend van Spriel <arend.vanspriel@broadcom.com>, Franky Lin <franky.lin@broadcom.com>, Hante Meuleman <hante.meuleman@broadcom.com>, Stanislaw Gruszka <sgruszka@redhat.com>, Johannes Berg <johannes.berg@intel.com>, Emmanuel Grumbach <emmanuel.grumbach@intel.com>, Intel Linux Wireless <linuxwifi@intel.com>, Jakub Kicinski <kubakici@wp.pl>, Larry Finger <Larry.Finger@lwfinger.net>, Chaoming Li <chaoming_li@realsil.com.cn>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "David S. Miller" <davem@davemloft.net>, Alexander Aring <aar@pengutronix.de>, Stefan Schmidt <stefan@osg.samsung.com>, Matthias Brugger <matthias.bgg@gmail.com>, linux-bluetooth@vger.kernel.org, linux-can@vger.kernel.org, netdev@vger.kernel.org, nios2-dev@lists.rocketboards.org, linux-wireless@vger.kernel.org, wil6210@qca.qualcomm.com, brcm80211-dev-list.pdl@broadcom.com, devel@driverdev.osuosl.org, linux-wpan@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
 
-On 15-12-2016 6:15, Michael S. Tsirkin wrote:
+On Thu, 2016-12-15 at 07:15 +0200, Michael S. Tsirkin wrote:
 > That's the default now, no need for makefiles to set it.
 > 
 > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
@@ -34,10 +32,14 @@ On 15-12-2016 6:15, Michael S. Tsirkin wrote:
 >  drivers/net/wireless/ath/wil6210/Makefile                 | 2 --
 >  drivers/net/wireless/broadcom/brcm80211/brcmfmac/Makefile | 2 --
 >  drivers/net/wireless/broadcom/brcm80211/brcmsmac/Makefile | 1 -
+>  drivers/net/wireless/intel/iwlegacy/Makefile              | 2 --
+>  drivers/net/wireless/intel/iwlwifi/Makefile               | 2 +-
+>  drivers/net/wireless/intel/iwlwifi/dvm/Makefile           | 2 +-
+>  drivers/net/wireless/intel/iwlwifi/mvm/Makefile           | 2 +-
 
-For brcm80211 drivers:
+For the drivers/net/wireless/intel/iwlwifi/ part:
 
-Acked-by: Arend van Spriel <arend.vanspriel@broadcom.com>
+Acked-by: Luca Coelho <luciano.coelho@intel.com>
 
-Regards,
-Arend
+--
+Luca.
