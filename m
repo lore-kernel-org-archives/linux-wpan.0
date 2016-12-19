@@ -1,70 +1,79 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mga06.intel.com ([134.134.136.31]:39318 "EHLO mga06.intel.com"
+Received: from mga03.intel.com ([134.134.136.65]:19199 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752592AbcLSA1S (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-        Sun, 18 Dec 2016 19:27:18 -0500
+        id S1750847AbcLSGi1 (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+        Mon, 19 Dec 2016 01:38:27 -0500
 From: "Wong, Joshua Weng Onn" <joshua.weng.onn.wong@intel.com>
 Subject: RE: Bluetooth 6lowpan ping6 slab corruption
-Date: Mon, 19 Dec 2016 00:27:14 +0000
-Message-ID: <E3B98393E6037849B63EA428240A65135C42A6@PGSMSX103.gar.corp.intel.com>
+Date: Mon, 19 Dec 2016 06:38:23 +0000
+Message-ID: <E3B98393E6037849B63EA428240A65135C5492@PGSMSX103.gar.corp.intel.com>
 References: <E3B98393E6037849B63EA428240A65135BC9D5@PGSMSX103.gar.corp.intel.com>
  <c70d7129-be2d-4764-6f09-1153192c49be@pengutronix.de>
  <E3B98393E6037849B63EA428240A65135BCA89@PGSMSX103.gar.corp.intel.com>
  <efdc1a54-7fdc-80b8-f46d-d663addae509@pengutronix.de>
-In-Reply-To: <efdc1a54-7fdc-80b8-f46d-d663addae509@pengutronix.de>
+ <E3B98393E6037849B63EA428240A65135C42A6@PGSMSX103.gar.corp.intel.com>
+ <CAAK7Ti_wdFr6PUGzE0aDdUMTNJtNVZxRpJ7WWrV61btWcYHJJw@mail.gmail.com>
+In-Reply-To: <CAAK7Ti_wdFr6PUGzE0aDdUMTNJtNVZxRpJ7WWrV61btWcYHJJw@mail.gmail.com>
 Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <aar@pengutronix.de>
-Cc: "alex.aring@gmail.com" <alex.aring@gmail.com>, "jukka.rissanen@linux.intel.com" <jukka.rissanen@linux.intel.com>, "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>
+To: JANARDHANACHARI KELLA <eni.chari@gmail.com>, Alexander Aring <aar@pengutronix.de>
+Cc: "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>
 
-Hi Alex,
-
-> Hi,
-> 
-> On 12/16/2016 09:18 AM, Wong, Joshua Weng Onn wrote:
-> ...
-> >
-> > Thank you for informing me about this. Sorry as I was not aware of the newer
-> patches that you submitted to mainline.
-> > At the moment I am not able to upgrade the kernel to a recent version as the
-> other teams in my department are using kernel version 4.1.27 and I have to
-> follow it strictly.
-> >
-> > I just got an idea. Perhaps what I can do is backport the patches and apply
-> them to this version of the kernel. I am not sure if it will work entirely. I'll discuss
-> this with my lead first if he wants me to do this and let you know if I am pursuing
-> this.
-> >
-> 
-> You can backport it, yes... but please _please_ don't do it... bring it mainline and
-> then backport it.
-> 
-> Tell that your lead as suggestion from me.
-> 
-> It makes no sense that you backporting it only for you. This thing need to be
-> fixed upstream...
-> 
-> In my opinion, all people who backporting it will do work for nothing...
-> The next guy/girl which wants to try that out runs again into such issues.
-> 
-> These patches was sending to bluetooth-next, now I am busy with other things
-> and can work on it at end of April maybe... and I think only in my free-time. This
-> patch-series just needs a little cleanup and send as PATCH...
-> 
-> - Alex
-
-I've finally just learned how to add inline '>' characters to the previous email. Had to make some changes in my email settings.
-
-Thank you very much for your reply.
-Ok noted on that. My most sincere apologies as I am quite new to this and I am still trying to understand how open source works. Didn't realize that it will cause repetitive work for others.
-
-I will discuss this with my technical lead and update you along the way.
-
-Thank you.
-
-Best regards,
-Joshua
+PiBGcm9tOiBKQU5BUkRIQU5BQ0hBUkkgS0VMTEEgW21haWx0bzplbmkuY2hhcmlAZ21haWwuY29t
+XSANCj4gU2VudDogTW9uZGF5LCBEZWNlbWJlciAxOSwgMjAxNiAyOjM0IFBNDQo+IFRvOiBBbGV4
+YW5kZXIgQXJpbmcgPGFhckBwZW5ndXRyb25peC5kZT47IFdvbmcsIEpvc2h1YSBXZW5nIE9ubiA8
+am9zaHVhLndlbmcub25uLndvbmdAaW50ZWwuY29tPg0KPiBDYzogbGludXgtd3BhbkB2Z2VyLmtl
+cm5lbC5vcmcNCj4gU3ViamVjdDogUmU6IEJsdWV0b290aCA2bG93cGFuIHBpbmc2IHNsYWIgY29y
+cnVwdGlvbg0KPg0KPiBoaSBzaXIsDQo+IHdoeSBhbSBpIG5vdCBhYmxlIHRvIHNlbmQgYW55IG1l
+c3NhZ2UgdG8gbGludXgtd3BhbkBAdmdlci5rZXJuZWwub3JnIG1haWxpbmcgbGlzdC4uDQo+DQo+
+DQo+IHdpdGggUmVnYXJkcw0KPiBKYW5hcmRoYW5hY2hhcmkgS2VsbGENCj4NCkhpIEphbmFyZCwN
+Cg0KWW91IGNhbiBvbmx5IHNlbmQgUGxhaW4gVGV4dCB0byB0aGUgbWFpbGluZyBsaXN0LiBZb3Ug
+d2lsbCBmaXJzdCBuZWVkIHRvIHR1cm4gb2ZmIEhUTUwgZW5jb2RpbmdzLiBQcm9iYWJseSB0aGF0
+IHdhcyB3aHkgeW91ciBlbWFpbCB3YXMgcmVqZWN0ZWQuDQpBbHNvLCB5b3UgbmVlZCB0byBwZXJm
+b3JtIGJvdHRvbSBwb3N0aW5nIGFuZCBub3QgdG9wIHBvc3RpbmcgaS5lLiBzZW5kIHJlcGx5IGF0
+IHRoZSBib3R0b20gb2YgYW4gZW1haWwuDQpUaGlyZCwgeW91IG5lZWQgdG8gcHJlcGVuZCB0aGUg
+Jz4nIGNoYXJhY3RlciBvZiB0aGUgcHJldmlvdXMgb3JpZ2luYWwgbWVzc2FnZQ0KDQotSm9zaHVh
+LQ0KDQo+IE9uIE1vbiwgRGVjIDE5LCAyMDE2IGF0IDU6NTcgQU0sIFdvbmcsIEpvc2h1YSBXZW5n
+IE9ubiA8am9zaHVhLndlbmcub25uLndvbmdAaW50ZWwuY29tPiB3cm90ZToNCj4gSGkgQWxleCwN
+Cg0KPiBIaSwNCj4NCj4gT24gMTIvMTYvMjAxNiAwOToxOCBBTSwgV29uZywgSm9zaHVhIFdlbmcg
+T25uIHdyb3RlOg0KPiAuLi4NCj4gPg0KPiA+IFRoYW5rIHlvdSBmb3IgaW5mb3JtaW5nIG1lIGFi
+b3V0IHRoaXMuIFNvcnJ5IGFzIEkgd2FzIG5vdCBhd2FyZSBvZiB0aGUgbmV3ZXINCj4gcGF0Y2hl
+cyB0aGF0IHlvdSBzdWJtaXR0ZWQgdG8gbWFpbmxpbmUuDQo+ID4gQXQgdGhlIG1vbWVudCBJIGFt
+IG5vdCBhYmxlIHRvIHVwZ3JhZGUgdGhlIGtlcm5lbCB0byBhIHJlY2VudCB2ZXJzaW9uIGFzIHRo
+ZQ0KPiBvdGhlciB0ZWFtcyBpbiBteSBkZXBhcnRtZW50IGFyZSB1c2luZyBrZXJuZWwgdmVyc2lv
+biA0LjEuMjcgYW5kIEkgaGF2ZSB0bw0KPiBmb2xsb3cgaXQgc3RyaWN0bHkuDQo+ID4NCj4gPiBJ
+IGp1c3QgZ290IGFuIGlkZWEuIFBlcmhhcHMgd2hhdCBJIGNhbiBkbyBpcyBiYWNrcG9ydCB0aGUg
+cGF0Y2hlcyBhbmQgYXBwbHkNCj4gdGhlbSB0byB0aGlzIHZlcnNpb24gb2YgdGhlIGtlcm5lbC4g
+SSBhbSBub3Qgc3VyZSBpZiBpdCB3aWxsIHdvcmsgZW50aXJlbHkuIEknbGwgZGlzY3Vzcw0KPiB0
+aGlzIHdpdGggbXkgbGVhZCBmaXJzdCBpZiBoZSB3YW50cyBtZSB0byBkbyB0aGlzIGFuZCBsZXQg
+eW91IGtub3cgaWYgSSBhbSBwdXJzdWluZw0KPiB0aGlzLg0KPiA+DQo+DQo+IFlvdSBjYW4gYmFj
+a3BvcnQgaXQsIHllcy4uLiBidXQgcGxlYXNlIF9wbGVhc2VfIGRvbid0IGRvIGl0Li4uIGJyaW5n
+IGl0IG1haW5saW5lIGFuZA0KPiB0aGVuIGJhY2twb3J0IGl0Lg0KPg0KPiBUZWxsIHRoYXQgeW91
+ciBsZWFkIGFzIHN1Z2dlc3Rpb24gZnJvbSBtZS4NCj4NCj4gSXQgbWFrZXMgbm8gc2Vuc2UgdGhh
+dCB5b3UgYmFja3BvcnRpbmcgaXQgb25seSBmb3IgeW91LiBUaGlzIHRoaW5nIG5lZWQgdG8gYmUN
+Cj4gZml4ZWQgdXBzdHJlYW0uLi4NCj4NCj4gSW4gbXkgb3BpbmlvbiwgYWxsIHBlb3BsZSB3aG8g
+YmFja3BvcnRpbmcgaXQgd2lsbCBkbyB3b3JrIGZvciBub3RoaW5nLi4uDQo+IFRoZSBuZXh0IGd1
+eS9naXJsIHdoaWNoIHdhbnRzIHRvIHRyeSB0aGF0IG91dCBydW5zIGFnYWluIGludG8gc3VjaCBp
+c3N1ZXMuDQo+DQo+IFRoZXNlIHBhdGNoZXMgd2FzIHNlbmRpbmcgdG8gYmx1ZXRvb3RoLW5leHQs
+IG5vdyBJIGFtIGJ1c3kgd2l0aCBvdGhlciB0aGluZ3MNCj4gYW5kIGNhbiB3b3JrIG9uIGl0IGF0
+IGVuZCBvZiBBcHJpbCBtYXliZS4uLiBhbmQgSSB0aGluayBvbmx5IGluIG15IGZyZWUtdGltZS4g
+VGhpcw0KPiBwYXRjaC1zZXJpZXMganVzdCBuZWVkcyBhIGxpdHRsZSBjbGVhbnVwIGFuZCBzZW5k
+IGFzIFBBVENILi4uDQo+DQo+IC0gQWxleA0KDQpJJ3ZlIGZpbmFsbHkganVzdCBsZWFybmVkIGhv
+dyB0byBhZGQgaW5saW5lICc+JyBjaGFyYWN0ZXJzIHRvIHRoZSBwcmV2aW91cyBlbWFpbC4gSGFk
+IHRvIG1ha2Ugc29tZSBjaGFuZ2VzIGluIG15IGVtYWlsIHNldHRpbmdzLg0KDQpUaGFuayB5b3Ug
+dmVyeSBtdWNoIGZvciB5b3VyIHJlcGx5Lg0KT2sgbm90ZWQgb24gdGhhdC4gTXkgbW9zdCBzaW5j
+ZXJlIGFwb2xvZ2llcyBhcyBJIGFtIHF1aXRlIG5ldyB0byB0aGlzIGFuZCBJIGFtIHN0aWxsIHRy
+eWluZyB0byB1bmRlcnN0YW5kIGhvdyBvcGVuIHNvdXJjZSB3b3Jrcy4gRGlkbid0IHJlYWxpemUg
+dGhhdCBpdCB3aWxsIGNhdXNlIHJlcGV0aXRpdmUgd29yayBmb3Igb3RoZXJzLg0KDQpJIHdpbGwg
+ZGlzY3VzcyB0aGlzIHdpdGggbXkgdGVjaG5pY2FsIGxlYWQgYW5kIHVwZGF0ZSB5b3UgYWxvbmcg
+dGhlIHdheS4NCg0KVGhhbmsgeW91Lg0KDQpCZXN0IHJlZ2FyZHMsDQpKb3NodWENCi0tDQpUbyB1
+bnN1YnNjcmliZSBmcm9tIHRoaXMgbGlzdDogc2VuZCB0aGUgbGluZSAidW5zdWJzY3JpYmUgbGlu
+dXgtd3BhbiIgaW4NCnRoZSBib2R5IG9mIGEgbWVzc2FnZSB0byBtYWpvcmRvbW9Admdlci5rZXJu
+ZWwub3JnDQpNb3JlIG1ham9yZG9tbyBpbmZvIGF0wqAgaHR0cDovL3ZnZXIua2VybmVsLm9yZy9t
+YWpvcmRvbW8taW5mby5odG1sDQoNCg0KDQotLSANClNpbmNlcmVseSBZb3VyJ3MNCg0KSmFuYXJk
+aGFuYWNoYXJpIEtlbGxhDQpDb250YWN0Ois5MS05OTA4NDY5NTk5DQpFLW1haWw6IGVuaS5jaGFy
+aUBnbWFpbC5jb20NCg0K
