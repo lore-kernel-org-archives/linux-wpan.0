@@ -1,57 +1,89 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:46819 "EHLO
-        metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1750812AbcLSIT7 (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>);
-        Mon, 19 Dec 2016 03:19:59 -0500
-Subject: Re: Bluetooth 6lowpan ping6 slab corruption
+Received: from mga09.intel.com ([134.134.136.24]:39127 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1761992AbcLUXi5 (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+        Wed, 21 Dec 2016 18:38:57 -0500
+From: "Wong, Joshua Weng Onn" <joshua.weng.onn.wong@intel.com>
+Subject: RE: Bluetooth 6lowpan ping6 slab corruption
+Date: Wed, 21 Dec 2016 23:38:52 +0000
+Message-ID: <E3B98393E6037849B63EA428240A65135C6C50@PGSMSX103.gar.corp.intel.com>
 References: <E3B98393E6037849B63EA428240A65135BC9D5@PGSMSX103.gar.corp.intel.com>
  <c70d7129-be2d-4764-6f09-1153192c49be@pengutronix.de>
  <E3B98393E6037849B63EA428240A65135BCA89@PGSMSX103.gar.corp.intel.com>
  <efdc1a54-7fdc-80b8-f46d-d663addae509@pengutronix.de>
  <E3B98393E6037849B63EA428240A65135C42A6@PGSMSX103.gar.corp.intel.com>
- <CAAK7Ti_wdFr6PUGzE0aDdUMTNJtNVZxRpJ7WWrV61btWcYHJJw@mail.gmail.com>
- <E3B98393E6037849B63EA428240A65135C5492@PGSMSX103.gar.corp.intel.com>
-From: Alexander Aring <aar@pengutronix.de>
-Message-ID: <3c6323c7-0f29-937e-bd31-c846303d313a@pengutronix.de>
-Date: Mon, 19 Dec 2016 09:19:58 +0100
+In-Reply-To: <E3B98393E6037849B63EA428240A65135C42A6@PGSMSX103.gar.corp.intel.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-In-Reply-To: <E3B98393E6037849B63EA428240A65135C5492@PGSMSX103.gar.corp.intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: JANARDHANACHARI KELLA <eni.chari@gmail.com>
-Cc: "Wong, Joshua Weng Onn" <joshua.weng.onn.wong@intel.com>, "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>
+To: 'Alexander Aring' <aar@pengutronix.de>
+Cc: "'alex.aring@gmail.com'" <alex.aring@gmail.com>, "'jukka.rissanen@linux.intel.com'" <jukka.rissanen@linux.intel.com>, "'linux-bluetooth@vger.kernel.org'" <linux-bluetooth@vger.kernel.org>, "'linux-wpan@vger.kernel.org'" <linux-wpan@vger.kernel.org>
+
+Hi Alex,
 
 
-Hi,
-
-On 12/19/2016 07:38 AM, Wong, Joshua Weng Onn wrote:
->> From: JANARDHANACHARI KELLA [mailto:eni.chari@gmail.com] 
->> Sent: Monday, December 19, 2016 2:34 PM
->> To: Alexander Aring <aar@pengutronix.de>; Wong, Joshua Weng Onn <joshua.weng.onn.wong@intel.com>
->> Cc: linux-wpan@vger.kernel.org
->> Subject: Re: Bluetooth 6lowpan ping6 slab corruption
->>
->> hi sir,
->> why am i not able to send any message to linux-wpan@@vger.kernel.org mailing list..
->>
->>
->> with Regards
->> Janardhanachari Kella
->>
-> Hi Janard,
+> Hi Alex,
 > 
-> You can only send Plain Text to the mailing list. You will first need to turn off HTML encodings. Probably that was why your email was rejected.
-> Also, you need to perform bottom posting and not top posting i.e. send reply at the bottom of an email.
-> Third, you need to prepend the '>' character of the previous original message
+> > Hi,
+> >
+> > On 12/16/2016 09:18 AM, Wong, Joshua Weng Onn wrote:
+> > ...
+> > >
+> > > Thank you for informing me about this. Sorry as I was not aware of
+> > > the newer
+> > patches that you submitted to mainline.
+> > > At the moment I am not able to upgrade the kernel to a recent
+> > > version as the
+> > other teams in my department are using kernel version 4.1.27 and I
+> > have to follow it strictly.
+> > >
+> > > I just got an idea. Perhaps what I can do is backport the patches
+> > > and apply
+> > them to this version of the kernel. I am not sure if it will work
+> > entirely. I'll discuss this with my lead first if he wants me to do
+> > this and let you know if I am pursuing this.
+> > >
+> >
+> > You can backport it, yes... but please _please_ don't do it... bring
+> > it mainline and then backport it.
+> >
+> > Tell that your lead as suggestion from me.
+> >
+> > It makes no sense that you backporting it only for you. This thing
+> > need to be fixed upstream...
+> >
+> > In my opinion, all people who backporting it will do work for nothing...
+> > The next guy/girl which wants to try that out runs again into such issues.
+> >
+> > These patches was sending to bluetooth-next, now I am busy with other
+> > things and can work on it at end of April maybe... and I think only in
+> > my free-time. This patch-series just needs a little cleanup and send as PATCH...
+> >
+> > - Alex
 > 
+> I've finally just learned how to add inline '>' characters to the previous email.
+> Had to make some changes in my email settings.
+> 
+> Thank you very much for your reply.
+> Ok noted on that. My most sincere apologies as I am quite new to this and I am
+> still trying to understand how open source works. Didn't realize that it will cause
+> repetitive work for others.
+> 
+> I will discuss this with my technical lead and update you along the way.
+> 
+> Thank you.
+> 
+> Best regards,
+> Joshua
 
-again and for all:
+I have discussed this with my technical lead and that he mentioned that we will not be able to pursue to bring it to Linux mainline and also not able to backport the drivers due to resource limitation. We have pending tasks/projects that are upcoming.
 
-check http://vger.kernel.org/majordomo-info.html
+Just curious, can we know the estimated timeline that it will take for an inexperienced person in Linux kernel development to complete this task?
 
-Important part is "Taboo things".
+Thank you.
 
-- Alex
+Best regards,
+Joshua
