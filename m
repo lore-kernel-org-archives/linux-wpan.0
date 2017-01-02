@@ -1,89 +1,108 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:39127 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1761992AbcLUXi5 (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-        Wed, 21 Dec 2016 18:38:57 -0500
-From: "Wong, Joshua Weng Onn" <joshua.weng.onn.wong@intel.com>
-Subject: RE: Bluetooth 6lowpan ping6 slab corruption
-Date: Wed, 21 Dec 2016 23:38:52 +0000
-Message-ID: <E3B98393E6037849B63EA428240A65135C6C50@PGSMSX103.gar.corp.intel.com>
-References: <E3B98393E6037849B63EA428240A65135BC9D5@PGSMSX103.gar.corp.intel.com>
- <c70d7129-be2d-4764-6f09-1153192c49be@pengutronix.de>
- <E3B98393E6037849B63EA428240A65135BCA89@PGSMSX103.gar.corp.intel.com>
- <efdc1a54-7fdc-80b8-f46d-d663addae509@pengutronix.de>
- <E3B98393E6037849B63EA428240A65135C42A6@PGSMSX103.gar.corp.intel.com>
-In-Reply-To: <E3B98393E6037849B63EA428240A65135C42A6@PGSMSX103.gar.corp.intel.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+Received: from ec2-52-27-115-49.us-west-2.compute.amazonaws.com ([52.27.115.49]:56904
+        "EHLO osg.samsung.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S932959AbdABPBf (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 2 Jan 2017 10:01:35 -0500
+Subject: Re: [PATCH bluetooth-next 4/4] ieee802154: atusb: implement
+ .set_frame_retries ops callback
+References: <1480945640-3571-1-git-send-email-stefan@osg.samsung.com>
+ <1480945640-3571-5-git-send-email-stefan@osg.samsung.com>
+ <9a4a8de0-9057-553e-0766-957e9ed31fad@pengutronix.de>
+From: Stefan Schmidt <stefan@osg.samsung.com>
+Message-ID: <4066166f-d0c3-0ca2-5f00-4f5c5e5fa313@osg.samsung.com>
+Date: Mon, 2 Jan 2017 16:01:31 +0100
 MIME-Version: 1.0
+In-Reply-To: <9a4a8de0-9057-553e-0766-957e9ed31fad@pengutronix.de>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: 'Alexander Aring' <aar@pengutronix.de>
-Cc: "'alex.aring@gmail.com'" <alex.aring@gmail.com>, "'jukka.rissanen@linux.intel.com'" <jukka.rissanen@linux.intel.com>, "'linux-bluetooth@vger.kernel.org'" <linux-bluetooth@vger.kernel.org>, "'linux-wpan@vger.kernel.org'" <linux-wpan@vger.kernel.org>
+To: Alexander Aring <aar@pengutronix.de>
+Cc: linux-wpan@vger.kernel.org
 
-Hi Alex,
+Hello.
 
+On 20/12/16 12:13, Alexander Aring wrote:
+>
+> Hi,
+>
+> On 12/05/2016 02:47 PM, Stefan Schmidt wrote:
+>> From firmware version 0.3 onwards we use the TX_ARET mode allowing for automatic
+>> frame retransmissions. To actually make use of this feature we need to implement
+>> the callback for setting the frame retries.
+>>
+>> If the firmware version is to old print a warning and return with invalid value.
+>>
+>> Signed-off-by: Stefan Schmidt <stefan@osg.samsung.com>
+>> ---
+>>  drivers/net/ieee802154/atusb.c | 19 ++++++++++++++++++-
+>>  1 file changed, 18 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/net/ieee802154/atusb.c b/drivers/net/ieee802154/atusb.c
+>> index 3ed34cc..1253f86 100644
+>> --- a/drivers/net/ieee802154/atusb.c
+>> +++ b/drivers/net/ieee802154/atusb.c
+>> @@ -546,6 +546,21 @@ atusb_set_csma_params(struct ieee802154_hw *hw, u8 min_be, u8 max_be, u8 retries
+>>  }
+>>
+>>  static int
+>> +atusb_set_frame_retries(struct ieee802154_hw *hw, s8 retries)
+>> +{
+>> +	struct atusb *atusb = hw->priv;
+>> +	struct device *dev = &atusb->usb_dev->dev;
+>> +
+>> +	if (atusb->fw_ver_maj == 0 && atusb->fw_ver_min < 3) {
+>> +		dev_info(dev, "Automatic frame retransmission is only available from "
+>> +			"firmware version 0.3. Please update if you want this feature.");
+>> +		return -EINVAL;
+>> +	}
+>> +
+>
+> I think the user has not change anymore to use atusb driver with new
+> firmware now.
+>
+> Because this will set _currently_ when one interface comes first time up.
+> I say currently here, because we could change tx parameters on other
+> way... we just need to be sure that no other tx is currently running
+> anymore... and then change register values for tx parameters.
+>
+> One argument +1 to use xmit_async, with workqueue inside the driver we
+> have no change to get knowledge about locking tx in upper-layer..., but
+> this is another topic. :-)
+>
+>> +	return atusb_write_subreg(atusb, SR_MAX_FRAME_RETRIES, retries);
+>> +}
+>> +
+>> +static int
+>>  atusb_set_promiscuous_mode(struct ieee802154_hw *hw, const bool on)
+>>  {
+>>  	struct atusb *atusb = hw->priv;
+>> @@ -584,6 +599,7 @@ static const struct ieee802154_ops atusb_ops = {
+>>  	.set_cca_mode		= atusb_set_cca_mode,
+>>  	.set_cca_ed_level	= atusb_set_cca_ed_level,
+>>  	.set_csma_params	= atusb_set_csma_params,
+>> +	.set_frame_retries	= atusb_set_frame_retries,
+>>  	.set_promiscuous_mode	= atusb_set_promiscuous_mode,
+>>  };
+>>
+>> @@ -754,7 +770,8 @@ static int atusb_probe(struct usb_interface *interface,
+>>
+>>  	hw->parent = &usb_dev->dev;
+>>  	hw->flags = IEEE802154_HW_TX_OMIT_CKSUM | IEEE802154_HW_AFILT |
+>> -		    IEEE802154_HW_PROMISCUOUS | IEEE802154_HW_CSMA_PARAMS;
+>> +		    IEEE802154_HW_PROMISCUOUS | IEEE802154_HW_CSMA_PARAMS |
+>> +		    IEEE802154_HW_FRAME_RETRIES;
+>>
+>
+> You should set this flag only if it's new firmware... But not using
+> TX_ARET has also other effects... It's good now that the firmware use
+> TX_ARET per default.
+>
+> The current change is that old firmware users can't bring the interface
+> anymore up, because it fails with -EINVAL and not chance to turn it off. :-)
 
-> Hi Alex,
-> 
-> > Hi,
-> >
-> > On 12/16/2016 09:18 AM, Wong, Joshua Weng Onn wrote:
-> > ...
-> > >
-> > > Thank you for informing me about this. Sorry as I was not aware of
-> > > the newer
-> > patches that you submitted to mainline.
-> > > At the moment I am not able to upgrade the kernel to a recent
-> > > version as the
-> > other teams in my department are using kernel version 4.1.27 and I
-> > have to follow it strictly.
-> > >
-> > > I just got an idea. Perhaps what I can do is backport the patches
-> > > and apply
-> > them to this version of the kernel. I am not sure if it will work
-> > entirely. I'll discuss this with my lead first if he wants me to do
-> > this and let you know if I am pursuing this.
-> > >
-> >
-> > You can backport it, yes... but please _please_ don't do it... bring
-> > it mainline and then backport it.
-> >
-> > Tell that your lead as suggestion from me.
-> >
-> > It makes no sense that you backporting it only for you. This thing
-> > need to be fixed upstream...
-> >
-> > In my opinion, all people who backporting it will do work for nothing...
-> > The next guy/girl which wants to try that out runs again into such issues.
-> >
-> > These patches was sending to bluetooth-next, now I am busy with other
-> > things and can work on it at end of April maybe... and I think only in
-> > my free-time. This patch-series just needs a little cleanup and send as PATCH...
-> >
-> > - Alex
-> 
-> I've finally just learned how to add inline '>' characters to the previous email.
-> Had to make some changes in my email settings.
-> 
-> Thank you very much for your reply.
-> Ok noted on that. My most sincere apologies as I am quite new to this and I am
-> still trying to understand how open source works. Didn't realize that it will cause
-> repetitive work for others.
-> 
-> I will discuss this with my technical lead and update you along the way.
-> 
-> Thank you.
-> 
-> Best regards,
-> Joshua
+Sorry for not catching this earlier. I tested with old and new firmware 
+now and sent a patch that fixes this problem for me.
 
-I have discussed this with my technical lead and that he mentioned that we will not be able to pursue to bring it to Linux mainline and also not able to backport the drivers due to resource limitation. We have pending tasks/projects that are upcoming.
-
-Just curious, can we know the estimated timeline that it will take for an inexperienced person in Linux kernel development to complete this task?
-
-Thank you.
-
-Best regards,
-Joshua
+regards
+Stefan Schmidt
