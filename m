@@ -1,12 +1,12 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from proxima.lasnet.de ([78.47.171.185]:53748 "EHLO
+Received: from proxima.lasnet.de ([78.47.171.185]:53724 "EHLO
         proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933278AbdABP6V (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 2 Jan 2017 10:58:21 -0500
+        with ESMTP id S932959AbdABPAa (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 2 Jan 2017 10:00:30 -0500
 From: Stefan Schmidt <stefan@osg.samsung.com>
-Subject: [PATCH v2 bluetooth] ieee802154: atusb: fix driver to work with older firmware versions
-Date: Mon,  2 Jan 2017 16:58:13 +0100
-Message-Id: <1483372693-31334-1-git-send-email-stefan@osg.samsung.com>
+Subject: [PATCH bluetooth] ieee802154: atusb: fix driver to work with older firmware versions
+Date: Mon,  2 Jan 2017 16:00:10 +0100
+Message-Id: <1483369210-23893-1-git-send-email-stefan@osg.samsung.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
@@ -22,15 +22,13 @@ feature is not available.
 Fixes: 5d82288b93db3bc ("ieee802154: atusb: implement .set_frame_retries
 ops callback")
 Reported-by: Alexander Aring <aar@pengutronix.de>
-Acked-by: Alexander Aring <aar@pengutronix.de>
 Signed-off-by: Stefan Schmidt <stefan@osg.samsung.com>
-
 ---
- drivers/net/ieee802154/atusb.c | 13 ++++---------
- 1 file changed, 4 insertions(+), 9 deletions(-)
+ drivers/net/ieee802154/atusb.c | 14 +++++---------
+ 1 file changed, 5 insertions(+), 9 deletions(-)
 
 diff --git a/drivers/net/ieee802154/atusb.c b/drivers/net/ieee802154/atusb.c
-index 63cb679..ef68851 100644
+index 63cb679..ac32029 100644
 --- a/drivers/net/ieee802154/atusb.c
 +++ b/drivers/net/ieee802154/atusb.c
 @@ -562,13 +562,6 @@ static int
@@ -57,12 +55,13 @@ index 63cb679..ef68851 100644
  
  	hw->phy->flags = WPAN_PHY_FLAG_TXPOWER | WPAN_PHY_FLAG_CCA_ED_LEVEL |
  			 WPAN_PHY_FLAG_CCA_MODE;
-@@ -832,6 +824,9 @@ static int atusb_probe(struct usb_interface *interface,
+@@ -832,6 +824,10 @@ static int atusb_probe(struct usb_interface *interface,
  	atusb_get_and_show_build(atusb);
  	atusb_set_extended_addr(atusb);
  
-+	if (atusb->fw_ver_maj >= 0 && atusb->fw_ver_min >= 3)
++	if (atusb->fw_ver_maj >= 0 && atusb->fw_ver_min >= 3) {
 +		hw->flags |= IEEE802154_HW_FRAME_RETRIES;
++	}
 +
  	ret = atusb_get_and_clear_error(atusb);
  	if (ret) {
