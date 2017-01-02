@@ -1,93 +1,35 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from ec2-52-27-115-49.us-west-2.compute.amazonaws.com ([52.27.115.49]:57058
-        "EHLO osg.samsung.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1751763AbdABP7T (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 2 Jan 2017 10:59:19 -0500
-Subject: Re: [PATCH bluetooth] ieee802154: atusb: fix driver to work with
- older firmware versions
-References: <1483369210-23893-1-git-send-email-stefan@osg.samsung.com>
- <9fef164c-cba0-ba75-30ea-15f933f0a5c5@pengutronix.de>
-From: Stefan Schmidt <stefan@osg.samsung.com>
-Message-ID: <83129a28-b26a-4041-8dfc-766f9f152075@osg.samsung.com>
-Date: Mon, 2 Jan 2017 16:59:16 +0100
+Received: from mail-qk0-f180.google.com ([209.85.220.180]:34947 "EHLO
+        mail-qk0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751104AbdABI5M (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 2 Jan 2017 03:57:12 -0500
+Received: by mail-qk0-f180.google.com with SMTP id u25so335341602qki.2
+        for <linux-wpan@vger.kernel.org>; Mon, 02 Jan 2017 00:57:12 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <9fef164c-cba0-ba75-30ea-15f933f0a5c5@pengutronix.de>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
+From: JANARDHANACHARI KELLA <eni.chari@gmail.com>
+Date: Mon, 2 Jan 2017 14:27:11 +0530
+Message-ID: <CAAK7Ti-6NypT=jTFeuFv=Ka3EDDzzbnrqbRuv9PU0EaW3ibEhg@mail.gmail.com>
+Subject: please help me process for libcoap and and 6lowpan integration.
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <aar@pengutronix.de>
-Cc: linux-wpan@vger.kernel.org
+To: linux-wpan@vger.kernel.org
 
-Hello.
+Hi,
 
-On 02/01/17 16:39, Alexander Aring wrote:
->
-> Hi Stefan,
->
-> thanks for the fix!
->
-> On 01/02/2017 04:00 PM, Stefan Schmidt wrote:
->> After the addition of the frame_retries callback we could run into cases where
->> a ATUSB device with an older firmware version would now longer be able to bring
->> the interface up.
->>
->> We keep this functionality disabled now if the minimum firmware version for this
->> feature is not available.
->>
->> Fixes: 5d82288b93db3bc ("ieee802154: atusb: implement .set_frame_retries
->> ops callback")
->> Reported-by: Alexander Aring <aar@pengutronix.de>
->> Signed-off-by: Stefan Schmidt <stefan@osg.samsung.com>
->> ---
->
-> Acked-by: Alexander Aring <aar@pengutronix.de>
->
->>  drivers/net/ieee802154/atusb.c | 14 +++++---------
->>  1 file changed, 5 insertions(+), 9 deletions(-)
->>
->> diff --git a/drivers/net/ieee802154/atusb.c b/drivers/net/ieee802154/atusb.c
->> index 63cb679..ac32029 100644
->> --- a/drivers/net/ieee802154/atusb.c
->> +++ b/drivers/net/ieee802154/atusb.c
->> @@ -562,13 +562,6 @@ static int
->>  atusb_set_frame_retries(struct ieee802154_hw *hw, s8 retries)
->>  {
->>  	struct atusb *atusb = hw->priv;
->> -	struct device *dev = &atusb->usb_dev->dev;
->> -
->> -	if (atusb->fw_ver_maj == 0 && atusb->fw_ver_min < 3) {
->> -		dev_info(dev, "Automatic frame retransmission is only available from "
->> -			"firmware version 0.3. Please update if you want this feature.");
->> -		return -EINVAL;
->> -	}
->>
->>  	return atusb_write_subreg(atusb, SR_MAX_FRAME_RETRIES, retries);
->>  }
->> @@ -802,8 +795,7 @@ static int atusb_probe(struct usb_interface *interface,
->>
->>  	hw->parent = &usb_dev->dev;
->>  	hw->flags = IEEE802154_HW_TX_OMIT_CKSUM | IEEE802154_HW_AFILT |
->> -		    IEEE802154_HW_PROMISCUOUS | IEEE802154_HW_CSMA_PARAMS |
->> -		    IEEE802154_HW_FRAME_RETRIES;
->> +		    IEEE802154_HW_PROMISCUOUS | IEEE802154_HW_CSMA_PARAMS;
->>
->>  	hw->phy->flags = WPAN_PHY_FLAG_TXPOWER | WPAN_PHY_FLAG_CCA_ED_LEVEL |
->>  			 WPAN_PHY_FLAG_CCA_MODE;
->> @@ -832,6 +824,10 @@ static int atusb_probe(struct usb_interface *interface,
->>  	atusb_get_and_show_build(atusb);
->>  	atusb_set_extended_addr(atusb);
->>
->> +	if (atusb->fw_ver_maj >= 0 && atusb->fw_ver_min >= 3) {
->> +		hw->flags |= IEEE802154_HW_FRAME_RETRIES;
->> +	}
->> +
->
-> nitpick, remove brackets? Checkpatch should complain about that, I
-> suppose.
+I am trying for coap to release through wpan interfece. for generating
+coap packet i am using libcoap.  can any one tried for generate packet
+like bellow.
 
-Fair enough. I'm just to used to this. Version 2 with the parenthesis 
-removed and your ack added.
+Protocols in frame: wpan:6lowpan:ipv6:ipv6.nxt:udp:coap.data
 
-regards
-Stefan Schmidt
+please give any information to release coap packets with wpan interface.
+
+
+
+-- 
+Sincerely Your's
+
+Janardhanachari Kella
+Contact:+91-9908469599
+E-mail: eni.chari@gmail.com
