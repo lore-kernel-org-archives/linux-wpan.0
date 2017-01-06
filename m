@@ -1,47 +1,48 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from ec2-52-27-115-49.us-west-2.compute.amazonaws.com ([52.27.115.49]:42473
+Received: from ec2-52-27-115-49.us-west-2.compute.amazonaws.com ([52.27.115.49]:47696
         "EHLO osg.samsung.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S935421AbdAEMug (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 5 Jan 2017 07:50:36 -0500
-Received: from localhost (localhost [127.0.0.1])
-        by osg.samsung.com (Postfix) with ESMTP id 3EC1EA13EA
-        for <linux-wpan@vger.kernel.org>; Thu,  5 Jan 2017 12:49:42 +0000 (UTC)
-Received: from osg.samsung.com ([127.0.0.1])
-        by localhost (s-opensource.com [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id W6blGk5jnxgj for <linux-wpan@vger.kernel.org>;
-        Thu,  5 Jan 2017 12:49:41 +0000 (UTC)
-Received: from [192.168.2.110] (pD9F791C7.dip0.t-ipconnect.de [217.247.145.199])
-        by osg.samsung.com (Postfix) with ESMTPSA id 693A7A13E9
-        for <linux-wpan@vger.kernel.org>; Thu,  5 Jan 2017 12:49:41 +0000 (UTC)
+        with ESMTP id S932623AbdAFOLD (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 6 Jan 2017 09:11:03 -0500
 Subject: Re: Requesting for process, to port driver from contiki to linux
 References: <CAAK7Ti-pFkukD0wuRKKtg89oqeqAGycr--S1-ssdrXJwZsgT4Q@mail.gmail.com>
+ <c24f9bf0-97bf-ab26-1a5a-d147ae72d3c4@osg.samsung.com>
+ <CAAK7Ti_Pp9n4ERTmBrEeVwRtfi+SiKr9Lb6QgW_Wo+GHHku6gA@mail.gmail.com>
 From: Stefan Schmidt <stefan@osg.samsung.com>
-Message-ID: <c24f9bf0-97bf-ab26-1a5a-d147ae72d3c4@osg.samsung.com>
-Date: Thu, 5 Jan 2017 13:49:24 +0100
+Message-ID: <af5f2d15-ad3f-f25b-2967-69033d0b9ce1@osg.samsung.com>
+Date: Fri, 6 Jan 2017 15:10:56 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAAK7Ti-pFkukD0wuRKKtg89oqeqAGycr--S1-ssdrXJwZsgT4Q@mail.gmail.com>
+In-Reply-To: <CAAK7Ti_Pp9n4ERTmBrEeVwRtfi+SiKr9Lb6QgW_Wo+GHHku6gA@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org
+To: JANARDHANACHARI KELLA <eni.chari@gmail.com>
+Cc: "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>
 
 Hello.
 
-On 05/01/17 11:57, JANARDHANACHARI KELLA wrote:
-> Hi,
+On 06/01/17 13:57, JANARDHANACHARI KELLA wrote:
+> thankq Stefan.
 >
-> can any one explain how to port driver from contiki to linux?
+> can you suggest me, any documents to develop/ write STM Spirit1
+> supported module?
 
-Write a new one.
+If you want to get any help or support here you should read what people 
+are writing you. Alexander told you at least two times now to keep the 
+mailing list in cc when replying and STOP top posting on this list. (If 
+you do not know what he means I suggest you look it up). I you keep 
+ignoring this people will just ignore you.
 
-There is no process for this. Contiki and Linux are _very_ different in 
-how they handle hardware. If you need to get a hardware support for 
-Linux-wpan you best would be starting with one of the existing drivers 
-as a reference and start adding the needed logic for yours.
+And if you no read again what I wrote you will see that I already 
+suggested you to look at the existing drivers. We are a group of 
+volunteers here working on Linux-wpan. If nobody has an interest to 
+spent his time on writing a guide how to develop a driver for for 
+transceiver XXX it just does not happen.
 
-What transceiver is it anyway, maybe there is already support for it or 
-someones plans to work on it.
+You best bet it to take a look at the existing drivers, learn how they 
+are hooked up to the stack and interact with the kernel. Take the 
+datasheet (if the vendor offers one to you) and match what logic you 
+find there to drive the hardware to what we have.
 
 regards
 Stefan Schmidt
