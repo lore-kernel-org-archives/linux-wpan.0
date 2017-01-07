@@ -1,50 +1,108 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from proxima.lasnet.de ([78.47.171.185]:57019 "EHLO
+Received: from proxima.lasnet.de ([78.47.171.185]:57023 "EHLO
         proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S939468AbdAGATI (ORCPT
+        with ESMTP id S936866AbdAGATI (ORCPT
         <rfc822;linux-wpan@vger.kernel.org>); Fri, 6 Jan 2017 19:19:08 -0500
 From: Stefan Schmidt <stefan@osg.samsung.com>
-Subject: [pull-request bluetooth] wpan fixes for 4.10 2017-01-07
-Date: Sat,  7 Jan 2017 01:18:52 +0100
-Message-Id: <1483748337-4862-1-git-send-email-stefan@osg.samsung.com>
+Subject: [PATCH bluetooth 1/5] ieee802154: atusb: do not use the stack for buffers to make them DMA able
+Date: Sat,  7 Jan 2017 01:18:53 +0100
+Message-Id: <1483748337-4862-2-git-send-email-stefan@osg.samsung.com>
+In-Reply-To: <1483748337-4862-1-git-send-email-stefan@osg.samsung.com>
+References: <1483748337-4862-1-git-send-email-stefan@osg.samsung.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: marcel@holtmann.org
-Cc: linux-wpan@vger.kernel.org, Alexander Aring <aar@pengutronix.de>, Stefan Schmidt <stefan@osg.samsung.com>
+Cc: linux-wpan@vger.kernel.org, Alexander Aring <aar@pengutronix.de>, Stefan Schmidt <stefan@osg.samsung.com>, stable@vger.kernel.org
 
-A set of fixes for ieee802154 drivers targeting 4.10.
+ From 4.9 we should really avoid using the stack here as this will not be DMA
+able on various platforms. This changes the buffers already being present in
+time of 4.9 being released. This should go into stable as well.
 
-Two out of the four ATUSB patches are to make sure the buffers are DMA-able
-after the changes introduced in 4.9. One of them fixes code that was already
-present in 4.9 and might be worth a backport to stable. I added a cc stable
-to it. The other two ATUSB patches are fixing problems from the patchset
-supporting the new v0.3 firmware.
+Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
+Cc: stable@vger.kernel.org
+Signed-off-by: Stefan Schmidt <stefan@osg.samsung.com>
+---
+ drivers/net/ieee802154/atusb.c | 31 +++++++++++++++++++++++++++----
+ 1 file changed, 27 insertions(+), 4 deletions(-)
 
-For at86rf233 we got a patch from Andrey Smirnov to make sure it works well
-in hardware designs where the RSTN pin is connected to a slow GPIO pin.
+diff --git a/drivers/net/ieee802154/atusb.c b/drivers/net/ieee802154/atusb.c
+index 1253f86..fa3e8c3 100644
+--- a/drivers/net/ieee802154/atusb.c
++++ b/drivers/net/ieee802154/atusb.c
+@@ -117,13 +117,26 @@ static int atusb_read_reg(struct atusb *atusb, uint8_t reg)
+ {
+ 	struct usb_device *usb_dev = atusb->usb_dev;
+ 	int ret;
++	uint8_t *buffer;
+ 	uint8_t value;
+ 
++	buffer = kmalloc(1, GFP_KERNEL);
++	if (!buffer)
++		return -ENOMEM;
++
+ 	dev_dbg(&usb_dev->dev, "atusb: reg = 0x%x\n", reg);
+ 	ret = atusb_control_msg(atusb, usb_rcvctrlpipe(usb_dev, 0),
+ 				ATUSB_REG_READ, ATUSB_REQ_FROM_DEV,
+-				0, reg, &value, 1, 1000);
+-	return ret >= 0 ? value : ret;
++				0, reg, buffer, 1, 1000);
++
++	if (ret >= 0) {
++		value = buffer[0];
++		kfree(buffer);
++		return value;
++	} else {
++		kfree(buffer);
++		return ret;
++	}
+ }
+ 
+ static int atusb_write_subreg(struct atusb *atusb, uint8_t reg, uint8_t mask,
+@@ -608,9 +621,13 @@ static const struct ieee802154_ops atusb_ops = {
+ static int atusb_get_and_show_revision(struct atusb *atusb)
+ {
+ 	struct usb_device *usb_dev = atusb->usb_dev;
+-	unsigned char buffer[3];
++	unsigned char *buffer;
+ 	int ret;
+ 
++	buffer = kmalloc(3, GFP_KERNEL);
++	if (!buffer)
++		return -ENOMEM;
++
+ 	/* Get a couple of the ATMega Firmware values */
+ 	ret = atusb_control_msg(atusb, usb_rcvctrlpipe(usb_dev, 0),
+ 				ATUSB_ID, ATUSB_REQ_FROM_DEV, 0, 0,
+@@ -631,15 +648,20 @@ static int atusb_get_and_show_revision(struct atusb *atusb)
+ 		dev_info(&usb_dev->dev, "Please update to version 0.2 or newer");
+ 	}
+ 
++	kfree(buffer);
+ 	return ret;
+ }
+ 
+ static int atusb_get_and_show_build(struct atusb *atusb)
+ {
+ 	struct usb_device *usb_dev = atusb->usb_dev;
+-	char build[ATUSB_BUILD_SIZE + 1];
++	char *build;
+ 	int ret;
+ 
++	build = kmalloc(ATUSB_BUILD_SIZE + 1, GFP_KERNEL);
++	if (!build)
++		return -ENOMEM;
++
+ 	ret = atusb_control_msg(atusb, usb_rcvctrlpipe(usb_dev, 0),
+ 				ATUSB_BUILD, ATUSB_REQ_FROM_DEV, 0, 0,
+ 				build, ATUSB_BUILD_SIZE, 1000);
+@@ -648,6 +670,7 @@ static int atusb_get_and_show_build(struct atusb *atusb)
+ 		dev_info(&usb_dev->dev, "Firmware: build %s\n", build);
+ 	}
+ 
++	kfree(build);
+ 	return ret;
+ }
+ 
+-- 
+2.5.5
 
-The following changes since commit d896b3120b3391a2f95b2b8ec636e3f594d7f9c4:
-
-  Merge git://git.kernel.org/pub/scm/linux/kernel/git/pablo/nf (2017-01-05 11:49:57 -0500)
-
-are available in the git repository at:
-
-  https://github.com/linux-wpan/linux-wpan.git for-upstream
-
-for you to fetch changes up to 3215bb7dd0b4dc894bed61c216508ffdf8b7ebb3:
-
-  ieee802154: atusb: fix driver to work with older firmware versions (2017-01-06 23:19:51 +0100)
-
-----------------------------------------------------------------
-Andrey Smirnov (1):
-      at86rf230: Allow slow GPIO pins for "rstn"
-
-Stefan Schmidt (4):
-      ieee802154: atusb: do not use the stack for buffers to make them DMA able
-      ieee802154: atusb: make sure we set a randaom extended address if fetching fails
-      ieee802154: atusb: do not use the stack for address fetching to make it DMA able
-      ieee802154: atusb: fix driver to work with older firmware versions
-
- drivers/net/ieee802154/at86rf230.c |  4 +--
- drivers/net/ieee802154/atusb.c     | 59 +++++++++++++++++++++++++++-----------
- 2 files changed, 45 insertions(+), 18 deletions(-)
