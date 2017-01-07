@@ -1,34 +1,58 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from ec2-52-27-115-49.us-west-2.compute.amazonaws.com ([52.27.115.49]:50036
-        "EHLO osg.samsung.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1030244AbdAGAVA (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Fri, 6 Jan 2017 19:21:00 -0500
-Subject: Re: When will bluetooth.git get updated to 4.10-rcX?
-References: <f5463d2d-5e92-2b49-35b4-383c1054d381@osg.samsung.com>
- <19964A11-B8B9-4395-87B9-C5D1A6196AD7@holtmann.org>
-From: Stefan Schmidt <stefan@osg.samsung.com>
-Message-ID: <69e1ef0f-fe2e-9a05-2407-dde859577125@osg.samsung.com>
-Date: Sat, 7 Jan 2017 01:20:56 +0100
+Received: from mail-qt0-f174.google.com ([209.85.216.174]:35159 "EHLO
+        mail-qt0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751646AbdAGOVz (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Sat, 7 Jan 2017 09:21:55 -0500
+Received: by mail-qt0-f174.google.com with SMTP id x49so36382959qtc.2
+        for <linux-wpan@vger.kernel.org>; Sat, 07 Jan 2017 06:21:55 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <19964A11-B8B9-4395-87B9-C5D1A6196AD7@holtmann.org>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
+From: JANARDHANACHARI KELLA <eni.chari@gmail.com>
+Date: Sat, 7 Jan 2017 19:51:54 +0530
+Message-ID: <CAAK7Ti9=i2wRTmrViZiXuuC=sXsWUmFbjV5pSp0sFVrrGXBpqA@mail.gmail.com>
+Subject: Re: Requesting for process, to port driver from contiki to linux
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>
+To: Stefan Schmidt <stefan@osg.samsung.com>
+Cc: linux-wpan@vger.kernel.org
 
-Hello.
+Thankq Stefan for your advice.
 
-On 06/01/17 18:15, Marcel Holtmann wrote:
-> Hi Stefan,
+
+
+
+With regards
+Janardhanachari
+
+
+On Jan 6, 2017 7:41 PM, "Stefan Schmidt" <stefan@osg.samsung.com> wrote:
+
+> Hello.
 >
->> I wanted to prepare a pull request with some 15.4 fixes for 4.10 for you but the git repo is still at 4.9.rc6 and thus does not have any of the changes that came in from the merge window for 4.10.
+> On 06/01/17 13:57, JANARDHANACHARI KELLA wrote:
 >
-> I just pulled from davem and pushed it back out. Should be up-to-date now.
-
-Thanks, that worked well. Sent you a pull request with the fixes from 
-the list.
-
-regards
-Stefan Schmidt
+>> thankq Stefan.
+>>
+>> can you suggest me, any documents to develop/ write STM Spirit1
+>> supported module?
+>>
+>
+> If you want to get any help or support here you should read what people
+> are writing you. Alexander told you at least two times now to keep the
+> mailing list in cc when replying and STOP top posting on this list. (If you
+> do not know what he means I suggest you look it up). I you keep ignoring
+> this people will just ignore you.
+>
+> And if you no read again what I wrote you will see that I already
+> suggested you to look at the existing drivers. We are a group of volunteers
+> here working on Linux-wpan. If nobody has an interest to spent his time on
+> writing a guide how to develop a driver for for transceiver XXX it just
+> does not happen.
+>
+> You best bet it to take a look at the existing drivers, learn how they are
+> hooked up to the stack and interact with the kernel. Take the datasheet (if
+> the vendor offers one to you) and match what logic you find there to drive
+> the hardware to what we have.
+>
+> regards
+> Stefan Schmidt
