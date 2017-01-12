@@ -1,73 +1,64 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from proxima.lasnet.de ([78.47.171.185]:57030 "EHLO
-        proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S936866AbdAGATM (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Fri, 6 Jan 2017 19:19:12 -0500
-From: Stefan Schmidt <stefan@osg.samsung.com>
-Subject: [PATCH bluetooth 5/5] ieee802154: atusb: fix driver to work with older firmware versions
-Date: Sat,  7 Jan 2017 01:18:57 +0100
-Message-Id: <1483748337-4862-6-git-send-email-stefan@osg.samsung.com>
-In-Reply-To: <1483748337-4862-1-git-send-email-stefan@osg.samsung.com>
+Received: from ec2-52-27-115-49.us-west-2.compute.amazonaws.com ([52.27.115.49]:43359
+        "EHLO osg.samsung.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1750911AbdALH4G (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 12 Jan 2017 02:56:06 -0500
+Subject: Re: [pull-request bluetooth] wpan fixes for 4.10 2017-01-07
 References: <1483748337-4862-1-git-send-email-stefan@osg.samsung.com>
+From: Stefan Schmidt <stefan@osg.samsung.com>
+Message-ID: <85ea03e3-66b6-0de5-126c-d7eedce8fc98@osg.samsung.com>
+Date: Thu, 12 Jan 2017 08:56:01 +0100
+MIME-Version: 1.0
+In-Reply-To: <1483748337-4862-1-git-send-email-stefan@osg.samsung.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: marcel@holtmann.org
-Cc: linux-wpan@vger.kernel.org, Alexander Aring <aar@pengutronix.de>, Stefan Schmidt <stefan@osg.samsung.com>
+Cc: linux-wpan@vger.kernel.org, Alexander Aring <aar@pengutronix.de>
 
-After the addition of the frame_retries callback we could run into cases where
-a ATUSB device with an older firmware version would now longer be able to bring
-the interface up.
+Hello Marcel.
 
-We keep this functionality disabled now if the minimum firmware version for this
-feature is not available.
+On 07/01/17 01:18, Stefan Schmidt wrote:
+> A set of fixes for ieee802154 drivers targeting 4.10.
+>
+> Two out of the four ATUSB patches are to make sure the buffers are DMA-able
+> after the changes introduced in 4.9. One of them fixes code that was already
+> present in 4.9 and might be worth a backport to stable. I added a cc stable
+> to it. The other two ATUSB patches are fixing problems from the patchset
+> supporting the new v0.3 firmware.
+>
+> For at86rf233 we got a patch from Andrey Smirnov to make sure it works well
+> in hardware designs where the RSTN pin is connected to a slow GPIO pin.
+>
+> The following changes since commit d896b3120b3391a2f95b2b8ec636e3f594d7f9c4:
+>
+>   Merge git://git.kernel.org/pub/scm/linux/kernel/git/pablo/nf (2017-01-05 11:49:57 -0500)
+>
+> are available in the git repository at:
+>
+>   https://github.com/linux-wpan/linux-wpan.git for-upstream
+>
+> for you to fetch changes up to 3215bb7dd0b4dc894bed61c216508ffdf8b7ebb3:
+>
+>   ieee802154: atusb: fix driver to work with older firmware versions (2017-01-06 23:19:51 +0100)
+>
+> ----------------------------------------------------------------
+> Andrey Smirnov (1):
+>       at86rf230: Allow slow GPIO pins for "rstn"
+>
+> Stefan Schmidt (4):
+>       ieee802154: atusb: do not use the stack for buffers to make them DMA able
+>       ieee802154: atusb: make sure we set a randaom extended address if fetching fails
+>       ieee802154: atusb: do not use the stack for address fetching to make it DMA able
+>       ieee802154: atusb: fix driver to work with older firmware versions
+>
+>  drivers/net/ieee802154/at86rf230.c |  4 +--
+>  drivers/net/ieee802154/atusb.c     | 59 +++++++++++++++++++++++++++-----------
+>  2 files changed, 45 insertions(+), 18 deletions(-)
 
-Fixes: 5d82288b93db3bc ("ieee802154: atusb: implement .set_frame_retries
-ops callback")
-Reported-by: Alexander Aring <aar@pengutronix.de>
-Acked-by: Alexander Aring <aar@pengutronix.de>
-Signed-off-by: Stefan Schmidt <stefan@osg.samsung.com>
----
- drivers/net/ieee802154/atusb.c | 13 ++++---------
- 1 file changed, 4 insertions(+), 9 deletions(-)
+Anything wrong with this pull request or have you just been to busy to 
+come to it yet?
 
-diff --git a/drivers/net/ieee802154/atusb.c b/drivers/net/ieee802154/atusb.c
-index 63cb679..ef68851 100644
---- a/drivers/net/ieee802154/atusb.c
-+++ b/drivers/net/ieee802154/atusb.c
-@@ -562,13 +562,6 @@ static int
- atusb_set_frame_retries(struct ieee802154_hw *hw, s8 retries)
- {
- 	struct atusb *atusb = hw->priv;
--	struct device *dev = &atusb->usb_dev->dev;
--
--	if (atusb->fw_ver_maj == 0 && atusb->fw_ver_min < 3) {
--		dev_info(dev, "Automatic frame retransmission is only available from "
--			"firmware version 0.3. Please update if you want this feature.");
--		return -EINVAL;
--	}
- 
- 	return atusb_write_subreg(atusb, SR_MAX_FRAME_RETRIES, retries);
- }
-@@ -802,8 +795,7 @@ static int atusb_probe(struct usb_interface *interface,
- 
- 	hw->parent = &usb_dev->dev;
- 	hw->flags = IEEE802154_HW_TX_OMIT_CKSUM | IEEE802154_HW_AFILT |
--		    IEEE802154_HW_PROMISCUOUS | IEEE802154_HW_CSMA_PARAMS |
--		    IEEE802154_HW_FRAME_RETRIES;
-+		    IEEE802154_HW_PROMISCUOUS | IEEE802154_HW_CSMA_PARAMS;
- 
- 	hw->phy->flags = WPAN_PHY_FLAG_TXPOWER | WPAN_PHY_FLAG_CCA_ED_LEVEL |
- 			 WPAN_PHY_FLAG_CCA_MODE;
-@@ -832,6 +824,9 @@ static int atusb_probe(struct usb_interface *interface,
- 	atusb_get_and_show_build(atusb);
- 	atusb_set_extended_addr(atusb);
- 
-+	if (atusb->fw_ver_maj >= 0 && atusb->fw_ver_min >= 3)
-+		hw->flags |= IEEE802154_HW_FRAME_RETRIES;
-+
- 	ret = atusb_get_and_clear_error(atusb);
- 	if (ret) {
- 		dev_err(&atusb->usb_dev->dev,
--- 
-2.5.5
-
+regards
+Stefan Schmidt
