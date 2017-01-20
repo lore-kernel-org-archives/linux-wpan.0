@@ -1,47 +1,51 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wj0-f195.google.com ([209.85.210.195]:33357 "EHLO
-        mail-wj0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1764537AbdAJPmx (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 10 Jan 2017 10:42:53 -0500
-Received: by mail-wj0-f195.google.com with SMTP id kp2so87924723wjc.0
-        for <linux-wpan@vger.kernel.org>; Tue, 10 Jan 2017 07:42:52 -0800 (PST)
-From: Harry Morris <harrymorris12@gmail.com>
-Subject: [PATCH v7 3/3] ieee802154: Add entry in MAINTAINTERS for CA8210 driver
-Date: Tue, 10 Jan 2017 15:41:22 +0000
-Message-Id: <20170110154122.6724-4-h.morris@cascoda.com>
-In-Reply-To: <20170110154122.6724-1-h.morris@cascoda.com>
-References: <20170110154122.6724-1-h.morris@cascoda.com>
+Received: from mail-pf0-f195.google.com ([209.85.192.195]:35598 "EHLO
+        mail-pf0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752420AbdATOkp (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 20 Jan 2017 09:40:45 -0500
+From: Geliang Tang <geliangtang@gmail.com>
+Subject: [PATCH] 6lowpan: use rb_entry()
+Date: Fri, 20 Jan 2017 22:36:53 +0800
+Message-Id: <c6a809ea5820242a4ae126b03cdcd910a36e5cae.1484817152.git.geliangtang@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org
-Cc: aar@pengutronix.de, stefan@osg.samsung.com, marcel@holtmann.org, Harry Morris <h.morris@cascoda.com>
+To: Alexander Aring <aar@pengutronix.de>, Jukka Rissanen <jukka.rissanen@linux.intel.com>, "David S. Miller" <davem@davemloft.net>
+Cc: Geliang Tang <geliangtang@gmail.com>, linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Signed-off-by: Harry Morris <h.morris@cascoda.com>
-Acked-by: Stefan Schmidt <stefan@osg.samsung.com>
+To make the code clearer, use rb_entry() instead of container_of() to
+deal with rbtree.
+
+Signed-off-by: Geliang Tang <geliangtang@gmail.com>
 ---
- MAINTAINERS | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ net/6lowpan/nhc.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 5e925a2..cb3428f 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -2829,6 +2829,15 @@ W:	http://www.linux-c6x.org/wiki/index.php/Main_Page
- S:	Maintained
- F:	arch/c6x/
+diff --git a/net/6lowpan/nhc.c b/net/6lowpan/nhc.c
+index 7008d53..4fa2fdd 100644
+--- a/net/6lowpan/nhc.c
++++ b/net/6lowpan/nhc.c
+@@ -27,8 +27,8 @@ static int lowpan_nhc_insert(struct lowpan_nhc *nhc)
  
-+CA8210 IEEE-802.15.4 RADIO DRIVER
-+M:	Harry Morris <h.morris@cascoda.com>
-+M:	linuxdev@cascoda.com
-+L:	linux-wpan@vger.kernel.org
-+W:	https://github.com/Cascoda/ca8210-linux.git
-+S:	Maintained
-+F:	drivers/net/ieee802154/ca8210.c
-+F:	Documentation/devicetree/bindings/net/ieee802154/ca8210.txt
-+
- CACHEFILES: FS-CACHE BACKEND FOR CACHING ON MOUNTED FILESYSTEMS
- M:	David Howells <dhowells@redhat.com>
- L:	linux-cachefs@redhat.com (moderated for non-subscribers)
+ 	/* Figure out where to put new node */
+ 	while (*new) {
+-		struct lowpan_nhc *this = container_of(*new, struct lowpan_nhc,
+-						       node);
++		struct lowpan_nhc *this = rb_entry(*new, struct lowpan_nhc,
++						   node);
+ 		int result, len_dif, len;
+ 
+ 		len_dif = nhc->idlen - this->idlen;
+@@ -69,8 +69,8 @@ static struct lowpan_nhc *lowpan_nhc_by_nhcid(const struct sk_buff *skb)
+ 	const u8 *nhcid_skb_ptr = skb->data;
+ 
+ 	while (node) {
+-		struct lowpan_nhc *nhc = container_of(node, struct lowpan_nhc,
+-						      node);
++		struct lowpan_nhc *nhc = rb_entry(node, struct lowpan_nhc,
++						  node);
+ 		u8 nhcid_skb_ptr_masked[LOWPAN_NHC_MAX_ID_LEN];
+ 		int result, i;
+ 
 -- 
-2.9.3.windows.1
+2.9.3
 
