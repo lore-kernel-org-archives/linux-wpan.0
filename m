@@ -1,58 +1,73 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from tuna.sandelman.ca ([209.87.249.19]:41657 "EHLO
-        tuna.sandelman.ca" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752601AbdAZOcS (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 26 Jan 2017 09:32:18 -0500
-From: Michael Richardson <mcr@sandelman.ca>
-Subject: Re: how to communicate with contiki node, from raspberry pi with at86rf233 module
-In-Reply-To: <CAAK7Ti8d-1xHNg8T4P_AYCnUxp_akk4ge24tdqJoLMx-GxWrvw@mail.gmail.com>
-References: <CAAK7Ti8d-1xHNg8T4P_AYCnUxp_akk4ge24tdqJoLMx-GxWrvw@mail.gmail.com>
+Received: from mail-qt0-f180.google.com ([209.85.216.180]:33940 "EHLO
+        mail-qt0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754799AbdA0Orh (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 27 Jan 2017 09:47:37 -0500
+Received: by mail-qt0-f180.google.com with SMTP id w20so72321837qtb.1
+        for <linux-wpan@vger.kernel.org>; Fri, 27 Jan 2017 06:47:36 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-        micalg=pgp-sha256; protocol="application/pgp-signature"
-Date: Thu, 26 Jan 2017 09:26:30 -0500
-Message-ID: <23132.1485440790@obiwan.sandelman.ca>
+In-Reply-To: <23132.1485440790@obiwan.sandelman.ca>
+References: <CAAK7Ti8d-1xHNg8T4P_AYCnUxp_akk4ge24tdqJoLMx-GxWrvw@mail.gmail.com>
+ <23132.1485440790@obiwan.sandelman.ca>
+From: JANARDHANACHARI KELLA <eni.chari@gmail.com>
+Date: Fri, 27 Jan 2017 20:17:32 +0530
+Message-ID: <CAAK7Ti_eZ1PxspnEF_mGEyXmmS4O2pw11U_yMVdMDAH0Rvemeg@mail.gmail.com>
+Subject: Re: how to communicate with contiki node, from raspberry pi with
+ at86rf233 module
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: JANARDHANACHARI KELLA <eni.chari@gmail.com>
+To: Michael Richardson <mcr@sandelman.ca>
 Cc: linux-wpan@vger.kernel.org
 
---=-=-=
-Content-Type: text/plain
+Hi Michael,
 
+Thank you for your replay..
 
-JANARDHANACHARI KELLA <eni.chari@gmail.com> wrote:
-    > i have attached at86rf233 module to Raspberry pi. device is able to
-    > send radio packet data out. i am able to sniff from outside. any one
-    > please guide me, to initiate communication between contiki node and
-    > raspberry pi.
+On Thu, Jan 26, 2017 at 7:56 PM, Michael Richardson <mcr@sandelman.ca> wrote:
+>
+> JANARDHANACHARI KELLA <eni.chari@gmail.com> wrote:
+>     > i have attached at86rf233 module to Raspberry pi. device is able to
+>     > send radio packet data out. i am able to sniff from outside. any one
+>     > please guide me, to initiate communication between contiki node and
+>     > raspberry pi.
+>
+> Assuming that you have two contiki devices that can talk to each other so
+> that we aren't debugging the contiki side of things:
+>   Have you checked that you have the right PANIDs, and frequency choices?
 
-Assuming that you have two contiki devices that can talk to each other so
-that we aren't debugging the contiki side of things:
-  Have you checked that you have the right PANIDs, and frequency choices?
+yes, i had configured the same panid, and frequency.
 
-You also need to tell us something about the kernels involved, the version
-of wpan-tools you are using, how you are sniffing, and how you are generating
-traffic.
+> You also need to tell us something about the kernels involved
 
---
-]               Never tell me the odds!                 | ipv6 mesh networks [
-]   Michael Richardson, Sandelman Software Works        | network architect  [
-]     mcr@sandelman.ca  http://www.sandelman.ca/        |   ruby on rails    [
+i am using 4.9 kernel which source i have taken from github/raspberrypi
 
+>, the version of wpan-tools you are using,
 
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
+the version of wpan-tools i am using is version 0.7
 
------BEGIN PGP SIGNATURE-----
+> how you are sniffing
 
-iQEzBAEBCAAdFiEEbsyLEzg/qUTA43uogItw+93Q3WUFAliKBxYACgkQgItw+93Q
-3WWTaAf9EFm1QDJhWKe/qcJnaAmLcbq/CiKoohLpGNevfx1vYfnNfuIvOK5tDfd8
-PDShuosYNbpzemnU1UoAyotH0Krxg9szIFQm3W67lzpad8xF1lduo7qzzpCl2XgX
-y5oK8020eTPBJ3OUp/Btoi8uElDmdVlRysyEtXTI6nxE5hZfy538KAzng3kkXbdH
-NeqaKiw8YazjDZ0N/WOrPX4wxF7uA81OfWrGedyRixfwCc5r+ycsxnnHm5BYSuqD
-an+1ZT6EgPoNipTyCkNklP0Bgk29LpD7e7m6xWwWJAashZzAbTMY4/iKBe+HYSlX
-LhXC2jeHhiXCoLrN1bgwAuJ34iFXOg==
-=lXE0
------END PGP SIGNATURE-----
---=-=-=--
+i have taken a contiki node and i flashed sniffer program into it. and
+i am using foren6 sniffing tool to capture the packets in air.
+
+>, and how you are generating traffic.
+
+i have been generated the traffic between raspberry
+pi<--to-->raspberrypi and contiki node to contiki BR.
+
+>
+> --
+> ]               Never tell me the odds!                 | ipv6 mesh networks [
+> ]   Michael Richardson, Sandelman Software Works        | network architect  [
+> ]     mcr@sandelman.ca  http://www.sandelman.ca/        |   ruby on rails    [
+>
+
+Thank you.
+
+-- 
+Sincerely Your's
+
+Janardhanachari Kella
+Contact:+91-9908469599
+E-mail: eni.chari@gmail.com
