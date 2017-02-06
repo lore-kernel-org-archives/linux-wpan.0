@@ -1,46 +1,75 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from ec2-52-27-115-49.us-west-2.compute.amazonaws.com ([52.27.115.49]:33784
-        "EHLO osg.samsung.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1751419AbdB0Oam (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 27 Feb 2017 09:30:42 -0500
-Subject: Re: [PATCH v8 1/3] ieee802154: Add CA8210 IEEE 802.15.4 device driver
+Received: from mail-wm0-f65.google.com ([74.125.82.65]:34954 "EHLO
+        mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751094AbdBFRJh (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 6 Feb 2017 12:09:37 -0500
+Received: by mail-wm0-f65.google.com with SMTP id u63so23067648wmu.2
+        for <linux-wpan@vger.kernel.org>; Mon, 06 Feb 2017 09:09:36 -0800 (PST)
+From: Harry Morris <harrymorris12@gmail.com>
+Subject: [PATCH v8 2/3] ieee802154: Add device tree documentation for CA8210
+Date: Mon,  6 Feb 2017 17:08:56 +0000
+Message-Id: <20170206170857.5064-3-h.morris@cascoda.com>
+In-Reply-To: <20170206170857.5064-1-h.morris@cascoda.com>
 References: <20170206170857.5064-1-h.morris@cascoda.com>
- <20170206170857.5064-2-h.morris@cascoda.com>
-From: Stefan Schmidt <stefan@osg.samsung.com>
-Message-ID: <967ca575-923a-ed40-13c2-544f44eb50e6@osg.samsung.com>
-Date: Mon, 27 Feb 2017 15:20:40 +0100
-MIME-Version: 1.0
-In-Reply-To: <20170206170857.5064-2-h.morris@cascoda.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Harry Morris <harrymorris12@gmail.com>, linux-wpan@vger.kernel.org
-Cc: aar@pengutronix.de, marcel@holtmann.org, Harry Morris <h.morris@cascoda.com>
+To: linux-wpan@vger.kernel.org
+Cc: aar@pengutronix.de, stefan@osg.samsung.com, marcel@holtmann.org, Harry Morris <h.morris@cascoda.com>
 
-Hello.
-
-On 02/06/2017 06:08 PM, Harry Morris wrote:
-> Add driver source and config for softMAC implementation of Cascoda's CA8210
-> IEEE 802.15.4 transceiver device. The driver mimics a common PHY-only
-> implementation despite the CA8210 being a hardMAC device which exposes a SAP
-> interface to the fully integrated MAC.
->
-> The chip is a modem-only device with an integrated processor which runs the
-> 802.15.4 MAC. The chip communicates via full-duplex SPI with additional pins
-> for NIRQ and NRESET. The chip can also output its 16MHz clock to a GPIO with a
-> configurable divider.
->
-> The driver can be configured to implement a debugfs node that provides access
-> to the SAP-based API to drive mechanisms not currently supported by the
-> standard kernel interface.
->
-> Signed-off-by: Harry Morris <h.morris@cascoda.com>
-
-With the compile problem from common clk solved you can add my ack for 
-the next version:
-
+Signed-off-by: Harry Morris <h.morris@cascoda.com>
 Acked-by: Stefan Schmidt <stefan@osg.samsung.com>
+---
+ .../devicetree/bindings/net/ieee802154/ca8210.txt  | 28 ++++++++++++++++++++++
+ .../devicetree/bindings/vendor-prefixes.txt        |  1 +
+ 2 files changed, 29 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/net/ieee802154/ca8210.txt
 
-regards
-Stefan Schmidt
+diff --git a/Documentation/devicetree/bindings/net/ieee802154/ca8210.txt b/Documentation/devicetree/bindings/net/ieee802154/ca8210.txt
+new file mode 100644
+index 0000000..a1046e6
+--- /dev/null
++++ b/Documentation/devicetree/bindings/net/ieee802154/ca8210.txt
+@@ -0,0 +1,28 @@
++* CA8210 IEEE 802.15.4 *
++
++Required properties:
++	- compatible:           Should be "cascoda,ca8210"
++	- reg:                  Controlling chip select
++	- spi-max-frequency:    Maximum clock speed, should be *less than*
++	                        4000000
++	- spi-cpol:             Requires inverted clock polarity
++	- reset-gpio:           GPIO attached to reset
++	- irq-gpio:             GPIO attached to IRQ
++Optional properties:
++	- extclock-enable:      Include for the ca8210 to route its 16MHz clock
++	                        to an output
++	- extclock-freq:        Frequency in Hz of the external clock
++	- extclock-gpio:        GPIO of the ca8210 to output the clock on
++
++Example:
++	ca8210@0 {
++		compatible = "cascoda,ca8210";
++		reg = <0>;
++		spi-max-frequency = <3000000>;
++		spi-cpol;
++		reset-gpio = <&gpio1 1 GPIO_ACTIVE_HIGH>;
++		irq-gpio = <&gpio1 2 GPIO_ACTIVE_HIGH>;
++		extclock-enable;
++		extclock-freq = 16000000;
++		extclock-gpio = 2;
++	};
+diff --git a/Documentation/devicetree/bindings/vendor-prefixes.txt b/Documentation/devicetree/bindings/vendor-prefixes.txt
+index 24c6f65..6c5609f 100644
+--- a/Documentation/devicetree/bindings/vendor-prefixes.txt
++++ b/Documentation/devicetree/bindings/vendor-prefixes.txt
+@@ -47,6 +47,7 @@ brcm	Broadcom Corporation
+ buffalo	Buffalo, Inc.
+ calxeda	Calxeda
+ capella	Capella Microsystems, Inc
++cascoda	Cascoda, Ltd.
+ cavium	Cavium, Inc.
+ cdns	Cadence Design Systems Inc.
+ ceva	Ceva, Inc.
+-- 
+2.9.3.windows.1
+
