@@ -1,51 +1,68 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:55615 "EHLO
-        metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1750920AbdBTIed (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>);
-        Mon, 20 Feb 2017 03:34:33 -0500
-Subject: Re: Register two 802.15.4 devices/interfaces in one driver
-References: <CAJuUDwuKQvpXhZKKAmBLReUd4+LOqS3+5CaGjRR6DNcRkQgrVw@mail.gmail.com>
- <28517.1487255767@obiwan.sandelman.ca>
- <193c0df2-d259-9076-c442-5731f6124e50@pengutronix.de>
- <32430.1487274266@obiwan.sandelman.ca>
- <7eae598a-c56e-2aac-c0f4-cef9b92dc23b@pengutronix.de>
- <10193.1487347973@obiwan.sandelman.ca>
-From: Alexander Aring <aar@pengutronix.de>
-Message-ID: <c55ce28b-13a3-b0a8-f62d-be9f923081de@pengutronix.de>
-Date: Mon, 20 Feb 2017 09:34:29 +0100
-MIME-Version: 1.0
-In-Reply-To: <10193.1487347973@obiwan.sandelman.ca>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Received: from mail-wj0-f196.google.com ([209.85.210.196]:33571 "EHLO
+        mail-wj0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751094AbdBFRJf (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 6 Feb 2017 12:09:35 -0500
+Received: by mail-wj0-f196.google.com with SMTP id le4so3841010wjb.0
+        for <linux-wpan@vger.kernel.org>; Mon, 06 Feb 2017 09:09:34 -0800 (PST)
+From: Harry Morris <harrymorris12@gmail.com>
+Subject: [PATCH v8 0/3] ieee802154: Add support for Cascoda CA8210
+Date: Mon,  6 Feb 2017 17:08:54 +0000
+Message-Id: <20170206170857.5064-1-h.morris@cascoda.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Michael Richardson <mcr@sandelman.ca>
-Cc: Xue Liu <liuxuenetmail@gmail.com>, linux-wpan@vger.kernel.org
+To: linux-wpan@vger.kernel.org
+Cc: aar@pengutronix.de, stefan@osg.samsung.com, marcel@holtmann.org, Harry Morris <h.morris@cascoda.com>
 
+This patchset adds a new device driver, documentation and build support for
+Cascoda's CA8210 IEEE 802.15.4 radio transceiver:
+http://www.cascoda.com/products/ca-821x/
 
-Hi,
+v8:
+Use module_spi_driver helper
+Remove async tx timeout at driver level
+Style conformance change
+Rework synchronous command handling to remove mutex
 
-On 02/17/2017 05:12 PM, Michael Richardson wrote:
-> 
-> Alexander Aring <aar@pengutronix.de> wrote:
->     > Yes, turn transceiver "quietly" (maybe some pr_info notice) into
->     > promiscuous mode or (if supported) turn off address filtering only.
->     > Needs some driver layer changed and subsystem changes to allow it.
-> 
->     > And this all quietly, just make a pr_info notice for networking experts
->     > why your interrupt load for the transceiver will be increased.
-> 
-> Yup. Clearly if you try to do things in software to compensate for lacks in
-> hardware, there is a cost.  That's fine as long as nobody is surprised.
-> 
+v7:
+Remove use of cs_change property, always transmit full length buffers
+Implement fully async spi transfers
+Combine spi transmission and reception into one function
+Use completion objects when waiting for events
+Rework a lot of locking
+Remove deprecated xmit_sync
+Remove use of workqueue for IRQ handling
 
-rethinking of this while taking a shower... Then we need some kind of
-software ACK handling, because disable address filter will occur, if you
-don't disable ACK handling, you ack all frames which arrived.
+v6:
+Kernel style conformance changes
+Additional documentation
+More meaningful register structs/macros
+Removal of old TODOs
+Removal of unnecessary macros
+Check for safe removal of test interface
 
-We need somehow to check fast if we have such interface with this
-address -> then sending ack out so fast as possible... we can try it but
-I cannot promise that the time will always match.
+v5:
++Cc: Marcel Holtmann
 
-- Alex
+v4:
+Added allowable tx_powers and cca_ed_levels
+Changed power units to mbm (tx_power & cca_ed_level)
+
+Harry Morris (3):
+  ieee802154: Add CA8210 IEEE 802.15.4 device driver
+  ieee802154: Add device tree documentation for CA8210
+  ieee802154: Add entry in MAINTAINTERS for CA8210 driver
+
+ .../devicetree/bindings/net/ieee802154/ca8210.txt  |   28 +
+ .../devicetree/bindings/vendor-prefixes.txt        |    1 +
+ MAINTAINERS                                        |    9 +
+ drivers/net/ieee802154/Kconfig                     |   21 +
+ drivers/net/ieee802154/Makefile                    |    1 +
+ drivers/net/ieee802154/ca8210.c                    | 3155 ++++++++++++++++++++
+ 6 files changed, 3215 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/net/ieee802154/ca8210.txt
+ create mode 100644 drivers/net/ieee802154/ca8210.c
+
+-- 
+2.9.3.windows.1
+
