@@ -1,84 +1,55 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:55865 "EHLO
-        metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1750789AbdBSHJu (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>);
-        Sun, 19 Feb 2017 02:09:50 -0500
+Received: from tuna.sandelman.ca ([209.87.249.19]:47718 "EHLO
+        tuna.sandelman.ca" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S934283AbdBQQNH (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 17 Feb 2017 11:13:07 -0500
+From: Michael Richardson <mcr@sandelman.ca>
 Subject: Re: Register two 802.15.4 devices/interfaces in one driver
-References: <CAJuUDwuKQvpXhZKKAmBLReUd4+LOqS3+5CaGjRR6DNcRkQgrVw@mail.gmail.com>
- <28517.1487255767@obiwan.sandelman.ca>
- <193c0df2-d259-9076-c442-5731f6124e50@pengutronix.de>
- <32430.1487274266@obiwan.sandelman.ca>
- <7eae598a-c56e-2aac-c0f4-cef9b92dc23b@pengutronix.de>
- <CAJuUDwvpQ+9dWiyG2f6uE4EJu0NA8+Hz5sWRqFpDutY4Kue_sA@mail.gmail.com>
-From: Alexander Aring <aar@pengutronix.de>
-Message-ID: <94a8fff1-abac-2f85-0402-38cc4a07f1d7@pengutronix.de>
-Date: Sun, 19 Feb 2017 08:09:46 +0100
+In-Reply-To: <7eae598a-c56e-2aac-c0f4-cef9b92dc23b@pengutronix.de>
+References: <CAJuUDwuKQvpXhZKKAmBLReUd4+LOqS3+5CaGjRR6DNcRkQgrVw@mail.gmail.com> <28517.1487255767@obiwan.sandelman.ca> <193c0df2-d259-9076-c442-5731f6124e50@pengutronix.de> <32430.1487274266@obiwan.sandelman.ca> <7eae598a-c56e-2aac-c0f4-cef9b92dc23b@pengutronix.de>
 MIME-Version: 1.0
-In-Reply-To: <CAJuUDwvpQ+9dWiyG2f6uE4EJu0NA8+Hz5sWRqFpDutY4Kue_sA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; boundary="=-=-=";
+        micalg=pgp-sha256; protocol="application/pgp-signature"
+Date: Fri, 17 Feb 2017 11:12:53 -0500
+Message-ID: <10193.1487347973@obiwan.sandelman.ca>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Xue Liu <liuxuenetmail@gmail.com>
-Cc: Michael Richardson <mcr@sandelman.ca>, linux-wpan@vger.kernel.org
+To: Alexander Aring <aar@pengutronix.de>
+Cc: Xue Liu <liuxuenetmail@gmail.com>, linux-wpan@vger.kernel.org
 
-Hi,
+--=-=-=
+Content-Type: text/plain
 
-On 02/17/2017 12:01 PM, Xue Liu wrote:
-> At first, thanks for all help
-> 
-> 2017-02-17 8:26 GMT+01:00 Alexander Aring <aar@pengutronix.de>:
->>
->> Hi,
->>
->> On 02/16/2017 08:44 PM, Michael Richardson wrote:
->>>
->>> Alexander Aring <aar@pengutronix.de> wrote:
->>>     > I think the important thing is here (I suppose) the device can somehow
->>>     > handle TWO address filters. Meaning you can operate on TWO source
->>>     > pan-ids and having address filtering on.
->>>
->>> I imagine that yes, this is what the device is offering.
->>>
->>
->> Yes, but inclusive some channel hopping feature when switching the PAN,
->> so far I see... But it's still one phy. :-/
->>
->> For me this is already some "out of spec" specification because the PHY
->> PIB of 802.15.4 doesn't describe such handling to save it there, for one
->> PHY.
->>
-> 
-> It means, we should add new feature to handle this in
-> ieee802154_register_hw(), right ?
-> 
 
-Mhhh, not sure. :-/
+Alexander Aring <aar@pengutronix.de> wrote:
+    > Yes, turn transceiver "quietly" (maybe some pr_info notice) into
+    > promiscuous mode or (if supported) turn off address filtering only.
+    > Needs some driver layer changed and subsystem changes to allow it.
 
-You can provide a new phy flag and add some handling to a vendor
-specific nl802154 command to whatever you want (please lookup vendor
-specific nl80211 stuff in wireless).
+    > And this all quietly, just make a pr_info notice for networking experts
+    > why your interrupt load for the transceiver will be increased.
 
-If you want not to use these channel hopping feature then try to add
-support to allow two interfaces on one phy. Then other transceivers can
-follow to add support for that.
+Yup. Clearly if you try to do things in software to compensate for lacks in
+hardware, there is a cost.  That's fine as long as nobody is surprised.
 
----
+--
+]               Never tell me the odds!                 | ipv6 mesh networks [
+]   Michael Richardson, Sandelman Software Works        | network architect  [
+]     mcr@sandelman.ca  http://www.sandelman.ca/        |   ruby on rails    [
 
-What I think "calling ieee802154_register_hw twice, will register two
-phy's" but original you have still _one_ phy. One phy with a crazy
-channel hopping feature which I don't see in IEEE 802.15.4 to provide
-such handling. :-)
 
-First idea is: Try one phy and run two interfaces with two address
-filtering on it, seems that the transceiver supports such handling...
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
 
-How to implement it, don't know look driver_ops driver_flags and then
-think about how to handle it in 802.15.4, then implement it somehow
-that's mainline acceptable if you want.
+-----BEGIN PGP SIGNATURE-----
 
-_If_ you really need that "channel hopping" feature, what's the exact
-use-case for that and look for a vendor specific nl802154 command. :-/
-
-- Alex
+iQEzBAEBCAAdFiEEbsyLEzg/qUTA43uogItw+93Q3WUFAlinIQQACgkQgItw+93Q
+3WVyVgf+I7S6HF5D4UrVahzEBxFk1E2NaRJJXLDXmFATzJ246mSyJURr6JwKZNN/
+pSS+mjhWl0IUA9maO2Q2yxftAebGKatBWoPCrWJymnRMgb8j75wb2Z5qwQuXp4md
+cgHmD346sYEguq3+WxDMEAwl/xOnCc6zjJiYInYftUWFaKpFcSfz5CnqK1pzzmRj
+muYGbu3+Ip1RdMLpqjFNlTkMSe0757DBPL8HqY5ipux60k5hSF/KIFnYosKwOZmh
+FiWvB2WVGLLMK9bNq+rylfh/VodRqbXsQgcNsnX4GVzXe4kaOzc+5sdXVKdp1iTw
+AqTiNuiIi+WTCb9wBqa4x/57dUr1QQ==
+=q94X
+-----END PGP SIGNATURE-----
+--=-=-=--
