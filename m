@@ -1,12 +1,12 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-lf0-f65.google.com ([209.85.215.65]:36817 "EHLO
+Received: from mail-lf0-f65.google.com ([209.85.215.65]:33462 "EHLO
         mail-lf0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751352AbdBUKiU (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 21 Feb 2017 05:38:20 -0500
+        with ESMTP id S1751804AbdBUKiV (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 21 Feb 2017 05:38:21 -0500
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Subject: [PATCH v4 2/5] 6lowpan: Set MAC address length according to LOWPAN_LLTYPE
-Date: Tue, 21 Feb 2017 12:38:08 +0200
-Message-Id: <20170221103811.1506-4-luiz.dentz@gmail.com>
+Subject: [PATCH v4 3/5] 6lowpan: iphc: override l2 packet information
+Date: Tue, 21 Feb 2017 12:38:09 +0200
+Message-Id: <20170221103811.1506-5-luiz.dentz@gmail.com>
 In-Reply-To: <20170221103811.1506-1-luiz.dentz@gmail.com>
 References: <20170221103811.1506-1-luiz.dentz@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
@@ -14,40 +14,58 @@ List-ID: <linux-wpan.vger.kernel.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: patrik.flykt@linux.intel.com, aar@pengutronix.de, linux-wpan@vger.kernel.org, netdev@vger.kernel.org
 
-From: Patrik Flykt <patrik.flykt@linux.intel.com>
+From: Alexander Aring <aar@pengutronix.de>
 
-Set MAC address length according to the 6LoWPAN link layer in use.
-Bluetooth Low Energy uses 48 bit addressing while IEEE802.15.4 uses
-64 bits.
+The skb->pkt_type need to be set by L2, but on 6LoWPAN there exists L2
+e.g. BTLE which doesn't has multicast addressing. If it's a multicast or
+not is detected by IPHC headers multicast bit. The IPv6 layer will
+evaluate this pkt_type, so we force set this type while uncompressing.
+Should be okay for 802.15.4 as well.
 
-Signed-off-by: Patrik Flykt <patrik.flykt@linux.intel.com>
+Signed-off-by: Alexander Aring <aar@pengutronix.de>
 Reviewed-by: Stefan Schmidt <stefan@osg.samsung.com>
 ---
- net/6lowpan/core.c | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+ net/6lowpan/iphc.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/net/6lowpan/core.c b/net/6lowpan/core.c
-index 5945f7e..5f9909a 100644
---- a/net/6lowpan/core.c
-+++ b/net/6lowpan/core.c
-@@ -23,7 +23,16 @@ int lowpan_register_netdevice(struct net_device *dev,
- {
- 	int i, ret;
+diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
+index 79f1fa2..fb5f6fa 100644
+--- a/net/6lowpan/iphc.c
++++ b/net/6lowpan/iphc.c
+@@ -666,6 +666,8 @@ int lowpan_header_decompress(struct sk_buff *skb, const struct net_device *dev,
  
--	dev->addr_len = EUI64_ADDR_LEN;
-+	switch (lltype) {
-+	case LOWPAN_LLTYPE_IEEE802154:
-+		dev->addr_len = EUI64_ADDR_LEN;
-+		break;
+ 	switch (iphc1 & (LOWPAN_IPHC_M | LOWPAN_IPHC_DAC)) {
+ 	case LOWPAN_IPHC_M | LOWPAN_IPHC_DAC:
++		skb->pkt_type = PACKET_BROADCAST;
 +
-+	case LOWPAN_LLTYPE_BTLE:
-+		dev->addr_len = ETH_ALEN;
-+		break;
-+	}
+ 		spin_lock_bh(&lowpan_dev(dev)->ctx.lock);
+ 		ci = lowpan_iphc_ctx_get_by_id(dev, LOWPAN_IPHC_CID_DCI(cid));
+ 		if (!ci) {
+@@ -681,11 +683,15 @@ int lowpan_header_decompress(struct sk_buff *skb, const struct net_device *dev,
+ 		spin_unlock_bh(&lowpan_dev(dev)->ctx.lock);
+ 		break;
+ 	case LOWPAN_IPHC_M:
++		skb->pkt_type = PACKET_BROADCAST;
 +
- 	dev->type = ARPHRD_6LOWPAN;
- 	dev->mtu = IPV6_MIN_MTU;
- 	dev->priv_flags |= IFF_NO_QUEUE;
+ 		/* multicast */
+ 		err = lowpan_uncompress_multicast_daddr(skb, &hdr.daddr,
+ 							iphc1 & LOWPAN_IPHC_DAM_MASK);
+ 		break;
+ 	case LOWPAN_IPHC_DAC:
++		skb->pkt_type = PACKET_HOST;
++
+ 		spin_lock_bh(&lowpan_dev(dev)->ctx.lock);
+ 		ci = lowpan_iphc_ctx_get_by_id(dev, LOWPAN_IPHC_CID_DCI(cid));
+ 		if (!ci) {
+@@ -701,6 +707,8 @@ int lowpan_header_decompress(struct sk_buff *skb, const struct net_device *dev,
+ 		spin_unlock_bh(&lowpan_dev(dev)->ctx.lock);
+ 		break;
+ 	default:
++		skb->pkt_type = PACKET_HOST;
++
+ 		err = lowpan_iphc_uncompress_addr(skb, dev, &hdr.daddr,
+ 						  iphc1 & LOWPAN_IPHC_DAM_MASK,
+ 						  daddr);
 -- 
 2.9.3
 
