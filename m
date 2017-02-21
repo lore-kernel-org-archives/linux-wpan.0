@@ -1,12 +1,12 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-lf0-f68.google.com ([209.85.215.68]:36814 "EHLO
-        mail-lf0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751563AbdBUKiT (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 21 Feb 2017 05:38:19 -0500
+Received: from mail-lf0-f65.google.com ([209.85.215.65]:36817 "EHLO
+        mail-lf0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751352AbdBUKiU (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 21 Feb 2017 05:38:20 -0500
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Subject: [PATCH v3 2/5] 6lowpan: Set MAC address lenght according to LOWPAN_LLTYPE
-Date: Tue, 21 Feb 2017 12:38:07 +0200
-Message-Id: <20170221103811.1506-3-luiz.dentz@gmail.com>
+Subject: [PATCH v4 2/5] 6lowpan: Set MAC address length according to LOWPAN_LLTYPE
+Date: Tue, 21 Feb 2017 12:38:08 +0200
+Message-Id: <20170221103811.1506-4-luiz.dentz@gmail.com>
 In-Reply-To: <20170221103811.1506-1-luiz.dentz@gmail.com>
 References: <20170221103811.1506-1-luiz.dentz@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
@@ -21,6 +21,7 @@ Bluetooth Low Energy uses 48 bit addressing while IEEE802.15.4 uses
 64 bits.
 
 Signed-off-by: Patrik Flykt <patrik.flykt@linux.intel.com>
+Reviewed-by: Stefan Schmidt <stefan@osg.samsung.com>
 ---
  net/6lowpan/core.c | 11 ++++++++++-
  1 file changed, 10 insertions(+), 1 deletion(-)
