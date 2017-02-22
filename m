@@ -1,258 +1,139 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-lf0-f68.google.com ([209.85.215.68]:34718 "EHLO
-        mail-lf0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751629AbdBUKi3 (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 21 Feb 2017 05:38:29 -0500
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Subject: [PATCH v4 5/5] 6lowpan: Use netdev addr_len to determine lladdr len
-Date: Tue, 21 Feb 2017 12:38:11 +0200
-Message-Id: <20170221103811.1506-7-luiz.dentz@gmail.com>
-In-Reply-To: <20170221103811.1506-1-luiz.dentz@gmail.com>
-References: <20170221103811.1506-1-luiz.dentz@gmail.com>
+Received: from r0.smtpout1.alwaysdata.com ([176.31.58.0]:44834 "EHLO
+        r0.smtpout1.alwaysdata.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S933437AbdBVTUz (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>);
+        Wed, 22 Feb 2017 14:20:55 -0500
+Received: from 85.131.11.109.rev.sfr.net ([109.11.131.85] helo=laptop.numericable.fr)
+        by smtpout1.roubaix1.alwaysdata.com with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.88)
+        (envelope-from <web+oss@zopieux.com>)
+        id 1cgcT6-0002Gs-Gq
+        for linux-wpan@vger.kernel.org; Wed, 22 Feb 2017 20:20:52 +0100
+From: Alexandre Macabies <web+oss@zopieux.com>
+Subject: Review request: add pseudo-hardware timestamps to mrf24j40 driver
+Date: Wed, 22 Feb 2017 20:20:32 +0100
+Message-Id: <20170222192032.22360-1-web+oss@zopieux.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: patrik.flykt@linux.intel.com, aar@pengutronix.de, linux-wpan@vger.kernel.org, netdev@vger.kernel.org
+To: linux-wpan@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hello,
 
-This allow technologies such as Bluetooth to use its native lladdr which
-is eui48 instead of eui64 which was expected by functions like
-lowpan_header_decompress and lowpan_header_compress.
+This is not a formal patch. I am trying to add timestamping support to
+the drivers/net/ieee802154/mrf24j40.c driver. I need more precise
+timestamps that the software ones attached to the packets when
+entering/leaving the kernel.
 
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Reviewed-by: Stefan Schmidt <stefan@osg.samsung.com>
+As far as I am aware, the MRF24J40 has no registers[1] to retrieve
+hardware timestamps. Thus the idea is to use ktime_get() timestamps at
+the proper places in the driver -- hence the *pseudo*-hardware.
+
+- for incoming packets, call ktime_get() in the interrupt handler and
+store it for later user. Then push it to skb_hwtstamps just before
+sending the skb to ieee802154_rx_irqsafe().
+- for outgoing packets, call ktime_get() in the "TX complete"
+interrupt handler. This interrupt will only be triggered if the packet
+is indeed going out the physical radio, which may no always be the
+case, eg. if we send raw garbage on the wpan interface. But I guess
+this is fine.
+
+I implemented these changes according to [2] and by looking at existing
+timestamping code in other (mostly ethernet) drivers.
+
+Does this method make any sense? Could you do a review of my changes?
+Would you be interested in up-streaming these changes once reviewed and
+cleaned up?
+
+Thanks for your time.
+
+Alexandre
+
+[1] http://ww1.microchip.com/downloads/en/DeviceDoc/39776C.pdf
+[2] https://www.kernel.org/doc/Documentation/networking/timestamping.txt
+
 ---
- include/net/6lowpan.h   | 19 +++++++++++++++++++
- net/6lowpan/iphc.c      | 49 ++++++++++++++++++++++++++++++++++++++-----------
- net/bluetooth/6lowpan.c | 42 ++++++------------------------------------
- 3 files changed, 63 insertions(+), 47 deletions(-)
+ drivers/net/ieee802154/mrf24j40.c | 29 ++++++++++++++++++++++++++---
+ 1 file changed, 26 insertions(+), 3 deletions(-)
 
-diff --git a/include/net/6lowpan.h b/include/net/6lowpan.h
-index 5ab4c99..c5792cb 100644
---- a/include/net/6lowpan.h
-+++ b/include/net/6lowpan.h
-@@ -198,6 +198,25 @@ static inline void lowpan_iphc_uncompress_eui64_lladdr(struct in6_addr *ipaddr,
- 	ipaddr->s6_addr[8] ^= 0x02;
+diff --git a/drivers/net/ieee802154/mrf24j40.c b/drivers/net/ieee802154/mrf24j40.c
+index f446db828561..165c86992672 100644
+--- a/drivers/net/ieee802154/mrf24j40.c
++++ b/drivers/net/ieee802154/mrf24j40.c
+@@ -21,6 +21,7 @@
+ #include <linux/regmap.h>
+ #include <linux/ieee802154.h>
+ #include <linux/irq.h>
++#include <linux/ktime.h>
+ #include <net/cfg802154.h>
+ #include <net/mac802154.h>
+ 
+@@ -236,6 +237,7 @@ struct mrf24j40 {
+ 	struct spi_transfer rx_lqi_trx;
+ 	u8 rx_fifo_buf[RX_FIFO_SIZE];
+ 	struct spi_transfer rx_fifo_buf_trx;
++	ktime_t rx_tstamp;
+ 
+ 	/* isr handling for reading intstat */
+ 	struct spi_message irq_msg;
+@@ -558,6 +560,8 @@ static void write_tx_buf_complete(void *context)
+ 	if (ieee802154_is_ackreq(fc))
+ 		val |= BIT_TXNACKREQ;
+ 
++	skb_tx_timestamp(devrec->tx_skb);
++
+ 	devrec->tx_post_msg.complete = NULL;
+ 	devrec->tx_post_buf[0] = MRF24J40_WRITESHORT(REG_TXNCON);
+ 	devrec->tx_post_buf[1] = val;
+@@ -604,6 +608,9 @@ static int mrf24j40_tx(struct ieee802154_hw *hw, struct sk_buff *skb)
+ 	dev_dbg(printdev(devrec), "tx packet of %d bytes\n", skb->len);
+ 	devrec->tx_skb = skb;
+ 
++	if (unlikely(skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP))
++		skb_shinfo(skb)->tx_flags |= SKBTX_IN_PROGRESS;
++
+ 	return write_tx_buf(devrec, 0x000, skb->data, skb->len);
  }
  
-+static inline void lowpan_iphc_uncompress_eui48_lladdr(struct in6_addr *ipaddr,
-+						       const void *lladdr)
-+{
-+	/* fe:80::XXXX:XXff:feXX:XXXX
-+	 *        \_________________/
-+	 *              hwaddr
-+	 */
-+	ipaddr->s6_addr[0] = 0xFE;
-+	ipaddr->s6_addr[1] = 0x80;
-+	memcpy(&ipaddr->s6_addr[8], lladdr, 3);
-+	ipaddr->s6_addr[11] = 0xFF;
-+	ipaddr->s6_addr[12] = 0xFE;
-+	memcpy(&ipaddr->s6_addr[13], lladdr + 3, 3);
-+	/* second bit-flip (Universe/Local)
-+	 * is done according RFC2464
-+	 */
-+	ipaddr->s6_addr[8] ^= 0x02;
-+}
-+
- #ifdef DEBUG
- /* print data in line */
- static inline void raw_dump_inline(const char *caller, char *msg,
-diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
-index fb5f6fa..6b1042e 100644
---- a/net/6lowpan/iphc.c
-+++ b/net/6lowpan/iphc.c
-@@ -278,6 +278,23 @@ lowpan_iphc_ctx_get_by_mcast_addr(const struct net_device *dev,
- 	return ret;
- }
- 
-+static void lowpan_iphc_uncompress_lladdr(const struct net_device *dev,
-+					  struct in6_addr *ipaddr,
-+					  const void *lladdr)
-+{
-+	switch (dev->addr_len) {
-+	case ETH_ALEN:
-+		lowpan_iphc_uncompress_eui48_lladdr(ipaddr, lladdr);
-+		break;
-+	case EUI64_ADDR_LEN:
-+		lowpan_iphc_uncompress_eui64_lladdr(ipaddr, lladdr);
-+		break;
-+	default:
-+		WARN_ON_ONCE(1);
-+		break;
-+	}
-+}
-+
- /* Uncompress address function for source and
-  * destination address(non-multicast).
-  *
-@@ -320,7 +337,7 @@ static int lowpan_iphc_uncompress_addr(struct sk_buff *skb,
- 			lowpan_iphc_uncompress_802154_lladdr(ipaddr, lladdr);
- 			break;
- 		default:
--			lowpan_iphc_uncompress_eui64_lladdr(ipaddr, lladdr);
-+			lowpan_iphc_uncompress_lladdr(dev, ipaddr, lladdr);
- 			break;
- 		}
- 		break;
-@@ -381,7 +398,7 @@ static int lowpan_iphc_uncompress_ctx_addr(struct sk_buff *skb,
- 			lowpan_iphc_uncompress_802154_lladdr(ipaddr, lladdr);
- 			break;
- 		default:
--			lowpan_iphc_uncompress_eui64_lladdr(ipaddr, lladdr);
-+			lowpan_iphc_uncompress_lladdr(dev, ipaddr, lladdr);
- 			break;
- 		}
- 		ipv6_addr_prefix_copy(ipaddr, &ctx->pfx, ctx->plen);
-@@ -810,6 +827,21 @@ lowpan_iphc_compress_ctx_802154_lladdr(const struct in6_addr *ipaddr,
- 	return lladdr_compress;
- }
- 
-+static bool lowpan_iphc_addr_equal(const struct net_device *dev,
-+				   const struct lowpan_iphc_ctx *ctx,
-+				   const struct in6_addr *ipaddr,
-+				   const void *lladdr)
-+{
-+	struct in6_addr tmp = {};
-+
-+	lowpan_iphc_uncompress_lladdr(dev, &tmp, lladdr);
-+
-+	if (ctx)
-+		ipv6_addr_prefix_copy(&tmp, &ctx->pfx, ctx->plen);
-+
-+	return ipv6_addr_equal(&tmp, ipaddr);
-+}
-+
- static u8 lowpan_compress_ctx_addr(u8 **hc_ptr, const struct net_device *dev,
- 				   const struct in6_addr *ipaddr,
- 				   const struct lowpan_iphc_ctx *ctx,
-@@ -827,13 +859,7 @@ static u8 lowpan_compress_ctx_addr(u8 **hc_ptr, const struct net_device *dev,
- 		}
- 		break;
- 	default:
--		/* check for SAM/DAM = 11 */
--		memcpy(&tmp.s6_addr[8], lladdr, EUI64_ADDR_LEN);
--		/* second bit-flip (Universe/Local) is done according RFC2464 */
--		tmp.s6_addr[8] ^= 0x02;
--		/* context information are always used */
--		ipv6_addr_prefix_copy(&tmp, &ctx->pfx, ctx->plen);
--		if (ipv6_addr_equal(&tmp, ipaddr)) {
-+		if (lowpan_iphc_addr_equal(dev, ctx, ipaddr, lladdr)) {
- 			dam = LOWPAN_IPHC_DAM_11;
- 			goto out;
- 		}
-@@ -929,11 +955,12 @@ static u8 lowpan_compress_addr_64(u8 **hc_ptr, const struct net_device *dev,
- 		}
- 		break;
- 	default:
--		if (is_addr_mac_addr_based(ipaddr, lladdr)) {
--			dam = LOWPAN_IPHC_DAM_11; /* 0-bits */
-+		if (lowpan_iphc_addr_equal(dev, NULL, ipaddr, lladdr)) {
-+			dam = LOWPAN_IPHC_DAM_11;
- 			pr_debug("address compression 0 bits\n");
- 			goto out;
- 		}
-+
- 		break;
+@@ -774,6 +781,9 @@ static void mrf24j40_handle_rx_read_buf_complete(void *context)
  	}
  
-diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-index 1456b01..0b68cfc 100644
---- a/net/bluetooth/6lowpan.c
-+++ b/net/bluetooth/6lowpan.c
-@@ -64,7 +64,7 @@ struct lowpan_peer {
- 	struct l2cap_chan *chan;
+ 	memcpy(skb_put(skb, len), rx_local_buf, len);
++
++	skb_hwtstamps(skb)->hwtstamp = devrec->rx_tstamp;
++
+ 	ieee802154_rx_irqsafe(devrec->hw, skb, 0);
  
- 	/* peer addresses in various formats */
--	unsigned char eui64_addr[EUI64_ADDR_LEN];
-+	unsigned char lladdr[ETH_ALEN];
- 	struct in6_addr peer_addr;
- };
+ #ifdef DEBUG
+@@ -1038,12 +1048,25 @@ static void mrf24j40_intstat_complete(void *context)
+ 				   BIT_SECIGNORE);
  
-@@ -80,8 +80,6 @@ struct lowpan_btle_dev {
- 	struct delayed_work notify_peers;
- };
+ 	/* Check for TX complete */
+-	if (intstat & BIT_TXNIF)
+-		ieee802154_xmit_complete(devrec->hw, devrec->tx_skb, false);
++	if (intstat & BIT_TXNIF) {
++		struct sk_buff *skb = devrec->tx_skb;
++		/* Set hardware timestamp */
++		if (unlikely(skb_shinfo(skb)->tx_flags & SKBTX_IN_PROGRESS)) {
++			struct skb_shared_hwtstamps shhwtstamps;
++
++			memset(&shhwtstamps, 0, sizeof(shhwtstamps));
++			shhwtstamps.hwtstamp = ktime_get_real();
++			skb_tstamp_tx(skb, &shhwtstamps);
++		}
++		ieee802154_xmit_complete(devrec->hw, skb, false);
++	}
  
--static void set_addr(u8 *eui, u8 *addr, u8 addr_type);
--
- static inline struct lowpan_btle_dev *
- lowpan_btle_dev(const struct net_device *netdev)
- {
-@@ -277,7 +275,6 @@ static int iphc_decompress(struct sk_buff *skb, struct net_device *netdev,
- 	const u8 *saddr;
- 	struct lowpan_btle_dev *dev;
- 	struct lowpan_peer *peer;
--	unsigned char eui64_daddr[EUI64_ADDR_LEN];
- 
- 	dev = lowpan_btle_dev(netdev);
- 
-@@ -287,10 +284,9 @@ static int iphc_decompress(struct sk_buff *skb, struct net_device *netdev,
- 	if (!peer)
- 		return -EINVAL;
- 
--	saddr = peer->eui64_addr;
--	set_addr(&eui64_daddr[0], chan->src.b, chan->src_type);
-+	saddr = peer->lladdr;
- 
--	return lowpan_header_decompress(skb, netdev, &eui64_daddr, saddr);
-+	return lowpan_header_decompress(skb, netdev, netdev->dev_addr, saddr);
+ 	/* Check for Rx */
+-	if (intstat & BIT_RXIF)
++	if (intstat & BIT_RXIF) {
++		/* Save system clock timestamp for later */
++		devrec->rx_tstamp = ktime_get_real();
+ 		mrf24j40_handle_rx(devrec);
++	}
  }
  
- static int recv_pkt(struct sk_buff *skb, struct net_device *dev,
-@@ -477,7 +473,7 @@ static int setup_header(struct sk_buff *skb, struct net_device *netdev,
- 			}
- 		}
- 
--		daddr = peer->eui64_addr;
-+		daddr = peer->lladdr;
- 		*peer_addr = addr;
- 		*peer_addr_type = addr_type;
- 		lowpan_cb(skb)->chan = peer->chan;
-@@ -663,27 +659,6 @@ static struct device_type bt_type = {
- 	.name	= "bluetooth",
- };
- 
--static void set_addr(u8 *eui, u8 *addr, u8 addr_type)
--{
--	/* addr is the BT address in little-endian format */
--	eui[0] = addr[5];
--	eui[1] = addr[4];
--	eui[2] = addr[3];
--	eui[3] = 0xFF;
--	eui[4] = 0xFE;
--	eui[5] = addr[2];
--	eui[6] = addr[1];
--	eui[7] = addr[0];
--
--	/* Universal/local bit set, BT 6lowpan draft ch. 3.2.1 */
--	if (addr_type == BDADDR_LE_PUBLIC)
--		eui[0] &= ~0x02;
--	else
--		eui[0] |= 0x02;
--
--	BT_DBG("type %d addr %*phC", addr_type, 8, eui);
--}
--
- static void ifup(struct net_device *netdev)
- {
- 	int err;
-@@ -762,14 +737,9 @@ static struct l2cap_chan *add_peer_chan(struct l2cap_chan *chan,
- 	peer->chan = chan;
- 	memset(&peer->peer_addr, 0, sizeof(struct in6_addr));
- 
--	/* RFC 2464 ch. 5 */
--	peer->peer_addr.s6_addr[0] = 0xFE;
--	peer->peer_addr.s6_addr[1] = 0x80;
--	set_addr((u8 *)&peer->peer_addr.s6_addr + 8, chan->dst.b,
--		 chan->dst_type);
-+	baswap((void *)peer->lladdr, &chan->dst);
- 
--	memcpy(&peer->eui64_addr, (u8 *)&peer->peer_addr.s6_addr + 8,
--	       EUI64_ADDR_LEN);
-+	lowpan_iphc_uncompress_eui48_lladdr(&peer->peer_addr, peer->lladdr);
- 
- 	/* IPv6 address needs to have the U/L bit set properly so toggle
- 	 * it back here.
+ static irqreturn_t mrf24j40_isr(int irq, void *data)
 -- 
-2.9.3
+2.11.1
 
