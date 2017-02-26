@@ -1,68 +1,87 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-lf0-f68.google.com ([209.85.215.68]:34653 "EHLO
-        mail-lf0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751246AbdBXMPB (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Fri, 24 Feb 2017 07:15:01 -0500
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Subject: [PATCH v5 4/6] ipv6: addrconf: fix 48 bit 6lowpan autoconfiguration
-Date: Fri, 24 Feb 2017 14:14:38 +0200
-Message-Id: <20170224121440.32269-5-luiz.dentz@gmail.com>
-In-Reply-To: <20170224121440.32269-1-luiz.dentz@gmail.com>
+Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:53733 "EHLO
+        metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1751459AbdBZGjB (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>);
+        Sun, 26 Feb 2017 01:39:01 -0500
+Subject: Re: [PATCH v5 4/6] ipv6: addrconf: fix 48 bit 6lowpan
+ autoconfiguration
 References: <20170224121440.32269-1-luiz.dentz@gmail.com>
+ <20170224121440.32269-5-luiz.dentz@gmail.com>
+From: Alexander Aring <aar@pengutronix.de>
+Message-ID: <973f0299-54ee-3625-6c96-98fa0daeba1b@pengutronix.de>
+Date: Sun, 26 Feb 2017 07:38:38 +0100
+MIME-Version: 1.0
+In-Reply-To: <20170224121440.32269-5-luiz.dentz@gmail.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: patrik.flykt@linux.intel.com, jukka.rissanen@linux.intel.com, stefan@osg.samsung.com, aar@pengutronix.de, linux-wpan@vger.kernel.org, netdev@vger.kernel.org
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, patrik.flykt@linux.intel.com, jukka.rissanen@linux.intel.com, stefan@osg.samsung.com, linux-wpan@vger.kernel.org, netdev@vger.kernel.org
 
-From: Alexander Aring <aar@pengutronix.de>
 
-This patch adds support for 48 bit 6LoWPAN address length
-autoconfiguration which is the case for BTLE 6LoWPAN.
+Hi,
 
-Signed-off-by: Alexander Aring <aar@pengutronix.de>
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Reviewed-by: Stefan Schmidt <stefan@osg.samsung.com>
+okay now I am finally confused.
+
+On 02/24/2017 01:14 PM, Luiz Augusto von Dentz wrote:
+> From: Alexander Aring <aar@pengutronix.de>
+> 
+> This patch adds support for 48 bit 6LoWPAN address length
+> autoconfiguration which is the case for BTLE 6LoWPAN.
+> 
+> Signed-off-by: Alexander Aring <aar@pengutronix.de>
+> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> Reviewed-by: Stefan Schmidt <stefan@osg.samsung.com>
+> ---
+>  net/ipv6/addrconf.c | 17 ++++++++++++-----
+>  1 file changed, 12 insertions(+), 5 deletions(-)
+> 
+> diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
+> index 3a2025f..7756640 100644
+> --- a/net/ipv6/addrconf.c
+> +++ b/net/ipv6/addrconf.c
+> @@ -2052,12 +2052,19 @@ static void addrconf_leave_anycast(struct inet6_ifaddr *ifp)
+>  	__ipv6_dev_ac_dec(ifp->idev, &addr);
+>  }
+>  
+> -static int addrconf_ifid_eui64(u8 *eui, struct net_device *dev)
+> +static int addrconf_ifid_6lowpan(u8 *eui, struct net_device *dev)
+>  {
+> -	if (dev->addr_len != EUI64_ADDR_LEN)
+> +	switch (dev->addr_len) {
+> +	case ETH_ALEN:
+> +		return addrconf_ifid_eui48(eui, dev);
+
+You need to make the same thing here like what we discusss in antoher
+mail.
+
+   In the figure, letter 'b' represents a bit from the
+   Bluetooth device address, copied as is without any changes on any
+   bit.  This means that no bit in the IID indicates whether the
+   underlying Bluetooth device address is public or random.
+
+   |0              1|1              3|3              4|4              6|
+   |0              5|6              1|2              7|8              3|
+   +----------------+----------------+----------------+----------------+
+   |bbbbbbbbbbbbbbbb|bbbbbbbb11111111|11111110bbbbbbbb|bbbbbbbbbbbbbbbb|
+   +----------------+----------------+----------------+----------------+
+
+The function addrconf_ifid_eui48 will do a u/l bitflip. You need to change
+that otherwise transparent 6lowpan adaptiation will not match on your
+local address.
+
+Making u/l bit here, but not in IPHC code -> will not work together.
+
 ---
- net/ipv6/addrconf.c | 17 ++++++++++++-----
- 1 file changed, 12 insertions(+), 5 deletions(-)
 
-diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
-index 3a2025f..7756640 100644
---- a/net/ipv6/addrconf.c
-+++ b/net/ipv6/addrconf.c
-@@ -2052,12 +2052,19 @@ static void addrconf_leave_anycast(struct inet6_ifaddr *ifp)
- 	__ipv6_dev_ac_dec(ifp->idev, &addr);
- }
- 
--static int addrconf_ifid_eui64(u8 *eui, struct net_device *dev)
-+static int addrconf_ifid_6lowpan(u8 *eui, struct net_device *dev)
- {
--	if (dev->addr_len != EUI64_ADDR_LEN)
-+	switch (dev->addr_len) {
-+	case ETH_ALEN:
-+		return addrconf_ifid_eui48(eui, dev);
-+	case EUI64_ADDR_LEN:
-+		memcpy(eui, dev->dev_addr, EUI64_ADDR_LEN);
-+		eui[0] ^= 2;
-+		break;
-+	default:
- 		return -1;
--	memcpy(eui, dev->dev_addr, EUI64_ADDR_LEN);
--	eui[0] ^= 2;
-+	}
-+
- 	return 0;
- }
- 
-@@ -2149,7 +2156,7 @@ static int ipv6_generate_eui64(u8 *eui, struct net_device *dev)
- 	case ARPHRD_TUNNEL:
- 		return addrconf_ifid_gre(eui, dev);
- 	case ARPHRD_6LOWPAN:
--		return addrconf_ifid_eui64(eui, dev);
-+		return addrconf_ifid_6lowpan(eui, dev);
- 	case ARPHRD_IEEE1394:
- 		return addrconf_ifid_ieee1394(eui, dev);
- 	case ARPHRD_TUNNEL6:
--- 
-2.9.3
+btw: That's why I think we should provide some function _once_ to
+generate the IID for iphc code and ipv6. Then such mistakes will not
+happen.
 
+So we don't want to have some module dependency of 6lowpan in ipv6.
+My first idea is to make a callback in 6lowpan private data of
+netdevice. :-/
+
+- Alex
