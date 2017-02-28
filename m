@@ -1,71 +1,64 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:46183 "EHLO
-        metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1752146AbdBZGZG (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>);
-        Sun, 26 Feb 2017 01:25:06 -0500
+Received: from mga03.intel.com ([134.134.136.65]:4933 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751026AbdB1JP5 (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+        Tue, 28 Feb 2017 04:15:57 -0500
+Message-ID: <1488273208.3344.1.camel@linux.intel.com>
 Subject: Re: [PATCH v5 6/6] 6lowpan: Fix IID format for Bluetooth
+From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+Date: Tue, 28 Feb 2017 11:13:28 +0200
+In-Reply-To: <20170224121440.32269-7-luiz.dentz@gmail.com>
 References: <20170224121440.32269-1-luiz.dentz@gmail.com>
- <20170224121440.32269-7-luiz.dentz@gmail.com>
- <afc9cb44-edb6-287b-ce1d-da1c0974b5fa@pengutronix.de>
-From: Alexander Aring <aar@pengutronix.de>
-Message-ID: <145a7942-b86e-30e9-9542-187705c80fbf@pengutronix.de>
-Date: Sun, 26 Feb 2017 07:25:03 +0100
-MIME-Version: 1.0
-In-Reply-To: <afc9cb44-edb6-287b-ce1d-da1c0974b5fa@pengutronix.de>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+         <20170224121440.32269-7-luiz.dentz@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, patrik.flykt@linux.intel.com, 6lo@ietf.org, devel@riot-os.org, linux-wpan@vger.kernel.org, netdev@vger.kernel.org
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, linux-bluetooth@vger.kernel.org
+Cc: patrik.flykt@linux.intel.com, stefan@osg.samsung.com, aar@pengutronix.de, linux-wpan@vger.kernel.org, netdev@vger.kernel.org
 
+Hi Luiz,
 
-Hi,
-
-On 02/26/2017 07:05 AM, Alexander Aring wrote:
+On Fri, 2017-02-24 at 14:14 +0200, Luiz Augusto von Dentz wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > 
-> Hi,
+> Accourding to RFC 7668 U/L bit shall not be used:
 > 
-> On 02/24/2017 01:14 PM, Luiz Augusto von Dentz wrote:
->> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->>
->> Accourding to RFC 7668 U/L bit shall not be used:
->>
->> https://wiki.tools.ietf.org/html/rfc7668#section-3.2.2 [Page 10]:
->>
->>    In the figure, letter 'b' represents a bit from the
->>    Bluetooth device address, copied as is without any changes on any
->>    bit.  This means that no bit in the IID indicates whether the
->>    underlying Bluetooth device address is public or random.
->>
->>    |0              1|1              3|3              4|4              6|
->>    |0              5|6              1|2              7|8              3|
->>    +----------------+----------------+----------------+----------------+
->>    |bbbbbbbbbbbbbbbb|bbbbbbbb11111111|11111110bbbbbbbb|bbbbbbbbbbbbbbbb|
->>    +----------------+----------------+----------------+----------------+
->>
->> Because of this the code cannot figure out the address type from the IP
->> address anymore thus it makes no sense to use peer_lookup_ba as it needs
->> the peer address type.
->>
+> https://wiki.tools.ietf.org/html/rfc7668#section-3.2.2 [Page 10]:
 > 
-> I am still not quite 100% of this and want to leave my opinion about this
-> handling which can be interpreted in a different way.
+>    In the figure, letter 'b' represents a bit from the
+>    Bluetooth device address, copied as is without any changes on any
+>    bit.  This means that no bit in the IID indicates whether the
+>    underlying Bluetooth device address is public or random.
 > 
-> The RFC says here:
+>    |0              1|1              3|3              4|4             
+>  6|
+>    |0              5|6              1|2              7|8             
+>  3|
+>    +----------------+----------------+----------------+------------
+> ----+
+>    |bbbbbbbbbbbbbbbb|bbbbbbbb11111111|11111110bbbbbbbb|bbbbbbbbbbbbbb
+> bb|
+>    +----------------+----------------+----------------+------------
+> ----+
 > 
-> Following the guidance of [RFC7136], a 64-bit
-> Interface Identifier (IID) is formed from the 48-bit Bluetooth device
-> address by inserting two octets, with hexadecimal values of 0xFF and
-> 0xFE in the middle of the 48-bit Bluetooth device address as shown in
-> Figure 6. 
+> Because of this the code cannot figure out the address type from the
+> IP
+> address anymore thus it makes no sense to use peer_lookup_ba as it
+> needs
+> the peer address type.
+> 
+> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> ---
+>  include/net/6lowpan.h   |  4 ---
+> 
 
-Okay, they said from IID from the 48-bit address. 
+Looks good.
 
-And IID is what you need here and what [RFC7136] describes as result,
-so I think you are right.
+Acked-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
 
-There is no need for special u/l bitflip or link-layer multicast handling.
 
-- Alex
+Cheers,
+Jukka
+
