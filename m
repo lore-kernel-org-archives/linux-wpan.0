@@ -1,92 +1,35 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-ot0-f196.google.com ([74.125.82.196]:35983 "EHLO
-        mail-ot0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752323AbdCALLR (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 1 Mar 2017 06:11:17 -0500
+Received: from ec2-52-27-115-49.us-west-2.compute.amazonaws.com ([52.27.115.49]:42965
+        "EHLO osg.samsung.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1751088AbdCAPJc (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 1 Mar 2017 10:09:32 -0500
+From: Stefan Schmidt <stefan@osg.samsung.com>
+Subject: IoT networking protocols workshop at Netdev 2.1
+Message-ID: <2eec62e4-ed80-442b-05e0-b96bb6bcf310@osg.samsung.com>
+Date: Wed, 1 Mar 2017 16:08:53 +0100
 MIME-Version: 1.0
-In-Reply-To: <973f0299-54ee-3625-6c96-98fa0daeba1b@pengutronix.de>
-References: <20170224121440.32269-1-luiz.dentz@gmail.com> <20170224121440.32269-5-luiz.dentz@gmail.com>
- <973f0299-54ee-3625-6c96-98fa0daeba1b@pengutronix.de>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 1 Mar 2017 13:09:40 +0200
-Message-ID: <CABBYNZLtDxRmgA7=MErctZyTdxtcBD-QKjd4MxMbK81K7s8UAg@mail.gmail.com>
-Subject: Re: [PATCH v5 4/6] ipv6: addrconf: fix 48 bit 6lowpan autoconfiguration
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <aar@pengutronix.de>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, Patrik Flykt <patrik.flykt@linux.intel.com>, Jukka Rissanen <jukka.rissanen@linux.intel.com>, Stefan Schmidt <stefan@osg.samsung.com>, linux-wpan@vger.kernel.org, "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
+To: Network Development <netdev@vger.kernel.org>
+Cc: linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org
 
-Hi Alex,
+Hello.
 
-On Sun, Feb 26, 2017 at 8:38 AM, Alexander Aring <aar@pengutronix.de> wrote:
->
-> Hi,
->
-> okay now I am finally confused.
->
-> On 02/24/2017 01:14 PM, Luiz Augusto von Dentz wrote:
->> From: Alexander Aring <aar@pengutronix.de>
->>
->> This patch adds support for 48 bit 6LoWPAN address length
->> autoconfiguration which is the case for BTLE 6LoWPAN.
->>
->> Signed-off-by: Alexander Aring <aar@pengutronix.de>
->> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->> Reviewed-by: Stefan Schmidt <stefan@osg.samsung.com>
->> ---
->>  net/ipv6/addrconf.c | 17 ++++++++++++-----
->>  1 file changed, 12 insertions(+), 5 deletions(-)
->>
->> diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
->> index 3a2025f..7756640 100644
->> --- a/net/ipv6/addrconf.c
->> +++ b/net/ipv6/addrconf.c
->> @@ -2052,12 +2052,19 @@ static void addrconf_leave_anycast(struct inet6_ifaddr *ifp)
->>       __ipv6_dev_ac_dec(ifp->idev, &addr);
->>  }
->>
->> -static int addrconf_ifid_eui64(u8 *eui, struct net_device *dev)
->> +static int addrconf_ifid_6lowpan(u8 *eui, struct net_device *dev)
->>  {
->> -     if (dev->addr_len != EUI64_ADDR_LEN)
->> +     switch (dev->addr_len) {
->> +     case ETH_ALEN:
->> +             return addrconf_ifid_eui48(eui, dev);
->
-> You need to make the same thing here like what we discusss in antoher
-> mail.
->
->    In the figure, letter 'b' represents a bit from the
->    Bluetooth device address, copied as is without any changes on any
->    bit.  This means that no bit in the IID indicates whether the
->    underlying Bluetooth device address is public or random.
->
->    |0              1|1              3|3              4|4              6|
->    |0              5|6              1|2              7|8              3|
->    +----------------+----------------+----------------+----------------+
->    |bbbbbbbbbbbbbbbb|bbbbbbbb11111111|11111110bbbbbbbb|bbbbbbbbbbbbbbbb|
->    +----------------+----------------+----------------+----------------+
->
-> The function addrconf_ifid_eui48 will do a u/l bitflip. You need to change
-> that otherwise transparent 6lowpan adaptiation will not match on your
-> local address.
->
-> Making u/l bit here, but not in IPHC code -> will not work together.
->
-> ---
->
-> btw: That's why I think we should provide some function _once_ to
-> generate the IID for iphc code and ipv6. Then such mistakes will not
-> happen.
->
-> So we don't want to have some module dependency of 6lowpan in ipv6.
-> My first idea is to make a callback in 6lowpan private data of
-> netdevice. :-/
+At the next Netdev edition in April I will chair a workshop on IoT 
+related topics in Linux networking. A full abstract can be found here:
+http://www.netdevconf.org/2.1/session.html?schmidt
 
-Well if we will be introducing new fields why not introduce an iid
-field directly into net_device? That way we don't need to keep
-generating it in several places.
+I started to contact people I know having an interest and opinion on 
+this and will work on an initial agenda soon.
 
--- 
-Luiz Augusto von Dentz
+Obviously I don't know all people for this so here is your chance to be 
+part of it. Contact me directly if you either want to have short 
+timeslot (~10min) in this workshop to speak about a relevant topic or if 
+you have input that should be worked in because you are unable to attend.
+
+regards
+Stefan Schmidt
+
+
