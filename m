@@ -1,207 +1,134 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-lf0-f66.google.com ([209.85.215.66]:35545 "EHLO
-        mail-lf0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752957AbdCBNcf (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 2 Mar 2017 08:32:35 -0500
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Subject: [PATCH v6 6/6] 6lowpan: Fix IID format for Bluetooth
-Date: Thu,  2 Mar 2017 15:23:35 +0200
-Message-Id: <20170302132335.21192-7-luiz.dentz@gmail.com>
-In-Reply-To: <20170302132335.21192-1-luiz.dentz@gmail.com>
+Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:40451 "EHLO
+        metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1753882AbdCFUEQ (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 6 Mar 2017 15:04:16 -0500
+Subject: Re: [PATCH v6 6/6] 6lowpan: Fix IID format for Bluetooth
 References: <20170302132335.21192-1-luiz.dentz@gmail.com>
+ <20170302132335.21192-7-luiz.dentz@gmail.com>
+From: Alexander Aring <aar@pengutronix.de>
+Message-ID: <eaf424c0-731a-2bab-0050-35d0a1091fcb@pengutronix.de>
+Date: Mon, 6 Mar 2017 21:03:24 +0100
+MIME-Version: 1.0
+In-Reply-To: <20170302132335.21192-7-luiz.dentz@gmail.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: patrik.flykt@linux.intel.com, aar@pengutronix.de, jukka.rissanen@linux.intel.com, linux-wpan@vger.kernel.org, netdev@vger.kernel.org
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, patrik.flykt@linux.intel.com, jukka.rissanen@linux.intel.com, linux-wpan@vger.kernel.org, netdev@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-According to RFC 7668 U/L bit shall not be used:
+Hi,
 
-https://wiki.tools.ietf.org/html/rfc7668#section-3.2.2 [Page 10]:
+sorry, I decided now to take a look into the patch... Currently I have
+no time to do anything... normally. That's why I simple said "everything
+okay" in irc.
 
-   In the figure, letter 'b' represents a bit from the
-   Bluetooth device address, copied as is without any changes on any
-   bit.  This means that no bit in the IID indicates whether the
-   underlying Bluetooth device address is public or random.
+On 03/02/2017 02:23 PM, Luiz Augusto von Dentz wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> According to RFC 7668 U/L bit shall not be used:
+> 
+> https://wiki.tools.ietf.org/html/rfc7668#section-3.2.2 [Page 10]:
+> 
+>    In the figure, letter 'b' represents a bit from the
+>    Bluetooth device address, copied as is without any changes on any
+>    bit.  This means that no bit in the IID indicates whether the
+>    underlying Bluetooth device address is public or random.
+> 
+>    |0              1|1              3|3              4|4              6|
+>    |0              5|6              1|2              7|8              3|
+>    +----------------+----------------+----------------+----------------+
+>    |bbbbbbbbbbbbbbbb|bbbbbbbb11111111|11111110bbbbbbbb|bbbbbbbbbbbbbbbb|
+>    +----------------+----------------+----------------+----------------+
+> 
+> Because of this the code cannot figure out the address type from the IP
+> address anymore thus it makes no sense to use peer_lookup_ba as it needs
+> the peer address type.
+> 
+> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> Reviewed-by: Stefan Schmidt <stefan@osg.samsung.com>
+> Acked-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+> ---
+>  include/net/6lowpan.h   |  4 ---
+>  include/net/addrconf.h  |  7 ++++-
+>  net/bluetooth/6lowpan.c | 79 ++++++++-----------------------------------------
+>  3 files changed, 18 insertions(+), 72 deletions(-)
+> 
+> diff --git a/include/net/6lowpan.h b/include/net/6lowpan.h
+> index c5792cb..a713780 100644
+> --- a/include/net/6lowpan.h
+> +++ b/include/net/6lowpan.h
+> @@ -211,10 +211,6 @@ static inline void lowpan_iphc_uncompress_eui48_lladdr(struct in6_addr *ipaddr,
+>  	ipaddr->s6_addr[11] = 0xFF;
+>  	ipaddr->s6_addr[12] = 0xFE;
+>  	memcpy(&ipaddr->s6_addr[13], lladdr + 3, 3);
+> -	/* second bit-flip (Universe/Local)
+> -	 * is done according RFC2464
+> -	 */
+> -	ipaddr->s6_addr[8] ^= 0x02;
+>  }
+>  
+>  #ifdef DEBUG
+> diff --git a/include/net/addrconf.h b/include/net/addrconf.h
+> index 17c6fd8..3931fd2 100644
+> --- a/include/net/addrconf.h
+> +++ b/include/net/addrconf.h
+> @@ -129,7 +129,12 @@ static inline int addrconf_ifid_eui48(u8 *eui, struct net_device *dev)
+>  	} else {
+>  		eui[3] = 0xFF;
+>  		eui[4] = 0xFE;
+> -		eui[0] ^= 2;
+> +
+> +		/*
+> +		 * According to RFC 7668 U/L bit shall not be toggled.
+> +		 */
+> +		if (dev->type != ARPHRD_6LOWPAN)
+> +			eui[0] ^= 2;
+>  	}
+>  	return 0;
+>  }
 
-   |0              1|1              3|3              4|4              6|
-   |0              5|6              1|2              7|8              3|
-   +----------------+----------------+----------------+----------------+
-   |bbbbbbbbbbbbbbbb|bbbbbbbb11111111|11111110bbbbbbbb|bbbbbbbbbbbbbbbb|
-   +----------------+----------------+----------------+----------------+
+I don't know why you make this in such function which is called by a lot
+of others dev->types which are not ARPHRD_6LOWPAN.
 
-Because of this the code cannot figure out the address type from the IP
-address anymore thus it makes no sense to use peer_lookup_ba as it needs
-the peer address type.
+What addrconf does now is a switch case over dev->type and then calling
+addrconf_ifid_eui48 for some cases and recheck again dev->type for a
+special case of ARPHRD_6LOWPAN.
 
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Reviewed-by: Stefan Schmidt <stefan@osg.samsung.com>
-Acked-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+ARPHRD_6LOWPAN is also somehow wrong because you need check on ARPHRD_6LOWPAN and
+LLTYPE_BTLE. As I mentioned the IPv6-over-foo adaptation describes how
+to generate IID and not the dev->addr_len.
+
 ---
- include/net/6lowpan.h   |  4 ---
- include/net/addrconf.h  |  7 ++++-
- net/bluetooth/6lowpan.c | 79 ++++++++-----------------------------------------
- 3 files changed, 18 insertions(+), 72 deletions(-)
 
-diff --git a/include/net/6lowpan.h b/include/net/6lowpan.h
-index c5792cb..a713780 100644
---- a/include/net/6lowpan.h
-+++ b/include/net/6lowpan.h
-@@ -211,10 +211,6 @@ static inline void lowpan_iphc_uncompress_eui48_lladdr(struct in6_addr *ipaddr,
- 	ipaddr->s6_addr[11] = 0xFF;
- 	ipaddr->s6_addr[12] = 0xFE;
- 	memcpy(&ipaddr->s6_addr[13], lladdr + 3, 3);
--	/* second bit-flip (Universe/Local)
--	 * is done according RFC2464
--	 */
--	ipaddr->s6_addr[8] ^= 0x02;
- }
- 
- #ifdef DEBUG
-diff --git a/include/net/addrconf.h b/include/net/addrconf.h
-index 17c6fd8..3931fd2 100644
---- a/include/net/addrconf.h
-+++ b/include/net/addrconf.h
-@@ -129,7 +129,12 @@ static inline int addrconf_ifid_eui48(u8 *eui, struct net_device *dev)
- 	} else {
- 		eui[3] = 0xFF;
- 		eui[4] = 0xFE;
--		eui[0] ^= 2;
-+
-+		/*
-+		 * According to RFC 7668 U/L bit shall not be toggled.
-+		 */
-+		if (dev->type != ARPHRD_6LOWPAN)
-+			eui[0] ^= 2;
- 	}
- 	return 0;
- }
-diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-index 0b68cfc..ec89c55 100644
---- a/net/bluetooth/6lowpan.c
-+++ b/net/bluetooth/6lowpan.c
-@@ -398,37 +398,6 @@ static int chan_recv_cb(struct l2cap_chan *chan, struct sk_buff *skb)
- 	return err;
- }
- 
--static u8 get_addr_type_from_eui64(u8 byte)
--{
--	/* Is universal(0) or local(1) bit */
--	return ((byte & 0x02) ? BDADDR_LE_RANDOM : BDADDR_LE_PUBLIC);
--}
--
--static void copy_to_bdaddr(struct in6_addr *ip6_daddr, bdaddr_t *addr)
--{
--	u8 *eui64 = ip6_daddr->s6_addr + 8;
--
--	addr->b[0] = eui64[7];
--	addr->b[1] = eui64[6];
--	addr->b[2] = eui64[5];
--	addr->b[3] = eui64[2];
--	addr->b[4] = eui64[1];
--	addr->b[5] = eui64[0];
--}
--
--static void convert_dest_bdaddr(struct in6_addr *ip6_daddr,
--				bdaddr_t *addr, u8 *addr_type)
--{
--	copy_to_bdaddr(ip6_daddr, addr);
--
--	/* We need to toggle the U/L bit that we got from IPv6 address
--	 * so that we get the proper address and type of the BD address.
--	 */
--	addr->b[5] ^= 0x02;
--
--	*addr_type = get_addr_type_from_eui64(addr->b[5]);
--}
--
- static int setup_header(struct sk_buff *skb, struct net_device *netdev,
- 			bdaddr_t *peer_addr, u8 *peer_addr_type)
- {
-@@ -436,8 +405,7 @@ static int setup_header(struct sk_buff *skb, struct net_device *netdev,
- 	struct ipv6hdr *hdr;
- 	struct lowpan_btle_dev *dev;
- 	struct lowpan_peer *peer;
--	bdaddr_t addr, *any = BDADDR_ANY;
--	u8 *daddr = any->b;
-+	u8 *daddr;
- 	int err, status = 0;
- 
- 	hdr = ipv6_hdr(skb);
-@@ -448,34 +416,24 @@ static int setup_header(struct sk_buff *skb, struct net_device *netdev,
- 
- 	if (ipv6_addr_is_multicast(&ipv6_daddr)) {
- 		lowpan_cb(skb)->chan = NULL;
-+		daddr = NULL;
- 	} else {
--		u8 addr_type;
-+		BT_DBG("dest IP %pI6c", &ipv6_daddr);
- 
--		/* Get destination BT device from skb.
--		 * If there is no such peer then discard the packet.
-+		/* The packet might be sent to 6lowpan interface
-+		 * because of routing (either via default route
-+		 * or user set route) so get peer according to
-+		 * the destination address.
- 		 */
--		convert_dest_bdaddr(&ipv6_daddr, &addr, &addr_type);
--
--		BT_DBG("dest addr %pMR type %d IP %pI6c", &addr,
--		       addr_type, &ipv6_daddr);
--
--		peer = peer_lookup_ba(dev, &addr, addr_type);
-+		peer = peer_lookup_dst(dev, &ipv6_daddr, skb);
- 		if (!peer) {
--			/* The packet might be sent to 6lowpan interface
--			 * because of routing (either via default route
--			 * or user set route) so get peer according to
--			 * the destination address.
--			 */
--			peer = peer_lookup_dst(dev, &ipv6_daddr, skb);
--			if (!peer) {
--				BT_DBG("no such peer %pMR found", &addr);
--				return -ENOENT;
--			}
-+			BT_DBG("no such peer");
-+			return -ENOENT;
- 		}
- 
- 		daddr = peer->lladdr;
--		*peer_addr = addr;
--		*peer_addr_type = addr_type;
-+		peer_addr = &peer->chan->dst;
-+		*peer_addr_type = peer->chan->dst_type;
- 		lowpan_cb(skb)->chan = peer->chan;
- 
- 		status = 1;
-@@ -717,14 +675,6 @@ static struct l2cap_chan *chan_create(void)
- 	return chan;
- }
- 
--static void set_ip_addr_bits(u8 addr_type, u8 *addr)
--{
--	if (addr_type == BDADDR_LE_PUBLIC)
--		*addr |= 0x02;
--	else
--		*addr &= ~0x02;
--}
--
- static struct l2cap_chan *add_peer_chan(struct l2cap_chan *chan,
- 					struct lowpan_btle_dev *dev)
- {
-@@ -741,11 +691,6 @@ static struct l2cap_chan *add_peer_chan(struct l2cap_chan *chan,
- 
- 	lowpan_iphc_uncompress_eui48_lladdr(&peer->peer_addr, peer->lladdr);
- 
--	/* IPv6 address needs to have the U/L bit set properly so toggle
--	 * it back here.
--	 */
--	set_ip_addr_bits(chan->dst_type, (u8 *)&peer->peer_addr.s6_addr + 8);
--
- 	spin_lock(&devices_lock);
- 	INIT_LIST_HEAD(&peer->list);
- 	peer_add(dev, peer);
--- 
-2.9.3
+Second thing is we bitflip u/l and then we bitflip again because we
+don't want it and do it again...
 
+---
+
+Anyway, I see it will working for you... but it's very confusing for me.
+Don't use addrconf_ifid_eui48 here, grab 2-3 code lines from which does:
+
+1. copy first mac addr bytes
+2. set FF FE
+3. copy last mac addr bytes
+
+and this according LLTYPE_BTLE and not dev->addr_len....
+
+---
+
+For me it's not acceptable because you doing dev->type handling which is
+already evaluated before and other subsystems will do such check as
+well. We can avoid this check on others subsystems. If your IID is
+different generated than a normal EUI48, then simple don't use
+addrconf_ifid_eui48.
+
+---
+
+We already talked about to place the 8 IID bytes into 6lowpan netdev private
+space. If we do that later, we need to touch addrconf_ifid_eui48
+again..
+
+- Alex
