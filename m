@@ -1,53 +1,92 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-lf0-f53.google.com ([209.85.215.53]:36395 "EHLO
-        mail-lf0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750933AbdCLITn (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Sun, 12 Mar 2017 04:19:43 -0400
+Received: from mail-lf0-f66.google.com ([209.85.215.66]:33762 "EHLO
+        mail-lf0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754372AbdCLITo (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Sun, 12 Mar 2017 04:19:44 -0400
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Subject: [PATCH v7 0/6] Bluetooth: 6LoWPAN: Fix lladdr length
-Date: Sun, 12 Mar 2017 10:19:32 +0200
-Message-Id: <20170312081938.11700-1-luiz.dentz@gmail.com>
+Subject: [PATCH v7 1/6] bluetooth: Set 6 byte device addresses
+Date: Sun, 12 Mar 2017 10:19:33 +0200
+Message-Id: <20170312081938.11700-2-luiz.dentz@gmail.com>
+In-Reply-To: <20170312081938.11700-1-luiz.dentz@gmail.com>
+References: <20170312081938.11700-1-luiz.dentz@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: patrik.flykt@linux.intel.com, aar@pengutronix.de, jukka.rissanen@linux.intel.com, linux-wpan@vger.kernel.org, netdev@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+From: Patrik Flykt <patrik.flykt@linux.intel.com>
 
-These patches fixes lladdr length to be 6 bytes long and not 8 which cause
-neighbor advertisement to be sent with wrong lladdr including FF:FE filler
-bytes for eui64.
+Set BTLE MAC addresses that are 6 bytes long and not 8 bytes
+that are used in other places with 6lowpan.
 
-Note: This does not fix some of the existing crashes which I hope to address
-in a different set.
+Signed-off-by: Patrik Flykt <patrik.flykt@linux.intel.com>
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Reviewed-by: Stefan Schmidt <stefan@osg.samsung.com>
+---
+ net/bluetooth/6lowpan.c | 19 ++++++++-----------
+ 1 file changed, 8 insertions(+), 11 deletions(-)
 
-v2: Make all code paths that generate a link-local from lladdr use the same
-code.
-v3: Use lowpan_iphc_uncompress_eui48_lladdr to generate the remote ip address.
-v4: Handle comments from Stefan Schmidt.
-v5: Add patch to fix IID format for Bluetooth
-v6: Fix addrconf_ifid_eui48 to follow IID format for Bluetooth
-v7: Rework addrconf_ifid_6lowpan so it doesn't use addrconf_ifid_eui48
-
-Alexander Aring (2):
-  6lowpan: iphc: override l2 packet information
-  ipv6: addrconf: fix 48 bit 6lowpan autoconfiguration
-
-Luiz Augusto von Dentz (2):
-  6lowpan: Use netdev addr_len to determine lladdr len
-  6lowpan: Fix IID format for Bluetooth
-
-Patrik Flykt (2):
-  bluetooth: Set 6 byte device addresses
-  6lowpan: Set MAC address length according to LOWPAN_LLTYPE
-
- include/net/6lowpan.h   |  15 ++++++
- net/6lowpan/core.c      |  11 +++-
- net/6lowpan/iphc.c      |  57 +++++++++++++++++----
- net/bluetooth/6lowpan.c | 130 ++++++++----------------------------------------
- net/ipv6/addrconf.c     |  23 ++++++---
- 5 files changed, 109 insertions(+), 127 deletions(-)
-
+diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+index 1904a93..1456b01 100644
+--- a/net/bluetooth/6lowpan.c
++++ b/net/bluetooth/6lowpan.c
+@@ -80,6 +80,8 @@ struct lowpan_btle_dev {
+ 	struct delayed_work notify_peers;
+ };
+ 
++static void set_addr(u8 *eui, u8 *addr, u8 addr_type);
++
+ static inline struct lowpan_btle_dev *
+ lowpan_btle_dev(const struct net_device *netdev)
+ {
+@@ -272,9 +274,10 @@ static int give_skb_to_upper(struct sk_buff *skb, struct net_device *dev)
+ static int iphc_decompress(struct sk_buff *skb, struct net_device *netdev,
+ 			   struct l2cap_chan *chan)
+ {
+-	const u8 *saddr, *daddr;
++	const u8 *saddr;
+ 	struct lowpan_btle_dev *dev;
+ 	struct lowpan_peer *peer;
++	unsigned char eui64_daddr[EUI64_ADDR_LEN];
+ 
+ 	dev = lowpan_btle_dev(netdev);
+ 
+@@ -285,9 +288,9 @@ static int iphc_decompress(struct sk_buff *skb, struct net_device *netdev,
+ 		return -EINVAL;
+ 
+ 	saddr = peer->eui64_addr;
+-	daddr = dev->netdev->dev_addr;
++	set_addr(&eui64_daddr[0], chan->src.b, chan->src_type);
+ 
+-	return lowpan_header_decompress(skb, netdev, daddr, saddr);
++	return lowpan_header_decompress(skb, netdev, &eui64_daddr, saddr);
+ }
+ 
+ static int recv_pkt(struct sk_buff *skb, struct net_device *dev,
+@@ -681,13 +684,6 @@ static void set_addr(u8 *eui, u8 *addr, u8 addr_type)
+ 	BT_DBG("type %d addr %*phC", addr_type, 8, eui);
+ }
+ 
+-static void set_dev_addr(struct net_device *netdev, bdaddr_t *addr,
+-		         u8 addr_type)
+-{
+-	netdev->addr_assign_type = NET_ADDR_PERM;
+-	set_addr(netdev->dev_addr, addr->b, addr_type);
+-}
+-
+ static void ifup(struct net_device *netdev)
+ {
+ 	int err;
+@@ -803,7 +799,8 @@ static int setup_netdev(struct l2cap_chan *chan, struct lowpan_btle_dev **dev)
+ 	if (!netdev)
+ 		return -ENOMEM;
+ 
+-	set_dev_addr(netdev, &chan->src, chan->src_type);
++	netdev->addr_assign_type = NET_ADDR_PERM;
++	baswap((void *)netdev->dev_addr, &chan->src);
+ 
+ 	netdev->netdev_ops = &netdev_ops;
+ 	SET_NETDEV_DEV(netdev, &chan->conn->hcon->hdev->dev);
 -- 
 2.9.3
 
