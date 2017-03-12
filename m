@@ -1,12 +1,12 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-lf0-f66.google.com ([209.85.215.66]:34140 "EHLO
+Received: from mail-lf0-f66.google.com ([209.85.215.66]:33774 "EHLO
         mail-lf0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755716AbdCLITr (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Sun, 12 Mar 2017 04:19:47 -0400
+        with ESMTP id S1755723AbdCLITs (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Sun, 12 Mar 2017 04:19:48 -0400
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Subject: [PATCH v7 3/6] 6lowpan: iphc: override l2 packet information
-Date: Sun, 12 Mar 2017 10:19:35 +0200
-Message-Id: <20170312081938.11700-4-luiz.dentz@gmail.com>
+Subject: [PATCH v7 4/6] ipv6: addrconf: fix 48 bit 6lowpan autoconfiguration
+Date: Sun, 12 Mar 2017 10:19:36 +0200
+Message-Id: <20170312081938.11700-5-luiz.dentz@gmail.com>
 In-Reply-To: <20170312081938.11700-1-luiz.dentz@gmail.com>
 References: <20170312081938.11700-1-luiz.dentz@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
@@ -16,56 +16,54 @@ Cc: patrik.flykt@linux.intel.com, aar@pengutronix.de, jukka.rissanen@linux.intel
 
 From: Alexander Aring <aar@pengutronix.de>
 
-The skb->pkt_type need to be set by L2, but on 6LoWPAN there exists L2
-e.g. BTLE which doesn't has multicast addressing. If it's a multicast or
-not is detected by IPHC headers multicast bit. The IPv6 layer will
-evaluate this pkt_type, so we force set this type while uncompressing.
-Should be okay for 802.15.4 as well.
+This patch adds support for 48 bit 6LoWPAN address length
+autoconfiguration which is the case for BTLE 6LoWPAN.
 
 Signed-off-by: Alexander Aring <aar@pengutronix.de>
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 Reviewed-by: Stefan Schmidt <stefan@osg.samsung.com>
+Acked-by: David S. Miller <davem@davemloft.net>
 ---
- net/6lowpan/iphc.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ net/ipv6/addrconf.c | 17 ++++++++++++-----
+ 1 file changed, 12 insertions(+), 5 deletions(-)
 
-diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
-index 79f1fa2..fb5f6fa 100644
---- a/net/6lowpan/iphc.c
-+++ b/net/6lowpan/iphc.c
-@@ -666,6 +666,8 @@ int lowpan_header_decompress(struct sk_buff *skb, const struct net_device *dev,
+diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
+index 3a2025f..7756640 100644
+--- a/net/ipv6/addrconf.c
++++ b/net/ipv6/addrconf.c
+@@ -2052,12 +2052,19 @@ static void addrconf_leave_anycast(struct inet6_ifaddr *ifp)
+ 	__ipv6_dev_ac_dec(ifp->idev, &addr);
+ }
  
- 	switch (iphc1 & (LOWPAN_IPHC_M | LOWPAN_IPHC_DAC)) {
- 	case LOWPAN_IPHC_M | LOWPAN_IPHC_DAC:
-+		skb->pkt_type = PACKET_BROADCAST;
+-static int addrconf_ifid_eui64(u8 *eui, struct net_device *dev)
++static int addrconf_ifid_6lowpan(u8 *eui, struct net_device *dev)
+ {
+-	if (dev->addr_len != EUI64_ADDR_LEN)
++	switch (dev->addr_len) {
++	case ETH_ALEN:
++		return addrconf_ifid_eui48(eui, dev);
++	case EUI64_ADDR_LEN:
++		memcpy(eui, dev->dev_addr, EUI64_ADDR_LEN);
++		eui[0] ^= 2;
++		break;
++	default:
+ 		return -1;
+-	memcpy(eui, dev->dev_addr, EUI64_ADDR_LEN);
+-	eui[0] ^= 2;
++	}
 +
- 		spin_lock_bh(&lowpan_dev(dev)->ctx.lock);
- 		ci = lowpan_iphc_ctx_get_by_id(dev, LOWPAN_IPHC_CID_DCI(cid));
- 		if (!ci) {
-@@ -681,11 +683,15 @@ int lowpan_header_decompress(struct sk_buff *skb, const struct net_device *dev,
- 		spin_unlock_bh(&lowpan_dev(dev)->ctx.lock);
- 		break;
- 	case LOWPAN_IPHC_M:
-+		skb->pkt_type = PACKET_BROADCAST;
-+
- 		/* multicast */
- 		err = lowpan_uncompress_multicast_daddr(skb, &hdr.daddr,
- 							iphc1 & LOWPAN_IPHC_DAM_MASK);
- 		break;
- 	case LOWPAN_IPHC_DAC:
-+		skb->pkt_type = PACKET_HOST;
-+
- 		spin_lock_bh(&lowpan_dev(dev)->ctx.lock);
- 		ci = lowpan_iphc_ctx_get_by_id(dev, LOWPAN_IPHC_CID_DCI(cid));
- 		if (!ci) {
-@@ -701,6 +707,8 @@ int lowpan_header_decompress(struct sk_buff *skb, const struct net_device *dev,
- 		spin_unlock_bh(&lowpan_dev(dev)->ctx.lock);
- 		break;
- 	default:
-+		skb->pkt_type = PACKET_HOST;
-+
- 		err = lowpan_iphc_uncompress_addr(skb, dev, &hdr.daddr,
- 						  iphc1 & LOWPAN_IPHC_DAM_MASK,
- 						  daddr);
+ 	return 0;
+ }
+ 
+@@ -2149,7 +2156,7 @@ static int ipv6_generate_eui64(u8 *eui, struct net_device *dev)
+ 	case ARPHRD_TUNNEL:
+ 		return addrconf_ifid_gre(eui, dev);
+ 	case ARPHRD_6LOWPAN:
+-		return addrconf_ifid_eui64(eui, dev);
++		return addrconf_ifid_6lowpan(eui, dev);
+ 	case ARPHRD_IEEE1394:
+ 		return addrconf_ifid_ieee1394(eui, dev);
+ 	case ARPHRD_TUNNEL6:
 -- 
 2.9.3
 
