@@ -1,45 +1,75 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from coyote.holtmann.net ([212.227.132.17]:60653 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752765AbdC0OsL (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 27 Mar 2017 10:48:11 -0400
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.2 \(3259\))
-Subject: Re: [PATCH v8 0/3] ieee802154: Add support for Cascoda CA8210
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1f46560a-f28e-3121-c1e9-1bf75061cade@pengutronix.de>
-Date: Mon, 27 Mar 2017 16:46:34 +0200
-Content-Transfer-Encoding: 8BIT
-Message-Id: <75B6F7AE-3064-4D1D-9264-3B0C15BBC778@holtmann.org>
-References: <20170206170857.5064-1-h.morris@cascoda.com>
- <3E93277B-2B5C-402A-A683-2E94ADEC038F@holtmann.org>
- <9b21db69-6034-4e01-28f0-852ea75d4bd5@cascoda.com>
- <b40da21e-1b49-7b1d-ad85-3086bfad2683@osg.samsung.com>
- <924D8F3E-2D22-48B4-9501-340CB611AA9C@holtmann.org>
- <4d8de4ad-51bf-a3ab-8bdd-b80c71fc6d0d@osg.samsung.com>
- <d7aa153b-3bd4-4052-65c4-c3585e970691@cascoda.com>
- <1f46560a-f28e-3121-c1e9-1bf75061cade@pengutronix.de>
+Received: from mail-wr0-f196.google.com ([209.85.128.196]:33747 "EHLO
+        mail-wr0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752066AbdC1MLL (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 28 Mar 2017 08:11:11 -0400
+Received: by mail-wr0-f196.google.com with SMTP id u18so2634129wrc.0
+        for <linux-wpan@vger.kernel.org>; Tue, 28 Mar 2017 05:10:55 -0700 (PDT)
+From: Harry Morris <harrymorris12@gmail.com>
+Subject: [PATCH v9 0/3] ieee802154: Add support for Cascoda CA8210
+Date: Tue, 28 Mar 2017 13:08:57 +0100
+Message-Id: <20170328120900.5328-1-h.morris@cascoda.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <aar@pengutronix.de>
-Cc: h.morris@cascoda.com, Stefan Schmidt <stefan@osg.samsung.com>, Harry Morris <harrymorris12@gmail.com>, linux-wpan@vger.kernel.org
+To: linux-wpan@vger.kernel.org
+Cc: aar@pengutronix.de, marcel@holtmann.org, stefan@osg.samsung.com, Harry Morris <h.morris@cascoda.com>
 
-Hi,
+This patchset adds a new device driver, documentation and build support for
+Cascoda's CA8210 IEEE 802.15.4 radio transceiver:
+http://www.cascoda.com/products/ca-821x/
 
->> I was looking into this "select vs depends on" and it seems select is by far the more widely used approach when it comes to COMMON_CLK. I guess this doesn't exactly justify it but also I agree having to manually enable it feels a bit unintuitive. I'd appreciate any further thoughts though.
->> 
-> 
-> Please note, so far I know:
-> 
-> Select is used mostly on Top Level Entries. It can't solve dependencies...
-> it can solve it, but then you need also select them in your entry.
-> 
-> Depends on can solve it by make it simple available only if the depended
-> menu entry is selected.
+v9:
+Add promiscuous mode support
+Rework SPI retries
+Fix printf typo
+Remove old TODOs
+add "select COMMON_CLK" to Kconfig entry
 
-can someone send me a version of this patchset where this is solved?
+v8:
+Use module_spi_driver helper
+Remove async tx timeout at driver level
+Style conformance change
+Rework synchronous command handling to remove mutex
 
-Regards
+v7:
+Remove use of cs_change property, always transmit full length buffers
+Implement fully async spi transfers
+Combine spi transmission and reception into one function
+Use completion objects when waiting for events
+Rework a lot of locking
+Remove deprecated xmit_sync
+Remove use of workqueue for IRQ handling
 
-Marcel
+v6:
+Kernel style conformance changes
+Additional documentation
+More meaningful register structs/macros
+Removal of old TODOs
+Removal of unnecessary macros
+Check for safe removal of test interface
+
+v5:
++Cc: Marcel Holtmann
+
+v4:
+Added allowable tx_powers and cca_ed_levels
+Changed power units to mbm (tx_power & cca_ed_level)
+
+Harry Morris (3):
+  ieee802154: Add CA8210 IEEE 802.15.4 device driver
+  ieee802154: Add device tree documentation for CA8210
+  ieee802154: Add entry in MAINTAINTERS for CA8210 driver
+
+ .../devicetree/bindings/net/ieee802154/ca8210.txt  |   28 +
+ .../devicetree/bindings/vendor-prefixes.txt        |    1 +
+ MAINTAINERS                                        |    9 +
+ drivers/net/ieee802154/Kconfig                     |   22 +
+ drivers/net/ieee802154/Makefile                    |    1 +
+ drivers/net/ieee802154/ca8210.c                    | 3240 ++++++++++++++++++++
+ 6 files changed, 3301 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/net/ieee802154/ca8210.txt
+ create mode 100644 drivers/net/ieee802154/ca8210.c
+
+-- 
+2.9.3.windows.1
 
