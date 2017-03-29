@@ -1,32 +1,38 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from coyote.holtmann.net ([212.227.132.17]:49869 "EHLO
+Received: from coyote.holtmann.net ([212.227.132.17]:45767 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751468AbdC2Sva (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 29 Mar 2017 14:51:30 -0400
+        with ESMTP id S1752138AbdC2Sy5 (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 29 Mar 2017 14:54:57 -0400
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
 Subject: Re: [PATCH][bluetooth-next][V2] ieee802154: ca8210: Add checks for
  kmalloc allocation failures
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20170329.101740.93561929292168345.davem@davemloft.net>
-Date: Wed, 29 Mar 2017 20:51:26 +0200
-Content-Transfer-Encoding: 8BIT
-Message-Id: <F83769CD-CFDF-460E-8528-ED2CF1D6FC88@holtmann.org>
+In-Reply-To: <20170329170540.21011-1-colin.king@canonical.com>
+Date: Wed, 29 Mar 2017 20:54:53 +0200
+Content-Transfer-Encoding: 7bit
+Message-Id: <80D11AF4-0CD7-4FEE-AF17-AD79FBFBD294@holtmann.org>
 References: <20170329170540.21011-1-colin.king@canonical.com>
- <20170329.101740.93561929292168345.davem@davemloft.net>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: "David S. Miller" <davem@davemloft.net>
-Cc: Colin King <colin.king@canonical.com>, Harry Morris <h.morris@cascoda.com>, linuxdev@cascoda.com, Alexander Aring <aar@pengutronix.de>, Stefan Schmidt <stefan@osg.samsung.com>, linux-wpan@vger.kernel.org, Network Development <netdev@vger.kernel.org>, kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Colin King <colin.king@canonical.com>
+Cc: Harry Morris <h.morris@cascoda.com>, linuxdev@cascoda.com, Alexander Aring <aar@pengutronix.de>, Stefan Schmidt <stefan@osg.samsung.com>, linux-wpan@vger.kernel.org, netdev@vger.kernel.org, kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hi Dave,
+Hi Colin,
 
->> drivers/net/ieee802154/ca8210.c | 18 ++++++++++--------
+> Ensure we don't end up with a null pointer dereferences by checking
+> for for allocation failures.  Allocate by sizeof(*ptr) rather than
+> the type to fix checkpack warnings.  Also merge multiple lines into
+> one line for the kmalloc call.
 > 
-> This file doesn't exist in any of my trees.
+> Detected by CoverityScan, CID#1422435 ("Dereference null return value")
 > 
+> Signed-off-by: Colin Ian King <colin.king@canonical.com>
+> ---
+> drivers/net/ieee802154/ca8210.c | 18 ++++++++++--------
+> 1 file changed, 10 insertions(+), 8 deletions(-)
 
-because we have not send you a bluetooth-next pull request yet. I review it and take it through my tree first.
+patch has been applied to bluetooth-next tree.
 
 Regards
 
