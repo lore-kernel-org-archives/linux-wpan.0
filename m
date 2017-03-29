@@ -1,77 +1,27 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from youngberry.canonical.com ([91.189.89.112]:34373 "EHLO
-        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753277AbdC2RFs (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 29 Mar 2017 13:05:48 -0400
-From: Colin King <colin.king@canonical.com>
-Subject: [PATCH][bluetooth-next][V2] ieee802154: ca8210: Add checks for kmalloc allocation failures
-Date: Wed, 29 Mar 2017 18:05:40 +0100
-Message-Id: <20170329170540.21011-1-colin.king@canonical.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Received: from shards.monkeyblade.net ([184.105.139.130]:49052 "EHLO
+        shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752762AbdC2RRm (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 29 Mar 2017 13:17:42 -0400
+Date: Wed, 29 Mar 2017 10:17:40 -0700 (PDT)
+Message-Id: <20170329.101740.93561929292168345.davem@davemloft.net>
+Subject: Re: [PATCH][bluetooth-next][V2] ieee802154: ca8210: Add checks for
+ kmalloc allocation failures
+From: David Miller <davem@davemloft.net>
+In-Reply-To: <20170329170540.21011-1-colin.king@canonical.com>
+References: <20170329170540.21011-1-colin.king@canonical.com>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Harry Morris <h.morris@cascoda.com>, linuxdev@cascoda.com, Alexander Aring <aar@pengutronix.de>, Stefan Schmidt <stefan@osg.samsung.com>, linux-wpan@vger.kernel.org, netdev@vger.kernel.org
-Cc: kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+To: colin.king@canonical.com
+Cc: h.morris@cascoda.com, linuxdev@cascoda.com, aar@pengutronix.de, stefan@osg.samsung.com, linux-wpan@vger.kernel.org, netdev@vger.kernel.org, kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
 
-From: Colin Ian King <colin.king@canonical.com>
+From: Colin King <colin.king@canonical.com>
+Date: Wed, 29 Mar 2017 18:05:40 +0100
 
-Ensure we don't end up with a null pointer dereferences by checking
-for for allocation failures.  Allocate by sizeof(*ptr) rather than
-the type to fix checkpack warnings.  Also merge multiple lines into
-one line for the kmalloc call.
+>  drivers/net/ieee802154/ca8210.c | 18 ++++++++++--------
 
-Detected by CoverityScan, CID#1422435 ("Dereference null return value")
-
-Signed-off-by: Colin Ian King <colin.king@canonical.com>
----
- drivers/net/ieee802154/ca8210.c | 18 ++++++++++--------
- 1 file changed, 10 insertions(+), 8 deletions(-)
-
-diff --git a/drivers/net/ieee802154/ca8210.c b/drivers/net/ieee802154/ca8210.c
-index 53fa87bfede0..25fd3b04b3c0 100644
---- a/drivers/net/ieee802154/ca8210.c
-+++ b/drivers/net/ieee802154/ca8210.c
-@@ -634,6 +634,8 @@ static int ca8210_test_int_driver_write(
- 		dev_dbg(&priv->spi->dev, "%#03x\n", buf[i]);
- 
- 	fifo_buffer = kmalloc(len, GFP_KERNEL);
-+	if (!fifo_buffer)
-+		return -ENOMEM;
- 	memcpy(fifo_buffer, buf, len);
- 	kfifo_in(&test->up_fifo, &fifo_buffer, 4);
- 	wake_up_interruptible(&priv->test.readq);
-@@ -759,10 +761,10 @@ static void ca8210_rx_done(struct cas_control *cas_ctl)
- 				&priv->spi->dev,
- 				"Resetting MAC...\n");
- 
--			mlme_reset_wpc = kmalloc(
--				sizeof(struct work_priv_container),
--				GFP_KERNEL
--			);
-+			mlme_reset_wpc = kmalloc(sizeof(*mlme_reset_wpc),
-+						 GFP_KERNEL);
-+			if (!mlme_reset_wpc)
-+				goto finish;
- 			INIT_WORK(
- 				&mlme_reset_wpc->work,
- 				ca8210_mlme_reset_worker
-@@ -925,10 +927,10 @@ static int ca8210_spi_transfer(
- 
- 	dev_dbg(&spi->dev, "ca8210_spi_transfer called\n");
- 
--	cas_ctl = kmalloc(
--		sizeof(struct cas_control),
--		GFP_ATOMIC
--	);
-+	cas_ctl = kmalloc(sizeof(*cas_ctl), GFP_ATOMIC);
-+	if (!cas_ctl)
-+		return -ENOMEM;
-+
- 	cas_ctl->priv = priv;
- 	memset(cas_ctl->tx_buf, SPI_IDLE, CA8210_SPI_BUF_SIZE);
- 	memset(cas_ctl->tx_in_buf, SPI_IDLE, CA8210_SPI_BUF_SIZE);
--- 
-2.11.0
+This file doesn't exist in any of my trees.
 
