@@ -1,88 +1,88 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mx02-sz.bfs.de ([194.94.69.103]:29821 "EHLO mx02-sz.bfs.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752113AbdC2Sy6 (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-        Wed, 29 Mar 2017 14:54:58 -0400
-Message-ID: <58DC02F6.40009@bfs.de>
-Date: Wed, 29 Mar 2017 20:54:46 +0200
-From: walter harms <wharms@bfs.de>
-Reply-To: wharms@bfs.de
-MIME-Version: 1.0
-Subject: Re: [PATCH] Add checks for kmalloc allocation failures
-References: <20170329155447.17991-1-colin.king@canonical.com>
-In-Reply-To: <20170329155447.17991-1-colin.king@canonical.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Received: from mail-ot0-f174.google.com ([74.125.82.174]:35396 "EHLO
+        mail-ot0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752958AbdC2GKs (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 29 Mar 2017 02:10:48 -0400
+Received: by mail-ot0-f174.google.com with SMTP id y88so3837902ota.2
+        for <linux-wpan@vger.kernel.org>; Tue, 28 Mar 2017 23:10:47 -0700 (PDT)
+From: Michael Scott <michael.scott@linaro.org>
+Subject: [PATCH] bluetooth: 6lowpan: fix use after free in chan_suspend/resume
+Date: Tue, 28 Mar 2017 23:10:18 -0700
+Message-Id: <20170329061018.4243-1-michael.scott@linaro.org>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Colin King <colin.king@canonical.com>
-Cc: Harry Morris <h.morris@cascoda.com>, linuxdev@cascoda.com, Alexander Aring <aar@pengutronix.de>, Stefan Schmidt <stefan@osg.samsung.com>, linux-wpan@vger.kernel.org, netdev@vger.kernel.org, kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan <gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jukka Rissanen <jukka.rissanen@linux.intel.com>, linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Michael Scott <michael.scott@linaro.org>
 
+A status field in the skb_cb struct was storing a channel status
+based on channel suspend/resume events.  This stored status was
+then used to return EAGAIN if there were packet sending issues
+in snd_pkt().
 
+The issue is that the skb has been freed by the time the callback
+to 6lowpan's suspend/resume was called.  So, this generates a
+"use after free" issue that was noticed while running kernel tests
+with KASAN debug enabled.
 
-Am 29.03.2017 17:54, schrieb Colin King:
-> From: Colin Ian King <colin.king@canonical.com>
-> 
-> Ensure we don't end up with a null pointer dereferences by checking
-> for for allocation failures.  Allocate by sizeof(*ptr) rather than
-> the type to fix checkpack warnings.  Also merge multiple lines into
-> one line for the kmalloc call.
-> 
-> Detected by CoverityScan, CID#1422435 ("Dereference null return value")
-> 
-> Signed-off-by: Colin Ian King <colin.king@canonical.com>
-> ---
->  drivers/net/ieee802154/ca8210.c | 18 ++++++++++--------
->  1 file changed, 10 insertions(+), 8 deletions(-)
-> 
-> diff --git a/drivers/net/ieee802154/ca8210.c b/drivers/net/ieee802154/ca8210.c
-> index 53fa87bfede0..25fd3b04b3c0 100644
-> --- a/drivers/net/ieee802154/ca8210.c
-> +++ b/drivers/net/ieee802154/ca8210.c
-> @@ -634,6 +634,8 @@ static int ca8210_test_int_driver_write(
->  		dev_dbg(&priv->spi->dev, "%#03x\n", buf[i]);
->  
->  	fifo_buffer = kmalloc(len, GFP_KERNEL);
-> +	if (!fifo_buffer)
-> +		return -ENOMEM;
->  	memcpy(fifo_buffer, buf, len);
+Let's eliminate the status field entirely as we can use the channel
+tx_credits to indicate whether we should return EAGAIN when handling
+packets.
 
+Signed-off-by: Michael Scott <michael.scott@linaro.org>
+---
+ net/bluetooth/6lowpan.c | 21 +++------------------
+ 1 file changed, 3 insertions(+), 18 deletions(-)
 
-perhaps kmemdup() ist the way to go ?
-by replace kamlloc()+memcpy
+diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+index d491529332f4..e27be3ca0a0c 100644
+--- a/net/bluetooth/6lowpan.c
++++ b/net/bluetooth/6lowpan.c
+@@ -38,7 +38,6 @@ struct skb_cb {
+ 	struct in6_addr addr;
+ 	struct in6_addr gw;
+ 	struct l2cap_chan *chan;
+-	int status;
+ };
+ #define lowpan_cb(skb) ((struct skb_cb *)((skb)->cb))
+ 
+@@ -528,7 +527,7 @@ static int send_pkt(struct l2cap_chan *chan, struct sk_buff *skb,
+ 	}
+ 
+ 	if (!err)
+-		err = lowpan_cb(skb)->status;
++		err = (!chan->tx_credits ? -EAGAIN : 0);
+ 
+ 	if (err < 0) {
+ 		if (err == -EAGAIN)
+@@ -964,26 +963,12 @@ static struct sk_buff *chan_alloc_skb_cb(struct l2cap_chan *chan,
+ 
+ static void chan_suspend_cb(struct l2cap_chan *chan)
+ {
+-	struct sk_buff *skb = chan->data;
+-
+-	BT_DBG("chan %p conn %p skb %p", chan, chan->conn, skb);
+-
+-	if (!skb)
+-		return;
+-
+-	lowpan_cb(skb)->status = -EAGAIN;
++	BT_DBG("chan %p suspend", chan);
+ }
+ 
+ static void chan_resume_cb(struct l2cap_chan *chan)
+ {
+-	struct sk_buff *skb = chan->data;
+-
+-	BT_DBG("chan %p conn %p skb %p", chan, chan->conn, skb);
+-
+-	if (!skb)
+-		return;
+-
+-	lowpan_cb(skb)->status = 0;
++	BT_DBG("chan %p resume", chan);
+ }
+ 
+ static long chan_get_sndtimeo_cb(struct l2cap_chan *chan)
+-- 
+2.11.0
 
-re,
- wh
-
->  	kfifo_in(&test->up_fifo, &fifo_buffer, 4);
->  	wake_up_interruptible(&priv->test.readq);
-> @@ -759,10 +761,10 @@ static void ca8210_rx_done(struct cas_control *cas_ctl)
->  				&priv->spi->dev,
->  				"Resetting MAC...\n");
->  
-> -			mlme_reset_wpc = kmalloc(
-> -				sizeof(struct work_priv_container),
-> -				GFP_KERNEL
-> -			);
-> +			mlme_reset_wpc = kmalloc(sizeof(*mlme_reset_wpc),
-> +						 GFP_KERNEL);
-> +			if (!mlme_reset_wpc)
-> +				goto finish;
->  			INIT_WORK(
->  				&mlme_reset_wpc->work,
->  				ca8210_mlme_reset_worker
-> @@ -925,10 +927,10 @@ static int ca8210_spi_transfer(
->  
->  	dev_dbg(&spi->dev, "ca8210_spi_transfer called\n");
->  
-> -	cas_ctl = kmalloc(
-> -		sizeof(struct cas_control),
-> -		GFP_ATOMIC
-> -	);
-> +	cas_ctl = kmalloc(sizeof(*cas_ctl), GFP_ATOMIC);
-> +	if (!cas_ctl)
-> +		return -ENOMEM;
-> +
->  	cas_ctl->priv = priv;
->  	memset(cas_ctl->tx_buf, SPI_IDLE, CA8210_SPI_BUF_SIZE);
->  	memset(cas_ctl->tx_in_buf, SPI_IDLE, CA8210_SPI_BUF_SIZE);
