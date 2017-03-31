@@ -1,88 +1,101 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-ot0-f174.google.com ([74.125.82.174]:35396 "EHLO
-        mail-ot0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752958AbdC2GKs (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 29 Mar 2017 02:10:48 -0400
-Received: by mail-ot0-f174.google.com with SMTP id y88so3837902ota.2
-        for <linux-wpan@vger.kernel.org>; Tue, 28 Mar 2017 23:10:47 -0700 (PDT)
-From: Michael Scott <michael.scott@linaro.org>
-Subject: [PATCH] bluetooth: 6lowpan: fix use after free in chan_suspend/resume
-Date: Tue, 28 Mar 2017 23:10:18 -0700
-Message-Id: <20170329061018.4243-1-michael.scott@linaro.org>
+Received: from mail-io0-f194.google.com ([209.85.223.194]:35476 "EHLO
+        mail-io0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932648AbdCaIdj (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 31 Mar 2017 04:33:39 -0400
+MIME-Version: 1.0
+In-Reply-To: <20170329061018.4243-1-michael.scott@linaro.org>
+References: <20170329061018.4243-1-michael.scott@linaro.org>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Fri, 31 Mar 2017 11:33:37 +0300
+Message-ID: <CABBYNZ+=W6kvxrmaTWktNTtc76hoDgYuZOK9QF5QNd+5+MSjNA@mail.gmail.com>
+Subject: Re: [PATCH] bluetooth: 6lowpan: fix use after free in chan_suspend/resume
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan <gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jukka Rissanen <jukka.rissanen@linux.intel.com>, linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Michael Scott <michael.scott@linaro.org>
+To: Michael Scott <michael.scott@linaro.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan <gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>, "David S . Miller" <davem@davemloft.net>, Jukka Rissanen <jukka.rissanen@linux.intel.com>, "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, linux-wpan@vger.kernel.org, "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-A status field in the skb_cb struct was storing a channel status
-based on channel suspend/resume events.  This stored status was
-then used to return EAGAIN if there were packet sending issues
-in snd_pkt().
+Hi Michael,
 
-The issue is that the skb has been freed by the time the callback
-to 6lowpan's suspend/resume was called.  So, this generates a
-"use after free" issue that was noticed while running kernel tests
-with KASAN debug enabled.
+On Wed, Mar 29, 2017 at 9:10 AM, Michael Scott <michael.scott@linaro.org> wrote:
+> A status field in the skb_cb struct was storing a channel status
+> based on channel suspend/resume events.  This stored status was
+> then used to return EAGAIN if there were packet sending issues
+> in snd_pkt().
+>
+> The issue is that the skb has been freed by the time the callback
+> to 6lowpan's suspend/resume was called.  So, this generates a
+> "use after free" issue that was noticed while running kernel tests
+> with KASAN debug enabled.
+>
+> Let's eliminate the status field entirely as we can use the channel
+> tx_credits to indicate whether we should return EAGAIN when handling
+> packets.
+>
+> Signed-off-by: Michael Scott <michael.scott@linaro.org>
+> ---
+>  net/bluetooth/6lowpan.c | 21 +++------------------
+>  1 file changed, 3 insertions(+), 18 deletions(-)
+>
+> diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+> index d491529332f4..e27be3ca0a0c 100644
+> --- a/net/bluetooth/6lowpan.c
+> +++ b/net/bluetooth/6lowpan.c
+> @@ -38,7 +38,6 @@ struct skb_cb {
+>         struct in6_addr addr;
+>         struct in6_addr gw;
+>         struct l2cap_chan *chan;
+> -       int status;
+>  };
+>  #define lowpan_cb(skb) ((struct skb_cb *)((skb)->cb))
+>
+> @@ -528,7 +527,7 @@ static int send_pkt(struct l2cap_chan *chan, struct sk_buff *skb,
+>         }
+>
+>         if (!err)
+> -               err = lowpan_cb(skb)->status;
+> +               err = (!chan->tx_credits ? -EAGAIN : 0);
+>
+>         if (err < 0) {
+>                 if (err == -EAGAIN)
+> @@ -964,26 +963,12 @@ static struct sk_buff *chan_alloc_skb_cb(struct l2cap_chan *chan,
+>
+>  static void chan_suspend_cb(struct l2cap_chan *chan)
+>  {
+> -       struct sk_buff *skb = chan->data;
+> -
+> -       BT_DBG("chan %p conn %p skb %p", chan, chan->conn, skb);
+> -
+> -       if (!skb)
+> -               return;
+> -
+> -       lowpan_cb(skb)->status = -EAGAIN;
+> +       BT_DBG("chan %p suspend", chan);
+>  }
+>
+>  static void chan_resume_cb(struct l2cap_chan *chan)
+>  {
+> -       struct sk_buff *skb = chan->data;
+> -
+> -       BT_DBG("chan %p conn %p skb %p", chan, chan->conn, skb);
+> -
+> -       if (!skb)
+> -               return;
+> -
+> -       lowpan_cb(skb)->status = 0;
+> +       BT_DBG("chan %p resume", chan);
+>  }
+>
+>  static long chan_get_sndtimeo_cb(struct l2cap_chan *chan)
+> --
+> 2.11.0
 
-Let's eliminate the status field entirely as we can use the channel
-tx_credits to indicate whether we should return EAGAIN when handling
-packets.
+It should be possible to queue the packets on l2cap_chan_send, Im not
+sure why we have this suspend logic in the first place so perhaps
+Jukka can shed some light here.
 
-Signed-off-by: Michael Scott <michael.scott@linaro.org>
----
- net/bluetooth/6lowpan.c | 21 +++------------------
- 1 file changed, 3 insertions(+), 18 deletions(-)
 
-diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-index d491529332f4..e27be3ca0a0c 100644
---- a/net/bluetooth/6lowpan.c
-+++ b/net/bluetooth/6lowpan.c
-@@ -38,7 +38,6 @@ struct skb_cb {
- 	struct in6_addr addr;
- 	struct in6_addr gw;
- 	struct l2cap_chan *chan;
--	int status;
- };
- #define lowpan_cb(skb) ((struct skb_cb *)((skb)->cb))
- 
-@@ -528,7 +527,7 @@ static int send_pkt(struct l2cap_chan *chan, struct sk_buff *skb,
- 	}
- 
- 	if (!err)
--		err = lowpan_cb(skb)->status;
-+		err = (!chan->tx_credits ? -EAGAIN : 0);
- 
- 	if (err < 0) {
- 		if (err == -EAGAIN)
-@@ -964,26 +963,12 @@ static struct sk_buff *chan_alloc_skb_cb(struct l2cap_chan *chan,
- 
- static void chan_suspend_cb(struct l2cap_chan *chan)
- {
--	struct sk_buff *skb = chan->data;
--
--	BT_DBG("chan %p conn %p skb %p", chan, chan->conn, skb);
--
--	if (!skb)
--		return;
--
--	lowpan_cb(skb)->status = -EAGAIN;
-+	BT_DBG("chan %p suspend", chan);
- }
- 
- static void chan_resume_cb(struct l2cap_chan *chan)
- {
--	struct sk_buff *skb = chan->data;
--
--	BT_DBG("chan %p conn %p skb %p", chan, chan->conn, skb);
--
--	if (!skb)
--		return;
--
--	lowpan_cb(skb)->status = 0;
-+	BT_DBG("chan %p resume", chan);
- }
- 
- static long chan_get_sndtimeo_cb(struct l2cap_chan *chan)
+
 -- 
-2.11.0
-
+Luiz Augusto von Dentz
