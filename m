@@ -1,53 +1,79 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from coyote.holtmann.net ([212.227.132.17]:53860 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932342AbdCaKKr (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Fri, 31 Mar 2017 06:10:47 -0400
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Subject: Re: [PATCH] bluetooth: 6lowpan: fix delay work init in
- add_peer_chan()
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20170329061054.4300-1-michael.scott@linaro.org>
-Date: Fri, 31 Mar 2017 12:10:44 +0200
-Content-Transfer-Encoding: 8BIT
-Message-Id: <6B40174C-6834-4C3D-BF41-92119E78E353@holtmann.org>
-References: <20170329061054.4300-1-michael.scott@linaro.org>
+Received: from mail-lf0-f67.google.com ([209.85.215.67]:35005 "EHLO
+        mail-lf0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750777AbdDCOtD (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 3 Apr 2017 10:49:03 -0400
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Subject: [PATCH 1/3] Bluetooth: 6lowpan: Remove unnecessary peer lookup
+Date: Mon,  3 Apr 2017 17:48:55 +0300
+Message-Id: <20170403144857.4661-1-luiz.dentz@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Michael Scott <michael.scott@linaro.org>
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>, "David S. Miller" <davem@davemloft.net>, Jukka Rissanen <jukka.rissanen@linux.intel.com>, linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+To: linux-bluetooth@vger.kernel.org
+Cc: aar@pengutronix.de, jukka.rissanen@linux.intel.com, linux-wpan@vger.kernel.org
 
-Hi Michael,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-> When adding 6lowpan devices very rapidly we sometimes see a crash:
-> [23122.306615] CPU: 2 PID: 0 Comm: swapper/2 Not tainted 4.9.0-43-arm64 #1 Debian 4.9.9.linaro.43-1
-> [23122.315400] Hardware name: HiKey Development Board (DT)
-> [23122.320623] task: ffff800075443080 task.stack: ffff800075484000
-> [23122.326551] PC is at expire_timers+0x70/0x150
-> [23122.330907] LR is at run_timer_softirq+0xa0/0x1a0
-> [23122.335616] pc : [<ffff000008142dd8>] lr : [<ffff000008142f58>] pstate: 600001c5
-> 
-> This was due to add_peer_chan() unconditionally initializing the
-> lowpan_btle_dev->notify_peers delayed work structure, even if the
-> lowpan_btle_dev passed into add_peer_chan() had previously been
-> initialized.
-> 
-> Normally, this would go unnoticed as the delayed work timer is set for
-> 100 msec, however when calling add_peer_chan() faster than 100 msec it
-> clears out a previously queued delay work causing the crash above.
-> 
-> To fix this, let add_peer_chan() know when a new lowpan_btle_dev is passed
-> in so that it only performs the delay work initialization when needed.
-> 
-> Signed-off-by: Michael Scott <michael.scott@linaro.org>
-> ---
-> net/bluetooth/6lowpan.c | 10 +++++++---
-> 1 file changed, 7 insertions(+), 3 deletions(-)
+During chan_recv_cb there is already a peer lookup which can be passed
+to recv_pkt directly instead of the channel.
 
-patch has been applied to bluetooth-next tree.
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ net/bluetooth/6lowpan.c | 15 ++++-----------
+ 1 file changed, 4 insertions(+), 11 deletions(-)
 
-Regards
-
-Marcel
+diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+index b39da8d..2063e96 100644
+--- a/net/bluetooth/6lowpan.c
++++ b/net/bluetooth/6lowpan.c
+@@ -269,27 +269,20 @@ static int give_skb_to_upper(struct sk_buff *skb, struct net_device *dev)
+ }
+ 
+ static int iphc_decompress(struct sk_buff *skb, struct net_device *netdev,
+-			   struct l2cap_chan *chan)
++			   struct lowpan_peer *peer)
+ {
+ 	const u8 *saddr;
+ 	struct lowpan_btle_dev *dev;
+-	struct lowpan_peer *peer;
+ 
+ 	dev = lowpan_btle_dev(netdev);
+ 
+-	rcu_read_lock();
+-	peer = __peer_lookup_chan(dev, chan);
+-	rcu_read_unlock();
+-	if (!peer)
+-		return -EINVAL;
+-
+ 	saddr = peer->lladdr;
+ 
+ 	return lowpan_header_decompress(skb, netdev, netdev->dev_addr, saddr);
+ }
+ 
+ static int recv_pkt(struct sk_buff *skb, struct net_device *dev,
+-		    struct l2cap_chan *chan)
++		    struct lowpan_peer *peer)
+ {
+ 	struct sk_buff *local_skb;
+ 	int ret;
+@@ -342,7 +335,7 @@ static int recv_pkt(struct sk_buff *skb, struct net_device *dev,
+ 
+ 		local_skb->dev = dev;
+ 
+-		ret = iphc_decompress(local_skb, dev, chan);
++		ret = iphc_decompress(local_skb, dev, peer);
+ 		if (ret < 0) {
+ 			kfree_skb(local_skb);
+ 			goto drop;
+@@ -388,7 +381,7 @@ static int chan_recv_cb(struct l2cap_chan *chan, struct sk_buff *skb)
+ 	if (!dev || !dev->netdev)
+ 		return -ENOENT;
+ 
+-	err = recv_pkt(skb, dev->netdev, chan);
++	err = recv_pkt(skb, dev->netdev, peer);
+ 	if (err) {
+ 		BT_DBG("recv pkt %d", err);
+ 		err = -EAGAIN;
+-- 
+2.9.3
 
