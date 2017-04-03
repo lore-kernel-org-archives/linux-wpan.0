@@ -1,37 +1,53 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from coyote.holtmann.net ([212.227.132.17]:50915 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754445AbdDLT6r (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 12 Apr 2017 15:58:47 -0400
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Subject: Re: [PATCH 1/6] 6lowpan: Don't set IFF_NO_QUEUE
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20170411192103.3209-1-luiz.dentz@gmail.com>
-Date: Wed, 12 Apr 2017 21:58:45 +0200
-Content-Transfer-Encoding: 7bit
-Message-Id: <CD68D4DF-AEF7-4142-9999-B2FDD0E9A44C@holtmann.org>
-References: <20170411192103.3209-1-luiz.dentz@gmail.com>
+Received: from mail-wr0-f170.google.com ([209.85.128.170]:33794 "EHLO
+        mail-wr0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752915AbdDCRaR (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 3 Apr 2017 13:30:17 -0400
+MIME-Version: 1.0
+In-Reply-To: <56012235-e1d0-1e5e-840a-cc8d5938c380@ntnu.no>
+References: <56012235-e1d0-1e5e-840a-cc8d5938c380@ntnu.no>
+From: Cong Wang <xiyou.wangcong@gmail.com>
+Date: Mon, 3 Apr 2017 10:29:55 -0700
+Message-ID: <CAM_iQpWqQj3FLpBLE1Z+==Z7tJGXHyHXTvLmKRCNjyc=vtQvnQ@mail.gmail.com>
+Subject: Re: skb_over_panic using UDP and 6lowpan / fakelb
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Linux Bluetooth <linux-bluetooth@vger.kernel.org>, Patrik Flykt <patrik.flykt@linux.intel.com>, Alexander Aring <aar@pengutronix.de>, Jukka Rissanen <jukka.rissanen@linux.intel.com>, linux-wpan@vger.kernel.org
+To: David Palma <david.palma@ntnu.no>
+Cc: LKML <linux-kernel@vger.kernel.org>, Linux Kernel Network Developers <netdev@vger.kernel.org>, aar@pengutronix.de, stefan@osg.samsung.com, linux-wpan@vger.kernel.org
 
-Hi Luiz,
+(Cc'ing netdev and maintainers)
 
-> There is no point in setting IFF_NO_QUEUE should already have taken
-> care of setting it if tx_queue_len is not set, in fact this may
-> actually disable queue for interfaces that require it and do set
-> tx_queue_len.
-> 
-> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> ---
-> net/6lowpan/core.c | 1 -
-> 1 file changed, 1 deletion(-)
-
-all 6 patches have been applied to bluetooth-next tree.
-
-Regards
-
-Marcel
-
+On Mon, Mar 27, 2017 at 2:16 AM, David Palma <david.palma@ntnu.no> wrote:
+>
+> Hi,
+>
+> Sending a simple UDP packet (39 bytes long), over a 6lowpan interface
+> (using fakelb), creates a kernel panic (skb_over_panic).
+>
+> Steps to reproduce, and more details, can be found in:
+> https://github.com/PalmaITEM/6lowpan-skb_over_panic
+>
+> This bug has been reported in
+> https://bugzilla.kernel.org/show_bug.cgi?id=195059
+>
+> I have found that lengths around 39 bytes can also trigger this
+> behaviour and that longer packets are handled without problem.
+>
+> Verified in:
+>
+> - Linux version 4.9.0-0.bpo.2-amd64 (debian-kernel@lists.debian.org)
+> (gcc version 4.9.2 (Debian 4.9.2-10) ) #1 SMP Debian 4.9.13-1~bpo8+1
+> (2017-02-27)
+> - Linux version 4.10.4-1-ARCH (builduser@tobias) (gcc version 6.3.1
+> 20170306 (GCC) ) #1 SMP PREEMPT Sat Mar 18 19:39:18 CET 2017
+>
+>
+> I am not familiar with the process of reporting kernel bugs, so
+> apologies beforehand. I am also available to provide any missing
+> information.
+>
+> Cheers,
+> --
+> David Palma
+>
