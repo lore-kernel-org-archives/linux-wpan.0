@@ -1,35 +1,82 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from coyote.holtmann.net ([212.227.132.17]:49156 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754694AbdDENrS (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 5 Apr 2017 09:47:18 -0400
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Subject: Re: [PATCH 1/3] Bluetooth: 6lowpan: Remove unnecessary peer lookup
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20170403144857.4661-1-luiz.dentz@gmail.com>
-Date: Wed, 5 Apr 2017 15:47:15 +0200
-Content-Transfer-Encoding: 7bit
-Message-Id: <6D8C6EC7-4E52-4C4B-8A2D-728880DDF938@holtmann.org>
-References: <20170403144857.4661-1-luiz.dentz@gmail.com>
+Received: from 178.161.235.229.dyn.v4.saturn-internet.ru ([178.161.235.229]:38596
+        "HELO saturn-internet.ru" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with SMTP id S1752511AbdDIRZa (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Sun, 9 Apr 2017 13:25:30 -0400
+Content-Disposition: attachment
+Content-Type: application/zip; name="8808_linux-wpan.zip"
+MIME-Version: 1.0
+Message-ID: <149175872577.21476.10007380609810842792@saturn-internet.ru>
+Subject: 
+Reply-To: <ln@ngh.nu>
+From: <ln@ngh.nu>
+Date: Sun, 09 Apr 2017 17:25:25 -0000
+Content-Transfer-Encoding: base64
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Linux Bluetooth <linux-bluetooth@vger.kernel.org>, Alexander Aring <aar@pengutronix.de>, Jukka Rissanen <jukka.rissanen@linux.intel.com>, linux-wpan@vger.kernel.org
+To: linux-wpan@vger.kernel.org
 
-Hi Luiz,
-
-> During chan_recv_cb there is already a peer lookup which can be passed
-> to recv_pkt directly instead of the channel.
-> 
-> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> ---
-> net/bluetooth/6lowpan.c | 15 ++++-----------
-> 1 file changed, 4 insertions(+), 11 deletions(-)
-
-all 3 patches have been applied to bluetooth-next tree.
-
-Regards
-
-Marcel
-
+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
