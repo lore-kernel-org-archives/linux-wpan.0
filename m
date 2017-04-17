@@ -1,50 +1,70 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from coyote.holtmann.net ([212.227.132.17]:43227 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S936309AbdDSULw (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 19 Apr 2017 16:11:52 -0400
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Subject: Re: [PATCH] ieee802154: don't select COMMON_CLK
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20170419173233.3726121-1-arnd@arndb.de>
-Date: Wed, 19 Apr 2017 22:11:45 +0200
-Content-Transfer-Encoding: 8BIT
-Message-Id: <0C05AA51-5B19-416C-B708-9E0700C112E0@holtmann.org>
-References: <20170419173233.3726121-1-arnd@arndb.de>
+Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:36627 "EHLO
+        metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1752205AbdDQR4Q (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>);
+        Mon, 17 Apr 2017 13:56:16 -0400
+From: Alexander Aring <aar@pengutronix.de>
+Subject: bluetooth 6lowpan interfaces are not virtual anymore
+Message-ID: <2d178eb8-3fbc-3385-6e0c-fa9941713959@pengutronix.de>
+Date: Mon, 17 Apr 2017 19:56:12 +0200
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Alexander Aring <aar@pengutronix.de>, Stefan Schmidt <stefan@osg.samsung.com>, Harry Morris <harrymorris12@gmail.com>, linux-wpan@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Network Development <netdev@vger.kernel.org>
+Cc: Jukka Rissanen <jukka.rissanen@linux.intel.com>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>, Linux Bluetooth <linux-bluetooth@vger.kernel.org>
 
-Hi Arnd,
+Hi,
 
-> A device driver must not select the COMMON_CLK subsystem, as that conflicts
-> with platforms that provide a legacy implementation of the clk API:
-> 
-> drivers/clk/clk.o: In function `clk_enable':
-> clk.c:(.text.clk_enable+0x0): multiple definition of `clk_enable'
-> arch/arm/mach-sa1100/clock.o:clock.c:(.text.clk_enable+0x0): first defined here
-> drivers/clk/clk.o: In function `clk_round_rate':
-> clk.c:(.text.clk_round_rate+0x0): multiple definition of `clk_round_rate'
-> arch/arm/mach-sa1100/clock.o:clock.c:(.text.clk_round_rate+0x0): first defined here
-> drivers/clk/clk.o: In function `clk_get_parent':
-> clk.c:(.text.clk_get_parent+0x0): multiple definition of `clk_get_parent'
-> arch/arm/mach-sa1100/clock.o:clock.c:(.text.clk_get_parent+0x0): first defined here
-> drivers/clk/clk.o: In function `clk_get_rate':
-> clk.c:(.text.clk_get_rate+0x0): multiple definition of `clk_get_rate'
-> 
-> This changes the 'select' into 'depends on', as all other similar drivers do.
-> 
-> Fixes: d931acd575d6 ("ieee802154: Add CA8210 IEEE 802.15.4 device driver")
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> ---
-> drivers/net/ieee802154/Kconfig | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
+bluetooth-next contains patches which introduces a queue for bluetooth
+6LoWPAN interfaces. [0]
 
-patch has been applied to bluetooth-next tree.
+At first, the current behaviour is now that 802.15.4 6LoWPAN interfaces
+are virtual and bluetooth 6LoWPAN interfaces are not virtual anymore.
+To have a different handling in both subsystems is _definitely_ wrong.
 
-Regards
+What does the 6LoWPAN interface?
 
-Marcel
+It will do a protocol change (an adaptation, because 6LoWPAN should
+provide the same functionality as IPv6) from IPv6 to 6LoWPAN (tx) and
+vice versa for (rx). In my opinion this should be handled as a virtual
+interface and not as an interface with a queue.
 
+What makes a queue on 6LoWPAN interfaces?
+
+It will queue IPv6 packets which waits for it adaptation (the protocol
+change) with some additional qdisc handling.
+If finally the xmit_do callback will occur it will replace IPv6 header
+with 6LoWPAN, etc. After that it should be queued into some queue on
+link layer side which should be do the transmit finally.
+
+Why I think bluetooth introduced a queue handling on 6LoWPAN interfaces?
+
+Because I think they don't like their own *qdisc* handling on their link
+layer interface. I write *qdisc* here because, they have no net_devices
+and use some kind of own qdisc handling.
+
+My question: is this correct?
+
+How to fix that (In my opinion):
+
+So commit [0] says something "out of credits" that's what I think it's
+the *qdisc* handling. If you cannot queue anymore -> you need to drop
+it. If you don't like how the current behaviour is, you need to change
+your *qdisc* handling on your link layer interface. Introducing queue at
+6LoWPAN interfaces will introduce "buffer bloating".
+
+---
+
+I don't care what bluetooth does with the 6LoWPAN interface. If bluetooth
+people wants such behaviour, then I am okay with that.
+
+I will bookmark this mail for the time when somebody reverts it to a
+virtual interface again. I think somebody will change it again, or maybe
+somebody will argument why we need a queue here. 
+
+- Alex
+
+[0] https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git/commit/?id=814f1b243d2c63928f6aa72d66bec0e5fae2f4a9
