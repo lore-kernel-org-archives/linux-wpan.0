@@ -1,95 +1,76 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mga06.intel.com ([134.134.136.31]:38130 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750961AbdDZQwm (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-        Wed, 26 Apr 2017 12:52:42 -0400
-Message-ID: <1493225552.3165.5.camel@linux.intel.com>
-Subject: Re: bluetooth 6lowpan interfaces are not virtual anymore
-From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-Date: Wed, 26 Apr 2017 19:52:32 +0300
-In-Reply-To: <383.1493218546@dooku.sandelman.ca>
-References: <2d178eb8-3fbc-3385-6e0c-fa9941713959@pengutronix.de>
-         <28530.1492534783@obiwan.sandelman.ca>
-         <11cf222a-0c1f-4136-091d-719ee68824e1@pengutronix.de>
-         <383.1493218546@dooku.sandelman.ca>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Received: from mail1.mail.bhtafe.edu.au ([192.232.128.5]:14870 "EHLO
+        MAIL1.mail.bhtafe.edu.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751522AbdDQMIL (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 17 Apr 2017 08:08:11 -0400
+From: Jan Newmarch <j.newmarch@boxhill.edu.au>
+Subject: llsec: command failed: Operation not supported (-95)
+Date: Mon, 17 Apr 2017 12:01:08 +0000
+Message-ID: <1492430559.14787.49.camel@boxhill.edu.au>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <4652ACE2B9512B4EA0C16E5C4E353D09@boxhill.edu.au>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Michael Richardson <mcr@sandelman.ca>, Alexander Aring <aar@pengutronix.de>
-Cc: Network Development <netdev@vger.kernel.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>, Linux Bluetooth <linux-bluetooth@vger.kernel.org>
+To: "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>
 
-Hi Michael,
-
-On Wed, 2017-04-26 at 10:55 -0400, Michael Richardson wrote:
-> Alexander Aring <aar@pengutronix.de> wrote:
->     >> In a classic SVR4 STREAMS works, it would have been just
-> another
->     >> module.  (No, I'm not a fan of *STREAMS* or of SVR4 in
-> general,
->     >> although I liked some of the ideas).
->     >>
-> 
->     > ok, I see you complain about "having a virtual on top of wpan
->     > interface", or?
-> 
->     > I wanted to talk at first about the queue handling which is
-> introduced
->     > when 6LoWPAN is not a virtual interface anymore. Or do you want
-> to have
->     > a queue in front of 6lowpan adaptation (see other mail reply
-> with ASCII
->     > graphics).
-> 
-> I would like to have a single queue, as close to the hardware as
-> possible,
-> such that BQL can do it's thing easily.  Should we rethink outgoing
-> fragment
-> handling for 6lowpan?  Clearly the BT people had a need.
-> I don't think they've had a chance to respond to your complaints.
-
-Note that the BT fragmentation (or actually it is called segmentation
-in BT) is totally different what 802.15.4 is doing. I do not think
-there is any need to add fragmentation handling into 6lo.
-
-Actually the 6lowpan kernel module could probably be simplified to be a
-library. We did this in Zephyr where we have compress() and
-uncompress() functions that do all the magic.  
-
-> 
->     > We can change that you can run multiple interfaces on one
->     > PHY. Currently we just allow one, because address filtering.
-> Disable
->     > address filtering
->     > we will loose ACK handling on hardware.
-> 
-> Yes, that's a limitation of some hardware, and if you enable multiple
-> PANIDs,
-> that might be the consequence....
-> 
->     > I can try to implement all stuff in software "for fun, maybe
-> see what
->     > we can do to handle ACK in software, etc" Then you can run
-> multiple
-> 
-> I'm not asking you to do it, I'm asking, now that we've gotten to a
-> certain
-> point, we have a better idea what the various requirements are, and
-> can we
-> re-evaluate things and maybe tweak some things.
-> 
-> --
-> ]               Never tell me the odds!                 | ipv6 mesh
-> networks [
-> ]   Michael Richardson, Sandelman Software Works        | network
-> architect  [
-> ]     mcr@sandelman.ca  http://www.sandelman.ca/        |   ruby on
-> rails    [
-> 
-
-
-Cheers,
-Jukka
-
-
+UnVubmluZyA4MDIuMTUuNCBhbmQgNkxvV1BBTiBzdWNjZXNzZnVsbHkgb24gUlBpIHVzaW5nIHRo
+ZSBPcGVuTGFicw0KbW9kdWxlLiBDYW4gcGluZywgcnVuIFVEUCwgVENQIHByb2dyYW1zIGV0YyBv
+a2F5IHRvIGFub3RoZXIgUlBpLiBUcmllZA0KdG8gYWRkIGxsc2VjIHVzaW5nIHdwYW4tdG9vbHMg
+ZnJvbSBodHRwczovL2dpdGh1Yi5jb20vbGludXgtd3Bhbi93cGFuLXQNCm9vbHMvdHJlZS9ubDgw
+MjE1NF9sbHNlYywgd2l0aCBpbnN0cnVjdGlvbnMgZ2l2ZW4gYnkgU3RlZmFuIFNjaG1pZHQgYXQN
+Cmh0dHA6Ly9ldmVudHMubGludXhmb3VuZGF0aW9uLm9yZy9zaXRlcy9ldmVudHMvZmlsZXMvc2xp
+ZGVzL29wZW5pb3QtMjAxDQo2LWxpbnV4LXdwYW5fMC5wZGYNCg0KT24gcnVubmluZw0KICAgLi9p
+d3BhbiBkZXYgd3BhbjAgc2V0IHNlY3VyaXR5IDENCkkgZ2V0DQogICBjb21tYW5kIGZhaWxlZDog
+T3BlcmF0aW9uIG5vdCBzdXBwb3J0ZWQgKC05NSkNCmFmdGVyIGV4ZWN1dGluZw0KICAgbmxfcmVj
+dm1zZ3Moc3RhdGUtPm5sX3NvY2ssIGNiKTsNCmxpbmUgNDQ1LCBpd3Bhbi5jDQoNCkkgZ3Vlc3Mg
+SSdtIG1pc3Npbmcgc29tZXRoaW5nLCBub3Qgc3VyZSB3aGF0Lg0KDQokIC4vaXdwYW4gd3BhbjAg
+aW5mbw0KSW50ZXJmYWNlIHdwYW4wDQogICAgICAgIGlmaW5kZXggMw0KICAgICAgICB3cGFuX2Rl
+diAweDENCiAgICAgICAgZXh0ZW5kZWRfYWRkciAweDAyMDAwMDAwMDAwMDAwMDENCiAgICAgICAg
+c2hvcnRfYWRkciAweGZmZmYNCiAgICAgICAgcGFuX2lkIDB4YmVlZg0KICAgICAgICB0eXBlIG5v
+ZGUNCiAgICAgICAgbWF4X2ZyYW1lX3JldHJpZXMgMw0KICAgICAgICBtaW5fYmUgMw0KICAgICAg
+ICBtYXhfYmUgNQ0KICAgICAgICBtYXhfY3NtYV9iYWNrb2ZmcyA0DQogICAgICAgIGxidCAwDQog
+ICAgICAgIGFja3JlcV9kZWZhdWx0IDANCg0KJCB1bmFtZSAtYQ0KTGludXggcmFzcGJlcnJ5cGkg
+NC43LjItdjcrICMxIFNNUCBGcmkgQXVnIDI2IDE1OjQ1OjI5IFVUQyAyMDE2IGFybXY3bA0KR05V
+L0xpbnV4DQoNCiQgbHNtb2QNCk1vZHVsZSAgICAgICAgICAgICAgICAgIFNpemUgIFVzZWQgYnkN
+Cm5oY19tb2JpbGl0eSAgICAgICAgICAgICA5MzIgIDANCm5oY191ZHAgICAgICAgICAgICAgICAg
+IDI3MjIgIDANCm5oY19yb3V0aW5nICAgICAgICAgICAgICA5MzAgIDANCm5oY19mcmFnbWVudCAg
+ICAgICAgICAgICA5MzIgIDANCmllZWU4MDIxNTRfNmxvd3BhbiAgICAgMTkzMzUgIDANCm5oY19p
+cHY2ICAgICAgICAgICAgICAgICA5MjQgIDANCm5oY19ob3AgICAgICAgICAgICAgICAgICA5MjIg
+IDANCm5oY19kZXN0ICAgICAgICAgICAgICAgICA5MjQgIDANCjZsb3dwYW4gICAgICAgICAgICAg
+ICAgMTMxOTEgIDgNCm5oY19mcmFnbWVudCxpZWVlODAyMTU0XzZsb3dwYW4sbmhjX2hvcCxuaGNf
+dWRwLG5oY19kZXN0LG5oY19pcHY2LG5oY19tDQpvYmlsaXR5LG5oY19yb3V0aW5nDQpjZmc4MDIx
+MSAgICAgICAgICAgICAgNDM0MTAzICAwDQpyZmtpbGwgICAgICAgICAgICAgICAgIDE1Nzg0ICAx
+IGNmZzgwMjExDQphdDg2cmYyMzAgICAgICAgICAgICAgIDIyMjExICAwDQptYWM4MDIxNTQgICAg
+ICAgICAgICAgIDQ5MDM1ICAxIGF0ODZyZjIzMA0KaWVlZTgwMjE1NCAgICAgICAgICAgICA1NTY5
+OCAgMiBpZWVlODAyMTU0XzZsb3dwYW4sbWFjODAyMTU0DQpjcmNfY2NpdHQgICAgICAgICAgICAg
+ICAxMjc4ICAxIG1hYzgwMjE1NA0KDQpUaGFua3MNCg0KSmFuDQotLQ0KRHIgSmFuIE5ld21hcmNo
+LA0KRGlyZWN0b3Igb2YgSGlnaGVyIEVkdWNhdGlvbiAoQnVzaW5lc3MgJiBJQ1QpIEAgQm94IEhp
+bGwsDQpBZGp1bmN0IFByb2Zlc3NvciBAIFVuaXZlcnNpdHkgb2YgQ2FuYmVycmENCg0KIFtNaWQg
+WWVhciAyMDE3XSA8aHR0cDovL3d3dy5ib3hoaWxsLmVkdS5hdS8+DQoNCltCb3ggSGlsbCBJbnN0
+aXR1dGVdPGh0dHA6Ly93d3cuYm94aGlsbC5lZHUuYXU+DQoNClJUTyBOby40Njg3DQpDUklDT1Mg
+UHJvdmlkZXIgTm8uIDAyNDExSg0KQm94IEhpbGwgSW5zdGl0dXRlDQoNCltRdWVzdGlvbnM/IEZl
+ZWRiYWNrPyBBc2sgQW5uaWUhXTxodHRwOi8vd3d3LmJveGhpbGwuZWR1LmF1L2NvbnRhY3QtdXMv
+PiAgICAgICAgW0Nvbm5lY3Qgd2l0aCB1cyBvbiBMaW5rZWRJbl0gPGh0dHA6Ly93d3cubGlua2Vk
+aW4uY29tL2VkdS9zY2hvb2w/aWQ9NDE4Njg+ICAgICBbV2F0Y2ggb3VyIHZpZGVvcyBvbiBZb3VU
+dWJlXSA8aHR0cDovL3d3dy55b3V0dWJlLmNvbS91c2VyL0JveEhpbGxJbnN0aXR1dGU+ICAgIFtG
+b2xsb3cgdXMgb24gVHdpdHRlcl0gPGh0dHBzOi8vdHdpdHRlci5jb20vQm94SGlsbFRBRkU+ICAg
+ICAgICBbQmVjb21lIGEgZmFuIG9uIEZhY2Vib29rXSA8aHR0cHM6Ly93d3cuZmFjZWJvb2suY29t
+L2JveGhpbGx0YWZlPiAgICAgICBbVmlldyB1cyBvbiBJbnN0YWdyYW1dIDxodHRwOi8vaW5zdGFn
+cmFtLmNvbS9ib3hoaWxsaW5zdGl0dXRlIz4gICAgICAgICBbR29vZ2xlK10gPGh0dHBzOi8vcGx1
+cy5nb29nbGUuY29tLzEwNjY3MjgzODcyMzEzNTQwMTM5MS9wb3N0cz4NCg0KQ29uZmlkZW50aWFs
+aXR5IGFuZCBQcml2YWN5DQpUaGlzIG1lc3NhZ2UgaXMgaW50ZW5kZWQgb25seSBmb3IgdGhlIHVz
+ZSBvZiB0aGUgaW5kaXZpZHVhbCBvciBlbnRpdHkgbmFtZWQgYWJvdmUgYW5kIG1heSBjb250YWlu
+IGluZm9ybWF0aW9uIHRoYXQgaXMgY29uZmlkZW50aWFsIGFuZCBwcml2aWxlZ2VkLiBJZiB5b3Ug
+YXJlIG5vdCB0aGUgaW50ZW5kZWQgcmVjaXBpZW50LCB5b3UgYXJlIGhlcmVieSBub3RpZmllZCB0
+aGF0IGFueSBkaXNzZW1pbmF0aW9uLCBkaXN0cmlidXRpb24gb3IgY29weWluZyBvZiB0aGlzIGNv
+bW11bmljYXRpb24gaXMgc3RyaWN0bHkgcHJvaGliaXRlZC4gSWYgeW91IGhhdmUgcmVjZWl2ZWQg
+dGhpcyBjb21tdW5pY2F0aW9uIGluIGVycm9yLCBwbGVhc2Ugbm90aWZ5IHVzIGltbWVkaWF0ZWx5
+IGJ5IHRlbGVwaG9uZSBhbmQgZGVzdHJveSB0aGUgb3JpZ2luYWwgbWVzc2FnZS4gQm94IEhpbGwg
+SW5zdGl0dXRlIGlzIGNvbW1pdHRlZCB0byBwcm90ZWN0aW5nIHlvdXIgcHJpdmFjeSBhbmQgdGhl
+IGNvbmZpZGVudGlhbGl0eSBhbmQgc2VjdXJpdHkgb2YgcGVyc29uYWwgaW5mb3JtYXRpb24gcHJv
+dmlkZWQgYnkgeW91IHRvIHVzLiBGb3IgZnVydGhlciBpbmZvcm1hdGlvbiB2aXNpdCB3d3cuYm94
+aGlsbC5lZHUuYXU8aHR0cDovL3d3dy5ib3hoaWxsLmVkdS5hdT4gb3IgZW1haWwgcHJpdmFjeUBi
+b3hoaWxsLmVkdS5hdTxtYWlsdG86cHJpdmFjeUBib3hoaWxsLmVkdS5hdT4uDQo=
