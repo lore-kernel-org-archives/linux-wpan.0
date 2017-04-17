@@ -1,76 +1,75 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail1.mail.bhtafe.edu.au ([192.232.128.5]:14870 "EHLO
-        MAIL1.mail.bhtafe.edu.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751522AbdDQMIL (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 17 Apr 2017 08:08:11 -0400
-From: Jan Newmarch <j.newmarch@boxhill.edu.au>
-Subject: llsec: command failed: Operation not supported (-95)
-Date: Mon, 17 Apr 2017 12:01:08 +0000
-Message-ID: <1492430559.14787.49.camel@boxhill.edu.au>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <4652ACE2B9512B4EA0C16E5C4E353D09@boxhill.edu.au>
-Content-Transfer-Encoding: base64
+Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:34363 "EHLO
+        metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1753283AbdDQNcD (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>);
+        Mon, 17 Apr 2017 09:32:03 -0400
+Subject: Re: llsec: command failed: Operation not supported (-95)
+References: <1492430559.14787.49.camel@boxhill.edu.au>
+From: Alexander Aring <aar@pengutronix.de>
+Message-ID: <0d63c71c-d334-cd62-065e-b003a44bdced@pengutronix.de>
+Date: Mon, 17 Apr 2017 15:32:00 +0200
 MIME-Version: 1.0
+In-Reply-To: <1492430559.14787.49.camel@boxhill.edu.au>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>
+To: Jan Newmarch <j.newmarch@boxhill.edu.au>
+Cc: "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>
 
-UnVubmluZyA4MDIuMTUuNCBhbmQgNkxvV1BBTiBzdWNjZXNzZnVsbHkgb24gUlBpIHVzaW5nIHRo
-ZSBPcGVuTGFicw0KbW9kdWxlLiBDYW4gcGluZywgcnVuIFVEUCwgVENQIHByb2dyYW1zIGV0YyBv
-a2F5IHRvIGFub3RoZXIgUlBpLiBUcmllZA0KdG8gYWRkIGxsc2VjIHVzaW5nIHdwYW4tdG9vbHMg
-ZnJvbSBodHRwczovL2dpdGh1Yi5jb20vbGludXgtd3Bhbi93cGFuLXQNCm9vbHMvdHJlZS9ubDgw
-MjE1NF9sbHNlYywgd2l0aCBpbnN0cnVjdGlvbnMgZ2l2ZW4gYnkgU3RlZmFuIFNjaG1pZHQgYXQN
-Cmh0dHA6Ly9ldmVudHMubGludXhmb3VuZGF0aW9uLm9yZy9zaXRlcy9ldmVudHMvZmlsZXMvc2xp
-ZGVzL29wZW5pb3QtMjAxDQo2LWxpbnV4LXdwYW5fMC5wZGYNCg0KT24gcnVubmluZw0KICAgLi9p
-d3BhbiBkZXYgd3BhbjAgc2V0IHNlY3VyaXR5IDENCkkgZ2V0DQogICBjb21tYW5kIGZhaWxlZDog
-T3BlcmF0aW9uIG5vdCBzdXBwb3J0ZWQgKC05NSkNCmFmdGVyIGV4ZWN1dGluZw0KICAgbmxfcmVj
-dm1zZ3Moc3RhdGUtPm5sX3NvY2ssIGNiKTsNCmxpbmUgNDQ1LCBpd3Bhbi5jDQoNCkkgZ3Vlc3Mg
-SSdtIG1pc3Npbmcgc29tZXRoaW5nLCBub3Qgc3VyZSB3aGF0Lg0KDQokIC4vaXdwYW4gd3BhbjAg
-aW5mbw0KSW50ZXJmYWNlIHdwYW4wDQogICAgICAgIGlmaW5kZXggMw0KICAgICAgICB3cGFuX2Rl
-diAweDENCiAgICAgICAgZXh0ZW5kZWRfYWRkciAweDAyMDAwMDAwMDAwMDAwMDENCiAgICAgICAg
-c2hvcnRfYWRkciAweGZmZmYNCiAgICAgICAgcGFuX2lkIDB4YmVlZg0KICAgICAgICB0eXBlIG5v
-ZGUNCiAgICAgICAgbWF4X2ZyYW1lX3JldHJpZXMgMw0KICAgICAgICBtaW5fYmUgMw0KICAgICAg
-ICBtYXhfYmUgNQ0KICAgICAgICBtYXhfY3NtYV9iYWNrb2ZmcyA0DQogICAgICAgIGxidCAwDQog
-ICAgICAgIGFja3JlcV9kZWZhdWx0IDANCg0KJCB1bmFtZSAtYQ0KTGludXggcmFzcGJlcnJ5cGkg
-NC43LjItdjcrICMxIFNNUCBGcmkgQXVnIDI2IDE1OjQ1OjI5IFVUQyAyMDE2IGFybXY3bA0KR05V
-L0xpbnV4DQoNCiQgbHNtb2QNCk1vZHVsZSAgICAgICAgICAgICAgICAgIFNpemUgIFVzZWQgYnkN
-Cm5oY19tb2JpbGl0eSAgICAgICAgICAgICA5MzIgIDANCm5oY191ZHAgICAgICAgICAgICAgICAg
-IDI3MjIgIDANCm5oY19yb3V0aW5nICAgICAgICAgICAgICA5MzAgIDANCm5oY19mcmFnbWVudCAg
-ICAgICAgICAgICA5MzIgIDANCmllZWU4MDIxNTRfNmxvd3BhbiAgICAgMTkzMzUgIDANCm5oY19p
-cHY2ICAgICAgICAgICAgICAgICA5MjQgIDANCm5oY19ob3AgICAgICAgICAgICAgICAgICA5MjIg
-IDANCm5oY19kZXN0ICAgICAgICAgICAgICAgICA5MjQgIDANCjZsb3dwYW4gICAgICAgICAgICAg
-ICAgMTMxOTEgIDgNCm5oY19mcmFnbWVudCxpZWVlODAyMTU0XzZsb3dwYW4sbmhjX2hvcCxuaGNf
-dWRwLG5oY19kZXN0LG5oY19pcHY2LG5oY19tDQpvYmlsaXR5LG5oY19yb3V0aW5nDQpjZmc4MDIx
-MSAgICAgICAgICAgICAgNDM0MTAzICAwDQpyZmtpbGwgICAgICAgICAgICAgICAgIDE1Nzg0ICAx
-IGNmZzgwMjExDQphdDg2cmYyMzAgICAgICAgICAgICAgIDIyMjExICAwDQptYWM4MDIxNTQgICAg
-ICAgICAgICAgIDQ5MDM1ICAxIGF0ODZyZjIzMA0KaWVlZTgwMjE1NCAgICAgICAgICAgICA1NTY5
-OCAgMiBpZWVlODAyMTU0XzZsb3dwYW4sbWFjODAyMTU0DQpjcmNfY2NpdHQgICAgICAgICAgICAg
-ICAxMjc4ICAxIG1hYzgwMjE1NA0KDQpUaGFua3MNCg0KSmFuDQotLQ0KRHIgSmFuIE5ld21hcmNo
-LA0KRGlyZWN0b3Igb2YgSGlnaGVyIEVkdWNhdGlvbiAoQnVzaW5lc3MgJiBJQ1QpIEAgQm94IEhp
-bGwsDQpBZGp1bmN0IFByb2Zlc3NvciBAIFVuaXZlcnNpdHkgb2YgQ2FuYmVycmENCg0KIFtNaWQg
-WWVhciAyMDE3XSA8aHR0cDovL3d3dy5ib3hoaWxsLmVkdS5hdS8+DQoNCltCb3ggSGlsbCBJbnN0
-aXR1dGVdPGh0dHA6Ly93d3cuYm94aGlsbC5lZHUuYXU+DQoNClJUTyBOby40Njg3DQpDUklDT1Mg
-UHJvdmlkZXIgTm8uIDAyNDExSg0KQm94IEhpbGwgSW5zdGl0dXRlDQoNCltRdWVzdGlvbnM/IEZl
-ZWRiYWNrPyBBc2sgQW5uaWUhXTxodHRwOi8vd3d3LmJveGhpbGwuZWR1LmF1L2NvbnRhY3QtdXMv
-PiAgICAgICAgW0Nvbm5lY3Qgd2l0aCB1cyBvbiBMaW5rZWRJbl0gPGh0dHA6Ly93d3cubGlua2Vk
-aW4uY29tL2VkdS9zY2hvb2w/aWQ9NDE4Njg+ICAgICBbV2F0Y2ggb3VyIHZpZGVvcyBvbiBZb3VU
-dWJlXSA8aHR0cDovL3d3dy55b3V0dWJlLmNvbS91c2VyL0JveEhpbGxJbnN0aXR1dGU+ICAgIFtG
-b2xsb3cgdXMgb24gVHdpdHRlcl0gPGh0dHBzOi8vdHdpdHRlci5jb20vQm94SGlsbFRBRkU+ICAg
-ICAgICBbQmVjb21lIGEgZmFuIG9uIEZhY2Vib29rXSA8aHR0cHM6Ly93d3cuZmFjZWJvb2suY29t
-L2JveGhpbGx0YWZlPiAgICAgICBbVmlldyB1cyBvbiBJbnN0YWdyYW1dIDxodHRwOi8vaW5zdGFn
-cmFtLmNvbS9ib3hoaWxsaW5zdGl0dXRlIz4gICAgICAgICBbR29vZ2xlK10gPGh0dHBzOi8vcGx1
-cy5nb29nbGUuY29tLzEwNjY3MjgzODcyMzEzNTQwMTM5MS9wb3N0cz4NCg0KQ29uZmlkZW50aWFs
-aXR5IGFuZCBQcml2YWN5DQpUaGlzIG1lc3NhZ2UgaXMgaW50ZW5kZWQgb25seSBmb3IgdGhlIHVz
-ZSBvZiB0aGUgaW5kaXZpZHVhbCBvciBlbnRpdHkgbmFtZWQgYWJvdmUgYW5kIG1heSBjb250YWlu
-IGluZm9ybWF0aW9uIHRoYXQgaXMgY29uZmlkZW50aWFsIGFuZCBwcml2aWxlZ2VkLiBJZiB5b3Ug
-YXJlIG5vdCB0aGUgaW50ZW5kZWQgcmVjaXBpZW50LCB5b3UgYXJlIGhlcmVieSBub3RpZmllZCB0
-aGF0IGFueSBkaXNzZW1pbmF0aW9uLCBkaXN0cmlidXRpb24gb3IgY29weWluZyBvZiB0aGlzIGNv
-bW11bmljYXRpb24gaXMgc3RyaWN0bHkgcHJvaGliaXRlZC4gSWYgeW91IGhhdmUgcmVjZWl2ZWQg
-dGhpcyBjb21tdW5pY2F0aW9uIGluIGVycm9yLCBwbGVhc2Ugbm90aWZ5IHVzIGltbWVkaWF0ZWx5
-IGJ5IHRlbGVwaG9uZSBhbmQgZGVzdHJveSB0aGUgb3JpZ2luYWwgbWVzc2FnZS4gQm94IEhpbGwg
-SW5zdGl0dXRlIGlzIGNvbW1pdHRlZCB0byBwcm90ZWN0aW5nIHlvdXIgcHJpdmFjeSBhbmQgdGhl
-IGNvbmZpZGVudGlhbGl0eSBhbmQgc2VjdXJpdHkgb2YgcGVyc29uYWwgaW5mb3JtYXRpb24gcHJv
-dmlkZWQgYnkgeW91IHRvIHVzLiBGb3IgZnVydGhlciBpbmZvcm1hdGlvbiB2aXNpdCB3d3cuYm94
-aGlsbC5lZHUuYXU8aHR0cDovL3d3dy5ib3hoaWxsLmVkdS5hdT4gb3IgZW1haWwgcHJpdmFjeUBi
-b3hoaWxsLmVkdS5hdTxtYWlsdG86cHJpdmFjeUBib3hoaWxsLmVkdS5hdT4uDQo=
+Hi,
+
+On 04/17/2017 02:01 PM, Jan Newmarch wrote:
+> Running 802.15.4 and 6LoWPAN successfully on RPi using the OpenLabs
+> module. Can ping, run UDP, TCP programs etc okay to another RPi. Tried
+> to add llsec using wpan-tools from https://github.com/linux-wpan/wpan-t
+> ools/tree/nl802154_llsec, with instructions given by Stefan Schmidt at
+> http://events.linuxfoundation.org/sites/events/files/slides/openiot-201
+> 6-linux-wpan_0.pdf
+> 
+> On running
+>    ./iwpan dev wpan0 set security 1
+> I get
+>    command failed: Operation not supported (-95)
+> after executing
+>    nl_recvmsgs(state->nl_sock, cb);
+> line 445, iwpan.c
+> 
+> I guess I'm missing something, not sure what.
+> 
+> $ ./iwpan wpan0 info
+> Interface wpan0
+>         ifindex 3
+>         wpan_dev 0x1
+>         extended_addr 0x0200000000000001
+>         short_addr 0xffff
+>         pan_id 0xbeef
+>         type node
+>         max_frame_retries 3
+>         min_be 3
+>         max_be 5
+>         max_csma_backoffs 4
+>         lbt 0
+>         ackreq_default 0
+> 
+> $ uname -a
+> Linux raspberrypi 4.7.2-v7+ #1 SMP Fri Aug 26 15:45:29 UTC 2016 armv7l
+> GNU/Linux
+> 
+
+Don't know yet when I added support for it in the kernel - maybe use bluetooth-next?
+It's currently a experimental feature, you need to enable:
+
+IEEE802154_NL802154_EXPERIMENTAL
+
+---
+Also there exists some cases on dumping where the kernel crashes (I
+have it on my list) It's because monitor interfaces doesn't has softmac
+layers and doesn't need that all security related stuff. Maybe you can
+send patches? It occurs when dumping values with iwpan.
+
+Don't know how to send patches? There exists lot's of youtube tutorials
+from Greg Kroah Hartmann. :-)
+
+- Alex
