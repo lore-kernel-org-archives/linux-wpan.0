@@ -1,80 +1,59 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from relay.cooperix.net ([176.58.120.209]:35784 "EHLO
-        relay.sandelman.ca" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1437727AbdDZPFz (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 26 Apr 2017 11:05:55 -0400
+Received: from tuna.sandelman.ca ([209.87.249.19]:45313 "EHLO
+        tuna.sandelman.ca" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1757328AbdDRRHf (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 18 Apr 2017 13:07:35 -0400
 From: Michael Richardson <mcr@sandelman.ca>
 Subject: Re: bluetooth 6lowpan interfaces are not virtual anymore
-In-reply-to: <CABBYNZJqChBfB4jNCN3edmKSfhNd-haTKOjeYy1toK-Mn=qzoA@mail.gmail.com>
-References: <2d178eb8-3fbc-3385-6e0c-fa9941713959@pengutronix.de> <CABBYNZLqTvd5cnG4fKJgPKJGvS6hsk8vOM+7NQ_RhLJ-WOszmg@mail.gmail.com> <f3c04860-651e-c9f3-e7ab-db609d105436@pengutronix.de> <CABBYNZJqChBfB4jNCN3edmKSfhNd-haTKOjeYy1toK-Mn=qzoA@mail.gmail.com>
+In-Reply-To: <2d178eb8-3fbc-3385-6e0c-fa9941713959@pengutronix.de>
+References: <2d178eb8-3fbc-3385-6e0c-fa9941713959@pengutronix.de>
 MIME-Version: 1.0
 Content-Type: multipart/signed; boundary="=-=-=";
-        micalg=pgp-sha1; protocol="application/pgp-signature"
-Date: Wed, 26 Apr 2017 11:05:52 -0400
-Message-ID: <1193.1493219152@dooku.sandelman.ca>
+        micalg=pgp-sha256; protocol="application/pgp-signature"
+Date: Tue, 18 Apr 2017 12:59:43 -0400
+Message-ID: <28530.1492534783@obiwan.sandelman.ca>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Alexander Aring <aar@pengutronix.de>, Network Development <netdev@vger.kernel.org>, Jukka Rissanen <jukka.rissanen@linux.intel.com>, "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>, Linux Bluetooth <linux-bluetooth@vger.kernel.org>
+To: Alexander Aring <aar@pengutronix.de>
+Cc: Network Development <netdev@vger.kernel.org>, Jukka Rissanen <jukka.rissanen@linux.intel.com>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>, Linux Bluetooth <linux-bluetooth@vger.kernel.org>
 
 --=-=-=
 Content-Type: text/plain
 
 
-I said that BT people hadn't replied, but it was next in my inbox :-)
+Alexander Aring <aar@pengutronix.de> wrote:
+    > What does the 6LoWPAN interface?
 
-Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
-    >> At least if you want to try to make a more efficient qdisc handling,
-    >> means dropping skb's in queue when userspace sends too much. You will
-    >> change it back, control two queues seems to be difficult.
+    > It will do a protocol change (an adaptation, because 6LoWPAN should
+    > provide the same functionality as IPv6) from IPv6 to 6LoWPAN (tx) and
+    > vice versa for (rx). In my opinion this should be handled as a virtual
+    > interface and not as an interface with a queue.
 
-    > It is wrong only if you look at 6LoWPAN interface as being owned by
-    > 6lowpan modules, but it doesn't, in fact it won't anything by itself so
-    > it basically acts as a library to that perform 6LoWPAN operation on the
-    > packet level, thus why it is possible to switch from virtual to real
-    > interface. Also in terms of 15.4, the 6LoWPAN interfaces you depicted
-    > above is also no controlled by 6LoWPAN itself, in fact it seeems to
-    > represent links in 15.4, and I also assume these links may not use
-    > 6LoWPAN.
+I wonder if modeling all the 6lowpan work as a virtual interface is even
+the right abstraction anymore.  I think that it was certainly a good model at
+the time the interface was created, given no other clear thing to do.
 
-At present I do not think we support any 15.4 links which are not 6lowpan in the Kernel.
-Perhaps a userspace can open the device in raw mode and do stuff with it
-directly.  Do such users exist right now?
+We don't model IPv6 ND (or IPv4 ARP) or fragmentation in general as a
+virtual interface on top of a raw interface.
 
-    >> This queue should have the same meaning like our queue in IEEE
-    >> 802.15.4 interface which you mentioned above.  At this point, we have
-    >> no difference. There exists already a queue for your real transeiver
-    >> hardware.
+Really, it's a set of operations that happens on a packet.
+802.15.4 is notable for it's current lack of an ethertype (IEEE is fixing
+that though), so you can't actually run different protocols on the
+same PANID.
+BT does have a variety of different protocols, and IPv6 is only one.
 
-    > The queue here is per channel, btw the queue size is not decided by us
-    > it is the remote side that provides the tx credits so to some extend
-    > the tx_queue is actually the remote queue in case of CoC. When testing
-    > this it was quite clear this does not work in practice, with IPv6 at
-    > least, because the remote side may not have enough credits for a single
-    > packet (MPS * tx_credits < MTU) which means without proper queueing
-    > support we would be dropping every packet.
+In a classic SVR4 STREAMS works, it would have been just another module.
+(No, I'm not a fan of *STREAMS* or of SVR4 in general,  although I liked
+some of the ideas).
 
-Would a longer amortization interval help this?
-It seems that if there isn't bandwidth to send the packet, that userspace has
-to learn about this fact...
+At this time, things like PANID and channel are set on the wpanX interface.
+If they were set on the 6lowpan interface, such that one could (in theory,
+assuming the hardware could do it, which some can, and some can not) then
+one could have multiple 6lowpan interfaces on top of the same wpanX.
+Or one could run some non-IP protocol like pre-IP Zigbee on one PANID
+while one runs 6lowpan on another.  THEN, a virtual interface would make
+sense for the same reason VLAN interfaces make sense.
 
-    >> At least, having a queue and don't put anything anymore into the queue
-    >> when "tx credits" is at zero (because queue is full). _Is_ a kind of
-    >> qdisc handling.
-
-    > The tx_credits operate at L2CAP segment level (MPS), so it is at a
-    > completely different level, there are no guarantees the credits will
-    > attend to a single IP packet.
-
-That seems like a problem.
-I think that we need to either send the entire packet, or none.
-Spreading the credits across two packets would just make the system stutter,
-as an upper layer retransmits packets that were half-sent, but then delayed.
-
-Is there someway we can wait, at the IP packet queue level, until there are
-sufficient credits to send all the fragments?  That way, the IP qdisc layer
-can decide to abort(drop,defer) an IP packet from the queue in favour of a more
-important packet.
 
 --
 ]               Never tell me the odds!                 | ipv6 mesh networks [
@@ -86,14 +65,14 @@ important packet.
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iQEcBAEBAgAGBQJZALdQAAoJEJVM4Vb9/EKQkngH/2anNuQZEDvLZHuQ4QvoL6YH
-vK+lZujnd0FcbIu8mCKiO3rWJFZCr2EXju7k0cehMDDKf/v5NwiPpKcxeBbgE9K/
-9/34yn3g5Hua49NehmzwcBIAmSAljpr19Ijr37mbi37RUHT4JJ/15dSJtrJ8Hb+y
-SPZXGZFC85TzpMpC9gYLcb/EBsxhe8XWrpjOdn3TlO8Hk9QA85mfd4JwWy/q7+v7
-8W9WHIuGzdeigZ7ytse8oynrW1BRIR8SjxqGC57hIpfaJsPJbdn+FUoXvXEiw8f1
-3yLjtQfVafTLygpQdFNEKIvhgaLkh/jZyJUNMvGx3zMywPKH0w4QQ3ERg+gAWRg=
-=+mov
+iQEzBAEBCAAdFiEEbsyLEzg/qUTA43uogItw+93Q3WUFAlj2Rf8ACgkQgItw+93Q
+3WWnQQgAgkXo44pEodfLnFpGEo4hSX/79hZhA2np/WAx0tLbZlYwfgnAExG5II/2
+j+eWevu5kW62oCaP3A7YckJ2WZXhiMI4UGqEPEJIC614GK7cZ8tQImflXnklpUO1
+kjeecZchtGUuBV7ZgD7AT2z83k2IU7r3nAf3msLB7YnISvS3HKlGaI8M901T6JZG
+wrjjJikMVklZw9809cVj09AT4YKTtOiwNzIvGKZ4J/qCqapcfrj/5chPwoxGuiUh
+JK2eKe5QUb37Bknso7i2gDf1LM5Oy1QlljzWPJ0b47gqppCKOwhIUvxbrcZygN8y
+NUrrQM+G68yn5UYszmUdjkFWXE32hA==
+=ntFW
 -----END PGP SIGNATURE-----
 --=-=-=--
