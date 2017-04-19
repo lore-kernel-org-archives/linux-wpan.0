@@ -1,70 +1,54 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:34455 "EHLO
-        metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1753250AbdDQNZw (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>);
-        Mon, 17 Apr 2017 09:25:52 -0400
-Subject: Re: skb_over_panic using UDP and 6lowpan / fakelb
-References: <56012235-e1d0-1e5e-840a-cc8d5938c380@ntnu.no>
- <CAM_iQpWqQj3FLpBLE1Z+==Z7tJGXHyHXTvLmKRCNjyc=vtQvnQ@mail.gmail.com>
-From: Alexander Aring <aar@pengutronix.de>
-Message-ID: <0ddbdbde-8610-0ea5-bae2-4ec2702927dc@pengutronix.de>
-Date: Mon, 17 Apr 2017 15:25:48 +0200
-MIME-Version: 1.0
-In-Reply-To: <CAM_iQpWqQj3FLpBLE1Z+==Z7tJGXHyHXTvLmKRCNjyc=vtQvnQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Received: from mout.kundenserver.de ([212.227.126.134]:59131 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S965500AbdDSRdQ (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 19 Apr 2017 13:33:16 -0400
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH] ieee802154: don't select COMMON_CLK
+Date: Wed, 19 Apr 2017 19:32:25 +0200
+Message-Id: <20170419173233.3726121-1-arnd@arndb.de>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Cong Wang <xiyou.wangcong@gmail.com>
-Cc: David Palma <david.palma@ntnu.no>, LKML <linux-kernel@vger.kernel.org>, Linux Kernel Network Developers <netdev@vger.kernel.org>, stefan@osg.samsung.com, linux-wpan@vger.kernel.org
+To: Marcel Holtmann <marcel@holtmann.org>, Alexander Aring <aar@pengutronix.de>, Stefan Schmidt <stefan@osg.samsung.com>
+Cc: Arnd Bergmann <arnd@arndb.de>, Harry Morris <harrymorris12@gmail.com>, linux-wpan@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
+A device driver must not select the COMMON_CLK subsystem, as that conflicts
+with platforms that provide a legacy implementation of the clk API:
 
-Hi,
+drivers/clk/clk.o: In function `clk_enable':
+clk.c:(.text.clk_enable+0x0): multiple definition of `clk_enable'
+arch/arm/mach-sa1100/clock.o:clock.c:(.text.clk_enable+0x0): first defined here
+drivers/clk/clk.o: In function `clk_round_rate':
+clk.c:(.text.clk_round_rate+0x0): multiple definition of `clk_round_rate'
+arch/arm/mach-sa1100/clock.o:clock.c:(.text.clk_round_rate+0x0): first defined here
+drivers/clk/clk.o: In function `clk_get_parent':
+clk.c:(.text.clk_get_parent+0x0): multiple definition of `clk_get_parent'
+arch/arm/mach-sa1100/clock.o:clock.c:(.text.clk_get_parent+0x0): first defined here
+drivers/clk/clk.o: In function `clk_get_rate':
+clk.c:(.text.clk_get_rate+0x0): multiple definition of `clk_get_rate'
 
-sorry for the late reply.
+This changes the 'select' into 'depends on', as all other similar drivers do.
 
-On 04/03/2017 07:29 PM, Cong Wang wrote:
-> (Cc'ing netdev and maintainers)
-> 
-> On Mon, Mar 27, 2017 at 2:16 AM, David Palma <david.palma@ntnu.no> wrote:
->>
->> Hi,
->>
->> Sending a simple UDP packet (39 bytes long), over a 6lowpan interface
->> (using fakelb), creates a kernel panic (skb_over_panic).
->>
->> Steps to reproduce, and more details, can be found in:
->> https://github.com/PalmaITEM/6lowpan-skb_over_panic
->>
->> This bug has been reported in
->> https://bugzilla.kernel.org/show_bug.cgi?id=195059
->>
->> I have found that lengths around 39 bytes can also trigger this
->> behaviour and that longer packets are handled without problem.
->>
->> Verified in:
->>
->> - Linux version 4.9.0-0.bpo.2-amd64 (debian-kernel@lists.debian.org)
->> (gcc version 4.9.2 (Debian 4.9.2-10) ) #1 SMP Debian 4.9.13-1~bpo8+1
->> (2017-02-27)
->> - Linux version 4.10.4-1-ARCH (builduser@tobias) (gcc version 6.3.1
->> 20170306 (GCC) ) #1 SMP PREEMPT Sat Mar 18 19:39:18 CET 2017
->>
->>
->> I am not familiar with the process of reporting kernel bugs, so
->> apologies beforehand. I am also available to provide any missing
->> information.
->>
+Fixes: d931acd575d6 ("ieee802154: Add CA8210 IEEE 802.15.4 device driver")
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+ drivers/net/ieee802154/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-I will try to reproduce the failure with an x86_64 qemu virtual machine.
-Myself I use a 32 Bit qemu machine because I have a dependency on
-userspace software which use x86 assembler (somebody should change it to
-setjmp/longjmp)... it's the RIOT-OS native plattform. I use some cross
-compiling environment which doesn't support multilib yet, so I used
-always 32 Bit.
+diff --git a/drivers/net/ieee802154/Kconfig b/drivers/net/ieee802154/Kconfig
+index ce4864dc3c6e..303ba4133920 100644
+--- a/drivers/net/ieee802154/Kconfig
++++ b/drivers/net/ieee802154/Kconfig
+@@ -86,8 +86,8 @@ config IEEE802154_ADF7242
+ config IEEE802154_CA8210
+ 	tristate "Cascoda CA8210 transceiver driver"
+ 	depends on IEEE802154_DRIVERS && MAC802154
++	depends on COMMON_CLK
+ 	depends on SPI
+-	select COMMON_CLK
+ 	---help---
+ 	  Say Y here to enable the CA8210 SPI 802.15.4 wireless
+ 	  controller.
+-- 
+2.9.0
 
-btw: the github stuff is very useful and thanks for the hard work! I am
-on it to reproduce it. I will report when I have more information.
-
-- Alex
