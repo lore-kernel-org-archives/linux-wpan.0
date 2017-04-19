@@ -1,54 +1,50 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.126.134]:59131 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S965500AbdDSRdQ (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 19 Apr 2017 13:33:16 -0400
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH] ieee802154: don't select COMMON_CLK
-Date: Wed, 19 Apr 2017 19:32:25 +0200
-Message-Id: <20170419173233.3726121-1-arnd@arndb.de>
+Received: from coyote.holtmann.net ([212.227.132.17]:43227 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S936309AbdDSULw (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 19 Apr 2017 16:11:52 -0400
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: [PATCH] ieee802154: don't select COMMON_CLK
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20170419173233.3726121-1-arnd@arndb.de>
+Date: Wed, 19 Apr 2017 22:11:45 +0200
+Content-Transfer-Encoding: 8BIT
+Message-Id: <0C05AA51-5B19-416C-B708-9E0700C112E0@holtmann.org>
+References: <20170419173233.3726121-1-arnd@arndb.de>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Marcel Holtmann <marcel@holtmann.org>, Alexander Aring <aar@pengutronix.de>, Stefan Schmidt <stefan@osg.samsung.com>
-Cc: Arnd Bergmann <arnd@arndb.de>, Harry Morris <harrymorris12@gmail.com>, linux-wpan@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Alexander Aring <aar@pengutronix.de>, Stefan Schmidt <stefan@osg.samsung.com>, Harry Morris <harrymorris12@gmail.com>, linux-wpan@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
-A device driver must not select the COMMON_CLK subsystem, as that conflicts
-with platforms that provide a legacy implementation of the clk API:
+Hi Arnd,
 
-drivers/clk/clk.o: In function `clk_enable':
-clk.c:(.text.clk_enable+0x0): multiple definition of `clk_enable'
-arch/arm/mach-sa1100/clock.o:clock.c:(.text.clk_enable+0x0): first defined here
-drivers/clk/clk.o: In function `clk_round_rate':
-clk.c:(.text.clk_round_rate+0x0): multiple definition of `clk_round_rate'
-arch/arm/mach-sa1100/clock.o:clock.c:(.text.clk_round_rate+0x0): first defined here
-drivers/clk/clk.o: In function `clk_get_parent':
-clk.c:(.text.clk_get_parent+0x0): multiple definition of `clk_get_parent'
-arch/arm/mach-sa1100/clock.o:clock.c:(.text.clk_get_parent+0x0): first defined here
-drivers/clk/clk.o: In function `clk_get_rate':
-clk.c:(.text.clk_get_rate+0x0): multiple definition of `clk_get_rate'
+> A device driver must not select the COMMON_CLK subsystem, as that conflicts
+> with platforms that provide a legacy implementation of the clk API:
+> 
+> drivers/clk/clk.o: In function `clk_enable':
+> clk.c:(.text.clk_enable+0x0): multiple definition of `clk_enable'
+> arch/arm/mach-sa1100/clock.o:clock.c:(.text.clk_enable+0x0): first defined here
+> drivers/clk/clk.o: In function `clk_round_rate':
+> clk.c:(.text.clk_round_rate+0x0): multiple definition of `clk_round_rate'
+> arch/arm/mach-sa1100/clock.o:clock.c:(.text.clk_round_rate+0x0): first defined here
+> drivers/clk/clk.o: In function `clk_get_parent':
+> clk.c:(.text.clk_get_parent+0x0): multiple definition of `clk_get_parent'
+> arch/arm/mach-sa1100/clock.o:clock.c:(.text.clk_get_parent+0x0): first defined here
+> drivers/clk/clk.o: In function `clk_get_rate':
+> clk.c:(.text.clk_get_rate+0x0): multiple definition of `clk_get_rate'
+> 
+> This changes the 'select' into 'depends on', as all other similar drivers do.
+> 
+> Fixes: d931acd575d6 ("ieee802154: Add CA8210 IEEE 802.15.4 device driver")
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> ---
+> drivers/net/ieee802154/Kconfig | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
 
-This changes the 'select' into 'depends on', as all other similar drivers do.
+patch has been applied to bluetooth-next tree.
 
-Fixes: d931acd575d6 ("ieee802154: Add CA8210 IEEE 802.15.4 device driver")
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- drivers/net/ieee802154/Kconfig | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Regards
 
-diff --git a/drivers/net/ieee802154/Kconfig b/drivers/net/ieee802154/Kconfig
-index ce4864dc3c6e..303ba4133920 100644
---- a/drivers/net/ieee802154/Kconfig
-+++ b/drivers/net/ieee802154/Kconfig
-@@ -86,8 +86,8 @@ config IEEE802154_ADF7242
- config IEEE802154_CA8210
- 	tristate "Cascoda CA8210 transceiver driver"
- 	depends on IEEE802154_DRIVERS && MAC802154
-+	depends on COMMON_CLK
- 	depends on SPI
--	select COMMON_CLK
- 	---help---
- 	  Say Y here to enable the CA8210 SPI 802.15.4 wireless
- 	  controller.
--- 
-2.9.0
+Marcel
 
