@@ -1,104 +1,85 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wr0-f176.google.com ([209.85.128.176]:34737 "EHLO
-        mail-wr0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754228AbdEEUKN (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Fri, 5 May 2017 16:10:13 -0400
-Received: by mail-wr0-f176.google.com with SMTP id l9so9482379wre.1
-        for <linux-wpan@vger.kernel.org>; Fri, 05 May 2017 13:10:12 -0700 (PDT)
-Received: from omega (p20030064A906BC11286E4959969D9F1E.dip0.t-ipconnect.de. [2003:64:a906:bc11:286e:4959:969d:9f1e])
-        by smtp.gmail.com with ESMTPSA id p17sm3087207wmd.11.2017.05.05.13.10.10
-        for <linux-wpan@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Fri, 05 May 2017 13:10:10 -0700 (PDT)
-Date: Fri, 5 May 2017 22:10:01 +0200
-From: Alexander Aring <alex.aring@gmail.com>
-Subject: monitor interfaces and fcs
-Message-ID: <20170505201000.hprmmtwsfi6jy7uf@omega>
+Received: from tuna.sandelman.ca ([209.87.249.19]:37117 "EHLO
+        tuna.sandelman.ca" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932071AbdEKM3g (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 11 May 2017 08:29:36 -0400
+From: Michael Richardson <mcr@sandelman.ca>
+Subject: Re: monitor interfaces and fcs
+In-Reply-To: <20170505201000.hprmmtwsfi6jy7uf@omega>
+References: <20170505201000.hprmmtwsfi6jy7uf@omega>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Content-Type: multipart/signed; boundary="=-=-=";
+        micalg=pgp-sha256; protocol="application/pgp-signature"
+Date: Thu, 11 May 2017 08:29:34 -0400
+Message-ID: <20887.1494505774@obiwan.sandelman.ca>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org
+To: Alexander Aring <alex.aring@gmail.com>
+Cc: linux-wpan@vger.kernel.org
 
-Hi,
+--=-=-=
+Content-Type: text/plain
 
-I want to prepare the fakelb extensioni (mainline) [0] to create phy mesh
-topologies and want to fix at first a behaviour in monitor interfaces because
-somehow it's crazy whats going on...
 
-It's because node and monitor interfaces have different _default_ behaviours
-if fcs is present or not and we have users for AF_PACKET RAW for node
-and monitor interfaces (but I think only on monitors it makes more
-sense, without syncing address filters).
+Alexander Aring <alex.aring@gmail.com> wrote:
+    > New behaviour?:
 
-The difference is at rx side default behaviour (which you also cannot
-change):
+    > The new behaviour should also deal with hardware where we don't get FCS
+    > information from hardware (cc2520 in non promicuousmode is such
+    > hardware).
 
-On rx side:
+Nice.
 
-Node: doesn't send FCS to userspace
+    > Important node - you can change this behaviour for monitors:
 
-Monitor: send FCS to userspace (which makes sense for sniffing)
+    > Rx: while monitor interface generation you can decide if you want FCS
 
-It was some behaviour which is good for wireshark stuff... but having
-this mixed it's difficult to handle AF_PACKET RAW sockets in userspace.
-It's because with the current behaviour you cannot run you AF_PACKET
-software on nodes and monitors -> evaluate the type before would fix
-it... but I want it somehow "easy" to not make nl802154 magic.
+    > Tx: while monitor interface generation you can decide if you want to
+    > send FCS
 
-It means: If you develop for monitors -> it will not run on nodes and
-vice versa interface types.
+Do you return FCS as auxdata if asked for?
 
-On tx side:
+    > If the hardware doesn't support that - it will not allow you to generate
+    > such interface.
 
-This is current complicated, we don't have driver callback support to
-disable fcs on hardware side, both doesn't require a FCS.
+Do you mean, if the hardware can't return FCS? Or insists on generating FCS
+itself?
 
----
+    > IMPORTANT NOTE:
+    > This will of course break userspace software - fix should be simple, but
+    > it's already broken somehow. E.g. tx with wireshark, it thinks there is
+    > a FCS there, but there is no FCS...
 
-New behaviour?:
+    > We should fix all userspace software afterwards...
 
-The new behaviour should also deal with hardware where we don't get FCS
-information from hardware (cc2520 in non promicuousmode is such
-hardware).
+    > What we need is just some behaviour which everybody acks now and we
+    > don't touch it again! Please comment this mail with your opinions about
+    > default behaviours of FCS and different interface types (node vs
+    > monitor) in combination with AF_PACKET RAW.
 
-This means (new default handling):
+It is unfortunate, but I think that the number of people doing monitoring
+on 15.4 is relatively small, and it's mostly with wireshark.
+Is there a way to determine old behaviour vs new behaviour?
 
-Rx:
-Monitor and Nodes will not deliver FCS
 
-Tx:
-Monitor and Nodes don't need to send frames with FCS
+--
+]               Never tell me the odds!                 | ipv6 mesh networks [
+]   Michael Richardson, Sandelman Software Works        | network architect  [
+]     mcr@sandelman.ca  http://www.sandelman.ca/        |   ruby on rails    [
 
-Important node - you can change this behaviour for monitors:
 
-Rx: while monitor interface generation you can decide if you want FCS
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Tx: while monitor interface generation you can decide if you want to
-    send FCS
+-----BEGIN PGP SIGNATURE-----
 
-If the hardware doesn't support that - it will not allow you to generate
-such interface.
-
-If you run AF_PACKET userspace software which doesn't check on these
-"flags" if FCS on rx/tx is needed - it will not work unless you fix
-userspace software.
-
----
-
-IMPORTANT NOTE:
-This will of course break userspace software - fix should be simple, but
-it's already broken somehow. E.g. tx with wireshark, it thinks there is
-a FCS there, but there is no FCS...
-
-We should fix all userspace software afterwards...
-
-What we need is just some behaviour which everybody acks now and we
-don't touch it again! Please comment this mail with your opinions about
-default behaviours of FCS and different interface types (node vs
-monitor) in combination with AF_PACKET RAW.
-
-- Alex
-
-[0] https://www.netdevconf.org/2.1/session.html?aring
+iQEzBAEBCAAdFiEEbsyLEzg/qUTA43uogItw+93Q3WUFAlkUWS4ACgkQgItw+93Q
+3WW2Ewf+MiVnB0KB/iaVBce5LM59Qxozvuj2jqRc0GZ13VboTxfuBVj4aZfBWuM/
+YYrVaS9iK/S+w1V0qm5NxlCz0RMp6Gq34UBpznemvhm5dGp09BuYYTIy/nYRYKog
+/uS01VWqUDXycUNjIJF3pPcUW/mWgJn2DELThi/TyxScdqnSXotMCQn/OwzSP63d
+jXO0ozIIIdr/0camIGK0JmFl/SUrmeXq3iLVp41HRxrYIvBtPNX7vIH2GTjfvnFb
+ohoRHOf0f3PXG378/Zdc08fJYVAVSV2q7mzrpCCQFnDnXDTf56lwcDg87Ffo782Z
+3LLF2LLDVA363r9Rv78WO09ukwQBgQ==
+=3384
+-----END PGP SIGNATURE-----
+--=-=-=--
