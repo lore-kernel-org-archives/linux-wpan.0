@@ -1,143 +1,56 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wr0-f194.google.com ([209.85.128.194]:33254 "EHLO
-        mail-wr0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751978AbdEFKhv (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Sat, 6 May 2017 06:37:51 -0400
-Received: by mail-wr0-f194.google.com with SMTP id w50so2826317wrc.0
-        for <linux-wpan@vger.kernel.org>; Sat, 06 May 2017 03:37:50 -0700 (PDT)
-Date: Sat, 6 May 2017 12:37:48 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-Subject: Re: [Unstrung-hackers] [RFC net-next] ipv6: ext_header: add function
- to handle RPL extension header option 0x63
-Message-ID: <20170506103748.GB2017@nanopsycho>
-References: <dca567582f1979384fb1f3c3d1411349@ceid.upatras.gr>
- <20170504160042.GB2385@nanopsycho>
- <CAAK7Ti9iFFqM7vMyveNfaNeCi6PmAGptXdTYgEzh2gsMptqi4w@mail.gmail.com>
- <96b9f3bc67da7c16249600990c2df4cc@ceid.upatras.gr>
+Received: from poseidon.ceid.upatras.gr ([150.140.141.169]:33462 "EHLO
+        poseidon.ceid.upatras.gr" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S934470AbdEOOvM (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 15 May 2017 10:51:12 -0400
+Received: from mail.ceid.upatras.gr (mail.ceid.upatras.gr [10.1.0.174])
+        by poseidon.ceid.upatras.gr (Postfix) with ESMTP id A783080CC1
+        for <linux-wpan@vger.kernel.org>; Mon, 15 May 2017 17:51:01 +0300 (EEST)
+Received: from webmail.ceid.upatras.gr (web.ceid.upatras.gr [10.1.0.173])
+        (Authenticated sender: bardoutsos)
+        by mail.ceid.upatras.gr (Postfix) with ESMTPSA id 98B68209C9
+        for <linux-wpan@vger.kernel.org>; Mon, 15 May 2017 17:51:01 +0300 (EEST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <96b9f3bc67da7c16249600990c2df4cc@ceid.upatras.gr>
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date: Mon, 15 May 2017 16:50:57 +0200
+From: Andreas Bardoutsos <bardoutsos@ceid.upatras.gr>
+Subject: llsec:key retrieval fails
+Message-ID: <562fd13530e9e287ac7a85e0931bcbce@ceid.upatras.gr>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Andreas Bardoutsos <bardoutsos@ceid.upatras.gr>
-Cc: JANARDHANACHARI KELLA <eni.chari@gmail.com>, Michael Richardson <mcr@sandelman.ca>, netdev <netdev@vger.kernel.org>, netdev-owner@vger.kernel.org, linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org, unstrung-hackers@lists.sandelman.ca
+To: linux-wpan@vger.kernel.org
 
-Fri, May 05, 2017 at 09:55:54AM CEST, bardoutsos@ceid.upatras.gr wrote:
->Yes I think we have faced the same problem,communication with RPL supporting
->devices was failing otherwise.Your patch is also more complete since it also
->implements #ifdef .About the comment,yes I have run checkpatch twice with no
->errors,but ok :)
+Hi all!
+I have managed to have a working setup with rpi running kernel 4.7.y 
+with an AT86RF233(openlabs) tranceiver and i want to enable 
+llsec.However ping6 always fails and on dmesg I get the message 
+"encryption fails:-126".After some research i found out that on file: 
+net/802154/llsec.c on line 1014 function llsec_lookup_seclevel always 
+fails with error 22(invalid argument) and as a result encryption fails 
+because it can not find the right key(or that is what i have 
+understood).
 
-Top-posting is highly annoying. Please stop with that.
+This is my script which enables llsec according to the guide:
 
->
->Στις 2017-05-05 08:59, JANARDHANACHARI KELLA έγραψε:
->> I was inserted this patch manually. It was working. on 4.9 kernel.
->> 
->> check this bellow link for your ref.
->> 
->> https://github.com/mwasilak/bluetooth-next/commit/f29c632ef6a6a1777815c97fd2f326faccc704f7
->> [2]
->> 
->> On Thu, May 4, 2017 at 9:30 PM, Jiri Pirko <jiri@resnulli.us> wrote:
->> 
->> > Thu, May 04, 2017 at 05:17:18PM CEST, bardoutsos@ceid.upatras.gr
->> > wrote:
->> > > Signed-off-by: Andreas Bardoutsos <bardoutsos@ceid.upatras.gr>
->> > > ---
->> > > Hi all!
->> > > 
->> > > I have added a dump function(always return true) to recognise RPL
->> > extension
->> > > header(RFC6553)
->> > > Otherwise packet was dropped by kernel resulting in failing
->> > communication in
->> > > RPL DAG's between
->> > > linux running border routers and devices in the graph.For example
->> > > communication
->> > > with contiki OS running devices was previously impossible.
->> > > 
->> > > include/uapi/linux/in6.h | 1 +
->> > > net/ipv6/exthdrs.c | 13 +++++++++++++
->> > > 2 files changed, 14 insertions(+)
->> > > 
->> > > diff --git a/include/uapi/linux/in6.h b/include/uapi/linux/in6.h
->> > > index 46444f8fbee4..5cc12d309dfe 100644
->> > > --- a/include/uapi/linux/in6.h
->> > > +++ b/include/uapi/linux/in6.h
->> > > @@ -146,6 +146,7 @@ struct in6_flowlabel_req {
->> > > #define IPV6_TLV_CALIPSO 7 /* RFC 5570 */
->> > > #define IPV6_TLV_JUMBO 194
->> > > #define IPV6_TLV_HAO 201 /* home address option */
->> > > +#define IPV6_TLV_RPL 99 /* RFC 6553 */
->> > > 
->> > > /*
->> > > * IPV6 socket options
->> > > diff --git a/net/ipv6/exthdrs.c b/net/ipv6/exthdrs.c
->> > > index b636f1da9aec..82ed60d3180e 100644
->> > > --- a/net/ipv6/exthdrs.c
->> > > +++ b/net/ipv6/exthdrs.c
->> > > @@ -785,6 +785,15 @@ static bool ipv6_hop_calipso(struct sk_buff
->> > *skb, int
->> > > optoff)
->> > > return false;
->> > > }
->> > > 
->> > > +/* RPL RFC 6553 */
->> > > +
->> > > +static bool ipv6_hop_rpl(struct sk_buff *skb, int optoff)
->> > > +{
->> > > + /*Dump function which always return true
->> > > + *when rpl option is detected*/
->> > 
->> > This is definitelly wrong formatting of comment. Did you run
->> > checkpatch?
->> > 
->> > > + return true;
->> > > +}
->> > > +
->> > > static const struct tlvtype_proc tlvprochopopt_lst[] = {
->> > > {
->> > > .type = IPV6_TLV_ROUTERALERT,
->> > > @@ -798,6 +807,10 @@ static const struct tlvtype_proc
->> > tlvprochopopt_lst[] = {
->> > > .type = IPV6_TLV_CALIPSO,
->> > > .func = ipv6_hop_calipso,
->> > > },
->> > > + {
->> > > + .type = IPV6_TLV_RPL,
->> > > + .func = ipv6_hop_rpl,
->> > > + },
->> > > { -1, }
->> > > };
->> > > 
->> > --
->> > To unsubscribe from this list: send the line "unsubscribe
->> > linux-wpan" in
->> > the body of a message to majordomo@vger.kernel.org
->> > More majordomo info at http://vger.kernel.org/majordomo-info.html
->> > [1]
->> 
->> --
->> 
->> Sincerely Your's
->> 
->> Janardhanachari Kella
->> 
->> Contact:+91-9908469599
->> E-mail: eni.chari@gmail.com
->> 
->> 
->> Links:
->> ------
->> [1] http://vger.kernel.org/majordomo-info.html
->> [2]
->> https://github.com/mwasilak/bluetooth-next/commit/f29c632ef6a6a1777815c97fd2f326faccc704f7
->> 
->> _______________________________________________
->> Unstrung-hackers mailing list
->> Unstrung-hackers@lists.sandelman.ca
->> https://lists.sandelman.ca/mailman/listinfo/unstrung-hackers
->
+iwpan dev wpan0 set security 1
+iwpan dev wpan0 key add 2 
+00:01:02:03:04:05:06:07:08:09:0A:0B:0C:0D:0E:0F 0 0xabcd 3 
+0x00124b0007a84380
+iwpan dev wpan0 seclevel add 0xff 2 0
+iwpan dev wpan0 device add 0 0xabcd 0xffff 0x00124b0007a84380 0 0
+iwpan dev wpan0 set out_level 0x05
+iwpan dev wpan0 set out_key_id 0 0xabcd 2 0xffff 3 0x00124b0007a84380
+
+However on wireshark,security level is recognised as 0x5 but MIC check 
+fails.What might be the issue?
+Thank you!
+
+-- 
+--
+Andreas Bardoutsos
+Undergraduate student
+@
+Computer Engineering Informatics Department(CEID)
+University of Patras,Greece
