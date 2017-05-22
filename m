@@ -1,54 +1,38 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mout.web.de ([212.227.15.14]:50703 "EHLO mout.web.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751425AbdEVGOv (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-        Mon, 22 May 2017 02:14:51 -0400
-Subject: [PATCH 2/2] ieee802154: ca8210: Delete an error message for a failed
- memory allocation in ca8210_skb_rx()
-From: SF Markus Elfring <elfring@users.sourceforge.net>
-References: <55fddbc7-28c4-8866-67d3-ff1ff1a4eeb7@users.sourceforge.net>
-Message-ID: <a0c71307-4777-fd52-9f4c-cafd0f4d43a0@users.sourceforge.net>
-Date: Mon, 22 May 2017 08:14:38 +0200
-MIME-Version: 1.0
+Received: from coyote.holtmann.net ([212.227.132.17]:33662 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752994AbdEVI2E (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 22 May 2017 04:28:04 -0400
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: [PATCH 0/2] ieee802154: ca8210: Adjustments for two function
+ implementations
+From: Marcel Holtmann <marcel@holtmann.org>
 In-Reply-To: <55fddbc7-28c4-8866-67d3-ff1ff1a4eeb7@users.sourceforge.net>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
+Date: Mon, 22 May 2017 10:28:02 +0200
 Content-Transfer-Encoding: 7bit
+Message-Id: <9247C8F0-7FA1-4D02-96D5-DFB9753D7C05@holtmann.org>
+References: <55fddbc7-28c4-8866-67d3-ff1ff1a4eeb7@users.sourceforge.net>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linuxdev@cascoda.com, linux-wpan@vger.kernel.org, netdev@vger.kernel.org, Alexander Aring <aar@pengutronix.de>, Harry Morris <h.morris@cascoda.com>, Stefan Schmidt <stefan@osg.samsung.com>
-Cc: LKML <linux-kernel@vger.kernel.org>, kernel-janitors@vger.kernel.org
+To: SF Markus Elfring <elfring@users.sourceforge.net>
+Cc: linuxdev@cascoda.com, linux-wpan@vger.kernel.org, Network Development <netdev@vger.kernel.org>, Alexander Aring <aar@pengutronix.de>, Harry Morris <h.morris@cascoda.com>, Stefan Schmidt <stefan@osg.samsung.com>, LKML <linux-kernel@vger.kernel.org>, kernel-janitors@vger.kernel.org
 
-From: Markus Elfring <elfring@users.sourceforge.net>
-Date: Mon, 22 May 2017 08:03:17 +0200
+Hi Markus,
 
-Omit an extra message for a memory allocation failure in this function.
+> Two update suggestions were taken into account
+> from static source code analysis.
+> 
+> Markus Elfring (2):
+>  Delete an error message for a failed memory allocation in ca8210_probe()
+>  Delete an error message for a failed memory allocation in ca8210_skb_rx()
+> 
+> drivers/net/ieee802154/ca8210.c | 9 ++-------
+> 1 file changed, 2 insertions(+), 7 deletions(-)
 
-This issue was detected by using the Coccinelle software.
+both patches have been applied to bluetooth-next tree.
 
-Link: http://events.linuxfoundation.org/sites/events/files/slides/LCJ16-Refactor_Strings-WSang_0.pdf
-Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
----
- drivers/net/ieee802154/ca8210.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+Regards
 
-diff --git a/drivers/net/ieee802154/ca8210.c b/drivers/net/ieee802154/ca8210.c
-index 25ed11bb5ed3..f6df75e80a60 100644
---- a/drivers/net/ieee802154/ca8210.c
-+++ b/drivers/net/ieee802154/ca8210.c
-@@ -1808,10 +1808,9 @@ static int ca8210_skb_rx(
- 
- 	/* Allocate mtu size buffer for every rx packet */
- 	skb = dev_alloc_skb(IEEE802154_MTU + sizeof(hdr));
--	if (!skb) {
--		dev_crit(&priv->spi->dev, "dev_alloc_skb failed\n");
-+	if (!skb)
- 		return -ENOMEM;
--	}
-+
- 	skb_reserve(skb, sizeof(hdr));
- 
- 	msdulen = data_ind[22]; /* msdu_length */
--- 
-2.13.0
+Marcel
 
