@@ -1,14 +1,16 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mout.web.de ([212.227.15.14]:65422 "EHLO mout.web.de"
+Received: from mout.web.de ([212.227.15.4]:56806 "EHLO mout.web.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751425AbdEVGMf (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-        Mon, 22 May 2017 02:12:35 -0400
+        id S1751425AbdEVGNw (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+        Mon, 22 May 2017 02:13:52 -0400
+Subject: [PATCH 1/2] ieee802154: ca8210: Delete an error message for a failed
+ memory allocation in ca8210_probe()
 From: SF Markus Elfring <elfring@users.sourceforge.net>
-Subject: [PATCH 0/2] ieee802154: ca8210: Adjustments for two function
- implementations
-Message-ID: <55fddbc7-28c4-8866-67d3-ff1ff1a4eeb7@users.sourceforge.net>
-Date: Mon, 22 May 2017 08:12:13 +0200
+References: <55fddbc7-28c4-8866-67d3-ff1ff1a4eeb7@users.sourceforge.net>
+Message-ID: <374015a3-15c9-f799-f26b-3aca91c77c55@users.sourceforge.net>
+Date: Mon, 22 May 2017 08:13:37 +0200
 MIME-Version: 1.0
+In-Reply-To: <55fddbc7-28c4-8866-67d3-ff1ff1a4eeb7@users.sourceforge.net>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-GB
 Content-Transfer-Encoding: 7bit
@@ -18,18 +20,33 @@ To: linuxdev@cascoda.com, linux-wpan@vger.kernel.org, netdev@vger.kernel.org, Al
 Cc: LKML <linux-kernel@vger.kernel.org>, kernel-janitors@vger.kernel.org
 
 From: Markus Elfring <elfring@users.sourceforge.net>
-Date: Mon, 22 May 2017 08:08:04 +0200
+Date: Mon, 22 May 2017 07:32:46 +0200
 
-Two update suggestions were taken into account
-from static source code analysis.
+Omit an extra message for a memory allocation failure in this function.
 
-Markus Elfring (2):
-  Delete an error message for a failed memory allocation in ca8210_probe()
-  Delete an error message for a failed memory allocation in ca8210_skb_rx()
+This issue was detected by using the Coccinelle software.
 
- drivers/net/ieee802154/ca8210.c | 9 ++-------
- 1 file changed, 2 insertions(+), 7 deletions(-)
+Link: http://events.linuxfoundation.org/sites/events/files/slides/LCJ16-Refactor_Strings-WSang_0.pdf
+Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
+---
+ drivers/net/ieee802154/ca8210.c | 4 ----
+ 1 file changed, 4 deletions(-)
 
+diff --git a/drivers/net/ieee802154/ca8210.c b/drivers/net/ieee802154/ca8210.c
+index 25fd3b04b3c0..25ed11bb5ed3 100644
+--- a/drivers/net/ieee802154/ca8210.c
++++ b/drivers/net/ieee802154/ca8210.c
+@@ -3143,10 +3143,6 @@ static int ca8210_probe(struct spi_device *spi_device)
+ 
+ 	pdata = kmalloc(sizeof(*pdata), GFP_KERNEL);
+ 	if (!pdata) {
+-		dev_crit(
+-			&spi_device->dev,
+-			"Could not allocate platform data\n"
+-		);
+ 		ret = -ENOMEM;
+ 		goto error;
+ 	}
 -- 
 2.13.0
 
