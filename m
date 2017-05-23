@@ -1,167 +1,193 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mproxygzt1.163.com ([113.108.225.5]:33262 "EHLO
-        mproxygzt1.163.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932810AbdEWCA6 (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 22 May 2017 22:00:58 -0400
-Date: Tue, 23 May 2017 09:45:08 +0800 (CST)
-From: zhanglin496 <zhanglin496@163.com>
-Subject: Re: [PATCH] net: ieee802154: fix net_device reference release too
- early
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=GBK
-MIME-Version: 1.0
-Message-ID: <7b94cc3f.4acf.15c32faad0b.Coremail.zhanglin496@163.com>
+Received: from mail-pf0-f193.google.com ([209.85.192.193]:33049 "EHLO
+        mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1759747AbdEWF3q (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 23 May 2017 01:29:46 -0400
+From: Lin Zhang <xiaolou4617@gmail.com>
+Subject: [PATCH net v2 2/2] net: ieee802154: fix net_device reference release too early
+Date: Tue, 23 May 2017 13:29:39 +0800
+Message-Id: <1495517379-18456-1-git-send-email-xiaolou4617@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: stefan@osg.samsung.com
-Cc: aar@pengutronix.de, davem@davemloft.net, linux-wpan@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+To: aar@pengutronix.de, stefan@osg.samsung.com, davem@davemloft.net
+Cc: linux-wpan@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Lin Zhang <xiaolou4617@gmail.com>
 
-SGVsbG8uCgpTb3JyeSB0b28gbGF0ZSB0byByZXBseS4KPgo+IEhlbGxvLgo+Cj4gT24gVGh1LCAy
-MDE3LTA1LTE4IGF0IDE1OjE0LCBTdGVmYW4gU2NobWlkdCB3cm90ZToKPiA+IEhlbGxvLgo+ID4K
-PiA+IE9uIFRodSwgMjAxNy0wNS0xOCBhdCAxNTo1MCwgbGluemhhbmcgd3JvdGU6Cj4gPiA+IFRo
-aXMgcGF0Y2ggZml4ZXMgdGhlIGtlcm5lbCBvb3BzIHdoZW4gcmVsZWFzZSBuZXRfZGV2aWNlIHJl
-ZmVyZW5jZSBpbgo+ID4gPiBhZHZhbmNlLiBJbiBmdW5jdGlvbiByYXdfc2VuZG1zZyhpIHRoaW5r
-IHRoZSBkZ3JhbV9zZW5kbXNnIGhhcyB0aGUgc2FtZQo+ID4gPiBwcm9ibGVtKSwgdGhlcmUgaXMg
-YSByYWNlIGNvbmRpdGlvbiBiZXR3ZWVuIGRldl9wdXQgYW5kIGRldl9xdWV1ZV94bWl0Cj4gPiA+
-IHdoZW4gdGhlIGRldmljZSBpcyBnb25nIHRoYXQgbWF5YmUgbGVhZCB0byBkZXZfcXVldWVfeGlt
-dCB0byBzZWUKPiA+ID4gYW4gaWxsZWdhbCBuZXRfZGV2aWNlIHBvaW50ZXIuCj4gPiA+Cj4gPgo+
-ID4gWW91IGhhdmUgYSB0ZXN0IGNhc2UgdG8gcmVwcm9kdWNlIHRoaXMgb29wcz8gSSBmZWFyIEkg
-aGF2ZSBub3Qgc2Vlbgo+ID4gb25lLgo+Cj4gSWYgeW91IGhhdmUgYSB0ZXN0IGNhc2UgaGFuZHkg
-YWRkaW5nIGl0IHRvIHRoZSBjb21taXQgd291bGQgYmUgaGFuZHkuIElmIHlvdSBkbwo+IG5vdCBo
-YXZlIG9uZSBhcm91bmQgd2UgY2FuIGRvIHdpdGhvdXQuCj4KCk15IHRlc3Qga2VybmVsIGlzIDMu
-MTMuMC0zMi4KQmVjYXN1ZSBpIGFtIG5vdCBoYXZlIGEgcmVhbCA4MDIxNTQgZGV2aWNlLCBzbyBp
-IGNoYW5nZSBsb3dwYW5fbmV3bGluawpmdW5jdGlvbiB0byB0aGlzOgoKICAgICAgICAvKiBmaW5k
-IGFuZCBob2xkIHJlYWwgd3BhbiBkZXZpY2UgKi8KICAgICAgICByZWFsX2RldiA9IGRldl9nZXRf
-YnlfaW5kZXgoc3JjX25ldCwgbmxhX2dldF91MzIodGJbSUZMQV9MSU5LXSkpOwogICAgICAgIGlm
-ICghcmVhbF9kZXYpCiAgICAgICAgICAgICAgICByZXR1cm4gLUVOT0RFVjsKLy8gICAgICBpZiAo
-cmVhbF9kZXYtPnR5cGUgIT0gQVJQSFJEX0lFRUU4MDIxNTQpIHsKLy8gICAgICAgICAgICAgIGRl
-dl9wdXQocmVhbF9kZXYpOwovLyAgICAgICAgICAgICAgcmV0dXJuIC1FSU5WQUw7Ci8vICAgICAg
-fQogICAgICAgIGxvd3Bhbl9kZXZfaW5mbyhkZXYpLT5yZWFsX2RldiA9IHJlYWxfZGV2OwogICAg
-ICAgIGxvd3Bhbl9kZXZfaW5mbyhkZXYpLT5mcmFnbWVudF90YWcgPSAwOwogICAgICAgIG11dGV4
-X2luaXQoJmxvd3Bhbl9kZXZfaW5mbyhkZXYpLT5kZXZfbGlzdF9tdHgpOwoKQWxzbywgaW4gb3Jk
-ZXIgdG8gc2ltdWxhdGUgcHJlZW1wdCwgaSBjaGFuZ2UgdGhlIHJhd19zZW5kbXNnIGZ1bmN0aW9u
-IHRvIHRoaXM6CgogICAgICAgIHNrYi0+ZGV2ID0gZGV2OwogICAgICAgIHNrYi0+c2sgID0gc2s7
-CiAgICAgICAgc2tiLT5wcm90b2NvbCA9IGh0b25zKEVUSF9QX0lFRUU4MDIxNTQpOwogICAgICAg
-IGRldl9wdXQoZGV2KTsKICAgICAgICAvL3NpbXVsYXRlIHByZWVtcHQKICAgICAgICBzY2hlZHVs
-ZV90aW1lb3V0X3VuaW50ZXJydXB0aWJsZSgzMCAqIEhaKTsKICAgICAgICBlcnIgPSBkZXZfcXVl
-dWVfeG1pdChza2IpOwogICAgICAgIGlmIChlcnIgPiAwKQogICAgICAgICAgICAgICAgZXJyID0g
-bmV0X3htaXRfZXJybm8oZXJyKTsKCmFuZCB0aGlzIGlzIG15IHVzZXJzcGFjZSB0ZXN0IGNvZGUg
-bmFtZWQgdGVzdF9zZW5kX2RhdGE6CgojaW5jbHVkZSA8c3RkaW8uaD4KI2luY2x1ZGUgPHN0cmlu
-Zy5oPgojaW5jbHVkZSA8ZXJybm8uaD4KI2luY2x1ZGUgPHN5cy90eXBlcy5oPgojaW5jbHVkZSA8
-c3lzL3NvY2tldC5oPgppbnQgbWFpbihpbnQgYXJnYywgY2hhciAqKmFyZ3YpCnsKICAgICAgICBj
-aGFyIGJ1ZlsxMjddOwogICAgICAgIGludCBzb2NrZmQ7CiAgICAgICAgc29ja2ZkID0gc29ja2V0
-KEFGX0lFRUU4MDIxNTQsIFNPQ0tfUkFXLCAwKTsKICAgICAgICBpZiAoc29ja2ZkIDwgMCkgewog
-ICAgICAgICAgICAgICAgcHJpbnRmKCJjcmVhdGUgc29ja2ZkIGVycm9yOiAlc1xuIiwgc3RyZXJy
-b3IoZXJybm8pKTsKICAgICAgICAgICAgICAgIHJldHVybiAtMTsKICAgICAgICB9CiAgICAgICAg
-c2VuZChzb2NrZmQsIGJ1Ziwgc2l6ZW9mKGJ1ZiksIDApOwogICAgICAgIHJldHVybiAwOwp9CgpU
-aGlzIGlzIG15IHRlc3QgY2FzZToKcm9vdEB6aGFuZ2xpbi14LWNvbXB1dGVyOn4vZGV2ZWxvcC84
-MDIxNTQjIHVuYW1lIC1hCkxpbnV4IHpoYW5nbGluLXgtY29tcHV0ZXIgMy4xMy4wLTMyLWdlbmVy
-aWMgIzU3LVVidW50dSBTTVAgVHVlIEp1bCAxNQowMzo1MTowOCBVVEMgMjAxNCB4ODZfNjQgeDg2
-XzY0IHg4Nl82NCBHTlUvTGludXgKcm9vdEB6aGFuZ2xpbi14LWNvbXB1dGVyOn4vZGV2ZWxvcC84
-MDIxNTQjIGlwIGxpbmsgYWRkIGxpbmsgZXRoMCBuYW1lCmxvd3BhbjAgdHlwZSBsb3dwYW4Kcm9v
-dEB6aGFuZ2xpbi14LWNvbXB1dGVyOn4vZGV2ZWxvcC84MDIxNTQjCi8va2VlcCB0aGUgbG93cGFu
-MCBkZXZpY2UgZG93bgpyb290QHpoYW5nbGluLXgtY29tcHV0ZXI6fi9kZXZlbG9wLzgwMjE1NCMg
-Li90ZXN0X3NlbmRfZGF0YSAmCi8vd2FpdCBhIHdoaWxlCnJvb3RAemhhbmdsaW4teC1jb21wdXRl
-cjp+L2RldmVsb3AvODAyMTU0IyBpcCBsaW5rIGRlbCBsaW5rIGRldiBsb3dwYW4wCi8vdGhlIGRl
-dmljZSBpcyBnb25lCi8vb29wcwpbMzgxLjMwMzMwN10gZ2VuZXJhbCBwcm90ZWN0aW9uIGZhdWx0
-OiAwMDAwIFsjMV1TTVAKWzM4MS4zMDM0MDddIE1vZHVsZXMgbGlua2VkIGluOiBhZl84MDIxNTQg
-Nmxvd3BhbiBibmVwIHJmY29tbQpibHVldG9vdGggbmxzX2lzbzg4NTlfMSBzbmRfaGRhX2NvZGVj
-X2hkbWkgc25kX2hkYV9jb2RlY19yZWFsdGVrCnJ0czUxMzkoQykgc25kX2hkYV9pbnRlbApzbmRf
-aGFkX2NvZGVjIHNuZF9od2RlcCBzbmRfcGNtIHNuZF9wYWdlX2FsbG9jIHNuZF9zZXFfbWlkaQpz
-bmRfc2VxX21pZGlfZXZlbnQgc25kX3Jhd21pZGkgc25kX3JlcSBpbnRlbF9yYXBsIHNuZF9zZXFf
-ZGV2aWNlCmNvcmV0ZW1wIGk5MTUga3ZtX2ludGVsCmt2bSBzbmRfdGltZXIgc25kIGNyY3QxMGRp
-Zl9wY2xtdWwgY3JjMzJfcGNsbXVsIGdoYXNoX2NsbXVsbmlfaW50ZWwKY3lwdGVkIGRybV9rbXNf
-aGVscGVyIGRybSBpMmNfYWxnb19iaXQgc291bmRjb3JlIHZpZGVvIG1hY19oaWQKcGFycG9ydF9w
-YyBwcGRldiBpcCBwYXJwb3J0IGhpZF9nZW5lcmljCnVzYmhpZCBoaWQgYWhjaSByODE2OSBtaWkg
-bGliYWhkaQpbMzgxLjMwNDI4Nl0gQ1BVOjEgUElEOiAyNTI0IENvbW1tOiAxIFRhaW50ZWQ6IEcg
-QyAwIDMuMTMuMC0zMi1nZW5lcmljCiM1Ny1VYnVudHUKWzM4MS4zMDQ0MDldIEhhcmR3YXJlIG5h
-bWU6IEhhaWVyIEhhaWVyIERUIENvbXB1dGVyL0hhaWVyIERUIENvZHB1dGVyLApCSU9TIEZJQlQx
-OUgwMl9YNjQgMDYvMDkvMjAxNApbMzgxLjMwNDU0Nl0gdGFza3M6IGZmZmYwMDAwOTY5NjVmYzAg
-dGk6IGZmZmZCMDAxMzc3OWMwMDAgdGFzay50aToKZmZmZkI4MDEzNzc5YzAwMApbMzgxLjMwNDY1
-OV0gUklQOiAwMDEwOls8ZmZmZmZmZmYwMTYyMWZlMT5dIFs8ZmZmZmZmZmY4MTYyMWZlMT5dCl9f
-ZGV2X3F1ZXVlX3hpbXQrMHg2MS8weDUwMApbMzgxLjMwNDc5OF0gUlNQOiAwMDE4OmZmZmZCODAx
-Mzc3OWRjYTAgRUZMQUdTOiAwMDAxMDIwMgpbMzgxLjMwNDg4MF0gUkFYOiAyNzJiMDMxZDU3NTY1
-MzUxIFJCWDogMDAwMDAwMDAwMDAwMDAwMCBSQ1g6IGZmZmY4ODAwOTY4ZjFhMDAKWzM4MS4zMDQ5
-ODddIFJEWDogMDAwMDAwMDAwMDAwMDAwMCBSU0k6IDAwMDAwMDAwMDAwMDAwMDAgUkRJOiBmZmZm
-ODgwMDk2OGYxYTAwClszODEuMzA1MDk1XSBSQlA6IGZmZmY4ZTAxMzc3M2RjZTAgUjA4OiAwMDAw
-MDAwMDAwMDAwMjY2IFIwOTogMDAwMDAwMDAwMDAwMDAwNApbMzgxLjMwNTIwMl0gUjEwOiAwMDAw
-MDAwMDAwMDAwMDA0IFIxMTogMDAwMDAwMDAwMDAwMDAwNSBSMTI6IGZmZmY4ODAxMzkwMmUwMDAK
-WzM4MS4zMDUzMTBdIFIxMzogMDAwMDAwMDAwMDAwMDA3ZiBSMTQ6IDAwMDAwMDAwMDAwMDAwN2Yg
-UjE1OiBmZmZmODgwMDk2OGYxYTAwClszODEuMzA1NDE4XSBGUzogIDAwMDA3ZmM1N2Y1MGY3NDAo
-MDAwMCkgR1M6IGZmZmY4ODAxM2ZjODAwMDAoMDAwMCkKa25sR1M6IDAwMDAwMDAwMDAwMDAwMDAK
-WzM4MS4zMDU1NDBdIENTOiAgMDAxMCBEUzogMDAwMCBFUzogMDAwMCBDUjA6IDAwMDAwMDAwODAw
-NTAwM2IKWzM4MS4zMDU2MjddIENSMjogMDAwMDdmYWQwODQxYzAwMCBDUjM6IDAwMDAwMDAxMzY4
-ZGQwMDAgQ1I0OiAwMDAwMDAwMDAwMTAwN2UwClszNjEuOTA1NzM0XSBTdGFjazoKWzM4MS4zMDU3
-NjhdICAwMDAwMDAwMDAwMjA1MmQwIDAwMDAwMDAwM2ZhY2IzMGEgZmZmZjg4MDEzNzc5ZGNjMApm
-ZmZmODgwMTM3NzY0MDAwClszODEuMzA1ODk4XSAgZmZmZjg4MDEzNzc5ZGU3MCAwMDAwMDAwMDAw
-MDAwMDdmIDAwMDAwMDAwMDAwMDAwN2YKZmZmZjg4MDEzOTAyZTAwMApbMzgxLjMwNjAyNl0gIGZm
-ZmY4ODAxMzc3OWRjZjAgZmZmZmZmZmY4MTYyMjQ5MCBmZmZmODgwMTM3NzlkZDM5CmZmZmZmZmZm
-YTAzYWY5ZjEKWzM4MS4zMDYxNTVdIENhbGwgVHJhY2U6ClszODEuMzA2MjAyXSAgWzxmZmZmZmZm
-ZjgxNjIyNDkwPl0gZGV2X3F1ZXVlX3htaXQrMHgxMC8weDIwClszODEuMzA2Mjk0XSAgWzxmZmZm
-ZmZmZmEwM2FmOWYxPl0gcmF3X3NlbmRtc2crMHgxYjEvMHgyNzAgW2FmXzgwMjE1NF0KWzM4MS4z
-MDYzOTZdICBbPGZmZmZmZmZmYTAzYWYwNTQ+XSBpZWVlODAyMTU0X3NvY2tfc2VuZG1zZysweDE0
-LzB4MjAgW2FmXzgwMjE1NF0KWzM4MS4zMDY1MTJdICBbPGZmZmZmZmZmODE2MDc5ZWI+XSBzb2Nr
-X3NlbmRtc2crMHg4Yi8weGMwClszODEuMzA2NjAwXSAgWzxmZmZmZmZmZjgxMWQ1MmE1Pl0gPyBf
-X2RfYWxsb2MrMHgyNS8weDE4MApbMzgxLjMwNjY4N10gIFs8ZmZmZmZmZmY4MTFhMWY1Nj5dID8g
-a21lbV9jYWNoZV9hbGxvY190cmFjZSsweDFjNi8weDFmMApbMzgxLjMwNjc5MV0gIFs8ZmZmZmZm
-ZmY4MTYwN2I5MT5dIFNZU0Nfc2VuZHRvKzB4MTIxLzB4MWMwClszODEuMzA2ODc4XSAgWzxmZmZm
-ZmZmZjgxMDlkZGY0Pl0gPyB2dGltZV9hY2NvdW50X3VzZXIreDU0LzB4NjAKWzM4MS4zMDY5NzVd
-ICBbPGZmZmZmZmZmODEwMjBkNDU+XSA/IHN5c2NhbGxfdHJhY2VfZW50ZXIrMHgxNDUvMHgyNTAK
-WzM4MS4zMDcwNzNdICBbPGZmZmZmZmZmODE2MDg2YWU+XSBTeVNfc2VuZHRvKzB4ZS8weDEwClsz
-ODEuMzA3MTU2XSAgWzxmZmZmZmZmZjgxNzJjODdmPl0gdHJhY2VzeXMrMHhlMS8weGU2ClszODEu
-MzA3MjMzXSBDb2RlOiBjNiBhMSBhNCBmZiA0MSA4YiA1NyA3OCA0OSA4YiA0NyAyMCA4NSBkMiA0
-OCA4YiA4MAo3OCAwNyAwMCAwMCA3NSAyMSA0OSA4YiA1NyAxOCA0OCA4NSBkMiA3NCAxOCA0OCA4
-NSBjMCA3NCAxMyA4YiA5MiBhYwowMSAwMCAwMCA8M2I+IDUwIDEwIDczIDA4IDhiIDQ0IDkwIDE0
-IDQxIDg5IDQ3IDc4IDQxIGY2IDg0IDI0IGQ1IDAwIDAwCjAwClszODEuMzA3ODAxXSBSSVAgWzxm
-ZmZmZmZmZjgxNjIxZmUxPl0gX2Rldl9xdWV1ZV94bWl0KzB4NjEvMHg1MDAKWzM4MS4zMDc5MDFd
-ICBSU1AgPGZmZmY4ODAxMzc3OWRjYTA+ClszODEuMzQ3NTEyXSBLZXJuZWwgcGFuaWMgLSBub3Qg
-c3luY2luZzogRmF0YWwgZXhjZXB0aW9uIGluIGludGVycnVwdApbMzgxLjM0Nzc0N10gZHJtX2tt
-c19oZWxwZXI6IHBhbmljIG9jY3VycmVkLCBzd2l0Y2hpbmcgYmFjayB0byB0ZXh0IGNvbnNvbGUK
-Cgo+ID4gPiBTbyBpIHRoaW5rIHRoYXQgZGV2X3B1dCBzaG91bGQgYmUgYmVoaW5kIG9mIHRoZSBk
-ZXZfcXVldWVfeG1pdC4KPiA+ID4KPiA+ID4gQWxzbywgZXhwbGljaXQgc2V0IHNrYi0+c2sgaXMg
-bmVlZGxlc3MsIHNvY2tfYWxsb2Nfc2VuZF9za2IgaXMKPiA+ID4gYWxyZWFkeSBzZXQgaXQuCj4g
-Pgo+ID4gWW91IGNvdWxkIGhhdmUgcHV0IHRoaXMgZml4dXAgaW4gYSBkaWZmZXJlbnQgcGF0Y2gu
-Cj4KClRoYW5rcywgaSB3aWxsIHJlcG9zdCBpdC4KCj4gSSBhY3R1YWxseSB3b3VsZCByZXF1ZXN0
-IHlvdSB0byBzcGxpdCB0aGlzIGludG8gdHdvIHBhdGNoZXMuIE9uZSBmb3IgdGhlCj4gcmVtb3Zh
-bCBvZiB0aGUgc2sgc2V0dGluZyBhbmQgb25lIGZvciB0aGUgcmFjZSBjb25kaXRpb24gZml4Lgo+
-Cj4gPiA+IFNpZ25lZC1vZmYtYnk6IGxpbnpoYW5nIDx4aWFvbG91NDYxN0BnbWFpbC5jb20+Cj4g
-Pgo+ID4gVGhpcyBsb29rcyBtb3JlIGxpa2UgYSB1c2VybmFtZSBpbnN0ZWFkIG9mIGEgcmVhbCBu
-YW1lLiBJZiB5b3UgaGF2ZSBMaW4KPiA+IFpoYW5nIGFzIHlvdSBFbmdsaXNoIHJlYWwgbmFtZSB0
-aGF0IHdvdWxkIGJlIGJldHRlciBoZXJlLiA6KQo+Cj4gVGhpcyB3b3VsZCBiZSBhbHNvIGFwcHJl
-Y2lhdGVkLgoKWWVzLCBteSByZWFsIG5hbWUgaXMgTGluIFpoYW5nLCBzb3JyeSB0byBtYWtlIHlv
-dSBjb25mdXNpb24uCgo+ID4gPiAtLS0KPiA+ID4gIG5ldC9pZWVlODAyMTU0L3NvY2tldC5jIHwg
-MTAgKysrKy0tLS0tLQo+ID4gPiAgMSBmaWxlIGNoYW5nZWQsIDQgaW5zZXJ0aW9ucygrKSwgNiBk
-ZWxldGlvbnMoLSkKPiA+ID4KPiA+ID4gZGlmZiAtLWdpdCBhL25ldC9pZWVlODAyMTU0L3NvY2tl
-dC5jIGIvbmV0L2llZWU4MDIxNTQvc29ja2V0LmMKPiA+ID4gaW5kZXggZWVkYmE3Ni4uYTYwNjU4
-YyAxMDA2NDQKPiA+ID4gLS0tIGEvbmV0L2llZWU4MDIxNTQvc29ja2V0LmMKPiA+ID4gKysrIGIv
-bmV0L2llZWU4MDIxNTQvc29ja2V0LmMKPiA+ID4gQEAgLTMwMSwxNSArMzAxLDE0IEBAIHN0YXRp
-YyBpbnQgcmF3X3NlbmRtc2coc3RydWN0IHNvY2sgKnNrLCBzdHJ1Y3QgbXNnaGRyICptc2csIHNp
-emVfdCBzaXplKQo+ID4gPiAgICAgICAgICAgICBnb3RvIG91dF9za2I7Cj4gPiA+Cj4gPiA+ICAg
-ICBza2ItPmRldiA9IGRldjsKPiA+ID4gLSAgIHNrYi0+c2sgID0gc2s7Cj4gPiA+ICAgICBza2It
-PnByb3RvY29sID0gaHRvbnMoRVRIX1BfSUVFRTgwMjE1NCk7Cj4gPiA+Cj4gPiA+IC0gICBkZXZf
-cHV0KGRldik7Cj4gPiA+IC0KPiA+ID4gICAgIGVyciA9IGRldl9xdWV1ZV94bWl0KHNrYik7Cj4g
-PiA+ICAgICBpZiAoZXJyID4gMCkKPiA+ID4gICAgICAgICAgICAgZXJyID0gbmV0X3htaXRfZXJy
-bm8oZXJyKTsKPiA+ID4KPiA+ID4gKyAgIGRldl9wdXQoZGV2KTsKPiA+ID4gKwo+ID4gPiAgICAg
-cmV0dXJuIGVyciA/OiBzaXplOwo+ID4gPgo+ID4gPiAgb3V0X3NrYjoKPiA+ID4gQEAgLTY5MCwx
-NSArNjg5LDE0IEBAIHN0YXRpYyBpbnQgZGdyYW1fc2VuZG1zZyhzdHJ1Y3Qgc29jayAqc2ssIHN0
-cnVjdCBtc2doZHIgKm1zZywgc2l6ZV90IHNpemUpCj4gPiA+ICAgICAgICAgICAgIGdvdG8gb3V0
-X3NrYjsKPiA+ID4KPiA+ID4gICAgIHNrYi0+ZGV2ID0gZGV2Owo+ID4gPiAtICAgc2tiLT5zayAg
-PSBzazsKPiA+ID4gICAgIHNrYi0+cHJvdG9jb2wgPSBodG9ucyhFVEhfUF9JRUVFODAyMTU0KTsK
-PiA+ID4KPiA+ID4gLSAgIGRldl9wdXQoZGV2KTsKPiA+ID4gLQo+ID4gPiAgICAgZXJyID0gZGV2
-X3F1ZXVlX3htaXQoc2tiKTsKPiA+ID4gICAgIGlmIChlcnIgPiAwKQo+ID4gPiAgICAgICAgICAg
-ICBlcnIgPSBuZXRfeG1pdF9lcnJubyhlcnIpOwo+ID4gPgo+ID4gPiArICAgZGV2X3B1dChkZXYp
-Owo+ID4gPiArCj4gPiA+ICAgICByZXR1cm4gZXJyID86IHNpemU7Cj4gPgo+ID4gR29pbmcgdG8g
-Z2l2ZSB0aGlzIGEgdGVzdCByaWRlIGhlcmUgbm93Lgo+Cj4gSSBnYXZlIGl0IGEgcmlkZSBpbiBt
-eSB0ZXN0YmVkIGFuZCBJIGVuY291bnRlcmVkIG5vIHByb2JsZW1zLiBXaGlsZSBJIGhhdmUgbmV2
-ZXIKPiBzZWVuIHRoZSByYWNlIGFuZCBvb3BzIG15c2VsZiBkb2luZyB0aGUgZGV2X3B1dCBiZWZv
-cmUgdGhlIHhtaXQgY2FuIHN1cmVseSBsZWFkIHRvCj4gc3VjaCBhIHJhY2UgYW5kIHRoZSBmaXgg
-aXMgdmFsaWQuCj4KPiBPbmNlIHlvdSBoYXZlIGRvbmUgdGhlIGNoYW5nZXMgcmVxdWVzdGVkIGFi
-b3ZlIGFuZCByZS1zdWJtaXQgeW91ciB0d28gcGF0Y2hlcyB5b3UgY2FuCj4gYWRkIG15Cj4KPiBB
-Y2tlZC1ieTogU3RlZmFuIFNjaG1pZHQgPHN0ZWZhbkBvc2cuc2Ftc3VuZy5jb20+Cj4KPiB0byBi
-b3RoIG9mIHRoZW0uCj4KPiByZWdhcmRzCj4gU3RlZmFuIFNjaG1pZHQKCkluIG15IG9waW5pb24s
-IHRoZXJlIGlzIGFsd2F5cyBleGlzdCBhIGNoYW5jZSB0aGF0IHRoZSBkZXZpY2UgaXMgZ29uZwpi
-ZWZvcmUgY2FsbCBkZXZfcXVldWVfeG1pdC4KCkkgdGhpbmsgdGhlIGxhdGVzdCBrZXJuZWwgaXMg
-aGF2ZSB0aGUgc2FtZSBwcm9ibGVtLiBJZiB5b3UgaGF2ZSBhIHJlYWwgODAyMTU0IGRldmljZSwg
-Cm1heWJlIHVzZSB0aGUgdGVzdCBjYXNlIGFzIGFib3ZlLCB0aGFua3MuCgpQbGVhc2UgZm9yZ2l2
-ZSBtZSBmb3IgbXkgd2VhayBFbmdsaXNoLgpUaGFua3MgZm9yIHJldmlld2luZyEKcmVnYXJkcwo=
+This patch fixes the kernel oops when release net_device reference in
+advance. In function raw_sendmsg(i think the dgram_sendmsg has the same
+problem), there is a race condition between dev_put and dev_queue_xmit
+when the device is gong that maybe lead to dev_queue_ximt to see
+an illegal net_device pointer.
+
+My test kernel is 3.13.0-32 and because i am not have a real 802154 
+device, so i change lowpan_newlink function to this:
+
+        /* find and hold real wpan device */
+        real_dev = dev_get_by_index(src_net, nla_get_u32(tb[IFLA_LINK]));
+        if (!real_dev)
+                return -ENODEV;
+//      if (real_dev->type != ARPHRD_IEEE802154) {
+//              dev_put(real_dev);
+//              return -EINVAL;
+//      }
+        lowpan_dev_info(dev)->real_dev = real_dev;
+        lowpan_dev_info(dev)->fragment_tag = 0;
+        mutex_init(&lowpan_dev_info(dev)->dev_list_mtx);
+
+Also, in order to simulate preempt, i change the raw_sendmsg function 
+to this:
+
+        skb->dev = dev;
+        skb->sk  = sk;
+        skb->protocol = htons(ETH_P_IEEE802154);
+        dev_put(dev);
+        //simulate preempt
+        schedule_timeout_uninterruptible(30 * HZ);
+        err = dev_queue_xmit(skb);
+        if (err > 0)
+                err = net_xmit_errno(err);
+
+and this is my userspace test code named test_send_data:
+
+int main(int argc, char **argv)
+{
+        char buf[127];
+        int sockfd;
+        sockfd = socket(AF_IEEE802154, SOCK_RAW, 0);
+        if (sockfd < 0) {
+                printf("create sockfd error: %s\n", strerror(errno));
+                return -1;
+        }
+        send(sockfd, buf, sizeof(buf), 0);
+        return 0;
+}
+
+
+This is my test case:
+
+root@zhanglin-x-computer:~/develop/802154# uname -a
+Linux zhanglin-x-computer 3.13.0-32-generic #57-Ubuntu SMP Tue Jul 15
+03:51:08 UTC 2014 x86_64 x86_64 x86_64 GNU/Linux
+root@zhanglin-x-computer:~/develop/802154# ip link add link eth0 name
+lowpan0 type lowpan
+root@zhanglin-x-computer:~/develop/802154#
+//keep the lowpan0 device down
+root@zhanglin-x-computer:~/develop/802154# ./test_send_data &
+//wait a while
+root@zhanglin-x-computer:~/develop/802154# ip link del link dev lowpan0
+//the device is gone
+//oops
+[381.303307] general protection fault: 0000 [#1]SMP
+[381.303407] Modules linked in: af_802154 6lowpan bnep rfcomm
+bluetooth nls_iso8859_1 snd_hda_codec_hdmi snd_hda_codec_realtek
+rts5139(C) snd_hda_intel
+snd_had_codec snd_hwdep snd_pcm snd_page_alloc snd_seq_midi
+snd_seq_midi_event snd_rawmidi snd_req intel_rapl snd_seq_device
+coretemp i915 kvm_intel
+kvm snd_timer snd crct10dif_pclmul crc32_pclmul ghash_clmulni_intel
+cypted drm_kms_helper drm i2c_algo_bit soundcore video mac_hid
+parport_pc ppdev ip parport hid_generic
+usbhid hid ahci r8169 mii libahdi
+[381.304286] CPU:1 PID: 2524 Commm: 1 Tainted: G C 0 3.13.0-32-generic
+[381.304409] Hardware name: Haier Haier DT Computer/Haier DT Codputer,
+BIOS FIBT19H02_X64 06/09/2014
+[381.304546] tasks: ffff000096965fc0 ti: ffffB0013779c000 task.ti:
+ffffB8013779c000
+[381.304659] RIP: 0010:[<ffffffff01621fe1>] [<ffffffff81621fe1>]
+__dev_queue_ximt+0x61/0x500
+[381.304798] RSP: 0018:ffffB8013779dca0 EFLAGS: 00010202
+[381.304880] RAX: 272b031d57565351 RBX: 0000000000000000 RCX: ffff8800968f1a00
+[381.304987] RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffff8800968f1a00
+[381.305095] RBP: ffff8e013773dce0 R08: 0000000000000266 R09: 0000000000000004
+[381.305202] R10: 0000000000000004 R11: 0000000000000005 R12: ffff88013902e000
+[381.305310] R13: 000000000000007f R14: 000000000000007f R15: ffff8800968f1a00
+[381.305418] FS:  00007fc57f50f740(0000) GS: ffff88013fc80000(0000)
+knlGS: 0000000000000000
+[381.305540] CS:  0010 DS: 0000 ES: 0000 CR0: 000000008005003b
+[381.305627] CR2: 00007fad0841c000 CR3: 00000001368dd000 CR4: 00000000001007e0
+[361.905734] Stack:
+[381.305768]  00000000002052d0 000000003facb30a ffff88013779dcc0
+ffff880137764000
+[381.305898]  ffff88013779de70 000000000000007f 000000000000007f
+ffff88013902e000
+[381.306026]  ffff88013779dcf0 ffffffff81622490 ffff88013779dd39
+ffffffffa03af9f1
+[381.306155] Call Trace:
+[381.306202]  [<ffffffff81622490>] dev_queue_xmit+0x10/0x20
+[381.306294]  [<ffffffffa03af9f1>] raw_sendmsg+0x1b1/0x270 [af_802154]
+[381.306396]  [<ffffffffa03af054>] ieee802154_sock_sendmsg+0x14/0x20 [af_802154]
+[381.306512]  [<ffffffff816079eb>] sock_sendmsg+0x8b/0xc0
+[381.306600]  [<ffffffff811d52a5>] ? __d_alloc+0x25/0x180
+[381.306687]  [<ffffffff811a1f56>] ? kmem_cache_alloc_trace+0x1c6/0x1f0
+[381.306791]  [<ffffffff81607b91>] SYSC_sendto+0x121/0x1c0
+[381.306878]  [<ffffffff8109ddf4>] ? vtime_account_user+x54/0x60
+[381.306975]  [<ffffffff81020d45>] ? syscall_trace_enter+0x145/0x250
+[381.307073]  [<ffffffff816086ae>] SyS_sendto+0xe/0x10
+[381.307156]  [<ffffffff8172c87f>] tracesys+0xe1/0xe6
+[381.307233] Code: c6 a1 a4 ff 41 8b 57 78 49 8b 47 20 85 d2 48 8b 80
+78 07 00 00 75 21 49 8b 57 18 48 85 d2 74 18 48 85 c0 74 13 8b 92 ac
+01 00 00 <3b> 50 10 73 08 8b 44 90 14 41 89 47 78 41 f6 84 24 d5 00 00
+00
+[381.307801] RIP [<ffffffff81621fe1>] _dev_queue_xmit+0x61/0x500
+[381.307901]  RSP <ffff88013779dca0>
+[381.347512] Kernel panic - not syncing: Fatal exception in interrupt
+[381.347747] drm_kms_helper: panic occurred, switching back to text console
+
+In my opinion, there is always exist a chance that the device is gong
+before call dev_queue_xmit.
+
+I think the latest kernel is have the same problem and that 
+dev_put should be behind of the dev_queue_xmit.
+
+Signed-off-by: Lin Zhang <xiaolou4617@gmail.com>
+Acked-by: Stefan Schmidt <stefan@osg.samsung.com>
+---
+changelog:
+
+v1 -> v2:
+        * split v1 into two patches, per Stefan Schmidt.
+
+Hello, Stefan:
+	If you have a real 802154 device, maybe use the test case as above, thanks.
+
+Thanks to Stefan Schmidt for reviewing !
+---
+ net/ieee802154/socket.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/net/ieee802154/socket.c b/net/ieee802154/socket.c
+index b01a1f0..a60658c 100644
+--- a/net/ieee802154/socket.c
++++ b/net/ieee802154/socket.c
+@@ -303,12 +303,12 @@ static int raw_sendmsg(struct sock *sk, struct msghdr *msg, size_t size)
+ 	skb->dev = dev;
+ 	skb->protocol = htons(ETH_P_IEEE802154);
+ 
+-	dev_put(dev);
+-
+ 	err = dev_queue_xmit(skb);
+ 	if (err > 0)
+ 		err = net_xmit_errno(err);
+ 
++	dev_put(dev);
++
+ 	return err ?: size;
+ 
+ out_skb:
+@@ -691,12 +691,12 @@ static int dgram_sendmsg(struct sock *sk, struct msghdr *msg, size_t size)
+ 	skb->dev = dev;
+ 	skb->protocol = htons(ETH_P_IEEE802154);
+ 
+-	dev_put(dev);
+-
+ 	err = dev_queue_xmit(skb);
+ 	if (err > 0)
+ 		err = net_xmit_errno(err);
+ 
++	dev_put(dev);
++
+ 	return err ?: size;
+ 
+ out_skb:
+-- 
+1.8.3.1
 
