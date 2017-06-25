@@ -1,24 +1,26 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-io0-f193.google.com ([209.85.223.193]:35131 "EHLO
-        mail-io0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750852AbdFYC7a (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Sat, 24 Jun 2017 22:59:30 -0400
+Received: from shards.monkeyblade.net ([184.105.139.130]:40522 "EHLO
+        shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751012AbdFYPuS (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Sun, 25 Jun 2017 11:50:18 -0400
+Date: Sun, 25 Jun 2017 11:50:12 -0400 (EDT)
+Message-Id: <20170625.115012.1229577774043704298.davem@davemloft.net>
 Subject: Re: [PATCH net-next] net: add netlink_ext_ack support to
  rtnl_link_ops
-References: <01256ebba091f2108ebeff43e61305bb533067d4.1498303258.git.mschiffer@universe-factory.net>
-From: David Ahern <dsahern@gmail.com>
-Message-ID: <1bfb7a80-a440-f960-1f35-a70542106cfb@gmail.com>
-Date: Sat, 24 Jun 2017 20:50:24 -0600
-MIME-Version: 1.0
+From: David Miller <davem@davemloft.net>
 In-Reply-To: <01256ebba091f2108ebeff43e61305bb533067d4.1498303258.git.mschiffer@universe-factory.net>
-Content-Type: text/plain; charset=windows-1252
+References: <01256ebba091f2108ebeff43e61305bb533067d4.1498303258.git.mschiffer@universe-factory.net>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Matthias Schiffer <mschiffer@universe-factory.net>, dledford@redhat.com, sean.hefty@intel.com, hal.rosenstock@gmail.com, j.vosburgh@gmail.com, vfalico@gmail.com, andy@greyhouse.net, dmitry.tarnyagin@lockless.no, wg@grandegger.com, mkl@pengutronix.de, pablo@netfilter.org, laforge@gnumonks.org, paulus@samba.org, jiri@resnulli.us, dsa@cumulusnetworks.com, shm@cumulusnetworks.com, davem@davemloft.net, stephen@networkplumber.org, arvid.brodin@alten.se, alex.aring@gmail.com, stefan@osg.samsung.com, kuznet@ms2.inr.ac.ru, jmorris@namei.org, yoshfuji@linux-ipv6.org, kaber@trash.net, steffen.klassert@secunet.com, herbert@gondor.apana.org.au, johannes@sipsolutions.net
-Cc: linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, linux-can@vger.kernel.org, osmocom-net-gprs@lists.osmocom.org, linux-ppp@vger.kernel.org, linux-wpan@vger.kernel.org
+To: mschiffer@universe-factory.net
+Cc: dledford@redhat.com, sean.hefty@intel.com, hal.rosenstock@gmail.com, j.vosburgh@gmail.com, vfalico@gmail.com, andy@greyhouse.net, dmitry.tarnyagin@lockless.no, wg@grandegger.com, mkl@pengutronix.de, pablo@netfilter.org, laforge@gnumonks.org, paulus@samba.org, jiri@resnulli.us, dsa@cumulusnetworks.com, shm@cumulusnetworks.com, stephen@networkplumber.org, arvid.brodin@alten.se, alex.aring@gmail.com, stefan@osg.samsung.com, kuznet@ms2.inr.ac.ru, jmorris@namei.org, yoshfuji@linux-ipv6.org, kaber@trash.net, steffen.klassert@secunet.com, herbert@gondor.apana.org.au, johannes@sipsolutions.net, linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, linux-can@vger.kernel.org, osmocom-net-gprs@lists.osmocom.org, linux-ppp@vger.kernel.org, linux-wpan@vger.kernel.org
 
-On 6/24/17 5:35 AM, Matthias Schiffer wrote:
+From: Matthias Schiffer <mschiffer@universe-factory.net>
+Date: Sat, 24 Jun 2017 13:35:17 +0200
+
 > The following functions are extended with a netlink_ext_ack argument to
 > allow extended error reporting:
 > 
@@ -27,7 +29,9 @@ On 6/24/17 5:35 AM, Matthias Schiffer wrote:
 > * changelink
 > * slave_validate
 > * slave_changelink
+> 
+> Signed-off-by: Matthias Schiffer <mschiffer@universe-factory.net>
 
-I would prefer separate patches for validate, slave_validate, newlink,
-changelink, and slave_changelink. I do not believe there is a reason to
-lump them into 1 giant patch.
+Like David Ahern, I think you should split this patch up.
+
+Thanks.
