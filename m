@@ -1,37 +1,31 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from shards.monkeyblade.net ([184.105.139.130]:40522 "EHLO
-        shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751012AbdFYPuS (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Sun, 25 Jun 2017 11:50:18 -0400
-Date: Sun, 25 Jun 2017 11:50:12 -0400 (EDT)
-Message-Id: <20170625.115012.1229577774043704298.davem@davemloft.net>
-Subject: Re: [PATCH net-next] net: add netlink_ext_ack support to
- rtnl_link_ops
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <01256ebba091f2108ebeff43e61305bb533067d4.1498303258.git.mschiffer@universe-factory.net>
-References: <01256ebba091f2108ebeff43e61305bb533067d4.1498303258.git.mschiffer@universe-factory.net>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+Received: from host238-201-177-94.serverdedicati.aruba.it ([94.177.201.238]:34215
+        "EHLO mail.dealer.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1751445AbdF0BFJ (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 26 Jun 2017 21:05:09 -0400
+Subject: Product Inquiry
+From: Julian Smith <sinara_group@126.com>
+Reply-To: sinara-group@bk.ru
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7BIT
+Message-Id: <20170626215245.4DC0B9CC54@mail.dealer.com>
+Date: Mon, 26 Jun 2017 17:52:45 -0400 (EDT)
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: mschiffer@universe-factory.net
-Cc: dledford@redhat.com, sean.hefty@intel.com, hal.rosenstock@gmail.com, j.vosburgh@gmail.com, vfalico@gmail.com, andy@greyhouse.net, dmitry.tarnyagin@lockless.no, wg@grandegger.com, mkl@pengutronix.de, pablo@netfilter.org, laforge@gnumonks.org, paulus@samba.org, jiri@resnulli.us, dsa@cumulusnetworks.com, shm@cumulusnetworks.com, stephen@networkplumber.org, arvid.brodin@alten.se, alex.aring@gmail.com, stefan@osg.samsung.com, kuznet@ms2.inr.ac.ru, jmorris@namei.org, yoshfuji@linux-ipv6.org, kaber@trash.net, steffen.klassert@secunet.com, herbert@gondor.apana.org.au, johannes@sipsolutions.net, linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, linux-can@vger.kernel.org, osmocom-net-gprs@lists.osmocom.org, linux-ppp@vger.kernel.org, linux-wpan@vger.kernel.org
+To: linux-wpan@vger.kernel.org
 
-From: Matthias Schiffer <mschiffer@universe-factory.net>
-Date: Sat, 24 Jun 2017 13:35:17 +0200
+Hello, 
 
-> The following functions are extended with a netlink_ext_ack argument to
-> allow extended error reporting:
-> 
-> * validate
-> * newlink
-> * changelink
-> * slave_validate
-> * slave_changelink
-> 
-> Signed-off-by: Matthias Schiffer <mschiffer@universe-factory.net>
+My name is Ms Julian Smith and i am from Sinara Group Co.
+We are glad to know about your company from the web and we are interested in
+your products.Please send us your Latest catalog and price list for our
+trial order. 
 
-Like David Ahern, I think you should split this patch up.
+Julian Smith, 
+Purchasing Manager
+Sinara Group Co.
+7 Krasnogo Znameni Ave.
+Vladivostok,690106,Ukraine
 
-Thanks.
+
