@@ -1,21 +1,22 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wr0-f181.google.com ([209.85.128.181]:36801 "EHLO
-        mail-wr0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751438AbdGGLAU (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Fri, 7 Jul 2017 07:00:20 -0400
-Received: by mail-wr0-f181.google.com with SMTP id c11so41703119wrc.3
-        for <linux-wpan@vger.kernel.org>; Fri, 07 Jul 2017 04:00:19 -0700 (PDT)
-Date: Fri, 7 Jul 2017 13:00:13 +0200
+Received: from mail-wr0-f169.google.com ([209.85.128.169]:36195 "EHLO
+        mail-wr0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753092AbdGHSG7 (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Sat, 8 Jul 2017 14:06:59 -0400
+Received: by mail-wr0-f169.google.com with SMTP id c11so86720560wrc.3
+        for <linux-wpan@vger.kernel.org>; Sat, 08 Jul 2017 11:06:58 -0700 (PDT)
+Date: Sat, 8 Jul 2017 20:06:52 +0200
 From: Alexander Aring <alex.aring@gmail.com>
 Subject: Re: Resend : Reading corrupt IEEE 802.15.4 packages with the
  AT-REB233 and the BeagleBone Black with IWPAN
-Message-ID: <20170707110011.pwz272ppmwwu2wzh@omega>
+Message-ID: <20170708180631.l7lddi475pmua33o@omega>
 References: <06812919-6657-de81-25c5-63444c1527b9@hm.edu>
+ <20170707110011.pwz272ppmwwu2wzh@omega>
+ <da32b41b-ff84-9054-13d9-c03584cc5091@hm.edu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <06812919-6657-de81-25c5-63444c1527b9@hm.edu>
+In-Reply-To: <da32b41b-ff84-9054-13d9-c03584cc5091@hm.edu>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: Balz <s.balz@hm.edu>
@@ -23,96 +24,192 @@ Cc: linux-wpan@vger.kernel.org
 
 Hi,
 
-On Fri, Jul 07, 2017 at 12:18:34PM +0200, Balz wrote:
-> Dear IWPAN Team,
+please keep mailinglist in cc.
+
+On Sat, Jul 08, 2017 at 11:39:22AM +0200, Balz wrote:
+> Hi Alex,
 > 
-> I’m not sure if you received my last mail because it get's declared as spam
-> because of using HTML.
-> Maybe there is a Problem with the Attachment (I’ve upload it to Dropbox).
+> Thank you very mutch for you fast replay,
 > 
-
-no, previous not. Now we received them.
-
-> Original Mail:
-> We (university of applied since Munich) are developing a multi-sensor
-> Sniffer for IEEE 802.15.4 Networks, basted on your Linux-WPAN and the
-> AT86RF233 Chip (with the REB233-XPRO).
-> We connect the REB233-XPRO with a BeagleBone Black and implement the
-> AT-REB233 chip as Network interface (via iwpan).
-> The Beaglebone (BBB) is with at AT-REB233 via a 1Mhz SPI connected.
+> I've combined the openlabs DeviceTree fragment for rpi with the SPI-Dev
+> Overlay from elinux:
 > 
-
-I don't own this board, but I used openlabs board (rf233) with BeagleBone
-already and with success. (without problems so far I noticed).
-
-> The AT-REB is so configured, that after a frame has received it send a
-> interrupt to the BBB with can then read out the Frame Buffer.
-> The connection with the BeagleBone Works fine, but sometimes the network
-> interface reads corrupted date.  That package starts normal but after +/- 6
-> Byte the frame gets (at most) periodical byte sequence like (0xff 0 x30 0xf0
-> 0x00 | 0xff 0 x30 0xf0 0x00 | ….).
+> /dts-v1/;
 > 
-
-Can you provide dts entry? Maybe lower your spi clock but 1 Mhz should
-be okay :-/ ... maybe it's actually too low, try to use 5-4 Mhz
-(controller will round down the clock anyway) I expiered bad behaviours
-with a low clock.
-
-> We could evaluate, that the packages get corrupt after following situation:
-> - AT-REB233 sends a first interrupt
-> - The BBB ask what kind of interrupt it is and starts reading the
-> Framebuffer
-> - The AT-REB sends a second interrupt after about the sixed Byte of the
-> Framebuffer. Since this second interrupt the content of the Frame Buffer is
-> corrupt (detectable by the byte sequence).
-> After the BBB has read the (corrupt) framebuffer it starts a new read
-> (because of the second interrupt signalized that there are new data
-> available), usually this is a ACK.
-> Might it be possible that the AT-REB233 received a new Data-Frame and
-> overwrite the current Framebuffer after receiving the new (ACK)Package ?
-> The AT86RF233 does have a Framebuffer Protection (Section 9.3 in the
-> Datasheet of the AT86RF233) (Dynamic Frame Buffer Reg 0x0C bit: 7 section
-> 11.8 in the Datasheet) ore by setting PLL_ON in the TRX_STATE Register (Reg:
-> 0x02 9.3.1)
-> But I do not see such a configuration. May I have overseen it?
+> /plugin/;
+> 
+> / {
+> 
+> compatible = "ti,beaglebone", "ti,beaglebone-black";
+> 
+> /* identification */
+> 
+> part-number = "spi0pinmux";
+> 
+> fragment@0 {
+> 
+> target = <&am33xx_pinmux>;
+> 
+> __overlay__ {
+> 
+> spi0_pins_s0: spi0_pins_s0 {
+> 
+> pinctrl-single,pins = <
+> 
+> 0x150 0x30/* spi0_sclk, INPUT_PULLUP | MODE0 */
+> 
+> 0x154 0x30/* spi0_d0, INPUT_PULLUP | MODE0 */
+> 
+> 0x158 0x10/* spi0_d1, OUTPUT_PULLUP | MODE0 */
+> 
+> 0x15c 0x10/* spi0_cs0, OUTPUT_PULLUP | MODE0 */
+> 
+> /* 0x044 0x17PWM - RESET*/
+> 
+> /* 0x1ac 0x27IRQ*/
+> 
+> /* 0x1a4 0x27SLP-Trigger*/
 > 
 
-We use them... See [0] and also the reason why we always read the _full_
-frame buffer, because protection will lost after losing chip select when
-start read frame command. [1]
+why is this commented?
 
-> I have a PCAP package and a Logic dump attached. The logic dump could be
-> analysed with the SALEAE Logic Tool(https://www.saleae.com/downloads )
-> This errors could be seen e.g. at and sec. :
-> - 10.099
-> - 11.428
-> - 11.433
-> - 28.218
-> I would be very grateful if you can help us with this problem.
+> > ;
+> 
+> };
+> 
+> };
+> 
+> };
+> 
+> fragment@1 {
+> 
+> target = <&spi0>;
+> 
+> __overlay__ {
+> 
+> #address-cells = <1>;
+> 
+> #size-cells = <0>;
+> 
+> status = "okay";
+> 
+> pinctrl-names = "default";
+> 
+> pinctrl-0 = <&spi0_pins_s0>;
+> 
+> spidev@0 {
+> 
+> spi-max-frequency = <24000000>;
+> 
+> reg = <0>;
+> 
+> compatible = "linux,spidev";
+> 
+> };
 >
 
-If you see the error on the bus sounds like some framebuffer overwriting
-issue sure... and lower/higher clock is unlikely that they fix your
-issue..
+remove the spidev entry. This is for userspace /dev/spi0 device and the
+bus is already used by at86rf230. OR you use different chipselects and
+you have two devices on one spi bus. (Then it makes sense, but one of
+them should be reg = <1>; then. If it makes sense - I don't know, I
+think this is just for making board config more readable. Linux will
+ignore reg <1>. Or maybe not?)
 
-I think I need more _important_ information:
+Also I don't know what happens with the multiple max freq stuff.
 
-- Kernel version (ti or mainline kernel?)
+> at86rf233@0 {
+> 
+> compatible = "atmel,at86rf233";
+> 
+> reg = <0>;
+> 
+> interrupts = <14 4>;
+> 
+> interrupt-parent = <&gpio0>;
+> 
+> reset-gpio = <&gpio1 17 1>;
+> 
+> sleep-gpio = <&gpio3 19 1>;
+> 
+> spi-max-frequency = <3000000>;
+> 
+> xtal-trim = /bits/ 8 <0x0F>;
+> 
+> };
+> 
+> };
+> 
+> };
+> 
+> };
+> 
 
-- cat /sys/kernel/debug/regmap/spi32766.0/registers
+I googled for my valid spi configuration. _IMPORTANT_ i don't know if I
+used the same SPI interface which you used. See [0].
 
-"spi32766.0" need to be changed to you spi controller name and mount
-debugfs as well. Then you can check the current register settings on
-your own as well.
+> The Registers a configured as:
+> 
+> cat /sys/kernel/debug/regmap/spi1.0/registers
+> 
+> 01: 16
+> 02: 16
+> 03: 00
+> 04: 20
+> 05: 00
+> 06: 20
+> 07: ff
+> 08: 1a
+> 09: 00
+> 0a: 00
+> 0b: 00
+> 0c: a0
 
-- DTS entry section for AT86RF233 transceiver, you could change from
-  level to edge triggered irqs (_maybe_? it will fix your issue, please
-  provide if it fixed the issue then).
+RX_SAFE_MODE is 1 here, good.
 
-- You did the capture as monitor interface? (I think yes, otherwise you
-  would not see ack frames)
+> 0d: 00
+> 0e: 08
+> 10: 44
+> 11: 00
+> 12: ff
+> 15: 00
+> 17: 02
+> 18: 00
+> 1a: 57
+> 1b: 2a
+> 1c: 0b
+> 1d: 01
+> 1e: 1f
+> 1f: 00
+> 20: ff
+> 21: ff
+> 22: ff
+> 23: ff
+> 24: 00
+> 25: 00
+> 26: 00
+> 27: 00
+> 28: 00
+> 29: 00
+> 2a: 00
+> 2b: 00
+> 2c: 38
+> 2d: 74
+> 2e: 57
+> 2f: 53
+> 
+> uname -a prints :
+> Linux beaglebone 4.4.54-ti-r93
+> 
+> i've set the irq trigger to Mode 1 rising edge :
+> interrupts = <14 1>;
+> 
+> and increased the Clock frequency to 7 MHZ but the result is the same.
+> 
+> Unfortunately i'm not able sniff reliable 7Mhz.
+> 
+
+7 is to high, try 4.
 
 - Alex
 
-[0] http://elixir.free-electrons.com/linux/latest/source/drivers/net/ieee802154/at86rf230.c#L1404
-[1] http://elixir.free-electrons.com/linux/latest/source/drivers/net/ieee802154/at86rf230.c#L759
+[0] http://www.spinics.net/lists/linux-wpan/msg01597.html
