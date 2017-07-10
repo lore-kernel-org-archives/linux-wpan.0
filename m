@@ -1,10 +1,15 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from postout2.mail.lrz.de ([129.187.255.138]:44412 "EHLO
-        postout2.mail.lrz.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753596AbdGJIjj (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 10 Jul 2017 04:39:39 -0400
+Received: from mail-wr0-f172.google.com ([209.85.128.172]:32861 "EHLO
+        mail-wr0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752457AbdGJJke (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 10 Jul 2017 05:40:34 -0400
+Received: by mail-wr0-f172.google.com with SMTP id r103so130892473wrb.0
+        for <linux-wpan@vger.kernel.org>; Mon, 10 Jul 2017 02:40:33 -0700 (PDT)
+Date: Mon, 10 Jul 2017 11:40:27 +0200
+From: Alexander Aring <alex.aring@gmail.com>
 Subject: Re: Resend : Reading corrupt IEEE 802.15.4 packages with the
  AT-REB233 and the BeagleBone Black with IWPAN
+Message-ID: <20170710094026.4urdv5bovwiztku7@omega>
 References: <06812919-6657-de81-25c5-63444c1527b9@hm.edu>
  <20170707110011.pwz272ppmwwu2wzh@omega>
  <da32b41b-ff84-9054-13d9-c03584cc5091@hm.edu>
@@ -13,104 +18,42 @@ References: <06812919-6657-de81-25c5-63444c1527b9@hm.edu>
  <20170708181410.64zhqqyfvgp22b6c@omega>
  <583268dc-46a4-c78d-dfcf-d0083caa0888@hm.edu>
  <20170709182728.kam75j2kpt36ulju@omega>
-From: Balz <s.balz@hm.edu>
-Message-ID: <3cf26613-fe30-c9a4-01f8-5a9219bf6da1@hm.edu>
-Date: Mon, 10 Jul 2017 10:39:34 +0200
+ <3cf26613-fe30-c9a4-01f8-5a9219bf6da1@hm.edu>
 MIME-Version: 1.0
-In-Reply-To: <20170709182728.kam75j2kpt36ulju@omega>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <3cf26613-fe30-c9a4-01f8-5a9219bf6da1@hm.edu>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>, Balz <s.balz@hm.edu>
+To: Balz <s.balz@hm.edu>
 Cc: linux-wpan@vger.kernel.org
 
-hi,
+Hi,
 
-I figured out that you can disable the shadow registers (in the regmap 
-dir) by writing "y" to "cache_bypass" by the command "echo y > 
-cache_bypass", ore by setting the third char to y (in the corresponding 
-line ) in the file access but this you cannot do in user space.
+On Mon, Jul 10, 2017 at 10:39:34AM +0200, Balz wrote:
+> hi,
+> 
+> I figured out that you can disable the shadow registers (in the regmap dir)
+> by writing "y" to "cache_bypass" by the command "echo y > cache_bypass", ore
+> by setting the third char to y (in the corresponding line ) in the file
+> access but this you cannot do in user space.
+> 
+> I've checked it out that if you write a "y" to "cache_bypass" that the drive
+> reads all defined registers (seen in "range") from the device.
+> The value of ref 0x0C stays unchanged.
+> 
+> I would be very grateful if you could use you connections to Atmel.
+> Of cause you can refer to my proved logic-dump and pcap file in my dropbox
+> 
 
-I've checked it out that if you write a "y" to "cache_bypass" that the 
-drive reads all defined registers (seen in "range") from the device.
-The value of ref 0x0C stays unchanged.
+tried it, gave up... seems to be everything has changed because
+microchip & atmel stuff. You could try it...
 
-I would be very grateful if you could use you connections to Atmel.
-Of cause you can refer to my proved logic-dump and pcap file in my dropbox
+You didn't answered my other question:
 
-regards
+Do you transmit over monitor interface?
 
-Sebastian Balz
+Also I don't have such issues with RPi, do you have some RPi around and
+use _mainline_ Linux kernel. Very important _mainline_.
 
-Am 09.07.2017 um 20:27 schrieb Alexander Aring:
-
-> Hi,
->
-> On Sun, Jul 09, 2017 at 06:22:29PM +0200, Balz wrote:
->> Hi,
->> I do not use the SPIDEV fragment, so I've deleted it out of the Overlay.
->> The data sheet of the ATREB233 says that the SPI cut get up to 7.5 MHZ but
->> decreasing it does have no positive effects.
->> My SPI Configuration is specified for the BBB.
->>
-> mh, ok. 7Mhz could be too high, I expierenced bad behaviours on RPI with
-> openlabs board which has no jumpwire etc. setup.
->
->> I do think that released the RX_Save_MODE means, that the frame buffer is
->> not any more protected, so that the hardware can override the FrameBuffer.
->> I've checked the value of register 0x0c periodically but it does not change
->> its value while operating.  But i have no idea how to make the regmap
->> volatile.
->>
-> You need to have it volatile otherwise the read will not trigger a register
-> read on the bus. Maybe there exists a runtime solution to add it via debugfs
-> to volatile registers. I know this way only, you can run the cat on
-> registers afterwards and it should trigger a register read. Acutally you
-> could check it on you logic analyzer (but there should be a lot of
-> register read, search for 0x0c).
->
-> Here is the diff, very easy (recompile kernel and boot it, sure... or
-> just at86rf230.ko replacement):
->
-> diff --git a/drivers/net/ieee802154/at86rf230.c b/drivers/net/ieee802154/at86rf230.c
-> index 548d9d026a85..858b07a4febc 100644
-> --- a/drivers/net/ieee802154/at86rf230.c
-> +++ b/drivers/net/ieee802154/at86rf230.c
-> @@ -311,6 +311,7 @@ at86rf230_reg_volatile(struct device *dev, unsigned int reg)
->          case RG_VREG_CTRL:
->          case RG_PLL_CF:
->          case RG_PLL_DCU:
-> +       case RG_TRX_CTRL_2:
->                  return true;
->          default:
->                  return false;
->
-> ----------
->
-> I reread the datasheet and I think this will not happen, that we lost
-> RX_SAFE_MODE... because the datasheet [0] shows how to setup enable
-> "receive mode" inclusive address filtering etc. there is the
-> RX_SAFE_MODE setting mentioned. That says to me: we need it for hardware
-> init once OR when going into some RX state of at86rf233... but what an
-> ugly behaviour that it will drop RX_SAFE_MODE when changing state -
-> another question: would we always set the address filtering again then?
-> I don't know...
->
-> I maybe can ask "again" Atmel support for help me, but this support
-> interface of them are very ugly and I only got reponse the last time,
-> because somebody on the list had some support contract with them (I
-> think).
->
-> Also [0] for running in promiscuous mode (page 59) doesn't mention
-> anything about RX_SAFE_MODE! So question would be if RX_SAFE_MODE
-> working in promiscuous mode? Or does the hardware doesn't support it...
-> in this configuration.
->
-> The datasheet doesn't contain the information which I need to know... I
-> need the firmware of this chip >:-(
->
-> - Alex
->
-> [0] http://www.atmel.com/images/Atmel-8351-MCU_Wireless-AT86RF233_Datasheet.pdf (PDF PAGE 56)
-
+- Alex
