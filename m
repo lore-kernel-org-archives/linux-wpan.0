@@ -1,44 +1,37 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from ec2-52-27-115-49.us-west-2.compute.amazonaws.com ([52.27.115.49]:41478
-        "EHLO osg.samsung.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1750807AbdGMJBm (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 13 Jul 2017 05:01:42 -0400
-Received: from localhost (localhost [127.0.0.1])
-        by osg.samsung.com (Postfix) with ESMTP id AB066A0D4D
-        for <linux-wpan@vger.kernel.org>; Thu, 13 Jul 2017 09:02:09 +0000 (UTC)
-Received: from osg.samsung.com ([127.0.0.1])
-        by localhost (s-opensource.com [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id 6XAuysiZjF7t for <linux-wpan@vger.kernel.org>;
-        Thu, 13 Jul 2017 09:02:08 +0000 (UTC)
-Received: from [192.168.2.114] (pD9F79869.dip0.t-ipconnect.de [217.247.152.105])
-        by osg.samsung.com (Postfix) with ESMTPSA id 5D665A05F0
-        for <linux-wpan@vger.kernel.org>; Thu, 13 Jul 2017 09:02:08 +0000 (UTC)
+Received: from mail-wm0-f47.google.com ([74.125.82.47]:35400 "EHLO
+        mail-wm0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752722AbdGMOUL (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 13 Jul 2017 10:20:11 -0400
+Received: by mail-wm0-f47.google.com with SMTP id w126so25124011wme.0
+        for <linux-wpan@vger.kernel.org>; Thu, 13 Jul 2017 07:20:10 -0700 (PDT)
+Date: Thu, 13 Jul 2017 16:20:04 +0200
+From: Alexander Aring <alex.aring@gmail.com>
 Subject: Re: Applications on wpan-linux
+Message-ID: <20170713142002.rwab6uz474cljiky@omega>
 References: <CAJuUDws4t0mSS4mONnXs=b9QLF28w9CTfQE-+2QKMnHg8_5HmA@mail.gmail.com>
  <b3e88cdb-59f7-5915-6abe-36c5b6cfc8ef@osg.samsung.com>
- <28959.1499804094@dooku.sandelman.ca> <20170712155110.itv5gqc4ohnh5lrz@omega>
+ <28959.1499804094@dooku.sandelman.ca>
+ <20170712155110.itv5gqc4ohnh5lrz@omega>
  <13647.1499935823@dooku.sandelman.ca>
-From: Stefan Schmidt <stefan@osg.samsung.com>
-Message-ID: <d575f687-d5b1-9b3b-7caa-6fab81426850@osg.samsung.com>
-Date: Thu, 13 Jul 2017 11:01:36 +0200
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 In-Reply-To: <13647.1499935823@dooku.sandelman.ca>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org
+To: Michael Richardson <mcr@sandelman.ca>
+Cc: linux-wpan@vger.kernel.org
 
-Hello.
+Hi,
 
-On 07/13/2017 10:50 AM, Michael Richardson wrote:
+On Thu, Jul 13, 2017 at 10:50:23AM +0200, Michael Richardson wrote:
 > 
 > Alexander Aring <alex.aring@gmail.com> wrote:
->      > About marketing: I think we need to make some tutorial for RIOT/Contiki
->      > to build e.g. a broder router. All others IoT MCU OS's make their own
->      > Border Router solution and feed their IPv6 Stack on $MCU_IOT_OS over
->      > SLIP and they do marketing with that.
+>     > About marketing: I think we need to make some tutorial for RIOT/Contiki
+>     > to build e.g. a broder router. All others IoT MCU OS's make their own
+>     > Border Router solution and feed their IPv6 Stack on $MCU_IOT_OS over
+>     > SLIP and they do marketing with that.
 > 
 > That's not what I mean by marketing.
 > Assume that we had some tutorial, where would people look for it?
@@ -48,16 +41,17 @@ On 07/13/2017 10:50 AM, Michael Richardson wrote:
 > Documentation/networking//ieee802154.txt points at http://wpan.cakelab.org/
 > and https://github.com/linux-wpan/wpan-tools
 > 
+
+ah, yes we need to update this documentation stuff.
+
 > I don't know Christian Fromme, is he still around? He seems to own cakelab.org.
+
+hehe, that's a friend of mine which gave me some little webspace on
+cakelab.org to make a project website.
+
 > I'm happy with github wiki documentation.
+> 
 
-I wanted to try out github pages and maybe combine it with read the docs 
-under our own domain. But I badly fall behind with my things on my todo 
-list recently. Need to make some time for linux-wpan again.
+ok.
 
-I just looked again and linux-wpan.{net,org} are still free. I might 
-just go ahead to register one of them which we can then use to point to 
-whatever better marketing we come up with. :)
-
-regards
-Stefan Schmidt
+- Alex
