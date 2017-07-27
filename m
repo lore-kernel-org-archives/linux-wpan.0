@@ -1,32 +1,86 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wr0-f174.google.com ([209.85.128.174]:35519 "EHLO
-        mail-wr0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753552AbdGXNqB (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 24 Jul 2017 09:46:01 -0400
-Received: by mail-wr0-f174.google.com with SMTP id k71so52927569wrc.2
-        for <linux-wpan@vger.kernel.org>; Mon, 24 Jul 2017 06:46:01 -0700 (PDT)
+Received: from demetra.cnit.it ([217.9.64.12]:34280 "EHLO mail.cnit.it"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750836AbdG0MmT (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+        Thu, 27 Jul 2017 08:42:19 -0400
+Received: from localhost (localhost [127.0.0.1])
+        by mail.cnit.it (Postfix) with ESMTP id 7BE1853D78
+        for <linux-wpan@vger.kernel.org>; Thu, 27 Jul 2017 14:35:49 +0200 (CEST)
+Received: from mail.cnit.it ([127.0.0.1])
+        by localhost (demetra.cnit.it [127.0.0.1]) (amavisd-new, port 10024)
+        with LMTP id IbUflcTPhshr for <linux-wpan@vger.kernel.org>;
+        Thu, 27 Jul 2017 14:35:49 +0200 (CEST)
+Received: from giove (giove.cnit.it [217.9.64.16])
+        (using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mail.cnit.it (Postfix) with ESMTPSA id 18B0853A9D
+        for <linux-wpan@vger.kernel.org>; Thu, 27 Jul 2017 14:35:49 +0200 (CEST)
+Date: Thu, 27 Jul 2017 12:35:49 +0000
+Message-ID: <20170727123549.Horde.7xqTlveAHbfe7yBsbff4GA1@webmail.cnit.it>
+From: Luca Di Mauro <ldimauro@cnit.it>
+Content-Type: text/plain; charset=UTF-8; format=flowed; DelSp=Yes
 MIME-Version: 1.0
-From: Amitkumar Karwar <amitkarwar@gmail.com>
-Date: Mon, 24 Jul 2017 19:15:59 +0530
-Message-ID: <CAEhWJFkiL5Gvcm1vn4UY3=vH98FRUvAv_fdTN=je274Ctxc2og@mail.gmail.com>
-Subject: Query about ZigBee driver
-Content-Type: text/plain; charset="UTF-8"
+Content-Disposition: inline
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
 
-Hi All,
 
-We have a proprietary ZigBee stack running in our firmware. ZigBee
-profiles run in application. These profiles talk with our thin ZigBee
-driver through netlink sockets.
+Dear all,
+I am working with transceiver AT86RF233 on a board with Variscite i.MX 6 SOM.
+I'm using ieee802154sockets in the following test code:
 
-We wanted to submit this ZigBee driver to Linux kernel.
-Please let me know if this is possible.
+#include<errno.h>
+#include <stdio.h>
+#include <sys/ioctl.h>
+#include <string.h>
+#include <net/if.h>
 
-Writing ieee802154 based driver doesn't suit our requirement, as
-mac802154 and ZigBee stack are present in firmare.
-Please guide.
 
-Regards,
-Amitkumar
+
+int main () {
+	int socketfd = 0;
+	struct ifreq ifr;
+	static const char *wpandevs[] = {"wpan0"};
+	int ret;
+
+	socketfd = socket(PF_IEEE802154, SOCK_RAW, 0);
+
+	strncpy(ifr.ifr_name, wpandevs[0], IF_NAMESIZE);
+printf("d0\n");
+	ret = ioctl(socketfd, SIOCGIFADDR, &ifr);
+printf("d1\n");
+
+	if (ret < 0) {
+		fprintf(stderr,"ioctl: SIOCGIFADDR error\n");
+		return;
+	}
+printf("d2\n");
+
+	return 0;
+}
+
+But when I execute this code, kernel says to me following error messages:
+RTNL: assertion failed at net/mac802154/iface.c (65)
+CPU: 1 PID: 2023 Comm: main Not tainted 4.1.15-224528-gc28c3ac-dirty #3
+Hardware name: Freescale i.MX6 Quad/DualLite (Device Tree)
+[<8001691c>] (unwind_backtrace) from [<80012748>] (show_stack+0x10/0x14)
+[<80012748>] (show_stack) from [<807577a8>] (dump_stack+0x84/0xc4)
+[<807577a8>] (dump_stack) from [<8074e41c>] (mac802154_wpan_ioctl+0xf0/0x154)
+[<8074e41c>] (mac802154_wpan_ioctl) from [<7f039744>]  
+(ieee802154_sock_ioctl+0x184/0x1f0 [ieee802154_socket])
+[<7f039744>] (ieee802154_sock_ioctl [ieee802154_socket]) from  
+[<805fcbf4>] (sock_ioctl+0x1c0/0x294)
+[<805fcbf4>] (sock_ioctl) from [<800f9dd0>] (do_vfs_ioctl+0x40c/0x5fc)
+[<800f9dd0>] (do_vfs_ioctl) from [<800f9ff4>] (SyS_ioctl+0x34/0x5c)
+[<800f9ff4>] (SyS_ioctl) from [<8000f480>] (ret_fast_syscall+0x0/0x3c)
+
+Do you have some tips to solve the problem?
+
+I'm using Debian Jessie (downloaded here  
+http://www.variwiki.com/index.php?title=VAR-SOM-MX6_Debian_R2) with  
+kernel 4.1.15-224528-gc28c3ac-dirty.
+
+Best,
+Luca Di Mauro
+
