@@ -1,45 +1,78 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-io0-f176.google.com ([209.85.223.176]:36903 "EHLO
-        mail-io0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751104AbdHCNoz (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 3 Aug 2017 09:44:55 -0400
-Received: by mail-io0-f176.google.com with SMTP id c74so7069309iod.4
-        for <linux-wpan@vger.kernel.org>; Thu, 03 Aug 2017 06:44:54 -0700 (PDT)
+Received: from postout1.mail.lrz.de ([129.187.255.137]:36363 "EHLO
+        postout1.mail.lrz.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752066AbdHBRDr (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 2 Aug 2017 13:03:47 -0400
+Subject: Re: Resend : Reading corrupt IEEE 802.15.4 packages with the
+ AT-REB233 and the BeagleBone Black with IWPAN
+References: <20170707110011.pwz272ppmwwu2wzh@omega>
+ <da32b41b-ff84-9054-13d9-c03584cc5091@hm.edu>
+ <20170708180631.l7lddi475pmua33o@omega>
+ <20170708181113.htxnpxrzxgsrqyva@omega>
+ <20170708181410.64zhqqyfvgp22b6c@omega>
+ <583268dc-46a4-c78d-dfcf-d0083caa0888@hm.edu>
+ <20170709182728.kam75j2kpt36ulju@omega>
+ <3cf26613-fe30-c9a4-01f8-5a9219bf6da1@hm.edu>
+ <20170710094026.4urdv5bovwiztku7@omega>
+ <6deda57a-4a26-ecae-0846-f34174acef09@hm.edu>
+ <20170710120303.5v3wikb3lkpvoao2@omega>
+ <1a7c2fd3-fda8-765a-f055-c32302a23879@freenet.de>
+ <CAOHTApjAMYz+=ngH15M3wyNKE+noSvhN0iBWarYDYv_QN-k48g@mail.gmail.com>
+From: Balz <s.balz@hm.edu>
+Message-ID: <5146468f-566c-40e4-e428-9cac2b90d470@hm.edu>
+Date: Wed, 2 Aug 2017 19:03:48 +0200
 MIME-Version: 1.0
-In-Reply-To: <29a009df-433e-2855-dc44-5e81d1a7a3d6@osg.samsung.com>
-References: <1909067.WLLFt4d09f@hella-laptop> <29a009df-433e-2855-dc44-5e81d1a7a3d6@osg.samsung.com>
-From: Alexander Aring <alex.aring@gmail.com>
-Date: Thu, 3 Aug 2017 09:44:53 -0400
-Message-ID: <CAB_54W4PfykGKHiGVomduZseC=R-3PiKF0Dsht0Obre_8uRH8Q@mail.gmail.com>
-Subject: Re: AT86RF212 based USB-Stick (HUL)
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <CAOHTApjAMYz+=ngH15M3wyNKE+noSvhN0iBWarYDYv_QN-k48g@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Stefan Schmidt <stefan@osg.samsung.com>
-Cc: Josef Filzmaier <j.filzmaier@gmx.at>, linux-wpan - ML <linux-wpan@vger.kernel.org>
+To: Alexander Aring <aring@mojatatu.com>
+Cc: Balz <s.balz@hm.edu>, linux-wpan@vger.kernel.org
 
-Hi,
+Hi Alex,
 
-2017-08-03 2:59 GMT-04:00 Stefan Schmidt <stefan@osg.samsung.com>:
-...
+I've changed the Kernel module so that i read the Framebuffer as SRAM 
+and not as FrameBuffer.
+I've write a 0x00n followed by 0x00 to determine a SRAM read from the 
+addr 0.
+
+But the Kernel Module can not identity the frame length any more.
+
+The Sniffed packages (all Packages have 143 byte length) do not show the 
+behaviour any more.
+
+Maybe the SRAM read access is protected and the Frame-buffer Read not...?
+
+Best Regards
+
+Sebastian Balz
+
+
+
+Am 31.07.2017 um 15:48 schrieb Alexander Aring:
+> Hi,
 >
-> To be honest I would first want to verify that your communication between
-> the atusb driver and the firmware is actually working correctly.
+> On Sat, Jul 29, 2017 at 8:05 AM, Balz <Sebastian.balz@freenet.de> wrote:
+>> Hi Alex,
+>>
+>> The Atmel/Microchip Team ask me to do not a Frame-Buffer Reader but a SRAM read(addr 0x00-0x7F)
+>> I locked through the Code but could not find the Frame-Buffer reading part.
+>>
+> We start the read frame buffer command at [0].
 >
-> If you flashed a unmodified rzusb firmware on the device you would have to
-> be very lucky that everything would just work out of the box. If this design
-> uses the same MCU  it would help a lot (please confirm) but the state
-> handling of the rx/tx logic inside the firmware might still be slightly
-> different for the 212 compared top the 230/231. The actual 212 kernel driver
-> might give some hints about that. I do not know off hand.
+>> I would like to recompile the corresponding part and check if that changes something
+>>
+> For me it sounds weird. You definitely lost the frame buffer
+> protection with that.
+> Is there some errata released where it stands you should use SRAM access?
 >
+> If I would be atmel, then maybe try to use manual locks, see register
+> bits "RX_PDT_DIS". If they don't trust that automatic way doesn't
+> work.
+> You can change the code as well to use the manual way.
+>
+> - Alex
+>
+> [0] http://elixir.free-electrons.com/linux/latest/source/drivers/net/ieee802154/at86rf230.c#L758
 
-Please take care of Errata of at86rf212 [0]. The reset doesn't work
-you need to change to TRX_OFF after reset... something like that. Not
-sure if atusb firmware really does that.
-But this is more just like that... set CLKM stuff etc. Simple see
-workaround at [0].
-
-- Alex
-
-[0] http://www.atmel.com/images/doc8168.pdf
