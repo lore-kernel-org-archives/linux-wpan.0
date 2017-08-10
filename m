@@ -1,56 +1,73 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wm0-f45.google.com ([74.125.82.45]:35881 "EHLO
-        mail-wm0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751143AbdHCL1I (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 3 Aug 2017 07:27:08 -0400
-Received: by mail-wm0-f45.google.com with SMTP id t201so12545343wmt.1
-        for <linux-wpan@vger.kernel.org>; Thu, 03 Aug 2017 04:27:07 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <CAOHTApjS9h+RXtdJzCbhA+8ixYL9LvRAKa=3uLa+qHJrf277MA@mail.gmail.com>
-References: <20170707110011.pwz272ppmwwu2wzh@omega> <da32b41b-ff84-9054-13d9-c03584cc5091@hm.edu>
- <20170708180631.l7lddi475pmua33o@omega> <20170708181113.htxnpxrzxgsrqyva@omega>
- <20170708181410.64zhqqyfvgp22b6c@omega> <583268dc-46a4-c78d-dfcf-d0083caa0888@hm.edu>
- <20170709182728.kam75j2kpt36ulju@omega> <3cf26613-fe30-c9a4-01f8-5a9219bf6da1@hm.edu>
- <20170710094026.4urdv5bovwiztku7@omega> <6deda57a-4a26-ecae-0846-f34174acef09@hm.edu>
- <20170710120303.5v3wikb3lkpvoao2@omega> <1a7c2fd3-fda8-765a-f055-c32302a23879@freenet.de>
- <CAOHTApjAMYz+=ngH15M3wyNKE+noSvhN0iBWarYDYv_QN-k48g@mail.gmail.com>
- <5146468f-566c-40e4-e428-9cac2b90d470@hm.edu> <CAOHTApi5ZPNRMc0Sy0BBacXWbPnaG-NMedwdb8D9DqzPYM5u4g@mail.gmail.com>
- <CAB_54W5+pnKoL2LzfwfqsOOXVj0BG6dNRstJMFkrX1fG9mm=kA@mail.gmail.com> <CAOHTApjS9h+RXtdJzCbhA+8ixYL9LvRAKa=3uLa+qHJrf277MA@mail.gmail.com>
-From: Alexander Aring <aring@mojatatu.com>
-Date: Thu, 3 Aug 2017 07:27:06 -0400
-Message-ID: <CAOHTAphROv01OiuMKsAJ8Oes6DRYUD6qcR8Gx97+uxX2xTAouA@mail.gmail.com>
+Received: from mout2.freenet.de ([195.4.92.92]:37610 "EHLO mout2.freenet.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752016AbdHJMBP (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+        Thu, 10 Aug 2017 08:01:15 -0400
 Subject: Re: Resend : Reading corrupt IEEE 802.15.4 packages with the
  AT-REB233 and the BeagleBone Black with IWPAN
-Content-Type: text/plain; charset="UTF-8"
+References: <20170707110011.pwz272ppmwwu2wzh@omega>
+ <da32b41b-ff84-9054-13d9-c03584cc5091@hm.edu>
+ <20170708180631.l7lddi475pmua33o@omega>
+ <20170708181113.htxnpxrzxgsrqyva@omega>
+ <20170708181410.64zhqqyfvgp22b6c@omega>
+ <583268dc-46a4-c78d-dfcf-d0083caa0888@hm.edu>
+ <20170709182728.kam75j2kpt36ulju@omega>
+ <3cf26613-fe30-c9a4-01f8-5a9219bf6da1@hm.edu>
+ <20170710094026.4urdv5bovwiztku7@omega>
+ <6deda57a-4a26-ecae-0846-f34174acef09@hm.edu>
+ <20170710120303.5v3wikb3lkpvoao2@omega>
+ <1a7c2fd3-fda8-765a-f055-c32302a23879@freenet.de>
+ <CAOHTApjAMYz+=ngH15M3wyNKE+noSvhN0iBWarYDYv_QN-k48g@mail.gmail.com>
+From: Balz <Sebastian.balz@freenet.de>
+Message-ID: <e2e32fd2-4f23-bcaa-db64-b425e9518068@freenet.de>
+Date: Thu, 10 Aug 2017 13:59:12 +0200
+MIME-Version: 1.0
+In-Reply-To: <CAOHTApjAMYz+=ngH15M3wyNKE+noSvhN0iBWarYDYv_QN-k48g@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Balz <s.balz@hm.edu>
-Cc: linux-wpan - ML <linux-wpan@vger.kernel.org>
+To: Alexander Aring <aring@mojatatu.com>
+Cc: Balz <s.balz@hm.edu>, linux-wpan@vger.kernel.org
 
 Hi,
 
-On Wed, Aug 2, 2017 at 6:16 PM, Alexander Aring <aring@mojatatu.com> wrote:
+as mention the packages seems to be valid expected the package size of 143.
+I tried to manipulate the kernel module so that is read the SRAM but 
+I've trouble with reading the correct frame length. For me that is to 
+deep into kernel programming (I have no knowledge with the Linux kernel).
+
+Temporally we switch to a RIOT based SLIP sniffer.
+
+Thank you very much fro your help.
+
+Best Regards
+Sebastian Balz
+
+
+Am 31.07.2017 um 15:48 schrieb Alexander Aring:
 > Hi,
 >
-...
+> On Sat, Jul 29, 2017 at 8:05 AM, Balz <Sebastian.balz@freenet.de> wrote:
+>> Hi Alex,
 >>
->> It's "... to another state."... Maybe when a RX irq occurs during the
->> spi async handling there could be some "xmit" callbacks... This will
->> change the transceiver into another state... (not directly, but so far
->> I know it queues for state change). So when it will automatically go
->> into RX_AACK_ON then it will change the state to something else and
->> allows framebuffer overwrite.
+>> The Atmel/Microchip Team ask me to do not a Frame-Buffer Reader but a SRAM read(addr 0x00-0x7F)
+>> I locked through the Code but could not find the Frame-Buffer reading part.
+>>
+> We start the read frame buffer command at [0].
 >
-> it could be that there exists a race when stop queue is running and
-> currently a xmit is going on...
-> I currently have no idea how to solve it and need to have more details
-> what happens when the transceiver is in BUSY_RX and we do another
-> state change? Will it be queued or not (so after BUSY_RX it will
-> change to RX_ON and then another state)?
+>> I would like to recompile the corresponding part and check if that changes something
+>>
+> For me it sounds weird. You definitely lost the frame buffer
+> protection with that.
+> Is there some errata released where it stands you should use SRAM access?
 >
+> If I would be atmel, then maybe try to use manual locks, see register
+> bits "RX_PDT_DIS". If they don't trust that automatic way doesn't
+> work.
+> You can change the code as well to use the manual way.
+>
+> - Alex
+>
+> [0] http://elixir.free-electrons.com/linux/latest/source/drivers/net/ieee802154/at86rf230.c#L758
 
-Sorry, I remember... you told you don't send anything? Then this can't
-be the issue. :-(
-... but maybe we should stop transmit queue while receiving.
-
-- Alex
