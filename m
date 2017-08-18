@@ -1,47 +1,67 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mout.gmx.net ([212.227.15.15]:64026 "EHLO mout.gmx.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750812AbdHRK0e (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-        Fri, 18 Aug 2017 06:26:34 -0400
-From: Josef Filzmaier <j.filzmaier@gmx.at>
+Received: from ec2-52-27-115-49.us-west-2.compute.amazonaws.com ([52.27.115.49]:54277
+        "EHLO osg.samsung.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1751017AbdHRKdy (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 18 Aug 2017 06:33:54 -0400
+Received: from localhost (localhost [127.0.0.1])
+        by osg.samsung.com (Postfix) with ESMTP id E53EFA0CAD
+        for <linux-wpan@vger.kernel.org>; Fri, 18 Aug 2017 10:34:21 +0000 (UTC)
+Received: from osg.samsung.com ([127.0.0.1])
+        by localhost (s-opensource.com [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id z2b4kWhxIHUU for <linux-wpan@vger.kernel.org>;
+        Fri, 18 Aug 2017 10:34:21 +0000 (UTC)
+Received: from [192.168.2.112] (pD9F79285.dip0.t-ipconnect.de [217.247.146.133])
+        by osg.samsung.com (Postfix) with ESMTPSA id C8AD1A06C2
+        for <linux-wpan@vger.kernel.org>; Fri, 18 Aug 2017 10:34:20 +0000 (UTC)
 Subject: Re: AT86RF212 based USB-Stick (HUL)
-Date: Fri, 18 Aug 2017 12:26:23 +0200
-Message-ID: <751534928.IoX8EvYzkW@hella-laptop>
-In-Reply-To: <79f111e5-5c1e-78d6-c1c8-b6598492fa2e@osg.samsung.com>
-References: <5179358.aL3rf9WXy9@hella-laptop> <29470889.B3lc1jFHDt@hella-laptop> <79f111e5-5c1e-78d6-c1c8-b6598492fa2e@osg.samsung.com>
+References: <5179358.aL3rf9WXy9@hella-laptop>
+ <29470889.B3lc1jFHDt@hella-laptop>
+ <79f111e5-5c1e-78d6-c1c8-b6598492fa2e@osg.samsung.com>
+ <751534928.IoX8EvYzkW@hella-laptop>
+From: Stefan Schmidt <stefan@osg.samsung.com>
+Message-ID: <741c1341-ffe2-3394-4273-85079c9bf97b@osg.samsung.com>
+Date: Fri, 18 Aug 2017 12:33:49 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <751534928.IoX8EvYzkW@hella-laptop>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
-Cc: Stefan Schmidt <stefan@osg.samsung.com>
 
-Hi!
+Hello.
 
-I did refactor both repositories. I think they should now be much more 
-enjoyable to review ;) - I would however like you to have another quick look 
-within my github repo before i git send-mail it to the mailing list.
+On 08/18/2017 12:26 PM, Josef Filzmaier wrote:
+> Hi!
+> 
+> I did refactor both repositories. I think they should now be much more
+> enjoyable to review ;) - I would however like you to have another quick look
+> within my github repo before i git send-mail it to the mailing list.
+> 
+> I rebased the patch of the linux driver to the 4.13-rc5 source code so it
+> should be much easier to mainline. It is only a single commit, i was not sure
+> how i should separate the commits without having "dead code". I think the
+> patch is small enough that one commit is still feasible. [1]
+> 
+> I did separate the firmware into two commits: One that enables debugging
+> and one that introduces the new board (with refactoring). [2]
+> 
+> The changes were tested again on the raspberry pi with linux 4.13-rc5 and
+> both patches applied (Firmware and Kernel).
+> 
+> Today i finally sent you the Busware HUL dongle, so you should receive it
+> sometime next week.
+> 
+> Regards,
+> Josef
+> 
+> [1] https://github.com/joseffilzmaier/linux/compare/rpi-4.13.y...joseffilzmaier:atusb-busware-hul-4.13
+> [2] https://github.com/joseffilzmaier/ben-wpan/compare/busware-hul-final
 
-I rebased the patch of the linux driver to the 4.13-rc5 source code so it 
-should be much easier to mainline. It is only a single commit, i was not sure 
-how i should separate the commits without having "dead code". I think the 
-patch is small enough that one commit is still feasible. [1]
 
-I did separate the firmware into two commits: One that enables debugging 
-and one that introduces the new board (with refactoring). [2]
+That sounds all good. I'm offline at the weekend but I will go over your 
+github commit on Monday and test it out.
 
-The changes were tested again on the raspberry pi with linux 4.13-rc5 and
-both patches applied (Firmware and Kernel).
-
-Today i finally sent you the Busware HUL dongle, so you should receive it
-sometime next week.
-
-Regards,
-Josef
-
-[1] https://github.com/joseffilzmaier/linux/compare/rpi-4.13.y...joseffilzmaier:atusb-busware-hul-4.13
-[2] https://github.com/joseffilzmaier/ben-wpan/compare/busware-hul-final
-
--- 
-Josef Filzmaier
+regards
+Stefan Schmidt
