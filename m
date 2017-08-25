@@ -1,29 +1,40 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from shards.monkeyblade.net ([184.105.139.130]:45292 "EHLO
-        shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751221AbdH1SaS (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 28 Aug 2017 14:30:18 -0400
-Date: Mon, 28 Aug 2017 11:30:15 -0700 (PDT)
-Message-Id: <20170828.113015.1454742226773245453.davem@davemloft.net>
-Subject: Re: [PATCH 2/7] bridge: make ebt_table const
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <1503670907-23221-3-git-send-email-bhumirks@gmail.com>
+Received: from mail-pg0-f66.google.com ([74.125.83.66]:38709 "EHLO
+        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932562AbdHYOWz (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 25 Aug 2017 10:22:55 -0400
+From: Bhumika Goyal <bhumirks@gmail.com>
+Subject: [PATCH 3/7] ieee802154: 6lowpan: make header_ops const
+Date: Fri, 25 Aug 2017 19:51:43 +0530
+Message-Id: <1503670907-23221-4-git-send-email-bhumirks@gmail.com>
+In-Reply-To: <1503670907-23221-1-git-send-email-bhumirks@gmail.com>
 References: <1503670907-23221-1-git-send-email-bhumirks@gmail.com>
-        <1503670907-23221-3-git-send-email-bhumirks@gmail.com>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: bhumirks@gmail.com
-Cc: julia.lawall@lip6.fr, marcel@holtmann.org, gustavo@padovan.org, johan.hedberg@gmail.com, pablo@netfilter.org, kadlec@blackhole.kfki.hu, fw@strlen.de, stephen@networkplumber.org, alex.aring@gmail.com, stefan@osg.samsung.com, kuznet@ms2.inr.ac.ru, yoshfuji@linux-ipv6.org, santosh.shilimkar@oracle.com, trond.myklebust@primarydata.com, anna.schumaker@netapp.com, bfields@fieldses.org, jlayton@poochiereds.net, linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, netfilter-devel@vger.kernel.org, coreteam@netfilter.org, bridge@lists.linux-foundation.org, linux-wpan@vger.kernel.org, linux-rdma@vger.kernel.org, rds-devel@oss.oracle.com, linux-nfs@vger.kernel.org
+To: julia.lawall@lip6.fr, marcel@holtmann.org, gustavo@padovan.org, johan.hedberg@gmail.com, davem@davemloft.net, pablo@netfilter.org, kadlec@blackhole.kfki.hu, fw@strlen.de, stephen@networkplumber.org, alex.aring@gmail.com, stefan@osg.samsung.com, kuznet@ms2.inr.ac.ru, yoshfuji@linux-ipv6.org, santosh.shilimkar@oracle.com, trond.myklebust@primarydata.com, anna.schumaker@netapp.com, bfields@fieldses.org, jlayton@poochiereds.net, linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, netfilter-devel@vger.kernel.org, coreteam@netfilter.org, bridge@lists.linux-foundation.org, linux-wpan@vger.kernel.org, linux-rdma@vger.kernel.org, rds-devel@oss.oracle.com, linux-nfs@vger.kernel.org
+Cc: Bhumika Goyal <bhumirks@gmail.com>
 
-From: Bhumika Goyal <bhumirks@gmail.com>
-Date: Fri, 25 Aug 2017 19:51:42 +0530
+Make this const as it is only stored as a reference in a const field of
+a net_device structure.
 
-> Make this const as it is only passed to a const argument of the function
-> ebt_register_table.
-> 
-> Signed-off-by: Bhumika Goyal <bhumirks@gmail.com>
+Signed-off-by: Bhumika Goyal <bhumirks@gmail.com>
+---
+ net/ieee802154/6lowpan/core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Applied.
+diff --git a/net/ieee802154/6lowpan/core.c b/net/ieee802154/6lowpan/core.c
+index de2661c..974765b 100644
+--- a/net/ieee802154/6lowpan/core.c
++++ b/net/ieee802154/6lowpan/core.c
+@@ -54,7 +54,7 @@
+ 
+ static int open_count;
+ 
+-static struct header_ops lowpan_header_ops = {
++static const struct header_ops lowpan_header_ops = {
+ 	.create	= lowpan_header_create,
+ };
+ 
+-- 
+1.9.1
+
