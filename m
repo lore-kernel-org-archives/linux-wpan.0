@@ -1,38 +1,51 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from ec2-52-27-115-49.us-west-2.compute.amazonaws.com ([52.27.115.49]:51176
-        "EHLO osg.samsung.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1752436AbdHIN0g (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 9 Aug 2017 09:26:36 -0400
-Subject: Re: [PATCH v0 1/2] mac802154: fix header and payload encrypted
-References: <1502126560-24462-1-git-send-email-dvnp@cesar.org.br>
- <7ca3098f-a309-ca09-9e3d-f9c948f1fd67@osg.samsung.com>
- <CAC9NHkkHZJLk7_shZ37jFqp06Gu9Qg1Eu=sGi_259GjhkpSftg@mail.gmail.com>
-From: Stefan Schmidt <stefan@osg.samsung.com>
-Message-ID: <d54b2bff-a91d-2a25-1bf1-59b4bf4db3f2@osg.samsung.com>
-Date: Wed, 9 Aug 2017 15:26:31 +0200
-MIME-Version: 1.0
-In-Reply-To: <CAC9NHkkHZJLk7_shZ37jFqp06Gu9Qg1Eu=sGi_259GjhkpSftg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Received: from mout.gmx.net ([212.227.15.18]:49418 "EHLO mout.gmx.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752563AbdIAX2c (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+        Fri, 1 Sep 2017 19:28:32 -0400
+From: Josef Filzmaier <j.filzmaier@gmx.at>
+Subject: [PATCH bluetooth-next 0/2] *** Firmware patch to support HULUSB ***
+Date: Sat,  2 Sep 2017 01:28:20 +0200
+Message-Id: <20170901232822.31901-1-j.filzmaier@gmx.at>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: =?UTF-8?Q?Di=c3=b3genes_Vila_Nova_Pereira?= <dvnp@cesar.org.br>
-Cc: linux-wpan@vger.kernel.org
+To: linux-wpan@vger.kernel.org
+Cc: Josef Filzmaier <j.filzmaier@gmx.at>
 
-Hello.
+This patch (in combination with the linux kernel patch)
+introduces support for the Busware HUL stick. There are two 
+commits, one that enables UART debugging (for convenience purposes)
+and another that modularizes the firmware to better support
+multiple hardware targets. As the Busware HUL stick uses the
+at86rf212 transceiver there have been a few modifications to
+support this transceiver. Otherwise this board is very similar to the
+already existing atusb and rzusb boards, meaning most of the code
+can be shared. (e.g. it also uses the at90usb1287 microcontroller).
 
-On 08/09/2017 02:49 PM, Diógenes Vila Nova Pereira wrote:
-> Hi Stefan,
-> 
-> So, can you give me time analyze the specifications and to tests at 
-> other platforms no linux?
+Josef Filzmaier (2):
+  atusb/fw: Introduce DEBUG flag
+  atusb/fw: Introduction of a new board named HULUSB
 
-Sure, take all the time you need. Better have something well understood 
-and tested.
+ atusb/fw/Makefile              |  16 +++-
+ atusb/fw/atusb.c               |  11 +++
+ atusb/fw/board.c               |  68 ++++++++++------
+ atusb/fw/board.h               |   9 +++
+ atusb/fw/board_atusb.c         |  40 +++++++++
+ atusb/fw/board_hulusb.c        | 179 +++++++++++++++++++++++++++++++++++++++++
+ atusb/fw/board_hulusb.h        |  66 +++++++++++++++
+ atusb/fw/board_rzusb.c         |  40 +++++++++
+ atusb/fw/ep0.c                 |  15 +++-
+ atusb/fw/include/atusb/atusb.h |   8 ++
+ atusb/fw/include/atusb/ep0.h   |   5 --
+ atusb/fw/mac.c                 |  32 --------
+ atusb/fw/uart.c                |  64 +++++++++++++++
+ atusb/fw/uart.h                |  25 ++++++
+ 14 files changed, 513 insertions(+), 65 deletions(-)
+ create mode 100644 atusb/fw/board_hulusb.c
+ create mode 100644 atusb/fw/board_hulusb.h
+ create mode 100644 atusb/fw/uart.c
+ create mode 100644 atusb/fw/uart.h
 
-You can submit the second patch separately so we can get it applied 
-while you are looking into this one a bit further.
+-- 
+2.14.1
 
-regards
-Stefan Schmidt
