@@ -1,33 +1,45 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mout.gmx.net ([212.227.15.19]:51243 "EHLO mout.gmx.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751624AbdIKMFN (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-        Mon, 11 Sep 2017 08:05:13 -0400
-From: Josef Filzmaier <j.filzmaier@gmx.at>
-Subject: Re: AT86RF212 based USB-Stick (HUL)
-Date: Mon, 11 Sep 2017 14:05:04 +0200
-Message-ID: <26878135.rzNqLzIH56@hella-laptop>
-In-Reply-To: <ea442c4b-98be-5d97-bee2-f964342960f1@osg.samsung.com>
-References: <526ff7aa-6342-4a8e-8278-0d76d897044e@email.android.com> <1650467.HkNtZu56h0@hella-laptop> <ea442c4b-98be-5d97-bee2-f964342960f1@osg.samsung.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+Received: from mout.kundenserver.de ([212.227.17.24]:61145 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751311AbdILKRe (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 12 Sep 2017 06:17:34 -0400
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH] ieee802154: fix gcc-4.9 warnings
+Date: Tue, 12 Sep 2017 12:16:24 +0200
+Message-Id: <20170912101636.3811626-1-arnd@arndb.de>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org
-Cc: Stefan Schmidt <stefan@osg.samsung.com>
+To: Harry Morris <h.morris@cascoda.com>, linuxdev@cascoda.com, Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt <stefan@osg.samsung.com>
+Cc: Arnd Bergmann <arnd@arndb.de>, Marcel Holtmann <marcel@holtmann.org>, "David S. Miller" <davem@davemloft.net>, Markus Elfring <elfring@users.sourceforge.net>, "Gustavo A. R. Silva" <garsilva@embeddedor.com>, Florian Westphal <fw@strlen.de>, Johannes Berg <johannes.berg@intel.com>, Christophe JAILLET <christophe.jaillet@wanadoo.fr>, Colin Ian King <colin.king@canonical.com>, linux-wpan@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hello!
+All older compiler versions up to gcc-4.9 produce these
+harmless warnings:
 
-> You would re-send the updated patches with a v2 or similar in the 
-> subject prefix.
+drivers/net/ieee802154/ca8210.c: In function 'ca8210_skb_tx':
+drivers/net/ieee802154/ca8210.c:1947:9: warning: missing braces around initializer [-Wmissing-braces]
 
-I have corrected the firmware patch and sent it again with a v2 indicator.
-The patch for the kernel is not affected and is now working fine for over a week on my system.
+This changes the syntax to something that works on all versions
+without warnings.
 
-regards
-Josef Filzmaier
+Fixes: ded845a781a5 ("ieee802154: Add CA8210 IEEE 802.15.4 device driver")
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+ drivers/net/ieee802154/ca8210.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-
+diff --git a/drivers/net/ieee802154/ca8210.c b/drivers/net/ieee802154/ca8210.c
+index 24a1eabbbc9d..e6b8ce81a6c3 100644
+--- a/drivers/net/ieee802154/ca8210.c
++++ b/drivers/net/ieee802154/ca8210.c
+@@ -1944,7 +1944,7 @@ static int ca8210_skb_tx(
+ )
+ {
+ 	int status;
+-	struct ieee802154_hdr header = { 0 };
++	struct ieee802154_hdr header = { };
+ 	struct secspec secspec;
+ 	unsigned int mac_len;
+ 
 -- 
-Josef Filzmaier
+2.9.0
+
