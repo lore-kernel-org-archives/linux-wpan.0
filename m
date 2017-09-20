@@ -1,40 +1,60 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from ec2-52-27-115-49.us-west-2.compute.amazonaws.com ([52.27.115.49]:46947
+Received: from ec2-52-27-115-49.us-west-2.compute.amazonaws.com ([52.27.115.49]:46900
         "EHLO osg.samsung.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1751663AbdITMcv (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 20 Sep 2017 08:32:51 -0400
-Subject: Re: [PATCH bluetooth-next v2 1/1] ieee802154: atusb: Driver for
- Busware HUL dongle
-References: <20170914123210.3765-1-j.filzmaier@gmx.at>
- <20170914123210.3765-2-j.filzmaier@gmx.at>
+        with ESMTP id S1751778AbdITMaZ (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 20 Sep 2017 08:30:25 -0400
+Date: Wed, 20 Sep 2017 14:30:09 +0200
 From: Stefan Schmidt <stefan@osg.samsung.com>
-Message-ID: <0c1f69dd-771d-003c-4390-9a25d2995b37@osg.samsung.com>
-Date: Wed, 20 Sep 2017 14:32:43 +0200
+Subject: pull-request: ieee802154 2017-09-20
+Message-ID: <20170920123008.GA876@work.Speedport_W_724V_09011603_05_010>
 MIME-Version: 1.0
-In-Reply-To: <20170914123210.3765-2-j.filzmaier@gmx.at>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Josef Filzmaier <j.filzmaier@gmx.at>, linux-wpan@vger.kernel.org
+To: "David S. Miller" <davem@davemloft.net>
+Cc: linux-wpan@vger.kernel.org, alex.aring@gmail.com, marcel@holtmann.org
 
-Hello.
+Hello Dave.
 
-On 09/14/2017 02:32 PM, Josef Filzmaier wrote:
-> Busware manufactured an USB dongle that is quite similar to
-> the atben and rzusb USB dongles. that are already supported.
-> This patch aims to support the Busware HUL dongle (called
-> hulusb) alongside atusb and rzusb. hulusb is using the
-> at86rf212 transceiver which is specifically designed to
-> support the 700/800/900 MHz wave band.
-> 
-> The source code is heavily inspired by the existing atusb
-> and at86rf2xx drivers.
-> 
-> Signed-off-by: Josef Filzmaier <j.filzmaier@gmx.at>
+Here comes a pull request for ieee802154 changes I have queued up for
+this merge window.
 
-Thanks! This patch has been applied to the wpan-next tree and will be part of the next pull request.
+Normally these have been coming through the bluetooth tree but as this
+three have been falling through the cracks so far and I have to review
+and ack all of them anyway I think it makes sense if I save the
+bluetooth people some work and handle them directly.
+
+Its the first pull request I send to you so please let me know if I did
+something wrong or if you prefer a different format.
 
 regards
 Stefan Schmidt
+
+The following changes since commit 8ca712c373a462cfa1b62272870b6c2c74aa83f9:
+
+  Merge branch 'net-speedup-netns-create-delete-time' (2017-09-19 16:32:24 -0700)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/sschmidt/wpan-next.git ieee802154-for-davem-2017-09-20
+
+for you to fetch changes up to d5dd29e4dafef4baad7bf529ad73cafeb13e1aa8:
+
+  ieee802154: atusb: Driver for Busware HUL dongle (2017-09-20 13:37:16 +0200)
+
+----------------------------------------------------------------
+Support for the hulusb hardware inside the atusb driver by Josef
+Filzmaier and 802.15.4 MAC security compliance fix by Diogenes Pereira.
+----------------------------------------------------------------
+Diogenes Pereira (2):
+      mac802154: replace hardcoded value with macro
+      mac802154: Fix MAC header and payload encrypted
+
+Josef Filzmaier (1):
+      ieee802154: atusb: Driver for Busware HUL dongle
+
+ drivers/net/ieee802154/atusb.c | 317 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++----------------
+ drivers/net/ieee802154/atusb.h |   8 ++++
+ net/mac802154/llsec.c          |  14 ++++--
+ 3 files changed, 295 insertions(+), 44 deletions(-)
