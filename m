@@ -1,60 +1,38 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from ec2-52-27-115-49.us-west-2.compute.amazonaws.com ([52.27.115.49]:46900
-        "EHLO osg.samsung.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1751778AbdITMaZ (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 20 Sep 2017 08:30:25 -0400
-Date: Wed, 20 Sep 2017 14:30:09 +0200
-From: Stefan Schmidt <stefan@osg.samsung.com>
-Subject: pull-request: ieee802154 2017-09-20
-Message-ID: <20170920123008.GA876@work.Speedport_W_724V_09011603_05_010>
-MIME-Version: 1.0
+Received: from coyote.holtmann.net ([212.227.132.17]:35471 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750825AbdITRIg (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 20 Sep 2017 13:08:36 -0400
 Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: pull-request: ieee802154 2017-09-20
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20170920123008.GA876@work.Speedport_W_724V_09011603_05_010>
+Date: Wed, 20 Sep 2017 19:08:34 +0200
+Content-Transfer-Encoding: 8BIT
+Message-Id: <A8275381-2BDA-4F96-B8BD-E50F16554D23@holtmann.org>
+References: <20170920123008.GA876@work.Speedport_W_724V_09011603_05_010>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: "David S. Miller" <davem@davemloft.net>
-Cc: linux-wpan@vger.kernel.org, alex.aring@gmail.com, marcel@holtmann.org
+To: Stefan Schmidt <stefan@osg.samsung.com>
+Cc: "David S. Miller" <davem@davemloft.net>, linux-wpan@vger.kernel.org, Alexander Aring <alex.aring@gmail.com>
 
-Hello Dave.
+Hi Stefan,
 
-Here comes a pull request for ieee802154 changes I have queued up for
-this merge window.
+> Here comes a pull request for ieee802154 changes I have queued up for
+> this merge window.
+> 
+> Normally these have been coming through the bluetooth tree but as this
+> three have been falling through the cracks so far and I have to review
+> and ack all of them anyway I think it makes sense if I save the
+> bluetooth people some work and handle them directly.
+> 
+> Its the first pull request I send to you so please let me know if I did
+> something wrong or if you prefer a different format.
 
-Normally these have been coming through the bluetooth tree but as this
-three have been falling through the cracks so far and I have to review
-and ack all of them anyway I think it makes sense if I save the
-bluetooth people some work and handle them directly.
+that is fine with me since I think the major contention points are gone these days. I think for 6lowpan patches we might still want them go through bluetooth-next so that they are synced properly.
 
-Its the first pull request I send to you so please let me know if I did
-something wrong or if you prefer a different format.
+Regards
 
-regards
-Stefan Schmidt
+Marcel
 
-The following changes since commit 8ca712c373a462cfa1b62272870b6c2c74aa83f9:
-
-  Merge branch 'net-speedup-netns-create-delete-time' (2017-09-19 16:32:24 -0700)
-
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/sschmidt/wpan-next.git ieee802154-for-davem-2017-09-20
-
-for you to fetch changes up to d5dd29e4dafef4baad7bf529ad73cafeb13e1aa8:
-
-  ieee802154: atusb: Driver for Busware HUL dongle (2017-09-20 13:37:16 +0200)
-
-----------------------------------------------------------------
-Support for the hulusb hardware inside the atusb driver by Josef
-Filzmaier and 802.15.4 MAC security compliance fix by Diogenes Pereira.
-----------------------------------------------------------------
-Diogenes Pereira (2):
-      mac802154: replace hardcoded value with macro
-      mac802154: Fix MAC header and payload encrypted
-
-Josef Filzmaier (1):
-      ieee802154: atusb: Driver for Busware HUL dongle
-
- drivers/net/ieee802154/atusb.c | 317 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++----------------
- drivers/net/ieee802154/atusb.h |   8 ++++
- net/mac802154/llsec.c          |  14 ++++--
- 3 files changed, 295 insertions(+), 44 deletions(-)
