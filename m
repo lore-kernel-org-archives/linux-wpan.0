@@ -1,12 +1,12 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from proxima.lasnet.de ([78.47.171.185]:54874 "EHLO
+Received: from proxima.lasnet.de ([78.47.171.185]:54879 "EHLO
         proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752319AbdIVMOZ (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Fri, 22 Sep 2017 08:14:25 -0400
+        with ESMTP id S1752323AbdIVMO0 (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 22 Sep 2017 08:14:26 -0400
 From: Stefan Schmidt <stefan@osg.samsung.com>
-Subject: [PATCH 09/14] ieee802154: ca8210: fix some kernel coding style errors
-Date: Fri, 22 Sep 2017 14:14:00 +0200
-Message-Id: <20170922121405.31789-10-stefan@osg.samsung.com>
+Subject: [PATCH 10/14] ieee802154: ca8210: use __func__ macro for debug messages
+Date: Fri, 22 Sep 2017 14:14:01 +0200
+Message-Id: <20170922121405.31789-11-stefan@osg.samsung.com>
 In-Reply-To: <20170922121405.31789-1-stefan@osg.samsung.com>
 References: <20170922121405.31789-1-stefan@osg.samsung.com>
 Sender: linux-wpan-owner@vger.kernel.org
@@ -14,71 +14,56 @@ List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
 Cc: Alexander Aring <aring@mojatatu.com>, michael.hennerich@analog.com, h.morris@cascoda.com, linuxdev@cascoda.com, varkabhadram@gmail.com, alan@signal11.us, Stefan Schmidt <stefan@osg.samsung.com>
 
-Remove unneeded parentheses and fix format for pointer style.
+Instead of having the function name hard-coded (it might change and we
+forgot to update them in the debug output) we can use __func__ instead
+and also shorter the line so we do not need to break it.
+Found by checkpatch.
 
 Signed-off-by: Stefan Schmidt <stefan@osg.samsung.com>
 ---
- drivers/net/ieee802154/ca8210.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ drivers/net/ieee802154/ca8210.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/net/ieee802154/ca8210.c b/drivers/net/ieee802154/ca8210.c
-index 24a1eabbbc9d..66829055aa8b 100644
+index 66829055aa8b..26e04c9176a4 100644
 --- a/drivers/net/ieee802154/ca8210.c
 +++ b/drivers/net/ieee802154/ca8210.c
-@@ -1303,7 +1303,7 @@ static u8 tdme_checkpibattribute(
- 		break;
- 	/* MAC */
- 	case MAC_BATT_LIFE_EXT_PERIODS:
--		if ((value < 6) || (value > 41))
-+		if (value < 6 || value > 41)
- 			status = MAC_INVALID_PARAMETER;
- 		break;
- 	case MAC_BEACON_PAYLOAD:
-@@ -1319,7 +1319,7 @@ static u8 tdme_checkpibattribute(
- 			status = MAC_INVALID_PARAMETER;
- 		break;
- 	case MAC_MAX_BE:
--		if ((value < 3) || (value > 8))
-+		if (value < 3 || value > 8)
- 			status = MAC_INVALID_PARAMETER;
- 		break;
- 	case MAC_MAX_CSMA_BACKOFFS:
-@@ -1335,7 +1335,7 @@ static u8 tdme_checkpibattribute(
- 			status = MAC_INVALID_PARAMETER;
- 		break;
- 	case MAC_RESPONSE_WAIT_TIME:
--		if ((value < 2) || (value > 64))
-+		if (value < 2 || value > 64)
- 			status = MAC_INVALID_PARAMETER;
- 		break;
- 	case MAC_SUPERFRAME_ORDER:
-@@ -1511,7 +1511,7 @@ static u8 mcps_data_request(
- 	psec = (struct secspec *)(command.pdata.data_req.msdu + msdu_length);
- 	command.length = sizeof(struct mcps_data_request_pset) -
- 		MAX_DATA_SIZE + msdu_length;
--	if (!security || (security->security_level == 0)) {
-+	if (!security || security->security_level == 0) {
- 		psec->security_level = 0;
- 		command.length += 1;
- 	} else {
-@@ -1561,7 +1561,7 @@ static u8 mlme_reset_request_sync(
- 	status = response.pdata.status;
+@@ -924,7 +924,7 @@ static int ca8210_spi_transfer(
+ 	priv = spi_get_drvdata(spi);
+ 	reinit_completion(&priv->spi_transfer_complete);
  
- 	/* reset COORD Bit for Channel Filtering as Coordinator */
--	if (CA8210_MAC_WORKAROUNDS && set_default_pib && (!status)) {
-+	if (CA8210_MAC_WORKAROUNDS && set_default_pib && !status) {
- 		status = tdme_setsfr_request_sync(
- 			0,
- 			CA8210_SFR_MACCON,
-@@ -2369,7 +2369,7 @@ static int ca8210_set_promiscuous_mode(struct ieee802154_hw *hw, const bool on)
- 		MAC_PROMISCUOUS_MODE,
- 		0,
- 		1,
--		(const void*)&on,
-+		(const void *)&on,
- 		priv->spi
- 	);
- 	if (status) {
+-	dev_dbg(&spi->dev, "ca8210_spi_transfer called\n");
++	dev_dbg(&spi->dev, "%s called\n", __func__);
+ 
+ 	cas_ctl = kmalloc(sizeof(*cas_ctl), GFP_ATOMIC);
+ 	if (!cas_ctl)
+@@ -1898,7 +1898,7 @@ static int ca8210_net_rx(struct ieee802154_hw *hw, u8 *command, size_t len)
+ 	unsigned long flags;
+ 	u8 status;
+ 
+-	dev_dbg(&priv->spi->dev, "ca8210_net_rx(), CmdID = %d\n", command[0]);
++	dev_dbg(&priv->spi->dev, "%s: CmdID = %d\n", __func__, command[0]);
+ 
+ 	if (command[0] == SPI_MCPS_DATA_INDICATION) {
+ 		/* Received data */
+@@ -1948,7 +1948,7 @@ static int ca8210_skb_tx(
+ 	struct secspec secspec;
+ 	unsigned int mac_len;
+ 
+-	dev_dbg(&priv->spi->dev, "ca8210_skb_tx() called\n");
++	dev_dbg(&priv->spi->dev, "%s called\n", __func__);
+ 
+ 	/* Get addressing info from skb - ieee802154 layer creates a full
+ 	 * packet
+@@ -2051,7 +2051,7 @@ static int ca8210_xmit_async(struct ieee802154_hw *hw, struct sk_buff *skb)
+ 	struct ca8210_priv *priv = hw->priv;
+ 	int status;
+ 
+-	dev_dbg(&priv->spi->dev, "calling ca8210_xmit_async()\n");
++	dev_dbg(&priv->spi->dev, "calling %s\n", __func__);
+ 
+ 	priv->tx_skb = skb;
+ 	priv->async_tx_pending = true;
 -- 
 2.13.5
 
