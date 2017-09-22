@@ -1,12 +1,12 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from proxima.lasnet.de ([78.47.171.185]:54836 "EHLO
+Received: from proxima.lasnet.de ([78.47.171.185]:54850 "EHLO
         proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752257AbdIVMOT (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Fri, 22 Sep 2017 08:14:19 -0400
+        with ESMTP id S1752257AbdIVMOU (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 22 Sep 2017 08:14:20 -0400
 From: Stefan Schmidt <stefan@osg.samsung.com>
-Subject: [PATCH 03/14] ieee802154: at86rf230: use __func__ macro for debug messages
-Date: Fri, 22 Sep 2017 14:13:54 +0200
-Message-Id: <20170922121405.31789-4-stefan@osg.samsung.com>
+Subject: [PATCH 04/14] ieee802154: atusb: switch from uint8_t to u8
+Date: Fri, 22 Sep 2017 14:13:55 +0200
+Message-Id: <20170922121405.31789-5-stefan@osg.samsung.com>
 In-Reply-To: <20170922121405.31789-1-stefan@osg.samsung.com>
 References: <20170922121405.31789-1-stefan@osg.samsung.com>
 Sender: linux-wpan-owner@vger.kernel.org
@@ -14,67 +14,107 @@ List-ID: <linux-wpan.vger.kernel.org>
 To: linux-wpan@vger.kernel.org
 Cc: Alexander Aring <aring@mojatatu.com>, michael.hennerich@analog.com, h.morris@cascoda.com, linuxdev@cascoda.com, varkabhadram@gmail.com, alan@signal11.us, Stefan Schmidt <stefan@osg.samsung.com>
 
-Instead of having the function name hard-coded (it might change and we
-forgot to update them in the debug output) we can use __func__ instead
-and also shorter the line so we do not need to break it. Also fix an
-extra blank line while being here.
+Switch top the preferred kernel type naming.
 Found by checkpatch.
 
 Signed-off-by: Stefan Schmidt <stefan@osg.samsung.com>
 ---
- drivers/net/ieee802154/at86rf230.c | 13 ++++---------
- 1 file changed, 4 insertions(+), 9 deletions(-)
+ drivers/net/ieee802154/atusb.c | 26 +++++++++++++-------------
+ 1 file changed, 13 insertions(+), 13 deletions(-)
 
-diff --git a/drivers/net/ieee802154/at86rf230.c b/drivers/net/ieee802154/at86rf230.c
-index ea1704a4b4b9..5c48bdb6f678 100644
---- a/drivers/net/ieee802154/at86rf230.c
-+++ b/drivers/net/ieee802154/at86rf230.c
-@@ -1121,8 +1121,7 @@ at86rf230_set_hw_addr_filt(struct ieee802154_hw *hw,
- 	if (changed & IEEE802154_AFILT_SADDR_CHANGED) {
- 		u16 addr = le16_to_cpu(filt->short_addr);
+diff --git a/drivers/net/ieee802154/atusb.c b/drivers/net/ieee802154/atusb.c
+index 115fa3f37a86..a4a326933977 100644
+--- a/drivers/net/ieee802154/atusb.c
++++ b/drivers/net/ieee802154/atusb.c
+@@ -63,7 +63,7 @@ struct atusb {
+ 	struct usb_ctrlrequest tx_dr;
+ 	struct urb *tx_urb;
+ 	struct sk_buff *tx_skb;
+-	uint8_t tx_ack_seq;		/* current TX ACK sequence number */
++	u8 tx_ack_seq;		/* current TX ACK sequence number */
  
--		dev_vdbg(&lp->spi->dev,
--			 "at86rf230_set_hw_addr_filt called for saddr\n");
-+		dev_vdbg(&lp->spi->dev, "%s called for saddr\n", __func__);
- 		__at86rf230_write(lp, RG_SHORT_ADDR_0, addr);
- 		__at86rf230_write(lp, RG_SHORT_ADDR_1, addr >> 8);
- 	}
-@@ -1130,8 +1129,7 @@ at86rf230_set_hw_addr_filt(struct ieee802154_hw *hw,
- 	if (changed & IEEE802154_AFILT_PANID_CHANGED) {
- 		u16 pan = le16_to_cpu(filt->pan_id);
- 
--		dev_vdbg(&lp->spi->dev,
--			 "at86rf230_set_hw_addr_filt called for pan id\n");
-+		dev_vdbg(&lp->spi->dev, "%s called for pan id\n", __func__);
- 		__at86rf230_write(lp, RG_PAN_ID_0, pan);
- 		__at86rf230_write(lp, RG_PAN_ID_1, pan >> 8);
- 	}
-@@ -1140,15 +1138,13 @@ at86rf230_set_hw_addr_filt(struct ieee802154_hw *hw,
- 		u8 i, addr[8];
- 
- 		memcpy(addr, &filt->ieee_addr, 8);
--		dev_vdbg(&lp->spi->dev,
--			 "at86rf230_set_hw_addr_filt called for IEEE addr\n");
-+		dev_vdbg(&lp->spi->dev, "%s called for IEEE addr\n", __func__);
- 		for (i = 0; i < 8; i++)
- 			__at86rf230_write(lp, RG_IEEE_ADDR_0 + i, addr[i]);
- 	}
- 
- 	if (changed & IEEE802154_AFILT_PANC_CHANGED) {
--		dev_vdbg(&lp->spi->dev,
--			 "at86rf230_set_hw_addr_filt called for panc change\n");
-+		dev_vdbg(&lp->spi->dev, "%s called for panc change\n", __func__);
- 		if (filt->pan_coord)
- 			at86rf230_write_subreg(lp, SR_AACK_I_AM_COORD, 1);
- 		else
-@@ -1252,7 +1248,6 @@ at86rf230_set_cca_mode(struct ieee802154_hw *hw,
- 	return at86rf230_write_subreg(lp, SR_CCA_MODE, val);
+ 	/* Firmware variable */
+ 	unsigned char fw_ver_maj;	/* Firmware major version number */
+@@ -107,7 +107,7 @@ static int atusb_control_msg(struct atusb *atusb, unsigned int pipe,
+ 	return ret;
  }
  
--
- static int
- at86rf230_set_cca_ed_level(struct ieee802154_hw *hw, s32 mbm)
+-static int atusb_command(struct atusb *atusb, uint8_t cmd, uint8_t arg)
++static int atusb_command(struct atusb *atusb, u8 cmd, u8 arg)
  {
+ 	struct usb_device *usb_dev = atusb->usb_dev;
+ 
+@@ -116,7 +116,7 @@ static int atusb_command(struct atusb *atusb, uint8_t cmd, uint8_t arg)
+ 				 cmd, ATUSB_REQ_TO_DEV, arg, 0, NULL, 0, 1000);
+ }
+ 
+-static int atusb_write_reg(struct atusb *atusb, uint8_t reg, uint8_t value)
++static int atusb_write_reg(struct atusb *atusb, u8 reg, u8 value)
+ {
+ 	struct usb_device *usb_dev = atusb->usb_dev;
+ 
+@@ -127,12 +127,12 @@ static int atusb_write_reg(struct atusb *atusb, uint8_t reg, uint8_t value)
+ 				 value, reg, NULL, 0, 1000);
+ }
+ 
+-static int atusb_read_reg(struct atusb *atusb, uint8_t reg)
++static int atusb_read_reg(struct atusb *atusb, u8 reg)
+ {
+ 	struct usb_device *usb_dev = atusb->usb_dev;
+ 	int ret;
+-	uint8_t *buffer;
+-	uint8_t value;
++	u8 *buffer;
++	u8 value;
+ 
+ 	buffer = kmalloc(1, GFP_KERNEL);
+ 	if (!buffer)
+@@ -153,11 +153,11 @@ static int atusb_read_reg(struct atusb *atusb, uint8_t reg)
+ 	}
+ }
+ 
+-static int atusb_write_subreg(struct atusb *atusb, uint8_t reg, uint8_t mask,
+-			      uint8_t shift, uint8_t value)
++static int atusb_write_subreg(struct atusb *atusb, u8 reg, u8 mask,
++			      u8 shift, u8 value)
+ {
+ 	struct usb_device *usb_dev = atusb->usb_dev;
+-	uint8_t orig, tmp;
++	u8 orig, tmp;
+ 	int ret = 0;
+ 
+ 	dev_dbg(&usb_dev->dev, "atusb_write_subreg: 0x%02x <- 0x%02x\n",
+@@ -263,10 +263,10 @@ static void atusb_work_urbs(struct work_struct *work)
+ 
+ /* ----- Asynchronous USB -------------------------------------------------- */
+ 
+-static void atusb_tx_done(struct atusb *atusb, uint8_t seq)
++static void atusb_tx_done(struct atusb *atusb, u8 seq)
+ {
+ 	struct usb_device *usb_dev = atusb->usb_dev;
+-	uint8_t expect = atusb->tx_ack_seq;
++	u8 expect = atusb->tx_ack_seq;
+ 
+ 	dev_dbg(&usb_dev->dev, "atusb_tx_done (0x%02x/0x%02x)\n", seq, expect);
+ 	if (seq == expect) {
+@@ -289,7 +289,7 @@ static void atusb_in_good(struct urb *urb)
+ 	struct usb_device *usb_dev = urb->dev;
+ 	struct sk_buff *skb = urb->context;
+ 	struct atusb *atusb = SKB_ATUSB(skb);
+-	uint8_t len, lqi;
++	u8 len, lqi;
+ 
+ 	if (!urb->actual_length) {
+ 		dev_dbg(&usb_dev->dev, "atusb_in: zero-sized URB ?\n");
+@@ -882,7 +882,7 @@ static int atusb_get_and_show_build(struct atusb *atusb)
+ static int atusb_get_and_conf_chip(struct atusb *atusb)
+ {
+ 	struct usb_device *usb_dev = atusb->usb_dev;
+-	uint8_t man_id_0, man_id_1, part_num, version_num;
++	u8 man_id_0, man_id_1, part_num, version_num;
+ 	const char *chip;
+ 	struct ieee802154_hw *hw = atusb->hw;
+ 
 -- 
 2.13.5
 
