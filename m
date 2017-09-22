@@ -1,42 +1,41 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from ec2-52-27-115-49.us-west-2.compute.amazonaws.com ([52.27.115.49]:35194
-        "EHLO osg.samsung.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1751728AbdIUU6r (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 21 Sep 2017 16:58:47 -0400
-Date: Thu, 21 Sep 2017 22:58:41 +0200
+Received: from proxima.lasnet.de ([78.47.171.185]:54961 "EHLO
+        proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752116AbdIVM2x (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 22 Sep 2017 08:28:53 -0400
 From: Stefan Schmidt <stefan@osg.samsung.com>
-Subject: Re: pull-request: ieee802154 2017-09-20
-Message-ID: <20170921205841.GB14244@work.Speedport_W_724V_09011603_05_010>
-References: <20170920123008.GA876@work.Speedport_W_724V_09011603_05_010>
- <20170921.115610.415534136684495388.davem@davemloft.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170921.115610.415534136684495388.davem@davemloft.net>
+Subject: [PATCH] MAINTAINERS: update git tree locations for ieee802154 subsystem
+Date: Fri, 22 Sep 2017 14:28:46 +0200
+Message-Id: <20170922122846.32377-1-stefan@osg.samsung.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: David Miller <davem@davemloft.net>
-Cc: stefan@osg.samsung.com, linux-wpan@vger.kernel.org, alex.aring@gmail.com, marcel@holtmann.org
+To: davem@davemloft.net, linux-wpan@vger.kernel.org
+Cc: Alexander Aring <aring@mojatatu.com>, netdev@vger.kernel.org, Stefan Schmidt <stefan@osg.samsung.com>
 
-Hello.
+Patches for ieee802154 will go through my new trees towards netdev from
+now on. The 6LoWPAN subsystem will stay as is (shared between ieee802154
+and bluetooth) and go through the bluetooth tree as usual.
 
-On Thu, 2017-09-21 at 11:56, David Miller wrote:
-> From: Stefan Schmidt <stefan@osg.samsung.com>
-> Date: Wed, 20 Sep 2017 14:30:09 +0200
-> 
-> > Its the first pull request I send to you so please let me know if I did
-> > something wrong or if you prefer a different format.
-> 
-> This is fine, but you need to send this again with netdev@vger.kernel.org
-> CC:'d properly.
-> 
-> That makes sure everything gets tracked in patchwork and people can see
-> on the netdev list where pull requests came from.
+Signed-off-by: Stefan Schmidt <stefan@osg.samsung.com>
+---
+ MAINTAINERS | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-No idea why I did forgot this. I actually looked at other pull requests on
-netdev as templates. :)
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 2281af4b41b6..fc7313daf4b0 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -6643,8 +6643,8 @@ M:	Alexander Aring <alex.aring@gmail.com>
+ M:	Stefan Schmidt <stefan@osg.samsung.com>
+ L:	linux-wpan@vger.kernel.org
+ W:	http://wpan.cakelab.org/
+-T:	git git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git
+-T:	git git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git
++T:	git git://git.kernel.org/pub/scm/linux/kernel/git/sschmidt/wpan.git
++T:	git git://git.kernel.org/pub/scm/linux/kernel/git/sschmidt/wpan-next.git
+ S:	Maintained
+ F:	net/ieee802154/
+ F:	net/mac802154/
+-- 
+2.13.5
 
-Resend with netdev added.
-
-regards
-Stefan Schmidt
