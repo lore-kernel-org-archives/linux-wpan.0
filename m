@@ -1,41 +1,30 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from proxima.lasnet.de ([78.47.171.185]:54961 "EHLO
-        proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752116AbdIVM2x (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Fri, 22 Sep 2017 08:28:53 -0400
-From: Stefan Schmidt <stefan@osg.samsung.com>
-Subject: [PATCH] MAINTAINERS: update git tree locations for ieee802154 subsystem
-Date: Fri, 22 Sep 2017 14:28:46 +0200
-Message-Id: <20170922122846.32377-1-stefan@osg.samsung.com>
+Received: from shards.monkeyblade.net ([184.105.139.130]:55248 "EHLO
+        shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752158AbdIWB3B (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 22 Sep 2017 21:29:01 -0400
+Date: Fri, 22 Sep 2017 18:29:00 -0700 (PDT)
+Message-Id: <20170922.182900.690770266022989097.davem@davemloft.net>
+Subject: Re: [PATCH] MAINTAINERS: update git tree locations for ieee802154
+ subsystem
+From: David Miller <davem@davemloft.net>
+In-Reply-To: <20170922122846.32377-1-stefan@osg.samsung.com>
+References: <20170922122846.32377-1-stefan@osg.samsung.com>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: davem@davemloft.net, linux-wpan@vger.kernel.org
-Cc: Alexander Aring <aring@mojatatu.com>, netdev@vger.kernel.org, Stefan Schmidt <stefan@osg.samsung.com>
+To: stefan@osg.samsung.com
+Cc: linux-wpan@vger.kernel.org, aring@mojatatu.com, netdev@vger.kernel.org
 
-Patches for ieee802154 will go through my new trees towards netdev from
-now on. The 6LoWPAN subsystem will stay as is (shared between ieee802154
-and bluetooth) and go through the bluetooth tree as usual.
+From: Stefan Schmidt <stefan@osg.samsung.com>
+Date: Fri, 22 Sep 2017 14:28:46 +0200
 
-Signed-off-by: Stefan Schmidt <stefan@osg.samsung.com>
----
- MAINTAINERS | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+> Patches for ieee802154 will go through my new trees towards netdev from
+> now on. The 6LoWPAN subsystem will stay as is (shared between ieee802154
+> and bluetooth) and go through the bluetooth tree as usual.
+> 
+> Signed-off-by: Stefan Schmidt <stefan@osg.samsung.com>
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 2281af4b41b6..fc7313daf4b0 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -6643,8 +6643,8 @@ M:	Alexander Aring <alex.aring@gmail.com>
- M:	Stefan Schmidt <stefan@osg.samsung.com>
- L:	linux-wpan@vger.kernel.org
- W:	http://wpan.cakelab.org/
--T:	git git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git
--T:	git git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git
-+T:	git git://git.kernel.org/pub/scm/linux/kernel/git/sschmidt/wpan.git
-+T:	git git://git.kernel.org/pub/scm/linux/kernel/git/sschmidt/wpan-next.git
- S:	Maintained
- F:	net/ieee802154/
- F:	net/mac802154/
--- 
-2.13.5
-
+Applied.
