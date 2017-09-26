@@ -1,34 +1,65 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from shards.monkeyblade.net ([184.105.139.130]:32780 "EHLO
-        shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750707AbdIWE36 (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Sat, 23 Sep 2017 00:29:58 -0400
-Date: Fri, 22 Sep 2017 21:29:57 -0700 (PDT)
-Message-Id: <20170922.212957.1788701109019802150.davem@davemloft.net>
-Subject: Re: pull-request: ieee802154 2017-09-20
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <20170921205606.GA14244@work.Speedport_W_724V_09011603_05_010>
-References: <20170921205606.GA14244@work.Speedport_W_724V_09011603_05_010>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+Received: from youngberry.canonical.com ([91.189.89.112]:38470 "EHLO
+        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S965948AbdIZNSl (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 26 Sep 2017 09:18:41 -0400
+From: Colin King <colin.king@canonical.com>
+Subject: [PATCH][next] ieee802154: atusb: make two structures static, fixes warnings
+Date: Tue, 26 Sep 2017 14:18:36 +0100
+Message-Id: <20170926131836.15171-1-colin.king@canonical.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: stefan@osg.samsung.com
-Cc: linux-wpan@vger.kernel.org, alex.aring@gmail.com, marcel@holtmann.org, netdev@vger.kernel.org
+To: Stefan Schmidt <stefan@osg.samsung.com>, Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org, netdev@vger.kernel.org
+Cc: kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
 
-From: Stefan Schmidt <stefan@osg.samsung.com>
-Date: Thu, 21 Sep 2017 22:56:07 +0200
+From: Colin Ian King <colin.king@canonical.com>
 
-> Here comes a pull request for ieee802154 changes I have queued up for
-> this merge window.
-> 
-> Normally these have been coming through the bluetooth tree but as this
-> three have been falling through the cracks so far and I have to review
-> and ack all of them anyway I think it makes sense if I save the
-> bluetooth people some work and handle them directly.
-> 
-> Its the first pull request I send to you so please let me know if I did
-> something wrong or if you prefer a different format.
+The arrays atusb_chip_data and hulusb_chip_data are local to the source
+and do not need to be in global scope, so make them static. Also
+remove unnecessary forward declaration of atusb_chip_data.
 
-Pulled, thanks.
+Cleans up sparse warnings:
+symbol 'atusb_chip_data' was not declared. Should it be static?
+symbol 'hulusb_chip_data' was not declared. Should it be static?
+
+Signed-off-by: Colin Ian King <colin.king@canonical.com>
+---
+ drivers/net/ieee802154/atusb.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/net/ieee802154/atusb.c b/drivers/net/ieee802154/atusb.c
+index 115fa3f37a86..8b0718de568f 100644
+--- a/drivers/net/ieee802154/atusb.c
++++ b/drivers/net/ieee802154/atusb.c
+@@ -45,8 +45,6 @@
+ #define ATUSB_ALLOC_DELAY_MS	100	/* delay after failed allocation */
+ #define ATUSB_TX_TIMEOUT_MS	200	/* on the air timeout */
+ 
+-struct atusb_chip_data;
+-
+ struct atusb {
+ 	struct ieee802154_hw *hw;
+ 	struct usb_device *usb_dev;
+@@ -767,14 +765,14 @@ atusb_set_promiscuous_mode(struct ieee802154_hw *hw, const bool on)
+ 	return 0;
+ }
+ 
+-struct atusb_chip_data atusb_chip_data = {
++static struct atusb_chip_data atusb_chip_data = {
+ 	.t_channel_switch = 1,
+ 	.rssi_base_val = -91,
+ 	.set_txpower = atusb_set_txpower,
+ 	.set_channel = atusb_set_channel,
+ };
+ 
+-struct atusb_chip_data hulusb_chip_data = {
++static struct atusb_chip_data hulusb_chip_data = {
+ 	.t_channel_switch = 11,
+ 	.rssi_base_val = -100,
+ 	.set_txpower = hulusb_set_txpower,
+-- 
+2.14.1
+
