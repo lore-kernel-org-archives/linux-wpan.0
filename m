@@ -1,263 +1,53 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-lf0-f65.google.com ([209.85.215.65]:54760 "EHLO
-        mail-lf0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752853AbdJTKWs (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Fri, 20 Oct 2017 06:22:48 -0400
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Subject: [RFC 7/7] ipsp: Add support for bt_6lo
-Date: Fri, 20 Oct 2017 13:22:36 +0300
-Message-Id: <20171020102236.17499-8-luiz.dentz@gmail.com>
-In-Reply-To: <20171020102236.17499-1-luiz.dentz@gmail.com>
-References: <20171020102236.17499-1-luiz.dentz@gmail.com>
+Received: from proxima.lasnet.de ([78.47.171.185]:56509 "EHLO
+        proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750880AbdJRWDo (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 18 Oct 2017 18:03:44 -0400
+From: Stefan Schmidt <stefan@datenfreihafen.org>
+Subject: pull-request: ieee802154 2017-10-18
+Date: Thu, 19 Oct 2017 00:03:33 +0200
+Message-Id: <20171018220333.28378-1-stefan@datenfreihafen.org>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: patrik.flykt@linux.intel.com, linux-wpan@vger.kernel.org
+To: davem@davemloft.net
+Cc: linux-wpan@vger.kernel.org, alex.aring@gmail.com, marcel@holtmann.org, netdev@vger.kernel.org, Stefan Schmidt <stefan@osg.samsung.com>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+From: Stefan Schmidt <stefan@osg.samsung.com>
 
-This makes use of bt_6lo instance to create interfaces and attach
-channels to them.
----
- profiles/network/ipsp.c | 131 ++++++++++++++++++++++++++++++++++++++++--------
- 1 file changed, 111 insertions(+), 20 deletions(-)
+Hello Dave.
 
-diff --git a/profiles/network/ipsp.c b/profiles/network/ipsp.c
-index 28683f4b6..f6bace956 100644
---- a/profiles/network/ipsp.c
-+++ b/profiles/network/ipsp.c
-@@ -40,6 +40,7 @@
- #include "src/shared/queue.h"
- #include "src/shared/gatt-db.h"
- #include "src/shared/gatt-client.h"
-+#include "src/shared/6lo.h"
- #include "src/plugin.h"
- #include "src/adapter.h"
- #include "src/device.h"
-@@ -50,8 +51,12 @@
- #define IPSP_UUID16 0x1820
- #define IPSP_PSM 0x0023
- #define IPSP_MTU 1280
-+#define IF_PREFIX "bt"
-+
-+static struct bt_6lo *lo;
- 
- struct ipsp_session {
-+	int ifindex;
- 	GIOChannel *io;
- 	unsigned int id;
- };
-@@ -63,36 +68,49 @@ static void ipsp_cleanup(struct btd_service *service)
- 	if (!session)
- 		return;
- 
--	btd_service_set_user_data(service, NULL);
--
--	if (session->id > 0)
-+	if (session->id > 0) {
- 		g_source_remove(session->id);
-+		session->id = 0;
-+	}
- 
--	g_io_channel_unref(session->io);
-+	if (session->io) {
-+		g_io_channel_unref(session->io);
-+		session->io = NULL;
-+	}
- }
- 
- static int ipsp_probe(struct btd_service *service)
- {
- 	struct btd_device *device = btd_service_get_device(service);
- 	const char *path = device_get_path(device);
-+	struct ipsp_session *session;
- 
- 	DBG("path %s", path);
- 
-+	session = new0(struct ipsp_session, 1);
-+
-+	/* Attach session to the service */
-+	btd_service_set_user_data(service, session);
-+
- 	return 0;
- }
- 
- static void ipsp_remove(struct btd_service *service)
- {
- 	struct btd_device *device = btd_service_get_device(service);
-+	struct ipsp_session *session = btd_service_get_user_data(service);
- 	const char *path = device_get_path(device);
- 
- 	DBG("path %s", path);
- 
- 	ipsp_cleanup(service);
-+
-+	btd_service_set_user_data(service, NULL);
-+
-+	g_free(session);
- }
- 
--static gboolean ipsp_session(GIOChannel *chan, GIOCondition cond,
--				gpointer data)
-+static gboolean ipsp_hup(GIOChannel *chan, GIOCondition cond, gpointer data)
- {
- 	struct btd_service *service = data;
- 
-@@ -112,19 +130,38 @@ static void ipsp_connect(GIOChannel *io, GError *err, gpointer user_data)
- {
- 	struct btd_service *service = user_data;
- 	struct ipsp_session *session = btd_service_get_user_data(service);
-+	GError *gerr = NULL;
-+	bdaddr_t src, dst;
-+	int fd;
- 
- 	if (err) {
- 		DBG("%s", err->message);
--
- 		ipsp_cleanup(service);
-+		btd_service_connecting_complete(service, -EIO);
-+		return;
-+	}
-+
-+	bt_io_get(io, &gerr, BT_IO_OPT_SOURCE_BDADDR, &src,
-+					BT_IO_OPT_DEST_BDADDR, &dst,
-+					BT_IO_OPT_INVALID);
-+	if (gerr) {
-+		error("bt_io_get: %s", gerr->message);
-+		g_error_free(gerr);
-+		g_io_channel_unref(io);
-+		return;
-+	}
-+
-+	fd = g_io_channel_unix_get_fd(io);
- 
-+	if (bt_6lo_attach(lo, src.b, fd, dst.b) < 0) {
-+		DBG("Unable to attach channel");
-+		ipsp_cleanup(service);
- 		btd_service_connecting_complete(service, -EIO);
- 		return;
- 	}
- 
--	session->id = g_io_add_watch(io,
--				G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL,
--				(GIOFunc) ipsp_session, service);
-+	session->id = g_io_add_watch(io, G_IO_ERR | G_IO_HUP | G_IO_NVAL,
-+					(GIOFunc) ipsp_hup, service);
- 
- 	g_io_channel_unref(session->io);
- 	session->io = NULL;
-@@ -144,10 +181,10 @@ static int ipsp_accept(struct btd_service *service)
- {
- 	struct btd_device *device = btd_service_get_device(service);
- 	struct btd_adapter *adapter = device_get_adapter(device);
-+	struct ipsp_session *session = btd_service_get_user_data(service);
- 	struct gatt_db *db = btd_device_get_gatt_db(device);
- 	bool found = false;
- 	bt_uuid_t ipsp_uuid;
--	struct ipsp_session *session;
- 
- 	DBG("path %s", device_get_path(device));
- 
-@@ -159,11 +196,8 @@ static int ipsp_accept(struct btd_service *service)
- 		return -EINVAL;
- 	}
- 
--	session = g_new0(struct ipsp_session, 1);
--	if (!session) {
--		error("Unable to allocate IPSP session");
--		return -ENOMEM;
--	}
-+	if (session->io)
-+		return -EINPROGRESS;
- 
- 	/* Connect L2CAP channel */
- 	session->io = bt_io_connect(ipsp_connect, service, NULL, NULL,
-@@ -184,9 +218,6 @@ static int ipsp_accept(struct btd_service *service)
- 		return -EIO;
- 	}
- 
--	/* Attach session to the service */
--	btd_service_set_user_data(service, session);
--
- 	return 0;
- }
- 
-@@ -213,14 +244,74 @@ static struct btd_profile ipsp_profile = {
- 	.disconnect	= ipsp_disconnect,
- };
- 
-+static int net_6lo_probe(struct btd_adapter *adapter)
-+{
-+	uint16_t index = btd_adapter_get_index(adapter);
-+	const bdaddr_t *addr = btd_adapter_get_address(adapter);
-+	char *ifname;
-+	int err;
-+
-+	DBG("");
-+
-+	ifname = g_strdup_printf("%s%u", IF_PREFIX, index);
-+
-+	err = bt_6lo_add(lo, ifname, addr->b);
-+
-+	g_free(ifname);
-+
-+	return err;
-+}
-+
-+static void net_6lo_remove(struct btd_adapter *adapter)
-+{
-+	const bdaddr_t *addr = btd_adapter_get_address(adapter);
-+
-+	DBG("");
-+
-+	bt_6lo_remove(lo, addr->b);
-+}
-+
-+static struct btd_adapter_driver net_6lo_driver = {
-+	.name	= "network-6lo",
-+	.probe	= net_6lo_probe,
-+	.remove	= net_6lo_remove,
-+};
-+
-+static void net_6lo_debug(const char *str, void *user_data)
-+{
-+	DBG("%s", str);
-+}
-+
- static int ipsp_init(void)
- {
--	return btd_profile_register(&ipsp_profile);
-+	int err;
-+
-+	lo = bt_6lo_new_default();
-+	if (!lo)
-+		return -ENOTSUP;
-+
-+	bt_6lo_set_debug(lo, net_6lo_debug, NULL, NULL);
-+
-+	err = btd_register_adapter_driver(&net_6lo_driver);
-+	if (err < 0) {
-+		bt_6lo_unref(lo);
-+		return err;
-+	}
-+
-+	err = btd_profile_register(&ipsp_profile);
-+	if (err < 0) {
-+		btd_unregister_adapter_driver(&net_6lo_driver);
-+		bt_6lo_unref(lo);
-+	}
-+
-+	return err;
- }
- 
- static void ipsp_exit(void)
- {
- 	btd_profile_unregister(&ipsp_profile);
-+	btd_unregister_adapter_driver(&net_6lo_driver);
-+	bt_6lo_unref(lo);
- }
- 
- BLUETOOTH_PLUGIN_DEFINE(ipsp, VERSION, BLUETOOTH_PLUGIN_PRIORITY_DEFAULT,
--- 
-2.13.6
+Please find below a pull request from the ieee802154 subsystem for net-next.
 
+regards
+Stefan Schmidt
+
+The following changes since commit b9f1f1ce866c28e3d9b86202441b220244754a69:
+
+  tcp: fix tcp_xmit_retransmit_queue() after rbtree introduction (2017-10-18 14:19:26 +0100)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/sschmidt/wpan-next.git ieee802154-for-davem-2017-10-18
+
+for you to fetch changes up to 396665e8320987ff43b20a62a6a1cdae57aa1cc1:
+
+  Merge remote-tracking branch 'net-next/master' (2017-10-18 17:40:18 +0200)
+
+----------------------------------------------------------------
+A warning fix from Colin King and a typo fix from Xue Liu. Bundled together with
+a fixed firmware version check in the atusb driver.
+
+----------------------------------------------------------------
+Colin Ian King (1):
+      ieee802154: atusb: make two structures static, fixes warnings
+
+Stefan Schmidt (2):
+      ieee802154: atusb: fix firmware version check to enable frame retries
+      Merge remote-tracking branch 'net-next/master'
+
+Xue Liu (1):
+      ieee802154: netlink: fix typo of the name of struct genl_ops
+
+ drivers/net/ieee802154/atusb.c | 8 +++-----
+ net/ieee802154/netlink.c       | 6 +++---
+ 2 files changed, 6 insertions(+), 8 deletions(-)
