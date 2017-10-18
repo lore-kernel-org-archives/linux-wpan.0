@@ -1,170 +1,194 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mga06.intel.com ([134.134.136.31]:20031 "EHLO mga06.intel.com"
+Received: from mga03.intel.com ([134.134.136.65]:58197 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752411AbdJ0KTQ (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-        Fri, 27 Oct 2017 06:19:16 -0400
-Message-ID: <1509099550.18015.13.camel@linux.intel.com>
-Subject: Re: [RFC 3/3] tun: Add 6LoWPAN compression/decompression to tun
- driver
+        id S932333AbdJRMGU (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+        Wed, 18 Oct 2017 08:06:20 -0400
 From: Patrik Flykt <patrik.flykt@linux.intel.com>
-Date: Fri, 27 Oct 2017 13:19:10 +0300
-In-Reply-To: <CAOHTApijss4n7r6tr7oMdGGduzVs-Hx=s0r5uL4+ACX1d=ePFw@mail.gmail.com>
-References: <20171018120615.24126-3-patrik.flykt@linux.intel.com>
-         <20171018120615.24126-4-patrik.flykt@linux.intel.com>
-         <20171018122705.25478-1-patrik.flykt@linux.intel.com>
-         <CAOHTApijss4n7r6tr7oMdGGduzVs-Hx=s0r5uL4+ACX1d=ePFw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-Mime-Version: 1.0
+Subject: [RFC 3/3] tun: Add 6LoWPAN compression/decompression to tun driver
+Date: Wed, 18 Oct 2017 15:06:15 +0300
+Message-Id: <20171018120615.24126-4-patrik.flykt@linux.intel.com>
+In-Reply-To: <20171018120615.24126-1-patrik.flykt@linux.intel.com>
+References: <20171018120615.24126-1-patrik.flykt@linux.intel.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <aring@mojatatu.com>
-Cc: linux-bluetooth@vger.kernel.org, linux-wpan - ML <linux-wpan@vger.kernel.org>, luiz.von.dentz@intel.com, Jamal Hadi Salim <hadi@mojatatu.com>, Stefan Schmidt <stefan@osg.samsung.com>, mcr@sandelman.ca
+To: linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org
+Cc: luiz.von.dentz@intel.com
 
+Define a new IFF_6LO flag for the tun/tap driver that enables 6LoWPAN
+compression/decompression for tap devices. This is achieved by calling
+lowpan_header_compress once the sk_buff is destined for user space and
+calling lowpan_header_decompress when the user space writes packets to
+kernel. A copy of the ethernet MAC headers are needed both ways, as
+the 6LoWPAN compression may end up expanding the header size by one
+byte in the worst case.
 
-	Hi Alex,
+LOWPAN_IPHC_MAX_HC_BUF_LEN more bytes are added to sk_buff headroom
+to ensure there will be enough bytes to push headers to. This is
+probably an overkill and probably done wrongly anyway.
 
-On Thu, 2017-10-26 at 10:54 -0400, Alexander Aring wrote:
-> LOWPAN_IPHC_MAX_HC_BUF_LEN more bytes are added to sk_buff headroom
-> > to ensure there will be enough bytes to push headers to. This is
-> > probably an overkill and probably done wrongly anyway.
-> > 
-> 
-> This define should be removed because there exists no case where the
-> compression will be larger than the ipv6 header and vice versa.
+An ethernet MAC header is added in front of the (compressed) IPv6
+datagram in both directions; no such transport exists for 6LoWPAN,
+but this is just an example implementation trying to explain the
+idea behind the BTLE handling in user space and the 6LoWPAN
+compression and decompression in kernel space. Thus the tun/tap
+driver comes in handy as the victim of the demonstration.
 
-Ok, good to know. I could not convince myself otherwise, so I took a
-shot at it with a really big cannon. I will remove this from any future
-iterations.
+Signed-off-by: Patrik Flykt <patrik.flykt@linux.intel.com>
+---
+ drivers/net/tun.c           | 61 +++++++++++++++++++++++++++++++++++++++++++--
+ include/uapi/linux/if_tun.h |  1 +
+ 2 files changed, 60 insertions(+), 2 deletions(-)
 
-> > An ethernet MAC header is added in front of the (compressed) IPv6
-> > datagram in both directions; no such transport exists for 6LoWPAN,
-> > but this is just an example implementation trying to explain the
-> > idea behind the BTLE handling in user space and the 6LoWPAN
-> > compression and decompression in kernel space. Thus the tun/tap
-> > driver comes in handy as the victim of the demonstration.
-> 
-> Sorry but this really scares me.
-
-The header format should of course take 802.15.4 and Bluetooth into
-account, but for the time being this was the easiest wrt time that I
-could implement and simplest to understand. See 
-https://marc.info/?l=linux-wpan&m=150849496308755&w=2 how it is all
-used together in Luiz' patch set.
-
-Do we have a user space entity for 802.15.4 similar to Bluez that needs
-to do the same thing? If yes, the different address lengths will then
-mandate a new header format to be used that fits both technologies and
-8, 6 and 2 byte MAC addresses.
-
-> The kernel use 6LoWPAN IPHC for
-> ethernet (as mac header information) and you doing BTLE/L2CAP stuff
-> in user space which is not anymore for your original use-case which
-> is "ethernet".
-
-It's actually the other way round. BTLE/IPSP requires 6LoWPAN
-copmression in RFC 7668. Those BTLE/IPSP encapsulated 6LoWPAN
-compressed IPv6 packets need to end up somewhere, and as Bluetooth uses
-otherwise "ethernet compatible" MAC addresses, it's really easy to
-write an ethernet header in front and have the rest of the Linux kernel
-to forward it, be it via a bridge or plain IP routing.
-
-> This might work for now, because only address handling is used in
-> IPHC as MAC header information and eth/btle use the same address
-> length (besides that the address is not always the same and BTLE is
-> not a EUI-48 address with multicast bit etc.)
-
-Yes, the address generation is different from 802.15.4, see RFC 7668,
-Section 3.2.2.
-
-> You cannot simple use MAC X handling in kernelspace and use then MAC
-> handling Y in userspace - this will not work for long time.
-
-Sending ethernet frames stuffed with 6LoWPAN is not a generally good
-idea, its just easy for demonstration purposes. As above, a new header
-format of expressing MAC addresses is probably the way to go?
-
-> I already
-> fight with UDP based protocols in 802.15.4 6LoWPAN who depends on
-> 802.15.4 MAC information which are not just addressing information. 
-
-Quickly looking into UDP header compression didn't reveal any further
-dependencies on MAC addressing, which specification did you have in
-mind wrt UDP or similar layer headers?
+diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+index 3c9985f29950..8770ad46d3ef 100644
+--- a/drivers/net/tun.c
++++ b/drivers/net/tun.c
+@@ -66,6 +66,7 @@
+ #include <linux/nsproxy.h>
+ #include <linux/virtio_net.h>
+ #include <linux/rcupdate.h>
++#include <net/6lowpan.h>
+ #include <net/net_namespace.h>
+ #include <net/netns/generic.h>
+ #include <net/rtnetlink.h>
+@@ -227,6 +228,8 @@ struct tun_struct {
+ 	u32 rx_batched;
+ 	struct tun_pcpu_stats __percpu *pcpu_stats;
+ 	struct bpf_prog __rcu *xdp_prog;
++
++	struct lowpan_dev       ldev;
+ };
  
-> If they need more bluetooth related information there you have no
-> possibility to get them. The same for next header compression which
-> might want more MAC information than just addressing for bluetooth.
+ #ifdef CONFIG_TUN_VNET_CROSS_LE
+@@ -975,6 +978,9 @@ static void tun_set_headroom(struct net_device *dev, int new_hr)
+ 		new_hr = NET_SKB_PAD;
+ 
+ 	tun->align = new_hr;
++
++	if ((tun->flags & (IFF_TAP|IFF_6LO)) == (IFF_TAP|IFF_6LO))
++		tun->align += LOWPAN_IPHC_MAX_HC_BUF_LEN;
+ }
+ 
+ static void
+@@ -1515,6 +1521,27 @@ static ssize_t tun_get_user(struct tun_struct *tun, struct tun_file *tfile,
+ 		skb->dev = tun->dev;
+ 		break;
+ 	case IFF_TAP:
++		if (tun->flags & IFF_6LO) {
++			struct ethhdr eth;
++
++			skb_reset_mac_header(skb);
++			memcpy(&eth, skb_mac_header(skb), sizeof(eth));
++
++			skb_pull(skb, sizeof(struct ethhdr));
++			skb_reset_network_header(skb);
++
++			if (lowpan_header_decompress(skb, &tun->ldev,
++							tun->dev->dev_addr,
++							&eth.h_source) < 0) {
++				this_cpu_inc(tun->pcpu_stats->rx_dropped);
++				kfree_skb(skb);
++				return -EINVAL;
++			}
++
++			memcpy(skb_push(skb, sizeof(eth)), &eth, sizeof(eth));
++			skb_reset_mac_header(skb);
++		}
++
+ 		skb->protocol = eth_type_trans(skb, tun->dev);
+ 		break;
+ 	}
+@@ -1596,6 +1623,25 @@ static ssize_t tun_put_user(struct tun_struct *tun,
+ 	int vlan_hlen = 0;
+ 	int vnet_hdr_sz = 0;
+ 
++	if ((tun->flags & (IFF_6LO | IFF_TAP)) == (IFF_6LO | IFF_TAP) &&
++			skb->protocol == htons(ETH_P_IPV6)) {
++		struct ethhdr eth;
++		int err;
++
++		memcpy(&eth, skb_mac_header(skb), sizeof(eth));
++
++		skb_pull(skb, sizeof(struct ethhdr));
++		skb_reset_network_header(skb);
++
++		err = lowpan_header_compress(skb, &tun->ldev, &eth.h_dest,
++					tun->dev->dev_addr);
++		if (err < 0)
++			return -EINVAL;
++
++		memcpy(skb_push(skb, sizeof(eth)), &eth, sizeof(eth));
++		skb_reset_mac_header(skb);
++	}
++
+ 	if (skb_vlan_tag_present(skb))
+ 		vlan_hlen = VLAN_HLEN;
+ 
+@@ -1904,7 +1950,8 @@ static struct proto tun_proto = {
+ 
+ static int tun_flags(struct tun_struct *tun)
+ {
+-	return tun->flags & (TUN_FEATURES | IFF_PERSIST | IFF_TUN | IFF_TAP);
++	return tun->flags & (TUN_FEATURES | IFF_PERSIST | IFF_TUN | IFF_TAP |
++		IFF_6LO);
+ }
+ 
+ static ssize_t tun_show_flags(struct device *dev, struct device_attribute *attr,
+@@ -1974,6 +2021,9 @@ static int tun_set_iff(struct net *net, struct file *file, struct ifreq *ifr)
+ 		    !!(tun->flags & IFF_MULTI_QUEUE))
+ 			return -EINVAL;
+ 
++		if (ifr->ifr_flags & IFF_6LO && !(ifr->ifr_flags & IFF_TAP))
++			return -EINVAL;
++
+ 		if (tun_not_capable(tun))
+ 			return -EPERM;
+ 		err = security_tun_dev_open(tun->security);
+@@ -2013,9 +2063,14 @@ static int tun_set_iff(struct net *net, struct file *file, struct ifreq *ifr)
+ 			/* TAP device */
+ 			flags |= IFF_TAP;
+ 			name = "tap%d";
++			if (ifr->ifr_flags & IFF_6LO)
++				flags |= IFF_6LO;
+ 		} else
+ 			return -EINVAL;
+ 
++		if (ifr->ifr_flags & IFF_6LO && !(ifr->ifr_flags & IFF_TAP))
++			return -EINVAL;
++
+ 		if (*ifr->ifr_name)
+ 			name = ifr->ifr_name;
+ 
+@@ -2054,6 +2109,8 @@ static int tun_set_iff(struct net *net, struct file *file, struct ifreq *ifr)
+ 		if (err < 0)
+ 			goto err_free_stat;
+ 
++		lowpan_initialize_ctx(&tun->ldev, LOWPAN_LLTYPE_BTLE);
++
+ 		tun_net_init(dev);
+ 		tun_flow_init(tun);
+ 
+@@ -2257,7 +2314,7 @@ static long __tun_chr_ioctl(struct file *file, unsigned int cmd,
+ 		 * This is needed because we never checked for invalid flags on
+ 		 * TUNSETIFF.
+ 		 */
+-		return put_user(IFF_TUN | IFF_TAP | TUN_FEATURES,
++		return put_user(IFF_TUN | IFF_TAP | IFF_6LO | TUN_FEATURES,
+ 				(unsigned int __user*)argp);
+ 	} else if (cmd == TUNSETQUEUE)
+ 		return tun_set_queue(file, &ifr);
+diff --git a/include/uapi/linux/if_tun.h b/include/uapi/linux/if_tun.h
+index 3cb5e1d85ddd..6e515c606754 100644
+--- a/include/uapi/linux/if_tun.h
++++ b/include/uapi/linux/if_tun.h
+@@ -60,6 +60,7 @@
+ /* TUNSETIFF ifr flags */
+ #define IFF_TUN		0x0001
+ #define IFF_TAP		0x0002
++#define IFF_6LO         0x0010
+ #define IFF_NO_PI	0x1000
+ /* This flag has no real effect */
+ #define IFF_ONE_QUEUE	0x2000
+-- 
+2.11.0
 
-There are no additional dependencies or even planned ones from 6LoWPAN
-to Bluetooth that I'm aware of. So I'd go with the assumption that
-6LoWPAN will know only of the MAC addresses and the (MAC layer) data
-length, with the rest of the information being on IP(v6) level.
-
-> > +                       if (lowpan_header_decompress(skb, &tun-
-> > >ldev,
-> > +                                                       tun->dev-
-> > >dev_addr,
-> > +                                                       &eth.h_sour
-> > ce) < 0) {
-> 
-> This will make a module dependency of 6lowpan_iphc for the tap
-> driver. I am pretty sure that the tap driver people doesn't like
-> that.
-
-Ok, needs to be adressed.
-
-> Which
-> brings me to another issue with this patch:
-> Why you don't create a virtual lowpan interface on top of the tap
-> device. This handling is _incredibly_ against our design to have a
-> 6LoWPAN interface device type for the user space.
-> Now we have will have a tap device which makes internally 6LoWPAN
-> handling but is not visible as 6LoWPAN interface in the user space,
-> this will confuse 6LoWPAN user space applications.
-
-The only user space application that will know of 6LoWPAN compression
-being applied is Bluez. There are zero parameters that can be tuned, as
-Bluetooth specifies no configurable knobs for the 6LoWPAN IPv6
-datagrams that are transported over BTLE/IPSP. The Bluetooth
-specification relies on RFC 7668 getting the IPv6 details in sync end
-to end.
-
-What, if any, user space application would be able to manipulate a
-Bluetooth 6LoWPAN interface and why? Much like a VPN with compression,
-Bluetooth is by its nature tunneling 6LoWPAN IPv6 over BTLE/IPSP so
-there is no inherent need of a device driver specific for handling
-6LoWPAN.
-
-> What our design is (just to remember):
->  - Ethernet interface (MAC/6LoWPAN view, before adaption)
->  - 6LoWPAN interface (IPv6 view, after adaption)
-> 
-> I am pretty sure you can run your above changes transparently
-> separated of TAP driver by adding a 6LoWPAN interface on top. This
-> will also make no dependency to the TAP driver.
-
-Probably. But that also means there is some other user space
-application that can somehow manipulate such an interface. But for
-Bluetooth there already is Bluez that takes care of setting up and
-tearing down connections, si there isn't much need of any other
-application to control or configure BTLE/IPSP interfaces?
-
-> I guess what you want is a TAP interface which is NOT ethernet. It
-> need to get some special MAC information for your subsystem which is
-> BTLE. Not using ethernet here. To have the assumption here "it will
-> work because the address length is the same" is simple wrong, they
-> will be more use-cases where upper-layers need to have special MAC
-> information belongs to your link-layer subsystem.
-
-So it does sound like we do want a decent header for 6LowPAN traffic
-which can take both 802.15.4 and Bluetooth systems into account when
-dealing with the TAP file descriptor pulling the packets to/from user
-space, right? The end result in the kernel should be ethernet MAC
-frames for Bluetooth for maximum compatibility with all other
-networking subsystems, and with 802.15.4 frames for IEEE 802.15.4?
-
-
-Cheers,
-
-	Patrik
