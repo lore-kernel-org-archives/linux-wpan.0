@@ -1,49 +1,40 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from gateway30.websitewelcome.com ([192.185.180.41]:43589 "EHLO
-        gateway30.websitewelcome.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1751539AbdJaHD7 (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>);
-        Tue, 31 Oct 2017 03:03:59 -0400
-Received: from cm16.websitewelcome.com (cm16.websitewelcome.com [100.42.49.19])
-        by gateway30.websitewelcome.com (Postfix) with ESMTP id 5EE3932BFFA
-        for <linux-wpan@vger.kernel.org>; Tue, 31 Oct 2017 01:31:33 -0500 (CDT)
-Date: Tue, 31 Oct 2017 01:31:27 -0500
-From: "Gustavo A. R. Silva" <garsilva@embeddedor.com>
-Subject: [PATCH] ieee802154: mrf24j40: fix incorrect mask in mrf24j40_stop
-Message-ID: <20171031063127.GA6032@embeddedor.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Received: from mail-wr0-f194.google.com ([209.85.128.194]:46502 "EHLO
+        mail-wr0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751395AbdJaLXB (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 31 Oct 2017 07:23:01 -0400
+Received: by mail-wr0-f194.google.com with SMTP id l1so15602407wrc.3
+        for <linux-wpan@vger.kernel.org>; Tue, 31 Oct 2017 04:23:00 -0700 (PDT)
+From: harrymorris12@gmail.com
+Subject: [PATCH] MAINTAINERS: Update ca8210 driver contact emails
+Date: Tue, 31 Oct 2017 11:22:06 +0000
+Message-Id: <20171031112206.2952-1-h.morris@cascoda.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alan Ott <alan@signal11.us>, Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt <stefan@osg.samsung.com>
-Cc: linux-wpan@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Julia Lawall <julia.lawall@lip6.fr>, "Gustavo A. R. Silva" <garsilva@embeddedor.com>
+To: linux-wpan@vger.kernel.org
+Cc: alex.aring@gmail.com, stefan@osg.samsung.com, Harry Morris <h.morris@cascoda.com>
 
-It seems that this is a copy/paste error and the proper bit masking is:
-BIT_TXNIE | BIT_RXIE
+From: Harry Morris <h.morris@cascoda.com>
 
-This issue was detected with the help of Coccinelle.
+Remove non-functioning secondary email address from maintainer information.
 
-Reported-by: Julia Lawall <julia.lawall@lip6.fr>
-Signed-off-by: Gustavo A. R. Silva <garsilva@embeddedor.com>
-Fixes: 7d840545e5b9 ("mrf24j40: replace magic numbers")
+Signed-off-by: Harry Morris <h.morris@cascoda.com>
 ---
- drivers/net/ieee802154/mrf24j40.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ MAINTAINERS | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/drivers/net/ieee802154/mrf24j40.c b/drivers/net/ieee802154/mrf24j40.c
-index ee7084b..cf4788d 100644
---- a/drivers/net/ieee802154/mrf24j40.c
-+++ b/drivers/net/ieee802154/mrf24j40.c
-@@ -635,7 +635,7 @@ static void mrf24j40_stop(struct ieee802154_hw *hw)
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 11dde28..852c308 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -3035,7 +3035,6 @@ F:	arch/c6x/
  
- 	/* Set TXNIE and RXIE. Disable Interrupts */
- 	regmap_update_bits(devrec->regmap_short, REG_INTCON,
--			   BIT_TXNIE | BIT_TXNIE, BIT_TXNIE | BIT_TXNIE);
-+			   BIT_TXNIE | BIT_RXIE, BIT_TXNIE | BIT_RXIE);
- }
- 
- static int mrf24j40_set_channel(struct ieee802154_hw *hw, u8 page, u8 channel)
+ CA8210 IEEE-802.15.4 RADIO DRIVER
+ M:	Harry Morris <h.morris@cascoda.com>
+-M:	linuxdev@cascoda.com
+ L:	linux-wpan@vger.kernel.org
+ W:	https://github.com/Cascoda/ca8210-linux.git
+ S:	Maintained
 -- 
-2.7.4
+2.9.3.windows.1
 
