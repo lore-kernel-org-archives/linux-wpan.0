@@ -1,78 +1,128 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from proxima.lasnet.de ([78.47.171.185]:47880 "EHLO
+Received: from proxima.lasnet.de ([78.47.171.185]:47852 "EHLO
         proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753944AbdKFPj4 (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 6 Nov 2017 10:39:56 -0500
-Subject: Re: [PATCH 01/14] ieee802154: adf7242: use unsigned int over only
- unsigned
+        with ESMTP id S1753071AbdKFPfm (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 6 Nov 2017 10:35:42 -0500
+Subject: Re: [PATCH 04/14] ieee802154: atusb: switch from uint8_t to u8
 References: <20170922121405.31789-1-stefan@osg.samsung.com>
- <20170922121405.31789-2-stefan@osg.samsung.com>
- <45c7b95b-fff6-aef6-eae6-b82e957cdf91@analog.com>
+ <20170922121405.31789-5-stefan@osg.samsung.com>
 From: Stefan Schmidt <stefan@datenfreihafen.org>
-Message-ID: <a1f82677-6549-cf73-8b98-686cb9e11eb2@datenfreihafen.org>
-Date: Mon, 6 Nov 2017 16:39:53 +0100
+Message-ID: <dcbf0342-6206-03b8-ba2e-dc48f98ee7a7@datenfreihafen.org>
+Date: Mon, 6 Nov 2017 16:35:38 +0100
 MIME-Version: 1.0
-In-Reply-To: <45c7b95b-fff6-aef6-eae6-b82e957cdf91@analog.com>
+In-Reply-To: <20170922121405.31789-5-stefan@osg.samsung.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: michael.hennerich@analog.com, Stefan Schmidt <stefan@osg.samsung.com>, linux-wpan@vger.kernel.org
-Cc: Alexander Aring <aring@mojatatu.com>, h.morris@cascoda.com, linuxdev@cascoda.com, varkabhadram@gmail.com, alan@signal11.us
+To: Stefan Schmidt <stefan@osg.samsung.com>, linux-wpan@vger.kernel.org
+Cc: Alexander Aring <aring@mojatatu.com>, michael.hennerich@analog.com, h.morris@cascoda.com, linuxdev@cascoda.com, varkabhadram@gmail.com, alan@signal11.us
 
 Hello.
 
-On 06.11.2017 16:37, Michael Hennerich wrote:
-> On 22.09.2017 14:13, Stefan Schmidt wrote:
->> Bring it in line with the rest of the ieee802154 drivers.
->> Found by checkpatch.
->>
->> Signed-off-by: Stefan Schmidt <stefan@osg.samsung.com>
+On 22.09.2017 14:13, Stefan Schmidt wrote:
+> Switch top the preferred kernel type naming.
+> Found by checkpatch.
 > 
-> Acked-by: Michael Hennerich <michael.hennerich@analog.com>
+> Signed-off-by: Stefan Schmidt <stefan@osg.samsung.com>
+> ---
+>  drivers/net/ieee802154/atusb.c | 26 +++++++++++++-------------
+>  1 file changed, 13 insertions(+), 13 deletions(-)
 > 
->> ---
->>   drivers/net/ieee802154/adf7242.c | 8 ++++----
->>   1 file changed, 4 insertions(+), 4 deletions(-)
->>
->> diff --git a/drivers/net/ieee802154/adf7242.c
->> b/drivers/net/ieee802154/adf7242.c
->> index 3e4c8b21403c..400fdbd3a120 100644
->> --- a/drivers/net/ieee802154/adf7242.c
->> +++ b/drivers/net/ieee802154/adf7242.c
->> @@ -311,8 +311,8 @@ static int adf7242_status(struct adf7242_local
->> *lp, u8 *stat)
->>       return status;
->>   }
->>   -static int adf7242_wait_status(struct adf7242_local *lp, unsigned
->> status,
->> -                   unsigned mask, int line)
->> +static int adf7242_wait_status(struct adf7242_local *lp, unsigned int
->> status,
->> +                   unsigned int mask, int line)
->>   {
->>       int cnt = 0, ret = 0;
->>       u8 stat;
->> @@ -477,7 +477,7 @@ static int adf7242_write_reg(struct adf7242_local
->> *lp, u16 addr, u8 data)
->>       return status;
->>   }
->>   -static int adf7242_cmd(struct adf7242_local *lp, unsigned cmd)
->> +static int adf7242_cmd(struct adf7242_local *lp, unsigned int cmd)
->>   {
->>       int status;
->>   @@ -920,7 +920,7 @@ static void adf7242_debug(u8 irq1)
->>   static irqreturn_t adf7242_isr(int irq, void *data)
->>   {
->>       struct adf7242_local *lp = data;
->> -    unsigned xmit;
->> +    unsigned int xmit;
->>       u8 irq1;
->>         adf7242_wait_status(lp, RC_STATUS_PHY_RDY, RC_STATUS_MASK,
->> __LINE__);
->>
-> 
+> diff --git a/drivers/net/ieee802154/atusb.c b/drivers/net/ieee802154/atusb.c
+> index 115fa3f37a86..a4a326933977 100644
+> --- a/drivers/net/ieee802154/atusb.c
+> +++ b/drivers/net/ieee802154/atusb.c
+> @@ -63,7 +63,7 @@ struct atusb {
+>  	struct usb_ctrlrequest tx_dr;
+>  	struct urb *tx_urb;
+>  	struct sk_buff *tx_skb;
+> -	uint8_t tx_ack_seq;		/* current TX ACK sequence number */
+> +	u8 tx_ack_seq;		/* current TX ACK sequence number */
+>  
+>  	/* Firmware variable */
+>  	unsigned char fw_ver_maj;	/* Firmware major version number */
+> @@ -107,7 +107,7 @@ static int atusb_control_msg(struct atusb *atusb, unsigned int pipe,
+>  	return ret;
+>  }
+>  
+> -static int atusb_command(struct atusb *atusb, uint8_t cmd, uint8_t arg)
+> +static int atusb_command(struct atusb *atusb, u8 cmd, u8 arg)
+>  {
+>  	struct usb_device *usb_dev = atusb->usb_dev;
+>  
+> @@ -116,7 +116,7 @@ static int atusb_command(struct atusb *atusb, uint8_t cmd, uint8_t arg)
+>  				 cmd, ATUSB_REQ_TO_DEV, arg, 0, NULL, 0, 1000);
+>  }
+>  
+> -static int atusb_write_reg(struct atusb *atusb, uint8_t reg, uint8_t value)
+> +static int atusb_write_reg(struct atusb *atusb, u8 reg, u8 value)
+>  {
+>  	struct usb_device *usb_dev = atusb->usb_dev;
+>  
+> @@ -127,12 +127,12 @@ static int atusb_write_reg(struct atusb *atusb, uint8_t reg, uint8_t value)
+>  				 value, reg, NULL, 0, 1000);
+>  }
+>  
+> -static int atusb_read_reg(struct atusb *atusb, uint8_t reg)
+> +static int atusb_read_reg(struct atusb *atusb, u8 reg)
+>  {
+>  	struct usb_device *usb_dev = atusb->usb_dev;
+>  	int ret;
+> -	uint8_t *buffer;
+> -	uint8_t value;
+> +	u8 *buffer;
+> +	u8 value;
+>  
+>  	buffer = kmalloc(1, GFP_KERNEL);
+>  	if (!buffer)
+> @@ -153,11 +153,11 @@ static int atusb_read_reg(struct atusb *atusb, uint8_t reg)
+>  	}
+>  }
+>  
+> -static int atusb_write_subreg(struct atusb *atusb, uint8_t reg, uint8_t mask,
+> -			      uint8_t shift, uint8_t value)
+> +static int atusb_write_subreg(struct atusb *atusb, u8 reg, u8 mask,
+> +			      u8 shift, u8 value)
+>  {
+>  	struct usb_device *usb_dev = atusb->usb_dev;
+> -	uint8_t orig, tmp;
+> +	u8 orig, tmp;
+>  	int ret = 0;
+>  
+>  	dev_dbg(&usb_dev->dev, "atusb_write_subreg: 0x%02x <- 0x%02x\n",
+> @@ -263,10 +263,10 @@ static void atusb_work_urbs(struct work_struct *work)
+>  
+>  /* ----- Asynchronous USB -------------------------------------------------- */
+>  
+> -static void atusb_tx_done(struct atusb *atusb, uint8_t seq)
+> +static void atusb_tx_done(struct atusb *atusb, u8 seq)
+>  {
+>  	struct usb_device *usb_dev = atusb->usb_dev;
+> -	uint8_t expect = atusb->tx_ack_seq;
+> +	u8 expect = atusb->tx_ack_seq;
+>  
+>  	dev_dbg(&usb_dev->dev, "atusb_tx_done (0x%02x/0x%02x)\n", seq, expect);
+>  	if (seq == expect) {
+> @@ -289,7 +289,7 @@ static void atusb_in_good(struct urb *urb)
+>  	struct usb_device *usb_dev = urb->dev;
+>  	struct sk_buff *skb = urb->context;
+>  	struct atusb *atusb = SKB_ATUSB(skb);
+> -	uint8_t len, lqi;
+> +	u8 len, lqi;
+>  
+>  	if (!urb->actual_length) {
+>  		dev_dbg(&usb_dev->dev, "atusb_in: zero-sized URB ?\n");
+> @@ -882,7 +882,7 @@ static int atusb_get_and_show_build(struct atusb *atusb)
+>  static int atusb_get_and_conf_chip(struct atusb *atusb)
+>  {
+>  	struct usb_device *usb_dev = atusb->usb_dev;
+> -	uint8_t man_id_0, man_id_1, part_num, version_num;
+> +	u8 man_id_0, man_id_1, part_num, version_num;
+>  	const char *chip;
+>  	struct ieee802154_hw *hw = atusb->hw;
+>  
 > 
 
 This patch has been applied to the wpan-next tree and will be
