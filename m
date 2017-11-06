@@ -1,17 +1,15 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from proxima.lasnet.de ([78.47.171.185]:47809 "EHLO
+Received: from proxima.lasnet.de ([78.47.171.185]:47762 "EHLO
         proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752019AbdKFPci (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 6 Nov 2017 10:32:38 -0500
-Subject: Re: [PATCH 13/14] ieee802154: cc2520: switch from BUG_ON() to
- WARN_ON() on problem
+        with ESMTP id S1752968AbdKFOZU (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 6 Nov 2017 09:25:20 -0500
+Subject: Re: [PATCH 00/14] Checkpatch cleanup for ieee802154 drivers
 References: <20170922121405.31789-1-stefan@osg.samsung.com>
- <20170922121405.31789-14-stefan@osg.samsung.com>
 From: Stefan Schmidt <stefan@datenfreihafen.org>
-Message-ID: <a173ae21-4a1f-c238-3988-3d4397d5f7e5@datenfreihafen.org>
-Date: Mon, 6 Nov 2017 16:32:36 +0100
+Message-ID: <fcc2e345-3905-1501-7023-1651b73ad7bc@datenfreihafen.org>
+Date: Mon, 6 Nov 2017 15:25:15 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170922121405.31789-14-stefan@osg.samsung.com>
+In-Reply-To: <20170922121405.31789-1-stefan@osg.samsung.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -22,46 +20,51 @@ Cc: Alexander Aring <aring@mojatatu.com>, michael.hennerich@analog.com, h.morris
 
 Hello.
 
-On 22.09.2017 14:14, Stefan Schmidt wrote:
-> The check is valid but it does not warrant to crash the kernel. A
-> WARN_ON() is good enough here.
-> Found by checkpatch.
-> 
-> Signed-off-by: Stefan Schmidt <stefan@osg.samsung.com>
-> ---
->  drivers/net/ieee802154/cc2520.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/net/ieee802154/cc2520.c b/drivers/net/ieee802154/cc2520.c
-> index 735b9f5f9754..0c89d3edf901 100644
-> --- a/drivers/net/ieee802154/cc2520.c
-> +++ b/drivers/net/ieee802154/cc2520.c
-> @@ -517,7 +517,7 @@ cc2520_tx(struct ieee802154_hw *hw, struct sk_buff *skb)
->  	}
->  
->  	spin_lock_irqsave(&priv->lock, flags);
-> -	BUG_ON(priv->is_tx);
-> +	WARN_ON(priv->is_tx);
->  	priv->is_tx = 1;
->  	spin_unlock_irqrestore(&priv->lock, flags);
->  
-> @@ -643,9 +643,9 @@ cc2520_set_channel(struct ieee802154_hw *hw, u8 page, u8 channel)
->  
->  	dev_dbg(&priv->spi->dev, "trying to set channel\n");
->  
-> -	BUG_ON(page != 0);
-> -	BUG_ON(channel < CC2520_MINCHANNEL);
-> -	BUG_ON(channel > CC2520_MAXCHANNEL);
-> +	WARN_ON(page != 0);
-> +	WARN_ON(channel < CC2520_MINCHANNEL);
-> +	WARN_ON(channel > CC2520_MAXCHANNEL);
->  
->  	ret = cc2520_write_register(priv, CC2520_FREQCTRL,
->  				    11 + 5 * (channel - 11));
-> 
+I would like to move forward with these patches. Could the driver
+maintainers give their ACK here please if they are happy with the patch?
 
-This patch has been applied to the wpan-next tree and will be
-part of the next pull request to net-next. Thanks!
+On 22.09.2017 14:13, Stefan Schmidt wrote:
+> Hello.
+> 
+> This patchset works through various warnings and errors reported from checkpatch
+> on all ieee802154 drivers. Testing and ACKs from the repective driver
+> maintainers would be appreciated.
+> 
+> Stefan Schmidt (14):
+>   ieee802154: adf7242: use unsigned int over only unsigned
+
+Michael?
+
+>   ieee802154: at86rf230: switch from BUG_ON() to WARN_ON() on problem
+>   ieee802154: at86rf230: use __func__ macro for debug messages
+
+Alex?
+
+>   ieee802154: atusb: switch from uint8_t to u8
+>   ieee802154: atusb: use __func__ macro for debug messages
+>   ieee802154: atusb: fix some kernel coding style errors
+>   ieee802154: atusb: switch from BUG_ON() to WARN_ON() on problem
+
+These four are getting applied soon.
+
+>   ieee802154: mrf24j40: fix some kernel coding style errors
+
+Alan, you spoke against this one. I will drop it.
+
+>   ieee802154: ca8210: fix some kernel coding style errors
+>   ieee802154: ca8210: use __func__ macro for debug messages
+
+Harry?
+
+>   ieee802154: cc2520: fix some kernel coding style errors
+>   ieee802154: cc2520: use __func__ macro for debug messages
+>   ieee802154: cc2520: switch from BUG_ON() to WARN_ON() on problem
+
+Varka?
+
+>   ieee802154: fakelb: switch from BUG_ON() to WARN_ON() on problem
+
+Alex?
 
 regards
 Stefan Schmidt
