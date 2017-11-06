@@ -1,17 +1,17 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from proxima.lasnet.de ([78.47.171.185]:47864 "EHLO
+Received: from proxima.lasnet.de ([78.47.171.185]:47871 "EHLO
         proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752632AbdKFPgK (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 6 Nov 2017 10:36:10 -0500
-Subject: Re: [PATCH 06/14] ieee802154: atusb: fix some kernel coding style
- errors
+        with ESMTP id S1753758AbdKFPgV (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 6 Nov 2017 10:36:21 -0500
+Subject: Re: [PATCH 07/14] ieee802154: atusb: switch from BUG_ON() to
+ WARN_ON() on problem
 References: <20170922121405.31789-1-stefan@osg.samsung.com>
- <20170922121405.31789-7-stefan@osg.samsung.com>
+ <20170922121405.31789-8-stefan@osg.samsung.com>
 From: Stefan Schmidt <stefan@datenfreihafen.org>
-Message-ID: <1774341f-e736-11a9-4f1e-dcaecc24572d@datenfreihafen.org>
-Date: Mon, 6 Nov 2017 16:36:07 +0100
+Message-ID: <c165ea45-287f-94a8-2795-bb72147777c8@datenfreihafen.org>
+Date: Mon, 6 Nov 2017 16:36:19 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170922121405.31789-7-stefan@osg.samsung.com>
+In-Reply-To: <20170922121405.31789-8-stefan@osg.samsung.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -23,46 +23,28 @@ Cc: Alexander Aring <aring@mojatatu.com>, michael.hennerich@analog.com, h.morris
 Hello.
 
 On 22.09.2017 14:13, Stefan Schmidt wrote:
-> Fix a long line, wrong comment format and misaligned indent.
+> The check is valid but it does not warrant to crash the kernel. A
+> WARN_ON() is good enough here.
+> Found by checkpatch.
 > 
 > Signed-off-by: Stefan Schmidt <stefan@osg.samsung.com>
 > ---
->  drivers/net/ieee802154/atusb.c | 8 +++++---
->  1 file changed, 5 insertions(+), 3 deletions(-)
+>  drivers/net/ieee802154/atusb.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
 > diff --git a/drivers/net/ieee802154/atusb.c b/drivers/net/ieee802154/atusb.c
-> index bb02e37257cf..13d8ee5df094 100644
+> index 13d8ee5df094..99d40617dc79 100644
 > --- a/drivers/net/ieee802154/atusb.c
 > +++ b/drivers/net/ieee802154/atusb.c
-> @@ -841,7 +841,8 @@ static int atusb_get_and_show_revision(struct atusb *atusb)
+> @@ -405,7 +405,7 @@ static int atusb_xmit(struct ieee802154_hw *hw, struct sk_buff *skb)
 >  
->  		dev_info(&usb_dev->dev,
->  			 "Firmware: major: %u, minor: %u, hardware type: %s (%d)\n",
-> -			 atusb->fw_ver_maj, atusb->fw_ver_min, hw_name, atusb->fw_hw_type);
-> +			 atusb->fw_ver_maj, atusb->fw_ver_min, hw_name,
-> +			 atusb->fw_hw_type);
->  	}
->  	if (atusb->fw_ver_maj == 0 && atusb->fw_ver_min < 2) {
->  		dev_info(&usb_dev->dev,
-> @@ -976,7 +977,8 @@ static int atusb_set_extended_addr(struct atusb *atusb)
->  	int ret;
->  
->  	/* Firmware versions before 0.3 do not support the EUI64_READ command.
-> -	 * Just use a random address and be done */
-> +	 * Just use a random address and be done.
-> +	 */
->  	if (atusb->fw_ver_maj == 0 && atusb->fw_ver_min < 3) {
->  		ieee802154_random_extended_addr(&atusb->hw->phy->perm_extended_addr);
->  		return 0;
-> @@ -1006,7 +1008,7 @@ static int atusb_set_extended_addr(struct atusb *atusb)
->  		atusb->hw->phy->perm_extended_addr = extended_addr;
->  		addr = swab64((__force u64)atusb->hw->phy->perm_extended_addr);
->  		dev_info(&usb_dev->dev, "Read permanent extended address %8phC from device\n",
-> -			&addr);
-> +			 &addr);
->  	}
->  
->  	kfree(buffer);
+>  static int atusb_ed(struct ieee802154_hw *hw, u8 *level)
+>  {
+> -	BUG_ON(!level);
+> +	WARN_ON(!level);
+>  	*level = 0xbe;
+>  	return 0;
+>  }
 > 
 
 This patch has been applied to the wpan-next tree and will be
