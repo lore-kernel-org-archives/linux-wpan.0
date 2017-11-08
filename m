@@ -1,70 +1,121 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mout.web.de ([212.227.17.11]:58301 "EHLO mout.web.de"
+Received: from mout.web.de ([212.227.17.12]:56900 "EHLO mout.web.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750752AbdKHJUc (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-        Wed, 8 Nov 2017 04:20:32 -0500
+        id S1751763AbdKHQQN (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+        Wed, 8 Nov 2017 11:16:13 -0500
 From: SF Markus Elfring <elfring@users.sourceforge.net>
-Subject: [PATCH] 6lowpan: Combine two condition checks into one statement in
- lowpan_xmit()
-Message-ID: <221426d9-d049-b304-d7c1-bdf0a788bf36@users.sourceforge.net>
-Date: Wed, 8 Nov 2017 10:20:08 +0100
+Subject: [PATCH] nl802154: Improve unlocking of a table in four functions
+Message-ID: <f2f31af4-d8a6-a961-aa2a-f7b29203a3f4@users.sourceforge.net>
+Date: Wed, 8 Nov 2017 17:15:59 +0100
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-GB
 Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org, netdev@vger.kernel.org, Alexander Aring <alex.aring@gmail.com>, "David S. Miller" <davem@davemloft.net>, Johannes Berg <johannes.berg@intel.com>, Stefan Schmidt <stefan@osg.samsung.com>, Stephen Hemminger <stephen@networkplumber.org>
+To: linux-wpan@vger.kernel.org, netdev@vger.kernel.org, Alexander Aring <alex.aring@gmail.com>, "David S. Miller" <davem@davemloft.net>, Stefan Schmidt <stefan@osg.samsung.com>
 Cc: LKML <linux-kernel@vger.kernel.org>, kernel-janitors@vger.kernel.org
 
 From: Markus Elfring <elfring@users.sourceforge.net>
-Date: Wed, 8 Nov 2017 10:10:41 +0100
+Date: Wed, 8 Nov 2017 17:08:55 +0100
 
-The same exception handling was used in an if branch of two
-separate statements.
+* Add jump targets so that a call of the function "rdev_unlock_llsec_table"
+  is stored only once in these function implementations.
 
-* Merge their condition checks into a single statement instead.
-
-* Delete the local variable "ret" which became unnecessary
-  with this refactoring.
+* Replace four calls by goto statements.
 
 This issue was detected by using the Coccinelle software.
 
 Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
 ---
- net/ieee802154/6lowpan/tx.c | 11 +++--------
- 1 file changed, 3 insertions(+), 8 deletions(-)
+ net/ieee802154/nl802154.c | 24 ++++++++++++------------
+ 1 file changed, 12 insertions(+), 12 deletions(-)
 
-diff --git a/net/ieee802154/6lowpan/tx.c b/net/ieee802154/6lowpan/tx.c
-index e6ff5128e61a..1b0757db2078 100644
---- a/net/ieee802154/6lowpan/tx.c
-+++ b/net/ieee802154/6lowpan/tx.c
-@@ -255,7 +255,7 @@ static int lowpan_header(struct sk_buff *skb, struct net_device *ldev,
- netdev_tx_t lowpan_xmit(struct sk_buff *skb, struct net_device *ldev)
- {
- 	struct ieee802154_hdr wpan_hdr;
--	int max_single, ret;
-+	int max_single;
- 	u16 dgram_size, dgram_offset;
- 
- 	pr_debug("package xmit\n");
-@@ -269,13 +269,8 @@ netdev_tx_t lowpan_xmit(struct sk_buff *skb, struct net_device *ldev)
- 	if (!skb)
- 		return NET_XMIT_DROP;
- 
--	ret = lowpan_header(skb, ldev, &dgram_size, &dgram_offset);
--	if (ret < 0) {
--		kfree_skb(skb);
--		return NET_XMIT_DROP;
--	}
--
--	if (ieee802154_hdr_peek(skb, &wpan_hdr) < 0) {
-+	if (lowpan_header(skb, ldev, &dgram_size, &dgram_offset) < 0 ||
-+	    ieee802154_hdr_peek(skb, &wpan_hdr) < 0) {
- 		kfree_skb(skb);
- 		return NET_XMIT_DROP;
+diff --git a/net/ieee802154/nl802154.c b/net/ieee802154/nl802154.c
+index 99f6c254ea77..33865d355433 100644
+--- a/net/ieee802154/nl802154.c
++++ b/net/ieee802154/nl802154.c
+@@ -1527,16 +1527,16 @@ nl802154_dump_llsec_key(struct sk_buff *skb, struct netlink_callback *cb)
+ 				      rdev, wpan_dev->netdev, key) < 0) {
+ 			/* TODO */
+ 			err = -EIO;
+-			rdev_unlock_llsec_table(rdev, wpan_dev);
+-			goto out_err;
++			goto unlock_table;
+ 		}
  	}
+ 
+ 	cb->args[2] = 1;
+ 
+ out:
+-	rdev_unlock_llsec_table(rdev, wpan_dev);
+ 	err = skb->len;
++unlock_table:
++	rdev_unlock_llsec_table(rdev, wpan_dev);
+ out_err:
+ 	nl802154_finish_wpan_dev_dump(rdev);
+ 
+@@ -1697,16 +1697,16 @@ nl802154_dump_llsec_dev(struct sk_buff *skb, struct netlink_callback *cb)
+ 					 rdev, wpan_dev->netdev, dev) < 0) {
+ 			/* TODO */
+ 			err = -EIO;
+-			rdev_unlock_llsec_table(rdev, wpan_dev);
+-			goto out_err;
++			goto unlock_table;
+ 		}
+ 	}
+ 
+ 	cb->args[2] = 1;
+ 
+ out:
+-	rdev_unlock_llsec_table(rdev, wpan_dev);
+ 	err = skb->len;
++unlock_table:
++	rdev_unlock_llsec_table(rdev, wpan_dev);
+ out_err:
+ 	nl802154_finish_wpan_dev_dump(rdev);
+ 
+@@ -1875,8 +1875,7 @@ nl802154_dump_llsec_devkey(struct sk_buff *skb, struct netlink_callback *cb)
+ 						 kpos) < 0) {
+ 				/* TODO */
+ 				err = -EIO;
+-				rdev_unlock_llsec_table(rdev, wpan_dev);
+-				goto out_err;
++				goto unlock_table;
+ 			}
+ 		}
+ 	}
+@@ -1884,8 +1883,9 @@ nl802154_dump_llsec_devkey(struct sk_buff *skb, struct netlink_callback *cb)
+ 	cb->args[2] = 1;
+ 
+ out:
+-	rdev_unlock_llsec_table(rdev, wpan_dev);
+ 	err = skb->len;
++unlock_table:
++	rdev_unlock_llsec_table(rdev, wpan_dev);
+ out_err:
+ 	nl802154_finish_wpan_dev_dump(rdev);
+ 
+@@ -2034,16 +2034,16 @@ nl802154_dump_llsec_seclevel(struct sk_buff *skb, struct netlink_callback *cb)
+ 					   rdev, wpan_dev->netdev, sl) < 0) {
+ 			/* TODO */
+ 			err = -EIO;
+-			rdev_unlock_llsec_table(rdev, wpan_dev);
+-			goto out_err;
++			goto unlock_table;
+ 		}
+ 	}
+ 
+ 	cb->args[2] = 1;
+ 
+ out:
+-	rdev_unlock_llsec_table(rdev, wpan_dev);
+ 	err = skb->len;
++unlock_table:
++	rdev_unlock_llsec_table(rdev, wpan_dev);
+ out_err:
+ 	nl802154_finish_wpan_dev_dump(rdev);
+ 
 -- 
 2.15.0
-
 
