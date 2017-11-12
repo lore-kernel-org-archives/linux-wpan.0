@@ -1,62 +1,54 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mailgw02.it.ntnu.no ([129.241.56.175]:34248 "EHLO
-        mailgw02.it.ntnu.no" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751607AbdKKWyR (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Sat, 11 Nov 2017 17:54:17 -0500
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Received: from mail-vk0-f41.google.com ([209.85.213.41]:50260 "EHLO
+        mail-vk0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752274AbdKLAGP (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Sat, 11 Nov 2017 19:06:15 -0500
+Received: by mail-vk0-f41.google.com with SMTP id h82so6785427vkf.7
+        for <linux-wpan@vger.kernel.org>; Sat, 11 Nov 2017 16:06:15 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <7828B4AD-AE60-4783-829D-899F028CB3A6@ntnu.no>
+References: <1BB434E6-8E27-4282-84FE-4CC88C48ED68@ntnu.no> <730.1510335972@obiwan.sandelman.ca>
+ <D59C859A-19A4-4898-A7E1-19C09BEBEA4E@ntnu.no> <22033.1510426407@obiwan.sandelman.ca>
+ <7828B4AD-AE60-4783-829D-899F028CB3A6@ntnu.no>
+From: Alexander Aring <aring@mojatatu.com>
+Date: Sat, 11 Nov 2017 19:06:14 -0500
+Message-ID: <CAOHTAphUMTNho7hA3kP8sZNr7zODOUGB8uWwpYaJ2fx8SP536w@mail.gmail.com>
 Subject: Re: Bridging a lowpan interface
-From: David Palma <david.palma@ntnu.no>
-In-Reply-To: <22033.1510426407@obiwan.sandelman.ca>
-Date: Sat, 11 Nov 2017 23:59:12 +0100
-Content-Transfer-Encoding: 8BIT
-Message-Id: <7828B4AD-AE60-4783-829D-899F028CB3A6@ntnu.no>
-References: <1BB434E6-8E27-4282-84FE-4CC88C48ED68@ntnu.no>
- <730.1510335972@obiwan.sandelman.ca>
- <D59C859A-19A4-4898-A7E1-19C09BEBEA4E@ntnu.no>
- <22033.1510426407@obiwan.sandelman.ca>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Michael Richardson <mcr@sandelman.ca>
-Cc: linux-wpan - ML <linux-wpan@vger.kernel.org>
+To: David Palma <david.palma@ntnu.no>
+Cc: Michael Richardson <mcr@sandelman.ca>, linux-wpan - ML <linux-wpan@vger.kernel.org>
 
+Hi,
 
-> On 11 Nov 2017, at 19:53, Michael Richardson <mcr@sandelman.ca> wrote:
-> 
-> 
-> David Palma <david.palma@ntnu.no> wrote:
->> I'm all for routing and starting with RPL is fine. However, the idea
->> was also to enable traffic differentiation based on flows (the SDN
->> part), without breaking them, and not only based on IP
->> addresses. That's why I mentioned that I used routing and ip6tables.
-> 
-> I don't understand what the problem is.
-> What would you do with bridged interfaces in an SDN?
+On Sat, Nov 11, 2017 at 5:59 PM, David Palma <david.palma@ntnu.no> wrote:
+>
+>> On 11 Nov 2017, at 19:53, Michael Richardson <mcr@sandelman.ca> wrote:
+>>
+>>
+>> David Palma <david.palma@ntnu.no> wrote:
+>>> I'm all for routing and starting with RPL is fine. However, the idea
+>>> was also to enable traffic differentiation based on flows (the SDN
+>>> part), without breaking them, and not only based on IP
+>>> addresses. That's why I mentioned that I used routing and ip6tables.
+>>
+>> I don't understand what the problem is.
+>> What would you do with bridged interfaces in an SDN?
+>
+> For example, if you use Open vSwitch for the SDN part, you add an interface to a bridge and manage flows from there.
+>
+>> What kind of breaking are you speaking of?
+>
+> By breaking I mean, for example:
+> - establish a CoAP transaction with DTLS through one interface/network (e.g. .11, fd03::120)
 
-For example, if you use Open vSwitch for the SDN part, you add an interface to a bridge and manage flows from there.
+Check out ndisc proxy for IPv6.
 
-> What kind of breaking are you speaking of?
+There is no automatically handling for that inside the kernel (please
+send-patches, somebody wanted already such feature). What I mean for
+IPv4 yes, but for IPv6 you need a daemon like [0].
 
-By breaking I mean, for example:
-- establish a CoAP transaction with DTLS through one interface/network (e.g. .11, fd03::120)
-- redirect the traffic to another interface/network (e.g. 15.4, fe80::ff:fe00:beef)
-- a new transaction will be created on the CoAP server, it will expect a DTLS handshake, it will timeout because the client is not expecting a new transaction.
+- Alex
 
-I guess this could happen in other scenarios too, but I could be wrong.
-
-My approach to this is re-writing the sources and destinations at the edges, per flow (using Ip6tables for the time being).
-
-What I thought was that if the 8/2 byte addresses were converted to 6 byte addresses one could just use Open vSwitch/bridges/etc.
-
---
-David
-
-http://dpalma.eu
-
-> 
-> --
-> ]               Never tell me the odds!                 | ipv6 mesh networks [
-> ]   Michael Richardson, Sandelman Software Works        | network architect  [
-> ]     mcr@sandelman.ca  http://www.sandelman.ca/        |   ruby on rails    [
-> 
-
+[0] https://github.com/DanielAdolfsson/ndppd
