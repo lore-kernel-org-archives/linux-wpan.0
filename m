@@ -1,13 +1,13 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-dm3nam03on0073.outbound.protection.outlook.com ([104.47.41.73]:40072
-        "EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
+Received: from mail-by2nam01on0041.outbound.protection.outlook.com ([104.47.34.41]:29361
+        "EHLO NAM01-BY2-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751144AbdK1Muj (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+        id S1751377AbdK1Muj (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
         Tue, 28 Nov 2017 07:50:39 -0500
 From: <michael.hennerich@analog.com>
-Subject: [PATCH 3/5] net: ieee802154: adf7242: Add additional DEBUG information
-Date: Tue, 28 Nov 2017 13:53:13 +0100
-Message-ID: <1511873595-29238-3-git-send-email-michael.hennerich@analog.com>
+Subject: [PATCH 4/5] net: ieee802154: adf7242: Avoid redundant RC_READY polling
+Date: Tue, 28 Nov 2017 13:53:14 +0100
+Message-ID: <1511873595-29238-4-git-send-email-michael.hennerich@analog.com>
 In-Reply-To: <1511873595-29238-1-git-send-email-michael.hennerich@analog.com>
 References: <1511873595-29238-1-git-send-email-michael.hennerich@analog.com>
 MIME-Version: 1.0
@@ -19,44 +19,83 @@ Cc: linux-wpan@vger.kernel.org, Michael Hennerich <michael.hennerich@analog.com>
 
 From: Michael Hennerich <michael.hennerich@analog.com>
 
-This adds missing status bits and improves the DEBUG prints.
+READ/WRITE register and packet buffer can be done anytime as long
+as SPI_READY. Only CMD transactions require RC_READY && SPI_READY.
 
 Signed-off-by: Michael Hennerich <michael.hennerich@analog.com>
 ---
- drivers/net/ieee802154/adf7242.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+ drivers/net/ieee802154/adf7242.c | 18 ++++++++++++------
+ 1 file changed, 12 insertions(+), 6 deletions(-)
 
 diff --git a/drivers/net/ieee802154/adf7242.c b/drivers/net/ieee802154/adf7242.c
-index a11948a..ce1a6d2 100644
+index ce1a6d2..548bec1 100644
 --- a/drivers/net/ieee802154/adf7242.c
 +++ b/drivers/net/ieee802154/adf7242.c
-@@ -906,9 +906,12 @@ static void adf7242_debug(struct adf7242_local *lp, u8 irq1)
- 		irq1 & IRQ_FRAME_VALID ? "IRQ_FRAME_VALID\n" : "",
- 		irq1 & IRQ_ADDRESS_VALID ? "IRQ_ADDRESS_VALID\n" : "");
+@@ -344,12 +344,18 @@ static int adf7242_wait_status(struct adf7242_local *lp, unsigned int status,
+ 	return ret;
+ }
  
--	dev_dbg(&lp->spi->dev, "%s STATUS = %X:\n%s\n%s%s%s%s%s\n",
-+	dev_dbg(&lp->spi->dev, "%s STATUS = %X:\n%s\n%s\n%s\n%s\n%s%s%s%s%s\n",
- 		__func__, stat,
-+		stat & STAT_SPI_READY ? "SPI_READY" : "SPI_BUSY",
-+		stat & STAT_IRQ_STATUS ? "IRQ_PENDING" : "IRQ_CLEAR",
- 		stat & STAT_RC_READY ? "RC_READY" : "RC_BUSY",
-+		stat & STAT_CCA_RESULT ? "CHAN_IDLE" : "CHAN_BUSY",
- 		(stat & 0xf) == RC_STATUS_IDLE ? "RC_STATUS_IDLE" : "",
- 		(stat & 0xf) == RC_STATUS_MEAS ? "RC_STATUS_MEAS" : "",
- 		(stat & 0xf) == RC_STATUS_PHY_RDY ? "RC_STATUS_PHY_RDY" : "",
-@@ -1086,8 +1089,11 @@ static int adf7242_stats_show(struct seq_file *file, void *offset)
- 		   irq1 & IRQ_FRAME_VALID ? "IRQ_FRAME_VALID\n" : "",
- 		   irq1 & IRQ_ADDRESS_VALID ? "IRQ_ADDRESS_VALID\n" : "");
+-static int adf7242_wait_ready(struct adf7242_local *lp, int line)
++static int adf7242_wait_rc_ready(struct adf7242_local *lp, int line)
+ {
+ 	return adf7242_wait_status(lp, STAT_RC_READY | STAT_SPI_READY,
+ 				   STAT_RC_READY | STAT_SPI_READY, line);
+ }
  
--	seq_printf(file, "STATUS = %X:\n%s\n%s%s%s%s%s\n", stat,
-+	seq_printf(file, "STATUS = %X:\n%s\n%s\n%s\n%s\n%s%s%s%s%s\n", stat,
-+		   stat & STAT_SPI_READY ? "SPI_READY" : "SPI_BUSY",
-+		   stat & STAT_IRQ_STATUS ? "IRQ_PENDING" : "IRQ_CLEAR",
- 		   stat & STAT_RC_READY ? "RC_READY" : "RC_BUSY",
-+		   stat & STAT_CCA_RESULT ? "CHAN_IDLE" : "CHAN_BUSY",
- 		   (stat & 0xf) == RC_STATUS_IDLE ? "RC_STATUS_IDLE" : "",
- 		   (stat & 0xf) == RC_STATUS_MEAS ? "RC_STATUS_MEAS" : "",
- 		   (stat & 0xf) == RC_STATUS_PHY_RDY ? "RC_STATUS_PHY_RDY" : "",
++static int adf7242_wait_spi_ready(struct adf7242_local *lp, int line)
++{
++	return adf7242_wait_status(lp, STAT_SPI_READY,
++				   STAT_SPI_READY, line);
++}
++
+ static int adf7242_write_fbuf(struct adf7242_local *lp, u8 *data, u8 len)
+ {
+ 	u8 *buf = lp->buf;
+@@ -369,7 +375,7 @@ static int adf7242_write_fbuf(struct adf7242_local *lp, u8 *data, u8 len)
+ 	spi_message_add_tail(&xfer_head, &msg);
+ 	spi_message_add_tail(&xfer_buf, &msg);
+ 
+-	adf7242_wait_ready(lp, __LINE__);
++	adf7242_wait_spi_ready(lp, __LINE__);
+ 
+ 	mutex_lock(&lp->bmux);
+ 	buf[0] = CMD_SPI_PKT_WR;
+@@ -401,7 +407,7 @@ static int adf7242_read_fbuf(struct adf7242_local *lp,
+ 	spi_message_add_tail(&xfer_head, &msg);
+ 	spi_message_add_tail(&xfer_buf, &msg);
+ 
+-	adf7242_wait_ready(lp, __LINE__);
++	adf7242_wait_spi_ready(lp, __LINE__);
+ 
+ 	mutex_lock(&lp->bmux);
+ 	if (packet_read) {
+@@ -432,7 +438,7 @@ static int adf7242_read_reg(struct adf7242_local *lp, u16 addr, u8 *data)
+ 		.rx_buf = lp->buf_read_rx,
+ 	};
+ 
+-	adf7242_wait_ready(lp, __LINE__);
++	adf7242_wait_spi_ready(lp, __LINE__);
+ 
+ 	mutex_lock(&lp->bmux);
+ 	lp->buf_read_tx[0] = CMD_SPI_MEM_RD(addr);
+@@ -462,7 +468,7 @@ static int adf7242_write_reg(struct adf7242_local *lp, u16 addr, u8 data)
+ {
+ 	int status;
+ 
+-	adf7242_wait_ready(lp, __LINE__);
++	adf7242_wait_spi_ready(lp, __LINE__);
+ 
+ 	mutex_lock(&lp->bmux);
+ 	lp->buf_reg_tx[0] = CMD_SPI_MEM_WR(addr);
+@@ -484,7 +490,7 @@ static int adf7242_cmd(struct adf7242_local *lp, unsigned int cmd)
+ 	dev_vdbg(&lp->spi->dev, "%s : CMD=0x%X\n", __func__, cmd);
+ 
+ 	if (cmd != CMD_RC_PC_RESET_NO_WAIT)
+-		adf7242_wait_ready(lp, __LINE__);
++		adf7242_wait_rc_ready(lp, __LINE__);
+ 
+ 	mutex_lock(&lp->bmux);
+ 	lp->buf_cmd = cmd;
 -- 
 2.7.4
 
