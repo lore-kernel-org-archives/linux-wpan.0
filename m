@@ -1,13 +1,13 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-by2nam03on0084.outbound.protection.outlook.com ([104.47.42.84]:45760
-        "EHLO NAM03-BY2-obe.outbound.protection.outlook.com"
+Received: from mail-dm3nam03on0073.outbound.protection.outlook.com ([104.47.41.73]:40072
+        "EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751239AbdK1Muk (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-        Tue, 28 Nov 2017 07:50:40 -0500
+        id S1751144AbdK1Muj (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+        Tue, 28 Nov 2017 07:50:39 -0500
 From: <michael.hennerich@analog.com>
-Subject: [PATCH 2/5] net: ieee802154: adf7242: Fix bug if defined DEBUG
-Date: Tue, 28 Nov 2017 13:53:12 +0100
-Message-ID: <1511873595-29238-2-git-send-email-michael.hennerich@analog.com>
+Subject: [PATCH 3/5] net: ieee802154: adf7242: Add additional DEBUG information
+Date: Tue, 28 Nov 2017 13:53:13 +0100
+Message-ID: <1511873595-29238-3-git-send-email-michael.hennerich@analog.com>
 In-Reply-To: <1511873595-29238-1-git-send-email-michael.hennerich@analog.com>
 References: <1511873595-29238-1-git-send-email-michael.hennerich@analog.com>
 MIME-Version: 1.0
@@ -19,36 +19,44 @@ Cc: linux-wpan@vger.kernel.org, Michael Hennerich <michael.hennerich@analog.com>
 
 From: Michael Hennerich <michael.hennerich@analog.com>
 
-This fixes undefined reference to struct adf7242_local *lp in
-case DEBUG is defined.
+This adds missing status bits and improves the DEBUG prints.
 
 Signed-off-by: Michael Hennerich <michael.hennerich@analog.com>
 ---
- drivers/net/ieee802154/adf7242.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/net/ieee802154/adf7242.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/net/ieee802154/adf7242.c b/drivers/net/ieee802154/adf7242.c
-index 56f4ca8..a11948a 100644
+index a11948a..ce1a6d2 100644
 --- a/drivers/net/ieee802154/adf7242.c
 +++ b/drivers/net/ieee802154/adf7242.c
-@@ -888,7 +888,7 @@ static const struct ieee802154_ops adf7242_ops = {
- 	.set_cca_ed_level = adf7242_set_cca_ed_level,
- };
+@@ -906,9 +906,12 @@ static void adf7242_debug(struct adf7242_local *lp, u8 irq1)
+ 		irq1 & IRQ_FRAME_VALID ? "IRQ_FRAME_VALID\n" : "",
+ 		irq1 & IRQ_ADDRESS_VALID ? "IRQ_ADDRESS_VALID\n" : "");
  
--static void adf7242_debug(u8 irq1)
-+static void adf7242_debug(struct adf7242_local *lp, u8 irq1)
- {
- #ifdef DEBUG
- 	u8 stat;
-@@ -932,7 +932,7 @@ static irqreturn_t adf7242_isr(int irq, void *data)
- 		dev_err(&lp->spi->dev, "%s :ERROR IRQ1 = 0x%X\n",
- 			__func__, irq1);
+-	dev_dbg(&lp->spi->dev, "%s STATUS = %X:\n%s\n%s%s%s%s%s\n",
++	dev_dbg(&lp->spi->dev, "%s STATUS = %X:\n%s\n%s\n%s\n%s\n%s%s%s%s%s\n",
+ 		__func__, stat,
++		stat & STAT_SPI_READY ? "SPI_READY" : "SPI_BUSY",
++		stat & STAT_IRQ_STATUS ? "IRQ_PENDING" : "IRQ_CLEAR",
+ 		stat & STAT_RC_READY ? "RC_READY" : "RC_BUSY",
++		stat & STAT_CCA_RESULT ? "CHAN_IDLE" : "CHAN_BUSY",
+ 		(stat & 0xf) == RC_STATUS_IDLE ? "RC_STATUS_IDLE" : "",
+ 		(stat & 0xf) == RC_STATUS_MEAS ? "RC_STATUS_MEAS" : "",
+ 		(stat & 0xf) == RC_STATUS_PHY_RDY ? "RC_STATUS_PHY_RDY" : "",
+@@ -1086,8 +1089,11 @@ static int adf7242_stats_show(struct seq_file *file, void *offset)
+ 		   irq1 & IRQ_FRAME_VALID ? "IRQ_FRAME_VALID\n" : "",
+ 		   irq1 & IRQ_ADDRESS_VALID ? "IRQ_ADDRESS_VALID\n" : "");
  
--	adf7242_debug(irq1);
-+	adf7242_debug(lp, irq1);
- 
- 	xmit = test_bit(FLAG_XMIT, &lp->flags);
- 
+-	seq_printf(file, "STATUS = %X:\n%s\n%s%s%s%s%s\n", stat,
++	seq_printf(file, "STATUS = %X:\n%s\n%s\n%s\n%s\n%s%s%s%s%s\n", stat,
++		   stat & STAT_SPI_READY ? "SPI_READY" : "SPI_BUSY",
++		   stat & STAT_IRQ_STATUS ? "IRQ_PENDING" : "IRQ_CLEAR",
+ 		   stat & STAT_RC_READY ? "RC_READY" : "RC_BUSY",
++		   stat & STAT_CCA_RESULT ? "CHAN_IDLE" : "CHAN_BUSY",
+ 		   (stat & 0xf) == RC_STATUS_IDLE ? "RC_STATUS_IDLE" : "",
+ 		   (stat & 0xf) == RC_STATUS_MEAS ? "RC_STATUS_MEAS" : "",
+ 		   (stat & 0xf) == RC_STATUS_PHY_RDY ? "RC_STATUS_PHY_RDY" : "",
 -- 
 2.7.4
 
