@@ -1,91 +1,72 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from osg.samsung.com ([64.30.133.232]:59941 "EHLO osg.samsung.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S932476AbdK2QEc (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-        Wed, 29 Nov 2017 11:04:32 -0500
-Subject: Re: [PATCH] doc: linux-wpan: Fulfill the description of missed
- 802.15.4 APIs
-References: <20171118155501.14148-1-starnight@g.ncu.edu.tw>
-From: Stefan Schmidt <stefan@osg.samsung.com>
-Message-ID: <e29ab89d-46e4-5daf-acb6-07521066bc0f@osg.samsung.com>
-Date: Wed, 29 Nov 2017 17:04:26 +0100
+Received: from mail-bl2nam02on0053.outbound.protection.outlook.com ([104.47.38.53]:39156
+        "EHLO NAM02-BL2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751239AbdK1Mui (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+        Tue, 28 Nov 2017 07:50:38 -0500
+From: <michael.hennerich@analog.com>
+Subject: [PATCH 1/5] net: ieee802154: adf7242: Add support for ADF7241 devices
+Date: Tue, 28 Nov 2017 13:53:11 +0100
+Message-ID: <1511873595-29238-1-git-send-email-michael.hennerich@analog.com>
 MIME-Version: 1.0
-In-Reply-To: <20171118155501.14148-1-starnight@g.ncu.edu.tw>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Type: text/plain
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Jian-Hong Pan <starnight@g.ncu.edu.tw>, Alexander Aring <alex.aring@gmail.com>, Jonathan Corbet <corbet@lwn.net>, linux-wpan@vger.kernel.org, linux-doc@vger.kernel.org
+To: alex.aring@gmail.com, stefan@osg.samsung.com
+Cc: linux-wpan@vger.kernel.org, Michael Hennerich <michael.hennerich@analog.com>
 
-Hello
+From: Michael Hennerich <michael.hennerich@analog.com>
 
+This adds support for ADF7241 Low Power IEEE 802.15.4
+Zero-IF 2.4 GHz Transceivers
 
-On 11/18/2017 04:55 PM, Jian-Hong Pan wrote:
-> There are more functions and operations which must be used or implemented
-> in each IEEE 802.15.4 device driver, but are not mentioned in the Device
-> drivers API section of Documentation/networking/ieee802154.txt.  Therefore,
-> I want to fulfill the missed part into the documentation with this patch.
->
-> Signed-off-by: Jian-Hong Pan <starnight@g.ncu.edu.tw>
-> ---
->  Documentation/networking/ieee802154.txt | 40 +++++++++++++++++++++++++++++++++
->  1 file changed, 40 insertions(+)
->
-> diff --git a/Documentation/networking/ieee802154.txt b/Documentation/networking/ieee802154.txt
-> index 057e9fdbfac9..e74d8e1da0e2 100644
-> --- a/Documentation/networking/ieee802154.txt
-> +++ b/Documentation/networking/ieee802154.txt
-> @@ -97,6 +97,46 @@ The include/net/mac802154.h defines following functions:
->   - void ieee802154_unregister_hw(struct ieee802154_hw *hw):
->     freeing registered PHY
->  
-> + - void ieee802154_rx_irqsafe(struct ieee802154_hw *hw, struct sk_buff *skb,
-> +                              u8 lqi):
-> +   telling 802.15.4 module there is a new received frame in the skb with
-> +   the RF Link Quality Indicator (LQI) from the hardware device
-> +
-> + - void ieee802154_xmit_complete(struct ieee802154_hw *hw, struct sk_buff *skb,
-> +                                 bool ifs_handling):
-> +   telling 802.15.4 module the frame in the skb is or going to be
-> +   transmitted through the hardware device
-> +
-> +The device driver must implement the following callbacks in the IEEE 802.15.4
-> +operations structure at least:
-> +struct ieee802154_ops {
-> +	...
-> +	int	(*start)(struct ieee802154_hw *hw);
-> +	void	(*stop)(struct ieee802154_hw *hw);
-> +	...
-> +	int	(*xmit_async)(struct ieee802154_hw *hw, struct sk_buff *skb);
-> +	int	(*ed)(struct ieee802154_hw *hw, u8 *level);
-> +	int	(*set_channel)(struct ieee802154_hw *hw, u8 page, u8 channel);
-> +	...
-> +};
-> +
-> + - int start(struct ieee802154_hw *hw):
-> +   handler that 802.15.4 module calls for the hardware device initialization.
-> +
-> + - void stop(struct ieee802154_hw *hw):
-> +   handler that 802.15.4 module calls for the hardware device cleanup.
-> +
-> + - int xmit_async(struct ieee802154_hw *hw, struct sk_buff *skb):
-> +   handler that 802.15.4 module calls for each frame in the skb going to be
-> +   transmitted through the hardware device.
-> +
-> + - int ed(struct ieee802154_hw *hw, u8 *level):
-> +   handler that 802.15.4 module calls for Energy Detection from the hardware
-> +   device.
-> +
-> + - int set_channel(struct ieee802154_hw *hw, u8 page, u8 channel):
-> +   set radio for listening on specific channel of the hardware device.
-> +
->  Moreover IEEE 802.15.4 device operations structure should be filled.
->  
->  Fake drivers
+Signed-off-by: Michael Hennerich <michael.hennerich@analog.com>
+---
+ Documentation/devicetree/bindings/net/ieee802154/adf7242.txt | 2 +-
+ drivers/net/ieee802154/adf7242.c                             | 4 +++-
+ 2 files changed, 4 insertions(+), 2 deletions(-)
 
-This patch has been applied to the wpan-next tree and will be
-part of the next pull request to net-next. Thanks!
+diff --git a/Documentation/devicetree/bindings/net/ieee802154/adf7242.txt b/Documentation/devicetree/bindings/net/ieee802154/adf7242.txt
+index dea5124..d24172c 100644
+--- a/Documentation/devicetree/bindings/net/ieee802154/adf7242.txt
++++ b/Documentation/devicetree/bindings/net/ieee802154/adf7242.txt
+@@ -1,7 +1,7 @@
+ * ADF7242 IEEE 802.15.4 *
+ 
+ Required properties:
+-  - compatible:		should be "adi,adf7242"
++  - compatible:		should be "adi,adf7242", "adi,adf7241"
+   - spi-max-frequency:	maximal bus speed (12.5 MHz)
+   - reg:		the chipselect index
+   - interrupts:		the interrupt generated by the device via pin IRQ1.
+diff --git a/drivers/net/ieee802154/adf7242.c b/drivers/net/ieee802154/adf7242.c
+index 400fdbd..56f4ca8 100644
+--- a/drivers/net/ieee802154/adf7242.c
++++ b/drivers/net/ieee802154/adf7242.c
+@@ -1,7 +1,7 @@
+ /*
+  * Analog Devices ADF7242 Low-Power IEEE 802.15.4 Transceiver
+  *
+- * Copyright 2009-2015 Analog Devices Inc.
++ * Copyright 2009-2017 Analog Devices Inc.
+  *
+  * Licensed under the GPL-2 or later.
+  *
+@@ -1257,12 +1257,14 @@ static int adf7242_remove(struct spi_device *spi)
+ 
+ static const struct of_device_id adf7242_of_match[] = {
+ 	{ .compatible = "adi,adf7242", },
++	{ .compatible = "adi,adf7241", },
+ 	{ },
+ };
+ MODULE_DEVICE_TABLE(of, adf7242_of_match);
+ 
+ static const struct spi_device_id adf7242_device_id[] = {
+ 	{ .name = "adf7242", },
++	{ .name = "adf7241", },
+ 	{ },
+ };
+ MODULE_DEVICE_TABLE(spi, adf7242_device_id);
+-- 
+2.7.4
 
-regards
-Stefan Schmidt
