@@ -1,53 +1,42 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from osg.samsung.com ([64.30.133.232]:55544 "EHLO osg.samsung.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752294AbeBEKoT (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-        Mon, 5 Feb 2018 05:44:19 -0500
-Subject: Re: wpan-tools 0.8 release
-References: <dea4d0e2-af43-1d46-2abe-ef947fa1298e@osg.samsung.com>
- <20180205093325.GA6609@bogon.m.sigxcpu.org>
-From: Stefan Schmidt <stefan@osg.samsung.com>
-Message-ID: <eb51adc8-91d5-6443-d1b8-7a5d0e2c684c@osg.samsung.com>
-Date: Mon, 5 Feb 2018 11:44:15 +0100
-MIME-Version: 1.0
-In-Reply-To: <20180205093325.GA6609@bogon.m.sigxcpu.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+Received: from mail-io0-f195.google.com ([209.85.223.195]:36874 "EHLO
+        mail-io0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932477AbeBLDvO (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Sun, 11 Feb 2018 22:51:14 -0500
+Received: by mail-io0-f195.google.com with SMTP id f89so15848878ioj.4
+        for <linux-wpan@vger.kernel.org>; Sun, 11 Feb 2018 19:51:13 -0800 (PST)
+From: Alexander Aring <aring@mojatatu.com>
+Subject: [PATCH wpan-next] ieee802154: 6lowpan: set IFF_NO_QUEUE
+Date: Sun, 11 Feb 2018 22:50:46 -0500
+Message-Id: <20180212035046.11550-1-aring@mojatatu.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: =?UTF-8?Q?Guido_G=c3=bcnther?= <agx@sigxcpu.org>, "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>
+To: stefan@osg.samsung.com
+Cc: linux-wpan@vger.kernel.org, kernel@mojatatu.com, Alexander Aring <aring@mojatatu.com>
 
-Hello.
+This patch sets the IFF_NO_QUEUE for IEEE 802.15.4 6lowpan interfaces. As
+commit 24dcbf662205 ("6lowpan: Don't set IFF_NO_QUEUE") removes it for
+"reasons" from the bluetooth 6lowpan subsystem. In IEEE 802.15.4 the lower
+interface deals with one qdisc for the real hardware, 6LoWPAN does the
+protocol adaption only and no second queuing on top.
 
+Signed-off-by: Alexander Aring <aring@mojatatu.com>
+---
+ net/ieee802154/6lowpan/core.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-On 02/05/2018 10:33 AM, Guido Günther wrote:
-> Hi,
-> On Thu, Feb 01, 2018 at 11:29:11AM +0100, Stefan Schmidt wrote:
->> Hello.
->>
->>
->> It is a pleasure to announce the 0.8 release of wpan-tools.
->> Thanks to everyone who contributed!
->>
->> More of a maintenance release this time around. We did not have a release in a while and the build error with libnl >= 3.3 started to hit
->> more people. Having this fixed is worth a release alone. Thanks a lot to Thomas Petazzoni for the fix.
->>
->> We also added some some examples on how to use the ieee802154 subsystem socket types from userspace.
->> Xue Wenqian added some more functionality to the wpan-ping utility. Mayn thanks here as well.
->>
->> https://github.com/linux-wpan/wpan-tools/releases/download/wpan-tools-0.8/wpan-tools-0.8.tar.gz
->>
->> sha256sum: 0e22cadbc40d4c12d0a66e8175bda12046f03237ce6da23d4fd26fd3ab557d8b
->>
->> https://github.com/linux-wpan/wpan-tools/releases/download/wpan-tools-0.8/wpan-tools-0.8.tar.xz
->>
->> sha256sum: daacd38fe2f216095664dbf2628151c8f632d3f122d526059a37ba3cc4d3d8af
-> The Debian package has been updated as well:
->
->     https://packages.debian.org/sid/wpan-tools
+diff --git a/net/ieee802154/6lowpan/core.c b/net/ieee802154/6lowpan/core.c
+index 974765b7d92a..e4f305320519 100644
+--- a/net/ieee802154/6lowpan/core.c
++++ b/net/ieee802154/6lowpan/core.c
+@@ -104,6 +104,7 @@ static void lowpan_setup(struct net_device *ldev)
+ 	/* We need an ipv6hdr as minimum len when calling xmit */
+ 	ldev->hard_header_len	= sizeof(struct ipv6hdr);
+ 	ldev->flags		= IFF_BROADCAST | IFF_MULTICAST;
++	ldev->priv_flags	|= IFF_NO_QUEUE;
+ 
+ 	ldev->netdev_ops	= &lowpan_netdev_ops;
+ 	ldev->header_ops	= &lowpan_header_ops;
+-- 
+2.11.0
 
-Thanks a lot for the quick update!
-
-regards
-Stefan Schmidt
