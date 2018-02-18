@@ -1,39 +1,54 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from osg.samsung.com ([64.30.133.232]:63445 "EHLO osg.samsung.com"
+Received: from picapica.im ([88.198.95.67]:51470 "EHLO picapica.im"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S932782AbeBUKYc (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-        Wed, 21 Feb 2018 05:24:32 -0500
-Subject: Re: [PATCHv3 3/3] This is a driver for the NXP MCR20A 802.15.4
- transceiver.
-References: <1519127758-2084-1-git-send-email-liuxuenetmail@gmail.com>
- <1519127758-2084-4-git-send-email-liuxuenetmail@gmail.com>
- <020d8281-720c-4359-409e-15016d39a386@osg.samsung.com>
- <CAJuUDwuOa9DHpadQhQaNq_ba8mv6bB3RdOr9MYKx2wNX_-JJUQ@mail.gmail.com>
-From: Stefan Schmidt <stefan@osg.samsung.com>
-Message-ID: <bb4a5ac8-c9fe-72be-1e98-03ecb1f33b66@osg.samsung.com>
-Date: Wed, 21 Feb 2018 11:24:23 +0100
+        id S1750961AbeBRXDS (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+        Sun, 18 Feb 2018 18:03:18 -0500
+Date: Mon, 19 Feb 2018 00:03:16 +0100
+From: anton@picapica.im
+Subject: [PATCH] website: Add troubleshooting section in how-tos
+Message-ID: <20180218230316.GA8719@picapica.im>
 MIME-Version: 1.0
-In-Reply-To: <CAJuUDwuOa9DHpadQhQaNq_ba8mv6bB3RdOr9MYKx2wNX_-JJUQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Xue Liu <liuxuenetmail@gmail.com>
-Cc: linux-wpan - ML <linux-wpan@vger.kernel.org>
-
-Hello.
+To: linux-wpan@vger.kernel.org
 
 
-On 02/21/2018 11:13 AM, Xue Liu wrote:
-> Hello,
->
-> Thanks for the review. Now I can pick up the CC2420 driver again and
-> hope to post a new one in a few weeks.
->
+Some hints about issues related to SPI bus.
 
-Great, looking forward to it!
-I vaguely remember problems with the state machine and the SFD pin when i was working on it many years ago. :)
+Signed-off-by: Anton Sviridenko <anton@picapica.im>
+---
+ website/index.txt | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-regards
-Stefan Schmidt
+diff --git a/website/index.txt b/website/index.txt
+index 9fd149e..6d9fe88 100644
+--- a/website/index.txt
++++ b/website/index.txt
+@@ -135,6 +135,21 @@ ip netns exec wpan0 ping6 ff02::1%lowpan0
+ Now watch wireshark and all the nice ICMP packets there.
+ 
+ 
++Troubleshooting
++~~~~~~~~~~~~~~~
++If you have issues with transceiver connected to SPI bus, check first
++if wiring is correct and SPI controller is properly configured. Try to
++decrease SPI clock frequency. Messages like these ones in dmesg output
++could indicate problems with SPI connection:
++
++---------------------------------------------------------------------
++at86rf230 spi32765.0: unexcept state change from 0x01 to 0x08. Actual state:
++0x01
++WARNING: CPU: 0 PID: 61 at drivers/net/ieee802154/at86rf230.c:696 0xc0442644
++received tx trac status 4
++---------------------------------------------------------------------
++
++
+ Sniffing
+ ~~~~~~~~
+ 
+-- 
+2.3.6
+
+
