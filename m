@@ -1,42 +1,76 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wm0-f68.google.com ([74.125.82.68]:34770 "EHLO
-        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752410AbeBZJvg (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 26 Feb 2018 04:51:36 -0500
-Received: by mail-wm0-f68.google.com with SMTP id a20so16148122wmd.1
-        for <linux-wpan@vger.kernel.org>; Mon, 26 Feb 2018 01:51:35 -0800 (PST)
-Received: from xue-ThinkPad-T470s.kelle.grp (p578b164d.dip0.t-ipconnect.de. [87.139.22.77])
-        by smtp.gmail.com with ESMTPSA id g7sm6482431edf.4.2018.02.26.01.51.33
-        for <linux-wpan@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Mon, 26 Feb 2018 01:51:34 -0800 (PST)
-From: Xue Liu <liuxuenetmail@gmail.com>
-Subject: [PATCH] website: Add NXP mcr20a to the suppoted hardware
-Date: Mon, 26 Feb 2018 10:51:29 +0100
-Message-Id: <1519638689-5134-1-git-send-email-liuxuenetmail@gmail.com>
+Received: from mail-db5eur01on0077.outbound.protection.outlook.com ([104.47.2.77]:35072
+        "EHLO EUR01-DB5-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1753391AbeBULfy (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+        Wed, 21 Feb 2018 06:35:54 -0500
+Date: Wed, 21 Feb 2018 12:35:40 +0100
+From: Rafael Vuijk <r.vuijk@sownet.nl>
+Subject: [PATCH] ieee802154: assembly of 6LoWPAN fragments improvement
+Message-ID: <20180221113540.GA54319@Rafael-Mac.intra.sownet.nl>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org
+To: Alexander Aring <alex.aring@gmail.com>, Jukka Rissanen <jukka.rissanen@linux.intel.com>
+Cc: linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org
 
-add NXP mcr20a to the suppoted hardware list.
+Hi,
 
-Signed-off-by: Xue Liu <liuxuenetmail@gmail.com>
----
- website/index.txt | 1 +
- 1 file changed, 1 insertion(+)
+We have tested the 6LoWPAN modules in the Linux kernel and came to some issue regarding fragmentation. We have seen aborted SCP transfers ("message authentication code incorrect") and tested TCP transfers as well and saw corruption on fragment-sized intervals. The current fragment assembling functions do not check enough for corrupted L2 packets that might slip through L2 CRC check. (in our case IEEE802.15.4 which has only 16-bit CRC).
+As a result, overlapping fragments due to offset corruption are not detected and assembled incorrectly. Part of packets may have old data. At TCP-level, there is only a simple TCP-checksum which is not enough in this case as the corruption occurs frequently (once every few minutes).
 
-diff --git a/website/index.txt b/website/index.txt
-index 6d9fe88..d631371 100644
---- a/website/index.txt
-+++ b/website/index.txt
-@@ -47,6 +47,7 @@ Supported Hardware
- |cc2420      |no               |           | SPI | http://de.aliexpress.com/store/product/ZIGBEE-networking-technology-Wi-Fi-CC2420-wireless-transceiver-modules-including-antenna/1383438_2036388706.html[aliexpress]
- |cc2520      |yes              |cc2520     | SPI | http://de.aliexpress.com/item/CC2520-wireless-module-ZIGBEE-wireless-sensor-networking-module-with-SMA-external-antenna/1921436550.html[aliexpress]
- |cc2531      |no               |           | USB | http://de.aliexpress.com/item/free-shipping-FOR-ZigBee-CC2531-USB-dongle-protocol-analysis-port-capture-wireless-keyboard-and-mouse/32270975591.html[aliexpress]
-+|mcr20a      |yes              |mcr20a	   | SPI | https://www.nxp.com/products/wireless-connectivity/thread/2.4-ghz-802.15.4-wireless-transceiver:MCR20A[NXP]
-  |mrf24j40   |yes              |mrf24j40   | SPI |  http://de.aliexpress.com/item/MRF24J40MA-I-RM-MRF24J40MA-I-MRF24J40MA-MRF24J40-MICROC-QFN-Import-original/32223258627.html[aliexpress]
- |RZUSBstick  |experimental, http://wpan.cakelab.org/firmwares/rzusb.bin[WIP]          |atusb      | USB | http://www.element14.com/community/docs/DOC-67532/l/avr-rz-usb-stick-module[element14]
- |Xbee        |no |https://github.com/joaopedrotaveira/linux-rpl/blob/master/mainline-3.12.y/0001-Added-XBee-driver-support.patch[out of tree]| ?? | https://www.sparkfun.com/pages/xbee_guide[sparkfun]
--- 
-2.7.4
+After quickly analysing the code we saw some potential issues and created a patch that adds additional overlap checks and simplifies some conditional statements. After running tests again, TCP corruption was not seen again. The test was performed with SCP and keeps transferring large files now without error.
+
+Rafael Vuijk
+
+Signed-off-by: Rafael Vuijk <r.vuijk@sownet.nl>
+--- ./net/ieee802154/6lowpan/reassembly.c	2018-02-20 11:10:06.000000000 +0100
++++ ./net/ieee802154/6lowpan/reassembly.c	2018-02-21 09:13:29.000000000 +0100
+@@ -140,23 +140,14 @@ static int lowpan_frag_queue(struct lowp
+ 	offset = lowpan_802154_cb(skb)->d_offset << 3;
+ 	end = lowpan_802154_cb(skb)->d_size;
+ 
++	if (fq->q.len == 0)
++		fq->q.len = end;
++	if (fq->q.len != end)
++		goto err;
++
+ 	/* Is this the final fragment? */
+ 	if (offset + skb->len == end) {
+-		/* If we already have some bits beyond end
+-		 * or have different end, the segment is corrupted.
+-		 */
+-		if (end < fq->q.len ||
+-		    ((fq->q.flags & INET_FRAG_LAST_IN) && end != fq->q.len))
+-			goto err;
+ 		fq->q.flags |= INET_FRAG_LAST_IN;
+-		fq->q.len = end;
+-	} else {
+-		if (end > fq->q.len) {
+-			/* Some bits beyond end -> corruption. */
+-			if (fq->q.flags & INET_FRAG_LAST_IN)
+-				goto err;
+-			fq->q.len = end;
+-		}
+ 	}
+ 
+ 	/* Find out which fragments are in front and at the back of us
+@@ -179,6 +170,13 @@ static int lowpan_frag_queue(struct lowp
+ 	}
+ 
+ found:
++	/* Current fragment overlaps with previous fragment? */
++	if (prev && (lowpan_802154_cb(prev)->d_offset << 3) + prev->len > offset)
++		goto err;
++	/* Current fragment overlaps with next fragment? */
++	if (next && offset + skb->len > lowpan_802154_cb(next)->d_offset << 3)
++		goto err;
++
+ 	/* Insert this fragment in the chain of fragments. */
+ 	skb->next = next;
+ 	if (!next)
+
+--
 
