@@ -1,57 +1,59 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from osg.samsung.com ([64.30.133.232]:56380 "EHLO osg.samsung.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751999AbeBZLx6 (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-        Mon, 26 Feb 2018 06:53:58 -0500
-Subject: Re: [PATCH] website: Add troubleshooting section in how-tos
-References: <20180218230316.GA8719@picapica.im>
- <1dd13aca-fc2d-82fb-821e-3b1994f26930@osg.samsung.com>
- <CAB_54W7jQzAO_fYRKV=qJHxxDfnpk=ddNrF20yvCRbdp70KwEg@mail.gmail.com>
+Received: from proxima.lasnet.de ([78.47.171.185]:59514 "EHLO
+        proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752392AbeBZPvm (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 26 Feb 2018 10:51:42 -0500
 From: Stefan Schmidt <stefan@osg.samsung.com>
-Message-ID: <fd14390a-38b7-a120-3a3f-6e9a6fe44e11@osg.samsung.com>
-Date: Mon, 26 Feb 2018 12:53:48 +0100
-MIME-Version: 1.0
-In-Reply-To: <CAB_54W7jQzAO_fYRKV=qJHxxDfnpk=ddNrF20yvCRbdp70KwEg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Subject: pull-request: ieee802154-next 2018-02-26
+Date: Mon, 26 Feb 2018 16:41:35 +0100
+Message-Id: <20180226154135.13798-1-stefan@osg.samsung.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>
-Cc: anton@picapica.im, linux-wpan - ML <linux-wpan@vger.kernel.org>
+To: davem@davemloft.net
+Cc: linux-wpan@vger.kernel.org, alex.aring@gmail.com, netdev@vger.kernel.org
 
-Hello.
+Hello Dave.
 
+An update from ieee802154 for *net-next*
 
-On 02/25/2018 11:02 PM, Alexander Aring wrote:
-> Hi,
->
->> Thanks for the patch I applied and pushed it to the repo now.
->> While doing this I toke the freedom to replace your email with name and email in the from line to ahve your name show up correctly in git.
->>
->> Alex, could you re-generate the website to get this included?
-> I regenerate and updated the website... 
+Alexander corrected a setting which got lost during some 6lowpan rework
+a while back and Xue Liu provided us with a new driver for the MCR20A
+transceiver.
 
-Thanks
-
-I also spent some time at the weekend to get the hosting on githuib pages going.
-
-
-http://linux-wpan.org/ (no https or IPv6 so far as github is still working on getting this rolled out for github pages with own domain
-names. At least https seems to be in progress more recently)
-https://linux-wpan.github.io/ (for https and IPv6 access)
-
-This has a copy of the latest generated html page we serve on our current side as well.
-
-Todo items before we could switch over:
-1) Find a way to run the generator on commits (or simply to the generating by hand prior to check in)
-2) http redirect from cakelab page to new domain (Alex, I can help you with the place holder html page to put there but you would need to
-upload it)
-
-Mid term:
-o Monitor GitHub progress on using https with custom domain
-o Monitor GitHub progress on using IPv6 with custom domain
-o Maybe switch to a different theme or at least re-structure the content of the page
+If there are any issues let me know. If not, please pull.
 
 regards
 Stefan Schmidt
+
+The following changes since commit 77079683617b60387ad23e91cc5b82693b3075ab:
+
+  Merge branch '40GbE' of git://git.kernel.org/pub/scm/linux/kernel/git/jkirsher/next-queue (2018-02-13 22:31:23 -0500)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/sschmidt/wpan-next.git ieee802154-for-davem-2018-02-26
+
+for you to fetch changes up to 8c6ad9cc51574c8f20b5777e97b42457802ac36d:
+
+  ieee802154: Add NXP MCR20A IEEE 802.15.4 transceiver driver (2018-02-21 09:08:39 +0100)
+
+----------------------------------------------------------------
+Alexander Aring (1):
+      ieee802154: 6lowpan: set IFF_NO_QUEUE
+
+Xue Liu (3):
+      ieee802154: Add device tree documentation for MCR20A
+      ieee802154: Add entry in MAINTAINTERS for MCR20a driver
+      ieee802154: Add NXP MCR20A IEEE 802.15.4 transceiver driver
+
+ .../devicetree/bindings/net/ieee802154/mcr20a.txt  |   23 +
+ MAINTAINERS                                        |    9 +
+ drivers/net/ieee802154/Kconfig                     |   11 +
+ drivers/net/ieee802154/Makefile                    |    1 +
+ drivers/net/ieee802154/mcr20a.c                    | 1413 ++++++++++++++++++++
+ drivers/net/ieee802154/mcr20a.h                    |  498 +++++++
+ net/ieee802154/6lowpan/core.c                      |    1 +
+ 7 files changed, 1956 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/net/ieee802154/mcr20a.txt
+ create mode 100644 drivers/net/ieee802154/mcr20a.c
+ create mode 100644 drivers/net/ieee802154/mcr20a.h
