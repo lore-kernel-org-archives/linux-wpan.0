@@ -1,80 +1,47 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from osg.samsung.com ([64.30.133.232]:54877 "EHLO osg.samsung.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752392AbeDJK6W (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-        Tue, 10 Apr 2018 06:58:22 -0400
-Subject: Re: [PATCH] ieee802154: mcr20a: Fix memory leak in mcr20a_probe
-References: <20180405162006.GA2199@embeddedor.com>
-From: Stefan Schmidt <stefan@osg.samsung.com>
-Message-ID: <59fce20c-0450-e59b-4db4-94bbb2372c9c@osg.samsung.com>
-Date: Tue, 10 Apr 2018 12:58:17 +0200
-MIME-Version: 1.0
-In-Reply-To: <20180405162006.GA2199@embeddedor.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Received: from mail-pl0-f67.google.com ([209.85.160.67]:36035 "EHLO
+        mail-pl0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752172AbeDKCOR (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 10 Apr 2018 22:14:17 -0400
+From: Jia-Ju Bai <baijiaju1990@gmail.com>
+Subject: [PATCH] net: ieee802154: atusb: Replace GFP_ATOMIC with GFP_KERNEL in atusb_probe
+Date: Wed, 11 Apr 2018 10:14:10 +0800
+Message-Id: <1523412850-2260-1-git-send-email-baijiaju1990@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: "Gustavo A. R. Silva" <gustavo@embeddedor.com>, Xue Liu <liuxuenetmail@gmail.com>, Alexander Aring <alex.aring@gmail.com>
-Cc: linux-wpan@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+To: stefan@osg.samsung.com, alex.aring@gmail.com
+Cc: linux-wpan@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Jia-Ju Bai <baijiaju1990@gmail.com>
 
-Hello.
+atusb_probe() is never called in atomic context.
+This function is only set as ".probe" in struct usb_driver.
 
+Despite never getting called from atomic context,
+atusb_probe() calls usb_alloc_urb() with GFP_ATOMIC,
+which does not sleep for allocation.
+GFP_ATOMIC is not necessary and can be replaced with GFP_KERNEL,
+which can sleep and improve the possibility of sucessful allocation.
 
-On 04/05/2018 06:20 PM, Gustavo A. R. Silva wrote:
-> Free allocated memory for pdata before return.
->
-> Addresses-Coverity-ID: 1466096 ("Resource leak")
-> Fixes: 8c6ad9cc5157 ("ieee802154: Add NXP MCR20A IEEE 802.15.4 transceiver driver")
-> Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
-> ---
->  drivers/net/ieee802154/mcr20a.c | 9 ++++++---
->  1 file changed, 6 insertions(+), 3 deletions(-)
->
-> diff --git a/drivers/net/ieee802154/mcr20a.c b/drivers/net/ieee802154/mcr20a.c
-> index 55a22c7..944470d 100644
-> --- a/drivers/net/ieee802154/mcr20a.c
-> +++ b/drivers/net/ieee802154/mcr20a.c
-> @@ -1267,7 +1267,7 @@ mcr20a_probe(struct spi_device *spi)
->  	ret = mcr20a_get_platform_data(spi, pdata);
->  	if (ret < 0) {
->  		dev_crit(&spi->dev, "mcr20a_get_platform_data failed.\n");
-> -		return ret;
-> +		goto free_pdata;
->  	}
->  
->  	/* init reset gpio */
-> @@ -1275,7 +1275,7 @@ mcr20a_probe(struct spi_device *spi)
->  		ret = devm_gpio_request_one(&spi->dev, pdata->rst_gpio,
->  					    GPIOF_OUT_INIT_HIGH, "reset");
->  		if (ret)
-> -			return ret;
-> +			goto free_pdata;
->  	}
->  
->  	/* reset mcr20a */
-> @@ -1291,7 +1291,8 @@ mcr20a_probe(struct spi_device *spi)
->  	hw = ieee802154_alloc_hw(sizeof(*lp), &mcr20a_hw_ops);
->  	if (!hw) {
->  		dev_crit(&spi->dev, "ieee802154_alloc_hw failed\n");
-> -		return -ENOMEM;
-> +		ret = -ENOMEM;
-> +		goto free_pdata;
->  	}
->  
->  	/* init mcr20a local data */
-> @@ -1366,6 +1367,8 @@ mcr20a_probe(struct spi_device *spi)
->  
->  free_dev:
->  	ieee802154_free_hw(lp->hw);
-> +free_pdata:
-> +	kfree(pdata);
->  
->  	return ret;
->  }
+This is found by a static analysis tool named DCNS written by myself.
+And I also manually check it.
 
-This patch has been applied to the wpan tree and will be
-part of the next pull request to net. Thanks!
+Signed-off-by: Jia-Ju Bai <baijiaju1990@gmail.com>
+---
+ drivers/net/ieee802154/atusb.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-regards
-Stefan Schmidt
+diff --git a/drivers/net/ieee802154/atusb.c b/drivers/net/ieee802154/atusb.c
+index ef68851..ab6a505 100644
+--- a/drivers/net/ieee802154/atusb.c
++++ b/drivers/net/ieee802154/atusb.c
+@@ -789,7 +789,7 @@ static int atusb_probe(struct usb_interface *interface,
+ 	atusb->tx_dr.bRequest = ATUSB_TX;
+ 	atusb->tx_dr.wValue = cpu_to_le16(0);
+ 
+-	atusb->tx_urb = usb_alloc_urb(0, GFP_ATOMIC);
++	atusb->tx_urb = usb_alloc_urb(0, GFP_KERNEL);
+ 	if (!atusb->tx_urb)
+ 		goto fail;
+ 
+-- 
+1.9.1
+
