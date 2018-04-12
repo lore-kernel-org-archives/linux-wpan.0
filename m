@@ -1,61 +1,43 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from osg.samsung.com ([64.30.133.232]:41612 "EHLO osg.samsung.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752483AbeDLMI6 (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-        Thu, 12 Apr 2018 08:08:58 -0400
-Subject: Re: [PATCH] net: ieee802154: atusb: Replace GFP_ATOMIC with
- GFP_KERNEL in atusb_probe
-References: <1523412850-2260-1-git-send-email-baijiaju1990@gmail.com>
+Received: from proxima.lasnet.de ([78.47.171.185]:33803 "EHLO
+        proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751589AbeDLM3I (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 12 Apr 2018 08:29:08 -0400
 From: Stefan Schmidt <stefan@osg.samsung.com>
-Message-ID: <46cf6980-ff83-7d68-9a5e-67d874c1900a@osg.samsung.com>
-Date: Thu, 12 Apr 2018 14:08:52 +0200
-MIME-Version: 1.0
-In-Reply-To: <1523412850-2260-1-git-send-email-baijiaju1990@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Subject: [PATCH] net: ieee802154: mcr20a: do not leak resources on error path
+Date: Thu, 12 Apr 2018 14:28:49 +0200
+Message-Id: <20180412122849.15329-1-stefan@osg.samsung.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Jia-Ju Bai <baijiaju1990@gmail.com>, alex.aring@gmail.com
-Cc: linux-wpan@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Xue Liu <liuxuenetmail@gmail.com>, linux-wpan@vger.kernel.org
+Cc: Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt <stefan@osg.samsung.com>
 
-Hello.
+We already allocated the device and platform  data at this
+point. Instead of simply return from the probe function we
+need to cleanup the resources first.
 
+Signed-off-by: Stefan Schmidt <stefan@osg.samsung.com>
+---
+ drivers/net/ieee802154/mcr20a.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-On 04/11/2018 04:14 AM, Jia-Ju Bai wrote:
-> atusb_probe() is never called in atomic context.
-> This function is only set as ".probe" in struct usb_driver.
->
-> Despite never getting called from atomic context,
-> atusb_probe() calls usb_alloc_urb() with GFP_ATOMIC,
-> which does not sleep for allocation.
-> GFP_ATOMIC is not necessary and can be replaced with GFP_KERNEL,
-> which can sleep and improve the possibility of sucessful allocation.
->
-> This is found by a static analysis tool named DCNS written by myself.
-> And I also manually check it.
->
-> Signed-off-by: Jia-Ju Bai <baijiaju1990@gmail.com>
-> ---
->  drivers/net/ieee802154/atusb.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/drivers/net/ieee802154/atusb.c b/drivers/net/ieee802154/atusb.c
-> index ef68851..ab6a505 100644
-> --- a/drivers/net/ieee802154/atusb.c
-> +++ b/drivers/net/ieee802154/atusb.c
-> @@ -789,7 +789,7 @@ static int atusb_probe(struct usb_interface *interface,
->  	atusb->tx_dr.bRequest = ATUSB_TX;
->  	atusb->tx_dr.wValue = cpu_to_le16(0);
->  
-> -	atusb->tx_urb = usb_alloc_urb(0, GFP_ATOMIC);
-> +	atusb->tx_urb = usb_alloc_urb(0, GFP_KERNEL);
->  	if (!atusb->tx_urb)
->  		goto fail;
->  
+diff --git a/drivers/net/ieee802154/mcr20a.c b/drivers/net/ieee802154/mcr20a.c
+index 944470d69ba9..de0d7f28a181 100644
+--- a/drivers/net/ieee802154/mcr20a.c
++++ b/drivers/net/ieee802154/mcr20a.c
+@@ -1309,8 +1309,10 @@ mcr20a_probe(struct spi_device *spi)
+ 	/* init buf */
+ 	lp->buf = devm_kzalloc(&spi->dev, SPI_COMMAND_BUFFER, GFP_KERNEL);
+ 
+-	if (!lp->buf)
+-		return -ENOMEM;
++	if (!lp->buf) {
++		ret = -ENOMEM;
++		goto free_dev;
++	}
+ 
+ 	mcr20a_setup_tx_spi_messages(lp);
+ 	mcr20a_setup_rx_spi_messages(lp);
+-- 
+2.14.3
 
-This patch has been applied to the wpan tree and will be
-part of the next pull request to net. Thanks!
-
-regards
-Stefan Schmidt
