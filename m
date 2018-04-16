@@ -1,66 +1,50 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from osg.samsung.com ([64.30.133.232]:56831 "EHLO osg.samsung.com"
+Received: from osg.samsung.com ([64.30.133.232]:61115 "EHLO osg.samsung.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750973AbeDMIuD (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-        Fri, 13 Apr 2018 04:50:03 -0400
-Subject: Re: [PATCH] net: ieee802154: mcr20a: do not leak resources on error
- path
-References: <20180412122849.15329-1-stefan@osg.samsung.com>
- <CAJuUDwuPeZhPOFcozP5zO+ZR9OLoDemK5_BPr0F=Rb88NBryBw@mail.gmail.com>
+        id S1750884AbeDPNBj (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+        Mon, 16 Apr 2018 09:01:39 -0400
+Subject: Re: [PATCH] ieee802154: assembly of 6LoWPAN fragments improvement
 From: Stefan Schmidt <stefan@osg.samsung.com>
-Message-ID: <1abbb92a-6b44-e9c4-10ab-91943c0b4f9a@osg.samsung.com>
-Date: Fri, 13 Apr 2018 10:49:58 +0200
+References: <20180221113540.GA54319@Rafael-Mac.intra.sownet.nl>
+ <60c224d2-17e5-eaf8-2d1b-763ae4cd92db@osg.samsung.com>
+ <20180222212407.GA82995@Rafael-Mac.intra.sownet.nl>
+ <e387c90e-ad4d-994f-4043-b6b83eb7a2a8@osg.samsung.com>
+Message-ID: <6a728b61-26f1-7a2a-779d-7205b3c7c3b1@osg.samsung.com>
+Date: Mon, 16 Apr 2018 15:01:34 +0200
 MIME-Version: 1.0
-In-Reply-To: <CAJuUDwuPeZhPOFcozP5zO+ZR9OLoDemK5_BPr0F=Rb88NBryBw@mail.gmail.com>
+In-Reply-To: <e387c90e-ad4d-994f-4043-b6b83eb7a2a8@osg.samsung.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 Content-Language: en-US
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Xue Liu <liuxuenetmail@gmail.com>
-Cc: linux-wpan - ML <linux-wpan@vger.kernel.org>, Alexander Aring <alex.aring@gmail.com>
+To: Rafael Vuijk <r.vuijk@sownet.nl>
+Cc: Alexander Aring <alex.aring@gmail.com>, Jukka Rissanen <jukka.rissanen@linux.intel.com>, linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org
 
-Hello.
+Hello Rafael.
 
 
-On 04/12/2018 03:28 PM, Xue Liu wrote:
-> Acked-by: Xue Liu <liuxuenetmail@gmail.com>
-
-Thanks for the review, Xue.
-
+On 02/26/2018 01:10 PM, Stefan Schmidt wrote:
+> On 02/23/2018 12:10 AM, Rafael Vuijk wrote:
+>> On Wed, Feb 21, 2018 at 05:31:07PM +0100, Stefan Schmidt wrote:
+>>
+>>> To me this looks like to distinguished things to fix and thus being fixed in two separate commits.
+>> That makes sense. That'd be 1/2 v2 and 2/2 v2 or so?
+>> I should split up my own commits more often too ;) (bad habit)
+> Yes, splitting them up in 1/2 and 2/2 and adding the v2 version tag will help me and patchwork to keep track of it.
 >
-> On 12 April 2018 at 14:28, Stefan Schmidt <stefan@osg.samsung.com> wrote:
->> We already allocated the device and platform  data at this
->> point. Instead of simply return from the probe function we
->> need to cleanup the resources first.
->>
->> Signed-off-by: Stefan Schmidt <stefan@osg.samsung.com>
->> ---
->>  drivers/net/ieee802154/mcr20a.c | 6 ++++--
->>  1 file changed, 4 insertions(+), 2 deletions(-)
->>
->> diff --git a/drivers/net/ieee802154/mcr20a.c b/drivers/net/ieee802154/mcr20a.c
->> index 944470d69ba9..de0d7f28a181 100644
->> --- a/drivers/net/ieee802154/mcr20a.c
->> +++ b/drivers/net/ieee802154/mcr20a.c
->> @@ -1309,8 +1309,10 @@ mcr20a_probe(struct spi_device *spi)
->>         /* init buf */
->>         lp->buf = devm_kzalloc(&spi->dev, SPI_COMMAND_BUFFER, GFP_KERNEL);
->>
->> -       if (!lp->buf)
->> -               return -ENOMEM;
->> +       if (!lp->buf) {
->> +               ret = -ENOMEM;
->> +               goto free_dev;
->> +       }
->>
->>         mcr20a_setup_tx_spi_messages(lp);
->>         mcr20a_setup_rx_spi_messages(lp);
->> --
->> 2.14.3
->>
-This patch has been applied to the wpan tree and will be
-part of the next pull request to net.
+
+Just a quick note on this patch. I first waited for you to sent the split version. During this I sadly forgot
+about this issue and patch all together during some travels.
+
+Last week I finally remembered and wanted to setup a test case for this on my own. With the result
+that I found a new patchset in 4.16 breaking 6LoWPAN fragmentation/reassembly for completely. Not
+even initiating a ssh session works. I bisected the commit now and reported to the author. Hopefully
+we can get this fixed soon.
+
+In summary: your patch is nor forgotten and I still want to reproduce it and get your fix in (sorry for the delay)
+You could help from your side by splitting the patch up and sending the second version. Once the above
+mentioned other issue is fixed I will look into yours.
 
 regards
 Stefan Schmidt
