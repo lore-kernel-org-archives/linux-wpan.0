@@ -1,62 +1,86 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-ua0-f193.google.com ([209.85.217.193]:45085 "EHLO
-        mail-ua0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753581AbeDSXmX (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 19 Apr 2018 19:42:23 -0400
-Received: by mail-ua0-f193.google.com with SMTP id j18so4587429uae.12
-        for <linux-wpan@vger.kernel.org>; Thu, 19 Apr 2018 16:42:23 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20180419205303.30035-1-aring@mojatatu.com>
-References: <20180419205303.30035-1-aring@mojatatu.com>
+Received: from mail-io0-f196.google.com ([209.85.223.196]:43133 "EHLO
+        mail-io0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750745AbeDTSyf (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 20 Apr 2018 14:54:35 -0400
+Received: by mail-io0-f196.google.com with SMTP id q84-v6so11645661iod.10
+        for <linux-wpan@vger.kernel.org>; Fri, 20 Apr 2018 11:54:35 -0700 (PDT)
 From: Alexander Aring <aring@mojatatu.com>
-Date: Thu, 19 Apr 2018 19:42:21 -0400
-Message-ID: <CAOHTApiq_PNEWbD6xgrWRyUVvVw9DSWL+mmwc3Uf2=9vkV-n1w@mail.gmail.com>
-Subject: Re: [PATCH wpan] net: cfg802154: mark ieee802154_addr as packed
-Content-Type: text/plain; charset="UTF-8"
+Subject: [PATCH wpan] net: ieee802154: 6lowpan: fix frag reassembly
+Date: Fri, 20 Apr 2018 14:54:13 -0400
+Message-Id: <20180420185413.8818-1-aring@mojatatu.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Stefan Schmidt <stefan@osg.samsung.com>
-Cc: linux-wpan - ML <linux-wpan@vger.kernel.org>, Eric Dumazet <eric.dumazet@gmail.com>, kernel@mojatatu.com, Alexander Aring <aring@mojatatu.com>
+To: stefan@osg.samsung.com
+Cc: linux-wpan@vger.kernel.org, eric.dumazet@gmail.com, kernel@mojatatu.com, Alexander Aring <aring@mojatatu.com>
 
-Hi,
+This patch initialize stack variables which are used in
+frag_lowpan_compare_key to zero. In my case there are padding bytes in the
+structures ieee802154_addr as well in frag_lowpan_compare_key. Otherwise
+the key variable contains random bytes. The result is that a compare of
+two keys by memcmp works incorrect.
 
-On Thu, Apr 19, 2018 at 4:53 PM, Alexander Aring <aring@mojatatu.com> wrote:
-> This patch marks ieee802154_addr as packed as it used by memcmp to
-> compare this struct for rhashtable in fragmentation api.
->
-> Fixes: 648700f76b03 ("inet: frags: use rhashtables for reassembly units")
-> Reported-by: Stefan Schmidt <stefan@osg.samsung.com>
-> Signed-off-by: Alexander Aring <aring@mojatatu.com>
-> ---
->  include/net/cfg802154.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/include/net/cfg802154.h b/include/net/cfg802154.h
-> index 795ca4008f72..fc5dab9c798e 100644
-> --- a/include/net/cfg802154.h
-> +++ b/include/net/cfg802154.h
-> @@ -242,7 +242,7 @@ struct ieee802154_addr {
->                 __le16 short_addr;
->                 __le64 extended_addr;
->         };
-> -};
-> +} __packed;
->
+Fixes: 648700f76b03 ("inet: frags: use rhashtables for reassembly units")
+Signed-off-by: Alexander Aring <aring@mojatatu.com>
+Reported-by: Stefan Schmidt <stefan@osg.samsung.com>
+---
+So far I see it's a case of 32 alignment in frag_v4_compare_key and
+frag_v6_compare_key and I am not sure about if this works on all arch
+correctly.
 
-Stefan drop this one, it was somehow to fix my issue at first... but
-its not the real solution.
-I just did a hexdump on the key and saw that the length doesn't fit
-what sizeof tells me so I did that and was too happy that it worked.
+ net/ieee802154/6lowpan/6lowpan_i.h  |  4 ++--
+ net/ieee802154/6lowpan/reassembly.c | 14 +++++++-------
+ 2 files changed, 9 insertions(+), 9 deletions(-)
 
-The real fix would be to figure out why I have some "random" bits in
-this structure... something need to have memset to zero before... I
-need to check, so far I see it only in FRAG1 I guess it's related to
-uncompression...
+diff --git a/net/ieee802154/6lowpan/6lowpan_i.h b/net/ieee802154/6lowpan/6lowpan_i.h
+index b8d95cb71c25..44a7e16bf3b5 100644
+--- a/net/ieee802154/6lowpan/6lowpan_i.h
++++ b/net/ieee802154/6lowpan/6lowpan_i.h
+@@ -20,8 +20,8 @@ typedef unsigned __bitwise lowpan_rx_result;
+ struct frag_lowpan_compare_key {
+ 	u16 tag;
+ 	u16 d_size;
+-	const struct ieee802154_addr src;
+-	const struct ieee802154_addr dst;
++	struct ieee802154_addr src;
++	struct ieee802154_addr dst;
+ };
+ 
+ /* Equivalent of ipv4 struct ipq
+diff --git a/net/ieee802154/6lowpan/reassembly.c b/net/ieee802154/6lowpan/reassembly.c
+index 1790b65944b3..2cc224106b69 100644
+--- a/net/ieee802154/6lowpan/reassembly.c
++++ b/net/ieee802154/6lowpan/reassembly.c
+@@ -75,14 +75,14 @@ fq_find(struct net *net, const struct lowpan_802154_cb *cb,
+ {
+ 	struct netns_ieee802154_lowpan *ieee802154_lowpan =
+ 		net_ieee802154_lowpan(net);
+-	struct frag_lowpan_compare_key key = {
+-		.tag = cb->d_tag,
+-		.d_size = cb->d_size,
+-		.src = *src,
+-		.dst = *dst,
+-	};
++	struct frag_lowpan_compare_key key = {};
+ 	struct inet_frag_queue *q;
+ 
++	key.tag = cb->d_tag;
++	key.d_size = cb->d_size;
++	key.src = *src;
++	key.dst = *dst;
++
+ 	q = inet_frag_find(&ieee802154_lowpan->frags, &key);
+ 	if (!q)
+ 		return NULL;
+@@ -372,7 +372,7 @@ int lowpan_frag_rcv(struct sk_buff *skb, u8 frag_type)
+ 	struct lowpan_frag_queue *fq;
+ 	struct net *net = dev_net(skb->dev);
+ 	struct lowpan_802154_cb *cb = lowpan_802154_cb(skb);
+-	struct ieee802154_hdr hdr;
++	struct ieee802154_hdr hdr = {};
+ 	int err;
+ 
+ 	if (ieee802154_hdr_peek_addrs(skb, &hdr) < 0)
+-- 
+2.11.0
 
-This fix will work so far... but you will get issues in short address
-handling which will be filled with more padding bytes and this should
-be zero, so it's all the same...
-
-Sorry.
-
-- Alex
