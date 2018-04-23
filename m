@@ -1,13 +1,13 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from osg.samsung.com ([64.30.133.232]:47264 "EHLO osg.samsung.com"
+Received: from osg.samsung.com ([64.30.133.232]:58099 "EHLO osg.samsung.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752291AbeDTVHw (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-        Fri, 20 Apr 2018 17:07:52 -0400
+        id S932175AbeDWTHQ (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+        Mon, 23 Apr 2018 15:07:16 -0400
 Subject: Re: [PATCH wpan] net: ieee802154: 6lowpan: fix frag reassembly
 References: <20180420185413.8818-1-aring@mojatatu.com>
 From: Stefan Schmidt <stefan@osg.samsung.com>
-Message-ID: <805bf7d3-59f6-781f-40f4-8c6cecbb4074@osg.samsung.com>
-Date: Fri, 20 Apr 2018 23:07:42 +0200
+Message-ID: <dc1829c9-f482-2c0f-9920-4638e5b6c374@osg.samsung.com>
+Date: Mon, 23 Apr 2018 21:07:03 +0200
 MIME-Version: 1.0
 In-Reply-To: <20180420185413.8818-1-aring@mojatatu.com>
 Content-Type: text/plain; charset=utf-8
@@ -31,14 +31,6 @@ On 04/20/2018 08:54 PM, Alexander Aring wrote:
 > Fixes: 648700f76b03 ("inet: frags: use rhashtables for reassembly units")
 > Signed-off-by: Alexander Aring <aring@mojatatu.com>
 > Reported-by: Stefan Schmidt <stefan@osg.samsung.com>
-
-Thanks for having another attempt on this. I dropped the __packed patch you sent earlier.
-
-Giving this some more testing with SSH and large ping packets and it is as stable again as before.
-
-Eric, you did the original change so let me know if you have a problem with this.
-
-
 > ---
 > So far I see it's a case of 32 alignment in frag_v4_compare_key and
 > frag_v6_compare_key and I am not sure about if this works on all arch
@@ -98,6 +90,8 @@ Eric, you did the original change so let me know if you have a problem with this
 >  
 >  	if (ieee802154_hdr_peek_addrs(skb, &hdr) < 0)
 
+This patch has been applied to the wpan tree and will be
+part of the next pull request to net. Thanks!
+
 regards
 Stefan Schmidt
-
