@@ -1,69 +1,1139 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:55714 "EHLO mail.kernel.org"
+Received: from osg.samsung.com ([64.30.133.232]:39937 "EHLO osg.samsung.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752223AbeEQP72 (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-        Thu, 17 May 2018 11:59:28 -0400
-Date: Thu, 17 May 2018 17:59:08 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-Subject: Re: net: ieee802154: 6lowpan: fix frag reassembly
-Message-ID: <20180517155908.GA4831@kroah.com>
-References: <142208d4-6ca6-5923-327c-8d1cb069ceb8@osg.samsung.com>
- <20180517085919.GD25318@kroah.com>
- <d70c35cd-2795-70f1-a7fc-2785c7938fac@datenfreihafen.org>
+        id S1752281AbeEGOBG (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+        Mon, 7 May 2018 10:01:06 -0400
+Subject: Re: [RFC PATCH wpan-next 1/2] ieee802154: hwsim: add replacement for
+ fakelb
+References: <20180427212154.29582-1-aring@mojatatu.com>
+ <20180427212154.29582-2-aring@mojatatu.com>
+From: Stefan Schmidt <stefan@osg.samsung.com>
+Message-ID: <6f789057-24b1-9d43-e7af-26c6c8650805@osg.samsung.com>
+Date: Mon, 7 May 2018 16:00:49 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d70c35cd-2795-70f1-a7fc-2785c7938fac@datenfreihafen.org>
+In-Reply-To: <20180427212154.29582-2-aring@mojatatu.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Stefan Schmidt <stefan@datenfreihafen.org>
-Cc: Stefan Schmidt <stefan@osg.samsung.com>, stable@vger.kernel.org, Alexander Aring <aring@mojatatu.com>, "David S. Miller" <davem@davemloft.net>, "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>, Network Development <netdev@vger.kernel.org>
+To: Alexander Aring <aring@mojatatu.com>
+Cc: linux-wpan@vger.kernel.org, kernel@mojatatu.com
 
-On Thu, May 17, 2018 at 04:16:20PM +0200, Stefan Schmidt wrote:
-> Hello Greg.
-> 
-> On 17.05.2018 10:59, Greg KH wrote:
-> > On Mon, May 14, 2018 at 05:22:18PM +0200, Stefan Schmidt wrote:
-> >> Hello.
-> >>
-> >>
-> >> Please apply f18fa5de5ba7f1d6650951502bb96a6e4715a948
-> >>
-> >> (net: ieee802154: 6lowpan: fix frag reassembly) to the 4.16.x stable tree.
-> >>
-> >>
-> >> Earlier trees are not needed as the problem was introduced in 4.16.
-> > 
-> > Really?  Commit f18fa5de5ba7 ("net: ieee802154: 6lowpan: fix frag
-> > reassembly") says it fixes commit 648700f76b03 ("inet: frags: use
-> > rhashtables for reassembly units") which did not show up until 4.17-rc1:
-> > 	$ git describe --contains 648700f76b03
-> > 	v4.17-rc1~148^2~20^2~11
-> > 
-> > Also, it did not get backported to 4.16.y, so I don't see how it is
-> > needed in 4.16-stable.
-> 
-> I guess its time to blush on my side. During the bisection for the
-> commit that introduced the problem I came to the point where it was
-> clear to me that it was already in 4.16. This was a while back I have
-> have honestly no idea how I did this mistake.
-> 
-> I tested again now with plain 4.16 and it works fine.
-> The fix is also in 4.17-rcX where it actually is needed. In the end I am
-> glad that it was not introduced and slipped me in an earlier release.
-> 
-> > To verify this, I tried applying the patch, and it totally fails to
-> > apply to the 4.16.y tree.
-> > 
-> > So are you _sure_ you want/need this in 4.16?  If so, can you provide a
-> > working backport that you have verified works?
-> 
-> No backport needed. I simply screwed up when verifying this for 4.16.
-> I put on the hat of shame for today and will try harder the next time.
+Hello.
 
-Hey, not a problem, thanks for verifying, 'git describe --contains' is
-your friend :)
 
-thanks,
+On 04/27/2018 11:21 PM, Alexander Aring wrote:
+> This patch adds a new virtual driver mac802154_hwsim which is based on
+> the fakelb driver.
+> The fakelb driver will get deprecated and hopefully removed someday.
+> The main reason for doing this step is to rename the driver to
+> mac802154_hwsim to have a similar naming scheme as mac80211_hwsim,
+> which is more popular in the 802.11 wireless word and the idea is the
+> same behind this driver.
+>
+> The new features of this driver are to have knowledge about connected
+> edges, which can be changed during runtime. This offers a testing
+> environment for routing protocols e.g. RPL.
+> The default behaviour is still as fakelb: two radios connected to each
+> other. New added radios during runtime will not be connected to other
+> wpan_hwsim instances.
+>
+> The netlink api is not namespace aware on purpose, only the registered
+> wpan_phy's can be moved to namespaces. The physical layer according to
+> wiresless "air" communication can be handled across namespaces.
+>
+> Furthermore the edges can be weighted with the LQI value according IEEE
+> 802.15.4 which offers additional handling to mark bad or good connection
+> indicators to other connected virtual phys.
+>
+> Signed-off-by: Alexander Aring <aring@mojatatu.com>
+> ---
+>  drivers/net/ieee802154/Kconfig           |  11 +
+>  drivers/net/ieee802154/Makefile          |   1 +
+>  drivers/net/ieee802154/mac802154_hwsim.c | 925 +++++++++++++++++++++++++++++++
+>  drivers/net/ieee802154/mac802154_hwsim.h |  73 +++
+>  4 files changed, 1010 insertions(+)
+>  create mode 100644 drivers/net/ieee802154/mac802154_hwsim.c
+>  create mode 100644 drivers/net/ieee802154/mac802154_hwsim.h
+>
+> diff --git a/drivers/net/ieee802154/Kconfig b/drivers/net/ieee802154/Kconfig
+> index 8782f5655e3f..ff3552044679 100644
+> --- a/drivers/net/ieee802154/Kconfig
+> +++ b/drivers/net/ieee802154/Kconfig
+> @@ -115,3 +115,14 @@ config IEEE802154_MCR20A
+>  
+>  	  This driver can also be built as a module. To do so, say M here.
+>  	  the module will be called 'mcr20a'.
+> +
+> +config MAC802154_HWSIM
+> +	depends on IEEE802154_DRIVERS && MAC802154
+> +	tristate "Simulated radio testing tool for mac802154"
+> +	---help---
+> +	  This driver is a developer testing tool that can be used to test
+> +	  IEEE 802.15.4 networking stack (mac802154) functionality. This is not
+> +	  needed for normal wireless LAN usage and is only for testing.
 
-greg k-h
+The wireless LAN wording seems to be a left over :-)
+
+
+> +	  This driver can also be built as a module. To do so say M here.
+> +	  The module will be called 'mac802154_hwsim'.
+> diff --git a/drivers/net/ieee802154/Makefile b/drivers/net/ieee802154/Makefile
+> index 104744d5a668..3b17aa17d46a 100644
+> --- a/drivers/net/ieee802154/Makefile
+> +++ b/drivers/net/ieee802154/Makefile
+> @@ -7,3 +7,4 @@ obj-$(CONFIG_IEEE802154_ATUSB) += atusb.o
+>  obj-$(CONFIG_IEEE802154_ADF7242) += adf7242.o
+>  obj-$(CONFIG_IEEE802154_CA8210) += ca8210.o
+>  obj-$(CONFIG_IEEE802154_MCR20A) += mcr20a.o
+> +obj-$(CONFIG_MAC802154_HWSIM) += mac802154_hwsim.o
+> diff --git a/drivers/net/ieee802154/mac802154_hwsim.c b/drivers/net/ieee802154/mac802154_hwsim.c
+> new file mode 100644
+> index 000000000000..eea0d355bbd8
+> --- /dev/null
+> +++ b/drivers/net/ieee802154/mac802154_hwsim.c
+> @@ -0,0 +1,925 @@
+> +/*
+> + * HWSIM IEEE 802.15.4 interface
+> + *
+> + * (C) 2018 Mojatau, Alexander Aring <aring@mojatau.com>
+> + * Copyright 2007-2012 Siemens AG
+> + *
+> + * This program is free software; you can redistribute it and/or modify
+> + * it under the terms of the GNU General Public License version 2
+> + * as published by the Free Software Foundation.
+> + *
+> + * This program is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + * GNU General Public License for more details.
+
+Not only related to this patch but we might want to think about moving from the license boiler plate text to SPDX for the ieee802154
+subsystem at some point.
+
+> + * Based on fakelb, original Written by:
+> + * Sergey Lapin <slapin@ossfans.org>
+> + * Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+> + * Alexander Smirnov <alex.bluesman.smirnov@gmail.com>
+> + */
+> +
+> +#include <linux/module.h>
+> +#include <linux/timer.h>
+> +#include <linux/platform_device.h>
+> +#include <linux/netdevice.h>
+> +#include <linux/device.h>
+> +#include <linux/spinlock.h>
+> +#include <net/mac802154.h>
+> +#include <net/cfg802154.h>
+> +#include <net/genetlink.h>
+> +#include "mac802154_hwsim.h"
+> +
+> +MODULE_DESCRIPTION("Software simulator of 802.15.4 radio(s) for mac802154");
+
+"IEEE 802.15.4", please.
+
+> +MODULE_LICENSE("GPL");
+
+The license text does not have the "or any later version" part which means we should indicate it really is GPL v2 only.
+
+> +
+> +/* Number of dummy devices to be set up by this module. */
+> +static int radios = 2;
+
+Does this really need to be a global variable?
+
+> +module_param(radios, int, 0444);
+> +MODULE_PARM_DESC(radios, "Number of simulated radios");
+
+What happens if more than 2 devices are given as module parameter, are only the first two connected and the rest unconnected?
+
+
+> +static LIST_HEAD(hwsim_phys);
+> +static DEFINE_MUTEX(hwsim_phys_lock);
+> +
+> +static __rcu LIST_HEAD(hwsim_ifup_phys);
+> +
+> +static struct platform_device *mac802154hwsim_dev;
+> +
+> +/* MAC802154_HWSIM netlink family */
+> +static struct genl_family hwsim_genl_family;
+> +
+> +static int hwsim_radio_idx;
+
+Another global variable I would like to avoid, if it make sense.
+
+> +
+> +enum hwsim_multicast_groups {
+> +	HWSIM_MCGRP_CONFIG,
+> +};
+> +
+> +static const struct genl_multicast_group hwsim_mcgrps[] = {
+> +	[HWSIM_MCGRP_CONFIG] = { .name = "config", },
+> +};
+> +
+> +struct hwsim_pib {
+> +	u8 page;
+> +	u8 channel;
+> +
+> +	struct rcu_head rcu;
+> +};
+> +
+> +struct hwsim_edge_info {
+> +	u8 lqi;
+> +
+> +	struct rcu_head rcu;
+> +};
+> +
+> +struct hwsim_edge {
+> +	struct hwsim_phy *endpoint;
+> +	struct hwsim_edge_info *info;
+> +
+> +	struct list_head list;
+> +	struct rcu_head rcu;
+> +};
+> +
+> +struct hwsim_phy {
+> +	struct ieee802154_hw *hw;
+> +	u32 idx;
+> +
+> +	struct hwsim_pib __rcu *pib;
+> +
+> +	bool suspended;
+> +	struct list_head __rcu edges;
+> +
+> +	struct list_head list;
+> +	struct list_head list_ifup;
+> +};
+> +
+> +static int hwsim_hw_ed(struct ieee802154_hw *hw, u8 *level)
+> +{
+> +	*level = 0xbe;
+> +
+> +	return 0;
+> +}
+> +
+> +static int hwsim_hw_channel(struct ieee802154_hw *hw, u8 page, u8 channel)
+> +{
+> +	struct hwsim_phy *phy = hw->priv;
+> +	struct hwsim_pib *pib, *pib_old;
+> +
+> +	pib = kzalloc(sizeof(*pib), GFP_KERNEL);
+> +	if (!pib)
+> +		return -ENOMEM;
+> +
+> +	pib->page = page;
+> +	pib->channel = channel;
+> +
+> +	pib_old = phy->pib;
+> +	rcu_assign_pointer(phy->pib, pib);
+> +	kfree_rcu(pib_old, rcu);
+> +	return 0;
+> +}
+> +
+> +static int hwsim_hw_xmit(struct ieee802154_hw *hw, struct sk_buff *skb)
+> +{
+> +	struct hwsim_phy *current_phy = hw->priv;
+> +	struct hwsim_pib *current_pib, *endpoint_pib;
+> +	struct hwsim_edge_info *einfo;
+> +	struct hwsim_edge *e;
+> +
+> +	WARN_ON(current_phy->suspended);
+> +
+> +	rcu_read_lock();
+> +	current_pib = rcu_dereference(current_phy->pib);
+> +	list_for_each_entry_rcu(e, &current_phy->edges, list) {
+> +		/* Can be changed later in rx_irqsafe, but this is only a
+> +		 * performance tweak. Received radio should drop the frame
+> +		 * in mac802154 stack anyway... so we don't need to be
+> +		 * 100% of locking here to check on suspended
+> +		 */
+> +		if (e->endpoint->suspended)
+> +			continue;
+> +
+> +		endpoint_pib = rcu_dereference(e->endpoint->pib);
+> +		if (current_pib->page == endpoint_pib->page &&
+> +		    current_pib->channel == endpoint_pib->channel) {
+> +			struct sk_buff *newskb = pskb_copy(skb, GFP_ATOMIC);
+> +
+> +			einfo = rcu_dereference(e->info);
+> +			if (newskb)
+> +				ieee802154_rx_irqsafe(e->endpoint->hw, newskb,
+> +						      einfo->lqi);
+> +		}
+> +	}
+> +	rcu_read_unlock();
+> +
+> +	ieee802154_xmit_complete(hw, skb, false);
+> +	return 0;
+> +}
+> +
+> +static int hwsim_hw_start(struct ieee802154_hw *hw)
+> +{
+> +	struct hwsim_phy *phy = hw->priv;
+> +
+> +	phy->suspended = false;
+> +	list_add_rcu(&phy->list_ifup, &hwsim_ifup_phys);
+> +	synchronize_rcu();
+> +
+> +	return 0;
+> +}
+> +
+> +static void hwsim_hw_stop(struct ieee802154_hw *hw)
+> +{
+> +	struct hwsim_phy *phy = hw->priv;
+> +
+> +	phy->suspended = true;
+> +	list_del_rcu(&phy->list_ifup);
+> +	synchronize_rcu();
+> +}
+> +
+> +static int
+> +hwsim_set_promiscuous_mode(struct ieee802154_hw *hw, const bool on)
+> +{
+> +	return 0;
+> +}
+> +
+> +static const struct ieee802154_ops hwsim_ops = {
+> +	.owner = THIS_MODULE,
+> +	.xmit_async = hwsim_hw_xmit,
+> +	.ed = hwsim_hw_ed,
+> +	.set_channel = hwsim_hw_channel,
+> +	.start = hwsim_hw_start,
+> +	.stop = hwsim_hw_stop,
+> +	.set_promiscuous_mode = hwsim_set_promiscuous_mode,
+> +};
+> +
+> +static int hwsim_add_one(struct genl_info *info, struct device *dev,
+> +			 bool init);
+
+Please re-order the functions so we can avoid forward declarations.
+
+> +static int hwsim_new_radio_nl(struct sk_buff *msg, struct genl_info *info)
+> +{
+> +	return hwsim_add_one(info, &mac802154hwsim_dev->dev, false);
+> +}
+> +
+> +static void hwsim_del(struct hwsim_phy *phy);
+
+Another forward declaration to avoid.
+
+> +static int hwsim_del_radio_nl(struct sk_buff *msg, struct genl_info *info)
+> +{
+> +	struct hwsim_phy *phy, *tmp;
+> +	s64 idx = -1;
+> +
+> +	if (!info->attrs[MAC802154_HWSIM_ATTR_RADIO_ID])
+> +		return -EINVAL;
+> +
+> +	idx = nla_get_u32(info->attrs[MAC802154_HWSIM_ATTR_RADIO_ID]);
+> +
+> +	mutex_lock(&hwsim_phys_lock);
+> +	list_for_each_entry_safe(phy, tmp, &hwsim_phys, list) {
+> +		if (idx == phy->idx) {
+> +			hwsim_del(phy);
+> +			mutex_unlock(&hwsim_phys_lock);
+> +			return 0;
+> +		}
+> +	}
+> +	mutex_unlock(&hwsim_phys_lock);
+> +
+> +	return -ENODEV;
+> +}
+> +
+> +static int append_radio_msg(struct sk_buff *skb, struct hwsim_phy *phy)
+> +{
+> +	struct nlattr *nl_edges, *nl_edge;
+> +	struct hwsim_edge_info *einfo;
+> +	struct hwsim_edge *e;
+> +	int ret;
+> +
+> +	ret = nla_put_u32(skb, MAC802154_HWSIM_ATTR_RADIO_ID, phy->idx);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	rcu_read_lock();
+> +	if (list_empty(&phy->edges)) {
+> +		rcu_read_unlock();
+> +		return 0;
+> +	}
+> +
+> +	nl_edges = nla_nest_start(skb, MAC802154_HWSIM_ATTR_RADIO_EDGES);
+> +	if (!nl_edges) {
+> +		rcu_read_unlock();
+> +		return -ENOBUFS;
+> +	}
+> +
+> +	list_for_each_entry_rcu(e, &phy->edges, list) {
+> +		nl_edge = nla_nest_start(skb, MAC802154_HWSIM_ATTR_RADIO_EDGE);
+> +		if (!nl_edges) {
+
+You save the return of bla_nest_start in nl_edge but you are checking on nl_edges.
+
+> +			rcu_read_unlock();
+> +			nla_nest_cancel(skb, nl_edges);
+> +			return -ENOBUFS;
+> +		}
+> +
+> +		ret = nla_put_u32(skb, MAC802154_HWSIM_EDGE_ATTR_ENDPOINT_ID,
+> +				  e->endpoint->idx);
+> +		if (ret < 0) {
+> +			rcu_read_unlock();
+> +			nla_nest_cancel(skb, nl_edge);
+> +			nla_nest_cancel(skb, nl_edges);
+> +			return ret;
+> +		}
+> +
+> +		einfo = rcu_dereference(e->info);
+> +		ret = nla_put_u8(skb, MAC802154_HWSIM_EDGE_ATTR_LQI,
+> +				 einfo->lqi);
+> +		if (ret < 0) {
+> +			rcu_read_unlock();
+> +			nla_nest_cancel(skb, nl_edge);
+> +			nla_nest_cancel(skb, nl_edges);
+> +			return ret;
+> +		}
+> +
+> +		nla_nest_end(skb, nl_edge);
+> +	}
+> +	rcu_read_unlock();
+> +
+> +	nla_nest_end(skb, nl_edges);
+> +
+> +	return 0;
+> +}
+> +
+> +static int hwsim_get_radio(struct sk_buff *skb, struct hwsim_phy *phy,
+> +			   u32 portid, u32 seq,
+> +			   struct netlink_callback *cb, int flags)
+> +{
+> +	void *hdr;
+> +	int res = -EMSGSIZE;
+> +
+> +	hdr = genlmsg_put(skb, portid, seq, &hwsim_genl_family, flags,
+> +			  MAC802154_HWSIM_CMD_GET_RADIO);
+> +	if (!hdr)
+> +		return -EMSGSIZE;
+> +
+> +	if (cb)
+> +		genl_dump_check_consistent(cb, hdr);
+> +
+> +	res = append_radio_msg(skb, phy);
+> +	if (res < 0)
+> +		goto out_err;
+> +
+> +	genlmsg_end(skb, hdr);
+> +	return 0;
+> +
+> +out_err:
+> +	genlmsg_cancel(skb, hdr);
+> +	return res;
+> +}
+> +
+> +static int hwsim_get_radio_nl(struct sk_buff *msg, struct genl_info *info)
+> +{
+> +	struct hwsim_phy *phy;
+> +	struct sk_buff *skb;
+> +	int idx, res = -ENODEV;
+> +
+> +	if (!info->attrs[MAC802154_HWSIM_ATTR_RADIO_ID])
+> +		return -EINVAL;
+> +	idx = nla_get_u32(info->attrs[MAC802154_HWSIM_ATTR_RADIO_ID]);
+> +
+> +	mutex_lock(&hwsim_phys_lock);
+> +	list_for_each_entry(phy, &hwsim_phys, list) {
+> +		if (phy->idx != idx)
+> +			continue;
+> +
+> +		skb = nlmsg_new(NLMSG_DEFAULT_SIZE, GFP_ATOMIC);
+> +		if (!skb) {
+> +			res = -ENOMEM;
+> +			goto out_err;
+> +		}
+> +
+> +		res = hwsim_get_radio(skb, phy, info->snd_portid,
+> +				      info->snd_seq, NULL, 0);
+> +		if (res < 0) {
+> +			nlmsg_free(skb);
+> +			goto out_err;
+> +		}
+> +
+> +		genlmsg_reply(skb, info);
+> +		break;
+> +	}
+> +
+> +out_err:
+> +	mutex_unlock(&hwsim_phys_lock);
+> +
+> +	return res;
+> +}
+> +
+> +static int hwsim_dump_radio_nl(struct sk_buff *skb,
+> +			       struct netlink_callback *cb)
+> +{
+> +	int idx = cb->args[0];
+> +	struct hwsim_phy *phy;
+> +	int res;
+> +
+> +	mutex_lock(&hwsim_phys_lock);
+> +
+> +	if (idx == hwsim_radio_idx)
+> +		goto done;
+> +
+> +	list_for_each_entry(phy, &hwsim_phys, list) {
+> +		if (phy->idx < idx)
+> +			continue;
+> +
+> +		res = hwsim_get_radio(skb, phy, NETLINK_CB(cb->skb).portid,
+> +				      cb->nlh->nlmsg_seq, cb, NLM_F_MULTI);
+> +		if (res < 0)
+> +			break;
+> +
+> +		idx = phy->idx + 1;
+> +	}
+> +
+> +	cb->args[0] = idx;
+> +
+> +done:
+> +	mutex_unlock(&hwsim_phys_lock);
+> +	return skb->len;
+> +}
+> +
+> +/* caller need to held hwsim_phys_lock */
+> +static struct hwsim_phy *hwsim_get_radio_by_id(uint32_t idx)
+> +{
+> +	struct hwsim_phy *phy;
+> +
+> +	list_for_each_entry(phy, &hwsim_phys, list) {
+> +		if (phy->idx == idx)
+> +			return phy;
+> +	}
+> +
+> +	return NULL;
+> +}
+> +
+> +static const struct nla_policy hwsim_edge_policy[MAC802154_HWSIM_EDGE_ATTR_MAX + 1] = {
+> +	[MAC802154_HWSIM_EDGE_ATTR_ENDPOINT_ID] = { .type = NLA_U32 },
+> +	[MAC802154_HWSIM_EDGE_ATTR_LQI] = { .type = NLA_U8 },
+> +};
+> +
+> +static struct hwsim_edge *hwsim_alloc_edge(struct hwsim_phy *endpoint, u8 lqi)
+> +{
+> +	struct hwsim_edge_info *einfo;
+> +	struct hwsim_edge *e;
+> +
+> +	e = kzalloc(sizeof(*e), GFP_KERNEL);
+> +	if (!e)
+> +		return NULL;
+> +
+> +	einfo = kzalloc(sizeof(*einfo), GFP_KERNEL);
+> +	if (!einfo) {
+> +		kfree(e);
+> +		return NULL;
+> +	}
+> +
+> +	einfo->lqi = 0xff;
+> +	e->info = einfo;
+> +	e->endpoint = endpoint;
+> +
+> +	return e;
+> +}
+> +
+> +static void hwsim_free_edge(struct hwsim_edge *e)
+> +{
+> +	kfree_rcu(e->info, rcu);
+> +	kfree_rcu(e, rcu);
+> +}
+> +
+> +static int hwsim_new_edge_nl(struct sk_buff *msg, struct genl_info *info)
+> +{
+> +	struct nlattr *edge_attrs[MAC802154_HWSIM_EDGE_ATTR_MAX + 1];
+> +	struct hwsim_phy *phy_v0, *phy_v1;
+> +	struct hwsim_edge *e;
+> +	u32 v0, v1;
+> +
+> +	if (!info->attrs[MAC802154_HWSIM_ATTR_RADIO_ID] &&
+> +	    !info->attrs[MAC802154_HWSIM_ATTR_RADIO_EDGE])
+> +		return -EINVAL;
+> +
+> +	if (nla_parse_nested(edge_attrs, MAC802154_HWSIM_EDGE_ATTR_MAX,
+> +			     info->attrs[MAC802154_HWSIM_ATTR_RADIO_EDGE],
+> +			     hwsim_edge_policy, NULL))
+> +		return -EINVAL;
+> +
+> +	if (!edge_attrs[MAC802154_HWSIM_EDGE_ATTR_ENDPOINT_ID])
+> +		return -EINVAL;
+> +
+> +	v0 = nla_get_u32(info->attrs[MAC802154_HWSIM_ATTR_RADIO_ID]);
+> +	v1 = nla_get_u32(edge_attrs[MAC802154_HWSIM_EDGE_ATTR_ENDPOINT_ID]);
+> +
+> +	if (v0 == v1)
+> +		return -EINVAL;
+> +
+> +	mutex_lock(&hwsim_phys_lock);
+> +	phy_v0 = hwsim_get_radio_by_id(v0);
+> +	if (!phy_v0) {
+> +		mutex_unlock(&hwsim_phys_lock);
+> +		return -ENOENT;
+> +	}
+> +
+> +	phy_v1 = hwsim_get_radio_by_id(v1);
+> +	if (!phy_v1) {
+> +		mutex_unlock(&hwsim_phys_lock);
+> +		return -ENOENT;
+> +	}
+> +
+> +	rcu_read_lock();
+> +	list_for_each_entry_rcu(e, &phy_v0->edges, list) {
+> +		if (e->endpoint->idx == v1) {
+> +			mutex_unlock(&hwsim_phys_lock);
+> +			rcu_read_unlock();
+> +			return -EEXIST;
+> +		}
+> +	}
+> +	rcu_read_unlock();
+> +
+> +	e = hwsim_alloc_edge(phy_v1, 0xff);
+> +	if (!e) {
+> +		mutex_unlock(&hwsim_phys_lock);
+> +		return -ENOMEM;
+> +	}
+> +	list_add_rcu(&e->list, &phy_v0->edges);
+> +	/* wait until changes are done under hwsim_phys_lock lock
+> +	 * should prevent of calling this function twice while
+> +	 * edges list has not the changes yet.
+> +	 */
+> +	synchronize_rcu();
+> +	mutex_unlock(&hwsim_phys_lock);
+> +
+> +	return 0;
+> +}
+> +
+> +static int hwsim_del_edge_nl(struct sk_buff *msg, struct genl_info *info)
+> +{
+> +	struct nlattr *edge_attrs[MAC802154_HWSIM_EDGE_ATTR_MAX + 1];
+> +	struct hwsim_phy *phy_v0;
+> +	struct hwsim_edge *e;
+> +	u32 v0, v1;
+> +
+> +	if (!info->attrs[MAC802154_HWSIM_ATTR_RADIO_ID] &&
+> +	    !info->attrs[MAC802154_HWSIM_ATTR_RADIO_EDGE])
+> +		return -EINVAL;
+> +
+> +	if (nla_parse_nested(edge_attrs, MAC802154_HWSIM_EDGE_ATTR_MAX + 1,
+> +			     info->attrs[MAC802154_HWSIM_ATTR_RADIO_EDGE],
+> +			     hwsim_edge_policy, NULL))
+> +		return -EINVAL;
+> +
+> +	if (!edge_attrs[MAC802154_HWSIM_EDGE_ATTR_ENDPOINT_ID])
+> +		return -EINVAL;
+> +
+> +	v0 = nla_get_u32(info->attrs[MAC802154_HWSIM_ATTR_RADIO_ID]);
+> +	v1 = nla_get_u32(edge_attrs[MAC802154_HWSIM_EDGE_ATTR_ENDPOINT_ID]);
+> +
+> +	mutex_lock(&hwsim_phys_lock);
+> +	phy_v0 = hwsim_get_radio_by_id(v0);
+> +	if (!phy_v0) {
+> +		mutex_unlock(&hwsim_phys_lock);
+> +		return -ENOENT;
+> +	}
+> +
+> +	rcu_read_lock();
+> +	list_for_each_entry_rcu(e, &phy_v0->edges, list) {
+> +		if (e->endpoint->idx == v1) {
+> +			rcu_read_unlock();
+> +			list_del_rcu(&e->list);
+> +			hwsim_free_edge(e);
+> +			/* same again - wait until list changes are done */
+> +			synchronize_rcu();
+> +			mutex_unlock(&hwsim_phys_lock);
+> +			return 0;
+> +		}
+> +	}
+> +	rcu_read_unlock();
+> +
+> +	mutex_unlock(&hwsim_phys_lock);
+> +
+> +	return -ENOENT;
+> +}
+> +
+> +static int hwsim_set_edge_lqi(struct sk_buff *msg, struct genl_info *info)
+> +{
+> +	struct nlattr *edge_attrs[MAC802154_HWSIM_EDGE_ATTR_MAX + 1];
+> +	struct hwsim_edge_info *einfo;
+> +	struct hwsim_phy *phy_v0;
+> +	struct hwsim_edge *e;
+> +	u32 v0, v1;
+> +	u8 lqi;
+> +
+> +	if (!info->attrs[MAC802154_HWSIM_ATTR_RADIO_ID] &&
+> +	    !info->attrs[MAC802154_HWSIM_ATTR_RADIO_EDGE])
+> +		return -EINVAL;
+> +
+> +	if (nla_parse_nested(edge_attrs, MAC802154_HWSIM_EDGE_ATTR_MAX + 1,
+> +			     info->attrs[MAC802154_HWSIM_ATTR_RADIO_EDGE],
+> +			     hwsim_edge_policy, NULL))
+> +		return -EINVAL;
+> +
+> +	if (!edge_attrs[MAC802154_HWSIM_EDGE_ATTR_ENDPOINT_ID] &&
+> +	    !edge_attrs[MAC802154_HWSIM_EDGE_ATTR_LQI])
+> +		return -EINVAL;
+> +
+> +	v0 = nla_get_u32(info->attrs[MAC802154_HWSIM_ATTR_RADIO_ID]);
+> +	v1 = nla_get_u32(edge_attrs[MAC802154_HWSIM_EDGE_ATTR_ENDPOINT_ID]);
+> +	lqi = nla_get_u8(edge_attrs[MAC802154_HWSIM_EDGE_ATTR_LQI]);
+> +
+> +	mutex_lock(&hwsim_phys_lock);
+> +	phy_v0 = hwsim_get_radio_by_id(v0);
+> +	if (!phy_v0) {
+> +		mutex_unlock(&hwsim_phys_lock);
+> +		return -ENOENT;
+> +	}
+> +
+> +	einfo = kzalloc(sizeof(*einfo), GFP_KERNEL);
+> +	if (!info) {
+> +		mutex_unlock(&hwsim_phys_lock);
+> +		return -ENOMEM;
+> +	}
+> +
+> +	rcu_read_lock();
+> +	list_for_each_entry_rcu(e, &phy_v0->edges, list) {
+> +		if (e->endpoint->idx == v1) {
+> +			einfo->lqi = lqi;
+> +			rcu_assign_pointer(e->info, einfo);
+> +			rcu_read_unlock();
+> +			mutex_unlock(&hwsim_phys_lock);
+> +			return 0;
+> +		}
+> +	}
+> +	rcu_read_unlock();
+> +
+> +	kfree(einfo);
+> +	mutex_unlock(&hwsim_phys_lock);
+> +
+> +	return -ENOENT;
+> +}
+> +
+> +/* MAC802154_HWSIM netlink policy */
+> +
+> +static const struct nla_policy hwsim_genl_policy[MAC802154_HWSIM_ATTR_MAX + 1] = {
+> +	[MAC802154_HWSIM_ATTR_RADIO_ID] = { .type = NLA_U32 },
+> +	[MAC802154_HWSIM_ATTR_RADIO_EDGE] = { .type = NLA_NESTED },
+> +	[MAC802154_HWSIM_ATTR_RADIO_EDGES] = { .type = NLA_NESTED },
+> +};
+> +
+> +/* Generic Netlink operations array */
+> +static const struct genl_ops hwsim_nl_ops[] = {
+> +	{
+> +		.cmd = MAC802154_HWSIM_CMD_NEW_RADIO,
+> +		.policy = hwsim_genl_policy,
+> +		.doit = hwsim_new_radio_nl,
+> +		.flags = GENL_UNS_ADMIN_PERM,
+> +	},
+> +	{
+> +		.cmd = MAC802154_HWSIM_CMD_DEL_RADIO,
+> +		.policy = hwsim_genl_policy,
+> +		.doit = hwsim_del_radio_nl,
+> +		.flags = GENL_UNS_ADMIN_PERM,
+> +	},
+> +	{
+> +		.cmd = MAC802154_HWSIM_CMD_GET_RADIO,
+> +		.policy = hwsim_genl_policy,
+> +		.doit = hwsim_get_radio_nl,
+> +		.dumpit = hwsim_dump_radio_nl,
+> +	},
+> +	{
+> +		.cmd = MAC802154_HWSIM_CMD_NEW_EDGE,
+> +		.policy = hwsim_genl_policy,
+> +		.doit = hwsim_new_edge_nl,
+> +		.flags = GENL_UNS_ADMIN_PERM,
+> +	},
+> +	{
+> +		.cmd = MAC802154_HWSIM_CMD_DEL_EDGE,
+> +		.policy = hwsim_genl_policy,
+> +		.doit = hwsim_del_edge_nl,
+> +		.flags = GENL_UNS_ADMIN_PERM,
+> +	},
+> +	{
+> +		.cmd = MAC802154_HWSIM_CMD_SET_EDGE,
+> +		.policy = hwsim_genl_policy,
+> +		.doit = hwsim_set_edge_lqi,
+> +		.flags = GENL_UNS_ADMIN_PERM,
+> +	},
+> +};
+> +
+
+This answers my questions on why MAC802154_HWSIM_CMD_SET_RADIO and MAC802154_HWSIM_CMD_GET_EDGE are not used in wpan-hwsim.
+The kernel does not really expose them. If you think they are not needed I would say we need to remove these enum types from the header below.
+> +static struct genl_family hwsim_genl_family __ro_after_init = {
+> +	.name = "MAC802154_HWSIM",
+> +	.version = 1,
+> +	.maxattr = MAC802154_HWSIM_ATTR_MAX,
+> +	.module = THIS_MODULE,
+> +	.ops = hwsim_nl_ops,
+> +	.n_ops = ARRAY_SIZE(hwsim_nl_ops),
+> +	.mcgrps = hwsim_mcgrps,
+> +	.n_mcgrps = ARRAY_SIZE(hwsim_mcgrps),
+> +};
+> +
+> +static void hwsim_mcast_config_msg(struct sk_buff *mcast_skb,
+> +				   struct genl_info *info)
+> +{
+> +	if (info)
+> +		genl_notify(&hwsim_genl_family, mcast_skb, info,
+> +			    HWSIM_MCGRP_CONFIG, GFP_KERNEL);
+> +	else
+> +		genlmsg_multicast(&hwsim_genl_family, mcast_skb, 0,
+> +				  HWSIM_MCGRP_CONFIG, GFP_KERNEL);
+> +}
+> +
+> +static void hwsim_mcast_new_radio(struct genl_info *info, struct hwsim_phy *phy)
+> +{
+> +	struct sk_buff *mcast_skb;
+> +	void *data;
+> +
+> +	mcast_skb = genlmsg_new(GENLMSG_DEFAULT_SIZE, GFP_KERNEL);
+> +	if (!mcast_skb)
+> +		return;
+> +
+> +	data = genlmsg_put(mcast_skb, 0, 0, &hwsim_genl_family, 0,
+> +			   MAC802154_HWSIM_CMD_NEW_RADIO);
+> +	if (!data)
+> +		goto out_err;
+> +
+> +	if (append_radio_msg(mcast_skb, phy) < 0)
+> +		goto out_err;
+> +
+> +	genlmsg_end(mcast_skb, data);
+> +
+> +	hwsim_mcast_config_msg(mcast_skb, info);
+> +	return;
+> +
+> +out_err:
+> +	genlmsg_cancel(mcast_skb, data);
+> +	nlmsg_free(mcast_skb);
+> +}
+> +
+> +static void hwsim_edge_unsubscribe_me(struct hwsim_phy *phy)
+> +{
+> +	struct hwsim_phy *tmp;
+> +	struct hwsim_edge *e;
+> +
+> +	rcu_read_lock();
+> +	/* going to all phy edges and remove phy from it */
+> +	list_for_each_entry(tmp, &hwsim_phys, list) {
+> +		list_for_each_entry_rcu(e, &tmp->edges, list) {
+> +			if (e->endpoint->idx == phy->idx) {
+> +				list_del_rcu(&e->list);
+> +				hwsim_free_edge(e);
+> +			}
+> +		}
+> +	}
+> +	rcu_read_unlock();
+> +}
+> +
+> +static int hwsim_subscribe_all_others(struct hwsim_phy *phy)
+> +{
+> +	struct hwsim_phy *sub;
+> +	struct hwsim_edge *e;
+> +
+> +	list_for_each_entry(sub, &hwsim_phys, list) {
+> +		e = hwsim_alloc_edge(sub, 0xff);
+> +		if (!e)
+> +			goto me_fail;
+> +
+> +		list_add_rcu(&e->list, &phy->edges);
+> +	}
+> +
+> +	list_for_each_entry(sub, &hwsim_phys, list) {
+> +		e = hwsim_alloc_edge(phy, 0xff);
+> +		if (!e)
+> +			goto sub_fail;
+> +
+> +		list_add_rcu(&e->list, &sub->edges);
+> +	}
+> +
+> +	return 0;
+> +
+> +me_fail:
+> +	list_for_each_entry(phy, &hwsim_phys, list) {
+> +		list_del_rcu(&e->list);
+> +		hwsim_free_edge(e);
+> +	}
+> +sub_fail:
+> +	hwsim_edge_unsubscribe_me(phy);
+> +	return -ENOMEM;
+> +}
+> +
+> +static int hwsim_add_one(struct genl_info *info, struct device *dev,
+> +			 bool init)
+> +{
+> +	struct ieee802154_hw *hw;
+> +	struct hwsim_phy *phy;
+> +	struct hwsim_pib *pib;
+> +	int idx;
+> +	int err;
+> +
+> +	idx = hwsim_radio_idx++;
+> +
+> +	hw = ieee802154_alloc_hw(sizeof(*phy), &hwsim_ops);
+> +	if (!hw)
+> +		return -ENOMEM;
+> +
+> +	phy = hw->priv;
+> +	phy->hw = hw;
+> +
+> +	/* 868 MHz BPSK	802.15.4-2003 */
+> +	hw->phy->supported.channels[0] |= 1;
+> +	/* 915 MHz BPSK	802.15.4-2003 */
+> +	hw->phy->supported.channels[0] |= 0x7fe;
+> +	/* 2.4 GHz O-QPSK 802.15.4-2003 */
+> +	hw->phy->supported.channels[0] |= 0x7FFF800;
+> +	/* 868 MHz ASK 802.15.4-2006 */
+> +	hw->phy->supported.channels[1] |= 1;
+> +	/* 915 MHz ASK 802.15.4-2006 */
+> +	hw->phy->supported.channels[1] |= 0x7fe;
+> +	/* 868 MHz O-QPSK 802.15.4-2006 */
+> +	hw->phy->supported.channels[2] |= 1;
+> +	/* 915 MHz O-QPSK 802.15.4-2006 */
+> +	hw->phy->supported.channels[2] |= 0x7fe;
+> +	/* 2.4 GHz CSS 802.15.4a-2007 */
+> +	hw->phy->supported.channels[3] |= 0x3fff;
+> +	/* UWB Sub-gigahertz 802.15.4a-2007 */
+> +	hw->phy->supported.channels[4] |= 1;
+> +	/* UWB Low band 802.15.4a-2007 */
+> +	hw->phy->supported.channels[4] |= 0x1e;
+> +	/* UWB High band 802.15.4a-2007 */
+> +	hw->phy->supported.channels[4] |= 0xffe0;
+> +	/* 750 MHz O-QPSK 802.15.4c-2009 */
+> +	hw->phy->supported.channels[5] |= 0xf;
+> +	/* 750 MHz MPSK 802.15.4c-2009 */
+> +	hw->phy->supported.channels[5] |= 0xf0;
+> +	/* 950 MHz BPSK 802.15.4d-2009 */
+> +	hw->phy->supported.channels[6] |= 0x3ff;
+> +	/* 950 MHz GFSK 802.15.4d-2009 */
+> +	hw->phy->supported.channels[6] |= 0x3ffc00;
+> +
+> +	ieee802154_random_extended_addr(&hw->phy->perm_extended_addr);
+> +
+> +	/* hwsim phy channel 13 as default */
+> +	hw->phy->current_channel = 13;
+> +	pib = kzalloc(sizeof(*pib), GFP_KERNEL);
+> +	if (!pib) {
+> +		err = -ENOMEM;
+> +		goto err_pib;
+> +	}
+> +
+> +	phy->pib = pib;
+> +	phy->idx = idx;
+> +	INIT_LIST_HEAD(&phy->edges);
+> +
+> +	hw->flags = IEEE802154_HW_PROMISCUOUS;
+> +	hw->parent = dev;
+> +
+> +	err = ieee802154_register_hw(hw);
+> +	if (err)
+> +		goto err_reg;
+> +
+> +	mutex_lock(&hwsim_phys_lock);
+> +	if (init) {
+> +		err = hwsim_subscribe_all_others(phy);
+> +		if (err < 0)
+> +			goto err_reg;
+> +	}
+> +	list_add_tail(&phy->list, &hwsim_phys);
+> +	mutex_unlock(&hwsim_phys_lock);
+> +
+> +	hwsim_mcast_new_radio(info, phy);
+> +
+> +	return idx;
+> +
+> +err_reg:
+> +	kfree(pib);
+> +err_pib:
+> +	ieee802154_free_hw(phy->hw);
+> +	return err;
+> +}
+> +
+> +static void hwsim_del(struct hwsim_phy *phy)
+> +{
+> +	hwsim_edge_unsubscribe_me(phy);
+> +
+> +	list_del(&phy->list);
+> +	kfree_rcu(phy->pib, rcu);
+> +
+> +	ieee802154_unregister_hw(phy->hw);
+> +	ieee802154_free_hw(phy->hw);
+> +}
+> +
+> +static int hwsim_probe(struct platform_device *pdev)
+> +{
+> +	struct hwsim_phy *phy, *tmp;
+> +	int err, i;
+> +
+> +	for (i = 0; i < radios; i++) {
+> +		err = hwsim_add_one(NULL, &pdev->dev, true);
+> +		if (err < 0)
+> +			goto err_slave;
+> +	}
+> +
+> +	dev_info(&pdev->dev, "Added %i mac802154 hwsim hardware radios\n",
+> +		 radios);
+> +	return 0;
+> +
+> +err_slave:
+> +	mutex_lock(&hwsim_phys_lock);
+> +	list_for_each_entry_safe(phy, tmp, &hwsim_phys, list)
+> +		hwsim_del(phy);
+> +	mutex_unlock(&hwsim_phys_lock);
+> +	return err;
+> +}
+> +
+> +static int hwsim_remove(struct platform_device *pdev)
+> +{
+> +	struct hwsim_phy *phy, *tmp;
+> +
+> +	mutex_lock(&hwsim_phys_lock);
+> +	list_for_each_entry_safe(phy, tmp, &hwsim_phys, list)
+> +		hwsim_del(phy);
+> +	mutex_unlock(&hwsim_phys_lock);
+> +
+> +	return 0;
+> +}
+> +
+> +static struct platform_driver mac802154hwsim_driver = {
+> +	.probe = hwsim_probe,
+> +	.remove = hwsim_remove,
+> +	.driver = {
+> +			.name = "mac802154_hwsim",
+> +	},
+> +};
+> +
+> +static __init int hwsim_init_module(void)
+> +{
+> +	int rc;
+> +
+> +	if (radios < 0 || radios > 100)
+> +		return -EINVAL;
+> +
+> +	rc = genl_register_family(&hwsim_genl_family);
+> +	if (rc)
+> +		return rc;
+> +
+> +	mac802154hwsim_dev = platform_device_register_simple("mac802154_hwsim",
+> +							     -1, NULL, 0);
+> +	if (IS_ERR(mac802154hwsim_dev)) {
+> +		rc = PTR_ERR(mac802154hwsim_dev);
+> +		goto platform_dev;
+> +	}
+> +
+> +	rc = platform_driver_register(&mac802154hwsim_driver);
+> +	if (rc < 0)
+> +		goto platform_drv;
+> +
+> +	return 0;
+> +
+> +platform_drv:
+> +	genl_unregister_family(&hwsim_genl_family);
+> +platform_dev:
+> +	platform_device_unregister(mac802154hwsim_dev);
+> +	return rc;
+> +}
+> +
+> +static __exit void hwsim_remove_module(void)
+> +{
+> +	genl_unregister_family(&hwsim_genl_family);
+> +	platform_driver_unregister(&mac802154hwsim_driver);
+> +	platform_device_unregister(mac802154hwsim_dev);
+> +}
+> +
+> +module_init(hwsim_init_module);
+> +module_exit(hwsim_remove_module);
+> diff --git a/drivers/net/ieee802154/mac802154_hwsim.h b/drivers/net/ieee802154/mac802154_hwsim.h
+> new file mode 100644
+> index 000000000000..6009214c0d75
+> --- /dev/null
+> +++ b/drivers/net/ieee802154/mac802154_hwsim.h
+> @@ -0,0 +1,73 @@
+> +#ifndef __MAC802154_HWSIM_H
+> +#define __MAC802154_HWSIM_H
+> +
+> +/* mac802154 hwsim netlink commands
+> + *
+> + * @MAC802154_HWSIM_CMD_UNSPEC: unspecified command to catch error
+> + * @MAC802154_HWSIM_CMD_GET_RADIO: fetch information about existing radios
+> + * @MAC802154_HWSIM_CMD_SEL_RADIO: change radio parameters during runtime
+
+Same typo as I mentioned in the wpan-hwsim patch. SET_RADIO.
+
+
+> + * @MAC802154_HWSIM_CMD_NEW_RADIO: create a new radio with the given parameters
+> + *	returns the radio ID (>= 0) or negative on errors, if successful
+> + *	then multicast the result
+> + * @MAC802154_HWSIM_CMD_DEL_RADIO: destroy a radio, reply is multicasted
+> + * @MAC802154_HWSIM_CMD_GET_EDGE: fetch information about existing edges
+> + * @MAC802154_HWSIM_CMD_SET_EDGE: change edge parameters during runtime
+> + * @MAC802154_HWSIM_CMD_DEL_EDGE: delete edges between radios
+> + * @MAC802154_HWSIM_CMD_NEW_EDGE: create a new edge between two radios
+> + * @__MAC802154_HWSIM_CMD_MAX: enum limit
+> + */
+> +enum {
+> +	MAC802154_HWSIM_CMD_UNSPEC,
+> +
+> +	MAC802154_HWSIM_CMD_GET_RADIO,
+> +	MAC802154_HWSIM_CMD_SET_RADIO,
+> +	MAC802154_HWSIM_CMD_NEW_RADIO,
+> +	MAC802154_HWSIM_CMD_DEL_RADIO,
+> +
+> +	MAC802154_HWSIM_CMD_GET_EDGE,
+> +	MAC802154_HWSIM_CMD_SET_EDGE,
+> +	MAC802154_HWSIM_CMD_DEL_EDGE,
+> +	MAC802154_HWSIM_CMD_NEW_EDGE,
+> +
+> +	__MAC802154_HWSIM_CMD_MAX,
+> +};
+> +
+> +#define MAC802154_HWSIM_CMD_MAX (__MAC802154_HWSIM_MAX - 1)
+> +
+> +/* mac802154 hwsim netlink attributes
+> + *
+> + * @MAC802154_HWSIM_ATTR_UNSPEC: unspecified attribute to catch error
+> + * @MAC802154_HWSIM_ATTR_RADIO_ID: u32 attribute to identify the radio
+> + * @MAC802154_HWSIM_ATTR_EDGE: nested attribute of edges
+> + * @MAC802154_HWSIM_ATTR_EDGES: list if nested attributes which contains the
+> + *	edge information according the radio id
+> + * @__MAC802154_HWSIM_ATTR_MAX: enum limit
+> + */
+> +enum {
+> +	MAC802154_HWSIM_ATTR_UNSPEC,
+> +	MAC802154_HWSIM_ATTR_RADIO_ID,
+> +	MAC802154_HWSIM_ATTR_RADIO_EDGE,
+> +	MAC802154_HWSIM_ATTR_RADIO_EDGES,
+> +	__MAC802154_HWSIM_ATTR_MAX,
+> +};
+> +
+> +#define MAC802154_HWSIM_ATTR_MAX (__MAC802154_HWSIM_ATTR_MAX - 1)
+> +
+> +/* mac802154 hwsim edge netlink attributes
+> + *
+> + * @MAC802154_HWSIM_EDGE_ATTR_UNSPEC: unspecified attribute to catch error
+> + * @MAC802154_HWSIM_EDGE_ATTR_ENDPOINT_ID: radio id where the edge points to
+> + * @MAC802154_HWSIM_EDGE_ATTR_LQI: LQI value which the endpoint radio will
+> + *	receive for this edge
+> + * @__MAC802154_HWSIM_ATTR_MAX: enum limit
+> + */
+> +enum {
+> +	MAC802154_HWSIM_EDGE_ATTR_UNSPEC,
+> +	MAC802154_HWSIM_EDGE_ATTR_ENDPOINT_ID,
+> +	MAC802154_HWSIM_EDGE_ATTR_LQI,
+> +	__MAC802154_HWSIM_EDGE_ATTR_MAX,
+> +};
+> +
+> +#define MAC802154_HWSIM_EDGE_ATTR_MAX (__MAC802154_HWSIM_EDGE_ATTR_MAX - 1)
+> +
+> +#endif /* __MAC802154_HWSIM_H */
+
+In general I am happy with the hwsim approach. I think we can go from RFC to normal patches and see that we get it fully reviewed and applied.
+
+regards
+Stefan Schmidt
