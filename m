@@ -1,82 +1,53 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-it0-f66.google.com ([209.85.214.66]:50346 "EHLO
-        mail-it0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751233AbeEQUgB (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 17 May 2018 16:36:01 -0400
-Received: by mail-it0-f66.google.com with SMTP id p3-v6so10544805itc.0
-        for <linux-wpan@vger.kernel.org>; Thu, 17 May 2018 13:36:01 -0700 (PDT)
-Date: Thu, 17 May 2018 16:35:55 -0400
-From: Alexander Aring <aring@mojatatu.com>
-Subject: Re: [RFC PATCH wpan-next 1/2] ieee802154: hwsim: add replacement for
- fakelb
-Message-ID: <20180517203555.jxu3si3ea6pqd6j3@x220t>
+Received: from osg.samsung.com ([64.30.133.232]:46016 "EHLO osg.samsung.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750937AbeEGOBo (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+        Mon, 7 May 2018 10:01:44 -0400
+Subject: Re: [RFC PATCH wpan-next 2/2] ieee802154: fakelb: add deprecated msg
+ while probe
 References: <20180427212154.29582-1-aring@mojatatu.com>
- <20180427212154.29582-2-aring@mojatatu.com>
- <20180514142938.afncswlenblaea7a@x220t>
- <d688a8f2-5414-58ee-74ff-9eccb30abe8d@osg.samsung.com>
- <20180517202934.azxojzh6hma3arde@x220t>
+ <20180427212154.29582-3-aring@mojatatu.com>
+From: Stefan Schmidt <stefan@osg.samsung.com>
+Message-ID: <cc5ec28d-c59a-6cf2-480f-fad87125fc31@osg.samsung.com>
+Date: Mon, 7 May 2018 16:01:35 +0200
 MIME-Version: 1.0
+In-Reply-To: <20180427212154.29582-3-aring@mojatatu.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180517202934.azxojzh6hma3arde@x220t>
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Stefan Schmidt <stefan@osg.samsung.com>
+To: Alexander Aring <aring@mojatatu.com>
 Cc: linux-wpan@vger.kernel.org, kernel@mojatatu.com
 
-Hi,
+Hello.
 
-On Thu, May 17, 2018 at 04:29:34PM -0400, Alexander Aring wrote:
-> Hi,
-> 
-> On Mon, May 14, 2018 at 05:40:26PM +0200, Stefan Schmidt wrote:
-> > Hello.
-> > 
-> > 
-> > On 05/14/2018 04:29 PM, Alexander Aring wrote:
-> > > Hi,
-> > >
-> > > On Fri, Apr 27, 2018 at 05:21:53PM -0400, Alexander Aring wrote:
-> > >> This patch adds a new virtual driver mac802154_hwsim which is based on
-> > >> the fakelb driver.
-> > >> The fakelb driver will get deprecated and hopefully removed someday.
-> > >> The main reason for doing this step is to rename the driver to
-> > >> mac802154_hwsim to have a similar naming scheme as mac80211_hwsim,
-> > >> which is more popular in the 802.11 wireless word and the idea is the
-> > >> same behind this driver.
-> > >>
-> > >> The new features of this driver are to have knowledge about connected
-> > >> edges, which can be changed during runtime. This offers a testing
-> > >> environment for routing protocols e.g. RPL.
-> > >> The default behaviour is still as fakelb: two radios connected to each
-> > >> other. New added radios during runtime will not be connected to other
-> > >> wpan_hwsim instances.
-> > >>
-> > >> The netlink api is not namespace aware on purpose, only the registered
-> > >> wpan_phy's can be moved to namespaces. The physical layer according to
-> > >> wiresless "air" communication can be handled across namespaces.
-> > >>
-> > >> Furthermore the edges can be weighted with the LQI value according IEEE
-> > >> 802.15.4 which offers additional handling to mark bad or good connection
-> > >> indicators to other connected virtual phys.
-> > >>
-> > >> Signed-off-by: Alexander Aring <aring@mojatatu.com>
-> > > somebody (don't cc him, I think he don't want to be public) reported
-> > > about issues with hwsim privetly. I will check on it and enable more
-> > > kernel debugging stuff in kernel hacking feature to see all
-> > > locking/stack issues.
-> > 
-> > The positive side is that it got some more testing and you got some problems reported. :-)
-> > 
-> 
-> My test case is:
-> 
-> while true;do wpan-hwsim edge del 0 1; sleep 1; wpan-hwsim edge add 0 1;sleep 1;done
-> 
 
-forget the sleep here, better without so add/del edge so fast as
-possible while traffic send.
+On 04/27/2018 11:21 PM, Alexander Aring wrote:
+> Since mac802154_hwsim the fakelb driver will get deprecated. This patch will
+> notifier all users of fakelb to switch to the new mac802154_hwsim driver.
+>
+> Signed-off-by: Alexander Aring <aring@mojatatu.com>
+> ---
+>  drivers/net/ieee802154/fakelb.c | 3 +++
+>  1 file changed, 3 insertions(+)
+>
+> diff --git a/drivers/net/ieee802154/fakelb.c b/drivers/net/ieee802154/fakelb.c
+> index 0d673f7682ee..d44cc27a13c7 100644
+> --- a/drivers/net/ieee802154/fakelb.c
+> +++ b/drivers/net/ieee802154/fakelb.c
+> @@ -254,6 +254,9 @@ static __init int fakelb_init_module(void)
+>  {
+>  	ieee802154fake_dev = platform_device_register_simple(
+>  			     "ieee802154fakelb", -1, NULL, 0);
+> +
+> +	pr_warn("fakelb driver is marked as deprecated, please use mac802154_hwsim!");
+> +
+>  	return platform_driver_register(&ieee802154fake_driver);
+>  }
+>  
 
-traffic send can be replaced by iperf or netperf.
+I am fine with this patch once the hwsim driver is merged.
 
-- Alex
+regards
+Stefan Schmidt
