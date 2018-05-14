@@ -1,17 +1,21 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-qt0-f173.google.com ([209.85.216.173]:34149 "EHLO
-        mail-qt0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750949AbeEMLfI (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Sun, 13 May 2018 07:35:08 -0400
+Received: from mail-qk0-f176.google.com ([209.85.220.176]:41548 "EHLO
+        mail-qk0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752249AbeENMQ1 (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 14 May 2018 08:16:27 -0400
+Received: by mail-qk0-f176.google.com with SMTP id d125-v6so9727384qkb.8
+        for <linux-wpan@vger.kernel.org>; Mon, 14 May 2018 05:16:27 -0700 (PDT)
 MIME-Version: 1.0
+In-Reply-To: <CAKyrCQUJWq8aOMskFkr3FJF3Kgt2mKz5tsMCYH7PKqNawybJnA@mail.gmail.com>
+References: <CAKyrCQUJWq8aOMskFkr3FJF3Kgt2mKz5tsMCYH7PKqNawybJnA@mail.gmail.com>
 From: Roman Makhov <roman.makhov@gmail.com>
-Date: Sun, 13 May 2018 14:35:07 +0300
-Message-ID: <CAKyrCQUJWq8aOMskFkr3FJF3Kgt2mKz5tsMCYH7PKqNawybJnA@mail.gmail.com>
-Subject: Kernel panic on kernel-3.10.0-693.21.1.el7 in ndisc.h
+Date: Mon, 14 May 2018 15:16:26 +0300
+Message-ID: <CAKyrCQV5KQ2zCZUMdHbodfwR-cYyEkeDtZUSPf-B_p+DAEFdUA@mail.gmail.com>
+Subject: Fwd: Kernel panic on kernel-3.10.0-693.21.1.el7 in ndisc.h
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org, netdev@vger.kernel.org
+To: linux-wpan@vger.kernel.org
 
 Hello,
 
