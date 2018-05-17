@@ -1,37 +1,37 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from osg.samsung.com ([64.30.133.232]:46016 "EHLO osg.samsung.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750937AbeEGOBo (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-        Mon, 7 May 2018 10:01:44 -0400
+Received: from mail-it0-f67.google.com ([209.85.214.67]:54694 "EHLO
+        mail-it0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751642AbeEQUkh (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 17 May 2018 16:40:37 -0400
+Received: by mail-it0-f67.google.com with SMTP id z6-v6so10518690iti.4
+        for <linux-wpan@vger.kernel.org>; Thu, 17 May 2018 13:40:36 -0700 (PDT)
+Date: Thu, 17 May 2018 16:40:29 -0400
+From: Alexander Aring <aring@mojatatu.com>
 Subject: Re: [RFC PATCH wpan-next 2/2] ieee802154: fakelb: add deprecated msg
  while probe
+Message-ID: <20180517204029.r447wupg22qvof6w@x220t>
 References: <20180427212154.29582-1-aring@mojatatu.com>
  <20180427212154.29582-3-aring@mojatatu.com>
-From: Stefan Schmidt <stefan@osg.samsung.com>
-Message-ID: <cc5ec28d-c59a-6cf2-480f-fad87125fc31@osg.samsung.com>
-Date: Mon, 7 May 2018 16:01:35 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180427212154.29582-3-aring@mojatatu.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Disposition: inline
+In-Reply-To: <20180427212154.29582-3-aring@mojatatu.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <aring@mojatatu.com>
+To: stefan@osg.samsung.com
 Cc: linux-wpan@vger.kernel.org, kernel@mojatatu.com
 
-Hello.
+Hi,
 
-
-On 04/27/2018 11:21 PM, Alexander Aring wrote:
+On Fri, Apr 27, 2018 at 05:21:54PM -0400, Alexander Aring wrote:
 > Since mac802154_hwsim the fakelb driver will get deprecated. This patch will
 > notifier all users of fakelb to switch to the new mac802154_hwsim driver.
->
+> 
 > Signed-off-by: Alexander Aring <aring@mojatatu.com>
 > ---
 >  drivers/net/ieee802154/fakelb.c | 3 +++
 >  1 file changed, 3 insertions(+)
->
+> 
 > diff --git a/drivers/net/ieee802154/fakelb.c b/drivers/net/ieee802154/fakelb.c
 > index 0d673f7682ee..d44cc27a13c7 100644
 > --- a/drivers/net/ieee802154/fakelb.c
@@ -43,11 +43,7 @@ On 04/27/2018 11:21 PM, Alexander Aring wrote:
 > +
 > +	pr_warn("fakelb driver is marked as deprecated, please use mac802154_hwsim!");
 > +
->  	return platform_driver_register(&ieee802154fake_driver);
->  }
->  
 
-I am fine with this patch once the hwsim driver is merged.
+I can mess up the smallest patches, there is a missing newline. :-)
 
-regards
-Stefan Schmidt
+- Alex
