@@ -1,40 +1,60 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-io0-f179.google.com ([209.85.223.179]:46134 "EHLO
-        mail-io0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752328AbeFHTlG (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Fri, 8 Jun 2018 15:41:06 -0400
-Received: by mail-io0-f179.google.com with SMTP id d22-v6so17149973iof.13
-        for <linux-wpan@vger.kernel.org>; Fri, 08 Jun 2018 12:41:06 -0700 (PDT)
-Date: Fri, 8 Jun 2018 15:41:00 -0400
-From: Alexander Aring <aring@mojatatu.com>
+Received: from tuna.sandelman.ca ([209.87.249.19]:56273 "EHLO
+        tuna.sandelman.ca" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752356AbeFHTt3 (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 8 Jun 2018 15:49:29 -0400
+From: Michael Richardson <mcr@sandelman.ca>
 Subject: Re: netdevice notifier and device private data
-Message-ID: <20180608194100.p5jtgook4bp4dkyw@x220t>
+In-Reply-To: <20180608173455.vrnfvv7dlu4oxwqf@x220t>
 References: <20180608173455.vrnfvv7dlu4oxwqf@x220t>
- <20180608111457.0a9b4cae@xeon-e3>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180608111457.0a9b4cae@xeon-e3>
+Content-Type: multipart/signed; boundary="=-=-=";
+        micalg=pgp-sha1; protocol="application/pgp-signature"
+Date: Fri, 08 Jun 2018 15:37:44 -0400
+Message-ID: <32763.1528486664@localhost>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Stephen Hemminger <stephen@networkplumber.org>
+To: Alexander Aring <aring@mojatatu.com>
 Cc: netdev@vger.kernel.org, linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org
 
-Hi Stephen,
+--=-=-=
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jun 08, 2018 at 11:14:57AM -0700, Stephen Hemminger wrote:
-...
-> 
-> notifiers are always called with RTNL mutex held
-> and dev->type should not change unless RTNL is held.
 
-thanks for you answer. I am not talking about any race between notifiers
-vs dev->type change.
+Alexander Aring <aring@mojatatu.com> wrote:
+    Alex> I already see code outside who changed tun netdevice to the
+    Alex> ARPHRD_6LOWPAN type and I suppose they running into this
+    Alex> issue.  (Btw: I don't know why somebody wants to changed that
+    Alex> type to ARPHRD_6LOWPAN on tun).
 
-I am talking that dev->type was already changed and a upcoming notifier ends
-in undefined behaviour when it derefences dev->priv. I have some notifier
-which maps a cast from dev->type to a specific structure at dev->priv. This
-structure is not there in tap/tun devices if they changed to "my" dev->type
-and the notifier occurs.
+so that they can have the kernel do 6lowpan processing, emitting 6lowPAN
+packets into userspace to be transfered into a radio via some proprietary
+interface (including, for instance SLIP over USB cable to Contiki or OpenWS=
+N stack,=20
+set up to act as radio only)
 
-- Alex
+=2D-=20
+]               Never tell me the odds!                 | ipv6 mesh network=
+s [=20
+]   Michael Richardson, Sandelman Software Works        | network architect=
+  [=20
+]     mcr@sandelman.ca  http://www.sandelman.ca/        |   ruby on rails  =
+  [=20
+=09
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEVAwUBWxrbCICLcPvd0N1lAQKJJwf/Wk66HYbOQi3dDrwU/x2nDr9CA0lSyLRL
+FLLulloFQ8kFHuT266D5HwktOCy2j8CdCspYH9k+KoRn5BnM+RoLHDQDDY+wwiZ4
+vzOY+z1JAzPJVqBtsfAjtl8jFM9QlkpbxqQVRDw2r5hR0thV3RI4GGZ0zIvGWSIK
+Oo1OOQmTcQLtH2UA1fQqTs/1g9ZNhBPCqmmVbPhUQSPwq9AtJSCuqJV8dw0oZpdq
+Af9PSwj+fqHtLosajyhnfZxow8ZDCTdcAypsRvtl8jEcTMohYelpbaGb+Ezklwm1
+5M3IVyJlki8g4WH0bLFGBzsreNLFVBLlr7iylhuqGcd4XuydP3zlBA==
+=Xnnk
+-----END PGP SIGNATURE-----
+--=-=-=--
