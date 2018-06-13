@@ -1,51 +1,59 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-io0-f196.google.com ([209.85.223.196]:45573 "EHLO
-        mail-io0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932976AbeFLNWr (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 12 Jun 2018 09:22:47 -0400
-Received: by mail-io0-f196.google.com with SMTP id l25-v6so27965466ioh.12
-        for <linux-wpan@vger.kernel.org>; Tue, 12 Jun 2018 06:22:46 -0700 (PDT)
-Date: Tue, 12 Jun 2018 09:22:36 -0400
-From: Alexander Aring <aring@mojatatu.com>
-Subject: Re: netdevice notifier and device private data
-Message-ID: <20180612132236.wld4mh6ecwcopmfl@x220t>
-References: <20180608173455.vrnfvv7dlu4oxwqf@x220t>
- <32763.1528486664@localhost>
- <20180609152921.hqfmprmd4ryttaie@x220t>
- <29706.1528570878@localhost>
- <20180610153956.mgzigzfne6shjb4s@x220t>
- <1326.1528682979@localhost>
+Received: from mout.gmx.net ([212.227.17.22]:34979 "EHLO mout.gmx.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S935256AbeFMWhX (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+        Wed, 13 Jun 2018 18:37:23 -0400
+Received: from saab-desktop.localnet ([178.191.41.231]) by mail.gmx.com
+ (mrgmx101 [212.227.17.168]) with ESMTPSA (Nemesis) id
+ 0MdWO8-1fsZJO1VzY-00PLYO for <linux-wpan@vger.kernel.org>; Thu, 14 Jun 2018
+ 00:37:22 +0200
+From: Josef Filzmaier <j.filzmaier@gmx.at>
+Subject: Problem using AF_PACKET with SOCK_RAW on ieee802514 devices
+Date: Thu, 14 Jun 2018 00:35:40 +0200
+Message-ID: <2998722.BvyPDujJB3@saab-desktop>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1326.1528682979@localhost>
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Michael Richardson <mcr+ietf@sandelman.ca>
-Cc: netdev@vger.kernel.org, linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org
+To: linux-wpan@vger.kernel.org
 
-Hi,
+Hello everyone (again)!
 
-On Sun, Jun 10, 2018 at 10:09:39PM -0400, Michael Richardson wrote:
-> 
-> Alexander Aring <aring@mojatatu.com> wrote:
->     >> It totally seems like broken behaviour.  Maybe it's not even
->     >> intentional.  Maybe they are just foobar.
-> 
->     > They simple don't know what they doing... somebody thought 6LoWPAN need
->     > to be 6LoWPAN, but they actually don't use the 6LoWPAN handling inside
->     > the kernel. _Except_ they doing out of tree stuff which I don't
->     > believe.
-> 
-> So, it seems like this ioctl() should be disabled, or restricted to cases
-> that actually work.  hate to break their code, but if it's broken anyway, at
-> least the kernel won't crash under them.
-> 
+I am using the linux-wpan stack with the atusb and at86rf230 drivers (rf212).
+Moreover i am using raw sockets to test some userspace implemenation of a 
+custom protocol. In userspace i am using (attention, golang ahead)
 
-before we breaking their software I will gentle ask before why they
-doing that and I get a good reason then. Then we look more how we deal
-with an illegal read/dereference in dev->priv.
+> protocol = htons(syscall.ETH_P_IEEE802154)
+> syscall.Socket(syscall.AF_PACKET, syscall.SOCK_RAW, int(protocol))
 
-I will figure out how I can do that over github.
+to create a raw socket. This has been working as desired up until commit 
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?
+id=b84bbaf7a6c8cca24f8acf25a2c8e46913a947ba
 
-- Alex
+After this commit the kernel mistakenly attaches two uninitialized bytes at 
+the end of my raw data. I am currently using a patched kernel which uses the 
+following code in af_packet.c (Modified the else if over Willem de Brujin's 
+patch)
+
+> } else if (sock->type != SOCK_RAW && reserve {
+> 	skb_push(skb, reserve);
+> }
+
+Making this modification i can use my raw sockets with the correct length 
+again. I wanted to ask if my solution is sensible here. I'm not 100% sure on 
+why the patch was introduced, and my solution might not be sufficient for all 
+use cases.
+
+Another solution i thought of was to change the dev->hard_header_len but i'm 
+unsure about changing these constants.
+
+Is anyone else having this problem here, or can anyone else reproduce?
+Any comments on whether my solution (or a modified one) could be upstreamed?
+
+Thanks
+
+-- 
+Filzmaier Josef
+
+
