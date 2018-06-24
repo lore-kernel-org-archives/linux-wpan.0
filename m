@@ -1,124 +1,90 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-eopbgr710081.outbound.protection.outlook.com ([40.107.71.81]:57024
-        "EHLO NAM05-BY2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1755500AbeFYNvI (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-        Mon, 25 Jun 2018 09:51:08 -0400
-From: Alexandru Ardelean <alexandru.ardelean@analog.com>
-Subject: [PATCH] net: ieee802154: adf7242: Fix OCL calibration runs
-Date: Mon, 25 Jun 2018 16:50:28 +0300
-Message-ID: <20180625135028.14350-1-alexandru.ardelean@analog.com>
+Received: from mx2.suse.de ([195.135.220.15]:37658 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S932073AbeFXPtx (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+        Sun, 24 Jun 2018 11:49:53 -0400
+Subject: Re: [RFC] net: Add new LoRaWAN subsystem
+References: <CAC=mGzijVyqEG=DXH4v9WkD0kXR2WOJC4KBPzoT7g5wqVrPGXA@mail.gmail.com>
+ <677E6987-24AE-4D7C-9BF2-6BE3F43212C7@holtmann.org>
+ <CAC=mGzj-GNQ0Xz3PodDHyypNtFsOEfBdNBnNkysW2ZZ8Wwuijg@mail.gmail.com>
+From: =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>
+Message-ID: <5e6b2d6a-f413-7547-6c03-c41dff21453c@suse.de>
+Date: Sun, 24 Jun 2018 17:49:49 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <CAC=mGzj-GNQ0Xz3PodDHyypNtFsOEfBdNBnNkysW2ZZ8Wwuijg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org, Michael.Hennerich@analog.com, stefan@osg.samsung.com
-Cc: Michael Hennerich <michael.hennerich@analog.com>, Alexandru Ardelean <alexandru.ardelean@analog.com>
+To: Jian-Hong Pan <starnight@g.ncu.edu.tw>
+Cc: Marcel Holtmann <marcel@holtmann.org>, "David S. Miller" <davem@davemloft.net>, Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt <stefan@osg.samsung.com>, linux-wpan - ML <linux-wpan@vger.kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
-From: Michael Hennerich <michael.hennerich@analog.com>
+Hi Jian-Hong Pan,
 
-Reissuing RC_RX every 400ms - to adjust for offset drift in
-receiver see datasheet page 61, OCL section.
+Am 13.05.2018 um 04:42 schrieb Jian-Hong Pan:
+> Hi Jiri and Marcel,
+> 
+> 2018-05-11 23:39 GMT+08:00 Marcel Holtmann <marcel@holtmann.org>:
+>> Hi Jian-Hong,
+>>
+>>> A Low-Power Wide-Area Network (LPWAN) is a type of wireless
+>>> telecommunication wide area network designed to allow long range
+>>> communications at a low bit rate among things (connected objects), such
+>>> as sensors operated on a battery.  It can be used widely in IoT area.
+>>> LoRaWAN, which is one kind of implementation of LPWAN, is a medium
+>>> access control (MAC) layer protocol for managing communication between
+>>> LPWAN gateways and end-node devices, maintained by the LoRa Alliance.
+>>> LoRaWAN™ Specification could be downloaded at:
+>>> https://lora-alliance.org/lorawan-for-developers
+>>>
+>>> However, LoRaWAN is not implemented in Linux kernel right now, so I am
+>>> trying to develop it.  Here is my repository:
+>>> https://github.com/starnight/LoRa/tree/lorawan-ndo/LoRaWAN
+>>>
+>>> Because it is a kind of network, the ideal usage in an user space
+>>> program should be like "socket(PF_LORAWAN, SOCK_DGRAM, 0)" and with
+>>> other socket APIs.  Therefore, the definitions like AF_LORAWAN,
+>>> PF_LORAWAN ..., must be listed in the header files of glibc.
+>>> For the driver in kernel space, the definitions also must be listed in
+>>> the corresponding Linux socket header files.
+>>> Especially, both are for the testing programs.
+>>>
+>>> Back to the mentioned "LoRaWAN is not implemented in Linux kernel now".
+>>> Could or should we add the definitions into corresponding kernel header
+>>> files now, if LoRaWAN will be accepted as a subsystem in Linux?
+>>
+>> when you submit your LoRaWAN subsystem to netdev for review, include a patch that adds these new address family definitions. Just pick the next one available. There will be no pre-allocation of numbers until your work has been accepted upstream. Meaning, that the number might change if other address families get merged before yours. So you have to keep updating. glibc will eventually follow the number assigned by the kernel.
+> 
+> Thanks for your guidance.  I will follow the steps.
 
-Signed-off-by: Michael Hennerich <michael.hennerich@analog.com>
-Signed-off-by: Alexandru Ardelean <alexandru.ardelean@analog.com>
----
- drivers/net/ieee802154/adf7242.c | 29 ++++++++++++++++++++++++++++-
- 1 file changed, 28 insertions(+), 1 deletion(-)
+I have been working on a similar thing on and off since proposing it at
+FOSDEM 2017:
 
-diff --git a/drivers/net/ieee802154/adf7242.c b/drivers/net/ieee802154/adf7242.c
-index 64f1b1e77bc0..3e85e9500233 100644
---- a/drivers/net/ieee802154/adf7242.c
-+++ b/drivers/net/ieee802154/adf7242.c
-@@ -275,6 +275,8 @@ struct adf7242_local {
- 	struct spi_message stat_msg;
- 	struct spi_transfer stat_xfer;
- 	struct dentry *debugfs_root;
-+	struct delayed_work work;
-+	struct workqueue_struct *wqueue;
- 	unsigned long flags;
- 	int tx_stat;
- 	bool promiscuous;
-@@ -575,10 +577,27 @@ static int adf7242_cmd_rx(struct adf7242_local *lp)
- 	/* Wait until the ACK is sent */
- 	adf7242_wait_status(lp, RC_STATUS_PHY_RDY, RC_STATUS_MASK, __LINE__);
- 	adf7242_clear_irqstat(lp);
-+	mod_delayed_work(lp->wqueue, &lp->work, msecs_to_jiffies(400));
- 
- 	return adf7242_cmd(lp, CMD_RC_RX);
- }
- 
-+static void adf7242_rx_cal_work(struct work_struct *work)
-+{
-+	struct adf7242_local *lp =
-+	container_of(work, struct adf7242_local, work.work);
-+
-+	/*
-+	 * Reissuing RC_RX every 400ms - to adjust for offset
-+	 * drift in receiver (datasheet page 61, OCL section)
-+	 */
-+
-+	if (!test_bit(FLAG_XMIT, &lp->flags)) {
-+		adf7242_cmd(lp, CMD_RC_PHY_RDY);
-+		adf7242_cmd_rx(lp);
-+	}
-+}
-+
- static int adf7242_set_txpower(struct ieee802154_hw *hw, int mbm)
- {
- 	struct adf7242_local *lp = hw->priv;
-@@ -686,7 +705,7 @@ static int adf7242_start(struct ieee802154_hw *hw)
- 	enable_irq(lp->spi->irq);
- 	set_bit(FLAG_START, &lp->flags);
- 
--	return adf7242_cmd(lp, CMD_RC_RX);
-+	return adf7242_cmd_rx(lp);
- }
- 
- static void adf7242_stop(struct ieee802154_hw *hw)
-@@ -694,6 +713,7 @@ static void adf7242_stop(struct ieee802154_hw *hw)
- 	struct adf7242_local *lp = hw->priv;
- 
- 	disable_irq(lp->spi->irq);
-+	cancel_delayed_work_sync(&lp->work);
- 	adf7242_cmd(lp, CMD_RC_IDLE);
- 	clear_bit(FLAG_START, &lp->flags);
- 	adf7242_clear_irqstat(lp);
-@@ -814,6 +834,7 @@ static int adf7242_xmit(struct ieee802154_hw *hw, struct sk_buff *skb)
- 	/* ensure existing instances of the IRQ handler have completed */
- 	disable_irq(lp->spi->irq);
- 	set_bit(FLAG_XMIT, &lp->flags);
-+	cancel_delayed_work_sync(&lp->work);
- 	reinit_completion(&lp->tx_complete);
- 	adf7242_cmd(lp, CMD_RC_PHY_RDY);
- 	adf7242_clear_irqstat(lp);
-@@ -952,6 +973,7 @@ static irqreturn_t adf7242_isr(int irq, void *data)
- 	unsigned int xmit;
- 	u8 irq1;
- 
-+	mod_delayed_work(lp->wqueue, &lp->work, msecs_to_jiffies(400));
- 	adf7242_read_reg(lp, REG_IRQ1_SRC1, &irq1);
- 
- 	if (!(irq1 & (IRQ_RX_PKT_RCVD | IRQ_CSMA_CA)))
-@@ -1241,6 +1263,8 @@ static int adf7242_probe(struct spi_device *spi)
- 	spi_message_add_tail(&lp->stat_xfer, &lp->stat_msg);
- 
- 	spi_set_drvdata(spi, lp);
-+	INIT_DELAYED_WORK(&lp->work, adf7242_rx_cal_work);
-+	lp->wqueue = alloc_ordered_workqueue(dev_name(&spi->dev), WQ_MEM_RECLAIM);
- 
- 	ret = adf7242_hw_init(lp);
- 	if (ret)
-@@ -1284,6 +1308,9 @@ static int adf7242_remove(struct spi_device *spi)
- 	if (!IS_ERR_OR_NULL(lp->debugfs_root))
- 		debugfs_remove_recursive(lp->debugfs_root);
- 
-+	cancel_delayed_work_sync(&lp->work);
-+	destroy_workqueue(lp->wqueue);
-+
- 	ieee802154_unregister_hw(lp->hw);
- 	mutex_destroy(&lp->bmux);
- 	ieee802154_free_hw(lp->hw);
+At https://github.com/afaerber/lora-modules you will find my proof of
+concept of PF_LORA with SOCK_DGRAM and stub drivers for various modules.
+My idea was to layer LoRaWAN on top of LoRa later.
+
+The way I have developed this was to simply reuse numbers unused in our
+distro kernel and built my modules against the distro kernel, to avoid
+frequent reboots and full kernel builds.
+
+Not having looked at your code yet, do you think our implementations are
+fairly independent at this point, or do you see conflicts apart from
+number allocation? Like, I am currently using lora0 as name - are you
+planning to use lorawan0 or rather something more generic like lpwan0?
+We might place your code in net/lora/lorawan/ and mine in net/lora/?
+
+More problematic would be the actual device drivers, where some devices
+would support both modes - some with soft MAC, others with full MAC. Do
+you have any ideas how to handle that in a sane way?
+
+Please keep me CC'ed on any follow-ups.
+
+Regards,
+Andreas
+
 -- 
-2.17.1
-
+SUSE Linux GmbH, Maxfeldstr. 5, 90409 Nürnberg, Germany
+GF: Felix Imendörffer, Jane Smithard, Graham Norton
+HRB 21284 (AG Nürnberg)
