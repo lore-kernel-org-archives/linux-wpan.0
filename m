@@ -1,44 +1,124 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-it0-f42.google.com ([209.85.214.42]:37578 "EHLO
-        mail-it0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754660AbeFNTM7 (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 14 Jun 2018 15:12:59 -0400
-Received: by mail-it0-f42.google.com with SMTP id l6-v6so10162645iti.2
-        for <linux-wpan@vger.kernel.org>; Thu, 14 Jun 2018 12:12:59 -0700 (PDT)
-Date: Thu, 14 Jun 2018 15:12:53 -0400
-From: Alexander Aring <aring@mojatatu.com>
-Subject: Re: Problem using AF_PACKET with SOCK_RAW on ieee802514 devices
-Message-ID: <20180614191253.eoazp527ygqwxamd@x220t>
-References: <2998722.BvyPDujJB3@saab-desktop>
- <1740660.EcI1Ua05jM@saab-desktop>
- <20180614171301.23vjxsxyjnmnsh3c@x220t>
- <2267568.qQMlmFo6mk@saab-desktop>
+Received: from mail-eopbgr710081.outbound.protection.outlook.com ([40.107.71.81]:57024
+        "EHLO NAM05-BY2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1755500AbeFYNvI (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+        Mon, 25 Jun 2018 09:51:08 -0400
+From: Alexandru Ardelean <alexandru.ardelean@analog.com>
+Subject: [PATCH] net: ieee802154: adf7242: Fix OCL calibration runs
+Date: Mon, 25 Jun 2018 16:50:28 +0300
+Message-ID: <20180625135028.14350-1-alexandru.ardelean@analog.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <2267568.qQMlmFo6mk@saab-desktop>
+Content-Type: text/plain
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Josef Filzmaier <j.filzmaier@gmx.at>
-Cc: linux-wpan@vger.kernel.org
+To: linux-wpan@vger.kernel.org, Michael.Hennerich@analog.com, stefan@osg.samsung.com
+Cc: Michael Hennerich <michael.hennerich@analog.com>, Alexandru Ardelean <alexandru.ardelean@analog.com>
 
-On Thu, Jun 14, 2018 at 08:37:20PM +0200, Josef Filzmaier wrote:
-> Hi!
-> 
-> > Also do you use RPi kernel? 
-> 
-> I first encountered this problem on arch linux (x86_64) with its current 
-> stable kernel (4.16.13) using the ATUSB firmware. Then i encountered the same 
-> problem on a raspberry pi using raspbian with a rf212 directly over the spi 
-> interface. (Custom compiled kernel to debug, 4.16.14).
-> 
+From: Michael Hennerich <michael.hennerich@analog.com>
 
-Question would be what is "Custom compiled kernel" rpi kernel [0] or mainline [1].
+Reissuing RC_RX every 400ms - to adjust for offset drift in
+receiver see datasheet page 61, OCL section.
 
-[0] has at least some known bugs sometimes, people report them here
-because they use raspbian, etc. which use [0].
+Signed-off-by: Michael Hennerich <michael.hennerich@analog.com>
+Signed-off-by: Alexandru Ardelean <alexandru.ardelean@analog.com>
+---
+ drivers/net/ieee802154/adf7242.c | 29 ++++++++++++++++++++++++++++-
+ 1 file changed, 28 insertions(+), 1 deletion(-)
 
-- Alex
+diff --git a/drivers/net/ieee802154/adf7242.c b/drivers/net/ieee802154/adf7242.c
+index 64f1b1e77bc0..3e85e9500233 100644
+--- a/drivers/net/ieee802154/adf7242.c
++++ b/drivers/net/ieee802154/adf7242.c
+@@ -275,6 +275,8 @@ struct adf7242_local {
+ 	struct spi_message stat_msg;
+ 	struct spi_transfer stat_xfer;
+ 	struct dentry *debugfs_root;
++	struct delayed_work work;
++	struct workqueue_struct *wqueue;
+ 	unsigned long flags;
+ 	int tx_stat;
+ 	bool promiscuous;
+@@ -575,10 +577,27 @@ static int adf7242_cmd_rx(struct adf7242_local *lp)
+ 	/* Wait until the ACK is sent */
+ 	adf7242_wait_status(lp, RC_STATUS_PHY_RDY, RC_STATUS_MASK, __LINE__);
+ 	adf7242_clear_irqstat(lp);
++	mod_delayed_work(lp->wqueue, &lp->work, msecs_to_jiffies(400));
+ 
+ 	return adf7242_cmd(lp, CMD_RC_RX);
+ }
+ 
++static void adf7242_rx_cal_work(struct work_struct *work)
++{
++	struct adf7242_local *lp =
++	container_of(work, struct adf7242_local, work.work);
++
++	/*
++	 * Reissuing RC_RX every 400ms - to adjust for offset
++	 * drift in receiver (datasheet page 61, OCL section)
++	 */
++
++	if (!test_bit(FLAG_XMIT, &lp->flags)) {
++		adf7242_cmd(lp, CMD_RC_PHY_RDY);
++		adf7242_cmd_rx(lp);
++	}
++}
++
+ static int adf7242_set_txpower(struct ieee802154_hw *hw, int mbm)
+ {
+ 	struct adf7242_local *lp = hw->priv;
+@@ -686,7 +705,7 @@ static int adf7242_start(struct ieee802154_hw *hw)
+ 	enable_irq(lp->spi->irq);
+ 	set_bit(FLAG_START, &lp->flags);
+ 
+-	return adf7242_cmd(lp, CMD_RC_RX);
++	return adf7242_cmd_rx(lp);
+ }
+ 
+ static void adf7242_stop(struct ieee802154_hw *hw)
+@@ -694,6 +713,7 @@ static void adf7242_stop(struct ieee802154_hw *hw)
+ 	struct adf7242_local *lp = hw->priv;
+ 
+ 	disable_irq(lp->spi->irq);
++	cancel_delayed_work_sync(&lp->work);
+ 	adf7242_cmd(lp, CMD_RC_IDLE);
+ 	clear_bit(FLAG_START, &lp->flags);
+ 	adf7242_clear_irqstat(lp);
+@@ -814,6 +834,7 @@ static int adf7242_xmit(struct ieee802154_hw *hw, struct sk_buff *skb)
+ 	/* ensure existing instances of the IRQ handler have completed */
+ 	disable_irq(lp->spi->irq);
+ 	set_bit(FLAG_XMIT, &lp->flags);
++	cancel_delayed_work_sync(&lp->work);
+ 	reinit_completion(&lp->tx_complete);
+ 	adf7242_cmd(lp, CMD_RC_PHY_RDY);
+ 	adf7242_clear_irqstat(lp);
+@@ -952,6 +973,7 @@ static irqreturn_t adf7242_isr(int irq, void *data)
+ 	unsigned int xmit;
+ 	u8 irq1;
+ 
++	mod_delayed_work(lp->wqueue, &lp->work, msecs_to_jiffies(400));
+ 	adf7242_read_reg(lp, REG_IRQ1_SRC1, &irq1);
+ 
+ 	if (!(irq1 & (IRQ_RX_PKT_RCVD | IRQ_CSMA_CA)))
+@@ -1241,6 +1263,8 @@ static int adf7242_probe(struct spi_device *spi)
+ 	spi_message_add_tail(&lp->stat_xfer, &lp->stat_msg);
+ 
+ 	spi_set_drvdata(spi, lp);
++	INIT_DELAYED_WORK(&lp->work, adf7242_rx_cal_work);
++	lp->wqueue = alloc_ordered_workqueue(dev_name(&spi->dev), WQ_MEM_RECLAIM);
+ 
+ 	ret = adf7242_hw_init(lp);
+ 	if (ret)
+@@ -1284,6 +1308,9 @@ static int adf7242_remove(struct spi_device *spi)
+ 	if (!IS_ERR_OR_NULL(lp->debugfs_root))
+ 		debugfs_remove_recursive(lp->debugfs_root);
+ 
++	cancel_delayed_work_sync(&lp->work);
++	destroy_workqueue(lp->wqueue);
++
+ 	ieee802154_unregister_hw(lp->hw);
+ 	mutex_destroy(&lp->bmux);
+ 	ieee802154_free_hw(lp->hw);
+-- 
+2.17.1
 
-[0] https://github.com/raspberrypi/linux
-[1] https://www.kernel.org/
