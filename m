@@ -1,18 +1,18 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-io0-f193.google.com ([209.85.223.193]:36951 "EHLO
-        mail-io0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726618AbeGNRL5 (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Sat, 14 Jul 2018 13:11:57 -0400
-Received: by mail-io0-f193.google.com with SMTP id z19-v6so33958511ioh.4
-        for <linux-wpan@vger.kernel.org>; Sat, 14 Jul 2018 09:52:18 -0700 (PDT)
+Received: from mail-it0-f65.google.com ([209.85.214.65]:37743 "EHLO
+        mail-it0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752566AbeGBUcQ (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 2 Jul 2018 16:32:16 -0400
+Received: by mail-it0-f65.google.com with SMTP id p17-v6so114056itc.2
+        for <linux-wpan@vger.kernel.org>; Mon, 02 Jul 2018 13:32:16 -0700 (PDT)
 From: Alexander Aring <aring@mojatatu.com>
-Subject: [PATCHv2 wpan] net: 6lowpan: fix reserved space for single frames
-Date: Sat, 14 Jul 2018 12:52:10 -0400
-Message-Id: <20180714165210.20517-1-aring@mojatatu.com>
+Subject: [PATCH wpan 1/2] net: 6lowpan: fix reserved space for single frames
+Date: Mon,  2 Jul 2018 16:32:02 -0400
+Message-Id: <20180702203203.21316-1-aring@mojatatu.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: stefan@osg.samsung.com
-Cc: linux-wpan@vger.kernel.org, netdev@vger.kernel.org, david.palma@ntnu.no, rabinarayans0828@gmail.com, Alexander Aring <aring@mojatatu.com>
+Cc: linux-wpan@vger.kernel.org, netdev@vger.kernel.org, kernel@mojatatu.com, Alexander Aring <aring@mojatatu.com>
 
 This patch fixes patch add handling to take care tail and headroom for
 single 6lowpan frames. We need to be sure we have a skb with the right
@@ -25,14 +25,11 @@ Reported-by: David Palma <david.palma@ntnu.no>
 Reported-by: Rabi Narayan Sahoo <rabinarayans0828@gmail.com>
 Signed-off-by: Alexander Aring <aring@mojatatu.com>
 ---
-changes since v2:
- skb to nskb, pointed out by stefan
-
  net/ieee802154/6lowpan/tx.c | 21 ++++++++++++++++++---
  1 file changed, 18 insertions(+), 3 deletions(-)
 
 diff --git a/net/ieee802154/6lowpan/tx.c b/net/ieee802154/6lowpan/tx.c
-index e6ff5128e61a..ca53efa17be1 100644
+index e6ff5128e61a..d0c4d220de08 100644
 --- a/net/ieee802154/6lowpan/tx.c
 +++ b/net/ieee802154/6lowpan/tx.c
 @@ -265,9 +265,24 @@ netdev_tx_t lowpan_xmit(struct sk_buff *skb, struct net_device *ldev)
@@ -48,7 +45,7 @@ index e6ff5128e61a..ca53efa17be1 100644
 +
 +		nskb = skb_copy_expand(skb, ldev->needed_headroom,
 +				       ldev->needed_tailroom, GFP_ATOMIC);
-+		if (likely(nskb)) {
++		if (likely(skb)) {
 +			consume_skb(skb);
 +			skb = nskb;
 +		} else {
