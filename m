@@ -1,41 +1,63 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mailout2.w1.samsung.com ([210.118.77.12]:34629 "EHLO
-        mailout2.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751535AbeGBN64 (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 2 Jul 2018 09:58:56 -0400
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-        by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20180702135854euoutp02577ddedda8b01e488f70b22405a693f4~9kfYX53G_0446004460euoutp02k
-        for <linux-wpan@vger.kernel.org>; Mon,  2 Jul 2018 13:58:54 +0000 (GMT)
+Received: from mail-it0-f65.google.com ([209.85.214.65]:50909 "EHLO
+        mail-it0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753193AbeGBRxh (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 2 Jul 2018 13:53:37 -0400
+Received: by mail-it0-f65.google.com with SMTP id u4-v6so13306285itg.0
+        for <linux-wpan@vger.kernel.org>; Mon, 02 Jul 2018 10:53:36 -0700 (PDT)
+Date: Mon, 2 Jul 2018 13:53:29 -0400
+From: Alexander Aring <aring@mojatatu.com>
 Subject: Re: [PATCH] ieee802154: add rx LQI from userspace
-From: Stefan Schmidt <s.schmidt@samsung.com>
-Date: Mon, 2 Jul 2018 15:58:40 +0200
-MIME-Version: 1.0
-In-Reply-To: <CAJiuCcdCE42FvWc0svNpQDD0rczYi7Xz-RW5PbbjAuvZe9dgwg@mail.gmail.com>
-Content-Transfer-Encoding: 8bit
-Content-Language: en-GB
-Message-Id: <20180702135852eucas1p21c0de19bcd68cec1eba09b919d253859~9kfWkOk4o2496824968eucas1p2F@eucas1p2.samsung.com>
-Content-Type: text/plain; charset="utf-8"
+Message-ID: <20180702175329.lobhttvi6z6nkdzq@x220t>
 References: <20180607140802.22666-1-peron.clem@gmail.com>
-        <CGME20180702132818epcas5p3c957729b84dc7cb6c779ef8468f14ef8@epcas5p3.samsung.com>
-        <CAJiuCcdCE42FvWc0svNpQDD0rczYi7Xz-RW5PbbjAuvZe9dgwg@mail.gmail.com>
+ <CAJiuCcdCE42FvWc0svNpQDD0rczYi7Xz-RW5PbbjAuvZe9dgwg@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAJiuCcdCE42FvWc0svNpQDD0rczYi7Xz-RW5PbbjAuvZe9dgwg@mail.gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: =?UTF-8?B?Q2zDqW1lbnQgUMOpcm9u?= <peron.clem@gmail.com>, Romuald Cari <romuald.cari@devialet.com>, linux-wpan@vger.kernel.org
-Cc: Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt <stefan@osg.samsung.com>, "David S . Miller" <davem@davemloft.net>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, =?UTF-8?Q?Cl=c3=a9ment_Peron?= <clement.peron@devialet.com>
+To: =?utf-8?B?Q2zDqW1lbnQgUMOpcm9u?= <peron.clem@gmail.com>
+Cc: Romuald Cari <romuald.cari@devialet.com>, linux-wpan@vger.kernel.org, Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt <stefan@osg.samsung.com>, "David S . Miller" <davem@davemloft.net>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, =?utf-8?Q?Cl=C3=A9ment?= Peron <clement.peron@devialet.com>
 
-Hello.
+Hi,
 
-
-On 02/07/2018 15:28, Clément Péron wrote:
+On Mon, Jul 02, 2018 at 03:28:04PM +0200, Clément Péron wrote:
 > Could you review it please ?
 >
-Yes, I will. Sorry for the delay, I am just back from 4 weeks parental 
-leave. A few thousand mails top go through in total.
 
-If you could bare with me for a few more days that would be appreciated. 
-I have all the patches I need to review here marked in my local inbox 
-already.
+sorry... I was thinking a lot what I can contribute to this patch, I
+want to make it short.
 
-regards
-Stefan Schmidt
+I see your use case and your use case has of course a valid point.
 
+
+What I can say about the code? This socket layer was contributed a lot
+in a time where the subsystem was unmaintained. Stefan has some
+experience with this socket layer by doing some examples [0].
+
+In my opinion I am confused that a lot of netlink handling is needed to
+do "something" with this socket layer. I already thought that we need
+some af802154ng for next generation.
+
+Known bug is also RAW sockets on af802154 are totally messed up... but
+we don't need them, this can be done by AF_PACKET (just need to think
+about similar handling there).
+
+---
+
+Now to your patch, you use skb->cb there. The tc ingress part can
+_maybe_? use this control block information. I think this issue is out
+of scope because we have also other parts in the code how we pass data
+between driver and packet layer with skb->cb -> we simply do it wrong.
+
+I have no problems to have this patch inside but for future we should
+tackle a af802154ng with a better UAPI handling.
+
+If we fix skb->cb we just need to think about how to pass such data up
+to socket layer.
+
+- Alex
+
+[0] https://github.com/linux-wpan/wpan-tools/tree/master/examples
