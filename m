@@ -1,58 +1,80 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-it0-f65.google.com ([209.85.214.65]:36264 "EHLO
-        mail-it0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752208AbeGBUcS (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 2 Jul 2018 16:32:18 -0400
-Received: by mail-it0-f65.google.com with SMTP id h19-v6so123335itf.1
-        for <linux-wpan@vger.kernel.org>; Mon, 02 Jul 2018 13:32:17 -0700 (PDT)
-From: Alexander Aring <aring@mojatatu.com>
-Subject: [PATCH wpan 2/2] net: mac802154: tx: expand tailroom if necessary
-Date: Mon,  2 Jul 2018 16:32:03 -0400
-Message-Id: <20180702203203.21316-2-aring@mojatatu.com>
-In-Reply-To: <20180702203203.21316-1-aring@mojatatu.com>
+Received: from proxima.lasnet.de ([78.47.171.185]:49800 "EHLO
+        proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753409AbeGELQG (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 5 Jul 2018 07:16:06 -0400
+Subject: Re: [PATCH wpan 1/2] net: 6lowpan: fix reserved space for single
+ frames
 References: <20180702203203.21316-1-aring@mojatatu.com>
+From: Stefan Schmidt <stefan@datenfreihafen.org>
+Message-ID: <a2cb217f-7e22-e603-bd46-13d8764fee64@datenfreihafen.org>
+Date: Thu, 5 Jul 2018 13:16:03 +0200
+MIME-Version: 1.0
+In-Reply-To: <20180702203203.21316-1-aring@mojatatu.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: stefan@osg.samsung.com
-Cc: linux-wpan@vger.kernel.org, netdev@vger.kernel.org, kernel@mojatatu.com, Alexander Aring <aring@mojatatu.com>
+To: Alexander Aring <aring@mojatatu.com>, stefan@osg.samsung.com
+Cc: linux-wpan@vger.kernel.org, netdev@vger.kernel.org, kernel@mojatatu.com, David Palma <david.palma@ntnu.no>, Rabi Narayan Sahoo <rabinarayans0828@gmail.com>
 
-This patch is necessary if case of AF_PACKET or other socket interface
-which I am aware of it and didn't allocated the necessary room.
+Hello.
 
-Reported-by: David Palma <david.palma@ntnu.no>
-Reported-by: Rabi Narayan Sahoo <rabinarayans0828@gmail.com>
-Signed-off-by: Alexander Aring <aring@mojatatu.com>
----
- net/mac802154/tx.c | 15 ++++++++++++++-
- 1 file changed, 14 insertions(+), 1 deletion(-)
+[CC David Palma and Rabi Narayan Sahoo]
 
-diff --git a/net/mac802154/tx.c b/net/mac802154/tx.c
-index 7e253455f9dd..bcd1a5e6ebf4 100644
---- a/net/mac802154/tx.c
-+++ b/net/mac802154/tx.c
-@@ -63,8 +63,21 @@ ieee802154_tx(struct ieee802154_local *local, struct sk_buff *skb)
- 	int ret;
- 
- 	if (!(local->hw.flags & IEEE802154_HW_TX_OMIT_CKSUM)) {
--		u16 crc = crc_ccitt(0, skb->data, skb->len);
-+		struct sk_buff *nskb;
-+		u16 crc;
-+
-+		if (unlikely(skb_tailroom(skb) < IEEE802154_FCS_LEN)) {
-+			nskb = skb_copy_expand(skb, 0, IEEE802154_FCS_LEN,
-+					       GFP_ATOMIC);
-+			if (likely(nskb)) {
-+				consume_skb(skb);
-+				skb = nskb;
-+			} else {
-+				goto err_tx;
-+			}
-+		}
- 
-+		crc = crc_ccitt(0, skb->data, skb->len);
- 		put_unaligned_le16(crc, skb_put(skb, 2));
- 	}
- 
--- 
-2.11.0
+On 02.07.2018 22:32, Alexander Aring wrote:
+> This patch fixes patch add handling to take care tail and headroom for
+> single 6lowpan frames. We need to be sure we have a skb with the right
+> head and tailroom for single frames. This patch do it by using
+> skb_copy_expand() if head and tailroom is not enough allocated by upper
+> layer.
+> 
+> Bugzilla: https://bugzilla.kernel.org/show_bug.cgi?id=195059
+> Reported-by: David Palma <david.palma@ntnu.no>
+> Reported-by: Rabi Narayan Sahoo <rabinarayans0828@gmail.com>
+> Signed-off-by: Alexander Aring <aring@mojatatu.com>
 
+David, Rabi and you please test these two patches and verify that it
+fixes the problems you have?
+
+regards
+Stefan Schmidt
+
+> ---
+>  net/ieee802154/6lowpan/tx.c | 21 ++++++++++++++++++---
+>  1 file changed, 18 insertions(+), 3 deletions(-)
+> 
+> diff --git a/net/ieee802154/6lowpan/tx.c b/net/ieee802154/6lowpan/tx.c
+> index e6ff5128e61a..d0c4d220de08 100644
+> --- a/net/ieee802154/6lowpan/tx.c
+> +++ b/net/ieee802154/6lowpan/tx.c
+> @@ -265,9 +265,24 @@ netdev_tx_t lowpan_xmit(struct sk_buff *skb, struct net_device *ldev)
+>  	/* We must take a copy of the skb before we modify/replace the ipv6
+>  	 * header as the header could be used elsewhere
+>  	 */
+> -	skb = skb_unshare(skb, GFP_ATOMIC);
+> -	if (!skb)
+> -		return NET_XMIT_DROP;
+> +	if (unlikely(skb_headroom(skb) < ldev->needed_headroom ||
+> +		     skb_tailroom(skb) < ldev->needed_tailroom)) {
+> +		struct sk_buff *nskb;
+> +
+> +		nskb = skb_copy_expand(skb, ldev->needed_headroom,
+> +				       ldev->needed_tailroom, GFP_ATOMIC);
+> +		if (likely(skb)) {
+> +			consume_skb(skb);
+> +			skb = nskb;
+> +		} else {
+> +			kfree_skb(skb);
+> +			return NET_XMIT_DROP;
+> +		}
+> +	} else {
+> +		skb = skb_unshare(skb, GFP_ATOMIC);
+> +		if (!skb)
+> +			return NET_XMIT_DROP;
+> +	}
+>  
+>  	ret = lowpan_header(skb, ldev, &dgram_size, &dgram_offset);
+>  	if (ret < 0) {
+> 
