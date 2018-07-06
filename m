@@ -1,47 +1,28 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from proxima.lasnet.de ([78.47.171.185]:49845 "EHLO
-        proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753722AbeGEL5P (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 5 Jul 2018 07:57:15 -0400
-From: Stefan Schmidt <stefan@datenfreihafen.org>
-Subject: [PATCH net] MAINTAINERS: update my email address
-Date: Thu,  5 Jul 2018 13:56:44 +0200
-Message-Id: <20180705115644.24980-1-stefan@datenfreihafen.org>
+Received: from shards.monkeyblade.net ([23.128.96.9]:44524 "EHLO
+        shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753608AbeGFCJV (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 5 Jul 2018 22:09:21 -0400
+Date: Fri, 06 Jul 2018 11:09:18 +0900 (KST)
+Message-Id: <20180706.110918.446466292855238133.davem@davemloft.net>
+Subject: Re: [PATCH net] MAINTAINERS: update my email address
+From: David Miller <davem@davemloft.net>
+In-Reply-To: <20180705115644.24980-1-stefan@datenfreihafen.org>
+References: <20180705115644.24980-1-stefan@datenfreihafen.org>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org, linux-wpan@vger.kernel.org, aring@mojatatu.com, Stefan Schmidt <stefan@datenfreihafen.org>
+To: stefan@datenfreihafen.org
+Cc: netdev@vger.kernel.org, linux-wpan@vger.kernel.org, aring@mojatatu.com
 
-The mail server hosting the old address is going to fade out.
-Time to update to an address I control directly.
+From: Stefan Schmidt <stefan@datenfreihafen.org>
+Date: Thu,  5 Jul 2018 13:56:44 +0200
 
-Signed-off-by: Stefan Schmidt <stefan@datenfreihafen.org>
----
- MAINTAINERS | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+> The mail server hosting the old address is going to fade out.
+> Time to update to an address I control directly.
+> 
+> Signed-off-by: Stefan Schmidt <stefan@datenfreihafen.org>
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index b40d702337f2..ca3e75ec9308 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -2523,7 +2523,7 @@ S:	Supported
- F:	drivers/scsi/esas2r
- 
- ATUSB IEEE 802.15.4 RADIO DRIVER
--M:	Stefan Schmidt <stefan@osg.samsung.com>
-+M:	Stefan Schmidt <stefan@datenfreihafen.org>
- L:	linux-wpan@vger.kernel.org
- S:	Maintained
- F:	drivers/net/ieee802154/atusb.c
-@@ -6908,7 +6908,7 @@ F:	drivers/clk/clk-versaclock5.c
- 
- IEEE 802.15.4 SUBSYSTEM
- M:	Alexander Aring <alex.aring@gmail.com>
--M:	Stefan Schmidt <stefan@osg.samsung.com>
-+M:	Stefan Schmidt <stefan@datenfreihafen.org>
- L:	linux-wpan@vger.kernel.org
- W:	http://wpan.cakelab.org/
- T:	git git://git.kernel.org/pub/scm/linux/kernel/git/sschmidt/wpan.git
--- 
-2.14.4
-
+Applied, thank you.
