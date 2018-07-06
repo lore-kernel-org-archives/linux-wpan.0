@@ -1,27 +1,26 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from proxima.lasnet.de ([78.47.171.185]:49849 "EHLO
-        proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753661AbeGEL73 (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 5 Jul 2018 07:59:29 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:34658 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754038AbeGFKqW (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 6 Jul 2018 06:46:22 -0400
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.4 \(3445.8.2\))
 Subject: Re: [PATCH] 6lowpan: iphc: reset mac_header after decompress to fix
  panic
-References: <20180619234406.8217-1-michael@opensourcefoundries.com>
-From: Stefan Schmidt <stefan@datenfreihafen.org>
-Message-ID: <6ab37806-6ff2-bda5-a457-7dffefa1fe08@datenfreihafen.org>
-Date: Thu, 5 Jul 2018 13:59:27 +0200
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
 In-Reply-To: <20180619234406.8217-1-michael@opensourcefoundries.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Date: Fri, 6 Jul 2018 12:46:20 +0200
 Content-Transfer-Encoding: 7bit
+Message-Id: <3AAE601A-9D04-4BC5-8D96-5570F4C53F3B@holtmann.org>
+References: <20180619234406.8217-1-michael@opensourcefoundries.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: Michael Scott <michael@opensourcefoundries.com>
 Cc: Alexander Aring <alex.aring@gmail.com>, Jukka Rissanen <jukka.rissanen@linux.intel.com>, "David S. Miller" <davem@davemloft.net>, linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hello.
+Hi Michael,
 
-On 20.06.2018 01:44, Michael Scott wrote:
 > After decompression of 6lowpan socket data, an IPv6 header is inserted
 > before the existing socket payload.  After this, we reset the
 > network_header value of the skb to account for the difference in payload
@@ -46,24 +45,12 @@ On 20.06.2018 01:44, Michael Scott wrote:
 > 
 > Signed-off-by: Michael Scott <michael@opensourcefoundries.com>
 > ---
->  net/6lowpan/iphc.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
-> index 6b1042e21656..52fad5dad9f7 100644
-> --- a/net/6lowpan/iphc.c
-> +++ b/net/6lowpan/iphc.c
-> @@ -770,6 +770,7 @@ int lowpan_header_decompress(struct sk_buff *skb, const struct net_device *dev,
->  		hdr.hop_limit, &hdr.daddr);
->  
->  	skb_push(skb, sizeof(hdr));
-> +	skb_reset_mac_header(skb);
->  	skb_reset_network_header(skb);
->  	skb_copy_to_linear_data(skb, &hdr, sizeof(hdr));
+> net/6lowpan/iphc.c | 1 +
+> 1 file changed, 1 insertion(+)
 
-This showed no problems in my ieee802154 + 6lowpan tests.
+patch has been applied to bluetooth-next tree.
 
-Acked-by: Stefan Schmidt <stefan@datenfreihafen.org>
+Regards
 
-regards
-Stefan Schmidt
+Marcel
+
