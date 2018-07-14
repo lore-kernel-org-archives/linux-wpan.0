@@ -1,83 +1,56 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from proxima.lasnet.de ([78.47.171.185]:50603 "EHLO
-        proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753605AbeGFKHC (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Fri, 6 Jul 2018 06:07:02 -0400
-Subject: Re: [PATCH wpan 1/2] net: 6lowpan: fix reserved space for single
- frames
-References: <20180702203203.21316-1-aring@mojatatu.com>
-From: Stefan Schmidt <stefan@datenfreihafen.org>
-Message-ID: <51306609-93b9-0e80-34ef-f5692cf9e380@datenfreihafen.org>
-Date: Fri, 6 Jul 2018 12:06:59 +0200
-MIME-Version: 1.0
-In-Reply-To: <20180702203203.21316-1-aring@mojatatu.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Received: from mail-io0-f195.google.com ([209.85.223.195]:36996 "EHLO
+        mail-io0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726618AbeGNQwu (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Sat, 14 Jul 2018 12:52:50 -0400
+Received: by mail-io0-f195.google.com with SMTP id z19-v6so33930777ioh.4
+        for <linux-wpan@vger.kernel.org>; Sat, 14 Jul 2018 09:33:14 -0700 (PDT)
+From: Alexander Aring <aring@mojatatu.com>
+Subject: [PATCHv2 wpan-next 0/2] ieee802154: hwsim: add hwsim driver
+Date: Sat, 14 Jul 2018 12:33:04 -0400
+Message-Id: <20180714163306.5629-1-aring@mojatatu.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <aring@mojatatu.com>, stefan@osg.samsung.com
-Cc: linux-wpan@vger.kernel.org, netdev@vger.kernel.org, kernel@mojatatu.com
+To: stefan@osg.samsung.com
+Cc: linux-wpan@vger.kernel.org, Alexander Aring <aring@mojatatu.com>
 
-Hello.
+Hi,
 
-On 02.07.2018 22:32, Alexander Aring wrote:
-> This patch fixes patch add handling to take care tail and headroom for
+This patch series introduce a new virtual ieee802154 driver mac802154_hwsim.
+The mac802154_hwsim driver offers more flexibility to change topology so
+we can use it to test 6LoWPAN routing protocols e.g. RPL.
 
-The "patch add" text here is form some patch managing? Please fix this
-when doing the re-spin for the problem below.
+This driver cleaned up and prepared for mainline now. I showed basic mechanism
+in my netdev 2.1 talk [0].
 
-> single 6lowpan frames. We need to be sure we have a skb with the right
-> head and tailroom for single frames. This patch do it by using
-> skb_copy_expand() if head and tailroom is not enough allocated by upper
-> layer.
-> 
-> Bugzilla: https://bugzilla.kernel.org/show_bug.cgi?id=195059
-> Reported-by: David Palma <david.palma@ntnu.no>
-> Reported-by: Rabi Narayan Sahoo <rabinarayans0828@gmail.com>
-> Signed-off-by: Alexander Aring <aring@mojatatu.com>
-> ---
->  net/ieee802154/6lowpan/tx.c | 21 ++++++++++++++++++---
->  1 file changed, 18 insertions(+), 3 deletions(-)
-> 
-> diff --git a/net/ieee802154/6lowpan/tx.c b/net/ieee802154/6lowpan/tx.c
-> index e6ff5128e61a..d0c4d220de08 100644
-> --- a/net/ieee802154/6lowpan/tx.c
-> +++ b/net/ieee802154/6lowpan/tx.c
-> @@ -265,9 +265,24 @@ netdev_tx_t lowpan_xmit(struct sk_buff *skb, struct net_device *ldev)
->  	/* We must take a copy of the skb before we modify/replace the ipv6
->  	 * header as the header could be used elsewhere
->  	 */
-> -	skb = skb_unshare(skb, GFP_ATOMIC);
-> -	if (!skb)
-> -		return NET_XMIT_DROP;
-> +	if (unlikely(skb_headroom(skb) < ldev->needed_headroom ||
-> +		     skb_tailroom(skb) < ldev->needed_tailroom)) {
-> +		struct sk_buff *nskb;
-> +
-> +		nskb = skb_copy_expand(skb, ldev->needed_headroom,
-> +				       ldev->needed_tailroom, GFP_ATOMIC);
-> +		if (likely(skb)) {
+- Alex
 
-I think you wanted to check for nskb here.
+[0] https://www.youtube.com/watch?v=iMYCaqHVmS0
 
-> +			consume_skb(skb);
-> +			skb = nskb;
-> +		} else {
-> +			kfree_skb(skb);
-> +			return NET_XMIT_DROP;
-> +		}
-> +	} else {
-> +		skb = skb_unshare(skb, GFP_ATOMIC);
-> +		if (!skb)
-> +			return NET_XMIT_DROP;
-> +	}
->  
->  	ret = lowpan_header(skb, ldev, &dgram_size, &dgram_offset);
->  	if (ret < 0) {
-> 
+since v2:
+ - don't remember anymore exactly...
+   - move some prototyes at beginning of the file
+   - tried to change to GPLv2 only but it's not possible, reverted it
+   - add newline
+   - remove module parameter and add a hardcoded 2 instead
 
-The rest looks fine to me.
+Currently sitting at the IETF hackathon to work on it, they have a lot of
+coke here and the food smells good as well. Not sure if they will throw me
+out - I am not registered.
 
-regards
-Stefan Schmidt
+Alexander Aring (2):
+  ieee802154: hwsim: add replacement for fakelb
+  ieee802154: fakelb: add deprecated msg while probe
+
+ drivers/net/ieee802154/Kconfig           |  11 +
+ drivers/net/ieee802154/Makefile          |   1 +
+ drivers/net/ieee802154/fakelb.c          |   3 +
+ drivers/net/ieee802154/mac802154_hwsim.c | 919 +++++++++++++++++++++++++++++++
+ drivers/net/ieee802154/mac802154_hwsim.h |  73 +++
+ 5 files changed, 1007 insertions(+)
+ create mode 100644 drivers/net/ieee802154/mac802154_hwsim.c
+ create mode 100644 drivers/net/ieee802154/mac802154_hwsim.h
+
+-- 
+2.11.0
+
