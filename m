@@ -1,12 +1,12 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:60638 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:60652 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731295AbeGQMjG (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+        id S1729508AbeGQMjG (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
         Tue, 17 Jul 2018 08:39:06 -0400
 From: dsahern@kernel.org
-Subject: [PATCH RFC/RFT net-next 02/17] net/neigh: export neigh_find_table
-Date: Tue, 17 Jul 2018 05:06:36 -0700
-Message-Id: <20180717120651.15748-3-dsahern@kernel.org>
+Subject: [PATCH RFC/RFT net-next 03/17] net/ipv4: wrappers for arp table references
+Date: Tue, 17 Jul 2018 05:06:37 -0700
+Message-Id: <20180717120651.15748-4-dsahern@kernel.org>
 In-Reply-To: <20180717120651.15748-1-dsahern@kernel.org>
 References: <20180717120651.15748-1-dsahern@kernel.org>
 Sender: linux-wpan-owner@vger.kernel.org
@@ -16,69 +16,59 @@ Cc: nikita.leshchenko@oracle.com, roopa@cumulusnetworks.com, stephen@networkplum
 
 From: David Ahern <dsahern@gmail.com>
 
-neighbor code already has an API for access to neighbor caches by
-address family. Export it for use by networking code. Add the
-namespace as an input arg and make family a u8 versus an int (all
-existing callers pass ndm_family which is a u8).
+Create a helper, ipv4_neigh_table, for retrieving a reference to the arp
+table. Add additional wrappers for commonly used neigh_* functions to
+avoid propagating the ipv4_neigh_table lookup all over the code.
 
 Signed-off-by: David Ahern <dsahern@gmail.com>
 ---
- include/net/neighbour.h | 2 ++
- net/core/neighbour.c    | 7 ++++---
- 2 files changed, 6 insertions(+), 3 deletions(-)
+ include/net/arp.h | 26 +++++++++++++++++++++++++-
+ 1 file changed, 25 insertions(+), 1 deletion(-)
 
-diff --git a/include/net/neighbour.h b/include/net/neighbour.h
-index 6c1eecd56a4d..5bc4d79b4b3a 100644
---- a/include/net/neighbour.h
-+++ b/include/net/neighbour.h
-@@ -229,6 +229,8 @@ enum {
- 	NEIGH_LINK_TABLE = NEIGH_NR_TABLES /* Pseudo table for neigh_xmit */
- };
+diff --git a/include/net/arp.h b/include/net/arp.h
+index 977aabfcdc03..7b503bedd9fb 100644
+--- a/include/net/arp.h
++++ b/include/net/arp.h
+@@ -10,6 +10,29 @@
  
-+struct neigh_table *neigh_find_table(struct net *net, u8 family);
+ extern struct neigh_table arp_tbl;
+ 
++static inline struct neigh_table *ipv4_neigh_table(struct net *net)
++{
++	return neigh_find_table(net, AF_INET);
++}
 +
- static inline int neigh_parms_family(struct neigh_parms *p)
++static inline struct neighbour *ipv4_neigh_create(struct net_device *dev,
++						  const void *pkey)
++{
++	return neigh_create(ipv4_neigh_table(dev_net(dev)), pkey, dev);
++}
++
++static inline struct neighbour *ipv4_neigh_create_noref(struct net_device *dev,
++							const void *pkey)
++{
++	return __neigh_create(ipv4_neigh_table(dev_net(dev)), pkey, dev, false);
++}
++
++static inline struct neighbour *ipv4_neigh_lookup(struct net_device *dev,
++						  void *key)
++{
++	return neigh_lookup(ipv4_neigh_table(dev_net(dev)), key, dev);
++}
++
+ static inline u32 arp_hashfn(const void *pkey, const struct net_device *dev, u32 *hash_rnd)
  {
- 	return p->tbl->family;
-diff --git a/net/core/neighbour.c b/net/core/neighbour.c
-index cbe85d8d4cc2..e8630f9de24a 100644
---- a/net/core/neighbour.c
-+++ b/net/core/neighbour.c
-@@ -1625,7 +1625,7 @@ int neigh_table_clear(int index, struct neigh_table *tbl)
+ 	u32 key = *(const u32 *)pkey;
+@@ -23,7 +46,8 @@ static inline struct neighbour *__ipv4_neigh_lookup_noref(struct net_device *dev
+ 	if (dev->flags & (IFF_LOOPBACK | IFF_POINTOPOINT))
+ 		key = INADDR_ANY;
+ 
+-	return ___neigh_lookup_noref(&arp_tbl, neigh_key_eq32, arp_hashfn, &key, dev);
++	return ___neigh_lookup_noref(ipv4_neigh_table(dev_net(dev)),
++				     neigh_key_eq32, arp_hashfn, &key, dev);
  }
- EXPORT_SYMBOL(neigh_table_clear);
  
--static struct neigh_table *neigh_find_table(int family)
-+struct neigh_table *neigh_find_table(struct net *net, u8 family)
- {
- 	struct neigh_table *tbl = NULL;
- 
-@@ -1643,6 +1643,7 @@ static struct neigh_table *neigh_find_table(int family)
- 
- 	return tbl;
- }
-+EXPORT_SYMBOL(neigh_find_table);
- 
- static int neigh_delete(struct sk_buff *skb, struct nlmsghdr *nlh,
- 			struct netlink_ext_ack *extack)
-@@ -1672,7 +1673,7 @@ static int neigh_delete(struct sk_buff *skb, struct nlmsghdr *nlh,
- 		}
- 	}
- 
--	tbl = neigh_find_table(ndm->ndm_family);
-+	tbl = neigh_find_table(net, ndm->ndm_family);
- 	if (tbl == NULL)
- 		return -EAFNOSUPPORT;
- 
-@@ -1740,7 +1741,7 @@ static int neigh_add(struct sk_buff *skb, struct nlmsghdr *nlh,
- 			goto out;
- 	}
- 
--	tbl = neigh_find_table(ndm->ndm_family);
-+	tbl = neigh_find_table(net, ndm->ndm_family);
- 	if (tbl == NULL)
- 		return -EAFNOSUPPORT;
- 
+ static inline struct neighbour *__ipv4_neigh_lookup(struct net_device *dev, u32 key)
 -- 
 2.11.0
 
