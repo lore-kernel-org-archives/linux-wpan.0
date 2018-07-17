@@ -1,12 +1,12 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:60652 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:60710 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731235AbeGQMjI (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+        id S1729508AbeGQMjI (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
         Tue, 17 Jul 2018 08:39:08 -0400
 From: dsahern@kernel.org
-Subject: [PATCH RFC/RFT net-next 06/17] net/ipv6: Remove open coded use of neighbor table
-Date: Tue, 17 Jul 2018 05:06:40 -0700
-Message-Id: <20180717120651.15748-7-dsahern@kernel.org>
+Subject: [PATCH RFC/RFT net-next 07/17] drivers/net: remove open coding of neighbor tables
+Date: Tue, 17 Jul 2018 05:06:41 -0700
+Message-Id: <20180717120651.15748-8-dsahern@kernel.org>
 In-Reply-To: <20180717120651.15748-1-dsahern@kernel.org>
 References: <20180717120651.15748-1-dsahern@kernel.org>
 Sender: linux-wpan-owner@vger.kernel.org
@@ -16,83 +16,358 @@ Cc: nikita.leshchenko@oracle.com, roopa@cumulusnetworks.com, stephen@networkplum
 
 From: David Ahern <dsahern@gmail.com>
 
-Convert existing uses for nd_tbl to the helpers introduced in the previous
-patch.
+Remove open use of arp_tbl and nd_tbl in favor of the new
+ipv{4,6}_neigh_table helpers. Since the existence of the IPv6 table
+is managed by the core networking, the IS_ENABLED checks for IPv6
+can be removed in favor of "is the table non-NULL".
 
 Signed-off-by: David Ahern <dsahern@gmail.com>
 ---
- net/ipv6/addrconf.c   | 16 ++++++++++------
- net/ipv6/ip6_output.c |  4 ++--
- net/ipv6/ndisc.c      | 41 +++++++++++++++++++++++------------------
- net/ipv6/route.c      | 12 +++++++-----
- 4 files changed, 42 insertions(+), 31 deletions(-)
+ drivers/infiniband/ulp/ipoib/ipoib_main.c          | 14 ++++++---
+ drivers/net/ethernet/mellanox/mlx5/core/en_rep.c   | 35 +++++++++++-----------
+ drivers/net/ethernet/mellanox/mlx5/core/en_tc.c    | 11 ++-----
+ .../net/ethernet/mellanox/mlxsw/spectrum_router.c  | 27 ++++++++---------
+ .../net/ethernet/mellanox/mlxsw/spectrum_span.c    |  8 +++--
+ .../ethernet/netronome/nfp/flower/tunnel_conf.c    |  2 +-
+ drivers/net/ethernet/rocker/rocker_main.c          |  4 +--
+ drivers/net/ethernet/rocker/rocker_ofdpa.c         |  2 +-
+ drivers/net/vrf.c                                  |  4 +--
+ drivers/net/vxlan.c                                | 10 +++----
+ net/atm/clip.c                                     | 14 +++++----
+ net/ieee802154/6lowpan/tx.c                        |  2 +-
+ 12 files changed, 70 insertions(+), 63 deletions(-)
 
-diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
-index 1659a6b3cf42..104bf4c6c1f9 100644
---- a/net/ipv6/addrconf.c
-+++ b/net/ipv6/addrconf.c
-@@ -365,6 +365,8 @@ static int snmp6_alloc_dev(struct inet6_dev *idev)
+diff --git a/drivers/infiniband/ulp/ipoib/ipoib_main.c b/drivers/infiniband/ulp/ipoib/ipoib_main.c
+index 26cde95bc0f3..4f798a7b9cc0 100644
+--- a/drivers/infiniband/ulp/ipoib/ipoib_main.c
++++ b/drivers/infiniband/ulp/ipoib/ipoib_main.c
+@@ -1298,6 +1298,8 @@ struct ipoib_neigh *ipoib_neigh_get(struct net_device *dev, u8 *daddr)
  
- static struct inet6_dev *ipv6_add_dev(struct net_device *dev)
+ static void __ipoib_reap_neigh(struct ipoib_dev_priv *priv)
  {
-+	struct net *net = dev_net(dev);
-+	struct neigh_table *neigh_tbl = ipv6_neigh_table(net);
- 	struct inet6_dev *ndev;
- 	int err = -ENOMEM;
++	struct net *net = dev_net(priv->dev);
++	struct neigh_table *arp_tbl = ipv4_neigh_table(net);
+ 	struct ipoib_neigh_table *ntbl = &priv->ntbl;
+ 	struct ipoib_neigh_hash *htbl;
+ 	unsigned long neigh_obsolete;
+@@ -1318,7 +1320,7 @@ static void __ipoib_reap_neigh(struct ipoib_dev_priv *priv)
+ 		goto out_unlock;
  
-@@ -381,13 +383,13 @@ static struct inet6_dev *ipv6_add_dev(struct net_device *dev)
- 	ndev->dev = dev;
- 	INIT_LIST_HEAD(&ndev->addr_list);
- 	timer_setup(&ndev->rs_timer, addrconf_rs_timer, 0);
--	memcpy(&ndev->cnf, dev_net(dev)->ipv6.devconf_dflt, sizeof(ndev->cnf));
-+	memcpy(&ndev->cnf, net->ipv6.devconf_dflt, sizeof(ndev->cnf));
+ 	/* neigh is obsolete if it was idle for two GC periods */
+-	dt = 2 * arp_tbl.gc_interval;
++	dt = 2 * arp_tbl->gc_interval;
+ 	neigh_obsolete = jiffies - dt;
+ 	/* handle possible race condition */
+ 	if (test_bit(IPOIB_STOP_NEIGH_GC, &priv->flags))
+@@ -1357,12 +1359,14 @@ static void ipoib_reap_neigh(struct work_struct *work)
+ {
+ 	struct ipoib_dev_priv *priv =
+ 		container_of(work, struct ipoib_dev_priv, neigh_reap_task.work);
++	struct net *net = dev_net(priv->dev);
++	struct neigh_table *arp_tbl = ipv4_neigh_table(net);
  
- 	if (ndev->cnf.stable_secret.initialized)
- 		ndev->cnf.addr_gen_mode = IN6_ADDR_GEN_MODE_STABLE_PRIVACY;
+ 	__ipoib_reap_neigh(priv);
  
- 	ndev->cnf.mtu6 = dev->mtu;
--	ndev->nd_parms = neigh_parms_alloc(dev, &nd_tbl);
-+	ndev->nd_parms = neigh_parms_alloc(dev, neigh_tbl);
- 	if (!ndev->nd_parms) {
- 		kfree(ndev);
- 		return ERR_PTR(err);
-@@ -400,7 +402,7 @@ static struct inet6_dev *ipv6_add_dev(struct net_device *dev)
- 	if (snmp6_alloc_dev(ndev) < 0) {
- 		netdev_dbg(dev, "%s: cannot allocate memory for statistics\n",
- 			   __func__);
--		neigh_parms_release(&nd_tbl, ndev->nd_parms);
-+		neigh_parms_release(neigh_tbl, ndev->nd_parms);
- 		dev_put(dev);
- 		kfree(ndev);
- 		return ERR_PTR(err);
-@@ -465,7 +467,7 @@ static struct inet6_dev *ipv6_add_dev(struct net_device *dev)
- 	return ndev;
+ 	if (!test_bit(IPOIB_STOP_NEIGH_GC, &priv->flags))
+ 		queue_delayed_work(priv->wq, &priv->neigh_reap_task,
+-				   arp_tbl.gc_interval);
++				   arp_tbl->gc_interval);
+ }
  
- err_release:
--	neigh_parms_release(&nd_tbl, ndev->nd_parms);
-+	neigh_parms_release(ipv6_neigh_table(net), ndev->nd_parms);
- 	ndev->dead = 1;
- 	in6_dev_finish_destroy(ndev);
- 	return ERR_PTR(err);
-@@ -3787,9 +3789,11 @@ static int addrconf_ifdown(struct net_device *dev, int how)
  
- 	/* Last: Shot the device (if unregistered) */
- 	if (how) {
-+		struct neigh_table *tbl = ipv6_neigh_table(net);
-+
- 		addrconf_sysctl_unregister(idev);
--		neigh_parms_release(&nd_tbl, idev->nd_parms);
--		neigh_ifdown(&nd_tbl, dev);
-+		neigh_parms_release(tbl, idev->nd_parms);
-+		neigh_ifdown(tbl, dev);
- 		in6_dev_put(idev);
- 	}
+@@ -1514,6 +1518,8 @@ void ipoib_neigh_free(struct ipoib_neigh *neigh)
+ 
+ static int ipoib_neigh_hash_init(struct ipoib_dev_priv *priv)
+ {
++	struct net *net = dev_net(priv->dev);
++	struct neigh_table *arp_tbl = ipv4_neigh_table(net);
+ 	struct ipoib_neigh_table *ntbl = &priv->ntbl;
+ 	struct ipoib_neigh_hash *htbl;
+ 	struct ipoib_neigh __rcu **buckets;
+@@ -1525,7 +1531,7 @@ static int ipoib_neigh_hash_init(struct ipoib_dev_priv *priv)
+ 	if (!htbl)
+ 		return -ENOMEM;
+ 	set_bit(IPOIB_STOP_NEIGH_GC, &priv->flags);
+-	size = roundup_pow_of_two(arp_tbl.gc_thresh3);
++	size = roundup_pow_of_two(arp_tbl->gc_thresh3);
+ 	buckets = kcalloc(size, sizeof(*buckets), GFP_KERNEL);
+ 	if (!buckets) {
+ 		kfree(htbl);
+@@ -1541,7 +1547,7 @@ static int ipoib_neigh_hash_init(struct ipoib_dev_priv *priv)
+ 	/* start garbage collection */
+ 	clear_bit(IPOIB_STOP_NEIGH_GC, &priv->flags);
+ 	queue_delayed_work(priv->wq, &priv->neigh_reap_task,
+-			   arp_tbl.gc_interval);
++			   arp_tbl->gc_interval);
+ 
  	return 0;
-diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
-index 8047fd41ba88..05e11f71da49 100644
---- a/net/ipv6/ip6_output.c
-+++ b/net/ipv6/ip6_output.c
-@@ -114,7 +114,7 @@ static int ip6_finish_output2(struct net *net, struct sock *sk, struct sk_buff *
+ }
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c b/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c
+index 8e3c5b4b90ab..a2283a4b3a17 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c
+@@ -309,17 +309,19 @@ void mlx5e_remove_sqs_fwd_rules(struct mlx5e_priv *priv)
+ 
+ static void mlx5e_rep_neigh_update_init_interval(struct mlx5e_rep_priv *rpriv)
+ {
+-#if IS_ENABLED(CONFIG_IPV6)
+-	unsigned long ipv6_interval = NEIGH_VAR(&nd_tbl.parms,
++	struct net_device *netdev = rpriv->netdev;
++	struct net *net = dev_net(netdev);
++	struct neigh_table *arp_table = ipv4_neigh_table(net);
++	struct neigh_table *nd_table = ipv6_neigh_table(net);
++
++	unsigned long ipv4_interval = NEIGH_VAR(&arp_table->parms,
+ 						DELAY_PROBE_TIME);
+-#else
+ 	unsigned long ipv6_interval = ~0UL;
+-#endif
+-	unsigned long ipv4_interval = NEIGH_VAR(&arp_tbl.parms,
+-						DELAY_PROBE_TIME);
+-	struct net_device *netdev = rpriv->netdev;
+ 	struct mlx5e_priv *priv = netdev_priv(netdev);
+ 
++	if (nd_table)
++		ipv6_interval = NEIGH_VAR(&nd_table->parms, DELAY_PROBE_TIME);
++
+ 	rpriv->neigh_update.min_interval = min_t(unsigned long, ipv6_interval, ipv4_interval);
+ 	mlx5_fc_update_sampling_interval(priv->mdev, rpriv->neigh_update.min_interval);
+ }
+@@ -437,19 +439,22 @@ static int mlx5e_rep_netevent_event(struct notifier_block *nb,
+ 	struct net_device *netdev = rpriv->netdev;
+ 	struct mlx5e_priv *priv = netdev_priv(netdev);
+ 	struct mlx5e_neigh_hash_entry *nhe = NULL;
++	struct net *net = dev_net(netdev);
+ 	struct mlx5e_neigh m_neigh = {};
++	struct neigh_table *arp_table;
++	struct neigh_table *nd_table;
+ 	struct neigh_parms *p;
+ 	struct neighbour *n;
+ 	bool found = false;
+ 
++	arp_table = ipv4_neigh_table(net);
++	nd_table = ipv6_neigh_table(net);
++
+ 	switch (event) {
+ 	case NETEVENT_NEIGH_UPDATE:
+ 		n = ptr;
+-#if IS_ENABLED(CONFIG_IPV6)
+-		if (n->tbl != &nd_tbl && n->tbl != &arp_tbl)
+-#else
+-		if (n->tbl != &arp_tbl)
+-#endif
++
++		if (n->tbl != nd_table && n->tbl != arp_table)
+ 			return NOTIFY_DONE;
+ 
+ 		m_neigh.dev = n->dev;
+@@ -493,11 +498,7 @@ static int mlx5e_rep_netevent_event(struct notifier_block *nb,
+ 		 * changes in the default table, we only care about changes
+ 		 * done per device delay prob time parameter.
+ 		 */
+-#if IS_ENABLED(CONFIG_IPV6)
+-		if (!p->dev || (p->tbl != &nd_tbl && p->tbl != &arp_tbl))
+-#else
+-		if (!p->dev || p->tbl != &arp_tbl)
+-#endif
++		if (!p->dev || (p->tbl != nd_table && p->tbl != arp_table))
+ 			return NOTIFY_DONE;
+ 
+ 		/* We are in atomic context and can't take RTNL mutex,
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c b/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
+index 0edf4751a8ba..f4f2bace496a 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
+@@ -45,7 +45,7 @@
+ #include <net/tc_act/tc_pedit.h>
+ #include <net/tc_act/tc_csum.h>
+ #include <net/vxlan.h>
+-#include <net/arp.h>
++#include <net/neighbour.h>
+ #include "en.h"
+ #include "en_rep.h"
+ #include "en_tc.h"
+@@ -999,13 +999,8 @@ void mlx5e_tc_update_neigh_used_value(struct mlx5e_neigh_hash_entry *nhe)
+ 	bool neigh_used = false;
+ 	struct neighbour *n;
+ 
+-	if (m_neigh->family == AF_INET)
+-		tbl = &arp_tbl;
+-#if IS_ENABLED(CONFIG_IPV6)
+-	else if (m_neigh->family == AF_INET6)
+-		tbl = &nd_tbl;
+-#endif
+-	else
++	tbl = neigh_find_table(dev_net(m_neigh->dev), m_neigh->family);
++	if (!tbl)
+ 		return;
+ 
+ 	list_for_each_entry(e, &nhe->encap_list, encap_list) {
+diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum_router.c b/drivers/net/ethernet/mellanox/mlxsw/spectrum_router.c
+index e51c8dc52f37..c5e6b2972d0f 100644
+--- a/drivers/net/ethernet/mellanox/mlxsw/spectrum_router.c
++++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum_router.c
+@@ -2019,15 +2019,15 @@ mlxsw_sp_neigh_entry_lookup(struct mlxsw_sp *mlxsw_sp, struct neighbour *n)
+ static void
+ mlxsw_sp_router_neighs_update_interval_init(struct mlxsw_sp *mlxsw_sp)
+ {
+-	unsigned long interval;
++	/* mlxsw only works with init_net at the moment */
++	struct neigh_table *arp_table = ipv4_neigh_table(&init_net);
++	struct neigh_table *nd_table = ipv6_neigh_table(&init_net);
++	unsigned long interval = NEIGH_VAR(&arp_table->parms, DELAY_PROBE_TIME);
++
++	if (nd_table)
++		interval = min_t(unsigned long, interval,
++				 NEIGH_VAR(&nd_table->parms, DELAY_PROBE_TIME));
+ 
+-#if IS_ENABLED(CONFIG_IPV6)
+-	interval = min_t(unsigned long,
+-			 NEIGH_VAR(&arp_tbl.parms, DELAY_PROBE_TIME),
+-			 NEIGH_VAR(&nd_tbl.parms, DELAY_PROBE_TIME));
+-#else
+-	interval = NEIGH_VAR(&arp_tbl.parms, DELAY_PROBE_TIME);
+-#endif
+ 	mlxsw_sp->router->neighs_update.interval = jiffies_to_msecs(interval);
+ }
+ 
+@@ -2050,7 +2050,7 @@ static void mlxsw_sp_router_neigh_ent_ipv4_process(struct mlxsw_sp *mlxsw_sp,
+ 
+ 	dipn = htonl(dip);
+ 	dev = mlxsw_sp->router->rifs[rif]->dev;
+-	n = neigh_lookup(&arp_tbl, &dipn, dev);
++	n = ipv4_neigh_lookup(dev, &dipn);
+ 	if (!n)
+ 		return;
+ 
+@@ -2064,6 +2064,7 @@ static void mlxsw_sp_router_neigh_ent_ipv6_process(struct mlxsw_sp *mlxsw_sp,
+ 						   char *rauhtd_pl,
+ 						   int rec_index)
+ {
++	struct neigh_table *nd_table = ipv6_neigh_table(&init_net);
+ 	struct net_device *dev;
+ 	struct neighbour *n;
+ 	struct in6_addr dip;
+@@ -2078,7 +2079,7 @@ static void mlxsw_sp_router_neigh_ent_ipv6_process(struct mlxsw_sp *mlxsw_sp,
+ 	}
+ 
+ 	dev = mlxsw_sp->router->rifs[rif]->dev;
+-	n = neigh_lookup(&nd_tbl, &dip, dev);
++	n = neigh_lookup(nd_table, &dip, dev);
+ 	if (!n)
+ 		return;
+ 
+@@ -3721,7 +3722,7 @@ mlxsw_sp_nexthop4_group_create(struct mlxsw_sp *mlxsw_sp, struct fib_info *fi)
+ 		return ERR_PTR(-ENOMEM);
+ 	nh_grp->priv = fi;
+ 	INIT_LIST_HEAD(&nh_grp->fib_list);
+-	nh_grp->neigh_tbl = &arp_tbl;
++	nh_grp->neigh_tbl = ipv4_neigh_table(&init_net);
+ 
+ 	nh_grp->gateway = mlxsw_sp_fi_is_gateway(mlxsw_sp, fi);
+ 	nh_grp->count = fi->fib_nhs;
+@@ -4919,9 +4920,7 @@ mlxsw_sp_nexthop6_group_create(struct mlxsw_sp *mlxsw_sp,
+ 	if (!nh_grp)
+ 		return ERR_PTR(-ENOMEM);
+ 	INIT_LIST_HEAD(&nh_grp->fib_list);
+-#if IS_ENABLED(CONFIG_IPV6)
+-	nh_grp->neigh_tbl = &nd_tbl;
+-#endif
++	nh_grp->neigh_tbl = ipv6_neigh_table(&init_net);
+ 	mlxsw_sp_rt6 = list_first_entry(&fib6_entry->rt6_list,
+ 					struct mlxsw_sp_rt6, list);
+ 	nh_grp->gateway = mlxsw_sp_rt6_is_gateway(mlxsw_sp, mlxsw_sp_rt6->rt);
+diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum_span.c b/drivers/net/ethernet/mellanox/mlxsw/spectrum_span.c
+index e42d640cddab..8d21a340cf47 100644
+--- a/drivers/net/ethernet/mellanox/mlxsw/spectrum_span.c
++++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum_span.c
+@@ -365,6 +365,7 @@ mlxsw_sp_span_entry_gretap4_parms(const struct net_device *to_dev,
+ 	bool inherit_ttl = !tparm.iph.ttl;
+ 	union mlxsw_sp_l3addr gw = daddr;
+ 	struct net_device *l3edev;
++	struct neigh_table *tbl;
+ 
+ 	if (!(to_dev->flags & IFF_UP) ||
+ 	    /* Reject tunnels with GRE keys, checksums, etc. */
+@@ -376,9 +377,10 @@ mlxsw_sp_span_entry_gretap4_parms(const struct net_device *to_dev,
+ 		return mlxsw_sp_span_entry_unoffloadable(sparmsp);
+ 
+ 	l3edev = mlxsw_sp_span_gretap4_route(to_dev, &saddr.addr4, &gw.addr4);
++	tbl = ipv4_neigh_table(dev_net(l3edev));
+ 	return mlxsw_sp_span_entry_tunnel_parms_common(l3edev, saddr, daddr, gw,
+ 						       tparm.iph.ttl,
+-						       &arp_tbl, sparmsp);
++						       tbl, sparmsp);
+ }
+ 
+ static int
+@@ -466,6 +468,7 @@ mlxsw_sp_span_entry_gretap6_parms(const struct net_device *to_dev,
+ 	bool inherit_ttl = !tparm.hop_limit;
+ 	union mlxsw_sp_l3addr gw = daddr;
+ 	struct net_device *l3edev;
++	struct neigh_table *tbl;
+ 
+ 	if (!(to_dev->flags & IFF_UP) ||
+ 	    /* Reject tunnels with GRE keys, checksums, etc. */
+@@ -477,9 +480,10 @@ mlxsw_sp_span_entry_gretap6_parms(const struct net_device *to_dev,
+ 		return mlxsw_sp_span_entry_unoffloadable(sparmsp);
+ 
+ 	l3edev = mlxsw_sp_span_gretap6_route(to_dev, &saddr.addr6, &gw.addr6);
++	tbl = ipv6_neigh_table(dev_net(l3edev));
+ 	return mlxsw_sp_span_entry_tunnel_parms_common(l3edev, saddr, daddr, gw,
+ 						       tparm.hop_limit,
+-						       &nd_tbl, sparmsp);
++						       tbl, sparmsp);
+ }
+ 
+ static int
+diff --git a/drivers/net/ethernet/netronome/nfp/flower/tunnel_conf.c b/drivers/net/ethernet/netronome/nfp/flower/tunnel_conf.c
+index 78afe75129ab..2f52cbd01d31 100644
+--- a/drivers/net/ethernet/netronome/nfp/flower/tunnel_conf.c
++++ b/drivers/net/ethernet/netronome/nfp/flower/tunnel_conf.c
+@@ -201,7 +201,7 @@ void nfp_tunnel_keep_alive(struct nfp_app *app, struct sk_buff *skb)
+ 		if (!netdev)
+ 			continue;
+ 
+-		n = neigh_lookup(&arp_tbl, &ipv4_addr, netdev);
++		n = ipv4_neigh_lookup(netdev, &ipv4_addr);
+ 		if (!n)
+ 			continue;
+ 
+diff --git a/drivers/net/ethernet/rocker/rocker_main.c b/drivers/net/ethernet/rocker/rocker_main.c
+index aeafdb9ac015..6791941b3472 100644
+--- a/drivers/net/ethernet/rocker/rocker_main.c
++++ b/drivers/net/ethernet/rocker/rocker_main.c
+@@ -3098,9 +3098,9 @@ static int rocker_netevent_event(struct notifier_block *unused,
+ 
+ 	switch (event) {
+ 	case NETEVENT_NEIGH_UPDATE:
+-		if (n->tbl != &arp_tbl)
+-			return NOTIFY_DONE;
+ 		dev = n->dev;
++		if (n->tbl != ipv4_neigh_table(dev_net(dev)))
++			return NOTIFY_DONE;
+ 		if (!rocker_port_dev_check(dev))
+ 			return NOTIFY_DONE;
+ 		rocker_port = netdev_priv(dev);
+diff --git a/drivers/net/ethernet/rocker/rocker_ofdpa.c b/drivers/net/ethernet/rocker/rocker_ofdpa.c
+index 6473cc68c2d5..5745d675aaeb 100644
+--- a/drivers/net/ethernet/rocker/rocker_ofdpa.c
++++ b/drivers/net/ethernet/rocker/rocker_ofdpa.c
+@@ -1356,7 +1356,7 @@ static int ofdpa_port_ipv4_resolve(struct ofdpa_port *ofdpa_port,
+ 	int err = 0;
+ 
+ 	if (!n) {
+-		n = neigh_create(&arp_tbl, &ip_addr, dev);
++		n = ipv4_neigh_create(dev, &ip_addr);
+ 		if (IS_ERR(n))
+ 			return PTR_ERR(n);
+ 	}
+diff --git a/drivers/net/vrf.c b/drivers/net/vrf.c
+index f93547f257fb..304f452f619a 100644
+--- a/drivers/net/vrf.c
++++ b/drivers/net/vrf.c
+@@ -367,7 +367,7 @@ static int vrf_finish_output6(struct net *net, struct sock *sk,
  	nexthop = rt6_nexthop((struct rt6_info *)dst, &ipv6_hdr(skb)->daddr);
  	neigh = __ipv6_neigh_lookup_noref(dst->dev, nexthop);
  	if (unlikely(!neigh))
@@ -101,197 +376,110 @@ index 8047fd41ba88..05e11f71da49 100644
  	if (!IS_ERR(neigh)) {
  		sock_confirm_neigh(skb, neigh);
  		ret = neigh_output(neigh, skb);
-@@ -462,7 +462,7 @@ int ip6_forward(struct sk_buff *skb)
+@@ -575,7 +575,7 @@ static int vrf_finish_output(struct net *net, struct sock *sk, struct sk_buff *s
+ 	nexthop = (__force u32)rt_nexthop(rt, ip_hdr(skb)->daddr);
+ 	neigh = __ipv4_neigh_lookup_noref(dev, nexthop);
+ 	if (unlikely(!neigh))
+-		neigh = __neigh_create(&arp_tbl, &nexthop, dev, false);
++		neigh = ipv4_neigh_create_noref(dev, &nexthop);
+ 	if (!IS_ERR(neigh)) {
+ 		sock_confirm_neigh(skb, neigh);
+ 		ret = neigh_output(neigh, skb);
+diff --git a/drivers/net/vxlan.c b/drivers/net/vxlan.c
+index ababba37d735..2ef9df11eaff 100644
+--- a/drivers/net/vxlan.c
++++ b/drivers/net/vxlan.c
+@@ -1520,8 +1520,7 @@ static int arp_reduce(struct net_device *dev, struct sk_buff *skb, __be32 vni)
+ 	    ipv4_is_multicast(tip))
+ 		goto out;
  
- 	/* XXX: idev->cnf.proxy_ndp? */
- 	if (net->ipv6.devconf_all->proxy_ndp &&
--	    pneigh_lookup(&nd_tbl, net, &hdr->daddr, skb->dev, 0)) {
-+	    ipv6_pneigh_lookup(net, &hdr->daddr, skb->dev, 0)) {
- 		int proxied = ip6_forward_proxy_check(skb);
- 		if (proxied > 0)
- 			return ip6_input(skb);
-diff --git a/net/ipv6/ndisc.c b/net/ipv6/ndisc.c
-index e640d2f3c55c..14b925f36099 100644
---- a/net/ipv6/ndisc.c
-+++ b/net/ipv6/ndisc.c
-@@ -729,14 +729,16 @@ static void ndisc_solicit(struct neighbour *neigh, struct sk_buff *skb)
- static int pndisc_is_router(const void *pkey,
- 			    struct net_device *dev)
- {
-+	struct net *net = dev_net(dev);
-+	struct neigh_table *neigh_tbl = ipv6_neigh_table(net);
- 	struct pneigh_entry *n;
- 	int ret = -1;
- 
--	read_lock_bh(&nd_tbl.lock);
--	n = __pneigh_lookup(&nd_tbl, dev_net(dev), pkey, dev);
-+	read_lock_bh(&neigh_tbl->lock);
-+	n = __pneigh_lookup(ipv6_neigh_table(net), net, pkey, dev);
- 	if (n)
- 		ret = !!(n->flags & NTF_ROUTER);
--	read_unlock_bh(&nd_tbl.lock);
-+	read_unlock_bh(&neigh_tbl->lock);
- 
- 	return ret;
- }
-@@ -764,6 +766,8 @@ static void ndisc_recv_ns(struct sk_buff *skb)
- 	struct inet6_dev *idev = NULL;
- 	struct neighbour *neigh;
- 	int dad = ipv6_addr_any(saddr);
-+	struct neigh_table *neigh_tbl;
-+	struct net *net;
- 	bool inc;
- 	int is_router = -1;
- 	u64 nonce = 0;
-@@ -816,7 +820,10 @@ static void ndisc_recv_ns(struct sk_buff *skb)
- 
- 	inc = ipv6_addr_is_multicast(daddr);
- 
--	ifp = ipv6_get_ifaddr(dev_net(dev), &msg->target, dev, 1);
-+	net = dev_net(dev);
-+	neigh_tbl = ipv6_neigh_table(net);
-+
-+	ifp = ipv6_get_ifaddr(net, &msg->target, dev, 1);
- 	if (ifp) {
- have_ifp:
- 		if (ifp->flags & (IFA_F_TENTATIVE|IFA_F_OPTIMISTIC)) {
-@@ -851,8 +858,6 @@ static void ndisc_recv_ns(struct sk_buff *skb)
- 
- 		idev = ifp->idev;
- 	} else {
--		struct net *net = dev_net(dev);
+-	n = neigh_lookup(&arp_tbl, &tip, dev);
 -
- 		/* perhaps an address on the master device */
- 		if (netif_is_l3_slave(dev)) {
- 			struct net_device *mdev;
-@@ -888,7 +893,7 @@ static void ndisc_recv_ns(struct sk_buff *skb)
- 				 */
- 				struct sk_buff *n = skb_clone(skb, GFP_ATOMIC);
- 				if (n)
--					pneigh_enqueue(&nd_tbl, idev->nd_parms, n);
-+					pneigh_enqueue(neigh_tbl, idev->nd_parms, n);
- 				goto out;
- 			}
- 		} else
-@@ -905,15 +910,15 @@ static void ndisc_recv_ns(struct sk_buff *skb)
- 	}
++	n = ipv4_neigh_lookup(dev, &tip);
+ 	if (n) {
+ 		struct vxlan_fdb *f;
+ 		struct sk_buff	*reply;
+@@ -1675,8 +1674,7 @@ static int neigh_reduce(struct net_device *dev, struct sk_buff *skb, __be32 vni)
+ 	    ipv6_addr_is_multicast(&msg->target))
+ 		goto out;
  
- 	if (inc)
--		NEIGH_CACHE_STAT_INC(&nd_tbl, rcv_probes_mcast);
-+		NEIGH_CACHE_STAT_INC(neigh_tbl, rcv_probes_mcast);
- 	else
--		NEIGH_CACHE_STAT_INC(&nd_tbl, rcv_probes_ucast);
-+		NEIGH_CACHE_STAT_INC(neigh_tbl, rcv_probes_ucast);
+-	n = neigh_lookup(ipv6_stub->nd_tbl, &msg->target, dev);
+-
++	n = ipv6_neigh_lookup(dev, &msg->target);
+ 	if (n) {
+ 		struct vxlan_fdb *f;
+ 		struct sk_buff *reply;
+@@ -1736,7 +1734,7 @@ static bool route_shortcircuit(struct net_device *dev, struct sk_buff *skb)
+ 		if (!pskb_may_pull(skb, sizeof(struct iphdr)))
+ 			return false;
+ 		pip = ip_hdr(skb);
+-		n = neigh_lookup(&arp_tbl, &pip->daddr, dev);
++		n = ipv4_neigh_lookup(dev, &pip->daddr);
+ 		if (!n && (vxlan->cfg.flags & VXLAN_F_L3MISS)) {
+ 			union vxlan_addr ipa = {
+ 				.sin.sin_addr.s_addr = pip->daddr,
+@@ -1757,7 +1755,7 @@ static bool route_shortcircuit(struct net_device *dev, struct sk_buff *skb)
+ 		if (!pskb_may_pull(skb, sizeof(struct ipv6hdr)))
+ 			return false;
+ 		pip6 = ipv6_hdr(skb);
+-		n = neigh_lookup(ipv6_stub->nd_tbl, &pip6->daddr, dev);
++		n = ipv6_neigh_lookup(dev, &pip6->daddr);
+ 		if (!n && (vxlan->cfg.flags & VXLAN_F_L3MISS)) {
+ 			union vxlan_addr ipa = {
+ 				.sin6.sin6_addr = pip6->daddr,
+diff --git a/net/atm/clip.c b/net/atm/clip.c
+index d795b9c5aea4..a85410000abc 100644
+--- a/net/atm/clip.c
++++ b/net/atm/clip.c
+@@ -155,10 +155,12 @@ static int neigh_check_cb(struct neighbour *n)
  
- 	/*
- 	 *	update / create cache entry
- 	 *	for the source address
- 	 */
--	neigh = __neigh_lookup(&nd_tbl, saddr, dev,
-+	neigh = __neigh_lookup(neigh_tbl, saddr, dev,
- 			       !inc || lladdr || !dev->addr_len);
- 	if (neigh)
- 		ndisc_update(dev, neigh, lladdr, NUD_STALE,
-@@ -1007,7 +1012,7 @@ static void ndisc_recv_na(struct sk_buff *skb)
- 		in6_ifa_put(ifp);
- 		return;
- 	}
--	neigh = neigh_lookup(&nd_tbl, &msg->target, dev);
-+	neigh = ipv6_neigh_lookup(dev, &msg->target);
- 
- 	if (neigh) {
- 		u8 old_flags = neigh->flags;
-@@ -1023,7 +1028,7 @@ static void ndisc_recv_na(struct sk_buff *skb)
- 		 */
- 		if (lladdr && !memcmp(lladdr, dev->dev_addr, dev->addr_len) &&
- 		    net->ipv6.devconf_all->forwarding && net->ipv6.devconf_all->proxy_ndp &&
--		    pneigh_lookup(&nd_tbl, net, &msg->target, dev, 0)) {
-+		    ipv6_pneigh_lookup(net, &msg->target, dev, 0)) {
- 			/* XXX: idev->cnf.proxy_ndp */
- 			goto out;
- 		}
-@@ -1091,7 +1096,7 @@ static void ndisc_recv_rs(struct sk_buff *skb)
- 			goto out;
- 	}
- 
--	neigh = __neigh_lookup(&nd_tbl, saddr, skb->dev, 1);
-+	neigh = __ipv6_neigh_lookup(skb->dev, saddr, 1);
- 	if (neigh) {
- 		ndisc_update(skb->dev, neigh, lladdr, NUD_STALE,
- 			     NEIGH_UPDATE_F_WEAK_OVERRIDE|
-@@ -1384,8 +1389,8 @@ static void ndisc_router_discovery(struct sk_buff *skb)
- 	 */
- 
- 	if (!neigh)
--		neigh = __neigh_lookup(&nd_tbl, &ipv6_hdr(skb)->saddr,
--				       skb->dev, 1);
-+		neigh = __ipv6_neigh_lookup(skb->dev, &ipv6_hdr(skb)->saddr, 1);
-+
- 	if (neigh) {
- 		u8 *lladdr = NULL;
- 		if (ndopts.nd_opts_src_lladdr) {
-@@ -1768,7 +1773,7 @@ static int ndisc_netdev_event(struct notifier_block *this, unsigned long event,
- 
- 	switch (event) {
- 	case NETDEV_CHANGEADDR:
--		neigh_changeaddr(&nd_tbl, dev);
-+		neigh_changeaddr(ipv6_neigh_table(dev_net(dev)), dev);
- 		fib6_run_gc(0, net, false);
- 		/* fallthrough */
- 	case NETDEV_UP:
-@@ -1783,10 +1788,10 @@ static int ndisc_netdev_event(struct notifier_block *this, unsigned long event,
- 	case NETDEV_CHANGE:
- 		change_info = ptr;
- 		if (change_info->flags_changed & IFF_NOARP)
--			neigh_changeaddr(&nd_tbl, dev);
-+			neigh_changeaddr(ipv6_neigh_table(dev_net(dev)), dev);
- 		break;
- 	case NETDEV_DOWN:
--		neigh_ifdown(&nd_tbl, dev);
-+		neigh_ifdown(ipv6_neigh_table(dev_net(dev)), dev);
- 		fib6_run_gc(0, net, false);
- 		break;
- 	case NETDEV_NOTIFY_PEERS:
-diff --git a/net/ipv6/route.c b/net/ipv6/route.c
-index 86a0e4333d42..17f01b8cb05f 100644
---- a/net/ipv6/route.c
-+++ b/net/ipv6/route.c
-@@ -207,10 +207,10 @@ struct neighbour *ip6_neigh_lookup(const struct in6_addr *gw,
- 	struct neighbour *n;
- 
- 	daddr = choose_neigh_daddr(gw, skb, daddr);
--	n = __ipv6_neigh_lookup(dev, daddr);
-+	n = __ipv6_neigh_lookup_noref(dev, daddr);
- 	if (n)
- 		return n;
--	return neigh_create(&nd_tbl, daddr, dev);
-+	return ipv6_neigh_create(dev, daddr, true);
- }
- 
- static struct neighbour *ip6_dst_neigh_lookup(const struct dst_entry *dst,
-@@ -3392,7 +3392,7 @@ static void rt6_do_redirect(struct dst_entry *dst, struct sock *sk, struct sk_bu
- 	 */
- 	dst_confirm_neigh(&rt->dst, &ipv6_hdr(skb)->saddr);
- 
--	neigh = __neigh_lookup(&nd_tbl, &msg->target, skb->dev, 1);
-+	neigh = __ipv6_neigh_lookup(skb->dev, &msg->target, 1);
- 	if (!neigh)
- 		return;
- 
-@@ -4064,9 +4064,11 @@ void rt6_sync_down_dev(struct net_device *dev, unsigned long event)
- 
- void rt6_disable_ip(struct net_device *dev, unsigned long event)
+ static void idle_timer_check(struct timer_list *unused)
  {
-+	struct net *net = dev_net(dev);
+-	write_lock(&arp_tbl.lock);
+-	__neigh_for_each_release(&arp_tbl, neigh_check_cb);
++	struct neigh_table *tbl = ipv4_neigh_table(&init_net);
 +
- 	rt6_sync_down_dev(dev, event);
--	rt6_uncached_list_flush_dev(dev_net(dev), dev);
--	neigh_ifdown(&nd_tbl, dev);
-+	rt6_uncached_list_flush_dev(net, dev);
-+	neigh_ifdown(ipv6_neigh_table(net), dev);
++	write_lock(&tbl->lock);
++	__neigh_for_each_release(tbl, neigh_check_cb);
+ 	mod_timer(&idle_timer, jiffies + CLIP_CHECK_INTERVAL * HZ);
+-	write_unlock(&arp_tbl.lock);
++	write_unlock(&tbl->lock);
  }
  
- struct rt6_mtu_change_arg {
+ static int clip_arp_rcv(struct sk_buff *skb)
+@@ -465,7 +467,8 @@ static int clip_setentry(struct atm_vcc *vcc, __be32 ip)
+ 	rt = ip_route_output(&init_net, ip, 0, 1, 0);
+ 	if (IS_ERR(rt))
+ 		return PTR_ERR(rt);
+-	neigh = __neigh_lookup(&arp_tbl, &ip, rt->dst.dev, 1);
++	neigh = __neigh_lookup(ipv4_neigh_table(&init_net), &ip,
++			       rt->dst.dev, 1);
+ 	ip_rt_put(rt);
+ 	if (!neigh)
+ 		return -ENOMEM;
+@@ -836,7 +839,8 @@ static void *clip_seq_start(struct seq_file *seq, loff_t * pos)
+ {
+ 	struct clip_seq_state *state = seq->private;
+ 	state->ns.neigh_sub_iter = clip_seq_sub_iter;
+-	return neigh_seq_start(seq, pos, &arp_tbl, NEIGH_SEQ_NEIGH_ONLY);
++	return neigh_seq_start(seq, pos, ipv4_neigh_table(&init_net),
++			       NEIGH_SEQ_NEIGH_ONLY);
+ }
+ 
+ static int clip_seq_show(struct seq_file *seq, void *v)
+diff --git a/net/ieee802154/6lowpan/tx.c b/net/ieee802154/6lowpan/tx.c
+index e6ff5128e61a..d472b08fbf25 100644
+--- a/net/ieee802154/6lowpan/tx.c
++++ b/net/ieee802154/6lowpan/tx.c
+@@ -64,7 +64,7 @@ int lowpan_header_create(struct sk_buff *skb, struct net_device *ldev,
+ 	} else {
+ 		__le16 short_addr = cpu_to_le16(IEEE802154_ADDR_SHORT_UNSPEC);
+ 
+-		n = neigh_lookup(&nd_tbl, &hdr->daddr, ldev);
++		n = ipv6_neigh_lookup(ldev, &hdr->daddr);
+ 		if (n) {
+ 			llneigh = lowpan_802154_neigh(neighbour_priv(n));
+ 			read_lock_bh(&n->lock);
 -- 
 2.11.0
 
