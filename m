@@ -1,12 +1,12 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:60710 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:60652 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731644AbeGQMjL (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+        id S1731673AbeGQMjL (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
         Tue, 17 Jul 2018 08:39:11 -0400
 From: dsahern@kernel.org
-Subject: [PATCH RFC/RFT net-next 14/17] net/ipv4: Convert arp table to per namespace
-Date: Tue, 17 Jul 2018 05:06:48 -0700
-Message-Id: <20180717120651.15748-15-dsahern@kernel.org>
+Subject: [PATCH RFC/RFT net-next 15/17] net/ipv6: Convert neighbor table to per-namespace
+Date: Tue, 17 Jul 2018 05:06:49 -0700
+Message-Id: <20180717120651.15748-16-dsahern@kernel.org>
 In-Reply-To: <20180717120651.15748-1-dsahern@kernel.org>
 References: <20180717120651.15748-1-dsahern@kernel.org>
 Sender: linux-wpan-owner@vger.kernel.org
@@ -16,234 +16,284 @@ Cc: nikita.leshchenko@oracle.com, roopa@cumulusnetworks.com, stephen@networkplum
 
 From: David Ahern <dsahern@gmail.com>
 
-Convert IPv4 neighbor table to per-namespace.
+Convert IPv6 neighbor table to per-namespace.
 
 This patch is a transition patch for the core neighbor code, so update
-the init_net reference as needed for AF_INET. With the per-namespace
+the init_net reference as needed for AF_INET6. With the per-namespace
 table allow gc parameters to be changed per namespace.
 
 Signed-off-by: David Ahern <dsahern@gmail.com>
 ---
- include/net/arp.h        |  2 +-
- include/net/netns/ipv4.h |  1 +
- net/core/neighbour.c     | 22 +++++++-----
- net/ipv4/arp.c           | 88 ++++++++++++++++++++++++++++--------------------
- 4 files changed, 67 insertions(+), 46 deletions(-)
+ include/net/ndisc.h      |   6 ++-
+ include/net/netns/ipv6.h |   1 +
+ net/core/neighbour.c     |  16 +++++--
+ net/ipv6/ndisc.c         | 120 +++++++++++++++++++++++------------------------
+ 4 files changed, 76 insertions(+), 67 deletions(-)
 
-diff --git a/include/net/arp.h b/include/net/arp.h
-index fae3561db10b..ec86b286f779 100644
---- a/include/net/arp.h
-+++ b/include/net/arp.h
-@@ -9,7 +9,7 @@
+diff --git a/include/net/ndisc.h b/include/net/ndisc.h
+index 6fc58a61acdd..ce8ccc45cb4e 100644
+--- a/include/net/ndisc.h
++++ b/include/net/ndisc.h
+@@ -374,7 +374,11 @@ static inline u32 ndisc_hashfn(const void *pkey, const struct net_device *dev, _
  
- static inline struct neigh_table *ipv4_neigh_table(struct net *net)
+ static inline struct neigh_table *ipv6_neigh_table(struct net *net)
  {
--	return neigh_find_table(net, AF_INET);
-+	return net->ipv4.arp_tbl;
+-	return neigh_find_table(net, AF_INET6);
++#if IS_ENABLED(CONFIG_IPV6)
++	return net->ipv6.nd_tbl;
++#else
++	return NULL;
++#endif
  }
  
- static inline struct neighbour *ipv4_neigh_create(struct net_device *dev,
-diff --git a/include/net/netns/ipv4.h b/include/net/netns/ipv4.h
-index 661348f23ea5..bc1fab231500 100644
---- a/include/net/netns/ipv4.h
-+++ b/include/net/netns/ipv4.h
-@@ -51,6 +51,7 @@ struct netns_ipv4 {
- 	struct ipv4_devconf	*devconf_dflt;
- 	struct ip_ra_chain __rcu *ra_chain;
- 	struct mutex		ra_mutex;
-+	struct neigh_table	*arp_tbl;
- #ifdef CONFIG_IP_MULTIPLE_TABLES
- 	struct fib_rules_ops	*rules_ops;
- 	bool			fib_has_custom_rules;
+ static inline struct neighbour *ipv6_neigh_create(struct net_device *dev,
+diff --git a/include/net/netns/ipv6.h b/include/net/netns/ipv6.h
+index 762ac9931b62..62fd0ce9ab0b 100644
+--- a/include/net/netns/ipv6.h
++++ b/include/net/netns/ipv6.h
+@@ -66,6 +66,7 @@ struct netns_ipv6 {
+ 	struct rt6_statistics   *rt6_stats;
+ 	struct timer_list       ip6_fib_timer;
+ 	struct hlist_head       *fib_table_hash;
++	struct neigh_table	*nd_tbl;
+ 	struct fib6_table       *fib6_main_tbl;
+ 	struct list_head	fib6_walkers;
+ 	struct dst_ops		ip6_dst_ops;
 diff --git a/net/core/neighbour.c b/net/core/neighbour.c
-index afb2ee985dd1..95b9269e3f35 100644
+index 95b9269e3f35..35c41c4876e5 100644
 --- a/net/core/neighbour.c
 +++ b/net/core/neighbour.c
-@@ -1485,11 +1485,15 @@ EXPORT_SYMBOL(pneigh_enqueue);
- static inline struct neigh_parms *lookup_neigh_parms(struct neigh_table *tbl,
- 						      struct net *net, int ifindex)
- {
-+	struct net *def_net = &init_net;
+@@ -1488,7 +1488,7 @@ static inline struct neigh_parms *lookup_neigh_parms(struct neigh_table *tbl,
+ 	struct net *def_net = &init_net;
  	struct neigh_parms *p;
  
-+	if (tbl->family == AF_INET)
-+		def_net = neigh_parms_net(p);
-+
+-	if (tbl->family == AF_INET)
++	if (tbl->family != AF_DECnet)
+ 		def_net = neigh_parms_net(p);
+ 
  	list_for_each_entry(p, &tbl->parms_list, list) {
- 		if ((p->dev && p->dev->ifindex == ifindex && net_eq(neigh_parms_net(p), net)) ||
--		    (!p->dev && !ifindex && net_eq(net, &init_net)))
-+		    (!p->dev && !ifindex && net_eq(net, def_net)))
- 			return p;
- 	}
- 
-@@ -1611,7 +1615,7 @@ void neigh_table_init(struct net *net, struct neigh_table *tbl)
- 
- 	switch (family) {
+@@ -1617,9 +1617,11 @@ void neigh_table_init(struct net *net, struct neigh_table *tbl)
  	case AF_INET:
--		neigh_tables[NEIGH_ARP_TABLE] = tbl;
-+		net->ipv4.arp_tbl = tbl;
+ 		net->ipv4.arp_tbl = tbl;
  		break;
++#if IS_ENABLED(CONFIG_IPV6)
  	case AF_INET6:
- 		neigh_tables[NEIGH_ND_TABLE] = tbl;
-@@ -1629,7 +1633,7 @@ int neigh_table_clear(struct net *net, struct neigh_table *tbl)
- 
- 	switch (family) {
+-		neigh_tables[NEIGH_ND_TABLE] = tbl;
++		net->ipv6.nd_tbl = tbl;
+ 		break;
++#endif
+ 	case AF_DECnet:
+ 		neigh_tables[NEIGH_DN_TABLE] = tbl;
+ 		break;
+@@ -1635,9 +1637,11 @@ int neigh_table_clear(struct net *net, struct neigh_table *tbl)
  	case AF_INET:
--		neigh_tables[NEIGH_ARP_TABLE] = NULL;
-+		net->ipv4.arp_tbl = NULL;
+ 		net->ipv4.arp_tbl = NULL;
  		break;
++#if IS_ENABLED(CONFIG_IPV6)
  	case AF_INET6:
- 		neigh_tables[NEIGH_ND_TABLE] = NULL;
-@@ -1669,7 +1673,7 @@ struct neigh_table *neigh_find_table(struct net *net, u8 family)
- 
- 	switch (family) {
+-		neigh_tables[NEIGH_ND_TABLE] = NULL;
++		net->ipv6.nd_tbl = NULL;
+ 		break;
++#endif
+ 	case AF_DECnet:
+ 		neigh_tables[NEIGH_DN_TABLE] = NULL;
+ 		break;
+@@ -1675,9 +1679,11 @@ struct neigh_table *neigh_find_table(struct net *net, u8 family)
  	case AF_INET:
--		tbl = neigh_tables[NEIGH_ARP_TABLE];
-+		tbl = net->ipv4.arp_tbl;
+ 		tbl = net->ipv4.arp_tbl;
  		break;
++#if IS_ENABLED(CONFIG_IPV6)
  	case AF_INET6:
- 		tbl = neigh_tables[NEIGH_ND_TABLE];
-@@ -2173,10 +2177,12 @@ static int neightbl_set(struct sk_buff *skb, struct nlmsghdr *nlh,
+-		tbl = neigh_tables[NEIGH_ND_TABLE];
++		tbl = net->ipv6.nd_tbl;
+ 		break;
++#endif
+ 	case AF_DECnet:
+ 		tbl = neigh_tables[NEIGH_DN_TABLE];
+ 		break;
+@@ -2177,7 +2183,7 @@ static int neightbl_set(struct sk_buff *skb, struct nlmsghdr *nlh,
  	}
  
  	err = -ENOENT;
--	if ((tb[NDTA_THRESH1] || tb[NDTA_THRESH2] ||
--	     tb[NDTA_THRESH3] || tb[NDTA_GC_INTERVAL]) &&
--	    !net_eq(net, &init_net))
--		goto errout_tbl_lock;
-+	if (tbl->family != AF_INET) {
-+		if ((tb[NDTA_THRESH1] || tb[NDTA_THRESH2] ||
-+		     tb[NDTA_THRESH3] || tb[NDTA_GC_INTERVAL]) &&
-+		    !net_eq(net, &init_net))
-+			goto errout_tbl_lock;
-+	}
- 
- 	if (tb[NDTA_THRESH1])
- 		tbl->gc_thresh1 = nla_get_u32(tb[NDTA_THRESH1]);
-diff --git a/net/ipv4/arp.c b/net/ipv4/arp.c
-index 707b40f76852..61c1d02a8fad 100644
---- a/net/ipv4/arp.c
-+++ b/net/ipv4/arp.c
-@@ -152,38 +152,19 @@ static const struct neigh_ops arp_direct_ops = {
+-	if (tbl->family != AF_INET) {
++	if (tbl->family == AF_DECnet) {
+ 		if ((tb[NDTA_THRESH1] || tb[NDTA_THRESH2] ||
+ 		     tb[NDTA_THRESH3] || tb[NDTA_GC_INTERVAL]) &&
+ 		    !net_eq(net, &init_net))
+diff --git a/net/ipv6/ndisc.c b/net/ipv6/ndisc.c
+index 6105530fe865..ae78984c4c94 100644
+--- a/net/ipv6/ndisc.c
++++ b/net/ipv6/ndisc.c
+@@ -107,39 +107,18 @@ static const struct neigh_ops ndisc_direct_ops = {
  	.connected_output =	neigh_direct_output,
  };
  
--struct neigh_table arp_tbl = {
--	.family		= AF_INET,
--	.key_len	= 4,
--	.protocol	= cpu_to_be16(ETH_P_IP),
--	.hash		= arp_hash,
--	.key_eq		= arp_key_eq,
--	.constructor	= arp_constructor,
--	.proxy_redo	= parp_redo,
--	.id		= "arp_cache",
--	.parms		= {
--		.tbl			= &arp_tbl,
--		.reachable_time		= 30 * HZ,
--		.data	= {
+-struct neigh_table nd_tbl = {
+-	.family =	AF_INET6,
+-	.key_len =	sizeof(struct in6_addr),
+-	.protocol =	cpu_to_be16(ETH_P_IPV6),
+-	.hash =		ndisc_hash,
+-	.key_eq =	ndisc_key_eq,
+-	.constructor =	ndisc_constructor,
+-	.pconstructor =	pndisc_constructor,
+-	.pdestructor =	pndisc_destructor,
+-	.proxy_redo =	pndisc_redo,
+-	.id =		"ndisc_cache",
+-	.parms = {
+-		.tbl			= &nd_tbl,
+-		.reachable_time		= ND_REACHABLE_TIME,
+-		.data = {
 -			[NEIGH_VAR_MCAST_PROBES] = 3,
 -			[NEIGH_VAR_UCAST_PROBES] = 3,
--			[NEIGH_VAR_RETRANS_TIME] = 1 * HZ,
--			[NEIGH_VAR_BASE_REACHABLE_TIME] = 30 * HZ,
+-			[NEIGH_VAR_RETRANS_TIME] = ND_RETRANS_TIMER,
+-			[NEIGH_VAR_BASE_REACHABLE_TIME] = ND_REACHABLE_TIME,
 -			[NEIGH_VAR_DELAY_PROBE_TIME] = 5 * HZ,
 -			[NEIGH_VAR_GC_STALETIME] = 60 * HZ,
 -			[NEIGH_VAR_QUEUE_LEN_BYTES] = SK_WMEM_MAX,
 -			[NEIGH_VAR_PROXY_QLEN] = 64,
 -			[NEIGH_VAR_ANYCAST_DELAY] = 1 * HZ,
--			[NEIGH_VAR_PROXY_DELAY]	= (8 * HZ) / 10,
--			[NEIGH_VAR_LOCKTIME] = 1 * HZ,
+-			[NEIGH_VAR_PROXY_DELAY] = (8 * HZ) / 10,
 -		},
 -	},
--	.gc_interval	= 30 * HZ,
--	.gc_thresh1	= 128,
--	.gc_thresh2	= 512,
--	.gc_thresh3	= 1024,
+-	.gc_interval =	  30 * HZ,
+-	.gc_thresh1 =	 128,
+-	.gc_thresh2 =	 512,
+-	.gc_thresh3 =	1024,
 +static int parms_data[NEIGH_VAR_DATA_MAX] = {
 +	[NEIGH_VAR_MCAST_PROBES] = 3,
 +	[NEIGH_VAR_UCAST_PROBES] = 3,
-+	[NEIGH_VAR_RETRANS_TIME] = 1 * HZ,
-+	[NEIGH_VAR_BASE_REACHABLE_TIME] = 30 * HZ,
++	[NEIGH_VAR_RETRANS_TIME] = ND_RETRANS_TIMER,
++	[NEIGH_VAR_BASE_REACHABLE_TIME] = ND_REACHABLE_TIME,
 +	[NEIGH_VAR_DELAY_PROBE_TIME] = 5 * HZ,
 +	[NEIGH_VAR_GC_STALETIME] = 60 * HZ,
 +	[NEIGH_VAR_QUEUE_LEN_BYTES] = SK_WMEM_MAX,
 +	[NEIGH_VAR_PROXY_QLEN] = 64,
 +	[NEIGH_VAR_ANYCAST_DELAY] = 1 * HZ,
-+	[NEIGH_VAR_PROXY_DELAY]	= (8 * HZ) / 10,
-+	[NEIGH_VAR_LOCKTIME] = 1 * HZ,
++	[NEIGH_VAR_PROXY_DELAY] = (8 * HZ) / 10,
  };
--EXPORT_SYMBOL(arp_tbl);
+-EXPORT_SYMBOL_GPL(nd_tbl);
  
- int arp_mc_map(__be32 addr, u8 *haddr, struct net_device *dev, int dir)
+ void __ndisc_fill_addr_option(struct sk_buff *skb, int type, void *data,
+ 			      int data_len, int pad)
+@@ -1865,16 +1844,22 @@ int ndisc_ifinfo_sysctl_change(struct ctl_table *ctl, int write, void __user *bu
+ 
+ static int __net_init ndisc_net_init(struct net *net)
  {
-@@ -1291,13 +1272,8 @@ static int arp_proc_init(void);
++	struct neigh_table *nd_tbl;
+ 	struct ipv6_pinfo *np;
+ 	struct sock *sk;
+ 	int err;
  
- void __init arp_init(void)
- {
--	neigh_table_init(&init_net, &arp_tbl);
--
- 	dev_add_pack(&arp_packet_type);
- 	arp_proc_init();
--#ifdef CONFIG_SYSCTL
--	neigh_sysctl_register(NULL, &arp_tbl.parms, NULL);
--#endif
- 	register_netdevice_notifier(&arp_netdev_notifier);
- }
- 
-@@ -1426,15 +1402,53 @@ static const struct seq_operations arp_seq_ops = {
- 
- static int __net_init arp_net_init(struct net *net)
- {
-+	struct neigh_table *arp_tbl;
-+
-+	arp_tbl = kzalloc(sizeof(*arp_tbl), GFP_KERNEL);
-+	if (!arp_tbl)
++	nd_tbl = kzalloc(sizeof(*nd_tbl), GFP_KERNEL);
++	if (!nd_tbl)
 +		return -ENOMEM;
 +
- 	if (!proc_create_net("arp", 0444, net->proc_net, &arp_seq_ops,
--			sizeof(struct neigh_seq_state)))
-+			sizeof(struct neigh_seq_state))) {
-+		kfree(arp_tbl);
- 		return -ENOMEM;
+ 	err = inet_ctl_sock_create(&sk, PF_INET6,
+ 				   SOCK_RAW, IPPROTO_ICMPV6, net);
+ 	if (err < 0) {
+ 		ND_PRINTK(0, err,
+ 			  "NDISC: Failed to initialize the control socket (err %d)\n",
+ 			  err);
++		kfree(nd_tbl);
+ 		return err;
+ 	}
+ 
+@@ -1885,12 +1870,52 @@ static int __net_init ndisc_net_init(struct net *net)
+ 	/* Do not loopback ndisc messages */
+ 	np->mc_loop = 0;
+ 
+-	return 0;
++	rwlock_init(&nd_tbl->lock);
++	nd_tbl->family		= AF_INET6;
++	nd_tbl->key_len		= sizeof(struct in6_addr);
++	nd_tbl->protocol	= cpu_to_be16(ETH_P_IPV6);
++	nd_tbl->hash		= ndisc_hash;
++	nd_tbl->key_eq		= ndisc_key_eq;
++	nd_tbl->constructor	= ndisc_constructor;
++	nd_tbl->pconstructor	= pndisc_constructor;
++	nd_tbl->pdestructor	= pndisc_destructor;
++	nd_tbl->proxy_redo	= pndisc_redo;
++	nd_tbl->id		= "ndisc_cache";
++	nd_tbl->gc_interval	= 30 * HZ;
++	nd_tbl->gc_thresh1	= 128;
++	nd_tbl->gc_thresh2	= 512;
++	nd_tbl->gc_thresh3	= 1024;
++
++	nd_tbl->parms.tbl	= nd_tbl;
++	nd_tbl->parms.reachable_time = ND_REACHABLE_TIME;
++	memcpy(nd_tbl->parms.data, parms_data, sizeof(parms_data));
++
++	neigh_table_init(net, nd_tbl);
++
++	err = 0;
++#ifdef CONFIG_SYSCTL
++	err = neigh_sysctl_register(NULL, &nd_tbl->parms,
++				    ndisc_ifinfo_sysctl_change);
++	if (err) {
++		inet_ctl_sock_destroy(net->ipv6.ndisc_sk);
++		kfree(nd_tbl);
 +	}
-+
-+	arp_tbl->family		= AF_INET;
-+	arp_tbl->key_len	= 4;
-+	arp_tbl->protocol	= cpu_to_be16(ETH_P_IP);
-+	arp_tbl->hash		= arp_hash;
-+	arp_tbl->key_eq		= arp_key_eq;
-+	arp_tbl->constructor	= arp_constructor;
-+	arp_tbl->proxy_redo	= parp_redo;
-+	arp_tbl->id		= "arp_cache";
-+	arp_tbl->gc_interval	= 30 * HZ;
-+	arp_tbl->gc_thresh1	= 128;
-+	arp_tbl->gc_thresh2	= 512;
-+	arp_tbl->gc_thresh3	= 1024;
-+
-+	arp_tbl->parms.tbl	= arp_tbl;
-+	arp_tbl->parms.reachable_time = 30 * HZ;
-+	memcpy(arp_tbl->parms.data, parms_data, sizeof(parms_data));
-+
-+	neigh_table_init(net, arp_tbl);
-+
-+#ifdef CONFIG_SYSCTL
-+	neigh_sysctl_register(NULL, &arp_tbl->parms, NULL);
 +#endif
- 	return 0;
++	return err;
  }
  
- static void __net_exit arp_net_exit(struct net *net)
+ static void __net_exit ndisc_net_exit(struct net *net)
  {
-+	struct neigh_table *arp_tbl = ipv4_neigh_table(net);
++	struct neigh_table *nd_tbl = net->ipv6.nd_tbl;
 +
- 	remove_proc_entry("arp", net->proc_net);
+ 	inet_ctl_sock_destroy(net->ipv6.ndisc_sk);
++
 +#ifdef CONFIG_SYSCTL
-+	neigh_sysctl_unregister(&arp_tbl->parms);
++	neigh_sysctl_unregister(&nd_tbl->parms);
 +#endif
-+	neigh_table_clear(net, arp_tbl);
-+	kfree(arp_tbl);
++	net->ipv6.nd_tbl = NULL;
++	neigh_table_clear(net, nd_tbl);
++	kfree(nd_tbl);
  }
  
- static struct pernet_operations arp_net_ops = {
+ static struct pernet_operations ndisc_net_ops = {
+@@ -1900,30 +1925,7 @@ static struct pernet_operations ndisc_net_ops = {
+ 
+ int __init ndisc_init(void)
+ {
+-	int err;
+-
+-	err = register_pernet_subsys(&ndisc_net_ops);
+-	if (err)
+-		return err;
+-	/*
+-	 * Initialize the neighbour table
+-	 */
+-	neigh_table_init(&init_net, &nd_tbl);
+-
+-#ifdef CONFIG_SYSCTL
+-	err = neigh_sysctl_register(NULL, &nd_tbl.parms,
+-				    ndisc_ifinfo_sysctl_change);
+-	if (err)
+-		goto out_unregister_pernet;
+-out:
+-#endif
+-	return err;
+-
+-#ifdef CONFIG_SYSCTL
+-out_unregister_pernet:
+-	unregister_pernet_subsys(&ndisc_net_ops);
+-	goto out;
+-#endif
++	return register_pernet_subsys(&ndisc_net_ops);
+ }
+ 
+ int __init ndisc_late_init(void)
+@@ -1938,9 +1940,5 @@ void ndisc_late_cleanup(void)
+ 
+ void ndisc_cleanup(void)
+ {
+-#ifdef CONFIG_SYSCTL
+-	neigh_sysctl_unregister(&nd_tbl.parms);
+-#endif
+-	neigh_table_clear(&init_net, &nd_tbl);
+ 	unregister_pernet_subsys(&ndisc_net_ops);
+ }
 -- 
 2.11.0
 
