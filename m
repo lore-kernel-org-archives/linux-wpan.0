@@ -1,50 +1,37 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-ed1-f67.google.com ([209.85.208.67]:44759 "EHLO
-        mail-ed1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729714AbeGQVLz (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 17 Jul 2018 17:11:55 -0400
-MIME-Version: 1.0
-References: <20180717120651.15748-1-dsahern@kernel.org> <CAM_iQpW4g2v6xk49Gz+WBasKaO9VUk3Q-umX7iBRK-mAhn21Fw@mail.gmail.com>
- <1a3f59a9-0ba5-c83f-16a6-f9550a84f693@gmail.com> <CAM_iQpWabZorkMNswyfHyS4KT=f_bgMtK8K35=84uah6Kfqxew@mail.gmail.com>
- <1a27e301-3275-b349-a2f8-afdfdc02f04f@gmail.com>
+Received: from shards.monkeyblade.net ([23.128.96.9]:56768 "EHLO
+        shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725730AbeGREfa (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 18 Jul 2018 00:35:30 -0400
+Date: Wed, 18 Jul 2018 12:59:38 +0900 (KST)
+Message-Id: <20180718.125938.2271502580775162784.davem@davemloft.net>
+Subject: Re: [PATCH RFC/RFT net-next 00/17] net: Convert neighbor tables to
+ per-namespace
+From: David Miller <davem@davemloft.net>
 In-Reply-To: <1a27e301-3275-b349-a2f8-afdfdc02f04f@gmail.com>
-From: Cong Wang <xiyou.wangcong@gmail.com>
-Date: Tue, 17 Jul 2018 13:37:26 -0700
-Message-ID: <CAM_iQpX-wZooTDqWeqtqAc=a-S2HVcJJtkKdn6gxZx-2YmXpmA@mail.gmail.com>
-Subject: Re: [PATCH RFC/RFT net-next 00/17] net: Convert neighbor tables to per-namespace
-Content-Type: text/plain; charset="UTF-8"
+References: <1a3f59a9-0ba5-c83f-16a6-f9550a84f693@gmail.com>
+        <CAM_iQpWabZorkMNswyfHyS4KT=f_bgMtK8K35=84uah6Kfqxew@mail.gmail.com>
+        <1a27e301-3275-b349-a2f8-afdfdc02f04f@gmail.com>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: David Ahern <dsahern@gmail.com>
-Cc: Linux Kernel Network Developers <netdev@vger.kernel.org>, nikita.leshchenko@oracle.com, Roopa Prabhu <roopa@cumulusnetworks.com>, Stephen Hemminger <stephen@networkplumber.org>, Ido Schimmel <idosch@mellanox.com>, Jiri Pirko <jiri@mellanox.com>, Saeed Mahameed <saeedm@mellanox.com>, Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org, NetFilter <netfilter-devel@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+To: dsahern@gmail.com
+Cc: xiyou.wangcong@gmail.com, netdev@vger.kernel.org, nikita.leshchenko@oracle.com, roopa@cumulusnetworks.com, stephen@networkplumber.org, idosch@mellanox.com, jiri@mellanox.com, saeedm@mellanox.com, alex.aring@gmail.com, linux-wpan@vger.kernel.org, netfilter-devel@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Tue, Jul 17, 2018 at 12:02 PM David Ahern <dsahern@gmail.com> wrote:
-> As for the per-namespace tables, it is 4 years later and over that time
-> Linux supports a number of features: EVPN which is very mac heavy, VRR
-> which doubles mac entries (one against the VRR device and one against
-> the lower device) and NOS level features such as mlxsw which has to
-> ensure mac entries for nexthop gateaways stay active. In addition there
-> are other features on the horizon - like the ability to use namespaces
-> to create virtual switches (what Cisco calls a VDC) where you absolutely
-> want isolation and not allowing entries from virtual switch to evict
-> entries from another. And of course the continued proliferation of
-> containerized workloads where isolation is desired.
+From: David Ahern <dsahern@gmail.com>
+Date: Tue, 17 Jul 2018 13:02:18 -0600
 
-As long as no change in neigh table code base itself, these can't
-address the concern people raised before.
-
-
->
 > I understand the concern about global resource and limits: as it stands
 > you have to increase the limits in init_net to the max expected and hope
 > for the best. With per namespace limits you can lower the limits of each
 > namespace better control the total impact on the total memory used.
+> Perhaps the defaults for namespaces after init_net could have really low
+> defaults (e.g., 16 / 32 / 64 for gc_thresh 1/2/3) requiring admin
+> intervention.
 
-The problem is that the number of containers in a host is usually
-not predictable.
+How does this work when a namespace creates another namespace?
 
-Of course, you can say containers limit kernel memory too, but
-memcg is not part of netns. I once told David Miller cpuset is the
-isolation for isolating per-CPU softnet_data, he didn't like it. Based
-on that I don't think you can convince him with memcg as a solution
-here.
+Changing the defaults for non-init_net namespaces could work, but that
+could be a surprise to some people.
