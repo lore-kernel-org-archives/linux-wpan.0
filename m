@@ -1,63 +1,77 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from out03.mta.xmission.com ([166.70.13.233]:43930 "EHLO
-        out03.mta.xmission.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730784AbeG0Rty (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Fri, 27 Jul 2018 13:49:54 -0400
-From: ebiederm@xmission.com (Eric W. Biederman)
-References: <1a3f59a9-0ba5-c83f-16a6-f9550a84f693@gmail.com>
-        <CAM_iQpWabZorkMNswyfHyS4KT=f_bgMtK8K35=84uah6Kfqxew@mail.gmail.com>
-        <1a27e301-3275-b349-a2f8-afdfdc02f04f@gmail.com>
-        <20180718.125938.2271502580775162784.davem@davemloft.net>
-        <28c30574-391c-b4bd-c337-51d3040d901a@gmail.com>
-        <CAM_iQpW4-JkZY7jXx0Q1b907hQ85UOL1eXv2YHwSukb5L=apUg@mail.gmail.com>
-        <5021d874-8e99-6eba-f24b-4257c62d4457@gmail.com>
-        <CAM_iQpUc-H2kZCBevePs6g-8qKyJkUhdd1ZDSQgYsCG0ChfC2w@mail.gmail.com>
-        <87muufze8w.fsf@xmission.com>
-        <4b03b5f6-87ce-9ff2-7c14-598beebd8fb8@gmail.com>
-        <87zhyfw70m.fsf@xmission.com>
-        <be5c3f5be49e4e22bf1160a1d6d3a1b0@AcuMS.aculab.com>
-Date: Fri, 27 Jul 2018 11:27:06 -0500
-In-Reply-To: <be5c3f5be49e4e22bf1160a1d6d3a1b0@AcuMS.aculab.com> (David
-        Laight's message of "Thu, 26 Jul 2018 11:12:34 +0000")
-Message-ID: <87k1pg1w6d.fsf@xmission.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Received: from tuna.sandelman.ca ([209.87.249.19]:57096 "EHLO
+        tuna.sandelman.ca" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729972AbeGSBqi (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 18 Jul 2018 21:46:38 -0400
+From: Michael Richardson <mcr@sandelman.ca>
 Subject: Re: [PATCH RFC/RFT net-next 00/17] net: Convert neighbor tables to per-namespace
+In-Reply-To: <20180717120651.15748-1-dsahern@kernel.org>
+References: <20180717120651.15748-1-dsahern@kernel.org>
+MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="=-=-=";
+        micalg=pgp-sha1; protocol="application/pgp-signature"
+Date: Wed, 18 Jul 2018 20:54:03 -0400
+Message-ID: <15730.1531961643@localhost>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: David Laight <David.Laight@ACULAB.COM>
-Cc: David Ahern <dsahern@gmail.com>, Cong Wang <xiyou.wangcong@gmail.com>, David Miller <davem@davemloft.net>, Linux Kernel Network Developers <netdev@vger.kernel.org>, "nikita.leshchenko@oracle.com" <nikita.leshchenko@oracle.com>, Roopa Prabhu <roopa@cumulusnetworks.com>, Stephen Hemminger <stephen@networkplumber.org>, Ido Schimmel <idosch@mellanox.com>, Jiri Pirko <jiri@mellanox.com>, Saeed Mahameed <saeedm@mellanox.com>, Alexander Aring <alex.aring@gmail.com>, "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>, NetFilter <netfilter-devel@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+To: dsahern@kernel.org
+Cc: netdev@vger.kernel.org, nikita.leshchenko@oracle.com, roopa@cumulusnetworks.com, stephen@networkplumber.org, idosch@mellanox.com, jiri@mellanox.com, saeedm@mellanox.com, alex.aring@gmail.com, linux-wpan@vger.kernel.org, netfilter-devel@vger.kernel.org, linux-kernel@vger.kernel.org, David Ahern <dsahern@gmail.com>
 
-David Laight <David.Laight@ACULAB.COM> writes:
+--=-=-=
+Content-Type: text/plain
 
-> From: Eric W. Biederman
->> Sent: 25 July 2018 18:38
-> ...
->> >> Further unless I misread something you are increasing the number of
->> >> timers to 3 per namespace.  If I create create a thousand network
->> >> namespaces that feels like it will hurt system performance overall.
->> >
->> > It seems to me the timers are per neighbor entry not table. The per
->> > table ones are for proxies.
->> 
->> It seems I misread that bit when I was refreshing my memory on what
->> everything is doing.  If we can already have 1024 timers that makes
->> timers not a concern.
->
-> Surely it is enough to just have a timestamp in each entry.
-> Deletion of expired items need not be done until insert (which
-> has the table suitable locked) bumps into an expired item.
+>>>>> David Ahern <dsahern@gmail.com> writes:
+dsahern@kernel.org wrote:
+    > Nikita Leshenko reported that neighbor entries in one namespace can
+    > evict neighbor entries in another. The problem is that the neighbor
+    > tables have entries across all namespaces without separate accounting
+    > and with global limits on when to scan for entries to evict.
 
-Part of the state machine the timer is used for is sending retransmits
-before we get out first response, so the state machine is not just
-about expiry and may not be simple enough to do without a timer.
+    > Resolve by making the neighbor tables for ipv4, ipv6 and decnet per
+    > namespace and making the accounting and threshold limits per namespace.
 
-I honestly don't remember the tradeoffs between the various kinds of
-timers.  If we already can have up to 1000 timers without problems I suspect
-they are cheap enough optimizing for fewer times simply doesn't matter.
-Certainly we are not in regression territory if we don't.
+This is a good improvement, thank you.
+We absolutely need to keep a DOS against a single netns from causing
+evictions in another netns.
 
-As for bumping into expired items on insert it would be a bad hash table
-if we were bumping into any other entries frequently on insert.
+Within a namespace there may be neighbours entries that are more
+sure/valid/useful than others.  I would like an API to be able to
+mark them explicitely, but that could come leter.
 
-Eric
+In particular, in the 802.15.4 case, NE that arrive via encrypted
+channels should be preferred over entries that arrive over unencrypted
+channels.  This is needed for IETF 6tisch secure join work, for instance.
+
+I believe that we could use network namespaces to implement though.
+
+I had not considered that before, and I think that it will work, but
+there might be something subtle that I've missed.  (Alex?)
+It appears that one can tune the amount of space on a per-namespace basis:
+
++	nd_tbl->gc_thresh1	= 128;
++	nd_tbl->gc_thresh2	= 512;
++	nd_tbl->gc_thresh3	= 1024;
+
+> Remove open use of arp_tbl and nd_tbl in favor of the new
+> ipv{4,6}_neigh_table helpers. Since the existence of the IPv6 table
+> is managed by the core networking, the IS_ENABLED checks for IPv6
+> can be removed in favor of "is the table non-NULL".
+
+What's the advantage of changing this check? (I am ignorant)
+
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEVAwUBW0/hJ4CLcPvd0N1lAQIyJQf/bfxvt2k0AgkFh2XrPvTiZ0pdXdicbhHE
+XDv5Fgft/iTBcvuDXH0ocIzPQGqyx46RbXBpH+ExJ/9YX3UHkaHQM19aDHZirOWj
+WS7Wxhxzcb5Tum/HfaD8vBF9n0qqGrRvDidn8b+UR4E8dnrhb4NRk0XVOUPnYx+J
+1dHMTOaPz1ubs/h3U48GpiMn8IdXeqTsQ569zYmM5G3SSMl9bTfCu4GDmcVoFXlZ
+U+h5GXZm3COzqMl7UHiAGEcC++7OizvDv/R0dk2rE3jnUACSgk8tkN+t/ymSUfFg
+C/VCZuwVUnZoSx5faWHd4OEdW10J5Z6Karuu4m7h0PM4tEYPNZHMGA==
+=Tc0V
+-----END PGP SIGNATURE-----
+--=-=-=--
