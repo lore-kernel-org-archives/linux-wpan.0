@@ -1,77 +1,45 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from tuna.sandelman.ca ([209.87.249.19]:57096 "EHLO
-        tuna.sandelman.ca" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729972AbeGSBqi (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 18 Jul 2018 21:46:38 -0400
-From: Michael Richardson <mcr@sandelman.ca>
-Subject: Re: [PATCH RFC/RFT net-next 00/17] net: Convert neighbor tables to per-namespace
-In-Reply-To: <20180717120651.15748-1-dsahern@kernel.org>
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:39010 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730521AbeGSQc7 (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 19 Jul 2018 12:32:59 -0400
+Subject: Re: [PATCH RFC/RFT net-next 00/17] net: Convert neighbor tables to
+ per-namespace
 References: <20180717120651.15748-1-dsahern@kernel.org>
+ <15730.1531961643@localhost>
+From: David Ahern <dsahern@gmail.com>
+Message-ID: <996fe2a0-391d-d596-dbfd-7d330e3098bf@gmail.com>
+Date: Thu, 19 Jul 2018 09:49:09 -0600
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-        micalg=pgp-sha1; protocol="application/pgp-signature"
-Date: Wed, 18 Jul 2018 20:54:03 -0400
-Message-ID: <15730.1531961643@localhost>
+In-Reply-To: <15730.1531961643@localhost>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: dsahern@kernel.org
-Cc: netdev@vger.kernel.org, nikita.leshchenko@oracle.com, roopa@cumulusnetworks.com, stephen@networkplumber.org, idosch@mellanox.com, jiri@mellanox.com, saeedm@mellanox.com, alex.aring@gmail.com, linux-wpan@vger.kernel.org, netfilter-devel@vger.kernel.org, linux-kernel@vger.kernel.org, David Ahern <dsahern@gmail.com>
+To: Michael Richardson <mcr@sandelman.ca>, dsahern@kernel.org
+Cc: netdev@vger.kernel.org, nikita.leshchenko@oracle.com, roopa@cumulusnetworks.com, stephen@networkplumber.org, idosch@mellanox.com, jiri@mellanox.com, saeedm@mellanox.com, alex.aring@gmail.com, linux-wpan@vger.kernel.org, netfilter-devel@vger.kernel.org, linux-kernel@vger.kernel.org
 
---=-=-=
-Content-Type: text/plain
+On 7/18/18 6:54 PM, Michael Richardson wrote:
+>> Remove open use of arp_tbl and nd_tbl in favor of the new
+>> ipv{4,6}_neigh_table helpers. Since the existence of the IPv6 table
+>> is managed by the core networking, the IS_ENABLED checks for IPv6
+>> can be removed in favor of "is the table non-NULL".
+> 
+> What's the advantage of changing this check? (I am ignorant)
+> 
 
->>>>> David Ahern <dsahern@gmail.com> writes:
-dsahern@kernel.org wrote:
-    > Nikita Leshenko reported that neighbor entries in one namespace can
-    > evict neighbor entries in another. The problem is that the neighbor
-    > tables have entries across all namespaces without separate accounting
-    > and with global limits on when to scan for entries to evict.
+Just makes the code simpler.
 
-    > Resolve by making the neighbor tables for ipv4, ipv6 and decnet per
-    > namespace and making the accounting and threshold limits per namespace.
+The current nd_tbl is a global owned by the ipv6 code
+(net/ipv6/ndisc.c). If CONFIG_IPV6 is not enabled, then nd_tbl is not
+defined which leads code referencing it to use if checks like this:
 
-This is a good improvement, thank you.
-We absolutely need to keep a DOS against a single netns from causing
-evictions in another netns.
+#if IS_ENABLED(CONFIG_IPV6)
+		if (!p->dev || (p->tbl != &nd_tbl && p->tbl != &arp_tbl))
+#else
+		if (!p->dev || p->tbl != &arp_tbl)
+#endif
 
-Within a namespace there may be neighbours entries that are more
-sure/valid/useful than others.  I would like an API to be able to
-mark them explicitely, but that could come leter.
-
-In particular, in the 802.15.4 case, NE that arrive via encrypted
-channels should be preferred over entries that arrive over unencrypted
-channels.  This is needed for IETF 6tisch secure join work, for instance.
-
-I believe that we could use network namespaces to implement though.
-
-I had not considered that before, and I think that it will work, but
-there might be something subtle that I've missed.  (Alex?)
-It appears that one can tune the amount of space on a per-namespace basis:
-
-+	nd_tbl->gc_thresh1	= 128;
-+	nd_tbl->gc_thresh2	= 512;
-+	nd_tbl->gc_thresh3	= 1024;
-
-> Remove open use of arp_tbl and nd_tbl in favor of the new
-> ipv{4,6}_neigh_table helpers. Since the existence of the IPv6 table
-> is managed by the core networking, the IS_ENABLED checks for IPv6
-> can be removed in favor of "is the table non-NULL".
-
-What's the advantage of changing this check? (I am ignorant)
-
-
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
-
-iQEVAwUBW0/hJ4CLcPvd0N1lAQIyJQf/bfxvt2k0AgkFh2XrPvTiZ0pdXdicbhHE
-XDv5Fgft/iTBcvuDXH0ocIzPQGqyx46RbXBpH+ExJ/9YX3UHkaHQM19aDHZirOWj
-WS7Wxhxzcb5Tum/HfaD8vBF9n0qqGrRvDidn8b+UR4E8dnrhb4NRk0XVOUPnYx+J
-1dHMTOaPz1ubs/h3U48GpiMn8IdXeqTsQ569zYmM5G3SSMl9bTfCu4GDmcVoFXlZ
-U+h5GXZm3COzqMl7UHiAGEcC++7OizvDv/R0dk2rE3jnUACSgk8tkN+t/ymSUfFg
-C/VCZuwVUnZoSx5faWHd4OEdW10J5Z6Karuu4m7h0PM4tEYPNZHMGA==
-=Tc0V
------END PGP SIGNATURE-----
---=-=-=--
+With the neigh_find_table approach the IS_ENABLED can be removed in
+favor of 'if (tbl)'. If tbl is set, then ipv6 is loaded and initialized.
