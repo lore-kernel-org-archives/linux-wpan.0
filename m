@@ -1,14 +1,14 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-pl0-f68.google.com ([209.85.160.68]:44134 "EHLO
-        mail-pl0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388819AbeGXUhc (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 24 Jul 2018 16:37:32 -0400
-Received: by mail-pl0-f68.google.com with SMTP id m16-v6so2194007pls.11
-        for <linux-wpan@vger.kernel.org>; Tue, 24 Jul 2018 12:29:36 -0700 (PDT)
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:39366 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388833AbeGXUhe (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 24 Jul 2018 16:37:34 -0400
+Received: by mail-pg1-f196.google.com with SMTP id g2-v6so3571335pgs.6
+        for <linux-wpan@vger.kernel.org>; Tue, 24 Jul 2018 12:29:38 -0700 (PDT)
 From: Stephen Hemminger <stephen@networkplumber.org>
-Subject: [PATCH PATCH net-next 05/18] mpls: remove trailing whitepace
-Date: Tue, 24 Jul 2018 12:29:05 -0700
-Message-Id: <20180724192918.31165-6-sthemmin@microsoft.com>
+Subject: [PATCH PATCH net-next 06/18] xfrm: remove blank lines at EOF
+Date: Tue, 24 Jul 2018 12:29:06 -0700
+Message-Id: <20180724192918.31165-7-sthemmin@microsoft.com>
 In-Reply-To: <20180724192918.31165-1-sthemmin@microsoft.com>
 References: <20180724192918.31165-1-sthemmin@microsoft.com>
 Sender: linux-wpan-owner@vger.kernel.org
@@ -18,22 +18,28 @@ Cc: netdev@vger.kernel.org, v9fs-developer@lists.sourceforge.net, linux-hams@vge
 
 Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
 ---
- net/mpls/mpls_iptunnel.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/xfrm/Kconfig     | 1 -
+ net/xfrm/xfrm_user.c | 1 -
+ 2 files changed, 2 deletions(-)
 
-diff --git a/net/mpls/mpls_iptunnel.c b/net/mpls/mpls_iptunnel.c
-index 6e558a419f60..94f53a9b7d1a 100644
---- a/net/mpls/mpls_iptunnel.c
-+++ b/net/mpls/mpls_iptunnel.c
-@@ -224,7 +224,7 @@ static int mpls_fill_encap_info(struct sk_buff *skb,
- 				struct lwtunnel_state *lwtstate)
- {
- 	struct mpls_iptunnel_encap *tun_encap_info;
--	
-+
- 	tun_encap_info = mpls_lwtunnel_encap(lwtstate);
+diff --git a/net/xfrm/Kconfig b/net/xfrm/Kconfig
+index 286ed25c1a69..eab952cca7d0 100644
+--- a/net/xfrm/Kconfig
++++ b/net/xfrm/Kconfig
+@@ -87,4 +87,3 @@ config NET_KEY_MIGRATE
+ 	  <draft-sugimoto-mip6-pfkey-migrate>.
  
- 	if (nla_put_labels(skb, MPLS_IPTUNNEL_DST, tun_encap_info->labels,
+ 	  If unsure, say N.
+-
+diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
+index 080035f056d9..09cceab450b8 100644
+--- a/net/xfrm/xfrm_user.c
++++ b/net/xfrm/xfrm_user.c
+@@ -3280,4 +3280,3 @@ module_init(xfrm_user_init);
+ module_exit(xfrm_user_exit);
+ MODULE_LICENSE("GPL");
+ MODULE_ALIAS_NET_PF_PROTO(PF_NETLINK, NETLINK_XFRM);
+-
 -- 
 2.18.0
 
