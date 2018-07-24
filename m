@@ -1,14 +1,14 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:36213 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388885AbeGXUhl (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 24 Jul 2018 16:37:41 -0400
-Received: by mail-pg1-f196.google.com with SMTP id s7-v6so3577038pgv.3
-        for <linux-wpan@vger.kernel.org>; Tue, 24 Jul 2018 12:29:45 -0700 (PDT)
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:42143 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388897AbeGXUhn (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 24 Jul 2018 16:37:43 -0400
+Received: by mail-pg1-f195.google.com with SMTP id y4-v6so3567694pgp.9
+        for <linux-wpan@vger.kernel.org>; Tue, 24 Jul 2018 12:29:47 -0700 (PDT)
 From: Stephen Hemminger <stephen@networkplumber.org>
-Subject: [PATCH PATCH net-next 10/18] 9p: fix whitespace issues
-Date: Tue, 24 Jul 2018 12:29:10 -0700
-Message-Id: <20180724192918.31165-11-sthemmin@microsoft.com>
+Subject: [PATCH PATCH net-next 11/18] atm: remove blank lines at EOF
+Date: Tue, 24 Jul 2018 12:29:11 -0700
+Message-Id: <20180724192918.31165-12-sthemmin@microsoft.com>
 In-Reply-To: <20180724192918.31165-1-sthemmin@microsoft.com>
 References: <20180724192918.31165-1-sthemmin@microsoft.com>
 Sender: linux-wpan-owner@vger.kernel.org
@@ -16,58 +16,24 @@ List-ID: <linux-wpan.vger.kernel.org>
 To: davem@davemloft.net, ericvh@gmail.com, rminnich@sandia.gov, lucho@ionkov.net, ralf@linux-mips.org, jreuter@yaina.de, pablo@netfilter.org, kadlec@blackhole.kfki.hu, fw@strlen.de, alex.aring@gmail.com, stefan@datenfreihafen.org, kuznet@ms2.inr.ac.ru, yoshfuji@linux-ipv6.org, johannes@sipsolutions.net, jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us, vyasevich@gmail.com, nhorman@tuxdriver.com, marcelo.leitner@gmail.com, trond.myklebust@hammerspace.com, anna.schumaker@netapp.com, steffen.klassert@secunet.com, herbert@gondor.apana.org.au
 Cc: netdev@vger.kernel.org, v9fs-developer@lists.sourceforge.net, linux-hams@vger.kernel.org, ceph-devel@vger.kernel.org, linux-decnet-user@lists.sourceforge.net, netfilter-devel@vger.kernel.org, coreteam@netfilter.org, linux-wpan@vger.kernel.org, linux-s390@vger.kernel.org, linux-wireless@vger.kernel.org, linux-rdma@vger.kernel.org, linux-sctp@vger.kernel.org, linux-nfs@vger.kernel.org, linux-x25@vger.kernel.org, Stephen Hemminger <sthemmin@microsoft.com>, Stephen Hemminger <stephen@networkplumber.org>
 
-Remove trailing whitespace and blank lines at EOF
-
 Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
 ---
- net/9p/client.c       | 4 ++--
- net/9p/trans_virtio.c | 2 +-
- net/9p/util.c         | 1 -
- 3 files changed, 3 insertions(+), 4 deletions(-)
+ net/atm/mpoa_proc.c | 6 ------
+ 1 file changed, 6 deletions(-)
 
-diff --git a/net/9p/client.c b/net/9p/client.c
-index 5c1343195292..ff02826e0407 100644
---- a/net/9p/client.c
-+++ b/net/9p/client.c
-@@ -341,7 +341,7 @@ struct p9_req_t *p9_tag_lookup(struct p9_client *c, u16 tag)
- 	 * buffer to read the data into */
- 	tag++;
- 
--	if(tag >= c->max_tag) 
-+	if (tag >= c->max_tag)
- 		return NULL;
- 
- 	row = tag / P9_ROW_MAXTAG;
-@@ -1576,7 +1576,7 @@ p9_client_read(struct p9_fid *fid, u64 offset, struct iov_iter *to, int *err)
- 		int count = iov_iter_count(to);
- 		int rsize, non_zc = 0;
- 		char *dataptr;
--			
-+
- 		rsize = fid->iounit;
- 		if (!rsize || rsize > clnt->msize-P9_IOHDRSZ)
- 			rsize = clnt->msize - P9_IOHDRSZ;
-diff --git a/net/9p/trans_virtio.c b/net/9p/trans_virtio.c
-index 05006cbb3361..279b24488d79 100644
---- a/net/9p/trans_virtio.c
-+++ b/net/9p/trans_virtio.c
-@@ -446,7 +446,7 @@ p9_virtio_zc_request(struct p9_client *client, struct p9_req_t *req,
- 		out += pack_sg_list_p(chan->sg, out, VIRTQUEUE_NUM,
- 				      out_pages, out_nr_pages, offs, outlen);
- 	}
--		
-+
- 	/*
- 	 * Take care of in data
- 	 * For example TREAD have 11.
-diff --git a/net/9p/util.c b/net/9p/util.c
-index 59f278e64f58..55ad98277e85 100644
---- a/net/9p/util.c
-+++ b/net/9p/util.c
-@@ -138,4 +138,3 @@ int p9_idpool_check(int id, struct p9_idpool *p)
- 	return idr_find(&p->pool, id) != NULL;
+diff --git a/net/atm/mpoa_proc.c b/net/atm/mpoa_proc.c
+index b93cc0f18292..46d6cd9a36ae 100644
+--- a/net/atm/mpoa_proc.c
++++ b/net/atm/mpoa_proc.c
+@@ -307,9 +307,3 @@ void mpc_proc_clean(void)
  }
- EXPORT_SYMBOL(p9_idpool_check);
+ 
+ #endif /* CONFIG_PROC_FS */
+-
+-
+-
+-
+-
 -
 -- 
 2.18.0
