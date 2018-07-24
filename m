@@ -1,14 +1,14 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:42143 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388897AbeGXUhn (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 24 Jul 2018 16:37:43 -0400
-Received: by mail-pg1-f195.google.com with SMTP id y4-v6so3567694pgp.9
-        for <linux-wpan@vger.kernel.org>; Tue, 24 Jul 2018 12:29:47 -0700 (PDT)
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:38014 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388907AbeGXUhp (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 24 Jul 2018 16:37:45 -0400
+Received: by mail-pf1-f196.google.com with SMTP id x17-v6so1081340pfh.5
+        for <linux-wpan@vger.kernel.org>; Tue, 24 Jul 2018 12:29:49 -0700 (PDT)
 From: Stephen Hemminger <stephen@networkplumber.org>
-Subject: [PATCH PATCH net-next 11/18] atm: remove blank lines at EOF
-Date: Tue, 24 Jul 2018 12:29:11 -0700
-Message-Id: <20180724192918.31165-12-sthemmin@microsoft.com>
+Subject: [PATCH PATCH net-next 12/18] ax25: remove blank line at EOF
+Date: Tue, 24 Jul 2018 12:29:12 -0700
+Message-Id: <20180724192918.31165-13-sthemmin@microsoft.com>
 In-Reply-To: <20180724192918.31165-1-sthemmin@microsoft.com>
 References: <20180724192918.31165-1-sthemmin@microsoft.com>
 Sender: linux-wpan-owner@vger.kernel.org
@@ -18,22 +18,57 @@ Cc: netdev@vger.kernel.org, v9fs-developer@lists.sourceforge.net, linux-hams@vge
 
 Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
 ---
- net/atm/mpoa_proc.c | 6 ------
- 1 file changed, 6 deletions(-)
+ net/ax25/ax25_addr.c    | 1 -
+ net/ax25/ax25_ds_in.c   | 1 -
+ net/ax25/ax25_ds_subr.c | 1 -
+ net/ax25/ax25_ip.c      | 1 -
+ net/ax25/ax25_out.c     | 1 -
+ 5 files changed, 5 deletions(-)
 
-diff --git a/net/atm/mpoa_proc.c b/net/atm/mpoa_proc.c
-index b93cc0f18292..46d6cd9a36ae 100644
---- a/net/atm/mpoa_proc.c
-+++ b/net/atm/mpoa_proc.c
-@@ -307,9 +307,3 @@ void mpc_proc_clean(void)
+diff --git a/net/ax25/ax25_addr.c b/net/ax25/ax25_addr.c
+index ac2542b7be88..a14cfa736b63 100644
+--- a/net/ax25/ax25_addr.c
++++ b/net/ax25/ax25_addr.c
+@@ -304,4 +304,3 @@ void ax25_digi_invert(const ax25_digi *in, ax25_digi *out)
+ 		}
+ 	}
  }
+-
+diff --git a/net/ax25/ax25_ds_in.c b/net/ax25/ax25_ds_in.c
+index 891596e74278..488fc2d7085a 100644
+--- a/net/ax25/ax25_ds_in.c
++++ b/net/ax25/ax25_ds_in.c
+@@ -299,4 +299,3 @@ int ax25_ds_frame_in(ax25_cb *ax25, struct sk_buff *skb, int type)
  
- #endif /* CONFIG_PROC_FS */
+ 	return queued;
+ }
 -
+diff --git a/net/ax25/ax25_ds_subr.c b/net/ax25/ax25_ds_subr.c
+index 28827e81ba2b..bc0329f43013 100644
+--- a/net/ax25/ax25_ds_subr.c
++++ b/net/ax25/ax25_ds_subr.c
+@@ -205,4 +205,3 @@ void ax25_dama_off(ax25_cb *ax25)
+ 	ax25->condition &= ~AX25_COND_DAMA_MODE;
+ 	ax25_dev_dama_off(ax25->ax25_dev);
+ }
 -
+diff --git a/net/ax25/ax25_ip.c b/net/ax25/ax25_ip.c
+index 183b1c583d56..70417e9b932d 100644
+--- a/net/ax25/ax25_ip.c
++++ b/net/ax25/ax25_ip.c
+@@ -249,4 +249,3 @@ const struct header_ops ax25_header_ops = {
+ 
+ EXPORT_SYMBOL(ax25_header_ops);
+ EXPORT_SYMBOL(ax25_ip_xmit);
 -
--
--
+diff --git a/net/ax25/ax25_out.c b/net/ax25/ax25_out.c
+index b11a5f466fcc..3e5afc8dc93e 100644
+--- a/net/ax25/ax25_out.c
++++ b/net/ax25/ax25_out.c
+@@ -394,4 +394,3 @@ int ax25_check_iframes_acked(ax25_cb *ax25, unsigned short nr)
+ 	}
+ 	return 0;
+ }
 -
 -- 
 2.18.0
