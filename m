@@ -1,14 +1,14 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-pl0-f66.google.com ([209.85.160.66]:32963 "EHLO
-        mail-pl0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388797AbeGXUhb (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 24 Jul 2018 16:37:31 -0400
-Received: by mail-pl0-f66.google.com with SMTP id 6-v6so2205152plb.0
-        for <linux-wpan@vger.kernel.org>; Tue, 24 Jul 2018 12:29:34 -0700 (PDT)
+Received: from mail-pl0-f68.google.com ([209.85.160.68]:44134 "EHLO
+        mail-pl0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388819AbeGXUhc (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 24 Jul 2018 16:37:32 -0400
+Received: by mail-pl0-f68.google.com with SMTP id m16-v6so2194007pls.11
+        for <linux-wpan@vger.kernel.org>; Tue, 24 Jul 2018 12:29:36 -0700 (PDT)
 From: Stephen Hemminger <stephen@networkplumber.org>
-Subject: [PATCH PATCH net-next 04/18] llc: fix whitespace issues
-Date: Tue, 24 Jul 2018 12:29:04 -0700
-Message-Id: <20180724192918.31165-5-sthemmin@microsoft.com>
+Subject: [PATCH PATCH net-next 05/18] mpls: remove trailing whitepace
+Date: Tue, 24 Jul 2018 12:29:05 -0700
+Message-Id: <20180724192918.31165-6-sthemmin@microsoft.com>
 In-Reply-To: <20180724192918.31165-1-sthemmin@microsoft.com>
 References: <20180724192918.31165-1-sthemmin@microsoft.com>
 Sender: linux-wpan-owner@vger.kernel.org
@@ -18,44 +18,22 @@ Cc: netdev@vger.kernel.org, v9fs-developer@lists.sourceforge.net, linux-hams@vge
 
 Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
 ---
- net/llc/Kconfig  | 2 +-
- net/llc/Makefile | 2 +-
- net/llc/llc_if.c | 1 -
- 3 files changed, 2 insertions(+), 3 deletions(-)
+ net/mpls/mpls_iptunnel.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/llc/Kconfig b/net/llc/Kconfig
-index b91c65108162..176a6c1521a5 100644
---- a/net/llc/Kconfig
-+++ b/net/llc/Kconfig
-@@ -6,5 +6,5 @@ config LLC2
- 	tristate "ANSI/IEEE 802.2 LLC type 2 Support"
- 	select LLC
- 	help
--	  This is a Logical Link Layer type 2, connection oriented support. 
-+	  This is a Logical Link Layer type 2, connection oriented support.
- 	  Select this if you want to have support for PF_LLC sockets.
-diff --git a/net/llc/Makefile b/net/llc/Makefile
-index 4e260cff3c5d..5e0ef436daae 100644
---- a/net/llc/Makefile
-+++ b/net/llc/Makefile
-@@ -4,7 +4,7 @@
- # Copyright (c) 1997 by Procom Technology,Inc.
- #		2001-2003 by Arnaldo Carvalho de Melo <acme@conectiva.com.br>
- #
--# This program can be redistributed or modified under the terms of the 
-+# This program can be redistributed or modified under the terms of the
- # GNU General Public License as published by the Free Software Foundation.
- # This program is distributed without any warranty or implied warranty
- # of merchantability or fitness for a particular purpose.
-diff --git a/net/llc/llc_if.c b/net/llc/llc_if.c
-index 6daf391b3e84..8db03c2d5440 100644
---- a/net/llc/llc_if.c
-+++ b/net/llc/llc_if.c
-@@ -151,4 +151,3 @@ int llc_send_disc(struct sock *sk)
- 	sock_put(sk);
- 	return rc;
- }
--
+diff --git a/net/mpls/mpls_iptunnel.c b/net/mpls/mpls_iptunnel.c
+index 6e558a419f60..94f53a9b7d1a 100644
+--- a/net/mpls/mpls_iptunnel.c
++++ b/net/mpls/mpls_iptunnel.c
+@@ -224,7 +224,7 @@ static int mpls_fill_encap_info(struct sk_buff *skb,
+ 				struct lwtunnel_state *lwtstate)
+ {
+ 	struct mpls_iptunnel_encap *tun_encap_info;
+-	
++
+ 	tun_encap_info = mpls_lwtunnel_encap(lwtstate);
+ 
+ 	if (nla_put_labels(skb, MPLS_IPTUNNEL_DST, tun_encap_info->labels,
 -- 
 2.18.0
 
