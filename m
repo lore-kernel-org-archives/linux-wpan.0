@@ -1,14 +1,9 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from eu-smtp-delivery-211.mimecast.com ([146.101.78.211]:43817 "EHLO
-        eu-smtp-delivery-211.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729191AbeGZMd0 (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>);
-        Thu, 26 Jul 2018 08:33:26 -0400
-From: David Laight <David.Laight@ACULAB.COM>
-Subject: RE: [PATCH RFC/RFT net-next 00/17] net: Convert neighbor tables to
- per-namespace
-Date: Thu, 26 Jul 2018 11:12:34 +0000
-Message-ID: <be5c3f5be49e4e22bf1160a1d6d3a1b0@AcuMS.aculab.com>
+Received: from out03.mta.xmission.com ([166.70.13.233]:43930 "EHLO
+        out03.mta.xmission.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730784AbeG0Rty (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 27 Jul 2018 13:49:54 -0400
+From: ebiederm@xmission.com (Eric W. Biederman)
 References: <1a3f59a9-0ba5-c83f-16a6-f9550a84f693@gmail.com>
         <CAM_iQpWabZorkMNswyfHyS4KT=f_bgMtK8K35=84uah6Kfqxew@mail.gmail.com>
         <1a27e301-3275-b349-a2f8-afdfdc02f04f@gmail.com>
@@ -19,38 +14,50 @@ References: <1a3f59a9-0ba5-c83f-16a6-f9550a84f693@gmail.com>
         <CAM_iQpUc-H2kZCBevePs6g-8qKyJkUhdd1ZDSQgYsCG0ChfC2w@mail.gmail.com>
         <87muufze8w.fsf@xmission.com>
         <4b03b5f6-87ce-9ff2-7c14-598beebd8fb8@gmail.com>
- <87zhyfw70m.fsf@xmission.com>
-In-Reply-To: <87zhyfw70m.fsf@xmission.com>
-Content-Language: en-US
+        <87zhyfw70m.fsf@xmission.com>
+        <be5c3f5be49e4e22bf1160a1d6d3a1b0@AcuMS.aculab.com>
+Date: Fri, 27 Jul 2018 11:27:06 -0500
+In-Reply-To: <be5c3f5be49e4e22bf1160a1d6d3a1b0@AcuMS.aculab.com> (David
+        Laight's message of "Thu, 26 Jul 2018 11:12:34 +0000")
+Message-ID: <87k1pg1w6d.fsf@xmission.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain
+Subject: Re: [PATCH RFC/RFT net-next 00/17] net: Convert neighbor tables to per-namespace
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: "'Eric W. Biederman'" <ebiederm@xmission.com>, David Ahern <dsahern@gmail.com>
-Cc: Cong Wang <xiyou.wangcong@gmail.com>, David Miller <davem@davemloft.net>, Linux Kernel Network Developers <netdev@vger.kernel.org>, "nikita.leshchenko@oracle.com" <nikita.leshchenko@oracle.com>, Roopa Prabhu <roopa@cumulusnetworks.com>, Stephen Hemminger <stephen@networkplumber.org>, Ido Schimmel <idosch@mellanox.com>, Jiri Pirko <jiri@mellanox.com>, Saeed Mahameed <saeedm@mellanox.com>, Alexander Aring <alex.aring@gmail.com>, "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>, NetFilter <netfilter-devel@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+To: David Laight <David.Laight@ACULAB.COM>
+Cc: David Ahern <dsahern@gmail.com>, Cong Wang <xiyou.wangcong@gmail.com>, David Miller <davem@davemloft.net>, Linux Kernel Network Developers <netdev@vger.kernel.org>, "nikita.leshchenko@oracle.com" <nikita.leshchenko@oracle.com>, Roopa Prabhu <roopa@cumulusnetworks.com>, Stephen Hemminger <stephen@networkplumber.org>, Ido Schimmel <idosch@mellanox.com>, Jiri Pirko <jiri@mellanox.com>, Saeed Mahameed <saeedm@mellanox.com>, Alexander Aring <alex.aring@gmail.com>, "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>, NetFilter <netfilter-devel@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
 
-From: Eric W. Biederman
-> Sent: 25 July 2018 18:38
-...
-> >> Further unless I misread something you are increasing the number of
-> >> timers to 3 per namespace.  If I create create a thousand network
-> >> namespaces that feels like it will hurt system performance overall.
-> >
-> > It seems to me the timers are per neighbor entry not table. The per
-> > table ones are for proxies.
-> 
-> It seems I misread that bit when I was refreshing my memory on what
-> everything is doing.  If we can already have 1024 timers that makes
-> timers not a concern.
+David Laight <David.Laight@ACULAB.COM> writes:
 
-Surely it is enough to just have a timestamp in each entry.
-Deletion of expired items need not be done until insert (which
-has the table suitable locked) bumps into an expired item.
+> From: Eric W. Biederman
+>> Sent: 25 July 2018 18:38
+> ...
+>> >> Further unless I misread something you are increasing the number of
+>> >> timers to 3 per namespace.  If I create create a thousand network
+>> >> namespaces that feels like it will hurt system performance overall.
+>> >
+>> > It seems to me the timers are per neighbor entry not table. The per
+>> > table ones are for proxies.
+>> 
+>> It seems I misread that bit when I was refreshing my memory on what
+>> everything is doing.  If we can already have 1024 timers that makes
+>> timers not a concern.
+>
+> Surely it is enough to just have a timestamp in each entry.
+> Deletion of expired items need not be done until insert (which
+> has the table suitable locked) bumps into an expired item.
 
-	David
+Part of the state machine the timer is used for is sending retransmits
+before we get out first response, so the state machine is not just
+about expiry and may not be simple enough to do without a timer.
 
--
-Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
-Registration No: 1397386 (Wales)
+I honestly don't remember the tradeoffs between the various kinds of
+timers.  If we already can have up to 1000 timers without problems I suspect
+they are cheap enough optimizing for fewer times simply doesn't matter.
+Certainly we are not in regression territory if we don't.
 
+As for bumping into expired items on insert it would be a bad hash table
+if we were bumping into any other entries frequently on insert.
+
+Eric
