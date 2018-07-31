@@ -1,66 +1,59 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from proxima.lasnet.de ([78.47.171.185]:56272 "EHLO
-        proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730149AbeGMP7F (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Fri, 13 Jul 2018 11:59:05 -0400
-Subject: Re: [PATCH] ieee802154: add rx LQI from userspace
-References: <20180607140802.22666-1-peron.clem@gmail.com>
- <ac0ff951-627d-9694-741d-03f6bc4d6ddc@datenfreihafen.org>
- <CAJiuCceN4uW1zOEwqNXFHgNn=HTHLT3Fy=bv78_dqw8LvRbpMQ@mail.gmail.com>
-From: Stefan Schmidt <stefan@datenfreihafen.org>
-Message-ID: <858d58d5-be9c-179e-c74c-3b47dee44993@datenfreihafen.org>
-Date: Fri, 13 Jul 2018 11:43:49 -0400
+Received: from youngberry.canonical.com ([91.189.89.112]:51765 "EHLO
+        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726789AbeGaR0G (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 31 Jul 2018 13:26:06 -0400
+From: Colin King <colin.king@canonical.com>
+Subject: [PATCH] net: ieee802154: 6lowpan: remove redundant pointers 'fq' and 'net'
+Date: Tue, 31 Jul 2018 16:45:07 +0100
+Message-Id: <20180731154507.5247-1-colin.king@canonical.com>
 MIME-Version: 1.0
-In-Reply-To: <CAJiuCceN4uW1zOEwqNXFHgNn=HTHLT3Fy=bv78_dqw8LvRbpMQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: =?UTF-8?B?Q2zDqW1lbnQgUMOpcm9u?= <peron.clem@gmail.com>
-Cc: Romuald Cari <romuald.cari@devialet.com>, linux-wpan@vger.kernel.org, Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt <stefan@osg.samsung.com>, "David S . Miller" <davem@davemloft.net>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, =?UTF-8?Q?Cl=c3=a9ment_Peron?= <clement.peron@devialet.com>
+To: Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt <stefan@datenfreihafen.org>, "David S . Miller" <davem@davemloft.net>, linux-wpan@vger.kernel.org, netdev@vger.kernel.org
+Cc: kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hello.
+From: Colin Ian King <colin.king@canonical.com>
 
-On 10.07.2018 11:13, Clément Péron wrote:
-> Hi Alexander, Stefan,
-> 
-> Thanks for your feedbacks,
-> 
-> On Mon, 9 Jul 2018 at 10:49, Stefan Schmidt <stefan@datenfreihafen.org> wrote:
->>
->> Hello Clement.
->>
->> Finally coming to review the patch. Sorry for the delay.
->>
->> On 07.06.2018 16:08, Clément Péron wrote:
->>> From: Romuald CARI <romuald.cari@devialet.com>
->>>
->>> The Link Quality Indication data exposed by drivers could not be accessed from
->>> userspace. Since this data is per-datagram received, it makes sense to make it
->>> available to userspace application through the ancillary data mechanism in
->>> recvmsg rather than through ioctls. This can be activated using the socket
->>> option WPAN_WANTLQI under SOL_IEEE802154 protocol.
->>
->> I can see that it makes the application life a lot easier to have data
->> send out and LQI value synced up by using the socket approach instead of
->> dealing with socket and ioctl's. I am good with this patch in general.
->>
->> So you have some public code that uses this approach? I would be
->> interesting in the userspace part of yours. A demo would be fine. If the
->> network handling part of your application is public anyway that would be
->> even better. :-)
-> 
-> I'm sorry but the userspace code that use this isn't open.
+Pointers fq and net are being assigned but are never used hence they
+are redundant and can be removed.
 
-Fair enough.
+Cleans up clang warnings:
+warning: variable 'fq' set but not used [-Wunused-but-set-variable]
+warning: variable 'net' set but not used [-Wunused-but-set-variable]
 
-> I will check if I can share this part.
-> Just the idea is to compute an average LQI and when it reach a
-> threshold we allow the remote to control the device.
+Signed-off-by: Colin Ian King <colin.king@canonical.com>
+---
+ net/ieee802154/6lowpan/reassembly.c | 5 -----
+ 1 file changed, 5 deletions(-)
 
-Yes, I would be happy with a simple example just showing how to use the
-socket opt and a very basic algo on how this LQI would be used.
+diff --git a/net/ieee802154/6lowpan/reassembly.c b/net/ieee802154/6lowpan/reassembly.c
+index ec7a5da56129..e7857a8ac86d 100644
+--- a/net/ieee802154/6lowpan/reassembly.c
++++ b/net/ieee802154/6lowpan/reassembly.c
+@@ -40,9 +40,6 @@ static int lowpan_frag_reasm(struct lowpan_frag_queue *fq,
+ static void lowpan_frag_init(struct inet_frag_queue *q, const void *a)
+ {
+ 	const struct frag_lowpan_compare_key *key = a;
+-	struct lowpan_frag_queue *fq;
+-
+-	fq = container_of(q, struct lowpan_frag_queue, q);
+ 
+ 	BUILD_BUG_ON(sizeof(*key) > sizeof(q->key));
+ 	memcpy(&q->key, key, sizeof(*key));
+@@ -52,10 +49,8 @@ static void lowpan_frag_expire(struct timer_list *t)
+ {
+ 	struct inet_frag_queue *frag = from_timer(frag, t, timer);
+ 	struct frag_queue *fq;
+-	struct net *net;
+ 
+ 	fq = container_of(frag, struct frag_queue, q);
+-	net = container_of(fq->q.net, struct net, ieee802154_lowpan.frags);
+ 
+ 	spin_lock(&fq->q.lock);
+ 
+-- 
+2.17.1
 
-regards
-Stefan Schmidt
