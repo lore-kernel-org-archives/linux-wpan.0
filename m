@@ -1,75 +1,64 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from proxima.lasnet.de ([78.47.171.185]:44929 "EHLO
+Received: from proxima.lasnet.de ([78.47.171.185]:44936 "EHLO
         proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726865AbeHFLc6 (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 6 Aug 2018 07:32:58 -0400
-Subject: Re: [PATCHv2 wpan] net: 6lowpan: fix reserved space for single frames
-References: <20180714165210.20517-1-aring@mojatatu.com>
+        with ESMTP id S1726865AbeHFLfE (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 6 Aug 2018 07:35:04 -0400
+Subject: Re: [PATCH wpan 2/2] net: mac802154: tx: expand tailroom if necessary
+References: <20180702203203.21316-1-aring@mojatatu.com>
+ <20180702203203.21316-2-aring@mojatatu.com>
 From: Stefan Schmidt <stefan@datenfreihafen.org>
-Message-ID: <2c6cad37-beea-e9ca-569a-5f976bdd2927@datenfreihafen.org>
-Date: Mon, 6 Aug 2018 11:24:44 +0200
+Message-ID: <11cbdc42-feb6-28af-db3f-2b28cd22700e@datenfreihafen.org>
+Date: Mon, 6 Aug 2018 11:26:51 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180714165210.20517-1-aring@mojatatu.com>
+In-Reply-To: <20180702203203.21316-2-aring@mojatatu.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: Alexander Aring <aring@mojatatu.com>, stefan@osg.samsung.com
-Cc: linux-wpan@vger.kernel.org, netdev@vger.kernel.org, david.palma@ntnu.no, rabinarayans0828@gmail.com
+Cc: linux-wpan@vger.kernel.org, netdev@vger.kernel.org, kernel@mojatatu.com
 
 Hello.
 
-On 07/14/2018 06:52 PM, Alexander Aring wrote:
-> This patch fixes patch add handling to take care tail and headroom for
-> single 6lowpan frames. We need to be sure we have a skb with the right
-> head and tailroom for single frames. This patch do it by using
-> skb_copy_expand() if head and tailroom is not enough allocated by upper
-> layer.
+On 07/02/2018 10:32 PM, Alexander Aring wrote:
+> This patch is necessary if case of AF_PACKET or other socket interface
+> which I am aware of it and didn't allocated the necessary room.
 > 
-> Bugzilla: https://bugzilla.kernel.org/show_bug.cgi?id=195059
 > Reported-by: David Palma <david.palma@ntnu.no>
 > Reported-by: Rabi Narayan Sahoo <rabinarayans0828@gmail.com>
 > Signed-off-by: Alexander Aring <aring@mojatatu.com>
 > ---
-> changes since v2:
->  skb to nskb, pointed out by stefan
+>  net/mac802154/tx.c | 15 ++++++++++++++-
+>  1 file changed, 14 insertions(+), 1 deletion(-)
 > 
->  net/ieee802154/6lowpan/tx.c | 21 ++++++++++++++++++---
->  1 file changed, 18 insertions(+), 3 deletions(-)
-> 
-> diff --git a/net/ieee802154/6lowpan/tx.c b/net/ieee802154/6lowpan/tx.c
-> index e6ff5128e61a..ca53efa17be1 100644
-> --- a/net/ieee802154/6lowpan/tx.c
-> +++ b/net/ieee802154/6lowpan/tx.c
-> @@ -265,9 +265,24 @@ netdev_tx_t lowpan_xmit(struct sk_buff *skb, struct net_device *ldev)
->  	/* We must take a copy of the skb before we modify/replace the ipv6
->  	 * header as the header could be used elsewhere
->  	 */
-> -	skb = skb_unshare(skb, GFP_ATOMIC);
-> -	if (!skb)
-> -		return NET_XMIT_DROP;
-> +	if (unlikely(skb_headroom(skb) < ldev->needed_headroom ||
-> +		     skb_tailroom(skb) < ldev->needed_tailroom)) {
-> +		struct sk_buff *nskb;
-> +
-> +		nskb = skb_copy_expand(skb, ldev->needed_headroom,
-> +				       ldev->needed_tailroom, GFP_ATOMIC);
-> +		if (likely(nskb)) {
-> +			consume_skb(skb);
-> +			skb = nskb;
-> +		} else {
-> +			kfree_skb(skb);
-> +			return NET_XMIT_DROP;
-> +		}
-> +	} else {
-> +		skb = skb_unshare(skb, GFP_ATOMIC);
-> +		if (!skb)
-> +			return NET_XMIT_DROP;
-> +	}
+> diff --git a/net/mac802154/tx.c b/net/mac802154/tx.c
+> index 7e253455f9dd..bcd1a5e6ebf4 100644
+> --- a/net/mac802154/tx.c
+> +++ b/net/mac802154/tx.c
+> @@ -63,8 +63,21 @@ ieee802154_tx(struct ieee802154_local *local, struct sk_buff *skb)
+>  	int ret;
 >  
->  	ret = lowpan_header(skb, ldev, &dgram_size, &dgram_offset);
->  	if (ret < 0) {
+>  	if (!(local->hw.flags & IEEE802154_HW_TX_OMIT_CKSUM)) {
+> -		u16 crc = crc_ccitt(0, skb->data, skb->len);
+> +		struct sk_buff *nskb;
+> +		u16 crc;
+> +
+> +		if (unlikely(skb_tailroom(skb) < IEEE802154_FCS_LEN)) {
+> +			nskb = skb_copy_expand(skb, 0, IEEE802154_FCS_LEN,
+> +					       GFP_ATOMIC);
+> +			if (likely(nskb)) {
+> +				consume_skb(skb);
+> +				skb = nskb;
+> +			} else {
+> +				goto err_tx;
+> +			}
+> +		}
+>  
+> +		crc = crc_ccitt(0, skb->data, skb->len);
+>  		put_unaligned_le16(crc, skb_put(skb, 2));
+>  	}
+>  
 > 
 
 This patch has been applied to the wpan-next tree and will be
