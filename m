@@ -1,45 +1,131 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:39010 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730521AbeGSQc7 (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 19 Jul 2018 12:32:59 -0400
-Subject: Re: [PATCH RFC/RFT net-next 00/17] net: Convert neighbor tables to
- per-namespace
-References: <20180717120651.15748-1-dsahern@kernel.org>
- <15730.1531961643@localhost>
-From: David Ahern <dsahern@gmail.com>
-Message-ID: <996fe2a0-391d-d596-dbfd-7d330e3098bf@gmail.com>
-Date: Thu, 19 Jul 2018 09:49:09 -0600
+Received: from proxima.lasnet.de ([78.47.171.185]:44913 "EHLO
+        proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726468AbeHFLPu (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 6 Aug 2018 07:15:50 -0400
+Subject: Re: [PATCH] ieee802154: add rx LQI from userspace
+References: <20180607140802.22666-1-peron.clem@gmail.com>
+From: Stefan Schmidt <stefan@datenfreihafen.org>
+Message-ID: <35c6ef3e-7f7b-2a2d-d73b-201efbc4594c@datenfreihafen.org>
+Date: Mon, 6 Aug 2018 11:07:39 +0200
 MIME-Version: 1.0
-In-Reply-To: <15730.1531961643@localhost>
+In-Reply-To: <20180607140802.22666-1-peron.clem@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Michael Richardson <mcr@sandelman.ca>, dsahern@kernel.org
-Cc: netdev@vger.kernel.org, nikita.leshchenko@oracle.com, roopa@cumulusnetworks.com, stephen@networkplumber.org, idosch@mellanox.com, jiri@mellanox.com, saeedm@mellanox.com, alex.aring@gmail.com, linux-wpan@vger.kernel.org, netfilter-devel@vger.kernel.org, linux-kernel@vger.kernel.org
+To: =?UTF-8?B?Q2zDqW1lbnQgUMOpcm9u?= <peron.clem@gmail.com>, Romuald Cari <romuald.cari@devialet.com>, linux-wpan@vger.kernel.org
+Cc: Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt <stefan@osg.samsung.com>, "David S . Miller" <davem@davemloft.net>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, =?UTF-8?Q?Cl=c3=a9ment_Peron?= <clement.peron@devialet.com>
 
-On 7/18/18 6:54 PM, Michael Richardson wrote:
->> Remove open use of arp_tbl and nd_tbl in favor of the new
->> ipv{4,6}_neigh_table helpers. Since the existence of the IPv6 table
->> is managed by the core networking, the IS_ENABLED checks for IPv6
->> can be removed in favor of "is the table non-NULL".
+Hello.
+
+On 06/07/2018 04:08 PM, Clément Péron wrote:
+> From: Romuald CARI <romuald.cari@devialet.com>
 > 
-> What's the advantage of changing this check? (I am ignorant)
+> The Link Quality Indication data exposed by drivers could not be accessed from
+> userspace. Since this data is per-datagram received, it makes sense to make it
+> available to userspace application through the ancillary data mechanism in
+> recvmsg rather than through ioctls. This can be activated using the socket
+> option WPAN_WANTLQI under SOL_IEEE802154 protocol.
+> 
+> This LQI data is available in the ancillary data buffer under the SOL_IEEE802154
+> level as the type WPAN_LQI. The value is an unsigned byte indicating the link
+> quality with values ranging 0-255.
+> 
+> Signed-off-by: Romuald Cari <romuald.cari@devialet.com>
+> Signed-off-by: Clément Peron <clement.peron@devialet.com>
+> ---
+>  include/net/af_ieee802154.h |  1 +
+>  net/ieee802154/socket.c     | 17 +++++++++++++++++
+>  2 files changed, 18 insertions(+)
+> 
+> diff --git a/include/net/af_ieee802154.h b/include/net/af_ieee802154.h
+> index a5563d27a3eb..8003a9f6eb43 100644
+> --- a/include/net/af_ieee802154.h
+> +++ b/include/net/af_ieee802154.h
+> @@ -56,6 +56,7 @@ struct sockaddr_ieee802154 {
+>  #define WPAN_WANTACK		0
+>  #define WPAN_SECURITY		1
+>  #define WPAN_SECURITY_LEVEL	2
+> +#define WPAN_WANTLQI		3
+>  
+>  #define WPAN_SECURITY_DEFAULT	0
+>  #define WPAN_SECURITY_OFF	1
+> diff --git a/net/ieee802154/socket.c b/net/ieee802154/socket.c
+> index a60658c85a9a..bc6b912603f1 100644
+> --- a/net/ieee802154/socket.c
+> +++ b/net/ieee802154/socket.c
+> @@ -25,6 +25,7 @@
+>  #include <linux/termios.h>	/* For TIOCOUTQ/INQ */
+>  #include <linux/list.h>
+>  #include <linux/slab.h>
+> +#include <linux/socket.h>
+>  #include <net/datalink.h>
+>  #include <net/psnap.h>
+>  #include <net/sock.h>
+> @@ -452,6 +453,7 @@ struct dgram_sock {
+>  	unsigned int bound:1;
+>  	unsigned int connected:1;
+>  	unsigned int want_ack:1;
+> +	unsigned int want_lqi:1;
+>  	unsigned int secen:1;
+>  	unsigned int secen_override:1;
+>  	unsigned int seclevel:3;
+> @@ -486,6 +488,7 @@ static int dgram_init(struct sock *sk)
+>  	struct dgram_sock *ro = dgram_sk(sk);
+>  
+>  	ro->want_ack = 1;
+> +	ro->want_lqi = 0;
+>  	return 0;
+>  }
+>  
+> @@ -713,6 +716,7 @@ static int dgram_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
+>  	size_t copied = 0;
+>  	int err = -EOPNOTSUPP;
+>  	struct sk_buff *skb;
+> +	struct dgram_sock *ro = dgram_sk(sk);
+>  	DECLARE_SOCKADDR(struct sockaddr_ieee802154 *, saddr, msg->msg_name);
+>  
+>  	skb = skb_recv_datagram(sk, flags, noblock, &err);
+> @@ -744,6 +748,13 @@ static int dgram_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
+>  		*addr_len = sizeof(*saddr);
+>  	}
+>  
+> +	if (ro->want_lqi) {
+> +		err = put_cmsg(msg, SOL_IEEE802154, WPAN_WANTLQI,
+> +			       sizeof(uint8_t), &(mac_cb(skb)->lqi));
+> +		if (err)
+> +			goto done;
+> +	}
+> +
+>  	if (flags & MSG_TRUNC)
+>  		copied = skb->len;
+>  done:
+> @@ -847,6 +858,9 @@ static int dgram_getsockopt(struct sock *sk, int level, int optname,
+>  	case WPAN_WANTACK:
+>  		val = ro->want_ack;
+>  		break;
+> +	case WPAN_WANTLQI:
+> +		val = ro->want_lqi;
+> +		break;
+>  	case WPAN_SECURITY:
+>  		if (!ro->secen_override)
+>  			val = WPAN_SECURITY_DEFAULT;
+> @@ -892,6 +906,9 @@ static int dgram_setsockopt(struct sock *sk, int level, int optname,
+>  	case WPAN_WANTACK:
+>  		ro->want_ack = !!val;
+>  		break;
+> +	case WPAN_WANTLQI:
+> +		ro->want_lqi = !!val;
+> +		break;
+>  	case WPAN_SECURITY:
+>  		if (!ns_capable(net->user_ns, CAP_NET_ADMIN) &&
+>  		    !ns_capable(net->user_ns, CAP_NET_RAW)) {
 > 
 
-Just makes the code simpler.
+This patch has been applied to the wpan-next tree and will be
+part of the next pull request to net-next. Thanks!
 
-The current nd_tbl is a global owned by the ipv6 code
-(net/ipv6/ndisc.c). If CONFIG_IPV6 is not enabled, then nd_tbl is not
-defined which leads code referencing it to use if checks like this:
-
-#if IS_ENABLED(CONFIG_IPV6)
-		if (!p->dev || (p->tbl != &nd_tbl && p->tbl != &arp_tbl))
-#else
-		if (!p->dev || p->tbl != &arp_tbl)
-#endif
-
-With the neigh_find_table approach the IS_ENABLED can be removed in
-favor of 'if (tbl)'. If tbl is set, then ipv6 is loaded and initialized.
+regards
+Stefan Schmidt
