@@ -1,36 +1,71 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from shards.monkeyblade.net ([23.128.96.9]:57566 "EHLO
-        shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732391AbeHFW3V (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 6 Aug 2018 18:29:21 -0400
-Date: Mon, 06 Aug 2018 13:18:37 -0700 (PDT)
-Message-Id: <20180806.131837.154627724686386668.davem@davemloft.net>
-Subject: Re: pull-request: ieee802154-next 2018-08-06
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <20180806193850.31949-1-stefan@datenfreihafen.org>
-References: <20180806193850.31949-1-stefan@datenfreihafen.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+Received: from mail-it0-f67.google.com ([209.85.214.67]:38303 "EHLO
+        mail-it0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2389085AbeHGQt0 (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 7 Aug 2018 12:49:26 -0400
+Received: by mail-it0-f67.google.com with SMTP id v71-v6so23251212itb.3
+        for <linux-wpan@vger.kernel.org>; Tue, 07 Aug 2018 07:34:50 -0700 (PDT)
+From: Alexander Aring <aring@mojatatu.com>
+Subject: [PATCH net-next] ieee802154: hwsim: fix rcu address annotation
+Date: Tue,  7 Aug 2018 10:34:44 -0400
+Message-Id: <20180807143444.32224-1-aring@mojatatu.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: stefan@datenfreihafen.org
-Cc: linux-wpan@vger.kernel.org, alex.aring@gmail.com, netdev@vger.kernel.org
+To: netdev@vger.kernel.org
+Cc: linux-wpan@vger.kernel.org, kernel@mojatatu.com, Alexander Aring <aring@mojatatu.com>, Stefan Schmidt <stefan@datenfreihafen.org>
 
-From: Stefan Schmidt <stefan@datenfreihafen.org>
-Date: Mon,  6 Aug 2018 21:38:50 +0200
+This patch fixes the following sparse warning about mismatch rcu
+attribute for address space annotation:
 
-> An update from ieee802154 for *net-next*
-> 
-> Romuald added a socket option to get the LQI value of the received datagram.
-> Alexander added a new hardware simulation driver modelled after hwsim of the
-> wireless people. It allows runtime configuration for new nodes and edges over a
-> netlink interface (a config utlity is making its way into wpan-tools).
-> We also have three fixes in here. One from Colin which is more of a cleanup and
-> two from Alex fixing tailroom and single frame space problems.
-> I would normally put the last two into my fixes tree, but given we are already
-> in -rc8 I simply put them here and added a cc: stable to them.
-> 
-> Please pull, or let me know if there are any problems.
+...
+error: incompatible types in comparison expression (different modifiers)
+error: incompatible types in comparison expression (different address spaces)
+...
 
-Pulled, thank you.
+Some __rcu annotation was at non-pointers list head structures and one was
+missing in edge information which is used by rcu_assign_pointer() to
+update edge setting information.
+
+Cc: Stefan Schmidt <stefan@datenfreihafen.org>
+Fixes: f25da51fdc38 ("ieee802154: hwsim: add replacement for fakelb")
+Signed-off-by: Alexander Aring <aring@mojatatu.com>
+---
+Hopefully I did it right now. Sorry again.
+
+ drivers/net/ieee802154/mac802154_hwsim.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/ieee802154/mac802154_hwsim.c b/drivers/net/ieee802154/mac802154_hwsim.c
+index 1982308b9b1c..f4e92054f7df 100644
+--- a/drivers/net/ieee802154/mac802154_hwsim.c
++++ b/drivers/net/ieee802154/mac802154_hwsim.c
+@@ -36,7 +36,7 @@ MODULE_LICENSE("GPL");
+ static LIST_HEAD(hwsim_phys);
+ static DEFINE_MUTEX(hwsim_phys_lock);
+ 
+-static __rcu LIST_HEAD(hwsim_ifup_phys);
++static LIST_HEAD(hwsim_ifup_phys);
+ 
+ static struct platform_device *mac802154hwsim_dev;
+ 
+@@ -68,7 +68,7 @@ struct hwsim_edge_info {
+ 
+ struct hwsim_edge {
+ 	struct hwsim_phy *endpoint;
+-	struct hwsim_edge_info *info;
++	struct hwsim_edge_info __rcu *info;
+ 
+ 	struct list_head list;
+ 	struct rcu_head rcu;
+@@ -81,7 +81,7 @@ struct hwsim_phy {
+ 	struct hwsim_pib __rcu *pib;
+ 
+ 	bool suspended;
+-	struct list_head __rcu edges;
++	struct list_head edges;
+ 
+ 	struct list_head list;
+ 	struct list_head list_ifup;
+-- 
+2.11.0
+
