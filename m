@@ -1,181 +1,200 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:33210 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1729884AbeHIBEx (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-        Wed, 8 Aug 2018 21:04:53 -0400
+Received: from www.llwyncelyn.cymru ([82.70.14.225]:48722 "EHLO fuzix.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727786AbeHIOZo (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+        Thu, 9 Aug 2018 10:25:44 -0400
+Date: Thu, 9 Aug 2018 12:59:39 +0100
+From: Alan Cox <gnomes@lxorguk.ukuu.org.uk>
 Subject: Re: [RFC net-next 00/15] net: A socket API for LoRa
+Message-ID: <20180809125939.39ac2cc9@alans-desktop>
+In-Reply-To: <a70e9715-beac-d9a8-145e-de00175e56fa@suse.de>
 References: <20180701110804.32415-1-afaerber@suse.de>
- <CAC=mGzgUCopz2xTOA0R-WD8a1DOaOOUn=YpfdMiJ33y3hnh6kg@mail.gmail.com>
- <92ee4016-1da9-826b-3674-b2d604a64848@suse.de>
- <20180808213640.10a1d76f@alans-desktop>
-From: =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>
-Message-ID: <a70e9715-beac-d9a8-145e-de00175e56fa@suse.de>
-Date: Thu, 9 Aug 2018 00:42:58 +0200
+        <CAC=mGzgUCopz2xTOA0R-WD8a1DOaOOUn=YpfdMiJ33y3hnh6kg@mail.gmail.com>
+        <92ee4016-1da9-826b-3674-b2d604a64848@suse.de>
+        <20180808213640.10a1d76f@alans-desktop>
+        <a70e9715-beac-d9a8-145e-de00175e56fa@suse.de>
 MIME-Version: 1.0
-In-Reply-To: <20180808213640.10a1d76f@alans-desktop>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alan Cox <gnomes@lxorguk.ukuu.org.uk>
-Cc: Jian-Hong Pan <starnight@g.ncu.edu.tw>, netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, Jiri Pirko <jiri@resnulli.us>, Marcel Holtmann <marcel@holtmann.org>, "David S. Miller" <davem@davemloft.net>, Matthias Brugger <mbrugger@suse.com>, Janus Piwek <jpiwek@arroweurope.com>, =?UTF-8?Q?Michael_R=c3=b6der?= <michael.roeder@avnet.eu>, Dollar Chen <dollar.chen@wtmec.com>, Ken Yu <ken.yu@rakwireless.com>, =?UTF-8?Q?Konstantin_B=c3=b6hm?= <konstantin.boehm@ancud.de>, Jan Jongboom <jan.jongboom@arm.com>, Jon Ortego <Jon.Ortego@imst.de>, contact@snootlab.com, Ben Whitten <ben.whitten@lairdtech.com>, Brian Ray <brian.ray@link-labs.com>, lora@globalsat.com.tw, Alexander Graf <agraf@suse.de>, =?UTF-8?Q?Michal_Kube=c4=8dek?= <mkubecek@suse.cz>, Rob Herring <robh@kernel.org>, devicetree@vger.kernel.org, Steve deRosier <derosier@gmail.com>, Mark Brown <broonie@kernel.org>, linux-spi@vger.kernel.org, Pieter Robyns <pieter.robyns@uhasselt.be>, Hasnain Virk <Hasnain.Virk@arm.com>, linux-wpan <linux-wpan@vger.kernel.org>, Stefan Schmidt <stefan@datenfreihafen.org>, Daniele Comel <dcomel@mipot.com>, =?UTF-8?Q?Sebastian_He=c3=9f?= <shess@hessware.de>, Xue Liu <liuxuenetmail@gmail.com>
+To: Andreas =?UTF-8?B?RsOkcmJlcg==?= <afaerber@suse.de>
+Cc: Jian-Hong Pan <starnight@g.ncu.edu.tw>, netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, Jiri Pirko <jiri@resnulli.us>, Marcel Holtmann <marcel@holtmann.org>, "David S. Miller" <davem@davemloft.net>, Matthias Brugger <mbrugger@suse.com>, Janus Piwek <jpiwek@arroweurope.com>, Michael =?UTF-8?B?UsO2ZGVy?= <michael.roeder@avnet.eu>, Dollar Chen <dollar.chen@wtmec.com>, Ken Yu <ken.yu@rakwireless.com>, Konstantin =?UTF-8?B?QsO2aG0=?= <konstantin.boehm@ancud.de>, Jan Jongboom <jan.jongboom@arm.com>, Jon Ortego <Jon.Ortego@imst.de>, contact@snootlab.com, Ben Whitten <ben.whitten@lairdtech.com>, Brian Ray <brian.ray@link-labs.com>, lora@globalsat.com.tw, Alexander Graf <agraf@suse.de>, Michal =?UTF-8?B?S3ViZcSNZWs=?= <mkubecek@suse.cz>, Rob Herring <robh@kernel.org>, devicetree@vger.kernel.org, Steve deRosier <derosier@gmail.com>, Mark Brown <broonie@kernel.org>, linux-spi@vger.kernel.org, Pieter Robyns <pieter.robyns@uhasselt.be>, Hasnain Virk <Hasnain.Virk@arm.com>, linux-wpan <linux-wpan@vger.kernel.org>, Stefan Schmidt <stefan@datenfreihafen.org>, Daniele Comel <dcomel@mipot.com>, Sebastian =?UTF-8?B?SGXDnw==?= <shess@hessware.de>, Xue Liu <liuxuenetmail@gmail.com>
 
-Am 08.08.2018 um 22:36 schrieb Alan Cox:
-> On Sun, 5 Aug 2018 02:11:25 +0200
-> Andreas Färber <afaerber@suse.de> wrote:
->> Am 03.07.2018 um 17:11 schrieb Jian-Hong Pan:
->>> 2018-07-01 19:07 GMT+08:00 Andreas Färber <afaerber@suse.de>:  
->> LoRa radio channels being half-duplex, we'd need to stop receiving in
->> ndo_start_xmit and re-start receiving in the TX interrupt handler AFAIU.
->> Yes, it's ugly - one reason I haven't implemented RX in sx1276 yet.
+> Yes, and we are talking about that concrete sx1276 driver here, whose
+> chipset has a state machine that only allows either rx or tx and also
+> has standby and sleep modes with differing levels of data retention.
+
+It's a hardware limit, it should never influence the protocol stack
+itself just the driver. Linux always tries to design to optimize the
+non-crappy case. In the long term that works out best because hardware
+improves and you don't want to be tied to an old limit.
+
+> > (Some ancient ethernet cards do this btw.. they can't listen and transmit
+> > at the same time)  
 > 
-> Why - the signal is still floating around in the air, you can't unhear it
-> at the antenna.
+> So when do they start receiving?
 
-Why what? :)
+When they are not transmitting. The transmit path switches modes and when
+the frame send is done it goes back to receiving. As old ethernet was
+also half duplex that worked.
 
-> If a given piece of hardware needs to flip between RX
-> and TX mode then it should be handled by that driver.
+> The issue here was that my original description, which you appear to
+> have cut, suggested a continuous listen mode, interrupted by transmit.
 
-Yes, and we are talking about that concrete sx1276 driver here, whose
-chipset has a state machine that only allows either rx or tx and also
-has standby and sleep modes with differing levels of data retention.
+I don't think I cut it but if so I didn't mean to and your approach is
+the one I agree with.
 
-The sx1301 is a different beast (and driver) and may allow both.
+> Jian-Hong didn't like that, with reference to the LoRaWAN spec that
+> supposedly asks for only being in receive mode when expecting a message,
+> likely to save on battery. So the question is, could we cleanly
+> implement receiving only when the user asks us to, or is that a no-go?
 
-In any case, the ndo_start_xmit hook is in each device driver. But the
-recvmsg hook I mentioned is at protocol layer, which exactly is the
-layering problem I see.
+Why would you do so ? You can't run Linux on a tiny little
+micro-controller where that would matter. Sure it makes sense for some
+tiny spec of embedded silicon buried in a sensor - but not a Linux box.
 
-> (Some ancient ethernet cards do this btw.. they can't listen and transmit
-> at the same time)
+Now you might power it down when the interface is down, or when there is
+nobody using that interface but that's really more about long term idle
+power.
 
-So when do they start receiving?
+> bands and 2.) duty-cycle limits for some of those bands. No maintainer
+> commented on that so far. Thus I am working in tiny steps on providing
+> netlink-layer commands in nllora that can dispatch the individual radio
+> settings to drivers, which then upper layers can instrument as needed.
 
-The issue here was that my original description, which you appear to
-have cut, suggested a continuous listen mode, interrupted by transmit.
-Jian-Hong didn't like that, with reference to the LoRaWAN spec that
-supposedly asks for only being in receive mode when expecting a message,
-likely to save on battery. So the question is, could we cleanly
-implement receiving only when the user asks us to, or is that a no-go?
-
->>> - We can have a pre-defined table according to LoRaWAN Regional Parameters.
->>> - Device driver declares the hardware's capability, for example
->>> frequency, TX power.  And then registers as a LoRaWAN compatible
->>> device.  
->>
->> That sounds like a layering violation. We rather need to expose all
->> these tunable parameters individually at the LoRa layer, allowing the
->> LoRaWAN layer to configure them as it pleases. Not the other direction.
->> That still leaves my above question 4) open of how to implement each.
+Sounds right to me.
 > 
-> Wifi already has the general policy database for the various existing
-> protocols. Please take a look at the CRDA agent and how it hooks into
-> wireless.It might need to some tweaking but it would be odd to have
-> different configuration schemes for different wifi protocols.
+> And making my very first steps with netlink here, it appeared as if each
+> technology has its own enums of commands and attributes, so I don't see
+> how to reuse anything from Wifi here apart from some design inspiration.
 
-CRDA/wireless-regdb had been brought up and I've been pointed to nl80211
-and nl802154, which I've tried to make sense of for my initial nllora.
-Admittedly with limited success, as that code is slightly complex.
+That seems reasonable - you aren't likely to want to manage them with the
+same tool.
 
-We also seemed to have consensus here that we _should_ be reusing
-wireless-regdb but would need to extend it 1.) with sub-GHz frequency
-bands and 2.) duty-cycle limits for some of those bands. No maintainer
-commented on that so far. Thus I am working in tiny steps on providing
-netlink-layer commands in nllora that can dispatch the individual radio
-settings to drivers, which then upper layers can instrument as needed.
-
-And making my very first steps with netlink here, it appeared as if each
-technology has its own enums of commands and attributes, so I don't see
-how to reuse anything from Wifi here apart from some design inspiration.
-
->> The use case I have in mind is this: User A opens a LoRaWAN socket and
->> using maclorawan sends a packet P1. Here the LoRaWAN Regional Parameters
->> and LoRaWAN Sync Word need to be applied.
->> User B then opens a pure LoRa socket and transmits a packet P1' with
->> different Sync Word, SF, BW, CR, etc.
->> Afterwards user A wants to send another packet P2 via LoRaWAN - this
->> needs to use the same LoRaWAN settings as before, not those used for
->> LoRa in between. Therefore I was thinking about socket-level options, as
->> netlink operations would be device-wide, with undesired side-effects.
+> > That's a hardware question. Imagine a software defined radio. If your
+> > limitation wouldn't exist in a pure software defined radio then it's
+> > almost certainly a device level detal.  
 > 
-> Agreed
+> An SDR would not be using this sx1276 device driver, I imagine.
 > 
->> Obviously in that scenario not both users can receive at the same time.
+> In fact I would expect an SDR device not to be in drivers/net/lora/ at
+> all but to live in drivers/net/sdr/ and to consume ETH_P_LORA etc. skbs
+> and just do the right thing for them depending on their type...
+
+The point I was trying to make was that if you want to decide whether
+something is driver level or protocol level ask 'is this something you
+can't do even with an SDR'. Some things are protocol properties that no
+fancy hardware will change. Others are hardware limits, in which case you
+want them driver level - because at some point the hardware will get
+better.
+
+> > If you've got something listening to data but without the structure
+> > needed to identify multiple listeners and split out the data meaningfully
+> > to those listeners according to parts of the packet then you've got no
+> > reason to make it a protocol just use SOCK_PACKET and if need be BPF.  
 > 
-> That's a hardware question. Imagine a software defined radio. If your
-> limitation wouldn't exist in a pure software defined radio then it's
-> almost certainly a device level detal.
+> Sorry, that doesn't parse for me. SOCK_PACKET must be a protocol on some
+> PF_ protocol family, no? Are you suggesting I use SOCK_PACKET instead of
+> SOCK_DGRAM in what is now net/lora/dgram.c? Or are you saying there's
+> some generic implementation that we can reuse and scratch mine?
 
-An SDR would not be using this sx1276 device driver, I imagine.
+There is a heirarchy. Let me us IP for an example
 
-In fact I would expect an SDR device not to be in drivers/net/lora/ at
-all but to live in drivers/net/sdr/ and to consume ETH_P_LORA etc. skbs
-and just do the right thing for them depending on their type...
+(historically it was SOCK_PACKET nowdays PF_PACKET - the layering got
+sorted better)
 
->> interface but cleanly distinguished as ETH_P_GFSK or something.
->> For example, the Chistera Pi HAT has both an RFM95W and an RFM22 module.
+PF_PACKET SOCK_RAW ETH_P_ALL		
+
+Everything on that device minus some things like hardware pre-ambles
+
+PF_PACKET SOCK_RAW ETH_P_SOMETHING
+
+Everything on that device that has the underlying protocol (and the
+protocol might not be in the packet but a property of the interface
+because it only does that format - simple example SLIP is IP packets over
+a serial link a SLIP interface is IP, not because there is anything
+saying it is but because that is *all* it can be)
+
+You get the two above for free. PF_PACKET is built into the stack so
+providing you label packets with the ETH_P_xxx you have for Lora, you can
+use PF_PACKET interfaces to dump them and write raw packets at the kernel
+layer.
+
+PF_INET SOCK_RAW
+
+Split the messages by protocol number in IP between multiple
+listeners/writers
+
+PF_INET SOCK_UDP / TCP etc
+
+Split the messages by port numbers in the higher level protocol
+
+
+For PF_LORA these would map to whatever goes on at the LORA protocol
+level and divide LORA messages up between multiple processes on the
+Linux system that are interested in some of the messages.
+
+
+> > The reason we have a socket layer not /dev/ethernet0 is that it's
+> > meaningful to divide messages up into flows, and to partition those flows
+> > securely amongst multiple consumers/generators.  
 > 
-> Agreed if you can flip per packet.
+> For me the distinction is that a /dev/whatever0 would seem more suited
+> for a stream of data to read/write, whereas sockets give us a bounded
+> skb for packets at device driver level.
 
-The SX127x can - it might involve delays of course.
+You could equally do that in a simple character device *if* you didn't
+need to split messages up and share between users. Some protocol stacks
+actually do that and then sort it out in user space, either because they
+are really obscure or they are incredibly complicated and broken so want
+to be out of kernel 8)
 
-The SX130x doesn't even need to flip for sending AFAICT, it's just
-metadata after the payload in the FIFO.
-
->> The next question arising is how the user would create such an skb. Just
->> like I was hesitant about PF_LORAWAN originally, I'd like to avoid
->> polluting the PF_ number space for each of these. Maybe have one PF_FSK
->> as equivalent to PF_LORA and then have either a socket option or
->> sockaddr field to select the modulation variants? Not sure how exactly
->> those others differ from each other, that's why I tried to postpone the
->> FSK topic and to focus on LoRa first - b) below.
->>
->> At this point we could also argue whether we need a PF_LORA at all or
->> rather just some generic PF_RADIO with lots of options stored in its
->> sockaddr.
+> These PHYs all broadcast something over the antenna when sending, with
+> any addressing of listeners or senders being optional and MAC-specific,
+> apart from the LoRa/FSK SyncWord as well as the various frequency etc.
+> settings that determine what the receiver listens for.
 > 
-> What matters most is mux/demux.
+> None of these PHYs define any mechanism like EtherType through which to
+> identify upper-layer protocols.
 > 
-> If you've got something listening to data but without the structure
-> needed to identify multiple listeners and split out the data meaningfully
-> to those listeners according to parts of the packet then you've got no
-> reason to make it a protocol just use SOCK_PACKET and if need be BPF.
+> So in a way, listening is always in a promiscuous mode, and I guess we
+> would need to try to parse each incoming packet as e.g. a LoRaWAN packet
+> and just give up if it's too short or checksums don't match. Only at the
+> layer of LoRaWAN and competing proprietary or custom protocols can we
+> split received packets out to individual listeners.
 
-Sorry, that doesn't parse for me. SOCK_PACKET must be a protocol on some
-PF_ protocol family, no? Are you suggesting I use SOCK_PACKET instead of
-SOCK_DGRAM in what is now net/lora/dgram.c? Or are you saying there's
-some generic implementation that we can reuse and scratch mine?
+My vote would be in that case that you either
 
-> The reason we have a socket layer not /dev/ethernet0 is that it's
-> meaningful to divide messages up into flows, and to partition those flows
-> securely amongst multiple consumers/generators.
+1. Set the protocol type on the interface assuming you don't mix and
+match (and if it's relying on random bits not looking like other packets
+then it sounds a complete mess at the moment - but yeah its new tech)
 
-For me the distinction is that a /dev/whatever0 would seem more suited
-for a stream of data to read/write, whereas sockets give us a bounded
-skb for packets at device driver level.
+2. You pass everything up to some magical agent which somehow splits them
+up and labels them ETH_P_LORA / ETH_P_FOO etc
 
-These PHYs all broadcast something over the antenna when sending, with
-any addressing of listeners or senders being optional and MAC-specific,
-apart from the LoRa/FSK SyncWord as well as the various frequency etc.
-settings that determine what the receiver listens for.
+3. You do what ethernet does (which admittedly is *way* simpler for
+ethernet) and you have a library routine you can pass an skbuff in the
+driver itself which figures out wtf to label the packet. Look how
+eth_type_trans() is used. Drivers then just do
 
-None of these PHYs define any mechanism like EtherType through which to
-identify upper-layer protocols.
+           skb->protocol = xxx_type_trans(skb, dev);
 
-So in a way, listening is always in a promiscuous mode, and I guess we
-would need to try to parse each incoming packet as e.g. a LoRaWAN packet
-and just give up if it's too short or checksums don't match. Only at the
-layer of LoRaWAN and competing proprietary or custom protocols can we
-split received packets out to individual listeners.
+and the basic labelling gets done and any header pulls (you probably won't
+have any given you don't have anything wrapping LORA), and
+multicast/broadcast labelling - again meaningless I suspect.
 
-Does that give us any further clues for the design discussion here?
+#3 Is probably the nicest because you update it all in one place as
+standards change and the market hopefully conslidates and develops some
+kind of sane packet formats. It's also effectively covering #1 and it's
+easy to start with because an initial implementation can just do 'return
+htons(ETH_P_LORA)'.
 
-Regards,
-Andreas
+> 
+> Does that give us any further clues for the design discussion here?
+> 
+I think so yes
 
--- 
-SUSE Linux GmbH, Maxfeldstr. 5, 90409 Nürnberg, Germany
-GF: Felix Imendörffer, Jane Smithard, Graham Norton
-HRB 21284 (AG Nürnberg)
+How do you plan to deal with routing if you've got multiple devices ?
+
+Alan
