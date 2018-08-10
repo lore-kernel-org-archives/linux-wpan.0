@@ -1,27 +1,70 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from shards.monkeyblade.net ([23.128.96.9]:47602 "EHLO
-        shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727530AbeHID7k (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 8 Aug 2018 23:59:40 -0400
-Date: Wed, 08 Aug 2018 18:37:22 -0700 (PDT)
-Message-Id: <20180808.183722.1390275880995727693.davem@davemloft.net>
-Subject: Re: [PATCH net-next] ieee802154: hwsim: fix rcu handling
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <0a1c05ae-b329-1053-d394-111e78348180@datenfreihafen.org>
-References: <20180807233249.28572-1-aring@mojatatu.com>
-        <0a1c05ae-b329-1053-d394-111e78348180@datenfreihafen.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+Received: from aserp2130.oracle.com ([141.146.126.79]:60628 "EHLO
+        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726963AbeHJNdE (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 10 Aug 2018 09:33:04 -0400
+Date: Fri, 10 Aug 2018 14:03:28 +0300
+From: Dan Carpenter <dan.carpenter@oracle.com>
+Subject: [bug report] ieee802154: hwsim: add replacement for fakelb
+Message-ID: <20180810110328.hkv5ktvp2hlxb6z4@kili.mountain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: stefan@datenfreihafen.org
-Cc: aring@mojatatu.com, netdev@vger.kernel.org, linux-wpan@vger.kernel.org, kernel@mojatatu.com
+To: aring@mojatatu.com
+Cc: linux-wpan@vger.kernel.org
 
-From: Stefan Schmidt <stefan@datenfreihafen.org>
-Date: Wed, 8 Aug 2018 22:05:54 +0200
+Hello Alexander Aring,
 
-> I would, once again, ask you to apply these three directly to
-> net-next.
+The patch f25da51fdc38: "ieee802154: hwsim: add replacement for
+fakelb" from Jul 14, 2018, leads to the following static checker
+warning:
 
-Ok, done.
+	drivers/net/ieee802154/mac802154_hwsim.c:739 hwsim_subscribe_all_others()
+	error: we previously assumed 'e' could be null (see line 721)
+
+drivers/net/ieee802154/mac802154_hwsim.c
+   714  static int hwsim_subscribe_all_others(struct hwsim_phy *phy)
+   715  {
+   716          struct hwsim_phy *sub;
+   717          struct hwsim_edge *e;
+   718  
+   719          list_for_each_entry(sub, &hwsim_phys, list) {
+   720                  e = hwsim_alloc_edge(sub, 0xff);
+   721                  if (!e)
+   722                          goto me_fail;
+                                ^^^^^^^^^^^^
+   723  
+   724                  list_add_rcu(&e->list, &phy->edges);
+   725          }
+   726  
+   727          list_for_each_entry(sub, &hwsim_phys, list) {
+   728                  e = hwsim_alloc_edge(phy, 0xff);
+   729                  if (!e)
+   730                          goto sub_fail;
+   731  
+   732                  list_add_rcu(&e->list, &sub->edges);
+   733          }
+   734  
+   735          return 0;
+   736  
+   737  me_fail:
+   738          list_for_each_entry(phy, &hwsim_phys, list) {
+   739                  list_del_rcu(&e->list);
+   740                  hwsim_free_edge(e);
+
+"e" is NULL.  Also we're in a loop so it's a double free.  You probably
+want to use list_for_each_entry_safe() when we call list_del() and free.
+
+   741          }
+   742  sub_fail:
+   743          hwsim_edge_unsubscribe_me(phy);
+                                          ^^^
+Then careful here.
+
+   744          return -ENOMEM;
+   745  }
+
+regards,
+dan carpenter
