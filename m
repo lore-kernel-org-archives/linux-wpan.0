@@ -1,153 +1,94 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:43625 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726915AbeIAB4O (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Fri, 31 Aug 2018 21:56:14 -0400
-Received: by mail-wr1-f67.google.com with SMTP id k5-v6so12410171wre.10
-        for <linux-wpan@vger.kernel.org>; Fri, 31 Aug 2018 14:46:49 -0700 (PDT)
-From: Xue Liu <liuxuenetmail@gmail.com>
-Subject: [PATCH 2/2] ieee802154: mcr20a: Remove struct mcr20a_platform_data
-Date: Fri, 31 Aug 2018 23:46:42 +0200
-Message-Id: <20180831214642.30711-3-liuxuenetmail@gmail.com>
-In-Reply-To: <20180831214642.30711-1-liuxuenetmail@gmail.com>
-References: <20180831214642.30711-1-liuxuenetmail@gmail.com>
+Received: from mail-pf1-f173.google.com ([209.85.210.173]:47095 "EHLO
+        mail-pf1-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726297AbeHWUt0 (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 23 Aug 2018 16:49:26 -0400
+Received: by mail-pf1-f173.google.com with SMTP id u24-v6so3094820pfn.13
+        for <linux-wpan@vger.kernel.org>; Thu, 23 Aug 2018 10:18:44 -0700 (PDT)
+From: Jian-Hong Pan <starnight@g.ncu.edu.tw>
+Subject: [RFC 0/3 net] lorawan: Add LoRaWAN soft MAC module
+Date: Fri, 24 Aug 2018 01:15:40 +0800
+Message-Id: <cover.1535039998.git.starnight@g.ncu.edu.tw>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-wpan@vger.kernel.org, stefan@datenfreihafen.org, alex.aring@gmail.com
+To: =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>, netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, Jiri Pirko <jiri@resnulli.us>, Marcel Holtmann <marcel@holtmann.org>, "David S. Miller" <davem@davemloft.net>, Matthias Brugger <mbrugger@suse.com>, Janus Piwek <jpiwek@arroweurope.com>, =?UTF-8?q?Michael=20R=C3=B6der?= <michael.roeder@avnet.eu>, Dollar Chen <dollar.chen@wtmec.com>, Ken Yu <ken.yu@rakwireless.com>, =?UTF-8?q?Konstantin=20B=C3=B6hm?= <konstantin.boehm@ancud.de>, Jan Jongboom <jan.jongboom@arm.com>, Jon Ortego <Jon.Ortego@imst.de>, "contact@snootlab.com" <contact@snootlab.com>, Ben Whitten <ben.whitten@lairdtech.com>, Brian Ray <brian.ray@link-labs.com>, lora@globalsat.com.tw, Alexander Graf <agraf@suse.de>, =?UTF-8?q?Michal=20Kube=C4=8Dek?= <mkubecek@suse.cz>, Rob Herring <robh@kernel.org>, devicetree@vger.kernel.org, Steve deRosier <derosier@gmail.com>, Mark Brown <broonie@kernel.org>, linux-spi@vger.kernel.org, Pieter ROBYNS <pieter.robyns@uhasselt.be>, Hasnain Virk <Hasnain.Virk@arm.com>, linux-wpan - ML <linux-wpan@vger.kernel.org>, Stefan Schmidt <stefan@datenfreihafen.org>, Daniele Comel <dcomel@mipot.com>, shess@hessware.de, Xue Liu <liuxuenetmail@gmail.com>
+Cc: Jian-Hong Pan <starnight@g.ncu.edu.tw>
 
-The struct mcr20a_platform_data is uesed only in probe function
-and it holds only one member. So it is not necessary to reserve it.
+LoRaWAN(TM) is the MAC layer defined by LoRa Alliance(TM) over LoRa
+devices.  LoRa is one of Low-Power Wide-Area Network (LPWAN) technology.
 
-Using gpiod family API to handle reset pin.
+LoRaWAN networks typically are laid out in a star-of-stars topology in
+which gateways relay messages between end-devices and a central network
+server at the backend.  Gateways are connected to the network server via
+standard IP connections while end-devices use single hop LoRa(TM) or FSK
+communication to one or many gateways.
 
-Signed-off-by: Xue Liu <liuxuenetmail@gmail.com>
----
- drivers/net/ieee802154/mcr20a.c | 64 +++++++--------------------------
- 1 file changed, 13 insertions(+), 51 deletions(-)
+A LoRa network distinguishes between a basic LoRaWAN (named Class A) and
+optional features (Class B, Class C ...):
+* Bi-directional end-devices (Class A)
+* Bi-directional end-devices with scheduled receive slots (Class B)
+* Bi-directional end-devices with maximal receive slots (Class C)
 
-diff --git a/drivers/net/ieee802154/mcr20a.c b/drivers/net/ieee802154/mcr20a.c
-index 04891429a554..44de81e5f140 100644
---- a/drivers/net/ieee802154/mcr20a.c
-+++ b/drivers/net/ieee802154/mcr20a.c
-@@ -132,11 +132,6 @@ static const struct reg_sequence mar20a_iar_overwrites[] = {
- };
- 
- #define MCR20A_VALID_CHANNELS (0x07FFF800)
--
--struct mcr20a_platform_data {
--	int rst_gpio;
--};
--
- #define MCR20A_MAX_BUF		(127)
- 
- #define printdev(X) (&X->spi->dev)
-@@ -412,7 +407,6 @@ struct mcr20a_local {
- 	struct spi_device *spi;
- 
- 	struct ieee802154_hw *hw;
--	struct mcr20a_platform_data *pdata;
- 	struct regmap *regmap_dar;
- 	struct regmap *regmap_iar;
- 
-@@ -976,20 +970,6 @@ static irqreturn_t mcr20a_irq_isr(int irq, void *data)
- 	return IRQ_HANDLED;
- }
- 
--static int mcr20a_get_platform_data(struct spi_device *spi,
--				    struct mcr20a_platform_data *pdata)
--{
--	int ret = 0;
--
--	if (!spi->dev.of_node)
--		return -EINVAL;
--
--	pdata->rst_gpio = of_get_named_gpio(spi->dev.of_node, "rst_b-gpio", 0);
--	dev_dbg(&spi->dev, "rst_b-gpio: %d\n", pdata->rst_gpio);
--
--	return ret;
--}
--
- static void mcr20a_hw_setup(struct mcr20a_local *lp)
- {
- 	u8 i;
-@@ -1249,7 +1229,7 @@ mcr20a_probe(struct spi_device *spi)
- {
- 	struct ieee802154_hw *hw;
- 	struct mcr20a_local *lp;
--	struct mcr20a_platform_data *pdata;
-+	struct gpio_desc *rst_b;
- 	int irq_type;
- 	int ret = -ENOMEM;
- 
-@@ -1260,48 +1240,32 @@ mcr20a_probe(struct spi_device *spi)
- 		return -EINVAL;
- 	}
- 
--	pdata = kmalloc(sizeof(*pdata), GFP_KERNEL);
--	if (!pdata)
--		return -ENOMEM;
--
--	/* set mcr20a platform data */
--	ret = mcr20a_get_platform_data(spi, pdata);
--	if (ret < 0) {
--		dev_crit(&spi->dev, "mcr20a_get_platform_data failed.\n");
--		goto free_pdata;
--	}
--
--	/* init reset gpio */
--	if (gpio_is_valid(pdata->rst_gpio)) {
--		ret = devm_gpio_request_one(&spi->dev, pdata->rst_gpio,
--					    GPIOF_OUT_INIT_HIGH, "reset");
--		if (ret)
--			goto free_pdata;
-+	rst_b = devm_gpiod_get(&spi->dev, "rst_b", GPIOD_OUT_HIGH);
-+	if (IS_ERR(rst_b)) {
-+		ret = PTR_ERR(rst_b);
-+		if (ret != -EPROBE_DEFER)
-+			dev_err(&spi->dev, "Failed to get 'rst_b' gpio: %d", ret);
-+		return ret;
- 	}
- 
- 	/* reset mcr20a */
--	if (gpio_is_valid(pdata->rst_gpio)) {
--		usleep_range(10, 20);
--		gpio_set_value_cansleep(pdata->rst_gpio, 0);
--		usleep_range(10, 20);
--		gpio_set_value_cansleep(pdata->rst_gpio, 1);
--		usleep_range(120, 240);
--	}
-+	usleep_range(10, 20);
-+	gpiod_set_value_cansleep(rst_b, 1);
-+	usleep_range(10, 20);
-+	gpiod_set_value_cansleep(rst_b, 0);
-+	usleep_range(120, 240);
- 
- 	/* allocate ieee802154_hw and private data */
- 	hw = ieee802154_alloc_hw(sizeof(*lp), &mcr20a_hw_ops);
- 	if (!hw) {
- 		dev_crit(&spi->dev, "ieee802154_alloc_hw failed\n");
--		ret = -ENOMEM;
--		goto free_pdata;
-+		return ret;
- 	}
- 
- 	/* init mcr20a local data */
- 	lp = hw->priv;
- 	lp->hw = hw;
- 	lp->spi = spi;
--	lp->spi->dev.platform_data = pdata;
--	lp->pdata = pdata;
- 
- 	/* init ieee802154_hw */
- 	hw->parent = &spi->dev;
-@@ -1370,8 +1334,6 @@ mcr20a_probe(struct spi_device *spi)
- 
- free_dev:
- 	ieee802154_free_hw(lp->hw);
--free_pdata:
--	kfree(pdata);
- 
- 	return ret;
- }
+This patch set add LoRaWAN class module implementing the stack,
+especially the soft MAC, between socket APIs and LoRa device drivers.
+
+socket APIs:
+send and receive the data
+------------------------------------------------------------------------
+LoRaWAN class module implements soft MAC:
+append the header/footer, encryption/decryption, timing slot and MAC
+commands
+------------------------------------------------------------------------
+LoRa device drivers:
+send and receive the messages for MAC layer
+------------------------------------------------------------------------
+LoRa devices
+
+This module starts from simple and implements partial Class A
+end-devices features defined in LoRaWAN(TM) Specification Ver. 1.0.2.
+More features and complexity, for example regional parameters, confirmed
+data messages, join request/accept messages for Over-The-Air Activation,
+MAC commands ... will be added in the future.
+
+Besides, I upload these patches and open discussion.  For example, the
+more common/flexible interface for compatible LoRa device drivers and
+protocols implementation, etc.
+
+Another idea mentioned by Andreas: Make PF_LORA and PF_LORAWAN like
+PF_INET and PF_INET6 exist at the same time.  That is also interesting.
+
+Jian-Hong Pan (3):
+  lorawan: Add LoRaWAN class module
+  lorawan: Add macro and definition for LoRaWAN class modlue
+  lorawan: List LORAWAN in menuconfig
+
+ include/linux/maclorawan/lora.h     | 239 ++++++++++
+ include/linux/socket.h              |   5 +-
+ include/uapi/linux/if_arp.h         |   1 +
+ include/uapi/linux/if_ether.h       |   1 +
+ net/Kconfig                         |   1 +
+ net/Makefile                        |   1 +
+ net/core/dev.c                      |   4 +-
+ net/maclorawan/Kconfig              |  14 +
+ net/maclorawan/Makefile             |   2 +
+ net/maclorawan/lorawan.h            | 219 +++++++++
+ net/maclorawan/lrwsec.c             | 237 ++++++++++
+ net/maclorawan/lrwsec.h             |  57 +++
+ net/maclorawan/mac.c                | 552 ++++++++++++++++++++++
+ net/maclorawan/main.c               | 665 ++++++++++++++++++++++++++
+ net/maclorawan/socket.c             | 700 ++++++++++++++++++++++++++++
+ security/selinux/hooks.c            |   4 +-
+ security/selinux/include/classmap.h |   4 +-
+ 17 files changed, 2701 insertions(+), 5 deletions(-)
+ create mode 100644 include/linux/maclorawan/lora.h
+ create mode 100644 net/maclorawan/Kconfig
+ create mode 100644 net/maclorawan/Makefile
+ create mode 100644 net/maclorawan/lorawan.h
+ create mode 100644 net/maclorawan/lrwsec.c
+ create mode 100644 net/maclorawan/lrwsec.h
+ create mode 100644 net/maclorawan/mac.c
+ create mode 100644 net/maclorawan/main.c
+ create mode 100644 net/maclorawan/socket.c
+
 -- 
-2.17.0
+2.18.0
