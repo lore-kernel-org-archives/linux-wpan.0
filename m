@@ -1,40 +1,43 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from szxga05-in.huawei.com ([45.249.212.191]:11673 "EHLO huawei.com"
+Received: from szxga07-in.huawei.com ([45.249.212.35]:58755 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726580AbeIHSmX (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-        Sat, 8 Sep 2018 14:42:23 -0400
-From: zhong jiang <zhongjiang@huawei.com>
-Subject: [PATCH] ieee802154: remove unecessary condition check before debugfs_remove_recursive
-Date: Sat, 8 Sep 2018 21:44:08 +0800
-Message-ID: <1536414248-32361-1-git-send-email-zhongjiang@huawei.com>
+        id S1725804AbeIFIQ3 (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+        Thu, 6 Sep 2018 04:16:29 -0400
+From: YueHaibing <yuehaibing@huawei.com>
+Subject: [PATCH net-next] ieee802154: ca8210: Use kmemdup instead of duplicating it in ca8210_test_int_driver_write
+Date: Thu, 6 Sep 2018 11:42:28 +0800
+Message-ID: <20180906034228.7660-1-yuehaibing@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: davem@davemloft.net, alex.aring@gmail.com, michael.hennerich@analog.com, stefan@datenfreihafen.org
-Cc: linux-wpan@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+To: davem@davemloft.net, h.morris@cascoda.com, alex.aring@gmail.com, stefan@datenfreihafen.org
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, linux-wpan@vger.kernel.org, YueHaibing <yuehaibing@huawei.com>
 
-debugfs_remove_recursive has taken IS_ERR_OR_NULL into account. So just
-remove the condition check before debugfs_remove_recursive.
+Replace calls to kmalloc followed by a memcpy with a direct call tokmemdup.
 
-Signed-off-by: zhong jiang <zhongjiang@huawei.com>
+Patch found using coccinelle.
+
+Signed-off-by: YueHaibing <yuehaibing@huawei.com>
 ---
- drivers/net/ieee802154/adf7242.c | 3 +--
+ drivers/net/ieee802154/ca8210.c | 3 +--
  1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/drivers/net/ieee802154/adf7242.c b/drivers/net/ieee802154/adf7242.c
-index 23a52b9..cd1d8fa 100644
---- a/drivers/net/ieee802154/adf7242.c
-+++ b/drivers/net/ieee802154/adf7242.c
-@@ -1308,8 +1308,7 @@ static int adf7242_remove(struct spi_device *spi)
- {
- 	struct adf7242_local *lp = spi_get_drvdata(spi);
+diff --git a/drivers/net/ieee802154/ca8210.c b/drivers/net/ieee802154/ca8210.c
+index 58299fb..e21279d 100644
+--- a/drivers/net/ieee802154/ca8210.c
++++ b/drivers/net/ieee802154/ca8210.c
+@@ -634,10 +634,9 @@ static int ca8210_test_int_driver_write(
+ 	for (i = 0; i < len; i++)
+ 		dev_dbg(&priv->spi->dev, "%#03x\n", buf[i]);
  
--	if (!IS_ERR_OR_NULL(lp->debugfs_root))
--		debugfs_remove_recursive(lp->debugfs_root);
-+	debugfs_remove_recursive(lp->debugfs_root);
+-	fifo_buffer = kmalloc(len, GFP_KERNEL);
++	fifo_buffer = kmemdup(buf, len, GFP_KERNEL);
+ 	if (!fifo_buffer)
+ 		return -ENOMEM;
+-	memcpy(fifo_buffer, buf, len);
+ 	kfifo_in(&test->up_fifo, &fifo_buffer, 4);
+ 	wake_up_interruptible(&priv->test.readq);
  
- 	cancel_delayed_work_sync(&lp->work);
- 	destroy_workqueue(lp->wqueue);
 -- 
-1.7.12.4
+2.7.0
