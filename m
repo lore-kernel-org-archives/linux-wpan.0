@@ -1,71 +1,71 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from tuna.sandelman.ca ([209.87.249.19]:48617 "EHLO
-        tuna.sandelman.ca" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726684AbeIJBuE (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Sun, 9 Sep 2018 21:50:04 -0400
-From: Michael Richardson <mcr@sandelman.ca>
+Received: from mail-it0-f46.google.com ([209.85.214.46]:39317 "EHLO
+        mail-it0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727649AbeIJUBa (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 10 Sep 2018 16:01:30 -0400
+Received: by mail-it0-f46.google.com with SMTP id h1-v6so29087658itj.4
+        for <linux-wpan@vger.kernel.org>; Mon, 10 Sep 2018 08:06:58 -0700 (PDT)
+Date: Mon, 10 Sep 2018 11:06:47 -0400
+From: Alexander Aring <aring@mojatatu.com>
 Subject: Re: about openthread and 6lowpan
-In-Reply-To: <SG2PR04MB315811F19F2A13136294C6A9EF060@SG2PR04MB3158.apcprd04.prod.outlook.com>
-References: <SG2PR04MB31586E124C6C9A919150F826EF000@SG2PR04MB3158.apcprd04.prod.outlook.com>,<SG2PR04MB3158366EFF8CBC241C84FFD5EF060@SG2PR04MB3158.apcprd04.prod.outlook.com> <SG2PR04MB315811F19F2A13136294C6A9EF060@SG2PR04MB3158.apcprd04.prod.outlook.com>
+Message-ID: <20180910150647.dcwoyslxrusvcj7j@x220t>
+References: <SG2PR04MB31586E124C6C9A919150F826EF000@SG2PR04MB3158.apcprd04.prod.outlook.com>
+ <SG2PR04MB3158366EFF8CBC241C84FFD5EF060@SG2PR04MB3158.apcprd04.prod.outlook.com>
+ <SG2PR04MB315811F19F2A13136294C6A9EF060@SG2PR04MB3158.apcprd04.prod.outlook.com>
+ <3503.1536526189@localhost>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-        micalg=pgp-sha256; protocol="application/pgp-signature"
-Date: Sun, 09 Sep 2018 16:49:49 -0400
-Message-ID: <3503.1536526189@localhost>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <3503.1536526189@localhost>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Sujay G <sujay.g@hcl.com>
-Cc: "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>
+To: Michael Richardson <mcr@sandelman.ca>
+Cc: Sujay G <sujay.g@hcl.com>, "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>
 
---=-=-=
-Content-Type: text/plain
+Hi,
 
+On Sun, Sep 09, 2018 at 04:49:49PM -0400, Michael Richardson wrote:
+> 
+> Sujay G <sujay.g@hcl.com> wrote:
+>     > I have been testing openThread on Docker. I wanted to use 6Lowpan with
+>     > openthread.  I assumed openThread would interact with wpan interfaces
+>     > and added wpan interfaces in container namespace but it did not work.
+> 
+>     > Then I came across change for 6Lowpan.  Comparison yielded changes in 7
+>     > files vs the latest openThread repositiry
+>     > github.com/openthread/openthread/compare/master...linux-wpan:af802154
+> 
+> Why are you asking the linux-wpan ML about openthread patches? :-)
+> 
 
-Sujay G <sujay.g@hcl.com> wrote:
-    > I have been testing openThread on Docker. I wanted to use 6Lowpan with
-    > openthread.  I assumed openThread would interact with wpan interfaces
-    > and added wpan interfaces in container namespace but it did not work.
+it's okay.
 
-    > Then I came across change for 6Lowpan.  Comparison yielded changes in 7
-    > files vs the latest openThread repositiry
-    > github.com/openthread/openthread/compare/master...linux-wpan:af802154
+> Alex did some patches to make openthread work better with the virtual
+> interfaces... it's up to the openthread people to adopt them or not.
+> 
 
-Why are you asking the linux-wpan ML about openthread patches? :-)
+What is does is to run openthread as somewhat "user space stack" with
+limited functionality on monitor interfaces. It's good for debugging.
 
-Alex did some patches to make openthread work better with the virtual
-interfaces... it's up to the openthread people to adopt them or not.
+"limited functionality" is e.g. not ack handling, every frame get to
+userspace... it's a pain to run productive I think.
 
-    > I manually merged the files and am trying to resolve the errors.
+I worried, here was somebody who said "it just works for him on node
+interfaces", but in this case the kernel run filtering... I am worried
+that people using it in this way and don't know what they do.
 
-    > Had few queries regarding the openThread and 6Lowpan
+>     > I manually merged the files and am trying to resolve the errors.
+> 
+>     > Had few queries regarding the openThread and 6Lowpan
+> 
+>     > Why was the project (af802154) abandoned ?  Was openThread working with
+>     > the above 6Lowpan changes ?  Does the current openThread stack support
+>     > 6Lowpan ? any configuration needs to be enabled ?  or is it the right
+>     > way to port the af802154 to current implementation of openthread ?
+> 
+> You could rebase it, and maybe you have more influence with the
+> openthread people than we do.
 
-    > Why was the project (af802154) abandoned ?  Was openThread working with
-    > the above 6Lowpan changes ?  Does the current openThread stack support
-    > 6Lowpan ? any configuration needs to be enabled ?  or is it the right
-    > way to port the af802154 to current implementation of openthread ?
+agree.
 
-You could rebase it, and maybe you have more influence with the
-openthread people than we do.
-
---
-]               Never tell me the odds!                 | ipv6 mesh networks [
-]   Michael Richardson, Sandelman Software Works        | network architect  [
-]     mcr@sandelman.ca  http://www.sandelman.ca/        |   ruby on rails    [
-
-
-
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEbsyLEzg/qUTA43uogItw+93Q3WUFAluVh20ACgkQgItw+93Q
-3WU+PQf/auDa9c7PyXllGvEOe+YP1UIcsQhUKZMGnhhpv1StfQrojZK1igGW/k24
-qiMZTj5lsnoZOEAIoyiLUSud9t4ZqIxNztYQOWJIdoHGPtyig/foGa0UTfZ0Q7Vh
-hKx1yXZu1DgkEvUunJiYpJq3aFMI6vpXOPjsaFbHIrdypZ40BukFwHT+rP5hQjSz
-GDYC/15wHouZsDVimvappv1/KO++B0qCZzJeLe9kPKtRT890jHfslx7VRPYhsYQf
-91QgioDj71nzN9bMhS34FX6OqUOv/hf5DtJpoBlPBIGi6a84IwPFDjJfZzsTb37V
-0VHc9JxrbRePb4IMcXfIsLwx1prrWA==
-=cCe0
------END PGP SIGNATURE-----
---=-=-=--
+- Alex
