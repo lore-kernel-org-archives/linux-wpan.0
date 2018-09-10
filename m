@@ -1,43 +1,49 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from szxga07-in.huawei.com ([45.249.212.35]:58755 "EHLO huawei.com"
+Received: from szxga07-in.huawei.com ([45.249.212.35]:46167 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725804AbeIFIQ3 (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-        Thu, 6 Sep 2018 04:16:29 -0400
+        id S1725889AbeIJHPC (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+        Mon, 10 Sep 2018 03:15:02 -0400
+Subject: Re: [PATCH net-next] ieee802154: ca8210: Use kmemdup instead of
+ duplicating it in ca8210_test_int_driver_write
+References: <20180906034228.7660-1-yuehaibing@huawei.com>
 From: YueHaibing <yuehaibing@huawei.com>
-Subject: [PATCH net-next] ieee802154: ca8210: Use kmemdup instead of duplicating it in ca8210_test_int_driver_write
-Date: Thu, 6 Sep 2018 11:42:28 +0800
-Message-ID: <20180906034228.7660-1-yuehaibing@huawei.com>
+Message-ID: <bb6d1de2-cb0c-73cb-e09a-a1a4c2357fb0@huawei.com>
+Date: Mon, 10 Sep 2018 10:08:09 +0800
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20180906034228.7660-1-yuehaibing@huawei.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: davem@davemloft.net, h.morris@cascoda.com, alex.aring@gmail.com, stefan@datenfreihafen.org
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, linux-wpan@vger.kernel.org, YueHaibing <yuehaibing@huawei.com>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, linux-wpan@vger.kernel.org
 
-Replace calls to kmalloc followed by a memcpy with a direct call tokmemdup.
+sorry, Pls ignore this duplicated patch.
 
-Patch found using coccinelle.
-
-Signed-off-by: YueHaibing <yuehaibing@huawei.com>
----
- drivers/net/ieee802154/ca8210.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
-
-diff --git a/drivers/net/ieee802154/ca8210.c b/drivers/net/ieee802154/ca8210.c
-index 58299fb..e21279d 100644
---- a/drivers/net/ieee802154/ca8210.c
-+++ b/drivers/net/ieee802154/ca8210.c
-@@ -634,10 +634,9 @@ static int ca8210_test_int_driver_write(
- 	for (i = 0; i < len; i++)
- 		dev_dbg(&priv->spi->dev, "%#03x\n", buf[i]);
- 
--	fifo_buffer = kmalloc(len, GFP_KERNEL);
-+	fifo_buffer = kmemdup(buf, len, GFP_KERNEL);
- 	if (!fifo_buffer)
- 		return -ENOMEM;
--	memcpy(fifo_buffer, buf, len);
- 	kfifo_in(&test->up_fifo, &fifo_buffer, 4);
- 	wake_up_interruptible(&priv->test.readq);
- 
--- 
-2.7.0
+On 2018/9/6 11:42, YueHaibing wrote:
+> Replace calls to kmalloc followed by a memcpy with a direct call tokmemdup.
+> 
+> Patch found using coccinelle.
+> 
+> Signed-off-by: YueHaibing <yuehaibing@huawei.com>
+> ---
+>  drivers/net/ieee802154/ca8210.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/ieee802154/ca8210.c b/drivers/net/ieee802154/ca8210.c
+> index 58299fb..e21279d 100644
+> --- a/drivers/net/ieee802154/ca8210.c
+> +++ b/drivers/net/ieee802154/ca8210.c
+> @@ -634,10 +634,9 @@ static int ca8210_test_int_driver_write(
+>  	for (i = 0; i < len; i++)
+>  		dev_dbg(&priv->spi->dev, "%#03x\n", buf[i]);
+>  
+> -	fifo_buffer = kmalloc(len, GFP_KERNEL);
+> +	fifo_buffer = kmemdup(buf, len, GFP_KERNEL);
+>  	if (!fifo_buffer)
+>  		return -ENOMEM;
+> -	memcpy(fifo_buffer, buf, len);
+>  	kfifo_in(&test->up_fifo, &fifo_buffer, 4);
+>  	wake_up_interruptible(&priv->test.readq);
+>  
+> 
