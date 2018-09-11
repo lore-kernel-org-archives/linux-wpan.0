@@ -1,49 +1,166 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from szxga07-in.huawei.com ([45.249.212.35]:46167 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725889AbeIJHPC (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-        Mon, 10 Sep 2018 03:15:02 -0400
-Subject: Re: [PATCH net-next] ieee802154: ca8210: Use kmemdup instead of
- duplicating it in ca8210_test_int_driver_write
-References: <20180906034228.7660-1-yuehaibing@huawei.com>
-From: YueHaibing <yuehaibing@huawei.com>
-Message-ID: <bb6d1de2-cb0c-73cb-e09a-a1a4c2357fb0@huawei.com>
-Date: Mon, 10 Sep 2018 10:08:09 +0800
-MIME-Version: 1.0
-In-Reply-To: <20180906034228.7660-1-yuehaibing@huawei.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+Received: from mail-pf1-f194.google.com ([209.85.210.194]:46540 "EHLO
+        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727693AbeILD5B (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 11 Sep 2018 23:57:01 -0400
+Received: by mail-pf1-f194.google.com with SMTP id u24-v6so12930843pfn.13
+        for <linux-wpan@vger.kernel.org>; Tue, 11 Sep 2018 15:55:31 -0700 (PDT)
+From: Stephen Hemminger <stephen@networkplumber.org>
+Subject: [PATCH 04/29] inet: frags: Convert timers to use timer_setup()
+Date: Tue, 11 Sep 2018 14:21:24 -0700
+Message-Id: <20180911212148.23795-5-sthemmin@microsoft.com>
+In-Reply-To: <20180903162300.GC6712@kroah.com>
+References: <20180903162300.GC6712@kroah.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: davem@davemloft.net, h.morris@cascoda.com, alex.aring@gmail.com, stefan@datenfreihafen.org
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, linux-wpan@vger.kernel.org
+To: gregkh@linuxfoundation.org, davem@davemloft.net, edumazet@google.com
+Cc: Kees Cook <keescook@chromium.org>, Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt <stefan@osg.samsung.com>, Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>, Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>, Pablo Neira Ayuso <pablo@netfilter.org>, Jozsef Kadlecsik <kadlec@blackhole.kfki.hu>, Florian Westphal <fw@strlen.de>, linux-wpan@vger.kernel.org, netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, coreteam@netfilter.org
 
-sorry, Pls ignore this duplicated patch.
+From: Kees Cook <keescook@chromium.org>
 
-On 2018/9/6 11:42, YueHaibing wrote:
-> Replace calls to kmalloc followed by a memcpy with a direct call tokmemdup.
-> 
-> Patch found using coccinelle.
-> 
-> Signed-off-by: YueHaibing <yuehaibing@huawei.com>
-> ---
->  drivers/net/ieee802154/ca8210.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/ieee802154/ca8210.c b/drivers/net/ieee802154/ca8210.c
-> index 58299fb..e21279d 100644
-> --- a/drivers/net/ieee802154/ca8210.c
-> +++ b/drivers/net/ieee802154/ca8210.c
-> @@ -634,10 +634,9 @@ static int ca8210_test_int_driver_write(
->  	for (i = 0; i < len; i++)
->  		dev_dbg(&priv->spi->dev, "%#03x\n", buf[i]);
->  
-> -	fifo_buffer = kmalloc(len, GFP_KERNEL);
-> +	fifo_buffer = kmemdup(buf, len, GFP_KERNEL);
->  	if (!fifo_buffer)
->  		return -ENOMEM;
-> -	memcpy(fifo_buffer, buf, len);
->  	kfifo_in(&test->up_fifo, &fifo_buffer, 4);
->  	wake_up_interruptible(&priv->test.readq);
->  
-> 
+In preparation for unconditionally passing the struct timer_list pointer to
+all timer callbacks, switch to using the new timer_setup() and from_timer()
+to pass the timer pointer explicitly.
+
+Cc: Alexander Aring <alex.aring@gmail.com>
+Cc: Stefan Schmidt <stefan@osg.samsung.com>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>
+Cc: Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: Jozsef Kadlecsik <kadlec@blackhole.kfki.hu>
+Cc: Florian Westphal <fw@strlen.de>
+Cc: linux-wpan@vger.kernel.org
+Cc: netdev@vger.kernel.org
+Cc: netfilter-devel@vger.kernel.org
+Cc: coreteam@netfilter.org
+Signed-off-by: Kees Cook <keescook@chromium.org>
+Acked-by: Stefan Schmidt <stefan@osg.samsung.com> # for ieee802154
+Signed-off-by: David S. Miller <davem@davemloft.net>
+(cherry picked from commit 78802011fbe34331bdef6f2dfb1634011f0e4c32)
+---
+ include/net/inet_frag.h                 | 2 +-
+ net/ieee802154/6lowpan/reassembly.c     | 5 +++--
+ net/ipv4/inet_fragment.c                | 4 ++--
+ net/ipv4/ip_fragment.c                  | 5 +++--
+ net/ipv6/netfilter/nf_conntrack_reasm.c | 5 +++--
+ net/ipv6/reassembly.c                   | 5 +++--
+ 6 files changed, 15 insertions(+), 11 deletions(-)
+
+diff --git a/include/net/inet_frag.h b/include/net/inet_frag.h
+index fd338293a095..69e531ed8189 100644
+--- a/include/net/inet_frag.h
++++ b/include/net/inet_frag.h
+@@ -97,7 +97,7 @@ struct inet_frags {
+ 	void			(*constructor)(struct inet_frag_queue *q,
+ 					       const void *arg);
+ 	void			(*destructor)(struct inet_frag_queue *);
+-	void			(*frag_expire)(unsigned long data);
++	void			(*frag_expire)(struct timer_list *t);
+ 	struct kmem_cache	*frags_cachep;
+ 	const char		*frags_cache_name;
+ };
+diff --git a/net/ieee802154/6lowpan/reassembly.c b/net/ieee802154/6lowpan/reassembly.c
+index 9ccb8458b5c3..6badc055555b 100644
+--- a/net/ieee802154/6lowpan/reassembly.c
++++ b/net/ieee802154/6lowpan/reassembly.c
+@@ -80,12 +80,13 @@ static void lowpan_frag_init(struct inet_frag_queue *q, const void *a)
+ 	fq->daddr = *arg->dst;
+ }
+ 
+-static void lowpan_frag_expire(unsigned long data)
++static void lowpan_frag_expire(struct timer_list *t)
+ {
++	struct inet_frag_queue *frag = from_timer(frag, t, timer);
+ 	struct frag_queue *fq;
+ 	struct net *net;
+ 
+-	fq = container_of((struct inet_frag_queue *)data, struct frag_queue, q);
++	fq = container_of(frag, struct frag_queue, q);
+ 	net = container_of(fq->q.net, struct net, ieee802154_lowpan.frags);
+ 
+ 	spin_lock(&fq->q.lock);
+diff --git a/net/ipv4/inet_fragment.c b/net/ipv4/inet_fragment.c
+index 4b44f973c37f..97e747b1e9a0 100644
+--- a/net/ipv4/inet_fragment.c
++++ b/net/ipv4/inet_fragment.c
+@@ -150,7 +150,7 @@ inet_evict_bucket(struct inet_frags *f, struct inet_frag_bucket *hb)
+ 	spin_unlock(&hb->chain_lock);
+ 
+ 	hlist_for_each_entry_safe(fq, n, &expired, list_evictor)
+-		f->frag_expire((unsigned long) fq);
++		f->frag_expire(&fq->timer);
+ 
+ 	return evicted;
+ }
+@@ -367,7 +367,7 @@ static struct inet_frag_queue *inet_frag_alloc(struct netns_frags *nf,
+ 	f->constructor(q, arg);
+ 	add_frag_mem_limit(nf, f->qsize);
+ 
+-	setup_timer(&q->timer, f->frag_expire, (unsigned long)q);
++	timer_setup(&q->timer, f->frag_expire, 0);
+ 	spin_lock_init(&q->lock);
+ 	refcount_set(&q->refcnt, 1);
+ 
+diff --git a/net/ipv4/ip_fragment.c b/net/ipv4/ip_fragment.c
+index 9d0b08c8ee00..5171c8cc0eb6 100644
+--- a/net/ipv4/ip_fragment.c
++++ b/net/ipv4/ip_fragment.c
+@@ -191,12 +191,13 @@ static bool frag_expire_skip_icmp(u32 user)
+ /*
+  * Oops, a fragment queue timed out.  Kill it and send an ICMP reply.
+  */
+-static void ip_expire(unsigned long arg)
++static void ip_expire(struct timer_list *t)
+ {
++	struct inet_frag_queue *frag = from_timer(frag, t, timer);
+ 	struct ipq *qp;
+ 	struct net *net;
+ 
+-	qp = container_of((struct inet_frag_queue *) arg, struct ipq, q);
++	qp = container_of(frag, struct ipq, q);
+ 	net = container_of(qp->q.net, struct net, ipv4.frags);
+ 
+ 	rcu_read_lock();
+diff --git a/net/ipv6/netfilter/nf_conntrack_reasm.c b/net/ipv6/netfilter/nf_conntrack_reasm.c
+index 7ea2b4490672..bc776ef392ea 100644
+--- a/net/ipv6/netfilter/nf_conntrack_reasm.c
++++ b/net/ipv6/netfilter/nf_conntrack_reasm.c
+@@ -169,12 +169,13 @@ static unsigned int nf_hashfn(const struct inet_frag_queue *q)
+ 	return nf_hash_frag(nq->id, &nq->saddr, &nq->daddr);
+ }
+ 
+-static void nf_ct_frag6_expire(unsigned long data)
++static void nf_ct_frag6_expire(struct timer_list *t)
+ {
++	struct inet_frag_queue *frag = from_timer(frag, t, timer);
+ 	struct frag_queue *fq;
+ 	struct net *net;
+ 
+-	fq = container_of((struct inet_frag_queue *)data, struct frag_queue, q);
++	fq = container_of(frag, struct frag_queue, q);
+ 	net = container_of(fq->q.net, struct net, nf_frag.frags);
+ 
+ 	ip6_expire_frag_queue(net, fq);
+diff --git a/net/ipv6/reassembly.c b/net/ipv6/reassembly.c
+index 26f737c3fc7b..b85ef051b75c 100644
+--- a/net/ipv6/reassembly.c
++++ b/net/ipv6/reassembly.c
+@@ -169,12 +169,13 @@ void ip6_expire_frag_queue(struct net *net, struct frag_queue *fq)
+ }
+ EXPORT_SYMBOL(ip6_expire_frag_queue);
+ 
+-static void ip6_frag_expire(unsigned long data)
++static void ip6_frag_expire(struct timer_list *t)
+ {
++	struct inet_frag_queue *frag = from_timer(frag, t, timer);
+ 	struct frag_queue *fq;
+ 	struct net *net;
+ 
+-	fq = container_of((struct inet_frag_queue *)data, struct frag_queue, q);
++	fq = container_of(frag, struct frag_queue, q);
+ 	net = container_of(fq->q.net, struct net, ipv6.frags);
+ 
+ 	ip6_expire_frag_queue(net, fq);
+-- 
+2.18.0
