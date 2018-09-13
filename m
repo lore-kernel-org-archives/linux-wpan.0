@@ -1,20 +1,20 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-pl1-f196.google.com ([209.85.214.196]:41924 "EHLO
-        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726879AbeILVmY (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 12 Sep 2018 17:42:24 -0400
-Received: by mail-pl1-f196.google.com with SMTP id b12-v6so1235281plr.8
-        for <linux-wpan@vger.kernel.org>; Wed, 12 Sep 2018 09:37:04 -0700 (PDT)
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:42117 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728257AbeIMUJJ (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 13 Sep 2018 16:09:09 -0400
+Received: by mail-pg1-f193.google.com with SMTP id y4-v6so2868559pgp.9
+        for <linux-wpan@vger.kernel.org>; Thu, 13 Sep 2018 07:59:16 -0700 (PDT)
 From: Stephen Hemminger <stephen@networkplumber.org>
-Subject: [PATCH v2 04/30] inet: frags: Convert timers to use timer_setup()
-Date: Wed, 12 Sep 2018 09:36:22 -0700
-Message-Id: <20180912163648.17611-5-sthemmin@microsoft.com>
-In-Reply-To: <20180912163648.17611-1-sthemmin@microsoft.com>
-References: <20180912163648.17611-1-sthemmin@microsoft.com>
+Subject: [PATCH v3 04/30] inet: frags: Convert timers to use timer_setup()
+Date: Thu, 13 Sep 2018 07:58:36 -0700
+Message-Id: <20180913145902.17531-5-sthemmin@microsoft.com>
+In-Reply-To: <20180913145902.17531-1-sthemmin@microsoft.com>
+References: <20180913145902.17531-1-sthemmin@microsoft.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: davem@davemloft.net, gregkh@linuxfoundation.org
-Cc: edumazet@google.com, Kees Cook <keescook@chromium.org>, Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt <stefan@osg.samsung.com>, Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>, Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>, Pablo Neira Ayuso <pablo@netfilter.org>, Jozsef Kadlecsik <kadlec@blackhole.kfki.hu>, Florian Westphal <fw@strlen.de>, linux-wpan@vger.kernel.org, netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, coreteam@netfilter.org
+Cc: netdev@vger.kernel.org, stable@vger.kernel.org, edumazet@google.com, Kees Cook <keescook@chromium.org>, Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt <stefan@osg.samsung.com>, Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>, Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>, Pablo Neira Ayuso <pablo@netfilter.org>, Jozsef Kadlecsik <kadlec@blackhole.kfki.hu>, Florian Westphal <fw@strlen.de>, linux-wpan@vger.kernel.org, netfilter-devel@vger.kernel.org, coreteam@netfilter.org
 
 From: Kees Cook <keescook@chromium.org>
 
