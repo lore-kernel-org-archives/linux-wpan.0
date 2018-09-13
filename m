@@ -1,120 +1,94 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:42047 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730651AbeISHqg (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 19 Sep 2018 03:46:36 -0400
-Received: by mail-pg1-f196.google.com with SMTP id y4-v6so1933312pgp.9
-        for <linux-wpan@vger.kernel.org>; Tue, 18 Sep 2018 19:11:08 -0700 (PDT)
-From: Kees Cook <keescook@chromium.org>
-Subject: [PATCH crypto-next 04/23] mac802154: Remove VLA usage of skcipher
-Date: Tue, 18 Sep 2018 19:10:41 -0700
-Message-Id: <20180919021100.3380-5-keescook@chromium.org>
-In-Reply-To: <20180919021100.3380-1-keescook@chromium.org>
-References: <20180919021100.3380-1-keescook@chromium.org>
+Received: from mail-qt0-f194.google.com ([209.85.216.194]:44269 "EHLO
+        mail-qt0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726741AbeIMRhk (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 13 Sep 2018 13:37:40 -0400
+MIME-Version: 1.0
+References: <20180829130308.3504560-1-arnd@arndb.de>
+In-Reply-To: <20180829130308.3504560-1-arnd@arndb.de>
+From: Arnd Bergmann <arnd@arndb.de>
+Date: Thu, 13 Sep 2018 14:28:08 +0200
+Message-ID: <CAK8P3a038aDQQotzua_QtKGhq8O9n+rdiz2=WDCp82ys8eUT+A@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/3] net: rework SIOCGSTAMP ioctl handling
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Kees Cook <keescook@chromium.org>, Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt <stefan@datenfreihafen.org>, linux-wpan@vger.kernel.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Eric Biggers <ebiggers@google.com>, linux-crypto <linux-crypto@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Networking <netdev@vger.kernel.org>, David Miller <davem@davemloft.net>
+Cc: linux-arch <linux-arch@vger.kernel.org>, y2038 Mailman List <y2038@lists.linaro.org>, Eric Dumazet <edumazet@google.com>, Willem de Bruijn <willemb@google.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-hams@vger.kernel.org, Bluez mailing list <linux-bluetooth@vger.kernel.org>, linux-can@vger.kernel.org, dccp@vger.kernel.org, linux-wpan@vger.kernel.org, linux-sctp@vger.kernel.org, linux-x25@vger.kernel.org
 
-In the quest to remove all stack VLA usage from the kernel[1], this
-replaces struct crypto_skcipher and SKCIPHER_REQUEST_ON_STACK() usage
-with struct crypto_sync_skcipher and SYNC_SKCIPHER_REQUEST_ON_STACK(),
-which uses a fixed stack size.
+On Wed, Aug 29, 2018 at 3:03 PM Arnd Bergmann <arnd@arndb.de> wrote:
 
-[1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
+> diff --git a/net/core/sock.c b/net/core/sock.c
+> index 3730eb855095..df17bbfaca27 100644
+> --- a/net/core/sock.c
+> +++ b/net/core/sock.c
+> @@ -2897,37 +2897,31 @@ bool lock_sock_fast(struct sock *sk)
+>  }
+>  EXPORT_SYMBOL(lock_sock_fast);
+>
+> -int sock_get_timestamp(struct sock *sk, struct timeval __user *userstamp)
+> +int sock_gettstamp(struct socket *sock, void __user *userstamp,
+> +                  bool timeval, bool time32)
+>  {
+> -       struct timeval tv;
+> -
+> -       sock_enable_timestamp(sk, SOCK_TIMESTAMP);
+> -       tv = ktime_to_timeval(sk->sk_stamp);
+> -       if (tv.tv_sec == -1)
+> -               return -ENOENT;
+> -       if (tv.tv_sec == 0) {
+> -               sk->sk_stamp = ktime_get_real();
+> -               tv = ktime_to_timeval(sk->sk_stamp);
+> -       }
+> -       return copy_to_user(userstamp, &tv, sizeof(tv)) ? -EFAULT : 0;
+> -}
+> -EXPORT_SYMBOL(sock_get_timestamp);
 
-Cc: Alexander Aring <alex.aring@gmail.com>
-Cc: Stefan Schmidt <stefan@datenfreihafen.org>
-Cc: linux-wpan@vger.kernel.org
-Signed-off-by: Kees Cook <keescook@chromium.org>
----
- net/mac802154/llsec.c | 16 ++++++++--------
- net/mac802154/llsec.h |  2 +-
- 2 files changed, 9 insertions(+), 9 deletions(-)
+As  I just learned, sparc64 uses a 32-bit suseconds_t, so this
+function always leaked 32 bits of kernel stack data by copying
+the padding bytes of 'tv' into user space.
 
-diff --git a/net/mac802154/llsec.c b/net/mac802154/llsec.c
-index 2fb703d70803..7e29f88dbf6a 100644
---- a/net/mac802154/llsec.c
-+++ b/net/mac802154/llsec.c
-@@ -146,18 +146,18 @@ llsec_key_alloc(const struct ieee802154_llsec_key *template)
- 			goto err_tfm;
- 	}
- 
--	key->tfm0 = crypto_alloc_skcipher("ctr(aes)", 0, CRYPTO_ALG_ASYNC);
-+	key->tfm0 = crypto_alloc_sync_skcipher("ctr(aes)", 0, 0);
- 	if (IS_ERR(key->tfm0))
- 		goto err_tfm;
- 
--	if (crypto_skcipher_setkey(key->tfm0, template->key,
-+	if (crypto_sync_skcipher_setkey(key->tfm0, template->key,
- 				   IEEE802154_LLSEC_KEY_SIZE))
- 		goto err_tfm0;
- 
- 	return key;
- 
- err_tfm0:
--	crypto_free_skcipher(key->tfm0);
-+	crypto_free_sync_skcipher(key->tfm0);
- err_tfm:
- 	for (i = 0; i < ARRAY_SIZE(key->tfm); i++)
- 		if (key->tfm[i])
-@@ -177,7 +177,7 @@ static void llsec_key_release(struct kref *ref)
- 	for (i = 0; i < ARRAY_SIZE(key->tfm); i++)
- 		crypto_free_aead(key->tfm[i]);
- 
--	crypto_free_skcipher(key->tfm0);
-+	crypto_free_sync_skcipher(key->tfm0);
- 	kzfree(key);
- }
- 
-@@ -622,7 +622,7 @@ llsec_do_encrypt_unauth(struct sk_buff *skb, const struct mac802154_llsec *sec,
- {
- 	u8 iv[16];
- 	struct scatterlist src;
--	SKCIPHER_REQUEST_ON_STACK(req, key->tfm0);
-+	SYNC_SKCIPHER_REQUEST_ON_STACK(req, key->tfm0);
- 	int err, datalen;
- 	unsigned char *data;
- 
-@@ -632,7 +632,7 @@ llsec_do_encrypt_unauth(struct sk_buff *skb, const struct mac802154_llsec *sec,
- 	datalen = skb_tail_pointer(skb) - data;
- 	sg_init_one(&src, data, datalen);
- 
--	skcipher_request_set_tfm(req, key->tfm0);
-+	skcipher_request_set_sync_tfm(req, key->tfm0);
- 	skcipher_request_set_callback(req, 0, NULL, NULL);
- 	skcipher_request_set_crypt(req, &src, &src, datalen, iv);
- 	err = crypto_skcipher_encrypt(req);
-@@ -840,7 +840,7 @@ llsec_do_decrypt_unauth(struct sk_buff *skb, const struct mac802154_llsec *sec,
- 	unsigned char *data;
- 	int datalen;
- 	struct scatterlist src;
--	SKCIPHER_REQUEST_ON_STACK(req, key->tfm0);
-+	SYNC_SKCIPHER_REQUEST_ON_STACK(req, key->tfm0);
- 	int err;
- 
- 	llsec_geniv(iv, dev_addr, &hdr->sec);
-@@ -849,7 +849,7 @@ llsec_do_decrypt_unauth(struct sk_buff *skb, const struct mac802154_llsec *sec,
- 
- 	sg_init_one(&src, data, datalen);
- 
--	skcipher_request_set_tfm(req, key->tfm0);
-+	skcipher_request_set_sync_tfm(req, key->tfm0);
- 	skcipher_request_set_callback(req, 0, NULL, NULL);
- 	skcipher_request_set_crypt(req, &src, &src, datalen, iv);
- 
-diff --git a/net/mac802154/llsec.h b/net/mac802154/llsec.h
-index 6f3b658e3279..8be46d74dc39 100644
---- a/net/mac802154/llsec.h
-+++ b/net/mac802154/llsec.h
-@@ -29,7 +29,7 @@ struct mac802154_llsec_key {
- 
- 	/* one tfm for each authsize (4/8/16) */
- 	struct crypto_aead *tfm[3];
--	struct crypto_skcipher *tfm0;
-+	struct crypto_sync_skcipher *tfm0;
- 
- 	struct kref ref;
- };
--- 
-2.17.1
+Linux-4.11 and higher could avoid that with
+CONFIG_GCC_PLUGIN_STRUCTLEAK, but older kernels
+have been affected since socket timestamps were first added.
+
+The same thing is probably true of many other interfaces
+that pass a timeval.
+
+> -int sock_get_timestampns(struct sock *sk, struct timespec __user *userstamp)
+> -{
+> -       struct timespec ts;
+> +       struct sock *sk = sock->sk;
+> +       struct timespec64 ts;
+>
+>         sock_enable_timestamp(sk, SOCK_TIMESTAMP);
+> -       ts = ktime_to_timespec(sk->sk_stamp);
+> +       ts = ktime_to_timespec64(sk->sk_stamp);
+>         if (ts.tv_sec == -1)
+>                 return -ENOENT;
+>         if (ts.tv_sec == 0) {
+>                 sk->sk_stamp = ktime_get_real();
+> -               ts = ktime_to_timespec(sk->sk_stamp);
+> +               ts = ktime_to_timespec64(sk->sk_stamp);
+>         }
+> -       return copy_to_user(userstamp, &ts, sizeof(ts)) ? -EFAULT : 0;
+> +
+> +       if (timeval)
+> +               ts.tv_nsec /= 1000;
+> +#ifdef CONFIG_COMPAT_32BIT_TIME
+> +       if (time32)
+> +               return put_old_timespec32(&ts, userstamp);
+> +#endif
+> +
+> +       return put_timespec64(&ts, userstamp);
+>  }
+
+My new implementation is worse here: it no longer leaks stack
+data, but since we now write a big-endian 64-bit microseconds
+value, the microseconds are in the wrong place and will
+be interpreted as zero by user space...
+
+I'll also have to revisit a few other similar patches I did for
+y2038, to figure out what they should do on sparc64.
+
+         Arnd
