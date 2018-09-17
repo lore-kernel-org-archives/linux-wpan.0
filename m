@@ -1,20 +1,25 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:42117 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728257AbeIMUJJ (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 13 Sep 2018 16:09:09 -0400
-Received: by mail-pg1-f193.google.com with SMTP id y4-v6so2868559pgp.9
-        for <linux-wpan@vger.kernel.org>; Thu, 13 Sep 2018 07:59:16 -0700 (PDT)
-From: Stephen Hemminger <stephen@networkplumber.org>
-Subject: [PATCH v3 04/30] inet: frags: Convert timers to use timer_setup()
-Date: Thu, 13 Sep 2018 07:58:36 -0700
-Message-Id: <20180913145902.17531-5-sthemmin@microsoft.com>
-In-Reply-To: <20180913145902.17531-1-sthemmin@microsoft.com>
-References: <20180913145902.17531-1-sthemmin@microsoft.com>
+Received: from mail.linuxfoundation.org ([140.211.169.12]:49180 "EHLO
+        mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727202AbeIREeK (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 18 Sep 2018 00:34:10 -0400
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: [PATCH 4.14 095/126] inet: frags: Convert timers to use timer_setup()
+Date: Tue, 18 Sep 2018 00:42:23 +0200
+Message-Id: <20180917211710.179209058@linuxfoundation.org>
+In-Reply-To: <20180917211703.481236999@linuxfoundation.org>
+References: <20180917211703.481236999@linuxfoundation.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: davem@davemloft.net, gregkh@linuxfoundation.org
-Cc: netdev@vger.kernel.org, stable@vger.kernel.org, edumazet@google.com, Kees Cook <keescook@chromium.org>, Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt <stefan@osg.samsung.com>, Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>, Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>, Pablo Neira Ayuso <pablo@netfilter.org>, Jozsef Kadlecsik <kadlec@blackhole.kfki.hu>, Florian Westphal <fw@strlen.de>, linux-wpan@vger.kernel.org, netfilter-devel@vger.kernel.org, coreteam@netfilter.org
+To: linux-kernel@vger.kernel.org
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, stable@vger.kernel.org, Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt <stefan@osg.samsung.com>, "David S. Miller" <davem@davemloft.net>, Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>, Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>, Pablo Neira Ayuso <pablo@netfilter.org>, Jozsef Kadlecsik <kadlec@blackhole.kfki.hu>, Florian Westphal <fw@strlen.de>, linux-wpan@vger.kernel.org, netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, coreteam@netfilter.org, Kees Cook <keescook@chromium.org>
+
+4.14-stable review patch.  If anyone has any objections, please let me know.
+
+------------------
 
 From: Kees Cook <keescook@chromium.org>
 
@@ -38,17 +43,16 @@ Signed-off-by: Kees Cook <keescook@chromium.org>
 Acked-by: Stefan Schmidt <stefan@osg.samsung.com> # for ieee802154
 Signed-off-by: David S. Miller <davem@davemloft.net>
 (cherry picked from commit 78802011fbe34331bdef6f2dfb1634011f0e4c32)
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 ---
- include/net/inet_frag.h                 | 2 +-
- net/ieee802154/6lowpan/reassembly.c     | 5 +++--
- net/ipv4/inet_fragment.c                | 4 ++--
- net/ipv4/ip_fragment.c                  | 5 +++--
- net/ipv6/netfilter/nf_conntrack_reasm.c | 5 +++--
- net/ipv6/reassembly.c                   | 5 +++--
+ include/net/inet_frag.h                 |    2 +-
+ net/ieee802154/6lowpan/reassembly.c     |    5 +++--
+ net/ipv4/inet_fragment.c                |    4 ++--
+ net/ipv4/ip_fragment.c                  |    5 +++--
+ net/ipv6/netfilter/nf_conntrack_reasm.c |    5 +++--
+ net/ipv6/reassembly.c                   |    5 +++--
  6 files changed, 15 insertions(+), 11 deletions(-)
 
-diff --git a/include/net/inet_frag.h b/include/net/inet_frag.h
-index fd338293a095..69e531ed8189 100644
 --- a/include/net/inet_frag.h
 +++ b/include/net/inet_frag.h
 @@ -97,7 +97,7 @@ struct inet_frags {
@@ -60,11 +64,9 @@ index fd338293a095..69e531ed8189 100644
  	struct kmem_cache	*frags_cachep;
  	const char		*frags_cache_name;
  };
-diff --git a/net/ieee802154/6lowpan/reassembly.c b/net/ieee802154/6lowpan/reassembly.c
-index 9ccb8458b5c3..6badc055555b 100644
 --- a/net/ieee802154/6lowpan/reassembly.c
 +++ b/net/ieee802154/6lowpan/reassembly.c
-@@ -80,12 +80,13 @@ static void lowpan_frag_init(struct inet_frag_queue *q, const void *a)
+@@ -80,12 +80,13 @@ static void lowpan_frag_init(struct inet
  	fq->daddr = *arg->dst;
  }
  
@@ -80,11 +82,9 @@ index 9ccb8458b5c3..6badc055555b 100644
  	net = container_of(fq->q.net, struct net, ieee802154_lowpan.frags);
  
  	spin_lock(&fq->q.lock);
-diff --git a/net/ipv4/inet_fragment.c b/net/ipv4/inet_fragment.c
-index 4b44f973c37f..97e747b1e9a0 100644
 --- a/net/ipv4/inet_fragment.c
 +++ b/net/ipv4/inet_fragment.c
-@@ -150,7 +150,7 @@ inet_evict_bucket(struct inet_frags *f, struct inet_frag_bucket *hb)
+@@ -150,7 +150,7 @@ inet_evict_bucket(struct inet_frags *f,
  	spin_unlock(&hb->chain_lock);
  
  	hlist_for_each_entry_safe(fq, n, &expired, list_evictor)
@@ -93,7 +93,7 @@ index 4b44f973c37f..97e747b1e9a0 100644
  
  	return evicted;
  }
-@@ -367,7 +367,7 @@ static struct inet_frag_queue *inet_frag_alloc(struct netns_frags *nf,
+@@ -367,7 +367,7 @@ static struct inet_frag_queue *inet_frag
  	f->constructor(q, arg);
  	add_frag_mem_limit(nf, f->qsize);
  
@@ -102,11 +102,9 @@ index 4b44f973c37f..97e747b1e9a0 100644
  	spin_lock_init(&q->lock);
  	refcount_set(&q->refcnt, 1);
  
-diff --git a/net/ipv4/ip_fragment.c b/net/ipv4/ip_fragment.c
-index 9d0b08c8ee00..5171c8cc0eb6 100644
 --- a/net/ipv4/ip_fragment.c
 +++ b/net/ipv4/ip_fragment.c
-@@ -191,12 +191,13 @@ static bool frag_expire_skip_icmp(u32 user)
+@@ -191,12 +191,13 @@ static bool frag_expire_skip_icmp(u32 us
  /*
   * Oops, a fragment queue timed out.  Kill it and send an ICMP reply.
   */
@@ -122,11 +120,9 @@ index 9d0b08c8ee00..5171c8cc0eb6 100644
  	net = container_of(qp->q.net, struct net, ipv4.frags);
  
  	rcu_read_lock();
-diff --git a/net/ipv6/netfilter/nf_conntrack_reasm.c b/net/ipv6/netfilter/nf_conntrack_reasm.c
-index 7ea2b4490672..bc776ef392ea 100644
 --- a/net/ipv6/netfilter/nf_conntrack_reasm.c
 +++ b/net/ipv6/netfilter/nf_conntrack_reasm.c
-@@ -169,12 +169,13 @@ static unsigned int nf_hashfn(const struct inet_frag_queue *q)
+@@ -169,12 +169,13 @@ static unsigned int nf_hashfn(const stru
  	return nf_hash_frag(nq->id, &nq->saddr, &nq->daddr);
  }
  
@@ -142,11 +138,9 @@ index 7ea2b4490672..bc776ef392ea 100644
  	net = container_of(fq->q.net, struct net, nf_frag.frags);
  
  	ip6_expire_frag_queue(net, fq);
-diff --git a/net/ipv6/reassembly.c b/net/ipv6/reassembly.c
-index 26f737c3fc7b..b85ef051b75c 100644
 --- a/net/ipv6/reassembly.c
 +++ b/net/ipv6/reassembly.c
-@@ -169,12 +169,13 @@ void ip6_expire_frag_queue(struct net *net, struct frag_queue *fq)
+@@ -169,12 +169,13 @@ out:
  }
  EXPORT_SYMBOL(ip6_expire_frag_queue);
  
@@ -162,5 +156,3 @@ index 26f737c3fc7b..b85ef051b75c 100644
  	net = container_of(fq->q.net, struct net, ipv6.frags);
  
  	ip6_expire_frag_queue(net, fq);
--- 
-2.18.0
