@@ -1,158 +1,120 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail.linuxfoundation.org ([140.211.169.12]:49180 "EHLO
-        mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727202AbeIREeK (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 18 Sep 2018 00:34:10 -0400
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: [PATCH 4.14 095/126] inet: frags: Convert timers to use timer_setup()
-Date: Tue, 18 Sep 2018 00:42:23 +0200
-Message-Id: <20180917211710.179209058@linuxfoundation.org>
-In-Reply-To: <20180917211703.481236999@linuxfoundation.org>
-References: <20180917211703.481236999@linuxfoundation.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:42047 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730651AbeISHqg (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 19 Sep 2018 03:46:36 -0400
+Received: by mail-pg1-f196.google.com with SMTP id y4-v6so1933312pgp.9
+        for <linux-wpan@vger.kernel.org>; Tue, 18 Sep 2018 19:11:08 -0700 (PDT)
+From: Kees Cook <keescook@chromium.org>
+Subject: [PATCH crypto-next 04/23] mac802154: Remove VLA usage of skcipher
+Date: Tue, 18 Sep 2018 19:10:41 -0700
+Message-Id: <20180919021100.3380-5-keescook@chromium.org>
+In-Reply-To: <20180919021100.3380-1-keescook@chromium.org>
+References: <20180919021100.3380-1-keescook@chromium.org>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, stable@vger.kernel.org, Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt <stefan@osg.samsung.com>, "David S. Miller" <davem@davemloft.net>, Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>, Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>, Pablo Neira Ayuso <pablo@netfilter.org>, Jozsef Kadlecsik <kadlec@blackhole.kfki.hu>, Florian Westphal <fw@strlen.de>, linux-wpan@vger.kernel.org, netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, coreteam@netfilter.org, Kees Cook <keescook@chromium.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Kees Cook <keescook@chromium.org>, Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt <stefan@datenfreihafen.org>, linux-wpan@vger.kernel.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Eric Biggers <ebiggers@google.com>, linux-crypto <linux-crypto@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-4.14-stable review patch.  If anyone has any objections, please let me know.
+In the quest to remove all stack VLA usage from the kernel[1], this
+replaces struct crypto_skcipher and SKCIPHER_REQUEST_ON_STACK() usage
+with struct crypto_sync_skcipher and SYNC_SKCIPHER_REQUEST_ON_STACK(),
+which uses a fixed stack size.
 
-------------------
-
-From: Kees Cook <keescook@chromium.org>
-
-In preparation for unconditionally passing the struct timer_list pointer to
-all timer callbacks, switch to using the new timer_setup() and from_timer()
-to pass the timer pointer explicitly.
+[1] https://lkml.kernel.org/r/CA+55aFzCG-zNmZwX4A2FQpadafLfEzK6CC=qPXydAacU1RqZWA@mail.gmail.com
 
 Cc: Alexander Aring <alex.aring@gmail.com>
-Cc: Stefan Schmidt <stefan@osg.samsung.com>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>
-Cc: Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: Jozsef Kadlecsik <kadlec@blackhole.kfki.hu>
-Cc: Florian Westphal <fw@strlen.de>
+Cc: Stefan Schmidt <stefan@datenfreihafen.org>
 Cc: linux-wpan@vger.kernel.org
-Cc: netdev@vger.kernel.org
-Cc: netfilter-devel@vger.kernel.org
-Cc: coreteam@netfilter.org
 Signed-off-by: Kees Cook <keescook@chromium.org>
-Acked-by: Stefan Schmidt <stefan@osg.samsung.com> # for ieee802154
-Signed-off-by: David S. Miller <davem@davemloft.net>
-(cherry picked from commit 78802011fbe34331bdef6f2dfb1634011f0e4c32)
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 ---
- include/net/inet_frag.h                 |    2 +-
- net/ieee802154/6lowpan/reassembly.c     |    5 +++--
- net/ipv4/inet_fragment.c                |    4 ++--
- net/ipv4/ip_fragment.c                  |    5 +++--
- net/ipv6/netfilter/nf_conntrack_reasm.c |    5 +++--
- net/ipv6/reassembly.c                   |    5 +++--
- 6 files changed, 15 insertions(+), 11 deletions(-)
+ net/mac802154/llsec.c | 16 ++++++++--------
+ net/mac802154/llsec.h |  2 +-
+ 2 files changed, 9 insertions(+), 9 deletions(-)
 
---- a/include/net/inet_frag.h
-+++ b/include/net/inet_frag.h
-@@ -97,7 +97,7 @@ struct inet_frags {
- 	void			(*constructor)(struct inet_frag_queue *q,
- 					       const void *arg);
- 	void			(*destructor)(struct inet_frag_queue *);
--	void			(*frag_expire)(unsigned long data);
-+	void			(*frag_expire)(struct timer_list *t);
- 	struct kmem_cache	*frags_cachep;
- 	const char		*frags_cache_name;
+diff --git a/net/mac802154/llsec.c b/net/mac802154/llsec.c
+index 2fb703d70803..7e29f88dbf6a 100644
+--- a/net/mac802154/llsec.c
++++ b/net/mac802154/llsec.c
+@@ -146,18 +146,18 @@ llsec_key_alloc(const struct ieee802154_llsec_key *template)
+ 			goto err_tfm;
+ 	}
+ 
+-	key->tfm0 = crypto_alloc_skcipher("ctr(aes)", 0, CRYPTO_ALG_ASYNC);
++	key->tfm0 = crypto_alloc_sync_skcipher("ctr(aes)", 0, 0);
+ 	if (IS_ERR(key->tfm0))
+ 		goto err_tfm;
+ 
+-	if (crypto_skcipher_setkey(key->tfm0, template->key,
++	if (crypto_sync_skcipher_setkey(key->tfm0, template->key,
+ 				   IEEE802154_LLSEC_KEY_SIZE))
+ 		goto err_tfm0;
+ 
+ 	return key;
+ 
+ err_tfm0:
+-	crypto_free_skcipher(key->tfm0);
++	crypto_free_sync_skcipher(key->tfm0);
+ err_tfm:
+ 	for (i = 0; i < ARRAY_SIZE(key->tfm); i++)
+ 		if (key->tfm[i])
+@@ -177,7 +177,7 @@ static void llsec_key_release(struct kref *ref)
+ 	for (i = 0; i < ARRAY_SIZE(key->tfm); i++)
+ 		crypto_free_aead(key->tfm[i]);
+ 
+-	crypto_free_skcipher(key->tfm0);
++	crypto_free_sync_skcipher(key->tfm0);
+ 	kzfree(key);
+ }
+ 
+@@ -622,7 +622,7 @@ llsec_do_encrypt_unauth(struct sk_buff *skb, const struct mac802154_llsec *sec,
+ {
+ 	u8 iv[16];
+ 	struct scatterlist src;
+-	SKCIPHER_REQUEST_ON_STACK(req, key->tfm0);
++	SYNC_SKCIPHER_REQUEST_ON_STACK(req, key->tfm0);
+ 	int err, datalen;
+ 	unsigned char *data;
+ 
+@@ -632,7 +632,7 @@ llsec_do_encrypt_unauth(struct sk_buff *skb, const struct mac802154_llsec *sec,
+ 	datalen = skb_tail_pointer(skb) - data;
+ 	sg_init_one(&src, data, datalen);
+ 
+-	skcipher_request_set_tfm(req, key->tfm0);
++	skcipher_request_set_sync_tfm(req, key->tfm0);
+ 	skcipher_request_set_callback(req, 0, NULL, NULL);
+ 	skcipher_request_set_crypt(req, &src, &src, datalen, iv);
+ 	err = crypto_skcipher_encrypt(req);
+@@ -840,7 +840,7 @@ llsec_do_decrypt_unauth(struct sk_buff *skb, const struct mac802154_llsec *sec,
+ 	unsigned char *data;
+ 	int datalen;
+ 	struct scatterlist src;
+-	SKCIPHER_REQUEST_ON_STACK(req, key->tfm0);
++	SYNC_SKCIPHER_REQUEST_ON_STACK(req, key->tfm0);
+ 	int err;
+ 
+ 	llsec_geniv(iv, dev_addr, &hdr->sec);
+@@ -849,7 +849,7 @@ llsec_do_decrypt_unauth(struct sk_buff *skb, const struct mac802154_llsec *sec,
+ 
+ 	sg_init_one(&src, data, datalen);
+ 
+-	skcipher_request_set_tfm(req, key->tfm0);
++	skcipher_request_set_sync_tfm(req, key->tfm0);
+ 	skcipher_request_set_callback(req, 0, NULL, NULL);
+ 	skcipher_request_set_crypt(req, &src, &src, datalen, iv);
+ 
+diff --git a/net/mac802154/llsec.h b/net/mac802154/llsec.h
+index 6f3b658e3279..8be46d74dc39 100644
+--- a/net/mac802154/llsec.h
++++ b/net/mac802154/llsec.h
+@@ -29,7 +29,7 @@ struct mac802154_llsec_key {
+ 
+ 	/* one tfm for each authsize (4/8/16) */
+ 	struct crypto_aead *tfm[3];
+-	struct crypto_skcipher *tfm0;
++	struct crypto_sync_skcipher *tfm0;
+ 
+ 	struct kref ref;
  };
---- a/net/ieee802154/6lowpan/reassembly.c
-+++ b/net/ieee802154/6lowpan/reassembly.c
-@@ -80,12 +80,13 @@ static void lowpan_frag_init(struct inet
- 	fq->daddr = *arg->dst;
- }
- 
--static void lowpan_frag_expire(unsigned long data)
-+static void lowpan_frag_expire(struct timer_list *t)
- {
-+	struct inet_frag_queue *frag = from_timer(frag, t, timer);
- 	struct frag_queue *fq;
- 	struct net *net;
- 
--	fq = container_of((struct inet_frag_queue *)data, struct frag_queue, q);
-+	fq = container_of(frag, struct frag_queue, q);
- 	net = container_of(fq->q.net, struct net, ieee802154_lowpan.frags);
- 
- 	spin_lock(&fq->q.lock);
---- a/net/ipv4/inet_fragment.c
-+++ b/net/ipv4/inet_fragment.c
-@@ -150,7 +150,7 @@ inet_evict_bucket(struct inet_frags *f,
- 	spin_unlock(&hb->chain_lock);
- 
- 	hlist_for_each_entry_safe(fq, n, &expired, list_evictor)
--		f->frag_expire((unsigned long) fq);
-+		f->frag_expire(&fq->timer);
- 
- 	return evicted;
- }
-@@ -367,7 +367,7 @@ static struct inet_frag_queue *inet_frag
- 	f->constructor(q, arg);
- 	add_frag_mem_limit(nf, f->qsize);
- 
--	setup_timer(&q->timer, f->frag_expire, (unsigned long)q);
-+	timer_setup(&q->timer, f->frag_expire, 0);
- 	spin_lock_init(&q->lock);
- 	refcount_set(&q->refcnt, 1);
- 
---- a/net/ipv4/ip_fragment.c
-+++ b/net/ipv4/ip_fragment.c
-@@ -191,12 +191,13 @@ static bool frag_expire_skip_icmp(u32 us
- /*
-  * Oops, a fragment queue timed out.  Kill it and send an ICMP reply.
-  */
--static void ip_expire(unsigned long arg)
-+static void ip_expire(struct timer_list *t)
- {
-+	struct inet_frag_queue *frag = from_timer(frag, t, timer);
- 	struct ipq *qp;
- 	struct net *net;
- 
--	qp = container_of((struct inet_frag_queue *) arg, struct ipq, q);
-+	qp = container_of(frag, struct ipq, q);
- 	net = container_of(qp->q.net, struct net, ipv4.frags);
- 
- 	rcu_read_lock();
---- a/net/ipv6/netfilter/nf_conntrack_reasm.c
-+++ b/net/ipv6/netfilter/nf_conntrack_reasm.c
-@@ -169,12 +169,13 @@ static unsigned int nf_hashfn(const stru
- 	return nf_hash_frag(nq->id, &nq->saddr, &nq->daddr);
- }
- 
--static void nf_ct_frag6_expire(unsigned long data)
-+static void nf_ct_frag6_expire(struct timer_list *t)
- {
-+	struct inet_frag_queue *frag = from_timer(frag, t, timer);
- 	struct frag_queue *fq;
- 	struct net *net;
- 
--	fq = container_of((struct inet_frag_queue *)data, struct frag_queue, q);
-+	fq = container_of(frag, struct frag_queue, q);
- 	net = container_of(fq->q.net, struct net, nf_frag.frags);
- 
- 	ip6_expire_frag_queue(net, fq);
---- a/net/ipv6/reassembly.c
-+++ b/net/ipv6/reassembly.c
-@@ -169,12 +169,13 @@ out:
- }
- EXPORT_SYMBOL(ip6_expire_frag_queue);
- 
--static void ip6_frag_expire(unsigned long data)
-+static void ip6_frag_expire(struct timer_list *t)
- {
-+	struct inet_frag_queue *frag = from_timer(frag, t, timer);
- 	struct frag_queue *fq;
- 	struct net *net;
- 
--	fq = container_of((struct inet_frag_queue *)data, struct frag_queue, q);
-+	fq = container_of(frag, struct frag_queue, q);
- 	net = container_of(fq->q.net, struct net, ipv6.frags);
- 
- 	ip6_expire_frag_queue(net, fq);
+-- 
+2.17.1
