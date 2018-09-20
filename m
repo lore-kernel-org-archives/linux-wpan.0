@@ -1,71 +1,101 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-it0-f46.google.com ([209.85.214.46]:39317 "EHLO
-        mail-it0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727649AbeIJUBa (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 10 Sep 2018 16:01:30 -0400
-Received: by mail-it0-f46.google.com with SMTP id h1-v6so29087658itj.4
-        for <linux-wpan@vger.kernel.org>; Mon, 10 Sep 2018 08:06:58 -0700 (PDT)
-Date: Mon, 10 Sep 2018 11:06:47 -0400
-From: Alexander Aring <aring@mojatatu.com>
-Subject: Re: about openthread and 6lowpan
-Message-ID: <20180910150647.dcwoyslxrusvcj7j@x220t>
+Received: from mail-sg2apc01on0128.outbound.protection.outlook.com ([104.47.125.128]:26944
+        "EHLO APC01-SG2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1731260AbeITLso (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+        Thu, 20 Sep 2018 07:48:44 -0400
+From: Sujay G <sujay.g@hcl.com>
+Subject: RE: about openthread and 6lowpan
+Date: Thu, 20 Sep 2018 06:06:43 +0000
+Message-ID: <SG2PR04MB3158C4FE1DDE26E663803449EF130@SG2PR04MB3158.apcprd04.prod.outlook.com>
 References: <SG2PR04MB31586E124C6C9A919150F826EF000@SG2PR04MB3158.apcprd04.prod.outlook.com>
  <SG2PR04MB3158366EFF8CBC241C84FFD5EF060@SG2PR04MB3158.apcprd04.prod.outlook.com>
  <SG2PR04MB315811F19F2A13136294C6A9EF060@SG2PR04MB3158.apcprd04.prod.outlook.com>
- <3503.1536526189@localhost>
+ <3503.1536526189@localhost> <20180910150647.dcwoyslxrusvcj7j@x220t>
+In-Reply-To: <20180910150647.dcwoyslxrusvcj7j@x220t>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <3503.1536526189@localhost>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Michael Richardson <mcr@sandelman.ca>
-Cc: Sujay G <sujay.g@hcl.com>, "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>
+To: Alexander Aring <aring@mojatatu.com>, Michael Richardson <mcr@sandelman.ca>
+Cc: "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>
 
-Hi,
-
-On Sun, Sep 09, 2018 at 04:49:49PM -0400, Michael Richardson wrote:
-> 
-> Sujay G <sujay.g@hcl.com> wrote:
->     > I have been testing openThread on Docker. I wanted to use 6Lowpan with
->     > openthread.  I assumed openThread would interact with wpan interfaces
->     > and added wpan interfaces in container namespace but it did not work.
-> 
->     > Then I came across change for 6Lowpan.  Comparison yielded changes in 7
->     > files vs the latest openThread repositiry
->     > github.com/openthread/openthread/compare/master...linux-wpan:af802154
-> 
-> Why are you asking the linux-wpan ML about openthread patches? :-)
-> 
-
-it's okay.
-
-> Alex did some patches to make openthread work better with the virtual
-> interfaces... it's up to the openthread people to adopt them or not.
-> 
-
-What is does is to run openthread as somewhat "user space stack" with
-limited functionality on monitor interfaces. It's good for debugging.
-
-"limited functionality" is e.g. not ack handling, every frame get to
-userspace... it's a pain to run productive I think.
-
-I worried, here was somebody who said "it just works for him on node
-interfaces", but in this case the kernel run filtering... I am worried
-that people using it in this way and don't know what they do.
-
->     > I manually merged the files and am trying to resolve the errors.
-> 
->     > Had few queries regarding the openThread and 6Lowpan
-> 
->     > Why was the project (af802154) abandoned ?  Was openThread working with
->     > the above 6Lowpan changes ?  Does the current openThread stack support
->     > 6Lowpan ? any configuration needs to be enabled ?  or is it the right
->     > way to port the af802154 to current implementation of openthread ?
-> 
-> You could rebase it, and maybe you have more influence with the
-> openthread people than we do.
-
-agree.
-
-- Alex
+QWxleCwNCg0KSSAgd2FzIGFibGUgdG8gcG9ydCB5b3VyIGNoYW5nZXMgdG8gbGF0ZXN0IG9wZW4g
+dGhyZWFkICBzdWNjZXNzZnVsbHkuDQpJIGZvbGxvd2VkIHRoZSBwcm9jZWR1cmUgaW4gaHR0cDov
+L3d3dy5zcGluaWNzLm5ldC9saXN0cy9saW51eC13cGFuL21zZzA0MTY3Lmh0bWwgIHRvIGJyaW5n
+IHVwIE9wZW4gVGhyZWFkICBub2RlcyBidXQgdGhlIG5vZGVzIHdlcmUgbm90IGFibGUgdG8gY29t
+bXVuaWNhdGUgd2l0aCBlYWNoIG90aGVyLg0KQ2FuIHlvdSBwcm92aWRlIHNvbWUgcG9pbnRlcnMg
+b24gIEhvdyB0byAgY29ubmVjdCB0aGUgUEhZJ3MgPw0KSSBoYXZlIGxvb2tlZCBhdCBodHRwczov
+L2dpdGh1Yi5jb20vUklPVC1PUy9SSU9UL3B1bGwvNTU4MiAgYnV0IG5vdCBjbGVhciAgb24gaG93
+IHRvIGNvbm5lY3QgdGhlIFBIWSdzIHVzaW5nIFJJT1QuDQogQ2FuIHlvdSBwbGVhc2Ugc2hhcmUg
+cHJvY2VkdXJlIHRvIGVzdGFibGlzaCBjb21tdW5pY2F0aW9uIGJldHdlZW4gUEhZIHVzaW5nIFJJ
+T1Q/DQoNCg0KLVN1amF5DQoNCi0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQpGcm9tOiBsaW51
+eC13cGFuLW93bmVyQHZnZXIua2VybmVsLm9yZyBbbWFpbHRvOmxpbnV4LXdwYW4tb3duZXJAdmdl
+ci5rZXJuZWwub3JnXSBPbiBCZWhhbGYgT2YgQWxleGFuZGVyIEFyaW5nDQpTZW50OiBNb25kYXks
+IFNlcHRlbWJlciAxMCwgMjAxOCA4OjM3IFBNDQpUbzogTWljaGFlbCBSaWNoYXJkc29uIDxtY3JA
+c2FuZGVsbWFuLmNhPg0KQ2M6IFN1amF5IEcgPHN1amF5LmdAaGNsLmNvbT47IGxpbnV4LXdwYW5A
+dmdlci5rZXJuZWwub3JnDQpTdWJqZWN0OiBSZTogYWJvdXQgb3BlbnRocmVhZCBhbmQgNmxvd3Bh
+bg0KDQpIaSwNCg0KT24gU3VuLCBTZXAgMDksIDIwMTggYXQgMDQ6NDk6NDlQTSAtMDQwMCwgTWlj
+aGFlbCBSaWNoYXJkc29uIHdyb3RlOg0KPg0KPiBTdWpheSBHIDxtYWlsdG86c3VqYXkuZ0BoY2wu
+Y29tPiB3cm90ZToNCj4gICAgID4gSSBoYXZlIGJlZW4gdGVzdGluZyBvcGVuVGhyZWFkIG9uIERv
+Y2tlci4gSSB3YW50ZWQgdG8gdXNlIDZMb3dwYW4gd2l0aA0KPiAgICAgPiBvcGVudGhyZWFkLiAg
+SSBhc3N1bWVkIG9wZW5UaHJlYWQgd291bGQgaW50ZXJhY3Qgd2l0aCB3cGFuIGludGVyZmFjZXMN
+Cj4gICAgID4gYW5kIGFkZGVkIHdwYW4gaW50ZXJmYWNlcyBpbiBjb250YWluZXIgbmFtZXNwYWNl
+IGJ1dCBpdCBkaWQgbm90IHdvcmsuDQo+DQo+ICAgICA+IFRoZW4gSSBjYW1lIGFjcm9zcyBjaGFu
+Z2UgZm9yIDZMb3dwYW4uICBDb21wYXJpc29uIHlpZWxkZWQgY2hhbmdlcyBpbiA3DQo+ICAgICA+
+IGZpbGVzIHZzIHRoZSBsYXRlc3Qgb3BlblRocmVhZCByZXBvc2l0aXJ5DQo+ICAgICA+DQo+IGdp
+dGh1Yi5jb20vb3BlbnRocmVhZC9vcGVudGhyZWFkL2NvbXBhcmUvbWFzdGVyLi4ubGludXgtd3Bh
+bjphZjgwMjE1NA0KPg0KPiBXaHkgYXJlIHlvdSBhc2tpbmcgdGhlIGxpbnV4LXdwYW4gTUwgYWJv
+dXQgb3BlbnRocmVhZCBwYXRjaGVzPyA6LSkNCj4NCg0KaXQncyBva2F5Lg0KDQo+IEFsZXggZGlk
+IHNvbWUgcGF0Y2hlcyB0byBtYWtlIG9wZW50aHJlYWQgd29yayBiZXR0ZXIgd2l0aCB0aGUgdmly
+dHVhbA0KPiBpbnRlcmZhY2VzLi4uIGl0J3MgdXAgdG8gdGhlIG9wZW50aHJlYWQgcGVvcGxlIHRv
+IGFkb3B0IHRoZW0gb3Igbm90Lg0KPg0KDQpXaGF0IGlzIGRvZXMgaXMgdG8gcnVuIG9wZW50aHJl
+YWQgYXMgc29tZXdoYXQgInVzZXIgc3BhY2Ugc3RhY2siIHdpdGggbGltaXRlZCBmdW5jdGlvbmFs
+aXR5IG9uIG1vbml0b3IgaW50ZXJmYWNlcy4gSXQncyBnb29kIGZvciBkZWJ1Z2dpbmcuDQoNCiJs
+aW1pdGVkIGZ1bmN0aW9uYWxpdHkiIGlzIGUuZy4gbm90IGFjayBoYW5kbGluZywgZXZlcnkgZnJh
+bWUgZ2V0IHRvIHVzZXJzcGFjZS4uLiBpdCdzIGEgcGFpbiB0byBydW4gcHJvZHVjdGl2ZSBJIHRo
+aW5rLg0KDQpJIHdvcnJpZWQsIGhlcmUgd2FzIHNvbWVib2R5IHdobyBzYWlkICJpdCBqdXN0IHdv
+cmtzIGZvciBoaW0gb24gbm9kZSBpbnRlcmZhY2VzIiwgYnV0IGluIHRoaXMgY2FzZSB0aGUga2Vy
+bmVsIHJ1biBmaWx0ZXJpbmcuLi4gSSBhbSB3b3JyaWVkIHRoYXQgcGVvcGxlIHVzaW5nIGl0IGlu
+IHRoaXMgd2F5IGFuZCBkb24ndCBrbm93IHdoYXQgdGhleSBkby4NCg0KPiAgICAgPiBJIG1hbnVh
+bGx5IG1lcmdlZCB0aGUgZmlsZXMgYW5kIGFtIHRyeWluZyB0byByZXNvbHZlIHRoZSBlcnJvcnMu
+DQo+DQo+ICAgICA+IEhhZCBmZXcgcXVlcmllcyByZWdhcmRpbmcgdGhlIG9wZW5UaHJlYWQgYW5k
+IDZMb3dwYW4NCj4NCj4gICAgID4gV2h5IHdhcyB0aGUgcHJvamVjdCAoYWY4MDIxNTQpIGFiYW5k
+b25lZCA/ICBXYXMgb3BlblRocmVhZCB3b3JraW5nIHdpdGgNCj4gICAgID4gdGhlIGFib3ZlIDZM
+b3dwYW4gY2hhbmdlcyA/ICBEb2VzIHRoZSBjdXJyZW50IG9wZW5UaHJlYWQgc3RhY2sgc3VwcG9y
+dA0KPiAgICAgPiA2TG93cGFuID8gYW55IGNvbmZpZ3VyYXRpb24gbmVlZHMgdG8gYmUgZW5hYmxl
+ZCA/ICBvciBpcyBpdCB0aGUgcmlnaHQNCj4gICAgID4gd2F5IHRvIHBvcnQgdGhlIGFmODAyMTU0
+IHRvIGN1cnJlbnQgaW1wbGVtZW50YXRpb24gb2Ygb3BlbnRocmVhZCA/DQo+DQo+IFlvdSBjb3Vs
+ZCByZWJhc2UgaXQsIGFuZCBtYXliZSB5b3UgaGF2ZSBtb3JlIGluZmx1ZW5jZSB3aXRoIHRoZQ0K
+PiBvcGVudGhyZWFkIHBlb3BsZSB0aGFuIHdlIGRvLg0KDQphZ3JlZS4NCg0KLSBBbGV4DQo6OkRJ
+U0NMQUlNRVI6Og0KLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0NClRoZSBjb250ZW50cyBvZiB0aGlzIGUtbWFpbCBhbmQgYW55IGF0dGFjaG1lbnQocykg
+YXJlIGNvbmZpZGVudGlhbCBhbmQgaW50ZW5kZWQgZm9yIHRoZSBuYW1lZCByZWNpcGllbnQocykg
+b25seS4gRS1tYWlsIHRyYW5zbWlzc2lvbiBpcyBub3QgZ3VhcmFudGVlZCB0byBiZSBzZWN1cmUg
+b3IgZXJyb3ItZnJlZSBhcyBpbmZvcm1hdGlvbiBjb3VsZCBiZSBpbnRlcmNlcHRlZCwgY29ycnVw
+dGVkLCBsb3N0LCBkZXN0cm95ZWQsIGFycml2ZSBsYXRlIG9yIGluY29tcGxldGUsIG9yIG1heSBj
+b250YWluIHZpcnVzZXMgaW4gdHJhbnNtaXNzaW9uLiBUaGUgZSBtYWlsIGFuZCBpdHMgY29udGVu
+dHMgKHdpdGggb3Igd2l0aG91dCByZWZlcnJlZCBlcnJvcnMpIHNoYWxsIHRoZXJlZm9yZSBub3Qg
+YXR0YWNoIGFueSBsaWFiaWxpdHkgb24gdGhlIG9yaWdpbmF0b3Igb3IgSENMIG9yIGl0cyBhZmZp
+bGlhdGVzLiBWaWV3cyBvciBvcGluaW9ucywgaWYgYW55LCBwcmVzZW50ZWQgaW4gdGhpcyBlbWFp
+bCBhcmUgc29sZWx5IHRob3NlIG9mIHRoZSBhdXRob3IgYW5kIG1heSBub3QgbmVjZXNzYXJpbHkg
+cmVmbGVjdCB0aGUgdmlld3Mgb3Igb3BpbmlvbnMgb2YgSENMIG9yIGl0cyBhZmZpbGlhdGVzLiBB
+bnkgZm9ybSBvZiByZXByb2R1Y3Rpb24sIGRpc3NlbWluYXRpb24sIGNvcHlpbmcsIGRpc2Nsb3N1
+cmUsIG1vZGlmaWNhdGlvbiwgZGlzdHJpYnV0aW9uIGFuZCAvIG9yIHB1YmxpY2F0aW9uIG9mIHRo
+aXMgbWVzc2FnZSB3aXRob3V0IHRoZSBwcmlvciB3cml0dGVuIGNvbnNlbnQgb2YgYXV0aG9yaXpl
+ZCByZXByZXNlbnRhdGl2ZSBvZiBIQ0wgaXMgc3RyaWN0bHkgcHJvaGliaXRlZC4gSWYgeW91IGhh
+dmUgcmVjZWl2ZWQgdGhpcyBlbWFpbCBpbiBlcnJvciBwbGVhc2UgZGVsZXRlIGl0IGFuZCBub3Rp
+ZnkgdGhlIHNlbmRlciBpbW1lZGlhdGVseS4gQmVmb3JlIG9wZW5pbmcgYW55IGVtYWlsIGFuZC9v
+ciBhdHRhY2htZW50cywgcGxlYXNlIGNoZWNrIHRoZW0gZm9yIHZpcnVzZXMgYW5kIG90aGVyIGRl
+ZmVjdHMuDQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LQ0K
