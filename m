@@ -1,83 +1,71 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-hk2apc01on0105.outbound.protection.outlook.com ([104.47.124.105]:50240
-        "EHLO APC01-HK2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726768AbeIZTlm (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-        Wed, 26 Sep 2018 15:41:42 -0400
-From: Sujay G <sujay.g@hcl.com>
-Subject: RE: about openthread and 6lowpan
-Date: Wed, 26 Sep 2018 13:28:09 +0000
-Message-ID: <SG2PR04MB3158B256663D74477E756933EF150@SG2PR04MB3158.apcprd04.prod.outlook.com>
+Received: from mail-qt1-f176.google.com ([209.85.160.176]:40151 "EHLO
+        mail-qt1-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726410AbeI0Bzq (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 26 Sep 2018 21:55:46 -0400
+Received: by mail-qt1-f176.google.com with SMTP id e9-v6so188991qtp.7
+        for <linux-wpan@vger.kernel.org>; Wed, 26 Sep 2018 12:41:15 -0700 (PDT)
+Date: Wed, 26 Sep 2018 15:41:09 -0400
+From: Alexander Aring <aring@mojatatu.com>
+Subject: Re: about openthread and 6lowpan
+Message-ID: <20180926194109.ovjgvdeb5ktkbcec@x220t>
 References: <SG2PR04MB31586E124C6C9A919150F826EF000@SG2PR04MB3158.apcprd04.prod.outlook.com>
  <SG2PR04MB3158366EFF8CBC241C84FFD5EF060@SG2PR04MB3158.apcprd04.prod.outlook.com>
  <SG2PR04MB315811F19F2A13136294C6A9EF060@SG2PR04MB3158.apcprd04.prod.outlook.com>
- <3503.1536526189@localhost> <20180910150647.dcwoyslxrusvcj7j@x220t>
+ <3503.1536526189@localhost>
+ <20180910150647.dcwoyslxrusvcj7j@x220t>
  <SG2PR04MB3158C4FE1DDE26E663803449EF130@SG2PR04MB3158.apcprd04.prod.outlook.com>
  <SG2PR04MB315858186E9C80FF004576DFEF130@SG2PR04MB3158.apcprd04.prod.outlook.com>
  <20180924205657.nfj7mhodj4t3qox7@x220t>
-In-Reply-To: <20180924205657.nfj7mhodj4t3qox7@x220t>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ <SG2PR04MB3158B256663D74477E756933EF150@SG2PR04MB3158.apcprd04.prod.outlook.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <SG2PR04MB3158B256663D74477E756933EF150@SG2PR04MB3158.apcprd04.prod.outlook.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <aring@mojatatu.com>
+To: Sujay G <sujay.g@hcl.com>
 Cc: "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>
 
-QWxleCwNCg0KSSBhbSByZWZlcnJpbmcgdG8gIHRoZSBwcmVzZW50YXRpb24geW91IGdhdmUgb24g
-IE5ldGRldiAyLjEgSU9UIFdpdGhvdXQgVGhpbmdzOiBCdWlsZGluZyB2aXJ0dWFsIDZMb1dQQU4g
-TWVzaCBOZXR3b3Jrcw0KSSBhbSB0cnlpbmcgdG8gY29ubmVjdCBQSFkwIGFuZCBQSFkxICBhcyBz
-aG93biBpbiB0aGUgcHJlc2VudGF0aW9uIGJ1dCBzbyBmYXIgSWFtIHVuYWJsZSB0byBkbyBzby4N
-CkkgY291bGQgZ2V0IG9ubHkgZm9sbG93aW5nIHN0ZXBzICBmcm9tIHRoZSB2aWRlbw0KZWNobyDi
-gJxhZGQgMSAy4oCdID4gL3N5cy9rZXJuZWwvZGVidWcvZmFrZWxiL2VkZ2VzDQppcCBuZXRucyBl
-eGVjIHdwYW4wIHNoIH4vaG9zdCBsb3dwYW4wIDAgJg0KDQpDYW4geW91IHBsZWFzZSBwcm92aWRl
-IHRoZSBzZXF1ZW5jZSBvZiBzdGVwcyB5b3UgdXNlZCB0byBjb25uZWN0IFBIWTAgYW5kIFBIWTEg
-Pw0KDQotLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KRnJvbTogQWxleGFuZGVyIEFyaW5nIFtt
-YWlsdG86YXJpbmdAbW9qYXRhdHUuY29tXQ0KU2VudDogVHVlc2RheSwgU2VwdGVtYmVyIDI1LCAy
-MDE4IDI6MjcgQU0NClRvOiBTdWpheSBHIDxzdWpheS5nQGhjbC5jb20+DQpDYzogTWljaGFlbCBS
-aWNoYXJkc29uIDxtY3JAc2FuZGVsbWFuLmNhPjsgbGludXgtd3BhbkB2Z2VyLmtlcm5lbC5vcmcN
-ClN1YmplY3Q6IFJlOiBhYm91dCBvcGVudGhyZWFkIGFuZCA2bG93cGFuDQoNCkhpLA0KDQpPbiBU
-aHUsIFNlcCAyMCwgMjAxOCBhdCAwNjo1Nzo0NEFNICswMDAwLCBTdWpheSBHIHdyb3RlOg0KPiBB
-bGV4LA0KPiBKdXN0IHdhbnRlZCB0byBtZW50aW9uIHRoYXQgSSBhbSAgYnVpbGRpbmcgb24gdWJ1
-bnR1IC1saW51eC4gIChFbmQgIHNvbHV0aW9uIGlzIHRvIHJ1biB0aGUgb3BlbnRocmVhZCBub2Rl
-cyBpbnNpZGUgY29udGFpbmVycyBhbmQgZXN0YWJsaXNoIGNvbW11bmljYXRpb24gdmlhIGZha2VM
-QikgLg0KPiBXb25kZXJpbmcgaWYgaXQgaXMgcG9zc2libGUgdG8gY29ubmVjdCB0aGUgUEhZIGRl
-dmljZXMgYW5kIGVzdGFibGlzaCBjb21tdW5pY2F0aW9uIHdpdGhvdXQgUklPVD8gT3IgaXMgIFJJ
-T1QgcmVxdWlyZWQgdG8gZXN0YWJsaXNoIGNvbW11bmljYXRpb24gYmV0d2VlbiBQSFkgZGV2aWNl
-cyAgPw0KPg0KDQpZb3UgZG9uJ3QgbmVlZCBjb250YWluZXJzLiBPbmx5IGlmIHlvdSB1c2UgbW9y
-ZSB0aGFuIG9uZSBsaW51eCBJUCBpbnRlcmZhY2VzIGl0J3MgbmVlZGVkIHRvIGF2b2lkIGludGVy
-bmFsIHJvdXRpbmcgd2l0aG91dCBoaXR0aW5nIHRoZSBtYWMgbGF5ZXIuDQoNCllvdSBkb24ndCBu
-ZWVkIFJJT1QsIHlvdSBjYW4gdXNlIFJJT1QuLi4geW91IGNhbiB1c2Ugd2hhdGV2ZXIgeW91IHdh
-bnQgdG8gY29ubmVjdCB0byBlYWNoIG90aGVyLi4uIHF1ZXN0aW9uIGlzIGlmIHRoZXkgd2lsbCB1
-bmRlcnN0YW5kIGVhY2ggb3RoZXIuIEZvciBvcGVudGhyZWFkIHlvdSBuZWVkIHRoZWlyIHRvIHNw
-ZWFrIHRoZWlyIE1MRSBwcm90b2NvbCBvdGhlcndpc2UgeW91IHdpbGwgbm90IGdldCBhbnkgY29t
-bXVuaWNhdGlvbi4NCg0KLSBBbGV4DQo6OkRJU0NMQUlNRVI6Og0KLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NClRoZSBjb250ZW50cyBvZiB0aGlzIGUt
-bWFpbCBhbmQgYW55IGF0dGFjaG1lbnQocykgYXJlIGNvbmZpZGVudGlhbCBhbmQgaW50ZW5kZWQg
-Zm9yIHRoZSBuYW1lZCByZWNpcGllbnQocykgb25seS4gRS1tYWlsIHRyYW5zbWlzc2lvbiBpcyBu
-b3QgZ3VhcmFudGVlZCB0byBiZSBzZWN1cmUgb3IgZXJyb3ItZnJlZSBhcyBpbmZvcm1hdGlvbiBj
-b3VsZCBiZSBpbnRlcmNlcHRlZCwgY29ycnVwdGVkLCBsb3N0LCBkZXN0cm95ZWQsIGFycml2ZSBs
-YXRlIG9yIGluY29tcGxldGUsIG9yIG1heSBjb250YWluIHZpcnVzZXMgaW4gdHJhbnNtaXNzaW9u
-LiBUaGUgZSBtYWlsIGFuZCBpdHMgY29udGVudHMgKHdpdGggb3Igd2l0aG91dCByZWZlcnJlZCBl
-cnJvcnMpIHNoYWxsIHRoZXJlZm9yZSBub3QgYXR0YWNoIGFueSBsaWFiaWxpdHkgb24gdGhlIG9y
-aWdpbmF0b3Igb3IgSENMIG9yIGl0cyBhZmZpbGlhdGVzLiBWaWV3cyBvciBvcGluaW9ucywgaWYg
-YW55LCBwcmVzZW50ZWQgaW4gdGhpcyBlbWFpbCBhcmUgc29sZWx5IHRob3NlIG9mIHRoZSBhdXRo
-b3IgYW5kIG1heSBub3QgbmVjZXNzYXJpbHkgcmVmbGVjdCB0aGUgdmlld3Mgb3Igb3BpbmlvbnMg
-b2YgSENMIG9yIGl0cyBhZmZpbGlhdGVzLiBBbnkgZm9ybSBvZiByZXByb2R1Y3Rpb24sIGRpc3Nl
-bWluYXRpb24sIGNvcHlpbmcsIGRpc2Nsb3N1cmUsIG1vZGlmaWNhdGlvbiwgZGlzdHJpYnV0aW9u
-IGFuZCAvIG9yIHB1YmxpY2F0aW9uIG9mIHRoaXMgbWVzc2FnZSB3aXRob3V0IHRoZSBwcmlvciB3
-cml0dGVuIGNvbnNlbnQgb2YgYXV0aG9yaXplZCByZXByZXNlbnRhdGl2ZSBvZiBIQ0wgaXMgc3Ry
-aWN0bHkgcHJvaGliaXRlZC4gSWYgeW91IGhhdmUgcmVjZWl2ZWQgdGhpcyBlbWFpbCBpbiBlcnJv
-ciBwbGVhc2UgZGVsZXRlIGl0IGFuZCBub3RpZnkgdGhlIHNlbmRlciBpbW1lZGlhdGVseS4gQmVm
-b3JlIG9wZW5pbmcgYW55IGVtYWlsIGFuZC9vciBhdHRhY2htZW50cywgcGxlYXNlIGNoZWNrIHRo
-ZW0gZm9yIHZpcnVzZXMgYW5kIG90aGVyIGRlZmVjdHMuDQotLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0K
+Hi,
+
+On Wed, Sep 26, 2018 at 01:28:09PM +0000, Sujay G wrote:
+> Alex,
+> 
+> I am referring to  the presentation you gave on  Netdev 2.1 IOT Without Things: Building virtual 6LoWPAN Mesh Networks
+> I am trying to connect PHY0 and PHY1  as shown in the presentation but so far Iam unable to do so.
+> I could get only following steps  from the video
+> echo “add 1 2” > /sys/kernel/debug/fakelb/edges
+> ip netns exec wpan0 sh ~/host lowpan0 0 &
+
+this is old api. I wanted to replace debugfs with netlink which I did.
+The feature what you are looking for is now upstream in a new driver
+named "mac802154_hwsim" - you need a recent kernel...
+
+Having two nodes connected to each other fakelb is enough. The new
+driver allows you to run a individual mesh network with 1000 nodes
+connected RIOT/Contiki/Linux/openthread/etc.... you need just enough
+memory to run it. And I think with 1000 nodes it will run terrible slow,
+because each userspace stack need to filter it _in_ userspace. But it's
+possible...
+
+> 
+> Can you please provide the sequence of steps you used to connect PHY0 and PHY1 ?
+> 
+
+With mac802154_hwsim you need to have wpan_hwsim which I think are still
+not part of wpan-tools upstream [0]. You need to apply these patches and
+then run a recent kernel.
+
+Then load mac802154_hwsim and using the tool which is more self
+explained. Sorry I don't have any example currently how to set it up...
+but you should try fakelb with 3 nodes, every phy is monitor.
+
+Then on two monitors each running openthread. One monitor runs
+wireshark/tshark, Then you should able too see the traffic between the
+nodes.
+
+- Alex
+
+[0] https://www.spinics.net/lists/linux-wpan/msg05122.html
