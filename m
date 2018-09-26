@@ -1,45 +1,83 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-qk1-f176.google.com ([209.85.222.176]:44637 "EHLO
-        mail-qk1-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728120AbeIYDBE (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 24 Sep 2018 23:01:04 -0400
-Received: by mail-qk1-f176.google.com with SMTP id d131-v6so12233701qke.11
-        for <linux-wpan@vger.kernel.org>; Mon, 24 Sep 2018 13:56:59 -0700 (PDT)
-Date: Mon, 24 Sep 2018 16:56:57 -0400
-From: Alexander Aring <aring@mojatatu.com>
-Subject: Re: about openthread and 6lowpan
-Message-ID: <20180924205657.nfj7mhodj4t3qox7@x220t>
+Received: from mail-hk2apc01on0105.outbound.protection.outlook.com ([104.47.124.105]:50240
+        "EHLO APC01-HK2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726768AbeIZTlm (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+        Wed, 26 Sep 2018 15:41:42 -0400
+From: Sujay G <sujay.g@hcl.com>
+Subject: RE: about openthread and 6lowpan
+Date: Wed, 26 Sep 2018 13:28:09 +0000
+Message-ID: <SG2PR04MB3158B256663D74477E756933EF150@SG2PR04MB3158.apcprd04.prod.outlook.com>
 References: <SG2PR04MB31586E124C6C9A919150F826EF000@SG2PR04MB3158.apcprd04.prod.outlook.com>
  <SG2PR04MB3158366EFF8CBC241C84FFD5EF060@SG2PR04MB3158.apcprd04.prod.outlook.com>
  <SG2PR04MB315811F19F2A13136294C6A9EF060@SG2PR04MB3158.apcprd04.prod.outlook.com>
- <3503.1536526189@localhost>
- <20180910150647.dcwoyslxrusvcj7j@x220t>
+ <3503.1536526189@localhost> <20180910150647.dcwoyslxrusvcj7j@x220t>
  <SG2PR04MB3158C4FE1DDE26E663803449EF130@SG2PR04MB3158.apcprd04.prod.outlook.com>
  <SG2PR04MB315858186E9C80FF004576DFEF130@SG2PR04MB3158.apcprd04.prod.outlook.com>
+ <20180924205657.nfj7mhodj4t3qox7@x220t>
+In-Reply-To: <20180924205657.nfj7mhodj4t3qox7@x220t>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <SG2PR04MB315858186E9C80FF004576DFEF130@SG2PR04MB3158.apcprd04.prod.outlook.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Sujay G <sujay.g@hcl.com>
-Cc: Michael Richardson <mcr@sandelman.ca>, "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>
+To: Alexander Aring <aring@mojatatu.com>
+Cc: "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>
 
-Hi,
-
-On Thu, Sep 20, 2018 at 06:57:44AM +0000, Sujay G wrote:
-> Alex,
-> Just wanted to mention that I am  building on ubuntu -linux.  (End  solution is to run the openthread nodes inside containers and establish communication via fakeLB) .
-> Wondering if it is possible to connect the PHY devices and establish communication without RIOT? Or is  RIOT required to establish communication between PHY devices  ?
->
-
-You don't need containers. Only if you use more than one linux IP
-interfaces it's needed to avoid internal routing without hitting the mac
-layer.
-
-You don't need RIOT, you can use RIOT... you can use whatever you want
-to connect to each other... question is if they will understand each
-other. For openthread you need their to speak their MLE protocol
-otherwise you will not get any communication.
-
-- Alex
+QWxleCwNCg0KSSBhbSByZWZlcnJpbmcgdG8gIHRoZSBwcmVzZW50YXRpb24geW91IGdhdmUgb24g
+IE5ldGRldiAyLjEgSU9UIFdpdGhvdXQgVGhpbmdzOiBCdWlsZGluZyB2aXJ0dWFsIDZMb1dQQU4g
+TWVzaCBOZXR3b3Jrcw0KSSBhbSB0cnlpbmcgdG8gY29ubmVjdCBQSFkwIGFuZCBQSFkxICBhcyBz
+aG93biBpbiB0aGUgcHJlc2VudGF0aW9uIGJ1dCBzbyBmYXIgSWFtIHVuYWJsZSB0byBkbyBzby4N
+CkkgY291bGQgZ2V0IG9ubHkgZm9sbG93aW5nIHN0ZXBzICBmcm9tIHRoZSB2aWRlbw0KZWNobyDi
+gJxhZGQgMSAy4oCdID4gL3N5cy9rZXJuZWwvZGVidWcvZmFrZWxiL2VkZ2VzDQppcCBuZXRucyBl
+eGVjIHdwYW4wIHNoIH4vaG9zdCBsb3dwYW4wIDAgJg0KDQpDYW4geW91IHBsZWFzZSBwcm92aWRl
+IHRoZSBzZXF1ZW5jZSBvZiBzdGVwcyB5b3UgdXNlZCB0byBjb25uZWN0IFBIWTAgYW5kIFBIWTEg
+Pw0KDQotLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KRnJvbTogQWxleGFuZGVyIEFyaW5nIFtt
+YWlsdG86YXJpbmdAbW9qYXRhdHUuY29tXQ0KU2VudDogVHVlc2RheSwgU2VwdGVtYmVyIDI1LCAy
+MDE4IDI6MjcgQU0NClRvOiBTdWpheSBHIDxzdWpheS5nQGhjbC5jb20+DQpDYzogTWljaGFlbCBS
+aWNoYXJkc29uIDxtY3JAc2FuZGVsbWFuLmNhPjsgbGludXgtd3BhbkB2Z2VyLmtlcm5lbC5vcmcN
+ClN1YmplY3Q6IFJlOiBhYm91dCBvcGVudGhyZWFkIGFuZCA2bG93cGFuDQoNCkhpLA0KDQpPbiBU
+aHUsIFNlcCAyMCwgMjAxOCBhdCAwNjo1Nzo0NEFNICswMDAwLCBTdWpheSBHIHdyb3RlOg0KPiBB
+bGV4LA0KPiBKdXN0IHdhbnRlZCB0byBtZW50aW9uIHRoYXQgSSBhbSAgYnVpbGRpbmcgb24gdWJ1
+bnR1IC1saW51eC4gIChFbmQgIHNvbHV0aW9uIGlzIHRvIHJ1biB0aGUgb3BlbnRocmVhZCBub2Rl
+cyBpbnNpZGUgY29udGFpbmVycyBhbmQgZXN0YWJsaXNoIGNvbW11bmljYXRpb24gdmlhIGZha2VM
+QikgLg0KPiBXb25kZXJpbmcgaWYgaXQgaXMgcG9zc2libGUgdG8gY29ubmVjdCB0aGUgUEhZIGRl
+dmljZXMgYW5kIGVzdGFibGlzaCBjb21tdW5pY2F0aW9uIHdpdGhvdXQgUklPVD8gT3IgaXMgIFJJ
+T1QgcmVxdWlyZWQgdG8gZXN0YWJsaXNoIGNvbW11bmljYXRpb24gYmV0d2VlbiBQSFkgZGV2aWNl
+cyAgPw0KPg0KDQpZb3UgZG9uJ3QgbmVlZCBjb250YWluZXJzLiBPbmx5IGlmIHlvdSB1c2UgbW9y
+ZSB0aGFuIG9uZSBsaW51eCBJUCBpbnRlcmZhY2VzIGl0J3MgbmVlZGVkIHRvIGF2b2lkIGludGVy
+bmFsIHJvdXRpbmcgd2l0aG91dCBoaXR0aW5nIHRoZSBtYWMgbGF5ZXIuDQoNCllvdSBkb24ndCBu
+ZWVkIFJJT1QsIHlvdSBjYW4gdXNlIFJJT1QuLi4geW91IGNhbiB1c2Ugd2hhdGV2ZXIgeW91IHdh
+bnQgdG8gY29ubmVjdCB0byBlYWNoIG90aGVyLi4uIHF1ZXN0aW9uIGlzIGlmIHRoZXkgd2lsbCB1
+bmRlcnN0YW5kIGVhY2ggb3RoZXIuIEZvciBvcGVudGhyZWFkIHlvdSBuZWVkIHRoZWlyIHRvIHNw
+ZWFrIHRoZWlyIE1MRSBwcm90b2NvbCBvdGhlcndpc2UgeW91IHdpbGwgbm90IGdldCBhbnkgY29t
+bXVuaWNhdGlvbi4NCg0KLSBBbGV4DQo6OkRJU0NMQUlNRVI6Og0KLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NClRoZSBjb250ZW50cyBvZiB0aGlzIGUt
+bWFpbCBhbmQgYW55IGF0dGFjaG1lbnQocykgYXJlIGNvbmZpZGVudGlhbCBhbmQgaW50ZW5kZWQg
+Zm9yIHRoZSBuYW1lZCByZWNpcGllbnQocykgb25seS4gRS1tYWlsIHRyYW5zbWlzc2lvbiBpcyBu
+b3QgZ3VhcmFudGVlZCB0byBiZSBzZWN1cmUgb3IgZXJyb3ItZnJlZSBhcyBpbmZvcm1hdGlvbiBj
+b3VsZCBiZSBpbnRlcmNlcHRlZCwgY29ycnVwdGVkLCBsb3N0LCBkZXN0cm95ZWQsIGFycml2ZSBs
+YXRlIG9yIGluY29tcGxldGUsIG9yIG1heSBjb250YWluIHZpcnVzZXMgaW4gdHJhbnNtaXNzaW9u
+LiBUaGUgZSBtYWlsIGFuZCBpdHMgY29udGVudHMgKHdpdGggb3Igd2l0aG91dCByZWZlcnJlZCBl
+cnJvcnMpIHNoYWxsIHRoZXJlZm9yZSBub3QgYXR0YWNoIGFueSBsaWFiaWxpdHkgb24gdGhlIG9y
+aWdpbmF0b3Igb3IgSENMIG9yIGl0cyBhZmZpbGlhdGVzLiBWaWV3cyBvciBvcGluaW9ucywgaWYg
+YW55LCBwcmVzZW50ZWQgaW4gdGhpcyBlbWFpbCBhcmUgc29sZWx5IHRob3NlIG9mIHRoZSBhdXRo
+b3IgYW5kIG1heSBub3QgbmVjZXNzYXJpbHkgcmVmbGVjdCB0aGUgdmlld3Mgb3Igb3BpbmlvbnMg
+b2YgSENMIG9yIGl0cyBhZmZpbGlhdGVzLiBBbnkgZm9ybSBvZiByZXByb2R1Y3Rpb24sIGRpc3Nl
+bWluYXRpb24sIGNvcHlpbmcsIGRpc2Nsb3N1cmUsIG1vZGlmaWNhdGlvbiwgZGlzdHJpYnV0aW9u
+IGFuZCAvIG9yIHB1YmxpY2F0aW9uIG9mIHRoaXMgbWVzc2FnZSB3aXRob3V0IHRoZSBwcmlvciB3
+cml0dGVuIGNvbnNlbnQgb2YgYXV0aG9yaXplZCByZXByZXNlbnRhdGl2ZSBvZiBIQ0wgaXMgc3Ry
+aWN0bHkgcHJvaGliaXRlZC4gSWYgeW91IGhhdmUgcmVjZWl2ZWQgdGhpcyBlbWFpbCBpbiBlcnJv
+ciBwbGVhc2UgZGVsZXRlIGl0IGFuZCBub3RpZnkgdGhlIHNlbmRlciBpbW1lZGlhdGVseS4gQmVm
+b3JlIG9wZW5pbmcgYW55IGVtYWlsIGFuZC9vciBhdHRhY2htZW50cywgcGxlYXNlIGNoZWNrIHRo
+ZW0gZm9yIHZpcnVzZXMgYW5kIG90aGVyIGRlZmVjdHMuDQotLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0K
