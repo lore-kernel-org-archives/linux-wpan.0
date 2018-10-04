@@ -1,68 +1,50 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from proxima.lasnet.de ([78.47.171.185]:53966 "EHLO
+Received: from proxima.lasnet.de ([78.47.171.185]:53988 "EHLO
         proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727203AbeJDR14 (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 4 Oct 2018 13:27:56 -0400
-Subject: Re: [PATCHv2 wpan-tools] wpan-hwsim: hardware simulator configuration
- utility
-References: <20180930215234.4679-1-aring@mojatatu.com>
- <d7ddf133-f8ff-e372-d722-14daa0de4545@datenfreihafen.org>
- <20181003143146.hf3qcdlxbvupt4yg@x220t>
+        with ESMTP id S1727183AbeJDSUO (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 4 Oct 2018 14:20:14 -0400
 From: Stefan Schmidt <stefan@datenfreihafen.org>
-Message-ID: <8b402bbe-71b5-c196-4a00-e50314464d78@datenfreihafen.org>
-Date: Thu, 4 Oct 2018 12:35:14 +0200
-MIME-Version: 1.0
-In-Reply-To: <20181003143146.hf3qcdlxbvupt4yg@x220t>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Subject: pull-request: ieee802154-next 2018-10-04
+Date: Thu,  4 Oct 2018 13:27:16 +0200
+Message-Id: <20181004112716.17565-1-stefan@datenfreihafen.org>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <aring@mojatatu.com>
-Cc: linux-wpan@vger.kernel.org
+To: davem@davemloft.net
+Cc: linux-wpan@vger.kernel.org, alex.aring@gmail.com, netdev@vger.kernel.org
 
-Hello.
+Hello Dave.
 
-On 03/10/2018 16:31, Alexander Aring wrote:
-> Hi,
-> 
-> On Wed, Oct 03, 2018 at 10:14:09AM +0200, Stefan Schmidt wrote:
->> Hello.
->>
->> On 30/09/2018 23:52, Alexander Aring wrote:
->>> This patch adds initial support for wpan-hwsim utility to control the
->>> mac802154_hwsim driver over netlink.
->>>
->>> Signed-off-by: Alexander Aring <aring@mojatatu.com>
->>> ---
->>>
->>> Forgot if I ever send v2 but my local change has the last complain.
->>> So I resend.
->>>
->>> changes since v2:
->>> - help and version both do not need an argument, please use no_argument
->>> - printf("wpan-hwsim " PACKAGE_VERSION "\n");
->>
->> Patch has been applied to wpan-tools. Thanks for fixing up my review
->> comments.
->>
->> Seems we want to get out a new wpan-tools release in the next weeks to
->> have this utility available. I will see what I can do.
->>
-> 
-> wait please for a fix... I forgot that dot longarg needs no_argument as
-> well...
+An update from ieee802154 for *net-next*
 
-No problem. We have time to get fixes in. Juts wanted to make sure we
-get a new release with the hwsim utility out to match the latest kernel
-release.
+A very quite cycle in the ieee802154 subsystem. We only have two cleanup
+patches for this pull request.
+Xue removed the platform_data struct handling from the mcr20a driver and
+Alexander cleaned up some left overs in the hwsim driver.
 
-> I begin to hate that interface. I need to define it for short with ':'
-> and then again for long in this struct. I do short sometimes only...
-> I will never do long args again, I fall into mistakes.
-
-Yeah, getopt is not the nicest interface, but doing command line option
-handling by hand is not nice either.
+Please pull, or let me know if there are any problems.
 
 regards
 Stefan Schmidt
+
+The following changes since commit 1042caa79e9351b81ed19dc8d2d7fd6ff51a4422:
+
+  net-ipv4: remove 2 always zero parameters from ipv4_redirect() (2018-09-26 20:30:55 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/sschmidt/wpan-next.git ieee802154-for-davem-2018-10-04
+
+for you to fetch changes up to 154113eb17735197796ff5f477c6243d00f2c5dc:
+
+  ieee802154: hwsim: remove not used ifup list (2018-10-02 17:14:13 +0200)
+
+----------------------------------------------------------------
+Alexander Aring (1):
+      ieee802154: hwsim: remove not used ifup list
+
+Xue Liu (1):
+      ieee802154: mcr20a: Remove struct mcr20a_platform_data
+
+ drivers/net/ieee802154/mac802154_hwsim.c |  8 ----
+ drivers/net/ieee802154/mcr20a.c          | 64 +++++++-------------------------
+ 2 files changed, 13 insertions(+), 59 deletions(-)
