@@ -1,14 +1,14 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:34674 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387718AbeKFCRg (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 5 Nov 2018 21:17:36 -0500
-Received: by mail-pg1-f193.google.com with SMTP id k1-v6so4497586pgq.1
-        for <linux-wpan@vger.kernel.org>; Mon, 05 Nov 2018 08:57:01 -0800 (PST)
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:35591 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387774AbeKFCRx (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 5 Nov 2018 21:17:53 -0500
+Received: by mail-pg1-f194.google.com with SMTP id 32-v6so4499210pgu.2
+        for <linux-wpan@vger.kernel.org>; Mon, 05 Nov 2018 08:57:18 -0800 (PST)
 From: Jian-Hong Pan <starnight@g.ncu.edu.tw>
-Subject: [PATCH V2 0/7] net: lorawan: Add LoRaWAN soft MAC module
-Date: Tue,  6 Nov 2018 00:55:38 +0800
-Message-Id: <20181105165544.5215-1-starnight@g.ncu.edu.tw>
+Subject: [PATCH V2 1/7] net: lorawan: Add macro and definition for LoRaWAN
+Date: Tue,  6 Nov 2018 00:55:39 +0800
+Message-Id: <20181105165544.5215-2-starnight@g.ncu.edu.tw>
 In-Reply-To: <fc737f3940bbe91341fb15d85ac11931eb56d1fc.1535039998.git.starnight@g.ncu.edu.tw>
 References: <fc737f3940bbe91341fb15d85ac11931eb56d1fc.1535039998.git.starnight@g.ncu.edu.tw>
 MIME-Version: 1.0
@@ -18,84 +18,130 @@ List-ID: <linux-wpan.vger.kernel.org>
 To: =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>
 Cc: netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>, "David S . Miller" <davem@davemloft.net>, Dollar Chen <dollar.chen@wtmec.com>, Ken Yu <ken.yu@rakwireless.com>, linux-wpan@vger.kernel.org, Stefan Schmidt <stefan@datenfreihafen.org>, Jian-Hong Pan <starnight@g.ncu.edu.tw>
 
-LoRaWAN(TM) is the MAC layer defined by LoRa Alliance(TM) over LoRa
-devices.  LoRa is one of Low-Power Wide-Area Network (LPWAN) technology.
+This patch adds the macro and definition for the implementation of
+LoRaWAN protocol.
 
-LoRaWAN networks typically are laid out in a star-of-stars topology in
-which gateways relay messages between end-devices and a central network
-server at the backend.  Gateways are connected to the network server via
-standard IP connections while end-devices use single hop LoRa(TM) or FSK
-communication to one or many gateways.
+Signed-off-by: Jian-Hong Pan <starnight@g.ncu.edu.tw>
+---
+V2:
+- Modify the commit message
 
-A LoRa network distinguishes between a basic LoRaWAN (named Class A) and
-optional features (Class B, Class C ...):
-* Bi-directional end-devices (Class A)
-* Bi-directional end-devices with scheduled receive slots (Class B)
-* Bi-directional end-devices with maximal receive slots (Class C)
+ include/linux/socket.h              | 5 ++++-
+ include/uapi/linux/if_arp.h         | 1 +
+ include/uapi/linux/if_ether.h       | 1 +
+ net/core/dev.c                      | 4 ++--
+ security/selinux/hooks.c            | 4 +++-
+ security/selinux/include/classmap.h | 4 +++-
+ 6 files changed, 14 insertions(+), 5 deletions(-)
 
-This patch set add LoRaWAN class module implementing the stack,
-especially the soft MAC, between socket APIs and LoRa device drivers.
-
-socket APIs:
-send and receive the data
-------------------------------------------------------------------------
-LoRaWAN class module implements soft MAC:
-append the header/footer, encryption/decryption, timing slot and MAC
-commands
-------------------------------------------------------------------------
-LoRa device drivers:
-send and receive the messages for MAC layer
-------------------------------------------------------------------------
-LoRa devices
-
-This module starts from simple and implements partial Class A
-end-devices features defined in LoRaWAN(TM) Specification Ver. 1.0.2.
-More features and complexity, for example regional parameters, confirmed
-data messages, join request/accept messages for Over-The-Air Activation,
-MAC commands ... will be added in the future.
-
-Jian-Hong Pan (7):
-  net: lorawan: Add macro and definition for LoRaWAN
-  net: lorawan: Add LoRaWAN socket module
-  net: lorawan: Add LoRaWAN API declaration for LoRa devices
-  net: maclorawan: Add maclorawan module declaration
-  net: maclorawan: Implement the crypto of maclorawan module
-  net: maclorawan: Implement maclorawan class module
-  net: lorawan: List LORAWAN in menuconfig
-
- include/linux/lora/lorawan.h        | 137 ++++++
- include/linux/lora/lorawan_netdev.h |  52 +++
- include/linux/socket.h              |   5 +-
- include/uapi/linux/if_arp.h         |   1 +
- include/uapi/linux/if_ether.h       |   1 +
- net/Kconfig                         |   2 +
- net/Makefile                        |   2 +
- net/core/dev.c                      |   4 +-
- net/lorawan/Kconfig                 |  10 +
- net/lorawan/Makefile                |   2 +
- net/lorawan/socket.c                | 681 ++++++++++++++++++++++++++++
- net/maclorawan/Kconfig              |  14 +
- net/maclorawan/Makefile             |   2 +
- net/maclorawan/crypto.c             | 209 +++++++++
- net/maclorawan/crypto.h             |  27 ++
- net/maclorawan/mac.c                | 522 +++++++++++++++++++++
- net/maclorawan/maclorawan.h         | 199 ++++++++
- net/maclorawan/main.c               | 600 ++++++++++++++++++++++++
- security/selinux/hooks.c            |   4 +-
- security/selinux/include/classmap.h |   4 +-
- 20 files changed, 2473 insertions(+), 5 deletions(-)
- create mode 100644 include/linux/lora/lorawan.h
- create mode 100644 include/linux/lora/lorawan_netdev.h
- create mode 100644 net/lorawan/Kconfig
- create mode 100644 net/lorawan/Makefile
- create mode 100644 net/lorawan/socket.c
- create mode 100644 net/maclorawan/Kconfig
- create mode 100644 net/maclorawan/Makefile
- create mode 100644 net/maclorawan/crypto.c
- create mode 100644 net/maclorawan/crypto.h
- create mode 100644 net/maclorawan/mac.c
- create mode 100644 net/maclorawan/maclorawan.h
- create mode 100644 net/maclorawan/main.c
-
+diff --git a/include/linux/socket.h b/include/linux/socket.h
+index aa1e288b1659..e5c8381fd1aa 100644
+--- a/include/linux/socket.h
++++ b/include/linux/socket.h
+@@ -209,8 +209,9 @@ struct ucred {
+ 				 */
+ #define AF_XDP		44	/* XDP sockets			*/
+ #define AF_LORA		45	/* LoRa sockets			*/
++#define AF_LORAWAN	46	/* LoRaWAN sockets			*/
+ 
+-#define AF_MAX		46	/* For now.. */
++#define AF_MAX		47	/* For now.. */
+ 
+ /* Protocol families, same as address families. */
+ #define PF_UNSPEC	AF_UNSPEC
+@@ -261,6 +262,7 @@ struct ucred {
+ #define PF_SMC		AF_SMC
+ #define PF_XDP		AF_XDP
+ #define PF_LORA		AF_LORA
++#define PF_LORAWAN	AF_LORAWAN
+ #define PF_MAX		AF_MAX
+ 
+ /* Maximum queue length specifiable by listen.  */
+@@ -343,6 +345,7 @@ struct ucred {
+ #define SOL_KCM		281
+ #define SOL_TLS		282
+ #define SOL_XDP		283
++#define SOL_LORAWAN	284
+ 
+ /* IPX options */
+ #define IPX_TYPE	1
+diff --git a/include/uapi/linux/if_arp.h b/include/uapi/linux/if_arp.h
+index 1ed7cb3f2129..2376f7839355 100644
+--- a/include/uapi/linux/if_arp.h
++++ b/include/uapi/linux/if_arp.h
+@@ -99,6 +99,7 @@
+ #define ARPHRD_6LOWPAN	825		/* IPv6 over LoWPAN             */
+ #define ARPHRD_VSOCKMON	826		/* Vsock monitor header		*/
+ #define ARPHRD_LORA	827		/* LoRa				*/
++#define ARPHRD_LORAWAN	828		/* LoRaWAN			*/
+ 
+ #define ARPHRD_VOID	  0xFFFF	/* Void type, nothing is known */
+ #define ARPHRD_NONE	  0xFFFE	/* zero header length */
+diff --git a/include/uapi/linux/if_ether.h b/include/uapi/linux/if_ether.h
+index 45644dcf5b39..b1ac70d4a377 100644
+--- a/include/uapi/linux/if_ether.h
++++ b/include/uapi/linux/if_ether.h
+@@ -148,6 +148,7 @@
+ 					 * aggregation protocol
+ 					 */
+ #define ETH_P_LORA	0x00FA		/* LoRa				*/
++#define ETH_P_LORAWAN	0x00FB		/* LoRaWAN			*/
+ 
+ /*
+  *	This is an Ethernet frame header.
+diff --git a/net/core/dev.c b/net/core/dev.c
+index f68122f0ab02..b95ce79ec5a8 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -297,7 +297,7 @@ static const unsigned short netdev_lock_type[] = {
+ 	 ARPHRD_IRDA, ARPHRD_FCPP, ARPHRD_FCAL, ARPHRD_FCPL,
+ 	 ARPHRD_FCFABRIC, ARPHRD_IEEE80211, ARPHRD_IEEE80211_PRISM,
+ 	 ARPHRD_IEEE80211_RADIOTAP, ARPHRD_PHONET, ARPHRD_PHONET_PIPE,
+-	 ARPHRD_IEEE802154, ARPHRD_VOID, ARPHRD_NONE};
++	 ARPHRD_IEEE802154, ARPHRD_LORAWAN, ARPHRD_VOID, ARPHRD_NONE};
+ 
+ static const char *const netdev_lock_name[] = {
+ 	"_xmit_NETROM", "_xmit_ETHER", "_xmit_EETHER", "_xmit_AX25",
+@@ -314,7 +314,7 @@ static const char *const netdev_lock_name[] = {
+ 	"_xmit_IRDA", "_xmit_FCPP", "_xmit_FCAL", "_xmit_FCPL",
+ 	"_xmit_FCFABRIC", "_xmit_IEEE80211", "_xmit_IEEE80211_PRISM",
+ 	"_xmit_IEEE80211_RADIOTAP", "_xmit_PHONET", "_xmit_PHONET_PIPE",
+-	"_xmit_IEEE802154", "_xmit_VOID", "_xmit_NONE"};
++	"_xmit_IEEE802154", "_xmit_LORAWAN", "_xmit_VOID", "_xmit_NONE"};
+ 
+ static struct lock_class_key netdev_xmit_lock_key[ARRAY_SIZE(netdev_lock_type)];
+ static struct lock_class_key netdev_addr_lock_key[ARRAY_SIZE(netdev_lock_type)];
+diff --git a/security/selinux/hooks.c b/security/selinux/hooks.c
+index aaf520a689d8..0da3a1d69cb8 100644
+--- a/security/selinux/hooks.c
++++ b/security/selinux/hooks.c
+@@ -1477,7 +1477,9 @@ static inline u16 socket_type_to_security_class(int family, int type, int protoc
+ 			return SECCLASS_XDP_SOCKET;
+ 		case PF_LORA:
+ 			return SECCLASS_LORA_SOCKET;
+-#if PF_MAX > 46
++		case PF_LORAWAN:
++			return SECCLASS_LORAWAN_SOCKET;
++#if PF_MAX > 47
+ #error New address family defined, please update this function.
+ #endif
+ 		}
+diff --git a/security/selinux/include/classmap.h b/security/selinux/include/classmap.h
+index 060d4bf8385e..fa0151fe6f32 100644
+--- a/security/selinux/include/classmap.h
++++ b/security/selinux/include/classmap.h
+@@ -244,9 +244,11 @@ struct security_class_mapping secclass_map[] = {
+ 	  { COMMON_SOCK_PERMS, NULL } },
+ 	{ "lora_socket",
+ 	  { COMMON_SOCK_PERMS, NULL } },
++	{ "lorawan_socket",
++	  { COMMON_SOCK_PERMS, NULL } },
+ 	{ NULL }
+   };
+ 
+-#if PF_MAX > 46
++#if PF_MAX > 47
+ #error New address family defined, please update secclass_map.
+ #endif
 -- 
 2.19.1
