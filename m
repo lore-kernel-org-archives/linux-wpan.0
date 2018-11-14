@@ -1,72 +1,101 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-oi1-f180.google.com ([209.85.167.180]:38475 "EHLO
-        mail-oi1-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388583AbeKFXxv (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 6 Nov 2018 18:53:51 -0500
-Received: by mail-oi1-f180.google.com with SMTP id v83-v6so10836570oia.5
-        for <linux-wpan@vger.kernel.org>; Tue, 06 Nov 2018 06:28:22 -0800 (PST)
-MIME-Version: 1.0
-References: <fc737f3940bbe91341fb15d85ac11931eb56d1fc.1535039998.git.starnight@g.ncu.edu.tw>
- <20181105165544.5215-3-starnight@g.ncu.edu.tw> <20181105.101610.1437737564548154497.davem@davemloft.net>
-In-Reply-To: <20181105.101610.1437737564548154497.davem@davemloft.net>
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:35605 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387418AbeKOCGX (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 14 Nov 2018 21:06:23 -0500
+Received: by mail-pg1-f196.google.com with SMTP id 32-v6so7564939pgu.2
+        for <linux-wpan@vger.kernel.org>; Wed, 14 Nov 2018 08:02:33 -0800 (PST)
 From: Jian-Hong Pan <starnight@g.ncu.edu.tw>
-Date: Tue, 6 Nov 2018 22:28:18 +0800
-Message-ID: <CAC=mGzh3KH5H6zAOb_rZvjkYycGcJ=99bJreRzKtgVGS==K8qA@mail.gmail.com>
-Subject: Re: [PATCH V2 2/7] net: lorawan: Add LoRaWAN socket module
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: [PATCH V3 0/7] net: lorawan: Add LoRaWAN soft MAC module
+Date: Thu, 15 Nov 2018 00:01:20 +0800
+Message-Id: <20181114160126.4445-1-starnight@g.ncu.edu.tw>
+In-Reply-To: <20181105.101610.1437737564548154497.davem@davemloft.net>
+References: <20181105.101610.1437737564548154497.davem@davemloft.net>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: "David S. Miller" <davem@davemloft.net>
-Cc: =?UTF-8?Q?Andreas_F=C3=A4rber?= <afaerber@suse.de>, netdev@vger.kernel.org, "<linux-arm-kernel@lists.infradead.org\\" <linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org>," <linux-kernel@vger.kernel.org>, Marcel Holtmann <marcel@holtmann.org>, Dollar Chen <dollar.chen@wtmec.com>, Ken Yu <ken.yu@rakwireless.com>, linux-wpan - ML <linux-wpan@vger.kernel.org>, Stefan Schmidt <stefan@datenfreihafen.org>
+To: =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>, "David S . Miller" <davem@davemloft.net>
+Cc: netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>, Dollar Chen <dollar.chen@wtmec.com>, Ken Yu <ken.yu@rakwireless.com>, linux-wpan@vger.kernel.org, Stefan Schmidt <stefan@datenfreihafen.org>, Jian-Hong Pan <starnight@g.ncu.edu.tw>
 
-David Miller <davem@davemloft.net> =E6=96=BC 2018=E5=B9=B411=E6=9C=886=E6=
-=97=A5 =E9=80=B1=E4=BA=8C =E4=B8=8A=E5=8D=882:16=E5=AF=AB=E9=81=93=EF=BC=9A
->
-> From: Jian-Hong Pan <starnight@g.ncu.edu.tw>
-> Date: Tue,  6 Nov 2018 00:55:40 +0800
->
-> > +static inline struct lrw_mac_cb * mac_cb(struct sk_buff *skb)
->
-> "mac_cb()" is pretty generic for a name, and leads to namespace pollution=
-,
-> please use lrw_mac_cb() or similar.
->
-> > +static inline struct dgram_sock *
-> > +dgram_sk(const struct sock *sk)
-> > +{
-> > +     return container_of(sk, struct dgram_sock, sk);
-> > +}
-> > +
-> > +static inline struct net_device *
-> > +lrw_get_dev_by_addr(struct net *net, u32 devaddr)
->
-> Never use inline for functions in a foo.c file, let the compiler decide.
->
-> > +{
-> > +     struct net_device *ndev =3D NULL;
-> > +     __be32 be_addr =3D cpu_to_be32(devaddr);
->
-> Always order local variables from longest to shortest line.
->
-> > +static int
-> > +dgram_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
-> > +           int noblock, int flags, int *addr_len)
-> > +{
-> > +     struct sk_buff *skb;
-> > +     size_t copied =3D 0;
-> > +     DECLARE_SOCKADDR(struct sockaddr_lorawan *, saddr, msg->msg_name)=
-;
-> > +     int err;
->
-> Likewise.
->
-> I'm not going to point out every single place where you have made these
-> two errors.
->
-> Please audit your entire submission and fix the problems wherever they
-> occur.
+LoRaWAN(TM) is the MAC layer defined by LoRa Alliance(TM) over LoRa
+devices.  LoRa is one of Low-Power Wide-Area Network (LPWAN) technology.
 
-Thanks for the reviewing.  I will check the submission again.
+LoRaWAN networks typically are laid out in a star-of-stars topology in
+which gateways relay messages between end-devices and a central network
+server at the backend.  Gateways are connected to the network server via
+standard IP connections while end-devices use single hop LoRa(TM) or FSK
+communication to one or many gateways.
 
-Jian-Hong Pan
+A LoRa network distinguishes between a basic LoRaWAN (named Class A) and
+optional features (Class B, Class C ...):
+* Bi-directional end-devices (Class A)
+* Bi-directional end-devices with scheduled receive slots (Class B)
+* Bi-directional end-devices with maximal receive slots (Class C)
+
+This patch set add LoRaWAN class module implementing the stack,
+especially the soft MAC, between socket APIs and LoRa device drivers.
+
+socket APIs:
+send and receive the data
+------------------------------------------------------------------------
+LoRaWAN class module implements soft MAC:
+append the header/footer, encryption/decryption, timing slot and MAC
+commands
+------------------------------------------------------------------------
+LoRa device drivers:
+send and receive the messages for MAC layer
+------------------------------------------------------------------------
+LoRa devices
+
+This module starts from simple and implements partial Class A
+end-devices features defined in LoRaWAN(TM) Specification Ver. 1.0.2.
+More features and complexity, for example regional parameters, confirmed
+data messages, join request/accept messages for Over-The-Air Activation,
+MAC commands ... will be added in the future.
+
+Jian-Hong Pan (7):
+  net: lorawan: Add macro and definition for LoRaWAN
+  net: lorawan: Add LoRaWAN socket module
+  net: lorawan: Add LoRaWAN API declaration for LoRa devices
+  net: maclorawan: Add maclorawan module declaration
+  net: maclorawan: Implement the crypto of maclorawan module
+  net: maclorawan: Implement maclorawan class module
+  net: lorawan: List LORAWAN in menuconfig
+
+ include/linux/lora/lorawan.h        | 131 ++++++
+ include/linux/lora/lorawan_netdev.h |  49 ++
+ include/linux/socket.h              |   5 +-
+ include/uapi/linux/if_arp.h         |   1 +
+ include/uapi/linux/if_ether.h       |   1 +
+ net/Kconfig                         |   2 +
+ net/Makefile                        |   2 +
+ net/core/dev.c                      |   4 +-
+ net/lorawan/Kconfig                 |  10 +
+ net/lorawan/Makefile                |   2 +
+ net/lorawan/socket.c                | 688 ++++++++++++++++++++++++++++
+ net/maclorawan/Kconfig              |  14 +
+ net/maclorawan/Makefile             |   2 +
+ net/maclorawan/crypto.c             | 209 +++++++++
+ net/maclorawan/crypto.h             |  27 ++
+ net/maclorawan/mac.c                | 520 +++++++++++++++++++++
+ net/maclorawan/maclorawan.h         | 199 ++++++++
+ net/maclorawan/main.c               | 605 ++++++++++++++++++++++++
+ security/selinux/hooks.c            |   4 +-
+ security/selinux/include/classmap.h |   4 +-
+ 20 files changed, 2474 insertions(+), 5 deletions(-)
+ create mode 100644 include/linux/lora/lorawan.h
+ create mode 100644 include/linux/lora/lorawan_netdev.h
+ create mode 100644 net/lorawan/Kconfig
+ create mode 100644 net/lorawan/Makefile
+ create mode 100644 net/lorawan/socket.c
+ create mode 100644 net/maclorawan/Kconfig
+ create mode 100644 net/maclorawan/Makefile
+ create mode 100644 net/maclorawan/crypto.c
+ create mode 100644 net/maclorawan/crypto.h
+ create mode 100644 net/maclorawan/mac.c
+ create mode 100644 net/maclorawan/maclorawan.h
+ create mode 100644 net/maclorawan/main.c
+
+-- 
+2.19.1
