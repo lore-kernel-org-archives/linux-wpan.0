@@ -1,57 +1,176 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-oi1-f194.google.com ([209.85.167.194]:45990 "EHLO
-        mail-oi1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726113AbeKRBLE (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Sat, 17 Nov 2018 20:11:04 -0500
-Received: by mail-oi1-f194.google.com with SMTP id b141so12972174oii.12
-        for <linux-wpan@vger.kernel.org>; Sat, 17 Nov 2018 06:54:09 -0800 (PST)
-MIME-Version: 1.0
-References: <20181105.101610.1437737564548154497.davem@davemloft.net>
- <20181114160126.4445-3-starnight@g.ncu.edu.tw> <20181116.203200.1638720313402188457.davem@davemloft.net>
-In-Reply-To: <20181116.203200.1638720313402188457.davem@davemloft.net>
+Received: from mail-pl1-f196.google.com ([209.85.214.196]:36537 "EHLO
+        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387577AbeKOCHN (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 14 Nov 2018 21:07:13 -0500
+Received: by mail-pl1-f196.google.com with SMTP id y6-v6so424885plt.3
+        for <linux-wpan@vger.kernel.org>; Wed, 14 Nov 2018 08:03:24 -0800 (PST)
 From: Jian-Hong Pan <starnight@g.ncu.edu.tw>
-Date: Sat, 17 Nov 2018 22:54:08 +0800
-Message-ID: <CAC=mGzhs0smXzRxn1k9jDFsaLNAkpCd7rMs--E-SafQVTob7JQ@mail.gmail.com>
-Subject: Re: [PATCH V3 2/7] net: lorawan: Add LoRaWAN socket module
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: [PATCH V3 3/7] net: lorawan: Add LoRaWAN API declaration for LoRa devices
+Date: Thu, 15 Nov 2018 00:01:24 +0800
+Message-Id: <20181114160126.4445-4-starnight@g.ncu.edu.tw>
+In-Reply-To: <20181105.101610.1437737564548154497.davem@davemloft.net>
+References: <20181105.101610.1437737564548154497.davem@davemloft.net>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: "David S. Miller" <davem@davemloft.net>
-Cc: =?UTF-8?Q?Andreas_F=C3=A4rber?= <afaerber@suse.de>, netdev@vger.kernel.org, "<linux-arm-kernel@lists.infradead.org\\" <linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org>," <linux-kernel@vger.kernel.org>, Marcel Holtmann <marcel@holtmann.org>, Dollar Chen <dollar.chen@wtmec.com>, Ken Yu <ken.yu@rakwireless.com>, linux-wpan - ML <linux-wpan@vger.kernel.org>, Stefan Schmidt <stefan@datenfreihafen.org>
+To: =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>, "David S . Miller" <davem@davemloft.net>
+Cc: netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>, Dollar Chen <dollar.chen@wtmec.com>, Ken Yu <ken.yu@rakwireless.com>, linux-wpan@vger.kernel.org, Stefan Schmidt <stefan@datenfreihafen.org>, Jian-Hong Pan <starnight@g.ncu.edu.tw>
 
-David Miller <davem@davemloft.net> =E6=96=BC 2018=E5=B9=B411=E6=9C=8817=E6=
-=97=A5 =E9=80=B1=E5=85=AD =E4=B8=8B=E5=8D=8812:32=E5=AF=AB=E9=81=93=EF=BC=
-=9A
->
-> From: Jian-Hong Pan <starnight@g.ncu.edu.tw>
-> Date: Thu, 15 Nov 2018 00:01:23 +0800
->
-> > +#define      lrw_get_mac_cb(skb)     ((struct lrw_mac_cb *)skb->cb)
->
-> Please make this a static inline function.  If the identifier is all lowe=
-rcase
-> programmers expect it to be real code not a CPP macro.
+Add public LoRaWAN API for compatible LoRa device drivers.
 
-Okay!  Sure
+Signed-off-by: Jian-Hong Pan <starnight@g.ncu.edu.tw>
+---
+V2:
+- Split the LoRaWAN class module patch in V1 into LoRaWAN socket and
+  LoRaWAN Soft MAC modules
+- Merge the lrw_operations: set_bw, set_mod, set_sf into set_dr
+- Use SPDX license identifiers
 
-> > +#define      LORAWAN_MODULE_NAME     "lorawan"
-> > +
-> > +#define      LRW_DBG_STR(fmt)        LORAWAN_MODULE_NAME": "fmt
-> > +#define      lrw_info(fmt, ...)      (pr_info(LRW_DBG_STR(fmt), ##__VA=
-_ARGS__))
-> > +#define      lrw_dbg(fmt, ...)       (pr_debug(LRW_DBG_STR(fmt), ##__V=
-A_ARGS__))
->
-> Just define "pr_fmt()" appropriately and you don't need to play these kin=
-ds
-> of games.
->
-> Set pr_fmt() and call pr_info() and pr_debug() directly.
+V3:
+- Remove the unused lrw_random_addr function
 
-After checking printk.h again, I get the idea of the comment.
-"pr_fmt()" is more convenient!
+ include/linux/lora/lorawan.h | 131 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 131 insertions(+)
+ create mode 100644 include/linux/lora/lorawan.h
 
-Thanks for the reviewing.  I will make new patches.
-
-Jian-Hong Pan
+diff --git a/include/linux/lora/lorawan.h b/include/linux/lora/lorawan.h
+new file mode 100644
+index 000000000000..cdeb280b2261
+--- /dev/null
++++ b/include/linux/lora/lorawan.h
+@@ -0,0 +1,131 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later OR BSD-3-Clause */
++/*-
++ * LoRaWAN compatible hardware's definitions
++ *
++ * Copyright (c) 2018 Jian-Hong, Pan <starnight@g.ncu.edu.tw>
++ *
++ */
++
++#ifndef __LORAWAN_H__
++#define __LORAWAN_H__
++
++#include <linux/skbuff.h>
++
++/* List the role of the LoRaWAN hardware */
++enum {
++	LRW_GATEWAY,
++	LRW_CLASS_A_NODE,
++	LRW_CLASS_B_NODE,
++	LRW_CLASS_C_NODE,
++};
++
++/* List the RF modes */
++enum {
++	LRW_LORA,
++	LRW_FSK,
++};
++
++/**
++ * lrw_dr - This structure holds the RF related configuration of the data rate.
++ * @bw:
++ * 	Bandwidth in Hz
++ *
++ * @sf:
++ * 	Spread factor of CSS modulation used by LoRa mode
++ *
++ * @mode:
++ * 	LoRa or FSK mode
++ */
++struct lrw_dr {
++	u32 bw;
++	u8 sf;
++	u8 mode;
++};
++
++#define	LRW_DEVADDR_LEN		(sizeof(__le32))
++
++/* List the LoRa device's states of LoRaWAN hardware */
++enum {
++	LRW_STOP,
++	LRW_START,
++	LRW_STATE_IDLE,
++	LRW_STATE_TX,
++	LRW_STATE_RX,
++};
++
++/**
++ * lrw_hw - This structure holds the LoRa device of LoRaWAN hardware.
++ * @priv:
++ * 	points to the private data of the LoRa device
++ */
++struct lrw_hw {
++	void *priv;
++};
++
++/**
++ * lrw_operations - Lists the LoRaWAN device/interface's operations.
++ * These are callback functions for the LoRaWAN module.  Compatible LoRa device
++ * driver should implement some of them according to the usage.  The
++ * unimplemented callback functions must be assigned as NULL.
++ *
++ * @start:
++ *	called when the interface is being up state
++ *
++ * @stop:
++ *	called when the interface is being down state
++ *
++ * @xmit_async:
++ *	called to xmit the data through the interface asynchronously
++ *
++ * @set_txpower:
++ *	called to set xmitting RF power in mBm of the interface
++ *
++ * @set_frq:
++ *	called to set carrier frequency in Hz of the interface
++ *
++ * @set_dr:
++ *	called to set related RF configuration of the LoRaWAN data rate
++ *
++ * @start_rx_window:
++ *	called to ask the LoRa device open a receiving window
++ *
++ * @set_state:
++ *	called to set the LoRa device's working state
++ */
++struct lrw_operations {
++	int (*start)(struct lrw_hw *);
++	void (*stop)(struct lrw_hw *);
++
++	int (*xmit_async)(struct lrw_hw *, struct sk_buff *);
++	int (*set_txpower)(struct lrw_hw *, s32);
++	int (*set_frq)(struct lrw_hw *, u32);
++	int (*set_dr)(struct lrw_hw *, struct lrw_dr *);
++	int (*start_rx_window)(struct lrw_hw *, u32);
++	int (*set_state)(struct lrw_hw *, u8);
++};
++
++struct lrw_hw *lrw_alloc_hw(size_t, struct lrw_operations *);
++void lrw_free_hw(struct lrw_hw *);
++int lrw_register_hw(struct lrw_hw *);
++void lrw_unregister_hw(struct lrw_hw *);
++void lrw_rx_irqsave(struct lrw_hw *, struct sk_buff *);
++void lrw_xmit_complete(struct lrw_hw *, struct sk_buff *);
++
++void lrw_set_deveui(struct lrw_hw *, u64);
++u64 lrw_get_deveui(struct lrw_hw *);
++void lrw_set_appeui(struct lrw_hw *, u64);
++u64 lrw_get_appeui(struct lrw_hw *);
++void lrw_set_devaddr(struct lrw_hw *, u32);
++u32 lrw_get_devaddr(struct lrw_hw *);
++
++enum {
++	LRW_APPKEY,
++	LRW_NWKSKEY,
++	LRW_APPSKEY,
++};
++
++#define	LRW_KEY_LEN		16
++
++int lrw_set_key(struct lrw_hw *, u8, u8 *, size_t);
++
++#endif
+-- 
+2.19.1
