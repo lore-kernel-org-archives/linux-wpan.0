@@ -1,51 +1,38 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-it1-f173.google.com ([209.85.166.173]:56319 "EHLO
-        mail-it1-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726393AbeK3JtF (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Fri, 30 Nov 2018 04:49:05 -0500
-Received: by mail-it1-f173.google.com with SMTP id o19so6306533itg.5
-        for <linux-wpan@vger.kernel.org>; Thu, 29 Nov 2018 14:42:01 -0800 (PST)
-From: Alexander Aring <aring@mojatatu.com>
-Subject: [PATCHv2 wpan] ieee802154: hwsim: fix off-by-one in parse nested
-Date: Thu, 29 Nov 2018 17:41:54 -0500
-Message-Id: <20181129224154.7525-1-aring@mojatatu.com>
+Received: from proxima.lasnet.de ([78.47.171.185]:44409 "EHLO
+        proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725788AbeK3HFA (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 30 Nov 2018 02:05:00 -0500
+From: Stefan Schmidt <stefan@datenfreihafen.org>
+Subject: [PATCH wpan-tools] hwsim: make sure lqi is always initialized
+Date: Thu, 29 Nov 2018 20:58:00 +0100
+Message-Id: <20181129195800.28483-1-stefan@datenfreihafen.org>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: stefan@datenfreihafen.org
-Cc: linux-wpan@vger.kernel.org, Alexander Aring <aring@mojatatu.com>
+To: linux-wpan@vger.kernel.org
+Cc: aring@mojatatu.com, Stefan Schmidt <stefan@datenfreihafen.org>
 
-This patch fixes a off-by-one mistake in nla_parse_nested() functions of
-mac802154_hwsim driver. I had to enabled stack protector so I was able
-to reproduce it.
+The lqi variable was not initialized in all code paths.
 
-Reference: https://github.com/linux-wpan/wpan-tools/issues/17
+CID: 185497
 
-Signed-off-by: Alexander Aring <aring@mojatatu.com>
+Signed-off-by: Stefan Schmidt <stefan@datenfreihafen.org>
 ---
- drivers/net/ieee802154/mac802154_hwsim.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ wpan-hwsim/wpan-hwsim.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ieee802154/mac802154_hwsim.c b/drivers/net/ieee802154/mac802154_hwsim.c
-index bf70ab892e69..624bff4d3636 100644
---- a/drivers/net/ieee802154/mac802154_hwsim.c
-+++ b/drivers/net/ieee802154/mac802154_hwsim.c
-@@ -500,7 +500,7 @@ static int hwsim_del_edge_nl(struct sk_buff *msg, struct genl_info *info)
- 	    !info->attrs[MAC802154_HWSIM_ATTR_RADIO_EDGE])
- 		return -EINVAL;
+diff --git a/wpan-hwsim/wpan-hwsim.c b/wpan-hwsim/wpan-hwsim.c
+index 3e54348..0a7c492 100644
+--- a/wpan-hwsim/wpan-hwsim.c
++++ b/wpan-hwsim/wpan-hwsim.c
+@@ -382,7 +382,7 @@ static void print_version(void)
  
--	if (nla_parse_nested(edge_attrs, MAC802154_HWSIM_EDGE_ATTR_MAX + 1,
-+	if (nla_parse_nested(edge_attrs, MAC802154_HWSIM_EDGE_ATTR_MAX,
- 			     info->attrs[MAC802154_HWSIM_ATTR_RADIO_EDGE],
- 			     hwsim_edge_policy, NULL))
- 		return -EINVAL;
-@@ -550,7 +550,7 @@ static int hwsim_set_edge_lqi(struct sk_buff *msg, struct genl_info *info)
- 	    !info->attrs[MAC802154_HWSIM_ATTR_RADIO_EDGE])
- 		return -EINVAL;
- 
--	if (nla_parse_nested(edge_attrs, MAC802154_HWSIM_EDGE_ATTR_MAX + 1,
-+	if (nla_parse_nested(edge_attrs, MAC802154_HWSIM_EDGE_ATTR_MAX,
- 			     info->attrs[MAC802154_HWSIM_ATTR_RADIO_EDGE],
- 			     hwsim_edge_policy, NULL))
- 		return -EINVAL;
+ int main(int argc, const char *argv[])
+ {
+-	unsigned long int idx, idx2, lqi, ignore_idx = ULONG_MAX;
++	unsigned long int idx, idx2, lqi = 0, ignore_idx = ULONG_MAX;
+ 	bool dot = false;
+ 	int cmd;
+ 	int rc;
 -- 
-2.11.0
+2.17.2
