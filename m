@@ -1,60 +1,63 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-pl1-f196.google.com ([209.85.214.196]:39976 "EHLO
-        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387922AbeKFCS1 (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 5 Nov 2018 21:18:27 -0500
-Received: by mail-pl1-f196.google.com with SMTP id q19-v6so1744644pll.7
-        for <linux-wpan@vger.kernel.org>; Mon, 05 Nov 2018 08:57:52 -0800 (PST)
-From: Jian-Hong Pan <starnight@g.ncu.edu.tw>
-Subject: [PATCH V2 7/7] net: lorawan: List LORAWAN in menuconfig
-Date: Tue,  6 Nov 2018 00:55:45 +0800
-Message-Id: <20181105165544.5215-8-starnight@g.ncu.edu.tw>
-In-Reply-To: <fc737f3940bbe91341fb15d85ac11931eb56d1fc.1535039998.git.starnight@g.ncu.edu.tw>
-References: <fc737f3940bbe91341fb15d85ac11931eb56d1fc.1535039998.git.starnight@g.ncu.edu.tw>
+Received: from proxima.lasnet.de ([78.47.171.185]:45640 "EHLO
+        proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725803AbeLBLTo (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Sun, 2 Dec 2018 06:19:44 -0500
+Subject: Re: [PATCHv2 wpan] ieee802154: hwsim: fix off-by-one in parse nested
+References: <20181129224154.7525-1-aring@mojatatu.com>
+From: Stefan Schmidt <stefan@datenfreihafen.org>
+Message-ID: <717b624d-b61f-8de2-8d7b-aeacd71a7786@datenfreihafen.org>
+Date: Sun, 2 Dec 2018 12:19:37 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20181129224154.7525-1-aring@mojatatu.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>
-Cc: netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>, "David S . Miller" <davem@davemloft.net>, Dollar Chen <dollar.chen@wtmec.com>, Ken Yu <ken.yu@rakwireless.com>, linux-wpan@vger.kernel.org, Stefan Schmidt <stefan@datenfreihafen.org>, Jian-Hong Pan <starnight@g.ncu.edu.tw>
+To: Alexander Aring <aring@mojatatu.com>
+Cc: linux-wpan@vger.kernel.org
 
-List LORAWAN and MACLORAWAN in menuconfig and enable them to be built.
+Hello.
 
-Signed-off-by: Jian-Hong Pan <starnight@g.ncu.edu.tw>
----
-V2:
-- Split the LoRaWAN class module patch in V1 into LoRaWAN socket and
-  LoRaWAN Soft MAC modules
+On 29.11.18 23:41, Alexander Aring wrote:
+> This patch fixes a off-by-one mistake in nla_parse_nested() functions of
+> mac802154_hwsim driver. I had to enabled stack protector so I was able
+> to reproduce it.
+> 
+> Reference: https://github.com/linux-wpan/wpan-tools/issues/17
+> 
+> Signed-off-by: Alexander Aring <aring@mojatatu.com>
+> ---
+>  drivers/net/ieee802154/mac802154_hwsim.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/ieee802154/mac802154_hwsim.c b/drivers/net/ieee802154/mac802154_hwsim.c
+> index bf70ab892e69..624bff4d3636 100644
+> --- a/drivers/net/ieee802154/mac802154_hwsim.c
+> +++ b/drivers/net/ieee802154/mac802154_hwsim.c
+> @@ -500,7 +500,7 @@ static int hwsim_del_edge_nl(struct sk_buff *msg, struct genl_info *info)
+>  	    !info->attrs[MAC802154_HWSIM_ATTR_RADIO_EDGE])
+>  		return -EINVAL;
+>  
+> -	if (nla_parse_nested(edge_attrs, MAC802154_HWSIM_EDGE_ATTR_MAX + 1,
+> +	if (nla_parse_nested(edge_attrs, MAC802154_HWSIM_EDGE_ATTR_MAX,
+>  			     info->attrs[MAC802154_HWSIM_ATTR_RADIO_EDGE],
+>  			     hwsim_edge_policy, NULL))
+>  		return -EINVAL;
+> @@ -550,7 +550,7 @@ static int hwsim_set_edge_lqi(struct sk_buff *msg, struct genl_info *info)
+>  	    !info->attrs[MAC802154_HWSIM_ATTR_RADIO_EDGE])
+>  		return -EINVAL;
+>  
+> -	if (nla_parse_nested(edge_attrs, MAC802154_HWSIM_EDGE_ATTR_MAX + 1,
+> +	if (nla_parse_nested(edge_attrs, MAC802154_HWSIM_EDGE_ATTR_MAX,
+>  			     info->attrs[MAC802154_HWSIM_ATTR_RADIO_EDGE],
+>  			     hwsim_edge_policy, NULL))
+>  		return -EINVAL;
+> 
 
- net/Kconfig  | 2 ++
- net/Makefile | 2 ++
- 2 files changed, 4 insertions(+)
+This patch has been applied to the wpan tree and will be
+part of the next pull request to net. Thanks!
 
-diff --git a/net/Kconfig b/net/Kconfig
-index 053b36998c18..b12b8bed6abb 100644
---- a/net/Kconfig
-+++ b/net/Kconfig
-@@ -224,6 +224,8 @@ source "net/6lowpan/Kconfig"
- source "net/ieee802154/Kconfig"
- source "net/mac802154/Kconfig"
- source "net/lora/Kconfig"
-+source "net/lorawan/Kconfig"
-+source "net/maclorawan/Kconfig"
- source "net/sched/Kconfig"
- source "net/dcb/Kconfig"
- source "net/dns_resolver/Kconfig"
-diff --git a/net/Makefile b/net/Makefile
-index e80b84313851..9d5515965a8f 100644
---- a/net/Makefile
-+++ b/net/Makefile
-@@ -63,6 +63,8 @@ obj-$(CONFIG_6LOWPAN)		+= 6lowpan/
- obj-$(CONFIG_IEEE802154)	+= ieee802154/
- obj-$(CONFIG_MAC802154)		+= mac802154/
- obj-$(CONFIG_LORA)		+= lora/
-+obj-$(CONFIG_LORAWAN)		+= lorawan/
-+obj-$(CONFIG_MACLORAWAN)	+= maclorawan/
- 
- ifeq ($(CONFIG_NET),y)
- obj-$(CONFIG_SYSCTL)		+= sysctl_net.o
--- 
-2.19.1
+regards
+Stefan Schmidt
