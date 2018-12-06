@@ -1,34 +1,47 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from coyote.holtmann.net ([212.227.132.17]:55302 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726719AbeLRXtr (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 18 Dec 2018 18:49:47 -0500
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
-Subject: Re: [PATCH] 6lowpan: convert to DEFINE_SHOW_ATTRIBUTE
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20181215072217.26085-1-tiny.windzz@gmail.com>
-Date: Wed, 19 Dec 2018 00:49:45 +0100
-Content-Transfer-Encoding: 7bit
-Message-Id: <62A2F405-FC91-4A6C-85B4-A5D28E306F01@holtmann.org>
-References: <20181215072217.26085-1-tiny.windzz@gmail.com>
+Received: from proxima.lasnet.de ([78.47.171.185]:53426 "EHLO
+        proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726112AbeLFU0V (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 6 Dec 2018 15:26:21 -0500
+From: Stefan Schmidt <stefan@datenfreihafen.org>
+Subject: [PATCH 1/2] iwpan: fix clang compiler warning on absolute-value
+Date: Thu,  6 Dec 2018 21:26:01 +0100
+Message-Id: <20181206202602.22176-1-stefan@datenfreihafen.org>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Yangtao Li <tiny.windzz@gmail.com>
-Cc: Alexander Aring <alex.aring@gmail.com>, Jukka Rissanen <jukka.rissanen@linux.intel.com>, "David S. Miller" <davem@davemloft.net>, linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+To: linux-wpan@vger.kernel.org
+Cc: aring@mojatatu.com, Stefan Schmidt <stefan@datenfreihafen.org>
 
-Hi Yangtao,
+Our CI found this when building with clang (seems to have
+the option on by deafult)
 
-> Use DEFINE_SHOW_ATTRIBUTE macro to simplify the code.
-> 
-> Signed-off-by: Yangtao Li <tiny.windzz@gmail.com>
-> ---
-> net/6lowpan/debugfs.c | 13 +------------
-> 1 file changed, 1 insertion(+), 12 deletions(-)
+iwpan.c:469:13: warning: absolute value function 'abs' given an argument of type 'long' but has parameter of type 'int' which may cause truncation of value [-Wabsolute-value]
+        cmd_size = abs((long)&__section_set - (long)&__section_get);
+                   ^
+iwpan.c:469:13: note: use function 'labs' instead
+        cmd_size = abs((long)&__section_set - (long)&__section_get);
+                   ^~~
+                   labs
 
-patch has been applied to bluetooth-next tree.
+This also follows a change in iw, where we derived from.
 
-Regards
+Signed-off-by: Stefan Schmidt <stefan@datenfreihafen.org>
+---
+ src/iwpan.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Marcel
+diff --git a/src/iwpan.c b/src/iwpan.c
+index e7781fd..fb7bef1 100644
+--- a/src/iwpan.c
++++ b/src/iwpan.c
+@@ -466,7 +466,7 @@ int main(int argc, char **argv)
+ 	int err;
+ 
+ 	/* calculate command size including padding */
+-	cmd_size = abs((long)&__section_set - (long)&__section_get);
++	cmd_size = labs((long)&__section_set - (long)&__section_get);
+ 	/* strip off self */
+ 	argc--;
+ 	argv0 = *argv++;
+-- 
+2.17.2
