@@ -1,63 +1,51 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from proxima.lasnet.de ([78.47.171.185]:45640 "EHLO
+Received: from proxima.lasnet.de ([78.47.171.185]:53407 "EHLO
         proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725803AbeLBLTo (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Sun, 2 Dec 2018 06:19:44 -0500
-Subject: Re: [PATCHv2 wpan] ieee802154: hwsim: fix off-by-one in parse nested
-References: <20181129224154.7525-1-aring@mojatatu.com>
+        with ESMTP id S1725921AbeLFTex (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 6 Dec 2018 14:34:53 -0500
+Subject: Re: [PATCH wpan-tools] hwsim: make sure lqi is always initialized
+References: <20181129195800.28483-1-stefan@datenfreihafen.org>
 From: Stefan Schmidt <stefan@datenfreihafen.org>
-Message-ID: <717b624d-b61f-8de2-8d7b-aeacd71a7786@datenfreihafen.org>
-Date: Sun, 2 Dec 2018 12:19:37 +0100
+Message-ID: <46d93ad8-889d-199c-bb12-1e4d5a86a431@datenfreihafen.org>
+Date: Thu, 6 Dec 2018 20:34:49 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181129224154.7525-1-aring@mojatatu.com>
+In-Reply-To: <20181129195800.28483-1-stefan@datenfreihafen.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <aring@mojatatu.com>
-Cc: linux-wpan@vger.kernel.org
+To: linux-wpan@vger.kernel.org
+Cc: aring@mojatatu.com
 
 Hello.
 
-On 29.11.18 23:41, Alexander Aring wrote:
-> This patch fixes a off-by-one mistake in nla_parse_nested() functions of
-> mac802154_hwsim driver. I had to enabled stack protector so I was able
-> to reproduce it.
+On 29.11.18 20:58, Stefan Schmidt wrote:
+> The lqi variable was not initialized in all code paths.
 > 
-> Reference: https://github.com/linux-wpan/wpan-tools/issues/17
+> CID: 185497
 > 
-> Signed-off-by: Alexander Aring <aring@mojatatu.com>
+> Signed-off-by: Stefan Schmidt <stefan@datenfreihafen.org>
 > ---
->  drivers/net/ieee802154/mac802154_hwsim.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  wpan-hwsim/wpan-hwsim.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/drivers/net/ieee802154/mac802154_hwsim.c b/drivers/net/ieee802154/mac802154_hwsim.c
-> index bf70ab892e69..624bff4d3636 100644
-> --- a/drivers/net/ieee802154/mac802154_hwsim.c
-> +++ b/drivers/net/ieee802154/mac802154_hwsim.c
-> @@ -500,7 +500,7 @@ static int hwsim_del_edge_nl(struct sk_buff *msg, struct genl_info *info)
->  	    !info->attrs[MAC802154_HWSIM_ATTR_RADIO_EDGE])
->  		return -EINVAL;
+> diff --git a/wpan-hwsim/wpan-hwsim.c b/wpan-hwsim/wpan-hwsim.c
+> index 3e54348..0a7c492 100644
+> --- a/wpan-hwsim/wpan-hwsim.c
+> +++ b/wpan-hwsim/wpan-hwsim.c
+> @@ -382,7 +382,7 @@ static void print_version(void)
 >  
-> -	if (nla_parse_nested(edge_attrs, MAC802154_HWSIM_EDGE_ATTR_MAX + 1,
-> +	if (nla_parse_nested(edge_attrs, MAC802154_HWSIM_EDGE_ATTR_MAX,
->  			     info->attrs[MAC802154_HWSIM_ATTR_RADIO_EDGE],
->  			     hwsim_edge_policy, NULL))
->  		return -EINVAL;
-> @@ -550,7 +550,7 @@ static int hwsim_set_edge_lqi(struct sk_buff *msg, struct genl_info *info)
->  	    !info->attrs[MAC802154_HWSIM_ATTR_RADIO_EDGE])
->  		return -EINVAL;
->  
-> -	if (nla_parse_nested(edge_attrs, MAC802154_HWSIM_EDGE_ATTR_MAX + 1,
-> +	if (nla_parse_nested(edge_attrs, MAC802154_HWSIM_EDGE_ATTR_MAX,
->  			     info->attrs[MAC802154_HWSIM_ATTR_RADIO_EDGE],
->  			     hwsim_edge_policy, NULL))
->  		return -EINVAL;
+>  int main(int argc, const char *argv[])
+>  {
+> -	unsigned long int idx, idx2, lqi, ignore_idx = ULONG_MAX;
+> +	unsigned long int idx, idx2, lqi = 0, ignore_idx = ULONG_MAX;
+>  	bool dot = false;
+>  	int cmd;
+>  	int rc;
 > 
 
-This patch has been applied to the wpan tree and will be
-part of the next pull request to net. Thanks!
+No complains and trivial enough. Applied to wpan-tools master.
 
 regards
 Stefan Schmidt
