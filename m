@@ -1,55 +1,37 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from szxga07-in.huawei.com ([45.249.212.35]:42307 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1729765AbeLKDOR (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-        Mon, 10 Dec 2018 22:14:17 -0500
-From: YueHaibing <yuehaibing@huawei.com>
-Subject: [PATCH net-next] ieee802154: ca8210: fix possible u8 overflow in ca8210_rx_done
-Date: Tue, 11 Dec 2018 11:13:39 +0800
-Message-ID: <20181211031339.21048-1-yuehaibing@huawei.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Received: from shards.monkeyblade.net ([23.128.96.9]:53784 "EHLO
+        shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727352AbeLKGBI (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 11 Dec 2018 01:01:08 -0500
+Date: Mon, 10 Dec 2018 22:01:07 -0800 (PST)
+Message-Id: <20181210.220107.751606140724107779.davem@davemloft.net>
+Subject: Re: [PATCH net-next] ieee802154: ca8210: fix possible u8 overflow
+ in ca8210_rx_done
+From: David Miller <davem@davemloft.net>
+In-Reply-To: <20181211031339.21048-1-yuehaibing@huawei.com>
+References: <20181211031339.21048-1-yuehaibing@huawei.com>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: davem@davemloft.net, h.morris@cascoda.com, alex.aring@gmail.com, stefan@datenfreihafen.org
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, linux-wpan@vger.kernel.org, YueHaibing <yuehaibing@huawei.com>
+To: yuehaibing@huawei.com
+Cc: h.morris@cascoda.com, alex.aring@gmail.com, stefan@datenfreihafen.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, linux-wpan@vger.kernel.org
 
-gcc warning this:
+From: YueHaibing <yuehaibing@huawei.com>
+Date: Tue, 11 Dec 2018 11:13:39 +0800
 
-drivers/net/ieee802154/ca8210.c:730:10: warning:
- comparison is always false due to limited range of data type [-Wtype-limits]
+> gcc warning this:
+> 
+> drivers/net/ieee802154/ca8210.c:730:10: warning:
+>  comparison is always false due to limited range of data type [-Wtype-limits]
+> 
+> 'len' is u8 type, we get it from buf[1] adding 2, which can overflow.
+> This patch change the type of 'len' to unsigned int to avoid this,also fix
+> the gcc warning.
+> 
+> Fixes: ded845a781a5 ("ieee802154: Add CA8210 IEEE 802.15.4 device driver")
+> Signed-off-by: YueHaibing <yuehaibing@huawei.com>
 
-'len' is u8 type, we get it from buf[1] adding 2, which can overflow.
-This patch change the type of 'len' to unsigned int to avoid this,also fix
-the gcc warning.
-
-Fixes: ded845a781a5 ("ieee802154: Add CA8210 IEEE 802.15.4 device driver")
-Signed-off-by: YueHaibing <yuehaibing@huawei.com>
----
- drivers/net/ieee802154/ca8210.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ieee802154/ca8210.c b/drivers/net/ieee802154/ca8210.c
-index 0ff5a40..b2ff903 100644
---- a/drivers/net/ieee802154/ca8210.c
-+++ b/drivers/net/ieee802154/ca8210.c
-@@ -721,7 +721,7 @@ static void ca8210_mlme_reset_worker(struct work_struct *work)
- static void ca8210_rx_done(struct cas_control *cas_ctl)
- {
- 	u8 *buf;
--	u8 len;
-+	unsigned int len;
- 	struct work_priv_container *mlme_reset_wpc;
- 	struct ca8210_priv *priv = cas_ctl->priv;
- 
-@@ -730,7 +730,7 @@ static void ca8210_rx_done(struct cas_control *cas_ctl)
- 	if (len > CA8210_SPI_BUF_SIZE) {
- 		dev_crit(
- 			&priv->spi->dev,
--			"Received packet len (%d) erroneously long\n",
-+			"Received packet len (%u) erroneously long\n",
- 			len
- 		);
- 		goto finish;
--- 
-2.7.0
+WPAN maintainers, I am assuming that as maintainers you will be
+picking this up and sending it to me.
