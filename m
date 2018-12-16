@@ -1,105 +1,94 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-oi1-f194.google.com ([209.85.167.194]:44529 "EHLO
-        mail-oi1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726076AbeLII1O (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Sun, 9 Dec 2018 03:27:14 -0500
-Received: by mail-oi1-f194.google.com with SMTP id m6so6658032oig.11
-        for <linux-wpan@vger.kernel.org>; Sun, 09 Dec 2018 00:27:13 -0800 (PST)
-MIME-Version: 1.0
-References: <CAC=mGzhs0smXzRxn1k9jDFsaLNAkpCd7rMs--E-SafQVTob7JQ@mail.gmail.com>
- <20181204141341.4353-6-starnight@g.ncu.edu.tw> <20181204204508.3ebead06@alans-desktop>
-In-Reply-To: <20181204204508.3ebead06@alans-desktop>
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:35033 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730066AbeLPKTR (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Sun, 16 Dec 2018 05:19:17 -0500
+Received: by mail-pg1-f195.google.com with SMTP id s198so4733104pgs.2
+        for <linux-wpan@vger.kernel.org>; Sun, 16 Dec 2018 02:19:16 -0800 (PST)
 From: Jian-Hong Pan <starnight@g.ncu.edu.tw>
-Date: Sun, 9 Dec 2018 16:27:15 +0800
-Message-ID: <CAC=mGziyi1ierhg++SUcHMrq1JQ0vH4gZCKUZgchzb8aD1Rv5Q@mail.gmail.com>
-Subject: Re: [PATCH V4 5/6] net: maclorawan: Implement maclorawan class module
-Content-Type: text/plain; charset="UTF-8"
+Subject: [PATCH v5 0/6] net: lorawan: Add LoRaWAN soft MAC module
+Date: Sun, 16 Dec 2018 18:18:53 +0800
+Message-Id: <20181216101858.9585-1-starnight@g.ncu.edu.tw>
+In-Reply-To: <CAC=mGziyi1ierhg++SUcHMrq1JQ0vH4gZCKUZgchzb8aD1Rv5Q@mail.gmail.com>
+References: <CAC=mGziyi1ierhg++SUcHMrq1JQ0vH4gZCKUZgchzb8aD1Rv5Q@mail.gmail.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alan Cox <gnomes@lxorguk.ukuu.org.uk>
-Cc: =?UTF-8?Q?Andreas_F=C3=A4rber?= <afaerber@suse.de>, "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org, "<linux-arm-kernel@lists.infradead.org\\" <linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org>," <linux-kernel@vger.kernel.org>, Marcel Holtmann <marcel@holtmann.org>, Dollar Chen <dollar.chen@wtmec.com>, Ken Yu <ken.yu@rakwireless.com>, linux-wpan - ML <linux-wpan@vger.kernel.org>, Stefan Schmidt <stefan@datenfreihafen.org>
+To: =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>, "David S . Miller" <davem@davemloft.net>, Alan Cox <gnomes@lxorguk.ukuu.org.uk>
+Cc: linux-lpwan@lists.infradead.org, netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>, Dollar Chen <dollar.chen@wtmec.com>, Ken Yu <ken.yu@rakwireless.com>, linux-wpan@vger.kernel.org, Jian-Hong Pan <starnight@g.ncu.edu.tw>
 
-I made a fake skb and passed it to lrw_parse_frame() function for
-testing.  I use print_hex_dump() function to show the skb's content.
-Here is the original content in the skb->data and the length is 20 bytes.
+LoRaWAN(TM) is the MAC layer defined by LoRa Alliance(TM) over LoRa
+devices.  LoRa is one of Low-Power Wide-Area Network (LPWAN) technology.
 
-[   33.732033] 00000000: 40 04 03 02 01 00 00 00 00 27 76 d3 2d 1b 79
-a0  @........'v.-.y.
-[   33.732065] 00000010: 18 38 fb a6                                      .8..
+LoRaWAN networks typically are laid out in a star-of-stars topology in
+which gateways relay messages between end-devices and a central network
+server at the backend.  Gateways are connected to the network server via
+standard IP connections while end-devices use single hop LoRa(TM) or FSK
+communication to one or many gateways.
 
-Byte 0: MHDR field, value is 0x40.
-Byte 1 ~ 4: DevAddr field, value is 0x04 0x03 0x02 0x01.
-Byte 5: FCtrl field, value is 0x00.
-Byte 6 ~ 7: FCnt field, value is 0x00 0x00.
-Byte 8: FPort field, value is 0x00.
-Byte 9 ~ 15: Encrypted payload
-Byte 16 ~ 19: MIC field value is 0x18 0x38 0xfb 0xa6.
+A LoRa network distinguishes between a basic LoRaWAN (named Class A) and
+optional features (Class B, Class C ...):
+* Bi-directional end-devices (Class A)
+* Bi-directional end-devices with scheduled receive slots (Class B)
+* Bi-directional end-devices with maximal receive slots (Class C)
 
-> > +void
-> > +lrw_parse_frame(struct lrw_session *ss, struct sk_buff *skb)
-> > +{
-> > +     struct lrw_fhdr *fhdr = &ss->rx_fhdr;
-> > +     __le16 *p_fcnt;
-> > +
-> > +     pr_debug("%s: %s\n", LORAWAN_MODULE_NAME, __func__);
-> > +
-> > +     /* Get message type */
-> > +     fhdr->mtype = skb->data[0];
-> > +     skb_pull(skb, LRW_MHDR_LEN);
+This patch set add LoRaWAN class module implementing the stack,
+especially the soft MAC, between socket APIs and LoRa device drivers.
 
-print_hex_dump skb here:
-[   33.732202] 00000000: 04 03 02 01 00 00 00 00 27 76 d3 2d 1b 79 a0
-18  ........'v.-.y..
-[   33.732204] 00000010: 38 fb a6
+socket APIs:
+send and receive the data
+------------------------------------------------------------------------
+LoRaWAN class module implements soft MAC:
+append the header/footer, encryption/decryption, timing slot and MAC
+commands
+------------------------------------------------------------------------
+LoRa device drivers:
+send and receive the messages for MAC layer
+------------------------------------------------------------------------
+LoRa devices
 
-> This does not seem robust. There is no point at which you actually check
-> the message size is valid etc
+This module starts from simple and implements partial Class A
+end-devices features defined in LoRaWAN(TM) Specification Ver. 1.0.2.
+More features and complexity, for example regional parameters, confirmed
+data messages, join request/accept messages for Over-The-Air Activation,
+MAC commands ... will be added in the future.
 
-Thanks!  It is a potential bug.
-It should check skb->len >= length of MHDR + DevAddr + FCtrl + FCnt + MIC.
-These are required fields for (Un)confirmed Data Up/Down messages.
+Jian-Hong Pan (6):
+  net: lorawan: Add LoRaWAN socket module
+  net: lorawan: Add LoRaWAN API declaration for LoRa devices
+  net: maclorawan: Add maclorawan module declaration
+  net: maclorawan: Implement the crypto of maclorawan module
+  net: maclorawan: Implement maclorawan class module
+  net: lorawan: List LORAWAN in menuconfig
 
+ include/linux/lora/lorawan.h        | 131 ++++++
+ include/linux/lora/lorawan_netdev.h |  52 +++
+ net/Kconfig                         |   2 +
+ net/Makefile                        |   2 +
+ net/lorawan/Kconfig                 |  10 +
+ net/lorawan/Makefile                |   2 +
+ net/lorawan/socket.c                | 686 ++++++++++++++++++++++++++++
+ net/maclorawan/Kconfig              |  14 +
+ net/maclorawan/Makefile             |   2 +
+ net/maclorawan/crypto.c             | 212 +++++++++
+ net/maclorawan/crypto.h             |  27 ++
+ net/maclorawan/mac.c                | 555 ++++++++++++++++++++++
+ net/maclorawan/maclorawan.h         | 202 ++++++++
+ net/maclorawan/main.c               | 606 ++++++++++++++++++++++++
+ 14 files changed, 2503 insertions(+)
+ create mode 100644 include/linux/lora/lorawan.h
+ create mode 100644 include/linux/lora/lorawan_netdev.h
+ create mode 100644 net/lorawan/Kconfig
+ create mode 100644 net/lorawan/Makefile
+ create mode 100644 net/lorawan/socket.c
+ create mode 100644 net/maclorawan/Kconfig
+ create mode 100644 net/maclorawan/Makefile
+ create mode 100644 net/maclorawan/crypto.c
+ create mode 100644 net/maclorawan/crypto.h
+ create mode 100644 net/maclorawan/mac.c
+ create mode 100644 net/maclorawan/maclorawan.h
+ create mode 100644 net/maclorawan/main.c
 
-print_hex_dump skb here:
-[   33.732211] 00000000: 00 27 76 d3 2d 1b 79 a0 18 38 fb a6
-   .'v.-.y..8..
-
-> > +     fhdr->fopts_len = fhdr->fctrl & 0xF;
-> > +     if (fhdr->fopts_len > 0) {
-> > +             memcpy(fhdr->fopts, skb->data, fhdr->fopts_len);
-> > +             skb_pull(skb, fhdr->fopts_len);
-> > +     }
-
-print_hex_dump skb here:
-[   33.732213] 00000000: 00 27 76 d3 2d 1b 79 a0 18 38 fb a6
-   .'v.-.y..8..
-
-> In fact you appear to copy random kernel memory into a buffer
-
-It copied fhdr->fopts_len bytes from skb->data to fhdr->fopts if
-fhdr->fopts_len > 0.
-https://www.kernel.org/doc/html/latest/core-api/kernel-api.html?highlight=memcpy#c.memcpy
-
-> > +
-> > +     /* TODO: Parse frame options */
-> > +
-> > +     /* Remove message integrity code */
-> > +     skb_trim(skb, skb->len - LRW_MIC_LEN);
-
-print_hex_dump skb here:
-[   33.732216] 00000000: 00 27 76 d3 2d 1b 79 a0
-   .'v.-.y.
-
-> and then try and trim the buffer to a negative size ?
-
-It removed 4 tail bytes (MIC).  (skb->len - LRW_MIC_LEN) is the final
-new length as skb_trim()'s 2nd argument len.
-https://www.kernel.org/doc/html/latest/networking/kapi.html?highlight=skb_trim#c.skb_trim
-
-I found another bug which did not initialize rx_skb_list.  So,
-lrw_parse_frame() may be passed a mystery skb.
-
-Please keep reviewing.  That is appreciated.
-
-Thank you,
-Jian-Hong Pan
+-- 
+2.20.0
