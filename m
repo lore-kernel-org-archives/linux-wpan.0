@@ -1,16 +1,15 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from proxima.lasnet.de ([78.47.171.185]:59627 "EHLO
+Received: from proxima.lasnet.de ([78.47.171.185]:59625 "EHLO
         proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729324AbeLSNd3 (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 19 Dec 2018 08:33:29 -0500
-Subject: Re: [PATCH 2/2] examples: fix wrongly used unsigned attribute
+        with ESMTP id S1729019AbeLSNdP (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 19 Dec 2018 08:33:15 -0500
+Subject: Re: [PATCH 1/2] iwpan: fix clang compiler warning on absolute-value
 References: <20181206202602.22176-1-stefan@datenfreihafen.org>
- <20181206202602.22176-2-stefan@datenfreihafen.org>
 From: Stefan Schmidt <stefan@datenfreihafen.org>
-Message-ID: <e4b9779f-1456-783d-bf33-c2107d91c2cb@datenfreihafen.org>
-Date: Wed, 19 Dec 2018 14:33:26 +0100
+Message-ID: <8f140636-2b12-4c1f-6d56-4fe65659dde9@datenfreihafen.org>
+Date: Wed, 19 Dec 2018 14:33:11 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181206202602.22176-2-stefan@datenfreihafen.org>
+In-Reply-To: <20181206202602.22176-1-stefan@datenfreihafen.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -22,43 +21,37 @@ Cc: aring@mojatatu.com
 Hello.
 
 On 06.12.18 21:26, Stefan Schmidt wrote:
-> We are passing this buffer into sprintf later which
-> expects signed. Its a constant string anyway, so
-> it does not matter for us. Fixes -Wpointer-sign values
-> spotted by our CI system.
+> Our CI found this when building with clang (seems to have
+> the option on by deafult)
+> 
+> iwpan.c:469:13: warning: absolute value function 'abs' given an argument of type 'long' but has parameter of type 'int' which may cause truncation of value [-Wabsolute-value]
+>         cmd_size = abs((long)&__section_set - (long)&__section_get);
+>                    ^
+> iwpan.c:469:13: note: use function 'labs' instead
+>         cmd_size = abs((long)&__section_set - (long)&__section_get);
+>                    ^~~
+>                    labs
+> 
+> This also follows a change in iw, where we derived from.
 > 
 > Signed-off-by: Stefan Schmidt <stefan@datenfreihafen.org>
 > ---
->  examples/af_ieee802154_tx.c | 2 +-
->  examples/af_inet6_tx.c      | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
+>  src/iwpan.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/examples/af_ieee802154_tx.c b/examples/af_ieee802154_tx.c
-> index e85a109..faad17e 100644
-> --- a/examples/af_ieee802154_tx.c
-> +++ b/examples/af_ieee802154_tx.c
-> @@ -55,7 +55,7 @@ int main(int argc, char *argv[]) {
->  	int sd;
->  	ssize_t len;
->  	struct sockaddr_ieee802154 dst;
-> -	unsigned char buf[MAX_PACKET_LEN + 1];
-> +	char buf[MAX_PACKET_LEN + 1];
->  	/* IEEE 802.15.4 extended send address, adapt to your setup */
->  	uint8_t long_addr[IEEE802154_ADDR_LEN] = {0xd6, 0x55, 0x2c, 0xd6, 0xe4, 0x1c, 0xeb, 0x57};
+> diff --git a/src/iwpan.c b/src/iwpan.c
+> index e7781fd..fb7bef1 100644
+> --- a/src/iwpan.c
+> +++ b/src/iwpan.c
+> @@ -466,7 +466,7 @@ int main(int argc, char **argv)
+>  	int err;
 >  
-> diff --git a/examples/af_inet6_tx.c b/examples/af_inet6_tx.c
-> index 9fe7491..a62f730 100644
-> --- a/examples/af_inet6_tx.c
-> +++ b/examples/af_inet6_tx.c
-> @@ -35,7 +35,7 @@ int main(int argc, char *argv[]) {
->  	int ret, sd;
->  	struct sockaddr_in6 dst;
->  	struct ifreq ifr;
-> -	unsigned char buf[MAX_PACKET_LEN + 1];
-> +	char buf[MAX_PACKET_LEN + 1];
->  
->  	/* Create IPv6 address family socket for the SOCK_DGRAM type */
->  	sd = socket(PF_INET6, SOCK_DGRAM, 0);
+>  	/* calculate command size including padding */
+> -	cmd_size = abs((long)&__section_set - (long)&__section_get);
+> +	cmd_size = labs((long)&__section_set - (long)&__section_get);
+>  	/* strip off self */
+>  	argc--;
+>  	argv0 = *argv++;
 > 
 
 This patch has now been applied to wpan-tools.
