@@ -1,100 +1,103 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:50216 "EHLO mx1.suse.de"
+Received: from mail-bgr052100140093.outbound.protection.outlook.com ([52.100.140.93]:63792
+        "EHLO NAM05-BY2-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726822AbeLRStK (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-        Tue, 18 Dec 2018 13:49:10 -0500
-Subject: Re: [PATCH v5 5/6] net: maclorawan: Implement maclorawan class module
+        id S1727821AbeLSL2F (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+        Wed, 19 Dec 2018 06:28:05 -0500
+From: Ben Whitten <Ben.Whitten@lairdtech.com>
+Subject: RE: [PATCH v5 5/6] net: maclorawan: Implement maclorawan class module
+Date: Wed, 19 Dec 2018 11:27:52 +0000
+Message-ID: <BY1PR02MB11148DBF420DCAC7CCDD8A79E7BE0@BY1PR02MB1114.namprd02.prod.outlook.com>
 References: <CAC=mGziyi1ierhg++SUcHMrq1JQ0vH4gZCKUZgchzb8aD1Rv5Q@mail.gmail.com>
  <20181216101858.9585-6-starnight@g.ncu.edu.tw>
  <20181217140233.GG2096@nanopsycho>
  <CAC=mGziN5KrXPMAXoN_hhfQrtofCeyzTr4AjbbJLOoJ+p2+Nng@mail.gmail.com>
-From: =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>
-Message-ID: <60ff6940-4bcc-750c-ad38-0a183375169f@suse.de>
-Date: Tue, 18 Dec 2018 19:49:03 +0100
-MIME-Version: 1.0
-In-Reply-To: <CAC=mGziN5KrXPMAXoN_hhfQrtofCeyzTr4AjbbJLOoJ+p2+Nng@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+ <60ff6940-4bcc-750c-ad38-0a183375169f@suse.de>
+In-Reply-To: <60ff6940-4bcc-750c-ad38-0a183375169f@suse.de>
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Jian-Hong Pan <starnight@g.ncu.edu.tw>, Jiri Pirko <jiri@resnulli.us>, Ben Whitten <ben.whitten@lairdtech.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Alan Cox <gnomes@lxorguk.ukuu.org.uk>, linux-lpwan@lists.infradead.org, netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>, Dollar Chen <dollar.chen@wtmec.com>, Ken Yu <ken.yu@rakwireless.com>, linux-wpan - ML <linux-wpan@vger.kernel.org>
+To: =?utf-8?B?QW5kcmVhcyBGw6RyYmVy?= <afaerber@suse.de>, Jian-Hong Pan <starnight@g.ncu.edu.tw>, Jiri Pirko <jiri@resnulli.us>
+Cc: "David S. Miller" <davem@davemloft.net>, Alan Cox <gnomes@lxorguk.ukuu.org.uk>, "linux-lpwan@lists.infradead.org" <linux-lpwan@lists.infradead.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Marcel Holtmann <marcel@holtmann.org>, Dollar Chen <dollar.chen@wtmec.com>, Ken Yu <ken.yu@rakwireless.com>, linux-wpan - ML <linux-wpan@vger.kernel.org>
 
-Am 18.12.18 um 15:27 schrieb Jian-Hong Pan:
->> Sun, Dec 16, 2018 at 11:18:59AM CET, starnight@g.ncu.edu.tw wrote:
->>> LoRaWAN defined by LoRa Alliance(TM) is the MAC layer over LoRa devices.
->>>
->>> This patch implements part of Class A end-devices SoftMAC defined in
->>> LoRaWAN(TM) Specification Ver. 1.0.2:
->>> 1. End-device receive slot timing
->>> 2. Only single channel and single data rate for now
->>> 3. Unconfirmed data up/down message types
->>>
->>> On the other side, it defines the basic interface and operation
->>> functions for compatible LoRa device drivers.
->>>
->>> Signed-off-by: Jian-Hong Pan <starnight@g.ncu.edu.tw>
-[...]
->>> net/maclorawan/Kconfig  |  14 +
->>> net/maclorawan/Makefile |   2 +
->>> net/maclorawan/mac.c    | 555 ++++++++++++++++++++++++++++++++++++
->>> net/maclorawan/main.c   | 606 ++++++++++++++++++++++++++++++++++++++++
->>> 4 files changed, 1177 insertions(+)
->>> create mode 100644 net/maclorawan/Kconfig
->>> create mode 100644 net/maclorawan/Makefile
->>> create mode 100644 net/maclorawan/mac.c
->>> create mode 100644 net/maclorawan/main.c
->>
->> I don't get it. In patch "Add LoRaWAN API declaration for LoRa devices"
->> you add headers for "API" and here you implement functions. That is just
->> weird. Does it mean you can have other implementations?
-> 
-> LoRaWAN defined by LoRa Alliance(TM) is the MAC layer over LoRa PHY.
-> This part is soft-MAC as Andreas mentioned
-> http://lists.infradead.org/pipermail/linux-lpwan/2018-December/000010.html
-> 
->> Also, you don't really have any user of this API in the set. Please
->> introduce at least 1 driver, preferably more (I see that Andreas has
->> multiple ones in his patchset). You cannot push kernel infrastructure
->> without kernel user.
-> 
-> The soft-MAC is suitable for the LoRa chips' device drivers, like
-> sx1276/77/78/79, RFM95/96/97/98W ...
-> Still waiting for Andreas' sx1276 version 2 patch and more discussion.
-
-sx1276 regmap conversion was pushed to my staging tree together with
-Ben's sx1301 final conversion last night, lightly tested.
-
-https://git.kernel.org/pub/scm/linux/kernel/git/afaerber/linux-lora.git/log/?h=lora-next
-
-TBD: rename to sx127x, implement regmap fields, only auto-detect reset
-when no OF node available (all low priority atm, patches welcome)
-
-(and for sx1301 I still need to update my DT overlays with the new clk)
-
-> For example, how to make PF_LORA and PF_LORAWAN like Ethernet, PF_INET
-> and PF_INET6 don't need separate devices either, both use eth0.
-> https://lkml.org/lkml/2018/8/3/266
-
-Jiri, I am expecting the maclorawan driver to lower packets from
-ETH_P_LORAWAN to ETH_P_LORA in a generic way, so that any of the LoRa
-device drivers can benefit of it, with maclorawan using the LoRa netlink
-commands that the individual drivers implement.
-Not sure what if anything is missing for that in the current revision?
-Still dealing with the lower-level infrastructure and my test setup ...
-progressing slowly.
-
-I'll probably need to queue the remaining generic LoRaWAN part 1/6 in my
-tree to resolve this circular dependency between Jian-Hong and me, so
-that only the soft-MAC implementation remains a separate patch series.
-The hard-MAC implementations will be on my plate mostly, as both SX1276
-and SX1301 need the soft-MAC.
-
-Regards,
-Andreas
-
--- 
-SUSE Linux GmbH, Maxfeldstr. 5, 90409 Nürnberg, Germany
-GF: Felix Imendörffer, Jane Smithard, Graham Norton
-HRB 21284 (AG Nürnberg)
+PiBBbSAxOC4xMi4xOCB1bSAxNToyNyBzY2hyaWViIEppYW4tSG9uZyBQYW46DQo+ID4+IFN1biwg
+RGVjIDE2LCAyMDE4IGF0IDExOjE4OjU5QU0gQ0VULCBzdGFybmlnaHRAZy5uY3UuZWR1LnR3IHdy
+b3RlOg0KPiA+Pj4gTG9SYVdBTiBkZWZpbmVkIGJ5IExvUmEgQWxsaWFuY2UoVE0pIGlzIHRoZSBN
+QUMgbGF5ZXIgb3ZlciBMb1JhDQo+IGRldmljZXMuDQo+ID4+Pg0KPiA+Pj4gVGhpcyBwYXRjaCBp
+bXBsZW1lbnRzIHBhcnQgb2YgQ2xhc3MgQSBlbmQtZGV2aWNlcyBTb2Z0TUFDIGRlZmluZWQgaW4N
+Cj4gPj4+IExvUmFXQU4oVE0pIFNwZWNpZmljYXRpb24gVmVyLiAxLjAuMjoNCj4gPj4+IDEuIEVu
+ZC1kZXZpY2UgcmVjZWl2ZSBzbG90IHRpbWluZw0KPiA+Pj4gMi4gT25seSBzaW5nbGUgY2hhbm5l
+bCBhbmQgc2luZ2xlIGRhdGEgcmF0ZSBmb3Igbm93DQo+ID4+PiAzLiBVbmNvbmZpcm1lZCBkYXRh
+IHVwL2Rvd24gbWVzc2FnZSB0eXBlcw0KPiA+Pj4NCj4gPj4+IE9uIHRoZSBvdGhlciBzaWRlLCBp
+dCBkZWZpbmVzIHRoZSBiYXNpYyBpbnRlcmZhY2UgYW5kIG9wZXJhdGlvbg0KPiA+Pj4gZnVuY3Rp
+b25zIGZvciBjb21wYXRpYmxlIExvUmEgZGV2aWNlIGRyaXZlcnMuDQo+ID4+Pg0KPiA+Pj4gU2ln
+bmVkLW9mZi1ieTogSmlhbi1Ib25nIFBhbiA8c3Rhcm5pZ2h0QGcubmN1LmVkdS50dz4NCj4gWy4u
+Ll0NCj4gPj4+IG5ldC9tYWNsb3Jhd2FuL0tjb25maWcgIHwgIDE0ICsNCj4gPj4+IG5ldC9tYWNs
+b3Jhd2FuL01ha2VmaWxlIHwgICAyICsNCj4gPj4+IG5ldC9tYWNsb3Jhd2FuL21hYy5jICAgIHwg
+NTU1DQo+ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKw0KPiA+Pj4gbmV0L21h
+Y2xvcmF3YW4vbWFpbi5jICAgfCA2MDYNCj4gKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKysrKysrKw0KPiA+Pj4gNCBmaWxlcyBjaGFuZ2VkLCAxMTc3IGluc2VydGlvbnMoKykNCj4g
+Pj4+IGNyZWF0ZSBtb2RlIDEwMDY0NCBuZXQvbWFjbG9yYXdhbi9LY29uZmlnDQo+ID4+PiBjcmVh
+dGUgbW9kZSAxMDA2NDQgbmV0L21hY2xvcmF3YW4vTWFrZWZpbGUNCj4gPj4+IGNyZWF0ZSBtb2Rl
+IDEwMDY0NCBuZXQvbWFjbG9yYXdhbi9tYWMuYw0KPiA+Pj4gY3JlYXRlIG1vZGUgMTAwNjQ0IG5l
+dC9tYWNsb3Jhd2FuL21haW4uYw0KPiA+Pg0KPiA+PiBJIGRvbid0IGdldCBpdC4gSW4gcGF0Y2gg
+IkFkZCBMb1JhV0FOIEFQSSBkZWNsYXJhdGlvbiBmb3IgTG9SYSBkZXZpY2VzIg0KPiA+PiB5b3Ug
+YWRkIGhlYWRlcnMgZm9yICJBUEkiIGFuZCBoZXJlIHlvdSBpbXBsZW1lbnQgZnVuY3Rpb25zLiBU
+aGF0IGlzIGp1c3QNCj4gPj4gd2VpcmQuIERvZXMgaXQgbWVhbiB5b3UgY2FuIGhhdmUgb3RoZXIg
+aW1wbGVtZW50YXRpb25zPw0KPiA+DQo+ID4gTG9SYVdBTiBkZWZpbmVkIGJ5IExvUmEgQWxsaWFu
+Y2UoVE0pIGlzIHRoZSBNQUMgbGF5ZXIgb3ZlciBMb1JhIFBIWS4NCj4gPiBUaGlzIHBhcnQgaXMg
+c29mdC1NQUMgYXMgQW5kcmVhcyBtZW50aW9uZWQNCj4gPiBodHRwOi8vbGlzdHMuaW5mcmFkZWFk
+Lm9yZy9waXBlcm1haWwvbGludXgtbHB3YW4vMjAxOC0NCj4gRGVjZW1iZXIvMDAwMDEwLmh0bWwN
+Cj4gPg0KPiA+PiBBbHNvLCB5b3UgZG9uJ3QgcmVhbGx5IGhhdmUgYW55IHVzZXIgb2YgdGhpcyBB
+UEkgaW4gdGhlIHNldC4gUGxlYXNlDQo+ID4+IGludHJvZHVjZSBhdCBsZWFzdCAxIGRyaXZlciwg
+cHJlZmVyYWJseSBtb3JlIChJIHNlZSB0aGF0IEFuZHJlYXMgaGFzDQo+ID4+IG11bHRpcGxlIG9u
+ZXMgaW4gaGlzIHBhdGNoc2V0KS4gWW91IGNhbm5vdCBwdXNoIGtlcm5lbCBpbmZyYXN0cnVjdHVy
+ZQ0KPiA+PiB3aXRob3V0IGtlcm5lbCB1c2VyLg0KPiA+DQo+ID4gVGhlIHNvZnQtTUFDIGlzIHN1
+aXRhYmxlIGZvciB0aGUgTG9SYSBjaGlwcycgZGV2aWNlIGRyaXZlcnMsIGxpa2UNCj4gPiBzeDEy
+NzYvNzcvNzgvNzksIFJGTTk1Lzk2Lzk3Lzk4VyAuLi4NCj4gPiBTdGlsbCB3YWl0aW5nIGZvciBB
+bmRyZWFzJyBzeDEyNzYgdmVyc2lvbiAyIHBhdGNoIGFuZCBtb3JlIGRpc2N1c3Npb24uDQo+IA0K
+PiBzeDEyNzYgcmVnbWFwIGNvbnZlcnNpb24gd2FzIHB1c2hlZCB0byBteSBzdGFnaW5nIHRyZWUg
+dG9nZXRoZXIgd2l0aA0KPiBCZW4ncyBzeDEzMDEgZmluYWwgY29udmVyc2lvbiBsYXN0IG5pZ2h0
+LCBsaWdodGx5IHRlc3RlZC4NCj4gDQo+IGh0dHBzOi8vZ2l0Lmtlcm5lbC5vcmcvcHViL3NjbS9s
+aW51eC9rZXJuZWwvZ2l0L2FmYWVyYmVyL2xpbnV4LQ0KPiBsb3JhLmdpdC9sb2cvP2g9bG9yYS1u
+ZXh0DQo+IA0KPiBUQkQ6IHJlbmFtZSB0byBzeDEyN3gsIGltcGxlbWVudCByZWdtYXAgZmllbGRz
+LCBvbmx5IGF1dG8tZGV0ZWN0IHJlc2V0DQo+IHdoZW4gbm8gT0Ygbm9kZSBhdmFpbGFibGUgKGFs
+bCBsb3cgcHJpb3JpdHkgYXRtLCBwYXRjaGVzIHdlbGNvbWUpDQo+IA0KPiAoYW5kIGZvciBzeDEz
+MDEgSSBzdGlsbCBuZWVkIHRvIHVwZGF0ZSBteSBEVCBvdmVybGF5cyB3aXRoIHRoZSBuZXcgY2xr
+KQ0KPiANCj4gPiBGb3IgZXhhbXBsZSwgaG93IHRvIG1ha2UgUEZfTE9SQSBhbmQgUEZfTE9SQVdB
+TiBsaWtlIEV0aGVybmV0LA0KPiBQRl9JTkVUDQo+ID4gYW5kIFBGX0lORVQ2IGRvbid0IG5lZWQg
+c2VwYXJhdGUgZGV2aWNlcyBlaXRoZXIsIGJvdGggdXNlIGV0aDAuDQo+ID4gaHR0cHM6Ly9sa21s
+Lm9yZy9sa21sLzIwMTgvOC8zLzI2Ng0KPiANCj4gSmlyaSwgSSBhbSBleHBlY3RpbmcgdGhlIG1h
+Y2xvcmF3YW4gZHJpdmVyIHRvIGxvd2VyIHBhY2tldHMgZnJvbQ0KPiBFVEhfUF9MT1JBV0FOIHRv
+IEVUSF9QX0xPUkEgaW4gYSBnZW5lcmljIHdheSwgc28gdGhhdCBhbnkgb2YgdGhlIExvUmENCj4g
+ZGV2aWNlIGRyaXZlcnMgY2FuIGJlbmVmaXQgb2YgaXQsIHdpdGggbWFjbG9yYXdhbiB1c2luZyB0
+aGUgTG9SYSBuZXRsaW5rDQo+IGNvbW1hbmRzIHRoYXQgdGhlIGluZGl2aWR1YWwgZHJpdmVycyBp
+bXBsZW1lbnQuDQo+IE5vdCBzdXJlIHdoYXQgaWYgYW55dGhpbmcgaXMgbWlzc2luZyBmb3IgdGhh
+dCBpbiB0aGUgY3VycmVudCByZXZpc2lvbj8NCj4gU3RpbGwgZGVhbGluZyB3aXRoIHRoZSBsb3dl
+ci1sZXZlbCBpbmZyYXN0cnVjdHVyZSBhbmQgbXkgdGVzdCBzZXR1cCAuLi4NCj4gcHJvZ3Jlc3Np
+bmcgc2xvd2x5Lg0KPiANCj4gSSdsbCBwcm9iYWJseSBuZWVkIHRvIHF1ZXVlIHRoZSByZW1haW5p
+bmcgZ2VuZXJpYyBMb1JhV0FOIHBhcnQgMS82IGluIG15DQo+IHRyZWUgdG8gcmVzb2x2ZSB0aGlz
+IGNpcmN1bGFyIGRlcGVuZGVuY3kgYmV0d2VlbiBKaWFuLUhvbmcgYW5kIG1lLCBzbw0KPiB0aGF0
+IG9ubHkgdGhlIHNvZnQtTUFDIGltcGxlbWVudGF0aW9uIHJlbWFpbnMgYSBzZXBhcmF0ZSBwYXRj
+aCBzZXJpZXMuDQo+IFRoZSBoYXJkLU1BQyBpbXBsZW1lbnRhdGlvbnMgd2lsbCBiZSBvbiBteSBw
+bGF0ZSBtb3N0bHksIGFzIGJvdGggU1gxMjc2DQo+IGFuZCBTWDEzMDEgbmVlZCB0aGUgc29mdC1N
+QUMuDQoNCk9uIHRoZSBTWDEzMDEgc2lkZSBvZiB0aGluZ3MsIHRoZSBhYmlsaXR5IHRvIHNlbmQg
+bWVzc2FnZXMgYXMgYSBMb1JhV0FODQpub2RlIGRldmljZSBpcyBhIG5pY2hlIHVzZSBjYXNlLCB0
+aGUgbWFqb3JpdHkgaWYgbm90IGFsbCBwZW9wbGUgd2lsbCB1c2UgdGhlDQpjb25jZW50cmF0b3Ig
+Y2FyZCBhcyB0aGUgcGFzcyB0aHJvdWdoIGdhdGV3YXkgdG8gdGhlIG5vZGUuDQoNCkluIHRoaXMg
+bW9kZSBvZiBvcGVyYXRpb24gdGhlIHBhcmFtZXRlcnMgZm9yIHRyYW5zbWlzc2lvbiBzdWNoIGFz
+OyBmcmVxdWVuY3ksDQpzcHJlYWRpbmcgZmFjdG9yIC8gZGF0YSByYXRlLCBwb3dlciwgYXJlIGdp
+dmVuIGJ5IGEgcmVtb3RlIHNlcnZlciBhbmQgcGFzc2VkDQppbiBmcm9tIHRoZSB1c2Vyc3BhY2Ug
+YXBwbGljYXRpb24gd2hpY2ggcmVjZWl2ZWQgaXQuDQpFdmVudHVhbGx5IGluIHRoZSBrZXJuZWwg
+dGhlc2UgbmVlZCB0byBiZSBjaGVja2VkIGxvY2FsbHkgdG8gZW5zdXJlIHJlZ3VsYXRvcnkNCmNv
+bXBsaWFuY2UuDQpUbyB0aGF0IGVuZCBJIGhhdmUgZXhwZXJpbWVudGVkIHdpdGggZnJhbWluZywg
+YXMgQ0FOIGRvZXMsIHNvIHRoYXQgdGhpcw0KbWV0YWRhdGEgY2FuIGJlIHByb3ZpZGVkIG9uIGEg
+d3JpdGUgZnJvbSB1c2Vyc3BhY2UgdG8gdGhlIFNYMTMwMSBkcml2ZXIuDQoNClNvdW5kcyBsaWtl
+IHdlIG5lZWQgZGlmZmVyZW50IHByb3RvY29scyBmb3IgZnJhbWluZyB3aXRoaW4gdGhlIHByb3Rv
+Y29sIGZhbWlseS4NClJhdyBpbiB0aGUgY2FzZSBvZiBub2RlcyBhbmQgZnJhbWVkIHdpdGggbWV0
+YWRhdGEgaW4gdGhlIGNhc2Ugb2YgY29uY2VudHJhdG9yDQpjYXJkcywgdGhvdWdodHM/DQpJIHdp
+bGwgc2VuZCBteSBleHBlcmltZW50IFJGQyB0byB0aGUgbHB3YW4gbWFpbGluZyBsaXN0Lg0KDQpS
+ZWdhcmRzLA0KQmVuIFdoaXR0ZW4NCg==
