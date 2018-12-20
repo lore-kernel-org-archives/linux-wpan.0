@@ -1,15 +1,13 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-io1-f68.google.com ([209.85.166.68]:37833 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726143AbeL1Ptp (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Fri, 28 Dec 2018 10:49:45 -0500
-Received: by mail-io1-f68.google.com with SMTP id g8so5664305iok.4
-        for <linux-wpan@vger.kernel.org>; Fri, 28 Dec 2018 07:49:45 -0800 (PST)
-Date: Fri, 28 Dec 2018 10:49:41 -0500
-From: Alexander Aring <aring@mojatatu.com>
-Subject: Re: Netlink userspace tools for LoRa(WAN), FSK, Sigfox, BLE, etc.
- (was: [PATCH v5 5/6] net: maclorawan: Implement maclorawan class module)
-Message-ID: <20181228154941.v7lvsh43kjqqowe7@x220t>
+Received: from mail-bgr052100128065.outbound.protection.outlook.com ([52.100.128.65]:58784
+        "EHLO NAM01-BN3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725795AbeLTKT1 (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+        Thu, 20 Dec 2018 05:19:27 -0500
+From: Ben Whitten <Ben.Whitten@lairdtech.com>
+Subject: RE: [PATCH v5 5/6] net: maclorawan: Implement maclorawan class module
+Date: Thu, 20 Dec 2018 10:19:07 +0000
+Message-ID: <BY1PR02MB1114B352A3A73F8478AE667DE7BF0@BY1PR02MB1114.namprd02.prod.outlook.com>
 References: <CAC=mGziyi1ierhg++SUcHMrq1JQ0vH4gZCKUZgchzb8aD1Rv5Q@mail.gmail.com>
  <20181216101858.9585-6-starnight@g.ncu.edu.tw>
  <20181217140233.GG2096@nanopsycho>
@@ -17,36 +15,114 @@ References: <CAC=mGziyi1ierhg++SUcHMrq1JQ0vH4gZCKUZgchzb8aD1Rv5Q@mail.gmail.com>
  <60ff6940-4bcc-750c-ad38-0a183375169f@suse.de>
  <BY1PR02MB11148DBF420DCAC7CCDD8A79E7BE0@BY1PR02MB1114.namprd02.prod.outlook.com>
  <CAC=mGzg4TGCaNUbq=_kFqmF5VNFR6rWHVBwO_5Fprt0u3m1O9g@mail.gmail.com>
- <CAJuUDwuYnuOs=7bs4h77XufqXLSWnZHVocR7vPYA1eor2HG+Cg@mail.gmail.com>
- <CAC=mGzgk0uSZRzE5NJ=FrLwaAkT3yYLb5j-0oFpouZ0YKFhtWQ@mail.gmail.com>
- <f676c877-ba52-9171-c994-5a5e3735f45c@suse.de>
+In-Reply-To: <CAC=mGzg4TGCaNUbq=_kFqmF5VNFR6rWHVBwO_5Fprt0u3m1O9g@mail.gmail.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <f676c877-ba52-9171-c994-5a5e3735f45c@suse.de>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Andreas =?utf-8?Q?F=C3=A4rber?= <afaerber@suse.de>
-Cc: Xue Liu <liuxuenetmail@gmail.com>, Jiri Pirko <jiri@resnulli.us>, Jian-Hong Pan <starnight@g.ncu.edu.tw>, Ben Whitten <Ben.Whitten@lairdtech.com>, "linux-lpwan@lists.infradead.org" <linux-lpwan@lists.infradead.org>, linux-wpan - ML <linux-wpan@vger.kernel.org>
+To: Jian-Hong Pan <starnight@g.ncu.edu.tw>
+Cc: =?utf-8?B?QW5kcmVhcyBGw6RyYmVy?= <afaerber@suse.de>, Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>, Alan Cox <gnomes@lxorguk.ukuu.org.uk>, "linux-lpwan@lists.infradead.org" <linux-lpwan@lists.infradead.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Marcel Holtmann <marcel@holtmann.org>, Dollar Chen <dollar.chen@wtmec.com>, Ken Yu <ken.yu@rakwireless.com>, linux-wpan - ML <linux-wpan@vger.kernel.org>
 
-Hi,
-
-On Fri, Dec 28, 2018 at 09:11:11AM +0100, Andreas Färber wrote:
-...
-> 
-> For instance, FSK/OOK are not really LPWAN technologies but are found on
-> LoRa chips and in LoRaWAN; but FSK also overlaps with 802.15.4 AFAIU,
-> which I guess already has its own userspace tool?
-> 
-
-as to clarify that, our userspace tool is based on the wireless iw tool.
-If you are tight to nl802154/nl80211 I would recommend it to do the
-same, it's well tested code.
-
-Original idea was to put our userspace tool as part of iw, we decided to
-fork iw for now with still have the possibility to merge with iw
-together when the IEEE 802.15.4 becomes more stable, if wireless
-community agree's to that.
-
-- Alex
+PiA+ID4gQW0gMTguMTIuMTggdW0gMTU6Mjcgc2NocmllYiBKaWFuLUhvbmcgUGFuOg0KPiA+ID4g
+Pj4gU3VuLCBEZWMgMTYsIDIwMTggYXQgMTE6MTg6NTlBTSBDRVQsIHN0YXJuaWdodEBnLm5jdS5l
+ZHUudHcgd3JvdGU6DQo+ID4gPiA+Pj4gTG9SYVdBTiBkZWZpbmVkIGJ5IExvUmEgQWxsaWFuY2Uo
+VE0pIGlzIHRoZSBNQUMgbGF5ZXIgb3ZlciBMb1JhDQo+ID4gPiBkZXZpY2VzLg0KPiA+ID4gPj4+
+DQo+ID4gPiA+Pj4gVGhpcyBwYXRjaCBpbXBsZW1lbnRzIHBhcnQgb2YgQ2xhc3MgQSBlbmQtZGV2
+aWNlcyBTb2Z0TUFDIGRlZmluZWQgaW4NCj4gPiA+ID4+PiBMb1JhV0FOKFRNKSBTcGVjaWZpY2F0
+aW9uIFZlci4gMS4wLjI6DQo+ID4gPiA+Pj4gMS4gRW5kLWRldmljZSByZWNlaXZlIHNsb3QgdGlt
+aW5nDQo+ID4gPiA+Pj4gMi4gT25seSBzaW5nbGUgY2hhbm5lbCBhbmQgc2luZ2xlIGRhdGEgcmF0
+ZSBmb3Igbm93DQo+ID4gPiA+Pj4gMy4gVW5jb25maXJtZWQgZGF0YSB1cC9kb3duIG1lc3NhZ2Ug
+dHlwZXMNCj4gPiA+ID4+Pg0KPiA+ID4gPj4+IE9uIHRoZSBvdGhlciBzaWRlLCBpdCBkZWZpbmVz
+IHRoZSBiYXNpYyBpbnRlcmZhY2UgYW5kIG9wZXJhdGlvbg0KPiA+ID4gPj4+IGZ1bmN0aW9ucyBm
+b3IgY29tcGF0aWJsZSBMb1JhIGRldmljZSBkcml2ZXJzLg0KPiA+ID4gPj4+DQo+ID4gPiA+Pj4g
+U2lnbmVkLW9mZi1ieTogSmlhbi1Ib25nIFBhbiA8c3Rhcm5pZ2h0QGcubmN1LmVkdS50dz4NCj4g
+PiA+IFsuLi5dDQo+ID4gPiA+Pj4gbmV0L21hY2xvcmF3YW4vS2NvbmZpZyAgfCAgMTQgKw0KPiA+
+ID4gPj4+IG5ldC9tYWNsb3Jhd2FuL01ha2VmaWxlIHwgICAyICsNCj4gPiA+ID4+PiBuZXQvbWFj
+bG9yYXdhbi9tYWMuYyAgICB8IDU1NQ0KPiA+ID4gKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKysrKysrDQo+ID4gPiA+Pj4gbmV0L21hY2xvcmF3YW4vbWFpbi5jICAgfCA2MDYNCj4gPiA+
+ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysNCj4gPiA+ID4+PiA0IGZp
+bGVzIGNoYW5nZWQsIDExNzcgaW5zZXJ0aW9ucygrKQ0KPiA+ID4gPj4+IGNyZWF0ZSBtb2RlIDEw
+MDY0NCBuZXQvbWFjbG9yYXdhbi9LY29uZmlnDQo+ID4gPiA+Pj4gY3JlYXRlIG1vZGUgMTAwNjQ0
+IG5ldC9tYWNsb3Jhd2FuL01ha2VmaWxlDQo+ID4gPiA+Pj4gY3JlYXRlIG1vZGUgMTAwNjQ0IG5l
+dC9tYWNsb3Jhd2FuL21hYy5jDQo+ID4gPiA+Pj4gY3JlYXRlIG1vZGUgMTAwNjQ0IG5ldC9tYWNs
+b3Jhd2FuL21haW4uYw0KPiA+ID4gPj4NCj4gPiA+ID4+IEkgZG9uJ3QgZ2V0IGl0LiBJbiBwYXRj
+aCAiQWRkIExvUmFXQU4gQVBJIGRlY2xhcmF0aW9uIGZvciBMb1JhIGRldmljZXMiDQo+ID4gPiA+
+PiB5b3UgYWRkIGhlYWRlcnMgZm9yICJBUEkiIGFuZCBoZXJlIHlvdSBpbXBsZW1lbnQgZnVuY3Rp
+b25zLiBUaGF0IGlzDQo+IGp1c3QNCj4gPiA+ID4+IHdlaXJkLiBEb2VzIGl0IG1lYW4geW91IGNh
+biBoYXZlIG90aGVyIGltcGxlbWVudGF0aW9ucz8NCj4gPiA+ID4NCj4gPiA+ID4gTG9SYVdBTiBk
+ZWZpbmVkIGJ5IExvUmEgQWxsaWFuY2UoVE0pIGlzIHRoZSBNQUMgbGF5ZXIgb3ZlciBMb1JhIFBI
+WS4NCj4gPiA+ID4gVGhpcyBwYXJ0IGlzIHNvZnQtTUFDIGFzIEFuZHJlYXMgbWVudGlvbmVkDQo+
+ID4gPiA+IGh0dHA6Ly9saXN0cy5pbmZyYWRlYWQub3JnL3BpcGVybWFpbC9saW51eC1scHdhbi8y
+MDE4LQ0KPiA+ID4gRGVjZW1iZXIvMDAwMDEwLmh0bWwNCj4gPiA+ID4NCj4gPiA+ID4+IEFsc28s
+IHlvdSBkb24ndCByZWFsbHkgaGF2ZSBhbnkgdXNlciBvZiB0aGlzIEFQSSBpbiB0aGUgc2V0LiBQ
+bGVhc2UNCj4gPiA+ID4+IGludHJvZHVjZSBhdCBsZWFzdCAxIGRyaXZlciwgcHJlZmVyYWJseSBt
+b3JlIChJIHNlZSB0aGF0IEFuZHJlYXMgaGFzDQo+ID4gPiA+PiBtdWx0aXBsZSBvbmVzIGluIGhp
+cyBwYXRjaHNldCkuIFlvdSBjYW5ub3QgcHVzaCBrZXJuZWwgaW5mcmFzdHJ1Y3R1cmUNCj4gPiA+
+ID4+IHdpdGhvdXQga2VybmVsIHVzZXIuDQo+ID4gPiA+DQo+ID4gPiA+IFRoZSBzb2Z0LU1BQyBp
+cyBzdWl0YWJsZSBmb3IgdGhlIExvUmEgY2hpcHMnIGRldmljZSBkcml2ZXJzLCBsaWtlDQo+ID4g
+PiA+IHN4MTI3Ni83Ny83OC83OSwgUkZNOTUvOTYvOTcvOThXIC4uLg0KPiA+ID4gPiBTdGlsbCB3
+YWl0aW5nIGZvciBBbmRyZWFzJyBzeDEyNzYgdmVyc2lvbiAyIHBhdGNoIGFuZCBtb3JlIGRpc2N1
+c3Npb24uDQo+ID4gPg0KPiA+ID4gc3gxMjc2IHJlZ21hcCBjb252ZXJzaW9uIHdhcyBwdXNoZWQg
+dG8gbXkgc3RhZ2luZyB0cmVlIHRvZ2V0aGVyIHdpdGgNCj4gPiA+IEJlbidzIHN4MTMwMSBmaW5h
+bCBjb252ZXJzaW9uIGxhc3QgbmlnaHQsIGxpZ2h0bHkgdGVzdGVkLg0KPiA+ID4NCj4gPiA+IGh0
+dHBzOi8vZ2l0Lmtlcm5lbC5vcmcvcHViL3NjbS9saW51eC9rZXJuZWwvZ2l0L2FmYWVyYmVyL2xp
+bnV4LQ0KPiA+ID4gbG9yYS5naXQvbG9nLz9oPWxvcmEtbmV4dA0KPiA+ID4NCj4gPiA+IFRCRDog
+cmVuYW1lIHRvIHN4MTI3eCwgaW1wbGVtZW50IHJlZ21hcCBmaWVsZHMsIG9ubHkgYXV0by1kZXRl
+Y3QgcmVzZXQNCj4gPiA+IHdoZW4gbm8gT0Ygbm9kZSBhdmFpbGFibGUgKGFsbCBsb3cgcHJpb3Jp
+dHkgYXRtLCBwYXRjaGVzIHdlbGNvbWUpDQo+ID4gPg0KPiA+ID4gKGFuZCBmb3Igc3gxMzAxIEkg
+c3RpbGwgbmVlZCB0byB1cGRhdGUgbXkgRFQgb3ZlcmxheXMgd2l0aCB0aGUgbmV3IGNsaykNCj4g
+PiA+DQo+ID4gPiA+IEZvciBleGFtcGxlLCBob3cgdG8gbWFrZSBQRl9MT1JBIGFuZCBQRl9MT1JB
+V0FOIGxpa2UgRXRoZXJuZXQsDQo+ID4gPiBQRl9JTkVUDQo+ID4gPiA+IGFuZCBQRl9JTkVUNiBk
+b24ndCBuZWVkIHNlcGFyYXRlIGRldmljZXMgZWl0aGVyLCBib3RoIHVzZSBldGgwLg0KPiA+ID4g
+PiBodHRwczovL2xrbWwub3JnL2xrbWwvMjAxOC84LzMvMjY2DQo+ID4gPg0KPiA+ID4gSmlyaSwg
+SSBhbSBleHBlY3RpbmcgdGhlIG1hY2xvcmF3YW4gZHJpdmVyIHRvIGxvd2VyIHBhY2tldHMgZnJv
+bQ0KPiA+ID4gRVRIX1BfTE9SQVdBTiB0byBFVEhfUF9MT1JBIGluIGEgZ2VuZXJpYyB3YXksIHNv
+IHRoYXQgYW55IG9mIHRoZSBMb1JhDQo+ID4gPiBkZXZpY2UgZHJpdmVycyBjYW4gYmVuZWZpdCBv
+ZiBpdCwgd2l0aCBtYWNsb3Jhd2FuIHVzaW5nIHRoZSBMb1JhIG5ldGxpbmsNCj4gPiA+IGNvbW1h
+bmRzIHRoYXQgdGhlIGluZGl2aWR1YWwgZHJpdmVycyBpbXBsZW1lbnQuDQo+ID4gPiBOb3Qgc3Vy
+ZSB3aGF0IGlmIGFueXRoaW5nIGlzIG1pc3NpbmcgZm9yIHRoYXQgaW4gdGhlIGN1cnJlbnQgcmV2
+aXNpb24/DQo+ID4gPiBTdGlsbCBkZWFsaW5nIHdpdGggdGhlIGxvd2VyLWxldmVsIGluZnJhc3Ry
+dWN0dXJlIGFuZCBteSB0ZXN0IHNldHVwIC4uLg0KPiA+ID4gcHJvZ3Jlc3Npbmcgc2xvd2x5Lg0K
+PiA+ID4NCj4gPiA+IEknbGwgcHJvYmFibHkgbmVlZCB0byBxdWV1ZSB0aGUgcmVtYWluaW5nIGdl
+bmVyaWMgTG9SYVdBTiBwYXJ0IDEvNiBpbiBteQ0KPiA+ID4gdHJlZSB0byByZXNvbHZlIHRoaXMg
+Y2lyY3VsYXIgZGVwZW5kZW5jeSBiZXR3ZWVuIEppYW4tSG9uZyBhbmQgbWUsIHNvDQo+ID4gPiB0
+aGF0IG9ubHkgdGhlIHNvZnQtTUFDIGltcGxlbWVudGF0aW9uIHJlbWFpbnMgYSBzZXBhcmF0ZSBw
+YXRjaCBzZXJpZXMuDQo+ID4gPiBUaGUgaGFyZC1NQUMgaW1wbGVtZW50YXRpb25zIHdpbGwgYmUg
+b24gbXkgcGxhdGUgbW9zdGx5LCBhcyBib3RoIFNYMTI3Ng0KPiA+ID4gYW5kIFNYMTMwMSBuZWVk
+IHRoZSBzb2Z0LU1BQy4NCj4gPg0KPiA+IE9uIHRoZSBTWDEzMDEgc2lkZSBvZiB0aGluZ3MsIHRo
+ZSBhYmlsaXR5IHRvIHNlbmQgbWVzc2FnZXMgYXMgYSBMb1JhV0FODQo+ID4gbm9kZSBkZXZpY2Ug
+aXMgYSBuaWNoZSB1c2UgY2FzZSwgdGhlIG1ham9yaXR5IGlmIG5vdCBhbGwgcGVvcGxlIHdpbGwg
+dXNlIHRoZQ0KPiA+IGNvbmNlbnRyYXRvciBjYXJkIGFzIHRoZSBwYXNzIHRocm91Z2ggZ2F0ZXdh
+eSB0byB0aGUgbm9kZS4NCj4gPg0KPiA+IEluIHRoaXMgbW9kZSBvZiBvcGVyYXRpb24gdGhlIHBh
+cmFtZXRlcnMgZm9yIHRyYW5zbWlzc2lvbiBzdWNoIGFzOw0KPiBmcmVxdWVuY3ksDQo+ID4gc3By
+ZWFkaW5nIGZhY3RvciAvIGRhdGEgcmF0ZSwgcG93ZXIsIGFyZSBnaXZlbiBieSBhIHJlbW90ZSBz
+ZXJ2ZXIgYW5kIHBhc3NlZA0KPiA+IGluIGZyb20gdGhlIHVzZXJzcGFjZSBhcHBsaWNhdGlvbiB3
+aGljaCByZWNlaXZlZCBpdC4NCj4gPiBFdmVudHVhbGx5IGluIHRoZSBrZXJuZWwgdGhlc2UgbmVl
+ZCB0byBiZSBjaGVja2VkIGxvY2FsbHkgdG8gZW5zdXJlDQo+IHJlZ3VsYXRvcnkNCj4gPiBjb21w
+bGlhbmNlLg0KPiA+IFRvIHRoYXQgZW5kIEkgaGF2ZSBleHBlcmltZW50ZWQgd2l0aCBmcmFtaW5n
+LCBhcyBDQU4gZG9lcywgc28gdGhhdCB0aGlzDQo+ID4gbWV0YWRhdGEgY2FuIGJlIHByb3ZpZGVk
+IG9uIGEgd3JpdGUgZnJvbSB1c2Vyc3BhY2UgdG8gdGhlIFNYMTMwMSBkcml2ZXIuDQo+ID4NCj4g
+PiBTb3VuZHMgbGlrZSB3ZSBuZWVkIGRpZmZlcmVudCBwcm90b2NvbHMgZm9yIGZyYW1pbmcgd2l0
+aGluIHRoZSBwcm90b2NvbA0KPiBmYW1pbHkuDQo+ID4gUmF3IGluIHRoZSBjYXNlIG9mIG5vZGVz
+IGFuZCBmcmFtZWQgd2l0aCBtZXRhZGF0YSBpbiB0aGUgY2FzZSBvZg0KPiBjb25jZW50cmF0b3IN
+Cj4gPiBjYXJkcywgdGhvdWdodHM/DQo+IA0KPiBZZXMsIEkgaGF2ZSB0aG91Z2h0IHRoZSByb2xl
+cyBvZiBub2RlIGFuZCBnYXRld2F5LiAgVGhleSBtYXkgaGF2ZQ0KPiBkaWZmZXJlbnQgc2tiIHBh
+c3NpbmcgcGF0aHMuDQo+IEFzIHlvdSBtZW50aW9uZWQsIG1hbnkgdGhpbmdzIG9mIHRoZSBnYXRl
+d2F5IGlzIGNvbnRyb2xsZWQgYnkgdGhlDQo+IHJlbW90ZSBzZXJ2ZXIuICBTbywgSSBvbmx5IGlt
+cGxlbWVudCB0aGUgcGF0aCBmb3Igbm9kZXMgcmlnaHQgbm93Lg0KPiBNYXliZSwgd2UgY2FuIGhh
+dmUgYSByb2xlIGZsYWc6IG5vZGUsIGdhdGV3YXkgd2hpY2ggY2FuIGJlIGFzc2lnbmVkIGJ5DQo+
+IHNvbWUgd2F5LiAgVGhlbiwgdGhlIHNrYiBjYW4gYmUgZGVjb2RlLCBjaGVja2VkIGFuZCBwYXNz
+ZWQgYWNjb3JkaW5nDQo+IHRvIHRoZSByb2xlIGZsYWcuICBBbmQgbW9kdWxlIGFsc28gY2hlY2tz
+IHRoZSBpbnRlZ3JpdHkgKE1JQywgbGVuZ3RoDQo+IC4uLikgYW5kIGZpbHRlciBvdXQgdGhlIGJh
+ZCBza2IgYmVmb3JlIHNlbmRzIHRvIG5leHQgc3RvcC4NCg0KQXMgSVAgaGF2ZSBJUFBST1RPX1RD
+UCwgSVBQUk9UT19VRFAsIGV0YyBtYXliZSB3ZSBjYW4gaGF2ZQ0KTE9SQV9QUk9UT19NT0RVTEUs
+IExPUkFfUFJPVE9fR0FURVdBWSB3aGljaCBkaWN0YXRlcyB0aGUNCnBhdGh3YXkgYW5kIHNrYiBm
+b3JtYXQuDQoNCj4gPiBJIHdpbGwgc2VuZCBteSBleHBlcmltZW50IFJGQyB0byB0aGUgbHB3YW4g
+bWFpbGluZyBsaXN0Lg0KPiANCj4gT3IgeW91IGNhbiBzZW5kIHRoZSBSRkMgZmlyc3QuICBUaGVu
+IHdlIGNhbiBoYXZlIHRoZSBza2IgcGFzc2luZyBwYXRoDQo+IGZvciBnYXRld2F5IGFuZCBmaWd1
+cmUgb3V0IGhvdyB0byBwdXQgdGhlbSB0b2dldGhlci4NCj4gDQo+IERvZXMgdGhpcyBzb3VuZCBy
+ZWFzb25hYmxlPw0KDQpTZW50LCBpdCdzIGJlaW5nIGhlbGQgYXQgbWFpbGluZyBsaXN0IGZvciBt
+b2RlcmF0b3IgYXBwcm92YWwgYnV0IHNob3VsZCBiZSBpbg0KeW91ciBpbmJveGVzIGN1cnJlbnRs
+eS4NCg0KUmVnYXJkcywNCkJlbg0K
