@@ -1,12 +1,12 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:36396 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:36716 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727254AbeLZWg2 (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-        Wed, 26 Dec 2018 17:36:28 -0500
+        id S1727827AbeLZWgo (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+        Wed, 26 Dec 2018 17:36:44 -0500
 From: Sasha Levin <sashal@kernel.org>
-Subject: [PATCH AUTOSEL 4.19 19/97] ieee802154: hwsim: fix off-by-one in parse nested
-Date: Wed, 26 Dec 2018 17:34:39 -0500
-Message-Id: <20181226223557.149329-19-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 29/97] ieee802154: ca8210: fix possible u8 overflow in ca8210_rx_done
+Date: Wed, 26 Dec 2018 17:34:49 -0500
+Message-Id: <20181226223557.149329-29-sashal@kernel.org>
 In-Reply-To: <20181226223557.149329-1-sashal@kernel.org>
 References: <20181226223557.149329-1-sashal@kernel.org>
 MIME-Version: 1.0
@@ -14,46 +14,50 @@ Content-Transfer-Encoding: 8bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: stable@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Alexander Aring <aring@mojatatu.com>, Stefan Schmidt <stefan@datenfreihafen.org>, Sasha Levin <sashal@kernel.org>, linux-wpan@vger.kernel.org, netdev@vger.kernel.org
+Cc: YueHaibing <yuehaibing@huawei.com>, Stefan Schmidt <stefan@datenfreihafen.org>, Sasha Levin <sashal@kernel.org>, linux-wpan@vger.kernel.org, netdev@vger.kernel.org
 
-From: Alexander Aring <aring@mojatatu.com>
+From: YueHaibing <yuehaibing@huawei.com>
 
-[ Upstream commit a73d4e1490913b76b292f91553b7ba08a65caa3f ]
+[ Upstream commit 8e41cae64b08fe2e86a9ffb88b295c6b4b3a3322 ]
 
-This patch fixes a off-by-one mistake in nla_parse_nested() functions of
-mac802154_hwsim driver. I had to enabled stack protector so I was able
-to reproduce it.
+gcc warning this:
 
-Reference: https://github.com/linux-wpan/wpan-tools/issues/17
+drivers/net/ieee802154/ca8210.c:730:10: warning:
+ comparison is always false due to limited range of data type [-Wtype-limits]
 
-Signed-off-by: Alexander Aring <aring@mojatatu.com>
+'len' is u8 type, we get it from buf[1] adding 2, which can overflow.
+This patch change the type of 'len' to unsigned int to avoid this,also fix
+the gcc warning.
+
+Fixes: ded845a781a5 ("ieee802154: Add CA8210 IEEE 802.15.4 device driver")
+Signed-off-by: YueHaibing <yuehaibing@huawei.com>
 Signed-off-by: Stefan Schmidt <stefan@datenfreihafen.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/ieee802154/mac802154_hwsim.c | 4 ++--
+ drivers/net/ieee802154/ca8210.c | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ieee802154/mac802154_hwsim.c b/drivers/net/ieee802154/mac802154_hwsim.c
-index bf70ab892e69..624bff4d3636 100644
---- a/drivers/net/ieee802154/mac802154_hwsim.c
-+++ b/drivers/net/ieee802154/mac802154_hwsim.c
-@@ -500,7 +500,7 @@ static int hwsim_del_edge_nl(struct sk_buff *msg, struct genl_info *info)
- 	    !info->attrs[MAC802154_HWSIM_ATTR_RADIO_EDGE])
- 		return -EINVAL;
+diff --git a/drivers/net/ieee802154/ca8210.c b/drivers/net/ieee802154/ca8210.c
+index 0ff5a403a8dc..b2ff903a9cb6 100644
+--- a/drivers/net/ieee802154/ca8210.c
++++ b/drivers/net/ieee802154/ca8210.c
+@@ -721,7 +721,7 @@ static void ca8210_mlme_reset_worker(struct work_struct *work)
+ static void ca8210_rx_done(struct cas_control *cas_ctl)
+ {
+ 	u8 *buf;
+-	u8 len;
++	unsigned int len;
+ 	struct work_priv_container *mlme_reset_wpc;
+ 	struct ca8210_priv *priv = cas_ctl->priv;
  
--	if (nla_parse_nested(edge_attrs, MAC802154_HWSIM_EDGE_ATTR_MAX + 1,
-+	if (nla_parse_nested(edge_attrs, MAC802154_HWSIM_EDGE_ATTR_MAX,
- 			     info->attrs[MAC802154_HWSIM_ATTR_RADIO_EDGE],
- 			     hwsim_edge_policy, NULL))
- 		return -EINVAL;
-@@ -550,7 +550,7 @@ static int hwsim_set_edge_lqi(struct sk_buff *msg, struct genl_info *info)
- 	    !info->attrs[MAC802154_HWSIM_ATTR_RADIO_EDGE])
- 		return -EINVAL;
- 
--	if (nla_parse_nested(edge_attrs, MAC802154_HWSIM_EDGE_ATTR_MAX + 1,
-+	if (nla_parse_nested(edge_attrs, MAC802154_HWSIM_EDGE_ATTR_MAX,
- 			     info->attrs[MAC802154_HWSIM_ATTR_RADIO_EDGE],
- 			     hwsim_edge_policy, NULL))
- 		return -EINVAL;
+@@ -730,7 +730,7 @@ static void ca8210_rx_done(struct cas_control *cas_ctl)
+ 	if (len > CA8210_SPI_BUF_SIZE) {
+ 		dev_crit(
+ 			&priv->spi->dev,
+-			"Received packet len (%d) erroneously long\n",
++			"Received packet len (%u) erroneously long\n",
+ 			len
+ 		);
+ 		goto finish;
 -- 
 2.19.1
