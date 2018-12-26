@@ -1,63 +1,59 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from proxima.lasnet.de ([78.47.171.185]:59650 "EHLO
-        proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729248AbeLSO2U (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 19 Dec 2018 09:28:20 -0500
-Received: from localhost.localdomain (p200300E9D74E972542AE244D155A9919.dip0.t-ipconnect.de [IPv6:2003:e9:d74e:9725:42ae:244d:155a:9919])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        (Authenticated sender: stefan@datenfreihafen.org)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id CA4CDC6ECA
-        for <linux-wpan@vger.kernel.org>; Wed, 19 Dec 2018 15:28:18 +0100 (CET)
-From: Stefan Schmidt <stefan@datenfreihafen.org>
-Subject: wpan-tools 0.9 release
-Message-ID: <c88277c7-d2dc-3ef4-f92d-a8ea772a6b9d@datenfreihafen.org>
-Date: Wed, 19 Dec 2018 15:28:18 +0100
+Received: from mail.kernel.org ([198.145.29.99]:36396 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727254AbeLZWg2 (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+        Wed, 26 Dec 2018 17:36:28 -0500
+From: Sasha Levin <sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 19/97] ieee802154: hwsim: fix off-by-one in parse nested
+Date: Wed, 26 Dec 2018 17:34:39 -0500
+Message-Id: <20181226223557.149329-19-sashal@kernel.org>
+In-Reply-To: <20181226223557.149329-1-sashal@kernel.org>
+References: <20181226223557.149329-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>
+To: stable@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Alexander Aring <aring@mojatatu.com>, Stefan Schmidt <stefan@datenfreihafen.org>, Sasha Levin <sashal@kernel.org>, linux-wpan@vger.kernel.org, netdev@vger.kernel.org
 
-Hello.
+From: Alexander Aring <aring@mojatatu.com>
 
-It is a pleasure to announce the 0.9 release of wpan-tools.
-Thanks to everyone who contributed!
+[ Upstream commit a73d4e1490913b76b292f91553b7ba08a65caa3f ]
 
-The one big feature in this release is a configuration utility for
-hwsim. A hardware simulation driver which landed mainline in the 4.19
-kernel release.
+This patch fixes a off-by-one mistake in nla_parse_nested() functions of
+mac802154_hwsim driver. I had to enabled stack protector so I was able
+to reproduce it.
 
-Guido Günther contributed a patch from a packagers perspective. Thanks!
+Reference: https://github.com/linux-wpan/wpan-tools/issues/17
 
-Alexander Aring (3):
-wpan-ping: fix ifname setting
-wpan-hwsim: hardware simulator configuration utility
-wpan-hwsim: fix long option argument option for dot
+Signed-off-by: Alexander Aring <aring@mojatatu.com>
+Signed-off-by: Stefan Schmidt <stefan@datenfreihafen.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/net/ieee802154/mac802154_hwsim.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Guido Günther (1):
-Don't install examples
-
-Stefan Schmidt (5):
-hwsim: make sure lqi is always initialized
-iwpan: fix clang compiler warning on absolute-value
-examples: fix wrongly used unsigned attribute
-build: hwsim: fix list of files needed for dist build
-Release 0.9
-
-
-https://github.com/linux-wpan/wpan-tools/releases/download/wpan-tools-0.9/wpan-tools-0.9.tar.gz
-
-sha256sum:
-fa76d9c1874220e4b1f91c226f42baf1e372ea8ccf4b892effaf0d164448f608
-
-https://github.com/linux-wpan/wpan-tools/releases/download/wpan-tools-0.9/wpan-tools-0.9.tar.xz
-
-sha256sum:
-a0bf858048f9a5888a0262a85ff4d0a1fff339fb4ede383aea36779fb6c9f90c
-
-regards
-
-Stefan Schmidt
+diff --git a/drivers/net/ieee802154/mac802154_hwsim.c b/drivers/net/ieee802154/mac802154_hwsim.c
+index bf70ab892e69..624bff4d3636 100644
+--- a/drivers/net/ieee802154/mac802154_hwsim.c
++++ b/drivers/net/ieee802154/mac802154_hwsim.c
+@@ -500,7 +500,7 @@ static int hwsim_del_edge_nl(struct sk_buff *msg, struct genl_info *info)
+ 	    !info->attrs[MAC802154_HWSIM_ATTR_RADIO_EDGE])
+ 		return -EINVAL;
+ 
+-	if (nla_parse_nested(edge_attrs, MAC802154_HWSIM_EDGE_ATTR_MAX + 1,
++	if (nla_parse_nested(edge_attrs, MAC802154_HWSIM_EDGE_ATTR_MAX,
+ 			     info->attrs[MAC802154_HWSIM_ATTR_RADIO_EDGE],
+ 			     hwsim_edge_policy, NULL))
+ 		return -EINVAL;
+@@ -550,7 +550,7 @@ static int hwsim_set_edge_lqi(struct sk_buff *msg, struct genl_info *info)
+ 	    !info->attrs[MAC802154_HWSIM_ATTR_RADIO_EDGE])
+ 		return -EINVAL;
+ 
+-	if (nla_parse_nested(edge_attrs, MAC802154_HWSIM_EDGE_ATTR_MAX + 1,
++	if (nla_parse_nested(edge_attrs, MAC802154_HWSIM_EDGE_ATTR_MAX,
+ 			     info->attrs[MAC802154_HWSIM_ATTR_RADIO_EDGE],
+ 			     hwsim_edge_policy, NULL))
+ 		return -EINVAL;
+-- 
+2.19.1
