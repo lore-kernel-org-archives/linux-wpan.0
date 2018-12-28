@@ -1,10 +1,15 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:59426 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728006AbeL1ILQ (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-        Fri, 28 Dec 2018 03:11:16 -0500
-Subject: Netlink userspace tools for LoRa(WAN), FSK, Sigfox, BLE, etc. (was:
- [PATCH v5 5/6] net: maclorawan: Implement maclorawan class module)
+Received: from mail-io1-f68.google.com ([209.85.166.68]:37833 "EHLO
+        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726143AbeL1Ptp (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 28 Dec 2018 10:49:45 -0500
+Received: by mail-io1-f68.google.com with SMTP id g8so5664305iok.4
+        for <linux-wpan@vger.kernel.org>; Fri, 28 Dec 2018 07:49:45 -0800 (PST)
+Date: Fri, 28 Dec 2018 10:49:41 -0500
+From: Alexander Aring <aring@mojatatu.com>
+Subject: Re: Netlink userspace tools for LoRa(WAN), FSK, Sigfox, BLE, etc.
+ (was: [PATCH v5 5/6] net: maclorawan: Implement maclorawan class module)
+Message-ID: <20181228154941.v7lvsh43kjqqowe7@x220t>
 References: <CAC=mGziyi1ierhg++SUcHMrq1JQ0vH4gZCKUZgchzb8aD1Rv5Q@mail.gmail.com>
  <20181216101858.9585-6-starnight@g.ncu.edu.tw>
  <20181217140233.GG2096@nanopsycho>
@@ -14,83 +19,34 @@ References: <CAC=mGziyi1ierhg++SUcHMrq1JQ0vH4gZCKUZgchzb8aD1Rv5Q@mail.gmail.com>
  <CAC=mGzg4TGCaNUbq=_kFqmF5VNFR6rWHVBwO_5Fprt0u3m1O9g@mail.gmail.com>
  <CAJuUDwuYnuOs=7bs4h77XufqXLSWnZHVocR7vPYA1eor2HG+Cg@mail.gmail.com>
  <CAC=mGzgk0uSZRzE5NJ=FrLwaAkT3yYLb5j-0oFpouZ0YKFhtWQ@mail.gmail.com>
-From: =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>
-Message-ID: <f676c877-ba52-9171-c994-5a5e3735f45c@suse.de>
-Date: Fri, 28 Dec 2018 09:11:11 +0100
+ <f676c877-ba52-9171-c994-5a5e3735f45c@suse.de>
 MIME-Version: 1.0
-In-Reply-To: <CAC=mGzgk0uSZRzE5NJ=FrLwaAkT3yYLb5j-0oFpouZ0YKFhtWQ@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <f676c877-ba52-9171-c994-5a5e3735f45c@suse.de>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Xue Liu <liuxuenetmail@gmail.com>, Jiri Pirko <jiri@resnulli.us>
-Cc: Jian-Hong Pan <starnight@g.ncu.edu.tw>, Ben Whitten <Ben.Whitten@lairdtech.com>, "linux-lpwan@lists.infradead.org" <linux-lpwan@lists.infradead.org>, linux-wpan - ML <linux-wpan@vger.kernel.org>
+To: Andreas =?utf-8?Q?F=C3=A4rber?= <afaerber@suse.de>
+Cc: Xue Liu <liuxuenetmail@gmail.com>, Jiri Pirko <jiri@resnulli.us>, Jian-Hong Pan <starnight@g.ncu.edu.tw>, Ben Whitten <Ben.Whitten@lairdtech.com>, "linux-lpwan@lists.infradead.org" <linux-lpwan@lists.infradead.org>, linux-wpan - ML <linux-wpan@vger.kernel.org>
 
-Hi Xue Liu,
+Hi,
 
-Am 20.12.18 um 17:00 schrieb Jian-Hong Pan:
->> where can I find your current source code for these patches. I would
->> like to add netlink support based on them and at the same time to make
->> a user tool.
+On Fri, Dec 28, 2018 at 09:11:11AM +0100, Andreas Färber wrote:
+...
 > 
-> I am developing the patches based on Andreas' LoRa repository [1]
-> You can apply the patches upon the "lora-next" branch.
+> For instance, FSK/OOK are not really LPWAN technologies but are found on
+> LoRa chips and in LoRaWAN; but FSK also overlaps with 802.15.4 AFAIU,
+> which I guess already has its own userspace tool?
 > 
-> I also wrote some testing programs.  But they are dirty now.
 
-You can also find some of my testing code (test.c, nltest.c) here:
+as to clarify that, our userspace tool is based on the wireless iw tool.
+If you are tight to nl802154/nl80211 I would recommend it to do the
+same, it's well tested code.
 
-https://github.com/afaerber/lora-modules
+Original idea was to put our userspace tool as part of iw, we decided to
+fork iw for now with still have the possibility to merge with iw
+together when the IEEE 802.15.4 becomes more stable, if wireless
+community agree's to that.
 
-I had envisioned nltest.c to evolve into a loraconfig tool for nllora
-and then a lorawanconfig tool for nllorawan etc.
-
-
-Jiri recently raised whether we might combine all that into a single
-lpwanconfig tool. Tricky is that many of these technologies appear to
-overlap (cf. slides 24 and 35 ff.).
-
-https://events.linuxfoundation.org/wp-content/uploads/2017/12/ELCE2018_LoRa_final_Andreas-Farber.pdf
-
-For instance, FSK/OOK are not really LPWAN technologies but are found on
-LoRa chips and in LoRaWAN; but FSK also overlaps with 802.15.4 AFAIU,
-which I guess already has its own userspace tool?
-
-For Sigfox I'm not yet sure whether they need a socket interface at all?
-Overlap here is the MM002 LoRa module (single antenna).
-
-For NB-IoT the main trick appears to be getting the module out of reset,
-and it might just get exposed as a tty, similar to what was proposed for
-GNSS a while ago? Not sure how standard NB-IoT AT commands are, I only
-have access to one (BC95) chipset so far. Haven't seen NB-IoT combined
-with any other LPWAN technology yet, so we're hopefully safe for now
-keeping it separate...
-
-MIOTY appears to rely on SDR hardware, which seems to lack mainline
-kernel drivers in the first place? Fraunhofer IIS (MP3) raises my doubts
-of whether this'll be GPL-friendy, given that there's hardly any public
-documentation beyond the ETSI TS-UNB specification, nor any code.
-
-Weightless appeared to require SIG membership for implementations. There
-did appear to be one AT command interface wrapping an implementation,
-but I haven't had access to such hardware and, again, one is dangerous.
-
-I couldn't quite figure out how BLE packets would fit in here: Would we
-need to implement an HCI layer ourselves and use hciconfig on top? Or is
-there any less work-intensive path to just push BLE PDU packets out our
-radio if delivered to our netdev? For the 2.4 GHz SX128x LoRa modules
-BLE is just another mode to switch to; for RF1276TS and RM186 it'll be a
-secondary radio (i.e., separate netdev).
-
-So not sure how many we can or want to shoehorn into a single tool...
-A loraconfig tool handling both LoRa and LoRaWAN might be a good start,
-plus switching to/from FSK, OOK, FLRC modes?
-
-Cheers,
-Andreas
-
--- 
-SUSE Linux GmbH, Maxfeldstr. 5, 90409 Nürnberg, Germany
-GF: Felix Imendörffer, Jane Smithard, Graham Norton
-HRB 21284 (AG Nürnberg)
+- Alex
