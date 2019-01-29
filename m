@@ -1,12 +1,12 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:53368 "EHLO mx1.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:53388 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725298AbfA2FBo (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+        id S1725308AbfA2FBo (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
         Tue, 29 Jan 2019 00:01:44 -0500
 From: =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>
-Subject: [RFC net-next 3/4] net: enocean: Add ESP3 driver
-Date: Tue, 29 Jan 2019 06:01:29 +0100
-Message-Id: <20190129050130.10932-4-afaerber@suse.de>
+Subject: [RFC net-next 4/4] net: enocean: Prepare ESP2 support
+Date: Tue, 29 Jan 2019 06:01:30 +0100
+Message-Id: <20190129050130.10932-5-afaerber@suse.de>
 In-Reply-To: <20190129050130.10932-1-afaerber@suse.de>
 References: <20190129050130.10932-1-afaerber@suse.de>
 MIME-Version: 1.0
@@ -17,719 +17,348 @@ List-ID: <linux-wpan.vger.kernel.org>
 To: linux-lpwan@lists.infradead.org, linux-wpan@vger.kernel.org
 Cc: Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt <stefan@datenfreihafen.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, support@enocean.com, =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>
 
-This implements the EnOcean Serial Protocol 3.
-Rudimentary sending is prepared. Error handling is lacking and
-reception handling is missing.
+The EnOcean Serial Protocol 2 used subtelegram frames different from ESP3.
+It also uses ORG identifiers differing from RORG identifiers in ERP.
 
-Tested with EnOcean TCM310 gateway module.
+Only checksumming has been tested.
 
 Signed-off-by: Andreas Färber <afaerber@suse.de>
 ---
- drivers/net/enocean/Makefile       |   4 +
- drivers/net/enocean/enocean_esp.c  | 277 +++++++++++++++++++++++++++
- drivers/net/enocean/enocean_esp.h  |  38 ++++
- drivers/net/enocean/enocean_esp3.c | 372 +++++++++++++++++++++++++++++++++++++
- 4 files changed, 691 insertions(+)
- create mode 100644 drivers/net/enocean/enocean_esp.c
- create mode 100644 drivers/net/enocean/enocean_esp.h
- create mode 100644 drivers/net/enocean/enocean_esp3.c
+ drivers/net/enocean/Makefile       |   1 +
+ drivers/net/enocean/enocean_esp.c  |  10 ++
+ drivers/net/enocean/enocean_esp.h  |   8 ++
+ drivers/net/enocean/enocean_esp2.c | 276 +++++++++++++++++++++++++++++++++++++
+ 4 files changed, 295 insertions(+)
+ create mode 100644 drivers/net/enocean/enocean_esp2.c
 
 diff --git a/drivers/net/enocean/Makefile b/drivers/net/enocean/Makefile
-index efb3cd16c7f2..4492e3d48c0a 100644
+index 4492e3d48c0a..f34b098997e4 100644
 --- a/drivers/net/enocean/Makefile
 +++ b/drivers/net/enocean/Makefile
-@@ -1,2 +1,6 @@
- obj-m += enocean-dev.o
- enocean-dev-y := enocean.o
-+
-+obj-m += enocean-esp.o
-+enocean-esp-y := enocean_esp.o
-+enocean-esp-y += enocean_esp3.o
+@@ -3,4 +3,5 @@ enocean-dev-y := enocean.o
+ 
+ obj-m += enocean-esp.o
+ enocean-esp-y := enocean_esp.o
++enocean-esp-y += enocean_esp2.o
+ enocean-esp-y += enocean_esp3.o
 diff --git a/drivers/net/enocean/enocean_esp.c b/drivers/net/enocean/enocean_esp.c
-new file mode 100644
-index 000000000000..61bddb77762d
---- /dev/null
+index 61bddb77762d..74720da49369 100644
+--- a/drivers/net/enocean/enocean_esp.c
 +++ b/drivers/net/enocean/enocean_esp.c
-@@ -0,0 +1,277 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ * EnOcean Serial Protocol
-+ *
-+ * Copyright (c) 2019 Andreas Färber
-+ */
-+
-+#include <linux/bitops.h>
-+#include <linux/completion.h>
-+#include <linux/enocean/dev.h>
-+#include <linux/module.h>
-+#include <linux/of.h>
-+#include <linux/of_device.h>
-+#include <linux/serdev.h>
-+
-+#include "enocean_esp.h"
-+
-+struct enocean_esp_version {
-+	int version;
-+	int baudrate;
-+	const struct serdev_device_ops *serdev_client_ops;
-+	int (*init)(struct enocean_device *edev);
-+	int (*send)(struct enocean_device *edev, u32 dest, const void *data, int data_len);
-+	void (*cleanup)(struct enocean_device *edev);
+@@ -150,6 +150,15 @@ static void enocean_esp_cleanup(struct enocean_device *edev)
+ 		edev->version->cleanup(edev);
+ }
+ 
++static const struct enocean_esp_version enocean_esp2 = {
++	.version = 2,
++	.baudrate = 9600,
++	.serdev_client_ops = &enocean_esp2_serdev_client_ops,
++	.init = enocean_esp2_init,
++	.send = enocean_esp2_send,
++	.cleanup = enocean_esp2_cleanup,
 +};
 +
-+struct enocean_esp_priv {
-+	struct enocean_dev_priv priv;
-+
-+	struct enocean_device *edev;
-+
-+	struct sk_buff *tx_skb;
-+	int tx_len;
-+
-+	struct workqueue_struct *wq;
-+	struct work_struct tx_work;
-+};
-+
-+static netdev_tx_t enocean_dev_start_xmit(struct sk_buff *skb, struct net_device *netdev)
-+{
-+	struct enocean_esp_priv *priv = netdev_priv(netdev);
-+
-+	netdev_dbg(netdev, "%s\n", __func__);
-+
-+	if (skb->protocol != htons(ETH_P_ERP1) &&
-+	    skb->protocol != htons(ETH_P_ERP2)) {
-+		kfree_skb(skb);
-+		netdev->stats.tx_dropped++;
-+		return NETDEV_TX_OK;
-+	}
-+
-+	netif_stop_queue(netdev);
-+	priv->tx_skb = skb;
-+	queue_work(priv->wq, &priv->tx_work);
-+
-+	return NETDEV_TX_OK;
-+}
-+
-+static int enocean_esp_tx(struct enocean_device *edev, void *data, int data_len)
-+{
-+	if (!edev->version->send)
-+		return -ENOTSUPP;
-+	return edev->version->send(edev, 0xffffffff, data, data_len);
-+}
-+
-+static void enocean_esp_tx_work_handler(struct work_struct *ws)
-+{
-+	struct enocean_esp_priv *priv = container_of(ws, struct enocean_esp_priv, tx_work);
-+	struct enocean_device *edev = priv->edev;
-+	struct net_device *netdev = edev->netdev;
-+
-+	netdev_dbg(netdev, "%s\n", __func__);
-+
-+	if (priv->tx_skb) {
-+		enocean_esp_tx(edev, priv->tx_skb->data, priv->tx_skb->len);
-+		priv->tx_len = 1 + priv->tx_skb->len;
-+		if (!(netdev->flags & IFF_ECHO) ||
-+			priv->tx_skb->pkt_type != PACKET_LOOPBACK ||
-+			(priv->tx_skb->protocol != htons(ETH_P_ERP1) &&
-+			 priv->tx_skb->protocol != htons(ETH_P_ERP2)))
-+			kfree_skb(priv->tx_skb);
-+		priv->tx_skb = NULL;
-+	}
-+}
-+
-+void enocean_esp_tx_done(struct enocean_device *edev)
-+{
-+	struct net_device *netdev = edev->netdev;
-+	struct enocean_esp_priv *priv = netdev_priv(netdev);
-+
-+	netdev_info(netdev, "TX done.\n");
-+	netdev->stats.tx_packets++;
-+	netdev->stats.tx_bytes += priv->tx_len - 1;
-+	priv->tx_len = 0;
-+	netif_wake_queue(netdev);
-+}
-+
-+static int enocean_dev_open(struct net_device *netdev)
-+{
-+	struct enocean_esp_priv *priv = netdev_priv(netdev);
-+	int ret;
-+
-+	netdev_dbg(netdev, "%s\n", __func__);
-+
-+	ret = open_enocean_dev(netdev);
-+	if (ret)
-+		return ret;
-+
-+	priv->tx_skb = NULL;
-+	priv->tx_len = 0;
-+
-+	priv->wq = alloc_workqueue("enocean_esp_wq", WQ_FREEZABLE | WQ_MEM_RECLAIM, 0);
-+	INIT_WORK(&priv->tx_work, enocean_esp_tx_work_handler);
-+
-+	netif_wake_queue(netdev);
-+
-+	return 0;
-+}
-+
-+static int enocean_dev_stop(struct net_device *netdev)
-+{
-+	struct enocean_esp_priv *priv = netdev_priv(netdev);
-+
-+	netdev_dbg(netdev, "%s\n", __func__);
-+
-+	close_enocean_dev(netdev);
-+
-+	destroy_workqueue(priv->wq);
-+	priv->wq = NULL;
-+
-+	if (priv->tx_skb || priv->tx_len)
-+		netdev->stats.tx_errors++;
-+	if (priv->tx_skb)
-+		dev_kfree_skb(priv->tx_skb);
-+	priv->tx_skb = NULL;
-+	priv->tx_len = 0;
-+
-+	return 0;
-+}
-+
-+static const struct net_device_ops enocean_esp_netdev_ops =  {
-+	.ndo_open = enocean_dev_open,
-+	.ndo_stop = enocean_dev_stop,
-+	.ndo_start_xmit = enocean_dev_start_xmit,
-+};
-+
-+static void enocean_esp_cleanup(struct enocean_device *edev)
-+{
-+	if (edev->version->cleanup)
-+		edev->version->cleanup(edev);
-+}
-+
-+static const struct enocean_esp_version enocean_esp3 = {
-+	.version = 3,
-+	.baudrate = 57600,
-+	.serdev_client_ops = &enocean_esp3_serdev_client_ops,
-+	.init = enocean_esp3_init,
-+	.send = enocean_esp3_send,
-+	.cleanup = enocean_esp3_cleanup,
-+};
-+
-+static const struct of_device_id enocean_of_match[] = {
-+	{ .compatible = "enocean,esp3", .data = &enocean_esp3 },
-+	{}
-+};
-+MODULE_DEVICE_TABLE(of, enocean_of_match);
-+
-+static int enocean_probe(struct serdev_device *sdev)
-+{
-+	struct enocean_esp_priv *priv;
-+	struct enocean_device *edev;
-+	int ret;
-+
-+	dev_dbg(&sdev->dev, "Probing");
-+
-+	edev = devm_kzalloc(&sdev->dev, sizeof(*edev), GFP_KERNEL);
-+	if (!edev)
-+		return -ENOMEM;
-+
-+	edev->version = of_device_get_match_data(&sdev->dev);
-+	if (!edev->version)
-+		return -ENOTSUPP;
-+
-+	dev_dbg(&sdev->dev, "ESP%d\n", edev->version->version);
-+
-+	edev->serdev = sdev;
-+	INIT_LIST_HEAD(&edev->esp_dispatchers);
-+	serdev_device_set_drvdata(sdev, edev);
-+
-+	ret = serdev_device_open(sdev);
-+	if (ret) {
-+		dev_err(&sdev->dev, "Failed to open (%d)\n", ret);
-+		return ret;
-+	}
-+
-+	serdev_device_set_baudrate(sdev, edev->version->baudrate);
-+	serdev_device_set_flow_control(sdev, false);
-+	serdev_device_set_client_ops(sdev, edev->version->serdev_client_ops);
-+
-+	if (edev->version->init) {
-+		ret = edev->version->init(edev);
-+		if (ret) {
-+			serdev_device_close(sdev);
-+			return ret;
-+		}
-+	}
-+
-+	edev->netdev = devm_alloc_enocean_dev(&sdev->dev, sizeof(struct enocean_esp_priv));
-+	if (!edev->netdev) {
-+		enocean_esp_cleanup(edev);
-+		serdev_device_close(sdev);
-+		return -ENOMEM;
-+	}
-+
-+	edev->netdev->netdev_ops = &enocean_esp_netdev_ops;
-+	edev->netdev->flags |= IFF_ECHO;
-+	SET_NETDEV_DEV(edev->netdev, &sdev->dev);
-+
-+	priv = netdev_priv(edev->netdev);
-+	priv->edev = edev;
-+
-+	ret = register_enocean_dev(edev->netdev);
-+	if (ret) {
-+		enocean_esp_cleanup(edev);
-+		serdev_device_close(sdev);
-+		return ret;
-+	}
-+
-+	dev_dbg(&sdev->dev, "Done.\n");
-+
-+	return 0;
-+}
-+
-+static void enocean_remove(struct serdev_device *sdev)
-+{
-+	struct enocean_device *edev = serdev_device_get_drvdata(sdev);
-+
-+	unregister_enocean_dev(edev->netdev);
-+	enocean_esp_cleanup(edev);
-+	serdev_device_close(sdev);
-+
-+	dev_dbg(&sdev->dev, "Removed\n");
-+}
-+
-+static struct serdev_device_driver enocean_serdev_driver = {
-+	.probe = enocean_probe,
-+	.remove = enocean_remove,
-+	.driver = {
-+		.name = "enocean-esp",
-+		.of_match_table = enocean_of_match,
-+	},
-+};
-+
-+static int __init enocean_init(void)
-+{
-+	int ret;
-+
-+	enocean_esp3_crc8_populate();
-+
-+	ret = serdev_device_driver_register(&enocean_serdev_driver);
-+	if (ret)
-+		return ret;
-+
-+	return 0;
-+}
-+
-+static void __exit enocean_exit(void)
-+{
-+	serdev_device_driver_unregister(&enocean_serdev_driver);
-+}
-+
-+module_init(enocean_init);
-+module_exit(enocean_exit);
-+
-+MODULE_DESCRIPTION("EnOcean serdev driver");
-+MODULE_AUTHOR("Andreas Färber <afaerber@suse.de>");
-+MODULE_LICENSE("GPL");
+ static const struct enocean_esp_version enocean_esp3 = {
+ 	.version = 3,
+ 	.baudrate = 57600,
+@@ -160,6 +169,7 @@ static const struct enocean_esp_version enocean_esp3 = {
+ };
+ 
+ static const struct of_device_id enocean_of_match[] = {
++	{ .compatible = "enocean,esp2", .data = &enocean_esp2 },
+ 	{ .compatible = "enocean,esp3", .data = &enocean_esp3 },
+ 	{}
+ };
 diff --git a/drivers/net/enocean/enocean_esp.h b/drivers/net/enocean/enocean_esp.h
-new file mode 100644
-index 000000000000..e02bf5352d61
---- /dev/null
+index e02bf5352d61..44660238043a 100644
+--- a/drivers/net/enocean/enocean_esp.h
 +++ b/drivers/net/enocean/enocean_esp.h
-@@ -0,0 +1,38 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ * EnOcean Serial Protocol
-+ *
-+ * Copyright (c) 2019 Andreas Färber
-+ */
-+#ifndef ENOCEAN_H
-+#define ENOCEAN_H
+@@ -24,15 +24,23 @@ struct enocean_device {
+ 	void *priv;
+ };
+ 
++extern const struct serdev_device_ops enocean_esp2_serdev_client_ops;
+ extern const struct serdev_device_ops enocean_esp3_serdev_client_ops;
+ 
+ void enocean_esp3_crc8_populate(void);
+ 
++int enocean_esp2_init(struct enocean_device *edev);
+ int enocean_esp3_init(struct enocean_device *edev);
+ 
++int enocean_esp2_send(struct enocean_device *edev, u32 dest, const void *data, int data_len);
+ int enocean_esp3_send(struct enocean_device *edev, u32 dest, const void *data, int data_len);
+ void enocean_esp_tx_done(struct enocean_device *edev);
+ 
++void enocean_esp2_cleanup(struct enocean_device *edev);
+ void enocean_esp3_cleanup(struct enocean_device *edev);
+ 
++#define ENOCEAN_RORG_RPS	0xF6
++#define ENOCEAN_RORG_1BS	0xD5
++#define ENOCEAN_RORG_4BS	0xA5
 +
-+#include <linux/netdevice.h>
-+#include <linux/rculist.h>
-+#include <linux/serdev.h>
-+
-+struct enocean_esp_version;
-+
-+struct enocean_device {
-+	struct serdev_device *serdev;
-+	const struct enocean_esp_version *version;
-+
-+	struct net_device *netdev;
-+
-+	struct list_head esp_dispatchers;
-+
-+	void *priv;
-+};
-+
-+extern const struct serdev_device_ops enocean_esp3_serdev_client_ops;
-+
-+void enocean_esp3_crc8_populate(void);
-+
-+int enocean_esp3_init(struct enocean_device *edev);
-+
-+int enocean_esp3_send(struct enocean_device *edev, u32 dest, const void *data, int data_len);
-+void enocean_esp_tx_done(struct enocean_device *edev);
-+
-+void enocean_esp3_cleanup(struct enocean_device *edev);
-+
-+#endif
-diff --git a/drivers/net/enocean/enocean_esp3.c b/drivers/net/enocean/enocean_esp3.c
+ #endif
+diff --git a/drivers/net/enocean/enocean_esp2.c b/drivers/net/enocean/enocean_esp2.c
 new file mode 100644
-index 000000000000..707c4054ac69
+index 000000000000..d4cb787de22e
 --- /dev/null
-+++ b/drivers/net/enocean/enocean_esp3.c
-@@ -0,0 +1,372 @@
++++ b/drivers/net/enocean/enocean_esp2.c
+@@ -0,0 +1,276 @@
 +// SPDX-License-Identifier: GPL-2.0-or-later
 +/*
-+ * EnOcean Serial Protocol 3
++ * EnOcean Serial Protocol 2
 + *
 + * Copyright (c) 2019 Andreas Färber
 + */
 +
-+#include <asm/unaligned.h>
-+#include <linux/completion.h>
-+#include <linux/crc8.h>
-+#include <linux/rculist.h>
 +#include <linux/serdev.h>
-+#include <linux/slab.h>
 +
 +#include "enocean_esp.h"
 +
-+/* G(x) = x^8 + x^2 + x^1 + x^0 */
-+#define ESP3_CRC8_POLY_MSB 0x07
++#define ESP2_SYNC_BYTE1 0xA5
++#define ESP2_SYNC_BYTE0 0x5A
 +
-+DECLARE_CRC8_TABLE(enocean_esp3_crc8_table);
++struct enocean_esp2_packet {
++	u8 sync[2];
++#ifdef CONFIG_CPU_BIG_ENDIAN
++	u8 h_seq:3;
++	u8 length:5;
++#else
++	u8 length:5;
++	u8 h_seq:3;
++#endif
++	u8 org;
++	u8 data[4];
++	u8 id[4];
++	u8 status;
++	u8 checksum;
++} __packed;
 +
-+void enocean_esp3_crc8_populate(void)
++#define ESP2_H_SEQ_TRT	0x3
++#define ESP2_H_SEQ_RCT	0x4
++#define ESP2_H_SEQ_TCT	0x5
++
++#define ESP2_TELEGRAM_RESET	0x0A
++
++#define ENOCEAN_ORG_RPS		0x05
++#define ENOCEAN_ORG_1BS		0x06
++#define ENOCEAN_ORG_4BS		0x07
++
++/* Cf. EnOcean Equipment Profiles, Telegram Types (RORG) */
++static inline u8 enocean_org_to_rorg(u8 org)
 +{
-+	crc8_populate_msb(enocean_esp3_crc8_table, ESP3_CRC8_POLY_MSB);
++	switch (org) {
++	case ENOCEAN_ORG_RPS:
++		return ENOCEAN_RORG_RPS;
++	case ENOCEAN_ORG_1BS:
++		return ENOCEAN_RORG_1BS;
++	case ENOCEAN_ORG_4BS:
++		return ENOCEAN_RORG_4BS;
++	default:
++		return org;
++	}
 +}
 +
-+static inline u8 enocean_esp3_crc8(u8 *pdata, size_t nbytes)
++static u8 enocean_rorg_to_org(u8 rorg)
 +{
-+	return crc8(enocean_esp3_crc8_table, pdata, nbytes, 0x00);
++	switch (rorg) {
++	case ENOCEAN_RORG_RPS:
++		return ENOCEAN_ORG_RPS;
++	case ENOCEAN_RORG_1BS:
++		return ENOCEAN_ORG_1BS;
++	case ENOCEAN_RORG_4BS:
++		return ENOCEAN_ORG_4BS;
++	default:
++		return rorg;
++	}
 +}
 +
-+#define ESP3_SYNC_WORD 0x55
-+
-+struct enocean_esp3_dispatcher {
++struct enocean_esp2_dispatcher {
 +	struct list_head list;
-+	u8 packet_type;
-+	void (*dispatch)(const u8 *data, u16 data_len, struct enocean_esp3_dispatcher *d);
++	u8 h_seq;
++	void (*dispatch)(const u8 *data, u8 data_len, struct enocean_esp2_dispatcher *d);
 +};
 +
-+static void enocean_add_esp3_dispatcher(struct enocean_device *edev,
-+	struct enocean_esp3_dispatcher *entry)
++static void enocean_add_esp2_dispatcher(struct enocean_device *edev,
++	struct enocean_esp2_dispatcher *entry)
 +{
 +	list_add_tail_rcu(&entry->list, &edev->esp_dispatchers);
 +}
 +
-+static void enocean_remove_esp3_dispatcher(struct enocean_device *edev,
-+	struct enocean_esp3_dispatcher *entry)
++static void enocean_remove_esp2_dispatcher(struct enocean_device *edev,
++	struct enocean_esp2_dispatcher *entry)
 +{
 +	list_del_rcu(&entry->list);
 +}
 +
-+struct enocean_esp3_response {
-+	struct enocean_esp3_dispatcher disp;
++#define ESP2_RESPONSE_ERR_SYNTAX_H_SEQ	0x08
++#define ESP2_RESPONSE_ERR_SYNTAX_LENGTH	0x09
++#define ESP2_RESPONSE_ERR_SYNTAX_CHKSUM	0x0A
++#define ESP2_RESPONSE_ERR_SYNTAX_ORG	0x0B
++#define ESP2_RESPONSE_ERR		0x19
++#define ESP2_RESPONSE_ERR_IDRANGE	0x1A
++#define ESP2_RESPONSE_ERR_TX_IDRANGE	0x22
++#define ESP2_RESPONSE_OK		0x58
 +
-+	u8 code;
-+	void *data;
-+	u16 data_len;
-+
-+	struct completion comp;
-+};
-+
-+static void enocean_esp3_response_dispatch(const u8 *data, u16 data_len,
-+	struct enocean_esp3_dispatcher *d)
-+{
-+	struct enocean_esp3_response *resp =
-+		container_of(d, struct enocean_esp3_response, disp);
-+
-+	if (completion_done(&resp->comp))
-+		return;
-+
-+	if (data_len < 1)
-+		return;
-+
-+	resp->code = data[0];
-+	if (data_len > 1) {
-+		resp->data = kzalloc(data_len - 1, GFP_KERNEL);
-+		if (resp->data)
-+			memcpy(resp->data, data + 1, data_len - 1);
-+		resp->data_len = data_len - 1;
-+	} else {
-+		resp->data = NULL;
-+		resp->data_len = 0;
-+	}
-+
-+	complete(&resp->comp);
-+}
-+
-+struct enocean_esp3_priv {
++struct enocean_esp2_priv {
 +	struct enocean_device *edev;
-+	struct enocean_esp3_dispatcher radio_erp1_response;
++	struct enocean_esp2_dispatcher tx_telegram_response;
 +};
 +
-+static inline int enocean_esp3_packet_size(u16 data_len, u8 optional_len)
++static u8 enocean_esp2_checksum(const u8 *data, int len)
 +{
-+	return 1 + 4 + 1 + data_len + optional_len + 1;
++	u8 chksum = 0;
++	int i;
++
++	for (i = 0; i < len; i++) {
++		chksum += data[i];
++	}
++	return chksum;
 +}
 +
-+static int enocean_send_esp3_packet(struct enocean_device *edev, u8 packet_type,
-+	const void *data, u16 data_len, const void *optional_data, u8 optional_len,
-+	unsigned long timeout)
++static int enocean_esp2_send_telegram(struct enocean_device *edev, u8 h_seq, u8 org,
++	const u8 *data, int data_len, unsigned long timeout)
 +{
-+	int len = enocean_esp3_packet_size(data_len, optional_len);
-+	u8 *buf;
++	struct enocean_esp2_packet pkt;
 +	int ret;
 +
-+	buf = kzalloc(len, GFP_KERNEL);
-+	if (!buf)
-+		return -ENOMEM;
++	memset(&pkt, 0, sizeof(pkt));
++	pkt.sync[0] = ESP2_SYNC_BYTE1;
++	pkt.sync[1] = ESP2_SYNC_BYTE0;
++	pkt.h_seq = h_seq;
++	pkt.length = 11;
++	dev_dbg(&edev->serdev->dev, "H_SEQ | LENGTH = %02x\n", (unsigned int)(((u8*)&pkt)[2]));
++	pkt.org = org;
++	if (data_len > 0)
++		memcpy(pkt.data, data, min(data_len, 9));
++	pkt.checksum = enocean_esp2_checksum(((u8 *)&pkt) + 2, sizeof(pkt) - 2 - 1);
++	dev_dbg(&edev->serdev->dev, "checksum = %02x\n", (unsigned int)pkt.checksum);
 +
-+	buf[0] = ESP3_SYNC_WORD;
-+	put_unaligned_be16(data_len, buf + 1);
-+	buf[3] = optional_len;
-+	buf[4] = packet_type;
-+	buf[5] = enocean_esp3_crc8(buf + 1, 4);
-+	dev_dbg(&edev->serdev->dev, "CRC8H = %02x\n", (unsigned int)buf[5]);
-+	memcpy(buf + 6, data, data_len);
-+	memcpy(buf + 6 + data_len, optional_data, optional_len);
-+	buf[6 + data_len + optional_len] = enocean_esp3_crc8(buf + 6, data_len + optional_len);
-+	dev_dbg(&edev->serdev->dev, "CRC8D = %02x\n", (unsigned int)buf[6 + data_len + optional_len]);
-+
-+	ret = serdev_device_write(edev->serdev, buf, len, timeout);
-+
-+	kfree(buf);
-+
++	ret = serdev_device_write(edev->serdev, (const u8 *)&pkt, sizeof(pkt), timeout);
 +	if (ret < 0)
 +		return ret;
-+	if (ret > 0 && ret < len)
++	if (ret > 0 && ret < sizeof(pkt))
 +		return -EIO;
 +	return 0;
 +}
 +
-+#define ESP3_RADIO_ERP1		0x1
-+#define ESP3_RESPONSE		0x2
-+#define ESP3_COMMON_COMMAND	0x5
-+
-+static void enocean_esp3_radio_erp1_response_dispatch(const u8 *data, u16 data_len,
-+	struct enocean_esp3_dispatcher *d)
++static void enocean_esp2_tx_telegram_response_dispatch(const u8 *data, u8 data_len,
++	struct enocean_esp2_dispatcher *d)
 +{
-+	struct enocean_esp3_priv *priv = container_of(d, struct enocean_esp3_priv, radio_erp1_response);
++	struct enocean_esp2_priv *priv = container_of(d, struct enocean_esp2_priv, tx_telegram_response);
 +	struct enocean_device *edev = priv->edev;
-+	int ret;
 +
-+	enocean_remove_esp3_dispatcher(edev, d);
++	enocean_remove_esp2_dispatcher(edev, d);
 +
 +	if (data_len < 1)
 +		return;
 +
 +	switch (data[0]) {
-+	case 0:
++	case ESP2_RESPONSE_OK:
 +		enocean_esp_tx_done(edev);
 +		break;
-+	case 2:
-+		ret = -ENOTSUPP;
-+		break;
-+	case 3:
-+		ret = -EINVAL;
-+		break;
-+	case 5:
-+		ret = -EIO;
-+		break;
++	case ESP2_RESPONSE_ERR:
++	case ESP2_RESPONSE_ERR_TX_IDRANGE:
 +	default:
-+		ret = -EIO;
 +		break;
 +	}
 +}
 +
-+static int enocean_esp3_send_radio_erp1(struct enocean_device *edev, u32 dest,
++static int enocean_esp2_tx_telegram(struct enocean_device *edev, u8 org,
 +	const u8 *data, int data_len, unsigned long timeout)
 +{
-+	struct enocean_esp3_priv *priv = edev->priv;
-+	struct esp3_radio_erp1_optional {
-+		u8 sub_tel_num;
-+		__be32 destination_id;
-+		u8 dbm;
-+		u8 security_level;
-+	} __packed opt = {
-+		.sub_tel_num = 3,
-+		.destination_id = cpu_to_be32(dest),
-+		.dbm = 0xff,
-+		.security_level = 0,
-+	};
++	struct enocean_esp2_priv *priv = edev->priv;
 +	int ret;
 +
-+	enocean_add_esp3_dispatcher(edev, &priv->radio_erp1_response);
++	enocean_add_esp2_dispatcher(edev, &priv->tx_telegram_response);
 +
-+	ret = enocean_send_esp3_packet(edev, ESP3_RADIO_ERP1, data, data_len, &opt, sizeof(opt), timeout);
++	ret = enocean_esp2_send_telegram(edev, ESP2_H_SEQ_TRT,
++		org, data, data_len, timeout);
 +	if (ret) {
-+		enocean_remove_esp3_dispatcher(edev, &priv->radio_erp1_response);
++		enocean_remove_esp2_dispatcher(edev, &priv->tx_telegram_response);
 +		return ret;
 +	}
 +
 +	return 0;
 +}
 +
-+static int enocean_esp3_reset(struct enocean_device *edev, unsigned long timeout)
++static int enocean_esp2_reset(struct enocean_device *edev, unsigned long timeout)
 +{
-+	struct enocean_esp3_response resp;
-+	const u8 buf[1] = { 0x02 };
-+	int ret;
-+
-+	init_completion(&resp.comp);
-+	resp.disp.packet_type = ESP3_RESPONSE;
-+	resp.disp.dispatch = enocean_esp3_response_dispatch;
-+	enocean_add_esp3_dispatcher(edev, &resp.disp);
-+
-+	ret = enocean_send_esp3_packet(edev, ESP3_COMMON_COMMAND, buf, sizeof(buf), NULL, 0, timeout);
-+	if (ret) {
-+		enocean_remove_esp3_dispatcher(edev, &resp.disp);
-+		return ret;
-+	}
-+
-+	timeout = wait_for_completion_timeout(&resp.comp, timeout);
-+	enocean_remove_esp3_dispatcher(edev, &resp.disp);
-+	if (!timeout)
-+		return -ETIMEDOUT;
-+
-+	switch (resp.code) {
-+	case 0:
-+		return 0;
-+	case 1:
-+		return -EIO;
-+	case 2:
-+		return -ENOTSUPP;
-+	default:
-+		return -EIO;
-+	}
++	return enocean_esp2_send_telegram(edev, ESP2_H_SEQ_TCT, ESP2_TELEGRAM_RESET, NULL, 0, timeout);
++	/* no RCT */
 +}
 +
-+struct enocean_esp3_version {
-+	u8 app_version[4];
-+	u8 api_version[4];
-+	__be32 chip_id;
-+	__be32 chip_version;
-+	char app_desc[16];
-+} __packed;
-+
-+static int enocean_esp3_read_version(struct enocean_device *edev, unsigned long timeout)
-+{
-+	struct enocean_esp3_response resp;
-+	struct enocean_esp3_version *ver;
-+	const u8 buf[1] = { 0x03 };
-+	int ret;
-+
-+	init_completion(&resp.comp);
-+	resp.disp.packet_type = ESP3_RESPONSE;
-+	resp.disp.dispatch = enocean_esp3_response_dispatch;
-+	enocean_add_esp3_dispatcher(edev, &resp.disp);
-+
-+	ret = enocean_send_esp3_packet(edev, ESP3_COMMON_COMMAND, buf, sizeof(buf), NULL, 0, timeout);
-+	if (ret) {
-+		enocean_remove_esp3_dispatcher(edev, &resp.disp);
-+		return ret;
-+	}
-+
-+	timeout = wait_for_completion_timeout(&resp.comp, timeout);
-+	enocean_remove_esp3_dispatcher(edev, &resp.disp);
-+	if (!timeout)
-+		return -ETIMEDOUT;
-+
-+	switch (resp.code) {
-+	case 0:
-+		if (!resp.data)
-+			return -ENOMEM;
-+		break;
-+	case 2:
-+		if (resp.data)
-+			kfree(resp.data);
-+		return -ENOTSUPP;
-+	default:
-+		if (resp.data)
-+			kfree(resp.data);
-+		return -EIO;
-+	}
-+
-+	ver = resp.data;
-+	ver->app_desc[15] = '\0';
-+	dev_info(&edev->serdev->dev, "'%s'\n", ver->app_desc);
-+	kfree(resp.data);
-+
-+	return 0;
-+}
-+
-+static int enocean_esp3_receive_buf(struct serdev_device *sdev, const u8 *data, size_t count)
++static int enocean_esp2_receive_buf(struct serdev_device *sdev, const u8 *data, size_t count)
 +{
 +	struct enocean_device *edev = serdev_device_get_drvdata(sdev);
-+	struct enocean_esp3_dispatcher *e;
-+	u8 crc8h, crc8d, optional_len;
-+	u16 data_len;
++	struct enocean_esp2_dispatcher *e;
++	u8 h_seq, length, chksum;
 +
 +	dev_dbg(&sdev->dev, "Receive (%zu)\n", count);
 +
-+	if (data[0] != ESP3_SYNC_WORD) {
-+		dev_warn(&sdev->dev, "not Sync Word (found 0x%02x), skipping\n",
++	if (data[0] != ESP2_SYNC_BYTE1) {
++		dev_warn(&sdev->dev, "not first Sync Byte (found 0x%02x), skipping\n",
 +			(unsigned int)data[0]);
 +		return 1;
 +	}
 +
-+	if (count < 6)
++	if (count < 2)
 +		return 0;
 +
-+	crc8h = enocean_esp3_crc8((u8*)data + 1, 4);
-+	if (data[5] != crc8h) {
-+		dev_warn(&sdev->dev, "invalid CRC8H (expected 0x%02x, found 0x%02x), skipping\n",
-+			(unsigned int)crc8h, (unsigned int)data[5]);
++	if (data[1] != ESP2_SYNC_BYTE0) {
++		dev_warn(&sdev->dev, "not second Sync Byte (found 0x%02x 0x%02x), skipping\n",
++			ESP2_SYNC_BYTE1, (unsigned int)data[1]);
 +		return 1;
 +	}
 +
-+	data_len = be16_to_cpup((__be16 *)(data + 1));
-+	optional_len = data[3];
-+	if (count < enocean_esp3_packet_size(data_len, optional_len))
++	if (count < 3)
 +		return 0;
 +
-+	crc8d = enocean_esp3_crc8((u8*)data + 6, data_len + optional_len);
-+	if (data[6 + data_len + optional_len] != crc8d) {
-+		dev_warn(&sdev->dev, "invalid CRC8D (expected 0x%02x, found 0x%02x), skipping\n",
-+			(unsigned int)crc8d, (unsigned int)data[6 + data_len + optional_len]);
-+		return 1;
++	h_seq = data[2] >> 5;
++	length = data[2] & 0x1f;
++
++	if (count < 3 + length)
++		return 0;
++
++	chksum = enocean_esp2_checksum(data + 2, 1 + length - 1);
++	if (data[3 + length - 1] != chksum) {
++		dev_warn(&sdev->dev, "invalid checksum (expected 0x%02x, found %02x), skipping\n",
++			(unsigned int)chksum, (unsigned int)data[3 + length - 1]);
++		return 2; /* valid second Sync Byte is not a valid first Sync Byte */
 +	}
 +
-+	print_hex_dump_debug("received: ", DUMP_PREFIX_NONE, 16, 1, data,
-+		enocean_esp3_packet_size(data_len, optional_len), false);
++	print_hex_dump_bytes("received: ", DUMP_PREFIX_OFFSET, data, 3 + length);
 +
 +	list_for_each_entry_rcu(e, &edev->esp_dispatchers, list) {
-+		if (e->packet_type == data[4])
-+			e->dispatch(data + 6, data_len, e);
++		if (e->h_seq == h_seq)
++			e->dispatch(data + 3, length, e);
 +	}
 +
-+	return enocean_esp3_packet_size(data_len, optional_len);
++	return 3 + length;
 +}
 +
-+const struct serdev_device_ops enocean_esp3_serdev_client_ops = {
-+	.receive_buf = enocean_esp3_receive_buf,
++const struct serdev_device_ops enocean_esp2_serdev_client_ops = {
++	.receive_buf = enocean_esp2_receive_buf,
 +	.write_wakeup = serdev_device_write_wakeup,
 +};
 +
-+int enocean_esp3_send(struct enocean_device *edev, u32 dest, const void *data, int data_len)
++int enocean_esp2_send(struct enocean_device *edev, u32 dest, const void *data, int data_len)
 +{
-+	return enocean_esp3_send_radio_erp1(edev, dest, data, data_len, HZ / 10);
++	const u8 *buf = data;
++
++	return enocean_esp2_tx_telegram(edev,
++		enocean_rorg_to_org(buf[0]), buf + 1, data_len - 1, HZ);
 +}
 +
-+int enocean_esp3_init(struct enocean_device *edev)
++int enocean_esp2_init(struct enocean_device *edev)
 +{
-+	struct enocean_esp3_priv *priv;
++	struct enocean_esp2_priv *priv;
 +	int ret;
 +
-+	ret = enocean_esp3_reset(edev, HZ / 10);
++	ret = enocean_esp2_reset(edev, HZ);
 +	if (ret)
 +		return ret;
 +
 +	msleep(100); /* XXX */
-+
-+	ret = enocean_esp3_read_version(edev, HZ / 10);
 +
 +	priv = kzalloc(sizeof(*priv), GFP_KERNEL);
 +	if (!priv)
@@ -738,15 +367,15 @@ index 000000000000..707c4054ac69
 +	priv->edev = edev;
 +	edev->priv = priv;
 +
-+	priv->radio_erp1_response.packet_type = ESP3_RESPONSE;
-+	priv->radio_erp1_response.dispatch = enocean_esp3_radio_erp1_response_dispatch;
++	priv->tx_telegram_response.h_seq = ESP2_H_SEQ_RCT;
++	priv->tx_telegram_response.dispatch = enocean_esp2_tx_telegram_response_dispatch;
 +
 +	return 0;
 +}
 +
-+void enocean_esp3_cleanup(struct enocean_device *edev)
++void enocean_esp2_cleanup(struct enocean_device *edev)
 +{
-+	struct enocean_esp3_priv *priv = edev->priv;
++	struct enocean_esp2_priv *priv = edev->priv;
 +
 +	kfree(priv);
 +}
