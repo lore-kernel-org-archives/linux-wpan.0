@@ -1,383 +1,171 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:53388 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725308AbfA2FBo (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-        Tue, 29 Jan 2019 00:01:44 -0500
-From: =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>
-Subject: [RFC net-next 4/4] net: enocean: Prepare ESP2 support
-Date: Tue, 29 Jan 2019 06:01:30 +0100
-Message-Id: <20190129050130.10932-5-afaerber@suse.de>
-In-Reply-To: <20190129050130.10932-1-afaerber@suse.de>
-References: <20190129050130.10932-1-afaerber@suse.de>
+Received: from mail-lf1-f67.google.com ([209.85.167.67]:44623 "EHLO
+        mail-lf1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725876AbfBAI5A (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 1 Feb 2019 03:57:00 -0500
+Received: by mail-lf1-f67.google.com with SMTP id z13so4438803lfe.11
+        for <linux-wpan@vger.kernel.org>; Fri, 01 Feb 2019 00:56:58 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20190128220930.23366-1-liuxuenetmail@gmail.com>
+ <20190128220930.23366-2-liuxuenetmail@gmail.com> <43477075-3df1-0437-dc57-51715271a323@suse.de>
+ <CAJuUDws-Ob_W4U83jnR3hH0Q=R45qRAQbyht11EbbPfL5CrD3A@mail.gmail.com> <e81ff92f-1093-557d-e780-0541410696b3@suse.de>
+In-Reply-To: <e81ff92f-1093-557d-e780-0541410696b3@suse.de>
+From: Xue Liu <liuxuenetmail@gmail.com>
+Date: Fri, 1 Feb 2019 09:56:20 +0100
+Message-ID: <CAJuUDwsad_mFOaqXseqytcQRZWjvr4c1eE=goz9AS4XYMyivKg@mail.gmail.com>
+Subject: Re: [PATCH 1/1] net: lora: add sysfs entry for LoRa system
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-lpwan@lists.infradead.org, linux-wpan@vger.kernel.org
-Cc: Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt <stefan@datenfreihafen.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, support@enocean.com, =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>
+To: =?UTF-8?Q?Andreas_F=C3=A4rber?= <afaerber@suse.de>
+Cc: linux-lpwan@lists.infradead.org, linux-wpan - ML <linux-wpan@vger.kernel.org>, Alexander Aring <aring@mojatatu.com>, Stefan Schmidt <stefan@datenfreihafen.org>
 
-The EnOcean Serial Protocol 2 used subtelegram frames different from ESP3.
-It also uses ORG identifiers differing from RORG identifiers in ERP.
+Hi Andreas,
 
-Only checksumming has been tested.
+On Tue, 29 Jan 2019 at 16:26, Andreas F=C3=A4rber <afaerber@suse.de> wrote:
+>
+> Hello,
+>
+> Am 29.01.19 um 13:58 schrieb Xue Liu:
+> > On Tue, 29 Jan 2019 at 06:53, Andreas F=C3=A4rber <afaerber@suse.de> wr=
+ote:
+> >> Am 28.01.19 um 23:09 schrieb Xue Liu:
+> >>> Signed-off-by: Xue Liu <liuxuenetmail@gmail.com>
+> >>> ---
+> >>>  net/lora/Makefile |  1 +
+> >>>  net/lora/cfg.c    | 45 +++++++++++++++++++++++++++-
+> >>>  net/lora/cfg.h    |  4 +++
+> >>>  net/lora/sysfs.c  | 76 +++++++++++++++++++++++++++++++++++++++++++++=
+++
+> >>>  net/lora/sysfs.h  | 10 +++++++
+> >>>  5 files changed, 135 insertions(+), 1 deletion(-)
+> >>>  create mode 100644 net/lora/sysfs.c
+> >>>  create mode 100644 net/lora/sysfs.h
+> [...]
+> >> Please don't copy code from 802.15.4 (including its "ugh" comments!) t=
+o
+> >> lora, I tried to do a minimal sane implementation here. Why does it ne=
+ed
+> >> to be a device?
+> > which device do you mean ? struct device ?
+>
+> Yes, you're doing a device_initialize() and lora_class dance there,
+> without mentioning it in your commit message or cover letter!
+>
+Yes. My fault.
+> >> I also didn't understand why a single 802.15.4 PHY would
+> >> be associated with multiple net_devices; when we don't allow that here=
+,
+> > AFAIK net_deivce (wpan_dev) is acting as a virtual interface.
+> > Multi interfaces can share a single PHY. The advantage is that you can =
+use
+> > only one PHY to simulate many virtual devices with different parameters=
+,
+> > e.g. address. Not only 802.15.4 but also 802.11 are using this strategy=
+.
+>
+> We don't have any address at the PHY layer, neither for LoRa nor FSK.
+> The only things we have at the PHY layer are freq/SF/bw and Sync Word.
+> And I have not found any LoRa or FSK PHY so far that could listen to
+> multiple Sync Words in parallel. Therefore it'll need to be configured
+> via netlink for the one PHY, with no obvious use case for multiple
+> net_devices.
+>
+> >> that also simplifies our reference counting, as it is then bound to th=
+e
+> >> lifetime of the parent device.
+> >>
+> >> Note also how I added a net_device pointer to the phy, whereas 802.15.=
+4
+> >> has a pointer in net_device (which would rule out me testing this on o=
+ur
+> >> distro kernels).
+> >>
+> > I did not touch net_device.
+> >> In case of SX1276 our sx127x SPI driver would have three different PHY=
+s.
+> >> Still not sure whether we would want ten PHYs for SX1301 or just two -
+> >> the former would rule out going by ifindex and require a netlink
+> >> interface to enumerate PHYs to obtain an identifier for reference,
+> >> unless we restart the old "joke" of how many netdevs we need for sx130=
+x.
+> >>
+> > Why do you want three different PHYs ?. Can SX1276 working in three
+> > different channel at the same time ? I think multiple PHYs for one chip=
+ is
+> > reasonable for the chip which can transmitting and receiving packets fr=
+om
+> > different channels at the same time, such as SX1301 and MCR20A.
+>
+> It's not about different channels, it's about different modulation modes
+> and therefore different configuration and driver frameworks. Just like a
+> Wifi driver won't use the ieee802154 or whatever other PHY struct.
+>
+> We can't tie FSK into a LoRa PHY, as I have demonstrated with nrf24l01p
+> and si443x drivers that there are FSK transceivers unrelated to LoRa. So
+> we'll end up with drivers/net/lora/ using LoRa, FSK and ASK/OOK PHYs,
+> drivers/fsk/ using FSK and ASK/OOK PHYs. Plus LoRaWAN MAC layer. Yes,
+> it's a mess, and it gets worse if you consider modules with BLE/Sigfox
+> in addition. I see no sane way to use mfd framework there.
+>
+> My original LoRa RFC received zero feedback on this topic so far, so I
+> am planning for a single lora0 net_device with three alternative PHYs,
+> switched via netlink or something; the alternative would've been three
+> net_devices with one PHY each, of which only one can be up at a time.
+>
+Sorry. I am not a fulltime developer for the open source community. Sometim=
+es
+I can open the maillist in the weekend.
+> Hoping we can discuss that at Netdevconf 0x13 in Stefan's IoT workshop.
+>
+Sorry. I have to move my home. Maybe next time.
+> >> Finally, why do we need a sysfs entry when we already have netlink? No=
+t
+> >> saying we can't have sysfs, you just haven't explained your motivation=
+.
+> >> Reasons (benefits) convince me more than precedence.
+> >>
+> > Not every programing language has support for netlink, such as Bash.
+> > A good example is the script used in OpenWRT[1].
+> [...]
+> > [1] https://github.com/openwrt/openwrt/blob/master/package/kernel/mac80=
+211/files/lib/wifi/mac80211.sh
+>
+> Exposing something in sysfs could also be done via the main driver
+> though, like I've done for debugfs in sx127x driver.
+>
+> What's your use case of using a bash script with the LoRa PHY? I'm not
+> convinced that OpenWRT scripts are the best design example here...
+>
+In the company we use OpenWRT as the base system for some industry products=
+.
+I have a proposal to exploit the LoRa for IIoT together with OPC UA
+for wireless remote control system.
+So I am looking forward a simlar way/script like mac80211.sh to
+communicate with this LoRa system,
+so that it can easily cooperate with OpenWRT system components. A
+seperate sysfs patch in OpenWRT
+only may a solution for me.
+> As long as a struct is internal to our drivers, we can refactor it as
+> much as we want. Once we expose things to userspace like you do here,
+> changes become much more problematic. Therefore it needs to be a
+> conscious decision and not hidden in a larger patch.
+>
+Could you please propose your LoRa system roadmap here or links to
+previous discussion, which I may miss before. So I can know what
+we need and what I can contribute.
 
-Signed-off-by: Andreas Färber <afaerber@suse.de>
----
- drivers/net/enocean/Makefile       |   1 +
- drivers/net/enocean/enocean_esp.c  |  10 ++
- drivers/net/enocean/enocean_esp.h  |   8 ++
- drivers/net/enocean/enocean_esp2.c | 276 +++++++++++++++++++++++++++++++++++++
- 4 files changed, 295 insertions(+)
- create mode 100644 drivers/net/enocean/enocean_esp2.c
+> Regards,
+> Andreas
+>
+> --
+> SUSE Linux GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg, Germany
+> GF: Felix Imend=C3=B6rffer, Jane Smithard, Graham Norton
+> HRB 21284 (AG N=C3=BCrnberg)
 
-diff --git a/drivers/net/enocean/Makefile b/drivers/net/enocean/Makefile
-index 4492e3d48c0a..f34b098997e4 100644
---- a/drivers/net/enocean/Makefile
-+++ b/drivers/net/enocean/Makefile
-@@ -3,4 +3,5 @@ enocean-dev-y := enocean.o
- 
- obj-m += enocean-esp.o
- enocean-esp-y := enocean_esp.o
-+enocean-esp-y += enocean_esp2.o
- enocean-esp-y += enocean_esp3.o
-diff --git a/drivers/net/enocean/enocean_esp.c b/drivers/net/enocean/enocean_esp.c
-index 61bddb77762d..74720da49369 100644
---- a/drivers/net/enocean/enocean_esp.c
-+++ b/drivers/net/enocean/enocean_esp.c
-@@ -150,6 +150,15 @@ static void enocean_esp_cleanup(struct enocean_device *edev)
- 		edev->version->cleanup(edev);
- }
- 
-+static const struct enocean_esp_version enocean_esp2 = {
-+	.version = 2,
-+	.baudrate = 9600,
-+	.serdev_client_ops = &enocean_esp2_serdev_client_ops,
-+	.init = enocean_esp2_init,
-+	.send = enocean_esp2_send,
-+	.cleanup = enocean_esp2_cleanup,
-+};
-+
- static const struct enocean_esp_version enocean_esp3 = {
- 	.version = 3,
- 	.baudrate = 57600,
-@@ -160,6 +169,7 @@ static const struct enocean_esp_version enocean_esp3 = {
- };
- 
- static const struct of_device_id enocean_of_match[] = {
-+	{ .compatible = "enocean,esp2", .data = &enocean_esp2 },
- 	{ .compatible = "enocean,esp3", .data = &enocean_esp3 },
- 	{}
- };
-diff --git a/drivers/net/enocean/enocean_esp.h b/drivers/net/enocean/enocean_esp.h
-index e02bf5352d61..44660238043a 100644
---- a/drivers/net/enocean/enocean_esp.h
-+++ b/drivers/net/enocean/enocean_esp.h
-@@ -24,15 +24,23 @@ struct enocean_device {
- 	void *priv;
- };
- 
-+extern const struct serdev_device_ops enocean_esp2_serdev_client_ops;
- extern const struct serdev_device_ops enocean_esp3_serdev_client_ops;
- 
- void enocean_esp3_crc8_populate(void);
- 
-+int enocean_esp2_init(struct enocean_device *edev);
- int enocean_esp3_init(struct enocean_device *edev);
- 
-+int enocean_esp2_send(struct enocean_device *edev, u32 dest, const void *data, int data_len);
- int enocean_esp3_send(struct enocean_device *edev, u32 dest, const void *data, int data_len);
- void enocean_esp_tx_done(struct enocean_device *edev);
- 
-+void enocean_esp2_cleanup(struct enocean_device *edev);
- void enocean_esp3_cleanup(struct enocean_device *edev);
- 
-+#define ENOCEAN_RORG_RPS	0xF6
-+#define ENOCEAN_RORG_1BS	0xD5
-+#define ENOCEAN_RORG_4BS	0xA5
-+
- #endif
-diff --git a/drivers/net/enocean/enocean_esp2.c b/drivers/net/enocean/enocean_esp2.c
-new file mode 100644
-index 000000000000..d4cb787de22e
---- /dev/null
-+++ b/drivers/net/enocean/enocean_esp2.c
-@@ -0,0 +1,276 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ * EnOcean Serial Protocol 2
-+ *
-+ * Copyright (c) 2019 Andreas Färber
-+ */
-+
-+#include <linux/serdev.h>
-+
-+#include "enocean_esp.h"
-+
-+#define ESP2_SYNC_BYTE1 0xA5
-+#define ESP2_SYNC_BYTE0 0x5A
-+
-+struct enocean_esp2_packet {
-+	u8 sync[2];
-+#ifdef CONFIG_CPU_BIG_ENDIAN
-+	u8 h_seq:3;
-+	u8 length:5;
-+#else
-+	u8 length:5;
-+	u8 h_seq:3;
-+#endif
-+	u8 org;
-+	u8 data[4];
-+	u8 id[4];
-+	u8 status;
-+	u8 checksum;
-+} __packed;
-+
-+#define ESP2_H_SEQ_TRT	0x3
-+#define ESP2_H_SEQ_RCT	0x4
-+#define ESP2_H_SEQ_TCT	0x5
-+
-+#define ESP2_TELEGRAM_RESET	0x0A
-+
-+#define ENOCEAN_ORG_RPS		0x05
-+#define ENOCEAN_ORG_1BS		0x06
-+#define ENOCEAN_ORG_4BS		0x07
-+
-+/* Cf. EnOcean Equipment Profiles, Telegram Types (RORG) */
-+static inline u8 enocean_org_to_rorg(u8 org)
-+{
-+	switch (org) {
-+	case ENOCEAN_ORG_RPS:
-+		return ENOCEAN_RORG_RPS;
-+	case ENOCEAN_ORG_1BS:
-+		return ENOCEAN_RORG_1BS;
-+	case ENOCEAN_ORG_4BS:
-+		return ENOCEAN_RORG_4BS;
-+	default:
-+		return org;
-+	}
-+}
-+
-+static u8 enocean_rorg_to_org(u8 rorg)
-+{
-+	switch (rorg) {
-+	case ENOCEAN_RORG_RPS:
-+		return ENOCEAN_ORG_RPS;
-+	case ENOCEAN_RORG_1BS:
-+		return ENOCEAN_ORG_1BS;
-+	case ENOCEAN_RORG_4BS:
-+		return ENOCEAN_ORG_4BS;
-+	default:
-+		return rorg;
-+	}
-+}
-+
-+struct enocean_esp2_dispatcher {
-+	struct list_head list;
-+	u8 h_seq;
-+	void (*dispatch)(const u8 *data, u8 data_len, struct enocean_esp2_dispatcher *d);
-+};
-+
-+static void enocean_add_esp2_dispatcher(struct enocean_device *edev,
-+	struct enocean_esp2_dispatcher *entry)
-+{
-+	list_add_tail_rcu(&entry->list, &edev->esp_dispatchers);
-+}
-+
-+static void enocean_remove_esp2_dispatcher(struct enocean_device *edev,
-+	struct enocean_esp2_dispatcher *entry)
-+{
-+	list_del_rcu(&entry->list);
-+}
-+
-+#define ESP2_RESPONSE_ERR_SYNTAX_H_SEQ	0x08
-+#define ESP2_RESPONSE_ERR_SYNTAX_LENGTH	0x09
-+#define ESP2_RESPONSE_ERR_SYNTAX_CHKSUM	0x0A
-+#define ESP2_RESPONSE_ERR_SYNTAX_ORG	0x0B
-+#define ESP2_RESPONSE_ERR		0x19
-+#define ESP2_RESPONSE_ERR_IDRANGE	0x1A
-+#define ESP2_RESPONSE_ERR_TX_IDRANGE	0x22
-+#define ESP2_RESPONSE_OK		0x58
-+
-+struct enocean_esp2_priv {
-+	struct enocean_device *edev;
-+	struct enocean_esp2_dispatcher tx_telegram_response;
-+};
-+
-+static u8 enocean_esp2_checksum(const u8 *data, int len)
-+{
-+	u8 chksum = 0;
-+	int i;
-+
-+	for (i = 0; i < len; i++) {
-+		chksum += data[i];
-+	}
-+	return chksum;
-+}
-+
-+static int enocean_esp2_send_telegram(struct enocean_device *edev, u8 h_seq, u8 org,
-+	const u8 *data, int data_len, unsigned long timeout)
-+{
-+	struct enocean_esp2_packet pkt;
-+	int ret;
-+
-+	memset(&pkt, 0, sizeof(pkt));
-+	pkt.sync[0] = ESP2_SYNC_BYTE1;
-+	pkt.sync[1] = ESP2_SYNC_BYTE0;
-+	pkt.h_seq = h_seq;
-+	pkt.length = 11;
-+	dev_dbg(&edev->serdev->dev, "H_SEQ | LENGTH = %02x\n", (unsigned int)(((u8*)&pkt)[2]));
-+	pkt.org = org;
-+	if (data_len > 0)
-+		memcpy(pkt.data, data, min(data_len, 9));
-+	pkt.checksum = enocean_esp2_checksum(((u8 *)&pkt) + 2, sizeof(pkt) - 2 - 1);
-+	dev_dbg(&edev->serdev->dev, "checksum = %02x\n", (unsigned int)pkt.checksum);
-+
-+	ret = serdev_device_write(edev->serdev, (const u8 *)&pkt, sizeof(pkt), timeout);
-+	if (ret < 0)
-+		return ret;
-+	if (ret > 0 && ret < sizeof(pkt))
-+		return -EIO;
-+	return 0;
-+}
-+
-+static void enocean_esp2_tx_telegram_response_dispatch(const u8 *data, u8 data_len,
-+	struct enocean_esp2_dispatcher *d)
-+{
-+	struct enocean_esp2_priv *priv = container_of(d, struct enocean_esp2_priv, tx_telegram_response);
-+	struct enocean_device *edev = priv->edev;
-+
-+	enocean_remove_esp2_dispatcher(edev, d);
-+
-+	if (data_len < 1)
-+		return;
-+
-+	switch (data[0]) {
-+	case ESP2_RESPONSE_OK:
-+		enocean_esp_tx_done(edev);
-+		break;
-+	case ESP2_RESPONSE_ERR:
-+	case ESP2_RESPONSE_ERR_TX_IDRANGE:
-+	default:
-+		break;
-+	}
-+}
-+
-+static int enocean_esp2_tx_telegram(struct enocean_device *edev, u8 org,
-+	const u8 *data, int data_len, unsigned long timeout)
-+{
-+	struct enocean_esp2_priv *priv = edev->priv;
-+	int ret;
-+
-+	enocean_add_esp2_dispatcher(edev, &priv->tx_telegram_response);
-+
-+	ret = enocean_esp2_send_telegram(edev, ESP2_H_SEQ_TRT,
-+		org, data, data_len, timeout);
-+	if (ret) {
-+		enocean_remove_esp2_dispatcher(edev, &priv->tx_telegram_response);
-+		return ret;
-+	}
-+
-+	return 0;
-+}
-+
-+static int enocean_esp2_reset(struct enocean_device *edev, unsigned long timeout)
-+{
-+	return enocean_esp2_send_telegram(edev, ESP2_H_SEQ_TCT, ESP2_TELEGRAM_RESET, NULL, 0, timeout);
-+	/* no RCT */
-+}
-+
-+static int enocean_esp2_receive_buf(struct serdev_device *sdev, const u8 *data, size_t count)
-+{
-+	struct enocean_device *edev = serdev_device_get_drvdata(sdev);
-+	struct enocean_esp2_dispatcher *e;
-+	u8 h_seq, length, chksum;
-+
-+	dev_dbg(&sdev->dev, "Receive (%zu)\n", count);
-+
-+	if (data[0] != ESP2_SYNC_BYTE1) {
-+		dev_warn(&sdev->dev, "not first Sync Byte (found 0x%02x), skipping\n",
-+			(unsigned int)data[0]);
-+		return 1;
-+	}
-+
-+	if (count < 2)
-+		return 0;
-+
-+	if (data[1] != ESP2_SYNC_BYTE0) {
-+		dev_warn(&sdev->dev, "not second Sync Byte (found 0x%02x 0x%02x), skipping\n",
-+			ESP2_SYNC_BYTE1, (unsigned int)data[1]);
-+		return 1;
-+	}
-+
-+	if (count < 3)
-+		return 0;
-+
-+	h_seq = data[2] >> 5;
-+	length = data[2] & 0x1f;
-+
-+	if (count < 3 + length)
-+		return 0;
-+
-+	chksum = enocean_esp2_checksum(data + 2, 1 + length - 1);
-+	if (data[3 + length - 1] != chksum) {
-+		dev_warn(&sdev->dev, "invalid checksum (expected 0x%02x, found %02x), skipping\n",
-+			(unsigned int)chksum, (unsigned int)data[3 + length - 1]);
-+		return 2; /* valid second Sync Byte is not a valid first Sync Byte */
-+	}
-+
-+	print_hex_dump_bytes("received: ", DUMP_PREFIX_OFFSET, data, 3 + length);
-+
-+	list_for_each_entry_rcu(e, &edev->esp_dispatchers, list) {
-+		if (e->h_seq == h_seq)
-+			e->dispatch(data + 3, length, e);
-+	}
-+
-+	return 3 + length;
-+}
-+
-+const struct serdev_device_ops enocean_esp2_serdev_client_ops = {
-+	.receive_buf = enocean_esp2_receive_buf,
-+	.write_wakeup = serdev_device_write_wakeup,
-+};
-+
-+int enocean_esp2_send(struct enocean_device *edev, u32 dest, const void *data, int data_len)
-+{
-+	const u8 *buf = data;
-+
-+	return enocean_esp2_tx_telegram(edev,
-+		enocean_rorg_to_org(buf[0]), buf + 1, data_len - 1, HZ);
-+}
-+
-+int enocean_esp2_init(struct enocean_device *edev)
-+{
-+	struct enocean_esp2_priv *priv;
-+	int ret;
-+
-+	ret = enocean_esp2_reset(edev, HZ);
-+	if (ret)
-+		return ret;
-+
-+	msleep(100); /* XXX */
-+
-+	priv = kzalloc(sizeof(*priv), GFP_KERNEL);
-+	if (!priv)
-+		return -ENOMEM;
-+
-+	priv->edev = edev;
-+	edev->priv = priv;
-+
-+	priv->tx_telegram_response.h_seq = ESP2_H_SEQ_RCT;
-+	priv->tx_telegram_response.dispatch = enocean_esp2_tx_telegram_response_dispatch;
-+
-+	return 0;
-+}
-+
-+void enocean_esp2_cleanup(struct enocean_device *edev)
-+{
-+	struct enocean_esp2_priv *priv = edev->priv;
-+
-+	kfree(priv);
-+}
--- 
-2.16.4
+Regards,
+
+Xue Liu
+
+--
