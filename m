@@ -1,270 +1,71 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-yw1-f74.google.com ([209.85.161.74]:38414 "EHLO
-        mail-yw1-f74.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727103AbfBOCaA (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 14 Feb 2019 21:30:00 -0500
-Received: by mail-yw1-f74.google.com with SMTP id c67so5062537ywe.5
-        for <linux-wpan@vger.kernel.org>; Thu, 14 Feb 2019 18:29:58 -0800 (PST)
-Date: Thu, 14 Feb 2019 18:29:53 -0800
-Message-Id: <20190215022953.128092-1-posk@google.com>
-Mime-Version: 1.0
-Subject: [PATCH RFC net-next] 6lowpan: use rbtree for IP frag queue
-From: Peter Oskolkov <posk@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Received: from mail-it1-f195.google.com ([209.85.166.195]:54329 "EHLO
+        mail-it1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727024AbfBQXIt (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Sun, 17 Feb 2019 18:08:49 -0500
+Received: by mail-it1-f195.google.com with SMTP id f10so13646385ita.4
+        for <linux-wpan@vger.kernel.org>; Sun, 17 Feb 2019 15:08:48 -0800 (PST)
+Date: Sun, 17 Feb 2019 18:08:40 -0500
+From: Alexander Aring <aring@mojatatu.com>
+Subject: Re: [PATCH RFC net-next] 6lowpan: use rbtree for IP frag queue
+Message-ID: <20190217230840.finshiu6s54cer4f@x220t>
+References: <20190215022953.128092-1-posk@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190215022953.128092-1-posk@google.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <aring@mojatatu.com>, David Miller <davem@davemloft.net>, linux-wpan@vger.kernel.org, netdev@vger.kernel.org
-Cc: Peter Oskolkov <posk@posk.io>, Peter Oskolkov <posk@google.com>
+To: Peter Oskolkov <posk@google.com>
+Cc: David Miller <davem@davemloft.net>, linux-wpan@vger.kernel.org, netdev@vger.kernel.org, Peter Oskolkov <posk@posk.io>, stefan@datenfreihafen.org
 
-This patch aligns IP defragmenation logic in 6lowpan with that
-of IPv4 and IPv6: see
-commit d4289fcc9b16 ("net: IP6 defrag: use rbtrees for IPv6 defrag")
+Hi,
 
-Modifying ip_defrag selftest seemed like an overkill, as I suspect
-most kernel test setups do not have 6lowpan hwsim enabled. So I ran
-the following code/script manually:
+On Thu, Feb 14, 2019 at 06:29:53PM -0800, Peter Oskolkov wrote:
+> This patch aligns IP defragmenation logic in 6lowpan with that
+> of IPv4 and IPv6: see
+> commit d4289fcc9b16 ("net: IP6 defrag: use rbtrees for IPv6 defrag")
+> 
+> Modifying ip_defrag selftest seemed like an overkill, as I suspect
+> most kernel test setups do not have 6lowpan hwsim enabled. So I ran
+> the following code/script manually:
+> 
+> 	insmod ./mac802154_hwsim.ko
+> 
+> 	iwpan dev wpan0 set pan_id 0xbeef
+> 	ip link add link wpan0 name lowpan0 type lowpan
+> 	ip link set wpan0 up
+> 	ip link set lowpan0 up
+> 
+> 	iwpan dev wpan1 set pan_id 0xbeef
+> 	ip netns add foo
+> 	iwpan phy1 set netns name foo
+> 	ip netns exec foo ip link add link wpan1 name lowpan1 type lowpan
+> 	ip netns exec foo ip link set wpan1 up
+> 	ip netns exec foo ip link set lowpan1 up
+> 
+> 	ip -6 addr add "fb01::1/128" nodad dev lowpan0
+> 	ip -netns foo -6 addr add "fb02::1/128" nodad dev lowpan1
+> 
+> 	ip -6 route add "fb02::1/128" dev lowpan0
+> 	ip -netns foo -6 route add "fb01::1/128" dev lowpan1
+> 
+> 	# then in term1:
+> 	   ip netns exec foo bash
+> 	   ./udp_stream -6
+> 
+> 	# in term2:
+> 	    ./udp_stream -c -6 -H fb02::1
+> 
+> 	# pr_warn_once showed that the code changed by this patch
+> 	# was invoked.
+> 
+> Signed-off-by: Peter Oskolkov <posk@google.com>
 
-	insmod ./mac802154_hwsim.ko
+Acked-by: Alexander Aring <aring@mojatatu.com>
 
-	iwpan dev wpan0 set pan_id 0xbeef
-	ip link add link wpan0 name lowpan0 type lowpan
-	ip link set wpan0 up
-	ip link set lowpan0 up
+I tested this series and the code looks a lot simpler. Thanks.
 
-	iwpan dev wpan1 set pan_id 0xbeef
-	ip netns add foo
-	iwpan phy1 set netns name foo
-	ip netns exec foo ip link add link wpan1 name lowpan1 type lowpan
-	ip netns exec foo ip link set wpan1 up
-	ip netns exec foo ip link set lowpan1 up
+Stefan do you see any issues?
 
-	ip -6 addr add "fb01::1/128" nodad dev lowpan0
-	ip -netns foo -6 addr add "fb02::1/128" nodad dev lowpan1
-
-	ip -6 route add "fb02::1/128" dev lowpan0
-	ip -netns foo -6 route add "fb01::1/128" dev lowpan1
-
-	# then in term1:
-	   ip netns exec foo bash
-	   ./udp_stream -6
-
-	# in term2:
-	    ./udp_stream -c -6 -H fb02::1
-
-	# pr_warn_once showed that the code changed by this patch
-	# was invoked.
-
-Signed-off-by: Peter Oskolkov <posk@google.com>
----
- net/ieee802154/6lowpan/reassembly.c | 141 ++++++----------------------
- 1 file changed, 29 insertions(+), 112 deletions(-)
-
-diff --git a/net/ieee802154/6lowpan/reassembly.c b/net/ieee802154/6lowpan/reassembly.c
-index d14226ecfde4..bd61633d2c32 100644
---- a/net/ieee802154/6lowpan/reassembly.c
-+++ b/net/ieee802154/6lowpan/reassembly.c
-@@ -27,6 +27,7 @@
- #include <net/6lowpan.h>
- #include <net/ipv6_frag.h>
- #include <net/inet_frag.h>
-+#include <net/ip.h>
- 
- #include "6lowpan_i.h"
- 
-@@ -34,8 +35,8 @@ static const char lowpan_frags_cache_name[] = "lowpan-frags";
- 
- static struct inet_frags lowpan_frags;
- 
--static int lowpan_frag_reasm(struct lowpan_frag_queue *fq,
--			     struct sk_buff *prev, struct net_device *ldev);
-+static int lowpan_frag_reasm(struct lowpan_frag_queue *fq, struct sk_buff *skb,
-+			     struct sk_buff *prev,  struct net_device *ldev);
- 
- static void lowpan_frag_init(struct inet_frag_queue *q, const void *a)
- {
-@@ -88,9 +89,15 @@ fq_find(struct net *net, const struct lowpan_802154_cb *cb,
- static int lowpan_frag_queue(struct lowpan_frag_queue *fq,
- 			     struct sk_buff *skb, u8 frag_type)
- {
--	struct sk_buff *prev, *next;
-+	struct sk_buff *prev_tail;
- 	struct net_device *ldev;
--	int end, offset;
-+	int end, offset, err;
-+
-+	/* inet_frag_queue_* functions use skb->cb; see struct ipfrag_skb_cb
-+	 * in inet_fragment.c
-+	 */
-+	BUILD_BUG_ON(sizeof(struct lowpan_802154_cb) > sizeof(struct inet_skb_parm));
-+	BUILD_BUG_ON(sizeof(struct lowpan_802154_cb) > sizeof(struct inet6_skb_parm));
- 
- 	if (fq->q.flags & INET_FRAG_COMPLETE)
- 		goto err;
-@@ -117,38 +124,15 @@ static int lowpan_frag_queue(struct lowpan_frag_queue *fq,
- 		}
- 	}
- 
--	/* Find out which fragments are in front and at the back of us
--	 * in the chain of fragments so far.  We must know where to put
--	 * this fragment, right?
--	 */
--	prev = fq->q.fragments_tail;
--	if (!prev ||
--	    lowpan_802154_cb(prev)->d_offset <
--	    lowpan_802154_cb(skb)->d_offset) {
--		next = NULL;
--		goto found;
--	}
--	prev = NULL;
--	for (next = fq->q.fragments; next != NULL; next = next->next) {
--		if (lowpan_802154_cb(next)->d_offset >=
--		    lowpan_802154_cb(skb)->d_offset)
--			break;	/* bingo! */
--		prev = next;
--	}
--
--found:
--	/* Insert this fragment in the chain of fragments. */
--	skb->next = next;
--	if (!next)
--		fq->q.fragments_tail = skb;
--	if (prev)
--		prev->next = skb;
--	else
--		fq->q.fragments = skb;
--
- 	ldev = skb->dev;
- 	if (ldev)
- 		skb->dev = NULL;
-+	barrier();
-+
-+	prev_tail = fq->q.fragments_tail;
-+	err = inet_frag_queue_insert(&fq->q, skb, offset, end);
-+	if (err)
-+		goto err;
- 
- 	fq->q.stamp = skb->tstamp;
- 	if (frag_type == LOWPAN_DISPATCH_FRAG1)
-@@ -163,10 +147,11 @@ static int lowpan_frag_queue(struct lowpan_frag_queue *fq,
- 		unsigned long orefdst = skb->_skb_refdst;
- 
- 		skb->_skb_refdst = 0UL;
--		res = lowpan_frag_reasm(fq, prev, ldev);
-+		res = lowpan_frag_reasm(fq, skb, prev_tail, ldev);
- 		skb->_skb_refdst = orefdst;
- 		return res;
- 	}
-+	skb_dst_drop(skb);
- 
- 	return -1;
- err:
-@@ -175,97 +160,29 @@ static int lowpan_frag_queue(struct lowpan_frag_queue *fq,
- }
- 
- /*	Check if this packet is complete.
-- *	Returns NULL on failure by any reason, and pointer
-- *	to current nexthdr field in reassembled frame.
-  *
-  *	It is called with locked fq, and caller must check that
-  *	queue is eligible for reassembly i.e. it is not COMPLETE,
-  *	the last and the first frames arrived and all the bits are here.
-  */
--static int lowpan_frag_reasm(struct lowpan_frag_queue *fq, struct sk_buff *prev,
--			     struct net_device *ldev)
-+static int lowpan_frag_reasm(struct lowpan_frag_queue *fq, struct sk_buff *skb,
-+			     struct sk_buff *prev_tail, struct net_device *ldev)
- {
--	struct sk_buff *fp, *head = fq->q.fragments;
--	int sum_truesize;
-+	void *reasm_data;
- 
- 	inet_frag_kill(&fq->q);
- 
--	/* Make the one we just received the head. */
--	if (prev) {
--		head = prev->next;
--		fp = skb_clone(head, GFP_ATOMIC);
--
--		if (!fp)
--			goto out_oom;
--
--		fp->next = head->next;
--		if (!fp->next)
--			fq->q.fragments_tail = fp;
--		prev->next = fp;
--
--		skb_morph(head, fq->q.fragments);
--		head->next = fq->q.fragments->next;
--
--		consume_skb(fq->q.fragments);
--		fq->q.fragments = head;
--	}
--
--	/* Head of list must not be cloned. */
--	if (skb_unclone(head, GFP_ATOMIC))
-+	reasm_data = inet_frag_reasm_prepare(&fq->q, skb, prev_tail);
-+	if (!reasm_data)
- 		goto out_oom;
-+	inet_frag_reasm_finish(&fq->q, skb, reasm_data);
- 
--	/* If the first fragment is fragmented itself, we split
--	 * it to two chunks: the first with data and paged part
--	 * and the second, holding only fragments.
--	 */
--	if (skb_has_frag_list(head)) {
--		struct sk_buff *clone;
--		int i, plen = 0;
--
--		clone = alloc_skb(0, GFP_ATOMIC);
--		if (!clone)
--			goto out_oom;
--		clone->next = head->next;
--		head->next = clone;
--		skb_shinfo(clone)->frag_list = skb_shinfo(head)->frag_list;
--		skb_frag_list_init(head);
--		for (i = 0; i < skb_shinfo(head)->nr_frags; i++)
--			plen += skb_frag_size(&skb_shinfo(head)->frags[i]);
--		clone->len = head->data_len - plen;
--		clone->data_len = clone->len;
--		head->data_len -= clone->len;
--		head->len -= clone->len;
--		add_frag_mem_limit(fq->q.net, clone->truesize);
--	}
--
--	WARN_ON(head == NULL);
--
--	sum_truesize = head->truesize;
--	for (fp = head->next; fp;) {
--		bool headstolen;
--		int delta;
--		struct sk_buff *next = fp->next;
--
--		sum_truesize += fp->truesize;
--		if (skb_try_coalesce(head, fp, &headstolen, &delta)) {
--			kfree_skb_partial(fp, headstolen);
--		} else {
--			if (!skb_shinfo(head)->frag_list)
--				skb_shinfo(head)->frag_list = fp;
--			head->data_len += fp->len;
--			head->len += fp->len;
--			head->truesize += fp->truesize;
--		}
--		fp = next;
--	}
--	sub_frag_mem_limit(fq->q.net, sum_truesize);
--
--	skb_mark_not_on_list(head);
--	head->dev = ldev;
--	head->tstamp = fq->q.stamp;
--
-+	skb->dev = ldev;
-+	skb->tstamp = fq->q.stamp;
- 	fq->q.fragments = NULL;
-+	fq->q.rb_fragments = RB_ROOT;
- 	fq->q.fragments_tail = NULL;
-+	fq->q.last_run_head = NULL;
- 
- 	return 1;
- out_oom:
--- 
-2.21.0.rc0.258.g878e2cd30e-goog
+- Alex
