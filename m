@@ -1,72 +1,63 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-it1-f193.google.com ([209.85.166.193]:51534 "EHLO
-        mail-it1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725858AbfBUPb3 (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 21 Feb 2019 10:31:29 -0500
-Received: by mail-it1-f193.google.com with SMTP id e24so9263037itl.1
-        for <linux-wpan@vger.kernel.org>; Thu, 21 Feb 2019 07:31:28 -0800 (PST)
-Date: Thu, 21 Feb 2019 10:31:23 -0500
-From: Alexander Aring <aring@mojatatu.com>
-Subject: Re: Running OpenThread on fakelb
-Message-ID: <20190221153123.jao2k2baqmd4eb45@x220t>
+Received: from act-MTAout6.csiro.au ([150.229.7.43]:14371 "EHLO
+        act-MTAout6.csiro.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725961AbfBVBJI (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 21 Feb 2019 20:09:08 -0500
+From: <Seung.Jang@data61.csiro.au>
+Subject: RE: Running OpenThread on fakelb
+Date: Fri, 22 Feb 2019 01:03:25 +0000
+Message-ID: <b1da154fe60a47699f7a04eb91df57cb@exch1-mel.nexus.csiro.au>
 References: <dec2e8f279a14dc0b29dd92707e83319@exch1-mel.nexus.csiro.au>
+ <20190221153123.jao2k2baqmd4eb45@x220t>
+In-Reply-To: <20190221153123.jao2k2baqmd4eb45@x220t>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <dec2e8f279a14dc0b29dd92707e83319@exch1-mel.nexus.csiro.au>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Seung.Jang@data61.csiro.au
+To: aring@mojatatu.com
 Cc: linux-wpan@vger.kernel.org
 
-Hi,
-
-On Thu, Feb 21, 2019 at 12:31:19AM +0000, Seung.Jang@data61.csiro.au wrote:
-> Hi all,
-> 
-> I'm trying to run OpenThread on fakelb, and I'd like to ask about this topic.
-> 
-> My test environment is Ubuntu 16.04 (kernel version 4.15).
-> 
-> I followed the instruction in Alex's announcement [1]. From one of ot-cli, I was able to ping the other ot-cli. At the same time, I tried to sniff packets of lowpan0, ot0, ot1, and monitor0 with wireshark. But wireshark detected nothing. When I compiled the ot-cli, I applied '--enable-af-packet'.
-> 
-
-The branch of openthread is somehow outdated, feel free to rebase to
-openthread/master and send it upstream to openthread.
-
-Your problem:
-
-As I understand you can talk between openthread nodes but not with an
-additional Linux 6lowpan interface. To make it capable with openthread
-you need to use protocols which are from the Thread world. They have a
-"somehow" closed bootstrapping protocol which is MLE. Also note they
-forked the IETF MLE standard, so Thread MLE != IETF MLE.
-
-I can give you more information what MLE exactly is if you want.
-
-> Do you have any idea about this? Could you share any experience regarding this?
-> 
-
-How you can get Thread MLE working for you?
-
-Good solution is:
-
-"Use open implementation OpenThread and make a library wrapper around
- which is a MLE Linux userspace implementation. It should work on IPv6
- sockets and not AF_PACKET"
-
-Hack solution is:
-
-"Run openthread on node interfaces and AF_PACKET and keep mac settings
-in sync" - not sure how this can work, I think it will only make more
-trouble.
-
-Another solution:
-
-Just use af802154 in openthread, but then you only use Linux 802.15.4
-drivers and mostly no upper layer protocol. Also on node interfaces you
-need to keep address settings in sync which I didn't implemented.
-On the other hand monitors has limitations when running in promiscuous
-mode.
-
-- Alex
+SGkgQWxleCwNCg0KVGhhbmtzIGZvciB5b3VyIHJlcGx5Lg0KDQpDb3VsZCB5b3UgcHJvdmlkZSBt
+b3JlIGluZm9ybWF0aW9uIGFib3V0IE1MRT8NCg0KLSBTZXVuZw0KDQotLS0tLU9yaWdpbmFsIE1l
+c3NhZ2UtLS0tLQ0KRnJvbTogbGludXgtd3Bhbi1vd25lckB2Z2VyLmtlcm5lbC5vcmcgW21haWx0
+bzpsaW51eC13cGFuLW93bmVyQHZnZXIua2VybmVsLm9yZ10gT24gQmVoYWxmIE9mIEFsZXhhbmRl
+ciBBcmluZw0KU2VudDogRnJpZGF5LCAyMiBGZWJydWFyeSAyMDE5IDI6MzEgQU0NClRvOiBKYW5n
+LCBTZXVuZyAoRGF0YTYxLCBNYXJzZmllbGQpIDxTZXVuZy5KYW5nQGRhdGE2MS5jc2lyby5hdT4N
+CkNjOiBsaW51eC13cGFuQHZnZXIua2VybmVsLm9yZw0KU3ViamVjdDogUmU6IFJ1bm5pbmcgT3Bl
+blRocmVhZCBvbiBmYWtlbGINCg0KSGksDQoNCk9uIFRodSwgRmViIDIxLCAyMDE5IGF0IDEyOjMx
+OjE5QU0gKzAwMDAsIFNldW5nLkphbmdAZGF0YTYxLmNzaXJvLmF1IHdyb3RlOg0KPiBIaSBhbGws
+DQo+IA0KPiBJJ20gdHJ5aW5nIHRvIHJ1biBPcGVuVGhyZWFkIG9uIGZha2VsYiwgYW5kIEknZCBs
+aWtlIHRvIGFzayBhYm91dCB0aGlzIHRvcGljLg0KPiANCj4gTXkgdGVzdCBlbnZpcm9ubWVudCBp
+cyBVYnVudHUgMTYuMDQgKGtlcm5lbCB2ZXJzaW9uIDQuMTUpLg0KPiANCj4gSSBmb2xsb3dlZCB0
+aGUgaW5zdHJ1Y3Rpb24gaW4gQWxleCdzIGFubm91bmNlbWVudCBbMV0uIEZyb20gb25lIG9mIG90
+LWNsaSwgSSB3YXMgYWJsZSB0byBwaW5nIHRoZSBvdGhlciBvdC1jbGkuIEF0IHRoZSBzYW1lIHRp
+bWUsIEkgdHJpZWQgdG8gc25pZmYgcGFja2V0cyBvZiBsb3dwYW4wLCBvdDAsIG90MSwgYW5kIG1v
+bml0b3IwIHdpdGggd2lyZXNoYXJrLiBCdXQgd2lyZXNoYXJrIGRldGVjdGVkIG5vdGhpbmcuIFdo
+ZW4gSSBjb21waWxlZCB0aGUgb3QtY2xpLCBJIGFwcGxpZWQgJy0tZW5hYmxlLWFmLXBhY2tldCcu
+DQo+IA0KDQpUaGUgYnJhbmNoIG9mIG9wZW50aHJlYWQgaXMgc29tZWhvdyBvdXRkYXRlZCwgZmVl
+bCBmcmVlIHRvIHJlYmFzZSB0byBvcGVudGhyZWFkL21hc3RlciBhbmQgc2VuZCBpdCB1cHN0cmVh
+bSB0byBvcGVudGhyZWFkLg0KDQpZb3VyIHByb2JsZW06DQoNCkFzIEkgdW5kZXJzdGFuZCB5b3Ug
+Y2FuIHRhbGsgYmV0d2VlbiBvcGVudGhyZWFkIG5vZGVzIGJ1dCBub3Qgd2l0aCBhbiBhZGRpdGlv
+bmFsIExpbnV4IDZsb3dwYW4gaW50ZXJmYWNlLiBUbyBtYWtlIGl0IGNhcGFibGUgd2l0aCBvcGVu
+dGhyZWFkIHlvdSBuZWVkIHRvIHVzZSBwcm90b2NvbHMgd2hpY2ggYXJlIGZyb20gdGhlIFRocmVh
+ZCB3b3JsZC4gVGhleSBoYXZlIGEgInNvbWVob3ciIGNsb3NlZCBib290c3RyYXBwaW5nIHByb3Rv
+Y29sIHdoaWNoIGlzIE1MRS4gQWxzbyBub3RlIHRoZXkgZm9ya2VkIHRoZSBJRVRGIE1MRSBzdGFu
+ZGFyZCwgc28gVGhyZWFkIE1MRSAhPSBJRVRGIE1MRS4NCg0KSSBjYW4gZ2l2ZSB5b3UgbW9yZSBp
+bmZvcm1hdGlvbiB3aGF0IE1MRSBleGFjdGx5IGlzIGlmIHlvdSB3YW50Lg0KDQo+IERvIHlvdSBo
+YXZlIGFueSBpZGVhIGFib3V0IHRoaXM/IENvdWxkIHlvdSBzaGFyZSBhbnkgZXhwZXJpZW5jZSBy
+ZWdhcmRpbmcgdGhpcz8NCj4gDQoNCkhvdyB5b3UgY2FuIGdldCBUaHJlYWQgTUxFIHdvcmtpbmcg
+Zm9yIHlvdT8NCg0KR29vZCBzb2x1dGlvbiBpczoNCg0KIlVzZSBvcGVuIGltcGxlbWVudGF0aW9u
+IE9wZW5UaHJlYWQgYW5kIG1ha2UgYSBsaWJyYXJ5IHdyYXBwZXIgYXJvdW5kICB3aGljaCBpcyBh
+IE1MRSBMaW51eCB1c2Vyc3BhY2UgaW1wbGVtZW50YXRpb24uIEl0IHNob3VsZCB3b3JrIG9uIElQ
+djYgIHNvY2tldHMgYW5kIG5vdCBBRl9QQUNLRVQiDQoNCkhhY2sgc29sdXRpb24gaXM6DQoNCiJS
+dW4gb3BlbnRocmVhZCBvbiBub2RlIGludGVyZmFjZXMgYW5kIEFGX1BBQ0tFVCBhbmQga2VlcCBt
+YWMgc2V0dGluZ3MgaW4gc3luYyIgLSBub3Qgc3VyZSBob3cgdGhpcyBjYW4gd29yaywgSSB0aGlu
+ayBpdCB3aWxsIG9ubHkgbWFrZSBtb3JlIHRyb3VibGUuDQoNCkFub3RoZXIgc29sdXRpb246DQoN
+Ckp1c3QgdXNlIGFmODAyMTU0IGluIG9wZW50aHJlYWQsIGJ1dCB0aGVuIHlvdSBvbmx5IHVzZSBM
+aW51eCA4MDIuMTUuNCBkcml2ZXJzIGFuZCBtb3N0bHkgbm8gdXBwZXIgbGF5ZXIgcHJvdG9jb2wu
+IEFsc28gb24gbm9kZSBpbnRlcmZhY2VzIHlvdSBuZWVkIHRvIGtlZXAgYWRkcmVzcyBzZXR0aW5n
+cyBpbiBzeW5jIHdoaWNoIEkgZGlkbid0IGltcGxlbWVudGVkLg0KT24gdGhlIG90aGVyIGhhbmQg
+bW9uaXRvcnMgaGFzIGxpbWl0YXRpb25zIHdoZW4gcnVubmluZyBpbiBwcm9taXNjdW91cyBtb2Rl
+Lg0KDQotIEFsZXgNCg==
