@@ -1,47 +1,47 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from proxima.lasnet.de ([78.47.171.185]:38475 "EHLO
+Received: from proxima.lasnet.de ([78.47.171.185]:38482 "EHLO
         proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727178AbfCMJIt (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 13 Mar 2019 05:08:49 -0400
+        with ESMTP id S1726163AbfCMJJE (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 13 Mar 2019 05:09:04 -0400
 Subject: Re: [PATCH] net: ieee802154: fix a potential NULL pointer dereference
 References: <20190311072517.29740-1-kjlu@umn.edu>
- <BN3PR0301MB0897817BBE72CE6A33A1DE728E480@BN3PR0301MB0897.namprd03.prod.outlook.com>
 From: Stefan Schmidt <stefan@datenfreihafen.org>
-Message-ID: <70435340-ecd3-2048-b1f2-b53e00a91d46@datenfreihafen.org>
-Date: Wed, 13 Mar 2019 10:08:46 +0100
+Message-ID: <b21fb850-19cf-0726-8d8a-f52789d33eb6@datenfreihafen.org>
+Date: Wed, 13 Mar 2019 10:09:02 +0100
 MIME-Version: 1.0
-In-Reply-To: <BN3PR0301MB0897817BBE72CE6A33A1DE728E480@BN3PR0301MB0897.namprd03.prod.outlook.com>
+In-Reply-To: <20190311072517.29740-1-kjlu@umn.edu>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: "Hennerich, Michael" <Michael.Hennerich@analog.com>, Kangjie Lu <kjlu@umn.edu>
-Cc: "pakki001@umn.edu" <pakki001@umn.edu>, Alexander Aring <alex.aring@gmail.com>, "David S. Miller" <davem@davemloft.net>, "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To: Kangjie Lu <kjlu@umn.edu>
+Cc: pakki001@umn.edu, Michael Hennerich <michael.hennerich@analog.com>, Alexander Aring <alex.aring@gmail.com>, "David S. Miller" <davem@davemloft.net>, linux-wpan@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Hello.
 
-On 11.03.19 08:30, Hennerich, Michael wrote:
+On 11.03.19 08:25, Kangjie Lu wrote:
+> In case alloc_ordered_workqueue fails, the fix releases
+> sources and returns -ENOMEM to avoid NULL pointer dereference.
 > 
+> Signed-off-by: Kangjie Lu <kjlu@umn.edu>
+> ---
+>  drivers/net/ieee802154/adf7242.c | 4 ++++
+>  1 file changed, 4 insertions(+)
 > 
->> -----Original Message-----
->> From: Kangjie Lu [mailto:kjlu@umn.edu]
->> Sent: Montag, 11. März 2019 08:25
->> To: kjlu@umn.edu
->> Cc: pakki001@umn.edu; Hennerich, Michael <Michael.Hennerich@analog.com>; Alexander Aring <alex.aring@gmail.com>; Stefan
->> Schmidt <stefan@datenfreihafen.org>; David S. Miller <davem@davemloft.net>; linux-wpan@vger.kernel.org;
->> netdev@vger.kernel.org; linux-kernel@vger.kernel.org
->> Subject: [PATCH] net: ieee802154: fix a potential NULL pointer dereference
->>
->> In case alloc_ordered_workqueue fails, the fix releases
->> sources and returns -ENOMEM to avoid NULL pointer dereference.
->>
->> Signed-off-by: Kangjie Lu <kjlu@umn.edu>
+> diff --git a/drivers/net/ieee802154/adf7242.c b/drivers/net/ieee802154/adf7242.c
+> index cd1d8faccca5..cd6b95e673a5 100644
+> --- a/drivers/net/ieee802154/adf7242.c
+> +++ b/drivers/net/ieee802154/adf7242.c
+> @@ -1268,6 +1268,10 @@ static int adf7242_probe(struct spi_device *spi)
+>  	INIT_DELAYED_WORK(&lp->work, adf7242_rx_cal_work);
+>  	lp->wqueue = alloc_ordered_workqueue(dev_name(&spi->dev),
+>  					     WQ_MEM_RECLAIM);
+> +	if (unlikely(!lp->wqueue)) {
+> +		ret = -ENOMEM;
+> +		goto err_hw_init;
+> +	}
+>  
+>  	ret = adf7242_hw_init(lp);
+>  	if (ret)
 > 
-> Acked-by: Michael Hennerich <michael.hennerich@analog.com>
-
-Strange enough patchwork did not pick up this acked by from you. I added
-in manually to the patch. Just so you know.
-
-regards
-Stefan Schmidt
