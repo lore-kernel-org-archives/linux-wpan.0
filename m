@@ -1,92 +1,69 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from smtprelay0192.hostedemail.com ([216.40.44.192]:51533 "EHLO
-        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729761AbfCYVgs (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>);
-        Mon, 25 Mar 2019 17:36:48 -0400
-Received: from smtprelay.hostedemail.com (10.5.19.251.rfc1918.com [10.5.19.251])
-        by smtpgrave05.hostedemail.com (Postfix) with ESMTP id 54D5F1801812C
-        for <linux-wpan@vger.kernel.org>; Mon, 25 Mar 2019 21:27:06 +0000 (UTC)
-From: Joe Perches <joe@perches.com>
-Subject: Bad file pattern in MAINTAINERS section 'IEEE 802.15.4 SUBSYSTEM'
-Date: Mon, 25 Mar 2019 14:27:01 -0700
-Message-Id: <20190325212701.26768-1-joe@perches.com>
-In-Reply-To: <7cd8d12f59bcacd18a78f599b46dac555f7f16c0.camel@perches.com>
-References: <7cd8d12f59bcacd18a78f599b46dac555f7f16c0.camel@perches.com>
+Received: from mta-p6.oit.umn.edu ([134.84.196.206]:40914 "EHLO
+        mta-p6.oit.umn.edu" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729069AbfCXXTE (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Sun, 24 Mar 2019 19:19:04 -0400
+Received: from localhost (unknown [127.0.0.1])
+        by mta-p6.oit.umn.edu (Postfix) with ESMTP id 0AECA6A5
+        for <linux-wpan@vger.kernel.org>; Sun, 24 Mar 2019 23:19:03 +0000 (UTC)
+Received: from mta-p6.oit.umn.edu ([127.0.0.1])
+        by localhost (mta-p6.oit.umn.edu [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id hXLx69waBPYp for <linux-wpan@vger.kernel.org>;
+        Sun, 24 Mar 2019 18:19:02 -0500 (CDT)
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
+        (using TLSv1.2 with cipher AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mta-p6.oit.umn.edu (Postfix) with ESMTPS id CB86760F
+        for <linux-wpan@vger.kernel.org>; Sun, 24 Mar 2019 18:19:02 -0500 (CDT)
+Received: by mail-io1-f72.google.com with SMTP id b16so6586636iot.5
+        for <linux-wpan@vger.kernel.org>; Sun, 24 Mar 2019 16:19:02 -0700 (PDT)
+From: Kangjie Lu <kjlu@umn.edu>
+Subject: [PATCH] net: ieee802154: fix missing checks for regmap_update_bits
+Date: Sun, 24 Mar 2019 18:18:56 -0500
+Message-Id: <20190324231856.2664-1-kjlu@umn.edu>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt <stefan@datenfreihafen.org>, linux-wpan@vger.kernel.org, Varka Bhadram <varkab@cdac.in>, Marcel Holtmann <marcel@holtmann.org>, "David S . Miller" <davem@davemloft.net>
+To: kjlu@umn.edu
+Cc: pakki001@umn.edu, Xue Liu <liuxuenetmail@gmail.com>, Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt <stefan@datenfreihafen.org>, "David S. Miller" <davem@davemloft.net>, linux-wpan@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
-A file pattern line in this section of the MAINTAINERS file in linux-next
-does not have a match in the linux source files.
+regmap_update_bits could fail and deserves a check.
 
-This could occur because a matching filename was never added, was deleted
-or renamed in some other commit.
+The patch adds the checks and if it fails, returns its error
+code upstream.
 
-The commits that added and if found renamed or removed the file pattern
-are shown below.
+Signed-off-by: Kangjie Lu <kjlu@umn.edu>
+---
+ drivers/net/ieee802154/mcr20a.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-Please fix this defect appropriately.
-
-1: ---------------------------------------------------------------------------
-
-linux-next MAINTAINERS section:
-
-	7509	IEEE 802.15.4 SUBSYSTEM
-	7510	M:	Alexander Aring <alex.aring@gmail.com>
-	7511	M:	Stefan Schmidt <stefan@datenfreihafen.org>
-	7512	L:	linux-wpan@vger.kernel.org
-	7513	W:	http://wpan.cakelab.org/
-	7514	T:	git git://git.kernel.org/pub/scm/linux/kernel/git/sschmidt/wpan.git
-	7515	T:	git git://git.kernel.org/pub/scm/linux/kernel/git/sschmidt/wpan-next.git
-	7516	S:	Maintained
-	7517	F:	net/ieee802154/
-	7518	F:	net/mac802154/
-	7519	F:	drivers/net/ieee802154/
-	7520	F:	include/linux/nl802154.h
-	7521	F:	include/linux/ieee802154.h
-	7522	F:	include/net/nl802154.h
-	7523	F:	include/net/mac802154.h
-	7524	F:	include/net/af_ieee802154.h
-	7525	F:	include/net/cfg802154.h
-	7526	F:	include/net/ieee802154_netdev.h
--->	7527	F:	Documentation/networking/ieee802154.txt
-
-2: ---------------------------------------------------------------------------
-
-The most recent commit that added or modified file pattern 'Documentation/networking/ieee802154.txt':
-
-commit ebef9c1236170fb3ba4dc05ccb41f6d842eb1c12
-Author: Varka Bhadram <varkab@cdac.in>
-Date:   Fri Aug 8 17:32:45 2014 +0530
-
-    MAINTAINERS: update maintainers info
-    
-    adds the mailing list address for bluetooth 6loWPAN and
-    IEEE-802.15.4 subsystems. Also adds web page info.
-    
-    Signed-off-by: Varka Bhadram <varkab@cdac.in>
-    Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-
- MAINTAINERS | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
-
-3: ---------------------------------------------------------------------------
-
-The last commit with a real presence of file pattern 'Documentation/networking/ieee802154.txt':
-
-commit 8a42eda2582ada073d7320ca703fb5fa49600e87
-Author: Stefan Schmidt <stefan@datenfreihafen.org>
-Date:   Wed Feb 27 20:59:14 2019 +0100
-
-    doc: net: ieee802154: remove old plain text docs after switching to rst
-    
-    The plain text docs are converted to rst now, which allows us to remove
-    the old text file from the tree.
-    
-    Signed-off-by: Stefan Schmidt <stefan@datenfreihafen.org>
-    Signed-off-by: David S. Miller <davem@davemloft.net>
-
- Documentation/networking/ieee802154.txt | 177 --------------------------------
- 1 file changed, 177 deletions(-)
+diff --git a/drivers/net/ieee802154/mcr20a.c b/drivers/net/ieee802154/mcr20a.c
+index c589f5ae75bb..8bb53ec8d9cf 100644
+--- a/drivers/net/ieee802154/mcr20a.c
++++ b/drivers/net/ieee802154/mcr20a.c
+@@ -533,6 +533,8 @@ mcr20a_start(struct ieee802154_hw *hw)
+ 	dev_dbg(printdev(lp), "no slotted operation\n");
+ 	ret = regmap_update_bits(lp->regmap_dar, DAR_PHY_CTRL1,
+ 				 DAR_PHY_CTRL1_SLOTTED, 0x0);
++	if (ret < 0)
++		return ret;
+ 
+ 	/* enable irq */
+ 	enable_irq(lp->spi->irq);
+@@ -540,11 +542,15 @@ mcr20a_start(struct ieee802154_hw *hw)
+ 	/* Unmask SEQ interrupt */
+ 	ret = regmap_update_bits(lp->regmap_dar, DAR_PHY_CTRL2,
+ 				 DAR_PHY_CTRL2_SEQMSK, 0x0);
++	if (ret < 0)
++		return ret;
+ 
+ 	/* Start the RX sequence */
+ 	dev_dbg(printdev(lp), "start the RX sequence\n");
+ 	ret = regmap_update_bits(lp->regmap_dar, DAR_PHY_CTRL1,
+ 				 DAR_PHY_CTRL1_XCVSEQ_MASK, MCR20A_XCVSEQ_RX);
++	if (ret < 0)
++		return ret;
+ 
+ 	return 0;
+ }
+-- 
+2.17.1
