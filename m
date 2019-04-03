@@ -1,46 +1,47 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:47158 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729205AbfDVTpZ (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-        Mon, 22 Apr 2019 15:45:25 -0400
-From: Sasha Levin <sashal@kernel.org>
-Subject: [PATCH AUTOSEL 4.19 04/68] ieee802154: hwsim: propagate genlmsg_reply return code
-Date: Mon, 22 Apr 2019 15:44:12 -0400
-Message-Id: <20190422194516.11634-4-sashal@kernel.org>
-In-Reply-To: <20190422194516.11634-1-sashal@kernel.org>
-References: <20190422194516.11634-1-sashal@kernel.org>
+Received: from aserp2120.oracle.com ([141.146.126.78]:42000 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726330AbfDCFgm (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 3 Apr 2019 01:36:42 -0400
+Date: Wed, 3 Apr 2019 08:34:16 +0300
+From: Dan Carpenter <dan.carpenter@oracle.com>
+Subject: [PATCH net] 6lowpan: Off by one handling ->nexthdr
+Message-ID: <20190403053416.GA21913@kadam>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc: Li RongQing <lirongqing@baidu.com>, Stefan Schmidt <stefan@datenfreihafen.org>, Sasha Levin <sashal@kernel.org>, linux-wpan@vger.kernel.org, netdev@vger.kernel.org
+To: Alexander Aring <alex.aring@gmail.com>
+Cc: Jukka Rissanen <jukka.rissanen@linux.intel.com>, "David S. Miller" <davem@davemloft.net>, linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org, netdev@vger.kernel.org, kernel-janitors@vger.kernel.org
 
-From: Li RongQing <lirongqing@baidu.com>
+NEXTHDR_MAX is 255.  What happens here is that we take a u8 value
+"hdr->nexthdr" from the network and then look it up in
+lowpan_nexthdr_nhcs[].  The problem is that if hdr->nexthdr is 0xff then
+we read one element beyond the end of the array so the array needs to
+be one element larger.
 
-[ Upstream commit 19b39a25388e71390e059906c979f87be4ef0c71 ]
-
-genlmsg_reply can fail, so propagate its return code
-
-Signed-off-by: Li RongQing <lirongqing@baidu.com>
-Signed-off-by: Stefan Schmidt <stefan@datenfreihafen.org>
-Signed-off-by: Sasha Levin (Microsoft) <sashal@kernel.org>
+Fixes: 92aa7c65d295 ("6lowpan: add generic nhc layer interface")
+Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
 ---
- drivers/net/ieee802154/mac802154_hwsim.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+This is the only place which uses the NEXTHDR_MAX define, so I considered
+changing that to 256 instead.  Either fix would work.
 
-diff --git a/drivers/net/ieee802154/mac802154_hwsim.c b/drivers/net/ieee802154/mac802154_hwsim.c
-index 624bff4d3636..f1ed1744801c 100644
---- a/drivers/net/ieee802154/mac802154_hwsim.c
-+++ b/drivers/net/ieee802154/mac802154_hwsim.c
-@@ -332,7 +332,7 @@ static int hwsim_get_radio_nl(struct sk_buff *msg, struct genl_info *info)
- 			goto out_err;
- 		}
+ net/6lowpan/nhc.c  | 2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/net/6lowpan/nhc.c b/net/6lowpan/nhc.c
+index 4fa2fdda174d..9e56fb98f33c 100644
+--- a/net/6lowpan/nhc.c
++++ b/net/6lowpan/nhc.c
+@@ -18,7 +18,7 @@
+ #include "nhc.h"
  
--		genlmsg_reply(skb, info);
-+		res = genlmsg_reply(skb, info);
- 		break;
- 	}
+ static struct rb_root rb_root = RB_ROOT;
+-static struct lowpan_nhc *lowpan_nexthdr_nhcs[NEXTHDR_MAX];
++static struct lowpan_nhc *lowpan_nexthdr_nhcs[NEXTHDR_MAX + 1];
+ static DEFINE_SPINLOCK(lowpan_nhc_lock);
  
+ static int lowpan_nhc_insert(struct lowpan_nhc *nhc)
 -- 
-2.19.1
+2.17.1
