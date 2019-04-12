@@ -1,31 +1,35 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from shards.monkeyblade.net ([23.128.96.9]:37178 "EHLO
-        shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727023AbfDHRMd (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 8 Apr 2019 13:12:33 -0400
-Date: Mon, 08 Apr 2019 10:12:31 -0700 (PDT)
-Message-Id: <20190408.101231.450448107143106931.davem@davemloft.net>
-Subject: Re: [PATCH] MAINTAINERS: ieee802154: update documentation file
- pattern
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <20190408160804.1617-1-stefan@datenfreihafen.org>
-References: <20190408160804.1617-1-stefan@datenfreihafen.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+Received: from mail-it1-f174.google.com ([209.85.166.174]:36465 "EHLO
+        mail-it1-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726616AbfDLIYs (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 12 Apr 2019 04:24:48 -0400
+Received: by mail-it1-f174.google.com with SMTP id y10so14196899itc.1
+        for <linux-wpan@vger.kernel.org>; Fri, 12 Apr 2019 01:24:47 -0700 (PDT)
+MIME-Version: 1.0
+From: Christopher Friedt <chrisfriedt@gmail.com>
+Date: Fri, 12 Apr 2019 04:24:35 -0400
+Message-ID: <CAF4BF-QKvP3i5nwpxGku+7kT0t+rbCWp6DgLy80Zyfaa3of+YA@mail.gmail.com>
+Subject: Plumbers 2019 IoT Microconference
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: stefan@datenfreihafen.org
-Cc: netdev@vger.kernel.org, linux-wpan@vger.kernel.org, aring@mojatatu.com
+To: linux-wpan@vger.kernel.org
+Cc: alex.aring@gmail.com, Stefan Schmidt <stefan@datenfreihafen.org>
 
-From: Stefan Schmidt <stefan@datenfreihafen.org>
-Date: Mon,  8 Apr 2019 18:08:04 +0200
+Hi linux-wpan!
 
-> When moving the documentation for the ieee802154 subsystem from
-> plain text to rst the file pattern in the MAINTAINERS file got wrong.
-> Updating it here to fix scripts using this file.
-> 
-> Reported-by: Joe Perches <joe@perches.com>
-> Signed-off-by: Stefan Schmidt <stefan@datenfreihafen.org>
+https://linuxplumbersconf.org
 
-Applied.
+Are any kernel contributors planning on attending this year's Linux
+Plumber's Conference?
+
+I'm in the process of finalizing the proposal for the IoT
+Microconference and wanted to gauge the possible turnout.
+
+If you would like to attend or are already planning to attend, please
+let me know, off-list if preferred.
+
+There will be some familiar open-hardware people as well. Speakers are
+welcome. Lots of open discussion.
+
+C
