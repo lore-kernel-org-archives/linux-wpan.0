@@ -1,36 +1,110 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from charlotte.tuxdriver.com ([70.61.120.58]:53784 "EHLO
-        smtp.tuxdriver.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725848AbfDQUQf (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 17 Apr 2019 16:16:35 -0400
-Date: Wed, 17 Apr 2019 16:15:21 -0400
-From: Neil Horman <nhorman@tuxdriver.com>
+Received: from metis.ext.pengutronix.de ([85.220.165.71]:52863 "EHLO
+        metis.ext.pengutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731676AbfDQKBK (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 17 Apr 2019 06:01:10 -0400
 Subject: Re: [PATCH net-next 1/3] net: rework SIOCGSTAMP ioctl handling
-Message-ID: <20190417201521.GB15487@hmswarspite.think-freely.org>
 References: <20190416203620.539628-1-arnd@arndb.de>
- <20190417093523.GA15487@hmswarspite.think-freely.org>
- <20190417.102112.382636552216165456.davem@davemloft.net>
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+Message-ID: <4eabda4b-d08e-ae29-b3df-0971e909fe9c@pengutronix.de>
+Date: Wed, 17 Apr 2019 11:59:55 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190417.102112.382636552216165456.davem@davemloft.net>
+In-Reply-To: <20190416203620.539628-1-arnd@arndb.de>
+Content-Type: multipart/signed; micalg=pgp-sha512;
+ protocol="application/pgp-signature";
+ boundary="oP6RuXvTEGF9Y54Th4EJnog3EsjFlvu8A"
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: David Miller <davem@davemloft.net>
-Cc: arnd@arndb.de, ralf@linux-mips.org, marcel@holtmann.org, johan.hedberg@gmail.com, socketcan@hartkopp.net, mkl@pengutronix.de, gerrit@erg.abdn.ac.uk, alex.aring@gmail.com, stefan@datenfreihafen.org, kuznet@ms2.inr.ac.ru, yoshfuji@linux-ipv6.org, vyasevich@gmail.com, marcelo.leitner@gmail.com, andrew.hendry@gmail.com, edumazet@google.com, willemb@google.com, deepa.kernel@gmail.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, linux-hams@vger.kernel.org, linux-bluetooth@vger.kernel.org, linux-can@vger.kernel.org, dccp@vger.kernel.org, linux-wpan@vger.kernel.org, linux-sctp@vger.kernel.org, linux-x25@vger.kernel.org
+To: Arnd Bergmann <arnd@arndb.de>, "David S. Miller" <davem@davemloft.net>, Ralf Baechle <ralf@linux-mips.org>, Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, Oliver Hartkopp <socketcan@hartkopp.net>, Gerrit Renker <gerrit@erg.abdn.ac.uk>, Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt <stefan@datenfreihafen.org>, Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>, Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>, Vlad Yasevich <vyasevich@gmail.com>, Neil Horman <nhorman@tuxdriver.com>, Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, Andrew Hendry <andrew.hendry@gmail.com>, Eric Dumazet <edumazet@google.com>, Willem de Bruijn <willemb@google.com>, Deepa Dinamani <deepa.kernel@gmail.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, linux-hams@vger.kernel.org, linux-bluetooth@vger.kernel.org, linux-can@vger.kernel.org, dccp@vger.kernel.org, linux-wpan@vger.kernel.org, linux-sctp@vger.kernel.org, linux-x25@vger.kernel.org
 
-On Wed, Apr 17, 2019 at 10:21:12AM -0700, David Miller wrote:
-> From: Neil Horman <nhorman@tuxdriver.com>
-> Date: Wed, 17 Apr 2019 05:35:23 -0400
-> 
-> > Acked-by: Neil Horman <nhorman@tuxdriver.com>
-> 
-> Neil, please quote appropriately in the future.
-> 
-> I have to scroll through all of those pages of quoted patch just to
-> see this one line.
-> 
-> Thank you.
-> 
-Sorry, completely forgot to snip.  Will remember in the future
-Neil
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--oP6RuXvTEGF9Y54Th4EJnog3EsjFlvu8A
+Content-Type: multipart/mixed; boundary="bhFxmOk9TZicUAH3UPosBJuXCCeMCMkUw";
+ protected-headers="v1"
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Arnd Bergmann <arnd@arndb.de>, "David S. Miller" <davem@davemloft.net>,
+ Ralf Baechle <ralf@linux-mips.org>, Marcel Holtmann <marcel@holtmann.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ Oliver Hartkopp <socketcan@hartkopp.net>,
+ Gerrit Renker <gerrit@erg.abdn.ac.uk>, Alexander Aring
+ <alex.aring@gmail.com>, Stefan Schmidt <stefan@datenfreihafen.org>,
+ Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
+ Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+ Vlad Yasevich <vyasevich@gmail.com>, Neil Horman <nhorman@tuxdriver.com>,
+ Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+ Andrew Hendry <andrew.hendry@gmail.com>, Eric Dumazet <edumazet@google.com>,
+ Willem de Bruijn <willemb@google.com>,
+ Deepa Dinamani <deepa.kernel@gmail.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-hams@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+ linux-can@vger.kernel.org, dccp@vger.kernel.org, linux-wpan@vger.kernel.org,
+ linux-sctp@vger.kernel.org, linux-x25@vger.kernel.org
+Message-ID: <4eabda4b-d08e-ae29-b3df-0971e909fe9c@pengutronix.de>
+Subject: Re: [PATCH net-next 1/3] net: rework SIOCGSTAMP ioctl handling
+References: <20190416203620.539628-1-arnd@arndb.de>
+In-Reply-To: <20190416203620.539628-1-arnd@arndb.de>
+
+--bhFxmOk9TZicUAH3UPosBJuXCCeMCMkUw
+Content-Type: text/plain; charset=utf-8
+Content-Language: de-DE
+Content-Transfer-Encoding: quoted-printable
+
+On 4/16/19 10:32 PM, Arnd Bergmann wrote:
+> The SIOCGSTAMP/SIOCGSTAMPNS ioctl commands are implemented by many
+> socket protocol handlers, and all of those end up calling the same
+> sock_get_timestamp()/sock_get_timestampns() helper functions, which
+> results in a lot of duplicate code.
+>=20
+> With the introduction of 64-bit time_t on 32-bit architectures, this
+> gets worse, as we then need four different ioctl commands in each
+> socket protocol implementation.
+>=20
+> To simplify that, let's add a new .gettstamp() operation in
+> struct proto_ops, and move ioctl implementation into the common
+> sock_ioctl()/compat_sock_ioctl_trans() functions that these all go
+> through.
+>=20
+> We can reuse the sock_get_timestamp() implementation, but generalize
+> it so it can deal with both native and compat mode, as well as
+> timeval and timespec structures.
+>=20
+> Acked-by: Stefan Schmidt <stefan@datenfreihafen.org>
+> Link: https://lore.kernel.org/lkml/CAK8P3a038aDQQotzua_QtKGhq8O9n+rdiz2=
+=3DWDCp82ys8eUT+A@mail.gmail.com/
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+
+For the CAN part:
+
+Acked-by: Marc Kleine-Budde <mkl@pengutronix.de>
+
+regards,
+Marc
+
+--=20
+Pengutronix e.K.                  | Marc Kleine-Budde           |
+Industrial Linux Solutions        | Phone: +49-231-2826-924     |
+Vertretung West/Dortmund          | Fax:   +49-5121-206917-5555 |
+Amtsgericht Hildesheim, HRA 2686  | http://www.pengutronix.de   |
+
+
+--bhFxmOk9TZicUAH3UPosBJuXCCeMCMkUw--
+
+--oP6RuXvTEGF9Y54Th4EJnog3EsjFlvu8A
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCgAdFiEEmvEkXzgOfc881GuFWsYho5HknSAFAly2+RsACgkQWsYho5Hk
+nSA+5Qf/TdRQd9Jb+CrEOmRTXkDOy+oG5Q4lOH8kTGLGuVcufVKYrWxNazF2WNAU
+uiohTFCKRBHADN7QSPuJcj5bKF/zAva4tIOEI+P/E/kJKklBF0JwPc676SmkUaop
+mMat6DD+JbjBkUVVGum0QxcuvTX870gX//xOhwjjEZDwx9nphQ0LJHas6t675WJY
+/gM4YTaSzuGCMsh65dduYl3d2UG0a1X4S8JtOgoBniszfkJYDxd2TAhZdur/tCq6
+C3WtdnLh3NvCFu6Q4HDaBrXqgtv0/n1pX0zko+TNiNv0ETTx8bbHztafQBR/xWIt
+W2DtCx2TmAr9FxU5oK3tnc5OO9QiFg==
+=MQJ6
+-----END PGP SIGNATURE-----
+
+--oP6RuXvTEGF9Y54Th4EJnog3EsjFlvu8A--
