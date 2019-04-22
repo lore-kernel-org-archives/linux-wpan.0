@@ -1,45 +1,50 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-ed1-f68.google.com ([209.85.208.68]:38277 "EHLO
-        mail-ed1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727013AbfDQV5W (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 17 Apr 2019 17:57:22 -0400
+Received: from mail.kernel.org ([198.145.29.99]:47124 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729722AbfDVTpY (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+        Mon, 22 Apr 2019 15:45:24 -0400
+From: Sasha Levin <sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 03/68] net: ieee802154: fix a potential NULL pointer dereference
+Date: Mon, 22 Apr 2019 15:44:11 -0400
+Message-Id: <20190422194516.11634-3-sashal@kernel.org>
+In-Reply-To: <20190422194516.11634-1-sashal@kernel.org>
+References: <20190422194516.11634-1-sashal@kernel.org>
 MIME-Version: 1.0
-References: <20190417205404.1877560-1-arnd@arndb.de>
-In-Reply-To: <20190417205404.1877560-1-arnd@arndb.de>
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Date: Wed, 17 Apr 2019 17:56:43 -0400
-Message-ID: <CAF=yD-KkUveFFj_j721kML0rMJF=uDcVQv+RQO4N6xjorHCtZg@mail.gmail.com>
-Subject: Re: [PATCH v3 1/3] net: rework SIOCGSTAMP ioctl handling
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Network Development <netdev@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>, y2038 Mailman List <y2038@lists.linaro.org>, Deepa Dinamani <deepa.kernel@gmail.com>, Stefan Schmidt <stefan@datenfreihafen.org>, Neil Horman <nhorman@tuxdriver.com>, Marc Kleine-Budde <mkl@pengutronix.de>, Eric Dumazet <edumazet@google.com>, Willem de Bruijn <willemb@google.com>, LKML <linux-kernel@vger.kernel.org>, linux-hams@vger.kernel.org, Bluez mailing list <linux-bluetooth@vger.kernel.org>, linux-can@vger.kernel.org, dccp@vger.kernel.org, linux-wpan@vger.kernel.org, linux-sctp@vger.kernel.org, linux-x25@vger.kernel.org
+To: linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc: Kangjie Lu <kjlu@umn.edu>, Stefan Schmidt <stefan@datenfreihafen.org>, Sasha Levin <sashal@kernel.org>, linux-wpan@vger.kernel.org, netdev@vger.kernel.org
 
-On Wed, Apr 17, 2019 at 4:54 PM Arnd Bergmann <arnd@arndb.de> wrote:
->
-> The SIOCGSTAMP/SIOCGSTAMPNS ioctl commands are implemented by many
-> socket protocol handlers, and all of those end up calling the same
-> sock_get_timestamp()/sock_get_timestampns() helper functions, which
-> results in a lot of duplicate code.
->
-> With the introduction of 64-bit time_t on 32-bit architectures, this
-> gets worse, as we then need four different ioctl commands in each
-> socket protocol implementation.
->
-> To simplify that, let's add a new .gettstamp() operation in
-> struct proto_ops, and move ioctl implementation into the common
-> sock_ioctl()/compat_sock_ioctl_trans() functions that these all go
-> through.
->
-> We can reuse the sock_get_timestamp() implementation, but generalize
-> it so it can deal with both native and compat mode, as well as
-> timeval and timespec structures.
->
-> Acked-by: Stefan Schmidt <stefan@datenfreihafen.org>
-> Acked-by: Neil Horman <nhorman@tuxdriver.com>
-> Acked-by: Marc Kleine-Budde <mkl@pengutronix.de>
-> Link: https://lore.kernel.org/lkml/CAK8P3a038aDQQotzua_QtKGhq8O9n+rdiz2=WDCp82ys8eUT+A@mail.gmail.com/
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+From: Kangjie Lu <kjlu@umn.edu>
 
-Acked-by: Willem de Bruijn <willemb@google.com>
+[ Upstream commit 2795e8c251614ac0784c9d41008551109f665716 ]
+
+In case alloc_ordered_workqueue fails, the fix releases
+sources and returns -ENOMEM to avoid NULL pointer dereference.
+
+Signed-off-by: Kangjie Lu <kjlu@umn.edu>
+Acked-by: Michael Hennerich <michael.hennerich@analog.com>
+Signed-off-by: Stefan Schmidt <stefan@datenfreihafen.org>
+Signed-off-by: Sasha Levin (Microsoft) <sashal@kernel.org>
+---
+ drivers/net/ieee802154/adf7242.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/drivers/net/ieee802154/adf7242.c b/drivers/net/ieee802154/adf7242.c
+index cd1d8faccca5..cd6b95e673a5 100644
+--- a/drivers/net/ieee802154/adf7242.c
++++ b/drivers/net/ieee802154/adf7242.c
+@@ -1268,6 +1268,10 @@ static int adf7242_probe(struct spi_device *spi)
+ 	INIT_DELAYED_WORK(&lp->work, adf7242_rx_cal_work);
+ 	lp->wqueue = alloc_ordered_workqueue(dev_name(&spi->dev),
+ 					     WQ_MEM_RECLAIM);
++	if (unlikely(!lp->wqueue)) {
++		ret = -ENOMEM;
++		goto err_hw_init;
++	}
+ 
+ 	ret = adf7242_hw_init(lp);
+ 	if (ret)
+-- 
+2.19.1
