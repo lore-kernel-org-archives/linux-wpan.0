@@ -1,27 +1,25 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-io1-f66.google.com ([209.85.166.66]:42889 "EHLO
-        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726343AbfDHSQV (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 8 Apr 2019 14:16:21 -0400
-Received: by mail-io1-f66.google.com with SMTP id c4so11870324ioh.9
-        for <linux-wpan@vger.kernel.org>; Mon, 08 Apr 2019 11:16:21 -0700 (PDT)
-Date: Mon, 8 Apr 2019 14:16:18 -0400
-From: Alexander Aring <aring@mojatatu.com>
+Received: from coyote.holtmann.net ([212.227.132.17]:56404 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727740AbfDWRKb (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 23 Apr 2019 13:10:31 -0400
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.8\))
 Subject: Re: [PATCH net] 6lowpan: Off by one handling ->nexthdr
-Message-ID: <20190408181618.2m5c3aqlqjmem57j@x220t>
-References: <20190403053416.GA21913@kadam>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+From: Marcel Holtmann <marcel@holtmann.org>
 In-Reply-To: <20190403053416.GA21913@kadam>
+Date: Tue, 23 Apr 2019 19:10:28 +0200
+Content-Transfer-Encoding: 7bit
+Message-Id: <18F5B032-F127-4EB9-8DB8-F760C6455431@holtmann.org>
+References: <20190403053416.GA21913@kadam>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: Dan Carpenter <dan.carpenter@oracle.com>
 Cc: Alexander Aring <alex.aring@gmail.com>, Jukka Rissanen <jukka.rissanen@linux.intel.com>, "David S. Miller" <davem@davemloft.net>, linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org, netdev@vger.kernel.org, kernel-janitors@vger.kernel.org
 
-Hi,
+Hi Dan,
 
-On Wed, Apr 03, 2019 at 08:34:16AM +0300, Dan Carpenter wrote:
 > NEXTHDR_MAX is 255.  What happens here is that we take a u8 value
 > "hdr->nexthdr" from the network and then look it up in
 > lowpan_nexthdr_nhcs[].  The problem is that if hdr->nexthdr is 0xff then
@@ -30,9 +28,15 @@ On Wed, Apr 03, 2019 at 08:34:16AM +0300, Dan Carpenter wrote:
 > 
 > Fixes: 92aa7c65d295 ("6lowpan: add generic nhc layer interface")
 > Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+> ---
+> This is the only place which uses the NEXTHDR_MAX define, so I considered
+> changing that to 256 instead.  Either fix would work.
+> 
+> net/6lowpan/nhc.c  | 2 +-
+> 1 files changed, 1 insertions(+), 1 deletions(-)
 
-Acked-by: Alexander Aring <aring@mojatatu.com>
+patch has been applied to bluetooth-next tree.
 
-Thanks.
+Regards
 
-- Alex
+Marcel
