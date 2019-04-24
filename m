@@ -1,42 +1,57 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from coyote.holtmann.net ([212.227.132.17]:56404 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727740AbfDWRKb (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 23 Apr 2019 13:10:31 -0400
+Received: from mail-it1-f182.google.com ([209.85.166.182]:40076 "EHLO
+        mail-it1-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725440AbfDXEMA (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 24 Apr 2019 00:12:00 -0400
+Received: by mail-it1-f182.google.com with SMTP id k64so3946337itb.5
+        for <linux-wpan@vger.kernel.org>; Tue, 23 Apr 2019 21:12:00 -0700 (PDT)
+Received: from ?IPv6:2601:245:c501:a88f:c4db:2aa4:2b61:fbbf? ([2601:245:c501:a88f:c4db:2aa4:2b61:fbbf])
+        by smtp.gmail.com with ESMTPSA id 64sm8220364ite.42.2019.04.23.21.11.58
+        for <linux-wpan@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 23 Apr 2019 21:11:58 -0700 (PDT)
+From: Aditya Nath <nath46950@gmail.com>
 Content-Type: text/plain;
-        charset=us-ascii
+        charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.8\))
-Subject: Re: [PATCH net] 6lowpan: Off by one handling ->nexthdr
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20190403053416.GA21913@kadam>
-Date: Tue, 23 Apr 2019 19:10:28 +0200
-Content-Transfer-Encoding: 7bit
-Message-Id: <18F5B032-F127-4EB9-8DB8-F760C6455431@holtmann.org>
-References: <20190403053416.GA21913@kadam>
+Subject: wpan-ping not working for an initial setup of Openlabs 802.15.4
+ modules connected to rapsberry pi.
+Message-Id: <114FA400-E2AA-441C-8691-B3D69E4C0414@gmail.com>
+References: <6BFF517D-8A33-4817-A251-BE649C27BE3D@gmail.com>
+Date: Wed, 24 Apr 2019 00:11:57 -0400
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Dan Carpenter <dan.carpenter@oracle.com>
-Cc: Alexander Aring <alex.aring@gmail.com>, Jukka Rissanen <jukka.rissanen@linux.intel.com>, "David S. Miller" <davem@davemloft.net>, linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org, netdev@vger.kernel.org, kernel-janitors@vger.kernel.org
+To: linux-wpan@vger.kernel.org
 
-Hi Dan,
+Hi,
 
-> NEXTHDR_MAX is 255.  What happens here is that we take a u8 value
-> "hdr->nexthdr" from the network and then look it up in
-> lowpan_nexthdr_nhcs[].  The problem is that if hdr->nexthdr is 0xff then
-> we read one element beyond the end of the array so the array needs to
-> be one element larger.
-> 
-> Fixes: 92aa7c65d295 ("6lowpan: add generic nhc layer interface")
-> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
-> ---
-> This is the only place which uses the NEXTHDR_MAX define, so I considered
-> changing that to 256 instead.  Either fix would work.
-> 
-> net/6lowpan/nhc.c  | 2 +-
-> 1 files changed, 1 insertions(+), 1 deletions(-)
+I=E2=80=99m trying to get basic ping working between the two devices and =
+from each of them it says host unreachable.
+My setup includes 2 raspberry pi 3b+ model and each of them attached to =
+2 Openlabs 802.15.4 module.
 
-patch has been applied to bluetooth-next tree.
+I ran the following commands on each of them seperately:
 
-Regards
+ip link set wpan0 down
+iwpan phy0 set channel 0 15
+iwpan dev wpan0 set pan_id 0x1111
+iwpan dev wpan0 set short_addr 0x0001
+ip link set wpan0 up
 
-Marcel
+wpan-ping -d 0x0002
+
+The only difference between the two pi was that I changed the short_addr =
+for the other pi to 0x0002.
+
+The ping command used was:
+
+wpan-ping -a 0x0001 -s 5 -c 5
+
+I understand you must tbe very busy, but I would really appreciate if =
+you can support with some answers. There is very little thorough =
+documentation on the web elsehwere, and that is why I have to turn to =
+thtis mailing list for answes.
+
+Thanks,
+Aditya Nath=
