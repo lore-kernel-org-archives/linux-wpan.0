@@ -1,105 +1,161 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from szxga07-in.huawei.com ([45.249.212.35]:39168 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726744AbfD1Ptn (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-        Sun, 28 Apr 2019 11:49:43 -0400
-From: Yue Haibing <yuehaibing@huawei.com>
-Subject: [PATCH] ieee802154: hwsim: unregister hw while hwsim_subscribe_all_others fails
-Date: Sun, 28 Apr 2019 23:48:10 +0800
-Message-ID: <20190428154810.40052-1-yuehaibing@huawei.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Received: from mail-it1-f180.google.com ([209.85.166.180]:39413 "EHLO
+        mail-it1-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726039AbfDZE35 (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 26 Apr 2019 00:29:57 -0400
+Received: by mail-it1-f180.google.com with SMTP id e13so3764522itk.4
+        for <linux-wpan@vger.kernel.org>; Thu, 25 Apr 2019 21:29:57 -0700 (PDT)
+Received: from ?IPv6:2601:245:c501:a88f:3496:7a24:52ca:e080? ([2601:245:c501:a88f:3496:7a24:52ca:e080])
+        by smtp.gmail.com with ESMTPSA id p5sm5570935iom.51.2019.04.25.21.29.55
+        for <linux-wpan@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 25 Apr 2019 21:29:55 -0700 (PDT)
+From: Aditya Nath <nath46950@gmail.com>
+Content-Type: text/plain;
+        charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.8\))
+Subject: wpan-ping not working for an initial setup of Openlabs 802.15.4
+ modules connected to rapsberry pi.
+Message-Id: <C17AA022-0F79-4663-877F-A4A0A62E141A@gmail.com>
+Date: Fri, 26 Apr 2019 00:29:54 -0400
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: alex.aring@gmail.com, stefan@datenfreihafen.org, davem@davemloft.net
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, linux-wpan@vger.kernel.org, YueHaibing <yuehaibing@huawei.com>
+To: linux-wpan@vger.kernel.org
 
-From: YueHaibing <yuehaibing@huawei.com>
+Hi,
 
-KASAN report this:
+Sorry for creating another thread of mails, but I couldn=E2=80=99t =
+figure out how to properly send the mail in the same chain using =
+git-send-mail.
 
-kernel BUG at net/mac802154/main.c:130!
-invalid opcode: 0000 [#1] PREEMPT SMP
-CPU: 0 PID: 19932 Comm: modprobe Not tainted 5.1.0-rc6+ #22
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.9.3-0-ge2fc41e-prebuilt.qemu-project.org 04/01/2014
-RIP: 0010:ieee802154_free_hw+0x2a/0x30 [mac802154]
-Code: 55 48 8d 57 38 48 89 e5 53 48 89 fb 48 8b 47 38 48 39 c2 75 15 48 8d 7f 48 e8 82 85 16 e1 48 8b 7b 28 e8 f9 ef 83 e2 5b 5d c3 <0f> 0b 0f 1f 40 00 55 48 89 e5 53 48 89 fb 0f b6 86 80 00 00 00 88
-RSP: 0018:ffffc90001c7b9f0 EFLAGS: 00010206
-RAX: ffff88822df3aa80 RBX: ffff88823143d5c0 RCX: 0000000000000002
-RDX: ffff88823143d5f8 RSI: ffff88822b1fabc0 RDI: ffff88823143d5c0
-RBP: ffffc90001c7b9f8 R08: 0000000000000000 R09: 0000000000000001
-R10: 0000000000000000 R11: 0000000000000000 R12: 00000000fffffff4
-R13: ffff88822dea4f50 R14: ffff88823143d7c0 R15: 00000000fffffff4
-FS: 00007ff52e999540(0000) GS:ffff888237a00000(0000) knlGS:0000000000000000
-CS: 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007fdc06dba768 CR3: 000000023160a000 CR4: 00000000000006f0
-Call Trace:
- hwsim_add_one+0x2dd/0x540 [mac802154_hwsim]
- hwsim_probe+0x2f/0xb0 [mac802154_hwsim]
- platform_drv_probe+0x3a/0x90
- ? driver_sysfs_add+0x79/0xb0
- really_probe+0x1d4/0x2d0
- driver_probe_device+0x50/0xf0
- device_driver_attach+0x54/0x60
- __driver_attach+0x7e/0xd0
- ? device_driver_attach+0x60/0x60
- bus_for_each_dev+0x68/0xc0
- driver_attach+0x19/0x20
- bus_add_driver+0x15e/0x200
- driver_register+0x5b/0xf0
- __platform_driver_register+0x31/0x40
- hwsim_init_module+0x74/0x1000 [mac802154_hwsim]
- ? 0xffffffffa00e9000
- do_one_initcall+0x6c/0x3cc
- ? kmem_cache_alloc_trace+0x248/0x3b0
- do_init_module+0x5b/0x1f1
- load_module+0x1db1/0x2690
- ? m_show+0x1d0/0x1d0
- __do_sys_finit_module+0xc5/0xd0
- __x64_sys_finit_module+0x15/0x20
- do_syscall_64+0x6b/0x1d0
- entry_SYSCALL_64_after_hwframe+0x49/0xbe
-RIP: 0033:0x7ff52e4a2839
-Code: 00 f3 c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d 1f f6 2c 00 f7 d8 64 89 01 48
-RSP: 002b:00007ffffa7b3c08 EFLAGS: 00000246 ORIG_RAX: 0000000000000139
-RAX: ffffffffffffffda RBX: 00005647560a2a00 RCX: 00007ff52e4a2839
-RDX: 0000000000000000 RSI: 00005647547f3c2e RDI: 0000000000000003
-RBP: 00005647547f3c2e R08: 0000000000000000 R09: 00005647560a2a00
-R10: 0000000000000003 R11: 0000000000000246 R12: 0000000000000000
-R13: 00005647560a2c10 R14: 0000000000040000 R15: 00005647560a2a00
-Modules linked in: mac802154_hwsim(+) mac802154 [last unloaded: mac802154_hwsim]
+Anyways, I gathered some data after my last mail.
 
-In hwsim_add_one, if hwsim_subscribe_all_others fails, we
-should call ieee802154_unregister_hw to free resources.
+> What kernel version are you using on the rpi? Mainline or the =
+Raspberry
+> provided kernel?
 
-Reported-by: Hulk Robot <hulkci@huawei.com>
-Fixes: f25da51fdc38 ("ieee802154: hwsim: add replacement for fakelb")
-Signed-off-by: YueHaibing <yuehaibing@huawei.com>
----
- drivers/net/ieee802154/mac802154_hwsim.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+The kernel on both the pi. It is the Raspberry provided kernel:
+Linux raspberrypi 4.14.98-v7+ #1200 SMP Tue Feb 12 20:27:48 GMT 2019 =
+armv7l GNU/Linux
+There are tutorials giving directions to create a custom kernel in order =
+to patch the driver support for at86rf233.
+But for the Raspberry provided kernel, the device overlay was already =
+present. So I did not go through the process
+of creating the custom kernel.
+> We had many problems that we helped debugging which ended in being a
+> problem with the rpi kernel and SPI or the wrong wiring (or wrongly
+> connected in the openlabs case). Thus I would like to ask you to =
+double
+> and triple check on these. :-)
+I understand your concerns, but if there was a chance of device not =
+connected properly (or the wiring issue) would it still show up in =
+kernel messages as an identified device.
+For example, the output of =E2=80=98dmesg | grep spi=E2=80=99:
+[        3.990085] at86rf233 spi0.0: Detected at86rf233 chip version 2
+> This would be the first time they would communicate? Or did you had =
+this
+> setup working before successfully?
+This is the first time I=E2=80=99m trying to make the connection.
+> Could you start wireshark/tshark/tcpdump on the server side wpan0
+> interface and see if packets are actually arriving? If not, try the =
+same
+> on the client side wpan0 and check if you see them being submitted.
+> Even better if you have another device (from which you know that it
+> works) to use as a sniffer directly on the air.
+=E2=80=94=E2=80=94=E2=80=94 Raspberry Pi3 - Acting as the IoT device =
+with the OpenLabs module transmitting the data.
 
-diff --git a/drivers/net/ieee802154/mac802154_hwsim.c b/drivers/net/ieee802154/mac802154_hwsim.c
-index c2b6ffb..3d9ffd2 100644
---- a/drivers/net/ieee802154/mac802154_hwsim.c
-+++ b/drivers/net/ieee802154/mac802154_hwsim.c
-@@ -813,7 +813,7 @@ static int hwsim_add_one(struct genl_info *info, struct device *dev,
- 		err = hwsim_subscribe_all_others(phy);
- 		if (err < 0) {
- 			mutex_unlock(&hwsim_phys_lock);
--			goto err_reg;
-+			goto err_subscribe;
- 		}
- 	}
- 	list_add_tail(&phy->list, &hwsim_phys);
-@@ -823,6 +823,8 @@ static int hwsim_add_one(struct genl_info *info, struct device *dev,
- 
- 	return idx;
- 
-+err_subscribe:
-+	ieee802154_unregister_hw(phy->hw);
- err_reg:
- 	kfree(pib);
- err_pib:
--- 
-2.7.0
+root@raspberrypi:/home/pi# ip link set wpan0 down
+root@raspberrypi:/home/pi# iwpan phy0 set channel 0 15
+root@raspberrypi:/home/pi# iwpan dev wpan0 set pan_id 0x1111
+root@raspberrypi:/home/pi# iwpan dev wpan0 set short_addr 0x0002
+root@raspberrypi:/home/pi# ip link set wpan0 up
+root@raspberrypi:/home/pi# wpan-ping -a 0x0001  -s 5 -c5
+PING 0x0001 (PAN ID 0x1111) 5 data bytes
+Hit 500 ms packet timeout
+Hit 500 ms packet timeout
+Hit 500 ms packet timeout
+Hit 500 ms packet timeout
+Hit 500 ms packet timeout
+
+--- 0x0001 ping statistics ---
+5 packets transmitted, 0 received, 100% packet loss
+rtt min/avg/max =3D 2147483.750/0.000/0.000 ms
+root@raspberrypi:/home/pi#=20
+
+
+=E2=80=94=E2=80=94=E2=80=94 Raspberry Pi3 - Device having the monitor =
+interface:
+
+root@raspberrypi:/home/pi# tshark -i monitor0
+Running as user "root" and group "root". This could be dangerous.
+Capturing on 'monitor0'
+    1 0.000000000              =E2=86=92              IEEE 802.15.4 143 =
+Beacon, Bad FCS
+    2 0.002232663              =E2=86=92              IEEE 802.15.4 143 =
+Beacon, Bad FCS
+    3 0.005587516              =E2=86=92              IEEE 802.15.4 143 =
+Beacon, Bad FCS
+    4 0.008298513              =E2=86=92              IEEE 802.15.4 143 =
+Beacon, Bad FCS
+    5 0.499330889              =E2=86=92              IEEE 802.15.4 143 =
+Beacon, Bad FCS
+
+> Another thing you could try is to setup 6lowpan fully and see if ping6
+> works. That would rule out problems with wpan-ping.
+Setting up LowPan to see if ping over ipv6 works:
+
+=E2=80=94=E2=80=94=E2=80=94 Raspberry pi - Node 1
+
+root@raspberrypi:/home/pi# ip link set lowpan0 down
+Cannot find device "lowpan0"
+root@raspberrypi:/home/pi# ip link set wpan0 down
+root@raspberrypi:/home/pi#=20
+root@raspberrypi:/home/pi# iwpan dev wpan0 set pan_id 0xcafe
+root@raspberrypi:/home/pi# iwpan phy0 set channel 0 26
+root@raspberrypi:/home/pi#=20
+root@raspberrypi:/home/pi# ip link add link wpan0 name lowpan0 type =
+lowpan
+root@raspberrypi:/home/pi#=20
+root@raspberrypi:/home/pi# ip link set wpan0 up
+root@raspberrypi:/home/pi# ip link set lowpan0 up
+root@raspberrypi:/home/pi#=20
+root@raspberrypi:/home/pi# ip addr add 2001:db8::1/64 dev lowpan0=20
+root@raspberrypi:/home/pi#=20
+
+=E2=80=94=E2=80=94=E2=80=94 Raspberry Pi - Node 2
+
+root@raspberrypi:/home/pi# ip link set lowpan0 down
+Cannot find device "lowpan0"
+root@raspberrypi:/home/pi# ip link set wpan0 down
+root@raspberrypi:/home/pi#=20
+root@raspberrypi:/home/pi# iwpan dev wpan0 set pan_id 0xcafe
+root@raspberrypi:/home/pi# iwpan phy0 set channel 0 26
+root@raspberrypi:/home/pi#=20
+root@raspberrypi:/home/pi# ip link add link wpan0 name lowpan0 type =
+lowpan
+root@raspberrypi:/home/pi#=20
+root@raspberrypi:/home/pi# ip link set wpan0 up
+root@raspberrypi:/home/pi# ip link set lowpan0 up
+root@raspberrypi:/home/pi#=20
+root@raspberrypi:/home/pi# ip addr add 2001:db8::2/64 dev lowpan0
+root@raspberrypi:/home/pi# ping6 2001:db8::1
+PING 2001:db8::1(2001:db8::1) 56 data bytes
+=46rom 2001:db8::2 icmp_seq=3D1 Destination unreachable: Address =
+unreachable
+=46rom 2001:db8::2 icmp_seq=3D2 Destination unreachable: Address =
+unreachable
+=46rom 2001:db8::2 icmp_seq=3D3 Destination unreachable: Address =
+unreachable
+^C
+--- 2001:db8::1 ping statistics ---
+5 packets transmitted, 0 received, +3 errors, 100% packet loss, time =
+4200ms
+
+
+Hopefully, I=E2=80=99ve provided all the information required for the =
+help that I=E2=80=99m asking.=20
+
+Thank you for your time again,
+Aditya Nath=
