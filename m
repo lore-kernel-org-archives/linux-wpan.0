@@ -1,153 +1,105 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from proxima.lasnet.de ([78.47.171.185]:57533 "EHLO
-        proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726145AbfD3KT3 (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 30 Apr 2019 06:19:29 -0400
-Subject: Re: [PATCH] ieee802154: hwsim: Fix error handle path in
- hwsim_init_module
-References: <20190428141451.32956-1-yuehaibing@huawei.com>
-From: Stefan Schmidt <stefan@datenfreihafen.org>
-Message-ID: <276a3533-19f3-a5f6-c61e-3ebbb4ef6600@datenfreihafen.org>
-Date: Tue, 30 Apr 2019 12:19:25 +0200
+Received: from szxga07-in.huawei.com ([45.249.212.35]:39168 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726744AbfD1Ptn (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+        Sun, 28 Apr 2019 11:49:43 -0400
+From: Yue Haibing <yuehaibing@huawei.com>
+Subject: [PATCH] ieee802154: hwsim: unregister hw while hwsim_subscribe_all_others fails
+Date: Sun, 28 Apr 2019 23:48:10 +0800
+Message-ID: <20190428154810.40052-1-yuehaibing@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20190428141451.32956-1-yuehaibing@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: base64
+Content-Type: text/plain
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Yue Haibing <yuehaibing@huawei.com>, alex.aring@gmail.com, davem@davemloft.net
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, linux-wpan@vger.kernel.org
+To: alex.aring@gmail.com, stefan@datenfreihafen.org, davem@davemloft.net
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, linux-wpan@vger.kernel.org, YueHaibing <yuehaibing@huawei.com>
 
-SGVsbG8gQWxleC4NCg0KDQpPbiAyOC4wNC4xOSAxNjoxNCwgWXVlIEhhaWJpbmcgd3JvdGU6
-DQo+IEZyb206IFl1ZUhhaWJpbmcgPHl1ZWhhaWJpbmdAaHVhd2VpLmNvbT4NCj4gDQo+IEtB
-U0FOIHJlcG9ydCB0aGlzOg0KPiANCj4gQlVHOiB1bmFibGUgdG8gaGFuZGxlIGtlcm5lbCBw
-YWdpbmcgcmVxdWVzdCBhdCBmZmZmZmJmZmY4MzRmMDAxDQo+IFBHRCAyMzdmZTgwNjcgUDRE
-IDIzN2ZlODA2NyBQVUQgMjM3ZTY0MDY3IFBNRCAxYzk2OGQwNjcgUFRFIDANCj4gT29wczog
-MDAwMCBbIzFdIFNNUCBLQVNBTiBQVEkNCj4gQ1BVOiAxIFBJRDogODg3MSBDb21tOiBzeXot
-ZXhlY3V0b3IuMCBUYWludGVkOiBHICAgICAgICAgQyAgICAgICAgNS4wLjArICM1DQo+IEhh
-cmR3YXJlIG5hbWU6IFFFTVUgU3RhbmRhcmQgUEMgKGk0NDBGWCArIFBJSVgsIDE5OTYpLCBC
-SU9TIDEuMTAuMi0xdWJ1bnR1MSAwNC8wMS8yMDE0DQo+IFJJUDogMDAxMDpzdHJjbXArMHgz
-MS8weGEwIGxpYi9zdHJpbmcuYzozMjgNCj4gQ29kZTogMDAgMDAgMDAgMDAgZmMgZmYgZGYg
-NTUgNTMgNDggODMgZWMgMDggZWIgMGEgODQgZGIgNDggODkgZWYgNzQgNWEgNGMgODkgZTYg
-NDggODkgZjggNDggODkgZmEgNDggOGQgNmYgMDEgNDggYzEgZTggMDMgODMgZTIgMDcgPDQy
-PiAwZiBiNiAwNCAyOCAzOCBkMCA3ZiAwNCA4NCBjMCA3NSA1MCA0OCA4OSBmMCA0OCA4OSBm
-MiAwZiBiNiA1ZA0KPiBSU1A6IDAwMTg6ZmZmZjg4ODFlMGM1NzgwMCBFRkxBR1M6IDAwMDEw
-MjQ2DQo+IFJBWDogMWZmZmZmZmZmODM0ZjAwMSBSQlg6IGZmZmZmZmZmYzFhNzgwMDAgUkNY
-OiBmZmZmZmZmZjgyN2I5NTAzDQo+IFJEWDogMDAwMDAwMDAwMDAwMDAwMCBSU0k6IGZmZmZm
-ZmZmYzFhNDAwMDggUkRJOiBmZmZmZmZmZmMxYTc4MDA4DQo+IFJCUDogZmZmZmZmZmZjMWE3
-ODAwOSBSMDg6IGZmZmZmYmZmZjZhOTIxOTUgUjA5OiBmZmZmZmJmZmY2YTkyMTk1DQo+IFIx
-MDogZmZmZjg4ODFlMGM1NzhiOCBSMTE6IGZmZmZmYmZmZjZhOTIxOTQgUjEyOiBmZmZmZmZm
-ZmMxYTQwMDA4DQo+IFIxMzogZGZmZmZjMDAwMDAwMDAwMCBSMTQ6IGZmZmZmZmZmYzFhM2U0
-NzAgUjE1OiBmZmZmZmZmZmMxYTQwMDAwDQo+IEZTOiAgMDAwMDdmZGNjMDJmZjcwMCgwMDAw
-KSBHUzpmZmZmODg4MWY3MzAwMDAwKDAwMDApIGtubEdTOjAwMDAwMDAwMDAwMDAwMDANCj4g
-Q1M6ICAwMDEwIERTOiAwMDAwIEVTOiAwMDAwIENSMDogMDAwMDAwMDA4MDA1MDAzMw0KPiBD
-UjI6IGZmZmZmYmZmZjgzNGYwMDEgQ1IzOiAwMDAwMDAwMWIzMTM0MDAzIENSNDogMDAwMDAw
-MDAwMDc2MDZlMA0KPiBEUjA6IDAwMDAwMDAwMDAwMDAwMDAgRFIxOiAwMDAwMDAwMDAwMDAw
-MDAwIERSMjogMDAwMDAwMDAwMDAwMDAwMA0KPiBEUjM6IDAwMDAwMDAwMDAwMDAwMDAgRFI2
-OiAwMDAwMDAwMGZmZmUwZmYwIERSNzogMDAwMDAwMDAwMDAwMDQwMA0KPiBQS1JVOiA1NTU1
-NTU1NA0KPiBDYWxsIFRyYWNlOg0KPiAgZ2VubF9mYW1pbHlfZmluZF9ieW5hbWUrMHg3Zi8w
-eGYwIG5ldC9uZXRsaW5rL2dlbmV0bGluay5jOjEwNA0KPiAgZ2VubF9yZWdpc3Rlcl9mYW1p
-bHkrMHgxZTEvMHgxMDcwIG5ldC9uZXRsaW5rL2dlbmV0bGluay5jOjMzMw0KPiAgPyAweGZm
-ZmZmZmZmYzE5NzgwMDANCj4gIGh3c2ltX2luaXRfbW9kdWxlKzB4NmEvMHgxMDAwIFttYWM4
-MDIxNTRfaHdzaW1dDQo+ICA/IDB4ZmZmZmZmZmZjMTk3ODAwMA0KPiAgPyAweGZmZmZmZmZm
-YzE5NzgwMDANCj4gID8gMHhmZmZmZmZmZmMxOTc4MDAwDQo+ICBkb19vbmVfaW5pdGNhbGwr
-MHhiYy8weDQ3ZCBpbml0L21haW4uYzo4ODcNCj4gIGRvX2luaXRfbW9kdWxlKzB4MWI1LzB4
-NTQ3IGtlcm5lbC9tb2R1bGUuYzozNDU2DQo+ICBsb2FkX21vZHVsZSsweDY0MDUvMHg4YzEw
-IGtlcm5lbC9tb2R1bGUuYzozODA0DQo+ICBfX2RvX3N5c19maW5pdF9tb2R1bGUrMHgxNjIv
-MHgxOTAga2VybmVsL21vZHVsZS5jOjM4OTgNCj4gIGRvX3N5c2NhbGxfNjQrMHg5Zi8weDQ1
-MCBhcmNoL3g4Ni9lbnRyeS9jb21tb24uYzoyOTANCj4gIGVudHJ5X1NZU0NBTExfNjRfYWZ0
-ZXJfaHdmcmFtZSsweDQ5LzB4YmUNCj4gUklQOiAwMDMzOjB4NDYyZTk5DQo+IENvZGU6IGY3
-IGQ4IDY0IDg5IDAyIGI4IGZmIGZmIGZmIGZmIGMzIDY2IDBmIDFmIDQ0IDAwIDAwIDQ4IDg5
-IGY4IDQ4IDg5IGY3IDQ4IDg5IGQ2IDQ4IDg5IGNhIDRkIDg5IGMyIDRkIDg5IGM4IDRjIDhi
-IDRjIDI0IDA4IDBmIDA1IDw0OD4gM2QgMDEgZjAgZmYgZmYgNzMgMDEgYzMgNDggYzcgYzEg
-YmMgZmYgZmYgZmYgZjcgZDggNjQgODkgMDEgNDgNCj4gUlNQOiAwMDJiOjAwMDA3ZmRjYzAy
-ZmVjNTggRUZMQUdTOiAwMDAwMDI0NiBPUklHX1JBWDogMDAwMDAwMDAwMDAwMDEzOQ0KPiBS
-QVg6IGZmZmZmZmZmZmZmZmZmZGEgUkJYOiAwMDAwMDAwMDAwNzNiZjAwIFJDWDogMDAwMDAw
-MDAwMDQ2MmU5OQ0KPiBSRFg6IDAwMDAwMDAwMDAwMDAwMDAgUlNJOiAwMDAwMDAwMDIwMDAw
-MjAwIFJESTogMDAwMDAwMDAwMDAwMDAwMw0KPiBSQlA6IDAwMDA3ZmRjYzAyZmVjNzAgUjA4
-OiAwMDAwMDAwMDAwMDAwMDAwIFIwOTogMDAwMDAwMDAwMDAwMDAwMA0KPiBSMTA6IDAwMDAw
-MDAwMDAwMDAwMDAgUjExOiAwMDAwMDAwMDAwMDAwMjQ2IFIxMjogMDAwMDdmZGNjMDJmZjZi
-Yw0KPiBSMTM6IDAwMDAwMDAwMDA0YmNlZmEgUjE0OiAwMDAwMDAwMDAwNmY2ZmIwIFIxNTog
-MDAwMDAwMDAwMDAwMDAwNA0KPiBNb2R1bGVzIGxpbmtlZCBpbjogbWFjODAyMTU0X2h3c2lt
-KCspIG1hYzgwMjE1NCBpZWVlODAyMTU0IHNwZWFrdXAoQykgcmNfcHJvdGV1c18yMzA5IHJ0
-Y19yazgwOCBzdHJlZWJvZ19nZW5lcmljIHJkcyB2Ym94Z3Vlc3QgbWFkZXJhX3NwaSBtYWRl
-cmEgZGE5MDUyX3dkdCBtSVNETl9jb3JlIHVlYWdsZV9hdG0gdXNiYXRtIGF0bSBpcl9pbW9u
-X2RlY29kZXIgc2NzaV90cmFuc3BvcnRfc2FzIHJjX2RudHZfbGl2ZV9kdmJfdCBwYW5lbF9z
-YW1zdW5nX3M2ZDE2ZDAgZHJtIGRybV9wYW5lbF9vcmllbnRhdGlvbl9xdWlya3MgbGliODAy
-MTEgZmJfYWdtMTI2NGtfZmwoQykgZ3NwY2FfcGFjNzMwMiBnc3BjYV9tYWluIHZpZGVvYnVm
-Ml92NGwyIHNvdW5kd2lyZV9pbnRlbF9pbml0IGkyY19kbG4yIGRsbjIgdXNiY29yZSBoaWRf
-Z2FmZiA4OHBtODYwNyBuZm5ldGxpbmsgYXhwMjB4X2kyYyBheHAyMHggdWlvIHBhdGFfbWFy
-dmVsbCBwbWJ1c19jb3JlIHNuZF9zb25pY3ZpYmVzIGdhbWVwb3J0IHNuZF9wY20gc25kX29w
-bDNfbGliIHNuZF90aW1lciBzbmRfaHdkZXAgc25kX21wdTQwMV91YXJ0IHNuZF9yYXdtaWRp
-IHNuZF9zZXFfZGV2aWNlIHNuZCBzb3VuZGNvcmUgcnRjX2RzMTUxMSBydGNfZHMxNzQyIHZz
-b2NrIGR3Y194bGdtYWMgcnRjX3J4ODAxMCBsaWJwaHkgdHdvZmlzaF94ODZfNjRfM3dheSB0
-d29maXNoX3g4Nl82NCB0d29maXNoX2NvbW1vbiBhZDU2OTZfaTJjIGFkNTY4NiBscDg3ODhf
-Y2hhcmdlciBjeGQyODgwX3NwaSBkdmJfY29yZSB2aWRlb2J1ZjJfY29tbW9uIHZpZGVvZGV2
-IG1lZGlhIHZpZGVvYnVmMl92bWFsbG9jIHZpZGVvYnVmMl9tZW1vcHMgZmJ0ZnQoQykgc3lz
-aW1nYmx0IHN5c2ZpbGxyZWN0IHN5c2NvcHlhcmVhIGZiX3N5c19mb3BzIGphbnpfaWNhbjMg
-ZmlyZXdpcmVfbmV0IGZpcmV3aXJlX2NvcmUgY3JjX2l0dV90IHNwaV9zbGF2ZV9zeXN0ZW1f
-Y29udHJvbCBpMmNfbWF0cm94ZmIgaTJjX2FsZ29fYml0DQo+ICBtYXRyb3hmYl9iYXNlIGZi
-IGZiZGV2IG1hdHJveGZiX0RBQzEwNjQgbWF0cm94ZmJfYWNjZWwgY2ZiY29weWFyZWEgY2Zi
-aW1nYmx0IGNmYmZpbGxyZWN0IG1hdHJveGZiX1RpMzAyNiBtYXRyb3hmYl9nNDUwIGc0NTBf
-cGxsIG1hdHJveGZiX21pc2MgbGVkc19ibGlua20gdGlfZGFjNzMxMSBpbnRlbF9zcGlfcGNp
-IGludGVsX3NwaSBzcGlfbm9yIGhpZF9lbGFuIGhpZCBhc3luY190eCByY19jaW5lcmd5XzE0
-MDAgcmNfY29yZSBpbnRlbF9pc2h0cCBreGNqa18xMDEzIGluZHVzdHJpYWxpb190cmlnZ2Vy
-ZWRfYnVmZmVyIGtmaWZvX2J1ZiBjYW5fZGV2IGludGVsX3RoIHNwaV9weGEyeHhfcGxhdGZv
-cm0gcGF0YV9hcnRvcCB2bWVfY2E5MWN4NDIgZ2JfZ2JwaHkoQykgZ3JleWJ1cyhDKSBpbmR1
-c3RyaWFsaW8gbXB0YmFzZSBzdF9kcnYgY21hYyB0dHBjaV9lZXByb20gdmlhX3dkdCBncGlv
-X3hyYTE0MDMgbXRkIGlwdGFibGVfc2VjdXJpdHkgaXB0YWJsZV9yYXcgaXB0YWJsZV9tYW5n
-bGUgaXB0YWJsZV9uYXQgbmZfbmF0IG5mX2Nvbm50cmFjayBuZl9kZWZyYWdfaXB2NiBuZl9k
-ZWZyYWdfaXB2NCBpcHRhYmxlX2ZpbHRlciBicGZpbHRlciBpcDZfdnRpIGlwX3Z0aSBpcF9n
-cmUgaXBpcCBzaXQgdHVubmVsNCBpcF90dW5uZWwgaHNyIHZldGggbmV0ZGV2c2ltIHZ4Y2Fu
-IGJhdG1hbl9hZHYgY2ZnODAyMTEgcmZraWxsIGNobmxfbmV0IGNhaWYgbmxtb24gZHVtbXkg
-dGVhbSBib25kaW5nIHZjYW4gYnJpZGdlIHN0cCBsbGMgaXA2X2dyZSBncmUgaXA2X3R1bm5l
-bCB0dW5uZWw2IHR1biBqb3lkZXYgbW91c2VkZXYgcHBkZXYga3ZtX2ludGVsIGt2bSBpcnFi
-eXBhc3MgY3JjdDEwZGlmX3BjbG11bCBjcmMzMl9wY2xtdWwgY3JjMzJjX2ludGVsIGdoYXNo
-X2NsbXVsbmlfaW50ZWwgYWVzbmlfaW50ZWwgYWVzX3g4Nl82NCBpbnB1dF9sZWRzIGNyeXB0
-b19zaW1kIGNyeXB0ZCBnbHVlX2hlbHBlciBpZGVfcGNpX2dlbmVyaWMgcGlpeCBwc21vdXNl
-DQo+ICBpZGVfY29yZSBzZXJpb19yYXcgYXRhX2dlbmVyaWMgaTJjX3BpaXg0IHBhdGFfYWNw
-aSBwYXJwb3J0X3BjIHBhcnBvcnQgZmxvcHB5IHJ0Y19jbW9zIGludGVsX2FncCBpbnRlbF9n
-dHQgYWdwZ2FydCBzY2hfZnFfY29kZWwgaXBfdGFibGVzIHhfdGFibGVzIHNoYTFfc3NzZTMg
-c2hhMV9nZW5lcmljIGlwdjYgW2xhc3QgdW5sb2FkZWQ6IHNwZWFrdXBdDQo+IER1bXBpbmcg
-ZnRyYWNlIGJ1ZmZlcjoNCj4gICAgKGZ0cmFjZSBidWZmZXIgZW1wdHkpDQo+IENSMjogZmZm
-ZmZiZmZmODM0ZjAwMQ0KPiAtLS1bIGVuZCB0cmFjZSA1YWE3NzJjNzkzZTBlOTcxIF0tLS0N
-Cj4gUklQOiAwMDEwOnN0cmNtcCsweDMxLzB4YTAgbGliL3N0cmluZy5jOjMyOA0KPiBDb2Rl
-OiAwMCAwMCAwMCAwMCBmYyBmZiBkZiA1NSA1MyA0OCA4MyBlYyAwOCBlYiAwYSA4NCBkYiA0
-OCA4OSBlZiA3NCA1YSA0YyA4OSBlNiA0OCA4OSBmOCA0OCA4OSBmYSA0OCA4ZCA2ZiAwMSA0
-OCBjMSBlOCAwMyA4MyBlMiAwNyA8NDI+IDBmIGI2IDA0IDI4IDM4IGQwIDdmIDA0IDg0IGMw
-IDc1IDUwIDQ4IDg5IGYwIDQ4IDg5IGYyIDBmIGI2IDVkDQo+IFJTUDogMDAxODpmZmZmODg4
-MWUwYzU3ODAwIEVGTEFHUzogMDAwMTAyNDYNCj4gUkFYOiAxZmZmZmZmZmY4MzRmMDAxIFJC
-WDogZmZmZmZmZmZjMWE3ODAwMCBSQ1g6IGZmZmZmZmZmODI3Yjk1MDMNCj4gUkRYOiAwMDAw
-MDAwMDAwMDAwMDAwIFJTSTogZmZmZmZmZmZjMWE0MDAwOCBSREk6IGZmZmZmZmZmYzFhNzgw
-MDgNCj4gUkJQOiBmZmZmZmZmZmMxYTc4MDA5IFIwODogZmZmZmZiZmZmNmE5MjE5NSBSMDk6
-IGZmZmZmYmZmZjZhOTIxOTUNCj4gUjEwOiBmZmZmODg4MWUwYzU3OGI4IFIxMTogZmZmZmZi
-ZmZmNmE5MjE5NCBSMTI6IGZmZmZmZmZmYzFhNDAwMDgNCj4gUjEzOiBkZmZmZmMwMDAwMDAw
-MDAwIFIxNDogZmZmZmZmZmZjMWEzZTQ3MCBSMTU6IGZmZmZmZmZmYzFhNDAwMDANCj4gRlM6
-ICAwMDAwN2ZkY2MwMmZmNzAwKDAwMDApIEdTOmZmZmY4ODgxZjczMDAwMDAoMDAwMCkga25s
-R1M6MDAwMDAwMDAwMDAwMDAwMA0KPiBDUzogIDAwMTAgRFM6IDAwMDAgRVM6IDAwMDAgQ1Iw
-OiAwMDAwMDAwMDgwMDUwMDMzDQo+IENSMjogZmZmZmZiZmZmODM0ZjAwMSBDUjM6IDAwMDAw
-MDAxYjMxMzQwMDMgQ1I0OiAwMDAwMDAwMDAwNzYwNmUwDQo+IERSMDogMDAwMDAwMDAwMDAw
-MDAwMCBEUjE6IDAwMDAwMDAwMDAwMDAwMDAgRFIyOiAwMDAwMDAwMDAwMDAwMDAwDQo+IERS
-MzogMDAwMDAwMDAwMDAwMDAwMCBEUjY6IDAwMDAwMDAwZmZmZTBmZjAgRFI3OiAwMDAwMDAw
-MDAwMDAwNDAwDQo+IFBLUlU6IDU1NTU1NTU0DQo+IA0KPiBUaGUgZXJyb3IgaGFuZGluZyBw
-YXRoIG1pc3BsYWNlIHRoZSBjbGVhbnVwIGluIGh3c2ltX2luaXRfbW9kdWxlLA0KPiBzd2l0
-Y2ggdGhlIHR3byBjbGVhbnVwIGZ1bmN0aW9ucyB0byBmaXggYWJvdmUgaXNzdWVzLg0KPiAN
-Cj4gUmVwb3J0ZWQtYnk6IEh1bGsgUm9ib3QgPGh1bGtjaUBodWF3ZWkuY29tPg0KPiBGaXhl
-czogZjI1ZGE1MWZkYzM4ICgiaWVlZTgwMjE1NDogaHdzaW06IGFkZCByZXBsYWNlbWVudCBm
-b3IgZmFrZWxiIikNCj4gU2lnbmVkLW9mZi1ieTogWXVlSGFpYmluZyA8eXVlaGFpYmluZ0Bo
-dWF3ZWkuY29tPg0KPiAtLS0NCj4gIGRyaXZlcnMvbmV0L2llZWU4MDIxNTQvbWFjODAyMTU0
-X2h3c2ltLmMgfCA0ICsrLS0NCj4gIDEgZmlsZSBjaGFuZ2VkLCAyIGluc2VydGlvbnMoKyks
-IDIgZGVsZXRpb25zKC0pDQo+IA0KPiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9uZXQvaWVlZTgw
-MjE1NC9tYWM4MDIxNTRfaHdzaW0uYyBiL2RyaXZlcnMvbmV0L2llZWU4MDIxNTQvbWFjODAy
-MTU0X2h3c2ltLmMNCj4gaW5kZXggM2I4ODg0Ni4uYzJiNmZmYiAxMDA2NDQNCj4gLS0tIGEv
-ZHJpdmVycy9uZXQvaWVlZTgwMjE1NC9tYWM4MDIxNTRfaHdzaW0uYw0KPiArKysgYi9kcml2
-ZXJzL25ldC9pZWVlODAyMTU0L21hYzgwMjE1NF9od3NpbS5jDQo+IEBAIC05MTIsOSArOTEy
-LDkgQEAgc3RhdGljIF9faW5pdCBpbnQgaHdzaW1faW5pdF9tb2R1bGUodm9pZCkNCj4gIAly
-ZXR1cm4gMDsNCj4gIA0KPiAgcGxhdGZvcm1fZHJ2Og0KPiAtCWdlbmxfdW5yZWdpc3Rlcl9m
-YW1pbHkoJmh3c2ltX2dlbmxfZmFtaWx5KTsNCj4gLXBsYXRmb3JtX2RldjoNCj4gIAlwbGF0
-Zm9ybV9kZXZpY2VfdW5yZWdpc3RlcihtYWM4MDIxNTRod3NpbV9kZXYpOw0KPiArcGxhdGZv
-cm1fZGV2Og0KPiArCWdlbmxfdW5yZWdpc3Rlcl9mYW1pbHkoJmh3c2ltX2dlbmxfZmFtaWx5
-KTsNCj4gIAlyZXR1cm4gcmM7DQo+ICB9DQo+ICANCj4gDQoNCkNvdWxkIHlvdSBwbGVhc2Ug
-cmV2aWV3IHRoaXMgb2VuIGFuZCB0aGUgb3RoZXIgaWVlZTgwMjE1NF9od3NpbSBmaXggWXVl
-DQpzZW5kPw0KDQpyZWdhcmRzDQpTdGVmYW4gU2NobWlkdA0K
+From: YueHaibing <yuehaibing@huawei.com>
+
+KASAN report this:
+
+kernel BUG at net/mac802154/main.c:130!
+invalid opcode: 0000 [#1] PREEMPT SMP
+CPU: 0 PID: 19932 Comm: modprobe Not tainted 5.1.0-rc6+ #22
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.9.3-0-ge2fc41e-prebuilt.qemu-project.org 04/01/2014
+RIP: 0010:ieee802154_free_hw+0x2a/0x30 [mac802154]
+Code: 55 48 8d 57 38 48 89 e5 53 48 89 fb 48 8b 47 38 48 39 c2 75 15 48 8d 7f 48 e8 82 85 16 e1 48 8b 7b 28 e8 f9 ef 83 e2 5b 5d c3 <0f> 0b 0f 1f 40 00 55 48 89 e5 53 48 89 fb 0f b6 86 80 00 00 00 88
+RSP: 0018:ffffc90001c7b9f0 EFLAGS: 00010206
+RAX: ffff88822df3aa80 RBX: ffff88823143d5c0 RCX: 0000000000000002
+RDX: ffff88823143d5f8 RSI: ffff88822b1fabc0 RDI: ffff88823143d5c0
+RBP: ffffc90001c7b9f8 R08: 0000000000000000 R09: 0000000000000001
+R10: 0000000000000000 R11: 0000000000000000 R12: 00000000fffffff4
+R13: ffff88822dea4f50 R14: ffff88823143d7c0 R15: 00000000fffffff4
+FS: 00007ff52e999540(0000) GS:ffff888237a00000(0000) knlGS:0000000000000000
+CS: 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007fdc06dba768 CR3: 000000023160a000 CR4: 00000000000006f0
+Call Trace:
+ hwsim_add_one+0x2dd/0x540 [mac802154_hwsim]
+ hwsim_probe+0x2f/0xb0 [mac802154_hwsim]
+ platform_drv_probe+0x3a/0x90
+ ? driver_sysfs_add+0x79/0xb0
+ really_probe+0x1d4/0x2d0
+ driver_probe_device+0x50/0xf0
+ device_driver_attach+0x54/0x60
+ __driver_attach+0x7e/0xd0
+ ? device_driver_attach+0x60/0x60
+ bus_for_each_dev+0x68/0xc0
+ driver_attach+0x19/0x20
+ bus_add_driver+0x15e/0x200
+ driver_register+0x5b/0xf0
+ __platform_driver_register+0x31/0x40
+ hwsim_init_module+0x74/0x1000 [mac802154_hwsim]
+ ? 0xffffffffa00e9000
+ do_one_initcall+0x6c/0x3cc
+ ? kmem_cache_alloc_trace+0x248/0x3b0
+ do_init_module+0x5b/0x1f1
+ load_module+0x1db1/0x2690
+ ? m_show+0x1d0/0x1d0
+ __do_sys_finit_module+0xc5/0xd0
+ __x64_sys_finit_module+0x15/0x20
+ do_syscall_64+0x6b/0x1d0
+ entry_SYSCALL_64_after_hwframe+0x49/0xbe
+RIP: 0033:0x7ff52e4a2839
+Code: 00 f3 c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d 1f f6 2c 00 f7 d8 64 89 01 48
+RSP: 002b:00007ffffa7b3c08 EFLAGS: 00000246 ORIG_RAX: 0000000000000139
+RAX: ffffffffffffffda RBX: 00005647560a2a00 RCX: 00007ff52e4a2839
+RDX: 0000000000000000 RSI: 00005647547f3c2e RDI: 0000000000000003
+RBP: 00005647547f3c2e R08: 0000000000000000 R09: 00005647560a2a00
+R10: 0000000000000003 R11: 0000000000000246 R12: 0000000000000000
+R13: 00005647560a2c10 R14: 0000000000040000 R15: 00005647560a2a00
+Modules linked in: mac802154_hwsim(+) mac802154 [last unloaded: mac802154_hwsim]
+
+In hwsim_add_one, if hwsim_subscribe_all_others fails, we
+should call ieee802154_unregister_hw to free resources.
+
+Reported-by: Hulk Robot <hulkci@huawei.com>
+Fixes: f25da51fdc38 ("ieee802154: hwsim: add replacement for fakelb")
+Signed-off-by: YueHaibing <yuehaibing@huawei.com>
+---
+ drivers/net/ieee802154/mac802154_hwsim.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/ieee802154/mac802154_hwsim.c b/drivers/net/ieee802154/mac802154_hwsim.c
+index c2b6ffb..3d9ffd2 100644
+--- a/drivers/net/ieee802154/mac802154_hwsim.c
++++ b/drivers/net/ieee802154/mac802154_hwsim.c
+@@ -813,7 +813,7 @@ static int hwsim_add_one(struct genl_info *info, struct device *dev,
+ 		err = hwsim_subscribe_all_others(phy);
+ 		if (err < 0) {
+ 			mutex_unlock(&hwsim_phys_lock);
+-			goto err_reg;
++			goto err_subscribe;
+ 		}
+ 	}
+ 	list_add_tail(&phy->list, &hwsim_phys);
+@@ -823,6 +823,8 @@ static int hwsim_add_one(struct genl_info *info, struct device *dev,
+ 
+ 	return idx;
+ 
++err_subscribe:
++	ieee802154_unregister_hw(phy->hw);
+ err_reg:
+ 	kfree(pib);
+ err_pib:
+-- 
+2.7.0
