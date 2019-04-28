@@ -1,73 +1,111 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from proxima.lasnet.de ([78.47.171.185]:57539 "EHLO
-        proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726129AbfD3KYI (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 30 Apr 2019 06:24:08 -0400
-Subject: Re: pull-request: ieee802154 for net 2019-04-25
-References: <20190425160311.19767-1-stefan@datenfreihafen.org>
- <20190429.182109.2278488103649846421.davem@davemloft.net>
-From: Stefan Schmidt <stefan@datenfreihafen.org>
-Message-ID: <04de2423-65bb-debc-2a8f-addb401b006d@datenfreihafen.org>
-Date: Tue, 30 Apr 2019 12:24:05 +0200
+Received: from szxga05-in.huawei.com ([45.249.212.191]:7702 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726638AbfD1OPy (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+        Sun, 28 Apr 2019 10:15:54 -0400
+From: Yue Haibing <yuehaibing@huawei.com>
+Subject: [PATCH] ieee802154: hwsim: Fix error handle path in hwsim_init_module
+Date: Sun, 28 Apr 2019 22:14:51 +0800
+Message-ID: <20190428141451.32956-1-yuehaibing@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20190429.182109.2278488103649846421.davem@davemloft.net>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: David Miller <davem@davemloft.net>
-Cc: linux-wpan@vger.kernel.org, alex.aring@gmail.com, netdev@vger.kernel.org
+To: alex.aring@gmail.com, stefan@datenfreihafen.org, davem@davemloft.net
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, linux-wpan@vger.kernel.org, YueHaibing <yuehaibing@huawei.com>
 
-Hello Dave.
+From: YueHaibing <yuehaibing@huawei.com>
 
-On 30.04.19 00:21, David Miller wrote:
-> From: Stefan Schmidt <stefan@datenfreihafen.org>
-> Date: Thu, 25 Apr 2019 18:03:11 +0200
-> 
->> An update from ieee802154 for your *net* tree.
->>
->> Another fix from Kangjie Lu to ensure better checking regmap updates in the
->> mcr20a driver. Nothing else I have pending for the final release.
->>
->> If there are any problems let me know.
-> 
-> Pulled, thanks Stefan.
-> 
->> During the preparation of this pull request a workflow question on
->> my side came up and wonder if you (or some subsystem maintainer
->> sending you pull requests) does have a comment on this. The
->> ieee802154 subsystem has a low activity in the number of patches
->> coming through it. I still wanted to pull from your net tree
->> regularly to test if changes have implications to it. During this
->> pulls I often end up with merge of the remote tracking branch. Which
->> in the end could mean that I would have something like 3-4 merge
->> commits in my tree with only one actual patch I want to send over to
->> you. Feels and looks kind of silly to be honest.
->>
->> How do other handle this? Just merge once every rc? Merge just
->> before sending a pull request? Never merge, wait for Dave to pull
->> and merge and do a pull of his tree directly afterwards?
-> 
-> I would say never pull from the net tree until right after I pull your
-> tree and thus you can do a clean fast-forward merge.
+KASAN report this:
 
-Thanks, I will try to work like this. Normally there should be no
-overlap on ieee802154 patches I get that would need a newer pull from
-net. Seems I was to eager to always work against your latest. :-)
+BUG: unable to handle kernel paging request at fffffbfff834f001
+PGD 237fe8067 P4D 237fe8067 PUD 237e64067 PMD 1c968d067 PTE 0
+Oops: 0000 [#1] SMP KASAN PTI
+CPU: 1 PID: 8871 Comm: syz-executor.0 Tainted: G         C        5.0.0+ #5
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.10.2-1ubuntu1 04/01/2014
+RIP: 0010:strcmp+0x31/0xa0 lib/string.c:328
+Code: 00 00 00 00 fc ff df 55 53 48 83 ec 08 eb 0a 84 db 48 89 ef 74 5a 4c 89 e6 48 89 f8 48 89 fa 48 8d 6f 01 48 c1 e8 03 83 e2 07 <42> 0f b6 04 28 38 d0 7f 04 84 c0 75 50 48 89 f0 48 89 f2 0f b6 5d
+RSP: 0018:ffff8881e0c57800 EFLAGS: 00010246
+RAX: 1ffffffff834f001 RBX: ffffffffc1a78000 RCX: ffffffff827b9503
+RDX: 0000000000000000 RSI: ffffffffc1a40008 RDI: ffffffffc1a78008
+RBP: ffffffffc1a78009 R08: fffffbfff6a92195 R09: fffffbfff6a92195
+R10: ffff8881e0c578b8 R11: fffffbfff6a92194 R12: ffffffffc1a40008
+R13: dffffc0000000000 R14: ffffffffc1a3e470 R15: ffffffffc1a40000
+FS:  00007fdcc02ff700(0000) GS:ffff8881f7300000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: fffffbfff834f001 CR3: 00000001b3134003 CR4: 00000000007606e0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+PKRU: 55555554
+Call Trace:
+ genl_family_find_byname+0x7f/0xf0 net/netlink/genetlink.c:104
+ genl_register_family+0x1e1/0x1070 net/netlink/genetlink.c:333
+ ? 0xffffffffc1978000
+ hwsim_init_module+0x6a/0x1000 [mac802154_hwsim]
+ ? 0xffffffffc1978000
+ ? 0xffffffffc1978000
+ ? 0xffffffffc1978000
+ do_one_initcall+0xbc/0x47d init/main.c:887
+ do_init_module+0x1b5/0x547 kernel/module.c:3456
+ load_module+0x6405/0x8c10 kernel/module.c:3804
+ __do_sys_finit_module+0x162/0x190 kernel/module.c:3898
+ do_syscall_64+0x9f/0x450 arch/x86/entry/common.c:290
+ entry_SYSCALL_64_after_hwframe+0x49/0xbe
+RIP: 0033:0x462e99
+Code: f7 d8 64 89 02 b8 ff ff ff ff c3 66 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 bc ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fdcc02fec58 EFLAGS: 00000246 ORIG_RAX: 0000000000000139
+RAX: ffffffffffffffda RBX: 000000000073bf00 RCX: 0000000000462e99
+RDX: 0000000000000000 RSI: 0000000020000200 RDI: 0000000000000003
+RBP: 00007fdcc02fec70 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 00007fdcc02ff6bc
+R13: 00000000004bcefa R14: 00000000006f6fb0 R15: 0000000000000004
+Modules linked in: mac802154_hwsim(+) mac802154 ieee802154 speakup(C) rc_proteus_2309 rtc_rk808 streebog_generic rds vboxguest madera_spi madera da9052_wdt mISDN_core ueagle_atm usbatm atm ir_imon_decoder scsi_transport_sas rc_dntv_live_dvb_t panel_samsung_s6d16d0 drm drm_panel_orientation_quirks lib80211 fb_agm1264k_fl(C) gspca_pac7302 gspca_main videobuf2_v4l2 soundwire_intel_init i2c_dln2 dln2 usbcore hid_gaff 88pm8607 nfnetlink axp20x_i2c axp20x uio pata_marvell pmbus_core snd_sonicvibes gameport snd_pcm snd_opl3_lib snd_timer snd_hwdep snd_mpu401_uart snd_rawmidi snd_seq_device snd soundcore rtc_ds1511 rtc_ds1742 vsock dwc_xlgmac rtc_rx8010 libphy twofish_x86_64_3way twofish_x86_64 twofish_common ad5696_i2c ad5686 lp8788_charger cxd2880_spi dvb_core videobuf2_common videodev media videobuf2_vmalloc videobuf2_memops fbtft(C) sysimgblt sysfillrect syscopyarea fb_sys_fops janz_ican3 firewire_net firewire_core crc_itu_t spi_slave_system_control i2c_matroxfb i2c_algo_bit
+ matroxfb_base fb fbdev matroxfb_DAC1064 matroxfb_accel cfbcopyarea cfbimgblt cfbfillrect matroxfb_Ti3026 matroxfb_g450 g450_pll matroxfb_misc leds_blinkm ti_dac7311 intel_spi_pci intel_spi spi_nor hid_elan hid async_tx rc_cinergy_1400 rc_core intel_ishtp kxcjk_1013 industrialio_triggered_buffer kfifo_buf can_dev intel_th spi_pxa2xx_platform pata_artop vme_ca91cx42 gb_gbphy(C) greybus(C) industrialio mptbase st_drv cmac ttpci_eeprom via_wdt gpio_xra1403 mtd iptable_security iptable_raw iptable_mangle iptable_nat nf_nat nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 iptable_filter bpfilter ip6_vti ip_vti ip_gre ipip sit tunnel4 ip_tunnel hsr veth netdevsim vxcan batman_adv cfg80211 rfkill chnl_net caif nlmon dummy team bonding vcan bridge stp llc ip6_gre gre ip6_tunnel tunnel6 tun joydev mousedev ppdev kvm_intel kvm irqbypass crct10dif_pclmul crc32_pclmul crc32c_intel ghash_clmulni_intel aesni_intel aes_x86_64 input_leds crypto_simd cryptd glue_helper ide_pci_generic piix psmouse
+ ide_core serio_raw ata_generic i2c_piix4 pata_acpi parport_pc parport floppy rtc_cmos intel_agp intel_gtt agpgart sch_fq_codel ip_tables x_tables sha1_ssse3 sha1_generic ipv6 [last unloaded: speakup]
+Dumping ftrace buffer:
+   (ftrace buffer empty)
+CR2: fffffbfff834f001
+---[ end trace 5aa772c793e0e971 ]---
+RIP: 0010:strcmp+0x31/0xa0 lib/string.c:328
+Code: 00 00 00 00 fc ff df 55 53 48 83 ec 08 eb 0a 84 db 48 89 ef 74 5a 4c 89 e6 48 89 f8 48 89 fa 48 8d 6f 01 48 c1 e8 03 83 e2 07 <42> 0f b6 04 28 38 d0 7f 04 84 c0 75 50 48 89 f0 48 89 f2 0f b6 5d
+RSP: 0018:ffff8881e0c57800 EFLAGS: 00010246
+RAX: 1ffffffff834f001 RBX: ffffffffc1a78000 RCX: ffffffff827b9503
+RDX: 0000000000000000 RSI: ffffffffc1a40008 RDI: ffffffffc1a78008
+RBP: ffffffffc1a78009 R08: fffffbfff6a92195 R09: fffffbfff6a92195
+R10: ffff8881e0c578b8 R11: fffffbfff6a92194 R12: ffffffffc1a40008
+R13: dffffc0000000000 R14: ffffffffc1a3e470 R15: ffffffffc1a40000
+FS:  00007fdcc02ff700(0000) GS:ffff8881f7300000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: fffffbfff834f001 CR3: 00000001b3134003 CR4: 00000000007606e0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+PKRU: 55555554
 
-I pulled now after your merge of my request and will do again after the
-next. Will see how it will work out for me.
+The error handing path misplace the cleanup in hwsim_init_module,
+switch the two cleanup functions to fix above issues.
 
-> If you want to test, right before you send me a pull request do a test
-> pull into a local throw-away branch.
+Reported-by: Hulk Robot <hulkci@huawei.com>
+Fixes: f25da51fdc38 ("ieee802154: hwsim: add replacement for fakelb")
+Signed-off-by: YueHaibing <yuehaibing@huawei.com>
+---
+ drivers/net/ieee802154/mac802154_hwsim.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-That is what I have been doing so far.
-
-> Otherwise I'll handle conflicts and merge issues.
-
-Thanks. When I see a merge conflict in my pre-pull-request testing I
-will include my merge result in the pull request.
-
-regards
-Stefan Schmidt
+diff --git a/drivers/net/ieee802154/mac802154_hwsim.c b/drivers/net/ieee802154/mac802154_hwsim.c
+index 3b88846..c2b6ffb 100644
+--- a/drivers/net/ieee802154/mac802154_hwsim.c
++++ b/drivers/net/ieee802154/mac802154_hwsim.c
+@@ -912,9 +912,9 @@ static __init int hwsim_init_module(void)
+ 	return 0;
+ 
+ platform_drv:
+-	genl_unregister_family(&hwsim_genl_family);
+-platform_dev:
+ 	platform_device_unregister(mac802154hwsim_dev);
++platform_dev:
++	genl_unregister_family(&hwsim_genl_family);
+ 	return rc;
+ }
+ 
+-- 
+2.7.0
