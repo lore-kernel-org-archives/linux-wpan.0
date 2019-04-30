@@ -1,111 +1,153 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from szxga05-in.huawei.com ([45.249.212.191]:7702 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726638AbfD1OPy (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-        Sun, 28 Apr 2019 10:15:54 -0400
-From: Yue Haibing <yuehaibing@huawei.com>
-Subject: [PATCH] ieee802154: hwsim: Fix error handle path in hwsim_init_module
-Date: Sun, 28 Apr 2019 22:14:51 +0800
-Message-ID: <20190428141451.32956-1-yuehaibing@huawei.com>
+Received: from proxima.lasnet.de ([78.47.171.185]:57533 "EHLO
+        proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726145AbfD3KT3 (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 30 Apr 2019 06:19:29 -0400
+Subject: Re: [PATCH] ieee802154: hwsim: Fix error handle path in
+ hwsim_init_module
+References: <20190428141451.32956-1-yuehaibing@huawei.com>
+From: Stefan Schmidt <stefan@datenfreihafen.org>
+Message-ID: <276a3533-19f3-a5f6-c61e-3ebbb4ef6600@datenfreihafen.org>
+Date: Tue, 30 Apr 2019 12:19:25 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20190428141451.32956-1-yuehaibing@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: base64
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: alex.aring@gmail.com, stefan@datenfreihafen.org, davem@davemloft.net
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, linux-wpan@vger.kernel.org, YueHaibing <yuehaibing@huawei.com>
+To: Yue Haibing <yuehaibing@huawei.com>, alex.aring@gmail.com, davem@davemloft.net
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, linux-wpan@vger.kernel.org
 
-From: YueHaibing <yuehaibing@huawei.com>
-
-KASAN report this:
-
-BUG: unable to handle kernel paging request at fffffbfff834f001
-PGD 237fe8067 P4D 237fe8067 PUD 237e64067 PMD 1c968d067 PTE 0
-Oops: 0000 [#1] SMP KASAN PTI
-CPU: 1 PID: 8871 Comm: syz-executor.0 Tainted: G         C        5.0.0+ #5
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.10.2-1ubuntu1 04/01/2014
-RIP: 0010:strcmp+0x31/0xa0 lib/string.c:328
-Code: 00 00 00 00 fc ff df 55 53 48 83 ec 08 eb 0a 84 db 48 89 ef 74 5a 4c 89 e6 48 89 f8 48 89 fa 48 8d 6f 01 48 c1 e8 03 83 e2 07 <42> 0f b6 04 28 38 d0 7f 04 84 c0 75 50 48 89 f0 48 89 f2 0f b6 5d
-RSP: 0018:ffff8881e0c57800 EFLAGS: 00010246
-RAX: 1ffffffff834f001 RBX: ffffffffc1a78000 RCX: ffffffff827b9503
-RDX: 0000000000000000 RSI: ffffffffc1a40008 RDI: ffffffffc1a78008
-RBP: ffffffffc1a78009 R08: fffffbfff6a92195 R09: fffffbfff6a92195
-R10: ffff8881e0c578b8 R11: fffffbfff6a92194 R12: ffffffffc1a40008
-R13: dffffc0000000000 R14: ffffffffc1a3e470 R15: ffffffffc1a40000
-FS:  00007fdcc02ff700(0000) GS:ffff8881f7300000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: fffffbfff834f001 CR3: 00000001b3134003 CR4: 00000000007606e0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-PKRU: 55555554
-Call Trace:
- genl_family_find_byname+0x7f/0xf0 net/netlink/genetlink.c:104
- genl_register_family+0x1e1/0x1070 net/netlink/genetlink.c:333
- ? 0xffffffffc1978000
- hwsim_init_module+0x6a/0x1000 [mac802154_hwsim]
- ? 0xffffffffc1978000
- ? 0xffffffffc1978000
- ? 0xffffffffc1978000
- do_one_initcall+0xbc/0x47d init/main.c:887
- do_init_module+0x1b5/0x547 kernel/module.c:3456
- load_module+0x6405/0x8c10 kernel/module.c:3804
- __do_sys_finit_module+0x162/0x190 kernel/module.c:3898
- do_syscall_64+0x9f/0x450 arch/x86/entry/common.c:290
- entry_SYSCALL_64_after_hwframe+0x49/0xbe
-RIP: 0033:0x462e99
-Code: f7 d8 64 89 02 b8 ff ff ff ff c3 66 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 bc ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fdcc02fec58 EFLAGS: 00000246 ORIG_RAX: 0000000000000139
-RAX: ffffffffffffffda RBX: 000000000073bf00 RCX: 0000000000462e99
-RDX: 0000000000000000 RSI: 0000000020000200 RDI: 0000000000000003
-RBP: 00007fdcc02fec70 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 00007fdcc02ff6bc
-R13: 00000000004bcefa R14: 00000000006f6fb0 R15: 0000000000000004
-Modules linked in: mac802154_hwsim(+) mac802154 ieee802154 speakup(C) rc_proteus_2309 rtc_rk808 streebog_generic rds vboxguest madera_spi madera da9052_wdt mISDN_core ueagle_atm usbatm atm ir_imon_decoder scsi_transport_sas rc_dntv_live_dvb_t panel_samsung_s6d16d0 drm drm_panel_orientation_quirks lib80211 fb_agm1264k_fl(C) gspca_pac7302 gspca_main videobuf2_v4l2 soundwire_intel_init i2c_dln2 dln2 usbcore hid_gaff 88pm8607 nfnetlink axp20x_i2c axp20x uio pata_marvell pmbus_core snd_sonicvibes gameport snd_pcm snd_opl3_lib snd_timer snd_hwdep snd_mpu401_uart snd_rawmidi snd_seq_device snd soundcore rtc_ds1511 rtc_ds1742 vsock dwc_xlgmac rtc_rx8010 libphy twofish_x86_64_3way twofish_x86_64 twofish_common ad5696_i2c ad5686 lp8788_charger cxd2880_spi dvb_core videobuf2_common videodev media videobuf2_vmalloc videobuf2_memops fbtft(C) sysimgblt sysfillrect syscopyarea fb_sys_fops janz_ican3 firewire_net firewire_core crc_itu_t spi_slave_system_control i2c_matroxfb i2c_algo_bit
- matroxfb_base fb fbdev matroxfb_DAC1064 matroxfb_accel cfbcopyarea cfbimgblt cfbfillrect matroxfb_Ti3026 matroxfb_g450 g450_pll matroxfb_misc leds_blinkm ti_dac7311 intel_spi_pci intel_spi spi_nor hid_elan hid async_tx rc_cinergy_1400 rc_core intel_ishtp kxcjk_1013 industrialio_triggered_buffer kfifo_buf can_dev intel_th spi_pxa2xx_platform pata_artop vme_ca91cx42 gb_gbphy(C) greybus(C) industrialio mptbase st_drv cmac ttpci_eeprom via_wdt gpio_xra1403 mtd iptable_security iptable_raw iptable_mangle iptable_nat nf_nat nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 iptable_filter bpfilter ip6_vti ip_vti ip_gre ipip sit tunnel4 ip_tunnel hsr veth netdevsim vxcan batman_adv cfg80211 rfkill chnl_net caif nlmon dummy team bonding vcan bridge stp llc ip6_gre gre ip6_tunnel tunnel6 tun joydev mousedev ppdev kvm_intel kvm irqbypass crct10dif_pclmul crc32_pclmul crc32c_intel ghash_clmulni_intel aesni_intel aes_x86_64 input_leds crypto_simd cryptd glue_helper ide_pci_generic piix psmouse
- ide_core serio_raw ata_generic i2c_piix4 pata_acpi parport_pc parport floppy rtc_cmos intel_agp intel_gtt agpgart sch_fq_codel ip_tables x_tables sha1_ssse3 sha1_generic ipv6 [last unloaded: speakup]
-Dumping ftrace buffer:
-   (ftrace buffer empty)
-CR2: fffffbfff834f001
----[ end trace 5aa772c793e0e971 ]---
-RIP: 0010:strcmp+0x31/0xa0 lib/string.c:328
-Code: 00 00 00 00 fc ff df 55 53 48 83 ec 08 eb 0a 84 db 48 89 ef 74 5a 4c 89 e6 48 89 f8 48 89 fa 48 8d 6f 01 48 c1 e8 03 83 e2 07 <42> 0f b6 04 28 38 d0 7f 04 84 c0 75 50 48 89 f0 48 89 f2 0f b6 5d
-RSP: 0018:ffff8881e0c57800 EFLAGS: 00010246
-RAX: 1ffffffff834f001 RBX: ffffffffc1a78000 RCX: ffffffff827b9503
-RDX: 0000000000000000 RSI: ffffffffc1a40008 RDI: ffffffffc1a78008
-RBP: ffffffffc1a78009 R08: fffffbfff6a92195 R09: fffffbfff6a92195
-R10: ffff8881e0c578b8 R11: fffffbfff6a92194 R12: ffffffffc1a40008
-R13: dffffc0000000000 R14: ffffffffc1a3e470 R15: ffffffffc1a40000
-FS:  00007fdcc02ff700(0000) GS:ffff8881f7300000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: fffffbfff834f001 CR3: 00000001b3134003 CR4: 00000000007606e0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-PKRU: 55555554
-
-The error handing path misplace the cleanup in hwsim_init_module,
-switch the two cleanup functions to fix above issues.
-
-Reported-by: Hulk Robot <hulkci@huawei.com>
-Fixes: f25da51fdc38 ("ieee802154: hwsim: add replacement for fakelb")
-Signed-off-by: YueHaibing <yuehaibing@huawei.com>
----
- drivers/net/ieee802154/mac802154_hwsim.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ieee802154/mac802154_hwsim.c b/drivers/net/ieee802154/mac802154_hwsim.c
-index 3b88846..c2b6ffb 100644
---- a/drivers/net/ieee802154/mac802154_hwsim.c
-+++ b/drivers/net/ieee802154/mac802154_hwsim.c
-@@ -912,9 +912,9 @@ static __init int hwsim_init_module(void)
- 	return 0;
- 
- platform_drv:
--	genl_unregister_family(&hwsim_genl_family);
--platform_dev:
- 	platform_device_unregister(mac802154hwsim_dev);
-+platform_dev:
-+	genl_unregister_family(&hwsim_genl_family);
- 	return rc;
- }
- 
--- 
-2.7.0
+SGVsbG8gQWxleC4NCg0KDQpPbiAyOC4wNC4xOSAxNjoxNCwgWXVlIEhhaWJpbmcgd3JvdGU6
+DQo+IEZyb206IFl1ZUhhaWJpbmcgPHl1ZWhhaWJpbmdAaHVhd2VpLmNvbT4NCj4gDQo+IEtB
+U0FOIHJlcG9ydCB0aGlzOg0KPiANCj4gQlVHOiB1bmFibGUgdG8gaGFuZGxlIGtlcm5lbCBw
+YWdpbmcgcmVxdWVzdCBhdCBmZmZmZmJmZmY4MzRmMDAxDQo+IFBHRCAyMzdmZTgwNjcgUDRE
+IDIzN2ZlODA2NyBQVUQgMjM3ZTY0MDY3IFBNRCAxYzk2OGQwNjcgUFRFIDANCj4gT29wczog
+MDAwMCBbIzFdIFNNUCBLQVNBTiBQVEkNCj4gQ1BVOiAxIFBJRDogODg3MSBDb21tOiBzeXot
+ZXhlY3V0b3IuMCBUYWludGVkOiBHICAgICAgICAgQyAgICAgICAgNS4wLjArICM1DQo+IEhh
+cmR3YXJlIG5hbWU6IFFFTVUgU3RhbmRhcmQgUEMgKGk0NDBGWCArIFBJSVgsIDE5OTYpLCBC
+SU9TIDEuMTAuMi0xdWJ1bnR1MSAwNC8wMS8yMDE0DQo+IFJJUDogMDAxMDpzdHJjbXArMHgz
+MS8weGEwIGxpYi9zdHJpbmcuYzozMjgNCj4gQ29kZTogMDAgMDAgMDAgMDAgZmMgZmYgZGYg
+NTUgNTMgNDggODMgZWMgMDggZWIgMGEgODQgZGIgNDggODkgZWYgNzQgNWEgNGMgODkgZTYg
+NDggODkgZjggNDggODkgZmEgNDggOGQgNmYgMDEgNDggYzEgZTggMDMgODMgZTIgMDcgPDQy
+PiAwZiBiNiAwNCAyOCAzOCBkMCA3ZiAwNCA4NCBjMCA3NSA1MCA0OCA4OSBmMCA0OCA4OSBm
+MiAwZiBiNiA1ZA0KPiBSU1A6IDAwMTg6ZmZmZjg4ODFlMGM1NzgwMCBFRkxBR1M6IDAwMDEw
+MjQ2DQo+IFJBWDogMWZmZmZmZmZmODM0ZjAwMSBSQlg6IGZmZmZmZmZmYzFhNzgwMDAgUkNY
+OiBmZmZmZmZmZjgyN2I5NTAzDQo+IFJEWDogMDAwMDAwMDAwMDAwMDAwMCBSU0k6IGZmZmZm
+ZmZmYzFhNDAwMDggUkRJOiBmZmZmZmZmZmMxYTc4MDA4DQo+IFJCUDogZmZmZmZmZmZjMWE3
+ODAwOSBSMDg6IGZmZmZmYmZmZjZhOTIxOTUgUjA5OiBmZmZmZmJmZmY2YTkyMTk1DQo+IFIx
+MDogZmZmZjg4ODFlMGM1NzhiOCBSMTE6IGZmZmZmYmZmZjZhOTIxOTQgUjEyOiBmZmZmZmZm
+ZmMxYTQwMDA4DQo+IFIxMzogZGZmZmZjMDAwMDAwMDAwMCBSMTQ6IGZmZmZmZmZmYzFhM2U0
+NzAgUjE1OiBmZmZmZmZmZmMxYTQwMDAwDQo+IEZTOiAgMDAwMDdmZGNjMDJmZjcwMCgwMDAw
+KSBHUzpmZmZmODg4MWY3MzAwMDAwKDAwMDApIGtubEdTOjAwMDAwMDAwMDAwMDAwMDANCj4g
+Q1M6ICAwMDEwIERTOiAwMDAwIEVTOiAwMDAwIENSMDogMDAwMDAwMDA4MDA1MDAzMw0KPiBD
+UjI6IGZmZmZmYmZmZjgzNGYwMDEgQ1IzOiAwMDAwMDAwMWIzMTM0MDAzIENSNDogMDAwMDAw
+MDAwMDc2MDZlMA0KPiBEUjA6IDAwMDAwMDAwMDAwMDAwMDAgRFIxOiAwMDAwMDAwMDAwMDAw
+MDAwIERSMjogMDAwMDAwMDAwMDAwMDAwMA0KPiBEUjM6IDAwMDAwMDAwMDAwMDAwMDAgRFI2
+OiAwMDAwMDAwMGZmZmUwZmYwIERSNzogMDAwMDAwMDAwMDAwMDQwMA0KPiBQS1JVOiA1NTU1
+NTU1NA0KPiBDYWxsIFRyYWNlOg0KPiAgZ2VubF9mYW1pbHlfZmluZF9ieW5hbWUrMHg3Zi8w
+eGYwIG5ldC9uZXRsaW5rL2dlbmV0bGluay5jOjEwNA0KPiAgZ2VubF9yZWdpc3Rlcl9mYW1p
+bHkrMHgxZTEvMHgxMDcwIG5ldC9uZXRsaW5rL2dlbmV0bGluay5jOjMzMw0KPiAgPyAweGZm
+ZmZmZmZmYzE5NzgwMDANCj4gIGh3c2ltX2luaXRfbW9kdWxlKzB4NmEvMHgxMDAwIFttYWM4
+MDIxNTRfaHdzaW1dDQo+ICA/IDB4ZmZmZmZmZmZjMTk3ODAwMA0KPiAgPyAweGZmZmZmZmZm
+YzE5NzgwMDANCj4gID8gMHhmZmZmZmZmZmMxOTc4MDAwDQo+ICBkb19vbmVfaW5pdGNhbGwr
+MHhiYy8weDQ3ZCBpbml0L21haW4uYzo4ODcNCj4gIGRvX2luaXRfbW9kdWxlKzB4MWI1LzB4
+NTQ3IGtlcm5lbC9tb2R1bGUuYzozNDU2DQo+ICBsb2FkX21vZHVsZSsweDY0MDUvMHg4YzEw
+IGtlcm5lbC9tb2R1bGUuYzozODA0DQo+ICBfX2RvX3N5c19maW5pdF9tb2R1bGUrMHgxNjIv
+MHgxOTAga2VybmVsL21vZHVsZS5jOjM4OTgNCj4gIGRvX3N5c2NhbGxfNjQrMHg5Zi8weDQ1
+MCBhcmNoL3g4Ni9lbnRyeS9jb21tb24uYzoyOTANCj4gIGVudHJ5X1NZU0NBTExfNjRfYWZ0
+ZXJfaHdmcmFtZSsweDQ5LzB4YmUNCj4gUklQOiAwMDMzOjB4NDYyZTk5DQo+IENvZGU6IGY3
+IGQ4IDY0IDg5IDAyIGI4IGZmIGZmIGZmIGZmIGMzIDY2IDBmIDFmIDQ0IDAwIDAwIDQ4IDg5
+IGY4IDQ4IDg5IGY3IDQ4IDg5IGQ2IDQ4IDg5IGNhIDRkIDg5IGMyIDRkIDg5IGM4IDRjIDhi
+IDRjIDI0IDA4IDBmIDA1IDw0OD4gM2QgMDEgZjAgZmYgZmYgNzMgMDEgYzMgNDggYzcgYzEg
+YmMgZmYgZmYgZmYgZjcgZDggNjQgODkgMDEgNDgNCj4gUlNQOiAwMDJiOjAwMDA3ZmRjYzAy
+ZmVjNTggRUZMQUdTOiAwMDAwMDI0NiBPUklHX1JBWDogMDAwMDAwMDAwMDAwMDEzOQ0KPiBS
+QVg6IGZmZmZmZmZmZmZmZmZmZGEgUkJYOiAwMDAwMDAwMDAwNzNiZjAwIFJDWDogMDAwMDAw
+MDAwMDQ2MmU5OQ0KPiBSRFg6IDAwMDAwMDAwMDAwMDAwMDAgUlNJOiAwMDAwMDAwMDIwMDAw
+MjAwIFJESTogMDAwMDAwMDAwMDAwMDAwMw0KPiBSQlA6IDAwMDA3ZmRjYzAyZmVjNzAgUjA4
+OiAwMDAwMDAwMDAwMDAwMDAwIFIwOTogMDAwMDAwMDAwMDAwMDAwMA0KPiBSMTA6IDAwMDAw
+MDAwMDAwMDAwMDAgUjExOiAwMDAwMDAwMDAwMDAwMjQ2IFIxMjogMDAwMDdmZGNjMDJmZjZi
+Yw0KPiBSMTM6IDAwMDAwMDAwMDA0YmNlZmEgUjE0OiAwMDAwMDAwMDAwNmY2ZmIwIFIxNTog
+MDAwMDAwMDAwMDAwMDAwNA0KPiBNb2R1bGVzIGxpbmtlZCBpbjogbWFjODAyMTU0X2h3c2lt
+KCspIG1hYzgwMjE1NCBpZWVlODAyMTU0IHNwZWFrdXAoQykgcmNfcHJvdGV1c18yMzA5IHJ0
+Y19yazgwOCBzdHJlZWJvZ19nZW5lcmljIHJkcyB2Ym94Z3Vlc3QgbWFkZXJhX3NwaSBtYWRl
+cmEgZGE5MDUyX3dkdCBtSVNETl9jb3JlIHVlYWdsZV9hdG0gdXNiYXRtIGF0bSBpcl9pbW9u
+X2RlY29kZXIgc2NzaV90cmFuc3BvcnRfc2FzIHJjX2RudHZfbGl2ZV9kdmJfdCBwYW5lbF9z
+YW1zdW5nX3M2ZDE2ZDAgZHJtIGRybV9wYW5lbF9vcmllbnRhdGlvbl9xdWlya3MgbGliODAy
+MTEgZmJfYWdtMTI2NGtfZmwoQykgZ3NwY2FfcGFjNzMwMiBnc3BjYV9tYWluIHZpZGVvYnVm
+Ml92NGwyIHNvdW5kd2lyZV9pbnRlbF9pbml0IGkyY19kbG4yIGRsbjIgdXNiY29yZSBoaWRf
+Z2FmZiA4OHBtODYwNyBuZm5ldGxpbmsgYXhwMjB4X2kyYyBheHAyMHggdWlvIHBhdGFfbWFy
+dmVsbCBwbWJ1c19jb3JlIHNuZF9zb25pY3ZpYmVzIGdhbWVwb3J0IHNuZF9wY20gc25kX29w
+bDNfbGliIHNuZF90aW1lciBzbmRfaHdkZXAgc25kX21wdTQwMV91YXJ0IHNuZF9yYXdtaWRp
+IHNuZF9zZXFfZGV2aWNlIHNuZCBzb3VuZGNvcmUgcnRjX2RzMTUxMSBydGNfZHMxNzQyIHZz
+b2NrIGR3Y194bGdtYWMgcnRjX3J4ODAxMCBsaWJwaHkgdHdvZmlzaF94ODZfNjRfM3dheSB0
+d29maXNoX3g4Nl82NCB0d29maXNoX2NvbW1vbiBhZDU2OTZfaTJjIGFkNTY4NiBscDg3ODhf
+Y2hhcmdlciBjeGQyODgwX3NwaSBkdmJfY29yZSB2aWRlb2J1ZjJfY29tbW9uIHZpZGVvZGV2
+IG1lZGlhIHZpZGVvYnVmMl92bWFsbG9jIHZpZGVvYnVmMl9tZW1vcHMgZmJ0ZnQoQykgc3lz
+aW1nYmx0IHN5c2ZpbGxyZWN0IHN5c2NvcHlhcmVhIGZiX3N5c19mb3BzIGphbnpfaWNhbjMg
+ZmlyZXdpcmVfbmV0IGZpcmV3aXJlX2NvcmUgY3JjX2l0dV90IHNwaV9zbGF2ZV9zeXN0ZW1f
+Y29udHJvbCBpMmNfbWF0cm94ZmIgaTJjX2FsZ29fYml0DQo+ICBtYXRyb3hmYl9iYXNlIGZi
+IGZiZGV2IG1hdHJveGZiX0RBQzEwNjQgbWF0cm94ZmJfYWNjZWwgY2ZiY29weWFyZWEgY2Zi
+aW1nYmx0IGNmYmZpbGxyZWN0IG1hdHJveGZiX1RpMzAyNiBtYXRyb3hmYl9nNDUwIGc0NTBf
+cGxsIG1hdHJveGZiX21pc2MgbGVkc19ibGlua20gdGlfZGFjNzMxMSBpbnRlbF9zcGlfcGNp
+IGludGVsX3NwaSBzcGlfbm9yIGhpZF9lbGFuIGhpZCBhc3luY190eCByY19jaW5lcmd5XzE0
+MDAgcmNfY29yZSBpbnRlbF9pc2h0cCBreGNqa18xMDEzIGluZHVzdHJpYWxpb190cmlnZ2Vy
+ZWRfYnVmZmVyIGtmaWZvX2J1ZiBjYW5fZGV2IGludGVsX3RoIHNwaV9weGEyeHhfcGxhdGZv
+cm0gcGF0YV9hcnRvcCB2bWVfY2E5MWN4NDIgZ2JfZ2JwaHkoQykgZ3JleWJ1cyhDKSBpbmR1
+c3RyaWFsaW8gbXB0YmFzZSBzdF9kcnYgY21hYyB0dHBjaV9lZXByb20gdmlhX3dkdCBncGlv
+X3hyYTE0MDMgbXRkIGlwdGFibGVfc2VjdXJpdHkgaXB0YWJsZV9yYXcgaXB0YWJsZV9tYW5n
+bGUgaXB0YWJsZV9uYXQgbmZfbmF0IG5mX2Nvbm50cmFjayBuZl9kZWZyYWdfaXB2NiBuZl9k
+ZWZyYWdfaXB2NCBpcHRhYmxlX2ZpbHRlciBicGZpbHRlciBpcDZfdnRpIGlwX3Z0aSBpcF9n
+cmUgaXBpcCBzaXQgdHVubmVsNCBpcF90dW5uZWwgaHNyIHZldGggbmV0ZGV2c2ltIHZ4Y2Fu
+IGJhdG1hbl9hZHYgY2ZnODAyMTEgcmZraWxsIGNobmxfbmV0IGNhaWYgbmxtb24gZHVtbXkg
+dGVhbSBib25kaW5nIHZjYW4gYnJpZGdlIHN0cCBsbGMgaXA2X2dyZSBncmUgaXA2X3R1bm5l
+bCB0dW5uZWw2IHR1biBqb3lkZXYgbW91c2VkZXYgcHBkZXYga3ZtX2ludGVsIGt2bSBpcnFi
+eXBhc3MgY3JjdDEwZGlmX3BjbG11bCBjcmMzMl9wY2xtdWwgY3JjMzJjX2ludGVsIGdoYXNo
+X2NsbXVsbmlfaW50ZWwgYWVzbmlfaW50ZWwgYWVzX3g4Nl82NCBpbnB1dF9sZWRzIGNyeXB0
+b19zaW1kIGNyeXB0ZCBnbHVlX2hlbHBlciBpZGVfcGNpX2dlbmVyaWMgcGlpeCBwc21vdXNl
+DQo+ICBpZGVfY29yZSBzZXJpb19yYXcgYXRhX2dlbmVyaWMgaTJjX3BpaXg0IHBhdGFfYWNw
+aSBwYXJwb3J0X3BjIHBhcnBvcnQgZmxvcHB5IHJ0Y19jbW9zIGludGVsX2FncCBpbnRlbF9n
+dHQgYWdwZ2FydCBzY2hfZnFfY29kZWwgaXBfdGFibGVzIHhfdGFibGVzIHNoYTFfc3NzZTMg
+c2hhMV9nZW5lcmljIGlwdjYgW2xhc3QgdW5sb2FkZWQ6IHNwZWFrdXBdDQo+IER1bXBpbmcg
+ZnRyYWNlIGJ1ZmZlcjoNCj4gICAgKGZ0cmFjZSBidWZmZXIgZW1wdHkpDQo+IENSMjogZmZm
+ZmZiZmZmODM0ZjAwMQ0KPiAtLS1bIGVuZCB0cmFjZSA1YWE3NzJjNzkzZTBlOTcxIF0tLS0N
+Cj4gUklQOiAwMDEwOnN0cmNtcCsweDMxLzB4YTAgbGliL3N0cmluZy5jOjMyOA0KPiBDb2Rl
+OiAwMCAwMCAwMCAwMCBmYyBmZiBkZiA1NSA1MyA0OCA4MyBlYyAwOCBlYiAwYSA4NCBkYiA0
+OCA4OSBlZiA3NCA1YSA0YyA4OSBlNiA0OCA4OSBmOCA0OCA4OSBmYSA0OCA4ZCA2ZiAwMSA0
+OCBjMSBlOCAwMyA4MyBlMiAwNyA8NDI+IDBmIGI2IDA0IDI4IDM4IGQwIDdmIDA0IDg0IGMw
+IDc1IDUwIDQ4IDg5IGYwIDQ4IDg5IGYyIDBmIGI2IDVkDQo+IFJTUDogMDAxODpmZmZmODg4
+MWUwYzU3ODAwIEVGTEFHUzogMDAwMTAyNDYNCj4gUkFYOiAxZmZmZmZmZmY4MzRmMDAxIFJC
+WDogZmZmZmZmZmZjMWE3ODAwMCBSQ1g6IGZmZmZmZmZmODI3Yjk1MDMNCj4gUkRYOiAwMDAw
+MDAwMDAwMDAwMDAwIFJTSTogZmZmZmZmZmZjMWE0MDAwOCBSREk6IGZmZmZmZmZmYzFhNzgw
+MDgNCj4gUkJQOiBmZmZmZmZmZmMxYTc4MDA5IFIwODogZmZmZmZiZmZmNmE5MjE5NSBSMDk6
+IGZmZmZmYmZmZjZhOTIxOTUNCj4gUjEwOiBmZmZmODg4MWUwYzU3OGI4IFIxMTogZmZmZmZi
+ZmZmNmE5MjE5NCBSMTI6IGZmZmZmZmZmYzFhNDAwMDgNCj4gUjEzOiBkZmZmZmMwMDAwMDAw
+MDAwIFIxNDogZmZmZmZmZmZjMWEzZTQ3MCBSMTU6IGZmZmZmZmZmYzFhNDAwMDANCj4gRlM6
+ICAwMDAwN2ZkY2MwMmZmNzAwKDAwMDApIEdTOmZmZmY4ODgxZjczMDAwMDAoMDAwMCkga25s
+R1M6MDAwMDAwMDAwMDAwMDAwMA0KPiBDUzogIDAwMTAgRFM6IDAwMDAgRVM6IDAwMDAgQ1Iw
+OiAwMDAwMDAwMDgwMDUwMDMzDQo+IENSMjogZmZmZmZiZmZmODM0ZjAwMSBDUjM6IDAwMDAw
+MDAxYjMxMzQwMDMgQ1I0OiAwMDAwMDAwMDAwNzYwNmUwDQo+IERSMDogMDAwMDAwMDAwMDAw
+MDAwMCBEUjE6IDAwMDAwMDAwMDAwMDAwMDAgRFIyOiAwMDAwMDAwMDAwMDAwMDAwDQo+IERS
+MzogMDAwMDAwMDAwMDAwMDAwMCBEUjY6IDAwMDAwMDAwZmZmZTBmZjAgRFI3OiAwMDAwMDAw
+MDAwMDAwNDAwDQo+IFBLUlU6IDU1NTU1NTU0DQo+IA0KPiBUaGUgZXJyb3IgaGFuZGluZyBw
+YXRoIG1pc3BsYWNlIHRoZSBjbGVhbnVwIGluIGh3c2ltX2luaXRfbW9kdWxlLA0KPiBzd2l0
+Y2ggdGhlIHR3byBjbGVhbnVwIGZ1bmN0aW9ucyB0byBmaXggYWJvdmUgaXNzdWVzLg0KPiAN
+Cj4gUmVwb3J0ZWQtYnk6IEh1bGsgUm9ib3QgPGh1bGtjaUBodWF3ZWkuY29tPg0KPiBGaXhl
+czogZjI1ZGE1MWZkYzM4ICgiaWVlZTgwMjE1NDogaHdzaW06IGFkZCByZXBsYWNlbWVudCBm
+b3IgZmFrZWxiIikNCj4gU2lnbmVkLW9mZi1ieTogWXVlSGFpYmluZyA8eXVlaGFpYmluZ0Bo
+dWF3ZWkuY29tPg0KPiAtLS0NCj4gIGRyaXZlcnMvbmV0L2llZWU4MDIxNTQvbWFjODAyMTU0
+X2h3c2ltLmMgfCA0ICsrLS0NCj4gIDEgZmlsZSBjaGFuZ2VkLCAyIGluc2VydGlvbnMoKyks
+IDIgZGVsZXRpb25zKC0pDQo+IA0KPiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9uZXQvaWVlZTgw
+MjE1NC9tYWM4MDIxNTRfaHdzaW0uYyBiL2RyaXZlcnMvbmV0L2llZWU4MDIxNTQvbWFjODAy
+MTU0X2h3c2ltLmMNCj4gaW5kZXggM2I4ODg0Ni4uYzJiNmZmYiAxMDA2NDQNCj4gLS0tIGEv
+ZHJpdmVycy9uZXQvaWVlZTgwMjE1NC9tYWM4MDIxNTRfaHdzaW0uYw0KPiArKysgYi9kcml2
+ZXJzL25ldC9pZWVlODAyMTU0L21hYzgwMjE1NF9od3NpbS5jDQo+IEBAIC05MTIsOSArOTEy
+LDkgQEAgc3RhdGljIF9faW5pdCBpbnQgaHdzaW1faW5pdF9tb2R1bGUodm9pZCkNCj4gIAly
+ZXR1cm4gMDsNCj4gIA0KPiAgcGxhdGZvcm1fZHJ2Og0KPiAtCWdlbmxfdW5yZWdpc3Rlcl9m
+YW1pbHkoJmh3c2ltX2dlbmxfZmFtaWx5KTsNCj4gLXBsYXRmb3JtX2RldjoNCj4gIAlwbGF0
+Zm9ybV9kZXZpY2VfdW5yZWdpc3RlcihtYWM4MDIxNTRod3NpbV9kZXYpOw0KPiArcGxhdGZv
+cm1fZGV2Og0KPiArCWdlbmxfdW5yZWdpc3Rlcl9mYW1pbHkoJmh3c2ltX2dlbmxfZmFtaWx5
+KTsNCj4gIAlyZXR1cm4gcmM7DQo+ICB9DQo+ICANCj4gDQoNCkNvdWxkIHlvdSBwbGVhc2Ug
+cmV2aWV3IHRoaXMgb2VuIGFuZCB0aGUgb3RoZXIgaWVlZTgwMjE1NF9od3NpbSBmaXggWXVl
+DQpzZW5kPw0KDQpyZWdhcmRzDQpTdGVmYW4gU2NobWlkdA0K
