@@ -1,143 +1,154 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-it1-f193.google.com ([209.85.166.193]:36764 "EHLO
-        mail-it1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726041AbfECV0j (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Fri, 3 May 2019 17:26:39 -0400
-Received: by mail-it1-f193.google.com with SMTP id v143so11267405itc.1
-        for <linux-wpan@vger.kernel.org>; Fri, 03 May 2019 14:26:39 -0700 (PDT)
-Date: Fri, 3 May 2019 17:26:32 -0400
-From: Alexander Aring <aring@mojatatu.com>
+Received: from proxima.lasnet.de ([78.47.171.185]:34980 "EHLO
+        proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726768AbfEDSrh (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Sat, 4 May 2019 14:47:37 -0400
 Subject: Re: [PATCH] ieee802154: hwsim: Fix error handle path in
  hwsim_init_module
-Message-ID: <20190503212632.oir5uf2qde73q6qn@x220t>
 References: <20190428141451.32956-1-yuehaibing@huawei.com>
+From: Stefan Schmidt <stefan@datenfreihafen.org>
+Message-ID: <b22f80a3-7b1b-a8fc-d837-cfeb03b80b0d@datenfreihafen.org>
+Date: Sat, 4 May 2019 20:47:32 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 In-Reply-To: <20190428141451.32956-1-yuehaibing@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: base64
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Yue Haibing <yuehaibing@huawei.com>
-Cc: alex.aring@gmail.com, stefan@datenfreihafen.org, davem@davemloft.net, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, linux-wpan@vger.kernel.org
+To: Yue Haibing <yuehaibing@huawei.com>, alex.aring@gmail.com, davem@davemloft.net
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, linux-wpan@vger.kernel.org
 
-Hi,
-
-On Sun, Apr 28, 2019 at 10:14:51PM +0800, Yue Haibing wrote:
-> From: YueHaibing <yuehaibing@huawei.com>
->=20
-> KASAN report this:
->=20
-> BUG: unable to handle kernel paging request at fffffbfff834f001
-> PGD 237fe8067 P4D 237fe8067 PUD 237e64067 PMD 1c968d067 PTE 0
-> Oops: 0000 [#1] SMP KASAN PTI
-> CPU: 1 PID: 8871 Comm: syz-executor.0 Tainted: G         C        5.0.0+ =
-#5
-> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.10.2-1ubunt=
-u1 04/01/2014
-> RIP: 0010:strcmp+0x31/0xa0 lib/string.c:328
-> Code: 00 00 00 00 fc ff df 55 53 48 83 ec 08 eb 0a 84 db 48 89 ef 74 5a 4=
-c 89 e6 48 89 f8 48 89 fa 48 8d 6f 01 48 c1 e8 03 83 e2 07 <42> 0f b6 04 28=
- 38 d0 7f 04 84 c0 75 50 48 89 f0 48 89 f2 0f b6 5d
-> RSP: 0018:ffff8881e0c57800 EFLAGS: 00010246
-> RAX: 1ffffffff834f001 RBX: ffffffffc1a78000 RCX: ffffffff827b9503
-> RDX: 0000000000000000 RSI: ffffffffc1a40008 RDI: ffffffffc1a78008
-> RBP: ffffffffc1a78009 R08: fffffbfff6a92195 R09: fffffbfff6a92195
-> R10: ffff8881e0c578b8 R11: fffffbfff6a92194 R12: ffffffffc1a40008
-> R13: dffffc0000000000 R14: ffffffffc1a3e470 R15: ffffffffc1a40000
-> FS:  00007fdcc02ff700(0000) GS:ffff8881f7300000(0000) knlGS:0000000000000=
-000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: fffffbfff834f001 CR3: 00000001b3134003 CR4: 00000000007606e0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> PKRU: 55555554
-> Call Trace:
->  genl_family_find_byname+0x7f/0xf0 net/netlink/genetlink.c:104
->  genl_register_family+0x1e1/0x1070 net/netlink/genetlink.c:333
->  ? 0xffffffffc1978000
->  hwsim_init_module+0x6a/0x1000 [mac802154_hwsim]
->  ? 0xffffffffc1978000
->  ? 0xffffffffc1978000
->  ? 0xffffffffc1978000
->  do_one_initcall+0xbc/0x47d init/main.c:887
->  do_init_module+0x1b5/0x547 kernel/module.c:3456
->  load_module+0x6405/0x8c10 kernel/module.c:3804
->  __do_sys_finit_module+0x162/0x190 kernel/module.c:3898
->  do_syscall_64+0x9f/0x450 arch/x86/entry/common.c:290
->  entry_SYSCALL_64_after_hwframe+0x49/0xbe
-> RIP: 0033:0x462e99
-> Code: f7 d8 64 89 02 b8 ff ff ff ff c3 66 0f 1f 44 00 00 48 89 f8 48 89 f=
-7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff=
- ff 73 01 c3 48 c7 c1 bc ff ff ff f7 d8 64 89 01 48
-> RSP: 002b:00007fdcc02fec58 EFLAGS: 00000246 ORIG_RAX: 0000000000000139
-> RAX: ffffffffffffffda RBX: 000000000073bf00 RCX: 0000000000462e99
-> RDX: 0000000000000000 RSI: 0000000020000200 RDI: 0000000000000003
-> RBP: 00007fdcc02fec70 R08: 0000000000000000 R09: 0000000000000000
-> R10: 0000000000000000 R11: 0000000000000246 R12: 00007fdcc02ff6bc
-> R13: 00000000004bcefa R14: 00000000006f6fb0 R15: 0000000000000004
-> Modules linked in: mac802154_hwsim(+) mac802154 ieee802154 speakup(C) rc_=
-proteus_2309 rtc_rk808 streebog_generic rds vboxguest madera_spi madera da9=
-052_wdt mISDN_core ueagle_atm usbatm atm ir_imon_decoder scsi_transport_sas=
- rc_dntv_live_dvb_t panel_samsung_s6d16d0 drm drm_panel_orientation_quirks =
-lib80211 fb_agm1264k_fl(C) gspca_pac7302 gspca_main videobuf2_v4l2 soundwir=
-e_intel_init i2c_dln2 dln2 usbcore hid_gaff 88pm8607 nfnetlink axp20x_i2c a=
-xp20x uio pata_marvell pmbus_core snd_sonicvibes gameport snd_pcm snd_opl3_=
-lib snd_timer snd_hwdep snd_mpu401_uart snd_rawmidi snd_seq_device snd soun=
-dcore rtc_ds1511 rtc_ds1742 vsock dwc_xlgmac rtc_rx8010 libphy twofish_x86_=
-64_3way twofish_x86_64 twofish_common ad5696_i2c ad5686 lp8788_charger cxd2=
-880_spi dvb_core videobuf2_common videodev media videobuf2_vmalloc videobuf=
-2_memops fbtft(C) sysimgblt sysfillrect syscopyarea fb_sys_fops janz_ican3 =
-firewire_net firewire_core crc_itu_t spi_slave_system_control i2c_matroxfb =
-i2c_algo_bit
->  matroxfb_base fb fbdev matroxfb_DAC1064 matroxfb_accel cfbcopyarea cfbim=
-gblt cfbfillrect matroxfb_Ti3026 matroxfb_g450 g450_pll matroxfb_misc leds_=
-blinkm ti_dac7311 intel_spi_pci intel_spi spi_nor hid_elan hid async_tx rc_=
-cinergy_1400 rc_core intel_ishtp kxcjk_1013 industrialio_triggered_buffer k=
-fifo_buf can_dev intel_th spi_pxa2xx_platform pata_artop vme_ca91cx42 gb_gb=
-phy(C) greybus(C) industrialio mptbase st_drv cmac ttpci_eeprom via_wdt gpi=
-o_xra1403 mtd iptable_security iptable_raw iptable_mangle iptable_nat nf_na=
-t nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 iptable_filter bpfilter ip6_vt=
-i ip_vti ip_gre ipip sit tunnel4 ip_tunnel hsr veth netdevsim vxcan batman_=
-adv cfg80211 rfkill chnl_net caif nlmon dummy team bonding vcan bridge stp =
-llc ip6_gre gre ip6_tunnel tunnel6 tun joydev mousedev ppdev kvm_intel kvm =
-irqbypass crct10dif_pclmul crc32_pclmul crc32c_intel ghash_clmulni_intel ae=
-sni_intel aes_x86_64 input_leds crypto_simd cryptd glue_helper ide_pci_gene=
-ric piix psmouse
->  ide_core serio_raw ata_generic i2c_piix4 pata_acpi parport_pc parport fl=
-oppy rtc_cmos intel_agp intel_gtt agpgart sch_fq_codel ip_tables x_tables s=
-ha1_ssse3 sha1_generic ipv6 [last unloaded: speakup]
-> Dumping ftrace buffer:
->    (ftrace buffer empty)
-> CR2: fffffbfff834f001
-> ---[ end trace 5aa772c793e0e971 ]---
-> RIP: 0010:strcmp+0x31/0xa0 lib/string.c:328
-> Code: 00 00 00 00 fc ff df 55 53 48 83 ec 08 eb 0a 84 db 48 89 ef 74 5a 4=
-c 89 e6 48 89 f8 48 89 fa 48 8d 6f 01 48 c1 e8 03 83 e2 07 <42> 0f b6 04 28=
- 38 d0 7f 04 84 c0 75 50 48 89 f0 48 89 f2 0f b6 5d
-> RSP: 0018:ffff8881e0c57800 EFLAGS: 00010246
-> RAX: 1ffffffff834f001 RBX: ffffffffc1a78000 RCX: ffffffff827b9503
-> RDX: 0000000000000000 RSI: ffffffffc1a40008 RDI: ffffffffc1a78008
-> RBP: ffffffffc1a78009 R08: fffffbfff6a92195 R09: fffffbfff6a92195
-> R10: ffff8881e0c578b8 R11: fffffbfff6a92194 R12: ffffffffc1a40008
-> R13: dffffc0000000000 R14: ffffffffc1a3e470 R15: ffffffffc1a40000
-> FS:  00007fdcc02ff700(0000) GS:ffff8881f7300000(0000) knlGS:0000000000000=
-000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: fffffbfff834f001 CR3: 00000001b3134003 CR4: 00000000007606e0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> PKRU: 55555554
->=20
-> The error handing path misplace the cleanup in hwsim_init_module,
-> switch the two cleanup functions to fix above issues.
->=20
-> Reported-by: Hulk Robot <hulkci@huawei.com>
-> Fixes: f25da51fdc38 ("ieee802154: hwsim: add replacement for fakelb")
-> Signed-off-by: YueHaibing <yuehaibing@huawei.com>
-
-Acked-by: Alexander Aring <aring@mojatatu.com>
-
-Thanks.
-
-- Alex
+SGVsbG8uDQoNCk9uIDI4LjA0LjE5IDE2OjE0LCBZdWUgSGFpYmluZyB3cm90ZToNCj4gRnJv
+bTogWXVlSGFpYmluZyA8eXVlaGFpYmluZ0BodWF3ZWkuY29tPg0KPiANCj4gS0FTQU4gcmVw
+b3J0IHRoaXM6DQo+IA0KPiBCVUc6IHVuYWJsZSB0byBoYW5kbGUga2VybmVsIHBhZ2luZyBy
+ZXF1ZXN0IGF0IGZmZmZmYmZmZjgzNGYwMDENCj4gUEdEIDIzN2ZlODA2NyBQNEQgMjM3ZmU4
+MDY3IFBVRCAyMzdlNjQwNjcgUE1EIDFjOTY4ZDA2NyBQVEUgMA0KPiBPb3BzOiAwMDAwIFsj
+MV0gU01QIEtBU0FOIFBUSQ0KPiBDUFU6IDEgUElEOiA4ODcxIENvbW06IHN5ei1leGVjdXRv
+ci4wIFRhaW50ZWQ6IEcgICAgICAgICBDICAgICAgICA1LjAuMCsgIzUNCj4gSGFyZHdhcmUg
+bmFtZTogUUVNVSBTdGFuZGFyZCBQQyAoaTQ0MEZYICsgUElJWCwgMTk5NiksIEJJT1MgMS4x
+MC4yLTF1YnVudHUxIDA0LzAxLzIwMTQNCj4gUklQOiAwMDEwOnN0cmNtcCsweDMxLzB4YTAg
+bGliL3N0cmluZy5jOjMyOA0KPiBDb2RlOiAwMCAwMCAwMCAwMCBmYyBmZiBkZiA1NSA1MyA0
+OCA4MyBlYyAwOCBlYiAwYSA4NCBkYiA0OCA4OSBlZiA3NCA1YSA0YyA4OSBlNiA0OCA4OSBm
+OCA0OCA4OSBmYSA0OCA4ZCA2ZiAwMSA0OCBjMSBlOCAwMyA4MyBlMiAwNyA8NDI+IDBmIGI2
+IDA0IDI4IDM4IGQwIDdmIDA0IDg0IGMwIDc1IDUwIDQ4IDg5IGYwIDQ4IDg5IGYyIDBmIGI2
+IDVkDQo+IFJTUDogMDAxODpmZmZmODg4MWUwYzU3ODAwIEVGTEFHUzogMDAwMTAyNDYNCj4g
+UkFYOiAxZmZmZmZmZmY4MzRmMDAxIFJCWDogZmZmZmZmZmZjMWE3ODAwMCBSQ1g6IGZmZmZm
+ZmZmODI3Yjk1MDMNCj4gUkRYOiAwMDAwMDAwMDAwMDAwMDAwIFJTSTogZmZmZmZmZmZjMWE0
+MDAwOCBSREk6IGZmZmZmZmZmYzFhNzgwMDgNCj4gUkJQOiBmZmZmZmZmZmMxYTc4MDA5IFIw
+ODogZmZmZmZiZmZmNmE5MjE5NSBSMDk6IGZmZmZmYmZmZjZhOTIxOTUNCj4gUjEwOiBmZmZm
+ODg4MWUwYzU3OGI4IFIxMTogZmZmZmZiZmZmNmE5MjE5NCBSMTI6IGZmZmZmZmZmYzFhNDAw
+MDgNCj4gUjEzOiBkZmZmZmMwMDAwMDAwMDAwIFIxNDogZmZmZmZmZmZjMWEzZTQ3MCBSMTU6
+IGZmZmZmZmZmYzFhNDAwMDANCj4gRlM6ICAwMDAwN2ZkY2MwMmZmNzAwKDAwMDApIEdTOmZm
+ZmY4ODgxZjczMDAwMDAoMDAwMCkga25sR1M6MDAwMDAwMDAwMDAwMDAwMA0KPiBDUzogIDAw
+MTAgRFM6IDAwMDAgRVM6IDAwMDAgQ1IwOiAwMDAwMDAwMDgwMDUwMDMzDQo+IENSMjogZmZm
+ZmZiZmZmODM0ZjAwMSBDUjM6IDAwMDAwMDAxYjMxMzQwMDMgQ1I0OiAwMDAwMDAwMDAwNzYw
+NmUwDQo+IERSMDogMDAwMDAwMDAwMDAwMDAwMCBEUjE6IDAwMDAwMDAwMDAwMDAwMDAgRFIy
+OiAwMDAwMDAwMDAwMDAwMDAwDQo+IERSMzogMDAwMDAwMDAwMDAwMDAwMCBEUjY6IDAwMDAw
+MDAwZmZmZTBmZjAgRFI3OiAwMDAwMDAwMDAwMDAwNDAwDQo+IFBLUlU6IDU1NTU1NTU0DQo+
+IENhbGwgVHJhY2U6DQo+ICBnZW5sX2ZhbWlseV9maW5kX2J5bmFtZSsweDdmLzB4ZjAgbmV0
+L25ldGxpbmsvZ2VuZXRsaW5rLmM6MTA0DQo+ICBnZW5sX3JlZ2lzdGVyX2ZhbWlseSsweDFl
+MS8weDEwNzAgbmV0L25ldGxpbmsvZ2VuZXRsaW5rLmM6MzMzDQo+ICA/IDB4ZmZmZmZmZmZj
+MTk3ODAwMA0KPiAgaHdzaW1faW5pdF9tb2R1bGUrMHg2YS8weDEwMDAgW21hYzgwMjE1NF9o
+d3NpbV0NCj4gID8gMHhmZmZmZmZmZmMxOTc4MDAwDQo+ICA/IDB4ZmZmZmZmZmZjMTk3ODAw
+MA0KPiAgPyAweGZmZmZmZmZmYzE5NzgwMDANCj4gIGRvX29uZV9pbml0Y2FsbCsweGJjLzB4
+NDdkIGluaXQvbWFpbi5jOjg4Nw0KPiAgZG9faW5pdF9tb2R1bGUrMHgxYjUvMHg1NDcga2Vy
+bmVsL21vZHVsZS5jOjM0NTYNCj4gIGxvYWRfbW9kdWxlKzB4NjQwNS8weDhjMTAga2VybmVs
+L21vZHVsZS5jOjM4MDQNCj4gIF9fZG9fc3lzX2Zpbml0X21vZHVsZSsweDE2Mi8weDE5MCBr
+ZXJuZWwvbW9kdWxlLmM6Mzg5OA0KPiAgZG9fc3lzY2FsbF82NCsweDlmLzB4NDUwIGFyY2gv
+eDg2L2VudHJ5L2NvbW1vbi5jOjI5MA0KPiAgZW50cnlfU1lTQ0FMTF82NF9hZnRlcl9od2Zy
+YW1lKzB4NDkvMHhiZQ0KPiBSSVA6IDAwMzM6MHg0NjJlOTkNCj4gQ29kZTogZjcgZDggNjQg
+ODkgMDIgYjggZmYgZmYgZmYgZmYgYzMgNjYgMGYgMWYgNDQgMDAgMDAgNDggODkgZjggNDgg
+ODkgZjcgNDggODkgZDYgNDggODkgY2EgNGQgODkgYzIgNGQgODkgYzggNGMgOGIgNGMgMjQg
+MDggMGYgMDUgPDQ4PiAzZCAwMSBmMCBmZiBmZiA3MyAwMSBjMyA0OCBjNyBjMSBiYyBmZiBm
+ZiBmZiBmNyBkOCA2NCA4OSAwMSA0OA0KPiBSU1A6IDAwMmI6MDAwMDdmZGNjMDJmZWM1OCBF
+RkxBR1M6IDAwMDAwMjQ2IE9SSUdfUkFYOiAwMDAwMDAwMDAwMDAwMTM5DQo+IFJBWDogZmZm
+ZmZmZmZmZmZmZmZkYSBSQlg6IDAwMDAwMDAwMDA3M2JmMDAgUkNYOiAwMDAwMDAwMDAwNDYy
+ZTk5DQo+IFJEWDogMDAwMDAwMDAwMDAwMDAwMCBSU0k6IDAwMDAwMDAwMjAwMDAyMDAgUkRJ
+OiAwMDAwMDAwMDAwMDAwMDAzDQo+IFJCUDogMDAwMDdmZGNjMDJmZWM3MCBSMDg6IDAwMDAw
+MDAwMDAwMDAwMDAgUjA5OiAwMDAwMDAwMDAwMDAwMDAwDQo+IFIxMDogMDAwMDAwMDAwMDAw
+MDAwMCBSMTE6IDAwMDAwMDAwMDAwMDAyNDYgUjEyOiAwMDAwN2ZkY2MwMmZmNmJjDQo+IFIx
+MzogMDAwMDAwMDAwMDRiY2VmYSBSMTQ6IDAwMDAwMDAwMDA2ZjZmYjAgUjE1OiAwMDAwMDAw
+MDAwMDAwMDA0DQo+IE1vZHVsZXMgbGlua2VkIGluOiBtYWM4MDIxNTRfaHdzaW0oKykgbWFj
+ODAyMTU0IGllZWU4MDIxNTQgc3BlYWt1cChDKSByY19wcm90ZXVzXzIzMDkgcnRjX3JrODA4
+IHN0cmVlYm9nX2dlbmVyaWMgcmRzIHZib3hndWVzdCBtYWRlcmFfc3BpIG1hZGVyYSBkYTkw
+NTJfd2R0IG1JU0ROX2NvcmUgdWVhZ2xlX2F0bSB1c2JhdG0gYXRtIGlyX2ltb25fZGVjb2Rl
+ciBzY3NpX3RyYW5zcG9ydF9zYXMgcmNfZG50dl9saXZlX2R2Yl90IHBhbmVsX3NhbXN1bmdf
+czZkMTZkMCBkcm0gZHJtX3BhbmVsX29yaWVudGF0aW9uX3F1aXJrcyBsaWI4MDIxMSBmYl9h
+Z20xMjY0a19mbChDKSBnc3BjYV9wYWM3MzAyIGdzcGNhX21haW4gdmlkZW9idWYyX3Y0bDIg
+c291bmR3aXJlX2ludGVsX2luaXQgaTJjX2RsbjIgZGxuMiB1c2Jjb3JlIGhpZF9nYWZmIDg4
+cG04NjA3IG5mbmV0bGluayBheHAyMHhfaTJjIGF4cDIweCB1aW8gcGF0YV9tYXJ2ZWxsIHBt
+YnVzX2NvcmUgc25kX3NvbmljdmliZXMgZ2FtZXBvcnQgc25kX3BjbSBzbmRfb3BsM19saWIg
+c25kX3RpbWVyIHNuZF9od2RlcCBzbmRfbXB1NDAxX3VhcnQgc25kX3Jhd21pZGkgc25kX3Nl
+cV9kZXZpY2Ugc25kIHNvdW5kY29yZSBydGNfZHMxNTExIHJ0Y19kczE3NDIgdnNvY2sgZHdj
+X3hsZ21hYyBydGNfcng4MDEwIGxpYnBoeSB0d29maXNoX3g4Nl82NF8zd2F5IHR3b2Zpc2hf
+eDg2XzY0IHR3b2Zpc2hfY29tbW9uIGFkNTY5Nl9pMmMgYWQ1Njg2IGxwODc4OF9jaGFyZ2Vy
+IGN4ZDI4ODBfc3BpIGR2Yl9jb3JlIHZpZGVvYnVmMl9jb21tb24gdmlkZW9kZXYgbWVkaWEg
+dmlkZW9idWYyX3ZtYWxsb2MgdmlkZW9idWYyX21lbW9wcyBmYnRmdChDKSBzeXNpbWdibHQg
+c3lzZmlsbHJlY3Qgc3lzY29weWFyZWEgZmJfc3lzX2ZvcHMgamFuel9pY2FuMyBmaXJld2ly
+ZV9uZXQgZmlyZXdpcmVfY29yZSBjcmNfaXR1X3Qgc3BpX3NsYXZlX3N5c3RlbV9jb250cm9s
+IGkyY19tYXRyb3hmYiBpMmNfYWxnb19iaXQNCj4gIG1hdHJveGZiX2Jhc2UgZmIgZmJkZXYg
+bWF0cm94ZmJfREFDMTA2NCBtYXRyb3hmYl9hY2NlbCBjZmJjb3B5YXJlYSBjZmJpbWdibHQg
+Y2ZiZmlsbHJlY3QgbWF0cm94ZmJfVGkzMDI2IG1hdHJveGZiX2c0NTAgZzQ1MF9wbGwgbWF0
+cm94ZmJfbWlzYyBsZWRzX2JsaW5rbSB0aV9kYWM3MzExIGludGVsX3NwaV9wY2kgaW50ZWxf
+c3BpIHNwaV9ub3IgaGlkX2VsYW4gaGlkIGFzeW5jX3R4IHJjX2NpbmVyZ3lfMTQwMCByY19j
+b3JlIGludGVsX2lzaHRwIGt4Y2prXzEwMTMgaW5kdXN0cmlhbGlvX3RyaWdnZXJlZF9idWZm
+ZXIga2ZpZm9fYnVmIGNhbl9kZXYgaW50ZWxfdGggc3BpX3B4YTJ4eF9wbGF0Zm9ybSBwYXRh
+X2FydG9wIHZtZV9jYTkxY3g0MiBnYl9nYnBoeShDKSBncmV5YnVzKEMpIGluZHVzdHJpYWxp
+byBtcHRiYXNlIHN0X2RydiBjbWFjIHR0cGNpX2VlcHJvbSB2aWFfd2R0IGdwaW9feHJhMTQw
+MyBtdGQgaXB0YWJsZV9zZWN1cml0eSBpcHRhYmxlX3JhdyBpcHRhYmxlX21hbmdsZSBpcHRh
+YmxlX25hdCBuZl9uYXQgbmZfY29ubnRyYWNrIG5mX2RlZnJhZ19pcHY2IG5mX2RlZnJhZ19p
+cHY0IGlwdGFibGVfZmlsdGVyIGJwZmlsdGVyIGlwNl92dGkgaXBfdnRpIGlwX2dyZSBpcGlw
+IHNpdCB0dW5uZWw0IGlwX3R1bm5lbCBoc3IgdmV0aCBuZXRkZXZzaW0gdnhjYW4gYmF0bWFu
+X2FkdiBjZmc4MDIxMSByZmtpbGwgY2hubF9uZXQgY2FpZiBubG1vbiBkdW1teSB0ZWFtIGJv
+bmRpbmcgdmNhbiBicmlkZ2Ugc3RwIGxsYyBpcDZfZ3JlIGdyZSBpcDZfdHVubmVsIHR1bm5l
+bDYgdHVuIGpveWRldiBtb3VzZWRldiBwcGRldiBrdm1faW50ZWwga3ZtIGlycWJ5cGFzcyBj
+cmN0MTBkaWZfcGNsbXVsIGNyYzMyX3BjbG11bCBjcmMzMmNfaW50ZWwgZ2hhc2hfY2xtdWxu
+aV9pbnRlbCBhZXNuaV9pbnRlbCBhZXNfeDg2XzY0IGlucHV0X2xlZHMgY3J5cHRvX3NpbWQg
+Y3J5cHRkIGdsdWVfaGVscGVyIGlkZV9wY2lfZ2VuZXJpYyBwaWl4IHBzbW91c2UNCj4gIGlk
+ZV9jb3JlIHNlcmlvX3JhdyBhdGFfZ2VuZXJpYyBpMmNfcGlpeDQgcGF0YV9hY3BpIHBhcnBv
+cnRfcGMgcGFycG9ydCBmbG9wcHkgcnRjX2Ntb3MgaW50ZWxfYWdwIGludGVsX2d0dCBhZ3Bn
+YXJ0IHNjaF9mcV9jb2RlbCBpcF90YWJsZXMgeF90YWJsZXMgc2hhMV9zc3NlMyBzaGExX2dl
+bmVyaWMgaXB2NiBbbGFzdCB1bmxvYWRlZDogc3BlYWt1cF0NCj4gRHVtcGluZyBmdHJhY2Ug
+YnVmZmVyOg0KPiAgICAoZnRyYWNlIGJ1ZmZlciBlbXB0eSkNCj4gQ1IyOiBmZmZmZmJmZmY4
+MzRmMDAxDQo+IC0tLVsgZW5kIHRyYWNlIDVhYTc3MmM3OTNlMGU5NzEgXS0tLQ0KPiBSSVA6
+IDAwMTA6c3RyY21wKzB4MzEvMHhhMCBsaWIvc3RyaW5nLmM6MzI4DQo+IENvZGU6IDAwIDAw
+IDAwIDAwIGZjIGZmIGRmIDU1IDUzIDQ4IDgzIGVjIDA4IGViIDBhIDg0IGRiIDQ4IDg5IGVm
+IDc0IDVhIDRjIDg5IGU2IDQ4IDg5IGY4IDQ4IDg5IGZhIDQ4IDhkIDZmIDAxIDQ4IGMxIGU4
+IDAzIDgzIGUyIDA3IDw0Mj4gMGYgYjYgMDQgMjggMzggZDAgN2YgMDQgODQgYzAgNzUgNTAg
+NDggODkgZjAgNDggODkgZjIgMGYgYjYgNWQNCj4gUlNQOiAwMDE4OmZmZmY4ODgxZTBjNTc4
+MDAgRUZMQUdTOiAwMDAxMDI0Ng0KPiBSQVg6IDFmZmZmZmZmZjgzNGYwMDEgUkJYOiBmZmZm
+ZmZmZmMxYTc4MDAwIFJDWDogZmZmZmZmZmY4MjdiOTUwMw0KPiBSRFg6IDAwMDAwMDAwMDAw
+MDAwMDAgUlNJOiBmZmZmZmZmZmMxYTQwMDA4IFJESTogZmZmZmZmZmZjMWE3ODAwOA0KPiBS
+QlA6IGZmZmZmZmZmYzFhNzgwMDkgUjA4OiBmZmZmZmJmZmY2YTkyMTk1IFIwOTogZmZmZmZi
+ZmZmNmE5MjE5NQ0KPiBSMTA6IGZmZmY4ODgxZTBjNTc4YjggUjExOiBmZmZmZmJmZmY2YTky
+MTk0IFIxMjogZmZmZmZmZmZjMWE0MDAwOA0KPiBSMTM6IGRmZmZmYzAwMDAwMDAwMDAgUjE0
+OiBmZmZmZmZmZmMxYTNlNDcwIFIxNTogZmZmZmZmZmZjMWE0MDAwMA0KPiBGUzogIDAwMDA3
+ZmRjYzAyZmY3MDAoMDAwMCkgR1M6ZmZmZjg4ODFmNzMwMDAwMCgwMDAwKSBrbmxHUzowMDAw
+MDAwMDAwMDAwMDAwDQo+IENTOiAgMDAxMCBEUzogMDAwMCBFUzogMDAwMCBDUjA6IDAwMDAw
+MDAwODAwNTAwMzMNCj4gQ1IyOiBmZmZmZmJmZmY4MzRmMDAxIENSMzogMDAwMDAwMDFiMzEz
+NDAwMyBDUjQ6IDAwMDAwMDAwMDA3NjA2ZTANCj4gRFIwOiAwMDAwMDAwMDAwMDAwMDAwIERS
+MTogMDAwMDAwMDAwMDAwMDAwMCBEUjI6IDAwMDAwMDAwMDAwMDAwMDANCj4gRFIzOiAwMDAw
+MDAwMDAwMDAwMDAwIERSNjogMDAwMDAwMDBmZmZlMGZmMCBEUjc6IDAwMDAwMDAwMDAwMDA0
+MDANCj4gUEtSVTogNTU1NTU1NTQNCj4gDQo+IFRoZSBlcnJvciBoYW5kaW5nIHBhdGggbWlz
+cGxhY2UgdGhlIGNsZWFudXAgaW4gaHdzaW1faW5pdF9tb2R1bGUsDQo+IHN3aXRjaCB0aGUg
+dHdvIGNsZWFudXAgZnVuY3Rpb25zIHRvIGZpeCBhYm92ZSBpc3N1ZXMuDQo+IA0KPiBSZXBv
+cnRlZC1ieTogSHVsayBSb2JvdCA8aHVsa2NpQGh1YXdlaS5jb20+DQo+IEZpeGVzOiBmMjVk
+YTUxZmRjMzggKCJpZWVlODAyMTU0OiBod3NpbTogYWRkIHJlcGxhY2VtZW50IGZvciBmYWtl
+bGIiKQ0KPiBTaWduZWQtb2ZmLWJ5OiBZdWVIYWliaW5nIDx5dWVoYWliaW5nQGh1YXdlaS5j
+b20+DQo+IC0tLQ0KPiAgZHJpdmVycy9uZXQvaWVlZTgwMjE1NC9tYWM4MDIxNTRfaHdzaW0u
+YyB8IDQgKystLQ0KPiAgMSBmaWxlIGNoYW5nZWQsIDIgaW5zZXJ0aW9ucygrKSwgMiBkZWxl
+dGlvbnMoLSkNCj4gDQo+IGRpZmYgLS1naXQgYS9kcml2ZXJzL25ldC9pZWVlODAyMTU0L21h
+YzgwMjE1NF9od3NpbS5jIGIvZHJpdmVycy9uZXQvaWVlZTgwMjE1NC9tYWM4MDIxNTRfaHdz
+aW0uYw0KPiBpbmRleCAzYjg4ODQ2Li5jMmI2ZmZiIDEwMDY0NA0KPiAtLS0gYS9kcml2ZXJz
+L25ldC9pZWVlODAyMTU0L21hYzgwMjE1NF9od3NpbS5jDQo+ICsrKyBiL2RyaXZlcnMvbmV0
+L2llZWU4MDIxNTQvbWFjODAyMTU0X2h3c2ltLmMNCj4gQEAgLTkxMiw5ICs5MTIsOSBAQCBz
+dGF0aWMgX19pbml0IGludCBod3NpbV9pbml0X21vZHVsZSh2b2lkKQ0KPiAgCXJldHVybiAw
+Ow0KPiAgDQo+ICBwbGF0Zm9ybV9kcnY6DQo+IC0JZ2VubF91bnJlZ2lzdGVyX2ZhbWlseSgm
+aHdzaW1fZ2VubF9mYW1pbHkpOw0KPiAtcGxhdGZvcm1fZGV2Og0KPiAgCXBsYXRmb3JtX2Rl
+dmljZV91bnJlZ2lzdGVyKG1hYzgwMjE1NGh3c2ltX2Rldik7DQo+ICtwbGF0Zm9ybV9kZXY6
+DQo+ICsJZ2VubF91bnJlZ2lzdGVyX2ZhbWlseSgmaHdzaW1fZ2VubF9mYW1pbHkpOw0KPiAg
+CXJldHVybiByYzsNCj4gIH0NCj4gIA0KPiANCg0KDQpUaGlzIHBhdGNoIGhhcyBiZWVuIGFw
+cGxpZWQgdG8gdGhlIHdwYW4gdHJlZSBhbmQgd2lsbCBiZQ0KcGFydCBvZiB0aGUgbmV4dCBw
+dWxsIHJlcXVlc3QgdG8gbmV0LiBUaGFua3MhDQoNCnJlZ2FyZHMNClN0ZWZhbiBTY2htaWR0
+DQo=
