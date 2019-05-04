@@ -1,28 +1,27 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-io1-f68.google.com ([209.85.166.68]:38033 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726042AbfECV3S (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Fri, 3 May 2019 17:29:18 -0400
-Received: by mail-io1-f68.google.com with SMTP id y6so6409098ior.5
-        for <linux-wpan@vger.kernel.org>; Fri, 03 May 2019 14:29:17 -0700 (PDT)
-Date: Fri, 3 May 2019 17:29:11 -0400
-From: Alexander Aring <aring@mojatatu.com>
+Received: from proxima.lasnet.de ([78.47.171.185]:34984 "EHLO
+        proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726768AbfEDSr4 (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Sat, 4 May 2019 14:47:56 -0400
 Subject: Re: [PATCH] ieee802154: hwsim: unregister hw while
  hwsim_subscribe_all_others fails
-Message-ID: <20190503212911.dxjf5ceoj2fkj4ij@x220t>
 References: <20190428154810.40052-1-yuehaibing@huawei.com>
+From: Stefan Schmidt <stefan@datenfreihafen.org>
+Message-ID: <0747fdf8-1adf-d6f7-81ee-33cfe5519e00@datenfreihafen.org>
+Date: Sat, 4 May 2019 20:47:52 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 In-Reply-To: <20190428154810.40052-1-yuehaibing@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Yue Haibing <yuehaibing@huawei.com>
-Cc: alex.aring@gmail.com, stefan@datenfreihafen.org, davem@davemloft.net, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, linux-wpan@vger.kernel.org
+To: Yue Haibing <yuehaibing@huawei.com>, alex.aring@gmail.com, davem@davemloft.net
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, linux-wpan@vger.kernel.org
 
-Hi,
+Hello.
 
-On Sun, Apr 28, 2019 at 11:48:10PM +0800, Yue Haibing wrote:
+On 28.04.19 17:48, Yue Haibing wrote:
 > From: YueHaibing <yuehaibing@huawei.com>
 > 
 > KASAN report this:
@@ -84,9 +83,37 @@ On Sun, Apr 28, 2019 at 11:48:10PM +0800, Yue Haibing wrote:
 > Reported-by: Hulk Robot <hulkci@huawei.com>
 > Fixes: f25da51fdc38 ("ieee802154: hwsim: add replacement for fakelb")
 > Signed-off-by: YueHaibing <yuehaibing@huawei.com>
+> ---
+>  drivers/net/ieee802154/mac802154_hwsim.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ieee802154/mac802154_hwsim.c b/drivers/net/ieee802154/mac802154_hwsim.c
+> index c2b6ffb..3d9ffd2 100644
+> --- a/drivers/net/ieee802154/mac802154_hwsim.c
+> +++ b/drivers/net/ieee802154/mac802154_hwsim.c
+> @@ -813,7 +813,7 @@ static int hwsim_add_one(struct genl_info *info, struct device *dev,
+>  		err = hwsim_subscribe_all_others(phy);
+>  		if (err < 0) {
+>  			mutex_unlock(&hwsim_phys_lock);
+> -			goto err_reg;
+> +			goto err_subscribe;
+>  		}
+>  	}
+>  	list_add_tail(&phy->list, &hwsim_phys);
+> @@ -823,6 +823,8 @@ static int hwsim_add_one(struct genl_info *info, struct device *dev,
+>  
+>  	return idx;
+>  
+> +err_subscribe:
+> +	ieee802154_unregister_hw(phy->hw);
+>  err_reg:
+>  	kfree(pib);
+>  err_pib:
+> 
 
-Acked-by: Alexander Aring <aring@mojatatu.com>
 
-Thanks.
+This patch has been applied to the wpan tree and will be
+part of the next pull request to net. Thanks!
 
-- Alex
+regards
+Stefan Schmidt
