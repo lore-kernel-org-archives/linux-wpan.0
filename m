@@ -1,14 +1,14 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:47978 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:49212 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727515AbfEPLj5 (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-        Thu, 16 May 2019 07:39:57 -0400
+        id S1727873AbfEPLkr (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+        Thu, 16 May 2019 07:40:47 -0400
 From: Sasha Levin <sashal@kernel.org>
-Subject: [PATCH AUTOSEL 5.0 19/34] net: ieee802154: fix missing checks for regmap_update_bits
-Date: Thu, 16 May 2019 07:39:16 -0400
-Message-Id: <20190516113932.8348-19-sashal@kernel.org>
-In-Reply-To: <20190516113932.8348-1-sashal@kernel.org>
-References: <20190516113932.8348-1-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 15/25] net: ieee802154: fix missing checks for regmap_update_bits
+Date: Thu, 16 May 2019 07:40:18 -0400
+Message-Id: <20190516114029.8682-15-sashal@kernel.org>
+In-Reply-To: <20190516114029.8682-1-sashal@kernel.org>
+References: <20190516114029.8682-1-sashal@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-wpan-owner@vger.kernel.org
@@ -34,10 +34,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 6 insertions(+)
 
 diff --git a/drivers/net/ieee802154/mcr20a.c b/drivers/net/ieee802154/mcr20a.c
-index c589f5ae75bb5..8bb53ec8d9cf2 100644
+index 04891429a5542..fe4057fca83d8 100644
 --- a/drivers/net/ieee802154/mcr20a.c
 +++ b/drivers/net/ieee802154/mcr20a.c
-@@ -533,6 +533,8 @@ mcr20a_start(struct ieee802154_hw *hw)
+@@ -539,6 +539,8 @@ mcr20a_start(struct ieee802154_hw *hw)
  	dev_dbg(printdev(lp), "no slotted operation\n");
  	ret = regmap_update_bits(lp->regmap_dar, DAR_PHY_CTRL1,
  				 DAR_PHY_CTRL1_SLOTTED, 0x0);
@@ -46,7 +46,7 @@ index c589f5ae75bb5..8bb53ec8d9cf2 100644
  
  	/* enable irq */
  	enable_irq(lp->spi->irq);
-@@ -540,11 +542,15 @@ mcr20a_start(struct ieee802154_hw *hw)
+@@ -546,11 +548,15 @@ mcr20a_start(struct ieee802154_hw *hw)
  	/* Unmask SEQ interrupt */
  	ret = regmap_update_bits(lp->regmap_dar, DAR_PHY_CTRL2,
  				 DAR_PHY_CTRL2_SEQMSK, 0x0);
