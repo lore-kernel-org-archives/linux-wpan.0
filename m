@@ -1,42 +1,66 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-io1-f68.google.com ([209.85.166.68]:34564 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726506AbfEHPnb (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 8 May 2019 11:43:31 -0400
-Received: by mail-io1-f68.google.com with SMTP id g84so9485035ioa.1
-        for <linux-wpan@vger.kernel.org>; Wed, 08 May 2019 08:43:30 -0700 (PDT)
-Date: Wed, 8 May 2019 11:43:21 -0400
-From: Alexander Aring <aring@mojatatu.com>
-Subject: Re: wpan-ping not working for an initial setup of Openlabs 802.15.4
- modules connected to rapsberry pi.
-Message-ID: <20190508154321.34euz2ygus2qjbvv@x220t>
-References: <C17AA022-0F79-4663-877F-A4A0A62E141A@gmail.com>
+Received: from mail.kernel.org ([198.145.29.99]:47978 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727515AbfEPLj5 (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+        Thu, 16 May 2019 07:39:57 -0400
+From: Sasha Levin <sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.0 19/34] net: ieee802154: fix missing checks for regmap_update_bits
+Date: Thu, 16 May 2019 07:39:16 -0400
+Message-Id: <20190516113932.8348-19-sashal@kernel.org>
+In-Reply-To: <20190516113932.8348-1-sashal@kernel.org>
+References: <20190516113932.8348-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <C17AA022-0F79-4663-877F-A4A0A62E141A@gmail.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Aditya Nath <nath46950@gmail.com>
-Cc: linux-wpan@vger.kernel.org
+To: linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc: Kangjie Lu <kjlu@umn.edu>, Mukesh Ojha <mojha@codeaurora.org>, Stefan Schmidt <stefan@datenfreihafen.org>, Sasha Levin <sashal@kernel.org>, linux-wpan@vger.kernel.org, netdev@vger.kernel.org
 
-Hi,
+From: Kangjie Lu <kjlu@umn.edu>
 
-On Fri, Apr 26, 2019 at 12:29:54AM -0400, Aditya Nath wrote:
-> Hi,
-> 
-> Sorry for creating another thread of mails, but I couldn’t figure out how to properly send the mail in the same chain using git-send-mail.
-> 
+[ Upstream commit 22e8860cf8f777fbf6a83f2fb7127f682a8e9de4 ]
 
-latest rpi kernel is known to have problems which I don't have with a
-mainline kernel.
+regmap_update_bits could fail and deserves a check.
 
-try:
+The patch adds the checks and if it fails, returns its error
+code upstream.
 
-sudo rpi-update 936a8dc3a605c20058fbb23672d6b47bca77b0d5
+Signed-off-by: Kangjie Lu <kjlu@umn.edu>
+Reviewed-by: Mukesh Ojha <mojha@codeaurora.org>
+Signed-off-by: Stefan Schmidt <stefan@datenfreihafen.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/net/ieee802154/mcr20a.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-which downgrades the kernel to a version where I heard from people that
-it works with the rpi kernel.
-
-- Alex
+diff --git a/drivers/net/ieee802154/mcr20a.c b/drivers/net/ieee802154/mcr20a.c
+index c589f5ae75bb5..8bb53ec8d9cf2 100644
+--- a/drivers/net/ieee802154/mcr20a.c
++++ b/drivers/net/ieee802154/mcr20a.c
+@@ -533,6 +533,8 @@ mcr20a_start(struct ieee802154_hw *hw)
+ 	dev_dbg(printdev(lp), "no slotted operation\n");
+ 	ret = regmap_update_bits(lp->regmap_dar, DAR_PHY_CTRL1,
+ 				 DAR_PHY_CTRL1_SLOTTED, 0x0);
++	if (ret < 0)
++		return ret;
+ 
+ 	/* enable irq */
+ 	enable_irq(lp->spi->irq);
+@@ -540,11 +542,15 @@ mcr20a_start(struct ieee802154_hw *hw)
+ 	/* Unmask SEQ interrupt */
+ 	ret = regmap_update_bits(lp->regmap_dar, DAR_PHY_CTRL2,
+ 				 DAR_PHY_CTRL2_SEQMSK, 0x0);
++	if (ret < 0)
++		return ret;
+ 
+ 	/* Start the RX sequence */
+ 	dev_dbg(printdev(lp), "start the RX sequence\n");
+ 	ret = regmap_update_bits(lp->regmap_dar, DAR_PHY_CTRL1,
+ 				 DAR_PHY_CTRL1_XCVSEQ_MASK, MCR20A_XCVSEQ_RX);
++	if (ret < 0)
++		return ret;
+ 
+ 	return 0;
+ }
+-- 
+2.20.1
