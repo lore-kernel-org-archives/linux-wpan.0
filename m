@@ -1,66 +1,53 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:49212 "EHLO mail.kernel.org"
+Received: from foss.arm.com ([217.140.101.70]:53886 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727873AbfEPLkr (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-        Thu, 16 May 2019 07:40:47 -0400
-From: Sasha Levin <sashal@kernel.org>
-Subject: [PATCH AUTOSEL 4.19 15/25] net: ieee802154: fix missing checks for regmap_update_bits
-Date: Thu, 16 May 2019 07:40:18 -0400
-Message-Id: <20190516114029.8682-15-sashal@kernel.org>
-In-Reply-To: <20190516114029.8682-1-sashal@kernel.org>
-References: <20190516114029.8682-1-sashal@kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        id S1729419AbfFCPvv (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+        Mon, 3 Jun 2019 11:51:51 -0400
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+Subject: [RFC PATCH 34/57] drivers: ieee802154: Use class_find_device_by_name() helper
+Date: Mon,  3 Jun 2019 16:50:00 +0100
+Message-Id: <1559577023-558-35-git-send-email-suzuki.poulose@arm.com>
+In-Reply-To: <1559577023-558-1-git-send-email-suzuki.poulose@arm.com>
+References: <1559577023-558-1-git-send-email-suzuki.poulose@arm.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc: Kangjie Lu <kjlu@umn.edu>, Mukesh Ojha <mojha@codeaurora.org>, Stefan Schmidt <stefan@datenfreihafen.org>, Sasha Levin <sashal@kernel.org>, linux-wpan@vger.kernel.org, netdev@vger.kernel.org
+To: linux-kernel@vger.kernel.org
+Cc: gregkh@linuxfoundation.org, rafael@kernel.org, suzuki.poulose@arm.com, Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt <stefan@datenfreihafen.org>, linux-wpan@vger.kernel.org
 
-From: Kangjie Lu <kjlu@umn.edu>
+Use the new class_find_device_by_name() helper.
 
-[ Upstream commit 22e8860cf8f777fbf6a83f2fb7127f682a8e9de4 ]
-
-regmap_update_bits could fail and deserves a check.
-
-The patch adds the checks and if it fails, returns its error
-code upstream.
-
-Signed-off-by: Kangjie Lu <kjlu@umn.edu>
-Reviewed-by: Mukesh Ojha <mojha@codeaurora.org>
-Signed-off-by: Stefan Schmidt <stefan@datenfreihafen.org>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
+Cc: Alexander Aring <alex.aring@gmail.com>
+Cc: Stefan Schmidt <stefan@datenfreihafen.org>
+Cc: linux-wpan@vger.kernel.org
+Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
- drivers/net/ieee802154/mcr20a.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ net/ieee802154/core.c | 7 +------
+ 1 file changed, 1 insertion(+), 6 deletions(-)
 
-diff --git a/drivers/net/ieee802154/mcr20a.c b/drivers/net/ieee802154/mcr20a.c
-index 04891429a5542..fe4057fca83d8 100644
---- a/drivers/net/ieee802154/mcr20a.c
-+++ b/drivers/net/ieee802154/mcr20a.c
-@@ -539,6 +539,8 @@ mcr20a_start(struct ieee802154_hw *hw)
- 	dev_dbg(printdev(lp), "no slotted operation\n");
- 	ret = regmap_update_bits(lp->regmap_dar, DAR_PHY_CTRL1,
- 				 DAR_PHY_CTRL1_SLOTTED, 0x0);
-+	if (ret < 0)
-+		return ret;
+diff --git a/net/ieee802154/core.c b/net/ieee802154/core.c
+index 60b7ac5..26fe751 100644
+--- a/net/ieee802154/core.c
++++ b/net/ieee802154/core.c
+@@ -23,11 +23,6 @@
+ LIST_HEAD(cfg802154_rdev_list);
+ int cfg802154_rdev_list_generation;
  
- 	/* enable irq */
- 	enable_irq(lp->spi->irq);
-@@ -546,11 +548,15 @@ mcr20a_start(struct ieee802154_hw *hw)
- 	/* Unmask SEQ interrupt */
- 	ret = regmap_update_bits(lp->regmap_dar, DAR_PHY_CTRL2,
- 				 DAR_PHY_CTRL2_SEQMSK, 0x0);
-+	if (ret < 0)
-+		return ret;
+-static int wpan_phy_match(struct device *dev, const void *data)
+-{
+-	return !strcmp(dev_name(dev), (const char *)data);
+-}
+-
+ struct wpan_phy *wpan_phy_find(const char *str)
+ {
+ 	struct device *dev;
+@@ -35,7 +30,7 @@ struct wpan_phy *wpan_phy_find(const char *str)
+ 	if (WARN_ON(!str))
+ 		return NULL;
  
- 	/* Start the RX sequence */
- 	dev_dbg(printdev(lp), "start the RX sequence\n");
- 	ret = regmap_update_bits(lp->regmap_dar, DAR_PHY_CTRL1,
- 				 DAR_PHY_CTRL1_XCVSEQ_MASK, MCR20A_XCVSEQ_RX);
-+	if (ret < 0)
-+		return ret;
+-	dev = class_find_device(&wpan_phy_class, NULL, str, wpan_phy_match);
++	dev = class_find_device_by_name(&wpan_phy_class, NULL, str);
+ 	if (!dev)
+ 		return NULL;
  
- 	return 0;
- }
 -- 
-2.20.1
+2.7.4
