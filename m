@@ -1,14 +1,14 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-lj1-f178.google.com ([209.85.208.178]:44157 "EHLO
-        mail-lj1-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726427AbfFFWoL (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 6 Jun 2019 18:44:11 -0400
-Received: by mail-lj1-f178.google.com with SMTP id k18so33155ljc.11
-        for <linux-wpan@vger.kernel.org>; Thu, 06 Jun 2019 15:44:10 -0700 (PDT)
+Received: from mail-lj1-f173.google.com ([209.85.208.173]:37096 "EHLO
+        mail-lj1-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726352AbfFFWtV (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 6 Jun 2019 18:49:21 -0400
+Received: by mail-lj1-f173.google.com with SMTP id 131so64642ljf.4
+        for <linux-wpan@vger.kernel.org>; Thu, 06 Jun 2019 15:49:19 -0700 (PDT)
 MIME-Version: 1.0
 From: Ramon Fontes <ramonreisfontes@gmail.com>
-Date: Thu, 6 Jun 2019 19:43:58 -0300
-Message-ID: <CAK8U23aMxHqVw7=vKdaLxQSC=n2pCLehbgoB4wCcft7Ui7Wm8A@mail.gmail.com>
+Date: Thu, 6 Jun 2019 19:49:07 -0300
+Message-ID: <CAK8U23aVH+O+4OWQrkG-Q+Kf2sD7DhvpDpO8+3C94Y9bE5k8ww@mail.gmail.com>
 Subject: Simulating 6lowpan with mac802154_hwsim
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-wpan-owner@vger.kernel.org
@@ -17,7 +17,7 @@ To: linux-wpan@vger.kernel.org
 
 Hello all,
 
-I've developed a wireless network emulator for IoT
+I've been developed a wireless network emulator for IoT
 (https://github.com/ramonfontes/mininet-iot) in which I'm using
 mac802154_hwsim. Mininet-IoT extends Mininet-WiFi
 (https://github.com/intrig-unicamp/mininet-wifi) by simulating WiFi
