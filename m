@@ -1,12 +1,12 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from relay11.mail.gandi.net ([217.70.178.231]:36203 "EHLO
-        relay11.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389338AbfGYPmT (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 25 Jul 2019 11:42:19 -0400
-Date: Thu, 25 Jul 2019 17:42:10 +0200
-From: Alexandre Belloni <alexandre.belloni@bootlin.com>
+Received: from mga07.intel.com ([134.134.136.100]:24694 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2387495AbfG2Ptd (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+        Mon, 29 Jul 2019 11:49:33 -0400
+Date: Mon, 29 Jul 2019 17:37:42 +0300
+From: Heikki Krogerus <heikki.krogerus@linux.intel.com>
 Subject: Re: [PATCH v3 1/7] drivers: Introduce device lookup variants by name
-Message-ID: <20190725154210.GU24911@piout.net>
+Message-ID: <20190729143742.GI28600@kuha.fi.intel.com>
 References: <20190723221838.12024-1-suzuki.poulose@arm.com>
  <20190723221838.12024-2-suzuki.poulose@arm.com>
 MIME-Version: 1.0
@@ -16,9 +16,9 @@ In-Reply-To: <20190723221838.12024-2-suzuki.poulose@arm.com>
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
 To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: linux-kernel@vger.kernel.org, gregkh@linuxfoundation.org, rafael@kernel.org, linux-arm-kernel@lists.infradead.org, Alessandro Zummo <a.zummo@towertech.it>, Alexander Aring <alex.aring@gmail.com>, Alexander Shishkin <alexander.shishkin@linux.intel.com>, Arnd Bergmann <arnd@arndb.de>, Dan Murphy <dmurphy@ti.com>, Harald Freudenberger <freude@linux.ibm.com>, Heikki Krogerus <heikki.krogerus@linux.intel.com>, Heiko Carstens <heiko.carstens@de.ibm.com>, Jacek Anaszewski <jacek.anaszewski@gmail.com>, Lee Jones <lee.jones@linaro.org>, linux-leds@vger.kernel.org, linux-rtc@vger.kernel.org, linux-usb@vger.kernel.org, linux-wpan@vger.kernel.org, Maxime Coquelin <mcoquelin.stm32@gmail.com>, Pavel Machek <pavel@ucw.cz>, Peter Oberparleiter <oberpar@linux.ibm.com>, Stefan Schmidt <stefan@datenfreihafen.org>, "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>
+Cc: linux-kernel@vger.kernel.org, gregkh@linuxfoundation.org, rafael@kernel.org, linux-arm-kernel@lists.infradead.org, Alessandro Zummo <a.zummo@towertech.it>, Alexander Aring <alex.aring@gmail.com>, Alexander Shishkin <alexander.shishkin@linux.intel.com>, Alexandre Belloni <alexandre.belloni@bootlin.com>, Arnd Bergmann <arnd@arndb.de>, Dan Murphy <dmurphy@ti.com>, Harald Freudenberger <freude@linux.ibm.com>, Heiko Carstens <heiko.carstens@de.ibm.com>, Jacek Anaszewski <jacek.anaszewski@gmail.com>, Lee Jones <lee.jones@linaro.org>, linux-leds@vger.kernel.org, linux-rtc@vger.kernel.org, linux-usb@vger.kernel.org, linux-wpan@vger.kernel.org, Maxime Coquelin <mcoquelin.stm32@gmail.com>, Pavel Machek <pavel@ucw.cz>, Peter Oberparleiter <oberpar@linux.ibm.com>, Stefan Schmidt <stefan@datenfreihafen.org>, "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>
 
-On 23/07/2019 23:18:32+0100, Suzuki K Poulose wrote:
+On Tue, Jul 23, 2019 at 11:18:32PM +0100, Suzuki K Poulose wrote:
 > Add a helper to match the device name for device lookup. Also
 > reuse this generic exported helper for the existing bus_find_device_by_name().
 > and add similar variants for driver/class.
@@ -47,7 +47,8 @@ On 23/07/2019 23:18:32+0100, Suzuki K Poulose wrote:
 > Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 > Cc: "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>
 > Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-Acked-by: Alexandre Belloni <alexandre.belloni@bootlin.com>
+
+Reviewed-by: Heikki Krogerus <heikki.krogerus@linux.intel.coM>
 
 > ---
 >  drivers/base/bus.c               | 24 ------------------
@@ -440,9 +441,8 @@ Acked-by: Alexandre Belloni <alexandre.belloni@bootlin.com>
 >  
 > -- 
 > 2.21.0
-> 
+
+thanks,
 
 -- 
-Alexandre Belloni, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
+heikki
