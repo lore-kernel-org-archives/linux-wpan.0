@@ -1,55 +1,51 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from proxima.lasnet.de ([78.47.171.185]:45156 "EHLO
+Received: from proxima.lasnet.de ([78.47.171.185]:45684 "EHLO
         proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725923AbfHMX2G (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 13 Aug 2019 19:28:06 -0400
-Subject: Re: [PATCH] net: ieee802154: remove redundant assignment to rc
-References: <20190813142818.15022-1-colin.king@canonical.com>
+        with ESMTP id S1727894AbfHXMT7 (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Sat, 24 Aug 2019 08:19:59 -0400
 From: Stefan Schmidt <stefan@datenfreihafen.org>
-Message-ID: <a3262e25-209d-209d-59fc-a09511fb9280@datenfreihafen.org>
-Date: Wed, 14 Aug 2019 01:28:02 +0200
+Subject: pull-request: ieee802154 for net 2019-08-24
+Date: Sat, 24 Aug 2019 14:19:53 +0200
+Message-Id: <20190824121953.27839-1-stefan@datenfreihafen.org>
 MIME-Version: 1.0
-In-Reply-To: <20190813142818.15022-1-colin.king@canonical.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Colin King <colin.king@canonical.com>, Alexander Aring <alex.aring@gmail.com>, "David S . Miller" <davem@davemloft.net>, linux-wpan@vger.kernel.org, netdev@vger.kernel.org
-Cc: kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+To: davem@davemloft.net
+Cc: linux-wpan@vger.kernel.org, alex.aring@gmail.com, netdev@vger.kernel.org
 
-Hello.
+Hello Dave.
 
-On 13.08.19 16:28, Colin King wrote:
-> From: Colin Ian King <colin.king@canonical.com>
-> 
-> Variable rc is initialized to a value that is never read and it is
-> re-assigned later. The initialization is redundant and can be removed.
-> 
-> Addresses-Coverity: ("Unused value")
-> Signed-off-by: Colin Ian King <colin.king@canonical.com>
-> ---
->  net/ieee802154/socket.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/net/ieee802154/socket.c b/net/ieee802154/socket.c
-> index dacbd58e1799..badc5cfe4dc6 100644
-> --- a/net/ieee802154/socket.c
-> +++ b/net/ieee802154/socket.c
-> @@ -1092,7 +1092,7 @@ static struct packet_type ieee802154_packet_type = {
->  
->  static int __init af_ieee802154_init(void)
->  {
-> -	int rc = -EINVAL;
-> +	int rc;
->  
->  	rc = proto_register(&ieee802154_raw_prot, 1);
->  	if (rc)
-> 
+An update from ieee802154 for your *net* tree.
 
+Yue  Haibing fixed two bugs discovered by KASAN in the hwsim driver for
+ieee802154 and Colin Ian King cleaned up a redundant variable assignment.
 
-This patch has been applied to the wpan tree and will be
-part of the next pull request to net. Thanks!
+If there are any problems let me know.
 
 regards
 Stefan Schmidt
+
+The following changes since commit 6c0afef5fb0c27758f4d52b2210c61b6bd8b4470:
+
+  ipv6/flowlabel: wait rcu grace period before put_pid() (2019-04-29 23:30:13 -0400)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/sschmidt/wpan.git ieee802154-for-davem-2019-08-24
+
+for you to fetch changes up to 074014abdf2bd2a00da3dd14a6ae04cafc1d62cc:
+
+  net: ieee802154: remove redundant assignment to rc (2019-08-14 01:10:41 +0200)
+
+----------------------------------------------------------------
+Colin Ian King (1):
+      net: ieee802154: remove redundant assignment to rc
+
+YueHaibing (2):
+      ieee802154: hwsim: Fix error handle path in hwsim_init_module
+      ieee802154: hwsim: unregister hw while hwsim_subscribe_all_others fails
+
+ drivers/net/ieee802154/mac802154_hwsim.c | 8 +++++---
+ net/ieee802154/socket.c                  | 2 +-
+ 2 files changed, 6 insertions(+), 4 deletions(-)
