@@ -1,99 +1,166 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-pg1-f182.google.com ([209.85.215.182]:39682 "EHLO
-        mail-pg1-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725826AbfH3Akf (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 29 Aug 2019 20:40:35 -0400
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (1.0)
-Subject: Re: ANNOUNCE: rpld an another RPL implementation for Linux
-From: Reuben Hawkins <reubenhwk@gmail.com>
-In-Reply-To: <CAB_54W7h9ca0UJAZtk=ApPX-2ZCvzu4774BTFTaB5mtkobWCtw@mail.gmail.com>
-Date: Thu, 29 Aug 2019 17:40:30 -0700
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <F9994340-5074-4CAB-9FCF-7CC5DAF48257@gmail.com>
-References: <CAB_54W7h9ca0UJAZtk=ApPX-2ZCvzu4774BTFTaB5mtkobWCtw@mail.gmail.com>
+Received: from mail-io1-f69.google.com ([209.85.166.69]:47024 "EHLO
+        mail-io1-f69.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729073AbfICMIK (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 3 Sep 2019 08:08:10 -0400
+Received: by mail-io1-f69.google.com with SMTP id o3so8640526iom.13
+        for <linux-wpan@vger.kernel.org>; Tue, 03 Sep 2019 05:08:10 -0700 (PDT)
+MIME-Version: 1.0
+Date: Tue, 03 Sep 2019 05:08:09 -0700
+Message-ID: <00000000000022c6e60591a4f15a@google.com>
+Subject: KASAN: use-after-free Read in atusb_disconnect
+From: syzbot <syzbot+f4509a9138a1472e7e80@syzkaller.appspotmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>
-Cc: "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>, Michael Richardson <mcr@sandelman.ca>, Jamal Hadi Salim <jhs@mojatatu.com>, Robert Kaiser <robert.kaiser@hs-rm.de>, Martin Gergeleit <martin.gergeleit@hs-rm.de>, Kai Beckmann <kai.beckmann@hs-rm.de>, koen@bergzand.net, linux-wpan - ML <linux-wpan@vger.kernel.org>, BlueZ development <linux-bluetooth@vger.kernel.org>, Stefan Schmidt <stefan@datenfreihafen.org>, sebastian.meiling@haw-hamburg.de, Marcel Holtmann <marcel@holtmann.org>, Werner Almesberger <werner@almesberger.net>, Jukka Rissanen <jukka.rissanen@linux.intel.com>
+To: alex.aring@gmail.com, andreyknvl@google.com, davem@davemloft.net, linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org, linux-wpan@vger.kernel.org, netdev@vger.kernel.org, stefan@datenfreihafen.org, syzkaller-bugs@googlegroups.com
 
-There is a COPYRIGHT file in radvd which I just read for the first time toda=
-y. It=E2=80=99s been there for 19+ years. Sounds very BSD to me. I=E2=80=99v=
-e been maintainer for 9 years. As far as I=E2=80=99m concerned, you can do w=
-ith the code whatever you like.  Good luck. =F0=9F=91=8D=20
+Hello,
 
-Sent from my iPhone
+syzbot found the following crash on:
 
-> On Aug 29, 2019, at 2:57 PM, Alexander Aring <alex.aring@gmail.com> wrote:=
+HEAD commit:    eea39f24 usb-fuzzer: main usb gadget fuzzer driver
+git tree:       https://github.com/google/kasan.git usb-fuzzer
+console output: https://syzkaller.appspot.com/x/log.txt?x=15c4eba6600000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=d0c62209eedfd54e
+dashboard link: https://syzkaller.appspot.com/bug?extid=f4509a9138a1472e7e80
+compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15486ab6600000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15777f22600000
 
->=20
-> Hi,
->=20
-> I had some free time, I wanted to know how RPL [0] works so I did a
-> implementation. It's _very_ basic as it only gives you a "routable"
-> (is that a word?) thing afterwards in a very constrained setup of RPL
-> messages.
->=20
-> Took ~1 month to implement it and I reused some great code from radvd
-> [1]. I released it under the same license (BSD?). Anyway, I know there
-> exists a lot of memory leaks and the parameters are just crazy as not
-> practical in a real environment BUT it works.
->=20
-> I changed a little bit the dependencies from radvd (because fancy new thin=
-gs):
->=20
-> - lua for config handling
-> - libev for event loop handling
-> - libmnl for netlink handling
->=20
-> The code is available at:
->=20
-> https://github.com/linux-wpan/rpld
->=20
-> With a recent kernel (I think 4.19 and above) and necessary user space
-> dependencies, just build it and run the start script. It will create
-> some virtual IEEE 802.15.4 6LoWPAN interfaces and you can run
-> traceroute from namespace ns0 (which is the RPL DODAG root) to any
-> other node e.g. namespace ns5. With more knowledge of the scripts you
-> can change the underlying topology, everybody is welcome to improve
-> them.
->=20
-> I will work more on it when I have time... to have at least something
-> running means the real fun can begin (but it was already fun before).
->=20
-> The big thing what everybody wants is source routing, which requires
-> some control plane for RPL into the kernel to say how and when to put
-> source routing headers in IPv6. I think somehow I know what's
-> necessary now... but I didn't implemented it, this simple
-> implementation just filling up routing tables as RPL supports storing
-> (routing table) or non-storing (source routing) modes. People tells me
-> to lookup frrouting to look how they do source routing, I will if I
-> get the chance.
->=20
-> It doesn't run on Bluetooth yet, I know there exists a lack of UAPI to
-> figure out the linklayer which is used by 6LoWPAN. I need somehow a
-> SLAVE_INFO attribute in netlink to figure this out and tell me some
-> 6LoWPAN specific attributes. I am sorry Bluetooth people, but I think
-> you are also more interested in source routing because I heard
-> somebody saying it's the more common approach outside (but I never saw
-> any other RPL implementation than unstrung running).
->=20
-> Also I did something in my masters thesis to make a better parent
-> selection, if this implementation becomes stable I can look to get
-> this migrated.
->=20
-> Please, radvd maintainer let me know if everything is okay from your
-> side. As I said I reused some code from radvd. I also operate on
-> ICMPv6 sockets. The same to Michael Richardson unstrung [2]. If there
-> is anything to talk or you have complains, I can change it.
->=20
-> Thanks, I really only wanted to get more knowledge about routing
-> protocols and how to implement such. Besides all known issues, I still
-> think it's a good starting point.
->=20
-> - Alex
->=20
-> [0] https://tools.ietf.org/html/rfc6550
-> [1] https://github.com/reubenhwk/radvd
-> [2] https://github.com/AnimaGUS-minerva/unstrung
+IMPORTANT: if you fix the bug, please add the following tag to the commit:
+Reported-by: syzbot+f4509a9138a1472e7e80@syzkaller.appspotmail.com
+
+usb 1-1: USB disconnect, device number 2
+==================================================================
+BUG: KASAN: use-after-free in atusb_disconnect+0x17f/0x1c0  
+drivers/net/ieee802154/atusb.c:1143
+Read of size 8 at addr ffff8881d53eee28 by task kworker/1:2/83
+
+CPU: 1 PID: 83 Comm: kworker/1:2 Not tainted 5.3.0-rc5+ #28
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS  
+Google 01/01/2011
+Workqueue: usb_hub_wq hub_event
+Call Trace:
+  __dump_stack lib/dump_stack.c:77 [inline]
+  dump_stack+0xca/0x13e lib/dump_stack.c:113
+  print_address_description+0x6a/0x32c mm/kasan/report.c:351
+  __kasan_report.cold+0x1a/0x33 mm/kasan/report.c:482
+  kasan_report+0xe/0x12 mm/kasan/common.c:612
+  atusb_disconnect+0x17f/0x1c0 drivers/net/ieee802154/atusb.c:1143
+  usb_unbind_interface+0x1bd/0x8a0 drivers/usb/core/driver.c:423
+  __device_release_driver drivers/base/dd.c:1134 [inline]
+  device_release_driver_internal+0x42f/0x500 drivers/base/dd.c:1165
+  bus_remove_device+0x2dc/0x4a0 drivers/base/bus.c:556
+  device_del+0x420/0xb10 drivers/base/core.c:2339
+  usb_disable_device+0x211/0x690 drivers/usb/core/message.c:1237
+  usb_disconnect+0x284/0x8d0 drivers/usb/core/hub.c:2199
+  hub_port_connect drivers/usb/core/hub.c:4949 [inline]
+  hub_port_connect_change drivers/usb/core/hub.c:5213 [inline]
+  port_event drivers/usb/core/hub.c:5359 [inline]
+  hub_event+0x1454/0x3640 drivers/usb/core/hub.c:5441
+  process_one_work+0x92b/0x1530 kernel/workqueue.c:2269
+  worker_thread+0x96/0xe20 kernel/workqueue.c:2415
+  kthread+0x318/0x420 kernel/kthread.c:255
+  ret_from_fork+0x24/0x30 arch/x86/entry/entry_64.S:352
+
+Allocated by task 12:
+  save_stack+0x1b/0x80 mm/kasan/common.c:69
+  set_track mm/kasan/common.c:77 [inline]
+  __kasan_kmalloc mm/kasan/common.c:487 [inline]
+  __kasan_kmalloc.constprop.0+0xbf/0xd0 mm/kasan/common.c:460
+  kmalloc include/linux/slab.h:557 [inline]
+  kzalloc include/linux/slab.h:748 [inline]
+  wpan_phy_new+0x22/0x290 net/ieee802154/core.c:109
+  ieee802154_alloc_hw+0x11d/0x750 net/mac802154/main.c:77
+  atusb_probe+0x9b/0xfa2 drivers/net/ieee802154/atusb.c:1023
+  usb_probe_interface+0x305/0x7a0 drivers/usb/core/driver.c:361
+  really_probe+0x281/0x6d0 drivers/base/dd.c:548
+  driver_probe_device+0x101/0x1b0 drivers/base/dd.c:721
+  __device_attach_driver+0x1c2/0x220 drivers/base/dd.c:828
+  bus_for_each_drv+0x162/0x1e0 drivers/base/bus.c:454
+  __device_attach+0x217/0x360 drivers/base/dd.c:894
+  bus_probe_device+0x1e4/0x290 drivers/base/bus.c:514
+  device_add+0xae6/0x16f0 drivers/base/core.c:2165
+  usb_set_configuration+0xdf6/0x1670 drivers/usb/core/message.c:2023
+  generic_probe+0x9d/0xd5 drivers/usb/core/generic.c:210
+  usb_probe_device+0x99/0x100 drivers/usb/core/driver.c:266
+  really_probe+0x281/0x6d0 drivers/base/dd.c:548
+  driver_probe_device+0x101/0x1b0 drivers/base/dd.c:721
+  __device_attach_driver+0x1c2/0x220 drivers/base/dd.c:828
+  bus_for_each_drv+0x162/0x1e0 drivers/base/bus.c:454
+  __device_attach+0x217/0x360 drivers/base/dd.c:894
+  bus_probe_device+0x1e4/0x290 drivers/base/bus.c:514
+  device_add+0xae6/0x16f0 drivers/base/core.c:2165
+  usb_new_device.cold+0x6a4/0xe79 drivers/usb/core/hub.c:2536
+  hub_port_connect drivers/usb/core/hub.c:5098 [inline]
+  hub_port_connect_change drivers/usb/core/hub.c:5213 [inline]
+  port_event drivers/usb/core/hub.c:5359 [inline]
+  hub_event+0x1b5c/0x3640 drivers/usb/core/hub.c:5441
+  process_one_work+0x92b/0x1530 kernel/workqueue.c:2269
+  worker_thread+0x96/0xe20 kernel/workqueue.c:2415
+  kthread+0x318/0x420 kernel/kthread.c:255
+  ret_from_fork+0x24/0x30 arch/x86/entry/entry_64.S:352
+
+Freed by task 83:
+  save_stack+0x1b/0x80 mm/kasan/common.c:69
+  set_track mm/kasan/common.c:77 [inline]
+  __kasan_slab_free+0x130/0x180 mm/kasan/common.c:449
+  slab_free_hook mm/slub.c:1423 [inline]
+  slab_free_freelist_hook mm/slub.c:1474 [inline]
+  slab_free mm/slub.c:3016 [inline]
+  kfree+0xe4/0x2f0 mm/slub.c:3957
+  device_release+0x71/0x200 drivers/base/core.c:1064
+  kobject_cleanup lib/kobject.c:693 [inline]
+  kobject_release lib/kobject.c:722 [inline]
+  kref_put include/linux/kref.h:65 [inline]
+  kobject_put+0x171/0x280 lib/kobject.c:739
+  put_device+0x1b/0x30 drivers/base/core.c:2264
+  atusb_disconnect+0x117/0x1c0 drivers/net/ieee802154/atusb.c:1140
+  usb_unbind_interface+0x1bd/0x8a0 drivers/usb/core/driver.c:423
+  __device_release_driver drivers/base/dd.c:1134 [inline]
+  device_release_driver_internal+0x42f/0x500 drivers/base/dd.c:1165
+  bus_remove_device+0x2dc/0x4a0 drivers/base/bus.c:556
+  device_del+0x420/0xb10 drivers/base/core.c:2339
+  usb_disable_device+0x211/0x690 drivers/usb/core/message.c:1237
+  usb_disconnect+0x284/0x8d0 drivers/usb/core/hub.c:2199
+  hub_port_connect drivers/usb/core/hub.c:4949 [inline]
+  hub_port_connect_change drivers/usb/core/hub.c:5213 [inline]
+  port_event drivers/usb/core/hub.c:5359 [inline]
+  hub_event+0x1454/0x3640 drivers/usb/core/hub.c:5441
+  process_one_work+0x92b/0x1530 kernel/workqueue.c:2269
+  worker_thread+0x96/0xe20 kernel/workqueue.c:2415
+  kthread+0x318/0x420 kernel/kthread.c:255
+  ret_from_fork+0x24/0x30 arch/x86/entry/entry_64.S:352
+
+The buggy address belongs to the object at ffff8881d53ee600
+  which belongs to the cache kmalloc-4k of size 4096
+The buggy address is located 2088 bytes inside of
+  4096-byte region [ffff8881d53ee600, ffff8881d53ef600)
+The buggy address belongs to the page:
+page:ffffea000754fa00 refcount:1 mapcount:0 mapping:ffff8881da00c280  
+index:0x0 compound_mapcount: 0
+flags: 0x200000000010200(slab|head)
+raw: 0200000000010200 0000000000000000 0000000600000001 ffff8881da00c280
+raw: 0000000000000000 0000000000070007 00000001ffffffff 0000000000000000
+page dumped because: kasan: bad access detected
+
+Memory state around the buggy address:
+  ffff8881d53eed00: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+  ffff8881d53eed80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+> ffff8881d53eee00: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+                                   ^
+  ffff8881d53eee80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+  ffff8881d53eef00: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+==================================================================
+
+
+---
+This bug is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this bug report. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+syzbot can test patches for this bug, for details see:
+https://goo.gl/tpsmEJ#testing-patches
