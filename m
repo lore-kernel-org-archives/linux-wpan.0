@@ -1,166 +1,116 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-Received: from mail-io1-f69.google.com ([209.85.166.69]:47024 "EHLO
-        mail-io1-f69.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729073AbfICMIK (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 3 Sep 2019 08:08:10 -0400
-Received: by mail-io1-f69.google.com with SMTP id o3so8640526iom.13
-        for <linux-wpan@vger.kernel.org>; Tue, 03 Sep 2019 05:08:10 -0700 (PDT)
+Received: from mail.kernel.org ([198.145.29.99]:59312 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730355AbfIDP5n (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+        Wed, 4 Sep 2019 11:57:43 -0400
+From: Sasha Levin <sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.2 01/94] ieee802154: hwsim: Fix error handle path in hwsim_init_module
+Date: Wed,  4 Sep 2019 11:56:06 -0400
+Message-Id: <20190904155739.2816-1-sashal@kernel.org>
 MIME-Version: 1.0
-Date: Tue, 03 Sep 2019 05:08:09 -0700
-Message-ID: <00000000000022c6e60591a4f15a@google.com>
-Subject: KASAN: use-after-free Read in atusb_disconnect
-From: syzbot <syzbot+f4509a9138a1472e7e80@syzkaller.appspotmail.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+Content-Transfer-Encoding: 8bit
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-wpan.vger.kernel.org>
-To: alex.aring@gmail.com, andreyknvl@google.com, davem@davemloft.net, linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org, linux-wpan@vger.kernel.org, netdev@vger.kernel.org, stefan@datenfreihafen.org, syzkaller-bugs@googlegroups.com
+To: linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc: YueHaibing <yuehaibing@huawei.com>, Hulk Robot <hulkci@huawei.com>, Alexander Aring <aring@mojatatu.com>, Stefan Schmidt <stefan@datenfreihafen.org>, Sasha Levin <sashal@kernel.org>, linux-wpan@vger.kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org
 
-Hello,
+From: YueHaibing <yuehaibing@huawei.com>
 
-syzbot found the following crash on:
+[ Upstream commit 1cbbbf39efab05fae67f59e6ed01bb85061c69e2 ]
 
-HEAD commit:    eea39f24 usb-fuzzer: main usb gadget fuzzer driver
-git tree:       https://github.com/google/kasan.git usb-fuzzer
-console output: https://syzkaller.appspot.com/x/log.txt?x=15c4eba6600000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=d0c62209eedfd54e
-dashboard link: https://syzkaller.appspot.com/bug?extid=f4509a9138a1472e7e80
-compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15486ab6600000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15777f22600000
+KASAN report this:
 
-IMPORTANT: if you fix the bug, please add the following tag to the commit:
-Reported-by: syzbot+f4509a9138a1472e7e80@syzkaller.appspotmail.com
-
-usb 1-1: USB disconnect, device number 2
-==================================================================
-BUG: KASAN: use-after-free in atusb_disconnect+0x17f/0x1c0  
-drivers/net/ieee802154/atusb.c:1143
-Read of size 8 at addr ffff8881d53eee28 by task kworker/1:2/83
-
-CPU: 1 PID: 83 Comm: kworker/1:2 Not tainted 5.3.0-rc5+ #28
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS  
-Google 01/01/2011
-Workqueue: usb_hub_wq hub_event
+BUG: unable to handle kernel paging request at fffffbfff834f001
+PGD 237fe8067 P4D 237fe8067 PUD 237e64067 PMD 1c968d067 PTE 0
+Oops: 0000 [#1] SMP KASAN PTI
+CPU: 1 PID: 8871 Comm: syz-executor.0 Tainted: G         C        5.0.0+ #5
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.10.2-1ubuntu1 04/01/2014
+RIP: 0010:strcmp+0x31/0xa0 lib/string.c:328
+Code: 00 00 00 00 fc ff df 55 53 48 83 ec 08 eb 0a 84 db 48 89 ef 74 5a 4c 89 e6 48 89 f8 48 89 fa 48 8d 6f 01 48 c1 e8 03 83 e2 07 <42> 0f b6 04 28 38 d0 7f 04 84 c0 75 50 48 89 f0 48 89 f2 0f b6 5d
+RSP: 0018:ffff8881e0c57800 EFLAGS: 00010246
+RAX: 1ffffffff834f001 RBX: ffffffffc1a78000 RCX: ffffffff827b9503
+RDX: 0000000000000000 RSI: ffffffffc1a40008 RDI: ffffffffc1a78008
+RBP: ffffffffc1a78009 R08: fffffbfff6a92195 R09: fffffbfff6a92195
+R10: ffff8881e0c578b8 R11: fffffbfff6a92194 R12: ffffffffc1a40008
+R13: dffffc0000000000 R14: ffffffffc1a3e470 R15: ffffffffc1a40000
+FS:  00007fdcc02ff700(0000) GS:ffff8881f7300000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: fffffbfff834f001 CR3: 00000001b3134003 CR4: 00000000007606e0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+PKRU: 55555554
 Call Trace:
-  __dump_stack lib/dump_stack.c:77 [inline]
-  dump_stack+0xca/0x13e lib/dump_stack.c:113
-  print_address_description+0x6a/0x32c mm/kasan/report.c:351
-  __kasan_report.cold+0x1a/0x33 mm/kasan/report.c:482
-  kasan_report+0xe/0x12 mm/kasan/common.c:612
-  atusb_disconnect+0x17f/0x1c0 drivers/net/ieee802154/atusb.c:1143
-  usb_unbind_interface+0x1bd/0x8a0 drivers/usb/core/driver.c:423
-  __device_release_driver drivers/base/dd.c:1134 [inline]
-  device_release_driver_internal+0x42f/0x500 drivers/base/dd.c:1165
-  bus_remove_device+0x2dc/0x4a0 drivers/base/bus.c:556
-  device_del+0x420/0xb10 drivers/base/core.c:2339
-  usb_disable_device+0x211/0x690 drivers/usb/core/message.c:1237
-  usb_disconnect+0x284/0x8d0 drivers/usb/core/hub.c:2199
-  hub_port_connect drivers/usb/core/hub.c:4949 [inline]
-  hub_port_connect_change drivers/usb/core/hub.c:5213 [inline]
-  port_event drivers/usb/core/hub.c:5359 [inline]
-  hub_event+0x1454/0x3640 drivers/usb/core/hub.c:5441
-  process_one_work+0x92b/0x1530 kernel/workqueue.c:2269
-  worker_thread+0x96/0xe20 kernel/workqueue.c:2415
-  kthread+0x318/0x420 kernel/kthread.c:255
-  ret_from_fork+0x24/0x30 arch/x86/entry/entry_64.S:352
+ genl_family_find_byname+0x7f/0xf0 net/netlink/genetlink.c:104
+ genl_register_family+0x1e1/0x1070 net/netlink/genetlink.c:333
+ ? 0xffffffffc1978000
+ hwsim_init_module+0x6a/0x1000 [mac802154_hwsim]
+ ? 0xffffffffc1978000
+ ? 0xffffffffc1978000
+ ? 0xffffffffc1978000
+ do_one_initcall+0xbc/0x47d init/main.c:887
+ do_init_module+0x1b5/0x547 kernel/module.c:3456
+ load_module+0x6405/0x8c10 kernel/module.c:3804
+ __do_sys_finit_module+0x162/0x190 kernel/module.c:3898
+ do_syscall_64+0x9f/0x450 arch/x86/entry/common.c:290
+ entry_SYSCALL_64_after_hwframe+0x49/0xbe
+RIP: 0033:0x462e99
+Code: f7 d8 64 89 02 b8 ff ff ff ff c3 66 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 bc ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fdcc02fec58 EFLAGS: 00000246 ORIG_RAX: 0000000000000139
+RAX: ffffffffffffffda RBX: 000000000073bf00 RCX: 0000000000462e99
+RDX: 0000000000000000 RSI: 0000000020000200 RDI: 0000000000000003
+RBP: 00007fdcc02fec70 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 00007fdcc02ff6bc
+R13: 00000000004bcefa R14: 00000000006f6fb0 R15: 0000000000000004
+Modules linked in: mac802154_hwsim(+) mac802154 ieee802154 speakup(C) rc_proteus_2309 rtc_rk808 streebog_generic rds vboxguest madera_spi madera da9052_wdt mISDN_core ueagle_atm usbatm atm ir_imon_decoder scsi_transport_sas rc_dntv_live_dvb_t panel_samsung_s6d16d0 drm drm_panel_orientation_quirks lib80211 fb_agm1264k_fl(C) gspca_pac7302 gspca_main videobuf2_v4l2 soundwire_intel_init i2c_dln2 dln2 usbcore hid_gaff 88pm8607 nfnetlink axp20x_i2c axp20x uio pata_marvell pmbus_core snd_sonicvibes gameport snd_pcm snd_opl3_lib snd_timer snd_hwdep snd_mpu401_uart snd_rawmidi snd_seq_device snd soundcore rtc_ds1511 rtc_ds1742 vsock dwc_xlgmac rtc_rx8010 libphy twofish_x86_64_3way twofish_x86_64 twofish_common ad5696_i2c ad5686 lp8788_charger cxd2880_spi dvb_core videobuf2_common videodev media videobuf2_vmalloc videobuf2_memops fbtft(C) sysimgblt sysfillrect syscopyarea fb_sys_fops janz_ican3 firewire_net firewire_core crc_itu_t spi_slave_system_control i2c_matroxfb i2c_algo_bit
+ matroxfb_base fb fbdev matroxfb_DAC1064 matroxfb_accel cfbcopyarea cfbimgblt cfbfillrect matroxfb_Ti3026 matroxfb_g450 g450_pll matroxfb_misc leds_blinkm ti_dac7311 intel_spi_pci intel_spi spi_nor hid_elan hid async_tx rc_cinergy_1400 rc_core intel_ishtp kxcjk_1013 industrialio_triggered_buffer kfifo_buf can_dev intel_th spi_pxa2xx_platform pata_artop vme_ca91cx42 gb_gbphy(C) greybus(C) industrialio mptbase st_drv cmac ttpci_eeprom via_wdt gpio_xra1403 mtd iptable_security iptable_raw iptable_mangle iptable_nat nf_nat nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 iptable_filter bpfilter ip6_vti ip_vti ip_gre ipip sit tunnel4 ip_tunnel hsr veth netdevsim vxcan batman_adv cfg80211 rfkill chnl_net caif nlmon dummy team bonding vcan bridge stp llc ip6_gre gre ip6_tunnel tunnel6 tun joydev mousedev ppdev kvm_intel kvm irqbypass crct10dif_pclmul crc32_pclmul crc32c_intel ghash_clmulni_intel aesni_intel aes_x86_64 input_leds crypto_simd cryptd glue_helper ide_pci_generic piix psmouse
+ ide_core serio_raw ata_generic i2c_piix4 pata_acpi parport_pc parport floppy rtc_cmos intel_agp intel_gtt agpgart sch_fq_codel ip_tables x_tables sha1_ssse3 sha1_generic ipv6 [last unloaded: speakup]
+Dumping ftrace buffer:
+   (ftrace buffer empty)
+CR2: fffffbfff834f001
+---[ end trace 5aa772c793e0e971 ]---
+RIP: 0010:strcmp+0x31/0xa0 lib/string.c:328
+Code: 00 00 00 00 fc ff df 55 53 48 83 ec 08 eb 0a 84 db 48 89 ef 74 5a 4c 89 e6 48 89 f8 48 89 fa 48 8d 6f 01 48 c1 e8 03 83 e2 07 <42> 0f b6 04 28 38 d0 7f 04 84 c0 75 50 48 89 f0 48 89 f2 0f b6 5d
+RSP: 0018:ffff8881e0c57800 EFLAGS: 00010246
+RAX: 1ffffffff834f001 RBX: ffffffffc1a78000 RCX: ffffffff827b9503
+RDX: 0000000000000000 RSI: ffffffffc1a40008 RDI: ffffffffc1a78008
+RBP: ffffffffc1a78009 R08: fffffbfff6a92195 R09: fffffbfff6a92195
+R10: ffff8881e0c578b8 R11: fffffbfff6a92194 R12: ffffffffc1a40008
+R13: dffffc0000000000 R14: ffffffffc1a3e470 R15: ffffffffc1a40000
+FS:  00007fdcc02ff700(0000) GS:ffff8881f7300000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: fffffbfff834f001 CR3: 00000001b3134003 CR4: 00000000007606e0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+PKRU: 55555554
 
-Allocated by task 12:
-  save_stack+0x1b/0x80 mm/kasan/common.c:69
-  set_track mm/kasan/common.c:77 [inline]
-  __kasan_kmalloc mm/kasan/common.c:487 [inline]
-  __kasan_kmalloc.constprop.0+0xbf/0xd0 mm/kasan/common.c:460
-  kmalloc include/linux/slab.h:557 [inline]
-  kzalloc include/linux/slab.h:748 [inline]
-  wpan_phy_new+0x22/0x290 net/ieee802154/core.c:109
-  ieee802154_alloc_hw+0x11d/0x750 net/mac802154/main.c:77
-  atusb_probe+0x9b/0xfa2 drivers/net/ieee802154/atusb.c:1023
-  usb_probe_interface+0x305/0x7a0 drivers/usb/core/driver.c:361
-  really_probe+0x281/0x6d0 drivers/base/dd.c:548
-  driver_probe_device+0x101/0x1b0 drivers/base/dd.c:721
-  __device_attach_driver+0x1c2/0x220 drivers/base/dd.c:828
-  bus_for_each_drv+0x162/0x1e0 drivers/base/bus.c:454
-  __device_attach+0x217/0x360 drivers/base/dd.c:894
-  bus_probe_device+0x1e4/0x290 drivers/base/bus.c:514
-  device_add+0xae6/0x16f0 drivers/base/core.c:2165
-  usb_set_configuration+0xdf6/0x1670 drivers/usb/core/message.c:2023
-  generic_probe+0x9d/0xd5 drivers/usb/core/generic.c:210
-  usb_probe_device+0x99/0x100 drivers/usb/core/driver.c:266
-  really_probe+0x281/0x6d0 drivers/base/dd.c:548
-  driver_probe_device+0x101/0x1b0 drivers/base/dd.c:721
-  __device_attach_driver+0x1c2/0x220 drivers/base/dd.c:828
-  bus_for_each_drv+0x162/0x1e0 drivers/base/bus.c:454
-  __device_attach+0x217/0x360 drivers/base/dd.c:894
-  bus_probe_device+0x1e4/0x290 drivers/base/bus.c:514
-  device_add+0xae6/0x16f0 drivers/base/core.c:2165
-  usb_new_device.cold+0x6a4/0xe79 drivers/usb/core/hub.c:2536
-  hub_port_connect drivers/usb/core/hub.c:5098 [inline]
-  hub_port_connect_change drivers/usb/core/hub.c:5213 [inline]
-  port_event drivers/usb/core/hub.c:5359 [inline]
-  hub_event+0x1b5c/0x3640 drivers/usb/core/hub.c:5441
-  process_one_work+0x92b/0x1530 kernel/workqueue.c:2269
-  worker_thread+0x96/0xe20 kernel/workqueue.c:2415
-  kthread+0x318/0x420 kernel/kthread.c:255
-  ret_from_fork+0x24/0x30 arch/x86/entry/entry_64.S:352
+The error handing path misplace the cleanup in hwsim_init_module,
+switch the two cleanup functions to fix above issues.
 
-Freed by task 83:
-  save_stack+0x1b/0x80 mm/kasan/common.c:69
-  set_track mm/kasan/common.c:77 [inline]
-  __kasan_slab_free+0x130/0x180 mm/kasan/common.c:449
-  slab_free_hook mm/slub.c:1423 [inline]
-  slab_free_freelist_hook mm/slub.c:1474 [inline]
-  slab_free mm/slub.c:3016 [inline]
-  kfree+0xe4/0x2f0 mm/slub.c:3957
-  device_release+0x71/0x200 drivers/base/core.c:1064
-  kobject_cleanup lib/kobject.c:693 [inline]
-  kobject_release lib/kobject.c:722 [inline]
-  kref_put include/linux/kref.h:65 [inline]
-  kobject_put+0x171/0x280 lib/kobject.c:739
-  put_device+0x1b/0x30 drivers/base/core.c:2264
-  atusb_disconnect+0x117/0x1c0 drivers/net/ieee802154/atusb.c:1140
-  usb_unbind_interface+0x1bd/0x8a0 drivers/usb/core/driver.c:423
-  __device_release_driver drivers/base/dd.c:1134 [inline]
-  device_release_driver_internal+0x42f/0x500 drivers/base/dd.c:1165
-  bus_remove_device+0x2dc/0x4a0 drivers/base/bus.c:556
-  device_del+0x420/0xb10 drivers/base/core.c:2339
-  usb_disable_device+0x211/0x690 drivers/usb/core/message.c:1237
-  usb_disconnect+0x284/0x8d0 drivers/usb/core/hub.c:2199
-  hub_port_connect drivers/usb/core/hub.c:4949 [inline]
-  hub_port_connect_change drivers/usb/core/hub.c:5213 [inline]
-  port_event drivers/usb/core/hub.c:5359 [inline]
-  hub_event+0x1454/0x3640 drivers/usb/core/hub.c:5441
-  process_one_work+0x92b/0x1530 kernel/workqueue.c:2269
-  worker_thread+0x96/0xe20 kernel/workqueue.c:2415
-  kthread+0x318/0x420 kernel/kthread.c:255
-  ret_from_fork+0x24/0x30 arch/x86/entry/entry_64.S:352
-
-The buggy address belongs to the object at ffff8881d53ee600
-  which belongs to the cache kmalloc-4k of size 4096
-The buggy address is located 2088 bytes inside of
-  4096-byte region [ffff8881d53ee600, ffff8881d53ef600)
-The buggy address belongs to the page:
-page:ffffea000754fa00 refcount:1 mapcount:0 mapping:ffff8881da00c280  
-index:0x0 compound_mapcount: 0
-flags: 0x200000000010200(slab|head)
-raw: 0200000000010200 0000000000000000 0000000600000001 ffff8881da00c280
-raw: 0000000000000000 0000000000070007 00000001ffffffff 0000000000000000
-page dumped because: kasan: bad access detected
-
-Memory state around the buggy address:
-  ffff8881d53eed00: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-  ffff8881d53eed80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-> ffff8881d53eee00: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-                                   ^
-  ffff8881d53eee80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-  ffff8881d53eef00: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-==================================================================
-
-
+Reported-by: Hulk Robot <hulkci@huawei.com>
+Fixes: f25da51fdc38 ("ieee802154: hwsim: add replacement for fakelb")
+Signed-off-by: YueHaibing <yuehaibing@huawei.com>
+Acked-by: Alexander Aring <aring@mojatatu.com>
+Signed-off-by: Stefan Schmidt <stefan@datenfreihafen.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
-This bug is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ drivers/net/ieee802154/mac802154_hwsim.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-syzbot will keep track of this bug report. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-syzbot can test patches for this bug, for details see:
-https://goo.gl/tpsmEJ#testing-patches
+diff --git a/drivers/net/ieee802154/mac802154_hwsim.c b/drivers/net/ieee802154/mac802154_hwsim.c
+index b41696e16bdc8..94b9e9d775e40 100644
+--- a/drivers/net/ieee802154/mac802154_hwsim.c
++++ b/drivers/net/ieee802154/mac802154_hwsim.c
+@@ -901,9 +901,9 @@ static __init int hwsim_init_module(void)
+ 	return 0;
+ 
+ platform_drv:
+-	genl_unregister_family(&hwsim_genl_family);
+-platform_dev:
+ 	platform_device_unregister(mac802154hwsim_dev);
++platform_dev:
++	genl_unregister_family(&hwsim_genl_family);
+ 	return rc;
+ }
+ 
+-- 
+2.20.1
