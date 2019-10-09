@@ -7,49 +7,49 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2269AC47404
-	for <linux-wpan@archiver.kernel.org>; Wed,  9 Oct 2019 17:28:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 529E6ECE58C
+	for <linux-wpan@archiver.kernel.org>; Wed,  9 Oct 2019 17:30:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E387E218AC
-	for <linux-wpan@archiver.kernel.org>; Wed,  9 Oct 2019 17:27:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2D87F20679
+	for <linux-wpan@archiver.kernel.org>; Wed,  9 Oct 2019 17:30:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1570642080;
-	bh=RsWxyvsNqS4MVQex/5Iit5lyMZbtGMxsHGAwjyXuaNE=;
+	s=default; t=1570642236;
+	bh=a6QrCgvPtkiusi9ilJt4Zom9bVBDTpq53Np9aJQXGDw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=LN7nOy0wrpOy37ivUBY4MBMF8LWtRMFK/qQSQzW+8A3S+p4wRCcCWAF/61gdBNgMJ
-	 GfXX++zRdfxf7dfsAj5IfPWyxkVD7rPFQGN3Y7S1qPdzrgqiwZDwydnY03iqgdvGul
-	 kMYYD2Y85sl3BLhudKyTK2cDhJLsF3xFDTDY/BOs=
+	b=PHDRieKIGHqWv7pMPX9vP4bdc/ZaFVX7ReOQxHx7eqvx5LJRIOC3p6ddnugV0QVMx
+	 SmshqCGIkLU7Vp4w1KvIZoC+Ngsm1xMywhQfjMI970Yq3+iGa6z3lZ5t4VPnMA0Q2u
+	 rwqWxreOhsHwvPGpRgtNIhb1iC/yR/LRy0f2c66c=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732317AbfJIRY0 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 9 Oct 2019 13:24:26 -0400
-Received: from mail.kernel.org ([198.145.29.99]:49050 "EHLO mail.kernel.org"
+        id S1732137AbfJIRYI (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 9 Oct 2019 13:24:08 -0400
+Received: from mail.kernel.org ([198.145.29.99]:48634 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732311AbfJIRY0 (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-        Wed, 9 Oct 2019 13:24:26 -0400
+        id S1732125AbfJIRYH (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+        Wed, 9 Oct 2019 13:24:07 -0400
 Received: from sasha-vm.mshome.net (unknown [167.220.2.234])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id EE516218AC;
-        Wed,  9 Oct 2019 17:24:25 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id BA7D221920;
+        Wed,  9 Oct 2019 17:24:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1570641866;
-        bh=RsWxyvsNqS4MVQex/5Iit5lyMZbtGMxsHGAwjyXuaNE=;
+        s=default; t=1570641846;
+        bh=a6QrCgvPtkiusi9ilJt4Zom9bVBDTpq53Np9aJQXGDw=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=T0Y1l2YkwWsY89TOH4BTSV74p1nbEOeKVfRfntd+dJdtl4Q1YG12dO5oYyFRL+6Wk
-         MzxETG4piLFybN/VC737a7GGaBa82vDcAr9QzdobAlWPv5hVbfvd5dDsagl/MnZ4wN
-         quVyYy+TRpL3l3EdgrhnTb9Icik7o8is3jluBd1Y=
+        b=NN9YBSozt62eSN1cxa2QG/tYks6GvAcAasBM03FBuxyozX8KsSQN37JxJM3PI+mV5
+         37k77AK+gq3f7Dm77XdAhxNMS6T1ruWSqNjo/VqHL8KkabbGD8ziU9NjL3ZUDCg000
+         8NnizyrYeZFgc3SZ7we3xV0wgvaF9DPz1duh9Dp0=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Navid Emamdoost <navid.emamdoost@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
         Sasha Levin <sashal@kernel.org>, linux-wpan@vger.kernel.org,
         netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.14 08/21] ieee802154: ca8210: prevent memory leak
-Date:   Wed,  9 Oct 2019 13:06:01 -0400
-Message-Id: <20191009170615.32750-8-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 10/26] ieee802154: ca8210: prevent memory leak
+Date:   Wed,  9 Oct 2019 13:05:42 -0400
+Message-Id: <20191009170558.32517-10-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191009170615.32750-1-sashal@kernel.org>
-References: <20191009170615.32750-1-sashal@kernel.org>
+In-Reply-To: <20191009170558.32517-1-sashal@kernel.org>
+References: <20191009170558.32517-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -76,10 +76,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/net/ieee802154/ca8210.c b/drivers/net/ieee802154/ca8210.c
-index dcd10dba08c72..3a58962babd41 100644
+index b2ff903a9cb6e..38a41651e451c 100644
 --- a/drivers/net/ieee802154/ca8210.c
 +++ b/drivers/net/ieee802154/ca8210.c
-@@ -3153,12 +3153,12 @@ static int ca8210_probe(struct spi_device *spi_device)
+@@ -3151,12 +3151,12 @@ static int ca8210_probe(struct spi_device *spi_device)
  		goto error;
  	}
  
