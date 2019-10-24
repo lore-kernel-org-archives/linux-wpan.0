@@ -1,62 +1,34 @@
-Return-Path: <SRS0=opz3=YQ=vger.kernel.org=linux-wpan-owner@kernel.org>
+Return-Path: <SRS0=QQ6u=YR=vger.kernel.org=linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3655CA9EB6
-	for <linux-wpan@archiver.kernel.org>; Wed, 23 Oct 2019 15:41:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD780CA9EAF
+	for <linux-wpan@archiver.kernel.org>; Thu, 24 Oct 2019 12:26:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A911F21A4A
-	for <linux-wpan@archiver.kernel.org>; Wed, 23 Oct 2019 15:41:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=android.com header.i=@android.com header.b="KBoKx5yO"
+	by mail.kernel.org (Postfix) with ESMTP id B868E20650
+	for <linux-wpan@archiver.kernel.org>; Thu, 24 Oct 2019 12:26:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2406881AbfJWPlE (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 23 Oct 2019 11:41:04 -0400
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:35611 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2406869AbfJWPlD (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 23 Oct 2019 11:41:03 -0400
-Received: by mail-pf1-f194.google.com with SMTP id 205so13180168pfw.2
-        for <linux-wpan@vger.kernel.org>; Wed, 23 Oct 2019 08:41:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=android.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-transfer-encoding:content-language;
-        bh=TI9rW32nt+i6GyURUSN10bGjthP0EG+xScjnb+pkqac=;
-        b=KBoKx5yOJdWGZz7I1M810keaJ1ZlEuvnt+HTZJAS0UmK0LTUpPmdFTkklfgcGdi73r
-         feMTzV569J5UceysOEInvWeJdRd/ZzonW6Aa3VYlqczCqXy+PY9ipoJvzLD+NWbnZ5rP
-         mW2vwJLR0Vq7sY9XP/QBVZSb/GxJx9fS5CE5Yo07sdXhMNQdYvScXxROVKhe4Esy5Cvd
-         e50H85g6521yumbQVB+PGX8SW/L7QzMUvgyanXK1Toe52me2wt2CIUN9qyd4f938PFQ7
-         rthEsivMBKI4ftQ33yVLiM1NHSBLjKlHtZVEVP38OG7iyjy4z/skVUexYga7/45kjz+T
-         6+ug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=TI9rW32nt+i6GyURUSN10bGjthP0EG+xScjnb+pkqac=;
-        b=c/VxRHm9uoVl0bHy7RUtLJCL7XUE/VcZeS3We1+Q+DrOS2uQ2qznrgyl5Cd+2KC5R2
-         gbZhADDCLO7R8CopMlcW0uBNOPx9i89JhzcbYBea2LW58pRFnMQKTPYK1SrK9NfulbHJ
-         +lbDPo7hSb/LM5vQi4T13nkgMSS9Pcszi6VkzG31tIH2/kcKwXiwmLhYPu4dQlKVVAqG
-         rt3Rz5mS7XV0eH3KmJYMUNXXiKGeQoMIHhDY1wiKgQaMiw+iwsoBjtSr9AcskgRrLamK
-         ndY3ib1OpVYe1LwUqMQdx5tzi3Cf0oH5zv39Ya2yqgtQ7vPZ3s0hyDFOQWd7ZZF+jo1T
-         pl1w==
-X-Gm-Message-State: APjAAAXL00EG0Wk6ooUsvgB34INov8nDt1Bksh0+6nefEdDH5dtqWXVw
-        8RqWiPNvi+540Vy+69I5hlTbzjvNgwPU5EZ4
-X-Google-Smtp-Source: APXvYqxpUg0BJf6IgZEek+Avbtx6SaPZVRb4CoPCBRhASaoQxSh7v/tZYoAbFxDTBg5wYPAauGUeIw==
-X-Received: by 2002:a17:90a:e987:: with SMTP id v7mr765373pjy.86.1571845261541;
-        Wed, 23 Oct 2019 08:41:01 -0700 (PDT)
-Received: from nebulus.mtv.corp.google.com ([2620:15c:211:200:5404:91ba:59dc:9400])
-        by smtp.googlemail.com with ESMTPSA id r18sm28682272pfc.3.2019.10.23.08.40.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 23 Oct 2019 08:41:01 -0700 (PDT)
-Subject: Re: [PATCH] Cleanup: replace prefered with preferred
-To:     Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
+        id S2501903AbfJXM0r (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Thu, 24 Oct 2019 08:26:47 -0400
+Received: from mga18.intel.com ([134.134.136.126]:41113 "EHLO mga18.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726360AbfJXM0q (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+        Thu, 24 Oct 2019 08:26:46 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 24 Oct 2019 05:26:45 -0700
+X-IronPort-AV: E=Sophos;i="5.68,224,1569308400"; 
+   d="scan'208";a="192171083"
+Received: from jnikula-mobl3.fi.intel.com (HELO localhost) ([10.237.66.161])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 24 Oct 2019 05:26:30 -0700
+From:   Jani Nikula <jani.nikula@linux.intel.com>
+To:     Mark Salyzyn <salyzyn@android.com>,
+        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
 Cc:     linux-kernel@vger.kernel.org, kernel-team@android.com,
         "David S. Miller" <davem@davemloft.net>,
         Jonathan Corbet <corbet@lwn.net>,
@@ -64,8 +36,8 @@ Cc:     linux-kernel@vger.kernel.org, kernel-team@android.com,
         Harry Wentland <harry.wentland@amd.com>,
         Leo Li <sunpeng.li@amd.com>,
         Alex Deucher <alexander.deucher@amd.com>,
-        =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
-        "David (ChunMing) Zhou" <David1.Zhou@amd.com>,
+        Christian =?utf-8?Q?K=C3=B6nig?= <christian.koenig@amd.com>,
+        "David \(ChunMing\) Zhou" <David1.Zhou@amd.com>,
         David Airlie <airlied@linux.ie>,
         Daniel Vetter <daniel@ffwll.ch>,
         VMware Graphics <linux-graphics-maintainer@vmware.com>,
@@ -85,60 +57,40 @@ Cc:     linux-kernel@vger.kernel.org, kernel-team@android.com,
         Maxim Martynov <maxim@arista.com>,
         David Ahern <dsahern@gmail.com>,
         Francesco Ruggeri <fruggeri@arista.com>,
-        =?UTF-8?Q?Linus_L=c3=bcssing?= <linus.luessing@c0d3.blue>,
+        Linus =?utf-8?Q?L=C3=BCssing?= <linus.luessing@c0d3.blue>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Feng Tang <feng.tang@intel.com>,
-        "Steven Rostedt (VMware)" <rostedt@goodmis.org>,
+        "Steven Rostedt \(VMware\)" <rostedt@goodmis.org>,
         Andrew Morton <akpm@linux-foundation.org>,
         Rafael Aquini <aquini@redhat.com>, netdev@vger.kernel.org,
         linux-doc@vger.kernel.org, linux-efi@vger.kernel.org,
         amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
         linux-media@vger.kernel.org, linux-nfs@vger.kernel.org,
         linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org
-References: <20191022214208.211448-1-salyzyn@android.com>
- <20191023115637.GA23733@linux.intel.com>
-From:   Mark Salyzyn <salyzyn@android.com>
-Message-ID: <fa12cb96-7a93-bf85-214d-a7bfaf8b8b0a@android.com>
-Date:   Wed, 23 Oct 2019 08:40:59 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+Subject: Re: [PATCH] Cleanup: replace prefered with preferred
+In-Reply-To: <fa12cb96-7a93-bf85-214d-a7bfaf8b8b0a@android.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+References: <20191022214208.211448-1-salyzyn@android.com> <20191023115637.GA23733@linux.intel.com> <fa12cb96-7a93-bf85-214d-a7bfaf8b8b0a@android.com>
+Date:   Thu, 24 Oct 2019 15:26:28 +0300
+Message-ID: <875zkecosr.fsf@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20191023115637.GA23733@linux.intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-GB
+Content-Type: text/plain
 Sender: linux-wpan-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-On 10/23/19 4:56 AM, Jarkko Sakkinen wrote:
-> On Tue, Oct 22, 2019 at 02:41:45PM -0700, Mark Salyzyn wrote:
->> Replace all occurrences of prefered with preferred to make future
->> checkpatch.pl's happy.  A few places the incorrect spelling is
->> matched with the correct spelling to preserve existing user space API.
->>
->> Signed-off-by: Mark Salyzyn <salyzyn@android.com>
-> I'd fix such things when the code is otherwise change and scope this
-> patch only to Documentation/. There is no pragmatic benefit of doing
-> this for the code.
->
-> /Jarkko
+On Wed, 23 Oct 2019, Mark Salyzyn <salyzyn@android.com> wrote:
+> I will split this between pure and inert documentation/comments for now, 
+> with a followup later for the code portion which understandably is more 
+> controversial.
 
-The pragmatic benefit comes with the use of an ABI/API checker (which is 
-a 'distro' thing, not a top of tree kernel thing) produces its map which 
-is typically required to be co-located in the same tree as the kernel 
-repository. Quite a few ABI/API update checkins result in a 
-checkpatch.pl complaint about the misspelled elements being 
-(re-)recorded due to proximity. We have a separate task to improve how 
-it is tracked in Android to reduce milepost marker changes that result 
-in sweeping changes to the database which would reduce the occurrences.
+Please split by driver/subsystem too, and it'll be all around much
+easier for everyone.
 
-I will split this between pure and inert documentation/comments for now, 
-with a followup later for the code portion which understandably is more 
-controversial.
+BR,
+Jani.
 
-Cleanup is the least appreciated part of kernel maintenance ;-}.
 
-Sincerely -- Mark Salyzyn
-
+-- 
+Jani Nikula, Intel Open Source Graphics Center
