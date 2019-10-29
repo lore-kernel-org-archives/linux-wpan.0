@@ -1,88 +1,94 @@
-Return-Path: <SRS0=+EIT=YS=vger.kernel.org=linux-wpan-owner@kernel.org>
+Return-Path: <SRS0=kc4L=YW=vger.kernel.org=linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.4 required=3.0 tests=FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16442CA9EA0
-	for <linux-wpan@archiver.kernel.org>; Fri, 25 Oct 2019 22:34:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77111CA9EC1
+	for <linux-wpan@archiver.kernel.org>; Tue, 29 Oct 2019 04:46:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A3D3420684
-	for <linux-wpan@archiver.kernel.org>; Fri, 25 Oct 2019 22:34:07 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=ufpe.br header.i=@ufpe.br header.b="Tw9YbuXD"
+	by mail.kernel.org (Postfix) with ESMTP id 546472067D
+	for <linux-wpan@archiver.kernel.org>; Tue, 29 Oct 2019 04:46:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726508AbfJYWeH (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Fri, 25 Oct 2019 18:34:07 -0400
-Received: from titan.ufpe.br ([150.161.6.80]:48519 "EHLO canit.ufpe.br"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726352AbfJYWeH (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-        Fri, 25 Oct 2019 18:34:07 -0400
-X-Greylist: delayed 849 seconds by postgrey-1.27 at vger.kernel.org; Fri, 25 Oct 2019 18:34:05 EDT
-Received: from zimbraufpe.ufpe.br (zimbraufpe.ufpe.br [150.161.6.73])
-        by canit.ufpe.br (8.14.4/8.14.4/Debian-4) with ESMTP id x9PMJsFY035849
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <linux-wpan@vger.kernel.org>; Fri, 25 Oct 2019 19:19:54 -0300
-Received: from localhost (localhost [127.0.0.1])
-        by zimbraufpe.ufpe.br (Postfix) with ESMTP id 6DBCB16300262
-        for <linux-wpan@vger.kernel.org>; Fri, 25 Oct 2019 19:20:10 -0300 (-03)
-X-Virus-Scanned: amavisd-new at ufpe.br
-Received: from zimbraufpe.ufpe.br ([127.0.0.1])
-        by localhost (zimbraufpe.ufpe.br [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id AE4xS-oA6LvI for <linux-wpan@vger.kernel.org>;
-        Fri, 25 Oct 2019 19:20:10 -0300 (-03)
-Received: from zimbraufpe.ufpe.br (zimbraufpe.ufpe.br [150.161.6.73])
-        by zimbraufpe.ufpe.br (Postfix) with ESMTP id 52534420BE8
-        for <linux-wpan@vger.kernel.org>; Fri, 25 Oct 2019 19:20:10 -0300 (-03)
-Date:   Fri, 25 Oct 2019 19:20:09 -0300 (BRT)
-From:   Victhor Foster <victhor.foster@ufpe.br>
-To:     linux-wpan@vger.kernel.org
-Message-ID: <547191739.3620092.1572042009933.JavaMail.zimbra@ufpe.br>
-Subject: Interfacing mac802154 stack with userspace applications
+        id S1729181AbfJ2EqC (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 29 Oct 2019 00:46:02 -0400
+Received: from mail-io1-f71.google.com ([209.85.166.71]:47066 "EHLO
+        mail-io1-f71.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727294AbfJ2EqC (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 29 Oct 2019 00:46:02 -0400
+Received: by mail-io1-f71.google.com with SMTP id y25so10207521ioc.13
+        for <linux-wpan@vger.kernel.org>; Mon, 28 Oct 2019 21:46:02 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
+         :from:to;
+        bh=YLV8f9ZsfAXyIIZYYq3+IarNtK/1IHU/hb3TF47qpcU=;
+        b=mqnFiXzKsqLWbXAJg5ZOJUjdiedd2tpxAJLYoUe6o+QaLADYJPT5NsYb6kjIQDo03G
+         St2r9z93xtWkQV6h2cYs0T/ZgIL9kHg1M1qSKY62OBdZJf7c2WKwPBVdPTbLuOTZUFYM
+         r/9kWkYC4ndtq8muAf30Lehm11qVlAG0VNOGUJaFr+ZFQiQl1sD3xSCevg8+IOJIAwXF
+         sUPrZtNmBDy2RD/ixTyCB7YkulV4PCEn9NfzddS+wFz99ay81eLWQSphp9y4+S6M71Sr
+         8WX+I8TPLsUylpek/ja0SK0iUX/D4hR8o3/WQ+arTJR8aMQ42IgC23JN88HV6G8z3Uk5
+         yA6g==
+X-Gm-Message-State: APjAAAXXWvc3aQBm9i9mthNWNbI0mokEloXz8ufy8M8EUfMFYVchy8p2
+        RQAyjjls/SeNDQQPcxrjmZYh+JCj+/xwXwe0VBd8f3ylcWNC
+X-Google-Smtp-Source: APXvYqy8A5HcqCyEPL5dtBElWBUVccfpfDJnoTHkuyLyMyzE3tC2AL+v78u811xV2KkRr1yWR23ZU1ZAqiGqqPS8jMwtkIRFFbuv
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [179.235.209.15]
-X-Mailer: Zimbra 8.8.7_GA_1964 (ZimbraWebClient - GC77 (Linux)/8.8.7_GA_1964)
-Thread-Index: b9saUzwtkxB8sUR2kSSFV/9SxR/s4g==
-Thread-Topic: Interfacing mac802154 stack with userspace applications
-X-Bayes-Prob: 0.5 (Score 0: No Bayes scoring rules defined, tokens from: SAIDA)
-X-CanIt-Incident-Id: 011hWjS1M
-X-CanIt-Geo: ip=150.161.6.73; country=BR; region=Pernambuco; city=Recife; latitude=-8.05; longitude=-34.9000; http://maps.google.com/maps?q=-8.05,-34.9000&z=6
-X-CanItPRO-Stream: SAIDA
-X-Canit-Stats-ID: 011hWjS1M - 8140bf2b47a8 - 20191025
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed; d=ufpe.br; h=date:from:to
-        :message-id:subject:mime-version:content-type
-        :content-transfer-encoding; s=ufpe201801; bh=WMCOpjDsbX8LA3+6314
-        rVNiAxztldQE47ZW6FLRkNno=; b=Tw9YbuXDYoaM0tbRF66OfQR1WRe4gp2ZT9z
-        avlBIlwRKZUXFo+3KeIlOhRAsApAcRlK3LWzXizxukVBOj1iu8x3rj9CZ9bd4HwD
-        5Ujv0zM+o81Vm3ATW1UpXFFteqvy+OX24cVAdqyaBlHTos2N4y5V+4qhegXjbJjr
-        YTdyMeA0CrB1qX+RkZ2UEker0j5hDB55iS5Qqg6p5OMms3BLQdystr3m8GM2r6QH
-        tzUhXJSX3i1zjv73oi2cJ1FuvcE1IpWoxYa6TQr2y9NOlDbuKReeBUu1zFlpj4NZ
-        drjPG3kIZ+yatC8ZqG2vhchMivtwJTrt1NqmgAXi+YRIKw78Org==
-X-Scanned-By: CanIt (www . roaringpenguin . com) on 150.161.6.80
+X-Received: by 2002:a5e:d90c:: with SMTP id n12mr1656385iop.140.1572324361470;
+ Mon, 28 Oct 2019 21:46:01 -0700 (PDT)
+Date:   Mon, 28 Oct 2019 21:46:01 -0700
+In-Reply-To: <000000000000fc25a1059602460a@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000000987900596054b0f@google.com>
+Subject: Re: INFO: trying to register non-static key in bond_3ad_update_lacp_rate
+From:   syzbot <syzbot+0d083911ab18b710da71@syzkaller.appspotmail.com>
+To:     a@unstable.cc, alex.aring@gmail.com, allison@lohutok.net,
+        andrew@lunn.ch, andy@greyhouse.net, ap420073@gmail.com,
+        aroulin@cumulusnetworks.com, ast@domdv.de,
+        b.a.t.m.a.n@lists.open-mesh.org, bridge@lists.linux-foundation.org,
+        cleech@redhat.com, daniel@iogearbox.net, davem@davemloft.net,
+        dcaratti@redhat.com, dsa@cumulusnetworks.com, edumazet@google.com,
+        f.fainelli@gmail.com, fw@strlen.de, gregkh@linuxfoundation.org,
+        gustavo@embeddedor.com, gvaradar@cisco.com, haiyangz@microsoft.com,
+        idosch@mellanox.com, info@metux.net, ivan.khoronzhuk@linaro.org,
+        j.vosburgh@gmail.com, j@w1.fi, jakub.kicinski@netronome.com,
+        jhs@mojatatu.com, jiri@mellanox.com, jiri@resnulli.us,
+        johan.hedberg@gmail.com, johannes.berg@intel.com,
+        john.hurley@netronome.com, jwi@linux.ibm.com,
+        kstewart@linuxfoundation.org, kvalo@codeaurora.org,
+        kys@microsoft.com, lariel@mellanox.com, linmiaohe@huawei.com,
+        linux-bluetooth@vger.kernel.org, linux-hams@vger.kernel.org,
+        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-ppp@vger.kernel.org, linux-wireless@vger.kernel.org,
+        linux-wpan@vger.kernel.org, liuhangbin@gmail.com,
+        marcel@holtmann.org, mareklindner@neomailbox.ch
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 Sender: linux-wpan-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello,
+syzbot has bisected this bug to:
 
-I'm working on a project to implement a 6LoWPAN network using software defined radios. I'm trying to interface the kernel's 802.15.4/6LoWPAN stacks to my physical layer implemented in GNU Radio, instead of using a userspace stack, but this isn't working very well.
+commit ab92d68fc22f9afab480153bd82a20f6e2533769
+Author: Taehee Yoo <ap420073@gmail.com>
+Date:   Mon Oct 21 18:47:51 2019 +0000
 
-The reason why I'm doing this is, while the GNU Radio plugin I'm using (gr-ieee802-15-4 from Bastian Bloessl) implements its own 802.15.4 MAC layer, I'd like to get around its limitations (such as not being able to change destination addresses at runtime) using the Linux kernel stack.
+     net: core: add generic lockdep keys
 
-The way this is being done is I have socat piping between a mac802154_hwsim interface and GNU Radio, using the following arguments: INTERFACE:wpan0 UDP4-DATAGRAM:127.0.0.1:<port>
-GNU Radio is running a UDP server at <port> that transmits and receives PDUs to/from the software defined PHY, which then goes out to a software defined radio device (a USRP N210, in this case). So the PDUs are sent via the socat pipe to the hwsim network interface and vice-versa. The 802.15.4 MAC block is removed.
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1467f674e00000
+start commit:   60c1769a Add linux-next specific files for 20191028
+git tree:       linux-next
+final crash:    https://syzkaller.appspot.com/x/report.txt?x=1667f674e00000
+console output: https://syzkaller.appspot.com/x/log.txt?x=1267f674e00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=cb86688f30db053d
+dashboard link: https://syzkaller.appspot.com/bug?extid=0d083911ab18b710da71
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15381ee0e00000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=11571570e00000
 
-While 802.15.4 packets are sent and received by both hosts, it seems these packets aren't getting through to the 6LoWPAN stack.
+Reported-by: syzbot+0d083911ab18b710da71@syzkaller.appspotmail.com
+Fixes: ab92d68fc22f ("net: core: add generic lockdep keys")
 
-During testing, I had packet capture set up on both the 802.15.4 ("wpan0") and the 6LoWPAN ("lowpan0") interfaces. The wpan0 interface was receiving packets from the other host (and also from itself, as the radio is full duplex), as expected. However, I could not get wpan-ping to work (timeout) and ping6, netcat, etc. wouldn't get a response from the other host. 
-On the lowpan0 interface, I could see the packets originating from applications would appear on the packet capture log, but those that should be coming from the wpan0 interface wouldn't, even those originating from the host itself (due to the full duplex nature of the radio).
-
-I also noticed the following message on the kernel log: ieee802154 phy0 wpan0: encryption failed: -22
-I haven't touched the link encryption settings, so the traffic is unencrypted.
-
-What could be done to get the 6LoWPAN stack to accept packets injected into the 802.15.4 interface by socat? I realize this is a very unusual situation, but I'm not familiar with the Linux 802.15.4 stack.
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
