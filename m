@@ -4,55 +4,52 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24B82C33CB3
-	for <linux-wpan@archiver.kernel.org>; Thu, 16 Jan 2020 18:27:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB298C33CB3
+	for <linux-wpan@archiver.kernel.org>; Thu, 16 Jan 2020 18:54:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E7AEC2073A
-	for <linux-wpan@archiver.kernel.org>; Thu, 16 Jan 2020 18:27:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8A9DA206D7
+	for <linux-wpan@archiver.kernel.org>; Thu, 16 Jan 2020 18:54:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1579199235;
-	bh=rn4pfLKM3XRU+IxIe6/WS+j0s2MfQwOgjyTvquAUgQk=;
+	s=default; t=1579200842;
+	bh=oLW8bhEuqWvslr3yGFZ5KkqJyKsLCXsxNqmIHwnuDoc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=YVBzhrPxb8QVLXm8z819jv5dPwYYzA7vXQcHoOWwCtiQ98tez/yHaVDfMOO8odUCq
-	 NA/oy77p8whd1d6TvxB5+xAm7YMWOY0zTaOS0cBoYEfPNcwwVESnQDB317aTVXXP81
-	 54YwIGh5hsqoBm9F1hzsCO8weUiwLI35IB/7csIw=
+	b=oyNNPdaSFYUw08SPSennktu5AFSIf/ty+eJBttj1m0k92p3SVuxZwa4TYtX2wRCRw
+	 58FU62T8TWev2sRT7pC+CYsoeI7fwTL1Hd2MuuyhfgvNYzvXbzrtlD7Emytkums1V2
+	 0aSfEOhogKWR5LGQLKoR4/WhTUF6Pcy+bAEEjWiE=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2392369AbgAPS1D (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Thu, 16 Jan 2020 13:27:03 -0500
-Received: from mail.kernel.org ([198.145.29.99]:35372 "EHLO mail.kernel.org"
+        id S2389427AbgAPSyB (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Thu, 16 Jan 2020 13:54:01 -0500
+Received: from mail.kernel.org ([198.145.29.99]:41128 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2403921AbgAPR0c (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-        Thu, 16 Jan 2020 12:26:32 -0500
+        id S2389278AbgAPRIF (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+        Thu, 16 Jan 2020 12:08:05 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 7D8EF246BC;
-        Thu, 16 Jan 2020 17:26:30 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 8CB592192A;
+        Thu, 16 Jan 2020 17:08:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1579195591;
-        bh=rn4pfLKM3XRU+IxIe6/WS+j0s2MfQwOgjyTvquAUgQk=;
+        s=default; t=1579194484;
+        bh=oLW8bhEuqWvslr3yGFZ5KkqJyKsLCXsxNqmIHwnuDoc=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=stcOJe6T2M5WSwoPKWQYSpQzu8RCkZvbllZUvZIA4a2YUe5TQMpKuD9pqmk209a+O
-         BWdc0f34pZdvL8kIN7FVYRKl+NdqDTzjPkVri+rgaiHswAzryNc3VSO5wOtbyMgmmG
-         z7ZyKowlUWorkDkw3KAEqDS9D6vigkpq5XYkWhpU=
+        b=RxTH9/OEO6pTnNDPpRW5Ljx++8CFOvHD8pyatmLxZYVowwxb65MY/4cbKYIaF/PFw
+         JeC0/hnN584QHAX3QleO/xI5cBChVotPlj+67f40LURI2w/fVfU5Z5/D1wqZEvQttt
+         wypq/Qepnai5xOp4aSfAbrvrLbUcI9pkVWu6wEXg=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Dan Carpenter <dan.carpenter@oracle.com>,
-        Jukka Rissanen <jukka.rissanen@linux.intel.com>,
-        Alexander Aring <aring@mojatatu.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Sasha Levin <sashal@kernel.org>,
-        linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
+Cc:     Eric Dumazet <edumazet@google.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Sasha Levin <sashal@kernel.org>, linux-wpan@vger.kernel.org,
         netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.14 169/371] 6lowpan: Off by one handling ->nexthdr
-Date:   Thu, 16 Jan 2020 12:20:41 -0500
-Message-Id: <20200116172403.18149-112-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 385/671] inet: frags: call inet_frags_fini() after unregister_pernet_subsys()
+Date:   Thu, 16 Jan 2020 12:00:23 -0500
+Message-Id: <20200116170509.12787-122-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200116172403.18149-1-sashal@kernel.org>
-References: <20200116172403.18149-1-sashal@kernel.org>
+In-Reply-To: <20200116170509.12787-1-sashal@kernel.org>
+References: <20200116170509.12787-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -62,39 +59,54 @@ Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-From: Dan Carpenter <dan.carpenter@oracle.com>
+From: Eric Dumazet <edumazet@google.com>
 
-[ Upstream commit f57c4bbf34439531adccd7d3a4ecc14f409c1399 ]
+[ Upstream commit ae7352d384a552d8c799c242e74a934809990a71 ]
 
-NEXTHDR_MAX is 255.  What happens here is that we take a u8 value
-"hdr->nexthdr" from the network and then look it up in
-lowpan_nexthdr_nhcs[].  The problem is that if hdr->nexthdr is 0xff then
-we read one element beyond the end of the array so the array needs to
-be one element larger.
+Both IPv6 and 6lowpan are calling inet_frags_fini() too soon.
 
-Fixes: 92aa7c65d295 ("6lowpan: add generic nhc layer interface")
-Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
-Acked-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-Acked-by: Alexander Aring <aring@mojatatu.com>
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+inet_frags_fini() is dismantling a kmem_cache, that might be needed
+later when unregister_pernet_subsys() eventually has to remove
+frags queues from hash tables and free them.
+
+This fixes potential use-after-free, and is a prereq for the following patch.
+
+Fixes: d4ad4d22e7ac ("inet: frags: use kmem_cache for inet_frag_queue")
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/6lowpan/nhc.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/ieee802154/6lowpan/reassembly.c | 2 +-
+ net/ipv6/reassembly.c               | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/net/6lowpan/nhc.c b/net/6lowpan/nhc.c
-index 4fa2fdda174d..9e56fb98f33c 100644
---- a/net/6lowpan/nhc.c
-+++ b/net/6lowpan/nhc.c
-@@ -18,7 +18,7 @@
- #include "nhc.h"
+diff --git a/net/ieee802154/6lowpan/reassembly.c b/net/ieee802154/6lowpan/reassembly.c
+index e7857a8ac86d..f3074249c6fc 100644
+--- a/net/ieee802154/6lowpan/reassembly.c
++++ b/net/ieee802154/6lowpan/reassembly.c
+@@ -629,7 +629,7 @@ int __init lowpan_net_frag_init(void)
  
- static struct rb_root rb_root = RB_ROOT;
--static struct lowpan_nhc *lowpan_nexthdr_nhcs[NEXTHDR_MAX];
-+static struct lowpan_nhc *lowpan_nexthdr_nhcs[NEXTHDR_MAX + 1];
- static DEFINE_SPINLOCK(lowpan_nhc_lock);
+ void lowpan_net_frag_exit(void)
+ {
+-	inet_frags_fini(&lowpan_frags);
+ 	lowpan_frags_sysctl_unregister();
+ 	unregister_pernet_subsys(&lowpan_frags_ops);
++	inet_frags_fini(&lowpan_frags);
+ }
+diff --git a/net/ipv6/reassembly.c b/net/ipv6/reassembly.c
+index 095825f964e2..c6132e39ab16 100644
+--- a/net/ipv6/reassembly.c
++++ b/net/ipv6/reassembly.c
+@@ -593,8 +593,8 @@ int __init ipv6_frag_init(void)
  
- static int lowpan_nhc_insert(struct lowpan_nhc *nhc)
+ void ipv6_frag_exit(void)
+ {
+-	inet_frags_fini(&ip6_frags);
+ 	ip6_frags_sysctl_unregister();
+ 	unregister_pernet_subsys(&ip6_frags_ops);
+ 	inet6_del_protocol(&frag_protocol, IPPROTO_FRAGMENT);
++	inet_frags_fini(&ip6_frags);
+ }
 -- 
 2.20.1
 
