@@ -2,66 +2,63 @@ Return-Path: <SRS0=B03G=32=vger.kernel.org=linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1268C3B185
-	for <linux-wpan@archiver.kernel.org>; Thu,  6 Feb 2020 15:18:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2006C3B188
+	for <linux-wpan@archiver.kernel.org>; Thu,  6 Feb 2020 15:18:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B3DCD217BA
-	for <linux-wpan@archiver.kernel.org>; Thu,  6 Feb 2020 15:18:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B4BD920838
+	for <linux-wpan@archiver.kernel.org>; Thu,  6 Feb 2020 15:18:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1581002306;
-	bh=UnNMWC/0/qM4XcS+W8r6JNL2MhsJZ+d+LVYR7MJikgQ=;
-	h=From:To:Cc:Subject:Date:List-ID:From;
-	b=C+EGz24s3gXWp0dv3KMo0SVrHKTCvris+wLSSinD5HnnY2U5NcZfH7YEUS+rwAzFF
-	 hKgqLJTc33oMHTFLDrXkpYrkc/2VEpO8a9prm1cwtsl1HPlxQmqpq+jnQIFA5GSmKl
-	 UJxqk+3+oqBqzuk7g2oBhBrwPVHEjO/IQeJHUIcE=
+	s=default; t=1581002322;
+	bh=op7eP86ynCTXd8Ox1Ttv502rN/tOuJ9csm0uPgp2G6Y=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=ynZQJ1eE27VTzv4G81crKlcls9i7dnMLI+f14Gmlmpumx5/MGY2AIr8XokO5Wb1TV
+	 2+XNTjVNEkBsD9spkkaGNT3txEztghliEJ6VoTI3QyQkzsTGB5a6eaWhNgpN5vz9yK
+	 GaVdt/W/UJVTNZGM7IqEZjc4D5Siw9i/fazqaY74=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727779AbgBFPSX (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Thu, 6 Feb 2020 10:18:23 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:38224 "EHLO
+        id S1727593AbgBFPSA (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Thu, 6 Feb 2020 10:18:00 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:38090 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727641AbgBFPSB (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 6 Feb 2020 10:18:01 -0500
+        with ESMTP id S1727572AbgBFPR7 (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 6 Feb 2020 10:17:59 -0500
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=Sender:Content-Transfer-Encoding:
-        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Reply-To:Content-Type:
-        Content-ID:Content-Description:In-Reply-To:References;
-        bh=eNDq33QOomCijKEVn1Z9oPH66Mc+mguHW+VeL5pLAhc=; b=So8I9geR14GrGuO9lA9c6sXiEo
-        7Ws15T/LX0KmsnmzEPlAAEj23x41YzqKtxcygM1Xqa3cte8wLkTcHLT/w0P+Mx8wvk79NQg2iSCJ6
-        fctuWwiTO348VpvHZBgzU9iqP9XQIh1Ohc78Tr+kj7Mm0cbBOWXGEsDO6B0PgI+o+1yyscaCOyL/A
-        8AD1Iv7rkKa0ycgY8nsAEugIElBxYwhWE91OCEI+owntY79wPXGI++GaM9OCtOmkpd9Nn8rpu7QfJ
-        72YqQZf8OZZXxyX88DBgxCoA76E6oyjzgcVYxeEFOzHXAyBfkpM9+mA0BT54q/c9g0dxFRCiSzrqF
-        UHHHAhNA==;
+        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
+        Reply-To:Content-Type:Content-ID:Content-Description;
+        bh=t2yWmhu1E5vZJKxFd22eXuudQGWyjBMcjrUmGzb6AJ8=; b=I7AU+Ful4eBxEXYWh/h3Q/pFNo
+        TPr4sZuabGHRRtrEPnInySpPHKamVwqtrVrRo2J6bFAfh6N2S0BC7BpAzwzKQ7NJqv6mVTYd1hfmi
+        ruwsQTlbuISoBMBKtwIAzSZeOmM0v2oyUIV+OGjXGK0n8o0IJkOcWKcImpVikJzvz16zVTddqRgbS
+        QDIYZC1wDB0EDXyaUvaN1GEaNKF/ldq18y73bb0Mlp5WBzycYpjKvh6MxMM2FT9HDaZ0SdqqdW8gg
+        CL2gCBukzgtRR8cAQRrB7gzCFC8eai6bI8unRgWJJKOktrHQwAPIODp/h2xp4HIlprVI1fZ10I6TW
+        DAPjMWVw==;
 Received: from [179.95.15.160] (helo=bombadil.infradead.org)
         by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1iziul-0005jA-Al; Thu, 06 Feb 2020 15:17:59 +0000
+        id 1iziul-0005jD-Ay; Thu, 06 Feb 2020 15:17:59 +0000
 Received: from mchehab by bombadil.infradead.org with local (Exim 4.92.3)
         (envelope-from <mchehab@bombadil.infradead.org>)
-        id 1iziuc-002oUk-B9; Thu, 06 Feb 2020 16:17:50 +0100
+        id 1iziuc-002oUr-GO; Thu, 06 Feb 2020 16:17:50 +0100
 From:   Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 To:     Linux Media Mailing List <linux-media@vger.kernel.org>
 Cc:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
         Mauro Carvalho Chehab <mchehab@infradead.org>,
-        Alexander Aring <alex.aring@gmail.com>,
-        linux-doc@vger.kernel.org, Yonghong Song <yhs@fb.com>,
-        Jukka Rissanen <jukka.rissanen@linux.intel.com>,
-        netdev@vger.kernel.org, Martin KaFai Lau <kafai@fb.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Alexei Starovoitov <ast@kernel.org>,
-        linux-wpan@vger.kernel.org, Song Liu <songliubraving@fb.com>,
-        Andrii Nakryiko <andriin@fb.com>,
         "David S. Miller" <davem@davemloft.net>,
-        Jonathan Corbet <corbet@lwn.net>, bpf@vger.kernel.org,
-        linux-decnet-user@lists.sourceforge.net,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        linux-bluetooth@vger.kernel.org
-Subject: [PATCH 00/28] Manually convert network text files to ReST (part 1)
-Date:   Thu,  6 Feb 2020 16:17:20 +0100
-Message-Id: <cover.1581002062.git.mchehab+huawei@kernel.org>
+        Jakub Kicinski <kuba@kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Alexander Aring <alex.aring@gmail.com>,
+        Jukka Rissanen <jukka.rissanen@linux.intel.com>,
+        netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org
+Subject: [PATCH 02/28] docs: networking: convert 6lowpan.txt to ReST
+Date:   Thu,  6 Feb 2020 16:17:22 +0100
+Message-Id: <bfa773f25584a3939e0a3e1fc6bc0e91f415cd91.1581002063.git.mchehab+huawei@kernel.org>
 X-Mailer: git-send-email 2.24.1
+In-Reply-To: <cover.1581002062.git.mchehab+huawei@kernel.org>
+References: <cover.1581002062.git.mchehab+huawei@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-wpan-owner@vger.kernel.org
@@ -69,110 +66,101 @@ Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Manually convert Documentation/networking text files to ReST.
+- add SPDX header;
+- use document title markup;
+- mark code blocks and literals as such;
+- adjust identation, whitespaces and blank lines;
+- add to networking/index.rst.
 
-As there are lots of unconverted files there, I have ~120 patches.
-So, I'll split the conversion into 4 parts. This is the first patch.
-
-Mauro Carvalho Chehab (28):
-  docs: networking: caif: convert to ReST
-  docs: networking: convert 6lowpan.txt to ReST
-  docs: networking: convert 6pack.txt to ReST
-  docs: networking: convert altera_tse.txt to ReST
-  docs: networking: convert arcnet-hardware.txt to ReST
-  docs: networking: convert arcnet.txt to ReST
-  docs: networking: convert atm.txt to ReST
-  docs: networking: convert ax25.txt to ReST
-  docs: networking: convert baycom.txt to ReST
-  docs: networking: convert bonding.txt to ReST
-  docs: networking: convert cdc_mbim.txt to ReST
-  docs: networking: convert cops.txt to ReST
-  docs: networking: convert cxacru.txt to ReST
-  docs: networking: convert dccp.txt to ReST
-  docs: networking: convert dctcp.txt to ReST
-  docs: networking: convert decnet.txt to ReST
-  docs: networking: convert defza.txt to ReST
-  docs: networking: convert dns_resolver.txt to ReST
-  docs: networking: convert driver.txt to ReST
-  docs: networking: convert eql.txt to ReST
-  docs: networking: convert fib_trie.txt to ReST
-  docs: networking: convert filter.txt to ReST
-  docs: networking: convert fore200e.txt to ReST
-  docs: networking: convert framerelay.txt to ReST
-  docs: networking: convert generic-hdlc.txt to ReST
-  docs: networking: convert generic_netlink.txt to ReST
-  docs: networking: convert gen_stats.txt to ReST
-  docs: networking: convert gtp.txt to ReST
-
- .../networking/{6lowpan.txt => 6lowpan.rst}   |   29 +-
- .../networking/{6pack.txt => 6pack.rst}       |   46 +-
- .../{altera_tse.txt => altera_tse.rst}        |   87 +-
- ...rcnet-hardware.txt => arcnet-hardware.rst} | 2169 +++++++++--------
- .../networking/{arcnet.txt => arcnet.rst}     |  348 +--
- Documentation/networking/{atm.txt => atm.rst} |    6 +
- .../networking/{ax25.txt => ax25.rst}         |    6 +
- .../networking/{baycom.txt => baycom.rst}     |  110 +-
- .../networking/{bonding.txt => bonding.rst}   | 1273 +++++-----
- Documentation/networking/caif/caif.rst        |    2 -
- Documentation/networking/caif/index.rst       |   13 +
- .../caif/{Linux-CAIF.txt => linux_caif.rst}   |   54 +-
- Documentation/networking/caif/spi_porting.rst |  229 ++
- Documentation/networking/caif/spi_porting.txt |  208 --
- .../networking/{cdc_mbim.txt => cdc_mbim.rst} |   76 +-
- Documentation/networking/cops.rst             |   80 +
- Documentation/networking/cops.txt             |   63 -
- .../networking/{cxacru.txt => cxacru.rst}     |   86 +-
- .../networking/{dccp.txt => dccp.rst}         |   39 +-
- .../networking/{dctcp.txt => dctcp.rst}       |   14 +-
- .../networking/{decnet.txt => decnet.rst}     |   77 +-
- .../networking/{defza.txt => defza.rst}       |    8 +-
- .../{dns_resolver.txt => dns_resolver.rst}    |   52 +-
- .../networking/{driver.txt => driver.rst}     |   22 +-
- Documentation/networking/{eql.txt => eql.rst} |  445 ++--
- .../networking/{fib_trie.txt => fib_trie.rst} |   16 +-
- .../networking/{filter.txt => filter.rst}     |  850 ++++---
- .../networking/{fore200e.txt => fore200e.rst} |    8 +-
- .../{framerelay.txt => framerelay.rst}        |   21 +-
- .../{gen_stats.txt => gen_stats.rst}          |   98 +-
- .../{generic-hdlc.txt => generic-hdlc.rst}    |   86 +-
- ...eneric_netlink.txt => generic_netlink.rst} |    6 +
- Documentation/networking/{gtp.txt => gtp.rst} |   95 +-
- Documentation/networking/index.rst            |   28 +
- 34 files changed, 3610 insertions(+), 3140 deletions(-)
+Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+---
+ .../networking/{6lowpan.txt => 6lowpan.rst}   | 29 ++++++++++---------
+ Documentation/networking/index.rst            |  1 +
+ 2 files changed, 17 insertions(+), 13 deletions(-)
  rename Documentation/networking/{6lowpan.txt => 6lowpan.rst} (64%)
- rename Documentation/networking/{6pack.txt => 6pack.rst} (90%)
- rename Documentation/networking/{altera_tse.txt => altera_tse.rst} (85%)
- rename Documentation/networking/{arcnet-hardware.txt => arcnet-hardware.rst} (66%)
- rename Documentation/networking/{arcnet.txt => arcnet.rst} (76%)
- rename Documentation/networking/{atm.txt => atm.rst} (89%)
- rename Documentation/networking/{ax25.txt => ax25.rst} (91%)
- rename Documentation/networking/{baycom.txt => baycom.rst} (58%)
- rename Documentation/networking/{bonding.txt => bonding.rst} (75%)
- create mode 100644 Documentation/networking/caif/index.rst
- rename Documentation/networking/caif/{Linux-CAIF.txt => linux_caif.rst} (90%)
- create mode 100644 Documentation/networking/caif/spi_porting.rst
- delete mode 100644 Documentation/networking/caif/spi_porting.txt
- rename Documentation/networking/{cdc_mbim.txt => cdc_mbim.rst} (88%)
- create mode 100644 Documentation/networking/cops.rst
- delete mode 100644 Documentation/networking/cops.txt
- rename Documentation/networking/{cxacru.txt => cxacru.rst} (66%)
- rename Documentation/networking/{dccp.txt => dccp.rst} (94%)
- rename Documentation/networking/{dctcp.txt => dctcp.rst} (89%)
- rename Documentation/networking/{decnet.txt => decnet.rst} (87%)
- rename Documentation/networking/{defza.txt => defza.rst} (91%)
- rename Documentation/networking/{dns_resolver.txt => dns_resolver.rst} (89%)
- rename Documentation/networking/{driver.txt => driver.rst} (85%)
- rename Documentation/networking/{eql.txt => eql.rst} (62%)
- rename Documentation/networking/{fib_trie.txt => fib_trie.rst} (96%)
- rename Documentation/networking/{filter.txt => filter.rst} (77%)
- rename Documentation/networking/{fore200e.txt => fore200e.rst} (94%)
- rename Documentation/networking/{framerelay.txt => framerelay.rst} (93%)
- rename Documentation/networking/{gen_stats.txt => gen_stats.rst} (60%)
- rename Documentation/networking/{generic-hdlc.txt => generic-hdlc.rst} (75%)
- rename Documentation/networking/{generic_netlink.txt => generic_netlink.rst} (64%)
- rename Documentation/networking/{gtp.txt => gtp.rst} (79%)
 
+diff --git a/Documentation/networking/6lowpan.txt b/Documentation/networking/6lowpan.rst
+similarity index 64%
+rename from Documentation/networking/6lowpan.txt
+rename to Documentation/networking/6lowpan.rst
+index 2e5a939d7e6f..e70a6520cc33 100644
+--- a/Documentation/networking/6lowpan.txt
++++ b/Documentation/networking/6lowpan.rst
+@@ -1,37 +1,40 @@
++.. SPDX-License-Identifier: GPL-2.0
+ 
+-Netdev private dataroom for 6lowpan interfaces:
++==============================================
++Netdev private dataroom for 6lowpan interfaces
++==============================================
+ 
+ All 6lowpan able net devices, means all interfaces with ARPHRD_6LOWPAN,
+ must have "struct lowpan_priv" placed at beginning of netdev_priv.
+ 
+-The priv_size of each interface should be calculate by:
++The priv_size of each interface should be calculate by::
+ 
+  dev->priv_size = LOWPAN_PRIV_SIZE(LL_6LOWPAN_PRIV_DATA);
+ 
+ Where LL_PRIV_6LOWPAN_DATA is sizeof linklayer 6lowpan private data struct.
+-To access the LL_PRIV_6LOWPAN_DATA structure you can cast:
++To access the LL_PRIV_6LOWPAN_DATA structure you can cast::
+ 
+  lowpan_priv(dev)-priv;
+ 
+ to your LL_6LOWPAN_PRIV_DATA structure.
+ 
+-Before registering the lowpan netdev interface you must run:
++Before registering the lowpan netdev interface you must run::
+ 
+  lowpan_netdev_setup(dev, LOWPAN_LLTYPE_FOOBAR);
+ 
+ wheres LOWPAN_LLTYPE_FOOBAR is a define for your 6LoWPAN linklayer type of
+ enum lowpan_lltypes.
+ 
+-Example to evaluate the private usually you can do:
++Example to evaluate the private usually you can do::
+ 
+-static inline struct lowpan_priv_foobar *
+-lowpan_foobar_priv(struct net_device *dev)
+-{
++ static inline struct lowpan_priv_foobar *
++ lowpan_foobar_priv(struct net_device *dev)
++ {
+ 	return (struct lowpan_priv_foobar *)lowpan_priv(dev)->priv;
+-}
++ }
+ 
+-switch (dev->type) {
+-case ARPHRD_6LOWPAN:
++ switch (dev->type) {
++ case ARPHRD_6LOWPAN:
+ 	lowpan_priv = lowpan_priv(dev);
+ 	/* do great stuff which is ARPHRD_6LOWPAN related */
+ 	switch (lowpan_priv->lltype) {
+@@ -42,8 +45,8 @@ case ARPHRD_6LOWPAN:
+ 	...
+ 	}
+ 	break;
+-...
+-}
++ ...
++ }
+ 
+ In case of generic 6lowpan branch ("net/6lowpan") you can remove the check
+ on ARPHRD_6LOWPAN, because you can be sure that these function are called
+diff --git a/Documentation/networking/index.rst b/Documentation/networking/index.rst
+index 3ccb89bf5585..cc34c06477eb 100644
+--- a/Documentation/networking/index.rst
++++ b/Documentation/networking/index.rst
+@@ -34,6 +34,7 @@ Contents:
+    tls
+    tls-offload
+    nfc
++   6lowpan
+ 
+ .. only::  subproject and html
+ 
 -- 
 2.24.1
-
 
