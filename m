@@ -1,85 +1,75 @@
-Return-Path: <SRS0=QIPK=6W=vger.kernel.org=linux-wpan-owner@kernel.org>
+Return-Path: <SRS0=sTt5=6X=vger.kernel.org=linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA15AC38A2A
-	for <linux-wpan@archiver.kernel.org>; Fri,  8 May 2020 15:16:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF28CC28CBC
+	for <linux-wpan@archiver.kernel.org>; Sat,  9 May 2020 05:26:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BBAA120736
-	for <linux-wpan@archiver.kernel.org>; Fri,  8 May 2020 15:16:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B0D3124953
+	for <linux-wpan@archiver.kernel.org>; Sat,  9 May 2020 05:26:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1589002018;
+	bh=2FbqU8bZl6w9cLuF4MoPItMpUp61yEjmaaPsancdiBA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:List-ID:From;
+	b=cmt/vHR2CFdjwURHiB+uhdiHCf4bjQE/QMHzWpQT6KxLFcYUsF6kSgM4Q7zibXIyt
+	 2u6F/GPUhIT4W9Ab14V/nME4P32CxpbJSBItFRsg+KkmO8Dz4dhLqDpWscMV6S34jH
+	 maLR1bDJ5dJUmCfeNbFAWMipCni1aBOcbzCCmiBo=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726689AbgEHPQA (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Fri, 8 May 2020 11:16:00 -0400
-Received: from proxima.lasnet.de ([78.47.171.185]:32910 "EHLO
-        proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726627AbgEHPQA (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Fri, 8 May 2020 11:16:00 -0400
-X-Greylist: delayed 370 seconds by postgrey-1.27 at vger.kernel.org; Fri, 08 May 2020 11:15:59 EDT
-Received: from PC192.168.2.51 (p200300E9D7489C6046CAB6DD825DF9A4.dip0.t-ipconnect.de [IPv6:2003:e9:d748:9c60:46ca:b6dd:825d:f9a4])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        id S1725820AbgEIF06 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Sat, 9 May 2020 01:26:58 -0400
+Received: from mail.kernel.org ([198.145.29.99]:56208 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725795AbgEIF06 (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+        Sat, 9 May 2020 01:26:58 -0400
+Received: from kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com (unknown [163.114.132.4])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        (Authenticated sender: stefan@datenfreihafen.org)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id 0789FC06E3;
-        Fri,  8 May 2020 17:09:44 +0200 (CEST)
+        by mail.kernel.org (Postfix) with ESMTPSA id AA1A920736;
+        Sat,  9 May 2020 05:26:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1589002017;
+        bh=2FbqU8bZl6w9cLuF4MoPItMpUp61yEjmaaPsancdiBA=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=rhxvvpBnzcB5zKzm7pZqXc6VWM5yV8OgUv6yVT/8j9OT40YqRJZjIGI6JyERzHkf0
+         3bHLNHHk2UDpT/X6QRnuJ6gtc4LoEVCnhact2U/CZgJi57lqxSpHhMBMRwwmlbNhfY
+         ZQRofNb0LM0Y9aBWpdWzlA9fvpdIa6BevMQo7SpA=
+Date:   Fri, 8 May 2020 22:26:55 -0700
+From:   Jakub Kicinski <kuba@kernel.org>
+To:     Stefan Schmidt <stefan@datenfreihafen.org>,
+        Yang Yingliang <yangyingliang@huawei.com>
+Cc:     alex.aring@gmail.com, davem@davemloft.net, netdev@vger.kernel.org,
+        linux-wpan@vger.kernel.org
 Subject: Re: [PATCH net-next] ieee802154: 6lowpan: remove unnecessary
  comparison
-To:     Yang Yingliang <yangyingliang@huawei.com>, alex.aring@gmail.com,
-        davem@davemloft.net
-Cc:     netdev@vger.kernel.org, linux-wpan@vger.kernel.org
+Message-ID: <20200508222655.71369682@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
+In-Reply-To: <e9ce1e47-79aa-aca2-e182-b9063d17fad8@datenfreihafen.org>
 References: <1588909928-58230-1-git-send-email-yangyingliang@huawei.com>
-From:   Stefan Schmidt <stefan@datenfreihafen.org>
-Message-ID: <e9ce1e47-79aa-aca2-e182-b9063d17fad8@datenfreihafen.org>
-Date:   Fri, 8 May 2020 17:09:43 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+        <e9ce1e47-79aa-aca2-e182-b9063d17fad8@datenfreihafen.org>
 MIME-Version: 1.0
-In-Reply-To: <1588909928-58230-1-git-send-email-yangyingliang@huawei.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Sender: linux-wpan-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello.
-
-On 08.05.20 05:52, Yang Yingliang wrote:
-> The type of dispatch is u8 which is always '<=' 0xff, so the
-> dispatch <= 0xff is always true, we can remove this comparison.
+On Fri, 8 May 2020 17:09:43 +0200 Stefan Schmidt wrote:
+>On 08.05.20 05:52, Yang Yingliang wrote:
+> > The type of dispatch is u8 which is always '<=' 0xff, so the
+> > dispatch <= 0xff is always true, we can remove this comparison.
+> > 
+> > Reported-by: Hulk Robot <hulkci@huawei.com>
+> > Signed-off-by: Yang Yingliang <yangyingliang@huawei.com>
+>
+> This looks good to me. Thanks for fixing this.
 > 
-> Reported-by: Hulk Robot <hulkci@huawei.com>
-> Signed-off-by: Yang Yingliang <yangyingliang@huawei.com>
-> ---
->   net/ieee802154/6lowpan/rx.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
+> Signed-off-by: Stefan Schmidt <stefan@datenfreihafen.org>
 > 
-> diff --git a/net/ieee802154/6lowpan/rx.c b/net/ieee802154/6lowpan/rx.c
-> index ee17938..b34d050 100644
-> --- a/net/ieee802154/6lowpan/rx.c
-> +++ b/net/ieee802154/6lowpan/rx.c
-> @@ -240,7 +240,7 @@ static inline bool lowpan_is_reserved(u8 dispatch)
->   	return ((dispatch >= 0x44 && dispatch <= 0x4F) ||
->   		(dispatch >= 0x51 && dispatch <= 0x5F) ||
->   		(dispatch >= 0xc8 && dispatch <= 0xdf) ||
-> -		(dispatch >= 0xe8 && dispatch <= 0xff));
-> +		dispatch >= 0xe8);
->   }
->   
->   /* lowpan_rx_h_check checks on generic 6LoWPAN requirements
-> 
+> Dave, can you apply this directly to your net tree? I have no other 
+> ieee802154 fixes pending to fill a pull request.
 
-This looks good to me. Thanks for fixing this.
-
-Signed-off-by: Stefan Schmidt <stefan@datenfreihafen.org>
-
-Dave, can you apply this directly to your net tree? I have no other 
-ieee802154 fixes pending to fill a pull request.
-
-regards
-Stefan Schmidt
+I'm sitting in for Dave today, applied to net-next, thank you!
