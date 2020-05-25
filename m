@@ -1,75 +1,85 @@
-Return-Path: <SRS0=sTt5=6X=vger.kernel.org=linux-wpan-owner@kernel.org>
+Return-Path: <SRS0=TYGC=7H=vger.kernel.org=linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF28CC28CBC
-	for <linux-wpan@archiver.kernel.org>; Sat,  9 May 2020 05:26:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A44A7C433DF
+	for <linux-wpan@archiver.kernel.org>; Mon, 25 May 2020 12:39:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B0D3124953
-	for <linux-wpan@archiver.kernel.org>; Sat,  9 May 2020 05:26:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1589002018;
-	bh=2FbqU8bZl6w9cLuF4MoPItMpUp61yEjmaaPsancdiBA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:List-ID:From;
-	b=cmt/vHR2CFdjwURHiB+uhdiHCf4bjQE/QMHzWpQT6KxLFcYUsF6kSgM4Q7zibXIyt
-	 2u6F/GPUhIT4W9Ab14V/nME4P32CxpbJSBItFRsg+KkmO8Dz4dhLqDpWscMV6S34jH
-	 maLR1bDJ5dJUmCfeNbFAWMipCni1aBOcbzCCmiBo=
+	by mail.kernel.org (Postfix) with ESMTP id 770782071A
+	for <linux-wpan@archiver.kernel.org>; Mon, 25 May 2020 12:39:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LcBsZoeC"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725820AbgEIF06 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Sat, 9 May 2020 01:26:58 -0400
-Received: from mail.kernel.org ([198.145.29.99]:56208 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725795AbgEIF06 (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-        Sat, 9 May 2020 01:26:58 -0400
-Received: from kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com (unknown [163.114.132.4])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id AA1A920736;
-        Sat,  9 May 2020 05:26:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1589002017;
-        bh=2FbqU8bZl6w9cLuF4MoPItMpUp61yEjmaaPsancdiBA=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=rhxvvpBnzcB5zKzm7pZqXc6VWM5yV8OgUv6yVT/8j9OT40YqRJZjIGI6JyERzHkf0
-         3bHLNHHk2UDpT/X6QRnuJ6gtc4LoEVCnhact2U/CZgJi57lqxSpHhMBMRwwmlbNhfY
-         ZQRofNb0LM0Y9aBWpdWzlA9fvpdIa6BevMQo7SpA=
-Date:   Fri, 8 May 2020 22:26:55 -0700
-From:   Jakub Kicinski <kuba@kernel.org>
-To:     Stefan Schmidt <stefan@datenfreihafen.org>,
-        Yang Yingliang <yangyingliang@huawei.com>
-Cc:     alex.aring@gmail.com, davem@davemloft.net, netdev@vger.kernel.org,
-        linux-wpan@vger.kernel.org
-Subject: Re: [PATCH net-next] ieee802154: 6lowpan: remove unnecessary
- comparison
-Message-ID: <20200508222655.71369682@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
-In-Reply-To: <e9ce1e47-79aa-aca2-e182-b9063d17fad8@datenfreihafen.org>
-References: <1588909928-58230-1-git-send-email-yangyingliang@huawei.com>
-        <e9ce1e47-79aa-aca2-e182-b9063d17fad8@datenfreihafen.org>
+        id S2390534AbgEYMjm (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 25 May 2020 08:39:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57396 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2390488AbgEYMjl (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 25 May 2020 08:39:41 -0400
+Received: from mail-io1-xd2c.google.com (mail-io1-xd2c.google.com [IPv6:2607:f8b0:4864:20::d2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E942C061A0E
+        for <linux-wpan@vger.kernel.org>; Mon, 25 May 2020 05:39:41 -0700 (PDT)
+Received: by mail-io1-xd2c.google.com with SMTP id c16so18487337iol.3
+        for <linux-wpan@vger.kernel.org>; Mon, 25 May 2020 05:39:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=pxHotUkcyFOHbcQKUf+Xj5LrOiEv/2gWXvynvhtr+ag=;
+        b=LcBsZoeCoXK8Fhme2V6bgdwkHHaxFRHJc/ScV3ITU4ffm4XDpXK43K4rueG6v3q3dl
+         XOQ85B1+Os51Zpey3PG5/GiP1Etfy9vkkkVJ92kkEXWI3ZM1zHyC2GChfyoGJOoPg4dV
+         QPT0X1d9YTUOvJ4he3WLQZo5DuCaeJYt8FyFa9oc1jZRnxqObZjz6T6SNYOMfhYhoVyx
+         0GsYHdWYxTtzrq/9iQJGT1TAAWPG/nl6wHYv8Qzz3NGzd9BBHz5HUohINKTt7YdgjyCB
+         9t9NUW68ZUwlD9I4HP4/3rPB0DowXE65Jazf7ZorWxij/eUFThH92Mc4abeItGxFlhdK
+         3yEw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=pxHotUkcyFOHbcQKUf+Xj5LrOiEv/2gWXvynvhtr+ag=;
+        b=JXZDIuIAplS+cEBsREBFq4u15Njg5qIaezEa+3/6l/PUrWXBYH8+JJyUIee/J+QTcS
+         X2WCFlBZxsJLkM8klGW8yYeglgf5NLYqtNnRwFTlWzjpEhDTwHu9OIH5LQebE4UTBvqu
+         4QBAIEv57ObewdnihjeFD/QSMZLjfcVQ41tQu9544gOb4Er/CgEHw+TxxrjNXyuEjmFD
+         wC2KzDPvdLAqjdaUvExbVX6HQn5bVuOEiGS9NVSG5BYFzHhHctksMIbYpSvVo9AjkaPn
+         b9tprySJq/YJDHZL04PKDmpjT1+fXzf+maR7MSV7K+shupwA6D50oeunbzeyQHE9r5Ea
+         kthw==
+X-Gm-Message-State: AOAM530vIrhDdWrAznz8Lwo3zJIEJeLjZZxg+rH+MH6XuwZFhPh3K53Q
+        JP18nmyb3QKPVicNB98wG9scDz4WBGsI/8i1BtlWeYyShs4=
+X-Google-Smtp-Source: ABdhPJxsNj8kpRPwUgfDUYyqlNT5EBjOaGD4Tor0eXyM9Jv9SOwPRSIRQ+z5e5Q0pRARAWZSkZTVJrzWZrM6qBHZVbE=
+X-Received: by 2002:a6b:8d44:: with SMTP id p65mr5717360iod.24.1590410380803;
+ Mon, 25 May 2020 05:39:40 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+From:   Christopher Friedt <chrisfriedt@gmail.com>
+Date:   Mon, 25 May 2020 08:39:30 -0400
+Message-ID: <CAF4BF-SFHA=mPHLxpDHGMLvgu0UKO-6ujfYB+n2a6=XhFvT6DA@mail.gmail.com>
+Subject: wpanusb?
+To:     linux-wpan@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-wpan-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-On Fri, 8 May 2020 17:09:43 +0200 Stefan Schmidt wrote:
->On 08.05.20 05:52, Yang Yingliang wrote:
-> > The type of dispatch is u8 which is always '<=' 0xff, so the
-> > dispatch <= 0xff is always true, we can remove this comparison.
-> > 
-> > Reported-by: Hulk Robot <hulkci@huawei.com>
-> > Signed-off-by: Yang Yingliang <yangyingliang@huawei.com>
->
-> This looks good to me. Thanks for fixing this.
-> 
-> Signed-off-by: Stefan Schmidt <stefan@datenfreihafen.org>
-> 
-> Dave, can you apply this directly to your net tree? I have no other 
-> ieee802154 fixes pending to fill a pull request.
+Hi all,
 
-I'm sitting in for Dave today, applied to net-next, thank you!
+Bouncing around a bit, but in Zephyr, there is reference to a
+"wpanusb" Linux kernel driver here:
+
+https://docs.zephyrproject.org/latest/samples/net/wpanusb/README.html
+
+This *might* be the driver in question:
+
+https://github.com/finikorg/wpanusb
+
+Just wondering if anyone has made any attempts to submit that, or
+would that go directly upstream these days?
+
+Hope you are well.
+
+Incidentally, we're hoping to do a microconference at Linux Plumbers
+again this year again, virtually of course.
+
+C
