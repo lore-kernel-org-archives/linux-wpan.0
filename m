@@ -1,51 +1,49 @@
-Return-Path: <SRS0=QRn2=74=vger.kernel.org=linux-wpan-owner@kernel.org>
+Return-Path: <SRS0=1fZ6=75=vger.kernel.org=linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6126C433E1
-	for <linux-wpan@archiver.kernel.org>; Mon, 15 Jun 2020 18:40:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D875C433E1
+	for <linux-wpan@archiver.kernel.org>; Tue, 16 Jun 2020 01:58:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8E79B207D4
-	for <linux-wpan@archiver.kernel.org>; Mon, 15 Jun 2020 18:40:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5013F20739
+	for <linux-wpan@archiver.kernel.org>; Tue, 16 Jun 2020 01:58:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Qdmw/PJx"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cmfbCyUD"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731365AbgFOSki (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 15 Jun 2020 14:40:38 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36230 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1731249AbgFOSkg (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 15 Jun 2020 14:40:36 -0400
+        id S1726483AbgFPB6Y (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 15 Jun 2020 21:58:24 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:53966 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726599AbgFPB6K (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>);
+        Mon, 15 Jun 2020 21:58:10 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1592246435;
+        s=mimecast20190719; t=1592272689;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=3LdVapGy9WTsAkwpfNEzCTfQe3Pij8/lM5ySXZsHExs=;
-        b=Qdmw/PJxLK31/rKmKgWbE5yAY+4i+gsfVEBtEc5ToE9B/FlegLfNgeLIEfjWVedKb+Y3z+
-        Ycm1/NjjL9Q+v0I8qj/IlOhBg48Vph4+42maRH5yobUN7AM1PVkzEfbgROmMIUaUwRj4yL
-        DHGm6MQRL2VNnBptPlwJW/1yX6HdQV8=
+         to:to:cc:cc:in-reply-to:in-reply-to:references:references;
+        bh=w0ZJeQQk3EMaWCq5vRe2fLP4T7LhSgQGKZa9FTUZAA4=;
+        b=cmfbCyUDRGwKjLGBejxtzwXYJZpxYp4m4gTqt1HJSocbaTeByL2ZSn3rJ/ux/7hS8NPcJY
+        pDmzv+GqMhAOF/UyMu9ENB1TqV6U+tP0Mht2YLdiU0vgD5MEO3kgZFDGI5G30nsnTYzl6e
+        3vAL0jFWUiwI5s0OQXwAYyvRhcKeSIM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-513-n3G_ZfGUONug8wkjJytxqA-1; Mon, 15 Jun 2020 14:40:12 -0400
-X-MC-Unique: n3G_ZfGUONug8wkjJytxqA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+ us-mta-271-siDUOdYEMkuGDz0Coifxdg-1; Mon, 15 Jun 2020 21:58:05 -0400
+X-MC-Unique: siDUOdYEMkuGDz0Coifxdg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E5F43184D144;
-        Mon, 15 Jun 2020 18:40:06 +0000 (UTC)
-Received: from llong.remote.csb (ovpn-117-41.rdu2.redhat.com [10.10.117.41])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3972B5D9CC;
-        Mon, 15 Jun 2020 18:40:00 +0000 (UTC)
-Subject: Re: [PATCH 1/2] mm, treewide: Rename kzfree() to kfree_sensitive()
-To:     Dan Carpenter <dan.carpenter@oracle.com>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6856710059B7;
+        Tue, 16 Jun 2020 01:58:00 +0000 (UTC)
+Received: from llong.com (ovpn-117-41.rdu2.redhat.com [10.10.117.41])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 45E126ED96;
+        Tue, 16 Jun 2020 01:57:52 +0000 (UTC)
+From:   Waiman Long <longman@redhat.com>
+To:     Andrew Morton <akpm@linux-foundation.org>,
         David Howells <dhowells@redhat.com>,
         Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
         James Morris <jmorris@namei.org>,
@@ -53,94 +51,68 @@ Cc:     Andrew Morton <akpm@linux-foundation.org>,
         Linus Torvalds <torvalds@linux-foundation.org>,
         Joe Perches <joe@perches.com>,
         Matthew Wilcox <willy@infradead.org>,
-        David Rientjes <rientjes@google.com>,
-        samba-technical@lists.samba.org,
-        virtualization@lists.linux-foundation.org, linux-mm@kvack.org,
-        linux-sctp@vger.kernel.org, target-devel@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        devel@driverdev.osuosl.org, linux-s390@vger.kernel.org,
-        linux-scsi@vger.kernel.org, x86@kernel.org,
-        kasan-dev@googlegroups.com, cocci@systeme.lip6.fr,
-        linux-wpan@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
+        David Rientjes <rientjes@google.com>
+Cc:     Michal Hocko <mhocko@suse.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        David Sterba <dsterba@suse.cz>,
+        "Jason A . Donenfeld" <Jason@zx2c4.com>, linux-mm@kvack.org,
+        keyrings@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-crypto@vger.kernel.org, linux-pm@vger.kernel.org,
-        ecryptfs@vger.kernel.org, linux-nfs@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, linux-mediatek@lists.infradead.org,
+        linux-stm32@st-md-mailman.stormreply.com,
         linux-amlogic@lists.infradead.org,
-        linux-arm-kernel@lists.infradead.org, linux-cifs@vger.kernel.org,
-        netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
-        tipc-discussion@lists.sourceforge.net, wireguard@lists.zx2c4.com,
-        linux-ppp@vger.kernel.org, linux-integrity@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-btrfs@vger.kernel.org
-References: <20200413211550.8307-1-longman@redhat.com>
- <20200413211550.8307-2-longman@redhat.com> <20200615180753.GJ4151@kadam>
-From:   Waiman Long <longman@redhat.com>
-Organization: Red Hat
-Message-ID: <9d084be2-29a3-7757-9386-20dbaeb5fc24@redhat.com>
-Date:   Mon, 15 Jun 2020 14:39:59 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
-MIME-Version: 1.0
-In-Reply-To: <20200615180753.GJ4151@kadam>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+        linux-mediatek@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-ppp@vger.kernel.org, wireguard@lists.zx2c4.com,
+        linux-wireless@vger.kernel.org, devel@driverdev.osuosl.org,
+        linux-scsi@vger.kernel.org, target-devel@vger.kernel.org,
+        linux-btrfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, ecryptfs@vger.kernel.org,
+        kasan-dev@googlegroups.com, linux-bluetooth@vger.kernel.org,
+        linux-wpan@vger.kernel.org, linux-sctp@vger.kernel.org,
+        linux-nfs@vger.kernel.org, tipc-discussion@lists.sourceforge.net,
+        linux-security-module@vger.kernel.org,
+        linux-integrity@vger.kernel.org, Waiman Long <longman@redhat.com>,
+        stable@vger.kernel.org
+Subject: [PATCH v4 1/3] mm/slab: Use memzero_explicit() in kzfree()
+Date:   Mon, 15 Jun 2020 21:57:16 -0400
+Message-Id: <20200616015718.7812-2-longman@redhat.com>
+In-Reply-To: <20200616015718.7812-1-longman@redhat.com>
+References: <20200616015718.7812-1-longman@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Sender: linux-wpan-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-On 6/15/20 2:07 PM, Dan Carpenter wrote:
-> On Mon, Apr 13, 2020 at 05:15:49PM -0400, Waiman Long wrote:
->> diff --git a/mm/slab_common.c b/mm/slab_common.c
->> index 23c7500eea7d..c08bc7eb20bd 100644
->> --- a/mm/slab_common.c
->> +++ b/mm/slab_common.c
->> @@ -1707,17 +1707,17 @@ void *krealloc(const void *p, size_t new_size, gfp_t flags)
->>   EXPORT_SYMBOL(krealloc);
->>   
->>   /**
->> - * kzfree - like kfree but zero memory
->> + * kfree_sensitive - Clear sensitive information in memory before freeing
->>    * @p: object to free memory of
->>    *
->>    * The memory of the object @p points to is zeroed before freed.
->> - * If @p is %NULL, kzfree() does nothing.
->> + * If @p is %NULL, kfree_sensitive() does nothing.
->>    *
->>    * Note: this function zeroes the whole allocated buffer which can be a good
->>    * deal bigger than the requested buffer size passed to kmalloc(). So be
->>    * careful when using this function in performance sensitive code.
->>    */
->> -void kzfree(const void *p)
->> +void kfree_sensitive(const void *p)
->>   {
->>   	size_t ks;
->>   	void *mem = (void *)p;
->> @@ -1725,10 +1725,10 @@ void kzfree(const void *p)
->>   	if (unlikely(ZERO_OR_NULL_PTR(mem)))
->>   		return;
->>   	ks = ksize(mem);
->> -	memset(mem, 0, ks);
->> +	memzero_explicit(mem, ks);
->          ^^^^^^^^^^^^^^^^^^^^^^^^^
-> This is an unrelated bug fix.  It really needs to be pulled into a
-> separate patch by itself and back ported to stable kernels.
->
->>   	kfree(mem);
->>   }
->> -EXPORT_SYMBOL(kzfree);
->> +EXPORT_SYMBOL(kfree_sensitive);
->>   
->>   /**
->>    * ksize - get the actual amount of memory allocated for a given object
-> regards,
-> dan carpenter
->
-Thanks for the suggestion. I will break it out and post a version soon.
+The kzfree() function is normally used to clear some sensitive
+information, like encryption keys, in the buffer before freeing it back
+to the pool. Memset() is currently used for the buffer clearing. However,
+it is entirely possible that the compiler may choose to optimize away the
+memory clearing especially if LTO is being used. To make sure that this
+optimization will not happen, memzero_explicit(), which is introduced
+in v3.18, is now used in kzfree() to do the clearing.
 
-Cheers,
-Longman
+Fixes: 3ef0e5ba4673 ("slab: introduce kzfree()")
+Cc: stable@vger.kernel.org
+Signed-off-by: Waiman Long <longman@redhat.com>
+---
+ mm/slab_common.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/mm/slab_common.c b/mm/slab_common.c
+index 9e72ba224175..37d48a56431d 100644
+--- a/mm/slab_common.c
++++ b/mm/slab_common.c
+@@ -1726,7 +1726,7 @@ void kzfree(const void *p)
+ 	if (unlikely(ZERO_OR_NULL_PTR(mem)))
+ 		return;
+ 	ks = ksize(mem);
+-	memset(mem, 0, ks);
++	memzero_explicit(mem, ks);
+ 	kfree(mem);
+ }
+ EXPORT_SYMBOL(kzfree);
+-- 
+2.18.1
 
