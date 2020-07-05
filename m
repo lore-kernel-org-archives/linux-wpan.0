@@ -1,77 +1,188 @@
-Return-Path: <SRS0=3mh+=AL=vger.kernel.org=linux-wpan-owner@kernel.org>
+Return-Path: <SRS0=+7pT=AQ=vger.kernel.org=linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-0.4 required=3.0 tests=FROM_LOCAL_HEX,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B06BC433DF
-	for <linux-wpan@archiver.kernel.org>; Tue, 30 Jun 2020 04:02:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA019C433E0
+	for <linux-wpan@archiver.kernel.org>; Sun,  5 Jul 2020 18:42:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2CB88206BE
-	for <linux-wpan@archiver.kernel.org>; Tue, 30 Jun 2020 04:02:12 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ky/iwafX"
+	by mail.kernel.org (Postfix) with ESMTP id 9C6992070C
+	for <linux-wpan@archiver.kernel.org>; Sun,  5 Jul 2020 18:42:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726264AbgF3ECH (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 30 Jun 2020 00:02:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41508 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725372AbgF3ECH (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 30 Jun 2020 00:02:07 -0400
-Received: from mail-io1-xd29.google.com (mail-io1-xd29.google.com [IPv6:2607:f8b0:4864:20::d29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC1CFC061755;
-        Mon, 29 Jun 2020 21:02:06 -0700 (PDT)
-Received: by mail-io1-xd29.google.com with SMTP id i25so19609294iog.0;
-        Mon, 29 Jun 2020 21:02:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=yAZduYcEKm4wiOoLB6wnk1hlMRtoPsLgtKlyIvlMUUk=;
-        b=Ky/iwafX+R7dEmWZyZumx6DSeZPlvcCGnf07kA1EqZ2yRSbzaR/LXNRc5U1uI6zusn
-         u+EiYnWG+JuhYHO0o94bpvhUzNWKKrF7/DLfDrkUPzwOLSeo9ub0K3pjFmen8fTDAnVf
-         BZ/TN4WX8DpphcUTFiD08QZ0tz6fE2nt6QR5sJ4dWnSV5WcYPD3s4yzmqO+zOjRDFfbR
-         rSVJjubT2vLGH8HcOSyS+B3DEtSK5lEUj0lUEyb1BqfvDO+KKtQMnebYpm/6+43YLRC7
-         UuAljR0/KCMeYJJjVxweHH/p4nuPd/bCpjrYrJH8D1BLghuA03ihwrqj03pgBEsTdoqo
-         9law==
+        id S1728094AbgGESmX (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Sun, 5 Jul 2020 14:42:23 -0400
+Received: from mail-il1-f198.google.com ([209.85.166.198]:41469 "EHLO
+        mail-il1-f198.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728061AbgGESmX (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Sun, 5 Jul 2020 14:42:23 -0400
+Received: by mail-il1-f198.google.com with SMTP id k6so26176120ilg.8
+        for <linux-wpan@vger.kernel.org>; Sun, 05 Jul 2020 11:42:21 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=yAZduYcEKm4wiOoLB6wnk1hlMRtoPsLgtKlyIvlMUUk=;
-        b=pFDbVik1EOo6jRBNO9YWV/EAjhW//MdCJ+HlTOdgnygKq1I7iA4fWAX9/WFdKcN37K
-         qdMYAplBeCTwuANBQaXFvtGZrFozJ5zo0asjqnzWj/n2f9VZ5fNJopaLmP13ok8rOlW7
-         klSaqIZmWrBSzlC+QSFIJMV3EMozVpoSzIv9vepLuUMesYQth9rKeRefYJC7r7hjhbHx
-         z9GxuF/qEGhf97UCNiECMXh1qBwSkaOMdyUMduJrvuXxN3E3MJrUr+a0R77gUkE3zjrG
-         I4cJKz0010On5eiW50NQP0tiq9PP4FbK2esk6mMfLwtdQzuz4z3K5LGzq/wDaJpZGxLi
-         Jq0Q==
-X-Gm-Message-State: AOAM533P1El/xfyri5IeUO/4InDy2zG/EQbQVzUMohTWFibERxF/h0ZX
-        /9ou44n3TvuIABI8eevOIL38dh1QmgDamJdRkp4=
-X-Google-Smtp-Source: ABdhPJzTs4iypkYJ4X1iAIulRzYJC9ZkZD+Cs777rZ1TTCrDJVdQr4rHW6keFvhcH9/GrW+YPSIFYa4tkC2/3uqe5E8=
-X-Received: by 2002:a5d:9819:: with SMTP id a25mr19269584iol.85.1593489726375;
- Mon, 29 Jun 2020 21:02:06 -0700 (PDT)
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=36lIim6U0EVSea9yn5eRaizKMk+KEYlJqS23zYMSLOk=;
+        b=fYuXhtsHROpdI+q33YV0AfM00VT769p9ImvGoVPPd0xPAv+Baty5b2gdpTbe9bmFlk
+         FJWjZXkfRwAciBgGstpN9CzXV1M8923WrROl7Jz7CyiCG0nGp8ebAR+ZXc2VRofaIbTD
+         gdQ5pIHd0HBBi+YgS8MceARAQOR08bNGZhr6EHgSNwcFwPjuFUaq3j7tNZpMFufVC+uB
+         K7Gr0Kd6QFzGO+gYU9MBGIGXxj1KsQI47E+vPPHm/abAfO3DpqBfW/NWoi98LKmTH73C
+         eNvsgE1721TCQnm+Ogi4/S7D/V+UO49qcwdn23nzkwDy5WZ6nDnG/rKzTx8gF3OjYdEo
+         KirA==
+X-Gm-Message-State: AOAM531kXHIsiCWY1JWlHfR8YAubw9j/i2UpHhsgnU1jS0a6MGJBmWWm
+        UX/sL6UnVJTA0LfMSpX8Kpz5Xwd1UUuXOvKHV8cWRrTxwwXN
+X-Google-Smtp-Source: ABdhPJxI8RfCHebzqFgY01iWDvhaoIwOhyEqBLiFwmY6Vbf1wGjH+aiyZVM2XuALnt4TZHdm/fahuQ+9CJqkHl2qP9/pB+wiO65u
 MIME-Version: 1.0
-References: <00000000000049ea0a05a8ffc126@google.com>
-In-Reply-To: <00000000000049ea0a05a8ffc126@google.com>
-From:   Cong Wang <xiyou.wangcong@gmail.com>
-Date:   Mon, 29 Jun 2020 21:01:55 -0700
-Message-ID: <CAM_iQpUXmLsM7dtZfcx59tC8fJWxnBd7tLi2iJ3990w-pkDb1A@mail.gmail.com>
-Subject: Re: KASAN: use-after-free Read in nl8NUM_dump_wpan_phy (2)
-To:     syzbot <syzbot+4c8afc85aa32ddb020dc@syzkaller.appspotmail.com>
-Cc:     Alexander Aring <alex.aring@gmail.com>,
-        David Miller <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>, linux-wpan@vger.kernel.org,
-        Linux Kernel Network Developers <netdev@vger.kernel.org>,
-        stefan@datenfreihafen.org,
-        syzkaller-bugs <syzkaller-bugs@googlegroups.com>
+X-Received: by 2002:a05:6602:d8:: with SMTP id z24mr21869065ioe.136.1593974541507;
+ Sun, 05 Jul 2020 11:42:21 -0700 (PDT)
+Date:   Sun, 05 Jul 2020 11:42:21 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000053e07805a9b61e09@google.com>
+Subject: KASAN: use-after-free Read in __cfg8NUM_wpan_dev_from_attrs (2)
+From:   syzbot <syzbot+14e0e4960091ffae7cf7@syzkaller.appspotmail.com>
+To:     alex.aring@gmail.com, davem@davemloft.net, kuba@kernel.org,
+        linux-kernel@vger.kernel.org, linux-wpan@vger.kernel.org,
+        netdev@vger.kernel.org, stefan@datenfreihafen.org,
+        syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-wpan-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-#syz fix: genetlink: get rid of family->attrbuf
+Hello,
+
+syzbot found the following crash on:
+
+HEAD commit:    e44f65fd xen-netfront: remove redundant assignment to vari..
+git tree:       net-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=120f87e5100000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=829871134ca5e230
+dashboard link: https://syzkaller.appspot.com/bug?extid=14e0e4960091ffae7cf7
+compiler:       gcc (GCC) 10.1.0-syz 20200507
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11818aa7100000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10f997d3100000
+
+IMPORTANT: if you fix the bug, please add the following tag to the commit:
+Reported-by: syzbot+14e0e4960091ffae7cf7@syzkaller.appspotmail.com
+
+netlink: 26 bytes leftover after parsing attributes in process `syz-executor982'.
+==================================================================
+BUG: KASAN: use-after-free in nla_len include/net/netlink.h:1135 [inline]
+BUG: KASAN: use-after-free in nla_memcpy+0x9c/0xa0 lib/nlattr.c:724
+Read of size 2 at addr ffff8880a0ca8414 by task syz-executor982/6816
+
+CPU: 0 PID: 6816 Comm: syz-executor982 Not tainted 5.8.0-rc2-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+Call Trace:
+ __dump_stack lib/dump_stack.c:77 [inline]
+ dump_stack+0x18f/0x20d lib/dump_stack.c:118
+ print_address_description.constprop.0.cold+0xae/0x436 mm/kasan/report.c:383
+ __kasan_report mm/kasan/report.c:513 [inline]
+ kasan_report.cold+0x1f/0x37 mm/kasan/report.c:530
+ nla_len include/net/netlink.h:1135 [inline]
+ nla_memcpy+0x9c/0xa0 lib/nlattr.c:724
+ nla_get_u64 include/net/netlink.h:1606 [inline]
+ __cfg802154_wpan_dev_from_attrs+0x3e0/0x510 net/ieee802154/nl802154.c:55
+ nl802154_prepare_wpan_dev_dump.constprop.0+0xf9/0x490 net/ieee802154/nl802154.c:245
+ nl802154_dump_llsec_dev+0xc0/0xb10 net/ieee802154/nl802154.c:1655
+ genl_lock_dumpit+0x7f/0xb0 net/netlink/genetlink.c:575
+ netlink_dump+0x4cd/0xf60 net/netlink/af_netlink.c:2245
+ __netlink_dump_start+0x643/0x900 net/netlink/af_netlink.c:2353
+ genl_family_rcv_msg_dumpit+0x2ac/0x310 net/netlink/genetlink.c:638
+ genl_family_rcv_msg net/netlink/genetlink.c:733 [inline]
+ genl_rcv_msg+0x797/0x9e0 net/netlink/genetlink.c:753
+ netlink_rcv_skb+0x15a/0x430 net/netlink/af_netlink.c:2469
+ genl_rcv+0x24/0x40 net/netlink/genetlink.c:764
+ netlink_unicast_kernel net/netlink/af_netlink.c:1303 [inline]
+ netlink_unicast+0x533/0x7d0 net/netlink/af_netlink.c:1329
+ netlink_sendmsg+0x856/0xd90 net/netlink/af_netlink.c:1918
+ sock_sendmsg_nosec net/socket.c:652 [inline]
+ sock_sendmsg+0xcf/0x120 net/socket.c:672
+ ____sys_sendmsg+0x6e8/0x810 net/socket.c:2352
+ ___sys_sendmsg+0xf3/0x170 net/socket.c:2406
+ __sys_sendmsg+0xe5/0x1b0 net/socket.c:2439
+ do_syscall_64+0x60/0xe0 arch/x86/entry/common.c:359
+ entry_SYSCALL_64_after_hwframe+0x44/0xa9
+RIP: 0033:0x4413c9
+Code: Bad RIP value.
+RSP: 002b:00007fff5b30bca8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00000000004413c9
+RDX: 0000000000000000 RSI: 0000000020000000 RDI: 0000000000000003
+RBP: 00000000006cb018 R08: 00000000004002c8 R09: 00000000004002c8
+R10: 0000000000000004 R11: 0000000000000246 R12: 0000000000402140
+R13: 00000000004021d0 R14: 0000000000000000 R15: 0000000000000000
+
+Allocated by task 6815:
+ save_stack+0x1b/0x40 mm/kasan/common.c:48
+ set_track mm/kasan/common.c:56 [inline]
+ __kasan_kmalloc.constprop.0+0xc2/0xd0 mm/kasan/common.c:494
+ __kmalloc_reserve net/core/skbuff.c:142 [inline]
+ __alloc_skb+0xae/0x550 net/core/skbuff.c:210
+ alloc_skb include/linux/skbuff.h:1083 [inline]
+ netlink_alloc_large_skb net/netlink/af_netlink.c:1175 [inline]
+ netlink_sendmsg+0x94f/0xd90 net/netlink/af_netlink.c:1893
+ sock_sendmsg_nosec net/socket.c:652 [inline]
+ sock_sendmsg+0xcf/0x120 net/socket.c:672
+ ____sys_sendmsg+0x6e8/0x810 net/socket.c:2352
+ ___sys_sendmsg+0xf3/0x170 net/socket.c:2406
+ __sys_sendmsg+0xe5/0x1b0 net/socket.c:2439
+ do_syscall_64+0x60/0xe0 arch/x86/entry/common.c:359
+ entry_SYSCALL_64_after_hwframe+0x44/0xa9
+
+Freed by task 6815:
+ save_stack+0x1b/0x40 mm/kasan/common.c:48
+ set_track mm/kasan/common.c:56 [inline]
+ kasan_set_free_info mm/kasan/common.c:316 [inline]
+ __kasan_slab_free+0xf5/0x140 mm/kasan/common.c:455
+ __cache_free mm/slab.c:3426 [inline]
+ kfree+0x103/0x2c0 mm/slab.c:3757
+ skb_free_head net/core/skbuff.c:590 [inline]
+ skb_release_data+0x6d9/0x910 net/core/skbuff.c:610
+ skb_release_all net/core/skbuff.c:664 [inline]
+ __kfree_skb net/core/skbuff.c:678 [inline]
+ consume_skb net/core/skbuff.c:837 [inline]
+ consume_skb+0xc2/0x160 net/core/skbuff.c:831
+ netlink_unicast_kernel net/netlink/af_netlink.c:1304 [inline]
+ netlink_unicast+0x53b/0x7d0 net/netlink/af_netlink.c:1329
+ netlink_sendmsg+0x856/0xd90 net/netlink/af_netlink.c:1918
+ sock_sendmsg_nosec net/socket.c:652 [inline]
+ sock_sendmsg+0xcf/0x120 net/socket.c:672
+ ____sys_sendmsg+0x6e8/0x810 net/socket.c:2352
+ ___sys_sendmsg+0xf3/0x170 net/socket.c:2406
+ __sys_sendmsg+0xe5/0x1b0 net/socket.c:2439
+ do_syscall_64+0x60/0xe0 arch/x86/entry/common.c:359
+ entry_SYSCALL_64_after_hwframe+0x44/0xa9
+
+The buggy address belongs to the object at ffff8880a0ca8400
+ which belongs to the cache kmalloc-512 of size 512
+The buggy address is located 20 bytes inside of
+ 512-byte region [ffff8880a0ca8400, ffff8880a0ca8600)
+The buggy address belongs to the page:
+page:ffffea0002832a00 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0
+flags: 0xfffe0000000200(slab)
+raw: 00fffe0000000200 ffffea00029e1288 ffffea00028ef888 ffff8880aa000a80
+raw: 0000000000000000 ffff8880a0ca8000 0000000100000004 0000000000000000
+page dumped because: kasan: bad access detected
+
+Memory state around the buggy address:
+ ffff8880a0ca8300: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+ ffff8880a0ca8380: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+>ffff8880a0ca8400: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+                         ^
+ ffff8880a0ca8480: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ffff8880a0ca8500: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+==================================================================
+
+
+---
+This bug is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this bug report. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+syzbot can test patches for this bug, for details see:
+https://goo.gl/tpsmEJ#testing-patches
