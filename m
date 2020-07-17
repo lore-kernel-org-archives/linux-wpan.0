@@ -1,201 +1,127 @@
-Return-Path: <SRS0=IwDR=AR=vger.kernel.org=linux-wpan-owner@kernel.org>
+Return-Path: <SRS0=NfXf=A4=vger.kernel.org=linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0ABCBC433DF
-	for <linux-wpan@archiver.kernel.org>; Mon,  6 Jul 2020 14:42:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13BF5C433E1
+	for <linux-wpan@archiver.kernel.org>; Fri, 17 Jul 2020 06:24:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DDC80206CB
-	for <linux-wpan@archiver.kernel.org>; Mon,  6 Jul 2020 14:42:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E54FF20704
+	for <linux-wpan@archiver.kernel.org>; Fri, 17 Jul 2020 06:24:13 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="o6zhOep2"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729195AbgGFOmo (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 6 Jul 2020 10:42:44 -0400
-Received: from proxima.lasnet.de ([78.47.171.185]:35564 "EHLO
-        proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729186AbgGFOmo (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 6 Jul 2020 10:42:44 -0400
-Received: from localhost.localdomain (p200300e9d72b9355b0c855f0872cef0a.dip0.t-ipconnect.de [IPv6:2003:e9:d72b:9355:b0c8:55f0:872c:ef0a])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits))
-        (No client certificate requested)
-        (Authenticated sender: stefan@datenfreihafen.org)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id 497CEC2AD6;
-        Mon,  6 Jul 2020 16:42:38 +0200 (CEST)
-Subject: Re: wpanusb?
-From:   Stefan Schmidt <stefan@datenfreihafen.org>
-To:     Koen Zandberg <koen@bergzand.net>,
-        Christopher Friedt <chrisfriedt@gmail.com>
-Cc:     linux-wpan@vger.kernel.org,
-        Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-References: <CAF4BF-SFHA=mPHLxpDHGMLvgu0UKO-6ujfYB+n2a6=XhFvT6DA@mail.gmail.com>
- <b009a2a8-64a5-fe66-a53e-5a93135cf1f8@datenfreihafen.org>
- <CAF4BF-SNRyXQzUBqx5k014nZou4q7=Gd8=dbUyK7JiDkaEEvFA@mail.gmail.com>
- <f98b4515-9570-ad48-2d8f-dcc5482a21a1@datenfreihafen.org>
- <CAF4BF-SipApoY=7CY8fWs8cSi8rKZaYMxOZHAqoKv=poAgVm=Q@mail.gmail.com>
- <61ffa93d-f8cf-b059-358c-84a6e04b96ac@bergzand.net>
- <CAF4BF-Re1CoR8abM=hvKN=TojDoLL_PRAJTvjWzB-Ak8tKTvRg@mail.gmail.com>
- <e5d22300-fccc-5a0f-6776-5438bfad57e1@datenfreihafen.org>
- <0ccbc151-cf8e-cd56-28f8-f1594d226056@bergzand.net>
- <8ddb855b-e9fb-6fb2-cb1f-38a7b7064683@datenfreihafen.org>
-Message-ID: <3993a752-bb9c-ab25-7b2f-0cbf27c2cd6a@datenfreihafen.org>
-Date:   Mon, 6 Jul 2020 16:42:37 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+        id S1726856AbgGQGYN (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Fri, 17 Jul 2020 02:24:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53890 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726656AbgGQGYK (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 17 Jul 2020 02:24:10 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75F00C08C5C0;
+        Thu, 16 Jul 2020 23:24:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
+        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
+        Content-Type:Content-ID:Content-Description;
+        bh=/E3yYoXC157551h6xowHq2pNR018OFBhJ9Arvav070Y=; b=o6zhOep28KSjcnYm3J9aHcpkgm
+        O2Fcz0+9OvZMn6mbYHPBFH/fhpi9DoauQT0ncpn5viSfaoFF6bLsJITCRXjgfdyqFLmf4LW5Djzbq
+        mVD4a9wW/2LPyab9lB73mzm+FvayvQ+EgI8+vOBPzlrpsBjPVCB3G88FaBPOFgmA9Mu2nVuQYxlZH
+        5LqOFVBqwVr859Q4epbLvsmne1egzV1tTu7+l4QNJED3wUW/yW3Y/QVQJEeAZPJymdlnG4fe6WTAC
+        BSzIX9qF0b7Pb8owGsYurQp2qXY/WMlbn+gcpCALS7U1mCseHNtxJKPafipfiMwCKx140COitXOWS
+        xalq63Mw==;
+Received: from [2001:4bb8:105:4a81:3772:912d:640:e6c6] (helo=localhost)
+        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1jwJmk-00051o-Jr; Fri, 17 Jul 2020 06:23:55 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     "David S. Miller" <davem@davemloft.net>
+Cc:     Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Chas Williams <3chas3@gmail.com>,
+        Pablo Neira Ayuso <pablo@netfilter.org>,
+        Jozsef Kadlecsik <kadlec@netfilter.org>,
+        Florian Westphal <fw@strlen.de>,
+        Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
+        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+        bpf@vger.kernel.org, netfilter-devel@vger.kernel.org,
+        linux-sctp@vger.kernel.org, linux-arch@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, bridge@lists.linux-foundation.org,
+        linux-can@vger.kernel.org, dccp@vger.kernel.org,
+        linux-wpan@vger.kernel.org, mptcp@lists.01.org
+Subject: [PATCH 03/22] net: streamline __sys_getsockopt
+Date:   Fri, 17 Jul 2020 08:23:12 +0200
+Message-Id: <20200717062331.691152-4-hch@lst.de>
+X-Mailer: git-send-email 2.27.0
+In-Reply-To: <20200717062331.691152-1-hch@lst.de>
+References: <20200717062331.691152-1-hch@lst.de>
 MIME-Version: 1.0
-In-Reply-To: <8ddb855b-e9fb-6fb2-cb1f-38a7b7064683@datenfreihafen.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-wpan-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello.
+Return early when sockfd_lookup_light fails to reduce a level of
+indentation for most of the function body.
 
-Bumping this thread again.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ net/socket.c | 31 ++++++++++++++-----------------
+ 1 file changed, 14 insertions(+), 17 deletions(-)
 
-On 07.06.20 14:17, Stefan Schmidt wrote:
-> Hallo.
-> 
-> On 05.06.20 13:07, Koen Zandberg wrote:
->> Hello
->>
->> On 03-06-2020 20:18, Stefan Schmidt wrote:
->>> Hello.
->>>
->>> Happy to see that we finally have the critical mass to get this moved
->>> forward. :-)
->>>
->>> Here is my take on what I think needs to be done.
->>>
->>> On a first review I found nothing wrong with the design. It needs
->>> further extending and flexibility in my opinion, though.
->> I would suggest using USB bulk endpoints for both the tx and rx paths.
->> An interrupt IN endpoint might be useful for events from the radio back
->> to the host such as ack information from a transmit. This way we can
->> keep the control messages to configuration only. This is similar to how
->> USB ethernet devices are using different USB endpoints. I also see
->> issues with transferring large 802.15.4g frames over control endpoints.
->> Something similar like CDC-ECM would be my preference here: Split the
->> frame in multiple bulk transfers and detect the end of the frame by a
->> transfer size not equal to the endpoint size.
-> 
-> That sounds fine to me. Adrei, what do you think about this change?
+diff --git a/net/socket.c b/net/socket.c
+index 49a6daf0293b83..b79376b17b45b7 100644
+--- a/net/socket.c
++++ b/net/socket.c
+@@ -2163,28 +2163,25 @@ static int __sys_getsockopt(int fd, int level, int optname,
+ 	int max_optlen;
+ 
+ 	sock = sockfd_lookup_light(fd, &err, &fput_needed);
+-	if (sock != NULL) {
+-		err = security_socket_getsockopt(sock, level, optname);
+-		if (err)
+-			goto out_put;
++	if (!sock)
++		return err;
+ 
+-		max_optlen = BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN(optlen);
++	err = security_socket_getsockopt(sock, level, optname);
++	if (err)
++		goto out_put;
+ 
+-		if (level == SOL_SOCKET)
+-			err =
+-			    sock_getsockopt(sock, level, optname, optval,
++	max_optlen = BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN(optlen);
++
++	if (level == SOL_SOCKET)
++		err = sock_getsockopt(sock, level, optname, optval, optlen);
++	else
++		err = sock->ops->getsockopt(sock, level, optname, optval,
+ 					    optlen);
+-		else
+-			err =
+-			    sock->ops->getsockopt(sock, level, optname, optval,
+-						  optlen);
+ 
+-		err = BPF_CGROUP_RUN_PROG_GETSOCKOPT(sock->sk, level, optname,
+-						     optval, optlen,
+-						     max_optlen, err);
++	err = BPF_CGROUP_RUN_PROG_GETSOCKOPT(sock->sk, level, optname, optval,
++					     optlen, max_optlen, err);
+ out_put:
+-		fput_light(sock->file, fput_needed);
+-	}
++	fput_light(sock->file, fput_needed);
+ 	return err;
+ }
+ 
+-- 
+2.27.0
 
-I heard back from him directly that he agrees with the idea of using 
-bulk endpoints. He is working on other parts right now and does not have 
-a working 15.4 setup at all. Unclear when he can come back to this.
-
-If we want this moving forward we need to push it ourselves. 
-Christopher, as you brought this up I am wondering if you have any plan 
-to work on the wpanusb driver side? Koen offered to work on the RIOT 
-side, but this does need the linux kernel driver as well.
-
-If nobody plans any work on wpanusb I would need to see if I can free up 
-time for it and do it myself. Not sure if and when this will be possible 
-though.
-
-With the other changes we discussed as changes before we should have a 
-first target of what we wanted to get implemented. (and see what we 
-forgot when the pieces are coming together)
-
-regards
-Stefan Schmidt
-
->>>
->>> o Add a GET_EXTENDED_ADDR command to receive the extended address
->>> provided by the transceiver itself, or firmware in some way.
->> +1
->>>
->>> o Adding a GET_CAPABILITIES command to query device capabilities
->>>   during init to enable and set needed ieee802154_ops based on the
->>> device. Given that we aim to support as many transceivers as possible
->>> we can't rely on static device knowledge to configure wpanusb correctly.
->> Does it make sense to include also a "protocol" version here, to allow
->> extending the feature set of the driver later without causing
->> compatibility issues between the firmware and the kernel?
-> 
-> I was hoping that we could cover what we need with the current spec and 
-> we could just add more capability flags for new things. We could got the 
-> full way to have a protocol version during the init as well.
-> 
->>>
->>> o Add opcode for set_lbt in USB spec
->> This requires some clarification for me how the radio should be
->> configured. Is this just a CSMA/CCA switch?
-> 
->  From what I have seen this listen before talk is often (always?) a 
-> hardware feature of sub GHz (where its needed) transceivers. I would 
-> assume this just makes sure we pass the config from linux stack through 
-> the driver to the firmware.
-> 
->>>
->>> o Add opcode for set_frame_retries USB spec. (If a transceiver does
->>> not support AutoACK in hardware do Zephyr and RIOT support a software
->>> fallback to handle AutoACK?)
->> This can be implemented in RIOT. I don't think there is something in
->> place at the moment, most of our radios support this in hardware, but I
->> see no technical reason why not to support this.
-> 
-> Good
-> 
->>>
->>> o How are we going to handle transceiver which allow MTUs > 127? Not a
->>> high priority as the kernel part does not support this either right now.
->> There is some preliminary support for 802.15.4g radios in RIOT. I know
->> some developers that would prefer not to have to have the MTU limited to
->> 127 bytes :)
-> 
-> While we do not support this in the Linux stack yet, we should still 
-> make sure the spec here is capable of supporting this.
-> 
->>>
->>> o Do Zephyr or RIOT expose additional functionality we should support
->>> here?
->>>
->>> o Koen, you offered to look into implementing the firmware support for
->>> the USB spec in RIOT. Does the spec fit what RIOT has as abstraction
->>> for ieee802154?
->>
->> Yes, implementing configuration settings as USB control messages makes
->> glueing them to the radio abstraction layer very easy. For now RIOT has
->> configuration for:
->>
->>   - reading and writing channel/page settings
->>   - read/write to addresses, both long and short
->>   - PAN ID
->>   - TX power settings
->>   - reading the max PSDU size
-> 
-> Hmm, we do not have that. But getting the info from the firmware would 
-> be useful.
-> 
-> 
->>   - Ack config settings
->>   - CCA and CSMA configuration, enabling/disabling, retries and backoff
->> exponent (max/min)
->>   - CCA threshold and mode
-> 
-> Is there a way to the device in promiscuous mode?
-> 
->>
->> Furthermore, it is possible to get frame metadata such as the received
->> signal strength and the number of retries required for the frame
-> 
-> Currently the spec only covers LQI, but getting extra stats on the 
-> reliability could bring in some extra benefit for routing decisions.
-> 
->> transmit. All these settings depend a bit on the radio hardware features
->> of course, but thats what we have the GET_CAPABILITIES for.
-> 
-> Yes, exactly, with the capabilities we get during init from the firmware 
-> it can be signalled what it supports and we would enable the needed 
-> device ops for the Linux stack ased on this.
-> 
-> regards
-> Stefan Schmidt
