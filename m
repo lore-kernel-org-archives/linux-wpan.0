@@ -4,39 +4,39 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6108C433E7
-	for <linux-wpan@archiver.kernel.org>; Mon, 20 Jul 2020 12:48:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B61DC433F4
+	for <linux-wpan@archiver.kernel.org>; Mon, 20 Jul 2020 12:48:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9FDD222C9D
-	for <linux-wpan@archiver.kernel.org>; Mon, 20 Jul 2020 12:48:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D926622C9C
+	for <linux-wpan@archiver.kernel.org>; Mon, 20 Jul 2020 12:48:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="W/SFxvtj"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="PEIxnuYK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729041AbgGTMsb (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 20 Jul 2020 08:48:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40554 "EHLO
+        id S1729214AbgGTMst (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 20 Jul 2020 08:48:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40614 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728971AbgGTMs1 (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 20 Jul 2020 08:48:27 -0400
+        with ESMTP id S1729189AbgGTMsq (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 20 Jul 2020 08:48:46 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3B34C061794;
-        Mon, 20 Jul 2020 05:48:26 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72F94C061794;
+        Mon, 20 Jul 2020 05:48:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=+GvvL8q4oszQFmBGqA8ndhgAauPjYMp2YX20se2Rz14=; b=W/SFxvtjkpSbdCe3dGLDpwJysW
-        Kf4mT9bppvn0bssZdcjZ5n0WRzHADU80XMa/3Y59SzGPudsLo+1rn4dGwK3m37MREE/JLRpPK/xr1
-        UojjBq5qMtyBaoa+1AhydjHBQCM62nWZQFpfq76FY5SIXZ/oa4NZKGkB3UknnUnERbor1KGqfxaDa
-        OnMIIRS/5shvCVa0wpTtP7NbwnkKSvPnPraxFDVCyejDWY23QLiHJ/unihJrffXuaOuSE+ZY/M8WP
-        5Q684yLCTG6auKnTJjrd4V2q+y5dRCZjY5nTzujW1+uNfnmVlc7heVlcKQqkDHBDZEEG/Xxh2qDj6
-        mbDMFwGg==;
+        bh=mHiWtESnfpmKOGnGR9J/VvKy447qDpvbyAZDADMp9hY=; b=PEIxnuYKVsyL4VbGipt5/qeMxh
+        hdLo1McwTpyeTRwLfRW8ZgnD8c7KxJu0KZ/qM4WKOnDjX1k53poojoKl8WDY9mRYwM12pb/UJH4Ua
+        CjyNfvuUsmPtIdMkbXPySDCjC9omPKaUZTa4ecBGlbbyDsIipip7l9Xd+wV4Z2UN9foVgIgX+4hsa
+        KANIuyKJjP0qKJA+oPLGsnhL2kIOPH9R7JhwnddXENJ3aLzrcjP+UlS8SO64LU6yvSOrerU+9833A
+        Vh5Nitqyj536Ahxvaz9eEXy0pVwRw0YrrEuyg//N9bEQT+EfyRUcSOFTCy0UWfNW7ClrBPHCvB1de
+        bSeAcmkA==;
 Received: from [2001:4bb8:105:4a81:2a8f:15b1:2c3:7be7] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jxVDI-0004Z2-7X; Mon, 20 Jul 2020 12:48:13 +0000
+        id 1jxVDd-0004cd-10; Mon, 20 Jul 2020 12:48:33 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
@@ -56,9 +56,9 @@ Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         mptcp@lists.01.org, lvs-devel@vger.kernel.org,
         rds-devel@oss.oracle.com, linux-afs@lists.infradead.org,
         tipc-discussion@lists.sourceforge.net, linux-x25@vger.kernel.org
-Subject: [PATCH 12/24] bpfilter: switch bpfilter_ip_set_sockopt to sockptr_t
-Date:   Mon, 20 Jul 2020 14:47:25 +0200
-Message-Id: <20200720124737.118617-13-hch@lst.de>
+Subject: [PATCH 19/24] net/ipv6: factor out a ipv6_set_opt_hdr helper
+Date:   Mon, 20 Jul 2020 14:47:32 +0200
+Message-Id: <20200720124737.118617-20-hch@lst.de>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200720124737.118617-1-hch@lst.de>
 References: <20200720124737.118617-1-hch@lst.de>
@@ -70,130 +70,183 @@ Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-This is mostly to prepare for cleaning up the callers, as bpfilter by
-design can't handle kernel pointers.
+Factour out a helper to set the IPv6 option headers from
+do_ipv6_setsockopt.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- include/linux/bpfilter.h     | 6 +++---
- net/bpfilter/bpfilter_kern.c | 8 ++++----
- net/ipv4/bpfilter/sockopt.c  | 8 ++++----
- net/ipv4/ip_sockglue.c       | 3 ++-
- 4 files changed, 13 insertions(+), 12 deletions(-)
+ net/ipv6/ipv6_sockglue.c | 150 +++++++++++++++++++--------------------
+ 1 file changed, 75 insertions(+), 75 deletions(-)
 
-diff --git a/include/linux/bpfilter.h b/include/linux/bpfilter.h
-index 9b114c718a7617..2ae3c8e1d83c43 100644
---- a/include/linux/bpfilter.h
-+++ b/include/linux/bpfilter.h
-@@ -4,9 +4,10 @@
- 
- #include <uapi/linux/bpfilter.h>
- #include <linux/usermode_driver.h>
-+#include <linux/sockptr.h>
- 
- struct sock;
--int bpfilter_ip_set_sockopt(struct sock *sk, int optname, char __user *optval,
-+int bpfilter_ip_set_sockopt(struct sock *sk, int optname, sockptr_t optval,
- 			    unsigned int optlen);
- int bpfilter_ip_get_sockopt(struct sock *sk, int optname, char __user *optval,
- 			    int __user *optlen);
-@@ -16,8 +17,7 @@ struct bpfilter_umh_ops {
- 	struct umd_info info;
- 	/* since ip_getsockopt() can run in parallel, serialize access to umh */
- 	struct mutex lock;
--	int (*sockopt)(struct sock *sk, int optname,
--		       char __user *optval,
-+	int (*sockopt)(struct sock *sk, int optname, sockptr_t optval,
- 		       unsigned int optlen, bool is_set);
- 	int (*start)(void);
- };
-diff --git a/net/bpfilter/bpfilter_kern.c b/net/bpfilter/bpfilter_kern.c
-index 713b4b3d02005d..52f8d0bc3f6b29 100644
---- a/net/bpfilter/bpfilter_kern.c
-+++ b/net/bpfilter/bpfilter_kern.c
-@@ -32,7 +32,7 @@ static void __stop_umh(void)
+diff --git a/net/ipv6/ipv6_sockglue.c b/net/ipv6/ipv6_sockglue.c
+index 3897fb55372d38..90442c8366dff2 100644
+--- a/net/ipv6/ipv6_sockglue.c
++++ b/net/ipv6/ipv6_sockglue.c
+@@ -315,6 +315,80 @@ static int compat_ipv6_mcast_join_leave(struct sock *sk, int optname,
+ 	return ipv6_sock_mc_drop(sk, gr32.gr_interface, &psin6->sin6_addr);
  }
  
- static int __bpfilter_process_sockopt(struct sock *sk, int optname,
--				      char __user *optval,
-+				      sockptr_t optval,
- 				      unsigned int optlen, bool is_set)
++static int ipv6_set_opt_hdr(struct sock *sk, int optname, void __user *optval,
++		int optlen)
++{
++	struct ipv6_pinfo *np = inet6_sk(sk);
++	struct ipv6_opt_hdr *new = NULL;
++	struct net *net = sock_net(sk);
++	struct ipv6_txoptions *opt;
++	int err;
++
++	/* hop-by-hop / destination options are privileged option */
++	if (optname != IPV6_RTHDR && !ns_capable(net->user_ns, CAP_NET_RAW))
++		return -EPERM;
++
++	/* remove any sticky options header with a zero option
++	 * length, per RFC3542.
++	 */
++	if (optlen > 0) {
++		if (!optval)
++			return -EINVAL;
++		if (optlen < sizeof(struct ipv6_opt_hdr) ||
++		    optlen & 0x7 ||
++		    optlen > 8 * 255)
++			return -EINVAL;
++
++		new = memdup_user(optval, optlen);
++		if (IS_ERR(new))
++			return PTR_ERR(new);
++		if (unlikely(ipv6_optlen(new) > optlen)) {
++			kfree(new);
++			return -EINVAL;
++		}
++	}
++
++	opt = rcu_dereference_protected(np->opt, lockdep_sock_is_held(sk));
++	opt = ipv6_renew_options(sk, opt, optname, new);
++	kfree(new);
++	if (IS_ERR(opt))
++		return PTR_ERR(opt);
++
++	/* routing header option needs extra check */
++	err = -EINVAL;
++	if (optname == IPV6_RTHDR && opt && opt->srcrt) {
++		struct ipv6_rt_hdr *rthdr = opt->srcrt;
++		switch (rthdr->type) {
++#if IS_ENABLED(CONFIG_IPV6_MIP6)
++		case IPV6_SRCRT_TYPE_2:
++			if (rthdr->hdrlen != 2 || rthdr->segments_left != 1)
++				goto sticky_done;
++			break;
++#endif
++		case IPV6_SRCRT_TYPE_4:
++		{
++			struct ipv6_sr_hdr *srh =
++				(struct ipv6_sr_hdr *)opt->srcrt;
++
++			if (!seg6_validate_srh(srh, optlen, false))
++				goto sticky_done;
++			break;
++		}
++		default:
++			goto sticky_done;
++		}
++	}
++
++	err = 0;
++	opt = ipv6_update_options(sk, opt);
++sticky_done:
++	if (opt) {
++		atomic_sub(opt->tot_len, &sk->sk_omem_alloc);
++		txopt_put(opt);
++	}
++	return err;
++}
++
+ static int do_ipv6_setsockopt(struct sock *sk, int level, int optname,
+ 		    char __user *optval, unsigned int optlen)
  {
- 	struct mbox_request req;
-@@ -41,7 +41,7 @@ static int __bpfilter_process_sockopt(struct sock *sk, int optname,
- 	ssize_t n;
- 	int ret = -EFAULT;
+@@ -580,82 +654,8 @@ static int do_ipv6_setsockopt(struct sock *sk, int level, int optname,
+ 	case IPV6_RTHDRDSTOPTS:
+ 	case IPV6_RTHDR:
+ 	case IPV6_DSTOPTS:
+-	{
+-		struct ipv6_txoptions *opt;
+-		struct ipv6_opt_hdr *new = NULL;
+-
+-		/* hop-by-hop / destination options are privileged option */
+-		retv = -EPERM;
+-		if (optname != IPV6_RTHDR && !ns_capable(net->user_ns, CAP_NET_RAW))
+-			break;
+-
+-		/* remove any sticky options header with a zero option
+-		 * length, per RFC3542.
+-		 */
+-		if (optlen == 0)
+-			optval = NULL;
+-		else if (!optval)
+-			goto e_inval;
+-		else if (optlen < sizeof(struct ipv6_opt_hdr) ||
+-			 optlen & 0x7 || optlen > 8 * 255)
+-			goto e_inval;
+-		else {
+-			new = memdup_user(optval, optlen);
+-			if (IS_ERR(new)) {
+-				retv = PTR_ERR(new);
+-				break;
+-			}
+-			if (unlikely(ipv6_optlen(new) > optlen)) {
+-				kfree(new);
+-				goto e_inval;
+-			}
+-		}
+-
+-		opt = rcu_dereference_protected(np->opt,
+-						lockdep_sock_is_held(sk));
+-		opt = ipv6_renew_options(sk, opt, optname, new);
+-		kfree(new);
+-		if (IS_ERR(opt)) {
+-			retv = PTR_ERR(opt);
+-			break;
+-		}
+-
+-		/* routing header option needs extra check */
+-		retv = -EINVAL;
+-		if (optname == IPV6_RTHDR && opt && opt->srcrt) {
+-			struct ipv6_rt_hdr *rthdr = opt->srcrt;
+-			switch (rthdr->type) {
+-#if IS_ENABLED(CONFIG_IPV6_MIP6)
+-			case IPV6_SRCRT_TYPE_2:
+-				if (rthdr->hdrlen != 2 ||
+-				    rthdr->segments_left != 1)
+-					goto sticky_done;
+-
+-				break;
+-#endif
+-			case IPV6_SRCRT_TYPE_4:
+-			{
+-				struct ipv6_sr_hdr *srh = (struct ipv6_sr_hdr *)
+-							  opt->srcrt;
+-
+-				if (!seg6_validate_srh(srh, optlen, false))
+-					goto sticky_done;
+-				break;
+-			}
+-			default:
+-				goto sticky_done;
+-			}
+-		}
+-
+-		retv = 0;
+-		opt = ipv6_update_options(sk, opt);
+-sticky_done:
+-		if (opt) {
+-			atomic_sub(opt->tot_len, &sk->sk_omem_alloc);
+-			txopt_put(opt);
+-		}
++		retv = ipv6_set_opt_hdr(sk, optname, optval, optlen);
+ 		break;
+-	}
  
--	if (uaccess_kernel()) {
-+	if (uaccess_kernel() || sockptr_is_kernel(optval)) {
- 		pr_err("kernel access not supported\n");
- 		return -EFAULT;
- 	}
-@@ -49,7 +49,7 @@ static int __bpfilter_process_sockopt(struct sock *sk, int optname,
- 	req.is_set = is_set;
- 	req.pid = current->pid;
- 	req.cmd = optname;
--	req.addr = (__force long)optval;
-+	req.addr = (__force long)optval.user;
- 	req.len = optlen;
- 	if (!bpfilter_ops.info.tgid)
- 		goto out;
-@@ -87,7 +87,7 @@ static int start_umh(void)
- 	pr_info("Loaded bpfilter_umh pid %d\n", pid_nr(bpfilter_ops.info.tgid));
- 
- 	/* health check that usermode process started correctly */
--	if (__bpfilter_process_sockopt(NULL, 0, NULL, 0, 0) != 0) {
-+	if (__bpfilter_process_sockopt(NULL, 0, USER_SOCKPTR(NULL), 0, 0)) {
- 		shutdown_umh();
- 		return -EFAULT;
- 	}
-diff --git a/net/ipv4/bpfilter/sockopt.c b/net/ipv4/bpfilter/sockopt.c
-index 9063c6767d3410..1b34cb9a7708ec 100644
---- a/net/ipv4/bpfilter/sockopt.c
-+++ b/net/ipv4/bpfilter/sockopt.c
-@@ -21,8 +21,7 @@ void bpfilter_umh_cleanup(struct umd_info *info)
- }
- EXPORT_SYMBOL_GPL(bpfilter_umh_cleanup);
- 
--static int bpfilter_mbox_request(struct sock *sk, int optname,
--				 char __user *optval,
-+static int bpfilter_mbox_request(struct sock *sk, int optname, sockptr_t optval,
- 				 unsigned int optlen, bool is_set)
- {
- 	int err;
-@@ -52,7 +51,7 @@ static int bpfilter_mbox_request(struct sock *sk, int optname,
- 	return err;
- }
- 
--int bpfilter_ip_set_sockopt(struct sock *sk, int optname, char __user *optval,
-+int bpfilter_ip_set_sockopt(struct sock *sk, int optname, sockptr_t optval,
- 			    unsigned int optlen)
- {
- 	return bpfilter_mbox_request(sk, optname, optval, optlen, true);
-@@ -66,7 +65,8 @@ int bpfilter_ip_get_sockopt(struct sock *sk, int optname, char __user *optval,
- 	if (get_user(len, optlen))
- 		return -EFAULT;
- 
--	return bpfilter_mbox_request(sk, optname, optval, len, false);
-+	return bpfilter_mbox_request(sk, optname, USER_SOCKPTR(optval), len,
-+				     false);
- }
- 
- static int __init bpfilter_sockopt_init(void)
-diff --git a/net/ipv4/ip_sockglue.c b/net/ipv4/ip_sockglue.c
-index 42befbf12846c0..36f746e01741f6 100644
---- a/net/ipv4/ip_sockglue.c
-+++ b/net/ipv4/ip_sockglue.c
-@@ -1414,7 +1414,8 @@ int ip_setsockopt(struct sock *sk, int level,
- #if IS_ENABLED(CONFIG_BPFILTER_UMH)
- 	if (optname >= BPFILTER_IPT_SO_SET_REPLACE &&
- 	    optname < BPFILTER_IPT_SET_MAX)
--		err = bpfilter_ip_set_sockopt(sk, optname, optval, optlen);
-+		err = bpfilter_ip_set_sockopt(sk, optname, USER_SOCKPTR(optval),
-+					      optlen);
- #endif
- #ifdef CONFIG_NETFILTER
- 	/* we need to exclude all possible ENOPROTOOPTs except default case */
+ 	case IPV6_PKTINFO:
+ 	{
 -- 
 2.27.0
 
