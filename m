@@ -7,36 +7,36 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B8DFC433E8
-	for <linux-wpan@archiver.kernel.org>; Mon, 20 Jul 2020 12:48:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6108C433E7
+	for <linux-wpan@archiver.kernel.org>; Mon, 20 Jul 2020 12:48:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2B73C22C9C
-	for <linux-wpan@archiver.kernel.org>; Mon, 20 Jul 2020 12:48:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9FDD222C9D
+	for <linux-wpan@archiver.kernel.org>; Mon, 20 Jul 2020 12:48:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="RnnEltcg"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="W/SFxvtj"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729051AbgGTMsc (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 20 Jul 2020 08:48:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40568 "EHLO
+        id S1729041AbgGTMsb (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 20 Jul 2020 08:48:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40554 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729032AbgGTMsb (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 20 Jul 2020 08:48:31 -0400
+        with ESMTP id S1728971AbgGTMs1 (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 20 Jul 2020 08:48:27 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1CB2BC061794;
-        Mon, 20 Jul 2020 05:48:31 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3B34C061794;
+        Mon, 20 Jul 2020 05:48:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=AgSxP7iVdXVEFS4IDrHx6ue4s0yWgQSmSEoUvewskkk=; b=RnnEltcg+Ve0KXQ0POUmdkEhpX
-        m1Bl97bPCoO6r8RFt3Qske527Eq14kMVg1fs39zlPOUd4EYJigbO4Grlx3xLvXvF/prk8LOYGc74j
-        84J6ZYEYeCJ6WnSwdoqcDax+ytfD8QfFPptmk3pPk2rgk63lkp3rVsJd/oLkg8eVQ8LAWdk6WadIU
-        TxEKdrHInirGIMTBUfhY+V3RnTL3IgLtMkANfP2k2NKs8zOygnqI+NbkmgzymdFFSSBwv1aoemFbk
-        KnC1dodsQVRGQmoqbDS0Kim0fWLF5oTQJG5uoeTUk9C0GAa1c9wqcFgAdQdaU3pMfzuzdi4NCqnIt
-        WVPrsBWA==;
+        bh=+GvvL8q4oszQFmBGqA8ndhgAauPjYMp2YX20se2Rz14=; b=W/SFxvtjkpSbdCe3dGLDpwJysW
+        Kf4mT9bppvn0bssZdcjZ5n0WRzHADU80XMa/3Y59SzGPudsLo+1rn4dGwK3m37MREE/JLRpPK/xr1
+        UojjBq5qMtyBaoa+1AhydjHBQCM62nWZQFpfq76FY5SIXZ/oa4NZKGkB3UknnUnERbor1KGqfxaDa
+        OnMIIRS/5shvCVa0wpTtP7NbwnkKSvPnPraxFDVCyejDWY23QLiHJ/unihJrffXuaOuSE+ZY/M8WP
+        5Q684yLCTG6auKnTJjrd4V2q+y5dRCZjY5nTzujW1+uNfnmVlc7heVlcKQqkDHBDZEEG/Xxh2qDj6
+        mbDMFwGg==;
 Received: from [2001:4bb8:105:4a81:2a8f:15b1:2c3:7be7] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jxVDM-0004Zn-DD; Mon, 20 Jul 2020 12:48:17 +0000
+        id 1jxVDI-0004Z2-7X; Mon, 20 Jul 2020 12:48:13 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
@@ -56,9 +56,9 @@ Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         mptcp@lists.01.org, lvs-devel@vger.kernel.org,
         rds-devel@oss.oracle.com, linux-afs@lists.infradead.org,
         tipc-discussion@lists.sourceforge.net, linux-x25@vger.kernel.org
-Subject: [PATCH 14/24] net/ipv4: merge ip_options_get and ip_options_get_from_user
-Date:   Mon, 20 Jul 2020 14:47:27 +0200
-Message-Id: <20200720124737.118617-15-hch@lst.de>
+Subject: [PATCH 12/24] bpfilter: switch bpfilter_ip_set_sockopt to sockptr_t
+Date:   Mon, 20 Jul 2020 14:47:25 +0200
+Message-Id: <20200720124737.118617-13-hch@lst.de>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200720124737.118617-1-hch@lst.de>
 References: <20200720124737.118617-1-hch@lst.de>
@@ -70,127 +70,130 @@ Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Use the sockptr_t type to merge the versions.
+This is mostly to prepare for cleaning up the callers, as bpfilter by
+design can't handle kernel pointers.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- include/net/ip.h       |  5 ++---
- net/ipv4/ip_options.c  | 43 +++++++++++-------------------------------
- net/ipv4/ip_sockglue.c |  7 ++++---
- 3 files changed, 17 insertions(+), 38 deletions(-)
+ include/linux/bpfilter.h     | 6 +++---
+ net/bpfilter/bpfilter_kern.c | 8 ++++----
+ net/ipv4/bpfilter/sockopt.c  | 8 ++++----
+ net/ipv4/ip_sockglue.c       | 3 ++-
+ 4 files changed, 13 insertions(+), 12 deletions(-)
 
-diff --git a/include/net/ip.h b/include/net/ip.h
-index 3d34acc95ca825..d66ad3a9522081 100644
---- a/include/net/ip.h
-+++ b/include/net/ip.h
-@@ -23,6 +23,7 @@
- #include <linux/in.h>
- #include <linux/skbuff.h>
- #include <linux/jhash.h>
+diff --git a/include/linux/bpfilter.h b/include/linux/bpfilter.h
+index 9b114c718a7617..2ae3c8e1d83c43 100644
+--- a/include/linux/bpfilter.h
++++ b/include/linux/bpfilter.h
+@@ -4,9 +4,10 @@
+ 
+ #include <uapi/linux/bpfilter.h>
+ #include <linux/usermode_driver.h>
 +#include <linux/sockptr.h>
  
- #include <net/inet_sock.h>
- #include <net/route.h>
-@@ -707,9 +708,7 @@ int __ip_options_compile(struct net *net, struct ip_options *opt,
- int ip_options_compile(struct net *net, struct ip_options *opt,
- 		       struct sk_buff *skb);
- int ip_options_get(struct net *net, struct ip_options_rcu **optp,
--		   unsigned char *data, int optlen);
--int ip_options_get_from_user(struct net *net, struct ip_options_rcu **optp,
--			     unsigned char __user *data, int optlen);
-+		   sockptr_t data, int optlen);
- void ip_options_undo(struct ip_options *opt);
- void ip_forward_options(struct sk_buff *skb);
- int ip_options_rcv_srr(struct sk_buff *skb, struct net_device *dev);
-diff --git a/net/ipv4/ip_options.c b/net/ipv4/ip_options.c
-index ddaa01ec2bce82..948747aac4e2d0 100644
---- a/net/ipv4/ip_options.c
-+++ b/net/ipv4/ip_options.c
-@@ -519,15 +519,20 @@ void ip_options_undo(struct ip_options *opt)
+ struct sock;
+-int bpfilter_ip_set_sockopt(struct sock *sk, int optname, char __user *optval,
++int bpfilter_ip_set_sockopt(struct sock *sk, int optname, sockptr_t optval,
+ 			    unsigned int optlen);
+ int bpfilter_ip_get_sockopt(struct sock *sk, int optname, char __user *optval,
+ 			    int __user *optlen);
+@@ -16,8 +17,7 @@ struct bpfilter_umh_ops {
+ 	struct umd_info info;
+ 	/* since ip_getsockopt() can run in parallel, serialize access to umh */
+ 	struct mutex lock;
+-	int (*sockopt)(struct sock *sk, int optname,
+-		       char __user *optval,
++	int (*sockopt)(struct sock *sk, int optname, sockptr_t optval,
+ 		       unsigned int optlen, bool is_set);
+ 	int (*start)(void);
+ };
+diff --git a/net/bpfilter/bpfilter_kern.c b/net/bpfilter/bpfilter_kern.c
+index 713b4b3d02005d..52f8d0bc3f6b29 100644
+--- a/net/bpfilter/bpfilter_kern.c
++++ b/net/bpfilter/bpfilter_kern.c
+@@ -32,7 +32,7 @@ static void __stop_umh(void)
+ }
+ 
+ static int __bpfilter_process_sockopt(struct sock *sk, int optname,
+-				      char __user *optval,
++				      sockptr_t optval,
+ 				      unsigned int optlen, bool is_set)
+ {
+ 	struct mbox_request req;
+@@ -41,7 +41,7 @@ static int __bpfilter_process_sockopt(struct sock *sk, int optname,
+ 	ssize_t n;
+ 	int ret = -EFAULT;
+ 
+-	if (uaccess_kernel()) {
++	if (uaccess_kernel() || sockptr_is_kernel(optval)) {
+ 		pr_err("kernel access not supported\n");
+ 		return -EFAULT;
  	}
+@@ -49,7 +49,7 @@ static int __bpfilter_process_sockopt(struct sock *sk, int optname,
+ 	req.is_set = is_set;
+ 	req.pid = current->pid;
+ 	req.cmd = optname;
+-	req.addr = (__force long)optval;
++	req.addr = (__force long)optval.user;
+ 	req.len = optlen;
+ 	if (!bpfilter_ops.info.tgid)
+ 		goto out;
+@@ -87,7 +87,7 @@ static int start_umh(void)
+ 	pr_info("Loaded bpfilter_umh pid %d\n", pid_nr(bpfilter_ops.info.tgid));
+ 
+ 	/* health check that usermode process started correctly */
+-	if (__bpfilter_process_sockopt(NULL, 0, NULL, 0, 0) != 0) {
++	if (__bpfilter_process_sockopt(NULL, 0, USER_SOCKPTR(NULL), 0, 0)) {
+ 		shutdown_umh();
+ 		return -EFAULT;
+ 	}
+diff --git a/net/ipv4/bpfilter/sockopt.c b/net/ipv4/bpfilter/sockopt.c
+index 9063c6767d3410..1b34cb9a7708ec 100644
+--- a/net/ipv4/bpfilter/sockopt.c
++++ b/net/ipv4/bpfilter/sockopt.c
+@@ -21,8 +21,7 @@ void bpfilter_umh_cleanup(struct umd_info *info)
+ }
+ EXPORT_SYMBOL_GPL(bpfilter_umh_cleanup);
+ 
+-static int bpfilter_mbox_request(struct sock *sk, int optname,
+-				 char __user *optval,
++static int bpfilter_mbox_request(struct sock *sk, int optname, sockptr_t optval,
+ 				 unsigned int optlen, bool is_set)
+ {
+ 	int err;
+@@ -52,7 +51,7 @@ static int bpfilter_mbox_request(struct sock *sk, int optname,
+ 	return err;
  }
  
--static struct ip_options_rcu *ip_options_get_alloc(const int optlen)
-+int ip_options_get(struct net *net, struct ip_options_rcu **optp,
-+		   sockptr_t data, int optlen)
+-int bpfilter_ip_set_sockopt(struct sock *sk, int optname, char __user *optval,
++int bpfilter_ip_set_sockopt(struct sock *sk, int optname, sockptr_t optval,
+ 			    unsigned int optlen)
  {
--	return kzalloc(sizeof(struct ip_options_rcu) + ((optlen + 3) & ~3),
-+	struct ip_options_rcu *opt;
-+
-+	opt = kzalloc(sizeof(struct ip_options_rcu) + ((optlen + 3) & ~3),
- 		       GFP_KERNEL);
--}
-+	if (!opt)
-+		return -ENOMEM;
-+	if (optlen && copy_from_sockptr(opt->opt.__data, data, optlen)) {
-+		kfree(opt);
-+		return -EFAULT;
-+	}
+ 	return bpfilter_mbox_request(sk, optname, optval, optlen, true);
+@@ -66,7 +65,8 @@ int bpfilter_ip_get_sockopt(struct sock *sk, int optname, char __user *optval,
+ 	if (get_user(len, optlen))
+ 		return -EFAULT;
  
--static int ip_options_get_finish(struct net *net, struct ip_options_rcu **optp,
--				 struct ip_options_rcu *opt, int optlen)
--{
- 	while (optlen & 3)
- 		opt->opt.__data[optlen++] = IPOPT_END;
- 	opt->opt.optlen = optlen;
-@@ -540,32 +545,6 @@ static int ip_options_get_finish(struct net *net, struct ip_options_rcu **optp,
- 	return 0;
+-	return bpfilter_mbox_request(sk, optname, optval, len, false);
++	return bpfilter_mbox_request(sk, optname, USER_SOCKPTR(optval), len,
++				     false);
  }
  
--int ip_options_get_from_user(struct net *net, struct ip_options_rcu **optp,
--			     unsigned char __user *data, int optlen)
--{
--	struct ip_options_rcu *opt = ip_options_get_alloc(optlen);
--
--	if (!opt)
--		return -ENOMEM;
--	if (optlen && copy_from_user(opt->opt.__data, data, optlen)) {
--		kfree(opt);
--		return -EFAULT;
--	}
--	return ip_options_get_finish(net, optp, opt, optlen);
--}
--
--int ip_options_get(struct net *net, struct ip_options_rcu **optp,
--		   unsigned char *data, int optlen)
--{
--	struct ip_options_rcu *opt = ip_options_get_alloc(optlen);
--
--	if (!opt)
--		return -ENOMEM;
--	if (optlen)
--		memcpy(opt->opt.__data, data, optlen);
--	return ip_options_get_finish(net, optp, opt, optlen);
--}
--
- void ip_forward_options(struct sk_buff *skb)
- {
- 	struct   ip_options *opt	= &(IPCB(skb)->opt);
+ static int __init bpfilter_sockopt_init(void)
 diff --git a/net/ipv4/ip_sockglue.c b/net/ipv4/ip_sockglue.c
-index ac495b0cff8ffb..b12f39b52008a3 100644
+index 42befbf12846c0..36f746e01741f6 100644
 --- a/net/ipv4/ip_sockglue.c
 +++ b/net/ipv4/ip_sockglue.c
-@@ -280,7 +280,8 @@ int ip_cmsg_send(struct sock *sk, struct msghdr *msg, struct ipcm_cookie *ipc,
- 			err = cmsg->cmsg_len - sizeof(struct cmsghdr);
- 
- 			/* Our caller is responsible for freeing ipc->opt */
--			err = ip_options_get(net, &ipc->opt, CMSG_DATA(cmsg),
-+			err = ip_options_get(net, &ipc->opt,
-+					     KERNEL_SOCKPTR(CMSG_DATA(cmsg)),
- 					     err < 40 ? err : 40);
- 			if (err)
- 				return err;
-@@ -940,8 +941,8 @@ static int do_ip_setsockopt(struct sock *sk, int level,
- 
- 		if (optlen > 40)
- 			goto e_inval;
--		err = ip_options_get_from_user(sock_net(sk), &opt,
--					       optval, optlen);
-+		err = ip_options_get(sock_net(sk), &opt, USER_SOCKPTR(optval),
+@@ -1414,7 +1414,8 @@ int ip_setsockopt(struct sock *sk, int level,
+ #if IS_ENABLED(CONFIG_BPFILTER_UMH)
+ 	if (optname >= BPFILTER_IPT_SO_SET_REPLACE &&
+ 	    optname < BPFILTER_IPT_SET_MAX)
+-		err = bpfilter_ip_set_sockopt(sk, optname, optval, optlen);
++		err = bpfilter_ip_set_sockopt(sk, optname, USER_SOCKPTR(optval),
 +					      optlen);
- 		if (err)
- 			break;
- 		old = rcu_dereference_protected(inet->inet_opt,
+ #endif
+ #ifdef CONFIG_NETFILTER
+ 	/* we need to exclude all possible ENOPROTOOPTs except default case */
 -- 
 2.27.0
 
