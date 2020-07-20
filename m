@@ -4,39 +4,39 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 851D4C433E4
-	for <linux-wpan@archiver.kernel.org>; Mon, 20 Jul 2020 12:48:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEA8CC433FE
+	for <linux-wpan@archiver.kernel.org>; Mon, 20 Jul 2020 12:49:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6638422CF7
-	for <linux-wpan@archiver.kernel.org>; Mon, 20 Jul 2020 12:48:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8AA0522C9C
+	for <linux-wpan@archiver.kernel.org>; Mon, 20 Jul 2020 12:49:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Q2M2BbM8"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Wkzy9EJD"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729170AbgGTMso (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 20 Jul 2020 08:48:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40604 "EHLO
+        id S1728647AbgGTMs5 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 20 Jul 2020 08:48:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40640 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728779AbgGTMsm (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 20 Jul 2020 08:48:42 -0400
+        with ESMTP id S1729253AbgGTMsx (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 20 Jul 2020 08:48:53 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6C4DC061794;
-        Mon, 20 Jul 2020 05:48:42 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BA45C061794;
+        Mon, 20 Jul 2020 05:48:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=oYVq7NIRWqvX/f/cel/N+xePG7N1PJ2B3QTLRfoiAMQ=; b=Q2M2BbM8skgQsbz+9IFT9+SRS8
-        wOn0jWnTATVFcYirebkCBwKq5mT6Ub4JpyN3kocyPSwcZ9qxddqTIFOBWgt5cHn7Fiaq/A/rTr1Ny
-        NJlv7iQ0FqlWOI2nLC8g9bDpVaGGUDRAPFvWzldUjdv+qtqUMGw9bRqAhBQHXLOTF8PBI5+b8YJ0f
-        lSUkjWJUoqeS7o7xpPt8jkfJjaD/qpK37PcCQGm6fR3w9Ve3Av+OXeSmQz1Fcz1KSaLMTuFeT0L3h
-        aoUfH/3lOromCbJGjPXv7nZzZc+/eTbity/L2HIf00Ca7AS8k5/AiW+/D9KsSdwaT+vKgWaf2mC9R
-        XUUDuXUg==;
+        bh=XFgdEhn2vLmThLShP1o7gYGDYV3zgNoNH4PA05fsJS8=; b=Wkzy9EJDG4l7lgluY2A4k1gkzk
+        dHXnUTdC/Nhh1WIcSPASdHtlIMwcRj8ffKYWkm/ND2HeOF9pwAr6W0kFtq++kQkmsFbDKkGph29TG
+        mLxMkHP/KhFXpyNQnHvKtgkdUiKmemflpUt39osjFaqvvF/EFGdVXCXHfwu5HIh/q2IOaC35QPVM6
+        DUvpfkRYCdoLNG0Zz72Bb7JVAWpDKbATSgbOwnqvggK4gHxNhJVnpZGhEV0mRP+mMAL7ub9tuTAvU
+        xQHw+/y8tgti6Qyzdrzl2hUUfwrzU7JnbzMGgsdbBO4RfqCvdlUEEmDH0RkjxN+ICaczwlL2GumfX
+        JoHLgVXw==;
 Received: from [2001:4bb8:105:4a81:2a8f:15b1:2c3:7be7] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jxVDW-0004bj-37; Mon, 20 Jul 2020 12:48:27 +0000
+        id 1jxVDk-0004dj-69; Mon, 20 Jul 2020 12:48:42 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
@@ -56,9 +56,9 @@ Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         mptcp@lists.01.org, lvs-devel@vger.kernel.org,
         rds-devel@oss.oracle.com, linux-afs@lists.infradead.org,
         tipc-discussion@lists.sourceforge.net, linux-x25@vger.kernel.org
-Subject: [PATCH 17/24] net/ipv6: split up ipv6_flowlabel_opt
-Date:   Mon, 20 Jul 2020 14:47:30 +0200
-Message-Id: <20200720124737.118617-18-hch@lst.de>
+Subject: [PATCH 22/24] net/tcp: switch ->md5_parse to sockptr_t
+Date:   Mon, 20 Jul 2020 14:47:35 +0200
+Message-Id: <20200720124737.118617-23-hch@lst.de>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200720124737.118617-1-hch@lst.de>
 References: <20200720124737.118617-1-hch@lst.de>
@@ -70,373 +70,88 @@ Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Split ipv6_flowlabel_opt into a subfunction for each action and a small
-wrapper.
+Pass a sockptr_t to prepare for set_fs-less handling of the kernel
+pointer from bpf-cgroup.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- net/ipv6/ip6_flowlabel.c | 311 +++++++++++++++++++++------------------
- 1 file changed, 167 insertions(+), 144 deletions(-)
+ include/net/tcp.h   | 2 +-
+ net/ipv4/tcp.c      | 3 ++-
+ net/ipv4/tcp_ipv4.c | 4 ++--
+ net/ipv6/tcp_ipv6.c | 4 ++--
+ 4 files changed, 7 insertions(+), 6 deletions(-)
 
-diff --git a/net/ipv6/ip6_flowlabel.c b/net/ipv6/ip6_flowlabel.c
-index ce4fbba4acce7e..27ee6de9beffc4 100644
---- a/net/ipv6/ip6_flowlabel.c
-+++ b/net/ipv6/ip6_flowlabel.c
-@@ -533,187 +533,210 @@ int ipv6_flowlabel_opt_get(struct sock *sk, struct in6_flowlabel_req *freq,
- 	return -ENOENT;
+diff --git a/include/net/tcp.h b/include/net/tcp.h
+index 9f7f7c0c110451..e3c8e1d820214c 100644
+--- a/include/net/tcp.h
++++ b/include/net/tcp.h
+@@ -2002,7 +2002,7 @@ struct tcp_sock_af_ops {
+ 					 const struct sk_buff *skb);
+ 	int		(*md5_parse)(struct sock *sk,
+ 				     int optname,
+-				     char __user *optval,
++				     sockptr_t optval,
+ 				     int optlen);
+ #endif
+ };
+diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+index 58ede3d62b2e2c..49bf15c27deac7 100644
+--- a/net/ipv4/tcp.c
++++ b/net/ipv4/tcp.c
+@@ -3249,7 +3249,8 @@ static int do_tcp_setsockopt(struct sock *sk, int level,
+ #ifdef CONFIG_TCP_MD5SIG
+ 	case TCP_MD5SIG:
+ 	case TCP_MD5SIG_EXT:
+-		err = tp->af_specific->md5_parse(sk, optname, optval, optlen);
++		err = tp->af_specific->md5_parse(sk, optname,
++						 USER_SOCKPTR(optval), optlen);
+ 		break;
+ #endif
+ 	case TCP_USER_TIMEOUT:
+diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
+index cd81b6e04efbfa..a03e70b3af2e6c 100644
+--- a/net/ipv4/tcp_ipv4.c
++++ b/net/ipv4/tcp_ipv4.c
+@@ -1194,7 +1194,7 @@ static void tcp_clear_md5_list(struct sock *sk)
  }
  
--int ipv6_flowlabel_opt(struct sock *sk, char __user *optval, int optlen)
-+#define socklist_dereference(__sflp) \
-+	rcu_dereference_protected(__sflp, lockdep_is_held(&ip6_sk_fl_lock))
-+
-+static int ipv6_flowlabel_put(struct sock *sk, struct in6_flowlabel_req *freq)
+ static int tcp_v4_parse_md5_keys(struct sock *sk, int optname,
+-				 char __user *optval, int optlen)
++				 sockptr_t optval, int optlen)
  {
--	int uninitialized_var(err);
--	struct net *net = sock_net(sk);
- 	struct ipv6_pinfo *np = inet6_sk(sk);
--	struct in6_flowlabel_req freq;
--	struct ipv6_fl_socklist *sfl1 = NULL;
--	struct ipv6_fl_socklist *sfl;
- 	struct ipv6_fl_socklist __rcu **sflp;
--	struct ip6_flowlabel *fl, *fl1 = NULL;
--
-+	struct ipv6_fl_socklist *sfl;
+ 	struct tcp_md5sig cmd;
+ 	struct sockaddr_in *sin = (struct sockaddr_in *)&cmd.tcpm_addr;
+@@ -1205,7 +1205,7 @@ static int tcp_v4_parse_md5_keys(struct sock *sk, int optname,
+ 	if (optlen < sizeof(cmd))
+ 		return -EINVAL;
  
--	if (optlen < sizeof(freq))
--		return -EINVAL;
-+	if (freq->flr_flags & IPV6_FL_F_REFLECT) {
-+		if (sk->sk_protocol != IPPROTO_TCP)
-+			return -ENOPROTOOPT;
-+		if (!np->repflow)
-+			return -ESRCH;
-+		np->flow_label = 0;
-+		np->repflow = 0;
-+		return 0;
-+	}
+-	if (copy_from_user(&cmd, optval, sizeof(cmd)))
++	if (copy_from_sockptr(&cmd, optval, sizeof(cmd)))
+ 		return -EFAULT;
  
--	if (copy_from_user(&freq, optval, sizeof(freq)))
--		return -EFAULT;
-+	spin_lock_bh(&ip6_sk_fl_lock);
-+	for (sflp = &np->ipv6_fl_list;
-+	     (sfl = socklist_dereference(*sflp)) != NULL;
-+	     sflp = &sfl->next) {
-+		if (sfl->fl->label == freq->flr_label)
-+			goto found;
-+	}
-+	spin_unlock_bh(&ip6_sk_fl_lock);
-+	return -ESRCH;
-+found:
-+	if (freq->flr_label == (np->flow_label & IPV6_FLOWLABEL_MASK))
-+		np->flow_label &= ~IPV6_FLOWLABEL_MASK;
-+	*sflp = sfl->next;
-+	spin_unlock_bh(&ip6_sk_fl_lock);
-+	fl_release(sfl->fl);
-+	kfree_rcu(sfl, rcu);
-+	return 0;
-+}
-+		
-+static int ipv6_flowlabel_renew(struct sock *sk, struct in6_flowlabel_req *freq)
-+{
-+	struct ipv6_pinfo *np = inet6_sk(sk);
-+	struct net *net = sock_net(sk);
-+	struct ipv6_fl_socklist *sfl;
-+	int err;
- 
--	switch (freq.flr_action) {
--	case IPV6_FL_A_PUT:
--		if (freq.flr_flags & IPV6_FL_F_REFLECT) {
--			if (sk->sk_protocol != IPPROTO_TCP)
--				return -ENOPROTOOPT;
--			if (!np->repflow)
--				return -ESRCH;
--			np->flow_label = 0;
--			np->repflow = 0;
--			return 0;
--		}
--		spin_lock_bh(&ip6_sk_fl_lock);
--		for (sflp = &np->ipv6_fl_list;
--		     (sfl = rcu_dereference_protected(*sflp,
--						      lockdep_is_held(&ip6_sk_fl_lock))) != NULL;
--		     sflp = &sfl->next) {
--			if (sfl->fl->label == freq.flr_label) {
--				if (freq.flr_label == (np->flow_label&IPV6_FLOWLABEL_MASK))
--					np->flow_label &= ~IPV6_FLOWLABEL_MASK;
--				*sflp = sfl->next;
--				spin_unlock_bh(&ip6_sk_fl_lock);
--				fl_release(sfl->fl);
--				kfree_rcu(sfl, rcu);
--				return 0;
--			}
-+	rcu_read_lock_bh();
-+	for_each_sk_fl_rcu(np, sfl) {
-+		if (sfl->fl->label == freq->flr_label) {
-+			err = fl6_renew(sfl->fl, freq->flr_linger,
-+					freq->flr_expires);
-+			rcu_read_unlock_bh();
-+			return err;
- 		}
--		spin_unlock_bh(&ip6_sk_fl_lock);
--		return -ESRCH;
-+	}
-+	rcu_read_unlock_bh();
- 
--	case IPV6_FL_A_RENEW:
--		rcu_read_lock_bh();
--		for_each_sk_fl_rcu(np, sfl) {
--			if (sfl->fl->label == freq.flr_label) {
--				err = fl6_renew(sfl->fl, freq.flr_linger, freq.flr_expires);
--				rcu_read_unlock_bh();
--				return err;
--			}
--		}
--		rcu_read_unlock_bh();
-+	if (freq->flr_share == IPV6_FL_S_NONE &&
-+	    ns_capable(net->user_ns, CAP_NET_ADMIN)) {
-+		struct ip6_flowlabel *fl = fl_lookup(net, freq->flr_label);
- 
--		if (freq.flr_share == IPV6_FL_S_NONE &&
--		    ns_capable(net->user_ns, CAP_NET_ADMIN)) {
--			fl = fl_lookup(net, freq.flr_label);
--			if (fl) {
--				err = fl6_renew(fl, freq.flr_linger, freq.flr_expires);
--				fl_release(fl);
--				return err;
--			}
-+		if (fl) {
-+			err = fl6_renew(fl, freq->flr_linger,
-+					freq->flr_expires);
-+			fl_release(fl);
-+			return err;
- 		}
--		return -ESRCH;
--
--	case IPV6_FL_A_GET:
--		if (freq.flr_flags & IPV6_FL_F_REFLECT) {
--			struct net *net = sock_net(sk);
--			if (net->ipv6.sysctl.flowlabel_consistency) {
--				net_info_ratelimited("Can not set IPV6_FL_F_REFLECT if flowlabel_consistency sysctl is enable\n");
--				return -EPERM;
--			}
-+	}
-+	return -ESRCH;
-+}
- 
--			if (sk->sk_protocol != IPPROTO_TCP)
--				return -ENOPROTOOPT;
-+static int ipv6_flowlabel_get(struct sock *sk, struct in6_flowlabel_req *freq,
-+		void __user *optval, int optlen)
-+{
-+	struct ipv6_fl_socklist *sfl, *sfl1 = NULL;
-+	struct ip6_flowlabel *fl, *fl1 = NULL;
-+	struct ipv6_pinfo *np = inet6_sk(sk);
-+	struct net *net = sock_net(sk);
-+	int uninitialized_var(err);
- 
--			np->repflow = 1;
--			return 0;
-+	if (freq->flr_flags & IPV6_FL_F_REFLECT) {
-+		if (net->ipv6.sysctl.flowlabel_consistency) {
-+			net_info_ratelimited("Can not set IPV6_FL_F_REFLECT if flowlabel_consistency sysctl is enable\n");
-+			return -EPERM;
- 		}
- 
--		if (freq.flr_label & ~IPV6_FLOWLABEL_MASK)
--			return -EINVAL;
-+		if (sk->sk_protocol != IPPROTO_TCP)
-+			return -ENOPROTOOPT;
-+		np->repflow = 1;
-+		return 0;
-+	}
- 
--		if (net->ipv6.sysctl.flowlabel_state_ranges &&
--		    (freq.flr_label & IPV6_FLOWLABEL_STATELESS_FLAG))
--			return -ERANGE;
-+	if (freq->flr_label & ~IPV6_FLOWLABEL_MASK)
-+		return -EINVAL;
-+	if (net->ipv6.sysctl.flowlabel_state_ranges &&
-+	    (freq->flr_label & IPV6_FLOWLABEL_STATELESS_FLAG))
-+		return -ERANGE;
- 
--		fl = fl_create(net, sk, &freq, optval, optlen, &err);
--		if (!fl)
--			return err;
--		sfl1 = kmalloc(sizeof(*sfl1), GFP_KERNEL);
-+	fl = fl_create(net, sk, freq, optval, optlen, &err);
-+	if (!fl)
-+		return err;
- 
--		if (freq.flr_label) {
--			err = -EEXIST;
--			rcu_read_lock_bh();
--			for_each_sk_fl_rcu(np, sfl) {
--				if (sfl->fl->label == freq.flr_label) {
--					if (freq.flr_flags&IPV6_FL_F_EXCL) {
--						rcu_read_unlock_bh();
--						goto done;
--					}
--					fl1 = sfl->fl;
--					if (!atomic_inc_not_zero(&fl1->users))
--						fl1 = NULL;
--					break;
-+	sfl1 = kmalloc(sizeof(*sfl1), GFP_KERNEL);
-+
-+	if (freq->flr_label) {
-+		err = -EEXIST;
-+		rcu_read_lock_bh();
-+		for_each_sk_fl_rcu(np, sfl) {
-+			if (sfl->fl->label == freq->flr_label) {
-+				if (freq->flr_flags & IPV6_FL_F_EXCL) {
-+					rcu_read_unlock_bh();
-+					goto done;
- 				}
-+				fl1 = sfl->fl;
-+				if (!atomic_inc_not_zero(&fl1->users))
-+					fl1 = NULL;
-+				break;
- 			}
--			rcu_read_unlock_bh();
-+		}
-+		rcu_read_unlock_bh();
- 
--			if (!fl1)
--				fl1 = fl_lookup(net, freq.flr_label);
--			if (fl1) {
-+		if (!fl1)
-+			fl1 = fl_lookup(net, freq->flr_label);
-+		if (fl1) {
- recheck:
--				err = -EEXIST;
--				if (freq.flr_flags&IPV6_FL_F_EXCL)
--					goto release;
--				err = -EPERM;
--				if (fl1->share == IPV6_FL_S_EXCL ||
--				    fl1->share != fl->share ||
--				    ((fl1->share == IPV6_FL_S_PROCESS) &&
--				     (fl1->owner.pid != fl->owner.pid)) ||
--				    ((fl1->share == IPV6_FL_S_USER) &&
--				     !uid_eq(fl1->owner.uid, fl->owner.uid)))
--					goto release;
--
--				err = -ENOMEM;
--				if (!sfl1)
--					goto release;
--				if (fl->linger > fl1->linger)
--					fl1->linger = fl->linger;
--				if ((long)(fl->expires - fl1->expires) > 0)
--					fl1->expires = fl->expires;
--				fl_link(np, sfl1, fl1);
--				fl_free(fl);
--				return 0;
-+			err = -EEXIST;
-+			if (freq->flr_flags&IPV6_FL_F_EXCL)
-+				goto release;
-+			err = -EPERM;
-+			if (fl1->share == IPV6_FL_S_EXCL ||
-+			    fl1->share != fl->share ||
-+			    ((fl1->share == IPV6_FL_S_PROCESS) &&
-+			     (fl1->owner.pid != fl->owner.pid)) ||
-+			    ((fl1->share == IPV6_FL_S_USER) &&
-+			     !uid_eq(fl1->owner.uid, fl->owner.uid)))
-+				goto release;
-+
-+			err = -ENOMEM;
-+			if (!sfl1)
-+				goto release;
-+			if (fl->linger > fl1->linger)
-+				fl1->linger = fl->linger;
-+			if ((long)(fl->expires - fl1->expires) > 0)
-+				fl1->expires = fl->expires;
-+			fl_link(np, sfl1, fl1);
-+			fl_free(fl);
-+			return 0;
- 
- release:
--				fl_release(fl1);
--				goto done;
--			}
--		}
--		err = -ENOENT;
--		if (!(freq.flr_flags&IPV6_FL_F_CREATE))
-+			fl_release(fl1);
- 			goto done;
-+		}
-+	}
-+	err = -ENOENT;
-+	if (!(freq->flr_flags & IPV6_FL_F_CREATE))
-+		goto done;
- 
--		err = -ENOMEM;
--		if (!sfl1)
--			goto done;
-+	err = -ENOMEM;
-+	if (!sfl1)
-+		goto done;
- 
--		err = mem_check(sk);
--		if (err != 0)
--			goto done;
-+	err = mem_check(sk);
-+	if (err != 0)
-+		goto done;
- 
--		fl1 = fl_intern(net, fl, freq.flr_label);
--		if (fl1)
--			goto recheck;
-+	fl1 = fl_intern(net, fl, freq->flr_label);
-+	if (fl1)
-+		goto recheck;
- 
--		if (!freq.flr_label) {
--			if (copy_to_user(&((struct in6_flowlabel_req __user *) optval)->flr_label,
--					 &fl->label, sizeof(fl->label))) {
--				/* Intentionally ignore fault. */
--			}
-+	if (!freq->flr_label) {
-+		if (copy_to_user(&((struct in6_flowlabel_req __user *) optval)->flr_label,
-+				 &fl->label, sizeof(fl->label))) {
-+			/* Intentionally ignore fault. */
- 		}
--
--		fl_link(np, sfl1, fl);
--		return 0;
--
--	default:
--		return -EINVAL;
- 	}
- 
-+	fl_link(np, sfl1, fl);
-+	return 0;
- done:
- 	fl_free(fl);
- 	kfree(sfl1);
- 	return err;
+ 	if (sin->sin_family != AF_INET)
+diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
+index c34b7834fd84a8..305870a72352d6 100644
+--- a/net/ipv6/tcp_ipv6.c
++++ b/net/ipv6/tcp_ipv6.c
+@@ -567,7 +567,7 @@ static struct tcp_md5sig_key *tcp_v6_md5_lookup(const struct sock *sk,
  }
  
-+int ipv6_flowlabel_opt(struct sock *sk, char __user *optval, int optlen)
-+{
-+	struct in6_flowlabel_req freq;
-+
-+	if (optlen < sizeof(freq))
-+		return -EINVAL;
-+	if (copy_from_user(&freq, optval, sizeof(freq)))
-+		return -EFAULT;
-+
-+	switch (freq.flr_action) {
-+	case IPV6_FL_A_PUT:
-+		return ipv6_flowlabel_put(sk, &freq);
-+	case IPV6_FL_A_RENEW:
-+		return ipv6_flowlabel_renew(sk, &freq);
-+	case IPV6_FL_A_GET:
-+		return ipv6_flowlabel_get(sk, &freq, optval, optlen);
-+	default:
-+		return -EINVAL;
-+	}
-+}
-+
- #ifdef CONFIG_PROC_FS
+ static int tcp_v6_parse_md5_keys(struct sock *sk, int optname,
+-				 char __user *optval, int optlen)
++				 sockptr_t optval, int optlen)
+ {
+ 	struct tcp_md5sig cmd;
+ 	struct sockaddr_in6 *sin6 = (struct sockaddr_in6 *)&cmd.tcpm_addr;
+@@ -577,7 +577,7 @@ static int tcp_v6_parse_md5_keys(struct sock *sk, int optname,
+ 	if (optlen < sizeof(cmd))
+ 		return -EINVAL;
  
- struct ip6fl_iter_state {
+-	if (copy_from_user(&cmd, optval, sizeof(cmd)))
++	if (copy_from_sockptr(&cmd, optval, sizeof(cmd)))
+ 		return -EFAULT;
+ 
+ 	if (sin6->sin6_family != AF_INET6)
 -- 
 2.27.0
 
