@@ -2,62 +2,115 @@ Return-Path: <SRS0=jj/+=A7=vger.kernel.org=linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC25EC433E7
-	for <linux-wpan@archiver.kernel.org>; Mon, 20 Jul 2020 01:17:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F38BC433E1
+	for <linux-wpan@archiver.kernel.org>; Mon, 20 Jul 2020 07:30:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D007B208B3
-	for <linux-wpan@archiver.kernel.org>; Mon, 20 Jul 2020 01:17:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 64B3421775
+	for <linux-wpan@archiver.kernel.org>; Mon, 20 Jul 2020 07:30:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727794AbgGTBRC (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Sun, 19 Jul 2020 21:17:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46736 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726531AbgGTBRB (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Sun, 19 Jul 2020 21:17:01 -0400
-Received: from shards.monkeyblade.net (shards.monkeyblade.net [IPv6:2620:137:e000::1:9])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9AAE1C0619D2;
-        Sun, 19 Jul 2020 18:17:01 -0700 (PDT)
-Received: from localhost (unknown [IPv6:2601:601:9f00:477::3d5])
-        (using TLSv1 with cipher AES256-SHA (256/256 bits))
-        (Client did not present a certificate)
-        (Authenticated sender: davem-davemloft)
-        by shards.monkeyblade.net (Postfix) with ESMTPSA id 1B85F1284AF6B;
-        Sun, 19 Jul 2020 18:17:00 -0700 (PDT)
-Date:   Sun, 19 Jul 2020 18:16:59 -0700 (PDT)
-Message-Id: <20200719.181659.1807927650741641565.davem@davemloft.net>
-To:     hch@lst.de
-Cc:     ast@kernel.org, daniel@iogearbox.net, 3chas3@gmail.com,
-        pablo@netfilter.org, kadlec@netfilter.org, fw@strlen.de,
-        kuznet@ms2.inr.ac.ru, yoshfuji@linux-ipv6.org,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        bpf@vger.kernel.org, netfilter-devel@vger.kernel.org,
-        linux-sctp@vger.kernel.org, linux-arch@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, bridge@lists.linux-foundation.org,
-        linux-can@vger.kernel.org, dccp@vger.kernel.org,
-        linux-wpan@vger.kernel.org, mptcp@lists.01.org
-Subject: Re: sockopt cleanups
-From:   David Miller <davem@davemloft.net>
-In-Reply-To: <20200717062331.691152-1-hch@lst.de>
-References: <20200717062331.691152-1-hch@lst.de>
-X-Mailer: Mew version 6.8 on Emacs 26.3
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
+        id S1726543AbgGTHaq (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 20 Jul 2020 03:30:46 -0400
+Received: from proxima.lasnet.de ([78.47.171.185]:45164 "EHLO
+        proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725815AbgGTHap (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 20 Jul 2020 03:30:45 -0400
+Received: from localhost.localdomain (p200300e9d7371614ec13d59c95910a08.dip0.t-ipconnect.de [IPv6:2003:e9:d737:1614:ec13:d59c:9591:a08])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits))
+        (No client certificate requested)
+        (Authenticated sender: stefan@datenfreihafen.org)
+        by proxima.lasnet.de (Postfix) with ESMTPSA id 3004EC237B;
+        Mon, 20 Jul 2020 09:30:43 +0200 (CEST)
+Subject: Re: [PATCH for v5.9] net: ieee802154: adf7242: Replace HTTP links
+ with HTTPS ones
+To:     "Alexander A. Klimov" <grandmaster@al2klimov.de>,
+        michael.hennerich@analog.com, alex.aring@gmail.com,
+        davem@davemloft.net, kuba@kernel.org, linux-wpan@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20200719113142.58304-1-grandmaster@al2klimov.de>
+From:   Stefan Schmidt <stefan@datenfreihafen.org>
+Message-ID: <03503036-0f13-7bde-5d11-6d7f61fad37e@datenfreihafen.org>
+Date:   Mon, 20 Jul 2020 09:30:43 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
+MIME-Version: 1.0
+In-Reply-To: <20200719113142.58304-1-grandmaster@al2klimov.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Greylist: Sender succeeded SMTP AUTH, not delayed by milter-greylist-4.5.12 (shards.monkeyblade.net [149.20.54.216]); Sun, 19 Jul 2020 18:17:00 -0700 (PDT)
 Sender: linux-wpan-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-From: Christoph Hellwig <hch@lst.de>
-Date: Fri, 17 Jul 2020 08:23:09 +0200
+Hello.
 
-> this series cleans up various lose ends in the sockopt code, most
-> importantly removing the compat_{get,set}sockopt infrastructure in favor
-> of just using in_compat_syscall() in the few places that care.
+On 19.07.20 13:31, Alexander A. Klimov wrote:
+> Rationale:
+> Reduces attack surface on kernel devs opening the links for MITM
+> as HTTPS traffic is much harder to manipulate.
+> 
+> Deterministic algorithm:
+> For each file:
+>    If not .svg:
+>      For each line:
+>        If doesn't contain `\bxmlns\b`:
+>          For each link, `\bhttp://[^# \t\r\n]*(?:\w|/)`:
+> 	  If neither `\bgnu\.org/license`, nor `\bmozilla\.org/MPL\b`:
+>              If both the HTTP and HTTPS versions
+>              return 200 OK and serve the same content:
+>                Replace HTTP with HTTPS.
+> 
+> Signed-off-by: Alexander A. Klimov <grandmaster@al2klimov.de>
+> ---
+>   Continuing my work started at 93431e0607e5.
+>   See also: git log --oneline '--author=Alexander A. Klimov <grandmaster@al2klimov.de>' v5.7..master
+>   (Actually letting a shell for loop submit all this stuff for me.)
+> 
+>   If there are any URLs to be removed completely
+>   or at least not (just) HTTPSified:
+>   Just clearly say so and I'll *undo my change*.
+>   See also: https://lkml.org/lkml/2020/6/27/64
+> 
+>   If there are any valid, but yet not changed URLs:
+>   See: https://lkml.org/lkml/2020/6/26/837
+> 
+>   If you apply the patch, please let me know.
+> 
+>   Sorry again to all maintainers who complained about subject lines.
+>   Now I realized that you want an actually perfect prefixes,
+>   not just subsystem ones.
+>   I tried my best...
+>   And yes, *I could* (at least half-)automate it.
+>   Impossible is nothing! :)
+> 
+> 
+>   drivers/net/ieee802154/adf7242.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ieee802154/adf7242.c b/drivers/net/ieee802154/adf7242.c
+> index 5a37514e4234..60a016a6806a 100644
+> --- a/drivers/net/ieee802154/adf7242.c
+> +++ b/drivers/net/ieee802154/adf7242.c
+> @@ -4,7 +4,7 @@
+>    *
+>    * Copyright 2009-2017 Analog Devices Inc.
+>    *
+> - * http://www.analog.com/ADF7242
+> + * https://www.analog.com/ADF7242
+>    */
+>   
+>   #include <linux/kernel.h>
+> 
 
-Series applied to net-next, thanks.
+
+This patch has been applied to the wpan tree and will be
+part of the next pull request to net. Thanks!
+
+regards
+Stefan Schmidt
