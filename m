@@ -7,36 +7,36 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D33A6C38142
-	for <linux-wpan@archiver.kernel.org>; Thu, 23 Jul 2020 06:11:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D3B1C43445
+	for <linux-wpan@archiver.kernel.org>; Thu, 23 Jul 2020 06:12:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AF0E82065F
-	for <linux-wpan@archiver.kernel.org>; Thu, 23 Jul 2020 06:11:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0F6D9206C1
+	for <linux-wpan@archiver.kernel.org>; Thu, 23 Jul 2020 06:12:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="sGtRnqYd"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="kkjnzCas"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728183AbgGWGLz (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Thu, 23 Jul 2020 02:11:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56480 "EHLO
+        id S1728236AbgGWGMM (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Thu, 23 Jul 2020 02:12:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56470 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725858AbgGWGJk (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 23 Jul 2020 02:09:40 -0400
+        with ESMTP id S1726852AbgGWGJi (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 23 Jul 2020 02:09:38 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EED8CC0619E3;
-        Wed, 22 Jul 2020 23:09:39 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDAA2C0619E2;
+        Wed, 22 Jul 2020 23:09:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=FYcs44yoYK35f4AWKo/oBKg4WT6Lxy2mEQ4X9UWOEVM=; b=sGtRnqYdkZcPfYZRzM5+T6BC7g
-        mhzEiZfizA260w/TsQecExreOl8sSzsN1E3mIXeoxHZU36ivBxA2nf5wopiR6Xmx/cQvYW2P/ynSC
-        Xe1nrgJEf8JieAdBjc+O1SmiuDErWv514IwyHESk6utAUAijDnTteN+yeaXikk8ne4xYjJ8zHfG6u
-        opDvToneN0P5tYC+PE7YvJfTgEyM3HlKL9UuVCORhwsrhnbMPetCBFN6bdXX0rq5XUUW7YFejw1P+
-        xHdieh/2tilcdHvGOXeaSMCYhuDDkM89QNbs529lpilLHSQLeMBqu6mV+cHiTQTFRT5zNKUXz2iEt
-        SkT72xJg==;
+        bh=BXIWlOxxLGAwEkybRtLTw7LIxC9f35ukkZ5P3mQ+S3I=; b=kkjnzCasd1GS1SWzGhJegyrZpR
+        +VfalNFJE7E4SdMPRTagIx5hwuzbGFMNreic5aeOahY3bOhrHbE3q5LS+A+qxs4f482fiuoOgYwF1
+        Gbudn5vnqxjNqormxDO5zPHCQ/dy65Wu5ZGcvd9mornUSJOffIaX1pv5bl6+2uBRhQetAt+HAWVLk
+        xHUaxwGq/hjfKCX8JQ1iW1zuAWbBdzg93ympxDOGXbyS4pchcbLCP/HHFBcTpZ6XDaGKVXHPFQuO+
+        Za1hOCwgkj0JI2o7Zt7jncDIfQeDQub97JNn4HlYFeqQIjdCCVJocZuJYofsMQ3aUZ2+eYlShYGfR
+        6Xs24t2w==;
 Received: from [2001:4bb8:18c:2acc:91df:aae8:fa3b:de9c] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jyUQ3-0003ll-36; Thu, 23 Jul 2020 06:09:27 +0000
+        id 1jyUQ0-0003lO-FO; Thu, 23 Jul 2020 06:09:24 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
@@ -56,9 +56,9 @@ Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         mptcp@lists.01.org, lvs-devel@vger.kernel.org,
         rds-devel@oss.oracle.com, linux-afs@lists.infradead.org,
         tipc-discussion@lists.sourceforge.net, linux-x25@vger.kernel.org
-Subject: [PATCH 13/26] bpfilter: switch bpfilter_ip_set_sockopt to sockptr_t
-Date:   Thu, 23 Jul 2020 08:08:55 +0200
-Message-Id: <20200723060908.50081-14-hch@lst.de>
+Subject: [PATCH 11/26] netfilter: switch xt_copy_counters to sockptr_t
+Date:   Thu, 23 Jul 2020 08:08:53 +0200
+Message-Id: <20200723060908.50081-12-hch@lst.de>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200723060908.50081-1-hch@lst.de>
 References: <20200723060908.50081-1-hch@lst.de>
@@ -70,115 +70,199 @@ Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-This is mostly to prepare for cleaning up the callers, as bpfilter by
-design can't handle kernel pointers.
+Pass a sockptr_t to prepare for set_fs-less handling of the kernel
+pointer from bpf-cgroup.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- include/linux/bpfilter.h     | 6 +++---
- net/bpfilter/bpfilter_kern.c | 6 +++---
- net/ipv4/bpfilter/sockopt.c  | 8 ++++----
- net/ipv4/ip_sockglue.c       | 3 ++-
- 4 files changed, 12 insertions(+), 11 deletions(-)
+ include/linux/netfilter/x_tables.h |  4 ++--
+ net/ipv4/netfilter/arp_tables.c    |  7 +++----
+ net/ipv4/netfilter/ip_tables.c     |  7 +++----
+ net/ipv6/netfilter/ip6_tables.c    |  6 +++---
+ net/netfilter/x_tables.c           | 20 ++++++++++----------
+ 5 files changed, 21 insertions(+), 23 deletions(-)
 
-diff --git a/include/linux/bpfilter.h b/include/linux/bpfilter.h
-index 9b114c718a7617..2ae3c8e1d83c43 100644
---- a/include/linux/bpfilter.h
-+++ b/include/linux/bpfilter.h
-@@ -4,9 +4,10 @@
+diff --git a/include/linux/netfilter/x_tables.h b/include/linux/netfilter/x_tables.h
+index b8b943ee7b8b66..5deb099d156dcb 100644
+--- a/include/linux/netfilter/x_tables.h
++++ b/include/linux/netfilter/x_tables.h
+@@ -301,8 +301,8 @@ int xt_target_to_user(const struct xt_entry_target *t,
+ int xt_data_to_user(void __user *dst, const void *src,
+ 		    int usersize, int size, int aligned_size);
  
- #include <uapi/linux/bpfilter.h>
- #include <linux/usermode_driver.h>
-+#include <linux/sockptr.h>
+-void *xt_copy_counters_from_user(const void __user *user, unsigned int len,
+-				 struct xt_counters_info *info);
++void *xt_copy_counters(sockptr_t arg, unsigned int len,
++		       struct xt_counters_info *info);
+ struct xt_counters *xt_counters_alloc(unsigned int counters);
  
- struct sock;
--int bpfilter_ip_set_sockopt(struct sock *sk, int optname, char __user *optval,
-+int bpfilter_ip_set_sockopt(struct sock *sk, int optname, sockptr_t optval,
- 			    unsigned int optlen);
- int bpfilter_ip_get_sockopt(struct sock *sk, int optname, char __user *optval,
- 			    int __user *optlen);
-@@ -16,8 +17,7 @@ struct bpfilter_umh_ops {
- 	struct umd_info info;
- 	/* since ip_getsockopt() can run in parallel, serialize access to umh */
- 	struct mutex lock;
--	int (*sockopt)(struct sock *sk, int optname,
--		       char __user *optval,
-+	int (*sockopt)(struct sock *sk, int optname, sockptr_t optval,
- 		       unsigned int optlen, bool is_set);
- 	int (*start)(void);
- };
-diff --git a/net/bpfilter/bpfilter_kern.c b/net/bpfilter/bpfilter_kern.c
-index 00540457e5f4d3..f580c3344cb3ac 100644
---- a/net/bpfilter/bpfilter_kern.c
-+++ b/net/bpfilter/bpfilter_kern.c
-@@ -60,17 +60,17 @@ static int bpfilter_send_req(struct mbox_request *req)
+ struct xt_table *xt_register_table(struct net *net,
+diff --git a/net/ipv4/netfilter/arp_tables.c b/net/ipv4/netfilter/arp_tables.c
+index 2c8a4dad39d748..6d24b686c7f00a 100644
+--- a/net/ipv4/netfilter/arp_tables.c
++++ b/net/ipv4/netfilter/arp_tables.c
+@@ -996,8 +996,7 @@ static int do_replace(struct net *net, const void __user *user,
+ 	return ret;
  }
  
- static int bpfilter_process_sockopt(struct sock *sk, int optname,
--				    char __user *optval, unsigned int optlen,
-+				    sockptr_t optval, unsigned int optlen,
- 				    bool is_set)
+-static int do_add_counters(struct net *net, const void __user *user,
+-			   unsigned int len)
++static int do_add_counters(struct net *net, sockptr_t arg, unsigned int len)
  {
- 	struct mbox_request req = {
- 		.is_set		= is_set,
- 		.pid		= current->pid,
- 		.cmd		= optname,
--		.addr		= (uintptr_t)optval,
-+		.addr		= (uintptr_t)optval.user,
- 		.len		= optlen,
- 	};
--	if (uaccess_kernel()) {
-+	if (uaccess_kernel() || sockptr_is_kernel(optval)) {
- 		pr_err("kernel access not supported\n");
- 		return -EFAULT;
- 	}
-diff --git a/net/ipv4/bpfilter/sockopt.c b/net/ipv4/bpfilter/sockopt.c
-index 9063c6767d3410..1b34cb9a7708ec 100644
---- a/net/ipv4/bpfilter/sockopt.c
-+++ b/net/ipv4/bpfilter/sockopt.c
-@@ -21,8 +21,7 @@ void bpfilter_umh_cleanup(struct umd_info *info)
- }
- EXPORT_SYMBOL_GPL(bpfilter_umh_cleanup);
+ 	unsigned int i;
+ 	struct xt_counters_info tmp;
+@@ -1008,7 +1007,7 @@ static int do_add_counters(struct net *net, const void __user *user,
+ 	struct arpt_entry *iter;
+ 	unsigned int addend;
  
--static int bpfilter_mbox_request(struct sock *sk, int optname,
--				 char __user *optval,
-+static int bpfilter_mbox_request(struct sock *sk, int optname, sockptr_t optval,
- 				 unsigned int optlen, bool is_set)
+-	paddc = xt_copy_counters_from_user(user, len, &tmp);
++	paddc = xt_copy_counters(arg, len, &tmp);
+ 	if (IS_ERR(paddc))
+ 		return PTR_ERR(paddc);
+ 
+@@ -1420,7 +1419,7 @@ static int do_arpt_set_ctl(struct sock *sk, int cmd, void __user *user, unsigned
+ 		break;
+ 
+ 	case ARPT_SO_SET_ADD_COUNTERS:
+-		ret = do_add_counters(sock_net(sk), user, len);
++		ret = do_add_counters(sock_net(sk), USER_SOCKPTR(user), len);
+ 		break;
+ 
+ 	default:
+diff --git a/net/ipv4/netfilter/ip_tables.c b/net/ipv4/netfilter/ip_tables.c
+index 161901dd1cae7f..4697d09c98dc3e 100644
+--- a/net/ipv4/netfilter/ip_tables.c
++++ b/net/ipv4/netfilter/ip_tables.c
+@@ -1151,8 +1151,7 @@ do_replace(struct net *net, const void __user *user, unsigned int len)
+ }
+ 
+ static int
+-do_add_counters(struct net *net, const void __user *user,
+-		unsigned int len)
++do_add_counters(struct net *net, sockptr_t arg, unsigned int len)
  {
- 	int err;
-@@ -52,7 +51,7 @@ static int bpfilter_mbox_request(struct sock *sk, int optname,
- 	return err;
+ 	unsigned int i;
+ 	struct xt_counters_info tmp;
+@@ -1163,7 +1162,7 @@ do_add_counters(struct net *net, const void __user *user,
+ 	struct ipt_entry *iter;
+ 	unsigned int addend;
+ 
+-	paddc = xt_copy_counters_from_user(user, len, &tmp);
++	paddc = xt_copy_counters(arg, len, &tmp);
+ 	if (IS_ERR(paddc))
+ 		return PTR_ERR(paddc);
+ 
+@@ -1629,7 +1628,7 @@ do_ipt_set_ctl(struct sock *sk, int cmd, void __user *user, unsigned int len)
+ 		break;
+ 
+ 	case IPT_SO_SET_ADD_COUNTERS:
+-		ret = do_add_counters(sock_net(sk), user, len);
++		ret = do_add_counters(sock_net(sk), USER_SOCKPTR(user), len);
+ 		break;
+ 
+ 	default:
+diff --git a/net/ipv6/netfilter/ip6_tables.c b/net/ipv6/netfilter/ip6_tables.c
+index fd1f8f93123188..a787aba30e2db7 100644
+--- a/net/ipv6/netfilter/ip6_tables.c
++++ b/net/ipv6/netfilter/ip6_tables.c
+@@ -1168,7 +1168,7 @@ do_replace(struct net *net, const void __user *user, unsigned int len)
  }
  
--int bpfilter_ip_set_sockopt(struct sock *sk, int optname, char __user *optval,
-+int bpfilter_ip_set_sockopt(struct sock *sk, int optname, sockptr_t optval,
- 			    unsigned int optlen)
+ static int
+-do_add_counters(struct net *net, const void __user *user, unsigned int len)
++do_add_counters(struct net *net, sockptr_t arg, unsigned int len)
  {
- 	return bpfilter_mbox_request(sk, optname, optval, optlen, true);
-@@ -66,7 +65,8 @@ int bpfilter_ip_get_sockopt(struct sock *sk, int optname, char __user *optval,
- 	if (get_user(len, optlen))
- 		return -EFAULT;
+ 	unsigned int i;
+ 	struct xt_counters_info tmp;
+@@ -1179,7 +1179,7 @@ do_add_counters(struct net *net, const void __user *user, unsigned int len)
+ 	struct ip6t_entry *iter;
+ 	unsigned int addend;
  
--	return bpfilter_mbox_request(sk, optname, optval, len, false);
-+	return bpfilter_mbox_request(sk, optname, USER_SOCKPTR(optval), len,
-+				     false);
- }
+-	paddc = xt_copy_counters_from_user(user, len, &tmp);
++	paddc = xt_copy_counters(arg, len, &tmp);
+ 	if (IS_ERR(paddc))
+ 		return PTR_ERR(paddc);
+ 	t = xt_find_table_lock(net, AF_INET6, tmp.name);
+@@ -1637,7 +1637,7 @@ do_ip6t_set_ctl(struct sock *sk, int cmd, void __user *user, unsigned int len)
+ 		break;
  
- static int __init bpfilter_sockopt_init(void)
-diff --git a/net/ipv4/ip_sockglue.c b/net/ipv4/ip_sockglue.c
-index 42befbf12846c0..36f746e01741f6 100644
---- a/net/ipv4/ip_sockglue.c
-+++ b/net/ipv4/ip_sockglue.c
-@@ -1414,7 +1414,8 @@ int ip_setsockopt(struct sock *sk, int level,
- #if IS_ENABLED(CONFIG_BPFILTER_UMH)
- 	if (optname >= BPFILTER_IPT_SO_SET_REPLACE &&
- 	    optname < BPFILTER_IPT_SET_MAX)
--		err = bpfilter_ip_set_sockopt(sk, optname, optval, optlen);
-+		err = bpfilter_ip_set_sockopt(sk, optname, USER_SOCKPTR(optval),
-+					      optlen);
+ 	case IP6T_SO_SET_ADD_COUNTERS:
+-		ret = do_add_counters(sock_net(sk), user, len);
++		ret = do_add_counters(sock_net(sk), USER_SOCKPTR(user), len);
+ 		break;
+ 
+ 	default:
+diff --git a/net/netfilter/x_tables.c b/net/netfilter/x_tables.c
+index 32bab45af7e415..b97eb4b538fd4e 100644
+--- a/net/netfilter/x_tables.c
++++ b/net/netfilter/x_tables.c
+@@ -1028,9 +1028,9 @@ int xt_check_target(struct xt_tgchk_param *par,
+ EXPORT_SYMBOL_GPL(xt_check_target);
+ 
+ /**
+- * xt_copy_counters_from_user - copy counters and metadata from userspace
++ * xt_copy_counters - copy counters and metadata from a sockptr_t
+  *
+- * @user: src pointer to userspace memory
++ * @arg: src sockptr
+  * @len: alleged size of userspace memory
+  * @info: where to store the xt_counters_info metadata
+  *
+@@ -1047,8 +1047,8 @@ EXPORT_SYMBOL_GPL(xt_check_target);
+  * Return: returns pointer that caller has to test via IS_ERR().
+  * If IS_ERR is false, caller has to vfree the pointer.
+  */
+-void *xt_copy_counters_from_user(const void __user *user, unsigned int len,
+-				 struct xt_counters_info *info)
++void *xt_copy_counters(sockptr_t arg, unsigned int len,
++		       struct xt_counters_info *info)
+ {
+ 	void *mem;
+ 	u64 size;
+@@ -1062,12 +1062,12 @@ void *xt_copy_counters_from_user(const void __user *user, unsigned int len,
+ 			return ERR_PTR(-EINVAL);
+ 
+ 		len -= sizeof(compat_tmp);
+-		if (copy_from_user(&compat_tmp, user, sizeof(compat_tmp)) != 0)
++		if (copy_from_sockptr(&compat_tmp, arg, sizeof(compat_tmp)) != 0)
+ 			return ERR_PTR(-EFAULT);
+ 
+ 		memcpy(info->name, compat_tmp.name, sizeof(info->name) - 1);
+ 		info->num_counters = compat_tmp.num_counters;
+-		user += sizeof(compat_tmp);
++		sockptr_advance(arg, sizeof(compat_tmp));
+ 	} else
  #endif
- #ifdef CONFIG_NETFILTER
- 	/* we need to exclude all possible ENOPROTOOPTs except default case */
+ 	{
+@@ -1075,10 +1075,10 @@ void *xt_copy_counters_from_user(const void __user *user, unsigned int len,
+ 			return ERR_PTR(-EINVAL);
+ 
+ 		len -= sizeof(*info);
+-		if (copy_from_user(info, user, sizeof(*info)) != 0)
++		if (copy_from_sockptr(info, arg, sizeof(*info)) != 0)
+ 			return ERR_PTR(-EFAULT);
+ 
+-		user += sizeof(*info);
++		sockptr_advance(arg, sizeof(*info));
+ 	}
+ 	info->name[sizeof(info->name) - 1] = '\0';
+ 
+@@ -1092,13 +1092,13 @@ void *xt_copy_counters_from_user(const void __user *user, unsigned int len,
+ 	if (!mem)
+ 		return ERR_PTR(-ENOMEM);
+ 
+-	if (copy_from_user(mem, user, len) == 0)
++	if (copy_from_sockptr(mem, arg, len) == 0)
+ 		return mem;
+ 
+ 	vfree(mem);
+ 	return ERR_PTR(-EFAULT);
+ }
+-EXPORT_SYMBOL_GPL(xt_copy_counters_from_user);
++EXPORT_SYMBOL_GPL(xt_copy_counters);
+ 
+ #ifdef CONFIG_COMPAT
+ int xt_compat_target_offset(const struct xt_target *target)
 -- 
 2.27.0
 
