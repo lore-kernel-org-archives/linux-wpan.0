@@ -7,36 +7,36 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB371C433E1
-	for <linux-wpan@archiver.kernel.org>; Thu, 23 Jul 2020 06:09:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2F39C433ED
+	for <linux-wpan@archiver.kernel.org>; Thu, 23 Jul 2020 06:09:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B98342084D
-	for <linux-wpan@archiver.kernel.org>; Thu, 23 Jul 2020 06:09:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B3158208E4
+	for <linux-wpan@archiver.kernel.org>; Thu, 23 Jul 2020 06:09:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="AHWMVgl+"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="CNu8wX7/"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726691AbgGWGJd (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Thu, 23 Jul 2020 02:09:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56438 "EHLO
+        id S1726858AbgGWGJi (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Thu, 23 Jul 2020 02:09:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56464 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726522AbgGWGJb (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 23 Jul 2020 02:09:31 -0400
+        with ESMTP id S1725773AbgGWGJg (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 23 Jul 2020 02:09:36 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F31CEC0619E3;
-        Wed, 22 Jul 2020 23:09:30 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26629C0619DC;
+        Wed, 22 Jul 2020 23:09:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=jnNftkdWuHutn0l5/V2Gz6Qvt1s8tXbdDMQLxkwuHBo=; b=AHWMVgl+gZI3ppeRUJG22CnuN2
-        mXsqGUtHr7hHIshIeM0BR3FDFu7P8hUJdDKWEDjaeFBPFzHAKS1/J2NqqrgVWAiWy0PDBIJV6MaAk
-        gPot77jPYt8McodlLqHe4rYj1xwXIh3dwL7d5dP2a47D69tnzjzBjxRqbyL4qtqPcLy6LsSPLTz8/
-        YOabKmimQamGM4cxDNfekHWNUuwVnDebo84hbzn4arDbH1CmgtyNxmN2OFQxyAhRHpoT37cldfrc6
-        Ax/DteamlOzerpb/bK5cMQkwL7vWGfqduGUdI9Ez5lzvt3eBZC1+o7Ayqr6UYOa2Jd5AGGDGAZ45S
-        4D3R2EfQ==;
+        bh=AjKHhDGZLqL4OuQUXI3ghPRn4d0K9eK+41+WmsKDw4s=; b=CNu8wX7/4AaScPiP+yKasX/Nuq
+        00LHKTXAD3IquBRcEMSnRF8bNgMD1cvHh+U+oC9aYlopzyBcHDT20XOh1UxeZFqfjZgeBbGvE1wB6
+        /V6nQUH0PdaU2g+5JOnd1u9l8C/s6uwbv4KhpIhdxBK8oLO0ZwY+sqyTh4ne0vagAIgh4N5VQBGx0
+        JHE6q8bbDMTkx2eOaxshkvfo9rjtP0ncEN/z4VwN6Hb6/0xYri2cf1nNOzgptOsfvtMuA7wmNkOac
+        QLJGCjm4BB8DbTIK1mpqQYiSCZNmMlsC+Vd1KrBSfphtSKPM32mRgHArgFrIC0MlfCF8txHO3F2DP
+        u7/I0W5g==;
 Received: from [2001:4bb8:18c:2acc:91df:aae8:fa3b:de9c] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jyUPo-0003jj-5f; Thu, 23 Jul 2020 06:09:12 +0000
+        id 1jyUPz-0003lF-6z; Thu, 23 Jul 2020 06:09:23 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
@@ -56,9 +56,9 @@ Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         mptcp@lists.01.org, lvs-devel@vger.kernel.org,
         rds-devel@oss.oracle.com, linux-afs@lists.infradead.org,
         tipc-discussion@lists.sourceforge.net, linux-x25@vger.kernel.org
-Subject: [PATCH 02/26] net/bpfilter: split __bpfilter_process_sockopt
-Date:   Thu, 23 Jul 2020 08:08:44 +0200
-Message-Id: <20200723060908.50081-3-hch@lst.de>
+Subject: [PATCH 10/26] netfilter: remove the unused user argument to do_update_counters
+Date:   Thu, 23 Jul 2020 08:08:52 +0200
+Message-Id: <20200723060908.50081-11-hch@lst.de>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200723060908.50081-1-hch@lst.de>
 References: <20200723060908.50081-1-hch@lst.de>
@@ -70,111 +70,45 @@ Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Split __bpfilter_process_sockopt into a low-level send request routine and
-the actual setsockopt hook to split the init time ping from the actual
-setsockopt processing.
-
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- net/bpfilter/bpfilter_kern.c | 51 +++++++++++++++++++-----------------
- 1 file changed, 27 insertions(+), 24 deletions(-)
+ net/bridge/netfilter/ebtables.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
 
-diff --git a/net/bpfilter/bpfilter_kern.c b/net/bpfilter/bpfilter_kern.c
-index 3bac5820062af1..78d561f2c54da7 100644
---- a/net/bpfilter/bpfilter_kern.c
-+++ b/net/bpfilter/bpfilter_kern.c
-@@ -31,48 +31,51 @@ static void __stop_umh(void)
- 		shutdown_umh();
+diff --git a/net/bridge/netfilter/ebtables.c b/net/bridge/netfilter/ebtables.c
+index fe13108af1f542..12f8929667bf43 100644
+--- a/net/bridge/netfilter/ebtables.c
++++ b/net/bridge/netfilter/ebtables.c
+@@ -1242,9 +1242,8 @@ void ebt_unregister_table(struct net *net, struct ebt_table *table,
+ 
+ /* userspace just supplied us with counters */
+ static int do_update_counters(struct net *net, const char *name,
+-				struct ebt_counter __user *counters,
+-				unsigned int num_counters,
+-				const void __user *user, unsigned int len)
++			      struct ebt_counter __user *counters,
++			      unsigned int num_counters, unsigned int len)
+ {
+ 	int i, ret;
+ 	struct ebt_counter *tmp;
+@@ -1299,7 +1298,7 @@ static int update_counters(struct net *net, const void __user *user,
+ 		return -EINVAL;
+ 
+ 	return do_update_counters(net, hlp.name, hlp.counters,
+-				hlp.num_counters, user, len);
++				  hlp.num_counters, len);
  }
  
--static int __bpfilter_process_sockopt(struct sock *sk, int optname,
--				      char __user *optval,
--				      unsigned int optlen, bool is_set)
-+static int bpfilter_send_req(struct mbox_request *req)
- {
--	struct mbox_request req;
- 	struct mbox_reply reply;
- 	loff_t pos;
- 	ssize_t n;
--	int ret = -EFAULT;
+ static inline int ebt_obj_to_user(char __user *um, const char *_name,
+@@ -2231,7 +2230,7 @@ static int compat_update_counters(struct net *net, void __user *user,
+ 		return update_counters(net, user, len);
  
--	req.is_set = is_set;
--	req.pid = current->pid;
--	req.cmd = optname;
--	req.addr = (uintptr_t)optval;
--	req.len = optlen;
- 	if (!bpfilter_ops.info.tgid)
--		goto out;
-+		return -EFAULT;
- 	pos = 0;
--	n = kernel_write(bpfilter_ops.info.pipe_to_umh, &req, sizeof(req),
-+	n = kernel_write(bpfilter_ops.info.pipe_to_umh, req, sizeof(*req),
- 			   &pos);
--	if (n != sizeof(req)) {
-+	if (n != sizeof(*req)) {
- 		pr_err("write fail %zd\n", n);
--		__stop_umh();
--		ret = -EFAULT;
--		goto out;
-+		goto stop;
- 	}
- 	pos = 0;
- 	n = kernel_read(bpfilter_ops.info.pipe_from_umh, &reply, sizeof(reply),
- 			&pos);
- 	if (n != sizeof(reply)) {
- 		pr_err("read fail %zd\n", n);
--		__stop_umh();
--		ret = -EFAULT;
--		goto out;
-+		goto stop;
- 	}
--	ret = reply.status;
--out:
--	return ret;
-+	return reply.status;
-+stop:
-+	__stop_umh();
-+	return -EFAULT;
-+}
-+
-+static int bpfilter_process_sockopt(struct sock *sk, int optname,
-+				    char __user *optval, unsigned int optlen,
-+				    bool is_set)
-+{
-+	struct mbox_request req = {
-+		.is_set		= is_set,
-+		.pid		= current->pid,
-+		.cmd		= optname,
-+		.addr		= (uintptr_t)optval,
-+		.len		= optlen,
-+	};
-+	return bpfilter_send_req(&req);
+ 	return do_update_counters(net, hlp.name, compat_ptr(hlp.counters),
+-					hlp.num_counters, user, len);
++				  hlp.num_counters, len);
  }
  
- static int start_umh(void)
- {
-+	struct mbox_request req = { .pid = current->pid };
- 	int err;
- 
- 	/* fork usermode process */
-@@ -82,7 +85,7 @@ static int start_umh(void)
- 	pr_info("Loaded bpfilter_umh pid %d\n", pid_nr(bpfilter_ops.info.tgid));
- 
- 	/* health check that usermode process started correctly */
--	if (__bpfilter_process_sockopt(NULL, 0, NULL, 0, 0) != 0) {
-+	if (bpfilter_send_req(&req) != 0) {
- 		shutdown_umh();
- 		return -EFAULT;
- 	}
-@@ -103,7 +106,7 @@ static int __init load_umh(void)
- 	mutex_lock(&bpfilter_ops.lock);
- 	err = start_umh();
- 	if (!err && IS_ENABLED(CONFIG_INET)) {
--		bpfilter_ops.sockopt = &__bpfilter_process_sockopt;
-+		bpfilter_ops.sockopt = &bpfilter_process_sockopt;
- 		bpfilter_ops.start = &start_umh;
- 	}
- 	mutex_unlock(&bpfilter_ops.lock);
+ static int compat_do_ebt_get_ctl(struct sock *sk, int cmd,
 -- 
 2.27.0
 
