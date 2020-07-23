@@ -2,72 +2,72 @@ Return-Path: <SRS0=qhZ0=BC=vger.kernel.org=linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FC5BC433EC
-	for <linux-wpan@archiver.kernel.org>; Thu, 23 Jul 2020 08:40:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C568C433EA
+	for <linux-wpan@archiver.kernel.org>; Thu, 23 Jul 2020 11:14:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3016C22B43
-	for <linux-wpan@archiver.kernel.org>; Thu, 23 Jul 2020 08:40:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 38DD720709
+	for <linux-wpan@archiver.kernel.org>; Thu, 23 Jul 2020 11:14:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=tessares-net.20150623.gappssmtp.com header.i=@tessares-net.20150623.gappssmtp.com header.b="CNsYMCaC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B5vDCuMK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727116AbgGWIkP (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Thu, 23 Jul 2020 04:40:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51456 "EHLO
+        id S1728541AbgGWLOx (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Thu, 23 Jul 2020 07:14:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47198 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727045AbgGWIjz (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 23 Jul 2020 04:39:55 -0400
-Received: from mail-ed1-x543.google.com (mail-ed1-x543.google.com [IPv6:2a00:1450:4864:20::543])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41D51C03CA43
-        for <linux-wpan@vger.kernel.org>; Thu, 23 Jul 2020 01:39:55 -0700 (PDT)
-Received: by mail-ed1-x543.google.com with SMTP id dg28so3905075edb.3
-        for <linux-wpan@vger.kernel.org>; Thu, 23 Jul 2020 01:39:55 -0700 (PDT)
+        with ESMTP id S1726867AbgGWLOw (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 23 Jul 2020 07:14:52 -0400
+Received: from mail-ej1-x643.google.com (mail-ej1-x643.google.com [IPv6:2a00:1450:4864:20::643])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB255C0619DC;
+        Thu, 23 Jul 2020 04:14:51 -0700 (PDT)
+Received: by mail-ej1-x643.google.com with SMTP id y10so5980718eje.1;
+        Thu, 23 Jul 2020 04:14:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tessares-net.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=t34u4KAm1gK/f1oDA6+0ZgZ3T1IDP3Ad7b21M8jn9IE=;
-        b=CNsYMCaC5YFx1sCHrUnGTyxK55+RElxWw1Y4CgVq4WviDSpLe5tvZRQNhbw/o8NHkS
-         5lNPKTvPIJgzELza08HXzETuGDGqESAjMwaETk5Mmah7A76FYju7HEJcSxVz2Z68Ez32
-         Fe8bkyg3EIliyQfIE0WUqAFYcrQUJWfpZsNbAdl/ll0KB40GMQt1yoxZTtepzlC4KdnZ
-         GnSg5TjVpPWt7FlYOZYnnYqZEV4wmhNftYUlMk2HjS0eEZRDa0Aihb7OonspbY3XBKmu
-         gfkANWXjINxT44g2wwmEPqLtqbE4VWM7CM7H0NR7+q8PAGIse1jhucMrcCJVf3oeSFy2
-         TE7Q==
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=vdYyoECOJpkvRW+iDSJN0RIdv+nH41NS293U/5tTNzU=;
+        b=B5vDCuMK34uIsnpD9z3FcIKsP+ARgUC68tC2JBNii294ZVz92X5OyPMGm1cnHIYPvl
+         3DKQSNa/jdlu0biVdgVy3X/Usw30FobXy8VPbwfs9mZO4hgKFIB5Q6ou4++0iHZWcmIg
+         rfstWtDzaQOlAHrnGsoBfnDZMJ2kD6uwV1y2oKkj2sr770VnwjwNmw0Za18fcxNwyhPN
+         PX5gNfWd5bOhXJY1Kvg+SfF57+CLOAPlOGTBbqcVuFCBHygW7tXdpNSN+uznlRCislSc
+         n2D4vVeaN2C63ZjJ8LYUcP4YwR3kpvL7IT5R8VKRAe3yBJewccDUsJmVY4TugCpk7vZl
+         wX7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=t34u4KAm1gK/f1oDA6+0ZgZ3T1IDP3Ad7b21M8jn9IE=;
-        b=BigHXAajE1yG1bKPDTtRAtt2bJd3p/pJ7gJe9Cy4E97p3F65vw3f95F/Dr8AMTKZBF
-         8M0EVv2zEsGH/RFgRfGY4exeLXCj4Dx5GHN62+SSoPQp8EXNlz81ivLYStiwAoboqDWb
-         kP3K5o4sAKk1mKioFIQfpArQ6U/8MaMR1Lfay3SEjTrnkl9Y+G603hunT0QDDDi8wURi
-         DTYpc6qqorOEi4kmZQ36DHnrHjlTmq5KQtn0oF6daJHoix1GJREvXpG5btmqFxyfPaNX
-         BGv7u4bG1joy+siyNj3xmGFEFoZMmlXBQ+w56jmKHvgwpw/UMNHKOePi7uHJ//N/t/LX
-         qLFw==
-X-Gm-Message-State: AOAM532L/w03RmEzAkztGONiEBvlSx3sBLeGsn8bjFYYk9e/Xj6CkdnD
-        BKkgee9hmjYbyBiQtzCpQQZE2A==
-X-Google-Smtp-Source: ABdhPJwbyZj4th/Ks5mvB+ElB/xiz0sHXiy/UKIrJCc8QLLBnJl9HfUHFNhTU1trrZNOtrIehMUs+A==
-X-Received: by 2002:aa7:da4c:: with SMTP id w12mr3098522eds.122.1595493593384;
-        Thu, 23 Jul 2020 01:39:53 -0700 (PDT)
-Received: from tsr-lap-08.nix.tessares.net ([79.132.248.22])
-        by smtp.gmail.com with ESMTPSA id q7sm1560608eja.69.2020.07.23.01.39.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 23 Jul 2020 01:39:52 -0700 (PDT)
-Subject: Re: [MPTCP] [PATCH 08/26] net: switch sock_set_timeout to sockptr_t
-To:     Christoph Hellwig <hch@lst.de>,
-        "David S. Miller" <davem@davemloft.net>,
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=vdYyoECOJpkvRW+iDSJN0RIdv+nH41NS293U/5tTNzU=;
+        b=OSvvl4od8qhpj0fbhiA5979OI0+nto4RcDPfbflf+CsAatqxszOPd30p2nbgNR+IfU
+         Hd4Ap9iZqCDKpgUp/3NGF5K7lQtcFWmFg7DLFnZ6EUXBh/VXovuO6fj16efUU0UZJB56
+         /yZaiZovVILBMf1WY2kqzsc28Xlbo1UNKEuIIMVN9CcfLJ94OEb+/LRhUFn+19ynMxmr
+         k+mdHaryMe5vp8ozuKPKGl1b+kojsES1aVxBo8FD/TjgQC+XFj3r/D/vvcvm8xuVF0i+
+         9ryHfVoYSCkW38tTAwIW5BkJD0WHLiwdFF/WScJ0DlHUbTehhAEeCth11uxc5MqgI1dW
+         srSg==
+X-Gm-Message-State: AOAM530tjR5YjkGijVHLCXbqdpcgxRzpeQ+0qqsNcCysFIF6kxanE7VZ
+        6AArdUThi60tVzU3ctXj05E=
+X-Google-Smtp-Source: ABdhPJz4rM+z9eQOHfGGUF+Hj1F0q1VizoeW8bUipy1mWLCV1z/2+oZlfysZjxBFObbrbyKXQkFElw==
+X-Received: by 2002:a17:906:1187:: with SMTP id n7mr3696742eja.161.1595502890446;
+        Thu, 23 Jul 2020 04:14:50 -0700 (PDT)
+Received: from ltop.local ([2a02:a03f:a7fb:e200:f109:49dc:4e2a:ea12])
+        by smtp.gmail.com with ESMTPSA id y22sm1817552ejj.67.2020.07.23.04.14.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Jul 2020 04:14:49 -0700 (PDT)
+Date:   Thu, 23 Jul 2020 13:14:47 +0200
+From:   Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
         Alexei Starovoitov <ast@kernel.org>,
         Daniel Borkmann <daniel@iogearbox.net>,
         Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
         Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        Eric Dumazet <edumazet@google.com>
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Eric Dumazet <edumazet@google.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         netdev@vger.kernel.org, bpf@vger.kernel.org,
         netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
         linux-sctp@vger.kernel.org, linux-hams@vger.kernel.org,
@@ -78,41 +78,25 @@ Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         mptcp@lists.01.org, lvs-devel@vger.kernel.org,
         rds-devel@oss.oracle.com, linux-afs@lists.infradead.org,
         tipc-discussion@lists.sourceforge.net, linux-x25@vger.kernel.org
+Subject: Re: [PATCH 01/26] bpfilter: fix up a sparse annotation
+Message-ID: <20200723111447.3xj7cidlsspofsja@ltop.local>
 References: <20200723060908.50081-1-hch@lst.de>
- <20200723060908.50081-9-hch@lst.de>
-From:   Matthieu Baerts <matthieu.baerts@tessares.net>
-Message-ID: <092368db-122f-60bc-6a32-3cd5c70727da@tessares.net>
-Date:   Thu, 23 Jul 2020 10:39:50 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ <20200723060908.50081-2-hch@lst.de>
 MIME-Version: 1.0
-In-Reply-To: <20200723060908.50081-9-hch@lst.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200723060908.50081-2-hch@lst.de>
 Sender: linux-wpan-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi Christoph,
+On Thu, Jul 23, 2020 at 08:08:43AM +0200, Christoph Hellwig wrote:
+> The __user doesn't make sense when casting to an integer type, just
+> switch to a uintptr_t cast which also removes the need for the __force.
 
-On 23/07/2020 08:08, Christoph Hellwig wrote:
-> Pass a sockptr_t to prepare for set_fs-less handling of the kernel
-> pointer from bpf-cgroup.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->   net/mptcp/protocol.c |  6 ++++--
+Feel free to add my:
 
-Thank you for looking at that!
+Reviewed-by: Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
 
-For MPTCP-related code:
-
-Acked-by: Matthieu Baerts <matthieu.baerts@tessares.net>
-
-Cheers,
-Matt
--- 
-Tessares | Belgium | Hybrid Access Solutions
-www.tessares.net
+-- Luc
