@@ -2,326 +2,114 @@ Return-Path: <SRS0=qhZ0=BC=vger.kernel.org=linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16C19C4161F
-	for <linux-wpan@archiver.kernel.org>; Thu, 23 Jul 2020 06:11:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61117C433E0
+	for <linux-wpan@archiver.kernel.org>; Thu, 23 Jul 2020 08:15:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EAEAF2065F
-	for <linux-wpan@archiver.kernel.org>; Thu, 23 Jul 2020 06:11:19 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="if/Qegv4"
+	by mail.kernel.org (Postfix) with ESMTP id 4709120888
+	for <linux-wpan@archiver.kernel.org>; Thu, 23 Jul 2020 08:15:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727098AbgGWGJx (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Thu, 23 Jul 2020 02:09:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56500 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726649AbgGWGJp (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 23 Jul 2020 02:09:45 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22A5DC0619DC;
-        Wed, 22 Jul 2020 23:09:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
-        Content-Type:Content-ID:Content-Description;
-        bh=7JpGBoLpaFE7Jf5UF2pDwmquZJ8aXq1cjTXF4rce5nE=; b=if/Qegv4brr1NXoBiud4NJcKIp
-        V7zYS2WTQuFNMlIeqML7By9MKB8BvXuzZYn/xCkWhSa63kU6Rl63ePHIdT8VvpiDZV8tJl9S6jbeV
-        iSeG9VgSbS1Ld1QuuPrqeu562yQRRnU0tKUBhgdN5cqchwPyXO1pgzYvgNbRFZNbk39h1InTlUdB9
-        XMqzDab2vgcAazMkysGnZWsSl4JlgdoBNR8lP/9CVu3XXew+u7ghJRJENmwh6sgXq4erH5QxcLlyN
-        E2M3yh0TCRU+aNENg8H8W9YAc6M4/B8vxXE/N4ONqP61HGCG9h8KGpQ0wQ4sdmlw9KE8QSa9Igv56
-        8a0ehEqg==;
-Received: from [2001:4bb8:18c:2acc:91df:aae8:fa3b:de9c] (helo=localhost)
-        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1jyUQ8-0003mj-AB; Thu, 23 Jul 2020 06:09:32 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        Eric Dumazet <edumazet@google.com>
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org, bpf@vger.kernel.org,
-        netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-        linux-sctp@vger.kernel.org, linux-hams@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, bridge@lists.linux-foundation.org,
-        linux-can@vger.kernel.org, dccp@vger.kernel.org,
-        linux-decnet-user@lists.sourceforge.net,
-        linux-wpan@vger.kernel.org, linux-s390@vger.kernel.org,
-        mptcp@lists.01.org, lvs-devel@vger.kernel.org,
-        rds-devel@oss.oracle.com, linux-afs@lists.infradead.org,
-        tipc-discussion@lists.sourceforge.net, linux-x25@vger.kernel.org
-Subject: [PATCH 16/26] net/ipv4: switch do_ip_setsockopt to sockptr_t
-Date:   Thu, 23 Jul 2020 08:08:58 +0200
-Message-Id: <20200723060908.50081-17-hch@lst.de>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20200723060908.50081-1-hch@lst.de>
-References: <20200723060908.50081-1-hch@lst.de>
+        id S1725911AbgGWIPo (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Thu, 23 Jul 2020 04:15:44 -0400
+Received: from proxima.lasnet.de ([78.47.171.185]:37730 "EHLO
+        proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725858AbgGWIPn (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 23 Jul 2020 04:15:43 -0400
+Received: from localhost.localdomain (p200300e9d73716751580db7264bb53cc.dip0.t-ipconnect.de [IPv6:2003:e9:d737:1675:1580:db72:64bb:53cc])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: stefan@datenfreihafen.org)
+        by proxima.lasnet.de (Postfix) with ESMTPSA id 48130C25CC;
+        Thu, 23 Jul 2020 10:15:41 +0200 (CEST)
+Subject: Re: wpanusb?
+To:     Christopher Friedt <chrisfriedt@gmail.com>
+Cc:     Koen Zandberg <koen@bergzand.net>, linux-wpan@vger.kernel.org,
+        Andrei Emeltchenko <andrei.emeltchenko@intel.com>,
+        erik@statropy.com
+References: <CAF4BF-SFHA=mPHLxpDHGMLvgu0UKO-6ujfYB+n2a6=XhFvT6DA@mail.gmail.com>
+ <b009a2a8-64a5-fe66-a53e-5a93135cf1f8@datenfreihafen.org>
+ <CAF4BF-SNRyXQzUBqx5k014nZou4q7=Gd8=dbUyK7JiDkaEEvFA@mail.gmail.com>
+ <f98b4515-9570-ad48-2d8f-dcc5482a21a1@datenfreihafen.org>
+ <CAF4BF-SipApoY=7CY8fWs8cSi8rKZaYMxOZHAqoKv=poAgVm=Q@mail.gmail.com>
+ <61ffa93d-f8cf-b059-358c-84a6e04b96ac@bergzand.net>
+ <CAF4BF-Re1CoR8abM=hvKN=TojDoLL_PRAJTvjWzB-Ak8tKTvRg@mail.gmail.com>
+ <e5d22300-fccc-5a0f-6776-5438bfad57e1@datenfreihafen.org>
+ <0ccbc151-cf8e-cd56-28f8-f1594d226056@bergzand.net>
+ <8ddb855b-e9fb-6fb2-cb1f-38a7b7064683@datenfreihafen.org>
+ <3993a752-bb9c-ab25-7b2f-0cbf27c2cd6a@datenfreihafen.org>
+ <CAF4BF-TdLpg6hCc8iiR40tGmV9C5EPDF6c6Qr5m5CfDWOVJUMA@mail.gmail.com>
+From:   Stefan Schmidt <stefan@datenfreihafen.org>
+Message-ID: <682cd659-c63e-1991-7c57-8804edb6e3aa@datenfreihafen.org>
+Date:   Thu, 23 Jul 2020 10:15:37 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
+In-Reply-To: <CAF4BF-TdLpg6hCc8iiR40tGmV9C5EPDF6c6Qr5m5CfDWOVJUMA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-wpan-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Pass a sockptr_t to prepare for set_fs-less handling of the kernel
-pointer from bpf-cgroup.
+Hello.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- net/ipv4/ip_sockglue.c | 68 ++++++++++++++++++++----------------------
- 1 file changed, 33 insertions(+), 35 deletions(-)
+On 21.07.20 19:11, Christopher Friedt wrote:
+> +Erik
+> 
+> Sorry for my late response.
+> 
+> On Mon, Jul 6, 2020 at 10:42 AM Stefan Schmidt 
+> <stefan@datenfreihafen.org <mailto:stefan@datenfreihafen.org>> wrote:
+> 
+>     If we want this moving forward we need to push it ourselves.
+>     Christopher, as you brought this up I am wondering if you have any plan
+>     to work on the wpanusb driver side? Koen offered to work on the RIOT
+>     side, but this does need the linux kernel driver as well.
+> 
+> 
+> Erik is also actively looking at wpan-usb for the BeagleConnect currently.
+> 
+> I'm sure I could get it up to snuff. In particular, it should be 
+> straight-forward to do with the nice list of TODO items that Stefan 
+> outlined earlier in the thread :-) 
+> [1]<https://marc.info/?t=159041047800001&r=1&w=2>
 
-diff --git a/net/ipv4/ip_sockglue.c b/net/ipv4/ip_sockglue.c
-index b12f39b52008a3..f7f1507b89fe24 100644
---- a/net/ipv4/ip_sockglue.c
-+++ b/net/ipv4/ip_sockglue.c
-@@ -683,15 +683,15 @@ static int set_mcast_msfilter(struct sock *sk, int ifindex,
- 	return -EADDRNOTAVAIL;
- }
- 
--static int copy_group_source_from_user(struct group_source_req *greqs,
--		void __user *optval, int optlen)
-+static int copy_group_source_from_sockptr(struct group_source_req *greqs,
-+		sockptr_t optval, int optlen)
- {
- 	if (in_compat_syscall()) {
- 		struct compat_group_source_req gr32;
- 
- 		if (optlen != sizeof(gr32))
- 			return -EINVAL;
--		if (copy_from_user(&gr32, optval, sizeof(gr32)))
-+		if (copy_from_sockptr(&gr32, optval, sizeof(gr32)))
- 			return -EFAULT;
- 		greqs->gsr_interface = gr32.gsr_interface;
- 		greqs->gsr_group = gr32.gsr_group;
-@@ -699,7 +699,7 @@ static int copy_group_source_from_user(struct group_source_req *greqs,
- 	} else {
- 		if (optlen != sizeof(*greqs))
- 			return -EINVAL;
--		if (copy_from_user(greqs, optval, sizeof(*greqs)))
-+		if (copy_from_sockptr(greqs, optval, sizeof(*greqs)))
- 			return -EFAULT;
- 	}
- 
-@@ -707,14 +707,14 @@ static int copy_group_source_from_user(struct group_source_req *greqs,
- }
- 
- static int do_mcast_group_source(struct sock *sk, int optname,
--		void __user *optval, int optlen)
-+		sockptr_t optval, int optlen)
- {
- 	struct group_source_req greqs;
- 	struct ip_mreq_source mreqs;
- 	struct sockaddr_in *psin;
- 	int omode, add, err;
- 
--	err = copy_group_source_from_user(&greqs, optval, optlen);
-+	err = copy_group_source_from_sockptr(&greqs, optval, optlen);
- 	if (err)
- 		return err;
- 
-@@ -754,8 +754,7 @@ static int do_mcast_group_source(struct sock *sk, int optname,
- 	return ip_mc_source(add, omode, sk, &mreqs, greqs.gsr_interface);
- }
- 
--static int ip_set_mcast_msfilter(struct sock *sk, void __user *optval,
--		int optlen)
-+static int ip_set_mcast_msfilter(struct sock *sk, sockptr_t optval, int optlen)
- {
- 	struct group_filter *gsf = NULL;
- 	int err;
-@@ -765,7 +764,7 @@ static int ip_set_mcast_msfilter(struct sock *sk, void __user *optval,
- 	if (optlen > sysctl_optmem_max)
- 		return -ENOBUFS;
- 
--	gsf = memdup_user(optval, optlen);
-+	gsf = memdup_sockptr(optval, optlen);
- 	if (IS_ERR(gsf))
- 		return PTR_ERR(gsf);
- 
-@@ -786,7 +785,7 @@ static int ip_set_mcast_msfilter(struct sock *sk, void __user *optval,
- 	return err;
- }
- 
--static int compat_ip_set_mcast_msfilter(struct sock *sk, void __user *optval,
-+static int compat_ip_set_mcast_msfilter(struct sock *sk, sockptr_t optval,
- 		int optlen)
- {
- 	const int size0 = offsetof(struct compat_group_filter, gf_slist);
-@@ -806,7 +805,7 @@ static int compat_ip_set_mcast_msfilter(struct sock *sk, void __user *optval,
- 	gf32 = p + 4; /* we want ->gf_group and ->gf_slist aligned */
- 
- 	err = -EFAULT;
--	if (copy_from_user(gf32, optval, optlen))
-+	if (copy_from_sockptr(gf32, optval, optlen))
- 		goto out_free_gsf;
- 
- 	/* numsrc >= (4G-140)/128 overflow in 32 bits */
-@@ -831,7 +830,7 @@ static int compat_ip_set_mcast_msfilter(struct sock *sk, void __user *optval,
- }
- 
- static int ip_mcast_join_leave(struct sock *sk, int optname,
--		void __user *optval, int optlen)
-+		sockptr_t optval, int optlen)
- {
- 	struct ip_mreqn mreq = { };
- 	struct sockaddr_in *psin;
-@@ -839,7 +838,7 @@ static int ip_mcast_join_leave(struct sock *sk, int optname,
- 
- 	if (optlen < sizeof(struct group_req))
- 		return -EINVAL;
--	if (copy_from_user(&greq, optval, sizeof(greq)))
-+	if (copy_from_sockptr(&greq, optval, sizeof(greq)))
- 		return -EFAULT;
- 
- 	psin = (struct sockaddr_in *)&greq.gr_group;
-@@ -853,7 +852,7 @@ static int ip_mcast_join_leave(struct sock *sk, int optname,
- }
- 
- static int compat_ip_mcast_join_leave(struct sock *sk, int optname,
--		void __user *optval, int optlen)
-+		sockptr_t optval, int optlen)
- {
- 	struct compat_group_req greq;
- 	struct ip_mreqn mreq = { };
-@@ -861,7 +860,7 @@ static int compat_ip_mcast_join_leave(struct sock *sk, int optname,
- 
- 	if (optlen < sizeof(struct compat_group_req))
- 		return -EINVAL;
--	if (copy_from_user(&greq, optval, sizeof(greq)))
-+	if (copy_from_sockptr(&greq, optval, sizeof(greq)))
- 		return -EFAULT;
- 
- 	psin = (struct sockaddr_in *)&greq.gr_group;
-@@ -875,8 +874,8 @@ static int compat_ip_mcast_join_leave(struct sock *sk, int optname,
- 	return ip_mc_leave_group(sk, &mreq);
- }
- 
--static int do_ip_setsockopt(struct sock *sk, int level,
--			    int optname, char __user *optval, unsigned int optlen)
-+static int do_ip_setsockopt(struct sock *sk, int level, int optname,
-+		sockptr_t optval, unsigned int optlen)
- {
- 	struct inet_sock *inet = inet_sk(sk);
- 	struct net *net = sock_net(sk);
-@@ -910,12 +909,12 @@ static int do_ip_setsockopt(struct sock *sk, int level,
- 	case IP_RECVFRAGSIZE:
- 	case IP_RECVERR_RFC4884:
- 		if (optlen >= sizeof(int)) {
--			if (get_user(val, (int __user *) optval))
-+			if (copy_from_sockptr(&val, optval, sizeof(val)))
- 				return -EFAULT;
- 		} else if (optlen >= sizeof(char)) {
- 			unsigned char ucval;
- 
--			if (get_user(ucval, (unsigned char __user *) optval))
-+			if (copy_from_sockptr(&ucval, optval, sizeof(ucval)))
- 				return -EFAULT;
- 			val = (int) ucval;
- 		}
-@@ -926,8 +925,7 @@ static int do_ip_setsockopt(struct sock *sk, int level,
- 	if (optname == IP_ROUTER_ALERT)
- 		return ip_ra_control(sk, val ? 1 : 0, NULL);
- 	if (ip_mroute_opt(optname))
--		return ip_mroute_setsockopt(sk, optname, USER_SOCKPTR(optval),
--					    optlen);
-+		return ip_mroute_setsockopt(sk, optname, optval, optlen);
- 
- 	err = 0;
- 	if (needs_rtnl)
-@@ -941,8 +939,7 @@ static int do_ip_setsockopt(struct sock *sk, int level,
- 
- 		if (optlen > 40)
- 			goto e_inval;
--		err = ip_options_get(sock_net(sk), &opt, USER_SOCKPTR(optval),
--					      optlen);
-+		err = ip_options_get(sock_net(sk), &opt, optval, optlen);
- 		if (err)
- 			break;
- 		old = rcu_dereference_protected(inet->inet_opt,
-@@ -1140,17 +1137,17 @@ static int do_ip_setsockopt(struct sock *sk, int level,
- 
- 		err = -EFAULT;
- 		if (optlen >= sizeof(struct ip_mreqn)) {
--			if (copy_from_user(&mreq, optval, sizeof(mreq)))
-+			if (copy_from_sockptr(&mreq, optval, sizeof(mreq)))
- 				break;
- 		} else {
- 			memset(&mreq, 0, sizeof(mreq));
- 			if (optlen >= sizeof(struct ip_mreq)) {
--				if (copy_from_user(&mreq, optval,
--						   sizeof(struct ip_mreq)))
-+				if (copy_from_sockptr(&mreq, optval,
-+						      sizeof(struct ip_mreq)))
- 					break;
- 			} else if (optlen >= sizeof(struct in_addr)) {
--				if (copy_from_user(&mreq.imr_address, optval,
--						   sizeof(struct in_addr)))
-+				if (copy_from_sockptr(&mreq.imr_address, optval,
-+						      sizeof(struct in_addr)))
- 					break;
- 			}
- 		}
-@@ -1202,11 +1199,12 @@ static int do_ip_setsockopt(struct sock *sk, int level,
- 			goto e_inval;
- 		err = -EFAULT;
- 		if (optlen >= sizeof(struct ip_mreqn)) {
--			if (copy_from_user(&mreq, optval, sizeof(mreq)))
-+			if (copy_from_sockptr(&mreq, optval, sizeof(mreq)))
- 				break;
- 		} else {
- 			memset(&mreq, 0, sizeof(mreq));
--			if (copy_from_user(&mreq, optval, sizeof(struct ip_mreq)))
-+			if (copy_from_sockptr(&mreq, optval,
-+					      sizeof(struct ip_mreq)))
- 				break;
- 		}
- 
-@@ -1226,7 +1224,7 @@ static int do_ip_setsockopt(struct sock *sk, int level,
- 			err = -ENOBUFS;
- 			break;
- 		}
--		msf = memdup_user(optval, optlen);
-+		msf = memdup_sockptr(optval, optlen);
- 		if (IS_ERR(msf)) {
- 			err = PTR_ERR(msf);
- 			break;
-@@ -1257,7 +1255,7 @@ static int do_ip_setsockopt(struct sock *sk, int level,
- 
- 		if (optlen != sizeof(struct ip_mreq_source))
- 			goto e_inval;
--		if (copy_from_user(&mreqs, optval, sizeof(mreqs))) {
-+		if (copy_from_sockptr(&mreqs, optval, sizeof(mreqs))) {
- 			err = -EFAULT;
- 			break;
- 		}
-@@ -1324,8 +1322,7 @@ static int do_ip_setsockopt(struct sock *sk, int level,
- 		err = -EPERM;
- 		if (!ns_capable(sock_net(sk)->user_ns, CAP_NET_ADMIN))
- 			break;
--		err = xfrm_user_policy(sk, optname, USER_SOCKPTR(optval),
--				       optlen);
-+		err = xfrm_user_policy(sk, optname, optval, optlen);
- 		break;
- 
- 	case IP_TRANSPARENT:
-@@ -1412,7 +1409,8 @@ int ip_setsockopt(struct sock *sk, int level,
- 	if (level != SOL_IP)
- 		return -ENOPROTOOPT;
- 
--	err = do_ip_setsockopt(sk, level, optname, optval, optlen);
-+	err = do_ip_setsockopt(sk, level, optname, USER_SOCKPTR(optval),
-+			       optlen);
- #if IS_ENABLED(CONFIG_BPFILTER_UMH)
- 	if (optname >= BPFILTER_IPT_SO_SET_REPLACE &&
- 	    optname < BPFILTER_IPT_SET_MAX)
--- 
-2.27.0
+Koen will also have some time in August and expressed interest in 
+working on it. I will be away on vacation first half of August. It would 
+be great if you three can coordinate this a bit.
 
+> 
+>     With the other changes we discussed as changes before we should have a
+>     first target of what we wanted to get implemented. (and see what we
+>     forgot when the pieces are coming together)
+> 
+> 
+> Exactly.
+> 
+> I had one question, specifically because it impacts the BeagleConnect 
+> project, but also because it's been a while since I've done any 15.4 
+> hacking in Linux.
+> 
+> Does Linux already support the 900 MHz phy and IEEE bits?
+> 
+> If possible, we're hoping to be able to use it for the 2.4 GHz band and 
+> the 900 MHz band.
+
+We have drivers for the sub-GHz band (at86rf212 and the HUL USB support 
+in atusb which also uses the 212). We also have support for a 
+listen-before-talk (LBT) driver operation to make that part work with 
+the drivers.
+
+To be honest I have not done sub-GHz testing myself here, but given the 
+work people put into the at86rf212 support I would think it should work 
+for some first tries. Reports welcome!
+
+regards
+Stefan Schmidt
