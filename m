@@ -1,36 +1,30 @@
-Return-Path: <SRS0=gm5i=BD=vger.kernel.org=linux-wpan-owner@kernel.org>
+Return-Path: <SRS0=LC6c=BF=vger.kernel.org=linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E336FC433E5
-	for <linux-wpan@archiver.kernel.org>; Fri, 24 Jul 2020 22:43:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE495C433E5
+	for <linux-wpan@archiver.kernel.org>; Sun, 26 Jul 2020 07:03:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BAFE9206EB
-	for <linux-wpan@archiver.kernel.org>; Fri, 24 Jul 2020 22:43:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D18622070B
+	for <linux-wpan@archiver.kernel.org>; Sun, 26 Jul 2020 07:03:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726617AbgGXWnr (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Fri, 24 Jul 2020 18:43:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40038 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726154AbgGXWnq (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Fri, 24 Jul 2020 18:43:46 -0400
-Received: from shards.monkeyblade.net (shards.monkeyblade.net [IPv6:2620:137:e000::1:9])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27EDEC0619D3;
-        Fri, 24 Jul 2020 15:43:46 -0700 (PDT)
-Received: from localhost (unknown [IPv6:2601:601:9f00:477::3d5])
-        (using TLSv1 with cipher AES256-SHA (256/256 bits))
-        (Client did not present a certificate)
-        (Authenticated sender: davem-davemloft)
-        by shards.monkeyblade.net (Postfix) with ESMTPSA id 7C0081274F734;
-        Fri, 24 Jul 2020 15:26:58 -0700 (PDT)
-Date:   Fri, 24 Jul 2020 15:43:42 -0700 (PDT)
-Message-Id: <20200724.154342.1433271593505001306.davem@davemloft.net>
-To:     hch@lst.de
-Cc:     kuba@kernel.org, ast@kernel.org, daniel@iogearbox.net,
+        id S1726781AbgGZHDT (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Sun, 26 Jul 2020 03:03:19 -0400
+Received: from verein.lst.de ([213.95.11.211]:39756 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725789AbgGZHDS (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+        Sun, 26 Jul 2020 03:03:18 -0400
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 2AB2768B05; Sun, 26 Jul 2020 09:03:12 +0200 (CEST)
+Date:   Sun, 26 Jul 2020 09:03:11 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     David Miller <davem@davemloft.net>
+Cc:     hch@lst.de, kuba@kernel.org, ast@kernel.org, daniel@iogearbox.net,
         kuznet@ms2.inr.ac.ru, yoshfuji@linux-ipv6.org, edumazet@google.com,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         netdev@vger.kernel.org, bpf@vger.kernel.org,
@@ -44,47 +38,60 @@ Cc:     kuba@kernel.org, ast@kernel.org, daniel@iogearbox.net,
         rds-devel@oss.oracle.com, linux-afs@lists.infradead.org,
         tipc-discussion@lists.sourceforge.net, linux-x25@vger.kernel.org
 Subject: Re: get rid of the address_space override in setsockopt v2
-From:   David Miller <davem@davemloft.net>
-In-Reply-To: <20200723060908.50081-1-hch@lst.de>
-References: <20200723060908.50081-1-hch@lst.de>
-X-Mailer: Mew version 6.8 on Emacs 26.3
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-X-Greylist: Sender succeeded SMTP AUTH, not delayed by milter-greylist-4.5.12 (shards.monkeyblade.net [149.20.54.216]); Fri, 24 Jul 2020 15:26:59 -0700 (PDT)
+Message-ID: <20200726070311.GA16687@lst.de>
+References: <20200723060908.50081-1-hch@lst.de> <20200724.154342.1433271593505001306.davem@davemloft.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200724.154342.1433271593505001306.davem@davemloft.net>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Sender: linux-wpan-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
+On Fri, Jul 24, 2020 at 03:43:42PM -0700, David Miller wrote:
+> > Changes since v1:
+> >  - check that users don't pass in kernel addresses
+> >  - more bpfilter cleanups
+> >  - cosmetic mptcp tweak
+> 
+> Series applied to net-next, I'm build testing and will push this out when
+> that is done.
+
+The buildbot found one warning with the isdn debug code after a few
+days, here is what I think is the best fix:
+
+---
+From 6601732f7a54db5f04efba08f7e9224e5b757112 Mon Sep 17 00:00:00 2001
 From: Christoph Hellwig <hch@lst.de>
-Date: Thu, 23 Jul 2020 08:08:42 +0200
+Date: Sun, 26 Jul 2020 09:00:09 +0200
+Subject: mISDN: remove a debug printk in data_sock_setsockopt
 
-> setsockopt is the last place in architecture-independ code that still
-> uses set_fs to force the uaccess routines to operate on kernel pointers.
-> 
-> This series adds a new sockptr_t type that can contained either a kernel
-> or user pointer, and which has accessors that do the right thing, and
-> then uses it for setsockopt, starting by refactoring some low-level
-> helpers and moving them over to it before finally doing the main
-> setsockopt method.
-> 
-> Note that apparently the eBPF selftests do not even cover this path, so
-> the series has been tested with a testing patch that always copies the
-> data first and passes a kernel pointer.  This is something that works for
-> most common sockopts (and is something that the ePBF support relies on),
-> but unfortunately in various corner cases we either don't use the passed
-> in length, or in one case actually copy data back from setsockopt, or in
-> case of bpfilter straight out do not work with kernel pointers at all.
-> 
-> Against net-next/master.
-> 
-> Changes since v1:
->  - check that users don't pass in kernel addresses
->  - more bpfilter cleanups
->  - cosmetic mptcp tweak
+The %p won't work with the new sockptr_t type.  But in the times of
+ftrace, bpftrace and co these kinds of debug printks are pretty anyway,
+so just remove the whole debug printk.
 
-Series applied to net-next, I'm build testing and will push this out when
-that is done.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/isdn/mISDN/socket.c | 4 ----
+ 1 file changed, 4 deletions(-)
 
-Thanks.
+diff --git a/drivers/isdn/mISDN/socket.c b/drivers/isdn/mISDN/socket.c
+index 1b2b91479107bc..2c58a6fe6d129e 100644
+--- a/drivers/isdn/mISDN/socket.c
++++ b/drivers/isdn/mISDN/socket.c
+@@ -406,10 +406,6 @@ static int data_sock_setsockopt(struct socket *sock, int level, int optname,
+ 	struct sock *sk = sock->sk;
+ 	int err = 0, opt = 0;
+ 
+-	if (*debug & DEBUG_SOCKET)
+-		printk(KERN_DEBUG "%s(%p, %d, %x, %p, %d)\n", __func__, sock,
+-		       level, optname, optval, len);
+-
+ 	lock_sock(sk);
+ 
+ 	switch (optname) {
+-- 
+2.27.0
+
