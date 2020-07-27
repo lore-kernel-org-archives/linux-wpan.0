@@ -7,23 +7,23 @@ X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7A2AC433E4
-	for <linux-wpan@archiver.kernel.org>; Mon, 27 Jul 2020 16:16:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D372AC433F4
+	for <linux-wpan@archiver.kernel.org>; Mon, 27 Jul 2020 16:16:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 921E720714
-	for <linux-wpan@archiver.kernel.org>; Mon, 27 Jul 2020 16:16:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AA81120714
+	for <linux-wpan@archiver.kernel.org>; Mon, 27 Jul 2020 16:16:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731170AbgG0QQC (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 27 Jul 2020 12:16:02 -0400
-Received: from verein.lst.de ([213.95.11.211]:44295 "EHLO verein.lst.de"
+        id S1731228AbgG0QQW (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 27 Jul 2020 12:16:22 -0400
+Received: from verein.lst.de ([213.95.11.211]:44311 "EHLO verein.lst.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726728AbgG0QQB (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-        Mon, 27 Jul 2020 12:16:01 -0400
+        id S1726728AbgG0QQU (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+        Mon, 27 Jul 2020 12:16:20 -0400
 Received: by verein.lst.de (Postfix, from userid 2407)
-        id 4880068B05; Mon, 27 Jul 2020 18:15:55 +0200 (CEST)
-Date:   Mon, 27 Jul 2020 18:15:55 +0200
+        id 3EEBF68C4E; Mon, 27 Jul 2020 18:16:15 +0200 (CEST)
+Date:   Mon, 27 Jul 2020 18:16:15 +0200
 From:   Christoph Hellwig <hch@lst.de>
-To:     Ido Schimmel <idosch@idosch.org>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
 Cc:     Christoph Hellwig <hch@lst.de>,
         "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
@@ -43,23 +43,20 @@ Cc:     Christoph Hellwig <hch@lst.de>,
         mptcp@lists.01.org, lvs-devel@vger.kernel.org,
         rds-devel@oss.oracle.com, linux-afs@lists.infradead.org,
         tipc-discussion@lists.sourceforge.net, linux-x25@vger.kernel.org
-Subject: Re: [PATCH 19/26] net/ipv6: switch ipv6_flowlabel_opt to sockptr_t
-Message-ID: <20200727161555.GA7817@lst.de>
-References: <20200723060908.50081-1-hch@lst.de> <20200723060908.50081-20-hch@lst.de> <20200727121505.GA1804864@shredder> <20200727130029.GA26393@lst.de> <20200727133331.GA1851348@shredder>
+Subject: Re: [PATCH 12/26] netfilter: switch nf_setsockopt to sockptr_t
+Message-ID: <20200727161615.GB7817@lst.de>
+References: <20200723060908.50081-1-hch@lst.de> <20200723060908.50081-13-hch@lst.de> <20200727150310.GA1632472@zx2c4.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200727133331.GA1851348@shredder>
+In-Reply-To: <20200727150310.GA1632472@zx2c4.com>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Sender: linux-wpan-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-I have to admit I didn't spot the difference between the good and the
-bad output even after trying hard..
-
-But can you try the patch below?
+Can you try the patch below?
 
 ---
 From cce2d2e1b43ecee5f4af7cf116808b74b330080f Mon Sep 17 00:00:00 2001
