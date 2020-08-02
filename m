@@ -1,132 +1,113 @@
-Return-Path: <SRS0=abW4=BH=vger.kernel.org=linux-wpan-owner@kernel.org>
+Return-Path: <SRS0=5gwn=BM=vger.kernel.org=linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79F24C433E4
-	for <linux-wpan@archiver.kernel.org>; Tue, 28 Jul 2020 08:17:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A46D8C433E1
+	for <linux-wpan@archiver.kernel.org>; Sun,  2 Aug 2020 14:23:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5028F22B43
-	for <linux-wpan@archiver.kernel.org>; Tue, 28 Jul 2020 08:17:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 83FC320759
+	for <linux-wpan@archiver.kernel.org>; Sun,  2 Aug 2020 14:23:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="nEjdWpcU"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D7nVgHf1"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728064AbgG1IRr (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 28 Jul 2020 04:17:47 -0400
-Received: from mail.zx2c4.com ([192.95.5.64]:36909 "EHLO mail.zx2c4.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727916AbgG1IRq (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-        Tue, 28 Jul 2020 04:17:46 -0400
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTP id 1f508000;
-        Tue, 28 Jul 2020 07:54:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=mime-version
-        :references:in-reply-to:from:date:message-id:subject:to:cc
-        :content-type; s=mail; bh=K4YAt33ilBR3hd1+7JojCPxtvSA=; b=nEjdWp
-        cUQVj0KWRd87puFx0fk1HADPVt/5ckkL0vcSiVAoyePGSTncp+KafcroE0itJJAR
-        hvCKOHIgNqwby+4I13HG5z9ibnxBmqHfVx+jKtrPfvHTnJrmPNg1WsagEKVyYT8s
-        0wLLBcv/NIyWIJ2xwHqa/F7Ekuot/H5qUld6hDSAXP06OIRI6q+V7cdk8Ye2E95N
-        oE2iYHJELOZGqN2H10I58K4qjsUNSGzPFklfgHdPIOfnKUBe2eF7SiuhT2DW4gmx
-        Zlh/4Lwi80eH4MYYZz1R0kvQtczs/XnszWGNGZW6geww/y9D6tsJ0FqJg7QkrUqh
-        r9lHeJJo9aIu1+DA==
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id d27e76da (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-        Tue, 28 Jul 2020 07:54:16 +0000 (UTC)
-Received: by mail-io1-f54.google.com with SMTP id a5so4613572ioa.13;
-        Tue, 28 Jul 2020 01:17:41 -0700 (PDT)
-X-Gm-Message-State: AOAM5326njdztPe3VkZjU3njFuLXGQOjJ86c1ItnwgBvIww26i5yBNmp
-        mf7+bJPIr4+tDgdochtGaglyFVJWyqL1zhmrfeY=
-X-Google-Smtp-Source: ABdhPJwruWEMSl6lI3SS18Iq/8cGmq7nVWSaRamLRaM9jzUJiajMF+UBN6XkUtAb0UlYhZIkk+zlhZ92oa7Pvf4Iz8s=
-X-Received: by 2002:a05:6638:250f:: with SMTP id v15mr8210865jat.75.1595924260418;
- Tue, 28 Jul 2020 01:17:40 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200723060908.50081-1-hch@lst.de> <20200723060908.50081-13-hch@lst.de>
- <20200727150310.GA1632472@zx2c4.com> <20200727150601.GA3447@lst.de>
- <CAHmME9ric=chLJayn7Erve7WBa+qCKn-+Gjri=zqydoY6623aA@mail.gmail.com>
- <20200727162357.GA8022@lst.de> <908ed73081cc42d58a5b01e0c97dbe47@AcuMS.aculab.com>
-In-Reply-To: <908ed73081cc42d58a5b01e0c97dbe47@AcuMS.aculab.com>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Tue, 28 Jul 2020 10:17:28 +0200
-X-Gmail-Original-Message-ID: <CAHmME9pUbRmJq1Qcj10eENt15cuQHkiXJNKrUDmmC18n2mLKDA@mail.gmail.com>
-Message-ID: <CAHmME9pUbRmJq1Qcj10eENt15cuQHkiXJNKrUDmmC18n2mLKDA@mail.gmail.com>
-Subject: Re: [PATCH 12/26] netfilter: switch nf_setsockopt to sockptr_t
-To:     David Laight <David.Laight@aculab.com>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        Eric Dumazet <edumazet@google.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Netdev <netdev@vger.kernel.org>,
-        "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
-        "netfilter-devel@vger.kernel.org" <netfilter-devel@vger.kernel.org>,
-        "coreteam@netfilter.org" <coreteam@netfilter.org>,
-        "linux-sctp@vger.kernel.org" <linux-sctp@vger.kernel.org>,
-        "linux-hams@vger.kernel.org" <linux-hams@vger.kernel.org>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "bridge@lists.linux-foundation.org" 
-        <bridge@lists.linux-foundation.org>,
-        "linux-can@vger.kernel.org" <linux-can@vger.kernel.org>,
-        "dccp@vger.kernel.org" <dccp@vger.kernel.org>,
-        "linux-decnet-user@lists.sourceforge.net" 
-        <linux-decnet-user@lists.sourceforge.net>,
-        "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "mptcp@lists.01.org" <mptcp@lists.01.org>,
-        "lvs-devel@vger.kernel.org" <lvs-devel@vger.kernel.org>,
-        "rds-devel@oss.oracle.com" <rds-devel@oss.oracle.com>,
-        "linux-afs@lists.infradead.org" <linux-afs@lists.infradead.org>,
-        "tipc-discussion@lists.sourceforge.net" 
-        <tipc-discussion@lists.sourceforge.net>,
-        "linux-x25@vger.kernel.org" <linux-x25@vger.kernel.org>,
-        Kernel Hardening <kernel-hardening@lists.openwall.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S1726299AbgHBOXx (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Sun, 2 Aug 2020 10:23:53 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:29006 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725780AbgHBOXv (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Sun, 2 Aug 2020 10:23:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1596378230;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc; bh=2/kHNXwW/Okw1oeFagoA94XTuvPYMO2ieikygdNu33E=;
+        b=D7nVgHf1S3i/q8yxrdZuEgxCrjAlZpEdFUwF/1KqORk3jg55ubGt6y9XT2FoqiKmZfpWo+
+        SYh8nyw0VEvsxh6pSHSC2tUZZkYJr/HrMU0dd19myDVN40oF6iHTWhwMJysmAnjWtxU3ao
+        T7vXowN1G/vi7KfHC1126hV7qEwJiZ4=
+Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
+ [209.85.160.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-167-0Lqg6mlMODCYJM_4qej-kA-1; Sun, 02 Aug 2020 10:23:46 -0400
+X-MC-Unique: 0Lqg6mlMODCYJM_4qej-kA-1
+Received: by mail-qt1-f198.google.com with SMTP id q19so15405439qtp.0
+        for <linux-wpan@vger.kernel.org>; Sun, 02 Aug 2020 07:23:46 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=2/kHNXwW/Okw1oeFagoA94XTuvPYMO2ieikygdNu33E=;
+        b=ioWXLTSZgZri5bggTZkQ3XOKtucxxIQSyHYhyAjqsIcKImNuFGI8kptRC2kM5raUkl
+         GQtQMTJZIFtC1pdaJiS8FyLWEOTAhqLkItNNs9tw07xlM31c7NjJf22zs17n2HLHDaVO
+         2lCIxbX/pWolur7s1TweKPU6iQkz8qnyxlh9Wh1lao97wKwsUxVyHZdTjX5qg8vMEk8a
+         LEhuAFhvdwH1sfpVWwq/uA4M7GBp7UN49abbweriixA4cIPEzcV3tjovvpqXw9CEP/H8
+         QSZda55G5Xdr7roBopHMzYYLatRMaq4du2+pw7jwmaAHrQsy9TR7H/W1TGzEdDS8vC+9
+         2Bag==
+X-Gm-Message-State: AOAM5314moytFnd7zQU18gXsE9Sfvt2UHYE/7NnYO44E4sqtNnnJpfIL
+        un92sELYqAkzva4JShswCXMVVC5InkYeF/gfb1v3VCiFM05BVHDXggxSUeV3Nm1aMDjCH1tIEI8
+        ogopgeK7fMJ86AJLZi03wSw==
+X-Received: by 2002:a37:62cc:: with SMTP id w195mr12855856qkb.33.1596378226330;
+        Sun, 02 Aug 2020 07:23:46 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxgE09Sl0MfhLOKvnnEluSkBTqBNuCaM3HjAVewFzyYuhdgdEgcM4E45wQlwXc1nshAvd3KIA==
+X-Received: by 2002:a37:62cc:: with SMTP id w195mr12855832qkb.33.1596378226027;
+        Sun, 02 Aug 2020 07:23:46 -0700 (PDT)
+Received: from trix.remote.csb (075-142-250-213.res.spectrum.com. [75.142.250.213])
+        by smtp.gmail.com with ESMTPSA id g61sm18050245qtd.65.2020.08.02.07.23.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 02 Aug 2020 07:23:45 -0700 (PDT)
+From:   trix@redhat.com
+To:     michael.hennerich@analog.com, alex.aring@gmail.com,
+        stefan@datenfreihafen.org, davem@davemloft.net, kuba@kernel.org,
+        marcel@holtmann.org
+Cc:     linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Tom Rix <trix@redhat.com>
+Subject: [PATCH] ieee802154/adf7242: check status of adf7242_read_reg
+Date:   Sun,  2 Aug 2020 07:23:39 -0700
+Message-Id: <20200802142339.21091-1-trix@redhat.com>
+X-Mailer: git-send-email 2.18.1
 Sender: linux-wpan-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-On Tue, Jul 28, 2020 at 10:07 AM David Laight <David.Laight@aculab.com> wrote:
->
-> From: Christoph Hellwig
-> > Sent: 27 July 2020 17:24
-> >
-> > On Mon, Jul 27, 2020 at 06:16:32PM +0200, Jason A. Donenfeld wrote:
-> > > Maybe sockptr_advance should have some safety checks and sometimes
-> > > return -EFAULT? Or you should always use the implementation where
-> > > being a kernel address is an explicit bit of sockptr_t, rather than
-> > > being implicit?
-> >
-> > I already have a patch to use access_ok to check the whole range in
-> > init_user_sockptr.
->
-> That doesn't make (much) difference to the code paths that ignore
-> the user-supplied length.
-> OTOH doing the user/kernel check on the base address (not an
-> incremented one) means that the correct copy function is always
-> selected.
+From: Tom Rix <trix@redhat.com>
 
-Right, I had the same reaction in reading this, but actually, his code
-gets rid of the sockptr_advance stuff entirely and never mutates, so
-even though my point about attacking those pointers was missed, the
-code does the better thing now -- checking the base address and never
-mutating the pointer. So I think we're good.
+Clang static analysis reports this error
 
->
-> Perhaps the functions should all be passed a 'const sockptr_t'.
-> The typedef could be made 'const' - requiring non-const items
-> explicitly use the union/struct itself.
+adf7242.c:887:6: warning: Assigned value is garbage or undefined
+        len = len_u8;
+            ^ ~~~~~~
 
-I was thinking the same, but just by making the pointers inside the
-struct const. However, making the whole struct const via the typedef
-is a much better idea. That'd probably require changing the signature
-of init_user_sockptr a bit, which would be fine, but indeed I think
-this would be a very positive change.
+len_u8 is set in
+       adf7242_read_reg(lp, 0, &len_u8);
 
-Jason
+When this call fails, len_u8 is not set.
+
+So check the return code.
+
+Fixes: 7302b9d90117 ("ieee802154/adf7242: Driver for ADF7242 MAC IEEE802154")
+
+Signed-off-by: Tom Rix <trix@redhat.com>
+---
+ drivers/net/ieee802154/adf7242.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/ieee802154/adf7242.c b/drivers/net/ieee802154/adf7242.c
+index c11f32f644db..7db9cbd0f5de 100644
+--- a/drivers/net/ieee802154/adf7242.c
++++ b/drivers/net/ieee802154/adf7242.c
+@@ -882,7 +882,9 @@ static int adf7242_rx(struct adf7242_local *lp)
+ 	int ret;
+ 	u8 lqi, len_u8, *data;
+ 
+-	adf7242_read_reg(lp, 0, &len_u8);
++	ret = adf7242_read_reg(lp, 0, &len_u8);
++	if (ret)
++		return ret;
+ 
+ 	len = len_u8;
+ 
+-- 
+2.18.1
+
