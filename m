@@ -1,165 +1,70 @@
-Return-Path: <SRS0=rntn=BS=vger.kernel.org=linux-wpan-owner@kernel.org>
+Return-Path: <SRS0=s/WF=BZ=vger.kernel.org=linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=BAYES_05,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 541F0C433E3
-	for <linux-wpan@archiver.kernel.org>; Sat,  8 Aug 2020 13:54:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83EE1C433DF
+	for <linux-wpan@archiver.kernel.org>; Sat, 15 Aug 2020 22:05:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 34D6820759
-	for <linux-wpan@archiver.kernel.org>; Sat,  8 Aug 2020 13:54:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5644A20639
+	for <linux-wpan@archiver.kernel.org>; Sat, 15 Aug 2020 22:05:15 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RE2IyiDZ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726382AbgHHNyR (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Sat, 8 Aug 2020 09:54:17 -0400
-Received: from eu-smtp-delivery-151.mimecast.com ([207.82.80.151]:47942 "EHLO
-        eu-smtp-delivery-151.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726346AbgHHNyM (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Sat, 8 Aug 2020 09:54:12 -0400
-Received: from AcuMS.aculab.com (156.67.243.126 [156.67.243.126]) (Using
- TLS) by relay.mimecast.com with ESMTP id uk-mta-8-i9qSWaqDO72eG3L16A1dCQ-1;
- Sat, 08 Aug 2020 14:54:08 +0100
-X-MC-Unique: i9qSWaqDO72eG3L16A1dCQ-1
-Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) by
- AcuMS.aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) with Microsoft SMTP
- Server (TLS) id 15.0.1347.2; Sat, 8 Aug 2020 14:54:07 +0100
-Received: from AcuMS.Aculab.com ([fe80::43c:695e:880f:8750]) by
- AcuMS.aculab.com ([fe80::43c:695e:880f:8750%12]) with mapi id 15.00.1347.000;
- Sat, 8 Aug 2020 14:54:07 +0100
-From:   David Laight <David.Laight@ACULAB.COM>
-To:     'Eric Dumazet' <eric.dumazet@gmail.com>,
-        Christoph Hellwig <hch@lst.de>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        Eric Dumazet <edumazet@google.com>
-CC:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
-        "netfilter-devel@vger.kernel.org" <netfilter-devel@vger.kernel.org>,
-        "coreteam@netfilter.org" <coreteam@netfilter.org>,
-        "linux-sctp@vger.kernel.org" <linux-sctp@vger.kernel.org>,
-        "linux-hams@vger.kernel.org" <linux-hams@vger.kernel.org>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "bridge@lists.linux-foundation.org" 
-        <bridge@lists.linux-foundation.org>,
-        "linux-can@vger.kernel.org" <linux-can@vger.kernel.org>,
-        "dccp@vger.kernel.org" <dccp@vger.kernel.org>,
-        "linux-decnet-user@lists.sourceforge.net" 
-        <linux-decnet-user@lists.sourceforge.net>,
-        "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "mptcp@lists.01.org" <mptcp@lists.01.org>,
-        "lvs-devel@vger.kernel.org" <lvs-devel@vger.kernel.org>,
-        "rds-devel@oss.oracle.com" <rds-devel@oss.oracle.com>,
-        "linux-afs@lists.infradead.org" <linux-afs@lists.infradead.org>,
-        "tipc-discussion@lists.sourceforge.net" 
-        <tipc-discussion@lists.sourceforge.net>,
-        "linux-x25@vger.kernel.org" <linux-x25@vger.kernel.org>,
-        Stefan Schmidt <stefan@datenfreihafen.org>
-Subject: RE: [PATCH 25/26] net: pass a sockptr_t into ->setsockopt
-Thread-Topic: [PATCH 25/26] net: pass a sockptr_t into ->setsockopt
-Thread-Index: AQHWbD/ze4VO5Mh7NUG6O93LfP2Gq6ksXaowgACKZoCAAVFEkA==
-Date:   Sat, 8 Aug 2020 13:54:06 +0000
-Message-ID: <ed3741fdf1774cfbbd59d06ecb6994d8@AcuMS.aculab.com>
-References: <20200723060908.50081-1-hch@lst.de>
- <20200723060908.50081-26-hch@lst.de>
- <6357942b-0b6e-1901-7dce-e308c9fac347@gmail.com>
- <f21589f1262640b09ca27ed20f8e6790@AcuMS.aculab.com>
- <90f626a4-d9e5-91a5-b71d-498e3b125da1@gmail.com>
-In-Reply-To: <90f626a4-d9e5-91a5-b71d-498e3b125da1@gmail.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
+        id S1729047AbgHOWFO (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Sat, 15 Aug 2020 18:05:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45642 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728440AbgHOVux (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Sat, 15 Aug 2020 17:50:53 -0400
+Received: from mail-io1-xd2f.google.com (mail-io1-xd2f.google.com [IPv6:2607:f8b0:4864:20::d2f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E5FBC02B8F8
+        for <linux-wpan@vger.kernel.org>; Sat, 15 Aug 2020 06:41:17 -0700 (PDT)
+Received: by mail-io1-xd2f.google.com with SMTP id s189so13430985iod.2
+        for <linux-wpan@vger.kernel.org>; Sat, 15 Aug 2020 06:41:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=M7Ud70YtlDlx0enjUdiOpi2MQqRFEA1vO5iFL76crIo=;
+        b=RE2IyiDZS5mYE96fXxu37/Dh48NljslHwnTQdwNSLPZFIkEjMN8cq8V21rGVezSATU
+         l2ETQ5fQ/dGauaxpiBkH4rlcZAJyF/WiTbkN9mISUZhFe16brUXDCbEOZur1ToY9xUCZ
+         4+VmZJIYYY7yyWc5SCtoJzIYwDQPSfMx4wIiOBbnvWVyQ6AFBOJ+zY22eJhs3xaSbBez
+         FFOslE+h/Kvm3/SluaJTVM2SqK21VCZF+UVSizFMi5PJDYUYeKvmngdp7OdLdqEWAQNg
+         x/CMEpI4XCuRcBIxStTKyoHblZCXCFDcWTd83qIxY/rkoafYOyA3zxk3HL5JlDx9tGT0
+         Mo5g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=M7Ud70YtlDlx0enjUdiOpi2MQqRFEA1vO5iFL76crIo=;
+        b=f/FAXRlGAd1j6+MZNJA+vwfy2E+N8jQHLxnikgkkjzsdDo31IlhIAgQJ5rSYkTcLZ0
+         pnH8/WHLkTEZvWWXmFmxphVr0aDfnN+D3MFIpLFu0Jxjv5JpBPeacalyVA1i0wAMlE84
+         iMzx1ZNlWevSgw4JWbNqDvkJSCLwlK9pjHdurQzLcCOcwcHAERhP24J0+Wu3dhmUST3U
+         5Ihq7weL4qDKt5L0lOAOlOFfPwkH8pF9eZLsED/7RfLVS56XFE3/q2FZjbrCg/0ZkSCE
+         xfW6lAy9fuOSkryLnT9YzySDoUd40MIBvm+dnLAFbql6w/knUXehf+idrQW4TaHiHk9r
+         h3nw==
+X-Gm-Message-State: AOAM532ccTjV+HIP6rIUikNf4OPF0cmwcfLVCrQTri5CNxaDOgvtNUfg
+        1e0M5f2IGjordN7XxqqGxHrvNX1riNhPasT2eHNy2vvJofIBCg==
+X-Google-Smtp-Source: ABdhPJxqaZG4QAFTXIjFGerF+Jr6On9+UKKQflloi0m4b7QxOeDzmnSn3idbqOeObVWXBvB0yD5Xd5b22Bhxv5GLS94=
+X-Received: by 2002:a02:866d:: with SMTP id e100mr6914093jai.83.1597498874671;
+ Sat, 15 Aug 2020 06:41:14 -0700 (PDT)
 MIME-Version: 1.0
-Authentication-Results: relay.mimecast.com;
-        auth=pass smtp.auth=C51A453 smtp.mailfrom=david.laight@aculab.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
+From:   Christopher Friedt <chrisfriedt@gmail.com>
+Date:   Sat, 15 Aug 2020 09:41:03 -0400
+Message-ID: <CAF4BF-SfVVKQJ6sMTqwbX7BWivuxEeXo4hndHOmS0a08b_B3qA@mail.gmail.com>
+Subject: Linux Plumbers IoT Microconference
+To:     linux-wpan@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-wpan-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-RnJvbTogRXJpYyBEdW1hemV0DQo+IFNlbnQ6IDA3IEF1Z3VzdCAyMDIwIDE5OjI5DQo+IA0KPiBP
-biA4LzcvMjAgMjoxOCBBTSwgRGF2aWQgTGFpZ2h0IHdyb3RlOg0KPiA+IEZyb206IEVyaWMgRHVt
-YXpldA0KPiA+PiBTZW50OiAwNiBBdWd1c3QgMjAyMCAyMzoyMQ0KPiA+Pg0KPiA+PiBPbiA3LzIy
-LzIwIDExOjA5IFBNLCBDaHJpc3RvcGggSGVsbHdpZyB3cm90ZToNCj4gPj4+IFJld29yayB0aGUg
-cmVtYWluaW5nIHNldHNvY2tvcHQgY29kZSB0byBwYXNzIGEgc29ja3B0cl90IGluc3RlYWQgb2Yg
-YQ0KPiA+Pj4gcGxhaW4gdXNlciBwb2ludGVyLiAgVGhpcyByZW1vdmVzIHRoZSBsYXN0IHJlbWFp
-bmluZyBzZXRfZnMoS0VSTkVMX0RTKQ0KPiA+Pj4gb3V0c2lkZSBvZiBhcmNoaXRlY3R1cmUgc3Bl
-Y2lmaWMgY29kZS4NCj4gPj4+DQo+ID4+PiBTaWduZWQtb2ZmLWJ5OiBDaHJpc3RvcGggSGVsbHdp
-ZyA8aGNoQGxzdC5kZT4NCj4gPj4+IEFja2VkLWJ5OiBTdGVmYW4gU2NobWlkdCA8c3RlZmFuQGRh
-dGVuZnJlaWhhZmVuLm9yZz4gW2llZWU4MDIxNTRdDQo+ID4+PiAtLS0NCj4gPj4NCj4gPj4NCj4g
-Pj4gLi4uDQo+ID4+DQo+ID4+PiBkaWZmIC0tZ2l0IGEvbmV0L2lwdjYvcmF3LmMgYi9uZXQvaXB2
-Ni9yYXcuYw0KPiA+Pj4gaW5kZXggNTk0ZTAxYWQ2NzBhYTYuLjg3NGYwMWNkN2FlYzQyIDEwMDY0
-NA0KPiA+Pj4gLS0tIGEvbmV0L2lwdjYvcmF3LmMNCj4gPj4+ICsrKyBiL25ldC9pcHY2L3Jhdy5j
-DQo+ID4+PiBAQCAtOTcyLDEzICs5NzIsMTMgQEAgc3RhdGljIGludCByYXd2Nl9zZW5kbXNnKHN0
-cnVjdCBzb2NrICpzaywgc3RydWN0IG1zZ2hkciAqbXNnLCBzaXplX3QgbGVuKQ0KPiA+Pj4gIH0N
-Cj4gPj4+DQo+ID4+DQo+ID4+IC4uLg0KPiA+Pg0KPiA+Pj4gIHN0YXRpYyBpbnQgZG9fcmF3djZf
-c2V0c29ja29wdChzdHJ1Y3Qgc29jayAqc2ssIGludCBsZXZlbCwgaW50IG9wdG5hbWUsDQo+ID4+
-PiAtCQkJICAgIGNoYXIgX191c2VyICpvcHR2YWwsIHVuc2lnbmVkIGludCBvcHRsZW4pDQo+ID4+
-PiArCQkJICAgICAgIHNvY2twdHJfdCBvcHR2YWwsIHVuc2lnbmVkIGludCBvcHRsZW4pDQo+ID4+
-PiAgew0KPiA+Pj4gIAlzdHJ1Y3QgcmF3Nl9zb2NrICpycCA9IHJhdzZfc2soc2spOw0KPiA+Pj4g
-IAlpbnQgdmFsOw0KPiA+Pj4NCj4gPj4+IC0JaWYgKGdldF91c2VyKHZhbCwgKGludCBfX3VzZXIg
-KilvcHR2YWwpKQ0KPiA+Pj4gKwlpZiAoY29weV9mcm9tX3NvY2twdHIoJnZhbCwgb3B0dmFsLCBz
-aXplb2YodmFsKSkpDQo+ID4+PiAgCQlyZXR1cm4gLUVGQVVMVDsNCj4gPj4+DQo+ID4+DQo+ID4+
-IGNvbnZlcnRpbmcgZ2V0X3VzZXIoLi4uKSAgIHRvICBjb3B5X2Zyb21fc29ja3B0ciguLi4pIHJl
-YWxseSBhc3N1bWVkIHRoZSBvcHRsZW4NCj4gPj4gaGFzIGJlZW4gdmFsaWRhdGVkIHRvIGJlID49
-IHNpemVvZihpbnQpIGVhcmxpZXIuDQo+ID4+DQo+ID4+IFdoaWNoIGlzIG5vdCBhbHdheXMgdGhl
-IGNhc2UsIGZvciBleGFtcGxlIGhlcmUuDQo+ID4+DQo+ID4+IFVzZXIgYXBwbGljYXRpb24gY2Fu
-IGZvb2wgdXMgcGFzc2luZyBvcHRsZW49MCwgYW5kIGEgdXNlciBwb2ludGVyIG9mIGV4YWN0bHkg
-VEFTS19TSVpFLTENCj4gPg0KPiA+IFdvbid0IHRoZSB1c2VyIHBvaW50ZXIgZm9yY2UgY29weV9m
-cm9tX3NvY2twdHIoKSB0byBjYWxsDQo+ID4gY29weV9mcm9tX3VzZXIoKSB3aGljaCB3aWxsIHRo
-ZW4gZG8gYWNjZXNzX29rKCkgb24gdGhlIGVudGlyZQ0KPiA+IHJhbmdlIGFuZCBzbyByZXR1cm4g
-LUVGQVVMVC4NCj4gPg0KPiA+IFRoZSBvbmx5IHByb2JsZW1zIGFyaXNlIGlmIHRoZSBrZXJuZWwg
-Y29kZSBhZGRzIGFuIG9mZnNldCB0byB0aGUNCj4gPiB1c2VyIGFkZHJlc3MuDQo+ID4gQW5kIHRo
-ZSBsYXRlciBwYXRjaCBhZGRlZCBhbiBvZmZzZXQgdG8gdGhlIGNvcHkgZnVuY3Rpb25zLg0KPiAN
-Cj4gSSBkdW5ubywgSSBkZWZpbml0ZWx5IGdvdCB0aGUgZm9sbG93aW5nIHN5emJvdCBjcmFzaA0K
-PiANCj4gTm8gcmVwcm8gZm91bmQgYnkgc3l6Ym90IHlldCwgYnV0IEkgc3VzcGVjdCBhIDMyYml0
-IGJpbmFyeSBwcm9ncmFtDQo+IGRpZCA6DQo+IA0KPiBzZXRzb2Nrb3B0KGZkLCAweDI5LCAweDI0
-LCAweGZmZmZmZmZmZmZmZmZmZmYsIDB4MCkNCg0KQSBmZXcgdG9vIG1hbnkgZmZzLi4uDQoNCj4g
-QlVHOiBLQVNBTjogd2lsZC1tZW1vcnktYWNjZXNzIGluIG1lbWNweSBpbmNsdWRlL2xpbnV4L3N0
-cmluZy5oOjQwNiBbaW5saW5lXQ0KPiBCVUc6IEtBU0FOOiB3aWxkLW1lbW9yeS1hY2Nlc3MgaW4g
-Y29weV9mcm9tX3NvY2twdHJfb2Zmc2V0IGluY2x1ZGUvbGludXgvc29ja3B0ci5oOjcxIFtpbmxp
-bmVdDQo+IEJVRzogS0FTQU46IHdpbGQtbWVtb3J5LWFjY2VzcyBpbiBjb3B5X2Zyb21fc29ja3B0
-ciBpbmNsdWRlL2xpbnV4L3NvY2twdHIuaDo3NyBbaW5saW5lXQ0KPiBCVUc6IEtBU0FOOiB3aWxk
-LW1lbW9yeS1hY2Nlc3MgaW4gZG9fcmF3djZfc2V0c29ja29wdCBuZXQvaXB2Ni9yYXcuYzoxMDIz
-IFtpbmxpbmVdDQo+IEJVRzogS0FTQU46IHdpbGQtbWVtb3J5LWFjY2VzcyBpbiByYXd2Nl9zZXRz
-b2Nrb3B0KzB4MWExLzB4NmYwIG5ldC9pcHY2L3Jhdy5jOjEwODQNCj4gUmVhZCBvZiBzaXplIDQg
-YXQgYWRkciAwMDAwMDAwMGZmZmZmZmZmIGJ5IHRhc2sgc3l6LWV4ZWN1dG9yLjAvMjgyNTENCg0K
-WWVwLCB0aGUgY29kZSBpcyBuZWFybHksIGJ1dCBub3QgcXVpdGUgcmlnaHQuDQpUaGUgcHJvYmxl
-bSBpcyBhbG1vc3QgY2VydGFpbmx5IHRoYXQgYWNjZXNzX29rKHgsIDApIGFsd2F5cyByZXR1cm5z
-IHN1Y2Nlc3MuDQoNCkluIGFueSBjYXNlIHRoZSBjaGVjayBmb3IgYSB2YWxpZCB1c2VyIGFkZHJl
-c3Mgb3VnaHQgdG8gYmUgZXhhY3RseQ0KdGhlIHNhbWUgb25lIHRoYXQgbGF0ZXIgc2VsZWN0cyBi
-ZXR3ZWVuIGNvcHlfdG8vZnJvbV91c2VyKCkgYW5kIG1lbWNweSgpLg0KDQpUaGUgbGF0dGVyIGNv
-bXBhcmVzIHRoZSBhZGRyZXNzIGFnYWluc3QgJ1RBU0tfU0laRScuDQpIb3dldmVyIHRoYXQgaXNu
-J3QgdGhlIHJpZ2h0IHZhbHVlIGVpdGhlciAtIEkgdGhpbmsgaXQgcmVhZHMNCnRoZSB2YWx1ZSBm
-cm9tICdjdXJyZW50JyB0aGF0IHNldF9mcygpIHNldHMuDQpXaGF0IHRoaXMgY29kZSBuZWVkcyBp
-cyBhbnkgYWRkcmVzcyB0aGF0IGlzIGFib3ZlIHRoZSBoaWdoZXN0DQp1c2VyIGFkZHJlc3MgYW5k
-IGJlbG93IChvciBlcXVhbCB0bykgdG8gbG93ZXN0IGtlcm5lbCBvbmUuDQoNCk9uIGkzODYgKGFu
-ZCBwcm9iYWJseSBtb3N0IDMyYml0IGxpbnV4KSB0aGlzIGlzIDB4YzAwMDAwMDAuDQpPbiB4ODYt
-NjQgdGhpcyBjb3VsZCBiZSBhbnkgYWRkcmVzcyBpbiB0aGUgYWRkcmVzcyAnYmxhY2sgaG9sZScu
-DQpQaWNraW5nIDF1bGw8PDYzIG1heSBiZSBiZXN0Lg0KUXVpdGUgd2hhdCB0aGUgY29ycmVjdCAj
-ZGVmaW5lIGlzIHJlcXVpcmVzIGZ1cnRoZXIgcmVzZWFyY2guDQoNClRoZXJlIGlzIGFjdHVhbGx5
-IHNjb3BlIGZvciBtYWtpbmcgaW5pdF91c2VyX3NvY2twdHIoa2Vybl9hZGRyZXNzKQ0Kc2F2ZSBh
-IHZhbHVlIHRoYXQgd2lsbCBjYXVzZSBjb3B5X3RvL2Zyb21fc29ja3B0cigpIGdvIGludG8NCnRo
-ZSB1c2VyLWNvcHkgcGF0aCB3aXRoIGFuIGFkZHJlc3MgdGhhdCBhY2Nlc3Nfb2soKSB3aWxsIHJl
-amVjdC4NClRoZW4gdGhlIC1FRkFVTFQgd2lsbCBnZXQgZ2VuZXJhdGVkIGluIHRoZSAnZXhwZWN0
-ZWQnIHBsYWNlDQphbmQgdGhlcmUgaXMgbm8gc2NvcGUgZm9yIGZhaWxpbmcgdG8gdGVzdCBpdCdz
-IHJldHVybiB2YWx1ZS4NCg0KCURhdmlkDQoNCi0NClJlZ2lzdGVyZWQgQWRkcmVzcyBMYWtlc2lk
-ZSwgQnJhbWxleSBSb2FkLCBNb3VudCBGYXJtLCBNaWx0b24gS2V5bmVzLCBNSzEgMVBULCBVSw0K
-UmVnaXN0cmF0aW9uIE5vOiAxMzk3Mzg2IChXYWxlcykNCg==
-
+You, Me, & IoT Two is looking at abstracts until Aug 17!
+If you are doing something fun with the #Linux community involving
+#IoT, drop us an abstract.
+Speaker gifts are still available and registration is free!
+https://www.linuxplumbersconf.org/event/7/abstracts/
