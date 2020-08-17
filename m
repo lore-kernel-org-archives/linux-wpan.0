@@ -1,70 +1,130 @@
-Return-Path: <SRS0=s/WF=BZ=vger.kernel.org=linux-wpan-owner@kernel.org>
+Return-Path: <SRS0=1pl5=B3=vger.kernel.org=linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=BAYES_05,DKIM_SIGNED,
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83EE1C433DF
-	for <linux-wpan@archiver.kernel.org>; Sat, 15 Aug 2020 22:05:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 487B0C433E1
+	for <linux-wpan@archiver.kernel.org>; Mon, 17 Aug 2020 08:51:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5644A20639
-	for <linux-wpan@archiver.kernel.org>; Sat, 15 Aug 2020 22:05:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1F80D20758
+	for <linux-wpan@archiver.kernel.org>; Mon, 17 Aug 2020 08:51:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RE2IyiDZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FhPl0yES"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729047AbgHOWFO (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Sat, 15 Aug 2020 18:05:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45642 "EHLO
+        id S1727927AbgHQIvh (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 17 Aug 2020 04:51:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56770 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728440AbgHOVux (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Sat, 15 Aug 2020 17:50:53 -0400
-Received: from mail-io1-xd2f.google.com (mail-io1-xd2f.google.com [IPv6:2607:f8b0:4864:20::d2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E5FBC02B8F8
-        for <linux-wpan@vger.kernel.org>; Sat, 15 Aug 2020 06:41:17 -0700 (PDT)
-Received: by mail-io1-xd2f.google.com with SMTP id s189so13430985iod.2
-        for <linux-wpan@vger.kernel.org>; Sat, 15 Aug 2020 06:41:17 -0700 (PDT)
+        with ESMTP id S1726779AbgHQIvh (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 17 Aug 2020 04:51:37 -0400
+Received: from mail-pl1-x642.google.com (mail-pl1-x642.google.com [IPv6:2607:f8b0:4864:20::642])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1B26C061389;
+        Mon, 17 Aug 2020 01:51:36 -0700 (PDT)
+Received: by mail-pl1-x642.google.com with SMTP id y10so5603518plr.11;
+        Mon, 17 Aug 2020 01:51:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=M7Ud70YtlDlx0enjUdiOpi2MQqRFEA1vO5iFL76crIo=;
-        b=RE2IyiDZS5mYE96fXxu37/Dh48NljslHwnTQdwNSLPZFIkEjMN8cq8V21rGVezSATU
-         l2ETQ5fQ/dGauaxpiBkH4rlcZAJyF/WiTbkN9mISUZhFe16brUXDCbEOZur1ToY9xUCZ
-         4+VmZJIYYY7yyWc5SCtoJzIYwDQPSfMx4wIiOBbnvWVyQ6AFBOJ+zY22eJhs3xaSbBez
-         FFOslE+h/Kvm3/SluaJTVM2SqK21VCZF+UVSizFMi5PJDYUYeKvmngdp7OdLdqEWAQNg
-         x/CMEpI4XCuRcBIxStTKyoHblZCXCFDcWTd83qIxY/rkoafYOyA3zxk3HL5JlDx9tGT0
-         Mo5g==
+        h=from:to:cc:subject:date:message-id;
+        bh=wOFnP+mIOUunUyi6RmfOX+Q5ALinLxcvae3Yp9Ni+zM=;
+        b=FhPl0yESGUE8TFhEMqa043m95wRC5RdMMRPdR5UgsrxCgGMSnZzudvjAwnJEl2hIJ1
+         oGndCZEaXVgoEMpGLQWbDq4g3kJ7z95+EP4HzK121db5e9kS55CzPp0XdHralL2dfHQh
+         dgpDPajBcs1sN12jaJpV3bPULcS4nizJvfIo9rn/3fx7vilSqLpMAKagKZrY7/vxomUR
+         /JvCYcmXLl2q9Y472Ww1UkCTwD/85BnJRzs3v8oBCg2Xd0tNW8YFSoJqcc2ADB76cSwb
+         2ZTQh2o3tq+8V+wdji6oB02Wot5qgPQpO+XpR/ggCT5pnQeKTXhPd1Wd60Oid5sZ9psL
+         3KfA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=M7Ud70YtlDlx0enjUdiOpi2MQqRFEA1vO5iFL76crIo=;
-        b=f/FAXRlGAd1j6+MZNJA+vwfy2E+N8jQHLxnikgkkjzsdDo31IlhIAgQJ5rSYkTcLZ0
-         pnH8/WHLkTEZvWWXmFmxphVr0aDfnN+D3MFIpLFu0Jxjv5JpBPeacalyVA1i0wAMlE84
-         iMzx1ZNlWevSgw4JWbNqDvkJSCLwlK9pjHdurQzLcCOcwcHAERhP24J0+Wu3dhmUST3U
-         5Ihq7weL4qDKt5L0lOAOlOFfPwkH8pF9eZLsED/7RfLVS56XFE3/q2FZjbrCg/0ZkSCE
-         xfW6lAy9fuOSkryLnT9YzySDoUd40MIBvm+dnLAFbql6w/knUXehf+idrQW4TaHiHk9r
-         h3nw==
-X-Gm-Message-State: AOAM532ccTjV+HIP6rIUikNf4OPF0cmwcfLVCrQTri5CNxaDOgvtNUfg
-        1e0M5f2IGjordN7XxqqGxHrvNX1riNhPasT2eHNy2vvJofIBCg==
-X-Google-Smtp-Source: ABdhPJxqaZG4QAFTXIjFGerF+Jr6On9+UKKQflloi0m4b7QxOeDzmnSn3idbqOeObVWXBvB0yD5Xd5b22Bhxv5GLS94=
-X-Received: by 2002:a02:866d:: with SMTP id e100mr6914093jai.83.1597498874671;
- Sat, 15 Aug 2020 06:41:14 -0700 (PDT)
-MIME-Version: 1.0
-From:   Christopher Friedt <chrisfriedt@gmail.com>
-Date:   Sat, 15 Aug 2020 09:41:03 -0400
-Message-ID: <CAF4BF-SfVVKQJ6sMTqwbX7BWivuxEeXo4hndHOmS0a08b_B3qA@mail.gmail.com>
-Subject: Linux Plumbers IoT Microconference
-To:     linux-wpan@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=wOFnP+mIOUunUyi6RmfOX+Q5ALinLxcvae3Yp9Ni+zM=;
+        b=CcRbs4NcmDfom0OZH1z12y9Az0knzvKtAXBvdPAlAmhVy7MLX3gYqZFk92cfchySs8
+         V1z/WJBpc/YBY/arZRTIRxuK8lKRNW4Btjt7XIhSADpdFbC6hxsXtrf9SYDSeFAiWzlF
+         Y9pRxjfnPtPvMwTxcAo6oqSDNNuRlKXJvCcbVZ78vFZ3KSe4oPOcXBTFmYqh5pGi9fKM
+         h8Znui2VSWjxfqgwstPJxzsv6YijPaZ35IjtUBmTjfwWqs3gCUzuFrlNMb6hN8z4fY6B
+         W614ZG4c77J5MoAE7WXMmMijEGlLa1cahLdasAbdEH+TYh1oO1WfCsoVLBwIrwoaODld
+         1UVQ==
+X-Gm-Message-State: AOAM533EhBRQei4eartpp5/gbi7csWF8Jrsd7ZPw7ll6si5wUR2dk39R
+        Jd+HVHI6Dc4RFfvMqucguvo=
+X-Google-Smtp-Source: ABdhPJwkHrfrADxoARIyFesLt8svDhCVc8Neq3PWKmf9xTMPVNTGXJJNDk1NroIFsEd4Jvyoxz8amQ==
+X-Received: by 2002:a17:90b:1493:: with SMTP id js19mr10627721pjb.223.1597654296487;
+        Mon, 17 Aug 2020 01:51:36 -0700 (PDT)
+Received: from localhost.localdomain ([49.207.202.98])
+        by smtp.gmail.com with ESMTPSA id b185sm18554863pfg.71.2020.08.17.01.51.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 17 Aug 2020 01:51:35 -0700 (PDT)
+From:   Allen Pais <allen.cryptic@gmail.com>
+To:     gerrit@erg.abdn.ac.uk, davem@davemloft.net, kuba@kernel.org,
+        edumazet@google.com, kuznet@ms2.inr.ac.ru, yoshfuji@linux-ipv6.org,
+        johannes@sipsolutions.net, alex.aring@gmail.com,
+        stefan@datenfreihafen.org, santosh.shilimkar@oracle.com,
+        jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us
+Cc:     keescook@chromium.org, netdev@vger.kernel.org,
+        linux-wireless@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-wpan@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linux-s390@vger.kernel.org, Allen Pais <allen.lkml@gmail.com>,
+        Romain Perier <romain.perier@gmail.com>
+Subject: [PATCH 1/8] net: dccp: convert tasklets to use new tasklet_setup() API
+Date:   Mon, 17 Aug 2020 14:21:13 +0530
+Message-Id: <20200817085120.24894-1-allen.cryptic@gmail.com>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-wpan-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-You, Me, & IoT Two is looking at abstracts until Aug 17!
-If you are doing something fun with the #Linux community involving
-#IoT, drop us an abstract.
-Speaker gifts are still available and registration is free!
-https://www.linuxplumbersconf.org/event/7/abstracts/
+From: Allen Pais <allen.lkml@gmail.com>
+
+In preparation for unconditionally passing the
+struct tasklet_struct pointer to all tasklet
+callbacks, switch to using the new tasklet_setup()
+and from_tasklet() to pass the tasklet pointer explicitly.
+
+Signed-off-by: Romain Perier <romain.perier@gmail.com>
+Signed-off-by: Allen Pais <allen.lkml@gmail.com>
+---
+ net/dccp/timer.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/net/dccp/timer.c b/net/dccp/timer.c
+index 0e06dfc32273..f174ecb2fb4e 100644
+--- a/net/dccp/timer.c
++++ b/net/dccp/timer.c
+@@ -220,9 +220,10 @@ static void dccp_delack_timer(struct timer_list *t)
+  *
+  * See the comments above %ccid_dequeueing_decision for supported modes.
+  */
+-static void dccp_write_xmitlet(unsigned long data)
++static void dccp_write_xmitlet(struct tasklet_struct *t)
+ {
+-	struct sock *sk = (struct sock *)data;
++	struct dccp_sock *dp = from_tasklet(dp, t, dccps_xmitlet);
++	struct sock *sk = &dp->dccps_inet_connection.icsk_inet.sk;
+ 
+ 	bh_lock_sock(sk);
+ 	if (sock_owned_by_user(sk))
+@@ -236,16 +237,15 @@ static void dccp_write_xmitlet(unsigned long data)
+ static void dccp_write_xmit_timer(struct timer_list *t)
+ {
+ 	struct dccp_sock *dp = from_timer(dp, t, dccps_xmit_timer);
+-	struct sock *sk = &dp->dccps_inet_connection.icsk_inet.sk;
+ 
+-	dccp_write_xmitlet((unsigned long)sk);
++	dccp_write_xmitlet(&dp->dccps_xmitlet);
+ }
+ 
+ void dccp_init_xmit_timers(struct sock *sk)
+ {
+ 	struct dccp_sock *dp = dccp_sk(sk);
+ 
+-	tasklet_init(&dp->dccps_xmitlet, dccp_write_xmitlet, (unsigned long)sk);
++	tasklet_setup(&dp->dccps_xmitlet, dccp_write_xmitlet);
+ 	timer_setup(&dp->dccps_xmit_timer, dccp_write_xmit_timer, 0);
+ 	inet_csk_init_xmit_timers(sk, &dccp_write_timer, &dccp_delack_timer,
+ 				  &dccp_keepalive_timer);
+-- 
+2.17.1
+
