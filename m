@@ -1,108 +1,92 @@
-Return-Path: <SRS0=1pl5=B3=vger.kernel.org=linux-wpan-owner@kernel.org>
+Return-Path: <SRS0=KPv3=CF=vger.kernel.org=linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0439C433E1
-	for <linux-wpan@archiver.kernel.org>; Mon, 17 Aug 2020 12:20:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3FC6C433E1
+	for <linux-wpan@archiver.kernel.org>; Thu, 27 Aug 2020 17:00:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AB34F20578
-	for <linux-wpan@archiver.kernel.org>; Mon, 17 Aug 2020 12:20:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C4BE920791
+	for <linux-wpan@archiver.kernel.org>; Thu, 27 Aug 2020 17:00:04 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="trXHqllC"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726194AbgHQMTr (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 17 Aug 2020 08:19:47 -0400
-Received: from proxima.lasnet.de ([78.47.171.185]:43126 "EHLO
-        proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726151AbgHQMTq (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 17 Aug 2020 08:19:46 -0400
-Received: from localhost.localdomain (p200300e9d747fd86eda1c6650823d2bd.dip0.t-ipconnect.de [IPv6:2003:e9:d747:fd86:eda1:c665:823:d2bd])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: stefan@datenfreihafen.org)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id 49FCBC25F9;
-        Mon, 17 Aug 2020 14:19:40 +0200 (CEST)
-Subject: Re: [PATCH 4/8] net: mac802154: convert tasklets to use new
- tasklet_setup() API
-To:     Allen Pais <allen.cryptic@gmail.com>, gerrit@erg.abdn.ac.uk,
-        davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
-        kuznet@ms2.inr.ac.ru, yoshfuji@linux-ipv6.org,
-        johannes@sipsolutions.net, alex.aring@gmail.com,
-        santosh.shilimkar@oracle.com, jhs@mojatatu.com,
-        xiyou.wangcong@gmail.com, jiri@resnulli.us
-Cc:     keescook@chromium.org, netdev@vger.kernel.org,
-        linux-wireless@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-wpan@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linux-s390@vger.kernel.org, Allen Pais <allen.lkml@gmail.com>,
-        Romain Perier <romain.perier@gmail.com>
-References: <20200817085120.24894-1-allen.cryptic@gmail.com>
- <20200817085120.24894-4-allen.cryptic@gmail.com>
-From:   Stefan Schmidt <stefan@datenfreihafen.org>
-Message-ID: <5309b90a-1caa-ec22-ddb9-49eca3581957@datenfreihafen.org>
-Date:   Mon, 17 Aug 2020 14:19:39 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+        id S1726157AbgH0RAE (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Thu, 27 Aug 2020 13:00:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53530 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726009AbgH0RAD (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 27 Aug 2020 13:00:03 -0400
+Received: from mail-il1-x12e.google.com (mail-il1-x12e.google.com [IPv6:2607:f8b0:4864:20::12e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A751DC061264
+        for <linux-wpan@vger.kernel.org>; Thu, 27 Aug 2020 10:00:03 -0700 (PDT)
+Received: by mail-il1-x12e.google.com with SMTP id o16so1511230ilq.0
+        for <linux-wpan@vger.kernel.org>; Thu, 27 Aug 2020 10:00:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=6mq2FEi+WqwW7ZVXUBQUyw7vCnNJsuOO4NMyDxtKng8=;
+        b=trXHqllCLMpceQkqJFwaIf3M/aHMzS+10nKhTc59s4aC6eNCPC0yXPWeRId7K/DEu0
+         hAa5c4MZK6ob5l7QBCiSIIAjEynsmEDVHjEcvBAfEXgllT9oEVtHVKDA4aPNuBNlwuFh
+         UCE3KsCeqA4ubb3t/6pmDVIT4yUUR7ld2o2a4YerbrWfToBdP2JAHJpxVNrjW/EvESIz
+         v3edx+j6P2VkGxw2uS96r82U9gFVLMlB/gjQ/Vg4t1xPoSFwgNZQfq4kc+1UARVCaiTx
+         MUxXrIbZRsjofp/KVCKa8+nIUDUWTI1pLM9H/iztB5pKgy9fapaoC5Uwp/ACS9gvDCPP
+         R1Mg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=6mq2FEi+WqwW7ZVXUBQUyw7vCnNJsuOO4NMyDxtKng8=;
+        b=NpNgjuBz7mT6ylLzz/LwMiPlmUd0QnX88YVJRKMGLweMSSlzZdIhR04D59kznlGPi2
+         ehJLOnHKzRxWuh2wyvGJcorMUhR1nBNEyMUTyudTndueM7L7j4kBByGW7O3vmG9H9ytV
+         peyZ8IOnCVJ4z2xyHGT+Rh6AOcT6UfAQp28IArbh3FgPwC3OQFXzgoloc5wdYzU2EPX8
+         6/a3OhGNpKQhDPI1ql5iVyhUJyFfRnRY1DIyHOZCfJL5YQO9L/F1pNGan7Br/xo6HnA3
+         NrrdcyIwWRfeflzoRygmj0d+JoxjiI+5l2jxWR92mWQi6vQzcQ7O1Rr0WRBtUZeQ3B5i
+         OuTQ==
+X-Gm-Message-State: AOAM531aL0OqADlTPauFTHh7NwZcqUoj5A93gHEPqPj9uKnOCoEFgueG
+        wX77CtBcuJTLow3WLGHQtHHbrRhQ3xPwhGf5TNC7H2FaEW2Sew==
+X-Google-Smtp-Source: ABdhPJz5xK8ryrrInXk5d2ui1MPw8ss/VA9xdZWv4b6JSGBdWYdBy8rFiDBS4Ca884GyWaseCiRfvCyEfkXzjrby9Yw=
+X-Received: by 2002:a05:6e02:d52:: with SMTP id h18mr1437472ilj.215.1598547602141;
+ Thu, 27 Aug 2020 10:00:02 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200817085120.24894-4-allen.cryptic@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+From:   Christopher Friedt <chrisfriedt@gmail.com>
+Date:   Thu, 27 Aug 2020 12:59:51 -0400
+Message-ID: <CAF4BF-TVe09FUdWZLw9dQf1=d0q-2w=Ey7LXx61rHBOtvczmBw@mail.gmail.com>
+Subject: MAC Layer Beacon / Scan Code
+To:     linux-wpan@vger.kernel.org
+Cc:     Stefan Schmidt <stefan@datenfreihafen.org>,
+        Michael Magyar <michael.magyarm@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-wpan-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello.
+Hi everyone,
 
-On 17.08.20 10:51, Allen Pais wrote:
-> From: Allen Pais <allen.lkml@gmail.com>
-> 
-> In preparation for unconditionally passing the
-> struct tasklet_struct pointer to all tasklet
-> callbacks, switch to using the new tasklet_setup()
-> and from_tasklet() to pass the tasklet pointer explicitly.
-> 
-> Signed-off-by: Romain Perier <romain.perier@gmail.com>
-> Signed-off-by: Allen Pais <allen.lkml@gmail.com>
-> ---
->   net/mac802154/main.c | 8 +++-----
->   1 file changed, 3 insertions(+), 5 deletions(-)
-> 
-> diff --git a/net/mac802154/main.c b/net/mac802154/main.c
-> index 06ea0f8bfd5c..520cedc594e1 100644
-> --- a/net/mac802154/main.c
-> +++ b/net/mac802154/main.c
-> @@ -20,9 +20,9 @@
->   #include "ieee802154_i.h"
->   #include "cfg.h"
->   
-> -static void ieee802154_tasklet_handler(unsigned long data)
-> +static void ieee802154_tasklet_handler(struct tasklet_struct *t)
->   {
-> -	struct ieee802154_local *local = (struct ieee802154_local *)data;
-> +	struct ieee802154_local *local = from_tasklet(local, t, tasklet);
->   	struct sk_buff *skb;
->   
->   	while ((skb = skb_dequeue(&local->skb_queue))) {
-> @@ -91,9 +91,7 @@ ieee802154_alloc_hw(size_t priv_data_len, const struct ieee802154_ops *ops)
->   	INIT_LIST_HEAD(&local->interfaces);
->   	mutex_init(&local->iflist_mtx);
->   
-> -	tasklet_init(&local->tasklet,
-> -		     ieee802154_tasklet_handler,
-> -		     (unsigned long)local);
-> +	tasklet_setup(&local->tasklet, ieee802154_tasklet_handler);
->   
->   	skb_queue_head_init(&local->skb_queue);
->   
-> 
+I thought it was lost after I moved on to a different employer, but my
+former colleague Michael Magyar managed to dig up some work that we
+had done back in 2015.
 
+I unfortunately do not know if my branch still exists, but it looks
+like his copy of it is still intact.
 
-Acked-by: Stefan Schmidt <stefan@datenfreihafen.org>
+https://github.com/magyarm/bluetooth-next/tree/feature/nl802154-get-active-scan-req
+https://github.com/magyarm/bluetooth-next/tree/feature/nl802154-beacon
 
-regards
-Stefan Schmidt
+We had some additional changes for wpan-tools. Hopefully we can find
+those as well.
+
+These changes should allow us to create something along the lines of
+Network Manager for IEEE 802.15.4 or even to do some automated channel
+joining, etc.
+
+Let's keep this thread open and try to rebase patches & get some
+patches posted for review soon.
+
+Cheers,
+
+C
