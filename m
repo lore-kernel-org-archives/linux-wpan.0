@@ -1,73 +1,107 @@
-Return-Path: <SRS0=c9gK=CG=vger.kernel.org=linux-wpan-owner@kernel.org>
+Return-Path: <SRS0=Rh/c=CR=vger.kernel.org=linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94F4AC433E7
-	for <linux-wpan@archiver.kernel.org>; Fri, 28 Aug 2020 15:05:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63D4BC43461
+	for <linux-wpan@archiver.kernel.org>; Tue,  8 Sep 2020 05:55:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7148E2075B
-	for <linux-wpan@archiver.kernel.org>; Fri, 28 Aug 2020 15:05:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 25CC62076C
+	for <linux-wpan@archiver.kernel.org>; Tue,  8 Sep 2020 05:55:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=ni.fr.eu.org header.i=@ni.fr.eu.org header.b="ebn4Tb4b"
+	dkim=pass (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="EBbjiswI"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726571AbgH1PFI (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Fri, 28 Aug 2020 11:05:08 -0400
-Received: from riva4.ni.fr.eu.org ([91.121.114.4]:54694 "EHLO
-        riva4.ni.fr.eu.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726197AbgH1PFI (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Fri, 28 Aug 2020 11:05:08 -0400
-Received: by riva4.ni.fr.eu.org (Postfix, from userid 1000)
-        id 796E1E2348; Fri, 28 Aug 2020 17:05:05 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ni.fr.eu.org;
-        s=riva4-20190323; t=1598627105;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=o98RozwxFqbnDHZpXWanLiAG1LiXEgdiRCrb4zUB4YQ=;
-        b=ebn4Tb4bQ+zOPO1pDPB9ytgkeHtQQz9G8Ht//zmGBgSIX56OMPwGlPFWfJDI0WBHWmfIeC
-        NG8j5MgwHLwOk7v+yQ/BAgrlR9NHV2kwsfjPdL9y4Fnk+2YfS/v/Gf2udtgcsfneuIRotX
-        gfOc3uKa0zxykDjg99NpSq9QDO3UeLQ=
-Date:   Fri, 28 Aug 2020 17:05:05 +0200
-From:   Nicolas Schodet <nico@ni.fr.eu.org>
-To:     Michael Magyar <michael.magyarm@gmail.com>
-Cc:     Christopher Friedt <chrisfriedt@gmail.com>,
-        linux-wpan@vger.kernel.org,
-        Stefan Schmidt <stefan@datenfreihafen.org>
-Subject: Re: MAC Layer Beacon / Scan Code
-Message-ID: <20200828150505.GJ5022@ni.fr.eu.org>
-References: <CAF4BF-TVe09FUdWZLw9dQf1=d0q-2w=Ey7LXx61rHBOtvczmBw@mail.gmail.com>
- <20200828142616.GI5022@ni.fr.eu.org>
- <CAF4BF-SikcubXWuQXEm_cieN08d+8_ZKjvNhtGwOmwMC7OSZDw@mail.gmail.com>
- <CANrQGhud-8RL_im99VpuR6ctVTvs32AXSAcMSz+Wyu2ay3Qp1Q@mail.gmail.com>
+        id S1728726AbgIHFzj (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 8 Sep 2020 01:55:39 -0400
+Received: from mout.gmx.net ([212.227.17.20]:54739 "EHLO mout.gmx.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728531AbgIHFzg (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+        Tue, 8 Sep 2020 01:55:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
+        s=badeba3b8450; t=1599544534;
+        bh=J3uUIqatYYMuHkR9Fpyx/qeJI0OjWjLUARlM4Jgt2mg=;
+        h=X-UI-Sender-Class:To:From:Subject:Date;
+        b=EBbjiswIsiq9IS42bpK0HuczQ4JRXs53nU3dio+Z5KzaNq6KItMPbMQitBcYvxLVS
+         i6JnDXJaf3fElGUFAgkzgQOEbPPxtbiL61fi9/2KqIBfGdKYFRC2QupJ8Rx9jzALIq
+         Z11ZAm5RoC/a4Bh/AlflE1X3CnUpoeXBNWWHhXkM=
+X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
+Received: from [192.168.178.45] ([178.10.251.51]) by mail.gmx.com (mrgmx104
+ [212.227.17.168]) with ESMTPSA (Nemesis) id 1N7i8Y-1kbCM80FVq-014jfh for
+ <linux-wpan@vger.kernel.org>; Tue, 08 Sep 2020 07:55:34 +0200
+To:     linux-wpan@vger.kernel.org
+From:   Achim Kraus <achimkraus@gmx.net>
+Subject: 6lowpan Support for Raspberry PI 3B+ - CYW43455
+Message-ID: <f1acad10-2fb3-a402-df58-907c2580c5ab@gmx.net>
+Date:   Tue, 8 Sep 2020 07:55:33 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CANrQGhud-8RL_im99VpuR6ctVTvs32AXSAcMSz+Wyu2ay3Qp1Q@mail.gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: de-AT-frami
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:+4ku38BoxFcMbAKhMmCltFV6XnLSfJgD5skNKW8rK0T62CYOooi
+ Y6s/FMUyDOfNS40GmhPR5a+TweEwXsiaeaPrWR8lzOo5KNVZvyPJEPHduAUcCjKQPCMVFP3
+ r8JKoRov+dMX9nsMGi0zG1dGPVFtbTCYP9/sVypmt2jFgwfi8F2v2YGAY3QQEUUKzZe/fAw
+ eT6tRNan8u8awX+4DU0Bw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:xZYnFF14o6U=:XJq08J2VusQKPwW/nU337d
+ 7uxBBNSjlnxYgaFwoxDl42P0OfUcu/k15ab9gNVLiPmIoPsIYXM4Nf3qbeiKL6V8YbdtPj3p4
+ 3hhhsJkZYdi+n/Uoi0ZLhzmW1mnKHivUhbLEP14Zm5mLexeiszsYXL7gHqwcgd+LqKGW+icPc
+ x1X25kLJe1N9AGVhGreKKp/PqQLtn0lYSoaS/TRTLx6dmtr/xZziRjtaqU1G5q0/NM4oZwkfl
+ y9XJ6zifEsL56F5q2n3s/as84viDptDX9OMv1poEoLKWVbWxJXq41W9g7M7iHatAcr59XRrhG
+ Bv15ma/IibGlEasrzzPFVvQgDJhAGosOxy98aQbBx43j1tDo1RkAukO6rUWH72TjCVFAF4DgJ
+ sAVeaSYYdbkIjgXhezcGqzUKn5uuUW8HoHf8d95YMfAtKbqcC0HEik0tUgHGqQntgGdYyjJKr
+ fZ9OHzN+L8cTDiAtddvpe4dc7B5Ukf0h5Ej15sacSzABRduDT9QJQY77dYqhMw4RFRclJebba
+ EVzdc9eG45cR8JTuZNv24Xzn6hnuUclqgdgKkQdYELQMKvU6ZyE7KjYLkQJ/S/PdXRguicwUE
+ EGuctvaV+pvJCvTHz3yaCvytxWOF2a2yEQyJGF1g9gKwb2msJAsO1C5649suCCLMjoxKjuVFd
+ rbcSNPNfbUiLMxK13VMnc0FJujqOUJvjRLP14chJE/Rmha6E5h4Q3w2ttJ1rVD6yICkR/M0L0
+ CiiGM0lzXpOh/t97ppDiJyCKyYf7ar3wGGPZmS8ZJH//Iavirih25BqtlwBmrews+MXfMa0bM
+ n7SN3odVYM0a7Wuh//jH6nK+zJkOz6hc2XGbuCa9XQCxfon7JQfHqp3G3b2RSNJZ8OJso0PyU
+ Up7WB19MahNM8NA8kqerRbIt1Q+5hY6lQ7VVc6Z3QdmS23/ipKqxCQJTmNrQdUWcVc5xlXE2q
+ R2oyRdex5td3uyUWlxOrGKyQ/O7tHjWFsUolP5peIO2QtnuwsSdbAM11tjR11VJf7mtvnT6Iz
+ G0BNOaJxSKNVZv1LNZTch97o6PXYMnUf0WzjyLUp8JSMDJ5+PpXLS9HGGCxofsRxmu30i8v/v
+ Syw8heuxmkQTxc81m0F2RsDKrhTb/mjEs1shW9dmtQDiclrTu+DZMsTCNIReiCqRZspu5Kkuc
+ DcyAjLkefJ20OysdYUTe/UZTLQUo3T4ZastOOj4R5RYKgl3Oh+KBZp+oOAhlb0T9hubn+ACqO
+ wdteQpHaZE/1aAYa7XD5dVxHSoRYBGb/yU0KSJA==
 Sender: linux-wpan-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi,
+Dear list,
 
-* Michael Magyar <michael.magyarm@gmail.com> [2020-08-28 11:01]:
-> Hello,
-> I have found the related wpan-tools branches:
-> https://github.com/magyarm/wpan-tools/tree/feature/add-active-scan-request
-> https://github.com/magyarm/wpan-tools/tree/feature/add-beacon-notification-command
-> https://github.com/magyarm/wpan-tools/tree/feature/association-req
-> I'll take a look and refresh my memory on where the code bases were left. I
-> think a couple of weeks to clean up the Kernel and wpan-tools branches is
-> doable. From there, I hope it'll be useful. If not, I'd be happy to try to
-> help where I can.
+spending some time in evaluating the current state of the 6lowpan
+support for Raspberry PIs in order to use it together with
+Eclipse/Californium CoAP/DTLS (I'm a committer in that project),
+I found a lot using an external modules.
+But I'm wondering, if there is any native support for a Raspberry PI 3B+
+with a  CYW43455.
 
-Thanks! We will also need a week or two to rebase, cleanup and cope with
-the other parallel urgent tasks :)
+According articles as:
 
-Nicolas.
+https://www.linux-magazine.com/Issues/2018/212/Raspberry-Pi-3-B/(offset)/3=
+/(tagID)/383
+
+"Bluetooth 4.2 takes this to a whole new level: The IPSP-supported
+6LoWPAN (Internet Protocol Support Profile/IPv6 over low-power wireless
+personal area networks) takes IPv6 to small, low-performance devices for
+integration into the Internet of Things."
+
+it seems to be possible for the hardware, but I could not find hints,
+that it is working with the software. According
+
+https://linux-wpan.org/hardware
+
+it's not listed, but the nrf52840 is also not listed (but working with
+the openthread setup from nordic).
+
+So:
+Does someone have tried to use a Raspberry PI 3B+ native CYW43455 for
+6lowpan?
+
+best regards
+Achim Kraus
+
