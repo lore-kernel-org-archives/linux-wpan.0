@@ -1,151 +1,111 @@
-Return-Path: <SRS0=wjm+=CY=vger.kernel.org=linux-wpan-owner@kernel.org>
+Return-Path: <SRS0=EzT3=CZ=vger.kernel.org=linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51FB0C433E2
-	for <linux-wpan@archiver.kernel.org>; Tue, 15 Sep 2020 22:08:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0605C43461
+	for <linux-wpan@archiver.kernel.org>; Wed, 16 Sep 2020 05:38:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0B6E720809
-	for <linux-wpan@archiver.kernel.org>; Tue, 15 Sep 2020 22:08:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6B26D206B6
+	for <linux-wpan@archiver.kernel.org>; Wed, 16 Sep 2020 05:38:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B5CCe/cs"
+	dkim=pass (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="TglAqnsy"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727443AbgIOWIF (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 15 Sep 2020 18:08:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49618 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728122AbgIOWHV (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 15 Sep 2020 18:07:21 -0400
-Received: from mail-oi1-x233.google.com (mail-oi1-x233.google.com [IPv6:2607:f8b0:4864:20::233])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCB70C061788
-        for <linux-wpan@vger.kernel.org>; Tue, 15 Sep 2020 15:07:20 -0700 (PDT)
-Received: by mail-oi1-x233.google.com with SMTP id x69so5689597oia.8
-        for <linux-wpan@vger.kernel.org>; Tue, 15 Sep 2020 15:07:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=6gaA2gF0K2Qy2FxnQy1g4sbMF8jQE2gDwQ1iWtX+Xu0=;
-        b=B5CCe/cspAQAQW68h3MhR0DDVUbD0t0zk4ieGN0mDm3seEsFTxv/0LyPiH/lSRV9qD
-         7ghzgPUUAdnMIjLLIYVGRZgglI1l3ML3NKoHJ/tjbJxHgc9Y1uCPyW8bSTK8X5sYEMt5
-         QyriVdbeg13O4rcjGS/6OV+TR/+Pcr55BcJpWSMHTH2IrPLUsoslPfDtvWFn2sqwy45h
-         KxaN79sSgInG3KfYAXbwpph8XqC17ncCqA6AjI3hIxDLrPGaulq9FzX3MfaQ+tJyBseD
-         R80tGlPpjFYQdclsB1bD+Fir4HLAeJ512bHYg5qGjQGMn67TbxruEMCTJt2BYwDZr9/z
-         UUPg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=6gaA2gF0K2Qy2FxnQy1g4sbMF8jQE2gDwQ1iWtX+Xu0=;
-        b=XX2p1JAqMC4VQVbpBVxol+chPbkvTrVxwhp+AXuOR9ouW2zgE1wpv2nId/vWQ2fqYR
-         Q4c4rvzihlNj/O0pJhSlzmJqkhczz4RWDZNuMxGukWA7xrlDyHvPgjU1EPjQs1g7TR7B
-         trbVndCgWyrbtlNhTgP7ZAd5YllIQjiMIWtTw8W4xIUoKT3nlAbPHCe66myIa53nbXbZ
-         5shYqO3EJsqbnh5mT/uR6ZYZHGzEkHYeVWJ1VtLosLYb9DeWneM38k0L4LBiL5A95qsb
-         XNGhde0wLdUDYD6c35gAZFMsotZK9UjHdSDM6j5CECOGyA2pkjyw/YXDyaTkxqDfkv8c
-         allg==
-X-Gm-Message-State: AOAM531RfvTkaGW55WcL5GfD20Byp8508tixULSqJdo/4BiNaKsVG1n3
-        +lHO+gLQgft0Z7TLqTM73IE9mYgjK0y6hrYRgm4=
-X-Google-Smtp-Source: ABdhPJyMLKw2G9p4BQXE3G86Mszkc/Hm1wwZ5rcJog0rOypBT9GFEuxGn3+k4WS7HkWvX01w2Hs+L60QL1B0dyMfP5o=
-X-Received: by 2002:aca:4894:: with SMTP id v142mr1073684oia.157.1600207640237;
- Tue, 15 Sep 2020 15:07:20 -0700 (PDT)
-MIME-Version: 1.0
-References: <f1acad10-2fb3-a402-df58-907c2580c5ab@gmx.net> <21010.1600201310@localhost>
-In-Reply-To: <21010.1600201310@localhost>
-From:   Alexander Aring <alex.aring@gmail.com>
-Date:   Tue, 15 Sep 2020 18:07:08 -0400
-Message-ID: <CAB_54W6S3+kf1Uowt9Y+nJVNOG4SS8GFwdd7F+6WJ8=W4Pbahg@mail.gmail.com>
+        id S1726100AbgIPFiv (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 16 Sep 2020 01:38:51 -0400
+Received: from mout.gmx.net ([212.227.17.21]:35405 "EHLO mout.gmx.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726068AbgIPFis (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+        Wed, 16 Sep 2020 01:38:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
+        s=badeba3b8450; t=1600234713;
+        bh=vpaJiw52rKw9t3qneU6SdCpCgBD3ifLRk8prHghAJsM=;
+        h=X-UI-Sender-Class:Subject:To:Cc:References:From:Date:In-Reply-To;
+        b=TglAqnsyUNTVFm7PKDXir/fCpHZtjYYc2uRzvsRe5X6iwAJ12wRYfn9p0sOrjdVQe
+         xjUZ0KYT7GoEhiD82/nVMhyztGrmvvRAFhQRv6G+8ooWb3MzvTLpsrEINyyOzyPOBZ
+         s3QJoxhJbwZh8t0tZEiLTAl/+iDVL+idIq7Qr1xA=
+X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
+Received: from [192.168.178.45] ([178.10.252.75]) by mail.gmx.com (mrgmx104
+ [212.227.17.168]) with ESMTPSA (Nemesis) id 1M3lcJ-1kIhOk0yjj-000pt0; Wed, 16
+ Sep 2020 07:38:33 +0200
 Subject: Re: 6lowpan Support for Raspberry PI 3B+ - CYW43455
-To:     Michael Richardson <mcr@sandelman.ca>
-Cc:     Achim Kraus <achimkraus@gmx.net>,
-        linux-wpan - ML <linux-wpan@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+To:     Alexander Aring <alex.aring@gmail.com>,
+        Michael Richardson <mcr@sandelman.ca>
+Cc:     linux-wpan - ML <linux-wpan@vger.kernel.org>
+References: <f1acad10-2fb3-a402-df58-907c2580c5ab@gmx.net>
+ <21010.1600201310@localhost>
+ <CAB_54W6S3+kf1Uowt9Y+nJVNOG4SS8GFwdd7F+6WJ8=W4Pbahg@mail.gmail.com>
+From:   Achim Kraus <achimkraus@gmx.net>
+Message-ID: <a9280f74-54f0-917f-22a7-8907afd33c95@gmx.net>
+Date:   Wed, 16 Sep 2020 07:38:32 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+MIME-Version: 1.0
+In-Reply-To: <CAB_54W6S3+kf1Uowt9Y+nJVNOG4SS8GFwdd7F+6WJ8=W4Pbahg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:QPm+hvKTlKu672kpPrFNsxMZulfjXC6qfnbfChnMqeJD5nHd2k9
+ wyZUJEKCNbURXh5xu2w2JiWIilBeyC1dAIKKsRj7ocxtKXfdVotqv1vkAXNv/FeTnBv4eQJ
+ VJaUnwkQ71wstDgs6NS1iqV20HG9mz6hVk8xuMriKFW9mpyaciwjw90ybkrARqeP/YRBbme
+ e3Io1g3O1eFaG0KnaZiag==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:xMeUWPg1fAk=:6h5FZrL8Q/7jyCLkAGZCGb
+ n4A9rSowLcYYeHn8k0flug1AdWu/QxYtkoR1khUrkpAHB/cdgV5uXdktIX/ZKB3pTKmiRqAPA
+ lctYSw5caAg7vwU2eAhqWe40seTimnkeFbiQTsXxWA9zzxX91vZU8IGouPKIy5Ogp7mTU3FgW
+ TFq+b6Lt8onoRWwtQzi0Z+lfx5VB2NalfAB2SDssHfX9IfXbl8v7/e4lXmrKgpXYDewXp6otw
+ QHKBTXoHYUYZALd9YZVrpuR0BVJusnAsOJDIF/1nMb+/3TOvTrJo+NPtQFXZuqYWwnxCRD4Gw
+ hGccwTOCUdB3WqP3PRscH7BoIuyZCLaTdW0Rgk0Z1eoBlDBKHWPnR4NDRrRtW7YxhLetx4etj
+ Vv4MNQKU+Jc/OycXa36V7SBJLkERe5il7slF/dLAyXb7EQYm9neQIwet4RQns9D4J7dAb1DKo
+ r2E945mXuvZPp8kI+J0HnKc6oiL4TNyfw4GkN6IAInr3mfOKPiDdmTpckXP4QYfHfa/j+Dbdw
+ 0hDAJPRLkbpR3DdSoiAIxfXrk+lPeCj44HmEOYOIx/f4OCePMblyPhFcToo4vGmFhmEXIZVuf
+ nSoIpOdpEWAMJqGkhMbZ6vvQgXndacVoii1tKV9zlBitNzpBcC/LDkEpCf6uhRNZcKQWUgVum
+ vy1bF1AQlC537SvoaxEj6N7AI4i/Lv6oyO/oQJo95oISBvMcgt9JKVZGAufpTl6cnufRwW+7y
+ QtPviqkVcGB6RQM5aHVl0sG+aU8OukacOB4QdaFtdw9i9GxWol8eHus9clpm82SE4aeHf05H1
+ NPUdyVVHAuTQhx2HzGSXmUh2dqG8ZdvVnkrMGiaahXjzmrvmejj8UfV1WSL5yod8EKT4+qO4T
+ l/ZnnYMg0MKiPf1j/a4Xb3DM1E8gDqQlg+LEqJWlef4t970dz/xRq/ku2ee6YaazlSBT9jinq
+ XN+MtVcWrInnZYCPTTi+NX2FEEIBJ/GIaujCrQu9NqgTfvEiryA0mfagCDOhKk93aOQ3Zc5zw
+ CnIZKtIFqT5dbJlo9Z/pKCZ6gTRRZ8ZJB0eHTla9LsYmTpRkPIh526wbJG+JAxXEvohsn3IWU
+ J70Ojl3ZvykMlNYl780+3+a63RijNpTc4I+CKU4CNNEd1l2W4Drr8RPa0IcAM8nL8vGjvdwgG
+ kVmoZaPnyRfJ7KPYMhN+kOzg7MoSNI8/K2fm2lnsRUSr5mXdKFBMgvKwiSIPhooELLPTrpVwz
+ w5OtOFpgOJzl/C4oEKOcYuRPdV5EgAoCGnDL/SA==
 Sender: linux-wpan-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi,
+Hi Alex,
 
-On Tue, 15 Sep 2020 at 16:35, Michael Richardson <mcr@sandelman.ca> wrote:
+> I tried to use BT 6LoWPAN and experienced a lot of races there, sadly
+> nobody is fixing it. I sent a RFC some years ago to tackle these
+> issues, also that the link-layer address is reconstructed by L3
+> address and not by a ndisc lookup is very weird. I don't know if this
+> is fixed or not.  However it was nothing related to the new BT mesh
+> stuff.
+
+"a lot of races", recently? Or some time ago?
+
 >
->
-> Achim Kraus <achimkraus@gmx.net> wrote:
->     > it seems to be possible for the hardware, but I could not find hints,
->     > that it is working with the software. According
->
->     > https://linux-wpan.org/hardware
->
->     > it's not listed, but the nrf52840 is also not listed (but working with
->     > the openthread setup from nordic).
->
->     > So:
->     > Does someone have tried to use a Raspberry PI 3B+ native CYW43455 for
->     > 6lowpan?
->
-> I don't think anyone has done RFC7668
->   _IPv6 over BLUETOOTH(R) Low Energy_
->
+>> for any BT device.  I would love to be wrong!!
+>>
 
-I tried to use BT 6LoWPAN and experienced a lot of races there, sadly
-nobody is fixing it. I sent a RFC some years ago to tackle these
-issues, also that the link-layer address is reconstructed by L3
-address and not by a ndisc lookup is very weird. I don't know if this
-is fixed or not.  However it was nothing related to the new BT mesh
-stuff.
+Hi Michael,
 
-> for any BT device.  I would love to be wrong!!
->
-> Running BTLE mesh is something I'd really like to do.
-> My guess is that one could probably prototype this in userspace on top of
-> bluez, and then use Alex' 6lowpan tap interface.
+The current Raspi OS (based on Debian, kernel 5.4) contains a
+bluetooth_6lowpan module. With that it's possible to connect the
+nrf52840 using a "plain raspi 3b+" (without extra rf module).
 
-I did not do the "6lowpan tap" interface, the bluetooth people did
-that and I complained about it and I never would accept this upstream.
-It basically was working to "map" bluetooth link-layer addresses to an
-ethernet interface (remember in Linux world TAP is an ethernet
-specific interface only). Then the code was somewhat doing parsing the
-ethernet link-layer addresses to feed the bt 6lowpan decompression
-algorithm.
-This might work until there is any draft which wants more than just
-link-layer addresses from L2 header, I think you would agree here?
-There are also corner cases that a bluetooth address is not an
-ethernet address...
+Unfortunately, nordic decided to provide precompile examples with the
+old, deprecated address mapping and so I need to spend some time in
+compile these examples before I can report, if it works at all, and the
+experienced stability.
 
-I am not against a "tap like" interface, but then the whole L2 header
-needs to feed to a, I name it "generic tap" interface from userspace
-(only describe receiving side, it's easier).
+best regards
+Achim
 
-I _think_ we also need to have not just L2 headers... all layers below
-6LoWPAN adaptation because the compression can use _any_ of this
-information. You agree?
-
-However, basically when people talk about TAP/TUN 6lowpan interfaces
-my thoughts are:
-
-6LoWPAN TAP:
-
-Ethernet specific, need to be a generic TAP interface to feed all
-layers below 6lowpan to kernel space/from kernel space. Ideal would be
-that the kernel 6lowpan stack creates/receives all layers below
-6lowpan... but then such interface makes no sense because it will
-require a kernel stack for all these layers and you want to run these
-in user space.
-I think about an own header format which describes "6lowpan parameters
-for everything to do in layers 6lowpan and above". Each is adaptation
-specific, I would like to see a draft about that! It's not the full
-info of all layers below, only the one what the upper-layer (6lowpan,
-etc) needs.
-
-That is for me the only thing that makes sense for me...
-
-6LoWPAN TUN:
-
-That wording makes no sense, TUN is RAW IPv6, there can't be RAW
-6LoWPAN without having information below that, see 6LoWPAN TAP.
-
-- Alex
+P.S.: though linux-wpan is not bluetooth, I hope the misuse of this list
+is still OK ;-). But I guess, moving it to the right list will alos have
+advantages. Does anyone know, which would be the proper list for that?
