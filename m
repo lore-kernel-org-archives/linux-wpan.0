@@ -2,112 +2,132 @@ Return-Path: <SRS0=ZGJA=DD=vger.kernel.org=linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50013C2D0A8
-	for <linux-wpan@archiver.kernel.org>; Sat, 26 Sep 2020 12:47:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70812C2D0A8
+	for <linux-wpan@archiver.kernel.org>; Sat, 26 Sep 2020 12:56:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0D87F20BED
-	for <linux-wpan@archiver.kernel.org>; Sat, 26 Sep 2020 12:47:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 252032080C
+	for <linux-wpan@archiver.kernel.org>; Sat, 26 Sep 2020 12:56:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y6Grq6nq"
+	dkim=pass (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="JjSeOEgh"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726956AbgIZMrX (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Sat, 26 Sep 2020 08:47:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34392 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726316AbgIZMrU (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Sat, 26 Sep 2020 08:47:20 -0400
-Received: from mail-ot1-x342.google.com (mail-ot1-x342.google.com [IPv6:2607:f8b0:4864:20::342])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0331C0613CE
-        for <linux-wpan@vger.kernel.org>; Sat, 26 Sep 2020 05:47:20 -0700 (PDT)
-Received: by mail-ot1-x342.google.com with SMTP id q21so4953580ota.8
-        for <linux-wpan@vger.kernel.org>; Sat, 26 Sep 2020 05:47:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=EIIAdlpLZ8QWBpnk1CRK2E0QztRVUXlgOgWtUcAY46M=;
-        b=Y6Grq6nqmll35dkCEIN8Q9psVSg1VjlYS3daQgA8QnpipZhYcLgBFPnc8ZTLGBaCHW
-         /4gfCap9XCeR+2h+Oi6epTKPux3tx3PUWl/P9ghGoZFxqSeIQEcy1kPkbmoN5W+6DQPa
-         kYcWocoOmlIBicOnymUn3S9JveIoV3GA6zmrYses3YR1GK5ryG7x1AOAl8tqLY3YMANS
-         tz6+Tj08xYs39+FPP2lqt/VdnvnXgriGKCwwNhFXZoP1LbUXr04MTi9PPgDXUWWD2xK2
-         FzDQtgX9ksc7FjOBIteEfjd6bLeTDCSo+6f/4yxx4+USL+JhuDm46aeFQHnrsNTKtz5f
-         BvMA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=EIIAdlpLZ8QWBpnk1CRK2E0QztRVUXlgOgWtUcAY46M=;
-        b=osESOsNHsvKzPRo4J1EY43NjOzWjAlcIVJBplRkU+o7RNz0fr+aH877xurggajSVrS
-         jZU3Tt4qVbAgynhxgD7mkhlFSK4A3JOoNFu7LqNUVGT3qzClCh3EgDEF15V5lsx5V+4v
-         yiVrtcExb9bhKXmtXX8t+C41yIcanepbNL1ZoTMpiHsu3DLsvSQU0I92ao4YMMd9I86Q
-         9i6ItBPr3SxpqlC/RPDNRZBhXz+1F6/ozRRptlbwRj++1klE7z+ZOSxfnOhKiW/6gZs9
-         WTxjdMKDMlS0a2oevoM3pMg9qR9idh0J8TsPZw4hf0oJnxreJLEueWFjNkVzj5J9UWw0
-         yfGw==
-X-Gm-Message-State: AOAM531quUWlKaMG6bs1f8sWX0keJJuPzCKHgUT3w4mFbtPaxstY3QTV
-        i5oSj/xbHZCEYitXSJ7/MCkmjPbpdylfCXJF+Qg=
-X-Google-Smtp-Source: ABdhPJzlOLGaedvGY0t53LigT8Ie6XY07foLbBDtg/JBNERM7pSWvgWvvLebDl367og99Xdwz3l7eoxc7i+DH0UFv9g=
-X-Received: by 2002:a9d:4a9c:: with SMTP id i28mr3342497otf.340.1601124440265;
- Sat, 26 Sep 2020 05:47:20 -0700 (PDT)
+        id S1729186AbgIZM4y (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Sat, 26 Sep 2020 08:56:54 -0400
+Received: from mout.gmx.net ([212.227.17.20]:44359 "EHLO mout.gmx.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729217AbgIZM4y (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+        Sat, 26 Sep 2020 08:56:54 -0400
+X-Greylist: delayed 306 seconds by postgrey-1.27 at vger.kernel.org; Sat, 26 Sep 2020 08:56:54 EDT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
+        s=badeba3b8450; t=1601125013;
+        bh=hKDuFYMzf0ybfRHiXA16+/7bATdQUDfOjTI8StAmkkY=;
+        h=X-UI-Sender-Class:Subject:From:To:Cc:References:Date:In-Reply-To;
+        b=JjSeOEghujUV9Q+c8j+0BxkN/uZEh1f46hNAm6xZPpVWL/AdPV5mc1NWK4XmY9kFL
+         QVGcNAnuZ6cgDn9r9hRXGbML6xyEdi31KuGzSBqAO1HfZxbp5qqxeyUsL3Dx7SwVYw
+         UImN48igCUAUGWRSA3filNEmwh1d2UxJV24G6BJU=
+X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
+Received: from [192.168.178.100] ([88.64.94.23]) by mail.gmx.com (mrgmx104
+ [212.227.17.168]) with ESMTPSA (Nemesis) id 1MgNh1-1kvkGq3SPv-00hsrN; Sat, 26
+ Sep 2020 14:51:39 +0200
+Subject: Re: 6lowpan Support for Raspberry PI 3B+ - CYW43455
+From:   Achim Kraus <achimkraus@gmx.net>
+To:     Alexander Aring <alex.aring@gmail.com>,
+        Michael Richardson <mcr@sandelman.ca>
+Cc:     linux-wpan - ML <linux-wpan@vger.kernel.org>
+References: <f1acad10-2fb3-a402-df58-907c2580c5ab@gmx.net>
+ <21010.1600201310@localhost>
+ <CAB_54W6S3+kf1Uowt9Y+nJVNOG4SS8GFwdd7F+6WJ8=W4Pbahg@mail.gmail.com>
+ <a9280f74-54f0-917f-22a7-8907afd33c95@gmx.net>
+Message-ID: <0d77ac6a-c90e-8113-4554-6fc3a444bea9@gmx.net>
+Date:   Sat, 26 Sep 2020 14:51:35 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-References: <CAF4BF-SFHA=mPHLxpDHGMLvgu0UKO-6ujfYB+n2a6=XhFvT6DA@mail.gmail.com>
- <b009a2a8-64a5-fe66-a53e-5a93135cf1f8@datenfreihafen.org> <CAF4BF-SNRyXQzUBqx5k014nZou4q7=Gd8=dbUyK7JiDkaEEvFA@mail.gmail.com>
- <f98b4515-9570-ad48-2d8f-dcc5482a21a1@datenfreihafen.org> <CAF4BF-SipApoY=7CY8fWs8cSi8rKZaYMxOZHAqoKv=poAgVm=Q@mail.gmail.com>
- <61ffa93d-f8cf-b059-358c-84a6e04b96ac@bergzand.net> <CAF4BF-Re1CoR8abM=hvKN=TojDoLL_PRAJTvjWzB-Ak8tKTvRg@mail.gmail.com>
- <e5d22300-fccc-5a0f-6776-5438bfad57e1@datenfreihafen.org> <0ccbc151-cf8e-cd56-28f8-f1594d226056@bergzand.net>
- <6d787a84-56ba-2dcf-af5c-6f05cec6194a@datenfreihafen.org> <71f4ce0f-5614-6410-9c8b-72a87ab7473d@datenfreihafen.org>
-In-Reply-To: <71f4ce0f-5614-6410-9c8b-72a87ab7473d@datenfreihafen.org>
-From:   Christopher Friedt <chrisfriedt@gmail.com>
-Date:   Sat, 26 Sep 2020 08:47:09 -0400
-Message-ID: <CAF4BF-TG4wpX8TdEXY=EeTz4HV0b-nceFwKb=VkFBkMjfSLPew@mail.gmail.com>
-Subject: Re: wpanusb?
-To:     Stefan Schmidt <stefan@datenfreihafen.org>
-Cc:     Koen Zandberg <koen@bergzand.net>, linux-wpan@vger.kernel.org,
-        Andrei Emeltchenko <andrei.emeltchenko@intel.com>,
-        erik@statropy.com
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <a9280f74-54f0-917f-22a7-8907afd33c95@gmx.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: de-AT-frami
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:m9Z9ddqXEN4Xz0UWMCRGfUVJWkHI9SUgdeMuUBbT+brpAzEijUA
+ O10wMtHYRVQdChpcewbBfDQrNyyesOIynLc2ndjQrSArglFGvOymJGa4DP6gbczutgdaHSf
+ cEo0hKHY5k+j/C/LZPEq3EZSTJ0ZpM8K61nbVVIsyZhd4FMe/NNR/qU7f8+zz50Kf5FZ6Da
+ e22XJNVQT+lalsPNA5B0w==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:0eQzYxyASKI=:0jNglmSO0y5Grm35eraj9l
+ 0XM0o+//Pd1QZ8HX0JSU0Cbho9P9u8z5pVIht+OwpBXi1DcsamZu0v3opYc4ezJgo6fyHKV2V
+ mS1/+XroZmyvpyySQJENEPpLkrkF20M3v+GYIq7hhPEvP3br4NlI005ffCi9/CoublJBQNlZK
+ +XbHdQ+GpQMWFWiIRC0ni7TLS3E041xlorOZZK/pp0JVovBb9OuWID+GGUSevO0MncOmgPuQG
+ OSkxE84F0Wok3JDyHjYBLJ3cc+ArotDbeEyXPPHxyOecBHgRoTH/MSM2PwRGgW5PSmlV7EJBB
+ CP6w818V/KTh26Te6vZqgEjTvFrvn9McX3Zhg3hmVGGjH5KFnD8OH/qG9nGW0Dphat5aSCR54
+ bnnrmvepQpXTCVQIfLYcTvrQ5FXfQcJz6XZRwWd8fhSpVRItdvcZuyLxryd9RuLO5ORLykSJy
+ w/kmMJhQHlqPTMyGpgEg/WM/l+gBoApRVerbgh7dEEWpEAO9+jdzkhUeGZ6aTNfxnwPjTax5P
+ BqZ5ag2p+Ap3M48FEIurh0HpBxz/JH9Nz91MMKBRoh1iQJes8fmFZM9fZCcmIsY22NPVtwwN+
+ jZkPzQT62z6lSMj/uPGEJeDduP1mhcwqpCGizyEhHkbX8bZCl9hQ2xVFErc1wgBaiBZI7GBpu
+ 9IysK2SV2Tg4S1hGVnb7P/l9LnnSCD7vVOk5gOKBmPD6L0DbNiTcbxs1OhBfMJ7dJtU0OjHDW
+ Y2K/51QYMXnOHyAYdacChuMBgY2WM1HTGKN1tKNB9wG60iK+aZDZeCk603Vs9E7RYIyNlxNKa
+ yUTiW6BOgQ/+BDoHYonwr2e6naPQPqzO0MAMVLups3BbkBQ3rzcrDJufWXBfHyhrVhPVF2/px
+ rZGuv90Dg5HzvnCLDrBYoneRuyqzXyRRqTABMu7jHmfi7oNO8nsUCni8XeIlB1jKy6uDNQqPe
+ yVetDczcIBqMNUb1LzTM8qtKagEGxtorLgE9hcnlroRYzwnd3UA7FzTQlAC/AvE1wHyAn6y4j
+ 7LLNRmyrYOTUmGqEXRr5fIr3HQOp/A2TZFTrLe4DJ9ZIyh+BLkSwO9xiiA5cUfRSPQIVGDZuL
+ LcH98Rn9Fr9wyGTgbnAOjoKrQrUP1WQ35sWJC8a7drGTYSYBW/uFtwDljpauywN706r5CL2qS
+ 4EN6QW9DFvZ2cEc8IeXUoeBYNhPAowouhDMt4fbpzNLN6vIPeTszSNsrFnyJNH1FmA699o7ES
+ WWVelLMkXZ9ZsYxZrLHoNpAvJCcnd8+BM+qXiAg==
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-On Sat, Sep 26, 2020 at 8:28 AM Stefan Schmidt
-<stefan@datenfreihafen.org> wrote:
-> On 24.07.20 15:41, Stefan Schmidt wrote:
-> > [Added Erik here to be part of the discussion]
-> >
-> > This mostly goes to Koen and Erik. Please coordinate how you are wanting
-> > to work on this. And be pro-active. Waiting for the other one to start
-> > will just lead to starving :-)
+Hi Alex,
+Hi Michael,
+
+after using the firmware with compliant address mapping for the
+nrf52840, it starts to work.
+
+With a linux kernel 4.15.0 stable over a couple of hours.
+With a linux kernel5.4.0 or 5.4.51 it's possible to connect, but that
+connection is dropped after a couple of seconds (30-40s).
+
+So, seems, that the "old bug" is back in 5.4.
+
+With "kernel lockdown", it seems to be not possible to connect.
+At least I didn't find out how.
+
+best regards
+Achim
+
+Am 16.09.20 um 07:38 schrieb Achim Kraus:
+> Hi Alex,
 >
-> With silence from both of you on this I would assume neither had time to
-> look over this. Correct?
+>> I tried to use BT 6LoWPAN and experienced a lot of races there, sadly
+>> nobody is fixing it. I sent a RFC some years ago to tackle these
+>> issues, also that the link-layer address is reconstructed by L3
+>> address and not by a ndisc lookup is very weird. I don't know if this
+>> is fixed or not.=C2=A0 However it was nothing related to the new BT mes=
+h
+>> stuff.
+>
+> "a lot of races", recently? Or some time ago?
+>
+>>
+>>> for any BT device.=C2=A0 I would love to be wrong!!
+>>>
+>
+> Hi Michael,
+>
+> The current Raspi OS (based on Debian, kernel 5.4) contains a
+> bluetooth_6lowpan module. With that it's possible to connect the
+> nrf52840 using a "plain raspi 3b+" (without extra rf module).
+>
+> Unfortunately, nordic decided to provide precompile examples with the
+> old, deprecated address mapping and so I need to spend some time in
+> compile these examples before I can report, if it works at all, and the
+> experienced stability.
+>
+> best regards
+> Achim
+>
+> P.S.: though linux-wpan is not bluetooth, I hope the misuse of this list
+> is still OK ;-). But I guess, moving it to the right list will alos have
+> advantages. Does anyone know, which would be the proper list for that?
 
-On the contrary, Erik & I are working on it right now (although mostly
-from the Zephyr side) ;-)
-
-We expect to have something demonstrable with the cc1352r within a
-week or 2, at which point I would very much like to work on
-upstreaming wpanusb with the additional features.
-
-In Zephyr, I recently got Sub GHz IEEE 802.15.4g running on the
-cc1352r1_launchxl. Did a fairly big overhaul of the 2.4 GHz driver as
-well. SubG should be able to run simultaneously to 2.4 GHz, and beyond
-that, the driver is written so that BLE will work concurrently at 2.4
-GHz (with arbitration).
-
-I might need to send you one more dev board though for testing
-purposes, because the cc1352r requires a second chip for USB.
-BeagleBoard.org is currently preparing for manufacturing of the
-BeagleConnect which includes the cc1352 and the USB chip The official
-release date is not announced yet.
-
-I have not touched MLME yet unfortunately due to contractual obligations.
-
-Also, somewhat annoying, but a shoddy USB hub damaged my ATUSB :( I
-ordered 2 more, so hopefully they get to me shortly!
-
-C
