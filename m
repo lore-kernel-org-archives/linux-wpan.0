@@ -7,37 +7,37 @@ X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 151BDC4741F
-	for <linux-wpan@archiver.kernel.org>; Tue, 29 Sep 2020 11:36:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CF01C4741F
+	for <linux-wpan@archiver.kernel.org>; Tue, 29 Sep 2020 11:53:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C475D2376F
-	for <linux-wpan@archiver.kernel.org>; Tue, 29 Sep 2020 11:36:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 14B652065C
+	for <linux-wpan@archiver.kernel.org>; Tue, 29 Sep 2020 11:53:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1601379376;
-	bh=74ouaHSZE3Zq+uWgxjQ7IJM1MVEC2egOJson4WLtlmc=;
+	s=default; t=1601380380;
+	bh=QrA7dvsKpXFZen8QuOgGNjZSWVR7QpehUkO9ZZZPs8U=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=QTIK0f6MxIhaz1GdtL3Y23XEDcSwUct0VlKrvEMgPwtQvEuuif09CkMPmwh7BZN+y
-	 G2zxrbM10TNppYairKL5uuqqLwro9yb2o0g9im7R+BzHTU5R+ZT7uaxv3wnjhAsqAl
-	 zLAySLaiJF7ShXV3UMZhuriNgR4vlwtGn/wrSmwA=
+	b=DChlf4QsuAZ1xQuSXljRZczCH8lgMwaDX0uCzsPadTVIs1rOePpKzHY1JItp7Chks
+	 OZ/r8r8jzg/K60sw9r+hNDAJelNh5mzv7dDDCqyIHiiBnkCeEhCjXAkNuK1RGWwIL7
+	 vtL3X1HF90PdcEMIWuXxpI4p8tPo1LizisVrXk4w=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729943AbgI2LgM (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 29 Sep 2020 07:36:12 -0400
-Received: from mail.kernel.org ([198.145.29.99]:49220 "EHLO mail.kernel.org"
+        id S1731233AbgI2Lw7 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 29 Sep 2020 07:52:59 -0400
+Received: from mail.kernel.org ([198.145.29.99]:48294 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728602AbgI2Lfg (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-        Tue, 29 Sep 2020 07:35:36 -0400
+        id S1730898AbgI2LrD (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+        Tue, 29 Sep 2020 07:47:03 -0400
 Received: from localhost (83-86-74-64.cable.dynamic.v4.ziggo.nl [83.86.74.64])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id E131223D59;
-        Tue, 29 Sep 2020 11:30:13 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 2735C20702;
+        Tue, 29 Sep 2020 11:47:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1601379014;
-        bh=74ouaHSZE3Zq+uWgxjQ7IJM1MVEC2egOJson4WLtlmc=;
+        s=default; t=1601380022;
+        bh=QrA7dvsKpXFZen8QuOgGNjZSWVR7QpehUkO9ZZZPs8U=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=C5/sqx/fzQSN9MC8T+kuf0Ceuq+aQ76SY73NAunt414xhpY0jxi79yYvGPuuMWCJf
-         TmK5uow1jklSBywP2ZCWXHkssx+LeqFGtBn3LzPB3tAORqenTvFK5Xl0pKH7SyNRey
-         SWhrIRjRI6e+eQlLbxf5QtVAnHvBaD8rKfYk3VZA=
+        b=myaVC+l5wi2/gCVVHI4a8xIFECQ/krycwd0iWb+MxiQizTuCJ6T2DRj2CwU/xKSNh
+         tWICwj7w3ai7m8HkEzeiyOeKfw4gSDzTNNeWc5018jdztMH1Qz1d0ROT7/lLiJXDOQ
+         i8YD5XmqN8qBFTHc7CuZRWO2dcXQwTmIuJDSbA+U=
 From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To:     linux-kernel@vger.kernel.org
 Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -46,12 +46,12 @@ Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
         linux-wpan@vger.kernel.org, Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 4.19 222/245] mac802154: tx: fix use-after-free
-Date:   Tue, 29 Sep 2020 13:01:13 +0200
-Message-Id: <20200929105957.787850158@linuxfoundation.org>
+Subject: [PATCH 5.8 33/99] mac802154: tx: fix use-after-free
+Date:   Tue, 29 Sep 2020 13:01:16 +0200
+Message-Id: <20200929105931.360050411@linuxfoundation.org>
 X-Mailer: git-send-email 2.28.0
-In-Reply-To: <20200929105946.978650816@linuxfoundation.org>
-References: <20200929105946.978650816@linuxfoundation.org>
+In-Reply-To: <20200929105929.719230296@linuxfoundation.org>
+References: <20200929105929.719230296@linuxfoundation.org>
 User-Agent: quilt/0.66
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -187,10 +187,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 5 insertions(+), 3 deletions(-)
 
 diff --git a/net/mac802154/tx.c b/net/mac802154/tx.c
-index bcd1a5e6ebf42..2f873a0dc5836 100644
+index ab52811523e99..c829e4a753256 100644
 --- a/net/mac802154/tx.c
 +++ b/net/mac802154/tx.c
-@@ -42,11 +42,11 @@ void ieee802154_xmit_worker(struct work_struct *work)
+@@ -34,11 +34,11 @@ void ieee802154_xmit_worker(struct work_struct *work)
  	if (res)
  		goto err_tx;
  
@@ -204,7 +204,7 @@ index bcd1a5e6ebf42..2f873a0dc5836 100644
  	return;
  
  err_tx:
-@@ -86,6 +86,8 @@ ieee802154_tx(struct ieee802154_local *local, struct sk_buff *skb)
+@@ -78,6 +78,8 @@ ieee802154_tx(struct ieee802154_local *local, struct sk_buff *skb)
  
  	/* async is priority, otherwise sync is fallback */
  	if (local->ops->xmit_async) {
@@ -213,7 +213,7 @@ index bcd1a5e6ebf42..2f873a0dc5836 100644
  		ret = drv_xmit_async(local, skb);
  		if (ret) {
  			ieee802154_wake_queue(&local->hw);
-@@ -93,7 +95,7 @@ ieee802154_tx(struct ieee802154_local *local, struct sk_buff *skb)
+@@ -85,7 +87,7 @@ ieee802154_tx(struct ieee802154_local *local, struct sk_buff *skb)
  		}
  
  		dev->stats.tx_packets++;
