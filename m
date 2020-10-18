@@ -1,104 +1,235 @@
-Return-Path: <SRS0=JCjv=DW=vger.kernel.org=linux-wpan-owner@kernel.org>
+Return-Path: <SRS0=f8AC=DZ=vger.kernel.org=linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31D72C43467
-	for <linux-wpan@archiver.kernel.org>; Thu, 15 Oct 2020 20:16:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67985C433DF
+	for <linux-wpan@archiver.kernel.org>; Sun, 18 Oct 2020 15:09:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B965220795
-	for <linux-wpan@archiver.kernel.org>; Thu, 15 Oct 2020 20:16:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0326A21D7F
+	for <linux-wpan@archiver.kernel.org>; Sun, 18 Oct 2020 15:09:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CBvgGvko"
+	dkim=pass (1024-bit key) header.d=MLPAConsultingGmbH.onmicrosoft.com header.i=@MLPAConsultingGmbH.onmicrosoft.com header.b="bO7rhaWL"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2392202AbgJOUQx (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Thu, 15 Oct 2020 16:16:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54730 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2392167AbgJOUQw (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 15 Oct 2020 16:16:52 -0400
-Received: from mail-oo1-xc44.google.com (mail-oo1-xc44.google.com [IPv6:2607:f8b0:4864:20::c44])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B82EAC061755
-        for <linux-wpan@vger.kernel.org>; Thu, 15 Oct 2020 13:16:50 -0700 (PDT)
-Received: by mail-oo1-xc44.google.com with SMTP id z1so83110ooj.3
-        for <linux-wpan@vger.kernel.org>; Thu, 15 Oct 2020 13:16:50 -0700 (PDT)
+        id S1727045AbgJRPJm (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Sun, 18 Oct 2020 11:09:42 -0400
+Received: from mail-eopbgr10112.outbound.protection.outlook.com ([40.107.1.112]:57230
+        "EHLO EUR02-HE1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725776AbgJRPJl (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+        Sun, 18 Oct 2020 11:09:41 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=RdHQzjfvkJLyt+yyddt4YkHHLMOhWXfJfLmTEnaFDUU7MPbrB2mxLIrA8MJjnfcqSfBAwIO1YnXCGveBSPkKKEiRH5Ex5NuuPwl1a1BJtv1Cd7IMKvErPXEc7SaFN4KthW5UxQVcid/3iOlskPMB0X9CQfyg+EkosS0QJ9+61Rax8pMMGkovCuasIVyXMSmwEdDP3z5NLJhxETF/zt33GJRbPssnnla2xsIBrQmvM0Ufl3XNIy+3cwcSWewBrgf5mFhN1REOAqaqEoj3dGfksMQG0geYfZ7gedPgRTgStyauXyz6RVfsU2RJY2RvmN/aGjAwPHlCk6OiQMFUb7luiA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=/8xeOa5XpGdJTukV2GcP+s30znnswDP66zraxVesQn8=;
+ b=V0QZMwxeLK4Aw4/2NlEAv2dLpqdFRX/0VozUJaptSTI1w+pcES4gZeQvMHl2+c0Cq8KkWhtH4GneLvR2MvuG+B9YoHqJynk3z+dQGFzhs6XJ3mUDvRV9rGJfsvBAMaVTqC6zplKDUfdcCQJ5/ja3p/WEFcI2iq5YWAxDlxGHbGQkjls4X5cGHW8SvX4yZX22Px/AzZR/zLSTAIAdB4RCk4PqthtMHVo6sS7YNkfQpdomzbConSsF6gs4+SUSQ6VPdWBoAN6zo0C6lFZEHw1nlWeL7jJYYZrl5cxruUMsa5SIBthCyCnziq8vep74r76ZE56evrCYyiaFJ9EyKqfbuA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=ml-pa.com; dmarc=pass action=none header.from=ml-pa.com;
+ dkim=pass header.d=ml-pa.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=pmTKSVtQ/tB16qDQx3xK18DhUlZdOCpgk1USPCfSSnA=;
-        b=CBvgGvkoXpSgA+oVqIj45v64t201GeJ38yqlgG1lYz6XFD7AO1VkBGBXeILQ5jL0WF
-         Qh4qs+IgoadzWa3yExMrFu/Q3MAB5qVb1wcTgON05ohGeGq2xsDPF16SFSBTQdE+M90Y
-         CZ0sHTCPUrZSMD4r/5bbdSoUT+UbURa8E+9tuGI6y5wnRaLe27zFORPnQUpZZ+/UVrhf
-         ovGxate/mzlJR+lSunIwEI9mw4TrLpm0E/sHdObMofN1qIKW1rEKk5PSt7RcaiXxaAU0
-         0WiBPFVBjSKN/OsVOibme/V6Oyvk8H2zO2N5IDngmAoyG+MxWyf7noyFsQtB56gvk0kp
-         Ta9w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=pmTKSVtQ/tB16qDQx3xK18DhUlZdOCpgk1USPCfSSnA=;
-        b=ZWas8mR5jq2x9XCGWML8fvFKr9ySBWvcDc4e78K5XRS4ga8lUsNTSFEg72fCBZheC0
-         zqUV4jOOqW1KTtzqz0C/fn5yIvdGA7xHkbEfOsXJPYRk44T3syxL4wUIZnSdriNewZdB
-         EyJdJsLzDQ1yp4rPvce8uVbU94a1eNGtMuNslKkq5LetH6MPHpHj466PxhbFb9ymTMZI
-         ukqpfgvlrN/z6us8eo9RU1SHZUfoLPB2FL6vWQpz1o4DeFlScHyoTDd5SUxOW9kSpihD
-         i7yh8a2FW1yQnn9ZROfxjNKpMu56BWzAaZqA92TKA29H/LvkwT+uOJG8vwOMIIJwFc+G
-         LxKg==
-X-Gm-Message-State: AOAM532cOJyX6rnUuh74sOzErx/pRXTfuIyRSaXboIdpXnhdENt5L0P0
-        16nfwAqbgPCcYnz53WJ03jFnOcjqxkv8yx+sZzUS3pnreZ5y4Q==
-X-Google-Smtp-Source: ABdhPJzGJCjwjF1dVyh5a8P8p5+MGLD1Gk3XSb9Tjyc1MakoLVOq6DE4RMe8DBjIA4NceSXIt4ECo9XW5PkoanO7mgA=
-X-Received: by 2002:a4a:d0a4:: with SMTP id t4mr170825oor.21.1602793008688;
- Thu, 15 Oct 2020 13:16:48 -0700 (PDT)
+ d=MLPAConsultingGmbH.onmicrosoft.com;
+ s=selector2-MLPAConsultingGmbH-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=/8xeOa5XpGdJTukV2GcP+s30znnswDP66zraxVesQn8=;
+ b=bO7rhaWLoWwwlwA2Y8vC/eS3VbId6SZtLAr6nNRefEgOJQqNRwZAvG847vyh/sy18SHd4wIo/0F9dWWWDSrsFdCl4NUWmwdptsAhUrRqwNt9PmozPXdD7vqoJCykqSrwf3X0UHM42OAFleuPhuX8iKYw0d/j4/pTWJWNSSwrbxQ=
+Authentication-Results: vger.kernel.org; dkim=none (message not signed)
+ header.d=none;vger.kernel.org; dmarc=none action=none header.from=ml-pa.com;
+Received: from AM0PR01MB5475.eurprd01.prod.exchangelabs.com
+ (2603:10a6:208:17a::28) by AM0PR01MB5313.eurprd01.prod.exchangelabs.com
+ (2603:10a6:208:11f::32) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3477.28; Sun, 18 Oct
+ 2020 15:09:36 +0000
+Received: from AM0PR01MB5475.eurprd01.prod.exchangelabs.com
+ ([fe80::c1ef:81:1816:4528]) by AM0PR01MB5475.eurprd01.prod.exchangelabs.com
+ ([fe80::c1ef:81:1816:4528%3]) with mapi id 15.20.3477.028; Sun, 18 Oct 2020
+ 15:09:36 +0000
+Date:   Sun, 18 Oct 2020 17:09:34 +0200
+From:   Benjamin Valentin <benjamin.valentin@ml-pa.com>
+To:     linux-wpan@vger.kernel.org
+Cc:     Alexander Aring <aring@mojatatu.com>
+Subject: iwpan with LLSEC - attribute type 1 has an invalid length
+Message-ID: <20201018170934.2c03c9e3@rechenknecht2k11>
+Organization: ML!PA Consulting GmbH
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [2001:16b8:458d:900:665f:6e86:ead4:af62]
+X-ClientProxiedBy: AM6P191CA0082.EURP191.PROD.OUTLOOK.COM
+ (2603:10a6:209:8a::23) To AM0PR01MB5475.eurprd01.prod.exchangelabs.com
+ (2603:10a6:208:17a::28)
 MIME-Version: 1.0
-References: <CAF4BF-SFHA=mPHLxpDHGMLvgu0UKO-6ujfYB+n2a6=XhFvT6DA@mail.gmail.com>
- <b009a2a8-64a5-fe66-a53e-5a93135cf1f8@datenfreihafen.org> <CAF4BF-SNRyXQzUBqx5k014nZou4q7=Gd8=dbUyK7JiDkaEEvFA@mail.gmail.com>
- <f98b4515-9570-ad48-2d8f-dcc5482a21a1@datenfreihafen.org> <CAF4BF-SipApoY=7CY8fWs8cSi8rKZaYMxOZHAqoKv=poAgVm=Q@mail.gmail.com>
- <61ffa93d-f8cf-b059-358c-84a6e04b96ac@bergzand.net> <CAF4BF-Re1CoR8abM=hvKN=TojDoLL_PRAJTvjWzB-Ak8tKTvRg@mail.gmail.com>
- <e5d22300-fccc-5a0f-6776-5438bfad57e1@datenfreihafen.org> <0ccbc151-cf8e-cd56-28f8-f1594d226056@bergzand.net>
- <6d787a84-56ba-2dcf-af5c-6f05cec6194a@datenfreihafen.org> <71f4ce0f-5614-6410-9c8b-72a87ab7473d@datenfreihafen.org>
- <CAF4BF-TG4wpX8TdEXY=EeTz4HV0b-nceFwKb=VkFBkMjfSLPew@mail.gmail.com> <e75f3fd8-fa0c-7708-e914-f757965920c0@datenfreihafen.org>
-In-Reply-To: <e75f3fd8-fa0c-7708-e914-f757965920c0@datenfreihafen.org>
-From:   Christopher Friedt <chrisfriedt@gmail.com>
-Date:   Thu, 15 Oct 2020 16:16:37 -0400
-Message-ID: <CAF4BF-TYYF_FU7dKFR+VXfYKFUfWes4euLPY3UMOL_f62_4hAQ@mail.gmail.com>
-Subject: Re: wpanusb?
-To:     Stefan Schmidt <stefan@datenfreihafen.org>
-Cc:     Koen Zandberg <koen@bergzand.net>, linux-wpan@vger.kernel.org,
-        Andrei Emeltchenko <andrei.emeltchenko@intel.com>,
-        erik@statropy.com
-Content-Type: text/plain; charset="UTF-8"
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from rechenknecht2k11 (2001:16b8:458d:900:665f:6e86:ead4:af62) by AM6P191CA0082.EURP191.PROD.OUTLOOK.COM (2603:10a6:209:8a::23) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3477.20 via Frontend Transport; Sun, 18 Oct 2020 15:09:35 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: e28100c5-580a-4b98-adf9-08d87377d38c
+X-MS-TrafficTypeDiagnostic: AM0PR01MB5313:
+X-Microsoft-Antispam-PRVS: <AM0PR01MB5313F06BDF77B5093263F96BAD010@AM0PR01MB5313.eurprd01.prod.exchangelabs.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: BE6Iweay7KT8itaRqe2vYWK0E0C/5E5VK9GUgMn9tcabYOMwY6wRC1gXsZ4yXbjgGhIt2Slom3ljETRNHZ+pYaF0glnEWaBKtTCw0KKDDEilx9fHeVtLavhsRrYLdSYP65uPeLj3IghyiQSM1eKDlJOePP7nW6CpTWoJQoJY5rWDo5YIo+teQSGeJwk628FIUZKq+41hSiCBpUgOPPxAvkKgeYDvBxCTAfeok04AbGaDUYcfwGrFC7akR7kpktd66rGaCjj8u8nWajwafzYTUamcs4sXMkYphKckV0jjWXfCBF16XcWtY/hsiFqzZTXZQbrOJFUJt977S7Zv9a0UuREjSgVGr0XQAEyoRUWcjtYqSDPymPQUTQxLnvByOome+jJ673dX37N1Gan/3IU3iw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR01MB5475.eurprd01.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(136003)(39830400003)(376002)(346002)(396003)(366004)(186003)(16526019)(55016002)(52116002)(5660300002)(36916002)(6496006)(9576002)(33716001)(966005)(316002)(8676002)(9686003)(8936002)(83380400001)(1076003)(2906002)(4326008)(83730400002)(478600001)(66556008)(66946007)(66476007)(86362001)(6916009)(44832011);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData: 4YocbdKfJVfVmwnm1F0cU1yGRyUS5ZG6DAK2I7SEUJnVJeTVQGa4xe/F+xkmB03c9pVsrB0fjum0V4qDUkTGGtBLx2gwZ0RxDcMbDlbiwvHieWU6b6TIFAx2XsMyzhixaEhHdbmKsfzyNpQ+LS61XMrAU02enRAhMyFd8B5ezMmC9jyJ9ytVyF4xHCFKVud6vXlaIclpkL3Oi8rmagWcXz+1c/VludtjqEieXj/EHpU9L09ZMAyuNEgRXzfEiIXpJxEieEsGH6wrbkIwn8mnBe9t1wYCY8r83JnTioSvIYyt9iWb5A1KbQl4rNybpcw+X1HXgYUYKAVi7ma1bLa+hY7+H4N/Ginx2lzbCCv+4Cb0D+yElJVJVajj/o4C3MXN6i9tEZlTZvTXDVUX4S9DmBiul20lCLe2are320UAtfxSlW/hn4lQHue3bqsyhLnkOHV1eWgv42HfefNHb8ihoulHAVXKycikl+W4EVMxPPqBCFXwZc2QwFOoUixKgIFAa88CSwUHjLilGMA5Ahl6FXqjBb5CsJ2qQ1gkuOD5fCl0a/MGyEpYTXpASdcdbXY0S5Oa8FqFF3tz8KofnVyM9d7PqIrHeQr7F65kNkLakoC7bZEP7m2/XxYorIBIZV3diegPmFcIyAuyMt+kmDCOcB5DyDg15waZgMqHGi6Fvx66rJu4hZH3BeDIbZKuBDap0XrgT/cvPnowad8xS4QutA==
+X-OriginatorOrg: ml-pa.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e28100c5-580a-4b98-adf9-08d87377d38c
+X-MS-Exchange-CrossTenant-AuthSource: AM0PR01MB5475.eurprd01.prod.exchangelabs.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Oct 2020 15:09:36.2108
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 23090d33-f0df-44f5-9356-137a7bdfe69c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 9dwqZVuXzDICfCmHP/pLN7vQEtkfcb50Y97Y2IX+Ff2GocJnfENll/QNyIeXmSI/55qqFGdwB73ITD396kizUSMBKMDvPQDR8tMyC5PEQvA=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR01MB5313
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-On Sun, Sep 27, 2020 at 4:59 AM Stefan Schmidt
-<stefan@datenfreihafen.org> wrote:
-> > Also, somewhat annoying, but a shoddy USB hub damaged my ATUSB :( I
-> > ordered 2 more, so hopefully they get to me shortly!
+Hi,
 
-I received my 2 ATUSB :-)
+I'm trying to use the Linux WPAN stack with link-layer security.
+I checked out the nl802154_llsec branch of wpan-tools and enabled the
+IEEE802154_NL802154_EXPERIMENTAL config option.
 
-Here is a question though - the cc1352r supports 802.15.4g (GFSK /
-2-FSK / 4-FSK / OQPSK) and does not support BPSK for 868 MHz or 915
-Mhz.
+I followed the steps outlined in [0], but configuring the seclevel
+would always fail with
 
-Erik confirmed today that our wpanusb solution is working today both
-at 2.4 GHz and SubGHz, but we are using channels 0-11 for SubGHz. I
-think those are reserved for the BPSK phy though.
+> netlink: 'iwpan': attribute type 1 has an invalid length.
 
-Do we have pages / channels that cover the 802.15.4g PHYs in the wpan
-stack? Are there any suggestions for which page / channels to use? We
-have been looking through the spec, but of course it's quite dense
-nowadays.
+in dmesg.
+I followed the commands from the GitHub wiki:
 
-Also, since these radios can theoretically work simultaneously, we are
-considering exposing that as two separate and simultaneous PHYs and
-data paths. Is that something that would be desirable in wpanusb?
+KEY="c0:c1:c2:c3:c4:c5:c6:c7:c8:c9:ca:cb:cc:cd:ce:cf"
+WPAN=wpan0
 
-Cheers,
+PANID=$(iwpan     dev $WPAN info | grep pan_id        | head -1 | awk '{print $2}')
+SHORTADDR=$(iwpan dev $WPAN info | grep short_addr    | head -1 | awk '{print $2}')
+EXTADDR=$(iwpan   dev $WPAN info | grep extended_addr | head -1 | awk '{print $2}')
 
-C
+iwpan dev $WPAN set security 1 # works fine
+iwpan dev --debug $WPAN key add 2 $KEY 0 $PANID 3 $EXTADDR # works fine
+
+-- Debug: Sent Message:
+--------------------------   BEGIN NETLINK MESSAGE ---------------------------
+  [NETLINK HEADER] 16 octets
+    .nlmsg_len = 112
+    .type = 24 <0x18>
+    .flags = 5 <REQUEST,ACK>
+    .seq = 1603033315
+    .port = 1971323733
+  [GENERIC NETLINK HEADER] 4 octets
+    .cmd = 23
+    .version = 0
+    .unused = 0
+  [PAYLOAD] 92 octets
+    08 00 03 00 03 00 00 00 54 00 25 00 05 00 02 00 ........T.%.....
+    02 00 00 00 14 00 04 00 c0 c1 c2 c3 c4 c5 c6 c7 ................
+    c8 c9 ca cb cc cd ce cf 34 00 01 00 28 00 03 00 ........4...(...
+    06 00 01 00 23 00 00 00 08 00 02 00 03 00 00 00 ....#...........
+    06 00 03 00 00 ab 00 00 0c 00 04 00 8f d7 0c a1 ................
+    9c 41 04 92 08 00 01 00 00 00 00 00             .A..........
+---------------------------  END NETLINK MESSAGE   ---------------------------
+-- Debug: Received Message:
+--------------------------   BEGIN NETLINK MESSAGE ---------------------------
+  [NETLINK HEADER] 16 octets
+    .nlmsg_len = 36
+    .type = 2 <ERROR>
+    .flags = 256 <ROOT>
+    .seq = 1603033315
+    .port = 1971323733
+  [ERRORMSG] 20 octets
+    .error = 0 "Success"
+  [ORIGINAL MESSAGE] 16 octets
+    .nlmsg_len = 16
+    .type = 24 <0x18>
+    .flags = 5 <REQUEST,ACK>
+    .seq = 1603033315
+    .port = 1971323733
+---------------------------  END NETLINK MESSAGE   ---------------------------
+
+iwpan --debug dev $WPAN seclevel add 0xff 2 0 # dmesg says attribute type 1 has an invalid length.
+
+-- Debug: Sent Message:
+--------------------------   BEGIN NETLINK MESSAGE ---------------------------
+  [NETLINK HEADER] 16 octets
+    .nlmsg_len = 56
+    .type = 24 <0x18>
+    .flags = 5 <REQUEST,ACK>
+    .seq = 1603033355
+    .port = 1535116138
+  [GENERIC NETLINK HEADER] 4 octets
+    .cmd = 32
+    .version = 0
+    .unused = 0
+  [PAYLOAD] 36 octets
+    08 00 03 00 03 00 00 00 1c 00 22 00 08 00 01 00 ..........".....
+    ff 00 00 00 08 00 02 00 02 00 00 00 05 00 04 00 ................
+    00 00 00 00                                     ....
+---------------------------  END NETLINK MESSAGE   ---------------------------
+-- Debug: Received Message:
+--------------------------   BEGIN NETLINK MESSAGE ---------------------------
+  [NETLINK HEADER] 16 octets
+    .nlmsg_len = 36
+    .type = 2 <ERROR>
+    .flags = 256 <ROOT>
+    .seq = 1603033355
+    .port = 1535116138
+  [ERRORMSG] 20 octets
+    .error = 0 "Success"
+  [ORIGINAL MESSAGE] 16 octets
+    .nlmsg_len = 16
+    .type = 24 <0x18>
+    .flags = 5 <REQUEST,ACK>
+    .seq = 1603033355
+    .port = 1535116138
+---------------------------  END NETLINK MESSAGE ---------------------------
+
+I then continue with
+
+iwpan dev $WPAN device add 0 $PANID $SHORTADDR $EXTADDR 0 0
+iwpan dev $WPAN set out_level 0x05
+iwpan dev $WPAN set out_key_id 0 $PANID 2 $SHORTADDR 3 $EXTADDR
+
+But I can not receive encrypted frames nor can I send any - instead I get
+
+[  502.970528] ieee802154 phy0 wpan0: encryption failed: -126
+[  503.972415] ieee802154 phy0 wpan0: encryption failed: -126
+
+in dmesg.
+
+iwpan dev wpan0 info gives:
+
+Interface wpan0
+	ifindex 3
+	wpan_dev 0x1
+	extended_addr 0x9204419ca10cd78f
+	short_addr 0xffff
+	pan_id 0x0023
+	type node
+	max_frame_retries 3
+	min_be 3
+	max_be 5
+	max_csma_backoffs 4
+	lbt 0
+	ackreq_default 0
+	security 1
+	out_level 5
+	out_key_id
+		mode implicit
+		pan_id 0x0023
+		addr_mode 2
+		short_addr 0xffff
+	frame_counter 0x00000000
+
+Is LLSEC broken or am I configuring it wrong?
+
+Best,
+Benjamin
+
+[0]
+https://github.com/linux-wpan/wpan-tools/wiki/Guide:-Contiki-%E2%86%94-Linux,-with-llsec#linuxiwpan-configuration
