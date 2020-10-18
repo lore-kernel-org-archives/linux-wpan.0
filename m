@@ -7,61 +7,63 @@ X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C30A4C433E7
-	for <linux-wpan@archiver.kernel.org>; Sun, 18 Oct 2020 23:21:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36D91C433E7
+	for <linux-wpan@archiver.kernel.org>; Sun, 18 Oct 2020 23:32:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7310522275
-	for <linux-wpan@archiver.kernel.org>; Sun, 18 Oct 2020 23:21:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E288222266
+	for <linux-wpan@archiver.kernel.org>; Sun, 18 Oct 2020 23:32:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AbLHiMmH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qQDs5njN"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727221AbgJRXVF (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Sun, 18 Oct 2020 19:21:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41400 "EHLO
+        id S1729694AbgJRXcN (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Sun, 18 Oct 2020 19:32:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43090 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726681AbgJRXVF (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Sun, 18 Oct 2020 19:21:05 -0400
-Received: from mail-ot1-x343.google.com (mail-ot1-x343.google.com [IPv6:2607:f8b0:4864:20::343])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99202C061755
-        for <linux-wpan@vger.kernel.org>; Sun, 18 Oct 2020 16:21:05 -0700 (PDT)
-Received: by mail-ot1-x343.google.com with SMTP id i12so8754687ota.5
-        for <linux-wpan@vger.kernel.org>; Sun, 18 Oct 2020 16:21:05 -0700 (PDT)
+        with ESMTP id S1726681AbgJRXcN (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Sun, 18 Oct 2020 19:32:13 -0400
+Received: from mail-oi1-x22a.google.com (mail-oi1-x22a.google.com [IPv6:2607:f8b0:4864:20::22a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EEA9C061755
+        for <linux-wpan@vger.kernel.org>; Sun, 18 Oct 2020 16:32:13 -0700 (PDT)
+Received: by mail-oi1-x22a.google.com with SMTP id u17so10501456oie.3
+        for <linux-wpan@vger.kernel.org>; Sun, 18 Oct 2020 16:32:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=2kfLteUIwExuv/yfta+bFTQO0lWy0FxvQfv/Bxv0vlY=;
-        b=AbLHiMmHe8z74cumAFemNNgAMaJINSnSs4j87eRCMCspMN6S3fMxCGz/2oUihzMVMr
-         7Cn+BYrMXceVKSkbVctke0Q0cBhxvIcez0LNkrKM3dQwVGcAH87jPJrTtm0DSuEWmMug
-         PT6og6sHV6cnJFeiQY4NzWzlbA/we5zocC5KSoNTi3+CZXsS2irAVjw7RTCge6fVu9Yg
-         AhA2EX9D525FR/QMpod+WbPNMvoNH5pkbSxdqEhgvpSZffRA9io7FOt/ON/ap0PlOW9S
-         cBN4WF/MEp46sJBnLQBxvdSCAA9Tvo3vmwERVWVdNqh4G4DqDn3d7dN0x1kiSHlSH29H
-         +CQA==
+        bh=wFVz1oodG8vEZ772ddhoCzJi/iDbmJXycexIPJOsAT4=;
+        b=qQDs5njNn7OTEXyp+c0FLwbLDuSkk12Fufw3kvYUVGY3aPQw54qltgBLK3LOnXcZeE
+         x1gvrP1ubfcHFJzZ4W6U/E6n8TcsxGtjZTY+sOr4Fwg/+9qt+a5ePF9zdJ9ZlxKheO9j
+         QaaTOck9/DkP1icKH6jEM7KSZMU0WsWj8isKb3Zdx5VHSaCX05uRj81ycQ1r9uBB5f0f
+         3tz8hHcBK75wOzxUNS7I7nC/MVB+b3ETyz6qJapA8KKpuz3EVJuIfbm1d60n5PEfC/gs
+         gCAdzANFsSIviNDunwkeHB7QyL6IMlhKEIMLf3rj7M28QgRW9PHoiRHgfjE7Ztz+l141
+         uZsw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=2kfLteUIwExuv/yfta+bFTQO0lWy0FxvQfv/Bxv0vlY=;
-        b=WVDypp2xJQPGTzSQ+kIav2m8E2Qh/YvalZUgYza1OQVVB6My02CVvUvCuiITz//3ng
-         6Tu9gfIi59avIJkLWzMf5iua2l5zkcaCRXIbswCTG9Y3hgXgRhyqbIa07jvFmsRxBmRZ
-         qP8WUWEHCOKxLZcmVf82nwZo8v7F7lcx1pnlF4vboeGboejpOUSeMBqp8mWTmGmXe9d1
-         MYuy4k6SbBx/V7o5fygUoX07Xc7hnnJvkY9/Z9n/syzNwPsC0e+VSTWgfQ9m1sNAgnxV
-         BXxImnYIemEIvYMPEmqmnmXQZl6oEjhiC5IkbTrVQuWue2PeOPZl4ZXV9O2e2t8WvgG3
-         N40g==
-X-Gm-Message-State: AOAM532bEwbS6tVqPXzDHx6pk2cvhyk5Ga2epBbzxr7exOw+p0Ve+Yj9
-        bFKTsBgyzfF+mGHOBEuczb1ttmaVcBh/FhIQ+WlwAwXHM4A=
-X-Google-Smtp-Source: ABdhPJwLcGgTEDAiOQ4p5bqQsbxiIAkA3Zq43q5d2eYLsyWNorRp3wAOkLALB/pV6QEND+arRHUsEsEkHKusLi9vSAs=
-X-Received: by 2002:a9d:2c05:: with SMTP id f5mr10341326otb.183.1603063264835;
- Sun, 18 Oct 2020 16:21:04 -0700 (PDT)
+        bh=wFVz1oodG8vEZ772ddhoCzJi/iDbmJXycexIPJOsAT4=;
+        b=fzJvsnQdI7Cs9AoGEiYp51Bp67EmQFw9b0q1yWOiob06FaCh/ktEGp/znsX8Pyznk+
+         W9y+G7F8CShW/JjFN9O50hv/VpkjkK8krTl8MsRKkd8h2F/aKueZB7rZQc3LtfSCwWA1
+         B2MH4STpgcBFlQqF332vJkbyfSTIqc/wYhvWS3Oh+ZjGXskCFSpHInkaeEuNNs7UjH9O
+         sCw4Z95mcm4m5TfTSM9oGilfI/nqYMIFURPVRVCHqfsFczXTTN/ALavTppfSS+G/sugk
+         ZMp/r7zm96FUHbr2mfXTaZOc2X1Sxu9JGQ5JdCXqfsaUJPNOjk6Zgo1sKXnz9Y1c2Ywm
+         tBUA==
+X-Gm-Message-State: AOAM530PpP2cZVLWlF4OYf8hiDU0THxZ9Xw1VOnrr+JfktLbR90c31JU
+        i7NFyJnM1toeTSMDhK+xQU6M3E+QSf4d5E26V7PHsyXD
+X-Google-Smtp-Source: ABdhPJxYFaDAFQxzV0UeooKCxHF4dr7oxd7Ub+vQWLEOl8Zq9kLNI3oJe1o4Hwzth3AlIq0o1UavH4TT/GwC9NIszLQ=
+X-Received: by 2002:a05:6808:4d3:: with SMTP id a19mr9065443oie.10.1603063932782;
+ Sun, 18 Oct 2020 16:32:12 -0700 (PDT)
 MIME-Version: 1.0
-References: <20201018170934.2c03c9e3@rechenknecht2k11>
-In-Reply-To: <20201018170934.2c03c9e3@rechenknecht2k11>
+References: <f1acad10-2fb3-a402-df58-907c2580c5ab@gmx.net> <21010.1600201310@localhost>
+ <CAB_54W6S3+kf1Uowt9Y+nJVNOG4SS8GFwdd7F+6WJ8=W4Pbahg@mail.gmail.com> <9724.1600275702@localhost>
+In-Reply-To: <9724.1600275702@localhost>
 From:   Alexander Aring <alex.aring@gmail.com>
-Date:   Sun, 18 Oct 2020 19:20:53 -0400
-Message-ID: <CAB_54W5VgY+DeqdjiQ7BJsmXw-G=POwGE7tzYuwAwYixe6y9XQ@mail.gmail.com>
-Subject: Re: iwpan with LLSEC - attribute type 1 has an invalid length
-To:     Benjamin Valentin <benjamin.valentin@ml-pa.com>
-Cc:     linux-wpan - ML <linux-wpan@vger.kernel.org>, koen@bergzand.net
+Date:   Sun, 18 Oct 2020 19:32:01 -0400
+Message-ID: <CAB_54W786Cfox4_CLMa1SteX_xab4X1bbwBsgqb_Ok5rQBS_8w@mail.gmail.com>
+Subject: Re: 6lowpan Support for Raspberry PI 3B+ - CYW43455
+To:     Michael Richardson <mcr@sandelman.ca>
+Cc:     Achim Kraus <achimkraus@gmx.net>,
+        linux-wpan - ML <linux-wpan@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
@@ -69,183 +71,36 @@ X-Mailing-List: linux-wpan@vger.kernel.org
 
 Hi,
 
-On Sun, 18 Oct 2020 at 11:48, Benjamin Valentin
-<benjamin.valentin@ml-pa.com> wrote:
+On Wed, 16 Sep 2020 at 13:01, Michael Richardson <mcr@sandelman.ca> wrote:
 >
-> Hi,
 >
-> I'm trying to use the Linux WPAN stack with link-layer security.
-> I checked out the nl802154_llsec branch of wpan-tools and enabled the
-> IEEE802154_NL802154_EXPERIMENTAL config option.
+> Alexander Aring <alex.aring@gmail.com> wrote:
+>     > I tried to use BT 6LoWPAN and experienced a lot of races there, sadly
+>     > nobody is fixing it. I sent a RFC some years ago to tackle these
+>     > issues, also that the link-layer address is reconstructed by L3
+>     > address and not by a ndisc lookup is very weird. I don't know if this
+>     > is fixed or not.  However it was nothing related to the new BT mesh
+>     > stuff.
 >
-> I followed the steps outlined in [0], but configuring the seclevel
-> would always fail with
+>     >> for any BT device.  I would love to be wrong!!
+>     >>
+>     >> Running BTLE mesh is something I'd really like to do.
+>     >> My guess is that one could probably prototype this in userspace on top of
+>     >> bluez, and then use Alex' 6lowpan tap interface.
 >
-> > netlink: 'iwpan': attribute type 1 has an invalid length.
+>     > I did not do the "6lowpan tap" interface, the bluetooth people did
+>     > that and I complained about it and I never would accept this upstream.
 >
-> in dmesg.
-> I followed the commands from the GitHub wiki:
->
-> KEY="c0:c1:c2:c3:c4:c5:c6:c7:c8:c9:ca:cb:cc:cd:ce:cf"
-> WPAN=wpan0
->
-> PANID=$(iwpan     dev $WPAN info | grep pan_id        | head -1 | awk '{print $2}')
-> SHORTADDR=$(iwpan dev $WPAN info | grep short_addr    | head -1 | awk '{print $2}')
-> EXTADDR=$(iwpan   dev $WPAN info | grep extended_addr | head -1 | awk '{print $2}')
->
-> iwpan dev $WPAN set security 1 # works fine
-> iwpan dev --debug $WPAN key add 2 $KEY 0 $PANID 3 $EXTADDR # works fine
->
-> -- Debug: Sent Message:
-> --------------------------   BEGIN NETLINK MESSAGE ---------------------------
->   [NETLINK HEADER] 16 octets
->     .nlmsg_len = 112
->     .type = 24 <0x18>
->     .flags = 5 <REQUEST,ACK>
->     .seq = 1603033315
->     .port = 1971323733
->   [GENERIC NETLINK HEADER] 4 octets
->     .cmd = 23
->     .version = 0
->     .unused = 0
->   [PAYLOAD] 92 octets
->     08 00 03 00 03 00 00 00 54 00 25 00 05 00 02 00 ........T.%.....
->     02 00 00 00 14 00 04 00 c0 c1 c2 c3 c4 c5 c6 c7 ................
->     c8 c9 ca cb cc cd ce cf 34 00 01 00 28 00 03 00 ........4...(...
->     06 00 01 00 23 00 00 00 08 00 02 00 03 00 00 00 ....#...........
->     06 00 03 00 00 ab 00 00 0c 00 04 00 8f d7 0c a1 ................
->     9c 41 04 92 08 00 01 00 00 00 00 00             .A..........
-> ---------------------------  END NETLINK MESSAGE   ---------------------------
-> -- Debug: Received Message:
-> --------------------------   BEGIN NETLINK MESSAGE ---------------------------
->   [NETLINK HEADER] 16 octets
->     .nlmsg_len = 36
->     .type = 2 <ERROR>
->     .flags = 256 <ROOT>
->     .seq = 1603033315
->     .port = 1971323733
->   [ERRORMSG] 20 octets
->     .error = 0 "Success"
->   [ORIGINAL MESSAGE] 16 octets
->     .nlmsg_len = 16
->     .type = 24 <0x18>
->     .flags = 5 <REQUEST,ACK>
->     .seq = 1603033315
->     .port = 1971323733
-> ---------------------------  END NETLINK MESSAGE   ---------------------------
->
-> iwpan --debug dev $WPAN seclevel add 0xff 2 0 # dmesg says attribute type 1 has an invalid length.
+> okay, what did you use to connect the OpenThread native-build processes together?
 >
 
-2 is ack frame, I think you mean 1.
-
-> -- Debug: Sent Message:
-> --------------------------   BEGIN NETLINK MESSAGE ---------------------------
->   [NETLINK HEADER] 16 octets
->     .nlmsg_len = 56
->     .type = 24 <0x18>
->     .flags = 5 <REQUEST,ACK>
->     .seq = 1603033355
->     .port = 1535116138
->   [GENERIC NETLINK HEADER] 4 octets
->     .cmd = 32
->     .version = 0
->     .unused = 0
->   [PAYLOAD] 36 octets
->     08 00 03 00 03 00 00 00 1c 00 22 00 08 00 01 00 ..........".....
->     ff 00 00 00 08 00 02 00 02 00 00 00 05 00 04 00 ................
->     00 00 00 00                                     ....
-> ---------------------------  END NETLINK MESSAGE   ---------------------------
-> -- Debug: Received Message:
-> --------------------------   BEGIN NETLINK MESSAGE ---------------------------
->   [NETLINK HEADER] 16 octets
->     .nlmsg_len = 36
->     .type = 2 <ERROR>
->     .flags = 256 <ROOT>
->     .seq = 1603033355
->     .port = 1535116138
->   [ERRORMSG] 20 octets
->     .error = 0 "Success"
-
-Success? Like above? Can you tell me the command line error message
-please? What does tell you "type 1 has an invalid length"
-
->   [ORIGINAL MESSAGE] 16 octets
->     .nlmsg_len = 16
->     .type = 24 <0x18>
->     .flags = 5 <REQUEST,ACK>
->     .seq = 1603033355
->     .port = 1535116138
-> ---------------------------  END NETLINK MESSAGE ---------------------------
->
-> I then continue with
->
-> iwpan dev $WPAN device add 0 $PANID $SHORTADDR $EXTADDR 0 0
-> iwpan dev $WPAN set out_level 0x05
-> iwpan dev $WPAN set out_key_id 0 $PANID 2 $SHORTADDR 3 $EXTADDR
->
-> But I can not receive encrypted frames nor can I send any - instead I get
->
-> [  502.970528] ieee802154 phy0 wpan0: encryption failed: -126
-> [  503.972415] ieee802154 phy0 wpan0: encryption failed: -126
->
-
-It tells you -ENOKEY, the whole thing has an ACL and somehow the
-lookup cannot find a key (if sec is enabled).
-
-> in dmesg.
->
-> iwpan dev wpan0 info gives:
->
-> Interface wpan0
->         ifindex 3
->         wpan_dev 0x1
->         extended_addr 0x9204419ca10cd78f
->         short_addr 0xffff
->         pan_id 0x0023
->         type node
->         max_frame_retries 3
->         min_be 3
->         max_be 5
->         max_csma_backoffs 4
->         lbt 0
->         ackreq_default 0
->         security 1
->         out_level 5
->         out_key_id
->                 mode implicit
->                 pan_id 0x0023
->                 addr_mode 2
->                 short_addr 0xffff
->         frame_counter 0x00000000
->
-> Is LLSEC broken or am I configuring it wrong?
-
-It's been a long time since I worked with it, it's good to have the
-802.15.4 standard right beside you, the implementation is very close
-to that structure that they describe.
-
-There are known issues:
-
- - Don't trust wireshark, you will not see exactly what's sending out
-on the wire. We just do the encryption on the wrong layer, but moving
-it was causing other problems. I recently stumbled over something
-which maybe can help us there, but didn't look closely at that, some
-subsystems have special handling for tcpdump/wireshark things.
- - The frame_counter thing that you see above needs to be synchronized
-on all nodes, if nodes join with a zero value you can do replay
-attacks. 802.15.4 doesn't solve that on the link layer for peer to
-peer, MLE can do that in a way to just make the attack window smaller.
- - When the fame_counter overflows you need a new key, means key
-management and key exchange. Biggest problem :-) I was talking with
-Koen about that once... he showed me some interesting stuff, forgot
-the name..
-
-Please dump more:
-
-iwpan dev $WPAN_DEV seclevel dump
-iwpan dev $WPAN_DEV device dump
-iwpan dev $WPAN_DEV devkey dump
-iwpan dev $WPAN_DEV key dump
+sorry for the late reply. This was doing L2 and above in user space,
+it was the Linux driver layer only... I thought it was about using
+6LoWPAN until the transport layer in kernel and link-layer in user
+space.
+It also had some problems with ack handling and you will not really
+use Linux then, however I was always thinking about to wrap a whole
+library around openthread and do some daemon to using Linux then,
+instead running an OS on an OS.
 
 - Alex
