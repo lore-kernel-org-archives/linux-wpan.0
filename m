@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0E80C433E0
-	for <linux-wpan@archiver.kernel.org>; Thu, 18 Feb 2021 19:09:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46813C433E0
+	for <linux-wpan@archiver.kernel.org>; Thu, 18 Feb 2021 19:46:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A59E564EBA
-	for <linux-wpan@archiver.kernel.org>; Thu, 18 Feb 2021 19:09:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EB08164EB3
+	for <linux-wpan@archiver.kernel.org>; Thu, 18 Feb 2021 19:46:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232083AbhBRTJY (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Thu, 18 Feb 2021 14:09:24 -0500
-Received: from mail-io1-f70.google.com ([209.85.166.70]:37637 "EHLO
-        mail-io1-f70.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232372AbhBRRWZ (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 18 Feb 2021 12:22:25 -0500
-Received: by mail-io1-f70.google.com with SMTP id q10so1832983ion.4
-        for <linux-wpan@vger.kernel.org>; Thu, 18 Feb 2021 09:21:51 -0800 (PST)
+        id S231990AbhBRTpu (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Thu, 18 Feb 2021 14:45:50 -0500
+Received: from mail-io1-f69.google.com ([209.85.166.69]:35398 "EHLO
+        mail-io1-f69.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231250AbhBRTZF (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 18 Feb 2021 14:25:05 -0500
+Received: by mail-io1-f69.google.com with SMTP id a1so2074831ios.2
+        for <linux-wpan@vger.kernel.org>; Thu, 18 Feb 2021 11:24:47 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=vTqU7z+hMuPADLiCcqd0CORJtVZxh1RcwMIGtNvcShM=;
-        b=ZCsETidED1ULsDQ/P2LgKwrPFmu0N2S6mNCKc1f5l0DQe2e+ICGX+fAIk+yW5GMz+N
-         gQQXY42BsqHr0bFsUkLCBxM0caEqBZNebFIsxBjrmaYQ9T4wY1tu5c33PnKL1wGvtfIq
-         c7lB+7j6chfxQ8cIlEEMTmok8esZ25ODTJPaUkvkWv7ttzKLAK79XJtWCmNI8AdzqwP0
-         ql6SFCaJIvQoHXeN8tVaRsBXgEyY+PtqwMzNNXHCh1uY8FM8LBLvReGxYN1ju415PThd
-         d9wB+4uraVSIxf2gBHlep5TMfvq0HVM7P9O85NjrnsNBXpaL/+dQJaAqoy6nA9dui2CJ
-         y0zQ==
-X-Gm-Message-State: AOAM5307wVjihJrMM7Yt8pmYMO6K4aMsr2tTPd3KFUsM4Bbm7DckcKPl
-        TWEXLD/Bb5I1WDCy5uC0gFRv1HPfgMhGP4oJDYMl80oQo6Ol
-X-Google-Smtp-Source: ABdhPJyhfC4emPz0tt0e0xYr/NQMSaPCtH2D7fzzBugRGRtdtTRHEstAEOsdHNNr3z//FFNEIC/39xJrLqB/G7WohdyWXluvIPrv
+        bh=MNizgv5mvQWhBT/s84w4wVfXhQTCYQ+gD1CNu9mQuu4=;
+        b=NZ/PmFeVO4XMFQ+zLRBuJZnk183GV8aOtfPZaIFq+HX7Y807HPCA1L4fPXZaSkFuLt
+         XwAi+nf1q8lk4PPAhZBRnSeuY/6npJJf4sRnauB7jU5j/yNe49klMIQD4AaRS8E+lptY
+         72k9CtHYS1EeNZ2Q0qlhwpYA0gF22LZ3tOh7o3FcAM2/y87RTolgMWl8MFWf1tyX0JZl
+         rKqC/2ax4Be0ipgowdoOgxTDU37fCCvnEQji/GU28WIu4Vj/oU0zRGZkMpwD6xaguy0h
+         9vN5KVeNqXVpCP29/v8zNfg8LXVivvaVVRuoiL1TPBvCSql+g6hJYYNnzA76+lr+pWJe
+         xc6Q==
+X-Gm-Message-State: AOAM531lyZy9SYQMRfPRxWqq+eT4OgKc0ETk/V8GGhbuUrtCuoA87Wna
+        Ki0hyM/qGz+6CBe2oxhA4vPExe7Wg1OQjMWRd+8/aca2kz+H
+X-Google-Smtp-Source: ABdhPJygfiVFf+6UJu1Xxuh6NPoc/nkSTCw7BvJc4CESWo6dfUttZyO9/aMhy4J5sNa+vDjZcwA9lbgm6JUU41SE0YRkBJjt5cKM
 MIME-Version: 1.0
-X-Received: by 2002:a02:1ac5:: with SMTP id 188mr5458237jai.71.1613668886098;
- Thu, 18 Feb 2021 09:21:26 -0800 (PST)
-Date:   Thu, 18 Feb 2021 09:21:26 -0800
+X-Received: by 2002:a92:cc41:: with SMTP id t1mr594092ilq.27.1613676262080;
+ Thu, 18 Feb 2021 11:24:22 -0800 (PST)
+Date:   Thu, 18 Feb 2021 11:24:22 -0800
 X-Google-Appengine-App-Id: s~syzkaller
 X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000bdbc6a05bb9f90b0@google.com>
-Subject: general protection fault in nl802154_del_llsec_dev
-From:   syzbot <syzbot+d946223c2e751d136c94@syzkaller.appspotmail.com>
+Message-ID: <0000000000006246f105bba148f9@google.com>
+Subject: BUG: unable to handle kernel paging request in nl802154_del_llsec_key
+From:   syzbot <syzbot+ac5c11d2959a8b3c4806@syzkaller.appspotmail.com>
 To:     alex.aring@gmail.com, davem@davemloft.net, kuba@kernel.org,
         linux-kernel@vger.kernel.org, linux-wpan@vger.kernel.org,
         netdev@vger.kernel.org, stefan@datenfreihafen.org,
@@ -55,77 +55,85 @@ Hello,
 
 syzbot found the following issue on:
 
-HEAD commit:    57baf8cc net: axienet: Handle deferred probe on clock prop..
-git tree:       net
-console output: https://syzkaller.appspot.com/x/log.txt?x=16d83be2d00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=8cb23303ddb9411f
-dashboard link: https://syzkaller.appspot.com/bug?extid=d946223c2e751d136c94
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=161c1204d00000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12daf1d2d00000
+HEAD commit:    f40ddce8 Linux 5.11
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=11261a4cd00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=67894355b1dbeb07
+dashboard link: https://syzkaller.appspot.com/bug?extid=ac5c11d2959a8b3c4806
+userspace arch: arm64
+
+Unfortunately, I don't have any reproducer for this issue yet.
 
 IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+d946223c2e751d136c94@syzkaller.appspotmail.com
+Reported-by: syzbot+ac5c11d2959a8b3c4806@syzkaller.appspotmail.com
 
-general protection fault, probably for non-canonical address 0xdffffc0000000000: 0000 [#1] PREEMPT SMP KASAN
-KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
-CPU: 1 PID: 8428 Comm: syz-executor295 Not tainted 5.11.0-rc7-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-RIP: 0010:nla_len include/net/netlink.h:1148 [inline]
-RIP: 0010:nla_parse_nested_deprecated include/net/netlink.h:1231 [inline]
-RIP: 0010:nl802154_del_llsec_dev+0x150/0x310 net/ieee802154/nl802154.c:1760
-Code: 00 48 89 fa 48 c1 ea 03 80 3c 02 00 0f 85 c4 01 00 00 48 8b 93 18 01 00 00 48 b8 00 00 00 00 00 fc ff df 48 89 d1 48 c1 e9 03 <0f> b6 0c 01 48 89 d0 83 e0 07 83 c0 01 38 c8 7c 08 84 c9 0f 85 13
-RSP: 0018:ffffc90001a67568 EFLAGS: 00010246
-RAX: dffffc0000000000 RBX: ffff88801def5400 RCX: 0000000000000000
-RDX: 0000000000000000 RSI: ffffffff8888ffaa RDI: ffff88801def5518
-RBP: 1ffff9200034ceae R08: 0000000000000000 R09: 0000000000000000
-R10: ffffffff87315ffa R11: 0000000000000000 R12: ffff8881443d6000
-R13: ffff8881441e4bd0 R14: ffffc90001a678b0 R15: 0000000000000000
-FS:  000000000208c300(0000) GS:ffff8880b9d00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f3aac6fd6c0 CR3: 00000000210c4000 CR4: 00000000001506e0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- genl_family_rcv_msg_doit+0x228/0x320 net/netlink/genetlink.c:739
- genl_family_rcv_msg net/netlink/genetlink.c:783 [inline]
- genl_rcv_msg+0x328/0x580 net/netlink/genetlink.c:800
- netlink_rcv_skb+0x153/0x420 net/netlink/af_netlink.c:2494
- genl_rcv+0x24/0x40 net/netlink/genetlink.c:811
- netlink_unicast_kernel net/netlink/af_netlink.c:1304 [inline]
- netlink_unicast+0x533/0x7d0 net/netlink/af_netlink.c:1330
- netlink_sendmsg+0x856/0xd90 net/netlink/af_netlink.c:1919
- sock_sendmsg_nosec net/socket.c:652 [inline]
- sock_sendmsg+0xcf/0x120 net/socket.c:672
- ____sys_sendmsg+0x6e8/0x810 net/socket.c:2345
- ___sys_sendmsg+0xf3/0x170 net/socket.c:2399
- __sys_sendmsg+0xe5/0x1b0 net/socket.c:2432
- do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
- entry_SYSCALL_64_after_hwframe+0x44/0xa9
-RIP: 0033:0x43f969
-Code: 28 c3 e8 5a 14 00 00 66 2e 0f 1f 84 00 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 c0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffe784206c8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00000000004004a0 RCX: 000000000043f969
-RDX: 0000000020008800 RSI: 0000000020000600 RDI: 0000000000000003
-RBP: 00000000004033d0 R08: 0000000000000008 R09: 00000000004004a0
-R10: 0000000000000003 R11: 0000000000000246 R12: 0000000000403460
-R13: 0000000000000000 R14: 00000000004ad018 R15: 00000000004004a0
+netlink: 164 bytes leftover after parsing attributes in process `syz-executor.1'.
+Unable to handle kernel paging request at virtual address dfff800000000000
+Mem abort info:
+  ESR = 0x96000004
+  EC = 0x25: DABT (current EL), IL = 32 bits
+  SET = 0, FnV = 0
+  EA = 0, S1PTW = 0
+Data abort info:
+  ISV = 0, ISS = 0x00000004
+  CM = 0, WnR = 0
+[dfff800000000000] address between user and kernel address ranges
+Internal error: Oops: 96000004 [#1] PREEMPT SMP
+Dumping ftrace buffer:
+   (ftrace buffer empty)
 Modules linked in:
----[ end trace 9aedc238aa0648a2 ]---
-RIP: 0010:nla_len include/net/netlink.h:1148 [inline]
-RIP: 0010:nla_parse_nested_deprecated include/net/netlink.h:1231 [inline]
-RIP: 0010:nl802154_del_llsec_dev+0x150/0x310 net/ieee802154/nl802154.c:1760
-Code: 00 48 89 fa 48 c1 ea 03 80 3c 02 00 0f 85 c4 01 00 00 48 8b 93 18 01 00 00 48 b8 00 00 00 00 00 fc ff df 48 89 d1 48 c1 e9 03 <0f> b6 0c 01 48 89 d0 83 e0 07 83 c0 01 38 c8 7c 08 84 c9 0f 85 13
-RSP: 0018:ffffc90001a67568 EFLAGS: 00010246
-RAX: dffffc0000000000 RBX: ffff88801def5400 RCX: 0000000000000000
-RDX: 0000000000000000 RSI: ffffffff8888ffaa RDI: ffff88801def5518
-RBP: 1ffff9200034ceae R08: 0000000000000000 R09: 0000000000000000
-R10: ffffffff87315ffa R11: 0000000000000000 R12: ffff8881443d6000
-R13: ffff8881441e4bd0 R14: ffffc90001a678b0 R15: 0000000000000000
-FS:  000000000208c300(0000) GS:ffff8880b9d00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f3aac6fd6c0 CR3: 00000000210c4000 CR4: 00000000001506e0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+CPU: 1 PID: 5366 Comm: syz-executor.1 Not tainted 5.11.0-syzkaller #0
+Hardware name: linux,dummy-virt (DT)
+pstate: 60000005 (nZCv daif -PAN -UAO -TCO BTYPE=--)
+pc : nla_len include/net/netlink.h:1148 [inline]
+pc : nla_parse_nested_deprecated include/net/netlink.h:1231 [inline]
+pc : nl802154_del_llsec_key+0x138/0x2c0 net/ieee802154/nl802154.c:1595
+lr : genl_family_rcv_msg_doit+0x1b8/0x2a0 net/netlink/genetlink.c:739
+sp : ffff000019c57280
+x29: ffff000019c57280 x28: ffff80001aa29cc0 
+x27: ffff000019c576d0 x26: ffff000012280000 
+x25: 1fffe0000338aeb2 x24: 1fffe0000338ae84 
+x23: ffff800018380c80 x22: ffff000016174c10 
+x21: ffff00000fca8000 x20: 0000000000000000 
+x19: 1fffe0000338ae5a x18: 0000000000000001 
+x17: 0000000000000000 x16: 0000000000000000 
+x15: 0000000000000000 x14: 1fffe0000338adf4 
+x13: 0000000000000000 x12: ffff60000338ae55 
+x11: 1fffe0000338ae54 x10: ffff60000338ae54 
+x9 : 000000000000f1f1 x8 : 000000000000f2f2 
+x7 : 00000000f3000000 x6 : 1fffe0000338ae90 
+x5 : 00000000f3f3f3f3 x4 : 0000000000000000 
+x3 : dfff800000000000 x2 : 0000000000000004 
+x1 : ffff000019c57450 x0 : 0000000000000001 
+Call trace:
+ nla_data include/net/netlink.h:1139 [inline]
+ nla_parse_nested_deprecated include/net/netlink.h:1231 [inline]
+ nl802154_del_llsec_key+0x138/0x2c0 net/ieee802154/nl802154.c:1595
+ genl_family_rcv_msg_doit+0x1b8/0x2a0 net/netlink/genetlink.c:739
+ genl_family_rcv_msg net/netlink/genetlink.c:783 [inline]
+ genl_rcv_msg+0x24c/0x430 net/netlink/genetlink.c:800
+ netlink_rcv_skb+0x198/0x34c net/netlink/af_netlink.c:2494
+ genl_rcv+0x38/0x50 net/netlink/genetlink.c:811
+ netlink_unicast_kernel net/netlink/af_netlink.c:1304 [inline]
+ netlink_unicast+0x3e0/0x670 net/netlink/af_netlink.c:1330
+ netlink_sendmsg+0x610/0xa20 net/netlink/af_netlink.c:1919
+ sock_sendmsg_nosec net/socket.c:652 [inline]
+ sock_sendmsg+0xc0/0xf4 net/socket.c:672
+ ____sys_sendmsg+0x548/0x6d0 net/socket.c:2345
+ ___sys_sendmsg+0xf4/0x170 net/socket.c:2399
+ __sys_sendmsg+0xbc/0x14c net/socket.c:2432
+ __do_sys_sendmsg net/socket.c:2441 [inline]
+ __se_sys_sendmsg net/socket.c:2439 [inline]
+ __arm64_sys_sendmsg+0x70/0xa0 net/socket.c:2439
+ __invoke_syscall arch/arm64/kernel/syscall.c:37 [inline]
+ invoke_syscall arch/arm64/kernel/syscall.c:49 [inline]
+ el0_svc_common.constprop.0+0x110/0x3c0 arch/arm64/kernel/syscall.c:159
+ do_el0_svc+0xa4/0xd0 arch/arm64/kernel/syscall.c:198
+ el0_svc+0x20/0x30 arch/arm64/kernel/entry-common.c:365
+ el0_sync_handler+0x1a4/0x1ac arch/arm64/kernel/entry-common.c:381
+ el0_sync+0x174/0x180 arch/arm64/kernel/entry.S:699
+Code: f2fbffe3 92400a80 11000400 91001282 (38e36883) 
+---[ end trace dde92eef2b40d315 ]---
 
 
 ---
@@ -135,5 +143,3 @@ syzbot engineers can be reached at syzkaller@googlegroups.com.
 
 syzbot will keep track of this issue. See:
 https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-syzbot can test patches for this issue, for details see:
-https://goo.gl/tpsmEJ#testing-patches
