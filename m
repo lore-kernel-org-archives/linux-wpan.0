@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 946D6C433DB
-	for <linux-wpan@archiver.kernel.org>; Mon, 22 Feb 2021 08:06:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E726C433DB
+	for <linux-wpan@archiver.kernel.org>; Mon, 22 Feb 2021 09:25:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 40B7C64E24
-	for <linux-wpan@archiver.kernel.org>; Mon, 22 Feb 2021 08:06:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DA8CC64E44
+	for <linux-wpan@archiver.kernel.org>; Mon, 22 Feb 2021 09:25:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230340AbhBVIGK (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 22 Feb 2021 03:06:10 -0500
-Received: from mail-io1-f69.google.com ([209.85.166.69]:51041 "EHLO
-        mail-io1-f69.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230057AbhBVIGK (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 22 Feb 2021 03:06:10 -0500
-Received: by mail-io1-f69.google.com with SMTP id w15so8799902ioa.17
-        for <linux-wpan@vger.kernel.org>; Mon, 22 Feb 2021 00:05:54 -0800 (PST)
+        id S229996AbhBVJZJ (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 22 Feb 2021 04:25:09 -0500
+Received: from mail-il1-f197.google.com ([209.85.166.197]:33948 "EHLO
+        mail-il1-f197.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229989AbhBVJZC (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 22 Feb 2021 04:25:02 -0500
+Received: by mail-il1-f197.google.com with SMTP id c16so7238450ile.1
+        for <linux-wpan@vger.kernel.org>; Mon, 22 Feb 2021 01:24:46 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=+DNCnXkYgjNeMtNYx/y9gykHMdDqLWWPfQzkJlb/eio=;
-        b=drB1Z2CH5pSwlEw1NWwySsPYq7HnD7rRLSQjaJPB516b7XFBsc4NHR2qWkSC5tmFk6
-         1tplWMpO3M1I8dtspw8/AJuopME2k8bUmJeM1Gs5FsbAvY1CjZ++kAyQv7Vh76vjxIWg
-         gqJH7FCkKYHwr9fN2ckm2CvDg4fgmCvTweV/w+6VaAPGA6XfQAr6e2iNQOfk8cisKICb
-         EHT60hkWyK3mymB0JUbrm4z2em2022K4V9llR+5jcxjYnMZytIG3NaZPSl2UrNnlzMDk
-         qubAEhwZ/IwbysBTAX+60LYoNhMMK2EoOtu9vF2kJbK07cyMwH+IvIFia5HNxa2nKxDQ
-         37Ow==
-X-Gm-Message-State: AOAM533Zb1gcSNRTSwRKCqbMLhIU+QPE00ys56taJrktB6dl0MKUCuBH
-        C5IL8aYf5dmTftdq7zpLORMeBXW2yJL0g1ZM1zLfd2OoRbm5
-X-Google-Smtp-Source: ABdhPJzc/vHboxd2/GoCtVE94V6/8QMQiLfKYwT0IDKiIewPQVCIhOlkOzFNrZ9/NIRYlVx8WYOZWXl8jP4yuKIEGX7d0TxHPPcs
+        bh=2uSBdEqU47c4oS9ECd3COMKQ/tDdxAm2kFaxZlo25JE=;
+        b=EsjNQBwYHuli7leRrkSK9T/NfRvzD/Wy6Z92pjIZwJ4bTI93a8dQ1DQqzBc2lZb/Lj
+         0V7Dy3Vei6UaUCuc4n0Yu0hyV6XLlaC3eZNmtsvg7AUJqSj89tTsps7e82QTNYuyeXSF
+         WdK1WZfIZBv0WYrHYMzokKm7iG6okPr8xIyRqJmU0c4nHd3OjcdbeZUftDlEL4CUdWp1
+         VO4a/nL10hmxIr2096KZJIN4Eaj+q1SZ203eEnXDyc8rGgDeHM/HfWB75cXbC5MoXCzy
+         +/9kdSEX1aYC0UQnOIy94ab5pqDP8Trice8XVQs7atRunZIe5jm67s/UNwkJQ7dc2cKg
+         gCPg==
+X-Gm-Message-State: AOAM532Hke3RiRtpchyVG2jqVS/cOE+b2L8JwRMZzX6vTucZV2gCKYM3
+        PVpJADAkShFa4+droJGq9Ugb2SwrRJE55FEYxy8oXfPgl+tj
+X-Google-Smtp-Source: ABdhPJxJtADNakcKhIpNEcZvK+RbczS8i7akNa4Yeo4xqbH5zi4F/RG2av5zJtFbIKl1aTYNCI+7PiiAsXhvx4W4HLDxcKtWst1h
 MIME-Version: 1.0
-X-Received: by 2002:a6b:db01:: with SMTP id t1mr2348276ioc.83.1613981129340;
- Mon, 22 Feb 2021 00:05:29 -0800 (PST)
-Date:   Mon, 22 Feb 2021 00:05:29 -0800
+X-Received: by 2002:a5d:9b18:: with SMTP id y24mr14518492ion.24.1613985860726;
+ Mon, 22 Feb 2021 01:24:20 -0800 (PST)
+Date:   Mon, 22 Feb 2021 01:24:20 -0800
 X-Google-Appengine-App-Id: s~syzkaller
 X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000e37c9805bbe843c1@google.com>
-Subject: UBSAN: shift-out-of-bounds in nl802154_new_interface
-From:   syzbot <syzbot+7bf7b22759195c9a21e9@syzkaller.appspotmail.com>
+Message-ID: <000000000000e6b67405bbe95dfd@google.com>
+Subject: general protection fault in ieee802154_llsec_parse_key_id
+From:   syzbot <syzbot+d4c07de0144f6f63be3a@syzkaller.appspotmail.com>
 To:     alex.aring@gmail.com, davem@davemloft.net, kuba@kernel.org,
         linux-kernel@vger.kernel.org, linux-wpan@vger.kernel.org,
         netdev@vger.kernel.org, stefan@datenfreihafen.org,
@@ -55,58 +55,86 @@ Hello,
 
 syzbot found the following issue on:
 
-HEAD commit:    3af409ca net: enetc: fix destroyed phylink dereference dur..
-git tree:       net
-console output: https://syzkaller.appspot.com/x/log.txt?x=139da604d00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=8cb23303ddb9411f
-dashboard link: https://syzkaller.appspot.com/bug?extid=7bf7b22759195c9a21e9
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=108c7e04d00000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1177c324d00000
+HEAD commit:    38b5133a octeontx2-pf: Fix otx2_get_fecparam()
+git tree:       net-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=140c2512d00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=dbc1ca9e55dc1f9f
+dashboard link: https://syzkaller.appspot.com/bug?extid=d4c07de0144f6f63be3a
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13db6e22d00000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=13fea434d00000
 
 Bisection is inconclusive: the issue happens on the oldest tested release.
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=11a6e7d2d00000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=13a6e7d2d00000
-console output: https://syzkaller.appspot.com/x/log.txt?x=15a6e7d2d00000
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=168e7f02d00000
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=158e7f02d00000
+console output: https://syzkaller.appspot.com/x/log.txt?x=118e7f02d00000
 
 IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+7bf7b22759195c9a21e9@syzkaller.appspotmail.com
+Reported-by: syzbot+d4c07de0144f6f63be3a@syzkaller.appspotmail.com
 
-================================================================================
-UBSAN: shift-out-of-bounds in net/ieee802154/nl802154.c:914:44
-shift exponent -1627389953 is negative
-CPU: 0 PID: 8454 Comm: syz-executor539 Not tainted 5.11.0-rc7-syzkaller #0
+general protection fault, probably for non-canonical address 0xdffffc0000000000: 0000 [#1] PREEMPT SMP KASAN
+KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
+CPU: 0 PID: 8431 Comm: syz-executor292 Not tainted 5.11.0-rc7-syzkaller #0
 Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+RIP: 0010:nla_get_u16 include/net/netlink.h:1581 [inline]
+RIP: 0010:nla_get_shortaddr net/ieee802154/nl-mac.c:48 [inline]
+RIP: 0010:ieee802154_llsec_parse_key_id+0x17f/0x8a0 net/ieee802154/nl-mac.c:559
+Code: 00 00 4d 8b 66 30 4d 85 e4 0f 84 1e 05 00 00 e8 a7 16 e8 f8 49 8d 7c 24 04 48 b8 00 00 00 00 00 fc ff df 48 89 fa 48 c1 ea 03 <0f> b6 14 02 48 89 f8 83 e0 07 83 c0 01 38 d0 7c 08 84 d2 0f 85 4e
+RSP: 0018:ffffc900017ff4f0 EFLAGS: 00010247
+RAX: dffffc0000000000 RBX: ffffc900017ff5a8 RCX: 0000000000000000
+RDX: 0000000000000000 RSI: ffffffff888ad1e9 RDI: 0000000000000004
+RBP: ffffc900017ff680 R08: 0000000000000001 R09: 0000000000000000
+R10: ffffffff888ad1a6 R11: 0000000000000000 R12: 0000000000000000
+R13: 1ffff920002ffe9e R14: ffff888025b7c400 R15: ffffffff8da591f8
+FS:  00000000008e1300(0000) GS:ffff8880b9c00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000000002000030c CR3: 000000001cb7a000 CR4: 00000000001506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
 Call Trace:
- __dump_stack lib/dump_stack.c:79 [inline]
- dump_stack+0x107/0x163 lib/dump_stack.c:120
- ubsan_epilogue+0xb/0x5a lib/ubsan.c:148
- __ubsan_handle_shift_out_of_bounds.cold+0xb1/0x181 lib/ubsan.c:395
- nl802154_new_interface.cold+0x19/0x1e net/ieee802154/nl802154.c:914
+ llsec_remove_key net/ieee802154/nl-mac.c:896 [inline]
+ ieee802154_nl_llsec_change net/ieee802154/nl-mac.c:824 [inline]
+ ieee802154_llsec_del_key+0x109/0x240 net/ieee802154/nl-mac.c:904
  genl_family_rcv_msg_doit+0x228/0x320 net/netlink/genetlink.c:739
  genl_family_rcv_msg net/netlink/genetlink.c:783 [inline]
  genl_rcv_msg+0x328/0x580 net/netlink/genetlink.c:800
- netlink_rcv_skb+0x153/0x420 net/netlink/af_netlink.c:2494
+ netlink_rcv_skb+0x153/0x420 net/netlink/af_netlink.c:2502
  genl_rcv+0x24/0x40 net/netlink/genetlink.c:811
- netlink_unicast_kernel net/netlink/af_netlink.c:1304 [inline]
- netlink_unicast+0x533/0x7d0 net/netlink/af_netlink.c:1330
- netlink_sendmsg+0x856/0xd90 net/netlink/af_netlink.c:1919
+ netlink_unicast_kernel net/netlink/af_netlink.c:1312 [inline]
+ netlink_unicast+0x533/0x7d0 net/netlink/af_netlink.c:1338
+ netlink_sendmsg+0x856/0xd90 net/netlink/af_netlink.c:1927
  sock_sendmsg_nosec net/socket.c:652 [inline]
  sock_sendmsg+0xcf/0x120 net/socket.c:672
- ____sys_sendmsg+0x6e8/0x810 net/socket.c:2345
- ___sys_sendmsg+0xf3/0x170 net/socket.c:2399
- __sys_sendmsg+0xe5/0x1b0 net/socket.c:2432
+ ____sys_sendmsg+0x6e8/0x810 net/socket.c:2348
+ ___sys_sendmsg+0xf3/0x170 net/socket.c:2402
+ __sys_sendmsg+0xe5/0x1b0 net/socket.c:2435
  do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
  entry_SYSCALL_64_after_hwframe+0x44/0xa9
-RIP: 0033:0x43fa19
+RIP: 0033:0x43fa99
 Code: 28 c3 e8 5a 14 00 00 66 2e 0f 1f 84 00 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 c0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fffda15b8b8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00000000004004a0 RCX: 000000000043fa19
-RDX: 0000000000000000 RSI: 0000000020000ac0 RDI: 0000000000000003
-RBP: 0000000000403480 R08: 0000000000000001 R09: 00000000004004a0
-R10: 0000000000000008 R11: 0000000000000246 R12: 0000000000403510
+RSP: 002b:00007ffce4fc0e98 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00000000004004a0 RCX: 000000000043fa99
+RDX: 0000000000004054 RSI: 0000000020000440 RDI: 0000000000000004
+RBP: 0000000000403500 R08: 00000000ffffffff R09: 00000000004004a0
+R10: 0000000000000004 R11: 0000000000000246 R12: 0000000000403590
 R13: 0000000000000000 R14: 00000000004ad018 R15: 00000000004004a0
-================================================================================
+Modules linked in:
+---[ end trace 32b0ca68504d0ad5 ]---
+RIP: 0010:nla_get_u16 include/net/netlink.h:1581 [inline]
+RIP: 0010:nla_get_shortaddr net/ieee802154/nl-mac.c:48 [inline]
+RIP: 0010:ieee802154_llsec_parse_key_id+0x17f/0x8a0 net/ieee802154/nl-mac.c:559
+Code: 00 00 4d 8b 66 30 4d 85 e4 0f 84 1e 05 00 00 e8 a7 16 e8 f8 49 8d 7c 24 04 48 b8 00 00 00 00 00 fc ff df 48 89 fa 48 c1 ea 03 <0f> b6 14 02 48 89 f8 83 e0 07 83 c0 01 38 d0 7c 08 84 d2 0f 85 4e
+RSP: 0018:ffffc900017ff4f0 EFLAGS: 00010247
+RAX: dffffc0000000000 RBX: ffffc900017ff5a8 RCX: 0000000000000000
+RDX: 0000000000000000 RSI: ffffffff888ad1e9 RDI: 0000000000000004
+RBP: ffffc900017ff680 R08: 0000000000000001 R09: 0000000000000000
+R10: ffffffff888ad1a6 R11: 0000000000000000 R12: 0000000000000000
+R13: 1ffff920002ffe9e R14: ffff888025b7c400 R15: ffffffff8da591f8
+FS:  00000000008e1300(0000) GS:ffff8880b9d00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000055bf74e6f0b8 CR3: 000000001cb7a000 CR4: 00000000001506e0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
 
 
 ---
