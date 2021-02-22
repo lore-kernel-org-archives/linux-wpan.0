@@ -2,84 +2,120 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53B62C433DB
-	for <linux-wpan@archiver.kernel.org>; Sun, 21 Feb 2021 17:45:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 946D6C433DB
+	for <linux-wpan@archiver.kernel.org>; Mon, 22 Feb 2021 08:06:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1F41C64DEC
-	for <linux-wpan@archiver.kernel.org>; Sun, 21 Feb 2021 17:45:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 40B7C64E24
+	for <linux-wpan@archiver.kernel.org>; Mon, 22 Feb 2021 08:06:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230048AbhBURpG (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Sun, 21 Feb 2021 12:45:06 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:26030 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230074AbhBURpE (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>);
-        Sun, 21 Feb 2021 12:45:04 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1613929418;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=8VgaRV7Fd9A+gYNGoaLn/LCYYkPGKOfSnguHXEuxcJE=;
-        b=KpocSHh/4zDNnLouqT/ZBQS99kA9T4sDbQl58ANwKDK81zeBAE0DqOU7MelipuQVibNtdR
-        4nPoZEUpzPFnP4ERMe6kr7vuPit613WyIr24svsjII1J1vPS6DnHJmGusg4DGoy4T2momn
-        2vaQHh2HdUj4Ac1faGFHWRTKhKMLxIs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-598-Muv1seoRPkWbg_Lhd79lcw-1; Sun, 21 Feb 2021 12:43:36 -0500
-X-MC-Unique: Muv1seoRPkWbg_Lhd79lcw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ED48A801979;
-        Sun, 21 Feb 2021 17:43:34 +0000 (UTC)
-Received: from carbon.redhat.com (ovpn-112-235.rdu2.redhat.com [10.10.112.235])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 842482BFE1;
-        Sun, 21 Feb 2021 17:43:34 +0000 (UTC)
-From:   Alexander Aring <aahringo@redhat.com>
-To:     stefan@datenfreihafen.org
-Cc:     linux-wpan@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH wpan 4/4] net: ieee802154: fix nl802154 del llsec devkey
-Date:   Sun, 21 Feb 2021 12:43:21 -0500
-Message-Id: <20210221174321.14210-4-aahringo@redhat.com>
-In-Reply-To: <20210221174321.14210-1-aahringo@redhat.com>
-References: <20210221174321.14210-1-aahringo@redhat.com>
+        id S230340AbhBVIGK (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 22 Feb 2021 03:06:10 -0500
+Received: from mail-io1-f69.google.com ([209.85.166.69]:51041 "EHLO
+        mail-io1-f69.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230057AbhBVIGK (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 22 Feb 2021 03:06:10 -0500
+Received: by mail-io1-f69.google.com with SMTP id w15so8799902ioa.17
+        for <linux-wpan@vger.kernel.org>; Mon, 22 Feb 2021 00:05:54 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=+DNCnXkYgjNeMtNYx/y9gykHMdDqLWWPfQzkJlb/eio=;
+        b=drB1Z2CH5pSwlEw1NWwySsPYq7HnD7rRLSQjaJPB516b7XFBsc4NHR2qWkSC5tmFk6
+         1tplWMpO3M1I8dtspw8/AJuopME2k8bUmJeM1Gs5FsbAvY1CjZ++kAyQv7Vh76vjxIWg
+         gqJH7FCkKYHwr9fN2ckm2CvDg4fgmCvTweV/w+6VaAPGA6XfQAr6e2iNQOfk8cisKICb
+         EHT60hkWyK3mymB0JUbrm4z2em2022K4V9llR+5jcxjYnMZytIG3NaZPSl2UrNnlzMDk
+         qubAEhwZ/IwbysBTAX+60LYoNhMMK2EoOtu9vF2kJbK07cyMwH+IvIFia5HNxa2nKxDQ
+         37Ow==
+X-Gm-Message-State: AOAM533Zb1gcSNRTSwRKCqbMLhIU+QPE00ys56taJrktB6dl0MKUCuBH
+        C5IL8aYf5dmTftdq7zpLORMeBXW2yJL0g1ZM1zLfd2OoRbm5
+X-Google-Smtp-Source: ABdhPJzc/vHboxd2/GoCtVE94V6/8QMQiLfKYwT0IDKiIewPQVCIhOlkOzFNrZ9/NIRYlVx8WYOZWXl8jP4yuKIEGX7d0TxHPPcs
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Received: by 2002:a6b:db01:: with SMTP id t1mr2348276ioc.83.1613981129340;
+ Mon, 22 Feb 2021 00:05:29 -0800 (PST)
+Date:   Mon, 22 Feb 2021 00:05:29 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000e37c9805bbe843c1@google.com>
+Subject: UBSAN: shift-out-of-bounds in nl802154_new_interface
+From:   syzbot <syzbot+7bf7b22759195c9a21e9@syzkaller.appspotmail.com>
+To:     alex.aring@gmail.com, davem@davemloft.net, kuba@kernel.org,
+        linux-kernel@vger.kernel.org, linux-wpan@vger.kernel.org,
+        netdev@vger.kernel.org, stefan@datenfreihafen.org,
+        syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-This patch fixes a nullpointer dereference if NL802154_ATTR_SEC_DEVKEY is
-not set by the user. If this is the case nl802154 will return -EINVAL.
+Hello,
 
-Reported-by: syzbot+368672e0da240db53b5f@syzkaller.appspotmail.com
-Signed-off-by: Alexander Aring <aahringo@redhat.com>
+syzbot found the following issue on:
+
+HEAD commit:    3af409ca net: enetc: fix destroyed phylink dereference dur..
+git tree:       net
+console output: https://syzkaller.appspot.com/x/log.txt?x=139da604d00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=8cb23303ddb9411f
+dashboard link: https://syzkaller.appspot.com/bug?extid=7bf7b22759195c9a21e9
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=108c7e04d00000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1177c324d00000
+
+Bisection is inconclusive: the issue happens on the oldest tested release.
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=11a6e7d2d00000
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=13a6e7d2d00000
+console output: https://syzkaller.appspot.com/x/log.txt?x=15a6e7d2d00000
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+7bf7b22759195c9a21e9@syzkaller.appspotmail.com
+
+================================================================================
+UBSAN: shift-out-of-bounds in net/ieee802154/nl802154.c:914:44
+shift exponent -1627389953 is negative
+CPU: 0 PID: 8454 Comm: syz-executor539 Not tainted 5.11.0-rc7-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+Call Trace:
+ __dump_stack lib/dump_stack.c:79 [inline]
+ dump_stack+0x107/0x163 lib/dump_stack.c:120
+ ubsan_epilogue+0xb/0x5a lib/ubsan.c:148
+ __ubsan_handle_shift_out_of_bounds.cold+0xb1/0x181 lib/ubsan.c:395
+ nl802154_new_interface.cold+0x19/0x1e net/ieee802154/nl802154.c:914
+ genl_family_rcv_msg_doit+0x228/0x320 net/netlink/genetlink.c:739
+ genl_family_rcv_msg net/netlink/genetlink.c:783 [inline]
+ genl_rcv_msg+0x328/0x580 net/netlink/genetlink.c:800
+ netlink_rcv_skb+0x153/0x420 net/netlink/af_netlink.c:2494
+ genl_rcv+0x24/0x40 net/netlink/genetlink.c:811
+ netlink_unicast_kernel net/netlink/af_netlink.c:1304 [inline]
+ netlink_unicast+0x533/0x7d0 net/netlink/af_netlink.c:1330
+ netlink_sendmsg+0x856/0xd90 net/netlink/af_netlink.c:1919
+ sock_sendmsg_nosec net/socket.c:652 [inline]
+ sock_sendmsg+0xcf/0x120 net/socket.c:672
+ ____sys_sendmsg+0x6e8/0x810 net/socket.c:2345
+ ___sys_sendmsg+0xf3/0x170 net/socket.c:2399
+ __sys_sendmsg+0xe5/0x1b0 net/socket.c:2432
+ do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
+ entry_SYSCALL_64_after_hwframe+0x44/0xa9
+RIP: 0033:0x43fa19
+Code: 28 c3 e8 5a 14 00 00 66 2e 0f 1f 84 00 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 c0 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fffda15b8b8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00000000004004a0 RCX: 000000000043fa19
+RDX: 0000000000000000 RSI: 0000000020000ac0 RDI: 0000000000000003
+RBP: 0000000000403480 R08: 0000000000000001 R09: 00000000004004a0
+R10: 0000000000000008 R11: 0000000000000246 R12: 0000000000403510
+R13: 0000000000000000 R14: 00000000004ad018 R15: 00000000004004a0
+================================================================================
+
+
 ---
- net/ieee802154/nl802154.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/net/ieee802154/nl802154.c b/net/ieee802154/nl802154.c
-index 3f6d86d63923..e9e4652cd592 100644
---- a/net/ieee802154/nl802154.c
-+++ b/net/ieee802154/nl802154.c
-@@ -1916,7 +1916,8 @@ static int nl802154_del_llsec_devkey(struct sk_buff *skb, struct genl_info *info
- 	struct ieee802154_llsec_device_key key;
- 	__le64 extended_addr;
- 
--	if (nla_parse_nested_deprecated(attrs, NL802154_DEVKEY_ATTR_MAX, info->attrs[NL802154_ATTR_SEC_DEVKEY], nl802154_devkey_policy, info->extack))
-+	if (!info->attrs[NL802154_ATTR_SEC_DEVKEY] ||
-+	    nla_parse_nested_deprecated(attrs, NL802154_DEVKEY_ATTR_MAX, info->attrs[NL802154_ATTR_SEC_DEVKEY], nl802154_devkey_policy, info->extack))
- 		return -EINVAL;
- 
- 	if (!attrs[NL802154_DEVKEY_ATTR_EXTENDED_ADDR])
--- 
-2.26.2
-
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+syzbot can test patches for this issue, for details see:
+https://goo.gl/tpsmEJ#testing-patches
