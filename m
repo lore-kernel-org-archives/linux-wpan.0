@@ -7,47 +7,47 @@ X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C18EBC433E9
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEB99C433E6
 	for <linux-wpan@archiver.kernel.org>; Sun, 28 Feb 2021 15:20:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7744064EAF
+	by mail.kernel.org (Postfix) with ESMTP id 54E3D64EB3
 	for <linux-wpan@archiver.kernel.org>; Sun, 28 Feb 2021 15:20:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230449AbhB1PT4 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        id S230163AbhB1PT4 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
         Sun, 28 Feb 2021 10:19:56 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:31516 "EHLO
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:48901 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230260AbhB1PTx (ORCPT
+        by vger.kernel.org with ESMTP id S230207AbhB1PTx (ORCPT
         <rfc822;linux-wpan@vger.kernel.org>);
         Sun, 28 Feb 2021 10:19:53 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614525508;
+        s=mimecast20190719; t=1614525506;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=TycFQJJZAk4wM9Q8t5do6tcFRN5RoTXKW1hvc8NynC0=;
-        b=E7xSKiITKK0yE2goJVwVqBHoVzNoMQSA6F6OiUlNimXEGsZFA62ZcCGw8Zd5MWnF985Ma7
-        PpF9XpDTCd0of/zKmGCRUgwO41YWgw7G9i8qUcRT5h1EccQqup9+vP4j1Idm/4Sup3lZxT
-        wu8zp6zCiRqCWVc16RBZFtXPPbHKVzM=
+        bh=GtcLdlm1Iv1/5mJ7s1Xbu8kLpZIcHwisL8Wo5TnuA84=;
+        b=J1hu8JHr/dzIzB9WqnQNOptmWebLQznmen6CJc+8OzSiLiIgd2DbMfmbyrPBQ8a3RJnlbR
+        XIS0IcHhNsv4f7wvrKM5yAkCoApr+xF7lIFRS/NlfhKR3C2OVBywyNu8MUm9wVUoN52mbq
+        SUKtH3kFx5pRvzPUfQJ3Pvvpgx2Qx+U=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-83--i6qSeXEOhO51JrUXiug0A-1; Sun, 28 Feb 2021 10:18:25 -0500
-X-MC-Unique: -i6qSeXEOhO51JrUXiug0A-1
+ us-mta-16-q_X4dfRjMOW5l1zi2N4jNw-1; Sun, 28 Feb 2021 10:18:25 -0500
+X-MC-Unique: q_X4dfRjMOW5l1zi2N4jNw-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7BCDE6D4F0;
-        Sun, 28 Feb 2021 15:18:24 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E799310066EE;
+        Sun, 28 Feb 2021 15:18:23 +0000 (UTC)
 Received: from carbon.redhat.com (ovpn-112-225.rdu2.redhat.com [10.10.112.225])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 15C845C1D5;
-        Sun, 28 Feb 2021 15:18:24 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 8064E5C1D5;
+        Sun, 28 Feb 2021 15:18:23 +0000 (UTC)
 From:   Alexander Aring <aahringo@redhat.com>
 To:     stefan@datenfreihafen.org
 Cc:     linux-wpan@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH wpan 04/17] net: ieee802154: forbid monitor for set llsec params
-Date:   Sun, 28 Feb 2021 10:18:04 -0500
-Message-Id: <20210228151817.95700-5-aahringo@redhat.com>
+Subject: [PATCH wpan 03/17] net: ieee802154: nl-mac: fix check on panid
+Date:   Sun, 28 Feb 2021 10:18:03 -0500
+Message-Id: <20210228151817.95700-4-aahringo@redhat.com>
 In-Reply-To: <20210228151817.95700-1-aahringo@redhat.com>
 References: <20210228151817.95700-1-aahringo@redhat.com>
 MIME-Version: 1.0
@@ -57,29 +57,40 @@ Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-This patch forbids to set llsec params for monitor interfaces which we
-don't support yet.
+This patch fixes a null pointer derefence for panid handle by move the
+check for the netlink variable directly before accessing them.
 
-Reported-by: syzbot+8b6719da8a04beeafcc3@syzkaller.appspotmail.com
+Reported-by: syzbot+d4c07de0144f6f63be3a@syzkaller.appspotmail.com
 Signed-off-by: Alexander Aring <aahringo@redhat.com>
 ---
- net/ieee802154/nl802154.c | 3 +++
- 1 file changed, 3 insertions(+)
+ net/ieee802154/nl-mac.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/net/ieee802154/nl802154.c b/net/ieee802154/nl802154.c
-index 3ee09f6d13b7..67f0dc622bc2 100644
---- a/net/ieee802154/nl802154.c
-+++ b/net/ieee802154/nl802154.c
-@@ -1384,6 +1384,9 @@ static int nl802154_set_llsec_params(struct sk_buff *skb,
- 	u32 changed = 0;
- 	int ret;
+diff --git a/net/ieee802154/nl-mac.c b/net/ieee802154/nl-mac.c
+index 9c640d670ffe..0c1b0770c59e 100644
+--- a/net/ieee802154/nl-mac.c
++++ b/net/ieee802154/nl-mac.c
+@@ -551,9 +551,7 @@ ieee802154_llsec_parse_key_id(struct genl_info *info,
+ 	desc->mode = nla_get_u8(info->attrs[IEEE802154_ATTR_LLSEC_KEY_MODE]);
  
-+	if (wpan_dev->iftype == NL802154_IFTYPE_MONITOR)
-+		return -EOPNOTSUPP;
+ 	if (desc->mode == IEEE802154_SCF_KEY_IMPLICIT) {
+-		if (!info->attrs[IEEE802154_ATTR_PAN_ID] &&
+-		    !(info->attrs[IEEE802154_ATTR_SHORT_ADDR] ||
+-		      info->attrs[IEEE802154_ATTR_HW_ADDR]))
++		if (!info->attrs[IEEE802154_ATTR_PAN_ID])
+ 			return -EINVAL;
+ 
+ 		desc->device_addr.pan_id = nla_get_shortaddr(info->attrs[IEEE802154_ATTR_PAN_ID]);
+@@ -562,6 +560,9 @@ ieee802154_llsec_parse_key_id(struct genl_info *info,
+ 			desc->device_addr.mode = IEEE802154_ADDR_SHORT;
+ 			desc->device_addr.short_addr = nla_get_shortaddr(info->attrs[IEEE802154_ATTR_SHORT_ADDR]);
+ 		} else {
++			if (!info->attrs[IEEE802154_ATTR_HW_ADDR])
++				return -EINVAL;
 +
- 	if (info->attrs[NL802154_ATTR_SEC_ENABLED]) {
- 		u8 enabled;
- 
+ 			desc->device_addr.mode = IEEE802154_ADDR_LONG;
+ 			desc->device_addr.extended_addr = nla_get_hwaddr(info->attrs[IEEE802154_ATTR_HW_ADDR]);
+ 		}
 -- 
 2.26.2
 
