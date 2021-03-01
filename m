@@ -2,99 +2,120 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3020C433E0
-	for <linux-wpan@archiver.kernel.org>; Mon,  1 Mar 2021 03:17:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB339C433DB
+	for <linux-wpan@archiver.kernel.org>; Mon,  1 Mar 2021 11:50:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8098F64DFF
-	for <linux-wpan@archiver.kernel.org>; Mon,  1 Mar 2021 03:17:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7C26864E38
+	for <linux-wpan@archiver.kernel.org>; Mon,  1 Mar 2021 11:50:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230222AbhCADRc (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Sun, 28 Feb 2021 22:17:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36508 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230215AbhCADRa (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Sun, 28 Feb 2021 22:17:30 -0500
-Received: from mail-ot1-x333.google.com (mail-ot1-x333.google.com [IPv6:2607:f8b0:4864:20::333])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3292AC06174A;
-        Sun, 28 Feb 2021 19:16:50 -0800 (PST)
-Received: by mail-ot1-x333.google.com with SMTP id g8so11465940otk.4;
-        Sun, 28 Feb 2021 19:16:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=trM9Hw6F/8BdnuCHEMW3BcGPyI0dBakVgMcEAabB39c=;
-        b=OpBe4h7RXJZfLfeGas1y+gfHJChx3UikyHMtAHXrwapnv9piV4ucMppKQNHzd8UWxO
-         cU71Hejufg3OwsozHy/OcHbFUMJcxNiMylHqQHGv51qk/D6AF8xb2wO/XgBLa685PhD1
-         bTaVvM14jyhm9LEFz+wvt9WtDI/IePyt7eD94+I+0Z5oIA9E1yVriY179Fg3mWH2Vetc
-         ARBSNApQbfEaDOCproHFC3sr1jpQJ2kN/N0yElb55M/5sA1e/j/ezPIC5lyTd5WdBlDr
-         Nkv5ITdCjFEcO82Pdx15lzjanYnrwCFqVS3k5M7jDCS0sLiibWUElsMlxNG0WL/cZltJ
-         DcUw==
+        id S234139AbhCALuB (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 1 Mar 2021 06:50:01 -0500
+Received: from mail-io1-f71.google.com ([209.85.166.71]:51387 "EHLO
+        mail-io1-f71.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234178AbhCALty (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 1 Mar 2021 06:49:54 -0500
+Received: by mail-io1-f71.google.com with SMTP id i19so5154261ioh.18
+        for <linux-wpan@vger.kernel.org>; Mon, 01 Mar 2021 03:49:39 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=trM9Hw6F/8BdnuCHEMW3BcGPyI0dBakVgMcEAabB39c=;
-        b=gRCWes95MJT1qjHMqabAEJ1ORnJBKLy9+DctIEPdLVv1gTlCpW4/KBq3C/4hYDrulV
-         l0epC6d9vEa2550JfJDjyRPTj/Onx3bthgiAzB0FMXTITgqcyKh9EuDOxUo8kXC/VjXM
-         uygV785WjLK6ZS/AiIKwKTDSIJwyUxrVIukINcAKdmHK3qrxGcWKUVJImE/PGBruD9aW
-         6Yws0gZDDtB3nwjNzGTn4puIA7L+2xae9d5kg9qhaz+PuP4MqW2Oflr8cLuiRbt/fx4a
-         ICTHDzRPbAIrJjg2GVefcjlWDYCbJaFmMSHFJe5v8gT20447PYzndT+IvL8CN/OWqss/
-         +B0w==
-X-Gm-Message-State: AOAM532Ro0uXmLnX+sqJpjuvbH6Kt/KZvhuhSowe6vRfEUloYOOdPymk
-        OvLOtsx2fOSPMjPMI6v9/dfSPFTMnTlL7JrhNWJnKr31V68hhw==
-X-Google-Smtp-Source: ABdhPJyITr121oeGVjWZWoCM41JlRGzYN9E81U0RQ1iMRMDSHJORCpq7VoR85XiMvKeGPJ70w0uTWkvY72EDKUS+T24=
-X-Received: by 2002:a9d:63d1:: with SMTP id e17mr11835784otl.183.1614568609597;
- Sun, 28 Feb 2021 19:16:49 -0800 (PST)
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=DwARR0f16pytt1tCFzY3s3chbtjz6oz+ioNdZQ7XKbE=;
+        b=t/5aCIvvfnBzax8vMy8dsWskLlPvhx6dxaH9PdADkoBz+k4SmZIhyU7+0Yn2rG30Pn
+         9IM8T4wvFXPPqm21/uSQo4gg++q7x2qrp/l0H+LiV84zhuWd+NfmBXGEp7Kz4kqgM+pb
+         OyGq8tXNPmPDrpUjWFl23/2VQKD3SurCKY5XUbBwjEhMkDFSjzv5d9X9ORgqvuvIl5Zj
+         YpxlO5Xa00Ix+sbjV3ZUKjHFMbxDFq9pnmzqvsQ4hX+gDvve8HChbyVDtccn03HSCTzx
+         OzRqDuxzycYYrmCN1STxYsGqoyoMUNL7g2/ZbeyHx9yTpOhhqfG9LnH/zQt5ttWAIPSV
+         4avQ==
+X-Gm-Message-State: AOAM531D2MXF49SKQA3MzGwKtPwD2tJ2kYJZqWSJ75ReMADx97VGkpUn
+        CHaSXDx9lgSUWTe0/Uiw6oIEPptwu9of7Iqtq9uXFhEjmK3r
+X-Google-Smtp-Source: ABdhPJxhD0zPY5Uhs0jKXVz/djbISrGEHK64CWufRALhFr638FsvoBeCA3iDrAmzXrTKoANokDPVKYR/wFXDWPFV2Ltp5x5IG7JS
 MIME-Version: 1.0
-References: <20210228151817.95700-1-aahringo@redhat.com> <20210228151817.95700-3-aahringo@redhat.com>
-In-Reply-To: <20210228151817.95700-3-aahringo@redhat.com>
-From:   Alexander Aring <alex.aring@gmail.com>
-Date:   Sun, 28 Feb 2021 22:16:38 -0500
-Message-ID: <CAB_54W4Lo7TKnqWm_xH=SncTYXTrvT3JCGxTNamagPQ4e0Vs0g@mail.gmail.com>
-Subject: Re: [PATCH wpan 02/17] net: ieee802154: fix memory leak when deliver
- monitor skbs
-To:     Alexander Aring <aahringo@redhat.com>
-Cc:     Stefan Schmidt <stefan@datenfreihafen.org>,
-        linux-wpan - ML <linux-wpan@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
+X-Received: by 2002:a92:6a0b:: with SMTP id f11mr12229147ilc.290.1614599353665;
+ Mon, 01 Mar 2021 03:49:13 -0800 (PST)
+Date:   Mon, 01 Mar 2021 03:49:13 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000ee0e3005bc783400@google.com>
+Subject: KMSAN: uninit-value in dgram_sendmsg
+From:   syzbot <syzbot+a209a964d48b219587cc@syzkaller.appspotmail.com>
+To:     alex.aring@gmail.com, davem@davemloft.net, glider@google.com,
+        kuba@kernel.org, linux-kernel@vger.kernel.org,
+        linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
+        stefan@datenfreihafen.org, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi Stefan,
+Hello,
 
-On Sun, 28 Feb 2021 at 10:21, Alexander Aring <aahringo@redhat.com> wrote:
->
-> This patch adds a missing consume_skb() when deliver a skb to upper
-> monitor interfaces of a wpan phy.
->
-> Reported-by: syzbot+44b651863a17760a893b@syzkaller.appspotmail.com
-> Signed-off-by: Alexander Aring <aahringo@redhat.com>
-> ---
->  net/mac802154/rx.c | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/net/mac802154/rx.c b/net/mac802154/rx.c
-> index b8ce84618a55..18abc1f49323 100644
-> --- a/net/mac802154/rx.c
-> +++ b/net/mac802154/rx.c
-> @@ -244,6 +244,8 @@ ieee802154_monitors_rx(struct ieee802154_local *local, struct sk_buff *skb)
->                         sdata->dev->stats.rx_bytes += skb->len;
->                 }
->         }
-> +
-> +       consume_skb(skb);
+syzbot found the following issue on:
 
-Please drop this patch. It's not correct. I will look next weekend at
-this one again.
-The other patches should be fine, I hope.
+HEAD commit:    29ad81a1 arch/x86: add missing include to sparsemem.h
+git tree:       https://github.com/google/kmsan.git master
+console output: https://syzkaller.appspot.com/x/log.txt?x=13b86466d00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=c8e3b38ca92283e
+dashboard link: https://syzkaller.appspot.com/bug?extid=a209a964d48b219587cc
+compiler:       Debian clang version 11.0.1-2
+userspace arch: i386
 
-- Alex
+Unfortunately, I don't have any reproducer for this issue yet.
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+a209a964d48b219587cc@syzkaller.appspotmail.com
+
+=====================================================
+BUG: KMSAN: uninit-value in ieee802154_addr_from_sa include/net/ieee802154_netdev.h:174 [inline]
+BUG: KMSAN: uninit-value in dgram_sendmsg+0x14cb/0x15c0 net/ieee802154/socket.c:660
+CPU: 0 PID: 14314 Comm: syz-executor.3 Not tainted 5.11.0-rc7-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+Call Trace:
+ __dump_stack lib/dump_stack.c:79 [inline]
+ dump_stack+0x21c/0x280 lib/dump_stack.c:120
+ kmsan_report+0xfb/0x1e0 mm/kmsan/kmsan_report.c:118
+ __msan_warning+0x5f/0xa0 mm/kmsan/kmsan_instr.c:197
+ ieee802154_addr_from_sa include/net/ieee802154_netdev.h:174 [inline]
+ dgram_sendmsg+0x14cb/0x15c0 net/ieee802154/socket.c:660
+ ieee802154_sock_sendmsg+0xec/0x130 net/ieee802154/socket.c:97
+ sock_sendmsg_nosec net/socket.c:652 [inline]
+ sock_sendmsg net/socket.c:672 [inline]
+ ____sys_sendmsg+0xcfc/0x12f0 net/socket.c:2345
+ ___sys_sendmsg net/socket.c:2399 [inline]
+ __sys_sendmsg+0x714/0x830 net/socket.c:2432
+ __compat_sys_sendmsg net/compat.c:347 [inline]
+ __do_compat_sys_sendmsg net/compat.c:354 [inline]
+ __se_compat_sys_sendmsg+0xa7/0xc0 net/compat.c:351
+ __ia32_compat_sys_sendmsg+0x4a/0x70 net/compat.c:351
+ do_syscall_32_irqs_on arch/x86/entry/common.c:79 [inline]
+ __do_fast_syscall_32+0x102/0x160 arch/x86/entry/common.c:141
+ do_fast_syscall_32+0x6a/0xc0 arch/x86/entry/common.c:166
+ do_SYSENTER_32+0x73/0x90 arch/x86/entry/common.c:209
+ entry_SYSENTER_compat_after_hwframe+0x4d/0x5c
+RIP: 0023:0xf7fcc549
+Code: 03 74 c0 01 10 05 03 74 b8 01 10 06 03 74 b4 01 10 07 03 74 b0 01 10 08 03 74 d8 01 00 00 00 00 00 51 52 55 89 e5 0f 34 cd 80 <5d> 5a 59 c3 90 90 90 90 8d b4 26 00 00 00 00 8d b4 26 00 00 00 00
+RSP: 002b:00000000f55c65fc EFLAGS: 00000296 ORIG_RAX: 0000000000000172
+RAX: ffffffffffffffda RBX: 0000000000000004 RCX: 0000000020000380
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
+RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000000000
+R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
+
+Local variable ----address.i@__sys_sendmsg created at:
+ ___sys_sendmsg net/socket.c:2389 [inline]
+ __sys_sendmsg+0x30e/0x830 net/socket.c:2432
+ ___sys_sendmsg net/socket.c:2389 [inline]
+ __sys_sendmsg+0x30e/0x830 net/socket.c:2432
+=====================================================
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
