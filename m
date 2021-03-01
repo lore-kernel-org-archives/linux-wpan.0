@@ -2,85 +2,99 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7947FC433E9
-	for <linux-wpan@archiver.kernel.org>; Sun, 28 Feb 2021 15:20:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3020C433E0
+	for <linux-wpan@archiver.kernel.org>; Mon,  1 Mar 2021 03:17:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4D86764D5D
-	for <linux-wpan@archiver.kernel.org>; Sun, 28 Feb 2021 15:20:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8098F64DFF
+	for <linux-wpan@archiver.kernel.org>; Mon,  1 Mar 2021 03:17:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231169AbhB1PUd (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Sun, 28 Feb 2021 10:20:33 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22558 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231139AbhB1PUC (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>);
-        Sun, 28 Feb 2021 10:20:02 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614525516;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=PeSpDSkiOIRLibPx5IY1ERbxboVDlbwir0mbFIxNQ4c=;
-        b=SGg4rYYhGHoscfg+UNAoy4XPT9Ndd6lAf8WHE6AFrbyScqKETrf46Ies3uix7fpsnzHQ9Z
-        /n2R9YR/J+mtjUq2tERGoNbc6nPEyWprBO1uNfoepjyfV46VRm105AC5gob1RPQUJAbmQ6
-        CgMuwf5hhaRfCJa7NImQ+h0OIh97RwQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-597-YTShLGthP2OJqeAxgZcPQQ-1; Sun, 28 Feb 2021 10:18:32 -0500
-X-MC-Unique: YTShLGthP2OJqeAxgZcPQQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 639D110066F0;
-        Sun, 28 Feb 2021 15:18:31 +0000 (UTC)
-Received: from carbon.redhat.com (ovpn-112-225.rdu2.redhat.com [10.10.112.225])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id F2AC85C1D5;
-        Sun, 28 Feb 2021 15:18:30 +0000 (UTC)
-From:   Alexander Aring <aahringo@redhat.com>
-To:     stefan@datenfreihafen.org
-Cc:     linux-wpan@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH wpan 16/17] net: ieee802154: forbid monitor for del llsec seclevel
-Date:   Sun, 28 Feb 2021 10:18:16 -0500
-Message-Id: <20210228151817.95700-17-aahringo@redhat.com>
-In-Reply-To: <20210228151817.95700-1-aahringo@redhat.com>
-References: <20210228151817.95700-1-aahringo@redhat.com>
+        id S230222AbhCADRc (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Sun, 28 Feb 2021 22:17:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36508 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230215AbhCADRa (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Sun, 28 Feb 2021 22:17:30 -0500
+Received: from mail-ot1-x333.google.com (mail-ot1-x333.google.com [IPv6:2607:f8b0:4864:20::333])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3292AC06174A;
+        Sun, 28 Feb 2021 19:16:50 -0800 (PST)
+Received: by mail-ot1-x333.google.com with SMTP id g8so11465940otk.4;
+        Sun, 28 Feb 2021 19:16:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=trM9Hw6F/8BdnuCHEMW3BcGPyI0dBakVgMcEAabB39c=;
+        b=OpBe4h7RXJZfLfeGas1y+gfHJChx3UikyHMtAHXrwapnv9piV4ucMppKQNHzd8UWxO
+         cU71Hejufg3OwsozHy/OcHbFUMJcxNiMylHqQHGv51qk/D6AF8xb2wO/XgBLa685PhD1
+         bTaVvM14jyhm9LEFz+wvt9WtDI/IePyt7eD94+I+0Z5oIA9E1yVriY179Fg3mWH2Vetc
+         ARBSNApQbfEaDOCproHFC3sr1jpQJ2kN/N0yElb55M/5sA1e/j/ezPIC5lyTd5WdBlDr
+         Nkv5ITdCjFEcO82Pdx15lzjanYnrwCFqVS3k5M7jDCS0sLiibWUElsMlxNG0WL/cZltJ
+         DcUw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=trM9Hw6F/8BdnuCHEMW3BcGPyI0dBakVgMcEAabB39c=;
+        b=gRCWes95MJT1qjHMqabAEJ1ORnJBKLy9+DctIEPdLVv1gTlCpW4/KBq3C/4hYDrulV
+         l0epC6d9vEa2550JfJDjyRPTj/Onx3bthgiAzB0FMXTITgqcyKh9EuDOxUo8kXC/VjXM
+         uygV785WjLK6ZS/AiIKwKTDSIJwyUxrVIukINcAKdmHK3qrxGcWKUVJImE/PGBruD9aW
+         6Yws0gZDDtB3nwjNzGTn4puIA7L+2xae9d5kg9qhaz+PuP4MqW2Oflr8cLuiRbt/fx4a
+         ICTHDzRPbAIrJjg2GVefcjlWDYCbJaFmMSHFJe5v8gT20447PYzndT+IvL8CN/OWqss/
+         +B0w==
+X-Gm-Message-State: AOAM532Ro0uXmLnX+sqJpjuvbH6Kt/KZvhuhSowe6vRfEUloYOOdPymk
+        OvLOtsx2fOSPMjPMI6v9/dfSPFTMnTlL7JrhNWJnKr31V68hhw==
+X-Google-Smtp-Source: ABdhPJyITr121oeGVjWZWoCM41JlRGzYN9E81U0RQ1iMRMDSHJORCpq7VoR85XiMvKeGPJ70w0uTWkvY72EDKUS+T24=
+X-Received: by 2002:a9d:63d1:: with SMTP id e17mr11835784otl.183.1614568609597;
+ Sun, 28 Feb 2021 19:16:49 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+References: <20210228151817.95700-1-aahringo@redhat.com> <20210228151817.95700-3-aahringo@redhat.com>
+In-Reply-To: <20210228151817.95700-3-aahringo@redhat.com>
+From:   Alexander Aring <alex.aring@gmail.com>
+Date:   Sun, 28 Feb 2021 22:16:38 -0500
+Message-ID: <CAB_54W4Lo7TKnqWm_xH=SncTYXTrvT3JCGxTNamagPQ4e0Vs0g@mail.gmail.com>
+Subject: Re: [PATCH wpan 02/17] net: ieee802154: fix memory leak when deliver
+ monitor skbs
+To:     Alexander Aring <aahringo@redhat.com>
+Cc:     Stefan Schmidt <stefan@datenfreihafen.org>,
+        linux-wpan - ML <linux-wpan@vger.kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-This patch forbids to del llsec seclevel for monitor interfaces which we
-don't support yet. Otherwise we will access llsec mib which isn't
-initialized for monitors.
+Hi Stefan,
 
-Reported-by: syzbot+fbf4fc11a819824e027b@syzkaller.appspotmail.com
-Signed-off-by: Alexander Aring <aahringo@redhat.com>
----
- net/ieee802154/nl802154.c | 3 +++
- 1 file changed, 3 insertions(+)
+On Sun, 28 Feb 2021 at 10:21, Alexander Aring <aahringo@redhat.com> wrote:
+>
+> This patch adds a missing consume_skb() when deliver a skb to upper
+> monitor interfaces of a wpan phy.
+>
+> Reported-by: syzbot+44b651863a17760a893b@syzkaller.appspotmail.com
+> Signed-off-by: Alexander Aring <aahringo@redhat.com>
+> ---
+>  net/mac802154/rx.c | 2 ++
+>  1 file changed, 2 insertions(+)
+>
+> diff --git a/net/mac802154/rx.c b/net/mac802154/rx.c
+> index b8ce84618a55..18abc1f49323 100644
+> --- a/net/mac802154/rx.c
+> +++ b/net/mac802154/rx.c
+> @@ -244,6 +244,8 @@ ieee802154_monitors_rx(struct ieee802154_local *local, struct sk_buff *skb)
+>                         sdata->dev->stats.rx_bytes += skb->len;
+>                 }
+>         }
+> +
+> +       consume_skb(skb);
 
-diff --git a/net/ieee802154/nl802154.c b/net/ieee802154/nl802154.c
-index e5181de4a77a..576e418cf5aa 100644
---- a/net/ieee802154/nl802154.c
-+++ b/net/ieee802154/nl802154.c
-@@ -2133,6 +2133,9 @@ static int nl802154_del_llsec_seclevel(struct sk_buff *skb,
- 	struct wpan_dev *wpan_dev = dev->ieee802154_ptr;
- 	struct ieee802154_llsec_seclevel sl;
- 
-+	if (wpan_dev->iftype == NL802154_IFTYPE_MONITOR)
-+		return -EOPNOTSUPP;
-+
- 	if (!info->attrs[NL802154_ATTR_SEC_LEVEL] ||
- 	    llsec_parse_seclevel(info->attrs[NL802154_ATTR_SEC_LEVEL],
- 				 &sl) < 0)
--- 
-2.26.2
+Please drop this patch. It's not correct. I will look next weekend at
+this one again.
+The other patches should be fine, I hope.
 
+- Alex
