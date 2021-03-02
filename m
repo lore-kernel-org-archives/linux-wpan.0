@@ -2,58 +2,54 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-17.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5075BC433E0
-	for <linux-wpan@archiver.kernel.org>; Wed,  3 Mar 2021 03:42:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C30FC433DB
+	for <linux-wpan@archiver.kernel.org>; Wed,  3 Mar 2021 03:42:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 041CF64E6F
-	for <linux-wpan@archiver.kernel.org>; Wed,  3 Mar 2021 03:42:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 122E164E6B
+	for <linux-wpan@archiver.kernel.org>; Wed,  3 Mar 2021 03:42:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235119AbhCCDkt (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 2 Mar 2021 22:40:49 -0500
-Received: from proxima.lasnet.de ([78.47.171.185]:43404 "EHLO
+        id S1343740AbhCCDk7 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 2 Mar 2021 22:40:59 -0500
+Received: from proxima.lasnet.de ([78.47.171.185]:36418 "EHLO
         proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243409AbhCBMqt (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 2 Mar 2021 07:46:49 -0500
+        with ESMTP id S1448179AbhCBVS6 (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 2 Mar 2021 16:18:58 -0500
 Received: from [IPv6:2003:e9:d72a:21a0:8b4a:5ec4:afc4:817c] (p200300e9d72a21a08b4a5ec4afc4817c.dip0.t-ipconnect.de [IPv6:2003:e9:d72a:21a0:8b4a:5ec4:afc4:817c])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
         (No client certificate requested)
         (Authenticated sender: stefan@datenfreihafen.org)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id 788FEC0C3A;
-        Tue,  2 Mar 2021 13:43:17 +0100 (CET)
+        by proxima.lasnet.de (Postfix) with ESMTPSA id 6D246C07F4;
+        Tue,  2 Mar 2021 22:18:15 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
-        s=2021; t=1614688997;
+        s=2021; t=1614719895;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=k4cDsSMEoBl+WI1nsm3Xy99TFgQIfTj9lZa4tbXwYQg=;
-        b=i0phIXFrMPbKYZp4uh/XWMcNPas1PBmISHKnsqZ3J8NcNkrIBAWM7uKgWwf4z75C2g4fZX
-        1e/50XH5XR7Lu+M1HCsGwbcNXpna27+tuhhNLbrR1C8hz2m8DNQQlDfJGxcg/mau3n83Oe
-        C2Ivz+oRmDjnZduJRhK7EzJD6EgwVwwrKZ5j/pzO1ShN09AIJTy6irbHOs0m/SNX7Jka5p
-        ygMYc39TeIHbnOVOResj7YiPRP7bhq+EqUpNK7nZD5nGhRlCyKSo2RLnvgzEDoP6Y6b/Na
-        SIIfpnKq2sOeBAt3aiShPO8cdrIt3hPTxB5mOOb/6VMJm9kUOSyZ5x1ZosJhyg==
-Subject: Re: [PATCH wpan 02/17] net: ieee802154: fix memory leak when deliver
- monitor skbs
-To:     Alexander Aring <alex.aring@gmail.com>,
-        Alexander Aring <aahringo@redhat.com>
-Cc:     linux-wpan - ML <linux-wpan@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
+        bh=kdo6eum8wkd2iODfotmdqvpBWhx/QCj5SmddN3Nhegw=;
+        b=mecsQ6MkrEaxjuLy86lDGI/P41tcSX+OE/oE8Hp70lcO/30Zt14zV6TJ+Ne70Eh9Q2t3ku
+        8rpwqp9JTG6mVt42lS13homYXOI/44D7TrasHlu590SfvP+NjQ/P2qs4zxxisWl/oEFN7G
+        ed2ZIsrJJHzbId80Z76wbIp5yXyT3jUj2WQPy3p6aoPCEXpQjfCjVeAkp+JPKpu+rNaclT
+        7mHz920ojCIISCI//lHapGo3lzwOkcoh+6DJPb/SlzokImWRbF1ssz1946n768T++9Ac6F
+        pO3s7/fgypPnTY/HA4WkvWinAFwtEaOHaify3KQSaheXNB8/DnuYr0Aq8XpSCA==
+Subject: Re: [PATCH wpan 01/17] net: ieee802154: make shift exponent unsigned
+To:     Alexander Aring <aahringo@redhat.com>
+Cc:     linux-wpan@vger.kernel.org, netdev@vger.kernel.org
 References: <20210228151817.95700-1-aahringo@redhat.com>
- <20210228151817.95700-3-aahringo@redhat.com>
- <CAB_54W4Lo7TKnqWm_xH=SncTYXTrvT3JCGxTNamagPQ4e0Vs0g@mail.gmail.com>
+ <20210228151817.95700-2-aahringo@redhat.com>
 From:   Stefan Schmidt <stefan@datenfreihafen.org>
-Message-ID: <1855c82f-df0b-4c72-9cfe-5eb312b6b41a@datenfreihafen.org>
-Date:   Tue, 2 Mar 2021 13:43:17 +0100
+Message-ID: <b9baaf49-0e25-4c74-e8b7-f826157e1d48@datenfreihafen.org>
+Date:   Tue, 2 Mar 2021 22:18:14 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.6.0
 MIME-Version: 1.0
-In-Reply-To: <CAB_54W4Lo7TKnqWm_xH=SncTYXTrvT3JCGxTNamagPQ4e0Vs0g@mail.gmail.com>
+In-Reply-To: <20210228151817.95700-2-aahringo@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -63,37 +59,39 @@ X-Mailing-List: linux-wpan@vger.kernel.org
 
 Hello Alex.
 
-On 01.03.21 04:16, Alexander Aring wrote:
-> Hi Stefan,
+On 28.02.21 16:18, Alexander Aring wrote:
+> This patch changes the iftype type variable to unsigned that it can
+> never be reach a negative value.
 > 
-> On Sun, 28 Feb 2021 at 10:21, Alexander Aring <aahringo@redhat.com> wrote:
->>
->> This patch adds a missing consume_skb() when deliver a skb to upper
->> monitor interfaces of a wpan phy.
->>
->> Reported-by: syzbot+44b651863a17760a893b@syzkaller.appspotmail.com
->> Signed-off-by: Alexander Aring <aahringo@redhat.com>
->> ---
->>   net/mac802154/rx.c | 2 ++
->>   1 file changed, 2 insertions(+)
->>
->> diff --git a/net/mac802154/rx.c b/net/mac802154/rx.c
->> index b8ce84618a55..18abc1f49323 100644
->> --- a/net/mac802154/rx.c
->> +++ b/net/mac802154/rx.c
->> @@ -244,6 +244,8 @@ ieee802154_monitors_rx(struct ieee802154_local *local, struct sk_buff *skb)
->>                          sdata->dev->stats.rx_bytes += skb->len;
->>                  }
->>          }
->> +
->> +       consume_skb(skb);
+> Reported-by: syzbot+7bf7b22759195c9a21e9@syzkaller.appspotmail.com
+> Signed-off-by: Alexander Aring <aahringo@redhat.com>
+> ---
+>   net/ieee802154/nl802154.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> Please drop this patch. It's not correct. I will look next weekend at
-> this one again.
-> The other patches should be fine, I hope.
+> diff --git a/net/ieee802154/nl802154.c b/net/ieee802154/nl802154.c
+> index e9e4652cd592..3ee09f6d13b7 100644
+> --- a/net/ieee802154/nl802154.c
+> +++ b/net/ieee802154/nl802154.c
+> @@ -898,8 +898,8 @@ static int nl802154_get_interface(struct sk_buff *skb, struct genl_info *info)
+>   static int nl802154_new_interface(struct sk_buff *skb, struct genl_info *info)
+>   {
+>   	struct cfg802154_registered_device *rdev = info->user_ptr[0];
+> -	enum nl802154_iftype type = NL802154_IFTYPE_UNSPEC;
+>   	__le64 extended_addr = cpu_to_le64(0x0000000000000000ULL);
+> +	u32 type = NL802154_IFTYPE_UNSPEC;
+>   
+>   	/* TODO avoid failing a new interface
+>   	 * creation due to pending removal?
+> 
 
-Thanks for the heads up. I dropped this patch and will take a look at 
-the rest of the  series today or tomorrow.
+I am concerned about this one. Maybe you can shed some light on it.
+NL802154_IFTYPE_UNSPEC is -1 which means the u32 will not hold this 
+value, but something at the end of the range for u32.
+
+There is a path (info->attrs[NL802154_ATTR_IFTYPE] is not true) where we 
+put type forward to  rdev_add_virtual_intf() with its changed value but 
+it would expect and enum which could hold -1 for UNSPEC.
 
 regards
 Stefan Schmidt
