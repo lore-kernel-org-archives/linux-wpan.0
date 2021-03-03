@@ -2,94 +2,124 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54624C433E0
-	for <linux-wpan@archiver.kernel.org>; Wed,  3 Mar 2021 03:43:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA230C433E6
+	for <linux-wpan@archiver.kernel.org>; Wed,  3 Mar 2021 22:06:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0DD8064E6F
-	for <linux-wpan@archiver.kernel.org>; Wed,  3 Mar 2021 03:43:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9A97364EED
+	for <linux-wpan@archiver.kernel.org>; Wed,  3 Mar 2021 22:06:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350009AbhCCDlV (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 2 Mar 2021 22:41:21 -0500
-Received: from proxima.lasnet.de ([78.47.171.185]:37508 "EHLO
-        proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1382352AbhCBVpr (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 2 Mar 2021 16:45:47 -0500
-Received: from [IPv6:2003:e9:d72a:21a0:8b4a:5ec4:afc4:817c] (p200300e9d72a21a08b4a5ec4afc4817c.dip0.t-ipconnect.de [IPv6:2003:e9:d72a:21a0:8b4a:5ec4:afc4:817c])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits))
-        (No client certificate requested)
-        (Authenticated sender: stefan@datenfreihafen.org)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id 68498C07F4;
-        Tue,  2 Mar 2021 22:45:04 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
-        s=2021; t=1614721504;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=jxEb6AzB4Hi58jqmVNIl9Zsljq62e2w8j1ymEKI1zLE=;
-        b=GsuNc//hjk3gmxmB/bAC4o3j+AMEFaotT6lIXcs91jawxmXXqUTlBvklujchB4EuHmtyrf
-        cHVWRaNNz2zV+MXrHH/9aOuDGVWXJL3zw321uN2F+qdpepQsoonEX2VnVF2zstNuioxe+u
-        pg7Rhtq+mXkDfYeOI3OYewJNQIDvucbN9//E90qzDltGFR+4Xl05037ZRrp7EgQcidcSgV
-        6HPgfn4U4AIWudcBc3f41biKu97oH61/joNNs1eAUxM4ZOwUPIsdc1VZJYhZhjcvwO59WE
-        iNc8eJKfXytlhb7IROPSzDnY2XFStp7IHSJIg0Zf95nCGGowlUcOIc9OjZpFDQ==
-Subject: Re: [PATCH wpan 04/17] net: ieee802154: forbid monitor for set llsec
- params
-To:     Alexander Aring <aahringo@redhat.com>
-Cc:     linux-wpan@vger.kernel.org, netdev@vger.kernel.org
-References: <20210228151817.95700-1-aahringo@redhat.com>
- <20210228151817.95700-5-aahringo@redhat.com>
-From:   Stefan Schmidt <stefan@datenfreihafen.org>
-Message-ID: <f4599ca2-31c3-a08e-fad8-444f35cc6f6b@datenfreihafen.org>
-Date:   Tue, 2 Mar 2021 22:45:04 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        id S229589AbhCCVwZ (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 3 Mar 2021 16:52:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60464 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1349003AbhCCQ3S (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 3 Mar 2021 11:29:18 -0500
+Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDB66C061762;
+        Wed,  3 Mar 2021 08:28:32 -0800 (PST)
+Received: by mail-lf1-x12d.google.com with SMTP id q25so17831908lfc.8;
+        Wed, 03 Mar 2021 08:28:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=e6jk4zYBS5RjBAZNG1Jc1PukaUiIwiF3IBqy3w9hmmE=;
+        b=BVFfZbLb/FeEe0raR3StYBDGVDr7EX5N7HR+g7owlm2IURTCIF/HOBRI03YTYuqbXF
+         jywwE5g/Qr2634AGPScQqQZ32quudwZ7KqWjwszCuBZBb/QQduiNLOZmqI0CvZxJBav5
+         FTVlD/6w9RwzTBzlDIybudSexYk0YPtLLWHyGFkftBOX3MWf9vhrz8MLyO6SeA3rSgi4
+         G5euWldZ6kU0QG2RBFGMIvX0ZEXJco1BDjJICcq29HtG1dZV6IPaF9yeqhQLOyzZkmXI
+         4gKWrKZuv+ktwOl7R56zww/pDMCkfIAu7YWW3iGQb9poXB766giMAKNQ79eHN86519k3
+         Haew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=e6jk4zYBS5RjBAZNG1Jc1PukaUiIwiF3IBqy3w9hmmE=;
+        b=A2AyNPrbyWTvxEywP60T82SYU6Ms+R2naiIPpGpzh9C3O8yLW3aycVnJkbUvERm8sr
+         z6JdiuFpO1Q4wl5hdRcYxM7whDBRhjJL0t58wCvqZsZ5Jit3Jtck+bwqmSwCa5j4buiI
+         hyyhJrwvpoJ3TPii24bwU7VCHdJkhU6vwX6qoyvjEaEun2syDphIDm5De2gDZDC2D5Qe
+         kw4Axeb3tQiMZvROzDq4gCiaBxaTl4FEV2+Yh/2B4tqcHnr32JIJ19spc6ZLY1tgxlkp
+         HwhPlFOvwI3Dwyv+CEWnwsTdtBfyMInEMjIq+10ZaD7/QNO9r6GHVHuLcYHfNe66wsoY
+         9Qrw==
+X-Gm-Message-State: AOAM530YBa4YMgdCfQy9MrG7m4mS3+rJ/6x9E5roUH25t7qSMi2rLoRy
+        I5y/ysm5NXirEOhN+TRyB2m/7HVAOEaU8RG72E4=
+X-Google-Smtp-Source: ABdhPJzHo9T4zCaRaT2RXZe7050zl4QyZYHQQOAv+ZHRdXKF78eQwZLT0ljcRlyNCHQr+e/PesVdKQ==
+X-Received: by 2002:a19:8888:: with SMTP id k130mr14960980lfd.399.1614788911449;
+        Wed, 03 Mar 2021 08:28:31 -0800 (PST)
+Received: from localhost.localdomain ([94.103.235.167])
+        by smtp.gmail.com with ESMTPSA id s7sm2084403lfi.140.2021.03.03.08.28.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 Mar 2021 08:28:31 -0800 (PST)
+From:   Pavel Skripkin <paskripkin@gmail.com>
+To:     alex.aring@gmail.com, stefan@datenfreihafen.org,
+        davem@davemloft.net
+Cc:     linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Pavel Skripkin <paskripkin@gmail.com>,
+        syzbot+12cf5fbfdeba210a89dd@syzkaller.appspotmail.com
+Subject: [PATCH] net: mac802154: Fix null pointer dereference
+Date:   Wed,  3 Mar 2021 19:27:56 +0300
+Message-Id: <20210303162757.763502-1-paskripkin@gmail.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-In-Reply-To: <20210228151817.95700-5-aahringo@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello Alex.
+syzbot found general protection fault in crypto_destroy_tfm()[1].
+It was caused by wrong clean up loop in llsec_key_alloc().
+If one of the tfm array members won't be initialized it will cause
+NULL dereference in crypto_destroy_tfm().
 
-On 28.02.21 16:18, Alexander Aring wrote:
-> This patch forbids to set llsec params for monitor interfaces which we
-> don't support yet.
-> 
-> Reported-by: syzbot+8b6719da8a04beeafcc3@syzkaller.appspotmail.com
-> Signed-off-by: Alexander Aring <aahringo@redhat.com>
-> ---
->   net/ieee802154/nl802154.c | 3 +++
->   1 file changed, 3 insertions(+)
-> 
-> diff --git a/net/ieee802154/nl802154.c b/net/ieee802154/nl802154.c
-> index 3ee09f6d13b7..67f0dc622bc2 100644
-> --- a/net/ieee802154/nl802154.c
-> +++ b/net/ieee802154/nl802154.c
-> @@ -1384,6 +1384,9 @@ static int nl802154_set_llsec_params(struct sk_buff *skb,
->   	u32 changed = 0;
->   	int ret;
->   
-> +	if (wpan_dev->iftype == NL802154_IFTYPE_MONITOR)
-> +		return -EOPNOTSUPP;
-> +
->   	if (info->attrs[NL802154_ATTR_SEC_ENABLED]) {
->   		u8 enabled;
->   
-> 
+Call Trace:
+ crypto_free_aead include/crypto/aead.h:191 [inline] [1]
+ llsec_key_alloc net/mac802154/llsec.c:156 [inline]
+ mac802154_llsec_key_add+0x9e0/0xcc0 net/mac802154/llsec.c:249
+ ieee802154_add_llsec_key+0x56/0x80 net/mac802154/cfg.c:338
+ rdev_add_llsec_key net/ieee802154/rdev-ops.h:260 [inline]
+ nl802154_add_llsec_key+0x3d3/0x560 net/ieee802154/nl802154.c:1584
+ genl_family_rcv_msg_doit+0x228/0x320 net/netlink/genetlink.c:739
+ genl_family_rcv_msg net/netlink/genetlink.c:783 [inline]
+ genl_rcv_msg+0x328/0x580 net/netlink/genetlink.c:800
+ netlink_rcv_skb+0x153/0x420 net/netlink/af_netlink.c:2502
+ genl_rcv+0x24/0x40 net/netlink/genetlink.c:811
+ netlink_unicast_kernel net/netlink/af_netlink.c:1312 [inline]
+ netlink_unicast+0x533/0x7d0 net/netlink/af_netlink.c:1338
+ netlink_sendmsg+0x856/0xd90 net/netlink/af_netlink.c:1927
+ sock_sendmsg_nosec net/socket.c:654 [inline]
+ sock_sendmsg+0xcf/0x120 net/socket.c:674
+ ____sys_sendmsg+0x6e8/0x810 net/socket.c:2350
+ ___sys_sendmsg+0xf3/0x170 net/socket.c:2404
+ __sys_sendmsg+0xe5/0x1b0 net/socket.c:2433
+ do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
 
-I am fine with this patch and all the rest up to 17. They just do not 
-apply for me with 1 and 2 left out and only 3 applied.
+Signed-off-by: Pavel Skripkin <paskripkin@gmail.com>
+Reported-by: syzbot+12cf5fbfdeba210a89dd@syzkaller.appspotmail.com
+---
+ net/mac802154/llsec.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Could you resend 3-17 as a series and we can discuss 1 & 2 separately?
+diff --git a/net/mac802154/llsec.c b/net/mac802154/llsec.c
+index 585d33144c33..6709f186f777 100644
+--- a/net/mac802154/llsec.c
++++ b/net/mac802154/llsec.c
+@@ -151,7 +151,7 @@ llsec_key_alloc(const struct ieee802154_llsec_key *template)
+ err_tfm0:
+ 	crypto_free_sync_skcipher(key->tfm0);
+ err_tfm:
+-	for (i = 0; i < ARRAY_SIZE(key->tfm); i++)
++	for (; i >= 0; i--)
+ 		if (key->tfm[i])
+ 			crypto_free_aead(key->tfm[i]);
+ 
+-- 
+2.25.1
 
-regards
-Stefan Schmidt
