@@ -2,132 +2,149 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C4F1C433E0
-	for <linux-wpan@archiver.kernel.org>; Thu,  4 Mar 2021 04:34:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 116E4C433E9
+	for <linux-wpan@archiver.kernel.org>; Thu,  4 Mar 2021 09:25:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1439264EF6
-	for <linux-wpan@archiver.kernel.org>; Thu,  4 Mar 2021 04:34:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CE2B264F02
+	for <linux-wpan@archiver.kernel.org>; Thu,  4 Mar 2021 09:25:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232437AbhCDEdM (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 3 Mar 2021 23:33:12 -0500
-Received: from mail-io1-f70.google.com ([209.85.166.70]:53331 "EHLO
-        mail-io1-f70.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232926AbhCDEdA (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 3 Mar 2021 23:33:00 -0500
-Received: by mail-io1-f70.google.com with SMTP id r10so20448908iod.20
-        for <linux-wpan@vger.kernel.org>; Wed, 03 Mar 2021 20:32:45 -0800 (PST)
+        id S237587AbhCDJYO (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Thu, 4 Mar 2021 04:24:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53398 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237559AbhCDJYG (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 4 Mar 2021 04:24:06 -0500
+Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9A7CC06175F;
+        Thu,  4 Mar 2021 01:23:25 -0800 (PST)
+Received: by mail-lf1-x12a.google.com with SMTP id v9so24223469lfa.1;
+        Thu, 04 Mar 2021 01:23:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=message-id:subject:from:to:cc:date:in-reply-to:references
+         :user-agent:mime-version:content-transfer-encoding;
+        bh=pZ19mgNU3Qr30eSsWiilV/pbn6I16lt5wQNtnDOvD5Q=;
+        b=BbfCtS1fiicYn5B4uJEnMRK6RcOKMhLTWEHf6kDTf6VnciGKysU0j2/A1IoX4lXu2g
+         PKQEcAZ77l1l4iI6XsoMRZiRmkxg1smweK4OI1oqwKeHcobXTUVAXeBSTfLqCeUmYkR9
+         6gs/ABsofyKrPej+iXIR2iAhaiBboozIsqIYXvnoHeYVQZ1xee9SbDMTGnYv+tDO4r7j
+         TVRZyBmpgA0vMBFi7ydVjhrwoZa5Dc312norseDQ1MnF/TdNxQC2D4PM9kli5/QZeKkF
+         FvmoRXAbShjokgXcfU+pJUrGnRKa9CrsLo0xhw0fhPvJlZU5FtjAlRmPBiCORh2GGjyV
+         aItw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=438ryhskUK23Uad5Y6ZFyNz3as0ZaRCtJbK9Brlm7wg=;
-        b=YO60aPLsdQTxApZDqfs8uW/a3vpjGPlj9RafkV5y0h/XsfPd2X8p8JQNjVTpVrIzcl
-         ptk5AAA7OmaBciGJeFN9dSnbM/HC3jhmclZNdUK/jR8hn5neJCfkQVDuv8NC892THemW
-         Cp/9T4fHKtfay7HZpfjXIf+ocTYQcgI8YRHTmIGf54cr6dorysNIDiHLlj4K67yenx0b
-         m8B96ez88Yi0fQd/S42rm1iJ2UgQqc+p/mHtoN+bASvfgMcY2H1mFQUhW/pPEpJ9mgAU
-         YTCUGdcfI1N/KkkGuo5YF3OdJvzQpl3bv/Xa2YYRcWcYEXtRCwak8oaLLYc8DMnhijnb
-         pgbg==
-X-Gm-Message-State: AOAM533zWSZpluJc0P4iYFF/ilvJANcwyvZxVT6SGZ84BL0lbU7FrIh1
-        aceNSL6INIRVGGccMVw6McPs3jO43hxmXljTVzE+o2eO/TeO
-X-Google-Smtp-Source: ABdhPJyU3YrzRSC8SrKnWA0f9PvpaP56ILm6xqVpMCk15bxQpZFe7WB7bWcEea3qVxtjZO0AFUGaMHAn8O4QplNojp6/I3QR2OOv
-MIME-Version: 1.0
-X-Received: by 2002:a02:cc1b:: with SMTP id n27mr2336010jap.106.1614832339741;
- Wed, 03 Mar 2021 20:32:19 -0800 (PST)
-Date:   Wed, 03 Mar 2021 20:32:19 -0800
-In-Reply-To: <000000000000de949705bc59e0f6@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000fb718e05bcae7372@google.com>
-Subject: Re: general protection fault in crypto_destroy_tfm
-From:   syzbot <syzbot+12cf5fbfdeba210a89dd@syzkaller.appspotmail.com>
-To:     alex.aring@gmail.com, ardb@kernel.org, davem@davemloft.net,
-        ebiggers@google.com, ebiggers@kernel.org,
-        herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-wpan@vger.kernel.org,
-        netdev@vger.kernel.org, paskripkin@gmail.com,
-        stefan@datenfreihafen.org, syzkaller-bugs@googlegroups.com
+        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
+         :references:user-agent:mime-version:content-transfer-encoding;
+        bh=pZ19mgNU3Qr30eSsWiilV/pbn6I16lt5wQNtnDOvD5Q=;
+        b=NBzbKC2WWv700dRA+qc0yqiWExKnO/E9V4DFQuMkUbtJ7MPB/juV1gyu94RdYGfJ1j
+         P0tCcqTg++MrfgCk083Y8ElA4ht8QSw7zT1g/Ga4OVa5s8CIyUsIyV28wYtj2uLUneTg
+         8IL0tZgpZznIY2lDh2NJ7sO+lx1A4CUohry1mPg66fQKlJznBwKV6258S6tBwdU/2PVr
+         jj4u1RIjeNp96trMj2aQ7dSrdUI3JpcN0Y/pa7qXvpOHeKpn1eogpU8VwsqT20wRtcgB
+         35SG8mcS+4FU/Sr2b/7LxjWsSHySETPp9AraCaHct8UeT0CEa7pHEvFTl84gR/VsyHgi
+         TjEw==
+X-Gm-Message-State: AOAM533I3rlkXjqBkoqNODWBZ90YTH53Flj+GhnSnXDzVtM4CU4/yvB1
+        rQtEQZWBm/vw5kSXeVX3L1MvRdoouGuWJ/T7jlo=
+X-Google-Smtp-Source: ABdhPJxVgRGLvTzQezwsszj5YgYcGBwk+WQu9kJRfPjkqxk5RQID6DqXvaJpWRb633OqZuOFpsR7fQ==
+X-Received: by 2002:a05:6512:2185:: with SMTP id b5mr1742211lft.489.1614849804226;
+        Thu, 04 Mar 2021 01:23:24 -0800 (PST)
+Received: from pskrgag-home ([94.103.235.167])
+        by smtp.gmail.com with ESMTPSA id n13sm3208491lfu.265.2021.03.04.01.23.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 04 Mar 2021 01:23:23 -0800 (PST)
+Message-ID: <e70d7b45638db427be978c620475a330cb9db57c.camel@gmail.com>
+Subject: Re: [PATCH] net: mac802154: Fix null pointer dereference
+From:   Pavel Skripkin <paskripkin@gmail.com>
+To:     Alexander Aring <alex.aring@gmail.com>
+Cc:     Stefan Schmidt <stefan@datenfreihafen.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-wpan - ML <linux-wpan@vger.kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
+        kernel list <linux-kernel@vger.kernel.org>,
+        syzbot+12cf5fbfdeba210a89dd@syzkaller.appspotmail.com
+Date:   Thu, 04 Mar 2021 12:23:22 +0300
+In-Reply-To: <CAB_54W6-ONBmLhaQqrDD=efiinRosxe06VEGDqmMM-1-XjYcPw@mail.gmail.com>
+References: <20210303162757.763502-1-paskripkin@gmail.com>
+         <CAB_54W6-ONBmLhaQqrDD=efiinRosxe06VEGDqmMM-1-XjYcPw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.4-0ubuntu1 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-syzbot has found a reproducer for the following issue on:
+Hi, thanks for your reply!
 
-HEAD commit:    d310ec03 Merge tag 'perf-core-2021-02-17' of git://git.ker..
-git tree:       net-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=13e7a292d00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=2b8307379601586a
-dashboard link: https://syzkaller.appspot.com/bug?extid=12cf5fbfdeba210a89dd
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=103b89b6d00000
+On Wed, 2021-03-03 at 21:40 -0500, Alexander Aring wrote:
+> Hi,
+> 
+> On Wed, 3 Mar 2021 at 11:28, Pavel Skripkin <paskripkin@gmail.com>
+> wrote:
+> > syzbot found general protection fault in crypto_destroy_tfm()[1].
+> > It was caused by wrong clean up loop in llsec_key_alloc().
+> > If one of the tfm array members won't be initialized it will cause
+> > NULL dereference in crypto_destroy_tfm().
+> > 
+> > Call Trace:
+> >  crypto_free_aead include/crypto/aead.h:191 [inline] [1]
+> >  llsec_key_alloc net/mac802154/llsec.c:156 [inline]
+> >  mac802154_llsec_key_add+0x9e0/0xcc0 net/mac802154/llsec.c:249
+> >  ieee802154_add_llsec_key+0x56/0x80 net/mac802154/cfg.c:338
+> >  rdev_add_llsec_key net/ieee802154/rdev-ops.h:260 [inline]
+> >  nl802154_add_llsec_key+0x3d3/0x560 net/ieee802154/nl802154.c:1584
+> >  genl_family_rcv_msg_doit+0x228/0x320 net/netlink/genetlink.c:739
+> >  genl_family_rcv_msg net/netlink/genetlink.c:783 [inline]
+> >  genl_rcv_msg+0x328/0x580 net/netlink/genetlink.c:800
+> >  netlink_rcv_skb+0x153/0x420 net/netlink/af_netlink.c:2502
+> >  genl_rcv+0x24/0x40 net/netlink/genetlink.c:811
+> >  netlink_unicast_kernel net/netlink/af_netlink.c:1312 [inline]
+> >  netlink_unicast+0x533/0x7d0 net/netlink/af_netlink.c:1338
+> >  netlink_sendmsg+0x856/0xd90 net/netlink/af_netlink.c:1927
+> >  sock_sendmsg_nosec net/socket.c:654 [inline]
+> >  sock_sendmsg+0xcf/0x120 net/socket.c:674
+> >  ____sys_sendmsg+0x6e8/0x810 net/socket.c:2350
+> >  ___sys_sendmsg+0xf3/0x170 net/socket.c:2404
+> >  __sys_sendmsg+0xe5/0x1b0 net/socket.c:2433
+> >  do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
+> >  entry_SYSCALL_64_after_hwframe+0x44/0xae
+> > 
+> > Signed-off-by: Pavel Skripkin <paskripkin@gmail.com>
+> > Reported-by: syzbot+12cf5fbfdeba210a89dd@syzkaller.appspotmail.com
+> > ---
+> >  net/mac802154/llsec.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/net/mac802154/llsec.c b/net/mac802154/llsec.c
+> > index 585d33144c33..6709f186f777 100644
+> > --- a/net/mac802154/llsec.c
+> > +++ b/net/mac802154/llsec.c
+> > @@ -151,7 +151,7 @@ llsec_key_alloc(const struct
+> > ieee802154_llsec_key *template)
+> >  err_tfm0:
+> >         crypto_free_sync_skcipher(key->tfm0);
+> >  err_tfm:
+> > -       for (i = 0; i < ARRAY_SIZE(key->tfm); i++)
+> > +       for (; i >= 0; i--)
+> >                 if (key->tfm[i])
+> 
+> I think this need to be:
+> 
+> if (!IS_ERR_OR_NULL(key->tfm[i]))
+> 
+> otherwise we still run into issues for the current iterator when
+> key->tfm[i] is in range of IS_ERR().
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+12cf5fbfdeba210a89dd@syzkaller.appspotmail.com
+Oh... I got it completly wrong, I'm sorry. If it's still not fixed,
+I'll send rigth patch for that.
 
-general protection fault, probably for non-canonical address 0xdffffc0000000002: 0000 [#1] PREEMPT SMP KASAN
-KASAN: null-ptr-deref in range [0x0000000000000010-0x0000000000000017]
-CPU: 0 PID: 9813 Comm: syz-executor.2 Not tainted 5.11.0-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-RIP: 0010:crypto_destroy_tfm+0x38/0x210 crypto/api.c:568
-Code: f5 53 e8 ab c9 dd fd 4d 85 ed 0f 84 a2 00 00 00 e8 9d c9 dd fd 4c 8d 75 10 48 b8 00 00 00 00 00 fc ff df 4c 89 f2 48 c1 ea 03 <80> 3c 02 00 0f 85 8c 01 00 00 4c 8d 7d 08 4c 8b 65 10 48 b8 00 00
-RSP: 0018:ffffc9000adff360 EFLAGS: 00010203
-RAX: dffffc0000000000 RBX: 0000000000000000 RCX: 0000000000000000
-RDX: 0000000000000002 RSI: ffffffff83951013 RDI: fffffffffffffffe
-RBP: 0000000000000006 R08: fffffffffffff000 R09: ffffffff8fa99847
-R10: ffffffff8891f97e R11: 0000000000000000 R12: ffff8880133ed000
-R13: fffffffffffffffe R14: 0000000000000016 R15: fffffffffffffffe
-FS:  00007f0265ee2700(0000) GS:ffff8880b9c00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000000000 CR3: 000000002631b000 CR4: 00000000001506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- crypto_free_aead include/crypto/aead.h:191 [inline]
- llsec_key_alloc net/mac802154/llsec.c:156 [inline]
- mac802154_llsec_key_add+0x9e0/0xcc0 net/mac802154/llsec.c:249
- ieee802154_add_llsec_key+0x56/0x80 net/mac802154/cfg.c:338
- rdev_add_llsec_key net/ieee802154/rdev-ops.h:260 [inline]
- nl802154_add_llsec_key+0x3d3/0x560 net/ieee802154/nl802154.c:1584
- genl_family_rcv_msg_doit+0x228/0x320 net/netlink/genetlink.c:739
- genl_family_rcv_msg net/netlink/genetlink.c:783 [inline]
- genl_rcv_msg+0x328/0x580 net/netlink/genetlink.c:800
- netlink_rcv_skb+0x153/0x420 net/netlink/af_netlink.c:2502
- genl_rcv+0x24/0x40 net/netlink/genetlink.c:811
- netlink_unicast_kernel net/netlink/af_netlink.c:1312 [inline]
- netlink_unicast+0x533/0x7d0 net/netlink/af_netlink.c:1338
- netlink_sendmsg+0x856/0xd90 net/netlink/af_netlink.c:1927
- sock_sendmsg_nosec net/socket.c:652 [inline]
- sock_sendmsg+0xcf/0x120 net/socket.c:672
- ____sys_sendmsg+0x6e8/0x810 net/socket.c:2348
- ___sys_sendmsg+0xf3/0x170 net/socket.c:2402
- __sys_sendmsg+0xe5/0x1b0 net/socket.c:2435
- do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-RIP: 0033:0x465ef9
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 bc ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f0265ee2188 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 000000000056c008 RCX: 0000000000465ef9
-RDX: 0000000000000000 RSI: 00000000200000c0 RDI: 0000000000000004
-RBP: 00000000004bfa34 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 000000000056c008
-R13: 00007fff0057718f R14: 00007f0265ee2300 R15: 0000000000022000
-Modules linked in:
----[ end trace 8a3ba3ae0abac852 ]---
-RIP: 0010:crypto_destroy_tfm+0x38/0x210 crypto/api.c:568
-Code: f5 53 e8 ab c9 dd fd 4d 85 ed 0f 84 a2 00 00 00 e8 9d c9 dd fd 4c 8d 75 10 48 b8 00 00 00 00 00 fc ff df 4c 89 f2 48 c1 ea 03 <80> 3c 02 00 0f 85 8c 01 00 00 4c 8d 7d 08 4c 8b 65 10 48 b8 00 00
-RSP: 0018:ffffc9000adff360 EFLAGS: 00010203
-RAX: dffffc0000000000 RBX: 0000000000000000 RCX: 0000000000000000
-RDX: 0000000000000002 RSI: ffffffff83951013 RDI: fffffffffffffffe
-RBP: 0000000000000006 R08: fffffffffffff000 R09: ffffffff8fa99847
-R10: ffffffff8891f97e R11: 0000000000000000 R12: ffff8880133ed000
-R13: fffffffffffffffe R14: 0000000000000016 R15: fffffffffffffffe
-FS:  00007f0265ee2700(0000) GS:ffff8880b9c00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000000000 CR3: 000000002631b000 CR4: 00000000001506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> 
+> - Alex
+-- 
+With regards,
+Pavel Skripkin
 
