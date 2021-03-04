@@ -2,91 +2,127 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D42DCC433E0
-	for <linux-wpan@archiver.kernel.org>; Thu,  4 Mar 2021 14:24:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E9C5C433DB
+	for <linux-wpan@archiver.kernel.org>; Thu,  4 Mar 2021 15:26:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9877064F23
-	for <linux-wpan@archiver.kernel.org>; Thu,  4 Mar 2021 14:24:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 204A764F9F
+	for <linux-wpan@archiver.kernel.org>; Thu,  4 Mar 2021 15:26:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233987AbhCDOXr (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Thu, 4 Mar 2021 09:23:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33162 "EHLO
+        id S233627AbhCDP0M (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Thu, 4 Mar 2021 10:26:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46508 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240834AbhCDOXj (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 4 Mar 2021 09:23:39 -0500
-Received: from mail-oi1-x236.google.com (mail-oi1-x236.google.com [IPv6:2607:f8b0:4864:20::236])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D1E4C061574;
-        Thu,  4 Mar 2021 06:22:59 -0800 (PST)
-Received: by mail-oi1-x236.google.com with SMTP id i21so27981769oii.2;
-        Thu, 04 Mar 2021 06:22:59 -0800 (PST)
+        with ESMTP id S232758AbhCDPZv (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 4 Mar 2021 10:25:51 -0500
+Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42885C061756;
+        Thu,  4 Mar 2021 07:25:11 -0800 (PST)
+Received: by mail-lf1-x131.google.com with SMTP id q25so23608421lfc.8;
+        Thu, 04 Mar 2021 07:25:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=6git8wNlDsSLDjVUii3CBUd0Th3PWz6n9wOTfDK7YLc=;
-        b=PyZYbk/K2HbO11rQADvYx7sTXh1bBbEWei72K/0itzsP18fthwPDI2pKdDsMfCZmxI
-         GW77b2Cal6U1hXniKwHOFUjdilZ2X1DPR8crq2zfd69cAXNBLhFT9RXGI/92W0IS4CNF
-         lZ1uo2nHXo2waoRFhTBOTR2MUC4fw7sWAAA6vj6LHuGgw1KS2ODMSZ+9P3130+11WsKk
-         UclHf2MkX5YSXZNXBykQeapSGmCNY9qQCA5yXI2JZrbT38xYmQJvG/1DkwRQWE6C9wH1
-         UxzcaE+xenuTlGr+hTXP3EBYsQVbFFk7pjQq8hJmQ7emGNEsCdwESNFVw1pSEFj++EZ3
-         kcQA==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=aeN2LKdORXb0lZrwnrlpd8qrBTJtdHVZ+ffDq501Us8=;
+        b=i+DknTjhTVuXq7MZUlypiuq2JeQK4/edGuiLVDG8YUHG3exXaY/yG8yLBtjp1r6zwu
+         xBCfPXSbY5SpQFOAV5/at+WrDVti0dDvr/nmHTeoNuGKcqwQTb9WyzERXzyjKwjcl65l
+         bTmQDbzaUFJFusDofGxg4vdMrRxa5XT2maO4+dFgSbuV8fXD9kp+tFctJm2jhtYsdp7W
+         S8HGt333upLNPULnrmgk55nDQT+Ij37chqPpzuj2xfYsTNts9Ah1/lAAoP+MbP4uovbN
+         BtesAzVJ/OW95zoaLiVJFxkR9KR5PuhF2TfQQ1sDbD9+wBteNpPr1N8wmkUkzBIOYP2f
+         PcBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=6git8wNlDsSLDjVUii3CBUd0Th3PWz6n9wOTfDK7YLc=;
-        b=Hf0w4mbHvs4FZ/UTUJuxvTK4fQWsVLT9XFMPFFsgNwAymRp/0cELD3Qb/vpLGloq1k
-         ngrFWkhW8b0UF1RwiF7Vr8WOXxGPNiLXXoijq+GubPr7UiPpESaLyv8uGZVIcsjBI05V
-         LZGbthmHeWW1pPp3QR6VnHxR+9WCjlvEqnBhlIPVBAJJNXTiSW12Qqx+bMU8Mt/3lKq9
-         z2V6GEupMczhrsisjjMQg7yrsmRXyQXvtnsigfp5SD0816CO0WozHjLCUaKTQ4PrRKVs
-         E1TOZgG3IInp+U8Cf6rqoYtmyhCJoKkcapVKhL4oJfzqUqplPCVeiIPRq5Z/hjnc2+gm
-         09ZQ==
-X-Gm-Message-State: AOAM531kvq+ohe3FltqFqtk2xpI9DPtYxDYoNqNtqaMCNrgu5GzH0bbg
-        oqM0bMqMrOBmvTUhwictPSAWnhNK9USIHCTIGNc=
-X-Google-Smtp-Source: ABdhPJza6KqKND0SPEifCF8m8ht1WDfQzuBen506UAZXyTCDAUig/3hwvnLXFwAD9m0HiOQzLMAR1+OGbypVjsECUJk=
-X-Received: by 2002:aca:3d85:: with SMTP id k127mr3251418oia.157.1614867778829;
- Thu, 04 Mar 2021 06:22:58 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=aeN2LKdORXb0lZrwnrlpd8qrBTJtdHVZ+ffDq501Us8=;
+        b=KDS8v07OXXQ0s/HyfICTfv67Dec+R++3AFUSrhmcPFgFmAmwfgp0gA/93V2i7IYDCE
+         BS9RbAlaO+d2/5RP+PdvkCGTRL+i/hl+lGI3NmjUfhYMSEppvEJOntZqzeO0gb4NYYZb
+         lBrsOuRzCluPryJ4v3uvLUYMPRMDpOGQTFyhUCyxgcRpCr+vM+aQkgx8uSV0DHY0+hgs
+         EWQyyUqj64/adoumDVSPtrcFsXPGCvk6X8pYvLwM6XSuzEwZhCS3fslkxziXX8QD5DiK
+         ZGVRRK1DA7a1f1YdBHxpxCMvGTWMxNapcfxjGEFiO9nLSj1pxH6j8W8ukKM8S4YKZiF7
+         ZKtQ==
+X-Gm-Message-State: AOAM533QFicX6Hs3i8oh3nl4uIl+M9DcJLX8nDIsSt5SlQZ8gFaDmuiU
+        39pwL41ZETDtZmRionxbLbv64X2gtMFJDNTVGak=
+X-Google-Smtp-Source: ABdhPJwKMUQh9PtBYqbGI/8c5OxKmNVwr0F+4JArX5VTcw9L9vOFzh/5/DLlV1N2jv4ludGo8Dkv0w==
+X-Received: by 2002:a05:6512:906:: with SMTP id e6mr2644644lft.224.1614871509714;
+        Thu, 04 Mar 2021 07:25:09 -0800 (PST)
+Received: from localhost.localdomain ([94.103.235.167])
+        by smtp.gmail.com with ESMTPSA id d8sm467647ljc.129.2021.03.04.07.25.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 04 Mar 2021 07:25:09 -0800 (PST)
+From:   Pavel Skripkin <paskripkin@gmail.com>
+To:     alex.aring@gmail.com, stefan@datenfreihafen.org,
+        davem@davemloft.net
+Cc:     linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Pavel Skripkin <paskripkin@gmail.com>,
+        syzbot+9ec037722d2603a9f52e@syzkaller.appspotmail.com
+Subject: [PATCH v2] net: mac802154: Fix general protection fault
+Date:   Thu,  4 Mar 2021 18:21:25 +0300
+Message-Id: <20210304152125.1052825-1-paskripkin@gmail.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <CAB_54W7v1Dk9KjytfO8hAGfiqPJ6qO0SdgwDQ-s4ybA2yvuoCg@mail.gmail.com>
+References: <CAB_54W7v1Dk9KjytfO8hAGfiqPJ6qO0SdgwDQ-s4ybA2yvuoCg@mail.gmail.com>
 MIME-Version: 1.0
-References: <20210303162757.763502-1-paskripkin@gmail.com> <CAB_54W6-ONBmLhaQqrDD=efiinRosxe06VEGDqmMM-1-XjYcPw@mail.gmail.com>
- <e70d7b45638db427be978c620475a330cb9db57c.camel@gmail.com>
-In-Reply-To: <e70d7b45638db427be978c620475a330cb9db57c.camel@gmail.com>
-From:   Alexander Aring <alex.aring@gmail.com>
-Date:   Thu, 4 Mar 2021 09:22:47 -0500
-Message-ID: <CAB_54W7v1Dk9KjytfO8hAGfiqPJ6qO0SdgwDQ-s4ybA2yvuoCg@mail.gmail.com>
-Subject: Re: [PATCH] net: mac802154: Fix null pointer dereference
-To:     Pavel Skripkin <paskripkin@gmail.com>
-Cc:     Stefan Schmidt <stefan@datenfreihafen.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-wpan - ML <linux-wpan@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-        kernel list <linux-kernel@vger.kernel.org>,
-        syzbot+12cf5fbfdeba210a89dd@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi,
+syzbot found general protection fault in crypto_destroy_tfm()[1].
+It was caused by wrong clean up loop in llsec_key_alloc().
+If one of the tfm array members is in IS_ERR() range it will
+cause general protection fault in clean up function [1].
 
-On Thu, 4 Mar 2021 at 04:23, Pavel Skripkin <paskripkin@gmail.com> wrote:
-...
-> >
-> > I think this need to be:
-> >
-> > if (!IS_ERR_OR_NULL(key->tfm[i]))
-> >
-> > otherwise we still run into issues for the current iterator when
-> > key->tfm[i] is in range of IS_ERR().
->
-> Oh... I got it completly wrong, I'm sorry. If it's still not fixed,
-> I'll send rigth patch for that.
->
+Call Trace:
+ crypto_free_aead include/crypto/aead.h:191 [inline] [1]
+ llsec_key_alloc net/mac802154/llsec.c:156 [inline]
+ mac802154_llsec_key_add+0x9e0/0xcc0 net/mac802154/llsec.c:249
+ ieee802154_add_llsec_key+0x56/0x80 net/mac802154/cfg.c:338
+ rdev_add_llsec_key net/ieee802154/rdev-ops.h:260 [inline]
+ nl802154_add_llsec_key+0x3d3/0x560 net/ieee802154/nl802154.c:1584
+ genl_family_rcv_msg_doit+0x228/0x320 net/netlink/genetlink.c:739
+ genl_family_rcv_msg net/netlink/genetlink.c:783 [inline]
+ genl_rcv_msg+0x328/0x580 net/netlink/genetlink.c:800
+ netlink_rcv_skb+0x153/0x420 net/netlink/af_netlink.c:2502
+ genl_rcv+0x24/0x40 net/netlink/genetlink.c:811
+ netlink_unicast_kernel net/netlink/af_netlink.c:1312 [inline]
+ netlink_unicast+0x533/0x7d0 net/netlink/af_netlink.c:1338
+ netlink_sendmsg+0x856/0xd90 net/netlink/af_netlink.c:1927
+ sock_sendmsg_nosec net/socket.c:654 [inline]
+ sock_sendmsg+0xcf/0x120 net/socket.c:674
+ ____sys_sendmsg+0x6e8/0x810 net/socket.c:2350
+ ___sys_sendmsg+0xf3/0x170 net/socket.c:2404
+ __sys_sendmsg+0xe5/0x1b0 net/socket.c:2433
+ do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
 
-please resend your patch. We will review again.
+Signed-off-by: Pavel Skripkin <paskripkin@gmail.com>
+Reported-by: syzbot+9ec037722d2603a9f52e@syzkaller.appspotmail.com
+Change-Id: I29f7ac641a039096d63d1e6070bb32cb5a3beb07
+---
+ net/mac802154/llsec.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-- Alex
+diff --git a/net/mac802154/llsec.c b/net/mac802154/llsec.c
+index 585d33144c33..55550ead2ced 100644
+--- a/net/mac802154/llsec.c
++++ b/net/mac802154/llsec.c
+@@ -152,7 +152,7 @@ llsec_key_alloc(const struct ieee802154_llsec_key *template)
+ 	crypto_free_sync_skcipher(key->tfm0);
+ err_tfm:
+ 	for (i = 0; i < ARRAY_SIZE(key->tfm); i++)
+-		if (key->tfm[i])
++		if (!IS_ERR_OR_NULL(key->tfm[i]))
+ 			crypto_free_aead(key->tfm[i]);
+ 
+ 	kfree_sensitive(key);
+-- 
+2.25.1
+
