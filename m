@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 902A4C433DB
-	for <linux-wpan@archiver.kernel.org>; Fri,  5 Mar 2021 00:04:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C45FFC433E9
+	for <linux-wpan@archiver.kernel.org>; Fri,  5 Mar 2021 06:37:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 515C865000
-	for <linux-wpan@archiver.kernel.org>; Fri,  5 Mar 2021 00:04:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8CF5C64FE9
+	for <linux-wpan@archiver.kernel.org>; Fri,  5 Mar 2021 06:37:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231550AbhCEAEU (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Thu, 4 Mar 2021 19:04:20 -0500
-Received: from mail-il1-f197.google.com ([209.85.166.197]:54102 "EHLO
-        mail-il1-f197.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231542AbhCEAET (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 4 Mar 2021 19:04:19 -0500
-Received: by mail-il1-f197.google.com with SMTP id s12so145759ilh.20
-        for <linux-wpan@vger.kernel.org>; Thu, 04 Mar 2021 16:04:19 -0800 (PST)
+        id S229523AbhCEGhJ (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Fri, 5 Mar 2021 01:37:09 -0500
+Received: from mail-io1-f72.google.com ([209.85.166.72]:46578 "EHLO
+        mail-io1-f72.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229674AbhCEGhG (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 5 Mar 2021 01:37:06 -0500
+Received: by mail-io1-f72.google.com with SMTP id w8so1081333iox.13
+        for <linux-wpan@vger.kernel.org>; Thu, 04 Mar 2021 22:37:05 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
          :from:to;
-        bh=bqLq8lEZAr3udvWoJ5bAlwyE7Hbzc7Aau7j02WMMyZQ=;
-        b=Ni6usynqmwXvytyjkAHewO1KTNqaWI8JEMU6QkSiA/m0DHAfTRhEiUZdQJENUhhR5u
-         LmRP423KsvpicUd2Tti/qWh07c24tPRII9Arel1yDeiM7nkmF7RTGuIT5sBHjYtT9/YE
-         jDMwyJ10KnYADc2C6FvpWbHPpplbnawkuX9hOeO/lzKwvo8wili6lqD+QWBjh6fPxd3i
-         65IAzTzNJUi/N1b4J6hteMpx3KQbnzuRjUarrIMfYsoMjZNPrtIPHmeYwXDJXEiQCh39
-         1o7E3jRXpFnOqlgFsTJm8O2kCfb6ohaoYVHjbNWwV+3i6i4OEoR6XnVIb0qcGDk5IwLa
-         M22A==
-X-Gm-Message-State: AOAM532ql5tv0o0lh3pVz6xxqRRZ7rO3pZfaFI9m0DnAHZk944KPTE3l
-        SMfdE/gHARpvfOhLv5Mq3I0wrZFJsBs+oSFrFt4qzVuBc8e9
-X-Google-Smtp-Source: ABdhPJyZ7X1PN5WYLX+tIw1Zbs+iVyIUGLXs1ez5SRC8FYFFL2+T/5vm5avVf1e1dadgDVcjILLDvy61otGySSFxz5gWtMQsnXWC
+        bh=9eaCYfkOQuJEVGK3vD++ucoro9m1dub/WdBbvxw09lQ=;
+        b=Bspgxp4LCxCEK0UQKn4MysEqjLlqAmAQMTf8KMyLhVs3pwC8yxvnCiIsHl6+5vryML
+         gJq5Y+ftQeuIepSRPLtnNxXDJhOTaxiRcGngkFw8CnB7hgHSFlsyq5XKSkQ14Ov7TlVw
+         P7BvIQoblFAsf/7jN8VThaj5t6yM2hRCtYOCsREJjoHLkouV5NLKqhDRDkFSgBrW3PJB
+         wMrv1fru1UKP/mSh+fCz6ALdOrITtK79lMDC7DIA5EO56oZWyOCekD9c07zU8tdxNU7V
+         5WU64b3k+621al1oOAAQK2umQLH7ksBvW6XBS8zkczrN05K+/1WvzWdhOb2pgn+KdsSS
+         2mgw==
+X-Gm-Message-State: AOAM532wMI+orMA/CWQIDPgV1o+x3tpTX7XzCoifCHVK7MAU3QD1ozlt
+        E6/bUn+M28fagbEeIoA1WsmxvZxk2pnhXvhuXdIrQ+KfiSZz
+X-Google-Smtp-Source: ABdhPJxi5FMb8Gtqz+q8eOcjlJ7eTcYMgt8xt0JDLdD5lcTHbZxuE/yqpKlOFPKmyN37WeK74E03P96+WJLIcvMieDoGzNTvO9hX
 MIME-Version: 1.0
-X-Received: by 2002:a5e:980e:: with SMTP id s14mr3880359ioj.63.1614902658921;
- Thu, 04 Mar 2021 16:04:18 -0800 (PST)
-Date:   Thu, 04 Mar 2021 16:04:18 -0800
+X-Received: by 2002:a05:6e02:20e5:: with SMTP id q5mr7133793ilv.131.1614926224754;
+ Thu, 04 Mar 2021 22:37:04 -0800 (PST)
+Date:   Thu, 04 Mar 2021 22:37:04 -0800
 In-Reply-To: <0000000000009b387305bc00fda6@google.com>
 X-Google-Appengine-App-Id: s~syzkaller
 X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000054fbc005bcbed38f@google.com>
+Message-ID: <000000000000f70f8f05bcc44f14@google.com>
 Subject: Re: WARNING in ieee802154_get_llsec_params
 From:   syzbot <syzbot+cde43a581a8e5f317bc2@syzkaller.appspotmail.com>
 To:     alex.aring@gmail.com, davem@davemloft.net, kuba@kernel.org,
@@ -53,67 +53,25 @@ Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-syzbot has found a reproducer for the following issue on:
+syzbot has bisected this issue to:
 
-HEAD commit:    f5427c24 Add linux-next specific files for 20210304
+commit b60673c4c418bef7550d02faf53c34fbfeb366bf
+Author: Jakub Kicinski <kuba@kernel.org>
+Date:   Tue Mar 3 05:05:15 2020 +0000
+
+    nl802154: add missing attribute validation for dev_type
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=100b11b0d00000
+start commit:   f5427c24 Add linux-next specific files for 20210304
 git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=12bb4ff2d00000
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=120b11b0d00000
+console output: https://syzkaller.appspot.com/x/log.txt?x=140b11b0d00000
 kernel config:  https://syzkaller.appspot.com/x/.config?x=a7876f68bf0bea99
 dashboard link: https://syzkaller.appspot.com/bug?extid=cde43a581a8e5f317bc2
 syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=124c7b46d00000
 C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1276f5b0d00000
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
 Reported-by: syzbot+cde43a581a8e5f317bc2@syzkaller.appspotmail.com
+Fixes: b60673c4c418 ("nl802154: add missing attribute validation for dev_type")
 
-------------[ cut here ]------------
-DEBUG_LOCKS_WARN_ON(lock->magic != lock)
-WARNING: CPU: 1 PID: 8406 at kernel/locking/mutex.c:928 __mutex_lock_common kernel/locking/mutex.c:928 [inline]
-WARNING: CPU: 1 PID: 8406 at kernel/locking/mutex.c:928 __mutex_lock+0xc0b/0x1120 kernel/locking/mutex.c:1093
-Modules linked in:
-CPU: 1 PID: 8406 Comm: syz-executor446 Not tainted 5.12.0-rc1-next-20210304-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-RIP: 0010:__mutex_lock_common kernel/locking/mutex.c:928 [inline]
-RIP: 0010:__mutex_lock+0xc0b/0x1120 kernel/locking/mutex.c:1093
-Code: 08 84 d2 0f 85 a3 04 00 00 8b 05 98 77 c0 04 85 c0 0f 85 12 f5 ff ff 48 c7 c6 00 85 6b 89 48 c7 c7 c0 82 6b 89 e8 ed be bc ff <0f> 0b e9 f8 f4 ff ff 65 48 8b 1c 25 00 f0 01 00 be 08 00 00 00 48
-RSP: 0018:ffffc9000163f258 EFLAGS: 00010282
-RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000000000000
-RDX: ffff88801e509c00 RSI: ffffffff815bc1b5 RDI: fffff520002c7e3d
-RBP: ffff8880220e0c90 R08: 0000000000000000 R09: 0000000000000000
-R10: ffffffff815b528e R11: 0000000000000000 R12: 0000000000000000
-R13: dffffc0000000000 R14: ffffffff8a8a8200 R15: 0000000000000000
-FS:  0000000001676300(0000) GS:ffff8880b9d00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007ffc942cffac CR3: 0000000020f9b000 CR4: 00000000001506e0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- ieee802154_get_llsec_params+0x3f/0x70 net/mac802154/cfg.c:321
- rdev_get_llsec_params net/ieee802154/rdev-ops.h:241 [inline]
- nl802154_get_llsec_params+0xce/0x390 net/ieee802154/nl802154.c:745
- nl802154_send_iface+0x7cf/0xa70 net/ieee802154/nl802154.c:823
- nl802154_get_interface+0xeb/0x230 net/ieee802154/nl802154.c:889
- genl_family_rcv_msg_doit+0x228/0x320 net/netlink/genetlink.c:739
- genl_family_rcv_msg net/netlink/genetlink.c:783 [inline]
- genl_rcv_msg+0x328/0x580 net/netlink/genetlink.c:800
- netlink_rcv_skb+0x153/0x420 net/netlink/af_netlink.c:2502
- genl_rcv+0x24/0x40 net/netlink/genetlink.c:811
- netlink_unicast_kernel net/netlink/af_netlink.c:1312 [inline]
- netlink_unicast+0x533/0x7d0 net/netlink/af_netlink.c:1338
- netlink_sendmsg+0x856/0xd90 net/netlink/af_netlink.c:1927
- sock_sendmsg_nosec net/socket.c:654 [inline]
- sock_sendmsg+0xcf/0x120 net/socket.c:674
- ____sys_sendmsg+0x6e8/0x810 net/socket.c:2350
- ___sys_sendmsg+0xf3/0x170 net/socket.c:2404
- __sys_sendmsg+0xe5/0x1b0 net/socket.c:2433
- do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-RIP: 0033:0x440899
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 14 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 c0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffe18370df8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00000000000107cf RCX: 0000000000440899
-RDX: 0000000000000000 RSI: 0000000020000300 RDI: 0000000000000005
-RBP: 0000000000000000 R08: 00007ffe18370f98 R09: 00007ffe18370f98
-R10: 00007ffe18370f98 R11: 0000000000000246 R12: 00007ffe18370e0c
-R13: 431bde82d7b634db R14: 00000000004ae018 R15: 00000000004004a0
-
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
