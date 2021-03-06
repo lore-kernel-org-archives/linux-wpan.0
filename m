@@ -1,77 +1,114 @@
-Return-Path: <linux-wpan-owner@kernel.org>
+Return-Path: <SRS0=55Lu=IE=vger.kernel.org=linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C45FFC433E9
-	for <linux-wpan@archiver.kernel.org>; Fri,  5 Mar 2021 06:37:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29C29C433E0
+	for <linux-wpan@archiver.kernel.org>; Sat,  6 Mar 2021 13:13:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8CF5C64FE9
-	for <linux-wpan@archiver.kernel.org>; Fri,  5 Mar 2021 06:37:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 06C5364F4B
+	for <linux-wpan@archiver.kernel.org>; Sat,  6 Mar 2021 13:13:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229523AbhCEGhJ (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Fri, 5 Mar 2021 01:37:09 -0500
-Received: from mail-io1-f72.google.com ([209.85.166.72]:46578 "EHLO
-        mail-io1-f72.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229674AbhCEGhG (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Fri, 5 Mar 2021 01:37:06 -0500
-Received: by mail-io1-f72.google.com with SMTP id w8so1081333iox.13
-        for <linux-wpan@vger.kernel.org>; Thu, 04 Mar 2021 22:37:05 -0800 (PST)
+        id S230242AbhCFNMg (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Sat, 6 Mar 2021 08:12:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43712 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230213AbhCFNMY (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Sat, 6 Mar 2021 08:12:24 -0500
+Received: from mail-oo1-xc33.google.com (mail-oo1-xc33.google.com [IPv6:2607:f8b0:4864:20::c33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5CB7C06174A;
+        Sat,  6 Mar 2021 05:12:23 -0800 (PST)
+Received: by mail-oo1-xc33.google.com with SMTP id l11so1105730oov.13;
+        Sat, 06 Mar 2021 05:12:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=n0wzqVaXChjStroXwWRXVPgVCKcQRwhC1Jqv2F7KESE=;
+        b=jTbA/XBo32PJVo5h9pweUfGkPzzzASN2PlqlO2iMKECp9f6xXlgS4CsbDebpWqCg1Q
+         ce5aUNqcsqZYGiy+41bIVEt2nG5/uqpUYAQCy4mZT/6N7lCajHCZUUUOMo7qGVsgifar
+         jkRl/jlNkzxFP5VpEMaqV4oGE7GwdAuN1+opdE+pEaKu8Mq+LBsX95fhpk+Ppyd3eovD
+         wpPejfHj8qV9s6WED/DZKBlCaBjvgrPmIaBx7qbWCWvwckEiWHrdKUnzqCFIWCERlkwL
+         /17bie4/eD6//XM3rNZJkwsoi7N/JOwGk639Jc4f8bx2q2ajYXkZnVeoVbsnO0VYAGOM
+         Y8VA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=9eaCYfkOQuJEVGK3vD++ucoro9m1dub/WdBbvxw09lQ=;
-        b=Bspgxp4LCxCEK0UQKn4MysEqjLlqAmAQMTf8KMyLhVs3pwC8yxvnCiIsHl6+5vryML
-         gJq5Y+ftQeuIepSRPLtnNxXDJhOTaxiRcGngkFw8CnB7hgHSFlsyq5XKSkQ14Ov7TlVw
-         P7BvIQoblFAsf/7jN8VThaj5t6yM2hRCtYOCsREJjoHLkouV5NLKqhDRDkFSgBrW3PJB
-         wMrv1fru1UKP/mSh+fCz6ALdOrITtK79lMDC7DIA5EO56oZWyOCekD9c07zU8tdxNU7V
-         5WU64b3k+621al1oOAAQK2umQLH7ksBvW6XBS8zkczrN05K+/1WvzWdhOb2pgn+KdsSS
-         2mgw==
-X-Gm-Message-State: AOAM532wMI+orMA/CWQIDPgV1o+x3tpTX7XzCoifCHVK7MAU3QD1ozlt
-        E6/bUn+M28fagbEeIoA1WsmxvZxk2pnhXvhuXdIrQ+KfiSZz
-X-Google-Smtp-Source: ABdhPJxi5FMb8Gtqz+q8eOcjlJ7eTcYMgt8xt0JDLdD5lcTHbZxuE/yqpKlOFPKmyN37WeK74E03P96+WJLIcvMieDoGzNTvO9hX
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=n0wzqVaXChjStroXwWRXVPgVCKcQRwhC1Jqv2F7KESE=;
+        b=m2C8RnS68OJMPWoUY2538UdL5b4oDviQu44CjxicHaD8DuH4PL09o32nDDkNKKSGjo
+         adH8v/TuWq41VDHs+bSw64M2Ds2OJGp7n+4JLGwpQ/+nM29JHps/Y5QycbWQM765j393
+         QASWm+lRdPMKFPkRO4paebqxMGuh5RlLaFkS7eOTHicxGR9v2O1yXb2e/6wGmRB+PFRJ
+         mZQ5hk2HtvfaeY1yqR3KarEfa1RgLGXkNKYPu9bQSI5islafm/AOprk/ksoyQHcOqvD4
+         1/yYWAuQ9r3d3RrKXfMOF/uo0iS5c0YBT7CCzPmRSqql3xYwUpvSejiRTZG+xDEke+Nj
+         4sZA==
+X-Gm-Message-State: AOAM5335u8e0ppu7Ow8DvTZAuUWmopcWHwBdZLkSFyZnua5LdEG8rsq/
+        HqU7vCOgjJxFEub15IFykXYdF4rmPFE9z8rg8HE=
+X-Google-Smtp-Source: ABdhPJx2f+GvGkQmfvyAUv1PcXcuXHOti6AZ0WFUwteLTO7ruLs4FWUEI5Yv3dLXtHPMOz+i8C0FeIr1plvB83xuN9k=
+X-Received: by 2002:a4a:a1a1:: with SMTP id k33mr11715767ool.34.1615036342478;
+ Sat, 06 Mar 2021 05:12:22 -0800 (PST)
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:20e5:: with SMTP id q5mr7133793ilv.131.1614926224754;
- Thu, 04 Mar 2021 22:37:04 -0800 (PST)
-Date:   Thu, 04 Mar 2021 22:37:04 -0800
-In-Reply-To: <0000000000009b387305bc00fda6@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000f70f8f05bcc44f14@google.com>
-Subject: Re: WARNING in ieee802154_get_llsec_params
-From:   syzbot <syzbot+cde43a581a8e5f317bc2@syzkaller.appspotmail.com>
-To:     alex.aring@gmail.com, davem@davemloft.net, kuba@kernel.org,
-        linux-kernel@vger.kernel.org, linux-wpan@vger.kernel.org,
-        netdev@vger.kernel.org, stefan@datenfreihafen.org,
-        syzkaller-bugs@googlegroups.com
+References: <20210228151817.95700-1-aahringo@redhat.com> <20210228151817.95700-5-aahringo@redhat.com>
+ <f4599ca2-31c3-a08e-fad8-444f35cc6f6b@datenfreihafen.org>
+In-Reply-To: <f4599ca2-31c3-a08e-fad8-444f35cc6f6b@datenfreihafen.org>
+From:   Alexander Aring <alex.aring@gmail.com>
+Date:   Sat, 6 Mar 2021 08:12:11 -0500
+Message-ID: <CAB_54W5JrDSi89-5EEouutNMv6wwvS=8CzgOjcyecasfaw9pKQ@mail.gmail.com>
+Subject: Re: [PATCH wpan 04/17] net: ieee802154: forbid monitor for set llsec params
+To:     Stefan Schmidt <stefan@datenfreihafen.org>
+Cc:     Alexander Aring <aahringo@redhat.com>,
+        linux-wpan - ML <linux-wpan@vger.kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-syzbot has bisected this issue to:
+Hi,
 
-commit b60673c4c418bef7550d02faf53c34fbfeb366bf
-Author: Jakub Kicinski <kuba@kernel.org>
-Date:   Tue Mar 3 05:05:15 2020 +0000
+On Thu, 4 Mar 2021 at 02:28, Stefan Schmidt <stefan@datenfreihafen.org> wrote:
+>
+> Hello Alex.
+>
+> On 28.02.21 16:18, Alexander Aring wrote:
+> > This patch forbids to set llsec params for monitor interfaces which we
+> > don't support yet.
+> >
+> > Reported-by: syzbot+8b6719da8a04beeafcc3@syzkaller.appspotmail.com
+> > Signed-off-by: Alexander Aring <aahringo@redhat.com>
+> > ---
+> >   net/ieee802154/nl802154.c | 3 +++
+> >   1 file changed, 3 insertions(+)
+> >
+> > diff --git a/net/ieee802154/nl802154.c b/net/ieee802154/nl802154.c
+> > index 3ee09f6d13b7..67f0dc622bc2 100644
+> > --- a/net/ieee802154/nl802154.c
+> > +++ b/net/ieee802154/nl802154.c
+> > @@ -1384,6 +1384,9 @@ static int nl802154_set_llsec_params(struct sk_buff *skb,
+> >       u32 changed = 0;
+> >       int ret;
+> >
+> > +     if (wpan_dev->iftype == NL802154_IFTYPE_MONITOR)
+> > +             return -EOPNOTSUPP;
+> > +
+> >       if (info->attrs[NL802154_ATTR_SEC_ENABLED]) {
+> >               u8 enabled;
+> >
+> >
+>
+> I am fine with this patch and all the rest up to 17. They just do not
+> apply for me with 1 and 2 left out and only 3 applied.
+>
 
-    nl802154: add missing attribute validation for dev_type
+I am sorry, I will recheck.
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=100b11b0d00000
-start commit:   f5427c24 Add linux-next specific files for 20210304
-git tree:       linux-next
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=120b11b0d00000
-console output: https://syzkaller.appspot.com/x/log.txt?x=140b11b0d00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=a7876f68bf0bea99
-dashboard link: https://syzkaller.appspot.com/bug?extid=cde43a581a8e5f317bc2
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=124c7b46d00000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1276f5b0d00000
+> Could you resend 3-17 as a series and we can discuss 1 & 2 separately?
 
-Reported-by: syzbot+cde43a581a8e5f317bc2@syzkaller.appspotmail.com
-Fixes: b60673c4c418 ("nl802154: add missing attribute validation for dev_type")
+okay.
 
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+- Alex
