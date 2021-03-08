@@ -1,143 +1,120 @@
-Return-Path: <SRS0=55Lu=IE=vger.kernel.org=linux-wpan-owner@kernel.org>
+Return-Path: <SRS0=reTu=IG=vger.kernel.org=linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3894AC433DB
-	for <linux-wpan@archiver.kernel.org>; Sat,  6 Mar 2021 23:42:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 966C9C433E0
+	for <linux-wpan@archiver.kernel.org>; Mon,  8 Mar 2021 08:28:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E6ADF6509A
-	for <linux-wpan@archiver.kernel.org>; Sat,  6 Mar 2021 23:42:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4E174651BC
+	for <linux-wpan@archiver.kernel.org>; Mon,  8 Mar 2021 08:28:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229758AbhCFXff (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Sat, 6 Mar 2021 18:35:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36712 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229719AbhCFXfT (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Sat, 6 Mar 2021 18:35:19 -0500
-Received: from mail-oi1-x231.google.com (mail-oi1-x231.google.com [IPv6:2607:f8b0:4864:20::231])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C74FC06174A;
-        Sat,  6 Mar 2021 15:35:18 -0800 (PST)
-Received: by mail-oi1-x231.google.com with SMTP id d20so6939613oiw.10;
-        Sat, 06 Mar 2021 15:35:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=HTaNUUaToaDrVihiXPvalyzf1gp0a+sOljx+Ntsz1r4=;
-        b=WJXand+p0M+rWIQUG+OrX6zKJB/aZFsI19+Yjj3BxloEMdVFyhRS5XgSzfV1nYqsNE
-         uKEr+yU03d5MeLbSgPV2si9sV7VAPv95yITYkMC8cb+ax3ve0EvkzNWT2HVwZVHuCLvp
-         TP6PN2Py2RaGyeS68Y7UGEotaKWp2xdsgq+xJ4QXM3QBtmkMEnI0cFe30pJhQA96NIsS
-         9muQN7rPYSdoHah5G6hYQxm2fbEksDAMYsyIZ/4N6fZE7hy4eDyz2VyNUl8his/AAzfR
-         8HV+NfQ+ZiZTm4lX7cXuV4bACfIHBaLoHVh51VrQFg83lxDZ8DiuSG0cGzVQtBrBrJO+
-         B+CA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=HTaNUUaToaDrVihiXPvalyzf1gp0a+sOljx+Ntsz1r4=;
-        b=HiOcEtL4henWrOUg4soXHVHhX1XzQ1u6g1TmOJCE0b/FGCa8HiGRp4IgJDwFdpXLQy
-         DWcrGEXcrJqBHB70joALQ1rCb542wpApXUhbLP2/e5eh6XcLPMmgjcLNp1Y2xxOkNQ79
-         WEUkH5feEfSNUV8xXjg/YB+jk8rXfq5Jk6qxY5TgpnEAp/Y6ju3zUK4cN+z+/URGBYVF
-         Vc/DVpykMs4k19fX/QwZDgkL/OaVpc7eFLCYNyUy6eTeUVbyggG+V+W9abR6+OhuBKAy
-         J+M6+1WU6zsKMErGn7oyxCGpTvEjs7LOQ++UJYasbfQVnkBVdnQHp4gZSTc/jNQgrvHN
-         WXOQ==
-X-Gm-Message-State: AOAM5307DiP84Q4XyAEijYvHsP3QS9TLiIkdBxzBmzikLZ9VL/HwDJT9
-        pE/LEK+VJcj5Lv6gR9PHzd02K3ASIL49TUAAc2CNzg3jcpo=
-X-Google-Smtp-Source: ABdhPJwYE1jmc5l5+PfAiYiw9w/wupm4lJpcSe6eHlzJ4Ga91wfPJHQW2YyW+iFYYxHQiwofcnfN1MRzb7NOmHpe4iY=
-X-Received: by 2002:aca:3dd7:: with SMTP id k206mr12200383oia.10.1615073717576;
- Sat, 06 Mar 2021 15:35:17 -0800 (PST)
+        id S231732AbhCHI2J (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 8 Mar 2021 03:28:09 -0500
+Received: from proxima.lasnet.de ([78.47.171.185]:46400 "EHLO
+        proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230430AbhCHI17 (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 8 Mar 2021 03:27:59 -0500
+Received: from [IPv6:2003:e9:d737:8f29:e49:1922:adb:7fb2] (p200300e9d7378f290e4919220adb7fb2.dip0.t-ipconnect.de [IPv6:2003:e9:d737:8f29:e49:1922:adb:7fb2])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: stefan@datenfreihafen.org)
+        by proxima.lasnet.de (Postfix) with ESMTPSA id 326F8C0CBC;
+        Mon,  8 Mar 2021 09:27:57 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
+        s=2021; t=1615192077;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=eVcmNkVaT4+KdJAwSWE3Uwhiy5rTlGCGMLR+CL1ud88=;
+        b=YO6KWeUf5VB09DvUatnqsZO7VE3lONLQOvrdoKxwFBeyVzN1RDwCdqIX041MYlYKpayszh
+        92QckaUlVVVykBU09/LEsElM5yNFXSUGiReviCofCztpB/9rnVx1hEjQzLX/lwqVsNalD9
+        gLs72ImrktrJtVjOd6KdaRedVbyuQixtP+h5XhJtRNmUGFYOhZ8BLDYjII07/OFdpV4C9q
+        1AL5cDOsDucQ1EEkQ+iLNY4wrsCJZLTN1c4TqyEP57ua17NjTScuU8UTx6GjXmoNNp8DrT
+        kk/YI/eVM9US5WfxJa+LuPAIM0UCSwazXVaCvLqtlOpS/BvKMHdAIUV/vrmC/Q==
+Subject: Re: [PATCH v2] net: mac802154: Fix general protection fault
+To:     Pavel Skripkin <paskripkin@gmail.com>, alex.aring@gmail.com,
+        davem@davemloft.net
+Cc:     linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        syzbot+9ec037722d2603a9f52e@syzkaller.appspotmail.com
+References: <CAB_54W7v1Dk9KjytfO8hAGfiqPJ6qO0SdgwDQ-s4ybA2yvuoCg@mail.gmail.com>
+ <20210304152125.1052825-1-paskripkin@gmail.com>
+From:   Stefan Schmidt <stefan@datenfreihafen.org>
+Message-ID: <02c79193-808e-55b3-f2c9-9d7a0643aaee@datenfreihafen.org>
+Date:   Mon, 8 Mar 2021 09:27:53 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 MIME-Version: 1.0
-References: <20210228151817.95700-1-aahringo@redhat.com> <20210228151817.95700-2-aahringo@redhat.com>
- <b9baaf49-0e25-4c74-e8b7-f826157e1d48@datenfreihafen.org>
-In-Reply-To: <b9baaf49-0e25-4c74-e8b7-f826157e1d48@datenfreihafen.org>
-From:   Alexander Aring <alex.aring@gmail.com>
-Date:   Sat, 6 Mar 2021 18:35:06 -0500
-Message-ID: <CAB_54W6d0NC7W3U6EMOR7RxYGQhJS_hAFcgRcrpM5W7BC7SXXg@mail.gmail.com>
-Subject: Re: [PATCH wpan 01/17] net: ieee802154: make shift exponent unsigned
-To:     Stefan Schmidt <stefan@datenfreihafen.org>
-Cc:     Alexander Aring <aahringo@redhat.com>,
-        linux-wpan - ML <linux-wpan@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20210304152125.1052825-1-paskripkin@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi Stefan,
+Hello.
 
-On Thu, 4 Mar 2021 at 02:28, Stefan Schmidt <stefan@datenfreihafen.org> wrote:
->
-> Hello Alex.
->
-> On 28.02.21 16:18, Alexander Aring wrote:
-> > This patch changes the iftype type variable to unsigned that it can
-> > never be reach a negative value.
-> >
-> > Reported-by: syzbot+7bf7b22759195c9a21e9@syzkaller.appspotmail.com
-> > Signed-off-by: Alexander Aring <aahringo@redhat.com>
-> > ---
-> >   net/ieee802154/nl802154.c | 2 +-
-> >   1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> > diff --git a/net/ieee802154/nl802154.c b/net/ieee802154/nl802154.c
-> > index e9e4652cd592..3ee09f6d13b7 100644
-> > --- a/net/ieee802154/nl802154.c
-> > +++ b/net/ieee802154/nl802154.c
-> > @@ -898,8 +898,8 @@ static int nl802154_get_interface(struct sk_buff *skb, struct genl_info *info)
-> >   static int nl802154_new_interface(struct sk_buff *skb, struct genl_info *info)
-> >   {
-> >       struct cfg802154_registered_device *rdev = info->user_ptr[0];
-> > -     enum nl802154_iftype type = NL802154_IFTYPE_UNSPEC;
-> >       __le64 extended_addr = cpu_to_le64(0x0000000000000000ULL);
-> > +     u32 type = NL802154_IFTYPE_UNSPEC;
-> >
-> >       /* TODO avoid failing a new interface
-> >        * creation due to pending removal?
-> >
->
-> I am concerned about this one. Maybe you can shed some light on it.
-> NL802154_IFTYPE_UNSPEC is -1 which means the u32 will not hold this
-> value, but something at the end of the range for u32.
->
+On 04.03.21 16:21, Pavel Skripkin wrote:
+> syzbot found general protection fault in crypto_destroy_tfm()[1].
+> It was caused by wrong clean up loop in llsec_key_alloc().
+> If one of the tfm array members is in IS_ERR() range it will
+> cause general protection fault in clean up function [1].
+> 
+> Call Trace:
+>   crypto_free_aead include/crypto/aead.h:191 [inline] [1]
+>   llsec_key_alloc net/mac802154/llsec.c:156 [inline]
+>   mac802154_llsec_key_add+0x9e0/0xcc0 net/mac802154/llsec.c:249
+>   ieee802154_add_llsec_key+0x56/0x80 net/mac802154/cfg.c:338
+>   rdev_add_llsec_key net/ieee802154/rdev-ops.h:260 [inline]
+>   nl802154_add_llsec_key+0x3d3/0x560 net/ieee802154/nl802154.c:1584
+>   genl_family_rcv_msg_doit+0x228/0x320 net/netlink/genetlink.c:739
+>   genl_family_rcv_msg net/netlink/genetlink.c:783 [inline]
+>   genl_rcv_msg+0x328/0x580 net/netlink/genetlink.c:800
+>   netlink_rcv_skb+0x153/0x420 net/netlink/af_netlink.c:2502
+>   genl_rcv+0x24/0x40 net/netlink/genetlink.c:811
+>   netlink_unicast_kernel net/netlink/af_netlink.c:1312 [inline]
+>   netlink_unicast+0x533/0x7d0 net/netlink/af_netlink.c:1338
+>   netlink_sendmsg+0x856/0xd90 net/netlink/af_netlink.c:1927
+>   sock_sendmsg_nosec net/socket.c:654 [inline]
+>   sock_sendmsg+0xcf/0x120 net/socket.c:674
+>   ____sys_sendmsg+0x6e8/0x810 net/socket.c:2350
+>   ___sys_sendmsg+0xf3/0x170 net/socket.c:2404
+>   __sys_sendmsg+0xe5/0x1b0 net/socket.c:2433
+>   do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
+>   entry_SYSCALL_64_after_hwframe+0x44/0xae
+> 
+> Signed-off-by: Pavel Skripkin <paskripkin@gmail.com>
+> Reported-by: syzbot+9ec037722d2603a9f52e@syzkaller.appspotmail.com
+> Change-Id: I29f7ac641a039096d63d1e6070bb32cb5a3beb07
+> ---
+>   net/mac802154/llsec.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/net/mac802154/llsec.c b/net/mac802154/llsec.c
+> index 585d33144c33..55550ead2ced 100644
+> --- a/net/mac802154/llsec.c
+> +++ b/net/mac802154/llsec.c
+> @@ -152,7 +152,7 @@ llsec_key_alloc(const struct ieee802154_llsec_key *template)
+>   	crypto_free_sync_skcipher(key->tfm0);
+>   err_tfm:
+>   	for (i = 0; i < ARRAY_SIZE(key->tfm); i++)
+> -		if (key->tfm[i])
+> +		if (!IS_ERR_OR_NULL(key->tfm[i]))
+>   			crypto_free_aead(key->tfm[i]);
+>   
+>   	kfree_sensitive(key);
+> 
 
-yes, ugh... it's NL802154_IFTYPE_UNSPEC = -1 only for
-NL802154_IFTYPE... all others UNSPEC are 0. There is a comment there
-/* for backwards compatibility TODO */. I think I did that because the
-old netlink interfaces and instead of mapping new values to old values
-(internally) which is bad.
-Would it be 0 I think the compiler would handle it as unsigned.
+Alex, are you happy with this patch now? I would like to get it applied. 
+Waiting for your review or ack given you had comments on the first version.
 
-> There is a path (info->attrs[NL802154_ATTR_IFTYPE] is not true) where we
-> put type forward to  rdev_add_virtual_intf() with its changed value but
-> it would expect and enum which could hold -1 for UNSPEC.
->
-
-It will be converted back here to -1 again? Or maybe depends on the
-compiler, because it may use a different int type which the enum
-values fits? I am not sure here...
-
-In nl802154 we use u32 (netlink) for enums because the range fits,
-however this isn't true for NL802154_IFTYPE_, we cannot change it
-back. I think we should try to switch NL802154_IFTYPE_UNSPEC to
-"(~(__u32)0)" and let start NL802154_IFTYPE_NODE = 0. Which is still
-backwards compatible. Just give the compiler a note to handle it as
-unsigned value and more importantly an enum where the range fits in.
-It depends on the compiler, may it decide to use a signed char for
-this enum, then we get problems when converting it ? After quick
-research it seems we can not rely on whatever the compiler handles the
-enum as signed or unsigned and that makes problems with the shift
-operator "BIT(type)" and it's what this patch is trying to fix. I
-would make two patches, one is making the nl802154.h changes and the
-other is this patch, should be fine to handle it as enum value when we
-did some max range checks.
-
-There is also a third patch to return -EINVAL earlier if type attr
-isn't given, I think it's nothing for stable.
-
-- Alex
+regards
+Stefan Schmidt
