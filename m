@@ -2,119 +2,98 @@ Return-Path: <SRS0=reTu=IG=vger.kernel.org=linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 966C9C433E0
-	for <linux-wpan@archiver.kernel.org>; Mon,  8 Mar 2021 08:28:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1602AC433E0
+	for <linux-wpan@archiver.kernel.org>; Mon,  8 Mar 2021 09:28:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4E174651BC
-	for <linux-wpan@archiver.kernel.org>; Mon,  8 Mar 2021 08:28:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D640764ED5
+	for <linux-wpan@archiver.kernel.org>; Mon,  8 Mar 2021 09:28:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231732AbhCHI2J (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 8 Mar 2021 03:28:09 -0500
-Received: from proxima.lasnet.de ([78.47.171.185]:46400 "EHLO
-        proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230430AbhCHI17 (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 8 Mar 2021 03:27:59 -0500
-Received: from [IPv6:2003:e9:d737:8f29:e49:1922:adb:7fb2] (p200300e9d7378f290e4919220adb7fb2.dip0.t-ipconnect.de [IPv6:2003:e9:d737:8f29:e49:1922:adb:7fb2])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: stefan@datenfreihafen.org)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id 326F8C0CBC;
-        Mon,  8 Mar 2021 09:27:57 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
-        s=2021; t=1615192077;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=eVcmNkVaT4+KdJAwSWE3Uwhiy5rTlGCGMLR+CL1ud88=;
-        b=YO6KWeUf5VB09DvUatnqsZO7VE3lONLQOvrdoKxwFBeyVzN1RDwCdqIX041MYlYKpayszh
-        92QckaUlVVVykBU09/LEsElM5yNFXSUGiReviCofCztpB/9rnVx1hEjQzLX/lwqVsNalD9
-        gLs72ImrktrJtVjOd6KdaRedVbyuQixtP+h5XhJtRNmUGFYOhZ8BLDYjII07/OFdpV4C9q
-        1AL5cDOsDucQ1EEkQ+iLNY4wrsCJZLTN1c4TqyEP57ua17NjTScuU8UTx6GjXmoNNp8DrT
-        kk/YI/eVM9US5WfxJa+LuPAIM0UCSwazXVaCvLqtlOpS/BvKMHdAIUV/vrmC/Q==
-Subject: Re: [PATCH v2] net: mac802154: Fix general protection fault
-To:     Pavel Skripkin <paskripkin@gmail.com>, alex.aring@gmail.com,
-        davem@davemloft.net
+        id S229917AbhCHJ1z (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 8 Mar 2021 04:27:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47774 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229754AbhCHJ1f (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 8 Mar 2021 04:27:35 -0500
+Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BD8AC06174A;
+        Mon,  8 Mar 2021 01:27:35 -0800 (PST)
+Received: by mail-pg1-x52d.google.com with SMTP id x29so6037810pgk.6;
+        Mon, 08 Mar 2021 01:27:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=FkcecBQ/uWNOh6SH1+lVeHED1t6Xg7QLIjl+W6LrKKI=;
+        b=IF9T0ZtK+A7Xu9/M6ex4Kvc/Hmy1QnWC5CQjIzyP6MVjbd6GamZLDrKjDhUYI4k5XP
+         9lZ0m5vRe/9CddhARoTqjBJhMbrZbo3hgfA+Bk6WKRzaVeG5TWug6r54lBJB0JR48HSi
+         Sqvz9KiyoN8hTCFthIv1lrt4r7up6e1OviRVzNeq/YstKp4Ahzp7Ka5ULxQ+okpvpNpE
+         zJq7Ir2bcnBahTrp8vAXUSbm/V6+TPTgp0XtZGYpFYjUWw4Exxafx1MeNkhRam1irniA
+         aFQp82xi0DCezbvKjn739mXCT6+InYVyot/PWw1huC9DZwB9DErigUkRlUvXKqF5f3EZ
+         E/Wg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=FkcecBQ/uWNOh6SH1+lVeHED1t6Xg7QLIjl+W6LrKKI=;
+        b=WSk808CZQajSNOZn4hitA3XpIj6wAsThXkuhYo8FXMQwcpw8FzlNM+KeCUpxv03zcH
+         Op2CO3Fy/n3xSD7NL3MAeiPUxq2dI/+nq7SGK6D3i+1iLWStNEQ7t5R8BTgFX7bO6LjM
+         tYryqN7L7PN3Ds8nY3D8Vc2nQIIJufsI8ABFp4CDarEXu96K4RwzTaQLDXdB5/1C9zkZ
+         G0I/8GBT+Xu+XGjIC1XJonjaHkeliHjYG3kDA7YPDu+stcHeqLBIgZHCyBYFd8gj6BlS
+         167cVLeUbos1a1zbNVuzTm5U9RwRmUCpMMDPdsgZ+UcBP0r4G1czvP5Q+6MzoEs5wPCl
+         wopA==
+X-Gm-Message-State: AOAM532aFLXjKGC4007X8DayMzBXrEoYpnWCMT5DbO/p7eHKHxDXyKQx
+        gM7EKqa7rBYHSAMMgsh8rLQ=
+X-Google-Smtp-Source: ABdhPJyg0J+RG8DJ7HUAvCH/220Jxex5/mLy5l2vWTnWB+rHIE/EbU2o1v5mSwfpTLwvTQPKfA1kig==
+X-Received: by 2002:a65:41c6:: with SMTP id b6mr19364742pgq.7.1615195655142;
+        Mon, 08 Mar 2021 01:27:35 -0800 (PST)
+Received: from localhost.localdomain ([45.135.186.99])
+        by smtp.gmail.com with ESMTPSA id a15sm10408491pju.34.2021.03.08.01.27.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 08 Mar 2021 01:27:34 -0800 (PST)
+From:   Jia-Ju Bai <baijiaju1990@gmail.com>
+To:     alex.aring@gmail.com, stefan@datenfreihafen.org,
+        davem@davemloft.net, kuba@kernel.org
 Cc:     linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        syzbot+9ec037722d2603a9f52e@syzkaller.appspotmail.com
-References: <CAB_54W7v1Dk9KjytfO8hAGfiqPJ6qO0SdgwDQ-s4ybA2yvuoCg@mail.gmail.com>
- <20210304152125.1052825-1-paskripkin@gmail.com>
-From:   Stefan Schmidt <stefan@datenfreihafen.org>
-Message-ID: <02c79193-808e-55b3-f2c9-9d7a0643aaee@datenfreihafen.org>
-Date:   Mon, 8 Mar 2021 09:27:53 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
-MIME-Version: 1.0
-In-Reply-To: <20210304152125.1052825-1-paskripkin@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        linux-kernel@vger.kernel.org, Jia-Ju Bai <baijiaju1990@gmail.com>
+Subject: [PATCH] net: ieee802154: fix error return code of raw_sendmsg()
+Date:   Mon,  8 Mar 2021 01:27:20 -0800
+Message-Id: <20210308092720.9552-1-baijiaju1990@gmail.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello.
+When sock_alloc_send_skb() returns NULL to skb, no error return code of
+raw_sendmsg() is assigned.
+To fix this bug, err is assigned with -ENOMEM in this case.
 
-On 04.03.21 16:21, Pavel Skripkin wrote:
-> syzbot found general protection fault in crypto_destroy_tfm()[1].
-> It was caused by wrong clean up loop in llsec_key_alloc().
-> If one of the tfm array members is in IS_ERR() range it will
-> cause general protection fault in clean up function [1].
-> 
-> Call Trace:
->   crypto_free_aead include/crypto/aead.h:191 [inline] [1]
->   llsec_key_alloc net/mac802154/llsec.c:156 [inline]
->   mac802154_llsec_key_add+0x9e0/0xcc0 net/mac802154/llsec.c:249
->   ieee802154_add_llsec_key+0x56/0x80 net/mac802154/cfg.c:338
->   rdev_add_llsec_key net/ieee802154/rdev-ops.h:260 [inline]
->   nl802154_add_llsec_key+0x3d3/0x560 net/ieee802154/nl802154.c:1584
->   genl_family_rcv_msg_doit+0x228/0x320 net/netlink/genetlink.c:739
->   genl_family_rcv_msg net/netlink/genetlink.c:783 [inline]
->   genl_rcv_msg+0x328/0x580 net/netlink/genetlink.c:800
->   netlink_rcv_skb+0x153/0x420 net/netlink/af_netlink.c:2502
->   genl_rcv+0x24/0x40 net/netlink/genetlink.c:811
->   netlink_unicast_kernel net/netlink/af_netlink.c:1312 [inline]
->   netlink_unicast+0x533/0x7d0 net/netlink/af_netlink.c:1338
->   netlink_sendmsg+0x856/0xd90 net/netlink/af_netlink.c:1927
->   sock_sendmsg_nosec net/socket.c:654 [inline]
->   sock_sendmsg+0xcf/0x120 net/socket.c:674
->   ____sys_sendmsg+0x6e8/0x810 net/socket.c:2350
->   ___sys_sendmsg+0xf3/0x170 net/socket.c:2404
->   __sys_sendmsg+0xe5/0x1b0 net/socket.c:2433
->   do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
->   entry_SYSCALL_64_after_hwframe+0x44/0xae
-> 
-> Signed-off-by: Pavel Skripkin <paskripkin@gmail.com>
-> Reported-by: syzbot+9ec037722d2603a9f52e@syzkaller.appspotmail.com
-> Change-Id: I29f7ac641a039096d63d1e6070bb32cb5a3beb07
-> ---
->   net/mac802154/llsec.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/net/mac802154/llsec.c b/net/mac802154/llsec.c
-> index 585d33144c33..55550ead2ced 100644
-> --- a/net/mac802154/llsec.c
-> +++ b/net/mac802154/llsec.c
-> @@ -152,7 +152,7 @@ llsec_key_alloc(const struct ieee802154_llsec_key *template)
->   	crypto_free_sync_skcipher(key->tfm0);
->   err_tfm:
->   	for (i = 0; i < ARRAY_SIZE(key->tfm); i++)
-> -		if (key->tfm[i])
-> +		if (!IS_ERR_OR_NULL(key->tfm[i]))
->   			crypto_free_aead(key->tfm[i]);
->   
->   	kfree_sensitive(key);
-> 
+Fixes: 78f821b64826 ("ieee802154: socket: put handling into one file")
+Reported-by: TOTE Robot <oslab@tsinghua.edu.cn>
+Signed-off-by: Jia-Ju Bai <baijiaju1990@gmail.com>
+---
+ net/ieee802154/socket.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-Alex, are you happy with this patch now? I would like to get it applied. 
-Waiting for your review or ack given you had comments on the first version.
+diff --git a/net/ieee802154/socket.c b/net/ieee802154/socket.c
+index a45a0401adc5..3d76b207385e 100644
+--- a/net/ieee802154/socket.c
++++ b/net/ieee802154/socket.c
+@@ -277,8 +277,10 @@ static int raw_sendmsg(struct sock *sk, struct msghdr *msg, size_t size)
+ 	tlen = dev->needed_tailroom;
+ 	skb = sock_alloc_send_skb(sk, hlen + tlen + size,
+ 				  msg->msg_flags & MSG_DONTWAIT, &err);
+-	if (!skb)
++	if (!skb) {
++		err = -ENOMEM;
+ 		goto out_dev;
++	}
+ 
+ 	skb_reserve(skb, hlen);
+ 
+-- 
+2.17.1
 
-regards
-Stefan Schmidt
