@@ -2,77 +2,98 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A551C433DB
-	for <linux-wpan@archiver.kernel.org>; Wed, 24 Mar 2021 06:20:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9908FC433DB
+	for <linux-wpan@archiver.kernel.org>; Wed, 24 Mar 2021 16:59:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C7F8A619E8
-	for <linux-wpan@archiver.kernel.org>; Wed, 24 Mar 2021 06:20:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6DC49619E0
+	for <linux-wpan@archiver.kernel.org>; Wed, 24 Mar 2021 16:59:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233160AbhCXGTv (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 24 Mar 2021 02:19:51 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:14572 "EHLO
-        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232972AbhCXGTf (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 24 Mar 2021 02:19:35 -0400
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.60])
-        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4F4yhC5LVdz19GC3;
-        Wed, 24 Mar 2021 14:17:31 +0800 (CST)
-Received: from huawei.com (10.175.113.133) by DGGEMS409-HUB.china.huawei.com
- (10.3.19.209) with Microsoft SMTP Server id 14.3.498.0; Wed, 24 Mar 2021
- 14:19:29 +0800
-From:   Wang Hai <wanghai38@huawei.com>
-To:     <alex.aring@gmail.com>, <jukka.rissanen@linux.intel.com>,
-        <davem@davemloft.net>, <kuba@kernel.org>
-CC:     <linux-bluetooth@vger.kernel.org>, <linux-wpan@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH net-next] 6lowpan: Fix some typos in nhc_udp.c
-Date:   Wed, 24 Mar 2021 14:22:24 +0800
-Message-ID: <20210324062224.13032-1-wanghai38@huawei.com>
-X-Mailer: git-send-email 2.17.1
+        id S236928AbhCXQ6u (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 24 Mar 2021 12:58:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54264 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236399AbhCXQ6d (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 24 Mar 2021 12:58:33 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAA19C061763;
+        Wed, 24 Mar 2021 09:58:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:Content-Type:
+        In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+        :Reply-To:Content-ID:Content-Description;
+        bh=jafv0gazuyTSC4IKqAojqIlpdwE8g/2OqzXZ6qaK9qM=; b=Iw3KkCGuCbVP7EeFoTNUp8tgY7
+        44scb4S8dhiLzP9qYq6wPSjp5gBcwJlndeZBulKYY1x9TTr5nF/SPQw02CoePrDI2wkXjuwB8r9NW
+        Y7itHo0FqQdWQobekQwSvXKWpqmG3zSmgKUMXOD9TlXsGw6+bkag3GJcv6dYBDr6o+85YAlw9dj9l
+        XI7JxQwILss9feYUyN+i6Q1jM5fOhSx80j0dOKCX5tXf7B86wuw3ZWhH8j7UJTwTpr3BNApONG001
+        dQDf3Kv6qkukZwMmQVmfitp0X1Em+6hlF4qP+7ixiYT6UHgkqJYenm4FKMeigghZeKTcKxbBPPyhM
+        m+kgdMcg==;
+Received: from [2601:1c0:6280:3f0::3ba4]
+        by casper.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
+        id 1lP6pN-00Bbg8-E0; Wed, 24 Mar 2021 16:58:02 +0000
+Subject: Re: [PATCH net-next] 6lowpan: Fix some typos in nhc_udp.c
+To:     Wang Hai <wanghai38@huawei.com>, alex.aring@gmail.com,
+        jukka.rissanen@linux.intel.com, davem@davemloft.net,
+        kuba@kernel.org
+Cc:     linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20210324062224.13032-1-wanghai38@huawei.com>
+From:   Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <8b3f510f-3999-5775-e3b9-4720df77ad7a@infradead.org>
+Date:   Wed, 24 Mar 2021 09:57:49 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.175.113.133]
-X-CFilter-Loop: Reflected
+In-Reply-To: <20210324062224.13032-1-wanghai38@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-s/Orignal/Original/
-s/infered/inferred/
+On 3/23/21 11:22 PM, Wang Hai wrote:
+> s/Orignal/Original/
+> s/infered/inferred/
+> 
+> Reported-by: Hulk Robot <hulkci@huawei.com>
+> Signed-off-by: Wang Hai <wanghai38@huawei.com>
 
-Reported-by: Hulk Robot <hulkci@huawei.com>
-Signed-off-by: Wang Hai <wanghai38@huawei.com>
----
- net/6lowpan/nhc_udp.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Acked-by: Randy Dunlap <rdunlap@infradead.org>
 
-diff --git a/net/6lowpan/nhc_udp.c b/net/6lowpan/nhc_udp.c
-index 8a3507524f7b..33f17bd8cda7 100644
---- a/net/6lowpan/nhc_udp.c
-+++ b/net/6lowpan/nhc_udp.c
-@@ -5,7 +5,7 @@
-  *	Authors:
-  *	Alexander Aring	<aar@pengutronix.de>
-  *
-- *	Orignal written by:
-+ *	Original written by:
-  *	Alexander Smirnov <alex.bluesman.smirnov@gmail.com>
-  *	Jon Smirl <jonsmirl@gmail.com>
-  */
-@@ -82,7 +82,7 @@ static int udp_uncompress(struct sk_buff *skb, size_t needed)
- 	if (fail)
- 		return -EINVAL;
- 
--	/* UDP length needs to be infered from the lower layers
-+	/* UDP length needs to be inferred from the lower layers
- 	 * here, we obtain the hint from the remaining size of the
- 	 * frame
- 	 */
+> ---
+>  net/6lowpan/nhc_udp.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/6lowpan/nhc_udp.c b/net/6lowpan/nhc_udp.c
+> index 8a3507524f7b..33f17bd8cda7 100644
+> --- a/net/6lowpan/nhc_udp.c
+> +++ b/net/6lowpan/nhc_udp.c
+> @@ -5,7 +5,7 @@
+>   *	Authors:
+>   *	Alexander Aring	<aar@pengutronix.de>
+>   *
+> - *	Orignal written by:
+> + *	Original written by:
+>   *	Alexander Smirnov <alex.bluesman.smirnov@gmail.com>
+>   *	Jon Smirl <jonsmirl@gmail.com>
+>   */
+> @@ -82,7 +82,7 @@ static int udp_uncompress(struct sk_buff *skb, size_t needed)
+>  	if (fail)
+>  		return -EINVAL;
+>  
+> -	/* UDP length needs to be infered from the lower layers
+> +	/* UDP length needs to be inferred from the lower layers
+>  	 * here, we obtain the hint from the remaining size of the
+>  	 * frame
+>  	 */
+> 
+
+
 -- 
-2.17.1
+~Randy
 
