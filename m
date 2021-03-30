@@ -2,89 +2,116 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DA58C433C1
-	for <linux-wpan@archiver.kernel.org>; Tue, 30 Mar 2021 07:38:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02A61C433C1
+	for <linux-wpan@archiver.kernel.org>; Tue, 30 Mar 2021 21:09:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F031C61959
-	for <linux-wpan@archiver.kernel.org>; Tue, 30 Mar 2021 07:38:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B4DAE619C1
+	for <linux-wpan@archiver.kernel.org>; Tue, 30 Mar 2021 21:09:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231240AbhC3HiC (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 30 Mar 2021 03:38:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40688 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231206AbhC3Hh3 (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 30 Mar 2021 03:37:29 -0400
-Received: from proxima.lasnet.de (proxima.lasnet.de [IPv6:2a01:4f8:121:31eb:3::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28CA9C061762
-        for <linux-wpan@vger.kernel.org>; Tue, 30 Mar 2021 00:37:28 -0700 (PDT)
-Received: from [IPv6:2003:e9:d726:e14c:1577:8d47:675:6abb] (p200300e9d726e14c15778d4706756abb.dip0.t-ipconnect.de [IPv6:2003:e9:d726:e14c:1577:8d47:675:6abb])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits))
-        (No client certificate requested)
-        (Authenticated sender: stefan@datenfreihafen.org)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id 9EBFAC0769;
-        Tue, 30 Mar 2021 09:37:25 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
-        s=2021; t=1617089845;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=yITNb4/vYCkiu/3mhGofwAOxAtAUEfHMKz+FpjwX+XU=;
-        b=f5Ea85UYfF915jQt1Ve8ZL1N+CzERKTcBfnOf+ms5Q8l1WC9EQ/yaTxJzZr3myeT5aqZDf
-        JuTNz+YX2gLEJIJGkkMH3NM624BMetFzg5RENf/vIzfKj/atX+mRWVzIKp2+Ze5Nd2JdaZ
-        TM4wTgfiBwOH4/R+hVpKG3yiq79bkP6iFEodOSk4yADVEcTGCid6SB9U9pvzbLe/c+KEuD
-        NQwb7LgU1wMuQ9zN9BsqJVxyJKT8dMB/CxZr/9GW2JSBObEo5bqfeg2ZCsvsPoCfXGVq4N
-        JLnNx5YON9deGkg0zz0dJ1SNBRtZhakfDts5uMdDGtfo+1Zc5m32KeoiG7AbrQ==
-Subject: Re: Plumbers / IoT MC Sep 27-29, Dublin
-To:     Christopher Friedt <chrisfriedt@gmail.com>,
-        linux-wpan@vger.kernel.org
-References: <CAF4BF-QJ4WRgSQZUS2+amNLX5H5CyvB+C81gQrrB16eh+hqKcw@mail.gmail.com>
-From:   Stefan Schmidt <stefan@datenfreihafen.org>
-Message-ID: <93781356-4bd7-8a9b-7e52-ecc622fc6ec2@datenfreihafen.org>
-Date:   Tue, 30 Mar 2021 09:37:25 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        id S231579AbhC3VIv (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 30 Mar 2021 17:08:51 -0400
+Received: from mail-io1-f71.google.com ([209.85.166.71]:45285 "EHLO
+        mail-io1-f71.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232292AbhC3VIY (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 30 Mar 2021 17:08:24 -0400
+Received: by mail-io1-f71.google.com with SMTP id n13so60158ioh.12
+        for <linux-wpan@vger.kernel.org>; Tue, 30 Mar 2021 14:08:24 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
+         :from:to;
+        bh=Lzi5bMKkls9Xd2UZQOCL76vuZtMRxKtuq8CWVbFaDwU=;
+        b=C4AWTOcviU0HyNgQdGkHf+BjUk2Emt/rlLUU0tjP1RPyqj+CmtHtEIK9g+5ClmEoex
+         XHyGtKojgNM94/shUpYhGoHZqjd0nbbnJyofqOa85D5F2Gv8qxuE6yhpouGBTZtT86oh
+         3M/mqjAVRixSSzAVOG0s72m4sEnM68lyEwBie/fdBSqpmt5AG6rnS+3viX1UOUj/KUMG
+         kYaxW7zerdrJAIkvNnRYHG5nOzr3fXgrQTHAW8VO420kMNx3FKRHH2ZTEtV7Bkhf3yk5
+         8MsMeEUzPf858iXNOUeyl+1ahoi2Pf7pNdP7mdxFZCTFAl+CnPAogRSyvLkiMGRB+nf0
+         0WOg==
+X-Gm-Message-State: AOAM533A4z3XSsa3swJkJr4CjtuO0uCwvLz2XyS/x9GNcZ0JZRVaCXtt
+        LtB1ef9egdFOWWS6VoSzxSNrX7vGKpTyJFdliJP2vIxL5h1O
+X-Google-Smtp-Source: ABdhPJxj/cahfDX/Wrs5v8qHwLjSug1dsd7i2JNx264ZuSNHlwc4fNN+7j7Zxgj7fElQQLIMmGfwtAxqJMmwo+izYrOgnlk2QYCT
 MIME-Version: 1.0
-In-Reply-To: <CAF4BF-QJ4WRgSQZUS2+amNLX5H5CyvB+C81gQrrB16eh+hqKcw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a02:6654:: with SMTP id l20mr196612jaf.55.1617138504084;
+ Tue, 30 Mar 2021 14:08:24 -0700 (PDT)
+Date:   Tue, 30 Mar 2021 14:08:24 -0700
+In-Reply-To: <00000000000073afff05bbe9a54d@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000016afc505bec766d3@google.com>
+Subject: Re: [syzbot] WARNING in ieee802154_del_seclevel
+From:   syzbot <syzbot+fbf4fc11a819824e027b@syzkaller.appspotmail.com>
+To:     alex.aring@gmail.com, davem@davemloft.net, info@sophiescuban.com,
+        kuba@kernel.org, linux-kernel@vger.kernel.org,
+        linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
+        stefan@datenfreihafen.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello.
+syzbot has found a reproducer for the following issue on:
 
-On 29.03.21 17:55, Christopher Friedt wrote:
-> Hi everyone,
-> 
-> LPC is happening Sept 27-29 this year and is tentatively scheduled to
-> occur in Dublin, Ireland. However, there is a small chance it might be
-> virtual again. Things were obviously very crazy for a lot of people in
-> 2020 and it's continuing into 2021 for many parts of the globe, so I
-> hope everyone is hanging in there.
-> 
-> Likely I will submit the IoT MC proposal today and I'm hopeful that it
-> will be accepted again. I don't have statistics handy, but I think our
-> attendance was actually up last year. Maybe being virtual actually
-> helped in that regard.
-> 
-> In any case, I also wanted to get everyone's gears turning to inspire
-> others to give a talk. I know that a number of us were working on
-> wpanusb for both Zephyr & RIOT and there was some momentum to get MLME
-> / MAC Layer changes in as well.
-> 
-> If there are any cool developments that are happening, please don't
-> hesitate to reach out :-)
+HEAD commit:    37f368d8 lan743x: remove redundant intializations of point..
+git tree:       net-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=11ede3bed00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=7eff0f22b8563a5f
+dashboard link: https://syzkaller.appspot.com/bug?extid=fbf4fc11a819824e027b
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16d31a11d00000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12ca3611d00000
 
-Looking forward to it. Let us know when the MC gets accepted. I have 
-some ideas for topics starting to take shape in my head.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+fbf4fc11a819824e027b@syzkaller.appspotmail.com
 
-regards
-Stefan Schmidt
+------------[ cut here ]------------
+DEBUG_LOCKS_WARN_ON(lock->magic != lock)
+WARNING: CPU: 1 PID: 8394 at kernel/locking/mutex.c:931 __mutex_lock_common kernel/locking/mutex.c:931 [inline]
+WARNING: CPU: 1 PID: 8394 at kernel/locking/mutex.c:931 __mutex_lock+0xc0b/0x1120 kernel/locking/mutex.c:1096
+Modules linked in:
+CPU: 1 PID: 8394 Comm: syz-executor533 Not tainted 5.12.0-rc4-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+RIP: 0010:__mutex_lock_common kernel/locking/mutex.c:931 [inline]
+RIP: 0010:__mutex_lock+0xc0b/0x1120 kernel/locking/mutex.c:1096
+Code: 08 84 d2 0f 85 a3 04 00 00 8b 05 18 cb be 04 85 c0 0f 85 12 f5 ff ff 48 c7 c6 20 8b 6b 89 48 c7 c7 e0 88 6b 89 e8 b2 3b bd ff <0f> 0b e9 f8 f4 ff ff 65 48 8b 1c 25 00 f0 01 00 be 08 00 00 00 48
+RSP: 0018:ffffc90002a2f3f8 EFLAGS: 00010286
+RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000000000000
+RDX: ffff888020b554c0 RSI: ffffffff815c51f5 RDI: fffff52000545e71
+RBP: ffff8880195a4c90 R08: 0000000000000000 R09: 0000000000000000
+R10: ffffffff815bdf8e R11: 0000000000000000 R12: 0000000000000000
+R13: dffffc0000000000 R14: ffffc90002a2f5a8 R15: ffff888014580014
+FS:  0000000001f49300(0000) GS:ffff8880b9d00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007ffc43046ba8 CR3: 0000000011a5a000 CR4: 00000000001506e0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ ieee802154_del_seclevel+0x3f/0x70 net/mac802154/cfg.c:382
+ rdev_del_seclevel net/ieee802154/rdev-ops.h:284 [inline]
+ nl802154_del_llsec_seclevel+0x1a7/0x250 net/ieee802154/nl802154.c:2093
+ genl_family_rcv_msg_doit+0x228/0x320 net/netlink/genetlink.c:739
+ genl_family_rcv_msg net/netlink/genetlink.c:783 [inline]
+ genl_rcv_msg+0x328/0x580 net/netlink/genetlink.c:800
+ netlink_rcv_skb+0x153/0x420 net/netlink/af_netlink.c:2502
+ genl_rcv+0x24/0x40 net/netlink/genetlink.c:811
+ netlink_unicast_kernel net/netlink/af_netlink.c:1312 [inline]
+ netlink_unicast+0x533/0x7d0 net/netlink/af_netlink.c:1338
+ netlink_sendmsg+0x856/0xd90 net/netlink/af_netlink.c:1927
+ sock_sendmsg_nosec net/socket.c:654 [inline]
+ sock_sendmsg+0xcf/0x120 net/socket.c:674
+ ____sys_sendmsg+0x6e8/0x810 net/socket.c:2350
+ ___sys_sendmsg+0xf3/0x170 net/socket.c:2404
+ __sys_sendmsg+0xe5/0x1b0 net/socket.c:2433
+ do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+RIP: 0033:0x440909
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 14 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 c0 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffc43047c38 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00000000004004a0 RCX: 0000000000440909
+RDX: 0000000000000000 RSI: 00000000200002c0 RDI: 0000000000000006
+RBP: 0000000000000000 R08: 0000000000000000 R09: 00007ffc43047dd8
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000403c10
+R13: 431bde82d7b634db R14: 00000000004ae018 R15: 00000000004004a0
+
