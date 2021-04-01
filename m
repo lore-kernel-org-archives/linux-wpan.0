@@ -2,79 +2,106 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB03BC433B4
-	for <linux-wpan@archiver.kernel.org>; Wed, 31 Mar 2021 21:03:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A11B6C433ED
+	for <linux-wpan@archiver.kernel.org>; Thu,  1 Apr 2021 04:47:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8453A61073
-	for <linux-wpan@archiver.kernel.org>; Wed, 31 Mar 2021 21:03:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7682A610A5
+	for <linux-wpan@archiver.kernel.org>; Thu,  1 Apr 2021 04:47:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230073AbhCaVDX (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 31 Mar 2021 17:03:23 -0400
-Received: from mail-io1-f70.google.com ([209.85.166.70]:49033 "EHLO
-        mail-io1-f70.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230142AbhCaVDJ (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 31 Mar 2021 17:03:09 -0400
-Received: by mail-io1-f70.google.com with SMTP id g12so2444920ion.15
-        for <linux-wpan@vger.kernel.org>; Wed, 31 Mar 2021 14:03:08 -0700 (PDT)
+        id S230073AbhDAErM (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Thu, 1 Apr 2021 00:47:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33186 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229459AbhDAEqk (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 1 Apr 2021 00:46:40 -0400
+Received: from mail-lj1-x22a.google.com (mail-lj1-x22a.google.com [IPv6:2a00:1450:4864:20::22a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 521A0C0613E6;
+        Wed, 31 Mar 2021 21:46:40 -0700 (PDT)
+Received: by mail-lj1-x22a.google.com with SMTP id z8so763953ljm.12;
+        Wed, 31 Mar 2021 21:46:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=zjqdiooQd5/01txoaSk7jE08J1uiZ+F+O8QxpLK+ei4=;
+        b=XnpEJG2HT1OMn2+AW9X47ZWsDL892/KS0v5ic9jdz4wRnh+vIMiqMLm9Es5Hw8x4Oc
+         0d2x5OQtKpp9iIWaGYSy/qT2/XopLkZ5f+PttxFU2c7SZxB2VJeRVbOg6iStAVY7s3fh
+         YaqNLYTgCAoUfpS6sEUj1KLUN25w8499BmKqcxyXW/b3O3NscwUxzM+CebuGykG09Gmy
+         9dBfybyE+jBVQhMHpesHzwOJDS0NttuNkAklHbujUltLDRqxBVjF1BAHkmdQ8nw0OqY9
+         oWp75R4dLQdMbsvPlLxPrd7+QzO3S4moqQMcAeFagW8p6hjIzEVCWT3NZYf/LpAa/yZF
+         c+sw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=kP/y11epKcSUPOyR3ggVPINM0BmYMwSnVyCElSIqNFk=;
-        b=HoRPHlGC4auNs1NywI0ioQyjLwXN71C4Elw9P4Y0suqNqgv31oyFq8B4j0bcT5UFZo
-         1ipIJqQh3zs5yOFNocWm4+v4/YuYCIMzogk+XZR+LECeI6m8OhHVXW31xoM0eCbLsZoB
-         nj1Y+qhCWJSN2B1StnfQRVfTTtS7EZS7zW3Tpr7Sbf8NKGzrf1H+PxplUv0lNT2s3lp0
-         gd32zQgt4inrcIDghajHC2FlR4IQvoNAKPXd3hw+ixgEOlVLMrdaQp1k2hQzIJFHUPZv
-         EDHyLJgDNjAvND5nq0zvrxdY14LT/oqbVoQXaXWGtkzW1hyvoo9Iq60rERrfEV0JLGoc
-         9Yzg==
-X-Gm-Message-State: AOAM531bdHWbsaQfjiP/3AbtU9aSxtc37uvhhcIiYyNES8Om56IwBGpg
-        MCuSRDPpWsyUJsG3f9fO33KkXG77l3cgm6FyKMphEg5yw5iX
-X-Google-Smtp-Source: ABdhPJwLRBNjRlYsZOUMcyuiCfXjpK8qdqf9jZ3VAQDOJm+DbI0iO8VxG0rEbQUcU2oSqtwg/wuXvw4w01xF8OT1kTor7aN6bJkU
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=zjqdiooQd5/01txoaSk7jE08J1uiZ+F+O8QxpLK+ei4=;
+        b=pMJm67BoLIiD08qvHYJd2M07L5t5qJiziLKcNP2TFv1SKDh7NHUde5az8QC1Io2iV1
+         4H1vXMqYXHOh/zOUBphMg+GTvSb677hx8L2mC/+IOJxoYsVe8gXLpNvV4Gl/rT6B4Gg+
+         FmfYT/x1KrPFMMLOO1pV/wYJMSxa+J7IUlnCFTeVimbqLO1ay5w0CsmOQZkv5d9Af7oZ
+         yX3ymeGDTp7Gbxzb75lHxe/WJmRPAnSHJxV7VhopZK/scEWLtCqDiWrVv0xdqYrx497S
+         euU3DlL7UCQas6sXQKJCY6IcxF0sDD49KusDKNyqYiDP4/1PW5nBcQFK+FcqmCfK4m8j
+         nAxw==
+X-Gm-Message-State: AOAM5315/84beJ9eUDn7JsV7ACzY34VHITw10UiH0QrtUK6AwSN4pCwv
+        SVWkmW93KfULbTJJE0lutaA=
+X-Google-Smtp-Source: ABdhPJyz3NEQm9Q8izBmRjhDMCSUIjXsftQO8zVzOyEVy91PGj04o6ewrh7dbAE90v/qJhdLaTcr5w==
+X-Received: by 2002:a2e:8159:: with SMTP id t25mr4263398ljg.437.1617252398843;
+        Wed, 31 Mar 2021 21:46:38 -0700 (PDT)
+Received: from localhost.localdomain ([94.103.229.149])
+        by smtp.gmail.com with ESMTPSA id f8sm482754ljn.1.2021.03.31.21.46.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 31 Mar 2021 21:46:38 -0700 (PDT)
+From:   Pavel Skripkin <paskripkin@gmail.com>
+To:     stefan@datenfreihafen.org, alex.aring@gmail.com,
+        davem@davemloft.net, kuba@kernel.org
+Cc:     linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Pavel Skripkin <paskripkin@gmail.com>,
+        syzbot+28a246747e0a465127f3@syzkaller.appspotmail.com
+Subject: [PATCH] drivers: net: fix memory leak in atusb_probe
+Date:   Thu,  1 Apr 2021 07:46:24 +0300
+Message-Id: <20210401044624.19017-1-paskripkin@gmail.com>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:388e:: with SMTP id b14mr4857937jav.62.1617224588612;
- Wed, 31 Mar 2021 14:03:08 -0700 (PDT)
-Date:   Wed, 31 Mar 2021 14:03:08 -0700
-In-Reply-To: <00000000000073afff05bbe9a54d@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000020564605bedb716e@google.com>
-Subject: Re: [syzbot] WARNING in ieee802154_del_seclevel
-From:   syzbot <syzbot+fbf4fc11a819824e027b@syzkaller.appspotmail.com>
-To:     a@unstable.cc, alex.aring@gmail.com,
-        b.a.t.m.a.n@lists.open-mesh.org, davem@davemloft.net,
-        info@sophiescuban.com, jkosina@suse.cz, kuba@kernel.org,
-        linux-kernel@vger.kernel.org, linux-wpan@vger.kernel.org,
-        mareklindner@neomailbox.ch, netdev@vger.kernel.org,
-        stefan@datenfreihafen.org, stern@rowland.harvard.edu,
-        sw@simonwunderlich.de, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-syzbot has bisected this issue to:
+syzbot reported memory leak in atusb_probe()[1].
+The problem was in atusb_alloc_urbs().
+Since urb is anchored, we need to release the reference
+to correctly free the urb
 
-commit 416dacb819f59180e4d86a5550052033ebb6d72c
-Author: Alan Stern <stern@rowland.harvard.edu>
-Date:   Wed Aug 21 17:27:12 2019 +0000
+backtrace:
+    [<ffffffff82ba0466>] kmalloc include/linux/slab.h:559 [inline]
+    [<ffffffff82ba0466>] usb_alloc_urb+0x66/0xe0 drivers/usb/core/urb.c:74
+    [<ffffffff82ad3888>] atusb_alloc_urbs drivers/net/ieee802154/atusb.c:362 [inline][2]
+    [<ffffffff82ad3888>] atusb_probe+0x158/0x820 drivers/net/ieee802154/atusb.c:1038 [1]
 
-    HID: hidraw: Fix invalid read in hidraw_ioctl
+Reported-by: syzbot+28a246747e0a465127f3@syzkaller.appspotmail.com
+Signed-off-by: Pavel Skripkin <paskripkin@gmail.com>
+---
+ drivers/net/ieee802154/atusb.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=127430fcd00000
-start commit:   6e5a03bc ethernet/netronome/nfp: Fix a use after free in n..
-git tree:       net
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=117430fcd00000
-console output: https://syzkaller.appspot.com/x/log.txt?x=167430fcd00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=daeff30c2474a60f
-dashboard link: https://syzkaller.appspot.com/bug?extid=fbf4fc11a819824e027b
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13bfe45ed00000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1188e31ad00000
+diff --git a/drivers/net/ieee802154/atusb.c b/drivers/net/ieee802154/atusb.c
+index 0dd0ba915ab9..23ee0b14cbfa 100644
+--- a/drivers/net/ieee802154/atusb.c
++++ b/drivers/net/ieee802154/atusb.c
+@@ -365,6 +365,7 @@ static int atusb_alloc_urbs(struct atusb *atusb, int n)
+ 			return -ENOMEM;
+ 		}
+ 		usb_anchor_urb(urb, &atusb->idle_urbs);
++		usb_free_urb(urb);
+ 		n--;
+ 	}
+ 	return 0;
+-- 
+2.30.2
 
-Reported-by: syzbot+fbf4fc11a819824e027b@syzkaller.appspotmail.com
-Fixes: 416dacb819f5 ("HID: hidraw: Fix invalid read in hidraw_ioctl")
-
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
