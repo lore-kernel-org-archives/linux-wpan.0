@@ -2,75 +2,77 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,DATE_IN_PAST_03_06,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BE11C433B4
-	for <linux-wpan@archiver.kernel.org>; Thu,  1 Apr 2021 19:04:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED8A3C433ED
+	for <linux-wpan@archiver.kernel.org>; Thu,  1 Apr 2021 22:50:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 061136100A
-	for <linux-wpan@archiver.kernel.org>; Thu,  1 Apr 2021 19:04:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B19C9610FA
+	for <linux-wpan@archiver.kernel.org>; Thu,  1 Apr 2021 22:50:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235019AbhDATD2 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Thu, 1 Apr 2021 15:03:28 -0400
-Received: from netrider.rowland.org ([192.131.102.5]:33157 "HELO
-        netrider.rowland.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with SMTP id S235720AbhDAS5U (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 1 Apr 2021 14:57:20 -0400
-Received: (qmail 1052805 invoked by uid 1000); 1 Apr 2021 09:30:37 -0400
-Date:   Thu, 1 Apr 2021 09:30:37 -0400
-From:   Alan Stern <stern@rowland.harvard.edu>
-To:     syzbot <syzbot+fbf4fc11a819824e027b@syzkaller.appspotmail.com>
-Cc:     a@unstable.cc, alex.aring@gmail.com,
-        b.a.t.m.a.n@lists.open-mesh.org, davem@davemloft.net,
-        info@sophiescuban.com, jkosina@suse.cz, kuba@kernel.org,
-        linux-kernel@vger.kernel.org, linux-wpan@vger.kernel.org,
-        mareklindner@neomailbox.ch, netdev@vger.kernel.org,
-        stefan@datenfreihafen.org, sw@simonwunderlich.de,
-        syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] WARNING in ieee802154_del_seclevel
-Message-ID: <20210401133037.GA1052133@rowland.harvard.edu>
-References: <00000000000073afff05bbe9a54d@google.com>
- <00000000000020564605bedb716e@google.com>
+        id S234477AbhDAWuJ (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Thu, 1 Apr 2021 18:50:09 -0400
+Received: from mail.kernel.org ([198.145.29.99]:55996 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S234273AbhDAWuI (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+        Thu, 1 Apr 2021 18:50:08 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPS id 98A61610F7;
+        Thu,  1 Apr 2021 22:50:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1617317408;
+        bh=XzQ9t7E1vfxGLlA0Ov+CF+/XYR82rASkAZpibljHW3Y=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=XTgFgm2NF7+p4Kr9gb10rgaevqFOotUB5bhrJsZpyQGSwareYD94y57naHMWbTssC
+         1L4YmLW2hrkvA9xs06m5t2max9Fo1Z9A8Mui7l201aS2OLV7gYVeGZ9FysY3M++/Es
+         xhRzSSOHicac8HovTbDhPWNNmHlmWSJEqFxftLSDH+9GHRICQDCScKT8qBTn/2qZuv
+         xFujRwMF1/RoEkHfE1PKVU1SD7SsgXuEVYx85QY8MZkn14/IQWbjuYYsEVQH/oZoPP
+         kYR5dmAVJS56jEzIQVByoiRdGbfdM1VFgmJfbSLFgBozG7T/abnkskZ1xkuiCevJfn
+         nyG5QL1PW0rTQ==
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <00000000000020564605bedb716e@google.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] drivers: net: fix memory leak in atusb_probe
+From:   patchwork-bot+netdevbpf@kernel.org
+Message-Id: <161731740856.4407.2943205104358647134.git-patchwork-notify@kernel.org>
+Date:   Thu, 01 Apr 2021 22:50:08 +0000
+References: <20210401044624.19017-1-paskripkin@gmail.com>
+In-Reply-To: <20210401044624.19017-1-paskripkin@gmail.com>
+To:     Pavel Skripkin <paskripkin@gmail.com>
+Cc:     stefan@datenfreihafen.org, alex.aring@gmail.com,
+        davem@davemloft.net, kuba@kernel.org, linux-wpan@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        syzbot+28a246747e0a465127f3@syzkaller.appspotmail.com
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-On Wed, Mar 31, 2021 at 02:03:08PM -0700, syzbot wrote:
-> syzbot has bisected this issue to:
-> 
-> commit 416dacb819f59180e4d86a5550052033ebb6d72c
-> Author: Alan Stern <stern@rowland.harvard.edu>
-> Date:   Wed Aug 21 17:27:12 2019 +0000
-> 
->     HID: hidraw: Fix invalid read in hidraw_ioctl
-> 
-> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=127430fcd00000
-> start commit:   6e5a03bc ethernet/netronome/nfp: Fix a use after free in n..
-> git tree:       net
-> final oops:     https://syzkaller.appspot.com/x/report.txt?x=117430fcd00000
-> console output: https://syzkaller.appspot.com/x/log.txt?x=167430fcd00000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=daeff30c2474a60f
-> dashboard link: https://syzkaller.appspot.com/bug?extid=fbf4fc11a819824e027b
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13bfe45ed00000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1188e31ad00000
-> 
-> Reported-by: syzbot+fbf4fc11a819824e027b@syzkaller.appspotmail.com
-> Fixes: 416dacb819f5 ("HID: hidraw: Fix invalid read in hidraw_ioctl")
-> 
-> For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+Hello:
 
-It seems likely that the bisection ran off the rails here.  This commit 
-could not have caused a problem, although it may have revealed a 
-pre-existing problem that previously was hidden.
+This patch was applied to netdev/net.git (refs/heads/master):
 
-By the way, what happened to the annotated stack dumps that syzkaller 
-used to provide in its bug reports?
+On Thu,  1 Apr 2021 07:46:24 +0300 you wrote:
+> syzbot reported memory leak in atusb_probe()[1].
+> The problem was in atusb_alloc_urbs().
+> Since urb is anchored, we need to release the reference
+> to correctly free the urb
+> 
+> backtrace:
+>     [<ffffffff82ba0466>] kmalloc include/linux/slab.h:559 [inline]
+>     [<ffffffff82ba0466>] usb_alloc_urb+0x66/0xe0 drivers/usb/core/urb.c:74
+>     [<ffffffff82ad3888>] atusb_alloc_urbs drivers/net/ieee802154/atusb.c:362 [inline][2]
+>     [<ffffffff82ad3888>] atusb_probe+0x158/0x820 drivers/net/ieee802154/atusb.c:1038 [1]
+> 
+> [...]
 
-Alan Stern
+Here is the summary with links:
+  - drivers: net: fix memory leak in atusb_probe
+    https://git.kernel.org/netdev/net/c/6b9fbe169551
+
+You are awesome, thank you!
+--
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
