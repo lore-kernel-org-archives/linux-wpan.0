@@ -2,77 +2,110 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED8A3C433ED
-	for <linux-wpan@archiver.kernel.org>; Thu,  1 Apr 2021 22:50:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 338E6C433ED
+	for <linux-wpan@archiver.kernel.org>; Sat,  3 Apr 2021 15:19:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B19C9610FA
-	for <linux-wpan@archiver.kernel.org>; Thu,  1 Apr 2021 22:50:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 01EDB61002
+	for <linux-wpan@archiver.kernel.org>; Sat,  3 Apr 2021 15:19:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234477AbhDAWuJ (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Thu, 1 Apr 2021 18:50:09 -0400
-Received: from mail.kernel.org ([198.145.29.99]:55996 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234273AbhDAWuI (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-        Thu, 1 Apr 2021 18:50:08 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPS id 98A61610F7;
-        Thu,  1 Apr 2021 22:50:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1617317408;
-        bh=XzQ9t7E1vfxGLlA0Ov+CF+/XYR82rASkAZpibljHW3Y=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=XTgFgm2NF7+p4Kr9gb10rgaevqFOotUB5bhrJsZpyQGSwareYD94y57naHMWbTssC
-         1L4YmLW2hrkvA9xs06m5t2max9Fo1Z9A8Mui7l201aS2OLV7gYVeGZ9FysY3M++/Es
-         xhRzSSOHicac8HovTbDhPWNNmHlmWSJEqFxftLSDH+9GHRICQDCScKT8qBTn/2qZuv
-         xFujRwMF1/RoEkHfE1PKVU1SD7SsgXuEVYx85QY8MZkn14/IQWbjuYYsEVQH/oZoPP
-         kYR5dmAVJS56jEzIQVByoiRdGbfdM1VFgmJfbSLFgBozG7T/abnkskZ1xkuiCevJfn
-         nyG5QL1PW0rTQ==
-Content-Type: text/plain; charset="utf-8"
+        id S236621AbhDCPTD (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Sat, 3 Apr 2021 11:19:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55198 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236364AbhDCPTC (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Sat, 3 Apr 2021 11:19:02 -0400
+Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 840CEC0613E6;
+        Sat,  3 Apr 2021 08:18:59 -0700 (PDT)
+Received: by mail-lf1-x133.google.com with SMTP id d13so11359589lfg.7;
+        Sat, 03 Apr 2021 08:18:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=LJMSco07kl6UgHcL4lI5BdZNbUDIYrJUOjySLJzHFcw=;
+        b=sEBxfjtVS3jSVCEFwhxfH7RjMIkNyDTkHmAKxhHX28Oq7cvSprBREUyQTVousYRTju
+         MZ3hIJPWFXF/gQ/JyXlCeS+R3CIsSpIfqJtDbTJAOOVyFya08iec3zsSIv4alskyAR6J
+         5LJE3OnMjPvDIsmEADZUX8LI+QImh4jWx6i5qbM0hvIxkG/Xy5vDcG3cZKwgFf4s6hJj
+         WXv5S2F8iTk1HND2alaWng6FUXjXLsWeDINEDrwK+VPHfL3KQj+VcUQmmzdj4YinjIji
+         y/GDKxQXV1JM/Dmcsu1LKsPQqr81FxyP+CwUaihk54uwojFex0zsGbg2QkpFEGBAUZCf
+         YDRQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=LJMSco07kl6UgHcL4lI5BdZNbUDIYrJUOjySLJzHFcw=;
+        b=nacoH6iLp5Rp1omzEgkQdELXf4ElN570jnTSSr5v7juueP3Y7Vk9cyTPIUpNXT9mmK
+         gYNv1jFLkVQw4LmDS1TXzrVQ4vsr0enndoz021N2WN4c1jgztNFp35QiVrw1d1CCf2nO
+         mlzxSsDmpoV+C23tf/m+9sRUOPK2aUQu7KWNFZbsX8ytiea9N1H7+L2URFhfxTvyFUxl
+         qG6gy6Ah/gHpfGe4DBAOA5fe1wToIsDJMy1qzS/CaQeLX7gvf4AG5AFyl0Gf/VXIplLg
+         n4dZLeNtgwj7RcavMm0dvXfYBPxenWSadGrthmFatEQLNWmGc+7Q/CBHtiL/7qoWr2Ac
+         /4Kg==
+X-Gm-Message-State: AOAM531Wve45Q6eS/MW1lG9XyT2CRZSy0vec9SarwDtBRqgRsNgSeZh2
+        x0kDr6ZUqpWJlwVd0fT3RzA=
+X-Google-Smtp-Source: ABdhPJzdjHoTcKsPHbzfuMr6Zmj8CuysNF1elSXfZ86spAL44RsAs5/tD0AWZ81rKIrqlOWOFILuzA==
+X-Received: by 2002:a05:6512:104e:: with SMTP id c14mr11626975lfb.570.1617463137430;
+        Sat, 03 Apr 2021 08:18:57 -0700 (PDT)
+Received: from localhost.localdomain ([94.103.229.149])
+        by smtp.gmail.com with ESMTPSA id a18sm1216549ljj.106.2021.04.03.08.18.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 03 Apr 2021 08:18:57 -0700 (PDT)
+From:   Pavel Skripkin <paskripkin@gmail.com>
+To:     alex.aring@gmail.com, stefan@datenfreihafen.org,
+        davem@davemloft.net
+Cc:     linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Pavel Skripkin <paskripkin@gmail.com>,
+        syzbot+ac5c11d2959a8b3c4806@syzkaller.appspotmail.com
+Subject: [PATCH] net: fix NULL ptr dereference in nl802154_del_llsec_key
+Date:   Sat,  3 Apr 2021 18:18:51 +0300
+Message-Id: <20210403151851.9437-1-paskripkin@gmail.com>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] drivers: net: fix memory leak in atusb_probe
-From:   patchwork-bot+netdevbpf@kernel.org
-Message-Id: <161731740856.4407.2943205104358647134.git-patchwork-notify@kernel.org>
-Date:   Thu, 01 Apr 2021 22:50:08 +0000
-References: <20210401044624.19017-1-paskripkin@gmail.com>
-In-Reply-To: <20210401044624.19017-1-paskripkin@gmail.com>
-To:     Pavel Skripkin <paskripkin@gmail.com>
-Cc:     stefan@datenfreihafen.org, alex.aring@gmail.com,
-        davem@davemloft.net, kuba@kernel.org, linux-wpan@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        syzbot+28a246747e0a465127f3@syzkaller.appspotmail.com
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello:
+syzbot reported NULL ptr dereference in nl802154_del_llsec_key()[1]
+The problem was in case of info->attrs[NL802154_ATTR_SEC_KEY] == NULL.
+nla_parse_nested_deprecated()[2] doesn't check this condition before calling
+nla_len()[3]
 
-This patch was applied to netdev/net.git (refs/heads/master):
+Call Trace:
+ nla_len include/net/netlink.h:1148 [inline]                       [3]
+ nla_parse_nested_deprecated include/net/netlink.h:1231 [inline]   [2]
+ nl802154_del_llsec_key+0x16d/0x320 net/ieee802154/nl802154.c:1595 [1]
+ genl_family_rcv_msg_doit+0x228/0x320 net/netlink/genetlink.c:739
+ genl_family_rcv_msg net/netlink/genetlink.c:783 [inline]
+ genl_rcv_msg+0x328/0x580 net/netlink/genetlink.c:800
 
-On Thu,  1 Apr 2021 07:46:24 +0300 you wrote:
-> syzbot reported memory leak in atusb_probe()[1].
-> The problem was in atusb_alloc_urbs().
-> Since urb is anchored, we need to release the reference
-> to correctly free the urb
-> 
-> backtrace:
->     [<ffffffff82ba0466>] kmalloc include/linux/slab.h:559 [inline]
->     [<ffffffff82ba0466>] usb_alloc_urb+0x66/0xe0 drivers/usb/core/urb.c:74
->     [<ffffffff82ad3888>] atusb_alloc_urbs drivers/net/ieee802154/atusb.c:362 [inline][2]
->     [<ffffffff82ad3888>] atusb_probe+0x158/0x820 drivers/net/ieee802154/atusb.c:1038 [1]
-> 
-> [...]
+Reported-by: syzbot+ac5c11d2959a8b3c4806@syzkaller.appspotmail.com
+Signed-off-by: Pavel Skripkin <paskripkin@gmail.com>
+---
+ net/ieee802154/nl802154.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Here is the summary with links:
-  - drivers: net: fix memory leak in atusb_probe
-    https://git.kernel.org/netdev/net/c/6b9fbe169551
-
-You are awesome, thank you!
---
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+diff --git a/net/ieee802154/nl802154.c b/net/ieee802154/nl802154.c
+index 7c5a1aa5adb4..2f0a138bd5eb 100644
+--- a/net/ieee802154/nl802154.c
++++ b/net/ieee802154/nl802154.c
+@@ -1592,7 +1592,8 @@ static int nl802154_del_llsec_key(struct sk_buff *skb, struct genl_info *info)
+ 	struct nlattr *attrs[NL802154_KEY_ATTR_MAX + 1];
+ 	struct ieee802154_llsec_key_id id;
+ 
+-	if (nla_parse_nested_deprecated(attrs, NL802154_KEY_ATTR_MAX, info->attrs[NL802154_ATTR_SEC_KEY], nl802154_key_policy, info->extack))
++	if (!info->attrs[NL802154_ATTR_SEC_KEY] ||
++	    nla_parse_nested_deprecated(attrs, NL802154_KEY_ATTR_MAX, info->attrs[NL802154_ATTR_SEC_KEY], nl802154_key_policy, info->extack))
+ 		return -EINVAL;
+ 
+ 	if (ieee802154_llsec_parse_key_id(attrs[NL802154_KEY_ATTR_ID], &id) < 0)
+-- 
+2.30.2
 
