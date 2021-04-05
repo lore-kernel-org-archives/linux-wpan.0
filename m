@@ -7,46 +7,46 @@ X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4B94C433B4
-	for <linux-wpan@archiver.kernel.org>; Mon,  5 Apr 2021 00:31:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0677C433ED
+	for <linux-wpan@archiver.kernel.org>; Mon,  5 Apr 2021 00:31:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 931F46136A
-	for <linux-wpan@archiver.kernel.org>; Mon,  5 Apr 2021 00:31:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 94F7F6136A
+	for <linux-wpan@archiver.kernel.org>; Mon,  5 Apr 2021 00:31:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231785AbhDEAb0 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Sun, 4 Apr 2021 20:31:26 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:37708 "EHLO
+        id S231788AbhDEAb1 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Sun, 4 Apr 2021 20:31:27 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:55653 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231744AbhDEAbO (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Sun, 4 Apr 2021 20:31:14 -0400
+        by vger.kernel.org with ESMTP id S231749AbhDEAbP (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Sun, 4 Apr 2021 20:31:15 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617582669;
+        s=mimecast20190719; t=1617582670;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=SMB8jZVQAr9/HLgYxfoV6B+Y6iLCp4LjTvctPXaLaCE=;
-        b=WlMVkoOYY5tl8dmr0DQXp0PehSOCxpkLXNyzJa0MIeKlXiDwdFV8szBmgnuKfQnDE55XKO
-        4ljs54oFN8eUUnkeFC35/CHLv+RoAfZZyS2GClea/5uoCE5NA4Ii1SwXRza8x9FQ0lkfxd
-        wKAxIe9u/7yKDgBjLUGC7a1hm+H22w8=
+        bh=tnSLsRPy7fHZnncoOcRalDHqIOYtKxrUOy+3tLNMXug=;
+        b=FRdxX16kTvfIbw2KAT/4t0Y+/kIxTVRtIhPHcY6KqfQZdxEZ65BCH7f/z31KOb5B62O2dA
+        3D60lqbGjc4mQTbpK0au7vNnnyNlLp2nbQC9WJVaEx1g4ZS3seaJmpApabPtSmQnodSMFP
+        W8g93x5p9TuBORJTwr47T6BtZd53mtE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-379-b1m8LBV1PRCiTSjAn7ao_w-1; Sun, 04 Apr 2021 20:31:07 -0400
-X-MC-Unique: b1m8LBV1PRCiTSjAn7ao_w-1
+ us-mta-439-LBSdQQ-ePcGaa0u-SbHi5w-1; Sun, 04 Apr 2021 20:31:08 -0400
+X-MC-Unique: LBSdQQ-ePcGaa0u-SbHi5w-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D34ED6B9C1;
-        Mon,  5 Apr 2021 00:31:05 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4C674881278;
+        Mon,  5 Apr 2021 00:31:07 +0000 (UTC)
 Received: from carbon.redhat.com (ovpn-113-102.rdu2.redhat.com [10.10.113.102])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5DE9A37DD;
-        Mon,  5 Apr 2021 00:31:04 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id CBD7E37DD;
+        Mon,  5 Apr 2021 00:31:06 +0000 (UTC)
 From:   Alexander Aring <aahringo@redhat.com>
 To:     stefan@datenfreihafen.org
 Cc:     linux-wpan@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH RESEND wpan 03/15] net: ieee802154: stop dump llsec keys for monitors
-Date:   Sun,  4 Apr 2021 20:30:42 -0400
-Message-Id: <20210405003054.256017-4-aahringo@redhat.com>
+Subject: [PATCH RESEND wpan 05/15] net: ieee802154: forbid monitor for del llsec key
+Date:   Sun,  4 Apr 2021 20:30:44 -0400
+Message-Id: <20210405003054.256017-6-aahringo@redhat.com>
 In-Reply-To: <20210405003054.256017-1-aahringo@redhat.com>
 References: <20210405003054.256017-1-aahringo@redhat.com>
 MIME-Version: 1.0
@@ -56,31 +56,29 @@ Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-This patch stops dumping llsec keys for monitors which we don't support
-yet. Otherwise we will access llsec mib which isn't initialized for
-monitors.
+This patch forbids to del llsec key for monitor interfaces which we
+don't support yet. Otherwise we will access llsec mib which isn't
+initialized for monitors.
 
 Signed-off-by: Alexander Aring <aahringo@redhat.com>
 ---
- net/ieee802154/nl802154.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ net/ieee802154/nl802154.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
 diff --git a/net/ieee802154/nl802154.c b/net/ieee802154/nl802154.c
-index ce8956f31ef9..7815f253c8a3 100644
+index 42a246b6f9cb..bfc0eca774e3 100644
 --- a/net/ieee802154/nl802154.c
 +++ b/net/ieee802154/nl802154.c
-@@ -1493,6 +1493,11 @@ nl802154_dump_llsec_key(struct sk_buff *skb, struct netlink_callback *cb)
- 	if (err)
- 		return err;
+@@ -1604,6 +1604,9 @@ static int nl802154_del_llsec_key(struct sk_buff *skb, struct genl_info *info)
+ 	struct nlattr *attrs[NL802154_KEY_ATTR_MAX + 1];
+ 	struct ieee802154_llsec_key_id id;
  
-+	if (wpan_dev->iftype == NL802154_IFTYPE_MONITOR) {
-+		err = skb->len;
-+		goto out_err;
-+	}
++	if (wpan_dev->iftype == NL802154_IFTYPE_MONITOR)
++		return -EOPNOTSUPP;
 +
- 	if (!wpan_dev->netdev) {
- 		err = -EINVAL;
- 		goto out_err;
+ 	if (!info->attrs[NL802154_ATTR_SEC_KEY] ||
+ 	    nla_parse_nested_deprecated(attrs, NL802154_KEY_ATTR_MAX, info->attrs[NL802154_ATTR_SEC_KEY], nl802154_key_policy, info->extack))
+ 		return -EINVAL;
 -- 
 2.26.3
 
