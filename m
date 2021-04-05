@@ -2,105 +2,94 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CABAC433ED
-	for <linux-wpan@archiver.kernel.org>; Sun,  4 Apr 2021 04:57:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30CB1C433ED
+	for <linux-wpan@archiver.kernel.org>; Mon,  5 Apr 2021 00:31:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EC2C561002
-	for <linux-wpan@archiver.kernel.org>; Sun,  4 Apr 2021 04:57:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E18C56136A
+	for <linux-wpan@archiver.kernel.org>; Mon,  5 Apr 2021 00:31:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229565AbhDDE5X (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Sun, 4 Apr 2021 00:57:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60030 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229562AbhDDE5X (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Sun, 4 Apr 2021 00:57:23 -0400
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B837C061756
-        for <linux-wpan@vger.kernel.org>; Sat,  3 Apr 2021 21:57:18 -0700 (PDT)
-Received: by mail-pj1-x102b.google.com with SMTP id s21so4503578pjq.1
-        for <linux-wpan@vger.kernel.org>; Sat, 03 Apr 2021 21:57:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=5wePQzm+fjHwIolbQ+55diGyg4mHT6kViQ0QEVhszlY=;
-        b=ei4/vejrSnAjUxIlTxPVkg0WrxHoQ5U9aScBlTx3qfmgyWwiWpUVeNTw2EeiCB5VmT
-         xBsHmOmr53OifwsFgFFMz9DjVT2TLs6Af1ghYIeqb2UvEgMuYpU2Y6M4gSzS5WGofIwe
-         w3ZplM+b3m7Q2hA1AsOkQKntQ7yYVWE2zgeSuErKB33gzKEhmIqeZ0Fx8DDaVQ0yLguL
-         /hsmgoYxRARZ84a4kdytNm1+EsWNXW2sFutISC2FgPyPTMZcIwr8hC89YxKIbu9LBXIm
-         4AtMFwj3uEmbN0HL8Xy67aw7A+kuvxwDqpfMRF48feac5pcPfvwBlDJ1+2Aqm76LM87u
-         /puw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=5wePQzm+fjHwIolbQ+55diGyg4mHT6kViQ0QEVhszlY=;
-        b=U9uIOqooW+qAjtrug5M2HIas24bYaQMx6q/nqNndIDp1DDRZQEWyE15VNtexGvzvWw
-         QZK9XjUVIcBXJGsodQWr2aEiIom03Ykv2JzRYDoE0mJT+yay30qNA9iDMVWbKy1bwpNn
-         7y5Bm3xjkUBYfVtY9PnH+Py9zXXOpHkCGTrD/qNyACT9Y/7Gpy6dGnGySlVDJUbDp+2C
-         qC9fKcc5ALLzronsQct2ztUy+hThZu78s3TYWIyCbOsfMK2oYpTEVxlSb7xhg4rWvYzk
-         hSx4hyyq8hxVMBn/HpVLEw/C1Pt99D/LhmpZ1x9eUX1My9aTC3RpHwJny++rvJ63GuvR
-         g7SQ==
-X-Gm-Message-State: AOAM53125Xz6aXmRl2+ooG4w06weev7G7w/gGEn5PDrISDaY0Gd/TiUH
-        FkHZjKHulnzBhDMjz54/GLE=
-X-Google-Smtp-Source: ABdhPJxlCsF6yOg9WXBnLo1XFuwOqFX7AwibiW/DwhGBlVoMAIcmS3sATbb8Gvc/oB6l1h/5bNXb/A==
-X-Received: by 2002:a17:90a:5d14:: with SMTP id s20mr21004578pji.6.1617512237558;
-        Sat, 03 Apr 2021 21:57:17 -0700 (PDT)
-Received: from nuc.c.rabbit-hole-integration-007.internal ([202.133.196.154])
-        by smtp.gmail.com with ESMTPSA id w23sm12230872pgi.63.2021.04.03.21.57.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 03 Apr 2021 21:57:17 -0700 (PDT)
-From:   Du Cheng <ducheng2@gmail.com>
-To:     Alexander Aring <alex.aring@gmail.com>,
-        Stefan Schmidt <stefan@datenfreihafen.org>
-Cc:     linux-wpan@vger.kernel.org, gregkh@linuxfoundation.org,
-        skhan@linuxfoundation.org, Du Cheng <ducheng2@gmail.com>,
-        syzbot+cde43a581a8e5f317bc2@syzkaller.appspotmail.com
-Subject: [PATCH] net:mac802154: add init of .sec and .sec_mtx for sdata in ieee802154_setup_sdata
-Date:   Sun,  4 Apr 2021 12:57:12 +0800
-Message-Id: <20210404045712.50954-1-ducheng2@gmail.com>
-X-Mailer: git-send-email 2.30.2
+        id S231731AbhDEAbM (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Sun, 4 Apr 2021 20:31:12 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:29119 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231726AbhDEAbM (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Sun, 4 Apr 2021 20:31:12 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1617582666;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Dfw4ZRxqgfVUaJTec3AjfO7oo1Gb5lLdSHR4klxNszM=;
+        b=dAt2P3mw++qHyRB2oEDS9vryeq2C4iTMGsXL3wx8acTmJZXnly9o4luLzuUeSNseiKUuXY
+        dYr9zmiJe+WLPR7TVwKUi6UUvgbIarTcDt5ksUFkIOg5VexrH1XwJg5wpTheawln8goJeo
+        hwPYveFbWMtq1Ij4STOAlf+6nvvgkw8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-513-9gQ-7ZK2Pzi8G5KnOpnE3A-1; Sun, 04 Apr 2021 20:31:04 -0400
+X-MC-Unique: 9gQ-7ZK2Pzi8G5KnOpnE3A-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BEAD981744F;
+        Mon,  5 Apr 2021 00:31:03 +0000 (UTC)
+Received: from carbon.redhat.com (ovpn-113-102.rdu2.redhat.com [10.10.113.102])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4ABB92B189;
+        Mon,  5 Apr 2021 00:31:03 +0000 (UTC)
+From:   Alexander Aring <aahringo@redhat.com>
+To:     stefan@datenfreihafen.org
+Cc:     linux-wpan@vger.kernel.org, netdev@vger.kernel.org
+Subject: [PATCH RESEND wpan 01/15] net: ieee802154: nl-mac: fix check on panid
+Date:   Sun,  4 Apr 2021 20:30:40 -0400
+Message-Id: <20210405003054.256017-2-aahringo@redhat.com>
+In-Reply-To: <20210405003054.256017-1-aahringo@redhat.com>
+References: <20210405003054.256017-1-aahringo@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-add mutex_init(&sdata->sec_mtx) and mac802154_llsec_init(&sdata->sec) for
-NL802154_IFTYPE_MONITOR inside ieee802154_setup_sdata. As the unintiated
-mutex and sec data structure were used in ieee802154_get_llsec_params
-which would cause a kernel crash. BUG reported by syzkaller.
+This patch fixes a null pointer derefence for panid handle by move the
+check for the netlink variable directly before accessing them.
 
-Reported-by: syzbot+cde43a581a8e5f317bc2@syzkaller.appspotmail.com
-Signed-off-by: Du Cheng <ducheng2@gmail.com>
+Reported-by: syzbot+d4c07de0144f6f63be3a@syzkaller.appspotmail.com
+Signed-off-by: Alexander Aring <aahringo@redhat.com>
 ---
-link to syzkaller bug:
-https://syzkaller.appspot.com/bug?id=a9cc0c65e7bb15be7143107d4215ebc8ef047528
-This patch has passed syzbot testing.
+ net/ieee802154/nl-mac.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
- net/mac802154/iface.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/net/mac802154/iface.c b/net/mac802154/iface.c
-index 1cf5ac09edcb..bec903e98db0 100644
---- a/net/mac802154/iface.c
-+++ b/net/mac802154/iface.c
-@@ -602,6 +602,9 @@ ieee802154_setup_sdata(struct ieee802154_sub_if_data *sdata,
- 		sdata->dev->needs_free_netdev = true;
- 		sdata->dev->netdev_ops = &mac802154_monitor_ops;
- 		wpan_dev->promiscuous_mode = true;
+diff --git a/net/ieee802154/nl-mac.c b/net/ieee802154/nl-mac.c
+index 9c640d670ffe..0c1b0770c59e 100644
+--- a/net/ieee802154/nl-mac.c
++++ b/net/ieee802154/nl-mac.c
+@@ -551,9 +551,7 @@ ieee802154_llsec_parse_key_id(struct genl_info *info,
+ 	desc->mode = nla_get_u8(info->attrs[IEEE802154_ATTR_LLSEC_KEY_MODE]);
+ 
+ 	if (desc->mode == IEEE802154_SCF_KEY_IMPLICIT) {
+-		if (!info->attrs[IEEE802154_ATTR_PAN_ID] &&
+-		    !(info->attrs[IEEE802154_ATTR_SHORT_ADDR] ||
+-		      info->attrs[IEEE802154_ATTR_HW_ADDR]))
++		if (!info->attrs[IEEE802154_ATTR_PAN_ID])
+ 			return -EINVAL;
+ 
+ 		desc->device_addr.pan_id = nla_get_shortaddr(info->attrs[IEEE802154_ATTR_PAN_ID]);
+@@ -562,6 +560,9 @@ ieee802154_llsec_parse_key_id(struct genl_info *info,
+ 			desc->device_addr.mode = IEEE802154_ADDR_SHORT;
+ 			desc->device_addr.short_addr = nla_get_shortaddr(info->attrs[IEEE802154_ATTR_SHORT_ADDR]);
+ 		} else {
++			if (!info->attrs[IEEE802154_ATTR_HW_ADDR])
++				return -EINVAL;
 +
-+		mutex_init(&sdata->sec_mtx);
-+		mac802154_llsec_init(&sdata->sec);
- 		break;
- 	default:
- 		BUG();
+ 			desc->device_addr.mode = IEEE802154_ADDR_LONG;
+ 			desc->device_addr.extended_addr = nla_get_hwaddr(info->attrs[IEEE802154_ATTR_HW_ADDR]);
+ 		}
 -- 
-2.30.2
+2.26.3
 
