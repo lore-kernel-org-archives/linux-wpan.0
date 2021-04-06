@@ -2,117 +2,100 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DC78C433B4
-	for <linux-wpan@archiver.kernel.org>; Tue,  6 Apr 2021 13:16:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6211C433ED
+	for <linux-wpan@archiver.kernel.org>; Tue,  6 Apr 2021 20:29:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E7E03613B7
-	for <linux-wpan@archiver.kernel.org>; Tue,  6 Apr 2021 13:16:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 76034613D2
+	for <linux-wpan@archiver.kernel.org>; Tue,  6 Apr 2021 20:29:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234030AbhDFNQm (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 6 Apr 2021 09:16:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55488 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229720AbhDFNQl (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 6 Apr 2021 09:16:41 -0400
-Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 435E9C06174A;
-        Tue,  6 Apr 2021 06:16:33 -0700 (PDT)
-Received: by mail-lf1-x136.google.com with SMTP id n8so3922988lfh.1;
-        Tue, 06 Apr 2021 06:16:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=message-id:subject:from:to:cc:date:in-reply-to:references
-         :user-agent:mime-version:content-transfer-encoding;
-        bh=oK0EvQq5supIkmdytebd79wfYwhuD8P3BwaCXG7Z7hI=;
-        b=JwlFh059EWXARC3pWryr8G4rNFVgyPGcRFcZR3fc1UgSmW+vYxbhtLzBO+4CJ6B11T
-         +nQxQB1ezl2f0aEoqMYI/rwPLzu5Iw9feXGZqkS5LCAUws+2QhLEZ8ORgEYpagBJqfsB
-         sUq3rnvJbBNT08uEY+s8kNnzOmibxNNxrRxeIbXStWNmc5HIEJl0f/nfoRRgPFCD9tuK
-         tYPDue4tqXb7ytfEbotfk6cbw98fMsYZtEItNYm+w5WNkHDKyHJu9dOsN8ZSSbN3tfo4
-         dVl8WfepjQsBc9LdtMpvvHqSfsP45sKKPoGOjBA1m0/rdBeyGGlm2pdKGF31XhEdG4Bf
-         o0Ow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
-         :references:user-agent:mime-version:content-transfer-encoding;
-        bh=oK0EvQq5supIkmdytebd79wfYwhuD8P3BwaCXG7Z7hI=;
-        b=jAJIluhf9XnmHn/r2DpWyVp9cZhWtV9WVphqmGL5BfBzV/7pRtBrHlnv7aGs/RDtjU
-         eOb+uqlvF0/+YMu45ffTWxxGEIIc1jW5sRy1uI7BS+VO9Wr81Fr1pg7lhd2+0wIakqOS
-         u5qpJJUAPFv3j01MBuUT3zIekrqbAr+QoTaPWOZsxJ7lJ75Fg0de5Tz2nxxjedGmsiO8
-         913G1kuY3pZxNSvqtmZAAWl3+DLQwN+D+dUqNv6CADiK18wibAON5gmI7QymzQXiQ7XJ
-         zqCEg/w8fBVFruyz5hCO3kPw3oE82UJCDIPqilQQlznSEaqD1FJNGpVL6yRzIPMtfu+G
-         xfxw==
-X-Gm-Message-State: AOAM533lP8HRiWEyByAalQL3fzKRbt0mgKLKMVTD3Q20eO+iqcDAzMGG
-        nbV6+q7L50S40Lop6QhtRgyacp3nDsaEfL+E
-X-Google-Smtp-Source: ABdhPJzDhp+uGFjyYrbpEJDXoTUzaRZ6JV3//HVJvbSnqFgMDmHs32s/CEiY0zu/w/kQgWc+yhkd6A==
-X-Received: by 2002:a19:242:: with SMTP id 63mr3139544lfc.0.1617714991761;
-        Tue, 06 Apr 2021 06:16:31 -0700 (PDT)
-Received: from [192.168.1.11] ([94.103.229.149])
-        by smtp.gmail.com with ESMTPSA id x27sm2158024lfn.95.2021.04.06.06.16.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Apr 2021 06:16:31 -0700 (PDT)
-Message-ID: <f8af54cece4150b2a0ac7db4e73bfcda36da5555.camel@gmail.com>
-Subject: Re: [PATCH] net: fix shift-out-of-bounds in nl802154_new_interface
-From:   Pavel Skripkin <paskripkin@gmail.com>
-To:     Alexander Aring <alex.aring@gmail.com>
-Cc:     Stefan Schmidt <stefan@datenfreihafen.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-wpan - ML <linux-wpan@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-        kernel list <linux-kernel@vger.kernel.org>,
-        syzbot <syzbot+7bf7b22759195c9a21e9@syzkaller.appspotmail.com>
-Date:   Tue, 06 Apr 2021 16:16:29 +0300
-In-Reply-To: <CAB_54W7R-27cwOTUw1Db1+kbWTMTtRn0X2EW1_9nKuiAWpLFfA@mail.gmail.com>
-References: <20210405195744.19386-1-paskripkin@gmail.com>
-         <CAB_54W7R-27cwOTUw1Db1+kbWTMTtRn0X2EW1_9nKuiAWpLFfA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.38.4 
+        id S232290AbhDFU3r (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 6 Apr 2021 16:29:47 -0400
+Received: from proxima.lasnet.de ([78.47.171.185]:54778 "EHLO
+        proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231650AbhDFU3r (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 6 Apr 2021 16:29:47 -0400
+Received: from [IPv6:2003:e9:d71d:a9d1:9fa1:9dd5:9888:d937] (p200300e9d71da9d19fa19dd59888d937.dip0.t-ipconnect.de [IPv6:2003:e9:d71d:a9d1:9fa1:9dd5:9888:d937])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: stefan@datenfreihafen.org)
+        by proxima.lasnet.de (Postfix) with ESMTPSA id 837E2C00BF;
+        Tue,  6 Apr 2021 22:29:37 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
+        s=2021; t=1617740977;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=v+Aa34mrYRYXTRnPmxDapeYdZ+YqBsHbucIpuyF0UhE=;
+        b=Ckpb/CRzhe0/dfo2zJTRIuzHFXeC64bYXWdZ+8H9N1V2h+PO7K5CS5Gq7yizDa8aVH2BM0
+        nCzm+PZ61tIRihK9vXW/9THdpwIcYVyH361COhQNbzw83eTsECe648EorYGEWAJZDFvdYQ
+        uecoSALRtorgvyUtdIozbLsNqWHM/Wjz62C9qYyrCbXXsXji4joD83CAxs+c32VMtaGElZ
+        WoriYo9Disvtv1x951/W9diAtSq710/tqbkPGGfH+kw2tkdJ1Va9F/K0czRmXETUbxzIhM
+        oyj7AhQDkoaQa93edIG3Hnbe5PEBnP5qtvLkN02ViS1ujeqPsddrKzDVHXcV2w==
+Subject: Re: [PATCH RESEND wpan 00/15] net: ieee802154: forbid sec params for
+ monitors
+To:     Alexander Aring <aahringo@redhat.com>
+Cc:     linux-wpan@vger.kernel.org, netdev@vger.kernel.org
+References: <20210405003054.256017-1-aahringo@redhat.com>
+From:   Stefan Schmidt <stefan@datenfreihafen.org>
+Message-ID: <ff309881-1312-1c81-973f-f7ec125c0f29@datenfreihafen.org>
+Date:   Tue, 6 Apr 2021 22:29:37 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20210405003054.256017-1-aahringo@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-On Tue, 2021-04-06 at 08:21 -0400, Alexander Aring wrote:
+Hello.
+
+On 05.04.21 02:30, Alexander Aring wrote:
 > Hi,
 > 
-> On Mon, 5 Apr 2021 at 15:58, Pavel Skripkin <paskripkin@gmail.com>
-> wrote:
-> > 
-> > syzbot reported shift-out-of-bounds in nl802154_new_interface.
-> > The problem was in signed representation of enum nl802154_iftype
-> > 
-> > enum nl802154_iftype {
-> >         /* for backwards compatibility TODO */
-> >         NL802154_IFTYPE_UNSPEC = -1,
-> > ...
-> > 
-> > Since, enum has negative value in it, objects of this type
-> > will be represented as signed integer.
-> > 
-> >         type = nla_get_u32(info->attrs[NL802154_ATTR_IFTYPE]);
-> > 
-> > u32 will be casted to signed, which can cause negative value type.
-> > 
-> > Reported-by: syzbot+7bf7b22759195c9a21e9@syzkaller.appspotmail.com
-> > Signed-off-by: Pavel Skripkin <paskripkin@gmail.com>
-> 
-> Yes, this patch will fix the issue but we discussed that the problem
-> is deeper than such a fix. The real problem is that we are using a -1
-> value which doesn't fit into the u32 netlink value and it gets
-> converted back and forward which we should avoid.
-> 
-
-OK, thanks for feedback!
-
+> this patch series contains fixes to forbid various security parameters
+> settings for monitor types. Monitor types doesn't use the llsec security
+> currently and we don't support it. With this patch series the user will
+> be notified with a EOPNOTSUPP error that for monitor interfaces security
+> is not supported yet. However there might be a possibility in future
+> that the kernel will decrypt frames with llsec information for sniffing
+> frames and deliver plaintext to userspace, but this isn't supported yet.
 > 
 > - Alex
+> 
+> Alexander Aring (15):
+>    net: ieee802154: nl-mac: fix check on panid
+>    net: ieee802154: forbid monitor for set llsec params
+>    net: ieee802154: stop dump llsec keys for monitors
+>    net: ieee802154: forbid monitor for add llsec key
+>    net: ieee802154: forbid monitor for del llsec key
+>    net: ieee802154: stop dump llsec devs for monitors
+>    net: ieee802154: forbid monitor for add llsec dev
+>    net: ieee802154: forbid monitor for del llsec dev
+>    net: ieee802154: stop dump llsec devkeys for monitors
+>    net: ieee802154: forbid monitor for add llsec devkey
+>    net: ieee802154: forbid monitor for del llsec devkey
+>    net: ieee802154: stop dump llsec seclevels for monitors
+>    net: ieee802154: forbid monitor for add llsec seclevel
+>    net: ieee802154: forbid monitor for del llsec seclevel
+>    net: ieee802154: stop dump llsec params for monitors
+> 
+>   net/ieee802154/nl-mac.c   |  7 +++---
+>   net/ieee802154/nl802154.c | 52 +++++++++++++++++++++++++++++++++++++++
+>   2 files changed, 56 insertions(+), 3 deletions(-)
+> 
 
-With regards,
-Pavel Skripkin
+This series has been applied to the wpan tree and will be
+part of the next pull request to net. Thanks!
 
-
+regards
+Stefan Schmidt
