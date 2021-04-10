@@ -2,248 +2,188 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48D0FC433ED
-	for <linux-wpan@archiver.kernel.org>; Fri,  9 Apr 2021 16:59:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 239B0C433ED
+	for <linux-wpan@archiver.kernel.org>; Sat, 10 Apr 2021 10:19:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1FAC060FF0
-	for <linux-wpan@archiver.kernel.org>; Fri,  9 Apr 2021 16:59:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DFDD46115B
+	for <linux-wpan@archiver.kernel.org>; Sat, 10 Apr 2021 10:19:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233864AbhDIQ7z (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Fri, 9 Apr 2021 12:59:55 -0400
-Received: from mail-dm6nam12on2050.outbound.protection.outlook.com ([40.107.243.50]:47497
-        "EHLO NAM12-DM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S232642AbhDIQ7y (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-        Fri, 9 Apr 2021 12:59:54 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ODbz3QbWKW/LLrTXv1aaWjXCh+sj7Q7FPX6yDPJBSmIjBcLTbGe0RMrPT0B4abGqzfhTaJ9BzcM2FITN1KG/xyheOo/bl8RLyKGoXAbEgjIEcBZFKcIYcUzmxvtFYAHrztijZ47cqrbkjY/2JGRSH4NToQ+rWrXCt7ofbWqV1zWdJsEA5xi/96VZqmSC8oDuLWcb2hFsVpfPWjuo00J1XyHC95jILy5roYdany/Xbr2ebuA/4cUj6z3EJKF0+Io+y8+m3yiGsSlWiFNfOctM+Qh7sc0Tjr10H13JIg5utGhdhVqK9L1LbZhblNl/1Fcp1lSUsHnr0Rpfon7U7c/Piw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/c+JURbmF5M+D6K/yZWyPhBZf3fr5mKTsKoK8wgZxJQ=;
- b=eB2LX/nIEiLHUz6XUAE/Qpcjmx2otXXbfDIhcR7AZsgx1ns41Z1f/79ANiau7f/aeBlTXw0vD29ir34bcSUrSBQ70+cTpqqYm4uhuweQ6CxQXLzRrffjpBIvFt+MLuwLS6H0I+pz6riZOM6ePnXsmPezyyIpUeAA9hQdNxgjm2NFAtVMglNtszROrGl16sBs9SJoDPqojnLT5rqP+5oH/iCpprJehuq1kTsJjzz8GIz2LchelPy/PzND2OwCJqRTsFlF5QJpmdOxpnKwFIpJC135EKtKFLMUkYCH3pXiBwhnqvayjoB39bon1U7uT8KGB3QWt4GWft1s+wi4iWRfhQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=myfuelmaster.com; dmarc=pass action=none
- header.from=myfuelmaster.com; dkim=pass header.d=myfuelmaster.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=SynTechSystemsInc.onmicrosoft.com;
- s=selector2-SynTechSystemsInc-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/c+JURbmF5M+D6K/yZWyPhBZf3fr5mKTsKoK8wgZxJQ=;
- b=fjZD2ZqT4myaxXOGNGOaJJO8pSKn2sGquZN9dxL7KMplVAnwBsMQoEQl/jH+3wRTZso6meynl8Gm9vPGqkq+26b3SAtVi9B61ObQ0LrEgGeXkpvuvDDMn224MmNYEizmO8MnO+J0hWZMJmLNG6cETYfo3OoO4ZmaQ4khqPr/lDY=
-Received: from SN6PR01MB3648.prod.exchangelabs.com (2603:10b6:805:17::29) by
- SN6PR01MB3693.prod.exchangelabs.com (2603:10b6:805:23::17) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.4020.18; Fri, 9 Apr 2021 16:59:39 +0000
-Received: from SN6PR01MB3648.prod.exchangelabs.com
- ([fe80::35c4:628c:3aa6:356b]) by SN6PR01MB3648.prod.exchangelabs.com
- ([fe80::35c4:628c:3aa6:356b%4]) with mapi id 15.20.3999.032; Fri, 9 Apr 2021
- 16:59:39 +0000
-From:   Mark Butsch <Mark.Butsch@myfuelmaster.com>
-To:     Alexander Aring <alex.aring@gmail.com>
-CC:     "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>
-Subject: RE: things not working - newbie questions
-Thread-Topic: things not working - newbie questions
-Thread-Index: AQHXLJbSrwMevhaahUSOzvbwPssI7KqsLYNQgAASYACAACU4kA==
-Date:   Fri, 9 Apr 2021 16:59:39 +0000
-Message-ID: <SN6PR01MB3648864C8E0A272EAC656AEA87739@SN6PR01MB3648.prod.exchangelabs.com>
-References: <SN6PR01MB3648B4FC16E10CA1B04F756587749@SN6PR01MB3648.prod.exchangelabs.com>
- <CAB_54W7K7ir+CLxMkXGMYbxuvDEEJD5vNW2arbLLiaSKrGtbLg@mail.gmail.com>
- <SN6PR01MB3648AD0120B58D72E5B0C00F87739@SN6PR01MB3648.prod.exchangelabs.com>
- <CAB_54W4j7G53YT8G32GdM4pNET8i0v9_zkNMe=0dwdfbHvEXFg@mail.gmail.com>
-In-Reply-To: <CAB_54W4j7G53YT8G32GdM4pNET8i0v9_zkNMe=0dwdfbHvEXFg@mail.gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: gmail.com; dkim=none (message not signed)
- header.d=none;gmail.com; dmarc=none action=none header.from=myfuelmaster.com;
-x-originating-ip: [63.148.217.19]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: d46e4250-274a-4d0e-72bb-08d8fb78dd10
-x-ms-traffictypediagnostic: SN6PR01MB3693:
-x-microsoft-antispam-prvs: <SN6PR01MB369383E12DFCBB71CBAB866387739@SN6PR01MB3693.prod.exchangelabs.com>
-x-ms-oob-tlc-oobclassifiers: OLM:1850;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 1ZTBNz80PS0IrL25lJzozdV3LIp9UChaBnrELPkA5aStgPSZgyWNZogMqQZgKjRIx3g8q7Pn1NN48R75JdmCQdSp1ZIdCI5nxehd+F96fU2lE/UbxeP+u3gICJXdDt3z4xP/eKd3LrKlNsEPVjFnUIanOAx0oIxt0KhFsHS3jh9ea8ZwQnwc57hRnHEX5UeAIg8zGplZFk56+oROHPAopCJjwnVW01/vvky2usCMNDrLr/KPxmslOEDOUSBKAS5vSz/dT/vKHVov8NaGbH897SrkBE3fiCbtn37OldUwUcrrhI4bH8PP2tRlMH7/pvpoprKkprq4nIyYVt9ms4hAqNfLOFLChWC/8LZnV+Y76cgEtVzFNATcSeMIEIKXtpQwRaapJJq8YSLlI4LmEAPta135lFFod8lhukCxzKm/Jn4RzGhais8aIndqgfFZmJxMkPTi07U4YzJXQREflmiShfu2dM0GJDxghNAprR3hhEOE9tHwcr7qhHg/+xI/kVy8sO2TnCMSOk95e/xjQK2k5MRIAG9vFVdJVDBNsy9KvFkAqr66hE4gcIM44tJJMH2Av34foB48lhEfc7/ziBhY/GdiwqlDGZYkO+Ttn5O3dcAX+iPtRTnqJxG+PZ2IAPTv3Yp1AFt80TUM4LarE1xNMmOJPd05FnL469B803YkB50=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR01MB3648.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(376002)(39840400004)(136003)(346002)(366004)(9686003)(2906002)(55016002)(76116006)(316002)(38100700001)(26005)(186003)(5660300002)(6916009)(8676002)(53546011)(7696005)(8936002)(6506007)(4326008)(66446008)(52536014)(66556008)(71200400001)(66476007)(478600001)(66946007)(33656002)(86362001)(64756008);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata: =?utf-8?B?VUxVVW45UHFFVUs3T21VcVRITmc2WkVaN2JtVjFDaHZOVFpjdVo2RnVQRkVs?=
- =?utf-8?B?ZDJyM08wL0JjeDN5eElCbzM0dFVFd0hYa1lUWFIveDdhZlN2SW95WEI4QlV0?=
- =?utf-8?B?cm5PYmN0OVk0KzJyR3ZUTkZ1bEhXSWR3dm9NaXl2b3JHV2xRZHl5cUUyUEsr?=
- =?utf-8?B?WkRDSmhLWFo5SEFCczN2UUpQR2pZM1VzOG5OclI0VTh5UUdiUEUzaHhOVlI2?=
- =?utf-8?B?T041WU5udisvVVN6eEF6NVV1alJ2aGVUUm1JdzFDUGRNVWhXbm5SSUZKRkhw?=
- =?utf-8?B?UU8vZy94RVczR3hVa2hlOHNQakNRK1Vac1BTLytqYXdNQ1pKTjdpRitxT2lB?=
- =?utf-8?B?ZjVYekZ5TEtSaGNjdy9Yc1pEdTd4Z3Z4Q1R6enVQVDVYM1I1Y25zdzFVV0ow?=
- =?utf-8?B?RjIrbU1jMnNvTGRYOXhVYmxpMkpvdllkcGFhaTgrMVVNLzFhK284NTBwam5L?=
- =?utf-8?B?cVpldWpTbloySmxGdFlDcVF1STBKK3pUYnE0SCsxR3pSZndZajJFN1dDWVBD?=
- =?utf-8?B?ZjQ0VUlwQjN1a3VkUkdXbGdGNlFKcDZxNVhOcFU1YlU0NXQ1U1N2VzVNZXlX?=
- =?utf-8?B?WnFiRS8rN2hXRDNNZ3BEZlBBdU13T2IvbVBQbEdXbEhNdGdRcjZzS1BoUk5s?=
- =?utf-8?B?UWV3QXRFemZ2UDFPL2pTc2dNUlB4aWozSnVGb1hFUmRIMWV5WHhTOTF6V0dU?=
- =?utf-8?B?SnA4T3BnamRaNlE5NWdsd3p0dVJHSkpoaWs3V08wSGFWeEJYZHBHRW1UVjlI?=
- =?utf-8?B?SW9sSHdMdW5vS0ZTYW9YNEFienMxSVpISjlodnRuWks3Sk1RNHM2K3J5TWk0?=
- =?utf-8?B?TDNZT1lNMGtOSHo5dHVmZVFpbnFNMlZmR1JISFhGWVp0YkhnNDIrdmtaU3J0?=
- =?utf-8?B?V2drdHM1QTNVbXlsVDh2SDdRY3N3RVVzdUFKQzFvaXhiZUovY3c1TFE0Tldt?=
- =?utf-8?B?OVhZOXBQL0R3YVo2ckRCSVcxaU5XUFQ1Q1N6RjBJeks1eGEwa0xrSDNhcms4?=
- =?utf-8?B?dnVVVkFOMVhrWjVMb2ZjNkdOYVZwMDQzaUNBblQrVkdSSkYzcWgzNllFM2x2?=
- =?utf-8?B?YnNRMlp0MXRRYkg0UVJLM3JsdW9PLzhHU3YzK0xzN1kySlZKbURoOG1qc25a?=
- =?utf-8?B?L1NSOFJIL2J6TmM4ZVNYNTBseExCR0llZGNadmZXQ29WMEg0VFdFdC8ydGt2?=
- =?utf-8?B?K3k5QllOL21aY2tPL3RjN21DQzRjbUp4OE4wYmtDeG9yc1VhY3dVeGE5cFRO?=
- =?utf-8?B?bHRWZkFPVkQzYlF4VUEvM2wrKzliWHVqT0VoN1Y3WkNaWG5xUS9hTEJDbjl5?=
- =?utf-8?B?TXV4dVdLSk5wNkVwSUhNS1RmMXpyS2xTb25oMmFwUllBWkp5YzVCSlc5aDRW?=
- =?utf-8?B?VTE1ZGpoWWFsZSszUmR3dVQ0a1dxK3lvVkd1NjlnV092cS9UTnFTWWNmUGN6?=
- =?utf-8?B?ckdFdk1KSmQwWG03dWJZTi9SRVg3M0l3UlUyZ1FiaFRickdwbi9XdE1sZm9Z?=
- =?utf-8?B?TUE0QjZDMHF0b3VibUlTOWxSWUQyVHFONENha0I1QlBjdElGS2xpcjMrRXNJ?=
- =?utf-8?B?aVNnc3dHejRlTkc2RXQ4blYvM3krdFZmeStWaStPdS81ZW5LYzlnN3lKdkhx?=
- =?utf-8?B?WC9RV29OZmdKV1FTdDMvZTc0SmhKOFJKelNLZ2s2YU5zREV1NVJQeWQ5YlZU?=
- =?utf-8?B?QTZSQUVCOWJETVF3R3l2ZWVkTzhhaGhhVXVuUEdDeXQxRmRLZ1dVamVZVTMx?=
- =?utf-8?Q?koXVjAdXf8gTTQhrF1GkdlZwBpkCzsQBKHm+2Tf?=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        id S229992AbhDJKTa (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Sat, 10 Apr 2021 06:19:30 -0400
+Received: from mail-io1-f71.google.com ([209.85.166.71]:48756 "EHLO
+        mail-io1-f71.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229943AbhDJKTa (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Sat, 10 Apr 2021 06:19:30 -0400
+Received: by mail-io1-f71.google.com with SMTP id g12so5510438ion.15
+        for <linux-wpan@vger.kernel.org>; Sat, 10 Apr 2021 03:19:16 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=hgSXG9YBnaSp6Ilz4xmiRDkeX/YTSm22NjoFotcBRY8=;
+        b=TWbCTuKnel4eRjoBtsXBpsKu0fSGUq54lkLtNi/j5Vh0o8pV9AJwGr5/OAy5fsXWoi
+         S+432TvJHWe9Ti6ey4y0gmF5b+k6tGVtxNd4fc9nwnCNlWoHPPVvTrroKdZPtPBQvh4a
+         ALSspzAs64Hm2n1gb0If2FhJJZOn0OAMFz9MZN9gOQaaP8rsGVOkMPGfQPd6vOURmpeW
+         4P4AixhRnrU/hueYYd/BJlT+xOeLMmGoXAGOUKUsHiODffKDznnMx9VlQ2Wc8Ipc/Hcb
+         1jMIBsMyjASDAsv5B+U2kUXkUTeKKuCSIS6Cl0EcHTfZf00M4xUZgx2dUoQd3RlIgxY/
+         jZbw==
+X-Gm-Message-State: AOAM531d2YBCvPLfsM+2C6q63maDKHxib3avgbGiMxGRL+zA6ym3WyyA
+        Lv1y/h3rkUZPA6YW6cmiM3AQbhk3Dke3FdB1sZ/SXFaCKwI/
+X-Google-Smtp-Source: ABdhPJzN+SpBEPIBq7vts6GZVLRlUjiaiDY68lmVWNbRbvt+gnOlT5rwC4Q7qEaedrBqUrhUcpG49AMj3H2Bfk06nPoQGxlIKqJd
 MIME-Version: 1.0
-X-OriginatorOrg: myfuelmaster.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR01MB3648.prod.exchangelabs.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d46e4250-274a-4d0e-72bb-08d8fb78dd10
-X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Apr 2021 16:59:39.5395
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: dd4cdb5b-3a50-4947-bce6-dd41ce3544d6
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: JnE/+DjyfpSgxI7sNmryJmK/ttMpTPWvZkjH9RVvTceQOcIgAV6PETDnSKqaplJPGROtB/IqK7OpTTHKNx2i8A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR01MB3693
+X-Received: by 2002:a02:69c9:: with SMTP id e192mr1159544jac.143.1618049955851;
+ Sat, 10 Apr 2021 03:19:15 -0700 (PDT)
+Date:   Sat, 10 Apr 2021 03:19:15 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000d8f55905bf9b9cbd@google.com>
+Subject: [syzbot] memory leak in skb_clone
+From:   syzbot <syzbot+1f68113fa907bf0695a8@syzkaller.appspotmail.com>
+To:     alex.aring@gmail.com, davem@davemloft.net, kuba@kernel.org,
+        linux-kernel@vger.kernel.org, linux-wpan@vger.kernel.org,
+        netdev@vger.kernel.org, stefan@datenfreihafen.org,
+        syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-SGVsbG8sDQoNCj4gT24gRnJpZGF5LCBBcHJpbCA5LCAyMDIxIDEwOjI4IEFNLCBBbGV4YW5kZXIg
-QXJpbmcgPGFsZXguYXJpbmdAZ21haWwuY29tPiB3cm90ZToNCj4gDQo+IHBsZWFzZSB0ZWxsIHVz
-IGFsbCB0aGUgc3RlcHMgd2hpY2ggeW91IGFyZSBkb2luZyB3aXRoIG1hYzgwMjE1NF9od3NpbSwg
-dGhlDQo+IGdvb2QgcGFydCBvZiB0aGF0IEkgY2FuIHR5cGUgaXQgaGVyZSBhcyBleGFjdGx5IHdo
-YXQgeW91IGRvIGFuZCB0aGVuIEkgY2FuIHRlbGwNCj4geW91IHdoeSBpdCdzIG5vdCB3b3JraW5n
-Lg0KDQpJIHJhbiB0aGVzZSBjb21tYW5kcyB0byBzZXR1cCB0aGUgc2ltdWxhdGVkIGRldmljZXM6
-DQotLS0tLQ0KbW9kcHJvYmUgbWFjODAyMTU0X2h3c2ltDQoNCml3cGFuIGRldiB3cGFuMCBzZXQg
-cGFuX2lkIDB4YmVlZg0KaXdwYW4gZGV2IHdwYW4xIHNldCBwYW5faWQgMHhiZWVmDQoNCml3cGFu
-IGRldiB3cGFuMCBzZXQgc2hvcnRfYWRkciAweDAwMDENCml3cGFuIGRldiB3cGFuMSBzZXQgc2hv
-cnRfYWRkciAweDAwMDINCg0KaXAgbGluayBhZGQgbGluayB3cGFuMCBuYW1lIGxvd3BhbjAgdHlw
-ZSBsb3dwYW4NCmlwIGxpbmsgYWRkIGxpbmsgd3BhbjEgbmFtZSBsb3dwYW4xIHR5cGUgbG93cGFu
-DQoNCmlwIGxpbmsgc2V0IHdwYW4wIHVwDQppcCBsaW5rIHNldCB3cGFuMSB1cA0KDQppcCBsaW5r
-IHNldCBsb3dwYW4wIHVwDQppcCBsaW5rIHNldCBsb3dwYW4xIHVwDQotLS0tLQ0KDQpSdW5uaW5n
-IGlmY29uZmlnIHlpZWxkZWQ6DQotLS0tLQ0KcGlAcmFzcGJlcnJ5cGk6fiAkIGlmY29uZmlnDQps
-b3dwYW4wOiBmbGFncz00MTYzPFVQLEJST0FEQ0FTVCxSVU5OSU5HLE1VTFRJQ0FTVD4gIG10dSAx
-MjgwDQogICAgICAgIGluZXQ2IGZlODA6OmJjZWY6ZmY6ZmUwMDoxICBwcmVmaXhsZW4gNjQgIHNj
-b3BlaWQgMHgyMDxsaW5rPg0KICAgICAgICBpbmV0NiBmZTgwOjo4ODQ3OjI5NTM6YjAxMDo0N2M4
-ICBwcmVmaXhsZW4gNjQgIHNjb3BlaWQgMHgyMDxsaW5rPg0KICAgICAgICB1bnNwZWMgOEEtNDct
-MjktNTMtQjAtMTAtNDctQzgtMDAtMDAtMDAtMDAtMDAtMDAtMDAtMDAgIHR4cXVldWVsZW4gMTAw
-MCAgKFVOU1BFQykNCiAgICAgICAgUlggcGFja2V0cyAxNSAgYnl0ZXMgMjIyMiAoMi4xIEtpQikN
-CiAgICAgICAgUlggZXJyb3JzIDAgIGRyb3BwZWQgMCAgb3ZlcnJ1bnMgMCAgZnJhbWUgMA0KICAg
-ICAgICBUWCBwYWNrZXRzIDE5ICBieXRlcyAyNTU4ICgyLjQgS2lCKQ0KICAgICAgICBUWCBlcnJv
-cnMgMCAgZHJvcHBlZCAwIG92ZXJydW5zIDAgIGNhcnJpZXIgMCAgY29sbGlzaW9ucyAwDQoNCmxv
-d3BhbjE6IGZsYWdzPTQxNjM8VVAsQlJPQURDQVNULFJVTk5JTkcsTVVMVElDQVNUPiAgbXR1IDEy
-ODANCiAgICAgICAgaW5ldDYgZmU4MDo6MzA4ZToyZTZiOjU4YTc6MWFlMCAgcHJlZml4bGVuIDY0
-ICBzY29wZWlkIDB4MjA8bGluaz4NCiAgICAgICAgaW5ldDYgZmU4MDo6YmNlZjpmZjpmZTAwOjIg
-IHByZWZpeGxlbiA2NCAgc2NvcGVpZCAweDIwPGxpbms+DQogICAgICAgIHVuc3BlYyAzMi04RS0y
-RS02Qi01OC1BNy0xQS1FMC0wMC0wMC0wMC0wMC0wMC0wMC0wMC0wMCAgdHhxdWV1ZWxlbiAxMDAw
-ICAoVU5TUEVDKQ0KICAgICAgICBSWCBwYWNrZXRzIDE1ICBieXRlcyAyMjIyICgyLjEgS2lCKQ0K
-ICAgICAgICBSWCBlcnJvcnMgMCAgZHJvcHBlZCAwICBvdmVycnVucyAwICBmcmFtZSAwDQogICAg
-ICAgIFRYIHBhY2tldHMgMTkgIGJ5dGVzIDI1NTggKDIuNCBLaUIpDQogICAgICAgIFRYIGVycm9y
-cyAwICBkcm9wcGVkIDAgb3ZlcnJ1bnMgMCAgY2FycmllciAwICBjb2xsaXNpb25zIDANCg0Kd3Bh
-bjA6IGZsYWdzPTE5NTxVUCxCUk9BRENBU1QsUlVOTklORyxOT0FSUD4gIG10dSAxMjMNCiAgICAg
-ICAgdW5zcGVjIDhBLTQ3LTI5LTUzLUIwLTEwLTQ3LUM4LTAwLTAwLTAwLTAwLTAwLTAwLTAwLTAw
-ICB0eHF1ZXVlbGVuIDMwMCAgKFVOU1BFQykNCiAgICAgICAgUlggcGFja2V0cyAyNyAgYnl0ZXMg
-MjA4NiAoMi4wIEtpQikNCiAgICAgICAgUlggZXJyb3JzIDAgIGRyb3BwZWQgMCAgb3ZlcnJ1bnMg
-MCAgZnJhbWUgMA0KICAgICAgICBUWCBwYWNrZXRzIDI3ICBieXRlcyAyMzgzICgyLjMgS2lCKQ0K
-ICAgICAgICBUWCBlcnJvcnMgMCAgZHJvcHBlZCAwIG92ZXJydW5zIDAgIGNhcnJpZXIgMCAgY29s
-bGlzaW9ucyAwDQoNCndwYW4xOiBmbGFncz0xOTU8VVAsQlJPQURDQVNULFJVTk5JTkcsTk9BUlA+
-ICBtdHUgMTIzDQogICAgICAgIHVuc3BlYyAzMi04RS0yRS02Qi01OC1BNy0xQS1FMC0wMC0wMC0w
-MC0wMC0wMC0wMC0wMC0wMCAgdHhxdWV1ZWxlbiAzMDAgIChVTlNQRUMpDQogICAgICAgIFJYIHBh
-Y2tldHMgMjcgIGJ5dGVzIDIwODYgKDIuMCBLaUIpDQogICAgICAgIFJYIGVycm9ycyAwICBkcm9w
-cGVkIDAgIG92ZXJydW5zIDAgIGZyYW1lIDANCiAgICAgICAgVFggcGFja2V0cyAyNyAgYnl0ZXMg
-MjM4MyAoMi4zIEtpQikNCiAgICAgICAgVFggZXJyb3JzIDAgIGRyb3BwZWQgMCBvdmVycnVucyAw
-ICBjYXJyaWVyIDAgIGNvbGxpc2lvbnMgMA0KLS0tLS0NCg0KDQpUaGVuIEkgcmFuICJ3cGFuLXBp
-bmcgLWQiDQotLS0tLQ0KcGlAcmFzcGJlcnJ5cGk6fi9kZXZpY2V0cmVlICQgd3Bhbi1waW5nIC1k
-DQpTZXJ2ZXIgbW9kZS4gV2FpdGluZyBmb3IgcGFja2V0cy4uLg0KLS0tLS0NCg0KSSB0aGVuIG9w
-ZW5lZCBhIDJuZCB3aW5kb3cgYW5kIHJhbiAid3Bhbi1waW5nIC1hIDB4MDAwMSAtYyA1IC1pIHdw
-YW4wDQotLS0tLQ0KcGlAcmFzcGJlcnJ5cGk6fiAkIHdwYW4tcGluZyAtYSAweDAwMDEgLWMgNSAt
-aSB3cGFuMA0KUElORyAweDAwMDEgKFBBTiBJRCAweGJlZWYpIDUgZGF0YSBieXRlcw0KSGl0IDUw
-MCBtcyBwYWNrZXQgdGltZW91dA0KSGl0IDUwMCBtcyBwYWNrZXQgdGltZW91dA0KSGl0IDUwMCBt
-cyBwYWNrZXQgdGltZW91dA0KSGl0IDUwMCBtcyBwYWNrZXQgdGltZW91dA0KSGl0IDUwMCBtcyBw
-YWNrZXQgdGltZW91dA0KDQotLS0gMHgwMDAxIHBpbmcgc3RhdGlzdGljcyAtLS0NCjUgcGFja2V0
-cyB0cmFuc21pdHRlZCwgMCByZWNlaXZlZCwgMTAwJSBwYWNrZXQgbG9zcw0KcnR0IG1pbi9hdmcv
-bWF4ID0gMjE0NzQ4My43NTAvMC4wMDAvMC4wMDAgbXMNCg0KcGlAcmFzcGJlcnJ5cGk6fiAkIGlm
-Y29uZmlnDQpsb3dwYW4wOiBmbGFncz00MTYzPFVQLEJST0FEQ0FTVCxSVU5OSU5HLE1VTFRJQ0FT
-VD4gIG10dSAxMjgwDQogICAgICAgIGluZXQ2IGZlODA6OmJjZWY6ZmY6ZmUwMDoxICBwcmVmaXhs
-ZW4gNjQgIHNjb3BlaWQgMHgyMDxsaW5rPg0KICAgICAgICBpbmV0NiBmZTgwOjo4ODQ3OjI5NTM6
-YjAxMDo0N2M4ICBwcmVmaXhsZW4gNjQgIHNjb3BlaWQgMHgyMDxsaW5rPg0KICAgICAgICB1bnNw
-ZWMgOEEtNDctMjktNTMtQjAtMTAtNDctQzgtMDAtMDAtMDAtMDAtMDAtMDAtMDAtMDAgIHR4cXVl
-dWVsZW4gMTAwMCAgKFVOU1BFQykNCiAgICAgICAgUlggcGFja2V0cyAzMSAgYnl0ZXMgMzk5NyAo
-My45IEtpQikNCiAgICAgICAgUlggZXJyb3JzIDAgIGRyb3BwZWQgMCAgb3ZlcnJ1bnMgMCAgZnJh
-bWUgMA0KICAgICAgICBUWCBwYWNrZXRzIDM2ICBieXRlcyA0NDA1ICg0LjMgS2lCKQ0KICAgICAg
-ICBUWCBlcnJvcnMgMCAgZHJvcHBlZCAwIG92ZXJydW5zIDAgIGNhcnJpZXIgMCAgY29sbGlzaW9u
-cyAwDQoNCmxvd3BhbjE6IGZsYWdzPTQxNjM8VVAsQlJPQURDQVNULFJVTk5JTkcsTVVMVElDQVNU
-PiAgbXR1IDEyODANCiAgICAgICAgaW5ldDYgZmU4MDo6MzA4ZToyZTZiOjU4YTc6MWFlMCAgcHJl
-Zml4bGVuIDY0ICBzY29wZWlkIDB4MjA8bGluaz4NCiAgICAgICAgaW5ldDYgZmU4MDo6YmNlZjpm
-ZjpmZTAwOjIgIHByZWZpeGxlbiA2NCAgc2NvcGVpZCAweDIwPGxpbms+DQogICAgICAgIHVuc3Bl
-YyAzMi04RS0yRS02Qi01OC1BNy0xQS1FMC0wMC0wMC0wMC0wMC0wMC0wMC0wMC0wMCAgdHhxdWV1
-ZWxlbiAxMDAwICAoVU5TUEVDKQ0KICAgICAgICBSWCBwYWNrZXRzIDMyICBieXRlcyA0MDY5ICgz
-LjkgS2lCKQ0KICAgICAgICBSWCBlcnJvcnMgMCAgZHJvcHBlZCAwICBvdmVycnVucyAwICBmcmFt
-ZSAwDQogICAgICAgIFRYIHBhY2tldHMgMzUgIGJ5dGVzIDQzMzMgKDQuMiBLaUIpDQogICAgICAg
-IFRYIGVycm9ycyAwICBkcm9wcGVkIDAgb3ZlcnJ1bnMgMCAgY2FycmllciAwICBjb2xsaXNpb25z
-IDANCg0Kd3BhbjA6IGZsYWdzPTE5NTxVUCxCUk9BRENBU1QsUlVOTklORyxOT0FSUD4gIG10dSAx
-MjMNCiAgICAgICAgdW5zcGVjIDhBLTQ3LTI5LTUzLUIwLTEwLTQ3LUM4LTAwLTAwLTAwLTAwLTAw
-LTAwLTAwLTAwICB0eHF1ZXVlbGVuIDMwMCAgKFVOU1BFQykNCiAgICAgICAgUlggcGFja2V0cyA0
-NyAgYnl0ZXMgMzQ2MCAoMy4zIEtpQikNCiAgICAgICAgUlggZXJyb3JzIDAgIGRyb3BwZWQgMCAg
-b3ZlcnJ1bnMgMCAgZnJhbWUgMA0KICAgICAgICBUWCBwYWNrZXRzIDUzICBieXRlcyA0MTEyICg0
-LjAgS2lCKQ0KICAgICAgICBUWCBlcnJvcnMgMCAgZHJvcHBlZCAwIG92ZXJydW5zIDAgIGNhcnJp
-ZXIgMCAgY29sbGlzaW9ucyAwDQoNCndwYW4xOiBmbGFncz0xOTU8VVAsQlJPQURDQVNULFJVTk5J
-TkcsTk9BUlA+ICBtdHUgMTIzDQogICAgICAgIHVuc3BlYyAzMi04RS0yRS02Qi01OC1BNy0xQS1F
-MC0wMC0wMC0wMC0wMC0wMC0wMC0wMC0wMCAgdHhxdWV1ZWxlbiAzMDAgIChVTlNQRUMpDQogICAg
-ICAgIFJYIHBhY2tldHMgNTMgIGJ5dGVzIDM1MjkgKDMuNCBLaUIpDQogICAgICAgIFJYIGVycm9y
-cyAwICBkcm9wcGVkIDAgIG92ZXJydW5zIDAgIGZyYW1lIDANCiAgICAgICAgVFggcGFja2V0cyA0
-NyAgYnl0ZXMgMzk3NyAoMy44IEtpQikNCiAgICAgICAgVFggZXJyb3JzIDAgIGRyb3BwZWQgMCBv
-dmVycnVucyAwICBjYXJyaWVyIDAgIGNvbGxpc2lvbnMgMA0KLS0tLS0NCg0KSSB0cmllZCBpdCB3
-aXRoIHdwYW4xIGFzIHdlbGw6DQotLS0tLQ0KcGlAcmFzcGJlcnJ5cGk6fiAkIHdwYW4tcGluZyAt
-YSAweDAwMDEgLWMgNSAtaSB3cGFuMQ0KUElORyAweDAwMDEgKFBBTiBJRCAweGJlZWYpIDUgZGF0
-YSBieXRlcw0KSGl0IDUwMCBtcyBwYWNrZXQgdGltZW91dA0KSGl0IDUwMCBtcyBwYWNrZXQgdGlt
-ZW91dA0KSGl0IDUwMCBtcyBwYWNrZXQgdGltZW91dA0KSGl0IDUwMCBtcyBwYWNrZXQgdGltZW91
-dA0KSGl0IDUwMCBtcyBwYWNrZXQgdGltZW91dA0KDQotLS0gMHgwMDAxIHBpbmcgc3RhdGlzdGlj
-cyAtLS0NCjUgcGFja2V0cyB0cmFuc21pdHRlZCwgMCByZWNlaXZlZCwgMTAwJSBwYWNrZXQgbG9z
-cw0KcnR0IG1pbi9hdmcvbWF4ID0gMjE0NzQ4My43NTAvMC4wMDAvMC4wMDAgbXMNCg0KcGlAcmFz
-cGJlcnJ5cGk6fiAkIGlmY29uZmlnDQpsb3dwYW4wOiBmbGFncz00MTYzPFVQLEJST0FEQ0FTVCxS
-VU5OSU5HLE1VTFRJQ0FTVD4gIG10dSAxMjgwDQogICAgICAgIGluZXQ2IGZlODA6OmJjZWY6ZmY6
-ZmUwMDoxICBwcmVmaXhsZW4gNjQgIHNjb3BlaWQgMHgyMDxsaW5rPg0KICAgICAgICBpbmV0NiBm
-ZTgwOjo4ODQ3OjI5NTM6YjAxMDo0N2M4ICBwcmVmaXhsZW4gNjQgIHNjb3BlaWQgMHgyMDxsaW5r
-Pg0KICAgICAgICB1bnNwZWMgOEEtNDctMjktNTMtQjAtMTAtNDctQzgtMDAtMDAtMDAtMDAtMDAt
-MDAtMDAtMDAgIHR4cXVldWVsZW4gMTAwMCAgKFVOU1BFQykNCiAgICAgICAgUlggcGFja2V0cyAz
-MiAgYnl0ZXMgNDA2OSAoMy45IEtpQikNCiAgICAgICAgUlggZXJyb3JzIDAgIGRyb3BwZWQgMCAg
-b3ZlcnJ1bnMgMCAgZnJhbWUgMA0KICAgICAgICBUWCBwYWNrZXRzIDM2ICBieXRlcyA0NDA1ICg0
-LjMgS2lCKQ0KICAgICAgICBUWCBlcnJvcnMgMCAgZHJvcHBlZCAwIG92ZXJydW5zIDAgIGNhcnJp
-ZXIgMCAgY29sbGlzaW9ucyAwDQoNCmxvd3BhbjE6IGZsYWdzPTQxNjM8VVAsQlJPQURDQVNULFJV
-Tk5JTkcsTVVMVElDQVNUPiAgbXR1IDEyODANCiAgICAgICAgaW5ldDYgZmU4MDo6MzA4ZToyZTZi
-OjU4YTc6MWFlMCAgcHJlZml4bGVuIDY0ICBzY29wZWlkIDB4MjA8bGluaz4NCiAgICAgICAgaW5l
-dDYgZmU4MDo6YmNlZjpmZjpmZTAwOjIgIHByZWZpeGxlbiA2NCAgc2NvcGVpZCAweDIwPGxpbms+
-DQogICAgICAgIHVuc3BlYyAzMi04RS0yRS02Qi01OC1BNy0xQS1FMC0wMC0wMC0wMC0wMC0wMC0w
-MC0wMC0wMCAgdHhxdWV1ZWxlbiAxMDAwICAoVU5TUEVDKQ0KICAgICAgICBSWCBwYWNrZXRzIDMy
-ICBieXRlcyA0MDY5ICgzLjkgS2lCKQ0KICAgICAgICBSWCBlcnJvcnMgMCAgZHJvcHBlZCAwICBv
-dmVycnVucyAwICBmcmFtZSAwDQogICAgICAgIFRYIHBhY2tldHMgMzYgIGJ5dGVzIDQ0MDUgKDQu
-MyBLaUIpDQogICAgICAgIFRYIGVycm9ycyAwICBkcm9wcGVkIDAgb3ZlcnJ1bnMgMCAgY2Fycmll
-ciAwICBjb2xsaXNpb25zIDANCg0Kd3BhbjA6IGZsYWdzPTE5NTxVUCxCUk9BRENBU1QsUlVOTklO
-RyxOT0FSUD4gIG10dSAxMjMNCiAgICAgICAgdW5zcGVjIDhBLTQ3LTI5LTUzLUIwLTEwLTQ3LUM4
-LTAwLTAwLTAwLTAwLTAwLTAwLTAwLTAwICB0eHF1ZXVlbGVuIDMwMCAgKFVOU1BFQykNCiAgICAg
-ICAgUlggcGFja2V0cyA0OCAgYnl0ZXMgMzUwNCAoMy40IEtpQikNCiAgICAgICAgUlggZXJyb3Jz
-IDAgIGRyb3BwZWQgMCAgb3ZlcnJ1bnMgMCAgZnJhbWUgMA0KICAgICAgICBUWCBwYWNrZXRzIDU4
-ICBieXRlcyA0MTkyICg0LjAgS2lCKQ0KICAgICAgICBUWCBlcnJvcnMgMCAgZHJvcHBlZCAwIG92
-ZXJydW5zIDAgIGNhcnJpZXIgMCAgY29sbGlzaW9ucyAwDQoNCndwYW4xOiBmbGFncz0xOTU8VVAs
-QlJPQURDQVNULFJVTk5JTkcsTk9BUlA+ICBtdHUgMTIzDQogICAgICAgIHVuc3BlYyAzMi04RS0y
-RS02Qi01OC1BNy0xQS1FMC0wMC0wMC0wMC0wMC0wMC0wMC0wMC0wMCAgdHhxdWV1ZWxlbiAzMDAg
-IChVTlNQRUMpDQogICAgICAgIFJYIHBhY2tldHMgNTggIGJ5dGVzIDM1NTQgKDMuNCBLaUIpDQog
-ICAgICAgIFJYIGVycm9ycyAwICBkcm9wcGVkIDAgIG92ZXJydW5zIDAgIGZyYW1lIDANCiAgICAg
-ICAgVFggcGFja2V0cyA0OCAgYnl0ZXMgNDAzMiAoMy45IEtpQikNCiAgICAgICAgVFggZXJyb3Jz
-IDAgIGRyb3BwZWQgMCBvdmVycnVucyAwICBjYXJyaWVyIDAgIGNvbGxpc2lvbnMgMA0KLS0tLS0N
-Cg0KSSBmZWVsIEkgYW0gbWlzc2luZyBzb21lIGNydWNpYWwgZGV0YWlsLg0KDQpUaGFua3MsDQpN
-YXJrDQoNCg==
+Hello,
+
+syzbot found the following issue on:
+
+HEAD commit:    17e7124a Merge tag '5.12-rc6-smb3' of git://git.samba.org/..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=11a62c6ad00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=b8dbd3c72fdc7777
+dashboard link: https://syzkaller.appspot.com/bug?extid=1f68113fa907bf0695a8
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=179321a6d00000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=11922ba1d00000
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+1f68113fa907bf0695a8@syzkaller.appspotmail.com
+
+write to /proc/sys/kernel/softlockup_all_cpu_backtrace failed: No such file or directory
+BUG: memory leak
+unreferenced object 0xffff88810f644600 (size 232):
+  comm "softirq", pid 0, jiffies 4294967032 (age 81.270s)
+  hex dump (first 32 bytes):
+    10 7d 4b 12 81 88 ff ff 10 7d 4b 12 81 88 ff ff  .}K......}K.....
+    00 00 00 00 00 00 00 00 40 7c 4b 12 81 88 ff ff  ........@|K.....
+  backtrace:
+    [<ffffffff83651d4a>] skb_clone+0xaa/0x2b0 net/core/skbuff.c:1496
+    [<ffffffff83fe1b80>] ieee802154_raw_deliver net/ieee802154/socket.c:369 [inline]
+    [<ffffffff83fe1b80>] ieee802154_rcv+0x100/0x340 net/ieee802154/socket.c:1070
+    [<ffffffff8367cc7a>] __netif_receive_skb_one_core+0x6a/0xa0 net/core/dev.c:5384
+    [<ffffffff8367cd07>] __netif_receive_skb+0x27/0xa0 net/core/dev.c:5498
+    [<ffffffff8367cdd9>] netif_receive_skb_internal net/core/dev.c:5603 [inline]
+    [<ffffffff8367cdd9>] netif_receive_skb+0x59/0x260 net/core/dev.c:5662
+    [<ffffffff83fe6302>] ieee802154_deliver_skb net/mac802154/rx.c:29 [inline]
+    [<ffffffff83fe6302>] ieee802154_subif_frame net/mac802154/rx.c:102 [inline]
+    [<ffffffff83fe6302>] __ieee802154_rx_handle_packet net/mac802154/rx.c:212 [inline]
+    [<ffffffff83fe6302>] ieee802154_rx+0x612/0x620 net/mac802154/rx.c:284
+    [<ffffffff83fe59a6>] ieee802154_tasklet_handler+0x86/0xa0 net/mac802154/main.c:35
+    [<ffffffff81232aab>] tasklet_action_common.constprop.0+0x5b/0x100 kernel/softirq.c:557
+    [<ffffffff846000bf>] __do_softirq+0xbf/0x2ab kernel/softirq.c:345
+    [<ffffffff81232f4c>] do_softirq kernel/softirq.c:248 [inline]
+    [<ffffffff81232f4c>] do_softirq+0x5c/0x80 kernel/softirq.c:235
+    [<ffffffff81232fc1>] __local_bh_enable_ip+0x51/0x60 kernel/softirq.c:198
+    [<ffffffff8367a9a4>] local_bh_enable include/linux/bottom_half.h:32 [inline]
+    [<ffffffff8367a9a4>] rcu_read_unlock_bh include/linux/rcupdate.h:745 [inline]
+    [<ffffffff8367a9a4>] __dev_queue_xmit+0x7f4/0xf60 net/core/dev.c:4221
+    [<ffffffff83fe2db4>] raw_sendmsg+0x1f4/0x2b0 net/ieee802154/socket.c:295
+    [<ffffffff8363af16>] sock_sendmsg_nosec net/socket.c:654 [inline]
+    [<ffffffff8363af16>] sock_sendmsg+0x56/0x80 net/socket.c:674
+    [<ffffffff8363deec>] __sys_sendto+0x15c/0x200 net/socket.c:1977
+    [<ffffffff8363dfb6>] __do_sys_sendto net/socket.c:1989 [inline]
+    [<ffffffff8363dfb6>] __se_sys_sendto net/socket.c:1985 [inline]
+    [<ffffffff8363dfb6>] __x64_sys_sendto+0x26/0x30 net/socket.c:1985
+
+BUG: memory leak
+unreferenced object 0xffff88810dae5200 (size 512):
+  comm "syz-executor749", pid 8387, jiffies 4294967560 (age 75.990s)
+  hex dump (first 32 bytes):
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+  backtrace:
+    [<ffffffff8364aeff>] kmalloc_reserve net/core/skbuff.c:353 [inline]
+    [<ffffffff8364aeff>] __alloc_skb+0xdf/0x280 net/core/skbuff.c:424
+    [<ffffffff836539e3>] __pskb_copy_fclone+0x73/0x330 net/core/skbuff.c:1601
+    [<ffffffff82ad4213>] __pskb_copy include/linux/skbuff.h:1167 [inline]
+    [<ffffffff82ad4213>] pskb_copy include/linux/skbuff.h:3191 [inline]
+    [<ffffffff82ad4213>] hwsim_hw_xmit+0xd3/0x140 drivers/net/ieee802154/mac802154_hwsim.c:132
+    [<ffffffff83fe63d7>] drv_xmit_async net/mac802154/driver-ops.h:16 [inline]
+    [<ffffffff83fe63d7>] ieee802154_tx+0xc7/0x190 net/mac802154/tx.c:83
+    [<ffffffff83fe65c8>] ieee802154_subif_start_xmit+0x58/0x70 net/mac802154/tx.c:132
+    [<ffffffff83679e31>] __netdev_start_xmit include/linux/netdevice.h:4825 [inline]
+    [<ffffffff83679e31>] netdev_start_xmit include/linux/netdevice.h:4839 [inline]
+    [<ffffffff83679e31>] xmit_one net/core/dev.c:3605 [inline]
+    [<ffffffff83679e31>] dev_hard_start_xmit+0xe1/0x330 net/core/dev.c:3621
+    [<ffffffff8371d125>] sch_direct_xmit+0x1c5/0x500 net/sched/sch_generic.c:313
+    [<ffffffff8371d661>] qdisc_restart net/sched/sch_generic.c:376 [inline]
+    [<ffffffff8371d661>] __qdisc_run+0x201/0x810 net/sched/sch_generic.c:384
+    [<ffffffff8367ad4f>] qdisc_run include/net/pkt_sched.h:136 [inline]
+    [<ffffffff8367ad4f>] qdisc_run include/net/pkt_sched.h:128 [inline]
+    [<ffffffff8367ad4f>] __dev_xmit_skb net/core/dev.c:3807 [inline]
+    [<ffffffff8367ad4f>] __dev_queue_xmit+0xb9f/0xf60 net/core/dev.c:4162
+    [<ffffffff83fe2db4>] raw_sendmsg+0x1f4/0x2b0 net/ieee802154/socket.c:295
+    [<ffffffff8363af16>] sock_sendmsg_nosec net/socket.c:654 [inline]
+    [<ffffffff8363af16>] sock_sendmsg+0x56/0x80 net/socket.c:674
+    [<ffffffff8363deec>] __sys_sendto+0x15c/0x200 net/socket.c:1977
+    [<ffffffff8363dfb6>] __do_sys_sendto net/socket.c:1989 [inline]
+    [<ffffffff8363dfb6>] __se_sys_sendto net/socket.c:1985 [inline]
+    [<ffffffff8363dfb6>] __x64_sys_sendto+0x26/0x30 net/socket.c:1985
+    [<ffffffff842ded2d>] do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
+    [<ffffffff84400068>] entry_SYSCALL_64_after_hwframe+0x44/0xae
+
+BUG: memory leak
+unreferenced object 0xffff88810e079d00 (size 232):
+  comm "softirq", pid 0, jiffies 4294967560 (age 75.990s)
+  hex dump (first 32 bytes):
+    10 71 4b 12 81 88 ff ff 10 71 4b 12 81 88 ff ff  .qK......qK.....
+    00 00 00 00 00 00 00 00 40 70 4b 12 81 88 ff ff  ........@pK.....
+  backtrace:
+    [<ffffffff83651d4a>] skb_clone+0xaa/0x2b0 net/core/skbuff.c:1496
+    [<ffffffff83fe1b80>] ieee802154_raw_deliver net/ieee802154/socket.c:369 [inline]
+    [<ffffffff83fe1b80>] ieee802154_rcv+0x100/0x340 net/ieee802154/socket.c:1070
+    [<ffffffff8367cc7a>] __netif_receive_skb_one_core+0x6a/0xa0 net/core/dev.c:5384
+    [<ffffffff8367cd07>] __netif_receive_skb+0x27/0xa0 net/core/dev.c:5498
+    [<ffffffff8367cdd9>] netif_receive_skb_internal net/core/dev.c:5603 [inline]
+    [<ffffffff8367cdd9>] netif_receive_skb+0x59/0x260 net/core/dev.c:5662
+    [<ffffffff83fe6302>] ieee802154_deliver_skb net/mac802154/rx.c:29 [inline]
+    [<ffffffff83fe6302>] ieee802154_subif_frame net/mac802154/rx.c:102 [inline]
+    [<ffffffff83fe6302>] __ieee802154_rx_handle_packet net/mac802154/rx.c:212 [inline]
+    [<ffffffff83fe6302>] ieee802154_rx+0x612/0x620 net/mac802154/rx.c:284
+    [<ffffffff83fe59a6>] ieee802154_tasklet_handler+0x86/0xa0 net/mac802154/main.c:35
+    [<ffffffff81232aab>] tasklet_action_common.constprop.0+0x5b/0x100 kernel/softirq.c:557
+    [<ffffffff846000bf>] __do_softirq+0xbf/0x2ab kernel/softirq.c:345
+    [<ffffffff81232f4c>] do_softirq kernel/softirq.c:248 [inline]
+    [<ffffffff81232f4c>] do_softirq+0x5c/0x80 kernel/softirq.c:235
+    [<ffffffff81232fc1>] __local_bh_enable_ip+0x51/0x60 kernel/softirq.c:198
+    [<ffffffff8367a9a4>] local_bh_enable include/linux/bottom_half.h:32 [inline]
+    [<ffffffff8367a9a4>] rcu_read_unlock_bh include/linux/rcupdate.h:745 [inline]
+    [<ffffffff8367a9a4>] __dev_queue_xmit+0x7f4/0xf60 net/core/dev.c:4221
+    [<ffffffff83fe2db4>] raw_sendmsg+0x1f4/0x2b0 net/ieee802154/socket.c:295
+    [<ffffffff8363af16>] sock_sendmsg_nosec net/socket.c:654 [inline]
+    [<ffffffff8363af16>] sock_sendmsg+0x56/0x80 net/socket.c:674
+    [<ffffffff8363deec>] __sys_sendto+0x15c/0x200 net/socket.c:1977
+    [<ffffffff8363dfb6>] __do_sys_sendto net/socket.c:1989 [inline]
+    [<ffffffff8363dfb6>] __se_sys_sendto net/socket.c:1985 [inline]
+    [<ffffffff8363dfb6>] __x64_sys_sendto+0x26/0x30 net/socket.c:1985
+
+write to /proc/sys/kernel/hung_task_check_interval_secs failed: No such file or directory
+write to /proc/sys/kernel/softlockup_all_cpu_backtrace failed: No such file or directory
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+syzbot can test patches for this issue, for details see:
+https://goo.gl/tpsmEJ#testing-patches
