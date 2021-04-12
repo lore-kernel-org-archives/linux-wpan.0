@@ -7,39 +7,39 @@ X-Spam-Status: No, score=-19.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 612F6C43460
-	for <linux-wpan@archiver.kernel.org>; Mon, 12 Apr 2021 16:26:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F23DC43470
+	for <linux-wpan@archiver.kernel.org>; Mon, 12 Apr 2021 16:26:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 43027613BC
-	for <linux-wpan@archiver.kernel.org>; Mon, 12 Apr 2021 16:26:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 01C52613DC
+	for <linux-wpan@archiver.kernel.org>; Mon, 12 Apr 2021 16:26:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244588AbhDLQ0h (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 12 Apr 2021 12:26:37 -0400
-Received: from mail.kernel.org ([198.145.29.99]:57016 "EHLO mail.kernel.org"
+        id S244625AbhDLQ0z (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 12 Apr 2021 12:26:55 -0400
+Received: from mail.kernel.org ([198.145.29.99]:57086 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S243750AbhDLQY4 (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-        Mon, 12 Apr 2021 12:24:56 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id C33C06138B;
-        Mon, 12 Apr 2021 16:24:32 +0000 (UTC)
+        id S244029AbhDLQY6 (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+        Mon, 12 Apr 2021 12:24:58 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 89AAA61382;
+        Mon, 12 Apr 2021 16:24:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1618244673;
-        bh=cVzxih78KjyS2DB18rOlSVUKQmib598DiAgSu7lcCgQ=;
+        s=k20201202; t=1618244677;
+        bh=2pjS5ZqasrTBB1xW9gK+Ycx/cZGON+/PMmVlv+QVoXU=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=pqsRJBrtwcIPHD5MQBA2HFmlYcoXiYruU8w6IgBGzIAUvvcNd0LSPUdfuGUDglmws
-         DHt7CndZWbp0dT8sLHKV3hKKx09aiZNQzPbsUTt5z6hABa+9R4ibJBrpHqZmoX230+
-         aVnehEA5+41Em04WlrEeGo8PXXuoKlZyyEjw9W5xat6XNK2AlE9BDrwrOqi65C836g
-         NsWHYrjJlMJlWlvk32w2yX16lEhjucdEz052xNzkKm16W7MpnXwVR0nRNmvcPxRzN5
-         6Qa+wOGrwvWyjtI49mpg4nJSIZq+pqIVTX/lACRMOjq/HS3WgpNVZFscHfnaSD5v32
-         sf8JTBpuM1Prw==
+        b=dMwGZOM1KctDaSLVf3/egl5Ki6sGMHtrTWp35XwCu2qlyj9NDBhMg7jGD9ra52bO1
+         zTKHoiPiCupZPddlQqesS+E3CDHjY4rageN0rffnKZZDQj6TAjfac1bHjm4z9D7Qxq
+         CEg/pFC678Gp2b8cAzo7jtnzQcFCpRtCDeyW3MLSx5qpWtJ4txo3b/7lGNS9Pm0lOS
+         aHv6e40fQWV31zfhOPivruXTWBbSOj/XvBbry2S+G6AfqEnRkM7x/loZxYejkKQSqR
+         AG8t88CMdKhjCwem1PaQl3fHdSa3zZerIUMzf5pRpfn2lNwXlYn31PwIYsELiYar72
+         qDiNXh0J0TrDA==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Alexander Aring <aahringo@redhat.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
         Sasha Levin <sashal@kernel.org>, linux-wpan@vger.kernel.org,
         netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 25/46] net: ieee802154: stop dump llsec keys for monitors
-Date:   Mon, 12 Apr 2021 12:23:40 -0400
-Message-Id: <20210412162401.314035-25-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.10 28/46] net: ieee802154: stop dump llsec devs for monitors
+Date:   Mon, 12 Apr 2021 12:23:43 -0400
+Message-Id: <20210412162401.314035-28-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210412162401.314035-1-sashal@kernel.org>
 References: <20210412162401.314035-1-sashal@kernel.org>
@@ -53,14 +53,14 @@ X-Mailing-List: linux-wpan@vger.kernel.org
 
 From: Alexander Aring <aahringo@redhat.com>
 
-[ Upstream commit fb3c5cdf88cd504ef11d59e8d656f4bc896c6922 ]
+[ Upstream commit 5582d641e6740839c9b83efd1fbf9bcd00b6f5fc ]
 
-This patch stops dumping llsec keys for monitors which we don't support
+This patch stops dumping llsec devs for monitors which we don't support
 yet. Otherwise we will access llsec mib which isn't initialized for
 monitors.
 
 Signed-off-by: Alexander Aring <aahringo@redhat.com>
-Link: https://lore.kernel.org/r/20210405003054.256017-4-aahringo@redhat.com
+Link: https://lore.kernel.org/r/20210405003054.256017-7-aahringo@redhat.com
 Signed-off-by: Stefan Schmidt <stefan@datenfreihafen.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
@@ -68,10 +68,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 5 insertions(+)
 
 diff --git a/net/ieee802154/nl802154.c b/net/ieee802154/nl802154.c
-index dd43aa03200e..c85e4230ec60 100644
+index 9cdc1457c97c..39a81602e5b5 100644
 --- a/net/ieee802154/nl802154.c
 +++ b/net/ieee802154/nl802154.c
-@@ -1493,6 +1493,11 @@ nl802154_dump_llsec_key(struct sk_buff *skb, struct netlink_callback *cb)
+@@ -1672,6 +1672,11 @@ nl802154_dump_llsec_dev(struct sk_buff *skb, struct netlink_callback *cb)
  	if (err)
  		return err;
  
