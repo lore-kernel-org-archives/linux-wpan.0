@@ -7,39 +7,41 @@ X-Spam-Status: No, score=-19.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A90B2C43616
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9F41C4360C
 	for <linux-wpan@archiver.kernel.org>; Mon, 12 Apr 2021 16:36:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9452B6101B
+	by mail.kernel.org (Postfix) with ESMTP id A61DD6138B
 	for <linux-wpan@archiver.kernel.org>; Mon, 12 Apr 2021 16:36:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245296AbhDLQg6 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        id S244675AbhDLQg6 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
         Mon, 12 Apr 2021 12:36:58 -0400
-Received: from mail.kernel.org ([198.145.29.99]:35674 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:37272 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S245105AbhDLQeB (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-        Mon, 12 Apr 2021 12:34:01 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id B0173613CC;
-        Mon, 12 Apr 2021 16:26:50 +0000 (UTC)
+        id S1343626AbhDLQfh (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+        Mon, 12 Apr 2021 12:35:37 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id B0250613CE;
+        Mon, 12 Apr 2021 16:26:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1618244811;
-        bh=qgkCEU+nWLpn9PzoFx7Ncz2ZBYf6M6VMQcu98tEMbsE=;
+        s=k20201202; t=1618244816;
+        bh=ghVp9RGT3BIhb9IiNZFXzVSViS++d/A79zG/PJkR3eI=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=YN7RU3Ta/iQAfyJvBhp6EXvcrpaAkjO/IldWI5wxoxyYNf2kPhGLVCLayOyR1bTye
-         Xp51TMjf7TzIbDhwnnWKi5YWDj2OoD3CLVuAKFnVVzFacbZ7EcbwxcSAePtW7+uSpk
-         D7BHBE+HG7PfgX/b38c4SBy7bWFgv0xLL0hJjwB0/LJeFehw4IOhi3IwHD6NuaBDGm
-         vAPKSwBPvvRQc8GayOuY6l1ajmrjnSw/JWYa54Z25faKqzZk2pWfS5YTSgqkZT96Oj
-         GNgp+iXG5o1hPsTeUSM7NdhGeBBTSgmF9S/JIxwqWC3SKok9MoLP183xyzjtWzCb+o
-         vVcFC4WSlRwHA==
+        b=gCs/FckfUtvWglYh6PNX15u4bNJtexkei8u87/NRsYZPYS71wkHk64WAWspejWG0E
+         2E3/PGjcOH0mgrInv2zRCjJAvM7KnpcHO4cMqA+rx7ozBxRZEAyJfTLF8viaf63uxR
+         NZpb4fZx8ufeJKrWhY9q79KRa7hDj148tpu7cdT0pi/4iQSFwgCiuqNi8tx7EuN1iP
+         cGR2AA2OOKgI0bVCV8+dFtk4ZBok+5Un7R3zPj21UZD0u/qwABFfDU/Q16ThAlEgzm
+         bnqK+vxsO4BgSs2vPwqxaJWGlhXzXVgIli+uryXkJ7BekXdn3jv1qhh3mekUUu6558
+         /olWD+S4mK41A==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Alexander Aring <aahringo@redhat.com>,
+Cc:     Pavel Skripkin <paskripkin@gmail.com>,
+        syzbot+9ec037722d2603a9f52e@syzkaller.appspotmail.com,
+        Alexander Aring <aahringo@redhat.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
         Sasha Levin <sashal@kernel.org>, linux-wpan@vger.kernel.org,
         netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.14 16/25] net: ieee802154: stop dump llsec seclevels for monitors
-Date:   Mon, 12 Apr 2021 12:26:21 -0400
-Message-Id: <20210412162630.315526-16-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.14 20/25] net: mac802154: Fix general protection fault
+Date:   Mon, 12 Apr 2021 12:26:25 -0400
+Message-Id: <20210412162630.315526-20-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210412162630.315526-1-sashal@kernel.org>
 References: <20210412162630.315526-1-sashal@kernel.org>
@@ -51,38 +53,61 @@ Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-From: Alexander Aring <aahringo@redhat.com>
+From: Pavel Skripkin <paskripkin@gmail.com>
 
-[ Upstream commit 4c9b4f55ad1f5a4b6206ac4ea58f273126d21925 ]
+[ Upstream commit 1165affd484889d4986cf3b724318935a0b120d8 ]
 
-This patch stops dumping llsec seclevels for monitors which we don't
-support yet. Otherwise we will access llsec mib which isn't initialized
-for monitors.
+syzbot found general protection fault in crypto_destroy_tfm()[1].
+It was caused by wrong clean up loop in llsec_key_alloc().
+If one of the tfm array members is in IS_ERR() range it will
+cause general protection fault in clean up function [1].
 
-Signed-off-by: Alexander Aring <aahringo@redhat.com>
-Link: https://lore.kernel.org/r/20210405003054.256017-13-aahringo@redhat.com
+Call Trace:
+ crypto_free_aead include/crypto/aead.h:191 [inline] [1]
+ llsec_key_alloc net/mac802154/llsec.c:156 [inline]
+ mac802154_llsec_key_add+0x9e0/0xcc0 net/mac802154/llsec.c:249
+ ieee802154_add_llsec_key+0x56/0x80 net/mac802154/cfg.c:338
+ rdev_add_llsec_key net/ieee802154/rdev-ops.h:260 [inline]
+ nl802154_add_llsec_key+0x3d3/0x560 net/ieee802154/nl802154.c:1584
+ genl_family_rcv_msg_doit+0x228/0x320 net/netlink/genetlink.c:739
+ genl_family_rcv_msg net/netlink/genetlink.c:783 [inline]
+ genl_rcv_msg+0x328/0x580 net/netlink/genetlink.c:800
+ netlink_rcv_skb+0x153/0x420 net/netlink/af_netlink.c:2502
+ genl_rcv+0x24/0x40 net/netlink/genetlink.c:811
+ netlink_unicast_kernel net/netlink/af_netlink.c:1312 [inline]
+ netlink_unicast+0x533/0x7d0 net/netlink/af_netlink.c:1338
+ netlink_sendmsg+0x856/0xd90 net/netlink/af_netlink.c:1927
+ sock_sendmsg_nosec net/socket.c:654 [inline]
+ sock_sendmsg+0xcf/0x120 net/socket.c:674
+ ____sys_sendmsg+0x6e8/0x810 net/socket.c:2350
+ ___sys_sendmsg+0xf3/0x170 net/socket.c:2404
+ __sys_sendmsg+0xe5/0x1b0 net/socket.c:2433
+ do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+
+Signed-off-by: Pavel Skripkin <paskripkin@gmail.com>
+Reported-by: syzbot+9ec037722d2603a9f52e@syzkaller.appspotmail.com
+Acked-by: Alexander Aring <aahringo@redhat.com>
+Link: https://lore.kernel.org/r/20210304152125.1052825-1-paskripkin@gmail.com
 Signed-off-by: Stefan Schmidt <stefan@datenfreihafen.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/ieee802154/nl802154.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ net/mac802154/llsec.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/ieee802154/nl802154.c b/net/ieee802154/nl802154.c
-index 07139905e63e..c47f83bd21df 100644
---- a/net/ieee802154/nl802154.c
-+++ b/net/ieee802154/nl802154.c
-@@ -2039,6 +2039,11 @@ nl802154_dump_llsec_seclevel(struct sk_buff *skb, struct netlink_callback *cb)
- 	if (err)
- 		return err;
+diff --git a/net/mac802154/llsec.c b/net/mac802154/llsec.c
+index 1e1c9b20bab7..ed1b9876d545 100644
+--- a/net/mac802154/llsec.c
++++ b/net/mac802154/llsec.c
+@@ -160,7 +160,7 @@ llsec_key_alloc(const struct ieee802154_llsec_key *template)
+ 	crypto_free_skcipher(key->tfm0);
+ err_tfm:
+ 	for (i = 0; i < ARRAY_SIZE(key->tfm); i++)
+-		if (key->tfm[i])
++		if (!IS_ERR_OR_NULL(key->tfm[i]))
+ 			crypto_free_aead(key->tfm[i]);
  
-+	if (wpan_dev->iftype == NL802154_IFTYPE_MONITOR) {
-+		err = skb->len;
-+		goto out_err;
-+	}
-+
- 	if (!wpan_dev->netdev) {
- 		err = -EINVAL;
- 		goto out_err;
+ 	kzfree(key);
 -- 
 2.30.2
 
