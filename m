@@ -2,188 +2,99 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 239B0C433ED
-	for <linux-wpan@archiver.kernel.org>; Sat, 10 Apr 2021 10:19:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34A17C433B4
+	for <linux-wpan@archiver.kernel.org>; Mon, 12 Apr 2021 10:58:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DFDD46115B
-	for <linux-wpan@archiver.kernel.org>; Sat, 10 Apr 2021 10:19:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EBCCB61074
+	for <linux-wpan@archiver.kernel.org>; Mon, 12 Apr 2021 10:58:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229992AbhDJKTa (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Sat, 10 Apr 2021 06:19:30 -0400
-Received: from mail-io1-f71.google.com ([209.85.166.71]:48756 "EHLO
-        mail-io1-f71.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229943AbhDJKTa (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Sat, 10 Apr 2021 06:19:30 -0400
-Received: by mail-io1-f71.google.com with SMTP id g12so5510438ion.15
-        for <linux-wpan@vger.kernel.org>; Sat, 10 Apr 2021 03:19:16 -0700 (PDT)
+        id S239768AbhDLK7P (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 12 Apr 2021 06:59:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36548 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239697AbhDLK7N (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 12 Apr 2021 06:59:13 -0400
+Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1572DC061574;
+        Mon, 12 Apr 2021 03:58:55 -0700 (PDT)
+Received: by mail-lj1-x22e.google.com with SMTP id a36so3965955ljq.8;
+        Mon, 12 Apr 2021 03:58:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Dp6p0gMd3x2WXvScuMIZoyQe18FTdqYLYhIX49taeDA=;
+        b=huoc3k6DOHXu3TPGdUcKmvoWbYk+TP0aFv2jZnVxgDanJ30IFs9Pfs1a/+4MS3Y/sD
+         4HWslI+beUxY8OzNpT3QtFmK6rI9X/4I0Oj+WCvloec0X5KwVF2OF925qqkl4G8KYRV5
+         MMwFlt6C4qOU83kzRZnz+asWJbW4wMR9T1KF0BHde04sBLTursEw4GmpHnrUQG2QcLQg
+         pvlEJG6Mexhqh3Na3eIJQ+jbp0K+gbr6OXDrGUH5muitIlbCLWK6PzChNumI5to6Uom0
+         EYSdZsR/jfTf+Qm81VG4d7lHomS9FJIgWyWFgHsDRciYMAdq2ffWqyA8dFqNxWXLzqKT
+         g49A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=hgSXG9YBnaSp6Ilz4xmiRDkeX/YTSm22NjoFotcBRY8=;
-        b=TWbCTuKnel4eRjoBtsXBpsKu0fSGUq54lkLtNi/j5Vh0o8pV9AJwGr5/OAy5fsXWoi
-         S+432TvJHWe9Ti6ey4y0gmF5b+k6tGVtxNd4fc9nwnCNlWoHPPVvTrroKdZPtPBQvh4a
-         ALSspzAs64Hm2n1gb0If2FhJJZOn0OAMFz9MZN9gOQaaP8rsGVOkMPGfQPd6vOURmpeW
-         4P4AixhRnrU/hueYYd/BJlT+xOeLMmGoXAGOUKUsHiODffKDznnMx9VlQ2Wc8Ipc/Hcb
-         1jMIBsMyjASDAsv5B+U2kUXkUTeKKuCSIS6Cl0EcHTfZf00M4xUZgx2dUoQd3RlIgxY/
-         jZbw==
-X-Gm-Message-State: AOAM531d2YBCvPLfsM+2C6q63maDKHxib3avgbGiMxGRL+zA6ym3WyyA
-        Lv1y/h3rkUZPA6YW6cmiM3AQbhk3Dke3FdB1sZ/SXFaCKwI/
-X-Google-Smtp-Source: ABdhPJzN+SpBEPIBq7vts6GZVLRlUjiaiDY68lmVWNbRbvt+gnOlT5rwC4Q7qEaedrBqUrhUcpG49AMj3H2Bfk06nPoQGxlIKqJd
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Dp6p0gMd3x2WXvScuMIZoyQe18FTdqYLYhIX49taeDA=;
+        b=mWGixyRSDUQX3EqXGc4NOP6fcMhky6y0vCwlVUE8lkj1a38skQo5PfeShgc+mhKTe8
+         iy+09OZS8/W0ZAg9W6x6OtYHiECptLUhphozapj+qzFYGrUc5XIJB3+xQjdYwl7zmmGZ
+         wY3R0+n7gSiXCHKaSFm6SkC5kYH71xuG9ykgGdV8/Z3i2AOMQkUy63TgH1SW1W5h+qtX
+         svN/P3H9KP+rI9ZqVS7maPR9TkK0Ily9S0z1z3YiwPn7XDjbyKZhalXAGDJmoz5c+1hf
+         19sKOG4d1DbBq19xWbc1jlIzoCQ/vOqrNLDo1U+K43tOL2IBtH4Vb7iBZuOLIEJKa1i6
+         YJgw==
+X-Gm-Message-State: AOAM533AGCk409dNGN3PpgohftwkiB+YmkyFuxZBlL8ulNMdm1SDgkvA
+        pH1nzA3ywMIi9DYcvD/jv3k=
+X-Google-Smtp-Source: ABdhPJw4yuYM4gwVm5IZiH8q/+G1wmoYG1WZJYnhf3o8o9uVM0lccGmML1GIVYv0nzbjpK/ndx6ZfA==
+X-Received: by 2002:a2e:9082:: with SMTP id l2mr1725290ljg.272.1618225133461;
+        Mon, 12 Apr 2021 03:58:53 -0700 (PDT)
+Received: from localhost.localdomain ([94.103.229.90])
+        by smtp.gmail.com with ESMTPSA id g18sm2317167lfr.8.2021.04.12.03.58.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 12 Apr 2021 03:58:53 -0700 (PDT)
+From:   Pavel Skripkin <paskripkin@gmail.com>
+To:     alex.aring@gmail.com, stefan@datenfreihafen.org,
+        davem@davemloft.net
+Cc:     linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Pavel Skripkin <paskripkin@gmail.com>,
+        syzbot+bf8b5834b7ec229487ce@syzkaller.appspotmail.com
+Subject: [PATCH] net: mac802154: fix WARNING in ieee802154_del_device
+Date:   Mon, 12 Apr 2021 13:58:51 +0300
+Message-Id: <20210412105851.24809-1-paskripkin@gmail.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-X-Received: by 2002:a02:69c9:: with SMTP id e192mr1159544jac.143.1618049955851;
- Sat, 10 Apr 2021 03:19:15 -0700 (PDT)
-Date:   Sat, 10 Apr 2021 03:19:15 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000d8f55905bf9b9cbd@google.com>
-Subject: [syzbot] memory leak in skb_clone
-From:   syzbot <syzbot+1f68113fa907bf0695a8@syzkaller.appspotmail.com>
-To:     alex.aring@gmail.com, davem@davemloft.net, kuba@kernel.org,
-        linux-kernel@vger.kernel.org, linux-wpan@vger.kernel.org,
-        netdev@vger.kernel.org, stefan@datenfreihafen.org,
-        syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello,
+syzbot reported WARNING in ieee802154_del_device. The problem
+was in uninitialized mutex. In case of NL802154_IFTYPE_MONITOR
+mutex won't be initialized, but ieee802154_del_device() accessing it.
 
-syzbot found the following issue on:
-
-HEAD commit:    17e7124a Merge tag '5.12-rc6-smb3' of git://git.samba.org/..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=11a62c6ad00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=b8dbd3c72fdc7777
-dashboard link: https://syzkaller.appspot.com/bug?extid=1f68113fa907bf0695a8
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=179321a6d00000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=11922ba1d00000
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+1f68113fa907bf0695a8@syzkaller.appspotmail.com
-
-write to /proc/sys/kernel/softlockup_all_cpu_backtrace failed: No such file or directory
-BUG: memory leak
-unreferenced object 0xffff88810f644600 (size 232):
-  comm "softirq", pid 0, jiffies 4294967032 (age 81.270s)
-  hex dump (first 32 bytes):
-    10 7d 4b 12 81 88 ff ff 10 7d 4b 12 81 88 ff ff  .}K......}K.....
-    00 00 00 00 00 00 00 00 40 7c 4b 12 81 88 ff ff  ........@|K.....
-  backtrace:
-    [<ffffffff83651d4a>] skb_clone+0xaa/0x2b0 net/core/skbuff.c:1496
-    [<ffffffff83fe1b80>] ieee802154_raw_deliver net/ieee802154/socket.c:369 [inline]
-    [<ffffffff83fe1b80>] ieee802154_rcv+0x100/0x340 net/ieee802154/socket.c:1070
-    [<ffffffff8367cc7a>] __netif_receive_skb_one_core+0x6a/0xa0 net/core/dev.c:5384
-    [<ffffffff8367cd07>] __netif_receive_skb+0x27/0xa0 net/core/dev.c:5498
-    [<ffffffff8367cdd9>] netif_receive_skb_internal net/core/dev.c:5603 [inline]
-    [<ffffffff8367cdd9>] netif_receive_skb+0x59/0x260 net/core/dev.c:5662
-    [<ffffffff83fe6302>] ieee802154_deliver_skb net/mac802154/rx.c:29 [inline]
-    [<ffffffff83fe6302>] ieee802154_subif_frame net/mac802154/rx.c:102 [inline]
-    [<ffffffff83fe6302>] __ieee802154_rx_handle_packet net/mac802154/rx.c:212 [inline]
-    [<ffffffff83fe6302>] ieee802154_rx+0x612/0x620 net/mac802154/rx.c:284
-    [<ffffffff83fe59a6>] ieee802154_tasklet_handler+0x86/0xa0 net/mac802154/main.c:35
-    [<ffffffff81232aab>] tasklet_action_common.constprop.0+0x5b/0x100 kernel/softirq.c:557
-    [<ffffffff846000bf>] __do_softirq+0xbf/0x2ab kernel/softirq.c:345
-    [<ffffffff81232f4c>] do_softirq kernel/softirq.c:248 [inline]
-    [<ffffffff81232f4c>] do_softirq+0x5c/0x80 kernel/softirq.c:235
-    [<ffffffff81232fc1>] __local_bh_enable_ip+0x51/0x60 kernel/softirq.c:198
-    [<ffffffff8367a9a4>] local_bh_enable include/linux/bottom_half.h:32 [inline]
-    [<ffffffff8367a9a4>] rcu_read_unlock_bh include/linux/rcupdate.h:745 [inline]
-    [<ffffffff8367a9a4>] __dev_queue_xmit+0x7f4/0xf60 net/core/dev.c:4221
-    [<ffffffff83fe2db4>] raw_sendmsg+0x1f4/0x2b0 net/ieee802154/socket.c:295
-    [<ffffffff8363af16>] sock_sendmsg_nosec net/socket.c:654 [inline]
-    [<ffffffff8363af16>] sock_sendmsg+0x56/0x80 net/socket.c:674
-    [<ffffffff8363deec>] __sys_sendto+0x15c/0x200 net/socket.c:1977
-    [<ffffffff8363dfb6>] __do_sys_sendto net/socket.c:1989 [inline]
-    [<ffffffff8363dfb6>] __se_sys_sendto net/socket.c:1985 [inline]
-    [<ffffffff8363dfb6>] __x64_sys_sendto+0x26/0x30 net/socket.c:1985
-
-BUG: memory leak
-unreferenced object 0xffff88810dae5200 (size 512):
-  comm "syz-executor749", pid 8387, jiffies 4294967560 (age 75.990s)
-  hex dump (first 32 bytes):
-    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-  backtrace:
-    [<ffffffff8364aeff>] kmalloc_reserve net/core/skbuff.c:353 [inline]
-    [<ffffffff8364aeff>] __alloc_skb+0xdf/0x280 net/core/skbuff.c:424
-    [<ffffffff836539e3>] __pskb_copy_fclone+0x73/0x330 net/core/skbuff.c:1601
-    [<ffffffff82ad4213>] __pskb_copy include/linux/skbuff.h:1167 [inline]
-    [<ffffffff82ad4213>] pskb_copy include/linux/skbuff.h:3191 [inline]
-    [<ffffffff82ad4213>] hwsim_hw_xmit+0xd3/0x140 drivers/net/ieee802154/mac802154_hwsim.c:132
-    [<ffffffff83fe63d7>] drv_xmit_async net/mac802154/driver-ops.h:16 [inline]
-    [<ffffffff83fe63d7>] ieee802154_tx+0xc7/0x190 net/mac802154/tx.c:83
-    [<ffffffff83fe65c8>] ieee802154_subif_start_xmit+0x58/0x70 net/mac802154/tx.c:132
-    [<ffffffff83679e31>] __netdev_start_xmit include/linux/netdevice.h:4825 [inline]
-    [<ffffffff83679e31>] netdev_start_xmit include/linux/netdevice.h:4839 [inline]
-    [<ffffffff83679e31>] xmit_one net/core/dev.c:3605 [inline]
-    [<ffffffff83679e31>] dev_hard_start_xmit+0xe1/0x330 net/core/dev.c:3621
-    [<ffffffff8371d125>] sch_direct_xmit+0x1c5/0x500 net/sched/sch_generic.c:313
-    [<ffffffff8371d661>] qdisc_restart net/sched/sch_generic.c:376 [inline]
-    [<ffffffff8371d661>] __qdisc_run+0x201/0x810 net/sched/sch_generic.c:384
-    [<ffffffff8367ad4f>] qdisc_run include/net/pkt_sched.h:136 [inline]
-    [<ffffffff8367ad4f>] qdisc_run include/net/pkt_sched.h:128 [inline]
-    [<ffffffff8367ad4f>] __dev_xmit_skb net/core/dev.c:3807 [inline]
-    [<ffffffff8367ad4f>] __dev_queue_xmit+0xb9f/0xf60 net/core/dev.c:4162
-    [<ffffffff83fe2db4>] raw_sendmsg+0x1f4/0x2b0 net/ieee802154/socket.c:295
-    [<ffffffff8363af16>] sock_sendmsg_nosec net/socket.c:654 [inline]
-    [<ffffffff8363af16>] sock_sendmsg+0x56/0x80 net/socket.c:674
-    [<ffffffff8363deec>] __sys_sendto+0x15c/0x200 net/socket.c:1977
-    [<ffffffff8363dfb6>] __do_sys_sendto net/socket.c:1989 [inline]
-    [<ffffffff8363dfb6>] __se_sys_sendto net/socket.c:1985 [inline]
-    [<ffffffff8363dfb6>] __x64_sys_sendto+0x26/0x30 net/socket.c:1985
-    [<ffffffff842ded2d>] do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
-    [<ffffffff84400068>] entry_SYSCALL_64_after_hwframe+0x44/0xae
-
-BUG: memory leak
-unreferenced object 0xffff88810e079d00 (size 232):
-  comm "softirq", pid 0, jiffies 4294967560 (age 75.990s)
-  hex dump (first 32 bytes):
-    10 71 4b 12 81 88 ff ff 10 71 4b 12 81 88 ff ff  .qK......qK.....
-    00 00 00 00 00 00 00 00 40 70 4b 12 81 88 ff ff  ........@pK.....
-  backtrace:
-    [<ffffffff83651d4a>] skb_clone+0xaa/0x2b0 net/core/skbuff.c:1496
-    [<ffffffff83fe1b80>] ieee802154_raw_deliver net/ieee802154/socket.c:369 [inline]
-    [<ffffffff83fe1b80>] ieee802154_rcv+0x100/0x340 net/ieee802154/socket.c:1070
-    [<ffffffff8367cc7a>] __netif_receive_skb_one_core+0x6a/0xa0 net/core/dev.c:5384
-    [<ffffffff8367cd07>] __netif_receive_skb+0x27/0xa0 net/core/dev.c:5498
-    [<ffffffff8367cdd9>] netif_receive_skb_internal net/core/dev.c:5603 [inline]
-    [<ffffffff8367cdd9>] netif_receive_skb+0x59/0x260 net/core/dev.c:5662
-    [<ffffffff83fe6302>] ieee802154_deliver_skb net/mac802154/rx.c:29 [inline]
-    [<ffffffff83fe6302>] ieee802154_subif_frame net/mac802154/rx.c:102 [inline]
-    [<ffffffff83fe6302>] __ieee802154_rx_handle_packet net/mac802154/rx.c:212 [inline]
-    [<ffffffff83fe6302>] ieee802154_rx+0x612/0x620 net/mac802154/rx.c:284
-    [<ffffffff83fe59a6>] ieee802154_tasklet_handler+0x86/0xa0 net/mac802154/main.c:35
-    [<ffffffff81232aab>] tasklet_action_common.constprop.0+0x5b/0x100 kernel/softirq.c:557
-    [<ffffffff846000bf>] __do_softirq+0xbf/0x2ab kernel/softirq.c:345
-    [<ffffffff81232f4c>] do_softirq kernel/softirq.c:248 [inline]
-    [<ffffffff81232f4c>] do_softirq+0x5c/0x80 kernel/softirq.c:235
-    [<ffffffff81232fc1>] __local_bh_enable_ip+0x51/0x60 kernel/softirq.c:198
-    [<ffffffff8367a9a4>] local_bh_enable include/linux/bottom_half.h:32 [inline]
-    [<ffffffff8367a9a4>] rcu_read_unlock_bh include/linux/rcupdate.h:745 [inline]
-    [<ffffffff8367a9a4>] __dev_queue_xmit+0x7f4/0xf60 net/core/dev.c:4221
-    [<ffffffff83fe2db4>] raw_sendmsg+0x1f4/0x2b0 net/ieee802154/socket.c:295
-    [<ffffffff8363af16>] sock_sendmsg_nosec net/socket.c:654 [inline]
-    [<ffffffff8363af16>] sock_sendmsg+0x56/0x80 net/socket.c:674
-    [<ffffffff8363deec>] __sys_sendto+0x15c/0x200 net/socket.c:1977
-    [<ffffffff8363dfb6>] __do_sys_sendto net/socket.c:1989 [inline]
-    [<ffffffff8363dfb6>] __se_sys_sendto net/socket.c:1985 [inline]
-    [<ffffffff8363dfb6>] __x64_sys_sendto+0x26/0x30 net/socket.c:1985
-
-write to /proc/sys/kernel/hung_task_check_interval_secs failed: No such file or directory
-write to /proc/sys/kernel/softlockup_all_cpu_backtrace failed: No such file or directory
-
-
+Reported-by: syzbot+bf8b5834b7ec229487ce@syzkaller.appspotmail.com
+Signed-off-by: Pavel Skripkin <paskripkin@gmail.com>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ net/mac802154/iface.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-syzbot can test patches for this issue, for details see:
-https://goo.gl/tpsmEJ#testing-patches
+diff --git a/net/mac802154/iface.c b/net/mac802154/iface.c
+index 1cf5ac09edcb..be8d2a02c882 100644
+--- a/net/mac802154/iface.c
++++ b/net/mac802154/iface.c
+@@ -599,6 +599,7 @@ ieee802154_setup_sdata(struct ieee802154_sub_if_data *sdata,
+ 
+ 		break;
+ 	case NL802154_IFTYPE_MONITOR:
++		mutex_init(&sdata->sec_mtx);
+ 		sdata->dev->needs_free_netdev = true;
+ 		sdata->dev->netdev_ops = &mac802154_monitor_ops;
+ 		wpan_dev->promiscuous_mode = true;
+-- 
+2.31.1
+
