@@ -2,112 +2,132 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 057EEC433B4
-	for <linux-wpan@archiver.kernel.org>; Mon, 12 Apr 2021 16:43:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C69DCC433B4
+	for <linux-wpan@archiver.kernel.org>; Mon, 12 Apr 2021 16:53:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DADE761042
-	for <linux-wpan@archiver.kernel.org>; Mon, 12 Apr 2021 16:43:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 95D2D61074
+	for <linux-wpan@archiver.kernel.org>; Mon, 12 Apr 2021 16:53:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244898AbhDLQnj (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 12 Apr 2021 12:43:39 -0400
-Received: from mail.kernel.org ([198.145.29.99]:41032 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S245091AbhDLQh6 (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-        Mon, 12 Apr 2021 12:37:58 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id EDC64613F0;
-        Mon, 12 Apr 2021 16:28:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1618244881;
-        bh=PKWGjn59mD7Mm5VpJQLtqmDQ2WQyPivU4D3AlBj5KVs=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=GUEUF0dYAjCCxRu+6ZZkaieCmXXdT+J7bLwCGVobx7RQbLeWrTbCwNdt9CvfyEJ2P
-         IO2GA/dkHt5a6qoqcwpqN1lbgzU3XwAPBuWhHHZFnqKMqnF9fGE2629Ct75MpRlbEy
-         axwdsa6ut/UE0QPUMDUg2uEzQHJ3+WVEBOj2PgO1Ur8Ayz9nzd9HGNobo/ShtuPTah
-         h0C0324v5E0WjfKgj5qAWygClGOPpNJfoBikzvJhkBcYlHuKU2RZ2HoMpC0xjfjYAA
-         gSNdVMuuay/IzwhWQH6reJVG5JMPg9hNmv0lWWUK3Ai56qubqfNsNA2vG2FbQPsq3D
-         6vaoj+IrAKe4Q==
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Pavel Skripkin <paskripkin@gmail.com>,
-        syzbot+9ec037722d2603a9f52e@syzkaller.appspotmail.com,
-        Alexander Aring <aahringo@redhat.com>,
-        Stefan Schmidt <stefan@datenfreihafen.org>,
-        Sasha Levin <sashal@kernel.org>, linux-wpan@vger.kernel.org,
-        netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.4 19/23] net: mac802154: Fix general protection fault
-Date:   Mon, 12 Apr 2021 12:27:32 -0400
-Message-Id: <20210412162736.316026-19-sashal@kernel.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210412162736.316026-1-sashal@kernel.org>
-References: <20210412162736.316026-1-sashal@kernel.org>
+        id S244207AbhDLQx1 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 12 Apr 2021 12:53:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56946 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1345637AbhDLQrk (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 12 Apr 2021 12:47:40 -0400
+Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F30FFC0610E3;
+        Mon, 12 Apr 2021 09:42:02 -0700 (PDT)
+Received: by mail-lf1-x12f.google.com with SMTP id w8so13941995lfr.0;
+        Mon, 12 Apr 2021 09:42:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=message-id:subject:from:to:cc:date:in-reply-to:references
+         :user-agent:mime-version:content-transfer-encoding;
+        bh=DmUEYaWbsAlR+VYhVgl0qhMHR79e89X0qZWa+1dURuI=;
+        b=OwwF0d5gKiPn94Gi8YtvHotVZxBa6/bCbLbig48/n4GX6hDvPHu+e9W3Hd0Nubbt7f
+         iS87rCkk+3vHISmhMlfTTL3HiQaqk1Q3RniZML/O4LlpsnYplRF2w+KdYTt5GhTd3Siy
+         WzzLeNdrfyXXNF7rdMRTcxguAMyYNtx9j7J2oGYriWZgK2P3odtHNTIstQ9tqoHQl+AJ
+         5VbBe7rxCuERkMgo4e6TNxxfqIB/KvCLFh+N0LRJv1Ag42sbd8RuQvID+/nr4XhQfOn3
+         itwOmIjBsFXwCx2pgMjlGJTg6XVii5ccpY3Qv3GasP0DJfudIiDnJpo2jeZ5nAAueFJH
+         Fi9Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
+         :references:user-agent:mime-version:content-transfer-encoding;
+        bh=DmUEYaWbsAlR+VYhVgl0qhMHR79e89X0qZWa+1dURuI=;
+        b=pFfr9Mz4Z4cFFEKE9im6uXCAUdr/rK7STHQTaNK0UAO2RYGgW8/vTGRDYCLTfC3UNL
+         SJxtORrYLxI7m9X+OtPjoicNvtWtrsaMQz/RZJZwds/LdpNDIvC9xVAt3vIQkBxX00uK
+         Mwp/t4Rhuq9/vT8XhjJNgBjxnnXVMERB5ZexqRyDJiMTRUpupSJE34W2qw8KBqbckSH+
+         RDtKQYW7F3sooEyt93jpGSrtMOkrifTYxvR9nypCl8iiikHIIumXcOUBYCfrgLeszAu8
+         eYtwk7KHjmaqpjzyj2wYQ0iyL3k+T4JElnBUmoOcba4F2gEVNaPcJyWxzgUV165Zp3nw
+         rLlg==
+X-Gm-Message-State: AOAM533zNH1UrYgX6kZdop18QcJ6kqwM4B8c5TxnihcZyxSQuYPJ+xen
+        qQSvAfzCyWPwQCsTUM0X8Bo=
+X-Google-Smtp-Source: ABdhPJw8vslTv3+VDRDH84DU9lTPyMzGBa2PuNznZmKZ0YjMwf68SPcqveSEVnaykL7QSD+/OcSQSQ==
+X-Received: by 2002:a05:6512:31ca:: with SMTP id j10mr20125220lfe.459.1618245721495;
+        Mon, 12 Apr 2021 09:42:01 -0700 (PDT)
+Received: from [192.168.1.11] ([94.103.229.90])
+        by smtp.gmail.com with ESMTPSA id q25sm1434770lfe.163.2021.04.12.09.42.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 12 Apr 2021 09:42:00 -0700 (PDT)
+Message-ID: <dd04fe4401f5e516885798541b6ebb5b0e40892b.camel@gmail.com>
+Subject: Re: [PATCH] net: mac802154: fix WARNING in ieee802154_del_device
+From:   Pavel Skripkin <paskripkin@gmail.com>
+To:     Alexander Aring <alex.aring@gmail.com>
+Cc:     Stefan Schmidt <stefan@datenfreihafen.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-wpan - ML <linux-wpan@vger.kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
+        kernel list <linux-kernel@vger.kernel.org>,
+        syzbot+bf8b5834b7ec229487ce@syzkaller.appspotmail.com
+Date:   Mon, 12 Apr 2021 19:41:58 +0300
+In-Reply-To: <CAB_54W7R6ZmMQQPscc04PhJsGu_uoaVqVx=PAiLrqb4nZqTWzw@mail.gmail.com>
+References: <20210412105851.24809-1-paskripkin@gmail.com>
+         <CAB_54W7R6ZmMQQPscc04PhJsGu_uoaVqVx=PAiLrqb4nZqTWzw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.38.4 
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-From: Pavel Skripkin <paskripkin@gmail.com>
+Hi!
 
-[ Upstream commit 1165affd484889d4986cf3b724318935a0b120d8 ]
+On Mon, 2021-04-12 at 07:45 -0400, Alexander Aring wrote:
+> Hi,
+> 
+> On Mon, 12 Apr 2021 at 06:58, Pavel Skripkin <paskripkin@gmail.com>
+> wrote:
+> > 
+> > syzbot reported WARNING in ieee802154_del_device. The problem
+> > was in uninitialized mutex. In case of NL802154_IFTYPE_MONITOR
+> > mutex won't be initialized, but ieee802154_del_device() accessing
+> > it.
+> > 
+> > Reported-by: syzbot+bf8b5834b7ec229487ce@syzkaller.appspotmail.com
+> > Signed-off-by: Pavel Skripkin <paskripkin@gmail.com>
+> > ---
+> >  net/mac802154/iface.c | 1 +
+> >  1 file changed, 1 insertion(+)
+> > 
+> > diff --git a/net/mac802154/iface.c b/net/mac802154/iface.c
+> > index 1cf5ac09edcb..be8d2a02c882 100644
+> > --- a/net/mac802154/iface.c
+> > +++ b/net/mac802154/iface.c
+> > @@ -599,6 +599,7 @@ ieee802154_setup_sdata(struct
+> > ieee802154_sub_if_data *sdata,
+> > 
+> >                 break;
+> >         case NL802154_IFTYPE_MONITOR:
+> > +               mutex_init(&sdata->sec_mtx);
+> >                 sdata->dev->needs_free_netdev = true;
+> >                 sdata->dev->netdev_ops = &mac802154_monitor_ops;
+> >                 wpan_dev->promiscuous_mode = true;
+> 
+> yes that will fix the issue, but will let the user notify that
+> setting
+> any security setting is supported by monitors which is not the case.
+> There are patches around which should return -EOPNOTSUPP for
+> monitors.
+> However we might support it in future to let the kernel encrypt air
+> frames, but this isn't supported yet and the user should be aware
+> that
+> it isn't.
+> 
 
-syzbot found general protection fault in crypto_destroy_tfm()[1].
-It was caused by wrong clean up loop in llsec_key_alloc().
-If one of the tfm array members is in IS_ERR() range it will
-cause general protection fault in clean up function [1].
+Thank you for your feedback. I am still not familiar with net internals
+yet :) Next time I ll try to go deeper. Thanks!
 
-Call Trace:
- crypto_free_aead include/crypto/aead.h:191 [inline] [1]
- llsec_key_alloc net/mac802154/llsec.c:156 [inline]
- mac802154_llsec_key_add+0x9e0/0xcc0 net/mac802154/llsec.c:249
- ieee802154_add_llsec_key+0x56/0x80 net/mac802154/cfg.c:338
- rdev_add_llsec_key net/ieee802154/rdev-ops.h:260 [inline]
- nl802154_add_llsec_key+0x3d3/0x560 net/ieee802154/nl802154.c:1584
- genl_family_rcv_msg_doit+0x228/0x320 net/netlink/genetlink.c:739
- genl_family_rcv_msg net/netlink/genetlink.c:783 [inline]
- genl_rcv_msg+0x328/0x580 net/netlink/genetlink.c:800
- netlink_rcv_skb+0x153/0x420 net/netlink/af_netlink.c:2502
- genl_rcv+0x24/0x40 net/netlink/genetlink.c:811
- netlink_unicast_kernel net/netlink/af_netlink.c:1312 [inline]
- netlink_unicast+0x533/0x7d0 net/netlink/af_netlink.c:1338
- netlink_sendmsg+0x856/0xd90 net/netlink/af_netlink.c:1927
- sock_sendmsg_nosec net/socket.c:654 [inline]
- sock_sendmsg+0xcf/0x120 net/socket.c:674
- ____sys_sendmsg+0x6e8/0x810 net/socket.c:2350
- ___sys_sendmsg+0xf3/0x170 net/socket.c:2404
- __sys_sendmsg+0xe5/0x1b0 net/socket.c:2433
- do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
- entry_SYSCALL_64_after_hwframe+0x44/0xae
+> - Alex
 
-Signed-off-by: Pavel Skripkin <paskripkin@gmail.com>
-Reported-by: syzbot+9ec037722d2603a9f52e@syzkaller.appspotmail.com
-Acked-by: Alexander Aring <aahringo@redhat.com>
-Link: https://lore.kernel.org/r/20210304152125.1052825-1-paskripkin@gmail.com
-Signed-off-by: Stefan Schmidt <stefan@datenfreihafen.org>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- net/mac802154/llsec.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+With regards,
+Pavel Skripkin
 
-diff --git a/net/mac802154/llsec.c b/net/mac802154/llsec.c
-index a13d02b7cee4..55ed8a97b33f 100644
---- a/net/mac802154/llsec.c
-+++ b/net/mac802154/llsec.c
-@@ -158,7 +158,7 @@ llsec_key_alloc(const struct ieee802154_llsec_key *template)
- 	crypto_free_blkcipher(key->tfm0);
- err_tfm:
- 	for (i = 0; i < ARRAY_SIZE(key->tfm); i++)
--		if (key->tfm[i])
-+		if (!IS_ERR_OR_NULL(key->tfm[i]))
- 			crypto_free_aead(key->tfm[i]);
- 
- 	kzfree(key);
--- 
-2.30.2
 
