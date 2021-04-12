@@ -4,43 +4,42 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-19.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CC07C43460
-	for <linux-wpan@archiver.kernel.org>; Mon, 12 Apr 2021 16:33:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F815C43460
+	for <linux-wpan@archiver.kernel.org>; Mon, 12 Apr 2021 16:33:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2E7A86128E
-	for <linux-wpan@archiver.kernel.org>; Mon, 12 Apr 2021 16:33:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 596FE6134F
+	for <linux-wpan@archiver.kernel.org>; Mon, 12 Apr 2021 16:33:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244681AbhDLQd1 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 12 Apr 2021 12:33:27 -0400
-Received: from mail.kernel.org ([198.145.29.99]:35580 "EHLO mail.kernel.org"
+        id S245014AbhDLQdm (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 12 Apr 2021 12:33:42 -0400
+Received: from mail.kernel.org ([198.145.29.99]:37276 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S244916AbhDLQbZ (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-        Mon, 12 Apr 2021 12:31:25 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id C6EC0613B3;
-        Mon, 12 Apr 2021 16:26:02 +0000 (UTC)
+        id S245063AbhDLQbj (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+        Mon, 12 Apr 2021 12:31:39 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id E12C8613A8;
+        Mon, 12 Apr 2021 16:26:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1618244763;
-        bh=2FUckz8Yv4S0+gUrRdU495vyUV/4kGWDtk4hns+sF9A=;
+        s=k20201202; t=1618244771;
+        bh=Voh8y93ylmYb0hpiuVCM2v210dVWOSiD+VcoCZTIfQQ=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=n+JMFz51gz2C/L5Gch/834DSJJw43jeL5RAq9BgFQe2AaWD4K0l3MoU/dgJhEr5xA
-         qlNXuq1/uhXvtJJXGzkBrg03nLJakWxg2cnq+J1ScLIwHmAwoNEZzzXBH+fhZs2/gZ
-         rYY4rTgqSV7h+RYT/gYDFzJV7OGcLyuu0JLXF0nEMEsKHEnbNaU4x9+6f56R7x+5uw
-         dHt5tfzAt7z7VfEjgXPx/RAezcW+NXgPk1hp7YJIIzzGK+sMtwTqEgyp22nYhlp4uJ
-         toiGnz8k7Am3yo28kMgstc4/zmd/zorfydybiKMirPAjWseMVygIiYoN3Wud5vuIJJ
-         OKtxawGjTkpeA==
+        b=XN1q46ZNhKXasW40eh00ykvraooFU1t9cKuMzHXPf7VzBt/x8noADrhjRnXU7fch5
+         +i5hVtmP90nFba2VG+dxTHJzGFh9YU9pB8myG/m7q4rp9oaz2VYS9RSb3uy3Hu/SCo
+         cphNedXfh6REY7Xny0wB9iMtKRitGAKpquZoWD4EJtgdbKElv+UCZ8Kq9DlUJI7twc
+         etizY9/yH7Qi5of0PtME4CZilXdgVqd0RyC1ClNZeIXUIlZDYxxCUffR1VtWlQIKbT
+         qaWYCQasyNXImDgi8Ph1iFjuMB9o4BydmbtfJvsyrPxIJRFLlXu/8GG/lGXrItlGFw
+         wsf8sehCMFP7Q==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Pavel Skripkin <paskripkin@gmail.com>,
-        syzbot+28a246747e0a465127f3@syzkaller.appspotmail.com,
-        "David S . Miller" <davem@davemloft.net>,
+Cc:     Alexander Aring <aahringo@redhat.com>,
+        Stefan Schmidt <stefan@datenfreihafen.org>,
         Sasha Levin <sashal@kernel.org>, linux-wpan@vger.kernel.org,
         netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 08/28] drivers: net: fix memory leak in atusb_probe
-Date:   Mon, 12 Apr 2021 12:25:33 -0400
-Message-Id: <20210412162553.315227-8-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 14/28] net: ieee802154: stop dump llsec keys for monitors
+Date:   Mon, 12 Apr 2021 12:25:39 -0400
+Message-Id: <20210412162553.315227-14-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210412162553.315227-1-sashal@kernel.org>
 References: <20210412162553.315227-1-sashal@kernel.org>
@@ -52,41 +51,38 @@ Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-From: Pavel Skripkin <paskripkin@gmail.com>
+From: Alexander Aring <aahringo@redhat.com>
 
-[ Upstream commit 6b9fbe16955152626557ec6f439f3407b7769941 ]
+[ Upstream commit fb3c5cdf88cd504ef11d59e8d656f4bc896c6922 ]
 
-syzbot reported memory leak in atusb_probe()[1].
-The problem was in atusb_alloc_urbs().
-Since urb is anchored, we need to release the reference
-to correctly free the urb
+This patch stops dumping llsec keys for monitors which we don't support
+yet. Otherwise we will access llsec mib which isn't initialized for
+monitors.
 
-backtrace:
-    [<ffffffff82ba0466>] kmalloc include/linux/slab.h:559 [inline]
-    [<ffffffff82ba0466>] usb_alloc_urb+0x66/0xe0 drivers/usb/core/urb.c:74
-    [<ffffffff82ad3888>] atusb_alloc_urbs drivers/net/ieee802154/atusb.c:362 [inline][2]
-    [<ffffffff82ad3888>] atusb_probe+0x158/0x820 drivers/net/ieee802154/atusb.c:1038 [1]
-
-Reported-by: syzbot+28a246747e0a465127f3@syzkaller.appspotmail.com
-Signed-off-by: Pavel Skripkin <paskripkin@gmail.com>
-Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Alexander Aring <aahringo@redhat.com>
+Link: https://lore.kernel.org/r/20210405003054.256017-4-aahringo@redhat.com
+Signed-off-by: Stefan Schmidt <stefan@datenfreihafen.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/ieee802154/atusb.c | 1 +
- 1 file changed, 1 insertion(+)
+ net/ieee802154/nl802154.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/drivers/net/ieee802154/atusb.c b/drivers/net/ieee802154/atusb.c
-index 078027bbe002..a2b876abb03b 100644
---- a/drivers/net/ieee802154/atusb.c
-+++ b/drivers/net/ieee802154/atusb.c
-@@ -368,6 +368,7 @@ static int atusb_alloc_urbs(struct atusb *atusb, int n)
- 			return -ENOMEM;
- 		}
- 		usb_anchor_urb(urb, &atusb->idle_urbs);
-+		usb_free_urb(urb);
- 		n--;
- 	}
- 	return 0;
+diff --git a/net/ieee802154/nl802154.c b/net/ieee802154/nl802154.c
+index e07624fd8b3b..8ca3a83b260a 100644
+--- a/net/ieee802154/nl802154.c
++++ b/net/ieee802154/nl802154.c
+@@ -1511,6 +1511,11 @@ nl802154_dump_llsec_key(struct sk_buff *skb, struct netlink_callback *cb)
+ 	if (err)
+ 		return err;
+ 
++	if (wpan_dev->iftype == NL802154_IFTYPE_MONITOR) {
++		err = skb->len;
++		goto out_err;
++	}
++
+ 	if (!wpan_dev->netdev) {
+ 		err = -EINVAL;
+ 		goto out_err;
 -- 
 2.30.2
 
