@@ -7,43 +7,41 @@ X-Spam-Status: No, score=-19.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A94F0C43460
-	for <linux-wpan@archiver.kernel.org>; Mon, 12 Apr 2021 16:31:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30472C433ED
+	for <linux-wpan@archiver.kernel.org>; Mon, 12 Apr 2021 16:31:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 879DC61288
-	for <linux-wpan@archiver.kernel.org>; Mon, 12 Apr 2021 16:31:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DF44A61287
+	for <linux-wpan@archiver.kernel.org>; Mon, 12 Apr 2021 16:31:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244546AbhDLQbx (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 12 Apr 2021 12:31:53 -0400
-Received: from mail.kernel.org ([198.145.29.99]:57488 "EHLO mail.kernel.org"
+        id S244571AbhDLQb4 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 12 Apr 2021 12:31:56 -0400
+Received: from mail.kernel.org ([198.145.29.99]:35662 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S245113AbhDLQ3i (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-        Mon, 12 Apr 2021 12:29:38 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 94CCB61355;
-        Mon, 12 Apr 2021 16:25:40 +0000 (UTC)
+        id S245184AbhDLQ3z (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+        Mon, 12 Apr 2021 12:29:55 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 846CC6135C;
+        Mon, 12 Apr 2021 16:25:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1618244741;
-        bh=X9P2DvyyH6TJKlkYDHxyo8R/S4pAm5T6q8oC4Vknip8=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=j5C5/N0y51HQKCEEH7SbDlqW123N4lh4cQdHj1AwQYvUZO6FHMtHCtzOIjNyrTPHV
-         k3tB2Zyrj/tQRxTjo3iPLC2FMexiA8q/FZT1GrKoMso18wy8pQEoszUOCdEOHeTpAj
-         pKPccykw/u5jfxnhi/WpgTXUQcRElvhTd4JBWyqGiWwB9UZQhqGj26N+n9h1SntSQl
-         bewqmVbwe7OKB1DwN/Ic6LnkRCgpkykYDQYPi+dDtwSt1PtuXN0PtQ/ApAxLRXDouZ
-         KQNF0wzSF9Lz+9FcK2OrabxmeKyLseAMGEYErkJ02dJiVBQmSHA6vvscPz3z9A+wjR
-         LyyPJWpOJG6vA==
+        s=k20201202; t=1618244755;
+        bh=nkH7xThCyOmnPCpcc/xlAl5WT+HcSRCGoCaTMMxeiEA=;
+        h=From:To:Cc:Subject:Date:From;
+        b=HmaMrQ/ohn/mnVLGUxQY+AcaP1Rg6S4+bmy+9+Fl342gUIyM3iHtQIKOMXaCmRyNs
+         A41LSap4Wb+Vw0EiGrlXv3cesyVaHxJZe1y1kv6t49Gu/J/62Uew4Un+maBq/QY7Tq
+         IFKN1FdinYxHaBBAJJwZjofqZOi5zfmoIH6aaLE9mIGJdLlJlz9y6VujZz43sUUX1Q
+         //ST1LGqKbp956/nBRrd/WrTAUunZjrFNaDiqm83hZVNltdy8wAclyPO6NfzUoDCAv
+         A54YgV7z8EHKR0DEQ7COH6X6ZEplvsszYn0eWLsqt4w48KAYxNsTYdyGL83fHyetbd
+         nCnV3rUZ2EGfw==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Alexander Aring <aahringo@redhat.com>,
-        syzbot+fbf4fc11a819824e027b@syzkaller.appspotmail.com,
+        syzbot+d4c07de0144f6f63be3a@syzkaller.appspotmail.com,
         Stefan Schmidt <stefan@datenfreihafen.org>,
         Sasha Levin <sashal@kernel.org>, linux-wpan@vger.kernel.org,
         netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 31/39] net: ieee802154: forbid monitor for del llsec seclevel
-Date:   Mon, 12 Apr 2021 12:24:53 -0400
-Message-Id: <20210412162502.314854-31-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 01/28] net: ieee802154: nl-mac: fix check on panid
+Date:   Mon, 12 Apr 2021 12:25:26 -0400
+Message-Id: <20210412162553.315227-1-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210412162502.314854-1-sashal@kernel.org>
-References: <20210412162502.314854-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -54,35 +52,45 @@ X-Mailing-List: linux-wpan@vger.kernel.org
 
 From: Alexander Aring <aahringo@redhat.com>
 
-[ Upstream commit 9dde130937e95b72adfae64ab21d6e7e707e2dac ]
+[ Upstream commit 6f7f657f24405f426212c09260bf7fe8a52cef33 ]
 
-This patch forbids to del llsec seclevel for monitor interfaces which we
-don't support yet. Otherwise we will access llsec mib which isn't
-initialized for monitors.
+This patch fixes a null pointer derefence for panid handle by move the
+check for the netlink variable directly before accessing them.
 
-Reported-by: syzbot+fbf4fc11a819824e027b@syzkaller.appspotmail.com
+Reported-by: syzbot+d4c07de0144f6f63be3a@syzkaller.appspotmail.com
 Signed-off-by: Alexander Aring <aahringo@redhat.com>
-Link: https://lore.kernel.org/r/20210405003054.256017-15-aahringo@redhat.com
+Link: https://lore.kernel.org/r/20210228151817.95700-4-aahringo@redhat.com
 Signed-off-by: Stefan Schmidt <stefan@datenfreihafen.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/ieee802154/nl802154.c | 3 +++
- 1 file changed, 3 insertions(+)
+ net/ieee802154/nl-mac.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/net/ieee802154/nl802154.c b/net/ieee802154/nl802154.c
-index 898982b51363..d9f05390144e 100644
---- a/net/ieee802154/nl802154.c
-+++ b/net/ieee802154/nl802154.c
-@@ -2149,6 +2149,9 @@ static int nl802154_del_llsec_seclevel(struct sk_buff *skb,
- 	struct wpan_dev *wpan_dev = dev->ieee802154_ptr;
- 	struct ieee802154_llsec_seclevel sl;
+diff --git a/net/ieee802154/nl-mac.c b/net/ieee802154/nl-mac.c
+index d3cbb3258718..c0930b9fe848 100644
+--- a/net/ieee802154/nl-mac.c
++++ b/net/ieee802154/nl-mac.c
+@@ -559,9 +559,7 @@ ieee802154_llsec_parse_key_id(struct genl_info *info,
+ 	desc->mode = nla_get_u8(info->attrs[IEEE802154_ATTR_LLSEC_KEY_MODE]);
  
-+	if (wpan_dev->iftype == NL802154_IFTYPE_MONITOR)
-+		return -EOPNOTSUPP;
+ 	if (desc->mode == IEEE802154_SCF_KEY_IMPLICIT) {
+-		if (!info->attrs[IEEE802154_ATTR_PAN_ID] &&
+-		    !(info->attrs[IEEE802154_ATTR_SHORT_ADDR] ||
+-		      info->attrs[IEEE802154_ATTR_HW_ADDR]))
++		if (!info->attrs[IEEE802154_ATTR_PAN_ID])
+ 			return -EINVAL;
+ 
+ 		desc->device_addr.pan_id = nla_get_shortaddr(info->attrs[IEEE802154_ATTR_PAN_ID]);
+@@ -570,6 +568,9 @@ ieee802154_llsec_parse_key_id(struct genl_info *info,
+ 			desc->device_addr.mode = IEEE802154_ADDR_SHORT;
+ 			desc->device_addr.short_addr = nla_get_shortaddr(info->attrs[IEEE802154_ATTR_SHORT_ADDR]);
+ 		} else {
++			if (!info->attrs[IEEE802154_ATTR_HW_ADDR])
++				return -EINVAL;
 +
- 	if (!info->attrs[NL802154_ATTR_SEC_LEVEL] ||
- 	    llsec_parse_seclevel(info->attrs[NL802154_ATTR_SEC_LEVEL],
- 				 &sl) < 0)
+ 			desc->device_addr.mode = IEEE802154_ADDR_LONG;
+ 			desc->device_addr.extended_addr = nla_get_hwaddr(info->attrs[IEEE802154_ATTR_HW_ADDR]);
+ 		}
 -- 
 2.30.2
 
