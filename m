@@ -7,40 +7,40 @@ X-Spam-Status: No, score=-19.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D42DAC43470
-	for <linux-wpan@archiver.kernel.org>; Mon, 12 Apr 2021 16:24:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 456BFC43611
+	for <linux-wpan@archiver.kernel.org>; Mon, 12 Apr 2021 16:24:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A7F0A6136B
-	for <linux-wpan@archiver.kernel.org>; Mon, 12 Apr 2021 16:24:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 258336137F
+	for <linux-wpan@archiver.kernel.org>; Mon, 12 Apr 2021 16:24:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243679AbhDLQYm (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 12 Apr 2021 12:24:42 -0400
-Received: from mail.kernel.org ([198.145.29.99]:56822 "EHLO mail.kernel.org"
+        id S243708AbhDLQYq (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 12 Apr 2021 12:24:46 -0400
+Received: from mail.kernel.org ([198.145.29.99]:56864 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S243804AbhDLQYX (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-        Mon, 12 Apr 2021 12:24:23 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id DA54061287;
-        Mon, 12 Apr 2021 16:24:03 +0000 (UTC)
+        id S237798AbhDLQYY (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+        Mon, 12 Apr 2021 12:24:24 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 40DD661360;
+        Mon, 12 Apr 2021 16:24:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1618244644;
-        bh=krV1K4j+48ccwbbz7TQE71hv/SiAMhVAAlfz7lT4FYk=;
+        s=k20201202; t=1618244646;
+        bh=DI0VEFHBCT3xzKTXZtshWBdtdhwSd3fpK4WQObPT7Mw=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=pcceZK38Jo1Iko/ic3/XZqUWcH2V9KJvHkn4s1A+aJHNmmez3XmbzgK2hZKXhSriu
-         eLG99mzerbhP84HWocClSac6M8b0QgbX4kuNL2V9q0OD2bv6eGsiS1jcmwmgQGDQoE
-         e/tMFlH5ntxq+Y+do5+Nqltik3nMb1DLYc4NqnvUphDUUeWG/NTEYUflrSChiiDiIw
-         9XQQK2cD3L3RjJ7MbwiPZfMQp6GDhTXIwSNsiOa7Fn3Adfrk/ik8LQvCD7C0MX5lX/
-         Ico7WX97W9a5XXt67wErl5lrEX5MMaV9AaoICsNtcunSvPcWk23xkvKIR9OrymnC3o
-         hiQ/FSPfcPg0g==
+        b=SavNuI/jFdYJz0e3QtvGhcz1TkPo7WzHlhXeKk/rtngc6VdIDyhjghL02zWcWs1qA
+         W9knZXLBxRD/pN562kKktzSlgPMrALUvC4jQsgepxYshnOrAcchJRs8malaRLukiN9
+         +GnfFtCThxZ6Bx/RHEUOhsF0vpR3WwuWkrUj7heDrxX32AtkgK/WqaHK6Frv6UKnWI
+         J3z7fAagSMhjD4AlHbJfJKKDjxOVUOpAug3l88xLO4+1awEsDoXu3hxxxOCPQlm8qR
+         wW0LNonXR5CxZk8W1CqNEWoWNV6NmM3VjwSioqy4KyypgkjH8tra6elSu3S7MDYpjT
+         0f9yNogeyBgew==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Alexander Aring <aahringo@redhat.com>,
-        syzbot+d946223c2e751d136c94@syzkaller.appspotmail.com,
+        syzbot+ce4e062c2d51977ddc50@syzkaller.appspotmail.com,
         Stefan Schmidt <stefan@datenfreihafen.org>,
         Sasha Levin <sashal@kernel.org>, linux-wpan@vger.kernel.org,
         netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 02/46] net: ieee802154: fix nl802154 del llsec dev
-Date:   Mon, 12 Apr 2021 12:23:17 -0400
-Message-Id: <20210412162401.314035-2-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.10 03/46] net: ieee802154: fix nl802154 add llsec key
+Date:   Mon, 12 Apr 2021 12:23:18 -0400
+Message-Id: <20210412162401.314035-3-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210412162401.314035-1-sashal@kernel.org>
 References: <20210412162401.314035-1-sashal@kernel.org>
@@ -54,14 +54,14 @@ X-Mailing-List: linux-wpan@vger.kernel.org
 
 From: Alexander Aring <aahringo@redhat.com>
 
-[ Upstream commit 3d1eac2f45585690d942cf47fd7fbd04093ebd1b ]
+[ Upstream commit 20d5fe2d7103f5c43ad11a3d6d259e9d61165c35 ]
 
-This patch fixes a nullpointer dereference if NL802154_ATTR_SEC_DEVICE is
+This patch fixes a nullpointer dereference if NL802154_ATTR_SEC_KEY is
 not set by the user. If this is the case nl802154 will return -EINVAL.
 
-Reported-by: syzbot+d946223c2e751d136c94@syzkaller.appspotmail.com
+Reported-by: syzbot+ce4e062c2d51977ddc50@syzkaller.appspotmail.com
 Signed-off-by: Alexander Aring <aahringo@redhat.com>
-Link: https://lore.kernel.org/r/20210221174321.14210-2-aahringo@redhat.com
+Link: https://lore.kernel.org/r/20210221174321.14210-3-aahringo@redhat.com
 Signed-off-by: Stefan Schmidt <stefan@datenfreihafen.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
@@ -69,19 +69,19 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/net/ieee802154/nl802154.c b/net/ieee802154/nl802154.c
-index 2f0a138bd5eb..063b12cba71f 100644
+index 063b12cba71f..3f6d86d63923 100644
 --- a/net/ieee802154/nl802154.c
 +++ b/net/ieee802154/nl802154.c
-@@ -1758,7 +1758,8 @@ static int nl802154_del_llsec_dev(struct sk_buff *skb, struct genl_info *info)
- 	struct nlattr *attrs[NL802154_DEV_ATTR_MAX + 1];
- 	__le64 extended_addr;
+@@ -1544,7 +1544,8 @@ static int nl802154_add_llsec_key(struct sk_buff *skb, struct genl_info *info)
+ 	struct ieee802154_llsec_key_id id = { };
+ 	u32 commands[NL802154_CMD_FRAME_NR_IDS / 32] = { };
  
--	if (nla_parse_nested_deprecated(attrs, NL802154_DEV_ATTR_MAX, info->attrs[NL802154_ATTR_SEC_DEVICE], nl802154_dev_policy, info->extack))
-+	if (!info->attrs[NL802154_ATTR_SEC_DEVICE] ||
-+	    nla_parse_nested_deprecated(attrs, NL802154_DEV_ATTR_MAX, info->attrs[NL802154_ATTR_SEC_DEVICE], nl802154_dev_policy, info->extack))
+-	if (nla_parse_nested_deprecated(attrs, NL802154_KEY_ATTR_MAX, info->attrs[NL802154_ATTR_SEC_KEY], nl802154_key_policy, info->extack))
++	if (!info->attrs[NL802154_ATTR_SEC_KEY] ||
++	    nla_parse_nested_deprecated(attrs, NL802154_KEY_ATTR_MAX, info->attrs[NL802154_ATTR_SEC_KEY], nl802154_key_policy, info->extack))
  		return -EINVAL;
  
- 	if (!attrs[NL802154_DEV_ATTR_EXTENDED_ADDR])
+ 	if (!attrs[NL802154_KEY_ATTR_USAGE_FRAMES] ||
 -- 
 2.30.2
 
