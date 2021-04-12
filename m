@@ -7,39 +7,39 @@ X-Spam-Status: No, score=-19.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CAB27C43618
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8311BC43600
 	for <linux-wpan@archiver.kernel.org>; Mon, 12 Apr 2021 16:36:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B94036101B
+	by mail.kernel.org (Postfix) with ESMTP id 5CCE36101B
 	for <linux-wpan@archiver.kernel.org>; Mon, 12 Apr 2021 16:36:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244456AbhDLQg6 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 12 Apr 2021 12:36:58 -0400
-Received: from mail.kernel.org ([198.145.29.99]:38772 "EHLO mail.kernel.org"
+        id S245217AbhDLQg5 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 12 Apr 2021 12:36:57 -0400
+Received: from mail.kernel.org ([198.145.29.99]:35670 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S245421AbhDLQeT (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-        Mon, 12 Apr 2021 12:34:19 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id D9ECC613D3;
-        Mon, 12 Apr 2021 16:26:51 +0000 (UTC)
+        id S245103AbhDLQeB (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+        Mon, 12 Apr 2021 12:34:01 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 76879613CD;
+        Mon, 12 Apr 2021 16:26:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1618244812;
-        bh=jg1qQhWF9uBukkVmaeh1ltTMWssWijDjIOBMESgcPiM=;
+        s=k20201202; t=1618244810;
+        bh=3bgBpdWtx7URtqSsxm+WZoyWoK8X5xD+e/jneOPoXZs=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=uKtQzcph2ZjbfnfVHIlDRzWPs7KhkX5t+RiuwfrB8UQrtgKzaFuxE2BW+EHdC2hG2
-         RQ9MbrZ+QFHX+3/H60HHPGIOITYoLpct671g3xsNuTR1ZUma4pmeefvosufjSKTqCX
-         jmwBMFjcgDg5mWM1ViimFyJ1CSBJMWIK39Xo4KcGjxoHznmbu4dNzxBTqe0TXOYgJg
-         sxpfhkWrNH4/XrTtU4mazmnnOplsxc3/dNPc8zjM5dmIZOwh/OBJta3Ijv5Um4DApT
-         eWRZTUXXfmG6eS7xnsdeLe8sEgSzAXcivc0L86NBghSEWl1/4DTzkh3ByIRhf+1yB3
-         BYsfw0NKLUUfA==
+        b=aCeQfuqDvkvN/IfBDBDo5GMDvf0WD6y6AX5qDfuKjaNDFBNCMHoZgLKUsIA/xyqyf
+         HCl/RgXv1Xlaie58OeOWHoT57koSqajvRqFokdEc0axSTq4hEaINmcRlR+ZREzw7e7
+         dX2BohuxUMuCQQVlSYHk4rrUfx9tLOU8ScYNZHJHDIO64tU6oo1Tdoa4WXQzVagZ/q
+         V85UNjxLolV77gGVuupT7BVoXmiagcB/uUQ3CLy03yD7V7TUzrgxWE/rr02DxH0pU4
+         k44+cL+3cgGLLXnnD4wYAVswOmc1N65/kvVFi5xt3offOzx7zRy927BLmEjOOJdRQO
+         EDNVbreOo9inw==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Alexander Aring <aahringo@redhat.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
         Sasha Levin <sashal@kernel.org>, linux-wpan@vger.kernel.org,
         netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.14 17/25] net: ieee802154: forbid monitor for add llsec seclevel
-Date:   Mon, 12 Apr 2021 12:26:22 -0400
-Message-Id: <20210412162630.315526-17-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.14 15/25] net: ieee802154: forbid monitor for add llsec devkey
+Date:   Mon, 12 Apr 2021 12:26:20 -0400
+Message-Id: <20210412162630.315526-15-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210412162630.315526-1-sashal@kernel.org>
 References: <20210412162630.315526-1-sashal@kernel.org>
@@ -53,14 +53,14 @@ X-Mailing-List: linux-wpan@vger.kernel.org
 
 From: Alexander Aring <aahringo@redhat.com>
 
-[ Upstream commit 9ec87e322428d4734ac647d1a8e507434086993d ]
+[ Upstream commit a347b3b394868fef15b16f143719df56184be81d ]
 
-This patch forbids to add llsec seclevel for monitor interfaces which we
+This patch forbids to add llsec devkey for monitor interfaces which we
 don't support yet. Otherwise we will access llsec mib which isn't
 initialized for monitors.
 
 Signed-off-by: Alexander Aring <aahringo@redhat.com>
-Link: https://lore.kernel.org/r/20210405003054.256017-14-aahringo@redhat.com
+Link: https://lore.kernel.org/r/20210405003054.256017-11-aahringo@redhat.com
 Signed-off-by: Stefan Schmidt <stefan@datenfreihafen.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
@@ -68,19 +68,19 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 3 insertions(+)
 
 diff --git a/net/ieee802154/nl802154.c b/net/ieee802154/nl802154.c
-index c47f83bd21df..8cf71f637ead 100644
+index b770837b3379..07139905e63e 100644
 --- a/net/ieee802154/nl802154.c
 +++ b/net/ieee802154/nl802154.c
-@@ -2129,6 +2129,9 @@ static int nl802154_add_llsec_seclevel(struct sk_buff *skb,
- 	struct wpan_dev *wpan_dev = dev->ieee802154_ptr;
- 	struct ieee802154_llsec_seclevel sl;
+@@ -1928,6 +1928,9 @@ static int nl802154_add_llsec_devkey(struct sk_buff *skb, struct genl_info *info
+ 	struct ieee802154_llsec_device_key key;
+ 	__le64 extended_addr;
  
 +	if (wpan_dev->iftype == NL802154_IFTYPE_MONITOR)
 +		return -EOPNOTSUPP;
 +
- 	if (llsec_parse_seclevel(info->attrs[NL802154_ATTR_SEC_LEVEL],
- 				 &sl) < 0)
- 		return -EINVAL;
+ 	if (!info->attrs[NL802154_ATTR_SEC_DEVKEY] ||
+ 	    nla_parse_nested(attrs, NL802154_DEVKEY_ATTR_MAX,
+ 			     info->attrs[NL802154_ATTR_SEC_DEVKEY],
 -- 
 2.30.2
 
