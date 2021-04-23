@@ -2,75 +2,84 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB824C433ED
-	for <linux-wpan@archiver.kernel.org>; Fri, 23 Apr 2021 04:18:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02AA7C433B4
+	for <linux-wpan@archiver.kernel.org>; Fri, 23 Apr 2021 13:25:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A802461041
-	for <linux-wpan@archiver.kernel.org>; Fri, 23 Apr 2021 04:18:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BF4A86145A
+	for <linux-wpan@archiver.kernel.org>; Fri, 23 Apr 2021 13:25:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235511AbhDWESr (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Fri, 23 Apr 2021 00:18:47 -0400
-Received: from sender4-op-o14.zoho.com ([136.143.188.14]:17473 "EHLO
-        sender4-op-o14.zoho.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229456AbhDWESr (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Fri, 23 Apr 2021 00:18:47 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1619150552; cv=none; 
-        d=zohomail.com; s=zohoarc; 
-        b=cyF6ZYzcO7ENFwPNPgc0RT2cwJzMpr6UUfx8varHiC20ido87HoEqfWP8nF0zmmzrpW2fVdUpuJG/AUpb7HCmLYiG+QEg/ieDL0/AgRH5yA+A+CwaChAHCyGT+SE8iE10z1OX3uTEQtDV6mcmdawS0gGndv3ZrRYqgPLyuIRbZA=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-        t=1619150552; h=Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:To; 
-        bh=3f/MHuAv6lLyy57kXDD21smInIUne4Nyu2IOKNLZhX8=; 
-        b=BW4I80+xefnJkNjTIIrWQT3SaczUXJfhZWYivqP5I+pFtJMli//dVf/Nh8Ilj3YtVY4g/c922TOqNcoRRiQRNKTbXJUjXjsHMWY6sVoW+AajqWwF32Pq36w2WmYhpp2zBUe3A4u5R7ZSNGxJ5qpiB4lNSsY0LxlS1074NCpyzT4=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-        spf=pass  smtp.mailfrom=dan@dlrobertson.com;
-        dmarc=pass header.from=<dan@dlrobertson.com> header.from=<dan@dlrobertson.com>
-Received: from gothmog.test (pool-173-66-46-118.washdc.fios.verizon.net [173.66.46.118]) by mx.zohomail.com
-        with SMTPS id 161915054973553.194049103966336; Thu, 22 Apr 2021 21:02:29 -0700 (PDT)
-From:   Dan Robertson <dan@dlrobertson.com>
-To:     Alexander Aring <alex.aring@gmail.com>,
-        Stefan Schmidt <stefan@datenfreihafen.org>,
-        "David S . Miller" <davem@davemloft.net>,
-        linux-wpan@vger.kernel.org, netdev@vger.kernel.org
-Cc:     Dan Robertson <dan@dlrobertson.com>
-Subject: [PATCH 2/2] net: ieee802154: fix null deref in parse key id
-Date:   Fri, 23 Apr 2021 00:02:14 -0400
-Message-Id: <20210423040214.15438-3-dan@dlrobertson.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20210423040214.15438-1-dan@dlrobertson.com>
-References: <20210423040214.15438-1-dan@dlrobertson.com>
+        id S242219AbhDWN0F (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Fri, 23 Apr 2021 09:26:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56106 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229456AbhDWN0E (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 23 Apr 2021 09:26:04 -0400
+Received: from mail-oo1-xc32.google.com (mail-oo1-xc32.google.com [IPv6:2607:f8b0:4864:20::c32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 493D2C061574;
+        Fri, 23 Apr 2021 06:25:27 -0700 (PDT)
+Received: by mail-oo1-xc32.google.com with SMTP id i3-20020a4ad3830000b02901ef20f8cae8so3365813oos.11;
+        Fri, 23 Apr 2021 06:25:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=YSQOUmxdffhcoZfDyn1pZOzJ9DCUbUh8m5un/UK0zCA=;
+        b=YOnp4SpVNbttkDgEEP/5xkCQU2j06ktjbcNg/lYnQLu5yhkQMNLHt8GlqKtCyFl9HP
+         mqdVWc9SojGcjGdQQRHeAyapZwG0wQuRTW8BzCu7HBkw6HS6pYebGDSw09F3RFMbnp0+
+         fPCD7ZWswDXawUvNGgHhDtPtaL1UUUdWRxz42HDwL6w93HFh7O4ws+G8eft3EfHH0nY6
+         3bCpRz1ls6I/fg4+C8bzFXExmbmYmq46+c1I0UlbaL0zTXHSj2AH7uihHbzCXoVLmYVl
+         pNXkSyUq+v++i0TJi6PRjQRSYXTxEv864zFddMmbIIyhsgwUu59N4FQ4yBBPb0NhvoYS
+         hFmQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=YSQOUmxdffhcoZfDyn1pZOzJ9DCUbUh8m5un/UK0zCA=;
+        b=CSYW26qMMyBcGSxhBq8KrrFMl9ti74qyDA5fUqNKUyDbkmeTAKcCEnt8J4HcKl28aj
+         j1KtWnPsVzh5AZsahisYVUC4RGEVaaMpshqGSnT1ajsRhC8PR3gRxejS0rpFx0CicUdw
+         iKdi1POorvA2cj3gLfBEZbnSxbDj4weXKniry+RNyepaAQMMLsd/yVOdnq/FaBMtF4VK
+         3/exvDCefcoCz1/Luc7W8OVrI+H/L98lw59hHs/fAj25EPiTwQbOlog6i/8Im7flmsTA
+         G/XtzJYMvvGuJXbVRUKkobTxTbZ4teZYen4LcXLZwgIzQwccV285EcxnYGV2ORwc3578
+         LllA==
+X-Gm-Message-State: AOAM531IP9Yys017HcGdrf/soHVHnl+30vqLytVY/chY1HjaSxTk58yy
+        JDPyGYM6q57oT+lUf49Xi/aAqv9YYKZZ6OkcMUFzmVXM4gc=
+X-Google-Smtp-Source: ABdhPJyydSyE9r/cpqFz9BOj5MNgKdm2RdyKTY5UuN0UGF2KtE0bOu2EmymS1MMcmAHAuZCk35rdmmBg1q8qVzUB70s=
+X-Received: by 2002:a05:6820:34b:: with SMTP id m11mr3003508ooe.49.1619184326731;
+ Fri, 23 Apr 2021 06:25:26 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-ZohoMailClient: External
+References: <20210423040214.15438-1-dan@dlrobertson.com> <20210423040214.15438-2-dan@dlrobertson.com>
+In-Reply-To: <20210423040214.15438-2-dan@dlrobertson.com>
+From:   Alexander Aring <alex.aring@gmail.com>
+Date:   Fri, 23 Apr 2021 09:25:15 -0400
+Message-ID: <CAB_54W4T_ZpK2GGvSwwXF0rzXg8eZLWNS6wru0sHq2kL1x4E1A@mail.gmail.com>
+Subject: Re: [PATCH 1/2] net: ieee802154: fix null deref in parse dev addr
+To:     Dan Robertson <dan@dlrobertson.com>
+Cc:     Stefan Schmidt <stefan@datenfreihafen.org>,
+        "David S . Miller" <davem@davemloft.net>,
+        linux-wpan - ML <linux-wpan@vger.kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Fix a logic error that could result in a null deref if the user does not
-set the PAN ID but does set the address.
+Hi,
 
-Signed-off-by: Dan Robertson <dan@dlrobertson.com>
----
- net/ieee802154/nl-mac.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On Fri, 23 Apr 2021 at 00:02, Dan Robertson <dan@dlrobertson.com> wrote:
+>
+> Fix a logic error that could result in a null deref if the user sets
+> the mode incorrectly for the given addr type.
+>
+> Signed-off-by: Dan Robertson <dan@dlrobertson.com>
 
-diff --git a/net/ieee802154/nl-mac.c b/net/ieee802154/nl-mac.c
-index 9c640d670ffe..66983c5d4d85 100644
---- a/net/ieee802154/nl-mac.c
-+++ b/net/ieee802154/nl-mac.c
-@@ -551,7 +551,7 @@ ieee802154_llsec_parse_key_id(struct genl_info *info,
- 	desc->mode = nla_get_u8(info->attrs[IEEE802154_ATTR_LLSEC_KEY_MODE]);
- 
- 	if (desc->mode == IEEE802154_SCF_KEY_IMPLICIT) {
--		if (!info->attrs[IEEE802154_ATTR_PAN_ID] &&
-+		if (!info->attrs[IEEE802154_ATTR_PAN_ID] ||
- 		    !(info->attrs[IEEE802154_ATTR_SHORT_ADDR] ||
- 		      info->attrs[IEEE802154_ATTR_HW_ADDR]))
- 			return -EINVAL;
--- 
-2.31.1
+Acked-by: Alexander Aring <aahringo@redhat.com>
 
+Thanks.
+
+- Alex
