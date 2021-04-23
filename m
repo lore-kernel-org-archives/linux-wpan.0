@@ -2,121 +2,68 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.2 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3C7EC433ED
-	for <linux-wpan@archiver.kernel.org>; Tue, 13 Apr 2021 08:33:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 153F8C433B4
+	for <linux-wpan@archiver.kernel.org>; Fri, 23 Apr 2021 04:17:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B9954613DA
-	for <linux-wpan@archiver.kernel.org>; Tue, 13 Apr 2021 08:33:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DD6936100B
+	for <linux-wpan@archiver.kernel.org>; Fri, 23 Apr 2021 04:17:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230134AbhDMIdW (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 13 Apr 2021 04:33:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36996 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230083AbhDMIdV (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 13 Apr 2021 04:33:21 -0400
-Received: from mail-qk1-x72b.google.com (mail-qk1-x72b.google.com [IPv6:2607:f8b0:4864:20::72b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCA0BC061574
-        for <linux-wpan@vger.kernel.org>; Tue, 13 Apr 2021 01:33:01 -0700 (PDT)
-Received: by mail-qk1-x72b.google.com with SMTP id q189so6624903qka.8
-        for <linux-wpan@vger.kernel.org>; Tue, 13 Apr 2021 01:33:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=8nrqvVxvltpzH7RYZqpvLzY8XnwRwce2q6/g0kk8slc=;
-        b=QAOG0RG8adp5ycX0lJkHwnEJPjkPyROHvocgANgIV0TKKHsqDrBvWVkwkq0BMm3fl0
-         pREAlHcCXQ5OYela9E9tkJ+wZ2gDhE734EADbRRQ+Ag9u5PxdtAOEXpyaC8+pYFRDZmK
-         l8brOtdr8mZdh2GQ+udPuWKEUwz5HbwWkfsBfEdZrslLlB+s3NDz+mf5B3Hx7cbqaBnj
-         lA7G3VKGQUJ0eAyrGYvUHMDbMd0HEVuDJwjc4SxzCwXRuUZyClngI3BKmCWooSluJggB
-         oq/VXu9s2qS04lfZtV1WOSmyn5+nDLEV3hZCamvFizFtXYnll6OekZ/41AIHgdRlRKlI
-         sKcA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=8nrqvVxvltpzH7RYZqpvLzY8XnwRwce2q6/g0kk8slc=;
-        b=PeP/TzugzXPxhkBPcSCcwLKQJZkZ8In3R6vXqv/YsujVrOh37/7stg7gOaYwYc3aKo
-         dCrcZfAso3RDho464qthfMQYt36BePc49R9fSAFDk5OIW7U7Lddbz+tBpv1MtAzQ9aK9
-         7J1HpXR3b3i1tAll+juukm058fsdQU8fWZI9LKHQI0btIy62ZjpazS7GGHslBumTn3Gy
-         VTHPeP3wGFl9lzHzvD4dFIGCI43XrL2hNlwTIK70OPWHIH6IJ13fU0v4MRsvSbuFMJBh
-         InsM92QBCjQhaCBgY/JZnD4ecuKJVETzgj7Ov2Oa9yuwTK23yUuGSsbzs+vRJMAQfTbW
-         pnug==
-X-Gm-Message-State: AOAM531bSbUhS6HU6AexlboseKghjrDKX6WV2vpp6Lni5VgCrBXoHtta
-        mp+AgQ3hn3itutRO9mHL9xzRsInif9zY3cvh2+5SWQ==
-X-Google-Smtp-Source: ABdhPJz+1ReMEouOSg1zddV3GpTwRAtGceqbdLT5e7gbK5z0KeIyb0y7vjOodqSziBb/LhSo5KaJKtJZG8vCt6jwMU4=
-X-Received: by 2002:a05:620a:a47:: with SMTP id j7mr8648989qka.350.1618302780925;
- Tue, 13 Apr 2021 01:33:00 -0700 (PDT)
+        id S229717AbhDWESY (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Fri, 23 Apr 2021 00:18:24 -0400
+Received: from sender4-op-o14.zoho.com ([136.143.188.14]:17407 "EHLO
+        sender4-op-o14.zoho.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229454AbhDWESY (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 23 Apr 2021 00:18:24 -0400
+X-Greylist: delayed 904 seconds by postgrey-1.27 at vger.kernel.org; Fri, 23 Apr 2021 00:18:24 EDT
+ARC-Seal: i=1; a=rsa-sha256; t=1619150547; cv=none; 
+        d=zohomail.com; s=zohoarc; 
+        b=hpx6XwQ3ZyjJ2m7fp2F7pSJ10f5K69WIEJDdglHAPgil5Rg3sO7ty/drHdTGWZugqUjDTUb8j9+bPBLCMKlYtPc6QOj9PpSIZhlIjJ9QzQXABe9vcT9qs1pzJ5aWjqVYJS4DeTkt0+evNgwsyhiUbRDmp5nML74QRqJUOWWus54=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+        t=1619150547; h=Content-Transfer-Encoding:Cc:Date:From:MIME-Version:Message-ID:Subject:To; 
+        bh=ovELkitdepEboed/gVAZEcG2v0IlVO4bIoov9qocPHI=; 
+        b=EP43QZUEdf8+gRWp0O1+mducaJrrk8xCz505yJr3/8irAq+OKDP0p2chhBL2z4G9PeguYCHJs4Hmr+ucOMBB9kHufGgx27XYHJS/meKAlj7+xDaDKhCCs316FINx1ELRMOEIeK53LeaamHHBu8YlhzIbTEIiPeHQh3KZAd4wDzw=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+        spf=pass  smtp.mailfrom=dan@dlrobertson.com;
+        dmarc=pass header.from=<dan@dlrobertson.com> header.from=<dan@dlrobertson.com>
+Received: from gothmog.test (pool-173-66-46-118.washdc.fios.verizon.net [173.66.46.118]) by mx.zohomail.com
+        with SMTPS id 161915054532687.06870622077247; Thu, 22 Apr 2021 21:02:25 -0700 (PDT)
+From:   Dan Robertson <dan@dlrobertson.com>
+To:     Alexander Aring <alex.aring@gmail.com>,
+        Stefan Schmidt <stefan@datenfreihafen.org>,
+        "David S . Miller" <davem@davemloft.net>,
+        linux-wpan@vger.kernel.org, netdev@vger.kernel.org
+Cc:     Dan Robertson <dan@dlrobertson.com>
+Subject: [PATCH 0/2] net: ieee802154: fix logic errors
+Date:   Fri, 23 Apr 2021 00:02:12 -0400
+Message-Id: <20210423040214.15438-1-dan@dlrobertson.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-References: <00000000000073afff05bbe9a54d@google.com> <00000000000020564605bedb716e@google.com>
- <20210401133037.GA1052133@rowland.harvard.edu>
-In-Reply-To: <20210401133037.GA1052133@rowland.harvard.edu>
-From:   Dmitry Vyukov <dvyukov@google.com>
-Date:   Tue, 13 Apr 2021 10:32:50 +0200
-Message-ID: <CACT4Y+ZMFwTLrdK+8YZifJR_7V21gwOxbVKnbRP3Yj=YQ+k7xQ@mail.gmail.com>
-Subject: Re: [syzbot] WARNING in ieee802154_del_seclevel
-To:     Alan Stern <stern@rowland.harvard.edu>
-Cc:     syzbot <syzbot+fbf4fc11a819824e027b@syzkaller.appspotmail.com>,
-        a@unstable.cc, alex.aring@gmail.com,
-        b.a.t.m.a.n@lists.open-mesh.org,
-        David Miller <davem@davemloft.net>, info@sophiescuban.com,
-        Jiri Kosina <jkosina@suse.cz>,
-        Jakub Kicinski <kuba@kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>, linux-wpan@vger.kernel.org,
-        mareklindner@neomailbox.ch, netdev <netdev@vger.kernel.org>,
-        stefan@datenfreihafen.org, sw@simonwunderlich.de,
-        syzkaller-bugs <syzkaller-bugs@googlegroups.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ZohoMailClient: External
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-On Thu, Apr 1, 2021 at 3:30 PM Alan Stern <stern@rowland.harvard.edu> wrote:
->
-> On Wed, Mar 31, 2021 at 02:03:08PM -0700, syzbot wrote:
-> > syzbot has bisected this issue to:
-> >
-> > commit 416dacb819f59180e4d86a5550052033ebb6d72c
-> > Author: Alan Stern <stern@rowland.harvard.edu>
-> > Date:   Wed Aug 21 17:27:12 2019 +0000
-> >
-> >     HID: hidraw: Fix invalid read in hidraw_ioctl
-> >
-> > bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=127430fcd00000
-> > start commit:   6e5a03bc ethernet/netronome/nfp: Fix a use after free in n..
-> > git tree:       net
-> > final oops:     https://syzkaller.appspot.com/x/report.txt?x=117430fcd00000
-> > console output: https://syzkaller.appspot.com/x/log.txt?x=167430fcd00000
-> > kernel config:  https://syzkaller.appspot.com/x/.config?x=daeff30c2474a60f
-> > dashboard link: https://syzkaller.appspot.com/bug?extid=fbf4fc11a819824e027b
-> > syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13bfe45ed00000
-> > C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1188e31ad00000
-> >
-> > Reported-by: syzbot+fbf4fc11a819824e027b@syzkaller.appspotmail.com
-> > Fixes: 416dacb819f5 ("HID: hidraw: Fix invalid read in hidraw_ioctl")
-> >
-> > For information about bisection process see: https://goo.gl/tpsmEJ#bisection
->
-> It seems likely that the bisection ran off the rails here.  This commit
-> could not have caused a problem, although it may have revealed a
-> pre-existing problem that previously was hidden.
+I hit two null derefs due to logic errors.
 
-Hi Alan,
+ - ieee802154_llsec_parse_key_id null deref if PAN ID is null.
+ - ieee802154_llsec_parse_dev_addr null deref if the given mode
+   does not match the given address.
 
-Yes, bisection log shows it was derailed by:
-KASAN: use-after-free Read in batadv_iv_ogm_queue_add
-and:
-BUG: MAX_LOCKDEP_CHAIN_HLOCKS too low!
+New to ieee802154, so feedback would definitely be appreciated.
 
-https://syzkaller.appspot.com/x/bisect.txt?x=127430fcd00000
+Dan Robertson (2):
+  net: ieee802154: fix null deref in parse dev addr
+  net: ieee802154: fix null deref in parse key id
 
+ net/ieee802154/nl-mac.c   | 2 +-
+ net/ieee802154/nl802154.c | 9 +++++----
+ 2 files changed, 6 insertions(+), 5 deletions(-)
 
-> By the way, what happened to the annotated stack dumps that syzkaller
-> used to provide in its bug reports?
+-- 
+2.31.1
 
-Nothing has changed in this respect, they are still in bug reports:
-https://lore.kernel.org/lkml/00000000000073afff05bbe9a54d@google.com/
