@@ -2,87 +2,91 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6442BC433ED
-	for <linux-wpan@archiver.kernel.org>; Fri, 23 Apr 2021 15:11:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7FB8C433ED
+	for <linux-wpan@archiver.kernel.org>; Sun, 25 Apr 2021 10:25:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2170D61463
-	for <linux-wpan@archiver.kernel.org>; Fri, 23 Apr 2021 15:11:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AB654613AF
+	for <linux-wpan@archiver.kernel.org>; Sun, 25 Apr 2021 10:25:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242854AbhDWPLf (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Fri, 23 Apr 2021 11:11:35 -0400
-Received: from proxima.lasnet.de ([78.47.171.185]:39976 "EHLO
-        proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231320AbhDWPLf (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Fri, 23 Apr 2021 11:11:35 -0400
-Received: from [IPv6:2003:e9:d72f:be76:f08b:2b88:fdb6:ca12] (p200300e9d72fbe76f08b2b88fdb6ca12.dip0.t-ipconnect.de [IPv6:2003:e9:d72f:be76:f08b:2b88:fdb6:ca12])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits))
-        (No client certificate requested)
-        (Authenticated sender: stefan@datenfreihafen.org)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id 84EA0C0415;
-        Fri, 23 Apr 2021 17:10:56 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
-        s=2021; t=1619190656;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=S070Ld9KTNP9Xn/umxdObbbmHMdP10amp3GIXAglQPY=;
-        b=escJAnycWIB6D+onsvioWPlxgDL6D/PcZ81gBgHd161eL70NPBnQvi11G7NZ3nmvYLONPu
-        xs+6+pdasmQbh2NtBLrG96VbSFf50H1oC2QwHiFgDPDYxJtGFkP78tYt6O6GNjV6jKC308
-        GEjK2GeN5PS7YNtM+I1bAz5XcgOB3y55iQASXxmKJMj036pcHcYvMJg+cuRn3rpGRZpQYJ
-        sl0qtxUrzfKq0z8LiUBR1l6wT20ZIo8lpJX17zkm/x7Q4PL8a7qNp5n+RcObeqE1ZDshHw
-        34pMSBQaXNhcdaElxQNqhAYuO4KFqmgO3VHj6oUpMPx9Pi5w0yxi/h43FjCigg==
-Subject: Re: [PATCH 1/2] net: ieee802154: fix null deref in parse dev addr
-To:     Alexander Aring <alex.aring@gmail.com>,
-        Dan Robertson <dan@dlrobertson.com>
-Cc:     "David S . Miller" <davem@davemloft.net>,
-        linux-wpan - ML <linux-wpan@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
-References: <20210423040214.15438-1-dan@dlrobertson.com>
- <20210423040214.15438-2-dan@dlrobertson.com>
- <CAB_54W4T_ZpK2GGvSwwXF0rzXg8eZLWNS6wru0sHq2kL1x4E1A@mail.gmail.com>
-From:   Stefan Schmidt <stefan@datenfreihafen.org>
-Message-ID: <9d7af572-bf93-447d-e239-ba1015096aab@datenfreihafen.org>
-Date:   Fri, 23 Apr 2021 17:10:56 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
+        id S229707AbhDYKZq (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Sun, 25 Apr 2021 06:25:46 -0400
+Received: from out30-43.freemail.mail.aliyun.com ([115.124.30.43]:50800 "EHLO
+        out30-43.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229466AbhDYKZq (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>);
+        Sun, 25 Apr 2021 06:25:46 -0400
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R201e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e01424;MF=yang.lee@linux.alibaba.com;NM=1;PH=DS;RN=8;SR=0;TI=SMTPD_---0UWg2IQf_1619346303;
+Received: from j63c13417.sqa.eu95.tbsite.net(mailfrom:yang.lee@linux.alibaba.com fp:SMTPD_---0UWg2IQf_1619346303)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Sun, 25 Apr 2021 18:25:04 +0800
+From:   Yang Li <yang.lee@linux.alibaba.com>
+To:     alex.aring@gmail.com
+Cc:     stefan@datenfreihafen.org, davem@davemloft.net, kuba@kernel.org,
+        linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Yang Li <yang.lee@linux.alibaba.com>
+Subject: [PATCH] net/ieee802154: drop unneeded assignment in llsec_iter_devkeys()
+Date:   Sun, 25 Apr 2021 18:24:59 +0800
+Message-Id: <1619346299-40237-1-git-send-email-yang.lee@linux.alibaba.com>
+X-Mailer: git-send-email 1.8.3.1
 MIME-Version: 1.0
-In-Reply-To: <CAB_54W4T_ZpK2GGvSwwXF0rzXg8eZLWNS6wru0sHq2kL1x4E1A@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=n
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello.
+In order to keep the code style consistency of the whole file,
+redundant return value ‘rc’ and its assignments should be deleted
 
-On 23.04.21 15:25, Alexander Aring wrote:
-> Hi,
-> 
-> On Fri, 23 Apr 2021 at 00:02, Dan Robertson <dan@dlrobertson.com> wrote:
->>
->> Fix a logic error that could result in a null deref if the user sets
->> the mode incorrectly for the given addr type.
->>
->> Signed-off-by: Dan Robertson <dan@dlrobertson.com>
-> 
-> Acked-by: Alexander Aring <aahringo@redhat.com>
-> 
-> Thanks.
-> 
-> - Alex
-> 
+The clang_analyzer complains as follows:
+net/ieee802154/nl-mac.c:1203:12: warning: Although the value stored to
+'rc' is used in the enclosing expression, the value is never actually
+read from 'rc'
 
+No functional change, only more efficient.
 
-This patch has been applied to the wpan tree and will be
-part of the next pull request to net. Thanks!
+Reported-by: Abaci Robot <abaci@linux.alibaba.com>
+Signed-off-by: Yang Li <yang.lee@linux.alibaba.com>
+---
+ net/ieee802154/nl-mac.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-regards
-Stefan Schmidt
+diff --git a/net/ieee802154/nl-mac.c b/net/ieee802154/nl-mac.c
+index 0c1b077..a6a8cf6 100644
+--- a/net/ieee802154/nl-mac.c
++++ b/net/ieee802154/nl-mac.c
+@@ -1184,7 +1184,7 @@ static int llsec_iter_devkeys(struct llsec_dump_data *data)
+ {
+ 	struct ieee802154_llsec_device *dpos;
+ 	struct ieee802154_llsec_device_key *kpos;
+-	int rc = 0, idx = 0, idx2;
++	int idx = 0, idx2;
+ 
+ 	list_for_each_entry(dpos, &data->table->devices, list) {
+ 		if (idx++ < data->s_idx)
+@@ -1200,7 +1200,7 @@ static int llsec_iter_devkeys(struct llsec_dump_data *data)
+ 						      data->nlmsg_seq,
+ 						      dpos->hwaddr, kpos,
+ 						      data->dev)) {
+-				return rc = -EMSGSIZE;
++				return -EMSGSIZE;
+ 			}
+ 
+ 			data->s_idx2++;
+@@ -1209,7 +1209,7 @@ static int llsec_iter_devkeys(struct llsec_dump_data *data)
+ 		data->s_idx++;
+ 	}
+ 
+-	return rc;
++	return 0;
+ }
+ 
+ int ieee802154_llsec_dump_devkeys(struct sk_buff *skb,
+-- 
+1.8.3.1
+
