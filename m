@@ -1,78 +1,80 @@
 Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: *
-X-Spam-Status: No, score=1.0 required=3.0 tests=BAYES_50,DKIMWL_BL,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Level: 
+X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B597C433B4
-	for <linux-wpan@archiver.kernel.org>; Mon, 10 May 2021 16:16:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 453A6C433B4
+	for <linux-wpan@archiver.kernel.org>; Wed, 19 May 2021 14:07:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 44CF3613CF
-	for <linux-wpan@archiver.kernel.org>; Mon, 10 May 2021 16:16:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 21D4A611AE
+	for <linux-wpan@archiver.kernel.org>; Wed, 19 May 2021 14:07:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231164AbhEJQRG (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 10 May 2021 12:17:06 -0400
-Received: from flippiebeckerswealth.xyz ([62.173.147.206]:33678 "EHLO
-        host.flippiebeckerswealth.xyz" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231401AbhEJQRF (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>);
-        Mon, 10 May 2021 12:17:05 -0400
-X-Greylist: delayed 5314 seconds by postgrey-1.27 at vger.kernel.org; Mon, 10 May 2021 12:17:04 EDT
-Received: from flippiebeckerswealth.xyz (ec2-3-142-218-249.us-east-2.compute.amazonaws.com [3.142.218.249])
-        by host.flippiebeckerswealth.xyz (Postfix) with ESMTPA id 84FEC2314C3
-        for <linux-wpan@vger.kernel.org>; Mon, 10 May 2021 17:06:52 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 host.flippiebeckerswealth.xyz 84FEC2314C3
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=flippiebeckerswealth.xyz; s=default; t=1620655614;
-        bh=Lxx5rGQCX/MQzrwE9epz1Mb5yPYRqDyEupWj6GReobo=;
-        h=Reply-To:From:To:Subject:Date:From;
-        b=HoTGEUXoBArXmdrSQOIvmM3AlTcdg+62M6UbZ6mBkNWk6GOreiNmhjN/u1U4EPPeh
-         e2YM8LSnU3p6gFz75+l1sKLs+RGMP+mzEq8/oy8hoqAiwAMFwZ4qxX5Cv42I69FZCt
-         o/eWMoEMuCwhia8Mmt6SuCRqzbG33satBny9AcZw=
-DKIM-Filter: OpenDKIM Filter v2.11.0 host.flippiebeckerswealth.xyz 84FEC2314C3
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=flippiebeckerswealth.xyz; s=default; t=1620655614;
-        bh=Lxx5rGQCX/MQzrwE9epz1Mb5yPYRqDyEupWj6GReobo=;
-        h=Reply-To:From:To:Subject:Date:From;
-        b=HoTGEUXoBArXmdrSQOIvmM3AlTcdg+62M6UbZ6mBkNWk6GOreiNmhjN/u1U4EPPeh
-         e2YM8LSnU3p6gFz75+l1sKLs+RGMP+mzEq8/oy8hoqAiwAMFwZ4qxX5Cv42I69FZCt
-         o/eWMoEMuCwhia8Mmt6SuCRqzbG33satBny9AcZw=
-Reply-To: cpavlides@flippiebeckerwealthservices.com
-From:   Chris Pavlides <cpavlides@flippiebeckerswealth.xyz>
-To:     linux-wpan@vger.kernel.org
-Subject: Personal
-Date:   10 May 2021 14:06:52 +0000
-Message-ID: <20210510140652.AEEA10D72211CAB2@flippiebeckerswealth.xyz>
-Mime-Version: 1.0
-Content-Type: text/plain;
-        charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+        id S1353800AbhESOIY (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 19 May 2021 10:08:24 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:3033 "EHLO
+        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S240179AbhESOIW (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 19 May 2021 10:08:22 -0400
+Received: from dggems702-chm.china.huawei.com (unknown [172.30.72.60])
+        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4FlZN16LXLzQp1k;
+        Wed, 19 May 2021 22:03:29 +0800 (CST)
+Received: from dggeml759-chm.china.huawei.com (10.1.199.138) by
+ dggems702-chm.china.huawei.com (10.3.19.179) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
+ 15.1.2176.2; Wed, 19 May 2021 22:07:00 +0800
+Received: from localhost.localdomain (10.175.102.38) by
+ dggeml759-chm.china.huawei.com (10.1.199.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2176.2; Wed, 19 May 2021 22:06:59 +0800
+From:   Wei Yongjun <weiyongjun1@huawei.com>
+To:     <weiyongjun1@huawei.com>, Alexander Aring <alex.aring@gmail.com>,
+        "Stefan Schmidt" <stefan@datenfreihafen.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>
+CC:     <linux-wpan@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <kernel-janitors@vger.kernel.org>, Hulk Robot <hulkci@huawei.com>
+Subject: [PATCH net-next] ieee802154: fix error return code in ieee802154_llsec_getparams()
+Date:   Wed, 19 May 2021 14:16:14 +0000
+Message-ID: <20210519141614.3040055-1-weiyongjun1@huawei.com>
+X-Mailer: git-send-email 2.25.1
+MIME-Version: 1.0
+Content-Type:   text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7BIT
+X-Originating-IP: [10.175.102.38]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ dggeml759-chm.china.huawei.com (10.1.199.138)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello there,
+Fix to return negative error code -ENOBUFS from the error handling
+case instead of 0, as done elsewhere in this function.
 
-I hope this message finds you in good spirits especially during=20
-this challenging time of coronavirus pandemic. I hope you and=20
-your family are well and keeping safe. Anyway, I am Chris=20
-Pavlides, a broker working with Flippiebecker Wealth. I got your=20
-contact (along with few other contacts) through an online=20
-business directory and I thought I should contact you to see if=20
-you are interested in this opportunity. I am contacting you=20
-because one of my high profile clients is interested in investing=20
-abroad and has asked me to look for individuals and companies=20
-with interesting business ideas and projects that he can invest=20
-in. He wants to invest a substantial amount of asset abroad.
+Reported-by: Hulk Robot <hulkci@huawei.com>
+Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
+---
+ net/ieee802154/nl-mac.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-Please kindly respond back to this email if you are interested in=20
-this opportunity. Once I receive your response, I will give you=20
-more details and we can plan a strategy that will be beneficial=20
-to all parties.
+diff --git a/net/ieee802154/nl-mac.c b/net/ieee802154/nl-mac.c
+index 0c1b0770c59e..c23c152860b7 100644
+--- a/net/ieee802154/nl-mac.c
++++ b/net/ieee802154/nl-mac.c
+@@ -680,8 +680,10 @@ int ieee802154_llsec_getparams(struct sk_buff *skb, struct genl_info *info)
+ 	    nla_put_u8(msg, IEEE802154_ATTR_LLSEC_SECLEVEL, params.out_level) ||
+ 	    nla_put_u32(msg, IEEE802154_ATTR_LLSEC_FRAME_COUNTER,
+ 			be32_to_cpu(params.frame_counter)) ||
+-	    ieee802154_llsec_fill_key_id(msg, &params.out_key))
++	    ieee802154_llsec_fill_key_id(msg, &params.out_key)) {
++		rc = -ENOBUFS;
+ 		goto out_free;
++	}
+ 
+ 	dev_put(dev);
+ 
 
-Best regards
-
-C Pavlides
-Flippiebecker Wealth
