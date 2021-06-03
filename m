@@ -7,54 +7,57 @@ X-Spam-Status: No, score=-17.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC036C47082
-	for <linux-wpan@archiver.kernel.org>; Thu,  3 Jun 2021 08:34:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47645C47096
+	for <linux-wpan@archiver.kernel.org>; Thu,  3 Jun 2021 08:53:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AD61C613DA
-	for <linux-wpan@archiver.kernel.org>; Thu,  3 Jun 2021 08:34:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2CB1460FF1
+	for <linux-wpan@archiver.kernel.org>; Thu,  3 Jun 2021 08:53:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229611AbhFCIgL (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Thu, 3 Jun 2021 04:36:11 -0400
-Received: from proxima.lasnet.de ([78.47.171.185]:56558 "EHLO
-        proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229486AbhFCIgL (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 3 Jun 2021 04:36:11 -0400
-X-Greylist: delayed 791 seconds by postgrey-1.27 at vger.kernel.org; Thu, 03 Jun 2021 04:36:10 EDT
+        id S229721AbhFCIzl (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Thu, 3 Jun 2021 04:55:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54762 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229623AbhFCIzl (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 3 Jun 2021 04:55:41 -0400
+Received: from proxima.lasnet.de (proxima.lasnet.de [IPv6:2a01:4f8:121:31eb:3::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66C4DC06174A;
+        Thu,  3 Jun 2021 01:53:57 -0700 (PDT)
 Received: from [IPv6:2003:e9:d722:28a1:9240:5b8a:f037:504] (p200300e9d72228a192405b8af0370504.dip0.t-ipconnect.de [IPv6:2003:e9:d722:28a1:9240:5b8a:f037:504])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (4096 bits))
         (No client certificate requested)
         (Authenticated sender: stefan@datenfreihafen.org)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id E8697C0183;
-        Thu,  3 Jun 2021 10:34:24 +0200 (CEST)
+        by proxima.lasnet.de (Postfix) with ESMTPSA id A472EC02EE;
+        Thu,  3 Jun 2021 10:53:55 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
-        s=2021; t=1622709265;
+        s=2021; t=1622710435;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=oauhH3Ixt97LDuDikBnAm6GsqUl3zbClERjs993Fk2I=;
-        b=A0F3+WPm4XPjnrnkbXdkKlPdCWQNBoecFzV6Rqh+hLlZI6kX/hYZ6KunETx7qKqehJFzYp
-        1WY1uxKcygpyT+TZ0B6bIh8w1S4CqAnSGTsf+e9ASOMOvBDOBe8iZwZ0JXp90mAm0FctEy
-        pKEe+GQ9O+4B1EWmTBbQA4PV3YvLzIOq6ExO1oVgPFDkIJ/uQYATz6AQMU+PSVamypNuCc
-        d8ksBRFBAnK+fA73Of8+QmwitMKVgWnbncCR7sePUvVqOQD7EJFjlZa3PSvtvZUPVct0p3
-        kV3PObiHRhU3B8dGS+9UYd2xwu3ZF9P5xmIhd9bC88zv3bjuYXzeaofdbmqdWg==
-Subject: Re: [PATCH v1 1/1] mrf29j40: Drop unneeded of_match_ptr()
-To:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     Alan Ott <alan@signal11.us>,
+        bh=joNf4+AILeuIn49vemAPcdrgOG/ZJnkV8zC3Ten9Yi0=;
+        b=KAq4psuj+Yagbs7GznIl9wEJNRpfDe2NH4Nq4otXtzGZ0Jc4vJly4zRxNzHvpmf5L94wuu
+        3K/yUBIT5XnLZUPplMohT1N9s+760qxqiwQ+1LPj7YAR5yMBfI+5AfCUSBx6E5ApoMfW/5
+        xBo3/vnI0ONWB3vYRqRWKmRUom/82BFC36U1HLs6ENO7uWBSA+ekUUR868naXF4ktUZqEm
+        vjOnm6AaRVPRk2iCpsYgUrTT+VWSmKM3kk2XE4oz8JAuS5QmYfvX7crL/a9qd2yFiZzid2
+        FkY3nNq1T1gKWoX7kauzwHh/mTaYHYIeNcGIRrEp7MnPUxxwXhq10FtHAYzu7A==
+Subject: Re: [PATCH 1/1] ieee802154: fix error return code in
+ ieee802154_add_iface()
+To:     Zhen Lei <thunder.leizhen@huawei.com>,
         Alexander Aring <alex.aring@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>
-References: <20210531132226.47081-1-andriy.shevchenko@linux.intel.com>
+        "David S . Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        linux-wpan <linux-wpan@vger.kernel.org>,
+        netdev <netdev@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>
+References: <20210508062517.2574-1-thunder.leizhen@huawei.com>
 From:   Stefan Schmidt <stefan@datenfreihafen.org>
-Message-ID: <5dd2a42d-b218-0b23-aa14-7e5681e0fb3a@datenfreihafen.org>
-Date:   Thu, 3 Jun 2021 10:34:24 +0200
+Message-ID: <03320214-828c-4ac8-0fb8-89bd78b85c97@datenfreihafen.org>
+Date:   Thu, 3 Jun 2021 10:53:55 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.10.1
 MIME-Version: 1.0
-In-Reply-To: <20210531132226.47081-1-andriy.shevchenko@linux.intel.com>
+In-Reply-To: <20210508062517.2574-1-thunder.leizhen@huawei.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -64,47 +67,38 @@ X-Mailing-List: linux-wpan@vger.kernel.org
 
 Hello.
 
-On 31.05.21 15:22, Andy Shevchenko wrote:
-> Driver can be used in different environments and moreover, when compiled
-> with !OF, the compiler may issue a warning due to unused mrf24j40_of_match
-> variable. Hence drop unneeded of_match_ptr() call.
+On 08.05.21 08:25, Zhen Lei wrote:
+> Fix to return a negative error code from the error handling
+> case instead of 0, as done elsewhere in this function.
 > 
-> While at it, update headers block to reflect above changes.
-> 
-> Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+> Fixes: be51da0f3e34 ("ieee802154: Stop using NLA_PUT*().")
+> Reported-by: Hulk Robot <hulkci@huawei.com>
+> Signed-off-by: Zhen Lei <thunder.leizhen@huawei.com>
 > ---
->   drivers/net/ieee802154/mrf24j40.c | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
+>   net/ieee802154/nl-phy.c | 4 +++-
+>   1 file changed, 3 insertions(+), 1 deletion(-)
 > 
-> diff --git a/drivers/net/ieee802154/mrf24j40.c b/drivers/net/ieee802154/mrf24j40.c
-> index b9be530b285f..ff83e00b77af 100644
-> --- a/drivers/net/ieee802154/mrf24j40.c
-> +++ b/drivers/net/ieee802154/mrf24j40.c
-> @@ -8,8 +8,8 @@
+> diff --git a/net/ieee802154/nl-phy.c b/net/ieee802154/nl-phy.c
+> index 2cdc7e63fe17..88215b5c93aa 100644
+> --- a/net/ieee802154/nl-phy.c
+> +++ b/net/ieee802154/nl-phy.c
+> @@ -241,8 +241,10 @@ int ieee802154_add_iface(struct sk_buff *skb, struct genl_info *info)
+>   	}
 >   
->   #include <linux/spi/spi.h>
->   #include <linux/interrupt.h>
-> +#include <linux/mod_devicetable.h>
->   #include <linux/module.h>
-> -#include <linux/of.h>
->   #include <linux/regmap.h>
->   #include <linux/ieee802154.h>
->   #include <linux/irq.h>
-> @@ -1388,7 +1388,7 @@ MODULE_DEVICE_TABLE(spi, mrf24j40_ids);
+>   	if (nla_put_string(msg, IEEE802154_ATTR_PHY_NAME, wpan_phy_name(phy)) ||
+> -	    nla_put_string(msg, IEEE802154_ATTR_DEV_NAME, dev->name))
+> +	    nla_put_string(msg, IEEE802154_ATTR_DEV_NAME, dev->name)) {
+> +		rc = -EMSGSIZE;
+>   		goto nla_put_failure;
+> +	}
+>   	dev_put(dev);
 >   
->   static struct spi_driver mrf24j40_driver = {
->   	.driver = {
-> -		.of_match_table = of_match_ptr(mrf24j40_of_match),
-> +		.of_match_table = mrf24j40_of_match,
->   		.name = "mrf24j40",
->   	},
->   	.id_table = mrf24j40_ids,
+>   	wpan_phy_put(phy);
 > 
 
-I took the freedom to fix the typo in the subject line and add a better 
-prefix:
-
-net: ieee802154: mrf24j40: Drop unneeded of_match_ptr()
+Good find. We could indeed hit a case where the IEEE802154_ATTR_HW_ADDR 
+attribute is present and rc would be assigned 0 before reaching this 
+goto nla_put_failure
 
 This patch has been applied to the wpan tree and will be
 part of the next pull request to net. Thanks!
