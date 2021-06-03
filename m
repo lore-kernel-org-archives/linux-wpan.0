@@ -2,99 +2,99 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BEB7CC47096
-	for <linux-wpan@archiver.kernel.org>; Thu,  3 Jun 2021 09:01:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 953B3C47082
+	for <linux-wpan@archiver.kernel.org>; Thu,  3 Jun 2021 09:20:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A092F6136E
-	for <linux-wpan@archiver.kernel.org>; Thu,  3 Jun 2021 09:01:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7077660231
+	for <linux-wpan@archiver.kernel.org>; Thu,  3 Jun 2021 09:20:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229626AbhFCJDi (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Thu, 3 Jun 2021 05:03:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56480 "EHLO
+        id S229617AbhFCJWJ (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Thu, 3 Jun 2021 05:22:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60444 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229610AbhFCJDi (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 3 Jun 2021 05:03:38 -0400
-Received: from proxima.lasnet.de (proxima.lasnet.de [IPv6:2a01:4f8:121:31eb:3::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2BC3C06174A;
-        Thu,  3 Jun 2021 02:01:53 -0700 (PDT)
-Received: from [IPv6:2003:e9:d722:28a1:9240:5b8a:f037:504] (p200300e9d72228a192405b8af0370504.dip0.t-ipconnect.de [IPv6:2003:e9:d722:28a1:9240:5b8a:f037:504])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits))
-        (No client certificate requested)
-        (Authenticated sender: stefan@datenfreihafen.org)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id B82F1C0542;
-        Thu,  3 Jun 2021 11:01:51 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
-        s=2021; t=1622710911;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=EquOF3L85NGLb2EjoTiXBRVqUAA5DMvQV13UsmvqEj8=;
-        b=V1t42NxkMUQBsS21i8B1xRB5X0c/XHSOrjXe01m+OQ2HlF1EWB0++h5b4xOO1CEFYriMWL
-        ++267Qzf0j5t1ktsLufano9KlUwMulqeuoMspOqV4pwJUGMtMOKWYmDGv4/mlIFDwVmP6a
-        t6CwmiCOIqsB1zldc7s693PwVfOWEtn8LzlFHTaXIkH+kxxRyuRQ+bc/ltTavEEigJnBn8
-        Wu7DD0JzTd41A8DaCWtPSSgMr1esvMh+c6VsWal6o84hlyrztWeMB6BswO1yz8LaPaDQx4
-        Y28gzW7S+Zo4FFs7L+Hd6aiNc8HChCt6Qw9EMwGr5lRr7DksnWT24vG1rnui3g==
-Subject: Re: [PATCH net-next] ieee802154: fix error return code in
- ieee802154_llsec_getparams()
-To:     Wei Yongjun <weiyongjun1@huawei.com>,
+        with ESMTP id S229576AbhFCJWJ (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 3 Jun 2021 05:22:09 -0400
+Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06597C06174A;
+        Thu,  3 Jun 2021 02:20:12 -0700 (PDT)
+Received: by mail-pl1-x62b.google.com with SMTP id v13so2555766ple.9;
+        Thu, 03 Jun 2021 02:20:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=BogpqCOUCey2alE1P/oF0fJr06ZHXOEm/gnc1w6+dGw=;
+        b=oRq4uPqpjKfqi00/x+r3zKPWwxr092s9U9SMGSFhRN3tMhU6VpwA/k3BuOLdjBOYth
+         nUdmcWhsL3mehyfF2ui2DjNB/mI4VaYkg78liLYLRHGhiBHKGXf0EhJXgMxT9Ynm7/s3
+         h/itEZXAnWtKKKh1H7nrNNZtC4WDuXqcI3RxEYdWIXUanM6LnmHK8JudsQNNOyIH7l/L
+         znjlrL4YISkmzjFKK3+B2NJekfTQzwlUFk1OTvcucs6RJ9BGS4+WCtU3Qt8tWr/iIz8Q
+         J059fNeGhbAJplkqFoCYvapfHPII7AhJZkBZSHTDy+mZU7wRHHu0ivnA+fl25N3h2CH+
+         ms0w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=BogpqCOUCey2alE1P/oF0fJr06ZHXOEm/gnc1w6+dGw=;
+        b=D+RQm2iYTUI6BwxLuybOdYyRzbX3Yfo8cGDp746AsdMp8WtggX31k8KHRN8Vv9XawL
+         KbPYpmy6YGUOMezmtzY8tp4gEcDWL6tP0cT2kIW00qEHhTk2KYbG+9sCqjGWn+i9IBAy
+         slYlICHeYqjKRaYZRZgm0Ph7f5hwUk6ZibVxkFDEci3sseW9UCXznuh8+BQWMV86EnaI
+         6h4o9vHd6qzzIS+0TEMJfqJCjEtSc7y01/o4GvM3cI6sMQd5Gs71IsZTaM6sCdqqjtLo
+         DtW0UbdFxTZUEIgNfteobe6bKetKp9sj3FynSNDsd0XndEvqyjSyRLm+rZYHTshc+1qA
+         /bRw==
+X-Gm-Message-State: AOAM530do4dGstzZBpu0MF32blUGbF0lDtXgwM7rh4tY9Mk+beTns6Lr
+        xO0Tmbx+btp2j4LCd3whZeCTMafB9EzoFUATXfsmMpM7ZCE=
+X-Google-Smtp-Source: ABdhPJws9BMrj0ZBR0gjYZu9DoW0oS7QU5smzz6VfwvJ++cAaP6R3RpbO0mPZRKjcg0epixcuBLPxnoX2SUeUjiElKM=
+X-Received: by 2002:a17:90a:af8b:: with SMTP id w11mr35557628pjq.228.1622712011449;
+ Thu, 03 Jun 2021 02:20:11 -0700 (PDT)
+MIME-Version: 1.0
+References: <20210531132226.47081-1-andriy.shevchenko@linux.intel.com> <5dd2a42d-b218-0b23-aa14-7e5681e0fb3a@datenfreihafen.org>
+In-Reply-To: <5dd2a42d-b218-0b23-aa14-7e5681e0fb3a@datenfreihafen.org>
+From:   Andy Shevchenko <andy.shevchenko@gmail.com>
+Date:   Thu, 3 Jun 2021 12:19:55 +0300
+Message-ID: <CAHp75VdcFut0Tks3O=HJPLncebgDdfEv7Robm9ujG6yL+PT3OQ@mail.gmail.com>
+Subject: Re: [PATCH v1 1/1] mrf29j40: Drop unneeded of_match_ptr()
+To:     Stefan Schmidt <stefan@datenfreihafen.org>
+Cc:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        linux-wpan@vger.kernel.org, netdev <netdev@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Alan Ott <alan@signal11.us>,
         Alexander Aring <alex.aring@gmail.com>,
         "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>
-Cc:     linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
-        kernel-janitors@vger.kernel.org, Hulk Robot <hulkci@huawei.com>
-References: <20210519141614.3040055-1-weiyongjun1@huawei.com>
-From:   Stefan Schmidt <stefan@datenfreihafen.org>
-Message-ID: <b8700eed-1791-fd55-4568-dc4efeda35eb@datenfreihafen.org>
-Date:   Thu, 3 Jun 2021 11:01:51 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
-MIME-Version: 1.0
-In-Reply-To: <20210519141614.3040055-1-weiyongjun1@huawei.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello.
+On Thu, Jun 3, 2021 at 11:35 AM Stefan Schmidt
+<stefan@datenfreihafen.org> wrote:
+> On 31.05.21 15:22, Andy Shevchenko wrote:
+> > Driver can be used in different environments and moreover, when compiled
+> > with !OF, the compiler may issue a warning due to unused mrf24j40_of_match
+> > variable. Hence drop unneeded of_match_ptr() call.
+> >
+> > While at it, update headers block to reflect above changes.
 
-On 19.05.21 16:16, Wei Yongjun wrote:
-> Fix to return negative error code -ENOBUFS from the error handling
-> case instead of 0, as done elsewhere in this function.
-> 
-> Reported-by: Hulk Robot <hulkci@huawei.com>
-> Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
-> ---
->   net/ieee802154/nl-mac.c | 4 +++-
->   1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/net/ieee802154/nl-mac.c b/net/ieee802154/nl-mac.c
-> index 0c1b0770c59e..c23c152860b7 100644
-> --- a/net/ieee802154/nl-mac.c
-> +++ b/net/ieee802154/nl-mac.c
-> @@ -680,8 +680,10 @@ int ieee802154_llsec_getparams(struct sk_buff *skb, struct genl_info *info)
->   	    nla_put_u8(msg, IEEE802154_ATTR_LLSEC_SECLEVEL, params.out_level) ||
->   	    nla_put_u32(msg, IEEE802154_ATTR_LLSEC_FRAME_COUNTER,
->   			be32_to_cpu(params.frame_counter)) ||
-> -	    ieee802154_llsec_fill_key_id(msg, &params.out_key))
-> +	    ieee802154_llsec_fill_key_id(msg, &params.out_key)) {
-> +		rc = -ENOBUFS;
->   		goto out_free;
-> +	}
->   
->   	dev_put(dev);
+...
 
+> I took the freedom to fix the typo in the subject line and add a better
+> prefix:
+>
+> net: ieee802154: mrf24j40: Drop unneeded of_match_ptr()
 
-This patch has been applied to the wpan tree and will be
-part of the next pull request to net. Thanks!
+Right, thanks!
 
-regards
-Stefan Schmidt
+> This patch has been applied to the wpan tree and will be
+> part of the next pull request to net. Thanks!
+
+Btw, which tree are you using for wpan development? I see one with 6
+weeks old commits, is that the correct one?
+
+-- 
+With Best Regards,
+Andy Shevchenko
