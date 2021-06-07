@@ -4,33 +4,33 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-19.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FA1CC47094
-	for <linux-wpan@archiver.kernel.org>; Mon,  7 Jun 2021 16:14:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6D3CC47094
+	for <linux-wpan@archiver.kernel.org>; Mon,  7 Jun 2021 16:17:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 69D9561584
-	for <linux-wpan@archiver.kernel.org>; Mon,  7 Jun 2021 16:14:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D52A06108E
+	for <linux-wpan@archiver.kernel.org>; Mon,  7 Jun 2021 16:17:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232310AbhFGQQO (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 7 Jun 2021 12:16:14 -0400
-Received: from mail.kernel.org ([198.145.29.99]:48738 "EHLO mail.kernel.org"
+        id S232568AbhFGQTd (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 7 Jun 2021 12:19:33 -0400
+Received: from mail.kernel.org ([198.145.29.99]:48406 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231998AbhFGQPR (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-        Mon, 7 Jun 2021 12:15:17 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 4FD6361407;
-        Mon,  7 Jun 2021 16:13:20 +0000 (UTC)
+        id S232629AbhFGQRb (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+        Mon, 7 Jun 2021 12:17:31 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id CD77A61439;
+        Mon,  7 Jun 2021 16:14:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1623082401;
-        bh=/KOVpH4rv9fwOqe9CmwxcXiyoVX1h85wYnu2sLJMTgc=;
+        s=k20201202; t=1623082452;
+        bh=vqjqIDbMlYZPAfIgI/fP7LY+EVjhIGlykwYrcE7qBug=;
         h=From:To:Cc:Subject:Date:From;
-        b=DkVbRWXQVNF5k0ZPI7AVXdZViVDNltT+Ilf6Mm6GZuCTzhhrY4OWEFBnmjsTDG1kz
-         ZzcEJ6+GYB5dMaQMo7sJPyTvvZYp1IUqkvcgyohbG2CQWDAJtRiav4J/q6oeTT5n1g
-         B5P9A+jQmtCdsJmTsDUMmyCjt7rtKgpFEpLeFUbD2NBBpRTZth+/pz81SKT0poMtbG
-         Sqnayjl2Hs7QRIj0RlWM4LdlevQeKOC4f6VyCX/6SobY9J9xAUnI6KHYh7fQRYqNcf
-         PFtpB+wufSHS3Zvdk+7f67Hu2L3v8+tsU4TGptOD+sT/QjNTrMFZzszxjt8UwORfrw
-         jCNj1hN05rtyQ==
+        b=omrtM2TYo7ref6dE53dt6tU58GeUO/caLqfJ+GuZz+A7cqyovjgXJVRPQoeNGNU96
+         8H02yjxQ3aLyewXR7sK+ZXSHrxmu4T0/2O7Axr0dOVziSWtAgwfyQchUm7JMJPLnSf
+         1iaaEjEgTpgP2GT9iVZ6iVuWAA/IvUW6B7rvgdP5IBpbojkEgLhRJUjOX28p5jOV4Z
+         a1TSPyWV9LNlyoYX39k69K+IslGbENoxpgnB3F9Xg7j//e/5gFD+qvJOBFM5zSEbn8
+         oqx+3jWJlMUy0BNK1qHKZCXFoe4E/T8gS4v+eM2C8VphgnSe7A9q8pWNYzBjxlZOVC
+         cn9qXN3hxH5nw==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Dan Robertson <dan@dlrobertson.com>,
@@ -38,9 +38,9 @@ Cc:     Dan Robertson <dan@dlrobertson.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
         Sasha Levin <sashal@kernel.org>, linux-wpan@vger.kernel.org,
         netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 01/39] net: ieee802154: fix null deref in parse dev addr
-Date:   Mon,  7 Jun 2021 12:12:40 -0400
-Message-Id: <20210607161318.3583636-1-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.4 01/29] net: ieee802154: fix null deref in parse dev addr
+Date:   Mon,  7 Jun 2021 12:13:42 -0400
+Message-Id: <20210607161410.3584036-1-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
 X-stable: review
@@ -67,10 +67,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 5 insertions(+), 4 deletions(-)
 
 diff --git a/net/ieee802154/nl802154.c b/net/ieee802154/nl802154.c
-index f0b47d43c9f6..b34e4f827e75 100644
+index 328bb9f5342e..b2ba1d2556f1 100644
 --- a/net/ieee802154/nl802154.c
 +++ b/net/ieee802154/nl802154.c
-@@ -1298,19 +1298,20 @@ ieee802154_llsec_parse_dev_addr(struct nlattr *nla,
+@@ -1314,19 +1314,20 @@ ieee802154_llsec_parse_dev_addr(struct nlattr *nla,
  	if (!nla || nla_parse_nested_deprecated(attrs, NL802154_DEV_ADDR_ATTR_MAX, nla, nl802154_dev_addr_policy, NULL))
  		return -EINVAL;
  
