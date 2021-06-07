@@ -7,30 +7,30 @@ X-Spam-Status: No, score=-19.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74239C48BCD
-	for <linux-wpan@archiver.kernel.org>; Mon,  7 Jun 2021 16:20:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C8A4C47082
+	for <linux-wpan@archiver.kernel.org>; Mon,  7 Jun 2021 16:24:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 629C861585
-	for <linux-wpan@archiver.kernel.org>; Mon,  7 Jun 2021 16:20:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9CBC9613C8
+	for <linux-wpan@archiver.kernel.org>; Mon,  7 Jun 2021 16:24:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233299AbhFGQWb (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 7 Jun 2021 12:22:31 -0400
-Received: from mail.kernel.org ([198.145.29.99]:59820 "EHLO mail.kernel.org"
+        id S232786AbhFGQ0n (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 7 Jun 2021 12:26:43 -0400
+Received: from mail.kernel.org ([198.145.29.99]:59844 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232641AbhFGQU0 (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-        Mon, 7 Jun 2021 12:20:26 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id B9686613C0;
-        Mon,  7 Jun 2021 16:14:49 +0000 (UTC)
+        id S233298AbhFGQW2 (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+        Mon, 7 Jun 2021 12:22:28 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id BDF446192C;
+        Mon,  7 Jun 2021 16:15:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1623082490;
+        s=k20201202; t=1623082519;
         bh=jJYjTdoHxHUi8n/6g8UQTWTBJcpkxStl1jXbNNZZ7Bg=;
         h=From:To:Cc:Subject:Date:From;
-        b=hIOx3kuOBJ7OU7dgA8Thwmn8+GvZeNHnVl2FZyQgY9myh3GSdvfO8GpvrptOSKdZy
-         rYUP5jaOU29LPKN8dgQPPU17ZkDNifJ+bGYOSfIfsckxuvMUkkGptVSVKyh6PBwLLa
-         CLsZWUKRFeDNAmz+FT2oorB+np68lcBBSQeQg4fnqVF6JLrL715ypf4+8pLtZHincr
-         xos6699U5WjM1V8viaZ/GS3jnRuq2mQG+HPsdBwOP0+B/yb29cx6z7M8DLNzhu7K9P
-         brshU8Em+r0kCx0tLetVyuTPdw9DsUpcU/RDTjB/9+fIG8+d7VYAY2I1CeSTOM5PFR
-         m/D4NApMHdJbw==
+        b=Lce5rJRYoA42b7wc0NrZsN5aBAmfIEWgdMjANj7tws/2VY45lYs5LhlddcYj5qf0g
+         RJcztFjbUCs/YatlfEqb8IuufBm0/myBvra0IcVjv6ro9x0pdt11yKOe1bxGYAZTxc
+         FwEH5KSlBAdypr2Cck6IbPb12h/QyTlBDk3yvF8beBEp5hWBgZYEKah6M+7xg9D6Y0
+         WSTWR2PIEXC8U56RXu1JwDnHIc2cOpWGrUfkgA+yw9QQlTYHwNHpC3Fu4llloQDI/R
+         21AC/3bwAZ7KA4MQcB0dKFCKXsTAVniqZdRrPEQo20r8zdJcZ3uDJFtDYOo9NKLCIG
+         d5xKiJ8PkJmkA==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Dan Robertson <dan@dlrobertson.com>,
@@ -38,9 +38,9 @@ Cc:     Dan Robertson <dan@dlrobertson.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
         Sasha Levin <sashal@kernel.org>, linux-wpan@vger.kernel.org,
         netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 01/21] net: ieee802154: fix null deref in parse dev addr
-Date:   Mon,  7 Jun 2021 12:14:28 -0400
-Message-Id: <20210607161448.3584332-1-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.14 01/18] net: ieee802154: fix null deref in parse dev addr
+Date:   Mon,  7 Jun 2021 12:14:59 -0400
+Message-Id: <20210607161517.3584577-1-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
 X-stable: review
