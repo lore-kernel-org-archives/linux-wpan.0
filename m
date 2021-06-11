@@ -1,77 +1,106 @@
 Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: *
-X-Spam-Status: No, score=1.0 required=3.0 tests=BAYES_50,DKIMWL_BL,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Level: 
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5491BC48BCF
-	for <linux-wpan@archiver.kernel.org>; Wed,  9 Jun 2021 14:52:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A643C48BDF
+	for <linux-wpan@archiver.kernel.org>; Fri, 11 Jun 2021 01:59:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3E753611CC
-	for <linux-wpan@archiver.kernel.org>; Wed,  9 Jun 2021 14:52:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7D49D61376
+	for <linux-wpan@archiver.kernel.org>; Fri, 11 Jun 2021 01:59:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238070AbhFIOyf (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 9 Jun 2021 10:54:35 -0400
-Received: from flippie-beckerswealth-sa.xyz ([62.173.147.2]:47802 "EHLO
-        host.flippie-beckerswealth-sa.xyz" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234853AbhFIOye (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 9 Jun 2021 10:54:34 -0400
-X-Greylist: delayed 8152 seconds by postgrey-1.27 at vger.kernel.org; Wed, 09 Jun 2021 10:54:34 EDT
-Received: from flippie-beckerswealth-sa.xyz (ec2-3-131-99-163.us-east-2.compute.amazonaws.com [3.131.99.163])
-        by host.flippie-beckerswealth-sa.xyz (Postfix) with ESMTPA id 22A3E30C43DE
-        for <linux-wpan@vger.kernel.org>; Wed,  9 Jun 2021 15:10:29 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 host.flippie-beckerswealth-sa.xyz 22A3E30C43DE
+        id S230356AbhFKCBb (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Thu, 10 Jun 2021 22:01:31 -0400
+Received: from mail-pj1-f42.google.com ([209.85.216.42]:55147 "EHLO
+        mail-pj1-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230280AbhFKCBb (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 10 Jun 2021 22:01:31 -0400
+Received: by mail-pj1-f42.google.com with SMTP id g24so4774026pji.4;
+        Thu, 10 Jun 2021 18:59:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=flippie-beckerswealth-sa.xyz; s=default; t=1623240630;
-        bh=h0ivQLrZuUWuyEKz/TWb+FP9AASpHhVqOsJtRcwKQV4=;
-        h=Reply-To:From:To:Subject:Date:From;
-        b=MjQdmZOw9/NzfoIlqGeRe6vX66wEmMgHRzrfzuHn/2V+DmGTeu4/GjZyguwTS/ZEc
-         Aj6ETcBz+zQousO3+YOZIyBW8Y3vWyh4n97voxW8TIb9jSmjhR7eHgfpGJJXFAlSh8
-         OSxCX626Ux15EHsMj420WCtQuT+jOgU4AWGiG5z4=
-DKIM-Filter: OpenDKIM Filter v2.11.0 host.flippie-beckerswealth-sa.xyz 22A3E30C43DE
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=flippie-beckerswealth-sa.xyz; s=default; t=1623240630;
-        bh=h0ivQLrZuUWuyEKz/TWb+FP9AASpHhVqOsJtRcwKQV4=;
-        h=Reply-To:From:To:Subject:Date:From;
-        b=MjQdmZOw9/NzfoIlqGeRe6vX66wEmMgHRzrfzuHn/2V+DmGTeu4/GjZyguwTS/ZEc
-         Aj6ETcBz+zQousO3+YOZIyBW8Y3vWyh4n97voxW8TIb9jSmjhR7eHgfpGJJXFAlSh8
-         OSxCX626Ux15EHsMj420WCtQuT+jOgU4AWGiG5z4=
-Reply-To: jmasuku40@flippiebeckerwealthservices.com
-From:   Jotham Masuku <jmasuku40@flippie-beckerswealth-sa.xyz>
-To:     linux-wpan@vger.kernel.org
-Subject: Proposal
-Date:   09 Jun 2021 12:10:29 +0000
-Message-ID: <20210609121029.EA448947AE826434@flippie-beckerswealth-sa.xyz>
-Mime-Version: 1.0
-Content-Type: text/plain;
-        charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Uam97m8fS2yjD+Mrnj2iP7fVHgATXtrgF4fGudBtGmk=;
+        b=Dyt4nk1Pu8xd5m9v8yRBgfT+MsrytptON9aiTwNohR8w7yKPqvQYhj0At1IFfSOmnM
+         Nt6FTlxnME06uzWTVhEr0JPs54oTDdqMF/Br14RD6Acmv9pFgJeVLD8UxaPV/YUkJxjm
+         brLGF7lk+Hfe+qrIuEJZdr8nbzkc7EZNvC5iAk5qWPFmV/Y9PCb7wgTSloOLYcgokTEj
+         4eQZtq1+sRaaHlvIS6OYWiikqtd2zbu9RMpu3Eg0DAoa5J32w3fSWWV8XAJaJapUBB/M
+         VdzBsrRrkapgP135Zuy+4jtZmp9DwHcDY/nnePw9bFkHtFFBFIikz7Pd+50HbU1nIUVY
+         K86Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Uam97m8fS2yjD+Mrnj2iP7fVHgATXtrgF4fGudBtGmk=;
+        b=gf7ztcgUWcD55ZlfzKAIGd9t/GDxIODRr1vwn5r4ur7lteIrPWCGEnU7diljsVrAu6
+         07Ki0EpWVshsj3nlbVIWBWz3tqapN83vgjO1sRyWLsKAvvvWkPaWWkc4Z/ooGaKXexxF
+         khAQXbvUQAfFO1xXN5/tvYyXwWwrT4rNVjKjPgoGE0Gd5cxPLXG7h7LPcJROT7VC9Obq
+         UTMCgVjY4Tc9uD4tppFDY6n/mwt/czfpXeht+3s7lMHEYSqXOA8AbXZ8R6A0cYmTWFyg
+         JdgPxxvAB/8F1OekvpKWPMhRgk05qG2bwJ3ECYcDK+kNTnNS03cugpE4b+YD4gHOKTnt
+         p34A==
+X-Gm-Message-State: AOAM532lGydPqCh0JZUFJMAAAgJfuI2nAbS6/SLyS8drmF42FpDgFWH7
+        ssJeLVGRvKHvyfjFx71u/Ww=
+X-Google-Smtp-Source: ABdhPJx2Bs2oQ2y94cYwdskRqSzpReoujld6udSr5ON+lL6C+/tbdqes5CqOm3yNqMdFAXKWq2QSlw==
+X-Received: by 2002:a17:90a:6b46:: with SMTP id x6mr6366579pjl.163.1623376705046;
+        Thu, 10 Jun 2021 18:58:25 -0700 (PDT)
+Received: from localhost.localdomain ([45.135.186.34])
+        by smtp.gmail.com with ESMTPSA id md24sm8856222pjb.43.2021.06.10.18.58.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 10 Jun 2021 18:58:24 -0700 (PDT)
+From:   Dongliang Mu <mudongliangabcd@gmail.com>
+To:     alex.aring@gmail.com, stefan@datenfreihafen.org,
+        davem@davemloft.net, kuba@kernel.org
+Cc:     linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Dongliang Mu <mudongliangabcd@gmail.com>
+Subject: [PATCH] ieee802154: hwsim: Fix possible memory leak in hwsim_subscribe_all_others
+Date:   Fri, 11 Jun 2021 09:58:12 +0800
+Message-Id: <20210611015812.1626999-1-mudongliangabcd@gmail.com>
+X-Mailer: git-send-email 2.25.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello there,
+In hwsim_subscribe_all_others, the error handling code performs
+incorrectly if the second hwsim_alloc_edge fails. When this issue occurs,
+it goes to sub_fail, without cleaning the edges allocated before.
 
-I hope this message finds you in good spirits especially during=20
-this challenging time of coronavirus pandemic. I hope you and=20
-your family are well and keeping safe. Anyway, I am Jotham=20
-Masuku, a broker working with Flippiebecker Wealth. I got your=20
-contact (along with few other contacts) through an online=20
-business directory and I thought I should contact you to see if=20
-you are interested in this opportunity. I am contacting you=20
-because one of my high profile clients is interested in investing=20
-abroad and has asked me to look for individuals and companies=20
-with interesting business ideas and projects that he can invest=20
-in. He wants to invest a substantial amount of asset abroad.
+Fixes: f25da51fdc38 ("ieee802154: hwsim: add replacement for fakelb")
+Signed-off-by: Dongliang Mu <mudongliangabcd@gmail.com>
+---
+ drivers/net/ieee802154/mac802154_hwsim.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Please kindly respond back to this email if you are interested in=20
-this opportunity. Once I receive your response, I will give you=20
-more details and we can plan a strategy that will be beneficial=20
-to all parties.
+diff --git a/drivers/net/ieee802154/mac802154_hwsim.c b/drivers/net/ieee802154/mac802154_hwsim.c
+index da9135231c07..366eaae3550a 100644
+--- a/drivers/net/ieee802154/mac802154_hwsim.c
++++ b/drivers/net/ieee802154/mac802154_hwsim.c
+@@ -715,6 +715,8 @@ static int hwsim_subscribe_all_others(struct hwsim_phy *phy)
+ 
+ 	return 0;
+ 
++sub_fail:
++	hwsim_edge_unsubscribe_me(phy);
+ me_fail:
+ 	rcu_read_lock();
+ 	list_for_each_entry_rcu(e, &phy->edges, list) {
+@@ -722,8 +724,6 @@ static int hwsim_subscribe_all_others(struct hwsim_phy *phy)
+ 		hwsim_free_edge(e);
+ 	}
+ 	rcu_read_unlock();
+-sub_fail:
+-	hwsim_edge_unsubscribe_me(phy);
+ 	return -ENOMEM;
+ }
+ 
+-- 
+2.25.1
 
-Best regards
-
-J Masuku
-Flippiebecker Wealth
