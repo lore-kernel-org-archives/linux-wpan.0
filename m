@@ -2,59 +2,61 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49E14C48BE5
-	for <linux-wpan@archiver.kernel.org>; Sat, 12 Jun 2021 12:39:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35331C48BE5
+	for <linux-wpan@archiver.kernel.org>; Sat, 12 Jun 2021 12:49:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1A90561287
-	for <linux-wpan@archiver.kernel.org>; Sat, 12 Jun 2021 12:39:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 022196138C
+	for <linux-wpan@archiver.kernel.org>; Sat, 12 Jun 2021 12:49:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231180AbhFLMl4 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Sat, 12 Jun 2021 08:41:56 -0400
-Received: from mail-wm1-f43.google.com ([209.85.128.43]:42694 "EHLO
-        mail-wm1-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230191AbhFLMl4 (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Sat, 12 Jun 2021 08:41:56 -0400
-Received: by mail-wm1-f43.google.com with SMTP id l7-20020a05600c1d07b02901b0e2ebd6deso10129457wms.1;
-        Sat, 12 Jun 2021 05:39:56 -0700 (PDT)
+        id S231228AbhFLMvm (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Sat, 12 Jun 2021 08:51:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34898 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230191AbhFLMvl (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Sat, 12 Jun 2021 08:51:41 -0400
+Received: from mail-wm1-x32b.google.com (mail-wm1-x32b.google.com [IPv6:2a00:1450:4864:20::32b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84481C061574;
+        Sat, 12 Jun 2021 05:49:41 -0700 (PDT)
+Received: by mail-wm1-x32b.google.com with SMTP id b205so4790251wmb.3;
+        Sat, 12 Jun 2021 05:49:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=wATO3SBIvcHH5zKCoztgf7hTtPEc8pIrXiwcM0mnpqs=;
-        b=OK1SUX1TOjQQpyQgo4pmvkfbxVR2Zd5nIEsOWPIseXa0JLb3MRjFQBWV4iLCK1yDWP
-         VFoXklRs8RpO/GRHvabmSa61TawAtml+5dfE9fb7toQjAjeJnG+acNrdDoXCgTM3UgQM
-         bPBjCr82ej8L/tlZ8GX14GMgV9MNavaF4VKhYjHsvRn55TervHd4GmclDHJyC3lHOlaG
-         PxLvmiAX+NGHmQV/W1uxuLMTS/bE7qcNs3TWOBlL6EgHa5ylUe499JOVarBLKSJ2et5U
-         heeX3xulVp4yXrKgO5K93DWGXQM99Pr6IJbQZypWvuIIV/E6D39Q/i8Dxi9ub67ZpXfN
-         KAaA==
+        bh=soLSFJbZrxFS2wM14vi/4uzx1dl/kBu0tVSsmZ6Wonw=;
+        b=DnM0ImUc9snQoG0t2N1Pa+Zu+cS+TfoIxjsjVB5/k3QmYqqod12eg58VfqdoyZJr00
+         xXAhIR4CRaUdeEP3YWrvLZAUTM2bSgHU9jQXHsbXhBwk5kbqHLhtncJvKguxqboypqsA
+         RWpxkInz8Krrx21DfEMKVT3fcU5c2l0YZFBeB6HBMtOvXk1/Nfn1w28k8Ru589LyjKRB
+         ZE6xduyAGH1jBzjWdL6K7a9pd+pH9wIrblZSJjnR5J1WsV0Qz8WwO7SoSXi3ll7W9ENK
+         xsDI858P5HrGhllNyE+GI8Pw7zK42U6evxsGk3T5jcmKF1ztrRrWIoqZ/uWtf2unNaZI
+         y9MA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=wATO3SBIvcHH5zKCoztgf7hTtPEc8pIrXiwcM0mnpqs=;
-        b=lHiUU+7oV1r0dH+IkGbmIXrKmYgPaB1cydo+z/3fCpHk2V5h5hJkMDIGHDVLDDxJ3Q
-         DFAoop+1RphA1CUKzQ5Ewg5s8HwGaD2X9aNp883ImbtQFwB80YcsGG6RdpcsUMiCA8tm
-         wI4nFtmft1be6SrOKBAkQKrFbLs9M/AjekdGaNTxGTybTksH/PgAeTxglk9h7sXSCNVp
-         BGCxEkWgF8pd4skcLZZg9wOlOcaFfvQ2HbHXKSXBYnf3gIvu9vaB6TmBb1TjcUoB3T45
-         sj1+dlzY3ctlJKBJLRrmVT8n6STY058HSlmtFogqE5dHPc6vzpAjBGofZYkr4wk18r6C
-         UBCg==
-X-Gm-Message-State: AOAM531jVl8njZIfL0kRY3ONN0uyQRxX0u1/4HMKUIj4t9QWQD92rfcS
-        xlD+GDuBwnUJU7dWLJQ9DdVp8ryO2/lUqJyH3Cs=
-X-Google-Smtp-Source: ABdhPJw1k3oLECkOwrb2mi+jgLs5kQCXkmSXHEQOjtL/SYfz6lF2Vy2r9IM1+fho6fILVSszLIt6t/aa6gEOqEsiJKk=
-X-Received: by 2002:a05:600c:4ec8:: with SMTP id g8mr24368436wmq.62.1623501535722;
- Sat, 12 Jun 2021 05:38:55 -0700 (PDT)
+        bh=soLSFJbZrxFS2wM14vi/4uzx1dl/kBu0tVSsmZ6Wonw=;
+        b=QlWeoKbqwvuvGmCAulYqjn4WnpdhBFFiqoLtxQibVxccRvP8O4sYhOiK9hC5RzqVnl
+         FQoxviAagXDAHEC7fkX9UucN1NVwzUGyNCV7F8xLqPpYaZbwIQybisK4OC3iEN+CD/dW
+         YoW5e8Cd4yqMny2sDlOkrlwUNi9ETKbSyJewhxPH56l/jQZclQPMUuqWIXGQXWxtKV7f
+         VbgjhPywtVvDBFEJWxUs96/jNYjyJTD5FiNvogR3T8Gd3sGadXaWksHNEGoVoiP0vavh
+         7YQn79XiRQnTinbPJVAFU9I5I6dOyjpr1s/tvfXSkj3GP+UZD4E/O81XFeAjjYSV1bJR
+         21+g==
+X-Gm-Message-State: AOAM532iIW53mLv5Tf+az7U5JcSRA3hcJx4j4/q05cH/rTQq1FsMTDzt
+        H8iM8R4yGnJzWtHjf2a60T/U8XH1qXMV06H3opE=
+X-Google-Smtp-Source: ABdhPJxBVK2JqokeUcnyfOIslQB54QeJ696/LbQ5r6ljs6Lg2btGVl3NHWKKKrPd9e6IYdxd2BKAhiXY5+NfA0chFLQ=
+X-Received: by 2002:a1c:6a09:: with SMTP id f9mr24341932wmc.91.1623502179896;
+ Sat, 12 Jun 2021 05:49:39 -0700 (PDT)
 MIME-Version: 1.0
 References: <20210611015812.1626999-1-mudongliangabcd@gmail.com>
 In-Reply-To: <20210611015812.1626999-1-mudongliangabcd@gmail.com>
 From:   Alexander Aring <alex.aring@gmail.com>
-Date:   Sat, 12 Jun 2021 08:38:44 -0400
-Message-ID: <CAB_54W4akfaXse1KRO0oomh5i66wO5rUVZ28h2_PM9CSqNsHtA@mail.gmail.com>
+Date:   Sat, 12 Jun 2021 08:49:28 -0400
+Message-ID: <CAB_54W4djgY19-z8Pr9A4FgECDTESwjprk-P-x4gQCLBxvt3xA@mail.gmail.com>
 Subject: Re: [PATCH] ieee802154: hwsim: Fix possible memory leak in hwsim_subscribe_all_others
 To:     Dongliang Mu <mudongliangabcd@gmail.com>
 Cc:     Stefan Schmidt <stefan@datenfreihafen.org>,
@@ -78,31 +80,9 @@ On Thu, 10 Jun 2021 at 21:58, Dongliang Mu <mudongliangabcd@gmail.com> wrote:
 >
 > Fixes: f25da51fdc38 ("ieee802154: hwsim: add replacement for fakelb")
 > Signed-off-by: Dongliang Mu <mudongliangabcd@gmail.com>
-> ---
->  drivers/net/ieee802154/mac802154_hwsim.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/drivers/net/ieee802154/mac802154_hwsim.c b/drivers/net/ieee802154/mac802154_hwsim.c
-> index da9135231c07..366eaae3550a 100644
-> --- a/drivers/net/ieee802154/mac802154_hwsim.c
-> +++ b/drivers/net/ieee802154/mac802154_hwsim.c
-> @@ -715,6 +715,8 @@ static int hwsim_subscribe_all_others(struct hwsim_phy *phy)
->
->         return 0;
->
-> +sub_fail:
-> +       hwsim_edge_unsubscribe_me(phy);
->  me_fail:
->         rcu_read_lock();
->         list_for_each_entry_rcu(e, &phy->edges, list) {
-> @@ -722,8 +724,6 @@ static int hwsim_subscribe_all_others(struct hwsim_phy *phy)
->                 hwsim_free_edge(e);
->         }
->         rcu_read_unlock();
-> -sub_fail:
 
-this goto needs to be removed and all goto cases need to end in
-me_fail (better named to be fail only).
-In an error case both loops need to be iterated again to cleanup.
+Acked-by: Alexander Aring <aahringo@redhat.com>
+
+sorry, it is a correct fix. Thanks.
 
 - Alex
