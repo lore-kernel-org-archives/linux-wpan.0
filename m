@@ -2,62 +2,68 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C27FDC2B9F4
-	for <linux-wpan@archiver.kernel.org>; Mon, 14 Jun 2021 20:30:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 636CFC48BDF
+	for <linux-wpan@archiver.kernel.org>; Tue, 15 Jun 2021 10:37:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AB78E60FEA
-	for <linux-wpan@archiver.kernel.org>; Mon, 14 Jun 2021 20:30:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 362536115B
+	for <linux-wpan@archiver.kernel.org>; Tue, 15 Jun 2021 10:37:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234824AbhFNUcW (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 14 Jun 2021 16:32:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51224 "EHLO
+        id S231386AbhFOKjs (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 15 Jun 2021 06:39:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41434 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234626AbhFNUcV (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 14 Jun 2021 16:32:21 -0400
-Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41C5CC061574;
-        Mon, 14 Jun 2021 13:30:16 -0700 (PDT)
-Received: by mail-lj1-x22e.google.com with SMTP id c11so21906496ljd.6;
-        Mon, 14 Jun 2021 13:30:16 -0700 (PDT)
+        with ESMTP id S231324AbhFOKjr (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 15 Jun 2021 06:39:47 -0400
+Received: from mail-ej1-x633.google.com (mail-ej1-x633.google.com [IPv6:2a00:1450:4864:20::633])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADFE2C061574;
+        Tue, 15 Jun 2021 03:37:42 -0700 (PDT)
+Received: by mail-ej1-x633.google.com with SMTP id ce15so21705923ejb.4;
+        Tue, 15 Jun 2021 03:37:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=/hnnncj7vzT6xrqQOtqK95hj1J3zQcIX0GD5ENHwYGs=;
-        b=Sf/C6jQAejQ7QgbqyKgzN5j9RKIEIYJ5qRCASL/CGyadtbYOldpIm39EE+PC/IKXuf
-         P8tJ6EJIryYoPG1+Fy2KA1D+ZHhcsLap7Y8VKeDn1AnPFqUxZ+rNJ4xuw8fmFAzS0n7F
-         DbJG3wesc2UbKZsKsj+rHOO9uXSbn86OdUlQalg6+3hnLjAJ/AhVrRQjFzYaXK+ynlfZ
-         IwG6Lx/G3uFxuU+hEOIPhrvgt/LS6Bg1CNUWUv3FIcqdaSjwP8Aim+e1DsTbUoskgPFH
-         07q4i7KlMmaO5Q4Z4XqSLYnOmdSguEV8WZjDyE3riaIy+dUZzZ6zOsOy/NnRPDA1TL14
-         TEig==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=MtrZlwOnKCiqTIsZyr9FcNUuCAAc8LVqPYmpZpunwBw=;
+        b=sX/IKWWvBf7AJJgA801akMh10X6iRWyD4L4o2OhN3TDt0C155Zy2zLDzAogwg2Th2R
+         FwZxMFoipKiLX0Aag8R9UtLARg/mp1xBS3Ly9RzC/DCbbWdr5wuQ5N4R+yAU62yViWzT
+         gBzgIK0AKCKkWjcTsX1MPATcGpY6xSk7our/IYz2SJDi/pAkJzibdnOS5m2GIf5j6bSE
+         QvUUo177tLuZBsufdLYeHqn/mtr00P/CI1whPol0ml+BV5s9rKwPbrAe1FXCl8eor12Q
+         9fB/VxOvlLWBG46Tkp0lNJuGW6o+k+cMY8UOmX6etz2eUq09n6S/Zzs+Tli5cPmttAOA
+         6QGg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=/hnnncj7vzT6xrqQOtqK95hj1J3zQcIX0GD5ENHwYGs=;
-        b=TaZwYsptwrnXkdtpktSroOvEm+uT1+8XrfqQuL5Nmwk3+iToA6UsxnNUySDmNxtw68
-         aWDE/8tt5H5kOKtrPcdiiMrtkZFglPtXq9y4rXYhbMSuhpQOlonGZM1/LyDHxoyp+u87
-         Z/Ym+S+/LxDY3WdjRk1U7lixWHB+wB1SgibXHuTq4jQsup3DvOQR0GMue8uGCYvSMIYs
-         MLPSSYY8gHG9hdG0oWq9JmlT+WCAsY5OBYdkpywhN/5bM07ji+++K8Sv1yL0hsuDOO0V
-         0FdghefG/ct1VtFsUqgpiSyUtbOgN7nWrFHE7jUn8w08TP1qc1SvqO4FaoUg7S1J1Ngn
-         leiA==
-X-Gm-Message-State: AOAM531lu4WKRlrtEvnVdxQmxEXB5cgoy8bPud54jCSuH83HFfopfyQU
-        ddhAiXX/cVV5FgKLNLr9hkM=
-X-Google-Smtp-Source: ABdhPJwIAkPoePHhzl7KL6lSn4/Ac+1NH4oqgxaj2w/nYPwdN8ocoZPG8abc63Nw9LkwP5vtZ0O+8w==
-X-Received: by 2002:a2e:9959:: with SMTP id r25mr14631258ljj.317.1623702614608;
-        Mon, 14 Jun 2021 13:30:14 -0700 (PDT)
-Received: from localhost.localdomain ([94.103.229.24])
-        by smtp.gmail.com with ESMTPSA id d4sm1574079lfk.295.2021.06.14.13.30.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Jun 2021 13:30:14 -0700 (PDT)
-Date:   Mon, 14 Jun 2021 23:30:11 +0300
-From:   Pavel Skripkin <paskripkin@gmail.com>
-To:     Dongliang Mu <mudongliangabcd@gmail.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=MtrZlwOnKCiqTIsZyr9FcNUuCAAc8LVqPYmpZpunwBw=;
+        b=Ib0+JtrNEZ16IHN6Dr/d+FBaAxRy29JReLc/0t/gg7D5WELAyHdRCtlHUHuoN/ktPR
+         6B59ysoiRMzYy2712YgUsZOlv3JY0KPBSJElTZ5sSSQF3Q9kQuFPaeta5DW3w2tIW/9f
+         uBNDa6yrRqf0FIXwAjQN+gFLiLqWQ7CZFQ833n98dvT6r8nVJxlk7NKAsZo2Qc40YKPj
+         kc1GocHXtI9SYa7traI7GAWi/WVYRjdoH7RGDCJ/kICK4yRov6fIFZUttPhqJzxrzlHG
+         PWhEs9iXz+5l2ITp3k50CwRdsHpYf0Sw7OyKoG4rt570CctFbrAK8aZaar/eCLJrJywo
+         ReQg==
+X-Gm-Message-State: AOAM531KPjIKzwYMTzCJKWdjp5WEW3nk7Q06ga81v9NIetZhJLxHT+sx
+        6CER7Rfgig8huzm9S7UerwozTyIeOtEGAoZfzYU=
+X-Google-Smtp-Source: ABdhPJz7lnbIX2lahXzVLoe09HL55d69W8pMSWjbbe0rh+PguNFz7IkFzdIbTH5JBTGQEDu6oEaWFf5u6V4iu/GygDM=
+X-Received: by 2002:a17:906:4f10:: with SMTP id t16mr19512291eju.337.1623753461201;
+ Tue, 15 Jun 2021 03:37:41 -0700 (PDT)
+MIME-Version: 1.0
+References: <CAD-N9QUUCSpZjg5RwdKBNF7xx127E6fUowTZkUhm66C891Fpkg@mail.gmail.com>
+ <20210614163401.52807197@gmail.com> <CAD-N9QV5_91A6n5QcrafmQRbqH_qzFRatno-6z0i7q-V9VnLzg@mail.gmail.com>
+ <20210614172512.799db10d@gmail.com> <CAD-N9QUhQT8pG8Une8Fac1pJaiVd_mi9AU2c_nkPjTi36xbutQ@mail.gmail.com>
+ <20210614174727.6a38b584@gmail.com> <CAD-N9QXUrv7zjSyUjsJsWO6KZDhGYtkTCK9U_ZuPA7awJ8P3Yw@mail.gmail.com>
+ <20210614233011.79ebe38a@gmail.com>
+In-Reply-To: <20210614233011.79ebe38a@gmail.com>
+From:   Dongliang Mu <mudongliangabcd@gmail.com>
+Date:   Tue, 15 Jun 2021 18:37:14 +0800
+Message-ID: <CAD-N9QWj7LpdJvDy7r2+WCeFKw2P7DFos=88186-h3GFZPKAvw@mail.gmail.com>
+Subject: Re: Suggestions on how to debug kernel crashes where printk and gdb
+ both does not work
+To:     Pavel Skripkin <paskripkin@gmail.com>
 Cc:     alex.aring@gmail.com, "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
         linux-kernel <linux-kernel@vger.kernel.org>,
@@ -67,145 +73,177 @@ Cc:     alex.aring@gmail.com, "David S. Miller" <davem@davemloft.net>,
         syzbot+b80c9959009a9325cdff@syzkaller.appspotmail.com,
         Dan Carpenter <dan.carpenter@oracle.com>,
         Greg KH <gregkh@linuxfoundation.org>
-Subject: Re: Suggestions on how to debug kernel crashes where printk and gdb
- both does not work
-Message-ID: <20210614233011.79ebe38a@gmail.com>
-In-Reply-To: <CAD-N9QXUrv7zjSyUjsJsWO6KZDhGYtkTCK9U_ZuPA7awJ8P3Yw@mail.gmail.com>
-References: <CAD-N9QUUCSpZjg5RwdKBNF7xx127E6fUowTZkUhm66C891Fpkg@mail.gmail.com>
-        <20210614163401.52807197@gmail.com>
-        <CAD-N9QV5_91A6n5QcrafmQRbqH_qzFRatno-6z0i7q-V9VnLzg@mail.gmail.com>
-        <20210614172512.799db10d@gmail.com>
-        <CAD-N9QUhQT8pG8Une8Fac1pJaiVd_mi9AU2c_nkPjTi36xbutQ@mail.gmail.com>
-        <20210614174727.6a38b584@gmail.com>
-        <CAD-N9QXUrv7zjSyUjsJsWO6KZDhGYtkTCK9U_ZuPA7awJ8P3Yw@mail.gmail.com>
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-suse-linux-gnu)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-On Mon, 14 Jun 2021 23:04:03 +0800
-Dongliang Mu <mudongliangabcd@gmail.com> wrote:
-
-> On Mon, Jun 14, 2021 at 10:47 PM Pavel Skripkin
-> <paskripkin@gmail.com> wrote:
-> >
-> > On Mon, 14 Jun 2021 22:40:55 +0800
-> > Dongliang Mu <mudongliangabcd@gmail.com> wrote:
-> >
-> > > On Mon, Jun 14, 2021 at 10:25 PM Pavel Skripkin
-> > > <paskripkin@gmail.com> wrote:
-> > > >
-> > > > On Mon, 14 Jun 2021 22:19:10 +0800
-> > > > Dongliang Mu <mudongliangabcd@gmail.com> wrote:
-> > > >
-> > > > > On Mon, Jun 14, 2021 at 9:34 PM Pavel Skripkin
-> > > > > <paskripkin@gmail.com> wrote:
-> > > > > >
-> > > > > > On Mon, 14 Jun 2021 21:22:43 +0800
-> > > > > > Dongliang Mu <mudongliangabcd@gmail.com> wrote:
-> > > > > >
-> > > > > > > Dear kernel developers,
+On Tue, Jun 15, 2021 at 4:30 AM Pavel Skripkin <paskripkin@gmail.com> wrote:
+>
+> On Mon, 14 Jun 2021 23:04:03 +0800
+> Dongliang Mu <mudongliangabcd@gmail.com> wrote:
+>
+> > On Mon, Jun 14, 2021 at 10:47 PM Pavel Skripkin
+> > <paskripkin@gmail.com> wrote:
+> > >
+> > > On Mon, 14 Jun 2021 22:40:55 +0800
+> > > Dongliang Mu <mudongliangabcd@gmail.com> wrote:
+> > >
+> > > > On Mon, Jun 14, 2021 at 10:25 PM Pavel Skripkin
+> > > > <paskripkin@gmail.com> wrote:
+> > > > >
+> > > > > On Mon, 14 Jun 2021 22:19:10 +0800
+> > > > > Dongliang Mu <mudongliangabcd@gmail.com> wrote:
+> > > > >
+> > > > > > On Mon, Jun 14, 2021 at 9:34 PM Pavel Skripkin
+> > > > > > <paskripkin@gmail.com> wrote:
 > > > > > > >
-> > > > > > > I was trying to debug the crash - memory leak in
-> > > > > > > hwsim_add_one [1] recently. However, I encountered a
-> > > > > > > disgusting issue: my breakpoint and printk/pr_alert in the
-> > > > > > > functions that will be surely executed do not work. The
-> > > > > > > stack trace is in the following. I wrote this email to
-> > > > > > > ask for some suggestions on how to debug such cases?
+> > > > > > > On Mon, 14 Jun 2021 21:22:43 +0800
+> > > > > > > Dongliang Mu <mudongliangabcd@gmail.com> wrote:
 > > > > > > >
-> > > > > > > Thanks very much. Looking forward to your reply.
+> > > > > > > > Dear kernel developers,
+> > > > > > > >
+> > > > > > > > I was trying to debug the crash - memory leak in
+> > > > > > > > hwsim_add_one [1] recently. However, I encountered a
+> > > > > > > > disgusting issue: my breakpoint and printk/pr_alert in the
+> > > > > > > > functions that will be surely executed do not work. The
+> > > > > > > > stack trace is in the following. I wrote this email to
+> > > > > > > > ask for some suggestions on how to debug such cases?
+> > > > > > > >
+> > > > > > > > Thanks very much. Looking forward to your reply.
+> > > > > > > >
+> > > > > > >
+> > > > > > > Hi, Dongliang!
+> > > > > > >
+> > > > > > > This bug is not similar to others on the dashboard. I spent
+> > > > > > > some time debugging it a week ago. The main problem here,
+> > > > > > > that memory allocation happens in the boot time:
+> > > > > > >
+> > > > > > > > [<ffffffff84359255>] kernel_init+0xc/0x1a7
+> > > > > > > > init/main.c:1447
 > > > > > > >
 > > > > > >
-> > > > > > Hi, Dongliang!
+> > > > > > Oh, nice catch. No wonder why my debugging does not work. :(
 > > > > > >
-> > > > > > This bug is not similar to others on the dashboard. I spent
-> > > > > > some time debugging it a week ago. The main problem here,
-> > > > > > that memory allocation happens in the boot time:
+> > > > > > > and reproducer simply tries to
+> > > > > > > free this data. You can use ftrace to look at it. Smth like
+> > > > > > > this:
+> > > > > > >
+> > > > > > > $ echo 'hwsim_*' > $TRACE_DIR/set_ftrace_filter
 > > > > > >
-> > > > > > > [<ffffffff84359255>] kernel_init+0xc/0x1a7
-> > > > > > > init/main.c:1447
+> > > > > > Thanks for your suggestion.
 > > > > > >
+> > > > > > Do you have any conclusions about this case? If you have found
+> > > > > > out the root cause and start writing patches, I will turn my
+> > > > > > focus to other cases.
 > > > > >
-> > > > > Oh, nice catch. No wonder why my debugging does not work. :(
+> > > > > No, I had some busy days and I have nothing about this bug for
+> > > > > now. I've just traced the reproducer execution and that's all :)
 > > > > >
-> > > > > > and reproducer simply tries to
-> > > > > > free this data. You can use ftrace to look at it. Smth like
-> > > > > > this:
-> > > > > >
-> > > > > > $ echo 'hwsim_*' > $TRACE_DIR/set_ftrace_filter
-> > > > >
-> > > > > Thanks for your suggestion.
-> > > > >
-> > > > > Do you have any conclusions about this case? If you have found
-> > > > > out the root cause and start writing patches, I will turn my
-> > > > > focus to other cases.
+> > > > > I guess, some error handling paths are broken, but Im not sure
 > > > >
-> > > > No, I had some busy days and I have nothing about this bug for
-> > > > now. I've just traced the reproducer execution and that's all :)
+> > > > In the beginning, I agreed with you. However, after I manually
+> > > > checked functions: hwsim_probe (initialization) and  hwsim_remove
+> > > > (cleanup), then things may be different. The cleanup looks
+> > > > correct to me. I would like to debug but stuck with the debugging
+> > > > process.
 > > > >
-> > > > I guess, some error handling paths are broken, but Im not sure
+> > > > And there is another issue: the cleanup function also does not
+> > > > output anything or hit the breakpoint. I don't quite understand
+> > > > it since the cleanup is not at the boot time.
+> > > >
+> > > > Any idea?
+> > > >
 > > >
-> > > In the beginning, I agreed with you. However, after I manually
-> > > checked functions: hwsim_probe (initialization) and  hwsim_remove
-> > > (cleanup), then things may be different. The cleanup looks
-> > > correct to me. I would like to debug but stuck with the debugging
-> > > process.
+> > > Output from ftrace (syzkaller repro):
 > > >
-> > > And there is another issue: the cleanup function also does not
-> > > output anything or hit the breakpoint. I don't quite understand
-> > > it since the cleanup is not at the boot time.
+> > > root@syzkaller:~# cat /sys/kernel/tracing/trace
+> > > # tracer: function_graph
+> > > #
+> > > # CPU  DURATION                  FUNCTION CALLS
+> > > # |     |   |                     |   |   |   |
+> > >  1)               |  hwsim_del_radio_nl() {
+> > >  1)               |    hwsim_del() {
+> > >  1)               |      hwsim_edge_unsubscribe_me() {
+> > >  1) ! 310.041 us  |        hwsim_free_edge();
+> > >  1) ! 665.221 us  |      }
+> > >  1) * 52999.05 us |    }
+> > >  1) * 53035.38 us |  }
 > > >
-> > > Any idea?
-> > >
+> > > Cleanup function is not the case, I think :)
 > >
-> > Output from ftrace (syzkaller repro):
+> > It seems like I spot the incorrect cleanup function (hwsim_remove is
+> > the right one is in my mind). Let me learn how to use ftrace to log
+> > the executed functions and then discuss this case with you guys.
 > >
-> > root@syzkaller:~# cat /sys/kernel/tracing/trace
-> > # tracer: function_graph
-> > #
-> > # CPU  DURATION                  FUNCTION CALLS
-> > # |     |   |                     |   |   |   |
-> >  1)               |  hwsim_del_radio_nl() {
-> >  1)               |    hwsim_del() {
-> >  1)               |      hwsim_edge_unsubscribe_me() {
-> >  1) ! 310.041 us  |        hwsim_free_edge();
-> >  1) ! 665.221 us  |      }
-> >  1) * 52999.05 us |    }
-> >  1) * 53035.38 us |  }
-> >
-> > Cleanup function is not the case, I think :)
-> 
-> It seems like I spot the incorrect cleanup function (hwsim_remove is
-> the right one is in my mind). Let me learn how to use ftrace to log
-> the executed functions and then discuss this case with you guys.
-> 
+>
+> Hmmm, I think, there is a mess with lists.
+>
+> I just want to share my debug results, I have no idea about the fix for
+> now.
+>
+> In hwsim_probe() edge for phy->idx = 1 is allocated, then reproduces
+> sends a request to delete phy with idx == 0, so this check in
+> hwsim_edge_unsubscribe_me():
+>
+>         if (e->endpoint->idx == phy->idx) {
+>                 ... clean up code ...
+>         }
+>
+> won't be passed and edge won't be freed (because it was allocated for
+> phy with idx == 1). Allocated edge for phy 1 becomes leaked after
+> hwsim_del(). I can't really see the code where phy with idx == 1 can
+> be deleted from list...
 
-Hmmm, I think, there is a mess with lists.
+Thanks for sharing your debugging result.
 
-I just want to share my debug results, I have no idea about the fix for
-now.
+              hwsim_phys
+                       |
+   ---------------------------------
+   |                                      |
+sub0 (edges)                 sub1 (edges)
+   ----> e (idx = 1)               ----> e (idx = 0)
 
-In hwsim_probe() edge for phy->idx = 1 is allocated, then reproduces
-sends a request to delete phy with idx == 0, so this check in
-hwsim_edge_unsubscribe_me():
+hwsim_del_radio_nl will call hwsim_del to delete phy (idx:1).
+However, in this function, it only deletes the e in the edge list of sub1.
+Then it deletes phy (i.e., sub0) from the hwsim_phys list. So it
+leaves the e in the edge list of sub0 non-free.
 
-	if (e->endpoint->idx == phy->idx) { 
-		... clean up code ...
-	}
+I proposed a patch and test it successfully in the syzbot dashboard.
 
-won't be passed and edge won't be freed (because it was allocated for
-phy with idx == 1). Allocated edge for phy 1 becomes leaked after
-hwsim_del(). I can't really see the code where phy with idx == 1 can
-be deleted from list...
+diff --git a/drivers/net/ieee802154/mac802154_hwsim.c
+b/drivers/net/ieee802154/mac802154_hwsim.c
+index da9135231c07..b05159cff33a 100644
+--- a/drivers/net/ieee802154/mac802154_hwsim.c
++++ b/drivers/net/ieee802154/mac802154_hwsim.c
+@@ -824,9 +824,16 @@ static int hwsim_add_one(struct genl_info *info,
+struct device *dev,
+ static void hwsim_del(struct hwsim_phy *phy)
+ {
+  struct hwsim_pib *pib;
++ struct hwsim_edge *e;
 
-Maybe, it's kmemleak bug. Similar strange case was with this one
-https://syzkaller.appspot.com/bug?id=3a325b8389fc41c1bc94de0f4ac437ed13cce584.
-I find it strange, that I could reach leaked pointers after kmemleak reported a
-leak. Im not familiar with kmemleak internals and I might be wrong 
+  hwsim_edge_unsubscribe_me(phy);
+
++ // remove the edges in the list
++ list_for_each_entry_rcu(e, &phy->edges, list) {
++ list_del_rcu(&e->list);
++ hwsim_free_edge(e);
++ }
++
+  list_del(&phy->list);
+
+  rcu_read_lock();
+
+ I will send a patch later.
 
 
-With regards,
-Pavel Skripkin
+>
+> Maybe, it's kmemleak bug. Similar strange case was with this one
+> https://syzkaller.appspot.com/bug?id=3a325b8389fc41c1bc94de0f4ac437ed13cce584.
+> I find it strange, that I could reach leaked pointers after kmemleak reported a
+> leak. Im not familiar with kmemleak internals and I might be wrong
+>
+>
+> With regards,
+> Pavel Skripkin
