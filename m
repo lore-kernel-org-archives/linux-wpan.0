@@ -2,82 +2,99 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=0.2 required=3.0 tests=BAYES_20,DKIM_SIGNED,
+X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89012C2B9F4
-	for <linux-wpan@archiver.kernel.org>; Sat, 19 Jun 2021 11:35:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD4C9C2B9F4
+	for <linux-wpan@archiver.kernel.org>; Tue, 22 Jun 2021 18:29:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 67F7B610A1
-	for <linux-wpan@archiver.kernel.org>; Sat, 19 Jun 2021 11:35:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 84FBF61164
+	for <linux-wpan@archiver.kernel.org>; Tue, 22 Jun 2021 18:29:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233888AbhFSLhv (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Sat, 19 Jun 2021 07:37:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43058 "EHLO
+        id S231971AbhFVScO (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 22 Jun 2021 14:32:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44910 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233146AbhFSLhu (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Sat, 19 Jun 2021 07:37:50 -0400
-Received: from mail-oi1-x22a.google.com (mail-oi1-x22a.google.com [IPv6:2607:f8b0:4864:20::22a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1146C061574
-        for <linux-wpan@vger.kernel.org>; Sat, 19 Jun 2021 04:35:39 -0700 (PDT)
-Received: by mail-oi1-x22a.google.com with SMTP id w1so765615oie.13
-        for <linux-wpan@vger.kernel.org>; Sat, 19 Jun 2021 04:35:39 -0700 (PDT)
+        with ESMTP id S231297AbhFVScO (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 22 Jun 2021 14:32:14 -0400
+Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2526C061574;
+        Tue, 22 Jun 2021 11:29:57 -0700 (PDT)
+Received: by mail-wr1-x435.google.com with SMTP id n7so24796054wri.3;
+        Tue, 22 Jun 2021 11:29:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=x5HrP36gO0ALn9u29sXSbHdTWm62qTUICdR76n9yB/M=;
-        b=qfyno8OX68b9pxiY3AUAvfsIq2NyMCu6SahEE4S0bSx92e0LY1+dbXapw6Jz+3uBpc
-         vvtcs9fwMiri69umkSyhsjS3Si24HJ5oXTva1PBloe7bUDW98aDP9VWuRKnQXS3RdZPn
-         OLNqafmwFufmaDrdUi3r/+sYEyfxVIFa+nVdRjgFIMPWFgJNhhRIWHLuVSSKUbIPjOiv
-         Ze7Ksvfn3Nv7fwKq/EQJ/9oAWgp9Y+dR2zo22Oxaz5U3RKrjNoQvd2ZNEFjF1u8NOHCP
-         ZxbHkHyOV/jXL+nQP73NXPe9hyV7IK3+i0bfZyj2q0H/G3VIgAsGML3e+/bg3fX/rlK5
-         gDvA==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=6JFgiOQERZSIy0aWNl2Nl9CVI7uX5ANotzhjU2/vxGw=;
+        b=jIbmPpEhJU74qAsdco+GdmvRW7QJEL+iz1azILolEbS/x6/m088dbH2Nhzl5jhr/uv
+         etvI7XLpDyh+bk/6gXuIHY0qMATunpX6fjQ3NrttjO4u+HbNcinf7bkJCQxK8sTSc08K
+         EoD9Afn5HGSgn+Bsc3DifuEAeAh+2YmhjR3IlZwggW4YcAmA9YQCwSPGdwxp3nKxdqb0
+         AQpC8x/zK57rBdJwxzz/0ypiXYBTz0TsUo7L7khGcxjucRoKlrGGs87Kw19J6/FIvrnb
+         9tkX8QHrq7pPq5oeKCHiUkpSBUye9lJpHvG33iEiCVYT4O+Za7+fJOl62iM2ikc3EotX
+         D6bA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=x5HrP36gO0ALn9u29sXSbHdTWm62qTUICdR76n9yB/M=;
-        b=hZUW2SRPNDP9a85PHShyhIdsMJPG3PGwwCKwU7MZ21WoRPtlyI3HwOdAMoVgWbaW3a
-         Z/nv2qnXSwV8aaZuv0MTEAloNKxtolmgrfKPVzfmSfqEX9Vony2LaRINZY4eOty/HiAK
-         udcq1+4uhqQ+B11E0rFKoeWvE+fU/+XQHhF8KlwHIqZF/PZO4HzGEhAsm+CORR54LNGI
-         xZ75b0tCWExXwRadm1iGmg07n8FkO9HAb/z4NRY0DyCjkBs+JrqMTTsLWwxD3j4yVNwZ
-         +Yby+K/DPuxdO9uL38+vwFBR0s8PjguNG6LSbLRPYFR8NKOdTb5FcQYTFpYWwUX9zdGj
-         +RKw==
-X-Gm-Message-State: AOAM533GYyeVK5de/cy+DnMD/UuNAtYcyX48cJSW87+rm+8C7f42klaK
-        sxAU7A9nkEpVyPHZr6rIcFQTErvmN9wOBYBqIoOt/9JRdEQIDg==
-X-Google-Smtp-Source: ABdhPJzDS6pNmTfyn2dwFVNfIUBnd0+PwH9OTcW4RVQLW99Qx4ETNAMCUpc7+L9AIibEn/vFd2xu0Ai1mOcf3+Khx6k=
-X-Received: by 2002:aca:7541:: with SMTP id q62mr17780488oic.37.1624102539053;
- Sat, 19 Jun 2021 04:35:39 -0700 (PDT)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=6JFgiOQERZSIy0aWNl2Nl9CVI7uX5ANotzhjU2/vxGw=;
+        b=paUN1JQgOkHGrH9gDnIUcxdCdJIaPHCWjHPN8cbpST/fJn+Pl3QXWs5JbHWfqw9Q4y
+         YJKdbm9XJRdYL9daGjL40gDjL0OKGCM7wy7WJxbQv8BRY3yP7jUDO1P5DZbZYebJwUtX
+         U7TdNhftsMtWUAwuQMIjxsjTOGzDgzUrzPsSuVa4AkEe4ABcatLyUfcq3aMIwr2Be7Oo
+         sNo4yEFPzxxM2BbvXHtaU7LoM16F2b1FdFbiBCCGHiX3RT53U9tha6+t2TxGNM55GNGk
+         ZD9TdOfR7LsZ6PKfvC/rH/ZVepJ9Al2mMTk8OE7D9uiikpmzzrks46aq7I903qqCbdxT
+         gQaA==
+X-Gm-Message-State: AOAM533ylD3ZWMDCcWKBXeRCfsj8tA+FLNxXA2+unrJypPuVJKcAu6ZP
+        CcVpOKNrcDBw4yI+YFYbt5Oil6kUQFTkCGkUXMY=
+X-Google-Smtp-Source: ABdhPJzLN9lgHu7OvRNCUQaRpxm70alEhzgPPZOlg1pCZqZyJEQ8nIDs/TQ1ghwGdgr8Y400beOlOs0T7GCv1ZBoo3g=
+X-Received: by 2002:a5d:5741:: with SMTP id q1mr2127032wrw.65.1624386596637;
+ Tue, 22 Jun 2021 11:29:56 -0700 (PDT)
 MIME-Version: 1.0
-From:   Christopher Friedt <chrisfriedt@gmail.com>
-Date:   Sat, 19 Jun 2021 07:35:28 -0400
-Message-ID: <CAF4BF-Qd9nenMGO2mQv8PCHUfU5aRaMHgdGyo51YDx+_wgZQPQ@mail.gmail.com>
-Subject: Linux Plumbers IoT MC: Call For Proposals
-To:     linux-wpan@vger.kernel.org
+References: <20210616020901.2759466-1-mudongliangabcd@gmail.com>
+In-Reply-To: <20210616020901.2759466-1-mudongliangabcd@gmail.com>
+From:   Alexander Aring <alex.aring@gmail.com>
+Date:   Tue, 22 Jun 2021 14:29:45 -0400
+Message-ID: <CAB_54W51MxDwN5oPxBqioaNhq-eB1QfXNMyUpmNZOWNDM3MmnA@mail.gmail.com>
+Subject: Re: [PATCH v2] ieee802154: hwsim: Fix memory leak in hwsim_add_one
+To:     Dongliang Mu <mudongliangabcd@gmail.com>
+Cc:     Stefan Schmidt <stefan@datenfreihafen.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        linux-wpan - ML <linux-wpan@vger.kernel.org>,
+        kernel list <linux-kernel@vger.kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
+        syzbot+b80c9959009a9325cdff@syzkaller.appspotmail.com
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi everyone,
+Hi,
 
-The IoT MC (IoThree's Company) has been accepted for the 3rd straight
-year at Linux Plumbers, Sept 20-24 2021 (Virtual).
+On Tue, 15 Jun 2021 at 22:09, Dongliang Mu <mudongliangabcd@gmail.com> wrote:
+>
+> No matter from hwsim_remove or hwsim_del_radio_nl, hwsim_del fails to
+> remove the entry in the edges list. Take the example below, phy0, phy1
+> and e0 will be deleted, resulting in e1 not freed and accessed in the
+> future.
+>
+>               hwsim_phys
+>                   |
+>     ------------------------------
+>     |                            |
+> phy0 (edges)                 phy1 (edges)
+>    ----> e1 (idx = 1)             ----> e0 (idx = 0)
+>
+> Fix this by deleting and freeing all the entries in the edges list
+> between hwsim_edge_unsubscribe_me and list_del(&phy->list).
+>
+> Reported-by: syzbot+b80c9959009a9325cdff@syzkaller.appspotmail.com
+> Fixes: 1c9f4a3fce77 ("ieee802154: hwsim: fix rcu handling")
+> Signed-off-by: Dongliang Mu <mudongliangabcd@gmail.com>
 
-I see lots of great stuff happening here and would like to invite the
-community to put in some proposals for IoT-related talks and
-discussions.
+Acked-by: Alexander Aring <aahringo@redhat.com>
 
-https://linuxplumbersconf.org/event/11/abstracts/
-
-Just scroll down to "Submit New Proposal". In the dialog that appears,
-under "Track" select "IoThree's Company MC".
-
-Tell us about your successes and frustrations about bringing-up IoT
-products in the Linux ecosystem :-) We want to improve the developer
-experience for everyone and discussion is very welcome!
-
-Looking forward to seeing everyone again this year virtually.
-
-Chris
+Thanks!
