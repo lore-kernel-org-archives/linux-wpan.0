@@ -2,74 +2,110 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF0D0C49EB9
-	for <linux-wpan@archiver.kernel.org>; Thu, 24 Jun 2021 22:50:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1327AC07E99
+	for <linux-wpan@archiver.kernel.org>; Mon,  5 Jul 2021 13:13:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E02716138C
-	for <linux-wpan@archiver.kernel.org>; Thu, 24 Jun 2021 22:50:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DC051613FC
+	for <linux-wpan@archiver.kernel.org>; Mon,  5 Jul 2021 13:13:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232966AbhFXWw1 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Thu, 24 Jun 2021 18:52:27 -0400
-Received: from mail.kernel.org ([198.145.29.99]:54912 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232921AbhFXWwX (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-        Thu, 24 Jun 2021 18:52:23 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPS id AA5CD613C9;
-        Thu, 24 Jun 2021 22:50:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1624575003;
-        bh=/o7mHC8UiHdNqD8OncCd0TNsfyIG7RXD+Wqd1ei3thA=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=f/WUWEaYzgnvDDpjM5Ac0/DsvkjeEJfc27wS/D3AJ594ycvlFNGETW6jtCz4euZ4e
-         k1J/idnmLzy8/KkuSveYgQiwKRnl3DfAjPe5DK0Kboat8StJ0Ht68LL4Kj9t8UK9U6
-         yJAHKEvXIinD6JZnkVrlfb7bgjqKsGY7Bnszu7fOy7rN9M5Au6hn5ZDQzv+AkbgC5j
-         mAXg5a2rd8QGd0iYzh+QfGf8kcVtWBI+3mxBMgik9menui5RDgtYbkdEZrR+rK8ssC
-         7OVZw6S9vMVmrEc3tHbJWBUtihSk6tRySEtaX+AleS7y6E65PxS4ZLCURVTgpHnVe+
-         fUPo1FtfAKAzA==
-Content-Type: text/plain; charset="utf-8"
+        id S231253AbhGENQW (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 5 Jul 2021 09:16:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36116 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230188AbhGENQW (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 5 Jul 2021 09:16:22 -0400
+Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA02EC061574;
+        Mon,  5 Jul 2021 06:13:44 -0700 (PDT)
+Received: by mail-pg1-x52e.google.com with SMTP id h4so18253189pgp.5;
+        Mon, 05 Jul 2021 06:13:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=wFmAr/8kD/4DnJeP0k0Om9P2bTmcS4/IENh/FR70ReU=;
+        b=eO1L2aKpwY2CCfPM/UQZcmfKJaylanS0BZAQbHSNM0KtuNbmpUZzBsl/TGptzoT4Fm
+         izUBqQy4qS7SeA6NR1dbtMaLJyF2luIsziceDnbgjxLWrbn3e1R2gqhqpeF4f5Mtr2cW
+         yNhcV3Z21CovXQ4TG4KcLMTIhHP7bnzCr10zXlPVCSFZccJ98C4/wZIBejT1VkdCUfus
+         6VUKPGBb3qdVgEAniVoXLnoSEdXbEngy1aSYEp0iVPEFmM/3QgX3ah/o2b02GL1lFHQr
+         cJI3oe0BT7xMq6W/BCXmouTDq1wZjKVXwc16T0xZzJz5LPyei9to38PIGEwM6U2X5ZLi
+         EwcQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=wFmAr/8kD/4DnJeP0k0Om9P2bTmcS4/IENh/FR70ReU=;
+        b=CB3bYUaSTJky4T6Zz6dJv2tcMpbAiakVmm2z82YS4Eye+29wUuK4tWfvLmVs5fCKTq
+         zSNjb/LIMFBE8aa7va7re248IsUem2sjJbQeoJA4ZbdKQZ+BONNKkin+Pt2UTH4KCcul
+         Qn1974cXfhT1NFP3NJAblgbVMMIQ6r6+SbZHhrVvG9FUJzXZbKpd5Qdyt+HLpyRsDevJ
+         lCkGVGPhhLOtVBWd2h5Zna2hKEOY5so3ivii32o681a5VvD+GbTJvjMoZwdKIyHAIwWA
+         ERClhk6VJn2aHYpQ92pfexKuxUOZ7tAoHcf+GlbvRzp/TeZTQuqrLUqhEQYonBMsqsjq
+         bzTA==
+X-Gm-Message-State: AOAM531I7c6xoZ0xPk4WyHBCNzKu4XL2WEPclMtP2Xl0uLKPlec22hwt
+        rMRDlhCylstQgJQad/kNVk0=
+X-Google-Smtp-Source: ABdhPJx9A2kcwStu6d8y6Vi0qpz3Y2owioRqVMIYcD264kII+3mQGLQWUYA3gALoexJHddnf+2gLxw==
+X-Received: by 2002:aa7:959d:0:b029:31a:8c2c:e91d with SMTP id z29-20020aa7959d0000b029031a8c2ce91dmr11889870pfj.64.1625490824349;
+        Mon, 05 Jul 2021 06:13:44 -0700 (PDT)
+Received: from localhost.localdomain ([45.135.186.93])
+        by smtp.gmail.com with ESMTPSA id y9sm12326191pfn.182.2021.07.05.06.13.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 Jul 2021 06:13:43 -0700 (PDT)
+From:   Dongliang Mu <mudongliangabcd@gmail.com>
+To:     Alexander Aring <alex.aring@gmail.com>,
+        Stefan Schmidt <stefan@datenfreihafen.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>
+Cc:     Dongliang Mu <mudongliangabcd@gmail.com>,
+        Alexander Aring <aring@mojatatu.com>,
+        linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] ieee802154: hwsim: fix GPF in hwsim_set_edge_lqi
+Date:   Mon,  5 Jul 2021 21:13:20 +0800
+Message-Id: <20210705131321.217111-1-mudongliangabcd@gmail.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: pull-request: ieee802154 for net 2021-06-24
-From:   patchwork-bot+netdevbpf@kernel.org
-Message-Id: <162457500363.3017.14562119396532729689.git-patchwork-notify@kernel.org>
-Date:   Thu, 24 Jun 2021 22:50:03 +0000
-References: <20210624204009.3953413-1-stefan@datenfreihafen.org>
-In-Reply-To: <20210624204009.3953413-1-stefan@datenfreihafen.org>
-To:     Stefan Schmidt <stefan@datenfreihafen.org>
-Cc:     davem@davemloft.net, kuba@kernel.org, linux-wpan@vger.kernel.org,
-        alex.aring@gmail.com, netdev@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello:
+Both MAC802154_HWSIM_ATTR_RADIO_ID and MAC802154_HWSIM_ATTR_RADIO_EDGE,
+MAC802154_HWSIM_EDGE_ATTR_ENDPOINT_ID and MAC802154_HWSIM_EDGE_ATTR_LQI
+must be present to fix GPF.
 
-This pull request was applied to netdev/net.git (refs/heads/master):
+Fixes: f25da51fdc38 ("ieee802154: hwsim: add replacement for fakelb")
+Signed-off-by: Dongliang Mu <mudongliangabcd@gmail.com>
+---
+ drivers/net/ieee802154/mac802154_hwsim.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-On Thu, 24 Jun 2021 22:40:09 +0200 you wrote:
-> Hello Dave, Jakub.
-> 
-> An update from ieee802154 for your *net* tree.
-> 
-> This time we only have fixes for ieee802154 hwsim driver.
-> 
-> Sparked from some syzcaller reports We got a potential
-> crash fix from Eric Dumazet and two memory leak fixes from
-> Dongliang Mu.
-> 
-> [...]
-
-Here is the summary with links:
-  - pull-request: ieee802154 for net 2021-06-24
-    https://git.kernel.org/netdev/net/c/8bead5c2a255
-
-You are awesome, thank you!
---
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+diff --git a/drivers/net/ieee802154/mac802154_hwsim.c b/drivers/net/ieee802154/mac802154_hwsim.c
+index ebc976b7fcc2..cae52bfb871e 100644
+--- a/drivers/net/ieee802154/mac802154_hwsim.c
++++ b/drivers/net/ieee802154/mac802154_hwsim.c
+@@ -528,14 +528,14 @@ static int hwsim_set_edge_lqi(struct sk_buff *msg, struct genl_info *info)
+ 	u32 v0, v1;
+ 	u8 lqi;
+ 
+-	if (!info->attrs[MAC802154_HWSIM_ATTR_RADIO_ID] &&
++	if (!info->attrs[MAC802154_HWSIM_ATTR_RADIO_ID] ||
+ 	    !info->attrs[MAC802154_HWSIM_ATTR_RADIO_EDGE])
+ 		return -EINVAL;
+ 
+ 	if (nla_parse_nested_deprecated(edge_attrs, MAC802154_HWSIM_EDGE_ATTR_MAX, info->attrs[MAC802154_HWSIM_ATTR_RADIO_EDGE], hwsim_edge_policy, NULL))
+ 		return -EINVAL;
+ 
+-	if (!edge_attrs[MAC802154_HWSIM_EDGE_ATTR_ENDPOINT_ID] &&
++	if (!edge_attrs[MAC802154_HWSIM_EDGE_ATTR_ENDPOINT_ID] ||
+ 	    !edge_attrs[MAC802154_HWSIM_EDGE_ATTR_LQI])
+ 		return -EINVAL;
+ 
+-- 
+2.25.1
 
