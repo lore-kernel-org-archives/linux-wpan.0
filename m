@@ -2,110 +2,89 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1327AC07E99
-	for <linux-wpan@archiver.kernel.org>; Mon,  5 Jul 2021 13:13:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED8ADC07E9B
+	for <linux-wpan@archiver.kernel.org>; Wed,  7 Jul 2021 13:44:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DC051613FC
-	for <linux-wpan@archiver.kernel.org>; Mon,  5 Jul 2021 13:13:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CB9F761C93
+	for <linux-wpan@archiver.kernel.org>; Wed,  7 Jul 2021 13:44:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231253AbhGENQW (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 5 Jul 2021 09:16:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36116 "EHLO
+        id S231357AbhGGNrS (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 7 Jul 2021 09:47:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58656 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230188AbhGENQW (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 5 Jul 2021 09:16:22 -0400
-Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA02EC061574;
-        Mon,  5 Jul 2021 06:13:44 -0700 (PDT)
-Received: by mail-pg1-x52e.google.com with SMTP id h4so18253189pgp.5;
-        Mon, 05 Jul 2021 06:13:44 -0700 (PDT)
+        with ESMTP id S231516AbhGGNrR (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 7 Jul 2021 09:47:17 -0400
+Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7736EC061574;
+        Wed,  7 Jul 2021 06:44:37 -0700 (PDT)
+Received: by mail-wm1-x336.google.com with SMTP id l18-20020a1ced120000b029014c1adff1edso4284941wmh.4;
+        Wed, 07 Jul 2021 06:44:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=wFmAr/8kD/4DnJeP0k0Om9P2bTmcS4/IENh/FR70ReU=;
-        b=eO1L2aKpwY2CCfPM/UQZcmfKJaylanS0BZAQbHSNM0KtuNbmpUZzBsl/TGptzoT4Fm
-         izUBqQy4qS7SeA6NR1dbtMaLJyF2luIsziceDnbgjxLWrbn3e1R2gqhqpeF4f5Mtr2cW
-         yNhcV3Z21CovXQ4TG4KcLMTIhHP7bnzCr10zXlPVCSFZccJ98C4/wZIBejT1VkdCUfus
-         6VUKPGBb3qdVgEAniVoXLnoSEdXbEngy1aSYEp0iVPEFmM/3QgX3ah/o2b02GL1lFHQr
-         cJI3oe0BT7xMq6W/BCXmouTDq1wZjKVXwc16T0xZzJz5LPyei9to38PIGEwM6U2X5ZLi
-         EwcQ==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=7HoO777ODl3CaYhM0dKd5nY0hn/FqfWTEQuvzzyL5K0=;
+        b=vMEH+TFKvFv524Mvb6LIH7+r0dXmVCqSM9ni5Odv22fm2w/TY8evb2mmBlfnZu0hIE
+         MrKIEomkLj1KqlOqRTzE9cw+C+kpIXXSvcxsdMauOmQoZ55WjG0Nx0vJ2dCIO/pv2QpD
+         67qoovHdnjZCMIgoAOqL9Bjoqt7Bx+Tgd13c8Rzu09ZTAv2MA+iCvo6Ug2mI76a4uxQ9
+         5P2zhqVJ/o7AnvvAZa0cGfriN1iuHkkw+av8rSfuBxi9wA3Q2fGlAQrWlXqzvhtij2wC
+         zNVJdiE4la1rHrJQCKJGhp+K99VYQ3715NnQeF/jqxVL02s2Z4LUB60OjjcXVBofOJrU
+         pcxQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=wFmAr/8kD/4DnJeP0k0Om9P2bTmcS4/IENh/FR70ReU=;
-        b=CB3bYUaSTJky4T6Zz6dJv2tcMpbAiakVmm2z82YS4Eye+29wUuK4tWfvLmVs5fCKTq
-         zSNjb/LIMFBE8aa7va7re248IsUem2sjJbQeoJA4ZbdKQZ+BONNKkin+Pt2UTH4KCcul
-         Qn1974cXfhT1NFP3NJAblgbVMMIQ6r6+SbZHhrVvG9FUJzXZbKpd5Qdyt+HLpyRsDevJ
-         lCkGVGPhhLOtVBWd2h5Zna2hKEOY5so3ivii32o681a5VvD+GbTJvjMoZwdKIyHAIwWA
-         ERClhk6VJn2aHYpQ92pfexKuxUOZ7tAoHcf+GlbvRzp/TeZTQuqrLUqhEQYonBMsqsjq
-         bzTA==
-X-Gm-Message-State: AOAM531I7c6xoZ0xPk4WyHBCNzKu4XL2WEPclMtP2Xl0uLKPlec22hwt
-        rMRDlhCylstQgJQad/kNVk0=
-X-Google-Smtp-Source: ABdhPJx9A2kcwStu6d8y6Vi0qpz3Y2owioRqVMIYcD264kII+3mQGLQWUYA3gALoexJHddnf+2gLxw==
-X-Received: by 2002:aa7:959d:0:b029:31a:8c2c:e91d with SMTP id z29-20020aa7959d0000b029031a8c2ce91dmr11889870pfj.64.1625490824349;
-        Mon, 05 Jul 2021 06:13:44 -0700 (PDT)
-Received: from localhost.localdomain ([45.135.186.93])
-        by smtp.gmail.com with ESMTPSA id y9sm12326191pfn.182.2021.07.05.06.13.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Jul 2021 06:13:43 -0700 (PDT)
-From:   Dongliang Mu <mudongliangabcd@gmail.com>
-To:     Alexander Aring <alex.aring@gmail.com>,
-        Stefan Schmidt <stefan@datenfreihafen.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>
-Cc:     Dongliang Mu <mudongliangabcd@gmail.com>,
-        Alexander Aring <aring@mojatatu.com>,
-        linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] ieee802154: hwsim: fix GPF in hwsim_set_edge_lqi
-Date:   Mon,  5 Jul 2021 21:13:20 +0800
-Message-Id: <20210705131321.217111-1-mudongliangabcd@gmail.com>
-X-Mailer: git-send-email 2.25.1
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=7HoO777ODl3CaYhM0dKd5nY0hn/FqfWTEQuvzzyL5K0=;
+        b=p00qur0V2ZZkgfRpJFUZ0A06mb8M6OdTIBmzrmLbJcylUWvn4wW80nm/X8sQpho5Oe
+         sHTsY1NwYguLI22iXPzbe/opB3jrPgEBkx3MlhGoONViepKPCZ/GmmMOvK7QqlAXTT78
+         M/MkrAEgDYmLUQqOo37f/yBkXT8PRbEpXz0Q+DQGft68ki4rDoj3bCaOXJ1/XZAPknH0
+         9zL4uhWEd61HG1yIqcTpdgqVQpcrdESyyspeOgYOwLDD4HcQFyM9gYUL65e2Te6kQLNX
+         GJEQLGIfNXXhn0FU4dzJMgR1Pv2d96BG2DY4tUH3giLKYoNICy+Uio8QBNc+9FUeI2bj
+         j3ng==
+X-Gm-Message-State: AOAM530w6kEcewpeG7nGgQ34ZOffM8TcNz3hmp6nNBri4UtxcBTgTV9o
+        kKjWhbayihr8IHPCcwHHuVNxbaQs49R/IALeVeojLU1Kbg4=
+X-Google-Smtp-Source: ABdhPJybEHc60axCSGk8qJoZ9ObsYO7vYHlSTJsV0EeT2/xVrIaeYzUNBujqkd5EBYolgdKc2PHdXw3Jy5DOcZ8p/Vs=
+X-Received: by 2002:a1c:e485:: with SMTP id b127mr2502161wmh.91.1625665476160;
+ Wed, 07 Jul 2021 06:44:36 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20210705131321.217111-1-mudongliangabcd@gmail.com>
+In-Reply-To: <20210705131321.217111-1-mudongliangabcd@gmail.com>
+From:   Alexander Aring <alex.aring@gmail.com>
+Date:   Wed, 7 Jul 2021 09:44:25 -0400
+Message-ID: <CAB_54W5ceXFPaYGs0T4pVq8AzRqUSvaBDWdBjvRurBYyihqfVg@mail.gmail.com>
+Subject: Re: [PATCH] ieee802154: hwsim: fix GPF in hwsim_set_edge_lqi
+To:     Dongliang Mu <mudongliangabcd@gmail.com>
+Cc:     Stefan Schmidt <stefan@datenfreihafen.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Alexander Aring <aring@mojatatu.com>,
+        linux-wpan - ML <linux-wpan@vger.kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
+        kernel list <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Both MAC802154_HWSIM_ATTR_RADIO_ID and MAC802154_HWSIM_ATTR_RADIO_EDGE,
-MAC802154_HWSIM_EDGE_ATTR_ENDPOINT_ID and MAC802154_HWSIM_EDGE_ATTR_LQI
-must be present to fix GPF.
+Hi,
 
-Fixes: f25da51fdc38 ("ieee802154: hwsim: add replacement for fakelb")
-Signed-off-by: Dongliang Mu <mudongliangabcd@gmail.com>
----
- drivers/net/ieee802154/mac802154_hwsim.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+On Mon, 5 Jul 2021 at 09:13, Dongliang Mu <mudongliangabcd@gmail.com> wrote:
+>
+> Both MAC802154_HWSIM_ATTR_RADIO_ID and MAC802154_HWSIM_ATTR_RADIO_EDGE,
+> MAC802154_HWSIM_EDGE_ATTR_ENDPOINT_ID and MAC802154_HWSIM_EDGE_ATTR_LQI
+> must be present to fix GPF.
+>
+> Fixes: f25da51fdc38 ("ieee802154: hwsim: add replacement for fakelb")
+> Signed-off-by: Dongliang Mu <mudongliangabcd@gmail.com>
 
-diff --git a/drivers/net/ieee802154/mac802154_hwsim.c b/drivers/net/ieee802154/mac802154_hwsim.c
-index ebc976b7fcc2..cae52bfb871e 100644
---- a/drivers/net/ieee802154/mac802154_hwsim.c
-+++ b/drivers/net/ieee802154/mac802154_hwsim.c
-@@ -528,14 +528,14 @@ static int hwsim_set_edge_lqi(struct sk_buff *msg, struct genl_info *info)
- 	u32 v0, v1;
- 	u8 lqi;
- 
--	if (!info->attrs[MAC802154_HWSIM_ATTR_RADIO_ID] &&
-+	if (!info->attrs[MAC802154_HWSIM_ATTR_RADIO_ID] ||
- 	    !info->attrs[MAC802154_HWSIM_ATTR_RADIO_EDGE])
- 		return -EINVAL;
- 
- 	if (nla_parse_nested_deprecated(edge_attrs, MAC802154_HWSIM_EDGE_ATTR_MAX, info->attrs[MAC802154_HWSIM_ATTR_RADIO_EDGE], hwsim_edge_policy, NULL))
- 		return -EINVAL;
- 
--	if (!edge_attrs[MAC802154_HWSIM_EDGE_ATTR_ENDPOINT_ID] &&
-+	if (!edge_attrs[MAC802154_HWSIM_EDGE_ATTR_ENDPOINT_ID] ||
- 	    !edge_attrs[MAC802154_HWSIM_EDGE_ATTR_LQI])
- 		return -EINVAL;
- 
--- 
-2.25.1
+Acked-by: Alexander Aring <aahringo@redhat.com>
 
+Thanks, but there are more places than this one. Can you send patches
+for them as well? Thanks! :)
+
+- Alex
