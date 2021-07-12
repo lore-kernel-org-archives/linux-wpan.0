@@ -2,83 +2,89 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 821C6C07E96
-	for <linux-wpan@archiver.kernel.org>; Thu,  8 Jul 2021 07:40:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05507C07E99
+	for <linux-wpan@archiver.kernel.org>; Mon, 12 Jul 2021 12:14:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 610CF61CE0
-	for <linux-wpan@archiver.kernel.org>; Thu,  8 Jul 2021 07:40:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D4EBC60D07
+	for <linux-wpan@archiver.kernel.org>; Mon, 12 Jul 2021 12:14:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229851AbhGHHnT (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Thu, 8 Jul 2021 03:43:19 -0400
-Received: from proxima.lasnet.de ([78.47.171.185]:41792 "EHLO
-        proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229838AbhGHHnS (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 8 Jul 2021 03:43:18 -0400
-Received: from [IPv6:2003:e9:d72a:e927:359b:e3fc:a5d5:7a7a] (p200300e9d72ae927359be3fca5d57a7a.dip0.t-ipconnect.de [IPv6:2003:e9:d72a:e927:359b:e3fc:a5d5:7a7a])
+        id S233738AbhGLMRj (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 12 Jul 2021 08:17:39 -0400
+Received: from smtp-relay-canonical-1.canonical.com ([185.125.188.121]:53964
+        "EHLO smtp-relay-canonical-1.canonical.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230074AbhGLMRh (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>);
+        Mon, 12 Jul 2021 08:17:37 -0400
+Received: from localhost (1.general.cking.uk.vpn [10.172.193.212])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
         (No client certificate requested)
-        (Authenticated sender: stefan@datenfreihafen.org)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id ADE75C03B9;
-        Thu,  8 Jul 2021 09:40:34 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
-        s=2021; t=1625730034;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=WzKCpAOxjZo2PkNwB1c0dcE+Sna2H3Vzrc3eOLIWS7c=;
-        b=vdNL/lO4ZZ8bZNWvSEIvddi8fbi5lUmXJjPV5qBTGDzTzXhGo1eFAjrp2LheHrbd67keB9
-        445yK7aGHMtzHyWSjmkiJWFfFuZ3nI+4++0johLEJ/zPXnki/PrbrVfj7d+SOAy0wrJFox
-        XPH6Qp+LA9u/8pK6TrwKLKGR/9xECHI09bO/e5OXXM0Q+/8CI00G48Mla6nZLsbKFJhqgZ
-        Que1p3rdZfOpSmu9Xjpt2pR0TvrTCdbF8sZx5DDM78LLmZaYLuLWfrI8MbNVIWpjc7mA9e
-        DqZlUZr6+MQSo/j8ZrZH1yJuz6A9Dc6QhKRjBNVdA3kGyw6XRJLCc02DflgOoQ==
-Subject: Re: [PATCH] ieee802154: hwsim: fix GPF in hwsim_new_edge_nl
+        by smtp-relay-canonical-1.canonical.com (Postfix) with ESMTPSA id 5174B405AE;
+        Mon, 12 Jul 2021 12:14:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+        s=20210705; t=1626092081;
+        bh=9cd7SB+YDylOyt5Q5dBTF8mzwTTXz59sqh18sE/UjxM=;
+        h=From:To:Subject:Date:Message-Id:MIME-Version:Content-Type;
+        b=siSb/6wSXYwWx+DNORGB6EzQlm7CHMJFGVlLZNSB05IJkhUNQhl/VaepdhWdi0u7X
+         SIeKZP1dWfcSa+LuFRtWFNz40UMNjioQoGJe9Y5nAT40qp5bgEvqjAfjlA1MJjRgSW
+         92a7aGdOqs/aU0yDuJYB9T3Z3EaUbsFZvWNOLUdvGHK44UScXBK1UFHKSvisxDczLn
+         sp3T2G4Vb6tw5SkMh9oocoZMduXmS1VQwZbNVdLay2/kxdAyVGX5k8rnqP9YeL6cqw
+         GV0iwaXi0msLt1PtoEnn9Gv75RqGozxf5JnSzSiKw9/HKdRr53tuZZYcLyDrJRe3OW
+         3Hrm6BaTEIYvg==
+From:   Colin King <colin.king@canonical.com>
 To:     Alexander Aring <alex.aring@gmail.com>,
-        Dongliang Mu <mudongliangabcd@gmail.com>
-Cc:     "David S. Miller" <davem@davemloft.net>,
+        Jukka Rissanen <jukka.rissanen@linux.intel.com>,
+        "David S . Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
-        linux-wpan - ML <linux-wpan@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-        kernel list <linux-kernel@vger.kernel.org>
-References: <20210707155633.1486603-1-mudongliangabcd@gmail.com>
- <CAB_54W5u9m3Xrfee8ywmWg7=aMB+Rx05w03kHfLuBpYVbxbEwQ@mail.gmail.com>
-From:   Stefan Schmidt <stefan@datenfreihafen.org>
-Message-ID: <98ba898e-98ef-ac5d-d8d2-fb177d7fa73a@datenfreihafen.org>
-Date:   Thu, 8 Jul 2021 09:40:34 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+        Stefan Schmidt <stefan@osg.samsung.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
+        netdev@vger.kernel.org
+Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] 6lowpan: iphc: Fix an off-by-one check of array index
+Date:   Mon, 12 Jul 2021 13:14:40 +0100
+Message-Id: <20210712121440.17860-1-colin.king@canonical.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-In-Reply-To: <CAB_54W5u9m3Xrfee8ywmWg7=aMB+Rx05w03kHfLuBpYVbxbEwQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello.
+From: Colin Ian King <colin.king@canonical.com>
 
-On 08.07.21 01:34, Alexander Aring wrote:
-> Hi,
-> 
-> On Wed, 7 Jul 2021 at 11:56, Dongliang Mu <mudongliangabcd@gmail.com> wrote:
->>
->> Both MAC802154_HWSIM_ATTR_RADIO_ID and MAC802154_HWSIM_ATTR_RADIO_EDGE
->> must be present to fix GPF.
->>
->> Fixes: f25da51fdc38 ("ieee802154: hwsim: add replacement for fakelb")
->> Signed-off-by: Dongliang Mu <mudongliangabcd@gmail.com>
-> 
-> Acked-by: Alexander Aring <aahringo@redhat.com>
+The bounds check of id is off-by-one and the comparison should
+be >= rather >. Currently the WARN_ON_ONCE check does not stop
+the out of range indexing of &ldev->ctx.table[id] so also add
+a return path if the bounds are out of range.
 
-This patch has been applied to the wpan tree and will be
-part of the next pull request to net. Thanks!
+Addresses-Coverity: ("Illegal address computation").
+Fixes: 5609c185f24d ("6lowpan: iphc: add support for stateful compression")
+Signed-off-by: Colin Ian King <colin.king@canonical.com>
+---
+ net/6lowpan/debugfs.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-regards
-Stefan Schmidt
+diff --git a/net/6lowpan/debugfs.c b/net/6lowpan/debugfs.c
+index 1c140af06d52..600b9563bfc5 100644
+--- a/net/6lowpan/debugfs.c
++++ b/net/6lowpan/debugfs.c
+@@ -170,7 +170,8 @@ static void lowpan_dev_debugfs_ctx_init(struct net_device *dev,
+ 	struct dentry *root;
+ 	char buf[32];
+ 
+-	WARN_ON_ONCE(id > LOWPAN_IPHC_CTX_TABLE_SIZE);
++	if (WARN_ON_ONCE(id >= LOWPAN_IPHC_CTX_TABLE_SIZE))
++		return;
+ 
+ 	sprintf(buf, "%d", id);
+ 
+-- 
+2.31.1
+
