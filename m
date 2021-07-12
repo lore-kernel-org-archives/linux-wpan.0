@@ -2,89 +2,94 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05507C07E99
-	for <linux-wpan@archiver.kernel.org>; Mon, 12 Jul 2021 12:14:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 678B2C07E99
+	for <linux-wpan@archiver.kernel.org>; Mon, 12 Jul 2021 13:49:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D4EBC60D07
-	for <linux-wpan@archiver.kernel.org>; Mon, 12 Jul 2021 12:14:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5082861003
+	for <linux-wpan@archiver.kernel.org>; Mon, 12 Jul 2021 13:49:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233738AbhGLMRj (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 12 Jul 2021 08:17:39 -0400
-Received: from smtp-relay-canonical-1.canonical.com ([185.125.188.121]:53964
-        "EHLO smtp-relay-canonical-1.canonical.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230074AbhGLMRh (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>);
-        Mon, 12 Jul 2021 08:17:37 -0400
-Received: from localhost (1.general.cking.uk.vpn [10.172.193.212])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by smtp-relay-canonical-1.canonical.com (Postfix) with ESMTPSA id 5174B405AE;
-        Mon, 12 Jul 2021 12:14:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-        s=20210705; t=1626092081;
-        bh=9cd7SB+YDylOyt5Q5dBTF8mzwTTXz59sqh18sE/UjxM=;
-        h=From:To:Subject:Date:Message-Id:MIME-Version:Content-Type;
-        b=siSb/6wSXYwWx+DNORGB6EzQlm7CHMJFGVlLZNSB05IJkhUNQhl/VaepdhWdi0u7X
-         SIeKZP1dWfcSa+LuFRtWFNz40UMNjioQoGJe9Y5nAT40qp5bgEvqjAfjlA1MJjRgSW
-         92a7aGdOqs/aU0yDuJYB9T3Z3EaUbsFZvWNOLUdvGHK44UScXBK1UFHKSvisxDczLn
-         sp3T2G4Vb6tw5SkMh9oocoZMduXmS1VQwZbNVdLay2/kxdAyVGX5k8rnqP9YeL6cqw
-         GV0iwaXi0msLt1PtoEnn9Gv75RqGozxf5JnSzSiKw9/HKdRr53tuZZYcLyDrJRe3OW
-         3Hrm6BaTEIYvg==
-From:   Colin King <colin.king@canonical.com>
-To:     Alexander Aring <alex.aring@gmail.com>,
-        Jukka Rissanen <jukka.rissanen@linux.intel.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Stefan Schmidt <stefan@osg.samsung.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
-        netdev@vger.kernel.org
-Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] 6lowpan: iphc: Fix an off-by-one check of array index
-Date:   Mon, 12 Jul 2021 13:14:40 +0100
-Message-Id: <20210712121440.17860-1-colin.king@canonical.com>
-X-Mailer: git-send-email 2.31.1
+        id S234172AbhGLNw1 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 12 Jul 2021 09:52:27 -0400
+Received: from szxga01-in.huawei.com ([45.249.212.187]:14070 "EHLO
+        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229503AbhGLNw0 (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 12 Jul 2021 09:52:26 -0400
+Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.54])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4GNlRH37M7zYrMm;
+        Mon, 12 Jul 2021 21:46:19 +0800 (CST)
+Received: from dggema769-chm.china.huawei.com (10.1.198.211) by
+ dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
+ 15.1.2176.2; Mon, 12 Jul 2021 21:49:35 +0800
+Received: from localhost (10.174.179.215) by dggema769-chm.china.huawei.com
+ (10.1.198.211) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2176.2; Mon, 12
+ Jul 2021 21:49:34 +0800
+From:   YueHaibing <yuehaibing@huawei.com>
+To:     <alex.aring@gmail.com>, <stefan@datenfreihafen.org>,
+        <davem@davemloft.net>, <kuba@kernel.org>, <marcel@holtmann.org>
+CC:     <linux-wpan@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, YueHaibing <yuehaibing@huawei.com>
+Subject: [PATCH] nl802154: Fix type check in nl802154_new_interface()
+Date:   Mon, 12 Jul 2021 21:44:30 +0800
+Message-ID: <20210712134430.19372-1-yuehaibing@huawei.com>
+X-Mailer: git-send-email 2.10.2.windows.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.174.179.215]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ dggema769-chm.china.huawei.com (10.1.198.211)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-From: Colin Ian King <colin.king@canonical.com>
+We got this UBSAN warning:
 
-The bounds check of id is off-by-one and the comparison should
-be >= rather >. Currently the WARN_ON_ONCE check does not stop
-the out of range indexing of &ldev->ctx.table[id] so also add
-a return path if the bounds are out of range.
+UBSAN: shift-out-of-bounds in net/ieee802154/nl802154.c:920:44
+shift exponent -1 is negative
+CPU: 3 PID: 8258 Comm: repro Not tainted 5.13.0+ #222
+Call Trace:
+ dump_stack_lvl+0x8d/0xcf
+ ubsan_epilogue+0xa/0x4e
+ __ubsan_handle_shift_out_of_bounds+0x161/0x182
+ nl802154_new_interface+0x3bf/0x3d0
+ genl_family_rcv_msg_doit.isra.15+0x12d/0x170
+ genl_rcv_msg+0x11a/0x240
+ netlink_rcv_skb+0x69/0x160
+ genl_rcv+0x24/0x40
 
-Addresses-Coverity: ("Illegal address computation").
-Fixes: 5609c185f24d ("6lowpan: iphc: add support for stateful compression")
-Signed-off-by: Colin Ian King <colin.king@canonical.com>
+NL802154_IFTYPE_UNSPEC is -1, so enum nl802154_iftype type now
+is a signed integer, which is assigned by nla_get_u32 in
+nl802154_new_interface(), this may cause type is negative and trigger
+this warning.
+
+Fixes: 65318680c97c ("ieee802154: add iftypes capability")
+Signed-off-by: YueHaibing <yuehaibing@huawei.com>
 ---
- net/6lowpan/debugfs.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ net/ieee802154/nl802154.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/net/6lowpan/debugfs.c b/net/6lowpan/debugfs.c
-index 1c140af06d52..600b9563bfc5 100644
---- a/net/6lowpan/debugfs.c
-+++ b/net/6lowpan/debugfs.c
-@@ -170,7 +170,8 @@ static void lowpan_dev_debugfs_ctx_init(struct net_device *dev,
- 	struct dentry *root;
- 	char buf[32];
+diff --git a/net/ieee802154/nl802154.c b/net/ieee802154/nl802154.c
+index 0cf2374..aab7ed4 100644
+--- a/net/ieee802154/nl802154.c
++++ b/net/ieee802154/nl802154.c
+@@ -915,7 +915,9 @@ static int nl802154_new_interface(struct sk_buff *skb, struct genl_info *info)
  
--	WARN_ON_ONCE(id > LOWPAN_IPHC_CTX_TABLE_SIZE);
-+	if (WARN_ON_ONCE(id >= LOWPAN_IPHC_CTX_TABLE_SIZE))
-+		return;
- 
- 	sprintf(buf, "%d", id);
- 
+ 	if (info->attrs[NL802154_ATTR_IFTYPE]) {
+ 		type = nla_get_u32(info->attrs[NL802154_ATTR_IFTYPE]);
+-		if (type > NL802154_IFTYPE_MAX ||
++		if (type < NL802154_IFTYPE_UNSPEC || type > NL802154_IFTYPE_MAX)
++			return -EINVAL;
++		if (type != NL802154_IFTYPE_UNSPEC &&
+ 		    !(rdev->wpan_phy.supported.iftypes & BIT(type)))
+ 			return -EINVAL;
+ 	}
 -- 
-2.31.1
+1.8.3.1
 
