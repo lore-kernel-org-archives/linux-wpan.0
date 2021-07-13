@@ -2,124 +2,101 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C860C07E96
-	for <linux-wpan@archiver.kernel.org>; Tue, 13 Jul 2021 05:40:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63DF3C07E95
+	for <linux-wpan@archiver.kernel.org>; Tue, 13 Jul 2021 13:32:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0E0F660FF2
-	for <linux-wpan@archiver.kernel.org>; Tue, 13 Jul 2021 05:40:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 43E6861175
+	for <linux-wpan@archiver.kernel.org>; Tue, 13 Jul 2021 13:32:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231373AbhGMFnZ (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 13 Jul 2021 01:43:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36098 "EHLO
+        id S236461AbhGMNfm (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 13 Jul 2021 09:35:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59644 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231261AbhGMFnY (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 13 Jul 2021 01:43:24 -0400
-Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A22D8C0613DD;
-        Mon, 12 Jul 2021 22:40:34 -0700 (PDT)
-Received: by mail-pg1-x532.google.com with SMTP id h4so20626699pgp.5;
-        Mon, 12 Jul 2021 22:40:34 -0700 (PDT)
+        with ESMTP id S236222AbhGMNfm (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 13 Jul 2021 09:35:42 -0400
+Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 465B0C0613DD;
+        Tue, 13 Jul 2021 06:32:51 -0700 (PDT)
+Received: by mail-wr1-x42c.google.com with SMTP id a13so30478805wrf.10;
+        Tue, 13 Jul 2021 06:32:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=nCoykUfAeCmm7EweIlj2EVckVQsnC0tULaDKLSufM14=;
-        b=IQcarGJNgxbM+9PEbA2hjgnAzguOJ6Fl8BtlwbD+QiGIWR2QMTzdNYqfV8/O5RePMu
-         jc+dxLQtSRSvJd5BvPgOvvLJ5OeW0woWRuZQVOXF5jGWBxWJsiXTQcKd+XRV+mHg8sqx
-         +w4nFQh3mtoYFNWwMqwL8aDxwxO4NBFoHE6iVr0d9Lwm7Ec2Q2hRYnlojrMdxLu9ICzW
-         s8ZMU++QeEBFGBOF2ZFYYlhO8fjIHEh3A8gHxCjvIPXDq2/yN6wwBKOfr/SJGk4gR6Uy
-         p38QX2Gm7WcgYXi5HiI76B0oFzTiPA+hGlMBBmhSccKY5AEKuaI5ZTtidS9bx/RVvo9U
-         BW/g==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=pI0cbCYu+L65LMy8pKJADG6rkLokSzcNjTpiGRxQp6k=;
+        b=tzviYNhsTAOgc2k4Tair+DBq/t1cmo1dLBHrPo0PW+saTfiEvydWb0j1O24Sndv9/R
+         leZ9yBtCnOJTAVSyzig0tskpCZKjiGg1v+q2Uwm7cylyrZ/4Sn6HD6yesz4C+koR4fMo
+         2LdU4YrhXqSsU9mOASz5Wg2wnQLYSJs0A2zRvkgWqIIeOwlzcJqzgyri5ZFcoThvE2vp
+         ECoIlOIbC1naxFkOkcF+Re80GLhKCkzEcNn32sgzCOcVUgyblMhNWvQBhF/zOkzEktCH
+         4w3iRzTq7qRr9EnGIQyK1i6BKUNp5msOX67JBzKTdEldDQjPN1z4xaXUoEa9LiHg1XLu
+         WpQA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=nCoykUfAeCmm7EweIlj2EVckVQsnC0tULaDKLSufM14=;
-        b=Cw03a2WLrpqM6m+bEDPC1IFezzTr1a7sc4RthRIIqxB1G2RRmhuSBjKTKtdrRXIoza
-         zxQCuED1luUn4oeEGHAbGEc62/ZjkbL8VQ1SykEfpdn3NmL1BAx0/IJtfaFKLZ85QPBQ
-         ULwDO6lCgK7FFY0mlURc+mO7i7ywSC5XWd7/RzC44DWTUM8JQN8JTKRWBDcMrLe/1lp3
-         DTRII50GK6x2lbHDAOPk6j07CViCIMnfEtst5c2q4SFnJtCt1wHKkPL6sAf/lhVJpQTN
-         FpIFBpXIVbhAfDH9Mc9U3oPXKmbc2ivZ8g2g9z1xqBysY12ealUlA3neDqAqP3Ie04k/
-         6GeA==
-X-Gm-Message-State: AOAM530cjOuxCeajUDdNiehurLAum6K2PoOALOlBCelU2p4gcHZ0y3Xb
-        XMJ2cQw8KRYh49qs9dsZkS4=
-X-Google-Smtp-Source: ABdhPJwavFVmwmu61Q4RhV1CUjL6kBCllpAgmQF59n/2dp1wTEUND5wCoYi7BpbOIEhOSkWuQCDw9w==
-X-Received: by 2002:a62:cd47:0:b029:329:714e:cce2 with SMTP id o68-20020a62cd470000b0290329714ecce2mr2925551pfg.22.1626154834013;
-        Mon, 12 Jul 2021 22:40:34 -0700 (PDT)
-Received: from localhost.localdomain ([154.16.166.164])
-        by smtp.gmail.com with ESMTPSA id q14sm9232593pff.209.2021.07.12.22.40.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Jul 2021 22:40:33 -0700 (PDT)
-From:   Dongliang Mu <mudongliangabcd@gmail.com>
-To:     Alexander Aring <alex.aring@gmail.com>,
-        Stefan Schmidt <stefan@datenfreihafen.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>
-Cc:     Dongliang Mu <mudongliangabcd@gmail.com>,
-        Alexander Aring <aring@mojatatu.com>,
-        linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] ieee802154: hwsim: fix memory leak in __pskb_copy_fclone
-Date:   Tue, 13 Jul 2021 13:40:18 +0800
-Message-Id: <20210713054019.409273-1-mudongliangabcd@gmail.com>
-X-Mailer: git-send-email 2.25.1
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=pI0cbCYu+L65LMy8pKJADG6rkLokSzcNjTpiGRxQp6k=;
+        b=TgkY3bbZrzuhId5KgVPHJLDNG+FztrpSm38UiLh/pYZ+34BleCq1vpPpe68HVszSyc
+         RXl0g+Ekv5obHf23oxp08nfWk3+rbMh+ZjdC0EBo0rT4/tmZQWSwlRLkm4s6hrrzyB7t
+         HW7i0nUSR3eOW1AFDCR1B/o7Sc4HtNGQbFLl6mbsobhv/zUpp2Ohcyy6+Mb1oQ4warBv
+         i1D9AilT9PprVXWvvENq8KcJRo7GGDb2t9h4fSasIWOpSu1euCDAf23EIaDD7b2qPWsR
+         mHrmYoi/Pqt60dmuJ/w6aWInIs3pmUwrkHtC1xjI68IuIlotusUqxbYwdzT0gHwK+CZO
+         Af1w==
+X-Gm-Message-State: AOAM530QEx8OuQCjnddAE96QWhq6ZX6etxhiVHJv8TNHAzlk5N8OpXpL
+        5dF4HV4KS4LmZej6+NbleyLQbA+tZKvwnWCbi1w=
+X-Google-Smtp-Source: ABdhPJxhCWRtbJ84J+zskZZNBBOaoz+1AY5nwuladFjDzzth+/dJ0F1O+mOOZVMk765mKL+AoYCJ93FyUD9euxl6NCg=
+X-Received: by 2002:a5d:46c8:: with SMTP id g8mr5713496wrs.341.1626183169799;
+ Tue, 13 Jul 2021 06:32:49 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20210712134430.19372-1-yuehaibing@huawei.com>
+In-Reply-To: <20210712134430.19372-1-yuehaibing@huawei.com>
+From:   Alexander Aring <alex.aring@gmail.com>
+Date:   Tue, 13 Jul 2021 09:32:38 -0400
+Message-ID: <CAB_54W62WZCcPintGnu-kqzCmgAH7EsJxP9oaeD2NVZ03e_2Wg@mail.gmail.com>
+Subject: Re: [PATCH] nl802154: Fix type check in nl802154_new_interface()
+To:     YueHaibing <yuehaibing@huawei.com>
+Cc:     Stefan Schmidt <stefan@datenfreihafen.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        linux-wpan - ML <linux-wpan@vger.kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
+        kernel list <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-hwsim_hw_xmit fails to deallocate the newskb copied by pskb_copy. Fix
-this by adding kfree_skb after ieee802154_rx_irqsafe.
+Hi,
 
-  [<ffffffff836433fb>] __alloc_skb+0x22b/0x250 net/core/skbuff.c:414
-  [<ffffffff8364ad95>] __pskb_copy_fclone+0x75/0x360 net/core/skbuff.c:1609
-  [<ffffffff82ae65e3>] __pskb_copy include/linux/skbuff.h:1176 [inline]
-  [<ffffffff82ae65e3>] pskb_copy include/linux/skbuff.h:3207 [inline]
-  [<ffffffff82ae65e3>] hwsim_hw_xmit+0xd3/0x140 drivers/net/ieee802154/mac802154_hwsim.c:132
-  [<ffffffff83ff8f47>] drv_xmit_async net/mac802154/driver-ops.h:16 [inline]
-  [<ffffffff83ff8f47>] ieee802154_tx+0xc7/0x190 net/mac802154/tx.c:83
-  [<ffffffff83ff9138>] ieee802154_subif_start_xmit+0x58/0x70 net/mac802154/tx.c:132
-  [<ffffffff83670b82>] __netdev_start_xmit include/linux/netdevice.h:4944 [inline]
-  [<ffffffff83670b82>] netdev_start_xmit include/linux/netdevice.h:4958 [inline]
-  [<ffffffff83670b82>] xmit_one net/core/dev.c:3658 [inline]
-  [<ffffffff83670b82>] dev_hard_start_xmit+0xe2/0x330 net/core/dev.c:3674
-  [<ffffffff83718028>] sch_direct_xmit+0xf8/0x520 net/sched/sch_generic.c:342
-  [<ffffffff8367193b>] __dev_xmit_skb net/core/dev.c:3874 [inline]
-  [<ffffffff8367193b>] __dev_queue_xmit+0xa3b/0x1360 net/core/dev.c:4241
-  [<ffffffff83ff5437>] dgram_sendmsg+0x437/0x570 net/ieee802154/socket.c:682
-  [<ffffffff836345b6>] sock_sendmsg_nosec net/socket.c:702 [inline]
-  [<ffffffff836345b6>] sock_sendmsg+0x56/0x80 net/socket.c:722
+On Mon, 12 Jul 2021 at 09:49, YueHaibing <yuehaibing@huawei.com> wrote:
+>
+> We got this UBSAN warning:
+>
+> UBSAN: shift-out-of-bounds in net/ieee802154/nl802154.c:920:44
+> shift exponent -1 is negative
+> CPU: 3 PID: 8258 Comm: repro Not tainted 5.13.0+ #222
+> Call Trace:
+>  dump_stack_lvl+0x8d/0xcf
+>  ubsan_epilogue+0xa/0x4e
+>  __ubsan_handle_shift_out_of_bounds+0x161/0x182
+>  nl802154_new_interface+0x3bf/0x3d0
+>  genl_family_rcv_msg_doit.isra.15+0x12d/0x170
+>  genl_rcv_msg+0x11a/0x240
+>  netlink_rcv_skb+0x69/0x160
+>  genl_rcv+0x24/0x40
+>
+> NL802154_IFTYPE_UNSPEC is -1, so enum nl802154_iftype type now
+> is a signed integer, which is assigned by nla_get_u32 in
+> nl802154_new_interface(), this may cause type is negative and trigger
+> this warning.
 
-Fixes: f25da51fdc38 ("ieee802154: hwsim: add replacement for fakelb")
-Signed-off-by: Dongliang Mu <mudongliangabcd@gmail.com>
----
- drivers/net/ieee802154/mac802154_hwsim.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+I think this is not the right fix, the fix is to change the UAPI that
+NL802154_IFTYPE_UNSPEC fits into the netlink range of U32. I will
+prepare a fix for that, it should still be backwards compatible.
 
-diff --git a/drivers/net/ieee802154/mac802154_hwsim.c b/drivers/net/ieee802154/mac802154_hwsim.c
-index ebc976b7fcc2..d97ed033ac77 100644
---- a/drivers/net/ieee802154/mac802154_hwsim.c
-+++ b/drivers/net/ieee802154/mac802154_hwsim.c
-@@ -132,9 +132,11 @@ static int hwsim_hw_xmit(struct ieee802154_hw *hw, struct sk_buff *skb)
- 			struct sk_buff *newskb = pskb_copy(skb, GFP_ATOMIC);
- 
- 			einfo = rcu_dereference(e->info);
--			if (newskb)
-+			if (newskb) {
- 				ieee802154_rx_irqsafe(e->endpoint->hw, newskb,
- 						      einfo->lqi);
-+				kfree_skb(newskb);
-+			}
- 		}
- 	}
- 	rcu_read_unlock();
--- 
-2.25.1
-
+- Alex
