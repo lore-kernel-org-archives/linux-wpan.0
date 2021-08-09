@@ -2,138 +2,138 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1079DC4338F
-	for <linux-wpan@archiver.kernel.org>; Thu,  5 Aug 2021 13:50:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 390FAC4338F
+	for <linux-wpan@archiver.kernel.org>; Mon,  9 Aug 2021 07:54:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E977560F58
-	for <linux-wpan@archiver.kernel.org>; Thu,  5 Aug 2021 13:50:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 15F086105A
+	for <linux-wpan@archiver.kernel.org>; Mon,  9 Aug 2021 07:54:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238790AbhHENui (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Thu, 5 Aug 2021 09:50:38 -0400
-Received: from mail.kernel.org ([198.145.29.99]:39824 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233033AbhHENuh (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-        Thu, 5 Aug 2021 09:50:37 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 632FD6113B;
-        Thu,  5 Aug 2021 13:50:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1628171423;
-        bh=nT1UWnENjBDcl40entDFb9eLWswm/nuKc503srol/vs=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=gIchlBOMqTDeBdHZTHenHuInKv3KPHn8Meym0knKTakBQy70DvHmNpoau1xhq17Xb
-         pVr0TkUEe7oHjFXzveRVMD/lrUVnV2SY22MjBTTUjRd9NiG6I6nPZvZ8CcvZbKRgQD
-         Kp1ouuwH8pn8IU3cE4EbO3Nqz6Ia9VHuPURg5TY6DfB+UEmvgpVCtPvUWZvqA3RQ2B
-         ff7YfkJdPXdl059bjZ9uRUZvZm5lnCrIeowDDdL5tObHk6zgrlRxCNhT559wRqy0fa
-         aV+4AZmbuUNlRYLEagzocbq32FRkU9dUZwVqTSi5bsWpeZyag7n5GMSJ1nWq2qEH0D
-         BWQRarPdpMPPw==
-Date:   Thu, 5 Aug 2021 06:50:22 -0700
-From:   Jakub Kicinski <kuba@kernel.org>
-To:     Takeshi Misawa <jeliantsurux@gmail.com>
-Cc:     David Howells <dhowells@redhat.com>, netdev@vger.kernel.org,
-        Alexander Aring <alex.aring@gmail.com>,
-        Stefan Schmidt <stefan@datenfreihafen.org>,
-        linux-wpan@vger.kernel.org
-Subject: Re: [PATCH net] net: Fix memory leak in ieee802154_raw_deliver
-Message-ID: <20210805065022.574e0691@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
-In-Reply-To: <20210805075414.GA15796@DESKTOP>
-References: <20210805075414.GA15796@DESKTOP>
+        id S233640AbhHIHyn (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 9 Aug 2021 03:54:43 -0400
+Received: from mail-io1-f72.google.com ([209.85.166.72]:36778 "EHLO
+        mail-io1-f72.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233543AbhHIHyn (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 9 Aug 2021 03:54:43 -0400
+Received: by mail-io1-f72.google.com with SMTP id x13-20020a5eda0d0000b02905976d643e4cso3823200ioj.3
+        for <linux-wpan@vger.kernel.org>; Mon, 09 Aug 2021 00:54:23 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=8QI5/Ow9wqoi4wS1cgAAg/FGKAVs9yNR1XeA3INMSiI=;
+        b=P5vATmrJeU4940fjuW6lHhjTD+JegEFt1FjGPFOSNAHppRC1Pq2vGEVcVHYavH9pgm
+         yNadj+z1Bgi8B8kESrHHltX3e2gAURmd/0A/kOulLyN83LVusarn4vmvAVdNfkWef2eB
+         1gUKB6+YSQVEjRrfsurXi+uS8XKRkwwO2I+AhlUYkPxApjXmICCvEI+FjicQyD64CxBS
+         FFGy0ah68lFA5BIsr1idujm4l+Ww09/WXkuNwJATwz1e2/Xa88WbSSZzBHONGs8pIR/i
+         bQ18q735PQQGWDFhf4ozTe3TnttvO/aG/iRqneqk1HpqpkDjB3JHEMzahwIALoetc30h
+         xGhQ==
+X-Gm-Message-State: AOAM5316Sa9u6tQrTvlJ0yQvcd3p/zeULKgUlVYN1ASxfTZhvrQDKYpa
+        F8BY7QQJq+fOcARdF5xupM9jtJYBEcBhCBlZRd0CnIujMEVk
+X-Google-Smtp-Source: ABdhPJzDTxXN99MnJc7AwyZ3LSbWPzB44Tpctll5ZoYah9KsWRfMfr1x8ws3pfWMST+ETOzo7j30x+Y7r2qnja6UlBgBeNp8RmeT
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a92:da4a:: with SMTP id p10mr138371ilq.290.1628495662787;
+ Mon, 09 Aug 2021 00:54:22 -0700 (PDT)
+Date:   Mon, 09 Aug 2021 00:54:22 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000007faf7505c91bb19d@google.com>
+Subject: [syzbot] general protection fault in hwsim_new_edge_nl
+From:   syzbot <syzbot+fafb46da3f65fdbacd16@syzkaller.appspotmail.com>
+To:     alex.aring@gmail.com, davem@davemloft.net, kuba@kernel.org,
+        linux-kernel@vger.kernel.org, linux-wpan@vger.kernel.org,
+        netdev@vger.kernel.org, stefan@datenfreihafen.org,
+        syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-On Thu, 5 Aug 2021 16:54:14 +0900 Takeshi Misawa wrote:
-> If IEEE-802.15.4-RAW is closed before receive skb, skb is leaked.
-> Fix this, by freeing sk_receive_queue in sk->sk_destruct().
-> 
-> syzbot report:
-> BUG: memory leak
-> unreferenced object 0xffff88810f644600 (size 232):
->   comm "softirq", pid 0, jiffies 4294967032 (age 81.270s)
->   hex dump (first 32 bytes):
->     10 7d 4b 12 81 88 ff ff 10 7d 4b 12 81 88 ff ff  .}K......}K.....
->     00 00 00 00 00 00 00 00 40 7c 4b 12 81 88 ff ff  ........@|K.....
->   backtrace:
->     [<ffffffff83651d4a>] skb_clone+0xaa/0x2b0 net/core/skbuff.c:1496
->     [<ffffffff83fe1b80>] ieee802154_raw_deliver net/ieee802154/socket.c:369 [inline]
->     [<ffffffff83fe1b80>] ieee802154_rcv+0x100/0x340 net/ieee802154/socket.c:1070
->     [<ffffffff8367cc7a>] __netif_receive_skb_one_core+0x6a/0xa0 net/core/dev.c:5384
->     [<ffffffff8367cd07>] __netif_receive_skb+0x27/0xa0 net/core/dev.c:5498
->     [<ffffffff8367cdd9>] netif_receive_skb_internal net/core/dev.c:5603 [inline]
->     [<ffffffff8367cdd9>] netif_receive_skb+0x59/0x260 net/core/dev.c:5662
->     [<ffffffff83fe6302>] ieee802154_deliver_skb net/mac802154/rx.c:29 [inline]
->     [<ffffffff83fe6302>] ieee802154_subif_frame net/mac802154/rx.c:102 [inline]
->     [<ffffffff83fe6302>] __ieee802154_rx_handle_packet net/mac802154/rx.c:212 [inline]
->     [<ffffffff83fe6302>] ieee802154_rx+0x612/0x620 net/mac802154/rx.c:284
->     [<ffffffff83fe59a6>] ieee802154_tasklet_handler+0x86/0xa0 net/mac802154/main.c:35
->     [<ffffffff81232aab>] tasklet_action_common.constprop.0+0x5b/0x100 kernel/softirq.c:557
->     [<ffffffff846000bf>] __do_softirq+0xbf/0x2ab kernel/softirq.c:345
->     [<ffffffff81232f4c>] do_softirq kernel/softirq.c:248 [inline]
->     [<ffffffff81232f4c>] do_softirq+0x5c/0x80 kernel/softirq.c:235
->     [<ffffffff81232fc1>] __local_bh_enable_ip+0x51/0x60 kernel/softirq.c:198
->     [<ffffffff8367a9a4>] local_bh_enable include/linux/bottom_half.h:32 [inline]
->     [<ffffffff8367a9a4>] rcu_read_unlock_bh include/linux/rcupdate.h:745 [inline]
->     [<ffffffff8367a9a4>] __dev_queue_xmit+0x7f4/0xf60 net/core/dev.c:4221
->     [<ffffffff83fe2db4>] raw_sendmsg+0x1f4/0x2b0 net/ieee802154/socket.c:295
->     [<ffffffff8363af16>] sock_sendmsg_nosec net/socket.c:654 [inline]
->     [<ffffffff8363af16>] sock_sendmsg+0x56/0x80 net/socket.c:674
->     [<ffffffff8363deec>] __sys_sendto+0x15c/0x200 net/socket.c:1977
->     [<ffffffff8363dfb6>] __do_sys_sendto net/socket.c:1989 [inline]
->     [<ffffffff8363dfb6>] __se_sys_sendto net/socket.c:1985 [inline]
->     [<ffffffff8363dfb6>] __x64_sys_sendto+0x26/0x30 net/socket.c:1985
-> 
-> Fixes: 9ec767160357 ("net: add IEEE 802.15.4 socket family implementation")
-> Reported-and-tested-by: syzbot+1f68113fa907bf0695a8@syzkaller.appspotmail.com
-> Signed-off-by: Takeshi Misawa <jeliantsurux@gmail.com>
-> ---
-> Dear David Howells, Jakub Kicinski
+Hello,
 
-Please use scripts/get_maintainer.pl to find the people you should CC.
-Adding Alexander and Stefan.
+syzbot found the following issue on:
 
-> syzbot reported memory leak in ieee802154_raw_deliver.
-> 
-> I send a patch that passed syzbot reproducer test.
-> Please consider this memory leak and patch.
-> 
-> syzbot link:
-> https://syzkaller.appspot.com/bug?id=8dd3bcb1dc757587adfb4dbb810fd24dd990283f
-> 
-> Regards.
-> ---
->  net/ieee802154/socket.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
-> 
-> diff --git a/net/ieee802154/socket.c b/net/ieee802154/socket.c
-> index a45a0401adc5..c25f7617770c 100644
-> --- a/net/ieee802154/socket.c
-> +++ b/net/ieee802154/socket.c
-> @@ -984,6 +984,11 @@ static const struct proto_ops ieee802154_dgram_ops = {
->  	.sendpage	   = sock_no_sendpage,
->  };
->  
-> +static void ieee802154_sock_destruct(struct sock *sk)
-> +{
-> +	skb_queue_purge(&sk->sk_receive_queue);
-> +}
-> +
->  /* Create a socket. Initialise the socket, blank the addresses
->   * set the state.
->   */
-> @@ -1024,7 +1029,7 @@ static int ieee802154_create(struct net *net, struct socket *sock,
->  	sock->ops = ops;
->  
->  	sock_init_data(sock, sk);
-> -	/* FIXME: sk->sk_destruct */
-> +	sk->sk_destruct = ieee802154_sock_destruct;
->  	sk->sk_family = PF_IEEE802154;
->  
->  	/* Checksums on by default */
+HEAD commit:    c2eecaa193ff pktgen: Remove redundant clone_skb override
+git tree:       net-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=1226099a300000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=aba0c23f8230e048
+dashboard link: https://syzkaller.appspot.com/bug?extid=fafb46da3f65fdbacd16
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.1
 
+Unfortunately, I don't have any reproducer for this issue yet.
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+fafb46da3f65fdbacd16@syzkaller.appspotmail.com
+
+general protection fault, probably for non-canonical address 0xdffffc0000000000: 0000 [#1] PREEMPT SMP KASAN
+KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
+CPU: 1 PID: 1403 Comm: syz-executor.2 Not tainted 5.14.0-rc3-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+RIP: 0010:nla_len include/net/netlink.h:1148 [inline]
+RIP: 0010:nla_parse_nested_deprecated include/net/netlink.h:1231 [inline]
+RIP: 0010:hwsim_new_edge_nl+0xf4/0x8c0 drivers/net/ieee802154/mac802154_hwsim.c:425
+Code: 00 0f 85 76 07 00 00 4d 85 ed 48 8b 5b 10 0f 84 5e 05 00 00 e8 0d f2 40 fc 48 89 da 48 b8 00 00 00 00 00 fc ff df 48 c1 ea 03 <0f> b6 14 02 48 89 d8 83 e0 07 83 c0 01 38 d0 7c 08 84 d2 0f 85 87
+RSP: 0018:ffffc90009a47568 EFLAGS: 00010246
+RAX: dffffc0000000000 RBX: 0000000000000000 RCX: ffffc9000dd59000
+RDX: 0000000000000000 RSI: ffffffff8534ab43 RDI: ffff88801c2b44d0
+RBP: ffffc90009a47678 R08: 0000000000000001 R09: ffffc90009a476a8
+R10: fffff52001348ed6 R11: 0000000000000000 R12: ffffc90009a47698
+R13: ffff888025945c14 R14: ffff888071f0cdc0 R15: 0000000000000000
+FS:  00007f8448923700(0000) GS:ffff8880b9d00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00000000032f4708 CR3: 0000000033eed000 CR4: 00000000001506e0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ genl_family_rcv_msg_doit+0x228/0x320 net/netlink/genetlink.c:731
+ genl_family_rcv_msg net/netlink/genetlink.c:775 [inline]
+ genl_rcv_msg+0x328/0x580 net/netlink/genetlink.c:792
+ netlink_rcv_skb+0x153/0x420 net/netlink/af_netlink.c:2504
+ genl_rcv+0x24/0x40 net/netlink/genetlink.c:803
+ netlink_unicast_kernel net/netlink/af_netlink.c:1314 [inline]
+ netlink_unicast+0x533/0x7d0 net/netlink/af_netlink.c:1340
+ netlink_sendmsg+0x86d/0xdb0 net/netlink/af_netlink.c:1929
+ sock_sendmsg_nosec net/socket.c:704 [inline]
+ sock_sendmsg+0xcf/0x120 net/socket.c:724
+ ____sys_sendmsg+0x6e8/0x810 net/socket.c:2403
+ ___sys_sendmsg+0xf3/0x170 net/socket.c:2457
+ __sys_sendmsg+0xe5/0x1b0 net/socket.c:2486
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+RIP: 0033:0x4665e9
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 bc ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f8448923188 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 000000000056bf80 RCX: 00000000004665e9
+RDX: 0000000000000000 RSI: 0000000020001ac0 RDI: 0000000000000004
+RBP: 00000000004bfcc4 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 000000000056bf80
+R13: 00007ffd8ac8e60f R14: 00007f8448923300 R15: 0000000000022000
+Modules linked in:
+---[ end trace d1679fe789931133 ]---
+RIP: 0010:nla_len include/net/netlink.h:1148 [inline]
+RIP: 0010:nla_parse_nested_deprecated include/net/netlink.h:1231 [inline]
+RIP: 0010:hwsim_new_edge_nl+0xf4/0x8c0 drivers/net/ieee802154/mac802154_hwsim.c:425
+Code: 00 0f 85 76 07 00 00 4d 85 ed 48 8b 5b 10 0f 84 5e 05 00 00 e8 0d f2 40 fc 48 89 da 48 b8 00 00 00 00 00 fc ff df 48 c1 ea 03 <0f> b6 14 02 48 89 d8 83 e0 07 83 c0 01 38 d0 7c 08 84 d2 0f 85 87
+RSP: 0018:ffffc90009a47568 EFLAGS: 00010246
+RAX: dffffc0000000000 RBX: 0000000000000000 RCX: ffffc9000dd59000
+RDX: 0000000000000000 RSI: ffffffff8534ab43 RDI: ffff88801c2b44d0
+RBP: ffffc90009a47678 R08: 0000000000000001 R09: ffffc90009a476a8
+R10: fffff52001348ed6 R11: 0000000000000000 R12: ffffc90009a47698
+R13: ffff888025945c14 R14: ffff888071f0cdc0 R15: 0000000000000000
+FS:  00007f8448923700(0000) GS:ffff8880b9c00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000055bb2ea2f160 CR3: 0000000033eed000 CR4: 00000000001506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
