@@ -2,208 +2,125 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CED89C4338F
-	for <linux-wpan@archiver.kernel.org>; Tue, 10 Aug 2021 08:25:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E44A1C4338F
+	for <linux-wpan@archiver.kernel.org>; Tue, 10 Aug 2021 10:49:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AE7BE60EFF
-	for <linux-wpan@archiver.kernel.org>; Tue, 10 Aug 2021 08:25:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C9A9660F02
+	for <linux-wpan@archiver.kernel.org>; Tue, 10 Aug 2021 10:49:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238048AbhHJIZu (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 10 Aug 2021 04:25:50 -0400
-Received: from mail-io1-f69.google.com ([209.85.166.69]:55977 "EHLO
-        mail-io1-f69.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237527AbhHJIZt (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 10 Aug 2021 04:25:49 -0400
-Received: by mail-io1-f69.google.com with SMTP id f10-20020a6b620a0000b02904e5ab8bdc6cso14076629iog.22
-        for <linux-wpan@vger.kernel.org>; Tue, 10 Aug 2021 01:25:27 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=DTBo3khEZOU+h0oQTiTa1/X9B14yYY7SYQPoR8l9cKU=;
-        b=f38DVosimIWoScVvg5hTqx8H8St0wlfkKe0OinOid/6psE747jJJL7xvlJ/zHi5hiU
-         4QHkBHcEdf1HMWVZ4bnmTDPe9RS+tv9IOdPApF4m4GrlYvZ9/4Jy43GjNXSs1wDyshNv
-         vQOxBLCSDCSf6GhAvID+M3NcZPO6MwaIazP3AJa97aTXKXHfOsLHIYQ697I8+3bDcRvb
-         TsHUbyqtOGazS5GcyCIfYKTR3f6BcjZgbTPNea3vO5kmMuzhqLgvbDL/4UrWgv7zF/Nz
-         RY9xmmycb3R5/n968fhou/BvsvrzvO+JVWhqVTBBD68ghrd11IhcIcARIeB7hO0nz5L1
-         apyw==
-X-Gm-Message-State: AOAM531gVwkw6SAXp5PnwzDm86xlRzkzkkuDyqvIT+0SRtI2TbQZuJHr
-        tRUB8Qgzt6O+iPTYQ9vjmlp7+vJqJvJGAvaBdnIEbf3DUsTI
-X-Google-Smtp-Source: ABdhPJxSL822WJcCgEbOO8zBDc7ubIaooAsY9ZVzeKi/C7SZFs4XhU60TfzMZrMZfxNgN2jJJwohzAP36i8gzJ6IZ9/CkOYBTXw2
+        id S236505AbhHJKuA (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 10 Aug 2021 06:50:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40920 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239920AbhHJKuA (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 10 Aug 2021 06:50:00 -0400
+Received: from proxima.lasnet.de (proxima.lasnet.de [IPv6:2a01:4f8:121:31eb:3::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BC78C0613D3;
+        Tue, 10 Aug 2021 03:49:37 -0700 (PDT)
+Received: from [192.168.178.156] (unknown [80.156.89.84])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: stefan@datenfreihafen.org)
+        by proxima.lasnet.de (Postfix) with ESMTPSA id BEE9CC0353;
+        Tue, 10 Aug 2021 12:49:27 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
+        s=2021; t=1628592568;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=M0qF+o2AoVk5F58x/KmSY20curOZrhbNqe7IPSM3OJA=;
+        b=n+fHjMvtfN0LwKThosvhFKpTysHYNz3y05ebgbmXczVeSF2/Hpk8w0xIviQW0d4t9/2R8H
+        4CbkvT3toZe0uFnRDjHD8eFsNfj15HjXpPFettkL3f1U/Yk4mV3jtNuv1VGhK6xKeqFBzy
+        sU+dO+33KeSZ/trhYO8ULtLjvyVs6RyfInzyAy995ZoZW3AsXOjwt7z67FRZXLqBy7rHpf
+        0DLDZOzeQWPmbinKCCT3+vA4wrZaEBhleqOOk9aEZ/SGzDzCAyzJpeluaHFY2Pg8+Kpnjz
+        glKyjnOTwSo58vfq8m/C9ctC0VqL6lDpnAkTrW3Hfd+kX2F7Rgyvv2RG/PmLxw==
+Subject: Re: [PATCH net] net: Fix memory leak in ieee802154_raw_deliver
+To:     Alexander Aring <alex.aring@gmail.com>,
+        Jakub Kicinski <kuba@kernel.org>
+Cc:     Takeshi Misawa <jeliantsurux@gmail.com>,
+        David Howells <dhowells@redhat.com>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
+        linux-wpan - ML <linux-wpan@vger.kernel.org>
+References: <20210805075414.GA15796@DESKTOP>
+ <20210805065022.574e0691@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
+ <CAB_54W4DK3uo+q7vRC2Vzrs5BENq2L_ukkkewiSXMNaSBiTsEQ@mail.gmail.com>
+From:   Stefan Schmidt <stefan@datenfreihafen.org>
+Message-ID: <47581b9b-4def-40be-88cb-6357516f9eb3@datenfreihafen.org>
+Date:   Tue, 10 Aug 2021 12:49:26 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:b43:: with SMTP id f3mr409047ilu.94.1628583926914;
- Tue, 10 Aug 2021 01:25:26 -0700 (PDT)
-Date:   Tue, 10 Aug 2021 01:25:26 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000007365d805c9303e63@google.com>
-Subject: [syzbot] KMSAN: uninit-value in crc_ccitt
-From:   syzbot <syzbot+6d38e380afc486ec44a1@syzkaller.appspotmail.com>
-To:     alex.aring@gmail.com, davem@davemloft.net, glider@google.com,
-        kuba@kernel.org, linux-kernel@vger.kernel.org,
-        linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
-        stefan@datenfreihafen.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <CAB_54W4DK3uo+q7vRC2Vzrs5BENq2L_ukkkewiSXMNaSBiTsEQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello,
+Hello.
 
-syzbot found the following issue on:
-
-HEAD commit:    ee9407ea37bf kmsan: core: massage include/linux/sched.h
-git tree:       https://github.com/google/kmsan.git master
-console output: https://syzkaller.appspot.com/x/log.txt?x=1656babe300000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=92983a87b2ce6cdb
-dashboard link: https://syzkaller.appspot.com/bug?extid=6d38e380afc486ec44a1
-compiler:       Debian clang version 11.0.1-2, GNU ld (GNU Binutils for Debian) 2.35.1
-userspace arch: i386
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+6d38e380afc486ec44a1@syzkaller.appspotmail.com
-
-=====================================================
-BUG: KMSAN: uninit-value in crc_ccitt_byte include/linux/crc-ccitt.h:15 [inline]
-BUG: KMSAN: uninit-value in crc_ccitt+0x364/0x3f0 lib/crc-ccitt.c:102
-CPU: 1 PID: 9742 Comm: syz-executor.4 Not tainted 5.13.0-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Call Trace:
- __dump_stack lib/dump_stack.c:79 [inline]
- dump_stack+0x24c/0x2e0 lib/dump_stack.c:120
- kmsan_report+0xfb/0x1e0 mm/kmsan/report.c:121
- __msan_warning+0xd7/0x160 mm/kmsan/instrumentation.c:201
- crc_ccitt_byte include/linux/crc-ccitt.h:15 [inline]
- crc_ccitt+0x364/0x3f0 lib/crc-ccitt.c:102
- ieee802154_tx+0x300/0x800 net/mac802154/tx.c:72
- ieee802154_subif_start_xmit+0x16a/0x250 net/mac802154/tx.c:132
- __netdev_start_xmit include/linux/netdevice.h:4944 [inline]
- netdev_start_xmit include/linux/netdevice.h:4958 [inline]
- xmit_one+0x2b6/0x760 net/core/dev.c:3654
- dev_hard_start_xmit+0x196/0x420 net/core/dev.c:3670
- sch_direct_xmit+0x554/0x1b90 net/sched/sch_generic.c:336
- qdisc_restart net/sched/sch_generic.c:401 [inline]
- __qdisc_run+0x35b/0x490 net/sched/sch_generic.c:409
- qdisc_run include/net/pkt_sched.h:131 [inline]
- __dev_xmit_skb net/core/dev.c:3857 [inline]
- __dev_queue_xmit+0x1e3f/0x5440 net/core/dev.c:4214
- dev_queue_xmit+0x4b/0x60 net/core/dev.c:4279
- dgram_sendmsg+0x1142/0x15d0 net/ieee802154/socket.c:682
- ieee802154_sock_sendmsg+0xec/0x130 net/ieee802154/socket.c:97
- sock_sendmsg_nosec net/socket.c:654 [inline]
- sock_sendmsg net/socket.c:674 [inline]
- ____sys_sendmsg+0xcfc/0x12f0 net/socket.c:2337
- ___sys_sendmsg net/socket.c:2391 [inline]
- __sys_sendmsg+0x714/0x830 net/socket.c:2420
- __compat_sys_sendmsg net/compat.c:347 [inline]
- __do_compat_sys_sendmsg net/compat.c:354 [inline]
- __se_compat_sys_sendmsg net/compat.c:351 [inline]
- __ia32_compat_sys_sendmsg+0xed/0x130 net/compat.c:351
- do_syscall_32_irqs_on arch/x86/entry/common.c:84 [inline]
- __do_fast_syscall_32+0x132/0x1b0 arch/x86/entry/common.c:149
- do_fast_syscall_32+0x77/0xd0 arch/x86/entry/common.c:179
- do_SYSENTER_32+0x73/0x90 arch/x86/entry/common.c:222
- entry_SYSENTER_compat_after_hwframe+0x4d/0x5c
-RIP: 0023:0xf7fa3549
-Code: 03 74 c0 01 10 05 03 74 b8 01 10 06 03 74 b4 01 10 07 03 74 b0 01 10 08 03 74 d8 01 00 00 00 00 00 51 52 55 89 e5 0f 34 cd 80 <5d> 5a 59 c3 90 90 90 90 8d b4 26 00 00 00 00 8d b4 26 00 00 00 00
-RSP: 002b:00000000f559d5fc EFLAGS: 00000296 ORIG_RAX: 0000000000000172
-RAX: ffffffffffffffda RBX: 0000000000000004 RCX: 0000000020000880
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
-RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000000000
-R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
-
-Uninit was stored to memory at:
- kmsan_save_stack_with_flags mm/kmsan/core.c:106 [inline]
- kmsan_internal_chain_origin+0xab/0x120 mm/kmsan/core.c:244
- kmsan_memmove_metadata+0x23b/0x2c0 mm/kmsan/core.c:192
- __msan_memcpy+0x5e/0x90 mm/kmsan/instrumentation.c:111
- ieee802154_hdr_push+0xcd7/0xdd0 net/ieee802154/header_ops.c:117
- ieee802154_header_create+0xd07/0x1070 net/mac802154/iface.c:404
- wpan_dev_hard_header include/net/cfg802154.h:374 [inline]
- dgram_sendmsg+0xf4b/0x15d0 net/ieee802154/socket.c:670
- ieee802154_sock_sendmsg+0xec/0x130 net/ieee802154/socket.c:97
- sock_sendmsg_nosec net/socket.c:654 [inline]
- sock_sendmsg net/socket.c:674 [inline]
- ____sys_sendmsg+0xcfc/0x12f0 net/socket.c:2337
- ___sys_sendmsg net/socket.c:2391 [inline]
- __sys_sendmsg+0x714/0x830 net/socket.c:2420
- __compat_sys_sendmsg net/compat.c:347 [inline]
- __do_compat_sys_sendmsg net/compat.c:354 [inline]
- __se_compat_sys_sendmsg net/compat.c:351 [inline]
- __ia32_compat_sys_sendmsg+0xed/0x130 net/compat.c:351
- do_syscall_32_irqs_on arch/x86/entry/common.c:84 [inline]
- __do_fast_syscall_32+0x132/0x1b0 arch/x86/entry/common.c:149
- do_fast_syscall_32+0x77/0xd0 arch/x86/entry/common.c:179
- do_SYSENTER_32+0x73/0x90 arch/x86/entry/common.c:222
- entry_SYSENTER_compat_after_hwframe+0x4d/0x5c
-
-Uninit was stored to memory at:
- kmsan_save_stack_with_flags mm/kmsan/core.c:106 [inline]
- kmsan_internal_chain_origin+0xab/0x120 mm/kmsan/core.c:244
- kmsan_memmove_metadata+0x23b/0x2c0 mm/kmsan/core.c:192
- __msan_memcpy+0x5e/0x90 mm/kmsan/instrumentation.c:111
- ieee802154_hdr_push_addr net/ieee802154/header_ops.c:35 [inline]
- ieee802154_hdr_push+0x2b0/0xdd0 net/ieee802154/header_ops.c:89
- ieee802154_header_create+0xd07/0x1070 net/mac802154/iface.c:404
- wpan_dev_hard_header include/net/cfg802154.h:374 [inline]
- dgram_sendmsg+0xf4b/0x15d0 net/ieee802154/socket.c:670
- ieee802154_sock_sendmsg+0xec/0x130 net/ieee802154/socket.c:97
- sock_sendmsg_nosec net/socket.c:654 [inline]
- sock_sendmsg net/socket.c:674 [inline]
- ____sys_sendmsg+0xcfc/0x12f0 net/socket.c:2337
- ___sys_sendmsg net/socket.c:2391 [inline]
- __sys_sendmsg+0x714/0x830 net/socket.c:2420
- __compat_sys_sendmsg net/compat.c:347 [inline]
- __do_compat_sys_sendmsg net/compat.c:354 [inline]
- __se_compat_sys_sendmsg net/compat.c:351 [inline]
- __ia32_compat_sys_sendmsg+0xed/0x130 net/compat.c:351
- do_syscall_32_irqs_on arch/x86/entry/common.c:84 [inline]
- __do_fast_syscall_32+0x132/0x1b0 arch/x86/entry/common.c:149
- do_fast_syscall_32+0x77/0xd0 arch/x86/entry/common.c:179
- do_SYSENTER_32+0x73/0x90 arch/x86/entry/common.c:222
- entry_SYSENTER_compat_after_hwframe+0x4d/0x5c
-
-Uninit was stored to memory at:
- kmsan_save_stack_with_flags mm/kmsan/core.c:106 [inline]
- kmsan_internal_chain_origin+0xab/0x120 mm/kmsan/core.c:244
- kmsan_memmove_metadata+0x23b/0x2c0 mm/kmsan/core.c:192
- __msan_memcpy+0x5e/0x90 mm/kmsan/instrumentation.c:111
- ieee802154_header_create+0xcd1/0x1070 net/mac802154/iface.c:402
- wpan_dev_hard_header include/net/cfg802154.h:374 [inline]
- dgram_sendmsg+0xf4b/0x15d0 net/ieee802154/socket.c:670
- ieee802154_sock_sendmsg+0xec/0x130 net/ieee802154/socket.c:97
- sock_sendmsg_nosec net/socket.c:654 [inline]
- sock_sendmsg net/socket.c:674 [inline]
- ____sys_sendmsg+0xcfc/0x12f0 net/socket.c:2337
- ___sys_sendmsg net/socket.c:2391 [inline]
- __sys_sendmsg+0x714/0x830 net/socket.c:2420
- __compat_sys_sendmsg net/compat.c:347 [inline]
- __do_compat_sys_sendmsg net/compat.c:354 [inline]
- __se_compat_sys_sendmsg net/compat.c:351 [inline]
- __ia32_compat_sys_sendmsg+0xed/0x130 net/compat.c:351
- do_syscall_32_irqs_on arch/x86/entry/common.c:84 [inline]
- __do_fast_syscall_32+0x132/0x1b0 arch/x86/entry/common.c:149
- do_fast_syscall_32+0x77/0xd0 arch/x86/entry/common.c:179
- do_SYSENTER_32+0x73/0x90 arch/x86/entry/common.c:222
- entry_SYSENTER_compat_after_hwframe+0x4d/0x5c
-
-Local variable ----dst_addr@dgram_sendmsg created at:
- dgram_sendmsg+0x8a/0x15d0 net/ieee802154/socket.c:607
- dgram_sendmsg+0x8a/0x15d0 net/ieee802154/socket.c:607
-=====================================================
+On 09.08.21 15:06, Alexander Aring wrote:
+> Hi,
+> 
+> On Thu, 5 Aug 2021 at 09:50, Jakub Kicinski <kuba@kernel.org> wrote:
+>>
+>> On Thu, 5 Aug 2021 16:54:14 +0900 Takeshi Misawa wrote:
+>>> If IEEE-802.15.4-RAW is closed before receive skb, skb is leaked.
+>>> Fix this, by freeing sk_receive_queue in sk->sk_destruct().
+>>>
+>>> syzbot report:
+>>> BUG: memory leak
+>>> unreferenced object 0xffff88810f644600 (size 232):
+>>>    comm "softirq", pid 0, jiffies 4294967032 (age 81.270s)
+>>>    hex dump (first 32 bytes):
+>>>      10 7d 4b 12 81 88 ff ff 10 7d 4b 12 81 88 ff ff  .}K......}K.....
+>>>      00 00 00 00 00 00 00 00 40 7c 4b 12 81 88 ff ff  ........@|K.....
+>>>    backtrace:
+>>>      [<ffffffff83651d4a>] skb_clone+0xaa/0x2b0 net/core/skbuff.c:1496
+>>>      [<ffffffff83fe1b80>] ieee802154_raw_deliver net/ieee802154/socket.c:369 [inline]
+>>>      [<ffffffff83fe1b80>] ieee802154_rcv+0x100/0x340 net/ieee802154/socket.c:1070
+>>>      [<ffffffff8367cc7a>] __netif_receive_skb_one_core+0x6a/0xa0 net/core/dev.c:5384
+>>>      [<ffffffff8367cd07>] __netif_receive_skb+0x27/0xa0 net/core/dev.c:5498
+>>>      [<ffffffff8367cdd9>] netif_receive_skb_internal net/core/dev.c:5603 [inline]
+>>>      [<ffffffff8367cdd9>] netif_receive_skb+0x59/0x260 net/core/dev.c:5662
+>>>      [<ffffffff83fe6302>] ieee802154_deliver_skb net/mac802154/rx.c:29 [inline]
+>>>      [<ffffffff83fe6302>] ieee802154_subif_frame net/mac802154/rx.c:102 [inline]
+>>>      [<ffffffff83fe6302>] __ieee802154_rx_handle_packet net/mac802154/rx.c:212 [inline]
+>>>      [<ffffffff83fe6302>] ieee802154_rx+0x612/0x620 net/mac802154/rx.c:284
+>>>      [<ffffffff83fe59a6>] ieee802154_tasklet_handler+0x86/0xa0 net/mac802154/main.c:35
+>>>      [<ffffffff81232aab>] tasklet_action_common.constprop.0+0x5b/0x100 kernel/softirq.c:557
+>>>      [<ffffffff846000bf>] __do_softirq+0xbf/0x2ab kernel/softirq.c:345
+>>>      [<ffffffff81232f4c>] do_softirq kernel/softirq.c:248 [inline]
+>>>      [<ffffffff81232f4c>] do_softirq+0x5c/0x80 kernel/softirq.c:235
+>>>      [<ffffffff81232fc1>] __local_bh_enable_ip+0x51/0x60 kernel/softirq.c:198
+>>>      [<ffffffff8367a9a4>] local_bh_enable include/linux/bottom_half.h:32 [inline]
+>>>      [<ffffffff8367a9a4>] rcu_read_unlock_bh include/linux/rcupdate.h:745 [inline]
+>>>      [<ffffffff8367a9a4>] __dev_queue_xmit+0x7f4/0xf60 net/core/dev.c:4221
+>>>      [<ffffffff83fe2db4>] raw_sendmsg+0x1f4/0x2b0 net/ieee802154/socket.c:295
+>>>      [<ffffffff8363af16>] sock_sendmsg_nosec net/socket.c:654 [inline]
+>>>      [<ffffffff8363af16>] sock_sendmsg+0x56/0x80 net/socket.c:674
+>>>      [<ffffffff8363deec>] __sys_sendto+0x15c/0x200 net/socket.c:1977
+>>>      [<ffffffff8363dfb6>] __do_sys_sendto net/socket.c:1989 [inline]
+>>>      [<ffffffff8363dfb6>] __se_sys_sendto net/socket.c:1985 [inline]
+>>>      [<ffffffff8363dfb6>] __x64_sys_sendto+0x26/0x30 net/socket.c:1985
+>>>
+>>> Fixes: 9ec767160357 ("net: add IEEE 802.15.4 socket family implementation")
+>>> Reported-and-tested-by: syzbot+1f68113fa907bf0695a8@syzkaller.appspotmail.com
+>>> Signed-off-by: Takeshi Misawa <jeliantsurux@gmail.com>
+> 
+> Acked-by: Alexander Aring <aahringo@redhat.com>
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+This patch has been applied to the wpan tree and will be
+part of the next pull request to net. Thanks!
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+regards
+Stefan Schmidt
