@@ -2,125 +2,84 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E44A1C4338F
-	for <linux-wpan@archiver.kernel.org>; Tue, 10 Aug 2021 10:49:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B53EFC432BE
+	for <linux-wpan@archiver.kernel.org>; Tue, 10 Aug 2021 15:34:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C9A9660F02
-	for <linux-wpan@archiver.kernel.org>; Tue, 10 Aug 2021 10:49:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 999F861019
+	for <linux-wpan@archiver.kernel.org>; Tue, 10 Aug 2021 15:34:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236505AbhHJKuA (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 10 Aug 2021 06:50:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40920 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239920AbhHJKuA (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 10 Aug 2021 06:50:00 -0400
-Received: from proxima.lasnet.de (proxima.lasnet.de [IPv6:2a01:4f8:121:31eb:3::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BC78C0613D3;
-        Tue, 10 Aug 2021 03:49:37 -0700 (PDT)
-Received: from [192.168.178.156] (unknown [80.156.89.84])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: stefan@datenfreihafen.org)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id BEE9CC0353;
-        Tue, 10 Aug 2021 12:49:27 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
-        s=2021; t=1628592568;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=M0qF+o2AoVk5F58x/KmSY20curOZrhbNqe7IPSM3OJA=;
-        b=n+fHjMvtfN0LwKThosvhFKpTysHYNz3y05ebgbmXczVeSF2/Hpk8w0xIviQW0d4t9/2R8H
-        4CbkvT3toZe0uFnRDjHD8eFsNfj15HjXpPFettkL3f1U/Yk4mV3jtNuv1VGhK6xKeqFBzy
-        sU+dO+33KeSZ/trhYO8ULtLjvyVs6RyfInzyAy995ZoZW3AsXOjwt7z67FRZXLqBy7rHpf
-        0DLDZOzeQWPmbinKCCT3+vA4wrZaEBhleqOOk9aEZ/SGzDzCAyzJpeluaHFY2Pg8+Kpnjz
-        glKyjnOTwSo58vfq8m/C9ctC0VqL6lDpnAkTrW3Hfd+kX2F7Rgyvv2RG/PmLxw==
-Subject: Re: [PATCH net] net: Fix memory leak in ieee802154_raw_deliver
-To:     Alexander Aring <alex.aring@gmail.com>,
-        Jakub Kicinski <kuba@kernel.org>
-Cc:     Takeshi Misawa <jeliantsurux@gmail.com>,
-        David Howells <dhowells@redhat.com>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-        linux-wpan - ML <linux-wpan@vger.kernel.org>
-References: <20210805075414.GA15796@DESKTOP>
- <20210805065022.574e0691@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
- <CAB_54W4DK3uo+q7vRC2Vzrs5BENq2L_ukkkewiSXMNaSBiTsEQ@mail.gmail.com>
-From:   Stefan Schmidt <stefan@datenfreihafen.org>
-Message-ID: <47581b9b-4def-40be-88cb-6357516f9eb3@datenfreihafen.org>
-Date:   Tue, 10 Aug 2021 12:49:26 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+        id S242999AbhHJPfL (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 10 Aug 2021 11:35:11 -0400
+Received: from mail-il1-f198.google.com ([209.85.166.198]:38612 "EHLO
+        mail-il1-f198.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S243240AbhHJPfA (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 10 Aug 2021 11:35:00 -0400
+Received: by mail-il1-f198.google.com with SMTP id h27-20020a056e021d9bb02902021736bb95so7662507ila.5
+        for <linux-wpan@vger.kernel.org>; Tue, 10 Aug 2021 08:34:12 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
+         :from:to;
+        bh=ezvPuPtMzOuRLqecX2VTZ2ztz0IyxYGYWNq3bM8LvCs=;
+        b=ovAsTnQfb/S3t4WBhA+p/fXzekE664CsAs3mMdJnsx6jPqA9qxxvst/D/nNlmkiHIq
+         A+7Wz3PO7LyRX4oAQW3RB1MTh2L8xw3lTJbU9Xr5YkvptTpz1U1KvYZedk9PGo+MzYsW
+         3M4u6P9UZjHintr/i9JvHLK7aBl2KUOlYbcsmb9nzmkJqYdG+fvMGZpykYihtIwBBdIn
+         KFf+Ae//N9+Ah8364zwv695tKleD36988byMWY5Oe9dXZa1mSv0ojWeAi8a12aovynuV
+         WoFfiXVihYjumxRSjU6WwzWpMUqCdu6MEYn7CUCpRP6cOFR2Wsm4P2osJp6oQfKmz9fp
+         5E5w==
+X-Gm-Message-State: AOAM5312m9gx3faAH5dxIvMZJrSEquf6BaNBU9ykNijukT64ge5yuJkr
+        hrcY0ObXT2emYNgngThlhdL2QzALJYxIsDnS6GyCiCLCXp4o
+X-Google-Smtp-Source: ABdhPJxUNwqzmK5BP4xy5zYm2dHKjVhr9kXAul5tmQWBzbKn7f/vtTtKsjuaPj76egcfQsjLcONIB+8s6JEZ9u6yEHxs1CkpszEd
 MIME-Version: 1.0
-In-Reply-To: <CAB_54W4DK3uo+q7vRC2Vzrs5BENq2L_ukkkewiSXMNaSBiTsEQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a5d:9ac1:: with SMTP id x1mr16641ion.191.1628609652476;
+ Tue, 10 Aug 2021 08:34:12 -0700 (PDT)
+Date:   Tue, 10 Aug 2021 08:34:12 -0700
+In-Reply-To: <0000000000007faf7505c91bb19d@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000d04e9b05c9363bf1@google.com>
+Subject: Re: [syzbot] general protection fault in hwsim_new_edge_nl
+From:   syzbot <syzbot+fafb46da3f65fdbacd16@syzkaller.appspotmail.com>
+To:     akpm@linux-foundation.org, alex.aring@gmail.com, bp@alien8.de,
+        davem@davemloft.net, frederic@kernel.org, hpa@zytor.com,
+        jmattson@google.com, joro@8bytes.org, kuba@kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-wpan@vger.kernel.org, mark.rutland@arm.com,
+        masahiroy@kernel.org, mingo@redhat.com, mudongliangabcd@gmail.com,
+        netdev@vger.kernel.org, npiggin@gmail.com, pbonzini@redhat.com,
+        peterz@infradead.org, rafael.j.wysocki@intel.com,
+        rostedt@goodmis.org, seanjc@google.com, sedat.dilek@gmail.com,
+        stefan@datenfreihafen.org, syzkaller-bugs@googlegroups.com,
+        tglx@linutronix.de, vitor@massaru.org, vkuznets@redhat.com,
+        wanpengli@tencent.com, will@kernel.org, x86@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello.
+syzbot has bisected this issue to:
 
-On 09.08.21 15:06, Alexander Aring wrote:
-> Hi,
-> 
-> On Thu, 5 Aug 2021 at 09:50, Jakub Kicinski <kuba@kernel.org> wrote:
->>
->> On Thu, 5 Aug 2021 16:54:14 +0900 Takeshi Misawa wrote:
->>> If IEEE-802.15.4-RAW is closed before receive skb, skb is leaked.
->>> Fix this, by freeing sk_receive_queue in sk->sk_destruct().
->>>
->>> syzbot report:
->>> BUG: memory leak
->>> unreferenced object 0xffff88810f644600 (size 232):
->>>    comm "softirq", pid 0, jiffies 4294967032 (age 81.270s)
->>>    hex dump (first 32 bytes):
->>>      10 7d 4b 12 81 88 ff ff 10 7d 4b 12 81 88 ff ff  .}K......}K.....
->>>      00 00 00 00 00 00 00 00 40 7c 4b 12 81 88 ff ff  ........@|K.....
->>>    backtrace:
->>>      [<ffffffff83651d4a>] skb_clone+0xaa/0x2b0 net/core/skbuff.c:1496
->>>      [<ffffffff83fe1b80>] ieee802154_raw_deliver net/ieee802154/socket.c:369 [inline]
->>>      [<ffffffff83fe1b80>] ieee802154_rcv+0x100/0x340 net/ieee802154/socket.c:1070
->>>      [<ffffffff8367cc7a>] __netif_receive_skb_one_core+0x6a/0xa0 net/core/dev.c:5384
->>>      [<ffffffff8367cd07>] __netif_receive_skb+0x27/0xa0 net/core/dev.c:5498
->>>      [<ffffffff8367cdd9>] netif_receive_skb_internal net/core/dev.c:5603 [inline]
->>>      [<ffffffff8367cdd9>] netif_receive_skb+0x59/0x260 net/core/dev.c:5662
->>>      [<ffffffff83fe6302>] ieee802154_deliver_skb net/mac802154/rx.c:29 [inline]
->>>      [<ffffffff83fe6302>] ieee802154_subif_frame net/mac802154/rx.c:102 [inline]
->>>      [<ffffffff83fe6302>] __ieee802154_rx_handle_packet net/mac802154/rx.c:212 [inline]
->>>      [<ffffffff83fe6302>] ieee802154_rx+0x612/0x620 net/mac802154/rx.c:284
->>>      [<ffffffff83fe59a6>] ieee802154_tasklet_handler+0x86/0xa0 net/mac802154/main.c:35
->>>      [<ffffffff81232aab>] tasklet_action_common.constprop.0+0x5b/0x100 kernel/softirq.c:557
->>>      [<ffffffff846000bf>] __do_softirq+0xbf/0x2ab kernel/softirq.c:345
->>>      [<ffffffff81232f4c>] do_softirq kernel/softirq.c:248 [inline]
->>>      [<ffffffff81232f4c>] do_softirq+0x5c/0x80 kernel/softirq.c:235
->>>      [<ffffffff81232fc1>] __local_bh_enable_ip+0x51/0x60 kernel/softirq.c:198
->>>      [<ffffffff8367a9a4>] local_bh_enable include/linux/bottom_half.h:32 [inline]
->>>      [<ffffffff8367a9a4>] rcu_read_unlock_bh include/linux/rcupdate.h:745 [inline]
->>>      [<ffffffff8367a9a4>] __dev_queue_xmit+0x7f4/0xf60 net/core/dev.c:4221
->>>      [<ffffffff83fe2db4>] raw_sendmsg+0x1f4/0x2b0 net/ieee802154/socket.c:295
->>>      [<ffffffff8363af16>] sock_sendmsg_nosec net/socket.c:654 [inline]
->>>      [<ffffffff8363af16>] sock_sendmsg+0x56/0x80 net/socket.c:674
->>>      [<ffffffff8363deec>] __sys_sendto+0x15c/0x200 net/socket.c:1977
->>>      [<ffffffff8363dfb6>] __do_sys_sendto net/socket.c:1989 [inline]
->>>      [<ffffffff8363dfb6>] __se_sys_sendto net/socket.c:1985 [inline]
->>>      [<ffffffff8363dfb6>] __x64_sys_sendto+0x26/0x30 net/socket.c:1985
->>>
->>> Fixes: 9ec767160357 ("net: add IEEE 802.15.4 socket family implementation")
->>> Reported-and-tested-by: syzbot+1f68113fa907bf0695a8@syzkaller.appspotmail.com
->>> Signed-off-by: Takeshi Misawa <jeliantsurux@gmail.com>
-> 
-> Acked-by: Alexander Aring <aahringo@redhat.com>
+commit 997acaf6b4b59c6a9c259740312a69ea549cc684
+Author: Mark Rutland <mark.rutland@arm.com>
+Date:   Mon Jan 11 15:37:07 2021 +0000
 
+    lockdep: report broken irq restoration
 
-This patch has been applied to the wpan tree and will be
-part of the next pull request to net. Thanks!
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=13927981300000
+start commit:   d09c548dbf3b net: sched: act_mirred: Reset ct info when mi..
+git tree:       net
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=10527981300000
+console output: https://syzkaller.appspot.com/x/log.txt?x=17927981300000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=343fd21f6f4da2d6
+dashboard link: https://syzkaller.appspot.com/bug?extid=fafb46da3f65fdbacd16
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=152ee39e300000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15946ff1300000
 
-regards
-Stefan Schmidt
+Reported-by: syzbot+fafb46da3f65fdbacd16@syzkaller.appspotmail.com
+Fixes: 997acaf6b4b5 ("lockdep: report broken irq restoration")
+
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
