@@ -2,130 +2,208 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B2F7C4338F
-	for <linux-wpan@archiver.kernel.org>; Tue, 10 Aug 2021 05:41:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CED89C4338F
+	for <linux-wpan@archiver.kernel.org>; Tue, 10 Aug 2021 08:25:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6D3876101E
-	for <linux-wpan@archiver.kernel.org>; Tue, 10 Aug 2021 05:41:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AE7BE60EFF
+	for <linux-wpan@archiver.kernel.org>; Tue, 10 Aug 2021 08:25:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237648AbhHJFlu (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 10 Aug 2021 01:41:50 -0400
-Received: from mail-io1-f69.google.com ([209.85.166.69]:47839 "EHLO
+        id S238048AbhHJIZu (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 10 Aug 2021 04:25:50 -0400
+Received: from mail-io1-f69.google.com ([209.85.166.69]:55977 "EHLO
         mail-io1-f69.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237265AbhHJFlt (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 10 Aug 2021 01:41:49 -0400
-Received: by mail-io1-f69.google.com with SMTP id p7-20020a6b63070000b02904f58bb90366so1793988iog.14
-        for <linux-wpan@vger.kernel.org>; Mon, 09 Aug 2021 22:41:28 -0700 (PDT)
+        with ESMTP id S237527AbhHJIZt (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 10 Aug 2021 04:25:49 -0400
+Received: by mail-io1-f69.google.com with SMTP id f10-20020a6b620a0000b02904e5ab8bdc6cso14076629iog.22
+        for <linux-wpan@vger.kernel.org>; Tue, 10 Aug 2021 01:25:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=4k3xWVuvPtnO7/RXGNQCf+RD5uKUG8Fe1RKWCEcPJwo=;
-        b=Sr/VgwDoN4sKJVSjGl2bPJ+ayvY7XFguGPnN5qMx1YCha+m8WVxRcDopg3Mn5sHhp1
-         irXQHoEiS2puFHwfbp5QloSG0CXl/5lwSjODNLZ5YgBWiGsUIMJIN8PBH+sWcAliObNp
-         yOiJKlsEJ9zfNEjxVNB6Z0YqET2/9WmjLaPqgnNkRHsJ/A/POvFfMd9bK4DjZtqvtp6Z
-         Sin45dUi9anxhzXpMWnqaMtN5O7bRrpiW9x6SE9DvlKLw53u4KDvd+IkzfWW2MeUwt+N
-         2kKODrqcbnPeSNMaR4bJDEF2vn+D1nr+IZSYQ8E0BBeWClPMCp9afQpW+Ebm+3Qt+R9b
-         LjBQ==
-X-Gm-Message-State: AOAM533CprmuSCKLlLqLR/Beee07sj4b99q5T73Nl6hfISJEs0RD5+3n
-        Yidq+0XwwcCwBzds+g45ntV0XPwPC/8bh6EjrVMUZBihmxVz
-X-Google-Smtp-Source: ABdhPJw2Y4cmUsuL+QNQmnFFZz3f6/vxNEs3Dx7AIXnMWq7mXzVaULjZNUvNWeEqZ01SSCF0Cj1IIY53oII6KN9FE20Vgte83UNf
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=DTBo3khEZOU+h0oQTiTa1/X9B14yYY7SYQPoR8l9cKU=;
+        b=f38DVosimIWoScVvg5hTqx8H8St0wlfkKe0OinOid/6psE747jJJL7xvlJ/zHi5hiU
+         4QHkBHcEdf1HMWVZ4bnmTDPe9RS+tv9IOdPApF4m4GrlYvZ9/4Jy43GjNXSs1wDyshNv
+         vQOxBLCSDCSf6GhAvID+M3NcZPO6MwaIazP3AJa97aTXKXHfOsLHIYQ697I8+3bDcRvb
+         TsHUbyqtOGazS5GcyCIfYKTR3f6BcjZgbTPNea3vO5kmMuzhqLgvbDL/4UrWgv7zF/Nz
+         RY9xmmycb3R5/n968fhou/BvsvrzvO+JVWhqVTBBD68ghrd11IhcIcARIeB7hO0nz5L1
+         apyw==
+X-Gm-Message-State: AOAM531gVwkw6SAXp5PnwzDm86xlRzkzkkuDyqvIT+0SRtI2TbQZuJHr
+        tRUB8Qgzt6O+iPTYQ9vjmlp7+vJqJvJGAvaBdnIEbf3DUsTI
+X-Google-Smtp-Source: ABdhPJxSL822WJcCgEbOO8zBDc7ubIaooAsY9ZVzeKi/C7SZFs4XhU60TfzMZrMZfxNgN2jJJwohzAP36i8gzJ6IZ9/CkOYBTXw2
 MIME-Version: 1.0
-X-Received: by 2002:a5e:961a:: with SMTP id a26mr20924ioq.90.1628574087990;
- Mon, 09 Aug 2021 22:41:27 -0700 (PDT)
-Date:   Mon, 09 Aug 2021 22:41:27 -0700
-In-Reply-To: <0000000000007faf7505c91bb19d@google.com>
+X-Received: by 2002:a05:6e02:b43:: with SMTP id f3mr409047ilu.94.1628583926914;
+ Tue, 10 Aug 2021 01:25:26 -0700 (PDT)
+Date:   Tue, 10 Aug 2021 01:25:26 -0700
 X-Google-Appengine-App-Id: s~syzkaller
 X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000000156a605c92df4b2@google.com>
-Subject: Re: [syzbot] general protection fault in hwsim_new_edge_nl
-From:   syzbot <syzbot+fafb46da3f65fdbacd16@syzkaller.appspotmail.com>
-To:     alex.aring@gmail.com, davem@davemloft.net, kuba@kernel.org,
-        linux-kernel@vger.kernel.org, linux-wpan@vger.kernel.org,
-        mudongliangabcd@gmail.com, netdev@vger.kernel.org,
+Message-ID: <0000000000007365d805c9303e63@google.com>
+Subject: [syzbot] KMSAN: uninit-value in crc_ccitt
+From:   syzbot <syzbot+6d38e380afc486ec44a1@syzkaller.appspotmail.com>
+To:     alex.aring@gmail.com, davem@davemloft.net, glider@google.com,
+        kuba@kernel.org, linux-kernel@vger.kernel.org,
+        linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
         stefan@datenfreihafen.org, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-syzbot has found a reproducer for the following issue on:
+Hello,
 
-HEAD commit:    2a2b6e3640c4 devlink: Fix port_type_set function pointer c..
-git tree:       net-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=11abd8a1300000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=8075b2614f3db143
-dashboard link: https://syzkaller.appspot.com/bug?extid=fafb46da3f65fdbacd16
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.1
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13371f79300000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=16fabc4a300000
+syzbot found the following issue on:
+
+HEAD commit:    ee9407ea37bf kmsan: core: massage include/linux/sched.h
+git tree:       https://github.com/google/kmsan.git master
+console output: https://syzkaller.appspot.com/x/log.txt?x=1656babe300000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=92983a87b2ce6cdb
+dashboard link: https://syzkaller.appspot.com/bug?extid=6d38e380afc486ec44a1
+compiler:       Debian clang version 11.0.1-2, GNU ld (GNU Binutils for Debian) 2.35.1
+userspace arch: i386
+
+Unfortunately, I don't have any reproducer for this issue yet.
 
 IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+fafb46da3f65fdbacd16@syzkaller.appspotmail.com
+Reported-by: syzbot+6d38e380afc486ec44a1@syzkaller.appspotmail.com
 
-general protection fault, probably for non-canonical address 0xdffffc0000000000: 0000 [#1] PREEMPT SMP KASAN
-KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
-CPU: 1 PID: 8442 Comm: syz-executor760 Not tainted 5.14.0-rc4-syzkaller #0
+=====================================================
+BUG: KMSAN: uninit-value in crc_ccitt_byte include/linux/crc-ccitt.h:15 [inline]
+BUG: KMSAN: uninit-value in crc_ccitt+0x364/0x3f0 lib/crc-ccitt.c:102
+CPU: 1 PID: 9742 Comm: syz-executor.4 Not tainted 5.13.0-syzkaller #0
 Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-RIP: 0010:nla_len include/net/netlink.h:1148 [inline]
-RIP: 0010:nla_parse_nested_deprecated include/net/netlink.h:1231 [inline]
-RIP: 0010:hwsim_new_edge_nl+0xf4/0x8c0 drivers/net/ieee802154/mac802154_hwsim.c:425
-Code: 00 0f 85 76 07 00 00 4d 85 ed 48 8b 5b 10 0f 84 5e 05 00 00 e8 0d e3 40 fc 48 89 da 48 b8 00 00 00 00 00 fc ff df 48 c1 ea 03 <0f> b6 14 02 48 89 d8 83 e0 07 83 c0 01 38 d0 7c 08 84 d2 0f 85 87
-RSP: 0018:ffffc9000178f568 EFLAGS: 00010246
-RAX: dffffc0000000000 RBX: 0000000000000000 RCX: 0000000000000000
-RDX: 0000000000000000 RSI: ffffffff8534cab3 RDI: ffff88801dd72a10
-RBP: ffffc9000178f678 R08: 0000000000000001 R09: ffffc9000178f6a8
-R10: fffff520002f1ed6 R11: 0000000000000000 R12: ffffc9000178f698
-R13: ffff888025fbd014 R14: ffff8880278afb40 R15: 0000000000000000
-FS:  00000000013a1300(0000) GS:ffff8880b9d00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000020000744 CR3: 0000000031221000 CR4: 00000000001506e0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
 Call Trace:
- genl_family_rcv_msg_doit+0x228/0x320 net/netlink/genetlink.c:731
- genl_family_rcv_msg net/netlink/genetlink.c:775 [inline]
- genl_rcv_msg+0x328/0x580 net/netlink/genetlink.c:792
- netlink_rcv_skb+0x153/0x420 net/netlink/af_netlink.c:2504
- genl_rcv+0x24/0x40 net/netlink/genetlink.c:803
- netlink_unicast_kernel net/netlink/af_netlink.c:1314 [inline]
- netlink_unicast+0x533/0x7d0 net/netlink/af_netlink.c:1340
- netlink_sendmsg+0x86d/0xdb0 net/netlink/af_netlink.c:1929
- sock_sendmsg_nosec net/socket.c:704 [inline]
- sock_sendmsg+0xcf/0x120 net/socket.c:724
- ____sys_sendmsg+0x6e8/0x810 net/socket.c:2403
- ___sys_sendmsg+0xf3/0x170 net/socket.c:2457
- __sys_sendmsg+0xe5/0x1b0 net/socket.c:2486
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-RIP: 0033:0x43ef39
-Code: 28 c3 e8 2a 14 00 00 66 2e 0f 1f 84 00 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 c0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fff22c3c298 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 0000000000400488 RCX: 000000000043ef39
-RDX: 0000000000000000 RSI: 0000000020000000 RDI: 0000000000000003
-RBP: 0000000000402f20 R08: 0000000000000000 R09: 0000000000400488
-R10: 00000000004ac018 R11: 0000000000000246 R12: 0000000000402fb0
-R13: 0000000000000000 R14: 00000000004ac018 R15: 0000000000400488
-Modules linked in:
----[ end trace 63fa4e15cfb16ac5 ]---
-RIP: 0010:nla_len include/net/netlink.h:1148 [inline]
-RIP: 0010:nla_parse_nested_deprecated include/net/netlink.h:1231 [inline]
-RIP: 0010:hwsim_new_edge_nl+0xf4/0x8c0 drivers/net/ieee802154/mac802154_hwsim.c:425
-Code: 00 0f 85 76 07 00 00 4d 85 ed 48 8b 5b 10 0f 84 5e 05 00 00 e8 0d e3 40 fc 48 89 da 48 b8 00 00 00 00 00 fc ff df 48 c1 ea 03 <0f> b6 14 02 48 89 d8 83 e0 07 83 c0 01 38 d0 7c 08 84 d2 0f 85 87
-RSP: 0018:ffffc9000178f568 EFLAGS: 00010246
-RAX: dffffc0000000000 RBX: 0000000000000000 RCX: 0000000000000000
-RDX: 0000000000000000 RSI: ffffffff8534cab3 RDI: ffff88801dd72a10
-RBP: ffffc9000178f678 R08: 0000000000000001 R09: ffffc9000178f6a8
-R10: fffff520002f1ed6 R11: 0000000000000000 R12: ffffc9000178f698
-R13: ffff888025fbd014 R14: ffff8880278afb40 R15: 0000000000000000
-FS:  00000000013a1300(0000) GS:ffff8880b9d00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000020000744 CR3: 0000000031221000 CR4: 00000000001506e0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+ __dump_stack lib/dump_stack.c:79 [inline]
+ dump_stack+0x24c/0x2e0 lib/dump_stack.c:120
+ kmsan_report+0xfb/0x1e0 mm/kmsan/report.c:121
+ __msan_warning+0xd7/0x160 mm/kmsan/instrumentation.c:201
+ crc_ccitt_byte include/linux/crc-ccitt.h:15 [inline]
+ crc_ccitt+0x364/0x3f0 lib/crc-ccitt.c:102
+ ieee802154_tx+0x300/0x800 net/mac802154/tx.c:72
+ ieee802154_subif_start_xmit+0x16a/0x250 net/mac802154/tx.c:132
+ __netdev_start_xmit include/linux/netdevice.h:4944 [inline]
+ netdev_start_xmit include/linux/netdevice.h:4958 [inline]
+ xmit_one+0x2b6/0x760 net/core/dev.c:3654
+ dev_hard_start_xmit+0x196/0x420 net/core/dev.c:3670
+ sch_direct_xmit+0x554/0x1b90 net/sched/sch_generic.c:336
+ qdisc_restart net/sched/sch_generic.c:401 [inline]
+ __qdisc_run+0x35b/0x490 net/sched/sch_generic.c:409
+ qdisc_run include/net/pkt_sched.h:131 [inline]
+ __dev_xmit_skb net/core/dev.c:3857 [inline]
+ __dev_queue_xmit+0x1e3f/0x5440 net/core/dev.c:4214
+ dev_queue_xmit+0x4b/0x60 net/core/dev.c:4279
+ dgram_sendmsg+0x1142/0x15d0 net/ieee802154/socket.c:682
+ ieee802154_sock_sendmsg+0xec/0x130 net/ieee802154/socket.c:97
+ sock_sendmsg_nosec net/socket.c:654 [inline]
+ sock_sendmsg net/socket.c:674 [inline]
+ ____sys_sendmsg+0xcfc/0x12f0 net/socket.c:2337
+ ___sys_sendmsg net/socket.c:2391 [inline]
+ __sys_sendmsg+0x714/0x830 net/socket.c:2420
+ __compat_sys_sendmsg net/compat.c:347 [inline]
+ __do_compat_sys_sendmsg net/compat.c:354 [inline]
+ __se_compat_sys_sendmsg net/compat.c:351 [inline]
+ __ia32_compat_sys_sendmsg+0xed/0x130 net/compat.c:351
+ do_syscall_32_irqs_on arch/x86/entry/common.c:84 [inline]
+ __do_fast_syscall_32+0x132/0x1b0 arch/x86/entry/common.c:149
+ do_fast_syscall_32+0x77/0xd0 arch/x86/entry/common.c:179
+ do_SYSENTER_32+0x73/0x90 arch/x86/entry/common.c:222
+ entry_SYSENTER_compat_after_hwframe+0x4d/0x5c
+RIP: 0023:0xf7fa3549
+Code: 03 74 c0 01 10 05 03 74 b8 01 10 06 03 74 b4 01 10 07 03 74 b0 01 10 08 03 74 d8 01 00 00 00 00 00 51 52 55 89 e5 0f 34 cd 80 <5d> 5a 59 c3 90 90 90 90 8d b4 26 00 00 00 00 8d b4 26 00 00 00 00
+RSP: 002b:00000000f559d5fc EFLAGS: 00000296 ORIG_RAX: 0000000000000172
+RAX: ffffffffffffffda RBX: 0000000000000004 RCX: 0000000020000880
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
+RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000000000
+R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
 
+Uninit was stored to memory at:
+ kmsan_save_stack_with_flags mm/kmsan/core.c:106 [inline]
+ kmsan_internal_chain_origin+0xab/0x120 mm/kmsan/core.c:244
+ kmsan_memmove_metadata+0x23b/0x2c0 mm/kmsan/core.c:192
+ __msan_memcpy+0x5e/0x90 mm/kmsan/instrumentation.c:111
+ ieee802154_hdr_push+0xcd7/0xdd0 net/ieee802154/header_ops.c:117
+ ieee802154_header_create+0xd07/0x1070 net/mac802154/iface.c:404
+ wpan_dev_hard_header include/net/cfg802154.h:374 [inline]
+ dgram_sendmsg+0xf4b/0x15d0 net/ieee802154/socket.c:670
+ ieee802154_sock_sendmsg+0xec/0x130 net/ieee802154/socket.c:97
+ sock_sendmsg_nosec net/socket.c:654 [inline]
+ sock_sendmsg net/socket.c:674 [inline]
+ ____sys_sendmsg+0xcfc/0x12f0 net/socket.c:2337
+ ___sys_sendmsg net/socket.c:2391 [inline]
+ __sys_sendmsg+0x714/0x830 net/socket.c:2420
+ __compat_sys_sendmsg net/compat.c:347 [inline]
+ __do_compat_sys_sendmsg net/compat.c:354 [inline]
+ __se_compat_sys_sendmsg net/compat.c:351 [inline]
+ __ia32_compat_sys_sendmsg+0xed/0x130 net/compat.c:351
+ do_syscall_32_irqs_on arch/x86/entry/common.c:84 [inline]
+ __do_fast_syscall_32+0x132/0x1b0 arch/x86/entry/common.c:149
+ do_fast_syscall_32+0x77/0xd0 arch/x86/entry/common.c:179
+ do_SYSENTER_32+0x73/0x90 arch/x86/entry/common.c:222
+ entry_SYSENTER_compat_after_hwframe+0x4d/0x5c
+
+Uninit was stored to memory at:
+ kmsan_save_stack_with_flags mm/kmsan/core.c:106 [inline]
+ kmsan_internal_chain_origin+0xab/0x120 mm/kmsan/core.c:244
+ kmsan_memmove_metadata+0x23b/0x2c0 mm/kmsan/core.c:192
+ __msan_memcpy+0x5e/0x90 mm/kmsan/instrumentation.c:111
+ ieee802154_hdr_push_addr net/ieee802154/header_ops.c:35 [inline]
+ ieee802154_hdr_push+0x2b0/0xdd0 net/ieee802154/header_ops.c:89
+ ieee802154_header_create+0xd07/0x1070 net/mac802154/iface.c:404
+ wpan_dev_hard_header include/net/cfg802154.h:374 [inline]
+ dgram_sendmsg+0xf4b/0x15d0 net/ieee802154/socket.c:670
+ ieee802154_sock_sendmsg+0xec/0x130 net/ieee802154/socket.c:97
+ sock_sendmsg_nosec net/socket.c:654 [inline]
+ sock_sendmsg net/socket.c:674 [inline]
+ ____sys_sendmsg+0xcfc/0x12f0 net/socket.c:2337
+ ___sys_sendmsg net/socket.c:2391 [inline]
+ __sys_sendmsg+0x714/0x830 net/socket.c:2420
+ __compat_sys_sendmsg net/compat.c:347 [inline]
+ __do_compat_sys_sendmsg net/compat.c:354 [inline]
+ __se_compat_sys_sendmsg net/compat.c:351 [inline]
+ __ia32_compat_sys_sendmsg+0xed/0x130 net/compat.c:351
+ do_syscall_32_irqs_on arch/x86/entry/common.c:84 [inline]
+ __do_fast_syscall_32+0x132/0x1b0 arch/x86/entry/common.c:149
+ do_fast_syscall_32+0x77/0xd0 arch/x86/entry/common.c:179
+ do_SYSENTER_32+0x73/0x90 arch/x86/entry/common.c:222
+ entry_SYSENTER_compat_after_hwframe+0x4d/0x5c
+
+Uninit was stored to memory at:
+ kmsan_save_stack_with_flags mm/kmsan/core.c:106 [inline]
+ kmsan_internal_chain_origin+0xab/0x120 mm/kmsan/core.c:244
+ kmsan_memmove_metadata+0x23b/0x2c0 mm/kmsan/core.c:192
+ __msan_memcpy+0x5e/0x90 mm/kmsan/instrumentation.c:111
+ ieee802154_header_create+0xcd1/0x1070 net/mac802154/iface.c:402
+ wpan_dev_hard_header include/net/cfg802154.h:374 [inline]
+ dgram_sendmsg+0xf4b/0x15d0 net/ieee802154/socket.c:670
+ ieee802154_sock_sendmsg+0xec/0x130 net/ieee802154/socket.c:97
+ sock_sendmsg_nosec net/socket.c:654 [inline]
+ sock_sendmsg net/socket.c:674 [inline]
+ ____sys_sendmsg+0xcfc/0x12f0 net/socket.c:2337
+ ___sys_sendmsg net/socket.c:2391 [inline]
+ __sys_sendmsg+0x714/0x830 net/socket.c:2420
+ __compat_sys_sendmsg net/compat.c:347 [inline]
+ __do_compat_sys_sendmsg net/compat.c:354 [inline]
+ __se_compat_sys_sendmsg net/compat.c:351 [inline]
+ __ia32_compat_sys_sendmsg+0xed/0x130 net/compat.c:351
+ do_syscall_32_irqs_on arch/x86/entry/common.c:84 [inline]
+ __do_fast_syscall_32+0x132/0x1b0 arch/x86/entry/common.c:149
+ do_fast_syscall_32+0x77/0xd0 arch/x86/entry/common.c:179
+ do_SYSENTER_32+0x73/0x90 arch/x86/entry/common.c:222
+ entry_SYSENTER_compat_after_hwframe+0x4d/0x5c
+
+Local variable ----dst_addr@dgram_sendmsg created at:
+ dgram_sendmsg+0x8a/0x15d0 net/ieee802154/socket.c:607
+ dgram_sendmsg+0x8a/0x15d0 net/ieee802154/socket.c:607
+=====================================================
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
