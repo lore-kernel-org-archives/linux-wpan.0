@@ -2,127 +2,130 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C3C9C4338F
-	for <linux-wpan@archiver.kernel.org>; Mon,  9 Aug 2021 13:07:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B2F7C4338F
+	for <linux-wpan@archiver.kernel.org>; Tue, 10 Aug 2021 05:41:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F30D660F93
-	for <linux-wpan@archiver.kernel.org>; Mon,  9 Aug 2021 13:07:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6D3876101E
+	for <linux-wpan@archiver.kernel.org>; Tue, 10 Aug 2021 05:41:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235160AbhHINHU (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 9 Aug 2021 09:07:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54382 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235119AbhHINHU (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 9 Aug 2021 09:07:20 -0400
-Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8228EC0613D3;
-        Mon,  9 Aug 2021 06:06:59 -0700 (PDT)
-Received: by mail-wm1-x331.google.com with SMTP id h24-20020a1ccc180000b029022e0571d1a0so11523114wmb.5;
-        Mon, 09 Aug 2021 06:06:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=wO6dIk6sGlvME4DHqwcRib7/pkX9nrtkj0EYpHUiXq4=;
-        b=PUrP4YMs2FrwZ2oqOrctjZoc5IuOFRZv1QNtY4+W08mHVXThFvmfDTDRcD/80/VVSj
-         4pIoBC3TNH33GDiLmjTls57nF+Lp7DYGIoIkZiBBfZIrfkxXbEvgHk97aMPnRSPRmbrX
-         M97ccKZD8HC6j28wFtciO1L+IrwiHHwIW0/Gcf1CFEp8RHjOfD8Ho+qTWFqaNgfaWyx0
-         EPQCke5wVyNT/Dt4/GdLiU0XobEJhBWHrtvBr6H+O0++81JhpgyeLs9NU7+QwFpDoK/+
-         nJfxDwOD6792v8gZFYny6/zV6tDnn565Vk/VNBrnaQObJG+d/CKc6y7OCP84/POqTqQz
-         1OKw==
+        id S237648AbhHJFlu (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 10 Aug 2021 01:41:50 -0400
+Received: from mail-io1-f69.google.com ([209.85.166.69]:47839 "EHLO
+        mail-io1-f69.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237265AbhHJFlt (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 10 Aug 2021 01:41:49 -0400
+Received: by mail-io1-f69.google.com with SMTP id p7-20020a6b63070000b02904f58bb90366so1793988iog.14
+        for <linux-wpan@vger.kernel.org>; Mon, 09 Aug 2021 22:41:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=wO6dIk6sGlvME4DHqwcRib7/pkX9nrtkj0EYpHUiXq4=;
-        b=b8scyQ6TdGcDSif04JSk4n4u2ELs20zeVT66GByGoVSlLOKk4hr3w0pfXzCc3WJ4xP
-         OwC0G7C67oQ3q18I5s74dqElA8q8rvbqDnyCdhOdcKu0LDG4nZuKjEWQjFgONDBbIYWr
-         v0OoVf1E0/JuCkP4Xae6q8xzW3YirojOnDVQDpNzzKOLbSiviK39/9bHPLvY5ZBYTEPh
-         JAIRASgN8AwfWcHn28Ii5+TFroKqLv5KZcCCLDnJwWThp4OgUqvaiSNqzSBGk8z2z+UZ
-         4LM3QVpcWGbW4VQ2/kjHXsvkDyjzTKG4PMtwMdchdPOXEpLV3RUS4tdnwrtG+PLA/1xm
-         SpaQ==
-X-Gm-Message-State: AOAM531Q5N7LIRGs3pyvO/UFnhEcqNXeacX+DR5dXBAR1BdmG8Z2ajb6
-        3B2nGSlv9tgm/eKxAhQrIkskoA/npjqC8LiR9Xc=
-X-Google-Smtp-Source: ABdhPJwdxOd8XX5QAtBl68Ukm/oAM/V33DwkuIW90B1rewPa2Mp+o4Duh7mjd1C+W8Qau3kjgVowk9K2Edoz+CQKWmw=
-X-Received: by 2002:a05:600c:2046:: with SMTP id p6mr54395wmg.164.1628514418109;
- Mon, 09 Aug 2021 06:06:58 -0700 (PDT)
+        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
+         :from:to;
+        bh=4k3xWVuvPtnO7/RXGNQCf+RD5uKUG8Fe1RKWCEcPJwo=;
+        b=Sr/VgwDoN4sKJVSjGl2bPJ+ayvY7XFguGPnN5qMx1YCha+m8WVxRcDopg3Mn5sHhp1
+         irXQHoEiS2puFHwfbp5QloSG0CXl/5lwSjODNLZ5YgBWiGsUIMJIN8PBH+sWcAliObNp
+         yOiJKlsEJ9zfNEjxVNB6Z0YqET2/9WmjLaPqgnNkRHsJ/A/POvFfMd9bK4DjZtqvtp6Z
+         Sin45dUi9anxhzXpMWnqaMtN5O7bRrpiW9x6SE9DvlKLw53u4KDvd+IkzfWW2MeUwt+N
+         2kKODrqcbnPeSNMaR4bJDEF2vn+D1nr+IZSYQ8E0BBeWClPMCp9afQpW+Ebm+3Qt+R9b
+         LjBQ==
+X-Gm-Message-State: AOAM533CprmuSCKLlLqLR/Beee07sj4b99q5T73Nl6hfISJEs0RD5+3n
+        Yidq+0XwwcCwBzds+g45ntV0XPwPC/8bh6EjrVMUZBihmxVz
+X-Google-Smtp-Source: ABdhPJw2Y4cmUsuL+QNQmnFFZz3f6/vxNEs3Dx7AIXnMWq7mXzVaULjZNUvNWeEqZ01SSCF0Cj1IIY53oII6KN9FE20Vgte83UNf
 MIME-Version: 1.0
-References: <20210805075414.GA15796@DESKTOP> <20210805065022.574e0691@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
-In-Reply-To: <20210805065022.574e0691@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
-From:   Alexander Aring <alex.aring@gmail.com>
-Date:   Mon, 9 Aug 2021 09:06:46 -0400
-Message-ID: <CAB_54W4DK3uo+q7vRC2Vzrs5BENq2L_ukkkewiSXMNaSBiTsEQ@mail.gmail.com>
-Subject: Re: [PATCH net] net: Fix memory leak in ieee802154_raw_deliver
-To:     Jakub Kicinski <kuba@kernel.org>
-Cc:     Takeshi Misawa <jeliantsurux@gmail.com>,
-        David Howells <dhowells@redhat.com>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-        Stefan Schmidt <stefan@datenfreihafen.org>,
-        linux-wpan - ML <linux-wpan@vger.kernel.org>
+X-Received: by 2002:a5e:961a:: with SMTP id a26mr20924ioq.90.1628574087990;
+ Mon, 09 Aug 2021 22:41:27 -0700 (PDT)
+Date:   Mon, 09 Aug 2021 22:41:27 -0700
+In-Reply-To: <0000000000007faf7505c91bb19d@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000000156a605c92df4b2@google.com>
+Subject: Re: [syzbot] general protection fault in hwsim_new_edge_nl
+From:   syzbot <syzbot+fafb46da3f65fdbacd16@syzkaller.appspotmail.com>
+To:     alex.aring@gmail.com, davem@davemloft.net, kuba@kernel.org,
+        linux-kernel@vger.kernel.org, linux-wpan@vger.kernel.org,
+        mudongliangabcd@gmail.com, netdev@vger.kernel.org,
+        stefan@datenfreihafen.org, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi,
+syzbot has found a reproducer for the following issue on:
 
-On Thu, 5 Aug 2021 at 09:50, Jakub Kicinski <kuba@kernel.org> wrote:
->
-> On Thu, 5 Aug 2021 16:54:14 +0900 Takeshi Misawa wrote:
-> > If IEEE-802.15.4-RAW is closed before receive skb, skb is leaked.
-> > Fix this, by freeing sk_receive_queue in sk->sk_destruct().
-> >
-> > syzbot report:
-> > BUG: memory leak
-> > unreferenced object 0xffff88810f644600 (size 232):
-> >   comm "softirq", pid 0, jiffies 4294967032 (age 81.270s)
-> >   hex dump (first 32 bytes):
-> >     10 7d 4b 12 81 88 ff ff 10 7d 4b 12 81 88 ff ff  .}K......}K.....
-> >     00 00 00 00 00 00 00 00 40 7c 4b 12 81 88 ff ff  ........@|K.....
-> >   backtrace:
-> >     [<ffffffff83651d4a>] skb_clone+0xaa/0x2b0 net/core/skbuff.c:1496
-> >     [<ffffffff83fe1b80>] ieee802154_raw_deliver net/ieee802154/socket.c:369 [inline]
-> >     [<ffffffff83fe1b80>] ieee802154_rcv+0x100/0x340 net/ieee802154/socket.c:1070
-> >     [<ffffffff8367cc7a>] __netif_receive_skb_one_core+0x6a/0xa0 net/core/dev.c:5384
-> >     [<ffffffff8367cd07>] __netif_receive_skb+0x27/0xa0 net/core/dev.c:5498
-> >     [<ffffffff8367cdd9>] netif_receive_skb_internal net/core/dev.c:5603 [inline]
-> >     [<ffffffff8367cdd9>] netif_receive_skb+0x59/0x260 net/core/dev.c:5662
-> >     [<ffffffff83fe6302>] ieee802154_deliver_skb net/mac802154/rx.c:29 [inline]
-> >     [<ffffffff83fe6302>] ieee802154_subif_frame net/mac802154/rx.c:102 [inline]
-> >     [<ffffffff83fe6302>] __ieee802154_rx_handle_packet net/mac802154/rx.c:212 [inline]
-> >     [<ffffffff83fe6302>] ieee802154_rx+0x612/0x620 net/mac802154/rx.c:284
-> >     [<ffffffff83fe59a6>] ieee802154_tasklet_handler+0x86/0xa0 net/mac802154/main.c:35
-> >     [<ffffffff81232aab>] tasklet_action_common.constprop.0+0x5b/0x100 kernel/softirq.c:557
-> >     [<ffffffff846000bf>] __do_softirq+0xbf/0x2ab kernel/softirq.c:345
-> >     [<ffffffff81232f4c>] do_softirq kernel/softirq.c:248 [inline]
-> >     [<ffffffff81232f4c>] do_softirq+0x5c/0x80 kernel/softirq.c:235
-> >     [<ffffffff81232fc1>] __local_bh_enable_ip+0x51/0x60 kernel/softirq.c:198
-> >     [<ffffffff8367a9a4>] local_bh_enable include/linux/bottom_half.h:32 [inline]
-> >     [<ffffffff8367a9a4>] rcu_read_unlock_bh include/linux/rcupdate.h:745 [inline]
-> >     [<ffffffff8367a9a4>] __dev_queue_xmit+0x7f4/0xf60 net/core/dev.c:4221
-> >     [<ffffffff83fe2db4>] raw_sendmsg+0x1f4/0x2b0 net/ieee802154/socket.c:295
-> >     [<ffffffff8363af16>] sock_sendmsg_nosec net/socket.c:654 [inline]
-> >     [<ffffffff8363af16>] sock_sendmsg+0x56/0x80 net/socket.c:674
-> >     [<ffffffff8363deec>] __sys_sendto+0x15c/0x200 net/socket.c:1977
-> >     [<ffffffff8363dfb6>] __do_sys_sendto net/socket.c:1989 [inline]
-> >     [<ffffffff8363dfb6>] __se_sys_sendto net/socket.c:1985 [inline]
-> >     [<ffffffff8363dfb6>] __x64_sys_sendto+0x26/0x30 net/socket.c:1985
-> >
-> > Fixes: 9ec767160357 ("net: add IEEE 802.15.4 socket family implementation")
-> > Reported-and-tested-by: syzbot+1f68113fa907bf0695a8@syzkaller.appspotmail.com
-> > Signed-off-by: Takeshi Misawa <jeliantsurux@gmail.com>
+HEAD commit:    2a2b6e3640c4 devlink: Fix port_type_set function pointer c..
+git tree:       net-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=11abd8a1300000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=8075b2614f3db143
+dashboard link: https://syzkaller.appspot.com/bug?extid=fafb46da3f65fdbacd16
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.1
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13371f79300000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=16fabc4a300000
 
-Acked-by: Alexander Aring <aahringo@redhat.com>
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+fafb46da3f65fdbacd16@syzkaller.appspotmail.com
 
-Tested with one of the c reproducers. Doesn't occur anymore. I see
-other socket implementations e.g. af_can.c which do similar things.
+general protection fault, probably for non-canonical address 0xdffffc0000000000: 0000 [#1] PREEMPT SMP KASAN
+KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
+CPU: 1 PID: 8442 Comm: syz-executor760 Not tainted 5.14.0-rc4-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+RIP: 0010:nla_len include/net/netlink.h:1148 [inline]
+RIP: 0010:nla_parse_nested_deprecated include/net/netlink.h:1231 [inline]
+RIP: 0010:hwsim_new_edge_nl+0xf4/0x8c0 drivers/net/ieee802154/mac802154_hwsim.c:425
+Code: 00 0f 85 76 07 00 00 4d 85 ed 48 8b 5b 10 0f 84 5e 05 00 00 e8 0d e3 40 fc 48 89 da 48 b8 00 00 00 00 00 fc ff df 48 c1 ea 03 <0f> b6 14 02 48 89 d8 83 e0 07 83 c0 01 38 d0 7c 08 84 d2 0f 85 87
+RSP: 0018:ffffc9000178f568 EFLAGS: 00010246
+RAX: dffffc0000000000 RBX: 0000000000000000 RCX: 0000000000000000
+RDX: 0000000000000000 RSI: ffffffff8534cab3 RDI: ffff88801dd72a10
+RBP: ffffc9000178f678 R08: 0000000000000001 R09: ffffc9000178f6a8
+R10: fffff520002f1ed6 R11: 0000000000000000 R12: ffffc9000178f698
+R13: ffff888025fbd014 R14: ffff8880278afb40 R15: 0000000000000000
+FS:  00000000013a1300(0000) GS:ffff8880b9d00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000020000744 CR3: 0000000031221000 CR4: 00000000001506e0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ genl_family_rcv_msg_doit+0x228/0x320 net/netlink/genetlink.c:731
+ genl_family_rcv_msg net/netlink/genetlink.c:775 [inline]
+ genl_rcv_msg+0x328/0x580 net/netlink/genetlink.c:792
+ netlink_rcv_skb+0x153/0x420 net/netlink/af_netlink.c:2504
+ genl_rcv+0x24/0x40 net/netlink/genetlink.c:803
+ netlink_unicast_kernel net/netlink/af_netlink.c:1314 [inline]
+ netlink_unicast+0x533/0x7d0 net/netlink/af_netlink.c:1340
+ netlink_sendmsg+0x86d/0xdb0 net/netlink/af_netlink.c:1929
+ sock_sendmsg_nosec net/socket.c:704 [inline]
+ sock_sendmsg+0xcf/0x120 net/socket.c:724
+ ____sys_sendmsg+0x6e8/0x810 net/socket.c:2403
+ ___sys_sendmsg+0xf3/0x170 net/socket.c:2457
+ __sys_sendmsg+0xe5/0x1b0 net/socket.c:2486
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+RIP: 0033:0x43ef39
+Code: 28 c3 e8 2a 14 00 00 66 2e 0f 1f 84 00 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 c0 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fff22c3c298 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 0000000000400488 RCX: 000000000043ef39
+RDX: 0000000000000000 RSI: 0000000020000000 RDI: 0000000000000003
+RBP: 0000000000402f20 R08: 0000000000000000 R09: 0000000000400488
+R10: 00000000004ac018 R11: 0000000000000246 R12: 0000000000402fb0
+R13: 0000000000000000 R14: 00000000004ac018 R15: 0000000000400488
+Modules linked in:
+---[ end trace 63fa4e15cfb16ac5 ]---
+RIP: 0010:nla_len include/net/netlink.h:1148 [inline]
+RIP: 0010:nla_parse_nested_deprecated include/net/netlink.h:1231 [inline]
+RIP: 0010:hwsim_new_edge_nl+0xf4/0x8c0 drivers/net/ieee802154/mac802154_hwsim.c:425
+Code: 00 0f 85 76 07 00 00 4d 85 ed 48 8b 5b 10 0f 84 5e 05 00 00 e8 0d e3 40 fc 48 89 da 48 b8 00 00 00 00 00 fc ff df 48 c1 ea 03 <0f> b6 14 02 48 89 d8 83 e0 07 83 c0 01 38 d0 7c 08 84 d2 0f 85 87
+RSP: 0018:ffffc9000178f568 EFLAGS: 00010246
+RAX: dffffc0000000000 RBX: 0000000000000000 RCX: 0000000000000000
+RDX: 0000000000000000 RSI: ffffffff8534cab3 RDI: ffff88801dd72a10
+RBP: ffffc9000178f678 R08: 0000000000000001 R09: ffffc9000178f6a8
+R10: fffff520002f1ed6 R11: 0000000000000000 R12: ffffc9000178f698
+R13: ffff888025fbd014 R14: ffff8880278afb40 R15: 0000000000000000
+FS:  00000000013a1300(0000) GS:ffff8880b9d00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000020000744 CR3: 0000000031221000 CR4: 00000000001506e0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
 
-Thank you so much for fixing this issue!
-
-- Alex
