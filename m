@@ -2,84 +2,130 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B53EFC432BE
-	for <linux-wpan@archiver.kernel.org>; Tue, 10 Aug 2021 15:34:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 123D2C4338F
+	for <linux-wpan@archiver.kernel.org>; Wed, 11 Aug 2021 02:37:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 999F861019
-	for <linux-wpan@archiver.kernel.org>; Tue, 10 Aug 2021 15:34:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DB24560ED8
+	for <linux-wpan@archiver.kernel.org>; Wed, 11 Aug 2021 02:37:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242999AbhHJPfL (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 10 Aug 2021 11:35:11 -0400
-Received: from mail-il1-f198.google.com ([209.85.166.198]:38612 "EHLO
-        mail-il1-f198.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243240AbhHJPfA (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 10 Aug 2021 11:35:00 -0400
-Received: by mail-il1-f198.google.com with SMTP id h27-20020a056e021d9bb02902021736bb95so7662507ila.5
-        for <linux-wpan@vger.kernel.org>; Tue, 10 Aug 2021 08:34:12 -0700 (PDT)
+        id S231712AbhHKCh2 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 10 Aug 2021 22:37:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33650 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231699AbhHKCh2 (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 10 Aug 2021 22:37:28 -0400
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7722C061765;
+        Tue, 10 Aug 2021 19:37:05 -0700 (PDT)
+Received: by mail-pj1-x102b.google.com with SMTP id cp15-20020a17090afb8fb029017891959dcbso7316901pjb.2;
+        Tue, 10 Aug 2021 19:37:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=c34YqbDj4H2LkHIxUJ62k4rMkPDaBHR70bxWD8IA/H8=;
+        b=e9gDwcexdW+buNc728tSZSTDkMYQCZ8NLHBQgiANGkb1skl7uhP3dgDQzwR9/1pDFE
+         3KUbLGVxjJ+Abb8IHtezOFIoNwqcTd+Oopw50ieDYlwJe2S7Znk/MyIKwu/JSO1bQlTc
+         kwavT97aiZ8tVsbMCP8t05MLqXo7ahF1onj34Hh5rKm5jCtiVJ5UiPLTm7Mp8FPP5Xb3
+         ui5zDg5rr9ka1F2X9Q1BmtGeWDvAsmcq+d53nRhVRAh0Dw3bEFqs2jEMhTfFht55mbku
+         vYSFNcPq+7WcWM9UsXuTfhY1aGw/r98qfJ1CQTVDv1P7UyJIN52gOgjya300YhKfX8wy
+         +HSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=ezvPuPtMzOuRLqecX2VTZ2ztz0IyxYGYWNq3bM8LvCs=;
-        b=ovAsTnQfb/S3t4WBhA+p/fXzekE664CsAs3mMdJnsx6jPqA9qxxvst/D/nNlmkiHIq
-         A+7Wz3PO7LyRX4oAQW3RB1MTh2L8xw3lTJbU9Xr5YkvptTpz1U1KvYZedk9PGo+MzYsW
-         3M4u6P9UZjHintr/i9JvHLK7aBl2KUOlYbcsmb9nzmkJqYdG+fvMGZpykYihtIwBBdIn
-         KFf+Ae//N9+Ah8364zwv695tKleD36988byMWY5Oe9dXZa1mSv0ojWeAi8a12aovynuV
-         WoFfiXVihYjumxRSjU6WwzWpMUqCdu6MEYn7CUCpRP6cOFR2Wsm4P2osJp6oQfKmz9fp
-         5E5w==
-X-Gm-Message-State: AOAM5312m9gx3faAH5dxIvMZJrSEquf6BaNBU9ykNijukT64ge5yuJkr
-        hrcY0ObXT2emYNgngThlhdL2QzALJYxIsDnS6GyCiCLCXp4o
-X-Google-Smtp-Source: ABdhPJxUNwqzmK5BP4xy5zYm2dHKjVhr9kXAul5tmQWBzbKn7f/vtTtKsjuaPj76egcfQsjLcONIB+8s6JEZ9u6yEHxs1CkpszEd
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=c34YqbDj4H2LkHIxUJ62k4rMkPDaBHR70bxWD8IA/H8=;
+        b=rzptiEqCCOt/xeGhHzgwvi/OyVBSKileS33ubXlcRpScHYrxq9sx9hTBfeNinW1cwe
+         s8FD5x+JsRd5LG/jBwo35406vWmyCm4XsdUdWBtT0kSY1OW7Dz0ATluw23v5RkeOwnYx
+         jOK1e/FG7TIB9+Y08SnLZMc+Jn6zoNJ6WAAKyamEXbXC7gzgcS7I0rY3S+S598Y+muVJ
+         1RZjpaoH0aAauQ+0yitkZ3ILOfinIuHayCmQ256wuEdtTWXnqqEmbky47mAVNusIHNeh
+         PH6NclwYIYtXYr95HNwoadIZ4lHbKDXh544gWO5c7xgIHEshXetlS8ukBbKqy22SgiKH
+         A03g==
+X-Gm-Message-State: AOAM531d3M0sXEru0FrjJlsB8ODJI6RJO8SrmS6E4g8hx9KjInuA8WYT
+        LT855mR7PV3RDqyqvhF120c=
+X-Google-Smtp-Source: ABdhPJxeuzMTAdfuaWG3SE+gfJ7vLtU8abmwxbRvqmjSGRsIdZrRxNFrczjRApq+qN5EnIJCY6GIhA==
+X-Received: by 2002:a17:90a:ab07:: with SMTP id m7mr33714953pjq.27.1628649425179;
+        Tue, 10 Aug 2021 19:37:05 -0700 (PDT)
+Received: from localhost.localdomain ([45.135.186.103])
+        by smtp.gmail.com with ESMTPSA id l185sm18044975pfd.62.2021.08.10.19.37.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Aug 2021 19:37:04 -0700 (PDT)
+From:   Tuo Li <islituo@gmail.com>
+To:     alex.aring@gmail.com, stefan@datenfreihafen.org,
+        davem@davemloft.net, kuba@kernel.org
+Cc:     linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, baijiaju1990@gmail.com,
+        Tuo Li <islituo@gmail.com>, TOTE Robot <oslab@tsinghua.edu.cn>
+Subject: [PATCH] ieee802154: hwsim: fix possible null-pointer dereference in mac802154_hwsim.c
+Date:   Tue, 10 Aug 2021 19:36:54 -0700
+Message-Id: <20210811023654.2971-1-islituo@gmail.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-X-Received: by 2002:a5d:9ac1:: with SMTP id x1mr16641ion.191.1628609652476;
- Tue, 10 Aug 2021 08:34:12 -0700 (PDT)
-Date:   Tue, 10 Aug 2021 08:34:12 -0700
-In-Reply-To: <0000000000007faf7505c91bb19d@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000d04e9b05c9363bf1@google.com>
-Subject: Re: [syzbot] general protection fault in hwsim_new_edge_nl
-From:   syzbot <syzbot+fafb46da3f65fdbacd16@syzkaller.appspotmail.com>
-To:     akpm@linux-foundation.org, alex.aring@gmail.com, bp@alien8.de,
-        davem@davemloft.net, frederic@kernel.org, hpa@zytor.com,
-        jmattson@google.com, joro@8bytes.org, kuba@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-wpan@vger.kernel.org, mark.rutland@arm.com,
-        masahiroy@kernel.org, mingo@redhat.com, mudongliangabcd@gmail.com,
-        netdev@vger.kernel.org, npiggin@gmail.com, pbonzini@redhat.com,
-        peterz@infradead.org, rafael.j.wysocki@intel.com,
-        rostedt@goodmis.org, seanjc@google.com, sedat.dilek@gmail.com,
-        stefan@datenfreihafen.org, syzkaller-bugs@googlegroups.com,
-        tglx@linutronix.de, vitor@massaru.org, vkuznets@redhat.com,
-        wanpengli@tencent.com, will@kernel.org, x86@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-syzbot has bisected this issue to:
+In hwsim_new_edge_nl() and hwsim_set_edge_lqi(), if only one of the two
+info->attrs is NULL, the functions will not return.
+  if (!info->attrs[MAC802154_HWSIM_ATTR_RADIO_ID] &&
+      !info->attrs[MAC802154_HWSIM_ATTR_RADIO_EDGE])
+	  return -EINVAL;
 
-commit 997acaf6b4b59c6a9c259740312a69ea549cc684
-Author: Mark Rutland <mark.rutland@arm.com>
-Date:   Mon Jan 11 15:37:07 2021 +0000
+However, both of them may be dereferenced in the function
+nla_parse_nested_deprecated(), causing a null-pointer dereference.
+To fix this possible null-pointer dereference, the function returns
+-EINVAL if any info_attr is NULL.
 
-    lockdep: report broken irq restoration
+Similarly, in hwsim_set_edge_lqi(), if only one of the two edge_attrs is
+NULL, both nla_get_u32() and nla_get_u8() will be called, causing a
+null-pointer dereference.
+Also, to fix this possible null-pointer dereference, the function returns
+-EINVAL if any edge_attr is NULL.
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=13927981300000
-start commit:   d09c548dbf3b net: sched: act_mirred: Reset ct info when mi..
-git tree:       net
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=10527981300000
-console output: https://syzkaller.appspot.com/x/log.txt?x=17927981300000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=343fd21f6f4da2d6
-dashboard link: https://syzkaller.appspot.com/bug?extid=fafb46da3f65fdbacd16
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=152ee39e300000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15946ff1300000
+Fixes: f25da51fdc38 ("ieee802154: hwsim: add replacement for fakelb")
+Reported-by: TOTE Robot <oslab@tsinghua.edu.cn>
+Signed-off-by: Tuo Li <islituo@gmail.com>
+---
+ drivers/net/ieee802154/mac802154_hwsim.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-Reported-by: syzbot+fafb46da3f65fdbacd16@syzkaller.appspotmail.com
-Fixes: 997acaf6b4b5 ("lockdep: report broken irq restoration")
+diff --git a/drivers/net/ieee802154/mac802154_hwsim.c b/drivers/net/ieee802154/mac802154_hwsim.c
+index ebc976b7fcc2..8caa61ec718f 100644
+--- a/drivers/net/ieee802154/mac802154_hwsim.c
++++ b/drivers/net/ieee802154/mac802154_hwsim.c
+@@ -418,7 +418,7 @@ static int hwsim_new_edge_nl(struct sk_buff *msg, struct genl_info *info)
+ 	struct hwsim_edge *e;
+ 	u32 v0, v1;
+ 
+-	if (!info->attrs[MAC802154_HWSIM_ATTR_RADIO_ID] &&
++	if (!info->attrs[MAC802154_HWSIM_ATTR_RADIO_ID] ||
+ 	    !info->attrs[MAC802154_HWSIM_ATTR_RADIO_EDGE])
+ 		return -EINVAL;
+ 
+@@ -528,14 +528,14 @@ static int hwsim_set_edge_lqi(struct sk_buff *msg, struct genl_info *info)
+ 	u32 v0, v1;
+ 	u8 lqi;
+ 
+-	if (!info->attrs[MAC802154_HWSIM_ATTR_RADIO_ID] &&
++	if (!info->attrs[MAC802154_HWSIM_ATTR_RADIO_ID] ||
+ 	    !info->attrs[MAC802154_HWSIM_ATTR_RADIO_EDGE])
+ 		return -EINVAL;
+ 
+ 	if (nla_parse_nested_deprecated(edge_attrs, MAC802154_HWSIM_EDGE_ATTR_MAX, info->attrs[MAC802154_HWSIM_ATTR_RADIO_EDGE], hwsim_edge_policy, NULL))
+ 		return -EINVAL;
+ 
+-	if (!edge_attrs[MAC802154_HWSIM_EDGE_ATTR_ENDPOINT_ID] &&
++	if (!edge_attrs[MAC802154_HWSIM_EDGE_ATTR_ENDPOINT_ID] ||
+ 	    !edge_attrs[MAC802154_HWSIM_EDGE_ATTR_LQI])
+ 		return -EINVAL;
+ 
+-- 
+2.25.1
 
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
