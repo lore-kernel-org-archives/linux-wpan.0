@@ -2,54 +2,76 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-21.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B0DBC4338F
-	for <linux-wpan@archiver.kernel.org>; Thu, 12 Aug 2021 16:16:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A8FBC4338F
+	for <linux-wpan@archiver.kernel.org>; Thu, 12 Aug 2021 18:39:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0C19561077
-	for <linux-wpan@archiver.kernel.org>; Thu, 12 Aug 2021 16:16:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4A85F60C3E
+	for <linux-wpan@archiver.kernel.org>; Thu, 12 Aug 2021 18:39:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230103AbhHLQRR (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Thu, 12 Aug 2021 12:17:17 -0400
-Received: from mail.kernel.org ([198.145.29.99]:52652 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230089AbhHLQRR (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-        Thu, 12 Aug 2021 12:17:17 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id D4AF96104F;
-        Thu, 12 Aug 2021 16:16:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1628785012;
-        bh=LbUrk7wsh11pwwDn7W3KKBVOleHytlFxjSZL7TitFz0=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=i7XLc/wt3LUuaJ45SckdKUNMuKRi9+jIvGUyj1CYv2RcRyk3tyc0TMV0VwnQ27/08
-         cy9Od/qJiMbhjrka8dGl2qbYOuwqYFjTsC3qqfwnBKe6A8NFs0P+iakCUKRGUyY5zY
-         Bg7ruu3jnuEy/vNXQpttqA2WGtKufdtpjVGsIPe934jOFEvChJ2YqPe/iBvstEa2c/
-         7qCiZMIrFn9D9PAib2J4u9G41PZFsrxfgZDpr+FOQxEvOuFZnXV77xjAq9okYm4JJr
-         bY2dusYh/rINozKMiMahX5ViO995iAyL8rVg7BsM+7hnytc6lKYDg/PLJaFMtJnhGy
-         2XDetzDte9HtQ==
-Date:   Thu, 12 Aug 2021 09:16:51 -0700
-From:   Jakub Kicinski <kuba@kernel.org>
-To:     Stefan Schmidt <stefan@datenfreihafen.org>
-Cc:     davem@davemloft.net, linux-wpan@vger.kernel.org,
-        alex.aring@gmail.com, netdev@vger.kernel.org
-Subject: Re: pull-request: ieee802154 for net 2021-08-11
-Message-ID: <20210812091651.593afc12@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
-In-Reply-To: <20210811200417.1662917-1-stefan@datenfreihafen.org>
-References: <20210811200417.1662917-1-stefan@datenfreihafen.org>
+        id S234259AbhHLSjt (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Thu, 12 Aug 2021 14:39:49 -0400
+Received: from proxima.lasnet.de ([78.47.171.185]:56908 "EHLO
+        proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234251AbhHLSjs (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 12 Aug 2021 14:39:48 -0400
+Received: from fedora.fritz.box (unknown [80.156.89.114])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: stefan@sostec.de)
+        by proxima.lasnet.de (Postfix) with ESMTPSA id 5ED3FC0387;
+        Thu, 12 Aug 2021 20:39:20 +0200 (CEST)
+From:   Stefan Schmidt <stefan@datenfreihafen.org>
+To:     davem@davemloft.net, kuba@kernel.org
+Cc:     linux-wpan@vger.kernel.org, alex.aring@gmail.com,
+        netdev@vger.kernel.org
+Subject: pull-request: ieee802154 for net 2021-08-12 v2
+Date:   Thu, 12 Aug 2021 20:39:12 +0200
+Message-Id: <20210812183912.1663996-1-stefan@datenfreihafen.org>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-On Wed, 11 Aug 2021 22:04:17 +0200 Stefan Schmidt wrote:
-> Stefan Schmidt (1):
->       Merge remote-tracking branch 'net/master' into merge-test
+Hello Dave, Jakub.
 
-Hi Stefan, would it be possible to toss this Merge commit and resubmit?
-I don't think it's a common practice to merge the target tree before
-submitting a PR?
+An update from ieee802154 for your *net* tree.
+
+This is a v2 with the merge commit elided.
+
+Mostly fixes coming from bot reports. Dongliang Mu tackled some syzkaller
+reports in hwsim again and Takeshi Misawa a memory leak  in  ieee802154 raw.
+
+regards
+Stefan Schmidt
+
+The following changes since commit be7f62eebaff2f86c1467a2d33930a0a7a87675b:
+
+  net: dsa: sja1105: fix NULL pointer dereference in sja1105_reload_cbs() (2021-06-24 15:46:51 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/sschmidt/wpan.git tags/ieee802154-for-davem-2021-08-12
+
+for you to fetch changes up to 1090340f7ee53e824fd4eef66a4855d548110c5b:
+
+  net: Fix memory leak in ieee802154_raw_deliver (2021-08-10 12:18:10 +0200)
+
+----------------------------------------------------------------
+Dongliang Mu (2):
+      ieee802154: hwsim: fix GPF in hwsim_set_edge_lqi
+      ieee802154: hwsim: fix GPF in hwsim_new_edge_nl
+
+Takeshi Misawa (1):
+      net: Fix memory leak in ieee802154_raw_deliver
+
+ drivers/net/ieee802154/mac802154_hwsim.c | 6 +++---
+ net/ieee802154/socket.c                  | 7 ++++++-
+ 2 files changed, 9 insertions(+), 4 deletions(-)
