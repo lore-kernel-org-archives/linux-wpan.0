@@ -2,96 +2,54 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58E5FC4338F
-	for <linux-wpan@archiver.kernel.org>; Wed, 11 Aug 2021 20:08:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B0DBC4338F
+	for <linux-wpan@archiver.kernel.org>; Thu, 12 Aug 2021 16:16:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2FF7B60EB5
-	for <linux-wpan@archiver.kernel.org>; Wed, 11 Aug 2021 20:08:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0C19561077
+	for <linux-wpan@archiver.kernel.org>; Thu, 12 Aug 2021 16:16:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231605AbhHKUJJ (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 11 Aug 2021 16:09:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52302 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229655AbhHKUJJ (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 11 Aug 2021 16:09:09 -0400
-Received: from proxima.lasnet.de (proxima.lasnet.de [IPv6:2a01:4f8:121:31eb:3::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29101C061765;
-        Wed, 11 Aug 2021 13:08:45 -0700 (PDT)
-Received: from [192.168.178.156] (unknown [80.156.89.81])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: stefan@datenfreihafen.org)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id 6D6ABC028E;
-        Wed, 11 Aug 2021 22:08:40 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
-        s=2021; t=1628712522;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=PVzr+AKnU0TDCUnsw7r28VS4KgC9/neTogcSFZCDwyo=;
-        b=rrg+/npCAfebx+ScgG4wr6eelaF29kdK2FWSQf8rk60T2vPpQAkIi4F88kXu7DZ66iLWW0
-        Sx/zsp4K5OWruqibWkz6eByLcs6Su8IU3ItV3eRhDvP83KO/yfTpJCTZ8LV+1RhwjrwuA5
-        D6r45M9tcf7AoSbiU25ri1KMRGuF03pkab0IZf34Lpx5DKFAkJ0H0jNK5tIHae71uWHlRn
-        hS5wHtC6SoxZICtPK1FedGMWG5lfYG1zeD+JyNh6hbgoaxNnpH2LDFxFX01jFNiVQ/jOCQ
-        AniLUhL3HprwdjzcYFeHXEXkB73lxUfmUp7pMX3SrcW0DtEKxwdtTeGKuXl91Q==
-Subject: Re: [PATCH] ieee802154: hwsim: fix possible null-pointer dereference
- in mac802154_hwsim.c
-To:     Tuo Li <islituo@gmail.com>, alex.aring@gmail.com,
-        davem@davemloft.net, kuba@kernel.org
-Cc:     linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, baijiaju1990@gmail.com,
-        TOTE Robot <oslab@tsinghua.edu.cn>
-References: <20210811023654.2971-1-islituo@gmail.com>
-From:   Stefan Schmidt <stefan@datenfreihafen.org>
-Message-ID: <7f799a83-0709-d81a-6b45-88f8fafa3b3a@datenfreihafen.org>
-Date:   Wed, 11 Aug 2021 22:08:39 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+        id S230103AbhHLQRR (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Thu, 12 Aug 2021 12:17:17 -0400
+Received: from mail.kernel.org ([198.145.29.99]:52652 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230089AbhHLQRR (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+        Thu, 12 Aug 2021 12:17:17 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id D4AF96104F;
+        Thu, 12 Aug 2021 16:16:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1628785012;
+        bh=LbUrk7wsh11pwwDn7W3KKBVOleHytlFxjSZL7TitFz0=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=i7XLc/wt3LUuaJ45SckdKUNMuKRi9+jIvGUyj1CYv2RcRyk3tyc0TMV0VwnQ27/08
+         cy9Od/qJiMbhjrka8dGl2qbYOuwqYFjTsC3qqfwnBKe6A8NFs0P+iakCUKRGUyY5zY
+         Bg7ruu3jnuEy/vNXQpttqA2WGtKufdtpjVGsIPe934jOFEvChJ2YqPe/iBvstEa2c/
+         7qCiZMIrFn9D9PAib2J4u9G41PZFsrxfgZDpr+FOQxEvOuFZnXV77xjAq9okYm4JJr
+         bY2dusYh/rINozKMiMahX5ViO995iAyL8rVg7BsM+7hnytc6lKYDg/PLJaFMtJnhGy
+         2XDetzDte9HtQ==
+Date:   Thu, 12 Aug 2021 09:16:51 -0700
+From:   Jakub Kicinski <kuba@kernel.org>
+To:     Stefan Schmidt <stefan@datenfreihafen.org>
+Cc:     davem@davemloft.net, linux-wpan@vger.kernel.org,
+        alex.aring@gmail.com, netdev@vger.kernel.org
+Subject: Re: pull-request: ieee802154 for net 2021-08-11
+Message-ID: <20210812091651.593afc12@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
+In-Reply-To: <20210811200417.1662917-1-stefan@datenfreihafen.org>
+References: <20210811200417.1662917-1-stefan@datenfreihafen.org>
 MIME-Version: 1.0
-In-Reply-To: <20210811023654.2971-1-islituo@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello.
+On Wed, 11 Aug 2021 22:04:17 +0200 Stefan Schmidt wrote:
+> Stefan Schmidt (1):
+>       Merge remote-tracking branch 'net/master' into merge-test
 
-On 11.08.21 04:36, Tuo Li wrote:
-> In hwsim_new_edge_nl() and hwsim_set_edge_lqi(), if only one of the two
-> info->attrs is NULL, the functions will not return.
->    if (!info->attrs[MAC802154_HWSIM_ATTR_RADIO_ID] &&
->        !info->attrs[MAC802154_HWSIM_ATTR_RADIO_EDGE])
-> 	  return -EINVAL;
-> 
-> However, both of them may be dereferenced in the function
-> nla_parse_nested_deprecated(), causing a null-pointer dereference.
-> To fix this possible null-pointer dereference, the function returns
-> -EINVAL if any info_attr is NULL.
-> 
-> Similarly, in hwsim_set_edge_lqi(), if only one of the two edge_attrs is
-> NULL, both nla_get_u32() and nla_get_u8() will be called, causing a
-> null-pointer dereference.
-> Also, to fix this possible null-pointer dereference, the function returns
-> -EINVAL if any edge_attr is NULL.
-> 
-> Fixes: f25da51fdc38 ("ieee802154: hwsim: add replacement for fakelb")
-> Reported-by: TOTE Robot <oslab@tsinghua.edu.cn>
-> Signed-off-by: Tuo Li <islituo@gmail.com>
-
-Thanks for your patch. This has already been fixed with patches in the 
-wpan tree.
-https://git.kernel.org/pub/scm/linux/kernel/git/sschmidt/wpan.git/
-
-I just sent a pull request including them to get pulled into net.
-
-regards
-Stefan Schmidt
+Hi Stefan, would it be possible to toss this Merge commit and resubmit?
+I don't think it's a common practice to merge the target tree before
+submitting a PR?
