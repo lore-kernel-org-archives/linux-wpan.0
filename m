@@ -1,104 +1,62 @@
 Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6166BC433EF
-	for <linux-wpan@archiver.kernel.org>; Tue, 16 Nov 2021 18:32:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3D24661B54
-	for <linux-wpan@archiver.kernel.org>; Tue, 16 Nov 2021 18:32:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75070C433FE
+	for <linux-wpan@archiver.kernel.org>; Wed, 24 Nov 2021 15:09:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239506AbhKPSe5 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 16 Nov 2021 13:34:57 -0500
-Received: from proxima.lasnet.de ([78.47.171.185]:58680 "EHLO
+        id S229752AbhKXPMu (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 24 Nov 2021 10:12:50 -0500
+Received: from proxima.lasnet.de ([78.47.171.185]:53788 "EHLO
         proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239510AbhKPSes (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 16 Nov 2021 13:34:48 -0500
-Received: from [172.29.15.1] (unknown [185.214.200.54])
+        with ESMTP id S229517AbhKXPMu (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 24 Nov 2021 10:12:50 -0500
+Received: from localhost.localdomain.datenfreihafen.local (p200300e9d710513467c869e722e3db3d.dip0.t-ipconnect.de [IPv6:2003:e9:d710:5134:67c8:69e7:22e3:db3d])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
         (No client certificate requested)
-        (Authenticated sender: stefan@datenfreihafen.org)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id 0479CC0387;
-        Tue, 16 Nov 2021 19:31:47 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
-        s=2021; t=1637087508;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=q33VKNmnBYWaMgxXXz7vJiugiVjwWfFa7bPXnZywGAI=;
-        b=A401T7QmAKbJcVQAOdyXhmRhUTrRslyXmUWgf/vhhq0DJM0/o0EDdn7atSuONXikAqB99a
-        Kjvmok8KyCNfrVCYGeq3kCTnyUQ9gkafPYqVpM1+MeZwZnypfrmKdVf9ksZiB6/UA/4XjM
-        MPngdNWuWGezOqH2JY/nuG+ZKP6vm7pgd+iiQz6wVNx85jOSwjpNDvFLZNyGtw68IFJCHs
-        lxbkgyXMxYGtjPDknIu2I3xMy7TT26vfDVnwDapZ0O3+5gQFoQSo0yrfu6HH1zA1w3yHeH
-        GupMNlnckiila01DNDs7sArQgQNmGovGUBGR8zaMFOEX9AhlK2eqFKaFqZRIuQ==
-Message-ID: <9442473c-27fc-12d5-d520-206796e4edfa@datenfreihafen.org>
-Date:   Tue, 16 Nov 2021 19:31:46 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.0
-Subject: Re: [PATCH wpan] net: ieee802154: handle iftypes as u32
-Content-Language: en-US
-To:     Alexander Aring <aahringo@redhat.com>, mudongliangabcd@gmail.com
-Cc:     linux-wpan@vger.kernel.org, netdev@vger.kernel.org
-References: <20211112030916.685793-1-aahringo@redhat.com>
+        (Authenticated sender: stefan@sostec.de)
+        by proxima.lasnet.de (Postfix) with ESMTPSA id 48520C055C;
+        Wed, 24 Nov 2021 16:09:39 +0100 (CET)
 From:   Stefan Schmidt <stefan@datenfreihafen.org>
-In-Reply-To: <20211112030916.685793-1-aahringo@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+To:     davem@davemloft.net, kuba@kernel.org
+Cc:     linux-wpan@vger.kernel.org, alex.aring@gmail.com,
+        netdev@vger.kernel.org
+Subject: pull-request: ieee802154 for net 2021-11-24
+Date:   Wed, 24 Nov 2021 16:09:34 +0100
+Message-Id: <20211124150934.3670248-1-stefan@datenfreihafen.org>
+X-Mailer: git-send-email 2.31.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello.
+Hello Dave, Jakub.
 
-On 12.11.21 04:09, Alexander Aring wrote:
-> This patch fixes an issue that an u32 netlink value is handled as a
-> signed enum value which doesn't fit into the range of u32 netlink type.
-> If it's handled as -1 value some BIT() evaluation ends in a
-> shift-out-of-bounds issue. To solve the issue we set the to u32 max which
-> is s32 "-1" value to keep backwards compatibility and let the followed enum
-> values start counting at 0. This brings the compiler to never handle the
-> enum as signed and a check if the value is above NL802154_IFTYPE_MAX should
-> filter -1 out.
-> 
-> Fixes: f3ea5e44231a ("ieee802154: add new interface command")
-> Signed-off-by: Alexander Aring <aahringo@redhat.com>
-> ---
->   include/net/nl802154.h | 7 ++++---
->   1 file changed, 4 insertions(+), 3 deletions(-)
-> 
-> diff --git a/include/net/nl802154.h b/include/net/nl802154.h
-> index ddcee128f5d9..145acb8f2509 100644
-> --- a/include/net/nl802154.h
-> +++ b/include/net/nl802154.h
-> @@ -19,6 +19,8 @@
->    *
->    */
->   
-> +#include <linux/types.h>
-> +
->   #define NL802154_GENL_NAME "nl802154"
->   
->   enum nl802154_commands {
-> @@ -150,10 +152,9 @@ enum nl802154_attrs {
->   };
->   
->   enum nl802154_iftype {
-> -	/* for backwards compatibility TODO */
-> -	NL802154_IFTYPE_UNSPEC = -1,
-> +	NL802154_IFTYPE_UNSPEC = (~(__u32)0),
->   
-> -	NL802154_IFTYPE_NODE,
-> +	NL802154_IFTYPE_NODE = 0,
->   	NL802154_IFTYPE_MONITOR,
->   	NL802154_IFTYPE_COORD,
->   
+An update from ieee802154 for your *net* tree.
 
-
-This patch has been applied to the wpan tree and will be
-part of the next pull request to net. Thanks!
+A fix from Alexander which has been brought up various times found by
+automated checkers. Make sure values are in u32 range.
 
 regards
 Stefan Schmidt
+
+The following changes since commit 848e5d66fa3105b4136c95ddbc5654e9c43ba7d7:
+
+  Merge branch '40GbE' of git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue (2021-11-16 13:27:32 +0000)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/sschmidt/wpan.git tags/ieee802154-for-net-2021-11-24
+
+for you to fetch changes up to 451dc48c806a7ce9fbec5e7a24ccf4b2c936e834:
+
+  net: ieee802154: handle iftypes as u32 (2021-11-16 18:02:46 +0100)
+
+----------------------------------------------------------------
+Alexander Aring (1):
+      net: ieee802154: handle iftypes as u32
+
+ include/net/nl802154.h | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
