@@ -2,61 +2,68 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75070C433FE
-	for <linux-wpan@archiver.kernel.org>; Wed, 24 Nov 2021 15:09:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A87CC433EF
+	for <linux-wpan@archiver.kernel.org>; Thu, 25 Nov 2021 01:12:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229752AbhKXPMu (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 24 Nov 2021 10:12:50 -0500
-Received: from proxima.lasnet.de ([78.47.171.185]:53788 "EHLO
-        proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229517AbhKXPMu (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 24 Nov 2021 10:12:50 -0500
-Received: from localhost.localdomain.datenfreihafen.local (p200300e9d710513467c869e722e3db3d.dip0.t-ipconnect.de [IPv6:2003:e9:d710:5134:67c8:69e7:22e3:db3d])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: stefan@sostec.de)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id 48520C055C;
-        Wed, 24 Nov 2021 16:09:39 +0100 (CET)
-From:   Stefan Schmidt <stefan@datenfreihafen.org>
-To:     davem@davemloft.net, kuba@kernel.org
-Cc:     linux-wpan@vger.kernel.org, alex.aring@gmail.com,
-        netdev@vger.kernel.org
-Subject: pull-request: ieee802154 for net 2021-11-24
-Date:   Wed, 24 Nov 2021 16:09:34 +0100
-Message-Id: <20211124150934.3670248-1-stefan@datenfreihafen.org>
-X-Mailer: git-send-email 2.31.1
+        id S1348053AbhKYBPT (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 24 Nov 2021 20:15:19 -0500
+Received: from mail.kernel.org ([198.145.29.99]:56856 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S236229AbhKYBNT (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+        Wed, 24 Nov 2021 20:13:19 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPS id B4726610A8;
+        Thu, 25 Nov 2021 01:10:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1637802608;
+        bh=3uQo6Cli/nv39dBU8DRP7NU45m396rvpbu/fElm2pvg=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=NGFhEFDe5Gg+TgbCW2p7euqvCbq5FFcK88Kwx4hZJOkz/MCqvVNojvRq2YrkRUt7c
+         T4jOI52jEoXqeg90MFjT/FwdWJzpxTckmQFUijDiTwCLu6XGt1InAoIxtAd/fKaWg8
+         tCGu/niEuFlkWWRtGBKd/y0qECj3q7RgJDNoZHfSGTFKNsoLzBVl2UTjEEt8hv+vTm
+         Qlwtc4eUB4aVvKXXM2NiraembGfeE5k5+U0RNp+BVGbyqv2fNbwn1QOjK5LxT0/ANS
+         l4pTQWBCX+Gb6ASPGsHtfMZDEzQtrko+QG9nGXVImJW8HWnE6kZbA0BILvXIl+gH3X
+         3zRnKoAYlh2rA==
+Received: from pdx-korg-docbuild-2.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by pdx-korg-docbuild-2.ci.codeaurora.org (Postfix) with ESMTP id A63AC60A0A;
+        Thu, 25 Nov 2021 01:10:08 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: pull-request: ieee802154 for net 2021-11-24
+From:   patchwork-bot+netdevbpf@kernel.org
+Message-Id: <163780260867.28659.7876356954925087127.git-patchwork-notify@kernel.org>
+Date:   Thu, 25 Nov 2021 01:10:08 +0000
+References: <20211124150934.3670248-1-stefan@datenfreihafen.org>
+In-Reply-To: <20211124150934.3670248-1-stefan@datenfreihafen.org>
+To:     Stefan Schmidt <stefan@datenfreihafen.org>
+Cc:     davem@davemloft.net, kuba@kernel.org, linux-wpan@vger.kernel.org,
+        alex.aring@gmail.com, netdev@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello Dave, Jakub.
+Hello:
 
-An update from ieee802154 for your *net* tree.
+This pull request was applied to netdev/net.git (master)
+by Jakub Kicinski <kuba@kernel.org>:
 
-A fix from Alexander which has been brought up various times found by
-automated checkers. Make sure values are in u32 range.
+On Wed, 24 Nov 2021 16:09:34 +0100 you wrote:
+> Hello Dave, Jakub.
+> 
+> An update from ieee802154 for your *net* tree.
+> 
+> A fix from Alexander which has been brought up various times found by
+> automated checkers. Make sure values are in u32 range.
+> 
+> [...]
 
-regards
-Stefan Schmidt
+Here is the summary with links:
+  - pull-request: ieee802154 for net 2021-11-24
+    https://git.kernel.org/netdev/net/c/48a78f501f45
 
-The following changes since commit 848e5d66fa3105b4136c95ddbc5654e9c43ba7d7:
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-  Merge branch '40GbE' of git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue (2021-11-16 13:27:32 +0000)
 
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/sschmidt/wpan.git tags/ieee802154-for-net-2021-11-24
-
-for you to fetch changes up to 451dc48c806a7ce9fbec5e7a24ccf4b2c936e834:
-
-  net: ieee802154: handle iftypes as u32 (2021-11-16 18:02:46 +0100)
-
-----------------------------------------------------------------
-Alexander Aring (1):
-      net: ieee802154: handle iftypes as u32
-
- include/net/nl802154.h | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
