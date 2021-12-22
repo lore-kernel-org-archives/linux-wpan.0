@@ -2,18 +2,18 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10C85C4332F
-	for <linux-wpan@archiver.kernel.org>; Wed, 22 Dec 2021 15:58:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D36C3C433F5
+	for <linux-wpan@archiver.kernel.org>; Wed, 22 Dec 2021 15:58:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343842AbhLVP6C (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 22 Dec 2021 10:58:02 -0500
-Received: from relay3-d.mail.gandi.net ([217.70.183.195]:49907 "EHLO
+        id S1343872AbhLVP6P (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 22 Dec 2021 10:58:15 -0500
+Received: from relay3-d.mail.gandi.net ([217.70.183.195]:60803 "EHLO
         relay3-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343825AbhLVP55 (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 22 Dec 2021 10:57:57 -0500
+        with ESMTP id S1343873AbhLVP6C (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 22 Dec 2021 10:58:02 -0500
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by relay3-d.mail.gandi.net (Postfix) with ESMTPSA id 76E896000C;
-        Wed, 22 Dec 2021 15:57:55 +0000 (UTC)
+        by relay3-d.mail.gandi.net (Postfix) with ESMTPSA id B201D60002;
+        Wed, 22 Dec 2021 15:57:59 +0000 (UTC)
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
 To:     "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
@@ -26,9 +26,9 @@ Cc:     David Girault <david.girault@qorvo.com>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
         <linux-kernel@vger.kernel.org>,
         Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: [net-next 07/18] net: ieee802154: Return meaningful error codes from the netlink helpers
-Date:   Wed, 22 Dec 2021 16:57:32 +0100
-Message-Id: <20211222155743.256280-8-miquel.raynal@bootlin.com>
+Subject: [net-next 10/18] net: ieee802154: Define frame types
+Date:   Wed, 22 Dec 2021 16:57:35 +0100
+Message-Id: <20211222155743.256280-11-miquel.raynal@bootlin.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20211222155743.256280-1-miquel.raynal@bootlin.com>
 References: <20211222155743.256280-1-miquel.raynal@bootlin.com>
@@ -39,55 +39,37 @@ Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Returning -1 does not indicate anything useful.
-
-Use a standard and meaningful error code instead.
+A 802.15.4 frame can be of different types, here is a definition
+matching the specification. This enumeration will be soon be used when
+adding scanning support.
 
 Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
 ---
- net/ieee802154/nl802154.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ include/net/ieee802154_netdev.h | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/net/ieee802154/nl802154.c b/net/ieee802154/nl802154.c
-index 277124f206e0..e0b072aecf0f 100644
---- a/net/ieee802154/nl802154.c
-+++ b/net/ieee802154/nl802154.c
-@@ -1441,7 +1441,7 @@ static int nl802154_send_key(struct sk_buff *msg, u32 cmd, u32 portid,
+diff --git a/include/net/ieee802154_netdev.h b/include/net/ieee802154_netdev.h
+index a92999817dc0..04738ae3b25e 100644
+--- a/include/net/ieee802154_netdev.h
++++ b/include/net/ieee802154_netdev.h
+@@ -105,6 +105,17 @@ struct ieee802154_hdr_fc {
+ #endif
+ };
  
- 	hdr = nl802154hdr_put(msg, portid, seq, flags, cmd);
- 	if (!hdr)
--		return -1;
-+		return -ENOBUFS;
- 
- 	if (nla_put_u32(msg, NL802154_ATTR_IFINDEX, dev->ifindex))
- 		goto nla_put_failure;
-@@ -1634,7 +1634,7 @@ static int nl802154_send_device(struct sk_buff *msg, u32 cmd, u32 portid,
- 
- 	hdr = nl802154hdr_put(msg, portid, seq, flags, cmd);
- 	if (!hdr)
--		return -1;
-+		return -ENOBUFS;
- 
- 	if (nla_put_u32(msg, NL802154_ATTR_IFINDEX, dev->ifindex))
- 		goto nla_put_failure;
-@@ -1812,7 +1812,7 @@ static int nl802154_send_devkey(struct sk_buff *msg, u32 cmd, u32 portid,
- 
- 	hdr = nl802154hdr_put(msg, portid, seq, flags, cmd);
- 	if (!hdr)
--		return -1;
-+		return -ENOBUFS;
- 
- 	if (nla_put_u32(msg, NL802154_ATTR_IFINDEX, dev->ifindex))
- 		goto nla_put_failure;
-@@ -1988,7 +1988,7 @@ static int nl802154_send_seclevel(struct sk_buff *msg, u32 cmd, u32 portid,
- 
- 	hdr = nl802154hdr_put(msg, portid, seq, flags, cmd);
- 	if (!hdr)
--		return -1;
-+		return -ENOBUFS;
- 
- 	if (nla_put_u32(msg, NL802154_ATTR_IFINDEX, dev->ifindex))
- 		goto nla_put_failure;
++enum ieee802154_frame_type {
++	IEEE802154_BEACON_FRAME,
++	IEEE802154_DATA_FRAME,
++	IEEE802154_ACKNOWLEDGEMENT_FRAME,
++	IEEE802154_MAC_COMMAND_FRAME,
++	IEEE802154_RESERVED_FRAME,
++	IEEE802154_MULTIPURPOSE_FRAME,
++	IEEE802154_FRAGMENT_FRAME,
++	IEEE802154_EXTENDED_FRAME,
++};
++
+ struct ieee802154_hdr {
+ 	struct ieee802154_hdr_fc fc;
+ 	u8 seq;
 -- 
 2.27.0
 
