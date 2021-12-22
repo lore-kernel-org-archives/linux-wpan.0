@@ -2,18 +2,18 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDCCFC433F5
-	for <linux-wpan@archiver.kernel.org>; Wed, 22 Dec 2021 15:58:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E308C43217
+	for <linux-wpan@archiver.kernel.org>; Wed, 22 Dec 2021 15:58:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344004AbhLVP6x (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 22 Dec 2021 10:58:53 -0500
-Received: from relay4-d.mail.gandi.net ([217.70.183.196]:50977 "EHLO
+        id S1344032AbhLVP6y (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 22 Dec 2021 10:58:54 -0500
+Received: from relay4-d.mail.gandi.net ([217.70.183.196]:43303 "EHLO
         relay4-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344032AbhLVP6U (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 22 Dec 2021 10:58:20 -0500
+        with ESMTP id S1344041AbhLVP6W (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 22 Dec 2021 10:58:22 -0500
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by relay4-d.mail.gandi.net (Postfix) with ESMTPSA id 6F339E0011;
-        Wed, 22 Dec 2021 15:58:17 +0000 (UTC)
+        by relay4-d.mail.gandi.net (Postfix) with ESMTPSA id 0C501E000A;
+        Wed, 22 Dec 2021 15:58:19 +0000 (UTC)
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
 To:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
@@ -23,10 +23,12 @@ Cc:     David Girault <david.girault@qorvo.com>,
         Frederic Blain <frederic.blain@qorvo.com>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
         netdev@vger.kernel.org, Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: [wpan-tools 0/7] IEEE 802.15.4 passive scan support
-Date:   Wed, 22 Dec 2021 16:58:09 +0100
-Message-Id: <20211222155816.256405-1-miquel.raynal@bootlin.com>
+Subject: [wpan-tools 2/7] iwpan: Export iwpan_debug
+Date:   Wed, 22 Dec 2021 16:58:11 +0100
+Message-Id: <20211222155816.256405-3-miquel.raynal@bootlin.com>
 X-Mailer: git-send-email 2.27.0
+In-Reply-To: <20211222155816.256405-1-miquel.raynal@bootlin.com>
+References: <20211222155816.256405-1-miquel.raynal@bootlin.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
@@ -34,78 +36,41 @@ Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello,
+From: David Girault <david.girault@qorvo.com>
 
-This series follows the work done in the Linux kernel stack: now that
-the core knows about the different netlink commands and attributes in
-order to support passive scan requests from end-to-end, here are the
-userspace changes to be able to use it.
+This debug flag will be used later on in different files.
 
-Here is a list of the new available features.
+Signed-off-by: David Girault <david.girault@qorvo.com>
+Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
+---
+ src/iwpan.c | 2 +-
+ src/iwpan.h | 2 ++
+ 2 files changed, 3 insertions(+), 1 deletion(-)
 
-* Passively sending (or stopping) beacons. So far only intervals ranging
-  from 0 to 14 are valid. Bigger values would request the PAN
-  coordinator to answer to BEACONS_REQ (active scans), this is not
-  supported yet.
-  # iwpan dev wpan0 beacons send interval 2
-  # iwpan dev wpan0 beacons stop
-
-* Scanning all the channels or only a subset:
-  # iwpan dev wpan1 scan type passive duration 3
-
-* If a beacon is received during this operation the internal PAN list is
-  updated and can be dumped or flushed with:
-  # iwpan dev wpan1 pans dump
-  PAN 0xffff (on wpan1)
-	coordinator 0x2efefdd4cdbf9330
-	page 0
-	channel 13
-	superframe spec. 0xcf22
-	LQI 0
-	seen 7156ms ago
-  # iwpan dev wpan1 pans flush
-
-* It is also possible to monitor the events with:
-  # iwpan event
-
-* As well as triggering a non blocking scan:
-  # iwpan dev wpan1 scan trigger type passive duration 3
-  # iwpan dev wpan1 scan done
-  # iwpan dev wpan1 scan abort
-
-Cheers,
-Miquèl
-
-David Girault (4):
-  iwpan: Export iwpan_debug
-  iwpan: Remove duplicated SECTION
-  iwpan: Add full scan support
-  iwpan: Add events support
-
-Miquel Raynal (2):
-  iwpan: Fix a comment
-  iwpan: Synchronize nl802154 header with the Linux kernel
-
-Romuald Despres (1):
-  iwpan: Fix the channels printing
-
- DEST/usr/local/bin/iwpan      | Bin 0 -> 178448 bytes
- DEST/usr/local/bin/wpan-hwsim | Bin 0 -> 45056 bytes
- DEST/usr/local/bin/wpan-ping  | Bin 0 -> 47840 bytes
- src/Makefile.am               |   2 +
- src/event.c                   | 221 ++++++++++++++++
- src/info.c                    |   2 +-
- src/iwpan.c                   |   2 +-
- src/iwpan.h                   |  13 +-
- src/nl802154.h                |  95 +++++++
- src/scan.c                    | 471 ++++++++++++++++++++++++++++++++++
- 10 files changed, 797 insertions(+), 9 deletions(-)
- create mode 100755 DEST/usr/local/bin/iwpan
- create mode 100755 DEST/usr/local/bin/wpan-hwsim
- create mode 100755 DEST/usr/local/bin/wpan-ping
- create mode 100644 src/event.c
- create mode 100644 src/scan.c
-
+diff --git a/src/iwpan.c b/src/iwpan.c
+index fb7bef1..3cf5fe2 100644
+--- a/src/iwpan.c
++++ b/src/iwpan.c
+@@ -21,7 +21,7 @@
+ 
+ /* TODO libnl 1.x compatibility code */
+ 
+-static int iwpan_debug = 0;
++int iwpan_debug = 0;
+ 
+ static int nl802154_init(struct nl802154_state *state)
+ {
+diff --git a/src/iwpan.h b/src/iwpan.h
+index 48c4f03..860dd37 100644
+--- a/src/iwpan.h
++++ b/src/iwpan.h
+@@ -120,4 +120,6 @@ DECLARE_SECTION(get);
+ 
+ const char *iftype_name(enum nl802154_iftype iftype);
+ 
++extern int iwpan_debug;
++
+ #endif /* __IWPAN_H */
 -- 
 2.27.0
 
