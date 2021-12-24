@@ -2,171 +2,194 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81E83C433F5
-	for <linux-wpan@archiver.kernel.org>; Fri, 24 Dec 2021 19:25:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA5C5C433F5
+	for <linux-wpan@archiver.kernel.org>; Fri, 24 Dec 2021 19:57:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230314AbhLXTZF (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Fri, 24 Dec 2021 14:25:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59166 "EHLO
+        id S1353464AbhLXT5y (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Fri, 24 Dec 2021 14:57:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38072 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229553AbhLXTZF (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Fri, 24 Dec 2021 14:25:05 -0500
-Received: from mail-qt1-x834.google.com (mail-qt1-x834.google.com [IPv6:2607:f8b0:4864:20::834])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17F03C061401
-        for <linux-wpan@vger.kernel.org>; Fri, 24 Dec 2021 11:25:05 -0800 (PST)
-Received: by mail-qt1-x834.google.com with SMTP id a1so8263671qtx.11
-        for <linux-wpan@vger.kernel.org>; Fri, 24 Dec 2021 11:25:05 -0800 (PST)
+        with ESMTP id S239476AbhLXT5x (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 24 Dec 2021 14:57:53 -0500
+Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27F5DC061401
+        for <linux-wpan@vger.kernel.org>; Fri, 24 Dec 2021 11:57:53 -0800 (PST)
+Received: by mail-lf1-x135.google.com with SMTP id j11so19159120lfg.3
+        for <linux-wpan@vger.kernel.org>; Fri, 24 Dec 2021 11:57:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:from:date:message-id:subject:to:cc;
-        bh=bG9DSWQCCiPED0y+52uUiscZQ8hnoCCOpO3bvNOqiks=;
-        b=tK7aK9gRDTn0zK5i9IJQypbdODw9ciZvQukGNkpuiCaLsenT88h2rFYe7O9+MFgibV
-         WvV/Yi0GwUuNuxNnRCEz5++X5X2i+PgbAYkTCLzMcx6iNO23QVUwQnhs5wZO387NYBfs
-         ocZ9nzeK+5uxjUrW/KeCTrGeNFMGXw62FeOqjrUb2RGK+xxAYJYU+H7rNOpJjIH7Zm/b
-         KSNZYbN23Wo8854+C1aT+mqHAKlpcH7x0v5cEUiUiu4Qsvm0ji4XpkjceG4B6tYHMWjt
-         7K/iivsZFR3URn/8Pw1cevsO/ephfFlZpOXNeJRWTpdDczlVsp+IzXduoCHRcNVB5Aie
-         u2Lw==
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to;
+        bh=sDxoFSrEcd7FWd9REkuuWUD/j4yMqKQ3xk62eFqvT+0=;
+        b=D3SheZbNF78xBJKeen09SZYR5vRndtJQjtfTJfsCvCZoloFqFCtHwaQE42+sWNG6TV
+         hKo4/NoeuJrMF5HOMJ5+wCXqIgtcI/ja/O4kvqV6SvnonDvyO9vpjUVsNm+AHSEXxkE8
+         8SuRPUTYE7rvvKWEQLE78vqMwHt0t9vlnGT/zjAm5COMxhIWQhTiF3Eui4LS1nVbl9u+
+         AuXkLbRC6cLPwAjuCLVLxa4ftyUOY5z7hK0GoPCuZ6vImkEOh+EaUoY++AfSeAlEwcvA
+         FRcmBgWTpqzafO6ahjKFrCjkStsqVDu1dROvOfuN+y5u3SWPxpt4CQMvL1Q7j9emb7BP
+         GdRQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=bG9DSWQCCiPED0y+52uUiscZQ8hnoCCOpO3bvNOqiks=;
-        b=xgEPFCtSiy+x5apsT6xfIoQLnJFYyG4/YSZEaGiqZ+aZ5LsOzBOWrJxKmwQ7YXK9if
-         hqRFmXlKGYtyrTFuVl32vx0Hk7MqX1o5VxpaQPV2wUov8nGAOE6EzNcm6gvGwginX0Nu
-         fHlDHugxARwa4PJ/l9L4AH5sw5ScWHp0+HEwevZ/rumFyu5RShapUaJ4IujBwG84Yn6o
-         7CtDS2WYdVSVqW58tePf70w2+YwXrUuV3ZlJxZ60xJM5kKfNqJcTi/yN38o/FvpH2Gn9
-         9losB+1CKexqdFku1PuTvEmT4QEpCX9A03YFE1aYWqXWUWN6vHxvxHB4t6EXFdK4sUB8
-         l6jA==
-X-Gm-Message-State: AOAM531XlutKba+hiZdNXjEuoz8EAWY5cM0SFGJC4dj8NB1wltISXzhJ
-        WCCpLbHBE3t/YUvx144JyWkbZvN0PEAZbnMrpTbh7A==
-X-Google-Smtp-Source: ABdhPJy87a67wO1JNXlNuaxBQB9DxhKvCfTCs4TWGZ4erXZzaCPPAmc/o5O4WNvNU5yGY5D3yjSdGz3fjfKwzAGWYjA=
-X-Received: by 2002:ac8:7d50:: with SMTP id h16mr6959438qtb.324.1640373903729;
- Fri, 24 Dec 2021 11:25:03 -0800 (PST)
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to;
+        bh=sDxoFSrEcd7FWd9REkuuWUD/j4yMqKQ3xk62eFqvT+0=;
+        b=tyVHFdSW5ctQRD4l7OCwh9cInaFdZ8OyJbkVpwB1IOhAjWjouzmWrSsiYzGs53e8Wj
+         NyTf8EIiR1mhzJjV4z6K4h3YYbOEDF0iYj5epUh0zlLEjxs4ZAzqzrTsF8UDcCL384Tb
+         B8jaXgU4GR0Kx1gmvSSNiFT11v82O8cvdqPJfJSBOZKnlzqeIlATl/XWLBsUj9J1s7eV
+         Ec0ef+57skXEC5HK1oPF2/OvqXgckBFa69UeQ89edIvDMQI4vqPS53iZOAwnM7gxNEsB
+         nUaxlPMNX0CExg67zbg7f7nfC7NBdLzsr7KjeVnTU6L3l48mx19Yx6oX3scxZZ71TRla
+         RBfQ==
+X-Gm-Message-State: AOAM532DE+ouUQaejh8hBUdok1CSQ4NPhO+QJoSoB1maPmV2Fdwf8k43
+        bEi60FdVYPVfFqXoGSVNUIlOnCG9IKc=
+X-Google-Smtp-Source: ABdhPJwQQ6N/ozFrhgbWGc+GLl4p1Z8tthiHcysOfUaLOLC83t23lpq+Qg+dPjo92tl7I7aQnVKXmQ==
+X-Received: by 2002:a19:380e:: with SMTP id f14mr6400796lfa.612.1640375871288;
+        Fri, 24 Dec 2021 11:57:51 -0800 (PST)
+Received: from [192.168.1.11] ([94.103.235.97])
+        by smtp.gmail.com with ESMTPSA id g13sm624313lfr.237.2021.12.24.11.57.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 24 Dec 2021 11:57:50 -0800 (PST)
+Content-Type: multipart/mixed; boundary="------------0yDdLORdt2pZG9ogRqTUpcCN"
+Message-ID: <913852cb-a1c2-eb69-1e5d-67867b79a357@gmail.com>
+Date:   Fri, 24 Dec 2021 22:57:49 +0300
 MIME-Version: 1.0
-From:   Alexander Potapenko <glider@google.com>
-Date:   Fri, 24 Dec 2021 20:24:27 +0100
-Message-ID: <CAG_fn=VDEoQx5c7XzWX1yaYBd5y5FrG1aagrkv+SZ03c8TfQYQ@mail.gmail.com>
-Subject: Use of uninitialized value in atusb_set_extended_addr()
-To:     David Miller <davem@davemloft.net>, stefan@datenfreihafen.org
-Cc:     paskripkin@gmail.com, linux-wpan@vger.kernel.org,
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.0
+Subject: Re: Use of uninitialized value in atusb_set_extended_addr()
+Content-Language: en-US
+To:     Alexander Potapenko <glider@google.com>,
+        David Miller <davem@davemloft.net>, stefan@datenfreihafen.org
+Cc:     linux-wpan@vger.kernel.org,
         syzkaller-bugs <syzkaller-bugs@googlegroups.com>
-Content-Type: text/plain; charset="UTF-8"
+References: <CAG_fn=VDEoQx5c7XzWX1yaYBd5y5FrG1aagrkv+SZ03c8TfQYQ@mail.gmail.com>
+From:   Pavel Skripkin <paskripkin@gmail.com>
+In-Reply-To: <CAG_fn=VDEoQx5c7XzWX1yaYBd5y5FrG1aagrkv+SZ03c8TfQYQ@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi folks,
+This is a multi-part message in MIME format.
+--------------0yDdLORdt2pZG9ogRqTUpcCN
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-KASAN* reported a use of uninitialized value in atusb_set_extended_addr().
-The value came from kmalloc() in the same function, but then
-apparently atusb_control_msg() returned 0, leaving `buffer` intact but
-also avoiding the ret < 0 check.
-Then the buffer got passed to
-ieee802154_is_valid_extended_unicast_addr(), which used it in a
-comparison - at that point KASAN reported an error.
+On 12/24/21 22:24, Alexander Potapenko wrote:
+> Hi folks,
+> 
+> KASAN* reported a use of uninitialized value in atusb_set_extended_addr().
+> The value came from kmalloc() in the same function, but then
+> apparently atusb_control_msg() returned 0, leaving `buffer` intact but
+> also avoiding the ret < 0 check.
+> Then the buffer got passed to
+> ieee802154_is_valid_extended_unicast_addr(), which used it in a
+> comparison - at that point KASAN reported an error.
+> 
+> * - this is an experiment to make KASAN detect some limited subset of
+> bugs caused by using uninitialized values.
+> 
+> Full report is below, I am not sure if it's enough to kzalloc the
+> buffer, or we'd better check the return values more carefully.
+> 
 
-* - this is an experiment to make KASAN detect some limited subset of
-bugs caused by using uninitialized values.
+Hi Alexander,
+thanks for your report
 
-Full report is below, I am not sure if it's enough to kzalloc the
-buffer, or we'd better check the return values more carefully.
+I think, the right fix is switch to new usb API, since it cannot read 
+less bytes than was requested by caller.
 
-===========================
-usb 7-1: ATUSB: AT86RF230 version 187
-usb 7-1: Firmware: major: 3, minor: 0, hardware type: ATUSB (0)
-usb write operation failed. (-71)
-usb 6-1: dvb_usb_v2: will pass the complete MPEG2 transport stream to
-the software demuxer
-dvbdev: DVB: registering new adapter (Technisat CableStar Combo HD CI)
-usb 6-1: media controller created
-usb read operation failed. (-71)
-usb write operation failed. (-71)
-dvb_usb_az6007: probe of 6-1:0.0 failed with error -5
-usb 6-1: USB disconnect, device number 6
-usb 7-1: Firmware: build
+Only build-tested, just for thoughts
 
-BUG: KASAN: uninit-cmp in ieee802154_is_valid_extended_unicast_addr
-include/linux/ieee802154.h:310 [inline]
-BUG: KASAN: uninit-cmp in atusb_set_extended_addr
-drivers/net/ieee802154/atusb.c:1000 [inline]
-BUG: KASAN: uninit-cmp in atusb_probe.cold+0x29f/0x14db
-drivers/net/ieee802154/atusb.c:1056
-Uninit value used in comparison: 311daa649a2003bd
-stack handle: 000000009a2003bd
- ieee802154_is_valid_extended_unicast_addr
-include/linux/ieee802154.h:310 [inline]
- atusb_set_extended_addr drivers/net/ieee802154/atusb.c:1000 [inline]
- atusb_probe.cold+0x29f/0x14db drivers/net/ieee802154/atusb.c:1056
- usb_probe_interface+0x314/0x7f0 drivers/usb/core/driver.c:396
- call_driver_probe drivers/base/dd.c:517 [inline]
- really_probe+0x245/0xcd0 drivers/base/dd.c:596
- __driver_probe_device+0x338/0x4d0 drivers/base/dd.c:751
- driver_probe_device+0x4c/0x1a0 drivers/base/dd.c:781
- __device_attach_driver+0x20b/0x2f0 drivers/base/dd.c:898
- bus_for_each_drv+0x15f/0x1e0 drivers/base/bus.c:427
- __device_attach+0x226/0x4a0 drivers/base/dd.c:969
- bus_probe_device+0x1e4/0x290 drivers/base/bus.c:487
- device_add+0xb83/0x1e20 drivers/base/core.c:3394
- usb_set_configuration+0x1041/0x19c0 drivers/usb/core/message.c:2170
- usb_generic_driver_probe+0xba/0x100 drivers/usb/core/generic.c:238
- usb_probe_device+0xd9/0x2c0 drivers/usb/core/driver.c:293
- call_driver_probe drivers/base/dd.c:517 [inline]
- really_probe+0x245/0xcd0 drivers/base/dd.c:596
- __driver_probe_device+0x338/0x4d0 drivers/base/dd.c:751
- driver_probe_device+0x4c/0x1a0 drivers/base/dd.c:781
- __device_attach_driver+0x20b/0x2f0 drivers/base/dd.c:898
- bus_for_each_drv+0x15f/0x1e0 drivers/base/bus.c:427
- __device_attach+0x226/0x4a0 drivers/base/dd.c:969
- bus_probe_device+0x1e4/0x290 drivers/base/bus.c:487
- device_add+0xb83/0x1e20 drivers/base/core.c:3394
- usb_new_device.cold+0x5f2/0x1018 drivers/usb/core/hub.c:2563
- hub_port_connect drivers/usb/core/hub.c:5353 [inline]
- hub_port_connect_change drivers/usb/core/hub.c:5497 [inline]
- port_event drivers/usb/core/hub.c:5643 [inline]
- hub_event+0x247a/0x4470 drivers/usb/core/hub.c:5725
- process_one_work+0x976/0x1620 kernel/workqueue.c:2298
- worker_thread+0x658/0x11f0 kernel/workqueue.c:2445
- kthread+0x405/0x4f0 kernel/kthread.c:327
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
-Memory allocated at:
- kasan_save_stack+0x1e/0x50 mm/kasan/common.c:38
- kasan_color_object+0x17/0x80 mm/kasan/color.c:165
- __kasan_kmalloc mm/kasan/common.c:529 [inline]
- __kasan_kmalloc+0xe1/0xf0 mm/kasan/common.c:522
- kmalloc include/linux/slab.h:590 [inline]
- atusb_set_extended_addr drivers/net/ieee802154/atusb.c:983 [inline]
- atusb_probe+0x991/0x1280 drivers/net/ieee802154/atusb.c:1056
- usb_probe_interface+0x314/0x7f0 drivers/usb/core/driver.c:396
- call_driver_probe drivers/base/dd.c:517 [inline]
- really_probe+0x245/0xcd0 drivers/base/dd.c:596
- __driver_probe_device+0x338/0x4d0 drivers/base/dd.c:751
- driver_probe_device+0x4c/0x1a0 drivers/base/dd.c:781
- __device_attach_driver+0x20b/0x2f0 drivers/base/dd.c:898
- bus_for_each_drv+0x15f/0x1e0 drivers/base/bus.c:427
- __device_attach+0x226/0x4a0 drivers/base/dd.c:969
- bus_probe_device+0x1e4/0x290 drivers/base/bus.c:487
- device_add+0xb83/0x1e20 drivers/base/core.c:3394
- usb_set_configuration+0x1041/0x19c0 drivers/usb/core/message.c:2170
- usb_generic_driver_probe+0xba/0x100 drivers/usb/core/generic.c:238
- usb_probe_device+0xd9/0x2c0 drivers/usb/core/driver.c:293
- call_driver_probe drivers/base/dd.c:517 [inline]
- really_probe+0x245/0xcd0 drivers/base/dd.c:596
- __driver_probe_device+0x338/0x4d0 drivers/base/dd.c:751
- driver_probe_device+0x4c/0x1a0 drivers/base/dd.c:781
- __device_attach_driver+0x20b/0x2f0 drivers/base/dd.c:898
- bus_for_each_drv+0x15f/0x1e0 drivers/base/bus.c:427
- __device_attach+0x226/0x4a0 drivers/base/dd.c:969
- bus_probe_device+0x1e4/0x290 drivers/base/bus.c:487
- device_add+0xb83/0x1e20 drivers/base/core.c:3394
- usb_new_device.cold+0x5f2/0x1018 drivers/usb/core/hub.c:2563
- hub_port_connect drivers/usb/core/hub.c:5353 [inline]
- hub_port_connect_change drivers/usb/core/hub.c:5497 [inline]
- port_event drivers/usb/core/hub.c:5643 [inline]
- hub_event+0x247a/0x4470 drivers/usb/core/hub.c:5725
- process_one_work+0x976/0x1620 kernel/workqueue.c:2298
- worker_thread+0x658/0x11f0 kernel/workqueue.c:2445
- kthread+0x405/0x4f0 kernel/kthread.c:327
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
 
-CPU: 1 PID: 29149 Comm: kworker/1:14 Not tainted 5.16.0-rc6+ #111
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.14.0-2 04/01/2014
-Workqueue: usb_hub_wq hub_event
+
+
+With regards,
+Pavel Skripkin
+
+--------------0yDdLORdt2pZG9ogRqTUpcCN
+Content-Type: text/plain; charset=UTF-8; name="test.ph"
+Content-Disposition: attachment; filename="test.ph"
+Content-Transfer-Encoding: base64
+
+ZGlmZiAtLWdpdCBhL2RyaXZlcnMvbmV0L2llZWU4MDIxNTQvYXR1c2IuYyBiL2RyaXZlcnMv
+bmV0L2llZWU4MDIxNTQvYXR1c2IuYwppbmRleCAyM2VlMGIxNGNiZmEuLjE1ZjM4NzI2NmUx
+OCAxMDA2NDQKLS0tIGEvZHJpdmVycy9uZXQvaWVlZTgwMjE1NC9hdHVzYi5jCisrKyBiL2Ry
+aXZlcnMvbmV0L2llZWU4MDIxNTQvYXR1c2IuYwpAQCAtODAsMTAgKzgwLDkgQEAgc3RydWN0
+IGF0dXNiX2NoaXBfZGF0YSB7CiAgKiBpbiBhdHVzYi0+ZXJyIGFuZCByZWplY3QgYWxsIHN1
+YnNlcXVlbnQgcmVxdWVzdHMgdW50aWwgdGhlIGVycm9yIGlzIGNsZWFyZWQuCiAgKi8KIAot
+c3RhdGljIGludCBhdHVzYl9jb250cm9sX21zZyhzdHJ1Y3QgYXR1c2IgKmF0dXNiLCB1bnNp
+Z25lZCBpbnQgcGlwZSwKLQkJCSAgICAgX191OCByZXF1ZXN0LCBfX3U4IHJlcXVlc3R0eXBl
+LAotCQkJICAgICBfX3UxNiB2YWx1ZSwgX191MTYgaW5kZXgsCi0JCQkgICAgIHZvaWQgKmRh
+dGEsIF9fdTE2IHNpemUsIGludCB0aW1lb3V0KQorc3RhdGljIGludCBhdHVzYl9jb250cm9s
+X21zZ19yZWN2KHN0cnVjdCBhdHVzYiAqYXR1c2IsIF9fdTggcmVxdWVzdCwgX191OCByZXF1
+ZXN0dHlwZSwKKwkJCQkgIF9fdTE2IHZhbHVlLCBfX3UxNiBpbmRleCwKKwkJCQkgIHZvaWQg
+KmRhdGEsIF9fdTE2IHNpemUsIGludCB0aW1lb3V0KQogewogCXN0cnVjdCB1c2JfZGV2aWNl
+ICp1c2JfZGV2ID0gYXR1c2ItPnVzYl9kZXY7CiAJaW50IHJldDsKQEAgLTkxLDggKzkwLDMw
+IEBAIHN0YXRpYyBpbnQgYXR1c2JfY29udHJvbF9tc2coc3RydWN0IGF0dXNiICphdHVzYiwg
+dW5zaWduZWQgaW50IHBpcGUsCiAJaWYgKGF0dXNiLT5lcnIpCiAJCXJldHVybiBhdHVzYi0+
+ZXJyOwogCi0JcmV0ID0gdXNiX2NvbnRyb2xfbXNnKHVzYl9kZXYsIHBpcGUsIHJlcXVlc3Qs
+IHJlcXVlc3R0eXBlLAotCQkJICAgICAgdmFsdWUsIGluZGV4LCBkYXRhLCBzaXplLCB0aW1l
+b3V0KTsKKwlyZXQgPSB1c2JfY29udHJvbF9tc2dfcmVjdih1c2JfZGV2LCAwLCByZXF1ZXN0
+LCByZXF1ZXN0dHlwZSwKKwkJCQkgICB2YWx1ZSwgaW5kZXgsIGRhdGEsIHNpemUsIHRpbWVv
+dXQsIEdGUF9LRVJORUwpOworCWlmIChyZXQgPCAwKSB7CisJCWF0dXNiLT5lcnIgPSByZXQ7
+CisJCWRldl9lcnIoJnVzYl9kZXYtPmRldiwKKwkJCSIlczogcmVxIDB4JTAyeCB2YWwgMHgl
+eCBpZHggMHgleCwgZXJyb3IgJWRcbiIsCisJCQlfX2Z1bmNfXywgcmVxdWVzdCwgdmFsdWUs
+IGluZGV4LCByZXQpOworCX0KKworCXJldHVybiByZXQ7Cit9CisKK3N0YXRpYyBpbnQgYXR1
+c2JfY29udHJvbF9tc2dfc2VuZChzdHJ1Y3QgYXR1c2IgKmF0dXNiLCBfX3U4IHJlcXVlc3Qs
+IF9fdTggcmVxdWVzdHR5cGUsCisJCQkJICBfX3UxNiB2YWx1ZSwgX191MTYgaW5kZXgsCisJ
+CQkJICB2b2lkICpkYXRhLCBfX3UxNiBzaXplLCBpbnQgdGltZW91dCkKK3sKKwlzdHJ1Y3Qg
+dXNiX2RldmljZSAqdXNiX2RldiA9IGF0dXNiLT51c2JfZGV2OworCWludCByZXQ7CisKKwlp
+ZiAoYXR1c2ItPmVycikKKwkJcmV0dXJuIGF0dXNiLT5lcnI7CisKKwlyZXQgPSB1c2JfY29u
+dHJvbF9tc2dfc2VuZCh1c2JfZGV2LCAwLCByZXF1ZXN0LCByZXF1ZXN0dHlwZSwKKwkJCQkg
+ICB2YWx1ZSwgaW5kZXgsIGRhdGEsIHNpemUsIHRpbWVvdXQsIEdGUF9LRVJORUwpOwogCWlm
+IChyZXQgPCAwKSB7CiAJCWF0dXNiLT5lcnIgPSByZXQ7CiAJCWRldl9lcnIoJnVzYl9kZXYt
+PmRldiwKQEAgLTEwNyw4ICsxMjgsNyBAQCBzdGF0aWMgaW50IGF0dXNiX2NvbW1hbmQoc3Ry
+dWN0IGF0dXNiICphdHVzYiwgdTggY21kLCB1OCBhcmcpCiAJc3RydWN0IHVzYl9kZXZpY2Ug
+KnVzYl9kZXYgPSBhdHVzYi0+dXNiX2RldjsKIAogCWRldl9kYmcoJnVzYl9kZXYtPmRldiwg
+IiVzOiBjbWQgPSAweCV4XG4iLCBfX2Z1bmNfXywgY21kKTsKLQlyZXR1cm4gYXR1c2JfY29u
+dHJvbF9tc2coYXR1c2IsIHVzYl9zbmRjdHJscGlwZSh1c2JfZGV2LCAwKSwKLQkJCQkgY21k
+LCBBVFVTQl9SRVFfVE9fREVWLCBhcmcsIDAsIE5VTEwsIDAsIDEwMDApOworCXJldHVybiBh
+dHVzYl9jb250cm9sX21zZ19zZW5kKGF0dXNiLCBjbWQsIEFUVVNCX1JFUV9UT19ERVYsIGFy
+ZywgMCwgTlVMTCwgMCwgMTAwMCk7CiB9CiAKIHN0YXRpYyBpbnQgYXR1c2Jfd3JpdGVfcmVn
+KHN0cnVjdCBhdHVzYiAqYXR1c2IsIHU4IHJlZywgdTggdmFsdWUpCkBAIC0xMTYsOSArMTM2
+LDggQEAgc3RhdGljIGludCBhdHVzYl93cml0ZV9yZWcoc3RydWN0IGF0dXNiICphdHVzYiwg
+dTggcmVnLCB1OCB2YWx1ZSkKIAlzdHJ1Y3QgdXNiX2RldmljZSAqdXNiX2RldiA9IGF0dXNi
+LT51c2JfZGV2OwogCiAJZGV2X2RiZygmdXNiX2Rldi0+ZGV2LCAiJXM6IDB4JTAyeCA8LSAw
+eCUwMnhcbiIsIF9fZnVuY19fLCByZWcsIHZhbHVlKTsKLQlyZXR1cm4gYXR1c2JfY29udHJv
+bF9tc2coYXR1c2IsIHVzYl9zbmRjdHJscGlwZSh1c2JfZGV2LCAwKSwKLQkJCQkgQVRVU0Jf
+UkVHX1dSSVRFLCBBVFVTQl9SRVFfVE9fREVWLAotCQkJCSB2YWx1ZSwgcmVnLCBOVUxMLCAw
+LCAxMDAwKTsKKwlyZXR1cm4gYXR1c2JfY29udHJvbF9tc2dfc2VuZChhdHVzYiwgQVRVU0Jf
+UkVHX1dSSVRFLCBBVFVTQl9SRVFfVE9fREVWLAorCQkJCSAgICAgIHZhbHVlLCByZWcsIE5V
+TEwsIDAsIDEwMDApOwogfQogCiBzdGF0aWMgaW50IGF0dXNiX3JlYWRfcmVnKHN0cnVjdCBh
+dHVzYiAqYXR1c2IsIHU4IHJlZykKQEAgLTEzMyw5ICsxNTIsOCBAQCBzdGF0aWMgaW50IGF0
+dXNiX3JlYWRfcmVnKHN0cnVjdCBhdHVzYiAqYXR1c2IsIHU4IHJlZykKIAkJcmV0dXJuIC1F
+Tk9NRU07CiAKIAlkZXZfZGJnKCZ1c2JfZGV2LT5kZXYsICIlczogcmVnID0gMHgleFxuIiwg
+X19mdW5jX18sIHJlZyk7Ci0JcmV0ID0gYXR1c2JfY29udHJvbF9tc2coYXR1c2IsIHVzYl9y
+Y3ZjdHJscGlwZSh1c2JfZGV2LCAwKSwKLQkJCQlBVFVTQl9SRUdfUkVBRCwgQVRVU0JfUkVR
+X0ZST01fREVWLAotCQkJCTAsIHJlZywgYnVmZmVyLCAxLCAxMDAwKTsKKwlyZXQgPSBhdHVz
+Yl9jb250cm9sX21zZ19yZWN2KGF0dXNiLCBBVFVTQl9SRUdfUkVBRCwgQVRVU0JfUkVRX0ZS
+T01fREVWLAorCQkJCSAgICAgMCwgcmVnLCBidWZmZXIsIDEsIDEwMDApOwogCiAJaWYgKHJl
+dCA+PSAwKSB7CiAJCXZhbHVlID0gYnVmZmVyWzBdOwpAQCAtODA1LDggKzgyMyw3IEBAIHN0
+YXRpYyBpbnQgYXR1c2JfZ2V0X2FuZF9zaG93X3JldmlzaW9uKHN0cnVjdCBhdHVzYiAqYXR1
+c2IpCiAJCXJldHVybiAtRU5PTUVNOwogCiAJLyogR2V0IGEgY291cGxlIG9mIHRoZSBBVE1l
+Z2EgRmlybXdhcmUgdmFsdWVzICovCi0JcmV0ID0gYXR1c2JfY29udHJvbF9tc2coYXR1c2Is
+IHVzYl9yY3ZjdHJscGlwZSh1c2JfZGV2LCAwKSwKLQkJCQlBVFVTQl9JRCwgQVRVU0JfUkVR
+X0ZST01fREVWLCAwLCAwLAorCXJldCA9IGF0dXNiX2NvbnRyb2xfbXNnX3JlY3YoYXR1c2Is
+IEFUVVNCX0lELCBBVFVTQl9SRVFfRlJPTV9ERVYsIDAsIDAsCiAJCQkJYnVmZmVyLCAzLCAx
+MDAwKTsKIAlpZiAocmV0ID49IDApIHsKIAkJYXR1c2ItPmZ3X3Zlcl9tYWogPSBidWZmZXJb
+MF07CkBAIC04NjEsOCArODc4LDcgQEAgc3RhdGljIGludCBhdHVzYl9nZXRfYW5kX3Nob3df
+YnVpbGQoc3RydWN0IGF0dXNiICphdHVzYikKIAlpZiAoIWJ1aWxkKQogCQlyZXR1cm4gLUVO
+T01FTTsKIAotCXJldCA9IGF0dXNiX2NvbnRyb2xfbXNnKGF0dXNiLCB1c2JfcmN2Y3RybHBp
+cGUodXNiX2RldiwgMCksCi0JCQkJQVRVU0JfQlVJTEQsIEFUVVNCX1JFUV9GUk9NX0RFViwg
+MCwgMCwKKwlyZXQgPSBhdHVzYl9jb250cm9sX21zZ19yZWN2KGF0dXNiLCBBVFVTQl9CVUlM
+RCwgQVRVU0JfUkVRX0ZST01fREVWLCAwLCAwLAogCQkJCWJ1aWxkLCBBVFVTQl9CVUlMRF9T
+SVpFLCAxMDAwKTsKIAlpZiAocmV0ID49IDApIHsKIAkJYnVpbGRbcmV0XSA9IDA7CkBAIC05
+ODUsOCArMTAwMSw3IEBAIHN0YXRpYyBpbnQgYXR1c2Jfc2V0X2V4dGVuZGVkX2FkZHIoc3Ry
+dWN0IGF0dXNiICphdHVzYikKIAkJcmV0dXJuIC1FTk9NRU07CiAKIAkvKiBGaXJtd2FyZSBp
+cyBuZXcgZW5vdWdoIHNvIHdlIGZldGNoIHRoZSBhZGRyZXNzIGZyb20gRUVQUk9NICovCi0J
+cmV0ID0gYXR1c2JfY29udHJvbF9tc2coYXR1c2IsIHVzYl9yY3ZjdHJscGlwZSh1c2JfZGV2
+LCAwKSwKLQkJCQlBVFVTQl9FVUk2NF9SRUFELCBBVFVTQl9SRVFfRlJPTV9ERVYsIDAsIDAs
+CisJcmV0ID0gYXR1c2JfY29udHJvbF9tc2dfcmVjdihhdHVzYiwgQVRVU0JfRVVJNjRfUkVB
+RCwgQVRVU0JfUkVRX0ZST01fREVWLCAwLCAwLAogCQkJCWJ1ZmZlciwgSUVFRTgwMjE1NF9F
+WFRFTkRFRF9BRERSX0xFTiwgMTAwMCk7CiAJaWYgKHJldCA8IDApIHsKIAkJZGV2X2Vycigm
+dXNiX2Rldi0+ZGV2LCAiZmFpbGVkIHRvIGZldGNoIGV4dGVuZGVkIGFkZHJlc3MsIHJhbmRv
+bSBhZGRyZXNzIHNldFxuIik7Cg==
+--------------0yDdLORdt2pZG9ogRqTUpcCN--
+
