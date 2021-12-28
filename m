@@ -2,55 +2,54 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DED7FC433F5
-	for <linux-wpan@archiver.kernel.org>; Tue, 28 Dec 2021 21:05:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8574DC433EF
+	for <linux-wpan@archiver.kernel.org>; Tue, 28 Dec 2021 22:22:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237370AbhL1VF5 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 28 Dec 2021 16:05:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59388 "EHLO
+        id S237522AbhL1WWw (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 28 Dec 2021 17:22:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48276 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234329AbhL1VF4 (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 28 Dec 2021 16:05:56 -0500
-Received: from mail-wr1-x42d.google.com (mail-wr1-x42d.google.com [IPv6:2a00:1450:4864:20::42d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C4D4C061574;
-        Tue, 28 Dec 2021 13:05:56 -0800 (PST)
-Received: by mail-wr1-x42d.google.com with SMTP id w20so31506995wra.9;
-        Tue, 28 Dec 2021 13:05:56 -0800 (PST)
+        with ESMTP id S237488AbhL1WWv (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 28 Dec 2021 17:22:51 -0500
+Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67945C061574;
+        Tue, 28 Dec 2021 14:22:51 -0800 (PST)
+Received: by mail-wm1-x335.google.com with SMTP id d198-20020a1c1dcf000000b0034569cdd2a2so10777898wmd.5;
+        Tue, 28 Dec 2021 14:22:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=qy+EN1lEEGLvFLWU5Lg6MhBBtKBXhty/n19mTqx1M+Y=;
-        b=mW1eywlqHMpCc/0xSL16ALeiB5YKscP6ggephiuxpezOWfLa0Wc2HIisMBJaFNq60a
-         wJAQOZ1kwHmsv4eJzH8YJ3nsN1knIg4m0oO35NNj3/69DX7qHhGCpCoF2LdaJmEsdtsW
-         9GqdC/aWJ8n7vFNihjG0IVtg9B8SiVFqNCatv9txyBEUs7yP4j83T0JpQBDDllq4TvqV
-         pAFOc8gs0GCea1bFqLcZDkugvGYCZAOwBufWc73eHL+nT3MPIcDbmNIVHmKnung3SGDu
-         s1HjCe5JgpSBhkd7/6yXJXl6X5H+afSM1lDu2Zs/Ro6l4vhaapV+Tziqb7Q7YSbiwMOt
-         Ht4g==
+        bh=4M2fYiV8osMi/K8zko/E+wLNgrYelg1lIier9ENbgz4=;
+        b=MTKPBFoweWQAhvBXIY2VwrdoTs5ZERc088ZFz7/vRSsKUJDkmBhSTGP/gaPPiD8OQH
+         OjaQ2FRKJ++BwUGIqqWroyrNS/UipVg0pDStLTa4ZU2aswCOg5JfOR71rXH1E83hwcZa
+         /uJMCWnXKlyuBidjzrDACpO4QcJtP1MEm1Z+icdpOahf1g35t/N+YegnDtCJZI/SUtWx
+         R8oLCbrZb8jdHBHtDaK914vY6A/7iNkvyanveUqZWaUSl1xpOZ8CODNKoBfxMIJSstDx
+         tXAIhmZFo61uZgRy/E05mfrhfl0q6uyMCw7sstDkmn2jveTMPKZQrGrK53EAmQXQnFbZ
+         E4aw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=qy+EN1lEEGLvFLWU5Lg6MhBBtKBXhty/n19mTqx1M+Y=;
-        b=di0OJ2DJ9z9TMO1fbeau5zoXyKgbgx/ZiXHuawtbDj7LQCmI81mQpoQM97ZlyCyM9N
-         1yrMqtQTaAEEW2vydA+3GKJAB+47D7A7HGPwSYm/dGZRREV88N22OHdPgo7yqumMym4F
-         RK6aV97E3E48JIqgdQbWuZHZwgxjwfWZn4e0pMh+n6FUNu3QKKWje13Xur74MgX0fAVq
-         uosNFHp7CGI2TUAAnq20ONrdYKExxJUDzQ0Ny37OwUAeVmmcFDtuEHwy5GWVnEsq4cJi
-         SZS718ccBi5VdhzcVw8eXkMhkS14PwdY7KW87g6p7XqgrAdUI0qDgVXHMajIN1sMb0cT
-         M0cQ==
-X-Gm-Message-State: AOAM533OnppPyyRJaRLSzY9uaOQlrLf78Utrj0fkRDWSCqsCbNl3sKIx
-        TtZheHNCp5wunx6x4uo+mu5Nz7zJNzQqzpZqefk=
-X-Google-Smtp-Source: ABdhPJwgSX7LvSGdN6JoCzUtXHv3hQpgoAcX4eT2jSwcbhfNuNn0v5EAVoanuWWKelRz3a7cL6loM4afEFyClzoXdKM=
-X-Received: by 2002:adf:d1c2:: with SMTP id b2mr18095209wrd.81.1640725554288;
- Tue, 28 Dec 2021 13:05:54 -0800 (PST)
+        bh=4M2fYiV8osMi/K8zko/E+wLNgrYelg1lIier9ENbgz4=;
+        b=UkymKyGCTQFl/cOCpweELmgn6BJM62DUN8jIspMr6HNJaYeENkJQc+INt8OgLNndiO
+         AY1+BY2cb/gno4xGXr7iyDHn8qQkF7jHviWHrJI1cTK7Z0j8PiRDtDzzBuwAytrGxQg5
+         GRoPV9Aih8UQmFieUlqDNgn5dRmt6LJ+w/IEjN+eUFRtF5GLnXtWtZa+V/sQJJINEM5H
+         MNYj7zCXLvO+N9x8CBy69GL1+cR6odGLWtAWO+w4WbtnWGGZ29uCUBfLwI2pIskJVgCi
+         Pf7zq7gHKoPU+UFe5Dl7ZUO3HpreWJ2NGQTxV+hUdPOm1YcOPkv/4PMjMNobYywpvT6f
+         VeDA==
+X-Gm-Message-State: AOAM531MlL8SVky1TmgRozl77oPiI8yLEa0HHoePOom0QqTvF+z/Z7uF
+        qv/rORzKXi+QIxPjAVAZLpek3qliIE1EOGnAeWM=
+X-Google-Smtp-Source: ABdhPJxbN5uJV2qwOV1CevVgZ2wlylt+xml/HywNaRnBImF/FE4LIZ3QJQ//TL4sRCsZvSzPrxKW/TijM58nSoABn3A=
+X-Received: by 2002:a7b:c745:: with SMTP id w5mr18697759wmk.167.1640730169930;
+ Tue, 28 Dec 2021 14:22:49 -0800 (PST)
 MIME-Version: 1.0
-References: <20211222155743.256280-1-miquel.raynal@bootlin.com> <20211222155743.256280-2-miquel.raynal@bootlin.com>
-In-Reply-To: <20211222155743.256280-2-miquel.raynal@bootlin.com>
+References: <20211222155743.256280-1-miquel.raynal@bootlin.com> <20211222155743.256280-9-miquel.raynal@bootlin.com>
+In-Reply-To: <20211222155743.256280-9-miquel.raynal@bootlin.com>
 From:   Alexander Aring <alex.aring@gmail.com>
-Date:   Tue, 28 Dec 2021 16:05:43 -0500
-Message-ID: <CAB_54W7BeSA+2GVzb9Yvz1kj12wkRSqHj9Ybr8cK7oYd7804RQ@mail.gmail.com>
-Subject: Re: [net-next 01/18] ieee802154: hwsim: Ensure proper channel
- selection at probe time
+Date:   Tue, 28 Dec 2021 17:22:38 -0500
+Message-ID: <CAB_54W786n6_4FAMc7VMAX0nuyd6r2Hi+wYEEbd5Bjdrd8ArpA@mail.gmail.com>
+Subject: Re: [net-next 08/18] net: ieee802154: Add support for internal PAN management
 To:     Miquel Raynal <miquel.raynal@bootlin.com>
 Cc:     "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
@@ -71,55 +70,40 @@ Hi,
 
 On Wed, 22 Dec 2021 at 10:57, Miquel Raynal <miquel.raynal@bootlin.com> wrote:
 >
-> A default channel is selected by default (13), let's clarify that this
-> is page 0 channel 13. Call the right helper to ensure the necessary
-> configuration for this channel has been applied.
->
-> So far there is very little configuration done in this helper but we
-> will soon add more information (like the symbol duration which is
-> missing) and having this helper called at probe time will prevent us to
-> this type of initialization at two different locations.
+> Let's introduce the basics of PAN management:
+> - structures defining PANs
+> - helpers for PANs registration
+> - helpers discarding old PANs
 >
 
-I see why this patch is necessary because in later patches the symbol
-duration is set at ".set_channel()" callback like the at86rf230 driver
-is doing it.
-However there is an old TODO [0]. I think we should combine it and
-implement it in ieee802154_set_channel() of "net/mac802154/cfg.c".
-Also do the symbol duration setting according to the channel/page when
-we call ieee802154_register_hw(), so we have it for the default
-settings.
+I think there exists a little misunderstanding about how the
+architecture is between the structures wpan_phy, wpan_dev and
+cfg802154.
 
-> So far there is very little configuration done in this helper but thanks
-> to this improvement, future enhancements in this area (like setting a
-> symbol duration, which is missing) will be reflected automatically in
-> the default probe state.
->
-> Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
-> ---
->  drivers/net/ieee802154/mac802154_hwsim.c | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
->
-> diff --git a/drivers/net/ieee802154/mac802154_hwsim.c b/drivers/net/ieee802154/mac802154_hwsim.c
-> index 62ced7a30d92..b1a4ee7dceda 100644
-> --- a/drivers/net/ieee802154/mac802154_hwsim.c
-> +++ b/drivers/net/ieee802154/mac802154_hwsim.c
-> @@ -778,8 +778,6 @@ static int hwsim_add_one(struct genl_info *info, struct device *dev,
->
->         ieee802154_random_extended_addr(&hw->phy->perm_extended_addr);
->
-> -       /* hwsim phy channel 13 as default */
-> -       hw->phy->current_channel = 13;
->         pib = kzalloc(sizeof(*pib), GFP_KERNEL);
->         if (!pib) {
->                 err = -ENOMEM;
-> @@ -793,6 +791,11 @@ static int hwsim_add_one(struct genl_info *info, struct device *dev,
->         hw->flags = IEEE802154_HW_PROMISCUOUS | IEEE802154_HW_RX_DROP_BAD_CKSUM;
+ - wpan_phy: represents the PHY layer of IEEE 802154 and is a
+registered device class.
+ - wpan_dev: represents the MAC layer of IEEE 802154 and is a netdev interface.
 
-sadly this patch doesn't apply on current net-next/master because
-IEEE802154_HW_RX_DROP_BAD_CKSUM is not set.
-I agree that it should be set, so we need a patch for it.
+You can have multiple wpan_dev operate on one wpan_phy. To my best
+knowledge it's like having multiple access points running on one phy
+(wireless) or macvlan on ethernet. You can actually do that with the
+mac802154_hwsim driver. However as there exists currently no (as my
+knowledge) hardware which supports e.g. multiple address filters we
+wanted to be prepared for to support such handling. Although, there
+exists some transceivers which support something like a "pan bridge"
+which goes into such a direction.
+
+What is a cfg802154 registered device? Well, at first it offers an
+interface between SoftMAC and HardMAC from nl802154, that's the
+cfg802154_ops structure. In theory a HardMAC transceiver would bypass
+the SoftMAC stack by implementing "cfg802154_ops" on the driver layer
+and try to do everything there as much as possible to support it. It
+is not a registered device class but the instance is tight to a
+wpan_phy. There can be multiple wpan_dev's (MAC layer instances on a
+phy/cfg802154 registered device). We currently don't support a HardMAC
+transceiver and I think because this misunderstanding came up.
+
+That means as far I see you should move the most of those attributes
+to per wpan_dev instead of per cfg802154.
 
 - Alex
-
-[0] https://elixir.bootlin.com/linux/v5.16-rc7/source/drivers/net/ieee802154/at86rf230.c#L1059
