@@ -2,55 +2,55 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88CCDC433F5
-	for <linux-wpan@archiver.kernel.org>; Tue, 28 Dec 2021 22:25:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97D17C433EF
+	for <linux-wpan@archiver.kernel.org>; Wed, 29 Dec 2021 01:45:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237578AbhL1WZY (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 28 Dec 2021 17:25:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48826 "EHLO
+        id S232641AbhL2Bpq (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 28 Dec 2021 20:45:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36932 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237488AbhL1WZX (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 28 Dec 2021 17:25:23 -0500
-Received: from mail-wm1-x330.google.com (mail-wm1-x330.google.com [IPv6:2a00:1450:4864:20::330])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CFF1C061574;
-        Tue, 28 Dec 2021 14:25:23 -0800 (PST)
-Received: by mail-wm1-x330.google.com with SMTP id l4so12463088wmq.3;
-        Tue, 28 Dec 2021 14:25:23 -0800 (PST)
+        with ESMTP id S232602AbhL2Bpq (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 28 Dec 2021 20:45:46 -0500
+Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3180CC061574;
+        Tue, 28 Dec 2021 17:45:46 -0800 (PST)
+Received: by mail-wm1-x336.google.com with SMTP id j140-20020a1c2392000000b003399ae48f58so13649235wmj.5;
+        Tue, 28 Dec 2021 17:45:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=J8LoOMksFX8CI0QJpXomJXWXSGzLukaJKYwJljG6uWY=;
-        b=ZhSvdql+i2v/qh6IKx8Ia+1bW0uSqTYxbMf6Op8o2u2jnzRwhZabkcAo5Qrf+vn8gX
-         KP1jV3uDFkWWWaomSZX8phf6As3wQDX691z+PRWG2P5cKRv2M1Jd0BKq1uYZ9nlK/i0p
-         tk2g401KUY5+rxZ1Co9q88lliSQ5C4qR+FyowYPVsxRFYV3fCp1YmMBuaK8gKGt9oICE
-         PShtHFWPAtg6oIE5+4L9CBe2f8O6sdr5egThQmZ81YvyFCnn3OpvZmajtri+xMuYbwVE
-         6ZC2oGNTwmGXDDR5ykde3gcSfSlXyDLikGLe5O47JCASbCXmX0ywKrm7Jqh1/bOtfG+l
-         lyig==
+        bh=kMVKjCl04dw0PGuDwWt7IinMb2TiSh25Rh+lXPqPFbI=;
+        b=SCCNyvQg7iXPbiZPdRR2LY1DBUkkHUrTJQ9Ulv0ztBotO32vDDmJDNTn7lSppjcgoe
+         SyxAFqH2cfu9oIPFSpPFSiOBJrnGdL9rA5pgxnScrQduKqzAj7Cbi83i9MKnXlV1D6AW
+         Ndd1/Jwe7y4aZrJ+YKaKdnn9jEqTRp+h8f+/HEVq5aChQsS5Sp1K0bFfDZ6k2KlTR0Ft
+         DxJ8Jq2TA5jZUOWJH2Nj1cUmXoffzm2wews31upvF/dQ618wghnzJBNYKtg5SDjB1m2A
+         +oy1eezZiellDqdDXydB+7W4wRpKOlTTmNGXWi+bEXtGgIp3t4VOOEN/o+u8lhsT/QSK
+         NL4A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=J8LoOMksFX8CI0QJpXomJXWXSGzLukaJKYwJljG6uWY=;
-        b=ptNXzEEvH+LYi956jrWR/gNXC0GdpR8n2d/5yJhocZGQpztuW+mtZEE/HMMjQWFht7
-         Wo6ykC/m5studvLJfYvQIxets2p7DtxCV//4aR0LAS3i9aXdyfJ/T8Of6ILz4uFEkC7N
-         1LxkTN92Y9jeEkiq241ztTwVnYLLkL70FJxqMhm8NcKcFXK9KDzlXDVodTowZ87ypuE/
-         yl3XCEocUmT30J/DtxsxpPRffEoFU9AvRmAwZS9aoi/m0V0p/iw09Qk8OfasbUJzIkdu
-         BZJaNO5pVJEHnxMZM3gip++wgLSjOmRgjwtfDikKfdMf1PZOo9yaEpUOVbs7IVGHeBVC
-         jH5Q==
-X-Gm-Message-State: AOAM532ywlIAya65QbQZ4TKNWBp7XsLge9mAhJNr52rJLYc+W+Da4SFm
-        l95C4i4YqMowezdYnxpSvR5YaXOUFaiRYX0mHxuWpRt9
-X-Google-Smtp-Source: ABdhPJyEH9ab4C24qv9761MGC9VAmxNzmekvDA0t8/nsCO/JEtUE61/V/o7GyHccPitbF9Nl7R4NeEWVwwvvr6BoNz8=
-X-Received: by 2002:a05:600c:3b12:: with SMTP id m18mr18511117wms.54.1640730321807;
- Tue, 28 Dec 2021 14:25:21 -0800 (PST)
+        bh=kMVKjCl04dw0PGuDwWt7IinMb2TiSh25Rh+lXPqPFbI=;
+        b=PCulj9+hZAo3NqpcjbtyQp3AaUVvsaqRi60Xn3/ad03NfaKU/RIFdaANLXkHlf49uv
+         yX2vPJjmElk0NPgv52ZG9Pt6MR3z6NllAfsNgovWzSLBp83uLEcW4SITpwKjxCSHkJxx
+         VaAg0EQYP69k08DADVmwfSFD/3aDNEpV6KstHLLvw5lA5o5Non024Fy9TpL5HUextuWj
+         lc5e/1HTV0TFX4YT80xz6KN7Yfl0VwksW+4qsouV6YRqxyr9E/d/09uT8CkGiwNAvDmU
+         xoXKcpajuExd+3JST1hxjquhvZ/rsYNKmng9UeG3BvyJ+4OAc8MCWKeMv8I8rnwDUO5h
+         SWyA==
+X-Gm-Message-State: AOAM532AmW4YyoNa/luyTH0zMyDAIupmkEtzWqYZyc2Z/c4EcQWiUZYO
+        +9qSqu0jaSX3XhfebkqHSumwqVukCj5Fdve03Jo=
+X-Google-Smtp-Source: ABdhPJx0tjGKzj8i/l6FP7eKW9dyVRnwdtuuj/WDM9AR3Mmhc8CSeoTst/aSp0ee1EAyiFDU+TzkIgUf4wrd7BYO4oU=
+X-Received: by 2002:a7b:c745:: with SMTP id w5mr19219810wmk.167.1640742344307;
+ Tue, 28 Dec 2021 17:45:44 -0800 (PST)
 MIME-Version: 1.0
-References: <20211222155743.256280-1-miquel.raynal@bootlin.com> <20211222155743.256280-18-miquel.raynal@bootlin.com>
-In-Reply-To: <20211222155743.256280-18-miquel.raynal@bootlin.com>
+References: <20211222155743.256280-1-miquel.raynal@bootlin.com>
+ <20211222155743.256280-9-miquel.raynal@bootlin.com> <CAB_54W786n6_4FAMc7VMAX0nuyd6r2Hi+wYEEbd5Bjdrd8ArpA@mail.gmail.com>
+In-Reply-To: <CAB_54W786n6_4FAMc7VMAX0nuyd6r2Hi+wYEEbd5Bjdrd8ArpA@mail.gmail.com>
 From:   Alexander Aring <alex.aring@gmail.com>
-Date:   Tue, 28 Dec 2021 17:25:10 -0500
-Message-ID: <CAB_54W7o5b7a-2Gg5ZnzPj3o4Yw9FOAxJfykrA=LtpVf9naAng@mail.gmail.com>
-Subject: Re: [net-next 17/18] net: mac802154: Let drivers provide their own
- beacons implementation
+Date:   Tue, 28 Dec 2021 20:45:33 -0500
+Message-ID: <CAB_54W5pj=zFwfDh7=0Nh-FivGb6Edjosd19dzmH_k0C5mszmw@mail.gmail.com>
+Subject: Re: [net-next 08/18] net: ieee802154: Add support for internal PAN management
 To:     Miquel Raynal <miquel.raynal@bootlin.com>
 Cc:     "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
@@ -69,14 +69,17 @@ X-Mailing-List: linux-wpan@vger.kernel.org
 
 Hi,
 
-On Wed, 22 Dec 2021 at 10:58, Miquel Raynal <miquel.raynal@bootlin.com> wrote:
->
-> So far only a pure software procedure for sending beacons was possible.
-> Let's create a couple of driver's hooks in order to allow the device
-> drivers to provide their own implementation. If not provided, fallback
-> to the pure software logic.
->
+On Tue, 28 Dec 2021 at 17:22, Alexander Aring <alex.aring@gmail.com> wrote:
+...
+> That means as far I see you should move the most of those attributes
+> to per wpan_dev instead of per cfg802154.
 
-Can you name a SoftMAC transceiver which provides such an "offload" feature?
+Sorry that's wrong.
+
+I see now, that the result for a scan on every possible wpan_dev for a
+specific wpan_phy should return the same result, that's why it belongs
+to cfg802154 and this is correct (as a cfg802154 has a 1:1 mapping to
+wpan_phy).
+Same as in wireless...
 
 - Alex
