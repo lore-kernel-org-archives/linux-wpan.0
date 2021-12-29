@@ -2,55 +2,54 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97D17C433EF
-	for <linux-wpan@archiver.kernel.org>; Wed, 29 Dec 2021 01:45:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B2F7C433F5
+	for <linux-wpan@archiver.kernel.org>; Wed, 29 Dec 2021 14:31:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232641AbhL2Bpq (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 28 Dec 2021 20:45:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36932 "EHLO
+        id S237020AbhL2ObM (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 29 Dec 2021 09:31:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35172 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232602AbhL2Bpq (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 28 Dec 2021 20:45:46 -0500
-Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3180CC061574;
-        Tue, 28 Dec 2021 17:45:46 -0800 (PST)
-Received: by mail-wm1-x336.google.com with SMTP id j140-20020a1c2392000000b003399ae48f58so13649235wmj.5;
-        Tue, 28 Dec 2021 17:45:46 -0800 (PST)
+        with ESMTP id S236856AbhL2ObM (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 29 Dec 2021 09:31:12 -0500
+Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99807C061574;
+        Wed, 29 Dec 2021 06:31:11 -0800 (PST)
+Received: by mail-wr1-x431.google.com with SMTP id e5so44785844wrc.5;
+        Wed, 29 Dec 2021 06:31:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=kMVKjCl04dw0PGuDwWt7IinMb2TiSh25Rh+lXPqPFbI=;
-        b=SCCNyvQg7iXPbiZPdRR2LY1DBUkkHUrTJQ9Ulv0ztBotO32vDDmJDNTn7lSppjcgoe
-         SyxAFqH2cfu9oIPFSpPFSiOBJrnGdL9rA5pgxnScrQduKqzAj7Cbi83i9MKnXlV1D6AW
-         Ndd1/Jwe7y4aZrJ+YKaKdnn9jEqTRp+h8f+/HEVq5aChQsS5Sp1K0bFfDZ6k2KlTR0Ft
-         DxJ8Jq2TA5jZUOWJH2Nj1cUmXoffzm2wews31upvF/dQ618wghnzJBNYKtg5SDjB1m2A
-         +oy1eezZiellDqdDXydB+7W4wRpKOlTTmNGXWi+bEXtGgIp3t4VOOEN/o+u8lhsT/QSK
-         NL4A==
+        bh=cEnwtDepCWRMsqbEiePGkHOVDpvDpwQE2RGWhARN1Wo=;
+        b=FPC+7lX27AlyFkM+h3rmxNEHNzpmiE/lVRUO8hxn75+T/yOS3eqton5N5qATqwZe6p
+         FQM02ymXOtdQIza81hmsGZScudyJm0om3VGgjV2AEfHHcohLLPHRmJ24dLnCO+7IpJBA
+         5Nq2tXhbnccQaxsKa0JA1cITe9QrS8MWitn8wMDWTcfOTZycESJGwIkwPP5VR3eT6bor
+         5eLF8Cq1g7tlB3h6p6igXBEN7Jyb+3LMj3Q8reZQVmW631CxkOgze7G7M5t674TDID3Q
+         YjuC9EhvBhYrfG7WoY3653dAv+SLalKHRaN+piWrHdl8PE55Jv+nBZE/RaDRKo8Kzj9e
+         CC8w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=kMVKjCl04dw0PGuDwWt7IinMb2TiSh25Rh+lXPqPFbI=;
-        b=PCulj9+hZAo3NqpcjbtyQp3AaUVvsaqRi60Xn3/ad03NfaKU/RIFdaANLXkHlf49uv
-         yX2vPJjmElk0NPgv52ZG9Pt6MR3z6NllAfsNgovWzSLBp83uLEcW4SITpwKjxCSHkJxx
-         VaAg0EQYP69k08DADVmwfSFD/3aDNEpV6KstHLLvw5lA5o5Non024Fy9TpL5HUextuWj
-         lc5e/1HTV0TFX4YT80xz6KN7Yfl0VwksW+4qsouV6YRqxyr9E/d/09uT8CkGiwNAvDmU
-         xoXKcpajuExd+3JST1hxjquhvZ/rsYNKmng9UeG3BvyJ+4OAc8MCWKeMv8I8rnwDUO5h
-         SWyA==
-X-Gm-Message-State: AOAM532AmW4YyoNa/luyTH0zMyDAIupmkEtzWqYZyc2Z/c4EcQWiUZYO
-        +9qSqu0jaSX3XhfebkqHSumwqVukCj5Fdve03Jo=
-X-Google-Smtp-Source: ABdhPJx0tjGKzj8i/l6FP7eKW9dyVRnwdtuuj/WDM9AR3Mmhc8CSeoTst/aSp0ee1EAyiFDU+TzkIgUf4wrd7BYO4oU=
-X-Received: by 2002:a7b:c745:: with SMTP id w5mr19219810wmk.167.1640742344307;
- Tue, 28 Dec 2021 17:45:44 -0800 (PST)
+        bh=cEnwtDepCWRMsqbEiePGkHOVDpvDpwQE2RGWhARN1Wo=;
+        b=m5ivjAk5R2ixo2p7Yd5owLjevR0csYsTCrwR7wNfU7oijhiLDoiS82eLIEot9G8XZ2
+         wLc5zDNDBmGkdUe4sQHQMos3MWnBcXdE+jEuFT2U8tXgdmM+wHkkmS4UKmI9qUYR9Kks
+         mQ5yiF4ulm90XVCu33EFfFruZY8VikYg3EAX52qUbrBFw3jXndDos3FVcpjvOcqKoa8D
+         pK8HwngsuqwA+ezxdXGclMT1CXHAq350LhCSjeDRe4FQf7aY2aMfBRhU8SLDmF61O71s
+         sNmpngzS9PuWdnEciPdXDi/ptnXRBJWrEYsVHdCvqasMK7MIdo72bAKONIzibvgCNYhK
+         D/Bw==
+X-Gm-Message-State: AOAM530e1edKVk72WVWLXZenLqlxiUvbvUf7HH9npzP0YSEChsCxDLav
+        kNmQDQFGHWElyJQ89YuVmqHh47UHehTo03UJ0Ks=
+X-Google-Smtp-Source: ABdhPJx69lU469JucVuRNRwTlMMLyuoFdtR2jdXQhSgv7+tYijErixl7g0iFXFoJK8e8/VVPdyT7nXUF/IOc84Vsy3o=
+X-Received: by 2002:adf:d1c2:: with SMTP id b2mr21189405wrd.81.1640788270149;
+ Wed, 29 Dec 2021 06:31:10 -0800 (PST)
 MIME-Version: 1.0
-References: <20211222155743.256280-1-miquel.raynal@bootlin.com>
- <20211222155743.256280-9-miquel.raynal@bootlin.com> <CAB_54W786n6_4FAMc7VMAX0nuyd6r2Hi+wYEEbd5Bjdrd8ArpA@mail.gmail.com>
-In-Reply-To: <CAB_54W786n6_4FAMc7VMAX0nuyd6r2Hi+wYEEbd5Bjdrd8ArpA@mail.gmail.com>
+References: <20211222155743.256280-1-miquel.raynal@bootlin.com> <20211222155743.256280-13-miquel.raynal@bootlin.com>
+In-Reply-To: <20211222155743.256280-13-miquel.raynal@bootlin.com>
 From:   Alexander Aring <alex.aring@gmail.com>
-Date:   Tue, 28 Dec 2021 20:45:33 -0500
-Message-ID: <CAB_54W5pj=zFwfDh7=0Nh-FivGb6Edjosd19dzmH_k0C5mszmw@mail.gmail.com>
-Subject: Re: [net-next 08/18] net: ieee802154: Add support for internal PAN management
+Date:   Wed, 29 Dec 2021 09:30:59 -0500
+Message-ID: <CAB_54W6AZ+LGTcFsQjNx7uq=+R5v_kdF0Xm5kwWQ8ONtfOrmAw@mail.gmail.com>
+Subject: Re: [net-next 12/18] net: mac802154: Handle scan requests
 To:     Miquel Raynal <miquel.raynal@bootlin.com>
 Cc:     "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
@@ -69,17 +68,26 @@ X-Mailing-List: linux-wpan@vger.kernel.org
 
 Hi,
 
-On Tue, 28 Dec 2021 at 17:22, Alexander Aring <alex.aring@gmail.com> wrote:
+On Wed, 22 Dec 2021 at 10:58, Miquel Raynal <miquel.raynal@bootlin.com> wrote:
 ...
-> That means as far I see you should move the most of those attributes
-> to per wpan_dev instead of per cfg802154.
+> +{
+> +       bool promiscuous_on = mac802154_check_promiscuous(local);
+> +       int ret;
+> +
+> +       if ((state && promiscuous_on) || (!state && !promiscuous_on))
+> +               return 0;
+> +
+> +       ret = drv_set_promiscuous_mode(local, state);
+> +       if (ret)
+> +               pr_err("Failed to %s promiscuous mode for SW scanning",
+> +                      state ? "set" : "reset");
+> +
 
-Sorry that's wrong.
+The semantic of promiscuous mode on the driver layer is to turn off
+ack response, address filtering and crc checking. Some transceivers
+don't allow a more fine tuning on what to enable/disable. I think we
+should at least do the checksum checking per software then?
 
-I see now, that the result for a scan on every possible wpan_dev for a
-specific wpan_phy should return the same result, that's why it belongs
-to cfg802154 and this is correct (as a cfg802154 has a 1:1 mapping to
-wpan_phy).
-Same as in wireless...
+Sure there is a possible tune up for more "powerful" transceivers then...
 
 - Alex
