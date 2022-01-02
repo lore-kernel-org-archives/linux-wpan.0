@@ -2,197 +2,218 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24EEDC433F5
-	for <linux-wpan@archiver.kernel.org>; Fri, 31 Dec 2021 19:27:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 465A4C433EF
+	for <linux-wpan@archiver.kernel.org>; Sun,  2 Jan 2022 17:20:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231571AbhLaT1Z (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Fri, 31 Dec 2021 14:27:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50490 "EHLO
+        id S229998AbiABRUA (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Sun, 2 Jan 2022 12:20:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46610 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231365AbhLaT1Z (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Fri, 31 Dec 2021 14:27:25 -0500
-Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF9FAC061574;
-        Fri, 31 Dec 2021 11:27:24 -0800 (PST)
-Received: by mail-wr1-x42a.google.com with SMTP id v7so57258260wrv.12;
-        Fri, 31 Dec 2021 11:27:24 -0800 (PST)
+        with ESMTP id S229446AbiABRUA (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Sun, 2 Jan 2022 12:20:00 -0500
+Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4EAFC061761;
+        Sun,  2 Jan 2022 09:19:59 -0800 (PST)
+Received: by mail-lf1-x12f.google.com with SMTP id i31so70594274lfv.10;
+        Sun, 02 Jan 2022 09:19:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Qm//CCvSZhhAyMJiVwLJsA5O+pIcy0ON3NGd+6daj8I=;
-        b=NdkAcUyFpbV/pCYiiMGbRnTZdchrB5+9Vlh1TTrjVdMFMERdIo0bPOiLA9qMfOMYcG
-         VDM1+LXQ0/WLKG4Jk12xctM5UKOkIILHxXbfkRpbub9BKaSnFtmhIp2xxsgsFLxY/GoG
-         qD89/hb/DykEN4bclctzQR6tikasjYnud1pq8QVjgdfEX9h5Dohrw+T9HuurC7A945Zd
-         zbZ5IASxcZ30qRSkEsRfWeGkGnnwuriJw+XC89KGaurql/HmUlgom5lVobt7EYEk94Qf
-         3kzKF+MxRXBJyyrFKN8mXaWm/oDhDnqZLtWXecHJ7zlW7ZjB/HLzsDG96rMxjsqf192w
-         VznA==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=zeIz7SpaGchv068gfQcu2/c3ylmt2DT39R9W0+3wJqA=;
+        b=NFQTL8r5c4YsZSk6PoTHW83Yeme+g/ldhGk4UTcz00ptGs1dMmsi7iCjUuNLthFX9f
+         kUQHyo0ua6nPyUPenu92NX+HCMioWfeHO+aHRudimuYSVLdjPyp6s3tWOp2okCVbYv1Z
+         ADIZvlfVwu3LBBsJna993kECPGxWFpXfl/Ci2/XWzjj3vRDw1GWKlGhKa3RD0WyJhCtW
+         QreJeWMsDZzSvIW+lrCk9Qd5Kp25ak3Iy6JzbSEYOJUIGof8Da7jRnoI35BYibaKQ7yA
+         yrPFFIGR7k2wpnu/7TNP3Z2hFkKvzhwh1uKQw144FR+Q7yyKkhppFbselT0shpskkJ+P
+         bJ3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Qm//CCvSZhhAyMJiVwLJsA5O+pIcy0ON3NGd+6daj8I=;
-        b=b2SNBLlnnilr9yk72TkuSbmZXuWgirN2AFm9JTAG4eo9YU5/z/J9ux7f4+3ZRnFltW
-         8Stoz3usqr9lxclh0x56IhAvk1GaCyITom/4ti4AVAWf9r8hucUiGMX79sY8cRyxAQ6V
-         7piQ/4aJINkchFuSHu24O4q5feoBO/YEa8tPKkwJTxHA/016Mgwuw/aZsReavmYwKgbT
-         B2r6COlDKHUodyekW423UFIC7r2TVY+E5WN4JHqVonj6wlEqCRcmi2VY6JL3JsDoWZ9y
-         8YQsmqizVxrsqgTZ3f+sJ6Y9AAHOlGnEBjTCAPY5sa4SS3J3/Lr3KFVg4FenqygFPfHk
-         yfhQ==
-X-Gm-Message-State: AOAM5331savUS8rAn/yEfuQXqusDuQ1XQHkbUNgl5sGMo1kA41QUhv0I
-        vFodQykH90CRdrjk0QE4MKKrz7AQI+Srs9LhGEH2sutWvnI=
-X-Google-Smtp-Source: ABdhPJxhyb5Hc+/IrcPvoUpXtTAEsXA3e/2gae0d4byRMf+Aq5LuT6moGYOB1H8xqvJlFDr0n7U7qWxaLN7I4TvBzJ8=
-X-Received: by 2002:a5d:588c:: with SMTP id n12mr30515862wrf.56.1640978843312;
- Fri, 31 Dec 2021 11:27:23 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=zeIz7SpaGchv068gfQcu2/c3ylmt2DT39R9W0+3wJqA=;
+        b=cV83Pk8I5uvVxWpAwzgeX87jfAnFpNCjipPnQbSZGHxaPm25Wos+6ePxcSjsFz3q/N
+         LJHtrcl6gcBhHUlthMlpv2kHst1e8LRzyuqGfxl9n5EEPCBlpTYVI43lah+XUW+8fB46
+         Gky5iW64w4xOjwBu6MAH1FM6/nM9TREuJQWQ8kLotTUY8lKSd7ila+rB18Z8/Ci8EUPV
+         m6S882g6HpaZZs5yBGzccf4jfE0gxpD+rtvL+Pzb19uoRjVCuFhdwP47xGbQKwL0/KKE
+         wDLDqBx+0ru6SNKLUchOKTv3teNmYaaxms4oBf1HpKEWJqeaBlakPwJ4/N/Kt8O4qjMI
+         om2g==
+X-Gm-Message-State: AOAM533vsdjUr46IRPxSQMH0Q+/KbUuAO9LF+5TyjZSw2vh8DVfPtzga
+        72Ea3KQIQbemEMXA/t39ZMU=
+X-Google-Smtp-Source: ABdhPJyglLbS47dxDNoj9LAWgXaANJ1ArO/SIIBU1yq01Qjf7OkvalYeZSX7iSvTqTGdTt64XdpiRQ==
+X-Received: by 2002:a19:6042:: with SMTP id p2mr38331806lfk.381.1641143998046;
+        Sun, 02 Jan 2022 09:19:58 -0800 (PST)
+Received: from localhost.localdomain ([217.117.245.177])
+        by smtp.gmail.com with ESMTPSA id s7sm2662018ljc.110.2022.01.02.09.19.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 02 Jan 2022 09:19:57 -0800 (PST)
+From:   Pavel Skripkin <paskripkin@gmail.com>
+To:     stefan@datenfreihafen.org, alex.aring@gmail.com,
+        davem@davemloft.net, kuba@kernel.org
+Cc:     linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Pavel Skripkin <paskripkin@gmail.com>, stable@vger.kernel.org,
+        Alexander Potapenko <glider@google.com>
+Subject: [PATCH RFT] ieee802154: atusb: move to new USB API
+Date:   Sun,  2 Jan 2022 20:19:43 +0300
+Message-Id: <20220102171943.28846-1-paskripkin@gmail.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <CAG_fn=VDEoQx5c7XzWX1yaYBd5y5FrG1aagrkv+SZ03c8TfQYQ@mail.gmail.com>
+References: <CAG_fn=VDEoQx5c7XzWX1yaYBd5y5FrG1aagrkv+SZ03c8TfQYQ@mail.gmail.com>
 MIME-Version: 1.0
-References: <20211222155743.256280-1-miquel.raynal@bootlin.com>
- <20211222155743.256280-13-miquel.raynal@bootlin.com> <CAB_54W6AZ+LGTcFsQjNx7uq=+R5v_kdF0Xm5kwWQ8ONtfOrmAw@mail.gmail.com>
- <Ycx0mwQcFsmVqWVH@ni.fr.eu.org> <CAB_54W41ZEoXzoD2_wadfMTY8anv9D9e2T5wRckdXjs7jKTTCA@mail.gmail.com>
-In-Reply-To: <CAB_54W41ZEoXzoD2_wadfMTY8anv9D9e2T5wRckdXjs7jKTTCA@mail.gmail.com>
-From:   Alexander Aring <alex.aring@gmail.com>
-Date:   Fri, 31 Dec 2021 14:27:12 -0500
-Message-ID: <CAB_54W6gHE1S9Q+-SVbrnAWPxBxnvf54XVTCmddtj8g-bZzMRA@mail.gmail.com>
-Subject: Re: [net-next 12/18] net: mac802154: Handle scan requests
-To:     Nicolas Schodet <nico@ni.fr.eu.org>
-Cc:     Miquel Raynal <miquel.raynal@bootlin.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-        Stefan Schmidt <stefan@datenfreihafen.org>,
-        linux-wpan - ML <linux-wpan@vger.kernel.org>,
-        David Girault <david.girault@qorvo.com>,
-        Romuald Despres <romuald.despres@qorvo.com>,
-        Frederic Blain <frederic.blain@qorvo.com>,
-        Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-        kernel list <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi,
+Alexander reported a use of uninitialized value in
+atusb_set_extended_addr(), that is caused by reading 0 bytes via
+usb_control_msg().
 
-On Thu, 30 Dec 2021 at 14:47, Alexander Aring <alex.aring@gmail.com> wrote:
->
-> Hi,
->
-> On Wed, 29 Dec 2021 at 09:45, Nicolas Schodet <nico@ni.fr.eu.org> wrote:
-> >
-> > Hi,
-> >
-> > * Alexander Aring <alex.aring@gmail.com> [2021-12-29 09:30]:
-> > > Hi,
-> > > On Wed, 22 Dec 2021 at 10:58, Miquel Raynal <miquel.raynal@bootlin.com> wrote:
-> > > ...
-> > > > +{
-> > > > +       bool promiscuous_on = mac802154_check_promiscuous(local);
-> > > > +       int ret;
-> > > > +
-> > > > +       if ((state && promiscuous_on) || (!state && !promiscuous_on))
-> > > > +               return 0;
-> > > > +
-> > > > +       ret = drv_set_promiscuous_mode(local, state);
-> > > > +       if (ret)
-> > > > +               pr_err("Failed to %s promiscuous mode for SW scanning",
-> > > > +                      state ? "set" : "reset");
-> > > The semantic of promiscuous mode on the driver layer is to turn off
-> > > ack response, address filtering and crc checking. Some transceivers
-> > > don't allow a more fine tuning on what to enable/disable. I think we
-> > > should at least do the checksum checking per software then?
-> > > Sure there is a possible tune up for more "powerful" transceivers then...
-> >
-> > In this case, the driver could change the (flags &
-> > IEEE802154_HW_RX_DROP_BAD_CKSUM) bit dynamically to signal it does not
-> > check the checksum anymore. Would it work?
->
-> I think that would work, although the intention of the hw->flags is to
-> define what the hardware is supposed to support as not changing those
-> values dynamically during runtime so mac will care about it. However
-> we don't expose those flags to the userspace, so far I know. We can
-> still introduce two separated flags if necessary in future.
->
-> Why do we need promiscuous mode at all? Why is it necessary for a
-> scan? What of "ack response, address filtering and crc checking" you
-> want to disable and why?
->
+Since there is an API, that cannot read less bytes, than was requested,
+let's move atusb driver to use it. It will fix all potintial bugs with
+uninit values and make code more modern
 
-I see now why promiscuous mode is necessary here. The actual
-promiscuous mode setting for the driver is not the same as promiscuous
-mode in 802.15.4 spec. For until now it was there for running a
-sniffer device only.
-As the 802.15.4 spec defines some "filtering levels" I came up with a
-draft so we can define which filtering level should be done on the
-hardware.
+Fail log:
 
-diff --git a/include/net/mac802154.h b/include/net/mac802154.h
-index 72978fb72a3a..3839ed3f8f0d 100644
---- a/include/net/mac802154.h
-+++ b/include/net/mac802154.h
-@@ -130,6 +130,48 @@ enum ieee802154_hw_flags {
- #define IEEE802154_HW_OMIT_CKSUM       (IEEE802154_HW_TX_OMIT_CKSUM | \
-                                         IEEE802154_HW_RX_OMIT_CKSUM)
+BUG: KASAN: uninit-cmp in ieee802154_is_valid_extended_unicast_addr include/linux/ieee802154.h:310 [inline]
+BUG: KASAN: uninit-cmp in atusb_set_extended_addr drivers/net/ieee802154/atusb.c:1000 [inline]
+BUG: KASAN: uninit-cmp in atusb_probe.cold+0x29f/0x14db drivers/net/ieee802154/atusb.c:1056
+Uninit value used in comparison: 311daa649a2003bd stack handle: 000000009a2003bd
+ ieee802154_is_valid_extended_unicast_addr include/linux/ieee802154.h:310 [inline]
+ atusb_set_extended_addr drivers/net/ieee802154/atusb.c:1000 [inline]
+ atusb_probe.cold+0x29f/0x14db drivers/net/ieee802154/atusb.c:1056
+ usb_probe_interface+0x314/0x7f0 drivers/usb/core/driver.c:396
 
-+/**
-+ * enum ieee802154_filter_mode - hardware filter mode that a driver
-will pass to
-+ *                              pass to mac802154.
-+ *
-+ * @IEEE802154_FILTER_MODE_0: No MFR filtering at all.
-+ *
-+ * @IEEE802154_FILTER_MODE_1: IEEE802154_FILTER_MODE_1 with a bad FCS filter.
-+ *
-+ * @IEEE802154_FILTER_MODE_2: Same as IEEE802154_FILTER_MODE_1, known as
-+ *                           802.15.4 promiscuous mode, sets
-+ *                           mib.PromiscuousMode.
-+ *
-+ * @IEEE802154_FILTER_MODE_3_SCAN: Same as IEEE802154_FILTER_MODE_2 without
-+ *                                set mib.PromiscuousMode.
-+ *
-+ * @IEEE802154_FILTER_MODE_3_NO_SCAN:
-+ *     IEEE802154_FILTER_MODE_3_SCAN with MFR additional filter on:
-+ *
-+ *     - No reserved value in frame type
-+ *     - No reserved value in frame version
-+ *     - Match mib.PanId or broadcast
-+ *     - Destination address field:
-+ *       - Match mib.ShortAddress or broadcast
-+ *       - Match mib.ExtendedAddress or GroupRxMode is true
-+ *       - ImplicitBroadcast is true and destination address field/destination
-+ *         panid is not included.
-+ *       - Device is coordinator only source address present in data
-+ *         frame/command frame and source panid matches mib.PanId
-+ *       - Device is coordinator only source address present in multipurpose
-+ *         frame and destination panid matches macPanId
-+ *     - Beacon frames source panid matches mib.PanId. If mib.PanId is
-+ *       broadcast it should always be accepted.
-+ *
-+ */
-+enum ieee802154_filter_mode {
-+       IEEE802154_FILTER_MODE_0,
-+       IEEE802154_FILTER_MODE_1,
-+       IEEE802154_FILTER_MODE_2,
-+       IEEE802154_FILTER_MODE_3_SCAN,
-+       IEEE802154_FILTER_MODE_3_NO_SCAN,
-+};
-+
- /* struct ieee802154_ops - callbacks from mac802154 to the driver
-  *
-  * This structure contains various callbacks that the driver may
-@@ -249,7 +291,7 @@ struct ieee802154_ops {
-        int             (*set_frame_retries)(struct ieee802154_hw *hw,
-                                             s8 retries);
-        int             (*set_promiscuous_mode)(struct ieee802154_hw *hw,
--                                               const bool on);
-+                                               enum
-ieee802154_filter_mode mode);
-        int             (*enter_scan_mode)(struct ieee802154_hw *hw,
-                                           struct
-cfg802154_scan_request *request);
-        int             (*exit_scan_mode)(struct ieee802154_hw *hw);
-
+Fixes: 7490b008d123 ("ieee802154: add support for atusb transceiver")
+Cc: stable@vger.kernel.org # 5.9
+Reported-by: Alexander Potapenko <glider@google.com>
+Signed-off-by: Pavel Skripkin <paskripkin@gmail.com>
 ---
+ drivers/net/ieee802154/atusb.c | 61 +++++++++++++++++++++-------------
+ 1 file changed, 38 insertions(+), 23 deletions(-)
 
-In your case it will be IEEE802154_FILTER_MODE_3_SCAN mode, for a
-sniffer we probably want as default IEEE802154_FILTER_MODE_0, as
-"promiscuous mode" currently is.
+diff --git a/drivers/net/ieee802154/atusb.c b/drivers/net/ieee802154/atusb.c
+index 23ee0b14cbfa..43befea0110f 100644
+--- a/drivers/net/ieee802154/atusb.c
++++ b/drivers/net/ieee802154/atusb.c
+@@ -80,10 +80,9 @@ struct atusb_chip_data {
+  * in atusb->err and reject all subsequent requests until the error is cleared.
+  */
+ 
+-static int atusb_control_msg(struct atusb *atusb, unsigned int pipe,
+-			     __u8 request, __u8 requesttype,
+-			     __u16 value, __u16 index,
+-			     void *data, __u16 size, int timeout)
++static int atusb_control_msg_recv(struct atusb *atusb, __u8 request, __u8 requesttype,
++				  __u16 value, __u16 index,
++				  void *data, __u16 size, int timeout)
+ {
+ 	struct usb_device *usb_dev = atusb->usb_dev;
+ 	int ret;
+@@ -91,8 +90,30 @@ static int atusb_control_msg(struct atusb *atusb, unsigned int pipe,
+ 	if (atusb->err)
+ 		return atusb->err;
+ 
+-	ret = usb_control_msg(usb_dev, pipe, request, requesttype,
+-			      value, index, data, size, timeout);
++	ret = usb_control_msg_recv(usb_dev, 0, request, requesttype,
++				   value, index, data, size, timeout, GFP_KERNEL);
++	if (ret < 0) {
++		atusb->err = ret;
++		dev_err(&usb_dev->dev,
++			"%s: req 0x%02x val 0x%x idx 0x%x, error %d\n",
++			__func__, request, value, index, ret);
++	}
++
++	return ret;
++}
++
++static int atusb_control_msg_send(struct atusb *atusb, __u8 request, __u8 requesttype,
++				  __u16 value, __u16 index,
++				  void *data, __u16 size, int timeout)
++{
++	struct usb_device *usb_dev = atusb->usb_dev;
++	int ret;
++
++	if (atusb->err)
++		return atusb->err;
++
++	ret = usb_control_msg_send(usb_dev, 0, request, requesttype,
++				   value, index, data, size, timeout, GFP_KERNEL);
+ 	if (ret < 0) {
+ 		atusb->err = ret;
+ 		dev_err(&usb_dev->dev,
+@@ -107,8 +128,7 @@ static int atusb_command(struct atusb *atusb, u8 cmd, u8 arg)
+ 	struct usb_device *usb_dev = atusb->usb_dev;
+ 
+ 	dev_dbg(&usb_dev->dev, "%s: cmd = 0x%x\n", __func__, cmd);
+-	return atusb_control_msg(atusb, usb_sndctrlpipe(usb_dev, 0),
+-				 cmd, ATUSB_REQ_TO_DEV, arg, 0, NULL, 0, 1000);
++	return atusb_control_msg_send(atusb, cmd, ATUSB_REQ_TO_DEV, arg, 0, NULL, 0, 1000);
+ }
+ 
+ static int atusb_write_reg(struct atusb *atusb, u8 reg, u8 value)
+@@ -116,9 +136,8 @@ static int atusb_write_reg(struct atusb *atusb, u8 reg, u8 value)
+ 	struct usb_device *usb_dev = atusb->usb_dev;
+ 
+ 	dev_dbg(&usb_dev->dev, "%s: 0x%02x <- 0x%02x\n", __func__, reg, value);
+-	return atusb_control_msg(atusb, usb_sndctrlpipe(usb_dev, 0),
+-				 ATUSB_REG_WRITE, ATUSB_REQ_TO_DEV,
+-				 value, reg, NULL, 0, 1000);
++	return atusb_control_msg_send(atusb, ATUSB_REG_WRITE, ATUSB_REQ_TO_DEV,
++				      value, reg, NULL, 0, 1000);
+ }
+ 
+ static int atusb_read_reg(struct atusb *atusb, u8 reg)
+@@ -133,9 +152,8 @@ static int atusb_read_reg(struct atusb *atusb, u8 reg)
+ 		return -ENOMEM;
+ 
+ 	dev_dbg(&usb_dev->dev, "%s: reg = 0x%x\n", __func__, reg);
+-	ret = atusb_control_msg(atusb, usb_rcvctrlpipe(usb_dev, 0),
+-				ATUSB_REG_READ, ATUSB_REQ_FROM_DEV,
+-				0, reg, buffer, 1, 1000);
++	ret = atusb_control_msg_recv(atusb, ATUSB_REG_READ, ATUSB_REQ_FROM_DEV,
++				     0, reg, buffer, 1, 1000);
+ 
+ 	if (ret >= 0) {
+ 		value = buffer[0];
+@@ -805,9 +823,8 @@ static int atusb_get_and_show_revision(struct atusb *atusb)
+ 		return -ENOMEM;
+ 
+ 	/* Get a couple of the ATMega Firmware values */
+-	ret = atusb_control_msg(atusb, usb_rcvctrlpipe(usb_dev, 0),
+-				ATUSB_ID, ATUSB_REQ_FROM_DEV, 0, 0,
+-				buffer, 3, 1000);
++	ret = atusb_control_msg_recv(atusb, ATUSB_ID, ATUSB_REQ_FROM_DEV, 0, 0,
++				     buffer, 3, 1000);
+ 	if (ret >= 0) {
+ 		atusb->fw_ver_maj = buffer[0];
+ 		atusb->fw_ver_min = buffer[1];
+@@ -861,9 +878,8 @@ static int atusb_get_and_show_build(struct atusb *atusb)
+ 	if (!build)
+ 		return -ENOMEM;
+ 
+-	ret = atusb_control_msg(atusb, usb_rcvctrlpipe(usb_dev, 0),
+-				ATUSB_BUILD, ATUSB_REQ_FROM_DEV, 0, 0,
+-				build, ATUSB_BUILD_SIZE, 1000);
++	ret = atusb_control_msg_recv(atusb, ATUSB_BUILD, ATUSB_REQ_FROM_DEV, 0, 0,
++				     build, ATUSB_BUILD_SIZE, 1000);
+ 	if (ret >= 0) {
+ 		build[ret] = 0;
+ 		dev_info(&usb_dev->dev, "Firmware: build %s\n", build);
+@@ -985,9 +1001,8 @@ static int atusb_set_extended_addr(struct atusb *atusb)
+ 		return -ENOMEM;
+ 
+ 	/* Firmware is new enough so we fetch the address from EEPROM */
+-	ret = atusb_control_msg(atusb, usb_rcvctrlpipe(usb_dev, 0),
+-				ATUSB_EUI64_READ, ATUSB_REQ_FROM_DEV, 0, 0,
+-				buffer, IEEE802154_EXTENDED_ADDR_LEN, 1000);
++	ret = atusb_control_msg_recv(atusb, ATUSB_EUI64_READ, ATUSB_REQ_FROM_DEV, 0, 0,
++				     buffer, IEEE802154_EXTENDED_ADDR_LEN, 1000);
+ 	if (ret < 0) {
+ 		dev_err(&usb_dev->dev, "failed to fetch extended address, random address set\n");
+ 		ieee802154_random_extended_addr(&atusb->hw->phy->perm_extended_addr);
+-- 
+2.34.1
 
-- Alex
