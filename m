@@ -2,116 +2,117 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24F2DC433FE
-	for <linux-wpan@archiver.kernel.org>; Sun,  2 Jan 2022 22:36:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18CFBC433EF
+	for <linux-wpan@archiver.kernel.org>; Mon,  3 Jan 2022 12:09:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230432AbiABWgz (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Sun, 2 Jan 2022 17:36:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58098 "EHLO
+        id S231651AbiACMJb (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 3 Jan 2022 07:09:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36252 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230405AbiABWgz (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Sun, 2 Jan 2022 17:36:55 -0500
-Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 217E8C061761;
-        Sun,  2 Jan 2022 14:36:55 -0800 (PST)
-Received: by mail-wr1-x432.google.com with SMTP id v7so66553140wrv.12;
-        Sun, 02 Jan 2022 14:36:55 -0800 (PST)
+        with ESMTP id S231398AbiACMJb (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 3 Jan 2022 07:09:31 -0500
+Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98B83C061761;
+        Mon,  3 Jan 2022 04:09:30 -0800 (PST)
+Received: by mail-lj1-x235.google.com with SMTP id t14so27063490ljh.8;
+        Mon, 03 Jan 2022 04:09:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=J/+oeCXYZ5vSQikGncgP5k15zSUqzYA+Gew2jgommjI=;
-        b=ZEh/3VL6mfwWiY0ZW1XF4gZ/9dmgFcIrydJ/E8RJceUXBjR1YLvLzQYyvW9rdyGkDW
-         ARno+fTtI8ZQj4FTiHEX1AdRG/KQwpl65Z0B0JPUKNCbPl33O+S5iG+ipnlkbYyK4mfn
-         chgV/k5MFMxUKNMnaUALxogQE27BjwOoVedGqQFMAW3oveQD0sZn7DGshK1TsA+3sAo5
-         29QSUMUPLQZW8pnFmx/0qrFPlOxMD9Oar8Dp8W0Yb3HCiDhbwl6CgglhZm2TWP/Rc5BK
-         SrsnakbB9XmsC8IutZN4B9oqVqMsmLm9ZeljIDYAfedXJ4puRoQnLlYbDV8pATh5CExA
-         fCfg==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=UukyjmK4YO+JAfUbdkXWjCdeVRCY8BxgquJ5yskx9Jg=;
+        b=aWUjFGhW5nXqlUcE7KmEecswKjBKIAnC3Z9I1LFR8jbC/fgxjalQLBA223E/WVevze
+         8EV8FDkB45ybcG8GQS5BR0yVpoqbNLDtgjBhiwRR26Lb8HSKecTGYyVYH8UnX/anh/+Y
+         N51E050c1fuesDk0W+xjM1XoDfaALSyL6Yf7yQyjhjU8r671dgmSZQqmec9kySaDEy3Q
+         MjprMLZUrvf4BkImDsYefPhVpCpVuVe11yylvToXOTMbXdgOmIRZqUM43m7TYFnXrFwu
+         ft5JLvOc2RUffhyTPAwenFX1nkfntD9fjB5lKgFuHtx8o+tS4WJaA6zA4A9pXdeixzkU
+         AlfA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=J/+oeCXYZ5vSQikGncgP5k15zSUqzYA+Gew2jgommjI=;
-        b=QWlQFoJB7Iqywv/Of3/oVV1K6V1c4RHztQ/TwVj3YRNjUQod/j4FmLo+TmDff9H1Sp
-         JLZPmgqAbkVDVWmTeGysT7hsmC8a0iNmqiWeojRh1muHjt+DQP9vah32+AszY2/LysSB
-         5SW0E/xBfCRFBs2AqYD9i9Q3BzetprT6LltqBeorEarQzEKffrABQS9WJ0X9C8lT5t4M
-         b3i2AcFlAUzbCzjUMHQnElac/U+1xBaRVCQYOWjf69H1beGHvg7CBc52GZvr0cx45RTC
-         nkb9ctghOpVaDa9e7S2rcQ2OcgNh4xzsuyE/sunXmnLE1+61as2Y2huUsgqT1du+kWIB
-         +r8w==
-X-Gm-Message-State: AOAM531AD8Nkr665rAUa0pk2apMgawbPEQoZeAHuOabeyeInRGB41NRY
-        x5KCm4OImEa6UzFMt9tGa/9nv+/JwJYWCqx6Gs0=
-X-Google-Smtp-Source: ABdhPJzACikmBCmNga+QSoSY5xz73ioEyoeewlJ7AtcP9Ml2naaObVMZCGAR5ekrUOJgQZ/zV4QCVBsuccMLKtop3Xc=
-X-Received: by 2002:adf:fc02:: with SMTP id i2mr36325658wrr.154.1641163013752;
- Sun, 02 Jan 2022 14:36:53 -0800 (PST)
-MIME-Version: 1.0
-References: <CAG_fn=VDEoQx5c7XzWX1yaYBd5y5FrG1aagrkv+SZ03c8TfQYQ@mail.gmail.com>
- <20220102171943.28846-1-paskripkin@gmail.com> <CAB_54W6i9-fy8Vc-uypXPtj3Uy0VuZpidFuRH0DVoWJ8utcWiw@mail.gmail.com>
- <81467464-630a-25c4-425d-d8c5c01a739c@gmail.com>
-In-Reply-To: <81467464-630a-25c4-425d-d8c5c01a739c@gmail.com>
-From:   Alexander Aring <alex.aring@gmail.com>
-Date:   Sun, 2 Jan 2022 17:36:42 -0500
-Message-ID: <CAB_54W50xKFCWZ5vYuDG2p4ijpd63cSutRrV4MLs9oasLmKgzQ@mail.gmail.com>
-Subject: Re: [PATCH RFT] ieee802154: atusb: move to new USB API
-To:     Pavel Skripkin <paskripkin@gmail.com>
-Cc:     Stefan Schmidt <stefan@datenfreihafen.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        linux-wpan - ML <linux-wpan@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-        kernel list <linux-kernel@vger.kernel.org>,
-        "# 3.19.x" <stable@vger.kernel.org>,
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=UukyjmK4YO+JAfUbdkXWjCdeVRCY8BxgquJ5yskx9Jg=;
+        b=Xt8PInwsu22XmEeVtwHr5Jp1EDxFViYPWdL5pTXUKykz/GlWAjp8LjouGj7R3dQKG9
+         63BXjwp3k/Wby8iib/9kMaYlH7k+vGyYsX3PbbbVZXs+EraMUGA+7zfV2danpUvALrn9
+         BPuqhurRnelQw/jic+utP71zqzYUQ0+gA8CVY5svB2yRgHVX2allMPxZT3EETdYuoGC6
+         K1J2vZwxhpTdJ0bbH3ikizpjqiIkq4Q249wHCdL6OGxk0fd1TaCdA2yrpXibEO/bjQMt
+         BDYVV78h1k/y2zLH7HtEXgLEPWCMDUh/ahlBjxYT4I1U4TomhCuMw0hVkngnzNZRZi37
+         L2Pg==
+X-Gm-Message-State: AOAM532o1GvPxi1T3WEg2fNee9C+FUEYgcd81/HJvcwnd+t8SQR+xcFo
+        /2i/vKryOyKZIqQjC6BjLgc=
+X-Google-Smtp-Source: ABdhPJweKSRJfLpRC+gpZp4f8LcMCQwhZRJtQqwFODRf7noArKTJotGPveDtQ0YDV14jVg+24kjkXw==
+X-Received: by 2002:a2e:87d6:: with SMTP id v22mr37373886ljj.251.1641211768710;
+        Mon, 03 Jan 2022 04:09:28 -0800 (PST)
+Received: from localhost.localdomain ([94.103.235.100])
+        by smtp.gmail.com with ESMTPSA id y7sm3359433lfb.272.2022.01.03.04.09.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 03 Jan 2022 04:09:28 -0800 (PST)
+From:   Pavel Skripkin <paskripkin@gmail.com>
+To:     stefan@datenfreihafen.org, alex.aring@gmail.com,
+        davem@davemloft.net, kuba@kernel.org
+Cc:     linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Pavel Skripkin <paskripkin@gmail.com>,
         Alexander Potapenko <glider@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Subject: [PATCH v2] ieee802154: atusb: fix uninit value in atusb_set_extended_addr
+Date:   Mon,  3 Jan 2022 15:09:25 +0300
+Message-Id: <20220103120925.25207-1-paskripkin@gmail.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <CAB_54W50xKFCWZ5vYuDG2p4ijpd63cSutRrV4MLs9oasLmKgzQ@mail.gmail.com>
+References: <CAB_54W50xKFCWZ5vYuDG2p4ijpd63cSutRrV4MLs9oasLmKgzQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi,
+Alexander reported a use of uninitialized value in
+atusb_set_extended_addr(), that is caused by reading 0 bytes via
+usb_control_msg().
 
-On Sun, 2 Jan 2022 at 17:21, Pavel Skripkin <paskripkin@gmail.com> wrote:
->
-> On 1/3/22 01:15, Alexander Aring wrote:
-> > Hi,
-> >
-> > On Sun, 2 Jan 2022 at 12:19, Pavel Skripkin <paskripkin@gmail.com> wrote:
-> >>
-> >> Alexander reported a use of uninitialized value in
-> >> atusb_set_extended_addr(), that is caused by reading 0 bytes via
-> >> usb_control_msg().
-> >>
-> >
-> > Does there exist no way to check on this and return an error on USB
-> > API caller level?
-> >
-> >> Since there is an API, that cannot read less bytes, than was requested,
-> >> let's move atusb driver to use it. It will fix all potintial bugs with
-> >> uninit values and make code more modern
-> >>
-> >
-> > If this is not possible to fix with the "old" USB API then I think the
-> > "old" USB API needs to be fixed.
-> > Changing to the new USB API as "making the code more modern" is a new
-> > feature and is a candidate for next.
-> >
->
-> It can be fixed with the old one. Something like that should work:
->
-> -       if (ret < 0) {
-> -               atusb->err = ret;
-> +       if (ret < size) {
-> +               atusb->err = ret < 0: ret: -ENODATA;
->
-> But I thought, that moving to new API is better fix, just because old
-> one prone to uninit value bugs if error checking is wrong
+Fix it by validating if the number of bytes transferred is actually
+correct, since usb_control_msg() may read less bytes, than was requested
+by caller.
 
-A fix should have the smallest changes as possible and not use "new
-stuff" which might break other things. Also I am not sure since "when"
-this new USB API exists. To backport the fix into stable send a fix
-using the "old USB API".
-If the fix is upstream you can send patches to use the new API and
-remove the additional check if this is done by using the new API.
-Maybe it's worth checking that the errno stays the same.
+Fail log:
 
-Thanks.
+BUG: KASAN: uninit-cmp in ieee802154_is_valid_extended_unicast_addr include/linux/ieee802154.h:310 [inline]
+BUG: KASAN: uninit-cmp in atusb_set_extended_addr drivers/net/ieee802154/atusb.c:1000 [inline]
+BUG: KASAN: uninit-cmp in atusb_probe.cold+0x29f/0x14db drivers/net/ieee802154/atusb.c:1056
+Uninit value used in comparison: 311daa649a2003bd stack handle: 000000009a2003bd
+ ieee802154_is_valid_extended_unicast_addr include/linux/ieee802154.h:310 [inline]
+ atusb_set_extended_addr drivers/net/ieee802154/atusb.c:1000 [inline]
+ atusb_probe.cold+0x29f/0x14db drivers/net/ieee802154/atusb.c:1056
+ usb_probe_interface+0x314/0x7f0 drivers/usb/core/driver.c:396
 
-- Alex
+Fixes: 7490b008d123 ("ieee802154: add support for atusb transceiver")
+Reported-by: Alexander Potapenko <glider@google.com>
+Signed-off-by: Pavel Skripkin <paskripkin@gmail.com>
+---
+
+Changes in v2:
+	- Reworked fix approach, since moving to new USB API is not
+	  suitable for backporting to stable kernels
+
+---
+ drivers/net/ieee802154/atusb.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/ieee802154/atusb.c b/drivers/net/ieee802154/atusb.c
+index 23ee0b14cbfa..e6cc816dd7a1 100644
+--- a/drivers/net/ieee802154/atusb.c
++++ b/drivers/net/ieee802154/atusb.c
+@@ -93,7 +93,9 @@ static int atusb_control_msg(struct atusb *atusb, unsigned int pipe,
+ 
+ 	ret = usb_control_msg(usb_dev, pipe, request, requesttype,
+ 			      value, index, data, size, timeout);
+-	if (ret < 0) {
++	if (ret < size) {
++		ret = ret < 0 ? ret : -ENODATA;
++
+ 		atusb->err = ret;
+ 		dev_err(&usb_dev->dev,
+ 			"%s: req 0x%02x val 0x%x idx 0x%x, error %d\n",
+-- 
+2.34.1
+
