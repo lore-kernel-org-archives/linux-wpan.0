@@ -2,143 +2,124 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6ECF7C433F5
-	for <linux-wpan@archiver.kernel.org>; Tue,  4 Jan 2022 15:49:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B1FDC433EF
+	for <linux-wpan@archiver.kernel.org>; Tue,  4 Jan 2022 17:27:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230407AbiADPtH (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 4 Jan 2022 10:49:07 -0500
-Received: from proxima.lasnet.de ([78.47.171.185]:52038 "EHLO
-        proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230352AbiADPtG (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 4 Jan 2022 10:49:06 -0500
-X-Greylist: delayed 501 seconds by postgrey-1.27 at vger.kernel.org; Tue, 04 Jan 2022 10:49:06 EST
-Received: from [IPV6:2003:e9:d728:ec47:4b31:73e4:34c5:505a] (p200300e9d728ec474b3173e434c5505a.dip0.t-ipconnect.de [IPv6:2003:e9:d728:ec47:4b31:73e4:34c5:505a])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: stefan@datenfreihafen.org)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id 120EAC055C;
-        Tue,  4 Jan 2022 16:40:43 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
-        s=2021; t=1641310843;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=fzrSYWdpug8dV2D+vjEBY0DdwVSV7UgruGe2VxZhMYQ=;
-        b=wMtj+/+SQEzNvk7geCsi6F8u7AI0xwhhl98uuCWCZNgKfj6mugjmItNNOXweG1ESnJYKvv
-        1Xjpl9tjKW0IPX9xK5g/1C+TQM9blc0CxuUUqyhC5Q6G6OcW0s1Pt0Mj2WygkrGqz18Twk
-        H6OdYiPDZQTLzBd1Bq7ZVEP2gNpb5eexDji955LofwwI3j35/HloYjyUnoFaq7OgYSSCs6
-        ciYVNffIlOiuWFPj44xtDZIrE4LUBH/UyYTfUWZUPy2vmE9UESYZobGM0B6fgai+/TGGWs
-        JuR7TOHx22BlMHDf5G9fYwVGwNv+MvKy5CwqK6dsTsxFvhwkROqtxqRBBVwBpA==
-Message-ID: <ed39cbe6-0885-a3ab-fc30-7c292e1acc53@datenfreihafen.org>
-Date:   Tue, 4 Jan 2022 16:40:41 +0100
+        id S235499AbiADR1c (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 4 Jan 2022 12:27:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39656 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232884AbiADR1b (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 4 Jan 2022 12:27:31 -0500
+Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64C84C061761;
+        Tue,  4 Jan 2022 09:27:31 -0800 (PST)
+Received: by mail-lf1-x12c.google.com with SMTP id j11so81475296lfg.3;
+        Tue, 04 Jan 2022 09:27:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=oEpnYAm67CBx/UycGy4K6PJ7NPnBfxvjloHj5Duq34Q=;
+        b=nVw2UAiB6xthSU977wls63qlOy/xOCnv8ZomXUTgIWL3zEdNoc6OyFtMlm/cOvg6r1
+         dLEi7/HHba0k9iYS016eh5ZjvBEzd7vqYDI0vg97d/IuEHhun7CJF7zRZBJ6RRuXl9He
+         QtaqH8xW++i7QlRATLPVS2VQq7QfjMYfdQvYQr1b11Dr4w+DL3vt7qrr1QSfCAMBd5FO
+         Lkf25fOMuhaHgUE3Q7i/sz56iBYNGxqk22eIcATQiWvZMFoCExIuJjef8YH2DwKu/x+1
+         FGaYiigyNFSMXgC239AE/mXgjfV9OOZHiuWxw5gwVR4iR5k9RWc7HXclCkOKMqCRX7ZI
+         nszw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=oEpnYAm67CBx/UycGy4K6PJ7NPnBfxvjloHj5Duq34Q=;
+        b=gbOc14JDbv2BQEyYNAFoO09Dw8mPEsnnRiQXZ8b6OpC6jgraAYVEsVAezaR2vNiVdA
+         Y8G+Fom0roYxyJHMa7m/qkUCDCoK1EtkcrydvaXuZD0Sud32hmx0B/uAGCn43KymCaWR
+         WTkDbp3B4QzkkFL0fm2M5jWMIkCxaWKWJyWaQti8GLZdB92jtoDcvOub1W8yAtOUt5Ho
+         H1l+J2oJQn+J/iHysRSTKDqfaOjRfjCwA3Ii2h5GaQi3xr4HMa82Gl9rYiJzvoFjaPvm
+         hjP6mdMVQFFavIrTtJAchWb7IWPtSRgz0Xl0UNHfcqpNptS0D0ezEb8eNrYXdhmDmjDa
+         QUqw==
+X-Gm-Message-State: AOAM531oymOJnrBwUfRzE9LF96/Fc7hR8BuDqspHhbmReHJOVwN9NR7Z
+        rLyp55og+9Jkcwh2D23Qi0s=
+X-Google-Smtp-Source: ABdhPJzcTWddpB4EQvW94F90YPyJtOXWx2ZegvKevNmhAZzYtRfDTtyzybQXGcnD+0YnfK/2who+zg==
+X-Received: by 2002:a05:6512:3056:: with SMTP id b22mr41917697lfb.142.1641317249615;
+        Tue, 04 Jan 2022 09:27:29 -0800 (PST)
+Received: from [192.168.1.11] ([94.103.235.38])
+        by smtp.gmail.com with ESMTPSA id br34sm3949699lfb.305.2022.01.04.09.27.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 04 Jan 2022 09:27:29 -0800 (PST)
+Message-ID: <5b0b8dc6-f038-bfaa-550c-dc23636f0497@gmail.com>
+Date:   Tue, 4 Jan 2022 20:27:28 +0300
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.0
+ Thunderbird/91.4.1
 Subject: Re: [PATCH v2] ieee802154: atusb: fix uninit value in
  atusb_set_extended_addr
 Content-Language: en-US
-To:     Pavel Skripkin <paskripkin@gmail.com>, alex.aring@gmail.com,
+To:     Stefan Schmidt <stefan@datenfreihafen.org>, alex.aring@gmail.com,
         davem@davemloft.net, kuba@kernel.org
 Cc:     linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
         linux-kernel@vger.kernel.org,
         Alexander Potapenko <glider@google.com>
 References: <CAB_54W50xKFCWZ5vYuDG2p4ijpd63cSutRrV4MLs9oasLmKgzQ@mail.gmail.com>
  <20220103120925.25207-1-paskripkin@gmail.com>
-From:   Stefan Schmidt <stefan@datenfreihafen.org>
-In-Reply-To: <20220103120925.25207-1-paskripkin@gmail.com>
+ <ed39cbe6-0885-a3ab-fc30-7c292e1acc53@datenfreihafen.org>
+From:   Pavel Skripkin <paskripkin@gmail.com>
+In-Reply-To: <ed39cbe6-0885-a3ab-fc30-7c292e1acc53@datenfreihafen.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello.
-
-On 03.01.22 13:09, Pavel Skripkin wrote:
-> Alexander reported a use of uninitialized value in
-> atusb_set_extended_addr(), that is caused by reading 0 bytes via
-> usb_control_msg().
+On 1/4/22 18:40, Stefan Schmidt wrote:
 > 
-> Fix it by validating if the number of bytes transferred is actually
-> correct, since usb_control_msg() may read less bytes, than was requested
-> by caller.
+> It compiles, but does not work on the real hardware.
 > 
-> Fail log:
+> [    1.114698] usb 1-1: new full-speed USB device number 2 using uhci_hcd
+> [    1.261691] usb 1-1: New USB device found, idVendor=20b7,
+> idProduct=1540, bcdDevice= 0.01
+> [    1.263421] usb 1-1: New USB device strings: Mfr=0, Product=0,
+> SerialNumber=1
+> [    1.264952] usb 1-1: SerialNumber: 4630333438371502231a
+> [    1.278042] usb 1-1: ATUSB: AT86RF231 version 2
+> [    1.281087] usb 1-1: Firmware: major: 0, minor: 3, hardware type:
+> ATUSB (2)
+> [    1.285191] usb 1-1: atusb_control_msg: req 0x01 val 0x0 idx 0x0,
+> error -61
+> [    1.286903] usb 1-1: failed to fetch extended address, random address set
+> [    1.288757] usb 1-1: atusb_probe: initialization failed, error = -61
+> [    1.290922] atusb: probe of 1-1:1.0 failed with error -61
 > 
-> BUG: KASAN: uninit-cmp in ieee802154_is_valid_extended_unicast_addr include/linux/ieee802154.h:310 [inline]
-> BUG: KASAN: uninit-cmp in atusb_set_extended_addr drivers/net/ieee802154/atusb.c:1000 [inline]
-> BUG: KASAN: uninit-cmp in atusb_probe.cold+0x29f/0x14db drivers/net/ieee802154/atusb.c:1056
-> Uninit value used in comparison: 311daa649a2003bd stack handle: 000000009a2003bd
->   ieee802154_is_valid_extended_unicast_addr include/linux/ieee802154.h:310 [inline]
->   atusb_set_extended_addr drivers/net/ieee802154/atusb.c:1000 [inline]
->   atusb_probe.cold+0x29f/0x14db drivers/net/ieee802154/atusb.c:1056
->   usb_probe_interface+0x314/0x7f0 drivers/usb/core/driver.c:396
 > 
-> Fixes: 7490b008d123 ("ieee802154: add support for atusb transceiver")
-> Reported-by: Alexander Potapenko <glider@google.com>
-> Signed-off-by: Pavel Skripkin <paskripkin@gmail.com>
-> ---
+> Without your patch it works as expected:
 > 
-> Changes in v2:
-> 	- Reworked fix approach, since moving to new USB API is not
-> 	  suitable for backporting to stable kernels
-> 
-> ---
->   drivers/net/ieee802154/atusb.c | 4 +++-
->   1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ieee802154/atusb.c b/drivers/net/ieee802154/atusb.c
-> index 23ee0b14cbfa..e6cc816dd7a1 100644
-> --- a/drivers/net/ieee802154/atusb.c
-> +++ b/drivers/net/ieee802154/atusb.c
-> @@ -93,7 +93,9 @@ static int atusb_control_msg(struct atusb *atusb, unsigned int pipe,
->   
->   	ret = usb_control_msg(usb_dev, pipe, request, requesttype,
->   			      value, index, data, size, timeout);
-> -	if (ret < 0) {
-> +	if (ret < size) {
-> +		ret = ret < 0 ? ret : -ENODATA;
-> +
->   		atusb->err = ret;
->   		dev_err(&usb_dev->dev,
->   			"%s: req 0x%02x val 0x%x idx 0x%x, error %d\n",
+> [    1.091925] usb 1-1: new full-speed USB device number 2 using uhci_hcd
+> [    1.237743] usb 1-1: New USB device found, idVendor=20b7,
+> idProduct=1540, bcdDevice= 0.01
+> [    1.239788] usb 1-1: New USB device strings: Mfr=0, Product=0,
+> SerialNumber=1
+> [    1.241432] usb 1-1: SerialNumber: 4630333438371502231a
+> [    1.255012] usb 1-1: ATUSB: AT86RF231 version 2
+> [    1.258073] usb 1-1: Firmware: major: 0, minor: 3, hardware type:
+> ATUSB (2)
+> [    1.262170] usb 1-1: Firmware: build #132 Mo 28. Nov 16:20:35 CET 2016
+> [    1.266195] usb 1-1: Read permanent extended address
+> 10:e2:d5:ff:ff:00:02:e8 from device
 > 
 
-It compiles, but does not work on the real hardware.
+Hi Stefan,
 
-[    1.114698] usb 1-1: new full-speed USB device number 2 using uhci_hcd
-[    1.261691] usb 1-1: New USB device found, idVendor=20b7, 
-idProduct=1540, bcdDevice= 0.01
-[    1.263421] usb 1-1: New USB device strings: Mfr=0, Product=0, 
-SerialNumber=1
-[    1.264952] usb 1-1: SerialNumber: 4630333438371502231a
-[    1.278042] usb 1-1: ATUSB: AT86RF231 version 2
-[    1.281087] usb 1-1: Firmware: major: 0, minor: 3, hardware type: 
-ATUSB (2)
-[    1.285191] usb 1-1: atusb_control_msg: req 0x01 val 0x0 idx 0x0, 
-error -61
-[    1.286903] usb 1-1: failed to fetch extended address, random address set
-[    1.288757] usb 1-1: atusb_probe: initialization failed, error = -61
-[    1.290922] atusb: probe of 1-1:1.0 failed with error -61
+thanks for testing on real hw.
+
+It looks like there is corner case, that Greg mentioned in this thread. 
+atusb_get_and_show_build() reads firmware build info, which may have 
+various length.
+
+Maybe we can change atusb_control_msg() to usb_control_msg() in 
+atusb_get_and_show_build(), since other callers do not have this problem
 
 
-Without your patch it works as expected:
 
-[    1.091925] usb 1-1: new full-speed USB device number 2 using uhci_hcd
-[    1.237743] usb 1-1: New USB device found, idVendor=20b7, 
-idProduct=1540, bcdDevice= 0.01
-[    1.239788] usb 1-1: New USB device strings: Mfr=0, Product=0, 
-SerialNumber=1
-[    1.241432] usb 1-1: SerialNumber: 4630333438371502231a
-[    1.255012] usb 1-1: ATUSB: AT86RF231 version 2
-[    1.258073] usb 1-1: Firmware: major: 0, minor: 3, hardware type: 
-ATUSB (2)
-[    1.262170] usb 1-1: Firmware: build #132 Mo 28. Nov 16:20:35 CET 2016
-[    1.266195] usb 1-1: Read permanent extended address 
-10:e2:d5:ff:ff:00:02:e8 from device
-
-regards
-Stefan Schmidt
-
+With regards,
+Pavel Skripkin
