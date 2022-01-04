@@ -2,136 +2,105 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76C03C433EF
-	for <linux-wpan@archiver.kernel.org>; Tue,  4 Jan 2022 18:28:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 363FAC433FE
+	for <linux-wpan@archiver.kernel.org>; Tue,  4 Jan 2022 18:57:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234673AbiADS2S (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 4 Jan 2022 13:28:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53790 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234669AbiADS2S (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 4 Jan 2022 13:28:18 -0500
-Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94DC0C061761;
-        Tue,  4 Jan 2022 10:28:17 -0800 (PST)
-Received: by mail-lf1-x132.google.com with SMTP id x6so30783811lfa.5;
-        Tue, 04 Jan 2022 10:28:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=kOvNpEQcBPJr05GLCmJ/AWrJaYJ4SSJmOSNygEHkrtE=;
-        b=HMs/PkrHfTWIjr3rVqqrMJ/3V+BrhpJtllKuP+dNqnNGottQyxJrcae0KeuNhirJWz
-         64RMK4Ml62l+iPxoCXwrfknYWbI2G2WX2HQNYKChHCflebzL/VoSQh6teGvm4EbTtr36
-         UwWcu3/a5Yq9mgTaho1gz0eJTjNfdcbyKzzl3mddQY2d6s+x14tZFS9JYVL3uesigSZr
-         QidUwiCg2039upoh4X8IjXDj30cnbnntsGz+OWEG4B9AJp1Ts1O0963nB2WqOuelrKFh
-         iwzubGUsTRE14VytBy/HYLqM1+aFgQcMw/P8ofwnx8jtiQrI6GDq0aD9rgJRyArFm+76
-         4Qnw==
+        id S236420AbiADS53 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 4 Jan 2022 13:57:29 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:53752 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235913AbiADS52 (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 4 Jan 2022 13:57:28 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1641322648;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=J5/oRp09czNHRuOEhgWyRyTW+iAZaeWjdUNct+kTpW0=;
+        b=PUpTl2EBGegppAYgWpCAkz1vPRNHzwNZ86TSIokMSbP4sMhVjjq4P67ahJmGFtaiCaMOKu
+        kzVdHkSJhaP/AjkNcTeS7vL6kzRU2KcU/EiKBtn1ez69k58qo2VQHjIIVWcMhrgw/RHKPi
+        zgLLq/jQDNlptCher6KUGdhD81eZyHM=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-378-LuPX_IZuNzmk7teDNCpzkQ-1; Tue, 04 Jan 2022 13:57:25 -0500
+X-MC-Unique: LuPX_IZuNzmk7teDNCpzkQ-1
+Received: by mail-qv1-f69.google.com with SMTP id kd7-20020a056214400700b0041195fd2977so27177669qvb.5
+        for <linux-wpan@vger.kernel.org>; Tue, 04 Jan 2022 10:57:24 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=kOvNpEQcBPJr05GLCmJ/AWrJaYJ4SSJmOSNygEHkrtE=;
-        b=1mheMO1K8UA0kJOaCzo22s7CM6OSfGTrU0cFs0FtU2BlM2Zy6SL9hqepxQUxQZi48Y
-         ne04e/ZteEjyGgZvzYpJrvRa7bg5zYUrWgd4EHj+kzberrzeQb33K02pMxfMCjUb3g//
-         9rXXbviIuaLcYA5F0gWg6XIFANlZI1NERI6arE76UYqEzKeraEG1bSlqtWkYz8yXhwYA
-         jP141MyGAhT/zKIeDuQGhoP/wMBMZI8izzOtQbqLuLU0I1f9GuCUPSdb+fErIecK5yYS
-         dRPMQCoOaAKyjJ0ue6MvZmUhet0hw+pCquINOdqH/L8sX98Zc33Jxu4/FnrbZSkKWElR
-         S0ew==
-X-Gm-Message-State: AOAM531+5BGnuCBLaRGmPveekbvSoTOJC0HcXIi+g1RUBkYFdtyzVHhe
-        TzTsdOA2/N5oTZoJ+seYEyE=
-X-Google-Smtp-Source: ABdhPJxUNOd+tte3KsNMLGZDZlP5K6G9WefrsczD8MfLDc4KrwRIcd7qMIUF9Qn6S8JuJZdf6GXKlQ==
-X-Received: by 2002:a05:6512:2116:: with SMTP id q22mr44591832lfr.258.1641320895886;
-        Tue, 04 Jan 2022 10:28:15 -0800 (PST)
-Received: from localhost.localdomain ([94.103.235.38])
-        by smtp.gmail.com with ESMTPSA id o5sm3916843lfk.162.2022.01.04.10.28.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Jan 2022 10:28:15 -0800 (PST)
-From:   Pavel Skripkin <paskripkin@gmail.com>
-To:     stefan@datenfreihafen.org, alex.aring@gmail.com,
-        davem@davemloft.net, kuba@kernel.org, linux-wpan@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Pavel Skripkin <paskripkin@gmail.com>,
-        Alexander Potapenko <glider@google.com>,
-        Alexander Aring <aahringo@redhat.com>
-Subject: [PATCH v3] ieee802154: atusb: fix uninit value in atusb_set_extended_addr
-Date:   Tue,  4 Jan 2022 21:28:06 +0300
-Message-Id: <20220104182806.7188-1-paskripkin@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <e8e73fcc-b902-4972-6001-84671361146d@datenfreihafen.org>
-References: <e8e73fcc-b902-4972-6001-84671361146d@datenfreihafen.org>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=J5/oRp09czNHRuOEhgWyRyTW+iAZaeWjdUNct+kTpW0=;
+        b=jap2UU2tn53s6asJUfjdU16//NVj+t8cHh+RO+g/LrVrVfeidiMsD29/961TCIhZu4
+         93dkbIva9QtXMe7j+r8aDsWS8L8T4+3n6H+XIR7CJvAPBweimaFtNLniVYtvxls3TfT6
+         yv6Z6smL0QqLzmKUBZeMPa9fX6floR6SVyPSWVMLhea+YwOTTrkzvEY/e5ei3ZJuDLn7
+         jIYVxWbpn3a2HYXbxh4Qi8gRuGeStB7CTEvDTTPaVqMEsIPoocc/MKQTi3yvZZowPOcF
+         8PsX6dfcBCFFei2sm12Qj9dD0rI738jujGMOKlnW++UFxXtA3nIrb3Z22IFB4WTUWZ1t
+         235g==
+X-Gm-Message-State: AOAM530ThpKMWWqs8T/peb2QlMNkync/fZfX46IrmjdUUJ5GVpo0pMTD
+        qBhuW7SIXdAPWGoHxjFqYxrL9N4GmMLkqCl7RlYmyGymYBmEdqoKDGALIPNeEdcaJPMuVO670dr
+        eqwGM0YQBT+mzedkEkiV+0L4BCVWpDV3SPU4qUw==
+X-Received: by 2002:ac8:4a0e:: with SMTP id x14mr46061152qtq.345.1641322644543;
+        Tue, 04 Jan 2022 10:57:24 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzY5Jb8OM0ChHLxAtBitQbRhduI6iTYF7RWU97ZON70BVaBcUtDPP4ln05Ykg45Jk6Z3AEJnPL9BvW00sROAkI=
+X-Received: by 2002:ac8:4a0e:: with SMTP id x14mr46061135qtq.345.1641322644295;
+ Tue, 04 Jan 2022 10:57:24 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <e8e73fcc-b902-4972-6001-84671361146d@datenfreihafen.org> <20220104182806.7188-1-paskripkin@gmail.com>
+In-Reply-To: <20220104182806.7188-1-paskripkin@gmail.com>
+From:   Alexander Aring <aahringo@redhat.com>
+Date:   Tue, 4 Jan 2022 13:57:13 -0500
+Message-ID: <CAK-6q+jkQqZ-Mog2Bwq2EGWFYv-vYtSYRJMqJUARm=C+Cd+uRA@mail.gmail.com>
+Subject: Re: [PATCH v3] ieee802154: atusb: fix uninit value in atusb_set_extended_addr
+To:     Pavel Skripkin <paskripkin@gmail.com>
+Cc:     stefan@datenfreihafen.org, alex.aring@gmail.com,
+        davem@davemloft.net, Jakub Kicinski <kuba@kernel.org>,
+        linux-wpan@vger.kernel.org,
+        Network Development <netdev@vger.kernel.org>,
+        linux-kernel@vger.kernel.org,
+        Alexander Potapenko <glider@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Alexander reported a use of uninitialized value in
-atusb_set_extended_addr(), that is caused by reading 0 bytes via
-usb_control_msg().
+Hi,
 
-Fix it by validating if the number of bytes transferred is actually
-correct, since usb_control_msg() may read less bytes, than was requested
-by caller.
+On Tue, Jan 4, 2022 at 1:28 PM Pavel Skripkin <paskripkin@gmail.com> wrote:
+>
+> Alexander reported a use of uninitialized value in
+> atusb_set_extended_addr(), that is caused by reading 0 bytes via
+> usb_control_msg().
+>
+> Fix it by validating if the number of bytes transferred is actually
+> correct, since usb_control_msg() may read less bytes, than was requested
+> by caller.
+>
+> Fail log:
+>
+> BUG: KASAN: uninit-cmp in ieee802154_is_valid_extended_unicast_addr include/linux/ieee802154.h:310 [inline]
+> BUG: KASAN: uninit-cmp in atusb_set_extended_addr drivers/net/ieee802154/atusb.c:1000 [inline]
+> BUG: KASAN: uninit-cmp in atusb_probe.cold+0x29f/0x14db drivers/net/ieee802154/atusb.c:1056
+> Uninit value used in comparison: 311daa649a2003bd stack handle: 000000009a2003bd
+>  ieee802154_is_valid_extended_unicast_addr include/linux/ieee802154.h:310 [inline]
+>  atusb_set_extended_addr drivers/net/ieee802154/atusb.c:1000 [inline]
+>  atusb_probe.cold+0x29f/0x14db drivers/net/ieee802154/atusb.c:1056
+>  usb_probe_interface+0x314/0x7f0 drivers/usb/core/driver.c:396
+>
+> Fixes: 7490b008d123 ("ieee802154: add support for atusb transceiver")
+> Reported-by: Alexander Potapenko <glider@google.com>
+> Acked-by: Alexander Aring <aahringo@redhat.com>
+> Signed-off-by: Pavel Skripkin <paskripkin@gmail.com>
+> ---
+>
+> Changes in v3:
+>         - Changed atusb_control_msg() to usb_control_msg() in
+>           atusb_get_and_show_build(), since request there may read various length
+>           data
+>
 
-Fail log:
+Thanks for catching this.
 
-BUG: KASAN: uninit-cmp in ieee802154_is_valid_extended_unicast_addr include/linux/ieee802154.h:310 [inline]
-BUG: KASAN: uninit-cmp in atusb_set_extended_addr drivers/net/ieee802154/atusb.c:1000 [inline]
-BUG: KASAN: uninit-cmp in atusb_probe.cold+0x29f/0x14db drivers/net/ieee802154/atusb.c:1056
-Uninit value used in comparison: 311daa649a2003bd stack handle: 000000009a2003bd
- ieee802154_is_valid_extended_unicast_addr include/linux/ieee802154.h:310 [inline]
- atusb_set_extended_addr drivers/net/ieee802154/atusb.c:1000 [inline]
- atusb_probe.cold+0x29f/0x14db drivers/net/ieee802154/atusb.c:1056
- usb_probe_interface+0x314/0x7f0 drivers/usb/core/driver.c:396
-
-Fixes: 7490b008d123 ("ieee802154: add support for atusb transceiver")
-Reported-by: Alexander Potapenko <glider@google.com>
-Acked-by: Alexander Aring <aahringo@redhat.com>
-Signed-off-by: Pavel Skripkin <paskripkin@gmail.com>
----
-
-Changes in v3:
-	- Changed atusb_control_msg() to usb_control_msg() in
-	  atusb_get_and_show_build(), since request there may read various length
-	  data
-
-Changes in v2:
-	- Reworked fix approach, since moving to new USB API is not
-	  suitable for backporting to stable kernels
-
----
- drivers/net/ieee802154/atusb.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/net/ieee802154/atusb.c b/drivers/net/ieee802154/atusb.c
-index 23ee0b14cbfa..2f5e7b31032a 100644
---- a/drivers/net/ieee802154/atusb.c
-+++ b/drivers/net/ieee802154/atusb.c
-@@ -93,7 +93,9 @@ static int atusb_control_msg(struct atusb *atusb, unsigned int pipe,
- 
- 	ret = usb_control_msg(usb_dev, pipe, request, requesttype,
- 			      value, index, data, size, timeout);
--	if (ret < 0) {
-+	if (ret < size) {
-+		ret = ret < 0 ? ret : -ENODATA;
-+
- 		atusb->err = ret;
- 		dev_err(&usb_dev->dev,
- 			"%s: req 0x%02x val 0x%x idx 0x%x, error %d\n",
-@@ -861,9 +863,9 @@ static int atusb_get_and_show_build(struct atusb *atusb)
- 	if (!build)
- 		return -ENOMEM;
- 
--	ret = atusb_control_msg(atusb, usb_rcvctrlpipe(usb_dev, 0),
--				ATUSB_BUILD, ATUSB_REQ_FROM_DEV, 0, 0,
--				build, ATUSB_BUILD_SIZE, 1000);
-+	/* We cannot call atusb_control_msg() here, since this request may read various length data */
-+	ret = usb_control_msg(atusb->usb_dev, usb_rcvctrlpipe(usb_dev, 0), ATUSB_BUILD,
-+			      ATUSB_REQ_FROM_DEV, 0, 0, build, ATUSB_BUILD_SIZE, 1000);
- 	if (ret >= 0) {
- 		build[ret] = 0;
- 		dev_info(&usb_dev->dev, "Firmware: build %s\n", build);
--- 
-2.34.1
+- Alex
 
