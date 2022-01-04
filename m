@@ -2,35 +2,38 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4AE4C433F5
-	for <linux-wpan@archiver.kernel.org>; Tue,  4 Jan 2022 10:17:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AD14C433EF
+	for <linux-wpan@archiver.kernel.org>; Tue,  4 Jan 2022 14:41:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231147AbiADKRw convert rfc822-to-8bit (ORCPT
+        id S234308AbiADOl4 convert rfc822-to-8bit (ORCPT
         <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 4 Jan 2022 05:17:52 -0500
-Received: from relay12.mail.gandi.net ([217.70.178.232]:44897 "EHLO
-        relay12.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230208AbiADKRv (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 4 Jan 2022 05:17:51 -0500
+        Tue, 4 Jan 2022 09:41:56 -0500
+Received: from relay10.mail.gandi.net ([217.70.178.230]:55833 "EHLO
+        relay10.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234240AbiADOl4 (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 4 Jan 2022 09:41:56 -0500
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by relay12.mail.gandi.net (Postfix) with ESMTPSA id B22BE20000A;
-        Tue,  4 Jan 2022 10:17:49 +0000 (UTC)
-Date:   Tue, 4 Jan 2022 11:17:48 +0100
+        by relay10.mail.gandi.net (Postfix) with ESMTPSA id 3FDDF24000C;
+        Tue,  4 Jan 2022 14:41:53 +0000 (UTC)
+Date:   Tue, 4 Jan 2022 15:41:51 +0100
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
-To:     Alexander Aring <alex.aring@gmail.com>
-Cc:     Stefan Schmidt <stefan@datenfreihafen.org>,
-        linux-wpan - ML <linux-wpan@vger.kernel.org>,
+To:     Jakub Kicinski <kuba@kernel.org>
+Cc:     "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
+        Alexander Aring <alex.aring@gmail.com>,
+        Stefan Schmidt <stefan@datenfreihafen.org>,
+        linux-wpan@vger.kernel.org,
         David Girault <david.girault@qorvo.com>,
         Romuald Despres <romuald.despres@qorvo.com>,
         Frederic Blain <frederic.blain@qorvo.com>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
-Subject: Re: [wpan-tools 6/7] iwpan: Add full scan support
-Message-ID: <20220104111748.5a4f99de@xps13>
-In-Reply-To: <CAB_54W5Nhhmz2paJ+RjscqFqHo1kZJf-3NPiGP8PAjWGjhecqA@mail.gmail.com>
-References: <20211222155816.256405-1-miquel.raynal@bootlin.com>
-        <20211222155816.256405-7-miquel.raynal@bootlin.com>
-        <CAB_54W5Nhhmz2paJ+RjscqFqHo1kZJf-3NPiGP8PAjWGjhecqA@mail.gmail.com>
+        <linux-kernel@vger.kernel.org>
+Subject: Re: [net-next 08/18] net: ieee802154: Add support for internal PAN
+ management
+Message-ID: <20220104154151.0d592bff@xps13>
+In-Reply-To: <20211222125555.576e60b3@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
+References: <20211222155743.256280-1-miquel.raynal@bootlin.com>
+        <20211222155743.256280-9-miquel.raynal@bootlin.com>
+        <20211222125555.576e60b3@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
 Organization: Bootlin
 X-Mailer: Claws Mail 3.17.7 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
@@ -40,41 +43,29 @@ Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi Alexander,
+Hi Jakub,
 
-alex.aring@gmail.com wrote on Wed, 22 Dec 2021 12:19:36 -0500:
+kuba@kernel.org wrote on Wed, 22 Dec 2021 12:55:55 -0800:
 
-> Hi,
+> On Wed, 22 Dec 2021 16:57:33 +0100 Miquel Raynal wrote:
+> > +/* Maximum number of PAN entries to store */
+> > +static int max_pan_entries = 100;
+> > +module_param(max_pan_entries, uint, 0644);
+> > +MODULE_PARM_DESC(max_pan_entries,
+> > +		 "Maximum number of PANs to discover per scan (default is 100)");
+> > +
+> > +static int pan_expiration = 60;
+> > +module_param(pan_expiration, uint, 0644);
+> > +MODULE_PARM_DESC(pan_expiration,
+> > +		 "Expiration of the scan validity in seconds (default is 60s)");  
 > 
-> I did a quick overlook of those patches and I am very happy to see
-> such patches and I will try them out in the next few days! Thanks.
+> Can these be per-device control knobs? Module params are rarely the
+> best answer.
 
-Sure, thanks for the feedback all along this series, I'll try to
-discuss and address all the points you raised.
-
-> On Wed, 22 Dec 2021 at 10:58, Miquel Raynal <miquel.raynal@bootlin.com> wrote:
-> >
-> > From: David Girault <david.girault@qorvo.com>
-> >
-> > Bring support for different scanning operations, such as starting or
-> > aborting a scan operation with a given configuration, dumping the list
-> > of discovered PANs, and flushing the list.
-> >
-> > It also brings support for a couple of semi-debug features, such as a
-> > manual beacon request to ask sending or stopping beacons out of a
-> > particular interface. This is particularly useful when trying to
-> > validate the scanning support without proper hardware.
-> >
-> > Signed-off-by: David Girault <david.girault@qorvo.com>
-> > Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
-> > ---
-> >  DEST/usr/local/bin/iwpan      | Bin 0 -> 178448 bytes
-> >  DEST/usr/local/bin/wpan-hwsim | Bin 0 -> 45056 bytes
-> >  DEST/usr/local/bin/wpan-ping  | Bin 0 -> 47840 bytes  
-> 
-> I think those binaries were added by accident, or?
-
-Oops! Of course I'll drop them all.
+I believe we can do that on a per FFD device basis (for now it will be
+on a per-device basis, but later when we will have the necessary
+information we might do something more fine grained). Would a couple of
+sysfs entries work?
 
 Thanks,
 Miquèl
