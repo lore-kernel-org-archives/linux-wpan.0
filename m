@@ -2,140 +2,79 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 270E4C433F5
-	for <linux-wpan@archiver.kernel.org>; Mon,  3 Jan 2022 15:35:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4AE4C433F5
+	for <linux-wpan@archiver.kernel.org>; Tue,  4 Jan 2022 10:17:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232654AbiACPfR (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 3 Jan 2022 10:35:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55442 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232579AbiACPfQ (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 3 Jan 2022 10:35:16 -0500
-Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95092C061761;
-        Mon,  3 Jan 2022 07:35:15 -0800 (PST)
-Received: by mail-wr1-x432.google.com with SMTP id t26so70585757wrb.4;
-        Mon, 03 Jan 2022 07:35:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=fwoh/wxpLCTrTZD3q7z2iU1EBbvcdilR8NQ1crz+Dak=;
-        b=FbSoY90AKEGYS7Bgpb3nuWnfa68L5JDl8Dj2rJnG7iw4CiY1Qitu+Z/fzhtAS5OMO/
-         hO68KW+RPZ+udHaAw1v4p7uOqE1USPbUzeURv7C2Q4nnLlGYLAt3ZsTbKlrnFPEgxrF9
-         UsHnEjhAZoSIxa1a4GMAjKQpzhbXQbfv7Lf0CV6RUuPlr/X4WOUahygScAfGQpf3j38W
-         wrd/0ioJJjBCqiZTb+6frG7j5PhE37ugu1MaDCmaApvbRcX1FRD/m7OPv0nlWL3md2WD
-         87Ys1771Dq3yQrz/uf0pxEbfUO0po0e6S0JrGdpkclzM4vSmhic/5p697yWi/bPXwPrJ
-         8ftA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=fwoh/wxpLCTrTZD3q7z2iU1EBbvcdilR8NQ1crz+Dak=;
-        b=KNt6u9P2ZdzuQvqT9O6K0ePVlHhFFg4A8TrUzS07dUZPVvKfdaAr9w9xuP/vyNmSbD
-         P2fnmiZpcWvhRPqWr3251hkDTVU+CsoM9WlTXiOzhzdbOg93losZVsChhs6AsdZUDSCD
-         H8cxEHdPjLrj02szxOuI26KvQSvhfv8f22Jm1EJVi8/JR79+M1gf21akX6wDJzeC09ih
-         QEI6eK6XWpCo9WII+AmLEStsAJrRE73ebPxZax8D5IsC/XIBGnuE+jIoBBtRT/AcDlkM
-         JTq+s3xJDm0qNULIa2W7gujW+POcoV5vZsV5R5kXgQ9cIV9Y5I7Fmhiy9abOU0W2pV1y
-         H2hw==
-X-Gm-Message-State: AOAM533VZ5AezecNQHR0qc3vbVQhmKZShHSi/9HQPFwv+U9D41gAxonF
-        FfKXDf+vxQ2yI0dQtKxM8QtAkOyBQnVqQtRoaEo=
-X-Google-Smtp-Source: ABdhPJyfYR5Tgej1+JbfKke6k6aFWArD0MekU/04WhRD9OHXM6/dib5ggFdNePgFDDRJu1kABOsT7XoAjKW/ssWe5jM=
-X-Received: by 2002:a05:6000:186e:: with SMTP id d14mr40390261wri.205.1641224114204;
- Mon, 03 Jan 2022 07:35:14 -0800 (PST)
-MIME-Version: 1.0
-References: <CAG_fn=VDEoQx5c7XzWX1yaYBd5y5FrG1aagrkv+SZ03c8TfQYQ@mail.gmail.com>
- <20220102171943.28846-1-paskripkin@gmail.com> <YdL0GPxy4TdGDzOO@kroah.com>
-In-Reply-To: <YdL0GPxy4TdGDzOO@kroah.com>
-From:   Alexander Aring <alex.aring@gmail.com>
-Date:   Mon, 3 Jan 2022 10:35:03 -0500
-Message-ID: <CAB_54W7HQmm1ncCEsTmZFR+GVf6p6Vz0RMWDJXAhXQcW4r3hUQ@mail.gmail.com>
-Subject: Re: [PATCH RFT] ieee802154: atusb: move to new USB API
-To:     Greg KH <greg@kroah.com>
-Cc:     Pavel Skripkin <paskripkin@gmail.com>,
-        Stefan Schmidt <stefan@datenfreihafen.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
+        id S231147AbiADKRw convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 4 Jan 2022 05:17:52 -0500
+Received: from relay12.mail.gandi.net ([217.70.178.232]:44897 "EHLO
+        relay12.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230208AbiADKRv (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 4 Jan 2022 05:17:51 -0500
+Received: (Authenticated sender: miquel.raynal@bootlin.com)
+        by relay12.mail.gandi.net (Postfix) with ESMTPSA id B22BE20000A;
+        Tue,  4 Jan 2022 10:17:49 +0000 (UTC)
+Date:   Tue, 4 Jan 2022 11:17:48 +0100
+From:   Miquel Raynal <miquel.raynal@bootlin.com>
+To:     Alexander Aring <alex.aring@gmail.com>
+Cc:     Stefan Schmidt <stefan@datenfreihafen.org>,
         linux-wpan - ML <linux-wpan@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-        kernel list <linux-kernel@vger.kernel.org>,
-        "# 3.19.x" <stable@vger.kernel.org>,
-        Alexander Potapenko <glider@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        David Girault <david.girault@qorvo.com>,
+        Romuald Despres <romuald.despres@qorvo.com>,
+        Frederic Blain <frederic.blain@qorvo.com>,
+        Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
+Subject: Re: [wpan-tools 6/7] iwpan: Add full scan support
+Message-ID: <20220104111748.5a4f99de@xps13>
+In-Reply-To: <CAB_54W5Nhhmz2paJ+RjscqFqHo1kZJf-3NPiGP8PAjWGjhecqA@mail.gmail.com>
+References: <20211222155816.256405-1-miquel.raynal@bootlin.com>
+        <20211222155816.256405-7-miquel.raynal@bootlin.com>
+        <CAB_54W5Nhhmz2paJ+RjscqFqHo1kZJf-3NPiGP8PAjWGjhecqA@mail.gmail.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 3.17.7 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi,
+Hi Alexander,
 
-On Mon, 3 Jan 2022 at 08:03, Greg KH <greg@kroah.com> wrote:
->
-> On Sun, Jan 02, 2022 at 08:19:43PM +0300, Pavel Skripkin wrote:
-> > Alexander reported a use of uninitialized value in
-> > atusb_set_extended_addr(), that is caused by reading 0 bytes via
-> > usb_control_msg().
+alex.aring@gmail.com wrote on Wed, 22 Dec 2021 12:19:36 -0500:
+
+> Hi,
+> 
+> I did a quick overlook of those patches and I am very happy to see
+> such patches and I will try them out in the next few days! Thanks.
+
+Sure, thanks for the feedback all along this series, I'll try to
+discuss and address all the points you raised.
+
+> On Wed, 22 Dec 2021 at 10:58, Miquel Raynal <miquel.raynal@bootlin.com> wrote:
 > >
-> > Since there is an API, that cannot read less bytes, than was requested,
-> > let's move atusb driver to use it. It will fix all potintial bugs with
-> > uninit values and make code more modern
+> > From: David Girault <david.girault@qorvo.com>
 > >
-> > Fail log:
+> > Bring support for different scanning operations, such as starting or
+> > aborting a scan operation with a given configuration, dumping the list
+> > of discovered PANs, and flushing the list.
 > >
-> > BUG: KASAN: uninit-cmp in ieee802154_is_valid_extended_unicast_addr include/linux/ieee802154.h:310 [inline]
-> > BUG: KASAN: uninit-cmp in atusb_set_extended_addr drivers/net/ieee802154/atusb.c:1000 [inline]
-> > BUG: KASAN: uninit-cmp in atusb_probe.cold+0x29f/0x14db drivers/net/ieee802154/atusb.c:1056
-> > Uninit value used in comparison: 311daa649a2003bd stack handle: 000000009a2003bd
-> >  ieee802154_is_valid_extended_unicast_addr include/linux/ieee802154.h:310 [inline]
-> >  atusb_set_extended_addr drivers/net/ieee802154/atusb.c:1000 [inline]
-> >  atusb_probe.cold+0x29f/0x14db drivers/net/ieee802154/atusb.c:1056
-> >  usb_probe_interface+0x314/0x7f0 drivers/usb/core/driver.c:396
+> > It also brings support for a couple of semi-debug features, such as a
+> > manual beacon request to ask sending or stopping beacons out of a
+> > particular interface. This is particularly useful when trying to
+> > validate the scanning support without proper hardware.
 > >
-> > Fixes: 7490b008d123 ("ieee802154: add support for atusb transceiver")
-> > Cc: stable@vger.kernel.org # 5.9
-> > Reported-by: Alexander Potapenko <glider@google.com>
-> > Signed-off-by: Pavel Skripkin <paskripkin@gmail.com>
+> > Signed-off-by: David Girault <david.girault@qorvo.com>
+> > Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
 > > ---
-> >  drivers/net/ieee802154/atusb.c | 61 +++++++++++++++++++++-------------
-> >  1 file changed, 38 insertions(+), 23 deletions(-)
-> >
-> > diff --git a/drivers/net/ieee802154/atusb.c b/drivers/net/ieee802154/atusb.c
-> > index 23ee0b14cbfa..43befea0110f 100644
-> > --- a/drivers/net/ieee802154/atusb.c
-> > +++ b/drivers/net/ieee802154/atusb.c
-> > @@ -80,10 +80,9 @@ struct atusb_chip_data {
-> >   * in atusb->err and reject all subsequent requests until the error is cleared.
-> >   */
-> >
-> > -static int atusb_control_msg(struct atusb *atusb, unsigned int pipe,
-> > -                          __u8 request, __u8 requesttype,
-> > -                          __u16 value, __u16 index,
-> > -                          void *data, __u16 size, int timeout)
-> > +static int atusb_control_msg_recv(struct atusb *atusb, __u8 request, __u8 requesttype,
-> > +                               __u16 value, __u16 index,
-> > +                               void *data, __u16 size, int timeout)
->
-> Why do you need a wrapper function at all?  Why not just call the real
-> usb functions instead?
->
+> >  DEST/usr/local/bin/iwpan      | Bin 0 -> 178448 bytes
+> >  DEST/usr/local/bin/wpan-hwsim | Bin 0 -> 45056 bytes
+> >  DEST/usr/local/bin/wpan-ping  | Bin 0 -> 47840 bytes  
+> 
+> I think those binaries were added by accident, or?
 
-This driver has a lot of history, there is a comment which states:
+Oops! Of course I'll drop them all.
 
-"To reduce the number of error checks in the code, we record the first
-error in atusb->err and reject all subsequent requests until the error
-is cleared."
-
-I think in the early state of this driver (as it was acting more as an
-USB<->SPI bridge) there was a lot of state handling involved. Nowadays
-we have a lot of such handling inside the device firmware (which is
-btw. open source). This might be not an excuse but an explanation why
-it was introduced in such a way.
-
-...
->
-> I would recommend just moving to use the real USB functions and no
-> wrapper function at all like this, it will make things more obvious and
-> easier to understand over time.
-
-okay.
-
-- Alex
+Thanks,
+Miquèl
