@@ -2,123 +2,143 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BE82C433EF
-	for <linux-wpan@archiver.kernel.org>; Tue,  4 Jan 2022 15:44:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6ECF7C433F5
+	for <linux-wpan@archiver.kernel.org>; Tue,  4 Jan 2022 15:49:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234965AbiADPoz convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 4 Jan 2022 10:44:55 -0500
-Received: from relay4-d.mail.gandi.net ([217.70.183.196]:38821 "EHLO
-        relay4-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234929AbiADPoy (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 4 Jan 2022 10:44:54 -0500
-Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by relay4-d.mail.gandi.net (Postfix) with ESMTPSA id BE972E0005;
-        Tue,  4 Jan 2022 15:44:50 +0000 (UTC)
-Date:   Tue, 4 Jan 2022 16:44:49 +0100
-From:   Miquel Raynal <miquel.raynal@bootlin.com>
-To:     Alexander Aring <alex.aring@gmail.com>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-        Stefan Schmidt <stefan@datenfreihafen.org>,
-        linux-wpan - ML <linux-wpan@vger.kernel.org>,
-        David Girault <david.girault@qorvo.com>,
-        Romuald Despres <romuald.despres@qorvo.com>,
-        Frederic Blain <frederic.blain@qorvo.com>,
-        Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-        kernel list <linux-kernel@vger.kernel.org>
-Subject: Re: [net-next 01/18] ieee802154: hwsim: Ensure proper channel
- selection at probe time
-Message-ID: <20220104164449.1179bfc7@xps13>
-In-Reply-To: <CAB_54W7BeSA+2GVzb9Yvz1kj12wkRSqHj9Ybr8cK7oYd7804RQ@mail.gmail.com>
-References: <20211222155743.256280-1-miquel.raynal@bootlin.com>
-        <20211222155743.256280-2-miquel.raynal@bootlin.com>
-        <CAB_54W7BeSA+2GVzb9Yvz1kj12wkRSqHj9Ybr8cK7oYd7804RQ@mail.gmail.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 3.17.7 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+        id S230407AbiADPtH (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 4 Jan 2022 10:49:07 -0500
+Received: from proxima.lasnet.de ([78.47.171.185]:52038 "EHLO
+        proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230352AbiADPtG (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 4 Jan 2022 10:49:06 -0500
+X-Greylist: delayed 501 seconds by postgrey-1.27 at vger.kernel.org; Tue, 04 Jan 2022 10:49:06 EST
+Received: from [IPV6:2003:e9:d728:ec47:4b31:73e4:34c5:505a] (p200300e9d728ec474b3173e434c5505a.dip0.t-ipconnect.de [IPv6:2003:e9:d728:ec47:4b31:73e4:34c5:505a])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: stefan@datenfreihafen.org)
+        by proxima.lasnet.de (Postfix) with ESMTPSA id 120EAC055C;
+        Tue,  4 Jan 2022 16:40:43 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
+        s=2021; t=1641310843;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=fzrSYWdpug8dV2D+vjEBY0DdwVSV7UgruGe2VxZhMYQ=;
+        b=wMtj+/+SQEzNvk7geCsi6F8u7AI0xwhhl98uuCWCZNgKfj6mugjmItNNOXweG1ESnJYKvv
+        1Xjpl9tjKW0IPX9xK5g/1C+TQM9blc0CxuUUqyhC5Q6G6OcW0s1Pt0Mj2WygkrGqz18Twk
+        H6OdYiPDZQTLzBd1Bq7ZVEP2gNpb5eexDji955LofwwI3j35/HloYjyUnoFaq7OgYSSCs6
+        ciYVNffIlOiuWFPj44xtDZIrE4LUBH/UyYTfUWZUPy2vmE9UESYZobGM0B6fgai+/TGGWs
+        JuR7TOHx22BlMHDf5G9fYwVGwNv+MvKy5CwqK6dsTsxFvhwkROqtxqRBBVwBpA==
+Message-ID: <ed39cbe6-0885-a3ab-fc30-7c292e1acc53@datenfreihafen.org>
+Date:   Tue, 4 Jan 2022 16:40:41 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.0
+Subject: Re: [PATCH v2] ieee802154: atusb: fix uninit value in
+ atusb_set_extended_addr
+Content-Language: en-US
+To:     Pavel Skripkin <paskripkin@gmail.com>, alex.aring@gmail.com,
+        davem@davemloft.net, kuba@kernel.org
+Cc:     linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Alexander Potapenko <glider@google.com>
+References: <CAB_54W50xKFCWZ5vYuDG2p4ijpd63cSutRrV4MLs9oasLmKgzQ@mail.gmail.com>
+ <20220103120925.25207-1-paskripkin@gmail.com>
+From:   Stefan Schmidt <stefan@datenfreihafen.org>
+In-Reply-To: <20220103120925.25207-1-paskripkin@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi Alexander,
+Hello.
 
-alex.aring@gmail.com wrote on Tue, 28 Dec 2021 16:05:43 -0500:
-
-> Hi,
+On 03.01.22 13:09, Pavel Skripkin wrote:
+> Alexander reported a use of uninitialized value in
+> atusb_set_extended_addr(), that is caused by reading 0 bytes via
+> usb_control_msg().
 > 
-> On Wed, 22 Dec 2021 at 10:57, Miquel Raynal <miquel.raynal@bootlin.com> wrote:
-> >
-> > A default channel is selected by default (13), let's clarify that this
-> > is page 0 channel 13. Call the right helper to ensure the necessary
-> > configuration for this channel has been applied.
-> >
-> > So far there is very little configuration done in this helper but we
-> > will soon add more information (like the symbol duration which is
-> > missing) and having this helper called at probe time will prevent us to
-> > this type of initialization at two different locations.
-> >  
+> Fix it by validating if the number of bytes transferred is actually
+> correct, since usb_control_msg() may read less bytes, than was requested
+> by caller.
 > 
-> I see why this patch is necessary because in later patches the symbol
-> duration is set at ".set_channel()" callback like the at86rf230 driver
-> is doing it.
-> However there is an old TODO [0]. I think we should combine it and
-> implement it in ieee802154_set_channel() of "net/mac802154/cfg.c".
-> Also do the symbol duration setting according to the channel/page when
-> we call ieee802154_register_hw(), so we have it for the default
-> settings.
-
-While I totally agree on the background idea, I don't really see how
-this is possible. Every driver internally knows what it supports but
-AFAIU the core itself has no easy and standard access to it?
-
-Another question that I have: is the protocol and center frequency
-enough to always derive the symbol rate? I am not sure this is correct,
-but I thought not all symbol rates could be derived, like for example
-certain UWB PHY protocols which can use different PRF on a single
-channel which has an effect on the symbol duration?
-
-> > So far there is very little configuration done in this helper but thanks
-> > to this improvement, future enhancements in this area (like setting a
-> > symbol duration, which is missing) will be reflected automatically in
-> > the default probe state.
-> >
-> > Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
-> > ---
-> >  drivers/net/ieee802154/mac802154_hwsim.c | 7 +++++--
-> >  1 file changed, 5 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/drivers/net/ieee802154/mac802154_hwsim.c b/drivers/net/ieee802154/mac802154_hwsim.c
-> > index 62ced7a30d92..b1a4ee7dceda 100644
-> > --- a/drivers/net/ieee802154/mac802154_hwsim.c
-> > +++ b/drivers/net/ieee802154/mac802154_hwsim.c
-> > @@ -778,8 +778,6 @@ static int hwsim_add_one(struct genl_info *info, struct device *dev,
-> >
-> >         ieee802154_random_extended_addr(&hw->phy->perm_extended_addr);
-> >
-> > -       /* hwsim phy channel 13 as default */
-> > -       hw->phy->current_channel = 13;
-> >         pib = kzalloc(sizeof(*pib), GFP_KERNEL);
-> >         if (!pib) {
-> >                 err = -ENOMEM;
-> > @@ -793,6 +791,11 @@ static int hwsim_add_one(struct genl_info *info, struct device *dev,
-> >         hw->flags = IEEE802154_HW_PROMISCUOUS | IEEE802154_HW_RX_DROP_BAD_CKSUM;  
+> Fail log:
 > 
-> sadly this patch doesn't apply on current net-next/master because
-> IEEE802154_HW_RX_DROP_BAD_CKSUM is not set.
-> I agree that it should be set, so we need a patch for it.
-
-Right, I just have a patch aside setting this to enforce beacons
-checksum were good. I can certainly set this flag officially.
-
+> BUG: KASAN: uninit-cmp in ieee802154_is_valid_extended_unicast_addr include/linux/ieee802154.h:310 [inline]
+> BUG: KASAN: uninit-cmp in atusb_set_extended_addr drivers/net/ieee802154/atusb.c:1000 [inline]
+> BUG: KASAN: uninit-cmp in atusb_probe.cold+0x29f/0x14db drivers/net/ieee802154/atusb.c:1056
+> Uninit value used in comparison: 311daa649a2003bd stack handle: 000000009a2003bd
+>   ieee802154_is_valid_extended_unicast_addr include/linux/ieee802154.h:310 [inline]
+>   atusb_set_extended_addr drivers/net/ieee802154/atusb.c:1000 [inline]
+>   atusb_probe.cold+0x29f/0x14db drivers/net/ieee802154/atusb.c:1056
+>   usb_probe_interface+0x314/0x7f0 drivers/usb/core/driver.c:396
 > 
-> - Alex
+> Fixes: 7490b008d123 ("ieee802154: add support for atusb transceiver")
+> Reported-by: Alexander Potapenko <glider@google.com>
+> Signed-off-by: Pavel Skripkin <paskripkin@gmail.com>
+> ---
 > 
-> [0] https://elixir.bootlin.com/linux/v5.16-rc7/source/drivers/net/ieee802154/at86rf230.c#L1059
+> Changes in v2:
+> 	- Reworked fix approach, since moving to new USB API is not
+> 	  suitable for backporting to stable kernels
+> 
+> ---
+>   drivers/net/ieee802154/atusb.c | 4 +++-
+>   1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ieee802154/atusb.c b/drivers/net/ieee802154/atusb.c
+> index 23ee0b14cbfa..e6cc816dd7a1 100644
+> --- a/drivers/net/ieee802154/atusb.c
+> +++ b/drivers/net/ieee802154/atusb.c
+> @@ -93,7 +93,9 @@ static int atusb_control_msg(struct atusb *atusb, unsigned int pipe,
+>   
+>   	ret = usb_control_msg(usb_dev, pipe, request, requesttype,
+>   			      value, index, data, size, timeout);
+> -	if (ret < 0) {
+> +	if (ret < size) {
+> +		ret = ret < 0 ? ret : -ENODATA;
+> +
+>   		atusb->err = ret;
+>   		dev_err(&usb_dev->dev,
+>   			"%s: req 0x%02x val 0x%x idx 0x%x, error %d\n",
+> 
+
+It compiles, but does not work on the real hardware.
+
+[    1.114698] usb 1-1: new full-speed USB device number 2 using uhci_hcd
+[    1.261691] usb 1-1: New USB device found, idVendor=20b7, 
+idProduct=1540, bcdDevice= 0.01
+[    1.263421] usb 1-1: New USB device strings: Mfr=0, Product=0, 
+SerialNumber=1
+[    1.264952] usb 1-1: SerialNumber: 4630333438371502231a
+[    1.278042] usb 1-1: ATUSB: AT86RF231 version 2
+[    1.281087] usb 1-1: Firmware: major: 0, minor: 3, hardware type: 
+ATUSB (2)
+[    1.285191] usb 1-1: atusb_control_msg: req 0x01 val 0x0 idx 0x0, 
+error -61
+[    1.286903] usb 1-1: failed to fetch extended address, random address set
+[    1.288757] usb 1-1: atusb_probe: initialization failed, error = -61
+[    1.290922] atusb: probe of 1-1:1.0 failed with error -61
 
 
-Thanks,
-Miquèl
+Without your patch it works as expected:
+
+[    1.091925] usb 1-1: new full-speed USB device number 2 using uhci_hcd
+[    1.237743] usb 1-1: New USB device found, idVendor=20b7, 
+idProduct=1540, bcdDevice= 0.01
+[    1.239788] usb 1-1: New USB device strings: Mfr=0, Product=0, 
+SerialNumber=1
+[    1.241432] usb 1-1: SerialNumber: 4630333438371502231a
+[    1.255012] usb 1-1: ATUSB: AT86RF231 version 2
+[    1.258073] usb 1-1: Firmware: major: 0, minor: 3, hardware type: 
+ATUSB (2)
+[    1.262170] usb 1-1: Firmware: build #132 Mo 28. Nov 16:20:35 CET 2016
+[    1.266195] usb 1-1: Read permanent extended address 
+10:e2:d5:ff:ff:00:02:e8 from device
+
+regards
+Stefan Schmidt
+
