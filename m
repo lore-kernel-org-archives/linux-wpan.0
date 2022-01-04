@@ -2,56 +2,57 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CA32C433EF
-	for <linux-wpan@archiver.kernel.org>; Tue,  4 Jan 2022 22:07:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 521E5C433EF
+	for <linux-wpan@archiver.kernel.org>; Tue,  4 Jan 2022 23:09:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235165AbiADWHk (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 4 Jan 2022 17:07:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47496 "EHLO
+        id S236081AbiADXI7 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 4 Jan 2022 18:08:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33284 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229984AbiADWHk (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 4 Jan 2022 17:07:40 -0500
-Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9218FC061761;
-        Tue,  4 Jan 2022 14:07:39 -0800 (PST)
-Received: by mail-wm1-x32f.google.com with SMTP id c66so24133037wma.5;
-        Tue, 04 Jan 2022 14:07:39 -0800 (PST)
+        with ESMTP id S235297AbiADXI7 (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 4 Jan 2022 18:08:59 -0500
+Received: from mail-wm1-x32a.google.com (mail-wm1-x32a.google.com [IPv6:2a00:1450:4864:20::32a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 344E1C061761;
+        Tue,  4 Jan 2022 15:08:59 -0800 (PST)
+Received: by mail-wm1-x32a.google.com with SMTP id p1-20020a1c7401000000b00345c2d068bdso638942wmc.3;
+        Tue, 04 Jan 2022 15:08:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=NUxH2ckJ+9UYa56DB+s+oA/xXtf+iVIO3XQNdFjXeTU=;
-        b=cdOfp3xvMsTmG0Z3oHOo0ubUk+yVTEqmyZUNfP2xV6D7AIV+ZxNrN67DOWahHftaaQ
-         sEt4nDtkQUdSFGBN+Moqlxzw9Jfuwar9PtzORB5XfMrGW6HMCFJWVGCb+REmbN/Lrsv6
-         bhucgcmFrAhZ1Rd4Ni8VWdzkXt11LcqkkBH8smZ/lgHdkhlFStKJ73zGyZ0sE5Te0J+H
-         uHdvCzD8iMoXZ23fCRax7FfnhJGg7JRKcYhXEcLJ0nntJDiIMYibZl/z9C9BH8vCKHQU
-         sOrrynedSUIGRvt9l7S+d8anyCUqdzg7RuOBis5Lsr7L/oECqZQYxH+MbZAE6d+OetKx
-         sxmw==
+        bh=kh8Gfm9+uyUN7wr5xX2KRQaXD7QaZKY7AK/XNvHYC3E=;
+        b=hZ6NJRccRCpO4CMIa3yzlhVLl0z63iFcwmvcFPbrifR+2TEYupPRZAk64v5tnDsGSg
+         hW1d8cse0R1802dRcEN4zjv93j+qP908LXcxlkfRpFTcVXwJ7Qxk3sGAxO/6ZikuMmf7
+         h5uLtH7IGByBpsPCm1QWSdxeTqwZJKlHQBQ6P3I70jHBTq3GnQbpqpCLzWF6PHv+x34w
+         zaUQBDs4uCx4ki2JvNBQCFabiTaPpmEN3023spR7Emf2SaigCnqdGJog6InJsOrhCbLP
+         TvT0wCgzn8Narm7MUDFRn3TdbIEur+DgjBYJA5V5qZjQ3Gt4GBhitW085KyJcO/shgMW
+         6vfg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=NUxH2ckJ+9UYa56DB+s+oA/xXtf+iVIO3XQNdFjXeTU=;
-        b=ve78D7gMLf+JXsVYg135pGdyPl/nHRFn/IJYAYJjFni5Vc09swq20IyzDWjTiIrMyE
-         4PU0ZzCuHGxmTqxKbvpHYaX2xlYo18t22P12e+nDs7NdS2dyvqDq2DdkR9LfFsAq5qkX
-         MC50p6ASoX+VwXKxMUUPYJuxDeuTnCzYU7zctCbsET106MK48JmNYdNwZ/cutFpLoJPI
-         Z91jUajCSNDYDhery4IsDZ1Rma4eqZUBb8mTuOX4cg0S7SLzcQWrc2F5NKSL/EZAFcGK
-         JLCNSpyepnRVa2u55k1fSfDP6UPwaKyb3CEkDokKbrfFjnQQ4Ild4PfhcLvNyGuYSZwD
-         Dqcw==
-X-Gm-Message-State: AOAM5320/e38ydoLKaRWMOQuN3PN5KvmZZVOLBOBAXLiFO65DTCkkh1n
-        Ml+J9DURMcFw79HVeMRBdSN9iTbgYqw4MOYTdntc7+RlOqk=
-X-Google-Smtp-Source: ABdhPJyz+lO4MkNtDWhNi3wTfYI0W0uymNlcQGAEVCS6Z9fUYvMQ8FLkVZxniKwE4Mhp5N+nBQ8mxNHvWPck0+/ia3w=
-X-Received: by 2002:a1c:ed01:: with SMTP id l1mr292300wmh.185.1641334057984;
- Tue, 04 Jan 2022 14:07:37 -0800 (PST)
+        bh=kh8Gfm9+uyUN7wr5xX2KRQaXD7QaZKY7AK/XNvHYC3E=;
+        b=MEglmiqze3fzShM3TjKxgOgLSYFeICmWCT/yFC+vrMZHruW5N/kQqOtXc/Rn2AtZbY
+         DgDV0NW0AdGurSsoDxG6TP7jAiOJfmjMAg1wLyK5/2ZB4k8qESp6M+1MJB++gMbtMa1i
+         pKW/IDdWmuPsLP8nNOZMvV7DKtGCMVcD7TTHOWri/CDBN9QmInxnGid1P6i39QFL09D8
+         1SpiqVyJj89Y3ssAftEAVXM1/JZ7ojxmBPi10Z+KCwCnpusDCyo0gVKgRb8SCSmib6Ji
+         /mwbjZaXGBttIEOpKwHSre3dn0kL6pgbW8qeENVgtC9eLFGJ2FbL7PLU8fDCBG1J31k4
+         Yjrg==
+X-Gm-Message-State: AOAM533IhhFBbz697ZZgeZn6tZ9OjTJMiKw3eLXUCGdHw1Mh/sGLJBwy
+        2pxmm54a2s2F82MWO7NQ3YuO+oW/xZVuFmIY3dA=
+X-Google-Smtp-Source: ABdhPJw6JV+p9Y5d9AhSPvSYGnLv28wD82+I6JVIkMGJ8gQt31cjL/s7aJ+8oKcUz3dn3JH+bE9+wNG74VoskgbqPI8=
+X-Received: by 2002:a05:600c:3b12:: with SMTP id m18mr456253wms.54.1641337737792;
+ Tue, 04 Jan 2022 15:08:57 -0800 (PST)
 MIME-Version: 1.0
 References: <20211222155743.256280-1-miquel.raynal@bootlin.com>
- <20211222155743.256280-9-miquel.raynal@bootlin.com> <CAB_54W786n6_4FAMc7VMAX0nuyd6r2Hi+wYEEbd5Bjdrd8ArpA@mail.gmail.com>
- <20220104160513.220b2901@xps13>
-In-Reply-To: <20220104160513.220b2901@xps13>
+ <20211222155743.256280-2-miquel.raynal@bootlin.com> <CAB_54W7BeSA+2GVzb9Yvz1kj12wkRSqHj9Ybr8cK7oYd7804RQ@mail.gmail.com>
+ <20220104164449.1179bfc7@xps13>
+In-Reply-To: <20220104164449.1179bfc7@xps13>
 From:   Alexander Aring <alex.aring@gmail.com>
-Date:   Tue, 4 Jan 2022 17:07:26 -0500
-Message-ID: <CAB_54W7g3GzDBP3Eks4YhdGs4NWQMy7aTer=_WY75PWrLo=VKw@mail.gmail.com>
-Subject: Re: [net-next 08/18] net: ieee802154: Add support for internal PAN management
+Date:   Tue, 4 Jan 2022 18:08:46 -0500
+Message-ID: <CAB_54W6LG4SKdS4HDSj1o2A64UiA6BEv_Bh_5e9WCyyJKeAbtg@mail.gmail.com>
+Subject: Re: [net-next 01/18] ieee802154: hwsim: Ensure proper channel
+ selection at probe time
 To:     Miquel Raynal <miquel.raynal@bootlin.com>
 Cc:     "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
@@ -70,64 +71,53 @@ X-Mailing-List: linux-wpan@vger.kernel.org
 
 Hi,
 
-On Tue, 4 Jan 2022 at 10:05, Miquel Raynal <miquel.raynal@bootlin.com> wrote:
+On Tue, 4 Jan 2022 at 10:44, Miquel Raynal <miquel.raynal@bootlin.com> wrote:
 >
 > Hi Alexander,
 >
-> alex.aring@gmail.com wrote on Tue, 28 Dec 2021 17:22:38 -0500:
+> alex.aring@gmail.com wrote on Tue, 28 Dec 2021 16:05:43 -0500:
 >
 > > Hi,
 > >
 > > On Wed, 22 Dec 2021 at 10:57, Miquel Raynal <miquel.raynal@bootlin.com> wrote:
 > > >
-> > > Let's introduce the basics of PAN management:
-> > > - structures defining PANs
-> > > - helpers for PANs registration
-> > > - helpers discarding old PANs
+> > > A default channel is selected by default (13), let's clarify that this
+> > > is page 0 channel 13. Call the right helper to ensure the necessary
+> > > configuration for this channel has been applied.
+> > >
+> > > So far there is very little configuration done in this helper but we
+> > > will soon add more information (like the symbol duration which is
+> > > missing) and having this helper called at probe time will prevent us to
+> > > this type of initialization at two different locations.
 > > >
 > >
-> > I think there exists a little misunderstanding about how the
-> > architecture is between the structures wpan_phy, wpan_dev and
-> > cfg802154.
-> >
-> >  - wpan_phy: represents the PHY layer of IEEE 802154 and is a
-> > registered device class.
-> >  - wpan_dev: represents the MAC layer of IEEE 802154 and is a netdev interface.
-> >
-> > You can have multiple wpan_dev operate on one wpan_phy. To my best
-> > knowledge it's like having multiple access points running on one phy
-> > (wireless) or macvlan on ethernet. You can actually do that with the
-> > mac802154_hwsim driver. However as there exists currently no (as my
-> > knowledge) hardware which supports e.g. multiple address filters we
-> > wanted to be prepared for to support such handling. Although, there
-> > exists some transceivers which support something like a "pan bridge"
-> > which goes into such a direction.
-> >
-> > What is a cfg802154 registered device? Well, at first it offers an
-> > interface between SoftMAC and HardMAC from nl802154, that's the
-> > cfg802154_ops structure. In theory a HardMAC transceiver would bypass
-> > the SoftMAC stack by implementing "cfg802154_ops" on the driver layer
-> > and try to do everything there as much as possible to support it. It
-> > is not a registered device class but the instance is tight to a
-> > wpan_phy. There can be multiple wpan_dev's (MAC layer instances on a
-> > phy/cfg802154 registered device). We currently don't support a HardMAC
-> > transceiver and I think because this misunderstanding came up.
+> > I see why this patch is necessary because in later patches the symbol
+> > duration is set at ".set_channel()" callback like the at86rf230 driver
+> > is doing it.
+> > However there is an old TODO [0]. I think we should combine it and
+> > implement it in ieee802154_set_channel() of "net/mac802154/cfg.c".
+> > Also do the symbol duration setting according to the channel/page when
+> > we call ieee802154_register_hw(), so we have it for the default
+> > settings.
 >
-> Thanks for the explanation, I think it helps because the relationship
-> between wpan_dev and wpan_phy was not yet fully clear to me.
+> While I totally agree on the background idea, I don't really see how
+> this is possible. Every driver internally knows what it supports but
+> AFAIU the core itself has no easy and standard access to it?
 >
-> In order to clarify further your explanation and be sure that I
-> understand it the correct way, I tried to picture the above explanation
-> into a figure. Would you mind looking at it and tell me if something
-> does not fit?
->
-> https://bootlin.com/~miquel/ieee802154.pdf
 
-I think so, yes... if a transceiver has e.g. two antennas/phy's it can
-also register two phy's and so on... then phy's can also move into net
-namespaces (like what we do for hwsim for routing testing [0]). Should
-keep that in mind.
+I am a little bit confused here, because a lot of timing related
+things in the phy information rate points to "x times symbols". If
+this value depends on the transceiver, how are they compatible then?
+
+> Another question that I have: is the protocol and center frequency
+> enough to always derive the symbol rate? I am not sure this is correct,
+> but I thought not all symbol rates could be derived, like for example
+> certain UWB PHY protocols which can use different PRF on a single
+> channel which has an effect on the symbol duration?
+
+Regarding UWB PHY I see that for values like LIFS/SIFS they reference
+a "preambleSymbols" value which is defined.
+
+I need to do more research regarding this.
 
 - Alex
-
-[0] https://github.com/linux-wpan/rpld/blob/nonstoring_mode/test/ns_setup
