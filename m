@@ -2,39 +2,40 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 489A3C433F5
-	for <linux-wpan@archiver.kernel.org>; Tue,  4 Jan 2022 15:05:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6EDEC433EF
+	for <linux-wpan@archiver.kernel.org>; Tue,  4 Jan 2022 15:13:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232022AbiADPFS convert rfc822-to-8bit (ORCPT
+        id S234767AbiADPNf convert rfc822-to-8bit (ORCPT
         <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 4 Jan 2022 10:05:18 -0500
-Received: from relay9-d.mail.gandi.net ([217.70.183.199]:46145 "EHLO
-        relay9-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233194AbiADPFS (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 4 Jan 2022 10:05:18 -0500
+        Tue, 4 Jan 2022 10:13:35 -0500
+Received: from relay10.mail.gandi.net ([217.70.178.230]:48883 "EHLO
+        relay10.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234758AbiADPNe (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 4 Jan 2022 10:13:34 -0500
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by relay9-d.mail.gandi.net (Postfix) with ESMTPSA id 0BC1AFF809;
-        Tue,  4 Jan 2022 15:05:14 +0000 (UTC)
-Date:   Tue, 4 Jan 2022 16:05:13 +0100
+        by relay10.mail.gandi.net (Postfix) with ESMTPSA id 6C09024000B;
+        Tue,  4 Jan 2022 15:13:32 +0000 (UTC)
+Date:   Tue, 4 Jan 2022 16:13:31 +0100
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
-To:     Alexander Aring <alex.aring@gmail.com>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
+To:     Jakub Kicinski <kuba@kernel.org>
+Cc:     "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
+        Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
-        linux-wpan - ML <linux-wpan@vger.kernel.org>,
+        linux-wpan@vger.kernel.org,
         David Girault <david.girault@qorvo.com>,
         Romuald Despres <romuald.despres@qorvo.com>,
         Frederic Blain <frederic.blain@qorvo.com>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-        kernel list <linux-kernel@vger.kernel.org>
+        <linux-kernel@vger.kernel.org>
 Subject: Re: [net-next 08/18] net: ieee802154: Add support for internal PAN
  management
-Message-ID: <20220104160513.220b2901@xps13>
-In-Reply-To: <CAB_54W786n6_4FAMc7VMAX0nuyd6r2Hi+wYEEbd5Bjdrd8ArpA@mail.gmail.com>
+Message-ID: <20220104161331.454f34c0@xps13>
+In-Reply-To: <20220104070127.34af925f@kicinski-fedora-PC1C0HJN.hsd1.ca.comcast.net>
 References: <20211222155743.256280-1-miquel.raynal@bootlin.com>
         <20211222155743.256280-9-miquel.raynal@bootlin.com>
-        <CAB_54W786n6_4FAMc7VMAX0nuyd6r2Hi+wYEEbd5Bjdrd8ArpA@mail.gmail.com>
+        <20211222125555.576e60b3@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
+        <20220104154151.0d592bff@xps13>
+        <20220104070127.34af925f@kicinski-fedora-PC1C0HJN.hsd1.ca.comcast.net>
 Organization: Bootlin
 X-Mailer: Claws Mail 3.17.7 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
@@ -44,56 +45,37 @@ Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi Alexander,
+Hi Jakub,
 
-alex.aring@gmail.com wrote on Tue, 28 Dec 2021 17:22:38 -0500:
+kuba@kernel.org wrote on Tue, 4 Jan 2022 07:01:27 -0800:
 
-> Hi,
+> On Tue, 4 Jan 2022 15:41:51 +0100 Miquel Raynal wrote:
+> > > On Wed, 22 Dec 2021 16:57:33 +0100 Miquel Raynal wrote:    
+> > > > +/* Maximum number of PAN entries to store */
+> > > > +static int max_pan_entries = 100;
+> > > > +module_param(max_pan_entries, uint, 0644);
+> > > > +MODULE_PARM_DESC(max_pan_entries,
+> > > > +		 "Maximum number of PANs to discover per scan (default is 100)");
+> > > > +
+> > > > +static int pan_expiration = 60;
+> > > > +module_param(pan_expiration, uint, 0644);
+> > > > +MODULE_PARM_DESC(pan_expiration,
+> > > > +		 "Expiration of the scan validity in seconds (default is 60s)");      
+> > > 
+> > > Can these be per-device control knobs? Module params are rarely the
+> > > best answer.    
+> > 
+> > I believe we can do that on a per FFD device basis (for now it will be
+> > on a per-device basis, but later when we will have the necessary
+> > information we might do something more fine grained). Would a couple of
+> > sysfs entries work?  
 > 
-> On Wed, 22 Dec 2021 at 10:57, Miquel Raynal <miquel.raynal@bootlin.com> wrote:
-> >
-> > Let's introduce the basics of PAN management:
-> > - structures defining PANs
-> > - helpers for PANs registration
-> > - helpers discarding old PANs
-> >  
-> 
-> I think there exists a little misunderstanding about how the
-> architecture is between the structures wpan_phy, wpan_dev and
-> cfg802154.
-> 
->  - wpan_phy: represents the PHY layer of IEEE 802154 and is a
-> registered device class.
->  - wpan_dev: represents the MAC layer of IEEE 802154 and is a netdev interface.
-> 
-> You can have multiple wpan_dev operate on one wpan_phy. To my best
-> knowledge it's like having multiple access points running on one phy
-> (wireless) or macvlan on ethernet. You can actually do that with the
-> mac802154_hwsim driver. However as there exists currently no (as my
-> knowledge) hardware which supports e.g. multiple address filters we
-> wanted to be prepared for to support such handling. Although, there
-> exists some transceivers which support something like a "pan bridge"
-> which goes into such a direction.
-> 
-> What is a cfg802154 registered device? Well, at first it offers an
-> interface between SoftMAC and HardMAC from nl802154, that's the
-> cfg802154_ops structure. In theory a HardMAC transceiver would bypass
-> the SoftMAC stack by implementing "cfg802154_ops" on the driver layer
-> and try to do everything there as much as possible to support it. It
-> is not a registered device class but the instance is tight to a
-> wpan_phy. There can be multiple wpan_dev's (MAC layer instances on a
-> phy/cfg802154 registered device). We currently don't support a HardMAC
-> transceiver and I think because this misunderstanding came up.
+> Is there no netlink object where this would fit? Sorry, I'm not at all
+> familiar with WPAN. If it's orthogonal to current cfg802154 objects
+> sysfs is fine, I guess.
 
-Thanks for the explanation, I think it helps because the relationship
-between wpan_dev and wpan_phy was not yet fully clear to me.
-
-In order to clarify further your explanation and be sure that I
-understand it the correct way, I tried to picture the above explanation
-into a figure. Would you mind looking at it and tell me if something
-does not fit?
-
-https://bootlin.com/~miquel/ieee802154.pdf
+Yes it's definitely possible to add a netlink arg for these two
+parameters as well.
 
 Thanks,
 Miquèl
