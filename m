@@ -2,42 +2,41 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE915C433F5
-	for <linux-wpan@archiver.kernel.org>; Wed,  5 Jan 2022 08:14:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92FDBC433F5
+	for <linux-wpan@archiver.kernel.org>; Wed,  5 Jan 2022 08:48:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230408AbiAEIOs convert rfc822-to-8bit (ORCPT
+        id S232724AbiAEIsx convert rfc822-to-8bit (ORCPT
         <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 5 Jan 2022 03:14:48 -0500
-Received: from relay1-d.mail.gandi.net ([217.70.183.193]:39521 "EHLO
-        relay1-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229821AbiAEIOr (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 5 Jan 2022 03:14:47 -0500
+        Wed, 5 Jan 2022 03:48:53 -0500
+Received: from relay12.mail.gandi.net ([217.70.178.232]:51927 "EHLO
+        relay12.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238631AbiAEIsx (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 5 Jan 2022 03:48:53 -0500
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by relay1-d.mail.gandi.net (Postfix) with ESMTPSA id 66B3F24000D;
-        Wed,  5 Jan 2022 08:14:43 +0000 (UTC)
-Date:   Wed, 5 Jan 2022 09:14:41 +0100
+        by relay12.mail.gandi.net (Postfix) with ESMTPSA id 6914D20000A;
+        Wed,  5 Jan 2022 08:48:50 +0000 (UTC)
+Date:   Wed, 5 Jan 2022 09:48:49 +0100
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
 To:     Alexander Aring <alex.aring@gmail.com>
-Cc:     "David S. Miller" <davem@davemloft.net>,
+Cc:     David Girault <David.Girault@qorvo.com>,
+        "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
         "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
         linux-wpan - ML <linux-wpan@vger.kernel.org>,
-        David Girault <david.girault@qorvo.com>,
-        Romuald Despres <romuald.despres@qorvo.com>,
-        Frederic Blain <frederic.blain@qorvo.com>,
+        Romuald Despres <Romuald.Despres@qorvo.com>,
+        Frederic Blain <Frederic.Blain@qorvo.com>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
         kernel list <linux-kernel@vger.kernel.org>
-Subject: Re: [net-next 01/18] ieee802154: hwsim: Ensure proper channel
- selection at probe time
-Message-ID: <20220105091441.10e96b34@xps13>
-In-Reply-To: <CAB_54W6o-wBD2wu7sohCD0ack5PR_wqc2NqOnYC6WEVV5VF8FQ@mail.gmail.com>
+Subject: Re: [net-next 17/18] net: mac802154: Let drivers provide their own
+ beacons implementation
+Message-ID: <20220105094849.0c7e9b65@xps13>
+In-Reply-To: <CAB_54W6ikdGe=ZYqOsMgBdb9KBtfAphkBeu4LLp6S4R47ZDHgA@mail.gmail.com>
 References: <20211222155743.256280-1-miquel.raynal@bootlin.com>
-        <20211222155743.256280-2-miquel.raynal@bootlin.com>
-        <CAB_54W7BeSA+2GVzb9Yvz1kj12wkRSqHj9Ybr8cK7oYd7804RQ@mail.gmail.com>
-        <20220104164449.1179bfc7@xps13>
-        <CAB_54W6LG4SKdS4HDSj1o2A64UiA6BEv_Bh_5e9WCyyJKeAbtg@mail.gmail.com>
-        <CAB_54W6o-wBD2wu7sohCD0ack5PR_wqc2NqOnYC6WEVV5VF8FQ@mail.gmail.com>
+ <20211222155743.256280-18-miquel.raynal@bootlin.com>
+ <CAB_54W7o5b7a-2Gg5ZnzPj3o4Yw9FOAxJfykrA=LtpVf9naAng@mail.gmail.com>
+ <SN6PR08MB4464D7124FCB5D0801D26B94E0459@SN6PR08MB4464.namprd08.prod.outlook.com>
+ <CAB_54W6ikdGe=ZYqOsMgBdb9KBtfAphkBeu4LLp6S4R47ZDHgA@mail.gmail.com>
 Organization: Bootlin
 X-Mailer: Claws Mail 3.17.7 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
@@ -49,98 +48,46 @@ X-Mailing-List: linux-wpan@vger.kernel.org
 
 Hi Alexander,
 
-alex.aring@gmail.com wrote on Tue, 4 Jan 2022 18:10:44 -0500:
+alex.aring@gmail.com wrote on Thu, 30 Dec 2021 14:48:41 -0500:
 
 > Hi,
 > 
-> On Tue, 4 Jan 2022 at 18:08, Alexander Aring <alex.aring@gmail.com> wrote:
+> On Thu, 30 Dec 2021 at 12:00, David Girault <David.Girault@qorvo.com> wrote:
 > >
-> > Hi,
+> > Hi Alexander,
 > >
-> > On Tue, 4 Jan 2022 at 10:44, Miquel Raynal <miquel.raynal@bootlin.com> wrote:  
-> > >
-> > > Hi Alexander,
-> > >
-> > > alex.aring@gmail.com wrote on Tue, 28 Dec 2021 16:05:43 -0500:
-> > >  
-> > > > Hi,
-> > > >
-> > > > On Wed, 22 Dec 2021 at 10:57, Miquel Raynal <miquel.raynal@bootlin.com> wrote:  
-> > > > >
-> > > > > A default channel is selected by default (13), let's clarify that this
-> > > > > is page 0 channel 13. Call the right helper to ensure the necessary
-> > > > > configuration for this channel has been applied.
-> > > > >
-> > > > > So far there is very little configuration done in this helper but we
-> > > > > will soon add more information (like the symbol duration which is
-> > > > > missing) and having this helper called at probe time will prevent us to
-> > > > > this type of initialization at two different locations.
-> > > > >  
-> > > >
-> > > > I see why this patch is necessary because in later patches the symbol
-> > > > duration is set at ".set_channel()" callback like the at86rf230 driver
-> > > > is doing it.
-> > > > However there is an old TODO [0]. I think we should combine it and
-> > > > implement it in ieee802154_set_channel() of "net/mac802154/cfg.c".
-> > > > Also do the symbol duration setting according to the channel/page when
-> > > > we call ieee802154_register_hw(), so we have it for the default
-> > > > settings.  
-> > >
-> > > While I totally agree on the background idea, I don't really see how
-> > > this is possible. Every driver internally knows what it supports but
-> > > AFAIU the core itself has no easy and standard access to it?
-> > >  
-> >
-> > I am a little bit confused here, because a lot of timing related
-> > things in the phy information rate points to "x times symbols". If  
+> > At Qorvo, we have developped a SoftMAC driver for our DW3000 chip that will benefit such API.
+> >  
+> Do you want to bring this driver upstream as well? Currently those
+> callbacks will be introduced but no user is there.
+
+I think so far the upstream fate of the DW3000 driver has not been ruled
+out so let's assume it won't be upstreamed (at least not fully), that's
+also why we decided to begin with the hwsim driver.
+
+However, when designing this series, it appeared quite clear that any
+hardMAC driver would need this type of interface. The content of the
+interface, I agree, could be further discussed and even edited, but the
+main idea of giving the information to the phy driver about what is
+happening regarding eg. scan operations or beacon frames, might make
+sense regardless of the current users, no?
+
+This being said, if other people decide to upstream a hardMAC driver
+and need these hooks to behave a little bit differently, it's their
+right to tweak them and that would also be part of the game.
+
+Although we might not need these hooks in a near future at all if we
+move to the filtering modes, because the promiscuous call with the
+specific level might indicate to the device how it should configure
+itself already.
+
+> > To be short, beacon sending is controller by our driver to be synchronized chip clock or delayed until
+> > other operation in progress (a ranging for example).
+> >  
 > 
-> s/rate/base/
-
-Yes indeed, but I bet it works because the phy drivers set the symbol
-duration by themselves. You can see that none of them does something
-clever like:
-
-switch (phy.protocol) {
-	case XXXXX:
-		symbol_duration = y;
-		break;
-	...
-
-Instead, they all go through the page/channel list in a quite hardcoded
-way because the phy driver knows internally that protocol X is used on
-{page, channel}, but the protocol id, while not being totally absent
-from drivers, is always provided as a comment.
-
-So getting rid of the core TODO you mentioned earlier means:
-- Listing properly the PHY protocols in the core (if not already done)
-- For each PHY protocol knowing the possible base frequencies
-- For each of these base frequencies knowing the symbol duration
-- Having the possibility to add more information such as the PRF in
-  order to let the core pick the right symbol duration when there is
-  more than one possibility for a {protocol, base frequency} couple
-- Convert the phy drivers (at least hwsim) to fill these new fields
-  correctly and expect the core to set the symbol duration properly.
-
-Two side notes as well:
-- I was not able to find all the the corresponding protocol from the
-  hwsim driver in the spec (these channels are marked "unknown")
-- The symbol duration in a few specific UWB cases is below 1us while
-  the core expects a value in us. Should we change the symbol duration
-  to ns?
-
-I believe all this is doable in a reasonable time frame provided that
-I only focus on the few protocols supported by hwsim which I already
-"addressed" and perhaps a couple of simple drivers. On the core side,
-the logic might be: "is the driver providing information about the phy
-protocols used? if yes, then set the symbol duration if we have enough
-data, otherwise let the driver handle it by itself". Such logic would
-allow a progressive shift towards the situation where drivers do not
-have to bother with symbol duration by themselves.
-
-As this looks like a project on its own and my first goal was to be
-able to use hwsim to demonstrate the different scan features, maybe we
-can continue to discuss this and consider tackling it as a separate
-series whish would apply on top of the current one, what do you think?
+> ok.
+> 
+> - Alex
 
 Thanks,
 Miquèl
