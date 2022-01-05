@@ -2,69 +2,77 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AAEC6C433F5
-	for <linux-wpan@archiver.kernel.org>; Wed,  5 Jan 2022 15:39:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F314BC433F5
+	for <linux-wpan@archiver.kernel.org>; Wed,  5 Jan 2022 17:10:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241585AbiAEPjW (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 5 Jan 2022 10:39:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58346 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230307AbiAEPjW (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 5 Jan 2022 10:39:22 -0500
-Received: from proxima.lasnet.de (proxima.lasnet.de [IPv6:2a01:4f8:121:31eb:3::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 657E1C061245;
-        Wed,  5 Jan 2022 07:39:21 -0800 (PST)
-Received: from localhost.localdomain.datenfreihafen.local (p200300e9d722f5b8f05b18fffe3e6112.dip0.t-ipconnect.de [IPv6:2003:e9:d722:f5b8:f05b:18ff:fe3e:6112])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        id S242160AbiAERKO (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 5 Jan 2022 12:10:14 -0500
+Received: from ams.source.kernel.org ([145.40.68.75]:51966 "EHLO
+        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S242157AbiAERKO (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 5 Jan 2022 12:10:14 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        (Authenticated sender: stefan@sostec.de)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id DD196C0611;
-        Wed,  5 Jan 2022 16:39:18 +0100 (CET)
-From:   Stefan Schmidt <stefan@datenfreihafen.org>
-To:     davem@davemloft.net, kuba@kernel.org
-Cc:     linux-wpan@vger.kernel.org, alex.aring@gmail.com,
-        netdev@vger.kernel.org
-Subject: pull-request: ieee802154 for net 2022-01-05
-Date:   Wed,  5 Jan 2022 16:39:14 +0100
-Message-Id: <20220105153914.512305-1-stefan@datenfreihafen.org>
-X-Mailer: git-send-email 2.31.1
+        by ams.source.kernel.org (Postfix) with ESMTPS id EBC20B81A88;
+        Wed,  5 Jan 2022 17:10:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id B86A4C36AE9;
+        Wed,  5 Jan 2022 17:10:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1641402611;
+        bh=0+7jAeT7eLb75NzaqVossLjW10fIz9vo2PdB2I5VB5E=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=aA1yJkl+GZVvXnAUfXMDIvlBEFFSCcfybDweD9qTASFD0UuyIj0ULLhd++6ltFlom
+         90op36G1g/dKf+LGhQPZq8ZfJEdARJMWM6Vq4ii5RWtCFOy1MrcG0OZSFwtiWCnugv
+         1i8Y6lsYDyc3UKyJZ3PfT7LFOMs8moAGVvYX8CfOwvW2hrFJCOgbJQLTDoxd128mwM
+         WModrgWeMZB1TmjIpc66RGTO0G/gng4ihQdt3gpyQNIteX7mT+Ha3696vTrPZ516H5
+         bBbKQQtR0tdncpn3zz+CrTovjvdtjhGUJ6dTPrPnkE23/Hszm3SFDG6XHPEhvgEvcw
+         4oT2mSvs/u8/Q==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 9E755F79401;
+        Wed,  5 Jan 2022 17:10:11 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: pull-request: ieee802154 for net 2022-01-05
+From:   patchwork-bot+netdevbpf@kernel.org
+Message-Id: <164140261164.10107.11009091878573559432.git-patchwork-notify@kernel.org>
+Date:   Wed, 05 Jan 2022 17:10:11 +0000
+References: <20220105153914.512305-1-stefan@datenfreihafen.org>
+In-Reply-To: <20220105153914.512305-1-stefan@datenfreihafen.org>
+To:     Stefan Schmidt <stefan@datenfreihafen.org>
+Cc:     davem@davemloft.net, kuba@kernel.org, linux-wpan@vger.kernel.org,
+        alex.aring@gmail.com, netdev@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello Dave, Jakub.
+Hello:
 
-An update from ieee802154 for your *net* tree.
+This pull request was applied to netdev/net.git (master)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Below I have a last minute fix for the atusb driver.
+On Wed,  5 Jan 2022 16:39:14 +0100 you wrote:
+> Hello Dave, Jakub.
+> 
+> An update from ieee802154 for your *net* tree.
+> 
+> Below I have a last minute fix for the atusb driver.
+> 
+> Pavel fixes a KASAN uninit report for the driver. This version is the
+> minimal impact fix to ease backporting. A bigger rework of the driver to
+> avoid potential similar problems is ongoing and will come through net-next
+> when ready.
+> 
+> [...]
 
-Pavel fixes a KASAN uninit report for the driver. This version is the
-minimal impact fix to ease backporting. A bigger rework of the driver to
-avoid potential similar problems is ongoing and will come through net-next
-when ready.
+Here is the summary with links:
+  - pull-request: ieee802154 for net 2022-01-05
+    https://git.kernel.org/netdev/net/c/af872b691926
 
-regards
-Stefan Schmidt
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-The following changes since commit 7d18a07897d07495ee140dd319b0e9265c0f68ba:
-
-  sch_qfq: prevent shift-out-of-bounds in qfq_init_qdisc (2022-01-04 12:36:51 +0000)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/sschmidt/wpan.git tags/ieee802154-for-net-2022-01-05
-
-for you to fetch changes up to 754e4382354f7908923a1949d8dc8d05f82f09cb:
-
-  ieee802154: atusb: fix uninit value in atusb_set_extended_addr (2022-01-04 20:10:04 +0100)
-
-----------------------------------------------------------------
-Pavel Skripkin (1):
-      ieee802154: atusb: fix uninit value in atusb_set_extended_addr
-
- drivers/net/ieee802154/atusb.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
