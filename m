@@ -2,100 +2,153 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E2E7C433F5
-	for <linux-wpan@archiver.kernel.org>; Wed,  5 Jan 2022 01:37:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84E24C433EF
+	for <linux-wpan@archiver.kernel.org>; Wed,  5 Jan 2022 08:08:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235890AbiAEBhI (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 4 Jan 2022 20:37:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37846 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234314AbiAEBhH (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 4 Jan 2022 20:37:07 -0500
-Received: from mail-wr1-x436.google.com (mail-wr1-x436.google.com [IPv6:2a00:1450:4864:20::436])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 512E7C061761;
-        Tue,  4 Jan 2022 17:37:07 -0800 (PST)
-Received: by mail-wr1-x436.google.com with SMTP id s1so79680905wra.6;
-        Tue, 04 Jan 2022 17:37:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=w9H0RMHXELZxjWd3I/ACDf9VOqwYsckamevzKs/JT8s=;
-        b=QwBRAKR5sb+6JmBfKpWx5MBc+gE5TWrIBys7KQDlz1SdYJ3j7yco4WoU7dJWv80E2P
-         kPadU7lZDdnDwMlpwgCjXBcBQ3YBxCSE5XMUoP55ikCCpcxMxpelm7mRnEt2HDOLnsPl
-         oOv0/xMA2hWKYMeszkt05Yu3bNwD/c1jC3uTjhSxf/bNQgQwep0vStLn1DIcR32d7EOs
-         vT3kQ/feKUhXilEcfYK0/5kdyFUO9QqDGMIOvJAI9GhO7bjbit4zCTrJ0sgUSuKbpkoQ
-         ZnN+bjLVWa9Y+mXdHxYNwRQdQpdl/wEZz+LbGjxFEh37lHDDIwYMk3RypUWCfDaWn19m
-         i8oQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=w9H0RMHXELZxjWd3I/ACDf9VOqwYsckamevzKs/JT8s=;
-        b=rzgcbkrNcrLSErikZHG+F7q02PV6fLsDzKAeJq0JHKUELkmkm32UWtLWOLPl7TIJ8T
-         0QqRzqgoMGUYhKDHx8egDqB1YBMhwsBkOgmzkjz18SEVkSFWguNemX+HehOn8ICNhHq5
-         GH43eD6O0tm9gqjjVVzc2bcAv5n8rz+JnXY5LHG7zJunDgoI1pTEdPgUPzfdlSYR4uKu
-         oRxAWqU+bZ1Vmkwcpkj1e0yRSzX5ihd3favSW2qV7rJM+efCBQ9Msu784X69bvIFEbZU
-         RTpvSZXkaCC8DQdx74r2v/+oYGNo339nQKcRyDbsf1B83IEp+z5dpfsCbL15SZ8O5pQG
-         po+g==
-X-Gm-Message-State: AOAM5308/RQq1hjJO0kS4NLTFRlHs5p47F21UOlNNbYnCxIj5DSrDyYJ
-        t3pEufI10tZwvFS52ZBx6EsfSs2CDuf0xbhXcFFHIcN/
-X-Google-Smtp-Source: ABdhPJxvOweL2Cw7kHuiYcMnJpRRLSuLqIN75VpNLpydDefvmhD15Z2ghun+6TAPgmvm+Z2GE6RDojAZxbnc3VEgZk8=
-X-Received: by 2002:adf:d1c2:: with SMTP id b2mr45141599wrd.81.1641346625949;
- Tue, 04 Jan 2022 17:37:05 -0800 (PST)
-MIME-Version: 1.0
-References: <20211222155743.256280-1-miquel.raynal@bootlin.com>
- <20211222155743.256280-13-miquel.raynal@bootlin.com> <CAB_54W6AZ+LGTcFsQjNx7uq=+R5v_kdF0Xm5kwWQ8ONtfOrmAw@mail.gmail.com>
- <Ycx0mwQcFsmVqWVH@ni.fr.eu.org> <CAB_54W41ZEoXzoD2_wadfMTY8anv9D9e2T5wRckdXjs7jKTTCA@mail.gmail.com>
- <20220104184340.0e977727@xps13>
-In-Reply-To: <20220104184340.0e977727@xps13>
-From:   Alexander Aring <alex.aring@gmail.com>
-Date:   Tue, 4 Jan 2022 20:36:54 -0500
-Message-ID: <CAB_54W6sfWfYNNx9vG2_ZQK2nA86O8-L5RiG-Qg8Dibq2HG7Yg@mail.gmail.com>
-Subject: Re: [net-next 12/18] net: mac802154: Handle scan requests
-To:     Miquel Raynal <miquel.raynal@bootlin.com>
-Cc:     Nicolas Schodet <nico@ni.fr.eu.org>,
+        id S238303AbiAEIIo (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 5 Jan 2022 03:08:44 -0500
+Received: from new4-smtp.messagingengine.com ([66.111.4.230]:39713 "EHLO
+        new4-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230005AbiAEIIn (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 5 Jan 2022 03:08:43 -0500
+Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
+        by mailnew.nyi.internal (Postfix) with ESMTP id A0EFA58035C;
+        Wed,  5 Jan 2022 03:08:42 -0500 (EST)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute1.internal (MEProxy); Wed, 05 Jan 2022 03:08:42 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=
+        date:from:to:cc:subject:message-id:references:mime-version
+        :content-type:in-reply-to; s=fm2; bh=loyXCU6417rX16GHEn/ISzTNLPl
+        e2vA9pVFu1dVyqOo=; b=vs+GGYihLVNGh92J4HffLjOA1b5Y5vtYWroHRah41Yf
+        IfuEOJJGteBCGdtEn5/wvbFJqtf4SLoIKlq1c43EGMgx7MgmrutRbo177TnssWjT
+        +3d9nmi2zAuXUpNluI12bpmtjZ4al+tTyA4WE1s+qcvsCcVDYvCxqbqbkYoz9ABh
+        wTNW5QroKUkrHx8KjXfmLu0e+ydIvFR9gxafVaW+tv6vrgsbyHaIPaipSe3KAa5P
+        KYJIHewX5YROcwrivs0AQOi93il5GG/pPHO389TPkmqAFsrwxnrdh+1lRsJznFyr
+        1atNpLjkJYvj+GX8ZweLFD8lSokKmlBcsLYHRl3nnzw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:content-type:date:from:in-reply-to
+        :message-id:mime-version:references:subject:to:x-me-proxy
+        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; bh=loyXCU
+        6417rX16GHEn/ISzTNLPle2vA9pVFu1dVyqOo=; b=I/jBf6Fj9YqwcdykGYsuDO
+        rsMrMFLqjSFGbMYGG9ykbStfXS/DZROPXYptO+MSP/1dk76b33iMrrZSnuUwqNMh
+        cAS1lUTb9quD0d45F4BOB9s1a6WuaBglsNgyh6Dmn2T5BIYhzo8bi78c6F8GT6CL
+        MaZz82yUuPkiZcThJGhQCJ/evvLnUDVDnOkk1muATsnodwF2T6AQicgFMxLVbBf+
+        VIFLTjLx7a7O20AUvEqIVMoKv4SPYW1dIysYIjtsFZZM2wS8c1EWJbgvZFPVApO/
+        HrCKcn5uKCjOoCieH/NCXdLYGu+MHwIH7j8pj1G+BWc4MGB8ghedarkPFe3lCggw
+        ==
+X-ME-Sender: <xms:CVLVYQLtaThXR_8yXR67VDplI-byTQLK4FTQYMvJGpnt083MTQ3u_w>
+    <xme:CVLVYQLS17Ez1uGfUszHPL8cooDnaJnbcmzZR9QJl2ap7JSFM3L-JcfeTF4pVmNX4
+    UTL1D44riM30g>
+X-ME-Received: <xmr:CVLVYQuPyuy-2tRjGfEsa3Ijn9gkPnoVwrZ2w6X2T70sn_APiUIV5fNTTHqtp6pFj-fSZdzpUhbIKe8lav-qDkrgMfFPzuDp>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvuddrudefgedguddufecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
+    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+    enucfjughrpeffhffvuffkfhggtggujgesthdtredttddtvdenucfhrhhomhepifhrvghg
+    ucfmjfcuoehgrhgvgheskhhrohgrhhdrtghomheqnecuggftrfgrthhtvghrnhepveeuhe
+    ejgfffgfeivddukedvkedtleelleeghfeljeeiueeggeevueduudekvdetnecuvehluhhs
+    thgvrhfuihiivgepudenucfrrghrrghmpehmrghilhhfrhhomhepghhrvghgsehkrhhorg
+    hhrdgtohhm
+X-ME-Proxy: <xmx:CVLVYdY1ynuihQV4ovWLFP8NzuFKffyQtWTOPD0MKtYm3MfXJTCp2g>
+    <xmx:CVLVYXb0AtPFZy9w2dVR83OqzQiEUbIKZQuyznQTOnRawps4G-YC7w>
+    <xmx:CVLVYZC2krFTnK49RirAq1VIgdArc21n07-jJpIjwxoQhnoDOf0lSw>
+    <xmx:ClLVYUTGrMlVf-ULEyuqPNTd6le8BK3Ns3guYw19HUE91vtzbo4H2Q>
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 5 Jan 2022 03:08:41 -0500 (EST)
+Date:   Wed, 5 Jan 2022 09:08:39 +0100
+From:   Greg KH <greg@kroah.com>
+To:     Stefan Schmidt <stefan@datenfreihafen.org>
+Cc:     Alexander Aring <alex.aring@gmail.com>,
+        Pavel Skripkin <paskripkin@gmail.com>,
         "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-        Stefan Schmidt <stefan@datenfreihafen.org>,
         linux-wpan - ML <linux-wpan@vger.kernel.org>,
-        David Girault <david.girault@qorvo.com>,
-        Romuald Despres <romuald.despres@qorvo.com>,
-        Frederic Blain <frederic.blain@qorvo.com>,
-        Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-        kernel list <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
+        kernel list <linux-kernel@vger.kernel.org>,
+        "# 3.19.x" <stable@vger.kernel.org>,
+        Alexander Potapenko <glider@google.com>
+Subject: Re: [PATCH RFT] ieee802154: atusb: move to new USB API
+Message-ID: <YdVSBy47e0+OdXAo@kroah.com>
+References: <CAG_fn=VDEoQx5c7XzWX1yaYBd5y5FrG1aagrkv+SZ03c8TfQYQ@mail.gmail.com>
+ <20220102171943.28846-1-paskripkin@gmail.com>
+ <YdL0GPxy4TdGDzOO@kroah.com>
+ <CAB_54W7HQmm1ncCEsTmZFR+GVf6p6Vz0RMWDJXAhXQcW4r3hUQ@mail.gmail.com>
+ <ab1ec1c0-389c-dcae-9cd8-6e6771a94178@datenfreihafen.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ab1ec1c0-389c-dcae-9cd8-6e6771a94178@datenfreihafen.org>
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi,
+On Tue, Jan 04, 2022 at 08:41:23PM +0100, Stefan Schmidt wrote:
+> Hello.
+> 
+> On 03.01.22 16:35, Alexander Aring wrote:
+> > Hi,
+> > 
+> > On Mon, 3 Jan 2022 at 08:03, Greg KH <greg@kroah.com> wrote:
+> > > 
+> > > On Sun, Jan 02, 2022 at 08:19:43PM +0300, Pavel Skripkin wrote:
+> > > > Alexander reported a use of uninitialized value in
+> > > > atusb_set_extended_addr(), that is caused by reading 0 bytes via
+> > > > usb_control_msg().
+> > > > 
+> > > > Since there is an API, that cannot read less bytes, than was requested,
+> > > > let's move atusb driver to use it. It will fix all potintial bugs with
+> > > > uninit values and make code more modern
+> > > > 
+> > > > Fail log:
+> > > > 
+> > > > BUG: KASAN: uninit-cmp in ieee802154_is_valid_extended_unicast_addr include/linux/ieee802154.h:310 [inline]
+> > > > BUG: KASAN: uninit-cmp in atusb_set_extended_addr drivers/net/ieee802154/atusb.c:1000 [inline]
+> > > > BUG: KASAN: uninit-cmp in atusb_probe.cold+0x29f/0x14db drivers/net/ieee802154/atusb.c:1056
+> > > > Uninit value used in comparison: 311daa649a2003bd stack handle: 000000009a2003bd
+> > > >   ieee802154_is_valid_extended_unicast_addr include/linux/ieee802154.h:310 [inline]
+> > > >   atusb_set_extended_addr drivers/net/ieee802154/atusb.c:1000 [inline]
+> > > >   atusb_probe.cold+0x29f/0x14db drivers/net/ieee802154/atusb.c:1056
+> > > >   usb_probe_interface+0x314/0x7f0 drivers/usb/core/driver.c:396
+> > > > 
+> > > > Fixes: 7490b008d123 ("ieee802154: add support for atusb transceiver")
+> > > > Cc: stable@vger.kernel.org # 5.9
+> > > > Reported-by: Alexander Potapenko <glider@google.com>
+> > > > Signed-off-by: Pavel Skripkin <paskripkin@gmail.com>
+> > > > ---
+> > > >   drivers/net/ieee802154/atusb.c | 61 +++++++++++++++++++++-------------
+> > > >   1 file changed, 38 insertions(+), 23 deletions(-)
+> > > > 
+> > > > diff --git a/drivers/net/ieee802154/atusb.c b/drivers/net/ieee802154/atusb.c
+> > > > index 23ee0b14cbfa..43befea0110f 100644
+> > > > --- a/drivers/net/ieee802154/atusb.c
+> > > > +++ b/drivers/net/ieee802154/atusb.c
+> > > > @@ -80,10 +80,9 @@ struct atusb_chip_data {
+> > > >    * in atusb->err and reject all subsequent requests until the error is cleared.
+> > > >    */
+> > > > 
+> > > > -static int atusb_control_msg(struct atusb *atusb, unsigned int pipe,
+> > > > -                          __u8 request, __u8 requesttype,
+> > > > -                          __u16 value, __u16 index,
+> > > > -                          void *data, __u16 size, int timeout)
+> > > > +static int atusb_control_msg_recv(struct atusb *atusb, __u8 request, __u8 requesttype,
+> > > > +                               __u16 value, __u16 index,
+> > > > +                               void *data, __u16 size, int timeout)
+> > > 
+> > > Why do you need a wrapper function at all?  Why not just call the real
+> > > usb functions instead?
+> 
+> > ...
+> 
+> > > 
+> > > I would recommend just moving to use the real USB functions and no
+> > > wrapper function at all like this, it will make things more obvious and
+> > > easier to understand over time.
+> > 
+> > okay.
+> 
+> With the small fix handle the actual KASAN report applied now
 
-On Tue, 4 Jan 2022 at 12:43, Miquel Raynal <miquel.raynal@bootlin.com> wrot=
-e:
->
-> Hi Alexander,
->
-> > I see that beacons are sent out with
-> > "local->beacon.mhr.fc.dest_addr_mode =3D IEEE802154_NO_ADDRESSING;"
-> > shouldn't that be a broadcast destination?
->
-> In the case of a beacon, 7.3.1.2 Beacon frame MHR field indicate:
->
->         When the Frame Version field is 0b00=E2=80=930b01:
->                 =E2=80=94 The Destination Addressing mode field shall be =
-set to
->                 indicated that the Destination Address and Destination
->                 PAN ID fields are not present.
->
-> So I think the NO_ADDRESSING choice here is legit. The destination
-> field however is useful in the Enhanced beacon frame case, but that's
-> not yet supported.
+It was?  What is the git commit id?
 
-ok, yes I agree.
+thanks,
 
-Thanks.
-
-- Alex
+greg k-h
