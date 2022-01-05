@@ -2,117 +2,240 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF2C4C433EF
-	for <linux-wpan@archiver.kernel.org>; Wed,  5 Jan 2022 20:28:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1477C433EF
+	for <linux-wpan@archiver.kernel.org>; Wed,  5 Jan 2022 20:56:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244040AbiAEU2B (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 5 Jan 2022 15:28:01 -0500
-Received: from proxima.lasnet.de ([78.47.171.185]:48778 "EHLO
-        proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244044AbiAEU1t (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 5 Jan 2022 15:27:49 -0500
-Received: from [IPV6:2003:e9:d722:f5b8:9ccb:8d7f:17cf:c65d] (p200300e9d722f5b89ccb8d7f17cfc65d.dip0.t-ipconnect.de [IPv6:2003:e9:d722:f5b8:9ccb:8d7f:17cf:c65d])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: stefan@datenfreihafen.org)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id D7F44C0879;
-        Wed,  5 Jan 2022 21:27:43 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
-        s=2021; t=1641414464;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=dpMLHMR//JIi9iap6ZA0k6rlKpmAkoFNdKjlI8yBUV8=;
-        b=j/3cQkOsdp6F3vHHOFYXCmZERpfQYl6N31/6fSnsALAkzOzBrSO8UE5IKpFMZDW0svfl8z
-        BlC/2l5i0ZSWlLnPpo+JoBlFhLYBi26FXUMnfypMLtG1RFOl7Och+d7CDTpjMFra4K2eIk
-        xVJMMvZ5+/H3yfB6YoEmncA+BFl7IG50lBa7fOWVUijZk4WMvQZVjpwiGMA8XVguzWwv86
-        CfYjfSdMiycbCXUrSZOB7Xi6TInzDhRBQ+uOXEEW/VyTbjxPajjTeXOz50lXcRhQOoC7f3
-        2yHLm1/1hDh3ztuRFl7gEQ80Z+FHNsyQn+NRD+uNxUZawydZmMjppRGOGGhqDw==
-Message-ID: <4186d48a-ea7e-39c1-d1fa-1db3f6627a3a@datenfreihafen.org>
-Date:   Wed, 5 Jan 2022 21:27:43 +0100
+        id S244252AbiAEU4A convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 5 Jan 2022 15:56:00 -0500
+Received: from relay10.mail.gandi.net ([217.70.178.230]:46595 "EHLO
+        relay10.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S244248AbiAEUz5 (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 5 Jan 2022 15:55:57 -0500
+Received: (Authenticated sender: miquel.raynal@bootlin.com)
+        by relay10.mail.gandi.net (Postfix) with ESMTPSA id 4E72B240003;
+        Wed,  5 Jan 2022 20:55:53 +0000 (UTC)
+Date:   Wed, 5 Jan 2022 21:55:51 +0100
+From:   Miquel Raynal <miquel.raynal@bootlin.com>
+To:     Alexander Aring <alex.aring@gmail.com>
+Cc:     Nicolas Schodet <nico@ni.fr.eu.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
+        Stefan Schmidt <stefan@datenfreihafen.org>,
+        linux-wpan - ML <linux-wpan@vger.kernel.org>,
+        David Girault <david.girault@qorvo.com>,
+        Romuald Despres <romuald.despres@qorvo.com>,
+        Frederic Blain <frederic.blain@qorvo.com>,
+        Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+        kernel list <linux-kernel@vger.kernel.org>
+Subject: Re: [net-next 12/18] net: mac802154: Handle scan requests
+Message-ID: <20220105215551.1693eba4@xps13>
+In-Reply-To: <CAB_54W5quZz8rVrbdx+cotTRZZpJ4ouRDZkxeW6S1L775Si=cw@mail.gmail.com>
+References: <20211222155743.256280-1-miquel.raynal@bootlin.com>
+        <20211222155743.256280-13-miquel.raynal@bootlin.com>
+        <CAB_54W6AZ+LGTcFsQjNx7uq=+R5v_kdF0Xm5kwWQ8ONtfOrmAw@mail.gmail.com>
+        <Ycx0mwQcFsmVqWVH@ni.fr.eu.org>
+        <CAB_54W41ZEoXzoD2_wadfMTY8anv9D9e2T5wRckdXjs7jKTTCA@mail.gmail.com>
+        <CAB_54W6gHE1S9Q+-SVbrnAWPxBxnvf54XVTCmddtj8g-bZzMRA@mail.gmail.com>
+        <20220104191802.2323e44a@xps13>
+        <CAB_54W5quZz8rVrbdx+cotTRZZpJ4ouRDZkxeW6S1L775Si=cw@mail.gmail.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 3.17.7 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.0
-Subject: Re: [PATCH -next] ieee802154: atusb: move to new USB API
-Content-Language: en-US
-To:     Pavel Skripkin <paskripkin@gmail.com>, alex.aring@gmail.com,
-        davem@davemloft.net, kuba@kernel.org, linux-wpan@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20220105144947.12540-1-paskripkin@gmail.com>
-From:   Stefan Schmidt <stefan@datenfreihafen.org>
-In-Reply-To: <20220105144947.12540-1-paskripkin@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
+Hi Alexander,
 
-Hello.
+alex.aring@gmail.com wrote on Tue, 4 Jan 2022 20:16:30 -0500:
 
-On 05.01.22 15:49, Pavel Skripkin wrote:
-> Old USB API is prone to uninit value bugs if error handling is not
-> correct. Let's move atusb to use new USB API to
+> Hi.
 > 
-> 	1) Make code more simple, since new API does not require memory
-> 	   to be allocates via kmalloc()
+> On Tue, 4 Jan 2022 at 13:18, Miquel Raynal <miquel.raynal@bootlin.com> wrote:
+> >
+> > Hi Alexander,
+> >  
+> ...
+> > >
+> > > I see now why promiscuous mode is necessary here. The actual
+> > > promiscuous mode setting for the driver is not the same as promiscuous
+> > > mode in 802.15.4 spec. For until now it was there for running a
+> > > sniffer device only.
+> > > As the 802.15.4 spec defines some "filtering levels" I came up with a
+> > > draft so we can define which filtering level should be done on the
+> > > hardware.  
+> >
+> > I like the idea but I'm not sure on what side you want to tackle the
+> > problem first. Is it the phy drivers which should advertise the mac
+> > about the promiscuous mode they support (which matches the description
+> > below but does not fit the purpose of an enum very well)? Or is it the
+> > MAC that requests a particular filtering mode? In this case what a phy
+> > driver should do if:
+> > - the requested mode is more constrained than its usual promiscuous
+> >   capabilities?  
 > 
-> 	2) Defend driver from usb-related uninit value bugs.
+> Then, the driver needs to go one level lower and tell mac802154 to
+> filter more out.
 > 
-> 	3) Make code more modern and simple
+> > - the requested mode is less constrained than its usual promiscuous
+> >   capabilities?
+> >  
 > 
-> This patch removes atusb usb wrappers as Greg suggested [0], this will make
-> code more obvious and easier to understand over time, and replaces old
-> API calls with new ones.
+> Then mac802154 needs to filter more out.
 > 
-> Also this patch adds and updates usb related error handling to prevent
-> possible uninit value bugs in future
+> I am more worried at the point the transceiver will shut off automatic
+> acknowledge handling which we probably can't do in software in cases
+> where it's required. Some transceivers will shut that off if they turn
+> off address filtering and if they don't have a detailed setting for
+> that they will ack every frame what they see, which is... not so good.
 > 
-> Link: https://lore.kernel.org/all/YdL0GPxy4TdGDzOO@kroah.com/ [0]
-> Signed-off-by: Pavel Skripkin <paskripkin@gmail.com>
-> ---
+> Future work would be to warn about mismatch of seeing frames, what the
+> hardware would filter out vs what mac802154 sees. More further work
+> could be to use a monitor interface and raw sockets and verify
+> transceivers how they act to frames.
 > 
-> Only build tested.
+> > >
+> > > diff --git a/include/net/mac802154.h b/include/net/mac802154.h
+> > > index 72978fb72a3a..3839ed3f8f0d 100644
+> > > --- a/include/net/mac802154.h
+> > > +++ b/include/net/mac802154.h
+> > > @@ -130,6 +130,48 @@ enum ieee802154_hw_flags {
+> > >  #define IEEE802154_HW_OMIT_CKSUM       (IEEE802154_HW_TX_OMIT_CKSUM | \
+> > >                                          IEEE802154_HW_RX_OMIT_CKSUM)
+> > >
+> > > +/**
+> > > + * enum ieee802154_filter_mode - hardware filter mode that a driver
+> > > will pass to
+> > > + *                              pass to mac802154.  
+> >
+> > Isn't it the opposite: The filtering level the mac is requesting? Here
+> > it looks like we are describing driver capabilities (ie what drivers
+> > advertise supporting).
+> >  
+> 
+> I am sorry. I meant what the transceiver "should" deliver or "level
+> less" to mac802154.
+> 
+> I think the filtering when not much resources are required can also be
+> done in a hardirq context. There exists a tasklet which is there to
+> switch to a softirq context [0], currently we do all parsing there.
+> 
+> > > + *
+> > > + * @IEEE802154_FILTER_MODE_0: No MFR filtering at all.  
+> >
+> > I suppose this would be for a sniffer accepting all frames, including
+> > the bad ones.
+> >  
+> 
+> yes.
+> 
+> > > + *
+> > > + * @IEEE802154_FILTER_MODE_1: IEEE802154_FILTER_MODE_1 with a bad FCS filter.  
+> >
+> > This means that the driver should only discard bad frames and propagate
+> > all the remaining frames, right? So this typically is a regular sniffer
+> > mode.
+> >  
+> 
+> I think this depends on what you want to filter out, so far I know in
+> wireless this is configurable. Wireshark always expects the FCS in
+> their payload for a linux 802.15.4 monitor interface and I think this
+> is because of some historical reason to support the first 802.15.4
+> sniffers in wireshark.
+> There is a difference between filter bad FCS and cutoff FCS. I need to
+> look it up but I think wireless would cut off the checksum if FCS is
+> filtered on hardware (may even some transceivers will not deliver FCS
+> to you if you enable filtering).
+> 
+> > > + *
+> > > + * @IEEE802154_FILTER_MODE_2: Same as IEEE802154_FILTER_MODE_1, known as
+> > > + *                           802.15.4 promiscuous mode, sets
+> > > + *                           mib.PromiscuousMode.  
+> >
+> > I believe what you call mib.PromiscuousMode is the mode that is
+> > referred in the spec, ie. being in the official promiscuous mode? So
+> > that is the mode that should be used "by default" when really asking
+> > for a 802154 promiscuous mode.
+> >  
+> 
+> then we don't call it in driver level promiscuous mode, we call it
+> "filtering level". And this is the filtering for cases when the
+> standard says set "mib.PromiscuousMode".
+> 
+> > Is there really a need for a different mode than mode_1 ?
+> >  
+> 
+> I think so, I am not sure what they or will define if PromiscuousMode
+> is set or not and might the transceiver need to get notice about it?
+> It's not needed now, but we might keep it in mind then.
+> 
+> > > + *
+> > > + * @IEEE802154_FILTER_MODE_3_SCAN: Same as IEEE802154_FILTER_MODE_2 without
+> > > + *                                set mib.PromiscuousMode.  
+> >
+> > And here what is the difference between MODE_1 and MODE_3 ?
+> >
+> > I suppose here we should as well drop all non-beacon frames?  
+> 
+> Yes, additionally there could be a transceiver doing this filtering on
+> hardware and tell that it's in scan and this is the difference.
+> 
+> >  
+> > > + *
+> > > + * @IEEE802154_FILTER_MODE_3_NO_SCAN:
+> > > + *     IEEE802154_FILTER_MODE_3_SCAN with MFR additional filter on:
+> > > + *  
+> 
+> should be IEEE802154_FILTER_MODE_2. Maybe we can also get some better
+> names for that but the standard describes it with numbers as well.
+> 
+> > > + *     - No reserved value in frame type
+> > > + *     - No reserved value in frame version
+> > > + *     - Match mib.PanId or broadcast
+> > > + *     - Destination address field:
+> > > + *       - Match mib.ShortAddress or broadcast
+> > > + *       - Match mib.ExtendedAddress or GroupRxMode is true
+> > > + *       - ImplicitBroadcast is true and destination address field/destination
+> > > + *         panid is not included.
+> > > + *       - Device is coordinator only source address present in data
+> > > + *         frame/command frame and source panid matches mib.PanId
+> > > + *       - Device is coordinator only source address present in multipurpose
+> > > + *         frame and destination panid matches macPanId
+> > > + *     - Beacon frames source panid matches mib.PanId. If mib.PanId is
+> > > + *       broadcast it should always be accepted.  
+> >
+> > This is a bit counter intuitive, but do we agree on the fact that the
+> > higher level of filtering should refer to promiscuous = false?
+> >  
+> 
+> Yes, it's a lot of filter rules at this level.
+> Yes, promiscuous is false in this case. That is what currently what
+> wpan "node" interface should filter at mac802154 [1] (for cases device
+> coordinator is false).
+> 
+> I might mention a lot of future work here. I think we can live for now
+> to make a difference between those levels and be sure that we drop
+> everything else in the scan operation (inclusive check fcs in
+> software). Moving stuff that we can do in hardware to hardware and the
+> rest in software is a bigger task here...
 
-Gave it a first quick run on real hardware here. Besides one small bug 
-(see below) it looked good.
+On the symbol duration side I feel I'm close to a working PoC.
 
-Will give it a bit more testing over the next days.
+So there is 'only' this item left in my mind. Could you please clarify
+what you expect from me exactly in terms of support for the promiscuous
+filters we discussed so far?
 
+Also, just for the record,
+- should I keep copying the netdev list for v2?
+- should I monitor if net-next is open before sending or do you have
+  your own set of rules?
 
+> [0] https://elixir.bootlin.com/linux/v5.16-rc8/source/net/mac802154/rx.c#L294
+> [1] https://elixir.bootlin.com/linux/v5.16-rc8/source/net/mac802154/rx.c#L132
 
-> @@ -881,14 +819,27 @@ static int atusb_get_and_conf_chip(struct atusb *atusb)
->   	u8 man_id_0, man_id_1, part_num, version_num;
->   	const char *chip;
->   	struct ieee802154_hw *hw = atusb->hw;
-> +	int ret;
->   
-> -	man_id_0 = atusb_read_reg(atusb, RG_MAN_ID_0);
-> -	man_id_1 = atusb_read_reg(atusb, RG_MAN_ID_1);
-> -	part_num = atusb_read_reg(atusb, RG_PART_NUM);
-> -	version_num = atusb_read_reg(atusb, RG_VERSION_NUM);
-> +	ret = usb_control_msg_recv(usb_dev, 0, ATUSB_REG_READ, ATUSB_REQ_FROM_DEV,
-> +				   0, RG_MAN_ID_0, &man_id_0, 1, 1000, GFP_KERNEL);
-> +	if (ret < 0)
-> +		return ret;
->   
-> -	if (atusb->err)
-> -		return atusb->err;
-> +	ret = usb_control_msg_recv(usb_dev, 0, ATUSB_REG_READ, ATUSB_REQ_FROM_DEV,
-> +				   0, RG_MAN_ID_1, &man_id_1, 1, 1000, GFP_KERNEL);
-> +	if (ret < 0)
-> +		return ret;
-> +
-> +	ret = usb_control_msg_recv(usb_dev, 0, ATUSB_REG_READ, ATUSB_REQ_FROM_DEV,
-> +				   0, RG_PART_NUM, &atusb, 1, 1000, GFP_KERNEL);
-
-This needs to be written to &part_num and not &atusb.
-
-Pretty nice for a first blind try without hardware. Thanks.
-
-Will let you know if I find anything else from testing.
-
-regards
-Stefan Schmidt
+Thanks,
+Miquèl
