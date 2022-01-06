@@ -2,67 +2,69 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99FACC433EF
-	for <linux-wpan@archiver.kernel.org>; Thu,  6 Jan 2022 00:23:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93CFEC433F5
+	for <linux-wpan@archiver.kernel.org>; Thu,  6 Jan 2022 00:38:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343748AbiAFAXt (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 5 Jan 2022 19:23:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37024 "EHLO
+        id S1343863AbiAFAi2 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 5 Jan 2022 19:38:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40660 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343703AbiAFAXR (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 5 Jan 2022 19:23:17 -0500
-Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E36AFC034003;
-        Wed,  5 Jan 2022 16:23:16 -0800 (PST)
-Received: by mail-wm1-x331.google.com with SMTP id c126-20020a1c9a84000000b00346f9ebee43so278649wme.4;
-        Wed, 05 Jan 2022 16:23:16 -0800 (PST)
+        with ESMTP id S1343858AbiAFAiZ (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 5 Jan 2022 19:38:25 -0500
+Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16757C061245;
+        Wed,  5 Jan 2022 16:38:25 -0800 (PST)
+Received: by mail-wr1-x42b.google.com with SMTP id h23so1584813wrc.1;
+        Wed, 05 Jan 2022 16:38:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=LtbJ7TD9znxzhf98x0PHy/SqzW7ZVDB+4Aleb2LR+tc=;
-        b=hm8//BPPbFhrIDzJYowb5oFbAdkOAQqY0Drc1KsxzS8Vuca6ZQ4YoCiHHlOXdoi/PY
-         CXAuEcjbHoYriLebucFP1lHBz/nldh8amCJIAO+4iZYBkS9CKyopNWWovCj/L2sZTqxZ
-         V/O+WtrL/K+4A6QvMZEscSkTY+NnZUSptQqk/hGPJ8fc1zbSsJve8zEWFNYeXVVjKHcy
-         10tyeKZbgazhtRf8/x46KcJM4Ww3tVliwKGm1bVwvXDQY/CGxV2iA7hvxbjmo/7wJxeI
-         mh7mpSD85dHYkCp73haOpCzQhOHPF8oVzZ0ZNUWpSRz8x4qe0yzyYoHRVbJRUcvrpFrI
-         r1ag==
+        bh=6oWGncUTdb/LGs3ySkcNJ1+7l0wPkYWMZXRxkONbwWM=;
+        b=WOcmcZQ91NLeY8r5Xhe7La5t9fA6IBVHUZjZjWnXFjUybWMbPDrXV5FkANWgkzc+xY
+         ErGRAcorpy3a4lkic8lw3HBIYltHiJbGGFTOzM9X8n2mDHW+DvurG6MVBJf4nhyQVEwn
+         W2VPWW7Kfp9Qc+9d75nkMhx0fwWVDo/dlzNbbNh2SOgwr4cmZzIhOr5IbFBVe9uQWKoZ
+         NXLr0QrU48jggfCxKuubg0aqNcQEIKjdNTvAPwIZn21lw+43aS8rJmqbRs0m1floyPfc
+         QRBvHnRMBj92FSD5Fm+xVNiq787IGqrJxZmbGdDHxeaLgn3LwHiT8rqPD5TKOxgR3aA6
+         Cbeg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=LtbJ7TD9znxzhf98x0PHy/SqzW7ZVDB+4Aleb2LR+tc=;
-        b=I5sFcQUAs/FAP5d4NidRH119G9ncVC1yllj1EC66NJRIGI5ikID40NVgPbi8XtToP6
-         ByuX1T2z2Qi9Xz3ZpQ3VPfw1ZLlZDhKSN11khHaAbzlE8/b/9XjzVqzoYhmRQzVTiBrk
-         EU8l5MPPi+y7lI21H7CeyFkRCtFyWquLrwbxkaHriX6PdhlCKFWK4pxOboB13lFXR0V0
-         PldhombY39HVGyB/9/c8xjB7H2K1tnExZWxq+Z9WppeIxVVJuOgbRmj6JbJONDxDqFSL
-         OZ+fy1pbVzW5JXeN8dSp0e2zfNTzJNOAab6tL+GqGY5k99k8Pa+pnPUYTKUfp7eaNC07
-         zG4w==
-X-Gm-Message-State: AOAM531/Z3HlV0fq24TNpxVQ2CnXvlU9Eafkrru2z/HbxAg0d66pcEfS
-        pJIUh7GyjiLwIS3WeA1f76rQFQrtCOflXsPjzPek4q99udA=
-X-Google-Smtp-Source: ABdhPJxwVU92PbeiEsPXmYrPJ+CTjuJsI2k8EV3VJh4/qbdXFirVB51FerExeLPe1Oj+yyb9zEpWh8SsJv9A1SN2BzM=
-X-Received: by 2002:a1c:ed01:: with SMTP id l1mr4906259wmh.185.1641428595576;
- Wed, 05 Jan 2022 16:23:15 -0800 (PST)
+        bh=6oWGncUTdb/LGs3ySkcNJ1+7l0wPkYWMZXRxkONbwWM=;
+        b=xFD4G1Ej9nPVRZolAw7fN4zvWsuXR+8GiggheRmlrM7IO9h8ug6R+3t3+1AzPvFmdl
+         6150dDD1Lx/FTrb2j77pElkhKwlkJBvQuZ/f+hQX20atwfdCxmVwJ4gx4ReXEbgue0Nh
+         hpzZ0JmWGCFLyUmkje0E/xxjJObFgS7VU+cfZ+5TnD7NkoEF+VaQo4aeJa/skFJm7cpC
+         6w6ZKrIVhdkv8OIJ40LzIguHaK1suxyPEyBciMZkO5XTWGef8uqEQoEeQN2jLYtkl7FE
+         Wwcu+joqN7g+RsiJg4bv65juk5HCGhazP/KL+LtjZHPEiborUWTbcmV2SlaTBi2nixdG
+         PQqw==
+X-Gm-Message-State: AOAM5334RWcPaDrTDJzEFR4LgojUOIVKbh7U+9UsiJTI1M+PJ26eTbos
+        kzmwiZ0yVSXM5mF3+qO4JaJhJCC8DxPXYRofpZI=
+X-Google-Smtp-Source: ABdhPJzYbthJEutPB8xzcTHiFt+sX1/4exTSZodjSsLHUirlJq6K8CsOg/GZBpWxBgw4QPzFTX6wwo1Oq4+v0Pfx93w=
+X-Received: by 2002:adf:d1c2:: with SMTP id b2mr49224826wrd.81.1641429503747;
+ Wed, 05 Jan 2022 16:38:23 -0800 (PST)
 MIME-Version: 1.0
 References: <20211222155743.256280-1-miquel.raynal@bootlin.com>
- <20211222155743.256280-18-miquel.raynal@bootlin.com> <CAB_54W7o5b7a-2Gg5ZnzPj3o4Yw9FOAxJfykrA=LtpVf9naAng@mail.gmail.com>
- <SN6PR08MB4464D7124FCB5D0801D26B94E0459@SN6PR08MB4464.namprd08.prod.outlook.com>
- <CAB_54W6ikdGe=ZYqOsMgBdb9KBtfAphkBeu4LLp6S4R47ZDHgA@mail.gmail.com> <20220105094849.0c7e9b65@xps13>
-In-Reply-To: <20220105094849.0c7e9b65@xps13>
+ <20211222155743.256280-13-miquel.raynal@bootlin.com> <CAB_54W6AZ+LGTcFsQjNx7uq=+R5v_kdF0Xm5kwWQ8ONtfOrmAw@mail.gmail.com>
+ <Ycx0mwQcFsmVqWVH@ni.fr.eu.org> <CAB_54W41ZEoXzoD2_wadfMTY8anv9D9e2T5wRckdXjs7jKTTCA@mail.gmail.com>
+ <CAB_54W6gHE1S9Q+-SVbrnAWPxBxnvf54XVTCmddtj8g-bZzMRA@mail.gmail.com>
+ <20220104191802.2323e44a@xps13> <CAB_54W5quZz8rVrbdx+cotTRZZpJ4ouRDZkxeW6S1L775Si=cw@mail.gmail.com>
+ <20220105215551.1693eba4@xps13>
+In-Reply-To: <20220105215551.1693eba4@xps13>
 From:   Alexander Aring <alex.aring@gmail.com>
-Date:   Wed, 5 Jan 2022 19:23:04 -0500
-Message-ID: <CAB_54W4Z1KgT+Cx0SXptvkwYK76wDOFTueFUFF4e7G_ABP7kkA@mail.gmail.com>
-Subject: Re: [net-next 17/18] net: mac802154: Let drivers provide their own
- beacons implementation
-To:     Miquel Raynal <miquel.raynal@bootlin.com>
-Cc:     David Girault <David.Girault@qorvo.com>,
+Date:   Wed, 5 Jan 2022 19:38:12 -0500
+Message-ID: <CAB_54W7zDXfybMZZo8QPwRCxX8-BbkQdznwEkLEWeW+E3k2dNg@mail.gmail.com>
+Subject: Re: [net-next 12/18] net: mac802154: Handle scan requests
+To:     Miquel Raynal <miquel.raynal@bootlin.com>,
+        Stefan Schmidt <stefan@datenfreihafen.org>
+Cc:     Nicolas Schodet <nico@ni.fr.eu.org>,
         "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
         "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-        Stefan Schmidt <stefan@datenfreihafen.org>,
         linux-wpan - ML <linux-wpan@vger.kernel.org>,
-        Romuald Despres <Romuald.Despres@qorvo.com>,
-        Frederic Blain <Frederic.Blain@qorvo.com>,
+        David Girault <david.girault@qorvo.com>,
+        Romuald Despres <romuald.despres@qorvo.com>,
+        Frederic Blain <frederic.blain@qorvo.com>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
         kernel list <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
@@ -72,56 +74,46 @@ X-Mailing-List: linux-wpan@vger.kernel.org
 
 Hi,
 
-On Wed, 5 Jan 2022 at 03:48, Miquel Raynal <miquel.raynal@bootlin.com> wrote:
+
+On Wed, 5 Jan 2022 at 15:55, Miquel Raynal <miquel.raynal@bootlin.com> wrote:
+...
+> > rest in software is a bigger task here...
 >
-> Hi Alexander,
->
-> alex.aring@gmail.com wrote on Thu, 30 Dec 2021 14:48:41 -0500:
->
-> > Hi,
-> >
-> > On Thu, 30 Dec 2021 at 12:00, David Girault <David.Girault@qorvo.com> wrote:
-> > >
-> > > Hi Alexander,
-> > >
-> > > At Qorvo, we have developped a SoftMAC driver for our DW3000 chip that will benefit such API.
-> > >
-> > Do you want to bring this driver upstream as well? Currently those
-> > callbacks will be introduced but no user is there.
->
-> I think so far the upstream fate of the DW3000 driver has not been ruled
-> out so let's assume it won't be upstreamed (at least not fully), that's
-> also why we decided to begin with the hwsim driver.
+> On the symbol duration side I feel I'm close to a working PoC.
 >
 
-ok.
+oh, ok.
 
-> However, when designing this series, it appeared quite clear that any
-> hardMAC driver would need this type of interface. The content of the
-> interface, I agree, could be further discussed and even edited, but the
-> main idea of giving the information to the phy driver about what is
-> happening regarding eg. scan operations or beacon frames, might make
-> sense regardless of the current users, no?
+> So there is 'only' this item left in my mind. Could you please clarify
+> what you expect from me exactly in terms of support for the promiscuous
+> filters we discussed so far?
 >
 
-A HardMAC driver does not use this driver interface... but there
-exists a SoftMAC driver for a HardMAC transceiver. This driver
-currently works because we use dataframes only... It will not support
-scanning currently and somehow we should make iit not available for
-drivers like that and for drivers which don't set symbol duration.
-They need to be fixed.
+I think for now it's okay to set the device into promiscuous mode and
+enable the flag which checks for bad FCS... we can still implement the
+filter modes later (and I think it should work on all supported
+transceivers (except that SoftMAC/HardMAC thing)).
 
-> This being said, if other people decide to upstream a hardMAC driver
-> and need these hooks to behave a little bit differently, it's their
-> right to tweak them and that would also be part of the game.
->
-> Although we might not need these hooks in a near future at all if we
-> move to the filtering modes, because the promiscuous call with the
-> specific level might indicate to the device how it should configure
-> itself already.
+One point to promiscuous mode, currently we have a checking for if a
+phy is in promiscuous mode on ifup and it would forbid to ifup a node
+interface if the phy is in promiscuous mode (because of the missing
+automatic acknowledgement). I see there is a need to turn the phy into
+promiscuous mode during runtime... so we need somehow make sure the
+constraints are still valid here. Maybe we even forbid multiple devs
+on a phy if the transceiver/driver/firmware is poor and this is
+currently all transceivers (except hwsim? But that doesn't use any ack
+handling anyway).
+
+> Also, just for the record,
+> - should I keep copying the netdev list for v2?
+
+yes, why not.
+
+> - should I monitor if net-next is open before sending or do you have
+>   your own set of rules?
 >
 
-My concern is that somebody else might want to remove those callbacks
-because they are not used.
+I need to admit, Stefan is the "Thanks, applied." hero here and he
+should answer this question.
 
 - Alex
