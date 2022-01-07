@@ -2,127 +2,71 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 278E6C433F5
-	for <linux-wpan@archiver.kernel.org>; Thu,  6 Jan 2022 19:15:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A2E8C433F5
+	for <linux-wpan@archiver.kernel.org>; Fri,  7 Jan 2022 01:00:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243230AbiAFTPc convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-wpan@archiver.kernel.org>);
-        Thu, 6 Jan 2022 14:15:32 -0500
-Received: from relay4-d.mail.gandi.net ([217.70.183.196]:34181 "EHLO
-        relay4-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243146AbiAFTPb (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 6 Jan 2022 14:15:31 -0500
-Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by relay4-d.mail.gandi.net (Postfix) with ESMTPSA id 71CA0E0008;
-        Thu,  6 Jan 2022 19:15:28 +0000 (UTC)
-Date:   Thu, 6 Jan 2022 20:15:26 +0100
-From:   Miquel Raynal <miquel.raynal@bootlin.com>
+        id S1344122AbiAGBAW (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Thu, 6 Jan 2022 20:00:22 -0500
+Received: from dfw.source.kernel.org ([139.178.84.217]:47148 "EHLO
+        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236544AbiAGBAV (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 6 Jan 2022 20:00:21 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 5A17961E9B;
+        Fri,  7 Jan 2022 01:00:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50683C36AE3;
+        Fri,  7 Jan 2022 01:00:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1641517220;
+        bh=dWaphkxeosDnzOLIsXfGqQdCs0GB28cQL553hwjSiig=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=ThklsKuo/uGCPpetV9gMpmKJrCNmeREMHr/2WI1G985/9PkmZSb0RduCS026APTmQ
+         dmum1ndOVGJxFIwzeIPoIoPg3HXWpmrWNALqwtzCtMnvlxQKLjV4aD0wdGClazr7HU
+         dMTFXgjr2uIL0Hcm6te3Qom1mmhMOORI2lJ1iRkNcm3AvVvQNeVjqiJZf55a1d1/Wz
+         hC+yAGRsK6mT91vVIGj3ZGR25XnJRRtKWQeWFW8z+mOzYKWUeuHH52jycGKSR182NM
+         NMQ7YJhwD3GF6VyvqSeFx4gGPip6+IQuiu8BF4hcwPsR9HhM2fupq+NthIIs90YI64
+         fnLr59fpDjF5Q==
+Date:   Thu, 6 Jan 2022 17:00:19 -0800
+From:   Jakub Kicinski <kuba@kernel.org>
 To:     Alexander Aring <alex.aring@gmail.com>
-Cc:     David Girault <David.Girault@qorvo.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
+Cc:     Miquel Raynal <miquel.raynal@bootlin.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
+        Nicolas Schodet <nico@ni.fr.eu.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
         linux-wpan - ML <linux-wpan@vger.kernel.org>,
-        Romuald Despres <Romuald.Despres@qorvo.com>,
-        Frederic Blain <Frederic.Blain@qorvo.com>,
+        David Girault <david.girault@qorvo.com>,
+        Romuald Despres <romuald.despres@qorvo.com>,
+        Frederic Blain <frederic.blain@qorvo.com>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
         kernel list <linux-kernel@vger.kernel.org>
-Subject: Re: [net-next 17/18] net: mac802154: Let drivers provide their own
- beacons implementation
-Message-ID: <20220106201526.7e513f2f@xps13>
-In-Reply-To: <CAB_54W4Z1KgT+Cx0SXptvkwYK76wDOFTueFUFF4e7G_ABP7kkA@mail.gmail.com>
+Subject: Re: [net-next 12/18] net: mac802154: Handle scan requests
+Message-ID: <20220106170019.730f45e8@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
+In-Reply-To: <CAB_54W7zDXfybMZZo8QPwRCxX8-BbkQdznwEkLEWeW+E3k2dNg@mail.gmail.com>
 References: <20211222155743.256280-1-miquel.raynal@bootlin.com>
-        <20211222155743.256280-18-miquel.raynal@bootlin.com>
-        <CAB_54W7o5b7a-2Gg5ZnzPj3o4Yw9FOAxJfykrA=LtpVf9naAng@mail.gmail.com>
-        <SN6PR08MB4464D7124FCB5D0801D26B94E0459@SN6PR08MB4464.namprd08.prod.outlook.com>
-        <CAB_54W6ikdGe=ZYqOsMgBdb9KBtfAphkBeu4LLp6S4R47ZDHgA@mail.gmail.com>
-        <20220105094849.0c7e9b65@xps13>
-        <CAB_54W4Z1KgT+Cx0SXptvkwYK76wDOFTueFUFF4e7G_ABP7kkA@mail.gmail.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 3.17.7 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+        <20211222155743.256280-13-miquel.raynal@bootlin.com>
+        <CAB_54W6AZ+LGTcFsQjNx7uq=+R5v_kdF0Xm5kwWQ8ONtfOrmAw@mail.gmail.com>
+        <Ycx0mwQcFsmVqWVH@ni.fr.eu.org>
+        <CAB_54W41ZEoXzoD2_wadfMTY8anv9D9e2T5wRckdXjs7jKTTCA@mail.gmail.com>
+        <CAB_54W6gHE1S9Q+-SVbrnAWPxBxnvf54XVTCmddtj8g-bZzMRA@mail.gmail.com>
+        <20220104191802.2323e44a@xps13>
+        <CAB_54W5quZz8rVrbdx+cotTRZZpJ4ouRDZkxeW6S1L775Si=cw@mail.gmail.com>
+        <20220105215551.1693eba4@xps13>
+        <CAB_54W7zDXfybMZZo8QPwRCxX8-BbkQdznwEkLEWeW+E3k2dNg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi Alexander,
-
-alex.aring@gmail.com wrote on Wed, 5 Jan 2022 19:23:04 -0500:
-
-> Hi,
+On Wed, 5 Jan 2022 19:38:12 -0500 Alexander Aring wrote:
+> > Also, just for the record,
+> > - should I keep copying the netdev list for v2?  
 > 
-> On Wed, 5 Jan 2022 at 03:48, Miquel Raynal <miquel.raynal@bootlin.com> wrote:
-> >
-> > Hi Alexander,
-> >
-> > alex.aring@gmail.com wrote on Thu, 30 Dec 2021 14:48:41 -0500:
-> >  
-> > > Hi,
-> > >
-> > > On Thu, 30 Dec 2021 at 12:00, David Girault <David.Girault@qorvo.com> wrote:  
-> > > >
-> > > > Hi Alexander,
-> > > >
-> > > > At Qorvo, we have developped a SoftMAC driver for our DW3000 chip that will benefit such API.
-> > > >  
-> > > Do you want to bring this driver upstream as well? Currently those
-> > > callbacks will be introduced but no user is there.  
-> >
-> > I think so far the upstream fate of the DW3000 driver has not been ruled
-> > out so let's assume it won't be upstreamed (at least not fully), that's
-> > also why we decided to begin with the hwsim driver.
-> >  
-> 
-> ok.
-> 
-> > However, when designing this series, it appeared quite clear that any
-> > hardMAC driver would need this type of interface. The content of the
-> > interface, I agree, could be further discussed and even edited, but the
-> > main idea of giving the information to the phy driver about what is
-> > happening regarding eg. scan operations or beacon frames, might make
-> > sense regardless of the current users, no?
-> >  
-> 
-> A HardMAC driver does not use this driver interface... but there
-> exists a SoftMAC driver for a HardMAC transceiver. This driver
-> currently works because we use dataframes only... It will not support
-> scanning currently and somehow we should make iit not available for
-> drivers like that and for drivers which don't set symbol duration.
-> They need to be fixed.
+> yes, why not.
 
-My bad. I did not look at it correctly. I made a mistake when talking
-about a hardMAC.
-
-Instead, it is a "custom" low level MAC layer. I believe we can compare
-the current mac802154 layer mostly to the MLME that is mentioned in the
-spec. Well here the additional layer that needs these hooks would be
-the MCPS. I don't know if this will be upstreamed or not, but the need
-for these hooks is real if such an intermediate low level MAC layer
-gets introduced.
-
-In v2 I will get rid of the two patches adding "driver access" to scans
-and beacons in order to facilitate the merge of the big part. Then we
-will have plenty of time to discuss how we can create such an interface.
-Perhaps I'll be able to propose more code as well to make use of these
-hooks, we will see.
-
-> > This being said, if other people decide to upstream a hardMAC driver
-> > and need these hooks to behave a little bit differently, it's their
-> > right to tweak them and that would also be part of the game.
-> >
-> > Although we might not need these hooks in a near future at all if we
-> > move to the filtering modes, because the promiscuous call with the
-> > specific level might indicate to the device how it should configure
-> > itself already.
-> >  
-> 
-> My concern is that somebody else might want to remove those callbacks
-> because they are not used.
-
-Yes, this is likely to happen quickly because of robots :)
-
-Thanks,
-Miquèl
+On the question of lists copied it may make sense to CC linux-wireless@
+in case they have some precedent to share, and drop linux-kernel@.
