@@ -2,73 +2,59 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DD67C433EF
-	for <linux-wpan@archiver.kernel.org>; Sat,  8 Jan 2022 13:21:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55C85C433EF
+	for <linux-wpan@archiver.kernel.org>; Mon, 10 Jan 2022 08:57:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234339AbiAHNVH (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Sat, 8 Jan 2022 08:21:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37172 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232663AbiAHNVG (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Sat, 8 Jan 2022 08:21:06 -0500
-Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9386C061574;
-        Sat,  8 Jan 2022 05:21:05 -0800 (PST)
-Received: by mail-lf1-x129.google.com with SMTP id x6so26008720lfa.5;
-        Sat, 08 Jan 2022 05:21:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=rEEQvk5Uck5nCpY81jxsRsod1zvCRX8Cy7vuSwuU20w=;
-        b=nvoIU95jfD0X5rzdTYqID+b+uRLzjpP8BoezE4XHaRZZ9Al1zMLBamHUotVxV6R33S
-         vxoqQqVnI156zdGsy4VZJeROx293CXzs2/3QvErcZvkzrBSSK4B/Iid/YiwjJ11FCOPu
-         Fh5B044qXfSQXdkHa0FnjvpBK10ga91QeM/GobLb5HPQ6ht3ql/8Si5E0cIhkXLEzME/
-         46nEWM65tOuKzWPnUbNlcMB/pqem/GjFg+cG8hZjtNKJ2jQol/+iG5K7pGhWjUaHAotG
-         zAASZAfIzBIrwwdndvDe0Pif80PysNDCiAAPUHd/GqWedryEvKuoGKy0K8QA+TdT9z5/
-         0p7g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=rEEQvk5Uck5nCpY81jxsRsod1zvCRX8Cy7vuSwuU20w=;
-        b=f/x4RwO390LZkXZIfYs4jLv5DwMCnl0VNhXxt2ASP5QydWUEKZJ3i33RXYdsCqdoeH
-         28Op2T5EOaLF3VVxSEQ7iCsSmrAaadurulqNJ+kkHgmRFt4RZMbUBB5lUVxMkL4zrf1L
-         siotCNJvDXGoMOVtYcd98xuegH2/e5h5/LW3uDbyANoZBOncjqu+xfdv8S8jjhvEsZQi
-         HpZv1cH4cXXkE1tehkxW3Zkx5J+bX4eEmW5exf+6O2A0hnr08Xl6M0I2q6+8ntVwtN3J
-         gXNV/D545/BC8o9fHFXq9i1uSPEvK8BO3Ab1P49MXBxyvKJpp3pryRkdMBLAJdFyxq3M
-         DTVw==
-X-Gm-Message-State: AOAM533t7IEvBmhVf0T9nxKOZoTnNrntBRaa2EtVxyWznsJM5VUfURXZ
-        ocZKah2mMQC7J1XdPHbVmxA=
-X-Google-Smtp-Source: ABdhPJxE1+p7uSaAQ1gOWG571UTgSZCt/5TZLMGoJLFBT8yu2EYsfO9aU8EnVDTlB+yU3tOsbc0q0w==
-X-Received: by 2002:a2e:9dcb:: with SMTP id x11mr49877694ljj.296.1641648064177;
-        Sat, 08 Jan 2022 05:21:04 -0800 (PST)
-Received: from [192.168.1.11] ([217.117.245.67])
-        by smtp.gmail.com with ESMTPSA id q5sm223025lji.57.2022.01.08.05.21.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 08 Jan 2022 05:21:03 -0800 (PST)
-Message-ID: <9f7b9736-e67e-19fb-0f7b-6ee6735d5d13@gmail.com>
-Date:   Sat, 8 Jan 2022 16:21:01 +0300
+        id S242304AbiAJI5b (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 10 Jan 2022 03:57:31 -0500
+Received: from proxima.lasnet.de ([78.47.171.185]:54072 "EHLO
+        proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S241968AbiAJI5G (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 10 Jan 2022 03:57:06 -0500
+Received: from [IPV6:2003:e9:d726:98fc:cdf9:bc0b:bacf:e07a] (p200300e9d72698fccdf9bc0bbacfe07a.dip0.t-ipconnect.de [IPv6:2003:e9:d726:98fc:cdf9:bc0b:bacf:e07a])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: stefan@datenfreihafen.org)
+        by proxima.lasnet.de (Postfix) with ESMTPSA id 4E392C05A1;
+        Mon, 10 Jan 2022 09:57:02 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
+        s=2021; t=1641805022;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=IaYI1Hh+FARrQFhEF0cAj1myGc5Q4XmWUc/d7YCm7jg=;
+        b=BKDixR9k/4qpycMv7rQ/G7RH+cpCQMhfg2Acg7w/IGD1+rdGc5GseTOKD1i5UytXMKqtya
+        P9+m/lrTcpfV8t+WRUlMGlNtdTfnCBT3W8oaWT/c/QANHfS8NRCf5jFbZ8zLkQKvCLOOed
+        yGN/gBkqLSKlNjs5VwU5jbRUgT9G9/ug6FAbjZjNAuIT5fsTHyNvRRkC436soN+aEoRniV
+        fSJBQsh9SDom8Jd1MGrnbTkQiNUoyVzEIweKsN+YisIWze//bFrVeLV78xblj6gwoFbxoe
+        L4XDfc5zqgf30t6x3WHLdxo49ceKt7ZOybXOlcFfw7OJj9A8fL1NUhfAbNhaRw==
+Message-ID: <871f2181-6356-8bfd-47cb-0872d70b2cd9@datenfreihafen.org>
+Date:   Mon, 10 Jan 2022 09:57:01 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.1
+ Thunderbird/91.2.0
 Subject: Re: [PATCH -next v2] ieee802154: atusb: move to new USB API
 Content-Language: en-US
-To:     alex.aring@gmail.com, davem@davemloft.net, kuba@kernel.org
+To:     Pavel Skripkin <paskripkin@gmail.com>, alex.aring@gmail.com,
+        davem@davemloft.net, kuba@kernel.org
 Cc:     linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
         linux-kernel@vger.kernel.org
-References: <2439d9ab-133f-0338-24f9-a9a5cd2065a3@datenfreihafen.org--to=stefan@datenfreihafen.org>
- <20220108131808.12225-1-paskripkin@gmail.com>
-From:   Pavel Skripkin <paskripkin@gmail.com>
-In-Reply-To: <20220108131808.12225-1-paskripkin@gmail.com>
+References: <2439d9ab-133f-0338-24f9-a9a5cd2065a3@datenfreihafen.org>
+ <20220108131838.12321-1-paskripkin@gmail.com>
+From:   Stefan Schmidt <stefan@datenfreihafen.org>
+In-Reply-To: <20220108131838.12321-1-paskripkin@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-On 1/8/22 16:18, Pavel Skripkin wrote:
+
+Hello.
+
+On 08.01.22 14:18, Pavel Skripkin wrote:
 > Old USB API is prone to uninit value bugs if error handling is not
 > correct. Let's move atusb to use new USB API to
 > 
@@ -88,13 +74,19 @@ On 1/8/22 16:18, Pavel Skripkin wrote:
 > 
 > Link: https://lore.kernel.org/all/YdL0GPxy4TdGDzOO@kroah.com/ [0]
 > Signed-off-by: Pavel Skripkin <paskripkin@gmail.com>
+> ---
+> 
+> Changes in v2:
+> 	- Fixed logic bug in atusb_get_and_conf_chip()
+> 	- Renamed rc variable to reg in atusb_read_subreg()
+> 
+> ---
+>   drivers/net/ieee802154/atusb.c | 186 ++++++++++++---------------------
+>   1 file changed, 67 insertions(+), 119 deletions(-)
 
-Please, ignore this one.
 
-Typo in git send-email args caused this email to be send in wrong thread 
-and missed Stefan in CC list.
+This patch has been applied to the wpan-next tree and will be
+part of the next pull request to net-next. Thanks!
 
-
-
-With regards,
-Pavel Skripkin
+regards
+Stefan Schmidt
