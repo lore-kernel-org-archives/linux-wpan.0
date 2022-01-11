@@ -2,56 +2,72 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 563CFC433EF
-	for <linux-wpan@archiver.kernel.org>; Tue, 11 Jan 2022 03:01:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1272DC433F5
+	for <linux-wpan@archiver.kernel.org>; Tue, 11 Jan 2022 13:44:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234094AbiAKDBO (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 10 Jan 2022 22:01:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39024 "EHLO
+        id S240661AbiAKNoE (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 11 Jan 2022 08:44:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45988 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231590AbiAKDBO (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 10 Jan 2022 22:01:14 -0500
-Received: from mail-yb1-xb31.google.com (mail-yb1-xb31.google.com [IPv6:2607:f8b0:4864:20::b31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56AAFC06173F;
-        Mon, 10 Jan 2022 19:01:14 -0800 (PST)
-Received: by mail-yb1-xb31.google.com with SMTP id h14so26102481ybe.12;
-        Mon, 10 Jan 2022 19:01:14 -0800 (PST)
+        with ESMTP id S240639AbiAKNoE (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 11 Jan 2022 08:44:04 -0500
+Received: from mail-wm1-x330.google.com (mail-wm1-x330.google.com [IPv6:2a00:1450:4864:20::330])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E33A1C06173F;
+        Tue, 11 Jan 2022 05:44:03 -0800 (PST)
+Received: by mail-wm1-x330.google.com with SMTP id w26so5191076wmi.0;
+        Tue, 11 Jan 2022 05:44:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:from:date:message-id:subject:to:cc;
-        bh=MWvcAvXFOF/Z8QQUHp2bmP40nPXieQHtuAf08iJH6U8=;
-        b=Ygv8h6i2/BRZHQOOUaST9LF3sjvhvBjSsxOidbDpbYYZ2qXItEwGd5CtwxfJP8M4pr
-         VV9y6cJNqdqChts0GCDEtHIo4Et2gOKpQ2IJ1hOVDWahZqXkt/Brt9ZXDqkupMTlQM17
-         D1tBfvuo410zCVwA4Q+cp0pGHsC3ACHpB1A1N0nNDeO+cUEjDwmJhNZCz+7N3k8ma8Zg
-         +RWw3e+K93kdje75UlnLEgN1n3F0z2xbPU1vQ0or+UZqdwyohmLaEgyHUf2AWsm//IfY
-         0J/NyWg4hwArqqdCJqvXqwpI9x/onQNTkR2quL6QaoCIGAQ6dPg0wE3oy2ChdSUi0z8T
-         vFSA==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=q/1TZTVcMCm0Q08vmDEx0MNqXROMr3/462DjqdnKRfk=;
+        b=gBWQgbbuaeUjs2d1kfbB/QbJpLEMbAqkEJiEVFRzII4OWyBQy+MRYbeYqAppx/cqFY
+         B9UzJs7nay4+s2dh7ZpVX7aF5P0/YSBRzAzqIRToq7IJLSArQUdJBMeeDhCPP+gPt4Tk
+         itXeN76MRYZ6yw6OqFAeMVvk1kjNVRrwbVoP8lKD1L4tZTDeDTYdC7yIXKKgwhQzrOiw
+         oTghcMI4E1Xx8PwFtJpe6iEQYwAkHP+eyDgb067StXSBBbjG2gduz5zpd8n4G3eNN+LH
+         RL3JIVKpds5DI8Aq5UF6JPu0CtpHDO1UWBNOzeiJ8ql5D7liGcNgD4pAbOjtXmpJVWXZ
+         mMbg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=MWvcAvXFOF/Z8QQUHp2bmP40nPXieQHtuAf08iJH6U8=;
-        b=IiK+GHq8umJXAZoXXE0UPlAx7I5DQU0dCJJIOrlXJYSNf1Dw7bPpz6QrBRwqHmUQRY
-         1NqyNdRZZPTsKA2yzpOll3zHb0oQhCyRjB4OlMdFDV8kxnNnWfJdhI+MgZEF2mIOHgNw
-         k7WNmzZ0xQfUGV+UiZ3odoVMRG7KsDARref/LHVQXPFpKCj0wsqBuE/yE8ApxH64NEFt
-         dTvuiLs2TDNjWGZwJfV1GnM13odmslxpq1gRozFti4hedzDstbehOsbELiL8WpA1UYkq
-         nFwApKLdG4wZUSupZNQiJZMhif0yNy3HV9TqwgAevI/dOyAiSNag81qqpLM8Cp3GK041
-         isww==
-X-Gm-Message-State: AOAM530+ikpJtYfCnfDvVFQh1j2BgXfS17qB8B0p49NYwWX1kkYTRmcn
-        R/H34pAASjYKWG+OdYHslQIARdq6nZApH23kGwjbmUTDDTgqaGhE5Rw=
-X-Google-Smtp-Source: ABdhPJzb89UvH8xmUGtFFAYjnuqiogDNOsac6Hev3lNTOBkPEYuaxHU+CHegsrS+ixre/iUmjyFZmxqkVSRT/lBD8qY=
-X-Received: by 2002:a25:4aca:: with SMTP id x193mr3559114yba.149.1641870073630;
- Mon, 10 Jan 2022 19:01:13 -0800 (PST)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=q/1TZTVcMCm0Q08vmDEx0MNqXROMr3/462DjqdnKRfk=;
+        b=OIfMT0fG5wYbzbmXIKODQ+EM89S6pl76q/J+otRQjoeVKcqCDobcs0sBPiTQfjLxw3
+         uA/C83cHhd0Sdt7i5E067NXH+6tjCXs3vATSvnaIj6bVHD+Ux62NqTFLdgSGrlPWFCZW
+         2yDtSLlULO5+rYz2Np9pTo7MDEr3qGQWGlt0l5iZD6uNri4OvhIuRO8CciLd9b727Q07
+         FvrzZHkGFKfaLOT4plW0qa1wBRrbn6RW0HqFziPQ7z+cbTnGXikVxuzn1GsVOzdM5kL2
+         qakMpgv+0CHwzohSGPDHRXxykiRHUt3uUxQSsXaqFgC22Ejp3b5AIcgx5GzJzpKB3yIL
+         IH7g==
+X-Gm-Message-State: AOAM5330/RzcTMhW2EUm1RXm54RuJnC/yecpMkzAXPuSyEeqX9eayzQa
+        EcBZIzITRCKBrml23BR5ToG4KH3bbx3nAP4p+Mk=
+X-Google-Smtp-Source: ABdhPJzv3sMf2ph7oP+5F3yymz/JZkN8z4oHszysdVs2BKRlhnswFYjmvulwtSDlrMYsQR2+rBHoHGsL3lHVkOT129w=
+X-Received: by 2002:a1c:545b:: with SMTP id p27mr2536690wmi.178.1641908642447;
+ Tue, 11 Jan 2022 05:44:02 -0800 (PST)
 MIME-Version: 1.0
-From:   cruise k <cruise4k@gmail.com>
-Date:   Tue, 11 Jan 2022 11:01:03 +0800
-Message-ID: <CAKcFiNDyPSx_M9HJNhDJd0Omq4JFLXNjDR_9bxaSjvmPc2bXxQ@mail.gmail.com>
-Subject: INFO: task hung in nl802154_pre_doit
-To:     Alexander Aring <alex.aring@gmail.com>,
-        Stefan Schmidt <stefan@datenfreihafen.org>,
+References: <20211222155743.256280-1-miquel.raynal@bootlin.com>
+ <20211222155743.256280-18-miquel.raynal@bootlin.com> <CAB_54W7o5b7a-2Gg5ZnzPj3o4Yw9FOAxJfykrA=LtpVf9naAng@mail.gmail.com>
+ <SN6PR08MB4464D7124FCB5D0801D26B94E0459@SN6PR08MB4464.namprd08.prod.outlook.com>
+ <CAB_54W6ikdGe=ZYqOsMgBdb9KBtfAphkBeu4LLp6S4R47ZDHgA@mail.gmail.com>
+ <20220105094849.0c7e9b65@xps13> <CAB_54W4Z1KgT+Cx0SXptvkwYK76wDOFTueFUFF4e7G_ABP7kkA@mail.gmail.com>
+ <20220106201526.7e513f2f@xps13> <CAB_54W7=YJu7qJPcGX0O6nkBhmg7EmX2iTy+Q+EgffqE5+0NCQ@mail.gmail.com>
+ <20220107084029.21f341a4@xps13>
+In-Reply-To: <20220107084029.21f341a4@xps13>
+From:   Alexander Aring <alex.aring@gmail.com>
+Date:   Tue, 11 Jan 2022 08:43:51 -0500
+Message-ID: <CAB_54W7kL6XnZxVXKudWXqMa=HVm=dk5ydAy6Ec4iMoU9mCNKA@mail.gmail.com>
+Subject: Re: [net-next 17/18] net: mac802154: Let drivers provide their own
+ beacons implementation
+To:     Miquel Raynal <miquel.raynal@bootlin.com>
+Cc:     David Girault <David.Girault@qorvo.com>,
         "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>, linux-wpan@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     sunhao.th@gmail.com
+        Jakub Kicinski <kuba@kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
+        Stefan Schmidt <stefan@datenfreihafen.org>,
+        linux-wpan - ML <linux-wpan@vger.kernel.org>,
+        Romuald Despres <Romuald.Despres@qorvo.com>,
+        Frederic Blain <Frederic.Blain@qorvo.com>,
+        Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+        kernel list <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
@@ -59,72 +75,76 @@ X-Mailing-List: linux-wpan@vger.kernel.org
 
 Hi,
 
-Syzkaller found the following issue:
+On Fri, 7 Jan 2022 at 02:40, Miquel Raynal <miquel.raynal@bootlin.com> wrote:
+>
+> Hi Alexander,
+>
+> alex.aring@gmail.com wrote on Thu, 6 Jan 2022 23:21:45 -0500:
+>
+> > Hi,
+> >
+> > On Thu, 6 Jan 2022 at 14:15, Miquel Raynal <miquel.raynal@bootlin.com> wrote:
+> > >
+> > > Hi Alexander,
+> > >
+> > > alex.aring@gmail.com wrote on Wed, 5 Jan 2022 19:23:04 -0500:
+> > >
+> > ...
+> > > >
+> > > > A HardMAC driver does not use this driver interface... but there
+> > > > exists a SoftMAC driver for a HardMAC transceiver. This driver
+> > > > currently works because we use dataframes only... It will not support
+> > > > scanning currently and somehow we should make iit not available for
+> > > > drivers like that and for drivers which don't set symbol duration.
+> > > > They need to be fixed.
+> > >
+> > > My bad. I did not look at it correctly. I made a mistake when talking
+> > > about a hardMAC.
+> > >
+> > > Instead, it is a "custom" low level MAC layer. I believe we can compare
+> > > the current mac802154 layer mostly to the MLME that is mentioned in the
+> > > spec. Well here the additional layer that needs these hooks would be
+> > > the MCPS. I don't know if this will be upstreamed or not, but the need
+> > > for these hooks is real if such an intermediate low level MAC layer
+> > > gets introduced.
+> > >
+> > > In v2 I will get rid of the two patches adding "driver access" to scans
+> > > and beacons in order to facilitate the merge of the big part. Then we
+> > > will have plenty of time to discuss how we can create such an interface.
+> > > Perhaps I'll be able to propose more code as well to make use of these
+> > > hooks, we will see.
+> > >
+> >
+> > That the we have a standardised interface between Ieee802154 and
+> > (HardMAC or SoftMAC(mac802154)) (see cfg802154_ops) which is defined
+> > according the spec would make it more "stable" that it will work with
+> > different HardMAC transceivers (which follows that interface) and
+> > mac802154 stack (which also follows that interface). If I understood
+> > you correctly.
+>
+>
+> I am not sure. I am really talking about a softMAC. I am not sure
+> where to put that layer "vertically" but according to the spec the MCPS
+> (MAC Common Part Sublayer) is the layer that contains the data
+> primitives, while MLME has been designed for management and
+> configuration.
+>
 
-HEAD commit: 75acfdb Linux 5.16-rc8
-git tree: upstream
-console output: https://pastebin.com/raw/AzAMX5zz
-kernel config: https://pastebin.com/raw/XsnKfdRt
+ok.
 
-And hope the report log can help you.
+> > I think this is one reason why we are not having any HardMAC
+> > transceivers driver supported in a proper way yet.
+> >
+> > I can also imagine about a hwsim HardMAC transceiver which redirects
+> > cfg802154 to mac802154 SoftMAC instance again (something like that),
+> > to have a virtual HardMAC transceiver for testing purpose, etc. In
+> > theory that should work...
+>
+> Yeah I see what you mean, but IMHO that's basically duplicating the
+> softMAC layer, we already have hwsim wired to cfg802154 through
+> mac802154. In a certain way we could argue that this is a hardMAC =)
 
-[ 1251.721354][   T59] INFO: task syz-executor.0:2134 blocked for more
-than 143 seconds.
-[ 1251.722724][   T59]       Not tainted 5.16.0-rc8+ #10
-[ 1251.723664][   T59] "echo 0 >
-/proc/sys/kernel/hung_task_timeout_secs" disables this message.
-[ 1251.725148][   T59] task:syz-executor.0  state:D stack:27536 pid:
-2134 ppid: 13069 flags:0x00000004
-[ 1251.726742][   T59] Call Trace:
-[ 1251.727272][   T59]  <TASK>
-[ 1251.727788][   T59]  __schedule+0xcd9/0x2550
-[ 1251.728512][   T59]  ? io_schedule_timeout+0x150/0x150
-[ 1251.731002][   T59]  schedule+0xd2/0x260
-[ 1251.731762][   T59]  schedule_preempt_disabled+0xf/0x20
-[ 1251.732627][   T59]  __mutex_lock+0xc48/0x1610
-[ 1251.733367][   T59]  ? nl802154_pre_doit+0x645/0xd30
-[ 1251.734194][   T59]  ? mutex_lock_io_nested+0x1410/0x1410
-[ 1251.735387][   T59]  ? __nla_validate_parse+0x2df/0x2400
-[ 1251.736727][   T59]  ? nla_get_range_signed+0x520/0x520
-[ 1251.737977][   T59]  ? rcu_read_lock_sched_held+0x9c/0xd0
-[ 1254.756569][ T3364] lowmem_reserve[]: 0 0 852 852 852
-[ 1254.757520][ T3364] Node 1 Normal free:36116kB boost:0kB
-min:24292kB low:30364kB high:36436kB reserved_highatomic:12288KB
-active_anon:15552kB inactive_anon:191888kB active_file:0kB
-inactive_file:56kB unevictable:1536kB writepending:0kB
-present:1048576kB managed:872480kB mlocked:0kB bounce:0kB
-free_pcp:4952kB local_pcp:776kB free_cma:0kB
-[ 1254.852260][ T2256] Node 0 DMA free:6572kB boost:2048kB min:2472kB
-low:2576kB high:2680kB reserved_highatomic:0KB active_anon:12kB
-inactive_anon:4636kB active_file:0kB inactive_file:0kB unevictable:0kB
-writepending:0kB present:15992kB managed:15360kB mlocked:0kB
-bounce:0kB free_pcp:8kB local_pcp:8kB free_cma:0kB
-[ 1254.856691][ T2256] lowmem_reserve[]: 0 1333 1333 1333 1333
-[ 1254.857666][ T2256] Node 0 DMA32 free:98544kB boost:85540kB
-min:123560kB low:133064kB high:142568kB reserved_highatomic:16384KB
-active_anon:10888kB inactive_anon:467648kB active_file:4kB
-inactive_file:1424kB unevictable:1536kB writepending:0kB
-present:2080768kB managed:1372868kB mlocked:0kB bounce:0kB
-free_pcp:4416kB local_pcp:316kB free_cma:0kB
-[ 1255.151925][   T59]  ? nl802154_pre_doit+0x645/0xd30
-[ 1255.152819][   T59]  ? rtnl_lock+0x5/0x20
-[ 1255.153500][   T59]  nl802154_pre_doit+0x645/0xd30
-[ 1255.154329][   T59]  ? __nla_parse+0x3d/0x50
-[ 1255.155330][   T59]  ? nl802154_dump_llsec_dev+0xba0/0xba0
-[ 1255.156224][   T59]  ? write_comp_data+0x1c/0x70
-[ 1255.157031][   T59]  ? __sanitizer_cov_trace_pc+0x1a/0x40
-[ 1255.158010][   T59]  ? genl_family_rcv_msg_attrs_parse.isra.0+0x1ae/0x280
-[ 1255.159174][   T59]  ? nl802154_dump_llsec_dev+0xba0/0xba0
-[ 1258.792471][ T1340] ieee802154 phy1 wpan1: encryption failed: -22
-[ 1258.882579][ T3364] lowmem_reserve[]: 0 0 0 0 0
-[ 1260.285180][   T59]  genl_family_rcv_msg_doit.isra.0+0x1e4/0x330
-[ 1260.286249][   T59]  ? genl_start+0x670/0x670
-[ 1260.287076][   T59]  ? __sanitizer_cov_trace_pc+0x1a/0x40
-[ 1260.287968][   T59]  ? __radix_tree_lookup+0x21b/0x2b0
-[ 1260.288832][   T59]  ? __sanitizer_cov_trace_pc+0x1a/0x40
-[ 1260.997983][ T2256] lowmem_reserve[]: 0 0 0 0 0
-[ 1260.998899][ T2256] Node 1 DMA32 free:21864kB boost:0kB min:27368kB
-low:34208kB high:41048kB reserved_highatomic:0KB active_anon:0kB
-inactive_anon:66040kB active_file:80kB inactive_file:0kB
-unevictable:0kB writepending:0kB present:1048444kB managed:982908kB
-mlocked:0kB bounce:0kB free_pcp:4064kB local_pcp:1984kB free_cma:0kB
+Would be good to show people "here is how to write a HardMAC
+driver..." if this is even possible without any change yet.
+
+- Alex
