@@ -2,73 +2,56 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97078C433EF
-	for <linux-wpan@archiver.kernel.org>; Mon, 10 Jan 2022 17:17:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 563CFC433EF
+	for <linux-wpan@archiver.kernel.org>; Tue, 11 Jan 2022 03:01:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238144AbiAJRRT (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 10 Jan 2022 12:17:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44862 "EHLO
+        id S234094AbiAKDBO (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 10 Jan 2022 22:01:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39024 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238145AbiAJRRN (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 10 Jan 2022 12:17:13 -0500
-Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57E0CC06173F;
-        Mon, 10 Jan 2022 09:17:13 -0800 (PST)
-Received: by mail-wr1-x42e.google.com with SMTP id r9so26329251wrg.0;
-        Mon, 10 Jan 2022 09:17:13 -0800 (PST)
+        with ESMTP id S231590AbiAKDBO (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 10 Jan 2022 22:01:14 -0500
+Received: from mail-yb1-xb31.google.com (mail-yb1-xb31.google.com [IPv6:2607:f8b0:4864:20::b31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56AAFC06173F;
+        Mon, 10 Jan 2022 19:01:14 -0800 (PST)
+Received: by mail-yb1-xb31.google.com with SMTP id h14so26102481ybe.12;
+        Mon, 10 Jan 2022 19:01:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=OspTksM1ZJ6oD0IVbU2kN9rq1ubtzw2y6Qqnpo9cR4E=;
-        b=QZXR1ossMQjLElP15+K7a4teC+yrrvepXZkQBQ9gag1wUy4dFQ6k5XdFKGfInRY6f+
-         tqasU+iagTMYWITaoIGzbhoRtwfT58Qem61YnuK5EhfvwIkru7vOL1T07bRM064lR1LN
-         xU/x9WyuWT4zgIQLJxPEZhmRkFrGHNLfnRRrUUz55rZP5WKSP8zA1TbrqrVX/XjGT36h
-         ZlRQlWw/PIZgn3TvPN3X8vh5qx/uIE6/g/Nn0Z3O1+8MedRzQtUCXVOhd9bxEZsOfMNt
-         ZqEVwrQgGbj6huWQe9FR0sgM9i9i8fgmsgLuSU+XbcncW/ivKE1TZ3v7t7l8KczJMYDb
-         CATQ==
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=MWvcAvXFOF/Z8QQUHp2bmP40nPXieQHtuAf08iJH6U8=;
+        b=Ygv8h6i2/BRZHQOOUaST9LF3sjvhvBjSsxOidbDpbYYZ2qXItEwGd5CtwxfJP8M4pr
+         VV9y6cJNqdqChts0GCDEtHIo4Et2gOKpQ2IJ1hOVDWahZqXkt/Brt9ZXDqkupMTlQM17
+         D1tBfvuo410zCVwA4Q+cp0pGHsC3ACHpB1A1N0nNDeO+cUEjDwmJhNZCz+7N3k8ma8Zg
+         +RWw3e+K93kdje75UlnLEgN1n3F0z2xbPU1vQ0or+UZqdwyohmLaEgyHUf2AWsm//IfY
+         0J/NyWg4hwArqqdCJqvXqwpI9x/onQNTkR2quL6QaoCIGAQ6dPg0wE3oy2ChdSUi0z8T
+         vFSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=OspTksM1ZJ6oD0IVbU2kN9rq1ubtzw2y6Qqnpo9cR4E=;
-        b=DH/rHZoDUQXrxXCbCNtZiVIfTVuumqOnnyx4Z6OreBCdx7ezqWl3TEbWetXqAvgHrW
-         aJEYxvoZzplX/57ac4+45LhjFTd0CxDRykTQeUEMrTrN8k0UALQRGsz/jAiziDYjFhcT
-         Z1C30RFtaIQpRUoYhyLejdoVI47fnZ8o/r5BdJTrFMm8DwEgy3El1N66RSaad+AKP6v+
-         /UEslsNvxPpmebdz795dmHB7ecykGh0LMHRgmW7Vnt+/S25o0do+3QDbcXvgkOMok9Ad
-         5eSEbceGKcRrb1mEYNOHVQievmv89Jsc1RU6SL59C0jCu8/fNs6nY3stJhyIlKt1UwYm
-         7zmQ==
-X-Gm-Message-State: AOAM533UvGZq3/Rl7rfFDMEGqHrvOPYZbrAgfZix29UH6xvFMk1NjHlc
-        BkKxsr/nPJ5spt/R3SmKhPCFxnBpISxDT5qKFZ0=
-X-Google-Smtp-Source: ABdhPJwwZuCfD7/bgyq5dInEMZrxdgueCg9GWP0XlvY7InW9pPIiLNDFg/wNYW+O3W1HvCvUtobN+HbxtVKTQBPSoWM=
-X-Received: by 2002:a5d:588c:: with SMTP id n12mr530022wrf.56.1641835031879;
- Mon, 10 Jan 2022 09:17:11 -0800 (PST)
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=MWvcAvXFOF/Z8QQUHp2bmP40nPXieQHtuAf08iJH6U8=;
+        b=IiK+GHq8umJXAZoXXE0UPlAx7I5DQU0dCJJIOrlXJYSNf1Dw7bPpz6QrBRwqHmUQRY
+         1NqyNdRZZPTsKA2yzpOll3zHb0oQhCyRjB4OlMdFDV8kxnNnWfJdhI+MgZEF2mIOHgNw
+         k7WNmzZ0xQfUGV+UiZ3odoVMRG7KsDARref/LHVQXPFpKCj0wsqBuE/yE8ApxH64NEFt
+         dTvuiLs2TDNjWGZwJfV1GnM13odmslxpq1gRozFti4hedzDstbehOsbELiL8WpA1UYkq
+         nFwApKLdG4wZUSupZNQiJZMhif0yNy3HV9TqwgAevI/dOyAiSNag81qqpLM8Cp3GK041
+         isww==
+X-Gm-Message-State: AOAM530+ikpJtYfCnfDvVFQh1j2BgXfS17qB8B0p49NYwWX1kkYTRmcn
+        R/H34pAASjYKWG+OdYHslQIARdq6nZApH23kGwjbmUTDDTgqaGhE5Rw=
+X-Google-Smtp-Source: ABdhPJzb89UvH8xmUGtFFAYjnuqiogDNOsac6Hev3lNTOBkPEYuaxHU+CHegsrS+ixre/iUmjyFZmxqkVSRT/lBD8qY=
+X-Received: by 2002:a25:4aca:: with SMTP id x193mr3559114yba.149.1641870073630;
+ Mon, 10 Jan 2022 19:01:13 -0800 (PST)
 MIME-Version: 1.0
-References: <20211222155743.256280-1-miquel.raynal@bootlin.com>
- <20211222155743.256280-13-miquel.raynal@bootlin.com> <CAB_54W6AZ+LGTcFsQjNx7uq=+R5v_kdF0Xm5kwWQ8ONtfOrmAw@mail.gmail.com>
- <Ycx0mwQcFsmVqWVH@ni.fr.eu.org> <CAB_54W41ZEoXzoD2_wadfMTY8anv9D9e2T5wRckdXjs7jKTTCA@mail.gmail.com>
- <CAB_54W6gHE1S9Q+-SVbrnAWPxBxnvf54XVTCmddtj8g-bZzMRA@mail.gmail.com>
- <20220104191802.2323e44a@xps13> <CAB_54W5quZz8rVrbdx+cotTRZZpJ4ouRDZkxeW6S1L775Si=cw@mail.gmail.com>
- <20220105215551.1693eba4@xps13> <CAB_54W7zDXfybMZZo8QPwRCxX8-BbkQdznwEkLEWeW+E3k2dNg@mail.gmail.com>
- <20220106201516.6a48154a@xps13> <CAB_54W5=6Zo7CzwfZw-OfRx6i4__pRt=QdmNbWdm6EQS5tvE7w@mail.gmail.com>
- <20220107120226.513554db@xps13>
-In-Reply-To: <20220107120226.513554db@xps13>
-From:   Alexander Aring <alex.aring@gmail.com>
-Date:   Mon, 10 Jan 2022 12:17:00 -0500
-Message-ID: <CAB_54W5fqG-E4kdBN4GvDnOVOd177L-x+9X5XCrQX2u3UEguGg@mail.gmail.com>
-Subject: Re: [net-next 12/18] net: mac802154: Handle scan requests
-To:     Miquel Raynal <miquel.raynal@bootlin.com>
-Cc:     Stefan Schmidt <stefan@datenfreihafen.org>,
-        Nicolas Schodet <nico@ni.fr.eu.org>,
+From:   cruise k <cruise4k@gmail.com>
+Date:   Tue, 11 Jan 2022 11:01:03 +0800
+Message-ID: <CAKcFiNDyPSx_M9HJNhDJd0Omq4JFLXNjDR_9bxaSjvmPc2bXxQ@mail.gmail.com>
+Subject: INFO: task hung in nl802154_pre_doit
+To:     Alexander Aring <alex.aring@gmail.com>,
+        Stefan Schmidt <stefan@datenfreihafen.org>,
         "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-        linux-wpan - ML <linux-wpan@vger.kernel.org>,
-        David Girault <david.girault@qorvo.com>,
-        Romuald Despres <romuald.despres@qorvo.com>,
-        Frederic Blain <frederic.blain@qorvo.com>,
-        Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-        kernel list <linux-kernel@vger.kernel.org>
+        Jakub Kicinski <kuba@kernel.org>, linux-wpan@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     sunhao.th@gmail.com
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
@@ -76,65 +59,72 @@ X-Mailing-List: linux-wpan@vger.kernel.org
 
 Hi,
 
-On Fri, 7 Jan 2022 at 06:02, Miquel Raynal <miquel.raynal@bootlin.com> wrote:
->
-...
-> > >
-> >
-> > Okay, I will look at this code closely regarding whenever multiple
-> > wpan_devs are running.
->
-> The "scanning" boolean is stored as a wpan_phy member (IIRC) so we
-> should be good on this regard (now that I have a clearer picture of the
-> dependencies).
->
+Syzkaller found the following issue:
 
-ok.
+HEAD commit: 75acfdb Linux 5.16-rc8
+git tree: upstream
+console output: https://pastebin.com/raw/AzAMX5zz
+kernel config: https://pastebin.com/raw/XsnKfdRt
 
-> > You should also check for possible stop of all possible wpan dev
-> > transmit queues, if it's not already done.
->
-> I forgot about this path. Indeed I'll add a check in the transmit path
-> as well, of course.
->
+And hope the report log can help you.
 
-What I mean is look into the functions "ieee802154_stop_queue()" and
-"ieee802154_wake_queue()".
-
-> > I suppose a scan can take a
-> > long time and we should not send some data frames out. I am thinking
-> > about the long time scan operation... if we stop the queue for a long
-> > time I think we will drop a lot, however the scan can only be
-> > triggered by the right permissions and the user should be aware of the
-> > side effects. Proper reliable upper layer protocols will care or non
-> > reliable will not care about this.
-> >
-> > There still exists the driver "ca8210" which is the mentioned HardMAC
-> > transceiver in SoftMAC. There should somehow be a flag that it cannot
-> > do a scan and the operation should not be allowed as the xmit callback
-> > allows dataframes only.
->
-> So it cannot do an active scan, but a passive scan would be allowed
-> (there is no transmission, and the beacons are regular valid frames,
-> I suppose they should not be filtered out by the hardware).
->
-> So we actually need these hooks back :-) Because the right thing to do
-> here is to use the "FYI here is the scan op that is starting" message
-> from the mac to the drivers and this driver should return "nope,
-> -ENOTSUPP". The mac would react in this case by canceling the
-> operation and returning an error to the caller. Same when sending
-> beacons if we consider beacons as !dataframes.
->
-
-I believe that a HardMAC transceiver will handle a lot of the scan
-process on the transceiver side and is only capable of dumping what
-it's stored and start/stop scan? This is one reason why the
-scan/dump/etc cfg802154 interface  should be close to the standard
-(MLME). At the end it should from userspace make no difference if at
-the end is a HardMAC or SoftMAC. Although there will always be a
-limitation and a SoftMAC is probably always "more" powerful than a
-HardMAC, but at some point there is a "minimum" of capable
-functionality... and SoftMAC transceivers might always have "some"
-things which they might offload to the hardware.
-
-- Alex
+[ 1251.721354][   T59] INFO: task syz-executor.0:2134 blocked for more
+than 143 seconds.
+[ 1251.722724][   T59]       Not tainted 5.16.0-rc8+ #10
+[ 1251.723664][   T59] "echo 0 >
+/proc/sys/kernel/hung_task_timeout_secs" disables this message.
+[ 1251.725148][   T59] task:syz-executor.0  state:D stack:27536 pid:
+2134 ppid: 13069 flags:0x00000004
+[ 1251.726742][   T59] Call Trace:
+[ 1251.727272][   T59]  <TASK>
+[ 1251.727788][   T59]  __schedule+0xcd9/0x2550
+[ 1251.728512][   T59]  ? io_schedule_timeout+0x150/0x150
+[ 1251.731002][   T59]  schedule+0xd2/0x260
+[ 1251.731762][   T59]  schedule_preempt_disabled+0xf/0x20
+[ 1251.732627][   T59]  __mutex_lock+0xc48/0x1610
+[ 1251.733367][   T59]  ? nl802154_pre_doit+0x645/0xd30
+[ 1251.734194][   T59]  ? mutex_lock_io_nested+0x1410/0x1410
+[ 1251.735387][   T59]  ? __nla_validate_parse+0x2df/0x2400
+[ 1251.736727][   T59]  ? nla_get_range_signed+0x520/0x520
+[ 1251.737977][   T59]  ? rcu_read_lock_sched_held+0x9c/0xd0
+[ 1254.756569][ T3364] lowmem_reserve[]: 0 0 852 852 852
+[ 1254.757520][ T3364] Node 1 Normal free:36116kB boost:0kB
+min:24292kB low:30364kB high:36436kB reserved_highatomic:12288KB
+active_anon:15552kB inactive_anon:191888kB active_file:0kB
+inactive_file:56kB unevictable:1536kB writepending:0kB
+present:1048576kB managed:872480kB mlocked:0kB bounce:0kB
+free_pcp:4952kB local_pcp:776kB free_cma:0kB
+[ 1254.852260][ T2256] Node 0 DMA free:6572kB boost:2048kB min:2472kB
+low:2576kB high:2680kB reserved_highatomic:0KB active_anon:12kB
+inactive_anon:4636kB active_file:0kB inactive_file:0kB unevictable:0kB
+writepending:0kB present:15992kB managed:15360kB mlocked:0kB
+bounce:0kB free_pcp:8kB local_pcp:8kB free_cma:0kB
+[ 1254.856691][ T2256] lowmem_reserve[]: 0 1333 1333 1333 1333
+[ 1254.857666][ T2256] Node 0 DMA32 free:98544kB boost:85540kB
+min:123560kB low:133064kB high:142568kB reserved_highatomic:16384KB
+active_anon:10888kB inactive_anon:467648kB active_file:4kB
+inactive_file:1424kB unevictable:1536kB writepending:0kB
+present:2080768kB managed:1372868kB mlocked:0kB bounce:0kB
+free_pcp:4416kB local_pcp:316kB free_cma:0kB
+[ 1255.151925][   T59]  ? nl802154_pre_doit+0x645/0xd30
+[ 1255.152819][   T59]  ? rtnl_lock+0x5/0x20
+[ 1255.153500][   T59]  nl802154_pre_doit+0x645/0xd30
+[ 1255.154329][   T59]  ? __nla_parse+0x3d/0x50
+[ 1255.155330][   T59]  ? nl802154_dump_llsec_dev+0xba0/0xba0
+[ 1255.156224][   T59]  ? write_comp_data+0x1c/0x70
+[ 1255.157031][   T59]  ? __sanitizer_cov_trace_pc+0x1a/0x40
+[ 1255.158010][   T59]  ? genl_family_rcv_msg_attrs_parse.isra.0+0x1ae/0x280
+[ 1255.159174][   T59]  ? nl802154_dump_llsec_dev+0xba0/0xba0
+[ 1258.792471][ T1340] ieee802154 phy1 wpan1: encryption failed: -22
+[ 1258.882579][ T3364] lowmem_reserve[]: 0 0 0 0 0
+[ 1260.285180][   T59]  genl_family_rcv_msg_doit.isra.0+0x1e4/0x330
+[ 1260.286249][   T59]  ? genl_start+0x670/0x670
+[ 1260.287076][   T59]  ? __sanitizer_cov_trace_pc+0x1a/0x40
+[ 1260.287968][   T59]  ? __radix_tree_lookup+0x21b/0x2b0
+[ 1260.288832][   T59]  ? __sanitizer_cov_trace_pc+0x1a/0x40
+[ 1260.997983][ T2256] lowmem_reserve[]: 0 0 0 0 0
+[ 1260.998899][ T2256] Node 1 DMA32 free:21864kB boost:0kB min:27368kB
+low:34208kB high:41048kB reserved_highatomic:0KB active_anon:0kB
+inactive_anon:66040kB active_file:80kB inactive_file:0kB
+unevictable:0kB writepending:0kB present:1048444kB managed:982908kB
+mlocked:0kB bounce:0kB free_pcp:4064kB local_pcp:1984kB free_cma:0kB
