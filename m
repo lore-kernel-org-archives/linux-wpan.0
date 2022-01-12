@@ -2,87 +2,105 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C00EC433EF
-	for <linux-wpan@archiver.kernel.org>; Tue, 11 Jan 2022 13:55:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31873C433EF
+	for <linux-wpan@archiver.kernel.org>; Wed, 12 Jan 2022 17:33:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240633AbiAKNzt (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 11 Jan 2022 08:55:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48818 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239487AbiAKNzt (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 11 Jan 2022 08:55:49 -0500
-Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F11F8C06173F;
-        Tue, 11 Jan 2022 05:55:48 -0800 (PST)
-Received: by mail-wm1-x331.google.com with SMTP id w26so5218318wmi.0;
-        Tue, 11 Jan 2022 05:55:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=5QHegbcEygh2W5IGA3CayrM6SBPU+A/OGV2FmBEZvB8=;
-        b=NulLQl18nPDc0P6PvcEjc+yU1ZTlH2TNAAD2KgB3zQnSoT7QHhhQlsiQ0uWkbDmbJ9
-         f5rDKnX44C9aNNl4OWyUfsV4jc2IAOYsUjrlIkN6ZAwCF0cd5nCXAv7+O/qGUcFMRs/P
-         v/VEmJjQFbbtcT/3QgmY7DrxaMbMqLVRWvvaV1qemJRUjGthu7l9nxtBdsr1l0gF2MBT
-         CCpwHXJV0L4aSkEIR6coC/ViNLTLhPRMyIs2FWV9j+5mSWV1WNjK/0pvJPZQ2/xVgSpa
-         EmIgWo6P8FBKvOp6Ed2fHBfxn3yC/h8TjPuH/wY0M3YqYYZr90Y4tSqPgkv6BIaZJStc
-         hunA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=5QHegbcEygh2W5IGA3CayrM6SBPU+A/OGV2FmBEZvB8=;
-        b=R428hTtQ8WKW93V0bwzAi44rSQGGyjLO9/5UodglA8/p8uQ5SkuywyMSMB/qGx08br
-         tCbz76DF5oI7KlKyFlu+lCEjmPZ5rEOQAQs4lBSuBIZAcg702B+GXVG3p5ZUZcYNBWtI
-         1k5qIcj29tHwUZtIJKaVJZ/df1Qb1Mjg7Lxm3xwpEKyrewWhudXH5L0oiFAngNCd6QZq
-         +AwTnFqAg2FvMNeC0eqbOy1B/fp/SYkF3Yv446fzcD+B0rVRJii4u+rlTcJ/fi+N3hNU
-         mbbWVNvipg+XcDXdd02XNeA8ulWCOQ11tnAiyNCtx8S6gQJpD/zvjZ44W4H36h9+eTa0
-         Skvg==
-X-Gm-Message-State: AOAM531BXXNfIzowhk1ffGWaGnEQeGDxjGbz5rSuw9k2TuvfqSjAOa9J
-        TOUiitl2qyHzpE67/mNoxY8+qhk+StX2bvG7BkM=
-X-Google-Smtp-Source: ABdhPJz8QQziEnUftyubzwIgqz2M+dbnbj1BFQWQo81+ecWeHjfvQikJL7IiehweL733BoK4XsFnLW2OWESHx37z1sA=
-X-Received: by 2002:a7b:c142:: with SMTP id z2mr2513949wmi.167.1641909347544;
- Tue, 11 Jan 2022 05:55:47 -0800 (PST)
-MIME-Version: 1.0
-References: <CAKcFiNDyPSx_M9HJNhDJd0Omq4JFLXNjDR_9bxaSjvmPc2bXxQ@mail.gmail.com>
-In-Reply-To: <CAKcFiNDyPSx_M9HJNhDJd0Omq4JFLXNjDR_9bxaSjvmPc2bXxQ@mail.gmail.com>
-From:   Alexander Aring <alex.aring@gmail.com>
-Date:   Tue, 11 Jan 2022 08:55:36 -0500
-Message-ID: <CAB_54W7d80pgJ-9+0H9Gn6-NO6j+qzKDXVr3p_qYmbTXo2OCRA@mail.gmail.com>
-Subject: Re: INFO: task hung in nl802154_pre_doit
-To:     cruise k <cruise4k@gmail.com>
-Cc:     Stefan Schmidt <stefan@datenfreihafen.org>,
+        id S1349988AbiALRdT (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 12 Jan 2022 12:33:19 -0500
+Received: from relay7-d.mail.gandi.net ([217.70.183.200]:34129 "EHLO
+        relay7-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239618AbiALRdT (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 12 Jan 2022 12:33:19 -0500
+Received: (Authenticated sender: miquel.raynal@bootlin.com)
+        by relay7-d.mail.gandi.net (Postfix) with ESMTPSA id B8EDE20008;
+        Wed, 12 Jan 2022 17:33:15 +0000 (UTC)
+From:   Miquel Raynal <miquel.raynal@bootlin.com>
+To:     Alexander Aring <alex.aring@gmail.com>,
+        Stefan Schmidt <stefan@datenfreihafen.org>,
+        linux-wpan@vger.kernel.org,
         "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        linux-wpan - ML <linux-wpan@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-        kernel list <linux-kernel@vger.kernel.org>,
-        Hao Sun <sunhao.th@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+        Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org
+Cc:     Michael Hennerich <michael.hennerich@analog.com>,
+        Harry Morris <h.morris@cascoda.com>,
+        Varka Bhadram <varkabhadram@gmail.com>,
+        Xue Liu <liuxuenetmail@gmail.com>, Alan Ott <alan@signal11.us>,
+        David Girault <david.girault@qorvo.com>,
+        Romuald Despres <romuald.despres@qorvo.com>,
+        Frederic Blain <frederic.blain@qorvo.com>,
+        Nicolas Schodet <nico@ni.fr.eu.org>,
+        Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+        linux-wireless@vger.kernel.org,
+        Miquel Raynal <miquel.raynal@bootlin.com>
+Subject: [wpan-next v2 01/27] net: mac802154: Split the set channel hook implementation
+Date:   Wed, 12 Jan 2022 18:32:46 +0100
+Message-Id: <20220112173312.764660-2-miquel.raynal@bootlin.com>
+X-Mailer: git-send-email 2.27.0
+In-Reply-To: <20220112173312.764660-1-miquel.raynal@bootlin.com>
+References: <20220112173312.764660-1-miquel.raynal@bootlin.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi,
+As it is currently designed, the set_channel() cfg802154 hook
+implemented in the softMAC is doing a couple of checks before actually
+performing the channel change. However, as we enhance the support for
+automatically setting the symbol duration during channel changes, it
+will also be needed to ensure that the corresponding channel as properly
+be selected at probe time. In order to verify this, we will need to
+separate the channel change from the previous checks. These checks are
+actually here to speed up the process when the user request necessitates
+no change, so we can safely bypass them.
 
-On Mon, 10 Jan 2022 at 22:01, cruise k <cruise4k@gmail.com> wrote:
->
-> Hi,
->
-> Syzkaller found the following issue:
->
-> HEAD commit: 75acfdb Linux 5.16-rc8
-> git tree: upstream
-> console output: https://pastebin.com/raw/AzAMX5zz
-> kernel config: https://pastebin.com/raw/XsnKfdRt
->
-> And hope the report log can help you.
->
-> [ 1251.721354][   T59] INFO: task syz-executor.0:2134 blocked for more
-> than 143 seconds.
+Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
+---
+ net/mac802154/cfg.c | 18 +++++++++++++-----
+ 1 file changed, 13 insertions(+), 5 deletions(-)
 
-any reproducer here?
-The console output shows "ieee802154 phy1 wpan1: encryption failed:
--22" so I guess something was configured.
+diff --git a/net/mac802154/cfg.c b/net/mac802154/cfg.c
+index fbeebe3bc31d..870e442bbff0 100644
+--- a/net/mac802154/cfg.c
++++ b/net/mac802154/cfg.c
+@@ -103,17 +103,13 @@ ieee802154_del_iface(struct wpan_phy *wpan_phy, struct wpan_dev *wpan_dev)
+ }
+ 
+ static int
+-ieee802154_set_channel(struct wpan_phy *wpan_phy, u8 page, u8 channel)
++ieee802154_change_channel(struct wpan_phy *wpan_phy, u8 page, u8 channel)
+ {
+ 	struct ieee802154_local *local = wpan_phy_priv(wpan_phy);
+ 	int ret;
+ 
+ 	ASSERT_RTNL();
+ 
+-	if (wpan_phy->current_page == page &&
+-	    wpan_phy->current_channel == channel)
+-		return 0;
+-
+ 	ret = drv_set_channel(local, page, channel);
+ 	if (!ret) {
+ 		wpan_phy->current_page = page;
+@@ -123,6 +119,18 @@ ieee802154_set_channel(struct wpan_phy *wpan_phy, u8 page, u8 channel)
+ 	return ret;
+ }
+ 
++static int
++ieee802154_set_channel(struct wpan_phy *wpan_phy, u8 page, u8 channel)
++{
++	ASSERT_RTNL();
++
++	if (wpan_phy->current_page == page &&
++	    wpan_phy->current_channel == channel)
++		return 0;
++
++	return ieee802154_change_channel(wpan_phy, page, channel);
++}
++
+ static int
+ ieee802154_set_cca_mode(struct wpan_phy *wpan_phy,
+ 			const struct wpan_phy_cca *cca)
+-- 
+2.27.0
 
-- Alex
