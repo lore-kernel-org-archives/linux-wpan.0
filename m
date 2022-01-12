@@ -2,42 +2,42 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6537C433F5
-	for <linux-wpan@archiver.kernel.org>; Wed, 12 Jan 2022 20:06:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DC93C4332F
+	for <linux-wpan@archiver.kernel.org>; Wed, 12 Jan 2022 20:47:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1356985AbiALUGh (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 12 Jan 2022 15:06:37 -0500
-Received: from mga09.intel.com ([134.134.136.24]:59219 "EHLO mga09.intel.com"
+        id S1357719AbiALUrS (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 12 Jan 2022 15:47:18 -0500
+Received: from mga03.intel.com ([134.134.136.65]:63404 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1357159AbiALUGO (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
-        Wed, 12 Jan 2022 15:06:14 -0500
+        id S1357727AbiALUrR (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+        Wed, 12 Jan 2022 15:47:17 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1642017974; x=1673553974;
+  t=1642020437; x=1673556437;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=jTYJ5MPdPVHmwKkOwlI7reeAFLonvjVi2dQZX/Vt8Fk=;
-  b=I83KMA0TT8ChwGvGw/5++4cq5030dx0xLjMTWj5SvPEaQBNZQQpe29jW
-   zAnDGHqsyW9BmIoKtl9uLkc3NSgSEDlnoZYfnxNicU/dXjOBLPoK4MDy5
-   dMKArmofngnnHR0V9Y0oYg5TUJUvb9fIhj7TMjXEAawS3o7I4z3/RgsqN
-   P094n8f36XKnUn+fqwDwYx2Gtr2jInV+HO3jWEy1DG7MiHZnR9u2asFFX
-   posPXNY6y6Kh5NxaIa91FDU80sKEIbLrQO5Fuh/eoX544nyHUtJ+DS4Qv
-   6ZB//VPyXr/J2Zm6naqpsTwFFYF0fbxIcshGX6Y/6djPJ6inNfsEjY0Gd
-   A==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10225"; a="243640026"
-X-IronPort-AV: E=Sophos;i="5.88,282,1635231600"; 
-   d="scan'208";a="243640026"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jan 2022 12:06:14 -0800
+  bh=1oKeTYieNeTqemgN2Am2ql5/7CDhEJPKPVoAiFcYU08=;
+  b=YgJjnvTzb+VV8tnpfal0JbZA1HJbt+mvbancjZs7LjoF+gYqU6dl5U+5
+   FezojpluDSI/l/lCtaEOZLUwSq5zt2ghsuO6dChPEjXpPNbXYjGDA9Cq2
+   UVUrb0h3Z/UmSLvMw0cMKQAixrhkNFEjnnijL9wUjpz10CPNfnXW18/Gy
+   i+H+aou/vKRBit3Jhq82zGsNRq+34BnbaKeUz42Q0IdaVF6JPz/dDkf4M
+   vpwM6om23QJG/o7QSBdNVPC8MZg2cqXrvnkFV4yKvizafD2+qNsjLpyTd
+   LOyAwOk/7rlK/fo5ERQAhZvgAT+gpRtJC6dAQ1SvXcntpJQcLpzEvNEaV
+   Q==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10225"; a="243804912"
+X-IronPort-AV: E=Sophos;i="5.88,284,1635231600"; 
+   d="scan'208";a="243804912"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jan 2022 12:47:17 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.88,282,1635231600"; 
-   d="scan'208";a="691524412"
+X-IronPort-AV: E=Sophos;i="5.88,284,1635231600"; 
+   d="scan'208";a="558855472"
 Received: from lkp-server01.sh.intel.com (HELO 276f1b88eecb) ([10.239.97.150])
-  by orsmga005.jf.intel.com with ESMTP; 12 Jan 2022 12:06:11 -0800
+  by orsmga001.jf.intel.com with ESMTP; 12 Jan 2022 12:47:14 -0800
 Received: from kbuild by 276f1b88eecb with local (Exim 4.92)
         (envelope-from <lkp@intel.com>)
-        id 1n7jso-0006Kk-7v; Wed, 12 Jan 2022 20:06:10 +0000
-Date:   Thu, 13 Jan 2022 04:05:27 +0800
+        id 1n7kWX-0006Ny-B3; Wed, 12 Jan 2022 20:47:13 +0000
+Date:   Thu, 13 Jan 2022 04:46:11 +0800
 From:   kernel test robot <lkp@intel.com>
 To:     Miquel Raynal <miquel.raynal@bootlin.com>,
         Alexander Aring <alex.aring@gmail.com>,
@@ -45,13 +45,14 @@ To:     Miquel Raynal <miquel.raynal@bootlin.com>,
         linux-wpan@vger.kernel.org,
         "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>
-Cc:     kbuild-all@lists.01.org, netdev@vger.kernel.org,
+Cc:     llvm@lists.linux.dev, kbuild-all@lists.01.org,
+        netdev@vger.kernel.org,
         Michael Hennerich <michael.hennerich@analog.com>,
         Harry Morris <h.morris@cascoda.com>,
         Varka Bhadram <varkabhadram@gmail.com>,
         Xue Liu <liuxuenetmail@gmail.com>
 Subject: Re: [wpan-next v2 19/27] net: ieee802154: Full PAN management
-Message-ID: <202201130312.AD3Sqi9A-lkp@intel.com>
+Message-ID: <202201130436.44AM2OXA-lkp@intel.com>
 References: <20220112173312.764660-20-miquel.raynal@bootlin.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
@@ -74,32 +75,37 @@ https://git-scm.com/docs/git-format-patch]
 
 url:    https://github.com/0day-ci/linux/commits/Miquel-Raynal/IEEE-802-15-4-scan-support/20220113-013731
 base:   https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git daadb3bd0e8d3e317e36bc2c1542e86c528665e5
-config: alpha-randconfig-r006-20220112 (https://download.01.org/0day-ci/archive/20220113/202201130312.AD3Sqi9A-lkp@intel.com/config)
-compiler: alpha-linux-gcc (GCC) 11.2.0
+config: riscv-randconfig-r042-20220112 (https://download.01.org/0day-ci/archive/20220113/202201130436.44AM2OXA-lkp@intel.com/config)
+compiler: clang version 14.0.0 (https://github.com/llvm/llvm-project 244dd2913a43a200f5a6544d424cdc37b771028b)
 reproduce (this is a W=1 build):
         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
         chmod +x ~/bin/make.cross
+        # install riscv cross compiling tool for clang build
+        # apt-get install binutils-riscv64-linux-gnu
         # https://github.com/0day-ci/linux/commit/9c8fbd918a704432bbf6cdce1d111e9002c756b4
         git remote add linux-review https://github.com/0day-ci/linux
         git fetch --no-tags linux-review Miquel-Raynal/IEEE-802-15-4-scan-support/20220113-013731
         git checkout 9c8fbd918a704432bbf6cdce1d111e9002c756b4
         # save the config file to linux build tree
         mkdir build_dir
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-11.2.0 make.cross O=build_dir ARCH=alpha SHELL=/bin/bash net/ieee802154/
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=riscv SHELL=/bin/bash net/ieee802154/
 
 If you fix the issue, kindly add following tag as appropriate
 Reported-by: kernel test robot <lkp@intel.com>
 
 All errors (new ones prefixed by >>):
 
-   net/ieee802154/nl802154.c: In function 'nl802154_dump_pans':
->> net/ieee802154/nl802154.c:1613:15: error: implicit declaration of function 'nl802154_prepare_wpan_dev_dump' [-Werror=implicit-function-declaration]
-    1613 |         err = nl802154_prepare_wpan_dev_dump(skb, cb, &rdev, &wpan_dev);
-         |               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->> net/ieee802154/nl802154.c:1637:9: error: implicit declaration of function 'nl802154_finish_wpan_dev_dump' [-Werror=implicit-function-declaration]
-    1637 |         nl802154_finish_wpan_dev_dump(rdev);
-         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   cc1: some warnings being treated as errors
+>> net/ieee802154/nl802154.c:1613:8: error: implicit declaration of function 'nl802154_prepare_wpan_dev_dump' [-Werror,-Wimplicit-function-declaration]
+           err = nl802154_prepare_wpan_dev_dump(skb, cb, &rdev, &wpan_dev);
+                 ^
+>> net/ieee802154/nl802154.c:1637:2: error: implicit declaration of function 'nl802154_finish_wpan_dev_dump' [-Werror,-Wimplicit-function-declaration]
+           nl802154_finish_wpan_dev_dump(rdev);
+           ^
+   net/ieee802154/nl802154.c:1637:2: note: did you mean 'nl802154_prepare_wpan_dev_dump'?
+   net/ieee802154/nl802154.c:1613:8: note: 'nl802154_prepare_wpan_dev_dump' declared here
+           err = nl802154_prepare_wpan_dev_dump(skb, cb, &rdev, &wpan_dev);
+                 ^
+   2 errors generated.
 
 
 vim +/nl802154_prepare_wpan_dev_dump +1613 net/ieee802154/nl802154.c
