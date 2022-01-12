@@ -2,40 +2,41 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BDD1C433FE
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE52AC433EF
 	for <linux-wpan@archiver.kernel.org>; Wed, 12 Jan 2022 17:36:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1355671AbiALRg2 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 12 Jan 2022 12:36:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34282 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1355632AbiALRfs (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 12 Jan 2022 12:35:48 -0500
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::226])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01DCEC06118C;
-        Wed, 12 Jan 2022 09:35:38 -0800 (PST)
+        id S1350084AbiALRga (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 12 Jan 2022 12:36:30 -0500
+Received: from relay7-d.mail.gandi.net ([217.70.183.200]:42183 "EHLO
+        relay7-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1355771AbiALReO (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 12 Jan 2022 12:34:14 -0500
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by relay6-d.mail.gandi.net (Postfix) with ESMTPSA id BD0B3C0003;
-        Wed, 12 Jan 2022 17:35:35 +0000 (UTC)
+        by relay7-d.mail.gandi.net (Postfix) with ESMTPSA id 766432000D;
+        Wed, 12 Jan 2022 17:34:11 +0000 (UTC)
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
 To:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
         linux-wpan@vger.kernel.org,
         "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org
-Cc:     David Girault <david.girault@qorvo.com>,
+Cc:     Michael Hennerich <michael.hennerich@analog.com>,
+        Harry Morris <h.morris@cascoda.com>,
+        Varka Bhadram <varkabhadram@gmail.com>,
+        Xue Liu <liuxuenetmail@gmail.com>, Alan Ott <alan@signal11.us>,
+        David Girault <david.girault@qorvo.com>,
         Romuald Despres <romuald.despres@qorvo.com>,
         Frederic Blain <frederic.blain@qorvo.com>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
         linux-wireless@vger.kernel.org,
         Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: [wpan-tools v2 3/7] iwpan: Fix a comment
-Date:   Wed, 12 Jan 2022 18:35:25 +0100
-Message-Id: <20220112173529.765170-4-miquel.raynal@bootlin.com>
+Subject: [wpan-next v2 27/27] net: ieee802154: ca8210: Refuse most of the scan operations
+Date:   Wed, 12 Jan 2022 18:33:12 +0100
+Message-Id: <20220112173312.764660-28-miquel.raynal@bootlin.com>
 X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20220112173529.765170-1-miquel.raynal@bootlin.com>
-References: <20220112173529.765170-1-miquel.raynal@bootlin.com>
+In-Reply-To: <20220112173312.764660-1-miquel.raynal@bootlin.com>
+References: <20220112173312.764660-1-miquel.raynal@bootlin.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
@@ -43,26 +44,60 @@ Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-There are a couple of words missing, add them to clarify the comment.
+The Cascada 8210 hardware transceiver is kind of a hardMAC which
+interfaces with the softMAC and in practice does not support sending
+anything else than dataframes. This means we cannot send any BEACON_REQ
+during active scans nor any BEACON in general. Refuse these operations
+officially so that the user is aware of the limitation.
 
 Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
 ---
- src/iwpan.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/ieee802154/ca8210.c | 25 ++++++++++++++++++++++++-
+ 1 file changed, 24 insertions(+), 1 deletion(-)
 
-diff --git a/src/iwpan.h b/src/iwpan.h
-index 860dd37..9d265c6 100644
---- a/src/iwpan.h
-+++ b/src/iwpan.h
-@@ -43,7 +43,7 @@ struct cmd {
- 	const enum command_identify_by idby;
- 	/* The handler should return a negative error code,
- 	 * zero on success, 1 if the arguments were wrong
--	 * and the usage message should and 2 otherwise.
-+	 * and the usage message should be displayed, 2 otherwise.
- 	 */
- 	int (*handler)(struct nl802154_state *state,
- 		       struct nl_cb *cb,
+diff --git a/drivers/net/ieee802154/ca8210.c b/drivers/net/ieee802154/ca8210.c
+index d3a9e4fe05f4..49c274280e3c 100644
+--- a/drivers/net/ieee802154/ca8210.c
++++ b/drivers/net/ieee802154/ca8210.c
+@@ -2385,6 +2385,25 @@ static int ca8210_set_promiscuous_mode(struct ieee802154_hw *hw, const bool on)
+ 	return link_to_linux_err(status);
+ }
+ 
++static int ca8210_enter_scan_mode(struct ieee802154_hw *hw,
++				  struct cfg802154_scan_request *request)
++{
++	/* This xceiver can only send dataframes */
++	if (request->type != NL802154_SCAN_PASSIVE)
++		return -EOPNOTSUPP;
++
++	return 0;
++}
++
++static int ca8210_enter_beacons_mode(struct ieee802154_hw *hw,
++				     struct cfg802154_beacons_request *request)
++{
++	/* This xceiver can only send dataframes */
++	return -EOPNOTSUPP;
++}
++
++static void ca8210_exit_scan_beacons_mode(struct ieee802154_hw *hw) { }
++
+ static const struct ieee802154_ops ca8210_phy_ops = {
+ 	.start = ca8210_start,
+ 	.stop = ca8210_stop,
+@@ -2397,7 +2416,11 @@ static const struct ieee802154_ops ca8210_phy_ops = {
+ 	.set_cca_ed_level = ca8210_set_cca_ed_level,
+ 	.set_csma_params = ca8210_set_csma_params,
+ 	.set_frame_retries = ca8210_set_frame_retries,
+-	.set_promiscuous_mode = ca8210_set_promiscuous_mode
++	.set_promiscuous_mode = ca8210_set_promiscuous_mode,
++	.enter_scan_mode = ca8210_enter_scan_mode,
++	.exit_scan_mode = ca8210_exit_scan_beacons_mode,
++	.enter_beacons_mode = ca8210_enter_beacons_mode,
++	.exit_beacons_mode = ca8210_exit_scan_beacons_mode,
+ };
+ 
+ /* Test/EVBME Interface */
 -- 
 2.27.0
 
