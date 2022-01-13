@@ -2,40 +2,44 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72107C433F5
-	for <linux-wpan@archiver.kernel.org>; Thu, 13 Jan 2022 14:52:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D913C433EF
+	for <linux-wpan@archiver.kernel.org>; Thu, 13 Jan 2022 17:07:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232719AbiAMOwB convert rfc822-to-8bit (ORCPT
+        id S232460AbiAMRHQ convert rfc822-to-8bit (ORCPT
         <rfc822;linux-wpan@archiver.kernel.org>);
-        Thu, 13 Jan 2022 09:52:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41212 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230016AbiAMOwA (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 13 Jan 2022 09:52:00 -0500
-Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::227])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F2B7C06161C;
-        Thu, 13 Jan 2022 06:51:59 -0800 (PST)
+        Thu, 13 Jan 2022 12:07:16 -0500
+Received: from relay1-d.mail.gandi.net ([217.70.183.193]:48395 "EHLO
+        relay1-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232285AbiAMRHQ (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 13 Jan 2022 12:07:16 -0500
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by relay7-d.mail.gandi.net (Postfix) with ESMTPSA id 696502000F;
-        Thu, 13 Jan 2022 14:51:56 +0000 (UTC)
-Date:   Thu, 13 Jan 2022 15:51:54 +0100
+        by relay1-d.mail.gandi.net (Postfix) with ESMTPSA id 0898724000F;
+        Thu, 13 Jan 2022 17:07:10 +0000 (UTC)
+Date:   Thu, 13 Jan 2022 18:07:09 +0100
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
-To:     kernel test robot <lkp@intel.com>
-Cc:     Alexander Aring <alex.aring@gmail.com>,
-        Stefan Schmidt <stefan@datenfreihafen.org>,
-        linux-wpan@vger.kernel.org,
+To:     Alexander Aring <alex.aring@gmail.com>
+Cc:     Stefan Schmidt <stefan@datenfreihafen.org>,
+        linux-wpan - ML <linux-wpan@vger.kernel.org>,
         "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>, llvm@lists.linux.dev,
-        kbuild-all@lists.01.org, netdev@vger.kernel.org,
+        Jakub Kicinski <kuba@kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
         Michael Hennerich <michael.hennerich@analog.com>,
         Harry Morris <h.morris@cascoda.com>,
         Varka Bhadram <varkabhadram@gmail.com>,
-        Xue Liu <liuxuenetmail@gmail.com>
-Subject: Re: [wpan-next v2 19/27] net: ieee802154: Full PAN management
-Message-ID: <20220113155154.243c36ad@xps13>
-In-Reply-To: <202201130436.44AM2OXA-lkp@intel.com>
-References: <20220112173312.764660-20-miquel.raynal@bootlin.com>
-        <202201130436.44AM2OXA-lkp@intel.com>
+        Xue Liu <liuxuenetmail@gmail.com>, Alan Ott <alan@signal11.us>,
+        David Girault <david.girault@qorvo.com>,
+        Romuald Despres <romuald.despres@qorvo.com>,
+        Frederic Blain <frederic.blain@qorvo.com>,
+        Nicolas Schodet <nico@ni.fr.eu.org>,
+        Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+        "linux-wireless@vger.kernel.org Wireless" 
+        <linux-wireless@vger.kernel.org>
+Subject: Re: [wpan-next v2 18/27] net: mac802154: Handle scan requests
+Message-ID: <20220113180709.0dade123@xps13>
+In-Reply-To: <CAB_54W4PL1ty5XsqRoEKwsy-h8KL9gSGMK6N=HiWJDp6NHsb0A@mail.gmail.com>
+References: <20220112173312.764660-1-miquel.raynal@bootlin.com>
+        <20220112173312.764660-19-miquel.raynal@bootlin.com>
+        <CAB_54W4PL1ty5XsqRoEKwsy-h8KL9gSGMK6N=HiWJDp6NHsb0A@mail.gmail.com>
 Organization: Bootlin
 X-Mailer: Claws Mail 3.17.7 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
@@ -45,103 +49,70 @@ Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
+Hi Alexander,
 
-lkp@intel.com wrote on Thu, 13 Jan 2022 04:46:11 +0800:
+alex.aring@gmail.com wrote on Wed, 12 Jan 2022 17:44:02 -0500:
 
-> Hi Miquel,
+> Hi,
 > 
-> I love your patch! Yet something to improve:
+> On Wed, 12 Jan 2022 at 12:33, Miquel Raynal <miquel.raynal@bootlin.com> wrote:
+> ...
+> > +       return 0;
+> > +}
+> > diff --git a/net/mac802154/tx.c b/net/mac802154/tx.c
+> > index c829e4a75325..40656728c624 100644
+> > --- a/net/mac802154/tx.c
+> > +++ b/net/mac802154/tx.c
+> > @@ -54,6 +54,9 @@ ieee802154_tx(struct ieee802154_local *local, struct sk_buff *skb)
+> >         struct net_device *dev = skb->dev;
+> >         int ret;
+> >
+> > +       if (unlikely(mac802154_scan_is_ongoing(local)))
+> > +               return NETDEV_TX_BUSY;
+> > +  
 > 
-> [auto build test ERROR on linus/master]
-> [also build test ERROR on v5.16 next-20220112]
-> [If your patch is applied to the wrong git tree, kindly drop us a note.
-> And when submitting patch, we suggest to use '--base' as documented in
-> https://git-scm.com/docs/git-format-patch]
-> 
-> url:    https://github.com/0day-ci/linux/commits/Miquel-Raynal/IEEE-802-15-4-scan-support/20220113-013731
-> base:   https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git daadb3bd0e8d3e317e36bc2c1542e86c528665e5
-> config: riscv-randconfig-r042-20220112 (https://download.01.org/0day-ci/archive/20220113/202201130436.44AM2OXA-lkp@intel.com/config)
-> compiler: clang version 14.0.0 (https://github.com/llvm/llvm-project 244dd2913a43a200f5a6544d424cdc37b771028b)
-> reproduce (this is a W=1 build):
->         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
->         chmod +x ~/bin/make.cross
->         # install riscv cross compiling tool for clang build
->         # apt-get install binutils-riscv64-linux-gnu
->         # https://github.com/0day-ci/linux/commit/9c8fbd918a704432bbf6cdce1d111e9002c756b4
->         git remote add linux-review https://github.com/0day-ci/linux
->         git fetch --no-tags linux-review Miquel-Raynal/IEEE-802-15-4-scan-support/20220113-013731
->         git checkout 9c8fbd918a704432bbf6cdce1d111e9002c756b4
->         # save the config file to linux build tree
->         mkdir build_dir
->         COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=riscv SHELL=/bin/bash net/ieee802154/
-> 
-> If you fix the issue, kindly add following tag as appropriate
-> Reported-by: kernel test robot <lkp@intel.com>
-> 
-> All errors (new ones prefixed by >>):
-> 
-> >> net/ieee802154/nl802154.c:1613:8: error: implicit declaration of function 'nl802154_prepare_wpan_dev_dump' [-Werror,-Wimplicit-function-declaration]  
->            err = nl802154_prepare_wpan_dev_dump(skb, cb, &rdev, &wpan_dev);
->                  ^
-> >> net/ieee802154/nl802154.c:1637:2: error: implicit declaration of function 'nl802154_finish_wpan_dev_dump' [-Werror,-Wimplicit-function-declaration]  
->            nl802154_finish_wpan_dev_dump(rdev);
+> Please look into the functions "ieee802154_wake_queue()" and
+> "ieee802154_stop_queue()" which prevent this function from being
+> called. Call stop before starting scanning and wake after scanning is
+> done or stopped.
 
-These two helpers were defined within the experimental section. I will
-move them out of this section now that they have other users than
-experimental code.
+Mmmh all this is already done, isn't it?
+- mac802154_trigger_scan_locked() stops the queue before setting the
+  promiscuous mode
+- mac802154_end_of_scan() wakes the queue after resetting the
+  promiscuous mode to its original state
 
->            ^
->    net/ieee802154/nl802154.c:1637:2: note: did you mean 'nl802154_prepare_wpan_dev_dump'?
->    net/ieee802154/nl802154.c:1613:8: note: 'nl802154_prepare_wpan_dev_dump' declared here
->            err = nl802154_prepare_wpan_dev_dump(skb, cb, &rdev, &wpan_dev);
->                  ^
->    2 errors generated.
-> 
-> 
-> vim +/nl802154_prepare_wpan_dev_dump +1613 net/ieee802154/nl802154.c
-> 
->   1605	
->   1606	static int nl802154_dump_pans(struct sk_buff *skb, struct netlink_callback *cb)
->   1607	{
->   1608		struct cfg802154_registered_device *rdev;
->   1609		struct cfg802154_internal_pan *pan;
->   1610		struct wpan_dev *wpan_dev;
->   1611		int err;
->   1612	
-> > 1613		err = nl802154_prepare_wpan_dev_dump(skb, cb, &rdev, &wpan_dev);  
->   1614		if (err)
->   1615			return err;
->   1616	
->   1617		spin_lock_bh(&rdev->pan_lock);
->   1618	
->   1619		if (cb->args[2])
->   1620			goto out;
->   1621	
->   1622		cb->seq = rdev->pan_generation;
->   1623	
->   1624		ieee802154_for_each_pan(pan, rdev) {
->   1625			err = nl802154_send_pan_info(skb, cb, cb->nlh->nlmsg_seq,
->   1626						     NLM_F_MULTI, rdev, wpan_dev, pan);
->   1627			if (err < 0)
->   1628				goto out_err;
->   1629		}
->   1630	
->   1631		cb->args[2] = 1;
->   1632	out:
->   1633		err = skb->len;
->   1634	out_err:
->   1635		spin_unlock_bh(&rdev->pan_lock);
->   1636	
-> > 1637		nl802154_finish_wpan_dev_dump(rdev);  
->   1638	
->   1639		return err;
->   1640	}
->   1641	
-> 
-> ---
-> 0-DAY CI Kernel Test Service, Intel Corporation
-> https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
+Should I drop the check which stands for an extra precaution?
 
+
+But overall I think I don't understand well this part. What is
+a bit foggy to me is why the (async) tx implementation does:
+
+*Core*                           *Driver*
+
+stop_queue()
+drv_async_xmit() -------
+                        \------> do something
+                         ------- calls ieee802154_xmit_complete()
+wakeup_queue() <--------/
+
+So we actually disable the queue for transmitting. Why??
+
+> Also there exists a race which exists in your way and also the one
+> mentioned above. There can still be some transmissions going on... We
+> need to wait until "all possible" tx completions are done... to be
+> sure there are really no transmissions going on. However we need to be
+> sure that a wake cannot be done if a tx completion is done, we need to
+> avoid it when the scan operation is ongoing as a workaround for this
+> race.
+> 
+> This race exists and should be fixed in future work?
+
+Yep, this is true, do you have any pointers? Because I looked at the
+code and for now it appears quite unpractical to add some kind of
+flushing mechanism on that net queue. I believe we cannot use the netif
+interface for that so we would have to implement our own mechanism in
+the ieee802154 core.
 
 Thanks,
 Miquèl
