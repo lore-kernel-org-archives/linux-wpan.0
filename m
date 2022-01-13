@@ -2,25 +2,57 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D592C433EF
-	for <linux-wpan@archiver.kernel.org>; Thu, 13 Jan 2022 17:15:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 291CCC433EF
+	for <linux-wpan@archiver.kernel.org>; Thu, 13 Jan 2022 23:27:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234055AbiAMRPA convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-wpan@archiver.kernel.org>);
-        Thu, 13 Jan 2022 12:15:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46204 "EHLO
+        id S238213AbiAMX1n (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Thu, 13 Jan 2022 18:27:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45244 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234010AbiAMRO5 (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 13 Jan 2022 12:14:57 -0500
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::226])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7283C061574;
-        Thu, 13 Jan 2022 09:14:56 -0800 (PST)
-Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by relay6-d.mail.gandi.net (Postfix) with ESMTPSA id C5D23C0003;
-        Thu, 13 Jan 2022 17:14:52 +0000 (UTC)
-Date:   Thu, 13 Jan 2022 18:14:51 +0100
-From:   Miquel Raynal <miquel.raynal@bootlin.com>
-To:     Alexander Aring <alex.aring@gmail.com>
+        with ESMTP id S238190AbiAMX1n (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 13 Jan 2022 18:27:43 -0500
+Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01E53C061574;
+        Thu, 13 Jan 2022 15:27:43 -0800 (PST)
+Received: by mail-wr1-x430.google.com with SMTP id e9so12883897wra.2;
+        Thu, 13 Jan 2022 15:27:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=tlvap2oP+61e2yvExfPH4KET6jHA0Dk431YlmavXzqU=;
+        b=mChYZ47QoBnVwuZ7TUmew2YmY2k2Fd9VJLUa4ZMdlJdaqxdwknfdf1vlF2T5ujpIcI
+         Y3o1patT8QbNgv5TJFzAGE37mkGq9Nbd/yE7fQpatI3fEkVnnIU5zQMS3aY9TFqJ5v8z
+         jdkgN0BAqj19Ocv+KUzaOyPgj+iR99b5Phow8WkjrvA6e2CzPv/80h08goiFN2FFLgVR
+         /eZ5qNzI/YHnRI6HCItTSYVQiiR4KRHQl7vyJcbOfEsPMuMQuCN6+m+n2V7JAIJKZrB+
+         TSzWf7j5BiM9fTibrsmV4bwqiFE8ZQcnNyKd1yF1rIyjSoQ4aIAC0hQeyjLOyDN1GLxh
+         akHA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=tlvap2oP+61e2yvExfPH4KET6jHA0Dk431YlmavXzqU=;
+        b=oHwxaENCSDOI7gDvF3GGkNiNqvMt4ET/5Lf7JpbVbRcFIS+T9O960mSI7UxWqZhmOy
+         WjPIM9/XMcNoD5ElmpDRGGS7YVm/SHfuy0OdM2h75tKHBY2hVYX4gcvFRlizL61rWgYe
+         lUzfD9dthkCx181cS99V5ACPgSpcHciCXGbTV8aVeWKhGAe/NNBiBR0TlbsCaiWUYP0B
+         8gzWc2yocV7y05ndaXcwITg2cHm8NVXPqhZJ3+6xEC/DkqFLox0flM0Gx3SZkG6jGndI
+         dDCoWOrn3iYiOdZ+nC/7IArWRZhLivS94SfypX7Q8uzrpkt9WD0meAJjaA/d88kmpn5j
+         Lntg==
+X-Gm-Message-State: AOAM531p5Xp5/1f9Y5JSy9P3fSirQQUjHRmWb0NDQJXUhF/LHJI8jTDZ
+        UPdZP1sbd1ZT2pORbTHZO/n2NWGmvUEDGTuvFyI=
+X-Google-Smtp-Source: ABdhPJwWs42SDt5la+BM9YL/9s7okRdULRG1K9KKVQsUWVHlUOyOv6cxOtl71XJSPfS1TLNQsEt69tIAUvZreJic54E=
+X-Received: by 2002:a5d:4a02:: with SMTP id m2mr5913487wrq.154.1642116461572;
+ Thu, 13 Jan 2022 15:27:41 -0800 (PST)
+MIME-Version: 1.0
+References: <20220112173312.764660-1-miquel.raynal@bootlin.com>
+ <20220112173312.764660-2-miquel.raynal@bootlin.com> <CAB_54W7uEQ5RJZxKT2qimoT=pbu8NsUhbZWZRWg+QjXDoTPFuQ@mail.gmail.com>
+ <20220113103229.64612657@xps13>
+In-Reply-To: <20220113103229.64612657@xps13>
+From:   Alexander Aring <alex.aring@gmail.com>
+Date:   Thu, 13 Jan 2022 18:27:30 -0500
+Message-ID: <CAB_54W4LCS++_BCzPu1kbSKWPC4uLzWwCSEj4CNi7-h8KOVc4w@mail.gmail.com>
+Subject: Re: [wpan-next v2 01/27] net: mac802154: Split the set channel hook implementation
+To:     Miquel Raynal <miquel.raynal@bootlin.com>
 Cc:     Stefan Schmidt <stefan@datenfreihafen.org>,
         linux-wpan - ML <linux-wpan@vger.kernel.org>,
         "David S. Miller" <davem@davemloft.net>,
@@ -37,78 +69,57 @@ Cc:     Stefan Schmidt <stefan@datenfreihafen.org>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
         "linux-wireless@vger.kernel.org Wireless" 
         <linux-wireless@vger.kernel.org>
-Subject: Re: [wpan-next v2 23/27] net: mac802154: Add support for active
- scans
-Message-ID: <20220113181451.6aa5e60a@xps13>
-In-Reply-To: <CAB_54W6bJ5oV1pTX03-xWaFohdyxrjy2WSa2kxp3rBzLqSo=UA@mail.gmail.com>
-References: <20220112173312.764660-1-miquel.raynal@bootlin.com>
-        <20220112173312.764660-24-miquel.raynal@bootlin.com>
-        <CAB_54W6bJ5oV1pTX03-xWaFohdyxrjy2WSa2kxp3rBzLqSo=UA@mail.gmail.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 3.17.7 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi Alexander,
+Hi,
 
-alex.aring@gmail.com wrote on Wed, 12 Jan 2022 18:16:11 -0500:
+On Thu, 13 Jan 2022 at 04:32, Miquel Raynal <miquel.raynal@bootlin.com> wrote:
+>
+> Hi Alexander,
+>
+> alex.aring@gmail.com wrote on Wed, 12 Jan 2022 17:30:35 -0500:
+>
+> > Hi,
+> >
+> > On Wed, 12 Jan 2022 at 12:33, Miquel Raynal <miquel.raynal@bootlin.com> wrote:
+> > >
+> > > As it is currently designed, the set_channel() cfg802154 hook
+> > > implemented in the softMAC is doing a couple of checks before actually
+> > > performing the channel change. However, as we enhance the support for
+> > > automatically setting the symbol duration during channel changes, it
+> > > will also be needed to ensure that the corresponding channel as properly
+> > > be selected at probe time. In order to verify this, we will need to
+> >
+> > no, we don't set channels at probe time. We set the
+> > current_page/channel whatever the default is according to the hardware
+> > datasheet. I think this channel should be dropped and all drivers set
+> > the defaults before registering hw as what we do at e.g. at86rf230,
+> > see [0].
+>
+> Is there a reason for refusing to call ->set_channel() at probe time?
+>
 
-> Hi,
-> 
-> On Wed, 12 Jan 2022 at 12:34, Miquel Raynal <miquel.raynal@bootlin.com> wrote:
-> ...
-> > +static int mac802154_scan_send_beacon_req_locked(struct ieee802154_local *local)
-> > +{
-> > +       struct sk_buff *skb;
-> > +       int ret;
-> > +
-> > +       lockdep_assert_held(&local->scan_lock);
-> > +
-> > +       skb = alloc_skb(IEEE802154_BEACON_REQ_SKB_SZ, GFP_KERNEL);
-> > +       if (!skb)
-> > +               return -ENOBUFS;
-> > +
-> > +       ret = ieee802154_beacon_req_push(skb, &local->beacon_req);
-> > +       if (ret) {
-> > +               kfree_skb(skb);
-> > +               return ret;
-> > +       }
-> > +
-> > +       return drv_xmit_async(local, skb);  
-> 
-> I think you need to implement a sync transmit handling here.
+because the current drivers work the way to not set the channel/page
+during probe time. Also the 802.15.4 spec states that this default
+value is hardware specific and this goes back whatever the vendor
+decides. Also you drop the check that if the same channel is already
+set don't set it which works like a shadow register for registers.
+Is there a reason why to set a channel during probe time? Are you
+setting the value which is the default one again? If the driver has a
+random default value it should choose some and stick to one, the
+others do whatever the datasheet has after resetting the hardware.
 
-True.
+I really don't see the sense here why every driver should introduce on
+driver level a set channel call. At probing time the transceiver
+registers are already in a state which we should reflect.
 
-> And what
-> I mean is not using dryv_xmit_sync() (It is a long story and should
-> not be used, it's just that the driver is allowed to call bus api
-> functions which can sleep).
+> Anyway, I'll put the symbol duration setting in the registration helper
+> and I will fix hwsim aside.
+>
 
-Understood.
+ok, thanks.
 
-> We don't have such a function yet (but I
-> think it can be implemented), you should wait until the transmission
-> is done. If we don't wait we fill framebuffers on the hardware while
-> the hardware is transmitting the framebuffer which is... bad.
-
-Do you already have something in mind?
-
-If I focus on the scan operation, it could be that we consider the
-queue empty, then we put this transfer, wait for completion and
-continue. But this only work for places where we know we have full
-control over what is transmitted (eg. during a scan) and not for all
-transfers. Would this fit your idea?
-
-Or do you want something more generic with some kind of an
-internal queue where we have the knowledge of what has been queued and
-a token to link with every xmit_done call that is made?
-
-I'm open to suggestions.
-
-Thanks,
-Miquèl
+- Alex
