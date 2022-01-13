@@ -2,55 +2,22 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C97CBC433F5
-	for <linux-wpan@archiver.kernel.org>; Wed, 12 Jan 2022 23:16:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA9D6C433F5
+	for <linux-wpan@archiver.kernel.org>; Thu, 13 Jan 2022 09:30:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235285AbiALXQY (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 12 Jan 2022 18:16:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56172 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235235AbiALXQX (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 12 Jan 2022 18:16:23 -0500
-Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8EA75C06173F;
-        Wed, 12 Jan 2022 15:16:23 -0800 (PST)
-Received: by mail-wm1-x32e.google.com with SMTP id p18so2652098wmg.4;
-        Wed, 12 Jan 2022 15:16:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Dv6pc+JoSrqBX2AZ4Y5u186caW5FzV8GVKLRws4BTnc=;
-        b=bUGfuIBwiXJlzr9YRA4ZdKS52M5LQrNX8k48lodePS4pqH0gEtL7y3VvEeulS6Gfru
-         oRSI/ukHI+GcqDzf+s2YafDK7XahCQeAbId1AnFL6D30km33y0d0wG3XqKSGeH9qdj8k
-         TjWEpU16LYv/zAaxmlr14XbJOVfGmEcBXcJPW0Z70yFfjYU0pQX9VME3ltcvqJjtenpV
-         IwZNumxA57CcmJRIk41uwqbESkFANMcMukfi8z2iuXyfDAhxFhnJUyzuV174swvLuRXt
-         0WPGXBnEm5jAV0vc+kZqfju+iEX49sVOB8r+wJ02TRi/v2wnMaoMancE9IY13dr549KK
-         pRJQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Dv6pc+JoSrqBX2AZ4Y5u186caW5FzV8GVKLRws4BTnc=;
-        b=ER60mzbFs86RuNOC5e+jPjfFTqtYKEKRpWEU07ZxBdLf0CQTyZBlBllARPzcHq6OJn
-         ns0X1Dz2gBPNF3xN+DgvxcpCYiVgPb9t2Pp+fO6DerV0/d/I7il/kiz0eSPIsCihf88g
-         xZzha1gIhSvB2D+HE3jd6jtaW7o47rbIb7DmSap+ZXVCVWSjHADwVtAeYfWpmS7Wa4xF
-         0SYRRd2gS9gV5iudZryN+xwHPuR6kDE/eZn/N/NRJfci079O36AFREqjYiJ/s9KuUpa5
-         3wQjtURakxFxb7xLeOWxkD47KvceriELTVTlM/8RWvn+5tH/hfuDQ0+KzLWK0pefLzsG
-         JabQ==
-X-Gm-Message-State: AOAM530bfe4DVWA31Z+pNKWnAeeb5GCo+of7dc55rBpxBqvqOgNZ8HDt
-        KlvKiCgZaXjQwFVB7MPeh+1tupah/KYj2lNolnM=
-X-Google-Smtp-Source: ABdhPJy/BYlvZB1v7EUFO2Aed1sLC550uY72jRNFYq4xRDcadJ52FiwpUvUQvBldtfJz5UjK4/xq75HKWvSKxjuwmW4=
-X-Received: by 2002:a1c:545b:: with SMTP id p27mr8651528wmi.178.1642029382252;
- Wed, 12 Jan 2022 15:16:22 -0800 (PST)
-MIME-Version: 1.0
-References: <20220112173312.764660-1-miquel.raynal@bootlin.com> <20220112173312.764660-24-miquel.raynal@bootlin.com>
-In-Reply-To: <20220112173312.764660-24-miquel.raynal@bootlin.com>
-From:   Alexander Aring <alex.aring@gmail.com>
-Date:   Wed, 12 Jan 2022 18:16:11 -0500
-Message-ID: <CAB_54W6bJ5oV1pTX03-xWaFohdyxrjy2WSa2kxp3rBzLqSo=UA@mail.gmail.com>
-Subject: Re: [wpan-next v2 23/27] net: mac802154: Add support for active scans
-To:     Miquel Raynal <miquel.raynal@bootlin.com>
+        id S233333AbiAMJaC convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-wpan@archiver.kernel.org>);
+        Thu, 13 Jan 2022 04:30:02 -0500
+Received: from relay3-d.mail.gandi.net ([217.70.183.195]:55679 "EHLO
+        relay3-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233382AbiAMJaB (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 13 Jan 2022 04:30:01 -0500
+Received: (Authenticated sender: miquel.raynal@bootlin.com)
+        by relay3-d.mail.gandi.net (Postfix) with ESMTPSA id BB9BF6002D;
+        Thu, 13 Jan 2022 09:29:55 +0000 (UTC)
+Date:   Thu, 13 Jan 2022 10:29:54 +0100
+From:   Miquel Raynal <miquel.raynal@bootlin.com>
+To:     Alexander Aring <alex.aring@gmail.com>
 Cc:     Stefan Schmidt <stefan@datenfreihafen.org>,
         linux-wpan - ML <linux-wpan@vger.kernel.org>,
         "David S. Miller" <davem@davemloft.net>,
@@ -67,43 +34,133 @@ Cc:     Stefan Schmidt <stefan@datenfreihafen.org>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
         "linux-wireless@vger.kernel.org Wireless" 
         <linux-wireless@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [wpan-next v2 27/27] net: ieee802154: ca8210: Refuse most of
+ the scan operations
+Message-ID: <20220113102954.7a0e213e@xps13>
+In-Reply-To: <CAB_54W5ojqi2obtNLihCMXsZkh+aN_cVbSTRptq3=PXkpknzJQ@mail.gmail.com>
+References: <20220112173312.764660-1-miquel.raynal@bootlin.com>
+        <20220112173312.764660-28-miquel.raynal@bootlin.com>
+        <CAB_54W5ojqi2obtNLihCMXsZkh+aN_cVbSTRptq3=PXkpknzJQ@mail.gmail.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 3.17.7 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi,
+Hi Alexander,
 
-On Wed, 12 Jan 2022 at 12:34, Miquel Raynal <miquel.raynal@bootlin.com> wrote:
-...
-> +static int mac802154_scan_send_beacon_req_locked(struct ieee802154_local *local)
-> +{
-> +       struct sk_buff *skb;
-> +       int ret;
-> +
-> +       lockdep_assert_held(&local->scan_lock);
-> +
-> +       skb = alloc_skb(IEEE802154_BEACON_REQ_SKB_SZ, GFP_KERNEL);
-> +       if (!skb)
-> +               return -ENOBUFS;
-> +
-> +       ret = ieee802154_beacon_req_push(skb, &local->beacon_req);
-> +       if (ret) {
-> +               kfree_skb(skb);
-> +               return ret;
-> +       }
-> +
-> +       return drv_xmit_async(local, skb);
+alex.aring@gmail.com wrote on Wed, 12 Jan 2022 17:48:59 -0500:
 
-I think you need to implement a sync transmit handling here. And what
-I mean is not using dryv_xmit_sync() (It is a long story and should
-not be used, it's just that the driver is allowed to call bus api
-functions which can sleep). We don't have such a function yet (but I
-think it can be implemented), you should wait until the transmission
-is done. If we don't wait we fill framebuffers on the hardware while
-the hardware is transmitting the framebuffer which is... bad.
+> Hi,
+> 
+> On Wed, 12 Jan 2022 at 12:34, Miquel Raynal <miquel.raynal@bootlin.com> wrote:
+> >
+> > The Cascada 8210 hardware transceiver is kind of a hardMAC which
+> > interfaces with the softMAC and in practice does not support sending
+> > anything else than dataframes. This means we cannot send any BEACON_REQ
+> > during active scans nor any BEACON in general. Refuse these operations
+> > officially so that the user is aware of the limitation.
+> >
+> > Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
+> > ---
+> >  drivers/net/ieee802154/ca8210.c | 25 ++++++++++++++++++++++++-
+> >  1 file changed, 24 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/drivers/net/ieee802154/ca8210.c b/drivers/net/ieee802154/ca8210.c
+> > index d3a9e4fe05f4..49c274280e3c 100644
+> > --- a/drivers/net/ieee802154/ca8210.c
+> > +++ b/drivers/net/ieee802154/ca8210.c
+> > @@ -2385,6 +2385,25 @@ static int ca8210_set_promiscuous_mode(struct ieee802154_hw *hw, const bool on)
+> >         return link_to_linux_err(status);
+> >  }
+> >
+> > +static int ca8210_enter_scan_mode(struct ieee802154_hw *hw,
+> > +                                 struct cfg802154_scan_request *request)
+> > +{
+> > +       /* This xceiver can only send dataframes */
+> > +       if (request->type != NL802154_SCAN_PASSIVE)
+> > +               return -EOPNOTSUPP;
+> > +
+> > +       return 0;
+> > +}
+> > +
+> > +static int ca8210_enter_beacons_mode(struct ieee802154_hw *hw,
+> > +                                    struct cfg802154_beacons_request *request)
+> > +{
+> > +       /* This xceiver can only send dataframes */
+> > +       return -EOPNOTSUPP;
+> > +}
+> > +
+> > +static void ca8210_exit_scan_beacons_mode(struct ieee802154_hw *hw) { }
+> > +
+> >  static const struct ieee802154_ops ca8210_phy_ops = {
+> >         .start = ca8210_start,
+> >         .stop = ca8210_stop,
+> > @@ -2397,7 +2416,11 @@ static const struct ieee802154_ops ca8210_phy_ops = {
+> >         .set_cca_ed_level = ca8210_set_cca_ed_level,
+> >         .set_csma_params = ca8210_set_csma_params,
+> >         .set_frame_retries = ca8210_set_frame_retries,
+> > -       .set_promiscuous_mode = ca8210_set_promiscuous_mode
+> > +       .set_promiscuous_mode = ca8210_set_promiscuous_mode,
+> > +       .enter_scan_mode = ca8210_enter_scan_mode,
+> > +       .exit_scan_mode = ca8210_exit_scan_beacons_mode,
+> > +       .enter_beacons_mode = ca8210_enter_beacons_mode,
+> > +       .exit_beacons_mode = ca8210_exit_scan_beacons_mode,
+> >  };  
+> 
+> so there is no flag that this driver can't support scanning currently
+> and it works now because the offload functionality will return
+> -ENOTSUPP? This is misleading because I would assume if it's not
+> supported we can do it by software which the driver can't do.
 
-Please implement it so that we have a synchronous api above the
-asynchronous transmit api.
+I believe there is a misunderstanding.
 
-- Alex
+This is what I have understood from your previous comments in v1:
+"This driver does not support transmitting anything else than
+datagrams", which is what I assumed was a regular data packet. IOW,
+sending a MAC_CMD such as a beacon request or sending a beacon was not
+supported physically by the hardware. Hence, most of the scans
+operations cannot be performed and must be rejected (all but a passive
+scan, assuming that receiving beacons was okay).
+
+Please mind the update in that hook which currently is just an FYI from
+the mac to the drivers and not a "do it by yourself" injunction. So
+answering -EOPNOTSUPP to the mac here does not mean:
+	"I cannot handle it by myself, the scan cannot happen"
+but
+	"I cannot handle the forged frames, so let's just not try"
+ 
+> ... I see that the offload functions now are getting used and have a
+> reason to be upstream, but the use of it is wrong.
+
+As a personal matter of taste, I don't like flags when it comes to
+something complex like supporting a specific operation. Just in the
+scanning procedure there are 4 different actions and a driver might
+support only a subset of these, which is totally fine but hard to
+properly describe by well-named flags. Here the driver hooks say to
+the driver which are interested "here is what is going to happen" and
+then they can:
+- ignore the details by just not implementing the hooks, let the mac do
+  its job, they will then transmit the relevant frames forged by the
+  mac
+- eventually enter a specific mode internally for this operation, but
+  basically do the same as above, ie. transmitting the frames forged
+  by the mac
+- refuse the operation by returning an error code if something cannot
+  be done
+
+I've experienced a number of situations in the MTD world and later with
+IIO drivers where flags have been remodeled and reused in different
+manners, until the flag description gets totally wrong and
+undescriptive regarding what it actually does. Hence my main idea of
+letting drivers refuse these operations instead of having the mac doing
+it for them.
+
+I can definitely use flags if you want, but in this case, what flags do
+you want to see?
+
+Thanks,
+Miquèl
