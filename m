@@ -2,48 +2,40 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0CCCC433EF
-	for <linux-wpan@archiver.kernel.org>; Thu, 13 Jan 2022 11:16:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72107C433F5
+	for <linux-wpan@archiver.kernel.org>; Thu, 13 Jan 2022 14:52:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234100AbiAMLQx convert rfc822-to-8bit (ORCPT
+        id S232719AbiAMOwB convert rfc822-to-8bit (ORCPT
         <rfc822;linux-wpan@archiver.kernel.org>);
-        Thu, 13 Jan 2022 06:16:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48278 "EHLO
+        Thu, 13 Jan 2022 09:52:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41212 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229670AbiAMLQw (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 13 Jan 2022 06:16:52 -0500
+        with ESMTP id S230016AbiAMOwA (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 13 Jan 2022 09:52:00 -0500
 Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::227])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DEBCC06173F;
-        Thu, 13 Jan 2022 03:16:51 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F2B7C06161C;
+        Thu, 13 Jan 2022 06:51:59 -0800 (PST)
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by relay7-d.mail.gandi.net (Postfix) with ESMTPSA id 4C16820004;
-        Thu, 13 Jan 2022 11:16:47 +0000 (UTC)
-Date:   Thu, 13 Jan 2022 12:16:45 +0100
+        by relay7-d.mail.gandi.net (Postfix) with ESMTPSA id 696502000F;
+        Thu, 13 Jan 2022 14:51:56 +0000 (UTC)
+Date:   Thu, 13 Jan 2022 15:51:54 +0100
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
-To:     Alexander Aring <alex.aring@gmail.com>
-Cc:     Stefan Schmidt <stefan@datenfreihafen.org>,
-        linux-wpan - ML <linux-wpan@vger.kernel.org>,
+To:     kernel test robot <lkp@intel.com>
+Cc:     Alexander Aring <alex.aring@gmail.com>,
+        Stefan Schmidt <stefan@datenfreihafen.org>,
+        linux-wpan@vger.kernel.org,
         "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
+        Jakub Kicinski <kuba@kernel.org>, llvm@lists.linux.dev,
+        kbuild-all@lists.01.org, netdev@vger.kernel.org,
         Michael Hennerich <michael.hennerich@analog.com>,
         Harry Morris <h.morris@cascoda.com>,
         Varka Bhadram <varkabhadram@gmail.com>,
-        Xue Liu <liuxuenetmail@gmail.com>, Alan Ott <alan@signal11.us>,
-        David Girault <david.girault@qorvo.com>,
-        Romuald Despres <romuald.despres@qorvo.com>,
-        Frederic Blain <frederic.blain@qorvo.com>,
-        Nicolas Schodet <nico@ni.fr.eu.org>,
-        Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-        "linux-wireless@vger.kernel.org Wireless" 
-        <linux-wireless@vger.kernel.org>
-Subject: Re: [wpan-next v2 08/27] net: ieee802154: Drop symbol duration
- settings when the core does it already
-Message-ID: <20220113121645.434a6ef6@xps13>
-In-Reply-To: <CAB_54W5QU5JCtQYwvTKREd6ZeQWmC19LF4mj853U0Gz-mCObVQ@mail.gmail.com>
-References: <20220112173312.764660-1-miquel.raynal@bootlin.com>
-        <20220112173312.764660-9-miquel.raynal@bootlin.com>
-        <CAB_54W5QU5JCtQYwvTKREd6ZeQWmC19LF4mj853U0Gz-mCObVQ@mail.gmail.com>
+        Xue Liu <liuxuenetmail@gmail.com>
+Subject: Re: [wpan-next v2 19/27] net: ieee802154: Full PAN management
+Message-ID: <20220113155154.243c36ad@xps13>
+In-Reply-To: <202201130436.44AM2OXA-lkp@intel.com>
+References: <20220112173312.764660-20-miquel.raynal@bootlin.com>
+        <202201130436.44AM2OXA-lkp@intel.com>
 Organization: Bootlin
 X-Mailer: Claws Mail 3.17.7 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
@@ -53,72 +45,103 @@ Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi Alexander,
 
-alex.aring@gmail.com wrote on Wed, 12 Jan 2022 17:26:14 -0500:
+lkp@intel.com wrote on Thu, 13 Jan 2022 04:46:11 +0800:
 
-> Hi,
+> Hi Miquel,
 > 
-> On Wed, 12 Jan 2022 at 12:33, Miquel Raynal <miquel.raynal@bootlin.com> wrote:
-> >
-> > The core now knows how to set the symbol duration in a few cases, when
-> > drivers correctly advertise the protocols used on each channel. For
-> > these drivers, there is no more need to bother with symbol duration, so
-> > just drop the duplicated code.
-> >
-> > Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
-> > ---
-> >  drivers/net/ieee802154/ca8210.c | 1 -
-> >  drivers/net/ieee802154/mcr20a.c | 2 --
-> >  2 files changed, 3 deletions(-)
-> >
-> > diff --git a/drivers/net/ieee802154/ca8210.c b/drivers/net/ieee802154/ca8210.c
-> > index 82b2a173bdbd..d3a9e4fe05f4 100644
-> > --- a/drivers/net/ieee802154/ca8210.c
-> > +++ b/drivers/net/ieee802154/ca8210.c
-> > @@ -2977,7 +2977,6 @@ static void ca8210_hw_setup(struct ieee802154_hw *ca8210_hw)
-> >         ca8210_hw->phy->cca.mode = NL802154_CCA_ENERGY_CARRIER;
-> >         ca8210_hw->phy->cca.opt = NL802154_CCA_OPT_ENERGY_CARRIER_AND;
-> >         ca8210_hw->phy->cca_ed_level = -9800;
-> > -       ca8210_hw->phy->symbol_duration = 16 * 1000;
-> >         ca8210_hw->phy->lifs_period = 40;
-> >         ca8210_hw->phy->sifs_period = 12;
-> >         ca8210_hw->flags =
-> > diff --git a/drivers/net/ieee802154/mcr20a.c b/drivers/net/ieee802154/mcr20a.c
-> > index 8aa87e9bf92e..da2ab19cb5ee 100644
-> > --- a/drivers/net/ieee802154/mcr20a.c
-> > +++ b/drivers/net/ieee802154/mcr20a.c
-> > @@ -975,7 +975,6 @@ static void mcr20a_hw_setup(struct mcr20a_local *lp)
-> >
-> >         dev_dbg(printdev(lp), "%s\n", __func__);
-> >
-> > -       phy->symbol_duration = 16 * 1000;
-> >         phy->lifs_period = 40;
-> >         phy->sifs_period = 12;
-> >
-> > @@ -1010,7 +1009,6 @@ static void mcr20a_hw_setup(struct mcr20a_local *lp)
-> >         phy->current_page = 0;
-> >         /* MCR20A default reset value */
-> >         phy->current_channel = 20;
-> > -       phy->symbol_duration = 16 * 1000;
-> >         phy->supported.tx_powers = mcr20a_powers;
-> >         phy->supported.tx_powers_size = ARRAY_SIZE(mcr20a_powers);
-> >         phy->cca_ed_level = phy->supported.cca_ed_levels[75];  
+> I love your patch! Yet something to improve:
 > 
-> What's about the atrf86230 driver?
+> [auto build test ERROR on linus/master]
+> [also build test ERROR on v5.16 next-20220112]
+> [If your patch is applied to the wrong git tree, kindly drop us a note.
+> And when submitting patch, we suggest to use '--base' as documented in
+> https://git-scm.com/docs/git-format-patch]
+> 
+> url:    https://github.com/0day-ci/linux/commits/Miquel-Raynal/IEEE-802-15-4-scan-support/20220113-013731
+> base:   https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git daadb3bd0e8d3e317e36bc2c1542e86c528665e5
+> config: riscv-randconfig-r042-20220112 (https://download.01.org/0day-ci/archive/20220113/202201130436.44AM2OXA-lkp@intel.com/config)
+> compiler: clang version 14.0.0 (https://github.com/llvm/llvm-project 244dd2913a43a200f5a6544d424cdc37b771028b)
+> reproduce (this is a W=1 build):
+>         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+>         chmod +x ~/bin/make.cross
+>         # install riscv cross compiling tool for clang build
+>         # apt-get install binutils-riscv64-linux-gnu
+>         # https://github.com/0day-ci/linux/commit/9c8fbd918a704432bbf6cdce1d111e9002c756b4
+>         git remote add linux-review https://github.com/0day-ci/linux
+>         git fetch --no-tags linux-review Miquel-Raynal/IEEE-802-15-4-scan-support/20220113-013731
+>         git checkout 9c8fbd918a704432bbf6cdce1d111e9002c756b4
+>         # save the config file to linux build tree
+>         mkdir build_dir
+>         COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=riscv SHELL=/bin/bash net/ieee802154/
+> 
+> If you fix the issue, kindly add following tag as appropriate
+> Reported-by: kernel test robot <lkp@intel.com>
+> 
+> All errors (new ones prefixed by >>):
+> 
+> >> net/ieee802154/nl802154.c:1613:8: error: implicit declaration of function 'nl802154_prepare_wpan_dev_dump' [-Werror,-Wimplicit-function-declaration]  
+>            err = nl802154_prepare_wpan_dev_dump(skb, cb, &rdev, &wpan_dev);
+>                  ^
+> >> net/ieee802154/nl802154.c:1637:2: error: implicit declaration of function 'nl802154_finish_wpan_dev_dump' [-Werror,-Wimplicit-function-declaration]  
+>            nl802154_finish_wpan_dev_dump(rdev);
 
-I couldn't find reliable information about what this meant:
+These two helpers were defined within the experimental section. I will
+move them out of this section now that they have other users than
+experimental code.
 
-	/* SUB:0 and BPSK:0 -> BPSK-20 */
-	/* SUB:1 and BPSK:0 -> BPSK-40 */
-	/* SUB:0 and BPSK:1 -> OQPSK-100/200/400 */
-	/* SUB:1 and BPSK:1 -> OQPSK-250/500/1000 */
+>            ^
+>    net/ieee802154/nl802154.c:1637:2: note: did you mean 'nl802154_prepare_wpan_dev_dump'?
+>    net/ieee802154/nl802154.c:1613:8: note: 'nl802154_prepare_wpan_dev_dump' declared here
+>            err = nl802154_prepare_wpan_dev_dump(skb, cb, &rdev, &wpan_dev);
+>                  ^
+>    2 errors generated.
+> 
+> 
+> vim +/nl802154_prepare_wpan_dev_dump +1613 net/ieee802154/nl802154.c
+> 
+>   1605	
+>   1606	static int nl802154_dump_pans(struct sk_buff *skb, struct netlink_callback *cb)
+>   1607	{
+>   1608		struct cfg802154_registered_device *rdev;
+>   1609		struct cfg802154_internal_pan *pan;
+>   1610		struct wpan_dev *wpan_dev;
+>   1611		int err;
+>   1612	
+> > 1613		err = nl802154_prepare_wpan_dev_dump(skb, cb, &rdev, &wpan_dev);  
+>   1614		if (err)
+>   1615			return err;
+>   1616	
+>   1617		spin_lock_bh(&rdev->pan_lock);
+>   1618	
+>   1619		if (cb->args[2])
+>   1620			goto out;
+>   1621	
+>   1622		cb->seq = rdev->pan_generation;
+>   1623	
+>   1624		ieee802154_for_each_pan(pan, rdev) {
+>   1625			err = nl802154_send_pan_info(skb, cb, cb->nlh->nlmsg_seq,
+>   1626						     NLM_F_MULTI, rdev, wpan_dev, pan);
+>   1627			if (err < 0)
+>   1628				goto out_err;
+>   1629		}
+>   1630	
+>   1631		cb->args[2] = 1;
+>   1632	out:
+>   1633		err = skb->len;
+>   1634	out_err:
+>   1635		spin_unlock_bh(&rdev->pan_lock);
+>   1636	
+> > 1637		nl802154_finish_wpan_dev_dump(rdev);  
+>   1638	
+>   1639		return err;
+>   1640	}
+>   1641	
+> 
+> ---
+> 0-DAY CI Kernel Test Service, Intel Corporation
+> https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
 
-None of these comments match the spec so I don't know what to put
-there. If you know what these protocols are, I will immediately
-provide this information into the driver and ensure the core handles
-these durations properly before dropping the symbol_durations settings
-from the code.
 
 Thanks,
 Miquèl
