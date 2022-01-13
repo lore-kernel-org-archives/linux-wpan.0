@@ -2,20 +2,23 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D913C433EF
-	for <linux-wpan@archiver.kernel.org>; Thu, 13 Jan 2022 17:07:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D592C433EF
+	for <linux-wpan@archiver.kernel.org>; Thu, 13 Jan 2022 17:15:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232460AbiAMRHQ convert rfc822-to-8bit (ORCPT
+        id S234055AbiAMRPA convert rfc822-to-8bit (ORCPT
         <rfc822;linux-wpan@archiver.kernel.org>);
-        Thu, 13 Jan 2022 12:07:16 -0500
-Received: from relay1-d.mail.gandi.net ([217.70.183.193]:48395 "EHLO
-        relay1-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232285AbiAMRHQ (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 13 Jan 2022 12:07:16 -0500
+        Thu, 13 Jan 2022 12:15:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46204 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234010AbiAMRO5 (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 13 Jan 2022 12:14:57 -0500
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::226])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7283C061574;
+        Thu, 13 Jan 2022 09:14:56 -0800 (PST)
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by relay1-d.mail.gandi.net (Postfix) with ESMTPSA id 0898724000F;
-        Thu, 13 Jan 2022 17:07:10 +0000 (UTC)
-Date:   Thu, 13 Jan 2022 18:07:09 +0100
+        by relay6-d.mail.gandi.net (Postfix) with ESMTPSA id C5D23C0003;
+        Thu, 13 Jan 2022 17:14:52 +0000 (UTC)
+Date:   Thu, 13 Jan 2022 18:14:51 +0100
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
 To:     Alexander Aring <alex.aring@gmail.com>
 Cc:     Stefan Schmidt <stefan@datenfreihafen.org>,
@@ -34,12 +37,13 @@ Cc:     Stefan Schmidt <stefan@datenfreihafen.org>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
         "linux-wireless@vger.kernel.org Wireless" 
         <linux-wireless@vger.kernel.org>
-Subject: Re: [wpan-next v2 18/27] net: mac802154: Handle scan requests
-Message-ID: <20220113180709.0dade123@xps13>
-In-Reply-To: <CAB_54W4PL1ty5XsqRoEKwsy-h8KL9gSGMK6N=HiWJDp6NHsb0A@mail.gmail.com>
+Subject: Re: [wpan-next v2 23/27] net: mac802154: Add support for active
+ scans
+Message-ID: <20220113181451.6aa5e60a@xps13>
+In-Reply-To: <CAB_54W6bJ5oV1pTX03-xWaFohdyxrjy2WSa2kxp3rBzLqSo=UA@mail.gmail.com>
 References: <20220112173312.764660-1-miquel.raynal@bootlin.com>
-        <20220112173312.764660-19-miquel.raynal@bootlin.com>
-        <CAB_54W4PL1ty5XsqRoEKwsy-h8KL9gSGMK6N=HiWJDp6NHsb0A@mail.gmail.com>
+        <20220112173312.764660-24-miquel.raynal@bootlin.com>
+        <CAB_54W6bJ5oV1pTX03-xWaFohdyxrjy2WSa2kxp3rBzLqSo=UA@mail.gmail.com>
 Organization: Bootlin
 X-Mailer: Claws Mail 3.17.7 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
@@ -51,68 +55,60 @@ X-Mailing-List: linux-wpan@vger.kernel.org
 
 Hi Alexander,
 
-alex.aring@gmail.com wrote on Wed, 12 Jan 2022 17:44:02 -0500:
+alex.aring@gmail.com wrote on Wed, 12 Jan 2022 18:16:11 -0500:
 
 > Hi,
 > 
-> On Wed, 12 Jan 2022 at 12:33, Miquel Raynal <miquel.raynal@bootlin.com> wrote:
+> On Wed, 12 Jan 2022 at 12:34, Miquel Raynal <miquel.raynal@bootlin.com> wrote:
 > ...
-> > +       return 0;
-> > +}
-> > diff --git a/net/mac802154/tx.c b/net/mac802154/tx.c
-> > index c829e4a75325..40656728c624 100644
-> > --- a/net/mac802154/tx.c
-> > +++ b/net/mac802154/tx.c
-> > @@ -54,6 +54,9 @@ ieee802154_tx(struct ieee802154_local *local, struct sk_buff *skb)
-> >         struct net_device *dev = skb->dev;
-> >         int ret;
-> >
-> > +       if (unlikely(mac802154_scan_is_ongoing(local)))
-> > +               return NETDEV_TX_BUSY;
-> > +  
+> > +static int mac802154_scan_send_beacon_req_locked(struct ieee802154_local *local)
+> > +{
+> > +       struct sk_buff *skb;
+> > +       int ret;
+> > +
+> > +       lockdep_assert_held(&local->scan_lock);
+> > +
+> > +       skb = alloc_skb(IEEE802154_BEACON_REQ_SKB_SZ, GFP_KERNEL);
+> > +       if (!skb)
+> > +               return -ENOBUFS;
+> > +
+> > +       ret = ieee802154_beacon_req_push(skb, &local->beacon_req);
+> > +       if (ret) {
+> > +               kfree_skb(skb);
+> > +               return ret;
+> > +       }
+> > +
+> > +       return drv_xmit_async(local, skb);  
 > 
-> Please look into the functions "ieee802154_wake_queue()" and
-> "ieee802154_stop_queue()" which prevent this function from being
-> called. Call stop before starting scanning and wake after scanning is
-> done or stopped.
+> I think you need to implement a sync transmit handling here.
 
-Mmmh all this is already done, isn't it?
-- mac802154_trigger_scan_locked() stops the queue before setting the
-  promiscuous mode
-- mac802154_end_of_scan() wakes the queue after resetting the
-  promiscuous mode to its original state
+True.
 
-Should I drop the check which stands for an extra precaution?
+> And what
+> I mean is not using dryv_xmit_sync() (It is a long story and should
+> not be used, it's just that the driver is allowed to call bus api
+> functions which can sleep).
 
+Understood.
 
-But overall I think I don't understand well this part. What is
-a bit foggy to me is why the (async) tx implementation does:
+> We don't have such a function yet (but I
+> think it can be implemented), you should wait until the transmission
+> is done. If we don't wait we fill framebuffers on the hardware while
+> the hardware is transmitting the framebuffer which is... bad.
 
-*Core*                           *Driver*
+Do you already have something in mind?
 
-stop_queue()
-drv_async_xmit() -------
-                        \------> do something
-                         ------- calls ieee802154_xmit_complete()
-wakeup_queue() <--------/
+If I focus on the scan operation, it could be that we consider the
+queue empty, then we put this transfer, wait for completion and
+continue. But this only work for places where we know we have full
+control over what is transmitted (eg. during a scan) and not for all
+transfers. Would this fit your idea?
 
-So we actually disable the queue for transmitting. Why??
+Or do you want something more generic with some kind of an
+internal queue where we have the knowledge of what has been queued and
+a token to link with every xmit_done call that is made?
 
-> Also there exists a race which exists in your way and also the one
-> mentioned above. There can still be some transmissions going on... We
-> need to wait until "all possible" tx completions are done... to be
-> sure there are really no transmissions going on. However we need to be
-> sure that a wake cannot be done if a tx completion is done, we need to
-> avoid it when the scan operation is ongoing as a workaround for this
-> race.
-> 
-> This race exists and should be fixed in future work?
-
-Yep, this is true, do you have any pointers? Because I looked at the
-code and for now it appears quite unpractical to add some kind of
-flushing mechanism on that net queue. I believe we cannot use the netif
-interface for that so we would have to implement our own mechanism in
-the ieee802154 core.
+I'm open to suggestions.
 
 Thanks,
 Miquèl
