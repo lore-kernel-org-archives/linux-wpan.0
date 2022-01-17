@@ -2,18 +2,18 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD6D2C4332F
-	for <linux-wpan@archiver.kernel.org>; Mon, 17 Jan 2022 11:55:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 152FAC433EF
+	for <linux-wpan@archiver.kernel.org>; Mon, 17 Jan 2022 11:56:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239477AbiAQLzx (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 17 Jan 2022 06:55:53 -0500
-Received: from relay12.mail.gandi.net ([217.70.178.232]:36145 "EHLO
+        id S236673AbiAQLz7 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 17 Jan 2022 06:55:59 -0500
+Received: from relay12.mail.gandi.net ([217.70.178.232]:45859 "EHLO
         relay12.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239411AbiAQLz2 (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 17 Jan 2022 06:55:28 -0500
+        with ESMTP id S239425AbiAQLzc (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 17 Jan 2022 06:55:32 -0500
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by relay12.mail.gandi.net (Postfix) with ESMTPSA id 452C0200009;
-        Mon, 17 Jan 2022 11:55:26 +0000 (UTC)
+        by relay12.mail.gandi.net (Postfix) with ESMTPSA id B0FA9200016;
+        Mon, 17 Jan 2022 11:55:29 +0000 (UTC)
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
 To:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
@@ -29,9 +29,9 @@ Cc:     netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
         Xue Liu <liuxuenetmail@gmail.com>, Alan Ott <alan@signal11.us>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
         Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: [PATCH v3 23/41] net: mac802154: Follow the count of ongoing transmissions
-Date:   Mon, 17 Jan 2022 12:54:22 +0100
-Message-Id: <20220117115440.60296-24-miquel.raynal@bootlin.com>
+Subject: [PATCH v3 25/41] net: mac802154: Create a hot tx path
+Date:   Mon, 17 Jan 2022 12:54:24 +0100
+Message-Id: <20220117115440.60296-26-miquel.raynal@bootlin.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20220117115440.60296-1-miquel.raynal@bootlin.com>
 References: <20220117115440.60296-1-miquel.raynal@bootlin.com>
@@ -42,72 +42,47 @@ Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-In order to create a synchronous API for MLME command purposes, we need
-to be able to track the end of the ongoing transmissions. Let's
-introduce an atomic variable which is incremented and decremented when
-relevant and now at any moment if a there is an ongoing transmission.
+Let's rename the current tx path to show that this is the "hot" path. We
+will soon introduce a slower path for MLME commands.
 
 Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
 ---
- include/net/cfg802154.h | 3 +++
- net/mac802154/tx.c      | 3 +++
- net/mac802154/util.c    | 1 +
- 3 files changed, 7 insertions(+)
+ net/mac802154/tx.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/include/net/cfg802154.h b/include/net/cfg802154.h
-index 0b8b1812cea1..969cae56b000 100644
---- a/include/net/cfg802154.h
-+++ b/include/net/cfg802154.h
-@@ -283,6 +283,9 @@ struct wpan_phy {
- 	/* the network namespace this phy lives in currently */
- 	possible_net_t _net;
- 
-+	/* Transmission monitoring */
-+	atomic_t ongoing_txs;
-+
- 	char priv[] __aligned(NETDEV_ALIGN);
- };
- 
 diff --git a/net/mac802154/tx.c b/net/mac802154/tx.c
-index a01689ddd547..731e86bfe73f 100644
+index a8d4d5e175b6..18ee6fcfcd7f 100644
 --- a/net/mac802154/tx.c
 +++ b/net/mac802154/tx.c
-@@ -45,6 +45,7 @@ void ieee802154_xmit_sync_worker(struct work_struct *work)
- 	/* Restart the netif queue on each sub_if_data object. */
- 	ieee802154_wake_queue(&local->hw);
- 	kfree_skb(skb);
-+	atomic_dec(&local->phy->ongoing_txs);
- 	netdev_dbg(dev, "transmission failed\n");
- }
- 
-@@ -80,6 +81,7 @@ ieee802154_tx(struct ieee802154_local *local, struct sk_buff *skb)
- 	 * cases they only provide a sync callback which we will use as a
- 	 * fallback.
- 	 */
-+	atomic_inc(&local->phy->ongoing_txs);
- 	if (local->ops->xmit_async) {
- 		unsigned int len = skb->len;
- 
-@@ -99,6 +101,7 @@ ieee802154_tx(struct ieee802154_local *local, struct sk_buff *skb)
- 	return NETDEV_TX_OK;
- 
- err_tx:
-+	atomic_dec(&local->phy->ongoing_txs);
- 	kfree_skb(skb);
+@@ -109,6 +109,12 @@ ieee802154_tx(struct ieee802154_local *local, struct sk_buff *skb)
  	return NETDEV_TX_OK;
  }
-diff --git a/net/mac802154/util.c b/net/mac802154/util.c
-index e093ccaebd76..0fa538b0debc 100644
---- a/net/mac802154/util.c
-+++ b/net/mac802154/util.c
-@@ -83,6 +83,7 @@ void ieee802154_xmit_complete(struct ieee802154_hw *hw, struct sk_buff *skb,
- 	}
  
- 	dev_consume_skb_any(skb);
-+	atomic_dec(&hw->phy->ongoing_txs);
++static netdev_tx_t
++ieee802154_hot_tx(struct ieee802154_local *local, struct sk_buff *skb)
++{
++	return ieee802154_tx(local, skb);
++}
++
+ netdev_tx_t
+ ieee802154_monitor_start_xmit(struct sk_buff *skb, struct net_device *dev)
+ {
+@@ -116,7 +122,7 @@ ieee802154_monitor_start_xmit(struct sk_buff *skb, struct net_device *dev)
+ 
+ 	skb->skb_iif = dev->ifindex;
+ 
+-	return ieee802154_tx(sdata->local, skb);
++	return ieee802154_hot_tx(sdata->local, skb);
  }
- EXPORT_SYMBOL(ieee802154_xmit_complete);
  
+ netdev_tx_t
+@@ -138,5 +144,5 @@ ieee802154_subif_start_xmit(struct sk_buff *skb, struct net_device *dev)
+ 
+ 	skb->skb_iif = dev->ifindex;
+ 
+-	return ieee802154_tx(sdata->local, skb);
++	return ieee802154_hot_tx(sdata->local, skb);
+ }
 -- 
 2.27.0
 
