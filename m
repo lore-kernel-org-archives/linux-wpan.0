@@ -2,18 +2,21 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24D73C433EF
-	for <linux-wpan@archiver.kernel.org>; Mon, 17 Jan 2022 11:55:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71E8BC433FE
+	for <linux-wpan@archiver.kernel.org>; Mon, 17 Jan 2022 11:55:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239369AbiAQLz0 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 17 Jan 2022 06:55:26 -0500
-Received: from relay12.mail.gandi.net ([217.70.178.232]:39685 "EHLO
-        relay12.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239377AbiAQLzU (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 17 Jan 2022 06:55:20 -0500
+        id S239405AbiAQLz1 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 17 Jan 2022 06:55:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59376 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239359AbiAQLzR (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 17 Jan 2022 06:55:17 -0500
+Received: from relay12.mail.gandi.net (relay12.mail.gandi.net [IPv6:2001:4b98:dc4:8::232])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3B37C06173E;
+        Mon, 17 Jan 2022 03:55:16 -0800 (PST)
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by relay12.mail.gandi.net (Postfix) with ESMTPSA id 2CEEA200012;
-        Mon, 17 Jan 2022 11:55:17 +0000 (UTC)
+        by relay12.mail.gandi.net (Postfix) with ESMTPSA id C0C91200008;
+        Mon, 17 Jan 2022 11:55:13 +0000 (UTC)
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
 To:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
@@ -29,9 +32,9 @@ Cc:     netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
         Xue Liu <liuxuenetmail@gmail.com>, Alan Ott <alan@signal11.us>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
         Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: [PATCH v3 18/41] net: ieee802154: atusb: Call the complete helper when a transmission is over
-Date:   Mon, 17 Jan 2022 12:54:17 +0100
-Message-Id: <20220117115440.60296-19-miquel.raynal@bootlin.com>
+Subject: [PATCH v3 16/41] net: mac802154: Explain the use of ieee802154_wake/stop_queue()
+Date:   Mon, 17 Jan 2022 12:54:15 +0100
+Message-Id: <20220117115440.60296-17-miquel.raynal@bootlin.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20220117115440.60296-1-miquel.raynal@bootlin.com>
 References: <20220117115440.60296-1-miquel.raynal@bootlin.com>
@@ -42,55 +45,46 @@ Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-ieee802154_xmit_complete() is the right helper to call when a
-transmission is over. The fact that it completed or not is not really a
-question, but drivers must tell the core that the completion is over,
-even if it was canceled. Do not call ieee802154_wake_queue() manually,
-in order to let full control of this task to the core.
-
-Here the skb is freed with a particular helper because it is done in irq
-context. It is not necessary to do that as the *_xmit_complete() helper
-will handle it properly anyway.
+It is not straightforward to the newcomer that a single skb can be sent
+at a time and that the internal process is to stop the queue when
+processing a frame before re-enabling it. Make this clear by documenting
+the ieee802154_wake/stop_queue() helpers.
 
 Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
 ---
- drivers/net/ieee802154/atusb.c | 23 ++++++++++-------------
- 1 file changed, 10 insertions(+), 13 deletions(-)
+ include/net/mac802154.h | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-diff --git a/drivers/net/ieee802154/atusb.c b/drivers/net/ieee802154/atusb.c
-index 1a56073c1c52..4bc7b2dcbdd2 100644
---- a/drivers/net/ieee802154/atusb.c
-+++ b/drivers/net/ieee802154/atusb.c
-@@ -262,19 +262,16 @@ static void atusb_tx_done(struct atusb *atusb, u8 seq)
- 	u8 expect = atusb->tx_ack_seq;
- 
- 	dev_dbg(&usb_dev->dev, "%s (0x%02x/0x%02x)\n", __func__, seq, expect);
--	if (seq == expect) {
--		/* TODO check for ifs handling in firmware */
--		ieee802154_xmit_complete(atusb->hw, atusb->tx_skb, false);
--	} else {
--		/* TODO I experience this case when atusb has a tx complete
--		 * irq before probing, we should fix the firmware it's an
--		 * unlikely case now that seq == expect is then true, but can
--		 * happen and fail with a tx_skb = NULL;
--		 */
--		ieee802154_wake_queue(atusb->hw);
--		if (atusb->tx_skb)
--			dev_kfree_skb_irq(atusb->tx_skb);
--	}
-+
-+	/* TODO:
-+	 * seq == expect: Check for ifs handling in firmware.
-+	 * seq != expect: I experience this case when atusb has a tx complete
-+	 * irq before probing, we should fix the firmware it's an unlikely case
-+	 * now that seq == expect is then true, but can happen and fail with a
-+	 * tx_skb = NULL;
-+	 */
-+
-+	ieee802154_xmit_complete(atusb->hw, atusb->tx_skb, false);
- }
- 
- static void atusb_in_good(struct urb *urb)
+diff --git a/include/net/mac802154.h b/include/net/mac802154.h
+index d524ffb9eb25..94b2e3008e77 100644
+--- a/include/net/mac802154.h
++++ b/include/net/mac802154.h
+@@ -464,6 +464,12 @@ void ieee802154_rx_irqsafe(struct ieee802154_hw *hw, struct sk_buff *skb,
+  * ieee802154_wake_queue - wake ieee802154 queue
+  * @hw: pointer as obtained from ieee802154_alloc_hw().
+  *
++ * Tranceivers have either one transmit framebuffer or one framebuffer for both
++ * transmitting and receiving. Hence, the core only handles one frame at a time
++ * for each phy, which means we had to stop the queue to avoid new skb to come
++ * during the transmission. The queue then needs to be woken up after the
++ * operation.
++ *
+  * Drivers should use this function instead of netif_wake_queue.
+  */
+ void ieee802154_wake_queue(struct ieee802154_hw *hw);
+@@ -472,6 +478,12 @@ void ieee802154_wake_queue(struct ieee802154_hw *hw);
+  * ieee802154_stop_queue - stop ieee802154 queue
+  * @hw: pointer as obtained from ieee802154_alloc_hw().
+  *
++ * Tranceivers have either one transmit framebuffer or one framebuffer for both
++ * transmitting and receiving. Hence, the core only handles one frame at a time
++ * for each phy, which means we need to tell upper layers to stop giving us new
++ * skbs while we are busy with the transmitted one. The queue must then be
++ * stopped before transmitting.
++ *
+  * Drivers should use this function instead of netif_stop_queue.
+  */
+ void ieee802154_stop_queue(struct ieee802154_hw *hw);
 -- 
 2.27.0
 
