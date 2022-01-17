@@ -2,18 +2,21 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CD71C43217
-	for <linux-wpan@archiver.kernel.org>; Mon, 17 Jan 2022 11:56:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2DCEC433FE
+	for <linux-wpan@archiver.kernel.org>; Mon, 17 Jan 2022 11:56:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236665AbiAQL4U (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 17 Jan 2022 06:56:20 -0500
-Received: from relay12.mail.gandi.net ([217.70.178.232]:36145 "EHLO
-        relay12.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236498AbiAQLzz (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 17 Jan 2022 06:55:55 -0500
+        id S239574AbiAQL4X (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 17 Jan 2022 06:56:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59494 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239456AbiAQLzp (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 17 Jan 2022 06:55:45 -0500
+Received: from relay12.mail.gandi.net (relay12.mail.gandi.net [IPv6:2001:4b98:dc4:8::232])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7014C061748;
+        Mon, 17 Jan 2022 03:55:35 -0800 (PST)
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by relay12.mail.gandi.net (Postfix) with ESMTPSA id 34CB8200010;
-        Mon, 17 Jan 2022 11:55:52 +0000 (UTC)
+        by relay12.mail.gandi.net (Postfix) with ESMTPSA id D167E200003;
+        Mon, 17 Jan 2022 11:55:32 +0000 (UTC)
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
 To:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
@@ -29,9 +32,9 @@ Cc:     netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
         Xue Liu <liuxuenetmail@gmail.com>, Alan Ott <alan@signal11.us>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
         Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: [PATCH v3 39/41] net: mac802154: Add support for processing beacon requests
-Date:   Mon, 17 Jan 2022 12:54:38 +0100
-Message-Id: <20220117115440.60296-40-miquel.raynal@bootlin.com>
+Subject: [PATCH v3 27/41] net: mac802154: Introduce a tx queue flushing mechanism
+Date:   Mon, 17 Jan 2022 12:54:26 +0100
+Message-Id: <20220117115440.60296-28-miquel.raynal@bootlin.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20220117115440.60296-1-miquel.raynal@bootlin.com>
 References: <20220117115440.60296-1-miquel.raynal@bootlin.com>
@@ -42,180 +45,106 @@ Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-When performing an active scan, coordinators emit beacon requests which
-must be answered by other PANs receiving the request.
-
-Answering a beacon request is considered a duty whenever the user
-performs a "send beacons" command with an interval of 15. As in the
-softMAC we save the interval in micro-seconds, we use a negative value
-to discriminate between a passive beacons command and the task to answer
-received beacon requests.
+Right now we are able to stop a queue but we have no indication if a
+transmission is ongoing or not. We recently introduced an ongoing tx
+count variable so let's use it to wake up a queue. Waiters on the queue
+will be woken up once all the ongoing transmissions are over. Thanks to
+this feature, we will soon be able to introduce a synchronous API.
 
 Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
 ---
- include/net/ieee802154_netdev.h |  4 +++-
- net/ieee802154/header_ops.c     | 13 +++++++++++++
- net/mac802154/ieee802154_i.h    | 17 ++++++++++++++++-
- net/mac802154/rx.c              | 13 +++++++++++++
- net/mac802154/scan.c            | 17 +++++++++++++----
- 5 files changed, 58 insertions(+), 6 deletions(-)
+ include/net/cfg802154.h      | 1 +
+ net/ieee802154/core.c        | 1 +
+ net/mac802154/cfg.c          | 1 +
+ net/mac802154/ieee802154_i.h | 1 +
+ net/mac802154/tx.c           | 6 ++++++
+ net/mac802154/util.c         | 1 +
+ 6 files changed, 11 insertions(+)
 
-diff --git a/include/net/ieee802154_netdev.h b/include/net/ieee802154_netdev.h
-index 1bf1a4e508a2..a2dba4442c57 100644
---- a/include/net/ieee802154_netdev.h
-+++ b/include/net/ieee802154_netdev.h
-@@ -179,9 +179,11 @@ int ieee802154_hdr_peek_addrs(const struct sk_buff *skb,
-  */
- int ieee802154_hdr_peek(const struct sk_buff *skb, struct ieee802154_hdr *hdr);
+diff --git a/include/net/cfg802154.h b/include/net/cfg802154.h
+index 56aa672e1912..0848896120fa 100644
+--- a/include/net/cfg802154.h
++++ b/include/net/cfg802154.h
+@@ -286,6 +286,7 @@ struct wpan_phy {
+ 	/* Transmission monitoring and control */
+ 	atomic_t ongoing_txs;
+ 	atomic_t hold_txs;
++	wait_queue_head_t sync_txq;
  
--/* pushes a beacon_req or a beacon frame into an skb */
-+/* pushes/pulls a beacon_req or a beacon frame into/from an skb */
- int ieee802154_beacon_req_push(struct sk_buff *skb,
- 			       struct ieee802154_beacon_req_frame *breq);
-+int ieee802154_beacon_req_pl_pull(struct sk_buff *skb,
-+				  struct ieee802154_mac_cmd_pl *mac_pl);
- int ieee802154_beacon_push(struct sk_buff *skb,
- 			   struct ieee802154_beacon_frame *beacon);
+ 	char priv[] __aligned(NETDEV_ALIGN);
+ };
+diff --git a/net/ieee802154/core.c b/net/ieee802154/core.c
+index de259b5170ab..0953cacafbff 100644
+--- a/net/ieee802154/core.c
++++ b/net/ieee802154/core.c
+@@ -129,6 +129,7 @@ wpan_phy_new(const struct cfg802154_ops *ops, size_t priv_size)
+ 	wpan_phy_net_set(&rdev->wpan_phy, &init_net);
  
-diff --git a/net/ieee802154/header_ops.c b/net/ieee802154/header_ops.c
-index c31a9e429a14..771dbcf6e0b8 100644
---- a/net/ieee802154/header_ops.c
-+++ b/net/ieee802154/header_ops.c
-@@ -314,6 +314,19 @@ ieee802154_hdr_pull(struct sk_buff *skb, struct ieee802154_hdr *hdr)
+ 	init_waitqueue_head(&rdev->dev_wait);
++	init_waitqueue_head(&rdev->wpan_phy.sync_txq);
+ 
+ 	return &rdev->wpan_phy;
  }
- EXPORT_SYMBOL_GPL(ieee802154_hdr_pull);
+diff --git a/net/mac802154/cfg.c b/net/mac802154/cfg.c
+index e8aabf215286..e2900c9b788c 100644
+--- a/net/mac802154/cfg.c
++++ b/net/mac802154/cfg.c
+@@ -48,6 +48,7 @@ static int ieee802154_suspend(struct wpan_phy *wpan_phy)
  
-+int ieee802154_beacon_req_pl_pull(struct sk_buff *skb,
-+				  struct ieee802154_mac_cmd_pl *mac_pl)
-+{
-+	if (!pskb_may_pull(skb, sizeof(*mac_pl)))
-+		return -EINVAL;
-+
-+	memcpy(mac_pl, skb->data, sizeof(*mac_pl));
-+	skb_pull(skb, sizeof(*mac_pl));
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(ieee802154_beacon_req_pl_pull);
-+
- int
- ieee802154_hdr_peek_addrs(const struct sk_buff *skb, struct ieee802154_hdr *hdr)
- {
+ 	atomic_inc(&wpan_phy->hold_txs);
+ 	ieee802154_stop_queue(&local->hw);
++	ieee802154_sync_tx(local);
+ 	synchronize_net();
+ 
+ 	/* stop hardware - this must stop RX */
 diff --git a/net/mac802154/ieee802154_i.h b/net/mac802154/ieee802154_i.h
-index 0b1bcbab1ff3..1e394b59d983 100644
+index 0291e49058f2..37d5438fdb3f 100644
 --- a/net/mac802154/ieee802154_i.h
 +++ b/net/mac802154/ieee802154_i.h
-@@ -61,7 +61,7 @@ struct ieee802154_local {
- 	/* Beacons handling */
- 	bool ongoing_beacons_request;
- 	struct mutex beacons_lock;
--	unsigned int beacons_interval;
-+	int beacons_interval;
- 	struct delayed_work beacons_work;
- 	struct ieee802154_sub_if_data __rcu *beacons_sdata;
- 	struct ieee802154_beacon_frame beacon;
-@@ -136,6 +136,21 @@ ieee802154_sdata_running(struct ieee802154_sub_if_data *sdata)
- 	return test_bit(SDATA_STATE_RUNNING, &sdata->state);
- }
- 
-+static inline bool ieee802154_frame_is_beacon_req(struct sk_buff *skb)
-+{
-+	struct ieee802154_mac_cmd_pl mac_pl;
-+	int ret;
-+
-+	if (mac_cb(skb)->type != IEEE802154_FC_TYPE_MAC_CMD)
-+		return false;
-+
-+	ret = ieee802154_beacon_req_pl_pull(skb, &mac_pl);
-+	if (ret)
-+		return false;
-+
-+	return mac_pl.cmd_id == IEEE802154_CMD_BEACON_REQ;
-+}
-+
- extern struct ieee802154_mlme_ops mac802154_mlme_wpan;
+@@ -122,6 +122,7 @@ extern struct ieee802154_mlme_ops mac802154_mlme_wpan;
  
  void ieee802154_rx(struct ieee802154_local *local, struct sk_buff *skb);
-diff --git a/net/mac802154/rx.c b/net/mac802154/rx.c
-index f2f3eca9bc20..1aba23d007cf 100644
---- a/net/mac802154/rx.c
-+++ b/net/mac802154/rx.c
-@@ -29,6 +29,11 @@ static int ieee802154_deliver_skb(struct sk_buff *skb)
- 	return netif_receive_skb(skb);
+ void ieee802154_xmit_sync_worker(struct work_struct *work);
++void ieee802154_sync_tx(struct ieee802154_local *local);
+ netdev_tx_t
+ ieee802154_monitor_start_xmit(struct sk_buff *skb, struct net_device *dev);
+ netdev_tx_t
+diff --git a/net/mac802154/tx.c b/net/mac802154/tx.c
+index de5ecda80472..d1fd2cc67cbe 100644
+--- a/net/mac802154/tx.c
++++ b/net/mac802154/tx.c
+@@ -48,6 +48,7 @@ void ieee802154_xmit_sync_worker(struct work_struct *work)
+ 
+ 	kfree_skb(skb);
+ 	atomic_dec(&local->phy->ongoing_txs);
++	wake_up(&local->phy->sync_txq);
+ 	netdev_dbg(dev, "transmission failed\n");
  }
  
-+static bool mac802154_should_answer_beacon_req(struct ieee802154_local *local)
+@@ -117,6 +118,11 @@ ieee802154_hot_tx(struct ieee802154_local *local, struct sk_buff *skb)
+ 	return ieee802154_tx(local, skb);
+ }
+ 
++void ieee802154_sync_tx(struct ieee802154_local *local)
 +{
-+	return local->ongoing_beacons_request && local->beacons_interval < 0;
++	wait_event(local->phy->sync_txq, !atomic_read(&local->phy->ongoing_txs));
 +}
 +
- static int
- ieee802154_subif_frame(struct ieee802154_sub_if_data *sdata,
- 		       struct sk_buff *skb, const struct ieee802154_hdr *hdr)
-@@ -101,6 +106,14 @@ ieee802154_subif_frame(struct ieee802154_sub_if_data *sdata,
- 		}
- 		goto fail;
- 	case IEEE802154_FC_TYPE_MAC_CMD:
-+		if (ieee802154_frame_is_beacon_req(skb) &&
-+		    mac802154_should_answer_beacon_req(sdata->local)) {
-+			ieee802154_queue_delayed_work(&sdata->local->hw,
-+						      &sdata->local->beacons_work,
-+						      0);
-+			goto success;
-+		}
-+		goto fail;
- 	case IEEE802154_FC_TYPE_ACK:
- 		goto fail;
- 	case IEEE802154_FC_TYPE_DATA:
-diff --git a/net/mac802154/scan.c b/net/mac802154/scan.c
-index 71a845e3e76d..767fc2ac8109 100644
---- a/net/mac802154/scan.c
-+++ b/net/mac802154/scan.c
-@@ -374,8 +374,9 @@ void mac802154_beacons_work(struct work_struct *work)
- 		pr_err("Error when transmitting beacon (%d)\n", ret);
- 
- queue_work:
--	ieee802154_queue_delayed_work(&local->hw, &local->beacons_work,
--				      local->beacons_interval);
-+	if (local->beacons_interval >= 0)
-+		ieee802154_queue_delayed_work(&local->hw, &local->beacons_work,
-+					      local->beacons_interval);
- 
- unlock_mutex:
- 	mutex_unlock(&local->beacons_lock);
-@@ -407,7 +408,8 @@ int mac802154_send_beacons_locked(struct ieee802154_sub_if_data *sdata,
- 	local->beacon.mhr.source.pan_id = cpu_to_le16(request->wpan_dev->pan_id);
- 	local->beacon.mhr.source.extended_addr = cpu_to_le64(request->wpan_dev->extended_addr);
- 	local->beacon.mac_pl.beacon_order = request->interval;
--	local->beacon.mac_pl.superframe_order = request->interval;
-+	if (request->interval <= IEEE802154_MAX_SCAN_DURATION)
-+		local->beacon.mac_pl.superframe_order = request->interval;
- 	local->beacon.mac_pl.final_cap_slot = 0xf;
- 	local->beacon.mac_pl.battery_life_ext = 0;
- 	local->beacon.mac_pl.pan_coordinator = 1;
-@@ -415,6 +417,11 @@ int mac802154_send_beacons_locked(struct ieee802154_sub_if_data *sdata,
- 
- 	rcu_assign_pointer(local->beacons_sdata, sdata);
- 
-+	if (request->interval == IEEE802154_ACTIVE_SCAN_DURATION) {
-+		local->beacons_interval = -1;
-+		return 0;
-+	}
-+
- 	/* Start the beacon work */
- 	local->beacons_interval =
- 		mac802154_scan_get_channel_time(request->interval,
-@@ -432,7 +439,9 @@ int mac802154_stop_beacons_locked(struct ieee802154_local *local)
- 		return -ESRCH;
- 
- 	local->ongoing_beacons_request = false;
--	cancel_delayed_work(&local->beacons_work);
-+
-+	if (local->beacons_interval >= 0)
-+		cancel_delayed_work(&local->beacons_work);
- 
- 	return 0;
+ netdev_tx_t
+ ieee802154_monitor_start_xmit(struct sk_buff *skb, struct net_device *dev)
+ {
+diff --git a/net/mac802154/util.c b/net/mac802154/util.c
+index db2ac53b937e..230fe3390df7 100644
+--- a/net/mac802154/util.c
++++ b/net/mac802154/util.c
+@@ -90,6 +90,7 @@ void ieee802154_xmit_complete(struct ieee802154_hw *hw, struct sk_buff *skb,
+ after_wakeup:
+ 	dev_consume_skb_any(skb);
+ 	atomic_dec(&hw->phy->ongoing_txs);
++	wake_up(&hw->phy->sync_txq);
  }
+ EXPORT_SYMBOL(ieee802154_xmit_complete);
+ 
 -- 
 2.27.0
 
