@@ -2,18 +2,18 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1047FC433EF
-	for <linux-wpan@archiver.kernel.org>; Mon, 17 Jan 2022 11:55:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A431FC433FE
+	for <linux-wpan@archiver.kernel.org>; Mon, 17 Jan 2022 11:55:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239379AbiAQLzV (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 17 Jan 2022 06:55:21 -0500
-Received: from relay12.mail.gandi.net ([217.70.178.232]:39685 "EHLO
+        id S239366AbiAQLzX (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 17 Jan 2022 06:55:23 -0500
+Received: from relay12.mail.gandi.net ([217.70.178.232]:56781 "EHLO
         relay12.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239315AbiAQLzO (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 17 Jan 2022 06:55:14 -0500
+        with ESMTP id S239354AbiAQLzS (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 17 Jan 2022 06:55:18 -0500
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by relay12.mail.gandi.net (Postfix) with ESMTPSA id 07B05200018;
-        Mon, 17 Jan 2022 11:55:11 +0000 (UTC)
+        by relay12.mail.gandi.net (Postfix) with ESMTPSA id 88F00200009;
+        Mon, 17 Jan 2022 11:55:15 +0000 (UTC)
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
 To:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
@@ -29,9 +29,9 @@ Cc:     netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
         Xue Liu <liuxuenetmail@gmail.com>, Alan Ott <alan@signal11.us>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
         Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: [PATCH v3 15/41] net: ieee802154: Return meaningful error codes from the netlink helpers
-Date:   Mon, 17 Jan 2022 12:54:14 +0100
-Message-Id: <20220117115440.60296-16-miquel.raynal@bootlin.com>
+Subject: [PATCH v3 17/41] net: ieee802154: at86rf230: Call the complete helper when a transmission is over
+Date:   Mon, 17 Jan 2022 12:54:16 +0100
+Message-Id: <20220117115440.60296-18-miquel.raynal@bootlin.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20220117115440.60296-1-miquel.raynal@bootlin.com>
 References: <20220117115440.60296-1-miquel.raynal@bootlin.com>
@@ -42,55 +42,32 @@ Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Returning -1 does not indicate anything useful.
+ieee802154_xmit_complete() is the right helper to call when a
+transmission is over. The fact that it completed or not is not really a
+question, but drivers must tell the core that the completion is over,
+even if it was canceled. Do not call ieee802154_wake_queue() manually,
+in order to let full control of this task to the core.
 
-Use a standard and meaningful error code instead.
+By using the complete helper we also avoid leacking the skb structure.
 
 Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
 ---
- net/ieee802154/nl802154.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ drivers/net/ieee802154/at86rf230.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/ieee802154/nl802154.c b/net/ieee802154/nl802154.c
-index 45e2c9b0505a..bd1015611a7e 100644
---- a/net/ieee802154/nl802154.c
-+++ b/net/ieee802154/nl802154.c
-@@ -1459,7 +1459,7 @@ static int nl802154_send_key(struct sk_buff *msg, u32 cmd, u32 portid,
+diff --git a/drivers/net/ieee802154/at86rf230.c b/drivers/net/ieee802154/at86rf230.c
+index 583f835c317a..1941e1f3d2ef 100644
+--- a/drivers/net/ieee802154/at86rf230.c
++++ b/drivers/net/ieee802154/at86rf230.c
+@@ -343,7 +343,7 @@ at86rf230_async_error_recover_complete(void *context)
+ 	if (ctx->free)
+ 		kfree(ctx);
  
- 	hdr = nl802154hdr_put(msg, portid, seq, flags, cmd);
- 	if (!hdr)
--		return -1;
-+		return -ENOBUFS;
+-	ieee802154_wake_queue(lp->hw);
++	ieee802154_xmit_complete(lp->hw, lp->tx_skb, false);
+ }
  
- 	if (nla_put_u32(msg, NL802154_ATTR_IFINDEX, dev->ifindex))
- 		goto nla_put_failure;
-@@ -1652,7 +1652,7 @@ static int nl802154_send_device(struct sk_buff *msg, u32 cmd, u32 portid,
- 
- 	hdr = nl802154hdr_put(msg, portid, seq, flags, cmd);
- 	if (!hdr)
--		return -1;
-+		return -ENOBUFS;
- 
- 	if (nla_put_u32(msg, NL802154_ATTR_IFINDEX, dev->ifindex))
- 		goto nla_put_failure;
-@@ -1830,7 +1830,7 @@ static int nl802154_send_devkey(struct sk_buff *msg, u32 cmd, u32 portid,
- 
- 	hdr = nl802154hdr_put(msg, portid, seq, flags, cmd);
- 	if (!hdr)
--		return -1;
-+		return -ENOBUFS;
- 
- 	if (nla_put_u32(msg, NL802154_ATTR_IFINDEX, dev->ifindex))
- 		goto nla_put_failure;
-@@ -2006,7 +2006,7 @@ static int nl802154_send_seclevel(struct sk_buff *msg, u32 cmd, u32 portid,
- 
- 	hdr = nl802154hdr_put(msg, portid, seq, flags, cmd);
- 	if (!hdr)
--		return -1;
-+		return -ENOBUFS;
- 
- 	if (nla_put_u32(msg, NL802154_ATTR_IFINDEX, dev->ifindex))
- 		goto nla_put_failure;
+ static void
 -- 
 2.27.0
 
