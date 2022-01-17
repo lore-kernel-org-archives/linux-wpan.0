@@ -2,18 +2,18 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED12AC4332F
-	for <linux-wpan@archiver.kernel.org>; Mon, 17 Jan 2022 11:56:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 225B0C43219
+	for <linux-wpan@archiver.kernel.org>; Mon, 17 Jan 2022 11:56:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239462AbiAQL4M (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        id S236788AbiAQL4M (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
         Mon, 17 Jan 2022 06:56:12 -0500
-Received: from relay12.mail.gandi.net ([217.70.178.232]:35037 "EHLO
+Received: from relay12.mail.gandi.net ([217.70.178.232]:38101 "EHLO
         relay12.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239463AbiAQLzs (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 17 Jan 2022 06:55:48 -0500
+        with ESMTP id S239412AbiAQLzx (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 17 Jan 2022 06:55:53 -0500
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by relay12.mail.gandi.net (Postfix) with ESMTPSA id A124B200007;
-        Mon, 17 Jan 2022 11:55:45 +0000 (UTC)
+        by relay12.mail.gandi.net (Postfix) with ESMTPSA id 85AD320000B;
+        Mon, 17 Jan 2022 11:55:50 +0000 (UTC)
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
 To:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
@@ -29,9 +29,9 @@ Cc:     netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
         Xue Liu <liuxuenetmail@gmail.com>, Alan Ott <alan@signal11.us>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
         Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: [PATCH v3 35/41] net: ieee802154: Add beacons support
-Date:   Mon, 17 Jan 2022 12:54:34 +0100
-Message-Id: <20220117115440.60296-36-miquel.raynal@bootlin.com>
+Subject: [PATCH v3 38/41] net: mac802154: Add support for active scans
+Date:   Mon, 17 Jan 2022 12:54:37 +0100
+Message-Id: <20220117115440.60296-39-miquel.raynal@bootlin.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20220117115440.60296-1-miquel.raynal@bootlin.com>
 References: <20220117115440.60296-1-miquel.raynal@bootlin.com>
@@ -42,271 +42,206 @@ Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-This involves processing beacons requests from userspace: starting or
-stopping the flow of beacons sent passively (for now) on a specific
-interface. The page and channel must be changed beforehands if
-needed. Interval orders above 14 are reserved to tell a device it must
-answer BEACON_REQ coming from an active scan procedure (this is not
-supported yet).
-
-A netlink beacons request structure is created to list the
-requirements.
-
-Mac layers may now implement the ->send_beacons() and
-->stop_beacons() hooks.
+Active scan support is based on the current passive scan support,
+cheered up with beacon requests sent after every channel change.
 
 Co-developed-by: David Girault <david.girault@qorvo.com>
 Signed-off-by: David Girault <david.girault@qorvo.com>
 Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
 ---
- include/net/cfg802154.h   | 22 +++++++++++
- include/net/nl802154.h    |  3 ++
- net/ieee802154/nl802154.c | 81 +++++++++++++++++++++++++++++++++++++++
- net/ieee802154/rdev-ops.h | 24 ++++++++++++
- net/ieee802154/trace.h    | 21 ++++++++++
- 5 files changed, 151 insertions(+)
+ include/net/ieee802154_netdev.h | 14 +++++++-
+ net/ieee802154/header_ops.c     | 25 +++++++++++++++
+ net/mac802154/ieee802154_i.h    |  1 +
+ net/mac802154/scan.c            | 57 +++++++++++++++++++++++++++++++--
+ 4 files changed, 94 insertions(+), 3 deletions(-)
 
-diff --git a/include/net/cfg802154.h b/include/net/cfg802154.h
-index 15b9cb2c213a..57bbc7eb22df 100644
---- a/include/net/cfg802154.h
-+++ b/include/net/cfg802154.h
-@@ -88,6 +88,24 @@ struct cfg802154_scan_request {
- 	struct wpan_phy *wpan_phy;
+diff --git a/include/net/ieee802154_netdev.h b/include/net/ieee802154_netdev.h
+index f7716aeec93b..1bf1a4e508a2 100644
+--- a/include/net/ieee802154_netdev.h
++++ b/include/net/ieee802154_netdev.h
+@@ -58,6 +58,11 @@ struct ieee802154_beacon_hdr {
+ #endif
+ } __packed;
+ 
++struct ieee802154_mac_cmd_pl {
++	u8  cmd_id;
++	/* TODO: content depending on the cmd_id */
++} __packed;
++
+ struct ieee802154_sechdr {
+ #if defined(__LITTLE_ENDIAN_BITFIELD)
+ 	u8 level:3,
+@@ -139,6 +144,11 @@ struct ieee802154_hdr {
+ 	struct ieee802154_sechdr sec;
  };
  
-+/**
-+ * struct cfg802154_beacons_request - beacons request descriptor
-+ *
-+ * @interval: interval n between sendings, in multiple order of the super frame
-+ *            duration: aBaseSuperframeDuration * (2^n) unless the interval
-+ *            order is greater or equal to 15, in this case beacons won't be
-+ *            passively sent out at a fixed rate but instead inform the device
-+ *            that it should answer beacon requests as part of active scan
-+ *            procedures
-+ * @wpan_dev: the concerned wpan device
-+ * @wpan_phy: the wpan phy this was for
-+ */
-+struct cfg802154_beacons_request {
-+	u8 interval;
-+	struct wpan_dev *wpan_dev;
-+	struct wpan_phy *wpan_phy;
++struct ieee802154_beacon_req_frame {
++	struct ieee802154_hdr mhr;
++	struct ieee802154_mac_cmd_pl mac_pl;
 +};
 +
- struct cfg802154_ops {
- 	struct net_device * (*add_virtual_intf_deprecated)(struct wpan_phy *wpan_phy,
- 							   const char *name,
-@@ -130,6 +148,10 @@ struct cfg802154_ops {
- 				struct cfg802154_scan_request *request);
- 	int	(*abort_scan)(struct wpan_phy *wpan_phy,
- 			      struct wpan_dev *wpan_dev);
-+	int	(*send_beacons)(struct wpan_phy *wpan_phy,
-+				struct cfg802154_beacons_request *request);
-+	int	(*stop_beacons)(struct wpan_phy *wpan_phy,
-+				struct wpan_dev *wpan_dev);
- #ifdef CONFIG_IEEE802154_NL802154_EXPERIMENTAL
- 	void	(*get_llsec_table)(struct wpan_phy *wpan_phy,
- 				   struct wpan_dev *wpan_dev,
-diff --git a/include/net/nl802154.h b/include/net/nl802154.h
-index 22af514dd339..20c46f15cef4 100644
---- a/include/net/nl802154.h
-+++ b/include/net/nl802154.h
-@@ -65,6 +65,8 @@ enum nl802154_commands {
- 	NL802154_CMD_FLUSH_PANS,
- 	NL802154_CMD_SET_MAX_PAN_ENTRIES,
- 	NL802154_CMD_SET_PANS_EXPIRATION,
-+	NL802154_CMD_SEND_BEACONS,
-+	NL802154_CMD_STOP_BEACONS,
+ struct ieee802154_beacon_frame {
+ 	struct ieee802154_hdr mhr;
+ 	struct ieee802154_beacon_hdr mac_pl;
+@@ -169,7 +179,9 @@ int ieee802154_hdr_peek_addrs(const struct sk_buff *skb,
+  */
+ int ieee802154_hdr_peek(const struct sk_buff *skb, struct ieee802154_hdr *hdr);
  
- 	/* add new commands above here */
+-/* pushes a beacon frame into an skb */
++/* pushes a beacon_req or a beacon frame into an skb */
++int ieee802154_beacon_req_push(struct sk_buff *skb,
++			       struct ieee802154_beacon_req_frame *breq);
+ int ieee802154_beacon_push(struct sk_buff *skb,
+ 			   struct ieee802154_beacon_frame *beacon);
  
-@@ -148,6 +150,7 @@ enum nl802154_attrs {
- 	NL802154_ATTR_PAN,
- 	NL802154_ATTR_MAX_PAN_ENTRIES,
- 	NL802154_ATTR_PANS_EXPIRATION,
-+	NL802154_ATTR_BEACON_INTERVAL,
- 
- 	/* add attributes here, update the policy in nl802154.c */
- 
-diff --git a/net/ieee802154/nl802154.c b/net/ieee802154/nl802154.c
-index 07bac1ae2cd2..1a0ce95625ec 100644
---- a/net/ieee802154/nl802154.c
-+++ b/net/ieee802154/nl802154.c
-@@ -226,6 +226,7 @@ static const struct nla_policy nl802154_policy[NL802154_ATTR_MAX+1] = {
- 	[NL802154_ATTR_PAN] = { .type = NLA_NESTED },
- 	[NL802154_ATTR_MAX_PAN_ENTRIES] = { .type = NLA_U32 },
- 	[NL802154_ATTR_PANS_EXPIRATION] = { .type = NLA_U32 },
-+	[NL802154_ATTR_BEACON_INTERVAL] = { .type = NLA_U8 },
- 
- #ifdef CONFIG_IEEE802154_NL802154_EXPERIMENTAL
- 	[NL802154_ATTR_SEC_ENABLED] = { .type = NLA_U8, },
-@@ -1684,6 +1685,70 @@ static int nl802154_set_pans_expiration(struct sk_buff *skb,
- 	return 0;
+diff --git a/net/ieee802154/header_ops.c b/net/ieee802154/header_ops.c
+index bab710aa36f9..c31a9e429a14 100644
+--- a/net/ieee802154/header_ops.c
++++ b/net/ieee802154/header_ops.c
+@@ -121,6 +121,31 @@ ieee802154_hdr_push(struct sk_buff *skb, struct ieee802154_hdr *hdr)
  }
+ EXPORT_SYMBOL_GPL(ieee802154_hdr_push);
  
-+static int
-+nl802154_send_beacons(struct sk_buff *skb, struct genl_info *info)
++int ieee802154_beacon_req_push(struct sk_buff *skb,
++			       struct ieee802154_beacon_req_frame *breq)
 +{
-+	struct cfg802154_registered_device *rdev = info->user_ptr[0];
-+	struct net_device *dev = info->user_ptr[1];
-+	struct wpan_dev *wpan_dev = dev->ieee802154_ptr;
-+	struct wpan_phy *wpan_phy = &rdev->wpan_phy;
-+	struct cfg802154_beacons_request *request;
-+	int err;
-+
-+	/* Avoid sending beacons on monitor interfaces */
-+	if (wpan_dev->iftype == NL802154_IFTYPE_MONITOR)
-+		return -EOPNOTSUPP;
-+
-+	request = kzalloc(sizeof(*request), GFP_KERNEL);
-+	if (!request)
-+		return -ENOMEM;
-+
-+	request->wpan_dev = wpan_dev;
-+	request->wpan_phy = wpan_phy;
-+
-+	if (info->attrs[NL802154_ATTR_BEACON_INTERVAL]) {
-+		request->interval = nla_get_u8(info->attrs[NL802154_ATTR_BEACON_INTERVAL]);
-+		if (request->interval > IEEE802154_ACTIVE_SCAN_DURATION) {
-+			pr_err("Interval is out of range\n");
-+			err = -EINVAL;
-+			goto free_request;
-+		}
-+	} else {
-+		/* Use maximum duration order by default */
-+		request->interval = IEEE802154_MAX_SCAN_DURATION;
-+	}
-+
-+	err = rdev_send_beacons(rdev, request);
-+	if (err) {
-+		pr_err("Failure starting sending beacons (%d)\n", err);
-+		goto free_request;
-+	}
-+
-+	if (wpan_dev->netdev)
-+		dev_hold(wpan_dev->netdev);
-+
-+free_request:
-+	kfree(request);
-+
-+	return err;
-+}
-+
-+static int
-+nl802154_stop_beacons(struct sk_buff *skb, struct genl_info *info)
-+{
-+	struct cfg802154_registered_device *rdev = info->user_ptr[0];
-+	struct net_device *dev = info->user_ptr[1];
-+	struct wpan_dev *wpan_dev = dev->ieee802154_ptr;
-+	int err;
-+
-+	err = rdev_stop_beacons(rdev, wpan_dev);
-+
-+	if (err != -ESRCH && wpan_dev->netdev)
-+		dev_put(wpan_dev->netdev);
-+
-+	return err;
-+}
-+
- #ifdef CONFIG_IEEE802154_NL802154_EXPERIMENTAL
- static const struct nla_policy nl802154_dev_addr_policy[NL802154_DEV_ADDR_ATTR_MAX + 1] = {
- 	[NL802154_DEV_ADDR_ATTR_PAN_ID] = { .type = NLA_U16 },
-@@ -2814,6 +2879,22 @@ static const struct genl_ops nl802154_ops[] = {
- 		.internal_flags = NL802154_FLAG_NEED_NETDEV |
- 				  NL802154_FLAG_NEED_RTNL,
- 	},
-+	{
-+		.cmd = NL802154_CMD_SEND_BEACONS,
-+		.doit = nl802154_send_beacons,
-+		.flags = GENL_ADMIN_PERM,
-+		.internal_flags = NL802154_FLAG_NEED_NETDEV |
-+				  NL802154_FLAG_CHECK_NETDEV_UP |
-+				  NL802154_FLAG_NEED_RTNL,
-+	},
-+	{
-+		.cmd = NL802154_CMD_STOP_BEACONS,
-+		.doit = nl802154_stop_beacons,
-+		.flags = GENL_ADMIN_PERM,
-+		.internal_flags = NL802154_FLAG_NEED_NETDEV |
-+				  NL802154_FLAG_CHECK_NETDEV_UP |
-+				  NL802154_FLAG_NEED_RTNL,
-+	},
- #ifdef CONFIG_IEEE802154_NL802154_EXPERIMENTAL
- 	{
- 		.cmd = NL802154_CMD_SET_SEC_PARAMS,
-diff --git a/net/ieee802154/rdev-ops.h b/net/ieee802154/rdev-ops.h
-index e171d74c3251..fa85efeaa150 100644
---- a/net/ieee802154/rdev-ops.h
-+++ b/net/ieee802154/rdev-ops.h
-@@ -237,6 +237,30 @@ static inline int rdev_abort_scan(struct cfg802154_registered_device *rdev,
- 	return ret;
- }
- 
-+static inline int rdev_send_beacons(struct cfg802154_registered_device *rdev,
-+				    struct cfg802154_beacons_request *request)
-+{
++	struct ieee802154_mac_cmd_pl *mac_pl = &breq->mac_pl;
++	struct ieee802154_hdr *mhr = &breq->mhr;
++	u16 crc;
 +	int ret;
 +
-+	/* TODO: check if this is an FFD? */
++	skb_reserve(skb, sizeof(*mhr));
++	ret = ieee802154_hdr_push(skb, mhr);
++	if (ret < 0)
++		return ret;
 +
-+	trace_802154_rdev_send_beacons(&rdev->wpan_phy, request);
-+	ret = rdev->ops->send_beacons(&rdev->wpan_phy, request);
-+	trace_802154_rdev_return_int(&rdev->wpan_phy, ret);
-+	return ret;
++	skb_reset_mac_header(skb);
++	skb->mac_len = ret;
++
++	skb_put_data(skb, mac_pl, sizeof(*mac_pl));
++
++	crc = crc_ccitt(0, skb->data, skb->len);
++	put_unaligned_le16(crc, skb_put(skb, 2));
++
++	return 0;
++}
++EXPORT_SYMBOL_GPL(ieee802154_beacon_req_push);
++
+ int ieee802154_beacon_push(struct sk_buff *skb,
+ 			   struct ieee802154_beacon_frame *beacon)
+ {
+diff --git a/net/mac802154/ieee802154_i.h b/net/mac802154/ieee802154_i.h
+index 514446c1f815..0b1bcbab1ff3 100644
+--- a/net/mac802154/ieee802154_i.h
++++ b/net/mac802154/ieee802154_i.h
+@@ -56,6 +56,7 @@ struct ieee802154_local {
+ 	struct cfg802154_scan_request __rcu *scan_req;
+ 	struct ieee802154_sub_if_data __rcu *scan_sdata;
+ 	struct delayed_work scan_work;
++	struct ieee802154_beacon_req_frame beacon_req;
+ 
+ 	/* Beacons handling */
+ 	bool ongoing_beacons_request;
+diff --git a/net/mac802154/scan.c b/net/mac802154/scan.c
+index d9b54b35660a..71a845e3e76d 100644
+--- a/net/mac802154/scan.c
++++ b/net/mac802154/scan.c
+@@ -19,10 +19,15 @@
+ 
+ #define IEEE802154_BEACON_MHR_SZ 13
+ #define IEEE802154_BEACON_PL_SZ 4
++#define IEEE802154_BEACON_REQ_MHR_SZ 7
++#define IEEE802154_BEACON_REQ_PL_SZ 1
+ #define IEEE802154_CRC_SZ 2
+ #define IEEE802154_BEACON_SKB_SZ (IEEE802154_BEACON_MHR_SZ + \
+ 				  IEEE802154_BEACON_PL_SZ + \
+ 				  IEEE802154_CRC_SZ)
++#define IEEE802154_BEACON_REQ_SKB_SZ (IEEE802154_BEACON_REQ_MHR_SZ + \
++				      IEEE802154_BEACON_REQ_PL_SZ +  \
++				      IEEE802154_CRC_SZ)
+ 
+ static bool mac802154_check_promiscuous(struct ieee802154_local *local)
+ {
+@@ -112,6 +117,48 @@ static unsigned int mac802154_scan_get_channel_time(u8 duration_order,
+ 				(BIT(duration_order) + 1));
+ }
+ 
++static int mac802154_scan_prepare_beacon_req(struct ieee802154_local *local)
++{
++	memset(&local->beacon_req, 0, sizeof(local->beacon_req));
++	local->beacon_req.mhr.fc.type = IEEE802154_FC_TYPE_MAC_CMD;
++	local->beacon_req.mhr.fc.dest_addr_mode = IEEE802154_SHORT_ADDRESSING;
++	local->beacon_req.mhr.fc.version = IEEE802154_2003_STD;
++	local->beacon_req.mhr.fc.source_addr_mode = IEEE802154_NO_ADDRESSING;
++	local->beacon_req.mhr.dest.mode = IEEE802154_ADDR_SHORT;
++	local->beacon_req.mhr.dest.pan_id = cpu_to_le16(IEEE802154_PANID_BROADCAST);
++	local->beacon_req.mhr.dest.short_addr = cpu_to_le16(IEEE802154_ADDR_BROADCAST);
++	local->beacon_req.mac_pl.cmd_id = IEEE802154_CMD_BEACON_REQ;
++
++	return 0;
 +}
 +
-+static inline int rdev_stop_beacons(struct cfg802154_registered_device *rdev,
-+				    struct wpan_dev *wpan_dev)
++static int mac802154_transmit_beacon_req_locked(struct ieee802154_local *local)
 +{
++	struct ieee802154_sub_if_data *sdata;
++	struct sk_buff *skb;
 +	int ret;
 +
-+	trace_802154_rdev_stop_beacons(&rdev->wpan_phy, wpan_dev);
-+	ret = rdev->ops->stop_beacons(&rdev->wpan_phy, wpan_dev);
-+	trace_802154_rdev_return_int(&rdev->wpan_phy, ret);
-+	return ret;
++	lockdep_assert_held(&local->scan_lock);
++
++	skb = alloc_skb(IEEE802154_BEACON_REQ_SKB_SZ, GFP_KERNEL);
++	if (!skb)
++		return -ENOBUFS;
++
++	sdata = rcu_dereference_protected(local->scan_sdata,
++					  lockdep_is_held(&local->scan_lock));
++	skb->dev = sdata->dev;
++
++	ret = ieee802154_beacon_req_push(skb, &local->beacon_req);
++	if (ret) {
++		kfree_skb(skb);
++		return ret;
++	}
++
++	ieee802154_mlme_tx(local, skb);
++
++	return 0;
 +}
 +
- #ifdef CONFIG_IEEE802154_NL802154_EXPERIMENTAL
- /* TODO this is already a nl802154, so move into ieee802154 */
- static inline void
-diff --git a/net/ieee802154/trace.h b/net/ieee802154/trace.h
-index e5405f737ded..353ba799244f 100644
---- a/net/ieee802154/trace.h
-+++ b/net/ieee802154/trace.h
-@@ -315,6 +315,22 @@ TRACE_EVENT(802154_rdev_trigger_scan,
- 		  WPAN_PHY_PR_ARG, __entry->page, __entry->channels, __entry->duration)
- );
+ void mac802154_scan_work(struct work_struct *work)
+ {
+ 	struct ieee802154_local *local =
+@@ -157,6 +204,9 @@ void mac802154_scan_work(struct work_struct *work)
+ 		ieee802154_configure_durations(local->phy);
+ 	} while (ret);
  
-+TRACE_EVENT(802154_rdev_send_beacons,
-+	TP_PROTO(struct wpan_phy *wpan_phy,
-+		 struct cfg802154_beacons_request *request),
-+	TP_ARGS(wpan_phy, request),
-+	TP_STRUCT__entry(
-+		WPAN_PHY_ENTRY
-+		__field(u8, interval)
-+	),
-+	TP_fast_assign(
-+		WPAN_PHY_ASSIGN;
-+		__entry->interval = request->interval;
-+	),
-+	TP_printk(WPAN_PHY_PR_FMT ", sending beacons (interval order: %d)",
-+		  WPAN_PHY_PR_ARG, __entry->interval)
-+);
++	if (scan_req->type == NL802154_SCAN_ACTIVE)
++		mac802154_transmit_beacon_req_locked(local);
 +
- DECLARE_EVENT_CLASS(802154_wdev_template,
- 	TP_PROTO(struct wpan_phy *wpan_phy, struct wpan_dev *wpan_dev),
- 	TP_ARGS(wpan_phy, wpan_dev),
-@@ -335,6 +351,11 @@ DEFINE_EVENT(802154_wdev_template, 802154_rdev_abort_scan,
- 	TP_ARGS(wpan_phy, wpan_dev)
- );
+ queue_work:
+ 	scan_duration = mac802154_scan_get_channel_time(scan_req->duration,
+ 							local->phy->symbol_duration);
+@@ -183,8 +233,8 @@ int mac802154_trigger_scan_locked(struct ieee802154_sub_if_data *sdata,
+ 	if (mac802154_scan_is_ongoing(local))
+ 		return -EBUSY;
  
-+DEFINE_EVENT(802154_wdev_template, 802154_rdev_stop_beacons,
-+	TP_PROTO(struct wpan_phy *wpan_phy, struct wpan_dev *wpan_dev),
-+	TP_ARGS(wpan_phy, wpan_dev)
-+);
+-	/* TODO: support other scanning type */
+-	if (request->type != NL802154_SCAN_PASSIVE)
++	if (request->type != NL802154_SCAN_PASSIVE &&
++	    request->type != NL802154_SCAN_ACTIVE)
+ 		return -EOPNOTSUPP;
+ 
+ 	/* Store scanning parameters */
+@@ -197,6 +247,9 @@ int mac802154_trigger_scan_locked(struct ieee802154_sub_if_data *sdata,
+ 	else
+ 		local->scan_addr = cpu_to_le64(get_unaligned_be64(sdata->dev->dev_addr));
+ 
++	if (request->type == NL802154_SCAN_ACTIVE)
++		mac802154_scan_prepare_beacon_req(local);
 +
- TRACE_EVENT(802154_rdev_return_int,
- 	TP_PROTO(struct wpan_phy *wpan_phy, int ret),
- 	TP_ARGS(wpan_phy, ret),
+ 	local->scan_channel_idx = -1;
+ 	atomic_set(&local->scanning, 1);
+ 
 -- 
 2.27.0
 
