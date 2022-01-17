@@ -2,21 +2,21 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71E8BC433FE
-	for <linux-wpan@archiver.kernel.org>; Mon, 17 Jan 2022 11:55:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEC94C433F5
+	for <linux-wpan@archiver.kernel.org>; Mon, 17 Jan 2022 11:55:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239405AbiAQLz1 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 17 Jan 2022 06:55:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59376 "EHLO
+        id S236427AbiAQLze (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 17 Jan 2022 06:55:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59348 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239359AbiAQLzR (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 17 Jan 2022 06:55:17 -0500
+        with ESMTP id S239362AbiAQLzM (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 17 Jan 2022 06:55:12 -0500
 Received: from relay12.mail.gandi.net (relay12.mail.gandi.net [IPv6:2001:4b98:dc4:8::232])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3B37C06173E;
-        Mon, 17 Jan 2022 03:55:16 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36A4FC06173E;
+        Mon, 17 Jan 2022 03:55:11 -0800 (PST)
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by relay12.mail.gandi.net (Postfix) with ESMTPSA id C0C91200008;
-        Mon, 17 Jan 2022 11:55:13 +0000 (UTC)
+        by relay12.mail.gandi.net (Postfix) with ESMTPSA id EA4B620000B;
+        Mon, 17 Jan 2022 11:55:07 +0000 (UTC)
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
 To:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
@@ -32,9 +32,9 @@ Cc:     netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
         Xue Liu <liuxuenetmail@gmail.com>, Alan Ott <alan@signal11.us>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
         Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: [PATCH v3 16/41] net: mac802154: Explain the use of ieee802154_wake/stop_queue()
-Date:   Mon, 17 Jan 2022 12:54:15 +0100
-Message-Id: <20220117115440.60296-17-miquel.raynal@bootlin.com>
+Subject: [PATCH v3 13/41] net: ieee802154: Move the address structure earlier
+Date:   Mon, 17 Jan 2022 12:54:12 +0100
+Message-Id: <20220117115440.60296-14-miquel.raynal@bootlin.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20220117115440.60296-1-miquel.raynal@bootlin.com>
 References: <20220117115440.60296-1-miquel.raynal@bootlin.com>
@@ -45,46 +45,54 @@ Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-It is not straightforward to the newcomer that a single skb can be sent
-at a time and that the internal process is to stop the queue when
-processing a frame before re-enabling it. Make this clear by documenting
-the ieee802154_wake/stop_queue() helpers.
+From: David Girault <david.girault@qorvo.com>
 
+Move the address structure earlier in the cfg802154.h header in order to
+use it in subsequent additions. There is no functional change here.
+
+Signed-off-by: David Girault <david.girault@qorvo.com>
+[miquel.raynal@bootlin.com: Isolate this change from a bigger commit]
 Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
 ---
- include/net/mac802154.h | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ include/net/cfg802154.h | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
 
-diff --git a/include/net/mac802154.h b/include/net/mac802154.h
-index d524ffb9eb25..94b2e3008e77 100644
---- a/include/net/mac802154.h
-+++ b/include/net/mac802154.h
-@@ -464,6 +464,12 @@ void ieee802154_rx_irqsafe(struct ieee802154_hw *hw, struct sk_buff *skb,
-  * ieee802154_wake_queue - wake ieee802154 queue
-  * @hw: pointer as obtained from ieee802154_alloc_hw().
-  *
-+ * Tranceivers have either one transmit framebuffer or one framebuffer for both
-+ * transmitting and receiving. Hence, the core only handles one frame at a time
-+ * for each phy, which means we had to stop the queue to avoid new skb to come
-+ * during the transmission. The queue then needs to be woken up after the
-+ * operation.
-+ *
-  * Drivers should use this function instead of netif_wake_queue.
-  */
- void ieee802154_wake_queue(struct ieee802154_hw *hw);
-@@ -472,6 +478,12 @@ void ieee802154_wake_queue(struct ieee802154_hw *hw);
-  * ieee802154_stop_queue - stop ieee802154 queue
-  * @hw: pointer as obtained from ieee802154_alloc_hw().
-  *
-+ * Tranceivers have either one transmit framebuffer or one framebuffer for both
-+ * transmitting and receiving. Hence, the core only handles one frame at a time
-+ * for each phy, which means we need to tell upper layers to stop giving us new
-+ * skbs while we are busy with the transmitted one. The queue must then be
-+ * stopped before transmitting.
-+ *
-  * Drivers should use this function instead of netif_stop_queue.
-  */
- void ieee802154_stop_queue(struct ieee802154_hw *hw);
+diff --git a/include/net/cfg802154.h b/include/net/cfg802154.h
+index 4491e2724ff2..4193c242d96e 100644
+--- a/include/net/cfg802154.h
++++ b/include/net/cfg802154.h
+@@ -29,6 +29,15 @@ struct ieee802154_llsec_key_id;
+ struct ieee802154_llsec_key;
+ #endif /* CONFIG_IEEE802154_NL802154_EXPERIMENTAL */
+ 
++struct ieee802154_addr {
++	u8 mode;
++	__le16 pan_id;
++	union {
++		__le16 short_addr;
++		__le64 extended_addr;
++	};
++};
++
+ struct cfg802154_ops {
+ 	struct net_device * (*add_virtual_intf_deprecated)(struct wpan_phy *wpan_phy,
+ 							   const char *name,
+@@ -277,15 +286,6 @@ static inline void wpan_phy_net_set(struct wpan_phy *wpan_phy, struct net *net)
+ 	write_pnet(&wpan_phy->_net, net);
+ }
+ 
+-struct ieee802154_addr {
+-	u8 mode;
+-	__le16 pan_id;
+-	union {
+-		__le16 short_addr;
+-		__le64 extended_addr;
+-	};
+-};
+-
+ struct ieee802154_llsec_key_id {
+ 	u8 mode;
+ 	u8 id;
 -- 
 2.27.0
 
