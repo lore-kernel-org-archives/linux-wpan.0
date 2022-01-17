@@ -2,18 +2,18 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4BF5C4332F
-	for <linux-wpan@archiver.kernel.org>; Mon, 17 Jan 2022 11:55:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F06BC433EF
+	for <linux-wpan@archiver.kernel.org>; Mon, 17 Jan 2022 11:55:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239454AbiAQLzp (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 17 Jan 2022 06:55:45 -0500
-Received: from relay12.mail.gandi.net ([217.70.178.232]:56781 "EHLO
+        id S239404AbiAQLzw (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 17 Jan 2022 06:55:52 -0500
+Received: from relay12.mail.gandi.net ([217.70.178.232]:38101 "EHLO
         relay12.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236699AbiAQLzX (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 17 Jan 2022 06:55:23 -0500
+        with ESMTP id S239399AbiAQLz1 (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 17 Jan 2022 06:55:27 -0500
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by relay12.mail.gandi.net (Postfix) with ESMTPSA id 2372520000B;
-        Mon, 17 Jan 2022 11:55:21 +0000 (UTC)
+        by relay12.mail.gandi.net (Postfix) with ESMTPSA id 6C7B7200017;
+        Mon, 17 Jan 2022 11:55:24 +0000 (UTC)
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
 To:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
@@ -29,9 +29,9 @@ Cc:     netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
         Xue Liu <liuxuenetmail@gmail.com>, Alan Ott <alan@signal11.us>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
         Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: [PATCH v3 20/41] net: mac802154: Stop exporting ieee802154_wake/stop_queue()
-Date:   Mon, 17 Jan 2022 12:54:19 +0100
-Message-Id: <20220117115440.60296-21-miquel.raynal@bootlin.com>
+Subject: [PATCH v3 22/41] net: mac802154: Rename the main tx_work struct
+Date:   Mon, 17 Jan 2022 12:54:21 +0100
+Message-Id: <20220117115440.60296-23-miquel.raynal@bootlin.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20220117115440.60296-1-miquel.raynal@bootlin.com>
 References: <20220117115440.60296-1-miquel.raynal@bootlin.com>
@@ -42,113 +42,78 @@ Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Individual drivers do not necessarily need to call these helpers
-manually. There are other functions, more suited for this purpose, that
-will do that for them. The advantage is that, as no more drivers call
-these, it eases the tracking of the ongoing transfers that we are about
-to introduce while keeping the possibility to bypass thse counters from
-core code.
+This entry is dedicated to synchronous transmissions done by drivers
+without async hook. Make this clearer that this is not a work that any
+driver can use by at least prefixing it with "sync_". While at it, let's
+enhance the comment explaining why we choose one or the other.
 
 Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
 ---
- include/net/mac802154.h      | 27 ---------------------------
- net/mac802154/ieee802154_i.h | 24 ++++++++++++++++++++++++
- net/mac802154/util.c         |  2 --
- 3 files changed, 24 insertions(+), 29 deletions(-)
+ net/mac802154/ieee802154_i.h | 2 +-
+ net/mac802154/main.c         | 2 +-
+ net/mac802154/tx.c           | 9 ++++++---
+ 3 files changed, 8 insertions(+), 5 deletions(-)
 
-diff --git a/include/net/mac802154.h b/include/net/mac802154.h
-index 94b2e3008e77..13798867b8d3 100644
---- a/include/net/mac802154.h
-+++ b/include/net/mac802154.h
-@@ -460,33 +460,6 @@ void ieee802154_unregister_hw(struct ieee802154_hw *hw);
-  */
- void ieee802154_rx_irqsafe(struct ieee802154_hw *hw, struct sk_buff *skb,
- 			   u8 lqi);
--/**
-- * ieee802154_wake_queue - wake ieee802154 queue
-- * @hw: pointer as obtained from ieee802154_alloc_hw().
-- *
-- * Tranceivers have either one transmit framebuffer or one framebuffer for both
-- * transmitting and receiving. Hence, the core only handles one frame at a time
-- * for each phy, which means we had to stop the queue to avoid new skb to come
-- * during the transmission. The queue then needs to be woken up after the
-- * operation.
-- *
-- * Drivers should use this function instead of netif_wake_queue.
-- */
--void ieee802154_wake_queue(struct ieee802154_hw *hw);
--
--/**
-- * ieee802154_stop_queue - stop ieee802154 queue
-- * @hw: pointer as obtained from ieee802154_alloc_hw().
-- *
-- * Tranceivers have either one transmit framebuffer or one framebuffer for both
-- * transmitting and receiving. Hence, the core only handles one frame at a time
-- * for each phy, which means we need to tell upper layers to stop giving us new
-- * skbs while we are busy with the transmitted one. The queue must then be
-- * stopped before transmitting.
-- *
-- * Drivers should use this function instead of netif_stop_queue.
-- */
--void ieee802154_stop_queue(struct ieee802154_hw *hw);
- 
- /**
-  * ieee802154_xmit_complete - frame transmission complete
 diff --git a/net/mac802154/ieee802154_i.h b/net/mac802154/ieee802154_i.h
-index 702560acc8ce..97b66088532b 100644
+index b4882b2d7688..18d1f6804810 100644
 --- a/net/mac802154/ieee802154_i.h
 +++ b/net/mac802154/ieee802154_i.h
-@@ -128,6 +128,30 @@ netdev_tx_t
- ieee802154_subif_start_xmit(struct sk_buff *skb, struct net_device *dev);
- enum hrtimer_restart ieee802154_xmit_ifs_timer(struct hrtimer *timer);
+@@ -55,7 +55,7 @@ struct ieee802154_local {
+ 	struct sk_buff_head skb_queue;
  
-+/**
-+ * ieee802154_wake_queue - wake ieee802154 queue
-+ * @hw: pointer as obtained from ieee802154_alloc_hw().
-+ *
-+ * Tranceivers have either one transmit framebuffer or one framebuffer for both
-+ * transmitting and receiving. Hence, the core only handles one frame at a time
-+ * for each phy, which means we had to stop the queue to avoid new skb to come
-+ * during the transmission. The queue then needs to be woken up after the
-+ * operation.
-+ */
-+void ieee802154_wake_queue(struct ieee802154_hw *hw);
-+
-+/**
-+ * ieee802154_stop_queue - stop ieee802154 queue
-+ * @hw: pointer as obtained from ieee802154_alloc_hw().
-+ *
-+ * Tranceivers have either one transmit framebuffer or one framebuffer for both
-+ * transmitting and receiving. Hence, the core only handles one frame at a time
-+ * for each phy, which means we need to tell upper layers to stop giving us new
-+ * skbs while we are busy with the transmitted one. The queue must then be
-+ * stopped before transmitting.
-+ */
-+void ieee802154_stop_queue(struct ieee802154_hw *hw);
-+
- /* MIB callbacks */
- void mac802154_dev_set_page_channel(struct net_device *dev, u8 page, u8 chan);
+ 	struct sk_buff *tx_skb;
+-	struct work_struct tx_work;
++	struct work_struct sync_tx_work;
+ };
  
-diff --git a/net/mac802154/util.c b/net/mac802154/util.c
-index f2078238718b..e093ccaebd76 100644
---- a/net/mac802154/util.c
-+++ b/net/mac802154/util.c
-@@ -27,7 +27,6 @@ void ieee802154_wake_queue(struct ieee802154_hw *hw)
- 	}
- 	rcu_read_unlock();
- }
--EXPORT_SYMBOL(ieee802154_wake_queue);
+ enum {
+diff --git a/net/mac802154/main.c b/net/mac802154/main.c
+index a938e49bf5dc..43fd4cc13b66 100644
+--- a/net/mac802154/main.c
++++ b/net/mac802154/main.c
+@@ -95,7 +95,7 @@ ieee802154_alloc_hw(size_t priv_data_len, const struct ieee802154_ops *ops)
  
- void ieee802154_stop_queue(struct ieee802154_hw *hw)
+ 	skb_queue_head_init(&local->skb_queue);
+ 
+-	INIT_WORK(&local->tx_work, ieee802154_xmit_sync_worker);
++	INIT_WORK(&local->sync_tx_work, ieee802154_xmit_sync_worker);
+ 	INIT_DELAYED_WORK(&local->scan_work, mac802154_scan_work);
+ 	INIT_DELAYED_WORK(&local->beacons_work, mac802154_beacons_work);
+ 
+diff --git a/net/mac802154/tx.c b/net/mac802154/tx.c
+index 97df5985b830..a01689ddd547 100644
+--- a/net/mac802154/tx.c
++++ b/net/mac802154/tx.c
+@@ -25,7 +25,7 @@
+ void ieee802154_xmit_sync_worker(struct work_struct *work)
  {
-@@ -43,7 +42,6 @@ void ieee802154_stop_queue(struct ieee802154_hw *hw)
- 	}
- 	rcu_read_unlock();
- }
--EXPORT_SYMBOL(ieee802154_stop_queue);
+ 	struct ieee802154_local *local =
+-		container_of(work, struct ieee802154_local, tx_work);
++		container_of(work, struct ieee802154_local, sync_tx_work);
+ 	struct sk_buff *skb = local->tx_skb;
+ 	struct net_device *dev = skb->dev;
+ 	int res;
+@@ -76,7 +76,10 @@ ieee802154_tx(struct ieee802154_local *local, struct sk_buff *skb)
+ 	/* Stop the netif queue on each sub_if_data object. */
+ 	ieee802154_stop_queue(&local->hw);
  
- enum hrtimer_restart ieee802154_xmit_ifs_timer(struct hrtimer *timer)
- {
+-	/* async is priority, otherwise sync is fallback */
++	/* Drivers should preferably implement the async callback. In some rare
++	 * cases they only provide a sync callback which we will use as a
++	 * fallback.
++	 */
+ 	if (local->ops->xmit_async) {
+ 		unsigned int len = skb->len;
+ 
+@@ -90,7 +93,7 @@ ieee802154_tx(struct ieee802154_local *local, struct sk_buff *skb)
+ 		dev->stats.tx_bytes += len;
+ 	} else {
+ 		local->tx_skb = skb;
+-		queue_work(local->workqueue, &local->tx_work);
++		queue_work(local->workqueue, &local->sync_tx_work);
+ 	}
+ 
+ 	return NETDEV_TX_OK;
 -- 
 2.27.0
 
