@@ -2,18 +2,18 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99C70C43219
-	for <linux-wpan@archiver.kernel.org>; Mon, 17 Jan 2022 11:56:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61629C433F5
+	for <linux-wpan@archiver.kernel.org>; Mon, 17 Jan 2022 11:56:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239353AbiAQL4A (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 17 Jan 2022 06:56:00 -0500
-Received: from relay12.mail.gandi.net ([217.70.178.232]:46595 "EHLO
+        id S239341AbiAQL4D (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 17 Jan 2022 06:56:03 -0500
+Received: from relay12.mail.gandi.net ([217.70.178.232]:33961 "EHLO
         relay12.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236741AbiAQLze (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 17 Jan 2022 06:55:34 -0500
+        with ESMTP id S239348AbiAQLzk (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 17 Jan 2022 06:55:40 -0500
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by relay12.mail.gandi.net (Postfix) with ESMTPSA id 4E7C4200005;
-        Mon, 17 Jan 2022 11:55:31 +0000 (UTC)
+        by relay12.mail.gandi.net (Postfix) with ESMTPSA id A3399200018;
+        Mon, 17 Jan 2022 11:55:37 +0000 (UTC)
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
 To:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
@@ -29,9 +29,9 @@ Cc:     netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
         Xue Liu <liuxuenetmail@gmail.com>, Alan Ott <alan@signal11.us>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
         Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: [PATCH v3 26/41] net: mac802154: Add a warning in the hot path
-Date:   Mon, 17 Jan 2022 12:54:25 +0100
-Message-Id: <20220117115440.60296-27-miquel.raynal@bootlin.com>
+Subject: [PATCH v3 30/41] net: ieee802154: Define a beacon frame header
+Date:   Mon, 17 Jan 2022 12:54:29 +0100
+Message-Id: <20220117115440.60296-31-miquel.raynal@bootlin.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20220117115440.60296-1-miquel.raynal@bootlin.com>
 References: <20220117115440.60296-1-miquel.raynal@bootlin.com>
@@ -42,29 +42,61 @@ Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-We should never start a transmission after the queue has been stopped.
-
-But because it might work we don't kill the function here but rather
-warn loudly the user that something is wrong.
+This definition will be used when adding support for scanning and defines
+the content of a beacon frame header as in the 802.15.4 specification.
 
 Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
 ---
- net/mac802154/tx.c | 2 ++
- 1 file changed, 2 insertions(+)
+ include/net/ieee802154_netdev.h | 36 +++++++++++++++++++++++++++++++++
+ 1 file changed, 36 insertions(+)
 
-diff --git a/net/mac802154/tx.c b/net/mac802154/tx.c
-index 18ee6fcfcd7f..de5ecda80472 100644
---- a/net/mac802154/tx.c
-+++ b/net/mac802154/tx.c
-@@ -112,6 +112,8 @@ ieee802154_tx(struct ieee802154_local *local, struct sk_buff *skb)
- static netdev_tx_t
- ieee802154_hot_tx(struct ieee802154_local *local, struct sk_buff *skb)
- {
-+	WARN_ON(mac802154_queue_is_stopped(local));
-+
- 	return ieee802154_tx(local, skb);
- }
+diff --git a/include/net/ieee802154_netdev.h b/include/net/ieee802154_netdev.h
+index d0d188c3294b..fb6ac354a7b6 100644
+--- a/include/net/ieee802154_netdev.h
++++ b/include/net/ieee802154_netdev.h
+@@ -22,6 +22,42 @@
  
+ #include <net/cfg802154.h>
+ 
++struct ieee802154_beacon_hdr {
++#if defined(__LITTLE_ENDIAN_BITFIELD)
++	u16 beacon_order:4,
++	    superframe_order:4,
++	    final_cap_slot:4,
++	    battery_life_ext:1,
++	    reserved0:1,
++	    pan_coordinator:1,
++	    assoc_permit:1;
++	u8  gts_count:3,
++	    gts_reserved:4,
++	    gts_permit:1;
++	u8  pend_short_addr_count:3,
++	    reserved1:1,
++	    pend_ext_addr_count:3,
++	    reserved2:1;
++#elif defined(__BIG_ENDIAN_BITFIELD)
++	u16 assoc_permit:1,
++	    pan_coordinator:1,
++	    reserved0:1,
++	    battery_life_ext:1,
++	    final_cap_slot:4,
++	    superframe_order:4,
++	    beacon_order:4;
++	u8  gts_permit:1,
++	    gts_reserved:4,
++	    gts_count:3;
++	u8  reserved2:1,
++	    pend_ext_addr_count:3,
++	    reserved1:1,
++	    pend_short_addr_count:3;
++#else
++#error	"Please fix <asm/byteorder.h>"
++#endif
++} __packed;
++
+ struct ieee802154_sechdr {
+ #if defined(__LITTLE_ENDIAN_BITFIELD)
+ 	u8 level:3,
 -- 
 2.27.0
 
