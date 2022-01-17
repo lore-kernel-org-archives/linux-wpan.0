@@ -2,21 +2,18 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63CE6C43217
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED12AC4332F
 	for <linux-wpan@archiver.kernel.org>; Mon, 17 Jan 2022 11:56:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239520AbiAQL4L (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 17 Jan 2022 06:56:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59526 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239337AbiAQLzv (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 17 Jan 2022 06:55:51 -0500
-Received: from relay12.mail.gandi.net (relay12.mail.gandi.net [IPv6:2001:4b98:dc4:8::232])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E627FC061753;
-        Mon, 17 Jan 2022 03:55:38 -0800 (PST)
+        id S239462AbiAQL4M (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 17 Jan 2022 06:56:12 -0500
+Received: from relay12.mail.gandi.net ([217.70.178.232]:35037 "EHLO
+        relay12.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239463AbiAQLzs (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 17 Jan 2022 06:55:48 -0500
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by relay12.mail.gandi.net (Postfix) with ESMTPSA id 070A7200008;
-        Mon, 17 Jan 2022 11:55:35 +0000 (UTC)
+        by relay12.mail.gandi.net (Postfix) with ESMTPSA id A124B200007;
+        Mon, 17 Jan 2022 11:55:45 +0000 (UTC)
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
 To:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
@@ -32,9 +29,9 @@ Cc:     netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
         Xue Liu <liuxuenetmail@gmail.com>, Alan Ott <alan@signal11.us>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
         Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: [PATCH v3 29/41] net: ieee802154: Add support for internal PAN management
-Date:   Mon, 17 Jan 2022 12:54:28 +0100
-Message-Id: <20220117115440.60296-30-miquel.raynal@bootlin.com>
+Subject: [PATCH v3 35/41] net: ieee802154: Add beacons support
+Date:   Mon, 17 Jan 2022 12:54:34 +0100
+Message-Id: <20220117115440.60296-36-miquel.raynal@bootlin.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20220117115440.60296-1-miquel.raynal@bootlin.com>
 References: <20220117115440.60296-1-miquel.raynal@bootlin.com>
@@ -45,382 +42,271 @@ Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Let's introduce the basics of PAN management:
-- structures defining PANs
-- helpers for PANs registration
-- helpers discarding old PANs
+This involves processing beacons requests from userspace: starting or
+stopping the flow of beacons sent passively (for now) on a specific
+interface. The page and channel must be changed beforehands if
+needed. Interval orders above 14 are reserved to tell a device it must
+answer BEACON_REQ coming from an active scan procedure (this is not
+supported yet).
+
+A netlink beacons request structure is created to list the
+requirements.
+
+Mac layers may now implement the ->send_beacons() and
+->stop_beacons() hooks.
 
 Co-developed-by: David Girault <david.girault@qorvo.com>
 Signed-off-by: David Girault <david.girault@qorvo.com>
 Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
 ---
- include/net/cfg802154.h |  31 ++++++
- net/ieee802154/Makefile |   2 +-
- net/ieee802154/core.c   |   2 +
- net/ieee802154/core.h   |  26 +++++
- net/ieee802154/pan.c    | 231 ++++++++++++++++++++++++++++++++++++++++
- 5 files changed, 291 insertions(+), 1 deletion(-)
- create mode 100644 net/ieee802154/pan.c
+ include/net/cfg802154.h   | 22 +++++++++++
+ include/net/nl802154.h    |  3 ++
+ net/ieee802154/nl802154.c | 81 +++++++++++++++++++++++++++++++++++++++
+ net/ieee802154/rdev-ops.h | 24 ++++++++++++
+ net/ieee802154/trace.h    | 21 ++++++++++
+ 5 files changed, 151 insertions(+)
 
 diff --git a/include/net/cfg802154.h b/include/net/cfg802154.h
-index 0848896120fa..8999f87ccac6 100644
+index 15b9cb2c213a..57bbc7eb22df 100644
 --- a/include/net/cfg802154.h
 +++ b/include/net/cfg802154.h
-@@ -48,6 +48,24 @@ struct ieee802154_addr {
- 	};
+@@ -88,6 +88,24 @@ struct cfg802154_scan_request {
+ 	struct wpan_phy *wpan_phy;
  };
  
 +/**
-+ * struct ieee802154_pan_desc - PAN descriptor information
-+ * @coord: PAN ID and coordinator address
-+ * @page: page this PAN is on
-+ * @channel: channel this PAN is on
-+ * @superframe_spec: SuperFrame specification as received
-+ * @link_quality: link quality indicator at which the beacon was received
-+ * @gts_permit: the PAN coordinator accepts GTS requests
++ * struct cfg802154_beacons_request - beacons request descriptor
++ *
++ * @interval: interval n between sendings, in multiple order of the super frame
++ *            duration: aBaseSuperframeDuration * (2^n) unless the interval
++ *            order is greater or equal to 15, in this case beacons won't be
++ *            passively sent out at a fixed rate but instead inform the device
++ *            that it should answer beacon requests as part of active scan
++ *            procedures
++ * @wpan_dev: the concerned wpan device
++ * @wpan_phy: the wpan phy this was for
 + */
-+struct ieee802154_pan_desc {
-+	struct ieee802154_addr *coord;
-+	u8 page;
-+	u8 channel;
-+	u16 superframe_spec;
-+	u8 link_quality;
-+	bool gts_permit;
++struct cfg802154_beacons_request {
++	u8 interval;
++	struct wpan_dev *wpan_dev;
++	struct wpan_phy *wpan_phy;
 +};
 +
  struct cfg802154_ops {
  	struct net_device * (*add_virtual_intf_deprecated)(struct wpan_phy *wpan_phy,
  							   const char *name,
-@@ -472,4 +490,17 @@ static inline const char *wpan_phy_name(struct wpan_phy *phy)
+@@ -130,6 +148,10 @@ struct cfg802154_ops {
+ 				struct cfg802154_scan_request *request);
+ 	int	(*abort_scan)(struct wpan_phy *wpan_phy,
+ 			      struct wpan_dev *wpan_dev);
++	int	(*send_beacons)(struct wpan_phy *wpan_phy,
++				struct cfg802154_beacons_request *request);
++	int	(*stop_beacons)(struct wpan_phy *wpan_phy,
++				struct wpan_dev *wpan_dev);
+ #ifdef CONFIG_IEEE802154_NL802154_EXPERIMENTAL
+ 	void	(*get_llsec_table)(struct wpan_phy *wpan_phy,
+ 				   struct wpan_dev *wpan_dev,
+diff --git a/include/net/nl802154.h b/include/net/nl802154.h
+index 22af514dd339..20c46f15cef4 100644
+--- a/include/net/nl802154.h
++++ b/include/net/nl802154.h
+@@ -65,6 +65,8 @@ enum nl802154_commands {
+ 	NL802154_CMD_FLUSH_PANS,
+ 	NL802154_CMD_SET_MAX_PAN_ENTRIES,
+ 	NL802154_CMD_SET_PANS_EXPIRATION,
++	NL802154_CMD_SEND_BEACONS,
++	NL802154_CMD_STOP_BEACONS,
  
- void ieee802154_configure_durations(struct wpan_phy *phy);
+ 	/* add new commands above here */
  
-+/**
-+ * cfg802154_record_pan - Advertize a new PAN following a beacon's reception
-+ * @wpan_phy: PHY receiving the beacon
-+ * @pan: PAN descriptor
-+ *
-+ * Tells the internal pan management layer to either register this PAN if it is
-+ * new or at least update its entry if already discovered.
-+ *
-+ * Returns 0 on success, a negative error code otherwise.
-+ */
-+int cfg802154_record_pan(struct wpan_phy *wpan_phy,
-+			 struct ieee802154_pan_desc *pan);
-+
- #endif /* __NET_CFG802154_H */
-diff --git a/net/ieee802154/Makefile b/net/ieee802154/Makefile
-index f05b7bdae2aa..6b7c66de730d 100644
---- a/net/ieee802154/Makefile
-+++ b/net/ieee802154/Makefile
-@@ -4,7 +4,7 @@ obj-$(CONFIG_IEEE802154_SOCKET) += ieee802154_socket.o
- obj-y += 6lowpan/
+@@ -148,6 +150,7 @@ enum nl802154_attrs {
+ 	NL802154_ATTR_PAN,
+ 	NL802154_ATTR_MAX_PAN_ENTRIES,
+ 	NL802154_ATTR_PANS_EXPIRATION,
++	NL802154_ATTR_BEACON_INTERVAL,
  
- ieee802154-y := netlink.o nl-mac.o nl-phy.o nl_policy.o core.o \
--                header_ops.o sysfs.o nl802154.o trace.o
-+                header_ops.o sysfs.o nl802154.o pan.o trace.o
- ieee802154_socket-y := socket.o
+ 	/* add attributes here, update the policy in nl802154.c */
  
- CFLAGS_trace.o := -I$(src)
-diff --git a/net/ieee802154/core.c b/net/ieee802154/core.c
-index 0953cacafbff..7e3e38a30078 100644
---- a/net/ieee802154/core.c
-+++ b/net/ieee802154/core.c
-@@ -115,6 +115,8 @@ wpan_phy_new(const struct cfg802154_ops *ops, size_t priv_size)
- 		kfree(rdev);
- 		return NULL;
- 	}
-+	spin_lock_init(&rdev->pan_lock);
-+	INIT_LIST_HEAD(&rdev->pan_list);
+diff --git a/net/ieee802154/nl802154.c b/net/ieee802154/nl802154.c
+index 07bac1ae2cd2..1a0ce95625ec 100644
+--- a/net/ieee802154/nl802154.c
++++ b/net/ieee802154/nl802154.c
+@@ -226,6 +226,7 @@ static const struct nla_policy nl802154_policy[NL802154_ATTR_MAX+1] = {
+ 	[NL802154_ATTR_PAN] = { .type = NLA_NESTED },
+ 	[NL802154_ATTR_MAX_PAN_ENTRIES] = { .type = NLA_U32 },
+ 	[NL802154_ATTR_PANS_EXPIRATION] = { .type = NLA_U32 },
++	[NL802154_ATTR_BEACON_INTERVAL] = { .type = NLA_U8 },
  
- 	/* atomic_inc_return makes it start at 1, make it start at 0 */
- 	rdev->wpan_phy_idx--;
-diff --git a/net/ieee802154/core.h b/net/ieee802154/core.h
-index a0cf6feffc6a..0d08d2f79ab9 100644
---- a/net/ieee802154/core.h
-+++ b/net/ieee802154/core.h
-@@ -22,6 +22,14 @@ struct cfg802154_registered_device {
- 	struct list_head wpan_dev_list;
- 	int devlist_generation, wpan_dev_id;
+ #ifdef CONFIG_IEEE802154_NL802154_EXPERIMENTAL
+ 	[NL802154_ATTR_SEC_ENABLED] = { .type = NLA_U8, },
+@@ -1684,6 +1685,70 @@ static int nl802154_set_pans_expiration(struct sk_buff *skb,
+ 	return 0;
+ }
  
-+	/* pan management */
-+	spinlock_t pan_lock;
-+	struct list_head pan_list;
-+	unsigned int max_pan_entries;
-+	unsigned int pan_expiration;
-+	unsigned int pan_entries;
-+	unsigned int pan_generation;
-+
- 	/* must be last because of the way we do wpan_phy_priv(),
- 	 * and it should at least be aligned to NETDEV_ALIGN
- 	 */
-@@ -39,6 +47,17 @@ wpan_phy_to_rdev(struct wpan_phy *wpan_phy)
- extern struct list_head cfg802154_rdev_list;
- extern int cfg802154_rdev_list_generation;
- 
-+struct cfg802154_internal_pan {
-+	struct list_head list;
-+	unsigned long discovery_ts;
-+	struct ieee802154_pan_desc desc;
-+};
-+
-+/* Always update the list by dropping the expired PANs before iterating */
-+#define ieee802154_for_each_pan(pan, rdev)				\
-+	cfg802154_expire_pans(rdev);					\
-+	list_for_each_entry((pan), &(rdev)->pan_list, list)
-+
- int cfg802154_switch_netns(struct cfg802154_registered_device *rdev,
- 			   struct net *net);
- /* free object */
-@@ -49,4 +68,11 @@ struct wpan_phy *wpan_phy_idx_to_wpan_phy(int wpan_phy_idx);
- 
- u32 cfg802154_get_supported_chans(struct wpan_phy *phy, unsigned int page);
- 
-+void cfg802154_set_max_pan_entries(struct cfg802154_registered_device *rdev,
-+				   unsigned int max);
-+void cfg802154_set_pans_expiration(struct cfg802154_registered_device *rdev,
-+				   unsigned int exp_time_s);
-+void cfg802154_expire_pans(struct cfg802154_registered_device *rdev);
-+void cfg802154_flush_pans(struct cfg802154_registered_device *rdev);
-+
- #endif /* __IEEE802154_CORE_H */
-diff --git a/net/ieee802154/pan.c b/net/ieee802154/pan.c
-new file mode 100644
-index 000000000000..1ea15ea1b3bd
---- /dev/null
-+++ b/net/ieee802154/pan.c
-@@ -0,0 +1,231 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * IEEE 802.15.4 PAN management
-+ *
-+ * Copyright (C) Qorvo, 2021
-+ * Authors:
-+ *   - David Girault <david.girault@qorvo.com>
-+ *   - Miquel Raynal <miquel.raynal@bootlin.com>
-+ */
-+
-+#include <linux/slab.h>
-+#include <linux/kernel.h>
-+#include <linux/module.h>
-+#include <linux/device.h>
-+
-+#include <net/cfg802154.h>
-+#include <net/af_ieee802154.h>
-+
-+#include "ieee802154.h"
-+#include "core.h"
-+
-+static struct cfg802154_internal_pan *
-+cfg802154_alloc_pan(struct ieee802154_pan_desc *desc)
++static int
++nl802154_send_beacons(struct sk_buff *skb, struct genl_info *info)
 +{
-+	struct cfg802154_internal_pan *new;
-+	struct ieee802154_addr *coord;
++	struct cfg802154_registered_device *rdev = info->user_ptr[0];
++	struct net_device *dev = info->user_ptr[1];
++	struct wpan_dev *wpan_dev = dev->ieee802154_ptr;
++	struct wpan_phy *wpan_phy = &rdev->wpan_phy;
++	struct cfg802154_beacons_request *request;
++	int err;
 +
-+	new = kzalloc(sizeof(*new), GFP_KERNEL);
-+	if (!new)
-+		return ERR_PTR(-ENOMEM);
++	/* Avoid sending beacons on monitor interfaces */
++	if (wpan_dev->iftype == NL802154_IFTYPE_MONITOR)
++		return -EOPNOTSUPP;
 +
-+	coord = kzalloc(sizeof(*coord), GFP_KERNEL);
-+	if (!coord) {
-+		kfree(new);
-+		return ERR_PTR(-ENOMEM);
++	request = kzalloc(sizeof(*request), GFP_KERNEL);
++	if (!request)
++		return -ENOMEM;
++
++	request->wpan_dev = wpan_dev;
++	request->wpan_phy = wpan_phy;
++
++	if (info->attrs[NL802154_ATTR_BEACON_INTERVAL]) {
++		request->interval = nla_get_u8(info->attrs[NL802154_ATTR_BEACON_INTERVAL]);
++		if (request->interval > IEEE802154_ACTIVE_SCAN_DURATION) {
++			pr_err("Interval is out of range\n");
++			err = -EINVAL;
++			goto free_request;
++		}
++	} else {
++		/* Use maximum duration order by default */
++		request->interval = IEEE802154_MAX_SCAN_DURATION;
 +	}
 +
-+	new->discovery_ts = jiffies;
-+	new->desc = *desc;
-+
-+	*coord = *desc->coord;
-+	new->desc.coord = coord;
-+
-+	return new;
-+}
-+
-+static void cfg802154_free_pan(struct cfg802154_internal_pan *pan)
-+{
-+	kfree(pan->desc.coord);
-+	kfree(pan);
-+}
-+
-+static void cfg802154_unlink_pan(struct cfg802154_registered_device *rdev,
-+				 struct cfg802154_internal_pan *pan)
-+{
-+	lockdep_assert_held(&rdev->pan_lock);
-+
-+	list_del(&pan->list);
-+	cfg802154_free_pan(pan);
-+	rdev->pan_entries--;
-+	rdev->pan_generation++;
-+}
-+
-+static void cfg802154_link_pan(struct cfg802154_registered_device *rdev,
-+			       struct cfg802154_internal_pan *pan)
-+{
-+	lockdep_assert_held(&rdev->pan_lock);
-+
-+	list_add_tail(&pan->list, &rdev->pan_list);
-+	rdev->pan_entries++;
-+	rdev->pan_generation++;
-+}
-+
-+void cfg802154_set_max_pan_entries(struct cfg802154_registered_device *rdev,
-+				   unsigned int max)
-+{
-+	lockdep_assert_held(&rdev->pan_lock);
-+
-+	rdev->max_pan_entries = max;
-+}
-+EXPORT_SYMBOL(cfg802154_set_max_pan_entries);
-+
-+static bool
-+cfg802154_need_to_expire_pans(struct cfg802154_registered_device *rdev)
-+{
-+	if (!rdev->max_pan_entries)
-+		return false;
-+
-+	if (rdev->pan_entries > rdev->max_pan_entries)
-+		return true;
-+
-+	return false;
-+}
-+
-+void cfg802154_set_pans_expiration(struct cfg802154_registered_device *rdev,
-+				   unsigned int exp_time_s)
-+{
-+	lockdep_assert_held(&rdev->pan_lock);
-+
-+	rdev->pan_expiration = exp_time_s * HZ;
-+}
-+EXPORT_SYMBOL(cfg802154_set_pans_expiration);
-+
-+void cfg802154_expire_pans(struct cfg802154_registered_device *rdev)
-+{
-+	struct cfg802154_internal_pan *pan, *tmp;
-+	unsigned long expiration_time;
-+
-+	lockdep_assert_held(&rdev->pan_lock);
-+
-+	if (!rdev->pan_expiration)
-+		return;
-+
-+	expiration_time = jiffies - rdev->pan_expiration;
-+	list_for_each_entry_safe(pan, tmp, &rdev->pan_list, list) {
-+		if (!time_after(expiration_time, pan->discovery_ts))
-+			continue;
-+
-+		cfg802154_unlink_pan(rdev, pan);
-+	}
-+}
-+EXPORT_SYMBOL(cfg802154_expire_pans);
-+
-+static void cfg802154_expire_oldest_pan(struct cfg802154_registered_device *rdev)
-+{
-+	struct cfg802154_internal_pan *pan, *oldest;
-+
-+	lockdep_assert_held(&rdev->pan_lock);
-+
-+	if (WARN_ON(list_empty(&rdev->pan_list)))
-+		return;
-+
-+	oldest = list_first_entry(&rdev->pan_list,
-+				  struct cfg802154_internal_pan, list);
-+
-+	list_for_each_entry(pan, &rdev->pan_list, list) {
-+		if (!time_before(oldest->discovery_ts, pan->discovery_ts))
-+			oldest = pan;
++	err = rdev_send_beacons(rdev, request);
++	if (err) {
++		pr_err("Failure starting sending beacons (%d)\n", err);
++		goto free_request;
 +	}
 +
-+	cfg802154_unlink_pan(rdev, oldest);
++	if (wpan_dev->netdev)
++		dev_hold(wpan_dev->netdev);
++
++free_request:
++	kfree(request);
++
++	return err;
 +}
 +
-+void cfg802154_flush_pans(struct cfg802154_registered_device *rdev)
++static int
++nl802154_stop_beacons(struct sk_buff *skb, struct genl_info *info)
 +{
-+	struct cfg802154_internal_pan *pan, *tmp;
++	struct cfg802154_registered_device *rdev = info->user_ptr[0];
++	struct net_device *dev = info->user_ptr[1];
++	struct wpan_dev *wpan_dev = dev->ieee802154_ptr;
++	int err;
 +
-+	lockdep_assert_held(&rdev->pan_lock);
++	err = rdev_stop_beacons(rdev, wpan_dev);
 +
-+	list_for_each_entry_safe(pan, tmp, &rdev->pan_list, list)
-+		cfg802154_unlink_pan(rdev, pan);
++	if (err != -ESRCH && wpan_dev->netdev)
++		dev_put(wpan_dev->netdev);
++
++	return err;
 +}
-+EXPORT_SYMBOL(cfg802154_flush_pans);
 +
-+static bool cfg802154_same_pan(struct ieee802154_pan_desc *a,
-+			       struct ieee802154_pan_desc *b)
+ #ifdef CONFIG_IEEE802154_NL802154_EXPERIMENTAL
+ static const struct nla_policy nl802154_dev_addr_policy[NL802154_DEV_ADDR_ATTR_MAX + 1] = {
+ 	[NL802154_DEV_ADDR_ATTR_PAN_ID] = { .type = NLA_U16 },
+@@ -2814,6 +2879,22 @@ static const struct genl_ops nl802154_ops[] = {
+ 		.internal_flags = NL802154_FLAG_NEED_NETDEV |
+ 				  NL802154_FLAG_NEED_RTNL,
+ 	},
++	{
++		.cmd = NL802154_CMD_SEND_BEACONS,
++		.doit = nl802154_send_beacons,
++		.flags = GENL_ADMIN_PERM,
++		.internal_flags = NL802154_FLAG_NEED_NETDEV |
++				  NL802154_FLAG_CHECK_NETDEV_UP |
++				  NL802154_FLAG_NEED_RTNL,
++	},
++	{
++		.cmd = NL802154_CMD_STOP_BEACONS,
++		.doit = nl802154_stop_beacons,
++		.flags = GENL_ADMIN_PERM,
++		.internal_flags = NL802154_FLAG_NEED_NETDEV |
++				  NL802154_FLAG_CHECK_NETDEV_UP |
++				  NL802154_FLAG_NEED_RTNL,
++	},
+ #ifdef CONFIG_IEEE802154_NL802154_EXPERIMENTAL
+ 	{
+ 		.cmd = NL802154_CMD_SET_SEC_PARAMS,
+diff --git a/net/ieee802154/rdev-ops.h b/net/ieee802154/rdev-ops.h
+index e171d74c3251..fa85efeaa150 100644
+--- a/net/ieee802154/rdev-ops.h
++++ b/net/ieee802154/rdev-ops.h
+@@ -237,6 +237,30 @@ static inline int rdev_abort_scan(struct cfg802154_registered_device *rdev,
+ 	return ret;
+ }
+ 
++static inline int rdev_send_beacons(struct cfg802154_registered_device *rdev,
++				    struct cfg802154_beacons_request *request)
 +{
 +	int ret;
 +
-+	if (a->page != b->page)
-+		return false;
++	/* TODO: check if this is an FFD? */
 +
-+	if (a->channel != b->channel)
-+		return false;
-+
-+	ret = memcmp(&a->coord->pan_id, &b->coord->pan_id,
-+		     sizeof(a->coord->pan_id));
-+	if (ret)
-+		return false;
-+
-+	if (a->coord->mode != b->coord->mode)
-+		return false;
-+
-+	if (a->coord->mode == IEEE802154_ADDR_SHORT)
-+		ret = memcmp(&a->coord->short_addr, &b->coord->short_addr,
-+			     IEEE802154_SHORT_ADDR_LEN);
-+	else
-+		ret = memcmp(&a->coord->extended_addr, &b->coord->extended_addr,
-+			     IEEE802154_EXTENDED_ADDR_LEN);
-+
-+	return true;
++	trace_802154_rdev_send_beacons(&rdev->wpan_phy, request);
++	ret = rdev->ops->send_beacons(&rdev->wpan_phy, request);
++	trace_802154_rdev_return_int(&rdev->wpan_phy, ret);
++	return ret;
 +}
 +
-+static struct cfg802154_internal_pan *
-+cfg802154_find_matching_pan(struct cfg802154_registered_device *rdev,
-+			    struct cfg802154_internal_pan *tmp)
++static inline int rdev_stop_beacons(struct cfg802154_registered_device *rdev,
++				    struct wpan_dev *wpan_dev)
 +{
-+	struct cfg802154_internal_pan *pan;
++	int ret;
 +
-+	list_for_each_entry(pan, &rdev->pan_list, list) {
-+		if (cfg802154_same_pan(&pan->desc, &tmp->desc))
-+			return pan;
-+	}
-+
-+	return NULL;
++	trace_802154_rdev_stop_beacons(&rdev->wpan_phy, wpan_dev);
++	ret = rdev->ops->stop_beacons(&rdev->wpan_phy, wpan_dev);
++	trace_802154_rdev_return_int(&rdev->wpan_phy, ret);
++	return ret;
 +}
 +
-+static void cfg802154_pan_update(struct cfg802154_registered_device *rdev,
-+				 struct cfg802154_internal_pan *new)
-+{
-+	struct cfg802154_internal_pan *found;
+ #ifdef CONFIG_IEEE802154_NL802154_EXPERIMENTAL
+ /* TODO this is already a nl802154, so move into ieee802154 */
+ static inline void
+diff --git a/net/ieee802154/trace.h b/net/ieee802154/trace.h
+index e5405f737ded..353ba799244f 100644
+--- a/net/ieee802154/trace.h
++++ b/net/ieee802154/trace.h
+@@ -315,6 +315,22 @@ TRACE_EVENT(802154_rdev_trigger_scan,
+ 		  WPAN_PHY_PR_ARG, __entry->page, __entry->channels, __entry->duration)
+ );
+ 
++TRACE_EVENT(802154_rdev_send_beacons,
++	TP_PROTO(struct wpan_phy *wpan_phy,
++		 struct cfg802154_beacons_request *request),
++	TP_ARGS(wpan_phy, request),
++	TP_STRUCT__entry(
++		WPAN_PHY_ENTRY
++		__field(u8, interval)
++	),
++	TP_fast_assign(
++		WPAN_PHY_ASSIGN;
++		__entry->interval = request->interval;
++	),
++	TP_printk(WPAN_PHY_PR_FMT ", sending beacons (interval order: %d)",
++		  WPAN_PHY_PR_ARG, __entry->interval)
++);
 +
-+	spin_lock_bh(&rdev->pan_lock);
+ DECLARE_EVENT_CLASS(802154_wdev_template,
+ 	TP_PROTO(struct wpan_phy *wpan_phy, struct wpan_dev *wpan_dev),
+ 	TP_ARGS(wpan_phy, wpan_dev),
+@@ -335,6 +351,11 @@ DEFINE_EVENT(802154_wdev_template, 802154_rdev_abort_scan,
+ 	TP_ARGS(wpan_phy, wpan_dev)
+ );
+ 
++DEFINE_EVENT(802154_wdev_template, 802154_rdev_stop_beacons,
++	TP_PROTO(struct wpan_phy *wpan_phy, struct wpan_dev *wpan_dev),
++	TP_ARGS(wpan_phy, wpan_dev)
++);
 +
-+	found = cfg802154_find_matching_pan(rdev, new);
-+	if (found)
-+		cfg802154_unlink_pan(rdev, found);
-+
-+	if (unlikely(cfg802154_need_to_expire_pans(rdev)))
-+		cfg802154_expire_oldest_pan(rdev);
-+
-+	cfg802154_link_pan(rdev, new);
-+
-+	spin_unlock_bh(&rdev->pan_lock);
-+}
-+
-+int cfg802154_record_pan(struct wpan_phy *wpan_phy,
-+			 struct ieee802154_pan_desc *desc)
-+{
-+	struct cfg802154_registered_device *rdev = wpan_phy_to_rdev(wpan_phy);
-+	struct cfg802154_internal_pan *new;
-+
-+	new = cfg802154_alloc_pan(desc);
-+	if (IS_ERR(new))
-+		return (PTR_ERR(new));
-+
-+	cfg802154_pan_update(rdev, new);
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL(cfg802154_record_pan);
+ TRACE_EVENT(802154_rdev_return_int,
+ 	TP_PROTO(struct wpan_phy *wpan_phy, int ret),
+ 	TP_ARGS(wpan_phy, ret),
 -- 
 2.27.0
 
