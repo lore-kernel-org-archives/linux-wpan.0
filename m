@@ -2,21 +2,21 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AEC94C433F5
-	for <linux-wpan@archiver.kernel.org>; Mon, 17 Jan 2022 11:55:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15DB8C433F5
+	for <linux-wpan@archiver.kernel.org>; Mon, 17 Jan 2022 11:55:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236427AbiAQLze (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 17 Jan 2022 06:55:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59348 "EHLO
+        id S239446AbiAQLzo (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 17 Jan 2022 06:55:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59400 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239362AbiAQLzM (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 17 Jan 2022 06:55:12 -0500
+        with ESMTP id S239388AbiAQLzX (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 17 Jan 2022 06:55:23 -0500
 Received: from relay12.mail.gandi.net (relay12.mail.gandi.net [IPv6:2001:4b98:dc4:8::232])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36A4FC06173E;
-        Mon, 17 Jan 2022 03:55:11 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55479C061574;
+        Mon, 17 Jan 2022 03:55:22 -0800 (PST)
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by relay12.mail.gandi.net (Postfix) with ESMTPSA id EA4B620000B;
-        Mon, 17 Jan 2022 11:55:07 +0000 (UTC)
+        by relay12.mail.gandi.net (Postfix) with ESMTPSA id 5F7E7200013;
+        Mon, 17 Jan 2022 11:55:19 +0000 (UTC)
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
 To:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
@@ -32,9 +32,9 @@ Cc:     netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
         Xue Liu <liuxuenetmail@gmail.com>, Alan Ott <alan@signal11.us>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
         Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: [PATCH v3 13/41] net: ieee802154: Move the address structure earlier
-Date:   Mon, 17 Jan 2022 12:54:12 +0100
-Message-Id: <20220117115440.60296-14-miquel.raynal@bootlin.com>
+Subject: [PATCH v3 19/41] net: ieee802154: ca8210: Call the complete helper when a transmission is over
+Date:   Mon, 17 Jan 2022 12:54:18 +0100
+Message-Id: <20220117115440.60296-20-miquel.raynal@bootlin.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20220117115440.60296-1-miquel.raynal@bootlin.com>
 References: <20220117115440.60296-1-miquel.raynal@bootlin.com>
@@ -45,54 +45,46 @@ Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-From: David Girault <david.girault@qorvo.com>
+ieee802154_xmit_complete() is the right helper to call when a
+transmission is over. The fact that it completed or not is not really a
+question, but drivers must tell the core that the completion is over,
+even if it was canceled. Do not call ieee802154_wake_queue() manually,
+in order to let full control of this task to the core.
 
-Move the address structure earlier in the cfg802154.h header in order to
-use it in subsequent additions. There is no functional change here.
+Here the two paths are equivalent of calling *_xmit_complete() with its
+ifs_handling parameter set to true or false, so let's use it instead of
+open coding it.
 
-Signed-off-by: David Girault <david.girault@qorvo.com>
-[miquel.raynal@bootlin.com: Isolate this change from a bigger commit]
 Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
 ---
- include/net/cfg802154.h | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+ drivers/net/ieee802154/ca8210.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
-diff --git a/include/net/cfg802154.h b/include/net/cfg802154.h
-index 4491e2724ff2..4193c242d96e 100644
---- a/include/net/cfg802154.h
-+++ b/include/net/cfg802154.h
-@@ -29,6 +29,15 @@ struct ieee802154_llsec_key_id;
- struct ieee802154_llsec_key;
- #endif /* CONFIG_IEEE802154_NL802154_EXPERIMENTAL */
+diff --git a/drivers/net/ieee802154/ca8210.c b/drivers/net/ieee802154/ca8210.c
+index d3a9e4fe05f4..374827f51dff 100644
+--- a/drivers/net/ieee802154/ca8210.c
++++ b/drivers/net/ieee802154/ca8210.c
+@@ -1750,6 +1750,7 @@ static int ca8210_async_xmit_complete(
+ 	u8                     status)
+ {
+ 	struct ca8210_priv *priv = hw->priv;
++	bool ifs_handling = true;
  
-+struct ieee802154_addr {
-+	u8 mode;
-+	__le16 pan_id;
-+	union {
-+		__le16 short_addr;
-+		__le64 extended_addr;
-+	};
-+};
-+
- struct cfg802154_ops {
- 	struct net_device * (*add_virtual_intf_deprecated)(struct wpan_phy *wpan_phy,
- 							   const char *name,
-@@ -277,15 +286,6 @@ static inline void wpan_phy_net_set(struct wpan_phy *wpan_phy, struct net *net)
- 	write_pnet(&wpan_phy->_net, net);
- }
+ 	if (priv->nextmsduhandle != msduhandle) {
+ 		dev_err(
+@@ -1770,10 +1771,8 @@ static int ca8210_async_xmit_complete(
+ 			"Link transmission unsuccessful, status = %d\n",
+ 			status
+ 		);
+-		if (status != MAC_TRANSACTION_OVERFLOW) {
+-			ieee802154_wake_queue(priv->hw);
+-			return 0;
+-		}
++		if (status != MAC_TRANSACTION_OVERFLOW)
++			ifs_handling = false;
+ 	}
+ 	ieee802154_xmit_complete(priv->hw, priv->tx_skb, true);
  
--struct ieee802154_addr {
--	u8 mode;
--	__le16 pan_id;
--	union {
--		__le16 short_addr;
--		__le64 extended_addr;
--	};
--};
--
- struct ieee802154_llsec_key_id {
- 	u8 mode;
- 	u8 id;
 -- 
 2.27.0
 
