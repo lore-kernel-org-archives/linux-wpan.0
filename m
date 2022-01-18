@@ -2,20 +2,20 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6B74C433EF
-	for <linux-wpan@archiver.kernel.org>; Tue, 18 Jan 2022 10:40:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39723C433F5
+	for <linux-wpan@archiver.kernel.org>; Tue, 18 Jan 2022 18:14:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237642AbiARKka convert rfc822-to-8bit (ORCPT
+        id S1347846AbiARSOh convert rfc822-to-8bit (ORCPT
         <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 18 Jan 2022 05:40:30 -0500
-Received: from relay7-d.mail.gandi.net ([217.70.183.200]:39581 "EHLO
-        relay7-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237630AbiARKk3 (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 18 Jan 2022 05:40:29 -0500
+        Tue, 18 Jan 2022 13:14:37 -0500
+Received: from relay3-d.mail.gandi.net ([217.70.183.195]:48303 "EHLO
+        relay3-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1347861AbiARSOg (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 18 Jan 2022 13:14:36 -0500
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id 3F2572000F;
-        Tue, 18 Jan 2022 10:40:25 +0000 (UTC)
-Date:   Tue, 18 Jan 2022 11:40:23 +0100
+        by mail.gandi.net (Postfix) with ESMTPSA id 9371E60002;
+        Tue, 18 Jan 2022 18:14:31 +0000 (UTC)
+Date:   Tue, 18 Jan 2022 19:14:29 +0100
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
 To:     Alexander Aring <alex.aring@gmail.com>
 Cc:     Stefan Schmidt <stefan@datenfreihafen.org>,
@@ -32,11 +32,13 @@ Cc:     Stefan Schmidt <stefan@datenfreihafen.org>,
         Varka Bhadram <varkabhadram@gmail.com>,
         Xue Liu <liuxuenetmail@gmail.com>, Alan Ott <alan@signal11.us>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH v3 00/41] IEEE 802.15.4 scan support
-Message-ID: <20220118114023.2d2c0207@xps13>
-In-Reply-To: <CAB_54W4q9a1MRdfK6yJHMRt+Zfapn0ggie9RbbUYi4=Biefz_A@mail.gmail.com>
+Subject: Re: [PATCH v3 27/41] net: mac802154: Introduce a tx queue flushing
+ mechanism
+Message-ID: <20220118191429.19ea3c7d@xps13>
+In-Reply-To: <CAB_54W562uzk3NzXDTgRLbQzi=hgQDntJOqmMDVZwaJ_eDZZMQ@mail.gmail.com>
 References: <20220117115440.60296-1-miquel.raynal@bootlin.com>
-        <CAB_54W4q9a1MRdfK6yJHMRt+Zfapn0ggie9RbbUYi4=Biefz_A@mail.gmail.com>
+        <20220117115440.60296-28-miquel.raynal@bootlin.com>
+        <CAB_54W562uzk3NzXDTgRLbQzi=hgQDntJOqmMDVZwaJ_eDZZMQ@mail.gmail.com>
 Organization: Bootlin
 X-Mailer: Claws Mail 3.17.7 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
@@ -48,39 +50,41 @@ X-Mailing-List: linux-wpan@vger.kernel.org
 
 Hi Alexander,
 
-> > So far the only technical point that is missing in this series is the
-> > possibility to grab a reference over the module driving the net device
-> > in order to prevent module unloading during a scan or when the beacons
-> > work is ongoing.
+alex.aring@gmail.com wrote on Mon, 17 Jan 2022 17:43:49 -0500:
 
-Do you have any advises regarding this issue? That is the only
-technical point that is left unaddressed IMHO.
-
-> > Finally, this series is a deep reshuffle of David Girault's original
-> > work, hence the fact that he is almost systematically credited, either
-> > by being the only author when I created the patches based on his changes
-> > with almost no modification, or with a Co-developped-by tag whenever the
-> > final code base is significantly different than his first proposal while
-> > still being greatly inspired from it.
-> >  
+> Hi,
 > 
-> can you please split this patch series, what I see is now:
+> On Mon, 17 Jan 2022 at 06:55, Miquel Raynal <miquel.raynal@bootlin.com> wrote:
+> ...
+> >
+> >         /* stop hardware - this must stop RX */
+> > diff --git a/net/mac802154/ieee802154_i.h b/net/mac802154/ieee802154_i.h
+> > index 0291e49058f2..37d5438fdb3f 100644
+> > --- a/net/mac802154/ieee802154_i.h
+> > +++ b/net/mac802154/ieee802154_i.h
+> > @@ -122,6 +122,7 @@ extern struct ieee802154_mlme_ops mac802154_mlme_wpan;
+> >
+> >  void ieee802154_rx(struct ieee802154_local *local, struct sk_buff *skb);
+> >  void ieee802154_xmit_sync_worker(struct work_struct *work);
+> > +void ieee802154_sync_tx(struct ieee802154_local *local);
+> >  netdev_tx_t
+> >  ieee802154_monitor_start_xmit(struct sk_buff *skb, struct net_device *dev);
+> >  netdev_tx_t
+> > diff --git a/net/mac802154/tx.c b/net/mac802154/tx.c
+> > index de5ecda80472..d1fd2cc67cbe 100644
+> > --- a/net/mac802154/tx.c
+> > +++ b/net/mac802154/tx.c
+> > @@ -48,6 +48,7 @@ void ieee802154_xmit_sync_worker(struct work_struct *work)
+> >
+> >         kfree_skb(skb);
+> >         atomic_dec(&local->phy->ongoing_txs);
+> > +       wake_up(&local->phy->sync_txq);  
 > 
-> 1. cleanup patches
-> 2. sync tx handling for mlme commands
-> 3. scan support
+> if (atomic_dec_and_test(&hw->phy->ongoing_txs))
+>       wake_up(&hw->phy->sync_txq);
 
-Works for me. I just wanted to give the big picture but I'll split the
-series.
-
-Also sorry for forgetting the 'wpan-next' subject prefix.
-
-> we try to bring the patches upstream in this order.
-> 
-> Thanks.
-> 
-> - Alex
-
+As we test this condition in the waiting path I assumed it was fine to
+do it this way, but the additional check does not hurt, so I'll add it.
 
 Thanks,
 Miquèl
