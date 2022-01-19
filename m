@@ -2,93 +2,146 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AF62C433F5
-	for <linux-wpan@archiver.kernel.org>; Tue, 18 Jan 2022 23:32:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A663EC433F5
+	for <linux-wpan@archiver.kernel.org>; Wed, 19 Jan 2022 22:26:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350268AbiARXcn (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 18 Jan 2022 18:32:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40710 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350196AbiARXcn (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 18 Jan 2022 18:32:43 -0500
-Received: from mail-wm1-x332.google.com (mail-wm1-x332.google.com [IPv6:2a00:1450:4864:20::332])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9D80C061574;
-        Tue, 18 Jan 2022 15:32:42 -0800 (PST)
-Received: by mail-wm1-x332.google.com with SMTP id n8so1433000wmk.3;
-        Tue, 18 Jan 2022 15:32:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=jhx4P/7V0jR1r4GS0bXkT54dwJLR8WwyaKkLIbcZ1Jw=;
-        b=o0FTBE3s5DNlBxwbq35uWlM7UHNGn1Xhi0jjWu07TqIpiVtfVtNG98tjNEUmWFrdlZ
-         z6MQRsTHyuwhJZPeTFHdOXk9cOsN4WYbhGCXDzkjoRM4mLnv8LSleP9RHg/7oLvkWTow
-         dj/5w+4kcRt5RsKT5ILLQispJwPqzCFwD+3rK74WHRVgsfWFRRLQjV8IVEtQ7LBKLonT
-         LZiPFKwuK4xPkanNaCUk/WcqIultoJ7+Ep2rvev0638MzYrNkO2b7E/4RtzR6W4273Tr
-         HqSpFL1MTJ6fQwD8MtDyOwIsKP/MWlwOu3J1KgqSunA9W0aVKHOzWTW6wGEmYbUvAvbX
-         3hiQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=jhx4P/7V0jR1r4GS0bXkT54dwJLR8WwyaKkLIbcZ1Jw=;
-        b=RSgG/u3NRGtkG5C5QuGw5CxDZ5daqr5s8hJtDqAMzHzKTwNGFZtmJMCjuqVo1w2Bis
-         P+U065oAr0TQxejJ80HKtAVEO+V3pTA8GeDjuvSHkdUh7aCJBX6tWNDNhDpPnCGKgdZP
-         abR5VAzNKSCH1ioWXFAFwA9imfF1beyJ7d8QnIH+bC9eM9CvLqNmkVCtzw+06rTjv0s8
-         72elQ5GaJ5kwc8j9cxEnoziTrsH6aehSG2KM3ZTAFIV0hDEhxiBiSj9oij6vgq6nRQrS
-         /JFV6n022/NcpGz15pKIEJreEYzH640TN4DE+vZGfbryf2+K3x4/AJCEG4Y5tMcHNtSg
-         Cv7A==
-X-Gm-Message-State: AOAM531CzY0MDxUatW8wcyCyFSZNA5OQyTsELVdDdQP8YrYCCYOklIpK
-        lOkTvsOW6D2a26Rv8UnIgFiJ7vLk9J+FyaIVkVc=
-X-Google-Smtp-Source: ABdhPJz9SEgf0a9qOeZ01tvL/cSJ34TakOjGqn32PE4qCTAd5YhVCs5iINzSLsvXk+Oq+QFlRdpn20D1tmmNCXOcFN0=
-X-Received: by 2002:a05:6000:1686:: with SMTP id y6mr15827016wrd.205.1642548761407;
- Tue, 18 Jan 2022 15:32:41 -0800 (PST)
-MIME-Version: 1.0
-References: <20220117115440.60296-1-miquel.raynal@bootlin.com>
- <CAB_54W4q9a1MRdfK6yJHMRt+Zfapn0ggie9RbbUYi4=Biefz_A@mail.gmail.com> <20220118114034.791933ca@kicinski-fedora-PC1C0HJN.hsd1.ca.comcast.net>
-In-Reply-To: <20220118114034.791933ca@kicinski-fedora-PC1C0HJN.hsd1.ca.comcast.net>
-From:   Alexander Aring <alex.aring@gmail.com>
-Date:   Tue, 18 Jan 2022 18:32:30 -0500
-Message-ID: <CAB_54W7EutVuSd65O7J8HWYX9qQ_Y9T8aq9Jy9VM2C-3BznJRA@mail.gmail.com>
-Subject: Re: [PATCH v3 00/41] IEEE 802.15.4 scan support
-To:     Jakub Kicinski <kuba@kernel.org>,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
-        Stefan Schmidt <stefan@datenfreihafen.org>
-Cc:     linux-wpan - ML <linux-wpan@vger.kernel.org>,
+        id S1343804AbiASW0K convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 19 Jan 2022 17:26:10 -0500
+Received: from relay9-d.mail.gandi.net ([217.70.183.199]:56099 "EHLO
+        relay9-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1357570AbiASW0G (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 19 Jan 2022 17:26:06 -0500
+Received: (Authenticated sender: miquel.raynal@bootlin.com)
+        by mail.gandi.net (Postfix) with ESMTPSA id 5399DFF805;
+        Wed, 19 Jan 2022 22:26:01 +0000 (UTC)
+Date:   Wed, 19 Jan 2022 23:26:00 +0100
+From:   Miquel Raynal <miquel.raynal@bootlin.com>
+To:     Alexander Aring <alex.aring@gmail.com>
+Cc:     Stefan Schmidt <stefan@datenfreihafen.org>,
+        linux-wpan - ML <linux-wpan@vger.kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
         "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-        =?UTF-8?Q?linux=2Dwireless=40vger=2Ekernel=2Eorg_Wireless_=3Clinux=2Dwireless=40vger?=
-         =?UTF-8?Q?=2Ekernel=2Eorg=3E=2C_David_Girault_=3Cdavid=2Egirault=40qorvo=2Ecom=3E=2C_Romua?=
-         =?UTF-8?Q?ld_Despres_=3Cromuald=2Edespres=40qorvo=2Ecom=3E=2C_Frederic_Blain_=3Cfred?=
-         =?UTF-8?Q?eric=2Eblain=40qorvo=2Ecom=3E=2C_Nicolas_Schodet_=3Cnico=40ni=2Efr=2Eeu=2Eorg=3E=2C_?=
-         =?UTF-8?Q?Michael_Hennerich_=3Cmichael=2Ehennerich=40analog=2Ecom=3E=2C_Varka_Bhad?=
-         =?UTF-8?Q?ram_=3Cvarkabhadram=40gmail=2Ecom=3E=2C_Xue_Liu_=3Cliuxuenetmail=40gmail=2Ec?=
-         =?UTF-8?Q?om=3E=2C_Alan_Ott_=3Calan=40signal11=2Eus=3E=2C_Thomas_Petazzoni?= 
-        <thomas.petazzoni@bootlin.com>
-Content-Type: text/plain; charset="UTF-8"
+        Michael Hennerich <michael.hennerich@analog.com>,
+        Harry Morris <h.morris@cascoda.com>,
+        Varka Bhadram <varkabhadram@gmail.com>,
+        Xue Liu <liuxuenetmail@gmail.com>, Alan Ott <alan@signal11.us>,
+        David Girault <david.girault@qorvo.com>,
+        Romuald Despres <romuald.despres@qorvo.com>,
+        Frederic Blain <frederic.blain@qorvo.com>,
+        Nicolas Schodet <nico@ni.fr.eu.org>,
+        Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+        "linux-wireless@vger.kernel.org Wireless" 
+        <linux-wireless@vger.kernel.org>
+Subject: Re: [wpan-next v2 08/27] net: ieee802154: Drop symbol duration
+ settings when the core does it already
+Message-ID: <20220119232600.6b8755d0@xps13>
+In-Reply-To: <CAB_54W4Z0H5ubvOBjpnCpGOWYrNXYOJvxB4_kZsp8LqdJrTLkg@mail.gmail.com>
+References: <20220112173312.764660-1-miquel.raynal@bootlin.com>
+        <20220112173312.764660-9-miquel.raynal@bootlin.com>
+        <CAB_54W5QU5JCtQYwvTKREd6ZeQWmC19LF4mj853U0Gz-mCObVQ@mail.gmail.com>
+        <20220113121645.434a6ef6@xps13>
+        <CAB_54W5_x88zVgSJep=yK5WVjPvcWMy8dmyOJWcjy=5o0jCy0w@mail.gmail.com>
+        <20220114112113.63661251@xps13>
+        <CAB_54W77d_PjX_ZfKJdO4D4hHsAWjw0jWgRA7L0ewNnqApQhcQ@mail.gmail.com>
+        <20220117101245.1946e474@xps13>
+        <CAB_54W4rqXxSrTY=fqbt6o41a2SAEY_suqyqZ3hymheCgzRqTQ@mail.gmail.com>
+        <20220118113833.0185f564@xps13>
+        <CAB_54W4Z0H5ubvOBjpnCpGOWYrNXYOJvxB4_kZsp8LqdJrTLkg@mail.gmail.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 3.17.7 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi Jakub,
+Hi Alexander,
 
-On Tue, 18 Jan 2022 at 14:40, Jakub Kicinski <kuba@kernel.org> wrote:
->
-> On Mon, 17 Jan 2022 18:02:06 -0500 Alexander Aring wrote:
-> > can you please split this patch series, what I see is now:
+alex.aring@gmail.com wrote on Tue, 18 Jan 2022 17:43:00 -0500:
+
+> Hi,
+> 
+> On Tue, 18 Jan 2022 at 05:38, Miquel Raynal <miquel.raynal@bootlin.com> wrote:
 > >
-> > 1. cleanup patches
->
-> I see a few patches here with Fixes tags and the MAINTAINERS patch -
-> do you mean those as cleanups? Fixes would preferably go to Linus soon
-> and then the rest should be merged to -next trees.
->
+> > Hi Alexander,
+> >  
+> > > > > btw:
+> > > > > Also for testing with hwsim and the missing features which currently
+> > > > > exist. Can we implement some user space test program which replies
+> > > > > (active scan) or sends periodically something out via AF_PACKET raw
+> > > > > and a monitor interface that should work to test if it is working?  
+> > > >
+> > > > We already have all this handled, no need for extra software. You can
+> > > > test active and passive scans between two hwsim devices already:
+> > > >
+> > > > # iwpan dev wpan0 beacons send interval 15
+> > > > # iwpan dev wpan1 scan type active duration 1
+> > > > # iwpan dev wpan0 beacons stop
+> > > >
+> > > > or
+> > > >
+> > > > # iwpan dev wpan0 beacons send interval 1
+> > > > # iwpan dev wpan1 scan type passive duration 2
+> > > > # iwpan dev wpan0 beacons stop
+> > > >  
+> > > > > Ideally we could do that very easily with scapy (not sure about their
+> > > > > _upstream_ 802.15.4 support). I hope I got that right that there is
+> > > > > still something missing but we could fake it in such a way (just for
+> > > > > hwsim testing).  
+> > > >
+> > > > I hope the above will match your expectations.
+> > > >  
+> > >
+> > > I need to think and read more about... in my mind is currently the
+> > > following question: are not coordinators broadcasting that information
+> > > only? Means, isn't that a job for a coordinator?  
+> >
+> > My understanding right now:
+> > - The spec states that coordinators only can send beacons and perform
+> >   scans.  
+> 
+> ok.
+> 
+> > - I don't yet have the necessary infrastructure to give coordinators
+> >   more rights than regular devices or RFDs (but 40+ patches already,
+> >   don't worry this is something we have in mind)
+> > - Right now this is the user to decide whether a device might answer
+> >   beacon requests or not. This will soon become more limited but it
+> >   greatly simplifies the logic for now.
+> >  
+> 
+> There was always the idea behind it to make an "coordinator" interface
+> type and there is a reason for that because things e.g. filtering
+> becomes different than a non-coordinator interface type (known as node
+> interface in wpan).
+> At the end interface types should make a big difference in how the
+> "role" inside the network should be, which you can also see in
+> wireless as "station"/"access point" interface devices.
+> 
+> A non full functional device should then also not be able to act as a
+> coordinator e.g. it cannot create coordinator types.
 
-okay. Then Miquel starts with fixes of the current code which came up
-recently as we discussed (bouncing address/tx_skb leak/sifs/lifs
-calculation/etc.). If this is done, we can take the rest of the
-patches.
-I am pretty sure Stefan can help here to get the right things sorted
-out between wpan/wpan-next. At the end he will make the next step by
-sending a pull-request to you.
+I've added a few more parameters to be able to reflect the type of
+device (ffd, rfd, rfd_r/tx) and also eventually its coordinator state.
+I've hacked into nl802154 to give these information to the user and let
+it device wether the device (if it's an ffd) should act as a
+coordinator. This is only a first step before we create a real PAN
+creation procedure of course.
 
-- Alex
+I've then adapted the following patches to follow check against the
+device/coordinator state to decide if an operation should be aborted or
+not.
+
+> However we can still make some -EOPNOTSUPP if something in a different
+> way should be done. This clearly breaks userspace and I am not sure if
+> we should worry or not worry about it in the current state of
+> 802.15.4...
+> 
+> - Alex
+
+
+Thanks,
+Miquèl
