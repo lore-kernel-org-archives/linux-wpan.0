@@ -2,21 +2,21 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48849C433FE
-	for <linux-wpan@archiver.kernel.org>; Thu, 20 Jan 2022 00:51:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95452C43217
+	for <linux-wpan@archiver.kernel.org>; Thu, 20 Jan 2022 00:51:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1358005AbiATAvt (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 19 Jan 2022 19:51:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45628 "EHLO
+        id S1358036AbiATAvu (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 19 Jan 2022 19:51:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45652 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1358030AbiATAvp (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 19 Jan 2022 19:51:45 -0500
+        with ESMTP id S1358001AbiATAvt (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 19 Jan 2022 19:51:49 -0500
 Received: from relay11.mail.gandi.net (relay11.mail.gandi.net [IPv6:2001:4b98:dc4:8::231])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6E20C061574;
-        Wed, 19 Jan 2022 16:51:44 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EF64C06161C;
+        Wed, 19 Jan 2022 16:51:47 -0800 (PST)
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id 0B079100006;
-        Thu, 20 Jan 2022 00:51:41 +0000 (UTC)
+        by mail.gandi.net (Postfix) with ESMTPSA id D3FE4100004;
+        Thu, 20 Jan 2022 00:51:44 +0000 (UTC)
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
 To:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
@@ -30,9 +30,9 @@ Cc:     "David S. Miller" <davem@davemloft.net>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
         Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: [wpan-next 12/14] net: mac802154: Add a warning in the hot path
-Date:   Thu, 20 Jan 2022 01:51:20 +0100
-Message-Id: <20220120005122.309104-13-miquel.raynal@bootlin.com>
+Subject: [wpan-next 14/14] net: mac802154: Introduce a synchronous API for MLME commands
+Date:   Thu, 20 Jan 2022 01:51:22 +0100
+Message-Id: <20220120005122.309104-15-miquel.raynal@bootlin.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20220120005122.309104-1-miquel.raynal@bootlin.com>
 References: <20220120005122.309104-1-miquel.raynal@bootlin.com>
@@ -43,29 +43,47 @@ Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-We should never start a transmission after the queue has been stopped.
-
-But because it might work we don't kill the function here but rather
-warn loudly the user that something is wrong.
+This is the slow path, we need to wait for each command to be processed
+before continuing so let's introduce an helper which does the
+transmission and blocks until it gets notified of its asynchronous
+completion. This helper is going to be used when introducing scan
+support.
 
 Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
 ---
- net/mac802154/tx.c | 2 ++
- 1 file changed, 2 insertions(+)
+ net/mac802154/ieee802154_i.h | 1 +
+ net/mac802154/tx.c           | 6 ++++++
+ 2 files changed, 7 insertions(+)
 
+diff --git a/net/mac802154/ieee802154_i.h b/net/mac802154/ieee802154_i.h
+index d9433e07906e..bdec3b9229e4 100644
+--- a/net/mac802154/ieee802154_i.h
++++ b/net/mac802154/ieee802154_i.h
+@@ -123,6 +123,7 @@ extern struct ieee802154_mlme_ops mac802154_mlme_wpan;
+ void ieee802154_rx(struct ieee802154_local *local, struct sk_buff *skb);
+ void ieee802154_xmit_sync_worker(struct work_struct *work);
+ void ieee802154_sync_and_stop_tx(struct ieee802154_local *local);
++void ieee802154_mlme_tx(struct ieee802154_local *local, struct sk_buff *skb);
+ netdev_tx_t
+ ieee802154_monitor_start_xmit(struct sk_buff *skb, struct net_device *dev);
+ netdev_tx_t
 diff --git a/net/mac802154/tx.c b/net/mac802154/tx.c
-index 18ee6fcfcd7f..abd9a057521e 100644
+index 06ae2e6cea43..7c281458942e 100644
 --- a/net/mac802154/tx.c
 +++ b/net/mac802154/tx.c
-@@ -112,6 +112,8 @@ ieee802154_tx(struct ieee802154_local *local, struct sk_buff *skb)
- static netdev_tx_t
- ieee802154_hot_tx(struct ieee802154_local *local, struct sk_buff *skb)
- {
-+	WARN_ON_ONCE(mac802154_queue_is_stopped(local));
-+
- 	return ieee802154_tx(local, skb);
+@@ -126,6 +126,12 @@ void ieee802154_sync_and_stop_tx(struct ieee802154_local *local)
+ 	atomic_dec(&local->phy->hold_txs);
  }
  
++void ieee802154_mlme_tx(struct ieee802154_local *local, struct sk_buff *skb)
++{
++	ieee802154_tx(local, skb);
++	ieee802154_sync_and_stop_tx(local);
++}
++
+ netdev_tx_t
+ ieee802154_monitor_start_xmit(struct sk_buff *skb, struct net_device *dev)
+ {
 -- 
 2.27.0
 
