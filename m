@@ -2,21 +2,21 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06FD6C43217
-	for <linux-wpan@archiver.kernel.org>; Thu, 20 Jan 2022 00:37:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5056EC433EF
+	for <linux-wpan@archiver.kernel.org>; Thu, 20 Jan 2022 00:41:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1357921AbiATAhI (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 19 Jan 2022 19:37:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42288 "EHLO
+        id S237296AbiATAl1 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 19 Jan 2022 19:41:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43266 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1357894AbiATAhE (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 19 Jan 2022 19:37:04 -0500
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::226])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F1FBC06173F;
-        Wed, 19 Jan 2022 16:37:03 -0800 (PST)
+        with ESMTP id S232101AbiATAl1 (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 19 Jan 2022 19:41:27 -0500
+Received: from relay12.mail.gandi.net (relay12.mail.gandi.net [IPv6:2001:4b98:dc4:8::232])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C5CCC061574;
+        Wed, 19 Jan 2022 16:41:26 -0800 (PST)
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id 7619EC0004;
-        Thu, 20 Jan 2022 00:37:00 +0000 (UTC)
+        by relay12.mail.gandi.net (Postfix) with ESMTPSA id E38A7200002;
+        Thu, 20 Jan 2022 00:41:20 +0000 (UTC)
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
 To:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
@@ -24,20 +24,19 @@ To:     Alexander Aring <alex.aring@gmail.com>,
 Cc:     "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
         linux-wireless@vger.kernel.org, Xue Liu <liuxuenetmail@gmail.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Harry Morris <harrymorris12@gmail.com>,
+        Alan Ott <alan@signal11.us>,
+        Varka Bhadram <varkabhadram@gmail.com>,
+        Michael Hennerich <michael.hennerich@analog.com>,
         David Girault <david.girault@qorvo.com>,
         Romuald Despres <romuald.despres@qorvo.com>,
         Frederic Blain <frederic.blain@qorvo.com>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
         Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: [wpan-next 8/9] net: mac802154: Explain the use of ieee802154_wake/stop_queue()
-Date:   Thu, 20 Jan 2022 01:36:44 +0100
-Message-Id: <20220120003645.308498-9-miquel.raynal@bootlin.com>
+Subject: [wpan-next 0/5] ieee802154: Improve symbol duration handling
+Date:   Thu, 20 Jan 2022 01:41:15 +0100
+Message-Id: <20220120004120.308709-1-miquel.raynal@bootlin.com>
 X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20220120003645.308498-1-miquel.raynal@bootlin.com>
-References: <20220120003645.308498-1-miquel.raynal@bootlin.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
@@ -45,46 +44,35 @@ Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-It is not straightforward to the newcomer that a single skb can be sent
-at a time and that the internal process is to stop the queue when
-processing a frame before re-enabling it. Make this clear by documenting
-the ieee802154_wake/stop_queue() helpers.
+These paches try to enhance the support of the various delays by adding
+into the core the necessary logic to derive the actual symbol duration
+(and then the lifs/sifs durations) depending on the protocol used.
 
-Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
----
- include/net/mac802154.h | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+Miquel Raynal (5):
+  net: ieee802154: Improve the way supported channels are declared
+  net: ieee802154: Give more details to the core about the channel
+    configurations
+  net: mac802154: Convert the symbol duration into nanoseconds
+  net: mac802154: Set the symbol duration automatically
+  net: ieee802154: Drop duration settings when the core does it already
 
-diff --git a/include/net/mac802154.h b/include/net/mac802154.h
-index d524ffb9eb25..94b2e3008e77 100644
---- a/include/net/mac802154.h
-+++ b/include/net/mac802154.h
-@@ -464,6 +464,12 @@ void ieee802154_rx_irqsafe(struct ieee802154_hw *hw, struct sk_buff *skb,
-  * ieee802154_wake_queue - wake ieee802154 queue
-  * @hw: pointer as obtained from ieee802154_alloc_hw().
-  *
-+ * Tranceivers have either one transmit framebuffer or one framebuffer for both
-+ * transmitting and receiving. Hence, the core only handles one frame at a time
-+ * for each phy, which means we had to stop the queue to avoid new skb to come
-+ * during the transmission. The queue then needs to be woken up after the
-+ * operation.
-+ *
-  * Drivers should use this function instead of netif_wake_queue.
-  */
- void ieee802154_wake_queue(struct ieee802154_hw *hw);
-@@ -472,6 +478,12 @@ void ieee802154_wake_queue(struct ieee802154_hw *hw);
-  * ieee802154_stop_queue - stop ieee802154 queue
-  * @hw: pointer as obtained from ieee802154_alloc_hw().
-  *
-+ * Tranceivers have either one transmit framebuffer or one framebuffer for both
-+ * transmitting and receiving. Hence, the core only handles one frame at a time
-+ * for each phy, which means we need to tell upper layers to stop giving us new
-+ * skbs while we are busy with the transmitted one. The queue must then be
-+ * stopped before transmitting.
-+ *
-  * Drivers should use this function instead of netif_stop_queue.
-  */
- void ieee802154_stop_queue(struct ieee802154_hw *hw);
+ drivers/net/ieee802154/adf7242.c         |   3 +-
+ drivers/net/ieee802154/at86rf230.c       |  66 ++++++-------
+ drivers/net/ieee802154/atusb.c           |  66 ++++++-------
+ drivers/net/ieee802154/ca8210.c          |   7 +-
+ drivers/net/ieee802154/cc2520.c          |   3 +-
+ drivers/net/ieee802154/fakelb.c          |  43 ++++++---
+ drivers/net/ieee802154/mac802154_hwsim.c |  76 ++++++++++++---
+ drivers/net/ieee802154/mcr20a.c          |  11 +--
+ drivers/net/ieee802154/mrf24j40.c        |   3 +-
+ include/net/cfg802154.h                  |  60 +++++++++++-
+ net/ieee802154/core.h                    |   2 +
+ net/ieee802154/nl-phy.c                  |   8 +-
+ net/ieee802154/nl802154.c                |  30 ++++--
+ net/mac802154/cfg.c                      |   1 +
+ net/mac802154/main.c                     | 113 ++++++++++++++++++++++-
+ 15 files changed, 361 insertions(+), 131 deletions(-)
+
 -- 
 2.27.0
 
