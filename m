@@ -2,84 +2,96 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 906A9C433EF
-	for <linux-wpan@archiver.kernel.org>; Thu, 20 Jan 2022 14:28:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15CDAC433EF
+	for <linux-wpan@archiver.kernel.org>; Thu, 20 Jan 2022 22:53:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347046AbiATO2a convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-wpan@archiver.kernel.org>);
-        Thu, 20 Jan 2022 09:28:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60100 "EHLO
+        id S1347719AbiATWxL (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Thu, 20 Jan 2022 17:53:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33644 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347393AbiATO2S (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 20 Jan 2022 09:28:18 -0500
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::226])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE9DBC061574;
-        Thu, 20 Jan 2022 06:28:17 -0800 (PST)
-Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id B07BAC000E;
-        Thu, 20 Jan 2022 14:28:14 +0000 (UTC)
-Date:   Thu, 20 Jan 2022 15:28:13 +0100
-From:   Miquel Raynal <miquel.raynal@bootlin.com>
-To:     Kalle Valo <kvalo@kernel.org>
-Cc:     Alexander Aring <alex.aring@gmail.com>,
-        Stefan Schmidt <stefan@datenfreihafen.org>,
-        linux-wpan@vger.kernel.org,
+        with ESMTP id S1347411AbiATWxL (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 20 Jan 2022 17:53:11 -0500
+Received: from mail-wm1-x32a.google.com (mail-wm1-x32a.google.com [IPv6:2a00:1450:4864:20::32a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD02AC061574;
+        Thu, 20 Jan 2022 14:53:10 -0800 (PST)
+Received: by mail-wm1-x32a.google.com with SMTP id w26so14918274wmi.0;
+        Thu, 20 Jan 2022 14:53:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=K61/M+xTTQGp0Mgz98g6GfPkiFK49OXLdi5dVmoErxc=;
+        b=Wb3OBpyeO6SX5ILh9uYqoncMxkaTfjem5R2kSgS/1PA1esE9ZQ7aZnV1iATYnzkLKX
+         qmfnFYMXvqxlvLAc0pStPZaHvJYJjP4z35hj+w0vsdtAx1Q4jHX3CtTowjkhMu0sWFLC
+         MjcQ85l9HU/iTR5yg2Y/QFrqgCcaPjeAk29cIgk6r72f3eDM5rlkda3T8b7i1weBo75c
+         GHyZrOqHCtxIdRsQiyL3jHVfryS5ilMD4ocVxMNZAfckXVskS1/PCIvevLmxlLhXw/L0
+         AklZXY/NJ3Ok3FvNNlkJjFcROl6gZXL8/Q3udK/hDhGHowZXv8f6VzVTXqvigxXSislt
+         pFDg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=K61/M+xTTQGp0Mgz98g6GfPkiFK49OXLdi5dVmoErxc=;
+        b=PKbQ0w18Z114fxYazUI8byjQy9ru/1g8jxcvQR8zxxQ3H+9qPYrwHRlHcmgJqZzWaz
+         8P7iwM/JuS9gONPusevUsqvA7tDkqYx0Ne9fyTx1pNEfQPcn7IrakUON8dyGoFXRuDDU
+         9gZmk4lmmtflXyntl6Sfr58UcMOVU2btXHYzE5kTT43olp/vSVpXaxoegl837QMIwKSz
+         du5RTmY7pDjbI8MMd0r3AqknAjj63MzEtc4GX/zi/UCh1RU+nF+75DmqkAOsnvRC+3c4
+         mJjjcOxk6G7ewZt/JiA9ansO1D0T07iYHgzKl/bB0Nh3Ry7I5rcw4q5rNJRgYHVoZawp
+         3zAw==
+X-Gm-Message-State: AOAM531K8lm6wc6t9EhWjibPv57aqkvyLcwPBCh3J/2tWAXWPCI2Pj4R
+        wLs5wZBUctqJqVHfwQgqRtmP+3wwCq6f98ogxa4=
+X-Google-Smtp-Source: ABdhPJx5Cz0PLl7dVhNHb/aoG1g6y2wJZ4EoEzDptty8AnTOnKll/vjpum1fYafeAvpnxhEy/fZSnQErGTWg7TtHGhw=
+X-Received: by 2002:a05:6000:1686:: with SMTP id y6mr1134790wrd.205.1642719189132;
+ Thu, 20 Jan 2022 14:53:09 -0800 (PST)
+MIME-Version: 1.0
+References: <20220120112115.448077-1-miquel.raynal@bootlin.com>
+In-Reply-To: <20220120112115.448077-1-miquel.raynal@bootlin.com>
+From:   Alexander Aring <alex.aring@gmail.com>
+Date:   Thu, 20 Jan 2022 17:52:57 -0500
+Message-ID: <CAB_54W5_dALTBdvXSRMpiEJBFTqVkzewHJcBjgLn79=Ku6cR9A@mail.gmail.com>
+Subject: Re: [wpan-next v2 0/9] ieee802154: A bunch of fixes
+To:     Miquel Raynal <miquel.raynal@bootlin.com>,
+        Stefan Schmidt <stefan@datenfreihafen.org>
+Cc:     linux-wpan - ML <linux-wpan@vger.kernel.org>,
         "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-        linux-wireless@vger.kernel.org,
+        Jakub Kicinski <kuba@kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
+        Xue Liu <liuxuenetmail@gmail.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Harry Morris <harrymorris12@gmail.com>,
         David Girault <david.girault@qorvo.com>,
         Romuald Despres <romuald.despres@qorvo.com>,
         Frederic Blain <frederic.blain@qorvo.com>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [wpan-next 0/4] ieee802154: General preparation to scan support
-Message-ID: <20220120152813.32e4b288@xps13>
-In-Reply-To: <87r192imcy.fsf@tynnyri.adurom.net>
-References: <20220120004350.308866-1-miquel.raynal@bootlin.com>
-        <87r192imcy.fsf@tynnyri.adurom.net>
-Organization: Bootlin
-X-Mailer: Claws Mail 3.17.7 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi Kalle,
+Hi,
 
-kvalo@kernel.org wrote on Thu, 20 Jan 2022 15:10:37 +0200:
+On Thu, 20 Jan 2022 at 06:21, Miquel Raynal <miquel.raynal@bootlin.com> wrote:
+>
+> In preparation to a wider series, here are a number of small and random
+> fixes across the subsystem.
+>
+> Changes in v2:
+> * Fixed the build error reported by a robot. It ended up being something
+>   which I fixed in a commit from a following series. I've now sorted
+>   this out and the patch now works on its own.
+>
 
-> Miquel Raynal <miquel.raynal@bootlin.com> writes:
-> 
-> > These few patches are preparation patches and light cleanups before the
-> > introduction of scan support.
-> >
-> > David Girault (4):
-> >   net: ieee802154: Move IEEE 802.15.4 Kconfig main entry
-> >   net: mac802154: Include the softMAC stack inside the IEEE 802.15.4
-> >     menu
-> >   net: ieee802154: Move the address structure earlier
-> >   net: ieee802154: Add a kernel doc header to the ieee802154_addr
-> >     structure
-> >
-> >  include/net/cfg802154.h | 28 +++++++++++++++++++---------
-> >  net/Kconfig             |  3 +--
-> >  net/ieee802154/Kconfig  |  1 +
-> >  3 files changed, 21 insertions(+), 11 deletions(-)  
-> 
-> Is there a reason why you cc linux-wireless? It looks like there's a
-> separate linux-wpan list now and people who are interested about wpan
-> can join that list, right?
-> 
+This patch series should be reviewed first and have all current
+detected fixes, it also should be tagged "wpan" (no need to fix that
+now). Then there is a following up series for a new feature which you
+like to tackle, maybe the "more generic symbol duration handling"? It
+should be based on this "fixes" patch series, Stefan will then get
+things sorted out to queue them right for upstream.
+Stefan, please correct me if I'm wrong.
 
-I originally was advised to cc linux-wireless@ on my scanning series,
-and I ended up with too many patches, leading to numerous smaller
-series.
+Also, please give me the weekend to review this patch series.
 
-I actually forgot to drop this list from the Cc list in the preparation
-patches for this version, I did however dropped it in the v2. Sorry for
-the noise.
+Thanks.
 
-Thanks,
-Miquèl
+- Alex
