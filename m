@@ -2,88 +2,151 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95452C43217
-	for <linux-wpan@archiver.kernel.org>; Thu, 20 Jan 2022 00:51:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B018C433F5
+	for <linux-wpan@archiver.kernel.org>; Thu, 20 Jan 2022 07:31:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1358036AbiATAvu (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 19 Jan 2022 19:51:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45652 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1358001AbiATAvt (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 19 Jan 2022 19:51:49 -0500
-Received: from relay11.mail.gandi.net (relay11.mail.gandi.net [IPv6:2001:4b98:dc4:8::231])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EF64C06161C;
-        Wed, 19 Jan 2022 16:51:47 -0800 (PST)
-Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id D3FE4100004;
-        Thu, 20 Jan 2022 00:51:44 +0000 (UTC)
-From:   Miquel Raynal <miquel.raynal@bootlin.com>
-To:     Alexander Aring <alex.aring@gmail.com>,
+        id S1359017AbiATHb5 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Thu, 20 Jan 2022 02:31:57 -0500
+Received: from mga17.intel.com ([192.55.52.151]:39039 "EHLO mga17.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1359009AbiATHb5 (ORCPT <rfc822;linux-wpan@vger.kernel.org>);
+        Thu, 20 Jan 2022 02:31:57 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1642663917; x=1674199917;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=7VYqLA8ntt7Lp1slrzIzKJovESqU7n1mPeZ9Fqm4IB8=;
+  b=V+cI2lBg588Kf45OyAZ/EXUzXnORV8Fl5g0IjPBpgvsTM1OFrWuYwOy6
+   YVcyqmW2knOC2BlOCZuc711ZnjXIujGH8t0YKysD7bmg6r0BgUwxaktpx
+   PXWBEH2oc/wmY2835KDBcp9RURalCprhMpHYVu/aR0rgnqOyB91CjCtbb
+   QSjpu2TXMaBdX2D/cYuhtsQhCJlOT86618yEmWdThZJ47Yz8v8urNnbBL
+   o/FDArcyUfZSICs9E/LB/29pVT4cFf7f9OYfQebF0RJpwvDycWbSMk7pk
+   KGg8cUeMEktsYEFYTBbjv1HLIOrcyEXDOXbxh9gfdNYFU46pmJNVCBvO7
+   Q==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10232"; a="225963657"
+X-IronPort-AV: E=Sophos;i="5.88,301,1635231600"; 
+   d="scan'208";a="225963657"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jan 2022 23:31:56 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.88,301,1635231600"; 
+   d="scan'208";a="475430889"
+Received: from lkp-server01.sh.intel.com (HELO 276f1b88eecb) ([10.239.97.150])
+  by orsmga003.jf.intel.com with ESMTP; 19 Jan 2022 23:31:53 -0800
+Received: from kbuild by 276f1b88eecb with local (Exim 4.92)
+        (envelope-from <lkp@intel.com>)
+        id 1nARvE-000E73-RZ; Thu, 20 Jan 2022 07:31:52 +0000
+Date:   Thu, 20 Jan 2022 15:31:39 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Miquel Raynal <miquel.raynal@bootlin.com>,
+        Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
         linux-wpan@vger.kernel.org
-Cc:     "David S. Miller" <davem@davemloft.net>,
+Cc:     llvm@lists.linux.dev, kbuild-all@lists.01.org,
         Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-        linux-wireless@vger.kernel.org,
-        David Girault <david.girault@qorvo.com>,
-        Romuald Despres <romuald.despres@qorvo.com>,
-        Frederic Blain <frederic.blain@qorvo.com>,
-        Nicolas Schodet <nico@ni.fr.eu.org>,
-        Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-        Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: [wpan-next 14/14] net: mac802154: Introduce a synchronous API for MLME commands
-Date:   Thu, 20 Jan 2022 01:51:22 +0100
-Message-Id: <20220120005122.309104-15-miquel.raynal@bootlin.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20220120005122.309104-1-miquel.raynal@bootlin.com>
-References: <20220120005122.309104-1-miquel.raynal@bootlin.com>
+        linux-wireless@vger.kernel.org, Xue Liu <liuxuenetmail@gmail.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Harry Morris <harrymorris12@gmail.com>,
+        David Girault <david.girault@qorvo.com>
+Subject: Re: [wpan-next 5/9] net: ieee802154: ca8210: Stop leaking skb's
+Message-ID: <202201201557.38baVRVX-lkp@intel.com>
+References: <20220120003645.308498-6-miquel.raynal@bootlin.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220120003645.308498-6-miquel.raynal@bootlin.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-This is the slow path, we need to wait for each command to be processed
-before continuing so let's introduce an helper which does the
-transmission and blocks until it gets notified of its asynchronous
-completion. This helper is going to be used when introducing scan
-support.
+Hi Miquel,
 
-Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
+I love your patch! Yet something to improve:
+
+[auto build test ERROR on linus/master]
+[also build test ERROR on v5.16 next-20220120]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch]
+
+url:    https://github.com/0day-ci/linux/commits/Miquel-Raynal/ieee802154-A-bunch-of-fixes/20220120-083906
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git 1d1df41c5a33359a00e919d54eaebfb789711fdc
+config: i386-randconfig-a013 (https://download.01.org/0day-ci/archive/20220120/202201201557.38baVRVX-lkp@intel.com/config)
+compiler: clang version 14.0.0 (https://github.com/llvm/llvm-project f7b7138a62648f4019c55e4671682af1f851f295)
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://github.com/0day-ci/linux/commit/77d3026b30aff560ef269d03aecc09f8c46a9173
+        git remote add linux-review https://github.com/0day-ci/linux
+        git fetch --no-tags linux-review Miquel-Raynal/ieee802154-A-bunch-of-fixes/20220120-083906
+        git checkout 77d3026b30aff560ef269d03aecc09f8c46a9173
+        # save the config file to linux build tree
+        mkdir build_dir
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=i386 SHELL=/bin/bash drivers/net/ieee802154/
+
+If you fix the issue, kindly add following tag as appropriate
+Reported-by: kernel test robot <lkp@intel.com>
+
+All errors (new ones prefixed by >>):
+
+>> drivers/net/ieee802154/ca8210.c:1775:22: error: use of undeclared identifier 'atusb'
+                           dev_kfree_skb_any(atusb->tx_skb);
+                                             ^
+   1 error generated.
+
+
+vim +/atusb +1775 drivers/net/ieee802154/ca8210.c
+
+  1737	
+  1738	/**
+  1739	 * ca8210_async_xmit_complete() - Called to announce that an asynchronous
+  1740	 *                                transmission has finished
+  1741	 * @hw:          ieee802154_hw of ca8210 that has finished exchange
+  1742	 * @msduhandle:  Identifier of transmission that has completed
+  1743	 * @status:      Returned 802.15.4 status code of the transmission
+  1744	 *
+  1745	 * Return: 0 or linux error code
+  1746	 */
+  1747	static int ca8210_async_xmit_complete(
+  1748		struct ieee802154_hw  *hw,
+  1749		u8                     msduhandle,
+  1750		u8                     status)
+  1751	{
+  1752		struct ca8210_priv *priv = hw->priv;
+  1753	
+  1754		if (priv->nextmsduhandle != msduhandle) {
+  1755			dev_err(
+  1756				&priv->spi->dev,
+  1757				"Unexpected msdu_handle on data confirm, Expected %d, got %d\n",
+  1758				priv->nextmsduhandle,
+  1759				msduhandle
+  1760			);
+  1761			return -EIO;
+  1762		}
+  1763	
+  1764		priv->async_tx_pending = false;
+  1765		priv->nextmsduhandle++;
+  1766	
+  1767		if (status) {
+  1768			dev_err(
+  1769				&priv->spi->dev,
+  1770				"Link transmission unsuccessful, status = %d\n",
+  1771				status
+  1772			);
+  1773			if (status != MAC_TRANSACTION_OVERFLOW) {
+  1774				ieee802154_wake_queue(priv->hw);
+> 1775				dev_kfree_skb_any(atusb->tx_skb);
+  1776				return 0;
+  1777			}
+  1778		}
+  1779		ieee802154_xmit_complete(priv->hw, priv->tx_skb, true);
+  1780	
+  1781		return 0;
+  1782	}
+  1783	
+
 ---
- net/mac802154/ieee802154_i.h | 1 +
- net/mac802154/tx.c           | 6 ++++++
- 2 files changed, 7 insertions(+)
-
-diff --git a/net/mac802154/ieee802154_i.h b/net/mac802154/ieee802154_i.h
-index d9433e07906e..bdec3b9229e4 100644
---- a/net/mac802154/ieee802154_i.h
-+++ b/net/mac802154/ieee802154_i.h
-@@ -123,6 +123,7 @@ extern struct ieee802154_mlme_ops mac802154_mlme_wpan;
- void ieee802154_rx(struct ieee802154_local *local, struct sk_buff *skb);
- void ieee802154_xmit_sync_worker(struct work_struct *work);
- void ieee802154_sync_and_stop_tx(struct ieee802154_local *local);
-+void ieee802154_mlme_tx(struct ieee802154_local *local, struct sk_buff *skb);
- netdev_tx_t
- ieee802154_monitor_start_xmit(struct sk_buff *skb, struct net_device *dev);
- netdev_tx_t
-diff --git a/net/mac802154/tx.c b/net/mac802154/tx.c
-index 06ae2e6cea43..7c281458942e 100644
---- a/net/mac802154/tx.c
-+++ b/net/mac802154/tx.c
-@@ -126,6 +126,12 @@ void ieee802154_sync_and_stop_tx(struct ieee802154_local *local)
- 	atomic_dec(&local->phy->hold_txs);
- }
- 
-+void ieee802154_mlme_tx(struct ieee802154_local *local, struct sk_buff *skb)
-+{
-+	ieee802154_tx(local, skb);
-+	ieee802154_sync_and_stop_tx(local);
-+}
-+
- netdev_tx_t
- ieee802154_monitor_start_xmit(struct sk_buff *skb, struct net_device *dev)
- {
--- 
-2.27.0
-
+0-DAY CI Kernel Test Service, Intel Corporation
+https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
