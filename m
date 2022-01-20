@@ -2,18 +2,18 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FC7CC433F5
-	for <linux-wpan@archiver.kernel.org>; Thu, 20 Jan 2022 11:21:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC3C3C4332F
+	for <linux-wpan@archiver.kernel.org>; Thu, 20 Jan 2022 11:21:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231132AbiATLVk (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Thu, 20 Jan 2022 06:21:40 -0500
-Received: from relay6-d.mail.gandi.net ([217.70.183.198]:48071 "EHLO
+        id S229696AbiATLVn (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Thu, 20 Jan 2022 06:21:43 -0500
+Received: from relay6-d.mail.gandi.net ([217.70.183.198]:34285 "EHLO
         relay6-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229696AbiATLV2 (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 20 Jan 2022 06:21:28 -0500
+        with ESMTP id S231149AbiATLVa (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 20 Jan 2022 06:21:30 -0500
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id 0BA01C0006;
-        Thu, 20 Jan 2022 11:21:25 +0000 (UTC)
+        by mail.gandi.net (Postfix) with ESMTPSA id ACAA9C000C;
+        Thu, 20 Jan 2022 11:21:27 +0000 (UTC)
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
 To:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
@@ -29,9 +29,9 @@ Cc:     "David S. Miller" <davem@davemloft.net>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
         Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: [wpan-next v2 5/9] net: ieee802154: ca8210: Stop leaking skb's
-Date:   Thu, 20 Jan 2022 12:21:11 +0100
-Message-Id: <20220120112115.448077-6-miquel.raynal@bootlin.com>
+Subject: [wpan-next v2 6/9] net: ieee802154: Use the IEEE802154_MAX_PAGE define when relevant
+Date:   Thu, 20 Jan 2022 12:21:12 +0100
+Message-Id: <20220120112115.448077-7-miquel.raynal@bootlin.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20220120112115.448077-1-miquel.raynal@bootlin.com>
 References: <20220120112115.448077-1-miquel.raynal@bootlin.com>
@@ -42,29 +42,36 @@ Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Upon error the ieee802154_xmit_complete() helper is not called. Only
-ieee802154_wake_queue() is called manually. We then leak the skb
-structure.
+This define already exist but is hardcoded in nl-phy.c. Use the
+definition when relevant.
 
-Free the skb structure upon error before returning.
-
-Fixes: ded845a781a5 ("ieee802154: Add CA8210 IEEE 802.15.4 device driver")
 Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
 ---
- drivers/net/ieee802154/ca8210.c | 1 +
- 1 file changed, 1 insertion(+)
+ net/ieee802154/nl-phy.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ieee802154/ca8210.c b/drivers/net/ieee802154/ca8210.c
-index ece6ff6049f6..8e69441f1fff 100644
---- a/drivers/net/ieee802154/ca8210.c
-+++ b/drivers/net/ieee802154/ca8210.c
-@@ -1772,6 +1772,7 @@ static int ca8210_async_xmit_complete(
- 		);
- 		if (status != MAC_TRANSACTION_OVERFLOW) {
- 			ieee802154_wake_queue(priv->hw);
-+			dev_kfree_skb_any(priv->tx_skb);
- 			return 0;
- 		}
+diff --git a/net/ieee802154/nl-phy.c b/net/ieee802154/nl-phy.c
+index dd5a45f8a78a..02f6a53d0faa 100644
+--- a/net/ieee802154/nl-phy.c
++++ b/net/ieee802154/nl-phy.c
+@@ -30,7 +30,8 @@ static int ieee802154_nl_fill_phy(struct sk_buff *msg, u32 portid,
+ {
+ 	void *hdr;
+ 	int i, pages = 0;
+-	uint32_t *buf = kcalloc(32, sizeof(uint32_t), GFP_KERNEL);
++	uint32_t *buf = kcalloc(IEEE802154_MAX_PAGE + 1, sizeof(uint32_t),
++				GFP_KERNEL);
+ 
+ 	pr_debug("%s\n", __func__);
+ 
+@@ -47,7 +48,7 @@ static int ieee802154_nl_fill_phy(struct sk_buff *msg, u32 portid,
+ 	    nla_put_u8(msg, IEEE802154_ATTR_PAGE, phy->current_page) ||
+ 	    nla_put_u8(msg, IEEE802154_ATTR_CHANNEL, phy->current_channel))
+ 		goto nla_put_failure;
+-	for (i = 0; i < 32; i++) {
++	for (i = 0; i <= IEEE802154_MAX_PAGE; i++) {
+ 		if (phy->supported.channels[i])
+ 			buf[pages++] = phy->supported.channels[i] | (i << 27);
  	}
 -- 
 2.27.0
