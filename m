@@ -2,18 +2,21 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA7E9C433FE
-	for <linux-wpan@archiver.kernel.org>; Thu, 20 Jan 2022 00:37:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B68AC433EF
+	for <linux-wpan@archiver.kernel.org>; Thu, 20 Jan 2022 00:37:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1357893AbiATAhE (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 19 Jan 2022 19:37:04 -0500
-Received: from relay6-d.mail.gandi.net ([217.70.183.198]:57505 "EHLO
-        relay6-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1357851AbiATAhB (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 19 Jan 2022 19:37:01 -0500
+        id S1357909AbiATAhH (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 19 Jan 2022 19:37:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42292 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1357877AbiATAhF (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 19 Jan 2022 19:37:05 -0500
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::226])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25D21C061401;
+        Wed, 19 Jan 2022 16:37:04 -0800 (PST)
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id BC868C0003;
-        Thu, 20 Jan 2022 00:36:58 +0000 (UTC)
+        by mail.gandi.net (Postfix) with ESMTPSA id 24F60C0007;
+        Thu, 20 Jan 2022 00:37:02 +0000 (UTC)
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
 To:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
@@ -29,9 +32,9 @@ Cc:     "David S. Miller" <davem@davemloft.net>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
         Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: [wpan-next 7/9] net: ieee802154: Return meaningful error codes from the netlink helpers
-Date:   Thu, 20 Jan 2022 01:36:43 +0100
-Message-Id: <20220120003645.308498-8-miquel.raynal@bootlin.com>
+Subject: [wpan-next 9/9] MAINTAINERS: Remove Harry Morris bouncing address
+Date:   Thu, 20 Jan 2022 01:36:45 +0100
+Message-Id: <20220120003645.308498-10-miquel.raynal@bootlin.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20220120003645.308498-1-miquel.raynal@bootlin.com>
 References: <20220120003645.308498-1-miquel.raynal@bootlin.com>
@@ -42,55 +45,30 @@ Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Returning -1 does not indicate anything useful.
-
-Use a standard and meaningful error code instead.
+Harry's e-mail address from Cascoda bounces, I have not found any
+contributions from him since 2018 so let's drop the Maintainer entry
+from the CA8210 driver and mark it Orphan.
 
 Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
 ---
- net/ieee802154/nl802154.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ MAINTAINERS | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/net/ieee802154/nl802154.c b/net/ieee802154/nl802154.c
-index 277124f206e0..e0b072aecf0f 100644
---- a/net/ieee802154/nl802154.c
-+++ b/net/ieee802154/nl802154.c
-@@ -1441,7 +1441,7 @@ static int nl802154_send_key(struct sk_buff *msg, u32 cmd, u32 portid,
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 4d479b554361..ab2b32080b73 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -4099,9 +4099,8 @@ N:	csky
+ K:	csky
  
- 	hdr = nl802154hdr_put(msg, portid, seq, flags, cmd);
- 	if (!hdr)
--		return -1;
-+		return -ENOBUFS;
- 
- 	if (nla_put_u32(msg, NL802154_ATTR_IFINDEX, dev->ifindex))
- 		goto nla_put_failure;
-@@ -1634,7 +1634,7 @@ static int nl802154_send_device(struct sk_buff *msg, u32 cmd, u32 portid,
- 
- 	hdr = nl802154hdr_put(msg, portid, seq, flags, cmd);
- 	if (!hdr)
--		return -1;
-+		return -ENOBUFS;
- 
- 	if (nla_put_u32(msg, NL802154_ATTR_IFINDEX, dev->ifindex))
- 		goto nla_put_failure;
-@@ -1812,7 +1812,7 @@ static int nl802154_send_devkey(struct sk_buff *msg, u32 cmd, u32 portid,
- 
- 	hdr = nl802154hdr_put(msg, portid, seq, flags, cmd);
- 	if (!hdr)
--		return -1;
-+		return -ENOBUFS;
- 
- 	if (nla_put_u32(msg, NL802154_ATTR_IFINDEX, dev->ifindex))
- 		goto nla_put_failure;
-@@ -1988,7 +1988,7 @@ static int nl802154_send_seclevel(struct sk_buff *msg, u32 cmd, u32 portid,
- 
- 	hdr = nl802154hdr_put(msg, portid, seq, flags, cmd);
- 	if (!hdr)
--		return -1;
-+		return -ENOBUFS;
- 
- 	if (nla_put_u32(msg, NL802154_ATTR_IFINDEX, dev->ifindex))
- 		goto nla_put_failure;
+ CA8210 IEEE-802.15.4 RADIO DRIVER
+-M:	Harry Morris <h.morris@cascoda.com>
+ L:	linux-wpan@vger.kernel.org
+-S:	Maintained
++S:	Orphan
+ W:	https://github.com/Cascoda/ca8210-linux.git
+ F:	Documentation/devicetree/bindings/net/ieee802154/ca8210.txt
+ F:	drivers/net/ieee802154/ca8210.c
 -- 
 2.27.0
 
