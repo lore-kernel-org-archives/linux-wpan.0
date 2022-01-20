@@ -2,21 +2,21 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B68AC433EF
-	for <linux-wpan@archiver.kernel.org>; Thu, 20 Jan 2022 00:37:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06FD6C43217
+	for <linux-wpan@archiver.kernel.org>; Thu, 20 Jan 2022 00:37:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1357909AbiATAhH (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 19 Jan 2022 19:37:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42292 "EHLO
+        id S1357921AbiATAhI (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 19 Jan 2022 19:37:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42288 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1357877AbiATAhF (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 19 Jan 2022 19:37:05 -0500
+        with ESMTP id S1357894AbiATAhE (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 19 Jan 2022 19:37:04 -0500
 Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::226])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25D21C061401;
-        Wed, 19 Jan 2022 16:37:04 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F1FBC06173F;
+        Wed, 19 Jan 2022 16:37:03 -0800 (PST)
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id 24F60C0007;
-        Thu, 20 Jan 2022 00:37:02 +0000 (UTC)
+        by mail.gandi.net (Postfix) with ESMTPSA id 7619EC0004;
+        Thu, 20 Jan 2022 00:37:00 +0000 (UTC)
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
 To:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
@@ -32,9 +32,9 @@ Cc:     "David S. Miller" <davem@davemloft.net>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
         Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: [wpan-next 9/9] MAINTAINERS: Remove Harry Morris bouncing address
-Date:   Thu, 20 Jan 2022 01:36:45 +0100
-Message-Id: <20220120003645.308498-10-miquel.raynal@bootlin.com>
+Subject: [wpan-next 8/9] net: mac802154: Explain the use of ieee802154_wake/stop_queue()
+Date:   Thu, 20 Jan 2022 01:36:44 +0100
+Message-Id: <20220120003645.308498-9-miquel.raynal@bootlin.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20220120003645.308498-1-miquel.raynal@bootlin.com>
 References: <20220120003645.308498-1-miquel.raynal@bootlin.com>
@@ -45,30 +45,46 @@ Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Harry's e-mail address from Cascoda bounces, I have not found any
-contributions from him since 2018 so let's drop the Maintainer entry
-from the CA8210 driver and mark it Orphan.
+It is not straightforward to the newcomer that a single skb can be sent
+at a time and that the internal process is to stop the queue when
+processing a frame before re-enabling it. Make this clear by documenting
+the ieee802154_wake/stop_queue() helpers.
 
 Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
 ---
- MAINTAINERS | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ include/net/mac802154.h | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 4d479b554361..ab2b32080b73 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -4099,9 +4099,8 @@ N:	csky
- K:	csky
- 
- CA8210 IEEE-802.15.4 RADIO DRIVER
--M:	Harry Morris <h.morris@cascoda.com>
- L:	linux-wpan@vger.kernel.org
--S:	Maintained
-+S:	Orphan
- W:	https://github.com/Cascoda/ca8210-linux.git
- F:	Documentation/devicetree/bindings/net/ieee802154/ca8210.txt
- F:	drivers/net/ieee802154/ca8210.c
+diff --git a/include/net/mac802154.h b/include/net/mac802154.h
+index d524ffb9eb25..94b2e3008e77 100644
+--- a/include/net/mac802154.h
++++ b/include/net/mac802154.h
+@@ -464,6 +464,12 @@ void ieee802154_rx_irqsafe(struct ieee802154_hw *hw, struct sk_buff *skb,
+  * ieee802154_wake_queue - wake ieee802154 queue
+  * @hw: pointer as obtained from ieee802154_alloc_hw().
+  *
++ * Tranceivers have either one transmit framebuffer or one framebuffer for both
++ * transmitting and receiving. Hence, the core only handles one frame at a time
++ * for each phy, which means we had to stop the queue to avoid new skb to come
++ * during the transmission. The queue then needs to be woken up after the
++ * operation.
++ *
+  * Drivers should use this function instead of netif_wake_queue.
+  */
+ void ieee802154_wake_queue(struct ieee802154_hw *hw);
+@@ -472,6 +478,12 @@ void ieee802154_wake_queue(struct ieee802154_hw *hw);
+  * ieee802154_stop_queue - stop ieee802154 queue
+  * @hw: pointer as obtained from ieee802154_alloc_hw().
+  *
++ * Tranceivers have either one transmit framebuffer or one framebuffer for both
++ * transmitting and receiving. Hence, the core only handles one frame at a time
++ * for each phy, which means we need to tell upper layers to stop giving us new
++ * skbs while we are busy with the transmitted one. The queue must then be
++ * stopped before transmitting.
++ *
+  * Drivers should use this function instead of netif_stop_queue.
+  */
+ void ieee802154_stop_queue(struct ieee802154_hw *hw);
 -- 
 2.27.0
 
