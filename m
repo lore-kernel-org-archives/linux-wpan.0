@@ -2,23 +2,26 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BDECC433EF
-	for <linux-wpan@archiver.kernel.org>; Tue, 25 Jan 2022 11:13:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F16C1C433EF
+	for <linux-wpan@archiver.kernel.org>; Tue, 25 Jan 2022 11:37:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1380282AbiAYLNq convert rfc822-to-8bit (ORCPT
+        id S1378448AbiAYLgy convert rfc822-to-8bit (ORCPT
         <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 25 Jan 2022 06:13:46 -0500
-Received: from relay9-d.mail.gandi.net ([217.70.183.199]:46795 "EHLO
-        relay9-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1380842AbiAYLLS (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 25 Jan 2022 06:11:18 -0500
+        Tue, 25 Jan 2022 06:36:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53700 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1350694AbiAYLdD (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 25 Jan 2022 06:33:03 -0500
+Received: from relay12.mail.gandi.net (relay12.mail.gandi.net [IPv6:2001:4b98:dc4:8::232])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5962C061744;
+        Tue, 25 Jan 2022 03:33:00 -0800 (PST)
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id E4114FF80E;
-        Tue, 25 Jan 2022 11:10:42 +0000 (UTC)
-Date:   Tue, 25 Jan 2022 12:10:41 +0100
+        by relay12.mail.gandi.net (Postfix) with ESMTPSA id A601420000A;
+        Tue, 25 Jan 2022 11:32:56 +0000 (UTC)
+Date:   Tue, 25 Jan 2022 12:32:55 +0100
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
-To:     Stefan Schmidt <stefan@datenfreihafen.org>
-Cc:     Alexander Aring <alex.aring@gmail.com>,
+To:     Alexander Aring <alex.aring@gmail.com>
+Cc:     Stefan Schmidt <stefan@datenfreihafen.org>,
         linux-wpan - ML <linux-wpan@vger.kernel.org>,
         "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
@@ -31,14 +34,13 @@ Cc:     Alexander Aring <alex.aring@gmail.com>,
         Frederic Blain <frederic.blain@qorvo.com>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [wpan-next v2 6/9] net: ieee802154: Use the IEEE802154_MAX_PAGE
- define when relevant
-Message-ID: <20220125121041.391d60c3@xps13>
-In-Reply-To: <7287b3d9-dbdd-c2c3-01c7-1f272749ebb9@datenfreihafen.org>
+Subject: Re: [wpan-next v2 8/9] net: mac802154: Explain the use of
+ ieee802154_wake/stop_queue()
+Message-ID: <20220125123255.05fef400@xps13>
+In-Reply-To: <CAB_54W6dCoEinhdq-HAQj0CQ9_wf-xK9ESOfvB6K4JMwHo7Vaw@mail.gmail.com>
 References: <20220120112115.448077-1-miquel.raynal@bootlin.com>
-        <20220120112115.448077-7-miquel.raynal@bootlin.com>
-        <CAB_54W5DfNa8QSTiejL=1ywEShkK07bwvJeHkhcVowLtOtZrUw@mail.gmail.com>
-        <7287b3d9-dbdd-c2c3-01c7-1f272749ebb9@datenfreihafen.org>
+        <20220120112115.448077-9-miquel.raynal@bootlin.com>
+        <CAB_54W6dCoEinhdq-HAQj0CQ9_wf-xK9ESOfvB6K4JMwHo7Vaw@mail.gmail.com>
 Organization: Bootlin
 X-Mailer: Claws Mail 3.17.7 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
@@ -48,55 +50,79 @@ Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi Stefan,
+Hi Alexander,
 
-stefan@datenfreihafen.org wrote on Mon, 24 Jan 2022 09:06:39 +0100:
+alex.aring@gmail.com wrote on Sun, 23 Jan 2022 15:56:22 -0500:
 
-> Hello.
+> Hi,
 > 
-> On 23.01.22 21:44, Alexander Aring wrote:
-> > Hi,
-> > 
-> > On Thu, 20 Jan 2022 at 06:21, Miquel Raynal <miquel.raynal@bootlin.com> wrote:  
-> >>
-> >> This define already exist but is hardcoded in nl-phy.c. Use the
-> >> definition when relevant.
-> >>
-> >> Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
-> >> ---
-> >>   net/ieee802154/nl-phy.c | 5 +++--
-> >>   1 file changed, 3 insertions(+), 2 deletions(-)
-> >>
-> >> diff --git a/net/ieee802154/nl-phy.c b/net/ieee802154/nl-phy.c
-> >> index dd5a45f8a78a..02f6a53d0faa 100644
-> >> --- a/net/ieee802154/nl-phy.c
-> >> +++ b/net/ieee802154/nl-phy.c
-> >> @@ -30,7 +30,8 @@ static int ieee802154_nl_fill_phy(struct sk_buff *msg, u32 portid,
-> >>   {
-> >>          void *hdr;
-> >>          int i, pages = 0;
-> >> -       uint32_t *buf = kcalloc(32, sizeof(uint32_t), GFP_KERNEL);
-> >> +       uint32_t *buf = kcalloc(IEEE802154_MAX_PAGE + 1, sizeof(uint32_t),
-> >> +                               GFP_KERNEL);
-> >>
-> >>          pr_debug("%s\n", __func__);
-> >>
-> >> @@ -47,7 +48,7 @@ static int ieee802154_nl_fill_phy(struct sk_buff *msg, u32 portid,
-> >>              nla_put_u8(msg, IEEE802154_ATTR_PAGE, phy->current_page) ||
-> >>              nla_put_u8(msg, IEEE802154_ATTR_CHANNEL, phy->current_channel))
-> >>                  goto nla_put_failure;
-> >> -       for (i = 0; i < 32; i++) {
-> >> +       for (i = 0; i <= IEEE802154_MAX_PAGE; i++) {
-> >>                  if (phy->supported.channels[i])
-> >>                          buf[pages++] = phy->supported.channels[i] | (i << 27);
-> >>          }  
-> > 
-> > Where is the fix here?  
+> On Thu, 20 Jan 2022 at 06:21, Miquel Raynal <miquel.raynal@bootlin.com> wrote:
+> >
+> > It is not straightforward to the newcomer that a single skb can be sent
+> > at a time and that the internal process is to stop the queue when
+> > processing a frame before re-enabling it. Make this clear by documenting
+> > the ieee802154_wake/stop_queue() helpers.
+> >
+> > Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
+> > ---
+> >  include/net/mac802154.h | 12 ++++++++++++
+> >  1 file changed, 12 insertions(+)
+> >
+> > diff --git a/include/net/mac802154.h b/include/net/mac802154.h
+> > index d524ffb9eb25..94b2e3008e77 100644
+> > --- a/include/net/mac802154.h
+> > +++ b/include/net/mac802154.h
+> > @@ -464,6 +464,12 @@ void ieee802154_rx_irqsafe(struct ieee802154_hw *hw, struct sk_buff *skb,
+> >   * ieee802154_wake_queue - wake ieee802154 queue
+> >   * @hw: pointer as obtained from ieee802154_alloc_hw().
+> >   *
+> > + * Tranceivers have either one transmit framebuffer or one framebuffer for both
+> > + * transmitting and receiving. Hence, the core only handles one frame at a time  
 > 
-> While its more cleanup than fix, its clear and easy and there is no problem for it to go into wpan instead of wpan-next.
+> this is not a fundamental physical law, they might exist but not supported yet.
 
-As answered earlier, I will split the series so that it's clearer what
-should go to wpan and what should go to wpan-next, no problem with that.
+I think it's important to explain why we call these helpers
+before/after transmissions. I've reworded the beginning of the sentence
+to: "Tranceivers usually have..." to reflect that this is the current
+state of the support, but is not marble solid either. I've also updated
+the second sentence about the core "Hence, the core currently only
+handles..."
+
+> > + * for each phy, which means we had to stop the queue to avoid new skb to come
+> > + * during the transmission. The queue then needs to be woken up after the
+> > + * operation.
+> > + *
+> >   * Drivers should use this function instead of netif_wake_queue.  
+> 
+> It's a must.
+>
+> >   */
+> >  void ieee802154_wake_queue(struct ieee802154_hw *hw);
+> > @@ -472,6 +478,12 @@ void ieee802154_wake_queue(struct ieee802154_hw *hw);
+> >   * ieee802154_stop_queue - stop ieee802154 queue
+> >   * @hw: pointer as obtained from ieee802154_alloc_hw().
+> >   *
+> > + * Tranceivers have either one transmit framebuffer or one framebuffer for both
+> > + * transmitting and receiving. Hence, the core only handles one frame at a time
+> > + * for each phy, which means we need to tell upper layers to stop giving us new
+> > + * skbs while we are busy with the transmitted one. The queue must then be
+> > + * stopped before transmitting.
+> > + *
+> >   * Drivers should use this function instead of netif_stop_queue.
+> >   */
+> >  void ieee802154_stop_queue(struct ieee802154_hw *hw);  
+> 
+> Same for stop, stop has something additional here... it is never used
+> by any driver because we do that on mac802154 layer. Simply, they
+> don't use this function.
+
+That's true, and this is addressed in a later series where we actually
+stop exporting these helpers because we want everything to be handled
+by the _xmit_complete/error() helpers and keep full control of the
+queue. The comments added above will remain because they are useful to
+understand why these helpers are called. But the last sentence above
+their use from drivers being preferred to the netif_ calls will be
+dropped.
 
 Thanks,
 Miquèl
