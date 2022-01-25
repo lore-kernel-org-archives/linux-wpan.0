@@ -2,101 +2,262 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7BB8C433FE
-	for <linux-wpan@archiver.kernel.org>; Mon, 24 Jan 2022 12:59:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 463A6C433F5
+	for <linux-wpan@archiver.kernel.org>; Tue, 25 Jan 2022 09:37:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242944AbiAXM73 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 24 Jan 2022 07:59:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43696 "EHLO
+        id S1574908AbiAYJhO (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 25 Jan 2022 04:37:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53342 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242887AbiAXM7M (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 24 Jan 2022 07:59:12 -0500
-Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C19CC061756;
-        Mon, 24 Jan 2022 04:59:11 -0800 (PST)
-Received: by mail-lf1-x129.google.com with SMTP id x11so49085789lfa.2;
-        Mon, 24 Jan 2022 04:59:11 -0800 (PST)
+        with ESMTP id S1573972AbiAYJa4 (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 25 Jan 2022 04:30:56 -0500
+Received: from mail-ua1-x92d.google.com (mail-ua1-x92d.google.com [IPv6:2607:f8b0:4864:20::92d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C9FCC0613E8
+        for <linux-wpan@vger.kernel.org>; Tue, 25 Jan 2022 01:30:55 -0800 (PST)
+Received: by mail-ua1-x92d.google.com with SMTP id y4so36267460uad.1
+        for <linux-wpan@vger.kernel.org>; Tue, 25 Jan 2022 01:30:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :references:from:in-reply-to:content-transfer-encoding;
-        bh=hy9h7krpA8HSqyaSzpL6OuBy89OEy4yHH0P9Egx8wMU=;
-        b=nqOBZDOFIM1Lg2pZJTU9REB16Pi35arSZfYjb2hDggpiW/R9YROp+HImquIJNCHScq
-         vUV7GbyRji32u+80rl/FZNU+1+4x258iXkLwQC4h/JbSwq2WWkiRf58rOstVz881uP0+
-         0h7atkDx1N572sJ6VjRdjzu0e0GzHQe0NcmZOKhjm49a0U565HYU4c0DHLmGWaXcI4EK
-         7vTK/fcUCh9tAYy2vse1gZrpiDX91m+GhlDkrH3R6a98FdjuCeilnIEHaJVxRYfftTdc
-         LHrcrt6zVABs/EP9TVSZrebf1s9TEl175+68+WU1BVvbI+dv2ErCW7QjWXl67R7pmWh9
-         TJBg==
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=1mm7+Qmz3LImo4aFwbhXIFkzVEgm/HAOzd6fbdAVMrg=;
+        b=kCmCEgQ+xOVJqgvY6mIiDwGpng9RE64Ri/x5bVEJVgfKmrbder8yB0SJa9j3j/iO6u
+         VSlwxJi1GtMfRaX9rz0Fi8V70QZmpTm/yg+yqKEhFTP/kvAigM6NlkG016BHxBuEGBud
+         aKKG3vXyGKhkWECz7g02ij5pN8RBjRbfSAGJhF2s+s/E8Wzq61/RmUZzmkHINs6y38kj
+         8W/C1tUsfkR71I5xYVxyEgRhxjIz/FmTGO/CwLqL3papla/+aWUpb3kyrOT/GpbDGqeC
+         c1kCPdzAMoEjl9Ka3L/ozlubTR502/GpTZoRLS5kuqKqPkl9NQ2lJSPzTzJVIDppuhpp
+         EfLg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=hy9h7krpA8HSqyaSzpL6OuBy89OEy4yHH0P9Egx8wMU=;
-        b=KFxDMGQu2h08ZRYc7cHRGWNO41V7yeNgMjpnu3ouMpIu9dC+E5Sh1rLQ1vOxzKKG+r
-         EBSB8sg4rJvWGzgFbmT5h50rYtVLiW7R0rRoWEUBHBDS5pAGFP7Za+uXDPZwci0IwuqJ
-         6KZaD44KawXTaA42HayuMynTC03SWo7wArdSfTGcYv6gSJ0PpZ5AX8eC2UQfWO3A8awC
-         1SZuKLrLLtwb22Jgki9OaxxvpOqixW/cDBxMd6X26mDuG3kB8K+wyeRP7P34HD2nMwdE
-         2ygd6/XeQ1Wm8vSIVq5d5bAYwmJiQYMyhv5dNV4V4ZziofMu8iBw0ViGU/P982uRcrxL
-         hMXQ==
-X-Gm-Message-State: AOAM532LB+W5OjIQ32WzocwrZ7SpGkPaM+wd4wKitPvks2QyU9AT8bFh
-        TJkjXOKmczAUN5ppnKWqeCY=
-X-Google-Smtp-Source: ABdhPJwI/7v8+jOw7RZaWhse02D+Um2AWJGt9KRF2IS1WPJN5qzN/xCjROOPzwZeTh7NCh2Z2/nRiw==
-X-Received: by 2002:a19:6b0b:: with SMTP id d11mr12892908lfa.594.1643029149450;
-        Mon, 24 Jan 2022 04:59:09 -0800 (PST)
-Received: from [192.168.1.11] ([94.103.227.208])
-        by smtp.gmail.com with ESMTPSA id i6sm1162352lfe.52.2022.01.24.04.59.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 24 Jan 2022 04:59:08 -0800 (PST)
-Message-ID: <3d071cde-9eff-c6c3-63bc-827e74f2e9ea@gmail.com>
-Date:   Mon, 24 Jan 2022 15:59:07 +0300
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=1mm7+Qmz3LImo4aFwbhXIFkzVEgm/HAOzd6fbdAVMrg=;
+        b=pHZIrpdOOUa4W6jB3o6WDRoc++H6YxFTre7KD4HXJFcOLioeTqlObO4bdS41xiOY5v
+         G3s8Y+wMKEFiITAmL9O6+9WurWfFTlDNVlp3eStz4W11XPZAAq1yntHynxzGrCHCEPOp
+         tRVYimpEYoq72M16e3+bfY6h2/9PbZXZ/U/tH2vmB1L7KoWaZnSjvpE/W0nT4Y2DN9ne
+         0E2rFG/tr0nu5aDRdJ7HaRuxCUuyQ60o0fNHLRLKXP5TPyxxSrSMtDYMRPpK8YidCbho
+         jiPXERoMZRtuuWyfe6y8HoStcc3zrggQ4QWMgRpLBQNagzzvIavysm+8xZSG/8QfUpKO
+         ueqQ==
+X-Gm-Message-State: AOAM532lHsTAShXOOpBfVjKOG6vmt7Nig2V4OuZJv/+dUWE2ZWTB6PTC
+        The5QglBCxWuCsN+dXP+KSE+o18SMJUTIOpvPiTzCg==
+X-Google-Smtp-Source: ABdhPJwHGGkAwOnsd7qe0zHQAqHAUzi5PBqvJQ90yr1sdZ5zdG5wkLeKm2Z8HhNpFMDsTHL1nOGUCrWQS9pCXlyV9Y0=
+X-Received: by 2002:a67:8c2:: with SMTP id 185mr712613vsi.19.1643103053912;
+ Tue, 25 Jan 2022 01:30:53 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [syzbot] UBSAN: shift-out-of-bounds in nl802154_new_interface
-Content-Language: en-US
-To:     syzbot <syzbot+7bf7b22759195c9a21e9@syzkaller.appspotmail.com>,
-        aahringo@redhat.com, alex.aring@gmail.com,
-        anant.thazhemadam@gmail.com, davem@davemloft.net, kuba@kernel.org,
-        linux-kernel@vger.kernel.org, linux-wpan@vger.kernel.org,
-        netdev@vger.kernel.org, stefan@datenfreihafen.org,
-        syzkaller-bugs@googlegroups.com
-References: <000000000000f09fca05d41a8aee@google.com>
-From:   Pavel Skripkin <paskripkin@gmail.com>
-In-Reply-To: <000000000000f09fca05d41a8aee@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20220123175201.34839-1-u.kleine-koenig@pengutronix.de>
+In-Reply-To: <20220123175201.34839-1-u.kleine-koenig@pengutronix.de>
+From:   Lee Jones <lee.jones@linaro.org>
+Date:   Tue, 25 Jan 2022 09:30:43 +0000
+Message-ID: <CAF2Aj3g0uxj7=m+USWz9QvmQ511DN83e9WsVDW-484aEdix4hg@mail.gmail.com>
+Subject: Re: [PATCH 0/5] spi: make remove callback a void function
+To:     =?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= 
+        <u.kleine-koenig@pengutronix.de>
+Cc:     Mark Brown <broonie@kernel.org>,
+        =?UTF-8?B?TWFyZWsgQmVow7pu?= <kabel@kernel.org>,
+        Peter Huewe <peterhuewe@gmx.de>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Michael Turquette <mturquette@baylibre.com>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Bartosz Golaszewski <brgl@bgdev.pl>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        Sam Ravnborg <sam@ravnborg.org>,
+        David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Markuss Broks <markuss.broks@gmail.com>,
+        Emma Anholt <emma@anholt.net>,
+        David Lechner <david@lechnology.com>,
+        Kamlesh Gurudasani <kamlesh.gurudasani@gmail.com>,
+        =?UTF-8?Q?Noralf_Tr=C3=B8nnes?= <noralf@tronnes.org>,
+        Jean Delvare <jdelvare@suse.com>,
+        Guenter Roeck <linux@roeck-us.net>,
+        Dan Robertson <dan@dlrobertson.com>,
+        Jonathan Cameron <jic23@kernel.org>,
+        Lars-Peter Clausen <lars@metafoo.de>,
+        Michael Hennerich <michael.hennerich@analog.com>,
+        Marcus Folkesson <marcus.folkesson@gmail.com>,
+        Kent Gustavsson <kent@minoris.se>,
+        Rui Miguel Silva <rmfrfs@gmail.com>,
+        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+        Pavel Machek <pavel@ucw.cz>,
+        Yasunari Takiguchi <Yasunari.Takiguchi@sony.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Charles-Antoine Couret <charles-antoine.couret@nexvision.fr>,
+        Antti Palosaari <crope@iki.fi>,
+        Support Opensource <support.opensource@diasemi.com>,
+        Charles Keepax <ckeepax@opensource.cirrus.com>,
+        Richard Fitzgerald <rf@opensource.cirrus.com>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Eric Piel <eric.piel@tremplin-utc.net>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        Richard Weinberger <richard@nod.at>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        Wolfgang Grandegger <wg@grandegger.com>,
+        Marc Kleine-Budde <mkl@pengutronix.de>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Manivannan Sadhasivam <mani@kernel.org>,
+        Thomas Kopp <thomas.kopp@microchip.com>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        Andrew Lunn <andrew@lunn.ch>,
+        Vivien Didelot <vivien.didelot@gmail.com>,
+        Vladimir Oltean <olteanv@gmail.com>,
+        Woojung Huh <woojung.huh@microchip.com>,
+        UNGLinuxDriver@microchip.com,
+        =?UTF-8?Q?=C5=81ukasz_Stelmach?= <l.stelmach@samsung.com>,
+        Alexander Aring <alex.aring@gmail.com>,
+        Stefan Schmidt <stefan@datenfreihafen.org>,
+        Harry Morris <h.morris@cascoda.com>,
+        Varka Bhadram <varkabhadram@gmail.com>,
+        Xue Liu <liuxuenetmail@gmail.com>, Alan Ott <alan@signal11.us>,
+        Heiner Kallweit <hkallweit1@gmail.com>,
+        Russell King <linux@armlinux.org.uk>,
+        Christian Lamparter <chunkeey@googlemail.com>,
+        Kalle Valo <kvalo@kernel.org>,
+        Ajay Singh <ajay.kathat@microchip.com>,
+        Claudiu Beznea <Claudiu.Beznea@microchip.com>,
+        Solomon Peachy <pizza@shaftnet.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>,
+        Mark Greer <mgreer@animalcreek.com>,
+        Benson Leung <bleung@chromium.org>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Mark Gross <markgross@kernel.org>,
+        Alessandro Zummo <a.zummo@towertech.it>,
+        Alexandre Belloni <alexandre.belloni@bootlin.com>,
+        =?UTF-8?B?SsOpcsO0bWUgUG91aWxsZXI=?= <jerome.pouiller@silabs.com>,
+        Jiri Slaby <jirislaby@kernel.org>,
+        Felipe Balbi <balbi@kernel.org>,
+        Daniel Thompson <daniel.thompson@linaro.org>,
+        Jingoo Han <jingoohan1@gmail.com>,
+        Helge Deller <deller@gmx.de>,
+        James Schulman <james.schulman@cirrus.com>,
+        David Rhodes <david.rhodes@cirrus.com>,
+        Lucas Tanure <tanureal@opensource.cirrus.com>,
+        Jaroslav Kysela <perex@perex.cz>,
+        Takashi Iwai <tiwai@suse.com>,
+        =?UTF-8?B?TnVubyBTw6E=?= <nuno.sa@analog.com>,
+        Liam Girdwood <lgirdwood@gmail.com>,
+        Daniel Mack <daniel@zonque.org>,
+        Thomas Zimmermann <tzimmermann@suse.de>,
+        Maxime Ripard <mripard@kernel.org>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Stephan Gerhold <stephan@gerhold.net>,
+        Alexandru Ardelean <ardeleanalex@gmail.com>,
+        Mike Looijmans <mike.looijmans@topic.nl>,
+        Gwendal Grignou <gwendal@chromium.org>,
+        Cai Huoqing <caihuoqing@baidu.com>,
+        Minghao Chi <chi.minghao@zte.com.cn>,
+        Antoniu Miclaus <antoniu.miclaus@analog.com>,
+        Julia Lawall <julia.lawall@inria.fr>,
+        =?UTF-8?Q?Ronald_Tschal=C3=A4r?= <ronald@innovation.ch>,
+        Marco Felsch <m.felsch@pengutronix.de>,
+        =?UTF-8?Q?Jonathan_Neusch=C3=A4fer?= <j.neuschaefer@gmx.net>,
+        Emmanuel Gil Peyrot <linkmauve@linkmauve.fr>,
+        Jon Hunter <jonathanh@nvidia.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Heiko Schocher <hs@denx.de>,
+        Fabio Estevam <festevam@gmail.com>,
+        Colin Ian King <colin.king@intel.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Tudor Ambarus <Tudor.Ambarus@microchip.com>,
+        Matt Kline <matt@bitbashing.io>,
+        Torin Cooper-Bennun <torin@maxiluxsystems.com>,
+        Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
+        =?UTF-8?Q?Stefan_M=C3=A4tje?= <stefan.maetje@esd.eu>,
+        Frieder Schrempf <frieder.schrempf@kontron.de>,
+        Wei Yongjun <weiyongjun1@huawei.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Nanyong Sun <sunnanyong@huawei.com>,
+        Yang Shen <shenyang39@huawei.com>,
+        dingsenjie <dingsenjie@yulong.com>,
+        Aditya Srivastava <yashsri421@gmail.com>,
+        Stefan Wahren <stefan.wahren@i2se.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Michael Walle <michael@walle.cc>,
+        Yang Li <yang.lee@linux.alibaba.com>,
+        Geert Uytterhoeven <geert+renesas@glider.be>,
+        wengjianfeng <wengjianfeng@yulong.com>,
+        Sidong Yang <realwakka@gmail.com>,
+        Paulo Miguel Almeida <paulo.miguel.almeida.rodenas@gmail.com>,
+        Zhang Qilong <zhangqilong3@huawei.com>,
+        Will Deacon <will@kernel.org>,
+        Mark Tomlinson <mark.tomlinson@alliedtelesis.co.nz>,
+        Davidlohr Bueso <dbueso@suse.de>, Claudius Heine <ch@denx.de>,
+        Jiri Prchal <jiri.prchal@aksignal.cz>,
+        linux-kernel@vger.kernel.org, linux-integrity@vger.kernel.org,
+        linux-clk@vger.kernel.org, linux-gpio@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, linux-hwmon@vger.kernel.org,
+        linux-iio@vger.kernel.org, linux-input@vger.kernel.org,
+        linux-leds@vger.kernel.org, linux-media@vger.kernel.org,
+        patches@opensource.cirrus.com, alsa-devel@alsa-project.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-arm-kernel@lists.infradead.org, linux-mmc@vger.kernel.org,
+        linux-mtd@lists.infradead.org, linux-can@vger.kernel.org,
+        netdev@vger.kernel.org, linux-wpan@vger.kernel.org,
+        linux-wireless@vger.kernel.org, libertas-dev@lists.infradead.org,
+        platform-driver-x86@vger.kernel.org, linux-rtc@vger.kernel.org,
+        linux-spi@vger.kernel.org, linux-fbdev@vger.kernel.org,
+        linux-staging@lists.linux.dev, linux-serial@vger.kernel.org,
+        linux-usb@vger.kernel.org, linux-omap@vger.kernel.org,
+        kernel@pengutronix.de, Noralf Tronnes <notro@tronnes.org>,
+        Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+        Guenter Roeck <groeck@google.com>,
+        Enric Balletbo i Serra <enric.balletbo@collabora.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-On 12/27/21 09:09, syzbot wrote:
-> syzbot suspects this issue was fixed by commit:
-> 
-> commit 451dc48c806a7ce9fbec5e7a24ccf4b2c936e834
-> Author: Alexander Aring <aahringo@redhat.com>
-> Date:   Fri Nov 12 03:09:16 2021 +0000
-> 
->      net: ieee802154: handle iftypes as u32
-> 
-> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1084d10db00000
-> start commit:   ec681c53f8d2 Merge tag 'net-5.15-rc6' of git://git.kernel...
-> git tree:       upstream
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=bab9d35f204746a7
-> dashboard link: https://syzkaller.appspot.com/bug?extid=7bf7b22759195c9a21e9
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14398d94b00000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=117fc40cb00000
-> 
-> If the result looks correct, please mark the issue as fixed by replying with:
-> 
-> #syz fix: net: ieee802154: handle iftypes as u32
-> 
-> For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+My usual mailer won't let me reply to this many people, so I'm using Gmail.
 
-#syz fix: net: ieee802154: handle iftypes as u32
+No idea what chaos this will cause, but here goes ...
 
+> The value returned by an spi driver's remove function is mostly ignored.
+> (Only an error message is printed if the value is non-zero that the
+> error is ignored.)
+>
+> So change the prototype of the remove function to return no value. This
+> way driver authors are not tempted to assume that passing an error to
+> the upper layer is a good idea. All drivers are adapted accordingly.
+> There is no intended change of behaviour, all callbacks were prepared to
+> return 0 before.
+>
+> Signed-off-by: Uwe Kleine-K=C3=B6nig <u.kleine-koenig@pengutronix.de>
+> ---
 
+[...]
 
+>  drivers/mfd/arizona-spi.c                             |  4 +---
+>  drivers/mfd/da9052-spi.c                             |  3 +--
+>  drivers/mfd/ezx-pcap.c                                |  4 +---
+>  drivers/mfd/madera-spi.c                             |  4 +---
+>  drivers/mfd/mc13xxx-spi.c                           |  3 +--
+>  drivers/mfd/rsmu_spi.c                                |  4 +---
+>  drivers/mfd/stmpe-spi.c                               |  4 +---
+>  drivers/mfd/tps65912-spi.c                          |  4 +---
 
-With regards,
-Pavel Skripkin
+>  drivers/video/backlight/ams369fg06.c         |  3 +--
+>  drivers/video/backlight/corgi_lcd.c               |  3 +--
+>  drivers/video/backlight/ili922x.c                    |  3 +--
+>  drivers/video/backlight/l4f00242t03.c           |  3 +--
+>  drivers/video/backlight/lms501kf03.c            |  3 +--
+>  drivers/video/backlight/ltv350qv.c                 |  3 +--
+>  drivers/video/backlight/tdo24m.c                  |  3 +--
+>  drivers/video/backlight/tosa_lcd.c                |  4 +---
+>  drivers/video/backlight/vgg2432a4.c            |  4 +---
+
+If it's okay with Mark, it's okay with me.
+
+Acked-by: Lee Jones <lee.jones@linaro.org>
+
+--=20
+Lee Jones [=E6=9D=8E=E7=90=BC=E6=96=AF]
+Linaro Services Principle Technical Lead
+Linaro.org =E2=94=82 Open source software for ARM SoCs
+Follow Linaro: Facebook | Twitter | Blog
