@@ -2,49 +2,35 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9767BC433EF
-	for <linux-wpan@archiver.kernel.org>; Thu, 27 Jan 2022 16:05:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB8ECC433EF
+	for <linux-wpan@archiver.kernel.org>; Thu, 27 Jan 2022 16:51:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243423AbiA0QFp (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Thu, 27 Jan 2022 11:05:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44158 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238116AbiA0QFo (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 27 Jan 2022 11:05:44 -0500
-Received: from proxima.lasnet.de (proxima.lasnet.de [IPv6:2a01:4f8:121:31eb:3::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9F06C061714;
-        Thu, 27 Jan 2022 08:05:44 -0800 (PST)
-Received: from [IPV6:2003:e9:d724:a665:d7b5:f965:3476:16f8] (p200300e9d724a665d7b5f965347616f8.dip0.t-ipconnect.de [IPv6:2003:e9:d724:a665:d7b5:f965:3476:16f8])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits))
-        (No client certificate requested)
-        (Authenticated sender: stefan@datenfreihafen.org)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id EF6B7C02E8;
-        Thu, 27 Jan 2022 17:05:42 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
-        s=2021; t=1643299543;
+        id S244115AbiA0Qv5 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Thu, 27 Jan 2022 11:51:57 -0500
+Received: from relay6-d.mail.gandi.net ([217.70.183.198]:55479 "EHLO
+        relay6-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S244141AbiA0Qv5 (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 27 Jan 2022 11:51:57 -0500
+Received: (Authenticated sender: miquel.raynal@bootlin.com)
+        by mail.gandi.net (Postfix) with ESMTPSA id 364CFC0008;
+        Thu, 27 Jan 2022 16:51:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+        t=1643302315;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=FfsBBNyW3usZsZKpkTjNPtPSOuDwgu4XSB4iGuoPRKw=;
-        b=Zv4PpLPz0FEwR6BAITIRZ3EDeyIQhvhP9iqfa2QefOgpWpQqw0pEFl4O7rlfC1fKv+GJBa
-        U2oqWGXakHtvnveqY92EBICoTTazJOM2LaAzPvSvyj65QW7F6LHTJeoESNJpzRNg8IjRgE
-        Fjxa+IC68Sj97laMd9Vla8oro9KJG+gBkh7XCkgVZL/U4MSbdNsk91aUhcD0+wCiPGAl9C
-        KS+yiLFaQawq5rQfUf5yxOtR55Nhuy0O6E0rY1yj03Fki74IFqtkYTcODbIKgdeEuJVjTs
-        gF39Bcnu8iUrH/jr6fz6NG9AceqOQwxw0SyujoYLVpBpLDPuFziKwns76LA0vQ==
-Message-ID: <6903cb13-2fc9-8c8a-f247-8cbeddf51103@datenfreihafen.org>
-Date:   Thu, 27 Jan 2022 17:05:42 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Subject: Re: [wpan-next 4/4] net: ieee802154: Add a kernel doc header to the
- ieee802154_addr structure
-Content-Language: en-US
-To:     Miquel Raynal <miquel.raynal@bootlin.com>,
-        Alexander Aring <alex.aring@gmail.com>,
-        linux-wpan@vger.kernel.org
-Cc:     "David S. Miller" <davem@davemloft.net>,
+        bh=yldgb1jJRgdr5TixNjS58O9AjaOif/VfjaBoPa/kMoY=;
+        b=AVA954oRh1GHgwDI6bSPcB2SlgInevrzfz+RG2NwscCR1IROs9Esf1+PJPbtdoAk3wJOfI
+        5RizSUBc5dgDc/4mUTP0O+Mp4STR3Q9xz5sDjEqFgNvsnWBy9V/jxYcl9MiBqYYiFhkKst
+        6PBJ4zzV/NkIpVcu17AUIPMKPvW/yPgR+Gfmwd8RciBPB9CLIIOGml0782pQ+hFe4h6SqS
+        mxa3mwEqj1jY4Ep+SttE+/JTeWyiTUQopX7CO8l3cAlJbSy6qJxzM6mIawGDdSDcW6TRS6
+        QJ6QuJRsxKvQ7dJRQ0SPivGVtxFJIB/PSbHsZsQva0MeAPgv+cSC9lOINBd6wg==
+Date:   Thu, 27 Jan 2022 17:51:51 +0100
+From:   Miquel Raynal <miquel.raynal@bootlin.com>
+To:     Stefan Schmidt <stefan@datenfreihafen.org>
+Cc:     Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
         linux-wireless@vger.kernel.org,
         David Girault <david.girault@qorvo.com>,
@@ -52,58 +38,69 @@ Cc:     "David S. Miller" <davem@davemloft.net>,
         Frederic Blain <frederic.blain@qorvo.com>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: Re: [wpan-next 4/4] net: ieee802154: Add a kernel doc header to the
+ ieee802154_addr structure
+Message-ID: <20220127175151.1d6f70bb@xps13>
+In-Reply-To: <6903cb13-2fc9-8c8a-f247-8cbeddf51103@datenfreihafen.org>
 References: <20220120004350.308866-1-miquel.raynal@bootlin.com>
- <20220120004350.308866-5-miquel.raynal@bootlin.com>
-From:   Stefan Schmidt <stefan@datenfreihafen.org>
-In-Reply-To: <20220120004350.308866-5-miquel.raynal@bootlin.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+        <20220120004350.308866-5-miquel.raynal@bootlin.com>
+        <6903cb13-2fc9-8c8a-f247-8cbeddf51103@datenfreihafen.org>
+Organization: Bootlin
+X-Mailer: Claws Mail 3.17.7 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
+Hi Stefan,
 
-Hello.
+stefan@datenfreihafen.org wrote on Thu, 27 Jan 2022 17:05:42 +0100:
 
-On 20.01.22 01:43, Miquel Raynal wrote:
-> From: David Girault <david.girault@qorvo.com>
-> 
-> While not being absolutely needed, it at least explain the mode vs. enum
-> fields.
-> 
-> Signed-off-by: David Girault <david.girault@qorvo.com>
-> [miquel.raynal@bootlin.com: Isolate this change from a bigger commit and
->                              reword the comment]
-> Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
-> ---
->   include/net/cfg802154.h | 10 ++++++++++
->   1 file changed, 10 insertions(+)
-> 
-> diff --git a/include/net/cfg802154.h b/include/net/cfg802154.h
-> index 4193c242d96e..0b8b1812cea1 100644
-> --- a/include/net/cfg802154.h
-> +++ b/include/net/cfg802154.h
-> @@ -29,6 +29,16 @@ struct ieee802154_llsec_key_id;
->   struct ieee802154_llsec_key;
->   #endif /* CONFIG_IEEE802154_NL802154_EXPERIMENTAL */
->   
-> +/**
-> + * struct ieee802154_addr - IEEE802.15.4 device address
-> + * @mode: Address mode from frame header. Can be one of:
-> + *        - @IEEE802154_ADDR_NONE
-> + *        - @IEEE802154_ADDR_SHORT
-> + *        - @IEEE802154_ADDR_LONG
-> + * @pan_id: The PAN ID this address belongs to
-> + * @short_addr: address if @mode is @IEEE802154_ADDR_SHORT
-> + * @extended_addr: address if @mode is @IEEE802154_ADDR_LONG
-> + */
->   struct ieee802154_addr {
->   	u8 mode;
->   	__le16 pan_id;
-> 
+> Hello.
+>=20
+> On 20.01.22 01:43, Miquel Raynal wrote:
+> > From: David Girault <david.girault@qorvo.com>
+> >=20
+> > While not being absolutely needed, it at least explain the mode vs. enum
+> > fields.
+> >=20
+> > Signed-off-by: David Girault <david.girault@qorvo.com>
+> > [miquel.raynal@bootlin.com: Isolate this change from a bigger commit and
+> >                              reword the comment]
+> > Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
+> > ---
+> >   include/net/cfg802154.h | 10 ++++++++++
+> >   1 file changed, 10 insertions(+)
+> >=20
+> > diff --git a/include/net/cfg802154.h b/include/net/cfg802154.h
+> > index 4193c242d96e..0b8b1812cea1 100644
+> > --- a/include/net/cfg802154.h
+> > +++ b/include/net/cfg802154.h
+> > @@ -29,6 +29,16 @@ struct ieee802154_llsec_key_id;
+> >   struct ieee802154_llsec_key;
+> >   #endif /* CONFIG_IEEE802154_NL802154_EXPERIMENTAL */ =20
+> >   > +/** =20
+> > + * struct ieee802154_addr - IEEE802.15.4 device address
+> > + * @mode: Address mode from frame header. Can be one of:
+> > + *        - @IEEE802154_ADDR_NONE
+> > + *        - @IEEE802154_ADDR_SHORT
+> > + *        - @IEEE802154_ADDR_LONG
+> > + * @pan_id: The PAN ID this address belongs to
+> > + * @short_addr: address if @mode is @IEEE802154_ADDR_SHORT
+> > + * @extended_addr: address if @mode is @IEEE802154_ADDR_LONG
+> > + */
+> >   struct ieee802154_addr {
+> >   	u8 mode;
+> >   	__le16 pan_id;
+> >  =20
+>=20
+> Same here, please fold into the addr moving patch. I see no reason why sp=
+litting these would make it easier or do I miss something?
 
-Same here, please fold into the addr moving patch. I see no reason why 
-splitting these would make it easier or do I miss something?
+I really split every change that I could as a habit, but there is no
+problem with squashing them both.
 
-regards
-Stefan Schmidt
+Thanks,
+Miqu=C3=A8l
