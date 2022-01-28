@@ -2,98 +2,73 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A54EBC433EF
-	for <linux-wpan@archiver.kernel.org>; Fri, 28 Jan 2022 11:11:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E42D8C433EF
+	for <linux-wpan@archiver.kernel.org>; Fri, 28 Jan 2022 11:20:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244295AbiA1LLu (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Fri, 28 Jan 2022 06:11:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52858 "EHLO
+        id S1348140AbiA1LUJ (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Fri, 28 Jan 2022 06:20:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54744 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232155AbiA1LLr (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Fri, 28 Jan 2022 06:11:47 -0500
-Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::227])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD0A8C061714;
-        Fri, 28 Jan 2022 03:11:46 -0800 (PST)
+        with ESMTP id S1348138AbiA1LUJ (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 28 Jan 2022 06:20:09 -0500
+Received: from relay11.mail.gandi.net (relay11.mail.gandi.net [IPv6:2001:4b98:dc4:8::231])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 609FAC061714;
+        Fri, 28 Jan 2022 03:20:08 -0800 (PST)
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id 5355E20008;
-        Fri, 28 Jan 2022 11:11:41 +0000 (UTC)
+        by mail.gandi.net (Postfix) with ESMTPSA id 88878100008;
+        Fri, 28 Jan 2022 11:20:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1643368305;
+        t=1643368806;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=iR0Ke+v1DOJu+t5Jl0WPRhbNBzvlE1GoH4GRyh4tuJs=;
-        b=ATYr5XHRHUGzCLC/tiE3p9jWlf3+rnEwnd0khx2ml1H50eWI86kU8RVNTYvejsf2yCTYkk
-        3CNun48k7vkpMzLkyR42tkW7y2KgEhHusX0y+03NqVm1tNKLFloEi2Gx6m18PaYD3FA10o
-        eXYL7nIhDX2qvwzV3eu18p+4kbL3VAn6x//zwhi0X6lRlePkv0LP4glpr+eKACD9lhoFUj
-        Lg7OeJZkYVltOmgg9JVUC4BhidSGWdcynfMqnje66Tpyw+xV0xrixi1/Dl2wdWer+flpMP
-        1xLHALUMbbF1xYc5FI+Ok7hA8KyOHUZlCQ1YYv8SbBfS1439kw02Q9L5WUAp3Q==
-Date:   Fri, 28 Jan 2022 12:11:39 +0100
+         content-transfer-encoding:content-transfer-encoding;
+        bh=4nv991dysX9iy3/kfE7r4VZ21Vrlg+JMIFLIIetOjCg=;
+        b=c9ZU6Tl2i2lSiQAjTCUd4NK0SckfEeUBxcCoq+WXQiqhq8n0U1OcP98FuHhNyVp9DnE5QW
+        cgFilRfdVHKbdqVjCCRMsti/CNznJDPOzomvCZwqQGd+4FWwCFVu5gIAT8Q/9GgNqExN+/
+        DEgUlOuoSCDAjCRcEV+31pxod4Vdd9ypwMbbslzrhXH6whPWHKNxlud9ugMRZzrrVwJQcI
+        bH67sJ+VkVCVF1/sgB0uLd/vU3ajQOrl4gxsHg+MBSR8bqDA3bDWWIqxDMA5l1ltD+E0iU
+        sT0GqPv/SfxJeWTXkovAS6ykOaY3o/PrPAaiccO8zZJKuWhdaE9RHhQxUn3gEw==
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
 To:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
         linux-wpan@vger.kernel.org
 Cc:     "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-        Michael Hennerich <michael.hennerich@analog.com>,
-        Varka Bhadram <varkabhadram@gmail.com>,
-        Xue Liu <liuxuenetmail@gmail.com>, Alan Ott <alan@signal11.us>
-Subject: Re: [PATCH wpan-next v2 0/5] ieee802154: Improve durations handling
-Message-ID: <20220128121139.626394ae@xps13>
-In-Reply-To: <20220128110825.1120678-1-miquel.raynal@bootlin.com>
-References: <20220128110825.1120678-1-miquel.raynal@bootlin.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 3.17.7 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+        Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+        David Girault <david.girault@qorvo.com>,
+        Romuald Despres <romuald.despres@qorvo.com>,
+        Frederic Blain <frederic.blain@qorvo.com>,
+        Nicolas Schodet <nico@ni.fr.eu.org>,
+        Miquel Raynal <miquel.raynal@bootlin.com>
+Subject: [PATCH wpan-next v2 0/2] ieee802154: Internal moves
+Date:   Fri, 28 Jan 2022 12:20:00 +0100
+Message-Id: <20220128112002.1121320-1-miquel.raynal@bootlin.com>
+X-Mailer: git-send-email 2.27.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello,
+I am sending just a couple of patches from David that can easily be
+reviewed outside of any other big patch series:
+* reorder a bit the Kconfig entries
+* move the ieee802154_addr structure and give it a kdoc before using it
+  in the scan procedure.
 
-miquel.raynal@bootlin.com wrote on Fri, 28 Jan 2022 12:08:20 +0100:
+Changes since v1:
+* There were four patches merged into two as advised by Stefan.
 
-> These paches try to enhance the support of the various delays by adding
-> into the core the necessary logic to derive the actual symbol duration
-> (and then the lifs/sifs durations) depending on the protocol used. The
-> symbol duration type is also updated to fit smaller numbers.
->=20
-> Having the symbol durations properly set is a mandatory step in order to
-> use the scanning feature that will soon be introduced.
+David Girault (2):
+  net: ieee802154: Move the IEEE 802.15.4 Kconfig main entries
+  net: ieee802154: Move the address structure earlier and provide a kdoc
 
-I forgot to mention the changelog here, I've just reworded a commit
-message and fixed a typo.
+ include/net/cfg802154.h | 28 +++++++++++++++++++---------
+ net/Kconfig             |  3 +--
+ net/ieee802154/Kconfig  |  1 +
+ 3 files changed, 21 insertions(+), 11 deletions(-)
 
->=20
-> Miquel Raynal (5):
->   net: ieee802154: Improve the way supported channels are declared
->   net: ieee802154: Give more details to the core about the channel
->     configurations
->   net: mac802154: Convert the symbol duration into nanoseconds
->   net: mac802154: Set durations automatically
->   net: ieee802154: Drop duration settings when the core does it already
->=20
->  drivers/net/ieee802154/adf7242.c         |   3 +-
->  drivers/net/ieee802154/at86rf230.c       |  66 ++++++-------
->  drivers/net/ieee802154/atusb.c           |  66 ++++++-------
->  drivers/net/ieee802154/ca8210.c          |   7 +-
->  drivers/net/ieee802154/cc2520.c          |   3 +-
->  drivers/net/ieee802154/fakelb.c          |  43 ++++++---
->  drivers/net/ieee802154/mac802154_hwsim.c |  76 ++++++++++++---
->  drivers/net/ieee802154/mcr20a.c          |  11 +--
->  drivers/net/ieee802154/mrf24j40.c        |   3 +-
->  include/net/cfg802154.h                  |  60 +++++++++++-
->  net/ieee802154/core.h                    |   2 +
->  net/ieee802154/nl-phy.c                  |   8 +-
->  net/ieee802154/nl802154.c                |  30 ++++--
->  net/mac802154/cfg.c                      |   1 +
->  net/mac802154/main.c                     | 113 ++++++++++++++++++++++-
->  15 files changed, 361 insertions(+), 131 deletions(-)
->=20
+-- 
+2.27.0
 
-
-Thanks,
-Miqu=C3=A8l
