@@ -2,118 +2,78 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BB72C433EF
-	for <linux-wpan@archiver.kernel.org>; Fri, 28 Jan 2022 11:20:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85C3BC433EF
+	for <linux-wpan@archiver.kernel.org>; Fri, 28 Jan 2022 11:45:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348154AbiA1LUN (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Fri, 28 Jan 2022 06:20:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54764 "EHLO
+        id S1348186AbiA1LpN (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Fri, 28 Jan 2022 06:45:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60566 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348151AbiA1LUM (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Fri, 28 Jan 2022 06:20:12 -0500
-Received: from relay11.mail.gandi.net (relay11.mail.gandi.net [IPv6:2001:4b98:dc4:8::231])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79CF8C061714;
-        Fri, 28 Jan 2022 03:20:12 -0800 (PST)
-Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id 8FA1010000C;
-        Fri, 28 Jan 2022 11:20:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1643368811;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=CshcTBva/M2NVguvG7PsVBg3fiICK3DauHpB29xU1CE=;
-        b=PuhYmaBgAqNv8+23pwzEJtXp9H2jv4i/Y40ewd3INoR0lRwNcN8eQuwMTpq2dNbPlZSJG9
-        0bEEU9Z9LT0rljVBJGr0kWffGhOMi9456yPEmCKAySf+gGWddmSLSBOizXSmx3yz8kAAOg
-        oZ2If7v6Lti6Jt47bJoO2zupCO4NcS6g3GvthGxiXaDL69MYVLwckCRyrpegJn+Llb64PM
-        0pAJbaY7h4QdEDgqohGvDj07CDyDqk0A3Yi8uIhjsmZcmMix2OyUg06nI5YtUDHgK1LCU3
-        odLbGCuKqARKTNEJovj0St4t75drsBXB0ecEtLpnFhjjX/T7wmiYYG74QjQySA==
-From:   Miquel Raynal <miquel.raynal@bootlin.com>
-To:     Alexander Aring <alex.aring@gmail.com>,
-        Stefan Schmidt <stefan@datenfreihafen.org>,
-        linux-wpan@vger.kernel.org
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-        Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-        David Girault <david.girault@qorvo.com>,
-        Romuald Despres <romuald.despres@qorvo.com>,
-        Frederic Blain <frederic.blain@qorvo.com>,
-        Nicolas Schodet <nico@ni.fr.eu.org>,
-        Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: [PATCH wpan-next v2 2/2] net: ieee802154: Move the address structure earlier and provide a kdoc
-Date:   Fri, 28 Jan 2022 12:20:02 +0100
-Message-Id: <20220128112002.1121320-3-miquel.raynal@bootlin.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20220128112002.1121320-1-miquel.raynal@bootlin.com>
-References: <20220128112002.1121320-1-miquel.raynal@bootlin.com>
+        with ESMTP id S1348153AbiA1LpI (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 28 Jan 2022 06:45:08 -0500
+Received: from proxima.lasnet.de (proxima.lasnet.de [IPv6:2a01:4f8:121:31eb:3::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B2D4C061714;
+        Fri, 28 Jan 2022 03:45:08 -0800 (PST)
+Received: from localhost.localdomain.datenfreihafen.local (p200300e9d705dc252cd134b0e26de30d.dip0.t-ipconnect.de [IPv6:2003:e9:d705:dc25:2cd1:34b0:e26d:e30d])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: stefan@sostec.de)
+        by proxima.lasnet.de (Postfix) with ESMTPSA id 29CC5C0220;
+        Fri, 28 Jan 2022 12:45:05 +0100 (CET)
+From:   Stefan Schmidt <stefan@datenfreihafen.org>
+To:     davem@davemloft.net, kuba@kernel.org
+Cc:     linux-wpan@vger.kernel.org, alex.aring@gmail.com,
+        netdev@vger.kernel.org
+Subject: pull-request: ieee802154 for net 2022-01-28
+Date:   Fri, 28 Jan 2022 12:45:01 +0100
+Message-Id: <20220128114501.2732329-1-stefan@datenfreihafen.org>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-From: David Girault <david.girault@qorvo.com>
+Hello Dave, Jakub.
 
-Move the address structure earlier in the cfg802154.h header in order to
-use it in subsequent additions. Give this structure a header to better
-explain its content.
+An update from ieee802154 for your *net* tree.
 
-Signed-off-by: David Girault <david.girault@qorvo.com>
-[miquel.raynal@bootlin.com: Isolate this change from a bigger commit and
-                            reword the comment]
-Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
----
- include/net/cfg802154.h | 28 +++++++++++++++++++---------
- 1 file changed, 19 insertions(+), 9 deletions(-)
+A bunch of fixes in drivers, all from Miquel Raynal.
+Clarifying the default channel in hwsim, leak fixes in at86rf230 and ca8210 as
+well as a symbol duration fix for mcr20a. Topping up the driver fixes with
+better error codes in nl802154 and a cleanup in MAINTAINERS for an orphaned
+driver.
 
-diff --git a/include/net/cfg802154.h b/include/net/cfg802154.h
-index 4491e2724ff2..0b8b1812cea1 100644
---- a/include/net/cfg802154.h
-+++ b/include/net/cfg802154.h
-@@ -29,6 +29,25 @@ struct ieee802154_llsec_key_id;
- struct ieee802154_llsec_key;
- #endif /* CONFIG_IEEE802154_NL802154_EXPERIMENTAL */
- 
-+/**
-+ * struct ieee802154_addr - IEEE802.15.4 device address
-+ * @mode: Address mode from frame header. Can be one of:
-+ *        - @IEEE802154_ADDR_NONE
-+ *        - @IEEE802154_ADDR_SHORT
-+ *        - @IEEE802154_ADDR_LONG
-+ * @pan_id: The PAN ID this address belongs to
-+ * @short_addr: address if @mode is @IEEE802154_ADDR_SHORT
-+ * @extended_addr: address if @mode is @IEEE802154_ADDR_LONG
-+ */
-+struct ieee802154_addr {
-+	u8 mode;
-+	__le16 pan_id;
-+	union {
-+		__le16 short_addr;
-+		__le64 extended_addr;
-+	};
-+};
-+
- struct cfg802154_ops {
- 	struct net_device * (*add_virtual_intf_deprecated)(struct wpan_phy *wpan_phy,
- 							   const char *name,
-@@ -277,15 +296,6 @@ static inline void wpan_phy_net_set(struct wpan_phy *wpan_phy, struct net *net)
- 	write_pnet(&wpan_phy->_net, net);
- }
- 
--struct ieee802154_addr {
--	u8 mode;
--	__le16 pan_id;
--	union {
--		__le16 short_addr;
--		__le64 extended_addr;
--	};
--};
--
- struct ieee802154_llsec_key_id {
- 	u8 mode;
- 	u8 id;
--- 
-2.27.0
+regards
+Stefan Schmidt
 
+
+The following changes since commit 2f61353cd2f789a4229b6f5c1c24a40a613357bb:
+
+  net: hns3: handle empty unknown interrupt for VF (2022-01-25 13:08:05 +0000)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/sschmidt/wpan.git tags/ieee802154-for-net-2022-01-28
+
+for you to fetch changes up to 5d8a8b324ff48c9d9fe4f1634e33dc647d2481b4:
+
+  MAINTAINERS: Remove Harry Morris bouncing address (2022-01-27 08:20:54 +0100)
+
+----------------------------------------------------------------
+Miquel Raynal (6):
+      net: ieee802154: hwsim: Ensure proper channel selection at probe time
+      net: ieee802154: mcr20a: Fix lifs/sifs periods
+      net: ieee802154: at86rf230: Stop leaking skb's
+      net: ieee802154: ca8210: Stop leaking skb's
+      net: ieee802154: Return meaningful error codes from the netlink helpers
+      MAINTAINERS: Remove Harry Morris bouncing address
+
+ MAINTAINERS                              |  3 +--
+ drivers/net/ieee802154/at86rf230.c       | 13 +++++++++++--
+ drivers/net/ieee802154/ca8210.c          |  1 +
+ drivers/net/ieee802154/mac802154_hwsim.c |  1 +
+ drivers/net/ieee802154/mcr20a.c          |  4 ++--
+ net/ieee802154/nl802154.c                |  8 ++++----
+ 6 files changed, 20 insertions(+), 10 deletions(-)
