@@ -2,116 +2,106 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82716C433EF
-	for <linux-wpan@archiver.kernel.org>; Thu, 27 Jan 2022 16:54:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94535C433EF
+	for <linux-wpan@archiver.kernel.org>; Fri, 28 Jan 2022 00:35:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244136AbiA0QyQ (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Thu, 27 Jan 2022 11:54:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55558 "EHLO
+        id S236734AbiA1AfM (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Thu, 27 Jan 2022 19:35:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49278 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237397AbiA0QyP (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 27 Jan 2022 11:54:15 -0500
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::226])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88965C061714;
-        Thu, 27 Jan 2022 08:54:14 -0800 (PST)
-Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id 1BCD7C0003;
-        Thu, 27 Jan 2022 16:54:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1643302452;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=IvtKV4Bh1kWEO/WKcmj7NfRZ2FJ3K2bDH9xAeH8VGHA=;
-        b=Xbh8gJr78/4fIFuTILF1vW84ncRpl1Hyg1RDrGOrCjaoSnfTbymyJ+NdYn/dzhiiydD8Im
-        NALYRTg4YmboqZ0vG2GFARgZfVzeBOMN8WwtnwbQXEY+uQw7DNbXPMdM69HuByAZtFK8fw
-        SHSGZMEWGxusxbtSNj5x8d4NRdXGw4eG2MpPeUZio+OeupGWpBrw46dl2bDMSQD9BojVoz
-        /n9FysPX6j6D6xa4X6X7OMIoE29Np0Sj9O405uEsFslG5Zc7GoLGxhru93MjBfy1DEz0tV
-        BfBU5XNOGrGlOKUMVVJSnTC/NfZgkEAQTEMxksHqyqGk2brYkxwSNNmXCdE5cw==
-Date:   Thu, 27 Jan 2022 17:54:09 +0100
-From:   Miquel Raynal <miquel.raynal@bootlin.com>
+        with ESMTP id S236730AbiA1AfL (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 27 Jan 2022 19:35:11 -0500
+Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 551E0C061714;
+        Thu, 27 Jan 2022 16:35:11 -0800 (PST)
+Received: by mail-wm1-x32d.google.com with SMTP id m26so700355wms.0;
+        Thu, 27 Jan 2022 16:35:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=m/g5IjygHJdyBKa2C2i5Lt6BGh/ss5sQbCSaGRICTRg=;
+        b=BWGnBi5+KKUxmMgIPzihbmEtdStfDql5LFNa3t7qhAkP4CzcuL3rc/v8NVx7h5x4rz
+         MGM+D0f9MfRJ2pdcH7EZ9TRm6B1KdSej8kSEykEeKGP/aaug1NpMh0wx7Uuj3wawpvP8
+         u30n0bkuBQcY162Ycig87EuDpHqx5M2SMDhsHoScaBXifbARLpNvzwZnVErfGH3Bc4XN
+         fltJ9Dw25vzOpLR6PJDtV5mkFH+cFH4wnzv/G6Qw7GrA9LPJ2PDjNiuuH5QAcryrlC+b
+         oAoCkA4I6bZxc837fX4qPkXq4Uglbio6/3WcNW/gg8jWBJiFiNKU2zIiTe6uQCUvvBS0
+         Phqg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=m/g5IjygHJdyBKa2C2i5Lt6BGh/ss5sQbCSaGRICTRg=;
+        b=bhI7qYg8Ps0G7uGIPyl4u+p5sdQcg02Dxl7xaIlKnoGn6WBquQjHySz6soMjsFcFPj
+         CBTO94R1Ib7FmnWugxhX/y/R1t3dHWqxHNemLwVmYIJiaZfB7TKssiLaVPen3ZvzDLA1
+         6aHlZ4ZfUclI2SJojYHB0X+1gL+jnW0apI4UExIVpXKu5MgXS3VzCGhAGmOd0ZtFzxNs
+         WxjHndxfKB5MsBHZ3RS/0bmXleUH4qNEoM9bSxqvZM9iqKBbyazR3Sh3MG3K1INl/+Rz
+         SY62RHTyJYghhevNo98As6KcCXUrEj0JrTPkZpoYb16Vyalp+RJfUGfdunsGOH/SivXj
+         3X/g==
+X-Gm-Message-State: AOAM530oLAdCdh6C8UGa6GL6KSaoO/3lf2KW1ja5xVjLbJ8W9EtJ9qUZ
+        0Qv50kJn3SYdoTW7OfJnRyyyRuDvSlMuOK3s2W8=
+X-Google-Smtp-Source: ABdhPJwt5kyj7zQQKu3804qzOAkMC2XQufGAyX7XIhycOJzEK2MZ3CX7s+dcYXK8SjRF689fQEaaLz+dyi/iLsBbtrw=
+X-Received: by 2002:a05:600c:3b90:: with SMTP id n16mr9129542wms.178.1643330109877;
+ Thu, 27 Jan 2022 16:35:09 -0800 (PST)
+MIME-Version: 1.0
+References: <20220125122540.855604-1-miquel.raynal@bootlin.com> <b07b446d-a48e-78bd-1841-2802e12cf1d1@datenfreihafen.org>
+In-Reply-To: <b07b446d-a48e-78bd-1841-2802e12cf1d1@datenfreihafen.org>
+From:   Alexander Aring <alex.aring@gmail.com>
+Date:   Thu, 27 Jan 2022 19:34:58 -0500
+Message-ID: <CAB_54W6-z-k-sUkPsbWr5BuTOuAAD5YY=L=A9qpe5dgXWQ6rXA@mail.gmail.com>
+Subject: Re: [wpan-next v3 0/3] ieee802154: A bunch of light changes
 To:     Stefan Schmidt <stefan@datenfreihafen.org>
-Cc:     Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org,
+Cc:     Miquel Raynal <miquel.raynal@bootlin.com>,
+        linux-wpan - ML <linux-wpan@vger.kernel.org>,
         "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-        linux-wireless@vger.kernel.org,
+        Jakub Kicinski <kuba@kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
         David Girault <david.girault@qorvo.com>,
         Romuald Despres <romuald.despres@qorvo.com>,
         Frederic Blain <frederic.blain@qorvo.com>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [wpan-next 2/4] net: mac802154: Include the softMAC stack
- inside the IEEE 802.15.4 menu
-Message-ID: <20220127175409.777b9dff@xps13>
-In-Reply-To: <53c2d017-a7a5-3ed0-a68c-6b67c96b5b54@datenfreihafen.org>
-References: <20220120004350.308866-1-miquel.raynal@bootlin.com>
-        <20220120004350.308866-3-miquel.raynal@bootlin.com>
-        <53c2d017-a7a5-3ed0-a68c-6b67c96b5b54@datenfreihafen.org>
-Organization: Bootlin
-X-Mailer: Claws Mail 3.17.7 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi Stefan,
+Hi,
 
-stefan@datenfreihafen.org wrote on Thu, 27 Jan 2022 17:04:41 +0100:
-
+On Thu, Jan 27, 2022 at 10:54 AM Stefan Schmidt
+<stefan@datenfreihafen.org> wrote:
+>
 > Hello.
->=20
-> On 20.01.22 01:43, Miquel Raynal wrote:
-> > From: David Girault <david.girault@qorvo.com>
-> >=20
-> > The softMAC stack has no meaning outside of the IEEE 802.15.4 stack and
-> > cannot be used without it.
-> >=20
-> > Signed-off-by: David Girault <david.girault@qorvo.com>
-> > [miquel.raynal@bootlin.com: Isolate this change from a bigger commit]
-> > Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
-> > ---
-> >   net/Kconfig            | 1 -
-> >   net/ieee802154/Kconfig | 1 +
-> >   2 files changed, 1 insertion(+), 1 deletion(-)
-> >=20
-> > diff --git a/net/Kconfig b/net/Kconfig
-> > index 0da89d09ffa6..a5e31078fd14 100644
-> > --- a/net/Kconfig
-> > +++ b/net/Kconfig
-> > @@ -228,7 +228,6 @@ source "net/x25/Kconfig"
-> >   source "net/lapb/Kconfig"
-> >   source "net/phonet/Kconfig"
-> >   source "net/6lowpan/Kconfig"
-> > -source "net/mac802154/Kconfig"
-> >   source "net/sched/Kconfig"
-> >   source "net/dcb/Kconfig"
-> >   source "net/dns_resolver/Kconfig"
-> > diff --git a/net/ieee802154/Kconfig b/net/ieee802154/Kconfig
-> > index 31aed75fe62d..7e4b1d49d445 100644
-> > --- a/net/ieee802154/Kconfig
-> > +++ b/net/ieee802154/Kconfig
-> > @@ -36,6 +36,7 @@ config IEEE802154_SOCKET
-> >   	  for 802.15.4 dataframes. Also RAW socket interface to build MAC
-> >   	  header from userspace. =20
-> >   > +source "net/mac802154/Kconfig" =20
-> >   source "net/ieee802154/6lowpan/Kconfig" =20
-> >   >   endif =20
-> >  =20
->=20
-> Please fold this patch into the previous one moving the Kconfig option ar=
-ound. This can be done in one go.
+>
+> On 25.01.22 13:25, Miquel Raynal wrote:
+> > Here are a few small cleanups and improvements in preparation of a wider
+> > series bringing a lot of features. These are aside changes, hence they
+> > have their own small series.
+> >
+> > Changes in v3:
+> > * Split the v2 into two series: fixes for the wpan branch and cleanups
+> >    for wpan-next. Here are random "cleanups".
+> > * Reworded the ieee802154_wake/stop_queue helpers kdoc as discussed
+> >    with Alexander.
+> >
+> > Miquel Raynal (3):
+> >    net: ieee802154: hwsim: Ensure frame checksum are valid
+> >    net: ieee802154: Use the IEEE802154_MAX_PAGE define when relevant
+> >    net: mac802154: Explain the use of ieee802154_wake/stop_queue()
+> >
+> >   drivers/net/ieee802154/mac802154_hwsim.c |  2 +-
+> >   include/net/mac802154.h                  | 12 ++++++++++++
+> >   net/ieee802154/nl-phy.c                  |  4 ++--
+> >   3 files changed, 15 insertions(+), 3 deletions(-)
+> >
+>
+> I am happy with all three of them now. Alex, let me know if there is
+> anything else you want to be adressed and ack if not so I can pull these in.
 
-Sure.
+Everything is fine.
 
-By the way, I was questioning myself: why is the mac802154 folder
-outside of ieee802154? I don't really understand the organization but
-as it would massively prevent any of the future changes that I already
-prepared to apply correctly, I haven't proposed such a move -yet. But
-I would like to know what's the idea behind the current folder
-hierarchy?
+Acked-by: Alexander Aring <aahringo@redhat.com>
 
-Thanks,
-Miqu=C3=A8l
+Thanks.
+
+- Alex
