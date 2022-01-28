@@ -2,89 +2,139 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB3FCC433EF
-	for <linux-wpan@archiver.kernel.org>; Fri, 28 Jan 2022 13:01:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DFC1BC433F5
+	for <linux-wpan@archiver.kernel.org>; Fri, 28 Jan 2022 14:04:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237817AbiA1NBB (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Fri, 28 Jan 2022 08:01:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50848 "EHLO
+        id S238986AbiA1OET (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Fri, 28 Jan 2022 09:04:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37190 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237795AbiA1NBA (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Fri, 28 Jan 2022 08:01:00 -0500
-Received: from proxima.lasnet.de (proxima.lasnet.de [IPv6:2a01:4f8:121:31eb:3::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58997C061749;
-        Fri, 28 Jan 2022 05:00:59 -0800 (PST)
-Received: from [IPV6:2003:e9:d705:dc25:2cd1:34b0:e26d:e30d] (p200300e9d705dc252cd134b0e26de30d.dip0.t-ipconnect.de [IPv6:2003:e9:d705:dc25:2cd1:34b0:e26d:e30d])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits))
-        (No client certificate requested)
-        (Authenticated sender: stefan@datenfreihafen.org)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id 3F54DC0963;
-        Fri, 28 Jan 2022 14:00:57 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
-        s=2021; t=1643374857;
+        with ESMTP id S1343836AbiA1OES (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 28 Jan 2022 09:04:18 -0500
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::226])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F36E3C061714;
+        Fri, 28 Jan 2022 06:04:17 -0800 (PST)
+Received: (Authenticated sender: miquel.raynal@bootlin.com)
+        by mail.gandi.net (Postfix) with ESMTPSA id A6A24C0004;
+        Fri, 28 Jan 2022 14:04:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+        t=1643378656;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=SwRXvp4anoiRWcjo/rFJ2ukSP2RgDfwZbWYriq2fE84=;
-        b=LcnaRCdXsOnhAHVu+iBGtSOqnAB1o61nB+0rMueP/PHv5dV4Qk1fuHBvgHoBBSjDy64U5u
-        E7yoi9TfAaTHwFeBO3dAY53gvMGUOOB5BvEexdvStCoUgyAydd7lGaUOG2zF3Xou/pGhrL
-        Zjni/MN9705QFaAIGdD3sdTAwSipsi0nq2lXQVlQCiSlxu1oM9Bsjb2BGbe3hE9CpM77Xe
-        u/j93r9OoJBoCqT2T10MDEA7X6gkCshGS7GkffksU23PCdrU7r0u3whEnnEkXgDkRey6iP
-        AOpkcYfhjk9kvvHPszlMu5Py/CJ6OadGSMFu/4uJmu2skhGaTj+yKDkFbGr9zw==
-Message-ID: <0ab159b2-b2f2-2442-0fba-cc6ec82cf397@datenfreihafen.org>
-Date:   Fri, 28 Jan 2022 14:00:56 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Subject: Re: [PATCH wpan-next v2 3/5] net: mac802154: Convert the symbol
- duration into nanoseconds
-Content-Language: en-US
-To:     Miquel Raynal <miquel.raynal@bootlin.com>,
-        Alexander Aring <alex.aring@gmail.com>,
-        linux-wpan@vger.kernel.org
-Cc:     "David S. Miller" <davem@davemloft.net>,
+        bh=VYFIO68eZ3ZkE9tPGEtJc6snkjqokpF1MQo//pTucJQ=;
+        b=PXEa5CwKNGgyG+OcGp/0MR7+YhxHILxCKmYPSWqdo1AJFlsa91aSj+u/vPhA98rsVZhpJD
+        jvYpHpuTKtHREScmFxQcAmOYfS6ca3reOvi/DMHsjR6gkDRwV1LZwBk7Ts6sVMF4jpT3o2
+        SO0RlwrB8OYDSeFujDacxhyBBTbi3XC77Z3kB8RS+lnJSSf4Q+WMR22FLramRVfo8H9/WM
+        UTKlhwOCiu0DrF+h2OUOlU1wrty6lhHZviMsEFgiWyPcfCDIJxExgIDBMSTLqMjKpEkILO
+        j0DGN+Xvl5+JslDe200g/5OKRRmGOmCZaR64aSk1sPIvCnEI/yu4rcw3l2thbg==
+Date:   Fri, 28 Jan 2022 15:04:12 +0100
+From:   Miquel Raynal <miquel.raynal@bootlin.com>
+To:     Stefan Schmidt <stefan@datenfreihafen.org>
+Cc:     Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-        Michael Hennerich <michael.hennerich@analog.com>,
-        Varka Bhadram <varkabhadram@gmail.com>,
-        Xue Liu <liuxuenetmail@gmail.com>, Alan Ott <alan@signal11.us>
-References: <20220128110825.1120678-1-miquel.raynal@bootlin.com>
- <20220128110825.1120678-4-miquel.raynal@bootlin.com>
-From:   Stefan Schmidt <stefan@datenfreihafen.org>
-In-Reply-To: <20220128110825.1120678-4-miquel.raynal@bootlin.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+        linux-wireless@vger.kernel.org,
+        David Girault <david.girault@qorvo.com>,
+        Romuald Despres <romuald.despres@qorvo.com>,
+        Frederic Blain <frederic.blain@qorvo.com>,
+        Nicolas Schodet <nico@ni.fr.eu.org>,
+        Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: Re: [wpan-next 2/4] net: mac802154: Include the softMAC stack
+ inside the IEEE 802.15.4 menu
+Message-ID: <20220128150412.4d3f8a3d@xps13>
+In-Reply-To: <431ac70b-40f8-0666-0919-e3dd20721794@datenfreihafen.org>
+References: <20220120004350.308866-1-miquel.raynal@bootlin.com>
+        <20220120004350.308866-3-miquel.raynal@bootlin.com>
+        <53c2d017-a7a5-3ed0-a68c-6b67c96b5b54@datenfreihafen.org>
+        <20220127175409.777b9dff@xps13>
+        <431ac70b-40f8-0666-0919-e3dd20721794@datenfreihafen.org>
+Organization: Bootlin
+X-Mailer: Claws Mail 3.17.7 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
+Hi Stefan,
 
-Hello.
+stefan@datenfreihafen.org wrote on Fri, 28 Jan 2022 13:35:00 +0100:
 
-On 28.01.22 12:08, Miquel Raynal wrote:
-> Tdsym is often given in the spec as pretty small numbers in microseconds
-> and hence was reflected in the code as symbol_duration and was stored as
-> a u8. Actually, for UWB PHYs, the symbol duration is given in
-> nanoseconds and are as precise as picoseconds. In order to handle better
-> these PHYs, change the type of symbol_duration to u32 and store this
-> value in nanoseconds.
-> 
-> All the users of this variable are updated in a mechanical way.
-> 
-> Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
-> ---
->   drivers/net/ieee802154/at86rf230.c | 22 +++++++++++-----------
->   drivers/net/ieee802154/atusb.c     | 22 +++++++++++-----------
->   drivers/net/ieee802154/ca8210.c    |  2 +-
->   drivers/net/ieee802154/mcr20a.c    |  8 ++++----
+> Hello.
+>=20
+> On 27.01.22 17:54, Miquel Raynal wrote:
+> > Hi Stefan,
+> >=20
+> > stefan@datenfreihafen.org wrote on Thu, 27 Jan 2022 17:04:41 +0100:
+> >  =20
+> >> Hello.
+> >>
+> >> On 20.01.22 01:43, Miquel Raynal wrote: =20
+> >>> From: David Girault <david.girault@qorvo.com>
+> >>>
+> >>> The softMAC stack has no meaning outside of the IEEE 802.15.4 stack a=
+nd
+> >>> cannot be used without it.
+> >>>
+> >>> Signed-off-by: David Girault <david.girault@qorvo.com>
+> >>> [miquel.raynal@bootlin.com: Isolate this change from a bigger commit]
+> >>> Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
+> >>> ---
+> >>>    net/Kconfig            | 1 -
+> >>>    net/ieee802154/Kconfig | 1 +
+> >>>    2 files changed, 1 insertion(+), 1 deletion(-)
+> >>>
+> >>> diff --git a/net/Kconfig b/net/Kconfig
+> >>> index 0da89d09ffa6..a5e31078fd14 100644
+> >>> --- a/net/Kconfig
+> >>> +++ b/net/Kconfig
+> >>> @@ -228,7 +228,6 @@ source "net/x25/Kconfig"
+> >>>    source "net/lapb/Kconfig"
+> >>>    source "net/phonet/Kconfig"
+> >>>    source "net/6lowpan/Kconfig"
+> >>> -source "net/mac802154/Kconfig"
+> >>>    source "net/sched/Kconfig"
+> >>>    source "net/dcb/Kconfig"
+> >>>    source "net/dns_resolver/Kconfig"
+> >>> diff --git a/net/ieee802154/Kconfig b/net/ieee802154/Kconfig
+> >>> index 31aed75fe62d..7e4b1d49d445 100644
+> >>> --- a/net/ieee802154/Kconfig
+> >>> +++ b/net/ieee802154/Kconfig
+> >>> @@ -36,6 +36,7 @@ config IEEE802154_SOCKET
+> >>>    	  for 802.15.4 dataframes. Also RAW socket interface to build MAC
+> >>>    	  header from userspace. =20
+> >>>    > +source "net/mac802154/Kconfig" =20
+> >>>    source "net/ieee802154/6lowpan/Kconfig" =20
+> >>>    >   endif =20
+> >>>    >> =20
+> >> Please fold this patch into the previous one moving the Kconfig option=
+ around. This can be done in one go. =20
+> >=20
+> > Sure.
+> >=20
+> > By the way, I was questioning myself: why is the mac802154 folder
+> > outside of ieee802154? I don't really understand the organization but
+> > as it would massively prevent any of the future changes that I already
+> > prepared to apply correctly, I haven't proposed such a move -yet. But
+> > I would like to know what's the idea behind the current folder
+> > hierarchy? =20
+>=20
+> The directory structure has been in place from the initial merge of the s=
+ubsystem, before Alex and myself took on the maintainer roles.
+>=20
+> I see no reason for a move though. The extra burden for backports, etc ou=
+tweigh the urge of cleanliness on the folder structure. :-)
 
-I get a error on the mcr20a hunk when applying this. I assume its due to 
-the mcr20a fix that hit wpan, but is not yet in wpan-next.
+That's fair.
 
-The wpan pull request for the fixes has been send today. Once merged and 
-the next merge of net to net-next happened I will pull that in here to 
-resolve the conflict.
+> The Kconfig cleanup and move of the file is worth doing, the move of the =
+whole source code folder not.
 
-regards
-Stefan Schmidt
+I agree there is more interesting and less impacting to do in the area,
+I was just wondering about that choice.
+
+Thanks,
+Miqu=C3=A8l
