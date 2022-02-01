@@ -2,68 +2,66 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8784CC433F5
-	for <linux-wpan@archiver.kernel.org>; Mon, 31 Jan 2022 22:58:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E584C433F5
+	for <linux-wpan@archiver.kernel.org>; Tue,  1 Feb 2022 00:04:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235320AbiAaW6K (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 31 Jan 2022 17:58:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41648 "EHLO
+        id S229998AbiBAAEy (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 31 Jan 2022 19:04:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56794 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233548AbiAaW6K (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 31 Jan 2022 17:58:10 -0500
-Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB426C061714;
-        Mon, 31 Jan 2022 14:58:09 -0800 (PST)
-Received: by mail-wr1-x430.google.com with SMTP id h21so28353386wrb.8;
-        Mon, 31 Jan 2022 14:58:09 -0800 (PST)
+        with ESMTP id S229933AbiBAAEy (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 31 Jan 2022 19:04:54 -0500
+Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EEB52C06173B;
+        Mon, 31 Jan 2022 16:04:53 -0800 (PST)
+Received: by mail-wr1-x434.google.com with SMTP id c23so28573765wrb.5;
+        Mon, 31 Jan 2022 16:04:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=lU1G9+dkgu85ynTOI5duAG/YVK2yiYMVuxleih31VWQ=;
-        b=WykjLdPIQhu+boQyH2Ffsyq0If/EgomKYiHHiYUPdWSri2xlCbIhZCTrhykLd3S12g
-         BLg56tIPmi0jPGqPQlZDq7qdmJEnWg7IAm7dbjZCVFOYP4UfF9qTPkehSAP5Bq/Gm29K
-         HdgI5jreR2lfrdHTsAo2r1Bk1Ed2qtRZ3hhJLBbEEgVBFC+GvhxxmlyhGhC03HdEp1ta
-         RfA5X1NRgndyc7DQyoUrCT0892+XUUiz4spgpIWwIaRDd5P7DSaLIrVXbBDRvxUUQfB7
-         FH7D4NwaYbmInlflNJV52Kfblhlse6Ox4MIn0tBR3ZF1u2f6L0sEdtJvuFZ1Dtoyfjh4
-         slVg==
+        bh=cBTkWatVoRf7mAdGB+dxqdrFr+qHLJMbIjv4D9cDcgo=;
+        b=TBJ927R42fEKQRHDCZwUtOu36hzRyfRJsPlcE/1UdzjrlxTJFtVUPuLSlgDZjUQ+2W
+         Z3W+dB7jP1VfW6t3WrYC+M5vxkr5YYLN4zoGmqLdo09tV1KIciPgD9CB2uT7RZePT6Cl
+         hsXmYPCUl4B3dFzZBC38bLeGTy+68fYdt6Szm584Bm85cCtUuLOgPHqyq1NXfJci0xeS
+         ofKg054YZTGxbzRKliDMUfgi2wDWIHr/XFwxsgKau0mqHW0Fho1arsqpNxUVSYs/FyM8
+         dNBICrxyTFwJ4mzrt68vgOpGqozqK/WuANPgcegmwlHH7omsKEdPUCaJCQOwm1cGKC6n
+         mSKw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=lU1G9+dkgu85ynTOI5duAG/YVK2yiYMVuxleih31VWQ=;
-        b=8PWDt+WOjs8O1sT13yjrS6lSXJ4g9+B8ZMYcj173EkTMz2yTXEG3+wrNViU0Po/VG6
-         MnbWGRd8W2u+sQAT6HZrag85oLww62juist5KbE/dEzApjXXPb+cL4iNQ7rcoXVPLCTr
-         fa3cbQExEGw0ihX2NQ6AgtJkF47PY9fH1CIn6PE90ckt3IKqksPtJhPJQ1d4zak+MWgZ
-         yvl2kGlIrxrk0duK65iGt4zmw0fDVYnCFcsRMhipR8K9bKcUHZ0/iJpZvuADk2NcI8wE
-         qWunRuB3CFEnK/AE9MSp8WMQTON8lSBOubQLdV6Ks5BIhENTfZ+nLwXkQQuw78xUaBF1
-         idrg==
-X-Gm-Message-State: AOAM532NUk2fpVe5tCcEZK3ISVAy2/Ya3dlrP+7o43hPI+dCPp49ZnXH
-        1kMQ6VdcN9oVmVnPpJ1mE1yvQ5/4za5cA0T+UZvVsLwtga4=
-X-Google-Smtp-Source: ABdhPJyD2fM3BtNInKv4oMf21T2wHQTDvfV7IYnED6scoOKURuDGAnDosQBESke9fj3fkXJAT8VE8vi2sXjcIegvvq4=
-X-Received: by 2002:a5d:6f10:: with SMTP id ay16mr19726478wrb.205.1643669888313;
- Mon, 31 Jan 2022 14:58:08 -0800 (PST)
+        bh=cBTkWatVoRf7mAdGB+dxqdrFr+qHLJMbIjv4D9cDcgo=;
+        b=lGhTashChUKzCLV1VAtpWlVYinLJJPmspIEhIux7YBmjgd9/hTmP+JAmdZpGEfyW1+
+         86B4Z7Je8Xa7dSannP9hOVyaImpQiM1PmdYSvdygvCW7eNpC1uY9aPdGxR5x71yEx8Tg
+         C4f+tCN6R38gi2jxnTSMD8xRAa1E2Y/60TliHc5b+h5EVNsiL0TwZGftotaAuYnOL1I+
+         qIwWFJXnmxFFqaibMWr4+6rz9tvJ2deb6y+mxRofd9hXgz+RCXEvQRGV/ajIUuR3wLSh
+         HYHWqieAfrxxWk4zMnZfx5cWjiJaitv4RPupI33YLqXPNIJGZf+T2Wj/DhS/JD4zaS/n
+         LoEQ==
+X-Gm-Message-State: AOAM531i7fLzCU5NHtVs+usy0EIKqwo8yAX1aXD41I0H5E1kiBS3Psh5
+        iIrhalKJOxJ77XQiqhCzRMN3WZTNTjYwDDTc26U=
+X-Google-Smtp-Source: ABdhPJzGV4y3Ta1GE0TKjv9FhswpUz4QxbLaboPqV49koQL/GO1e6pYU1VRUkwW2oJZhJMONypsZH7NsIq4Ll5FPnYs=
+X-Received: by 2002:a5d:47c2:: with SMTP id o2mr19465998wrc.81.1643673892365;
+ Mon, 31 Jan 2022 16:04:52 -0800 (PST)
 MIME-Version: 1.0
-References: <20220128112002.1121320-1-miquel.raynal@bootlin.com>
- <20220128112002.1121320-2-miquel.raynal@bootlin.com> <CAB_54W45Hht8OVLDhKTKkfORYUJ30oWBz2psxX2m8OB4foK=0Q@mail.gmail.com>
- <20220131144617.3c762cfb@xps13>
-In-Reply-To: <20220131144617.3c762cfb@xps13>
+References: <20220128110825.1120678-1-miquel.raynal@bootlin.com>
+ <20220128110825.1120678-2-miquel.raynal@bootlin.com> <CAB_54W60OiGmjLQ2dAvnraq6fkZ6GGTLMVzjVbVAobcvNsaWtQ@mail.gmail.com>
+ <20220131152345.3fefa3aa@xps13>
+In-Reply-To: <20220131152345.3fefa3aa@xps13>
 From:   Alexander Aring <alex.aring@gmail.com>
-Date:   Mon, 31 Jan 2022 17:57:57 -0500
-Message-ID: <CAB_54W7WTpJ+G2VMzL9d49aKejj9P4=f=BS4ryLHrpX1hnfxZw@mail.gmail.com>
-Subject: Re: [PATCH wpan-next v2 1/2] net: ieee802154: Move the IEEE 802.15.4
- Kconfig main entries
+Date:   Mon, 31 Jan 2022 19:04:40 -0500
+Message-ID: <CAB_54W7SZmgU=2_HEm=_agE0RWfsXxEs_4MHmnAPPFb+iVvxsQ@mail.gmail.com>
+Subject: Re: [PATCH wpan-next v2 1/5] net: ieee802154: Improve the way
+ supported channels are declared
 To:     Miquel Raynal <miquel.raynal@bootlin.com>
 Cc:     Stefan Schmidt <stefan@datenfreihafen.org>,
         linux-wpan - ML <linux-wpan@vger.kernel.org>,
         "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
         "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-        Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-        David Girault <david.girault@qorvo.com>,
-        Romuald Despres <romuald.despres@qorvo.com>,
-        Frederic Blain <frederic.blain@qorvo.com>,
-        Nicolas Schodet <nico@ni.fr.eu.org>
+        Michael Hennerich <michael.hennerich@analog.com>,
+        Varka Bhadram <varkabhadram@gmail.com>,
+        Xue Liu <liuxuenetmail@gmail.com>, Alan Ott <alan@signal11.us>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
@@ -71,104 +69,76 @@ X-Mailing-List: linux-wpan@vger.kernel.org
 
 Hi,
 
-On Mon, Jan 31, 2022 at 8:46 AM Miquel Raynal <miquel.raynal@bootlin.com> wrote:
+On Mon, Jan 31, 2022 at 9:23 AM Miquel Raynal <miquel.raynal@bootlin.com> wrote:
 >
 > Hi Alexander,
 >
-> alex.aring@gmail.com wrote on Sun, 30 Jan 2022 16:07:53 -0500:
+> alex.aring@gmail.com wrote on Sun, 30 Jan 2022 16:35:35 -0500:
 >
 > > Hi,
 > >
-> > I will do this review again because I messed up with other series.
-> >
-> > On Fri, Jan 28, 2022 at 6:20 AM Miquel Raynal <miquel.raynal@bootlin.com> wrote:
+> > On Fri, Jan 28, 2022 at 6:08 AM Miquel Raynal <miquel.raynal@bootlin.com> wrote:
 > > >
-> > > From: David Girault <david.girault@qorvo.com>
+> > > The idea here is to create a structure per set of channels so that we
+> > > can define much more than basic bitfields for these.
 > > >
-> > > It makes certainly more sense to have all the low-range wireless
-> > > protocols such as Bluetooth, IEEE 802.11 (WiFi) and IEEE 802.15.4
-> > > together, so let's move the main IEEE 802.15.4 stack Kconfig entry at a
-> > > better location.
-> > >
-> > > As the softMAC layer has no meaning outside of the IEEE 802.15.4 stack
-> > > and cannot be used without it, also move the mac802154 menu inside
-> > > ieee802154/.
+> > > The structure is currently almost empty on purpose because this change
+> > > is supposed to be a mechanical update without additional information but
+> > > more details will be added in the following commits.
 > > >
 > >
-> > That's why there is a "depends on".
-> >
-> > > Signed-off-by: David Girault <david.girault@qorvo.com>
-> > > [miquel.raynal@bootlin.com: Isolate this change from a bigger commit and
-> > > rewrite the commit message.]
-> > > Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
-> > > ---
-> > >  net/Kconfig            | 3 +--
-> > >  net/ieee802154/Kconfig | 1 +
-> > >  2 files changed, 2 insertions(+), 2 deletions(-)
-> > >
-> > > diff --git a/net/Kconfig b/net/Kconfig
-> > > index 8a1f9d0287de..a5e31078fd14 100644
-> > > --- a/net/Kconfig
-> > > +++ b/net/Kconfig
-> > > @@ -228,8 +228,6 @@ source "net/x25/Kconfig"
-> > >  source "net/lapb/Kconfig"
-> > >  source "net/phonet/Kconfig"
-> > >  source "net/6lowpan/Kconfig"
-> > > -source "net/ieee802154/Kconfig"
-> >
-> > I would argue here that IEEE 802.15.4 is no "network option". However
-> > I was talking once about moving it, but people don't like to move
-> > things there around.
-> > In my opinion there is no formal place to "have all the low-range
-> > wireless such as Bluetooth, IEEE 802.11 (WiFi) and IEEE 802.15.4
-> > together". If you bring all subsystems together and put them into an
-> > own menuentry this would look different.
-> >
-> > If nobody else complains about moving Kconfig entries here around it
-> > looks okay for me.
-> >
-> > > -source "net/mac802154/Kconfig"
-> > >  source "net/sched/Kconfig"
-> > >  source "net/dcb/Kconfig"
-> > >  source "net/dns_resolver/Kconfig"
-> > > @@ -380,6 +378,7 @@ source "net/mac80211/Kconfig"
-> > >
-> > >  endif # WIRELESS
-> > >
-> > > +source "net/ieee802154/Kconfig"
-> > >  source "net/rfkill/Kconfig"
-> > >  source "net/9p/Kconfig"
-> > >  source "net/caif/Kconfig"
-> > > diff --git a/net/ieee802154/Kconfig b/net/ieee802154/Kconfig
-> > > index 31aed75fe62d..7e4b1d49d445 100644
-> > > --- a/net/ieee802154/Kconfig
-> > > +++ b/net/ieee802154/Kconfig
-> > > @@ -36,6 +36,7 @@ config IEEE802154_SOCKET
-> > >           for 802.15.4 dataframes. Also RAW socket interface to build MAC
-> > >           header from userspace.
-> > >
-> > > +source "net/mac802154/Kconfig"
-> >
-> > The next person in a year will probably argue "but wireless do source
-> > of wireless/mac80211 in net/Kconfig... so this is wrong".
-> > To avoid this issue maybe we should take out the menuentry here and do
-> > whatever wireless is doing without questioning it?
+> > In my opinion you want to put more information in this structure which
+> > is not necessary and force the driver developer to add information
+> > which is already there encoded in the page/channel bitfields.
 >
-> Without discussing the cleanliness of the wireless subsystem, I don't
-> feel bad proposing alternatives :)
+> The information I am looking forward to add is clearly not encoded in
+> the page/channel bitfields (these information are added in the
+> following patches). At least I don't see anywhere in the spec a
+> paragraph telling which protocol and band must be used as a function of
+> the page and channel information. So I improved the way channels are
+> declared to give more information than what we currently have.
 >
-> I'm fine adapting to your preferred solution either way, so could you
-> clarify what should I do:
-> - Drop that commit entirely.
-> - Move things into their own submenu (we can discuss the naming,
->   "Low range wireless Networks" might be a good start).
-> - Keep it like it is.
 
-I think we should move things around to end in a situation like
-wireless has it in net/Kconfig. This will avoid other movements
-whoever declares what's wrong and right of handling Kconfig entries.
+This makes no sense for me, because you are telling right now that a
+page/channel combination depends on the transceiver.
 
-Sure you can do follow up patches which introduce "Low range wireless
-Networks" and ask for acks for doing such change.
+> BTW I see the wpan tools actually derive the protocol/band from the
+> channel/page information and I _really_ don't get it. I believe it only
+> works with hwsim but if it's not the case I would like to hear
+> more about it.
+>
 
-- A;ex
+No, I remember the discussion with Christoffer Holmstedt, he described
+it in his commit message "8.1.2 in IEEE 802.15.4-2011".
+See wpan-tools commit 0af3e40bbd6da60cc000cfdfd13b9cdd8a20d717 ("info:
+add frequency to channel listing for phy capabilities").
+
+I think it is the chapter "Channel assignments"?
+
+> > Why not
+> > add helper functionality and get your "band" and "protocol" for a
+> > page/channel combination?
+>
+> This information is as static as the channel/page information, so why
+> using two different channels to get it? This means two different places
+> where the channels must be described, which IMHO hardens the work for
+> device driver writers.
+>
+
+device drivers writers can make mistakes here, they probably can only
+set page/channel registers in their hardware and have no idea about
+other things.
+
+> I however agree that the final presentation looks a bit more heavy to
+> the eyes, but besides the extra fat that this change brings, it is
+> rather easy to give the core all the information it needs in a rather
+> detailed and understandable way.
+
+On the driver layer it should be as simple as possible. If you want to
+have a static array for that init it in the phy register
+functionality, however I think a simple lookup table should be enough
+for that.
+To make it more understandable I guess some people can introduce some
+defines/etc to make a more sense behind setting static hex values.
+
+- Alex
