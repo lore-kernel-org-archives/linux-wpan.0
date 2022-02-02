@@ -2,121 +2,133 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A08CDC433F5
-	for <linux-wpan@archiver.kernel.org>; Wed,  2 Feb 2022 12:17:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EAA3C433EF
+	for <linux-wpan@archiver.kernel.org>; Wed,  2 Feb 2022 13:50:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231481AbiBBMRm (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 2 Feb 2022 07:17:42 -0500
-Received: from proxima.lasnet.de ([78.47.171.185]:57734 "EHLO
-        proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344077AbiBBMRl (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 2 Feb 2022 07:17:41 -0500
-Received: from [IPV6:2003:e9:d731:20df:8d81:5815:ac7:f110] (p200300e9d73120df8d8158150ac7f110.dip0.t-ipconnect.de [IPv6:2003:e9:d731:20df:8d81:5815:ac7:f110])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: stefan@datenfreihafen.org)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id 0429AC02AF;
-        Wed,  2 Feb 2022 13:17:39 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
-        s=2021; t=1643804260;
+        id S1344542AbiBBNu4 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 2 Feb 2022 08:50:56 -0500
+Received: from relay3-d.mail.gandi.net ([217.70.183.195]:53251 "EHLO
+        relay3-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1344737AbiBBNum (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 2 Feb 2022 08:50:42 -0500
+Received: (Authenticated sender: miquel.raynal@bootlin.com)
+        by mail.gandi.net (Postfix) with ESMTPSA id 9447E6000D;
+        Wed,  2 Feb 2022 13:50:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+        t=1643809841;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=5Igh7BiNEYe//liASVMKQTPuMo3jqkmIZtlJu/P3YUA=;
-        b=F5o6UXIRp+EQgjfSzS3H7P27Vu6Z+78ARrO2addlgFG4NhKmpolvhj1xINuAh/SyO/vzHA
-        zF/Q5H3rtEt5sera7iz1Etz0ilMx7VV+fF5qdQuJI1DaARnN049LKkjwf7potkXDxZt7K+
-        42VFLmTfYB77Lcf+ZfriVZW+F+HyWlGsD9I6upg2e9qrkgQOnAWmLx97ceYUld4gbkWsxk
-        TOKt+/vD3nRC9Kfi4p/NkuY7f8/yPmBOqPdtYvhwTnsilhsA42LMa6X8tOsUPML9xOIoiN
-        xjBVnj6vwmQUGtccYbnNfSdfZoJi/2r1P8/l7trJ+UWShidnxZ1VrdpOOVAL3w==
-Message-ID: <026d499d-2814-2d5a-b148-fd7ec8ae9eb6@datenfreihafen.org>
-Date:   Wed, 2 Feb 2022 13:17:39 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Subject: Re: [PATCH wpan-next v2 5/5] net: ieee802154: Drop duration settings
- when the core does it already
-Content-Language: en-US
-To:     Miquel Raynal <miquel.raynal@bootlin.com>
+        bh=UhOm+HGT2TvQNz0Cij+moD/CsXOWHG18qYnI0MFlAck=;
+        b=inf9rbXwfM08jQCxkjl5EDviAJuF+lCJYDChgrG06Khd90PHLZEHu027tkvSB1YrApJLCV
+        ZpM5ZJmWd+j7UiaiWmv1yWSdR6J7EIJTPYGu3MWADhN4hV+I6Kqv5hwIkJApBTSTQkVYvh
+        TNvTlkga7kDNtBO2h/Rw9S4Ry6ZSIMMiwYnybZh578G747DsFv81gNpP7MzmnNe2EoRViG
+        G0gn1ZF6gZ0RWsjSbKq5aFHNvkeX9LYUmah8UJsEWozerrpB8Y5v7/RXZ7kLqFXF27hTTO
+        kRRluSnlmJYFGKxgbbT+JFxpcXJHDXZHCAZ0Dbgod8TyWcg67p5a4o32hF1Mgw==
+Date:   Wed, 2 Feb 2022 14:50:34 +0100
+From:   Miquel Raynal <miquel.raynal@bootlin.com>
+To:     Stefan Schmidt <stefan@datenfreihafen.org>
 Cc:     Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org,
         "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
         Michael Hennerich <michael.hennerich@analog.com>,
         Varka Bhadram <varkabhadram@gmail.com>,
         Xue Liu <liuxuenetmail@gmail.com>, Alan Ott <alan@signal11.us>
+Subject: Re: [PATCH wpan-next v2 5/5] net: ieee802154: Drop duration
+ settings when the core does it already
+Message-ID: <20220202145034.13a34e98@xps13>
+In-Reply-To: <026d499d-2814-2d5a-b148-fd7ec8ae9eb6@datenfreihafen.org>
 References: <20220128110825.1120678-1-miquel.raynal@bootlin.com>
- <20220128110825.1120678-6-miquel.raynal@bootlin.com>
- <20220201184014.72b3d9a3@xps13>
- <fab37d38-0239-8be3-81aa-98d163bf5ca4@datenfreihafen.org>
- <20220202084017.7a88f20d@xps13>
-From:   Stefan Schmidt <stefan@datenfreihafen.org>
-In-Reply-To: <20220202084017.7a88f20d@xps13>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+        <20220128110825.1120678-6-miquel.raynal@bootlin.com>
+        <20220201184014.72b3d9a3@xps13>
+        <fab37d38-0239-8be3-81aa-98d163bf5ca4@datenfreihafen.org>
+        <20220202084017.7a88f20d@xps13>
+        <026d499d-2814-2d5a-b148-fd7ec8ae9eb6@datenfreihafen.org>
+Organization: Bootlin
+X-Mailer: Claws Mail 3.17.7 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello.
+Hi Stefan,
 
-On 02.02.22 08:40, Miquel Raynal wrote:
-> Hi Stefan,
-> 
-> stefan@datenfreihafen.org wrote on Tue, 1 Feb 2022 21:51:04 +0100:
-> 
->> Hello.
->>
->> On 01.02.22 18:40, Miquel Raynal wrote:
->>> Hi,
->>>    
->>>> --- a/drivers/net/ieee802154/ca8210.c
->>>> +++ b/drivers/net/ieee802154/ca8210.c
->>>> @@ -2978,7 +2978,6 @@ static void ca8210_hw_setup(struct ieee802154_hw *ca8210_hw)
->>>>    	ca8210_hw->phy->cca.mode = NL802154_CCA_ENERGY_CARRIER;
->>>>    	ca8210_hw->phy->cca.opt = NL802154_CCA_OPT_ENERGY_CARRIER_AND;
->>>>    	ca8210_hw->phy->cca_ed_level = -9800;
->>>> -	ca8210_hw->phy->symbol_duration = 16 * NSEC_PER_USEC;
->>>>    	ca8210_hw->phy->lifs_period = 40;
->>>>    	ca8210_hw->phy->sifs_period = 12;
->>>
->>> I've missed that error                ^^
->>>
->>> This driver should be fixed first (that's probably a copy/paste of the
->>> error from the other driver which did the same).
->>>
->>> As the rest of the series will depend on this fix (or conflict) we could
->>> merge it through wpan-next anyway, if you don't mind, as it was there
->>> since 2017 and these numbers had no real impact so far (I believe).
->>
->> Not sure I follow this logic. The fix you do is being removed in 4/4 of your v3 set again. So it would only be in place for these two in between commits.
-> 
-> Exactly.
-> 
->> As you laid out above this has been in place since 2017 and the number have no real impact. Getting the fix in wpan-next to remove it again two patches later would not be needed here.
->>
->> If you would like to have this fixed for 5.16 and older stable kernels I could go ahead and apply it to wpan and let it trickle down into stable trees.
-> 
-> I'm fine "ignoring" the issue in stable kernels, it was just a warning
-> for you that this would happen otherwise, given the fact that this is
-> the second driver doing so (first fix has already been merged) and that
-> I just realized it now.
-> 
->> We would have to deal with either a merge of net into net-next or with
->> a merge conflicts when sending the pull request. Both can be done.
->>
->> But given the circumstances above I have no problem to drop this fix completely and have it fixed implicitly with the rest of the patchset.
-> 
-> Fine by me!
+stefan@datenfreihafen.org wrote on Wed, 2 Feb 2022 13:17:39 +0100:
 
-Let's do it like this.
-You drop it from this series against wpan-next.
-I will pull it out of the series and apply to wpan directly. That way we 
-get it into the stable kernels as well. You already did the work so we 
-should not waste it.
-I will deal with the merge conflict get get between wpan/net and 
-wpan-next/net-next on my side. Nothing to worry for you.
+> Hello.
+>=20
+> On 02.02.22 08:40, Miquel Raynal wrote:
+> > Hi Stefan,
+> >=20
+> > stefan@datenfreihafen.org wrote on Tue, 1 Feb 2022 21:51:04 +0100:
+> >  =20
+> >> Hello.
+> >>
+> >> On 01.02.22 18:40, Miquel Raynal wrote: =20
+> >>> Hi, =20
+> >>>    >>>> --- a/drivers/net/ieee802154/ca8210.c =20
+> >>>> +++ b/drivers/net/ieee802154/ca8210.c
+> >>>> @@ -2978,7 +2978,6 @@ static void ca8210_hw_setup(struct ieee802154_=
+hw *ca8210_hw)
+> >>>>    	ca8210_hw->phy->cca.mode =3D NL802154_CCA_ENERGY_CARRIER;
+> >>>>    	ca8210_hw->phy->cca.opt =3D NL802154_CCA_OPT_ENERGY_CARRIER_AND;
+> >>>>    	ca8210_hw->phy->cca_ed_level =3D -9800;
+> >>>> -	ca8210_hw->phy->symbol_duration =3D 16 * NSEC_PER_USEC;
+> >>>>    	ca8210_hw->phy->lifs_period =3D 40;
+> >>>>    	ca8210_hw->phy->sifs_period =3D 12; =20
+> >>>
+> >>> I've missed that error                ^^
+> >>>
+> >>> This driver should be fixed first (that's probably a copy/paste of the
+> >>> error from the other driver which did the same).
+> >>>
+> >>> As the rest of the series will depend on this fix (or conflict) we co=
+uld
+> >>> merge it through wpan-next anyway, if you don't mind, as it was there
+> >>> since 2017 and these numbers had no real impact so far (I believe). =
+=20
+> >>
+> >> Not sure I follow this logic. The fix you do is being removed in 4/4 o=
+f your v3 set again. So it would only be in place for these two in between =
+commits. =20
+> >=20
+> > Exactly.
+> >  =20
+> >> As you laid out above this has been in place since 2017 and the number=
+ have no real impact. Getting the fix in wpan-next to remove it again two p=
+atches later would not be needed here.
+> >>
+> >> If you would like to have this fixed for 5.16 and older stable kernels=
+ I could go ahead and apply it to wpan and let it trickle down into stable =
+trees. =20
+> >=20
+> > I'm fine "ignoring" the issue in stable kernels, it was just a warning
+> > for you that this would happen otherwise, given the fact that this is
+> > the second driver doing so (first fix has already been merged) and that
+> > I just realized it now.
+> >  =20
+> >> We would have to deal with either a merge of net into net-next or with
+> >> a merge conflicts when sending the pull request. Both can be done.
+> >>
+> >> But given the circumstances above I have no problem to drop this fix c=
+ompletely and have it fixed implicitly with the rest of the patchset. =20
+> >=20
+> > Fine by me! =20
+>=20
+> Let's do it like this.
+> You drop it from this series against wpan-next.
+> I will pull it out of the series and apply to wpan directly. That way we =
+get it into the stable kernels as well. You already did the work so we shou=
+ld not waste it.
+> I will deal with the merge conflict get get between wpan/net and wpan-nex=
+t/net-next on my side. Nothing to worry for you.
 
-regards
-Stefan Schmidt
+That's very kind, but don't feel forced to do that, I won't turn mad if
+you finally decide that this requires too much handling for such a
+short-in-time improvement ;)
 
+Thanks,
+Miqu=C3=A8l
