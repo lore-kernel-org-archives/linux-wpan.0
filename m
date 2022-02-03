@@ -2,136 +2,176 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00048C433EF
-	for <linux-wpan@archiver.kernel.org>; Wed,  2 Feb 2022 17:07:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44C1CC433F5
+	for <linux-wpan@archiver.kernel.org>; Thu,  3 Feb 2022 04:35:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240583AbiBBRHN (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 2 Feb 2022 12:07:13 -0500
-Received: from proxima.lasnet.de ([78.47.171.185]:45164 "EHLO
-        proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233696AbiBBRHN (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 2 Feb 2022 12:07:13 -0500
-Received: from [IPV6:2003:e9:d731:20df:8d81:5815:ac7:f110] (p200300e9d73120df8d8158150ac7f110.dip0.t-ipconnect.de [IPv6:2003:e9:d731:20df:8d81:5815:ac7:f110])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits))
+        id S245180AbiBCEfH (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 2 Feb 2022 23:35:07 -0500
+Received: from dfw.source.kernel.org ([139.178.84.217]:43546 "EHLO
+        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234031AbiBCEfG (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 2 Feb 2022 23:35:06 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        (Authenticated sender: stefan@datenfreihafen.org)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id 9A9B1C07BA;
-        Wed,  2 Feb 2022 18:07:11 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
-        s=2021; t=1643821631;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=A7n5yVKh4GIQdEb7lDq+H4Ebq+rZEZny6GqYiUP1FmU=;
-        b=baGpCIKsSgR3IJ14KL2eEUt53tKDLeyejzMdj0xLHmx7l3Tdxne44pamNX0FF4ZdRyZet6
-        57KoRKO3ununyE2VbwwF0OQPdlDGKs84cEZLSIECokccCyXxlOhpWU2Z5oespWa3IiTs6e
-        EfyehVyb2n7+bfCZ/iZB5hBusc4XCyyyIL52bf7LTvOR65lhq6D8nvANQNBmSx2Wt+N+A9
-        HD2cBV8PnRWQpQlJvHMrJpTpjXY1PaZT+GojaV6vIPRv4hAcytWwoCO5Y5SN4w2pw39oEf
-        ci96oeTDA1745cBMwYyQaJ9DWdpMQuFj8bPeQgmqw6R4p/gd0qPIN+Zm4NEUGA==
-Message-ID: <8bb9c2e0-21ed-d6ad-ddfe-c748ae06d66e@datenfreihafen.org>
-Date:   Wed, 2 Feb 2022 18:07:11 +0100
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 421096171A;
+        Thu,  3 Feb 2022 04:35:06 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF466C340EB;
+        Thu,  3 Feb 2022 04:35:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1643862905;
+        bh=J3CLrEhlOJTta1Pw3jPJy8ShYaMYmrnrd8RDIk5FRwo=;
+        h=From:To:Cc:Subject:Date:From;
+        b=fvyM3BDZx7IvF54M0LuomhAxdaeJ4K/B9e22+q2MCMXmW/EGv6vVoJZPFbpl1JfBG
+         E4g962BMJoOUH2sxpE7C6o6MU1zsKg0ayvcsHr80CeCWNeQ0Cw4vWpk9o0DLaSv0xV
+         D0MEWabZYcspS+DlqPwH/pn4TrnrH+AESbJoP5gzFYmOrDD01oU1/HtLr8epCX+d6h
+         YNxK2pJ4Ut/W5ptFUBOm2u0KDrWpD9+ue5/2e28QZqXBHnxXqNfDvD4FJBGwFK+6OA
+         gDyf0+4HF19l81igmkOiQ8hLaTxuNuH91iSgVRI2qS2JxvcAo254QTtG7hwjh4I8HG
+         qcTTwHfkpUbrQ==
+From:   Jakub Kicinski <kuba@kernel.org>
+To:     davem@davemloft.net
+Cc:     netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+        j.vosburgh@gmail.com, vfalico@gmail.com, andy@greyhouse.net,
+        oliver@neukum.org, yoshfuji@linux-ipv6.org, dsahern@kernel.org,
+        alex.aring@gmail.com, jukka.rissanen@linux.intel.com,
+        stefan@datenfreihafen.org, jk@codeconstruct.com.au,
+        matt@codeconstruct.com.au, linux-usb@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org
+Subject: [PATCH net-next] net: don't include ndisc.h from ipv6.h
+Date:   Wed,  2 Feb 2022 20:34:57 -0800
+Message-Id: <20220203043457.2222388-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Subject: Re: [PATCH wpan-next v2 5/5] net: ieee802154: Drop duration settings
- when the core does it already
-Content-Language: en-US
-To:     Miquel Raynal <miquel.raynal@bootlin.com>
-Cc:     Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-        Michael Hennerich <michael.hennerich@analog.com>,
-        Varka Bhadram <varkabhadram@gmail.com>,
-        Xue Liu <liuxuenetmail@gmail.com>, Alan Ott <alan@signal11.us>
-References: <20220128110825.1120678-1-miquel.raynal@bootlin.com>
- <20220128110825.1120678-6-miquel.raynal@bootlin.com>
- <20220201184014.72b3d9a3@xps13>
- <fab37d38-0239-8be3-81aa-98d163bf5ca4@datenfreihafen.org>
- <20220202084017.7a88f20d@xps13>
- <026d499d-2814-2d5a-b148-fd7ec8ae9eb6@datenfreihafen.org>
- <20220202145034.13a34e98@xps13>
-From:   Stefan Schmidt <stefan@datenfreihafen.org>
-In-Reply-To: <20220202145034.13a34e98@xps13>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
+Nothing in ipv6.h needs ndisc.h, drop it.
 
-Hello.
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+CC: j.vosburgh@gmail.com
+CC: vfalico@gmail.com
+CC: andy@greyhouse.net
+CC: oliver@neukum.org
+CC: yoshfuji@linux-ipv6.org
+CC: dsahern@kernel.org
+CC: alex.aring@gmail.com
+CC: jukka.rissanen@linux.intel.com
+CC: stefan@datenfreihafen.org
+CC: jk@codeconstruct.com.au
+CC: matt@codeconstruct.com.au
+CC: linux-usb@vger.kernel.org
+CC: linux-bluetooth@vger.kernel.org
+CC: linux-wpan@vger.kernel.org
+---
+ drivers/net/bonding/bond_alb.c | 1 +
+ drivers/net/usb/cdc_mbim.c     | 1 +
+ include/net/ipv6.h             | 1 -
+ include/net/ipv6_frag.h        | 1 +
+ include/net/ndisc.h            | 1 -
+ net/6lowpan/core.c             | 1 +
+ net/ieee802154/6lowpan/core.c  | 1 +
+ net/mctp/device.c              | 1 +
+ 8 files changed, 6 insertions(+), 2 deletions(-)
 
-On 02.02.22 14:50, Miquel Raynal wrote:
-> Hi Stefan,
-> 
-> stefan@datenfreihafen.org wrote on Wed, 2 Feb 2022 13:17:39 +0100:
-> 
->> Hello.
->>
->> On 02.02.22 08:40, Miquel Raynal wrote:
->>> Hi Stefan,
->>>
->>> stefan@datenfreihafen.org wrote on Tue, 1 Feb 2022 21:51:04 +0100:
->>>    
->>>> Hello.
->>>>
->>>> On 01.02.22 18:40, Miquel Raynal wrote:
->>>>> Hi,
->>>>>     >>>> --- a/drivers/net/ieee802154/ca8210.c
->>>>>> +++ b/drivers/net/ieee802154/ca8210.c
->>>>>> @@ -2978,7 +2978,6 @@ static void ca8210_hw_setup(struct ieee802154_hw *ca8210_hw)
->>>>>>     	ca8210_hw->phy->cca.mode = NL802154_CCA_ENERGY_CARRIER;
->>>>>>     	ca8210_hw->phy->cca.opt = NL802154_CCA_OPT_ENERGY_CARRIER_AND;
->>>>>>     	ca8210_hw->phy->cca_ed_level = -9800;
->>>>>> -	ca8210_hw->phy->symbol_duration = 16 * NSEC_PER_USEC;
->>>>>>     	ca8210_hw->phy->lifs_period = 40;
->>>>>>     	ca8210_hw->phy->sifs_period = 12;
->>>>>
->>>>> I've missed that error                ^^
->>>>>
->>>>> This driver should be fixed first (that's probably a copy/paste of the
->>>>> error from the other driver which did the same).
->>>>>
->>>>> As the rest of the series will depend on this fix (or conflict) we could
->>>>> merge it through wpan-next anyway, if you don't mind, as it was there
->>>>> since 2017 and these numbers had no real impact so far (I believe).
->>>>
->>>> Not sure I follow this logic. The fix you do is being removed in 4/4 of your v3 set again. So it would only be in place for these two in between commits.
->>>
->>> Exactly.
->>>    
->>>> As you laid out above this has been in place since 2017 and the number have no real impact. Getting the fix in wpan-next to remove it again two patches later would not be needed here.
->>>>
->>>> If you would like to have this fixed for 5.16 and older stable kernels I could go ahead and apply it to wpan and let it trickle down into stable trees.
->>>
->>> I'm fine "ignoring" the issue in stable kernels, it was just a warning
->>> for you that this would happen otherwise, given the fact that this is
->>> the second driver doing so (first fix has already been merged) and that
->>> I just realized it now.
->>>    
->>>> We would have to deal with either a merge of net into net-next or with
->>>> a merge conflicts when sending the pull request. Both can be done.
->>>>
->>>> But given the circumstances above I have no problem to drop this fix completely and have it fixed implicitly with the rest of the patchset.
->>>
->>> Fine by me!
->>
->> Let's do it like this.
->> You drop it from this series against wpan-next.
->> I will pull it out of the series and apply to wpan directly. That way we get it into the stable kernels as well. You already did the work so we should not waste it.
->> I will deal with the merge conflict get get between wpan/net and wpan-next/net-next on my side. Nothing to worry for you.
-> 
-> That's very kind, but don't feel forced to do that, I won't turn mad if
-> you finally decide that this requires too much handling for such a
-> short-in-time improvement ;)
+diff --git a/drivers/net/bonding/bond_alb.c b/drivers/net/bonding/bond_alb.c
+index c98a4b0a8453..303c8d32d451 100644
+--- a/drivers/net/bonding/bond_alb.c
++++ b/drivers/net/bonding/bond_alb.c
+@@ -19,6 +19,7 @@
+ #include <linux/in.h>
+ #include <net/arp.h>
+ #include <net/ipv6.h>
++#include <net/ndisc.h>
+ #include <asm/byteorder.h>
+ #include <net/bonding.h>
+ #include <net/bond_alb.h>
+diff --git a/drivers/net/usb/cdc_mbim.c b/drivers/net/usb/cdc_mbim.c
+index 82bb5ed94c48..a7c1434fe2da 100644
+--- a/drivers/net/usb/cdc_mbim.c
++++ b/drivers/net/usb/cdc_mbim.c
+@@ -21,6 +21,7 @@
+ #include <net/ipv6.h>
+ #include <net/addrconf.h>
+ #include <net/ipv6_stubs.h>
++#include <net/ndisc.h>
+ 
+ /* alternative VLAN for IP session 0 if not untagged */
+ #define MBIM_IPS0_VID	4094
+diff --git a/include/net/ipv6.h b/include/net/ipv6.h
+index 082f30256f59..cda1f205f391 100644
+--- a/include/net/ipv6.h
++++ b/include/net/ipv6.h
+@@ -15,7 +15,6 @@
+ #include <linux/refcount.h>
+ #include <linux/jump_label_ratelimit.h>
+ #include <net/if_inet6.h>
+-#include <net/ndisc.h>
+ #include <net/flow.h>
+ #include <net/flow_dissector.h>
+ #include <net/snmp.h>
+diff --git a/include/net/ipv6_frag.h b/include/net/ipv6_frag.h
+index 0a4779175a52..5052c66e22d2 100644
+--- a/include/net/ipv6_frag.h
++++ b/include/net/ipv6_frag.h
+@@ -1,6 +1,7 @@
+ /* SPDX-License-Identifier: GPL-2.0 */
+ #ifndef _IPV6_FRAG_H
+ #define _IPV6_FRAG_H
++#include <linux/icmpv6.h>
+ #include <linux/kernel.h>
+ #include <net/addrconf.h>
+ #include <net/ipv6.h>
+diff --git a/include/net/ndisc.h b/include/net/ndisc.h
+index 53cb8de0e589..07d48bd6c0bd 100644
+--- a/include/net/ndisc.h
++++ b/include/net/ndisc.h
+@@ -71,7 +71,6 @@ do {								\
+ 
+ struct ctl_table;
+ struct inet6_dev;
+-struct net_device;
+ struct net_proto_family;
+ struct sk_buff;
+ struct prefix_info;
+diff --git a/net/6lowpan/core.c b/net/6lowpan/core.c
+index a068757eabaf..7b3341cef926 100644
+--- a/net/6lowpan/core.c
++++ b/net/6lowpan/core.c
+@@ -5,6 +5,7 @@
+  * (C) 2015 Pengutronix, Alexander Aring <aar@pengutronix.de>
+  */
+ 
++#include <linux/if_arp.h>
+ #include <linux/module.h>
+ 
+ #include <net/6lowpan.h>
+diff --git a/net/ieee802154/6lowpan/core.c b/net/ieee802154/6lowpan/core.c
+index 2cf62718a282..2c087b7f17c5 100644
+--- a/net/ieee802154/6lowpan/core.c
++++ b/net/ieee802154/6lowpan/core.c
+@@ -47,6 +47,7 @@
+ #include <linux/module.h>
+ #include <linux/netdevice.h>
+ #include <linux/ieee802154.h>
++#include <linux/if_arp.h>
+ 
+ #include <net/ipv6.h>
+ 
+diff --git a/net/mctp/device.c b/net/mctp/device.c
+index ef2755f82f87..02ddc0f1bd3e 100644
+--- a/net/mctp/device.c
++++ b/net/mctp/device.c
+@@ -6,6 +6,7 @@
+  * Copyright (c) 2021 Google
+  */
+ 
++#include <linux/if_arp.h>
+ #include <linux/if_link.h>
+ #include <linux/mctp.h>
+ #include <linux/netdevice.h>
+-- 
+2.34.1
 
-Nah, don't worry. I just applied it to wpan. It's the right thing to do 
-as we simply do not know who is using the driving in what situation. 
-Holding off a fix that you already did would be silly.
-
-I deal with the merge conflict when it comes to it.
-
-regards
-Stefan Schmidt
