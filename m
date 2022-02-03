@@ -2,93 +2,116 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1770C433FE
-	for <linux-wpan@archiver.kernel.org>; Thu,  3 Feb 2022 15:14:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6137C433EF
+	for <linux-wpan@archiver.kernel.org>; Thu,  3 Feb 2022 22:48:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235000AbiBCPO4 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Thu, 3 Feb 2022 10:14:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39922 "EHLO
+        id S1355874AbiBCWsb (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Thu, 3 Feb 2022 17:48:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33434 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240788AbiBCPOz (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 3 Feb 2022 10:14:55 -0500
-Received: from proxima.lasnet.de (proxima.lasnet.de [IPv6:2a01:4f8:121:31eb:3::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 001B3C061714;
-        Thu,  3 Feb 2022 07:14:54 -0800 (PST)
-Received: from [IPV6:2003:e9:d71f:7b00:83f0:ef29:ebc6:2fb7] (p200300e9d71f7b0083f0ef29ebc62fb7.dip0.t-ipconnect.de [IPv6:2003:e9:d71f:7b00:83f0:ef29:ebc6:2fb7])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: stefan@datenfreihafen.org)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id 8C1E1C07BA;
-        Thu,  3 Feb 2022 16:14:51 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
-        s=2021; t=1643901291;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=hnORKNBRjHpFsTO4HG8md0wUuEgPB5te4IcquTqbRF8=;
-        b=m+EZTLpsxJR5EkC1JiJuc3h5jEiw2V5tWNU3lR8f2+645w0581xZmli9qwHFBW+BtH9hst
-        F4F+B8iXNZIHZ1WPM88SPDB40DNFLIfogpkLMUYpWU+9MoDSWBvkYq24WME7jdjFjNM95w
-        gd6186kQa061jbaR6vtvRN0JxnT1ItpP/mi5fszi6xXo0asZ6Qd7Gmq/NNl+k5jWGtP6Jz
-        VOvkzpX81ytP4NSevp6qeFSZFG7ChxgEYWcaQd+YoWt5RIMxh2yh/LFMWhtncHCV2bGNvB
-        BCGjozch/k7BpW3MlhQ7Os0zySosKtDd6FD9Ra82iLjTQr4doTlzlRFy5X8juw==
-Message-ID: <e8dd1abc-6558-1269-3995-c8920a4e6000@datenfreihafen.org>
-Date:   Thu, 3 Feb 2022 16:14:50 +0100
+        with ESMTP id S1355873AbiBCWsa (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 3 Feb 2022 17:48:30 -0500
+Received: from mail-io1-xd34.google.com (mail-io1-xd34.google.com [IPv6:2607:f8b0:4864:20::d34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46703C06173D;
+        Thu,  3 Feb 2022 14:48:30 -0800 (PST)
+Received: by mail-io1-xd34.google.com with SMTP id i62so5266838ioa.1;
+        Thu, 03 Feb 2022 14:48:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=NPWueLzrJFboH2nkL8a0Kt0j0fw6ZnAd3HPnO4FSgfI=;
+        b=nNf9+fu88OwLVGrq/dioOKFvP8s5k1wgcmIA0VUpL0g/hy3TXFhPHc3wyxof87N4DL
+         S9dL8n744p7DgMvaszLhpk9UVzZlvM5uJiSCAVoNXKxZRhHRCZ5usgYm+ADuK5wBJ7S+
+         ZoQ5hbKvmmwCIaIw1VDnkp23h88AIQsgGO3ay9gXodcD/FyRXW5eWSQ90mj7/VLn2pw3
+         +kJE5ubZEPHAr4k25BXA/C6+fQBvBdlewAVTX4AYxKrxeu25bhW/gpAK1IjjTJkq43AV
+         3qwzE/xtfapMQtuJxxyieb3Bv4dnGSY36SyNzXCnQqwQebVz2GG0UPbms3eFfpfeVZDe
+         Zj8w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=NPWueLzrJFboH2nkL8a0Kt0j0fw6ZnAd3HPnO4FSgfI=;
+        b=T+7P1yUOKJOH3grwPntv8eRb+GSdk8oFsPAz915c083Ga8edww92z2mQBfAvFF6OXd
+         hBTvJl57/poULFw9gvJoolJN2TIDdBm8eMQsHbsBuFGHQyVAnCBAjGqxT0THfqKEYy+A
+         aoHki1mRVTq+yDSUTgFOJ0LcaEbpLsqJ6ncbY/OpiTNKb4uptyojaYKlw0UWqeSSx4Rb
+         I/xgd+0FmQCt70HaflyQNXE9YRJZiIGspuLyixMCm3oUoQvw8t1Ka32Xoq7H++1b51cV
+         DIusnwtzcaTprV2WRYDJdx5OMwd/DGXL+GiAPVjKxeX7DwqxcjaJPsDl+PxflteqI053
+         Dg0Q==
+X-Gm-Message-State: AOAM532IzcMknInscxo2gwISd9VL+/Ma8YSSHgzMiSjlii2QqW5Fmqep
+        3GUbeQjp0UFjs6Mv5M0rNu75p01dU6Y=
+X-Google-Smtp-Source: ABdhPJzLaSuHyHZqPOm0OepBhbWkNuI2kyqYoTEolXQTeVDEglvTAlTZmmCRq7UGOlLTNrZN6aVkfw==
+X-Received: by 2002:a02:6d5a:: with SMTP id e26mr77543jaf.262.1643928509716;
+        Thu, 03 Feb 2022 14:48:29 -0800 (PST)
+Received: from ?IPV6:2601:282:800:dc80:8870:ce19:2c7:3513? ([2601:282:800:dc80:8870:ce19:2c7:3513])
+        by smtp.googlemail.com with ESMTPSA id x14sm106528ilj.33.2022.02.03.14.48.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 03 Feb 2022 14:48:29 -0800 (PST)
+Message-ID: <df19b376-49a3-1ef2-0664-a23a48e128dc@gmail.com>
+Date:   Thu, 3 Feb 2022 15:48:28 -0700
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.5.1
 Subject: Re: [PATCH net-next] net: don't include ndisc.h from ipv6.h
 Content-Language: en-US
 To:     Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
 Cc:     netdev@vger.kernel.org, j.vosburgh@gmail.com, vfalico@gmail.com,
         andy@greyhouse.net, oliver@neukum.org, yoshfuji@linux-ipv6.org,
         dsahern@kernel.org, alex.aring@gmail.com,
-        jukka.rissanen@linux.intel.com, jk@codeconstruct.com.au,
-        matt@codeconstruct.com.au, linux-usb@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org
+        jukka.rissanen@linux.intel.com, stefan@datenfreihafen.org,
+        jk@codeconstruct.com.au, matt@codeconstruct.com.au,
+        linux-usb@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-wpan@vger.kernel.org
 References: <20220203043457.2222388-1-kuba@kernel.org>
-From:   Stefan Schmidt <stefan@datenfreihafen.org>
+From:   David Ahern <dsahern@gmail.com>
 In-Reply-To: <20220203043457.2222388-1-kuba@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello.
+On 2/2/22 9:34 PM, Jakub Kicinski wrote:
+> diff --git a/include/net/ipv6.h b/include/net/ipv6.h
+> index 082f30256f59..cda1f205f391 100644
+> --- a/include/net/ipv6.h
+> +++ b/include/net/ipv6.h
+> @@ -15,7 +15,6 @@
+>  #include <linux/refcount.h>
+>  #include <linux/jump_label_ratelimit.h>
+>  #include <net/if_inet6.h>
+> -#include <net/ndisc.h>
+>  #include <net/flow.h>
+>  #include <net/flow_dissector.h>
+>  #include <net/snmp.h>
+> diff --git a/include/net/ipv6_frag.h b/include/net/ipv6_frag.h
+> index 0a4779175a52..5052c66e22d2 100644
+> --- a/include/net/ipv6_frag.h
+> +++ b/include/net/ipv6_frag.h
+> @@ -1,6 +1,7 @@
+>  /* SPDX-License-Identifier: GPL-2.0 */
+>  #ifndef _IPV6_FRAG_H
+>  #define _IPV6_FRAG_H
+> +#include <linux/icmpv6.h>
+>  #include <linux/kernel.h>
+>  #include <net/addrconf.h>
+>  #include <net/ipv6.h>
+> diff --git a/include/net/ndisc.h b/include/net/ndisc.h
+> index 53cb8de0e589..07d48bd6c0bd 100644
+> --- a/include/net/ndisc.h
+> +++ b/include/net/ndisc.h
+> @@ -71,7 +71,6 @@ do {								\
+>  
+>  struct ctl_table;
+>  struct inet6_dev;
+> -struct net_device;
 
-On 03.02.22 05:34, Jakub Kicinski wrote:
-> Nothing in ipv6.h needs ndisc.h, drop it.
-> 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
-> CC: j.vosburgh@gmail.com
-> CC: vfalico@gmail.com
-> CC: andy@greyhouse.net
-> CC: oliver@neukum.org
-> CC: yoshfuji@linux-ipv6.org
-> CC: dsahern@kernel.org
-> CC: alex.aring@gmail.com
-> CC: jukka.rissanen@linux.intel.com
-> CC: stefan@datenfreihafen.org
-> CC: jk@codeconstruct.com.au
-> CC: matt@codeconstruct.com.au
-> CC: linux-usb@vger.kernel.org
-> CC: linux-bluetooth@vger.kernel.org
-> CC: linux-wpan@vger.kernel.org
-> ---
->   drivers/net/bonding/bond_alb.c | 1 +
->   drivers/net/usb/cdc_mbim.c     | 1 +
->   include/net/ipv6.h             | 1 -
->   include/net/ipv6_frag.h        | 1 +
->   include/net/ndisc.h            | 1 -
->   net/6lowpan/core.c             | 1 +
->   net/ieee802154/6lowpan/core.c  | 1 +
+ndisc_parse_options references net_device. This part seems unrelated to
+the patch intent.
 
-For ieee802154:
+>  struct net_proto_family;
+>  struct sk_buff;
+>  struct prefix_info;
 
-Acked-by: Stefan Schmidt <stefan@datenfreihafen.org>
 
-regards
-Stefan Schmidt
