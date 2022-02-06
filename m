@@ -2,81 +2,90 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BB9FC433FE
-	for <linux-wpan@archiver.kernel.org>; Sat,  5 Feb 2022 03:50:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 939ABC433EF
+	for <linux-wpan@archiver.kernel.org>; Sun,  6 Feb 2022 21:37:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1379272AbiBEDuM (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Fri, 4 Feb 2022 22:50:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33008 "EHLO
+        id S237715AbiBFVhi (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Sun, 6 Feb 2022 16:37:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51108 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230127AbiBEDuM (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Fri, 4 Feb 2022 22:50:12 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E6A9C061346;
-        Fri,  4 Feb 2022 19:50:11 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 011C5B839A4;
-        Sat,  5 Feb 2022 03:50:09 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id A008BC340EF;
-        Sat,  5 Feb 2022 03:50:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1644033008;
-        bh=mXGGPzkMphVN/vNDxO0Db/r+CxmdI8M2QTgO5oSLptc=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=VtIlM+aj4dj+XxwnH5ONF2STs0o9OvMrnAlzxilwbHCCcykHMNviVK1zXjE94623D
-         btnYCKQeTY7dL5J/HTCkZVb4Dr6n93ALiBvI9ATq1o/kUgk2MyzOxWWfgyH0a8bUOu
-         RAyqQU+erdufyB0MTG7T+xbEtWioSrYM4YOqf3Md6LcomFYER38OBZWLC9NEzGcPvK
-         rZ2XnulrYOdsHcYcSr1IFRc4ntyUHnOY05Dxu0IzV2qZxeA9DYVHiL09C1wv/5ZLVE
-         kogoqrkKxNQvJDjtc5EUk/9Tf1kDr4wf1g6hzrMWLIjMkGqYqRgIgG6OX9o/ptxtSv
-         WUtL1bwsqzhIw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 802D3E5869F;
-        Sat,  5 Feb 2022 03:50:08 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+        with ESMTP id S232915AbiBFVhi (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Sun, 6 Feb 2022 16:37:38 -0500
+Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93F3BC06173B;
+        Sun,  6 Feb 2022 13:37:36 -0800 (PST)
+Received: by mail-wm1-x32f.google.com with SMTP id l123-20020a1c2581000000b0037b9d960079so4431812wml.0;
+        Sun, 06 Feb 2022 13:37:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=e/nI4S+KG3sKPJ67oamywZ9+MX889TO5LPjwkorRRhc=;
+        b=mv5VLvp/xIz3K2Mk030U/rva1PHMUEBi+wQJ2FTcldU34bwFv4PqkKv3FGKVgWwVl6
+         isKEqZ9kQdOCB7BVWegmSJGvFUd4vf+TohbVJdn7BTh0f0pb5l2oyouPTODr2N8o+wuD
+         2gOuXhT8W7bf0qWdMuMbj5KcyR+pVUj2ONQrMgucYngZtp3bSzP9otJ9lIMtxHrVeWLG
+         lhN4Ot937R5Q4DKhx7FhDY6a6eLgw1bxq/K+xErL2GxPhas+i5Ow0AuDcHFo7NbBXRkv
+         tARAqo2uK0XflZ6LYViYaGDFGmofQwRU6pNDGT7h9G2+Qwdwgd5CK2cCS19Su7R5g69x
+         3keg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=e/nI4S+KG3sKPJ67oamywZ9+MX889TO5LPjwkorRRhc=;
+        b=KMFQDo2grcHk0hppV8GouGmYssWL/CViglr5dYXbCZWiXn+DEV5wQlStKtUwVLjQ1e
+         8EklF0Dt68TiRTaABecwv7MTzaz0pZ5mqytbaq6x4cU+BkNHkF/1FjA4koj6KvN3mqKx
+         fE80V+fSMQngjTG3Q9K+J7DbS6ZB5HeP7kbXqUD32yO5PXkXhUIFfK78t23SkOk3CCw6
+         C5eYfN3ZMIKxag5wIXaQkXXd4dkj/HycoZwHZbOMswp4ZovqJiIHto6X6Y6zrAFZh6Tw
+         /azRID4X037zrGLmss7V8tbUqaUAGz/Er8911fdjqTAXtH1zyqK4JiYiRhZlGuzgVxmo
+         wZCw==
+X-Gm-Message-State: AOAM533YUIE798vasSxvMCDo1XEx1D3/+SBvWyZ94Xy+REWUgsWXWx9h
+        mnsVqSO6ZxseJunIz4G1gVssFAHIh4uC1XhbldM=
+X-Google-Smtp-Source: ABdhPJyYY6g9ybK861ygyONpra3GDe5zCFBIYBa9CEcyhR3Wv8cUdoHMuxCX8CGHmklQnLbCRFpcVUJ2g83o9H/3gp8=
+X-Received: by 2002:a7b:ce90:: with SMTP id q16mr6167526wmj.91.1644183455001;
+ Sun, 06 Feb 2022 13:37:35 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2] net: don't include ndisc.h from ipv6.h
-From:   patchwork-bot+netdevbpf@kernel.org
-Message-Id: <164403300852.24542.401822864711989941.git-patchwork-notify@kernel.org>
-Date:   Sat, 05 Feb 2022 03:50:08 +0000
-References: <20220203231240.2297588-1-kuba@kernel.org>
-In-Reply-To: <20220203231240.2297588-1-kuba@kernel.org>
-To:     Jakub Kicinski <kuba@kernel.org>
-Cc:     davem@davemloft.net, netdev@vger.kernel.org,
-        jk@codeconstruct.com.au, stefan@datenfreihafen.org,
-        j.vosburgh@gmail.com, vfalico@gmail.com, andy@greyhouse.net,
-        oliver@neukum.org, yoshfuji@linux-ipv6.org, dsahern@kernel.org,
-        alex.aring@gmail.com, jukka.rissanen@linux.intel.com,
-        matt@codeconstruct.com.au, linux-usb@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org
+References: <20220128110825.1120678-1-miquel.raynal@bootlin.com>
+ <20220128110825.1120678-2-miquel.raynal@bootlin.com> <CAB_54W60OiGmjLQ2dAvnraq6fkZ6GGTLMVzjVbVAobcvNsaWtQ@mail.gmail.com>
+ <20220131152345.3fefa3aa@xps13> <CAB_54W7SZmgU=2_HEm=_agE0RWfsXxEs_4MHmnAPPFb+iVvxsQ@mail.gmail.com>
+ <20220201155507.549cd2e3@xps13>
+In-Reply-To: <20220201155507.549cd2e3@xps13>
+From:   Alexander Aring <alex.aring@gmail.com>
+Date:   Sun, 6 Feb 2022 16:37:23 -0500
+Message-ID: <CAB_54W5mnovPX0cyq5dwVoQKa6VZx3QPCfVoPAF+LQ5DkdQ3Mw@mail.gmail.com>
+Subject: Re: [PATCH wpan-next v2 1/5] net: ieee802154: Improve the way
+ supported channels are declared
+To:     Miquel Raynal <miquel.raynal@bootlin.com>
+Cc:     Stefan Schmidt <stefan@datenfreihafen.org>,
+        linux-wpan - ML <linux-wpan@vger.kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
+        Michael Hennerich <michael.hennerich@analog.com>,
+        Varka Bhadram <varkabhadram@gmail.com>,
+        Xue Liu <liuxuenetmail@gmail.com>, Alan Ott <alan@signal11.us>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello:
+Hi,
 
-This patch was applied to netdev/net-next.git (master)
-by Jakub Kicinski <kuba@kernel.org>:
+On Tue, Feb 1, 2022 at 9:55 AM Miquel Raynal <miquel.raynal@bootlin.com> wrote:
+...
+>
+> Given the new information that I am currently processing, I believe the
+> array is not needed anymore, we can live with a minimal number of
+> additional helpers, like the one getting the PRF value for the UWB
+> PHYs. It's the only one I have in mind so far.
 
-On Thu,  3 Feb 2022 15:12:40 -0800 you wrote:
-> Nothing in ipv6.h needs ndisc.h, drop it.
-> 
-> Link: https://lore.kernel.org/r/20220203043457.2222388-1-kuba@kernel.org
-> Acked-by: Jeremy Kerr <jk@codeconstruct.com.au>
-> Acked-by: Stefan Schmidt <stefan@datenfreihafen.org>
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> 
-> [...]
+I am not really sure if I understood now. So far those channel/page
+combinations are the same because we have no special "type" value in
+wpan_phy, what we currently support is the "normal" (I think they name
+it legacy devices) phy type (no UWB, sun phy, whatever) and as Channel
+Assignments says that it does not apply for those PHY's I think it
+there are channel/page combinations which are different according to
+the PHY "type". However we don't support them and I think there might
+be an upcoming type field in wpan_phy which might be set only once at
+registration time.
 
-Here is the summary with links:
-  - [net-next,v2] net: don't include ndisc.h from ipv6.h
-    https://git.kernel.org/netdev/net-next/c/c78b8b20e349
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+- Alex
