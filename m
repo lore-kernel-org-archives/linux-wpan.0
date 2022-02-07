@@ -2,33 +2,33 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26F7BC433EF
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3617AC433F5
 	for <linux-wpan@archiver.kernel.org>; Mon,  7 Feb 2022 15:14:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235278AbiBGPMM (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        id S229844AbiBGPMM (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
         Mon, 7 Feb 2022 10:12:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54100 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54274 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1442263AbiBGOsM (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 7 Feb 2022 09:48:12 -0500
+        with ESMTP id S1442281AbiBGOsa (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 7 Feb 2022 09:48:30 -0500
 Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::227])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41F73C0401C2;
-        Mon,  7 Feb 2022 06:48:11 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C76FC0401C1;
+        Mon,  7 Feb 2022 06:48:29 -0800 (PST)
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id 81D332000B;
-        Mon,  7 Feb 2022 14:48:08 +0000 (UTC)
+        by mail.gandi.net (Postfix) with ESMTPSA id 480C52000D;
+        Mon,  7 Feb 2022 14:48:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1644245289;
+        t=1644245308;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=vDrO3Tw9p4ErYkEAD53kXKEoAP/91adCzTKGwaYTCW8=;
-        b=VGX00/Vm5BDswDYKP7TX/wNl9Y7+cHgIgOK/2JvI4RHpvu+yx8nuNfLLztEwIe/QL6um/Y
-        4lJipH7R0KRte9ksBzGsbwMpBpW/ecmAkidWFUSFvRfLOOTK57FEc/siUTkUVv/ndFoRnB
-        tYA3oiwYXO6DK6LuuVLOm4g9daOexdZNut7ZiOstaizXjQpb7GIfISxqV3xvoURw5odU7S
-        QnkNrwBWk3ePgPJI9tr9sp6Hf0+nbGB6ZOvCu9AYo+Z3lqAG4IJ4YepMEOY85s4UhRT6Ft
-        6QkGdgAVwMdok0OG7X04aJJr0BD6eYqNrxd5yznBuqxdrii/xAtLRmqj1Eqh3w==
+        bh=3N1S3rGLbsDgwaPfgEoq52NBP1iyP4isiXbkLeW13wk=;
+        b=PaGkctaRg5RDmERt6GXCqnai30UrvaT4v50vi5lN8ZnZ/vvXU46xJMd/0/tDZIi3iGe0V2
+        URwTf736vQnzGJGYQuZTmIr96kTQZvzwnt3xXYcZ8qr2njGd2eHF2We/aitRnmu3zKvtGR
+        0vyWFtb9sKzsdYUk/ZE7lSS0RsfHfXnjcXgR6ukDlYOPAIE0sV0S7IomYFW91ZqTLbwWb7
+        xCeYZLy7fwXuncZY3cqI731jGmTFr4PdMUG4sVvf7/WCJxy/PJEFxeXfKcP7Sy2hIPcGQu
+        WT9sMGQWimO6BwXnUMIoSnORHki9tlPpA8R5R5wuN5ZkR4H1gAWGnwsk0IgYXw==
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
 To:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
@@ -41,9 +41,9 @@ Cc:     "David S. Miller" <davem@davemloft.net>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
         Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: [PATCH wpan-next v2 02/14] net: mac802154: Create a transmit error helper
-Date:   Mon,  7 Feb 2022 15:47:52 +0100
-Message-Id: <20220207144804.708118-3-miquel.raynal@bootlin.com>
+Subject: [PATCH wpan-next v2 14/14] net: mac802154: Introduce a synchronous API for MLME commands
+Date:   Mon,  7 Feb 2022 15:48:04 +0100
+Message-Id: <20220207144804.708118-15-miquel.raynal@bootlin.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20220207144804.708118-1-miquel.raynal@bootlin.com>
 References: <20220207144804.708118-1-miquel.raynal@bootlin.com>
@@ -54,58 +54,47 @@ Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-So far there is only a helper for successful transmission, which led
-device drivers to implement their own handling in case of
-error. Unfortunately, we really need all the drivers to give the hand
-back to the core once they are done in order to be able to build a
-proper synchronous API. So let's create a _xmit_error() helper.
+This is the slow path, we need to wait for each command to be processed
+before continuing so let's introduce an helper which does the
+transmission and blocks until it gets notified of its asynchronous
+completion. This helper is going to be used when introducing scan
+support.
 
 Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
 ---
- include/net/mac802154.h | 10 ++++++++++
- net/mac802154/util.c    | 10 ++++++++++
- 2 files changed, 20 insertions(+)
+ net/mac802154/ieee802154_i.h | 1 +
+ net/mac802154/tx.c           | 6 ++++++
+ 2 files changed, 7 insertions(+)
 
-diff --git a/include/net/mac802154.h b/include/net/mac802154.h
-index 2c3bbc6645ba..9fe8cfef1ba0 100644
---- a/include/net/mac802154.h
-+++ b/include/net/mac802154.h
-@@ -498,4 +498,14 @@ void ieee802154_stop_queue(struct ieee802154_hw *hw);
- void ieee802154_xmit_complete(struct ieee802154_hw *hw, struct sk_buff *skb,
- 			      bool ifs_handling);
- 
-+/**
-+ * ieee802154_xmit_error - frame transmission failed
-+ *
-+ * @hw: pointer as obtained from ieee802154_alloc_hw().
-+ * @skb: buffer for transmission
-+ * @ifs_handling: indicate interframe space handling
-+ */
-+void ieee802154_xmit_error(struct ieee802154_hw *hw, struct sk_buff *skb,
-+			   bool ifs_handling);
-+
- #endif /* NET_MAC802154_H */
-diff --git a/net/mac802154/util.c b/net/mac802154/util.c
-index 6f82418e9dec..9016f634efba 100644
---- a/net/mac802154/util.c
-+++ b/net/mac802154/util.c
-@@ -102,6 +102,16 @@ void ieee802154_xmit_complete(struct ieee802154_hw *hw, struct sk_buff *skb,
+diff --git a/net/mac802154/ieee802154_i.h b/net/mac802154/ieee802154_i.h
+index 295c9ce091e1..ad76a60af087 100644
+--- a/net/mac802154/ieee802154_i.h
++++ b/net/mac802154/ieee802154_i.h
+@@ -123,6 +123,7 @@ extern struct ieee802154_mlme_ops mac802154_mlme_wpan;
+ void ieee802154_rx(struct ieee802154_local *local, struct sk_buff *skb);
+ void ieee802154_xmit_sync_worker(struct work_struct *work);
+ void ieee802154_sync_and_stop_tx(struct ieee802154_local *local);
++void ieee802154_mlme_tx(struct ieee802154_local *local, struct sk_buff *skb);
+ netdev_tx_t
+ ieee802154_monitor_start_xmit(struct sk_buff *skb, struct net_device *dev);
+ netdev_tx_t
+diff --git a/net/mac802154/tx.c b/net/mac802154/tx.c
+index 06ae2e6cea43..7c281458942e 100644
+--- a/net/mac802154/tx.c
++++ b/net/mac802154/tx.c
+@@ -126,6 +126,12 @@ void ieee802154_sync_and_stop_tx(struct ieee802154_local *local)
+ 	atomic_dec(&local->phy->hold_txs);
  }
- EXPORT_SYMBOL(ieee802154_xmit_complete);
  
-+void ieee802154_xmit_error(struct ieee802154_hw *hw, struct sk_buff *skb,
-+			   bool ifs_handling)
++void ieee802154_mlme_tx(struct ieee802154_local *local, struct sk_buff *skb)
 +{
-+	unsigned int skb_len = skb->len;
-+
-+	dev_kfree_skb_any(skb);
-+	ieee802154_xmit_end(hw, ifs_handling, skb_len);
++	ieee802154_tx(local, skb);
++	ieee802154_sync_and_stop_tx(local);
 +}
-+EXPORT_SYMBOL(ieee802154_xmit_error);
 +
- void ieee802154_stop_device(struct ieee802154_local *local)
+ netdev_tx_t
+ ieee802154_monitor_start_xmit(struct sk_buff *skb, struct net_device *dev)
  {
- 	flush_workqueue(local->workqueue);
 -- 
 2.27.0
 
