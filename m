@@ -2,33 +2,33 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13597C4321E
-	for <linux-wpan@archiver.kernel.org>; Mon,  7 Feb 2022 15:15:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1940C4332F
+	for <linux-wpan@archiver.kernel.org>; Mon,  7 Feb 2022 15:15:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1442940AbiBGPMZ (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 7 Feb 2022 10:12:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54346 "EHLO
+        id S1345916AbiBGPMV (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 7 Feb 2022 10:12:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54174 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1442285AbiBGOso (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 7 Feb 2022 09:48:44 -0500
+        with ESMTP id S1442270AbiBGOsT (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 7 Feb 2022 09:48:19 -0500
 Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::227])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F935C0401C1;
-        Mon,  7 Feb 2022 06:48:43 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82B67C0401C1;
+        Mon,  7 Feb 2022 06:48:18 -0800 (PST)
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id C8E0220018;
-        Mon,  7 Feb 2022 14:48:20 +0000 (UTC)
+        by mail.gandi.net (Postfix) with ESMTPSA id 7BB972000E;
+        Mon,  7 Feb 2022 14:48:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1644245302;
+        t=1644245295;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=gKnd6M0EVSNZgQEvfaJLr2HCQgkWZxPrPgHQMKTb7RA=;
-        b=UDTRE5JWVrBaSVBWraLt2u+J0pZKkBtzFDZKMu0WNUyZ2U1QxEpJayKdd8eMnAKw7DIEaa
-        gSDpup0OmVC7i+iFO+WPknVCFpcO4nJMFkJG7FWLmBy5kZiz3uBQMzlW5tlaFMea1x2oQ2
-        UAQhMGBZ2ACrHgefVTGkRrTZDFcIJUeU1+4WZrm84nMT1i7E3a7yAxVFdYNsR3ytajdkKt
-        tRVadQcRmwxYtyVNb40PbhRuLZ2/AVyPKaYCac5L18G05aPSiSPRCcHqIpEuMGdvpTbRJi
-        DEZJwQDbF+kbRWbL6IaUzIzFxAT+NrbTe+LBtt8dr5sOuuzYSDc3dvQMZAIjbw==
+        bh=KEvoIRvAVCq69JUqPSnTO94KCQuJsWgdxodYKZ8Wj08=;
+        b=kZ1YBpFxaZ3d/m7MBjCZGqiNHbWyrg65byhuLTgVjSqPTaLWMbrlTeop2mgug124jis6JY
+        VFfJdwGsp8FBpVuzKMz6aMujIs4tS9CnWnBRZfbcpSJQNgaXjG8MgHYEkecpl+ZQdZjDYT
+        BRjOxLOtPN4ZbFiOMmUg2AcOTSELTx+zOoY6UaFDpisk3Owup6SUjMOsU3/Vz3Cu/W+Fwf
+        myr5IQPNmGI8OGvRh7r+UnWqeoQ4/cQ76gKWlipKtF1BZLVJn81sCxDSaPpL+HHHAfy9BV
+        kV0hZ6OhYt7+eAQy6R/QGSojdGMRcQgTQPDo6mukl9Vlt6XqHZXf91Wp6+2WuQ==
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
 To:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
@@ -41,9 +41,9 @@ Cc:     "David S. Miller" <davem@davemloft.net>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
         Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: [PATCH wpan-next v2 10/14] net: mac802154: Hold the transmit queue when relevant
-Date:   Mon,  7 Feb 2022 15:48:00 +0100
-Message-Id: <20220207144804.708118-11-miquel.raynal@bootlin.com>
+Subject: [PATCH wpan-next v2 06/14] net: mac802154: Stop exporting ieee802154_wake/stop_queue()
+Date:   Mon,  7 Feb 2022 15:47:56 +0100
+Message-Id: <20220207144804.708118-7-miquel.raynal@bootlin.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20220207144804.708118-1-miquel.raynal@bootlin.com>
 References: <20220207144804.708118-1-miquel.raynal@bootlin.com>
@@ -54,119 +54,113 @@ Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Let's create a hold_txs atomic variable and increment/decrement it when
-relevant. A current use is during a suspend. Very soon we will also use
-this feature during scans.
-
-When the variable is incremented, any further call to helpers usually
-waking up the queue will skip this part because it is the core
-responsibility to wake up the queue when relevant.
+Individual drivers do not necessarily need to call these helpers
+manually. There are other functions, more suited for this purpose, that
+will do that for them. The advantage is that, as no more drivers call
+these, it eases the tracking of the ongoing transfers that we are about
+to introduce while keeping the possibility to bypass thse counters from
+core code.
 
 Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
 ---
- include/net/cfg802154.h      | 3 ++-
- net/mac802154/cfg.c          | 4 +++-
- net/mac802154/ieee802154_i.h | 5 +++++
- net/mac802154/tx.c           | 7 +++++--
- net/mac802154/util.c         | 7 ++++++-
- 5 files changed, 21 insertions(+), 5 deletions(-)
+ include/net/mac802154.h      | 27 ---------------------------
+ net/mac802154/ieee802154_i.h | 24 ++++++++++++++++++++++++
+ net/mac802154/util.c         |  2 --
+ 3 files changed, 24 insertions(+), 29 deletions(-)
 
-diff --git a/include/net/cfg802154.h b/include/net/cfg802154.h
-index 473ebcb9b155..043d8e4359e7 100644
---- a/include/net/cfg802154.h
-+++ b/include/net/cfg802154.h
-@@ -214,8 +214,9 @@ struct wpan_phy {
- 	/* the network namespace this phy lives in currently */
- 	possible_net_t _net;
+diff --git a/include/net/mac802154.h b/include/net/mac802154.h
+index 9fe8cfef1ba0..9e2e2b2cd65e 100644
+--- a/include/net/mac802154.h
++++ b/include/net/mac802154.h
+@@ -460,33 +460,6 @@ void ieee802154_unregister_hw(struct ieee802154_hw *hw);
+  */
+ void ieee802154_rx_irqsafe(struct ieee802154_hw *hw, struct sk_buff *skb,
+ 			   u8 lqi);
+-/**
+- * ieee802154_wake_queue - wake ieee802154 queue
+- * @hw: pointer as obtained from ieee802154_alloc_hw().
+- *
+- * Tranceivers usually have either one transmit framebuffer or one framebuffer
+- * for both transmitting and receiving. Hence, the core currently only handles
+- * one frame at a time for each phy, which means we had to stop the queue to
+- * avoid new skb to come during the transmission. The queue then needs to be
+- * woken up after the operation.
+- *
+- * Drivers should use this function instead of netif_wake_queue.
+- */
+-void ieee802154_wake_queue(struct ieee802154_hw *hw);
+-
+-/**
+- * ieee802154_stop_queue - stop ieee802154 queue
+- * @hw: pointer as obtained from ieee802154_alloc_hw().
+- *
+- * Tranceivers usually have either one transmit framebuffer or one framebuffer
+- * for both transmitting and receiving. Hence, the core currently only handles
+- * one frame at a time for each phy, which means we need to tell upper layers to
+- * stop giving us new skbs while we are busy with the transmitted one. The queue
+- * must then be stopped before transmitting.
+- *
+- * Drivers should use this function instead of netif_stop_queue.
+- */
+-void ieee802154_stop_queue(struct ieee802154_hw *hw);
  
--	/* Transmission monitoring */
-+	/* Transmission monitoring and control */
- 	atomic_t ongoing_txs;
-+	atomic_t hold_txs;
- 
- 	char priv[] __aligned(NETDEV_ALIGN);
- };
-diff --git a/net/mac802154/cfg.c b/net/mac802154/cfg.c
-index 1e4a9f74ed43..e8aabf215286 100644
---- a/net/mac802154/cfg.c
-+++ b/net/mac802154/cfg.c
-@@ -46,6 +46,7 @@ static int ieee802154_suspend(struct wpan_phy *wpan_phy)
- 	if (!local->open_count)
- 		goto suspend;
- 
-+	atomic_inc(&wpan_phy->hold_txs);
- 	ieee802154_stop_queue(&local->hw);
- 	synchronize_net();
- 
-@@ -72,7 +73,8 @@ static int ieee802154_resume(struct wpan_phy *wpan_phy)
- 		return ret;
- 
- wake_up:
--	ieee802154_wake_queue(&local->hw);
-+	if (!atomic_dec_and_test(&wpan_phy->hold_txs))
-+		ieee802154_wake_queue(&local->hw);
- 	local->suspended = false;
- 	return 0;
- }
+ /**
+  * ieee802154_xmit_complete - frame transmission complete
 diff --git a/net/mac802154/ieee802154_i.h b/net/mac802154/ieee802154_i.h
-index d3bcc097e491..56fcd7ef5b6f 100644
+index 702560acc8ce..c9451d18de31 100644
 --- a/net/mac802154/ieee802154_i.h
 +++ b/net/mac802154/ieee802154_i.h
-@@ -190,6 +190,11 @@ void mac802154_unlock_table(struct net_device *dev);
+@@ -128,6 +128,30 @@ netdev_tx_t
+ ieee802154_subif_start_xmit(struct sk_buff *skb, struct net_device *dev);
+ enum hrtimer_restart ieee802154_xmit_ifs_timer(struct hrtimer *timer);
  
- int mac802154_wpan_update_llsec(struct net_device *dev);
- 
-+static inline bool mac802154_queue_is_stopped(struct ieee802154_local *local)
-+{
-+	return atomic_read(&local->phy->hold_txs);
-+}
++/**
++ * ieee802154_wake_queue - wake ieee802154 queue
++ * @hw: pointer as obtained from ieee802154_alloc_hw().
++ *
++ * Tranceivers usually have either one transmit framebuffer or one framebuffer
++ * for both transmitting and receiving. Hence, the core currently only handles
++ * one frame at a time for each phy, which means we had to stop the queue to
++ * avoid new skb to come during the transmission. The queue then needs to be
++ * woken up after the operation.
++ */
++void ieee802154_wake_queue(struct ieee802154_hw *hw);
 +
- /* interface handling */
- int ieee802154_iface_init(void);
- void ieee802154_iface_exit(void);
-diff --git a/net/mac802154/tx.c b/net/mac802154/tx.c
-index 731e86bfe73f..a8d4d5e175b6 100644
---- a/net/mac802154/tx.c
-+++ b/net/mac802154/tx.c
-@@ -43,7 +43,9 @@ void ieee802154_xmit_sync_worker(struct work_struct *work)
- 
- err_tx:
- 	/* Restart the netif queue on each sub_if_data object. */
--	ieee802154_wake_queue(&local->hw);
-+	if (!mac802154_queue_is_stopped(local))
-+		ieee802154_wake_queue(&local->hw);
++/**
++ * ieee802154_stop_queue - stop ieee802154 queue
++ * @hw: pointer as obtained from ieee802154_alloc_hw().
++ *
++ * Tranceivers usually have either one transmit framebuffer or one framebuffer
++ * for both transmitting and receiving. Hence, the core currently only handles
++ * one frame at a time for each phy, which means we need to tell upper layers to
++ * stop giving us new skbs while we are busy with the transmitted one. The queue
++ * must then be stopped before transmitting.
++ */
++void ieee802154_stop_queue(struct ieee802154_hw *hw);
 +
- 	kfree_skb(skb);
- 	atomic_dec(&local->phy->ongoing_txs);
- 	netdev_dbg(dev, "transmission failed\n");
-@@ -87,7 +89,8 @@ ieee802154_tx(struct ieee802154_local *local, struct sk_buff *skb)
- 
- 		ret = drv_xmit_async(local, skb);
- 		if (ret) {
--			ieee802154_wake_queue(&local->hw);
-+			if (!mac802154_queue_is_stopped(local))
-+				ieee802154_wake_queue(&local->hw);
- 			goto err_tx;
- 		}
+ /* MIB callbacks */
+ void mac802154_dev_set_page_channel(struct net_device *dev, u8 page, u8 chan);
  
 diff --git a/net/mac802154/util.c b/net/mac802154/util.c
-index a72d202c212b..cc572c12a8f9 100644
+index 9016f634efba..6c56884ed508 100644
 --- a/net/mac802154/util.c
 +++ b/net/mac802154/util.c
-@@ -87,7 +87,12 @@ ieee802154_wakeup_after_xmit_done(struct ieee802154_hw *hw, bool ifs_handling,
- static void ieee802154_xmit_end(struct ieee802154_hw *hw, bool ifs_handling,
- 				unsigned int skb_len)
- {
--	ieee802154_wakeup_after_xmit_done(hw, ifs_handling, skb_len);
-+	struct ieee802154_local *local = hw_to_local(hw);
-+
-+	/* Avoid waking-up a transmit queue which needs to remain stopped */
-+	if (!mac802154_queue_is_stopped(local))
-+		ieee802154_wakeup_after_xmit_done(hw, ifs_handling, skb_len);
-+
- 	atomic_dec(&hw->phy->ongoing_txs);
+@@ -27,7 +27,6 @@ void ieee802154_wake_queue(struct ieee802154_hw *hw)
+ 	}
+ 	rcu_read_unlock();
  }
+-EXPORT_SYMBOL(ieee802154_wake_queue);
  
+ void ieee802154_stop_queue(struct ieee802154_hw *hw)
+ {
+@@ -43,7 +42,6 @@ void ieee802154_stop_queue(struct ieee802154_hw *hw)
+ 	}
+ 	rcu_read_unlock();
+ }
+-EXPORT_SYMBOL(ieee802154_stop_queue);
+ 
+ enum hrtimer_restart ieee802154_xmit_ifs_timer(struct hrtimer *timer)
+ {
 -- 
 2.27.0
 
