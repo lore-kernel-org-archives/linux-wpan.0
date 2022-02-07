@@ -2,100 +2,103 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A38EC433F5
-	for <linux-wpan@archiver.kernel.org>; Mon,  7 Feb 2022 07:59:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C7C3C433F5
+	for <linux-wpan@archiver.kernel.org>; Mon,  7 Feb 2022 15:12:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234527AbiBGH7G (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 7 Feb 2022 02:59:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40292 "EHLO
+        id S236659AbiBGPLQ (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 7 Feb 2022 10:11:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54082 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234070AbiBGHtZ (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 7 Feb 2022 02:49:25 -0500
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::223])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4138AC043185;
-        Sun,  6 Feb 2022 23:49:24 -0800 (PST)
+        with ESMTP id S1442261AbiBGOsK (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 7 Feb 2022 09:48:10 -0500
+Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::227])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A64AAC0401C2;
+        Mon,  7 Feb 2022 06:48:09 -0800 (PST)
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id CFCAB60004;
-        Mon,  7 Feb 2022 07:49:20 +0000 (UTC)
+        by mail.gandi.net (Postfix) with ESMTPSA id 0115320007;
+        Mon,  7 Feb 2022 14:48:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1644220162;
+        t=1644245286;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=G7cxc0gAWU4rslnbS/39RP9AnfZM5ZxAcoe/N8KOCDg=;
-        b=WQl4EY7xn77qNVFoI7VVQiNSXhFLGEMWvDFI1GS7eWLU4ZdmWd6p8u9GRt53FU0XJ/6IOR
-        MYa82OOSLKHnXoXddhR/Y9iHNomnXQ2GevDxiF3dbYfGTU7R5CzLjMNqJU51PrSYxjsJ4J
-        Bkyl/hO3L7kBf+Yv9A+WlwJhrQkMRjB5odW3vne96D/iE0SU/Hi2FBSbSGzFL3xDI3ig2I
-        PLimWmqNKE8902mBDsemaUdQE14h7rmqG0wnm9nCMiIGmapAZIdR3/Qztwq5G50R9JRzWj
-        z3NlyM0sM0xwFhUK1PQxA1PhzMs9EkxaREQOaO+kFWgwzdKRVP8RQ78pXuEvGg==
-Date:   Mon, 7 Feb 2022 08:49:18 +0100
+         content-transfer-encoding:content-transfer-encoding;
+        bh=eaDB1UBx5XrPGGkfvZYFP+JmE3S6lTPw6aBzvBv+vXs=;
+        b=fQV/JLwWKRK+XtGN39BnOX3TjF4kxcBM6XSOtLl4tdhFLG+c7Yvst8t1GmWO1mUWR/VOPh
+        rB0e3R5OKS+ItbuLisobX7+GKAyMqPM5fRstgfEDrvvwLpEQpa4BOgO9u+daYfpq6Rwm4C
+        ALFQQNFkKEcNQ8RrJy/VfrcRlb1e3OdQ6HSg61Z3+l34/21C21wVMoEO52rmpATVs1uTfZ
+        1vwW2pGP/6JtRqiW4Jw69+6R/LBeDkG2/xnsfjJGpWHQU1jwqxz2fUWXLhGPYsHx1uekQ+
+        aSvKfc82j8QStW1rHUKdAF1d0G3fGaQ4X21RlRNXAIFM4trfVYlTb0sMZ1YB7A==
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
-To:     Alexander Aring <alex.aring@gmail.com>
-Cc:     Stefan Schmidt <stefan@datenfreihafen.org>,
-        linux-wpan - ML <linux-wpan@vger.kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-        Michael Hennerich <michael.hennerich@analog.com>,
-        Varka Bhadram <varkabhadram@gmail.com>,
-        Xue Liu <liuxuenetmail@gmail.com>, Alan Ott <alan@signal11.us>
-Subject: Re: [PATCH wpan-next v2 1/5] net: ieee802154: Improve the way
- supported channels are declared
-Message-ID: <20220207084918.0c2e6d13@xps13>
-In-Reply-To: <CAB_54W5mnovPX0cyq5dwVoQKa6VZx3QPCfVoPAF+LQ5DkdQ3Mw@mail.gmail.com>
-References: <20220128110825.1120678-1-miquel.raynal@bootlin.com>
-        <20220128110825.1120678-2-miquel.raynal@bootlin.com>
-        <CAB_54W60OiGmjLQ2dAvnraq6fkZ6GGTLMVzjVbVAobcvNsaWtQ@mail.gmail.com>
-        <20220131152345.3fefa3aa@xps13>
-        <CAB_54W7SZmgU=2_HEm=_agE0RWfsXxEs_4MHmnAPPFb+iVvxsQ@mail.gmail.com>
-        <20220201155507.549cd2e3@xps13>
-        <CAB_54W5mnovPX0cyq5dwVoQKa6VZx3QPCfVoPAF+LQ5DkdQ3Mw@mail.gmail.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 3.17.7 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+To:     Alexander Aring <alex.aring@gmail.com>,
+        Stefan Schmidt <stefan@datenfreihafen.org>,
+        linux-wpan@vger.kernel.org
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+        David Girault <david.girault@qorvo.com>,
+        Romuald Despres <romuald.despres@qorvo.com>,
+        Frederic Blain <frederic.blain@qorvo.com>,
+        Nicolas Schodet <nico@ni.fr.eu.org>,
+        Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+        Miquel Raynal <miquel.raynal@bootlin.com>
+Subject: [PATCH wpan-next v2 00/14] ieee802154: Synchronous Tx API
+Date:   Mon,  7 Feb 2022 15:47:50 +0100
+Message-Id: <20220207144804.708118-1-miquel.raynal@bootlin.com>
+X-Mailer: git-send-email 2.27.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi Alexander,
+The idea here is to provide a fully synchronous Tx API and also be able
+to be sure that a transfer as finished. This will be used later by
+another series.
 
-alex.aring@gmail.com wrote on Sun, 6 Feb 2022 16:37:23 -0500:
+The first patches create an error helper and then use it in order to
+have only two "end of transmission" helpers that are always called.
 
-> Hi,
->=20
-> On Tue, Feb 1, 2022 at 9:55 AM Miquel Raynal <miquel.raynal@bootlin.com> =
-wrote:
-> ...
-> >
-> > Given the new information that I am currently processing, I believe the
-> > array is not needed anymore, we can live with a minimal number of
-> > additional helpers, like the one getting the PRF value for the UWB
-> > PHYs. It's the only one I have in mind so far. =20
->=20
-> I am not really sure if I understood now. So far those channel/page
-> combinations are the same because we have no special "type" value in
-> wpan_phy,
+Then, a bit of cleanup regarding the naming and the locations of certain
+peaces of code is done.
 
-Yes, my assumption was more: I know there are only -legacy- phy types
-supported, we will add another (or improve the current) way of defining
-channels when we'll need to. Eg when improving UWB support.
+Finally, we create a hot and a slow path, add the necessary logic to be
+able to track ongoing transfers and when the queue must be kept on hold,
+until we finally create a helper to stop emitting after the last
+transfer, which we then use to create a synchronous MLME API.
 
-> what we currently support is the "normal" (I think they name
-> it legacy devices) phy type (no UWB, sun phy, whatever) and as Channel
-> Assignments says that it does not apply for those PHY's I think it
-> there are channel/page combinations which are different according to
-> the PHY "type". However we don't support them and I think there might
-> be an upcoming type field in wpan_phy which might be set only once at
-> registration time.
+Changes in v2:
+* Adapted with the changes already merged/refused.
 
-An idea might be to create a callback that drivers might decide to
-implement or not. If they implement it, the core might call it to get
-further information about the channels. The core would provide a {page,
-channel} couple and retrieve a structure with many information such as
-the the frequency, the protocol, eventually the prf, etc.
+Miquel Raynal (14):
+  net: ieee802154: Move the logic restarting the queue upon transmission
+  net: mac802154: Create a transmit error helper
+  net: ieee802154: at86rf230: Call _xmit_error() when a transmission
+    fails
+  net: ieee802154: atusb: Call _xmit_error() when a transmission fails
+  net: ieee802154: ca8210: Call _xmit_error() when a transmission fails
+  net: mac802154: Stop exporting ieee802154_wake/stop_queue()
+  net: mac802154: Rename the synchronous xmit worker
+  net: mac802154: Rename the main tx_work struct
+  net: mac802154: Follow the count of ongoing transmissions
+  net: mac802154: Hold the transmit queue when relevant
+  net: mac802154: Create a hot tx path
+  net: mac802154: Add a warning in the hot path
+  net: mac802154: Introduce a tx queue flushing mechanism
+  net: mac802154: Introduce a synchronous API for MLME commands
 
-Thanks,
-Miqu=C3=A8l
+ drivers/net/ieee802154/at86rf230.c |  3 +-
+ drivers/net/ieee802154/atusb.c     |  4 +--
+ drivers/net/ieee802154/ca8210.c    |  7 +++--
+ include/net/cfg802154.h            |  5 ++++
+ include/net/mac802154.h            | 37 +++++++----------------
+ net/ieee802154/core.c              |  1 +
+ net/mac802154/cfg.c                |  5 ++--
+ net/mac802154/ieee802154_i.h       | 35 ++++++++++++++++++++--
+ net/mac802154/main.c               |  2 +-
+ net/mac802154/tx.c                 | 48 +++++++++++++++++++++++++-----
+ net/mac802154/util.c               | 39 ++++++++++++++++++++----
+ 11 files changed, 134 insertions(+), 52 deletions(-)
+
+-- 
+2.27.0
+
