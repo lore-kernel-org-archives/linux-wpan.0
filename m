@@ -2,32 +2,33 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C7C3C433F5
-	for <linux-wpan@archiver.kernel.org>; Mon,  7 Feb 2022 15:12:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26F7BC433EF
+	for <linux-wpan@archiver.kernel.org>; Mon,  7 Feb 2022 15:14:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236659AbiBGPLQ (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 7 Feb 2022 10:11:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54082 "EHLO
+        id S235278AbiBGPMM (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 7 Feb 2022 10:12:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54100 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1442261AbiBGOsK (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 7 Feb 2022 09:48:10 -0500
+        with ESMTP id S1442263AbiBGOsM (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 7 Feb 2022 09:48:12 -0500
 Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::227])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A64AAC0401C2;
-        Mon,  7 Feb 2022 06:48:09 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41F73C0401C2;
+        Mon,  7 Feb 2022 06:48:11 -0800 (PST)
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id 0115320007;
-        Mon,  7 Feb 2022 14:48:04 +0000 (UTC)
+        by mail.gandi.net (Postfix) with ESMTPSA id 81D332000B;
+        Mon,  7 Feb 2022 14:48:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1644245286;
+        t=1644245289;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=eaDB1UBx5XrPGGkfvZYFP+JmE3S6lTPw6aBzvBv+vXs=;
-        b=fQV/JLwWKRK+XtGN39BnOX3TjF4kxcBM6XSOtLl4tdhFLG+c7Yvst8t1GmWO1mUWR/VOPh
-        rB0e3R5OKS+ItbuLisobX7+GKAyMqPM5fRstgfEDrvvwLpEQpa4BOgO9u+daYfpq6Rwm4C
-        ALFQQNFkKEcNQ8RrJy/VfrcRlb1e3OdQ6HSg61Z3+l34/21C21wVMoEO52rmpATVs1uTfZ
-        1vwW2pGP/6JtRqiW4Jw69+6R/LBeDkG2/xnsfjJGpWHQU1jwqxz2fUWXLhGPYsHx1uekQ+
-        aSvKfc82j8QStW1rHUKdAF1d0G3fGaQ4X21RlRNXAIFM4trfVYlTb0sMZ1YB7A==
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=vDrO3Tw9p4ErYkEAD53kXKEoAP/91adCzTKGwaYTCW8=;
+        b=VGX00/Vm5BDswDYKP7TX/wNl9Y7+cHgIgOK/2JvI4RHpvu+yx8nuNfLLztEwIe/QL6um/Y
+        4lJipH7R0KRte9ksBzGsbwMpBpW/ecmAkidWFUSFvRfLOOTK57FEc/siUTkUVv/ndFoRnB
+        tYA3oiwYXO6DK6LuuVLOm4g9daOexdZNut7ZiOstaizXjQpb7GIfISxqV3xvoURw5odU7S
+        QnkNrwBWk3ePgPJI9tr9sp6Hf0+nbGB6ZOvCu9AYo+Z3lqAG4IJ4YepMEOY85s4UhRT6Ft
+        6QkGdgAVwMdok0OG7X04aJJr0BD6eYqNrxd5yznBuqxdrii/xAtLRmqj1Eqh3w==
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
 To:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
@@ -40,10 +41,12 @@ Cc:     "David S. Miller" <davem@davemloft.net>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
         Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: [PATCH wpan-next v2 00/14] ieee802154: Synchronous Tx API
-Date:   Mon,  7 Feb 2022 15:47:50 +0100
-Message-Id: <20220207144804.708118-1-miquel.raynal@bootlin.com>
+Subject: [PATCH wpan-next v2 02/14] net: mac802154: Create a transmit error helper
+Date:   Mon,  7 Feb 2022 15:47:52 +0100
+Message-Id: <20220207144804.708118-3-miquel.raynal@bootlin.com>
 X-Mailer: git-send-email 2.27.0
+In-Reply-To: <20220207144804.708118-1-miquel.raynal@bootlin.com>
+References: <20220207144804.708118-1-miquel.raynal@bootlin.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
@@ -51,54 +54,58 @@ Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-The idea here is to provide a fully synchronous Tx API and also be able
-to be sure that a transfer as finished. This will be used later by
-another series.
+So far there is only a helper for successful transmission, which led
+device drivers to implement their own handling in case of
+error. Unfortunately, we really need all the drivers to give the hand
+back to the core once they are done in order to be able to build a
+proper synchronous API. So let's create a _xmit_error() helper.
 
-The first patches create an error helper and then use it in order to
-have only two "end of transmission" helpers that are always called.
+Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
+---
+ include/net/mac802154.h | 10 ++++++++++
+ net/mac802154/util.c    | 10 ++++++++++
+ 2 files changed, 20 insertions(+)
 
-Then, a bit of cleanup regarding the naming and the locations of certain
-peaces of code is done.
-
-Finally, we create a hot and a slow path, add the necessary logic to be
-able to track ongoing transfers and when the queue must be kept on hold,
-until we finally create a helper to stop emitting after the last
-transfer, which we then use to create a synchronous MLME API.
-
-Changes in v2:
-* Adapted with the changes already merged/refused.
-
-Miquel Raynal (14):
-  net: ieee802154: Move the logic restarting the queue upon transmission
-  net: mac802154: Create a transmit error helper
-  net: ieee802154: at86rf230: Call _xmit_error() when a transmission
-    fails
-  net: ieee802154: atusb: Call _xmit_error() when a transmission fails
-  net: ieee802154: ca8210: Call _xmit_error() when a transmission fails
-  net: mac802154: Stop exporting ieee802154_wake/stop_queue()
-  net: mac802154: Rename the synchronous xmit worker
-  net: mac802154: Rename the main tx_work struct
-  net: mac802154: Follow the count of ongoing transmissions
-  net: mac802154: Hold the transmit queue when relevant
-  net: mac802154: Create a hot tx path
-  net: mac802154: Add a warning in the hot path
-  net: mac802154: Introduce a tx queue flushing mechanism
-  net: mac802154: Introduce a synchronous API for MLME commands
-
- drivers/net/ieee802154/at86rf230.c |  3 +-
- drivers/net/ieee802154/atusb.c     |  4 +--
- drivers/net/ieee802154/ca8210.c    |  7 +++--
- include/net/cfg802154.h            |  5 ++++
- include/net/mac802154.h            | 37 +++++++----------------
- net/ieee802154/core.c              |  1 +
- net/mac802154/cfg.c                |  5 ++--
- net/mac802154/ieee802154_i.h       | 35 ++++++++++++++++++++--
- net/mac802154/main.c               |  2 +-
- net/mac802154/tx.c                 | 48 +++++++++++++++++++++++++-----
- net/mac802154/util.c               | 39 ++++++++++++++++++++----
- 11 files changed, 134 insertions(+), 52 deletions(-)
-
+diff --git a/include/net/mac802154.h b/include/net/mac802154.h
+index 2c3bbc6645ba..9fe8cfef1ba0 100644
+--- a/include/net/mac802154.h
++++ b/include/net/mac802154.h
+@@ -498,4 +498,14 @@ void ieee802154_stop_queue(struct ieee802154_hw *hw);
+ void ieee802154_xmit_complete(struct ieee802154_hw *hw, struct sk_buff *skb,
+ 			      bool ifs_handling);
+ 
++/**
++ * ieee802154_xmit_error - frame transmission failed
++ *
++ * @hw: pointer as obtained from ieee802154_alloc_hw().
++ * @skb: buffer for transmission
++ * @ifs_handling: indicate interframe space handling
++ */
++void ieee802154_xmit_error(struct ieee802154_hw *hw, struct sk_buff *skb,
++			   bool ifs_handling);
++
+ #endif /* NET_MAC802154_H */
+diff --git a/net/mac802154/util.c b/net/mac802154/util.c
+index 6f82418e9dec..9016f634efba 100644
+--- a/net/mac802154/util.c
++++ b/net/mac802154/util.c
+@@ -102,6 +102,16 @@ void ieee802154_xmit_complete(struct ieee802154_hw *hw, struct sk_buff *skb,
+ }
+ EXPORT_SYMBOL(ieee802154_xmit_complete);
+ 
++void ieee802154_xmit_error(struct ieee802154_hw *hw, struct sk_buff *skb,
++			   bool ifs_handling)
++{
++	unsigned int skb_len = skb->len;
++
++	dev_kfree_skb_any(skb);
++	ieee802154_xmit_end(hw, ifs_handling, skb_len);
++}
++EXPORT_SYMBOL(ieee802154_xmit_error);
++
+ void ieee802154_stop_device(struct ieee802154_local *local)
+ {
+ 	flush_workqueue(local->workqueue);
 -- 
 2.27.0
 
