@@ -2,65 +2,77 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 109B9C433FE
-	for <linux-wpan@archiver.kernel.org>; Tue, 15 Feb 2022 09:32:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43A70C433F5
+	for <linux-wpan@archiver.kernel.org>; Tue, 15 Feb 2022 14:30:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233381AbiBOJcb (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 15 Feb 2022 04:32:31 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:33890 "EHLO
+        id S238660AbiBOOad (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 15 Feb 2022 09:30:33 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:51408 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232421AbiBOJca (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 15 Feb 2022 04:32:30 -0500
-Received: from proxima.lasnet.de (proxima.lasnet.de [IPv6:2a01:4f8:121:31eb:3::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3973DA94E6;
-        Tue, 15 Feb 2022 01:32:20 -0800 (PST)
-Received: from localhost.localdomain.datenfreihafen.local (p200300e9d7187a6e0343b5c7bb719883.dip0.t-ipconnect.de [IPv6:2003:e9:d718:7a6e:343:b5c7:bb71:9883])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        with ESMTP id S238630AbiBOOa1 (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 15 Feb 2022 09:30:27 -0500
+Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 343ADEEA71;
+        Tue, 15 Feb 2022 06:30:14 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        (Authenticated sender: stefan@sostec.de)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id 88520C0391;
-        Tue, 15 Feb 2022 10:32:17 +0100 (CET)
-From:   Stefan Schmidt <stefan@datenfreihafen.org>
-To:     davem@davemloft.net, kuba@kernel.org
-Cc:     linux-wpan@vger.kernel.org, alex.aring@gmail.com,
-        netdev@vger.kernel.org
-Subject: pull-request: ieee802154 for net 2022-02-15
-Date:   Tue, 15 Feb 2022 10:32:14 +0100
-Message-Id: <20220215093214.3709686-1-stefan@datenfreihafen.org>
-X-Mailer: git-send-email 2.34.1
+        by sin.source.kernel.org (Postfix) with ESMTPS id F1EB1CE2007;
+        Tue, 15 Feb 2022 14:30:11 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 42072C340F2;
+        Tue, 15 Feb 2022 14:30:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1644935410;
+        bh=v+SPf+a3vwnc8GB4cem/OWq9z+vis9gvUbMbiWiq7B0=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=V00Sz8IQIvzW5oNSfMGKGtVzU7RImqIwyz81hmmRO2FSjzaIIH3FthMAHZS883iUY
+         GyWMC3x5Aenc98dfuKYK+Kshqp//70vTkhBfGuesZYMSdBuHhujODTx7wB5UxE2I6E
+         tO3tUX15MbTvh1aHONgmwjaftoM6Ht8+XRimbItWxpndYH0et/7iJRFcGxypuoBTEx
+         Uo9hx/cpG9441fxSZCsHBctm+bDZXh10pPum2kERE84LGppPcAZiK8SmRnxVsfiYRY
+         ao9L4qU+1jxoKIOCn7n9H6JvF23NfXkLy2jMARI55iDU4ZqgASlM0ETNujq1MwrVPG
+         ZM6HpRy0NLSLg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 2AEEBE6D447;
+        Tue, 15 Feb 2022 14:30:10 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: pull-request: ieee802154 for net 2022-02-15
+From:   patchwork-bot+netdevbpf@kernel.org
+Message-Id: <164493541017.26708.4040304563113097967.git-patchwork-notify@kernel.org>
+Date:   Tue, 15 Feb 2022 14:30:10 +0000
+References: <20220215093214.3709686-1-stefan@datenfreihafen.org>
+In-Reply-To: <20220215093214.3709686-1-stefan@datenfreihafen.org>
+To:     Stefan Schmidt <stefan@datenfreihafen.org>
+Cc:     davem@davemloft.net, kuba@kernel.org, linux-wpan@vger.kernel.org,
+        alex.aring@gmail.com, netdev@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello Dave, Jakub.
+Hello:
 
-An update from ieee802154 for your *net* tree.
+This pull request was applied to netdev/net.git (master)
+by David S. Miller <davem@davemloft.net>:
 
-Only a single fix this time.
-Miquel Raynal fixed the lifs/sifs periods in the ca82010 to take the actual
-symbol duration time into account.
+On Tue, 15 Feb 2022 10:32:14 +0100 you wrote:
+> Hello Dave, Jakub.
+> 
+> An update from ieee802154 for your *net* tree.
+> 
+> Only a single fix this time.
+> Miquel Raynal fixed the lifs/sifs periods in the ca82010 to take the actual
+> symbol duration time into account.
+> 
+> [...]
 
-regards
-Stefan Schmidt
+Here is the summary with links:
+  - pull-request: ieee802154 for net 2022-02-15
+    https://git.kernel.org/netdev/net/c/b465c0dc83be
 
-The following changes since commit c86d86131ab75696fc52d98571148842e067d620:
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-  Partially revert "net/smc: Add netlink net namespace support" (2022-02-02 07:42:41 -0800)
 
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/sschmidt/wpan.git tags/ieee802154-for-net-2022-02-15
-
-for you to fetch changes up to bdc120a2bcd834e571ce4115aaddf71ab34495de:
-
-  net: ieee802154: ca8210: Fix lifs/sifs periods (2022-02-02 18:04:50 +0100)
-
-----------------------------------------------------------------
-Miquel Raynal (1):
-      net: ieee802154: ca8210: Fix lifs/sifs periods
-
- drivers/net/ieee802154/ca8210.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
