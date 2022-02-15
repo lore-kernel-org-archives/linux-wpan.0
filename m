@@ -2,104 +2,65 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84B27C433EF
-	for <linux-wpan@archiver.kernel.org>; Thu, 10 Feb 2022 14:53:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 109B9C433FE
+	for <linux-wpan@archiver.kernel.org>; Tue, 15 Feb 2022 09:32:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243278AbiBJOxB (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Thu, 10 Feb 2022 09:53:01 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:40398 "EHLO
+        id S233381AbiBOJcb (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 15 Feb 2022 04:32:31 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:33890 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243273AbiBJOw7 (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 10 Feb 2022 09:52:59 -0500
-X-Greylist: delayed 13827 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 10 Feb 2022 06:53:00 PST
-Received: from proxima.lasnet.de (proxima.lasnet.de [78.47.171.185])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4330B96;
-        Thu, 10 Feb 2022 06:53:00 -0800 (PST)
-Received: from [IPV6:2003:e9:d718:7a06:664f:fc39:1c1a:aa99] (p200300e9d7187a06664ffc391c1aaa99.dip0.t-ipconnect.de [IPv6:2003:e9:d718:7a06:664f:fc39:1c1a:aa99])
+        with ESMTP id S232421AbiBOJca (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 15 Feb 2022 04:32:30 -0500
+Received: from proxima.lasnet.de (proxima.lasnet.de [IPv6:2a01:4f8:121:31eb:3::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3973DA94E6;
+        Tue, 15 Feb 2022 01:32:20 -0800 (PST)
+Received: from localhost.localdomain.datenfreihafen.local (p200300e9d7187a6e0343b5c7bb719883.dip0.t-ipconnect.de [IPv6:2003:e9:d718:7a6e:343:b5c7:bb71:9883])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
         (No client certificate requested)
-        (Authenticated sender: stefan@datenfreihafen.org)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id DFCB2C0434;
-        Thu, 10 Feb 2022 15:52:56 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
-        s=2021; t=1644504777;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=woAICiXlaRHnaCbGqhU6WRh9hSqXCnJr+zBk1afWk5Y=;
-        b=Hj0VrcmolVGinTGiSegVceNcP89MPRiSuGcgJ5yxtnyqnrHPObplvfrGM718gMf5lYOKKx
-        S2nZSaJYCKah6Bs/curcJRfTMtFdeshd+qAzvjDDDBCVau42oYemk2EAM1mdQs/c4JXvpz
-        42tQ+r/lvhUh9S89whYnTh85O+ts5zOJuCxPAUqT05Vg+LYNgqNG3BgmxxECWpGEvMbM9E
-        KFkWjmPna2Hf6XwRU+2J+eCGNzqSJYx4ZQ4XmUGu5MjOX5CbPWEiCZQPt6KeHGWrhIdgX2
-        VCuEu7vbhHNzJ50kFVDlJEJYSOTgqjwpEXlahq8+gOwbLr/myjGf4BSCcT7YJg==
-Message-ID: <75c6cf8c-c7cc-4a5e-1b54-519bf51a7540@datenfreihafen.org>
-Date:   Thu, 10 Feb 2022 15:52:56 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Subject: Re: [PATCH wpan-next v3 0/4] ieee802154: Improve durations handling
-Content-Language: en-US
-To:     Miquel Raynal <miquel.raynal@bootlin.com>,
-        Alexander Aring <alex.aring@gmail.com>,
-        linux-wpan@vger.kernel.org
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-        Xue Liu <liuxuenetmail@gmail.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Harry Morris <harrymorris12@gmail.com>,
-        David Girault <david.girault@qorvo.com>,
-        Romuald Despres <romuald.despres@qorvo.com>,
-        Frederic Blain <frederic.blain@qorvo.com>,
-        Nicolas Schodet <nico@ni.fr.eu.org>,
-        Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-References: <20220201180629.93410-1-miquel.raynal@bootlin.com>
+        (Authenticated sender: stefan@sostec.de)
+        by proxima.lasnet.de (Postfix) with ESMTPSA id 88520C0391;
+        Tue, 15 Feb 2022 10:32:17 +0100 (CET)
 From:   Stefan Schmidt <stefan@datenfreihafen.org>
-In-Reply-To: <20220201180629.93410-1-miquel.raynal@bootlin.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+To:     davem@davemloft.net, kuba@kernel.org
+Cc:     linux-wpan@vger.kernel.org, alex.aring@gmail.com,
+        netdev@vger.kernel.org
+Subject: pull-request: ieee802154 for net 2022-02-15
+Date:   Tue, 15 Feb 2022 10:32:14 +0100
+Message-Id: <20220215093214.3709686-1-stefan@datenfreihafen.org>
+X-Mailer: git-send-email 2.34.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
+Hello Dave, Jakub.
 
-Hello.
+An update from ieee802154 for your *net* tree.
 
-On 01.02.22 19:06, Miquel Raynal wrote:
-> These patches try to enhance the support of the various delays by adding
-> into the core the necessary logic to derive the actual symbol duration
-> (and then the lifs/sifs durations) depending on the protocol used. The
-> symbol duration type is also updated to fit smaller numbers.
-> 
-> Having the symbol durations properly set is a mandatory step in order to
-> use the scanning feature that will soon be introduced.
-> 
-> Changes since v2:
-> * Added the ca8210 driver fix.
-> * Fully dropped my rework of the way channels are advertised by device
->    drivers. Adapted instead the main existing helper to derive durations
->    based on the page/channel couple.
-> 
-> Miquel Raynal (4):
->    net: ieee802154: ca8210: Fix lifs/sifs periods
->    net: mac802154: Convert the symbol duration into nanoseconds
->    net: mac802154: Set durations automatically
->    net: ieee802154: Drop duration settings when the core does it already
-> 
->   drivers/net/ieee802154/at86rf230.c | 33 ------------------
->   drivers/net/ieee802154/atusb.c     | 33 ------------------
->   drivers/net/ieee802154/ca8210.c    |  3 --
->   drivers/net/ieee802154/mcr20a.c    |  5 ---
->   include/net/cfg802154.h            |  6 ++--
->   net/mac802154/cfg.c                |  1 +
->   net/mac802154/main.c               | 54 +++++++++++++++++++++++++++---
->   7 files changed, 55 insertions(+), 80 deletions(-)
-> 
-
-
-This patchset has been applied to the wpan-next tree and will be
-part of the next pull request to net-next. Thanks!
+Only a single fix this time.
+Miquel Raynal fixed the lifs/sifs periods in the ca82010 to take the actual
+symbol duration time into account.
 
 regards
 Stefan Schmidt
+
+The following changes since commit c86d86131ab75696fc52d98571148842e067d620:
+
+  Partially revert "net/smc: Add netlink net namespace support" (2022-02-02 07:42:41 -0800)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/sschmidt/wpan.git tags/ieee802154-for-net-2022-02-15
+
+for you to fetch changes up to bdc120a2bcd834e571ce4115aaddf71ab34495de:
+
+  net: ieee802154: ca8210: Fix lifs/sifs periods (2022-02-02 18:04:50 +0100)
+
+----------------------------------------------------------------
+Miquel Raynal (1):
+      net: ieee802154: ca8210: Fix lifs/sifs periods
+
+ drivers/net/ieee802154/ca8210.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
