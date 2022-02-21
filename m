@@ -2,62 +2,64 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00657C433EF
-	for <linux-wpan@archiver.kernel.org>; Sun, 20 Feb 2022 23:53:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4818C433F5
+	for <linux-wpan@archiver.kernel.org>; Mon, 21 Feb 2022 20:22:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232721AbiBTXxb (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Sun, 20 Feb 2022 18:53:31 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:55384 "EHLO
+        id S233609AbiBUUXV (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 21 Feb 2022 15:23:21 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:34700 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230463AbiBTXxa (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Sun, 20 Feb 2022 18:53:30 -0500
-Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CD312AE16;
-        Sun, 20 Feb 2022 15:53:04 -0800 (PST)
-Received: by mail-lj1-x235.google.com with SMTP id p20so3839134ljo.0;
-        Sun, 20 Feb 2022 15:53:04 -0800 (PST)
+        with ESMTP id S229635AbiBUUXS (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 21 Feb 2022 15:23:18 -0500
+Received: from mail-lj1-x22a.google.com (mail-lj1-x22a.google.com [IPv6:2a00:1450:4864:20::22a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DB431083;
+        Mon, 21 Feb 2022 12:22:53 -0800 (PST)
+Received: by mail-lj1-x22a.google.com with SMTP id r20so16318442ljj.1;
+        Mon, 21 Feb 2022 12:22:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=27AGmAa3udM5tBlxi5FVJ+hzb+9/4pSfsBoqJMjHxEU=;
-        b=bD3F93OrhMNU2ydFH8XSS57YAe/sX8cQnkyUI22TCiyxa4zdiqKXID1S3jdfp21diG
-         AdQj3zXrS4QUS0FLgKUy/R+sboM7qFLn9wtmq0sUWQ+p/ikNueoaj2C07HJ/dWDGrLL5
-         LvDO3orzfJL2DgLT/WJcubPFlkzvzAnm73RkN+VNJZ5AEKXfEBTM2PJIJuf//fvmAeg9
-         RQnIfvWrdr1OovkRz2hhTWEx7ih1lSwwRYkGFJEJRg/S730Otap0Grd9gY9KVVDaLi0Q
-         GWvEib9nRdt0aiGklwy4xxrDtn0Te1zujCr3NsLLm7Pj92GtWqARp2Q6ddHrpVwAKOWU
-         wrlw==
+        bh=O8lP8zmhBYbpflQ0+nhCO46VybDBNFYhxhaJ1MKZ0Ms=;
+        b=KTrBOGImMf1pcF5kfOTnDkoFI7V4ke2kyLCKYcbScvzDS7HxY6gVH7cc4Qo3I/8edi
+         GnEPIzJKeOFyjl1h5yIQaUmP67OpR1/rxUR59WZze8/F78d6XkfDd6kyTMN6onVsD4sV
+         tPjKDC01sCrxHTBdutAR1RmZkzooxY5pvQaPZzmZFasG7dAL2yaptPjPtZbi/k3uXfiP
+         0XNzRbeUuHZPtAb+LxEriikz07SGPalEUUgl8ibX4nv5k4VpLHeJKOhFmvr+BqnwYV5c
+         cbPnjpIbgCdVc3mO3dbi99sz9Hh0no+re+yPwAPE5SkevWGxJankbx7Pe6+ZFYF/shtM
+         cySw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=27AGmAa3udM5tBlxi5FVJ+hzb+9/4pSfsBoqJMjHxEU=;
-        b=pzls5Wjmc/xg9m9uLkCb/o8UtVMmLnEzNFGSDbe4XY0kqV2FOEQrV2Vxb5StLWRXzo
-         7d77+sfQGj5/9nJDQWHoXusIVb0F9OEKIOwcsabArVIJ5JeGQxuXqjV7FfbXweHHTwjl
-         5+KWFMIxVUig+Kv8nD/1HGVeFS0J/mASrEeufaoFORAldZzrj1VKh6ZB2PA/vMHGV1Be
-         jRmsxyywUmCGeAWjNQ88c5jSNg7XpxAdpG38QyEBzun57zuO/fyWCUEOZf1SfgHbGgNU
-         Lu0fOMwB/kkpcAsCUhYKvindhTwLQ3ur79+h2lCdqZ0qeDK5FadueHtYMeXU6tKqy3pw
-         Eq3A==
-X-Gm-Message-State: AOAM530Dv1sylgrSl6whp0481d3b7soQZSO8/YmE+DiW0VvOIXspLylI
-        IU8LmffowhC6WEy7xFvayZ2QD110RxLhJftoiUo=
-X-Google-Smtp-Source: ABdhPJwPrKzVerEoO9CIdu+YACJNX8schLeJBl4+SGTGYvthT9GJ1zVgbShK5E/V8tS0epiCP8+sECHn6glvbGsVUmk=
-X-Received: by 2002:a2e:b16e:0:b0:244:d368:57e with SMTP id
- a14-20020a2eb16e000000b00244d368057emr12860468ljm.251.1645401183051; Sun, 20
- Feb 2022 15:53:03 -0800 (PST)
+        bh=O8lP8zmhBYbpflQ0+nhCO46VybDBNFYhxhaJ1MKZ0Ms=;
+        b=oIWME0nJbV4P58vECtYg3rUR3wmRf/H2ir4sM1liQCVkJRM5QR0YQ+Bdlc3qmZRDPL
+         SfmCef8kH3FvUztekxUBsIicIwJ4TuNCyZKbsx8P84vEXAxjIkzSW1QZ6j05q7WL0JkP
+         E4LkdmzAF+fm3fM1UAd9YWZJxQF0LOwdGj7nnlxKLs2hzg8GTA66s9yhFWKwpK+haF/k
+         B3h6S6rqPdHH8HqT14fE7UNPgJTTL7xw/lgsH8cdvXsdjuzLOhg6lIKm/CUBbGRnULJt
+         eTyXVPL1SI5UT0GUb3BlnI2DjczsrX8IvnZJ4WmKx68SjwcYUlp9TWbAIoNBwHabC4C5
+         Er0w==
+X-Gm-Message-State: AOAM532g9SGsVvD7g1DZ5D5vkZoBu7PYFMnlgPHSDqJq2FQBrXf82xtD
+        +dJmg5qhnh+twP3DD/8Slsm9KDCn6SoKGfmUHQY=
+X-Google-Smtp-Source: ABdhPJxJwDnxQRbVyMwmoo2aN0PfU2GO7knhpkuPvoCVLEKjPr4Y0/4vDkttgqbYK3cJX1rLGy0GXEVtmYhbfpdQ31E=
+X-Received: by 2002:a2e:91d7:0:b0:245:fce2:4551 with SMTP id
+ u23-20020a2e91d7000000b00245fce24551mr9254570ljg.446.1645474971588; Mon, 21
+ Feb 2022 12:22:51 -0800 (PST)
 MIME-Version: 1.0
-References: <20220207144804.708118-1-miquel.raynal@bootlin.com> <20220207144804.708118-15-miquel.raynal@bootlin.com>
-In-Reply-To: <20220207144804.708118-15-miquel.raynal@bootlin.com>
+References: <20220207144804.708118-1-miquel.raynal@bootlin.com>
+ <20220207144804.708118-3-miquel.raynal@bootlin.com> <CAK-6q+iebK43LComxxjvg0pBiD_AK0MMyMucLHmeVG2zbHPErQ@mail.gmail.com>
+In-Reply-To: <CAK-6q+iebK43LComxxjvg0pBiD_AK0MMyMucLHmeVG2zbHPErQ@mail.gmail.com>
 From:   Alexander Aring <alex.aring@gmail.com>
-Date:   Sun, 20 Feb 2022 18:52:51 -0500
-Message-ID: <CAB_54W45p6e5sY6O=yHq39vsN+h_Yi6e9=GGky+1vO_H3oUj9A@mail.gmail.com>
-Subject: Re: [PATCH wpan-next v2 14/14] net: mac802154: Introduce a
- synchronous API for MLME commands
-To:     Miquel Raynal <miquel.raynal@bootlin.com>
-Cc:     Stefan Schmidt <stefan@datenfreihafen.org>,
+Date:   Mon, 21 Feb 2022 15:22:40 -0500
+Message-ID: <CAB_54W6iBmxnRjdjmbWTPzci0za7Lu5UwVFqLJsjQFacxAYQYQ@mail.gmail.com>
+Subject: Re: [PATCH wpan-next v2 02/14] net: mac802154: Create a transmit
+ error helper
+To:     Alexander Aring <aahringo@redhat.com>
+Cc:     Miquel Raynal <miquel.raynal@bootlin.com>,
+        Stefan Schmidt <stefan@datenfreihafen.org>,
         linux-wpan - ML <linux-wpan@vger.kernel.org>,
         "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
+        Network Development <netdev@vger.kernel.org>,
         David Girault <david.girault@qorvo.com>,
         Romuald Despres <romuald.despres@qorvo.com>,
         Frederic Blain <frederic.blain@qorvo.com>,
@@ -70,46 +72,83 @@ X-Mailing-List: linux-wpan@vger.kernel.org
 
 Hi,
 
-On Mon, Feb 7, 2022 at 9:48 AM Miquel Raynal <miquel.raynal@bootlin.com> wrote:
+On Sun, Feb 20, 2022 at 6:31 PM Alexander Aring <aahringo@redhat.com> wrote:
 >
-> This is the slow path, we need to wait for each command to be processed
-> before continuing so let's introduce an helper which does the
-> transmission and blocks until it gets notified of its asynchronous
-> completion. This helper is going to be used when introducing scan
-> support.
+> Hi,
 >
-> Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
-> ---
->  net/mac802154/ieee802154_i.h | 1 +
->  net/mac802154/tx.c           | 6 ++++++
->  2 files changed, 7 insertions(+)
+> On Mon, Feb 7, 2022 at 10:09 AM Miquel Raynal <miquel.raynal@bootlin.com> wrote:
+> >
+> > So far there is only a helper for successful transmission, which led
+> > device drivers to implement their own handling in case of
+> > error. Unfortunately, we really need all the drivers to give the hand
+> > back to the core once they are done in order to be able to build a
+> > proper synchronous API. So let's create a _xmit_error() helper.
+> >
+> > Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
+> > ---
+> >  include/net/mac802154.h | 10 ++++++++++
+> >  net/mac802154/util.c    | 10 ++++++++++
+> >  2 files changed, 20 insertions(+)
+> >
+> > diff --git a/include/net/mac802154.h b/include/net/mac802154.h
+> > index 2c3bbc6645ba..9fe8cfef1ba0 100644
+> > --- a/include/net/mac802154.h
+> > +++ b/include/net/mac802154.h
+> > @@ -498,4 +498,14 @@ void ieee802154_stop_queue(struct ieee802154_hw *hw);
+> >  void ieee802154_xmit_complete(struct ieee802154_hw *hw, struct sk_buff *skb,
+> >                               bool ifs_handling);
+> >
+> > +/**
+> > + * ieee802154_xmit_error - frame transmission failed
+> > + *
+> > + * @hw: pointer as obtained from ieee802154_alloc_hw().
+> > + * @skb: buffer for transmission
+> > + * @ifs_handling: indicate interframe space handling
+> > + */
+> > +void ieee802154_xmit_error(struct ieee802154_hw *hw, struct sk_buff *skb,
+> > +                          bool ifs_handling);
+> > +
+> >  #endif /* NET_MAC802154_H */
+> > diff --git a/net/mac802154/util.c b/net/mac802154/util.c
+> > index 6f82418e9dec..9016f634efba 100644
+> > --- a/net/mac802154/util.c
+> > +++ b/net/mac802154/util.c
+> > @@ -102,6 +102,16 @@ void ieee802154_xmit_complete(struct ieee802154_hw *hw, struct sk_buff *skb,
+> >  }
+> >  EXPORT_SYMBOL(ieee802154_xmit_complete);
+> >
+> > +void ieee802154_xmit_error(struct ieee802154_hw *hw, struct sk_buff *skb,
+> > +                          bool ifs_handling)
+> > +{
+> > +       unsigned int skb_len = skb->len;
+> > +
+> > +       dev_kfree_skb_any(skb);
+> > +       ieee802154_xmit_end(hw, ifs_handling, skb_len);
+> > +}
 >
-> diff --git a/net/mac802154/ieee802154_i.h b/net/mac802154/ieee802154_i.h
-> index 295c9ce091e1..ad76a60af087 100644
-> --- a/net/mac802154/ieee802154_i.h
-> +++ b/net/mac802154/ieee802154_i.h
-> @@ -123,6 +123,7 @@ extern struct ieee802154_mlme_ops mac802154_mlme_wpan;
->  void ieee802154_rx(struct ieee802154_local *local, struct sk_buff *skb);
->  void ieee802154_xmit_sync_worker(struct work_struct *work);
->  void ieee802154_sync_and_stop_tx(struct ieee802154_local *local);
-> +void ieee802154_mlme_tx(struct ieee802154_local *local, struct sk_buff *skb);
->  netdev_tx_t
->  ieee802154_monitor_start_xmit(struct sk_buff *skb, struct net_device *dev);
->  netdev_tx_t
-> diff --git a/net/mac802154/tx.c b/net/mac802154/tx.c
-> index 06ae2e6cea43..7c281458942e 100644
-> --- a/net/mac802154/tx.c
-> +++ b/net/mac802154/tx.c
-> @@ -126,6 +126,12 @@ void ieee802154_sync_and_stop_tx(struct ieee802154_local *local)
->         atomic_dec(&local->phy->hold_txs);
->  }
->
-> +void ieee802154_mlme_tx(struct ieee802154_local *local, struct sk_buff *skb)
-> +{
-> +       ieee802154_tx(local, skb);
-> +       ieee802154_sync_and_stop_tx(local);
+> Remove ieee802154_xmit_end() function and just call to wake up the
+> queue here, also drop the "ifs_handling" parameter here.
 
-Some of those functions can fail, in async case we can do some stats
-but here we can deliver the caller an error. Please do so.
+I am sorry, I think I should deliver an explanation here... I think
+the handling of success and error paths are just too different. In
+error there will also never ifs handling in the error path. Also
+please note there are not just errors as bus/transceiver errors, in
+future transceiver should also deliver [0] to the caller, in sync
+transmit it should return those errors to the caller... in async mode
+there exists different ways to deliver errors like (no ack) to user
+space by using socket error queue, here again is worth to look into
+wireless subsystem which have a similar feature.
+
+The errors in [0] are currently ignored but I think should be switched
+some time soon or with an additional patch by you to calling
+xmit_error with an int for $REASON. Those errors are happening on the
+transceiver because some functionality is offloaded. btw: so far I
+know some MLME-ops need to know if an ack is received or not.
+
+You can split the functionality somehow it makes sense, but with the
+above change I only see the wake up queue is the only thing that both
+(success/error) should have in common.
 
 - Alex
+
+[0] https://elixir.bootlin.com/linux/v5.16-rc7/source/drivers/net/ieee802154/at86rf230.c#L670
