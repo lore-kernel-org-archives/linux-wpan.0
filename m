@@ -2,33 +2,33 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9B92C43217
-	for <linux-wpan@archiver.kernel.org>; Thu,  3 Mar 2022 18:25:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57E7DC433FE
+	for <linux-wpan@archiver.kernel.org>; Thu,  3 Mar 2022 18:25:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235769AbiCCS0S (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Thu, 3 Mar 2022 13:26:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56564 "EHLO
+        id S235773AbiCCS0T (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Thu, 3 Mar 2022 13:26:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56488 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235747AbiCCS0M (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 3 Mar 2022 13:26:12 -0500
+        with ESMTP id S235752AbiCCS0N (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 3 Mar 2022 13:26:13 -0500
 Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::227])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBC541A41CA;
-        Thu,  3 Mar 2022 10:25:26 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECB981A41E8;
+        Thu,  3 Mar 2022 10:25:27 -0800 (PST)
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id 4EF2A20002;
-        Thu,  3 Mar 2022 18:25:22 +0000 (UTC)
+        by mail.gandi.net (Postfix) with ESMTPSA id EEB7020007;
+        Thu,  3 Mar 2022 18:25:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1646331923;
+        t=1646331926;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ZZHfvpHNrn5AeNwFEm3pndYVL8rb2nvfYZUF4mirQIA=;
-        b=HCPKDm0O1M1ADILQMwiLrWO1NziQiklluLGtCebJ6Iveu+kbxvDqEBP5uGflz0khA0KhfU
-        4RhC54Lo5Yv9s7tmbdZnvmNermBmKRsbhkY9HHzdJsTxbhm8jDge4dctrmUSTFccddfyBi
-        TJOVhjJZNNrXVD5PZIneRYGtER69/YEl96zi7E20kvNWZ1qt28d2QcF4/Ou7nW477UuR6I
-        Z84Z81YZJ0KN41DEm7zuuCEFuNxQ1/8QaBa505XI4ph4RGLZKLOsuOfBz7zot4AOHAocc2
-        lL/iEJBwe1B+asl9NdKR2nliCrZHjmVyu1QLsfHzJsrGRKZ3tJY5bCmXY7n/7Q==
+        bh=7uhKeSJ5TdvqQx9rBcypmjG7Wuhjj3YD9ai0d1ExtG4=;
+        b=mO3TVnTqxWTtGVsoBlWkZLBmRY3e0T8rjRSNAT7fdbjNgGGP/7Z2CxBNMJcPG67NkVtXSr
+        ESmP9IATnJ4brMd6HA+Lmn2L7HdeNUFJ16UveDpglJPN4wRA4MhXHL/8W0id0Wyz/r/4Ay
+        fZCo/Ada6ym8RI0N70PmwwpYF2UREAnGJqHzCPH62jc2n8S+bODqR6MN21O/bXk76eGt/1
+        TkDAvf+UPtzQlhGNXuMmgq8uA+cxW8z6PBkGvH8GFaRZNuvP1ve245ZChTr2n9b0O0Rov7
+        MDOSzQV402M4qLIIorpLDVYajSRom0Jzz9bLvhSRRiJ3Hycrj3PHZMevWYrOEg==
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
 To:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
@@ -41,9 +41,9 @@ Cc:     "David S. Miller" <davem@davemloft.net>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
         Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: [PATCH wpan-next v3 09/11] net: ieee802154: atusb: Call _xmit_error() when a transmission fails
-Date:   Thu,  3 Mar 2022 19:25:06 +0100
-Message-Id: <20220303182508.288136-10-miquel.raynal@bootlin.com>
+Subject: [PATCH wpan-next v3 11/11] net: ieee802154: ca8210: Call _xmit_error() when a transmission fails
+Date:   Thu,  3 Mar 2022 19:25:08 +0100
+Message-Id: <20220303182508.288136-12-miquel.raynal@bootlin.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20220303182508.288136-1-miquel.raynal@bootlin.com>
 References: <20220303182508.288136-1-miquel.raynal@bootlin.com>
@@ -59,25 +59,27 @@ has failed. Let's use it instead of open-coding it.
 
 Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
 ---
- drivers/net/ieee802154/atusb.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ drivers/net/ieee802154/ca8210.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ieee802154/atusb.c b/drivers/net/ieee802154/atusb.c
-index f27a5f535808..9fa7febddff2 100644
---- a/drivers/net/ieee802154/atusb.c
-+++ b/drivers/net/ieee802154/atusb.c
-@@ -271,9 +271,8 @@ static void atusb_tx_done(struct atusb *atusb, u8 seq)
- 		 * unlikely case now that seq == expect is then true, but can
- 		 * happen and fail with a tx_skb = NULL;
- 		 */
--		ieee802154_wake_queue(atusb->hw);
--		if (atusb->tx_skb)
--			dev_kfree_skb_irq(atusb->tx_skb);
-+		ieee802154_xmit_error(atusb->hw, atusb->tx_skb,
-+				      IEEE802154_MAC_ERROR);
+diff --git a/drivers/net/ieee802154/ca8210.c b/drivers/net/ieee802154/ca8210.c
+index 116aece191cd..b1eb74200f23 100644
+--- a/drivers/net/ieee802154/ca8210.c
++++ b/drivers/net/ieee802154/ca8210.c
+@@ -1729,11 +1729,11 @@ static int ca8210_async_xmit_complete(
+ 			status
+ 		);
+ 		if (status != IEEE802154_TRANSACTION_OVERFLOW) {
+-			dev_kfree_skb_any(priv->tx_skb);
+-			ieee802154_wake_queue(priv->hw);
++			ieee802154_xmit_error(priv->hw, priv->tx_skb, status);
+ 			return 0;
+ 		}
  	}
- }
++
+ 	ieee802154_xmit_complete(priv->hw, priv->tx_skb, true);
  
+ 	return 0;
 -- 
 2.27.0
 
