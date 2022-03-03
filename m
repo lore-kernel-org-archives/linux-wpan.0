@@ -2,33 +2,33 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE0C5C433FE
-	for <linux-wpan@archiver.kernel.org>; Thu,  3 Mar 2022 18:25:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0641C433EF
+	for <linux-wpan@archiver.kernel.org>; Thu,  3 Mar 2022 18:25:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235726AbiCCS0L (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Thu, 3 Mar 2022 13:26:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56488 "EHLO
+        id S235744AbiCCS0M (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Thu, 3 Mar 2022 13:26:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56512 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235740AbiCCS0J (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 3 Mar 2022 13:26:09 -0500
+        with ESMTP id S235762AbiCCS0L (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 3 Mar 2022 13:26:11 -0500
 Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::227])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84E821A41EB;
-        Thu,  3 Mar 2022 10:25:18 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52A571A58EA;
+        Thu,  3 Mar 2022 10:25:25 -0800 (PST)
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id 35F2F2000B;
-        Thu,  3 Mar 2022 18:25:14 +0000 (UTC)
+        by mail.gandi.net (Postfix) with ESMTPSA id BB76F20011;
+        Thu,  3 Mar 2022 18:25:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1646331915;
+        t=1646331922;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=gc9GvEmcqPdgjbsstrsAlcUKY3OGmYysVOqtCmZ0Ffc=;
-        b=G2C2kWpZ8MCW9Vi1ORpk0GsXh2KYOqsRaIyJiL/DajnjKR/C5Tvsg+2EmFiUfjadFIFtpT
-        LtjtrC5Tic8FPTxQY6gJRhc/d4KJp5qJM3YqdLtuqOK6M4vn9huphze2YwxBTC3QFCqQ37
-        RX1u2SAe957HegMx736MrUpfszjwQ3efn+Hw8LxK2C8v1RLUTstG1yPFh0LHiIRor4rlCV
-        srrn7Q0K1k+xXekfibTSvvQqFOxjgu9DJbgJcjLhbbcw6NCZESVwG3QDQpOTipOgnErcYx
-        H7/hD9ztHz4l6Rb7cL1sFUVydE0UBuE02BGivt4HOYRZ2E0uGAAZn+W0LlYBSw==
+        bh=regqtWdmmr7YwP29eVg+fqSTAspcC6y2WbxEFTy5muw=;
+        b=mdKlb9kgwh3LLXPCZJ/K2YDn63AOlIxD1hlzJh34PEY0fa2IS0IHSUwXMHCJDb82bLJVPn
+        x4rdaE6/TXvqGJKFKTL+48BvgiL1M7XazEYnhIUHx/XvFrfHjucy9dTZDvbhYKjvHdd2hU
+        7q4NczKx/FVZ59KZRmBLy0KDI2K6RkcxZBzqO2j4nlA1Zt9EJZDrhwmAttX50EcyyquIwF
+        EXVOy67vo/RULj6S2YGhok9T1FPH1wavvwtymwb6pvXT1AIC+0r2zFWV1IFWglmO+1pvBv
+        MbzZYf06Kv+7IIq44YxVWmr8KkbqIskqSPuL9V+kb+sHFzhskrxTOsS5rGBMUw==
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
 To:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
@@ -41,9 +41,9 @@ Cc:     "David S. Miller" <davem@davemloft.net>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
         Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: [PATCH wpan-next v3 03/11] net: mac802154: Create a transmit error helper
-Date:   Thu,  3 Mar 2022 19:25:00 +0100
-Message-Id: <20220303182508.288136-4-miquel.raynal@bootlin.com>
+Subject: [PATCH wpan-next v3 08/11] net: ieee802154: at86rf230: Call _xmit_error() when a transmission fails
+Date:   Thu,  3 Mar 2022 19:25:05 +0100
+Message-Id: <20220303182508.288136-9-miquel.raynal@bootlin.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20220303182508.288136-1-miquel.raynal@bootlin.com>
 References: <20220303182508.288136-1-miquel.raynal@bootlin.com>
@@ -54,61 +54,82 @@ Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-So far there is only a helper for successful transmission, which led
-device drivers to implement their own handling in case of
-error. Unfortunately, we really need all the drivers to give the hand
-back to the core once they are done in order to be able to build a
-proper synchronous API. So let's create a _xmit_error() helper and take
-this opportunity to fill the new device-global field storing Tx
-statuses.
+ieee802154_xmit_error() is the right helper to call when a transmission
+has failed. Let's use it instead of open-coding it.
+
+As the error helper also requires an error code, save the error from the
+previous helper in order to give this value to the core when
+opportunate.
 
 Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
 ---
- include/net/mac802154.h | 10 ++++++++++
- net/mac802154/util.c    | 11 +++++++++++
- 2 files changed, 21 insertions(+)
+ drivers/net/ieee802154/at86rf230.c | 22 ++++++++++------------
+ 1 file changed, 10 insertions(+), 12 deletions(-)
 
-diff --git a/include/net/mac802154.h b/include/net/mac802154.h
-index 2c3bbc6645ba..abbe88dc9df5 100644
---- a/include/net/mac802154.h
-+++ b/include/net/mac802154.h
-@@ -498,4 +498,14 @@ void ieee802154_stop_queue(struct ieee802154_hw *hw);
- void ieee802154_xmit_complete(struct ieee802154_hw *hw, struct sk_buff *skb,
- 			      bool ifs_handling);
+diff --git a/drivers/net/ieee802154/at86rf230.c b/drivers/net/ieee802154/at86rf230.c
+index 5f19266b3045..9cc272e3460a 100644
+--- a/drivers/net/ieee802154/at86rf230.c
++++ b/drivers/net/ieee802154/at86rf230.c
+@@ -74,6 +74,7 @@ struct at86rf230_state_change {
+ 	u8 to_state;
  
-+/**
-+ * ieee802154_xmit_error - frame transmission failed
-+ *
-+ * @hw: pointer as obtained from ieee802154_alloc_hw().
-+ * @skb: buffer for transmission
-+ * @reason: error code
-+ */
-+void ieee802154_xmit_error(struct ieee802154_hw *hw, struct sk_buff *skb,
-+			   int reason);
-+
- #endif /* NET_MAC802154_H */
-diff --git a/net/mac802154/util.c b/net/mac802154/util.c
-index f2078238718b..37d2520804e3 100644
---- a/net/mac802154/util.c
-+++ b/net/mac802154/util.c
-@@ -88,6 +88,17 @@ void ieee802154_xmit_complete(struct ieee802154_hw *hw, struct sk_buff *skb,
- }
- EXPORT_SYMBOL(ieee802154_xmit_complete);
+ 	bool free;
++	int reason;
+ };
  
-+void ieee802154_xmit_error(struct ieee802154_hw *hw, struct sk_buff *skb,
-+			   int reason)
-+{
-+	struct ieee802154_local *local = hw_to_local(hw);
-+
-+	local->tx_result = reason;
-+	ieee802154_wake_queue(hw);
-+	dev_kfree_skb_any(skb);
-+}
-+EXPORT_SYMBOL(ieee802154_xmit_error);
-+
- void ieee802154_stop_device(struct ieee802154_local *local)
+ struct at86rf230_trac {
+@@ -340,14 +341,14 @@ at86rf230_async_error_recover_complete(void *context)
  {
- 	flush_workqueue(local->workqueue);
+ 	struct at86rf230_state_change *ctx = context;
+ 	struct at86rf230_local *lp = ctx->lp;
++	int reason = ctx->reason;
+ 
+ 	if (ctx->free)
+ 		kfree(ctx);
+ 
+ 	if (lp->was_tx) {
+ 		lp->was_tx = 0;
+-		dev_kfree_skb_any(lp->tx_skb);
+-		ieee802154_wake_queue(lp->hw);
++		ieee802154_xmit_error(lp->hw, lp->tx_skb, reason);
+ 	}
+ }
+ 
+@@ -370,27 +371,24 @@ static inline void
+ at86rf230_async_error(struct at86rf230_local *lp,
+ 		      struct at86rf230_state_change *ctx, int rc)
+ {
+-	int reason;
+-
+ 	switch (rc) {
+ 	case TRAC_CHANNEL_ACCESS_FAILURE:
+-		reason = IEEE802154_CHANNEL_ACCESS_FAILURE;
++		ctx->reason = IEEE802154_CHANNEL_ACCESS_FAILURE;
+ 		break;
+ 	case TRAC_NO_ACK:
+-		reason = IEEE802154_NO_ACK;
++		ctx->reason = IEEE802154_NO_ACK;
+ 		break;
+ 	case TRAC_INVALID:
+-		reason = IEEE802154_SYSTEM_ERROR;
++		ctx->reason = IEEE802154_SYSTEM_ERROR;
+ 		break;
+ 	default:
+-		reason = rc;
++		ctx->reason = rc;
+ 	}
+ 
+-	if (reason < 0)
+-		dev_err(&lp->spi->dev, "spi_async error %d\n", reason);
++	if (ctx->reason < 0)
++		dev_err(&lp->spi->dev, "spi_async error %d\n", ctx->reason);
+ 	else
+-		dev_err(&lp->spi->dev, "xceiver error %d\n", reason);
+-
++		dev_err(&lp->spi->dev, "xceiver error %d\n", ctx->reason);
+ 
+ 	at86rf230_async_state_change(lp, ctx, STATE_FORCE_TRX_OFF,
+ 				     at86rf230_async_error_recover);
 -- 
 2.27.0
 
