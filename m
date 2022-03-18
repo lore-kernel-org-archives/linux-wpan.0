@@ -2,33 +2,33 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF979C433EF
-	for <linux-wpan@archiver.kernel.org>; Fri, 18 Mar 2022 18:56:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8EFDC433F5
+	for <linux-wpan@archiver.kernel.org>; Fri, 18 Mar 2022 18:56:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237875AbiCRS6L (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Fri, 18 Mar 2022 14:58:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53838 "EHLO
+        id S240268AbiCRS6M (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Fri, 18 Mar 2022 14:58:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53970 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239672AbiCRS6J (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Fri, 18 Mar 2022 14:58:09 -0400
-X-Greylist: delayed 39534 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 18 Mar 2022 11:56:49 PDT
+        with ESMTP id S240265AbiCRS6L (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 18 Mar 2022 14:58:11 -0400
 Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A60A5223BC3;
-        Fri, 18 Mar 2022 11:56:48 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F37B227C75;
+        Fri, 18 Mar 2022 11:56:51 -0700 (PDT)
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id 83516C0007;
-        Fri, 18 Mar 2022 18:56:45 +0000 (UTC)
+        by mail.gandi.net (Postfix) with ESMTPSA id E7BA6C0005;
+        Fri, 18 Mar 2022 18:56:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1647629807;
+        t=1647629810;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=ZngBw8RPaSNnQzs7KObYiIjcLSn5DWlyyJF8eJWztrU=;
-        b=PTFLOLFKxBL91ffNYpIZVn9354GWq8AtzYtyNfFRFNHBR+78w0DcZHyNesipOjFiufMvap
-        F3z6PPgscPRSTF6F2IjnFngqvDn8eWqzleauqASzd9cYbHosjdIxFYCvXjtArbdGwgdxV+
-        HzVcnYq1p2ziUBcgyDwgz7t6ft8Xr83pGgal8Z5AH/wMxhAbdlYaO+cDl953uZ1SjPS4Rz
-        baPx783IWwjI+2jlPmrVCeQwLxgZvAon8nYwfhKMTJTtJzRqaKKVn6+cP71dcEu6mu1kXJ
-        bkAkGjZDv1g97VhS5kikYbdkXO8Wu2vu7KHZlWFCSy6j1kxzNfO8q6vIYfIjSA==
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=hzRFgzM4CKz3QS8PYg7wgueEZihoX1rywNOkCigJb0c=;
+        b=bQNcaC1Oj/7NG7wagqXL/RYgdwtwDvwrQ7LmOI5elSSvZG/K8/iCsCRMMYXavH0fTM/lOJ
+        4zR9AEQ6AUuYnTqFikfsYLpJPYp88O2ngzz0EFNG3gFbTV4oEsKZuz4yPCf7RS8BXYukb0
+        PmWeAv1k8H238Cf5Tu7KPl1Z6MvS8Kg0PNQm//qfr3Gk6rtm+I7bfQ2nlY5sqTVJRBmdiQ
+        euxFeOvs1wwA4YqNJTILv+bNKlCJYXQWKHaU+codioMG0kb7dNmug2XyVxAwxUJHGJ9ITS
+        hBishzTF4ZLo6XmNlilJKQrIf/+MtqkPSoU2uhbYfGG3LObSrKf4f1DEQLJ9xg==
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
 To:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
@@ -41,10 +41,12 @@ Cc:     "David S. Miller" <davem@davemloft.net>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
         Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: [PATCH wpan-next v4 00/11] ieee802154: Better Tx error handling
-Date:   Fri, 18 Mar 2022 19:56:33 +0100
-Message-Id: <20220318185644.517164-1-miquel.raynal@bootlin.com>
+Subject: [PATCH wpan-next v4 02/11] net: ieee802154: Fill the list of MLME return codes
+Date:   Fri, 18 Mar 2022 19:56:35 +0100
+Message-Id: <20220318185644.517164-3-miquel.raynal@bootlin.com>
 X-Mailer: git-send-email 2.27.0
+In-Reply-To: <20220318185644.517164-1-miquel.raynal@bootlin.com>
+References: <20220318185644.517164-1-miquel.raynal@bootlin.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
@@ -52,62 +54,105 @@ Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-The idea here is to provide a fully synchronous Tx API and also be able
-to be sure that a transfer as finished. This will be used later by
-another series. However, while working on this task, it appeared
-necessary to first rework the way MLME errors were (not) propagated to
-the upper layers. This small series tries to tackle exactly that.
+There are more codes than already listed, let's be a bit more
+exhaustive. This will allow to drop device drivers local definitions of
+these codes.
 
-Changes in v4:
-* Reverted the at86rf320 patch introducing trac values for debugfs
-  purposes as suggested by Alex. Reintroduced some of its content in a
-  subsequent patch to filter out offloaded transmission error cases.
-* Used IEEE802154_SYSTEM_ERROR as a non specific error code.
+Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
+---
+ include/linux/ieee802154.h | 67 +++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 66 insertions(+), 1 deletion(-)
 
-Changes in v3:
-* Split the series into two parts, this is the "error handling" halve.
-* Reworked the error path to not handle the ifs_handling situation
-  anymore.
-* Enhanced the list of MLME status codes available.
-* Improved the error handling by collecting the error codes, somethimes
-  by changing device drivers directly to propagate these MLME
-  statuses. Then, once in the core, save one global Tx status value so
-  that in the case of synchronous transfers we can check the return
-  value and eventually error out.
-* Prevented the core to stop the device before the end of the last
-  transmission to avoid deadlocks by just sync'ing the last Tx
-  transfer.
-
-Changes in v2:
-* Adapted with the changes already merged/refused.
-
-Miquel Raynal (11):
-  net: ieee802154: Enhance/fix the names of the MLME return codes
-  net: ieee802154: Fill the list of MLME return codes
-  net: mac802154: Save a global error code on transmissions
-  net: mac802154: Create a transmit error helper
-  Revert "at86rf230: add debugfs support"
-  net: ieee802154: at86rf230: Error out upon failed offloaded
-    transmissions
-  net: ieee802154: at86rf230: Provide meaningful error codes when
-    possible
-  net: ieee802154: at86rf230: Call _xmit_error() when a transmission
-    fails
-  net: ieee802154: atusb: Call _xmit_error() when a transmission fails
-  net: ieee802154: ca8210: Use core return codes instead of hardcoding
-    them
-  net: ieee802154: ca8210: Call _xmit_error() when a transmission fails
-
- drivers/net/ieee802154/Kconfig     |   7 --
- drivers/net/ieee802154/at86rf230.c | 139 +++++-----------------
- drivers/net/ieee802154/atusb.c     |   5 +-
- drivers/net/ieee802154/ca8210.c    | 182 +++++++++++------------------
- include/linux/ieee802154.h         |  81 +++++++++++--
- include/net/mac802154.h            |  10 ++
- net/mac802154/ieee802154_i.h       |   2 +
- net/mac802154/util.c               |  16 ++-
- 8 files changed, 202 insertions(+), 240 deletions(-)
-
+diff --git a/include/linux/ieee802154.h b/include/linux/ieee802154.h
+index 01d945c8b2e1..f1f9412b6ac6 100644
+--- a/include/linux/ieee802154.h
++++ b/include/linux/ieee802154.h
+@@ -134,7 +134,35 @@ enum {
+ 	 * a successful transmission.
+ 	 */
+ 	IEEE802154_SUCCESS = 0x0,
+-
++	/* The requested operation failed. */
++	IEEE802154_MAC_ERROR = 0x1,
++	/* The requested operation has been cancelled. */
++	IEEE802154_CANCELLED = 0x2,
++	/*
++	 * Device is ready to poll the coordinator for data in a non beacon
++	 * enabled PAN.
++	 */
++	IEEE802154_READY_FOR_POLL = 0x3,
++	/* Wrong frame counter. */
++	IEEE802154_COUNTER_ERROR = 0xdb,
++	/*
++	 * The frame does not conforms to the incoming key usage policy checking
++	 * procedure.
++	 */
++	IEEE802154_IMPROPER_KEY_TYPE = 0xdc,
++	/*
++	 * The frame does not conforms to the incoming security level usage
++	 * policy checking procedure.
++	 */
++	IEEE802154_IMPROPER_SECURITY_LEVEL = 0xdd,
++	/* Secured frame received with an empty Frame Version field. */
++	IEEE802154_UNSUPPORTED_LEGACY = 0xde,
++	/*
++	 * A secured frame is received or must be sent but security is not
++	 * enabled in the device. Or, the Auxiliary Security Header has security
++	 * level of zero in it.
++	 */
++	IEEE802154_UNSUPPORTED_SECURITY = 0xdf,
+ 	/* The beacon was lost following a synchronization request. */
+ 	IEEE802154_BEACON_LOST = 0xe0,
+ 	/*
+@@ -204,11 +232,48 @@ enum {
+ 	 * that is not supported.
+ 	 */
+ 	IEEE802154_UNSUPPORTED_ATTRIBUTE = 0xf4,
++	/* Missing source or destination address or address mode. */
++	IEEE802154_INVALID_ADDRESS = 0xf5,
++	/*
++	 * MLME asked to turn the receiver on, but the on time duration is too
++	 * big compared to the macBeaconOrder.
++	 */
++	IEEE802154_ON_TIME_TOO_LONG = 0xf6,
++	/*
++	 * MLME asaked to turn the receiver on, but the request was delayed for
++	 * too long before getting processed.
++	 */
++	IEEE802154_PAST_TIME = 0xf7,
++	/*
++	 * The StartTime parameter is nonzero, and the MLME is not currently
++	 * tracking the beacon of the coordinator through which it is
++	 * associated.
++	 */
++	IEEE802154_TRACKING_OFF = 0xf8,
++	/*
++	 * The index inside the hierarchical values in PIBAttribute is out of
++	 * range.
++	 */
++	IEEE802154_INVALID_INDEX = 0xf9,
++	/*
++	 * The number of PAN descriptors discovered during a scan has been
++	 * reached.
++	 */
++	IEEE802154_LIMIT_REACHED = 0xfa,
++	/*
++	 * The PIBAttribute parameter specifies an attribute that is a read-only
++	 * attribute.
++	 */
++	IEEE802154_READ_ONLY = 0xfb,
+ 	/*
+ 	 * A request to perform a scan operation failed because the MLME was
+ 	 * in the process of performing a previously initiated scan operation.
+ 	 */
+ 	IEEE802154_SCAN_IN_PROGRESS = 0xfc,
++	/* The outgoing superframe overlaps the incoming superframe. */
++	IEEE802154_SUPERFRAME_OVERLAP = 0xfd,
++	/* Any other error situation. */
++	IEEE802154_SYSTEM_ERROR = 0xff,
+ };
+ 
+ /* frame control handling */
 -- 
 2.27.0
 
