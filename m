@@ -2,34 +2,34 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D5F0C433EF
-	for <linux-wpan@archiver.kernel.org>; Fri, 18 Mar 2022 09:09:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC98EC433EF
+	for <linux-wpan@archiver.kernel.org>; Fri, 18 Mar 2022 18:11:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234106AbiCRJKf (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Fri, 18 Mar 2022 05:10:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56854 "EHLO
+        id S240048AbiCRSM1 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Fri, 18 Mar 2022 14:12:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35518 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229497AbiCRJKe (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Fri, 18 Mar 2022 05:10:34 -0400
-Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::229])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2246D17ECE0;
-        Fri, 18 Mar 2022 02:09:14 -0700 (PDT)
+        with ESMTP id S233194AbiCRSM1 (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 18 Mar 2022 14:12:27 -0400
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::223])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8B2F2EDC20;
+        Fri, 18 Mar 2022 11:11:06 -0700 (PDT)
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id 144D0FF80A;
-        Fri, 18 Mar 2022 09:09:11 +0000 (UTC)
+        by mail.gandi.net (Postfix) with ESMTPSA id 33FEE60007;
+        Fri, 18 Mar 2022 18:11:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1647594553;
+        t=1647627065;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=xFkxbVKYpg3VDoY3mOHshO8q1PcvjZGqSGaKf2RSoto=;
-        b=azVxy6JvwfUCjhDA83/C2uiJffqn/8yF2TcRSdlicdm4B5jL+BcGtLGZfsQslmfDLu8x2r
-        uD13rj9lI0gMDhJSsTczqZo6GPbj7X1uUfv2MPF+orHc3QLSRQXsJtc12sDCuSV5Ym59PU
-        T27C3qEMkCrqk+2fmre3T0hV30gtNb0F6gjXmxpQk7st9aDj6Og0MIg7XhwCitphq2oTPA
-        aTJM0/e48i1lWA9L/zwo98zh2UCfrtFn7QXMpe80r1WM6Jqur82NHcjCUz9Z0e74j198eq
-        XsFniYxNVBpPGhzzRHDgfM8Jz/rXedpWcEaipUW2Z9ox1LKPNz9fjKqvqX+Dyw==
-Date:   Fri, 18 Mar 2022 10:09:10 +0100
+        bh=R8NHyHx7StIdeAb1cP4RooO3thVY1uHjoKLKhREJtM8=;
+        b=iefKOzdHaPlyoX9hmY6jLRpAbKefC85BiNHNYqoEzaEDTQHPi1K9AhDBx35RogsMBHXHos
+        mtWDhQsflFMsIwHjqciccOTi12JW2atbfrm+HEcXlW4zSAItUt8VoRJGud2nwekRi7nB8j
+        lzWZxFCeyBmmDiIr0ZxDVpZTQW8I8R+JSEnP61yRAFsCLH6LfC1+8L1jSih8ua0hmds9p1
+        GL7LEbUQDO4eI2a1pvBsGTweOSXhzJjEcNYauAxY+hvsgOvWA3WNbR2jL89TOLy8yW/UV2
+        v197PO2+YGL6tjfcT6yr3jCi4yK3MWpmpTTP3O5B1zkvKv8BSxSXsGVNw3kd9Q==
+Date:   Fri, 18 Mar 2022 19:11:01 +0100
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
 To:     Alexander Aring <alex.aring@gmail.com>
 Cc:     Stefan Schmidt <stefan@datenfreihafen.org>,
@@ -37,24 +37,21 @@ Cc:     Stefan Schmidt <stefan@datenfreihafen.org>,
         "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
         "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-        Michael Hennerich <michael.hennerich@analog.com>,
-        Varka Bhadram <varkabhadram@gmail.com>,
-        Xue Liu <liuxuenetmail@gmail.com>, Alan Ott <alan@signal11.us>
-Subject: Re: [PATCH wpan-next v2 1/5] net: ieee802154: Improve the way
- supported channels are declared
-Message-ID: <20220318100910.3bc425d7@xps13>
-In-Reply-To: <CAB_54W5e2pgHtUXA41gn9B86e8Q-y3pWOty=cCv0FJd2V1b7yA@mail.gmail.com>
-References: <20220128110825.1120678-1-miquel.raynal@bootlin.com>
-        <20220128110825.1120678-2-miquel.raynal@bootlin.com>
-        <CAB_54W60OiGmjLQ2dAvnraq6fkZ6GGTLMVzjVbVAobcvNsaWtQ@mail.gmail.com>
-        <20220131152345.3fefa3aa@xps13>
-        <CAB_54W7SZmgU=2_HEm=_agE0RWfsXxEs_4MHmnAPPFb+iVvxsQ@mail.gmail.com>
-        <20220201155507.549cd2e3@xps13>
-        <CAB_54W5mnovPX0cyq5dwVoQKa6VZx3QPCfVoPAF+LQ5DkdQ3Mw@mail.gmail.com>
-        <20220207084918.0c2e6d13@xps13>
-        <CAB_54W6RC9dqRzPyN3OYb6pWfst+UixSAKppaCtDaCvzE0_kAQ@mail.gmail.com>
-        <20220302142138.4122b3c6@xps13>
-        <CAB_54W5e2pgHtUXA41gn9B86e8Q-y3pWOty=cCv0FJd2V1b7yA@mail.gmail.com>
+        David Girault <david.girault@qorvo.com>,
+        Romuald Despres <romuald.despres@qorvo.com>,
+        Frederic Blain <frederic.blain@qorvo.com>,
+        Nicolas Schodet <nico@ni.fr.eu.org>,
+        Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH wpan-next v2 13/14] net: mac802154: Introduce a tx queue
+ flushing mechanism
+Message-ID: <20220318191101.4dbe5a02@xps13>
+In-Reply-To: <CAB_54W4A6-Jgpr2WX3y3OPo-3=BJJDz+M5XPfWwpgCx1sXWAGQ@mail.gmail.com>
+References: <20220207144804.708118-1-miquel.raynal@bootlin.com>
+        <20220207144804.708118-14-miquel.raynal@bootlin.com>
+        <CAB_54W5ao0b6QE7E_uXFeorbn6UjB6NV4emtibqswL4iXYEfng@mail.gmail.com>
+        <20220303191723.39b87766@xps13>
+        <20220304115432.7913f2ef@xps13>
+        <CAB_54W4A6-Jgpr2WX3y3OPo-3=BJJDz+M5XPfWwpgCx1sXWAGQ@mail.gmail.com>
 Organization: Bootlin
 X-Mailer: Claws Mail 3.17.7 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
@@ -66,128 +63,82 @@ X-Mailing-List: linux-wpan@vger.kernel.org
 
 Hi Alexander,
 
-alex.aring@gmail.com wrote on Sun, 13 Mar 2022 16:58:01 -0400:
+alex.aring@gmail.com wrote on Sun, 13 Mar 2022 16:43:52 -0400:
 
 > Hi,
 >=20
-> On Wed, Mar 2, 2022 at 8:21 AM Miquel Raynal <miquel.raynal@bootlin.com> =
+> On Fri, Mar 4, 2022 at 5:54 AM Miquel Raynal <miquel.raynal@bootlin.com> =
 wrote:
-> >
-> > Hi Alexander,
-> >
-> > alex.aring@gmail.com wrote on Sun, 20 Feb 2022 18:05:39 -0500:
-> > =20
-> > > Hi,
-> > >
-> > > On Mon, Feb 7, 2022 at 2:49 AM Miquel Raynal <miquel.raynal@bootlin.c=
-om> wrote: =20
-> > > >
-> > > > Hi Alexander,
-> > > >
-> > > > alex.aring@gmail.com wrote on Sun, 6 Feb 2022 16:37:23 -0500:
-> > > > =20
-> > > > > Hi,
-> > > > >
-> > > > > On Tue, Feb 1, 2022 at 9:55 AM Miquel Raynal <miquel.raynal@bootl=
-in.com> wrote:
-> > > > > ... =20
-> > > > > >
-> > > > > > Given the new information that I am currently processing, I bel=
-ieve the
-> > > > > > array is not needed anymore, we can live with a minimal number =
-of
-> > > > > > additional helpers, like the one getting the PRF value for the =
-UWB
-> > > > > > PHYs. It's the only one I have in mind so far. =20
-> > > > >
-> > > > > I am not really sure if I understood now. So far those channel/pa=
-ge
-> > > > > combinations are the same because we have no special "type" value=
- in
-> > > > > wpan_phy, =20
-> > > >
-> > > > Yes, my assumption was more: I know there are only -legacy- phy typ=
-es
-> > > > supported, we will add another (or improve the current) way of defi=
-ning
-> > > > channels when we'll need to. Eg when improving UWB support.
-> > > > =20
-> > > > > what we currently support is the "normal" (I think they name
-> > > > > it legacy devices) phy type (no UWB, sun phy, whatever) and as Ch=
-annel
-> > > > > Assignments says that it does not apply for those PHY's I think it
-> > > > > there are channel/page combinations which are different according=
- to
-> > > > > the PHY "type". However we don't support them and I think there m=
-ight
-> > > > > be an upcoming type field in wpan_phy which might be set only onc=
-e at
-> > > > > registration time. =20
-> > > >
-> > > > An idea might be to create a callback that drivers might decide to
-> > > > implement or not. If they implement it, the core might call it to g=
-et
-> > > > further information about the channels. The core would provide a {p=
-age,
-> > > > channel} couple and retrieve a structure with many information such=
- as
-> > > > the the frequency, the protocol, eventually the prf, etc.
-> > > > =20
-> > >
-> > > As I said before, for "many information" we should look at how
-> > > wireless is using that with regdb and extend it with 802.15.4
-> > > channels/etc. The kernel should only deal with an unique
-> > > identification of a database key for "regdb" which so far I see is a
-> > > combination of phy type, page id and channel id. Then from "somewhere"
-> > > also the country code gets involved into that and you get a subset of
-> > > what is available. =20
-> >
-> > Do you want another implementation of regdb that would support the
-> > 802.15.4 world only (so far it is highly 802.11 oriented) ? Or is this
-> > something that you would like to merge in the existing project?
+>=20
+> > I had a second look at it and it appears to me that the issue was
+> > already there and is structural. We just did not really cared about it
+> > because we didn't bother with synchronization issues.
 > > =20
 >=20
-> I think we should run the strategy like wpan-tools, fork it but leave
-> it open that probably they can be merged in future. How about that?
+> I am not sure if I understand correctly. We stop the queue at some
+> specific moment and we need to make sure that xmit_do() is not called
+> or can't be called anymore.
 >=20
-> I don't like that it is wireless standard specific, it should be
-> specific to the standard which defines the regulation... As an
-> example, I remember that at86rf212 has some LBT (listen before
-> transmit) mode because of some duty cycle regulations in some
-> countries. The regdb should not contain if LBT should be used in a
-> country for specific sub 1Ghz range, etc. It should contain the duty
-> cycle allowance. That's an example of what I mean with "wireless
-> standard" and "regulation standard". However the regulation for sub
-> 1Ghz is also a little bit crazy so far I see. :)
+> I was thinking about:
 >=20
-> However I really don't know if this is extremely difficult to handle.
-> I would say this would be the better approach but if it doesn't work
-> do it wireless specific. So it's up to whoever wants to do the work?
+> void ieee802154_disable_queue(struct ieee802154_hw *hw)
+> {
+>         struct ieee802154_local *local =3D hw_to_local(hw);
+>         struct ieee802154_sub_if_data *sdata;
 >=20
-> > Overall it can be useful to define what is allowed in different
-> > countries but this will not save us from needing extra information from
-> > the devices. Describing the channels and protocols (and PRFs) for an
-> > UWB PHY has nothing to do with the regulatory database, it's just
-> > listing what is supported by the device. The actual location where it
-> > might be useful to have a regdb (but not mandatory at the beginning)
-> > would be when changing channels to avoid messing with local
-> > regulations, I believe?
-> > =20
+>         rcu_read_lock();
+>         list_for_each_entry_rcu(sdata, &local->interfaces, list) {
+>                 if (!sdata->dev)
+>                         continue;
 >=20
-> I see, but I am not sure what additional information you need as
-> channel, page, phy type?
+>                netif_tx_disable(sdata->dev);
+>         }
+>         rcu_read_unlock();
+> }
+> EXPORT_SYMBOL(ieee802154_stop_queue);
+>=20
+> From my quick view is that "netif_tx_disable()" ensures by holding
+> locks and other things and doing netif_tx_stop_queue() it we can be
+> sure there will be no xmit_do() going on while it's called and
+> afterwards. It can be that there are still transmissions on the
+> transceiver that are on the way, but then your atomic counter and
+> wait_event() will come in place.
 
-For a UWB PHY: the preamble code and the PRF, I believe.
+I went for a deeper investigation to understand how the net core
+was calling our callbacks. And it appeared to go through
+dev_hard_start_xmit() and come from __dev_queue_xmit(). This means
+the ieee802154 callback could only be called once at a time
+because it is protected by the network device transmit lock
+(netif_tx_lock()). Which makes the logic safe and not racy as I
+initially thought. This was the missing peace in my mental model I
+believe.
 
-> And if you have those values in user space
-> you can get other information out of it, or not? Why does the kernel
-> need to handle more than necessary? Even there we can use helpers to
-> map those combinations to something else. Just avoid that drivers
-> declare those information what they already declared and introduce
-> helpers to whatever higher level information you want to get out of
-> it.
+> We need to be sure there will be nothing queued anymore for
+> transmission what (in my opinion) tx_disable() does. from any context.
+>
+> We might need to review some netif callbacks... I have in my mind for
+> example stop(), maybe netif_tx_stop_queue() is enough (because the
+> context is like netif_tx_disable(), helding similar locks, etc.) but
+> we might want to be sure that nothing is going on anymore by using
+> your wait_event() with counter.
 
-I'll look into it soon.
+I don't see a real reason anymore to use the tx_disable() call. Is
+there any reason this could be needed that I don't have in mind? Right
+now the only thing that I see is that it could delay a little bit the
+moment where we actually stop the queue because we would be waiting for
+the lock to be released after the skb has been offloaded to hardware.
+Perhaps maybe we would let another frame to be transmitted before we
+actually get the lock.
+
+> Is there any problem which I don't see?
+
+One question however, as I understand, if userspace tries to send more
+packets, I believe the "if (!stopped)" condition will be false and the
+xmit call will simply be skipped, ending with a -ENETDOWN error [1]. Is
+it what we want? I initially thought we could actually queue patches and
+wait for the queue to be re-enabled again, but it does not look easy.
+
+[1] https://elixir.bootlin.com/linux/latest/source/net/core/dev.c#L4249
 
 Thanks,
 Miqu=C3=A8l
