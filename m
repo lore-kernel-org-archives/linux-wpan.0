@@ -2,84 +2,90 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1DC8C433F5
-	for <linux-wpan@archiver.kernel.org>; Fri, 18 Mar 2022 18:57:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EFE6FC433EF
+	for <linux-wpan@archiver.kernel.org>; Sun, 27 Mar 2022 15:37:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240311AbiCRS6p (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Fri, 18 Mar 2022 14:58:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55372 "EHLO
+        id S235827AbiC0Piv (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Sun, 27 Mar 2022 11:38:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58756 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240299AbiCRS61 (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Fri, 18 Mar 2022 14:58:27 -0400
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::226])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D195232D19;
-        Fri, 18 Mar 2022 11:57:05 -0700 (PDT)
-Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id 570F6C0009;
-        Fri, 18 Mar 2022 18:57:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1647629823;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=7uhKeSJ5TdvqQx9rBcypmjG7Wuhjj3YD9ai0d1ExtG4=;
-        b=Kq2QY0XfTQ54KLEUenh/1SARhK7DqAJX8ZA5+RQlOBz5fniOvyfeO7eXqDj05QJ3S0Md6p
-        HxkP/xN42jtBfLpwto29kfsT1u1/eUPE9qGvDPytZD2ffbIFBoazYbHiWEZG8p6DidNh4U
-        hS9CRuVQLklNY4kVYQPQw/11hwkNIo5bN990PkAGkfllSE/kkvN1kMPikvVZlq+3GYFp/f
-        s+F51MBQVUC+QHuyB0dlr9kTQp5ePz4zTXj849wg/ufT/y/WIp/urXXTuLihcM8pOEbx3i
-        FO6Pp/tzfllFU4A0l5yaw2uRfSgykz95hZS0ox+LWjTMD26NstiR2VZSOb4V8w==
-From:   Miquel Raynal <miquel.raynal@bootlin.com>
-To:     Alexander Aring <alex.aring@gmail.com>,
-        Stefan Schmidt <stefan@datenfreihafen.org>,
-        linux-wpan@vger.kernel.org
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+        with ESMTP id S233863AbiC0Piv (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Sun, 27 Mar 2022 11:38:51 -0400
+Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 561C112AB4;
+        Sun, 27 Mar 2022 08:37:12 -0700 (PDT)
+Received: by mail-lf1-x12b.google.com with SMTP id bq24so4926783lfb.5;
+        Sun, 27 Mar 2022 08:37:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=UNSedBTmK5s8jtfKnJd8Rt4VC9q5wdizP+aeJDiEQDY=;
+        b=i2al3x/FX7wp5hltGACwMNiE4tkiVXSm6X2KMQNUOTMYYHzeUJuCSmjT3Ho/yqT8PE
+         PMYl+/SAWkJkz9o/t/8TnEWmD/RO7b0UfB7ORgPyZ/w0V+FCg/3r92svvQsizC+Zddng
+         V21Nl5Wo7XF1uArGm7YKDBUweN+q6B7hI2pZyEU5xc+3MymDSWElwEp/Uva1RGmHdd0Z
+         Stg0zMs5MBTdFCpmRwR43q8v+v6i4NrGaea1/K/fCt6K2cf72f31+qveMfFqlTua6eaD
+         HApM0DoJ55jZieX4f/4edEbmnjB01CaNb+JQYxzrHhWPsJoLNqkoHF7qBOXKR8oaZL4B
+         5PhQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=UNSedBTmK5s8jtfKnJd8Rt4VC9q5wdizP+aeJDiEQDY=;
+        b=z1aY/CTKX5I5VwdWLNQZGojdEosTlk3Xjc/sX6Q9CwBDdB1q7BfTYuzhUbSbJemoBQ
+         SLSGCMiZEsq/jzyfRdrSVtHqXkVqA6RtOzgwS1yQYM2MOElx/TAy7q4qUV7eif9auZ4h
+         lNBq/JcAwusKo2VYuqxWFqTxifD6HfvvgEfWuXwH7UE0KlwKYvUHM1upwvVHDS0g7OZI
+         ONxEYc5+X7Svymtew4p3Kj7iTlknYn53pHPo7dSBGadViJ4jZqr9NHqaHz3vzxD1uNh9
+         78As12smzvi6C0IVJ8l7y748Rn0E1iHxpqtEWUw2ARcCJa6P7lvq/F7Wa4ufb7DFfda6
+         cqjQ==
+X-Gm-Message-State: AOAM532wQSVLIpA3VG1CcDNFv24eQjA4niY4cA7DMOTBX6NyHXzBaip5
+        FhZeANDTnyl7S4N3UW5nvMkGxf4/rAT3gGN4z4RcIcld
+X-Google-Smtp-Source: ABdhPJzNQ/D3J+P5lFg8VFfei9L+uWNmSxm8Te5WcP3eVpNNHD0iRMxXcLL08rz65afKdE/58ciEDRYOH1SGpNlTMSw=
+X-Received: by 2002:a05:6512:3981:b0:448:40e5:cf90 with SMTP id
+ j1-20020a056512398100b0044840e5cf90mr15342168lfu.656.1648395430264; Sun, 27
+ Mar 2022 08:37:10 -0700 (PDT)
+MIME-Version: 1.0
+References: <20220318185644.517164-1-miquel.raynal@bootlin.com> <20220318185644.517164-6-miquel.raynal@bootlin.com>
+In-Reply-To: <20220318185644.517164-6-miquel.raynal@bootlin.com>
+From:   Alexander Aring <alex.aring@gmail.com>
+Date:   Sun, 27 Mar 2022 11:36:59 -0400
+Message-ID: <CAB_54W41hPU-7Z3AqyLUst7Fohdrqtf7gP3ycmh74jqcnksQzg@mail.gmail.com>
+Subject: Re: [PATCH wpan-next v4 05/11] Revert "at86rf230: add debugfs support"
+To:     Miquel Raynal <miquel.raynal@bootlin.com>
+Cc:     Stefan Schmidt <stefan@datenfreihafen.org>,
+        linux-wpan - ML <linux-wpan@vger.kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
         David Girault <david.girault@qorvo.com>,
         Romuald Despres <romuald.despres@qorvo.com>,
         Frederic Blain <frederic.blain@qorvo.com>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
-        Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-        Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: [PATCH wpan-next v4 11/11] net: ieee802154: ca8210: Call _xmit_error() when a transmission fails
-Date:   Fri, 18 Mar 2022 19:56:44 +0100
-Message-Id: <20220318185644.517164-12-miquel.raynal@bootlin.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20220318185644.517164-1-miquel.raynal@bootlin.com>
-References: <20220318185644.517164-1-miquel.raynal@bootlin.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+        Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-ieee802154_xmit_error() is the right helper to call when a transmission
-has failed. Let's use it instead of open-coding it.
+Hi,
 
-Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
----
- drivers/net/ieee802154/ca8210.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+On Fri, Mar 18, 2022 at 2:56 PM Miquel Raynal <miquel.raynal@bootlin.com> wrote:
+>
+> This reverts commit 493bc90a96839ffde5e6216c62c025d2f9e6efc3.
+>
+> This commit was introduced because of some testing capabilities
+> involving ack handling. Not we want to collect errors so let's first
+> revert this commit, then right after reintroduce the Tx trac handling
+> which is the only one that makes sense for now.
+>
+> Suggested-by: Alexander Aring <alex.aring@gmail.com>
 
-diff --git a/drivers/net/ieee802154/ca8210.c b/drivers/net/ieee802154/ca8210.c
-index 116aece191cd..b1eb74200f23 100644
---- a/drivers/net/ieee802154/ca8210.c
-+++ b/drivers/net/ieee802154/ca8210.c
-@@ -1729,11 +1729,11 @@ static int ca8210_async_xmit_complete(
- 			status
- 		);
- 		if (status != IEEE802154_TRANSACTION_OVERFLOW) {
--			dev_kfree_skb_any(priv->tx_skb);
--			ieee802154_wake_queue(priv->hw);
-+			ieee802154_xmit_error(priv->hw, priv->tx_skb, status);
- 			return 0;
- 		}
- 	}
-+
- 	ieee802154_xmit_complete(priv->hw, priv->tx_skb, true);
- 
- 	return 0;
--- 
-2.27.0
+I didn't want to have a revert of the commit or... yes I wanted but
+not in such a way as `git revert...`, just that the whole debug
+feature is dropped (which was introduced by a commit) because you
+implemented a real first use case to make something with those values
+now and do not leave a half of the debug feature upstream.
 
+Nevertheless it's okay, this way will do it as well...
+
+- Alex
