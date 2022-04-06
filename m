@@ -2,33 +2,33 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B207BC43217
-	for <linux-wpan@archiver.kernel.org>; Wed,  6 Apr 2022 17:29:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75B9BC433EF
+	for <linux-wpan@archiver.kernel.org>; Wed,  6 Apr 2022 17:29:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238949AbiDFRbj (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 6 Apr 2022 13:31:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57886 "EHLO
+        id S238999AbiDFRbl (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 6 Apr 2022 13:31:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44934 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239175AbiDFRb2 (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 6 Apr 2022 13:31:28 -0400
+        with ESMTP id S239159AbiDFRbZ (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 6 Apr 2022 13:31:25 -0400
 Received: from relay12.mail.gandi.net (relay12.mail.gandi.net [IPv6:2001:4b98:dc4:8::232])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D384B23702F;
-        Wed,  6 Apr 2022 08:34:56 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E75DB2A047A;
+        Wed,  6 Apr 2022 08:34:53 -0700 (PDT)
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id 04A97200005;
-        Wed,  6 Apr 2022 15:34:53 +0000 (UTC)
+        by mail.gandi.net (Postfix) with ESMTPSA id 3FC45200010;
+        Wed,  6 Apr 2022 15:34:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1649259295;
+        t=1649259292;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=yj2cFOYKpa/ZpdUu3gbCTqoDBIoPudwTCp0bpdE6Mrk=;
-        b=b5E7BiXPmdyPIlLZiJpsgEOk9ocvIT4pRiJw5PxAS2R7bmUk5QCfJqdX85/4Okm3uaGUgm
-        RZJ6nuacAhiNWGjiHlhw8POQcfce/+O4pDI9vw63OR0rR70x5/ZJIZa72y8/ZMPswUZRIj
-        j/DTXgI2rAPZKzUhFbeTU5WuiHIayLhOyrKl1BTmydTk5KF7HSBvcRdtQOuY6dYiLBl62I
-        dwI9sYrIFhBuod/w5ywtt78gsKj8cvy0exl0ql8B3fiSg4Rp9ERvyCQrehmGwCLIAtJXwg
-        tpHni0CuSqnL0GLHTmaNco75s7pWBifX7dNi/s3PS1aoeqPf50Z6lvU8hFd2YA==
+        bh=cTOSqg3wgA/EBvGPJTu7veiSkHzXCmhlqoXd663CBgI=;
+        b=QM7BYPjxqyK6uGcHNYK7Oo2nemwlCHp/0hINWLeWdSjBr0aSSRyHXusPalgnzLTzEbVEiM
+        KQLN1L8JVa1CQk3r8xDr6iQocNspgWo2YFBZS1el7TZze41NEu2hVl3gbGA+rSK+0l/rSs
+        ghsnfnoqBACHD8XLjRkca8nxu/r/9xWtK+Q6pMMoxdjX7+jeBKAid2AyPairvQy3APj8K4
+        nUkeBm3HYvx3TcVd6P5vFU36xcJD3K7UEq/7K7PIyavAaIr8YcAhlKDKjknAMcAOeq5lzr
+        RWIony0SiHBE/U+s6clgE3qT9dk/IFBCU3RhMYWnp1Y9oB3rDDS1a8B8abO6GQ==
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
 To:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
@@ -41,9 +41,9 @@ Cc:     "David S. Miller" <davem@davemloft.net>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
         Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: [PATCH v5 09/11] net: ieee802154: atusb: Call _xmit_error() when a transmission fails
-Date:   Wed,  6 Apr 2022 17:34:39 +0200
-Message-Id: <20220406153441.1667375-10-miquel.raynal@bootlin.com>
+Subject: [PATCH v5 07/11] net: ieee802154: at86rf230: Call _xmit_bus_error() when a bus error occurs
+Date:   Wed,  6 Apr 2022 17:34:37 +0200
+Message-Id: <20220406153441.1667375-8-miquel.raynal@bootlin.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20220406153441.1667375-1-miquel.raynal@bootlin.com>
 References: <20220406153441.1667375-1-miquel.raynal@bootlin.com>
@@ -54,27 +54,26 @@ Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-ieee802154_xmit_error() is the right helper to call when a transmission
-has failed. Let's use it instead of open-coding it.
+ieee802154_xmit_bus_error() is the right helper to call when a transmission
+has failed. Let's use it instead of open-coding it. This also has the
+advantage of forwarding a generic IEEE80254_SYSTEM_ERROR reason.
 
 Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
 ---
- drivers/net/ieee802154/atusb.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ drivers/net/ieee802154/at86rf230.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/drivers/net/ieee802154/atusb.c b/drivers/net/ieee802154/atusb.c
-index f27a5f535808..d04db4d07a64 100644
---- a/drivers/net/ieee802154/atusb.c
-+++ b/drivers/net/ieee802154/atusb.c
-@@ -271,9 +271,8 @@ static void atusb_tx_done(struct atusb *atusb, u8 seq)
- 		 * unlikely case now that seq == expect is then true, but can
- 		 * happen and fail with a tx_skb = NULL;
- 		 */
--		ieee802154_wake_queue(atusb->hw);
--		if (atusb->tx_skb)
--			dev_kfree_skb_irq(atusb->tx_skb);
-+		ieee802154_xmit_error(atusb->hw, atusb->tx_skb,
-+				      IEEE802154_SYSTEM_ERROR);
+diff --git a/drivers/net/ieee802154/at86rf230.c b/drivers/net/ieee802154/at86rf230.c
+index cafc786aab57..f219732ab301 100644
+--- a/drivers/net/ieee802154/at86rf230.c
++++ b/drivers/net/ieee802154/at86rf230.c
+@@ -346,8 +346,7 @@ at86rf230_async_bus_error_recover_complete(void *context)
+ 
+ 	if (lp->was_tx) {
+ 		lp->was_tx = 0;
+-		dev_kfree_skb_any(lp->tx_skb);
+-		ieee802154_wake_queue(lp->hw);
++		ieee802154_xmit_bus_error(lp->hw, lp->tx_skb);
  	}
  }
  
