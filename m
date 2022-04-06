@@ -2,33 +2,33 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D814C4332F
-	for <linux-wpan@archiver.kernel.org>; Wed,  6 Apr 2022 17:29:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1936C433FE
+	for <linux-wpan@archiver.kernel.org>; Wed,  6 Apr 2022 17:29:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239005AbiDFRbm (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 6 Apr 2022 13:31:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49228 "EHLO
+        id S238913AbiDFRbn (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 6 Apr 2022 13:31:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49222 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238849AbiDFRbZ (ORCPT
+        with ESMTP id S239153AbiDFRbZ (ORCPT
         <rfc822;linux-wpan@vger.kernel.org>); Wed, 6 Apr 2022 13:31:25 -0400
 Received: from relay12.mail.gandi.net (relay12.mail.gandi.net [IPv6:2001:4b98:dc4:8::232])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BAA653B51;
-        Wed,  6 Apr 2022 08:34:52 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93B77251F1C;
+        Wed,  6 Apr 2022 08:34:50 -0700 (PDT)
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id EBBF120000A;
-        Wed,  6 Apr 2022 15:34:49 +0000 (UTC)
+        by mail.gandi.net (Postfix) with ESMTPSA id 56977200012;
+        Wed,  6 Apr 2022 15:34:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1649259291;
+        t=1649259287;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=khqlgvv+tcN9XQu/qHmypxl6n0RxGiIsc6xVakThOlU=;
-        b=ID6Gn4+EjmIJ+3DH02joSUhfCuxJjAGhGVUD8neWAksieHfesj9XXMJVrabxO8DxNmLt5w
-        Ay+Ggo7EHj7AgCyE/V9H54zwetqe0axuo8tF7k1wZcj+ruSP0LLsVGmnPLHZkzv4EWjdrN
-        sW9qSfa8486Uwl01hLmulXBzNCHB4BFBzwwB4Yvl2CyzBsFniWzfv2cdS4TLgKBhjZH2li
-        6FECB0X7uZi3Lrww7WZ1j1QXstBHY++4FTYfQSMuZWMJrbaYU5TKWuVBmg75uAszY3UTrX
-        nNJKyTjWYy78IM2lrM+zQfLojBiWNGkPQD0XxhsKxSwGoYKaCNIql++zCNy7oQ==
+        bh=KjQVyusI/NoALoNPcEIOjSAiTZnq5f6jB56z0p4Letc=;
+        b=e3h1nFX+0HQsgueFl5N2sCaJg3CZDnUKFAhArksGiGR4z24o2w/AN1/3pIJqQ73z5lLGYj
+        Jh+Lxs46tpuOfg3KYalFNVDJUWaEfuqubwBhZfiyHkpYPBUMbQ0HW2zhA1nZ3Tp+pqvLaY
+        XmwztizgWAnc+wLScjqEX4BJHqrqdJ+/4UqeBY7ggXkHq4H3K+j20idfnPyne33tJn1wOa
+        tjiKpbhPCHdSMBF1YaPCfiW9BO1ZXQjt9kZqT8u6lij5qUCVScWG3DirLbLpj4OQFTtFkc
+        BS+v5h7uNHkSIAe8+kUy3vRwWwgXXN0llphMi/kLjTMmHOD9GNlOFLowl2TEaw==
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
 To:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
@@ -41,9 +41,9 @@ Cc:     "David S. Miller" <davem@davemloft.net>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
         Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: [PATCH v5 06/11] net: ieee802154: at86rf230: Rename the asynchronous error helper
-Date:   Wed,  6 Apr 2022 17:34:36 +0200
-Message-Id: <20220406153441.1667375-7-miquel.raynal@bootlin.com>
+Subject: [PATCH v5 03/11] net: mac802154: Save a global error code on transmissions
+Date:   Wed,  6 Apr 2022 17:34:33 +0200
+Message-Id: <20220406153441.1667375-4-miquel.raynal@bootlin.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20220406153441.1667375-1-miquel.raynal@bootlin.com>
 References: <20220406153441.1667375-1-miquel.raynal@bootlin.com>
@@ -54,117 +54,49 @@ Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-In theory there are two distinct error path:
-- The bus error when forwarding a packet to the transceiver fails.
-- The transmitter error, after the transmission has been offloaded.
-
-Right now in this driver only the former situation is properly handled,
-so rename the different helpers to reflect this situation before
-improving the support of the other path.
+So far no error is returned from a failing transmission. However it
+might sometimes be useful, and particularly easy to use during sync
+transfers (for certain MLME commands). Let's create an internal variable
+for that, global to the device. Right now only success are registered,
+which is rather useless, but soon we will have more situations filling
+this field.
 
 Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
 ---
- drivers/net/ieee802154/at86rf230.c | 24 ++++++++++++------------
- 1 file changed, 12 insertions(+), 12 deletions(-)
+ net/mac802154/ieee802154_i.h | 2 ++
+ net/mac802154/util.c         | 5 ++++-
+ 2 files changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ieee802154/at86rf230.c b/drivers/net/ieee802154/at86rf230.c
-index 563031ce76f0..cafc786aab57 100644
---- a/drivers/net/ieee802154/at86rf230.c
-+++ b/drivers/net/ieee802154/at86rf230.c
-@@ -336,7 +336,7 @@ static const struct regmap_config at86rf230_regmap_spi_config = {
+diff --git a/net/mac802154/ieee802154_i.h b/net/mac802154/ieee802154_i.h
+index 702560acc8ce..1381e6a5e180 100644
+--- a/net/mac802154/ieee802154_i.h
++++ b/net/mac802154/ieee802154_i.h
+@@ -56,6 +56,8 @@ struct ieee802154_local {
+ 
+ 	struct sk_buff *tx_skb;
+ 	struct work_struct tx_work;
++	/* A negative Linux error code or a null/positive MLME error status */
++	int tx_result;
  };
  
- static void
--at86rf230_async_error_recover_complete(void *context)
-+at86rf230_async_bus_error_recover_complete(void *context)
+ enum {
+diff --git a/net/mac802154/util.c b/net/mac802154/util.c
+index f2078238718b..0bf46f174de3 100644
+--- a/net/mac802154/util.c
++++ b/net/mac802154/util.c
+@@ -58,8 +58,11 @@ enum hrtimer_restart ieee802154_xmit_ifs_timer(struct hrtimer *timer)
+ void ieee802154_xmit_complete(struct ieee802154_hw *hw, struct sk_buff *skb,
+ 			      bool ifs_handling)
  {
- 	struct at86rf230_state_change *ctx = context;
- 	struct at86rf230_local *lp = ctx->lp;
-@@ -352,7 +352,7 @@ at86rf230_async_error_recover_complete(void *context)
- }
++	struct ieee802154_local *local = hw_to_local(hw);
++
++	local->tx_result = IEEE802154_SUCCESS;
++
+ 	if (ifs_handling) {
+-		struct ieee802154_local *local = hw_to_local(hw);
+ 		u8 max_sifs_size;
  
- static void
--at86rf230_async_error_recover(void *context)
-+at86rf230_async_bus_error_recover(void *context)
- {
- 	struct at86rf230_state_change *ctx = context;
- 	struct at86rf230_local *lp = ctx->lp;
-@@ -363,17 +363,17 @@ at86rf230_async_error_recover(void *context)
- 	}
- 
- 	at86rf230_async_state_change(lp, ctx, STATE_RX_AACK_ON,
--				     at86rf230_async_error_recover_complete);
-+				     at86rf230_async_bus_error_recover_complete);
- }
- 
- static inline void
--at86rf230_async_error(struct at86rf230_local *lp,
--		      struct at86rf230_state_change *ctx, int rc)
-+at86rf230_async_bus_error(struct at86rf230_local *lp,
-+			  struct at86rf230_state_change *ctx, int rc)
- {
- 	dev_err(&lp->spi->dev, "spi_async error %d\n", rc);
- 
- 	at86rf230_async_state_change(lp, ctx, STATE_FORCE_TRX_OFF,
--				     at86rf230_async_error_recover);
-+				     at86rf230_async_bus_error_recover);
- }
- 
- /* Generic function to get some register value in async mode */
-@@ -390,7 +390,7 @@ at86rf230_async_read_reg(struct at86rf230_local *lp, u8 reg,
- 	ctx->msg.complete = complete;
- 	rc = spi_async(lp->spi, &ctx->msg);
- 	if (rc)
--		at86rf230_async_error(lp, ctx, rc);
-+		at86rf230_async_bus_error(lp, ctx, rc);
- }
- 
- static void
-@@ -405,7 +405,7 @@ at86rf230_async_write_reg(struct at86rf230_local *lp, u8 reg, u8 val,
- 	ctx->msg.complete = complete;
- 	rc = spi_async(lp->spi, &ctx->msg);
- 	if (rc)
--		at86rf230_async_error(lp, ctx, rc);
-+		at86rf230_async_bus_error(lp, ctx, rc);
- }
- 
- static void
-@@ -640,7 +640,7 @@ at86rf230_sync_state_change(struct at86rf230_local *lp, unsigned int state)
- 	rc = wait_for_completion_timeout(&lp->state_complete,
- 					 msecs_to_jiffies(100));
- 	if (!rc) {
--		at86rf230_async_error(lp, &lp->state, -ETIMEDOUT);
-+		at86rf230_async_bus_error(lp, &lp->state, -ETIMEDOUT);
- 		return -ETIMEDOUT;
- 	}
- 
-@@ -762,7 +762,7 @@ at86rf230_rx_trac_check(void *context)
- 	rc = spi_async(lp->spi, &ctx->msg);
- 	if (rc) {
- 		ctx->trx.len = 2;
--		at86rf230_async_error(lp, ctx, rc);
-+		at86rf230_async_bus_error(lp, ctx, rc);
- 	}
- }
- 
-@@ -839,7 +839,7 @@ static irqreturn_t at86rf230_isr(int irq, void *data)
- 	ctx->msg.complete = at86rf230_irq_status;
- 	rc = spi_async(lp->spi, &ctx->msg);
- 	if (rc) {
--		at86rf230_async_error(lp, ctx, rc);
-+		at86rf230_async_bus_error(lp, ctx, rc);
- 		enable_irq(irq);
- 		return IRQ_NONE;
- 	}
-@@ -881,7 +881,7 @@ at86rf230_write_frame(void *context)
- 	rc = spi_async(lp->spi, &ctx->msg);
- 	if (rc) {
- 		ctx->trx.len = 2;
--		at86rf230_async_error(lp, ctx, rc);
-+		at86rf230_async_bus_error(lp, ctx, rc);
- 	}
- }
- 
+ 		/* If transceiver sets CRC on his own we need to use lifs
 -- 
 2.27.0
 
