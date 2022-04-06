@@ -2,33 +2,33 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7267C433FE
-	for <linux-wpan@archiver.kernel.org>; Wed,  6 Apr 2022 17:29:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B207BC43217
+	for <linux-wpan@archiver.kernel.org>; Wed,  6 Apr 2022 17:29:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238776AbiDFRbj (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        id S238949AbiDFRbj (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
         Wed, 6 Apr 2022 13:31:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45068 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57886 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238777AbiDFRb0 (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 6 Apr 2022 13:31:26 -0400
+        with ESMTP id S239175AbiDFRb2 (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 6 Apr 2022 13:31:28 -0400
 Received: from relay12.mail.gandi.net (relay12.mail.gandi.net [IPv6:2001:4b98:dc4:8::232])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60D75657BF;
-        Wed,  6 Apr 2022 08:34:52 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D384B23702F;
+        Wed,  6 Apr 2022 08:34:56 -0700 (PDT)
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id BD49120000E;
-        Wed,  6 Apr 2022 15:34:48 +0000 (UTC)
+        by mail.gandi.net (Postfix) with ESMTPSA id 04A97200005;
+        Wed,  6 Apr 2022 15:34:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1649259289;
+        t=1649259295;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=9svJxavWtfvvcfr/SJ9LwNMS+TMtO405lMcDS46GPiI=;
-        b=AkN4DJmh5HqvZQXFi6DCOQGzv81gRzLUQ8ffp3Q02raCcuaCVJRVud2KfUIxTIF07TQoVF
-        IRp5EmDWAZu7TMQ4Fc5p5Vl64id/JbwyhbJkmVgk8B+RDPZJrQJdEPKNPrx3wxGovMW24I
-        NBCrQIZCYwR2ktOOPky+2mNSu7eJXMzlgh+6axy9FRMJsd4vu3OG4N6GWODZ5abzJC5VkF
-        mNpOC3KmR6lvt4UHC8DkZCAZRzZ+/5WAB1W1tZC0QV9AYy+BN1V1VoGJi+fWpFn82vXmTU
-        Zbem/ByoQyq2AphBfWrAjKpoXz3ojSqois/w8xwQpsurt+zSnzr49vPscxjIVQ==
+        bh=yj2cFOYKpa/ZpdUu3gbCTqoDBIoPudwTCp0bpdE6Mrk=;
+        b=b5E7BiXPmdyPIlLZiJpsgEOk9ocvIT4pRiJw5PxAS2R7bmUk5QCfJqdX85/4Okm3uaGUgm
+        RZJ6nuacAhiNWGjiHlhw8POQcfce/+O4pDI9vw63OR0rR70x5/ZJIZa72y8/ZMPswUZRIj
+        j/DTXgI2rAPZKzUhFbeTU5WuiHIayLhOyrKl1BTmydTk5KF7HSBvcRdtQOuY6dYiLBl62I
+        dwI9sYrIFhBuod/w5ywtt78gsKj8cvy0exl0ql8B3fiSg4Rp9ERvyCQrehmGwCLIAtJXwg
+        tpHni0CuSqnL0GLHTmaNco75s7pWBifX7dNi/s3PS1aoeqPf50Z6lvU8hFd2YA==
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
 To:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
@@ -41,9 +41,9 @@ Cc:     "David S. Miller" <davem@davemloft.net>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
         Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: [PATCH v5 05/11] net: mac802154: Create a transmit bus error helper
-Date:   Wed,  6 Apr 2022 17:34:35 +0200
-Message-Id: <20220406153441.1667375-6-miquel.raynal@bootlin.com>
+Subject: [PATCH v5 09/11] net: ieee802154: atusb: Call _xmit_error() when a transmission fails
+Date:   Wed,  6 Apr 2022 17:34:39 +0200
+Message-Id: <20220406153441.1667375-10-miquel.raynal@bootlin.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20220406153441.1667375-1-miquel.raynal@bootlin.com>
 References: <20220406153441.1667375-1-miquel.raynal@bootlin.com>
@@ -54,60 +54,30 @@ Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-A few drivers do the full transmit operation asynchronously, which means
-that a bus error that happens when forwarding the packet to the
-transmitter will not be reported immediately. The solution in this case
-is to call this new helper to free the necessary resources, restart the
-the queue and return a generic TRAC error code: IEEE802154_SYSTEM_ERROR.
+ieee802154_xmit_error() is the right helper to call when a transmission
+has failed. Let's use it instead of open-coding it.
 
-Suggested-by: Alexander Aring <alex.aring@gmail.com>
 Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
 ---
- include/net/mac802154.h |  9 +++++++++
- net/mac802154/util.c    | 10 ++++++++++
- 2 files changed, 19 insertions(+)
+ drivers/net/ieee802154/atusb.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/include/net/mac802154.h b/include/net/mac802154.h
-index abbe88dc9df5..5240d94aad8e 100644
---- a/include/net/mac802154.h
-+++ b/include/net/mac802154.h
-@@ -498,6 +498,15 @@ void ieee802154_stop_queue(struct ieee802154_hw *hw);
- void ieee802154_xmit_complete(struct ieee802154_hw *hw, struct sk_buff *skb,
- 			      bool ifs_handling);
- 
-+/**
-+ * ieee802154_xmit_bus_error - frame could not be delivered to the trasmitter
-+ *                             because of a bus error
-+ *
-+ * @hw: pointer as obtained from ieee802154_alloc_hw().
-+ * @skb: buffer for transmission
-+ */
-+void ieee802154_xmit_bus_error(struct ieee802154_hw *hw, struct sk_buff *skb);
-+
- /**
-  * ieee802154_xmit_error - frame transmission failed
-  *
-diff --git a/net/mac802154/util.c b/net/mac802154/util.c
-index ec523335336c..79ba803c40c9 100644
---- a/net/mac802154/util.c
-+++ b/net/mac802154/util.c
-@@ -102,6 +102,16 @@ void ieee802154_xmit_error(struct ieee802154_hw *hw, struct sk_buff *skb,
+diff --git a/drivers/net/ieee802154/atusb.c b/drivers/net/ieee802154/atusb.c
+index f27a5f535808..d04db4d07a64 100644
+--- a/drivers/net/ieee802154/atusb.c
++++ b/drivers/net/ieee802154/atusb.c
+@@ -271,9 +271,8 @@ static void atusb_tx_done(struct atusb *atusb, u8 seq)
+ 		 * unlikely case now that seq == expect is then true, but can
+ 		 * happen and fail with a tx_skb = NULL;
+ 		 */
+-		ieee802154_wake_queue(atusb->hw);
+-		if (atusb->tx_skb)
+-			dev_kfree_skb_irq(atusb->tx_skb);
++		ieee802154_xmit_error(atusb->hw, atusb->tx_skb,
++				      IEEE802154_SYSTEM_ERROR);
+ 	}
  }
- EXPORT_SYMBOL(ieee802154_xmit_error);
  
-+void ieee802154_xmit_bus_error(struct ieee802154_hw *hw, struct sk_buff *skb)
-+{
-+	struct ieee802154_local *local = hw_to_local(hw);
-+
-+	local->tx_result = IEEE802154_SYSTEM_ERROR;
-+	ieee802154_wake_queue(hw);
-+	dev_kfree_skb_any(skb);
-+}
-+EXPORT_SYMBOL(ieee802154_xmit_bus_error);
-+
- void ieee802154_stop_device(struct ieee802154_local *local)
- {
- 	flush_workqueue(local->workqueue);
 -- 
 2.27.0
 
