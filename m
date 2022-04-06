@@ -2,33 +2,32 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43A39C4332F
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53642C433F5
 	for <linux-wpan@archiver.kernel.org>; Wed,  6 Apr 2022 17:29:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239256AbiDFRbf (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 6 Apr 2022 13:31:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49136 "EHLO
+        id S238957AbiDFRbg (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 6 Apr 2022 13:31:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39656 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238895AbiDFRbX (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 6 Apr 2022 13:31:23 -0400
+        with ESMTP id S239131AbiDFRbW (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 6 Apr 2022 13:31:22 -0400
 Received: from relay12.mail.gandi.net (relay12.mail.gandi.net [IPv6:2001:4b98:dc4:8::232])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFDCE2963CB;
-        Wed,  6 Apr 2022 08:34:49 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C07E282514;
+        Wed,  6 Apr 2022 08:34:45 -0700 (PDT)
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id B442320000F;
-        Wed,  6 Apr 2022 15:34:44 +0000 (UTC)
+        by mail.gandi.net (Postfix) with ESMTPSA id 9DE6B200005;
+        Wed,  6 Apr 2022 15:34:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1649259286;
+        t=1649259283;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=hzRFgzM4CKz3QS8PYg7wgueEZihoX1rywNOkCigJb0c=;
-        b=j3kVvNgBsnOepOcYERnnLS7Hkon6kUP0ezruksFVRaO8O/VUoB/oVfW2XpG6fz27NWOIP1
-        awK1g1o45XaA6U+NNvkYzu1qJEIxm9D6y2UXqYzz6kWIQe6/67YPbLQnuuMVB6y+r+U8BF
-        7rZEM+tpaJ45JDUn1ExT31hghG29+BfOOzULuGsoVDyZGg5o0l3kMG+kmsCrNEJfOIkkAK
-        9egGF4m4oOb5KOS0doTuUQYGeI8FgxzdaiFeZ1mt9HRibtH6RqUG1OrfaaFyyqrxHq2nYv
-        so8asnQVD/Iiz9Cfhl9Q+1QUawI6277zxt4S9SqxIvgitw2N8MzvuXE4oxBCsA==
+         content-transfer-encoding:content-transfer-encoding;
+        bh=eFko5NX97m4muugeqnROyi5azqJxgV0f4MAyTkyBg8A=;
+        b=pYmUmwlYVj8lMczX9nkXhgi59o41A64KRAuWi2kWQfqNUWukWJ++QfbhIXwJuPIMy3ZsB0
+        YOVJh/buGokeEwVqMzWkNIP4Sqm7AB6Kk5cCKGuVz3gxAnsRj2SU+3qbO22UUozouKNoCG
+        +BjcSUPsMU+qdvVLSw7pmBlyrdEz0ewQVjc7bAx4i2EsP7RmPKPxzSHSc7oYDr5ywL86fs
+        eWdOVyJyzAd3H4/B8f3jD/+cqF8lyGozOvCSpIoCn8ZLP8dfCHlevMMDPh7zNiUGaPtCS3
+        W59mCJbTxpVfcCoXU7lZ18keumCatZEUbiMESV+4k05FCqXi77k7T2c91fIMIQ==
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
 To:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
@@ -41,12 +40,10 @@ Cc:     "David S. Miller" <davem@davemloft.net>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
         Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: [PATCH v5 02/11] net: ieee802154: Fill the list of MLME return codes
-Date:   Wed,  6 Apr 2022 17:34:32 +0200
-Message-Id: <20220406153441.1667375-3-miquel.raynal@bootlin.com>
+Subject: [PATCH v5 00/11] ieee802154: Better Tx error handling
+Date:   Wed,  6 Apr 2022 17:34:30 +0200
+Message-Id: <20220406153441.1667375-1-miquel.raynal@bootlin.com>
 X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20220406153441.1667375-1-miquel.raynal@bootlin.com>
-References: <20220406153441.1667375-1-miquel.raynal@bootlin.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
@@ -54,105 +51,74 @@ Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-There are more codes than already listed, let's be a bit more
-exhaustive. This will allow to drop device drivers local definitions of
-these codes.
+The idea here is to provide a fully synchronous Tx API and also be able
+to be sure that a transfer has finished. This will be used later by
+another series. However, while working on this task, it appeared
+necessary to first rework the way MLME errors were (not) propagated to
+the upper layers. This small series tries to tackle exactly that, before
+introducing the synchronous API.
 
-Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
----
- include/linux/ieee802154.h | 67 +++++++++++++++++++++++++++++++++++++-
- 1 file changed, 66 insertions(+), 1 deletion(-)
+Changes in v5:
+* Introduced a new helper which should be used upon bus errors. We don't
+  ask users to provide an error code (which would be misleading) and
+  instead forward IEEE802154_SYSTEM_ERROR which is our generic code.
+* Dropped most of my changes in the at86rf320 driver in ordre to do
+  things a little bit differently:
+  - the existing error path is renamed to clearly identify that it
+    handles bus errors.
+  - trac errors are handled in a separate path and the core helper is
+    used to return the trac value.
+* Merged the revert commit with the following commit forwarding trac
+  errors to the core.
 
-diff --git a/include/linux/ieee802154.h b/include/linux/ieee802154.h
-index 01d945c8b2e1..f1f9412b6ac6 100644
---- a/include/linux/ieee802154.h
-+++ b/include/linux/ieee802154.h
-@@ -134,7 +134,35 @@ enum {
- 	 * a successful transmission.
- 	 */
- 	IEEE802154_SUCCESS = 0x0,
--
-+	/* The requested operation failed. */
-+	IEEE802154_MAC_ERROR = 0x1,
-+	/* The requested operation has been cancelled. */
-+	IEEE802154_CANCELLED = 0x2,
-+	/*
-+	 * Device is ready to poll the coordinator for data in a non beacon
-+	 * enabled PAN.
-+	 */
-+	IEEE802154_READY_FOR_POLL = 0x3,
-+	/* Wrong frame counter. */
-+	IEEE802154_COUNTER_ERROR = 0xdb,
-+	/*
-+	 * The frame does not conforms to the incoming key usage policy checking
-+	 * procedure.
-+	 */
-+	IEEE802154_IMPROPER_KEY_TYPE = 0xdc,
-+	/*
-+	 * The frame does not conforms to the incoming security level usage
-+	 * policy checking procedure.
-+	 */
-+	IEEE802154_IMPROPER_SECURITY_LEVEL = 0xdd,
-+	/* Secured frame received with an empty Frame Version field. */
-+	IEEE802154_UNSUPPORTED_LEGACY = 0xde,
-+	/*
-+	 * A secured frame is received or must be sent but security is not
-+	 * enabled in the device. Or, the Auxiliary Security Header has security
-+	 * level of zero in it.
-+	 */
-+	IEEE802154_UNSUPPORTED_SECURITY = 0xdf,
- 	/* The beacon was lost following a synchronization request. */
- 	IEEE802154_BEACON_LOST = 0xe0,
- 	/*
-@@ -204,11 +232,48 @@ enum {
- 	 * that is not supported.
- 	 */
- 	IEEE802154_UNSUPPORTED_ATTRIBUTE = 0xf4,
-+	/* Missing source or destination address or address mode. */
-+	IEEE802154_INVALID_ADDRESS = 0xf5,
-+	/*
-+	 * MLME asked to turn the receiver on, but the on time duration is too
-+	 * big compared to the macBeaconOrder.
-+	 */
-+	IEEE802154_ON_TIME_TOO_LONG = 0xf6,
-+	/*
-+	 * MLME asaked to turn the receiver on, but the request was delayed for
-+	 * too long before getting processed.
-+	 */
-+	IEEE802154_PAST_TIME = 0xf7,
-+	/*
-+	 * The StartTime parameter is nonzero, and the MLME is not currently
-+	 * tracking the beacon of the coordinator through which it is
-+	 * associated.
-+	 */
-+	IEEE802154_TRACKING_OFF = 0xf8,
-+	/*
-+	 * The index inside the hierarchical values in PIBAttribute is out of
-+	 * range.
-+	 */
-+	IEEE802154_INVALID_INDEX = 0xf9,
-+	/*
-+	 * The number of PAN descriptors discovered during a scan has been
-+	 * reached.
-+	 */
-+	IEEE802154_LIMIT_REACHED = 0xfa,
-+	/*
-+	 * The PIBAttribute parameter specifies an attribute that is a read-only
-+	 * attribute.
-+	 */
-+	IEEE802154_READ_ONLY = 0xfb,
- 	/*
- 	 * A request to perform a scan operation failed because the MLME was
- 	 * in the process of performing a previously initiated scan operation.
- 	 */
- 	IEEE802154_SCAN_IN_PROGRESS = 0xfc,
-+	/* The outgoing superframe overlaps the incoming superframe. */
-+	IEEE802154_SUPERFRAME_OVERLAP = 0xfd,
-+	/* Any other error situation. */
-+	IEEE802154_SYSTEM_ERROR = 0xff,
- };
- 
- /* frame control handling */
+Changes in v4:
+* Reverted the at86rf320 patch introducing trac values for debugfs
+  purposes as suggested by Alex. Reintroduced some of its content in a
+  subsequent patch to filter out offloaded transmission error cases.
+* Used IEEE802154_SYSTEM_ERROR as a non specific error code.
+
+Changes in v3:
+* Split the series into two parts, this is the "error handling" halve.
+* Reworked the error path to not handle the ifs_handling situation
+  anymore.
+* Enhanced the list of MLME status codes available.
+* Improved the error handling by collecting the error codes, somethimes
+  by changing device drivers directly to propagate these MLME
+  statuses. Then, once in the core, save one global Tx status value so
+  that in the case of synchronous transfers we can check the return
+  value and eventually error out.
+* Prevented the core to stop the device before the end of the last
+  transmission to avoid deadlocks by just sync'ing the last Tx
+  transfer.
+
+Changes in v2:
+* Adapted with the changes already merged/refused.
+
+Miquel Raynal (11):
+  net: ieee802154: Enhance/fix the names of the MLME return codes
+  net: ieee802154: Fill the list of MLME return codes
+  net: mac802154: Save a global error code on transmissions
+  net: mac802154: Create a transmit error helper
+  net: mac802154: Create a transmit bus error helper
+  net: ieee802154: at86rf230: Rename the asynchronous error helper
+  net: ieee802154: at86rf230: Call _xmit_bus_error() when a bus error
+    occurs
+  net: ieee802154: at86rf230: Drop debugfs support
+  net: ieee802154: atusb: Call _xmit_error() when a transmission fails
+  net: ieee802154: ca8210: Use core return codes instead of hardcoding
+    them
+  net: ieee802154: ca8210: Call _xmit_error() when a transmission fails
+
+ drivers/net/ieee802154/Kconfig     |   7 --
+ drivers/net/ieee802154/at86rf230.c | 154 ++++++------------------
+ drivers/net/ieee802154/atusb.c     |   5 +-
+ drivers/net/ieee802154/ca8210.c    | 182 +++++++++++------------------
+ include/linux/ieee802154.h         |  81 +++++++++++--
+ include/net/mac802154.h            |  19 +++
+ net/mac802154/ieee802154_i.h       |   2 +
+ net/mac802154/util.c               |  26 ++++-
+ 8 files changed, 225 insertions(+), 251 deletions(-)
+
 -- 
 2.27.0
 
