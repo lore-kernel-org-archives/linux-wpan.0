@@ -2,34 +2,34 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1F5AC433FE
-	for <linux-wpan@archiver.kernel.org>; Thu,  7 Apr 2022 07:56:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A07CC433F5
+	for <linux-wpan@archiver.kernel.org>; Thu,  7 Apr 2022 08:07:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242403AbiDGH6b (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Thu, 7 Apr 2022 03:58:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53606 "EHLO
+        id S232374AbiDGIJy (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Thu, 7 Apr 2022 04:09:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36362 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242588AbiDGH6K (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 7 Apr 2022 03:58:10 -0400
-Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0879D10BC;
-        Thu,  7 Apr 2022 00:56:09 -0700 (PDT)
+        with ESMTP id S242839AbiDGIHT (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 7 Apr 2022 04:07:19 -0400
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::228])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6254A15E892;
+        Thu,  7 Apr 2022 01:05:17 -0700 (PDT)
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id 1AF3E40007;
-        Thu,  7 Apr 2022 07:56:06 +0000 (UTC)
+        by mail.gandi.net (Postfix) with ESMTPSA id E7BED1BF20F;
+        Thu,  7 Apr 2022 08:05:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1649318168;
+        t=1649318716;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=xzWtQrGhF2FpjlxnqN15bbWBsiH0n20STMCunGqXD5c=;
-        b=F46l/X2MljR59/T8b2ny2WoUKrkPmsluEtlliPuM5bcVjt8M5eiAhx5nBv1K3YnRa4Kl9/
-        knf0FqVpAKNh/msd17xhC7OIDq62nqFA+FsrZ6lZRfY/QSzBILHzBL+Q+PcYlei/NpMxoh
-        gXtxDlfBwL+EpD0FctCZlZLBDmirI5p/sAnx2FCSvhZYa5PdJmKp9q/l+BIbrSbx2+59tw
-        5x9YHIio5vNh9EJUY8eOsB9yMD/Xqx0YqgzS/eKXdDrEW4CLbollbFMz4zFUWouvEkBB1q
-        zrAbHVs5eD3Orc2AVQRiMwtyDAptAGsBkGcPNwUN6y9b2OTOsiMKGfLmx3x//g==
-Date:   Thu, 7 Apr 2022 09:56:05 +0200
+        bh=6dwUq/lt2WsDVhhZ/1fD04alAg8p/cPPGANiZ4vYVpE=;
+        b=mAMjI54nbxQTGy1pPkzMHxsbbMbRiX8aiZpUngRH9+k4G/eN7xlU8nC/dqw0NZF767UZgV
+        moF7yKEYE3msEAufBdBI6SzCu0FHlB6AvXobqUoZysA91VTN3y5kHZ3CMoOSdMQPTPDbON
+        t2D/bc4BfOoEYHAY/jqkH7GXCvxHfjkB6yF+KzAvjvHK86sAsMd1ZAPhBtauPZ9/PX0Dka
+        zyEi4zLJ+pNAyOXtqQY3aPEHNwaibtFGhEZd21yd1bYeS8bIj9dcgOrscLODR7HD1l9MbA
+        lTsVCukqS8RB+rVpd/hdmqY7F6CAgpCh1y71qn37x6M0f88u0jCkiM7/1iOvhg==
+Date:   Thu, 7 Apr 2022 10:05:13 +0200
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
 To:     Alexander Aring <alex.aring@gmail.com>
 Cc:     Stefan Schmidt <stefan@datenfreihafen.org>,
@@ -42,13 +42,13 @@ Cc:     Stefan Schmidt <stefan@datenfreihafen.org>,
         Frederic Blain <frederic.blain@qorvo.com>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH v5 05/11] net: mac802154: Create a transmit bus error
- helper
-Message-ID: <20220407095605.1ca9f6e6@xps13>
-In-Reply-To: <CAB_54W53OrQVYo4pjCpgYaQGVsa-hZ2gBrquFGO_vQ5RMsm-jQ@mail.gmail.com>
+Subject: Re: [PATCH v5 06/11] net: ieee802154: at86rf230: Rename the
+ asynchronous error helper
+Message-ID: <20220407100513.4b8378b6@xps13>
+In-Reply-To: <CAB_54W4DMkBxYYorSZXp52D=xCEATFDbuz+0YvxNc6doO8uJ2A@mail.gmail.com>
 References: <20220406153441.1667375-1-miquel.raynal@bootlin.com>
-        <20220406153441.1667375-6-miquel.raynal@bootlin.com>
-        <CAB_54W53OrQVYo4pjCpgYaQGVsa-hZ2gBrquFGO_vQ5RMsm-jQ@mail.gmail.com>
+        <20220406153441.1667375-7-miquel.raynal@bootlin.com>
+        <CAB_54W4DMkBxYYorSZXp52D=xCEATFDbuz+0YvxNc6doO8uJ2A@mail.gmail.com>
 Organization: Bootlin
 X-Mailer: Claws Mail 3.17.7 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
@@ -60,78 +60,44 @@ X-Mailing-List: linux-wpan@vger.kernel.org
 
 Hi Alexander,
 
-alex.aring@gmail.com wrote on Wed, 6 Apr 2022 17:43:30 -0400:
+alex.aring@gmail.com wrote on Wed, 6 Apr 2022 17:57:41 -0400:
 
 > Hi,
 >=20
 > On Wed, Apr 6, 2022 at 11:34 AM Miquel Raynal <miquel.raynal@bootlin.com>=
  wrote:
 > >
-> > A few drivers do the full transmit operation asynchronously, which means
-> > that a bus error that happens when forwarding the packet to the
-> > transmitter will not be reported immediately. The solution in this case
-> > is to call this new helper to free the necessary resources, restart the
-> > the queue and return a generic TRAC error code: IEEE802154_SYSTEM_ERROR.
+> > In theory there are two distinct error path:
+> > - The bus error when forwarding a packet to the transceiver fails.
+> > - The transmitter error, after the transmission has been offloaded.
 > >
-> > Suggested-by: Alexander Aring <alex.aring@gmail.com>
-> > Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
-> > ---
-> >  include/net/mac802154.h |  9 +++++++++
-> >  net/mac802154/util.c    | 10 ++++++++++
-> >  2 files changed, 19 insertions(+)
-> >
-> > diff --git a/include/net/mac802154.h b/include/net/mac802154.h
-> > index abbe88dc9df5..5240d94aad8e 100644
-> > --- a/include/net/mac802154.h
-> > +++ b/include/net/mac802154.h
-> > @@ -498,6 +498,15 @@ void ieee802154_stop_queue(struct ieee802154_hw *h=
-w);
-> >  void ieee802154_xmit_complete(struct ieee802154_hw *hw, struct sk_buff=
- *skb,
-> >                               bool ifs_handling);
-> >
-> > +/**
-> > + * ieee802154_xmit_bus_error - frame could not be delivered to the tra=
-smitter
-> > + *                             because of a bus error
-> > + *
-> > + * @hw: pointer as obtained from ieee802154_alloc_hw().
-> > + * @skb: buffer for transmission
-> > + */
-> > +void ieee802154_xmit_bus_error(struct ieee802154_hw *hw, struct sk_buf=
-f *skb);
-> > +
-> >  /**
-> >   * ieee802154_xmit_error - frame transmission failed
-> >   *
-> > diff --git a/net/mac802154/util.c b/net/mac802154/util.c
-> > index ec523335336c..79ba803c40c9 100644
-> > --- a/net/mac802154/util.c
-> > +++ b/net/mac802154/util.c
-> > @@ -102,6 +102,16 @@ void ieee802154_xmit_error(struct ieee802154_hw *h=
-w, struct sk_buff *skb,
-> >  }
-> >  EXPORT_SYMBOL(ieee802154_xmit_error);
-> >
-> > +void ieee802154_xmit_bus_error(struct ieee802154_hw *hw, struct sk_buf=
-f *skb)
-> > +{
-> > +       struct ieee802154_local *local =3D hw_to_local(hw);
-> > +
-> > +       local->tx_result =3D IEEE802154_SYSTEM_ERROR;
-> > +       ieee802154_wake_queue(hw);
-> > +       dev_kfree_skb_any(skb);
-> > +}
-> > +EXPORT_SYMBOL(ieee802154_xmit_bus_error);
-> > + =20
+> > Right now in this driver only the former situation is properly handled,
+> > so rename the different helpers to reflect this situation before
+> > improving the support of the other path.
+> > =20
 >=20
-> why not calling ieee802154_xmit_error(..., IEEE802154_SYSTEM_ERROR) ?
-> Just don't give the user a chance to pick a error code if something
-> bad happened.
+> I have no idea what I should think about this patch.
+>=20
+> On the driver layer there only exists "bus errors" okay, whatever
+> error because spi_async() returns an error and we try to recover from
+> it. Also async_error() will be called when there is a timeout because
+> the transceiver took too long for some state change... In this case
+> most often this async_error() is called if spi_async() returns an
+> error but as I said it's not always the case (e.g. timeout)... it is
+> some kind of hardware issue (indicated by 802.15.4 SYSTEM_ERROR for
+> upper layer) and probably if it occurs we can't recover anyway from it
+> (maybe rfkill support can do it, which does a whole transceiver reset
+> routine, but this is always user triggered so far I know).
+>=20
+> However if you want that patch in that's it's fine for me, but for me
+> this if somebody looks closely into the code it's obvious that in most
+> cases it's called when spi_async() returns an error (which is not
+> always the case see timeout).
 
-Oh ok, I assumed, based on your last comment, that you wanted a
-dedicated helper for that, but if just calling xmit_error() with the
-a fixed value is enough I'll drop this commit.
+I thought it would clarify the situation but I overlooked the timeout
+situation. Actually I did wrote it before understanding what was wrong
+with the patch coming next (I assume my new approach is fine?), and
+the two changes are fully independent, so I'll drop this patch too.
 
 Thanks,
 Miqu=C3=A8l
