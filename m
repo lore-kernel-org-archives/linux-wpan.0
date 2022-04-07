@@ -2,33 +2,33 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03596C433FE
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71C57C433F5
 	for <linux-wpan@archiver.kernel.org>; Thu,  7 Apr 2022 10:09:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239687AbiDGKLQ (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Thu, 7 Apr 2022 06:11:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49230 "EHLO
+        id S244132AbiDGKLR (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Thu, 7 Apr 2022 06:11:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49640 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244106AbiDGKLM (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 7 Apr 2022 06:11:12 -0400
+        with ESMTP id S244123AbiDGKLO (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 7 Apr 2022 06:11:14 -0400
 Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E0FA17288C;
-        Thu,  7 Apr 2022 03:09:11 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D42172E19;
+        Thu,  7 Apr 2022 03:09:14 -0700 (PDT)
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id EF01C6001A;
-        Thu,  7 Apr 2022 10:09:07 +0000 (UTC)
+        by mail.gandi.net (Postfix) with ESMTPSA id 8738760006;
+        Thu,  7 Apr 2022 10:09:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1649326150;
+        t=1649326152;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=KjQVyusI/NoALoNPcEIOjSAiTZnq5f6jB56z0p4Letc=;
-        b=CiiKhZRJKSZyARd5BOu5qMZ+Op7VRKn1MfqBUb9bwNiJnp9I3FfdrpmWAZAgUSu7Nxw9YH
-        6Wo6VuUVRzlk51gHcu9ZPXspj6mFv5p9Me0JGMDV5V8qHZ95lJXia+ikdb5MIf+YG/zWri
-        //xa4EePUiQVQPPUjmZMzHIMNsIICL777xHWly1l6+MwkK1UMjv5+3gc4BMs6pEJb6F31b
-        RrYlm6rjpKA0aQzDbJCgCTRO1ETB1EanaMg4AJTKTiU6aa6mSQuRcWWKYrKEFXT6fB3e/3
-        z2hR2B5SfRwXzsXnwwR66lMq2UWNKPkDnoyPMhMY7bKwGks8q76I7Xfvle0LtQ==
+        bh=sU6IzB0t/DtESo61MF3mytkIx1IBpiMobkcoPdkv94E=;
+        b=CpzFuwdb/3IF28UsxqumIG+5sQ+NRu7+wcNsCVnUer3BLXg8ArIDkuOJY/qVm0YMzsYU6n
+        99oMEz81I0WP/jhMYHZDDybwkxZPgBTiJtJ5UBXVF/+h3B2sMb5YloBL9vdx19yRvZL8LJ
+        KnyXHY4BCrxqIG40zUDelD00xuzslAqk63Q4Dh2wygtmRJBMXQpyNyGpcdIuB/qs1HZMsl
+        v+tEjceYxWVkGvWsGpS7xfjGuvGaLyUTpF9Xkub5dShdxfv/G0DuJF9Hu9/qIfqat0onTd
+        5WKtqzXlCXCudCXMUm/f0z2T5wr/Fh8u9fgo4ZQxyCKS4hpR9DCy+5c+uD02gQ==
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
 To:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
@@ -41,9 +41,9 @@ Cc:     "David S. Miller" <davem@davemloft.net>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
         Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: [PATCH v6 03/10] net: mac802154: Save a global error code on transmissions
-Date:   Thu,  7 Apr 2022 12:08:56 +0200
-Message-Id: <20220407100903.1695973-4-miquel.raynal@bootlin.com>
+Subject: [PATCH v6 05/10] net: mac802154: Create an error helper for asynchronous offloading errors
+Date:   Thu,  7 Apr 2022 12:08:58 +0200
+Message-Id: <20220407100903.1695973-6-miquel.raynal@bootlin.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20220407100903.1695973-1-miquel.raynal@bootlin.com>
 References: <20220407100903.1695973-1-miquel.raynal@bootlin.com>
@@ -54,49 +54,57 @@ Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-So far no error is returned from a failing transmission. However it
-might sometimes be useful, and particularly easy to use during sync
-transfers (for certain MLME commands). Let's create an internal variable
-for that, global to the device. Right now only success are registered,
-which is rather useless, but soon we will have more situations filling
-this field.
+A few drivers do the full transmit operation asynchronously, which means
+that a bus error that happens when forwarding the packet to the
+transmitter or a timeout happening when offloading the request to the
+transmitter will not be reported immediately.
 
+The solution in this case is to call this new helper to free the
+necessary resources, restart the queue and always return the same
+generic TRAC error code: IEEE802154_SYSTEM_ERROR.
+
+Suggested-by: Alexander Aring <alex.aring@gmail.com>
 Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
 ---
- net/mac802154/ieee802154_i.h | 2 ++
- net/mac802154/util.c         | 5 ++++-
- 2 files changed, 6 insertions(+), 1 deletion(-)
+ include/net/mac802154.h | 9 +++++++++
+ net/mac802154/util.c    | 6 ++++++
+ 2 files changed, 15 insertions(+)
 
-diff --git a/net/mac802154/ieee802154_i.h b/net/mac802154/ieee802154_i.h
-index 702560acc8ce..1381e6a5e180 100644
---- a/net/mac802154/ieee802154_i.h
-+++ b/net/mac802154/ieee802154_i.h
-@@ -56,6 +56,8 @@ struct ieee802154_local {
+diff --git a/include/net/mac802154.h b/include/net/mac802154.h
+index 29f289d58720..bdac0ddbdcdb 100644
+--- a/include/net/mac802154.h
++++ b/include/net/mac802154.h
+@@ -508,4 +508,13 @@ void ieee802154_xmit_complete(struct ieee802154_hw *hw, struct sk_buff *skb,
+ void ieee802154_xmit_error(struct ieee802154_hw *hw, struct sk_buff *skb,
+ 			   int reason);
  
- 	struct sk_buff *tx_skb;
- 	struct work_struct tx_work;
-+	/* A negative Linux error code or a null/positive MLME error status */
-+	int tx_result;
- };
- 
- enum {
++/**
++ * ieee802154_xmit_hw_error - frame could not be offloaded to the transmitter
++ *                            because of a hardware error (bus error, timeout, etc)
++ *
++ * @hw: pointer as obtained from ieee802154_alloc_hw().
++ * @skb: buffer for transmission
++ */
++void ieee802154_xmit_hw_error(struct ieee802154_hw *hw, struct sk_buff *skb);
++
+ #endif /* NET_MAC802154_H */
 diff --git a/net/mac802154/util.c b/net/mac802154/util.c
-index f2078238718b..0bf46f174de3 100644
+index ec523335336c..9f024d85563b 100644
 --- a/net/mac802154/util.c
 +++ b/net/mac802154/util.c
-@@ -58,8 +58,11 @@ enum hrtimer_restart ieee802154_xmit_ifs_timer(struct hrtimer *timer)
- void ieee802154_xmit_complete(struct ieee802154_hw *hw, struct sk_buff *skb,
- 			      bool ifs_handling)
- {
-+	struct ieee802154_local *local = hw_to_local(hw);
-+
-+	local->tx_result = IEEE802154_SUCCESS;
-+
- 	if (ifs_handling) {
--		struct ieee802154_local *local = hw_to_local(hw);
- 		u8 max_sifs_size;
+@@ -102,6 +102,12 @@ void ieee802154_xmit_error(struct ieee802154_hw *hw, struct sk_buff *skb,
+ }
+ EXPORT_SYMBOL(ieee802154_xmit_error);
  
- 		/* If transceiver sets CRC on his own we need to use lifs
++void ieee802154_xmit_hw_error(struct ieee802154_hw *hw, struct sk_buff *skb)
++{
++	ieee802154_xmit_error(hw, skb, IEEE802154_SYSTEM_ERROR);
++}
++EXPORT_SYMBOL(ieee802154_xmit_hw_error);
++
+ void ieee802154_stop_device(struct ieee802154_local *local)
+ {
+ 	flush_workqueue(local->workqueue);
 -- 
 2.27.0
 
