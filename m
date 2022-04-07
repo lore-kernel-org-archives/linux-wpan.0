@@ -2,33 +2,33 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10268C433EF
-	for <linux-wpan@archiver.kernel.org>; Thu,  7 Apr 2022 10:09:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0363DC433EF
+	for <linux-wpan@archiver.kernel.org>; Thu,  7 Apr 2022 10:09:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244141AbiDGKL1 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Thu, 7 Apr 2022 06:11:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49782 "EHLO
+        id S244153AbiDGKLd (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Thu, 7 Apr 2022 06:11:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50710 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244125AbiDGKLR (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 7 Apr 2022 06:11:17 -0400
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D04EF236935;
-        Thu,  7 Apr 2022 03:09:16 -0700 (PDT)
+        with ESMTP id S244138AbiDGKL0 (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 7 Apr 2022 06:11:26 -0400
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::223])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D36A7236B85;
+        Thu,  7 Apr 2022 03:09:19 -0700 (PDT)
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id 173DA60017;
-        Thu,  7 Apr 2022 10:09:13 +0000 (UTC)
+        by mail.gandi.net (Postfix) with ESMTPSA id D5DE76000B;
+        Thu,  7 Apr 2022 10:09:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1649326155;
+        t=1649326158;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=bmvANx7WYepho7DZQ0HsozEsj0y66stBZ846jh1dlsw=;
-        b=JGIer4PErvzE+JPm14rWlbBiF3pDVleODB49CriLOZAClO9SCKY1jLSXhAjU95F7lg0iDF
-        mbiLhzlHnOxBwednrFP9QwYqc++QWi41amEC/QZDb2AxLXSTR2KAdcxpeIlaeEkLonyVnc
-        6zT06nQdZZHaVSfqsi/E5OM9ZrQBp0TcraY29kYO+tWYs3RaUAH50BwTlmtmYErdOO+QF/
-        C92xmrTbxelP3IKUymt5qxTs9kbtpciWRbLl7+dY/0qp+wufZ6hk6MUubMR/8ahebMCFdN
-        DgZ4ncmoUghUJ2z74sHHiBacD6PIp2cM6jEHb0DhA66t/CkvWMacNooZXwlH1A==
+        bh=KkAfHbGQOvWKwZLtgQkDyXRAGYrqwKyHMzoOL4c5uOo=;
+        b=fgx0bY2er88H/PHpW3SnreMFEG/EyQqrzEjvcNHjh58WeXJNUK3To9Ql2XxJ9NMzRE8A98
+        tpy2O4A3BfQYAxfoeWZJ8YVy5cLfcuQZ5lGlLoHM1L2xKHeotRapGXr2RhEfyhiMDb6hLE
+        nnmteJjizuO3OB7+gMQbbVsKXXhj39x5YAoD73qVA/4FhCh+FgQodl6R5zsHB9HqOAKoun
+        7EuLic/JjjA0rCBLA/64lIDMHnUZu58tLhRERnfR+RUbLl5gwQNsLVx6swx9cXtQBif3Ef
+        TC0lj1oR4JiFnreT1BbbIlgk+NWlytLgkn4TAYSX3Lbyx43L1/gmCtgLWa0qGQ==
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
 To:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
@@ -41,9 +41,9 @@ Cc:     "David S. Miller" <davem@davemloft.net>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
         Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: [PATCH v6 06/10] net: ieee802154: at86rf230: Call _xmit_hw_error() when failing to offload frames
-Date:   Thu,  7 Apr 2022 12:08:59 +0200
-Message-Id: <20220407100903.1695973-7-miquel.raynal@bootlin.com>
+Subject: [PATCH v6 08/10] net: ieee802154: atusb: Call _xmit_hw_error() upon transmission error
+Date:   Thu,  7 Apr 2022 12:09:01 +0200
+Message-Id: <20220407100903.1695973-9-miquel.raynal@bootlin.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20220407100903.1695973-1-miquel.raynal@bootlin.com>
 References: <20220407100903.1695973-1-miquel.raynal@bootlin.com>
@@ -54,31 +54,27 @@ Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-If we end up at this location, it means that there was likely a hardware
-issue (either a bus error when asynchronously offloading the packet to
-the transceiver, or the transceiver took too long for some state
-change). In this case it was decided to return IEEE802154_SYSTEM_ERROR
-through the ieee802154_xmit_hw_error() helper dedicated to non
-IEEE802.15.4 specific errors.
-
-Let's use this helper instead of (almost) open-coding it.
+ieee802154_xmit_hw_error() is the right helper to call when a transmission
+has failed for a non-determined (and probably not IEEE802.15.4 specific)
+reason. Let's use this helper instead of open-coding it.
 
 Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
 ---
- drivers/net/ieee802154/at86rf230.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ drivers/net/ieee802154/atusb.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/drivers/net/ieee802154/at86rf230.c b/drivers/net/ieee802154/at86rf230.c
-index 563031ce76f0..0536ccd55e70 100644
---- a/drivers/net/ieee802154/at86rf230.c
-+++ b/drivers/net/ieee802154/at86rf230.c
-@@ -346,8 +346,7 @@ at86rf230_async_error_recover_complete(void *context)
- 
- 	if (lp->was_tx) {
- 		lp->was_tx = 0;
--		dev_kfree_skb_any(lp->tx_skb);
--		ieee802154_wake_queue(lp->hw);
-+		ieee802154_xmit_hw_error(lp->hw, lp->tx_skb);
+diff --git a/drivers/net/ieee802154/atusb.c b/drivers/net/ieee802154/atusb.c
+index f27a5f535808..46a63646f2a0 100644
+--- a/drivers/net/ieee802154/atusb.c
++++ b/drivers/net/ieee802154/atusb.c
+@@ -271,9 +271,7 @@ static void atusb_tx_done(struct atusb *atusb, u8 seq)
+ 		 * unlikely case now that seq == expect is then true, but can
+ 		 * happen and fail with a tx_skb = NULL;
+ 		 */
+-		ieee802154_wake_queue(atusb->hw);
+-		if (atusb->tx_skb)
+-			dev_kfree_skb_irq(atusb->tx_skb);
++		ieee802154_xmit_hw_error(atusb->hw, atusb->tx_skb);
  	}
  }
  
