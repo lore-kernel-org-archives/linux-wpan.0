@@ -2,33 +2,33 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92551C433F5
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01B23C433FE
 	for <linux-wpan@archiver.kernel.org>; Thu,  7 Apr 2022 10:09:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244121AbiDGKLO (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Thu, 7 Apr 2022 06:11:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49270 "EHLO
+        id S244127AbiDGKLP (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Thu, 7 Apr 2022 06:11:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49218 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244119AbiDGKLM (ORCPT
+        with ESMTP id S239687AbiDGKLM (ORCPT
         <rfc822;linux-wpan@vger.kernel.org>); Thu, 7 Apr 2022 06:11:12 -0400
 Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E25C023691E;
-        Thu,  7 Apr 2022 03:09:12 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32A73236935;
+        Thu,  7 Apr 2022 03:09:07 -0700 (PDT)
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id 2B2E760012;
-        Thu,  7 Apr 2022 10:09:10 +0000 (UTC)
+        by mail.gandi.net (Postfix) with ESMTPSA id 482026000E;
+        Thu,  7 Apr 2022 10:09:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1649326151;
+        t=1649326146;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=35ooHUKkVucweRorUExmNiRHhXXTQ1TtiROdmsJyU30=;
-        b=mTl6+5a88hsAgvx857JXpnHOLqvY2g2MDwsuLvdPvqx4JPgrUTA29Ek7fPfTGU5kGlm9yr
-        wlg4J/S/rC5lA0e8nQ12LNipZUl6lP+UegOPJp6PsmgEhSFhqK/4fnrba8KXW789HdKdBJ
-        OflT6nJCdZqSFfzMiTx5q9P8Ts4LSEEQnHQaB4coPOU/jyhrY5J7fpvL6OKVucGwmr0UXy
-        oIlgsyszWVHQhyS+o1bxbzXpOFPCuFFJpFUoClH2rnVkY1mb65PozVqI6kE3eEjNYmNwmx
-        STsZscnHsHlIKaLcZkDXm3azSX6lIRpj1XgdG52FDr6uGo2NVNMsossyEED+qA==
+        bh=Kj+PvFp1ksz07D636STHaz1vWj2YLBhvGeYDeYxJsEk=;
+        b=MxMTDig5IBzGqht5z2XjTHUoKMoVfHLrTfD8d2A4Fd9u6lLGJB5qGFKZmFPdQX4kxgldQP
+        lZpeewhJnYr0ou84c5Nr/Zx+f+93/kZTOPjQGxTQkD+QZbCfm2PEAxA1Raif+F40Ri6kG6
+        VWGJsdP7qRN0F/lghxUz1W0TzIqbxpxzMdFAWXG0ct91+DM7PuHmJDogddHwhVsCfKp5YL
+        P1XnpYRsoljL0hlZ9YnHV1CObi48dsDqT3c8IOvOS33EDNmWlDOASEP23wuvKo59BLJbEj
+        vuONCB4WxtGGsNkvzIpsbdhCsZzEgp+NIBIa9kWvhhQwYMw8s9aXiO4XknCUBw==
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
 To:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
@@ -41,9 +41,9 @@ Cc:     "David S. Miller" <davem@davemloft.net>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
         Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: [PATCH v6 04/10] net: mac802154: Create an offloaded transmission error helper
-Date:   Thu,  7 Apr 2022 12:08:57 +0200
-Message-Id: <20220407100903.1695973-5-miquel.raynal@bootlin.com>
+Subject: [PATCH v6 01/10] net: ieee802154: Enhance/fix the names of the MLME return codes
+Date:   Thu,  7 Apr 2022 12:08:54 +0200
+Message-Id: <20220407100903.1695973-2-miquel.raynal@bootlin.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20220407100903.1695973-1-miquel.raynal@bootlin.com>
 References: <20220407100903.1695973-1-miquel.raynal@bootlin.com>
@@ -54,62 +54,61 @@ Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-So far there is only a helper for successful transmissions, which led
-device drivers to implement their own handling in case of
-error. Unfortunately, we really need all the drivers to give the hand
-back to the core once they are done in order to be able to build a
-proper synchronous API. So let's create a _xmit_error() helper and take
-this opportunity to fill the new device-global field storing Tx
-statuses.
+Let's keep these definitions as close to the specification as possible
+while they are not yet in use. The names get slightly longer, but we
+gain the minor cost of being able to search the spec more easily.
 
-Suggested-by: Alexander Aring <alex.aring@gmail.com>
 Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
 ---
- include/net/mac802154.h | 10 ++++++++++
- net/mac802154/util.c    | 11 +++++++++++
- 2 files changed, 21 insertions(+)
+ include/linux/ieee802154.h | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/include/net/mac802154.h b/include/net/mac802154.h
-index 2c3bbc6645ba..29f289d58720 100644
---- a/include/net/mac802154.h
-+++ b/include/net/mac802154.h
-@@ -498,4 +498,14 @@ void ieee802154_stop_queue(struct ieee802154_hw *hw);
- void ieee802154_xmit_complete(struct ieee802154_hw *hw, struct sk_buff *skb,
- 			      bool ifs_handling);
+diff --git a/include/linux/ieee802154.h b/include/linux/ieee802154.h
+index 95c831162212..01d945c8b2e1 100644
+--- a/include/linux/ieee802154.h
++++ b/include/linux/ieee802154.h
+@@ -136,16 +136,16 @@ enum {
+ 	IEEE802154_SUCCESS = 0x0,
  
-+/**
-+ * ieee802154_xmit_error - offloaded frame transmission failed
-+ *
-+ * @hw: pointer as obtained from ieee802154_alloc_hw().
-+ * @skb: buffer for transmission
-+ * @reason: error code
-+ */
-+void ieee802154_xmit_error(struct ieee802154_hw *hw, struct sk_buff *skb,
-+			   int reason);
-+
- #endif /* NET_MAC802154_H */
-diff --git a/net/mac802154/util.c b/net/mac802154/util.c
-index 0bf46f174de3..ec523335336c 100644
---- a/net/mac802154/util.c
-+++ b/net/mac802154/util.c
-@@ -91,6 +91,17 @@ void ieee802154_xmit_complete(struct ieee802154_hw *hw, struct sk_buff *skb,
- }
- EXPORT_SYMBOL(ieee802154_xmit_complete);
- 
-+void ieee802154_xmit_error(struct ieee802154_hw *hw, struct sk_buff *skb,
-+			   int reason)
-+{
-+	struct ieee802154_local *local = hw_to_local(hw);
-+
-+	local->tx_result = reason;
-+	ieee802154_wake_queue(hw);
-+	dev_kfree_skb_any(skb);
-+}
-+EXPORT_SYMBOL(ieee802154_xmit_error);
-+
- void ieee802154_stop_device(struct ieee802154_local *local)
- {
- 	flush_workqueue(local->workqueue);
+ 	/* The beacon was lost following a synchronization request. */
+-	IEEE802154_BEACON_LOSS = 0xe0,
++	IEEE802154_BEACON_LOST = 0xe0,
+ 	/*
+ 	 * A transmission could not take place due to activity on the
+ 	 * channel, i.e., the CSMA-CA mechanism has failed.
+ 	 */
+-	IEEE802154_CHNL_ACCESS_FAIL = 0xe1,
++	IEEE802154_CHANNEL_ACCESS_FAILURE = 0xe1,
+ 	/* The GTS request has been denied by the PAN coordinator. */
+-	IEEE802154_DENINED = 0xe2,
++	IEEE802154_DENIED = 0xe2,
+ 	/* The attempt to disable the transceiver has failed. */
+-	IEEE802154_DISABLE_TRX_FAIL = 0xe3,
++	IEEE802154_DISABLE_TRX_FAILURE = 0xe3,
+ 	/*
+ 	 * The received frame induces a failed security check according to
+ 	 * the security suite.
+@@ -185,9 +185,9 @@ enum {
+ 	 * A PAN identifier conflict has been detected and communicated to the
+ 	 * PAN coordinator.
+ 	 */
+-	IEEE802154_PANID_CONFLICT = 0xee,
++	IEEE802154_PAN_ID_CONFLICT = 0xee,
+ 	/* A coordinator realignment command has been received. */
+-	IEEE802154_REALIGMENT = 0xef,
++	IEEE802154_REALIGNMENT = 0xef,
+ 	/* The transaction has expired and its information discarded. */
+ 	IEEE802154_TRANSACTION_EXPIRED = 0xf0,
+ 	/* There is no capacity to store the transaction. */
+@@ -203,7 +203,7 @@ enum {
+ 	 * A SET/GET request was issued with the identifier of a PIB attribute
+ 	 * that is not supported.
+ 	 */
+-	IEEE802154_UNSUPPORTED_ATTR = 0xf4,
++	IEEE802154_UNSUPPORTED_ATTRIBUTE = 0xf4,
+ 	/*
+ 	 * A request to perform a scan operation failed because the MLME was
+ 	 * in the process of performing a previously initiated scan operation.
 -- 
 2.27.0
 
