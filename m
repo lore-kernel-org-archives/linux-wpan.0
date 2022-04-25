@@ -2,80 +2,119 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E040DC433F5
-	for <linux-wpan@archiver.kernel.org>; Thu,  7 Apr 2022 10:09:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CBE2C433FE
+	for <linux-wpan@archiver.kernel.org>; Mon, 25 Apr 2022 12:27:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244163AbiDGKLj (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Thu, 7 Apr 2022 06:11:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51320 "EHLO
+        id S232729AbiDYM2k (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 25 Apr 2022 08:28:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39488 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244129AbiDGKLd (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 7 Apr 2022 06:11:33 -0400
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DDB2237FCA;
-        Thu,  7 Apr 2022 03:09:23 -0700 (PDT)
-Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id 710EE60009;
-        Thu,  7 Apr 2022 10:09:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1649326162;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ciS+k9VChIU4H5lHgCsYF4iRcuri5PAr+qW7SczT23g=;
-        b=ddJ1QyAEYMuFQmzcQsiFXJxEXtaRqomeq89oujvWk+O8ULPdeGS+RCBQ6+Dlz308O2AEtu
-        8BDslUIz5X3rgAjWR2xWxkutGB4oVOD3IOWKWPjZhpsgp39d9kQ0qYN8VyMryO7V+zJT6B
-        0oq3KViTXdzzJ835LD+23twJovmbmxJ3hs3jqqfIs8TzYmVrABMYJz22CH7grkd9UIiEUv
-        RZtplSvx3XzTN9towugfBNzvvmfxhGbIh6/fyi2ujg5ZwImJ3n36D8m5DQJyAZFkz6hO+R
-        +9K+2bIPS4NDKUg9NJEQTiuyCM/PICcgTz2p236TJd7rq5C9ANewzYeTcWSRnw==
-From:   Miquel Raynal <miquel.raynal@bootlin.com>
-To:     Alexander Aring <alex.aring@gmail.com>,
-        Stefan Schmidt <stefan@datenfreihafen.org>,
-        linux-wpan@vger.kernel.org
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+        with ESMTP id S241890AbiDYM0w (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 25 Apr 2022 08:26:52 -0400
+Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A85563BD8;
+        Mon, 25 Apr 2022 05:22:38 -0700 (PDT)
+Received: by mail-lf1-x136.google.com with SMTP id x17so25836079lfa.10;
+        Mon, 25 Apr 2022 05:22:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Q+5T1iKAozssuLKi38LNlFH4ednefJJfAeRf0+hMLKM=;
+        b=ZJC7SNXPrwQof0ANRY0Yj3olqdWPMt1ZrYJB2v3Y6B9lUxDC3sqNr/iLmmEYiAHXaz
+         3TmuukiHSNLldCoD5pseMU8pP7gdk/2GcDVHr2QXpweKl1AEIH/pA+Tj4ZgcWRoaoTVQ
+         JsKPklcHCwYtmlEpViGfXYuSZmu4bCT01ym0S1X+pjkL6aLwr/8GflSQ4OfMO7VBvjs3
+         KtlcWy+q1W/TZlks8SFqbx6btQ3prH+QF0cTZR0jQLlNcLTap7vwOJI+UMmEm50mkwRz
+         qlZI2DbYzT1fX/L7HG0SmO7ZWR+eNn5SaEgT2MN8hNnH5NHsJ+5v4ngUSTNyM6HMMkN5
+         hX1A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Q+5T1iKAozssuLKi38LNlFH4ednefJJfAeRf0+hMLKM=;
+        b=pgtahnOZ6UaqGiGO9E2gAkF9FpcDpjvv7w3cokCRciNCHCAHwql55TDPMOTJn8V/KJ
+         5Mg8SyQ5++X1Eea72R30lkwxK/efjzdkj9egI8sqEVbQeBQhInkUqmLah1SRD9nil9xN
+         e6S6o9wH5423h8wDoHfQj/bWdR92iQIzsO6vL9hPLTIRgZkVIUadIL8b8oW4VVVWBUT9
+         uOeQqRq23vTy3PDKvWHy5VhmLeBOBsLMkhNBc6e//4gfNAZap1lmLOG1YSM6JuKZGawC
+         XU6kO5kyNgx0vyHfHfCl0WnzYJZzS6O19IyBeBz/SzzQe41FOXATfLFJLazA/O173V28
+         BjKg==
+X-Gm-Message-State: AOAM533BCzPpWSquXFw+ddHaoqoNypPW3HkeGTMMiiQrijT5cqjlcVac
+        jniZogV/K33Q0ylaTffgV8l1Nz0cFf0VzPt94f8=
+X-Google-Smtp-Source: ABdhPJzjTx+/zhDCeVqqrGiL2ewisWzMtVBl+2Ll4NIfsnrLfZxsTjFstOPD99qVGSpcCO+E5tLWuoPaAPqcaasxPkY=
+X-Received: by 2002:ac2:4207:0:b0:442:bf8b:eee with SMTP id
+ y7-20020ac24207000000b00442bf8b0eeemr12805575lfh.536.1650889356420; Mon, 25
+ Apr 2022 05:22:36 -0700 (PDT)
+MIME-Version: 1.0
+References: <20220406153441.1667375-1-miquel.raynal@bootlin.com>
+ <20220406153441.1667375-7-miquel.raynal@bootlin.com> <CAB_54W4DMkBxYYorSZXp52D=xCEATFDbuz+0YvxNc6doO8uJ2A@mail.gmail.com>
+ <20220407100513.4b8378b6@xps13>
+In-Reply-To: <20220407100513.4b8378b6@xps13>
+From:   Alexander Aring <alex.aring@gmail.com>
+Date:   Mon, 25 Apr 2022 08:22:25 -0400
+Message-ID: <CAB_54W440CbmB4c6FqZ_8PR-iZASK2dq-jAujnVxiiXOMGvDXg@mail.gmail.com>
+Subject: Re: [PATCH v5 06/11] net: ieee802154: at86rf230: Rename the
+ asynchronous error helper
+To:     Miquel Raynal <miquel.raynal@bootlin.com>
+Cc:     Stefan Schmidt <stefan@datenfreihafen.org>,
+        linux-wpan - ML <linux-wpan@vger.kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
         David Girault <david.girault@qorvo.com>,
         Romuald Despres <romuald.despres@qorvo.com>,
         Frederic Blain <frederic.blain@qorvo.com>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
-        Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-        Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: [PATCH v6 10/10] net: ieee802154: ca8210: Call _xmit_error() when a transmission fails
-Date:   Thu,  7 Apr 2022 12:09:03 +0200
-Message-Id: <20220407100903.1695973-11-miquel.raynal@bootlin.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20220407100903.1695973-1-miquel.raynal@bootlin.com>
-References: <20220407100903.1695973-1-miquel.raynal@bootlin.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+        Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-ieee802154_xmit_error() is the right helper to call when a transmission
-has failed. Let's use it instead of open-coding it.
+Hi,
 
-Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
----
- drivers/net/ieee802154/ca8210.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+On Thu, Apr 7, 2022 at 4:05 AM Miquel Raynal <miquel.raynal@bootlin.com> wrote:
+>
+> Hi Alexander,
+>
+> alex.aring@gmail.com wrote on Wed, 6 Apr 2022 17:57:41 -0400:
+>
+> > Hi,
+> >
+> > On Wed, Apr 6, 2022 at 11:34 AM Miquel Raynal <miquel.raynal@bootlin.com> wrote:
+> > >
+> > > In theory there are two distinct error path:
+> > > - The bus error when forwarding a packet to the transceiver fails.
+> > > - The transmitter error, after the transmission has been offloaded.
+> > >
+> > > Right now in this driver only the former situation is properly handled,
+> > > so rename the different helpers to reflect this situation before
+> > > improving the support of the other path.
+> > >
+> >
+> > I have no idea what I should think about this patch.
+> >
+> > On the driver layer there only exists "bus errors" okay, whatever
+> > error because spi_async() returns an error and we try to recover from
+> > it. Also async_error() will be called when there is a timeout because
+> > the transceiver took too long for some state change... In this case
+> > most often this async_error() is called if spi_async() returns an
+> > error but as I said it's not always the case (e.g. timeout)... it is
+> > some kind of hardware issue (indicated by 802.15.4 SYSTEM_ERROR for
+> > upper layer) and probably if it occurs we can't recover anyway from it
+> > (maybe rfkill support can do it, which does a whole transceiver reset
+> > routine, but this is always user triggered so far I know).
+> >
+> > However if you want that patch in that's it's fine for me, but for me
+> > this if somebody looks closely into the code it's obvious that in most
+> > cases it's called when spi_async() returns an error (which is not
+> > always the case see timeout).
+>
+> I thought it would clarify the situation but I overlooked the timeout
+> situation. Actually I did wrote it before understanding what was wrong
+> with the patch coming next (I assume my new approach is fine?), and
+> the two changes are fully independent, so I'll drop this patch too.
+>
 
-diff --git a/drivers/net/ieee802154/ca8210.c b/drivers/net/ieee802154/ca8210.c
-index 116aece191cd..3c00310d26e8 100644
---- a/drivers/net/ieee802154/ca8210.c
-+++ b/drivers/net/ieee802154/ca8210.c
-@@ -1729,8 +1729,7 @@ static int ca8210_async_xmit_complete(
- 			status
- 		);
- 		if (status != IEEE802154_TRANSACTION_OVERFLOW) {
--			dev_kfree_skb_any(priv->tx_skb);
--			ieee802154_wake_queue(priv->hw);
-+			ieee802154_xmit_error(priv->hw, priv->tx_skb, status);
- 			return 0;
- 		}
- 	}
--- 
-2.27.0
+new patch is perfect, I like hw_error().
 
+- Alex
