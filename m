@@ -2,59 +2,36 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 706CEC433EF
-	for <linux-wpan@archiver.kernel.org>; Mon, 25 Apr 2022 13:06:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CFADC433F5
+	for <linux-wpan@archiver.kernel.org>; Mon, 25 Apr 2022 13:17:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234626AbiDYNJL (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 25 Apr 2022 09:09:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33928 "EHLO
+        id S233495AbiDYNUI (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 25 Apr 2022 09:20:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37540 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235807AbiDYNJJ (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 25 Apr 2022 09:09:09 -0400
-Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC33217E18;
-        Mon, 25 Apr 2022 06:06:03 -0700 (PDT)
-Received: by mail-lf1-x132.google.com with SMTP id j4so1549017lfh.8;
-        Mon, 25 Apr 2022 06:06:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=/iuipTIr85z9Ry7b+hLDpi3xx0sswTNr1LXRa0/lOgw=;
-        b=fdjhJ3vOP601i33FNSmI6Dv67D9wmS2cuQo5sf95mMqzRVqn0y11oysmC035jFLjaK
-         rIzNDpq34wH3dHU6jQ/KkOyvTv18U0LtsfLq8IZqunQAV0t2HV1kRHJVKj9dMTgkkqru
-         I/ktE+zcxcK2Soiyn7PQicVa1joZ1hgCj6ah4QpTyZBttuxZ/tcuV9/xR4myapTLNd74
-         GbBZ1HFAlXPNNKHiOlfJCEmWlP5KtsFqpjMhAE7b+4++LacTMe75F8f+C1t8WmaOjJY0
-         YoE5EzIhjExLEoFBH+eFS4XRiLxDPtHYrUcsH+k2SPrqk/zVQfzKc+6Kj1WknhWf436R
-         MdvA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=/iuipTIr85z9Ry7b+hLDpi3xx0sswTNr1LXRa0/lOgw=;
-        b=EF/Q9qEez/25XjQZpkPcOyjKTNpmPQYP3j2a422cKVzZGcbEL8pQ6mOPBFjcKsw6/o
-         FnLUjzl5agQWNNjnE8uimPMtantKIqkcZxCuzzEEtH0J8yl/pi9ueqx0qbEKXypeVMsB
-         5g/P/+myYkpZsZm/L+QMJjBrBF48LXR+ivkghvegcfADQxZ8sJ7nN5JQFTy3nNXDGXv+
-         HTdgvCcEksJKhj5ho7vJ4mMkAMeo5l7ec2aAhB0Oel4M2IAiL5HHQGELKTTgNoK4KnrQ
-         zAq3ecZaLhoRpoVlkoxq6nwcxJPT3LJN5roJJy6n/DUp1B+1gCXltqQjoZ42mFVGuPZN
-         ChAw==
-X-Gm-Message-State: AOAM530WpipQXc4+LQt2PdUML2Y63lhP+dIyWgLOLKi4F9mHjrZhebeD
-        f2zFTQGSugsUf4ji6R1vgOuWrtE0m5ukiiiW+74=
-X-Google-Smtp-Source: ABdhPJy3NUU+cYyK57zWY1LSg6EqgVJvq3DzMDa9sBKA+5nbVektwqdcqnWpVDGKfoOZE5FXrPX4smp3F9R7Ouwxjos=
-X-Received: by 2002:a05:6512:15a0:b0:472:d09:a6b4 with SMTP id
- bp32-20020a05651215a000b004720d09a6b4mr1908073lfb.656.1650891961397; Mon, 25
- Apr 2022 06:06:01 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220406153441.1667375-1-miquel.raynal@bootlin.com>
- <20220406153441.1667375-10-miquel.raynal@bootlin.com> <CAB_54W4epiqcATJhLB9JDZPKGZTj_jbmVwDHRZT9MxtXY6g-QA@mail.gmail.com>
- <20220407100646.049467af@xps13> <CAB_54W5ovb9=rWB-H9oZygWuQpLSG58XFtgniNn9eDh51BBQNw@mail.gmail.com>
-In-Reply-To: <CAB_54W5ovb9=rWB-H9oZygWuQpLSG58XFtgniNn9eDh51BBQNw@mail.gmail.com>
-From:   Alexander Aring <alex.aring@gmail.com>
-Date:   Mon, 25 Apr 2022 09:05:49 -0400
-Message-ID: <CAB_54W4X4--=kmXW-xtV5WiawP0s0UWSCZWb4U8wOR-xhhgR9g@mail.gmail.com>
-Subject: Re: [PATCH v5 09/11] net: ieee802154: atusb: Call _xmit_error() when
- a transmission fails
-To:     Miquel Raynal <miquel.raynal@bootlin.com>
+        with ESMTP id S240139AbiDYNTy (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 25 Apr 2022 09:19:54 -0400
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC3B519C09;
+        Mon, 25 Apr 2022 06:16:49 -0700 (PDT)
+Received: (Authenticated sender: miquel.raynal@bootlin.com)
+        by mail.gandi.net (Postfix) with ESMTPSA id 4CE0D240009;
+        Mon, 25 Apr 2022 13:16:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+        t=1650892607;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=yL+1WwuyV0gkc8EVoVMsP5ICunelXrVakkuddNSBziE=;
+        b=WLJgKmD85wBFk0heoDC7n1i9OcmOBy4XU905wiUIg05eiVS9Yza+T+Fsans7FP+NfmOCdT
+        ju5jxaX3pdN5/gclNIHOsqWKWLfFgGYsyai6T0r37iGaRRl6QAZu3Ej9OuNmH9j44OyqLo
+        F0RMcY2HKiFUtCGyVw7ECKqV9EY9SiACAEvre5vWfQxcAsd9fGkakrzr9U78SKPsg2kK1c
+        yYjCqoJf682IrhW2rutBL26mce9nPC3KjPaFemVnDmGjvBsdWj2t59C2L8UtkRO8dPnr6x
+        elP6HcrOfYo0ouxpvDtIQAHbYUQb17CGyB4LiBzre9R1XmWcxZDtX3CnqUkllA==
+Date:   Mon, 25 Apr 2022 15:16:44 +0200
+From:   Miquel Raynal <miquel.raynal@bootlin.com>
+To:     Alexander Aring <alex.aring@gmail.com>
 Cc:     Stefan Schmidt <stefan@datenfreihafen.org>,
         linux-wpan - ML <linux-wpan@vger.kernel.org>,
         "David S. Miller" <davem@davemloft.net>,
@@ -65,99 +42,140 @@ Cc:     Stefan Schmidt <stefan@datenfreihafen.org>,
         Frederic Blain <frederic.blain@qorvo.com>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH v5 09/11] net: ieee802154: atusb: Call _xmit_error()
+ when a transmission fails
+Message-ID: <20220425151644.01dd47f4@xps13>
+In-Reply-To: <CAB_54W4X4--=kmXW-xtV5WiawP0s0UWSCZWb4U8wOR-xhhgR9g@mail.gmail.com>
+References: <20220406153441.1667375-1-miquel.raynal@bootlin.com>
+        <20220406153441.1667375-10-miquel.raynal@bootlin.com>
+        <CAB_54W4epiqcATJhLB9JDZPKGZTj_jbmVwDHRZT9MxtXY6g-QA@mail.gmail.com>
+        <20220407100646.049467af@xps13>
+        <CAB_54W5ovb9=rWB-H9oZygWuQpLSG58XFtgniNn9eDh51BBQNw@mail.gmail.com>
+        <CAB_54W4X4--=kmXW-xtV5WiawP0s0UWSCZWb4U8wOR-xhhgR9g@mail.gmail.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 3.17.7 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi,
+Hi Alexander,
 
-On Mon, Apr 25, 2022 at 8:35 AM Alexander Aring <alex.aring@gmail.com> wrote:
->
+alex.aring@gmail.com wrote on Mon, 25 Apr 2022 09:05:49 -0400:
+
 > Hi,
->
-> On Thu, Apr 7, 2022 at 4:06 AM Miquel Raynal <miquel.raynal@bootlin.com> wrote:
+>=20
+> On Mon, Apr 25, 2022 at 8:35 AM Alexander Aring <alex.aring@gmail.com> wr=
+ote:
 > >
-> > Hi Alexander,
+> > Hi,
 > >
-> > alex.aring@gmail.com wrote on Wed, 6 Apr 2022 17:58:59 -0400:
-> >
-> > > Hi,
+> > On Thu, Apr 7, 2022 at 4:06 AM Miquel Raynal <miquel.raynal@bootlin.com=
+> wrote: =20
 > > >
-> > > On Wed, Apr 6, 2022 at 11:34 AM Miquel Raynal <miquel.raynal@bootlin.com> wrote:
-> > > >
-> > > > ieee802154_xmit_error() is the right helper to call when a transmission
-> > > > has failed. Let's use it instead of open-coding it.
-> > > >
-> > > > Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
-> > > > ---
-> > > >  drivers/net/ieee802154/atusb.c | 5 ++---
-> > > >  1 file changed, 2 insertions(+), 3 deletions(-)
-> > > >
-> > > > diff --git a/drivers/net/ieee802154/atusb.c b/drivers/net/ieee802154/atusb.c
-> > > > index f27a5f535808..d04db4d07a64 100644
-> > > > --- a/drivers/net/ieee802154/atusb.c
-> > > > +++ b/drivers/net/ieee802154/atusb.c
-> > > > @@ -271,9 +271,8 @@ static void atusb_tx_done(struct atusb *atusb, u8 seq)
-> > > >                  * unlikely case now that seq == expect is then true, but can
-> > > >                  * happen and fail with a tx_skb = NULL;
-> > > >                  */
-> > > > -               ieee802154_wake_queue(atusb->hw);
-> > > > -               if (atusb->tx_skb)
-> > > > -                       dev_kfree_skb_irq(atusb->tx_skb);
-> > > > +               ieee802154_xmit_error(atusb->hw, atusb->tx_skb,
-> > > > +                                     IEEE802154_SYSTEM_ERROR);
+> > > Hi Alexander,
 > > >
-> > > That should then call the xmit_error for ANY other reason which is not
-> > > 802.15.4 specific which is the bus_error() function?
+> > > alex.aring@gmail.com wrote on Wed, 6 Apr 2022 17:58:59 -0400:
+> > > =20
+> > > > Hi,
+> > > >
+> > > > On Wed, Apr 6, 2022 at 11:34 AM Miquel Raynal <miquel.raynal@bootli=
+n.com> wrote: =20
+> > > > >
+> > > > > ieee802154_xmit_error() is the right helper to call when a transm=
+ission
+> > > > > has failed. Let's use it instead of open-coding it.
+> > > > >
+> > > > > Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
+> > > > > ---
+> > > > >  drivers/net/ieee802154/atusb.c | 5 ++---
+> > > > >  1 file changed, 2 insertions(+), 3 deletions(-)
+> > > > >
+> > > > > diff --git a/drivers/net/ieee802154/atusb.c b/drivers/net/ieee802=
+154/atusb.c
+> > > > > index f27a5f535808..d04db4d07a64 100644
+> > > > > --- a/drivers/net/ieee802154/atusb.c
+> > > > > +++ b/drivers/net/ieee802154/atusb.c
+> > > > > @@ -271,9 +271,8 @@ static void atusb_tx_done(struct atusb *atusb=
+, u8 seq)
+> > > > >                  * unlikely case now that seq =3D=3D expect is th=
+en true, but can
+> > > > >                  * happen and fail with a tx_skb =3D NULL;
+> > > > >                  */
+> > > > > -               ieee802154_wake_queue(atusb->hw);
+> > > > > -               if (atusb->tx_skb)
+> > > > > -                       dev_kfree_skb_irq(atusb->tx_skb);
+> > > > > +               ieee802154_xmit_error(atusb->hw, atusb->tx_skb,
+> > > > > +                                     IEEE802154_SYSTEM_ERROR); =
+=20
+> > > >
+> > > > That should then call the xmit_error for ANY other reason which is =
+not
+> > > > 802.15.4 specific which is the bus_error() function? =20
+> > >
+> > > I'll drop the bus error function so we can stick to a regular
+> > > _xmit_error() call.
+> > > =20
 > >
-> > I'll drop the bus error function so we can stick to a regular
-> > _xmit_error() call.
+> > Okay, this error is only hardware related.
+> > =20
+> > > Besides, we do not have any trac information nor any easy access to
+> > > what failed exactly, so it's probably best anyway. =20
 > >
->
-> Okay, this error is only hardware related.
->
-> > Besides, we do not have any trac information nor any easy access to
-> > what failed exactly, so it's probably best anyway.
->
-> This is correct, Somebody needs to write support for it for atusb firmware. [0]
-> However some transceivers can't yet or will never (because lack of
-> functionality?) report such errors back... they will act a little bit
-> weird.
->
-> However, this return value is a BIG step moving into the right
-> direction that other drivers can follow.
->
-> I think for MLME ops we can definitely handle some transmit errors now
-> and retry so that we don't wait for anything when we know the
-> transceiver was never submitting.
->
+> > This is correct, Somebody needs to write support for it for atusb firmw=
+are. [0]
+> > However some transceivers can't yet or will never (because lack of
+> > functionality?) report such errors back... they will act a little bit
+> > weird.
+> >
+> > However, this return value is a BIG step moving into the right
+> > direction that other drivers can follow.
+> >
+> > I think for MLME ops we can definitely handle some transmit errors now
+> > and retry so that we don't wait for anything when we know the
+> > transceiver was never submitting.
+> > =20
+>=20
+> s/submitting/transmitted/
+>=20
+> I could more deeper into that topic:
+>=20
+> 1.
+>=20
+> In my opinion this result value was especially necessary for MLME-ops,
+> for others which do not directly work with MAC... they provide an
+> upper layer protocol if they want something reliable.
+>=20
+> 2.
+>=20
+> Later on we can do statistics like what was already going around in
+> the linux-wpan community to have something like whatever dump to see
+> all neighbors and see how many ack failures there, etc. Some people
+> want to make some predictions about link quality here. The kernel
+> should therefore only capture some stats and the $WHATEVER userspace
+> capable netlink monitor daemon should make some heuristic by dumping
+> those stats.
 
-s/submitting/transmitted/
+I like the idea of having a per-device dump of the stats. It would be
+really straightforward to implement with the current scan
+implementation that I am about to share. We already have a per PAN
+structure (with information like ID, channel, last time it was seen,
+strength, etc). We might improve this structure with counters for all
+the common mac errors. Maybe an option to the "pans dump" command
+(again, in the pipe) might be a good start to get all the stats, like
+"pans dump [stats]". I'll keep this in mind.
 
-I could more deeper into that topic:
+> 3.
+>=20
+> Sometimes even IP capable protocols (using 6LoWPAN) want to know if
+> ack was received or not, as mentioned. But this required additional
+> handling in the socket layers... I didn't look into that topic yet but
+> I know wireless solved it because they have some similar problems.
 
-1.
+I did not look at the upper layers yet, but that would indeed be a nice
+use case of these MAC statuses.
 
-In my opinion this result value was especially necessary for MLME-ops,
-for others which do not directly work with MAC... they provide an
-upper layer protocol if they want something reliable.
-
-2.
-
-Later on we can do statistics like what was already going around in
-the linux-wpan community to have something like whatever dump to see
-all neighbors and see how many ack failures there, etc. Some people
-want to make some predictions about link quality here. The kernel
-should therefore only capture some stats and the $WHATEVER userspace
-capable netlink monitor daemon should make some heuristic by dumping
-those stats.
-
-3.
-
-Sometimes even IP capable protocols (using 6LoWPAN) want to know if
-ack was received or not, as mentioned. But this required additional
-handling in the socket layers... I didn't look into that topic yet but
-I know wireless solved it because they have some similar problems.
-
-- Alex
+Thanks,
+Miqu=C3=A8l
