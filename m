@@ -2,33 +2,33 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 085B8C4332F
-	for <linux-wpan@archiver.kernel.org>; Wed, 27 Apr 2022 16:47:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11B5EC433F5
+	for <linux-wpan@archiver.kernel.org>; Wed, 27 Apr 2022 16:47:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243497AbiD0QuZ (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 27 Apr 2022 12:50:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57262 "EHLO
+        id S243579AbiD0Quk (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 27 Apr 2022 12:50:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57460 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243451AbiD0QuX (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 27 Apr 2022 12:50:23 -0400
+        with ESMTP id S243518AbiD0Qu0 (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 27 Apr 2022 12:50:26 -0400
 Received: from relay11.mail.gandi.net (relay11.mail.gandi.net [IPv6:2001:4b98:dc4:8::231])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4814914A515;
-        Wed, 27 Apr 2022 09:47:10 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D85A43A6AD3;
+        Wed, 27 Apr 2022 09:47:13 -0700 (PDT)
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id 8B061100008;
-        Wed, 27 Apr 2022 16:47:07 +0000 (UTC)
+        by mail.gandi.net (Postfix) with ESMTPSA id CFDCF10000F;
+        Wed, 27 Apr 2022 16:47:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1651078028;
+        t=1651078032;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=+u74cISYZQ6y5kyeBoVnGGpW+IMXgn01hz9uorp+y0w=;
-        b=Pz7pZN21WgHa3/gvseqoQN2aM0cHyYV9iheRom/pS8V/cYFOoj7Tgzd25WbEL3BAnggaMC
-        J4CfgD/4UxTzgahxbIiYTw00XnW+bkF0t2SjYbCUt+sLCWs4MDr8L8E5eGo6HdaLqr1ROq
-        c6IkfHl30CGvRlo5qbq/u4jpvB5VR3iZ1bPrg9MZYPP9QwyY65BqLakVtPukTlCddrmCsw
-        tudk0yZy5lnX7o615OW6lJtL8XzPKsiEzQVbQfDQC+mQQzzJGJ+xbJ2T4oxuIbVPm0Z2mO
-        Ga3gX5dBc3WEflVoHNdiJ04eQKNB8U+mKx4yydSfCRohaPJdf61trgWOKrBMzw==
+        bh=px6AHkCHCkCygBsaH5J3RUD7FCF1uQeWDYconq5IqwA=;
+        b=b071SoX+ibijv9ZM3IMsk8uDNOrVnM2jjXuqOXaya8R9WS0yOGou8MY4NqSTzQtbFpwifA
+        CzUelAneAwkq17v/ZtP706JhMKohkXkeRglpnezbvhddvTWa5qeZKCqvFkroV9npEPcWKj
+        Fxb1dw36alKNfyyI2l/g26a98Cr3yaHm0o+da7zTqia7ul5JBuChdLLgjKGYLKGJ9QDSxs
+        3axpWchRpKzfUxbn+rU7wYMZUzqRujgYg6eAxJ+UGc3MlMopWLG74QdoIIZIaFsBiUkz/w
+        FaQoNhmBpT9QVI9C5osMfVoTRXWK41RHsBLfKYARh8PUthQe6Kix7DOs2W7k6w==
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
 To:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
@@ -41,9 +41,9 @@ Cc:     "David S. Miller" <davem@davemloft.net>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
         Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: [PATCH wpan-next 04/11] net: mac802154: Rename the main tx_work struct
-Date:   Wed, 27 Apr 2022 18:46:52 +0200
-Message-Id: <20220427164659.106447-5-miquel.raynal@bootlin.com>
+Subject: [PATCH wpan-next 06/11] net: mac802154: Hold the transmit queue when relevant
+Date:   Wed, 27 Apr 2022 18:46:54 +0200
+Message-Id: <20220427164659.106447-7-miquel.raynal@bootlin.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20220427164659.106447-1-miquel.raynal@bootlin.com>
 References: <20220427164659.106447-1-miquel.raynal@bootlin.com>
@@ -54,78 +54,132 @@ Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-This entry is dedicated to synchronous transmissions done by drivers
-without async hook. Make this clearer that this is not a work that any
-driver can use by at least prefixing it with "sync_". While at it, let's
-enhance the comment explaining why we choose one or the other.
+Let's create a hold_txs atomic variable and increment/decrement it when
+relevant. Currently we can use it during a suspend. Very soon we will
+also use this feature during scans.
+
+When the variable is incremented, any further wake up call will be
+skipped until the variable gets decremented back.
 
 Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
 ---
- net/mac802154/ieee802154_i.h | 2 +-
- net/mac802154/main.c         | 2 +-
- net/mac802154/tx.c           | 9 ++++++---
- 3 files changed, 8 insertions(+), 5 deletions(-)
+ include/net/cfg802154.h      |  3 ++-
+ net/mac802154/cfg.c          |  2 ++
+ net/mac802154/ieee802154_i.h | 24 ++++++++++++++++++++++++
+ net/mac802154/tx.c           | 15 +++++++++++++++
+ net/mac802154/util.c         |  3 +++
+ 5 files changed, 46 insertions(+), 1 deletion(-)
 
+diff --git a/include/net/cfg802154.h b/include/net/cfg802154.h
+index 473ebcb9b155..043d8e4359e7 100644
+--- a/include/net/cfg802154.h
++++ b/include/net/cfg802154.h
+@@ -214,8 +214,9 @@ struct wpan_phy {
+ 	/* the network namespace this phy lives in currently */
+ 	possible_net_t _net;
+ 
+-	/* Transmission monitoring */
++	/* Transmission monitoring and control */
+ 	atomic_t ongoing_txs;
++	atomic_t hold_txs;
+ 
+ 	char priv[] __aligned(NETDEV_ALIGN);
+ };
+diff --git a/net/mac802154/cfg.c b/net/mac802154/cfg.c
+index dafe02548161..0540a2b014d2 100644
+--- a/net/mac802154/cfg.c
++++ b/net/mac802154/cfg.c
+@@ -46,6 +46,7 @@ static int ieee802154_suspend(struct wpan_phy *wpan_phy)
+ 	if (!local->open_count)
+ 		goto suspend;
+ 
++	ieee802154_hold_queue(local);
+ 	ieee802154_stop_queue(local);
+ 	synchronize_net();
+ 
+@@ -72,6 +73,7 @@ static int ieee802154_resume(struct wpan_phy *wpan_phy)
+ 		return ret;
+ 
+ wake_up:
++	ieee802154_release_queue(local);
+ 	ieee802154_wake_queue(local);
+ 	local->suspended = false;
+ 	return 0;
 diff --git a/net/mac802154/ieee802154_i.h b/net/mac802154/ieee802154_i.h
-index d27e9fe363b6..3f59a291b481 100644
+index 3f59a291b481..b55fdefb0b34 100644
 --- a/net/mac802154/ieee802154_i.h
 +++ b/net/mac802154/ieee802154_i.h
-@@ -55,7 +55,7 @@ struct ieee802154_local {
- 	struct sk_buff_head skb_queue;
+@@ -142,6 +142,30 @@ enum hrtimer_restart ieee802154_xmit_ifs_timer(struct hrtimer *timer);
+  */
+ void ieee802154_wake_queue(struct ieee802154_local *local);
  
- 	struct sk_buff *tx_skb;
--	struct work_struct tx_work;
-+	struct work_struct sync_tx_work;
- 	/* A negative Linux error code or a null/positive MLME error status */
- 	int tx_result;
- };
-diff --git a/net/mac802154/main.c b/net/mac802154/main.c
-index 13c6b3cd0429..46258c6d430f 100644
---- a/net/mac802154/main.c
-+++ b/net/mac802154/main.c
-@@ -95,7 +95,7 @@ ieee802154_alloc_hw(size_t priv_data_len, const struct ieee802154_ops *ops)
- 
- 	skb_queue_head_init(&local->skb_queue);
- 
--	INIT_WORK(&local->tx_work, ieee802154_xmit_sync_worker);
-+	INIT_WORK(&local->sync_tx_work, ieee802154_xmit_sync_worker);
- 
- 	/* init supported flags with 802.15.4 default ranges */
- 	phy->supported.max_minbe = 8;
++/**
++ * ieee802154_hold_queue - hold ieee802154 queue
++ * @local: main mac object
++ *
++ * Hold a queue, this queue cannot be woken up while this is active.
++ */
++void ieee802154_hold_queue(struct ieee802154_local *local);
++
++/**
++ * ieee802154_release_queue - release ieee802154 queue
++ * @local: main mac object
++ *
++ * Release a queue which is held. The queue can now be woken up.
++ */
++void ieee802154_release_queue(struct ieee802154_local *local);
++
++/**
++ * ieee802154_queue_is_held - checks whether the ieee802154 queue is held
++ * @local: main mac object
++ *
++ * Checks whether the queue is currently held.
++ */
++bool ieee802154_queue_is_held(struct ieee802154_local *local);
++
+ /**
+  * ieee802154_stop_queue - stop ieee802154 queue
+  * @local: main mac object
 diff --git a/net/mac802154/tx.c b/net/mac802154/tx.c
-index 0ebe39169309..6d559f96664d 100644
+index 8c0bad7796ba..d088aa8119e8 100644
 --- a/net/mac802154/tx.c
 +++ b/net/mac802154/tx.c
-@@ -25,7 +25,7 @@
- void ieee802154_xmit_sync_worker(struct work_struct *work)
- {
- 	struct ieee802154_local *local =
--		container_of(work, struct ieee802154_local, tx_work);
-+		container_of(work, struct ieee802154_local, sync_tx_work);
- 	struct sk_buff *skb = local->tx_skb;
- 	struct net_device *dev = skb->dev;
- 	int res;
-@@ -76,7 +76,10 @@ ieee802154_tx(struct ieee802154_local *local, struct sk_buff *skb)
- 	/* Stop the netif queue on each sub_if_data object. */
- 	ieee802154_stop_queue(local);
- 
--	/* async is priority, otherwise sync is fallback */
-+	/* Drivers should preferably implement the async callback. In some rare
-+	 * cases they only provide a sync callback which we will use as a
-+	 * fallback.
-+	 */
- 	if (local->ops->xmit_async) {
- 		unsigned int len = skb->len;
- 
-@@ -90,7 +93,7 @@ ieee802154_tx(struct ieee802154_local *local, struct sk_buff *skb)
- 		dev->stats.tx_bytes += len;
- 	} else {
- 		local->tx_skb = skb;
--		queue_work(local->workqueue, &local->tx_work);
-+		queue_work(local->workqueue, &local->sync_tx_work);
- 	}
- 
+@@ -106,6 +106,21 @@ ieee802154_tx(struct ieee802154_local *local, struct sk_buff *skb)
  	return NETDEV_TX_OK;
+ }
+ 
++void ieee802154_hold_queue(struct ieee802154_local *local)
++{
++	atomic_inc(&local->phy->hold_txs);
++}
++
++void ieee802154_release_queue(struct ieee802154_local *local)
++{
++	atomic_dec(&local->phy->hold_txs);
++}
++
++bool ieee802154_queue_is_held(struct ieee802154_local *local)
++{
++	return atomic_read(&local->phy->hold_txs);
++}
++
+ netdev_tx_t
+ ieee802154_monitor_start_xmit(struct sk_buff *skb, struct net_device *dev)
+ {
+diff --git a/net/mac802154/util.c b/net/mac802154/util.c
+index 4bcc9cd2eb9d..847e0864b575 100644
+--- a/net/mac802154/util.c
++++ b/net/mac802154/util.c
+@@ -17,6 +17,9 @@ void ieee802154_wake_queue(struct ieee802154_local *local)
+ {
+ 	struct ieee802154_sub_if_data *sdata;
+ 
++	if (ieee802154_queue_is_held(local))
++		return;
++
+ 	rcu_read_lock();
+ 	list_for_each_entry_rcu(sdata, &local->interfaces, list) {
+ 		if (!sdata->dev)
 -- 
 2.27.0
 
