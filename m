@@ -2,112 +2,156 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A8A3C433EF
-	for <linux-wpan@archiver.kernel.org>; Wed, 27 Apr 2022 16:47:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3867C433EF
+	for <linux-wpan@archiver.kernel.org>; Wed, 27 Apr 2022 18:01:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243456AbiD0QvA (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 27 Apr 2022 12:51:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58454 "EHLO
+        id S244598AbiD0SEx (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 27 Apr 2022 14:04:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41280 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243518AbiD0Qul (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 27 Apr 2022 12:50:41 -0400
-Received: from relay11.mail.gandi.net (relay11.mail.gandi.net [217.70.178.231])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60AE83BDE4C;
-        Wed, 27 Apr 2022 09:47:21 -0700 (PDT)
-Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id DE6D7100008;
-        Wed, 27 Apr 2022 16:47:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1651078040;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=BIiG20WZvkHQ4ep4wdahDp0PX+zvyjhFTQ2/0CC9xKE=;
-        b=dkfZlUwUt9kqDyy5AKoaowaBywT+wnU+nZcW6YYhZnwqsEgYBn1BkilD2IV3TyBR3SAA0J
-        1xniS1RC05PgLqyPC7pTpDgaPHQSx37CcuC5EWxFzicHs+MkShn7KTWf21sh6G6OVaN88m
-        ddUY3QB+byws1Yp4nR9i1rnx9lTaKuaG+k+Du8v/lVgSSQ/Sc0Bm4RsSPX9iwi7r5Amc5f
-        CS0IPnojUrqvGJ+LK1pLxgypt6XKNqOM6Kmy5WyNoKm8Yv7i+YMbRIJnoSwwRAu8t+gPcr
-        6u4S6EVLw0g/gDLdRxVdoSsH9tzS9Ce3tmmutpV+Up+5E26kJ8TgMKOoRiN7ug==
-From:   Miquel Raynal <miquel.raynal@bootlin.com>
-To:     Alexander Aring <alex.aring@gmail.com>,
-        Stefan Schmidt <stefan@datenfreihafen.org>,
-        linux-wpan@vger.kernel.org
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+        with ESMTP id S244559AbiD0SEw (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 27 Apr 2022 14:04:52 -0400
+Received: from mail-lj1-x234.google.com (mail-lj1-x234.google.com [IPv6:2a00:1450:4864:20::234])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48BDE389949;
+        Wed, 27 Apr 2022 11:01:39 -0700 (PDT)
+Received: by mail-lj1-x234.google.com with SMTP id 17so3723848lji.1;
+        Wed, 27 Apr 2022 11:01:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=wBbkKr1l4fRZGddkWdNjRpCVS3NAykDQMwUSejsRuZE=;
+        b=Wep757RhG8CnfBfotYSDRtSPM89WYLH2NCJRYfllAoHIz6kE3BB8fVbp0c+y3yc6Bv
+         B5wf4Cicopz8UZpCjcvWdkpq7LyFm76NXTkLk6RYTA4ZuPzfSVWN7gefEOR4X/9cUQ8z
+         F18gUjmpgjaaOXqF0M18sLqX2OmQB7ym9Zzs6V8wGeEeZOlpQVrtko4m2FAHhgeLLkqR
+         twu6iigAKjoiQ2NerblV0hpdrrjpsSBut6ZHj2zB7Pute+Xw5B5U+kellTx9rqvIEei8
+         xR5u/pN45NZcfYVnF54YDOdYeOPyNSAxHP6GviATJCskqHiEgSBjy5Rt2kmEzTS0iL57
+         i1lg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=wBbkKr1l4fRZGddkWdNjRpCVS3NAykDQMwUSejsRuZE=;
+        b=RjTP0DkSUVbOo4gQGVHjoUKo+4aGPSQERx7Pl6ytf8NjpjTVdXCIesEnr02sYCnds+
+         QeoWVI8oiWGRE/9Vut+x1O1jcEfGQw3eupXecPg4vuSwJ6SxzdpDc2iEFm7Hw7uNKAHH
+         vlcwHuNRK3UMk3SY6W7osj7jb6Cnbg8n5FWpF8TJ2VJkNjQcQ5U9w+8o5JEz9OMjx0Ic
+         Z9978aS5P1zBzjtfXn4n0oAI57zp+r6Wro2Xki6jGstBBo1vKCsXLHyJ8ZfeRpGOnuJl
+         j6aCuNnB1aoDeXY8hGeaFoyCrakFyCS1mgP0xIQMW7lXOhn2av6s+SkeW9914Zyo4EH7
+         h5Ng==
+X-Gm-Message-State: AOAM533deoL2A98DJ4BUXfWl+4LbQx4lA6+531HnPN4Na674oZMJEhvt
+        60KbTvwKXfNPQI3D88uJia2k2J7LoD6l/cZqh9I=
+X-Google-Smtp-Source: ABdhPJzXMtE1FLHK9Ck1kIGva2bRPD9aXCBn67HizHyS2mR6j+kh1lvKRN/3DmNpmvPcc72kzvxkN5B3LepnavT5iO4=
+X-Received: by 2002:a2e:b888:0:b0:24e:f423:93de with SMTP id
+ r8-20020a2eb888000000b0024ef42393demr17656957ljp.193.1651082497333; Wed, 27
+ Apr 2022 11:01:37 -0700 (PDT)
+MIME-Version: 1.0
+References: <20220427164659.106447-1-miquel.raynal@bootlin.com> <20220427164659.106447-9-miquel.raynal@bootlin.com>
+In-Reply-To: <20220427164659.106447-9-miquel.raynal@bootlin.com>
+From:   Alexander Aring <alex.aring@gmail.com>
+Date:   Wed, 27 Apr 2022 14:01:25 -0400
+Message-ID: <CAB_54W7NWEYgmLfowvyXtKEsKhBaVrPzpkB1kasYpAst98mKNA@mail.gmail.com>
+Subject: Re: [PATCH wpan-next 08/11] net: mac802154: Add a warning in the hot path
+To:     Miquel Raynal <miquel.raynal@bootlin.com>
+Cc:     Stefan Schmidt <stefan@datenfreihafen.org>,
+        linux-wpan - ML <linux-wpan@vger.kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
         David Girault <david.girault@qorvo.com>,
         Romuald Despres <romuald.despres@qorvo.com>,
         Frederic Blain <frederic.blain@qorvo.com>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
-        Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-        Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: [PATCH wpan-next 11/11] net: mac802154: Introduce a synchronous API for MLME commands
-Date:   Wed, 27 Apr 2022 18:46:59 +0200
-Message-Id: <20220427164659.106447-12-miquel.raynal@bootlin.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20220427164659.106447-1-miquel.raynal@bootlin.com>
-References: <20220427164659.106447-1-miquel.raynal@bootlin.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+        Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-This is the slow path, we need to wait for each command to be processed
-before continuing so let's introduce an helper which does the
-transmission and blocks until it gets notified of its asynchronous
-completion. This helper is going to be used when introducing scan
-support.
+Hi,
 
-Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
----
- net/mac802154/ieee802154_i.h |  1 +
- net/mac802154/tx.c           | 19 +++++++++++++++++++
- 2 files changed, 20 insertions(+)
+On Wed, Apr 27, 2022 at 12:47 PM Miquel Raynal
+<miquel.raynal@bootlin.com> wrote:
+>
+> We should never start a transmission after the queue has been stopped.
+>
+> But because it might work we don't kill the function here but rather
+> warn loudly the user that something is wrong.
+>
+> Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
+> ---
+>  net/mac802154/ieee802154_i.h |  8 ++++++++
+>  net/mac802154/tx.c           |  2 ++
+>  net/mac802154/util.c         | 18 ++++++++++++++++++
+>  3 files changed, 28 insertions(+)
+>
+> diff --git a/net/mac802154/ieee802154_i.h b/net/mac802154/ieee802154_i.h
+> index b55fdefb0b34..cb61a4abaf37 100644
+> --- a/net/mac802154/ieee802154_i.h
+> +++ b/net/mac802154/ieee802154_i.h
+> @@ -178,6 +178,14 @@ bool ieee802154_queue_is_held(struct ieee802154_local *local);
+>   */
+>  void ieee802154_stop_queue(struct ieee802154_local *local);
+>
+> +/**
+> + * ieee802154_queue_is_stopped - check whether ieee802154 queue was stopped
+> + * @local: main mac object
+> + *
+> + * Goes through all the interfaces and indicates if they are all stopped or not.
+> + */
+> +bool ieee802154_queue_is_stopped(struct ieee802154_local *local);
+> +
+>  /* MIB callbacks */
+>  void mac802154_dev_set_page_channel(struct net_device *dev, u8 page, u8 chan);
+>
+> diff --git a/net/mac802154/tx.c b/net/mac802154/tx.c
+> index a8a83f0167bf..021dddfea542 100644
+> --- a/net/mac802154/tx.c
+> +++ b/net/mac802154/tx.c
+> @@ -124,6 +124,8 @@ bool ieee802154_queue_is_held(struct ieee802154_local *local)
+>  static netdev_tx_t
+>  ieee802154_hot_tx(struct ieee802154_local *local, struct sk_buff *skb)
+>  {
+> +       WARN_ON_ONCE(ieee802154_queue_is_stopped(local));
+> +
+>         return ieee802154_tx(local, skb);
+>  }
+>
+> diff --git a/net/mac802154/util.c b/net/mac802154/util.c
+> index 847e0864b575..cfd17a7db532 100644
+> --- a/net/mac802154/util.c
+> +++ b/net/mac802154/util.c
+> @@ -44,6 +44,24 @@ void ieee802154_stop_queue(struct ieee802154_local *local)
+>         rcu_read_unlock();
+>  }
+>
+> +bool ieee802154_queue_is_stopped(struct ieee802154_local *local)
+> +{
+> +       struct ieee802154_sub_if_data *sdata;
+> +       bool stopped = true;
+> +
+> +       rcu_read_lock();
+> +       list_for_each_entry_rcu(sdata, &local->interfaces, list) {
+> +               if (!sdata->dev)
+> +                       continue;
+> +
+> +               if (!netif_queue_stopped(sdata->dev))
+> +                       stopped = false;
+> +       }
+> +       rcu_read_unlock();
+> +
+> +       return stopped;
+> +}
 
-diff --git a/net/mac802154/ieee802154_i.h b/net/mac802154/ieee802154_i.h
-index c87c7fa04435..8aa8d0dd9c41 100644
---- a/net/mac802154/ieee802154_i.h
-+++ b/net/mac802154/ieee802154_i.h
-@@ -125,6 +125,7 @@ extern struct ieee802154_mlme_ops mac802154_mlme_wpan;
- void ieee802154_rx(struct ieee802154_local *local, struct sk_buff *skb);
- void ieee802154_xmit_sync_worker(struct work_struct *work);
- int ieee802154_sync_and_hold_queue(struct ieee802154_local *local);
-+int ieee802154_mlme_tx(struct ieee802154_local *local, struct sk_buff *skb);
- netdev_tx_t
- ieee802154_monitor_start_xmit(struct sk_buff *skb, struct net_device *dev);
- netdev_tx_t
-diff --git a/net/mac802154/tx.c b/net/mac802154/tx.c
-index 5f94973b57e4..17244293c59a 100644
---- a/net/mac802154/tx.c
-+++ b/net/mac802154/tx.c
-@@ -143,6 +143,25 @@ int ieee802154_sync_and_hold_queue(struct ieee802154_local *local)
- 	return ieee802154_sync_queue(local);
- }
- 
-+int ieee802154_mlme_tx(struct ieee802154_local *local, struct sk_buff *skb)
-+{
-+	bool queue_held = ieee802154_queue_is_held(local);
-+	int ret;
-+
-+	if (!queue_held)
-+		ieee802154_sync_and_hold_queue(local);
-+
-+	ieee802154_tx(local, skb);
-+	ret = ieee802154_sync_queue(local);
-+
-+	if (!queue_held)
-+		ieee802154_release_queue(local);
-+
-+	ieee802154_wake_queue(local);
-+
-+	return ret;
-+}
-+
- static netdev_tx_t
- ieee802154_hot_tx(struct ieee802154_local *local, struct sk_buff *skb)
- {
--- 
-2.27.0
+sorry this makes no sense, you using net core functionality to check
+if a queue is stopped in a net core netif callback. Whereas the sense
+here for checking if the queue is really stopped is when 802.15.4
+thinks the queue is stopped vs net core netif callback running. It
+means for MLME-ops there are points we want to make sure that net core
+is not handling any xmit and we should check this point and not
+introducing net core functionality checks. btw: if it's hit your if
+branch the first time you can break?
 
+I am not done with the review, this is just what I see now and we can
+discuss that. Please be patient.
+
+- Alex
