@@ -2,111 +2,85 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74E8EC43217
-	for <linux-wpan@archiver.kernel.org>; Thu, 28 Apr 2022 01:27:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 402D6C433EF
+	for <linux-wpan@archiver.kernel.org>; Thu, 28 Apr 2022 03:06:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240553AbiD1Bau (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 27 Apr 2022 21:30:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51792 "EHLO
+        id S232329AbiD1DJQ (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 27 Apr 2022 23:09:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32932 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240368AbiD1Bap (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 27 Apr 2022 21:30:45 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1E1872471;
-        Wed, 27 Apr 2022 18:27:32 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        with ESMTP id S241857AbiD1DJP (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 27 Apr 2022 23:09:15 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id CF6752D1D2
+        for <linux-wpan@vger.kernel.org>; Wed, 27 Apr 2022 20:06:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1651115161;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=5MQTeNpfi0GJfUx46cs6svvWHy9BX/VsoVzEdXUF2TM=;
+        b=W2aoRN/5tdZkn/AR9RW5KMPE4eJ9DjliaQ9JXCSHSuwF+obMV5fEIGQvTvSJoXpXRI3D65
+        kiFE1f12CCMSqu8e+/gZ2Jhupi4djvfy0Id3LkvhoOku24szNZPRO8HY58DNPGZ70wnK5A
+        D4S2rgICq1TPMiOT7f5ktnyetOujCus=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-607-nnb5NoLmOM28SdU-Aun8ww-1; Wed, 27 Apr 2022 23:05:59 -0400
+X-MC-Unique: nnb5NoLmOM28SdU-Aun8ww-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 5614961F4C;
-        Thu, 28 Apr 2022 01:27:32 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50B7AC385A7;
-        Thu, 28 Apr 2022 01:27:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1651109251;
-        bh=5dLrCbyI9dL25gLCPU2lKXEykc++03SFd32wMmRhRMY=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=koKAxCKdTDd8Xos0qjF/PfaziMK1H7iXllHu4DOFfT+tReZ2slA19GSEMY1NlrAXx
-         VCl18ElprtpHwUe4m65SdEsv1lGqWR3skTPCIuYj/AcvueZmK3CfpzJW38Oe9aW1zU
-         niSCpJJrh/1kho5qWUQ0hxDz49tTwAxQmRAVgyHOutEFpbyFTQT+0/n0f2LPwPcn1R
-         +Dx77zrHy1TrRK6QnZ774j01Ivr9AWwFEgJu1KMLXjMZHmBX7IyZ29UEvIk2CTFpUy
-         L/bxWFE2CanErRZcRufMiQgOIsSO8CHUEukTRo4tKbwzfo1NiCLAjsYKkuz+oVQVEq
-         ZQkANYmzOu1Zg==
-Message-ID: <bde14dfc-d1ea-ca1f-5074-01e13eef3cab@kernel.org>
-Date:   Wed, 27 Apr 2022 19:27:26 -0600
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 03FBE3C01C00;
+        Thu, 28 Apr 2022 03:05:59 +0000 (UTC)
+Received: from fs-i40c-03.fs.lab.eng.bos.redhat.com (fs-i40c-03.fs.lab.eng.bos.redhat.com [10.16.224.23])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D0A6E2166B4D;
+        Thu, 28 Apr 2022 03:05:58 +0000 (UTC)
+From:   Alexander Aring <aahringo@redhat.com>
+To:     jukka.rissanen@linux.intel.com
+Cc:     linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
+        stefan@datenfreihafen.org, torvalds@linuxfoundation.org
+Subject: [PATCH bluetooth-next 1/3] net: 6lowpan: remove const from scalars
+Date:   Wed, 27 Apr 2022 23:05:32 -0400
+Message-Id: <20220428030534.3220410-2-aahringo@redhat.com>
+In-Reply-To: <20220428030534.3220410-1-aahringo@redhat.com>
+References: <20220428030534.3220410-1-aahringo@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.8.0
-Subject: Re: [PATCH net-next v3] net: SO_RCVMARK socket option for SO_MARK
- with recvmsg()
-Content-Language: en-US
-To:     Erin MacNeil <lnx.erin@gmail.com>
-Cc:     Richard Henderson <rth@twiddle.net>,
-        Ivan Kokshaysky <ink@jurassic.park.msu.ru>,
-        Matt Turner <mattst88@gmail.com>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
-        Helge Deller <deller@gmx.de>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Arnd Bergmann <arnd@arndb.de>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Oliver Hartkopp <socketcan@hartkopp.net>,
-        Marc Kleine-Budde <mkl@pengutronix.de>,
-        Robin van der Gracht <robin@protonic.nl>,
-        Oleksij Rempel <linux@rempel-privat.de>, kernel@pengutronix.de,
-        Alexander Aring <alex.aring@gmail.com>,
-        Stefan Schmidt <stefan@datenfreihafen.org>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Jeremy Kerr <jk@codeconstruct.com.au>,
-        Matt Johnston <matt@codeconstruct.com.au>,
-        Vlad Yasevich <vyasevich@gmail.com>,
-        Neil Horman <nhorman@tuxdriver.com>,
-        Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
-        Eric Dumazet <edumazet@google.com>,
-        Lorenz Bauer <lmb@cloudflare.com>,
-        Pavel Tikhomirov <ptikhomirov@virtuozzo.com>,
-        Martynas Pumputis <m@lambda.lt>,
-        Akhmat Karakotov <hmukos@yandex-team.ru>,
-        Stephen Rothwell <sfr@canb.auug.org.au>,
-        Wei Wang <weiwan@google.com>, Yangbo Lu <yangbo.lu@nxp.com>,
-        Florian Westphal <fw@strlen.de>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Richard Palethorpe <rpalethorpe@suse.com>,
-        Willem de Bruijn <willemb@google.com>,
-        Hangbin Liu <liuhangbin@gmail.com>,
-        Pablo Neira Ayuso <pablo@netfilter.org>,
-        Richard Sanger <rsanger@wand.net.nz>,
-        Yajun Deng <yajun.deng@linux.dev>,
-        Jiapeng Chong <jiapeng.chong@linux.alibaba.com>,
-        linux-alpha@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org,
-        sparclinux@vger.kernel.org, netdev@vger.kernel.org,
-        linux-arch@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-can@vger.kernel.org, linux-wpan@vger.kernel.org,
-        linux-sctp@vger.kernel.org
-References: <202204270907.nUUrw3dS-lkp@intel.com>
- <20220427200259.2564-1-lnx.erin@gmail.com>
-From:   David Ahern <dsahern@kernel.org>
-In-Reply-To: <20220427200259.2564-1-lnx.erin@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.78 on 10.11.54.6
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-On 4/27/22 2:02 PM, Erin MacNeil wrote:
-> Adding a new socket option, SO_RCVMARK, to indicate that SO_MARK
-> should be included in the ancillary data returned by recvmsg().
-> 
-> Renamed the sock_recv_ts_and_drops() function to sock_recv_cmsgs().
-> 
-> Signed-off-by: Erin MacNeil <lnx.erin@gmail.com>
-> ---
+The keyword const makes no sense for scalar types inside the lowpan_nhc
+structure. Most compilers will ignore it so we remove the keyword from
+the scalar types.
 
+Signed-off-by: Alexander Aring <aahringo@redhat.com>
+---
+ net/6lowpan/nhc.h | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-Reviewed-by: David Ahern <dsahern@kernel.org>
+diff --git a/net/6lowpan/nhc.h b/net/6lowpan/nhc.h
+index 67951c40734b..2ac7da388c4d 100644
+--- a/net/6lowpan/nhc.h
++++ b/net/6lowpan/nhc.h
+@@ -67,11 +67,11 @@ module_exit(__nhc##_exit);
+ struct lowpan_nhc {
+ 	struct rb_node	node;
+ 	const char	*name;
+-	const u8	nexthdr;
+-	const size_t	nexthdrlen;
++	u8		nexthdr;
++	size_t		nexthdrlen;
+ 	u8		*id;
+ 	u8		*idmask;
+-	const size_t	idlen;
++	size_t		idlen;
+ 
+ 	void		(*idsetup)(struct lowpan_nhc *nhc);
+ 	int		(*uncompress)(struct sk_buff *skb, size_t needed);
+-- 
+2.31.1
 
