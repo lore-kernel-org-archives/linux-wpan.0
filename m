@@ -2,77 +2,105 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FD7AC433F5
-	for <linux-wpan@archiver.kernel.org>; Thu, 28 Apr 2022 16:08:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28872C433EF
+	for <linux-wpan@archiver.kernel.org>; Thu, 28 Apr 2022 16:41:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236246AbiD1QMB (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Thu, 28 Apr 2022 12:12:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52382 "EHLO
+        id S1350180AbiD1Qo7 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Thu, 28 Apr 2022 12:44:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56006 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232927AbiD1QMB (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 28 Apr 2022 12:12:01 -0400
-Received: from relay12.mail.gandi.net (relay12.mail.gandi.net [IPv6:2001:4b98:dc4:8::232])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 083814A3E0;
-        Thu, 28 Apr 2022 09:08:45 -0700 (PDT)
+        with ESMTP id S1349054AbiD1Qo7 (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 28 Apr 2022 12:44:59 -0400
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::221])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 139157C7AB;
+        Thu, 28 Apr 2022 09:41:43 -0700 (PDT)
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id C15B4200013;
-        Thu, 28 Apr 2022 16:08:40 +0000 (UTC)
+        by mail.gandi.net (Postfix) with ESMTPSA id A571724000B;
+        Thu, 28 Apr 2022 16:41:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1651162122;
+        t=1651164102;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=0xAyaWEkH2/4aW5XlKRnGGy+8F8wUwVHlINCQRdnZd4=;
-        b=jq0PaPBqQNtmtxmy1ikGxVK/DCDWJTO3jwrRPwtK+B1rzJpR6TspK85e4CKPQHl2n6yS2R
-        n//jY10iWXk5zgiv5kuAXo/QZGoBhK33MWV+C2Xs7spzBPecDh9UAI5hqhnFI34j0wT0kN
-        fAagSyWE95uvGO5ZR6x2N4I5vhslRYhtjhewsqNkDK2RDTRdtvzTCVnsbSDfxVF4hsZ+Bq
-        hkUVOlftAqLabhWJM+dIDYqvbY14HgJUfFlCLQJKh0pEDlOWGbmHgKfOTPapxiwMKzHVSF
-        n4gQpjwbi2fUjT9ET5xUhnWgbn8dE6XuHtgvziiSCXm1ZqWRFg93r2PFNzrP5g==
-Date:   Thu, 28 Apr 2022 18:08:39 +0200
+         content-transfer-encoding:content-transfer-encoding;
+        bh=wTH6ZEk/Y++FSk1qrFx/NjlNBR+hPifrLu8zie/kLiE=;
+        b=AVqOosPs4Dry4Bg/cBfEdCXTwbs0XJy/Bk28t7urXxLAXgKH1YmZC9PkFL5+h9qDiWaRQ5
+        /efDBNdqMD4qnCXnCxJNWEI1F4D4MDZ06zjzenhxUh4+vqion4neuuu7uH2pxD1ydpEHAT
+        w46Exax5a12n6oJsbTxjH++JuEZmHNsffL3us4eQ5bSps7wXk7kKbeYcm8McvadWVAOlY/
+        IdcASigH4Wp7DKBNwi/C76Sks0A2WvI8QI9AE+HnU/EDj6d9NMhVbGF4QOE0ixXOPChqBk
+        2lqhAGZ/Zbr2jdIpNq3u67VLT55dfZd+C4SGki74G6oklLNh5nAHceEy3HQMuw==
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
-To:     Stefan Schmidt <stefan@datenfreihafen.org>
-Cc:     Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
+To:     Alexander Aring <alex.aring@gmail.com>,
+        Stefan Schmidt <stefan@datenfreihafen.org>,
+        linux-wpan@vger.kernel.org
+Cc:     "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-        Xue Liu <liuxuenetmail@gmail.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Harry Morris <harrymorris12@gmail.com>,
         David Girault <david.girault@qorvo.com>,
         Romuald Despres <romuald.despres@qorvo.com>,
         Frederic Blain <frederic.blain@qorvo.com>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
-        Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH wpan-next v3 3/4] net: mac802154: Set durations
- automatically
-Message-ID: <20220428180839.74347c3d@xps13>
-In-Reply-To: <8f32c05e-5830-79b3-1a3a-996ee8b58e52@datenfreihafen.org>
-References: <20220201180629.93410-1-miquel.raynal@bootlin.com>
-        <20220201180629.93410-4-miquel.raynal@bootlin.com>
-        <20220428175838.08bb7717@xps13>
-        <8f32c05e-5830-79b3-1a3a-996ee8b58e52@datenfreihafen.org>
-Organization: Bootlin
-X-Mailer: Claws Mail 3.17.7 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+        Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+        Miquel Raynal <miquel.raynal@bootlin.com>
+Subject: [PATCH wpan-next] net: mac802154: Fix symbol durations
+Date:   Thu, 28 Apr 2022 18:41:40 +0200
+Message-Id: <20220428164140.251965-1-miquel.raynal@bootlin.com>
+X-Mailer: git-send-email 2.27.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi Stefan,
+There are two major issues in the logic calculating the symbol durations
+based on the page/channel:
+- The page number is used in place of the channel value.
+- The BIT() macro is missing because we want to check the channel
+  value against a bitmask.
 
-> > I see it's "only" in wpan-next (781830c800dd "net: mac802154: Set
-> > durations automatically") and was not yet pulled in the net-next
-> > tree so please let me know what you prefer: I can either provide a
-> > proper patch to fit it (without upstream Fixes reference), or you can
-> > just apply this diff below and push -f the branch. Let me know what you
-> > prefer. =20
->=20
-> No forced push to a public branch in my public repo. Please provide a fix=
-up patch that I can apply on top.
+Fix these two errors and apologize loudly for this mistake.
 
-Duly noted.
+Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
+---
+ net/mac802154/main.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-Thanks,
-Miqu=C3=A8l
+diff --git a/net/mac802154/main.c b/net/mac802154/main.c
+index 5546ef86e231..bd7bdb1219dd 100644
+--- a/net/mac802154/main.c
++++ b/net/mac802154/main.c
+@@ -119,26 +119,26 @@ void ieee802154_configure_durations(struct wpan_phy *phy)
+ 
+ 	switch (phy->current_page) {
+ 	case 0:
+-		if (BIT(phy->current_page) & 0x1)
++		if (BIT(phy->current_channel) & 0x1)
+ 			/* 868 MHz BPSK 802.15.4-2003: 20 ksym/s */
+ 			duration = 50 * NSEC_PER_USEC;
+-		else if (phy->current_page & 0x7FE)
++		else if (BIT(phy->current_channel) & 0x7FE)
+ 			/* 915 MHz BPSK	802.15.4-2003: 40 ksym/s */
+ 			duration = 25 * NSEC_PER_USEC;
+-		else if (phy->current_page & 0x7FFF800)
++		else if (BIT(phy->current_channel) & 0x7FFF800)
+ 			/* 2400 MHz O-QPSK 802.15.4-2006: 62.5 ksym/s */
+ 			duration = 16 * NSEC_PER_USEC;
+ 		break;
+ 	case 2:
+-		if (BIT(phy->current_page) & 0x1)
++		if (BIT(phy->current_channel) & 0x1)
+ 			/* 868 MHz O-QPSK 802.15.4-2006: 25 ksym/s */
+ 			duration = 40 * NSEC_PER_USEC;
+-		else if (phy->current_page & 0x7FE)
++		else if (BIT(phy->current_channel) & 0x7FE)
+ 			/* 915 MHz O-QPSK 802.15.4-2006: 62.5 ksym/s */
+ 			duration = 16 * NSEC_PER_USEC;
+ 		break;
+ 	case 3:
+-		if (BIT(phy->current_page) & 0x3FFF)
++		if (BIT(phy->current_channel) & 0x3FFF)
+ 			/* 2.4 GHz CSS 802.15.4a-2007: 1/6 Msym/s */
+ 			duration = 6 * NSEC_PER_USEC;
+ 		break;
+-- 
+2.27.0
+
