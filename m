@@ -2,105 +2,86 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28872C433EF
-	for <linux-wpan@archiver.kernel.org>; Thu, 28 Apr 2022 16:41:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8AC5C433EF
+	for <linux-wpan@archiver.kernel.org>; Thu, 28 Apr 2022 18:32:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350180AbiD1Qo7 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Thu, 28 Apr 2022 12:44:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56006 "EHLO
+        id S1343665AbiD1SgL (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Thu, 28 Apr 2022 14:36:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40238 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349054AbiD1Qo7 (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 28 Apr 2022 12:44:59 -0400
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::221])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 139157C7AB;
-        Thu, 28 Apr 2022 09:41:43 -0700 (PDT)
-Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id A571724000B;
-        Thu, 28 Apr 2022 16:41:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1651164102;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=wTH6ZEk/Y++FSk1qrFx/NjlNBR+hPifrLu8zie/kLiE=;
-        b=AVqOosPs4Dry4Bg/cBfEdCXTwbs0XJy/Bk28t7urXxLAXgKH1YmZC9PkFL5+h9qDiWaRQ5
-        /efDBNdqMD4qnCXnCxJNWEI1F4D4MDZ06zjzenhxUh4+vqion4neuuu7uH2pxD1ydpEHAT
-        w46Exax5a12n6oJsbTxjH++JuEZmHNsffL3us4eQ5bSps7wXk7kKbeYcm8McvadWVAOlY/
-        IdcASigH4Wp7DKBNwi/C76Sks0A2WvI8QI9AE+HnU/EDj6d9NMhVbGF4QOE0ixXOPChqBk
-        2lqhAGZ/Zbr2jdIpNq3u67VLT55dfZd+C4SGki74G6oklLNh5nAHceEy3HQMuw==
-From:   Miquel Raynal <miquel.raynal@bootlin.com>
-To:     Alexander Aring <alex.aring@gmail.com>,
-        Stefan Schmidt <stefan@datenfreihafen.org>,
-        linux-wpan@vger.kernel.org
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+        with ESMTP id S235142AbiD1SgK (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 28 Apr 2022 14:36:10 -0400
+Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B7755A0B5;
+        Thu, 28 Apr 2022 11:32:55 -0700 (PDT)
+Received: by mail-lf1-x130.google.com with SMTP id x17so10122448lfa.10;
+        Thu, 28 Apr 2022 11:32:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=iYwpAKlBkZoPA+yWEtVITUSSaNgmAu1b7cqpcYmcgAs=;
+        b=FDcR/vXjfY+XIBnB6FHqa86R83ugNPGhcGpD7RyQNBz6flZF5XQ8qaX3LsYOKtgv76
+         DowHZHgqx4Hf/pMz0PIHUZPQAUSkBX3NYZfruy8FNrnRoGqyte0OnMuKaORovJSY9K0S
+         3/BslUsyZtESxrtGXtLhaH1HozfRHq7TcfUyzEOpIYwnzAxyQK5gBxWQwkJtximsn+zq
+         xVWkwQid11qdaQRUkaIeMCsFpQhvWNtvlVkLGOB/ch7i3IhSYNqGZa0G47L2h9Gkk0xx
+         RrS5zzNtjXi0aaIPROSgngT5F2QrQu2TsPxQhktbPiUPwAK6pKbhYLfpAjgG//wIHukb
+         /uyQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=iYwpAKlBkZoPA+yWEtVITUSSaNgmAu1b7cqpcYmcgAs=;
+        b=YXr9BbA1ELKgktNdFZVvZfTdb0vuq5ScjdEBuVXlCJ6zBevZCPVr276F8LzL1flXmM
+         i49KQsAn8oBQV6wghkZvzNibFe+Wj6Dn5UNGUsl7lXBVgrBs8c2VkxxjIt3Xer/PeP7b
+         CR8vAhdJXu1ZMyqyNP1h9L2CJ+X8S7Pif5EJJRD9mi/rc0pa5ZSrJnd9aZjuQBBsjgvW
+         c/vv1Yd5Ssiw6178nucI5vPUbZwfFoAvNwto0vgv8tfoxqm8WbgGH9T+hX4gJonTmzoC
+         NzdIFDn5aKYzfnyE9BR/+8g9ffOPdafB7qljud4XvAv13dC9c5V3YnoMu7yL3e4U6Bso
+         NS+Q==
+X-Gm-Message-State: AOAM530NWI1etFvK7Zdv8+ITd608EZJH+H/emaDoAYlV58C8EMytH7TF
+        r4W3FQk4ya21TnmK8NEei4sAIbpuRTCQlnRhHvVNF78m114=
+X-Google-Smtp-Source: ABdhPJzsy1/W6+3xM32IUqcIqcmbNNq7+WISt3f7vBJVg1pdNFOhH6dUMHKesA2D182dULqFfbmthxKAaF4cv4tfYGY=
+X-Received: by 2002:a05:6512:15a0:b0:472:d09:a6b4 with SMTP id
+ bp32-20020a05651215a000b004720d09a6b4mr13631034lfb.656.1651170773738; Thu, 28
+ Apr 2022 11:32:53 -0700 (PDT)
+MIME-Version: 1.0
+References: <20220428164140.251965-1-miquel.raynal@bootlin.com>
+In-Reply-To: <20220428164140.251965-1-miquel.raynal@bootlin.com>
+From:   Alexander Aring <alex.aring@gmail.com>
+Date:   Thu, 28 Apr 2022 14:32:42 -0400
+Message-ID: <CAB_54W5c0gATeeSEa5Wy150nT1Hoh91ygYuuNrMW4J-DQ7czGQ@mail.gmail.com>
+Subject: Re: [PATCH wpan-next] net: mac802154: Fix symbol durations
+To:     Miquel Raynal <miquel.raynal@bootlin.com>
+Cc:     Stefan Schmidt <stefan@datenfreihafen.org>,
+        linux-wpan - ML <linux-wpan@vger.kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
         David Girault <david.girault@qorvo.com>,
         Romuald Despres <romuald.despres@qorvo.com>,
         Frederic Blain <frederic.blain@qorvo.com>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
-        Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-        Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: [PATCH wpan-next] net: mac802154: Fix symbol durations
-Date:   Thu, 28 Apr 2022 18:41:40 +0200
-Message-Id: <20220428164140.251965-1-miquel.raynal@bootlin.com>
-X-Mailer: git-send-email 2.27.0
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+        Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-There are two major issues in the logic calculating the symbol durations
-based on the page/channel:
-- The page number is used in place of the channel value.
-- The BIT() macro is missing because we want to check the channel
-  value against a bitmask.
+Hi,
 
-Fix these two errors and apologize loudly for this mistake.
+On Thu, Apr 28, 2022 at 12:41 PM Miquel Raynal
+<miquel.raynal@bootlin.com> wrote:
+>
+> There are two major issues in the logic calculating the symbol durations
+> based on the page/channel:
+> - The page number is used in place of the channel value.
+> - The BIT() macro is missing because we want to check the channel
+>   value against a bitmask.
+>
+> Fix these two errors and apologize loudly for this mistake.
+>
+> Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
 
-Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
----
- net/mac802154/main.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+Acked-by: Alexander Aring <aahringo@redhat.com>
 
-diff --git a/net/mac802154/main.c b/net/mac802154/main.c
-index 5546ef86e231..bd7bdb1219dd 100644
---- a/net/mac802154/main.c
-+++ b/net/mac802154/main.c
-@@ -119,26 +119,26 @@ void ieee802154_configure_durations(struct wpan_phy *phy)
- 
- 	switch (phy->current_page) {
- 	case 0:
--		if (BIT(phy->current_page) & 0x1)
-+		if (BIT(phy->current_channel) & 0x1)
- 			/* 868 MHz BPSK 802.15.4-2003: 20 ksym/s */
- 			duration = 50 * NSEC_PER_USEC;
--		else if (phy->current_page & 0x7FE)
-+		else if (BIT(phy->current_channel) & 0x7FE)
- 			/* 915 MHz BPSK	802.15.4-2003: 40 ksym/s */
- 			duration = 25 * NSEC_PER_USEC;
--		else if (phy->current_page & 0x7FFF800)
-+		else if (BIT(phy->current_channel) & 0x7FFF800)
- 			/* 2400 MHz O-QPSK 802.15.4-2006: 62.5 ksym/s */
- 			duration = 16 * NSEC_PER_USEC;
- 		break;
- 	case 2:
--		if (BIT(phy->current_page) & 0x1)
-+		if (BIT(phy->current_channel) & 0x1)
- 			/* 868 MHz O-QPSK 802.15.4-2006: 25 ksym/s */
- 			duration = 40 * NSEC_PER_USEC;
--		else if (phy->current_page & 0x7FE)
-+		else if (BIT(phy->current_channel) & 0x7FE)
- 			/* 915 MHz O-QPSK 802.15.4-2006: 62.5 ksym/s */
- 			duration = 16 * NSEC_PER_USEC;
- 		break;
- 	case 3:
--		if (BIT(phy->current_page) & 0x3FFF)
-+		if (BIT(phy->current_channel) & 0x3FFF)
- 			/* 2.4 GHz CSS 802.15.4a-2007: 1/6 Msym/s */
- 			duration = 6 * NSEC_PER_USEC;
- 		break;
--- 
-2.27.0
-
+- Alex
