@@ -2,143 +2,142 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E15BC433FE
-	for <linux-wpan@archiver.kernel.org>; Thu, 28 Apr 2022 06:32:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11B1DC433F5
+	for <linux-wpan@archiver.kernel.org>; Thu, 28 Apr 2022 07:59:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243998AbiD1Gfh (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Thu, 28 Apr 2022 02:35:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37758 "EHLO
+        id S1343668AbiD1ICS (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Thu, 28 Apr 2022 04:02:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50554 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233520AbiD1Gff (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 28 Apr 2022 02:35:35 -0400
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 898B62180A
-        for <linux-wpan@vger.kernel.org>; Wed, 27 Apr 2022 23:32:21 -0700 (PDT)
-Received: from gallifrey.ext.pengutronix.de ([2001:67c:670:201:5054:ff:fe8d:eefb] helo=bjornoya.blackshift.org)
-        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <mkl@pengutronix.de>)
-        id 1njxhL-0001Q9-NF; Thu, 28 Apr 2022 08:32:19 +0200
-Received: from pengutronix.de (2a03-f580-87bc-d400-6c64-eec7-9c08-9d9e.ip6.dokom21.de [IPv6:2a03:f580:87bc:d400:6c64:eec7:9c08:9d9e])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (Client did not present a certificate)
-        (Authenticated sender: mkl-all@blackshift.org)
-        by smtp.blackshift.org (Postfix) with ESMTPSA id D7C416F531;
-        Thu, 28 Apr 2022 06:32:11 +0000 (UTC)
-Date:   Thu, 28 Apr 2022 08:32:11 +0200
-From:   Marc Kleine-Budde <mkl@pengutronix.de>
-To:     Erin MacNeil <lnx.erin@gmail.com>
-Cc:     Richard Henderson <rth@twiddle.net>,
-        Ivan Kokshaysky <ink@jurassic.park.msu.ru>,
-        Matt Turner <mattst88@gmail.com>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
-        Helge Deller <deller@gmx.de>,
+        with ESMTP id S1343692AbiD1ICI (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 28 Apr 2022 04:02:08 -0400
+Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4437820BCE;
+        Thu, 28 Apr 2022 00:58:53 -0700 (PDT)
+Received: (Authenticated sender: miquel.raynal@bootlin.com)
+        by mail.gandi.net (Postfix) with ESMTPSA id AF8451C0003;
+        Thu, 28 Apr 2022 07:58:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+        t=1651132731;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=3wu9h3NKSKmvHgwXQf+X1OC4mECGCeu1/MQPJ6QY6SE=;
+        b=bijCSztHgJJMugFQFHiUQ8aYuRkjruUCYnmB0kgjbJAB1EEdR4wYJf/Y0mbA+kgCGF7JDE
+        I/iYOiYIB8edk+3JyFYwuGrJtngst0ToSfMzvrBg9TpRnxazbFPe24IHBcrHqGYbkKnwzJ
+        AmoRy/5ozhvOXJYSLEMTxBnTDuuhWqOnFEpFGe+CaZspKLXsYEOuRRSHA7ajdmvRI6UTIu
+        YnzzEjZsG8UwGxkKMTAxiAJciDyFnbE/CbyVMQe/a09ZEm0kffvG5ewYVmmPyKNOmpHxT5
+        1fERTsbKynD+H9DtSoJSXV5e0lcbuNApL0mADhbfu6iecEqiaOEAKoS7S4O0zQ==
+Date:   Thu, 28 Apr 2022 09:58:48 +0200
+From:   Miquel Raynal <miquel.raynal@bootlin.com>
+To:     Alexander Aring <alex.aring@gmail.com>
+Cc:     Stefan Schmidt <stefan@datenfreihafen.org>,
+        linux-wpan - ML <linux-wpan@vger.kernel.org>,
         "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Arnd Bergmann <arnd@arndb.de>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Oliver Hartkopp <socketcan@hartkopp.net>,
-        Robin van der Gracht <robin@protonic.nl>,
-        Oleksij Rempel <linux@rempel-privat.de>, kernel@pengutronix.de,
-        Alexander Aring <alex.aring@gmail.com>,
-        Stefan Schmidt <stefan@datenfreihafen.org>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        David Ahern <dsahern@kernel.org>,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Jeremy Kerr <jk@codeconstruct.com.au>,
-        Matt Johnston <matt@codeconstruct.com.au>,
-        Vlad Yasevich <vyasevich@gmail.com>,
-        Neil Horman <nhorman@tuxdriver.com>,
-        Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
-        Eric Dumazet <edumazet@google.com>,
-        Lorenz Bauer <lmb@cloudflare.com>,
-        Pavel Tikhomirov <ptikhomirov@virtuozzo.com>,
-        Martynas Pumputis <m@lambda.lt>,
-        Akhmat Karakotov <hmukos@yandex-team.ru>,
-        Stephen Rothwell <sfr@canb.auug.org.au>,
-        Wei Wang <weiwan@google.com>, Yangbo Lu <yangbo.lu@nxp.com>,
-        Florian Westphal <fw@strlen.de>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Richard Palethorpe <rpalethorpe@suse.com>,
-        Willem de Bruijn <willemb@google.com>,
-        Hangbin Liu <liuhangbin@gmail.com>,
-        Pablo Neira Ayuso <pablo@netfilter.org>,
-        Richard Sanger <rsanger@wand.net.nz>,
-        Yajun Deng <yajun.deng@linux.dev>,
-        Jiapeng Chong <jiapeng.chong@linux.alibaba.com>,
-        linux-alpha@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org,
-        sparclinux@vger.kernel.org, netdev@vger.kernel.org,
-        linux-arch@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-can@vger.kernel.org, linux-wpan@vger.kernel.org,
-        linux-sctp@vger.kernel.org
-Subject: Re: [PATCH net-next v3] net: SO_RCVMARK socket option for SO_MARK
- with recvmsg()
-Message-ID: <20220428063211.4ndwg7xzudl7l7h7@pengutronix.de>
-References: <202204270907.nUUrw3dS-lkp@intel.com>
- <20220427200259.2564-1-lnx.erin@gmail.com>
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
+        David Girault <david.girault@qorvo.com>,
+        Romuald Despres <romuald.despres@qorvo.com>,
+        Frederic Blain <frederic.blain@qorvo.com>,
+        Nicolas Schodet <nico@ni.fr.eu.org>,
+        Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH wpan-next 08/11] net: mac802154: Add a warning in the
+ hot path
+Message-ID: <20220428095848.34582df4@xps13>
+In-Reply-To: <CAB_54W7NWEYgmLfowvyXtKEsKhBaVrPzpkB1kasYpAst98mKNA@mail.gmail.com>
+References: <20220427164659.106447-1-miquel.raynal@bootlin.com>
+        <20220427164659.106447-9-miquel.raynal@bootlin.com>
+        <CAB_54W7NWEYgmLfowvyXtKEsKhBaVrPzpkB1kasYpAst98mKNA@mail.gmail.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 3.17.7 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="twk6owb5igwqlcml"
-Content-Disposition: inline
-In-Reply-To: <20220427200259.2564-1-lnx.erin@gmail.com>
-X-SA-Exim-Connect-IP: 2001:67c:670:201:5054:ff:fe8d:eefb
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-wpan@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
+Hi Alexander,
 
---twk6owb5igwqlcml
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+alex.aring@gmail.com wrote on Wed, 27 Apr 2022 14:01:25 -0400:
 
-On 27.04.2022 16:02:37, Erin MacNeil wrote:
-> Adding a new socket option, SO_RCVMARK, to indicate that SO_MARK
-> should be included in the ancillary data returned by recvmsg().
+> Hi,
 >=20
-> Renamed the sock_recv_ts_and_drops() function to sock_recv_cmsgs().
+> On Wed, Apr 27, 2022 at 12:47 PM Miquel Raynal
+> <miquel.raynal@bootlin.com> wrote:
+> >
+> > We should never start a transmission after the queue has been stopped.
+> >
+> > But because it might work we don't kill the function here but rather
+> > warn loudly the user that something is wrong.
+> >
+> > Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
+> > ---
+
+[...]
+
+> > diff --git a/net/mac802154/tx.c b/net/mac802154/tx.c
+> > index a8a83f0167bf..021dddfea542 100644
+> > --- a/net/mac802154/tx.c
+> > +++ b/net/mac802154/tx.c
+> > @@ -124,6 +124,8 @@ bool ieee802154_queue_is_held(struct ieee802154_loc=
+al *local)
+> >  static netdev_tx_t
+> >  ieee802154_hot_tx(struct ieee802154_local *local, struct sk_buff *skb)
+> >  {
+> > +       WARN_ON_ONCE(ieee802154_queue_is_stopped(local));
+> > +
+> >         return ieee802154_tx(local, skb);
+> >  }
+> >
+> > diff --git a/net/mac802154/util.c b/net/mac802154/util.c
+> > index 847e0864b575..cfd17a7db532 100644
+> > --- a/net/mac802154/util.c
+> > +++ b/net/mac802154/util.c
+> > @@ -44,6 +44,24 @@ void ieee802154_stop_queue(struct ieee802154_local *=
+local)
+> >         rcu_read_unlock();
+> >  }
+> >
+> > +bool ieee802154_queue_is_stopped(struct ieee802154_local *local)
+> > +{
+> > +       struct ieee802154_sub_if_data *sdata;
+> > +       bool stopped =3D true;
+> > +
+> > +       rcu_read_lock();
+> > +       list_for_each_entry_rcu(sdata, &local->interfaces, list) {
+> > +               if (!sdata->dev)
+> > +                       continue;
+> > +
+> > +               if (!netif_queue_stopped(sdata->dev))
+> > +                       stopped =3D false;
+> > +       }
+> > +       rcu_read_unlock();
+> > +
+> > +       return stopped;
+> > +} =20
 >=20
-> Signed-off-by: Erin MacNeil <lnx.erin@gmail.com>
-> ---
->  net/can/bcm.c                           |  2 +-
->  net/can/j1939/socket.c                  |  2 +-
->  net/can/raw.c                           |  2 +-
+> sorry this makes no sense, you using net core functionality to check
+> if a queue is stopped in a net core netif callback. Whereas the sense
+> here for checking if the queue is really stopped is when 802.15.4
+> thinks the queue is stopped vs net core netif callback running. It
+> means for MLME-ops there are points we want to make sure that net core
+> is not handling any xmit and we should check this point and not
+> introducing net core functionality checks.
 
-For the net/can changes:
+I think I've mixed two things, your remark makes complete sense. I
+should instead here just check a 802.15.4 internal variable.
 
-Acked-by: Marc Kleine-Budde <mkl@pengutronix.de>
+> btw: if it's hit your if branch the first time you can break?
 
-regards,
-Marc
+Yes, we could definitely improve a bit the logic to break earlier, but
+in the end these checks won't remain I believe.
 
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde           |
-Embedded Linux                   | https://www.pengutronix.de  |
-Vertretung West/Dortmund         | Phone: +49-231-2826-924     |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-5555 |
+> I am not done with the review, this is just what I see now and we can
+> discuss that. Please be patient.
 
---twk6owb5igwqlcml
-Content-Type: application/pgp-signature; name="signature.asc"
+Sure, thanks for the quick feedback anyway!
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEBsvAIBsPu6mG7thcrX5LkNig010FAmJqNOgACgkQrX5LkNig
-010oWwf/YQtdMP9EhexK+DgW94m7NnyknIp9mL/PgS712H8tMgbdcesQGNCYJvag
-mWhVZeGq5XI/oC3he0VDrAvI+i0WVRjj4ljyd3hVnL5o6Y0+0V2kV8Te5+/qHKqp
-HG3KiLAkGO2LNKpoUXMVORu/+V4Mwl/oiggQbQ+tzAjZ4BIZ7fCHQVv39LSUDXAY
-NrrZ8oF+gi5QTRhvbvQXUlskp2Idym5ND+QevTxOX5Uo3zUV5H7ERo0iwpIZwRJw
-8/t1/a+pX6V8hgtHEgi8kmJOlw9AAWjiUFZY9ngresTMZL7pjyuz1cHTOaGt4Sve
-Y5A7ifvkLmiO+EpPJ8FsaWn53qpmgQ==
-=kyeH
------END PGP SIGNATURE-----
-
---twk6owb5igwqlcml--
+hanks,
+Miqu=C3=A8l
