@@ -2,32 +2,33 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B62AC433F5
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA452C433FE
 	for <linux-wpan@archiver.kernel.org>; Thu, 12 May 2022 14:33:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1355326AbiELOd1 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Thu, 12 May 2022 10:33:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52564 "EHLO
+        id S1351687AbiELOd2 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Thu, 12 May 2022 10:33:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52546 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1355337AbiELOd0 (ORCPT
+        with ESMTP id S1355339AbiELOd0 (ORCPT
         <rfc822;linux-wpan@vger.kernel.org>); Thu, 12 May 2022 10:33:26 -0400
-Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::229])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D92425D130;
-        Thu, 12 May 2022 07:33:19 -0700 (PDT)
+Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E690925E78D;
+        Thu, 12 May 2022 07:33:20 -0700 (PDT)
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id 5B329FF80F;
-        Thu, 12 May 2022 14:33:15 +0000 (UTC)
+        by mail.gandi.net (Postfix) with ESMTPSA id 3C8B0FF80B;
+        Thu, 12 May 2022 14:33:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1652365998;
+        t=1652365999;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=0Nolu4+cxZot8KO9Bdp6XNPXS6bQvguk5M6CgMmIybk=;
-        b=gBmQ5J0s5UAv4jRioQSfuDA4lqrk9vZfaEN0od+FtwB6gtHI7bdD32UviPwyG7RibqhUsb
-        LQnWPD/adT3aW7yYQ+//nrJfUn6pR4odm1Uv0EwbEGtgPc7CajTUZRO0YUQSr6NQ5/FyI0
-        NWYG8VRvPhvj1epWdRI0lIc7ARVLzt32LSVjwc8EfVu6GKHe6P/jZlblic0gZ2mz/fTjsU
-        stwkCxYp8Q1emwcAxGFga2ABDNvWUj3mzOYbNpL+jFZDzFWLnVI7nkT1ausVavVgikDp4r
-        0Y42A2CKl4vp2uh+aRvML9enGfIMf6S2DkWX+ysgz42IkyA1jX09CLiuim23Fw==
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ru7f6zDo127swMcyKVqCUc/U4VW+RvBLHSqyL/bVPt8=;
+        b=UKRlBlSVTBpCiwrHgRhY5bmwLsiFCxIYNeVON2E1uuDe1BHWKxyCFgqc0E6i7fsVX7kaQ1
+        mVUsmUburP9Yg/wohNHp1zFpofkOVAvbKKr9MPk9IkQuP2lcde3/yG/9M6ZnAiWOiGGyAv
+        kKahswJBOterWuJgmJcMr0miHR5++n+wrnL6GLmX7ayi6uBV94akcpjZAIukj5qmY8F0R5
+        BD7QyrtRzf6vNZNaouDYQcyh5d0Qs3ORwIeuT/68CE6N6A39MzwiS9pUc6yo/IeJJqadTz
+        ev/cLmIWhFvA/7GCYavpf8Y+JSnwCqN7C3alKW6pBpAc+qUfsvoxs5F6SvjupQ==
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
 To:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
@@ -41,10 +42,12 @@ Cc:     "David S. Miller" <davem@davemloft.net>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
         Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: [PATCH wpan-next v2 00/11] ieee802154: Synchronous Tx support
-Date:   Thu, 12 May 2022 16:33:03 +0200
-Message-Id: <20220512143314.235604-1-miquel.raynal@bootlin.com>
+Subject: [PATCH wpan-next v2 01/11] net: mac802154: Rename the synchronous xmit worker
+Date:   Thu, 12 May 2022 16:33:04 +0200
+Message-Id: <20220512143314.235604-2-miquel.raynal@bootlin.com>
 X-Mailer: git-send-email 2.27.0
+In-Reply-To: <20220512143314.235604-1-miquel.raynal@bootlin.com>
+References: <20220512143314.235604-1-miquel.raynal@bootlin.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
@@ -52,63 +55,61 @@ Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello,
+There are currently two driver hooks: one is synchronous, the other is
+not. We cannot rely on driver implementations to provide a synchronous
+API (which is related to the bus medium more than a wish to have a
+synchronized implementation) so we are going to introduce a sync API
+above any kind of driver transmit function. In order to clarify what
+this worker is for (synchronous driver implementation), let's rename it
+so that people don't get bothered by the fact that their driver does not
+make use of the "xmit worker" which is a too generic name.
 
-New series bringing support for that famous synchronous Tx API for MLME
-commands.
+Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
+---
+ net/mac802154/ieee802154_i.h | 2 +-
+ net/mac802154/main.c         | 2 +-
+ net/mac802154/tx.c           | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
 
-MLME commands will be used for during scan operations.
-
-We need to be able to be sure that all transfers finished and that no
-transfer will be queued for a short moment.
-
-Cheers,
-Miquèl
-
-Changes in v2:
-* Updated the main tx function error path.
-* Added a missing atomic_dec_at_test() call on the hold counter.
-* Always called (upon a certain condition) the queue wakeup helper from
-  the release queue helper (and similarly in the hold helper) and
-  squashed two existing patches in it to simplify the series.
-* Introduced a mutex to serialize accesses to the increment/decrement of
-  the hold counter and the wake up call.
-* Added a warning in case an MLME Tx gets triggered while the device was
-  stopped.
-* Used the rtnl to ensure the device cannot be stopped while an MLME
-  transmission is ongoing.
-
-Changes in v1 since this series got extracted from a bigger change:
-* Introduced a new atomic variable to know when the queue is actually
-  stopped. So far we only had an atomic to know when the queue was held
-  (indicates a transitioning state towards a stopped queue only) and
-  another atomic indicating if a transfer was still ongoing at this
-  point (used by the wait logic as a condition to wake up).
-
-
-Miquel Raynal (11):
-  net: mac802154: Rename the synchronous xmit worker
-  net: mac802154: Rename the main tx_work struct
-  net: mac802154: Enhance the error path in the main tx helper
-  net: mac802154: Follow the count of ongoing transmissions
-  net: mac802154: Bring the hability to hold the transmit queue
-  net: mac802154: Create a hot tx path
-  net: mac802154: Introduce a helper to disable the queue
-  net: mac802154: Introduce a tx queue flushing mechanism
-  net: mac802154: Introduce a synchronous API for MLME commands
-  net: mac802154: Add a warning in the hot path
-  net: mac802154: Add a warning in the slow path
-
- include/net/cfg802154.h      |   7 ++
- include/net/mac802154.h      |  27 --------
- net/ieee802154/core.c        |   3 +
- net/mac802154/cfg.c          |   4 +-
- net/mac802154/ieee802154_i.h |  37 +++++++++-
- net/mac802154/main.c         |   2 +-
- net/mac802154/tx.c           | 126 +++++++++++++++++++++++++++++++----
- net/mac802154/util.c         |  67 +++++++++++++++++--
- 8 files changed, 220 insertions(+), 53 deletions(-)
-
+diff --git a/net/mac802154/ieee802154_i.h b/net/mac802154/ieee802154_i.h
+index 1381e6a5e180..d7632c6d225f 100644
+--- a/net/mac802154/ieee802154_i.h
++++ b/net/mac802154/ieee802154_i.h
+@@ -123,7 +123,7 @@ ieee802154_sdata_running(struct ieee802154_sub_if_data *sdata)
+ extern struct ieee802154_mlme_ops mac802154_mlme_wpan;
+ 
+ void ieee802154_rx(struct ieee802154_local *local, struct sk_buff *skb);
+-void ieee802154_xmit_worker(struct work_struct *work);
++void ieee802154_xmit_sync_worker(struct work_struct *work);
+ netdev_tx_t
+ ieee802154_monitor_start_xmit(struct sk_buff *skb, struct net_device *dev);
+ netdev_tx_t
+diff --git a/net/mac802154/main.c b/net/mac802154/main.c
+index bd7bdb1219dd..392771bba9dd 100644
+--- a/net/mac802154/main.c
++++ b/net/mac802154/main.c
+@@ -95,7 +95,7 @@ ieee802154_alloc_hw(size_t priv_data_len, const struct ieee802154_ops *ops)
+ 
+ 	skb_queue_head_init(&local->skb_queue);
+ 
+-	INIT_WORK(&local->tx_work, ieee802154_xmit_worker);
++	INIT_WORK(&local->tx_work, ieee802154_xmit_sync_worker);
+ 
+ 	/* init supported flags with 802.15.4 default ranges */
+ 	phy->supported.max_minbe = 8;
+diff --git a/net/mac802154/tx.c b/net/mac802154/tx.c
+index c829e4a75325..97df5985b830 100644
+--- a/net/mac802154/tx.c
++++ b/net/mac802154/tx.c
+@@ -22,7 +22,7 @@
+ #include "ieee802154_i.h"
+ #include "driver-ops.h"
+ 
+-void ieee802154_xmit_worker(struct work_struct *work)
++void ieee802154_xmit_sync_worker(struct work_struct *work)
+ {
+ 	struct ieee802154_local *local =
+ 		container_of(work, struct ieee802154_local, tx_work);
 -- 
 2.27.0
 
