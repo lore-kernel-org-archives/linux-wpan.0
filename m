@@ -2,117 +2,158 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70A68C433F5
-	for <linux-wpan@archiver.kernel.org>; Thu, 12 May 2022 14:34:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D68C0C4332F
+	for <linux-wpan@archiver.kernel.org>; Thu, 12 May 2022 14:44:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1355357AbiELOd6 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Thu, 12 May 2022 10:33:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54134 "EHLO
+        id S1355522AbiELOo5 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Thu, 12 May 2022 10:44:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37858 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1355346AbiELOdx (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 12 May 2022 10:33:53 -0400
-Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 218A825F7AC;
-        Thu, 12 May 2022 07:33:36 -0700 (PDT)
-Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id C2A11FF813;
-        Thu, 12 May 2022 14:33:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1652366015;
+        with ESMTP id S1355519AbiELOov (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 12 May 2022 10:44:51 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id EDBBD261956
+        for <linux-wpan@vger.kernel.org>; Thu, 12 May 2022 07:44:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1652366688;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=V87QhPEf4fMiwaTvp/KGJROCR2XIjXq5O9RjBC7s++M=;
-        b=acGc/jj1fCb5b37McJP9Szmodr/aG3mUA7LKTP1ub+DwX15PGVFZ0xWK6o+3jglOWaDpRD
-        McJ5N+3fsf0TjDpyTn6ZN1xtveZcQFMr6LhCV90WxCB7wA2RWfLMILtxde4zT0PzWxaf9U
-        6oopz3TOG5FRV2HDGw2cyrXRdNtP99zNFekyOJKLsfTXYoqrZNaHLnDM48+xubkNsC/pd/
-        ncIEWWcGfqV4zFXcYD266CgoLhH5fyYLufeDRk+oPT4y451V3ygZRJ3UIG3VK7NV2Jq1s1
-        S1joC5vAdsRSUwbSLBJ2/c8VFA3i6Gru/9mZCwnffyc4QdAhkodOKeMhM+Gs0Q==
-From:   Miquel Raynal <miquel.raynal@bootlin.com>
-To:     Alexander Aring <alex.aring@gmail.com>,
+        bh=hDn+rJrqCWL0whZkTRg3HfuDKIQLnq7/rvfqZhPp9Dw=;
+        b=BT39E+Qhu+tOMMRdZ79aErajc3OIi3bdC9IQZUrcIeykk6SCOFEn0Vlit74vAMTGelBZ0o
+        NJUQWOgOwahX1GRDsqQHeBE3/Z4zj+oPq7l0b9bniYIccPKq+ZHzePxBSqw5ZzBXg9FOp4
+        ah+LpVak/r3ouwOPn+hMq7mp7P2G+yU=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-1-jNotzL1yPUaq9Bm4OQpdfA-1; Thu, 12 May 2022 10:44:46 -0400
+X-MC-Unique: jNotzL1yPUaq9Bm4OQpdfA-1
+Received: by mail-qk1-f199.google.com with SMTP id x191-20020a3763c8000000b0069fb66f3901so4248120qkb.12
+        for <linux-wpan@vger.kernel.org>; Thu, 12 May 2022 07:44:46 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=hDn+rJrqCWL0whZkTRg3HfuDKIQLnq7/rvfqZhPp9Dw=;
+        b=kUBAC4aKmVMPTCaeo2ueycEP7ad9fvzSLvyZ0qwebzbVtk0vvpjYcjXNq3bt833no1
+         wejfF8swvyYsHfXV7s6c1J+cNVrrkg7EfsY3bR5i/E3LMcY1BXdlhBz39IT8H4gF0bgV
+         bGJszCxBs28cexYHuFinPR1cig7rPSa1NiyYKHmhGqNI59e+USgu8c6lSwEVIbrnmviR
+         /PqGXOTM+XwxRr0RyiW+HoIAWdk5Oj0ekSOM01xPNbjFrGI6ikkX8xpIHLIzbIZIcc+O
+         puJR+GvFKR5qfli7MYoBcos07nKzUXjmk0dA1uR+NPBm/4FURyPL2OyOXqVsUL0Gw+I5
+         CGsA==
+X-Gm-Message-State: AOAM530dszGKCIlWZsxFQKReWqTxsDIcSLJsF/3o/eAUkhW5str059OU
+        WSrtYXL10Si9jCPr29VH3fiEydgt/inPhAt1gkbLf3sOhka9wKuOsVqCYvFT/XOjM3+hZI5Ogfq
+        P0UDYIAjiIwfmiJ9sj4b355wHwReXbRvSOYqWmw==
+X-Received: by 2002:a05:622a:351:b0:2f3:d8e4:529f with SMTP id r17-20020a05622a035100b002f3d8e4529fmr57468qtw.123.1652366686178;
+        Thu, 12 May 2022 07:44:46 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyR+6Osf3CvRwy7Ah7LACYipP4JyjvLB85JHn/ZxzsxI0lx2gfrRsWsVax9Le6bXtd4m3xXaSGkWkuODNi5pyY=
+X-Received: by 2002:a05:622a:351:b0:2f3:d8e4:529f with SMTP id
+ r17-20020a05622a035100b002f3d8e4529fmr57452qtw.123.1652366685957; Thu, 12 May
+ 2022 07:44:45 -0700 (PDT)
+MIME-Version: 1.0
+References: <20220427164659.106447-1-miquel.raynal@bootlin.com>
+ <20220427164659.106447-7-miquel.raynal@bootlin.com> <CAK-6q+jCYDQ-rtyawz1m2Yt+ti=3d6PrhZebB=-PjcX-6L-Kdg@mail.gmail.com>
+ <20220510165237.43382f42@xps13> <CAK-6q+jeubhGah2gG1JJxfmOW=sNdMrLf+mk_a3X_r+Na=tHXg@mail.gmail.com>
+ <20220512163307.540d635d@xps13>
+In-Reply-To: <20220512163307.540d635d@xps13>
+From:   Alexander Aring <aahringo@redhat.com>
+Date:   Thu, 12 May 2022 10:44:35 -0400
+Message-ID: <CAK-6q+h07LM1-Cu_mkxAZWN2kG9LLxoKvXxUiQ5DPSYwRkbXZw@mail.gmail.com>
+Subject: Re: [PATCH wpan-next 06/11] net: mac802154: Hold the transmit queue
+ when relevant
+To:     Miquel Raynal <miquel.raynal@bootlin.com>
+Cc:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
-        linux-wpan@vger.kernel.org
-Cc:     "David S. Miller" <davem@davemloft.net>,
+        linux-wpan@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+        Network Development <netdev@vger.kernel.org>,
         David Girault <david.girault@qorvo.com>,
         Romuald Despres <romuald.despres@qorvo.com>,
         Frederic Blain <frederic.blain@qorvo.com>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
-        Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-        Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: [PATCH wpan-next v2 11/11] net: mac802154: Add a warning in the slow path
-Date:   Thu, 12 May 2022 16:33:14 +0200
-Message-Id: <20220512143314.235604-12-miquel.raynal@bootlin.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20220512143314.235604-1-miquel.raynal@bootlin.com>
-References: <20220512143314.235604-1-miquel.raynal@bootlin.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+        Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-In order to be able to detect possible conflicts between the net
-interface core and the ieee802154 core, let's add a warning in the slow
-path: we want to be sure that whenever we start an asynchronous MLME
-transmission (which can be fully asynchronous) the net core somehow
-agrees that this transmission is possible, ie. the device was not
-stopped. Warning in this case would allow us to track down more easily
-possible issues with the MLME logic if we ever get reports.
+Hi,
 
-Unlike in the hot path, such a situation cannot be handled.
+On Thu, May 12, 2022 at 10:33 AM Miquel Raynal
+<miquel.raynal@bootlin.com> wrote:
+>
+> Hi Alexander,
+>
+> aahringo@redhat.com wrote on Wed, 11 May 2022 09:09:40 -0400:
+>
+> > Hi,
+> >
+> > On Tue, May 10, 2022 at 10:52 AM Miquel Raynal
+> > <miquel.raynal@bootlin.com> wrote:
+> > >
+> > > Hi Alex,
+> > >
+> > > > > --- a/net/mac802154/tx.c
+> > > > > +++ b/net/mac802154/tx.c
+> > > > > @@ -106,6 +106,21 @@ ieee802154_tx(struct ieee802154_local *local, struct sk_buff *skb)
+> > > > >         return NETDEV_TX_OK;
+> > > > >  }
+> > > > >
+> > > > > +void ieee802154_hold_queue(struct ieee802154_local *local)
+> > > > > +{
+> > > > > +       atomic_inc(&local->phy->hold_txs);
+> > > > > +}
+> > > > > +
+> > > > > +void ieee802154_release_queue(struct ieee802154_local *local)
+> > > > > +{
+> > > > > +       atomic_dec(&local->phy->hold_txs);
+> > > > > +}
+> > > > > +
+> > > > > +bool ieee802154_queue_is_held(struct ieee802154_local *local)
+> > > > > +{
+> > > > > +       return atomic_read(&local->phy->hold_txs);
+> > > > > +}
+> > > >
+> > > > I am not getting this, should the release_queue() function not do
+> > > > something like:
+> > > >
+> > > > if (atomic_dec_and_test(hold_txs))
+> > > >       ieee802154_wake_queue(local);
+> > > >
+> > > > I think we don't need the test of "ieee802154_queue_is_held()" here,
+> > > > then we need to replace all stop_queue/wake_queue with hold and
+> > > > release?
+> > >
+> > > That's actually a good idea. I've implemented it and it looks nice too.
+> > > I'll clean this up and share a new version with:
+> > > - The wake call checked everytime hold_txs gets decremented
+> > > - The removal of the _queue_is_held() helper
+> > > - _wake/stop_queue() turned static
+> > > - _hold/release_queue() used everywhere
+> > >
+> >
+> > I think there is also a lock necessary for atomic inc/dec hitting zero
+> > and the stop/wake call afterwards...
+>
+> Mmmh that is true, it can race. I've introduced a mutex (I think it's
+> safe but it can be turned into a spinlock if proven necessary) to
+> secure these increment/decrement+wakeup operations.
+>
 
-Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
----
- net/mac802154/tx.c | 25 +++++++++++++++++++++++++
- 1 file changed, 25 insertions(+)
+be aware that you might call these functions from different contexts,
+test your patches with PROVE_LOCKING enabled.
 
-diff --git a/net/mac802154/tx.c b/net/mac802154/tx.c
-index a3c9f194c025..d61b076239c3 100644
---- a/net/mac802154/tx.c
-+++ b/net/mac802154/tx.c
-@@ -132,6 +132,25 @@ int ieee802154_sync_and_hold_queue(struct ieee802154_local *local)
- 	return ret;
- }
- 
-+static bool ieee802154_netif_is_down(struct ieee802154_local *local)
-+{
-+	struct ieee802154_sub_if_data *sdata;
-+	bool is_down = false;
-+
-+	rcu_read_lock();
-+	list_for_each_entry_rcu(sdata, &local->interfaces, list) {
-+		if (!sdata->dev)
-+			continue;
-+
-+		is_down = !(sdata->dev->flags & IFF_UP);
-+		if (is_down)
-+			break;
-+	}
-+	rcu_read_unlock();
-+
-+	return is_down;
-+}
-+
- int ieee802154_mlme_tx(struct ieee802154_local *local, struct sk_buff *skb)
- {
- 	int ret;
-@@ -145,6 +164,12 @@ int ieee802154_mlme_tx(struct ieee802154_local *local, struct sk_buff *skb)
- 	if (!local->open_count)
- 		return -EBUSY;
- 
-+	/* Warn if the ieee802154 core thinks MLME frames can be sent while the
-+	 * net interface expects this cannot happen.
-+	 */
-+	if (WARN_ON_ONCE(ieee802154_netif_is_down(local)))
-+		return -EHOSTDOWN;
-+
- 	ieee802154_sync_and_hold_queue(local);
- 
- 	ieee802154_tx(local, skb);
--- 
-2.27.0
+> > ,there are also a lot of
+> > optimization techniques to only hold the lock for hitting zero cases
+> > in such areas. However we will see...
+>
+> I am not aware of technical solutions to avoid the locking in these
+> cases, what do you have in mind? Otherwise I propose just to come up
+> with a working and hopefully solid solution and then we'll see how to
+> optimize.
+
+Yes, it's not so important...
+
+- Alex
 
