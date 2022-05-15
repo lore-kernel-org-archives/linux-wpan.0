@@ -2,61 +2,61 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B8D9C433EF
-	for <linux-wpan@archiver.kernel.org>; Sun, 15 May 2022 22:56:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F80DC433EF
+	for <linux-wpan@archiver.kernel.org>; Sun, 15 May 2022 23:04:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234023AbiEOW4X (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Sun, 15 May 2022 18:56:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59178 "EHLO
+        id S234055AbiEOXEK (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Sun, 15 May 2022 19:04:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44312 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236976AbiEOW4V (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Sun, 15 May 2022 18:56:21 -0400
+        with ESMTP id S231549AbiEOXEI (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Sun, 15 May 2022 19:04:08 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 00971DF04
-        for <linux-wpan@vger.kernel.org>; Sun, 15 May 2022 15:56:19 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 501EA3617C
+        for <linux-wpan@vger.kernel.org>; Sun, 15 May 2022 16:04:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1652655378;
+        s=mimecast20190719; t=1652655846;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=W8jihZqsmnF0KMPdwjssLfaNbHl50i9BdsMYBRqa0ZA=;
-        b=hB/qxl139MzOn5OK7nYoeC5Wiq1ldbqfuD7E74jpFi5IC3OXeyYhfnWyFYUdaBzqY3+OLr
-        wTW4dol8E4hlYHH8+Wa76nD8l/uSQKcaeu9v/IgGdNEoUztBlIEofxX3iUi/zygXGmbrDd
-        hZsqlAr9MYZk7zArULjGuPctq8ozIIE=
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
- [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=HED6sqrRMHt5M94sg8hRTn2o/jwlXD/g70Ops+h6TfM=;
+        b=NRtKCOlLOkrNVf1RmfSR6MDSvOY0PE4AY4T/vFbMG0bt8g8CJaLIiaXa86XNROKBGxQBa/
+        0kH72Z/tiASOUFWfSXVk/91oQGTjguox2Sf91NJNb9Isv05CHgGpBIZ272beWzj/nXcFo0
+        c5di/KYMFzXnaVVrl5yemu1X7PYY6BA=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-516-7FWutxI3Ok-marA7Z6ZFmQ-1; Sun, 15 May 2022 18:56:17 -0400
-X-MC-Unique: 7FWutxI3Ok-marA7Z6ZFmQ-1
-Received: by mail-qk1-f199.google.com with SMTP id z12-20020ae9e60c000000b006a0e769f9caso9446748qkf.5
-        for <linux-wpan@vger.kernel.org>; Sun, 15 May 2022 15:56:17 -0700 (PDT)
+ us-mta-556-esTDzromOSiokn2XpJ9Ukg-1; Sun, 15 May 2022 19:04:05 -0400
+X-MC-Unique: esTDzromOSiokn2XpJ9Ukg-1
+Received: by mail-qk1-f198.google.com with SMTP id z12-20020ae9e60c000000b006a0e769f9caso9455609qkf.5
+        for <linux-wpan@vger.kernel.org>; Sun, 15 May 2022 16:04:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=W8jihZqsmnF0KMPdwjssLfaNbHl50i9BdsMYBRqa0ZA=;
-        b=Q8366+SAUjwHc/VFNZP80Svmzl+0BMoW0rPRjpFsNIvtuhUMiQmSDMgZnWj5JYJjCM
-         CRMKw97EjdRaWqDTJJhAtmWsk8Ya2luQGbpy0W4Ciyf2eGfZl3xEyZZfxRBu7vnY0ZUo
-         OGJeAdyj8QmUKEWwnm/rJwWA1NF3p3mEMfpsNviwJsJW8+iT0+AVcmKK8HUC5kIDWlZ6
-         wwt+oSxHTmEySmz7onVw3NTrwwFfrXSBXE+MQ1f/fxBIZhaGbDbtdHYYLMHtV70lVkIf
-         8LDnOHp5RKMseGFU2w/MZw0L6HoREj+YCySrUlQWWsWfniHb5Qkbdgnhak2paS7Zlj6k
-         I+Kg==
-X-Gm-Message-State: AOAM5308NBLTZD0ZAIVbHKvtCfqDbWliE11DroQ+Jo5h4o5HrdkV5OC2
-        hJ1XTMgMUjKuCjeFY7fx4SHqylOuCo7SPzpWS5sQaPLpGKzUJ5AuTlb4SpvIOYqpvVzGcl4GDtC
-        Dt/DdDYn4Z8BrK1T0qK2SC6OI6/puraMQFpR2jQ==
-X-Received: by 2002:a05:620a:4403:b0:6a0:5093:1742 with SMTP id v3-20020a05620a440300b006a050931742mr10521530qkp.691.1652655377057;
-        Sun, 15 May 2022 15:56:17 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzcmfziaShgyFbkoo5M2L5AciQaXrdHp6uz3PIqh90PF4gm8hy73Lf6yjPFlz1WN18rBr/Ia9rKQpxiF409ajA=
-X-Received: by 2002:a05:620a:4403:b0:6a0:5093:1742 with SMTP id
- v3-20020a05620a440300b006a050931742mr10521526qkp.691.1652655376867; Sun, 15
- May 2022 15:56:16 -0700 (PDT)
+        bh=HED6sqrRMHt5M94sg8hRTn2o/jwlXD/g70Ops+h6TfM=;
+        b=qC/F2gG4ViocnKL3u6zsTwfu0Y5PkugET7mcXX/AK3mL6q/5MJ+lw5muguUgGZ740W
+         v1oetmtQak7shVvP8eQtCbUZ3uosH5gFC7ku73yxXUkj9uEYBbqBQFt4wu6rtuCX5CTK
+         zJLT3cNlhR1Kg6T3ndYoSDa9tj/Lfbh8FySTFoHcNO3ESHRocTZH3K/ag3Mq1nloRmY5
+         OB9NdSKLyDuGHJpC/D9aTnyzWfwtmYXdv9UVlLf9WJ/wMohMw7p99M/WnkD0F22j1Zp1
+         OhJcZ0cb7x0c0e5qU9CqDJ3OjBD25y30AmA+hHRlk/RyBUAfu9PUOYrpTqWxlzFAr3Vt
+         46yA==
+X-Gm-Message-State: AOAM533bAV2F0JJK5SQ352x3WmLJ9663e54y/OFTHEkb//GglifiPs4v
+        5fEVodzqendVPP3YHfgK4heXYwwG2Cgw8r7k1Lqmls6RYmmUag5yENKBco2gW0SwBikmRi2Bg0R
+        JVx73GaGmXy8levjOWg8RNbAyJIE2gyyZqx6ybw==
+X-Received: by 2002:a05:620a:919:b0:69f:e373:3de8 with SMTP id v25-20020a05620a091900b0069fe3733de8mr10431658qkv.27.1652655844632;
+        Sun, 15 May 2022 16:04:04 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxVzzoy/qyjeaBmM2f/mbn7p3QjZ3CLZ+xk+5lleqUjWBiKRiluPA00va3+zN49cME8YcJnOEtooTr3RySqlk4=
+X-Received: by 2002:a05:620a:919:b0:69f:e373:3de8 with SMTP id
+ v25-20020a05620a091900b0069fe3733de8mr10431642qkv.27.1652655844437; Sun, 15
+ May 2022 16:04:04 -0700 (PDT)
 MIME-Version: 1.0
 References: <20220512143314.235604-1-miquel.raynal@bootlin.com>
  <20220512143314.235604-10-miquel.raynal@bootlin.com> <CAK-6q+ipHdD=NJB2N7SHQ0TUvNpc0GQXZ7dWM9nDxqyqNgxdSA@mail.gmail.com>
 In-Reply-To: <CAK-6q+ipHdD=NJB2N7SHQ0TUvNpc0GQXZ7dWM9nDxqyqNgxdSA@mail.gmail.com>
 From:   Alexander Aring <aahringo@redhat.com>
-Date:   Sun, 15 May 2022 18:56:05 -0400
-Message-ID: <CAK-6q+ivVCJOEF+MN-y64K1M-nf2ak0CUqjj0tiiyinaNCAE5w@mail.gmail.com>
+Date:   Sun, 15 May 2022 19:03:53 -0400
+Message-ID: <CAK-6q+i_T+FaK0tX6tF38VjyEfSzDi-QC85MTU2=4soepAag8g@mail.gmail.com>
 Subject: Re: [PATCH wpan-next v2 09/11] net: mac802154: Introduce a
  synchronous API for MLME commands
 To:     Miquel Raynal <miquel.raynal@bootlin.com>
@@ -129,16 +129,19 @@ On Sun, May 15, 2022 at 6:28 PM Alexander Aring <aahringo@redhat.com> wrote:
 >
 > I think we should make an ASSERT_RTNL() here, the lock needs to be
 > earlier than that over the whole MLME op. MLME can trigger more than
+
+not over the whole MLME_op, that's terrible to hold the rtnl lock so
+long... so I think this is fine that some netdev call will interfere
+with this transmission.
+So forget about the ASSERT_RTNL() here, it's fine (I hope).
+
 > one message, the whole sync_hold/release queue should be earlier than
 > that... in my opinion is it not right to allow other messages so far
 > an MLME op is going on? I am not sure what the standard says to this,
 > but I think it should be stopped the whole time? All those sequence
-> diagrams show only some specific frames, also remember that on the
-> receive side we drop all other frames if MLME op (e.g. scan) is going
-> on?
 
-Maybe some mlme_op_pre(), ... mlme_tx(), ..., mlme_tx(), ...,
-mlme_op_post() handling?
+Whereas the stop of the netdev queue makes sense for the whole mlme-op
+(in my opinion).
 
 - Alex
 
