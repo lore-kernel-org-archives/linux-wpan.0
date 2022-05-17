@@ -2,32 +2,33 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61269C433F5
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E99F3C433FE
 	for <linux-wpan@archiver.kernel.org>; Tue, 17 May 2022 16:35:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347238AbiEQQfD (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 17 May 2022 12:35:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35108 "EHLO
+        id S1350956AbiEQQfE (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 17 May 2022 12:35:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35020 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350912AbiEQQfA (ORCPT
+        with ESMTP id S1350959AbiEQQfA (ORCPT
         <rfc822;linux-wpan@vger.kernel.org>); Tue, 17 May 2022 12:35:00 -0400
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::228])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 567404EF40;
-        Tue, 17 May 2022 09:34:56 -0700 (PDT)
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D2FF4EDF1;
+        Tue, 17 May 2022 09:34:58 -0700 (PDT)
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id E4FD41BF206;
-        Tue, 17 May 2022 16:34:51 +0000 (UTC)
+        by mail.gandi.net (Postfix) with ESMTPSA id BBAD11BF20B;
+        Tue, 17 May 2022 16:34:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1652805294;
+        t=1652805297;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=1C6/OoL4x3xbcNLsvvdThUQzvrdFL+c7yTwDjfyPM+g=;
-        b=aD2gQn7j877VzjZrfHlvv3aeVXEe2vD9tSh0CZzOGNx5FKsxQweFODPmE0vzfdjfiySU5I
-        4GHPJDwyYt19Q1PtsEmkSo7xgP8qdpHUs1Ylhp9Nt39qS55Na+D6qCfkZqiYuGk3DhMLNa
-        qAHitdAoTOopRg5LqOHt8YJAUItZtjkM98mENJTFtm4zx3oQrgV4gMAiZQS148Vgl0Xncu
-        TQ9mQeJpLcr0XW3ksC8gpU8M8ClzKoa8kZ91oYJDTR7gggr+Oqvi/zvZfXhw2DmVhFLIlz
-        CEy+ffUHeQOlOkCIXcoKuXhczNRbFrNnHWkqXWZroM7yrPudbIeMqN7463LuQA==
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=sHe7QpRZDkkDN5jx8ES3bIsouncXdhD8eetbRXsACsQ=;
+        b=VDsskbylzk/uVJdYhL7VKYo4gUMAH4vh+6o4Z32Ei3/wjtTIFEWu7R920E3BA6fGh3jxKS
+        vp+cp0i+3bAuZK3zmjk/vKukr+uHMW1+2aU/7Dq5VXVHVRalFhkUhaMiL9eLselu5vQHqF
+        dOjCupA0Yj/WxAKqmMdAmbSgkAWpmfOhxSdtX9sb/Is4pSrgRxX1CoXCnPYq7Yxm9pZYTv
+        bhOz6j5NPT3C2MgwN55wB79TcK20Nio69f9GgbZkTs3+xdgAfOeOw+nVNz7wals8jKET57
+        WawuUOrJfBGmXq+3szkoDa8cSv/OxKAK52Kf5/6aFLktLx1PV966GicESo0HpA==
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
 To:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
@@ -41,10 +42,12 @@ Cc:     David Girault <david.girault@qorvo.com>,
         Jakub Kicinski <kuba@kernel.org>,
         Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
         Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: [PATCH wpan-next v3 00/11] ieee802154: Synchronous Tx support
-Date:   Tue, 17 May 2022 18:34:39 +0200
-Message-Id: <20220517163450.240299-1-miquel.raynal@bootlin.com>
+Subject: [PATCH wpan-next v3 02/11] net: mac802154: Rename the main tx_work struct
+Date:   Tue, 17 May 2022 18:34:41 +0200
+Message-Id: <20220517163450.240299-3-miquel.raynal@bootlin.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20220517163450.240299-1-miquel.raynal@bootlin.com>
+References: <20220517163450.240299-1-miquel.raynal@bootlin.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
@@ -52,73 +55,78 @@ Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello,
+This entry is dedicated to synchronous transmissions done by drivers
+without async hook. Make this clearer that this is not a work that any
+driver can use by at least prefixing it with "sync_". While at it, let's
+enhance the comment explaining why we choose one or the other.
 
-This series brings support for that famous synchronous Tx API for MLME
-commands.
+Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
+---
+ net/mac802154/ieee802154_i.h | 2 +-
+ net/mac802154/main.c         | 2 +-
+ net/mac802154/tx.c           | 9 ++++++---
+ 3 files changed, 8 insertions(+), 5 deletions(-)
 
-MLME commands will be used during scan operations. In this situation,
-we need to be sure that all transfers finished and that no transfer
-will be queued for a short moment.
-
-Cheers,
-Miquèl
-
-Changes in v3:
-* Tested with lockdep enabled, a more aggressive preemption level and
-  the sleeping while atomic warnings enabled.
-* Changed the hold/release queue mutex into a spinlock.
-* Split the mlme_tx function into three, one to hold the queue, then
-  another part that does takes the rtnl and has the real content, and a
-  last helper to release the queue.
-* Fixed the warning condition in the slow path.
-* Used an unsigned long and test/set_bit helpers to follow the queue
-  state instead of an atomic_t.
-
-Changes in v2:
-* Updated the main tx function error path.
-* Added a missing atomic_dec_at_test() call on the hold counter.
-* Always called (upon a certain condition) the queue wakeup helper from
-  the release queue helper (and similarly in the hold helper) and
-  squashed two existing patches in it to simplify the series.
-* Introduced a mutex to serialize accesses to the increment/decrement of
-  the hold counter and the wake up call.
-* Added a warning in case an MLME Tx gets triggered while the device was
-  stopped.
-* Used the rtnl to ensure the device cannot be stopped while an MLME
-  transmission is ongoing.
-
-Changes in v1 since this series got extracted from a bigger change:
-* Introduced a new atomic variable to know when the queue is actually
-  stopped. So far we only had an atomic to know when the queue was held
-  (indicates a transitioning state towards a stopped queue only) and
-  another atomic indicating if a transfer was still ongoing at this
-  point (used by the wait logic as a condition to wake up).
-
-
-Miquel Raynal (11):
-  net: mac802154: Rename the synchronous xmit worker
-  net: mac802154: Rename the main tx_work struct
-  net: mac802154: Enhance the error path in the main tx helper
-  net: mac802154: Follow the count of ongoing transmissions
-  net: mac802154: Bring the ability to hold the transmit queue
-  net: mac802154: Create a hot tx path
-  net: mac802154: Introduce a helper to disable the queue
-  net: mac802154: Introduce a tx queue flushing mechanism
-  net: mac802154: Introduce a synchronous API for MLME commands
-  net: mac802154: Add a warning in the hot path
-  net: mac802154: Add a warning in the slow path
-
- include/net/cfg802154.h      |   9 ++-
- include/net/mac802154.h      |  27 -------
- net/ieee802154/core.c        |   3 +
- net/mac802154/cfg.c          |   4 +-
- net/mac802154/ieee802154_i.h |  37 ++++++++-
- net/mac802154/main.c         |   2 +-
- net/mac802154/tx.c           | 147 +++++++++++++++++++++++++++++++----
- net/mac802154/util.c         |  71 +++++++++++++++--
- 8 files changed, 246 insertions(+), 54 deletions(-)
-
+diff --git a/net/mac802154/ieee802154_i.h b/net/mac802154/ieee802154_i.h
+index d7632c6d225f..a8b7b9049f14 100644
+--- a/net/mac802154/ieee802154_i.h
++++ b/net/mac802154/ieee802154_i.h
+@@ -55,7 +55,7 @@ struct ieee802154_local {
+ 	struct sk_buff_head skb_queue;
+ 
+ 	struct sk_buff *tx_skb;
+-	struct work_struct tx_work;
++	struct work_struct sync_tx_work;
+ 	/* A negative Linux error code or a null/positive MLME error status */
+ 	int tx_result;
+ };
+diff --git a/net/mac802154/main.c b/net/mac802154/main.c
+index 392771bba9dd..40fab08df24b 100644
+--- a/net/mac802154/main.c
++++ b/net/mac802154/main.c
+@@ -95,7 +95,7 @@ ieee802154_alloc_hw(size_t priv_data_len, const struct ieee802154_ops *ops)
+ 
+ 	skb_queue_head_init(&local->skb_queue);
+ 
+-	INIT_WORK(&local->tx_work, ieee802154_xmit_sync_worker);
++	INIT_WORK(&local->sync_tx_work, ieee802154_xmit_sync_worker);
+ 
+ 	/* init supported flags with 802.15.4 default ranges */
+ 	phy->supported.max_minbe = 8;
+diff --git a/net/mac802154/tx.c b/net/mac802154/tx.c
+index 97df5985b830..a01689ddd547 100644
+--- a/net/mac802154/tx.c
++++ b/net/mac802154/tx.c
+@@ -25,7 +25,7 @@
+ void ieee802154_xmit_sync_worker(struct work_struct *work)
+ {
+ 	struct ieee802154_local *local =
+-		container_of(work, struct ieee802154_local, tx_work);
++		container_of(work, struct ieee802154_local, sync_tx_work);
+ 	struct sk_buff *skb = local->tx_skb;
+ 	struct net_device *dev = skb->dev;
+ 	int res;
+@@ -76,7 +76,10 @@ ieee802154_tx(struct ieee802154_local *local, struct sk_buff *skb)
+ 	/* Stop the netif queue on each sub_if_data object. */
+ 	ieee802154_stop_queue(&local->hw);
+ 
+-	/* async is priority, otherwise sync is fallback */
++	/* Drivers should preferably implement the async callback. In some rare
++	 * cases they only provide a sync callback which we will use as a
++	 * fallback.
++	 */
+ 	if (local->ops->xmit_async) {
+ 		unsigned int len = skb->len;
+ 
+@@ -90,7 +93,7 @@ ieee802154_tx(struct ieee802154_local *local, struct sk_buff *skb)
+ 		dev->stats.tx_bytes += len;
+ 	} else {
+ 		local->tx_skb = skb;
+-		queue_work(local->workqueue, &local->tx_work);
++		queue_work(local->workqueue, &local->sync_tx_work);
+ 	}
+ 
+ 	return NETDEV_TX_OK;
 -- 
 2.34.1
 
