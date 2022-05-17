@@ -2,184 +2,91 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F19DC433EF
-	for <linux-wpan@archiver.kernel.org>; Mon, 16 May 2022 21:56:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40A5BC433EF
+	for <linux-wpan@archiver.kernel.org>; Tue, 17 May 2022 02:12:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348267AbiEPV4t (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 16 May 2022 17:56:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59902 "EHLO
+        id S230264AbiEQCM4 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 16 May 2022 22:12:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36788 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345860AbiEPV4s (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 16 May 2022 17:56:48 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5AB0435861;
-        Mon, 16 May 2022 14:56:47 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 0540FB8167E;
-        Mon, 16 May 2022 21:56:46 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E64BC385AA;
-        Mon, 16 May 2022 21:56:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1652738204;
-        bh=ls8JgtuOpHZ2dhUTbzwtVGDTIKO7WtBYziHxh3LZSZU=;
-        h=From:To:Cc:Subject:Date:From;
-        b=V/r3D+u2bdt+CXB8qu+SyLEotrkW0XR7/NAFmd2zPqtoZ63r6lUsQI2oFqF1kjWx9
-         AWen9YpY8FpYoGKZXECjy4r2EQn735o7NjJZgODw6db7QlJ4/frz38f/xdSdFT9u5I
-         YiG+3jcLuDVcW04vOsfqkF/b4LGTcG4EIf7HMOQLqetBSkb7U7KR9RfGUd03ndXuPQ
-         FqmHJ3i8FeeICIp+CZl84CDCWx91s4lp4l8ZJ9RoIzPMqAXM6XnqIs7+GjdYjhIv38
-         ra6391cW0k4oBMw0AlE4s2DrZp/IrQlvMcl3QMA4DevODw8kpXO5PcfF+v0VWVcz1U
-         nNOBsEnwojAtA==
-From:   Jakub Kicinski <kuba@kernel.org>
-To:     davem@davemloft.net
-Cc:     netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
-        Jakub Kicinski <kuba@kernel.org>, johannes@sipsolutions.net,
-        alex.aring@gmail.com, stefan@datenfreihafen.org,
-        mareklindner@neomailbox.ch, sw@simonwunderlich.de, a@unstable.cc,
-        sven@narfation.org, linux-wireless@vger.kernel.org,
-        linux-wpan@vger.kernel.org
-Subject: [PATCH net-next] net: ifdefy the wireless pointers in struct net_device
-Date:   Mon, 16 May 2022 14:56:38 -0700
-Message-Id: <20220516215638.1787257-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.34.3
+        with ESMTP id S229479AbiEQCMy (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 16 May 2022 22:12:54 -0400
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9534446159;
+        Mon, 16 May 2022 19:12:50 -0700 (PDT)
+Received: by mail-pj1-x1031.google.com with SMTP id l20-20020a17090a409400b001dd2a9d555bso1047784pjg.0;
+        Mon, 16 May 2022 19:12:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=3ZM/bXNrUv0VYX8K23DwSrqZnrWh9hjgIxkuc6viZwo=;
+        b=G/Uq+Bibk8biPAB2nd1ne5S03dV1mVV4KPJvjbWokbD/HF/VcN+SLSgWMLRsgV1EhH
+         0/G6np4gtSaOLlp4dBI9ZxH3eJYXBQXo1biwU86K9ixDplyGT8zIiv8+8A8DoKrZRhvu
+         HcMcvLWP05k1J8Ie9LB3sgo4L+bPtwxb8xZRR+5qEzYyJVsuAfhCU0qAInTTi/Qm//61
+         VYv6/jjC45626tW8k+QweHPLSyNbQDk/UvJNupuuHQYEqJWiqkehlEBKrDHL6uNWzgWV
+         oTG5v+Bpmscw/z2c2ldKS+7zAm8EGJJ4m5LjPbda8a6BmmWOun8Wjbb96IeDqfbQ/gas
+         8yPA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=3ZM/bXNrUv0VYX8K23DwSrqZnrWh9hjgIxkuc6viZwo=;
+        b=wZDRCYL/7ZiTayTfyDHEHOQQw670z1z6h1raHjKJ8bUWCb4uZ37syuKhB+V+OMf2D5
+         QMwGa9URAtpRqmIbCaDQEmGxBZPHXfy1Y621JQk6qhjak5QiB1jB3mLKlNNV7rD0Xhue
+         Dfx86EVpErCJVKWd4I9onDl6ww2ChzRzDEj+CI5OjK9g96cq73wcp1C0BvUfOLQME1mn
+         ORsprtTqvnvgIT/TK4UoryyBIa24kHx2xle7rhU6FgZqb15alWCLZejte5vDUX8ufp91
+         hSeETFpbCTE8a6MN3fFd8Cx7iNqlMC8Q6zere5DkUMBXCyLb3wRsY0VmyDdz2aaC5SAQ
+         4hUA==
+X-Gm-Message-State: AOAM532LXO3wSNfmmZRVZ3CLoPYOGDxpoNQ9zFh1U74PtGMaZ8w9ROun
+        RVlDaoXe0Pa9pMWNMlNP7V+mRWdoWMc=
+X-Google-Smtp-Source: ABdhPJx6ME/ewGYrihpAFJodPTzj9vcacNJMLG0j8CUptfyQtZTu3nMyZiN/77LkGUi5NhWhbn+7XA==
+X-Received: by 2002:a17:90a:764b:b0:1df:58f2:784c with SMTP id s11-20020a17090a764b00b001df58f2784cmr7744949pjl.122.1652753570063;
+        Mon, 16 May 2022 19:12:50 -0700 (PDT)
+Received: from [192.168.1.3] (ip72-194-116-95.oc.oc.cox.net. [72.194.116.95])
+        by smtp.gmail.com with ESMTPSA id n8-20020a654cc8000000b003c14af5061asm7421832pgt.50.2022.05.16.19.12.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 16 May 2022 19:12:49 -0700 (PDT)
+Message-ID: <8e9f1b04-d17b-2812-22bb-e62b5560aa6e@gmail.com>
+Date:   Mon, 16 May 2022 19:12:41 -0700
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.0
+Subject: Re: [PATCH net-next] net: ifdefy the wireless pointers in struct
+ net_device
+Content-Language: en-US
+To:     Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
+Cc:     netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+        johannes@sipsolutions.net, alex.aring@gmail.com,
+        stefan@datenfreihafen.org, mareklindner@neomailbox.ch,
+        sw@simonwunderlich.de, a@unstable.cc, sven@narfation.org,
+        linux-wireless@vger.kernel.org, linux-wpan@vger.kernel.org
+References: <20220516215638.1787257-1-kuba@kernel.org>
+From:   Florian Fainelli <f.fainelli@gmail.com>
+In-Reply-To: <20220516215638.1787257-1-kuba@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Most protocol-specific pointers in struct net_device are under
-a respective ifdef. Wireless is the notable exception. Since
-there's a sizable number of custom-built kernels for datacenter
-workloads which don't build wireless it seems reasonable to
-ifdefy those pointers as well.
 
-While at it move IPv4 and IPv6 pointers up, those are special
-for obvious reasons.
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-CC: johannes@sipsolutions.net
-CC: alex.aring@gmail.com
-CC: stefan@datenfreihafen.org
-CC: mareklindner@neomailbox.ch
-CC: sw@simonwunderlich.de
-CC: a@unstable.cc
-CC: sven@narfation.org
-CC: linux-wireless@vger.kernel.org
-CC: linux-wpan@vger.kernel.org
----
- include/linux/netdevice.h       | 8 ++++++--
- include/net/cfg80211.h          | 5 +----
- include/net/cfg802154.h         | 2 ++
- net/batman-adv/hard-interface.c | 2 ++
- net/wireless/core.c             | 6 ++++++
- 5 files changed, 17 insertions(+), 6 deletions(-)
+On 5/16/2022 2:56 PM, Jakub Kicinski wrote:
+> Most protocol-specific pointers in struct net_device are under
+> a respective ifdef. Wireless is the notable exception. Since
+> there's a sizable number of custom-built kernels for datacenter
+> workloads which don't build wireless it seems reasonable to
+> ifdefy those pointers as well.
+> 
+> While at it move IPv4 and IPv6 pointers up, those are special
+> for obvious reasons.
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index 536321691c72..f0604863f18c 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -2119,6 +2119,8 @@ struct net_device {
- 
- 	/* Protocol-specific pointers */
- 
-+	struct in_device __rcu	*ip_ptr;
-+	struct inet6_dev __rcu	*ip6_ptr;
- #if IS_ENABLED(CONFIG_VLAN_8021Q)
- 	struct vlan_info __rcu	*vlan_info;
- #endif
-@@ -2131,16 +2133,18 @@ struct net_device {
- #if IS_ENABLED(CONFIG_ATALK)
- 	void 			*atalk_ptr;
- #endif
--	struct in_device __rcu	*ip_ptr;
- #if IS_ENABLED(CONFIG_DECNET)
- 	struct dn_dev __rcu     *dn_ptr;
- #endif
--	struct inet6_dev __rcu	*ip6_ptr;
- #if IS_ENABLED(CONFIG_AX25)
- 	void			*ax25_ptr;
- #endif
-+#if IS_ENABLED(CONFIG_WIRELESS)
- 	struct wireless_dev	*ieee80211_ptr;
-+#endif
-+#if IS_ENABLED(CONFIG_IEEE802154) || IS_ENABLED(CONFIG_6LOWPAN)
- 	struct wpan_dev		*ieee802154_ptr;
-+#endif
- #if IS_ENABLED(CONFIG_MPLS_ROUTING)
- 	struct mpls_dev __rcu	*mpls_ptr;
- #endif
-diff --git a/include/net/cfg80211.h b/include/net/cfg80211.h
-index 68713388b617..a4a7fc3241cf 100644
---- a/include/net/cfg80211.h
-+++ b/include/net/cfg80211.h
-@@ -8004,10 +8004,7 @@ int cfg80211_register_netdevice(struct net_device *dev);
-  *
-  * Requires the RTNL and wiphy mutex to be held.
-  */
--static inline void cfg80211_unregister_netdevice(struct net_device *dev)
--{
--	cfg80211_unregister_wdev(dev->ieee80211_ptr);
--}
-+void cfg80211_unregister_netdevice(struct net_device *dev);
- 
- /**
-  * struct cfg80211_ft_event_params - FT Information Elements
-diff --git a/include/net/cfg802154.h b/include/net/cfg802154.h
-index 85f9e8417688..d8d8719315fd 100644
---- a/include/net/cfg802154.h
-+++ b/include/net/cfg802154.h
-@@ -373,6 +373,7 @@ struct wpan_dev {
- 
- #define to_phy(_dev)	container_of(_dev, struct wpan_phy, dev)
- 
-+#if IS_ENABLED(CONFIG_IEEE802154) || IS_ENABLED(CONFIG_6LOWPAN)
- static inline int
- wpan_dev_hard_header(struct sk_buff *skb, struct net_device *dev,
- 		     const struct ieee802154_addr *daddr,
-@@ -383,6 +384,7 @@ wpan_dev_hard_header(struct sk_buff *skb, struct net_device *dev,
- 
- 	return wpan_dev->header_ops->create(skb, dev, daddr, saddr, len);
- }
-+#endif
- 
- struct wpan_phy *
- wpan_phy_new(const struct cfg802154_ops *ops, size_t priv_size);
-diff --git a/net/batman-adv/hard-interface.c b/net/batman-adv/hard-interface.c
-index 83fb51b6e299..15d2bb4cd301 100644
---- a/net/batman-adv/hard-interface.c
-+++ b/net/batman-adv/hard-interface.c
-@@ -307,9 +307,11 @@ static bool batadv_is_cfg80211_netdev(struct net_device *net_device)
- 	if (!net_device)
- 		return false;
- 
-+#if IS_ENABLED(CONFIG_WIRELESS)
- 	/* cfg80211 drivers have to set ieee80211_ptr */
- 	if (net_device->ieee80211_ptr)
- 		return true;
-+#endif
- 
- 	return false;
- }
-diff --git a/net/wireless/core.c b/net/wireless/core.c
-index f08d4b3bb148..a24944e6d01e 100644
---- a/net/wireless/core.c
-+++ b/net/wireless/core.c
-@@ -1374,6 +1374,12 @@ int cfg80211_register_netdevice(struct net_device *dev)
- }
- EXPORT_SYMBOL(cfg80211_register_netdevice);
- 
-+void cfg80211_unregister_netdevice(struct net_device *dev)
-+{
-+	cfg80211_unregister_wdev(dev->ieee80211_ptr);
-+}
-+EXPORT_SYMBOL(cfg80211_unregister_netdevice);
-+
- static int cfg80211_netdev_notifier_call(struct notifier_block *nb,
- 					 unsigned long state, void *ptr)
- {
+Could not we move to an union of pointers in the future since in many 
+cases a network device can only have one of those pointers at any given 
+time?
 -- 
-2.34.3
-
+Florian
