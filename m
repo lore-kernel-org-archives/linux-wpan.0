@@ -2,66 +2,73 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11D7AC433F5
-	for <linux-wpan@archiver.kernel.org>; Tue, 17 May 2022 04:37:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6239AC433F5
+	for <linux-wpan@archiver.kernel.org>; Tue, 17 May 2022 07:09:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231517AbiEQEhF (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 17 May 2022 00:37:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39416 "EHLO
+        id S241407AbiEQHJW (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 17 May 2022 03:09:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60478 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229769AbiEQEhE (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 17 May 2022 00:37:04 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 668553AA52;
-        Mon, 16 May 2022 21:37:03 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        with ESMTP id S241122AbiEQHId (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 17 May 2022 03:08:33 -0400
+Received: from proxima.lasnet.de (proxima.lasnet.de [78.47.171.185])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8958847563;
+        Tue, 17 May 2022 00:08:29 -0700 (PDT)
+Received: from [IPV6:2003:e9:d730:2275:90ad:628b:58df:e295] (p200300e9d730227590ad628b58dfe295.dip0.t-ipconnect.de [IPv6:2003:e9:d730:2275:90ad:628b:58df:e295])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 20948B80936;
-        Tue, 17 May 2022 04:37:02 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60B89C385B8;
-        Tue, 17 May 2022 04:36:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1652762220;
-        bh=yqrFLKUyZSPOO62w2yYncUxQ/cjrWKNlIzELs9lP7vU=;
-        h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
-        b=VDAy7fAWds24lPLb33S5Yc7u8cbzgx/sP436FkaTD/doVNGCTiN2ze8/iSqxGwMUX
-         E3cc5xpta8piTbowEu9yvT5faQyKGaak7U9AbyPF4E2AcmsGsp1Mklshsy2Em7eg1M
-         0tJ2+bM4wuodmpwGiKLlhIimlQFBWgdjTt9R2xhNUke0NOvckVBrBiRMGKG480D5P5
-         CZPc3kmtaKu9HR9pCgHF0b9JupiwO+PWUEHkW0u/uCYofeqqzlnAQ+WBN/jSqp+6Dv
-         Khwt6AAPY0+rPaLLTdhhtkoaBrKcX9WTwbCP92aeGBNO3XdgefXAjkss9bPwyvONq+
-         ucqy1S7HlEadg==
-From:   Kalle Valo <kvalo@kernel.org>
-To:     Jakub Kicinski <kuba@kernel.org>
-Cc:     davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-        pabeni@redhat.com, johannes@sipsolutions.net, alex.aring@gmail.com,
-        stefan@datenfreihafen.org, mareklindner@neomailbox.ch,
-        sw@simonwunderlich.de, a@unstable.cc, sven@narfation.org,
-        linux-wireless@vger.kernel.org, linux-wpan@vger.kernel.org
-Subject: Re: [PATCH net-next] net: ifdefy the wireless pointers in struct net_device
-References: <20220516215638.1787257-1-kuba@kernel.org>
-Date:   Tue, 17 May 2022 07:36:54 +0300
-In-Reply-To: <20220516215638.1787257-1-kuba@kernel.org> (Jakub Kicinski's
-        message of "Mon, 16 May 2022 14:56:38 -0700")
-Message-ID: <87zgjgwza1.fsf@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
+        (Authenticated sender: stefan@datenfreihafen.org)
+        by proxima.lasnet.de (Postfix) with ESMTPSA id DC8ADC02C8;
+        Tue, 17 May 2022 09:08:26 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
+        s=2021; t=1652771307;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=xroGG9gPawE3RP2cg03Dt0eyU7bDJbhHLIhC64NcZ0Y=;
+        b=AhhojJ5TCXMKgsrwTUAWLezNYbJufujIt28U2eM25PWKF0JFZgrBluD0m7sy31ftYy0uY3
+        Df2UWndOlF97T8RZA080p/QSvDytGUhslsT84l5oOvKBcmCnvzr7moGqlHe0zazC0cGCpx
+        HbXr1utd6AThCIrxnJXfjwaxhf/IduzJ1RZOd8CYUJwmQm47xCbQMWO3I2vF0+YF1/BYQp
+        nosuYKU5CaKmJGUTx81ZF0aiNYYMTXRsdn8J4St/Hu6RB7omVwNypra/ZrvYkw0fptX0GZ
+        LHkRje3wfQ0jdwe4Q2k+0KeruHdy5Ij1QTwnX8lCZygdp3VMoCTFwqJJqm1i8A==
+Message-ID: <a3e28227-a2fe-4bf7-4abf-242421d07243@datenfreihafen.org>
+Date:   Tue, 17 May 2022 09:08:25 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Subject: Re: [PATCH net-next] net: ifdefy the wireless pointers in struct
+ net_device
+Content-Language: en-US
+To:     Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
+Cc:     netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+        johannes@sipsolutions.net, alex.aring@gmail.com,
+        mareklindner@neomailbox.ch, sw@simonwunderlich.de, a@unstable.cc,
+        sven@narfation.org, linux-wireless@vger.kernel.org,
+        linux-wpan@vger.kernel.org
+References: <20220516215638.1787257-1-kuba@kernel.org>
+From:   Stefan Schmidt <stefan@datenfreihafen.org>
+In-Reply-To: <20220516215638.1787257-1-kuba@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Jakub Kicinski <kuba@kernel.org> writes:
 
+Hello.
+
+On 16.05.22 23:56, Jakub Kicinski wrote:
 > Most protocol-specific pointers in struct net_device are under
 > a respective ifdef. Wireless is the notable exception. Since
 > there's a sizable number of custom-built kernels for datacenter
 > workloads which don't build wireless it seems reasonable to
 > ifdefy those pointers as well.
->
+> 
 > While at it move IPv4 and IPv6 pointers up, those are special
 > for obvious reasons.
->
+> 
 > Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 > ---
 > CC: johannes@sipsolutions.net
@@ -73,42 +80,17 @@ Jakub Kicinski <kuba@kernel.org> writes:
 > CC: sven@narfation.org
 > CC: linux-wireless@vger.kernel.org
 > CC: linux-wpan@vger.kernel.org
+> ---
+>   include/linux/netdevice.h       | 8 ++++++--
+>   include/net/cfg80211.h          | 5 +----
+>   include/net/cfg802154.h         | 2 ++
+>   net/batman-adv/hard-interface.c | 2 ++
+>   net/wireless/core.c             | 6 ++++++
+>   5 files changed, 17 insertions(+), 6 deletions(-)
 
-[...]
+For the ieee802154 changes:
 
-> --- a/include/net/cfg80211.h
-> +++ b/include/net/cfg80211.h
-> @@ -8004,10 +8004,7 @@ int cfg80211_register_netdevice(struct net_device *dev);
->   *
->   * Requires the RTNL and wiphy mutex to be held.
->   */
-> -static inline void cfg80211_unregister_netdevice(struct net_device *dev)
-> -{
-> -	cfg80211_unregister_wdev(dev->ieee80211_ptr);
-> -}
-> +void cfg80211_unregister_netdevice(struct net_device *dev);
->  
->  /**
->   * struct cfg80211_ft_event_params - FT Information Elements
+Acked-by: Stefan Schmidt <stefan@datenfreihafen.org>
 
-[...]
-
-> --- a/net/wireless/core.c
-> +++ b/net/wireless/core.c
-> @@ -1374,6 +1374,12 @@ int cfg80211_register_netdevice(struct net_device *dev)
->  }
->  EXPORT_SYMBOL(cfg80211_register_netdevice);
->  
-> +void cfg80211_unregister_netdevice(struct net_device *dev)
-> +{
-> +	cfg80211_unregister_wdev(dev->ieee80211_ptr);
-> +}
-> +EXPORT_SYMBOL(cfg80211_unregister_netdevice);
-
-Why moving this to a proper function? Just curious, I couldn't figure it
-out.
-
--- 
-https://patchwork.kernel.org/project/linux-wireless/list/
-
-https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
+regards
+Stefan Schmidt
