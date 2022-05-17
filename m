@@ -2,34 +2,34 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2620C433F5
-	for <linux-wpan@archiver.kernel.org>; Tue, 17 May 2022 13:31:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8300FC433EF
+	for <linux-wpan@archiver.kernel.org>; Tue, 17 May 2022 13:37:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233847AbiEQNbe (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 17 May 2022 09:31:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45468 "EHLO
+        id S1344961AbiEQNhC (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 17 May 2022 09:37:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60806 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347847AbiEQNay (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 17 May 2022 09:30:54 -0400
-Received: from relay10.mail.gandi.net (relay10.mail.gandi.net [IPv6:2001:4b98:dc4:8::230])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F2E0DFD0;
-        Tue, 17 May 2022 06:30:50 -0700 (PDT)
+        with ESMTP id S1346853AbiEQNhB (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 17 May 2022 09:37:01 -0400
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::226])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F82813F1E;
+        Tue, 17 May 2022 06:36:59 -0700 (PDT)
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id 56CC8240012;
-        Tue, 17 May 2022 13:30:47 +0000 (UTC)
+        by mail.gandi.net (Postfix) with ESMTPSA id 6D2E8C0003;
+        Tue, 17 May 2022 13:36:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1652794249;
+        t=1652794618;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=PMfOpTgcEbu3EpZVSKfpa5HDynTgAT8/eYq8vW0Qg0w=;
-        b=Kksfx9sL7zOWrnb2cgknIEscypRaYPv7+qWkollCVn8QqxIgIizjUswXGjYGzZHJmiaabL
-        7jcJksId8F8EohJ34M336M5PSpMqBf/sHkA/wrmiARWIedQFq4x+cRHh4Yoro1QOhVJAz0
-        4+3lrtcLs0bml2+ECMiCDFUFbYF3/5z2AWQRqxL9SyMtoxTg9ohfggp9V15FqnUO3CeB/9
-        eg+SjCmXTSEsnXIlJxdbr0EnuPzJt9e5VYLx8pOFW61onTXzxu/DQuSWBQy198BTH1L/mc
-        eHMyKCPUiKA9z67yQlfoJYEmLoOj9tfH5RLmNVpzJJQP++Jx0bH6em/rJK5K2w==
-Date:   Tue, 17 May 2022 15:30:45 +0200
+        bh=Gs+93tEqOiIRId+H3tx8QpHdCxarKpqDBp7PI2qHNtY=;
+        b=axifmMX/aGAptNFGfAhj7Nw3NhhJpa/B4CWUCYwvJOdWg9F15JGSi+7Df2NOCIdjUtFhOl
+        86YAmmOlHJoaRHpR9z6zXgp/issATQbgvOH+lGcz6NChYOhKgtCml2Xq4dE5vkK8k0ckW9
+        Iq+buJpd4JAqfFgwAJLXspVz/yyzVnIS3VkUMddVIywxZDM7VGThTlbjtrx5LhuVomh6yW
+        7kOOced79amPblZcgQiOrp/8aw6Vpp3YD+ERSB16ICHxgYsb4B+38u86qUfhupG2gN2xK8
+        tdDUdhgLUDqlaHvRVH+FqgNv35q791y7vPmBBJ9QnScZTYv4zG1XSHrQuX0jsA==
+Date:   Tue, 17 May 2022 15:36:55 +0200
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
 To:     Alexander Aring <aahringo@redhat.com>
 Cc:     Alexander Aring <alex.aring@gmail.com>,
@@ -44,109 +44,58 @@ Cc:     Alexander Aring <alex.aring@gmail.com>,
         Frederic Blain <frederic.blain@qorvo.com>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH wpan-next v2 09/11] net: mac802154: Introduce a
- synchronous API for MLME commands
-Message-ID: <20220517153045.73fda4ee@xps-13>
-In-Reply-To: <CAK-6q+i_T+FaK0tX6tF38VjyEfSzDi-QC85MTU2=4soepAag8g@mail.gmail.com>
+Subject: Re: [PATCH wpan-next v2 10/11] net: mac802154: Add a warning in the
+ hot path
+Message-ID: <20220517153655.155ba311@xps-13>
+In-Reply-To: <CAK-6q+jYb7A2RzG3u7PJYKZU9D5A=vben-Wnu-3EsUU-rqGT2Q@mail.gmail.com>
 References: <20220512143314.235604-1-miquel.raynal@bootlin.com>
-        <20220512143314.235604-10-miquel.raynal@bootlin.com>
-        <CAK-6q+ipHdD=NJB2N7SHQ0TUvNpc0GQXZ7dWM9nDxqyqNgxdSA@mail.gmail.com>
-        <CAK-6q+i_T+FaK0tX6tF38VjyEfSzDi-QC85MTU2=4soepAag8g@mail.gmail.com>
+        <20220512143314.235604-11-miquel.raynal@bootlin.com>
+        <CAK-6q+jYb7A2RzG3u7PJYKZU9D5A=vben-Wnu-3EsUU-rqGT2Q@mail.gmail.com>
 Organization: Bootlin
 X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
 
-aahringo@redhat.com wrote on Sun, 15 May 2022 19:03:53 -0400:
+aahringo@redhat.com wrote on Sun, 15 May 2022 18:30:15 -0400:
 
 > Hi,
->=20
-> On Sun, May 15, 2022 at 6:28 PM Alexander Aring <aahringo@redhat.com> wro=
-te:
+> 
+> On Thu, May 12, 2022 at 10:34 AM Miquel Raynal
+> <miquel.raynal@bootlin.com> wrote:
 > >
-> > Hi,
+> > We should never start a transmission after the queue has been stopped.
 > >
-> > On Thu, May 12, 2022 at 10:34 AM Miquel Raynal
-> > <miquel.raynal@bootlin.com> wrote: =20
-> > >
-> > > This is the slow path, we need to wait for each command to be process=
-ed
-> > > before continuing so let's introduce an helper which does the
-> > > transmission and blocks until it gets notified of its asynchronous
-> > > completion. This helper is going to be used when introducing scan
-> > > support.
-> > >
-> > > Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
-> > > ---
-> > >  net/mac802154/ieee802154_i.h |  1 +
-> > >  net/mac802154/tx.c           | 25 +++++++++++++++++++++++++
-> > >  2 files changed, 26 insertions(+)
-> > >
-> > > diff --git a/net/mac802154/ieee802154_i.h b/net/mac802154/ieee802154_=
-i.h
-> > > index a057827fc48a..f8b374810a11 100644
-> > > --- a/net/mac802154/ieee802154_i.h
-> > > +++ b/net/mac802154/ieee802154_i.h
-> > > @@ -125,6 +125,7 @@ extern struct ieee802154_mlme_ops mac802154_mlme_=
-wpan;
-> > >  void ieee802154_rx(struct ieee802154_local *local, struct sk_buff *s=
-kb);
-> > >  void ieee802154_xmit_sync_worker(struct work_struct *work);
-> > >  int ieee802154_sync_and_hold_queue(struct ieee802154_local *local);
-> > > +int ieee802154_mlme_tx(struct ieee802154_local *local, struct sk_buf=
-f *skb);
-> > >  netdev_tx_t
-> > >  ieee802154_monitor_start_xmit(struct sk_buff *skb, struct net_device=
- *dev);
-> > >  netdev_tx_t
-> > > diff --git a/net/mac802154/tx.c b/net/mac802154/tx.c
-> > > index 38f74b8b6740..ec8d872143ee 100644
-> > > --- a/net/mac802154/tx.c
-> > > +++ b/net/mac802154/tx.c
-> > > @@ -128,6 +128,31 @@ int ieee802154_sync_and_hold_queue(struct ieee80=
-2154_local *local)
-> > >         return ieee802154_sync_queue(local);
-> > >  }
-> > >
-> > > +int ieee802154_mlme_tx(struct ieee802154_local *local, struct sk_buf=
-f *skb)
-> > > +{
-> > > +       int ret;
-> > > +
-> > > +       /* Avoid possible calls to ->ndo_stop() when we asynchronousl=
-y perform
-> > > +        * MLME transmissions.
-> > > +        */
-> > > +       rtnl_lock(); =20
+> > But because it might work we don't kill the function here but rather
+> > warn loudly the user that something is wrong.
 > >
-> > I think we should make an ASSERT_RTNL() here, the lock needs to be
-> > earlier than that over the whole MLME op. MLME can trigger more than =20
->=20
-> not over the whole MLME_op, that's terrible to hold the rtnl lock so
-> long... so I think this is fine that some netdev call will interfere
-> with this transmission.
-> So forget about the ASSERT_RTNL() here, it's fine (I hope).
->=20
-> > one message, the whole sync_hold/release queue should be earlier than
-> > that... in my opinion is it not right to allow other messages so far
-> > an MLME op is going on? I am not sure what the standard says to this,
-> > but I think it should be stopped the whole time? All those sequence =20
->=20
-> Whereas the stop of the netdev queue makes sense for the whole mlme-op
-> (in my opinion).
+> > Set an atomic when the queue will remain stopped. Reset this atomic when
+> > the queue actually gets restarded. Just check this atomic to know if the
+> > transmission is legitimate, warn if it is not.
+> >
+> > Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
+> > ---
+> >  include/net/cfg802154.h |  1 +
+> >  net/mac802154/tx.c      | 16 +++++++++++++++-
+> >  net/mac802154/util.c    |  1 +
+> >  3 files changed, 17 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/include/net/cfg802154.h b/include/net/cfg802154.h
+> > index 8b6326aa2d42..a1370e87233e 100644
+> > --- a/include/net/cfg802154.h
+> > +++ b/include/net/cfg802154.h
+> > @@ -218,6 +218,7 @@ struct wpan_phy {
+> >         struct mutex queue_lock;
+> >         atomic_t ongoing_txs;
+> >         atomic_t hold_txs;
+> > +       atomic_t queue_stopped;  
+> 
+> Maybe some test_bit()/set_bit() is better there?
 
-I might still implement an MLME pre/post helper and do the queue
-hold/release calls there, while only taking the rtnl from the _tx.
+What do you mean? Shall I change the atomic_t type of queue_stopped?
+Isn't the atomic_t preferred in this situation?
 
-And I might create an mlme_tx_one() which does the pre/post calls as
-well.
-
-Would something like this fit?
-
-Thanks,
-Miqu=C3=A8l
