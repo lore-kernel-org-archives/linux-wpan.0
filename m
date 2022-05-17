@@ -2,161 +2,119 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B7E3C433EF
-	for <linux-wpan@archiver.kernel.org>; Tue, 17 May 2022 11:59:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5279FC433EF
+	for <linux-wpan@archiver.kernel.org>; Tue, 17 May 2022 13:19:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229565AbiEQL7e (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 17 May 2022 07:59:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49196 "EHLO
+        id S234729AbiEQNTq (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 17 May 2022 09:19:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51782 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344892AbiEQL6l (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 17 May 2022 07:58:41 -0400
-X-Greylist: delayed 558 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 17 May 2022 04:58:38 PDT
-Received: from dvalin.narfation.org (dvalin.narfation.org [IPv6:2a00:17d8:100::8b1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CCE543AC9;
-        Tue, 17 May 2022 04:58:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=narfation.org;
-        s=20121; t=1652788156;
+        with ESMTP id S1347451AbiEQNTo (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 17 May 2022 09:19:44 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7545F41FAA
+        for <linux-wpan@vger.kernel.org>; Tue, 17 May 2022 06:19:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1652793582;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=yjDZzYRlOEXaTeXKeiZ3BoDk5vWbzSf4BpCkz7w3naQ=;
-        b=jZbXTZ3/5SfUMbKEfhbQrWkTEcL8yFUx+ikl6g30Nlu2m76LUTuOUBnBpqHhSbtDX1D8Vv
-        vfDNbfsov68KP3/VLLSrOoMwgnaJrVRC6b/qSLdN1/Y89pk6cLuAgkNXUIH2Isg1WeIDQD
-        5ns148IgTVYW9qR130PUOy7zoApyzx8=
-From:   Sven Eckelmann <sven@narfation.org>
-To:     davem@davemloft.net, Jakub Kicinski <kuba@kernel.org>
-Cc:     netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
-        Jakub Kicinski <kuba@kernel.org>, johannes@sipsolutions.net,
-        alex.aring@gmail.com, stefan@datenfreihafen.org,
-        mareklindner@neomailbox.ch, sw@simonwunderlich.de, a@unstable.cc,
-        linux-wireless@vger.kernel.org, linux-wpan@vger.kernel.org
-Subject: Re: [PATCH net-next] net: ifdefy the wireless pointers in struct net_device
-Date:   Tue, 17 May 2022 13:49:13 +0200
-Message-ID: <2780967.JztxfRx3z1@ripper>
-In-Reply-To: <20220516215638.1787257-1-kuba@kernel.org>
-References: <20220516215638.1787257-1-kuba@kernel.org>
+        bh=byy4rNagdcXLWgiApX0leSlxdl79VV61hw0Ykw1jqds=;
+        b=iTGE4iy4bvaQ9Sga5BvcKBO2ipEO6jlh0/PQM8V8HAbDOddA7EVcOHMvBQYOZqURFzeK3V
+        kZo8QhoR8wSB8d3fJNUnvYY7iRY2fkzeIDu8w1LDaEQuB+wKYD0BpGijfDz9CT8aOd4d1p
+        jlK6TXVhClaTBqEq/hb2YopRxVMw/Nc=
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
+ [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-106-Y8tJMDKoPVGVKubeN3pHQQ-1; Tue, 17 May 2022 09:19:41 -0400
+X-MC-Unique: Y8tJMDKoPVGVKubeN3pHQQ-1
+Received: by mail-qt1-f199.google.com with SMTP id d13-20020ac85acd000000b002f3be21793dso13789219qtd.12
+        for <linux-wpan@vger.kernel.org>; Tue, 17 May 2022 06:19:41 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=byy4rNagdcXLWgiApX0leSlxdl79VV61hw0Ykw1jqds=;
+        b=XYX3H2M3FKL/6fbAR1+gBb+KH9ZQRaMlGG+N4fIgnwS+DXOOivD88ODCZfqJADQ/Yx
+         ETg1yyaQlC9Ox4+dgjKPGrqi9CI83WIEkgG3CZ+7dWtLJuVWDbHqzV2mWAbCp9xCVuEX
+         hVXyaOMnBebXr8sThOzbRjMvncjWPcDVJnlee5QE2SIFhqcDoBdt6FRRkAkFSMnmZty8
+         WIT6qknAnyZIkwQni7RUqKPmZ0iJAhi2eUh46HNwvW/Cy/twYqwx+Nt0awshKzOn1qAw
+         6DpNADRbu4cuy3eVfUlOFH55lKimaX1lxb5l0Scjf1sql/RSkBltOw0dQyB9wTLzQsi5
+         kVIQ==
+X-Gm-Message-State: AOAM531wv6mmCr9uFjeiiVXtkGPDeGcfOHIoSdqghXUsxYlazNr5huOa
+        M525fgKreartg7WcNgEwTK1tNBuHZSXpj5GkUHvWMD/EcPdNYjUXzLwDphxpshdmB2m7d/Yo805
+        0KtuZmo2mv4UlTBY3i++kwlBQUz7tOTson8juiA==
+X-Received: by 2002:a37:cd7:0:b0:69f:9cb9:603a with SMTP id 206-20020a370cd7000000b0069f9cb9603amr16122123qkm.177.1652793580680;
+        Tue, 17 May 2022 06:19:40 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwmgn7QGLtpfDJfS0f1M8fxJBXGGOuDsrAHNm32/2hHt0Gstz3sGYueKQ9Swor4LKZo2uGE+mtFm9/2ZEzL1wk=
+X-Received: by 2002:a37:cd7:0:b0:69f:9cb9:603a with SMTP id
+ 206-20020a370cd7000000b0069f9cb9603amr16122104qkm.177.1652793580474; Tue, 17
+ May 2022 06:19:40 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="nextPart53318918.RGKOpMJsdz"; micalg="pgp-sha512"; protocol="application/pgp-signature"
+References: <20220512143314.235604-1-miquel.raynal@bootlin.com>
+ <20220512143314.235604-6-miquel.raynal@bootlin.com> <CAB_54W605SGbkNHhOLG5WEKsvccUvJ=rBnHErcyrte8_H=rY+g@mail.gmail.com>
+ <20220517112726.4b89e907@xps-13>
+In-Reply-To: <20220517112726.4b89e907@xps-13>
+From:   Alexander Aring <aahringo@redhat.com>
+Date:   Tue, 17 May 2022 09:19:29 -0400
+Message-ID: <CAK-6q+ihfOSBjpw1Q-2qesd4nkrAfw_rBCd0QcWzXk0PP9Prtg@mail.gmail.com>
+Subject: Re: [PATCH wpan-next v2 05/11] net: mac802154: Bring the hability to
+ hold the transmit queue
+To:     Miquel Raynal <miquel.raynal@bootlin.com>
+Cc:     Alexander Aring <alex.aring@gmail.com>,
+        Stefan Schmidt <stefan@datenfreihafen.org>,
+        linux-wpan - ML <linux-wpan@vger.kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
+        David Girault <david.girault@qorvo.com>,
+        Romuald Despres <romuald.despres@qorvo.com>,
+        Frederic Blain <frederic.blain@qorvo.com>,
+        Nicolas Schodet <nico@ni.fr.eu.org>,
+        Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
---nextPart53318918.RGKOpMJsdz
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"; protected-headers="v1"
-From: Sven Eckelmann <sven@narfation.org>
-To: davem@davemloft.net, Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com, Jakub Kicinski <kuba@kernel.org>, johannes@sipsolutions.net, alex.aring@gmail.com, stefan@datenfreihafen.org, mareklindner@neomailbox.ch, sw@simonwunderlich.de, a@unstable.cc, linux-wireless@vger.kernel.org, linux-wpan@vger.kernel.org
-Subject: Re: [PATCH net-next] net: ifdefy the wireless pointers in struct net_device
-Date: Tue, 17 May 2022 13:49:13 +0200
-Message-ID: <2780967.JztxfRx3z1@ripper>
-In-Reply-To: <20220516215638.1787257-1-kuba@kernel.org>
-References: <20220516215638.1787257-1-kuba@kernel.org>
+Hi,
 
-On Monday, 16 May 2022 23:56:38 CEST Jakub Kicinski wrote:
-> diff --git a/net/batman-adv/hard-interface.c b/net/batman-adv/hard-interface.c
-> index 83fb51b6e299..15d2bb4cd301 100644
-> --- a/net/batman-adv/hard-interface.c
-> +++ b/net/batman-adv/hard-interface.c
-> @@ -307,9 +307,11 @@ static bool batadv_is_cfg80211_netdev(struct net_device *net_device)
->         if (!net_device)
->                 return false;
->  
-> +#if IS_ENABLED(CONFIG_WIRELESS)
->         /* cfg80211 drivers have to set ieee80211_ptr */
->         if (net_device->ieee80211_ptr)
->                 return true;
-> +#endif
->  
->         return false;
->  }
+On Tue, May 17, 2022 at 5:28 AM Miquel Raynal <miquel.raynal@bootlin.com> wrote:
+>
+> Hi Alex,
+>
+> > > @@ -84,7 +118,7 @@ void ieee802154_xmit_complete(struct ieee802154_hw *hw, struct sk_buff *skb,
+> > >                                       hw->phy->sifs_period * NSEC_PER_USEC,
+> > >                                       HRTIMER_MODE_REL);
+> > >         } else {
+> > > -               ieee802154_wake_queue(hw);
+> > > +               ieee802154_release_queue(local);
+> > >         }
+> > >
+> > >         dev_consume_skb_any(skb);
+> > > @@ -98,7 +132,7 @@ void ieee802154_xmit_error(struct ieee802154_hw *hw, struct sk_buff *skb,
+> > >         struct ieee802154_local *local = hw_to_local(hw);
+> > >
+> > >         local->tx_result = reason;
+> > > -       ieee802154_wake_queue(hw);
+> > > +       ieee802154_release_queue(local);
+> > >         dev_kfree_skb_any(skb);
+> > >         atomic_dec(&hw->phy->ongoing_txs);
+> >
+> > I am pretty sure that will end in a scheduling while atomic warning
+> > with hwsim. If you don't hit it you have the wrong config, you need to
+> > enable such warnings and have the right preemption model setting.
+>
+> I was using the "desktop" kernel preemption model (voluntary), I've
+> switched to CONFIG_PREEMPT ("Preemptible kernel (Low-latency)"),
+> and enabled CONFIG_DEBUG_ATOMIC_SLEEP. You are right that we should use
+> a spinlock instead of a mutex here. However I don't think disabling
+> IRQs is necessary, so I'll switch to spin_(un)lock() calls.
+>
 
-Acked-by: Sven Eckelmann <sven@narfation.org>
+In my opinion it's necessary for the ifs hrtimer. Normal
+spin_lock/unlock is not the right fit here.
 
-
-On Tuesday, 17 May 2022 09:48:24 CEST Johannes Berg wrote:
-> Something like the patch below might do that, but I haven't carefully
-> checked it yet, nor checked if there are any paths in mac80211/drivers
-> that might be doing this check - and it looks from Jakub's patch that
-> batman code would like to check this too.
-
-Yes, if something like netdev_is_wireless would be available then we could 
-change it to:
-
-diff --git a/net/batman-adv/hard-interface.c b/net/batman-adv/hard-interface.c
-index 35fadb924849..50a53e3364bf 100644
---- a/net/batman-adv/hard-interface.c
-+++ b/net/batman-adv/hard-interface.c
-@@ -294,26 +294,6 @@ static bool batadv_is_wext_netdev(struct net_device *net_device)
- 	return false;
- }
- 
--/**
-- * batadv_is_cfg80211_netdev() - check if the given net_device struct is a
-- *  cfg80211 wifi interface
-- * @net_device: the device to check
-- *
-- * Return: true if the net device is a cfg80211 wireless device, false
-- *  otherwise.
-- */
--static bool batadv_is_cfg80211_netdev(struct net_device *net_device)
--{
--	if (!net_device)
--		return false;
--
--	/* cfg80211 drivers have to set ieee80211_ptr */
--	if (net_device->ieee80211_ptr)
--		return true;
--
--	return false;
--}
--
- /**
-  * batadv_wifi_flags_evaluate() - calculate wifi flags for net_device
-  * @net_device: the device to check
-@@ -328,7 +308,7 @@ static u32 batadv_wifi_flags_evaluate(struct net_device *net_device)
- 	if (batadv_is_wext_netdev(net_device))
- 		wifi_flags |= BATADV_HARDIF_WIFI_WEXT_DIRECT;
- 
--	if (batadv_is_cfg80211_netdev(net_device))
-+	if (netdev_is_wireless(net_device))
- 		wifi_flags |= BATADV_HARDIF_WIFI_CFG80211_DIRECT;
- 
- 	real_netdev = batadv_get_real_netdevice(net_device);
-@@ -341,7 +321,7 @@ static u32 batadv_wifi_flags_evaluate(struct net_device *net_device)
- 	if (batadv_is_wext_netdev(real_netdev))
- 		wifi_flags |= BATADV_HARDIF_WIFI_WEXT_INDIRECT;
- 
--	if (batadv_is_cfg80211_netdev(real_netdev))
-+	if (netdev_is_wireless(real_netdev))
- 		wifi_flags |= BATADV_HARDIF_WIFI_CFG80211_INDIRECT;
- 
- out:
-
---nextPart53318918.RGKOpMJsdz
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part.
-Content-Transfer-Encoding: 7Bit
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEEF10rh2Elc9zjMuACXYcKB8Eme0YFAmKDi7kACgkQXYcKB8Em
-e0bh6g//ZaUMB74zvBCKHql+pln4FQ/wyUsj7/HF3gSU9MNG1qlDgzZn0kfAXplR
-ZlfIXj566nw7fezMDYzMoeJ+U4qrmAoa5gg1W2+4QlLXi08Z/7JjqoQjMgGpFWpS
-EqCT3L/qFpMkbV+iqSD9fsRC+4VWWA6quinU3tohEApW5Ibx5CDK1sDwjl+uVwJP
-eMegY4IixvtnH6xiZwZdhHIoXnAbJxnCMFpxWPzCk9DBkHtEgnS5G2iN2qVgJvlQ
-++ePF9edttDqwFeGdjuQTvyiLyVEPwlJ1VC3DvoHJmBEwLcCxYcu1Vxm3nqiDECi
-Ok6bbHn+s7P7q+tSAsnaL9NqfZmZA57RV/MHlrPgCyXEgA7zeF4PjLsaJBMVmfha
-Cv/PVf6/GmFYwk9pSQ1iM5rwgfDToh+d/UXARY+iI+iRmkNwt9+GQQIXAErYDu1d
-ryGHKhyWHzA/FEMmirpM/ZNoF/5/FPvUyBLDeu0s9am12IvWsYnFG/fmY/DO4Rbp
-/kKkX6WMpeUXz/go3THp4KReClydP322fYHfsJYtmG1Yo+cjQ3CFPhKvXqeA8jno
-aqkqN7k4nAvgRY112IExUrLeT/433y4c2vnAeFv3ShxSgbG/nFyN0puPRasqcVWk
-uoJGwGAZ5bkVzGTkRI/iY2qTj2PXxPnzMDJev6KWww7Bq+ir0U8=
-=HphN
------END PGP SIGNATURE-----
-
---nextPart53318918.RGKOpMJsdz--
-
-
+- Alex
 
