@@ -2,81 +2,155 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C07C9C433EF
-	for <linux-wpan@archiver.kernel.org>; Tue, 17 May 2022 07:51:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41087C433F5
+	for <linux-wpan@archiver.kernel.org>; Tue, 17 May 2022 09:15:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241875AbiEQHv6 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 17 May 2022 03:51:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47914 "EHLO
+        id S244450AbiEQJPB (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 17 May 2022 05:15:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50588 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241863AbiEQHvs (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 17 May 2022 03:51:48 -0400
-Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:191:4433::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18E581A820;
-        Tue, 17 May 2022 00:51:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-        Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-        :Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-        Resent-Cc:Resent-Message-ID; bh=MTfV3kZGVnrkxCsO0XjhCr2AVmWu4f7IQB0vynHt5bc=;
-        t=1652773907; x=1653983507; b=Iksef+KOCnq+3mNmxusCzl0JP88zn0RrjEyA/SMxFs/zMhm
-        TDz62cpP1Z80ZRipT8I8EU7rCMxOsWmCL7wiRsoCKyvjBevGuvD/aL3NzfeknNrtyJTrJmqA5AH43
-        yuAnqiskM8vJQSwnZOgqiXmK2zKAi9/8vyDp/BNvoIvPVb3HpWtmlScSqP5oicbQ3ficg7W9OYLM9
-        dO47E1O+08qdj+NBu9aCJAugdyhrp3je2/ieHV1k9Icq82fqvH4U5cCuwtAUmrKOMKuVcwb20vfyD
-        bSIye2257Q5/q4hIY71iqzaX3tI+V+sGg7Sx1paw9c0shW7HVuNBbWjoBLj4NTdA==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-        (Exim 4.95)
-        (envelope-from <johannes@sipsolutions.net>)
-        id 1nqrzQ-00EGgL-Rf;
-        Tue, 17 May 2022 09:51:33 +0200
-Message-ID: <8b9d18e351cc58aed65c4a4c7f12f167984ee088.camel@sipsolutions.net>
-Subject: Re: [PATCH net-next] net: ifdefy the wireless pointers in struct
- net_device
-From:   Johannes Berg <johannes@sipsolutions.net>
-To:     Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
-Cc:     netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
-        alex.aring@gmail.com, stefan@datenfreihafen.org,
-        mareklindner@neomailbox.ch, sw@simonwunderlich.de, a@unstable.cc,
-        sven@narfation.org, linux-wireless@vger.kernel.org,
-        linux-wpan@vger.kernel.org
-Date:   Tue, 17 May 2022 09:51:31 +0200
-In-Reply-To: <20220516215638.1787257-1-kuba@kernel.org>
-References: <20220516215638.1787257-1-kuba@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.1 (3.44.1-1.fc36) 
+        with ESMTP id S244693AbiEQJOV (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 17 May 2022 05:14:21 -0400
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::223])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4AA54249D;
+        Tue, 17 May 2022 02:13:33 -0700 (PDT)
+Received: (Authenticated sender: miquel.raynal@bootlin.com)
+        by mail.gandi.net (Postfix) with ESMTPSA id 77DD860007;
+        Tue, 17 May 2022 09:13:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+        t=1652778812;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=khwAh0BEehBqIojqv0kYs1TT2aLcqTaNywyfpltJ9Vo=;
+        b=OI7+rIr8p+qEjv8U+c/yglasGsfDw8P+QVGKI7KnWlrOC5a56gIKqvAExrCNx1738ozMtF
+        UqYNuqw4XfFkuojxZhIX9DrJiGI/CR/UawL5Kh5JrJZLYEKVHYiJuUnMYeeUIabZFacq4f
+        hLQqpxK6e5s3yjRvEJm/jMBtNolTKpGrv2gOY4NZTKgku+4UlgHBlwtDUDD76UHqxU9vp3
+        fime6AqVXjTSb5Z4fukKA2lm8FYh+00nnJcz57j6Vo41PSDi9uL4kumnre6kZxupIbYhS9
+        Xsfl3bC8LCSLYFLgS1XtLeEzBQ0q5L5/QJrpgGc767wZp/HBxEXVzNt3EwyZZQ==
+Date:   Tue, 17 May 2022 11:13:29 +0200
+From:   Miquel Raynal <miquel.raynal@bootlin.com>
+To:     Alexander Aring <aahringo@redhat.com>
+Cc:     Alexander Aring <alex.aring@gmail.com>,
+        Stefan Schmidt <stefan@datenfreihafen.org>,
+        linux-wpan@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Network Development <netdev@vger.kernel.org>,
+        David Girault <david.girault@qorvo.com>,
+        Romuald Despres <romuald.despres@qorvo.com>,
+        Frederic Blain <frederic.blain@qorvo.com>,
+        Nicolas Schodet <nico@ni.fr.eu.org>,
+        Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH wpan-next 06/11] net: mac802154: Hold the transmit queue
+ when relevant
+Message-ID: <20220517111329.6623d513@xps-13>
+In-Reply-To: <CAK-6q+h07LM1-Cu_mkxAZWN2kG9LLxoKvXxUiQ5DPSYwRkbXZw@mail.gmail.com>
+References: <20220427164659.106447-1-miquel.raynal@bootlin.com>
+        <20220427164659.106447-7-miquel.raynal@bootlin.com>
+        <CAK-6q+jCYDQ-rtyawz1m2Yt+ti=3d6PrhZebB=-PjcX-6L-Kdg@mail.gmail.com>
+        <20220510165237.43382f42@xps13>
+        <CAK-6q+jeubhGah2gG1JJxfmOW=sNdMrLf+mk_a3X_r+Na=tHXg@mail.gmail.com>
+        <20220512163307.540d635d@xps13>
+        <CAK-6q+h07LM1-Cu_mkxAZWN2kG9LLxoKvXxUiQ5DPSYwRkbXZw@mail.gmail.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-On Mon, 2022-05-16 at 14:56 -0700, Jakub Kicinski wrote:
+Hi Alex,
+
+aahringo@redhat.com wrote on Thu, 12 May 2022 10:44:35 -0400:
+
+> Hi,
 >=20
-> +#if IS_ENABLED(CONFIG_WIRELESS)
->  	struct wireless_dev	*ieee80211_ptr;
-> +#endif
+> On Thu, May 12, 2022 at 10:33 AM Miquel Raynal
+> <miquel.raynal@bootlin.com> wrote:
+> >
+> > Hi Alexander,
+> >
+> > aahringo@redhat.com wrote on Wed, 11 May 2022 09:09:40 -0400:
+> > =20
+> > > Hi,
+> > >
+> > > On Tue, May 10, 2022 at 10:52 AM Miquel Raynal
+> > > <miquel.raynal@bootlin.com> wrote: =20
+> > > >
+> > > > Hi Alex,
+> > > > =20
+> > > > > > --- a/net/mac802154/tx.c
+> > > > > > +++ b/net/mac802154/tx.c
+> > > > > > @@ -106,6 +106,21 @@ ieee802154_tx(struct ieee802154_local *loc=
+al, struct sk_buff *skb)
+> > > > > >         return NETDEV_TX_OK;
+> > > > > >  }
+> > > > > >
+> > > > > > +void ieee802154_hold_queue(struct ieee802154_local *local)
+> > > > > > +{
+> > > > > > +       atomic_inc(&local->phy->hold_txs);
+> > > > > > +}
+> > > > > > +
+> > > > > > +void ieee802154_release_queue(struct ieee802154_local *local)
+> > > > > > +{
+> > > > > > +       atomic_dec(&local->phy->hold_txs);
+> > > > > > +}
+> > > > > > +
+> > > > > > +bool ieee802154_queue_is_held(struct ieee802154_local *local)
+> > > > > > +{
+> > > > > > +       return atomic_read(&local->phy->hold_txs);
+> > > > > > +} =20
+> > > > >
+> > > > > I am not getting this, should the release_queue() function not do
+> > > > > something like:
+> > > > >
+> > > > > if (atomic_dec_and_test(hold_txs))
+> > > > >       ieee802154_wake_queue(local);
+> > > > >
+> > > > > I think we don't need the test of "ieee802154_queue_is_held()" he=
+re,
+> > > > > then we need to replace all stop_queue/wake_queue with hold and
+> > > > > release? =20
+> > > >
+> > > > That's actually a good idea. I've implemented it and it looks nice =
+too.
+> > > > I'll clean this up and share a new version with:
+> > > > - The wake call checked everytime hold_txs gets decremented
+> > > > - The removal of the _queue_is_held() helper
+> > > > - _wake/stop_queue() turned static
+> > > > - _hold/release_queue() used everywhere
+> > > > =20
+> > >
+> > > I think there is also a lock necessary for atomic inc/dec hitting zero
+> > > and the stop/wake call afterwards... =20
+> >
+> > Mmmh that is true, it can race. I've introduced a mutex (I think it's
+> > safe but it can be turned into a spinlock if proven necessary) to
+> > secure these increment/decrement+wakeup operations.
+> > =20
+>=20
+> be aware that you might call these functions from different contexts,
+> test your patches with PROVE_LOCKING enabled.
 
-Technically, you should be able to use CONFIG_CFG80211 here, but in
-practice I'd really hope nobody enables WIRELESS without CFG80211 :)
+Right, I've added it to my .config, let's see what it tells me.
 
-> +++ b/include/net/cfg80211.h
-> @@ -8004,10 +8004,7 @@ int cfg80211_register_netdevice(struct net_device =
-*dev);
->   *
->   * Requires the RTNL and wiphy mutex to be held.
->   */
-> -static inline void cfg80211_unregister_netdevice(struct net_device *dev)
-> -{
-> -	cfg80211_unregister_wdev(dev->ieee80211_ptr);
-> -}
-> +void cfg80211_unregister_netdevice(struct net_device *dev);
+> > > ,there are also a lot of
+> > > optimization techniques to only hold the lock for hitting zero cases
+> > > in such areas. However we will see... =20
+> >
+> > I am not aware of technical solutions to avoid the locking in these
+> > cases, what do you have in mind? Otherwise I propose just to come up
+> > with a working and hopefully solid solution and then we'll see how to
+> > optimize. =20
+>=20
+> Yes, it's not so important...
+>=20
+> - Alex
+>=20
 
-Exported functions aren't free either - I think in this case I'd
-(slightly) prefer the extra ifdef.
-
-
-Anyway, we can do this, but I also like Florian's suggestion about the
-union, and sent an attempt at a disambiguation patch there.
-
-johannes
+Thanks,
+Miqu=C3=A8l
