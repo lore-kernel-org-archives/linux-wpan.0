@@ -2,33 +2,33 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D5D3C433EF
-	for <linux-wpan@archiver.kernel.org>; Tue, 17 May 2022 16:35:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38245C4332F
+	for <linux-wpan@archiver.kernel.org>; Tue, 17 May 2022 16:35:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350984AbiEQQfS (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 17 May 2022 12:35:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35178 "EHLO
+        id S1350933AbiEQQfV (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 17 May 2022 12:35:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35454 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350962AbiEQQfN (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 17 May 2022 12:35:13 -0400
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F26B94EF47;
-        Tue, 17 May 2022 09:35:06 -0700 (PDT)
+        with ESMTP id S1350968AbiEQQfR (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 17 May 2022 12:35:17 -0400
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::228])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC2084EF79;
+        Tue, 17 May 2022 09:35:13 -0700 (PDT)
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id 128601BF206;
-        Tue, 17 May 2022 16:35:03 +0000 (UTC)
+        by mail.gandi.net (Postfix) with ESMTPSA id B078A1BF20A;
+        Tue, 17 May 2022 16:35:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1652805305;
+        t=1652805312;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=GBcaJ7pKaakuDM+JveCsuJiWc4KTOb4IXIoTonlZDVU=;
-        b=V5+2I6/xkcaV5IknxdL8OB1dMG/KSdLe2/Vq7xECpZl9m6zGWliqUE20y5/ZuD1WbywD3R
-        IYONVRWDgzAYf5MpUhuWUKObns1OY00hdUb2uvKEqlzB8p/IK2BzCg6UkGz6/P091SbV94
-        PM/CbdB1tBk7DfYCHYxTxbAreoYGVTtdyhFXEX6UuOcBMT0nAcl207V0XPEGr5B6zvp/hY
-        mocKuzm2JLtdVjNrabzRMwlMs89TVB+2wI5O7ry/jhhQhi3D0bg93IRdKjyvcHf6u4svak
-        idL/mNA9IYEWjJuu1i0oEyV2uAyzZwq8txUTALEpKre8r5H7ztHJhiOjVQ64Zg==
+        bh=dF4+CZUnuSwm1ST8JkssFZou68yDfHGT3R4u4rXqC9o=;
+        b=I/bpBbWPCbfTpCJf1k84s3P8ugFGk9accqldFEz2SFXx1WwWAUZcW8RYzLPUo9D2q4GvXJ
+        w2COnQXBvyWeCjTUIoEs0hs6ujs4LCFfOtBgTeoWg/gqKMbo8IeELxewzBjgef+Y4Q0+rc
+        KypuuENxvmhwg7vDTK8LZlpqNCdlkpkEEsfxuVFZv3Ek7QTn891ymOHXhRj/n4a0yh0jJv
+        xuvAgZydz4JVmt0+xff1AgsZ7wRuiLaOebiEADhjM1cC3BBOK2DN77YyOCkreeOIe3XvTP
+        ujPf4FVP2QCBDjv7h6bGc4BUei5UIUExqSybUdbTfxeBRp3+TwpDkZXSg1dlgw==
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
 To:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
@@ -42,9 +42,9 @@ Cc:     David Girault <david.girault@qorvo.com>,
         Jakub Kicinski <kuba@kernel.org>,
         Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
         Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: [PATCH wpan-next v3 07/11] net: mac802154: Introduce a helper to disable the queue
-Date:   Tue, 17 May 2022 18:34:46 +0200
-Message-Id: <20220517163450.240299-8-miquel.raynal@bootlin.com>
+Subject: [PATCH wpan-next v3 11/11] net: mac802154: Add a warning in the slow path
+Date:   Tue, 17 May 2022 18:34:50 +0200
+Message-Id: <20220517163450.240299-12-miquel.raynal@bootlin.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20220517163450.240299-1-miquel.raynal@bootlin.com>
 References: <20220517163450.240299-1-miquel.raynal@bootlin.com>
@@ -55,67 +55,64 @@ Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Sometimes calling the stop queue helper is not enough because it does
-not hold any lock. In order to be safe and avoid racy situations when
-trying to (soon) sync the Tx queue, for instance before sending an MLME
-frame, let's now introduce an helper which actually hold the necessary
-locks when doing so.
+In order to be able to detect possible conflicts between the net
+interface core and the ieee802154 core, let's add a warning in the slow
+path: we want to be sure that whenever we start an asynchronous MLME
+transmission (which can be fully asynchronous) the net core somehow
+agrees that this transmission is possible, ie. the device was not
+stopped. Warning in this case would allow us to track down more easily
+possible issues with the MLME logic if we ever get reports.
 
-Suggested-by: Alexander Aring <alex.aring@gmail.com>
+Unlike in the hot path, such a situation cannot be handled.
+
 Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
 ---
- net/mac802154/ieee802154_i.h | 12 ++++++++++++
- net/mac802154/util.c         | 14 ++++++++++++++
- 2 files changed, 26 insertions(+)
+ net/mac802154/tx.c | 25 +++++++++++++++++++++++++
+ 1 file changed, 25 insertions(+)
 
-diff --git a/net/mac802154/ieee802154_i.h b/net/mac802154/ieee802154_i.h
-index 0c7ff9e0b632..e34db1d49ef4 100644
---- a/net/mac802154/ieee802154_i.h
-+++ b/net/mac802154/ieee802154_i.h
-@@ -149,6 +149,18 @@ void ieee802154_hold_queue(struct ieee802154_local *local);
-  */
- void ieee802154_release_queue(struct ieee802154_local *local);
- 
-+/**
-+ * ieee802154_disable_queue - disable ieee802154 queue
-+ * @local: main mac object
-+ *
-+ * When trying to sync the Tx queue, we cannot just stop the queue
-+ * (which is basically a bit being set without proper lock handling)
-+ * because it would be racy. We actually need to call netif_tx_disable()
-+ * instead, which is done by this helper. Restarting the queue can
-+ * however still be done with a regular wake call.
-+ */
-+void ieee802154_disable_queue(struct ieee802154_local *local);
-+
- /* MIB callbacks */
- void mac802154_dev_set_page_channel(struct net_device *dev, u8 page, u8 chan);
- 
-diff --git a/net/mac802154/util.c b/net/mac802154/util.c
-index 6176cc40df91..02645f57fc2a 100644
---- a/net/mac802154/util.c
-+++ b/net/mac802154/util.c
-@@ -83,6 +83,20 @@ void ieee802154_release_queue(struct ieee802154_local *local)
- 	spin_unlock_irqrestore(&local->phy->queue_lock, flags);
+diff --git a/net/mac802154/tx.c b/net/mac802154/tx.c
+index e36aca788ea2..53a8be822e33 100644
+--- a/net/mac802154/tx.c
++++ b/net/mac802154/tx.c
+@@ -132,6 +132,25 @@ int ieee802154_sync_and_hold_queue(struct ieee802154_local *local)
+ 	return ret;
  }
  
-+void ieee802154_disable_queue(struct ieee802154_local *local)
++static bool ieee802154_netif_is_down(struct ieee802154_local *local)
 +{
 +	struct ieee802154_sub_if_data *sdata;
++	bool is_down = true;
 +
 +	rcu_read_lock();
 +	list_for_each_entry_rcu(sdata, &local->interfaces, list) {
 +		if (!sdata->dev)
 +			continue;
 +
-+		netif_tx_disable(sdata->dev);
++		is_down = !(sdata->dev->flags & IFF_UP);
++		if (is_down)
++			break;
 +	}
 +	rcu_read_unlock();
++
++	return is_down;
 +}
 +
- enum hrtimer_restart ieee802154_xmit_ifs_timer(struct hrtimer *timer)
+ static int ieee802154_mlme_op_pre(struct ieee802154_local *local)
  {
- 	struct ieee802154_local *local =
+ 	return ieee802154_sync_and_hold_queue(local);
+@@ -150,6 +169,12 @@ static int ieee802154_mlme_tx(struct ieee802154_local *local, struct sk_buff *sk
+ 	if (!local->open_count)
+ 		return -EBUSY;
+ 
++	/* Warn if the ieee802154 core thinks MLME frames can be sent while the
++	 * net interface expects this cannot happen.
++	 */
++	if (WARN_ON_ONCE(ieee802154_netif_is_down(local)))
++		return -EHOSTDOWN;
++
+ 	ieee802154_tx(local, skb);
+ 	ret = ieee802154_sync_queue(local);
+ 
 -- 
 2.34.1
 
