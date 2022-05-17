@@ -2,34 +2,34 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8300FC433EF
-	for <linux-wpan@archiver.kernel.org>; Tue, 17 May 2022 13:37:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0A69C433EF
+	for <linux-wpan@archiver.kernel.org>; Tue, 17 May 2022 13:45:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344961AbiEQNhC (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 17 May 2022 09:37:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60806 "EHLO
+        id S1344714AbiEQNpW (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 17 May 2022 09:45:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49018 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346853AbiEQNhB (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 17 May 2022 09:37:01 -0400
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::226])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F82813F1E;
-        Tue, 17 May 2022 06:36:59 -0700 (PDT)
+        with ESMTP id S243712AbiEQNpU (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 17 May 2022 09:45:20 -0400
+Received: from relay10.mail.gandi.net (relay10.mail.gandi.net [IPv6:2001:4b98:dc4:8::230])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 056CA4D240;
+        Tue, 17 May 2022 06:45:16 -0700 (PDT)
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id 6D2E8C0003;
-        Tue, 17 May 2022 13:36:56 +0000 (UTC)
+        by mail.gandi.net (Postfix) with ESMTPSA id 0ABC4240008;
+        Tue, 17 May 2022 13:45:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1652794618;
+        t=1652795115;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Gs+93tEqOiIRId+H3tx8QpHdCxarKpqDBp7PI2qHNtY=;
-        b=axifmMX/aGAptNFGfAhj7Nw3NhhJpa/B4CWUCYwvJOdWg9F15JGSi+7Df2NOCIdjUtFhOl
-        86YAmmOlHJoaRHpR9z6zXgp/issATQbgvOH+lGcz6NChYOhKgtCml2Xq4dE5vkK8k0ckW9
-        Iq+buJpd4JAqfFgwAJLXspVz/yyzVnIS3VkUMddVIywxZDM7VGThTlbjtrx5LhuVomh6yW
-        7kOOced79amPblZcgQiOrp/8aw6Vpp3YD+ERSB16ICHxgYsb4B+38u86qUfhupG2gN2xK8
-        tdDUdhgLUDqlaHvRVH+FqgNv35q791y7vPmBBJ9QnScZTYv4zG1XSHrQuX0jsA==
-Date:   Tue, 17 May 2022 15:36:55 +0200
+        bh=Ca1VcPUtCSThulRGThSIW1iyDvT90bQQDkEh2AeRIVg=;
+        b=n0DdyinVtJ0VWlovT+PRlOS076zecnvfH4oBIaHTDP/zz5MotJo8Em6PAMbydFLW/PTlLr
+        D60nTsJkddrqqciuxwyGuZDl/PDCfFtwDrW7Ia1doUr8yBwxtyOddGte5iepCa25YGNiWH
+        Ij5qBR/xxZ70gTcARBpf2PJIMngzBmrCmp+LXWxVaoSfKuP6QZ24HbqGm/KOnWXW+mTpku
+        265Yef7PlKATjEpge82eGl194QjvsuC4HCKeoypqtysblWFYj0pIRBTly6q0nuG6fjoaHb
+        UJ44p6wKa5d4iXRyHWDYCTQqA/oimIfCFJAlxOUakeHHhQEM0hGVGdYoYkFLiw==
+Date:   Tue, 17 May 2022 15:45:12 +0200
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
 To:     Alexander Aring <aahringo@redhat.com>
 Cc:     Alexander Aring <alex.aring@gmail.com>,
@@ -44,13 +44,13 @@ Cc:     Alexander Aring <alex.aring@gmail.com>,
         Frederic Blain <frederic.blain@qorvo.com>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH wpan-next v2 10/11] net: mac802154: Add a warning in the
- hot path
-Message-ID: <20220517153655.155ba311@xps-13>
-In-Reply-To: <CAK-6q+jYb7A2RzG3u7PJYKZU9D5A=vben-Wnu-3EsUU-rqGT2Q@mail.gmail.com>
+Subject: Re: [PATCH wpan-next v2 11/11] net: mac802154: Add a warning in the
+ slow path
+Message-ID: <20220517154512.5a98e4c4@xps-13>
+In-Reply-To: <CAK-6q+iuB4kFOP7RwwaFQ9AbQTijrmXBzDis7wXo2Pat=cW6kA@mail.gmail.com>
 References: <20220512143314.235604-1-miquel.raynal@bootlin.com>
-        <20220512143314.235604-11-miquel.raynal@bootlin.com>
-        <CAK-6q+jYb7A2RzG3u7PJYKZU9D5A=vben-Wnu-3EsUU-rqGT2Q@mail.gmail.com>
+        <20220512143314.235604-12-miquel.raynal@bootlin.com>
+        <CAK-6q+iuB4kFOP7RwwaFQ9AbQTijrmXBzDis7wXo2Pat=cW6kA@mail.gmail.com>
 Organization: Bootlin
 X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
@@ -60,42 +60,55 @@ Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
+Hi Alexander,
 
-aahringo@redhat.com wrote on Sun, 15 May 2022 18:30:15 -0400:
+aahringo@redhat.com wrote on Sun, 15 May 2022 18:30:28 -0400:
 
 > Hi,
 > 
 > On Thu, May 12, 2022 at 10:34 AM Miquel Raynal
 > <miquel.raynal@bootlin.com> wrote:
 > >
-> > We should never start a transmission after the queue has been stopped.
+> > In order to be able to detect possible conflicts between the net
+> > interface core and the ieee802154 core, let's add a warning in the slow
+> > path: we want to be sure that whenever we start an asynchronous MLME
+> > transmission (which can be fully asynchronous) the net core somehow
+> > agrees that this transmission is possible, ie. the device was not
+> > stopped. Warning in this case would allow us to track down more easily
+> > possible issues with the MLME logic if we ever get reports.
 > >
-> > But because it might work we don't kill the function here but rather
-> > warn loudly the user that something is wrong.
-> >
-> > Set an atomic when the queue will remain stopped. Reset this atomic when
-> > the queue actually gets restarded. Just check this atomic to know if the
-> > transmission is legitimate, warn if it is not.
+> > Unlike in the hot path, such a situation cannot be handled.
 > >
 > > Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
 > > ---
-> >  include/net/cfg802154.h |  1 +
-> >  net/mac802154/tx.c      | 16 +++++++++++++++-
-> >  net/mac802154/util.c    |  1 +
-> >  3 files changed, 17 insertions(+), 1 deletion(-)
+> >  net/mac802154/tx.c | 25 +++++++++++++++++++++++++
+> >  1 file changed, 25 insertions(+)
 > >
-> > diff --git a/include/net/cfg802154.h b/include/net/cfg802154.h
-> > index 8b6326aa2d42..a1370e87233e 100644
-> > --- a/include/net/cfg802154.h
-> > +++ b/include/net/cfg802154.h
-> > @@ -218,6 +218,7 @@ struct wpan_phy {
-> >         struct mutex queue_lock;
-> >         atomic_t ongoing_txs;
-> >         atomic_t hold_txs;
-> > +       atomic_t queue_stopped;  
+> > diff --git a/net/mac802154/tx.c b/net/mac802154/tx.c
+> > index a3c9f194c025..d61b076239c3 100644
+> > --- a/net/mac802154/tx.c
+> > +++ b/net/mac802154/tx.c
+> > @@ -132,6 +132,25 @@ int ieee802154_sync_and_hold_queue(struct ieee802154_local *local)
+> >         return ret;
+> >  }
+> >
+> > +static bool ieee802154_netif_is_down(struct ieee802154_local *local)
+> > +{
+> > +       struct ieee802154_sub_if_data *sdata;
+> > +       bool is_down = false;
+> > +
+> > +       rcu_read_lock();
+> > +       list_for_each_entry_rcu(sdata, &local->interfaces, list) {
+> > +               if (!sdata->dev)
+> > +                       continue;
+> > +
+> > +               is_down = !(sdata->dev->flags & IFF_UP);  
 > 
-> Maybe some test_bit()/set_bit() is better there?
+> Is there not a helper for this flag?
 
-What do you mean? Shall I change the atomic_t type of queue_stopped?
-Isn't the atomic_t preferred in this situation?
+I was surprised that nobody cared enough about that information to
+create a helper. Then I grepped and figured out I was not the first to
+to do that...
 
+$ git grep "flags & IFF_UP" | wc -l
+289
