@@ -2,58 +2,55 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB8CBC433F5
-	for <linux-wpan@archiver.kernel.org>; Wed, 18 May 2022 09:13:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CC97C433FE
+	for <linux-wpan@archiver.kernel.org>; Wed, 18 May 2022 09:37:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233884AbiERJNh (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 18 May 2022 05:13:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51768 "EHLO
+        id S234342AbiERJhs (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 18 May 2022 05:37:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34254 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233922AbiERJNf (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 18 May 2022 05:13:35 -0400
-Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 850901207D7;
-        Wed, 18 May 2022 02:13:32 -0700 (PDT)
+        with ESMTP id S234350AbiERJhe (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 18 May 2022 05:37:34 -0400
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::226])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C999CC8BD4;
+        Wed, 18 May 2022 02:37:31 -0700 (PDT)
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id 10CC7E001D;
-        Wed, 18 May 2022 09:13:28 +0000 (UTC)
+        by mail.gandi.net (Postfix) with ESMTPSA id EDDBFC0005;
+        Wed, 18 May 2022 09:37:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1652865211;
+        t=1652866650;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=04jfuH5BFGccW5q5/b1RjsWpg65MB3wYyeNJmV7uelc=;
-        b=FK29SCUS/LN4YW5+LtO8rrzkY5OQ3fhFKcK+BP/Pvr7uQi6T9Tjn+4PMZ1ADt1wumrS9xX
-        zSh7h36MzGd+TtNpsyGjpasyJU51Bz7kpcMUI+gpxYJ1IpCJg49M5y/FhLrJsWFUehh5bE
-        aB66y3Odb1UelG6RLWbJmMD9EKf9gfAo9jSYFWEKv8AS2akVQDQUpWCrWYzk5YEu3/CO1o
-        PnYnFNRNHlUrBQ8EOUW/n3F41Pqk6T53FHobMaf4R4Upr3ZEjHh8MKkycgu9Gxz7Y/Ghwg
-        N7rQPWaCEAtg6SsWz6eIeWz9Loc/eWzkpIUVwpgtrQWVtodp7X6zEyIZLD82Ug==
-Date:   Wed, 18 May 2022 11:13:26 +0200
+        bh=ZWvwRcNiLo+2tnHRVcavxMuPKBnYvD4fOtedtcIWA/w=;
+        b=aE7d2agwFlZZXHsCux/fP7i0fe6XwsIdxGgeMI8L3BQsWZVQFJ9msPBozCC1OY72ZKUt3m
+        budCHKF5wIFogVDlitcIMvLZbRm/z/0RCnLWjrmRxEFSvMdZUZmxWfdcrQ4/1eZ9DX+pQ7
+        WpwMAXIuH5C76jD2NPnKvHVpbGaLOBY5nUgtEzB/YPyS/ymp3n+IC8BNCCGx1gXtoMnA8k
+        +/p2MYuwfQotkv84K+Gd64dZZHHuhSqsiveThNZk+bzuJhnrISiZ3bCwdoy4nwH6tshpkL
+        wdYNLuFmQ0f3Ia2lYXPCeElGY49qx4KbNQTgJF7dD0tMJl2eJr0m5rsvwZLj8A==
+Date:   Wed, 18 May 2022 11:37:26 +0200
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
 To:     Alexander Aring <aahringo@redhat.com>
 Cc:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
         linux-wpan - ML <linux-wpan@vger.kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Network Development <netdev@vger.kernel.org>,
         David Girault <david.girault@qorvo.com>,
         Romuald Despres <romuald.despres@qorvo.com>,
         Frederic Blain <frederic.blain@qorvo.com>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
-        Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH wpan-next v2 10/11] net: mac802154: Add a warning in the
- hot path
-Message-ID: <20220518111326.243d7b45@xps-13>
-In-Reply-To: <CAK-6q+h=gNqoUHYi_2xamdGyMOYpO0GDO6--oKXSevJC9Wywag@mail.gmail.com>
-References: <20220512143314.235604-1-miquel.raynal@bootlin.com>
-        <20220512143314.235604-11-miquel.raynal@bootlin.com>
-        <CAK-6q+jYb7A2RzG3u7PJYKZU9D5A=vben-Wnu-3EsUU-rqGT2Q@mail.gmail.com>
-        <20220517153655.155ba311@xps-13>
-        <20220517165259.52ddf6fc@xps-13>
-        <CAK-6q+h=gNqoUHYi_2xamdGyMOYpO0GDO6--oKXSevJC9Wywag@mail.gmail.com>
+        Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Network Development <netdev@vger.kernel.org>
+Subject: Re: [PATCH wpan-next v3 11/11] net: mac802154: Add a warning in the
+ slow path
+Message-ID: <20220518113726.3cfb9d99@xps-13>
+In-Reply-To: <CAK-6q+hPWRUobMATaxD6rZ1zfQUnS_6pMacr+rKVHRAWe1xzSQ@mail.gmail.com>
+References: <20220517163450.240299-1-miquel.raynal@bootlin.com>
+        <20220517163450.240299-12-miquel.raynal@bootlin.com>
+        <CAK-6q+hPWRUobMATaxD6rZ1zfQUnS_6pMacr+rKVHRAWe1xzSQ@mail.gmail.com>
 Organization: Bootlin
 X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
@@ -65,69 +62,80 @@ X-Mailing-List: linux-wpan@vger.kernel.org
 
 Hi Alex,
 
-aahringo@redhat.com wrote on Tue, 17 May 2022 20:59:39 -0400:
+aahringo@redhat.com wrote on Tue, 17 May 2022 20:52:35 -0400:
 
 > Hi,
 >=20
-> On Tue, May 17, 2022 at 10:53 AM Miquel Raynal
+> On Tue, May 17, 2022 at 12:35 PM Miquel Raynal
 > <miquel.raynal@bootlin.com> wrote:
 > >
+> > In order to be able to detect possible conflicts between the net
+> > interface core and the ieee802154 core, let's add a warning in the slow
+> > path: we want to be sure that whenever we start an asynchronous MLME
+> > transmission (which can be fully asynchronous) the net core somehow
+> > agrees that this transmission is possible, ie. the device was not
+> > stopped. Warning in this case would allow us to track down more easily
+> > possible issues with the MLME logic if we ever get reports.
 > >
-> > miquel.raynal@bootlin.com wrote on Tue, 17 May 2022 15:36:55 +0200:
-> > =20
-> > > aahringo@redhat.com wrote on Sun, 15 May 2022 18:30:15 -0400:
-> > > =20
-> > > > Hi,
-> > > >
-> > > > On Thu, May 12, 2022 at 10:34 AM Miquel Raynal
-> > > > <miquel.raynal@bootlin.com> wrote: =20
-> > > > >
-> > > > > We should never start a transmission after the queue has been sto=
-pped.
-> > > > >
-> > > > > But because it might work we don't kill the function here but rat=
-her
-> > > > > warn loudly the user that something is wrong.
-> > > > >
-> > > > > Set an atomic when the queue will remain stopped. Reset this atom=
-ic when
-> > > > > the queue actually gets restarded. Just check this atomic to know=
- if the
-> > > > > transmission is legitimate, warn if it is not.
-> > > > >
-> > > > > Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
-> > > > > ---
-> > > > >  include/net/cfg802154.h |  1 +
-> > > > >  net/mac802154/tx.c      | 16 +++++++++++++++-
-> > > > >  net/mac802154/util.c    |  1 +
-> > > > >  3 files changed, 17 insertions(+), 1 deletion(-)
-> > > > >
-> > > > > diff --git a/include/net/cfg802154.h b/include/net/cfg802154.h
-> > > > > index 8b6326aa2d42..a1370e87233e 100644
-> > > > > --- a/include/net/cfg802154.h
-> > > > > +++ b/include/net/cfg802154.h
-> > > > > @@ -218,6 +218,7 @@ struct wpan_phy {
-> > > > >         struct mutex queue_lock;
-> > > > >         atomic_t ongoing_txs;
-> > > > >         atomic_t hold_txs;
-> > > > > +       atomic_t queue_stopped; =20
-> > > >
-> > > > Maybe some test_bit()/set_bit() is better there? =20
-> > >
-> > > What do you mean? Shall I change the atomic_t type of queue_stopped?
-> > > Isn't the atomic_t preferred in this situation? =20
+> > Unlike in the hot path, such a situation cannot be handled.
 > >
-> > Actually I re-read the doc and that's right, a regular unsigned long =20
+> > Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
+> > ---
+> >  net/mac802154/tx.c | 25 +++++++++++++++++++++++++
+> >  1 file changed, 25 insertions(+)
+> >
+> > diff --git a/net/mac802154/tx.c b/net/mac802154/tx.c
+> > index e36aca788ea2..53a8be822e33 100644
+> > --- a/net/mac802154/tx.c
+> > +++ b/net/mac802154/tx.c
+> > @@ -132,6 +132,25 @@ int ieee802154_sync_and_hold_queue(struct ieee8021=
+54_local *local)
+> >         return ret;
+> >  }
+> >
+> > +static bool ieee802154_netif_is_down(struct ieee802154_local *local)
+> > +{
+> > +       struct ieee802154_sub_if_data *sdata;
+> > +       bool is_down =3D true;
+> > +
+> > +       rcu_read_lock();
+> > +       list_for_each_entry_rcu(sdata, &local->interfaces, list) {
+> > +               if (!sdata->dev)
+> > +                       continue;
+> > +
+> > +               is_down =3D !(sdata->dev->flags & IFF_UP);
+> > +               if (is_down)
+> > +                       break; =20
 >=20
-> Which doc is that?
+> I thought that the helper would be "netif_running()". It seems there
+> are multiple ways to check if an interface is up.
 
-Documentation/atomic_t.txt states [SEMANTICS chapter]:
+Looking at net/core/dev.c shows that netif_running() may indicate a
+transitory state (the interface was requested to be up or down) while
+the IFF_UP flag really tells when the operation is done and the
+interface actually is up or down.
 
-	"if you find yourself only using the Non-RMW operations of
-	atomic_t, you do not in fact need atomic_t at all and are doing it wrong."
+Anyway they are both updated atomically wrt the rtnl lock. The sooner
+the better, so let's check the interface state with netif_running().
 
-In this case, I was only using atomic_set() and atomic_read(), which are
-both non-RMW operations.
+
+[...]
+
+> >
+> > +       /* Warn if the ieee802154 core thinks MLME frames can be sent w=
+hile the
+> > +        * net interface expects this cannot happen.
+> > +        */
+> > +       if (WARN_ON_ONCE(ieee802154_netif_is_down(local)))
+> > +               return -EHOSTDOWN; =20
+>=20
+> maybe also ENETDOWN?
+
+Sure
+
+> Also there is a missing rtnl_unlock().
+
+Duly noted.
 
 Thanks,
 Miqu=C3=A8l
