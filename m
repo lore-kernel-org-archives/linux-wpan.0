@@ -2,62 +2,62 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BAD46C433EF
-	for <linux-wpan@archiver.kernel.org>; Wed, 18 May 2022 00:52:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CB5BC433F5
+	for <linux-wpan@archiver.kernel.org>; Wed, 18 May 2022 00:58:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232911AbiERAwv (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 17 May 2022 20:52:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55180 "EHLO
+        id S230116AbiERA6f (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 17 May 2022 20:58:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43750 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232936AbiERAwv (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 17 May 2022 20:52:51 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 80B0F53B60
-        for <linux-wpan@vger.kernel.org>; Tue, 17 May 2022 17:52:49 -0700 (PDT)
+        with ESMTP id S232990AbiERA6d (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 17 May 2022 20:58:33 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 02CB653E3E
+        for <linux-wpan@vger.kernel.org>; Tue, 17 May 2022 17:58:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1652835168;
+        s=mimecast20190719; t=1652835512;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=S9mad11/WKyJ8qtJwe6UAYP1am6w3wILeYCMPsK0T8Q=;
-        b=OUEJEx7L4VdF8gc8YvU7ThQ9qOzTKyWzlSGwEbeEKze4t42zqMCcLFJIyTaI5Vl91LfmcM
-        Hzn9jwJVL/a22yx7oAqhtaOsmakuFdXPvBvWboyf2V3QfGIcIrEDLlwTUj6vinnGAWYo3b
-        Hu7SbA8zXfBC/cx2G/P8FOtagG02Ock=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=wJkD+7oiHBwfQ5b1c2K9F5TgSK//yqvR5ZJ7NvoECkI=;
+        b=f2oxS4jVBNRuwHXLu4L3fpLjwwYj3cC6ueK2S4uf/ug36ukqIEj84Kmvj04bJ5/v+/GgT/
+        Z1ORGDrCU5WVIRRhN6pw+OAwsZ7Nd8aeOAViHWaDngKWUSlr+5XL240qoRVmtS9Q9aYq3V
+        X8U+dgQxsBWZ0Adp3/gwk8FZHmiLO0o=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-108-0vKztDKlMEG_kBu6nkgI5w-1; Tue, 17 May 2022 20:52:47 -0400
-X-MC-Unique: 0vKztDKlMEG_kBu6nkgI5w-1
-Received: by mail-qk1-f197.google.com with SMTP id o18-20020a05620a2a1200b006a0cc3d8463so451458qkp.4
-        for <linux-wpan@vger.kernel.org>; Tue, 17 May 2022 17:52:47 -0700 (PDT)
+ us-mta-53-9ltPlhezNxq5EYzlshdRJw-1; Tue, 17 May 2022 20:58:30 -0400
+X-MC-Unique: 9ltPlhezNxq5EYzlshdRJw-1
+Received: by mail-qv1-f71.google.com with SMTP id j2-20020a0cfd42000000b0045ad9cba5deso469574qvs.5
+        for <linux-wpan@vger.kernel.org>; Tue, 17 May 2022 17:58:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=S9mad11/WKyJ8qtJwe6UAYP1am6w3wILeYCMPsK0T8Q=;
-        b=3ZwvMJMuHMVc2xd3Pi6yg26PV3lw9MQ/MJk1lYZ4uT/HY4HIDnl5OvLw5qL7QLBGKZ
-         Dl96IQVFpQSTSg0RDkkVo9l9oUmf3FWyVrkIpDyQkfuI/tmYpuBQmCepTvgH/gzL7zXe
-         93g6huWp23F2OwsHqlGTj4gBFNYOWlIeALqQ8rdOellFoy/cCJ0xwyh5oC0tN44RA63d
-         iun5W90b3QGtwpKhiHBx/akwtEDLJjIFyLercMw+jeeg6QTZT/8/zbHHaodzX5H41QlL
-         pZ97/Ue/bAMkC3uIKqDOVkH6Vp9LFoLX1/r0aBTNNpfoEF5A8cw1ll5W4yXElM6IhTKl
-         zVvw==
-X-Gm-Message-State: AOAM530VUG21nKvSSyRW3U9YvfBHGQsIXfcZodOAEHbLOrnJ2m0VdEXV
-        0Da8nm4mfgHFdJ6laYAu3g+ni2wG8tN0T/LC1n3d/Lptcn6vlhL0q6o9E0v9qVrjnEpgtMVv774
-        5svyZhbP/Kc3dlZ+cCRNB3QPDJ8gTGiPtemy3Sw==
-X-Received: by 2002:a05:620a:40c2:b0:6a0:2b1b:2b86 with SMTP id g2-20020a05620a40c200b006a02b1b2b86mr18374822qko.80.1652835166683;
-        Tue, 17 May 2022 17:52:46 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwj5CgY3t/X6jWl5mD6OgnYRUwIXUSh+pKul9iwwO4sgu7eTlEHEdWngGAKINHo2zh9bC3tDB7N/laKZy7XqGo=
-X-Received: by 2002:a05:620a:40c2:b0:6a0:2b1b:2b86 with SMTP id
- g2-20020a05620a40c200b006a02b1b2b86mr18374813qko.80.1652835166496; Tue, 17
- May 2022 17:52:46 -0700 (PDT)
+        bh=wJkD+7oiHBwfQ5b1c2K9F5TgSK//yqvR5ZJ7NvoECkI=;
+        b=qKsn7id4cgtDkC2OR5bxZIMNWnyeDh0DDcQAziGkF5fv3dKskUJ18yk1546jsm1wOc
+         N1ThXBish7ScjAfWURUkCRxJ5zFF5UgUwwKoesK88sANGoLJ8Yc1ANJBvZNOFJsalL90
+         Bp0IgzQNuaeAEoIzgyuLMYECYqi+WoG9plZrxlZdiiXg733uPp8O+j1sTbYzbR1ZQ7jN
+         ZnVmJueKhyymX2zMqGTTTwkqT2IIjRsDbfuLDCCc86eUYvV2nayxqlPtXgtEbmSvr5+T
+         WojPqr0OB2YEjm8jB519PkQAcSlvMSinUS8yfTC4Nu56O30ZIlmFCRXPDdmV1GkAGanz
+         ijEg==
+X-Gm-Message-State: AOAM531dc4qQSzge3afwuGHvtmvfH4/0MlRD/7oI9mh66jHPmGpastAC
+        x86WFErsNhbvRWSCA1Y7NibKsgBjNzHIkT4TGSEiTZsi9l/EM8/jPgvcSFal1k+ySirOYlEzW2g
+        LuPLxKkkNhs9CC8ihpS+Gb3wZlgix5g3KmS7vLA==
+X-Received: by 2002:a05:6214:c29:b0:45a:fedd:7315 with SMTP id a9-20020a0562140c2900b0045afedd7315mr22355454qvd.59.1652835510118;
+        Tue, 17 May 2022 17:58:30 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxg2xsobmhJ0gWNTQvpUgTVzDFpajtyaVVrEIKB3QgnXbi3qDoqkxEKIgNnDwQs+aBbl3JSmsaueD+fg+PJM0s=
+X-Received: by 2002:a05:6214:c29:b0:45a:fedd:7315 with SMTP id
+ a9-20020a0562140c2900b0045afedd7315mr22355440qvd.59.1652835509965; Tue, 17
+ May 2022 17:58:29 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220517163450.240299-1-miquel.raynal@bootlin.com> <20220517163450.240299-12-miquel.raynal@bootlin.com>
-In-Reply-To: <20220517163450.240299-12-miquel.raynal@bootlin.com>
+References: <20220517163450.240299-1-miquel.raynal@bootlin.com> <20220517163450.240299-11-miquel.raynal@bootlin.com>
+In-Reply-To: <20220517163450.240299-11-miquel.raynal@bootlin.com>
 From:   Alexander Aring <aahringo@redhat.com>
-Date:   Tue, 17 May 2022 20:52:35 -0400
-Message-ID: <CAK-6q+hPWRUobMATaxD6rZ1zfQUnS_6pMacr+rKVHRAWe1xzSQ@mail.gmail.com>
-Subject: Re: [PATCH wpan-next v3 11/11] net: mac802154: Add a warning in the
- slow path
+Date:   Tue, 17 May 2022 20:58:19 -0400
+Message-ID: <CAK-6q+g=9_aqTOmMYxCn6p=Z=uPNyifjVXe4hzC82ZF1QPpLMg@mail.gmail.com>
+Subject: Re: [PATCH wpan-next v3 10/11] net: mac802154: Add a warning in the
+ hot path
 To:     Miquel Raynal <miquel.raynal@bootlin.com>
 Cc:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
@@ -81,66 +81,56 @@ Hi,
 On Tue, May 17, 2022 at 12:35 PM Miquel Raynal
 <miquel.raynal@bootlin.com> wrote:
 >
-> In order to be able to detect possible conflicts between the net
-> interface core and the ieee802154 core, let's add a warning in the slow
-> path: we want to be sure that whenever we start an asynchronous MLME
-> transmission (which can be fully asynchronous) the net core somehow
-> agrees that this transmission is possible, ie. the device was not
-> stopped. Warning in this case would allow us to track down more easily
-> possible issues with the MLME logic if we ever get reports.
+> We should never start a transmission after the queue has been stopped.
 >
-> Unlike in the hot path, such a situation cannot be handled.
+> But because it might work we don't kill the function here but rather
+> warn loudly the user that something is wrong.
+>
+> Set an atomic when the queue will remain stopped. Reset this atomic when
+> the queue actually gets restarded. Just check this atomic to know if the
+> transmission is legitimate, warn if it is not.
 >
 > Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
 > ---
->  net/mac802154/tx.c | 25 +++++++++++++++++++++++++
->  1 file changed, 25 insertions(+)
+>  include/net/cfg802154.h |  1 +
+>  net/mac802154/tx.c      | 16 +++++++++++++++-
+>  net/mac802154/util.c    |  1 +
+>  3 files changed, 17 insertions(+), 1 deletion(-)
 >
+> diff --git a/include/net/cfg802154.h b/include/net/cfg802154.h
+> index 8881b6126b58..f4e7b3fe7cf0 100644
+> --- a/include/net/cfg802154.h
+> +++ b/include/net/cfg802154.h
+> @@ -218,6 +218,7 @@ struct wpan_phy {
+>         spinlock_t queue_lock;
+>         atomic_t ongoing_txs;
+>         atomic_t hold_txs;
+> +       unsigned long queue_stopped;
+
+Can we name it something like state_flags (as phy state flags)? Pretty
+sure there will be more coming, or internal_flags, no idea...
+something_flags...
+
+>         wait_queue_head_t sync_txq;
+>
+>         char priv[] __aligned(NETDEV_ALIGN);
 > diff --git a/net/mac802154/tx.c b/net/mac802154/tx.c
-> index e36aca788ea2..53a8be822e33 100644
+> index 6cc4e5c7ba94..e36aca788ea2 100644
 > --- a/net/mac802154/tx.c
 > +++ b/net/mac802154/tx.c
-> @@ -132,6 +132,25 @@ int ieee802154_sync_and_hold_queue(struct ieee802154_local *local)
->         return ret;
->  }
+> @@ -123,9 +123,13 @@ static int ieee802154_sync_queue(struct ieee802154_local *local)
 >
-> +static bool ieee802154_netif_is_down(struct ieee802154_local *local)
-> +{
-> +       struct ieee802154_sub_if_data *sdata;
-> +       bool is_down = true;
-> +
-> +       rcu_read_lock();
-> +       list_for_each_entry_rcu(sdata, &local->interfaces, list) {
-> +               if (!sdata->dev)
-> +                       continue;
-> +
-> +               is_down = !(sdata->dev->flags & IFF_UP);
-> +               if (is_down)
-> +                       break;
-
-I thought that the helper would be "netif_running()". It seems there
-are multiple ways to check if an interface is up.
-
-> +       }
-> +       rcu_read_unlock();
-> +
-> +       return is_down;
-> +}
-> +
->  static int ieee802154_mlme_op_pre(struct ieee802154_local *local)
+>  int ieee802154_sync_and_hold_queue(struct ieee802154_local *local)
 >  {
->         return ieee802154_sync_and_hold_queue(local);
-> @@ -150,6 +169,12 @@ static int ieee802154_mlme_tx(struct ieee802154_local *local, struct sk_buff *sk
->         if (!local->open_count)
->                 return -EBUSY;
+> +       int ret;
+> +
+>         ieee802154_hold_queue(local);
+> +       ret = ieee802154_sync_queue(local);
+> +       set_bit(0, &local->phy->queue_stopped);
 >
-> +       /* Warn if the ieee802154 core thinks MLME frames can be sent while the
-> +        * net interface expects this cannot happen.
-> +        */
-> +       if (WARN_ON_ONCE(ieee802154_netif_is_down(local)))
-> +               return -EHOSTDOWN;
 
-maybe also ENETDOWN? Also there is a missing rtnl_unlock().
+Define the 0 as WPAN_PHY_STATE_QUEUE_STOPPED_BIT or something like
+that, above wpan_phy.
 
 - Alex
 
