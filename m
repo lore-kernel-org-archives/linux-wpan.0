@@ -2,73 +2,71 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D328C433EF
-	for <linux-wpan@archiver.kernel.org>; Wed, 18 May 2022 12:06:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5460EC433F5
+	for <linux-wpan@archiver.kernel.org>; Wed, 18 May 2022 12:13:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236149AbiERMGR (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 18 May 2022 08:06:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49496 "EHLO
+        id S236312AbiERMNH (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 18 May 2022 08:13:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50980 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236351AbiERMGN (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 18 May 2022 08:06:13 -0400
-Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97F023B8;
-        Wed, 18 May 2022 05:06:12 -0700 (PDT)
-Received: by mail-lf1-x12c.google.com with SMTP id u30so3217473lfm.9;
-        Wed, 18 May 2022 05:06:12 -0700 (PDT)
+        with ESMTP id S236265AbiERMND (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 18 May 2022 08:13:03 -0400
+Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B6C715A3E6;
+        Wed, 18 May 2022 05:13:01 -0700 (PDT)
+Received: by mail-lj1-x22c.google.com with SMTP id h8so2272796ljb.6;
+        Wed, 18 May 2022 05:13:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=9ylo1QhxU2T8oVyW34oyE8KHWeXlZLcaPL2RcWN9uY4=;
-        b=gLxVxLa3SXkJNfSCcFq7G3SkqsEgE2QiadxDXb8qI39bLKw5/2Mh+DI9y24q8bR1NL
-         GT4WEwOSMGMBU3UmUYgyzTgyl+F+JGtRp/ehvRTC9whZkZdQjAy8Ijq/s00S7pixSbkg
-         JQBNC/cV5vz+Aby0KSY/HCw4zY0RHIgyz+jaN7dIK5CpUsubvRXUdHmYJmLoBuJgQp1n
-         rAPashabkSBNM/GqXizfs7I9uNnVW4eK7wN/4wzsuepQUCNr5XqVz7Gm5Wu7gyjpFSwJ
-         bHEquaw5SwU1CorsVpXbPzdkQRXbUKcEt+/rjOLKCwQfzOjNfgzovZZfH8oEPU039C0C
-         ZWRw==
+        bh=S8xiWwLl9oglUBlJaalCDzI0dhyWrjbQSK+WdET75zs=;
+        b=I6A3re+kEvltGk6iyhDEpWbfL1W6CZ75iWJ+63BgeHWgRMY6IaDnbds8iVREXdZpR4
+         6y2PIuZ4YGKaexQTYQRmVgdEZsfhtkgApCNWj096602xlnjUUFvwu5JGtHxN+wqnFVqc
+         5qlNSpPgnVxZ9qljMbm5xo+QRbl+AAWIDkxmwA8Rb5AK4ys0jCbVxjkBPBYkldeJ5d6T
+         kiF4CaIAVaxrAyszzrZqpcx20tqSqhClnhC0rxoe3/2xS8fPlktw/2c5/zskDEaChX+z
+         dbGlo/OGyekhNJnYlqWWkhZJTxor+nXedznNEjYzxyGQ/WINq48V4+17j6hT/E9nEi5L
+         pOow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=9ylo1QhxU2T8oVyW34oyE8KHWeXlZLcaPL2RcWN9uY4=;
-        b=fAHPaxcQRSIP9KimnwVEuDsvG1OklrctiX9O17uRwwoZ/OeGBdXHzgdBKJWHytWJqz
-         6+fUEp4+hlfby4QDxSQfwP5IzHXU+80nqP3dcyGAYXANLDU/8v0BNGQRVLMf96tgPgr8
-         jHY4u9/c85kiU1QKt4B3nCPdrgT2RzACyMRD/e3NDIquN8qBkxdUkCsu3tqtxICRzTq8
-         D+wBsTS6YS7f2q6+fvNfaSyuLbZBT7WOdt1oaY4dYvqTKUsyPJc0Xqpe5aDgurOUlUbz
-         AT5nIFFOK0ig4E3rZuaCRGQcfaQ0HaF22rN+4zoiOyPwM+p7n3wELNIFSVLpkq50K/Bb
-         73Cg==
-X-Gm-Message-State: AOAM53211QOl1jICANgxCdT+uoZcjDiWSLskM+rKhQzr4+eWWG4JmHE0
-        wIoPOK2UC3EFMo67zSnUE9Ht+mfiTbZwvL6DFug=
-X-Google-Smtp-Source: ABdhPJwCKEotBOk/h/BVMLEmqrN/Jcle36SoBbOF6poIosWJae9eGy/CdO0OZkITLtq26D66UVk6X5hCFrURaA+DHGY=
-X-Received: by 2002:a05:6512:3b28:b0:473:b9ec:187e with SMTP id
- f40-20020a0565123b2800b00473b9ec187emr20091694lfv.536.1652875570826; Wed, 18
- May 2022 05:06:10 -0700 (PDT)
+        bh=S8xiWwLl9oglUBlJaalCDzI0dhyWrjbQSK+WdET75zs=;
+        b=jrm1q16ojWy8jbu66EY3Q9n7SE6oeyid7PyJvZOwU+INmK3MJqI97mMOjPEEazbAJm
+         Y7X5lR7xDE+Tuqs+9OEc2FDnwwzuNAR+R1kqf380I63XHMcXikGs8Q9Skfy45Ce4w/GQ
+         P5qXLxIja2X7nhr3Opy4MAQmVibjBP4dYKu2m+t1RDc/pLd9h0wwREMNmBVbVJRrMvCc
+         d673IzsbfPfP9yuknTW5bePp2DlNiGCY/aG2c4BszjwviFsu69UDHKloTL0URWrNOyn0
+         1ETpqNV7SivstQTL6yMlXBmGyAnbaQnSL0KAf8HfcMzkW8Qytqw5FvyRWpPZNq/Uz55h
+         Tkrw==
+X-Gm-Message-State: AOAM530Cq2gIvjvqbz+OzPpe014+esIhsJ4BRypT3X5TRh8Mm21WYkah
+        Kk1wrQXgBF3s9WYyJymqXHGoqiGUMyON9BAyaRZVedLLoEc=
+X-Google-Smtp-Source: ABdhPJx+WqCgZEJ71ncfYrbbXP4WOGAFxQqpp1BwEzfSMBfSAcPKkPVcjdIIBgSLCnYEr6YF4Lq/aWgS99gRhhkikIw=
+X-Received: by 2002:a2e:b893:0:b0:250:6ab8:6e1a with SMTP id
+ r19-20020a2eb893000000b002506ab86e1amr16665030ljp.193.1652875979443; Wed, 18
+ May 2022 05:12:59 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220512143314.235604-1-miquel.raynal@bootlin.com>
- <20220512143314.235604-10-miquel.raynal@bootlin.com> <CAK-6q+ipHdD=NJB2N7SHQ0TUvNpc0GQXZ7dWM9nDxqyqNgxdSA@mail.gmail.com>
- <CAK-6q+i_T+FaK0tX6tF38VjyEfSzDi-QC85MTU2=4soepAag8g@mail.gmail.com>
- <20220517153045.73fda4ee@xps-13> <CAK-6q+h1fmJZobmUG5bUL3uXuQLv0kvHUv=7dW+fOCcgbrdPiA@mail.gmail.com>
- <20220518121200.2f08a6b1@xps-13>
-In-Reply-To: <20220518121200.2f08a6b1@xps-13>
+References: <20220517163450.240299-1-miquel.raynal@bootlin.com>
+ <20220517163450.240299-10-miquel.raynal@bootlin.com> <CAK-6q+jQL7cFJrL6XjuaJnNDggtO1d_sB+T+GrY9yT+Y+KC0oA@mail.gmail.com>
+ <20220518104435.76f5c0d5@xps-13> <CAB_54W7bLZ8i7W-ZzQ2WXgMvywcC=tEDHZqbj1yWYuKoVgm1sw@mail.gmail.com>
+In-Reply-To: <CAB_54W7bLZ8i7W-ZzQ2WXgMvywcC=tEDHZqbj1yWYuKoVgm1sw@mail.gmail.com>
 From:   Alexander Aring <alex.aring@gmail.com>
-Date:   Wed, 18 May 2022 08:05:46 -0400
-Message-ID: <CAB_54W6XN4kytUMgMveVF7n7TPh+w75-ew25rVt-eUQiCgNuGw@mail.gmail.com>
-Subject: Re: [PATCH wpan-next v2 09/11] net: mac802154: Introduce a
+Date:   Wed, 18 May 2022 08:12:48 -0400
+Message-ID: <CAB_54W6D-tr_c7dMbcLUO0VFfFz7vDgjjW+nRE4pWg78xqdbYg@mail.gmail.com>
+Subject: Re: [PATCH wpan-next v3 09/11] net: mac802154: Introduce a
  synchronous API for MLME commands
 To:     Miquel Raynal <miquel.raynal@bootlin.com>
 Cc:     Alexander Aring <aahringo@redhat.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
         linux-wpan - ML <linux-wpan@vger.kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Network Development <netdev@vger.kernel.org>,
         David Girault <david.girault@qorvo.com>,
         Romuald Despres <romuald.despres@qorvo.com>,
         Frederic Blain <frederic.blain@qorvo.com>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
-        Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+        Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Network Development <netdev@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
@@ -76,106 +74,84 @@ X-Mailing-List: linux-wpan@vger.kernel.org
 
 Hi,
 
-On Wed, May 18, 2022 at 6:12 AM Miquel Raynal <miquel.raynal@bootlin.com> wrote:
+On Wed, May 18, 2022 at 7:59 AM Alexander Aring <alex.aring@gmail.com> wrote:
 >
+> Hi,
 >
-> aahringo@redhat.com wrote on Tue, 17 May 2022 21:14:03 -0400:
->
-> > Hi,
+> On Wed, May 18, 2022 at 4:44 AM Miquel Raynal <miquel.raynal@bootlin.com> wrote:
 > >
-> > On Tue, May 17, 2022 at 9:30 AM Miquel Raynal <miquel.raynal@bootlin.com> wrote:
-> > >
-> > >
-> > > aahringo@redhat.com wrote on Sun, 15 May 2022 19:03:53 -0400:
-> > >
-> > > > Hi,
-> > > >
-> > > > On Sun, May 15, 2022 at 6:28 PM Alexander Aring <aahringo@redhat.com> wrote:
-> > > > >
-> > > > > Hi,
-> > > > >
-> > > > > On Thu, May 12, 2022 at 10:34 AM Miquel Raynal
-> > > > > <miquel.raynal@bootlin.com> wrote:
-> > > > > >
-> > > > > > This is the slow path, we need to wait for each command to be processed
-> > > > > > before continuing so let's introduce an helper which does the
-> > > > > > transmission and blocks until it gets notified of its asynchronous
-> > > > > > completion. This helper is going to be used when introducing scan
-> > > > > > support.
-> > > > > >
-> > > > > > Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
-> > > > > > ---
-> > > > > >  net/mac802154/ieee802154_i.h |  1 +
-> > > > > >  net/mac802154/tx.c           | 25 +++++++++++++++++++++++++
-> > > > > >  2 files changed, 26 insertions(+)
-> > > > > >
-> > > > > > diff --git a/net/mac802154/ieee802154_i.h b/net/mac802154/ieee802154_i.h
-> > > > > > index a057827fc48a..f8b374810a11 100644
-> > > > > > --- a/net/mac802154/ieee802154_i.h
-> > > > > > +++ b/net/mac802154/ieee802154_i.h
-> > > > > > @@ -125,6 +125,7 @@ extern struct ieee802154_mlme_ops mac802154_mlme_wpan;
-> > > > > >  void ieee802154_rx(struct ieee802154_local *local, struct sk_buff *skb);
-> > > > > >  void ieee802154_xmit_sync_worker(struct work_struct *work);
-> > > > > >  int ieee802154_sync_and_hold_queue(struct ieee802154_local *local);
-> > > > > > +int ieee802154_mlme_tx(struct ieee802154_local *local, struct sk_buff *skb);
-> > > > > >  netdev_tx_t
-> > > > > >  ieee802154_monitor_start_xmit(struct sk_buff *skb, struct net_device *dev);
-> > > > > >  netdev_tx_t
-> > > > > > diff --git a/net/mac802154/tx.c b/net/mac802154/tx.c
-> > > > > > index 38f74b8b6740..ec8d872143ee 100644
-> > > > > > --- a/net/mac802154/tx.c
-> > > > > > +++ b/net/mac802154/tx.c
-> > > > > > @@ -128,6 +128,31 @@ int ieee802154_sync_and_hold_queue(struct ieee802154_local *local)
-> > > > > >         return ieee802154_sync_queue(local);
-> > > > > >  }
-> > > > > >
-> > > > > > +int ieee802154_mlme_tx(struct ieee802154_local *local, struct sk_buff *skb)
-> > > > > > +{
-> > > > > > +       int ret;
-> > > > > > +
-> > > > > > +       /* Avoid possible calls to ->ndo_stop() when we asynchronously perform
-> > > > > > +        * MLME transmissions.
-> > > > > > +        */
-> > > > > > +       rtnl_lock();
-> > > > >
-> > > > > I think we should make an ASSERT_RTNL() here, the lock needs to be
-> > > > > earlier than that over the whole MLME op. MLME can trigger more than
-> > > >
-> > > > not over the whole MLME_op, that's terrible to hold the rtnl lock so
-> > > > long... so I think this is fine that some netdev call will interfere
-> > > > with this transmission.
-> > > > So forget about the ASSERT_RTNL() here, it's fine (I hope).
-> > > >
-> > > > > one message, the whole sync_hold/release queue should be earlier than
-> > > > > that... in my opinion is it not right to allow other messages so far
-> > > > > an MLME op is going on? I am not sure what the standard says to this,
-> > > > > but I think it should be stopped the whole time? All those sequence
-> > > >
-> > > > Whereas the stop of the netdev queue makes sense for the whole mlme-op
-> > > > (in my opinion).
-> > >
-> > > I might still implement an MLME pre/post helper and do the queue
-> > > hold/release calls there, while only taking the rtnl from the _tx.
-> > >
-> > > And I might create an mlme_tx_one() which does the pre/post calls as
-> > > well.
-> > >
-> > > Would something like this fit?
+> > Hi Alexander,
 > >
-> > I think so, I've heard for some transceiver types a scan operation can
-> > take hours... but I guess whoever triggers that scan in such an
-> > environment knows that it has some "side-effects"...
+> > aahringo@redhat.com wrote on Tue, 17 May 2022 20:41:41 -0400:
+> >
+> > > Hi,
+> > >
+> > > On Tue, May 17, 2022 at 12:35 PM Miquel Raynal
+> > > <miquel.raynal@bootlin.com> wrote:
+> > > >
+> > > > This is the slow path, we need to wait for each command to be processed
+> > > > before continuing so let's introduce an helper which does the
+> > > > transmission and blocks until it gets notified of its asynchronous
+> > > > completion. This helper is going to be used when introducing scan
+> > > > support.
+> > > >
+> > > > Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
+> > > > ---
+> > > >  net/mac802154/ieee802154_i.h |  1 +
+> > > >  net/mac802154/tx.c           | 46 ++++++++++++++++++++++++++++++++++++
+> > > >  2 files changed, 47 insertions(+)
+> > > >
+> > > > diff --git a/net/mac802154/ieee802154_i.h b/net/mac802154/ieee802154_i.h
+> > > > index a057827fc48a..b42c6ac789f5 100644
+> > > > --- a/net/mac802154/ieee802154_i.h
+> > > > +++ b/net/mac802154/ieee802154_i.h
+> > > > @@ -125,6 +125,7 @@ extern struct ieee802154_mlme_ops mac802154_mlme_wpan;
+> > > >  void ieee802154_rx(struct ieee802154_local *local, struct sk_buff *skb);
+> > > >  void ieee802154_xmit_sync_worker(struct work_struct *work);
+> > > >  int ieee802154_sync_and_hold_queue(struct ieee802154_local *local);
+> > > > +int ieee802154_mlme_tx_one(struct ieee802154_local *local, struct sk_buff *skb);
+> > > >  netdev_tx_t
+> > > >  ieee802154_monitor_start_xmit(struct sk_buff *skb, struct net_device *dev);
+> > > >  netdev_tx_t
+> > > > diff --git a/net/mac802154/tx.c b/net/mac802154/tx.c
+> > > > index 38f74b8b6740..6cc4e5c7ba94 100644
+> > > > --- a/net/mac802154/tx.c
+> > > > +++ b/net/mac802154/tx.c
+> > > > @@ -128,6 +128,52 @@ int ieee802154_sync_and_hold_queue(struct ieee802154_local *local)
+> > > >         return ieee802154_sync_queue(local);
+> > > >  }
+> > > >
+> > > > +static int ieee802154_mlme_op_pre(struct ieee802154_local *local)
+> > > > +{
+> > > > +       return ieee802154_sync_and_hold_queue(local);
+> > > > +}
+> > > > +
+> > > > +static int ieee802154_mlme_tx(struct ieee802154_local *local, struct sk_buff *skb)
+> > > > +{
+> > > > +       int ret;
+> > > > +
+> > > > +       /* Avoid possible calls to ->ndo_stop() when we asynchronously perform
+> > > > +        * MLME transmissions.
+> > > > +        */
+> > > > +       rtnl_lock();
+> > > > +
+> > > > +       /* Ensure the device was not stopped, otherwise error out */
+> > > > +       if (!local->open_count)
+> > > > +               return -EBUSY;
+> > > > +
+> > >
+> > > No -EBUSY here, use ?-ENETDOWN?.
+> >
+> > Isn't it strange to return "Network is down" while we try to stop the
+> > device but fail to do so because, actually, it is still being used?
+> >
 >
-> Yeah, a scan requires the data queue to be stopped and all incoming
-> packets to be dropped (others than beacons, ofc), so users must be
-> aware of this limitation.
+> you are right. Maybe -EPERM, in a sense of whether the netdev state
+> allows it or not.
 
-I think there is a real problem about how the user can synchronize the
-start of a scan and be sure that at this point everything was
-transmitted, we might need to real "flush" the queue. Your naming
-"flush" is also wrong, It will flush the framebuffer(s) of the
-transceivers but not the netdev queue... and we probably should flush
-the netdev queue before starting mlme-op... this is something to add
-in the mlme_op_pre() function.
+or maybe not, if this is the error the user gets by running iwpan. The
+problem I have with -EBUSY is that it indicates some resource is being
+used and will be solved at some time. Especially in a transmit
+function e.g. framebuffer.
 
 - Alex
