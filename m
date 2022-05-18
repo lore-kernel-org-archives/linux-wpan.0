@@ -2,62 +2,62 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF8A5C433FE
-	for <linux-wpan@archiver.kernel.org>; Wed, 18 May 2022 00:37:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F636C433F5
+	for <linux-wpan@archiver.kernel.org>; Wed, 18 May 2022 00:41:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231217AbiERAh4 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 17 May 2022 20:37:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46406 "EHLO
+        id S232345AbiERAl7 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 17 May 2022 20:41:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56266 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232648AbiERAhz (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 17 May 2022 20:37:55 -0400
+        with ESMTP id S231403AbiERAl6 (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 17 May 2022 20:41:58 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 02A803701A
-        for <linux-wpan@vger.kernel.org>; Tue, 17 May 2022 17:37:53 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 35F322B262
+        for <linux-wpan@vger.kernel.org>; Tue, 17 May 2022 17:41:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1652834273;
+        s=mimecast20190719; t=1652834516;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=m9x3dEHHI9vT8kzTo2Q1aOZl/Kuyhe2/Mpy2g+7kuvc=;
-        b=VsTKFKm8UadXw9mUOk9lkv5fPWa+k316to9rb6ZabqJoZmIrrmtaNQLNk82UbTPWWA7X9u
-        d7cvbgsMVTMmFF0l6S3myZjCBCP2h4PnOAnBryfZP6/dc3rrIYuoZ9OWkzpQlHhp31wAth
-        Rrb/u02N7MT4OE8ZbwyAjrE4tcKjOA8=
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=wERJ4wgK47PAcOyrRzert8+bNoC3QWGPRosED/fCVhI=;
+        b=ED5n+CgaMpEplkfGl9v5QHVMX3aDw2LobbWJC8vEDqjurxDinae8wjesfotZPZGMZeTuSF
+        0YG7DqsCd3Svuo8ErZAWDDwrsw7zNbV4p3vhljmPCCJLaDCIHkMNsC7Yc0JxZ7ZHziWVj8
+        9/J6AiCUWHfiQiBOHV2gDcNTEkuMNvg=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-412-VrGOlLN4MeuFwxrynkaquw-1; Tue, 17 May 2022 20:37:50 -0400
-X-MC-Unique: VrGOlLN4MeuFwxrynkaquw-1
-Received: by mail-qt1-f200.google.com with SMTP id a11-20020a05622a02cb00b002f3d23bdca2so598707qtx.5
-        for <linux-wpan@vger.kernel.org>; Tue, 17 May 2022 17:37:50 -0700 (PDT)
+ us-mta-112-0oKjj1sgPxyGsL6pfBG1Uw-1; Tue, 17 May 2022 20:41:53 -0400
+X-MC-Unique: 0oKjj1sgPxyGsL6pfBG1Uw-1
+Received: by mail-qv1-f71.google.com with SMTP id fw9-20020a056214238900b0043522aa5b81so399228qvb.21
+        for <linux-wpan@vger.kernel.org>; Tue, 17 May 2022 17:41:52 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=m9x3dEHHI9vT8kzTo2Q1aOZl/Kuyhe2/Mpy2g+7kuvc=;
-        b=rXXUpvrG6bEFGShwPnuAYXfQ3haPAysEzYPupztdOd4Mu03UyZ1OsQOTMNs+DGmDPS
-         z4tBGWUEDhAMTrG46DjzVY37Msfy9DAtxr1uAFtPqE06DuxAGwQrR2dSBt+GNbeXLUJm
-         t3k0pyItqD6JsEXW1MG3G7Ug7CYVVt3yBRp9sWYXxJhqfHoP9EAfYTBYHqKgGjnTQExD
-         Xdrt6SP2qMFYwpGh5AwDn+PsKWMfLxYnuAhj9GaQ8FgGFw4sOZffU4fMTS5am4s7kEaz
-         LdjlL9yGko/AuI0qeW+8pG0JfNoZxm8E/osWLXKLkVWTqIXtvmY844LRJhhzHBl+bnWS
-         /W+A==
-X-Gm-Message-State: AOAM532yr9lWq8pkc/p/ciNBryqxU6l6Dh7W91+lfeXGxWBFNrDij5E9
-        DSyorRogV6lxRvccRKLlLwBepyMEvUkKqBqGK2K6rPOnjnhMhSniFmt0ivRjRhk2LehRErSkMti
-        pOm8nYbRgDxx7wRod5SAzBMcog7DK33YI6ucnnQ==
-X-Received: by 2002:a05:620a:919:b0:69f:e373:3de8 with SMTP id v25-20020a05620a091900b0069fe3733de8mr17970407qkv.27.1652834269447;
-        Tue, 17 May 2022 17:37:49 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxlg9XmcKm6BmHLkYFuuDImEsNPIdGfI8TgiiUEWmyRI8/LasE85n0ZjtdnLUh3JkKRcfVMmEue0rakCkuggRM=
-X-Received: by 2002:a05:620a:919:b0:69f:e373:3de8 with SMTP id
- v25-20020a05620a091900b0069fe3733de8mr17970396qkv.27.1652834269134; Tue, 17
- May 2022 17:37:49 -0700 (PDT)
+        bh=wERJ4wgK47PAcOyrRzert8+bNoC3QWGPRosED/fCVhI=;
+        b=FD0EMZcsU+PLLTMm9Ec895qa9fWGzjYdrvJcTwacdDIaz5OVg6EM2Q5CvrHlU46bsC
+         IbID6rSoXbjTq+6/zp4XPTP+Xy288mB/NMGbh3MQ8iWWjnjjyEc4cnD/W4RPm4Wy4zrK
+         TIn+GeDlc+1/5GVIzRFmaF5mD1ChfnKNxO4fI2KzPrZS3ZnFGXh+3GrG2HGmjZtisKq6
+         gEJMa+/eGev/XsIL5UOlMl87ksu8u4CXk6xOG77zdUauH3ww6sob+Pz2HLnnGC6SLSwG
+         pq7NpPJvGm/oBGJ5BHBcZUN7cT0kjBdvEx+jujIWJz6L4GODSiuZhkOrIwavnTZrPD2Q
+         SwTA==
+X-Gm-Message-State: AOAM5323FvxiMV1jJv9LqgxaqLNfqiCONwPijCTv2VIrLPe+GUfwcHqJ
+        Ax0+AhqEhnJGdRr8fPRgZOypsf22HmyVAQ9kJIN74kuhBCEEaIJoPFYXPnhOCmRUHRYTaAcPPKd
+        NjbvtfgykYT1LRuU7NCUeiHVFxZbtcxprGuEO3A==
+X-Received: by 2002:a05:6214:23c9:b0:461:c9e7:9cd6 with SMTP id hr9-20020a05621423c900b00461c9e79cd6mr12932334qvb.116.1652834512517;
+        Tue, 17 May 2022 17:41:52 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyadn0My3D3HBXaGPzhfxj2ad+FiESM98CzYwZnx8PPV1iTmsc17Wmp8wgMacF/ZISfTXzy4MvZ3P4PnTmAgi4=
+X-Received: by 2002:a05:6214:23c9:b0:461:c9e7:9cd6 with SMTP id
+ hr9-20020a05621423c900b00461c9e79cd6mr12932324qvb.116.1652834512298; Tue, 17
+ May 2022 17:41:52 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220517163450.240299-1-miquel.raynal@bootlin.com> <20220517163450.240299-6-miquel.raynal@bootlin.com>
-In-Reply-To: <20220517163450.240299-6-miquel.raynal@bootlin.com>
+References: <20220517163450.240299-1-miquel.raynal@bootlin.com> <20220517163450.240299-10-miquel.raynal@bootlin.com>
+In-Reply-To: <20220517163450.240299-10-miquel.raynal@bootlin.com>
 From:   Alexander Aring <aahringo@redhat.com>
-Date:   Tue, 17 May 2022 20:37:38 -0400
-Message-ID: <CAK-6q+jh_PfkWB4odE8Dr+sxwWTqhirr8hyOxFFyEUzLDJC7+w@mail.gmail.com>
-Subject: Re: [PATCH wpan-next v3 05/11] net: mac802154: Bring the ability to
- hold the transmit queue
+Date:   Tue, 17 May 2022 20:41:41 -0400
+Message-ID: <CAK-6q+jQL7cFJrL6XjuaJnNDggtO1d_sB+T+GrY9yT+Y+KC0oA@mail.gmail.com>
+Subject: Re: [PATCH wpan-next v3 09/11] net: mac802154: Introduce a
+ synchronous API for MLME commands
 To:     Miquel Raynal <miquel.raynal@bootlin.com>
 Cc:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
@@ -81,261 +81,58 @@ Hi,
 On Tue, May 17, 2022 at 12:35 PM Miquel Raynal
 <miquel.raynal@bootlin.com> wrote:
 >
-> Create a hold_txs atomic variable and increment/decrement it when
-> relevant, ie. when we want to hold the queue or release it: currently
-> all the "stopped" situations are suitable, but very soon we will more
-> extensively use this feature for MLME purposes.
->
-> Upon release, the atomic counter is decremented and checked. If it is
-> back to 0, then the netif queue gets woken up. This makes the whole
-> process fully transparent, provided that all the users of
-> ieee802154_wake/stop_queue() now call ieee802154_hold/release_queue()
-> instead.
->
-> In no situation individual drivers should call any of these helpers
-> manually in order to avoid messing with the counters. There are other
-> functions more suited for this purpose which have been introduced, such
-> as the _xmit_complete() and _xmit_error() helpers which will handle all
-> that for them.
->
-> One advantage is that, as no more drivers call the stop/wake helpers
-> directly, we can safely stop exporting them and only declare the
-> hold/release ones in a header only accessible to the core.
+> This is the slow path, we need to wait for each command to be processed
+> before continuing so let's introduce an helper which does the
+> transmission and blocks until it gets notified of its asynchronous
+> completion. This helper is going to be used when introducing scan
+> support.
 >
 > Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
 > ---
->  include/net/cfg802154.h      |  6 +++--
->  include/net/mac802154.h      | 27 -------------------
->  net/ieee802154/core.c        |  2 ++
->  net/mac802154/cfg.c          |  4 +--
->  net/mac802154/ieee802154_i.h | 19 +++++++++++++
->  net/mac802154/tx.c           |  6 ++---
->  net/mac802154/util.c         | 52 +++++++++++++++++++++++++++++++-----
->  7 files changed, 75 insertions(+), 41 deletions(-)
+>  net/mac802154/ieee802154_i.h |  1 +
+>  net/mac802154/tx.c           | 46 ++++++++++++++++++++++++++++++++++++
+>  2 files changed, 47 insertions(+)
 >
-> diff --git a/include/net/cfg802154.h b/include/net/cfg802154.h
-> index 473ebcb9b155..7a191418f258 100644
-> --- a/include/net/cfg802154.h
-> +++ b/include/net/cfg802154.h
-> @@ -11,7 +11,7 @@
->
->  #include <linux/ieee802154.h>
->  #include <linux/netdevice.h>
-> -#include <linux/mutex.h>
-> +#include <linux/spinlock.h>
->  #include <linux/bug.h>
->
->  #include <net/nl802154.h>
-> @@ -214,8 +214,10 @@ struct wpan_phy {
->         /* the network namespace this phy lives in currently */
->         possible_net_t _net;
->
-> -       /* Transmission monitoring */
-> +       /* Transmission monitoring and control */
-> +       spinlock_t queue_lock;
->         atomic_t ongoing_txs;
-> +       atomic_t hold_txs;
->
->         char priv[] __aligned(NETDEV_ALIGN);
->  };
-> diff --git a/include/net/mac802154.h b/include/net/mac802154.h
-> index bdac0ddbdcdb..357d25ef627a 100644
-> --- a/include/net/mac802154.h
-> +++ b/include/net/mac802154.h
-> @@ -460,33 +460,6 @@ void ieee802154_unregister_hw(struct ieee802154_hw *hw);
->   */
->  void ieee802154_rx_irqsafe(struct ieee802154_hw *hw, struct sk_buff *skb,
->                            u8 lqi);
-> -/**
-> - * ieee802154_wake_queue - wake ieee802154 queue
-> - * @hw: pointer as obtained from ieee802154_alloc_hw().
-> - *
-> - * Tranceivers usually have either one transmit framebuffer or one framebuffer
-> - * for both transmitting and receiving. Hence, the core currently only handles
-> - * one frame at a time for each phy, which means we had to stop the queue to
-> - * avoid new skb to come during the transmission. The queue then needs to be
-> - * woken up after the operation.
-> - *
-> - * Drivers should use this function instead of netif_wake_queue.
-> - */
-> -void ieee802154_wake_queue(struct ieee802154_hw *hw);
-> -
-> -/**
-> - * ieee802154_stop_queue - stop ieee802154 queue
-> - * @hw: pointer as obtained from ieee802154_alloc_hw().
-> - *
-> - * Tranceivers usually have either one transmit framebuffer or one framebuffer
-> - * for both transmitting and receiving. Hence, the core currently only handles
-> - * one frame at a time for each phy, which means we need to tell upper layers to
-> - * stop giving us new skbs while we are busy with the transmitted one. The queue
-> - * must then be stopped before transmitting.
-> - *
-> - * Drivers should use this function instead of netif_stop_queue.
-> - */
-> -void ieee802154_stop_queue(struct ieee802154_hw *hw);
->
->  /**
->   * ieee802154_xmit_complete - frame transmission complete
-> diff --git a/net/ieee802154/core.c b/net/ieee802154/core.c
-> index de259b5170ab..47a4de6df88b 100644
-> --- a/net/ieee802154/core.c
-> +++ b/net/ieee802154/core.c
-> @@ -130,6 +130,8 @@ wpan_phy_new(const struct cfg802154_ops *ops, size_t priv_size)
->
->         init_waitqueue_head(&rdev->dev_wait);
->
-> +       spin_lock_init(&rdev->wpan_phy.queue_lock);
-> +
->         return &rdev->wpan_phy;
->  }
->  EXPORT_SYMBOL(wpan_phy_new);
-> diff --git a/net/mac802154/cfg.c b/net/mac802154/cfg.c
-> index 1e4a9f74ed43..b51100fd9e3f 100644
-> --- a/net/mac802154/cfg.c
-> +++ b/net/mac802154/cfg.c
-> @@ -46,7 +46,7 @@ static int ieee802154_suspend(struct wpan_phy *wpan_phy)
->         if (!local->open_count)
->                 goto suspend;
->
-> -       ieee802154_stop_queue(&local->hw);
-> +       ieee802154_hold_queue(local);
->         synchronize_net();
->
->         /* stop hardware - this must stop RX */
-> @@ -72,7 +72,7 @@ static int ieee802154_resume(struct wpan_phy *wpan_phy)
->                 return ret;
->
->  wake_up:
-> -       ieee802154_wake_queue(&local->hw);
-> +       ieee802154_release_queue(local);
->         local->suspended = false;
->         return 0;
->  }
 > diff --git a/net/mac802154/ieee802154_i.h b/net/mac802154/ieee802154_i.h
-> index a8b7b9049f14..0c7ff9e0b632 100644
+> index a057827fc48a..b42c6ac789f5 100644
 > --- a/net/mac802154/ieee802154_i.h
 > +++ b/net/mac802154/ieee802154_i.h
-> @@ -130,6 +130,25 @@ netdev_tx_t
->  ieee802154_subif_start_xmit(struct sk_buff *skb, struct net_device *dev);
->  enum hrtimer_restart ieee802154_xmit_ifs_timer(struct hrtimer *timer);
->
-> +/**
-> + * ieee802154_hold_queue - hold ieee802154 queue
-> + * @local: main mac object
-> + *
-> + * Hold a queue by incrementing an atomic counter and requesting the netif
-> + * queues to be stopped. The queues cannot be woken up while the counter has not
-> + * been reset with as any ieee802154_release_queue() calls as needed.
-> + */
-> +void ieee802154_hold_queue(struct ieee802154_local *local);
-> +
-> +/**
-> + * ieee802154_release_queue - release ieee802154 queue
-> + * @local: main mac object
-> + *
-> + * Release a queue which is held by decrementing an atomic counter and wake it
-> + * up only if the counter reaches 0.
-> + */
-> +void ieee802154_release_queue(struct ieee802154_local *local);
-> +
->  /* MIB callbacks */
->  void mac802154_dev_set_page_channel(struct net_device *dev, u8 page, u8 chan);
->
+> @@ -125,6 +125,7 @@ extern struct ieee802154_mlme_ops mac802154_mlme_wpan;
+>  void ieee802154_rx(struct ieee802154_local *local, struct sk_buff *skb);
+>  void ieee802154_xmit_sync_worker(struct work_struct *work);
+>  int ieee802154_sync_and_hold_queue(struct ieee802154_local *local);
+> +int ieee802154_mlme_tx_one(struct ieee802154_local *local, struct sk_buff *skb);
+>  netdev_tx_t
+>  ieee802154_monitor_start_xmit(struct sk_buff *skb, struct net_device *dev);
+>  netdev_tx_t
 > diff --git a/net/mac802154/tx.c b/net/mac802154/tx.c
-> index 33f64ecd96c7..6a53c83cf039 100644
+> index 38f74b8b6740..6cc4e5c7ba94 100644
 > --- a/net/mac802154/tx.c
 > +++ b/net/mac802154/tx.c
-> @@ -43,7 +43,7 @@ void ieee802154_xmit_sync_worker(struct work_struct *work)
->
->  err_tx:
->         /* Restart the netif queue on each sub_if_data object. */
-> -       ieee802154_wake_queue(&local->hw);
-> +       ieee802154_release_queue(local);
->         atomic_dec(&local->phy->ongoing_txs);
->         kfree_skb(skb);
->         netdev_dbg(dev, "transmission failed\n");
-> @@ -75,7 +75,7 @@ ieee802154_tx(struct ieee802154_local *local, struct sk_buff *skb)
->         }
->
->         /* Stop the netif queue on each sub_if_data object. */
-> -       ieee802154_stop_queue(&local->hw);
-> +       ieee802154_hold_queue(local);
->         atomic_inc(&local->phy->ongoing_txs);
->
->         /* Drivers should preferably implement the async callback. In some rare
-> @@ -99,7 +99,7 @@ ieee802154_tx(struct ieee802154_local *local, struct sk_buff *skb)
->         return NETDEV_TX_OK;
->
->  err_wake_netif_queue:
-> -       ieee802154_wake_queue(&local->hw);
-> +       ieee802154_release_queue(local);
->         atomic_dec(&local->phy->ongoing_txs);
->  err_free_skb:
->         kfree_skb(skb);
-> diff --git a/net/mac802154/util.c b/net/mac802154/util.c
-> index 76dc663e2af4..6176cc40df91 100644
-> --- a/net/mac802154/util.c
-> +++ b/net/mac802154/util.c
-> @@ -13,7 +13,17 @@
->  /* privid for wpan_phys to determine whether they belong to us or not */
->  const void *const mac802154_wpan_phy_privid = &mac802154_wpan_phy_privid;
->
-> -void ieee802154_wake_queue(struct ieee802154_hw *hw)
-> +/**
-> + * ieee802154_wake_queue - wake ieee802154 queue
-> + * @local: main mac object
-> + *
-> + * Tranceivers usually have either one transmit framebuffer or one framebuffer
-> + * for both transmitting and receiving. Hence, the core currently only handles
-> + * one frame at a time for each phy, which means we had to stop the queue to
-> + * avoid new skb to come during the transmission. The queue then needs to be
-> + * woken up after the operation.
-> + */
-> +static void ieee802154_wake_queue(struct ieee802154_hw *hw)
->  {
->         struct ieee802154_local *local = hw_to_local(hw);
->         struct ieee802154_sub_if_data *sdata;
-> @@ -27,9 +37,18 @@ void ieee802154_wake_queue(struct ieee802154_hw *hw)
->         }
->         rcu_read_unlock();
+> @@ -128,6 +128,52 @@ int ieee802154_sync_and_hold_queue(struct ieee802154_local *local)
+>         return ieee802154_sync_queue(local);
 >  }
-> -EXPORT_SYMBOL(ieee802154_wake_queue);
 >
-> -void ieee802154_stop_queue(struct ieee802154_hw *hw)
-> +/**
-> + * ieee802154_stop_queue - stop ieee802154 queue
-> + * @local: main mac object
-> + *
-> + * Tranceivers usually have either one transmit framebuffer or one framebuffer
-> + * for both transmitting and receiving. Hence, the core currently only handles
-> + * one frame at a time for each phy, which means we need to tell upper layers to
-> + * stop giving us new skbs while we are busy with the transmitted one. The queue
-> + * must then be stopped before transmitting.
-> + */
-> +static void ieee802154_stop_queue(struct ieee802154_hw *hw)
->  {
->         struct ieee802154_local *local = hw_to_local(hw);
->         struct ieee802154_sub_if_data *sdata;
-> @@ -43,14 +62,33 @@ void ieee802154_stop_queue(struct ieee802154_hw *hw)
->         }
->         rcu_read_unlock();
->  }
-> -EXPORT_SYMBOL(ieee802154_stop_queue);
-> +
-> +void ieee802154_hold_queue(struct ieee802154_local *local)
+> +static int ieee802154_mlme_op_pre(struct ieee802154_local *local)
 > +{
-> +       unsigned long flags;
-> +
-> +       spin_lock_irqsave(&local->phy->queue_lock, flags);
-> +       ieee802154_stop_queue(&local->hw);
-> +       atomic_inc(&local->phy->hold_txs);
-> +       spin_unlock_irqrestore(&local->phy->queue_lock, flags);
+> +       return ieee802154_sync_and_hold_queue(local);
 > +}
+> +
+> +static int ieee802154_mlme_tx(struct ieee802154_local *local, struct sk_buff *skb)
+> +{
+> +       int ret;
+> +
+> +       /* Avoid possible calls to ->ndo_stop() when we asynchronously perform
+> +        * MLME transmissions.
+> +        */
+> +       rtnl_lock();
+> +
+> +       /* Ensure the device was not stopped, otherwise error out */
+> +       if (!local->open_count)
+> +               return -EBUSY;
+> +
 
-I think that works, but I would expect something like:
-
-if (!atomic_fetch_inc(hold_txs))
-      ieee802154_stop_queue(&local->hw);
+No -EBUSY here, use ?-ENETDOWN?. You forgot rtnl_unlock() here.
 
 - Alex
 
