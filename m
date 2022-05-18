@@ -2,122 +2,212 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 850E9C433EF
-	for <linux-wpan@archiver.kernel.org>; Wed, 18 May 2022 16:29:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E458C433EF
+	for <linux-wpan@archiver.kernel.org>; Wed, 18 May 2022 18:18:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240284AbiERQ3u (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 18 May 2022 12:29:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54060 "EHLO
+        id S241416AbiERSSh (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 18 May 2022 14:18:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53558 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240357AbiERQ3q (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 18 May 2022 12:29:46 -0400
-Received: from relay11.mail.gandi.net (relay11.mail.gandi.net [217.70.178.231])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 167241F90EB;
-        Wed, 18 May 2022 09:29:22 -0700 (PDT)
-Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id 35CD3100005;
-        Wed, 18 May 2022 16:29:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1652891361;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=f2YX2eCJtpcllO5djYtewYQqwQlZHUUNrFfYk/j2enc=;
-        b=KZxA2EwxxWA7NnH0RgYMOZdGMZYJ29lPDs2eSHB/aHC6akBp1XoQ78Tu0ho+0TujFt+Hlh
-        PA5kdbFnYZU5nuRsSlWrFOeYYUWYUvq2kY7Be9ymKWmf8yyNpN7ByNR5nhoHpjiINEadgM
-        voRAl1M1alRBedv+oeKlermcLTe/XsXXg1jryQLBCiX3vLQg9l5Io+Po04UF0R9VV6is+C
-        A1/6WhsyRQtPWgBYB03BPFh47X9xL8e148N/ZyZBHZlcKJZFgqrUbltozP5tLxwFWUEJwr
-        vFVRKxYWPEw20IT1r38MfHcpagfjHyK3ijGoWqi86nGAGASSW2a05J0/uIkN9g==
-Date:   Wed, 18 May 2022 18:29:17 +0200
-From:   Miquel Raynal <miquel.raynal@bootlin.com>
-To:     Alexander Aring <aahringo@redhat.com>
-Cc:     Alexander Aring <alex.aring@gmail.com>,
-        Stefan Schmidt <stefan@datenfreihafen.org>,
-        linux-wpan - ML <linux-wpan@vger.kernel.org>,
-        David Girault <david.girault@qorvo.com>,
-        Romuald Despres <romuald.despres@qorvo.com>,
-        Frederic Blain <frederic.blain@qorvo.com>,
-        Nicolas Schodet <nico@ni.fr.eu.org>,
-        Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-        "David S. Miller" <davem@davemloft.net>,
+        with ESMTP id S241425AbiERSSd (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 18 May 2022 14:18:33 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB0D61BF1BF;
+        Wed, 18 May 2022 11:18:12 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 157DA61873;
+        Wed, 18 May 2022 18:18:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C8BA9C34100;
+        Wed, 18 May 2022 18:18:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1652897891;
+        bh=IKJuNH0T2oYWUhXspWXXPLngkxRB4DMqSX4Cy6CH1U0=;
+        h=From:To:Cc:Subject:Date:From;
+        b=Wqc+ADdjOoB0l2HDbuBRyCHN2rBSKrvA4EBPDO8DFvFI5HDBM6AsWZ2jY/8+nY9UA
+         dP5e02hfMbHZcIrnMGvO0mJouBus3EuDnsY+cBpB8UPmsWrDt4cZIOI20OG1OxbBNJ
+         Iycz8s1Qi0jb38hORoAJOMMeVVxLKDMT3fzLYJYWFNSr98cHOvksokKt3hk8nqkyUS
+         jJl1xnV/YZPpRmyT15raXEu+nZ0mRtKWXJEh3iIf06/fRcCpzC0GPKg9YGdit8qNvY
+         vNPtSBQ6AEmVFkdoKiq4gpnUR9ZzCwHBoYu6a9d9DO2ePTm3MXLVFVtS/ZqUHEpBlj
+         uITjzcfTL748g==
+From:   Jakub Kicinski <kuba@kernel.org>
+To:     davem@davemloft.net
+Cc:     netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
         Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Network Development <netdev@vger.kernel.org>
-Subject: Re: [PATCH wpan-next v3 10/11] net: mac802154: Add a warning in the
- hot path
-Message-ID: <20220518182917.10323dea@xps-13>
-In-Reply-To: <CAK-6q+j-EgoO-mWx_zRrORmA9-75h_=_fh22KMxySdSgeLsJEA@mail.gmail.com>
-References: <20220517163450.240299-1-miquel.raynal@bootlin.com>
-        <20220517163450.240299-11-miquel.raynal@bootlin.com>
-        <CAK-6q+g=9_aqTOmMYxCn6p=Z=uPNyifjVXe4hzC82ZF1QPpLMg@mail.gmail.com>
-        <20220518105543.54cda82f@xps-13>
-        <CAK-6q+j-EgoO-mWx_zRrORmA9-75h_=_fh22KMxySdSgeLsJEA@mail.gmail.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+        Stefan Schmidt <stefan@datenfreihafen.org>,
+        johannes@sipsolutions.net, alex.aring@gmail.com,
+        mareklindner@neomailbox.ch, sw@simonwunderlich.de, a@unstable.cc,
+        sven@narfation.org, linux-wireless@vger.kernel.org,
+        linux-wpan@vger.kernel.org
+Subject: [PATCH net-next v2] net: ifdefy the wireless pointers in struct net_device
+Date:   Wed, 18 May 2022 11:18:07 -0700
+Message-Id: <20220518181807.2030747-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.34.3
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
+Most protocol-specific pointers in struct net_device are under
+a respective ifdef. Wireless is the notable exception. Since
+there's a sizable number of custom-built kernels for datacenter
+workloads which don't build wireless it seems reasonable to
+ifdefy those pointers as well.
 
-aahringo@redhat.com wrote on Wed, 18 May 2022 10:31:55 -0400:
+While at it move IPv4 and IPv6 pointers up, those are special
+for obvious reasons.
 
-> Hi,
->=20
-> On Wed, May 18, 2022 at 4:55 AM Miquel Raynal <miquel.raynal@bootlin.com>=
- wrote:
-> >
-> >
-> > aahringo@redhat.com wrote on Tue, 17 May 2022 20:58:19 -0400:
-> > =20
-> > > Hi,
-> > >
-> > > On Tue, May 17, 2022 at 12:35 PM Miquel Raynal
-> > > <miquel.raynal@bootlin.com> wrote: =20
-> > > >
-> > > > We should never start a transmission after the queue has been stopp=
-ed.
-> > > >
-> > > > But because it might work we don't kill the function here but rather
-> > > > warn loudly the user that something is wrong.
-> > > >
-> > > > Set an atomic when the queue will remain stopped. Reset this atomic=
- when
-> > > > the queue actually gets restarded. Just check this atomic to know i=
-f the
-> > > > transmission is legitimate, warn if it is not.
-> > > >
-> > > > Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
-> > > > ---
-> > > >  include/net/cfg802154.h |  1 +
-> > > >  net/mac802154/tx.c      | 16 +++++++++++++++-
-> > > >  net/mac802154/util.c    |  1 +
-> > > >  3 files changed, 17 insertions(+), 1 deletion(-)
-> > > >
-> > > > diff --git a/include/net/cfg802154.h b/include/net/cfg802154.h
-> > > > index 8881b6126b58..f4e7b3fe7cf0 100644
-> > > > --- a/include/net/cfg802154.h
-> > > > +++ b/include/net/cfg802154.h
-> > > > @@ -218,6 +218,7 @@ struct wpan_phy {
-> > > >         spinlock_t queue_lock;
-> > > >         atomic_t ongoing_txs;
-> > > >         atomic_t hold_txs;
-> > > > +       unsigned long queue_stopped; =20
-> > >
-> > > Can we name it something like state_flags (as phy state flags)? Pretty
-> > > sure there will be more coming, or internal_flags, no idea...
-> > > something_flags... =20
-> >
-> > 'phy_flags'? Just 'flags', maybe? =20
->=20
-> make it so.
+Acked-by: Stefan Schmidt <stefan@datenfreihafen.org> # ieee802154
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+v1: https://lore.kernel.org/all/20220516215638.1787257-1-kuba@kernel.org/
+v2: - CONFIG_WIRELESS -> CONFIG_CFG80211 (this needs a bit of
+      untangling in sysfs)
+    - keep cfg80211_unregister_netdevice in the header
 
-Oh, there is already a flags entry in wpan_phy. I've adjusted the
-naming to what existed (keeping the _STATE_ prefix) and kept that
-"flags" entry instead of creating a new one.
+CC: johannes@sipsolutions.net
+CC: alex.aring@gmail.com
+CC: stefan@datenfreihafen.org
+CC: mareklindner@neomailbox.ch
+CC: sw@simonwunderlich.de
+CC: a@unstable.cc
+CC: sven@narfation.org
+CC: linux-wireless@vger.kernel.org
+CC: linux-wpan@vger.kernel.org
+---
+ include/linux/netdevice.h       |  8 ++++++--
+ include/net/cfg80211.h          |  2 ++
+ include/net/cfg802154.h         |  2 ++
+ net/batman-adv/hard-interface.c |  2 ++
+ net/core/net-sysfs.c            | 21 ++++++++++++++-------
+ 5 files changed, 26 insertions(+), 9 deletions(-)
 
-Thanks,
-Miqu=C3=A8l
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index cbaf312e365b..3ff4a654f1f0 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -2119,6 +2119,8 @@ struct net_device {
+ 
+ 	/* Protocol-specific pointers */
+ 
++	struct in_device __rcu	*ip_ptr;
++	struct inet6_dev __rcu	*ip6_ptr;
+ #if IS_ENABLED(CONFIG_VLAN_8021Q)
+ 	struct vlan_info __rcu	*vlan_info;
+ #endif
+@@ -2131,16 +2133,18 @@ struct net_device {
+ #if IS_ENABLED(CONFIG_ATALK)
+ 	void 			*atalk_ptr;
+ #endif
+-	struct in_device __rcu	*ip_ptr;
+ #if IS_ENABLED(CONFIG_DECNET)
+ 	struct dn_dev __rcu     *dn_ptr;
+ #endif
+-	struct inet6_dev __rcu	*ip6_ptr;
+ #if IS_ENABLED(CONFIG_AX25)
+ 	void			*ax25_ptr;
+ #endif
++#if IS_ENABLED(CONFIG_CFG80211)
+ 	struct wireless_dev	*ieee80211_ptr;
++#endif
++#if IS_ENABLED(CONFIG_IEEE802154) || IS_ENABLED(CONFIG_6LOWPAN)
+ 	struct wpan_dev		*ieee802154_ptr;
++#endif
+ #if IS_ENABLED(CONFIG_MPLS_ROUTING)
+ 	struct mpls_dev __rcu	*mpls_ptr;
+ #endif
+diff --git a/include/net/cfg80211.h b/include/net/cfg80211.h
+index 68713388b617..d523b1e49d1e 100644
+--- a/include/net/cfg80211.h
++++ b/include/net/cfg80211.h
+@@ -8006,7 +8006,9 @@ int cfg80211_register_netdevice(struct net_device *dev);
+  */
+ static inline void cfg80211_unregister_netdevice(struct net_device *dev)
+ {
++#if IS_ENABLED(CONFIG_CFG80211)
+ 	cfg80211_unregister_wdev(dev->ieee80211_ptr);
++#endif
+ }
+ 
+ /**
+diff --git a/include/net/cfg802154.h b/include/net/cfg802154.h
+index 85f9e8417688..d8d8719315fd 100644
+--- a/include/net/cfg802154.h
++++ b/include/net/cfg802154.h
+@@ -373,6 +373,7 @@ struct wpan_dev {
+ 
+ #define to_phy(_dev)	container_of(_dev, struct wpan_phy, dev)
+ 
++#if IS_ENABLED(CONFIG_IEEE802154) || IS_ENABLED(CONFIG_6LOWPAN)
+ static inline int
+ wpan_dev_hard_header(struct sk_buff *skb, struct net_device *dev,
+ 		     const struct ieee802154_addr *daddr,
+@@ -383,6 +384,7 @@ wpan_dev_hard_header(struct sk_buff *skb, struct net_device *dev,
+ 
+ 	return wpan_dev->header_ops->create(skb, dev, daddr, saddr, len);
+ }
++#endif
+ 
+ struct wpan_phy *
+ wpan_phy_new(const struct cfg802154_ops *ops, size_t priv_size);
+diff --git a/net/batman-adv/hard-interface.c b/net/batman-adv/hard-interface.c
+index 83fb51b6e299..b8f8da7ee3de 100644
+--- a/net/batman-adv/hard-interface.c
++++ b/net/batman-adv/hard-interface.c
+@@ -307,9 +307,11 @@ static bool batadv_is_cfg80211_netdev(struct net_device *net_device)
+ 	if (!net_device)
+ 		return false;
+ 
++#if IS_ENABLED(CONFIG_CFG80211)
+ 	/* cfg80211 drivers have to set ieee80211_ptr */
+ 	if (net_device->ieee80211_ptr)
+ 		return true;
++#endif
+ 
+ 	return false;
+ }
+diff --git a/net/core/net-sysfs.c b/net/core/net-sysfs.c
+index 4980c3a50475..99d737b1c720 100644
+--- a/net/core/net-sysfs.c
++++ b/net/core/net-sysfs.c
+@@ -757,6 +757,19 @@ static const struct attribute_group wireless_group = {
+ };
+ #endif
+ 
++static bool wireless_group_needed(struct net_device *ndev)
++{
++#if IS_ENABLED(CONFIG_CFG80211)
++	if (ndev->ieee80211_ptr)
++		return true;
++#endif
++#if IS_ENABLED(CONFIG_WIRELESS_EXT)
++	if (ndev->wireless_handlers)
++		return true;
++#endif
++	return false;
++}
++
+ #else /* CONFIG_SYSFS */
+ #define net_class_groups	NULL
+ #endif /* CONFIG_SYSFS */
+@@ -1996,14 +2009,8 @@ int netdev_register_kobject(struct net_device *ndev)
+ 
+ 	*groups++ = &netstat_group;
+ 
+-#if IS_ENABLED(CONFIG_WIRELESS_EXT) || IS_ENABLED(CONFIG_CFG80211)
+-	if (ndev->ieee80211_ptr)
+-		*groups++ = &wireless_group;
+-#if IS_ENABLED(CONFIG_WIRELESS_EXT)
+-	else if (ndev->wireless_handlers)
++	if (wireless_group_needed(ndev))
+ 		*groups++ = &wireless_group;
+-#endif
+-#endif
+ #endif /* CONFIG_SYSFS */
+ 
+ 	error = device_add(dev);
+-- 
+2.34.3
+
