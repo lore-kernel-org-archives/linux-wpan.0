@@ -2,144 +2,184 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F42FC433F5
-	for <linux-wpan@archiver.kernel.org>; Wed, 18 May 2022 20:31:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D88CC433EF
+	for <linux-wpan@archiver.kernel.org>; Thu, 19 May 2022 01:52:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242460AbiERUbq (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 18 May 2022 16:31:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54042 "EHLO
+        id S232684AbiESBwF (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 18 May 2022 21:52:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49662 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242454AbiERUbp (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 18 May 2022 16:31:45 -0400
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1932EAD3F;
-        Wed, 18 May 2022 13:31:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1652905904; x=1684441904;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=xBq3Cf7/l7VVICiNn+fUDIB0+RGgo7IdT8rhgcpuJqw=;
-  b=JirvlCP7ZRnWVPEMJH4djoPWcWY2M15Oo/askDPHX6p2e1s2ZqzA3vpU
-   DgaF0sO/X5Pz7FXWdO7QFAYJR8VUvZV5/2J0TGWgrunlxa77DPOWKUmM+
-   g3BhF1J3MOrag4t5b0jIHRPL+hibOBfDkHTXmL/+04amSPNkIXhd+0pdy
-   PHS8TE8nnANQp2gYPyvVPWFKxh1uRGY1xvwozEnyqmlMQA84sT+7EZlBO
-   lEfOWaJpyNJ9nwPnd7XmGEFR4jKpgK0hXuwsS4WQd7B9SUUAkbxtqsjmK
-   sWsiKFKd9OnptBF3hFV7sjpf36Jht6YdOFUKjdblBeT7O+uHyfhIf4okC
-   Q==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10351"; a="297179098"
-X-IronPort-AV: E=Sophos;i="5.91,235,1647327600"; 
-   d="scan'208";a="297179098"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 May 2022 13:31:44 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.91,235,1647327600"; 
-   d="scan'208";a="569725348"
-Received: from lkp-server02.sh.intel.com (HELO 242b25809ac7) ([10.239.97.151])
-  by orsmga007.jf.intel.com with ESMTP; 18 May 2022 13:31:40 -0700
-Received: from kbuild by 242b25809ac7 with local (Exim 4.95)
-        (envelope-from <lkp@intel.com>)
-        id 1nrQKZ-0002bd-Fi;
-        Wed, 18 May 2022 20:31:39 +0000
-Date:   Thu, 19 May 2022 04:31:31 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
-Cc:     kbuild-all@lists.01.org, netdev@vger.kernel.org,
-        edumazet@google.com, pabeni@redhat.com,
-        Jakub Kicinski <kuba@kernel.org>,
-        Stefan Schmidt <stefan@datenfreihafen.org>,
-        johannes@sipsolutions.net, alex.aring@gmail.com,
-        mareklindner@neomailbox.ch, sw@simonwunderlich.de, a@unstable.cc,
-        sven@narfation.org, linux-wireless@vger.kernel.org,
-        linux-wpan@vger.kernel.org
-Subject: Re: [PATCH net-next v2] net: ifdefy the wireless pointers in struct
- net_device
-Message-ID: <202205190456.MohbzV8M-lkp@intel.com>
-References: <20220518181807.2030747-1-kuba@kernel.org>
+        with ESMTP id S232689AbiESBwE (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 18 May 2022 21:52:04 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E1EEBC3D3F
+        for <linux-wpan@vger.kernel.org>; Wed, 18 May 2022 18:51:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1652925118;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=w3n7464PDnqcmAf3tMFw9NumVNCQiOBBYTd0UPzXjMc=;
+        b=SeGzwAuAgZkOVw/jdYRNcEAiJdBfgCcfoHzagXwq+UgPVKL8oC2+4yBE7aH6EE+Lh9nKFg
+        8P0DKaPoNPdQOWGENoDYWPcOR0caZoiiAN7ALJEa1cmgW2edD+AfHkr/UJ5BFO2WbM8+u0
+        cMwx/d8JCJKRo26YtADJkf+yeLLTxvs=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-649-GWa4BvCQOp-RD-Oiqvqz9A-1; Wed, 18 May 2022 21:51:49 -0400
+X-MC-Unique: GWa4BvCQOp-RD-Oiqvqz9A-1
+Received: by mail-qk1-f198.google.com with SMTP id bk23-20020a05620a1a1700b0067b32f93b90so2997284qkb.16
+        for <linux-wpan@vger.kernel.org>; Wed, 18 May 2022 18:51:49 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=w3n7464PDnqcmAf3tMFw9NumVNCQiOBBYTd0UPzXjMc=;
+        b=PW4MRaaXiMtZOBh5OEbpEXjJ0jpfVYQZHv6Y6axn3dIVOLmA3XZo8dgl7ZySHX5p+B
+         zKUHmCgjFd29DgSIMvW8oIezs0H7qMcE4M9vnwjr5XJqvIjk5vWvgk40XKmZWqbq94mX
+         ZMmQsS0cra7sKxl/TI2TWNOfe3pFnKu6002zMOPdYaxGYGiVT2az6lZM2IYJjzD/272H
+         OGHGaTTlnQdyt33zYI7m67Ra/fxRrWLDW5D75aoAlNZaEmRQlsbMieodlw8sC+q/w0CK
+         JFBWiq/WVa6L7B7uO9NDbmc3MjXzDJ7UzlLQrQmumPJSAna54vwCA/raVEej9xg2bmdq
+         GhRw==
+X-Gm-Message-State: AOAM532oGpkr7gAyINVuMiq7rgKq15Rl0zHnLXx0fkgTPmGILouYH8Su
+        ppQCKU6UHRS+bU098eDGQLcPa/ekrHGPP4knQPbg468tffzUXtzPmNSW/luRA7jXNbwl5gn7Tea
+        ZXNRGOAKDTdsWcy/pXRRIuxqh16bMneN4E8oY7w==
+X-Received: by 2002:ad4:5dcf:0:b0:461:fef4:c2de with SMTP id m15-20020ad45dcf000000b00461fef4c2demr22558qvh.28.1652925108197;
+        Wed, 18 May 2022 18:51:48 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzB13UGIyshjzGgSgLrDBB9JMg9j9SBLnrOLvRrHQDPRhSjgY9HAzDYdExdCDLz3Zs3PqSLX8JpdHeYhOi7Ri8=
+X-Received: by 2002:ad4:5dcf:0:b0:461:fef4:c2de with SMTP id
+ m15-20020ad45dcf000000b00461fef4c2demr22543qvh.28.1652925107943; Wed, 18 May
+ 2022 18:51:47 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220518181807.2030747-1-kuba@kernel.org>
+References: <20220512143314.235604-1-miquel.raynal@bootlin.com>
+ <20220512143314.235604-10-miquel.raynal@bootlin.com> <CAK-6q+ipHdD=NJB2N7SHQ0TUvNpc0GQXZ7dWM9nDxqyqNgxdSA@mail.gmail.com>
+ <CAK-6q+i_T+FaK0tX6tF38VjyEfSzDi-QC85MTU2=4soepAag8g@mail.gmail.com>
+ <20220517153045.73fda4ee@xps-13> <CAK-6q+h1fmJZobmUG5bUL3uXuQLv0kvHUv=7dW+fOCcgbrdPiA@mail.gmail.com>
+ <20220518121200.2f08a6b1@xps-13> <CAB_54W6XN4kytUMgMveVF7n7TPh+w75-ew25rVt-eUQiCgNuGw@mail.gmail.com>
+ <20220518143702.48cb9c66@xps-13> <CAK-6q+g07ficTc-h_ks8GPpv880goHuGNXTD2fqbfbR7LDPZWQ@mail.gmail.com>
+ <20220518181214.34a34ed6@xps-13>
+In-Reply-To: <20220518181214.34a34ed6@xps-13>
+From:   Alexander Aring <aahringo@redhat.com>
+Date:   Wed, 18 May 2022 21:51:36 -0400
+Message-ID: <CAK-6q+ixJsO7GYh97eCNH94JmkadTFzgjL5jOgdW2N7iTiWF6g@mail.gmail.com>
+Subject: Re: [PATCH wpan-next v2 09/11] net: mac802154: Introduce a
+ synchronous API for MLME commands
+To:     Miquel Raynal <miquel.raynal@bootlin.com>
+Cc:     Alexander Aring <alex.aring@gmail.com>,
+        Stefan Schmidt <stefan@datenfreihafen.org>,
+        linux-wpan - ML <linux-wpan@vger.kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Network Development <netdev@vger.kernel.org>,
+        David Girault <david.girault@qorvo.com>,
+        Romuald Despres <romuald.despres@qorvo.com>,
+        Frederic Blain <frederic.blain@qorvo.com>,
+        Nicolas Schodet <nico@ni.fr.eu.org>,
+        Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi Jakub,
+Hi,
 
-I love your patch! Yet something to improve:
+On Wed, May 18, 2022 at 12:12 PM Miquel Raynal
+<miquel.raynal@bootlin.com> wrote:
+>
+> Hi Alexander,
+>
+> > > > > > > > > > +int ieee802154_mlme_tx(struct ieee802154_local *local, struct sk_buff *skb)
+> > > > > > > > > > +{
+> > > > > > > > > > +       int ret;
+> > > > > > > > > > +
+> > > > > > > > > > +       /* Avoid possible calls to ->ndo_stop() when we asynchronously perform
+> > > > > > > > > > +        * MLME transmissions.
+> > > > > > > > > > +        */
+> > > > > > > > > > +       rtnl_lock();
+> > > > > > > > >
+> > > > > > > > > I think we should make an ASSERT_RTNL() here, the lock needs to be
+> > > > > > > > > earlier than that over the whole MLME op. MLME can trigger more than
+> > > > > > > >
+> > > > > > > > not over the whole MLME_op, that's terrible to hold the rtnl lock so
+> > > > > > > > long... so I think this is fine that some netdev call will interfere
+> > > > > > > > with this transmission.
+> > > > > > > > So forget about the ASSERT_RTNL() here, it's fine (I hope).
+> > > > > > > >
+> > > > > > > > > one message, the whole sync_hold/release queue should be earlier than
+> > > > > > > > > that... in my opinion is it not right to allow other messages so far
+> > > > > > > > > an MLME op is going on? I am not sure what the standard says to this,
+> > > > > > > > > but I think it should be stopped the whole time? All those sequence
+> > > > > > > >
+> > > > > > > > Whereas the stop of the netdev queue makes sense for the whole mlme-op
+> > > > > > > > (in my opinion).
+> > > > > > >
+> > > > > > > I might still implement an MLME pre/post helper and do the queue
+> > > > > > > hold/release calls there, while only taking the rtnl from the _tx.
+> > > > > > >
+> > > > > > > And I might create an mlme_tx_one() which does the pre/post calls as
+> > > > > > > well.
+> > > > > > >
+> > > > > > > Would something like this fit?
+> > > > > >
+> > > > > > I think so, I've heard for some transceiver types a scan operation can
+> > > > > > take hours... but I guess whoever triggers that scan in such an
+> > > > > > environment knows that it has some "side-effects"...
+> > > > >
+> > > > > Yeah, a scan requires the data queue to be stopped and all incoming
+> > > > > packets to be dropped (others than beacons, ofc), so users must be
+> > > > > aware of this limitation.
+> > > >
+> > > > I think there is a real problem about how the user can synchronize the
+> > > > start of a scan and be sure that at this point everything was
+> > > > transmitted, we might need to real "flush" the queue. Your naming
+> > > > "flush" is also wrong, It will flush the framebuffer(s) of the
+> > > > transceivers but not the netdev queue... and we probably should flush
+> > > > the netdev queue before starting mlme-op... this is something to add
+> > > > in the mlme_op_pre() function.
+> > >
+> > > Is it even possible? This requires waiting for the netdev queue to be
+> > > empty before stopping it, but if users constantly flood the transceiver
+> > > with data packets this might "never" happen.
+> > >
+> >
+> > Nothing is impossible, just maybe nobody thought about that. Sure
+> > putting more into the queue should be forbidden but what's inside
+> > should be "flushed". Currently we make a hard cut, there is no way
+> > that the user knows what's sent or not BUT that is the case for
+> > xmit_do() anyway, it's not reliable... people need to have the right
+> > upper layer protocol. However I think we could run into problems if we
+> > especially have features like waiting for the socket error queue to
+> > know if e.g. an ack was received or not.
+>
+> Looking at net/core/dev.c I don't see the issue anymore, let me try to
+> explain: as far as I understand the net device queue is a very
+> conceptual "queue" which only has a reality if the underlying layer
+> really implements the concept of a queue. To be more precise, at the
+> netdev level itself, there is a HARD_TX_LOCK() call which serializes
+> the ->ndo_start_xmit() calls, but whatever entered the
+> ->ndo_start_xmit() hook _will_ be handled by the lower layer and is not
+> in any "waiting" state at the net core level.
+>
+> In practice, the IEEE 802.15.4 core treats all packets immediately and
+> do not really bother "queuing" them like if there was a "waiting"
+> state. So all messages that the userspace expected to be send (which
+> did not return NETDEV_TX_BUSY) at the moment where we decide to stop
+> data transmissions will be processed.
+>
+> If several frames had to be transmitted to the IEEE 802.15.4 core and
+> they all passed the netdev "queuing" mechanism, then they will be
+> forwarded to the tranceivers thanks to the wait_event(!ongoing_txs) and
+> only after we declare the queue sync'ed.
+>
+> For me there is no hard cut.
 
-[auto build test ERROR on net-next/master]
+In my opinion there is definitely in case of a wpan interface a queue
+handling right above xmit_do() which is in a "works for now" state.
+Your queue flush function will not flush any queue, as I said it's
+flushing the transceivers framebuffer at the starting point of
+xmit_do() call and you should change your comments/function names to
+describe this behaviour.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Jakub-Kicinski/net-ifdefy-the-wireless-pointers-in-struct-net_device/20220519-022305
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/davem/net-next.git a3641ca416a3da7cbeae5bcf1fc26ba9797a1438
-config: um-i386_defconfig (https://download.01.org/0day-ci/archive/20220519/202205190456.MohbzV8M-lkp@intel.com/config)
-compiler: gcc-11 (Debian 11.2.0-20) 11.2.0
-reproduce (this is a W=1 build):
-        # https://github.com/intel-lab-lkp/linux/commit/c6413242ee18dfc005d7ed7ccc4db9cf7883b872
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Jakub-Kicinski/net-ifdefy-the-wireless-pointers-in-struct-net_device/20220519-022305
-        git checkout c6413242ee18dfc005d7ed7ccc4db9cf7883b872
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        make W=1 O=build_dir ARCH=um SUBARCH=i386 SHELL=/bin/bash
+- Alex
 
-If you fix the issue, kindly add following tag as appropriate
-Reported-by: kernel test robot <lkp@intel.com>
-
-All errors (new ones prefixed by >>):
-
-   net/core/net-sysfs.c: In function 'netdev_register_kobject':
->> net/core/net-sysfs.c:2013:30: error: 'wireless_group' undeclared (first use in this function); did you mean 'wireless_dev'?
-    2013 |                 *groups++ = &wireless_group;
-         |                              ^~~~~~~~~~~~~~
-         |                              wireless_dev
-   net/core/net-sysfs.c:2013:30: note: each undeclared identifier is reported only once for each function it appears in
-
-
-vim +2013 net/core/net-sysfs.c
-
-^1da177e4c3f41 Linus Torvalds     2005-04-16  1990  
-^1da177e4c3f41 Linus Torvalds     2005-04-16  1991  /* Create sysfs entries for network device. */
-6b53dafe23fd1f WANG Cong          2014-07-23  1992  int netdev_register_kobject(struct net_device *ndev)
-^1da177e4c3f41 Linus Torvalds     2005-04-16  1993  {
-6648c65e7ea72c stephen hemminger  2017-08-18  1994  	struct device *dev = &ndev->dev;
-6b53dafe23fd1f WANG Cong          2014-07-23  1995  	const struct attribute_group **groups = ndev->sysfs_groups;
-0a9627f2649a02 Tom Herbert        2010-03-16  1996  	int error = 0;
-^1da177e4c3f41 Linus Torvalds     2005-04-16  1997  
-a1b3f594dc5faa Eric W. Biederman  2010-05-04  1998  	device_initialize(dev);
-43cb76d91ee85f Greg Kroah-Hartman 2002-04-09  1999  	dev->class = &net_class;
-6b53dafe23fd1f WANG Cong          2014-07-23  2000  	dev->platform_data = ndev;
-43cb76d91ee85f Greg Kroah-Hartman 2002-04-09  2001  	dev->groups = groups;
-^1da177e4c3f41 Linus Torvalds     2005-04-16  2002  
-6b53dafe23fd1f WANG Cong          2014-07-23  2003  	dev_set_name(dev, "%s", ndev->name);
-^1da177e4c3f41 Linus Torvalds     2005-04-16  2004  
-8b41d1887db718 Eric W. Biederman  2007-09-26  2005  #ifdef CONFIG_SYSFS
-0c509a6c9393b2 Eric W. Biederman  2009-10-29  2006  	/* Allow for a device specific group */
-0c509a6c9393b2 Eric W. Biederman  2009-10-29  2007  	if (*groups)
-0c509a6c9393b2 Eric W. Biederman  2009-10-29  2008  		groups++;
-^1da177e4c3f41 Linus Torvalds     2005-04-16  2009  
-0c509a6c9393b2 Eric W. Biederman  2009-10-29  2010  	*groups++ = &netstat_group;
-38c1a01cf10c6e Johannes Berg      2012-11-16  2011  
-c6413242ee18df Jakub Kicinski     2022-05-18  2012  	if (wireless_group_needed(ndev))
-38c1a01cf10c6e Johannes Berg      2012-11-16 @2013  		*groups++ = &wireless_group;
-8b41d1887db718 Eric W. Biederman  2007-09-26  2014  #endif /* CONFIG_SYSFS */
-^1da177e4c3f41 Linus Torvalds     2005-04-16  2015  
-0a9627f2649a02 Tom Herbert        2010-03-16  2016  	error = device_add(dev);
-0a9627f2649a02 Tom Herbert        2010-03-16  2017  	if (error)
-8ed633b9baf9ec Wang Hai           2019-04-12  2018  		return error;
-0a9627f2649a02 Tom Herbert        2010-03-16  2019  
-6b53dafe23fd1f WANG Cong          2014-07-23  2020  	error = register_queue_kobjects(ndev);
-8ed633b9baf9ec Wang Hai           2019-04-12  2021  	if (error) {
-8ed633b9baf9ec Wang Hai           2019-04-12  2022  		device_del(dev);
-8ed633b9baf9ec Wang Hai           2019-04-12  2023  		return error;
-8ed633b9baf9ec Wang Hai           2019-04-12  2024  	}
-0a9627f2649a02 Tom Herbert        2010-03-16  2025  
-9802c8e22f6efd Ming Lei           2013-02-22  2026  	pm_runtime_set_memalloc_noio(dev, true);
-9802c8e22f6efd Ming Lei           2013-02-22  2027  
-0a9627f2649a02 Tom Herbert        2010-03-16  2028  	return error;
-^1da177e4c3f41 Linus Torvalds     2005-04-16  2029  }
-^1da177e4c3f41 Linus Torvalds     2005-04-16  2030  
-
--- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
