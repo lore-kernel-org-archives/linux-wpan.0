@@ -2,142 +2,101 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81DA8C433F5
-	for <linux-wpan@archiver.kernel.org>; Thu, 19 May 2022 01:53:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19760C433F5
+	for <linux-wpan@archiver.kernel.org>; Thu, 19 May 2022 06:53:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231976AbiESBxE (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 18 May 2022 21:53:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55004 "EHLO
+        id S232664AbiESGxs (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Thu, 19 May 2022 02:53:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41136 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231716AbiESBxE (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 18 May 2022 21:53:04 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9EED0C5E55
-        for <linux-wpan@vger.kernel.org>; Wed, 18 May 2022 18:53:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1652925181;
+        with ESMTP id S229562AbiESGxq (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 19 May 2022 02:53:46 -0400
+X-Greylist: delayed 155062 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 18 May 2022 23:53:42 PDT
+Received: from dvalin.narfation.org (dvalin.narfation.org [213.160.73.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 305D5B82FC;
+        Wed, 18 May 2022 23:53:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=narfation.org;
+        s=20121; t=1652943219;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=IjGLeBrRcw11u28Bb8tNR9LrGiBRTUJ4GJwFixtddiw=;
-        b=gfwkGdvU3BlJzZl6PNf4HgoKClqpGduSlVj8m7Y6j4owl32kqBnCLCPtqDMRCZjdbBeZ3W
-        50bGism35EoSB4xQtAqUR4USoTxNyYY38Cu1z1V+sprJvW+oVlJE6F0cEe8+p423x4oX3E
-        fJsfOx88oSScChuwdQ89i1Wf3RN8hwI=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-324-mAHU44ZmPgWDowWdCpne0g-1; Wed, 18 May 2022 21:53:00 -0400
-X-MC-Unique: mAHU44ZmPgWDowWdCpne0g-1
-Received: by mail-qv1-f69.google.com with SMTP id a12-20020a056214062c00b0045a7b4a1a29so3114919qvx.10
-        for <linux-wpan@vger.kernel.org>; Wed, 18 May 2022 18:53:00 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=IjGLeBrRcw11u28Bb8tNR9LrGiBRTUJ4GJwFixtddiw=;
-        b=MqUv3YPq1QHWYdwfcQldDTs2NPMwq1QFOGeLqp5jYiX4t3rfq8D2G0Bx12RM2MiKLh
-         Ag4UPpyhUHOdBVGGbUDQbM3+Wi81YFN3m43ECi1mKZMQNKkZGTPRN2PnKRrd6/I3w35h
-         N0tw9mtRhFPauPULjy6RzxBcOqYGOKL+Lj+Bb72NyfSoUFB7XfRAPprArVR3c+McvMjU
-         RgpgTS4IgifSv9974u3D3Hg5x43hNculCnvAZW3TtzS/P8k+8KF65wsPoipDTdHJ3F0Z
-         QNTqLSEUuDs/QC/yyunmrqMkxZh0ozZKZUvVvn78WwhXnOAiXYbIBq0rUdA62hjgZ++S
-         ORwg==
-X-Gm-Message-State: AOAM532UDw/GIuPPuCZfWFLAP2RFWPpUPn3Zzy3h2Krkg/RohQAurZk5
-        pc7IYRWUuhFeA9vQS7wLZSjY7WoV/tFEs5995el2mUK8QiLQo2r/RZDWAVxGtz24DqPBxHGcI8p
-        UEVzXHrpbxzhOHUJ8icwn8soxZs+2Cv/WDfQFzg==
-X-Received: by 2002:a05:6214:c29:b0:45a:fedd:7315 with SMTP id a9-20020a0562140c2900b0045afedd7315mr2187506qvd.59.1652925179960;
-        Wed, 18 May 2022 18:52:59 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzk/KwXjsA45B15BsH6jVLLRSb0d2OOK/MOklJzWLaVEiA9jnKoJREiL0Y7gBXS+atdP4fKg+Pw75WVyqjl4yc=
-X-Received: by 2002:a05:6214:c29:b0:45a:fedd:7315 with SMTP id
- a9-20020a0562140c2900b0045afedd7315mr2187498qvd.59.1652925179803; Wed, 18 May
- 2022 18:52:59 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220517163450.240299-1-miquel.raynal@bootlin.com>
- <20220517163450.240299-11-miquel.raynal@bootlin.com> <CAK-6q+g=9_aqTOmMYxCn6p=Z=uPNyifjVXe4hzC82ZF1QPpLMg@mail.gmail.com>
- <20220518105543.54cda82f@xps-13> <CAK-6q+j-EgoO-mWx_zRrORmA9-75h_=_fh22KMxySdSgeLsJEA@mail.gmail.com>
- <20220518182917.10323dea@xps-13>
-In-Reply-To: <20220518182917.10323dea@xps-13>
-From:   Alexander Aring <aahringo@redhat.com>
-Date:   Wed, 18 May 2022 21:52:48 -0400
-Message-ID: <CAK-6q+hudcKW4Z38bpj8FoYAMW8-Qp8BqiDtLP2wO-HN0ZpP0w@mail.gmail.com>
-Subject: Re: [PATCH wpan-next v3 10/11] net: mac802154: Add a warning in the
- hot path
-To:     Miquel Raynal <miquel.raynal@bootlin.com>
-Cc:     Alexander Aring <alex.aring@gmail.com>,
-        Stefan Schmidt <stefan@datenfreihafen.org>,
-        linux-wpan - ML <linux-wpan@vger.kernel.org>,
-        David Girault <david.girault@qorvo.com>,
-        Romuald Despres <romuald.despres@qorvo.com>,
-        Frederic Blain <frederic.blain@qorvo.com>,
-        Nicolas Schodet <nico@ni.fr.eu.org>,
-        Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-        "David S. Miller" <davem@davemloft.net>,
+        bh=9I1ByNdBJU9iQW2DNhg/h5E5pbMnvG3nYpxZmRsX1DI=;
+        b=wAVbfJ9XHqBzaF1USTjDN8fFEHpmvhojnDKQrPLoaC/U7KjBFQgG48Y16OEilW9jxf4QQM
+        3m+xNw0Rv2tSye2yWiCQJhf2LBp12OR6Hd6xJgKRAbyMq5gfqSSQ6GjZgiOQqd/7bpw1bn
+        qGHYXPI902jap7A3AeQFOMAcf4zFdDg=
+From:   Sven Eckelmann <sven@narfation.org>
+To:     davem@davemloft.net, Jakub Kicinski <kuba@kernel.org>
+Cc:     netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
         Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Network Development <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        Stefan Schmidt <stefan@datenfreihafen.org>,
+        johannes@sipsolutions.net, alex.aring@gmail.com,
+        mareklindner@neomailbox.ch, sw@simonwunderlich.de, a@unstable.cc,
+        linux-wireless@vger.kernel.org, linux-wpan@vger.kernel.org
+Subject: Re: [PATCH net-next v2] net: ifdefy the wireless pointers in struct net_device
+Date:   Thu, 19 May 2022 08:53:37 +0200
+Message-ID: <9613306.YnBLfnAi8y@ripper>
+In-Reply-To: <20220518181807.2030747-1-kuba@kernel.org>
+References: <20220518181807.2030747-1-kuba@kernel.org>
+MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="nextPart4659350.0FORYR1UfH"; micalg="pgp-sha512"; protocol="application/pgp-signature"
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi,
+--nextPart4659350.0FORYR1UfH
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"; protected-headers="v1"
+From: Sven Eckelmann <sven@narfation.org>
+To: davem@davemloft.net, Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com, Jakub Kicinski <kuba@kernel.org>, Stefan Schmidt <stefan@datenfreihafen.org>, johannes@sipsolutions.net, alex.aring@gmail.com, mareklindner@neomailbox.ch, sw@simonwunderlich.de, a@unstable.cc, linux-wireless@vger.kernel.org, linux-wpan@vger.kernel.org
+Subject: Re: [PATCH net-next v2] net: ifdefy the wireless pointers in struct net_device
+Date: Thu, 19 May 2022 08:53:37 +0200
+Message-ID: <9613306.YnBLfnAi8y@ripper>
+In-Reply-To: <20220518181807.2030747-1-kuba@kernel.org>
+References: <20220518181807.2030747-1-kuba@kernel.org>
 
-On Wed, May 18, 2022 at 12:29 PM Miquel Raynal
-<miquel.raynal@bootlin.com> wrote:
->
->
-> aahringo@redhat.com wrote on Wed, 18 May 2022 10:31:55 -0400:
->
-> > Hi,
-> >
-> > On Wed, May 18, 2022 at 4:55 AM Miquel Raynal <miquel.raynal@bootlin.com> wrote:
-> > >
-> > >
-> > > aahringo@redhat.com wrote on Tue, 17 May 2022 20:58:19 -0400:
-> > >
-> > > > Hi,
-> > > >
-> > > > On Tue, May 17, 2022 at 12:35 PM Miquel Raynal
-> > > > <miquel.raynal@bootlin.com> wrote:
-> > > > >
-> > > > > We should never start a transmission after the queue has been stopped.
-> > > > >
-> > > > > But because it might work we don't kill the function here but rather
-> > > > > warn loudly the user that something is wrong.
-> > > > >
-> > > > > Set an atomic when the queue will remain stopped. Reset this atomic when
-> > > > > the queue actually gets restarded. Just check this atomic to know if the
-> > > > > transmission is legitimate, warn if it is not.
-> > > > >
-> > > > > Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
-> > > > > ---
-> > > > >  include/net/cfg802154.h |  1 +
-> > > > >  net/mac802154/tx.c      | 16 +++++++++++++++-
-> > > > >  net/mac802154/util.c    |  1 +
-> > > > >  3 files changed, 17 insertions(+), 1 deletion(-)
-> > > > >
-> > > > > diff --git a/include/net/cfg802154.h b/include/net/cfg802154.h
-> > > > > index 8881b6126b58..f4e7b3fe7cf0 100644
-> > > > > --- a/include/net/cfg802154.h
-> > > > > +++ b/include/net/cfg802154.h
-> > > > > @@ -218,6 +218,7 @@ struct wpan_phy {
-> > > > >         spinlock_t queue_lock;
-> > > > >         atomic_t ongoing_txs;
-> > > > >         atomic_t hold_txs;
-> > > > > +       unsigned long queue_stopped;
-> > > >
-> > > > Can we name it something like state_flags (as phy state flags)? Pretty
-> > > > sure there will be more coming, or internal_flags, no idea...
-> > > > something_flags...
-> > >
-> > > 'phy_flags'? Just 'flags', maybe?
-> >
-> > make it so.
->
-> Oh, there is already a flags entry in wpan_phy. I've adjusted the
-> naming to what existed (keeping the _STATE_ prefix) and kept that
-> "flags" entry instead of creating a new one.
->
-make it so.
+On Wednesday, 18 May 2022 20:18:07 CEST Jakub Kicinski wrote:
+> diff --git a/net/batman-adv/hard-interface.c b/net/batman-adv/hard-interface.c
+> index 83fb51b6e299..b8f8da7ee3de 100644
+> --- a/net/batman-adv/hard-interface.c
+> +++ b/net/batman-adv/hard-interface.c
+> @@ -307,9 +307,11 @@ static bool batadv_is_cfg80211_netdev(struct net_device *net_device)
+>         if (!net_device)
+>                 return false;
+>  
+> +#if IS_ENABLED(CONFIG_CFG80211)
+>         /* cfg80211 drivers have to set ieee80211_ptr */
+>         if (net_device->ieee80211_ptr)
+>                 return true;
+> +#endif
+>  
+>         return false;
+>  }
 
-- Alex
+Acked-by: Sven Eckelmann <sven@narfation.org>
+--nextPart4659350.0FORYR1UfH
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part.
+Content-Transfer-Encoding: 7Bit
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEEF10rh2Elc9zjMuACXYcKB8Eme0YFAmKF6XEACgkQXYcKB8Em
+e0b7JxAAvG4arhZjsM0vWxljExgbu0ArtAZG6my2XE6gczf1v1+DLcCnyLf2U8ps
+NmpPpt5wPXmZpKJMEvr+v/mm3U3m1nDjPxV/44aEvVh9APsIuB7qAfipT2hFaJiG
+0LijjxQZAUK+2NU3j4MQbSSLe/oJ4Ia6+sU6YjAU42C2TAJIGyJwyX5GMlS4dvjc
+B6sOGjaprfERSSPiN4ztpHveRPv+3tzUfl65Pui7qrYLetthCGx7dyqgrjBaXA92
+hB2/tJeAQTOa/hhhTPbZl3hzAH9WuypZB6zne6YoaJ4QIAmQqjoZf1rU+MY+WxhY
+2KtvuRSPeRtPx6uk01vVw65+GGBKEYrGY5hfXvtV4FKYsHXMHJheaTRogcyb99/a
+2XT/azMwSducaSjZ4xjOs9frLw5zJLiVUZDfrYxEcZq4NwaGn8WM1RFMbmnfE8I9
+3pbe2V3Q7CNlLJ1C1S7n1bp2F93B/aEpPnHPt6VzgYeRNA3oztjnHnsTUSlnKo1/
+hvuT61DAhlY3Pb4ucm5/3gymx/IfdBaxKEBYQcn+GGsXAltwmR4a2g7GW9ChrHB7
+Mc3skEknhyNAgoEV5ZDcpuqoInx2E0baAxSwM8jQxCY5Xg07MvtE/DYUII1n0USM
+YtEw+QZGXYNU+aaZVj3JygdOIoPz9UUzMGrkNahxuMKGIjTgDDc=
+=DM23
+-----END PGP SIGNATURE-----
+
+--nextPart4659350.0FORYR1UfH--
+
+
 
