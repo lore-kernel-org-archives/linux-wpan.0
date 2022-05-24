@@ -2,83 +2,61 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B33DBC433F5
-	for <linux-wpan@archiver.kernel.org>; Sun, 22 May 2022 21:00:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD095C433F5
+	for <linux-wpan@archiver.kernel.org>; Tue, 24 May 2022 09:40:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344025AbiEVVAP (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Sun, 22 May 2022 17:00:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57928 "EHLO
+        id S235809AbiEXJkd (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 24 May 2022 05:40:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56222 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235201AbiEVVAO (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Sun, 22 May 2022 17:00:14 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8382738DB3;
-        Sun, 22 May 2022 14:00:13 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        with ESMTP id S235819AbiEXJkb (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 24 May 2022 05:40:31 -0400
+X-Greylist: delayed 920 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 24 May 2022 02:40:31 PDT
+Received: from box.indicandustries.com (hwsrv-970840.hostwindsdns.com [IPv6:2607:5501:3000:21a5::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34D1E663EF
+        for <linux-wpan@vger.kernel.org>; Tue, 24 May 2022 02:40:31 -0700 (PDT)
+Received: from authenticated-user (box.indicandustries.com [104.168.149.109])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 1B58F60EED;
-        Sun, 22 May 2022 21:00:13 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 622ABC34117;
-        Sun, 22 May 2022 21:00:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1653253212;
-        bh=+je1WtpiONe7QXdb5p6y5pwgJ78n2MxgtryLiQhP9d8=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=Cn/MxRME0Fys4R6ZdKoXeENGbz2X9mf94jPO64S04nzDP6YfRy8x9sThTTTEYBs1z
-         vAomVSInF1+eUmegilfOfe10PERuV8NLAs+UBvEha3dsF+fTCmjavBdutq3tyS+PIf
-         VVctY44FQZNmCMITsYiYIR8y3kRg4jIxO6RYs/r6EPJoX5uwjcnbNRX6eU/CMX8gPf
-         36fDXxRH2NQg4oCWMUCxNJDxLPgpGd/5tEmYPinowI5dT5qqMrWioSkNyAKC2+jeh9
-         PRjBCXWxKiMDoUAYOndXeg+I2+gyXbJ0Pr1Zk4QqgHXt4b9muCnenCUSRCzFhtc5XK
-         XUqhQJqEzey3Q==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 414C2F03944;
-        Sun, 22 May 2022 21:00:12 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+        by box.indicandustries.com (Postfix) with ESMTPSA id 7268A107FC1
+        for <linux-wpan@vger.kernel.org>; Tue, 24 May 2022 03:24:18 -0600 (MDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=box.indicandustries.com; s=mail; t=1653384258;
+        bh=V6VCn7WEbqHjVVQ20/+SYu6rwS1WmTHcxX88g+j430s=;
+        h=Reply-To:From:To:Subject:Date:From;
+        b=oAQx0qxDBgEgYRcf+cyCIBZWpceteJwypma/vv6L9IXq1riAEYfN/urin0dQm4/An
+         HGleAe3p6MlVcanicR3ZmdT6xHCpiZqmeV7Jw83CN6AWj+9ScGoHa3tc5HKLuAaHLI
+         CZx7r0XZB2N4n0j9S8sr3ypUoUjSZTDzNC/ORynpWkymQiXP3cOu1G3tnKIMvLRIiK
+         0l9/eaZDfVF7nKuWva0ULUrh0/3Jz+rvt9igrpl8SimAPD1Qc5f188A21sbsjDW0y+
+         e0Y/NfLeAKGV0mh4hojLjFJXe3CQkFHInwqlbY2loUex6cNnJ2v234eTtb4gCJ+vgr
+         1cAj9z2QzhlCw==
+Reply-To: amjalia90@gmail.com
+From:   amjad.ali@box.indicandustries.com
+To:     linux-wpan@vger.kernel.org
+Subject: Hello Sir, I seek your urgent consideration.
+Date:   24 May 2022 11:24:18 +0200
+Message-ID: <20220524112418.DA3CED2444C60A5B@box.indicandustries.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v3] net: wrap the wireless pointers in struct
- net_device in an ifdef
-From:   patchwork-bot+netdevbpf@kernel.org
-Message-Id: <165325321226.25167.8062837622435317741.git-patchwork-notify@kernel.org>
-Date:   Sun, 22 May 2022 21:00:12 +0000
-References: <20220519202054.2200749-1-kuba@kernel.org>
-In-Reply-To: <20220519202054.2200749-1-kuba@kernel.org>
-To:     Jakub Kicinski <kuba@kernel.org>
-Cc:     davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-        pabeni@redhat.com, johannes@sipsolutions.net,
-        stefan@datenfreihafen.org, sven@narfation.org,
-        alex.aring@gmail.com, mareklindner@neomailbox.ch,
-        sw@simonwunderlich.de, a@unstable.cc,
-        linux-wireless@vger.kernel.org, linux-wpan@vger.kernel.org
+Content-Type: text/plain;
+        charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello:
+Hello,
 
-This patch was applied to netdev/net-next.git (master)
-by David S. Miller <davem@davemloft.net>:
+Greetings? I am Amjad. I work with a leading Bio Firm.  Due to=20
+the setbacks of the pandemic, my company has opened a bid in=20
+search of new suppliers for basic raw materials needed in=20
+production.
 
-On Thu, 19 May 2022 13:20:54 -0700 you wrote:
-> Most protocol-specific pointers in struct net_device are under
-> a respective ifdef. Wireless is the notable exception. Since
-> there's a sizable number of custom-built kernels for datacenter
-> workloads which don't build wireless it seems reasonable to
-> ifdefy those pointers as well.
-> 
-> While at it move IPv4 and IPv6 pointers up, those are special
-> for obvious reasons.
-> 
-> [...]
+I am seeking a representative=C2=A0as I am a staff, I can not be=20
+involved directly. It may not be your area of work but the=20
+profits are great and I will guide you through. I have already=20
+sourced a local supplier for this. I only need a reliable=20
+representative.
 
-Here is the summary with links:
-  - [net-next,v3] net: wrap the wireless pointers in struct net_device in an ifdef
-    https://git.kernel.org/netdev/net-next/c/c304eddcecfe
+Please get back to me so I can explain this in full.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Amjad
