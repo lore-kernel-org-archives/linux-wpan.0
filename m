@@ -2,66 +2,74 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3E0DC433F5
-	for <linux-wpan@archiver.kernel.org>; Sat, 28 May 2022 15:48:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 451D2C433F5
+	for <linux-wpan@archiver.kernel.org>; Wed,  1 Jun 2022 03:30:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244839AbiE1Psy (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Sat, 28 May 2022 11:48:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56222 "EHLO
+        id S1349422AbiFADap (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 31 May 2022 23:30:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34872 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233172AbiE1Psx (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Sat, 28 May 2022 11:48:53 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id CE95312A
-        for <linux-wpan@vger.kernel.org>; Sat, 28 May 2022 08:48:51 -0700 (PDT)
+        with ESMTP id S1349446AbiFADam (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 31 May 2022 23:30:42 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 64E459CC8E
+        for <linux-wpan@vger.kernel.org>; Tue, 31 May 2022 20:30:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1653752929;
+        s=mimecast20190719; t=1654054238;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=5GAhpNoL6mVubSpwZ4APr5XIqQJTwS8OwKgO1Q7qWXM=;
-        b=dZdtc9faiWDozjJPa+MUOQ8Ltp750xU6GcX/ayYXhB3tOExhpKRD7abRY3vbj02lsZD9jq
-        JVCR6ELvSvY3/4xnLu8CA4O2d7FSEhu931dye2U0mu6GZ3y2aMYdmGlGqyE0eqZJ4xifPV
-        yzBdmSOFa5JVld4xvWszgX8djRt44rE=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=Uez4pdd6rTNByI07DHPT6nt3P15ulK/dmFK17elfDS8=;
+        b=Io+4xV09eqsdfzLKIbwvOw6AQ1Fj2rneM1QtO/IOnRtS1ELBCNslgfw+YJLnm5sZYcTO2A
+        ufe/tmBE3dZ0byc60ZJfnj2es7IFSEOdujKr1GzRwQsAaj2w1urKXx8l7zYt23QTZS2JLy
+        IBuOL+Ut1Kr0Vb5XpU3bFOFZo4W/vzA=
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
+ [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-613--oCKg88kMfevRnRXaOX5lw-1; Sat, 28 May 2022 11:48:48 -0400
-X-MC-Unique: -oCKg88kMfevRnRXaOX5lw-1
-Received: by mail-qk1-f200.google.com with SMTP id c8-20020a05620a268800b0069c0f1b3206so5896952qkp.18
-        for <linux-wpan@vger.kernel.org>; Sat, 28 May 2022 08:48:47 -0700 (PDT)
+ us-mta-618-iA3akX-wO12w8uNajBFb5w-1; Tue, 31 May 2022 23:30:37 -0400
+X-MC-Unique: iA3akX-wO12w8uNajBFb5w-1
+Received: by mail-qv1-f72.google.com with SMTP id ke5-20020a056214300500b00461fc78b983so509566qvb.17
+        for <linux-wpan@vger.kernel.org>; Tue, 31 May 2022 20:30:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=5GAhpNoL6mVubSpwZ4APr5XIqQJTwS8OwKgO1Q7qWXM=;
-        b=PLjTFIJOTbFxHp7JgP+e2s1hzJxZ4K5T+I4AhqvdCG45pI7Yg8RyKA0bZNCArRP3tW
-         6yyx2C+2xXAPLpzPDx7QT/+/+2CHY9d/Qzl+UCaB7MafKdCGGpnfHhAThyo/wwSPwRs/
-         0I8TMpLJSz9eh4Y12PGDj63+z0O8WbAG3ynIKLmf6N2ftm2fIdERz7rr7H+HbWoXEX+S
-         fcnZsv0MrRT5ZB1QoYRh2D7oVzSq5j7q8aG1/PuGF+cDlkqnfF0uN+yufzfU1ZmfhSeC
-         0E5B9QG5YAH45GLxAl+BkeKdT0we6+N8cBMFQugj+3HVHd0VQAUAccvatxRR1risg+6B
-         h9Wg==
-X-Gm-Message-State: AOAM530uiSm4Lo/07Ma4AWrjlxeGJVNP7BPkP/2VYXVbduhRtU4XhzHU
-        14XO8xYwGVZHXai31ow8OpgdRec1Ui+mWNpOf5xY8VD66lxTSdOGWCvCjLse9rxelxmbk7w/Hba
-        GiyhlPQQosv+uRkntqNDuA9BkWW5w5/6K+9Msyg==
-X-Received: by 2002:ac8:5750:0:b0:2f9:410b:7101 with SMTP id 16-20020ac85750000000b002f9410b7101mr19892461qtx.291.1653752927535;
-        Sat, 28 May 2022 08:48:47 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwmAsucB7ng/+qB+vvkMRhBKq3xcdUohmtwPZcqjrboA1dOIsdMeoqf6NSF/fuav7Oq7do5fGX9GQQTQ5RsLU8=
-X-Received: by 2002:ac8:5750:0:b0:2f9:410b:7101 with SMTP id
- 16-20020ac85750000000b002f9410b7101mr19892448qtx.291.1653752927345; Sat, 28
- May 2022 08:48:47 -0700 (PDT)
+        bh=Uez4pdd6rTNByI07DHPT6nt3P15ulK/dmFK17elfDS8=;
+        b=YvsdawW8r8TSIwvjTlFZogJQDmxTAYmcFzbnj+R6YidyC8BtASHznfp0QBlM8cPLVT
+         mMZMk///UHUtRznq4Jrtrqa8IsGbkyvh1GhkYTlqj2LntQerPreQPQk5akHZUcd5A9Sl
+         hnxAs+OT7gIg9TpWakAim7DP8/5+bo3EF4mqz4GsgJSALPWHgTKs3K30wu8KjSdJEQ5V
+         eNXdbfHnMBj0Y10znMzXb5AeGJ9ls32z5frA/j4oxYe9enUOVT8AGRjFZDaydMeKF9y2
+         d6wc8+edytAK0uDUxI+j2uYHjkFvZkkrmlpqiL7FS0LiugjXdik75LGuBMMHblszyWqG
+         QZeg==
+X-Gm-Message-State: AOAM533RvpY/97oQAO3HWR9E5a3TfZ+wHsrrrLcYi7TgY3qo4sLKqjaf
+        zPUkkbJ9P23cPAQ0BV+w/DjbyGRwr1eWLJvfgOXRipDOv8L7yK28FogsltP6JoFLi6ygNUQsWGj
+        JwKgUvkyEG160xOsw7nhwOoLEFhDBkqarCWBqBQ==
+X-Received: by 2002:ac8:5a82:0:b0:304:c138:9895 with SMTP id c2-20020ac85a82000000b00304c1389895mr2893552qtc.470.1654054236982;
+        Tue, 31 May 2022 20:30:36 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwmL0YAluv459XcSBEPJSIe71phqGVQHBoIyR7YZoUQlxcpz3e0vsJ8mQlBCbKPaoJGLQR7yyMdg4YqTTsxkcs=
+X-Received: by 2002:ac8:5a82:0:b0:304:c138:9895 with SMTP id
+ c2-20020ac85a82000000b00304c1389895mr2893543qtc.470.1654054236821; Tue, 31
+ May 2022 20:30:36 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220526162806.16618-1-jukka.rissanen@linux.intel.com> <20220527075625.9693-1-jukka.rissanen@linux.intel.com>
-In-Reply-To: <20220527075625.9693-1-jukka.rissanen@linux.intel.com>
+References: <20220519150516.443078-1-miquel.raynal@bootlin.com>
+In-Reply-To: <20220519150516.443078-1-miquel.raynal@bootlin.com>
 From:   Alexander Aring <aahringo@redhat.com>
-Date:   Sat, 28 May 2022 11:48:36 -0400
-Message-ID: <CAK-6q+icAttyjPFx6LXLTUu4b6WBpj9kwKNxUS9WE=cPz6=DnA@mail.gmail.com>
-Subject: Re: [PATCH] MAINTAINERS: Remove Jukka Rissanen as 6lowpan maintainer
-To:     Jukka Rissanen <jukka.rissanen@linux.intel.com>
+Date:   Tue, 31 May 2022 23:30:25 -0400
+Message-ID: <CAK-6q+hmd_Z-xJrz6QVM37gFrPRkYPAnyERit5oyDS=Beb83kg@mail.gmail.com>
+Subject: Re: [PATCH wpan-next v4 00/11] ieee802154: Synchronous Tx support
+To:     Miquel Raynal <miquel.raynal@bootlin.com>
 Cc:     Alexander Aring <alex.aring@gmail.com>,
-        linux-bluetooth@vger.kernel.org,
+        Stefan Schmidt <stefan@datenfreihafen.org>,
         linux-wpan - ML <linux-wpan@vger.kernel.org>,
-        pmenzel@molgen.mpg.de
+        David Girault <david.girault@qorvo.com>,
+        Romuald Despres <romuald.despres@qorvo.com>,
+        Frederic Blain <frederic.blain@qorvo.com>,
+        Nicolas Schodet <nico@ni.fr.eu.org>,
+        Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Network Development <netdev@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
@@ -69,17 +77,23 @@ X-Mailing-List: linux-wpan@vger.kernel.org
 
 Hi,
 
-On Fri, May 27, 2022 at 3:58 AM Jukka Rissanen
-<jukka.rissanen@linux.intel.com> wrote:
+On Thu, May 19, 2022 at 11:06 AM Miquel Raynal
+<miquel.raynal@bootlin.com> wrote:
 >
-> I no longer work on this so better update the file.
+> Hello,
 >
-
-> Signed-off-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+> This series brings support for that famous synchronous Tx API for MLME
+> commands.
+>
+> MLME commands will be used during scan operations. In this situation,
+> we need to be sure that all transfers finished and that no transfer
+> will be queued for a short moment.
+>
 
 Acked-by: Alexander Aring <aahringo@redhat.com>
 
-:'-(
+There will be now functions upstream which will never be used, Stefan
+should wait until they are getting used before sending it to net-next.
 
 - Alex
 
