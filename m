@@ -2,150 +2,176 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BECDAC43334
-	for <linux-wpan@archiver.kernel.org>; Fri,  3 Jun 2022 18:34:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E92EC43334
+	for <linux-wpan@archiver.kernel.org>; Sat,  4 Jun 2022 01:52:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243394AbiFCSeY (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Fri, 3 Jun 2022 14:34:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46362 "EHLO
+        id S1345660AbiFDBud (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Fri, 3 Jun 2022 21:50:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34174 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347571AbiFCSeC (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Fri, 3 Jun 2022 14:34:02 -0400
-Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::227])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59F41384;
-        Fri,  3 Jun 2022 11:21:51 -0700 (PDT)
-Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id 7480020008;
-        Fri,  3 Jun 2022 18:21:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1654280509;
+        with ESMTP id S242134AbiFDBuc (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 3 Jun 2022 21:50:32 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8625F27FE0
+        for <linux-wpan@vger.kernel.org>; Fri,  3 Jun 2022 18:50:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1654307428;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=SRmpKPc0/wg89OR5CLRbBeTtA9U60d8ApWjgx2ea+Lg=;
-        b=gTfkbK0Xr1TOlFAHXvS8S/ev9D1sVjrfX2U6v3vVvf7QpGmuk0ouC1zxb0HO2yxWEdUctz
-        nqvIpd/xmOY9QosQoZ/XxtFT8cVAm1xB+I4P0TSPE6uVeUHLw7r3L5I51zZx0GkoepEuvY
-        l2TmmL6V6s80+ZHPkfIGCV06pv3K0W/iLuT0WFr047sDRcG1lwBVOYuQiTtkdRadH4P2NM
-        VTSkDnf+6MZgLPz9rf4y2U6W1sbUBkNStYBy6Hx8x7JSUxiDzIlB2yIHVJsWs8hT940ARf
-        kaYoUK9xImYdPZJ1V3ICT9NRnwlPqD1T8Jz18CRnDVUvhxipzSvIkVgocvSdkQ==
-From:   Miquel Raynal <miquel.raynal@bootlin.com>
-To:     Alexander Aring <alex.aring@gmail.com>,
-        Stefan Schmidt <stefan@datenfreihafen.org>,
-        linux-wpan@vger.kernel.org
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+        bh=yyONruk37FP0IvD6T8UlE2+3rlPNbm0pNIQeBo7LBl8=;
+        b=fWWM12lALjnNFXpwEnfJDI5kPVe9slhevuSUWgPAmkxmFS/4sU+tF01p2q8eskrXl0nAmy
+        uZ60kQ2tFaA9UWWbhCxPtkAMgE1DvhP3YIb8bTGGqITOKY/M7f1szkaGUAMJq3tp1dHmtY
+        EG1wzaGVBcqgnjNBChIfXgPt+GDyNtM=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-479-2PP4RmV7OCeYzy75c8cavg-1; Fri, 03 Jun 2022 21:50:27 -0400
+X-MC-Unique: 2PP4RmV7OCeYzy75c8cavg-1
+Received: by mail-qv1-f69.google.com with SMTP id dg8-20020a056214084800b004645cecc145so6273898qvb.6
+        for <linux-wpan@vger.kernel.org>; Fri, 03 Jun 2022 18:50:27 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=yyONruk37FP0IvD6T8UlE2+3rlPNbm0pNIQeBo7LBl8=;
+        b=HRyPRMFOk3jKjTArRBwkkVoz9kYAmvuQDAfWzczXsD90UW8Wf7ZU40NSljBnvzs73x
+         Q2SXBSWCoOozC31RtfRgxX9QewsVxnVgR6+vnczhC/C/Hc51a6U8YJLBbyKk0BPJssmr
+         OvAqHC32/egVnT6KVfYCyeAhy63gywPr+MatpEJJGZB7hMGjNfNs0JMY4Kb1QBQEnoKU
+         5TM64n9KRv+Xxp+z4Yr+x66OsSJUFgrWRu8rDP6j0CmB4rZY8FG8Z4At+GXrrdHAARLu
+         4w10rMq9bqaHf1qpYmEaQuDKSlpbVE1o7R7BCHylGVhRprxYCeHEpciBq/sHLuOXjSe7
+         BPlw==
+X-Gm-Message-State: AOAM531V8f7PrCG6kJktRl9IQUyAOnn5ttFK5e/uGNyMplK1hp/5uNu2
+        1gdnQWrHa+OhL+XU4zHiQuhBe2udl+bpvt0P1qXrafO7aNnt9+HBl848OnL7PPjjtuBlPrBTj/w
+        ZC5FZRCcloHTzRnWRjq4w+sER/xdO7oP1KeneyA==
+X-Received: by 2002:a05:6214:c29:b0:45a:fedd:7315 with SMTP id a9-20020a0562140c2900b0045afedd7315mr63423065qvd.59.1654307426835;
+        Fri, 03 Jun 2022 18:50:26 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxHzOeETeFjMvaA+vQh5+GUdoJS6AaWH3HtiTczNatQjsPOGXDLrSNbwm3UbfTN/bfKlK7fzeO/f2Voxur4r9g=
+X-Received: by 2002:a05:6214:c29:b0:45a:fedd:7315 with SMTP id
+ a9-20020a0562140c2900b0045afedd7315mr63423059qvd.59.1654307426594; Fri, 03
+ Jun 2022 18:50:26 -0700 (PDT)
+MIME-Version: 1.0
+References: <20220519150516.443078-1-miquel.raynal@bootlin.com>
+ <CAK-6q+hmd_Z-xJrz6QVM37gFrPRkYPAnyERit5oyDS=Beb83kg@mail.gmail.com>
+ <d844514c-771f-e720-407b-2679e430243a@datenfreihafen.org> <20220603195509.73cf888f@xps-13>
+In-Reply-To: <20220603195509.73cf888f@xps-13>
+From:   Alexander Aring <aahringo@redhat.com>
+Date:   Fri, 3 Jun 2022 21:50:15 -0400
+Message-ID: <CAK-6q+if-dNbpbneTfUtj6MrZXiYPq9npZfMkatXKo8cfU1m9w@mail.gmail.com>
+Subject: Re: [PATCH wpan-next v4 00/11] ieee802154: Synchronous Tx support
+To:     Miquel Raynal <miquel.raynal@bootlin.com>
+Cc:     Stefan Schmidt <stefan@datenfreihafen.org>,
+        Alexander Aring <alex.aring@gmail.com>,
+        linux-wpan - ML <linux-wpan@vger.kernel.org>,
         David Girault <david.girault@qorvo.com>,
         Romuald Despres <romuald.despres@qorvo.com>,
         Frederic Blain <frederic.blain@qorvo.com>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-        Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: [PATCH wpan-next 3/6] net: ieee802154: Create a node type
-Date:   Fri,  3 Jun 2022 20:21:40 +0200
-Message-Id: <20220603182143.692576-4-miquel.raynal@bootlin.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220603182143.692576-1-miquel.raynal@bootlin.com>
-References: <20220603182143.692576-1-miquel.raynal@bootlin.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Network Development <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-A device can be either a fully functioning device or a kind of reduced
-functioning device. Let's create a node type member. Drivers will be in
-charge of setting this value if they handle non-FFD devices, which can
-be considered the default for now.
+Hi,
 
-Provide this information in the interface get netlink command.
+On Fri, Jun 3, 2022 at 1:55 PM Miquel Raynal <miquel.raynal@bootlin.com> wrote:
+>
+> Hi Stefan, Alex,
+>
+> stefan@datenfreihafen.org wrote on Wed, 1 Jun 2022 23:01:51 +0200:
+>
+> > Hello.
+> >
+> > On 01.06.22 05:30, Alexander Aring wrote:
+> > > Hi,
+> > >
+> > > On Thu, May 19, 2022 at 11:06 AM Miquel Raynal
+> > > <miquel.raynal@bootlin.com> wrote:
+> > >>
+> > >> Hello,
+> > >>
+> > >> This series brings support for that famous synchronous Tx API for MLME
+> > >> commands.
+> > >>
+> > >> MLME commands will be used during scan operations. In this situation,
+> > >> we need to be sure that all transfers finished and that no transfer
+> > >> will be queued for a short moment.
+> > >>
+> > >
+> > > Acked-by: Alexander Aring <aahringo@redhat.com>
+> >
+> > These patches have been applied to the wpan-next tree. Thanks!
+> >
+> > > There will be now functions upstream which will never be used, Stefan
+> > > should wait until they are getting used before sending it to net-next.
+> >
+> > Indeed this can wait until we have a consumer of the functions before pushing this forward to net-next. Pretty sure Miquel is happy to finally move on to other pieces of his puzzle and use them. :-)
+>
+> Next part is coming!
+>
+> In the mean time I've experienced a new lockdep warning:
+>
+> All the netlink commands are executed with the rtnl taken.
+> In my current implementation, when I configure/edit a scan request or a
+> beacon request I take a scan_lock or a beacons_lock, so they may only
+> be taken after the rtnl in this case, which leads to this sequence of
+> events:
+> - the rtnl is taken (by the net core)
+> - the beacon's lock is taken
+>
+> But now in a beacon's work or an active scan work, what happens is:
+> - work gets woken up
+> - the beacon/scan lock is taken
+> - a beacon/beacon-request frame is transmitted
+> - the rtnl lock is taken during this transmission
+>
+> Lockdep then detects a possible circular dependency:
+> [  490.153387]        CPU0                    CPU1
+> [  490.153391]        ----                    ----
+> [  490.153394]   lock(&local->beacons_lock);
+> [  490.153400]                                lock(rtnl_mutex);
+> [  490.153406]                                lock(&local->beacons_lock);
+> [  490.153412]   lock(rtnl_mutex);
+>
+> So in practice, I always need to have the rtnl lock taken when
+> acquiring these other locks (beacon/scan_lock) which I think is far
+> from optimal.
+>
 
-Create a helper just to check if an rdev is a FFD or not, which will
-then be useful when bringing scan support.
+*Note that those can also be false positives.
 
-Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
----
- include/net/nl802154.h    | 9 +++++++++
- net/ieee802154/core.h     | 7 +++++++
- net/ieee802154/nl802154.c | 6 +++++-
- 3 files changed, 21 insertions(+), 1 deletion(-)
+> 1# One solution is to drop the beacons/scan locks because they are not
+> useful anymore and simply rely on the rtnl.
+>
 
-diff --git a/include/net/nl802154.h b/include/net/nl802154.h
-index 0f508aaae126..8e4d8b7a6e24 100644
---- a/include/net/nl802154.h
-+++ b/include/net/nl802154.h
-@@ -133,6 +133,8 @@ enum nl802154_attrs {
- 	NL802154_ATTR_PID,
- 	NL802154_ATTR_NETNS_FD,
- 
-+	NL802154_ATTR_NODE_TYPE,
-+
- 	/* add attributes here, update the policy in nl802154.c */
- 
- #ifdef CONFIG_IEEE802154_NL802154_EXPERIMENTAL
-@@ -162,6 +164,13 @@ enum nl802154_iftype {
- 	NL802154_IFTYPE_MAX = NUM_NL802154_IFTYPES - 1
- };
- 
-+enum nl802154_node_type {
-+	NL802154_NODE_TYPE_FFD,
-+	NL802154_NODE_TYPE_RFD,
-+	NL802154_NODE_TYPE_RFD_RX,
-+	NL802154_NODE_TYPE_RFD_TX,
-+};
-+
- /**
-  * enum nl802154_wpan_phy_capability_attr - wpan phy capability attributes
-  *
-diff --git a/net/ieee802154/core.h b/net/ieee802154/core.h
-index cae071bede37..019309d6a3bb 100644
---- a/net/ieee802154/core.h
-+++ b/net/ieee802154/core.h
-@@ -23,6 +23,7 @@ struct cfg802154_registered_device {
- 	int devlist_generation, wpan_dev_id;
- 
- 	/* PAN management */
-+	enum nl802154_node_type node_type;
- 	spinlock_t pan_lock;
- 	struct list_head pan_list;
- 	unsigned int max_pan_entries;
-@@ -73,4 +74,10 @@ void cfg802154_set_pans_expiration(struct cfg802154_registered_device *rdev,
- void cfg802154_expire_pans(struct cfg802154_registered_device *rdev);
- void cfg802154_flush_pans(struct cfg802154_registered_device *rdev);
- 
-+static inline bool
-+cfg802154_is_ffd(struct cfg802154_registered_device *rdev)
-+{
-+	return rdev->node_type == NL802154_NODE_TYPE_FFD;
-+}
-+
- #endif /* __IEEE802154_CORE_H */
-diff --git a/net/ieee802154/nl802154.c b/net/ieee802154/nl802154.c
-index e0b072aecf0f..10767c3b25d7 100644
---- a/net/ieee802154/nl802154.c
-+++ b/net/ieee802154/nl802154.c
-@@ -216,6 +216,9 @@ static const struct nla_policy nl802154_policy[NL802154_ATTR_MAX+1] = {
- 
- 	[NL802154_ATTR_PID] = { .type = NLA_U32 },
- 	[NL802154_ATTR_NETNS_FD] = { .type = NLA_U32 },
-+
-+	[NL802154_ATTR_NODE_TYPE] = { .type = NLA_U8 },
-+
- #ifdef CONFIG_IEEE802154_NL802154_EXPERIMENTAL
- 	[NL802154_ATTR_SEC_ENABLED] = { .type = NLA_U8, },
- 	[NL802154_ATTR_SEC_OUT_LEVEL] = { .type = NLA_U32, },
-@@ -790,7 +793,8 @@ nl802154_send_iface(struct sk_buff *msg, u32 portid, u32 seq, int flags,
- 			      wpan_dev_id(wpan_dev), NL802154_ATTR_PAD) ||
- 	    nla_put_u32(msg, NL802154_ATTR_GENERATION,
- 			rdev->devlist_generation ^
--			(cfg802154_rdev_list_generation << 2)))
-+			(cfg802154_rdev_list_generation << 2)) ||
-+	    nla_put_u8(msg, NL802154_ATTR_NODE_TYPE, rdev->node_type))
- 		goto nla_put_failure;
- 
- 	/* address settings */
--- 
-2.34.1
+depends on how long it will be held.
+
+> 2# Another solution would be to change the mlme_tx() implementation to
+> finally not need the rtnl at all.
+>
+> Note that just calling ASSERT_RTNL() makes no difference in 2#, it
+> still means that I always need to acquire the rtnl before acquiring the
+> beacons/scan locks, which greatly reduces their usefulness and leads to
+> solution 1# in the end.
+>
+> IIRC I decided to introduce the rtnl to avoid ->ndo_stop() calls during
+> an MLME transmission. I don't know if it has another use there. If not,
+> we may perhaps get rid of the rtnl in mlme_tx() by really handling the
+> stop calls (but I was too lazy so far to do that).
+>
+> What direction would you advise?
+
+Hard to say without code. Please show us some code of the current
+state... there should also be some stacktrace of the circular lock
+dependency, please provide the full output _matching_ the provided
+code.
+
+Thanks.
+
+- Alex
 
