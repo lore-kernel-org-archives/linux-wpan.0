@@ -2,125 +2,259 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D769AC43334
-	for <linux-wpan@archiver.kernel.org>; Mon,  6 Jun 2022 15:43:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB403C43334
+	for <linux-wpan@archiver.kernel.org>; Mon,  6 Jun 2022 17:14:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241041AbiFFPn2 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 6 Jun 2022 11:43:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52236 "EHLO
+        id S229664AbiFFROA (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 6 Jun 2022 13:14:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47208 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241036AbiFFPn1 (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 6 Jun 2022 11:43:27 -0400
+        with ESMTP id S229785AbiFFRNp (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 6 Jun 2022 13:13:45 -0400
 Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA35987A38;
-        Mon,  6 Jun 2022 08:43:25 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5E703467B;
+        Mon,  6 Jun 2022 10:03:56 -0700 (PDT)
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id 7BC0440003;
-        Mon,  6 Jun 2022 15:43:21 +0000 (UTC)
+        by mail.gandi.net (Postfix) with ESMTPSA id BA33440004;
+        Mon,  6 Jun 2022 17:03:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1654530203;
+        t=1654535035;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=iB3ZlXySloDoec4clQsobveNwwgHZW2TIz9Z8M7REBg=;
-        b=KqhKu7xD42sVbE/RMck+GMlu0NvMd1LHOTIitc41BCqLnHDkyZFWCBTvPW6waO9HC6MSJO
-        j4xQIAsD5iTDRL56GLnJfHR2uPCjR86S4l+SA1YPuUyFFh60psIEbeM4CC/dW5kg7OPQQ8
-        tZ2gKABv+9RIBLKMGCwQFoVlSXwVctie5+JrOfrDWw86LfxgNt3yCMKDmxNf0YVy2THj5D
-        2leTrY1/YWiXwczT3iRwTb4zxFYVSPE4iriFuZzMHH6j+i9//sDlXo91iA2pOkZKAmkRbn
-        1b7BHwBCnDESLNWqagDZvDkSu1pu4dzbMvGywj3SVafI/H2SjEeKNWDTNxr/cw==
-Date:   Mon, 6 Jun 2022 17:43:19 +0200
+        bh=BeTjfg5dR7YkIvFUJwxUXcQIa0zY9mGXo3ppwn8z9N4=;
+        b=JZFZXt07dNu0tB67Tt4wrJn7SjGk5WZURsmn1H6RPf9uUsiBYmcJ0ZfsKcphmPmqTCVu4M
+        9W867m7aexyA0yeqHlMz1JiNbIsh0GF0mHsEAKbqah/+CcF4RAkqcUSyLoIhSHKCw2ppJE
+        BjlKjIsYu4j71Nys2glpwcv0sd9jX3hAtLLZeuiL+n71RxhhDIPxR0jJZrQu68K3ZSsZgw
+        S/IKVJAq4o7QLC6K6VDFLK1BwEgam49UfAYY/TzSnAVJ7v6FdnoSHp047wqIt61s8EDNdi
+        /ZPg/52S0mpLJS5A5n8iLOqF89tEt4JPNrlXMhiF7z9lURxekjaxBdzDZa1RGg==
+Date:   Mon, 6 Jun 2022 19:03:51 +0200
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
 To:     Alexander Aring <aahringo@redhat.com>
-Cc:     Alexander Aring <alex.aring@gmail.com>,
-        Stefan Schmidt <stefan@datenfreihafen.org>,
+Cc:     Stefan Schmidt <stefan@datenfreihafen.org>,
+        Alexander Aring <alex.aring@gmail.com>,
         linux-wpan - ML <linux-wpan@vger.kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Network Development <netdev@vger.kernel.org>,
         David Girault <david.girault@qorvo.com>,
         Romuald Despres <romuald.despres@qorvo.com>,
         Frederic Blain <frederic.blain@qorvo.com>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
-        Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH wpan-next 1/6] net: ieee802154: Drop coordinator
- interface type
-Message-ID: <20220606174319.0924f80d@xps-13>
-In-Reply-To: <CAK-6q+hAZMqsN=S9uWAm4rTN+uZwz7_L42=emPHz7+MvfW6ZpQ@mail.gmail.com>
-References: <20220603182143.692576-1-miquel.raynal@bootlin.com>
-        <20220603182143.692576-2-miquel.raynal@bootlin.com>
-        <CAK-6q+hAZMqsN=S9uWAm4rTN+uZwz7_L42=emPHz7+MvfW6ZpQ@mail.gmail.com>
+        Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Network Development <netdev@vger.kernel.org>
+Subject: Re: [PATCH wpan-next v4 00/11] ieee802154: Synchronous Tx support
+Message-ID: <20220606190351.73f42faf@xps-13>
+In-Reply-To: <CAK-6q+if-dNbpbneTfUtj6MrZXiYPq9npZfMkatXKo8cfU1m9w@mail.gmail.com>
+References: <20220519150516.443078-1-miquel.raynal@bootlin.com>
+ <CAK-6q+hmd_Z-xJrz6QVM37gFrPRkYPAnyERit5oyDS=Beb83kg@mail.gmail.com>
+ <d844514c-771f-e720-407b-2679e430243a@datenfreihafen.org>
+ <20220603195509.73cf888f@xps-13>
+ <CAK-6q+if-dNbpbneTfUtj6MrZXiYPq9npZfMkatXKo8cfU1m9w@mail.gmail.com>
 Organization: Bootlin
 X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi Alexander,
+Hi Alex,
 
-aahringo@redhat.com wrote on Fri, 3 Jun 2022 22:01:38 -0400:
+aahringo@redhat.com wrote on Fri, 3 Jun 2022 21:50:15 -0400:
 
 > Hi,
->=20
-> On Fri, Jun 3, 2022 at 2:34 PM Miquel Raynal <miquel.raynal@bootlin.com> =
-wrote:
+> 
+> On Fri, Jun 3, 2022 at 1:55 PM Miquel Raynal <miquel.raynal@bootlin.com> wrote:
 > >
-> > The current enum is wrong. A device can either be an RFD, an RFD-RX, an
-> > RFD-TX or an FFD. If it is an FFD, it can also be a coordinator. While
-> > defining a node type might make sense from a strict software point of
-> > view, opposing node and coordinator seems meaningless in the ieee
-> > 802.15.4 world. As this enumeration is not used anywhere, let's just
-> > drop it. We will in a second time add a new "node type" enumeration
-> > which apply only to nodes, and does differentiates the type of devices
-> > mentioned above.
-> > =20
->=20
-> First you cannot say if this is not used anywhere else.
+> > Hi Stefan, Alex,
+> >
+> > stefan@datenfreihafen.org wrote on Wed, 1 Jun 2022 23:01:51 +0200:
+> >  
+> > > Hello.
+> > >
+> > > On 01.06.22 05:30, Alexander Aring wrote:  
+> > > > Hi,
+> > > >
+> > > > On Thu, May 19, 2022 at 11:06 AM Miquel Raynal
+> > > > <miquel.raynal@bootlin.com> wrote:  
+> > > >>
+> > > >> Hello,
+> > > >>
+> > > >> This series brings support for that famous synchronous Tx API for MLME
+> > > >> commands.
+> > > >>
+> > > >> MLME commands will be used during scan operations. In this situation,
+> > > >> we need to be sure that all transfers finished and that no transfer
+> > > >> will be queued for a short moment.
+> > > >>  
+> > > >
+> > > > Acked-by: Alexander Aring <aahringo@redhat.com>  
+> > >
+> > > These patches have been applied to the wpan-next tree. Thanks!
+> > >  
+> > > > There will be now functions upstream which will never be used, Stefan
+> > > > should wait until they are getting used before sending it to net-next.  
+> > >
+> > > Indeed this can wait until we have a consumer of the functions before pushing this forward to net-next. Pretty sure Miquel is happy to finally move on to other pieces of his puzzle and use them. :-)  
+> >
+> > Next part is coming!
+> >
+> > In the mean time I've experienced a new lockdep warning:
+> >
+> > All the netlink commands are executed with the rtnl taken.
+> > In my current implementation, when I configure/edit a scan request or a
+> > beacon request I take a scan_lock or a beacons_lock, so they may only
+> > be taken after the rtnl in this case, which leads to this sequence of
+> > events:
+> > - the rtnl is taken (by the net core)
+> > - the beacon's lock is taken
+> >
+> > But now in a beacon's work or an active scan work, what happens is:
+> > - work gets woken up
+> > - the beacon/scan lock is taken
+> > - a beacon/beacon-request frame is transmitted
+> > - the rtnl lock is taken during this transmission
+> >
+> > Lockdep then detects a possible circular dependency:
+> > [  490.153387]        CPU0                    CPU1
+> > [  490.153391]        ----                    ----
+> > [  490.153394]   lock(&local->beacons_lock);
+> > [  490.153400]                                lock(rtnl_mutex);
+> > [  490.153406]                                lock(&local->beacons_lock);
+> > [  490.153412]   lock(rtnl_mutex);
+> >
+> > So in practice, I always need to have the rtnl lock taken when
+> > acquiring these other locks (beacon/scan_lock) which I think is far
+> > from optimal.
+> >  
+> 
+> *Note that those can also be false positives.
+> 
+> > 1# One solution is to drop the beacons/scan locks because they are not
+> > useful anymore and simply rely on the rtnl.
+> >  
+> 
+> depends on how long it will be held.
+> 
+> > 2# Another solution would be to change the mlme_tx() implementation to
+> > finally not need the rtnl at all.
+> >
+> > Note that just calling ASSERT_RTNL() makes no difference in 2#, it
+> > still means that I always need to acquire the rtnl before acquiring the
+> > beacons/scan locks, which greatly reduces their usefulness and leads to
+> > solution 1# in the end.
+> >
+> > IIRC I decided to introduce the rtnl to avoid ->ndo_stop() calls during
+> > an MLME transmission. I don't know if it has another use there. If not,
+> > we may perhaps get rid of the rtnl in mlme_tx() by really handling the
+> > stop calls (but I was too lazy so far to do that).
+> >
+> > What direction would you advise?  
+> 
+> Hard to say without code. Please show us some code of the current
+> state... there should also be some stacktrace of the circular lock
+> dependency, please provide the full output _matching_ the provided
+> code.
 
-Mmmh, that's tricky, I really don't see how that might be a
-problem because there is literally nowhere in the kernel that uses this
-type, besides ieee802154_setup_sdata() which would just BUG() if this
-type was to be used. So I assumed it was safe to be removed.
+Of course, here is the branch that I used to produce the warning:
+https://github.com/miquelraynal/linux/ branch wpan-next/scan
 
-> Second I have
-> a different opinion here that you cannot just "switch" the role from
-> RFD, FFD, whatever.
+Triggering this is just a matter or executing nl802154_send_beacons().
+And here is the trace which appears in the dmesg:
 
-I agree with this, and that's why I don't understand this enum.
+[  234.224911] mac802154_hwsim mac802154_hwsim: Added 2 mac802154 hwsim hardware radios
+[  257.846221] Sending beacon
 
-A device can either be a NODE (an active device) or a MONITOR (a
-passive device) at a time. We can certainly switch from one to
-another at run time.
+[  257.847439] ======================================================
+[  257.847446] WARNING: possible circular locking dependency detected
+[  257.847463] 5.18.0-rc4-uwb+ #217 Not tainted
+[  257.847473] ------------------------------------------------------
+[  257.847479] kworker/u4:4/53 is trying to acquire lock:
+[  257.847488] ffffffff9d049d48 (rtnl_mutex){+.+.}-{3:3}, at: ieee802154_mlme_tx+0xf/0x160 [mac802154]
+[  257.847577] 
+               but task is already holding lock:
+[  257.847584] ffff89b082ea7ae0 (&local->beacons_lock){+.+.}-{3:3}, at: mac802154_beacons_work+0x1d/0xb0 [mac802154]
+[  257.847651] 
+               which lock already depends on the new lock.
 
-A NODE can be either an RFD or an FFD. That is a static property which
-cannot change.
+[  257.847668] 
+               the existing dependency chain (in reverse order) is:
+[  257.847674] 
+               -> #1 (&local->beacons_lock){+.+.}-{3:3}:
+[  257.847702]        __mutex_lock+0x9d/0x9a0
+[  257.847719]        mac802154_send_beacons+0x32/0x80 [mac802154]
+[  257.847767]        nl802154_send_beacons+0xd7/0x1f0 [ieee802154]
+[  257.847829]        genl_family_rcv_msg_doit+0xe5/0x140
+[  257.847842]        genl_rcv_msg+0xd7/0x1e0
+[  257.847852]        netlink_rcv_skb+0x4c/0xf0
+[  257.847862]        genl_rcv+0x1f/0x30
+[  257.847871]        netlink_unicast+0x191/0x260
+[  257.847882]        netlink_sendmsg+0x22e/0x480
+[  257.847892]        sock_sendmsg+0x59/0x60
+[  257.847907]        ____sys_sendmsg+0x20c/0x260
+[  257.847922]        ___sys_sendmsg+0x7c/0xc0
+[  257.847932]        __sys_sendmsg+0x54/0xa0
+[  257.847942]        do_syscall_64+0x3b/0x90
+[  257.847956]        entry_SYSCALL_64_after_hwframe+0x44/0xae
+[  257.847972] 
+               -> #0 (rtnl_mutex){+.+.}-{3:3}:
+[  257.847989]        __lock_acquire+0x1253/0x22e0
+[  257.848002]        lock_acquire+0xca/0x2f0
+[  257.848011]        __mutex_lock+0x9d/0x9a0
+[  257.848023]        ieee802154_mlme_tx+0xf/0x160 [mac802154]
+[  257.848058]        ieee802154_mlme_tx_one+0x2d/0x40 [mac802154]
+[  257.848092]        mac802154_beacons_work.cold+0x100/0x110 [mac802154]
+[  257.848135]        process_one_work+0x26f/0x5a0
+[  257.848147]        worker_thread+0x4a/0x3d0
+[  257.848158]        kthread+0xee/0x120
+[  257.848168]        ret_from_fork+0x22/0x30
+[  257.848180] 
+               other info that might help us debug this:
 
-However being a coordinator is just an additional property of a NODE
-which is of type FFD, and this can change over time.
+[  257.848187]  Possible unsafe locking scenario:
 
-So I don't get what having a coordinator interface would bring. What
-was the idea behind its introduction then?
+[  257.848192]        CPU0                    CPU1
+[  257.848198]        ----                    ----
+[  257.848203]   lock(&local->beacons_lock);
+[  257.848215]                                lock(rtnl_mutex);
+[  257.848226]                                lock(&local->beacons_lock);
+[  257.848236]   lock(rtnl_mutex);
+[  257.848246] 
+                *** DEADLOCK ***
 
-> You are mixing things here with "role in the network" and what the
-> transceiver capability (RFD, FFD) is, which are two different things.
-
-I don't think I am, however maybe our vision differ on what an
-interface should be.
-
-> You should use those defines and the user needs to create a new
-> interface type and probably have a different extended address to act
-> as a coordinator.
-
-Can't we just simply switch from coordinator to !coordinator (that's
-what I currently implemented)? Why would we need the user to create a
-new interface type *and* to provide a new address?
-
-Note that these are real questions that I am asking myself. I'm fine
-adapting my implementation, as long as I get the main idea.
-
-Thanks,
-Miqu=C3=A8l
+[  257.848252] 3 locks held by kworker/u4:4/53:
+[  257.848262]  #0: ffff89b0b66b4138 ((wq_completion)phy0){+.+.}-{0:0}, at: process_one_work+0x1ef/0x5a0
+[  257.848290]  #1: ffffa021404e3e78 ((work_completion)(&(&local->beacons_work)->work)){+.+.}-{0:0}, at: process_one_work+0x1ef/0x5a0
+[  257.848317]  #2: ffff89b082ea7ae0 (&local->beacons_lock){+.+.}-{3:3}, at: mac802154_beacons_work+0x1d/0xb0 [mac802154]
+[  257.848371] 
+               stack backtrace:
+[  257.848388] CPU: 1 PID: 53 Comm: kworker/u4:4 Not tainted 5.18.0-rc4-uwb+ #217
+[  257.848404] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.15.0-1 04/01/2014
+[  257.848422] Workqueue: phy0 mac802154_beacons_work [mac802154]
+[  257.848472] Call Trace:
+[  257.848490]  <TASK>
+[  257.848507]  dump_stack_lvl+0x45/0x59
+[  257.848536]  check_noncircular+0xfe/0x110
+[  257.848559]  __lock_acquire+0x1253/0x22e0
+[  257.848581]  lock_acquire+0xca/0x2f0
+[  257.848592]  ? ieee802154_mlme_tx+0xf/0x160 [mac802154]
+[  257.848638]  __mutex_lock+0x9d/0x9a0
+[  257.848652]  ? ieee802154_mlme_tx+0xf/0x160 [mac802154]
+[  257.848690]  ? mark_held_locks+0x49/0x70
+[  257.848701]  ? ieee802154_mlme_tx+0xf/0x160 [mac802154]
+[  257.848737]  ? _raw_spin_unlock_irqrestore+0x28/0x50
+[  257.848753]  ? lockdep_hardirqs_on+0x79/0x100
+[  257.848770]  ? ieee802154_mlme_tx+0xf/0x160 [mac802154]
+[  257.848804]  ieee802154_mlme_tx+0xf/0x160 [mac802154]
+[  257.848841]  ieee802154_mlme_tx_one+0x2d/0x40 [mac802154]
+[  257.848878]  mac802154_beacons_work.cold+0x100/0x110 [mac802154]
+[  257.848924]  process_one_work+0x26f/0x5a0
+[  257.848944]  worker_thread+0x4a/0x3d0
+[  257.848959]  ? process_one_work+0x5a0/0x5a0
+[  257.848971]  kthread+0xee/0x120
+[  257.848981]  ? kthread_complete_and_exit+0x20/0x20
+[  257.848995]  ret_from_fork+0x22/0x30
+[  257.849022]  </TASK>
