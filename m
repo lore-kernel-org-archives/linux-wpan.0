@@ -2,34 +2,34 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DE3EC433EF
-	for <linux-wpan@archiver.kernel.org>; Tue,  7 Jun 2022 16:16:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C23FDC433EF
+	for <linux-wpan@archiver.kernel.org>; Wed,  8 Jun 2022 13:47:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344801AbiFGQQi (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 7 Jun 2022 12:16:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40210 "EHLO
+        id S240476AbiFHNr5 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 8 Jun 2022 09:47:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50054 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344804AbiFGQQh (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 7 Jun 2022 12:16:37 -0400
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::225])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 701A4101739;
-        Tue,  7 Jun 2022 09:16:14 -0700 (PDT)
+        with ESMTP id S240325AbiFHNr4 (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 8 Jun 2022 09:47:56 -0400
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 594225A5AE;
+        Wed,  8 Jun 2022 06:47:54 -0700 (PDT)
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id 45C9D1C000D;
-        Tue,  7 Jun 2022 16:16:09 +0000 (UTC)
+        by mail.gandi.net (Postfix) with ESMTPSA id DC00AE0006;
+        Wed,  8 Jun 2022 13:47:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1654618572;
+        t=1654696072;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ZkAbXoXs2t8ugzNXMaQPGeM/Hio1skCbepGCuzCcvq8=;
-        b=bT6KFVzefthNneJOZl8xkCHji1l5Zdj785++E0Brf8YKQwn0d6bDo1pkl/PZZTbwDDubHj
-        l3TDI4TaVPxxjSYrBrr3sg46UvL7WtKG09Gi1cAfr4UFxTv8LosEeHyhxMl0K8nMTso4jB
-        n4GX0PVEeB9YRe2XK7sAy4Lx7U4RHo/RKrtDOQ0ZikzT1zZu5m9y5t9ZFYEFxkEfUCMzYH
-        Hu5JWhFumTWtj/wI806sUrMay3awejAwhYEIPaY56zU95b8N2wHQtXbg3RzLPRLTiXa9NG
-        +2zy012ZyN66XybvqfOkVsoVDOajM/NNk0F3GSuYaVDHnvfkg3Mxmxuy0Ym7Xw==
-Date:   Tue, 7 Jun 2022 18:16:08 +0200
+        bh=0SnuIfKA+v08E4CLFZl2WBBZ+AqWPPvRbrIf1bDB0wA=;
+        b=TvjKk1lWzV0zQ6QuKckAk/o1FCGspzLB1tzb6OXXoY9qHAUywG6jgJaWwxYZ59mhzJHxd0
+        rZEI1VcaQrTXb7O4tMVFBIyU23v8U9bQGTOPMClMlNP8GeC3xs1DRu4VNntATgPldRMEi1
+        srOb5wCsJFi7qmvEOrff9BO4/1256Iwwn35OfRtRRnZVawbC8d9RH1vqza7e9q5vsIToDD
+        MLIQrCBguAeePfW0X3pu1ZA84/8AQgcgnWk4GKnC/RfV4/LmpLenvsZMQBVNeDnMMtcNwT
+        x99TCv5oG2iiEqoLav6T0nuMMEjo33EYZ5wwFNQXNPuejhXuEtvS9m5dzjBmrA==
+Date:   Wed, 8 Jun 2022 15:47:49 +0200
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
 To:     Alexander Aring <aahringo@redhat.com>
 Cc:     Alexander Aring <alex.aring@gmail.com>,
@@ -46,13 +46,14 @@ Cc:     Alexander Aring <alex.aring@gmail.com>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>
 Subject: Re: [PATCH wpan-next 1/6] net: ieee802154: Drop coordinator
  interface type
-Message-ID: <20220607181608.609429cb@xps-13>
-In-Reply-To: <CAK-6q+itswJrmy-AhZ5DpnHH0UsfAeTPQTmX8WfG8=PteumVLg@mail.gmail.com>
+Message-ID: <20220608154749.06b62d59@xps-13>
+In-Reply-To: <20220607181608.609429cb@xps-13>
 References: <20220603182143.692576-1-miquel.raynal@bootlin.com>
         <20220603182143.692576-2-miquel.raynal@bootlin.com>
         <CAK-6q+hAZMqsN=S9uWAm4rTN+uZwz7_L42=emPHz7+MvfW6ZpQ@mail.gmail.com>
         <20220606174319.0924f80d@xps-13>
         <CAK-6q+itswJrmy-AhZ5DpnHH0UsfAeTPQTmX8WfG8=PteumVLg@mail.gmail.com>
+        <20220607181608.609429cb@xps-13>
 Organization: Bootlin
 X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
@@ -64,158 +65,88 @@ X-Mailing-List: linux-wpan@vger.kernel.org
 
 Hi Alex,
 
-aahringo@redhat.com wrote on Mon, 6 Jun 2022 23:04:06 -0400:
-
-> Hi,
+> > 3. coordinator (any $TYPE specific) userspace software
+> >=20
+> > May the main argument. Some coordinator specific user space daemon
+> > does specific type handling (e.g. hostapd) maybe because some library
+> > is required. It is a pain to deal with changing roles during the
+> > lifetime of an interface and synchronize user space software with it.
+> > We should keep in mind that some of those handlings will maybe be
+> > moved to user space instead of doing it in the kernel. I am fine with
+> > the solution now, but keep in mind to offer such a possibility.
+> >=20
+> > I think the above arguments are probably the same why wireless is
+> > doing something similar and I would avoid running into issues or it's
+> > really difficult to handle because you need to solve other Linux net
+> > architecture handling at first. =20
 >=20
-> On Mon, Jun 6, 2022 at 11:43 AM Miquel Raynal <miquel.raynal@bootlin.com>=
- wrote:
-> >
-> > Hi Alexander,
-> >
-> > aahringo@redhat.com wrote on Fri, 3 Jun 2022 22:01:38 -0400:
-> > =20
-> > > Hi,
+> Yep.
+
+The spec makes a difference between "coordinator" and "PAN
+coordinator", which one is the "coordinator" interface type supposed to
+picture? I believe we are talking about being a "PAN coordinator", but
+I want to be sure that we are aligned on the terms.
+
+> > > > You are mixing things here with "role in the network" and what
+> > > > the transceiver capability (RFD, FFD) is, which are two
+> > > > different things.   =20
 > > >
-> > > On Fri, Jun 3, 2022 at 2:34 PM Miquel Raynal <miquel.raynal@bootlin.c=
-om> wrote: =20
-> > > >
-> > > > The current enum is wrong. A device can either be an RFD, an RFD-RX=
-, an
-> > > > RFD-TX or an FFD. If it is an FFD, it can also be a coordinator. Wh=
-ile
-> > > > defining a node type might make sense from a strict software point =
-of
-> > > > view, opposing node and coordinator seems meaningless in the ieee
-> > > > 802.15.4 world. As this enumeration is not used anywhere, let's just
-> > > > drop it. We will in a second time add a new "node type" enumeration
-> > > > which apply only to nodes, and does differentiates the type of devi=
-ces
-> > > > mentioned above.
-> > > > =20
+> > > I don't think I am, however maybe our vision differ on what an
+> > > interface should be.
+> > >   =20
+> > > > You should use those defines and the user needs to create a new
+> > > > interface type and probably have a different extended address
+> > > > to act as a coordinator.   =20
 > > >
-> > > First you cannot say if this is not used anywhere else. =20
-> >
-> > Mmmh, that's tricky, I really don't see how that might be a
-> > problem because there is literally nowhere in the kernel that uses this
-> > type, besides ieee802154_setup_sdata() which would just BUG() if this
-> > type was to be used. So I assumed it was safe to be removed.
-> > =20
+> > > Can't we just simply switch from coordinator to !coordinator
+> > > (that's what I currently implemented)? Why would we need the user
+> > > to create a new interface type *and* to provide a new address?
+> > >
+> > > Note that these are real questions that I am asking myself. I'm
+> > > fine adapting my implementation, as long as I get the main idea.
+> > >   =20
+> >=20
+> > See above. =20
 >=20
-> this header is somehow half uapi where we copy it into some other
-> software e.g. wpan-tools as you noticed.
->=20
-> > > Second I have
-> > > a different opinion here that you cannot just "switch" the role from
-> > > RFD, FFD, whatever. =20
-> >
-> > I agree with this, and that's why I don't understand this enum.
-> >
-> > A device can either be a NODE (an active device) or a MONITOR (a
-> > passive device) at a time. We can certainly switch from one to
-> > another at run time.
-> >
-> > A NODE can be either an RFD or an FFD. That is a static property which
-> > cannot change.
-> >
-> > However being a coordinator is just an additional property of a NODE
-> > which is of type FFD, and this can change over time.
-> >
-> > So I don't get what having a coordinator interface would bring. What
-> > was the idea behind its introduction then?
-> > =20
->=20
-> There exists arguments which I have in my mind right now:
->=20
-> 1. frame parsing/address filter (which is somehow missing in your patches)
->=20
-> The parsing of frames is different from other types (just as monitor
-> interfaces). You will notice that setting up the address filter will
-> require a parameter if coordinator or not.
+> That's okay for me. I will adapt my implementation to use the
+> interface thing. In the mean time additional details about what a
+> coordinator interface should do differently (above question) is
+> welcome because this is not something I am really comfortable with.
 
-I think this is something that I completely missed until now, can you
-point me to where/how this is expected to be done? I don't see anything
-wpan specific filtering implementation. What is expected on this area
-and is there code that I missed already?
+I've updated the implementation to use the IFACE_COORD interface and it
+works fine, besides one question below.
 
-> Changing the address
-> filterung during runtime of an interface is somehow _not_ supported.
-> The reason is that the datasheets tell you to first set up an address
-> filter and then switch into receiving mode. Changing the address
-> filter during receive mode (start()/stop()) is not a specified
-> behaviour. Due to bus communication it also cannot be done atomically.
-> This might be avoidable but is a pain to synchronize if you really
-> depend on hw address filtering which we might do in future. It should
-> end in a different receiving path e.g. node_rx/monitor_rx.
+Also, I read the spec once again (soon I'll sleep with it) and
+actually what I extracted is that:
 
-Got it.
+* A FFD, when turned on, will perform a scan, then associate to any PAN
+  it found (algorithm is beyond the spec) or otherwise create a PAN ID
+  and start its own PAN. In both cases, it finishes its setup by
+  starting to send beacons.
 
->=20
-> 2. HardMAC transceivers
->=20
-> The add_interface() callback will be directly forwarded to the driver
-> and the driver will during the lifetime of this interface act as a
-> coordinator and not a mixed mode which can be disabled and enabled
-> anytime. I am not even sure if this can ever be handled in such a way
-> from hardmac transceivers, it might depend on the transceiver
-> interface but we should assume some strict "static" handling. Static
-> handling means here that the transceiver is unable to switch from
-> coordinator and vice versa after some initialization state.
+* A RFD will behave more or less the same, without the PAN creation
+  possibility of course. RFD-RX and RFD-TX are not required to support
+  any of that, I'll assume none of the scanning features is suitable
+  for them.
 
-Okay. I just completely missed the "interface add" command. So your
-advice is to treat the "PAN coordinator" property as a static property
-for a given interface, which seems reasonable.
+I have a couple of questions however:
 
-For now I will assume the same treatment when adding the interface is
-required compared to a NODE, but if something comes to your mind,
-please let me know.
+- Creating an interface (let's call it wpancoord) out of wpan0 means
+  that two interfaces can be used in different ways and one can use
+  wpan0 as a node while using wpancoord as a PAN coordinator. Is that
+  really allowed? How should we prevent this from happening?
 
-By the way, is there a mechanism limiting the number of interfaces on a
-device? Should we prevent the introduction of a coordinator iface if
-there is a node iface active?
+- Should the device always wait for the user(space) to provide the PAN
+  to associate to after the scan procedure right after the
+  add_interface()? (like an information that must be provided prior to
+  set the interface up?)
 
-> 3. coordinator (any $TYPE specific) userspace software
->=20
-> May the main argument. Some coordinator specific user space daemon
-> does specific type handling (e.g. hostapd) maybe because some library
-> is required. It is a pain to deal with changing roles during the
-> lifetime of an interface and synchronize user space software with it.
-> We should keep in mind that some of those handlings will maybe be
-> moved to user space instead of doing it in the kernel. I am fine with
-> the solution now, but keep in mind to offer such a possibility.
->=20
-> I think the above arguments are probably the same why wireless is
-> doing something similar and I would avoid running into issues or it's
-> really difficult to handle because you need to solve other Linux net
-> architecture handling at first.
+- How does an orphan FFD should pick the PAN ID for a PAN creation?
+  Should we use a random number? Start from 0 upwards? Start from
+  0xfffd downwards? Should the user always provide it?
 
-Yep.
-
-> > > You are mixing things here with "role in the network" and what the
-> > > transceiver capability (RFD, FFD) is, which are two different things.=
- =20
-> >
-> > I don't think I am, however maybe our vision differ on what an
-> > interface should be.
-> > =20
-> > > You should use those defines and the user needs to create a new
-> > > interface type and probably have a different extended address to act
-> > > as a coordinator. =20
-> >
-> > Can't we just simply switch from coordinator to !coordinator (that's
-> > what I currently implemented)? Why would we need the user to create a
-> > new interface type *and* to provide a new address?
-> >
-> > Note that these are real questions that I am asking myself. I'm fine
-> > adapting my implementation, as long as I get the main idea.
-> > =20
->=20
-> See above.
-
-That's okay for me. I will adapt my implementation to use the interface
-thing. In the mean time additional details about what a coordinator
-interface should do differently (above question) is welcome because
-this is not something I am really comfortable with.
+- Should an FFD be able to create its own PAN on demand? Shall we
+  allow to do that at the creation of the new interface?
 
 Thanks,
 Miqu=C3=A8l
