@@ -2,66 +2,36 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40AE9C433EF
-	for <linux-wpan@archiver.kernel.org>; Thu,  9 Jun 2022 02:23:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D726C433EF
+	for <linux-wpan@archiver.kernel.org>; Thu,  9 Jun 2022 14:42:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235223AbiFICX3 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 8 Jun 2022 22:23:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49568 "EHLO
+        id S235304AbiFIOmr (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Thu, 9 Jun 2022 10:42:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34428 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231775AbiFICX2 (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 8 Jun 2022 22:23:28 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id F3AC48FF9B
-        for <linux-wpan@vger.kernel.org>; Wed,  8 Jun 2022 19:23:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1654741407;
+        with ESMTP id S233780AbiFIOmr (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 9 Jun 2022 10:42:47 -0400
+Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::222])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 263F915716;
+        Thu,  9 Jun 2022 07:42:44 -0700 (PDT)
+Received: (Authenticated sender: miquel.raynal@bootlin.com)
+        by mail.gandi.net (Postfix) with ESMTPSA id AA1AB40006;
+        Thu,  9 Jun 2022 14:42:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+        t=1654785763;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=eYNDEDwZM6hyBg8vNkvjxS80NrwAKCp+U6fNDWVw9JI=;
-        b=Eku6tpaoIKC/b9ReSJWMSRIrFjmIvnhgJtZKenXkzVgYUfW8nEMk117Pp0GvWPEZv79L+g
-        0gO+xrPE/0ReGiQ1a4h3rQufl/Fe/QJwxB4tdzFTMkdJemNxwU072SN0B9r8J/EUkMtuVY
-        vEFmhqoeJxhX1unT6BYHcywsWAbbXQA=
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
- [209.85.160.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-669-8tEiZwbgNV2npT_8Wby8Kg-1; Wed, 08 Jun 2022 22:23:25 -0400
-X-MC-Unique: 8tEiZwbgNV2npT_8Wby8Kg-1
-Received: by mail-qt1-f198.google.com with SMTP id f22-20020ac859d6000000b00304bf4dba7fso17690406qtf.3
-        for <linux-wpan@vger.kernel.org>; Wed, 08 Jun 2022 19:23:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=eYNDEDwZM6hyBg8vNkvjxS80NrwAKCp+U6fNDWVw9JI=;
-        b=ZZ4qbLKCpqgorQ2arTlF1xUWl0086rk78Iov8FzxVXVKUS/d3O6FxQB/+Q3wNE4MI9
-         c6zlY9I7vRqp4jjobS2Q+CnzWgwQcmBuTILew4CtkDWuUBfz44SAXgKDkwJc+l2NFDFI
-         bPwLCEO9uIUejwwbqSokAcXjI6NS9qRAjd2iiufX1BRpf56+QjP7cBaVvv6EKovjYHtz
-         irl7YfI9s3WwFrcyC4R/xve+sV8MGMVc0jgtBIweY81Qp01Zc7cv4ebzs2hZOEbMGnpv
-         okcGF6y+RtJSNoQAMK2x8gPAlPvrSVwqrpxWC7N6+R3q3UisThTp7gulZjGJqThz6mTP
-         ecug==
-X-Gm-Message-State: AOAM532WdgBcvqbQ1VJFS9197b0qP2O2uXq4skykImvC5x7aUkapqYu1
-        P/TH06y9tDnR0f478JUEWuB9l51PEMv/8vBKxjiYMWk51jVyKuV74pcaVBeFVOdiY4G2ubpZYsc
-        hr4gH000KU+sePVzoqcr4rDax/4QnNNSWw7ePiw==
-X-Received: by 2002:ad4:5f86:0:b0:46b:9505:5a27 with SMTP id jp6-20020ad45f86000000b0046b95055a27mr15060063qvb.2.1654741405180;
-        Wed, 08 Jun 2022 19:23:25 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwF0vr6SZ+jfD7Mv2R9WVieb9D8PWZIbLy9cHal/y2tBi5+x3mGbKQhuIJfdxjhh3z6s8iDHRVlgRKtDllMVME=
-X-Received: by 2002:ad4:5f86:0:b0:46b:9505:5a27 with SMTP id
- jp6-20020ad45f86000000b0046b95055a27mr15060048qvb.2.1654741404942; Wed, 08
- Jun 2022 19:23:24 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220603182143.692576-1-miquel.raynal@bootlin.com>
- <20220603182143.692576-2-miquel.raynal@bootlin.com> <CAK-6q+hAZMqsN=S9uWAm4rTN+uZwz7_L42=emPHz7+MvfW6ZpQ@mail.gmail.com>
- <20220606174319.0924f80d@xps-13> <CAK-6q+itswJrmy-AhZ5DpnHH0UsfAeTPQTmX8WfG8=PteumVLg@mail.gmail.com>
- <20220607181608.609429cb@xps-13> <20220608154749.06b62d59@xps-13>
- <20220608163708.26ccd4cc@xps-13> <CAK-6q+iD0_bS2z_BdKsyeqYvzxj2x-v+SWAo2UO02j7yGtEcEg@mail.gmail.com>
-In-Reply-To: <CAK-6q+iD0_bS2z_BdKsyeqYvzxj2x-v+SWAo2UO02j7yGtEcEg@mail.gmail.com>
-From:   Alexander Aring <aahringo@redhat.com>
-Date:   Wed, 8 Jun 2022 22:23:14 -0400
-Message-ID: <CAK-6q+gBCakX8Vm1SHuLfex5jBqLKySUiaZKg3So+zjeJaSehw@mail.gmail.com>
-Subject: Re: [PATCH wpan-next 1/6] net: ieee802154: Drop coordinator interface type
-To:     Miquel Raynal <miquel.raynal@bootlin.com>
+        bh=Uh4LLt/6JdErlzEN+2wYIYsmkK+wNN4OCN8Gh0tycMQ=;
+        b=Ef89YXxwmnlOCM6NACM9/Wy6lYrP2AuwfAQ02+G61O0fP+zcKU4efMI1qeKLvy2LPmF/Ik
+        rScxA9uLddVRc7JjSS8s5xkJDwrRwMWpat5T1HADkzhbRGfocIWeo7kQ7ROE+xDqYlmEet
+        +2TxbaDF41a2PPkzjAYkmvilNPRurcaFFelOyyqzxOBILrOTAp1zcGunS5Ts/+j2r/o0WV
+        IulLJUjN2sAaP8ryhPfzV++rS9kswMvom7gp807JFDh4wQpVoq7xRFWR2YVpjjKAKwRXwR
+        3HeZv3c9IAg4HBrN8o1SUQk3TS9hDXxCGSXiyyGHfKt0RZRM1P2X2uOjlK2SuA==
+Date:   Thu, 9 Jun 2022 16:42:40 +0200
+From:   Miquel Raynal <miquel.raynal@bootlin.com>
+To:     Alexander Aring <aahringo@redhat.com>
 Cc:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
         linux-wpan - ML <linux-wpan@vger.kernel.org>,
@@ -74,140 +44,124 @@ Cc:     Alexander Aring <alex.aring@gmail.com>,
         Frederic Blain <frederic.blain@qorvo.com>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH wpan-next 1/6] net: ieee802154: Drop coordinator
+ interface type
+Message-ID: <20220609164240.4e7515d4@xps-13>
+In-Reply-To: <CAK-6q+gf2_aVt4m7z77aLH+Rkc_sRTEjoykk5Dn+04wbu5n7Xg@mail.gmail.com>
+References: <20220603182143.692576-1-miquel.raynal@bootlin.com>
+        <20220603182143.692576-2-miquel.raynal@bootlin.com>
+        <CAK-6q+hAZMqsN=S9uWAm4rTN+uZwz7_L42=emPHz7+MvfW6ZpQ@mail.gmail.com>
+        <20220606174319.0924f80d@xps-13>
+        <CAK-6q+itswJrmy-AhZ5DpnHH0UsfAeTPQTmX8WfG8=PteumVLg@mail.gmail.com>
+        <20220607181608.609429cb@xps-13>
+        <CAK-6q+gf2_aVt4m7z77aLH+Rkc_sRTEjoykk5Dn+04wbu5n7Xg@mail.gmail.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi,
+Hi Alex,
 
-On Wed, Jun 8, 2022 at 10:06 PM Alexander Aring <aahringo@redhat.com> wrote:
->
-> Hi,
->
-> On Wed, Jun 8, 2022 at 10:37 AM Miquel Raynal <miquel.raynal@bootlin.com> wrote:
-> >
-> >
-> > miquel.raynal@bootlin.com wrote on Wed, 8 Jun 2022 15:47:49 +0200:
-> >
-> > > Hi Alex,
-> > >
-> > > > > 3. coordinator (any $TYPE specific) userspace software
-> > > > >
-> > > > > May the main argument. Some coordinator specific user space daemon
-> > > > > does specific type handling (e.g. hostapd) maybe because some library
-> > > > > is required. It is a pain to deal with changing roles during the
-> > > > > lifetime of an interface and synchronize user space software with it.
-> > > > > We should keep in mind that some of those handlings will maybe be
-> > > > > moved to user space instead of doing it in the kernel. I am fine with
-> > > > > the solution now, but keep in mind to offer such a possibility.
-> > > > >
-> > > > > I think the above arguments are probably the same why wireless is
-> > > > > doing something similar and I would avoid running into issues or it's
-> > > > > really difficult to handle because you need to solve other Linux net
-> > > > > architecture handling at first.
+> > > > > Second I have
+> > > > > a different opinion here that you cannot just "switch" the role f=
+rom
+> > > > > RFD, FFD, whatever. =20
 > > > >
-> > > > Yep.
-> > >
-> > > The spec makes a difference between "coordinator" and "PAN
-> > > coordinator", which one is the "coordinator" interface type supposed to
-> > > picture? I believe we are talking about being a "PAN coordinator", but
-> > > I want to be sure that we are aligned on the terms.
-> > >
-> > > > > > > You are mixing things here with "role in the network" and what
-> > > > > > > the transceiver capability (RFD, FFD) is, which are two
-> > > > > > > different things.
-> > > > > >
-> > > > > > I don't think I am, however maybe our vision differ on what an
-> > > > > > interface should be.
-> > > > > >
-> > > > > > > You should use those defines and the user needs to create a new
-> > > > > > > interface type and probably have a different extended address
-> > > > > > > to act as a coordinator.
-> > > > > >
-> > > > > > Can't we just simply switch from coordinator to !coordinator
-> > > > > > (that's what I currently implemented)? Why would we need the user
-> > > > > > to create a new interface type *and* to provide a new address?
-> > > > > >
-> > > > > > Note that these are real questions that I am asking myself. I'm
-> > > > > > fine adapting my implementation, as long as I get the main idea.
-> > > > > >
-> > > > >
-> > > > > See above.
+> > > > I agree with this, and that's why I don't understand this enum.
 > > > >
-> > > > That's okay for me. I will adapt my implementation to use the
-> > > > interface thing. In the mean time additional details about what a
-> > > > coordinator interface should do differently (above question) is
-> > > > welcome because this is not something I am really comfortable with.
+> > > > A device can either be a NODE (an active device) or a MONITOR (a
+> > > > passive device) at a time. We can certainly switch from one to
+> > > > another at run time.
+> > > >
+> > > > A NODE can be either an RFD or an FFD. That is a static property wh=
+ich
+> > > > cannot change.
+> > > >
+> > > > However being a coordinator is just an additional property of a NODE
+> > > > which is of type FFD, and this can change over time.
+> > > >
+> > > > So I don't get what having a coordinator interface would bring. What
+> > > > was the idea behind its introduction then?
+> > > > =20
 > > >
-> > > I've updated the implementation to use the IFACE_COORD interface and it
-> > > works fine, besides one question below.
+> > > There exists arguments which I have in my mind right now:
 > > >
-> > > Also, I read the spec once again (soon I'll sleep with it) and
-> > > actually what I extracted is that:
+> > > 1. frame parsing/address filter (which is somehow missing in your pat=
+ches)
 > > >
-> > > * A FFD, when turned on, will perform a scan, then associate to any PAN
-> > >   it found (algorithm is beyond the spec) or otherwise create a PAN ID
-> > >   and start its own PAN. In both cases, it finishes its setup by
-> > >   starting to send beacons.
-> > >
-> > > * A RFD will behave more or less the same, without the PAN creation
-> > >   possibility of course. RFD-RX and RFD-TX are not required to support
-> > >   any of that, I'll assume none of the scanning features is suitable
-> > >   for them.
+> > > The parsing of frames is different from other types (just as monitor
+> > > interfaces). You will notice that setting up the address filter will
+> > > require a parameter if coordinator or not. =20
 > >
-> > Acutally, RFDs do not send beacons, AFAIU.
-> >
-> > > I have a couple of questions however:
-> > >
-> > > - Creating an interface (let's call it wpancoord) out of wpan0 means
-> > >   that two interfaces can be used in different ways and one can use
-> > >   wpan0 as a node while using wpancoord as a PAN coordinator. Is that
-> > >   really allowed? How should we prevent this from happening?
-> > >
-> > > - Should the device always wait for the user(space) to provide the PAN
-> > >   to associate to after the scan procedure right after the
-> > >   add_interface()? (like an information that must be provided prior to
-> > >   set the interface up?)
-> > >
-> > > - How does an orphan FFD should pick the PAN ID for a PAN creation?
-> > >   Should we use a random number? Start from 0 upwards? Start from
-> > >   0xfffd downwards? Should the user always provide it?
-> > >
-> > > - Should an FFD be able to create its own PAN on demand? Shall we
-> > >   allow to do that at the creation of the new interface?
-> >
-> > Additional questions:
-> >
-> >   - How is chosen the beacon order? Should we have a default value?
-> >     Should we default to 15 (not on a beacon enabled PAN)? Should we be
-> >     able to update this value during the lifetime of the PAN?
-> >
->
-> Is there no mib default value for this?
->
-> >   - The spec talks about the cluster topology, where a coordinator that
-> >     just associated to a PAN starts emitting beacons, which may enable
-> >     other devices in its range to ask to join the PAN (increased area
-> >     coverage). But then, there is no information about how the newly
-> >     added device should do to join the PAN coordinator which is anyway
-> >     out of range to require the association, transmit data, etc. Any
-> >     idea how this is supposed to work?
-> >
->
-> I think we should maybe add a feature for this later if we don't know
-> how it is supposed to work or there are still open questions and first
-> introduce the manual setup. After that, maybe things will become
-> clearer and we can add support for this part. Is this okay?
+> > I think this is something that I completely missed until now, can you
+> > point me to where/how this is expected to be done? I don't see anything
+> > wpan specific filtering implementation. What is expected on this area
+> > and is there code that I missed already?
+> > =20
+>=20
+> https://elixir.bootlin.com/linux/v5.19-rc1/source/net/mac802154/rx.c#L284
 
-*I also think that this can be done in user space by a daemon by
-triggering netlink commands for scan/assoc/etc. (manual setup) and
-providing such functionality as mentioned by the spec (auto creation
-of pan, assoc with pan). Things which are unclear here are then moved
-to the user as the operations for scan/assoc/etc. will not be
-different or at least parameterized. The point here is that providing
-the minimum basic functionality should be done at first, then we can
-look at how to realize such handling (either in kernel or user space).
+Oh okay now I get what you mean. Indeed, I had to look into this
+function to allow coordinators to receive packets with the IFACE_COORD
+implementation, but so far the filtering is "the same" as for a node.
+We can improve that later if needed.
+=20
+> > > Changing the address
+> > > filterung during runtime of an interface is somehow _not_ supported.
+> > > The reason is that the datasheets tell you to first set up an address
+> > > filter and then switch into receiving mode. Changing the address
+> > > filter during receive mode (start()/stop()) is not a specified
+> > > behaviour. Due to bus communication it also cannot be done atomically.
+> > > This might be avoidable but is a pain to synchronize if you really
+> > > depend on hw address filtering which we might do in future. It should
+> > > end in a different receiving path e.g. node_rx/monitor_rx. =20
+> >
+> > Got it.
+> > =20
+>=20
+> I had some thoughts about this as well when going to promiscuous mode
+> while in "receiving mode"... this is "normally" not supported...
+>=20
+> > >
+> > > 2. HardMAC transceivers
+> > >
+> > > The add_interface() callback will be directly forwarded to the driver
+> > > and the driver will during the lifetime of this interface act as a
+> > > coordinator and not a mixed mode which can be disabled and enabled
+> > > anytime. I am not even sure if this can ever be handled in such a way
+> > > from hardmac transceivers, it might depend on the transceiver
+> > > interface but we should assume some strict "static" handling. Static
+> > > handling means here that the transceiver is unable to switch from
+> > > coordinator and vice versa after some initialization state. =20
+> >
+> > Okay. I just completely missed the "interface add" command. So your
+> > advice is to treat the "PAN coordinator" property as a static property
+> > for a given interface, which seems reasonable.
+> >
+> > For now I will assume the same treatment when adding the interface is
+> > required compared to a NODE, but if something comes to your mind,
+> > please let me know.
+> >
+> > By the way, is there a mechanism limiting the number of interfaces on a
+> > device? Should we prevent the introduction of a coordinator iface if
+> > there is a node iface active?
+> > =20
+>=20
+> such a mechanism already exists, look at the code when trying to ifup
+> an interface in mac802154. You cannot simply have a monitor and node
+> up at the same time. Hardware could have multiple address filters and
+> run multiple mac stack instances on one phy, which is in my opinion
+> not different than macvlan and in wireless running multiple access
+> points on the same phy.
 
-- Alex
+Oh nice, I didn't pay enough attention to figure out that this was
+executed during ifup. So I already changed that code to refuse two node
+*and* coordinators to be up at the same time, we should be on the safe
+side.
 
+Thanks,
+Miqu=C3=A8l
