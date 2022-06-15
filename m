@@ -2,46 +2,64 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26124C43334
-	for <linux-wpan@archiver.kernel.org>; Wed, 15 Jun 2022 09:08:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4B8DC43334
+	for <linux-wpan@archiver.kernel.org>; Wed, 15 Jun 2022 09:16:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245689AbiFOJIf (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 15 Jun 2022 05:08:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48146 "EHLO
+        id S1347932AbiFOJP7 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 15 Jun 2022 05:15:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55424 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346746AbiFOJIG (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 15 Jun 2022 05:08:06 -0400
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B50813E0E5;
-        Wed, 15 Jun 2022 02:08:04 -0700 (PDT)
+        with ESMTP id S1345653AbiFOJPh (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 15 Jun 2022 05:15:37 -0400
+Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB19E3ED3C;
+        Wed, 15 Jun 2022 02:15:34 -0700 (PDT)
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id 020C960003;
-        Wed, 15 Jun 2022 09:08:01 +0000 (UTC)
+        by mail.gandi.net (Postfix) with ESMTPSA id 98DDB4000A;
+        Wed, 15 Jun 2022 09:15:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1655284082;
+        t=1655284533;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=MymE6MOX0GlwQVuLH2UMzj0yLsWSK4MgouE3pnUGsOI=;
-        b=nezqxXEmW4FzurCD+Ou0ZngVNbU8PnTEZLxMUU4ge3iDVxKRZalp0zCN7WB4I5U3+99EWT
-        1tSSDwnO/NzQNc9ZHkSBOKRUDd4mcRGGnSh3dLIQMcQjTj1ugBL1EYFrx4VMXrydv6ZRfN
-        2PbUCd/xKbhQ27HDPOZRjJ/vw8RA/cV3/0X39XN+9kSV2BwpveoWrTtn5A6Wa/mQAjueea
-        0OQM65NQ6yQOA4HTxeBfWJMvj3KhxfLHSPc5MdmtAxKmqMFTjfYQV9nWTlE17MJcm+q7tg
-        diBXLlDZaP/ceLm88Wc4u6/3Gg+RPGQVcEj52I8jbriwwMm0HtmZbnhq1LNdAg==
-Date:   Wed, 15 Jun 2022 11:08:00 +0200
+        bh=uWE1Vk0+Zr2pLM5BMYfOcrVeY77S5kIxNU+y947KTYA=;
+        b=OCCYbLep7uSmyImaY+JZAde+Rv71ihGaCkTa5Pja7/OTipLP59KcHFfZMMgb5f5ycybS0u
+        owb3h9cWUSuRkBb8X0Y2prhWO8EsjJ6JPekAW5Ky0KskBkJ+bytNPeM466Kv39beHD0tdJ
+        UT29o73jCXTsV0XU7wXhFQGMgez2Dyrj7ldsmppKHcsj8wsW6vG0hUF1ndAEuPYFOsUoM0
+        NFqIQmqU39H0YCSTwcKiv9hXYiAWC0c0aWCI3q70DAkHJZ3tdyUscroQS5m7TRWDKta9eH
+        8Z2ZuD3eGW+itMNKb63RgQN3kbo2BCragNE7wZWti6ucXUl3/61iLh1EVHLigA==
+Date:   Wed, 15 Jun 2022 11:15:30 +0200
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
 To:     Alexander Aring <aahringo@redhat.com>
-Cc:     Stefan Schmidt <stefan@datenfreihafen.org>,
+Cc:     Alexander Aring <alex.aring@gmail.com>,
+        Stefan Schmidt <stefan@datenfreihafen.org>,
         linux-wpan - ML <linux-wpan@vger.kernel.org>,
-        Network Development <netdev@vger.kernel.org>
-Subject: Re: [PATCHv2 wpan-next 0/2] mac802154: atomic_dec_and_test() fixes
-Message-ID: <20220615110800.6b17960b@xps-13>
-In-Reply-To: <20220615092558.1ebe6abe@xps-13>
-References: <20220613043735.1039895-1-aahringo@redhat.com>
-        <20220613161457.0a05cda0@xps-13>
-        <CAK-6q+ioLUC=M-i00JX4mq8a9dh6+Jh=q4ZhYgmZmeoS8WMN+g@mail.gmail.com>
-        <20220615092558.1ebe6abe@xps-13>
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Network Development <netdev@vger.kernel.org>,
+        David Girault <david.girault@qorvo.com>,
+        Romuald Despres <romuald.despres@qorvo.com>,
+        Frederic Blain <frederic.blain@qorvo.com>,
+        Nicolas Schodet <nico@ni.fr.eu.org>,
+        Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH wpan-next 1/6] net: ieee802154: Drop coordinator
+ interface type
+Message-ID: <20220615111530.04c54bfd@xps-13>
+In-Reply-To: <CAK-6q+haNAxexhNe5_pReU=jpUyP+XKn9oq=DKGC_Leg0w41pA@mail.gmail.com>
+References: <20220603182143.692576-1-miquel.raynal@bootlin.com>
+        <20220603182143.692576-2-miquel.raynal@bootlin.com>
+        <CAK-6q+hAZMqsN=S9uWAm4rTN+uZwz7_L42=emPHz7+MvfW6ZpQ@mail.gmail.com>
+        <20220606174319.0924f80d@xps-13>
+        <CAK-6q+itswJrmy-AhZ5DpnHH0UsfAeTPQTmX8WfG8=PteumVLg@mail.gmail.com>
+        <20220607181608.609429cb@xps-13>
+        <20220608154749.06b62d59@xps-13>
+        <20220608163708.26ccd4cc@xps-13>
+        <CAK-6q+iD0_bS2z_BdKsyeqYvzxj2x-v+SWAo2UO02j7yGtEcEg@mail.gmail.com>
+        <CAK-6q+gBCakX8Vm1SHuLfex5jBqLKySUiaZKg3So+zjeJaSehw@mail.gmail.com>
+        <20220609174353.177daddb@xps-13>
+        <CAK-6q+haNAxexhNe5_pReU=jpUyP+XKn9oq=DKGC_Leg0w41pA@mail.gmail.com>
 Organization: Bootlin
 X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
@@ -51,80 +69,91 @@ Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
+Hi Alexander,
 
-miquel.raynal@bootlin.com wrote on Wed, 15 Jun 2022 09:25:58 +0200:
+aahringo@redhat.com wrote on Sat, 11 Jun 2022 08:05:31 -0400:
 
-> Hi Alex,
+> Hi,
 >=20
-> aahringo@redhat.com wrote on Tue, 14 Jun 2022 22:53:19 -0400:
->=20
-> > Hi,
-> >=20
-> > On Mon, Jun 13, 2022 at 10:15 AM Miquel Raynal
-> > <miquel.raynal@bootlin.com> wrote:
-> > >
-> > > Hi Alex,
-> > >
-> > > aahringo@redhat.com wrote on Mon, 13 Jun 2022 00:37:33 -0400:
-> > > =20
-> > > > Hi,
+> On Thu, Jun 9, 2022 at 11:44 AM Miquel Raynal <miquel.raynal@bootlin.com>=
+ wrote:
+> >
+> > Hi Alex,
+> > =20
+> > > > >
+> > > > >   - How is chosen the beacon order? Should we have a default valu=
+e?
+> > > > >     Should we default to 15 (not on a beacon enabled PAN)? Should=
+ we be
+> > > > >     able to update this value during the lifetime of the PAN?
+> > > > > =20
 > > > >
-> > > > I was wondering why nothing worked anymore. I found it...
+> > > > Is there no mib default value for this? =20
+> >
+> > I didn't find anything. I suppose we can ask for that parameter at PAN
+> > creation, but otherwise I'll keep a backward compatible value: 15,
+> > which means that the PAN is not beacon enabled (like today, basically).
+> > =20
+>=20
+> I hope it is not necessary to answer this question, see below.
+>=20
+> > > > =20
+> > > > >   - The spec talks about the cluster topology, where a coordinato=
+r that
+> > > > >     just associated to a PAN starts emitting beacons, which may e=
+nable
+> > > > >     other devices in its range to ask to join the PAN (increased =
+area
+> > > > >     coverage). But then, there is no information about how the ne=
+wly
+> > > > >     added device should do to join the PAN coordinator which is a=
+nyway
+> > > > >     out of range to require the association, transmit data, etc. =
+Any
+> > > > >     idea how this is supposed to work?
+> > > > > =20
 > > > >
-> > > > changes since v2:
-> > > >
-> > > >  - fix fixes tags in mac802154: util: fix release queue handling
-> > > >  - add patch mac802154: fix atomic_dec_and_test checks got somehow
-> > > >    confused 2 patch same issue =20
+> > > > I think we should maybe add a feature for this later if we don't kn=
+ow
+> > > > how it is supposed to work or there are still open questions and fi=
+rst
+> > > > introduce the manual setup. After that, maybe things will become
+> > > > clearer and we can add support for this part. Is this okay? =20
 > > >
-> > > I've got initially confused with your patchset but yes indeed the API
-> > > works the opposite way compared to my gut understanding.
-> > > =20
-> >=20
-> > not the first time I am seeing this, I fixed similar issues already at
-> > other places.
-> >=20
-> > btw I told you the right semantic at [0] ....
+> > > *I also think that this can be done in user space by a daemon by
+> > > triggering netlink commands for scan/assoc/etc. (manual setup) and
+> > > providing such functionality as mentioned by the spec (auto creation
+> > > of pan, assoc with pan). Things which are unclear here are then moved
+> > > to the user as the operations for scan/assoc/etc. will not be
+> > > different or at least parameterized. The point here is that providing
+> > > the minimum basic functionality should be done at first, then we can
+> > > look at how to realize such handling (either in kernel or user space)=
+. =20
+> >
+> > Actually this is none of the 802.15.4 MAC layer business. I believe
+> > this is the upper layer duty to make this interoperability work,
+> > namely, 6lowpan? =20
 >=20
-> I focused on the if statement more than the actual syntax...
->=20
-> >=20
-> > > We bought hardware and I am currently setting up a real network to
-> > > hopefully track these regressions myself in the future.
-> > > =20
-> >=20
-> > I wonder why you don't use hwsim... and you already mentioned hwsim to
-> > me.
->=20
-> I do use hwsim but I was exclusively testing the mlme ops with it.
->=20
-> > You can simply make a 6lowpan interface on it and ping it - no
-> > hardware needed and this would already show issues...
->=20
-> Actually I just learnt about how to create 6lowpan interfaces and do
-> basic data exchanges, it's rather easy and straightforward, but I must
-> admit I was not familiar at all with this area and thought it would be
-> more complex... Indeed, hwsim would work just fine for this purpose,
-> I will add this to my checklist.
->=20
-> > Now you can say,
-> > why I do not test it... maybe I do next time but review takes longer
-> > then.
->=20
-> I'm not saying this at all :) It is my duty, not yours, reviews and
-> feedback are more than enough.
+> I am not sure if I understand your answer, I meant that if
+> "coordinator" or "PAN coordinator" depends on whatever, if somebody is
+> running a "coordinator" software in the background on top of a coord
+> interface.
+> The kernel offers the functionality for scan/assoc/etc. (offers link
+> quality, etc. _statistics_ and not _heuristic_) which will be used by
+> this software to whatever the user defines to realize this behaviour
+> as it is user specific.
 
-Ok 6lowpan is _really_ well integrated, apologies for not taking the
-time to use it before.
+Yes.
 
-BTW I see all around the internet that ping6 produces this warning:
+> Sure linux-wpan, should then provide at least a standard piece of
+> software for it.
+>=20
+> This has in my opinion nothing to do with 6lowpan.
 
-	ping6: Warning: source address might be selected on device
-	other than: lowpan0
-
-At a first glance I could not find an explanation, do you also have it
-on your side? Do you know what it means?
-
+I was referring to the cluster topology routing logic. The routing
+logic to reach a device in a PAN that is not directly reachable by the
+PAN coordinator is the responsibility of the layer 3 in the OSI model,
+so I believe it's either 6lowpan's duty or even above.
 
 Thanks,
 Miqu=C3=A8l
