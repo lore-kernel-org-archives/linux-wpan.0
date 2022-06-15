@@ -2,158 +2,229 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4B8DC43334
-	for <linux-wpan@archiver.kernel.org>; Wed, 15 Jun 2022 09:16:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D21F1CCA47F
+	for <linux-wpan@archiver.kernel.org>; Wed, 15 Jun 2022 15:27:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347932AbiFOJP7 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 15 Jun 2022 05:15:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55424 "EHLO
+        id S1354138AbiFOP1W (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 15 Jun 2022 11:27:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48394 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345653AbiFOJPh (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 15 Jun 2022 05:15:37 -0400
-Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB19E3ED3C;
-        Wed, 15 Jun 2022 02:15:34 -0700 (PDT)
-Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id 98DDB4000A;
-        Wed, 15 Jun 2022 09:15:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1655284533;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=uWE1Vk0+Zr2pLM5BMYfOcrVeY77S5kIxNU+y947KTYA=;
-        b=OCCYbLep7uSmyImaY+JZAde+Rv71ihGaCkTa5Pja7/OTipLP59KcHFfZMMgb5f5ycybS0u
-        owb3h9cWUSuRkBb8X0Y2prhWO8EsjJ6JPekAW5Ky0KskBkJ+bytNPeM466Kv39beHD0tdJ
-        UT29o73jCXTsV0XU7wXhFQGMgez2Dyrj7ldsmppKHcsj8wsW6vG0hUF1ndAEuPYFOsUoM0
-        NFqIQmqU39H0YCSTwcKiv9hXYiAWC0c0aWCI3q70DAkHJZ3tdyUscroQS5m7TRWDKta9eH
-        8Z2ZuD3eGW+itMNKb63RgQN3kbo2BCragNE7wZWti6ucXUl3/61iLh1EVHLigA==
-Date:   Wed, 15 Jun 2022 11:15:30 +0200
-From:   Miquel Raynal <miquel.raynal@bootlin.com>
-To:     Alexander Aring <aahringo@redhat.com>
-Cc:     Alexander Aring <alex.aring@gmail.com>,
-        Stefan Schmidt <stefan@datenfreihafen.org>,
-        linux-wpan - ML <linux-wpan@vger.kernel.org>,
+        with ESMTP id S1352075AbiFOP1A (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 15 Jun 2022 11:27:00 -0400
+Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D81B141627;
+        Wed, 15 Jun 2022 08:26:53 -0700 (PDT)
+Received: by mail-ed1-x52f.google.com with SMTP id 25so16659798edw.8;
+        Wed, 15 Jun 2022 08:26:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=googlemail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=aD3KXmUM+TaBN7hTJKm0rCjbZHzjs5kWkG6RSEVpXOI=;
+        b=QvQ5VGcFr3+d2na6CeGcuynBeqUgn5YRGegdzwJhioXwEFEzc+XR9PMm5p2dqnqEc7
+         cbChMICejcuvR/cTVgcIEKdNk3MnPwurGtd8G35rcBqgrGhW8hvxOPJVtjuYSDVwjWI9
+         PDhMpk83kLOecZk+Y6JGAo6t7mY2cUKMtJ1h+6BghNLyPe3uEXtswic3XIqt3LDs2kNX
+         U272LCFRIFsKKpo+dw8PGEfK6+xtAKfBYCe8cqylBeqT/X0qGRxZGATSIEk0MbkEXoMP
+         Zw0yZTJpmLpyNbPTfivAW64sdto/rSYETIKc1y7VbUyMbRCFrAJAU60mV+gmH6vjNdNJ
+         adrA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=aD3KXmUM+TaBN7hTJKm0rCjbZHzjs5kWkG6RSEVpXOI=;
+        b=Nc0cN9qcFZyfG0njTNZTYgRlCwg4q3gNyYK8NL1vmsbDL1C7fVFsSjlr83LPw4OQsm
+         JlyPoQWgHCgRH4zFpPZj5gDBRTn1EQarZlYSIsXeykDW/bX0ux66w8UC/FoHTo5MBxpI
+         2tFqd4ry1kjNvzqL7Q/2bvRa77rAAP1zQ/79R1bn3GERqVn340bmaxDdK68JoBdLEZ4Y
+         ZZJLqkKEfObfk8pWK7rMKl3tEW74oI0qb/55Uc6GGxeoV7+931I+oJOmHO0UMr+aY2i5
+         k8wnoDLBEF0XDd4rNZYySkVmMRwFbaGrgQlJjq8d1pOcCTIQ65lH0/En+3M8CQpgua/u
+         yhyQ==
+X-Gm-Message-State: AJIora+Xm7zLb68OyEqFE+K/fYxTAni32urT4FIicIdR0FCsXGPDytrs
+        eU3pbwvs7pPOtCREtwLaE02sWyC1gGXsyA==
+X-Google-Smtp-Source: AGRyM1sEZmu+MTQbIwUzGr+8J42hYq6zjx150kpTt+7z4b6FMHkhpZ4n4pFUNtXVbDWR2eg/fg0Buw==
+X-Received: by 2002:a05:6402:2708:b0:431:45d1:3aa0 with SMTP id y8-20020a056402270800b0043145d13aa0mr332419edd.408.1655306812318;
+        Wed, 15 Jun 2022 08:26:52 -0700 (PDT)
+Received: from debianHome.localdomain (dynamic-077-003-151-196.77.3.pool.telefonica.de. [77.3.151.196])
+        by smtp.gmail.com with ESMTPSA id v14-20020aa7d9ce000000b0042bc97322desm9501224eds.43.2022.06.15.08.26.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 Jun 2022 08:26:51 -0700 (PDT)
+From:   =?UTF-8?q?Christian=20G=C3=B6ttsche?= <cgzones@googlemail.com>
+To:     selinux@vger.kernel.org
+Cc:     Serge Hallyn <serge@hallyn.com>,
         "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
         Jakub Kicinski <kuba@kernel.org>,
         Paolo Abeni <pabeni@redhat.com>,
-        Network Development <netdev@vger.kernel.org>,
-        David Girault <david.girault@qorvo.com>,
-        Romuald Despres <romuald.despres@qorvo.com>,
-        Frederic Blain <frederic.blain@qorvo.com>,
-        Nicolas Schodet <nico@ni.fr.eu.org>,
-        Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH wpan-next 1/6] net: ieee802154: Drop coordinator
- interface type
-Message-ID: <20220615111530.04c54bfd@xps-13>
-In-Reply-To: <CAK-6q+haNAxexhNe5_pReU=jpUyP+XKn9oq=DKGC_Leg0w41pA@mail.gmail.com>
-References: <20220603182143.692576-1-miquel.raynal@bootlin.com>
-        <20220603182143.692576-2-miquel.raynal@bootlin.com>
-        <CAK-6q+hAZMqsN=S9uWAm4rTN+uZwz7_L42=emPHz7+MvfW6ZpQ@mail.gmail.com>
-        <20220606174319.0924f80d@xps-13>
-        <CAK-6q+itswJrmy-AhZ5DpnHH0UsfAeTPQTmX8WfG8=PteumVLg@mail.gmail.com>
-        <20220607181608.609429cb@xps-13>
-        <20220608154749.06b62d59@xps-13>
-        <20220608163708.26ccd4cc@xps-13>
-        <CAK-6q+iD0_bS2z_BdKsyeqYvzxj2x-v+SWAo2UO02j7yGtEcEg@mail.gmail.com>
-        <CAK-6q+gBCakX8Vm1SHuLfex5jBqLKySUiaZKg3So+zjeJaSehw@mail.gmail.com>
-        <20220609174353.177daddb@xps-13>
-        <CAK-6q+haNAxexhNe5_pReU=jpUyP+XKn9oq=DKGC_Leg0w41pA@mail.gmail.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+        Alexander Aring <alex.aring@gmail.com>,
+        Stefan Schmidt <stefan@datenfreihafen.org>,
+        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+        David Ahern <dsahern@kernel.org>,
+        Nikolay Aleksandrov <nikolay@nvidia.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Oliver Hartkopp <socketcan@hartkopp.net>,
+        Ziyang Xuan <william.xuanziyang@huawei.com>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        Wei Wang <weiwan@google.com>, Yangbo Lu <yangbo.lu@nxp.com>,
+        Menglong Dong <imagedong@tencent.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Richard Palethorpe <rpalethorpe@suse.com>,
+        linux-security-module@vger.kernel.org,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+        linux-wpan@vger.kernel.org
+Subject: [PATCH v3 8/8] net: use new capable_any functionality
+Date:   Wed, 15 Jun 2022 17:26:22 +0200
+Message-Id: <20220615152623.311223-7-cgzones@googlemail.com>
+X-Mailer: git-send-email 2.36.1
+In-Reply-To: <20220615152623.311223-1-cgzones@googlemail.com>
+References: <20220502160030.131168-8-cgzones@googlemail.com>
+ <20220615152623.311223-1-cgzones@googlemail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi Alexander,
+Use the new added capable_any function in appropriate cases, where a
+task is required to have any of two capabilities.
 
-aahringo@redhat.com wrote on Sat, 11 Jun 2022 08:05:31 -0400:
+Reorder CAP_SYS_ADMIN last.
 
-> Hi,
->=20
-> On Thu, Jun 9, 2022 at 11:44 AM Miquel Raynal <miquel.raynal@bootlin.com>=
- wrote:
-> >
-> > Hi Alex,
-> > =20
-> > > > >
-> > > > >   - How is chosen the beacon order? Should we have a default valu=
-e?
-> > > > >     Should we default to 15 (not on a beacon enabled PAN)? Should=
- we be
-> > > > >     able to update this value during the lifetime of the PAN?
-> > > > > =20
-> > > >
-> > > > Is there no mib default value for this? =20
-> >
-> > I didn't find anything. I suppose we can ask for that parameter at PAN
-> > creation, but otherwise I'll keep a backward compatible value: 15,
-> > which means that the PAN is not beacon enabled (like today, basically).
-> > =20
->=20
-> I hope it is not necessary to answer this question, see below.
->=20
-> > > > =20
-> > > > >   - The spec talks about the cluster topology, where a coordinato=
-r that
-> > > > >     just associated to a PAN starts emitting beacons, which may e=
-nable
-> > > > >     other devices in its range to ask to join the PAN (increased =
-area
-> > > > >     coverage). But then, there is no information about how the ne=
-wly
-> > > > >     added device should do to join the PAN coordinator which is a=
-nyway
-> > > > >     out of range to require the association, transmit data, etc. =
-Any
-> > > > >     idea how this is supposed to work?
-> > > > > =20
-> > > >
-> > > > I think we should maybe add a feature for this later if we don't kn=
-ow
-> > > > how it is supposed to work or there are still open questions and fi=
-rst
-> > > > introduce the manual setup. After that, maybe things will become
-> > > > clearer and we can add support for this part. Is this okay? =20
-> > >
-> > > *I also think that this can be done in user space by a daemon by
-> > > triggering netlink commands for scan/assoc/etc. (manual setup) and
-> > > providing such functionality as mentioned by the spec (auto creation
-> > > of pan, assoc with pan). Things which are unclear here are then moved
-> > > to the user as the operations for scan/assoc/etc. will not be
-> > > different or at least parameterized. The point here is that providing
-> > > the minimum basic functionality should be done at first, then we can
-> > > look at how to realize such handling (either in kernel or user space)=
-. =20
-> >
-> > Actually this is none of the 802.15.4 MAC layer business. I believe
-> > this is the upper layer duty to make this interoperability work,
-> > namely, 6lowpan? =20
->=20
-> I am not sure if I understand your answer, I meant that if
-> "coordinator" or "PAN coordinator" depends on whatever, if somebody is
-> running a "coordinator" software in the background on top of a coord
-> interface.
-> The kernel offers the functionality for scan/assoc/etc. (offers link
-> quality, etc. _statistics_ and not _heuristic_) which will be used by
-> this software to whatever the user defines to realize this behaviour
-> as it is user specific.
+Signed-off-by: Christian Göttsche <cgzones@googlemail.com>
+---
+v3:
+  - rename to capable_any()
+  - make use of ns_capable_any
+---
+ net/caif/caif_socket.c   |  2 +-
+ net/core/sock.c          | 12 ++++--------
+ net/ieee802154/socket.c  |  6 ++----
+ net/ipv4/ip_sockglue.c   |  3 +--
+ net/ipv6/ipv6_sockglue.c |  3 +--
+ net/unix/scm.c           |  2 +-
+ 6 files changed, 10 insertions(+), 18 deletions(-)
 
-Yes.
+diff --git a/net/caif/caif_socket.c b/net/caif/caif_socket.c
+index 251e666ba9a2..2d3df7658e04 100644
+--- a/net/caif/caif_socket.c
++++ b/net/caif/caif_socket.c
+@@ -1036,7 +1036,7 @@ static int caif_create(struct net *net, struct socket *sock, int protocol,
+ 		.usersize = sizeof_field(struct caifsock, conn_req.param)
+ 	};
+ 
+-	if (!capable(CAP_SYS_ADMIN) && !capable(CAP_NET_ADMIN))
++	if (!capable_any(CAP_NET_ADMIN, CAP_SYS_ADMIN))
+ 		return -EPERM;
+ 	/*
+ 	 * The sock->type specifies the socket type to use.
+diff --git a/net/core/sock.c b/net/core/sock.c
+index 2ff40dd0a7a6..6b04301982d8 100644
+--- a/net/core/sock.c
++++ b/net/core/sock.c
+@@ -1163,8 +1163,7 @@ int sock_setsockopt(struct socket *sock, int level, int optname,
+ 
+ 	case SO_PRIORITY:
+ 		if ((val >= 0 && val <= 6) ||
+-		    ns_capable(sock_net(sk)->user_ns, CAP_NET_RAW) ||
+-		    ns_capable(sock_net(sk)->user_ns, CAP_NET_ADMIN))
++		    ns_capable_any(sock_net(sk)->user_ns, CAP_NET_RAW, CAP_NET_ADMIN))
+ 			sk->sk_priority = val;
+ 		else
+ 			ret = -EPERM;
+@@ -1309,8 +1308,7 @@ int sock_setsockopt(struct socket *sock, int level, int optname,
+ 			clear_bit(SOCK_PASSSEC, &sock->flags);
+ 		break;
+ 	case SO_MARK:
+-		if (!ns_capable(sock_net(sk)->user_ns, CAP_NET_RAW) &&
+-		    !ns_capable(sock_net(sk)->user_ns, CAP_NET_ADMIN)) {
++		if (!ns_capable_any(sock_net(sk)->user_ns, CAP_NET_RAW, CAP_NET_ADMIN)) {
+ 			ret = -EPERM;
+ 			break;
+ 		}
+@@ -1318,8 +1316,7 @@ int sock_setsockopt(struct socket *sock, int level, int optname,
+ 		__sock_set_mark(sk, val);
+ 		break;
+ 	case SO_RCVMARK:
+-		if (!ns_capable(sock_net(sk)->user_ns, CAP_NET_RAW) &&
+-		    !ns_capable(sock_net(sk)->user_ns, CAP_NET_ADMIN)) {
++		if (!ns_capable_any(sock_net(sk)->user_ns, CAP_NET_RAW, CAP_NET_ADMIN)) {
+ 			ret = -EPERM;
+ 			break;
+ 		}
+@@ -2680,8 +2677,7 @@ int __sock_cmsg_send(struct sock *sk, struct msghdr *msg, struct cmsghdr *cmsg,
+ 
+ 	switch (cmsg->cmsg_type) {
+ 	case SO_MARK:
+-		if (!ns_capable(sock_net(sk)->user_ns, CAP_NET_RAW) &&
+-		    !ns_capable(sock_net(sk)->user_ns, CAP_NET_ADMIN))
++		if (!ns_capable_any(sock_net(sk)->user_ns, CAP_NET_RAW, CAP_NET_ADMIN))
+ 			return -EPERM;
+ 		if (cmsg->cmsg_len != CMSG_LEN(sizeof(u32)))
+ 			return -EINVAL;
+diff --git a/net/ieee802154/socket.c b/net/ieee802154/socket.c
+index 718fb77bb372..882483602c27 100644
+--- a/net/ieee802154/socket.c
++++ b/net/ieee802154/socket.c
+@@ -894,8 +894,7 @@ static int dgram_setsockopt(struct sock *sk, int level, int optname,
+ 		ro->want_lqi = !!val;
+ 		break;
+ 	case WPAN_SECURITY:
+-		if (!ns_capable(net->user_ns, CAP_NET_ADMIN) &&
+-		    !ns_capable(net->user_ns, CAP_NET_RAW)) {
++		if (!ns_capable_any(net->user_ns, CAP_NET_RAW, CAP_NET_ADMIN)) {
+ 			err = -EPERM;
+ 			break;
+ 		}
+@@ -918,8 +917,7 @@ static int dgram_setsockopt(struct sock *sk, int level, int optname,
+ 		}
+ 		break;
+ 	case WPAN_SECURITY_LEVEL:
+-		if (!ns_capable(net->user_ns, CAP_NET_ADMIN) &&
+-		    !ns_capable(net->user_ns, CAP_NET_RAW)) {
++		if (!ns_capable_any(net->user_ns, CAP_NET_RAW, CAP_NET_ADMIN)) {
+ 			err = -EPERM;
+ 			break;
+ 		}
+diff --git a/net/ipv4/ip_sockglue.c b/net/ipv4/ip_sockglue.c
+index 445a9ecaefa1..2da0a450edf6 100644
+--- a/net/ipv4/ip_sockglue.c
++++ b/net/ipv4/ip_sockglue.c
+@@ -1339,8 +1339,7 @@ static int do_ip_setsockopt(struct sock *sk, int level, int optname,
+ 		break;
+ 
+ 	case IP_TRANSPARENT:
+-		if (!!val && !ns_capable(sock_net(sk)->user_ns, CAP_NET_RAW) &&
+-		    !ns_capable(sock_net(sk)->user_ns, CAP_NET_ADMIN)) {
++		if (!!val && !ns_capable_any(sock_net(sk)->user_ns, CAP_NET_RAW, CAP_NET_ADMIN)) {
+ 			err = -EPERM;
+ 			break;
+ 		}
+diff --git a/net/ipv6/ipv6_sockglue.c b/net/ipv6/ipv6_sockglue.c
+index 222f6bf220ba..25babd7ce844 100644
+--- a/net/ipv6/ipv6_sockglue.c
++++ b/net/ipv6/ipv6_sockglue.c
+@@ -634,8 +634,7 @@ static int do_ipv6_setsockopt(struct sock *sk, int level, int optname,
+ 		break;
+ 
+ 	case IPV6_TRANSPARENT:
+-		if (valbool && !ns_capable(net->user_ns, CAP_NET_RAW) &&
+-		    !ns_capable(net->user_ns, CAP_NET_ADMIN)) {
++		if (valbool && !ns_capable_any(net->user_ns, CAP_NET_RAW, CAP_NET_ADMIN)) {
+ 			retv = -EPERM;
+ 			break;
+ 		}
+diff --git a/net/unix/scm.c b/net/unix/scm.c
+index aa27a02478dc..6c47baf04d7d 100644
+--- a/net/unix/scm.c
++++ b/net/unix/scm.c
+@@ -99,7 +99,7 @@ static inline bool too_many_unix_fds(struct task_struct *p)
+ 	struct user_struct *user = current_user();
+ 
+ 	if (unlikely(user->unix_inflight > task_rlimit(p, RLIMIT_NOFILE)))
+-		return !capable(CAP_SYS_RESOURCE) && !capable(CAP_SYS_ADMIN);
++		return !capable_any(CAP_SYS_RESOURCE, CAP_SYS_ADMIN);
+ 	return false;
+ }
+ 
+-- 
+2.36.1
 
-> Sure linux-wpan, should then provide at least a standard piece of
-> software for it.
->=20
-> This has in my opinion nothing to do with 6lowpan.
-
-I was referring to the cluster topology routing logic. The routing
-logic to reach a device in a PAN that is not directly reachable by the
-PAN coordinator is the responsibility of the layer 3 in the OSI model,
-so I believe it's either 6lowpan's duty or even above.
-
-Thanks,
-Miqu=C3=A8l
