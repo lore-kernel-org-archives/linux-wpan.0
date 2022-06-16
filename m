@@ -2,229 +2,108 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D21F1CCA47F
-	for <linux-wpan@archiver.kernel.org>; Wed, 15 Jun 2022 15:27:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3389C433EF
+	for <linux-wpan@archiver.kernel.org>; Thu, 16 Jun 2022 07:57:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354138AbiFOP1W (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 15 Jun 2022 11:27:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48394 "EHLO
+        id S1358827AbiFPH5L (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Thu, 16 Jun 2022 03:57:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46292 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1352075AbiFOP1A (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 15 Jun 2022 11:27:00 -0400
-Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D81B141627;
-        Wed, 15 Jun 2022 08:26:53 -0700 (PDT)
-Received: by mail-ed1-x52f.google.com with SMTP id 25so16659798edw.8;
-        Wed, 15 Jun 2022 08:26:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=googlemail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=aD3KXmUM+TaBN7hTJKm0rCjbZHzjs5kWkG6RSEVpXOI=;
-        b=QvQ5VGcFr3+d2na6CeGcuynBeqUgn5YRGegdzwJhioXwEFEzc+XR9PMm5p2dqnqEc7
-         cbChMICejcuvR/cTVgcIEKdNk3MnPwurGtd8G35rcBqgrGhW8hvxOPJVtjuYSDVwjWI9
-         PDhMpk83kLOecZk+Y6JGAo6t7mY2cUKMtJ1h+6BghNLyPe3uEXtswic3XIqt3LDs2kNX
-         U272LCFRIFsKKpo+dw8PGEfK6+xtAKfBYCe8cqylBeqT/X0qGRxZGATSIEk0MbkEXoMP
-         Zw0yZTJpmLpyNbPTfivAW64sdto/rSYETIKc1y7VbUyMbRCFrAJAU60mV+gmH6vjNdNJ
-         adrA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=aD3KXmUM+TaBN7hTJKm0rCjbZHzjs5kWkG6RSEVpXOI=;
-        b=Nc0cN9qcFZyfG0njTNZTYgRlCwg4q3gNyYK8NL1vmsbDL1C7fVFsSjlr83LPw4OQsm
-         JlyPoQWgHCgRH4zFpPZj5gDBRTn1EQarZlYSIsXeykDW/bX0ux66w8UC/FoHTo5MBxpI
-         2tFqd4ry1kjNvzqL7Q/2bvRa77rAAP1zQ/79R1bn3GERqVn340bmaxDdK68JoBdLEZ4Y
-         ZZJLqkKEfObfk8pWK7rMKl3tEW74oI0qb/55Uc6GGxeoV7+931I+oJOmHO0UMr+aY2i5
-         k8wnoDLBEF0XDd4rNZYySkVmMRwFbaGrgQlJjq8d1pOcCTIQ65lH0/En+3M8CQpgua/u
-         yhyQ==
-X-Gm-Message-State: AJIora+Xm7zLb68OyEqFE+K/fYxTAni32urT4FIicIdR0FCsXGPDytrs
-        eU3pbwvs7pPOtCREtwLaE02sWyC1gGXsyA==
-X-Google-Smtp-Source: AGRyM1sEZmu+MTQbIwUzGr+8J42hYq6zjx150kpTt+7z4b6FMHkhpZ4n4pFUNtXVbDWR2eg/fg0Buw==
-X-Received: by 2002:a05:6402:2708:b0:431:45d1:3aa0 with SMTP id y8-20020a056402270800b0043145d13aa0mr332419edd.408.1655306812318;
-        Wed, 15 Jun 2022 08:26:52 -0700 (PDT)
-Received: from debianHome.localdomain (dynamic-077-003-151-196.77.3.pool.telefonica.de. [77.3.151.196])
-        by smtp.gmail.com with ESMTPSA id v14-20020aa7d9ce000000b0042bc97322desm9501224eds.43.2022.06.15.08.26.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Jun 2022 08:26:51 -0700 (PDT)
-From:   =?UTF-8?q?Christian=20G=C3=B6ttsche?= <cgzones@googlemail.com>
-To:     selinux@vger.kernel.org
-Cc:     Serge Hallyn <serge@hallyn.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Alexander Aring <alex.aring@gmail.com>,
-        Stefan Schmidt <stefan@datenfreihafen.org>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        David Ahern <dsahern@kernel.org>,
-        Nikolay Aleksandrov <nikolay@nvidia.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Oliver Hartkopp <socketcan@hartkopp.net>,
-        Ziyang Xuan <william.xuanziyang@huawei.com>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        Wei Wang <weiwan@google.com>, Yangbo Lu <yangbo.lu@nxp.com>,
-        Menglong Dong <imagedong@tencent.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Richard Palethorpe <rpalethorpe@suse.com>,
-        linux-security-module@vger.kernel.org,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        linux-wpan@vger.kernel.org
-Subject: [PATCH v3 8/8] net: use new capable_any functionality
-Date:   Wed, 15 Jun 2022 17:26:22 +0200
-Message-Id: <20220615152623.311223-7-cgzones@googlemail.com>
-X-Mailer: git-send-email 2.36.1
-In-Reply-To: <20220615152623.311223-1-cgzones@googlemail.com>
-References: <20220502160030.131168-8-cgzones@googlemail.com>
- <20220615152623.311223-1-cgzones@googlemail.com>
+        with ESMTP id S229535AbiFPH5K (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 16 Jun 2022 03:57:10 -0400
+Received: from proxima.lasnet.de (proxima.lasnet.de [78.47.171.185])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3CD45D5FB;
+        Thu, 16 Jun 2022 00:57:09 -0700 (PDT)
+Received: from [IPV6:2003:e9:d74a:356f:526e:76c5:79f4:ad31] (p200300e9d74a356f526e76c579f4ad31.dip0.t-ipconnect.de [IPv6:2003:e9:d74a:356f:526e:76c5:79f4:ad31])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: stefan@datenfreihafen.org)
+        by proxima.lasnet.de (Postfix) with ESMTPSA id 0BA6BC03F6;
+        Thu, 16 Jun 2022 09:57:08 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
+        s=2021; t=1655366228;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=wnCmQfsGbDJxNGzQYcv47WQM0mnY0aODpCEzh7cafPY=;
+        b=B8CMh4FsrcqfTc/dahG+Ch/NcYIWRor+NygafJcd49THF3UZr4xCHtKbtcwrDm6x/13Wzg
+        8c32+oPToox9/pWb8PsOf0l4+B3VfxEcu3XBYNqbENPwV2pEompigqilqyfpw8SYhTBPjh
+        unDxN0mC+JpA5QmRjtcB3A4vUM3Ob4yjWs3z2WACGkbAAsu54+dtzsHqhYS7WoVedxW6iB
+        IeJBoBemBuCQl3cID8tLDkJVnxOa1FcXlGXhvhqXAoVqFHCfKEAwFn44N8AM2P0PpkFPbn
+        RHzzIHGnxICdQGXGTVL/9QbUbmbsWIDt0TK6lBlih3HavdY92yY7PkmhdxcEYQ==
+Message-ID: <3b7a9363-1fea-d4a3-360d-a2e60b1038c7@datenfreihafen.org>
+Date:   Thu, 16 Jun 2022 09:57:07 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.0
+Subject: Re: [PATCH wpan-next 2/2] 6lowpan: nhc: drop EEXIST limitation
+Content-Language: en-US
+To:     Alexander Aring <aahringo@redhat.com>
+Cc:     linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        netdev@vger.kernel.org
+References: <20220613032922.1030739-1-aahringo@redhat.com>
+ <20220613032922.1030739-2-aahringo@redhat.com>
+From:   Stefan Schmidt <stefan@datenfreihafen.org>
+In-Reply-To: <20220613032922.1030739-2-aahringo@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Use the new added capable_any function in appropriate cases, where a
-task is required to have any of two capabilities.
 
-Reorder CAP_SYS_ADMIN last.
+Hello Alex.
 
-Signed-off-by: Christian Göttsche <cgzones@googlemail.com>
----
-v3:
-  - rename to capable_any()
-  - make use of ns_capable_any
----
- net/caif/caif_socket.c   |  2 +-
- net/core/sock.c          | 12 ++++--------
- net/ieee802154/socket.c  |  6 ++----
- net/ipv4/ip_sockglue.c   |  3 +--
- net/ipv6/ipv6_sockglue.c |  3 +--
- net/unix/scm.c           |  2 +-
- 6 files changed, 10 insertions(+), 18 deletions(-)
+On 13.06.22 05:29, Alexander Aring wrote:
+> In nhc we have compression() and uncompression(). Currently we have a
+> limitation that we return -EEXIST when it's the nhc is already
+> registered according the nexthdr. But on receiving handling and the
+> nhcid we can indeed support both at the same time. 
 
-diff --git a/net/caif/caif_socket.c b/net/caif/caif_socket.c
-index 251e666ba9a2..2d3df7658e04 100644
---- a/net/caif/caif_socket.c
-+++ b/net/caif/caif_socket.c
-@@ -1036,7 +1036,7 @@ static int caif_create(struct net *net, struct socket *sock, int protocol,
- 		.usersize = sizeof_field(struct caifsock, conn_req.param)
- 	};
- 
--	if (!capable(CAP_SYS_ADMIN) && !capable(CAP_NET_ADMIN))
-+	if (!capable_any(CAP_NET_ADMIN, CAP_SYS_ADMIN))
- 		return -EPERM;
- 	/*
- 	 * The sock->type specifies the socket type to use.
-diff --git a/net/core/sock.c b/net/core/sock.c
-index 2ff40dd0a7a6..6b04301982d8 100644
---- a/net/core/sock.c
-+++ b/net/core/sock.c
-@@ -1163,8 +1163,7 @@ int sock_setsockopt(struct socket *sock, int level, int optname,
- 
- 	case SO_PRIORITY:
- 		if ((val >= 0 && val <= 6) ||
--		    ns_capable(sock_net(sk)->user_ns, CAP_NET_RAW) ||
--		    ns_capable(sock_net(sk)->user_ns, CAP_NET_ADMIN))
-+		    ns_capable_any(sock_net(sk)->user_ns, CAP_NET_RAW, CAP_NET_ADMIN))
- 			sk->sk_priority = val;
- 		else
- 			ret = -EPERM;
-@@ -1309,8 +1308,7 @@ int sock_setsockopt(struct socket *sock, int level, int optname,
- 			clear_bit(SOCK_PASSSEC, &sock->flags);
- 		break;
- 	case SO_MARK:
--		if (!ns_capable(sock_net(sk)->user_ns, CAP_NET_RAW) &&
--		    !ns_capable(sock_net(sk)->user_ns, CAP_NET_ADMIN)) {
-+		if (!ns_capable_any(sock_net(sk)->user_ns, CAP_NET_RAW, CAP_NET_ADMIN)) {
- 			ret = -EPERM;
- 			break;
- 		}
-@@ -1318,8 +1316,7 @@ int sock_setsockopt(struct socket *sock, int level, int optname,
- 		__sock_set_mark(sk, val);
- 		break;
- 	case SO_RCVMARK:
--		if (!ns_capable(sock_net(sk)->user_ns, CAP_NET_RAW) &&
--		    !ns_capable(sock_net(sk)->user_ns, CAP_NET_ADMIN)) {
-+		if (!ns_capable_any(sock_net(sk)->user_ns, CAP_NET_RAW, CAP_NET_ADMIN)) {
- 			ret = -EPERM;
- 			break;
- 		}
-@@ -2680,8 +2677,7 @@ int __sock_cmsg_send(struct sock *sk, struct msghdr *msg, struct cmsghdr *cmsg,
- 
- 	switch (cmsg->cmsg_type) {
- 	case SO_MARK:
--		if (!ns_capable(sock_net(sk)->user_ns, CAP_NET_RAW) &&
--		    !ns_capable(sock_net(sk)->user_ns, CAP_NET_ADMIN))
-+		if (!ns_capable_any(sock_net(sk)->user_ns, CAP_NET_RAW, CAP_NET_ADMIN))
- 			return -EPERM;
- 		if (cmsg->cmsg_len != CMSG_LEN(sizeof(u32)))
- 			return -EINVAL;
-diff --git a/net/ieee802154/socket.c b/net/ieee802154/socket.c
-index 718fb77bb372..882483602c27 100644
---- a/net/ieee802154/socket.c
-+++ b/net/ieee802154/socket.c
-@@ -894,8 +894,7 @@ static int dgram_setsockopt(struct sock *sk, int level, int optname,
- 		ro->want_lqi = !!val;
- 		break;
- 	case WPAN_SECURITY:
--		if (!ns_capable(net->user_ns, CAP_NET_ADMIN) &&
--		    !ns_capable(net->user_ns, CAP_NET_RAW)) {
-+		if (!ns_capable_any(net->user_ns, CAP_NET_RAW, CAP_NET_ADMIN)) {
- 			err = -EPERM;
- 			break;
- 		}
-@@ -918,8 +917,7 @@ static int dgram_setsockopt(struct sock *sk, int level, int optname,
- 		}
- 		break;
- 	case WPAN_SECURITY_LEVEL:
--		if (!ns_capable(net->user_ns, CAP_NET_ADMIN) &&
--		    !ns_capable(net->user_ns, CAP_NET_RAW)) {
-+		if (!ns_capable_any(net->user_ns, CAP_NET_RAW, CAP_NET_ADMIN)) {
- 			err = -EPERM;
- 			break;
- 		}
-diff --git a/net/ipv4/ip_sockglue.c b/net/ipv4/ip_sockglue.c
-index 445a9ecaefa1..2da0a450edf6 100644
---- a/net/ipv4/ip_sockglue.c
-+++ b/net/ipv4/ip_sockglue.c
-@@ -1339,8 +1339,7 @@ static int do_ip_setsockopt(struct sock *sk, int level, int optname,
- 		break;
- 
- 	case IP_TRANSPARENT:
--		if (!!val && !ns_capable(sock_net(sk)->user_ns, CAP_NET_RAW) &&
--		    !ns_capable(sock_net(sk)->user_ns, CAP_NET_ADMIN)) {
-+		if (!!val && !ns_capable_any(sock_net(sk)->user_ns, CAP_NET_RAW, CAP_NET_ADMIN)) {
- 			err = -EPERM;
- 			break;
- 		}
-diff --git a/net/ipv6/ipv6_sockglue.c b/net/ipv6/ipv6_sockglue.c
-index 222f6bf220ba..25babd7ce844 100644
---- a/net/ipv6/ipv6_sockglue.c
-+++ b/net/ipv6/ipv6_sockglue.c
-@@ -634,8 +634,7 @@ static int do_ipv6_setsockopt(struct sock *sk, int level, int optname,
- 		break;
- 
- 	case IPV6_TRANSPARENT:
--		if (valbool && !ns_capable(net->user_ns, CAP_NET_RAW) &&
--		    !ns_capable(net->user_ns, CAP_NET_ADMIN)) {
-+		if (valbool && !ns_capable_any(net->user_ns, CAP_NET_RAW, CAP_NET_ADMIN)) {
- 			retv = -EPERM;
- 			break;
- 		}
-diff --git a/net/unix/scm.c b/net/unix/scm.c
-index aa27a02478dc..6c47baf04d7d 100644
---- a/net/unix/scm.c
-+++ b/net/unix/scm.c
-@@ -99,7 +99,7 @@ static inline bool too_many_unix_fds(struct task_struct *p)
- 	struct user_struct *user = current_user();
- 
- 	if (unlikely(user->unix_inflight > task_rlimit(p, RLIMIT_NOFILE)))
--		return !capable(CAP_SYS_RESOURCE) && !capable(CAP_SYS_ADMIN);
-+		return !capable_any(CAP_SYS_RESOURCE, CAP_SYS_ADMIN);
- 	return false;
- }
- 
--- 
-2.36.1
+The sentence above is not really clear to me. Do you want to say that on 
+rx we can support more than one nhcid? I am a bit confused why you write 
+both here. Where does the limit to two come from?
 
+We remove the current
+> static array implementation and replace it by a dynamic list handling to
+> get rid of this limitation.
+> 
+> Signed-off-by: Alexander Aring <aahringo@redhat.com>
+> ---
+>   net/6lowpan/nhc.c | 69 ++++++++++++++++++++++++++++++-----------------
+>   1 file changed, 44 insertions(+), 25 deletions(-)
+> 
+> diff --git a/net/6lowpan/nhc.c b/net/6lowpan/nhc.c
+> index 7b374595328d..3d7c50139142 100644
+> --- a/net/6lowpan/nhc.c
+> +++ b/net/6lowpan/nhc.c
+> @@ -12,13 +12,30 @@
+>   
+>   #include "nhc.h"
+>   
+> -static const struct lowpan_nhc *lowpan_nexthdr_nhcs[NEXTHDR_MAX + 1];
+> +struct lowpan_nhc_entry {
+> +	const struct lowpan_nhc *nhc;
+> +	struct list_head list;
+> +};
+> +
+>   static DEFINE_SPINLOCK(lowpan_nhc_lock);
+> +static LIST_HEAD(lowpan_nexthdr_nhcs);
+> +
+> +const struct lowpan_nhc *lowpan_nhc_by_nexthdr(u8 nexthdr)
+> +{
+> +	const struct lowpan_nhc_entry *e;
+> +
+> +	list_for_each_entry(e, &lowpan_nexthdr_nhcs, list) {
+> +		if (e->nhc->nexthdr == nexthdr &&
+> +		    e->nhc->compress)
+> +			return e->nhc;
+
+We will always go with the first one we find? Do I miss something or 
+does that mean the one registered as seond and above will never be taken 
+into acount?
+
+regards
+Stefan Schmidt
