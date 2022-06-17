@@ -2,69 +2,150 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E07B5C43334
-	for <linux-wpan@archiver.kernel.org>; Thu, 16 Jun 2022 16:34:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD762C43334
+	for <linux-wpan@archiver.kernel.org>; Fri, 17 Jun 2022 14:20:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233692AbiFPQeb (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Thu, 16 Jun 2022 12:34:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37448 "EHLO
+        id S1382598AbiFQOUn (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Fri, 17 Jun 2022 10:20:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56116 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233842AbiFPQe3 (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 16 Jun 2022 12:34:29 -0400
-Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E1C42F018;
-        Thu, 16 Jun 2022 09:34:27 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id EFD78CE263E;
-        Thu, 16 Jun 2022 16:34:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB7F4C34114;
-        Thu, 16 Jun 2022 16:34:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1655397264;
-        bh=29T+OZ2dJ8xYgp5r7/nDFbsxSnK+qN8k/QH2sDJqclU=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=nkaBP3DydJciNyiYD+He/cemq7jOl1vFjzycfaq7HUEXNmaAiTvhL3KFqt3U4pdmx
-         OkwvanYXO5S9uINrPZ6QSpIzF1KAc16/FflMYMVBxWSeZOxLiTVb0/cEMfzsSsyyRe
-         wrMkldTF5Khbat6folXjrqr9MSQONZokoOYqvHV3DvksPSDteRuNhIjP0Bgp1s7BFp
-         G4DzVGbeLBy1QKQJ1QaI9Smr/GPCEzMmoi4lST1ncKbeksUoDTNP+Nmp/Ambtg1ovM
-         8exV2SmcP+4c8ooLPW42RRn+BzPvbXqis4Lr2yvKhlbYKCmVVH24CGspp0ayB1FD1S
-         qWGEzDk8NYLSA==
-Date:   Thu, 16 Jun 2022 09:34:22 -0700
-From:   Jakub Kicinski <kuba@kernel.org>
+        with ESMTP id S1382484AbiFQOUm (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 17 Jun 2022 10:20:42 -0400
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::226])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 154BC43EFB;
+        Fri, 17 Jun 2022 07:20:40 -0700 (PDT)
+Received: (Authenticated sender: miquel.raynal@bootlin.com)
+        by mail.gandi.net (Postfix) with ESMTPSA id 1FAFDC0010;
+        Fri, 17 Jun 2022 14:20:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+        t=1655475639;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=WrYkNvOzTMIzxWUK5tbHcNaHrzffRjB2I4nCD6yzJ6M=;
+        b=IAYZjeoktt4PUmpFETUg9Kh/RJGKLnRCtF3x04LkK2Vjdypp2zMoPVNXkZz2EeB3VrzyOe
+        9SZ75EFV1jvjXN/hhy8LedYeAQXvxJ0qi1ddX4x/GiRPyPl5LFEh4yE/wXSIn7AjoLLVwC
+        4/3PL7yLZGRkyKVjSXHaPmlXLcO+hduMD+Bb0e/wNB46gsFgXw9AGPhoe+hYhAIGPW+Jq6
+        oDXh0CpE0x64mj0sjlOoOE3t3Gg1DhM/ZRdZlo0Z1C4WqIFdL44Kx9yPV7G5a0cyejbYsy
+        3UOsRQM7jySz2VPDTirmdSFmequBydUf+K0n5tiDfOyRGHFPSkQI72QeHbe+9Q==
+Date:   Fri, 17 Jun 2022 16:20:35 +0200
+From:   Miquel Raynal <miquel.raynal@bootlin.com>
 To:     Alexander Aring <aahringo@redhat.com>
 Cc:     Stefan Schmidt <stefan@datenfreihafen.org>,
+        Alexander Aring <alex.aring@gmail.com>,
         linux-wpan - ML <linux-wpan@vger.kernel.org>,
-        linux-bluetooth@vger.kernel.org,
+        David Girault <david.girault@qorvo.com>,
+        Romuald Despres <romuald.despres@qorvo.com>,
+        Frederic Blain <frederic.blain@qorvo.com>,
+        Nicolas Schodet <nico@ni.fr.eu.org>,
+        Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
         Network Development <netdev@vger.kernel.org>
-Subject: Re: 6lowpan netlink
-Message-ID: <20220616093422.2e9ec948@kernel.org>
-In-Reply-To: <CAK-6q+h7497czku9rf9E4E=up5k5gm_NT0agPU2bUZr4ADKioQ@mail.gmail.com>
-References: <CAK-6q+g1jy-Q911SWTGVV1nw8GAbEAVYSAKqss54+8ehPw9RDA@mail.gmail.com>
-        <e3efe652-eb22-4a3f-a121-be858fe2696b@datenfreihafen.org>
-        <CAK-6q+h7497czku9rf9E4E=up5k5gm_NT0agPU2bUZr4ADKioQ@mail.gmail.com>
+Subject: Re: [PATCH wpan-next v4 00/11] ieee802154: Synchronous Tx support
+Message-ID: <20220617162035.5024d8a8@xps-13>
+In-Reply-To: <CAK-6q+if-dNbpbneTfUtj6MrZXiYPq9npZfMkatXKo8cfU1m9w@mail.gmail.com>
+References: <20220519150516.443078-1-miquel.raynal@bootlin.com>
+        <CAK-6q+hmd_Z-xJrz6QVM37gFrPRkYPAnyERit5oyDS=Beb83kg@mail.gmail.com>
+        <d844514c-771f-e720-407b-2679e430243a@datenfreihafen.org>
+        <20220603195509.73cf888f@xps-13>
+        <CAK-6q+if-dNbpbneTfUtj6MrZXiYPq9npZfMkatXKo8cfU1m9w@mail.gmail.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-On Thu, 16 Jun 2022 09:00:08 -0400 Alexander Aring wrote:
-> > > I want to spread around that I started to work on some overdue
-> > > implementation, a netlink 6lowpan configuration interface, because
-> > > rtnetlink is not enough... it's for configuring very specific 6lowpan
-> > > device settings.  
-> >
-> > Great, looking forward to it!  
-> 
-> I would like to trigger a discussion about rtnetlink or generic. I can
-> put a nested rtnetlink for some device specific settings but then the
-> whole iproute2 (as it's currently is) would maintain a specific
-> 6lowpan setting which maybe the user never wants...
-> I think we should follow this way when there is a strict ipv6 device
-> specific setting e.g. l2 neighbor information in ipv6 ndisc.
+Hi Alex,
 
-Unless you'll have to repeat attributes which are already present 
-in rtnetlink in an obvious way genetlink > rtnetlink.
+aahringo@redhat.com wrote on Fri, 3 Jun 2022 21:50:15 -0400:
+
+> Hi,
+>=20
+> On Fri, Jun 3, 2022 at 1:55 PM Miquel Raynal <miquel.raynal@bootlin.com> =
+wrote:
+> >
+> > Hi Stefan, Alex,
+> >
+> > stefan@datenfreihafen.org wrote on Wed, 1 Jun 2022 23:01:51 +0200:
+> > =20
+> > > Hello.
+> > >
+> > > On 01.06.22 05:30, Alexander Aring wrote: =20
+> > > > Hi,
+> > > >
+> > > > On Thu, May 19, 2022 at 11:06 AM Miquel Raynal
+> > > > <miquel.raynal@bootlin.com> wrote: =20
+> > > >>
+> > > >> Hello,
+> > > >>
+> > > >> This series brings support for that famous synchronous Tx API for =
+MLME
+> > > >> commands.
+> > > >>
+> > > >> MLME commands will be used during scan operations. In this situati=
+on,
+> > > >> we need to be sure that all transfers finished and that no transfer
+> > > >> will be queued for a short moment.
+> > > >> =20
+> > > >
+> > > > Acked-by: Alexander Aring <aahringo@redhat.com> =20
+> > >
+> > > These patches have been applied to the wpan-next tree. Thanks!
+> > > =20
+> > > > There will be now functions upstream which will never be used, Stef=
+an
+> > > > should wait until they are getting used before sending it to net-ne=
+xt. =20
+> > >
+> > > Indeed this can wait until we have a consumer of the functions before=
+ pushing this forward to net-next. Pretty sure Miquel is happy to finally m=
+ove on to other pieces of his puzzle and use them. :-) =20
+> >
+> > Next part is coming!
+> >
+> > In the mean time I've experienced a new lockdep warning:
+> >
+> > All the netlink commands are executed with the rtnl taken.
+> > In my current implementation, when I configure/edit a scan request or a
+> > beacon request I take a scan_lock or a beacons_lock, so they may only
+> > be taken after the rtnl in this case, which leads to this sequence of
+> > events:
+> > - the rtnl is taken (by the net core)
+> > - the beacon's lock is taken
+> >
+> > But now in a beacon's work or an active scan work, what happens is:
+> > - work gets woken up
+> > - the beacon/scan lock is taken
+> > - a beacon/beacon-request frame is transmitted
+> > - the rtnl lock is taken during this transmission
+> >
+> > Lockdep then detects a possible circular dependency:
+> > [  490.153387]        CPU0                    CPU1
+> > [  490.153391]        ----                    ----
+> > [  490.153394]   lock(&local->beacons_lock);
+> > [  490.153400]                                lock(rtnl_mutex);
+> > [  490.153406]                                lock(&local->beacons_lock=
+);
+> > [  490.153412]   lock(rtnl_mutex);
+
+So after a lot of thinking and different tries, I've opted for a
+slightly different approach regarding the rtnl being taken in the mlme
+tx path. What we want there is actually to be sure that the device
+won't be turned off during the transmission. Either this is done
+before, and the transmission will just return an error (and this is
+fine) or there is no ndo_close() call and we are actually safe. So I've
+actually introduced a mutex for serializing accesses to the "stop the
+device" section which actually what we care about. It works well, avoid
+keeping the rtnl in all the scan/beacons works (which would have been
+a crazy thing to do IMHO) and allows to keep a beacons/scan mutex for
+the configuration of these specific parts. I'll propose this change in
+the upcoming series.
+
+Thanks,
+Miqu=C3=A8l
