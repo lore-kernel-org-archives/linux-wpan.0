@@ -2,117 +2,87 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35B12C43334
-	for <linux-wpan@archiver.kernel.org>; Mon, 27 Jun 2022 08:43:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0669C433EF
+	for <linux-wpan@archiver.kernel.org>; Mon, 27 Jun 2022 09:04:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233606AbiF0InJ (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 27 Jun 2022 04:43:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38512 "EHLO
+        id S233345AbiF0JER (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 27 Jun 2022 05:04:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56538 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232724AbiF0InI (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 27 Jun 2022 04:43:08 -0400
-Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B4E06327;
-        Mon, 27 Jun 2022 01:43:06 -0700 (PDT)
-Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id 53EA440012;
-        Mon, 27 Jun 2022 08:43:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1656319385;
+        with ESMTP id S233127AbiF0JEQ (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 27 Jun 2022 05:04:16 -0400
+Received: from proxima.lasnet.de (proxima.lasnet.de [IPv6:2a01:4f8:121:31eb:3::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A4A76358
+        for <linux-wpan@vger.kernel.org>; Mon, 27 Jun 2022 02:04:15 -0700 (PDT)
+Received: from [IPV6:2003:e9:d74e:f826:4917:6f43:fd50:6bb6] (p200300e9d74ef82649176f43fd506bb6.dip0.t-ipconnect.de [IPv6:2003:e9:d74e:f826:4917:6f43:fd50:6bb6])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: stefan@datenfreihafen.org)
+        by proxima.lasnet.de (Postfix) with ESMTPSA id 829E6C04B4;
+        Mon, 27 Jun 2022 11:04:12 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
+        s=2021; t=1656320652;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=f9dzcE7F6naI6mowy0rxK9mblp39wVly6K3avxay1Us=;
-        b=LJlYD6NaMBVpI/YwBWTZstDh+bxlTmdcM1yQc5wXwT43opSBBshs1JoB7wK5LcUlazzmFv
-        Ads1vpPz0lxNP3A6ZwDUXyxtYamb3UQHOCuv2JviMAVg7wv3fER/jo5Hz1G/YaV19ZUJTv
-        /TtHvg3Yav9ZwzP9tsys5mCK4yjYOjSSMoSiLvL5q3wA+3OMYGgpdareyembNpyjaIOCb8
-        358uMtQ6KIBFBK4NL7IDCQFcIf0qJmJ+EGtu7qHreOFoBSOZBMPQS7uSe5fIpt2yFlUzKP
-        MIolH27kigwg8IJ1lRTg6m4jkU6d295aiLFNwWuHQr0jaqYePEXDVeySTpbcMA==
-Date:   Mon, 27 Jun 2022 10:43:03 +0200
-From:   Miquel Raynal <miquel.raynal@bootlin.com>
-To:     Alexander Aring <aahringo@redhat.com>
-Cc:     Alexander Aring <alex.aring@gmail.com>,
-        Stefan Schmidt <stefan@datenfreihafen.org>,
-        linux-wpan - ML <linux-wpan@vger.kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
+        bh=tqxBSMP2wDu38wyUbk5uJUpI3MGUgBwribcrUBf6WmU=;
+        b=Qe8zDfq4Bqqrhh/pP6Wr91FvmAFEmHffGUctQFmNjegSZvszV3O4HrlBagsPYF1oLYrQrn
+        H7BZ8biv8I7IZbExgXtrVXxMNb22OeOi6V+Jl+KWfsaMLpX/u/JwhqWCkKitqjAqTat64f
+        4jGAqNR9/1faaqnJYm1iL/fK3qmNepeub+/EDyFuWj42YwXNaZXVgW9dzjQdF5Pid5oq2w
+        sIEYl1EwkoOmHkVsnrSp6dEzHiZ8TEUTd7b8HIa4nM+FOStdDIHMa7eybEVkiwdVciCNip
+        50e2qupzZlxscM4VlwMpv49Q/w0ViHDTkj983QJG8Iyx4X3b2ypjzmRbjQfnPA==
+Message-ID: <bd165a84-57a7-bfe2-7b15-752980d5d175@datenfreihafen.org>
+Date:   Mon, 27 Jun 2022 11:04:12 +0200
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [PATCH] net: mac802154: Fix a Tx warning check
+Content-Language: en-US
+To:     Miquel Raynal <miquel.raynal@bootlin.com>,
+        Alexander Aring <alex.aring@gmail.com>,
+        linux-wpan@vger.kernel.org
+Cc:     "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Eric Dumazet <edumazet@google.com>,
-        Network Development <netdev@vger.kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
         David Girault <david.girault@qorvo.com>,
         Romuald Despres <romuald.despres@qorvo.com>,
         Frederic Blain <frederic.blain@qorvo.com>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH wpan-next v3 2/4] net: ieee802154: Add support for inter
- PAN management
-Message-ID: <20220627104303.5392c7f6@xps-13>
-In-Reply-To: <CAK-6q+jAhikJq5tp-DRx1C_7ka5M4w6EKUB_cUdagSSwP5Tk_A@mail.gmail.com>
-References: <20220620134018.62414-1-miquel.raynal@bootlin.com>
-        <20220620134018.62414-3-miquel.raynal@bootlin.com>
-        <CAK-6q+jAhikJq5tp-DRx1C_7ka5M4w6EKUB_cUdagSSwP5Tk_A@mail.gmail.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+References: <20220617192914.1275611-1-miquel.raynal@bootlin.com>
+From:   Stefan Schmidt <stefan@datenfreihafen.org>
+In-Reply-To: <20220617192914.1275611-1-miquel.raynal@bootlin.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi Alexander,
+Hello.
 
-aahringo@redhat.com wrote on Sat, 25 Jun 2022 22:29:08 -0400:
+On 17.06.22 21:29, Miquel Raynal wrote:
+> The purpose of the netif_is_down() helper was to ensure that the network
+> interface used was still up when performing the transmission. What it
+> actually did was to check if _all_ interfaces were up. This was not
+> noticed at that time because I did not use interfaces at all before
+> discussing with Alexander Aring about how to handle coordinators
+> properly.
+> 
+> Drop the helper and call netif_running() on the right sub interface
+> object directly.
+> 
+> Fixes: 4f790184139b ("net: mac802154: Add a warning in the slow path")
+> Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
+> ---
+>   net/mac802154/ieee802154_i.h |  8 ++++++--
+>   net/mac802154/tx.c           | 31 ++++++++-----------------------
+>   2 files changed, 14 insertions(+), 25 deletions(-)
 
-> Hi,
->=20
-> On Mon, Jun 20, 2022 at 10:26 AM Miquel Raynal
-> <miquel.raynal@bootlin.com> wrote:
-> >
-> > Let's introduce the basics for defining PANs:
-> > - structures defining a PAN
-> > - helpers for PAN registration
-> > - helpers discarding old PANs
-> > =20
->=20
-> I think the whole pan management can/should be stored in user space by
-> a daemon running in background.
 
-We need both, and currently:
-- while the scan is happening, the kernel saves all the discovered PANs
-- the kernel PAN list can be dumped (and also flushed) asynchronously by
-  the userspace
+This patch has been applied to the wpan-next tree and will be
+part of the next pull request to net-next. Thanks!
 
-IOW the userspace is responsible of keeping its own list of PANs in
-sync with what the kernel discovers, so at any moment it can ask the
-kernel what it has in memory, it can be done during a scan or after. It
-can request a new scan to update the entries, or flush the kernel list.
-The scan operation is always requested by the user anyway, it's not
-something happening in the background.
-
-> This can be a network manager as it
-> listens to netlink events as "detect PAN xy" and stores it and offers
-> it in their list to associate with it.
-
-There are events produced, yes. But really, this is not something we
-actually need. The user requests a scan over a given range, when the
-scan is over it looks at the list and decides which PAN it
-wants to associate with, and through which coordinator (95% of the
-scenarii).
-
-> We need somewhere to draw a line and I guess the line is "Is this
-> information used e.g. as any lookup or something in the hot path", I
-> don't see this currently...
-
-Each PAN descriptor is like 20 bytes, so that's why I don't feel back
-keeping them, I think it's easier to be able to serve the list of PANs
-upon request rather than only forwarding events and not being able to
-retrieve the list a second time (at least during the development).
-
-Overall I feel like this part is still a little bit blurry because it
-has currently no user, perhaps I should send the next series which
-actually makes the current series useful.
-
-Thanks,
-Miqu=C3=A8l
+regards
+Stefan Schmidt
