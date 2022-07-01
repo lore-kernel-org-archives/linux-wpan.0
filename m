@@ -2,33 +2,33 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 241FFCCA47B
-	for <linux-wpan@archiver.kernel.org>; Fri,  1 Jul 2022 14:35:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F03EC43334
+	for <linux-wpan@archiver.kernel.org>; Fri,  1 Jul 2022 14:36:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231316AbiGAOfw (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Fri, 1 Jul 2022 10:35:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56902 "EHLO
+        id S232983AbiGAOgI (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Fri, 1 Jul 2022 10:36:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56962 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231350AbiGAOfe (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Fri, 1 Jul 2022 10:35:34 -0400
-Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A16DB3E0F5;
-        Fri,  1 Jul 2022 07:31:06 -0700 (PDT)
+        with ESMTP id S231991AbiGAOfg (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 1 Jul 2022 10:35:36 -0400
+Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::229])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 416DA70E7C;
+        Fri,  1 Jul 2022 07:31:08 -0700 (PDT)
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id 84450FF811;
-        Fri,  1 Jul 2022 14:30:56 +0000 (UTC)
+        by mail.gandi.net (Postfix) with ESMTPSA id 8C872FF805;
+        Fri,  1 Jul 2022 14:31:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1656685858;
+        t=1656685866;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=xsmXwpaLpw1nXtS9xDuA/axbZikDTvzLXsvuEZT4atc=;
-        b=ETtrcos/xOHeLfRnQ+IeH2sDtXwStgv6Z5xhpQ4xRa5uAqqBVQn04/H8P2ebBAg51pdoRe
-        QCEpJUKSUhh4PKXLG1lytSJku/1wNaxoQVbUnQlC3Tn8as8o4CuVbim+rufTTYsfdtEs15
-        L/nBt1Bws3DvssOgs1VYYGrOWn/RlFoHhDdPaJeyvSE1+9imo+TbKCKyscH8XC4iMa88ru
-        80laA0xF6Ms1SQCwbWyjJFnmHacuvyF8ED7cQqVJCleLx6zVCqML1dlebqdEYB2+r1roIz
-        MuUr45bAmhFnYXCHiRmVYrKsERWJ/35u4pLJlaWIEU5klChibND7IpIfkcrKuQ==
+        bh=+48KAEYT4N3CTgfihOqyVd6PFG2dWE2Syu7PlW90HYs=;
+        b=gvg59R9W7kKyLHvlsGFPCM8fjgNJ+AQTAPWThmB2gLY2pM9TC3l+fRWu/2q/Q/UHfW7pCJ
+        3MIYRBCfOFdJrRDuM+FP0obmkqUvCP93g5G0mnjNMoxEk8PT7eyNSkJ6Gprcsg38uAYuj8
+        HqYnqNR3H2+foEDPJJfigX0W+RR+KDS5HH2zdLENHWk1fjWT9mODb1QbpNFXwZrFRFmCY0
+        PXgfLSJoQccjCOsU9GwuEuez8OMmJkRFAZZO4WAqMCxCPGNr23K1992/kyAN8HBB0V0+BH
+        DoPDv7UBYd3lO0cEOaJnKfoBLi2+qHMggA6/3CJKpUozcMBuu7bwiW1pJRAEYQ==
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
 To:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
@@ -43,9 +43,9 @@ Cc:     "David S. Miller" <davem@davemloft.net>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
         Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: [PATCH wpan-next 01/20] net: mac802154: Allow the creation of coordinator interfaces
-Date:   Fri,  1 Jul 2022 16:30:33 +0200
-Message-Id: <20220701143052.1267509-2-miquel.raynal@bootlin.com>
+Subject: [PATCH wpan-next 05/20] net: ieee802154: Define frame types
+Date:   Fri,  1 Jul 2022 16:30:37 +0200
+Message-Id: <20220701143052.1267509-6-miquel.raynal@bootlin.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20220701143052.1267509-1-miquel.raynal@bootlin.com>
 References: <20220701143052.1267509-1-miquel.raynal@bootlin.com>
@@ -56,72 +56,37 @@ Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-As a first strep in introducing proper PAN management and association,
-we need to be able to create coordinator interfaces which might act as
-coordinator or PAN coordinator.
-
-Hence, let's add the minimum support to allow the creation of these
-interfaces. This might be restrained and improved later.
+A 802.15.4 frame can be of different types, here is a definition
+matching the specification. This enumeration will be soon be used when
+adding scanning support.
 
 Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
 ---
- net/mac802154/iface.c | 14 ++++++++------
- net/mac802154/rx.c    |  2 +-
- 2 files changed, 9 insertions(+), 7 deletions(-)
+ include/net/ieee802154_netdev.h | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/net/mac802154/iface.c b/net/mac802154/iface.c
-index 500ed1b81250..7ac0c5685d3f 100644
---- a/net/mac802154/iface.c
-+++ b/net/mac802154/iface.c
-@@ -273,13 +273,13 @@ ieee802154_check_concurrent_iface(struct ieee802154_sub_if_data *sdata,
- 		if (nsdata != sdata && ieee802154_sdata_running(nsdata)) {
- 			int ret;
+diff --git a/include/net/ieee802154_netdev.h b/include/net/ieee802154_netdev.h
+index d0d188c3294b..13167851b1c3 100644
+--- a/include/net/ieee802154_netdev.h
++++ b/include/net/ieee802154_netdev.h
+@@ -69,6 +69,17 @@ struct ieee802154_hdr_fc {
+ #endif
+ };
  
--			/* TODO currently we don't support multiple node types
--			 * we need to run skb_clone at rx path. Check if there
--			 * exist really an use case if we need to support
--			 * multiple node types at the same time.
-+			/* TODO currently we don't support multiple node/coord
-+			 * types we need to run skb_clone at rx path. Check if
-+			 * there exist really an use case if we need to support
-+			 * multiple node/coord types at the same time.
- 			 */
--			if (wpan_dev->iftype == NL802154_IFTYPE_NODE &&
--			    nsdata->wpan_dev.iftype == NL802154_IFTYPE_NODE)
-+			if (wpan_dev->iftype != NL802154_IFTYPE_MONITOR &&
-+			    nsdata->wpan_dev.iftype != NL802154_IFTYPE_MONITOR)
- 				return -EBUSY;
- 
- 			/* check all phy mac sublayer settings are the same.
-@@ -577,6 +577,7 @@ ieee802154_setup_sdata(struct ieee802154_sub_if_data *sdata,
- 	wpan_dev->short_addr = cpu_to_le16(IEEE802154_ADDR_BROADCAST);
- 
- 	switch (type) {
-+	case NL802154_IFTYPE_COORD:
- 	case NL802154_IFTYPE_NODE:
- 		ieee802154_be64_to_le64(&wpan_dev->extended_addr,
- 					sdata->dev->dev_addr);
-@@ -636,6 +637,7 @@ ieee802154_if_add(struct ieee802154_local *local, const char *name,
- 	ieee802154_le64_to_be64(ndev->perm_addr,
- 				&local->hw.phy->perm_extended_addr);
- 	switch (type) {
-+	case NL802154_IFTYPE_COORD:
- 	case NL802154_IFTYPE_NODE:
- 		ndev->type = ARPHRD_IEEE802154;
- 		if (ieee802154_is_valid_extended_unicast_addr(extended_addr)) {
-diff --git a/net/mac802154/rx.c b/net/mac802154/rx.c
-index b8ce84618a55..39459d8d787a 100644
---- a/net/mac802154/rx.c
-+++ b/net/mac802154/rx.c
-@@ -203,7 +203,7 @@ __ieee802154_rx_handle_packet(struct ieee802154_local *local,
- 	}
- 
- 	list_for_each_entry_rcu(sdata, &local->interfaces, list) {
--		if (sdata->wpan_dev.iftype != NL802154_IFTYPE_NODE)
-+		if (sdata->wpan_dev.iftype == NL802154_IFTYPE_MONITOR)
- 			continue;
- 
- 		if (!ieee802154_sdata_running(sdata))
++enum ieee802154_frame_type {
++	IEEE802154_BEACON_FRAME,
++	IEEE802154_DATA_FRAME,
++	IEEE802154_ACKNOWLEDGEMENT_FRAME,
++	IEEE802154_MAC_COMMAND_FRAME,
++	IEEE802154_RESERVED_FRAME,
++	IEEE802154_MULTIPURPOSE_FRAME,
++	IEEE802154_FRAGMENT_FRAME,
++	IEEE802154_EXTENDED_FRAME,
++};
++
+ struct ieee802154_hdr {
+ 	struct ieee802154_hdr_fc fc;
+ 	u8 seq;
 -- 
 2.34.1
 
