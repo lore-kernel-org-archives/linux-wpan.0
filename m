@@ -2,33 +2,33 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DF8CC43334
-	for <linux-wpan@archiver.kernel.org>; Fri,  1 Jul 2022 14:36:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29180C433EF
+	for <linux-wpan@archiver.kernel.org>; Fri,  1 Jul 2022 14:37:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230323AbiGAOg4 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Fri, 1 Jul 2022 10:36:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56954 "EHLO
+        id S233340AbiGAOg6 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Fri, 1 Jul 2022 10:36:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56968 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231732AbiGAOgH (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Fri, 1 Jul 2022 10:36:07 -0400
+        with ESMTP id S231879AbiGAOgI (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 1 Jul 2022 10:36:08 -0400
 Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::229])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 181BA42EE7;
-        Fri,  1 Jul 2022 07:31:31 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5208470E41;
+        Fri,  1 Jul 2022 07:31:34 -0700 (PDT)
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id E2578FF81C;
-        Fri,  1 Jul 2022 14:31:27 +0000 (UTC)
+        by mail.gandi.net (Postfix) with ESMTPSA id 8A7BAFF805;
+        Fri,  1 Jul 2022 14:31:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1656685889;
+        t=1656685892;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=a+M4RqfY+ocOOrxrHKUiJ1Db5HIuxHJ2cY1HB8kPzds=;
-        b=EB0UEnelF5DEaSNDip2QZXyxnfvQOTemeuUbnbSa1p33M6yq9aNKkYrxZhVrC1ZX8OIH2+
-        X4S5/xJ8bfJrXWwOw/1fbNojSpmb8GVR9WZcA/E5KheNbKSGmySuyFoFR9dm3+LLmOHX/5
-        EA5o+r2I0MSVFATM2tzpaTI59xhpPexlPT0Y/ZLV/cDoocl/W4BR/NdkVI7dQP2itwi9iK
-        +e0dxlIZS0HuM6VTBD/LZ04EPgG5h279QSWnSnV/eHj4Q/H9fbjZQRCaQoF3GxYG5g7Psd
-        wkm+xcSnwJbXkhrfqnSVU4wOj3fRkxqzIwH+O6sU+cykDv8qfQszoTBTfSHDcA==
+        bh=1LSAcTXR6qicmezvRhlLgmcrUrtDDK9geZUwOZJlwAk=;
+        b=PeqKqg6LU1afhIBtFeBEK2gfuSydBsWEau2zrssFjDPO0ja4xUfWRZpZwdN7sDADsNyMxt
+        XapjTXFMhdlqNZSzhZl/Ro5TvUqgQNgsOeJW7PCxNmUnDzlJrFjB16xx/9kbF6i+NL33v1
+        9ML97MhOiRUR7Op9CFG/+DPpE4WKUJhisVbKncsgcqPxgiB0uklO0zZQO8VeE8jOGWqn+G
+        kWvCSyrO++xVQDutKpWZCZn9rmLM2A0mIRMBAqZcsLptmBATu6x8A65NakWlB9WeJbaNYR
+        4yeg+cgbEqHxvtGUzQKvnEZ4QFrbP0BqBbc/6/Y8zxqD3vVlULHvG9E+6NInkw==
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
 To:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
@@ -43,9 +43,9 @@ Cc:     "David S. Miller" <davem@davemloft.net>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
         Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: [PATCH wpan-next 17/20] net: ieee802154: Handle limited devices with only datagram support
-Date:   Fri,  1 Jul 2022 16:30:49 +0200
-Message-Id: <20220701143052.1267509-18-miquel.raynal@bootlin.com>
+Subject: [PATCH wpan-next 19/20] ieee802154: hwsim: Do not check the rtnl
+Date:   Fri,  1 Jul 2022 16:30:51 +0200
+Message-Id: <20220701143052.1267509-20-miquel.raynal@bootlin.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20220701143052.1267509-1-miquel.raynal@bootlin.com>
 References: <20220701143052.1267509-1-miquel.raynal@bootlin.com>
@@ -56,63 +56,29 @@ Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Some devices, like HardMAC ones can be a bit limited in the way they
-handle mac commands. In particular, they might just not support it at
-all and instead only be able to transmit and receive regular data
-packets. In this case, they cannot be used for any of the internal
-management commands that we have introduced so far and must be flagged
-accordingly.
+There is no need to ensure the rtnl is locked when changing a driver's
+channel. This cause issues when scanning and this is the only driver
+relying on it. Just drop this dependency because it does not seem
+legitimate.
 
 Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
 ---
- include/net/cfg802154.h   | 3 +++
- net/ieee802154/nl802154.c | 6 ++++++
- 2 files changed, 9 insertions(+)
+ drivers/net/ieee802154/mac802154_hwsim.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/include/net/cfg802154.h b/include/net/cfg802154.h
-index d6ff60d900a9..20ac4df9dc7b 100644
---- a/include/net/cfg802154.h
-+++ b/include/net/cfg802154.h
-@@ -178,12 +178,15 @@ wpan_phy_cca_cmp(const struct wpan_phy_cca *a, const struct wpan_phy_cca *b)
-  *	setting.
-  * @WPAN_PHY_FLAG_STATE_QUEUE_STOPPED: Indicates that the transmit queue was
-  *	temporarily stopped.
-+ * @WPAN_PHY_FLAG_DATAGRAMS_ONLY: Indicates that transceiver is only able to
-+ *	send/receive datagrams.
-  */
- enum wpan_phy_flags {
- 	WPAN_PHY_FLAG_TXPOWER		= BIT(1),
- 	WPAN_PHY_FLAG_CCA_ED_LEVEL	= BIT(2),
- 	WPAN_PHY_FLAG_CCA_MODE		= BIT(3),
- 	WPAN_PHY_FLAG_STATE_QUEUE_STOPPED = BIT(4),
-+	WPAN_PHY_FLAG_DATAGRAMS_ONLY	= BIT(5),
- };
+diff --git a/drivers/net/ieee802154/mac802154_hwsim.c b/drivers/net/ieee802154/mac802154_hwsim.c
+index 38c217bd7c82..a5b9fc2fb64c 100644
+--- a/drivers/net/ieee802154/mac802154_hwsim.c
++++ b/drivers/net/ieee802154/mac802154_hwsim.c
+@@ -100,7 +100,7 @@ static int hwsim_hw_channel(struct ieee802154_hw *hw, u8 page, u8 channel)
+ 	pib->page = page;
+ 	pib->channel = channel;
  
- struct wpan_phy {
-diff --git a/net/ieee802154/nl802154.c b/net/ieee802154/nl802154.c
-index 00b03c33e826..b31a0bd36b08 100644
---- a/net/ieee802154/nl802154.c
-+++ b/net/ieee802154/nl802154.c
-@@ -1404,6 +1404,9 @@ static int nl802154_trigger_scan(struct sk_buff *skb, struct genl_info *info)
- 	if (wpan_dev->iftype == NL802154_IFTYPE_MONITOR)
- 		return -EPERM;
- 
-+	if (wpan_phy->flags & WPAN_PHY_FLAG_DATAGRAMS_ONLY)
-+		return -EOPNOTSUPP;
-+
- 	request = kzalloc(sizeof(*request), GFP_KERNEL);
- 	if (!request)
- 		return -ENOMEM;
-@@ -1585,6 +1588,9 @@ nl802154_send_beacons(struct sk_buff *skb, struct genl_info *info)
- 		return -EPERM;
- 	}
- 
-+	if (wpan_phy->flags & WPAN_PHY_FLAG_DATAGRAMS_ONLY)
-+		return -EOPNOTSUPP;
-+
- 	request = kzalloc(sizeof(*request), GFP_KERNEL);
- 	if (!request)
- 		return -ENOMEM;
+-	pib_old = rtnl_dereference(phy->pib);
++	rcu_assign_pointer(pib_old, phy->pib);
+ 	rcu_assign_pointer(phy->pib, pib);
+ 	kfree_rcu(pib_old, rcu);
+ 	return 0;
 -- 
 2.34.1
 
