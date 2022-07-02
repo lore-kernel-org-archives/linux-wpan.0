@@ -2,349 +2,187 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0AA7C433EF
-	for <linux-wpan@archiver.kernel.org>; Fri,  1 Jul 2022 14:38:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49C8ACCA498
+	for <linux-wpan@archiver.kernel.org>; Sat,  2 Jul 2022 01:03:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231639AbiGAOiX (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Fri, 1 Jul 2022 10:38:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56330 "EHLO
+        id S231978AbiGBBDs (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Fri, 1 Jul 2022 21:03:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35774 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232419AbiGAOh6 (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Fri, 1 Jul 2022 10:37:58 -0400
-Received: from relay12.mail.gandi.net (relay12.mail.gandi.net [217.70.178.232])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9038B3DA50
-        for <linux-wpan@vger.kernel.org>; Fri,  1 Jul 2022 07:34:45 -0700 (PDT)
-Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id 63C4520000B;
-        Fri,  1 Jul 2022 14:34:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1656686084;
+        with ESMTP id S231173AbiGBBDi (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 1 Jul 2022 21:03:38 -0400
+Received: from out1.migadu.com (out1.migadu.com [91.121.223.63])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C4682409E;
+        Fri,  1 Jul 2022 18:03:35 -0700 (PDT)
+Date:   Fri, 1 Jul 2022 18:03:10 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1656723813;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=bb5v/Hsp0+jefA3mGLCm/+wQVouPCXtqwXFQo/gwD5E=;
-        b=YN6Fo8+55nro/OVQuzRm7DtpAXW5GVQ6exWuMzFyQrFmS9xy90cbGIJwn874yQebl7Ssmg
-        pNJwDYpWIkxxxum2Rj02bsoF1JFfyzf+D/aNQMcd9OzZFvRxcsR8cR5BfEklOmfDN3iElR
-        UyOhCl3h6y23mVRRSTutg0qfxO4ReTxk766yagauYE5G1grsAoTTyH5VvLHqGqnUszKqK2
-        GYK8PxE1s7qY6iFPXDU+/922tuAJ4j86ylGiTn+IToOIszEU2agF6ZFC1zqH6CL57EnTaN
-        zcnSHx+1ZCi8qNZwELQi6I1egRhvQZI2/AIEoWweLI/JtIFv1HtDTHfIiYkv/g==
-From:   Miquel Raynal <miquel.raynal@bootlin.com>
-To:     Alexander Aring <alex.aring@gmail.com>,
-        Stefan Schmidt <stefan@datenfreihafen.org>,
-        linux-wpan@vger.kernel.org
-Cc:     David Girault <david.girault@qorvo.com>,
-        Romuald Despres <romuald.despres@qorvo.com>,
-        Frederic Blain <frederic.blain@qorvo.com>,
-        Nicolas Schodet <nico@ni.fr.eu.org>,
-        Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-        Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: [PATCH wpan-tools 7/7] iwpan: Add events support
-Date:   Fri,  1 Jul 2022 16:34:34 +0200
-Message-Id: <20220701143434.1267864-8-miquel.raynal@bootlin.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220701143434.1267864-1-miquel.raynal@bootlin.com>
-References: <20220701143434.1267864-1-miquel.raynal@bootlin.com>
+        bh=UefsvJWBOCsJEHG/jcpgIGR+KBtUCRUqjXcROu7qjh4=;
+        b=oGHlDm4tgr6UzDbC5z/sb7q2WEts5mi8mJ8aiIMXBOzW75BRr4BaIuszRL9hOCzoFfVxku
+        tmO6BM7R9GzDDzZbe/MQeyeOEOAx+3VHqH/w/8ecEZ7fImffcNYGlal4Cw/gQ26E9Sym1J
+        usYWeNXz8OdB9Vt23HLuxwKOwXbZ7ng=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Roman Gushchin <roman.gushchin@linux.dev>
+To:     Andrew Morton <akpm@linux-foundation.org>,
+        kernel test robot <lkp@intel.com>
+Cc:     virtualization@lists.linux-foundation.org,
+        usbb2k-api-dev@nongnu.org, tipc-discussion@lists.sourceforge.net,
+        target-devel@vger.kernel.org, sound-open-firmware@alsa-project.org,
+        samba-technical@lists.samba.org, rds-devel@oss.oracle.com,
+        patches@opensource.cirrus.com, osmocom-net-gprs@lists.osmocom.org,
+        openipmi-developer@lists.sourceforge.net, nvdimm@lists.linux.dev,
+        ntb@lists.linux.dev, netfilter-devel@vger.kernel.org,
+        netdev@vger.kernel.org, mjpeg-users@lists.sourceforge.net,
+        megaraidlinux.pdl@broadcom.com, linuxppc-dev@lists.ozlabs.org,
+        linux1394-devel@lists.sourceforge.net, linux-x25@vger.kernel.org,
+        linux-wpan@vger.kernel.org, linux-wireless@vger.kernel.org,
+        linux-watchdog@vger.kernel.org, linux-usb@vger.kernel.org,
+        linux-unionfs@vger.kernel.org, linux-tegra@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-staging@lists.linux.dev, linux-serial@vger.kernel.org,
+        linux-sctp@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-samsung-soc@vger.kernel.org,
+        linux-rockchip@lists.infradead.org,
+        linux-renesas-soc@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linux-raid@vger.kernel.org, linux-pm@vger.kernel.org,
+        linux-phy@lists.infradead.org, linux-perf-users@vger.kernel.org,
+        linux-pci@vger.kernel.org, linux-parport@lists.infradead.org,
+        linux-parisc@vger.kernel.org, linux-omap@vger.kernel.org,
+        linux-nfc@lists.01.org, linux-mtd@lists.infradead.org,
+        linux-mmc@vger.kernel.org, linux-mm@kvack.org,
+        linux-mediatek@lists.infradead.org, linux-media@vger.kernel.org,
+        linux-leds@vger.kernel.org, linux-integrity@vger.kernel.org,
+        linux-input@vger.kernel.org, linux-iio@vger.kernel.org,
+        linux-ide@vger.kernel.org, linux-hwmon@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-fpga@vger.kernel.org,
+        linux-fbdev@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-efi@vger.kernel.org, linux-cxl@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-clk@vger.kernel.org,
+        linux-cifs@vger.kernel.org, linux-btrfs@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-bcache@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-amlogic@lists.infradead.org, linaro-mm-sig@lists.linaro.org,
+        legousb-devel@lists.sourceforge.net, kvm@vger.kernel.org,
+        keyrings@vger.kernel.org, isdn4linux@listserv.isdn4linux.de,
+        iommu@lists.linux.dev, iommu@lists.linux-foundation.org,
+        intel-wired-lan@lists.osuosl.org, dri-devel@lists.freedesktop.org,
+        dm-devel@redhat.com, devicetree@vger.kernel.org,
+        dev@openvswitch.org, dccp@vger.kernel.org, damon@lists.linux.dev,
+        coreteam@netfilter.org, cgroups@vger.kernel.org,
+        ceph-devel@vger.kernel.org, apparmor@lists.ubuntu.com,
+        amd-gfx@lists.freedesktop.org, alsa-devel@alsa-project.org,
+        accessrunner-general@lists.sourceforge.net
+Subject: Re: [linux-next:master] BUILD REGRESSION
+ 6cc11d2a1759275b856e464265823d94aabd5eaf
+Message-ID: <Yr+ZTnLb9lJk6fJO@castle>
+References: <62be3696.+PAAAVlbtWK6G2hk%lkp@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <62be3696.+PAAAVlbtWK6G2hk%lkp@intel.com>
+X-Migadu-Flow: FLOW_OUT
+X-Migadu-Auth-User: linux.dev
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-From: David Girault <david.girault@qorvo.com>
+esOn Fri, Jul 01, 2022 at 07:49:42AM +0800, kbuild test robot wrote:
+> tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git master
+> branch HEAD: 6cc11d2a1759275b856e464265823d94aabd5eaf  Add linux-next specific files for 20220630
+> 
+> Error/Warning reports:
+> 
+> https://lore.kernel.org/linux-mm/202206301859.UodBCrva-lkp@intel.com
+> 
+> Error/Warning: (recently discovered and may have been fixed)
+> 
+> arch/powerpc/kernel/interrupt.c:542:55: error: suggest braces around empty body in an 'if' statement [-Werror=empty-body]
+> arch/powerpc/kernel/interrupt.c:542:55: warning: suggest braces around empty body in an 'if' statement [-Wempty-body]
+> drivers/pci/endpoint/functions/pci-epf-vntb.c:975:5: warning: no previous prototype for 'pci_read' [-Wmissing-prototypes]
+> drivers/pci/endpoint/functions/pci-epf-vntb.c:984:5: warning: no previous prototype for 'pci_write' [-Wmissing-prototypes]
+> mm/shrinker_debug.c:143:9: warning: function 'shrinker_debugfs_rename' might be a candidate for 'gnu_printf' format attribute [-Wsuggest-attribute=format]
+> mm/shrinker_debug.c:217:9: warning: function 'shrinker_debugfs_rename' might be a candidate for 'gnu_printf' format attribute [-Wsuggest-attribute=format]
+> mm/vmscan.c:637:9: warning: function 'prealloc_shrinker' might be a candidate for 'gnu_printf' format attribute [-Wsuggest-attribute=format]
+> mm/vmscan.c:642:9: warning: function 'prealloc_shrinker' might be a candidate for 'gnu_printf' format attribute [-Wsuggest-attribute=format]
+> mm/vmscan.c:697:9: warning: function 'register_shrinker' might be a candidate for 'gnu_printf' format attribute [-Wsuggest-attribute=format]
+> mm/vmscan.c:702:9: warning: function 'register_shrinker' might be a candidate for 'gnu_printf' format attribute [-Wsuggest-attribute=format]
 
-Add the possibility to listen to the scan multicast netlink family in
-order to print all the events happening in the 802.15.4 stack, like the
-discovery of a new coordinator or an end of scan.
+Shrinker-related warnings should be fixed by the following patch.
 
-Signed-off-by: David Girault <david.girault@qorvo.com>
-Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
+Thanks!
+
+--
+
+From c399aff65c7745a209397a531c5b28fd404d83c2 Mon Sep 17 00:00:00 2001
+From: Roman Gushchin <roman.gushchin@linux.dev>
+Date: Fri, 1 Jul 2022 17:38:31 -0700
+Subject: [PATCH] mm:shrinkers: fix build warnings
+
+Add __printf(a, b) attributes to shrinker functions taking shrinker
+name as an argument to avoid compiler warnings like:
+
+mm/shrinker_debug.c:143:9: warning: function 'shrinker_debugfs_rename'
+  might be a candidate for 'gnu_printf' format attribute [-Wsuggest-attribute=format]
+mm/shrinker_debug.c:217:9: warning: function 'shrinker_debugfs_rename'
+  might be a candidate for 'gnu_printf' format attribute [-Wsuggest-attribute=format]
+mm/vmscan.c:637:9: warning: function 'prealloc_shrinker' might be a
+  candidate for 'gnu_printf' format attribute [-Wsuggest-attribute=format]
+mm/vmscan.c:642:9: warning: function 'prealloc_shrinker' might be a
+  candidate for 'gnu_printf' format attribute [-Wsuggest-attribute=format]
+mm/vmscan.c:697:9: warning: function 'register_shrinker' might be a
+  candidate for 'gnu_printf' format attribute [-Wsuggest-attribute=format]
+mm/vmscan.c:702:9: warning: function 'register_shrinker' might be a
+  candidate for 'gnu_printf' format attribute [-Wsuggest-attribute=format]
+
+Signed-off-by: Roman Gushchin <roman.gushchin@linux.dev>
 ---
- src/Makefile.am |   1 +
- src/event.c     | 222 ++++++++++++++++++++++++++++++++++++++++++++++++
- src/iwpan.h     |   3 +
- src/scan.c      |   5 +-
- 4 files changed, 228 insertions(+), 3 deletions(-)
- create mode 100644 src/event.c
+ include/linux/shrinker.h | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
 
-diff --git a/src/Makefile.am b/src/Makefile.am
-index 18b3569..7933daf 100644
---- a/src/Makefile.am
-+++ b/src/Makefile.am
-@@ -10,6 +10,7 @@ iwpan_SOURCES = \
- 	phy.c \
- 	mac.c \
- 	scan.c \
-+	event.c \
- 	nl_extras.h \
- 	nl802154.h
+diff --git a/include/linux/shrinker.h b/include/linux/shrinker.h
+index 64416f3e0a1f..08e6054e061f 100644
+--- a/include/linux/shrinker.h
++++ b/include/linux/shrinker.h
+@@ -93,9 +93,11 @@ struct shrinker {
+  */
+ #define SHRINKER_NONSLAB	(1 << 3)
  
-diff --git a/src/event.c b/src/event.c
-new file mode 100644
-index 0000000..2eab144
---- /dev/null
-+++ b/src/event.c
-@@ -0,0 +1,222 @@
-+#include <net/if.h>
-+#include <errno.h>
-+#include <stdint.h>
-+#include <stdbool.h>
-+#include <inttypes.h>
-+
-+#include <netlink/genl/genl.h>
-+#include <netlink/genl/family.h>
-+#include <netlink/genl/ctrl.h>
-+#include <netlink/msg.h>
-+#include <netlink/attr.h>
-+
-+#include "nl802154.h"
-+#include "nl_extras.h"
-+#include "iwpan.h"
-+
-+struct print_event_args {
-+	struct timeval ts; /* internal */
-+	bool have_ts; /* must be set false */
-+	bool frame, time, reltime;
-+};
-+
-+static void parse_scan_terminated(struct nlattr **tb)
-+{
-+	struct nlattr *a;
-+	if ((a = tb[NL802154_ATTR_SCAN_TYPE])) {
-+		enum nl802154_scan_types st =
-+			(enum nl802154_scan_types)nla_get_u8(a);
-+		const char *stn = scantype_name(st);
-+		printf(" type %s,", stn);
-+	}
-+	if ((a = tb[NL802154_ATTR_SCAN_FLAGS])) {
-+		printf(" flags 0x%x,", nla_get_u32(a));
-+	}
-+	if ((a = tb[NL802154_ATTR_PAGE])) {
-+		printf(" page %u,", nla_get_u8(a));
-+	}
-+	if ((a = tb[NL802154_ATTR_SCAN_CHANNELS])) {
-+		printf(" channels mask 0x%x,", nla_get_u32(a));
-+	}
-+	/* TODO: show requested IEs */
-+	if ((a = tb[NL802154_ATTR_COORDINATOR])) {
-+		parse_scan_result_pan(a, tb[NL802154_ATTR_IFINDEX]);
-+	}
-+}
-+
-+static int print_event(struct nl_msg *msg, void *arg)
-+{
-+	struct genlmsghdr *gnlh = nlmsg_data(nlmsg_hdr(msg));
-+	struct nlattr *tb[NL802154_ATTR_MAX + 1], *nst;
-+	struct print_event_args *args = arg;
-+	char ifname[100];
-+
-+	uint8_t reg_type;
-+	uint32_t wpan_phy_idx = 0;
-+	int rem_nst;
-+	uint16_t status;
-+
-+	if (args->time || args->reltime) {
-+		unsigned long long usecs, previous;
-+
-+		previous = 1000000ULL * args->ts.tv_sec + args->ts.tv_usec;
-+		gettimeofday(&args->ts, NULL);
-+		usecs = 1000000ULL * args->ts.tv_sec + args->ts.tv_usec;
-+		if (args->reltime) {
-+			if (!args->have_ts) {
-+				usecs = 0;
-+				args->have_ts = true;
-+			} else
-+				usecs -= previous;
-+		}
-+		printf("%llu.%06llu: ", usecs/1000000, usecs % 1000000);
-+	}
-+
-+	nla_parse(tb, NL802154_ATTR_MAX, genlmsg_attrdata(gnlh, 0),
-+		  genlmsg_attrlen(gnlh, 0), NULL);
-+
-+	if (tb[NL802154_ATTR_IFINDEX] && tb[NL802154_ATTR_WPAN_PHY]) {
-+		if_indextoname(nla_get_u32(tb[NL802154_ATTR_IFINDEX]), ifname);
-+		printf("%s (phy #%d): ", ifname, nla_get_u32(tb[NL802154_ATTR_WPAN_PHY]));
-+	} else if (tb[NL802154_ATTR_WPAN_DEV] && tb[NL802154_ATTR_WPAN_PHY]) {
-+		printf("wdev 0x%llx (phy #%d): ",
-+			(unsigned long long)nla_get_u64(tb[NL802154_ATTR_WPAN_DEV]),
-+			nla_get_u32(tb[NL802154_ATTR_WPAN_PHY]));
-+	} else if (tb[NL802154_ATTR_IFINDEX]) {
-+		if_indextoname(nla_get_u32(tb[NL802154_ATTR_IFINDEX]), ifname);
-+		printf("%s: ", ifname);
-+	} else if (tb[NL802154_ATTR_WPAN_DEV]) {
-+		printf("wdev 0x%llx: ", (unsigned long long)nla_get_u64(tb[NL802154_ATTR_WPAN_DEV]));
-+	} else if (tb[NL802154_ATTR_WPAN_PHY]) {
-+		printf("phy #%d: ", nla_get_u32(tb[NL802154_ATTR_WPAN_PHY]));
-+	}
-+
-+	switch (gnlh->cmd) {
-+	case NL802154_CMD_NEW_WPAN_PHY:
-+		printf("renamed to %s\n", nla_get_string(tb[NL802154_ATTR_WPAN_PHY_NAME]));
-+		break;
-+	case NL802154_CMD_DEL_WPAN_PHY:
-+		printf("delete wpan_phy\n");
-+		break;
-+	case NL802154_CMD_TRIGGER_SCAN:
-+		printf("scan started\n");
-+		break;
-+	case NL802154_CMD_SCAN_DONE:
-+		printf("scan finished\n");
-+		break;
-+	case NL802154_CMD_NEW_COORDINATOR:
-+		printf("new coordinator\n");
-+		break;
-+	default:
-+		printf("unknown event %d\n", gnlh->cmd);
-+		break;
-+	}
-+	fflush(stdout);
-+	return NL_SKIP;
-+}
-+
-+static int __prepare_listen_events(struct nl802154_state *state)
-+{
-+	int mcid, ret;
-+
-+	/* Configuration multicast group */
-+	mcid = genl_ctrl_resolve_grp(state->nl_sock, NL802154_GENL_NAME,
-+				     "config");
-+	if (mcid < 0)
-+		return mcid;
-+	ret = nl_socket_add_membership(state->nl_sock, mcid);
-+	if (ret)
-+		return ret;
-+
-+	/* Scan multicast group */
-+	mcid = genl_ctrl_resolve_grp(state->nl_sock, NL802154_GENL_NAME,
-+				     "scan");
-+	if (mcid >= 0) {
-+		ret = nl_socket_add_membership(state->nl_sock, mcid);
-+		if (ret)
-+			return ret;
-+	}
-+
-+	/* MLME multicast group */
-+	mcid = genl_ctrl_resolve_grp(state->nl_sock, NL802154_GENL_NAME,
-+				     "mlme");
-+	if (mcid >= 0) {
-+		ret = nl_socket_add_membership(state->nl_sock, mcid);
-+		if (ret)
-+			return ret;
-+	}
-+
-+	return 0;
-+}
-+
-+static int __do_listen_events(struct nl802154_state *state,
-+			      struct print_event_args *args)
-+{
-+	struct nl_cb *cb = nl_cb_alloc(iwpan_debug ? NL_CB_DEBUG : NL_CB_DEFAULT);
-+	if (!cb) {
-+		fprintf(stderr, "failed to allocate netlink callbacks\n");
-+		return -ENOMEM;
-+	}
-+	nl_socket_set_cb(state->nl_sock, cb);
-+	/* No sequence checking for multicast messages */
-+	nl_socket_disable_seq_check(state->nl_sock);
-+	/* Install print_event message handler */
-+	nl_cb_set(cb, NL_CB_VALID, NL_CB_CUSTOM, print_event, args);
-+
-+	/* Loop waiting until interrupted by signal */
-+	while (1) {
-+		int ret = nl_recvmsgs(state->nl_sock, cb);
-+		if (ret) {
-+			fprintf(stderr, "nl_recvmsgs return error %d\n", ret);
-+			break;
-+		}
-+	}
-+	/* Free allocated nl_cb structure */
-+	nl_cb_put(cb);
-+	return 0;
-+}
-+
-+static int print_events(struct nl802154_state *state,
-+			struct nl_cb *cb,
-+			struct nl_msg *msg,
-+			int argc, char **argv,
-+			enum id_input id)
-+{
-+	struct print_event_args args;
-+	int ret;
-+
-+	memset(&args, 0, sizeof(args));
-+
-+	argc--;
-+	argv++;
-+
-+	while (argc > 0) {
-+		if (strcmp(argv[0], "-f") == 0)
-+			args.frame = true;
-+		else if (strcmp(argv[0], "-t") == 0)
-+			args.time = true;
-+		else if (strcmp(argv[0], "-r") == 0)
-+			args.reltime = true;
-+		else
-+			return 1;
-+		argc--;
-+		argv++;
-+	}
-+	if (args.time && args.reltime)
-+		return 1;
-+	if (argc)
-+		return 1;
-+
-+	/* Prepare reception of all multicast messages */
-+	ret = __prepare_listen_events(state);
-+	if (ret)
-+		return ret;
-+
-+	/* Read message loop */
-+	return __do_listen_events(state, &args);
-+}
-+TOPLEVEL(event, "[-t|-r] [-f]", 0, 0, CIB_NONE, print_events,
-+	"Monitor events from the kernel.\n"
-+	"-t - print timestamp\n"
-+	"-r - print relative timestamp\n"
-+	"-f - print full frame for auth/assoc etc.");
-diff --git a/src/iwpan.h b/src/iwpan.h
-index 406940a..a71b991 100644
---- a/src/iwpan.h
-+++ b/src/iwpan.h
-@@ -114,6 +114,9 @@ DECLARE_SECTION(get);
- 
- const char *iftype_name(enum nl802154_iftype iftype);
- 
-+const char *scantype_name(enum nl802154_scan_types scantype);
-+int parse_scan_result_pan(struct nlattr *nestedpan, struct nlattr *ifattr);
-+
- extern int iwpan_debug;
- 
- #endif /* __IWPAN_H */
-diff --git a/src/scan.c b/src/scan.c
-index de6caf4..bc06069 100644
---- a/src/scan.c
-+++ b/src/scan.c
-@@ -16,7 +16,7 @@
- 
- static char scantypebuf[100];
- 
--static const char *scantype_name(enum nl802154_scan_types scantype)
-+const char *scantype_name(enum nl802154_scan_types scantype)
+-extern int prealloc_shrinker(struct shrinker *shrinker, const char *fmt, ...);
++extern int __printf(2, 3) prealloc_shrinker(struct shrinker *shrinker,
++					    const char *fmt, ...);
+ extern void register_shrinker_prepared(struct shrinker *shrinker);
+-extern int register_shrinker(struct shrinker *shrinker, const char *fmt, ...);
++extern int __printf(2, 3) register_shrinker(struct shrinker *shrinker,
++					    const char *fmt, ...);
+ extern void unregister_shrinker(struct shrinker *shrinker);
+ extern void free_prealloced_shrinker(struct shrinker *shrinker);
+ extern void synchronize_shrinkers(void);
+@@ -103,8 +105,8 @@ extern void synchronize_shrinkers(void);
+ #ifdef CONFIG_SHRINKER_DEBUG
+ extern int shrinker_debugfs_add(struct shrinker *shrinker);
+ extern void shrinker_debugfs_remove(struct shrinker *shrinker);
+-extern int shrinker_debugfs_rename(struct shrinker *shrinker,
+-				   const char *fmt, ...);
++extern int __printf(2, 3) shrinker_debugfs_rename(struct shrinker *shrinker,
++						  const char *fmt, ...);
+ #else /* CONFIG_SHRINKER_DEBUG */
+ static inline int shrinker_debugfs_add(struct shrinker *shrinker)
  {
- 	switch (scantype) {
- 	case NL802154_SCAN_ED:
-@@ -168,8 +168,7 @@ static int scan_abort_handler(struct nl802154_state *state,
+@@ -113,8 +115,8 @@ static inline int shrinker_debugfs_add(struct shrinker *shrinker)
+ static inline void shrinker_debugfs_remove(struct shrinker *shrinker)
+ {
  }
- 
- 
--static int parse_new_coordinator(struct nlattr *nestedcoord,
--				 struct nlattr *ifattr)
-+int parse_new_coordinator(struct nlattr *nestedcoord, struct nlattr *ifattr)
+-static inline int shrinker_debugfs_rename(struct shrinker *shrinker,
+-					  const char *fmt, ...)
++static inline __printf(2, 3)
++int shrinker_debugfs_rename(struct shrinker *shrinker, const char *fmt, ...)
  {
- 	struct nlattr *pan[NL802154_COORD_MAX + 1];
- 	static struct nla_policy pan_policy[NL802154_COORD_MAX + 1] = {
+ 	return 0;
+ }
 -- 
-2.34.1
+2.36.1
 
