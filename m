@@ -2,70 +2,65 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A309DC43334
-	for <linux-wpan@archiver.kernel.org>; Mon,  4 Jul 2022 01:18:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2287C43334
+	for <linux-wpan@archiver.kernel.org>; Mon,  4 Jul 2022 01:18:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229471AbiGDBSH (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Sun, 3 Jul 2022 21:18:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45488 "EHLO
+        id S229459AbiGDBSz (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Sun, 3 Jul 2022 21:18:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46270 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229450AbiGDBSH (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Sun, 3 Jul 2022 21:18:07 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id AFBE96274
-        for <linux-wpan@vger.kernel.org>; Sun,  3 Jul 2022 18:18:05 -0700 (PDT)
+        with ESMTP id S229450AbiGDBSz (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Sun, 3 Jul 2022 21:18:55 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D62AD631E
+        for <linux-wpan@vger.kernel.org>; Sun,  3 Jul 2022 18:18:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1656897484;
+        s=mimecast20190719; t=1656897533;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=rBcId0LsMiJ8kchATAtPUDOo18oCzMowzraY14qwnJc=;
-        b=Nm939Zg2g7jPE12N+20Yi4oMeHsEZapdPqAtkpAH5DTeXD9AvYzOHTFnQtsZYHXqaCDZdf
-        VpnUCNzocyiESYJcvEWWF/zbq8jb88FrKWFONTa9f+jkq4+BmURV6zDDlt4ngoL1CdikEB
-        uX/AChRlk444HU63hfX8AGcBJw9krwU=
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=XTR42qOBAPJLVpeW3qzZHpf4gBnbwpAsJ5kRjUkC5/4=;
+        b=UV3xbE5VNTh1r4jXkvi8AO/h4Hg5ZBRoPHp3er3YGWnP8TZ73KaeY6g9uRx/IFhtIrfDuh
+        2NeWkgy1OC34KJyPzKSDsAs7XZH7DaOnJMMAyrreSWhfCwgc6C05+AzSM52GytcdkbCNKW
+        H1x5xW+f9KQ4X0YnisiFQrYrj+jOomQ=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-119-VFiVIDVEMPu4h3ug922lCw-1; Sun, 03 Jul 2022 21:18:03 -0400
-X-MC-Unique: VFiVIDVEMPu4h3ug922lCw-1
-Received: by mail-qt1-f200.google.com with SMTP id e14-20020ac8010e000000b00316edc1a792so5573920qtg.18
-        for <linux-wpan@vger.kernel.org>; Sun, 03 Jul 2022 18:18:03 -0700 (PDT)
+ us-mta-192-EBeqOguwOE-SJeiHV4ti6Q-1; Sun, 03 Jul 2022 21:18:51 -0400
+X-MC-Unique: EBeqOguwOE-SJeiHV4ti6Q-1
+Received: by mail-qk1-f199.google.com with SMTP id 186-20020a3708c3000000b006af306eb272so7364078qki.18
+        for <linux-wpan@vger.kernel.org>; Sun, 03 Jul 2022 18:18:51 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=rBcId0LsMiJ8kchATAtPUDOo18oCzMowzraY14qwnJc=;
-        b=7lgkcTHRHC8JzG4yZv5YNRxs+DlP8OROUV+3gfvJfM+KW9l2+UPe0SB1e4gtIzKBZS
-         mh6zGuVlV96L1aFXNvRbmhE1CmntdvNbzD90clZ+h+rkW78Cd4AEeEyvOYhm4Gf0FAMK
-         BhbHEkMVulXD6BdNWBFjGhC8saV7P2nPwvUqWCDzzCqZ5ZtwTwIqNQmDxgU9VKpv4XuG
-         pPbbVQ7piI7v3ol/WaeZnObHcxM1FKdSxxPXVWfDRlWyt76V4sDwWOEwdaBBzWi03Hvt
-         36EqulkOwWMZjBxxVx02MkUkFfYiQsYKfkgjeC6Bq/5QdwZ2LS6+pppnFtF7UQFKGfuD
-         4rNA==
-X-Gm-Message-State: AJIora9JRPTPY8G+rCvAxf8H+oCbgQ7kOwn0sIuRj7ijWEodAYxks/zX
-        XPePhCJFc5mkFmbuz6oqOssImDHB5zCOwpLirW2qof7CHeI0GLcgkGodFazGX3SLIFzTMvytPII
-        VClS14/GteAiWhw6SLpKwhn63jhLnEkEoA9RaOw==
-X-Received: by 2002:a05:622a:1306:b0:31a:f73e:3d6d with SMTP id v6-20020a05622a130600b0031af73e3d6dmr22388487qtk.339.1656897482818;
-        Sun, 03 Jul 2022 18:18:02 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1syz7xlfqoZFtm72jwtXJn8D6qO7f/i/zDerAeST5FMthivoVI/zdvKXb8JZXdbJyaIYsR2AWLIwVq1jSH/Yvc=
-X-Received: by 2002:a05:622a:1306:b0:31a:f73e:3d6d with SMTP id
- v6-20020a05622a130600b0031af73e3d6dmr22388477qtk.339.1656897482655; Sun, 03
- Jul 2022 18:18:02 -0700 (PDT)
+        bh=XTR42qOBAPJLVpeW3qzZHpf4gBnbwpAsJ5kRjUkC5/4=;
+        b=xbbRYOhs27DaXlE3DwD9CDm8TUwthdgaS4o6Cb1GEqYWy3j07fSymkR+CX3yl6ct6P
+         lR7alNu0M2eKEK1xK5DEVTK+q+Hkb93L996VcQ2R1VxGrjYPFMZ+Tf6OPpAdXx9L2P8f
+         uzTnsulf7XGRMrNInpszwLn4/WvUFRXeYQaAzHzNIB+6vIn1tAvFHOxv8OiBVgRonq4f
+         mr5QJL/EypFrIBRhAGdSR01FbN+1ZBQHTpkm6Xmon4N+38CLD4da4GrotWnZ2JUNsd3R
+         IRJRcR0Jr+FgcTWj6aEJyFeXgvz1MvreJpFNnKRdEr99huYCGsNlBsDFygSsYMT2m1eM
+         ln1A==
+X-Gm-Message-State: AJIora+SvUqsMxDlTp6HBY3bsxwX3L1/x6uNYDavyp/ZIu8Jya+a2/DH
+        U8PSdEATl6VUhRHNqm9FijdzdR+2YZ19gLjOoDXzlAxnc2nox4P5xBEz2jX55TX+qr50O6vrUfg
+        Anj44mio8ke0q+jgGpLml75yXLoCAHKfeKcS/tw==
+X-Received: by 2002:a05:620a:4723:b0:6af:46a2:8531 with SMTP id bs35-20020a05620a472300b006af46a28531mr18671155qkb.177.1656897531295;
+        Sun, 03 Jul 2022 18:18:51 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1stcCwmeFtgKS7xQd6QJ2zmIC8Kw7c89x0LvW/B3o128m4+o6swfs2oH6yMj0txMKyeikzZrxsQo7brOTHRalA=
+X-Received: by 2002:a05:620a:4723:b0:6af:46a2:8531 with SMTP id
+ bs35-20020a05620a472300b006af46a28531mr18671148qkb.177.1656897531121; Sun, 03
+ Jul 2022 18:18:51 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220701143052.1267509-1-miquel.raynal@bootlin.com>
-In-Reply-To: <20220701143052.1267509-1-miquel.raynal@bootlin.com>
+References: <20220701143434.1267864-1-miquel.raynal@bootlin.com>
+In-Reply-To: <20220701143434.1267864-1-miquel.raynal@bootlin.com>
 From:   Alexander Aring <aahringo@redhat.com>
-Date:   Sun, 3 Jul 2022 21:17:51 -0400
-Message-ID: <CAK-6q+jxyRVc=qwWQfhnnzOFOny5cp=eAn_pz_4_=NbK-NY5Eg@mail.gmail.com>
-Subject: Re: [PATCH wpan-next 00/20] net: ieee802154: Support scanning/beaconing
+Date:   Sun, 3 Jul 2022 21:18:40 -0400
+Message-ID: <CAK-6q+hUc0Cm+_9OyLNqX=gKNOO-3TU4ERu_bZKm=Qf-c9F-ug@mail.gmail.com>
+Subject: Re: [PATCH wpan-tools 0/7] iwpan: Support scanning/beaconing
 To:     Miquel Raynal <miquel.raynal@bootlin.com>
 Cc:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
         linux-wpan - ML <linux-wpan@vger.kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Eric Dumazet <edumazet@google.com>,
-        Network Development <netdev@vger.kernel.org>,
         David Girault <david.girault@qorvo.com>,
         Romuald Despres <romuald.despres@qorvo.com>,
         Frederic Blain <frederic.blain@qorvo.com>,
@@ -78,25 +73,50 @@ X-Mailing-List: linux-wpan@vger.kernel.org
 
 Hi,
 
-On Fri, Jul 1, 2022 at 10:36 AM Miquel Raynal <miquel.raynal@bootlin.com> wrote:
+On Fri, Jul 1, 2022 at 10:39 AM Miquel Raynal <miquel.raynal@bootlin.com> wrote:
 >
 > Hello,
 >
-> After a few exchanges about inter-PAN management with Alexander, it was
-> decided that most of this series would be dropped, because the kernel
-> should in the end not really care about keeping a local copy of the
-> discovered coordinators, this is userspace job.
+> This series follows the work done in the Linux kernel stack: now that
+> the core knows about the different netlink commands and attributes in
+> order to support scanning and beaconing requests from end-to-end, here
+> are the userspace changes to be able to use it.
 >
-> So here is a "first" version of the scanning series which hopefully
-> meets the main requirements discussed the past days on the mailing
-> list. I know it is rather big, but there are a few very trivial patches
-> there, so here is how it is built:
+> Here is a list of the new available features.
+>
+> * Sending (or stopping) beacons. Intervals ranging from 0 to 14 are
+>   valid for passively sending beacons at regular intervals. An interval
+>   of 15 would request the core to answer BEACON_REQ.
+>   # iwpan dev coord0 beacons send interval 2 # send BEACON at a fixed rate
+>   # iwpan dev coord0 beacons send interval 15 # answer BEACON_REQ only
+>   # iwpan dev coord0 beacons stop # apply to both cases
+>
+> * Scanning all the channels or only a subset:
+>   # iwpan dev wpan1 scan type passive duration 3 # will not trigger BEACON_REQ
+>   # iwpan dev wpan1 scan type active duration 3 # will trigger BEACON_REQ
+>
+> * During scans, there is a dedicated netlink channel event to listen to
+>   in order to get events like "a new coordinator was discovered" or "the
+>   scan is over". When beacons from new devices are received, the tool
+>   would print something like:
+>   PAN 0xabcd (on coord1)
+>         coordinator 0xe673d7a3f3a87ccc
+>         page 0
+>         channel 13
+>         preamble code 0
+>         mean prf 0
+>         superframe spec. 0x4f11
+>         LQI 0
+>
+> * It is also possible to monitor the events with:
+>   # iwpan event
+>
+> * As well as triggering a non blocking scan:
+>   # iwpan dev wpan1 scan trigger type passive duration 3
+>   # iwpan dev wpan1 scan done
+>   # iwpan dev wpan1 scan abort
 
-I have probably more to say about this patch series, but I need more
-days to look into it closely. So maybe we can first discuss here more
-about things I comment on and have questions about it.
-
-Thanks.
+why do we need an abort?
 
 - Alex
 
