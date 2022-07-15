@@ -2,61 +2,62 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A4D4C43334
-	for <linux-wpan@archiver.kernel.org>; Mon, 11 Jul 2022 02:07:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF60CC433EF
+	for <linux-wpan@archiver.kernel.org>; Fri, 15 Jul 2022 03:16:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229545AbiGKCHT (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Sun, 10 Jul 2022 22:07:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56390 "EHLO
+        id S229945AbiGODQu (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Thu, 14 Jul 2022 23:16:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40736 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229478AbiGKCHS (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Sun, 10 Jul 2022 22:07:18 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6BD2114084
-        for <linux-wpan@vger.kernel.org>; Sun, 10 Jul 2022 19:07:17 -0700 (PDT)
+        with ESMTP id S229809AbiGODQt (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 14 Jul 2022 23:16:49 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 74ECF76972
+        for <linux-wpan@vger.kernel.org>; Thu, 14 Jul 2022 20:16:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1657505236;
+        s=mimecast20190719; t=1657855006;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=meNn6SbpJh9fea8sNzE6pLer+JbMNyWdQAZ+kpRRRwo=;
-        b=HGJcfk8UnpPhWH0e85YRQYAPsQU8jMM3BddYZK59K30V6cXBYZZ3dn7Z0nTAPJ+IeSiSsr
-        ergFLjsEA+SrGxAghHV0euyM1B49c2umQ1kv7QF1nlYXWW/KBT1o9Sjj7cmHv4bjS5wRXj
-        J6NuhW8SnSzgvXlXD4/bQkxld2s2928=
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
- [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=BmtcGMfYg686hXvrQqOUlaN04B2am1yWRAo3lh34hGg=;
+        b=QB0iH7SPNUm3uaRi6YgPT+LK5mM1RpkkoUf9shex5a+a6+C8C5fx4wvuHEu37BhYAhbBk4
+        HP52dFgQz4Ko0izNSX/0yS265CCXopYk/llzQ3hKjLcYDTYQqTpPi2SNT9TgHhAyt54ZmC
+        GpbRNIjGRqp7MZG+cR6WmN43xhHEfB0=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-274-8jCkLNmeOFCCxjYJRWMpFg-1; Sun, 10 Jul 2022 22:07:09 -0400
-X-MC-Unique: 8jCkLNmeOFCCxjYJRWMpFg-1
-Received: by mail-qt1-f199.google.com with SMTP id d4-20020ac851c4000000b0031eb2c46a9bso1909792qtn.12
-        for <linux-wpan@vger.kernel.org>; Sun, 10 Jul 2022 19:07:09 -0700 (PDT)
+ us-mta-531-wEtXhK9yPx2rrZJmTsJ2Vg-1; Thu, 14 Jul 2022 23:16:45 -0400
+X-MC-Unique: wEtXhK9yPx2rrZJmTsJ2Vg-1
+Received: by mail-qv1-f71.google.com with SMTP id li2-20020a0562145e0200b0047350bbed70so2404786qvb.19
+        for <linux-wpan@vger.kernel.org>; Thu, 14 Jul 2022 20:16:45 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=meNn6SbpJh9fea8sNzE6pLer+JbMNyWdQAZ+kpRRRwo=;
-        b=T0yanWarmQEiOmXpn4QsJqFtH08zL1XObjWwBTzI94Y5W65cyi525HE1Dvmm1kd6uf
-         yoQ4dT1MQ2aujL+jjswpWJ0eGAKvp0wxTrj9AErTQ+0hBqLfPJrqa2n8h3fmnIFCPlU0
-         rLgIyLY4EXU/zXuPOHGqz6XyCQxL1vSvalb3o/tPhPatfIX9IDUaRf9n3XpHgYUWRulu
-         Q75gw+Kw2jn7YDZ3sI8YodnFI6twXzZW+lGTozbYJrZqEeJX3jFJGnJxi194lC80NPAX
-         6YaSZMP9A2ascQt3KakIeAJOwdrdoNgbU64Rs665fWQbgPYksPz1Lu0U4GbkAnRzZ4IA
-         c0xg==
-X-Gm-Message-State: AJIora+U+CYyPju65Db2F/Jvh3HVM2sd/BRPytcW0dY+w/trCimFfSJr
-        /0yZTDcTXfxDiNVHbAW8sAFxE+P1ogL9s8gatJo6k5rLpMb68G0vMiSQ6tKg3eP9ZGJo2oRuVbG
-        gz/872gawqKsVZgJmOeC6WXI1q7rhpspqORVyYg==
-X-Received: by 2002:a05:622a:4cb:b0:31e:a94d:f8aa with SMTP id q11-20020a05622a04cb00b0031ea94df8aamr9581156qtx.526.1657505228754;
-        Sun, 10 Jul 2022 19:07:08 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1swo0XjTp8Y/xb37YTwTbEFtbyj1jv27lOnGpdxWXFDq1UtDxu9MChS8YMYrOYFM6B2zx4h06J4QeTiLiXbyFE=
-X-Received: by 2002:a05:622a:4cb:b0:31e:a94d:f8aa with SMTP id
- q11-20020a05622a04cb00b0031ea94df8aamr9581152qtx.526.1657505228585; Sun, 10
- Jul 2022 19:07:08 -0700 (PDT)
+        bh=BmtcGMfYg686hXvrQqOUlaN04B2am1yWRAo3lh34hGg=;
+        b=V6fxa2EsRa1dOJVesIN219aRyT74Bb4T9kGw3upoFyruSNrpt5AR0m7uTCCRDYVyKA
+         SzYCanZKh70IjK8MNtrp/zeSn0/80oxtS/1Nya7CLmUdFQDMi9+z+x86+lTRRXw6nrFa
+         Y1I18sdYjhoSn+OaPajvZgD/nH39XuMx7kgvUdeVKqbBIlAzCC1dEcnZROhfGIcL4TLl
+         NYac+He8Txso3p3NjYaIdiQpdw7ohNqdtMbOCywx20sMmfRpUZhbjtMxRvmG/oLPsa0m
+         NomkNee4+7Bzprg4Y+njZti37NB+0VHXe1/V2+zfRwbPsxB6hUmbUhVJViFgBoaxdMCJ
+         JhVQ==
+X-Gm-Message-State: AJIora/OijPilAPaRqRSnok70s5Jj5KSHNUp1Ycv8b/UCFZRW2tqMejM
+        cxN8jR0FxByBPyWNKlQAYXGuHXvX1OfGp9m24flmLtkUd87rwbNkBBk2OFKG7Q3GYbQjUF2KWf5
+        TximUw3oWasLxIuTz8KiyI/3WhCh6jcfi2CrHrQ==
+X-Received: by 2002:ac8:5c12:0:b0:31e:9f86:1632 with SMTP id i18-20020ac85c12000000b0031e9f861632mr10533973qti.123.1657855005092;
+        Thu, 14 Jul 2022 20:16:45 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1usvWSZwU0LBvK4kfhxb45xCglRan9aFm84Ll3MKaEwQJs2VIX0cV84ZnYu2J83th6F1f9wzt7x+RIU9SfIcdY=
+X-Received: by 2002:ac8:5c12:0:b0:31e:9f86:1632 with SMTP id
+ i18-20020ac85c12000000b0031e9f861632mr10533966qti.123.1657855004896; Thu, 14
+ Jul 2022 20:16:44 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220701143052.1267509-1-miquel.raynal@bootlin.com> <20220701143052.1267509-6-miquel.raynal@bootlin.com>
-In-Reply-To: <20220701143052.1267509-6-miquel.raynal@bootlin.com>
+References: <20220701143052.1267509-1-miquel.raynal@bootlin.com> <20220701143052.1267509-18-miquel.raynal@bootlin.com>
+In-Reply-To: <20220701143052.1267509-18-miquel.raynal@bootlin.com>
 From:   Alexander Aring <aahringo@redhat.com>
-Date:   Sun, 10 Jul 2022 22:06:57 -0400
-Message-ID: <CAK-6q+gXUySx1YzPdq1+dt5MN5y_4qGWAB5a1qPe2tOGkbq19A@mail.gmail.com>
-Subject: Re: [PATCH wpan-next 05/20] net: ieee802154: Define frame types
+Date:   Thu, 14 Jul 2022 23:16:33 -0400
+Message-ID: <CAK-6q+ifj5DNrq31qjjyk3OoAsf0+LuBttM5o8Rs8Pt_TA_JMg@mail.gmail.com>
+Subject: Re: [PATCH wpan-next 17/20] net: ieee802154: Handle limited devices
+ with only datagram support
 To:     Miquel Raynal <miquel.raynal@bootlin.com>
 Cc:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
@@ -78,41 +79,70 @@ X-Mailing-List: linux-wpan@vger.kernel.org
 
 Hi,
 
-On Fri, Jul 1, 2022 at 10:36 AM Miquel Raynal <miquel.raynal@bootlin.com> wrote:
+On Fri, Jul 1, 2022 at 10:37 AM Miquel Raynal <miquel.raynal@bootlin.com> wrote:
 >
-> A 802.15.4 frame can be of different types, here is a definition
-> matching the specification. This enumeration will be soon be used when
-> adding scanning support.
+> Some devices, like HardMAC ones can be a bit limited in the way they
+> handle mac commands. In particular, they might just not support it at
+> all and instead only be able to transmit and receive regular data
+> packets. In this case, they cannot be used for any of the internal
+> management commands that we have introduced so far and must be flagged
+> accordingly.
 >
 > Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
 > ---
->  include/net/ieee802154_netdev.h | 11 +++++++++++
->  1 file changed, 11 insertions(+)
+>  include/net/cfg802154.h   | 3 +++
+>  net/ieee802154/nl802154.c | 6 ++++++
+>  2 files changed, 9 insertions(+)
 >
-> diff --git a/include/net/ieee802154_netdev.h b/include/net/ieee802154_netdev.h
-> index d0d188c3294b..13167851b1c3 100644
-> --- a/include/net/ieee802154_netdev.h
-> +++ b/include/net/ieee802154_netdev.h
-> @@ -69,6 +69,17 @@ struct ieee802154_hdr_fc {
->  #endif
+> diff --git a/include/net/cfg802154.h b/include/net/cfg802154.h
+> index d6ff60d900a9..20ac4df9dc7b 100644
+> --- a/include/net/cfg802154.h
+> +++ b/include/net/cfg802154.h
+> @@ -178,12 +178,15 @@ wpan_phy_cca_cmp(const struct wpan_phy_cca *a, const struct wpan_phy_cca *b)
+>   *     setting.
+>   * @WPAN_PHY_FLAG_STATE_QUEUE_STOPPED: Indicates that the transmit queue was
+>   *     temporarily stopped.
+> + * @WPAN_PHY_FLAG_DATAGRAMS_ONLY: Indicates that transceiver is only able to
+> + *     send/receive datagrams.
+>   */
+>  enum wpan_phy_flags {
+>         WPAN_PHY_FLAG_TXPOWER           = BIT(1),
+>         WPAN_PHY_FLAG_CCA_ED_LEVEL      = BIT(2),
+>         WPAN_PHY_FLAG_CCA_MODE          = BIT(3),
+>         WPAN_PHY_FLAG_STATE_QUEUE_STOPPED = BIT(4),
+> +       WPAN_PHY_FLAG_DATAGRAMS_ONLY    = BIT(5),
 >  };
 >
-> +enum ieee802154_frame_type {
-> +       IEEE802154_BEACON_FRAME,
-> +       IEEE802154_DATA_FRAME,
-> +       IEEE802154_ACKNOWLEDGEMENT_FRAME,
-> +       IEEE802154_MAC_COMMAND_FRAME,
-> +       IEEE802154_RESERVED_FRAME,
-> +       IEEE802154_MULTIPURPOSE_FRAME,
-> +       IEEE802154_FRAGMENT_FRAME,
-> +       IEEE802154_EXTENDED_FRAME,
-> +};
+>  struct wpan_phy {
+> diff --git a/net/ieee802154/nl802154.c b/net/ieee802154/nl802154.c
+> index 00b03c33e826..b31a0bd36b08 100644
+> --- a/net/ieee802154/nl802154.c
+> +++ b/net/ieee802154/nl802154.c
+> @@ -1404,6 +1404,9 @@ static int nl802154_trigger_scan(struct sk_buff *skb, struct genl_info *info)
+>         if (wpan_dev->iftype == NL802154_IFTYPE_MONITOR)
+>                 return -EPERM;
+>
+> +       if (wpan_phy->flags & WPAN_PHY_FLAG_DATAGRAMS_ONLY)
+> +               return -EOPNOTSUPP;
+> +
 
-Please use and extend include/linux/ieee802154.h e.g. IEEE802154_FC_TYPE_DATA.
-I am also not a fan of putting those structs on payload, because there
-can be several problems with it, we should introduce inline helpers to
-check/get each individual fields but... the struct is currently how
-it's implemented.
+for doing a scan it's also required to turn the transceiver into
+promiscuous mode, right?
+
+There is currently a flag if a driver supports promiscuous mode or
+not... I am not sure if all drivers have support for it. For me it
+looks like a mandatory feature but I am not sure if every driver
+supports it.
+We have a similar situation with acknowledge retransmit handling...
+some transceivers can't handle it and for normal dataframes we have a
+default behaviour that we don't set it. However sometimes it's
+required by the spec, then we can't do anything here.
+
+I think we should check on it but we should plan to drop this flag if
+promiscuous mode is supported or not. I also think that the
+promiscuous driver_ops should be removed and moved as a parameter for
+start() driver_ops to declare which "receive mode" should be
+enabled... but we can do that in due course.
 
 - Alex
 
