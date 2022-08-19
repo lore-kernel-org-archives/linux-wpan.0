@@ -2,35 +2,34 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12047C32773
-	for <linux-wpan@archiver.kernel.org>; Fri, 19 Aug 2022 17:47:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55244C28B2B
+	for <linux-wpan@archiver.kernel.org>; Fri, 19 Aug 2022 17:47:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354791AbiHSRrK (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Fri, 19 Aug 2022 13:47:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56724 "EHLO
+        id S1351300AbiHSRrf (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Fri, 19 Aug 2022 13:47:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50886 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350685AbiHSRqi (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Fri, 19 Aug 2022 13:46:38 -0400
-X-Greylist: delayed 149 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 19 Aug 2022 10:12:18 PDT
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45EF2107AC1;
-        Fri, 19 Aug 2022 10:12:18 -0700 (PDT)
+        with ESMTP id S1352034AbiHSRq4 (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 19 Aug 2022 13:46:56 -0400
+Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CBC0103C75;
+        Fri, 19 Aug 2022 10:13:04 -0700 (PDT)
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id 34B8860003;
-        Fri, 19 Aug 2022 17:12:14 +0000 (UTC)
+        by mail.gandi.net (Postfix) with ESMTPSA id 62DFE1C0004;
+        Fri, 19 Aug 2022 17:13:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1660929136;
+        t=1660929183;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=m3UMhrAoHpVgb/m5Er4vnR+gV0rJlsK78qtYXrGbcPg=;
-        b=gQc0BwP9l1T8AAVbqRDl8OqAxDW6tWpM2TAC1HJhz+zKz/Moil2PePHF6Hk3YWAcigu9ME
-        tJzgyT2OgcSbCAh7ilpAEtPCWO6VQWWKVqUcI0qJFmL/aySUGvA+Rff9gLNx0p6BSwYuz1
-        VmbWt9Y+/I5njZZ/D87f7LO5Hx5pRyHcQomYPxbZDNO/0lYyxS9gXG9DlTyUtXeJizWWb0
-        D05L/YKyBq7POgw9sDPLq7QHfWJtJrU+ZMj8GW0tlcevj/z+uFO5pVBFysByjNNgEqBVKb
-        RTNPL+xJhHfVX8SWB2b+Dbf8Yb1Lp9MG47FSxyFmkY5yKMOeRhpKQ+MBSnFWMg==
-Date:   Fri, 19 Aug 2022 19:12:12 +0200
+        bh=Mlity6Q4wht0162itMXjE3CAKh4WGGKaF+5FBqiJS2M=;
+        b=KhpYPvQH09vSxBIh5hBDnpHevqpIQZgcvUFuaGNB5IMKJnlAPCCjnSfKip5DyQiIsKtaPk
+        FXmAUT/PP+yHXkuGz6iq1BLg2BheMdn7FHo8ZK/A0UrWVPVB/9Tqes71HEXV/dZjmewoGp
+        gT/ZE8rGIxGUz5osuXCxXqelbBEgzz0hZ1s1otYHLypwBhztTaP3+DdY1zrc7TxXK29+Z9
+        aN7wNz4LLUinLeTWRlt8TQtbOHfmKjz9ZH/vs1tOAVqUTgpuUeHamk/rb9f28KMMwVv4mI
+        cNYLWcslwYWTpjiX290FfIs7frDF/JYyPCjk947xFnCrK6TrwBSbWCxVEKmjLA==
+Date:   Fri, 19 Aug 2022 19:13:00 +0200
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
 To:     Alexander Aring <aahringo@redhat.com>
 Cc:     Alexander Aring <alex.aring@gmail.com>,
@@ -46,13 +45,12 @@ Cc:     Alexander Aring <alex.aring@gmail.com>,
         Frederic Blain <frederic.blain@qorvo.com>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH wpan-next 20/20] ieee802154: hwsim: Allow devices to be
- coordinators
-Message-ID: <20220819191212.4503a6d9@xps-13>
-In-Reply-To: <CAK-6q+hS-6esVw7ebAsr8MoDDsEkorTLKVQupW1xoTZaawCHZA@mail.gmail.com>
+Subject: Re: [PATCH wpan-next 05/20] net: ieee802154: Define frame types
+Message-ID: <20220819191300.0e5e28f1@xps-13>
+In-Reply-To: <CAK-6q+gXUySx1YzPdq1+dt5MN5y_4qGWAB5a1qPe2tOGkbq19A@mail.gmail.com>
 References: <20220701143052.1267509-1-miquel.raynal@bootlin.com>
-        <20220701143052.1267509-21-miquel.raynal@bootlin.com>
-        <CAK-6q+hS-6esVw7ebAsr8MoDDsEkorTLKVQupW1xoTZaawCHZA@mail.gmail.com>
+        <20220701143052.1267509-6-miquel.raynal@bootlin.com>
+        <CAK-6q+gXUySx1YzPdq1+dt5MN5y_4qGWAB5a1qPe2tOGkbq19A@mail.gmail.com>
 Organization: Bootlin
 X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
@@ -64,56 +62,50 @@ X-Mailing-List: linux-wpan@vger.kernel.org
 
 Hi Alexander,
 
-aahringo@redhat.com wrote on Sun, 10 Jul 2022 22:01:43 -0400:
+aahringo@redhat.com wrote on Sun, 10 Jul 2022 22:06:57 -0400:
 
 > Hi,
 >=20
-> On Fri, Jul 1, 2022 at 10:37 AM Miquel Raynal <miquel.raynal@bootlin.com>=
+> On Fri, Jul 1, 2022 at 10:36 AM Miquel Raynal <miquel.raynal@bootlin.com>=
  wrote:
 > >
-> > In order to be able to create coordinator interfaces, we need the
-> > drivers to advertize that they support this type of interface. Fill in
-> > the right bit in the hwsim capabilities to allow the creation of these
-> > coordinator interfaces.
+> > A 802.15.4 frame can be of different types, here is a definition
+> > matching the specification. This enumeration will be soon be used when
+> > adding scanning support.
 > >
 > > Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
 > > ---
-> >  drivers/net/ieee802154/mac802154_hwsim.c | 2 ++
-> >  1 file changed, 2 insertions(+)
+> >  include/net/ieee802154_netdev.h | 11 +++++++++++
+> >  1 file changed, 11 insertions(+)
 > >
-> > diff --git a/drivers/net/ieee802154/mac802154_hwsim.c b/drivers/net/iee=
-e802154/mac802154_hwsim.c
-> > index a5b9fc2fb64c..a678ede07219 100644
-> > --- a/drivers/net/ieee802154/mac802154_hwsim.c
-> > +++ b/drivers/net/ieee802154/mac802154_hwsim.c
-> > @@ -776,6 +776,8 @@ static int hwsim_add_one(struct genl_info *info, st=
-ruct device *dev,
-> >         /* 950 MHz GFSK 802.15.4d-2009 */
-> >         hw->phy->supported.channels[6] |=3D 0x3ffc00;
+> > diff --git a/include/net/ieee802154_netdev.h b/include/net/ieee802154_n=
+etdev.h
+> > index d0d188c3294b..13167851b1c3 100644
+> > --- a/include/net/ieee802154_netdev.h
+> > +++ b/include/net/ieee802154_netdev.h
+> > @@ -69,6 +69,17 @@ struct ieee802154_hdr_fc {
+> >  #endif
+> >  };
 > >
-> > +       hw->phy->supported.iftypes |=3D BIT(NL802154_IFTYPE_COORD); =20
+> > +enum ieee802154_frame_type {
+> > +       IEEE802154_BEACON_FRAME,
+> > +       IEEE802154_DATA_FRAME,
+> > +       IEEE802154_ACKNOWLEDGEMENT_FRAME,
+> > +       IEEE802154_MAC_COMMAND_FRAME,
+> > +       IEEE802154_RESERVED_FRAME,
+> > +       IEEE802154_MULTIPURPOSE_FRAME,
+> > +       IEEE802154_FRAGMENT_FRAME,
+> > +       IEEE802154_EXTENDED_FRAME,
+> > +}; =20
 >=20
-> I think we can do that for more than one driver (except ca8210).
+> Please use and extend include/linux/ieee802154.h e.g. IEEE802154_FC_TYPE_=
+DATA.
+> I am also not a fan of putting those structs on payload, because there
+> can be several problems with it, we should introduce inline helpers to
+> check/get each individual fields but... the struct is currently how
+> it's implemented.
 
-Yes of course. I can update this patch and make the change to all the
-drivers except ca8210 indeed.
-
-> What about the other iftypes?
-
-The NODE type is set by default at initialization time:
-net/mac802154/main.c-120-       /* always supported */
-net/mac802154/main.c:121:       phy->supported.iftypes =3D BIT(NL802154_IFT=
-YPE_NODE);
-
-The MONITOR type is only set if the device supports the promiscuous
-mode:
-net/mac802154/main.c-255-       if (hw->flags & IEEE802154_HW_PROMISCUOUS)
-net/mac802154/main.c:256:               local->phy->supported.iftypes |=3D =
-BIT(NL802154_IFTYPE_MONITOR);
-
-Which indeed makes echo to one of your other review, saying that we
-should probably prevent the creation of MONITOR types if the device has
-no promiscuous support.
+Ok, I can easily do that.
 
 Thanks,
 Miqu=C3=A8l
