@@ -2,158 +2,200 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01846C25B06
-	for <linux-wpan@archiver.kernel.org>; Sun, 14 Aug 2022 14:14:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EA78C28B2B
+	for <linux-wpan@archiver.kernel.org>; Fri, 19 Aug 2022 17:45:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231268AbiHNOOq (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Sun, 14 Aug 2022 10:14:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36450 "EHLO
+        id S1351863AbiHSRpC (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Fri, 19 Aug 2022 13:45:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56378 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230483AbiHNOOp (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Sun, 14 Aug 2022 10:14:45 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8BE7B9FDB
-        for <linux-wpan@vger.kernel.org>; Sun, 14 Aug 2022 07:14:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1660486483;
+        with ESMTP id S1352104AbiHSRoi (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 19 Aug 2022 13:44:38 -0400
+Received: from relay10.mail.gandi.net (relay10.mail.gandi.net [217.70.178.230])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4A93DD750;
+        Fri, 19 Aug 2022 10:06:24 -0700 (PDT)
+Received: (Authenticated sender: miquel.raynal@bootlin.com)
+        by mail.gandi.net (Postfix) with ESMTPSA id 9DB30240006;
+        Fri, 19 Aug 2022 17:06:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+        t=1660928783;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=JLz/nkWkuOhJogoO/pArSt/pc8MAMXUnTi0JWcjLAlE=;
-        b=f9llHaPnMVNILZBgeA15F7x0ci64VnB0dais0UML1xgkQmj/13kUWcOuG/DLKF4oMeixC/
-        ky0MZ4sR/J0hrmWi5axHqxM4SFHge0aycKAw4jF7eDghEqElMj+s6vHDuG9dRnt1m2l06D
-        MtWfjEIlLk+p0cDZ+xw2vH1kZaUbDn8=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-531-14cvQHU_MEeauEKi1ntqQg-1; Sun, 14 Aug 2022 10:14:42 -0400
-X-MC-Unique: 14cvQHU_MEeauEKi1ntqQg-1
-Received: by mail-qk1-f197.google.com with SMTP id bp31-20020a05620a459f00b006baf9b65239so2862610qkb.12
-        for <linux-wpan@vger.kernel.org>; Sun, 14 Aug 2022 07:14:42 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc;
-        bh=JLz/nkWkuOhJogoO/pArSt/pc8MAMXUnTi0JWcjLAlE=;
-        b=Gf5Q2V6ZapWA6mx24yVuLUndu/ald6dem/1HIBJcijD3c7nDNLEFhmFGmk0RmDJ0t1
-         uLHpl1FThTU7k9dtnG5IY68/LQky8T9TM9iXod1kNSBwE+EuPmCxM2nIYvSlT1ZsQNI7
-         bohiCOHYgiCjHH2wjbeMEPdRVWnUkdgyoqhH4e5LvoxE2/kGrFDSqx+X0SKtiViPGJW9
-         WdJFXOsJfbVel3ckfYFj5dcMl7RcUrsp8o1mNdr5Esa9tUMVRQCekkaeHkcfwlfw6D2r
-         on9L2GechOzf6oY0oUvlPkozZ0bL0r2H4pubnJWgnR9wQqfhHmKOHk/HJnYrWiehtTMt
-         zJEA==
-X-Gm-Message-State: ACgBeo0iPnv/PGTRGVvvfRk+FfT24x0RJSXXLKl4mAKZGN66HdmBFjug
-        x0aG5p4UN5sZ2+6tq5UqDo1SiNoUc+G+BgbBIPWj6PJ0iWVl1gfusFZrN7MVX28Xw9kgTtg6b3K
-        qzz8Z4D4gnj3FYzOUwdOcLTiSv4RLd5NqII2DEQ==
-X-Received: by 2002:a05:622a:4cd:b0:343:65a4:e212 with SMTP id q13-20020a05622a04cd00b0034365a4e212mr10506024qtx.526.1660486481851;
-        Sun, 14 Aug 2022 07:14:41 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR5du35rQz9qs9g1n7nJMCVW9riJK9azlzbwtkicC2TL+kP73rs++J7+K+9j1Ne6HJ9siqIA2kDGIObKYxbew1g=
-X-Received: by 2002:a05:622a:4cd:b0:343:65a4:e212 with SMTP id
- q13-20020a05622a04cd00b0034365a4e212mr10506009qtx.526.1660486481583; Sun, 14
- Aug 2022 07:14:41 -0700 (PDT)
+        bh=8DZD3ncRKnZVvWUH0347hs4gx0Oa3fVlo3O2awQSE4Y=;
+        b=WO8iuOwq70/8iKGVgiTfxlY4mPQLGPHkhwoqvvmFwDMVD0HSLpxm5vzfLaGo6wqNY9MnRQ
+        RFAY6xBxs9ApzmuwlDgJFnV2YDXY8RvS9hanu/9huMSb1C3H8VsGLbvChVNxxY/oSjERsa
+        dfp2Q06eU4dTk0BOEIBe/figDp88er3sUcuqs5VW6/O+N5zQRVpOvZOPs+TYQhHECOZDfz
+        +mhckgx29fNeWbox512flMAOYjrzOXRDK34RVV2mJ/FS4YllFP+5/MyEj3CUJAxJQBm5SP
+        KAo509aUoSeVjRbgT/gEbtQyTouDz5gC6sJKXFd0YIvZvWzZYB9fqvlNByJRiw==
+Date:   Fri, 19 Aug 2022 19:06:18 +0200
+From:   Miquel Raynal <miquel.raynal@bootlin.com>
+To:     Alexander Aring <aahringo@redhat.com>
+Cc:     Alexander Aring <alex.aring@gmail.com>,
+        Stefan Schmidt <stefan@datenfreihafen.org>,
+        linux-wpan - ML <linux-wpan@vger.kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Eric Dumazet <edumazet@google.com>,
+        Network Development <netdev@vger.kernel.org>,
+        David Girault <david.girault@qorvo.com>,
+        Romuald Despres <romuald.despres@qorvo.com>,
+        Frederic Blain <frederic.blain@qorvo.com>,
+        Nicolas Schodet <nico@ni.fr.eu.org>,
+        Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH wpan-next 09/20] net: mac802154: Introduce a global
+ device lock
+Message-ID: <20220819190618.4647849f@xps-13>
+In-Reply-To: <CAK-6q+hu4YGfU9V5EkRiT+Z8MJhOEeVsVv=vEz5fHPkDL99=TQ@mail.gmail.com>
+References: <20220701143052.1267509-1-miquel.raynal@bootlin.com>
+        <20220701143052.1267509-10-miquel.raynal@bootlin.com>
+        <CAK-6q+hu4YGfU9V5EkRiT+Z8MJhOEeVsVv=vEz5fHPkDL99=TQ@mail.gmail.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-References: <3a3904c4-1bf9-ef1b-3d03-b5c3e1e2f8c5@desertmonitor.com>
- <CAK-6q+gBUHaR5njKHJJnONW41duVafMA-6R8jKMtN=7M1mg6rA@mail.gmail.com>
- <f1dcf16f-938c-0768-4c88-754a0ea7c2d0@desertmonitor.com> <CAK-6q+hfJ=oUHx0t7ueaNxg8NVsQZ2oJZ9wzj1PoP1fhHwpMrg@mail.gmail.com>
- <1d51db1a-746c-db67-99ec-cfe5c5a43616@desertmonitor.com>
-In-Reply-To: <1d51db1a-746c-db67-99ec-cfe5c5a43616@desertmonitor.com>
-From:   Alexander Aring <aahringo@redhat.com>
-Date:   Sun, 14 Aug 2022 10:14:30 -0400
-Message-ID: <CAK-6q+iM-UCL_CCgpVOMB3UqYf+1BJQLrP4+1cxwNoCyJuE9dg@mail.gmail.com>
-Subject: Re: 6LoWPAN (IPv6 over BLE) neighbor discovery
-To:     Philipp Blum <philipp-blum@desertmonitor.com>
-Cc:     linux-wpan - ML <linux-wpan@vger.kernel.org>,
-        linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi,
+Hi Alexander,
 
-On Wed, Aug 10, 2022 at 7:12 PM Philipp Blum
-<philipp-blum@desertmonitor.com> wrote:
->
+I hope you've had a wonderful summer :-)
+
+aahringo@redhat.com wrote on Sun, 3 Jul 2022 21:12:43 -0400:
+
 > Hi,
->
-> sorry, just realized I used the info@ email ^^
->
->  > What kind of workarounds? I am curious...
->
-> The radvd workaround to distribute a PD.
-> Ideally I would like it to be as plug & and play as possible.
-> Connecting the sensors to my router and passing down the PD
-> automatically. At the end of the day, not everyone is a dev.
->
+>=20
+> On Fri, Jul 1, 2022 at 10:36 AM Miquel Raynal <miquel.raynal@bootlin.com>=
+ wrote:
+> >
+> > The purpose of this device lock is to prevent the removal of the device
+> > while an asynchronous MLME operation happens. The RTNL works well for
+> > that but in a later series having the RTNL taken here will be
+> > problematic and will cause lockdep to warn us about a circular
+> > dependency. We don't really need the RTNL here, just a serialization
+> > over this operation.
+> >
+> > Replace the RTNL calls with this new lock. =20
+>=20
+> I am unhappy about this solution. Can we not interrupt the ongoing
+> operation "scan" here and come to an end at a stop?
+>=20
+> The RTNL is NOT only to prevent the removal of something... If mostly
+> all operations are protected by and I know one which makes trouble
+> here... setting page/channel. I know we don't hold the rtnl lock on
+> other transmit functionality for phy settings which has other reasons
+> why we allow it... but here we offer a mac operation which delivers
+> wrong results if somebody does another setting e.g. set page/channel
+> while scan is going on and we should prevent this.
+>=20
+> Dropping the rtnl lock, yes we can do that... I cannot think about all
+> the side effects which this change will bring into, one I know is the
+> channel setting, mostly everything that is interfering with a scan and
+> then ugly things which we don't want... preparing the code for the
+> page/channel gives us a direction on how to fix and check the other
+> cases if we find them. btw: we should do this on another approach
+> anyway because the rtnl lock is not held during a whole operation and
+> we don't want that.
+>=20
+> We should also take care that we hold some references which we held
+> during the scan, even if it's protected by stop (just for
+> correctness).
 
-Setting up a router is considered to be at least an "administrator"
-level. You need to at least provide a prefix. The RA message is from
-the Linux kernel networking branch considered as a user space message
-(on the transmit side, the receive side it's different), I doubt that
-this will ever be changed. At the end the user needs to configure
-something in any case.
+I was also a bit unhappy by this solution but the rtnl is a real mess
+when playing with background works. At least I was not able at all to
+make it fit. I'm gonna try to summarize the situation to argue in favor
+of the current solution, but I am really open if you see another way.
 
->  > Okay, if you like you could also try [0] on bluetooth networks... I
->  > never did it on bluetooth. Although I think it does not make any sense
->  > because it makes only sense on a mesh network and so far I understand
->  > this is the difference between bluetooth 4.x vs 5.x/upwards and
->  > currently there is no mesh bluetooth 6lowpan support here (but mesh
->  > bluetooth on link-layer is there). It's a star topology. I guess what
->  > you could try out is ndisc-proxy setup which is mostly the same but no
->  > routing involved and they share the same prefix.
->
-> Btw, I am on Bluetooth 4.2. I had a hard time to even find non audio
-> only Bluetooth 5.x USB sticks. Yes, it's only star topology so far. Even
-> though, from my understanding, you could theoretically run a RPL network
-> behind it.
-> There are more powerful MCUs that would be able to act as a RPL root.
-> Even though it probably would be better to use the linux border router
-> as root. Puts less pressure on the sensor nodes.
-> I am not familiar with ndisc-proxy. If you could point me to some
-> resources, that would be very helpful. Going to take a look into it.
-> Sharing the same prefix would be fine for now, since I only run it in a
-> star topology anyway.
+A scan is started by the user, through a netlink command. It basically
+involves stopping any other activity on the transceiver, setting a
+particular filtering mode, and possibly sending beacons through the MLME
+Tx API at a regular interval.
 
-It's also known as arp proxy on IPv4. Just google it, but for IPv6 you
-need to have a daemon in the background to make it automatically
-configured. Although I recommend at first to try it with a manual
-setup by using iproute2.
+A scan command from the user then involves acquiring the rtnl just to
+be sure that nothing else is requested in parallel. The rtnl is taken
+and released by the netlink core, just for the time of the
+configuring/triggering action.
 
-> RPL should be, from my understanding, also work on BLE. RIOT allows
-> three concurrent connections for BLE, as I remember.
->
+We absolutely do not want to keep the rtnl here, I believe we are
+aligned on that. This means we need to protect ourselves against a
+number of user actions:
+1- dropping the device (without stopping the background job/cleaning
+   everything),
+2- transmitting packets
+3- changing internal parameters such as the page/channel to avoid
+   messing with the ongoing scan.
 
-Sure it works on BLE, but here you have a star topology where RPL
-makes really no sense. It is just one parent with leaf-nodes and radvd
-will do the same for you. From my point Bluetooth mesh topology is
-supported by the kernel right now as link-layer but there is no
-6LoWPAN adaptation (speaking on Linux kernel level, IETF has standards
-for it) to run 6LoWPAN on BLE mesh topology. What we currently support
-is the star topology one which is how Bluetooth works for decades.
-Only on a mesh RPL becomes interesting.
+The current implementation does the following:
+1- in the ieee802154 layer we call dev_hold/dev_put to prevent device
+   removal,
+2- in the soft mac layer we stop the queue,
+3- in the soft mac layer we refuse any channel change command coming
+   from the netlink layer during scans, because this is not a nl
+   constraint, but a mac state constraint, so I think it is safe to
+   handle that from the soft mac layer rather than at the nl level.
 
-> I don't really understand why rpld only works in a mesh network.
-> When it runs on 6LoWPAN, it should also run on BLE, or am I missing
-> something?
->
+This is how I planned to handle the refcount and channel change issues.
 
-I did not say that it does not work, I said it makes no sense to run
-it on a link-layer star topology. If it's a mesh it looks different.
+Now, let me try to argue in favor of this commit.
 
-Another thing to test would be a 6CO option [0] which will allow
-6lowpan to compress non link-layer prefixes. It makes sense to add one
-like your prefix destination option in RA. For the arp/ndisc solution
-you could simply reach all neighbors by its link-local address. To be
-more clear, the arp/ndisc proxy needs to be configured on the device
-which was before your "router", then magically all neighbors behind it
-can be reachable by its link-local... if you want to access it behind
-your local area network, then you indeed need a global prefix and
-routing/gateway/etc..
+The problem I faced was a circular dependency on the device sending
+beacons or beacons requests, ie. sending MLME frames in the background.
+For the record, in both cases, I need to put some parameters in one of
+the main soft mac structures. I created local->scan_lock and
+local->beacon_lock to protect accesses to the scanning and beaconing
+structures respectively (we don't want eg. the struct to be freed while
+a job is using it).
 
-Note that [0] never came upstream (except one patch) because the UAPI
-in Linux kernel is not stable, I am working on it right now and my
-progress is at about 25% to make the UAPI stable. :)
+Let's take the situation of the device sending beacons in the
+background.
 
-- Alex
+For starting to send beacons, the user sends a netlink command. In the
+kernel first layers, the rtnl is acquired (almost) automatically, then
+the callback function in the soft mac does the job. One of the first
+operations is to acquire the beacons_lock.
 
-[0] https://github.com/linux-wpan/radvd/commit/562e1b3264ac1f352dcc3521f6256d16057775ba
+Lockdep detects that during the background operation, the kworker will
+first acquire beacons_lock (it encloses the whole operation) and after
+acquiring this first lock it will perform an MLME Tx to send the
+beacon. But this, unfortunately, acquires the rtnl, which triggers the
+following warning:
 
+[ 1445.105706]  Possible unsafe locking scenario:
+//               -> background job            -> nl802154_send_beacons()  =
+=20
+[ 1445.105707]        CPU0                    CPU1
+[ 1445.105708]        ----                    ----
+[ 1445.105709]   lock(&local->beacon_lock);
+[ 1445.105710]                                lock(rtnl_mutex);
+[ 1445.105712]                                lock(&local->beacon_lock);
+[ 1445.105713]   lock(rtnl_mutex);
+
+Exactly the same happens in the scanning path during active scans:
+
+[   52.518741]  Possible unsafe locking scenario:
+//               -> background job            -> nl802154_trigger_scan()
+[   52.518742]        CPU0                    CPU1
+[   52.518743]        ----                    ----
+[   52.518744]   lock(&local->scan_lock);
+[   52.518746]                                lock(rtnl_mutex);
+[   52.518748]                                lock(&local->scan_lock);
+[   52.518750]   lock(rtnl_mutex);
+
+In practice I doubt these situations can really happen because there is
+no background job running if the triggering netlink command was not
+yet called, but anyway, I feel too weak against locking scenarios
+to disobey such a clear lockdep warning :-)
+
+So, from my understanding it was safe not to acquire the rtnl in the
+MLME Tx path, as long as the calls were serialized (with another
+mutex). You seem not to agree with it, which I completely understand,
+but then how do I handle those circular dependencies?
+
+Do you think like me they are false positives?
+
+Thanks,
+Miqu=C3=A8l
