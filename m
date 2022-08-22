@@ -2,164 +2,99 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C190C32771
-	for <linux-wpan@archiver.kernel.org>; Fri, 19 Aug 2022 17:50:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30607C28D13
+	for <linux-wpan@archiver.kernel.org>; Mon, 22 Aug 2022 07:19:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351163AbiHSRu5 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Fri, 19 Aug 2022 13:50:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60272 "EHLO
+        id S231474AbiHVHTU (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 22 Aug 2022 03:19:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41120 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354883AbiHSRuV (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Fri, 19 Aug 2022 13:50:21 -0400
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EF43B4BD;
-        Fri, 19 Aug 2022 10:22:35 -0700 (PDT)
-Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id 34C081C0005;
-        Fri, 19 Aug 2022 17:22:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1660929751;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=YVuJLmtyvjBQfTz3ldnNOD8hJj8risCWE8ENHcXRIGI=;
-        b=BRJXjvr7YYosg25XKsquAzb5Q/WlKD6rxcvZSAKxMRSlix00GWy8H+iTSNc6Bg3by/FsFf
-        C3nZEgsnr2wyLJv+GkSgwjy0I99EkRXR79W5rieL54wkvwASVnHeMGzcY354mwG8iDD72C
-        S+LcMb0f8yTEVVHPq1H0ua2gD9s+e94wU3iz3Xo9IHj+iuTDj7unv1m92HJVG7oIPGKSVI
-        y9JMiwlc7mOakRqAtNM1aMgW6a9TYu2ktcmDvzX6c4hwfW+OpWhw+GSOimTT+kDM5pyHwk
-        h7Fu0IXf9Me2M5Ev61OoRSLVMv0t7qs4/z9BEzWc0WpUDT9ty74tHWZlIJiTkQ==
-Date:   Fri, 19 Aug 2022 19:22:28 +0200
-From:   Miquel Raynal <miquel.raynal@bootlin.com>
-To:     Alexander Aring <aahringo@redhat.com>
-Cc:     Alexander Aring <alex.aring@gmail.com>,
-        Stefan Schmidt <stefan@datenfreihafen.org>,
-        linux-wpan - ML <linux-wpan@vger.kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Eric Dumazet <edumazet@google.com>,
-        Network Development <netdev@vger.kernel.org>,
-        David Girault <david.girault@qorvo.com>,
-        Romuald Despres <romuald.despres@qorvo.com>,
-        Frederic Blain <frederic.blain@qorvo.com>,
-        Nicolas Schodet <nico@ni.fr.eu.org>,
-        Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH wpan-next 10/20] net: mac802154: Handle passive scanning
-Message-ID: <20220819192228.7c76e86c@xps-13>
-In-Reply-To: <CAK-6q+g5Co049ZED0fKkeh_k9mdRvm_wrgi4ostDBvN71UWcrA@mail.gmail.com>
-References: <20220701143052.1267509-1-miquel.raynal@bootlin.com>
-        <20220701143052.1267509-11-miquel.raynal@bootlin.com>
-        <CAK-6q+giwXeOue4x_mZK+qyG9FNLYpK6T5_L1HjaR6zz2LrW-A@mail.gmail.com>
-        <CAK-6q+g5Co049ZED0fKkeh_k9mdRvm_wrgi4ostDBvN71UWcrA@mail.gmail.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+        with ESMTP id S230090AbiHVHTT (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 22 Aug 2022 03:19:19 -0400
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B97C813CDA;
+        Mon, 22 Aug 2022 00:19:18 -0700 (PDT)
+Received: by mail-pj1-x102e.google.com with SMTP id o5-20020a17090a3d4500b001ef76490983so10356496pjf.2;
+        Mon, 22 Aug 2022 00:19:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc;
+        bh=03jo1+f8X3EXXKFUBIJeAZG4V9px5mryHYSkj2Zd4n8=;
+        b=pA1jdg+xuB/MBjFO+tnrbUfRwIwk8NjKBvPbX+U4uSnJRafMOMjI1atzqhTXmwpcqU
+         uqI1cx1w0+la3/N0efzt/xCZPOEr8jcmHKGPbu4eyJY5L8quVq0kMXd2U5jJihWlHLMQ
+         t/H2lBPFheBrxEMtX9M/6OZAv9EPCyuL/BS0pTQWMeRDb9JI3dTBNI0ZCkdR+sqRAUfl
+         /uR8B/OYtM/yOYbX2ysxkNFmvWqRCURrVsnMtZn4HMoHnmio0uF20f4cxu/6222nHcvV
+         oACmN3WweoN00q1OnZ2LXwlHAYxdWhBYcgLFynvR0Dby2+514Y3l8dg63zyQvGRWaeow
+         KF7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc;
+        bh=03jo1+f8X3EXXKFUBIJeAZG4V9px5mryHYSkj2Zd4n8=;
+        b=m0+KLSXhLZrKNKjigQ5dRRDsbuXPlsqAlM/zBq8u3DX5rCDLPWajxCiBjT/0HG8YH4
+         yYhKQvD1wApaianq8TAuG+i1mJDoaDQs+TM11T0H0KkqQU6/rwDNW3MLta8T0ADrgJUo
+         +Cc9M46slLpgQ3juPdTPvjywVR8hz3dnvsDrDPBjK39Cne9GL+reNCNI++z1+mkcHL06
+         2IiDTd62RJeitDGzRK5Pirizz18XBd0nXaqXir+6uc0zbqs/kp/PTMcKSnxX8jqHqa+E
+         58H5TPo2OfhjMrHCkR165ZHCP9aDDuZC5O8xPrhg7gz1zGonhCtsptSFPriOBhowWt+X
+         uWhQ==
+X-Gm-Message-State: ACgBeo0LAK2udfrB1PgJsRgqcClWsCt0IVXyCV7JPL4OERvIt5g52tkb
+        HBQSrvyME9v0BgRJ8rtF/Iw=
+X-Google-Smtp-Source: AA6agR5WnXDUV5MQwujJjQN1TuZSCgnkZwKzqgjYDKUr/W2Bcn0Lx5PJjWBL1OVFtGd288lgYqyGbg==
+X-Received: by 2002:a17:903:1d1:b0:172:e12b:71b2 with SMTP id e17-20020a17090301d100b00172e12b71b2mr6141394plh.60.1661152758257;
+        Mon, 22 Aug 2022 00:19:18 -0700 (PDT)
+Received: from localhost.localdomain ([43.132.141.8])
+        by smtp.gmail.com with ESMTPSA id d7-20020a17090ad3c700b001f3095af6a9sm7330394pjw.38.2022.08.22.00.19.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Aug 2022 00:19:17 -0700 (PDT)
+From:   Haimin Zhang <tcs.kernel@gmail.com>
+X-Google-Original-From: Haimin Zhang <tcs_kernel@tencent.com>
+To:     alex.aring@gmail.com, stefan@datenfreihafen.org,
+        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com, linux-wpan@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Haimin Zhang <tcs_kernel@tencent.com>
+Subject: [PATCH] net/ieee802154: fix uninit value bug in dgram_sendmsg
+Date:   Mon, 22 Aug 2022 15:19:02 +0800
+Message-Id: <20220822071902.3419042-1-tcs_kernel@tencent.com>
+X-Mailer: git-send-email 2.27.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi Alexander,
+There is uninit value bug in dgram_sendmsg function in
+net/ieee802154/socket.c when the length of valid data pointed by the
+msg->msg_name isn't verified.
 
-aahringo@redhat.com wrote on Thu, 14 Jul 2022 23:42:08 -0400:
+This length is specified by msg->msg_namelen. Function
+ieee802154_addr_from_sa is called by dgram_sendmsg, which use
+msg->msg_name as struct sockaddr_ieee802154* and read it, that will
+eventually lead to uninit value read. So we should check the length of
+msg->msg_name is not less than sizeof(struct sockaddr_ieee802154)
+before entering the ieee802154_addr_from_sa.
 
-> Hi,
->=20
-> On Thu, Jul 14, 2022 at 11:33 PM Alexander Aring <aahringo@redhat.com> wr=
-ote:
-> >
-> > Hi,
-> >
-> > On Fri, Jul 1, 2022 at 10:36 AM Miquel Raynal <miquel.raynal@bootlin.co=
-m> wrote: =20
-> > >
-> > > Implement the core hooks in order to provide the softMAC layer support
-> > > for passive scans. Scans are requested by the user and can be aborted.
-> > >
-> > > Changing the channels is prohibited during the scan.
-> > >
-> > > As transceivers enter promiscuous mode during scans, they might stop
-> > > checking frame validity so we ensure this gets done at mac level.
-> > >
-> > > The implementation uses a workqueue triggered at a certain interval
-> > > depending on the symbol duration for the current channel and the
-> > > duration order provided.
-> > >
-> > > Received beacons during a passive scan are processed also in a work
-> > > queue and forwarded to the upper layer.
-> > >
-> > > Active scanning is not supported yet.
-> > >
-> > > Co-developed-by: David Girault <david.girault@qorvo.com>
-> > > Signed-off-by: David Girault <david.girault@qorvo.com>
-> > > Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
-> > > ---
-> > >  include/linux/ieee802154.h   |   4 +
-> > >  include/net/cfg802154.h      |  12 ++
-> > >  net/mac802154/Makefile       |   2 +-
-> > >  net/mac802154/cfg.c          |  39 ++++++
-> > >  net/mac802154/ieee802154_i.h |  29 ++++
-> > >  net/mac802154/iface.c        |   6 +
-> > >  net/mac802154/main.c         |   4 +
-> > >  net/mac802154/rx.c           |  49 ++++++-
-> > >  net/mac802154/scan.c         | 264 +++++++++++++++++++++++++++++++++=
-++
-> > >  9 files changed, 405 insertions(+), 4 deletions(-)
-> > >  create mode 100644 net/mac802154/scan.c
-> > >
+Signed-off-by: Haimin Zhang <tcs_kernel@tencent.com>
+---
+ net/ieee802154/socket.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-[...]
+diff --git a/net/ieee802154/socket.c b/net/ieee802154/socket.c
+index 718fb77bb..efbe08590 100644
+--- a/net/ieee802154/socket.c
++++ b/net/ieee802154/socket.c
+@@ -655,6 +655,10 @@ static int dgram_sendmsg(struct sock *sk, struct msghdr *msg, size_t size)
+ 	if (msg->msg_name) {
+ 		DECLARE_SOCKADDR(struct sockaddr_ieee802154*,
+ 				 daddr, msg->msg_name);
++		if (msg->msg_namelen < sizeof(*daddr)) {
++			err = -EINVAL;
++			goto out_skb;
++		}
+ 
+ 		ieee802154_addr_from_sa(&dst_addr, &daddr->addr);
+ 	} else {
+-- 
+2.27.0
 
-> > > +int mac802154_trigger_scan_locked(struct
-ieee802154_sub_if_data *sdata,
-> > > +                                 struct cfg802154_scan_request *requ=
-est)
-> > > +{
-> > > +       struct ieee802154_local *local =3D sdata->local;
-> > > +       int ret;
-> > > +
-> > > +       lockdep_assert_held(&local->scan_lock);
-> > > +
-> > > +       if (mac802154_is_scanning(local))
-> > > +               return -EBUSY;
-> > > +
-> > > +       /* TODO: support other scanning type */
-> > > +       if (request->type !=3D NL802154_SCAN_PASSIVE)
-> > > +               return -EOPNOTSUPP;
-> > > +
-> > > +       /* Store scanning parameters */
-> > > +       rcu_assign_pointer(local->scan_req, request);
-> > > +
-> > > +       /* Software scanning requires to set promiscuous mode, so we =
-need to
-> > > +        * pause the Tx queue during the entire operation.
-> > > +        */
-> > > +       ieee802154_mlme_op_pre(local);
-> > > +
-> > > +       ret =3D mac802154_set_promiscuous_mode(local, true);
-> > > +       if (ret)
-> > > +               goto cancel_mlme; =20
-> >
-> > I know some driver datasheets and as I said before, it's not allowed
-> > to set promiscuous mode while in receive mode. We need to stop tx,
-> > what we are doing. Then call stop() driver callback,
-> > synchronize_net(), mac802154_set_promiscuous_mode(...), start(). The
-> > same always for the opposite. =20
->
-> s/always/as well/
-
-Mmmh. I didn't know. I will look into it.
-
-> I need to say, it needs to be something like that... we need to be
-> careful here e.g. lots of monitor interfaces on one phy which has
-> currently a serious use case for hwsim.
->=20
-> We also don't need to do anything above if we already are in
-> promiscuous mode, which might be worth checking.
-
-True!
-
-Thanks,
-Miqu=C3=A8l
