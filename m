@@ -2,65 +2,36 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9DF0C32789
-	for <linux-wpan@archiver.kernel.org>; Tue, 23 Aug 2022 16:23:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EEB7C32789
+	for <linux-wpan@archiver.kernel.org>; Tue, 23 Aug 2022 18:15:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243792AbiHWQXQ (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 23 Aug 2022 12:23:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38860 "EHLO
+        id S232464AbiHWSPu (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 23 Aug 2022 14:15:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39946 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244714AbiHWQWn (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 23 Aug 2022 12:22:43 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1EC990815
-        for <linux-wpan@vger.kernel.org>; Tue, 23 Aug 2022 05:44:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1661258650;
+        with ESMTP id S233941AbiHWSPb (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 23 Aug 2022 14:15:31 -0400
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60C7EA1A2;
+        Tue, 23 Aug 2022 09:29:56 -0700 (PDT)
+Received: (Authenticated sender: miquel.raynal@bootlin.com)
+        by mail.gandi.net (Postfix) with ESMTPSA id 2E08924000D;
+        Tue, 23 Aug 2022 16:29:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+        t=1661272194;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=N1QR7/fEkSEGvtR9cdL+cMtMgSlf4RLGbFttX75oGMA=;
-        b=hgIltdZnr9HWCnOOdDiqiSfkTvzyx2R5Lkdz4eSwBNWUtVXSVaqLj8u4GypJ1itSDg6e+x
-        3IDRj1UfksM/dsdfmDrdXs2ntzIsswT5UduhOipKXh9x7o0MFU76PHrPohsG78yiYdI2O2
-        BnVJL85fKUocpZC2xGvl2lYEFFT2jVQ=
-Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
- [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-397-fd0RDKdoNS6WAvwCIIJmIg-1; Tue, 23 Aug 2022 08:44:09 -0400
-X-MC-Unique: fd0RDKdoNS6WAvwCIIJmIg-1
-Received: by mail-qv1-f72.google.com with SMTP id cv17-20020ad44d91000000b00496b9fdf13bso7279797qvb.22
-        for <linux-wpan@vger.kernel.org>; Tue, 23 Aug 2022 05:44:09 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc;
-        bh=N1QR7/fEkSEGvtR9cdL+cMtMgSlf4RLGbFttX75oGMA=;
-        b=EAdL9Y+SeB7SnpFj9Ci8LGTblmp+4Hmhf8FB0GkWmkABfNcxEjRMiQVxD6TkBumIF2
-         4z5QXd+sySrdHxd0NSDxBJiqHscRnRoAUMBSbAnDGNoSc4fY5ZwivTbAoNgt8LrQMkvZ
-         n/I14kx1ZF/SAxqTdLtU5MqIeqlP8P/+0wl6aXPVl7pFz0NNXFzQ9xydqTlTE1DJP1vt
-         XrJSRZ8XoXrjte50HFi1VEl4aWZTunhom68mnbvpofmz0jlkqreiYEfBxiGY01YoZ14U
-         KlWhi4Ll4F5/UMFBk1vnsUS9ia7hduNcSeMpZuAOiX7bHtPIKzzxyaXMcm3uO67/VBzG
-         PJ3g==
-X-Gm-Message-State: ACgBeo2emX+/QqQIx5EkptpLzmbCO/9J8bWiB4K/EC83zX3IPbcOAqrA
-        wh1e4W6O86HWnwzGQj/fxquttN7IYi95L9hWEVlAbhoFH6tPr+IqHuI31vDNrC+d8s/CsLXh4ta
-        s5N4yKL/Qd5JtaW/HFdXEsNEqJ8KAlu6SCD8smw==
-X-Received: by 2002:a37:b741:0:b0:6b9:3b67:d0a7 with SMTP id h62-20020a37b741000000b006b93b67d0a7mr15353201qkf.770.1661258649009;
-        Tue, 23 Aug 2022 05:44:09 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR6KweMoriQTnzj4bnDSdUC0ausC1ixTLBAZJs1rzMT28/lX0LmWpmYCqZFNCfTj7g42M1xViFj9SYYbBbJHl68=
-X-Received: by 2002:a37:b741:0:b0:6b9:3b67:d0a7 with SMTP id
- h62-20020a37b741000000b006b93b67d0a7mr15353188qkf.770.1661258648785; Tue, 23
- Aug 2022 05:44:08 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220701143052.1267509-1-miquel.raynal@bootlin.com>
- <20220701143052.1267509-18-miquel.raynal@bootlin.com> <CAK-6q+ifj5DNrq31qjjyk3OoAsf0+LuBttM5o8Rs8Pt_TA_JMg@mail.gmail.com>
- <20220819191315.387ba71b@xps-13>
-In-Reply-To: <20220819191315.387ba71b@xps-13>
-From:   Alexander Aring <aahringo@redhat.com>
-Date:   Tue, 23 Aug 2022 08:43:58 -0400
-Message-ID: <CAK-6q+inCxP_wCWw8VCHXCETB7QqPYRw5L3c+gF4CSTKYO9Mjg@mail.gmail.com>
-Subject: Re: [PATCH wpan-next 17/20] net: ieee802154: Handle limited devices
- with only datagram support
-To:     Miquel Raynal <miquel.raynal@bootlin.com>
+        bh=jj40USbvC2Rr9GNDMHj94juQ531fz6yeaBS6ARCKDuM=;
+        b=Cx8zqDpK1QT+rnby9UXE1X+UU7YDWErYmf4YnnBMFxUBMVOG9fS6pDuzH6QFNE3/bTU2gx
+        azeymH71sk7+LDzDd3mN+YzvwfQWO0BqkyjNHtPXjwWw3/pHXpurp3We2tekcgDB1f9gno
+        O+pNFerRHvXOPRHr1dS64m9wmUZ6sTW8Pny1wY2yDE29bzp8VTm2j/mbMRQGHCKxQRZGwI
+        oPtoMA+xyjGw03d7F8h4R9WCjzSoYbNIFglhqqEMr6OwSo7Y2ecD4zg602BcogbuKdJEAf
+        9paCyUO0riewTwPv8DOS70GuU5c6V2V5f1wj9x7JqspivG+BpplXmtqTP6eTTQ==
+Date:   Tue, 23 Aug 2022 18:29:50 +0200
+From:   Miquel Raynal <miquel.raynal@bootlin.com>
+To:     Alexander Aring <aahringo@redhat.com>
 Cc:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
         linux-wpan - ML <linux-wpan@vger.kernel.org>,
@@ -74,103 +45,274 @@ Cc:     Alexander Aring <alex.aring@gmail.com>,
         Frederic Blain <frederic.blain@qorvo.com>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH wpan-next 01/20] net: mac802154: Allow the creation of
+ coordinator interfaces
+Message-ID: <20220823182950.1c722e13@xps-13>
+In-Reply-To: <CAK-6q+gCY3ufaADHNQWJGNpNZJMwm=fhKfe02GWkfGEdgsMVzg@mail.gmail.com>
+References: <20220701143052.1267509-1-miquel.raynal@bootlin.com>
+        <20220701143052.1267509-2-miquel.raynal@bootlin.com>
+        <CAK-6q+jkUUjAGqEDgU1oJvRkigUbvSO5SXWRau6+320b=GbfxQ@mail.gmail.com>
+        <20220819191109.0e639918@xps-13>
+        <CAK-6q+gCY3ufaADHNQWJGNpNZJMwm=fhKfe02GWkfGEdgsMVzg@mail.gmail.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi,
+Hi Alexander,
 
-On Fri, Aug 19, 2022 at 1:13 PM Miquel Raynal <miquel.raynal@bootlin.com> wrote:
->
-> Hi Alexander,
->
-> aahringo@redhat.com wrote on Thu, 14 Jul 2022 23:16:33 -0400:
->
-> > Hi,
-> >
-> > On Fri, Jul 1, 2022 at 10:37 AM Miquel Raynal <miquel.raynal@bootlin.com> wrote:
-> > >
-> > > Some devices, like HardMAC ones can be a bit limited in the way they
-> > > handle mac commands. In particular, they might just not support it at
-> > > all and instead only be able to transmit and receive regular data
-> > > packets. In this case, they cannot be used for any of the internal
-> > > management commands that we have introduced so far and must be flagged
-> > > accordingly.
-> > >
-> > > Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
-> > > ---
-> > >  include/net/cfg802154.h   | 3 +++
-> > >  net/ieee802154/nl802154.c | 6 ++++++
-> > >  2 files changed, 9 insertions(+)
-> > >
-> > > diff --git a/include/net/cfg802154.h b/include/net/cfg802154.h
-> > > index d6ff60d900a9..20ac4df9dc7b 100644
-> > > --- a/include/net/cfg802154.h
-> > > +++ b/include/net/cfg802154.h
-> > > @@ -178,12 +178,15 @@ wpan_phy_cca_cmp(const struct wpan_phy_cca *a, const struct wpan_phy_cca *b)
-> > >   *     setting.
-> > >   * @WPAN_PHY_FLAG_STATE_QUEUE_STOPPED: Indicates that the transmit queue was
-> > >   *     temporarily stopped.
-> > > + * @WPAN_PHY_FLAG_DATAGRAMS_ONLY: Indicates that transceiver is only able to
-> > > + *     send/receive datagrams.
-> > >   */
-> > >  enum wpan_phy_flags {
-> > >         WPAN_PHY_FLAG_TXPOWER           = BIT(1),
-> > >         WPAN_PHY_FLAG_CCA_ED_LEVEL      = BIT(2),
-> > >         WPAN_PHY_FLAG_CCA_MODE          = BIT(3),
-> > >         WPAN_PHY_FLAG_STATE_QUEUE_STOPPED = BIT(4),
-> > > +       WPAN_PHY_FLAG_DATAGRAMS_ONLY    = BIT(5),
-> > >  };
-> > >
-> > >  struct wpan_phy {
-> > > diff --git a/net/ieee802154/nl802154.c b/net/ieee802154/nl802154.c
-> > > index 00b03c33e826..b31a0bd36b08 100644
-> > > --- a/net/ieee802154/nl802154.c
-> > > +++ b/net/ieee802154/nl802154.c
-> > > @@ -1404,6 +1404,9 @@ static int nl802154_trigger_scan(struct sk_buff *skb, struct genl_info *info)
-> > >         if (wpan_dev->iftype == NL802154_IFTYPE_MONITOR)
-> > >                 return -EPERM;
-> > >
-> > > +       if (wpan_phy->flags & WPAN_PHY_FLAG_DATAGRAMS_ONLY)
-> > > +               return -EOPNOTSUPP;
-> > > +
-> >
-> > for doing a scan it's also required to turn the transceiver into
-> > promiscuous mode, right?
-> >
-> > There is currently a flag if a driver supports promiscuous mode or
-> > not... I am not sure if all drivers have support for it. For me it
-> > looks like a mandatory feature but I am not sure if every driver
-> > supports it.
-> > We have a similar situation with acknowledge retransmit handling...
-> > some transceivers can't handle it and for normal dataframes we have a
-> > default behaviour that we don't set it. However sometimes it's
-> > required by the spec, then we can't do anything here.
-> >
-> > I think we should check on it but we should plan to drop this flag if
-> > promiscuous mode is supported or not.
->
-> Yes, you are right, I should check this flag is set, I will do it at
-> the creation of the MONITOR interface, which anyway does not make sense
-> if the device has no filtering support (promiscuous being a very
-> standard one, but, as you said below, will later be replaced by some
-> more advanced levels).
->
-> > I also think that the
-> > promiscuous driver_ops should be removed and moved as a parameter for
-> > start() driver_ops to declare which "receive mode" should be
-> > enabled... but we can do that in due course.
->
-> Agreed.
+aahringo@redhat.com wrote on Tue, 23 Aug 2022 08:33:30 -0400:
 
-We need to keep in mind that hwsim is a transceiver which only can run
-in promiscuous mode and all receive paths need to be aware of this.
-Yes, we can do that by saying on the ieee802154_rx() it always
-receives frames in promiscuous mode and mac802154 does all the
-filtering. I have the feeling there needs to be more done, because the
-driver op to run into promiscuous mode and the mac802154 layer thinks
-it's not BUT hwsim was it all the time. :-/
+> Hi,
+>=20
+> On Fri, Aug 19, 2022 at 1:11 PM Miquel Raynal <miquel.raynal@bootlin.com>=
+ wrote:
+> >
+> > Hi Alexander,
+> >
+> > aahringo@redhat.com wrote on Tue, 5 Jul 2022 21:51:02 -0400:
+> > =20
+> > > Hi,
+> > >
+> > > On Fri, Jul 1, 2022 at 10:36 AM Miquel Raynal <miquel.raynal@bootlin.=
+com> wrote: =20
+> > > >
+> > > > As a first strep in introducing proper PAN management and associati=
+on,
+> > > > we need to be able to create coordinator interfaces which might act=
+ as
+> > > > coordinator or PAN coordinator.
+> > > >
+> > > > Hence, let's add the minimum support to allow the creation of these
+> > > > interfaces. This might be restrained and improved later.
+> > > >
+> > > > Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
+> > > > ---
+> > > >  net/mac802154/iface.c | 14 ++++++++------
+> > > >  net/mac802154/rx.c    |  2 +-
+> > > >  2 files changed, 9 insertions(+), 7 deletions(-)
+> > > >
+> > > > diff --git a/net/mac802154/iface.c b/net/mac802154/iface.c
+> > > > index 500ed1b81250..7ac0c5685d3f 100644
+> > > > --- a/net/mac802154/iface.c
+> > > > +++ b/net/mac802154/iface.c
+> > > > @@ -273,13 +273,13 @@ ieee802154_check_concurrent_iface(struct ieee=
+802154_sub_if_data *sdata,
+> > > >                 if (nsdata !=3D sdata && ieee802154_sdata_running(n=
+sdata)) {
+> > > >                         int ret;
+> > > >
+> > > > -                       /* TODO currently we don't support multiple=
+ node types
+> > > > -                        * we need to run skb_clone at rx path. Che=
+ck if there
+> > > > -                        * exist really an use case if we need to s=
+upport
+> > > > -                        * multiple node types at the same time.
+> > > > +                       /* TODO currently we don't support multiple=
+ node/coord
+> > > > +                        * types we need to run skb_clone at rx pat=
+h. Check if
+> > > > +                        * there exist really an use case if we nee=
+d to support
+> > > > +                        * multiple node/coord types at the same ti=
+me.
+> > > >                          */
+> > > > -                       if (wpan_dev->iftype =3D=3D NL802154_IFTYPE=
+_NODE &&
+> > > > -                           nsdata->wpan_dev.iftype =3D=3D NL802154=
+_IFTYPE_NODE)
+> > > > +                       if (wpan_dev->iftype !=3D NL802154_IFTYPE_M=
+ONITOR &&
+> > > > +                           nsdata->wpan_dev.iftype !=3D NL802154_I=
+FTYPE_MONITOR)
+> > > >                                 return -EBUSY;
+> > > >
+> > > >                         /* check all phy mac sublayer settings are =
+the same.
+> > > > @@ -577,6 +577,7 @@ ieee802154_setup_sdata(struct ieee802154_sub_if=
+_data *sdata,
+> > > >         wpan_dev->short_addr =3D cpu_to_le16(IEEE802154_ADDR_BROADC=
+AST);
+> > > >
+> > > >         switch (type) {
+> > > > +       case NL802154_IFTYPE_COORD:
+> > > >         case NL802154_IFTYPE_NODE:
+> > > >                 ieee802154_be64_to_le64(&wpan_dev->extended_addr,
+> > > >                                         sdata->dev->dev_addr);
+> > > > @@ -636,6 +637,7 @@ ieee802154_if_add(struct ieee802154_local *loca=
+l, const char *name,
+> > > >         ieee802154_le64_to_be64(ndev->perm_addr,
+> > > >                                 &local->hw.phy->perm_extended_addr);
+> > > >         switch (type) {
+> > > > +       case NL802154_IFTYPE_COORD:
+> > > >         case NL802154_IFTYPE_NODE:
+> > > >                 ndev->type =3D ARPHRD_IEEE802154;
+> > > >                 if (ieee802154_is_valid_extended_unicast_addr(exten=
+ded_addr)) {
+> > > > diff --git a/net/mac802154/rx.c b/net/mac802154/rx.c
+> > > > index b8ce84618a55..39459d8d787a 100644
+> > > > --- a/net/mac802154/rx.c
+> > > > +++ b/net/mac802154/rx.c
+> > > > @@ -203,7 +203,7 @@ __ieee802154_rx_handle_packet(struct ieee802154=
+_local *local,
+> > > >         }
+> > > >
+> > > >         list_for_each_entry_rcu(sdata, &local->interfaces, list) {
+> > > > -               if (sdata->wpan_dev.iftype !=3D NL802154_IFTYPE_NOD=
+E)
+> > > > +               if (sdata->wpan_dev.iftype =3D=3D NL802154_IFTYPE_M=
+ONITOR)
+> > > >                         continue; =20
+> > >
+> > > I probably get why you are doing that, but first the overall design is
+> > > working differently - means you should add an additional receive path
+> > > for the special interface type.
+> > >
+> > > Also we "discovered" before that the receive path of node vs
+> > > coordinator is different... Where is the different handling here? I
+> > > don't see it, I see that NODE and COORD are the same now (because that
+> > > is _currently_ everything else than monitor). This change is not
+> > > enough and does "something" to handle in some way coordinator receive
+> > > path but there are things missing.
+> > >
+> > > 1. Changing the address filters that it signals the transceiver it's
+> > > acting as coordinator
+> > > 2. We _should_ also have additional handling for whatever the
+> > > additional handling what address filters are doing in mac802154
+> > > _because_ there is hardware which doesn't have address filtering e.g.
+> > > hwsim which depend that this is working in software like other
+> > > transceiver hardware address filters.
+> > >
+> > > For the 2. one, I don't know if we do that even for NODE right or we
+> > > just have the bare minimal support there... I don't assume that
+> > > everything is working correctly here but what I want to see is a
+> > > separate receive path for coordinators that people can send patches to
+> > > fix it. =20
+> >
+> > Yes, we do very little differently between the two modes, that's why I
+> > took the easy way: just changing the condition. I really don't see what
+> > I can currently add here, but I am fine changing the style to easily
+> > show people where to add filters for such or such interface, but right
+> > now both path will look very "identical", do we agree on that? =20
+>=20
+> mostly yes, but there exists a difference and we should at least check
+> if the node receive path violates the coordinator receive path and
+> vice versa.
+> Put it in a receive_path() function and then coord_receive_path(),
+> node_receive_path() that calls the receive_path() and do the
+> additional filtering for coordinators, etc.
+>=20
+> There should be a part in the standard about "third level filter rule
+> if it's a coordinator".
+> btw: this is because the address filter on the transceiver needs to
+> have the "i am a coordinator" boolean set which is missing in this
+> series. However it depends on the transceiver filtering level and the
+> mac802154 receive path if we actually need to run such filtering or
+> not.
 
-- Alex
+I must be missing some information because I can't find any places
+where what you suggest is described in the spec.
 
+I agree there are multiple filtering level so let's go through them one
+by one (6.7.2 Reception and rejection):
+- first level: is the checksum (FCS) valid?
+	yes -> goto second level
+	no -> drop
+- second level: are we in promiscuous mode?
+	yes -> forward to upper layers
+	no -> goto second level (bis)
+- second level (bis): are we scanning?
+	yes -> goto scan filtering
+	no -> goto third level
+- scan filtering: is it a beacon?
+	yes -> process the beacon
+	no -> drop
+- third level: is the frame valid? (type, source, destination, pan id,
+  etc)
+	yes -> forward to upper layers
+	no -> drop
+
+But none of them, as you said, is dependent on the interface type.
+There is no mention of a specific filtering operation to do in all
+those cases when running in COORD mode. So I still don't get what
+should be included in either node_receive_path() which should be
+different than in coord_receive_path() for now.
+
+There are, however, two situations where the interface type has its
+importance:
+- Enhanced beacon requests with Enhanced beacon filter IE, which asks
+  the receiving device to process/drop the request upon certain
+  conditions (minimum LQI and/or randomness), as detailed in
+  7.4.4.6 Enhanced Beacon Filter IE. But, as mentioned in
+  7.5.9 Enhanced Beacon Request command: "The Enhanced Beacon Request
+  command is optional for an FFD and an RFD", so this series was only
+  targeting basic beaconing for now.
+- In relaying mode, the destination address must not be validated
+  because the message needs to be re-emitted. Indeed, a receiver in
+  relaying mode may not be the recipient. This is also optional and out
+  of the scope of this series.
+
+Right now I have the below diff, which clarifies the two path, without
+too much changes in the current code because I don't really see why it
+would be necessary. Unless you convince me otherwise or read the spec
+differently than I do :) What do you think?
+
+Thanks,
+Miqu=C3=A8l
+
+---
+
+--- a/net/mac802154/rx.c
++++ b/net/mac802154/rx.c
+@@ -194,6 +194,7 @@ __ieee802154_rx_handle_packet(struct ieee802154_local *=
+local,
+        int ret;
+        struct ieee802154_sub_if_data *sdata;
+        struct ieee802154_hdr hdr;
++       bool iface_found =3D false;
+=20
+        ret =3D ieee802154_parse_frame_start(skb, &hdr);
+        if (ret) {
+@@ -203,18 +204,31 @@ __ieee802154_rx_handle_packet(struct ieee802154_local=
+ *local,
+        }
+=20
+        list_for_each_entry_rcu(sdata, &local->interfaces, list) {
+-               if (sdata->wpan_dev.iftype !=3D NL802154_IFTYPE_NODE)
++               if (sdata->wpan_dev.iftype =3D=3D NL802154_IFTYPE_MONITOR)
+                        continue;
+=20
+                if (!ieee802154_sdata_running(sdata))
+                        continue;
+=20
++               iface_found =3D true;
++               break;
++       }
++
++       if (!iface_found) {
++               kfree_skb(skb);
++               return;
++       }
++
++       /* TBD: Additional filtering is possible on NODEs and/or COORDINATO=
+Rs */
++       switch (sdata->wpan_dev.iftype) {
++       case NL802154_IFTYPE_COORD:
++       case NL802154_IFTYPE_NODE:
+                ieee802154_subif_frame(sdata, skb, &hdr);
+-               skb =3D NULL;
++               break;
++       default:
++               kfree_skb(skb);
+                break;
+        }
+-
+-       kfree_skb(skb);
+ }
+=20
+ static void
