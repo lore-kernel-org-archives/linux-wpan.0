@@ -2,34 +2,34 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F491C00140
-	for <linux-wpan@archiver.kernel.org>; Wed, 24 Aug 2022 07:36:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38CEFC32796
+	for <linux-wpan@archiver.kernel.org>; Wed, 24 Aug 2022 10:21:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234045AbiHXHgA (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 24 Aug 2022 03:36:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38880 "EHLO
+        id S231846AbiHXKVI (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 24 Aug 2022 06:21:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36978 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233356AbiHXHf7 (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 24 Aug 2022 03:35:59 -0400
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85B5875492;
-        Wed, 24 Aug 2022 00:35:56 -0700 (PDT)
+        with ESMTP id S236785AbiHXKVH (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 24 Aug 2022 06:21:07 -0400
+Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0F4D2AF2;
+        Wed, 24 Aug 2022 03:21:03 -0700 (PDT)
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id E83F41BF204;
-        Wed, 24 Aug 2022 07:35:48 +0000 (UTC)
+        by mail.gandi.net (Postfix) with ESMTPSA id 3C72820017;
+        Wed, 24 Aug 2022 10:21:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1661326551;
+        t=1661336462;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=DHctkaFFFpXPmyUqQG0adf79N/Wv7WWv8AKbbE+tkJY=;
-        b=Kq5JpD2AqsZRwcI482hdZ1Fh4mkeIPLu0b0Z35g/luFCx4PmoLDVeI71207C/Fli6ON95K
-        B01W0EICTk7thNM7w9X7WAUcnCpi5arwrPXWz2gQxCTd0WYWF3RGbfhutMovvHf4yWQ9l5
-        kKWalYAbKr7yy6tRd+YN4jGcIocBTmOZK5vXhg4Ua/QDSykSTYKbyAZ6yJzAOSWuV0NZ7+
-        ubnVCxjXwIdm7Ueoh+1T+5sZovbGlfIYNXk7Ai4R3ljCHHPT8wnhH4RmEI+V6+roe+/NTZ
-        I7mcAn5SVvg5UFYmogn1fWjd7NVcVE2AZNMvtTvjUlokchzsPI6E+Tii6yu6Mg==
-Date:   Wed, 24 Aug 2022 09:35:47 +0200
+        bh=EVcLun4IpqpMJcMOrdpcuGesg4d0g3/ryDpO2out2II=;
+        b=npqIhVkPd3sSVkr7aEO4lt7byUjhng2m53nulc937QZ8HafVHG01yenCyng6Vo8MHvKaEU
+        qAvkxaiQZZliPHn/ckWix77U5K1X0p2nPI2+rIf3fW/4MAQnVkBNzTwUA6WUmelE4hQFgu
+        W2teHfriDqbNQrRHwekIv0bud/e+MWtRVo7bVpumlAKqrTQ/vKEMbHRBxsPzgn8C1Mgs+9
+        0D+CWPS5G58iM7gq+ZdOK/6JBlNkNFUUW1OIPPMoY6Y3VMmFbMhzyPLRAOEA+6ZHP+6NW5
+        i5iGyiAFNKPO7Cj77MXeZPmZJcw7XLyYCVGn1Y2Y6sJQqDKBZTJe/TtePAoSrw==
+Date:   Wed, 24 Aug 2022 12:20:58 +0200
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
 To:     Alexander Aring <aahringo@redhat.com>
 Cc:     Alexander Aring <alex.aring@gmail.com>,
@@ -47,7 +47,7 @@ Cc:     Alexander Aring <alex.aring@gmail.com>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>
 Subject: Re: [PATCH wpan-next 01/20] net: mac802154: Allow the creation of
  coordinator interfaces
-Message-ID: <20220824093547.16f05d15@xps-13>
+Message-ID: <20220824122058.1c46e09a@xps-13>
 In-Reply-To: <CAK-6q+jfva++dGkyX_h2zQGXnoJpiOu5+eofCto=KZ+u6KJbJA@mail.gmail.com>
 References: <20220701143052.1267509-1-miquel.raynal@bootlin.com>
         <20220701143052.1267509-2-miquel.raynal@bootlin.com>
@@ -263,138 +263,15 @@ ght
 > >   etc)
 > >         yes -> forward to upper layers
 > >         no -> drop
-> >
-> > But none of them, as you said, is dependent on the interface type.
-> > There is no mention of a specific filtering operation to do in all
-> > those cases when running in COORD mode. So I still don't get what
-> > should be included in either node_receive_path() which should be
-> > different than in coord_receive_path() for now.
-> >
-> > There are, however, two situations where the interface type has its
-> > importance:
-> > - Enhanced beacon requests with Enhanced beacon filter IE, which asks
-> >   the receiving device to process/drop the request upon certain
-> >   conditions (minimum LQI and/or randomness), as detailed in
-> >   7.4.4.6 Enhanced Beacon Filter IE. But, as mentioned in
-> >   7.5.9 Enhanced Beacon Request command: "The Enhanced Beacon Request
-> >   command is optional for an FFD and an RFD", so this series was only
-> >   targeting basic beaconing for now.
-> > - In relaying mode, the destination address must not be validated
-> >   because the message needs to be re-emitted. Indeed, a receiver in
-> >   relaying mode may not be the recipient. This is also optional and out
-> >   of the scope of this series.
-> >
-> > Right now I have the below diff, which clarifies the two path, without
-> > too much changes in the current code because I don't really see why it
-> > would be necessary. Unless you convince me otherwise or read the spec
-> > differently than I do :) What do you think?
-> > =20
->=20
-> "Reception and rejection"
->=20
-> third-level filtering regarding "destination address" and if the
-> device is "PAN coordinator".
-> This is, in my opinion, what the coordinator boolean tells the
-> transceiver to do on hardware when doing address filter there. You can
-> also read that up in datasheets of transceivers as atf86rf233, search
-> for I_AM_COORD.
 
-Oh right, I now see what you mean!
+Actually right now the second level is not enforced, and all the
+filtering levels are a bit fuzzy and spread everywhere in rx.c.
 
-> Whereas they use the word "PAN coordinator" not "coordinator", if they
-> really make a difference there at this point..., if so then the kernel
-> must know if the coordinator is a pan coordinator or coordinator
-> because we need to set the address filter in kernel.
-
-Yes we need to make a difference, you can have several coordinators but
-a single PAN coordinator in a PAN. I think we can assume that the PAN
-coordinator is the coordinator with no parent (association-wise). With
-the addition of the association series, I can handle that, so I will
-create the two path as you advise, add a comment about this additional
-filter rule that we don't yet support, and finally after the
-association series add another commit to make this filtering rule real.
-
->=20
-> > Thanks,
-> > Miqu=C3=A8l
-> >
-> > ---
-> >
-> > --- a/net/mac802154/rx.c
-> > +++ b/net/mac802154/rx.c
-> > @@ -194,6 +194,7 @@ __ieee802154_rx_handle_packet(struct ieee802154_loc=
-al *local,
-> >         int ret;
-> >         struct ieee802154_sub_if_data *sdata;
-> >         struct ieee802154_hdr hdr;
-> > +       bool iface_found =3D false;
-> >
-> >         ret =3D ieee802154_parse_frame_start(skb, &hdr);
-> >         if (ret) {
-> > @@ -203,18 +204,31 @@ __ieee802154_rx_handle_packet(struct ieee802154_l=
-ocal *local,
-> >         }
-> >
-> >         list_for_each_entry_rcu(sdata, &local->interfaces, list) {
-> > -               if (sdata->wpan_dev.iftype !=3D NL802154_IFTYPE_NODE)
-> > +               if (sdata->wpan_dev.iftype =3D=3D NL802154_IFTYPE_MONIT=
-OR)
-> >                         continue;
-> >
-> >                 if (!ieee802154_sdata_running(sdata))
-> >                         continue;
-> >
-> > +               iface_found =3D true;
-> > +               break;
-> > +       }
-> > +
-> > +       if (!iface_found) {
-> > +               kfree_skb(skb);
-> > +               return;
-> > +       }
-> > +
-> > +       /* TBD: Additional filtering is possible on NODEs and/or COORDI=
-NATORs */
-> > +       switch (sdata->wpan_dev.iftype) {
-> > +       case NL802154_IFTYPE_COORD:
-> > +       case NL802154_IFTYPE_NODE:
-> >                 ieee802154_subif_frame(sdata, skb, &hdr);
-> > -               skb =3D NULL;
-> > +               break;
-> > +       default:
-> > +               kfree_skb(skb);
-> >                 break;
-> >         } =20
->=20
-> Why do you remove the whole interface looping above and make it only
-> run for one ?first found? ?
-
-To reduce the indentation level.
-
-> That code changes this behaviour and I do
-> not know why.
-
-The precedent code did:
-for_each_iface() {
-	if (not a node)
-		continue;
-	if (not running)
-		continue;
-
-	subif_frame();
-	break;
-}
-
-That final break also elected only the first running node iface.
-Otherwise it would mean that we allow the same skb to be consumed
-twice, which is wrong IMHO?
-
-> Move the switch case into the loop and do a different
-> receive path if coord and node and do whatever differs from filtering
-> and then call ieee802154_subif_frame().
->=20
-> - Alex
->=20
+I'm gonna see if I can at least clarify all of that and only make
+coord-dependent the right section because right now a
+ieee802154_coord_rx() path in ieee802154_rx_handle_packet() does not
+really make sense given that the level 3 filtering rules are mostly
+enforced in ieee802154_subif_frame().
 
 Thanks,
 Miqu=C3=A8l
