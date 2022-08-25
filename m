@@ -2,178 +2,159 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C809CC04AA5
-	for <linux-wpan@archiver.kernel.org>; Thu, 25 Aug 2022 12:58:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CB61ECAA2B
+	for <linux-wpan@archiver.kernel.org>; Thu, 25 Aug 2022 19:22:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241153AbiHYM6h (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Thu, 25 Aug 2022 08:58:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60880 "EHLO
+        id S243185AbiHYTWL (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Thu, 25 Aug 2022 15:22:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33932 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241096AbiHYM6h (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 25 Aug 2022 08:58:37 -0400
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::226])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A77880359;
-        Thu, 25 Aug 2022 05:58:35 -0700 (PDT)
-Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id ADC9AC0002;
-        Thu, 25 Aug 2022 12:58:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1661432314;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=kaHYmMiQZE+TL7D8x2KLrmR70elOYdPqmPIh0JwWaag=;
-        b=bZHOGGLk/XnLXCJ8qIAB+kAlLREPejZFzLeEkTAROe54asuy4Eh1Tr1pfXl8I5fxRzps/C
-        FkpNenF6Eql15/2x7OjsJDQU1og5gW24kAETpu2cCCmJI57fkbXf+9+64nM8n7PGpT5hbZ
-        qnsnY6abPLTu2eB9pDkj0s+hk3dO9YPMua5DI6Ep7qFWaIiFuyIjnPe90ZUGkkoQYY+wZ5
-        epbDOoQGTylXC6RIWjzyPHLH9MaxnfUOLtR/DLjxn2K006ZKyTbA1vnqp4733NkyCm41hg
-        ICl7rQ1MYJHfbMWbEAdw9toVyoPKrXsqI1mpvmaWgbWlICnokXyeSvc+i3dTDw==
-Date:   Thu, 25 Aug 2022 14:58:31 +0200
-From:   Miquel Raynal <miquel.raynal@bootlin.com>
-To:     Alexander Aring <aahringo@redhat.com>
-Cc:     Alexander Aring <alex.aring@gmail.com>,
-        Stefan Schmidt <stefan@datenfreihafen.org>,
-        linux-wpan - ML <linux-wpan@vger.kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Eric Dumazet <edumazet@google.com>,
-        Network Development <netdev@vger.kernel.org>,
-        David Girault <david.girault@qorvo.com>,
-        Romuald Despres <romuald.despres@qorvo.com>,
-        Frederic Blain <frederic.blain@qorvo.com>,
-        Nicolas Schodet <nico@ni.fr.eu.org>,
-        Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH wpan-next 01/20] net: mac802154: Allow the creation of
- coordinator interfaces
-Message-ID: <20220825145831.1105cb54@xps-13>
-In-Reply-To: <CAK-6q+itA0C4zPAq5XGKXgCHW5znSFeB-YDMp3uB9W-kLV6WaA@mail.gmail.com>
-References: <20220701143052.1267509-1-miquel.raynal@bootlin.com>
-        <20220701143052.1267509-2-miquel.raynal@bootlin.com>
-        <CAK-6q+jkUUjAGqEDgU1oJvRkigUbvSO5SXWRau6+320b=GbfxQ@mail.gmail.com>
-        <20220819191109.0e639918@xps-13>
-        <CAK-6q+gCY3ufaADHNQWJGNpNZJMwm=fhKfe02GWkfGEdgsMVzg@mail.gmail.com>
-        <20220823182950.1c722e13@xps-13>
-        <CAK-6q+jfva++dGkyX_h2zQGXnoJpiOu5+eofCto=KZ+u6KJbJA@mail.gmail.com>
-        <20220824122058.1c46e09a@xps-13>
-        <CAK-6q+gjgQ1BF-QrT01JWh+2b3oL3RU+SoxUf5t7h3Hc6R8pcg@mail.gmail.com>
-        <20220824152648.4bfb9a89@xps-13>
-        <CAK-6q+itA0C4zPAq5XGKXgCHW5znSFeB-YDMp3uB9W-kLV6WaA@mail.gmail.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+        with ESMTP id S241530AbiHYTWI (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 25 Aug 2022 15:22:08 -0400
+Received: from mail-oi1-x22d.google.com (mail-oi1-x22d.google.com [IPv6:2607:f8b0:4864:20::22d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71E45BD0BE
+        for <linux-wpan@vger.kernel.org>; Thu, 25 Aug 2022 12:22:03 -0700 (PDT)
+Received: by mail-oi1-x22d.google.com with SMTP id p187so17176103oia.9
+        for <linux-wpan@vger.kernel.org>; Thu, 25 Aug 2022 12:22:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=paul-moore-com.20210112.gappssmtp.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc;
+        bh=j11I9jJbBdP2EsV8zm8vGrZ8to2ALD+DZiEMfyWlhf4=;
+        b=KjzVxnhpw6QKMn5c7oLhZ2YXfy0o0q7ppQDDA/IUG9Tba1CyII5IegLq2jiOsTx6sf
+         9PktWYsvLhv6OduPZa78FKjas33U49IxO+UttcDOMAdp3MTlGJvDXLmU3ofAZEoFFqZT
+         pafvPKdLl3l0hKSE9VWBcm6msZs1UGsFX0W0WhRtsci35MLKycrvSxbg6GiEiXprLSDz
+         35gtzDXDspqbKE6U1rd+mL/P+1w92XWlGqtbdRRUw9gw3+q3FfhdBiDfZom+YIwlZBrE
+         iSIuTPlKIwHdWrtxWrdA/Tch392Qi6e4omMMHzm85TUdvnZFdOZSQACivsWz9KW0c6uk
+         JDjQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc;
+        bh=j11I9jJbBdP2EsV8zm8vGrZ8to2ALD+DZiEMfyWlhf4=;
+        b=Mn7XkZWT+47JXhCeVXxXKjZCY0K0vT/1ieT8Z0w+5gB8Qbw4ifn5307rXnbCFspKvh
+         CsQ75hiMsVzs36gbWz9nd9OCu+NE3ho1cJsatoeK0sKq9D8NDjeNcCHZMyZPoNMXUFvG
+         de/MPgNL+W2fhaT0x/V0c37IeOniJJiEgusYzVV42XjjH6QhzT/vAaeOKtcRHxpDVtBO
+         GGsdb8FFnPAdToBr9fCJ4n7uGSnRqtGJurDfZPxSGbX2gw76yWsKdzBCMwKCFTNEiEn1
+         zX5RRaydeGXiatY9waQf2fz1EV1ou55NggHajj0Jn9y/sxvhDegXyhW13wstcBwn/u/+
+         gsuQ==
+X-Gm-Message-State: ACgBeo0P97kiOgMrxU6jkW4ZViQfFDNatmirVaRHheEK3zXQEMU8VJ0i
+        f4hQ3LQzaWuExahP1R2H91w0CvT/Y0eAKMyZQuvK
+X-Google-Smtp-Source: AA6agR5+NrNDgFeVEqQOH6xO8KzleveZvD24+0ma4hp6CR5I88pcrQbnickGgaR7sl54W0OczwK1VkCsRh+9Rsqv/HQ=
+X-Received: by 2002:a05:6808:3a9:b0:343:4b14:ccce with SMTP id
+ n9-20020a05680803a900b003434b14cccemr243316oie.41.1661455322788; Thu, 25 Aug
+ 2022 12:22:02 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+References: <20220825001830.1911524-1-kuba@kernel.org>
+In-Reply-To: <20220825001830.1911524-1-kuba@kernel.org>
+From:   Paul Moore <paul@paul-moore.com>
+Date:   Thu, 25 Aug 2022 15:21:52 -0400
+Message-ID: <CAHC9VhSxesi0TSSvcQSr1kDhP3Vce4+O3w2diEExGEGnjGpmiw@mail.gmail.com>
+Subject: Re: [PATCH net-next] genetlink: start to validate reserved header bytes
+To:     Jakub Kicinski <kuba@kernel.org>
+Cc:     davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+        pabeni@redhat.com, jiri@resnulli.us, johannes@sipsolutions.net,
+        linux-block@vger.kernel.org, osmocom-net-gprs@lists.osmocom.org,
+        linux-wpan@vger.kernel.org, wireguard@lists.zx2c4.com,
+        linux-wireless@vger.kernel.org, linux-scsi@vger.kernel.org,
+        target-devel@vger.kernel.org, linux-pm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-cifs@vger.kernel.org, cluster-devel@redhat.com,
+        mptcp@lists.linux.dev, lvs-devel@vger.kernel.org,
+        netfilter-devel@vger.kernel.org,
+        linux-security-module@vger.kernel.org, dev@openvswitch.org,
+        linux-s390@vger.kernel.org, tipc-discussion@lists.sourceforge.net
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi Alexander,
+On Wed, Aug 24, 2022 at 8:18 PM Jakub Kicinski <kuba@kernel.org> wrote:
+>
+> We had historically not checked that genlmsghdr.reserved
+> is 0 on input which prevents us from using those precious
+> bytes in the future.
+>
+> One use case would be to extend the cmd field, which is
+> currently just 8 bits wide and 256 is not a lot of commands
+> for some core families.
+>
+> To make sure that new families do the right thing by default
+> put the onus of opting out of validation on existing families.
+>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+> CC: jiri@resnulli.us
+> CC: johannes@sipsolutions.net
+> CC: linux-block@vger.kernel.org
+> CC: osmocom-net-gprs@lists.osmocom.org
+> CC: linux-wpan@vger.kernel.org
+> CC: wireguard@lists.zx2c4.com
+> CC: linux-wireless@vger.kernel.org
+> CC: linux-scsi@vger.kernel.org
+> CC: target-devel@vger.kernel.org
+> CC: linux-pm@vger.kernel.org
+> CC: virtualization@lists.linux-foundation.org
+> CC: linux-cifs@vger.kernel.org
+> CC: cluster-devel@redhat.com
+> CC: mptcp@lists.linux.dev
+> CC: lvs-devel@vger.kernel.org
+> CC: netfilter-devel@vger.kernel.org
+> CC: linux-security-module@vger.kernel.org
+> CC: dev@openvswitch.org
+> CC: linux-s390@vger.kernel.org
+> CC: tipc-discussion@lists.sourceforge.net
+> ---
+>  drivers/block/nbd.c                      | 1 +
+>  drivers/net/gtp.c                        | 1 +
+>  drivers/net/ieee802154/mac802154_hwsim.c | 1 +
+>  drivers/net/macsec.c                     | 1 +
+>  drivers/net/team/team.c                  | 1 +
+>  drivers/net/wireguard/netlink.c          | 1 +
+>  drivers/net/wireless/mac80211_hwsim.c    | 1 +
+>  drivers/target/target_core_user.c        | 1 +
+>  drivers/thermal/thermal_netlink.c        | 1 +
+>  drivers/vdpa/vdpa.c                      | 1 +
+>  fs/cifs/netlink.c                        | 1 +
+>  fs/dlm/netlink.c                         | 1 +
+>  fs/ksmbd/transport_ipc.c                 | 1 +
+>  include/linux/genl_magic_func.h          | 1 +
+>  include/net/genetlink.h                  | 3 +++
+>  kernel/taskstats.c                       | 1 +
+>  net/batman-adv/netlink.c                 | 1 +
+>  net/core/devlink.c                       | 1 +
+>  net/core/drop_monitor.c                  | 1 +
+>  net/ethtool/netlink.c                    | 1 +
+>  net/hsr/hsr_netlink.c                    | 1 +
+>  net/ieee802154/netlink.c                 | 1 +
+>  net/ieee802154/nl802154.c                | 1 +
+>  net/ipv4/fou.c                           | 1 +
+>  net/ipv4/tcp_metrics.c                   | 1 +
+>  net/ipv6/ila/ila_main.c                  | 1 +
+>  net/ipv6/ioam6.c                         | 1 +
+>  net/ipv6/seg6.c                          | 1 +
+>  net/l2tp/l2tp_netlink.c                  | 1 +
+>  net/mptcp/pm_netlink.c                   | 1 +
+>  net/ncsi/ncsi-netlink.c                  | 1 +
+>  net/netfilter/ipvs/ip_vs_ctl.c           | 1 +
+>  net/netlabel/netlabel_calipso.c          | 1 +
+>  net/netlabel/netlabel_cipso_v4.c         | 1 +
+>  net/netlabel/netlabel_mgmt.c             | 1 +
+>  net/netlabel/netlabel_unlabeled.c        | 1 +
+>  net/netlink/genetlink.c                  | 4 ++++
+>  net/nfc/netlink.c                        | 1 +
+>  net/openvswitch/conntrack.c              | 1 +
+>  net/openvswitch/datapath.c               | 3 +++
+>  net/openvswitch/meter.c                  | 1 +
+>  net/psample/psample.c                    | 1 +
+>  net/smc/smc_netlink.c                    | 3 ++-
+>  net/smc/smc_pnet.c                       | 3 ++-
+>  net/tipc/netlink.c                       | 1 +
+>  net/tipc/netlink_compat.c                | 1 +
+>  net/wireless/nl80211.c                   | 1 +
+>  47 files changed, 56 insertions(+), 2 deletions(-)
 
-aahringo@redhat.com wrote on Wed, 24 Aug 2022 17:53:45 -0400:
+Acked-by: Paul Moore <paul@paul-moore.com> (NetLabel)
 
-> Hi,
->=20
-> On Wed, Aug 24, 2022 at 9:27 AM Miquel Raynal <miquel.raynal@bootlin.com>=
- wrote:
-> >
-> > Hi Alexander,
-> >
-> > aahringo@redhat.com wrote on Wed, 24 Aug 2022 08:43:20 -0400:
-> > =20
-> > > Hi,
-> > >
-> > > On Wed, Aug 24, 2022 at 6:21 AM Miquel Raynal <miquel.raynal@bootlin.=
-com> wrote:
-> > > ... =20
-> > > >
-> > > > Actually right now the second level is not enforced, and all the
-> > > > filtering levels are a bit fuzzy and spread everywhere in rx.c.
-> > > >
-> > > > I'm gonna see if I can at least clarify all of that and only make
-> > > > coord-dependent the right section because right now a
-> > > > ieee802154_coord_rx() path in ieee802154_rx_handle_packet() does not
-> > > > really make sense given that the level 3 filtering rules are mostly
-> > > > enforced in ieee802154_subif_frame(). =20
-> > >
-> > > One thing I mentioned before is that we probably like to have a
-> > > parameter for rx path to give mac802154 a hint on which filtering
-> > > level it was received. We don't have that, I currently see that this
-> > > is a parameter for hwsim receiving it on promiscuous level only and
-> > > all others do third level filtering.
-> > > We need that now, because the promiscuous mode was only used for
-> > > sniffing which goes directly into the rx path for monitors. With scan
-> > > we mix things up here and in my opinion require such a parameter and
-> > > do filtering if necessary. =20
-> >
-> > I am currently trying to implement a slightly different approach. The
-> > core does not know hwsim is always in promiscuous mode, but it does
-> > know that it does not check FCS. So the core checks it. This is
-> > level 1 achieved. Then in level 2 we want to know if the core asked
-> > the transceiver to enter promiscuous mode, which, if it did, should
-> > not imply more filtering. If the device is working in promiscuous
-> > mode but this was not asked explicitly by the core, we don't really
-> > care, software filtering will apply anyway.
-> > =20
->=20
-> I doubt that I will be happy with this solution, this all sounds like
-> "for the specific current behaviour that we support 2 filtering levels
-> it will work", just do a parameter on which 802.15.4 filtering level
-> it was received and the rx path will check what kind of filter is
-> required and which not.
-> As driver ops start() callback you should say which filtering level
-> the receive mode should start with.
->=20
-> > I am reworking the rx path to clarify what is being done and when,
-> > because I found this part very obscure right now. In the end I don't
-> > think we need additional rx info from the drivers. Hopefully my
-> > proposal will clarify why this is (IMHO) not needed.
-> > =20
->=20
-> Never looked much in 802.15.4 receive path as it just worked but I
-> said that there might be things to clean up when filtering things on
-> hardware and when on software and I have the feeling we are doing
-> things twice. Sometimes it is also necessary to set some skb fields
-> e.g. PACKET_HOST, etc. and I think this is what the most important
-> part of it is there. However, there are probably some tune ups if we
-> know we are in third leveling filtering...
-
-Ok, I've done the following.
-
-- Adding a PHY parameter which reflects the actual filtering level of
-  the transceiver, the default level is 4 (standard situation, you're
-  receiving data) but of course if the PHY does not support this state
-  (like hwsim) it should overwrite this value by setting the actual
-  filtering level (none, in the hwsim case) so that the core knows what
-  it receives.
-
-- I've replaced the specific "do not check the FCS" flag only used by
-  hwsim by this filtering level, which gives all the information we
-  need.
-
-- I've added a real promiscuous filtering mode which truly does not
-  care about the content of the frame but only checks the FCS if not
-  already done by the xceiver.
-
-- I've also implemented in software filtering level 4 for most regular
-  data packets. Without changing the default PHY level mentioned in the
-  first item above, this additional filtering will be skipped which
-  ensures we keep the same behavior of most driver. In the case of hwsim
-  however, these filters will become active if the MAC is not in
-  promiscuous mode or in scan mode, which is actually what people
-  should be expecting.
-
-Hopefully all this fits what you had in mind.
-
-I have one item left on my current todo list: improving a bit the
-userspace tool with a "monitor" command.
-
-Otherwise the remaining things to do are to discuss the locking design
-which might need to be changed to avoid lockdep issues and keep the
-rtnl locked eg. during a channel change. I still don't know how to do
-that, so it's likely that the right next version will not include any
-change in this area unless something pops up.
-
-Thanks,
-Miqu=C3=A8l
+-- 
+paul-moore.com
