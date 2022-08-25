@@ -2,65 +2,51 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45F05C28D13
-	for <linux-wpan@archiver.kernel.org>; Thu, 25 Aug 2022 08:46:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48FDAC3F6B0
+	for <linux-wpan@archiver.kernel.org>; Thu, 25 Aug 2022 12:55:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236545AbiHYIqO (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Thu, 25 Aug 2022 04:46:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60758 "EHLO
+        id S240174AbiHYMzd (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Thu, 25 Aug 2022 08:55:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51618 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233608AbiHYIqN (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 25 Aug 2022 04:46:13 -0400
-Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::229])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DE29A7226;
-        Thu, 25 Aug 2022 01:46:11 -0700 (PDT)
+        with ESMTP id S242102AbiHYMzX (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 25 Aug 2022 08:55:23 -0400
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6DE445052
+        for <linux-wpan@vger.kernel.org>; Thu, 25 Aug 2022 05:55:20 -0700 (PDT)
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id D24DCFF80E;
-        Thu, 25 Aug 2022 08:46:07 +0000 (UTC)
+        by mail.gandi.net (Postfix) with ESMTPSA id 79960E000C;
+        Thu, 25 Aug 2022 12:55:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1661417169;
+        t=1661432118;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=bahjZcarBioPWMNdzDPpo1kw6IWEXf4GMLqcWxmA3kE=;
-        b=QIwwHfGyw5BPvquaPtSG63fOxLLy3LM0p29M2QSo2NkXn4P8pohaS2uYwPC3SMTT15fevc
-        51N3JcVvE8vKx1TA8R+yz9ZV4QrWpUVc8xc3edVr46rdkqOg0vY8rHwc4qheNjmEtaq3qn
-        843H2g9rIm5Uymbt4EEvwj9ubGFSObomHH+QWuYYBJun8jmKoX8eO7W1gBUQKqo+wK7nLS
-        PiS68GrZVXiNW84QhuK7QffGqYpIXbPN04/Y/UlpIAyyGaJCU9v6JnhMOf6vfaXC4lqB/i
-        yee72sXKXssycV9DcMC6hGlBWWu4/C1uAt2naAZBwGBUZEoWlMszwabCCcnzfg==
-Date:   Thu, 25 Aug 2022 10:46:07 +0200
+        bh=wpNTPrvEDKUm8h6b1qaXXXac/Vjy37QHlY3NErKemUc=;
+        b=gBQv/7V6YWnv7HM3WCVIbpFGUPhGXBncWUnDqzKP3yPHjFKQhjC3JyE/E7qCi9NokdSauf
+        /3ZLaZgRaGKKRj8xDpELbqkQvP72fpptJvr/Ate6pJRPclivT11UBYqPci708YWSTPZSuE
+        Br12lZRDTIn9zdu4mf1LrQmZqJ/Rsf91fkXwsxQG+9IRv42VwL8ZFelQaJqroGwKX1ED6h
+        p9MXBdiord7iGenWosmu/9YDqx3wh3N7yhSAcoH5RHn1tBjhPu7g4qw6lJEL+njU8JaVFo
+        ctcFXFrGjbLREoqk4nxA4zNf81toEepCy1YKhXKhxygTjrBkZuroyq9HsI2GYQ==
+Date:   Thu, 25 Aug 2022 14:55:16 +0200
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
 To:     Alexander Aring <aahringo@redhat.com>
 Cc:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
         linux-wpan - ML <linux-wpan@vger.kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Eric Dumazet <edumazet@google.com>,
-        Network Development <netdev@vger.kernel.org>,
         David Girault <david.girault@qorvo.com>,
         Romuald Despres <romuald.despres@qorvo.com>,
         Frederic Blain <frederic.blain@qorvo.com>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH wpan-next 01/20] net: mac802154: Allow the creation of
- coordinator interfaces
-Message-ID: <20220825104607.6274e906@xps-13>
-In-Reply-To: <CAK-6q+gnkz-Yf=39Ss361dDsmzhJErJCAq9FaKK3m5nRih=VDA@mail.gmail.com>
-References: <20220701143052.1267509-1-miquel.raynal@bootlin.com>
-        <20220701143052.1267509-2-miquel.raynal@bootlin.com>
-        <CAK-6q+jkUUjAGqEDgU1oJvRkigUbvSO5SXWRau6+320b=GbfxQ@mail.gmail.com>
-        <20220819191109.0e639918@xps-13>
-        <CAK-6q+gCY3ufaADHNQWJGNpNZJMwm=fhKfe02GWkfGEdgsMVzg@mail.gmail.com>
-        <20220823182950.1c722e13@xps-13>
-        <CAK-6q+jfva++dGkyX_h2zQGXnoJpiOu5+eofCto=KZ+u6KJbJA@mail.gmail.com>
-        <20220824122058.1c46e09a@xps-13>
-        <CAK-6q+gjgQ1BF-QrT01JWh+2b3oL3RU+SoxUf5t7h3Hc6R8pcg@mail.gmail.com>
-        <20220824152648.4bfb9a89@xps-13>
-        <CAK-6q+itA0C4zPAq5XGKXgCHW5znSFeB-YDMp3uB9W-kLV6WaA@mail.gmail.com>
-        <CAK-6q+gnkz-Yf=39Ss361dDsmzhJErJCAq9FaKK3m5nRih=VDA@mail.gmail.com>
+Subject: Re: [PATCH wpan-tools 0/7] iwpan: Support scanning/beaconing
+Message-ID: <20220825145516.14bd5b45@xps-13>
+In-Reply-To: <CAK-6q+gk2rt3crszskUOxxeTYb3OY+ybLsga6f6VC5RQmjY44w@mail.gmail.com>
+References: <20220701143434.1267864-1-miquel.raynal@bootlin.com>
+        <CAK-6q+hUc0Cm+_9OyLNqX=gKNOO-3TU4ERu_bZKm=Qf-c9F-ug@mail.gmail.com>
+        <20220819190654.6af62bca@xps-13>
+        <CAK-6q+gk2rt3crszskUOxxeTYb3OY+ybLsga6f6VC5RQmjY44w@mail.gmail.com>
 Organization: Bootlin
 X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
@@ -72,90 +58,123 @@ X-Mailing-List: linux-wpan@vger.kernel.org
 
 Hi Alexander,
 
-aahringo@redhat.com wrote on Wed, 24 Aug 2022 21:02:29 -0400:
+aahringo@redhat.com wrote on Tue, 23 Aug 2022 21:36:23 -0400:
 
 > Hi,
 >=20
-> On Wed, Aug 24, 2022 at 5:53 PM Alexander Aring <aahringo@redhat.com> wro=
-te:
+> On Fri, Aug 19, 2022 at 1:07 PM Miquel Raynal <miquel.raynal@bootlin.com>=
+ wrote:
 > >
-> > Hi,
+> > Hi Alexander,
 > >
-> > On Wed, Aug 24, 2022 at 9:27 AM Miquel Raynal <miquel.raynal@bootlin.co=
-m> wrote: =20
+> > aahringo@redhat.com wrote on Sun, 3 Jul 2022 21:18:40 -0400:
+> > =20
+> > > Hi,
 > > >
-> > > Hi Alexander,
-> > >
-> > > aahringo@redhat.com wrote on Wed, 24 Aug 2022 08:43:20 -0400:
-> > > =20
-> > > > Hi,
+> > > On Fri, Jul 1, 2022 at 10:39 AM Miquel Raynal <miquel.raynal@bootlin.=
+com> wrote: =20
 > > > >
-> > > > On Wed, Aug 24, 2022 at 6:21 AM Miquel Raynal <miquel.raynal@bootli=
-n.com> wrote:
-> > > > ... =20
-> > > > >
-> > > > > Actually right now the second level is not enforced, and all the
-> > > > > filtering levels are a bit fuzzy and spread everywhere in rx.c.
-> > > > >
-> > > > > I'm gonna see if I can at least clarify all of that and only make
-> > > > > coord-dependent the right section because right now a
-> > > > > ieee802154_coord_rx() path in ieee802154_rx_handle_packet() does =
-not
-> > > > > really make sense given that the level 3 filtering rules are most=
-ly
-> > > > > enforced in ieee802154_subif_frame(). =20
+> > > > Hello,
 > > > >
-> > > > One thing I mentioned before is that we probably like to have a
-> > > > parameter for rx path to give mac802154 a hint on which filtering
-> > > > level it was received. We don't have that, I currently see that this
-> > > > is a parameter for hwsim receiving it on promiscuous level only and
-> > > > all others do third level filtering.
-> > > > We need that now, because the promiscuous mode was only used for
-> > > > sniffing which goes directly into the rx path for monitors. With sc=
-an
-> > > > we mix things up here and in my opinion require such a parameter and
-> > > > do filtering if necessary. =20
+> > > > This series follows the work done in the Linux kernel stack: now th=
+at
+> > > > the core knows about the different netlink commands and attributes =
+in
+> > > > order to support scanning and beaconing requests from end-to-end, h=
+ere
+> > > > are the userspace changes to be able to use it.
+> > > >
+> > > > Here is a list of the new available features.
+> > > >
+> > > > * Sending (or stopping) beacons. Intervals ranging from 0 to 14 are
+> > > >   valid for passively sending beacons at regular intervals. An inte=
+rval
+> > > >   of 15 would request the core to answer BEACON_REQ.
+> > > >   # iwpan dev coord0 beacons send interval 2 # send BEACON at a fix=
+ed rate
+> > > >   # iwpan dev coord0 beacons send interval 15 # answer BEACON_REQ o=
+nly
+> > > >   # iwpan dev coord0 beacons stop # apply to both cases
+> > > >
+> > > > * Scanning all the channels or only a subset:
+> > > >   # iwpan dev wpan1 scan type passive duration 3 # will not trigger=
+ BEACON_REQ
+> > > >   # iwpan dev wpan1 scan type active duration 3 # will trigger BEAC=
+ON_REQ
+> > > >
+> > > > * During scans, there is a dedicated netlink channel event to liste=
+n to
+> > > >   in order to get events like "a new coordinator was discovered" or=
+ "the
+> > > >   scan is over". When beacons from new devices are received, the to=
+ol
+> > > >   would print something like:
+> > > >   PAN 0xabcd (on coord1)
+> > > >         coordinator 0xe673d7a3f3a87ccc
+> > > >         page 0
+> > > >         channel 13
+> > > >         preamble code 0
+> > > >         mean prf 0
+> > > >         superframe spec. 0x4f11
+> > > >         LQI 0
+> > > >
+> > > > * It is also possible to monitor the events with:
+> > > >   # iwpan event
+> > > >
+> > > > * As well as triggering a non blocking scan:
+> > > >   # iwpan dev wpan1 scan trigger type passive duration 3
+> > > >   # iwpan dev wpan1 scan done
+> > > >   # iwpan dev wpan1 scan abort =20
 > > >
-> > > I am currently trying to implement a slightly different approach. The
-> > > core does not know hwsim is always in promiscuous mode, but it does
-> > > know that it does not check FCS. So the core checks it. This is
-> > > level 1 achieved. Then in level 2 we want to know if the core asked
-> > > the transceiver to enter promiscuous mode, which, if it did, should
-> > > not imply more filtering. If the device is working in promiscuous
-> > > mode but this was not asked explicitly by the core, we don't really
-> > > care, software filtering will apply anyway.
-> > > =20
+> > > why do we need an abort? =20
 > >
-> > I doubt that I will be happy with this solution, this all sounds like
-> > "for the specific current behaviour that we support 2 filtering levels
-> > it will work", just do a parameter on which 802.15.4 filtering level
-> > it was received and the rx path will check what kind of filter is =20
+> > Perhaps the tool --help would have helped to get the naming, but we
+> > need:
+> > - a command to start a scan, either use:
+> >   * "scan" alone and it is synchronous, I mean the command returns when
+> >     the scan is over
+> >   or
+> >   * "scan trigger" which is asynchronous, and returns immediately after
+> >     starting the operation
+> > - if the scan was started asynchronously with the "trigger" keyword,
+> >   the "done" command will wait until the scan is over (maybe this one
+> >   needs to be renamed?)
+> > - if the user made a mistake and do not want to remain blocked for
+> >   several minutes (a scan can last for very long time), we need the
+> >   "abort" command to tell the kernel to stop and return to a standard
+> >   state. Once this has been processed and the scan effectively stopped,
+> >   the kernel will send a nl command saying the scan is over (which
+> >   "scan done" would capture)
+> > =20
 >=20
-> I think a per phy field is enough here because the receive path should
-> be synchronized with changing filtering level on hardware. No need for
-> per receive path parameter.
-
-Ok, I prefer the per-PHY field rather than the per-received-skb info.
-
-I will add a parameter in the start field set to LEVEL3, drivers are
-free to change this (like hwsim) if they can't.
-
-I will add also the major filtering rules in the rx path but we will
-actually use them only if the hw filtering level is lower than what is
-requested, as you said.
-
+> For me, trigger and done should be for the simple cli use case in one
+> command like "scan list". It will block them and trigger any scan
+> event popping up. The user can send SIGINT to stop scanning?
 >=20
-> "If the device is working in promiscuous mode but this was not asked
-> explicitly by the core, we don't really care, software filtering will
-> apply anyway."
-> I don't understand this sentence, we should not filter on things which
-> the hardware is doing for us. I mean okay I'm fine to handle it now
-> just to check twice, but in the future there might be more "we don't
-> need to filter this because we know the hardware is doing it" patches.
+> Although there should be still available an asynchronous way which is
+> for me "scan trigger" (non-blocking) and the user can do "iwpan
+> monitor" to observe upcoming events (all inclusive scan) and tell
+> optionally "scan done" to stop scanning if necessary (which probably
+> also produces an event to notify all listeners e.g. iwpan monitor).
 >=20
-> - Alex
+> However I think most people using iwpan want to trigger and wait and
+> the cli is filling up events and blocks until it's done (that would be
+> a combination with trigger/monitor into one command).
 >=20
+> Both solutions should be possible over cli?
 
+Yes, that's what I was saying, the two solutions are already supported.
+The iwpan tool is being enhanced with the "scan" composite command,
+- either "scan" is given an additional keyword and makes just that
+  (trigger, abort, done) and returns as soon as this precise
+  command is done (eg. it returns almost immediately on "trigger")
+- or, no additional command is provided (only the parameters for the
+  scan) and the command does an equivalent to "trigger + monitor +
+  done" which blocks after launching the scan, shows the results when
+  they arrive, and returns once the scan is finished.
+
+Do you want something more? I just miss a "monitor" command I guess, I
+may add it.
 
 Thanks,
 Miqu=C3=A8l
