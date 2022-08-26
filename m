@@ -2,69 +2,36 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51F5EECAAA2
-	for <linux-wpan@archiver.kernel.org>; Fri, 26 Aug 2022 01:35:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F4BEECAAA3
+	for <linux-wpan@archiver.kernel.org>; Fri, 26 Aug 2022 07:31:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229470AbiHZBfX (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Thu, 25 Aug 2022 21:35:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36066 "EHLO
+        id S238380AbiHZHbD (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Fri, 26 Aug 2022 03:31:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45496 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231848AbiHZBfV (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 25 Aug 2022 21:35:21 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D22F28E13
-        for <linux-wpan@vger.kernel.org>; Thu, 25 Aug 2022 18:35:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1661477718;
+        with ESMTP id S237088AbiHZHaq (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 26 Aug 2022 03:30:46 -0400
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A5127B2A3;
+        Fri, 26 Aug 2022 00:30:35 -0700 (PDT)
+Received: (Authenticated sender: miquel.raynal@bootlin.com)
+        by mail.gandi.net (Postfix) with ESMTPSA id B8E9C60014;
+        Fri, 26 Aug 2022 07:30:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+        t=1661499034;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=D+ja7am3QeRHI6I33cst2TOCn2FBIIdrvDrYrb42nMI=;
-        b=XKGWG7ChgSewrM0fkY3B1RZFF0u6nikJbLs7grWo4w+aPR9g9pa8Undq011R46AEaue59d
-        DZFtntJEVZh2n7Y8va4C7kZm7/+NdazAIc53Uo73dTkShs+wViEfFziZJ+zWqnr20b7XzE
-        QBkJVOejCI2rr8c8MNM9Gdp1qCg41Rk=
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
- [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-112-0N7MWpsaNjOdnUnW_vUEUA-1; Thu, 25 Aug 2022 21:35:17 -0400
-X-MC-Unique: 0N7MWpsaNjOdnUnW_vUEUA-1
-Received: by mail-qt1-f199.google.com with SMTP id bq11-20020a05622a1c0b00b003434f125b77so284552qtb.20
-        for <linux-wpan@vger.kernel.org>; Thu, 25 Aug 2022 18:35:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc;
-        bh=D+ja7am3QeRHI6I33cst2TOCn2FBIIdrvDrYrb42nMI=;
-        b=UwPMSie1JCAYrTXwaaDA31C1uUW7uMzoDMXNcVCvUq3tlO/oBLNANc8n8gicIWAGIM
-         eViPdVQbn3Gu+3Qn07+dd0HOl1lnT+gWoWZX4+haQVBoluKAl8LTI95yq0se0m01upz4
-         mgeyG2gkNLXScvMo3UJ+yVkXZktlUJgqr6s61WnYXRGxFXBGoyn2puKln5M252E/xfCR
-         Yno9QOGVoixmCkHOfq/fkPy82gANjujddOfdGZVGybpAHuW98wH+qhiyUL1PuvuS7pAj
-         F6sRqBlOb9qF5KSDNwHhgAta5vBmQx/Ui1PVfbKWWYLEPhWD4P2KOpBwLO7dVCmnPBEq
-         q0bw==
-X-Gm-Message-State: ACgBeo19w0Xrz9Zstrir9iGsXssKYGp/MMJD5KNZAgnHiuKmQt8cIjak
-        P8ZSlFSGTAhipQpR/FUy7CGrS4kNUKPfbi5NEgeJtJGiq9jzv5gajHFrQvQGCthiByvhHRBfIrV
-        Mz9VIXCfawyVtD/jwpmL8u84LZgmofQQ3HfIvwA==
-X-Received: by 2002:ae9:e70f:0:b0:6bb:eb30:4916 with SMTP id m15-20020ae9e70f000000b006bbeb304916mr5128626qka.691.1661477716988;
-        Thu, 25 Aug 2022 18:35:16 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR4dvlJkz1vC2Hu8SO52FlMk78H4r60AwPa83vIOplBiO8ghA8N+ih9P7REhqNlQtBzwJM/IIUL92PuTKfEY8Gk=
-X-Received: by 2002:ae9:e70f:0:b0:6bb:eb30:4916 with SMTP id
- m15-20020ae9e70f000000b006bbeb304916mr5128603qka.691.1661477716656; Thu, 25
- Aug 2022 18:35:16 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220701143052.1267509-1-miquel.raynal@bootlin.com>
- <20220701143052.1267509-2-miquel.raynal@bootlin.com> <CAK-6q+jkUUjAGqEDgU1oJvRkigUbvSO5SXWRau6+320b=GbfxQ@mail.gmail.com>
- <20220819191109.0e639918@xps-13> <CAK-6q+gCY3ufaADHNQWJGNpNZJMwm=fhKfe02GWkfGEdgsMVzg@mail.gmail.com>
- <20220823182950.1c722e13@xps-13> <CAK-6q+jfva++dGkyX_h2zQGXnoJpiOu5+eofCto=KZ+u6KJbJA@mail.gmail.com>
- <20220824093547.16f05d15@xps-13> <CAK-6q+gqX8w+WEgSk2J9FOdrFJPvqJOsgmaY4wOu=siRszBujA@mail.gmail.com>
- <20220825104035.11806a67@xps-13> <CAK-6q+hxSpw1yJR5H5D6gy5gGdm6Qa3VzyjZXA45KFQfVVqwFw@mail.gmail.com>
-In-Reply-To: <CAK-6q+hxSpw1yJR5H5D6gy5gGdm6Qa3VzyjZXA45KFQfVVqwFw@mail.gmail.com>
-From:   Alexander Aring <aahringo@redhat.com>
-Date:   Thu, 25 Aug 2022 21:35:05 -0400
-Message-ID: <CAK-6q+jbBg4kCh88Oz7mBa0RBBX_+cqqoPjT3POEjbQKX1ZDKw@mail.gmail.com>
-Subject: Re: [PATCH wpan-next 01/20] net: mac802154: Allow the creation of
- coordinator interfaces
-To:     Miquel Raynal <miquel.raynal@bootlin.com>
+        bh=oX2MMYRdBL3fMgi654ieTqHv7qv4T4+5c611KCXLe4I=;
+        b=VRjIDTcSHeOJ7yn/aJuVyfbfKtyILRXnk+613Ga/Rn6bVPT6jHthJayM1didIbb66faVWU
+        n6kC6J4lYnqHDM9F3SJSi/+hrsgbiobE7E0AxPu+ApyBJzxoGiQAsW+ccP8LkiatGJU4gh
+        mqmiCnwSZ8mmLYrY7lYajv2x8L1EDLCPERH3VGXwIEmD3mbMm9dJWV1/M8CnX8WkhN4uvw
+        aX4NdFy03QqTMeEpDbt2nqmoL2YOh/WOSoYn4DSdRLr/uStqf/tqrxfk7sp5RUyjYh5X0x
+        idClouiiBkgUoiG26JKnW8EL36zgqQtuNn0lPp2yAfR6yHdjeDCIlzB7kXKhMA==
+Date:   Fri, 26 Aug 2022 09:30:29 +0200
+From:   Miquel Raynal <miquel.raynal@bootlin.com>
+To:     Alexander Aring <aahringo@redhat.com>
 Cc:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
         linux-wpan - ML <linux-wpan@vger.kernel.org>,
@@ -78,56 +45,72 @@ Cc:     Alexander Aring <alex.aring@gmail.com>,
         Frederic Blain <frederic.blain@qorvo.com>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH wpan-next 01/20] net: mac802154: Allow the creation of
+ coordinator interfaces
+Message-ID: <20220826093029.474ae5b4@xps-13>
+In-Reply-To: <CAK-6q+hxSpw1yJR5H5D6gy5gGdm6Qa3VzyjZXA45KFQfVVqwFw@mail.gmail.com>
+References: <20220701143052.1267509-1-miquel.raynal@bootlin.com>
+        <20220701143052.1267509-2-miquel.raynal@bootlin.com>
+        <CAK-6q+jkUUjAGqEDgU1oJvRkigUbvSO5SXWRau6+320b=GbfxQ@mail.gmail.com>
+        <20220819191109.0e639918@xps-13>
+        <CAK-6q+gCY3ufaADHNQWJGNpNZJMwm=fhKfe02GWkfGEdgsMVzg@mail.gmail.com>
+        <20220823182950.1c722e13@xps-13>
+        <CAK-6q+jfva++dGkyX_h2zQGXnoJpiOu5+eofCto=KZ+u6KJbJA@mail.gmail.com>
+        <20220824093547.16f05d15@xps-13>
+        <CAK-6q+gqX8w+WEgSk2J9FOdrFJPvqJOsgmaY4wOu=siRszBujA@mail.gmail.com>
+        <20220825104035.11806a67@xps-13>
+        <CAK-6q+hxSpw1yJR5H5D6gy5gGdm6Qa3VzyjZXA45KFQfVVqwFw@mail.gmail.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi,
+Hi Alexander,
 
-On Thu, Aug 25, 2022 at 8:51 PM Alexander Aring <aahringo@redhat.com> wrote=
-:
->
+aahringo@redhat.com wrote on Thu, 25 Aug 2022 20:51:49 -0400:
+
 > Hi,
->
+>=20
 > On Thu, Aug 25, 2022 at 4:41 AM Miquel Raynal <miquel.raynal@bootlin.com>=
  wrote:
 > >
 > > Hi Alexander,
 > >
 > > aahringo@redhat.com wrote on Wed, 24 Aug 2022 17:43:11 -0400:
-> >
+> > =20
 > > > On Wed, Aug 24, 2022 at 3:35 AM Miquel Raynal <miquel.raynal@bootlin.=
-com> wrote:
+com> wrote: =20
 > > > >
 > > > > Hi Alexander,
 > > > >
 > > > > aahringo@redhat.com wrote on Tue, 23 Aug 2022 17:44:52 -0400:
-> > > >
+> > > > =20
 > > > > > Hi,
 > > > > >
 > > > > > On Tue, Aug 23, 2022 at 12:29 PM Miquel Raynal
-> > > > > <miquel.raynal@bootlin.com> wrote:
+> > > > > <miquel.raynal@bootlin.com> wrote: =20
 > > > > > >
 > > > > > > Hi Alexander,
 > > > > > >
 > > > > > > aahringo@redhat.com wrote on Tue, 23 Aug 2022 08:33:30 -0400:
-> > > > > >
+> > > > > > =20
 > > > > > > > Hi,
 > > > > > > >
 > > > > > > > On Fri, Aug 19, 2022 at 1:11 PM Miquel Raynal <miquel.raynal@=
-bootlin.com> wrote:
+bootlin.com> wrote: =20
 > > > > > > > >
 > > > > > > > > Hi Alexander,
 > > > > > > > >
-> > > > > > > > aahringo@redhat.com wrote on Tue, 5 Jul 2022 21:51:02 -0400=
-:
-> > > > > > > >
+> > > > > > > > aahringo@redhat.com wrote on Tue, 5 Jul 2022 21:51:02 -0400:
+> > > > > > > > =20
 > > > > > > > > > Hi,
 > > > > > > > > >
 > > > > > > > > > On Fri, Jul 1, 2022 at 10:36 AM Miquel Raynal <miquel.ray=
-nal@bootlin.com> wrote:
+nal@bootlin.com> wrote: =20
 > > > > > > > > > >
 > > > > > > > > > > As a first strep in introducing proper PAN management a=
 nd association,
@@ -137,11 +120,9 @@ ch might act as
 > > > > > > > > > >
 > > > > > > > > > > Hence, let's add the minimum support to allow the creat=
 ion of these
-> > > > > > > > > > interfaces. This might be restrained and improved later=
-.
+> > > > > > > > > > interfaces. This might be restrained and improved later.
 > > > > > > > > > >
-> > > > > > > > > > Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com=
->
+> > > > > > > > > > Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
 > > > > > > > > > > ---
 > > > > > > > > > >  net/mac802154/iface.c | 14 ++++++++------
 > > > > > > > > > >  net/mac802154/rx.c    |  2 +-
@@ -224,7 +205,7 @@ es, list) {
 4_IFTYPE_NODE)
 > > > > > > > > > > +               if (sdata->wpan_dev.iftype =3D=3D NL802=
 154_IFTYPE_MONITOR)
-> > > > > > > > > >                         continue;
+> > > > > > > > > >                         continue; =20
 > > > > > > > > >
 > > > > > > > > > I probably get why you are doing that, but first the over=
 all design is
@@ -265,7 +246,7 @@ e that
 ee is a
 > > > > > > > > > separate receive path for coordinators that people can se=
 nd patches to
-> > > > > > > > > fix it.
+> > > > > > > > > fix it. =20
 > > > > > > > >
 > > > > > > > > Yes, we do very little differently between the two modes, t=
 hat's why I
@@ -276,7 +257,7 @@ to easily
 > > > > > > > > show people where to add filters for such or such interface=
 , but right
 > > > > > > > > now both path will look very "identical", do we agree on th=
-at?
+at? =20
 > > > > > > >
 > > > > > > > mostly yes, but there exists a difference and we should at le=
 ast check
@@ -299,7 +280,7 @@ eds to
  and the
 > > > > > > > mac802154 receive path if we actually need to run such filter=
 ing or
-> > > > > > > not.
+> > > > > > > not. =20
 > > > > > >
 > > > > > > I must be missing some information because I can't find any pla=
 ces
@@ -332,8 +313,7 @@ pe.
 all
 > > > > > > those cases when running in COORD mode. So I still don't get wh=
 at
-> > > > > > should be included in either node_receive_path() which should b=
-e
+> > > > > > should be included in either node_receive_path() which should be
 > > > > > > different than in coord_receive_path() for now.
 > > > > > >
 > > > > > > There are, however, two situations where the interface type has=
@@ -364,7 +344,7 @@ without
 > > > > > > would be necessary. Unless you convince me otherwise or read th=
 e spec
 > > > > > > differently than I do :) What do you think?
-> > > > > >
+> > > > > > =20
 > > > > >
 > > > > > "Reception and rejection"
 > > > > >
@@ -375,16 +355,16 @@ e spec
 u can
 > > > > > also read that up in datasheets of transceivers as atf86rf233, se=
 arch
-> > > > > for I_AM_COORD.
+> > > > > for I_AM_COORD. =20
 > > > >
 > > > > Oh right, I now see what you mean!
-> > > >
+> > > > =20
 > > > > > Whereas they use the word "PAN coordinator" not "coordinator", if=
  they
 > > > > > really make a difference there at this point..., if so then the k=
 ernel
 > > > > > must know if the coordinator is a pan coordinator or coordinator
-> > > > > because we need to set the address filter in kernel.
+> > > > > because we need to set the address filter in kernel. =20
 > > > >
 > > > > Yes we need to make a difference, you can have several coordinators=
  but
@@ -392,15 +372,14 @@ ernel
 AN
 > > > > coordinator is the coordinator with no parent (association-wise). W=
 ith
-> > > > the addition of the association series, I can handle that, so I wil=
-l
+> > > > the addition of the association series, I can handle that, so I will
 > > > > create the two path as you advise, add a comment about this additio=
 nal
 > > > > filter rule that we don't yet support, and finally after the
 > > > > association series add another commit to make this filtering rule r=
 eal.
-> > > >
-> > > > >
+> > > > =20
+> > > > > =20
 > > > > > > Thanks,
 > > > > > > Miqu=C3=A8l
 > > > > > >
@@ -452,16 +431,16 @@ r COORDINATORs */
 > > > > > > +       default:
 > > > > > > +               kfree_skb(skb);
 > > > > > >                 break;
-> > > > > >         }
+> > > > > >         } =20
 > > > > >
 > > > > > Why do you remove the whole interface looping above and make it o=
 nly
-> > > > > run for one ?first found? ?
+> > > > > run for one ?first found? ? =20
 > > > >
 > > > > To reduce the indentation level.
-> > > >
+> > > > =20
 > > > > > That code changes this behaviour and I do
-> > > > > not know why.
+> > > > > not know why. =20
 > > > >
 > > > > The precedent code did:
 > > > > for_each_iface() {
@@ -476,43 +455,39 @@ nly
 > > > >
 > > > > That final break also elected only the first running node iface.
 > > > > Otherwise it would mean that we allow the same skb to be consumed
-> > > > twice, which is wrong IMHO?
+> > > > twice, which is wrong IMHO? =20
 > > >
 > > > no? Why is that wrong? There is a real use-case to have multiple
 > > > interfaces on one phy (or to do it in near future, I said that
-> > > multiple times). This patch does a step backwards to this.
+> > > multiple times). This patch does a step backwards to this. =20
 > >
 > > So we need to duplicate the skb because it automatically gets freed in
-> > the "forward to upper layer" path. Am I right? I'm fine doing so if
->
+> > the "forward to upper layer" path. Am I right? I'm fine doing so if =20
+>=20
 > What is the definition of "duplicate the skb" here.
->
+
+skb2 =3D skb_clone(skb, GFP_ATOMIC);
+if (skb2) {
+	skb2->dev =3D sdata->dev;
+	ieee802154_deliver_skb(skb2);
+	...
+}
+
+This is exactly what the ieee80254_monitors_rx() function does, it
+loops over all the monitor interfaces and each time there is one
+running, copies the skb and consumes it by forwarding it to the upper
+layers. I've done the same in the other path to keep the ability to use
+more than one "visible" interface on the same PHY (by visible I mean:
+not a monitor).
+
 > > this is the way to go, but I am interested if you can give me a real
 > > use case where having NODE+COORDINATOR on the same PHY is useful?
-> >
->
+> > =20
+>=20
 > Testing.
 
-I need to say that I really used multiple monitors at the same time on
-one phy only and I did that with hwsim to run multiple user space
-stacks. It was working and I was happy and didn't need to do a lot of
-phy creations in hwsim. Most hardware can probably not run multiple
-nodes and coordinators at the same time ?yet?, _but_ there is a
-candidate which can do that and this is atusb. On atusb we have a
-co-processor that can deal with multiple address filters. People
-already asked to do something like a node which can operate on two
-pans as I remember, that would be a candidate for such a feature. I
-really don't want to move step backwards here and delete this thing
-which probably can be useful later. I don't know how wireless history
-dealt with it and how complicated it was to bring such a feature in to
-e.g. run multiple access points on one phy. I also see it in ethernet
-with macvlan, which is a similar feature.
+Ok :-)
 
-We don't need to support it, make it so that on an ifup it returns
--EBUSY if something doesn't fit together as it currently is. We can
-later add support for it after playing around with hwsim a little bit
-more. We should at least take care that I can still run my multiple
-monitors at the same time (which is currently allowed).
 
-- Alex
-
+Thanks,
+Miqu=C3=A8l
