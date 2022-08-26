@@ -2,249 +2,93 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21119ECAAD4
-	for <linux-wpan@archiver.kernel.org>; Fri, 26 Aug 2022 10:50:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC0ADECAAD4
+	for <linux-wpan@archiver.kernel.org>; Fri, 26 Aug 2022 14:30:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343998AbiHZKu3 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Fri, 26 Aug 2022 06:50:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49178 "EHLO
+        id S1344502AbiHZOag (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Fri, 26 Aug 2022 10:30:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53046 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343978AbiHZKu2 (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Fri, 26 Aug 2022 06:50:28 -0400
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0336B13E33
-        for <linux-wpan@vger.kernel.org>; Fri, 26 Aug 2022 03:50:25 -0700 (PDT)
+        with ESMTP id S1344523AbiHZOaM (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 26 Aug 2022 10:30:12 -0400
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::221])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89769753AD;
+        Fri, 26 Aug 2022 07:30:00 -0700 (PDT)
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id CB4E2240004;
-        Fri, 26 Aug 2022 10:50:22 +0000 (UTC)
+        by mail.gandi.net (Postfix) with ESMTPSA id 43AF0240006;
+        Fri, 26 Aug 2022 14:29:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1661511024;
+        t=1661524198;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=/4eQNrjyEf5ZbtZBhL7ZPiBumB/krGKSyqpdE2KHpFs=;
-        b=jGiV1fF1ecc7Xf3i+jJiPkNpbDgGrEkRnGsEMNYLb01uqAw8Lwu614EWixUhNmXU+EDO3+
-        H4RoW3bi4t21oDFfPWTQU2OeBrwmo3JV7zoyhcpCwI6TzaquJ5Q07/Rm1+JOjxPqM2pF7Y
-        xJ3TUt67JQnpEHPt3Cqs+ZWFLU0tSn2BOTQFdJ7JtQtCxnUwbYclGp6odx7LoSFB1Rq7fy
-        JdTpOl5CUuKnF1rou3khJ3kQMCD+akZ9k5z52RNyptQ5fo47W3ogdHIiIzpmWxO90b9/4F
-        THd/UJnGsYi0BMNlHlNUd4evRyXWbdNvXkI5I6h/Vxq2I221XotK5J9abf34wQ==
-Date:   Fri, 26 Aug 2022 12:50:20 +0200
+         content-transfer-encoding:content-transfer-encoding;
+        bh=aQD20Brwv2E/xJ6AX9y2GLXP1qUIHPs5gmP90CzDfM4=;
+        b=QNn0W7jtgNYuxzSQ6EnXSsvFbxAJaM9M1my9vexOBTmwLCvGT8Z8G5Awm4+j4d6O2bEFP1
+        JzhDB4jOvR6zxZNolZz6OsHMbNA1ZrV+qo6b+L4ZXbY8CHEVyerPUKG4NbRE2qffZpCar8
+        f1hxTrc7TvE9m7gM99jKe7Q0+fGAS6c3X26SGWPk34TSxRUg4q/rLylTApb4Hjhc34JpIk
+        8oEYLSko9eJetFiajo9jtCZr4jyjLh3THIT+hmjzbz4l+0V2TfzgHq08ad9EnpoqB3U3zq
+        6PQMyqk0yBbfdL+s4KYU+lG7M7x9/AOhTpzK2I0W616YY9/GQsh35coJrjRrUQ==
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
-To:     Alexander Aring <aahringo@redhat.com>
-Cc:     Alexander Aring <alex.aring@gmail.com>,
+To:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
-        linux-wpan - ML <linux-wpan@vger.kernel.org>,
+        linux-wpan@vger.kernel.org
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
         David Girault <david.girault@qorvo.com>,
         Romuald Despres <romuald.despres@qorvo.com>,
         Frederic Blain <frederic.blain@qorvo.com>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
-        Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH wpan-tools 0/7] iwpan: Support scanning/beaconing
-Message-ID: <20220826125020.414964fd@xps-13>
-In-Reply-To: <CAK-6q+jy75nUH1dzr5KCFnLJ=QALLv5keXboTtbjQ7uh-KWwGg@mail.gmail.com>
-References: <20220701143434.1267864-1-miquel.raynal@bootlin.com>
-        <CAK-6q+hUc0Cm+_9OyLNqX=gKNOO-3TU4ERu_bZKm=Qf-c9F-ug@mail.gmail.com>
-        <20220819190654.6af62bca@xps-13>
-        <CAK-6q+gk2rt3crszskUOxxeTYb3OY+ybLsga6f6VC5RQmjY44w@mail.gmail.com>
-        <20220825145516.14bd5b45@xps-13>
-        <CAK-6q+jy75nUH1dzr5KCFnLJ=QALLv5keXboTtbjQ7uh-KWwGg@mail.gmail.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+        Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        stable@vger.kernel.org
+Subject: [PATCH] net: mac802154: Fix a condition in the receive path
+Date:   Fri, 26 Aug 2022 16:29:54 +0200
+Message-Id: <20220826142954.254853-1-miquel.raynal@bootlin.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi Alexander,
+Upon reception, a packet must be categorized, either it's destination is
+the host, or it is another host. A packet with no destination addressing
+fields may be valid in two situations:
+- the packet has no source field: only ACKs are built like that, we
+  consider the host as the destination.
+- the packet has a valid source field: it is directed to the PAN
+  coordinator, as for know we don't have this information we consider we
+  are not the PAN coordinator.
 
-aahringo@redhat.com wrote on Thu, 25 Aug 2022 21:22:48 -0400:
+There was likely a copy/paste error made during a previous cleanup
+because the if clause is now containing exactly the same condition as in
+the switch case, which can never be true. In the past the destination
+address was used in the switch and the source address was used in the
+if, which matches what the spec says.
 
-> Hi,
->=20
-> On Thu, Aug 25, 2022 at 8:55 AM Miquel Raynal <miquel.raynal@bootlin.com>=
- wrote:
-> >
-> > Hi Alexander,
-> >
-> > aahringo@redhat.com wrote on Tue, 23 Aug 2022 21:36:23 -0400:
-> > =20
-> > > Hi,
-> > >
-> > > On Fri, Aug 19, 2022 at 1:07 PM Miquel Raynal <miquel.raynal@bootlin.=
-com> wrote: =20
-> > > >
-> > > > Hi Alexander,
-> > > >
-> > > > aahringo@redhat.com wrote on Sun, 3 Jul 2022 21:18:40 -0400:
-> > > > =20
-> > > > > Hi,
-> > > > >
-> > > > > On Fri, Jul 1, 2022 at 10:39 AM Miquel Raynal <miquel.raynal@boot=
-lin.com> wrote: =20
-> > > > > >
-> > > > > > Hello,
-> > > > > >
-> > > > > > This series follows the work done in the Linux kernel stack: no=
-w that
-> > > > > > the core knows about the different netlink commands and attribu=
-tes in
-> > > > > > order to support scanning and beaconing requests from end-to-en=
-d, here
-> > > > > > are the userspace changes to be able to use it.
-> > > > > >
-> > > > > > Here is a list of the new available features.
-> > > > > >
-> > > > > > * Sending (or stopping) beacons. Intervals ranging from 0 to 14=
- are
-> > > > > >   valid for passively sending beacons at regular intervals. An =
-interval
-> > > > > >   of 15 would request the core to answer BEACON_REQ.
-> > > > > >   # iwpan dev coord0 beacons send interval 2 # send BEACON at a=
- fixed rate
-> > > > > >   # iwpan dev coord0 beacons send interval 15 # answer BEACON_R=
-EQ only
-> > > > > >   # iwpan dev coord0 beacons stop # apply to both cases
-> > > > > >
-> > > > > > * Scanning all the channels or only a subset:
-> > > > > >   # iwpan dev wpan1 scan type passive duration 3 # will not tri=
-gger BEACON_REQ
-> > > > > >   # iwpan dev wpan1 scan type active duration 3 # will trigger =
-BEACON_REQ
-> > > > > >
-> > > > > > * During scans, there is a dedicated netlink channel event to l=
-isten to
-> > > > > >   in order to get events like "a new coordinator was discovered=
-" or "the
-> > > > > >   scan is over". When beacons from new devices are received, th=
-e tool
-> > > > > >   would print something like:
-> > > > > >   PAN 0xabcd (on coord1)
-> > > > > >         coordinator 0xe673d7a3f3a87ccc
-> > > > > >         page 0
-> > > > > >         channel 13
-> > > > > >         preamble code 0
-> > > > > >         mean prf 0
-> > > > > >         superframe spec. 0x4f11
-> > > > > >         LQI 0
-> > > > > >
-> > > > > > * It is also possible to monitor the events with:
-> > > > > >   # iwpan event
-> > > > > >
-> > > > > > * As well as triggering a non blocking scan:
-> > > > > >   # iwpan dev wpan1 scan trigger type passive duration 3
-> > > > > >   # iwpan dev wpan1 scan done
-> > > > > >   # iwpan dev wpan1 scan abort =20
-> > > > >
-> > > > > why do we need an abort? =20
-> > > >
-> > > > Perhaps the tool --help would have helped to get the naming, but we
-> > > > need:
-> > > > - a command to start a scan, either use:
-> > > >   * "scan" alone and it is synchronous, I mean the command returns =
-when
-> > > >     the scan is over
-> > > >   or
-> > > >   * "scan trigger" which is asynchronous, and returns immediately a=
-fter
-> > > >     starting the operation
-> > > > - if the scan was started asynchronously with the "trigger" keyword,
-> > > >   the "done" command will wait until the scan is over (maybe this o=
-ne
-> > > >   needs to be renamed?)
-> > > > - if the user made a mistake and do not want to remain blocked for
-> > > >   several minutes (a scan can last for very long time), we need the
-> > > >   "abort" command to tell the kernel to stop and return to a standa=
-rd
-> > > >   state. Once this has been processed and the scan effectively stop=
-ped,
-> > > >   the kernel will send a nl command saying the scan is over (which
-> > > >   "scan done" would capture)
-> > > > =20
-> > >
-> > > For me, trigger and done should be for the simple cli use case in one
-> > > command like "scan list". It will block them and trigger any scan
-> > > event popping up. The user can send SIGINT to stop scanning?
-> > >
-> > > Although there should be still available an asynchronous way which is
-> > > for me "scan trigger" (non-blocking) and the user can do "iwpan
-> > > monitor" to observe upcoming events (all inclusive scan) and tell
-> > > optionally "scan done" to stop scanning if necessary (which probably
-> > > also produces an event to notify all listeners e.g. iwpan monitor).
-> > >
-> > > However I think most people using iwpan want to trigger and wait and
-> > > the cli is filling up events and blocks until it's done (that would be
-> > > a combination with trigger/monitor into one command).
-> > >
-> > > Both solutions should be possible over cli? =20
-> >
-> > Yes, that's what I was saying, the two solutions are already supported.
-> > The iwpan tool is being enhanced with the "scan" composite command,
-> > - either "scan" is given an additional keyword and makes just that
-> >   (trigger, abort, done) and returns as soon as this precise
-> >   command is done (eg. it returns almost immediately on "trigger") =20
->=20
-> But why do we need to have a done command?
->=20
-> Sorry, I still don't get that.
+Cc: stable@vger.kernel.org
+Fixes: ae531b9475f6 ("ieee802154: use ieee802154_addr instead of *_sa variants")
+Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
+---
+ net/mac802154/rx.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-My bad, I changed the command and I forgot to update my draft.
+diff --git a/net/mac802154/rx.c b/net/mac802154/rx.c
+index b8ce84618a55..c439125ef2b9 100644
+--- a/net/mac802154/rx.c
++++ b/net/mac802154/rx.c
+@@ -44,7 +44,7 @@ ieee802154_subif_frame(struct ieee802154_sub_if_data *sdata,
+ 
+ 	switch (mac_cb(skb)->dest.mode) {
+ 	case IEEE802154_ADDR_NONE:
+-		if (mac_cb(skb)->dest.mode != IEEE802154_ADDR_NONE)
++		if (hdr->source.mode != IEEE802154_ADDR_NONE)
+ 			/* FIXME: check if we are PAN coordinator */
+ 			skb->pkt_type = PACKET_OTHERHOST;
+ 		else
+-- 
+2.34.1
 
-> > - or, no additional command is provided (only the parameters for the
-> >   scan) and the command does an equivalent to "trigger + monitor +
-> >   done" which blocks after launching the scan, shows the results when
-> >   they arrive, and returns once the scan is finished. =20
->=20
-> "trigger + monitor" there is no done command needed here or? The
-> process should unblock when it's done, and for SIGINT/SIGKILL send an
-> abort?
-
-> Maybe a done event when the scan is "successful" finished and
-> everything that was there in the channel/page combinations was scanned
-> without an abort.
->=20
-> We need to consider that other processes listen to events? They should
-> be aware of what's happening there? There should be some event
-> sequence going on "trigger event" + "loop of found something event" +
-> "either abort or done"?
->=20
-> >
-> > Do you want something more? I just miss a "monitor" command I guess, I
-> > may add it.
-> > =20
->=20
-> Yea, monitor sounds like ip monitor, udevadm monitor, etc. to listen
-> to all those 802.15.4 subsystem events. I would take a look into it
-> for any scan results. At the end you should be able to do a blocked
-> scan and monitor at the same time and they should at least provide
-> similar events.
-> Probably the blocked scan with nicer output and filtered and the
-> monitor is for everything that is going on in 802.15.4 there.
-
-I've updated the tools so that we have:
-
-* "scan trigger" which does not block
-* "scan monitor" which displays with a pretty output the new
-  coordinators and stops blocking when the scan is over (either because
-  it reached the last channel to scan, or it got aborted)
-* "scan abort" which stops an ongoing scan
-* "scan" which is the same as "scan trigger; scan monitor", and will
-  send an abort command if interrupted with SIGINT
-
-On the other side there was in the previous versions a command "iwpan
-event" which I just renamed "iwpan monitor" which follows anything
-802154 related and displays a single line each time, it looks like:
-# iwpan monitor -t // -t is an option to display timestamps
-1661510897.820505: coord1 (phy #1): scan started
-1661510903.874055: coord1 (phy #1): new coordinator detected: PAN 0xabcd, a=
-ddr 0x42aab7e343ea5c0f
-1661510908.953874: coord1 (phy #1): scan finished
-1661510915.437030: coord1 (phy #1): scan started
-1661510916.242412: coord1 (phy #1): scan aborted
-
-This should address all the needs.
-
-Thanks,
-Miqu=C3=A8l
