@@ -2,214 +2,517 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C55D0ECAAA2
-	for <linux-wpan@archiver.kernel.org>; Fri, 26 Aug 2022 01:23:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51F5EECAAA2
+	for <linux-wpan@archiver.kernel.org>; Fri, 26 Aug 2022 01:35:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230181AbiHZBXE (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Thu, 25 Aug 2022 21:23:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43668 "EHLO
+        id S229470AbiHZBfX (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Thu, 25 Aug 2022 21:35:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36066 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229990AbiHZBXD (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 25 Aug 2022 21:23:03 -0400
+        with ESMTP id S231848AbiHZBfV (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 25 Aug 2022 21:35:21 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4C43C9938
-        for <linux-wpan@vger.kernel.org>; Thu, 25 Aug 2022 18:23:02 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D22F28E13
+        for <linux-wpan@vger.kernel.org>; Thu, 25 Aug 2022 18:35:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1661476981;
+        s=mimecast20190719; t=1661477718;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ViIqayQYinXW6Uc5m9xaEFbXEU8rAnolGpQ7GZrlZIA=;
-        b=YGEhOJbk2YM3NbrhwUgANEM1Ix+FJ0MYVSoNN2Nzzhre6rc3XKqtehA1HSLoD6c4fBvtpE
-        B8WUxmSaVKx5amHFD/Ppn0sLLwpB0Y0q0qZYgvyRJbGKFx9xm5MuuyJ6JAxmFktNzPHymK
-        ZmCODUCAdeWWEaPA2gWAb4NXnsvTr2s=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=D+ja7am3QeRHI6I33cst2TOCn2FBIIdrvDrYrb42nMI=;
+        b=XKGWG7ChgSewrM0fkY3B1RZFF0u6nikJbLs7grWo4w+aPR9g9pa8Undq011R46AEaue59d
+        DZFtntJEVZh2n7Y8va4C7kZm7/+NdazAIc53Uo73dTkShs+wViEfFziZJ+zWqnr20b7XzE
+        QBkJVOejCI2rr8c8MNM9Gdp1qCg41Rk=
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
+ [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-602-i9IaR_MeP9m5R8P37v8GVw-1; Thu, 25 Aug 2022 21:23:00 -0400
-X-MC-Unique: i9IaR_MeP9m5R8P37v8GVw-1
-Received: by mail-qv1-f70.google.com with SMTP id o6-20020ad443c6000000b00495d04028a6so9168qvs.18
-        for <linux-wpan@vger.kernel.org>; Thu, 25 Aug 2022 18:23:00 -0700 (PDT)
+ us-mta-112-0N7MWpsaNjOdnUnW_vUEUA-1; Thu, 25 Aug 2022 21:35:17 -0400
+X-MC-Unique: 0N7MWpsaNjOdnUnW_vUEUA-1
+Received: by mail-qt1-f199.google.com with SMTP id bq11-20020a05622a1c0b00b003434f125b77so284552qtb.20
+        for <linux-wpan@vger.kernel.org>; Thu, 25 Aug 2022 18:35:17 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc;
-        bh=ViIqayQYinXW6Uc5m9xaEFbXEU8rAnolGpQ7GZrlZIA=;
-        b=N1aCbLIc4gWCbM7OtSoHThbqVuJnwgwSzTEd517NX2VPYx5+mLrmEUHQlP1ClsnOF8
-         bNhhEuPrwaiKNRoUX6sSRs9mGsZJ5VUGdtppOd2cKVKloLfbWNXEuPM2M0xbWL3F7cz4
-         C97XcXqz06uyWD+MeAVBjGTtYJgQyGggOlk6nJjdJJD6sAhl1XWL/7P5eJ8jkMF8PRPA
-         CstXcsHYgSw+dr5q2HjAxdHcQmX8LYFNm2KxNaO9oz1dMxMtenZf5IF0sjTy/pjvfny/
-         L1oG0+C1PEoVSMJ6mHb4scfp6jqZb+SD86UUf/hSpmZ3iFLM00KynCVNZfKX50uQoOYf
-         EYpw==
-X-Gm-Message-State: ACgBeo3ZYmL6xYoJE5kyijgRYVXqleEKKl6FAKau6AzQYojWd6KYyYns
-        VIDXy+vSSH9SRH/4Ok94Z8d5NFs59HzmnbPtCDFDcgcO/BPpkLGQG+dr9HYjMDLv2bVLjWmQqYK
-        eZwI1mKMdbVgt37A456Xrl4dRvORxDrbgkpLa0Q==
-X-Received: by 2002:a37:b741:0:b0:6b9:3b67:d0a7 with SMTP id h62-20020a37b741000000b006b93b67d0a7mr4947300qkf.770.1661476980028;
-        Thu, 25 Aug 2022 18:23:00 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR6YtotaUg4SO0WwESg1NcJGJ262aiGUaRWVy3rqRq+EEDFapwpn30aj+irmF5lVWBNrGN561f+Ior8fjYcsMmw=
-X-Received: by 2002:a37:b741:0:b0:6b9:3b67:d0a7 with SMTP id
- h62-20020a37b741000000b006b93b67d0a7mr4947293qkf.770.1661476979793; Thu, 25
- Aug 2022 18:22:59 -0700 (PDT)
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc;
+        bh=D+ja7am3QeRHI6I33cst2TOCn2FBIIdrvDrYrb42nMI=;
+        b=UwPMSie1JCAYrTXwaaDA31C1uUW7uMzoDMXNcVCvUq3tlO/oBLNANc8n8gicIWAGIM
+         eViPdVQbn3Gu+3Qn07+dd0HOl1lnT+gWoWZX4+haQVBoluKAl8LTI95yq0se0m01upz4
+         mgeyG2gkNLXScvMo3UJ+yVkXZktlUJgqr6s61WnYXRGxFXBGoyn2puKln5M252E/xfCR
+         Yno9QOGVoixmCkHOfq/fkPy82gANjujddOfdGZVGybpAHuW98wH+qhiyUL1PuvuS7pAj
+         F6sRqBlOb9qF5KSDNwHhgAta5vBmQx/Ui1PVfbKWWYLEPhWD4P2KOpBwLO7dVCmnPBEq
+         q0bw==
+X-Gm-Message-State: ACgBeo19w0Xrz9Zstrir9iGsXssKYGp/MMJD5KNZAgnHiuKmQt8cIjak
+        P8ZSlFSGTAhipQpR/FUy7CGrS4kNUKPfbi5NEgeJtJGiq9jzv5gajHFrQvQGCthiByvhHRBfIrV
+        Mz9VIXCfawyVtD/jwpmL8u84LZgmofQQ3HfIvwA==
+X-Received: by 2002:ae9:e70f:0:b0:6bb:eb30:4916 with SMTP id m15-20020ae9e70f000000b006bbeb304916mr5128626qka.691.1661477716988;
+        Thu, 25 Aug 2022 18:35:16 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR4dvlJkz1vC2Hu8SO52FlMk78H4r60AwPa83vIOplBiO8ghA8N+ih9P7REhqNlQtBzwJM/IIUL92PuTKfEY8Gk=
+X-Received: by 2002:ae9:e70f:0:b0:6bb:eb30:4916 with SMTP id
+ m15-20020ae9e70f000000b006bbeb304916mr5128603qka.691.1661477716656; Thu, 25
+ Aug 2022 18:35:16 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220701143434.1267864-1-miquel.raynal@bootlin.com>
- <CAK-6q+hUc0Cm+_9OyLNqX=gKNOO-3TU4ERu_bZKm=Qf-c9F-ug@mail.gmail.com>
- <20220819190654.6af62bca@xps-13> <CAK-6q+gk2rt3crszskUOxxeTYb3OY+ybLsga6f6VC5RQmjY44w@mail.gmail.com>
- <20220825145516.14bd5b45@xps-13>
-In-Reply-To: <20220825145516.14bd5b45@xps-13>
+References: <20220701143052.1267509-1-miquel.raynal@bootlin.com>
+ <20220701143052.1267509-2-miquel.raynal@bootlin.com> <CAK-6q+jkUUjAGqEDgU1oJvRkigUbvSO5SXWRau6+320b=GbfxQ@mail.gmail.com>
+ <20220819191109.0e639918@xps-13> <CAK-6q+gCY3ufaADHNQWJGNpNZJMwm=fhKfe02GWkfGEdgsMVzg@mail.gmail.com>
+ <20220823182950.1c722e13@xps-13> <CAK-6q+jfva++dGkyX_h2zQGXnoJpiOu5+eofCto=KZ+u6KJbJA@mail.gmail.com>
+ <20220824093547.16f05d15@xps-13> <CAK-6q+gqX8w+WEgSk2J9FOdrFJPvqJOsgmaY4wOu=siRszBujA@mail.gmail.com>
+ <20220825104035.11806a67@xps-13> <CAK-6q+hxSpw1yJR5H5D6gy5gGdm6Qa3VzyjZXA45KFQfVVqwFw@mail.gmail.com>
+In-Reply-To: <CAK-6q+hxSpw1yJR5H5D6gy5gGdm6Qa3VzyjZXA45KFQfVVqwFw@mail.gmail.com>
 From:   Alexander Aring <aahringo@redhat.com>
-Date:   Thu, 25 Aug 2022 21:22:48 -0400
-Message-ID: <CAK-6q+jy75nUH1dzr5KCFnLJ=QALLv5keXboTtbjQ7uh-KWwGg@mail.gmail.com>
-Subject: Re: [PATCH wpan-tools 0/7] iwpan: Support scanning/beaconing
+Date:   Thu, 25 Aug 2022 21:35:05 -0400
+Message-ID: <CAK-6q+jbBg4kCh88Oz7mBa0RBBX_+cqqoPjT3POEjbQKX1ZDKw@mail.gmail.com>
+Subject: Re: [PATCH wpan-next 01/20] net: mac802154: Allow the creation of
+ coordinator interfaces
 To:     Miquel Raynal <miquel.raynal@bootlin.com>
 Cc:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
         linux-wpan - ML <linux-wpan@vger.kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Eric Dumazet <edumazet@google.com>,
+        Network Development <netdev@vger.kernel.org>,
         David Girault <david.girault@qorvo.com>,
         Romuald Despres <romuald.despres@qorvo.com>,
         Frederic Blain <frederic.blain@qorvo.com>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
 Hi,
 
-On Thu, Aug 25, 2022 at 8:55 AM Miquel Raynal <miquel.raynal@bootlin.com> wrote:
+On Thu, Aug 25, 2022 at 8:51 PM Alexander Aring <aahringo@redhat.com> wrote=
+:
 >
-> Hi Alexander,
+> Hi,
 >
-> aahringo@redhat.com wrote on Tue, 23 Aug 2022 21:36:23 -0400:
->
-> > Hi,
+> On Thu, Aug 25, 2022 at 4:41 AM Miquel Raynal <miquel.raynal@bootlin.com>=
+ wrote:
 > >
-> > On Fri, Aug 19, 2022 at 1:07 PM Miquel Raynal <miquel.raynal@bootlin.com> wrote:
-> > >
-> > > Hi Alexander,
-> > >
-> > > aahringo@redhat.com wrote on Sun, 3 Jul 2022 21:18:40 -0400:
-> > >
-> > > > Hi,
+> > Hi Alexander,
+> >
+> > aahringo@redhat.com wrote on Wed, 24 Aug 2022 17:43:11 -0400:
+> >
+> > > On Wed, Aug 24, 2022 at 3:35 AM Miquel Raynal <miquel.raynal@bootlin.=
+com> wrote:
 > > > >
-> > > > On Fri, Jul 1, 2022 at 10:39 AM Miquel Raynal <miquel.raynal@bootlin.com> wrote:
-> > > > >
-> > > > > Hello,
-> > > > >
-> > > > > This series follows the work done in the Linux kernel stack: now that
-> > > > > the core knows about the different netlink commands and attributes in
-> > > > > order to support scanning and beaconing requests from end-to-end, here
-> > > > > are the userspace changes to be able to use it.
-> > > > >
-> > > > > Here is a list of the new available features.
-> > > > >
-> > > > > * Sending (or stopping) beacons. Intervals ranging from 0 to 14 are
-> > > > >   valid for passively sending beacons at regular intervals. An interval
-> > > > >   of 15 would request the core to answer BEACON_REQ.
-> > > > >   # iwpan dev coord0 beacons send interval 2 # send BEACON at a fixed rate
-> > > > >   # iwpan dev coord0 beacons send interval 15 # answer BEACON_REQ only
-> > > > >   # iwpan dev coord0 beacons stop # apply to both cases
-> > > > >
-> > > > > * Scanning all the channels or only a subset:
-> > > > >   # iwpan dev wpan1 scan type passive duration 3 # will not trigger BEACON_REQ
-> > > > >   # iwpan dev wpan1 scan type active duration 3 # will trigger BEACON_REQ
-> > > > >
-> > > > > * During scans, there is a dedicated netlink channel event to listen to
-> > > > >   in order to get events like "a new coordinator was discovered" or "the
-> > > > >   scan is over". When beacons from new devices are received, the tool
-> > > > >   would print something like:
-> > > > >   PAN 0xabcd (on coord1)
-> > > > >         coordinator 0xe673d7a3f3a87ccc
-> > > > >         page 0
-> > > > >         channel 13
-> > > > >         preamble code 0
-> > > > >         mean prf 0
-> > > > >         superframe spec. 0x4f11
-> > > > >         LQI 0
-> > > > >
-> > > > > * It is also possible to monitor the events with:
-> > > > >   # iwpan event
-> > > > >
-> > > > > * As well as triggering a non blocking scan:
-> > > > >   # iwpan dev wpan1 scan trigger type passive duration 3
-> > > > >   # iwpan dev wpan1 scan done
-> > > > >   # iwpan dev wpan1 scan abort
+> > > > Hi Alexander,
 > > > >
-> > > > why do we need an abort?
+> > > > aahringo@redhat.com wrote on Tue, 23 Aug 2022 17:44:52 -0400:
+> > > >
+> > > > > Hi,
+> > > > >
+> > > > > On Tue, Aug 23, 2022 at 12:29 PM Miquel Raynal
+> > > > > <miquel.raynal@bootlin.com> wrote:
+> > > > > >
+> > > > > > Hi Alexander,
+> > > > > >
+> > > > > > aahringo@redhat.com wrote on Tue, 23 Aug 2022 08:33:30 -0400:
+> > > > > >
+> > > > > > > Hi,
+> > > > > > >
+> > > > > > > On Fri, Aug 19, 2022 at 1:11 PM Miquel Raynal <miquel.raynal@=
+bootlin.com> wrote:
+> > > > > > > >
+> > > > > > > > Hi Alexander,
+> > > > > > > >
+> > > > > > > > aahringo@redhat.com wrote on Tue, 5 Jul 2022 21:51:02 -0400=
+:
+> > > > > > > >
+> > > > > > > > > Hi,
+> > > > > > > > >
+> > > > > > > > > On Fri, Jul 1, 2022 at 10:36 AM Miquel Raynal <miquel.ray=
+nal@bootlin.com> wrote:
+> > > > > > > > > >
+> > > > > > > > > > As a first strep in introducing proper PAN management a=
+nd association,
+> > > > > > > > > > we need to be able to create coordinator interfaces whi=
+ch might act as
+> > > > > > > > > > coordinator or PAN coordinator.
+> > > > > > > > > >
+> > > > > > > > > > Hence, let's add the minimum support to allow the creat=
+ion of these
+> > > > > > > > > > interfaces. This might be restrained and improved later=
+.
+> > > > > > > > > >
+> > > > > > > > > > Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com=
+>
+> > > > > > > > > > ---
+> > > > > > > > > >  net/mac802154/iface.c | 14 ++++++++------
+> > > > > > > > > >  net/mac802154/rx.c    |  2 +-
+> > > > > > > > > >  2 files changed, 9 insertions(+), 7 deletions(-)
+> > > > > > > > > >
+> > > > > > > > > > diff --git a/net/mac802154/iface.c b/net/mac802154/ifac=
+e.c
+> > > > > > > > > > index 500ed1b81250..7ac0c5685d3f 100644
+> > > > > > > > > > --- a/net/mac802154/iface.c
+> > > > > > > > > > +++ b/net/mac802154/iface.c
+> > > > > > > > > > @@ -273,13 +273,13 @@ ieee802154_check_concurrent_iface=
+(struct ieee802154_sub_if_data *sdata,
+> > > > > > > > > >                 if (nsdata !=3D sdata && ieee802154_sda=
+ta_running(nsdata)) {
+> > > > > > > > > >                         int ret;
+> > > > > > > > > >
+> > > > > > > > > > -                       /* TODO currently we don't supp=
+ort multiple node types
+> > > > > > > > > > -                        * we need to run skb_clone at =
+rx path. Check if there
+> > > > > > > > > > -                        * exist really an use case if =
+we need to support
+> > > > > > > > > > -                        * multiple node types at the s=
+ame time.
+> > > > > > > > > > +                       /* TODO currently we don't supp=
+ort multiple node/coord
+> > > > > > > > > > +                        * types we need to run skb_clo=
+ne at rx path. Check if
+> > > > > > > > > > +                        * there exist really an use ca=
+se if we need to support
+> > > > > > > > > > +                        * multiple node/coord types at=
+ the same time.
+> > > > > > > > > >                          */
+> > > > > > > > > > -                       if (wpan_dev->iftype =3D=3D NL8=
+02154_IFTYPE_NODE &&
+> > > > > > > > > > -                           nsdata->wpan_dev.iftype =3D=
+=3D NL802154_IFTYPE_NODE)
+> > > > > > > > > > +                       if (wpan_dev->iftype !=3D NL802=
+154_IFTYPE_MONITOR &&
+> > > > > > > > > > +                           nsdata->wpan_dev.iftype !=
+=3D NL802154_IFTYPE_MONITOR)
+> > > > > > > > > >                                 return -EBUSY;
+> > > > > > > > > >
+> > > > > > > > > >                         /* check all phy mac sublayer s=
+ettings are the same.
+> > > > > > > > > > @@ -577,6 +577,7 @@ ieee802154_setup_sdata(struct ieee8=
+02154_sub_if_data *sdata,
+> > > > > > > > > >         wpan_dev->short_addr =3D cpu_to_le16(IEEE802154=
+_ADDR_BROADCAST);
+> > > > > > > > > >
+> > > > > > > > > >         switch (type) {
+> > > > > > > > > > +       case NL802154_IFTYPE_COORD:
+> > > > > > > > > >         case NL802154_IFTYPE_NODE:
+> > > > > > > > > >                 ieee802154_be64_to_le64(&wpan_dev->exte=
+nded_addr,
+> > > > > > > > > >                                         sdata->dev->dev=
+_addr);
+> > > > > > > > > > @@ -636,6 +637,7 @@ ieee802154_if_add(struct ieee802154=
+_local *local, const char *name,
+> > > > > > > > > >         ieee802154_le64_to_be64(ndev->perm_addr,
+> > > > > > > > > >                                 &local->hw.phy->perm_ex=
+tended_addr);
+> > > > > > > > > >         switch (type) {
+> > > > > > > > > > +       case NL802154_IFTYPE_COORD:
+> > > > > > > > > >         case NL802154_IFTYPE_NODE:
+> > > > > > > > > >                 ndev->type =3D ARPHRD_IEEE802154;
+> > > > > > > > > >                 if (ieee802154_is_valid_extended_unicas=
+t_addr(extended_addr)) {
+> > > > > > > > > > diff --git a/net/mac802154/rx.c b/net/mac802154/rx.c
+> > > > > > > > > > index b8ce84618a55..39459d8d787a 100644
+> > > > > > > > > > --- a/net/mac802154/rx.c
+> > > > > > > > > > +++ b/net/mac802154/rx.c
+> > > > > > > > > > @@ -203,7 +203,7 @@ __ieee802154_rx_handle_packet(struc=
+t ieee802154_local *local,
+> > > > > > > > > >         }
+> > > > > > > > > >
+> > > > > > > > > >         list_for_each_entry_rcu(sdata, &local->interfac=
+es, list) {
+> > > > > > > > > > -               if (sdata->wpan_dev.iftype !=3D NL80215=
+4_IFTYPE_NODE)
+> > > > > > > > > > +               if (sdata->wpan_dev.iftype =3D=3D NL802=
+154_IFTYPE_MONITOR)
+> > > > > > > > > >                         continue;
+> > > > > > > > >
+> > > > > > > > > I probably get why you are doing that, but first the over=
+all design is
+> > > > > > > > > working differently - means you should add an additional =
+receive path
+> > > > > > > > > for the special interface type.
+> > > > > > > > >
+> > > > > > > > > Also we "discovered" before that the receive path of node=
+ vs
+> > > > > > > > > coordinator is different... Where is the different handli=
+ng here? I
+> > > > > > > > > don't see it, I see that NODE and COORD are the same now =
+(because that
+> > > > > > > > > is _currently_ everything else than monitor). This change=
+ is not
+> > > > > > > > > enough and does "something" to handle in some way coordin=
+ator receive
+> > > > > > > > > path but there are things missing.
+> > > > > > > > >
+> > > > > > > > > 1. Changing the address filters that it signals the trans=
+ceiver it's
+> > > > > > > > > acting as coordinator
+> > > > > > > > > 2. We _should_ also have additional handling for whatever=
+ the
+> > > > > > > > > additional handling what address filters are doing in mac=
+802154
+> > > > > > > > > _because_ there is hardware which doesn't have address fi=
+ltering e.g.
+> > > > > > > > > hwsim which depend that this is working in software like =
+other
+> > > > > > > > > transceiver hardware address filters.
+> > > > > > > > >
+> > > > > > > > > For the 2. one, I don't know if we do that even for NODE =
+right or we
+> > > > > > > > > just have the bare minimal support there... I don't assum=
+e that
+> > > > > > > > > everything is working correctly here but what I want to s=
+ee is a
+> > > > > > > > > separate receive path for coordinators that people can se=
+nd patches to
+> > > > > > > > > fix it.
+> > > > > > > >
+> > > > > > > > Yes, we do very little differently between the two modes, t=
+hat's why I
+> > > > > > > > took the easy way: just changing the condition. I really do=
+n't see what
+> > > > > > > > I can currently add here, but I am fine changing the style =
+to easily
+> > > > > > > > show people where to add filters for such or such interface=
+, but right
+> > > > > > > > now both path will look very "identical", do we agree on th=
+at?
+> > > > > > >
+> > > > > > > mostly yes, but there exists a difference and we should at le=
+ast check
+> > > > > > > if the node receive path violates the coordinator receive pat=
+h and
+> > > > > > > vice versa.
+> > > > > > > Put it in a receive_path() function and then coord_receive_pa=
+th(),
+> > > > > > > node_receive_path() that calls the receive_path() and do the
+> > > > > > > additional filtering for coordinators, etc.
+> > > > > > >
+> > > > > > > There should be a part in the standard about "third level fil=
+ter rule
+> > > > > > > if it's a coordinator".
+> > > > > > > btw: this is because the address filter on the transceiver ne=
+eds to
+> > > > > > > have the "i am a coordinator" boolean set which is missing in=
+ this
+> > > > > > > series. However it depends on the transceiver filtering level=
+ and the
+> > > > > > > mac802154 receive path if we actually need to run such filter=
+ing or
+> > > > > > > not.
+> > > > > >
+> > > > > > I must be missing some information because I can't find any pla=
+ces
+> > > > > > where what you suggest is described in the spec.
+> > > > > >
+> > > > > > I agree there are multiple filtering level so let's go through =
+them one
+> > > > > > by one (6.7.2 Reception and rejection):
+> > > > > > - first level: is the checksum (FCS) valid?
+> > > > > >         yes -> goto second level
+> > > > > >         no -> drop
+> > > > > > - second level: are we in promiscuous mode?
+> > > > > >         yes -> forward to upper layers
+> > > > > >         no -> goto second level (bis)
+> > > > > > - second level (bis): are we scanning?
+> > > > > >         yes -> goto scan filtering
+> > > > > >         no -> goto third level
+> > > > > > - scan filtering: is it a beacon?
+> > > > > >         yes -> process the beacon
+> > > > > >         no -> drop
+> > > > > > - third level: is the frame valid? (type, source, destination, =
+pan id,
+> > > > > >   etc)
+> > > > > >         yes -> forward to upper layers
+> > > > > >         no -> drop
+> > > > > >
+> > > > > > But none of them, as you said, is dependent on the interface ty=
+pe.
+> > > > > > There is no mention of a specific filtering operation to do in =
+all
+> > > > > > those cases when running in COORD mode. So I still don't get wh=
+at
+> > > > > > should be included in either node_receive_path() which should b=
+e
+> > > > > > different than in coord_receive_path() for now.
+> > > > > >
+> > > > > > There are, however, two situations where the interface type has=
+ its
+> > > > > > importance:
+> > > > > > - Enhanced beacon requests with Enhanced beacon filter IE, whic=
+h asks
+> > > > > >   the receiving device to process/drop the request upon certain
+> > > > > >   conditions (minimum LQI and/or randomness), as detailed in
+> > > > > >   7.4.4.6 Enhanced Beacon Filter IE. But, as mentioned in
+> > > > > >   7.5.9 Enhanced Beacon Request command: "The Enhanced Beacon R=
+equest
+> > > > > >   command is optional for an FFD and an RFD", so this series wa=
+s only
+> > > > > >   targeting basic beaconing for now.
+> > > > > > - In relaying mode, the destination address must not be validat=
+ed
+> > > > > >   because the message needs to be re-emitted. Indeed, a receive=
+r in
+> > > > > >   relaying mode may not be the recipient. This is also optional=
+ and out
+> > > > > >   of the scope of this series.
+> > > > > >
+> > > > > > Right now I have the below diff, which clarifies the two path, =
+without
+> > > > > > too much changes in the current code because I don't really see=
+ why it
+> > > > > > would be necessary. Unless you convince me otherwise or read th=
+e spec
+> > > > > > differently than I do :) What do you think?
+> > > > > >
+> > > > >
+> > > > > "Reception and rejection"
+> > > > >
+> > > > > third-level filtering regarding "destination address" and if the
+> > > > > device is "PAN coordinator".
+> > > > > This is, in my opinion, what the coordinator boolean tells the
+> > > > > transceiver to do on hardware when doing address filter there. Yo=
+u can
+> > > > > also read that up in datasheets of transceivers as atf86rf233, se=
+arch
+> > > > > for I_AM_COORD.
+> > > >
+> > > > Oh right, I now see what you mean!
+> > > >
+> > > > > Whereas they use the word "PAN coordinator" not "coordinator", if=
+ they
+> > > > > really make a difference there at this point..., if so then the k=
+ernel
+> > > > > must know if the coordinator is a pan coordinator or coordinator
+> > > > > because we need to set the address filter in kernel.
+> > > >
+> > > > Yes we need to make a difference, you can have several coordinators=
+ but
+> > > > a single PAN coordinator in a PAN. I think we can assume that the P=
+AN
+> > > > coordinator is the coordinator with no parent (association-wise). W=
+ith
+> > > > the addition of the association series, I can handle that, so I wil=
+l
+> > > > create the two path as you advise, add a comment about this additio=
+nal
+> > > > filter rule that we don't yet support, and finally after the
+> > > > association series add another commit to make this filtering rule r=
+eal.
+> > > >
+> > > > >
+> > > > > > Thanks,
+> > > > > > Miqu=C3=A8l
+> > > > > >
+> > > > > > ---
+> > > > > >
+> > > > > > --- a/net/mac802154/rx.c
+> > > > > > +++ b/net/mac802154/rx.c
+> > > > > > @@ -194,6 +194,7 @@ __ieee802154_rx_handle_packet(struct ieee80=
+2154_local *local,
+> > > > > >         int ret;
+> > > > > >         struct ieee802154_sub_if_data *sdata;
+> > > > > >         struct ieee802154_hdr hdr;
+> > > > > > +       bool iface_found =3D false;
+> > > > > >
+> > > > > >         ret =3D ieee802154_parse_frame_start(skb, &hdr);
+> > > > > >         if (ret) {
+> > > > > > @@ -203,18 +204,31 @@ __ieee802154_rx_handle_packet(struct ieee=
+802154_local *local,
+> > > > > >         }
+> > > > > >
+> > > > > >         list_for_each_entry_rcu(sdata, &local->interfaces, list=
+) {
+> > > > > > -               if (sdata->wpan_dev.iftype !=3D NL802154_IFTYPE=
+_NODE)
+> > > > > > +               if (sdata->wpan_dev.iftype =3D=3D NL802154_IFTY=
+PE_MONITOR)
+> > > > > >                         continue;
+> > > > > >
+> > > > > >                 if (!ieee802154_sdata_running(sdata))
+> > > > > >                         continue;
+> > > > > >
+> > > > > > +               iface_found =3D true;
+> > > > > > +               break;
+> > > > > > +       }
+> > > > > > +
+> > > > > > +       if (!iface_found) {
+> > > > > > +               kfree_skb(skb);
+> > > > > > +               return;
+> > > > > > +       }
+> > > > > > +
+> > > > > > +       /* TBD: Additional filtering is possible on NODEs and/o=
+r COORDINATORs */
+> > > > > > +       switch (sdata->wpan_dev.iftype) {
+> > > > > > +       case NL802154_IFTYPE_COORD:
+> > > > > > +       case NL802154_IFTYPE_NODE:
+> > > > > >                 ieee802154_subif_frame(sdata, skb, &hdr);
+> > > > > > -               skb =3D NULL;
+> > > > > > +               break;
+> > > > > > +       default:
+> > > > > > +               kfree_skb(skb);
+> > > > > >                 break;
+> > > > > >         }
+> > > > >
+> > > > > Why do you remove the whole interface looping above and make it o=
+nly
+> > > > > run for one ?first found? ?
+> > > >
+> > > > To reduce the indentation level.
+> > > >
+> > > > > That code changes this behaviour and I do
+> > > > > not know why.
+> > > >
+> > > > The precedent code did:
+> > > > for_each_iface() {
+> > > >         if (not a node)
+> > > >                 continue;
+> > > >         if (not running)
+> > > >                 continue;
+> > > >
+> > > >         subif_frame();
+> > > >         break;
+> > > > }
+> > > >
+> > > > That final break also elected only the first running node iface.
+> > > > Otherwise it would mean that we allow the same skb to be consumed
+> > > > twice, which is wrong IMHO?
 > > >
-> > > Perhaps the tool --help would have helped to get the naming, but we
-> > > need:
-> > > - a command to start a scan, either use:
-> > >   * "scan" alone and it is synchronous, I mean the command returns when
-> > >     the scan is over
-> > >   or
-> > >   * "scan trigger" which is asynchronous, and returns immediately after
-> > >     starting the operation
-> > > - if the scan was started asynchronously with the "trigger" keyword,
-> > >   the "done" command will wait until the scan is over (maybe this one
-> > >   needs to be renamed?)
-> > > - if the user made a mistake and do not want to remain blocked for
-> > >   several minutes (a scan can last for very long time), we need the
-> > >   "abort" command to tell the kernel to stop and return to a standard
-> > >   state. Once this has been processed and the scan effectively stopped,
-> > >   the kernel will send a nl command saying the scan is over (which
-> > >   "scan done" would capture)
-> > >
+> > > no? Why is that wrong? There is a real use-case to have multiple
+> > > interfaces on one phy (or to do it in near future, I said that
+> > > multiple times). This patch does a step backwards to this.
 > >
-> > For me, trigger and done should be for the simple cli use case in one
-> > command like "scan list". It will block them and trigger any scan
-> > event popping up. The user can send SIGINT to stop scanning?
-> >
-> > Although there should be still available an asynchronous way which is
-> > for me "scan trigger" (non-blocking) and the user can do "iwpan
-> > monitor" to observe upcoming events (all inclusive scan) and tell
-> > optionally "scan done" to stop scanning if necessary (which probably
-> > also produces an event to notify all listeners e.g. iwpan monitor).
-> >
-> > However I think most people using iwpan want to trigger and wait and
-> > the cli is filling up events and blocks until it's done (that would be
-> > a combination with trigger/monitor into one command).
-> >
-> > Both solutions should be possible over cli?
+> > So we need to duplicate the skb because it automatically gets freed in
+> > the "forward to upper layer" path. Am I right? I'm fine doing so if
 >
-> Yes, that's what I was saying, the two solutions are already supported.
-> The iwpan tool is being enhanced with the "scan" composite command,
-> - either "scan" is given an additional keyword and makes just that
->   (trigger, abort, done) and returns as soon as this precise
->   command is done (eg. it returns almost immediately on "trigger")
-
-But why do we need to have a done command?
-
-Sorry, I still don't get that.
-
-> - or, no additional command is provided (only the parameters for the
->   scan) and the command does an equivalent to "trigger + monitor +
->   done" which blocks after launching the scan, shows the results when
->   they arrive, and returns once the scan is finished.
-
-"trigger + monitor" there is no done command needed here or? The
-process should unblock when it's done, and for SIGINT/SIGKILL send an
-abort? Maybe a done event when the scan is "successful" finished and
-everything that was there in the channel/page combinations was scanned
-without an abort.
-
-We need to consider that other processes listen to events? They should
-be aware of what's happening there? There should be some event
-sequence going on "trigger event" + "loop of found something event" +
-"either abort or done"?
-
+> What is the definition of "duplicate the skb" here.
 >
-> Do you want something more? I just miss a "monitor" command I guess, I
-> may add it.
+> > this is the way to go, but I am interested if you can give me a real
+> > use case where having NODE+COORDINATOR on the same PHY is useful?
+> >
 >
+> Testing.
 
-Yea, monitor sounds like ip monitor, udevadm monitor, etc. to listen
-to all those 802.15.4 subsystem events. I would take a look into it
-for any scan results. At the end you should be able to do a blocked
-scan and monitor at the same time and they should at least provide
-similar events.
-Probably the blocked scan with nicer output and filtered and the
-monitor is for everything that is going on in 802.15.4 there.
+I need to say that I really used multiple monitors at the same time on
+one phy only and I did that with hwsim to run multiple user space
+stacks. It was working and I was happy and didn't need to do a lot of
+phy creations in hwsim. Most hardware can probably not run multiple
+nodes and coordinators at the same time ?yet?, _but_ there is a
+candidate which can do that and this is atusb. On atusb we have a
+co-processor that can deal with multiple address filters. People
+already asked to do something like a node which can operate on two
+pans as I remember, that would be a candidate for such a feature. I
+really don't want to move step backwards here and delete this thing
+which probably can be useful later. I don't know how wireless history
+dealt with it and how complicated it was to bring such a feature in to
+e.g. run multiple access points on one phy. I also see it in ethernet
+with macvlan, which is a similar feature.
+
+We don't need to support it, make it so that on an ifup it returns
+-EBUSY if something doesn't fit together as it currently is. We can
+later add support for it after playing around with hwsim a little bit
+more. We should at least take care that I can still run my multiple
+monitors at the same time (which is currently allowed).
 
 - Alex
 
