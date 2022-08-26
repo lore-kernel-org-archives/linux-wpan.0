@@ -2,34 +2,34 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E28AFECAAD2
-	for <linux-wpan@archiver.kernel.org>; Fri, 26 Aug 2022 07:54:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D78A8ECAAD2
+	for <linux-wpan@archiver.kernel.org>; Fri, 26 Aug 2022 08:08:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245736AbiHZHyS (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Fri, 26 Aug 2022 03:54:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35012 "EHLO
+        id S229922AbiHZIIg (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Fri, 26 Aug 2022 04:08:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59798 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245631AbiHZHyR (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Fri, 26 Aug 2022 03:54:17 -0400
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62DC1D4184;
-        Fri, 26 Aug 2022 00:54:14 -0700 (PDT)
+        with ESMTP id S229532AbiHZIIf (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 26 Aug 2022 04:08:35 -0400
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::228])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98312D475F;
+        Fri, 26 Aug 2022 01:08:30 -0700 (PDT)
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id 1F03124000D;
-        Fri, 26 Aug 2022 07:54:09 +0000 (UTC)
+        by mail.gandi.net (Postfix) with ESMTPSA id 8A5BF1BF204;
+        Fri, 26 Aug 2022 08:08:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1661500452;
+        t=1661501308;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=cFsRR6LmnC4k63fn4bV/oIn6P2jpH43tFW9cuDYXxIQ=;
-        b=JyCkhYhOcTmBUrL8pZuf/UtPlBQVQFuii+TeJVteGPrMeJHSxPvDQ/U+HKHJXMZ45GxvAd
-        LIsHOZkSYXNB43yjT2qOBjd0fdT6o0U0Ky3NSKDd/wdPDTQxPCzxGr9SQZjq5hUfk99/vQ
-        o/pW29HoBMIdYnW1k4i7vEg5hLmTwhKLx9jBBx7e+7+pF6XzeNlwOc4Ady+tVOfQ0ka2TE
-        CzircAyp9GZaYnRedi6XeODWAVGSSBbwiSCDfsXJWKBnMgpdfyFVkSXH+rSS1GFvtlQi9Q
-        SEPuEtWyhXhXT9+VrtG8qEkH097Wro8DTuL0Yk3yROiNJZ6h0/LvhLESGkuEyQ==
-Date:   Fri, 26 Aug 2022 09:54:08 +0200
+        bh=u6JpZSoa946jk0BQxxzywAyZYUXfBX6HOgUDYQzAJ4A=;
+        b=X0vTU2ByLWlmQJ1bNfwXwUYouYthAJ4I0lcBsyewyEd3lNlTEaTzcCFTU4aXUyD48mWXEj
+        W46NKtmSstLnPWL1PWPgkQX+JL9Ku70NpU+If3JQEc+InfsIDS6KBxU+mGh3MeN9gAwQEc
+        U0At+95FTR6pxonsAny00C8HBuwHt9Kngq11iZ1UB2WJGDaUvEetX9PqwQeQzNkkncZDlQ
+        dWcE6Ya+s6SUxvohZHs8g/wNf5mTz9dVm/9qrggZVE3H7vdnSUJi5PdP3DuChetyIcEOJ7
+        8DKL6WPtpxmKydeFgVc7Lc3D4uCiR5JVGw8Us5TOFOwsckdGjXhg4F6cctAROg==
+Date:   Fri, 26 Aug 2022 10:08:25 +0200
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
 To:     Alexander Aring <aahringo@redhat.com>
 Cc:     Alexander Aring <alex.aring@gmail.com>,
@@ -47,8 +47,8 @@ Cc:     Alexander Aring <alex.aring@gmail.com>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>
 Subject: Re: [PATCH wpan-next 01/20] net: mac802154: Allow the creation of
  coordinator interfaces
-Message-ID: <20220826095408.706438c2@xps-13>
-In-Reply-To: <CAK-6q+j3LMoSe_7u0WqhowdPV9KM-6g0z-+OmSumJXCZfo0CAw@mail.gmail.com>
+Message-ID: <20220826100825.4f79c777@xps-13>
+In-Reply-To: <CAK-6q+jbBg4kCh88Oz7mBa0RBBX_+cqqoPjT3POEjbQKX1ZDKw@mail.gmail.com>
 References: <20220701143052.1267509-1-miquel.raynal@bootlin.com>
         <20220701143052.1267509-2-miquel.raynal@bootlin.com>
         <CAK-6q+jkUUjAGqEDgU1oJvRkigUbvSO5SXWRau6+320b=GbfxQ@mail.gmail.com>
@@ -56,12 +56,11 @@ References: <20220701143052.1267509-1-miquel.raynal@bootlin.com>
         <CAK-6q+gCY3ufaADHNQWJGNpNZJMwm=fhKfe02GWkfGEdgsMVzg@mail.gmail.com>
         <20220823182950.1c722e13@xps-13>
         <CAK-6q+jfva++dGkyX_h2zQGXnoJpiOu5+eofCto=KZ+u6KJbJA@mail.gmail.com>
-        <20220824122058.1c46e09a@xps-13>
-        <CAK-6q+gjgQ1BF-QrT01JWh+2b3oL3RU+SoxUf5t7h3Hc6R8pcg@mail.gmail.com>
-        <20220824152648.4bfb9a89@xps-13>
-        <CAK-6q+itA0C4zPAq5XGKXgCHW5znSFeB-YDMp3uB9W-kLV6WaA@mail.gmail.com>
-        <20220825145831.1105cb54@xps-13>
-        <CAK-6q+j3LMoSe_7u0WqhowdPV9KM-6g0z-+OmSumJXCZfo0CAw@mail.gmail.com>
+        <20220824093547.16f05d15@xps-13>
+        <CAK-6q+gqX8w+WEgSk2J9FOdrFJPvqJOsgmaY4wOu=siRszBujA@mail.gmail.com>
+        <20220825104035.11806a67@xps-13>
+        <CAK-6q+hxSpw1yJR5H5D6gy5gGdm6Qa3VzyjZXA45KFQfVVqwFw@mail.gmail.com>
+        <CAK-6q+jbBg4kCh88Oz7mBa0RBBX_+cqqoPjT3POEjbQKX1ZDKw@mail.gmail.com>
 Organization: Bootlin
 X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
@@ -73,219 +72,453 @@ X-Mailing-List: linux-wpan@vger.kernel.org
 
 Hi Alexander,
 
-aahringo@redhat.com wrote on Thu, 25 Aug 2022 21:05:09 -0400:
+aahringo@redhat.com wrote on Thu, 25 Aug 2022 21:35:05 -0400:
 
 > Hi,
 >=20
-> On Thu, Aug 25, 2022 at 8:58 AM Miquel Raynal <miquel.raynal@bootlin.com>=
- wrote:
+> On Thu, Aug 25, 2022 at 8:51 PM Alexander Aring <aahringo@redhat.com> wro=
+te:
 > >
-> > Hi Alexander,
+> > Hi,
 > >
-> > aahringo@redhat.com wrote on Wed, 24 Aug 2022 17:53:45 -0400:
-> > =20
-> > > Hi,
+> > On Thu, Aug 25, 2022 at 4:41 AM Miquel Raynal <miquel.raynal@bootlin.co=
+m> wrote: =20
 > > >
-> > > On Wed, Aug 24, 2022 at 9:27 AM Miquel Raynal <miquel.raynal@bootlin.=
-com> wrote: =20
-> > > >
-> > > > Hi Alexander,
-> > > >
-> > > > aahringo@redhat.com wrote on Wed, 24 Aug 2022 08:43:20 -0400:
-> > > > =20
-> > > > > Hi,
-> > > > >
-> > > > > On Wed, Aug 24, 2022 at 6:21 AM Miquel Raynal <miquel.raynal@boot=
-lin.com> wrote:
-> > > > > ... =20
-> > > > > >
-> > > > > > Actually right now the second level is not enforced, and all the
-> > > > > > filtering levels are a bit fuzzy and spread everywhere in rx.c.
-> > > > > >
-> > > > > > I'm gonna see if I can at least clarify all of that and only ma=
-ke
-> > > > > > coord-dependent the right section because right now a
-> > > > > > ieee802154_coord_rx() path in ieee802154_rx_handle_packet() doe=
-s not
-> > > > > > really make sense given that the level 3 filtering rules are mo=
-stly
-> > > > > > enforced in ieee802154_subif_frame(). =20
-> > > > >
-> > > > > One thing I mentioned before is that we probably like to have a
-> > > > > parameter for rx path to give mac802154 a hint on which filtering
-> > > > > level it was received. We don't have that, I currently see that t=
-his
-> > > > > is a parameter for hwsim receiving it on promiscuous level only a=
-nd
-> > > > > all others do third level filtering.
-> > > > > We need that now, because the promiscuous mode was only used for
-> > > > > sniffing which goes directly into the rx path for monitors. With =
-scan
-> > > > > we mix things up here and in my opinion require such a parameter =
-and
-> > > > > do filtering if necessary. =20
-> > > >
-> > > > I am currently trying to implement a slightly different approach. T=
-he
-> > > > core does not know hwsim is always in promiscuous mode, but it does
-> > > > know that it does not check FCS. So the core checks it. This is
-> > > > level 1 achieved. Then in level 2 we want to know if the core asked
-> > > > the transceiver to enter promiscuous mode, which, if it did, should
-> > > > not imply more filtering. If the device is working in promiscuous
-> > > > mode but this was not asked explicitly by the core, we don't really
-> > > > care, software filtering will apply anyway.
-> > > > =20
+> > > Hi Alexander,
 > > >
-> > > I doubt that I will be happy with this solution, this all sounds like
-> > > "for the specific current behaviour that we support 2 filtering levels
-> > > it will work", just do a parameter on which 802.15.4 filtering level
-> > > it was received and the rx path will check what kind of filter is
-> > > required and which not.
-> > > As driver ops start() callback you should say which filtering level
-> > > the receive mode should start with.
+> > > aahringo@redhat.com wrote on Wed, 24 Aug 2022 17:43:11 -0400:
 > > > =20
-> > > > I am reworking the rx path to clarify what is being done and when,
-> > > > because I found this part very obscure right now. In the end I don't
-> > > > think we need additional rx info from the drivers. Hopefully my
-> > > > proposal will clarify why this is (IMHO) not needed.
-> > > > =20
+> > > > On Wed, Aug 24, 2022 at 3:35 AM Miquel Raynal <miquel.raynal@bootli=
+n.com> wrote: =20
+> > > > >
+> > > > > Hi Alexander,
+> > > > >
+> > > > > aahringo@redhat.com wrote on Tue, 23 Aug 2022 17:44:52 -0400:
+> > > > > =20
+> > > > > > Hi,
+> > > > > >
+> > > > > > On Tue, Aug 23, 2022 at 12:29 PM Miquel Raynal
+> > > > > > <miquel.raynal@bootlin.com> wrote: =20
+> > > > > > >
+> > > > > > > Hi Alexander,
+> > > > > > >
+> > > > > > > aahringo@redhat.com wrote on Tue, 23 Aug 2022 08:33:30 -0400:
+> > > > > > > =20
+> > > > > > > > Hi,
+> > > > > > > >
+> > > > > > > > On Fri, Aug 19, 2022 at 1:11 PM Miquel Raynal <miquel.rayna=
+l@bootlin.com> wrote: =20
+> > > > > > > > >
+> > > > > > > > > Hi Alexander,
+> > > > > > > > >
+> > > > > > > > > aahringo@redhat.com wrote on Tue, 5 Jul 2022 21:51:02 -04=
+00:
+> > > > > > > > > =20
+> > > > > > > > > > Hi,
+> > > > > > > > > >
+> > > > > > > > > > On Fri, Jul 1, 2022 at 10:36 AM Miquel Raynal <miquel.r=
+aynal@bootlin.com> wrote: =20
+> > > > > > > > > > >
+> > > > > > > > > > > As a first strep in introducing proper PAN management=
+ and association,
+> > > > > > > > > > > we need to be able to create coordinator interfaces w=
+hich might act as
+> > > > > > > > > > > coordinator or PAN coordinator.
+> > > > > > > > > > >
+> > > > > > > > > > > Hence, let's add the minimum support to allow the cre=
+ation of these
+> > > > > > > > > > > interfaces. This might be restrained and improved lat=
+er.
+> > > > > > > > > > >
+> > > > > > > > > > > Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.c=
+om>
+> > > > > > > > > > > ---
+> > > > > > > > > > >  net/mac802154/iface.c | 14 ++++++++------
+> > > > > > > > > > >  net/mac802154/rx.c    |  2 +-
+> > > > > > > > > > >  2 files changed, 9 insertions(+), 7 deletions(-)
+> > > > > > > > > > >
+> > > > > > > > > > > diff --git a/net/mac802154/iface.c b/net/mac802154/if=
+ace.c
+> > > > > > > > > > > index 500ed1b81250..7ac0c5685d3f 100644
+> > > > > > > > > > > --- a/net/mac802154/iface.c
+> > > > > > > > > > > +++ b/net/mac802154/iface.c
+> > > > > > > > > > > @@ -273,13 +273,13 @@ ieee802154_check_concurrent_ifa=
+ce(struct ieee802154_sub_if_data *sdata,
+> > > > > > > > > > >                 if (nsdata !=3D sdata && ieee802154_s=
+data_running(nsdata)) {
+> > > > > > > > > > >                         int ret;
+> > > > > > > > > > >
+> > > > > > > > > > > -                       /* TODO currently we don't su=
+pport multiple node types
+> > > > > > > > > > > -                        * we need to run skb_clone a=
+t rx path. Check if there
+> > > > > > > > > > > -                        * exist really an use case i=
+f we need to support
+> > > > > > > > > > > -                        * multiple node types at the=
+ same time.
+> > > > > > > > > > > +                       /* TODO currently we don't su=
+pport multiple node/coord
+> > > > > > > > > > > +                        * types we need to run skb_c=
+lone at rx path. Check if
+> > > > > > > > > > > +                        * there exist really an use =
+case if we need to support
+> > > > > > > > > > > +                        * multiple node/coord types =
+at the same time.
+> > > > > > > > > > >                          */
+> > > > > > > > > > > -                       if (wpan_dev->iftype =3D=3D N=
+L802154_IFTYPE_NODE &&
+> > > > > > > > > > > -                           nsdata->wpan_dev.iftype =
+=3D=3D NL802154_IFTYPE_NODE)
+> > > > > > > > > > > +                       if (wpan_dev->iftype !=3D NL8=
+02154_IFTYPE_MONITOR &&
+> > > > > > > > > > > +                           nsdata->wpan_dev.iftype !=
+=3D NL802154_IFTYPE_MONITOR)
+> > > > > > > > > > >                                 return -EBUSY;
+> > > > > > > > > > >
+> > > > > > > > > > >                         /* check all phy mac sublayer=
+ settings are the same.
+> > > > > > > > > > > @@ -577,6 +577,7 @@ ieee802154_setup_sdata(struct iee=
+e802154_sub_if_data *sdata,
+> > > > > > > > > > >         wpan_dev->short_addr =3D cpu_to_le16(IEEE8021=
+54_ADDR_BROADCAST);
+> > > > > > > > > > >
+> > > > > > > > > > >         switch (type) {
+> > > > > > > > > > > +       case NL802154_IFTYPE_COORD:
+> > > > > > > > > > >         case NL802154_IFTYPE_NODE:
+> > > > > > > > > > >                 ieee802154_be64_to_le64(&wpan_dev->ex=
+tended_addr,
+> > > > > > > > > > >                                         sdata->dev->d=
+ev_addr);
+> > > > > > > > > > > @@ -636,6 +637,7 @@ ieee802154_if_add(struct ieee8021=
+54_local *local, const char *name,
+> > > > > > > > > > >         ieee802154_le64_to_be64(ndev->perm_addr,
+> > > > > > > > > > >                                 &local->hw.phy->perm_=
+extended_addr);
+> > > > > > > > > > >         switch (type) {
+> > > > > > > > > > > +       case NL802154_IFTYPE_COORD:
+> > > > > > > > > > >         case NL802154_IFTYPE_NODE:
+> > > > > > > > > > >                 ndev->type =3D ARPHRD_IEEE802154;
+> > > > > > > > > > >                 if (ieee802154_is_valid_extended_unic=
+ast_addr(extended_addr)) {
+> > > > > > > > > > > diff --git a/net/mac802154/rx.c b/net/mac802154/rx.c
+> > > > > > > > > > > index b8ce84618a55..39459d8d787a 100644
+> > > > > > > > > > > --- a/net/mac802154/rx.c
+> > > > > > > > > > > +++ b/net/mac802154/rx.c
+> > > > > > > > > > > @@ -203,7 +203,7 @@ __ieee802154_rx_handle_packet(str=
+uct ieee802154_local *local,
+> > > > > > > > > > >         }
+> > > > > > > > > > >
+> > > > > > > > > > >         list_for_each_entry_rcu(sdata, &local->interf=
+aces, list) {
+> > > > > > > > > > > -               if (sdata->wpan_dev.iftype !=3D NL802=
+154_IFTYPE_NODE)
+> > > > > > > > > > > +               if (sdata->wpan_dev.iftype =3D=3D NL8=
+02154_IFTYPE_MONITOR)
+> > > > > > > > > > >                         continue; =20
+> > > > > > > > > >
+> > > > > > > > > > I probably get why you are doing that, but first the ov=
+erall design is
+> > > > > > > > > > working differently - means you should add an additiona=
+l receive path
+> > > > > > > > > > for the special interface type.
+> > > > > > > > > >
+> > > > > > > > > > Also we "discovered" before that the receive path of no=
+de vs
+> > > > > > > > > > coordinator is different... Where is the different hand=
+ling here? I
+> > > > > > > > > > don't see it, I see that NODE and COORD are the same no=
+w (because that
+> > > > > > > > > > is _currently_ everything else than monitor). This chan=
+ge is not
+> > > > > > > > > > enough and does "something" to handle in some way coord=
+inator receive
+> > > > > > > > > > path but there are things missing.
+> > > > > > > > > >
+> > > > > > > > > > 1. Changing the address filters that it signals the tra=
+nsceiver it's
+> > > > > > > > > > acting as coordinator
+> > > > > > > > > > 2. We _should_ also have additional handling for whatev=
+er the
+> > > > > > > > > > additional handling what address filters are doing in m=
+ac802154
+> > > > > > > > > > _because_ there is hardware which doesn't have address =
+filtering e.g.
+> > > > > > > > > > hwsim which depend that this is working in software lik=
+e other
+> > > > > > > > > > transceiver hardware address filters.
+> > > > > > > > > >
+> > > > > > > > > > For the 2. one, I don't know if we do that even for NOD=
+E right or we
+> > > > > > > > > > just have the bare minimal support there... I don't ass=
+ume that
+> > > > > > > > > > everything is working correctly here but what I want to=
+ see is a
+> > > > > > > > > > separate receive path for coordinators that people can =
+send patches to
+> > > > > > > > > > fix it. =20
+> > > > > > > > >
+> > > > > > > > > Yes, we do very little differently between the two modes,=
+ that's why I
+> > > > > > > > > took the easy way: just changing the condition. I really =
+don't see what
+> > > > > > > > > I can currently add here, but I am fine changing the styl=
+e to easily
+> > > > > > > > > show people where to add filters for such or such interfa=
+ce, but right
+> > > > > > > > > now both path will look very "identical", do we agree on =
+that? =20
+> > > > > > > >
+> > > > > > > > mostly yes, but there exists a difference and we should at =
+least check
+> > > > > > > > if the node receive path violates the coordinator receive p=
+ath and
+> > > > > > > > vice versa.
+> > > > > > > > Put it in a receive_path() function and then coord_receive_=
+path(),
+> > > > > > > > node_receive_path() that calls the receive_path() and do the
+> > > > > > > > additional filtering for coordinators, etc.
+> > > > > > > >
+> > > > > > > > There should be a part in the standard about "third level f=
+ilter rule
+> > > > > > > > if it's a coordinator".
+> > > > > > > > btw: this is because the address filter on the transceiver =
+needs to
+> > > > > > > > have the "i am a coordinator" boolean set which is missing =
+in this
+> > > > > > > > series. However it depends on the transceiver filtering lev=
+el and the
+> > > > > > > > mac802154 receive path if we actually need to run such filt=
+ering or
+> > > > > > > > not. =20
+> > > > > > >
+> > > > > > > I must be missing some information because I can't find any p=
+laces
+> > > > > > > where what you suggest is described in the spec.
+> > > > > > >
+> > > > > > > I agree there are multiple filtering level so let's go throug=
+h them one
+> > > > > > > by one (6.7.2 Reception and rejection):
+> > > > > > > - first level: is the checksum (FCS) valid?
+> > > > > > >         yes -> goto second level
+> > > > > > >         no -> drop
+> > > > > > > - second level: are we in promiscuous mode?
+> > > > > > >         yes -> forward to upper layers
+> > > > > > >         no -> goto second level (bis)
+> > > > > > > - second level (bis): are we scanning?
+> > > > > > >         yes -> goto scan filtering
+> > > > > > >         no -> goto third level
+> > > > > > > - scan filtering: is it a beacon?
+> > > > > > >         yes -> process the beacon
+> > > > > > >         no -> drop
+> > > > > > > - third level: is the frame valid? (type, source, destination=
+, pan id,
+> > > > > > >   etc)
+> > > > > > >         yes -> forward to upper layers
+> > > > > > >         no -> drop
+> > > > > > >
+> > > > > > > But none of them, as you said, is dependent on the interface =
+type.
+> > > > > > > There is no mention of a specific filtering operation to do i=
+n all
+> > > > > > > those cases when running in COORD mode. So I still don't get =
+what
+> > > > > > > should be included in either node_receive_path() which should=
+ be
+> > > > > > > different than in coord_receive_path() for now.
+> > > > > > >
+> > > > > > > There are, however, two situations where the interface type h=
+as its
+> > > > > > > importance:
+> > > > > > > - Enhanced beacon requests with Enhanced beacon filter IE, wh=
+ich asks
+> > > > > > >   the receiving device to process/drop the request upon certa=
+in
+> > > > > > >   conditions (minimum LQI and/or randomness), as detailed in
+> > > > > > >   7.4.4.6 Enhanced Beacon Filter IE. But, as mentioned in
+> > > > > > >   7.5.9 Enhanced Beacon Request command: "The Enhanced Beacon=
+ Request
+> > > > > > >   command is optional for an FFD and an RFD", so this series =
+was only
+> > > > > > >   targeting basic beaconing for now.
+> > > > > > > - In relaying mode, the destination address must not be valid=
+ated
+> > > > > > >   because the message needs to be re-emitted. Indeed, a recei=
+ver in
+> > > > > > >   relaying mode may not be the recipient. This is also option=
+al and out
+> > > > > > >   of the scope of this series.
+> > > > > > >
+> > > > > > > Right now I have the below diff, which clarifies the two path=
+, without
+> > > > > > > too much changes in the current code because I don't really s=
+ee why it
+> > > > > > > would be necessary. Unless you convince me otherwise or read =
+the spec
+> > > > > > > differently than I do :) What do you think?
+> > > > > > > =20
+> > > > > >
+> > > > > > "Reception and rejection"
+> > > > > >
+> > > > > > third-level filtering regarding "destination address" and if the
+> > > > > > device is "PAN coordinator".
+> > > > > > This is, in my opinion, what the coordinator boolean tells the
+> > > > > > transceiver to do on hardware when doing address filter there. =
+You can
+> > > > > > also read that up in datasheets of transceivers as atf86rf233, =
+search
+> > > > > > for I_AM_COORD. =20
+> > > > >
+> > > > > Oh right, I now see what you mean!
+> > > > > =20
+> > > > > > Whereas they use the word "PAN coordinator" not "coordinator", =
+if they
+> > > > > > really make a difference there at this point..., if so then the=
+ kernel
+> > > > > > must know if the coordinator is a pan coordinator or coordinator
+> > > > > > because we need to set the address filter in kernel. =20
+> > > > >
+> > > > > Yes we need to make a difference, you can have several coordinato=
+rs but
+> > > > > a single PAN coordinator in a PAN. I think we can assume that the=
+ PAN
+> > > > > coordinator is the coordinator with no parent (association-wise).=
+ With
+> > > > > the addition of the association series, I can handle that, so I w=
+ill
+> > > > > create the two path as you advise, add a comment about this addit=
+ional
+> > > > > filter rule that we don't yet support, and finally after the
+> > > > > association series add another commit to make this filtering rule=
+ real.
+> > > > > =20
+> > > > > > =20
+> > > > > > > Thanks,
+> > > > > > > Miqu=C3=A8l
+> > > > > > >
+> > > > > > > ---
+> > > > > > >
+> > > > > > > --- a/net/mac802154/rx.c
+> > > > > > > +++ b/net/mac802154/rx.c
+> > > > > > > @@ -194,6 +194,7 @@ __ieee802154_rx_handle_packet(struct ieee=
+802154_local *local,
+> > > > > > >         int ret;
+> > > > > > >         struct ieee802154_sub_if_data *sdata;
+> > > > > > >         struct ieee802154_hdr hdr;
+> > > > > > > +       bool iface_found =3D false;
+> > > > > > >
+> > > > > > >         ret =3D ieee802154_parse_frame_start(skb, &hdr);
+> > > > > > >         if (ret) {
+> > > > > > > @@ -203,18 +204,31 @@ __ieee802154_rx_handle_packet(struct ie=
+ee802154_local *local,
+> > > > > > >         }
+> > > > > > >
+> > > > > > >         list_for_each_entry_rcu(sdata, &local->interfaces, li=
+st) {
+> > > > > > > -               if (sdata->wpan_dev.iftype !=3D NL802154_IFTY=
+PE_NODE)
+> > > > > > > +               if (sdata->wpan_dev.iftype =3D=3D NL802154_IF=
+TYPE_MONITOR)
+> > > > > > >                         continue;
+> > > > > > >
+> > > > > > >                 if (!ieee802154_sdata_running(sdata))
+> > > > > > >                         continue;
+> > > > > > >
+> > > > > > > +               iface_found =3D true;
+> > > > > > > +               break;
+> > > > > > > +       }
+> > > > > > > +
+> > > > > > > +       if (!iface_found) {
+> > > > > > > +               kfree_skb(skb);
+> > > > > > > +               return;
+> > > > > > > +       }
+> > > > > > > +
+> > > > > > > +       /* TBD: Additional filtering is possible on NODEs and=
+/or COORDINATORs */
+> > > > > > > +       switch (sdata->wpan_dev.iftype) {
+> > > > > > > +       case NL802154_IFTYPE_COORD:
+> > > > > > > +       case NL802154_IFTYPE_NODE:
+> > > > > > >                 ieee802154_subif_frame(sdata, skb, &hdr);
+> > > > > > > -               skb =3D NULL;
+> > > > > > > +               break;
+> > > > > > > +       default:
+> > > > > > > +               kfree_skb(skb);
+> > > > > > >                 break;
+> > > > > > >         } =20
+> > > > > >
+> > > > > > Why do you remove the whole interface looping above and make it=
+ only
+> > > > > > run for one ?first found? ? =20
+> > > > >
+> > > > > To reduce the indentation level.
+> > > > > =20
+> > > > > > That code changes this behaviour and I do
+> > > > > > not know why. =20
+> > > > >
+> > > > > The precedent code did:
+> > > > > for_each_iface() {
+> > > > >         if (not a node)
+> > > > >                 continue;
+> > > > >         if (not running)
+> > > > >                 continue;
+> > > > >
+> > > > >         subif_frame();
+> > > > >         break;
+> > > > > }
+> > > > >
+> > > > > That final break also elected only the first running node iface.
+> > > > > Otherwise it would mean that we allow the same skb to be consumed
+> > > > > twice, which is wrong IMHO? =20
+> > > >
+> > > > no? Why is that wrong? There is a real use-case to have multiple
+> > > > interfaces on one phy (or to do it in near future, I said that
+> > > > multiple times). This patch does a step backwards to this. =20
 > > >
-> > > Never looked much in 802.15.4 receive path as it just worked but I
-> > > said that there might be things to clean up when filtering things on
-> > > hardware and when on software and I have the feeling we are doing
-> > > things twice. Sometimes it is also necessary to set some skb fields
-> > > e.g. PACKET_HOST, etc. and I think this is what the most important
-> > > part of it is there. However, there are probably some tune ups if we
-> > > know we are in third leveling filtering... =20
-> >
-> > Ok, I've done the following.
-> >
-> > - Adding a PHY parameter which reflects the actual filtering level of
-> >   the transceiver, the default level is 4 (standard situation, you're =
+> > > So we need to duplicate the skb because it automatically gets freed in
+> > > the "forward to upper layer" path. Am I right? I'm fine doing so if =
 =20
->=20
-> 3?
-
-Honestly there are only two filtering levels in the normal path and one
-additional for scanning situations. But the spec mentions 4, so I
-figured we should use the same naming to avoid confusing people on what
-"level 3 means, if it's level 3 because level 1 and 2 are identical at
-PHY level, or level 3 which is the scan filtering as mentioned in the
-spec?".
-
-I used this enum to clarify the amount of filtering that is involved,
-hopefully it is clear enough. I remember we talked about this already
-but an unrelated thread, and was not capable of finding it anymore O:-).
-
-/** enum ieee802154_filtering_level - Filtering levels applicable to a PHY
- * @IEEE802154_FILTERING_NONE: No filtering at all, what is received is
- *	forwarded to the softMAC
- * @IEEE802154_FILTERING_1_FCS: First filtering level, frames with an inval=
-id
- *	FCS should be dropped
- * @IEEE802154_FILTERING_2_PROMISCUOUS: Second filtering level, promiscuous
- *	mode, identical in terms of filtering to the first level at the PHY
- *	level, but no ACK should be transmitted automatically and at the MAC
- *	level the frame should be forwarded to the upper layer directly
- * @IEEE802154_FILTERING_3_SCAN: Third filtering level, enforced during sca=
-ns,
- * 	which only forwards beacons
- * @IEEE802154_FILTERING_4_FRAME_FIELDS: Fourth filtering level actually
- *	enforcing the validity of the content of the frame with various checks
- */
-enum ieee802154_filtering_level {
-	IEEE802154_FILTERING_NONE,
-	IEEE802154_FILTERING_1_FCS,
-	IEEE802154_FILTERING_2_PROMISCUOUS,
-	IEEE802154_FILTERING_3_SCAN,
-	IEEE802154_FILTERING_4_FRAME_FIELDS,
-};
-
->=20
-> >   receiving data) but of course if the PHY does not support this state
-> >   (like hwsim) it should overwrite this value by setting the actual
-> >   filtering level (none, in the hwsim case) so that the core knows what
-> >   it receives.
-> > =20
->=20
-> ok.
->=20
-> > - I've replaced the specific "do not check the FCS" flag only used by
-> >   hwsim by this filtering level, which gives all the information we
-> >   need.
-> > =20
->=20
-> ok.
->=20
-> > - I've added a real promiscuous filtering mode which truly does not
-> >   care about the content of the frame but only checks the FCS if not
-> >   already done by the xceiver.
-> > =20
->=20
-> not sure what a "real promiscuous filtering here is" people have
-> different understanding about it, but 802.15.4 has a definition for
-> it.
-
-Promiscuous, by the 802154 spec means: the FCS is good so the content of
-the received packet must means something, just forward it and let upper
-layers handle it.
-
-Until now there was no real promiscuous mode in the mac NODE rx path.
-Only monitors would get all the frames (including the ones with a wrong
-FCS), which is fine because it's a bit out of the spec, so I'm fine
-with this idea. But otherwise in the NODE/COORD rx path, the FCS should
-be checked even in promiscuous mode to correctly match the spec.
-
-Until now, ieee802154_parse_frame_start() was always called in these
-path and this would validate the frame headers. I've added a more
-precise promiscuous mode in the rx patch which skips any additional
-checks. What happens however is that, if the transceiver disables FCS
-checks in promiscuous mode, then FCS is not checked at all and this is
-invalid. With my current implementation, the devices which do not check
-the FCS might be easily "fixed" by changing their PHY filtering level
-to "FILTERING_NONE" in the promiscuous callback.
-
-> You should consider that having monitors, frames with bad fcs
-> should not be filtered out by hardware. There it comes back what I
-> said before, the filtering level should be a parameter for start()
-> driver ops.
->=20
-> > - I've also implemented in software filtering level 4 for most
-> > regular =20
->=20
-> 3?
->=20
-> >   data packets. Without changing the default PHY level mentioned in
-> > the first item above, this additional filtering will be skipped
-> > which ensures we keep the same behavior of most driver. In the case
-> > of hwsim however, these filters will become active if the MAC is
-> > not in promiscuous mode or in scan mode, which is actually what
-> > people should be expecting.
-> > =20
->=20
-> To give feedback to that I need to see code. And please don't send the
-> whole feature stuff again, just this specific part of it. Thanks.
-
-The entire filtering feature is split: there are the basis introduced
-before the scan, and then after the whole scan+association thing I've
-introduced additional filtering levels.
-
-> > Hopefully all this fits what you had in mind.
 > >
-> > I have one item left on my current todo list: improving a bit the
-> > userspace tool with a "monitor" command.
+> > What is the definition of "duplicate the skb" here.
+> > =20
+> > > this is the way to go, but I am interested if you can give me a real
+> > > use case where having NODE+COORDINATOR on the same PHY is useful?
+> > > =20
 > >
-> > Otherwise the remaining things to do are to discuss the locking
-> > design which might need to be changed to avoid lockdep issues and
-> > keep the rtnl locked eg. during a channel change. I still don't
-> > know how to do that, so it's likely that the right next version
-> > will not include any change in this area unless something pops up. =20
+> > Testing. =20
 >=20
-> I try to look at that on the weekend.
+> I need to say that I really used multiple monitors at the same time on
+> one phy only and I did that with hwsim to run multiple user space
+> stacks. It was working and I was happy and didn't need to do a lot of
+> phy creations in hwsim.
 
-I've had an idea yesterday night which seem to work, I think I can drop
-the two patches which you disliked regarding discarding the rtnl in the
-tx path and in hwsim:change_channel().
+Indeed, looking at the code, you could use as many MONITOR interfaces
+you needed, but only a single NODE. I've changed that to use as many
+NODE and COORD that we wish.
+
+> Most hardware can probably not run multiple
+> nodes and coordinators at the same time ?yet?, _but_ there is a
+> candidate which can do that and this is atusb. On atusb we have a
+> co-processor that can deal with multiple address filters. People
+> already asked to do something like a node which can operate on two
+> pans as I remember, that would be a candidate for such a feature.
+
+Oh nice! Yes this makes sense.
+
+> I
+> really don't want to move step backwards here and delete this thing
+> which probably can be useful later. I don't know how wireless history
+> dealt with it and how complicated it was to bring such a feature in to
+> e.g. run multiple access points on one phy. I also see it in ethernet
+> with macvlan, which is a similar feature.
+>=20
+> We don't need to support it, make it so that on an ifup it returns
+> -EBUSY if something doesn't fit together as it currently is. We can
+> later add support for it after playing around with hwsim a little bit
+> more. We should at least take care that I can still run my multiple
+> monitors at the same time (which is currently allowed).
+>=20
+> - Alex
+>=20
+
 
 Thanks,
 Miqu=C3=A8l
