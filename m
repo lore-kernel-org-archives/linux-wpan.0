@@ -2,61 +2,68 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4D09ECAAD5
-	for <linux-wpan@archiver.kernel.org>; Mon, 29 Aug 2022 00:16:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8825C0502A
+	for <linux-wpan@archiver.kernel.org>; Mon, 29 Aug 2022 02:31:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229481AbiH2AQh (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Sun, 28 Aug 2022 20:16:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38272 "EHLO
+        id S229463AbiH2Cbf (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Sun, 28 Aug 2022 22:31:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40080 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229478AbiH2AQg (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Sun, 28 Aug 2022 20:16:36 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6AE552A96F
-        for <linux-wpan@vger.kernel.org>; Sun, 28 Aug 2022 17:16:34 -0700 (PDT)
+        with ESMTP id S229462AbiH2Cbe (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Sun, 28 Aug 2022 22:31:34 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FC6430F6D
+        for <linux-wpan@vger.kernel.org>; Sun, 28 Aug 2022 19:31:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1661732193;
+        s=mimecast20190719; t=1661740292;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=SzkAkorlo+AmttOHZ6iqjGEde1HkM0doNAcGjEIWZ4o=;
-        b=UgpOLiMhLm2QiGP+kik5FokYWZQ1uJ1WpQDfo48pGtywOBFSlIoE9dSHfe5MF7kkMQBTHX
-        mD8j5H9RhR3KCERfymdZbohYQHYfd8MsmnsTQVkKzepZL71wJM4zEVLwtiGWSHDf7lt+7L
-        2ADqL+jG9ZdD+Oa/6IcqDLgNdfo5xJY=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=ah8Haau/7IaRkO08sKK/2Ap55aXTGN4QiqzCtQHwyPs=;
+        b=hVT7VSonrffn7koa15oFpJYqeTUbn2ak1ldRHeACVtRg6Chlz4v1SWBkF+Ok8NAvAZBZsH
+        +QqpCkPsAJeyMZqmjEMF1hrC4XNcBIQUeWVT7hYVo7ruu0M9wpkdcTgWiJcwaJR7AUxp0D
+        SHSi/VpjncK+a50esluRyD6eEWPnDxk=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-39-7D7plrk1PWycyVS6SC70EA-1; Sun, 28 Aug 2022 20:16:31 -0400
-X-MC-Unique: 7D7plrk1PWycyVS6SC70EA-1
-Received: by mail-qv1-f70.google.com with SMTP id dn8-20020a056214094800b00498f685a1b3so2043590qvb.6
-        for <linux-wpan@vger.kernel.org>; Sun, 28 Aug 2022 17:16:31 -0700 (PDT)
+ us-mta-262-AAs2AbpCPPe92z5piZz6_Q-1; Sun, 28 Aug 2022 22:31:30 -0400
+X-MC-Unique: AAs2AbpCPPe92z5piZz6_Q-1
+Received: by mail-qk1-f198.google.com with SMTP id l15-20020a05620a28cf00b006b46997c070so5698678qkp.20
+        for <linux-wpan@vger.kernel.org>; Sun, 28 Aug 2022 19:31:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc;
-        bh=SzkAkorlo+AmttOHZ6iqjGEde1HkM0doNAcGjEIWZ4o=;
-        b=J7Rj7p854OsOFu8iLXYr9C2MaWN+4cPyAdeebH+ruANOYmBpF8DFWEFegdJGByzYux
-         kIBKPYNkVq9UrRjmbC6hMPeHQQ8ys3+NCFgUlqxIkXakgo5rcA2FrEYtD9/CX5pOXLxB
-         nnGNb1hMhbSFAOzIvwZKGAWyZyI5/wkkbMHkjcXccunFBvP4BBeS92n8rtf0Og4wd1kP
-         4+c6h4ukSP3kcgtERPu+SP0eM5OjyEVT6n4P/uyjcpq1wrbwutiLTJ9JdTfAdifvkcpa
-         vRnZzbVBQ2gR07I32qID7VbDkSQoDiuewiSo8KZUToqccQKt4QUPEo66IgFUyM+nu+4o
-         fRPw==
-X-Gm-Message-State: ACgBeo2iPJm44tsHChDhkPGogcwB0P1YZYUpfuFhvn2VbyMc8X1pLrJi
-        RRQrl0aJ6sBaxv4uaJ0YN4M9rTQ3OfeEHa+Ht9BB5GrzKND8nmubIwe5bbCvhW2/9auIb8JqSi+
-        uy53JbFxxCSHugRvQkjpcCYqsWTX/wcL0EPOcEA==
-X-Received: by 2002:a05:622a:1302:b0:344:8a9d:817d with SMTP id v2-20020a05622a130200b003448a9d817dmr8364117qtk.339.1661732191501;
-        Sun, 28 Aug 2022 17:16:31 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR6YH2nJIo0b6SviiSUMGBKXXeJaHL95jdsa0u6iUg5nlt6EWo3hqWiTPzDu5EZVS+GBLuTCvNVZOaiGzM0z1Ys=
-X-Received: by 2002:a05:622a:1302:b0:344:8a9d:817d with SMTP id
- v2-20020a05622a130200b003448a9d817dmr8364092qtk.339.1661732191317; Sun, 28
- Aug 2022 17:16:31 -0700 (PDT)
+        bh=ah8Haau/7IaRkO08sKK/2Ap55aXTGN4QiqzCtQHwyPs=;
+        b=w9gxriCulI+Ax8uAIv4QOUwcZBPHc6rPCIPhyPLW6K5aQK2stvS1AuEVKwWhu8mom9
+         KxwhZvgISj0xAs1LkYD5Qa8SHIriGluthMP66C7YyyqnPkR6BizreUNy1DJLHXFlg3Mt
+         M+YhRR2CpjWbPBiUFIFrtfhhxx6x7Fc+uhGhLyJJYpLno7AqlKWzCR5spI4Z5O5gX/ng
+         MLnvxzpjpClBWgY7lUB7h61vdif1ojjXeQrnIx54NoR55bYRl6vmEaABG5gT4s9fJObF
+         MRkl4qy2645n+W2G+X6ZQI1AW2HFrb5nPwWWhMGdkCP0vfrrfYS1WnMZPvnkN3vdk4ic
+         6fIg==
+X-Gm-Message-State: ACgBeo2OADb8s8BbRckL2A55XlvjwjKnb2ppG3nIh5yUooZXtB2RtPzc
+        dCKu+UgQXDqOzHMpkaf4Db5wW/CAv0sW3PND/KaaobTvuChZQIxh9BaLQiF4wbRSLAtZC+B/daK
+        IO3z4zWzfiY0WuBar+lHzApRmzCwoUF+Xp+moSg==
+X-Received: by 2002:a05:622a:214:b0:342:f97c:1706 with SMTP id b20-20020a05622a021400b00342f97c1706mr8420714qtx.291.1661740290450;
+        Sun, 28 Aug 2022 19:31:30 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR4BlX9asFU3kB2QAzKQnGObKQL+aiQ/8YjuCdJVz26dC8K8S8TDzTsjey0PyYfu5baLhfz1ztdhu8kcjt2ZtN4=
+X-Received: by 2002:a05:622a:214:b0:342:f97c:1706 with SMTP id
+ b20-20020a05622a021400b00342f97c1706mr8420702qtx.291.1661740290272; Sun, 28
+ Aug 2022 19:31:30 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220826142954.254853-1-miquel.raynal@bootlin.com>
-In-Reply-To: <20220826142954.254853-1-miquel.raynal@bootlin.com>
+References: <20220701143052.1267509-1-miquel.raynal@bootlin.com>
+ <20220701143052.1267509-2-miquel.raynal@bootlin.com> <CAK-6q+jkUUjAGqEDgU1oJvRkigUbvSO5SXWRau6+320b=GbfxQ@mail.gmail.com>
+ <20220819191109.0e639918@xps-13> <CAK-6q+gCY3ufaADHNQWJGNpNZJMwm=fhKfe02GWkfGEdgsMVzg@mail.gmail.com>
+ <20220823182950.1c722e13@xps-13> <CAK-6q+jfva++dGkyX_h2zQGXnoJpiOu5+eofCto=KZ+u6KJbJA@mail.gmail.com>
+ <20220824093547.16f05d15@xps-13> <CAK-6q+gqX8w+WEgSk2J9FOdrFJPvqJOsgmaY4wOu=siRszBujA@mail.gmail.com>
+ <20220825104035.11806a67@xps-13> <CAK-6q+hxSpw1yJR5H5D6gy5gGdm6Qa3VzyjZXA45KFQfVVqwFw@mail.gmail.com>
+ <CAK-6q+jbBg4kCh88Oz7mBa0RBBX_+cqqoPjT3POEjbQKX1ZDKw@mail.gmail.com> <20220826100825.4f79c777@xps-13>
+In-Reply-To: <20220826100825.4f79c777@xps-13>
 From:   Alexander Aring <aahringo@redhat.com>
-Date:   Sun, 28 Aug 2022 20:16:20 -0400
-Message-ID: <CAK-6q+imPjpBxSZG7e5nxYYgtkrM5pfncxza9=vA+sq+eFQsUw@mail.gmail.com>
-Subject: Re: [PATCH] net: mac802154: Fix a condition in the receive path
+Date:   Sun, 28 Aug 2022 22:31:19 -0400
+Message-ID: <CAK-6q+gZ5fSdNptvQoKpf1SOqODv70gzbFTYyWBagC6AFtAkig@mail.gmail.com>
+Subject: Re: [PATCH wpan-next 01/20] net: mac802154: Allow the creation of
+ coordinator interfaces
 To:     Miquel Raynal <miquel.raynal@bootlin.com>
 Cc:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
@@ -70,8 +77,7 @@ Cc:     Alexander Aring <alex.aring@gmail.com>,
         Romuald Despres <romuald.despres@qorvo.com>,
         Frederic Blain <frederic.blain@qorvo.com>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
-        Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-        stable@vger.kernel.org
+        Thomas Petazzoni <thomas.petazzoni@bootlin.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
@@ -79,53 +85,26 @@ X-Mailing-List: linux-wpan@vger.kernel.org
 
 Hi,
 
-On Fri, Aug 26, 2022 at 10:31 AM Miquel Raynal
-<miquel.raynal@bootlin.com> wrote:
+On Fri, Aug 26, 2022 at 4:08 AM Miquel Raynal <miquel.raynal@bootlin.com> wrote:
+...
+> >
+> > I need to say that I really used multiple monitors at the same time on
+> > one phy only and I did that with hwsim to run multiple user space
+> > stacks. It was working and I was happy and didn't need to do a lot of
+> > phy creations in hwsim.
 >
-> Upon reception, a packet must be categorized, either it's destination is
-> the host, or it is another host. A packet with no destination addressing
-> fields may be valid in two situations:
-> - the packet has no source field: only ACKs are built like that, we
->   consider the host as the destination.
-> - the packet has a valid source field: it is directed to the PAN
->   coordinator, as for know we don't have this information we consider we
->   are not the PAN coordinator.
+> Indeed, looking at the code, you could use as many MONITOR interfaces
+> you needed, but only a single NODE. I've changed that to use as many
+> NODE and COORD that we wish.
 >
-> There was likely a copy/paste error made during a previous cleanup
-> because the if clause is now containing exactly the same condition as in
-> the switch case, which can never be true. In the past the destination
-> address was used in the switch and the source address was used in the
-> if, which matches what the spec says.
->
-> Cc: stable@vger.kernel.org
-> Fixes: ae531b9475f6 ("ieee802154: use ieee802154_addr instead of *_sa variants")
-> Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
-> ---
->  net/mac802154/rx.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/net/mac802154/rx.c b/net/mac802154/rx.c
-> index b8ce84618a55..c439125ef2b9 100644
-> --- a/net/mac802154/rx.c
-> +++ b/net/mac802154/rx.c
-> @@ -44,7 +44,7 @@ ieee802154_subif_frame(struct ieee802154_sub_if_data *sdata,
->
->         switch (mac_cb(skb)->dest.mode) {
->         case IEEE802154_ADDR_NONE:
-> -               if (mac_cb(skb)->dest.mode != IEEE802154_ADDR_NONE)
-> +               if (hdr->source.mode != IEEE802154_ADDR_NONE)
->                         /* FIXME: check if we are PAN coordinator */
->                         skb->pkt_type = PACKET_OTHERHOST;
->                 else
 
+Be careful there, there is a reason why we don't allow this and this
+has to do with support of multiple address filters... but here it
+depends also what you mean with "use".
 
-This patch looks okay but it should not be addressed to stable. Leave
-of course the fixes tag.
-
-Wpan sends pull requests to net and they have their own way to get
-into the stable tree when they are in net.
-
-Thanks.
+I need to admit, you can achieve the same behaviour of multiple user
+space stacks and one monitor, _but_ you can easily filter the traffic
+if you do it per interface...
 
 - Alex
 
