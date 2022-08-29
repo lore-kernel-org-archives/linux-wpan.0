@@ -2,113 +2,80 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15ABDECAAD2
-	for <linux-wpan@archiver.kernel.org>; Mon, 29 Aug 2022 09:08:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0A98ECAAD4
+	for <linux-wpan@archiver.kernel.org>; Mon, 29 Aug 2022 10:03:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229879AbiH2JIq (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 29 Aug 2022 05:08:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58660 "EHLO
+        id S229518AbiH2KDZ (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 29 Aug 2022 06:03:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52804 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229753AbiH2JIp (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 29 Aug 2022 05:08:45 -0400
+        with ESMTP id S229955AbiH2KDR (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 29 Aug 2022 06:03:17 -0400
 Received: from proxima.lasnet.de (proxima.lasnet.de [IPv6:2a01:4f8:121:31eb:3::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A58F15924C;
-        Mon, 29 Aug 2022 02:08:44 -0700 (PDT)
-Received: from [IPV6:2003:e9:d701:1d41:444a:bdf5:adf8:9c98] (p200300e9d7011d41444abdf5adf89c98.dip0.t-ipconnect.de [IPv6:2003:e9:d701:1d41:444a:bdf5:adf8:9c98])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 623CB5FAC1;
+        Mon, 29 Aug 2022 03:03:15 -0700 (PDT)
+Received: from localhost.localdomain.datenfreihafen.local (p200300e9d7011d41444abdf5adf89c98.dip0.t-ipconnect.de [IPv6:2003:e9:d701:1d41:444a:bdf5:adf8:9c98])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits))
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
         (No client certificate requested)
-        (Authenticated sender: stefan@datenfreihafen.org)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id DC52CC025B;
-        Mon, 29 Aug 2022 11:08:42 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
-        s=2021; t=1661764123;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=kmK1xA3ChRDfbs0TeBtj2omjGednU5QOYRX/hf9CLvY=;
-        b=J+LMzCfIJh5USARdHZll17yWkpMM1GhQgg1nTknvtwECow/iAbAECbttAsIAccrGZEybGM
-        08W/WHkggZ3BtxYj//RWM4fb/HJ7zRB6Y786DRIVJdCcIhGmwBF9hOqB3EHiYEQtx4nJf1
-        L/kDChq0CZNHqnZFVvqJlUW3UDjwvwp9Xwk6Kj7wrHhoQmOouGtMbKsc11KOXl1vd/EkD5
-        57lfPrUI0d5A3Kjwtxv1JmNd/0MshTo44MWx4gNe10j4oUPvWttWBCmSkTQkpykLd9vK7o
-        ZhrrnBc7rnU9hF/WJFM1N7OaxgGCrlZ8n7U36me0IzjP8OQEopcpeu/qk9YV4g==
-Message-ID: <85f66a3a-95fa-5aaa-def0-998bf3f5139f@datenfreihafen.org>
-Date:   Mon, 29 Aug 2022 11:08:42 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH] net/ieee802154: fix uninit value bug in dgram_sendmsg
-Content-Language: en-US
-To:     Alexander Aring <aahringo@redhat.com>
-Cc:     Haimin Zhang <tcs.kernel@gmail.com>,
-        Alexander Aring <alex.aring@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        linux-wpan - ML <linux-wpan@vger.kernel.org>,
-        Network Development <netdev@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Haimin Zhang <tcs_kernel@tencent.com>
-References: <20220822071902.3419042-1-tcs_kernel@tencent.com>
- <f7e87879-1ac6-65e5-5162-c251204f07d4@datenfreihafen.org>
- <CAK-6q+hf27dY9d-FyAh2GtA_zG5J4kkHEX2Qj38Rac_PH63bQg@mail.gmail.com>
+        (Authenticated sender: stefan@sostec.de)
+        by proxima.lasnet.de (Postfix) with ESMTPSA id DA1F2C040C;
+        Mon, 29 Aug 2022 12:03:12 +0200 (CEST)
 From:   Stefan Schmidt <stefan@datenfreihafen.org>
-In-Reply-To: <CAK-6q+hf27dY9d-FyAh2GtA_zG5J4kkHEX2Qj38Rac_PH63bQg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+To:     davem@davemloft.net, kuba@kernel.org
+Cc:     linux-wpan@vger.kernel.org, alex.aring@gmail.com,
+        netdev@vger.kernel.org
+Subject: pull-request: ieee802154 for net 2022-08-29
+Date:   Mon, 29 Aug 2022 12:03:08 +0200
+Message-Id: <20220829100308.2802578-1-stefan@datenfreihafen.org>
+X-Mailer: git-send-email 2.37.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
+Hello Dave, Jakub.
 
-Hello Alex.
+An update from ieee802154 for your *net* tree.
 
-On 23.08.22 14:22, Alexander Aring wrote:
-> Hi,
-> 
-> On Tue, Aug 23, 2022 at 5:42 AM Stefan Schmidt
-> <stefan@datenfreihafen.org> wrote:
->>
->> Hello.
->>
->> On 22.08.22 09:19, Haimin Zhang wrote:
->>> There is uninit value bug in dgram_sendmsg function in
->>> net/ieee802154/socket.c when the length of valid data pointed by the
->>> msg->msg_name isn't verified.
->>>
->>> This length is specified by msg->msg_namelen. Function
->>> ieee802154_addr_from_sa is called by dgram_sendmsg, which use
->>> msg->msg_name as struct sockaddr_ieee802154* and read it, that will
->>> eventually lead to uninit value read. So we should check the length of
->>> msg->msg_name is not less than sizeof(struct sockaddr_ieee802154)
->>> before entering the ieee802154_addr_from_sa.
->>>
->>> Signed-off-by: Haimin Zhang <tcs_kernel@tencent.com>
->>
->>
->> This patch has been applied to the wpan tree and will be
->> part of the next pull request to net. Thanks!
-> 
-> For me this patch is buggy or at least it is questionable how to deal
-> with the size of ieee802154_addr_sa here.
-
-You are right. I completely missed this. Thanks for spotting!
-
-> There should be a helper to calculate the size which depends on the
-> addr_type field. It is not required to send the last 6 bytes if
-> addr_type is IEEE802154_ADDR_SHORT.
-> Nitpick is that we should check in the beginning of that function.
-
-Haimin, in ieee802154 we could have two different sizes for 
-ieee802154_addr_sa depending on the addr_type. We have short and 
-extended addresses.
-
-Could you please rework this patch to take this into account as Alex 
-suggested?
-
-I reverted your original patch from my tree.
+A repeated word fix from Jilin Yuan.
+A missed return code setting in the cc2520 driver by Li Qiong.
+Fixing a potential race in by defering the workqueue destroy in the adf7242
+driver by Lin Ma.
+Fixing a long standing problem in the mac802154 rx path to match corretcly by
+Miquel Raynal.
 
 regards
 Stefan Schmidt
+
+The following changes since commit 5003e52c311a2135d737ae906577c639fbaafe54:
+
+  Merge branch 'bonding-802-3ad-fix-no-transmission-of-lacpdus' (2022-08-22 18:30:28 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/sschmidt/wpan.git tags/ieee802154-for-net-2022-08-29
+
+for you to fetch changes up to ffd7bdddaab193c38416fd5dd416d065517d266e:
+
+  ieee802154: cc2520: add rc code in cc2520_tx() (2022-08-29 11:10:22 +0200)
+
+----------------------------------------------------------------
+Jilin Yuan (1):
+      net/ieee802154: fix repeated words in comments
+
+Li Qiong (1):
+      ieee802154: cc2520: add rc code in cc2520_tx()
+
+Lin Ma (1):
+      ieee802154/adf7242: defer destroy_workqueue call
+
+Miquel Raynal (1):
+      net: mac802154: Fix a condition in the receive path
+
+ drivers/net/ieee802154/adf7242.c | 3 ++-
+ drivers/net/ieee802154/ca8210.c  | 2 +-
+ drivers/net/ieee802154/cc2520.c  | 1 +
+ net/mac802154/rx.c               | 2 +-
+ 4 files changed, 5 insertions(+), 3 deletions(-)
