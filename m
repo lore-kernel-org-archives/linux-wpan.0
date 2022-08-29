@@ -2,144 +2,82 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF524ECAAD4
-	for <linux-wpan@archiver.kernel.org>; Mon, 29 Aug 2022 13:04:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C99D9ECAAD2
+	for <linux-wpan@archiver.kernel.org>; Mon, 29 Aug 2022 16:33:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229484AbiH2NEE (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 29 Aug 2022 09:04:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45492 "EHLO
+        id S229636AbiH2QdJ (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 29 Aug 2022 12:33:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44252 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230315AbiH2NDf (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 29 Aug 2022 09:03:35 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A425B861E3
-        for <linux-wpan@vger.kernel.org>; Mon, 29 Aug 2022 05:57:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1661777834;
+        with ESMTP id S229488AbiH2QdH (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 29 Aug 2022 12:33:07 -0400
+Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F7E2252B6;
+        Mon, 29 Aug 2022 09:33:06 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by sin.source.kernel.org (Postfix) with ESMTPS id 1EE6FCE130F;
+        Mon, 29 Aug 2022 16:33:04 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8EF56C433D6;
+        Mon, 29 Aug 2022 16:32:59 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="kNQTi4K8"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1661790778;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=fcP6ValkWWpzgumTf5whCf+XxKoGULQJyQXg47i7YXU=;
-        b=GFH1vD0mpNQgqrIs7zNZL0aCW/ExguVvJl321UoqgYLH2xGWScMTd1LeuuXLkagT55EGTZ
-        C0i/74NiA40U9O+zuy9q/g9oZcmg1FiB6KexVCR3p8hhIjBQmSEOP/H8aQdabtG5wLwJxy
-        dObA8n3WmKEH6SA0FVStNhm/+0do/mI=
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
- [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-574-8qH6s9HdNRy1mQGgXgPeog-1; Mon, 29 Aug 2022 08:57:13 -0400
-X-MC-Unique: 8qH6s9HdNRy1mQGgXgPeog-1
-Received: by mail-qt1-f197.google.com with SMTP id s2-20020ac85cc2000000b00342f8ad1f40so6293783qta.12
-        for <linux-wpan@vger.kernel.org>; Mon, 29 Aug 2022 05:57:13 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc;
-        bh=fcP6ValkWWpzgumTf5whCf+XxKoGULQJyQXg47i7YXU=;
-        b=wcc5LRsA6e9m5cCR/B+GNz0YuenytEAJlhF3Fkn69PYMH7eJ1zSs5VZiAEwWUB/AV/
-         1vTep+62ey2yyrRqUHj6881M/ZHD+fvmGjr21zwkF0ciIIpX+m9zOtQXvq7hy1oZDT9K
-         L0kuJK0v74n2Qoo6Y9VTxraopIeXw7dt6RbXXmYHXMEP57PmiufxbRY1viubxHqCeJYm
-         8aXR0jbJDVzc2PoZZGjI3PJ4n/EnURq8J2xPj721L/ZLZqVUz3BVJhTqOdcFGJb3fVel
-         hBJ3jZZTk2rY46at6pds5EQHxJFFqGjIj4tmiBbV2KFkl7uSwM6p/ie0peXH1mVl+aUZ
-         OmUg==
-X-Gm-Message-State: ACgBeo0E7KrZn6eBgs/WakeNfsZbv9P6CHjM6w6M4KUj4UOeG2rt2aj+
-        MQNQEB725Bt+ocDR3QPajPhIshfGxicsBSECL/tTRoH+dZeDlIH2By8Y3Ol6WfSRe3DZE8nB8rZ
-        6OqCciCbKP+UZsmovnEXY3W6jOVhPBbE8tZPlEg==
-X-Received: by 2002:a05:6214:1bce:b0:499:504:7631 with SMTP id m14-20020a0562141bce00b0049905047631mr2325150qvc.92.1661777832667;
-        Mon, 29 Aug 2022 05:57:12 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR58j/vDKtlAFApSzY4YEWqcnYvtoRLw1y2HmvfcViigJkQW7zxQXJikFfPDkyqmBMP9Cvq5HeJz3TqUZt0lJJ0=
-X-Received: by 2002:a05:6214:1bce:b0:499:504:7631 with SMTP id
- m14-20020a0562141bce00b0049905047631mr2325131qvc.92.1661777832434; Mon, 29
- Aug 2022 05:57:12 -0700 (PDT)
+        bh=3F5bs6wEmRDmdIQe96V5iwCeWjK5YoVTeKEuPdxSfN4=;
+        b=kNQTi4K8egLdu1zNarBL47SQOYWe4WMkhvHrAwskcAG/1adfCVQBMB0gvduSpWFDbav2Tj
+        2LIfVOx4v++zHCwTjVPKSR+kizVUx5w5Af4coUKZm2ZWFtmVrqoa79XBz+/8OYj2RpZKfG
+        GTXOi7IPk9NkM/oVEZTI4HyRLLvuSmE=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 1de32b3b (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+        Mon, 29 Aug 2022 16:32:58 +0000 (UTC)
+Date:   Mon, 29 Aug 2022 12:32:54 -0400
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     Jakub Kicinski <kuba@kernel.org>
+Cc:     davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+        pabeni@redhat.com, jiri@resnulli.us, johannes@sipsolutions.net,
+        linux-block@vger.kernel.org, osmocom-net-gprs@lists.osmocom.org,
+        linux-wpan@vger.kernel.org, wireguard@lists.zx2c4.com,
+        linux-wireless@vger.kernel.org, linux-scsi@vger.kernel.org,
+        target-devel@vger.kernel.org, linux-pm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-cifs@vger.kernel.org, cluster-devel@redhat.com,
+        mptcp@lists.linux.dev, lvs-devel@vger.kernel.org,
+        netfilter-devel@vger.kernel.org,
+        linux-security-module@vger.kernel.org, dev@openvswitch.org,
+        linux-s390@vger.kernel.org, tipc-discussion@lists.sourceforge.net
+Subject: Re: [PATCH net-next] genetlink: start to validate reserved header
+ bytes
+Message-ID: <YwzqNgj/bJoawrwh@zx2c4.com>
+References: <20220825001830.1911524-1-kuba@kernel.org>
 MIME-Version: 1.0
-References: <20220701143434.1267864-1-miquel.raynal@bootlin.com>
- <CAK-6q+hUc0Cm+_9OyLNqX=gKNOO-3TU4ERu_bZKm=Qf-c9F-ug@mail.gmail.com>
- <20220819190654.6af62bca@xps-13> <CAK-6q+gk2rt3crszskUOxxeTYb3OY+ybLsga6f6VC5RQmjY44w@mail.gmail.com>
- <20220825145516.14bd5b45@xps-13> <CAK-6q+jy75nUH1dzr5KCFnLJ=QALLv5keXboTtbjQ7uh-KWwGg@mail.gmail.com>
- <20220826125020.414964fd@xps-13> <CAK-6q+jjainnsMDm9tXjr7rD7--XjBFU8gg_FA65BrXYNkLNHw@mail.gmail.com>
- <20220829103702.4cce4670@xps-13>
-In-Reply-To: <20220829103702.4cce4670@xps-13>
-From:   Alexander Aring <aahringo@redhat.com>
-Date:   Mon, 29 Aug 2022 08:57:01 -0400
-Message-ID: <CAK-6q+j3mak0exMnQT9kw3pu6zNkXwY6Fxbjz8akap3N04AEeQ@mail.gmail.com>
-Subject: Re: [PATCH wpan-tools 0/7] iwpan: Support scanning/beaconing
-To:     Miquel Raynal <miquel.raynal@bootlin.com>
-Cc:     Alexander Aring <alex.aring@gmail.com>,
-        Stefan Schmidt <stefan@datenfreihafen.org>,
-        linux-wpan - ML <linux-wpan@vger.kernel.org>,
-        David Girault <david.girault@qorvo.com>,
-        Romuald Despres <romuald.despres@qorvo.com>,
-        Frederic Blain <frederic.blain@qorvo.com>,
-        Nicolas Schodet <nico@ni.fr.eu.org>,
-        Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20220825001830.1911524-1-kuba@kernel.org>
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi,
+Hi Jakub,
 
-On Mon, Aug 29, 2022 at 4:37 AM Miquel Raynal <miquel.raynal@bootlin.com> wrote:
->
-> Hi Alexander,
->
-> aahringo@redhat.com wrote on Sun, 28 Aug 2022 09:55:24 -0400:
->
-> > Hi,
-> >
-> > On Fri, Aug 26, 2022 at 6:50 AM Miquel Raynal <miquel.raynal@bootlin.com> wrote:
-> > ...
-> > >
-> > > I've updated the tools so that we have:
-> > >
-> > > * "scan trigger" which does not block
-> > > * "scan monitor" which displays with a pretty output the new
-> > >   coordinators and stops blocking when the scan is over (either because
-> > >   it reached the last channel to scan, or it got aborted)
-> > > * "scan abort" which stops an ongoing scan
-> > > * "scan" which is the same as "scan trigger; scan monitor", and will
-> >
-> > no, there is a race in the design of "scan trigger; scan monitor".
->
-> Right, I've used pthread to first start the monitoring, before actually
-> triggering the scan. That should be enough.
->
+On Wed, Aug 24, 2022 at 05:18:30PM -0700, Jakub Kicinski wrote:
+> diff --git a/drivers/net/wireguard/netlink.c b/drivers/net/wireguard/netlink.c
+> index d0f3b6d7f408..0c0644e762e5 100644
+> --- a/drivers/net/wireguard/netlink.c
+> +++ b/drivers/net/wireguard/netlink.c
+> @@ -621,6 +621,7 @@ static const struct genl_ops genl_ops[] = {
+>  static struct genl_family genl_family __ro_after_init = {
+>  	.ops = genl_ops,
+>  	.n_ops = ARRAY_SIZE(genl_ops),
+> +	.resv_start_op = WG_CMD_SET_DEVICE + 1,
+>  	.name = WG_GENL_NAME,
+>  	.version = WG_GENL_VERSION,
+>  	.maxattr = WGDEVICE_A_MAX,
 
-I think we should look at this, because it requires that all
-applications link to pthreads if we offer such an API. Any thoughts
-about alternative ways, can it not be done over libnl, that libnl
-internally used e.g. select()? The above example is only regarding the
-process context.
+FWIW, I wouldn't object to just leaving this at zero. I don't know of
+any wireguard userspaces doing anything with the reserved header field.
 
-> > >   send an abort command if interrupted with SIGINT
-> > >
-> > > On the other side there was in the previous versions a command "iwpan
-> > > event" which I just renamed "iwpan monitor" which follows anything
-> > > 802154 related and displays a single line each time, it looks like:
-> > > # iwpan monitor -t // -t is an option to display timestamps
-> > > 1661510897.820505: coord1 (phy #1): scan started
-> > > 1661510903.874055: coord1 (phy #1): new coordinator detected: PAN 0xabcd, addr 0x42aab7e343ea5c0f
-> > > 1661510908.953874: coord1 (phy #1): scan finished
-> > > 1661510915.437030: coord1 (phy #1): scan started
-> > > 1661510916.242412: coord1 (phy #1): scan aborted
-> > >
-> > > This should address all the needs.
-> >
-> > I would remove the scan monitor and if it is needed a "monitor scan",
->
-> Actually we need both "scan monitor" and "monitor scan". The former
-> shows what is happening in a clean manner, with a detailed view of all
-> the information about the beacon received, while the latter would more
-> something that we run aside to follow what's happening, it's a bare and
-> short output (one-liners).
->
-
-For me that can be already provided by the iwpan monitor command,
-maybe with some pretty print args or json args to have it in a nice
-way or json whatever looks like ip/iw thingy. :)
-
-However I don't really bother here, except that it might confuse
-people who want to scan and probably want the blocked command only and
-think the other scan commands are necessary to perform a scan...
-
-- Alex
-
+Jason
