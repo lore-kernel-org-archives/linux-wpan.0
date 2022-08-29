@@ -2,80 +2,142 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0A98ECAAD4
-	for <linux-wpan@archiver.kernel.org>; Mon, 29 Aug 2022 10:03:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33E62ECAAD2
+	for <linux-wpan@archiver.kernel.org>; Mon, 29 Aug 2022 12:04:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229518AbiH2KDZ (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 29 Aug 2022 06:03:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52804 "EHLO
+        id S229785AbiH2MEN (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 29 Aug 2022 08:04:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33212 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229955AbiH2KDR (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 29 Aug 2022 06:03:17 -0400
-Received: from proxima.lasnet.de (proxima.lasnet.de [IPv6:2a01:4f8:121:31eb:3::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 623CB5FAC1;
-        Mon, 29 Aug 2022 03:03:15 -0700 (PDT)
-Received: from localhost.localdomain.datenfreihafen.local (p200300e9d7011d41444abdf5adf89c98.dip0.t-ipconnect.de [IPv6:2003:e9:d701:1d41:444a:bdf5:adf8:9c98])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: stefan@sostec.de)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id DA1F2C040C;
-        Mon, 29 Aug 2022 12:03:12 +0200 (CEST)
-From:   Stefan Schmidt <stefan@datenfreihafen.org>
-To:     davem@davemloft.net, kuba@kernel.org
-Cc:     linux-wpan@vger.kernel.org, alex.aring@gmail.com,
-        netdev@vger.kernel.org
-Subject: pull-request: ieee802154 for net 2022-08-29
-Date:   Mon, 29 Aug 2022 12:03:08 +0200
-Message-Id: <20220829100308.2802578-1-stefan@datenfreihafen.org>
-X-Mailer: git-send-email 2.37.1
+        with ESMTP id S229509AbiH2MDs (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 29 Aug 2022 08:03:48 -0400
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C1ED89810;
+        Mon, 29 Aug 2022 04:48:54 -0700 (PDT)
+Received: by mail-wr1-f49.google.com with SMTP id az27so9831033wrb.6;
+        Mon, 29 Aug 2022 04:48:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=user-agent:content-disposition:mime-version:message-id:subject:to
+         :from:date:from:to:cc;
+        bh=/Di7lkoE4PMDXxx+KkgEBZLTyvjkUh6iLYQL6rsJ/+4=;
+        b=kaLiTO3uz69oCN4+obPyA7IvFEwMUQt4ZXB/gpCbSytpTKaDsW0nIRGyUJlrfFsdvE
+         mTMdi/Z4w215r5xJBREm+A9DCZWdKMDh9eP4c8/x3R5xGY1Hj6pf8n0K/p2+vM2pyS5q
+         EH0TfHmeSyxe2CLjCBzM+P4TTrUSlSTU/5kLYioLrW6im0+coy5EfOhPV1wi9aFRYsKQ
+         hdcV+CcTtuR2pH8q0XIYhRZxh8JLh0rNtGd2NdQ2X3bDN1rkv3ZahAOHeRI+AXcweHvy
+         isZDOgf8r2OYCTu57efimyUr2retjmscs1Oo6dcHFsHyruJqIe81Jp4UvEJuyYovbuz2
+         4y9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=user-agent:content-disposition:mime-version:message-id:subject:to
+         :from:date:x-gm-message-state:from:to:cc;
+        bh=/Di7lkoE4PMDXxx+KkgEBZLTyvjkUh6iLYQL6rsJ/+4=;
+        b=chtjH6W5gh6gGEp5VMHs68GGc3Nr+S0YFlEU2je8FdMhdQbHelfiKvHhH8GKOikjVf
+         QU7XLyuDHXLZUzPfNrSvWqlA6Vl6IZelO2BkJdTn4DQYry147GqCAbAh67vV5fEPdRqN
+         PJuaI/LH96yullbCgk6yYc2CY+cWL0IEMV658D6lia+VWJLuqLmIXC4Sx92UgXI86a0D
+         XksO4wJotQ5LsO2e0hdE/w62dUOm4IpufRH/ktdfyz/jSl/mE/ju+WAMRB+PDYetTXn2
+         LqG3JLyDH9NXsIc+SHIYedpPGSaMucumE2FB4K+OJdvEquQMnLBtT3k6ZswgGiSNQRi3
+         W6nQ==
+X-Gm-Message-State: ACgBeo2dGpJAmrz/DzEbvpwZVbkqKsImg1/+K8tQS117HBZBW6F+e7TU
+        Ooj9Jfufj9PjSWk5LeAOOEE=
+X-Google-Smtp-Source: AA6agR6Q8pcDSR2sGpo6Z+/Xk8vC5hvOIOH6YppdFlNOZIdRGVsL+2Mi1+jD+E1YNRyMMa7NoROLsA==
+X-Received: by 2002:a5d:64e9:0:b0:220:7dd7:63eb with SMTP id g9-20020a5d64e9000000b002207dd763ebmr6085539wri.590.1661773583790;
+        Mon, 29 Aug 2022 04:46:23 -0700 (PDT)
+Received: from debian ([89.238.191.199])
+        by smtp.gmail.com with ESMTPSA id i13-20020a05600c354d00b003a5f4fccd4asm8896858wmq.35.2022.08.29.04.46.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 29 Aug 2022 04:46:23 -0700 (PDT)
+Date:   Mon, 29 Aug 2022 13:44:35 +0200
+From:   Richard Gobert <richardbgobert@gmail.com>
+To:     davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com, corbet@lwn.net, yoshfuji@linux-ipv6.org,
+        dsahern@kernel.org, alex.aring@gmail.com,
+        stefan@datenfreihafen.org, pablo@netfilter.org,
+        kadlec@netfilter.org, fw@strlen.de, kafai@fb.com,
+        netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-wpan@vger.kernel.org,
+        netfilter-devel@vger.kernel.org, coreteam@netfilter.org
+Subject: [PATCH 0/4] net-next: frags: add adaptive per-peer timeout under load
+Message-ID: <20220829114427.GA2311@debian>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello Dave, Jakub.
+This patch series introduces an optimization of fragment queues under
+load.
 
-An update from ieee802154 for your *net* tree.
+The goal is to improve upon the current approach of static timeouts
+(frag_timeout, 30 seconds by default) by implementing Eric's
+suggestion of reducing timeouts under load [1], with additional
+considerations for peer-specific load.
 
-A repeated word fix from Jilin Yuan.
-A missed return code setting in the cc2520 driver by Li Qiong.
-Fixing a potential race in by defering the workqueue destroy in the adf7242
-driver by Lin Ma.
-Fixing a long standing problem in the mac802154 rx path to match corretcly by
-Miquel Raynal.
+The timeout reduction is done dynamically per peer, based on both
+global and peer-specific load. low_thresh is reintroduced and now acts 
+as a knob for adjusting per-peer memory limits.
 
-regards
-Stefan Schmidt
+A comparison of netperf results before and after applying the patch:
 
-The following changes since commit 5003e52c311a2135d737ae906577c639fbaafe54:
+Before:
+    [vm1 ~]# ./super_netperf.sh 10 -H 172.16.43.3 -l 60 -t UDP_STREAM
+    103.23
 
-  Merge branch 'bonding-802-3ad-fix-no-transmission-of-lacpdus' (2022-08-22 18:30:28 -0700)
+After:
+    [vm1 ~]# ./super_netperf.sh 10 -H 172.16.43.3 -l 60 -t UDP_STREAM
+    576.17
 
-are available in the Git repository at:
+And another benchmark of a more specific use case.
+One high-bandwidth memory-hogging peer (vm1), and another "average"
+client (vm2), attempting to communicate with the same server:
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/sschmidt/wpan.git tags/ieee802154-for-net-2022-08-29
+Before:
+    [vm1 ~]# ./super_netperf.sh 10 -H 172.16.43.3 -l 60 -t UDP_STREAM
+	42.57
+	[vm2 ~]# ./super_netperf.sh 1 -H 172.16.43.3 -l 60 -t UDP_STREAM
+	50.93
 
-for you to fetch changes up to ffd7bdddaab193c38416fd5dd416d065517d266e:
+After:
+    [vm1 ~]# ./super_netperf.sh 10 -H 172.16.43.3 -l 60 -t UDP_STREAM
+	420.65
+	[vm2 ~]# ./super_netperf.sh 1 -H 172.16.43.3 -l 60 -t UDP_STREAM
+	624.79
 
-  ieee802154: cc2520: add rc code in cc2520_tx() (2022-08-29 11:10:22 +0200)
 
-----------------------------------------------------------------
-Jilin Yuan (1):
-      net/ieee802154: fix repeated words in comments
+These benchmarks were done using the following configuration:
 
-Li Qiong (1):
-      ieee802154: cc2520: add rc code in cc2520_tx()
+[vm3 ~]# grep . /proc/sys/net/ipv4/ipfrag_*
+/proc/sys/net/ipv4/ipfrag_high_thresh:104857600
+/proc/sys/net/ipv4/ipfrag_low_thresh:78643200
+/proc/sys/net/ipv4/ipfrag_max_dist:64
+/proc/sys/net/ipv4/ipfrag_secret_interval:0
+/proc/sys/net/ipv4/ipfrag_time:30
 
-Lin Ma (1):
-      ieee802154/adf7242: defer destroy_workqueue call
+Regards,
+Richard
 
-Miquel Raynal (1):
-      net: mac802154: Fix a condition in the receive path
+[1] https://www.mail-archive.com/netdev@vger.kernel.org/msg242228.html
 
- drivers/net/ieee802154/adf7242.c | 3 ++-
- drivers/net/ieee802154/ca8210.c  | 2 +-
- drivers/net/ieee802154/cc2520.c  | 1 +
- net/mac802154/rx.c               | 2 +-
- 4 files changed, 5 insertions(+), 3 deletions(-)
+Richard Gobert (4):
+  net-next: frags: move inetpeer from ip4 to inet
+  net-next: ip6: fetch inetpeer in ip6frag_init
+  net-next: frags: add inetpeer frag_mem tracking
+  net-next: frags: dynamic timeout under load
+
+ Documentation/networking/ip-sysctl.rst  |  3 +
+ include/net/inet_frag.h                 | 13 ++---
+ include/net/inetpeer.h                  |  1 +
+ include/net/ipv6_frag.h                 |  3 +
+ net/ieee802154/6lowpan/reassembly.c     |  2 +-
+ net/ipv4/inet_fragment.c                | 77 ++++++++++++++++++++++---
+ net/ipv4/inetpeer.c                     |  1 +
+ net/ipv4/ip_fragment.c                  | 25 ++------
+ net/ipv6/netfilter/nf_conntrack_reasm.c |  2 +-
+ net/ipv6/reassembly.c                   |  2 +-
+ 10 files changed, 89 insertions(+), 40 deletions(-)
+
+-- 
+2.36.1
+
