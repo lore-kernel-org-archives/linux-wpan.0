@@ -2,126 +2,86 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53AF3ECAAA1
-	for <linux-wpan@archiver.kernel.org>; Tue, 30 Aug 2022 07:05:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AFDEECAAA1
+	for <linux-wpan@archiver.kernel.org>; Tue, 30 Aug 2022 09:27:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230332AbiH3HFS (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 30 Aug 2022 03:05:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32828 "EHLO
+        id S231841AbiH3J1A (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 30 Aug 2022 05:27:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38732 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230370AbiH3HFR (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 30 Aug 2022 03:05:17 -0400
-Received: from mail-oa1-x33.google.com (mail-oa1-x33.google.com [IPv6:2001:4860:4864:20::33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94E622CCA2;
-        Tue, 30 Aug 2022 00:05:14 -0700 (PDT)
-Received: by mail-oa1-x33.google.com with SMTP id 586e51a60fabf-11f34610d4aso3906859fac.9;
-        Tue, 30 Aug 2022 00:05:13 -0700 (PDT)
+        with ESMTP id S231229AbiH3J0v (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 30 Aug 2022 05:26:51 -0400
+Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB312DAB9B;
+        Tue, 30 Aug 2022 02:26:49 -0700 (PDT)
+Received: by mail-wm1-x32c.google.com with SMTP id k17so5474777wmr.2;
+        Tue, 30 Aug 2022 02:26:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc;
-        bh=kYWohH57HrtiR3G5jR/2fpi0CaMLK4KnxnOm/MXWrNQ=;
-        b=kAI1RG3rQl+TxxWuck7+8J10qVbuA1PCMdmiOGcOubN8F+pjSnkDLe0AMOwkjl11H1
-         zxmyPbe0DM2OZLG6gfScChP7iWhMKwe7YOWTW+cnhSKUx37T5lMN+UxJZ1dE3VPlNdTL
-         YtxYrizahOv0tio3ymXn1oLxtUu3aJyMKSeAwvN+/gUbqJxWSu5TFNbCyDQ9T98+l55e
-         exHKjFuVbSDAzbQi+z7KT0vniQCNVs+S0cWezfLEVUW/ovAxmZFLFSxv/0kleUDB468Z
-         tSTvcZSryEkOvg66sPufpHBozSsi/CV05ZSNSmzqaWWurRKPJEcmeI71Zh4qsq6SpwnJ
-         B1rg==
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc;
+        bh=axxTKJ7DNo641E2twsxzvKctjEb3pjQ9d136e4ccTvM=;
+        b=DHONYFv1wc5Tw4S3juE3P2HD9IDrjg0lt0flsqynuIqGbI6bge+1ruqe36WiSCEDr2
+         0H3ptNVwHqD6uKBwm8FPyhT7MkXLPwIOwJ0Hz0jEn/FjzI0/TEypVKuL5LlAub9yNZoy
+         SBVYJtK7+/b45IVoHxz25pnFhUFEijNUmTRd7a5qlHlTjRi4IpbQKOdBsNyY9eIWo3VW
+         xsHPeqGQ/uFx+C4jBal9XrxWFrEJTUo47WZNpX6S0ujyyrhKKpV6ckFK4fLDpKOGbvW8
+         ZGoL/7yEODMBQNajjZzy6SmZOI7g7LC5bEb5A9/jdpiunK6JpXM/LmwZPTYT1vlqS2wI
+         sGVA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc;
-        bh=kYWohH57HrtiR3G5jR/2fpi0CaMLK4KnxnOm/MXWrNQ=;
-        b=uKWzNLWZVRbnyvmV0jcKTDjtWyub6U62jOHt859PgHYvAQtMN6w+6+Xe5k9WfSWjVQ
-         WAqTf5sK1hw0Zvo++Cbx5eI3TQP+3J4nPZCarpWT7XAePdGb2WqeYjnj/h8gU7OzChmp
-         HVExV0x/7s0kxXrb5QzibeQ0Rn17tHN4dP5+90Q7kpn+KkTy2DFZ4zF68sFd0hGk5Ur8
-         9VYxY/rbYmrhBJjXC8mZ0B2MTLPbjz6hapq4OwLDpbLE2ICdrS6rOyvIzgApKdQARBQ4
-         iD8DJ3BDJKKt/+JN7b7AFOMv+yV1AtWBSKKOWxP2dnFqjLzC2Ap7x7KpgIH5IejP5jfS
-         dvzQ==
-X-Gm-Message-State: ACgBeo0Oo0NGmMLHrqxEmWnofO03ZB12eGgvVZD3fcyHp9KHvGcaAYy0
-        G2RPBv4BEMR9TebMyK+kLowffKEHlK+WM/R8aJo=
-X-Google-Smtp-Source: AA6agR6iDqDZpkAfemrVBNQR5IyP5DV+Nn8coE8ekGnmXxUZXafNRucloDJzxBU+nvKGN/PMZ8YvWlIZwafcrnWayC0=
-X-Received: by 2002:a05:6808:201c:b0:343:b55:ae85 with SMTP id
- q28-20020a056808201c00b003430b55ae85mr8737545oiw.185.1661843112755; Tue, 30
- Aug 2022 00:05:12 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220822071902.3419042-1-tcs_kernel@tencent.com>
- <f7e87879-1ac6-65e5-5162-c251204f07d4@datenfreihafen.org> <CAK-6q+hf27dY9d-FyAh2GtA_zG5J4kkHEX2Qj38Rac_PH63bQg@mail.gmail.com>
- <85f66a3a-95fa-5aaa-def0-998bf3f5139f@datenfreihafen.org>
-In-Reply-To: <85f66a3a-95fa-5aaa-def0-998bf3f5139f@datenfreihafen.org>
-From:   zhang haiming <tcs.kernel@gmail.com>
-Date:   Tue, 30 Aug 2022 15:04:36 +0800
-Message-ID: <CAB2z9exjHXMTA5dHFwdf0V+niQZ4ER00pT5Kwz2ybiRHqDC2ow@mail.gmail.com>
-Subject: Re: [PATCH] net/ieee802154: fix uninit value bug in dgram_sendmsg
-To:     Stefan Schmidt <stefan@datenfreihafen.org>
-Cc:     Alexander Aring <aahringo@redhat.com>,
-        Alexander Aring <alex.aring@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc;
+        bh=axxTKJ7DNo641E2twsxzvKctjEb3pjQ9d136e4ccTvM=;
+        b=Tnkmqnj71TFxXL1Um1+P/9VlPNVz1ZO7w52eUHnOlXnfoIYHHw9LFx9220O4GmAObk
+         tlsaIuLojkY6UwBQ+DHl9KqmBAorZZsjCCK0Ay2Z1HKAwLykT2KBpdWG4TPSmil4ip79
+         n5r2L9twHGrl78NMOYbXMuKSV9ak0ToHu4aax2u4TAEnEiPXHZPJNUDSm3IELiB5fwCx
+         4FD/wscURMJzeGycChocbl4SSxWH5HlTntLzD4mUa6ZXsWgoLBdDMPn9R5QMeTkp96Dh
+         RcorK4bNQNlyfUosz1eidXSzpQhgA3WZd559MhSnANMzuof/pwETOyHhjPBqbMaO7HWL
+         PJqg==
+X-Gm-Message-State: ACgBeo10J3pven6ZGiAFM7iK8Le9QeAIQGFTWJRIDlQoInfMpvR/zsqE
+        s6wcHFrplK+X6nM1CJj1qq0=
+X-Google-Smtp-Source: AA6agR5IAuFYfHhAO6qh8YCCB9V90SvltG7bBAxDuted7ULWu4ttx+OK4nWASSKVxqVVVU+LLuIjFA==
+X-Received: by 2002:a05:600c:1906:b0:3a5:fe9c:4dcf with SMTP id j6-20020a05600c190600b003a5fe9c4dcfmr9227557wmq.118.1661851608031;
+        Tue, 30 Aug 2022 02:26:48 -0700 (PDT)
+Received: from debian (host-78-150-37-98.as13285.net. [78.150.37.98])
+        by smtp.gmail.com with ESMTPSA id s10-20020a05600c384a00b003a5f54e3bbbsm11181949wmr.38.2022.08.30.02.26.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 Aug 2022 02:26:47 -0700 (PDT)
+Date:   Tue, 30 Aug 2022 10:26:45 +0100
+From:   "Sudip Mukherjee (Codethink)" <sudipm.mukherjee@gmail.com>
+To:     Jakub Kicinski <kuba@kernel.org>,
+        "David S. Miller" <davem@davemloft.net>
+Cc:     Alexander Aring <alex.aring@gmail.com>,
+        Stefan Schmidt <stefan@datenfreihafen.org>,
         Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        linux-wpan - ML <linux-wpan@vger.kernel.org>,
-        Network Development <netdev@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Haimin Zhang <tcs_kernel@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
+        Paolo Abeni <pabeni@redhat.com>, linux-wpan@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-next@vger.kernel.org
+Subject: build failure of next-20220830 due to 9c5d03d36251 ("genetlink:
+ start to validate reserved header bytes")
+Message-ID: <Yw3X1cB1j+r8uj7W@debian>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Thanks to all.
-I have sent patch v2 to fix this.
+Hi All,
 
-On Mon, Aug 29, 2022 at 5:08 PM Stefan Schmidt
-<stefan@datenfreihafen.org> wrote:
->
->
-> Hello Alex.
->
-> On 23.08.22 14:22, Alexander Aring wrote:
-> > Hi,
-> >
-> > On Tue, Aug 23, 2022 at 5:42 AM Stefan Schmidt
-> > <stefan@datenfreihafen.org> wrote:
-> >>
-> >> Hello.
-> >>
-> >> On 22.08.22 09:19, Haimin Zhang wrote:
-> >>> There is uninit value bug in dgram_sendmsg function in
-> >>> net/ieee802154/socket.c when the length of valid data pointed by the
-> >>> msg->msg_name isn't verified.
-> >>>
-> >>> This length is specified by msg->msg_namelen. Function
-> >>> ieee802154_addr_from_sa is called by dgram_sendmsg, which use
-> >>> msg->msg_name as struct sockaddr_ieee802154* and read it, that will
-> >>> eventually lead to uninit value read. So we should check the length of
-> >>> msg->msg_name is not less than sizeof(struct sockaddr_ieee802154)
-> >>> before entering the ieee802154_addr_from_sa.
-> >>>
-> >>> Signed-off-by: Haimin Zhang <tcs_kernel@tencent.com>
-> >>
-> >>
-> >> This patch has been applied to the wpan tree and will be
-> >> part of the next pull request to net. Thanks!
-> >
-> > For me this patch is buggy or at least it is questionable how to deal
-> > with the size of ieee802154_addr_sa here.
->
-> You are right. I completely missed this. Thanks for spotting!
->
-> > There should be a helper to calculate the size which depends on the
-> > addr_type field. It is not required to send the last 6 bytes if
-> > addr_type is IEEE802154_ADDR_SHORT.
-> > Nitpick is that we should check in the beginning of that function.
->
-> Haimin, in ieee802154 we could have two different sizes for
-> ieee802154_addr_sa depending on the addr_type. We have short and
-> extended addresses.
->
-> Could you please rework this patch to take this into account as Alex
-> suggested?
->
-> I reverted your original patch from my tree.
->
-> regards
-> Stefan Schmidt
+The builds of arm pxa_defconfig have failed to build next-20220830 with
+the error:
+
+net/ieee802154/nl802154.c:2503:26: error: 'NL802154_CMD_DEL_SEC_LEVEL' undeclared here (not in a function); did you mean 'NL802154_CMD_SET_CCA_ED_LEVEL'?
+ 2503 |         .resv_start_op = NL802154_CMD_DEL_SEC_LEVEL + 1,
+      |                          ^~~~~~~~~~~~~~~~~~~~~~~~~~
+      |                          NL802154_CMD_SET_CCA_ED_LEVEL
+
+git bisect pointed to 9c5d03d36251 ("genetlink: start to validate reserved header bytes")
+
+I will be happy to test any patch or provide any extra log if needed.
+
+
+-- 
+Regards
+Sudip
