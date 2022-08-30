@@ -2,241 +2,96 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48E3AECAAA1
-	for <linux-wpan@archiver.kernel.org>; Tue, 30 Aug 2022 11:48:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CFD14C0502A
+	for <linux-wpan@archiver.kernel.org>; Tue, 30 Aug 2022 11:50:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229722AbiH3LsZ (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 30 Aug 2022 07:48:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43298 "EHLO
+        id S230135AbiH3Lt6 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 30 Aug 2022 07:49:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45618 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229655AbiH3LsZ (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 30 Aug 2022 07:48:25 -0400
-Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72265A832F;
-        Tue, 30 Aug 2022 04:48:24 -0700 (PDT)
-Received: by mail-pg1-x532.google.com with SMTP id r22so10444356pgm.5;
-        Tue, 30 Aug 2022 04:48:24 -0700 (PDT)
+        with ESMTP id S229776AbiH3Ltx (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 30 Aug 2022 07:49:53 -0400
+Received: from mail-yw1-x112d.google.com (mail-yw1-x112d.google.com [IPv6:2607:f8b0:4864:20::112d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D72E3615C;
+        Tue, 30 Aug 2022 04:49:51 -0700 (PDT)
+Received: by mail-yw1-x112d.google.com with SMTP id 00721157ae682-3378303138bso266228387b3.9;
+        Tue, 30 Aug 2022 04:49:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc;
-        bh=UNxTL6CeWQB+DQ80rtz+AdW/LBYughSkJq6932n2y50=;
-        b=foSFAcZz9dQ+Pcr8MwM1fcE0p/IclBS5/ZQJ8X9SkBLfkEn3gvp6f8+avCx6iag2VO
-         ja06jQSSOVN2oKv1tsCfRxG0smAPlxMlgEff+1LLiSMIZSYY597L/lHA9MMdewDL1elw
-         HJmD3lD0lWcy23roNmfmP6JqSILbgKlVYBx4XGk8hldwSZHrFFS3w0V/t9B54zjvYgwp
-         SDNfTt66kdiobFDAljm3hqu3NWmgPpI8A0tnpKB0Lnf53C0m6vHVfKEfkRjbSh/Byy2m
-         OpGpKSQePRDwVSAaOVqQCycdC4PClMhW3Jpv1VCb1mYu0AiTGNGE2Cetsyl6KCkHb4HZ
-         MThQ==
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date;
+        bh=5PLSJHa8w6OwGuD5lJARZZs+KKmBDPnoAl8FZnIJYzo=;
+        b=bqGFQVKPcAzrHDMkGrkhp6+CBfKxiESZ9WWneeg5m32wxi6OBBtU3abXZhzyMkIONp
+         zUS71pGnXMvRIITR6yBDe7FJoSnTURWua07+NK9NCWtENrQO65J7XOrc/X7fSv9gGKrp
+         jEWTFgijC39dqzoKnnZ3PMqEyRFrhZn4KGkxznRNmSVhzb11LXnSbU4aPKTFUy7r589M
+         /AuyINX77EwlDfqTVe14KwLRht/kQMdbrJ7ghDPbZxqU4Bg7xtaDhfldhywCSWs3pSAm
+         8Oamf1Va0dY8+ZWP/JkkmSDjhyUOSVpRKz355cKkFB0tTDC4XPhVk5IWNoix2FDuyoVJ
+         xrhQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc;
-        bh=UNxTL6CeWQB+DQ80rtz+AdW/LBYughSkJq6932n2y50=;
-        b=NSF4xXoktE3DUW4K8imKgvUtHJ+qVt0eMXhhRESeVsDjH8PZPn14i4LB3xB8NNvaFj
-         I5rFXG3PtwdOpshA0FVpAo1HDPfxJLGcmxLkeySEys9giXLErjqsapV+9NXt9OkNvZ8C
-         4BefiqZN1h1Os5OEuXqlQsTkxM246+kpHbRPcHfpAFIuznTg/IRwBkcvxmKQTIZxPkIe
-         khvxtSrp8STz59l4dhn2NnDh4K8F216fdiUXghIpKr7+EzmyQ7OBOzojZr6TJNK4ALBE
-         8xSSn/SMnjPx4k6I9jYJxO8lxvV9+rIzx1lEA2E5R1VbW8ewXBDc2aMWzzmouCW4ODHv
-         Uutg==
-X-Gm-Message-State: ACgBeo38xn0AJWjdcDI1yIU8kFFAIBwyxKjHgd7+tNiXLDrSniK2qYfW
-        hB/sE+tyjMNeNw8R3IQqtAk=
-X-Google-Smtp-Source: AA6agR6ZLo8H0UMiseyuyjnDerXCr1rN3m7ZzqglCQxiSCsSuemScWlmw5ye8JCAx1purIx/n8UJGA==
-X-Received: by 2002:a05:6a00:1c46:b0:538:2b27:dd7f with SMTP id s6-20020a056a001c4600b005382b27dd7fmr10474024pfw.30.1661860103999;
-        Tue, 30 Aug 2022 04:48:23 -0700 (PDT)
-Received: from localhost.localdomain ([150.109.151.50])
-        by smtp.gmail.com with ESMTPSA id h6-20020aa79f46000000b0052d4b0d0c74sm9122778pfr.70.2022.08.30.04.48.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Aug 2022 04:48:23 -0700 (PDT)
-From:   Haimin Zhang <tcs.kernel@gmail.com>
-X-Google-Original-From: Haimin Zhang <tcs_kernel@tencent.com>
-To:     alex.aring@gmail.com, stefan@datenfreihafen.org,
-        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-        pabeni@redhat.com, linux-wpan@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Haimin Zhang <tcs_kernel@tencent.com>
-Subject: [PATCH V2] net/ieee802154: fix uninit value bug in dgram_sendmsg
-Date:   Tue, 30 Aug 2022 19:48:18 +0800
-Message-Id: <20220830114818.955255-1-tcs_kernel@tencent.com>
-X-Mailer: git-send-email 2.27.0
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date;
+        bh=5PLSJHa8w6OwGuD5lJARZZs+KKmBDPnoAl8FZnIJYzo=;
+        b=Bqv4Oq0m9w93H3UiOo8W22Tbavq6JkUrUjFv+BfCdZKy+L40f5jn1xSeB66BvrZO4B
+         uzVnYBIRAy0WKswrYW2NH0bddRBdCZ0a63VtbydWSkni77QA5T3czzUVq7bv2yRBkkKy
+         n29l8+EWuI5Hdzv//DYXeHgvdjdsDEMW5I96uWzTdiJepxVt+zcalOkKE1+C0hhRQrp8
+         L+/1b1mWTgukHsgYn+HOEeSZS1DG2SwXzv2c0iFOvTwBDE1iIlLbPkcXy36WBOyDmh8q
+         8g7E7Bp93Bn2QbdK6Lg7oeOR/gdWpb6vH8V86uU++ML9iW2mBr/XRWRmFaHNlpoUX7xg
+         P/5Q==
+X-Gm-Message-State: ACgBeo0Q6YWzwGlv3eijuNm4AymxkNj7zSLsQP0UN7gQiQIBMnC9YIgO
+        AZcBbe0EH3tni0R0ckLYDfbcxEvfWHpKqR+OIccLUzDlVeg=
+X-Google-Smtp-Source: AA6agR7LnDnGLIhZq0Fh8Z1cpViaRf1uPZO+5wWs+X6fb2yOi9zxs4QF/pope73o2EEVFT5lYhjdB9Bk71TXTiZ6tn8=
+X-Received: by 2002:a81:7882:0:b0:339:802b:b4c0 with SMTP id
+ t124-20020a817882000000b00339802bb4c0mr13825925ywc.488.1661860191125; Tue, 30
+ Aug 2022 04:49:51 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <Yw3X1cB1j+r8uj7W@debian> <09270720-bc55-29e5-2310-980cabb444f4@nvidia.com>
+In-Reply-To: <09270720-bc55-29e5-2310-980cabb444f4@nvidia.com>
+From:   Sudip Mukherjee <sudipm.mukherjee@gmail.com>
+Date:   Tue, 30 Aug 2022 12:49:15 +0100
+Message-ID: <CADVatmP7Du5WS4tJ=q4Ruvr+r-=mnWpUmvXCQu2r=Kjm5kh2bw@mail.gmail.com>
+Subject: Re: build failure of next-20220830 due to 9c5d03d36251 ("genetlink:
+ start to validate reserved header bytes")
+To:     Gal Pressman <gal@nvidia.com>
+Cc:     Jakub Kicinski <kuba@kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Alexander Aring <alex.aring@gmail.com>,
+        Stefan Schmidt <stefan@datenfreihafen.org>,
+        Eric Dumazet <edumazet@google.com>,
+        Paolo Abeni <pabeni@redhat.com>, linux-wpan@vger.kernel.org,
+        netdev <netdev@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        linux-next <linux-next@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-There is uninit value bug in dgram_sendmsg function in
-net/ieee802154/socket.c when the length of valid data pointed by the
-msg->msg_name isn't verified.
+On Tue, Aug 30, 2022 at 11:19 AM Gal Pressman <gal@nvidia.com> wrote:
+>
+> On 30/08/2022 12:26, Sudip Mukherjee (Codethink) wrote:
+> > Hi All,
+> >
+> > The builds of arm pxa_defconfig have failed to build next-20220830 with
+> > the error:
+> >
+> > net/ieee802154/nl802154.c:2503:26: error: 'NL802154_CMD_DEL_SEC_LEVEL' undeclared here (not in a function); did you mean 'NL802154_CMD_SET_CCA_ED_LEVEL'?
+> >  2503 |         .resv_start_op = NL802154_CMD_DEL_SEC_LEVEL + 1,
+> >       |                          ^~~~~~~~~~~~~~~~~~~~~~~~~~
+> >       |                          NL802154_CMD_SET_CCA_ED_LEVEL
+> >
+> > git bisect pointed to 9c5d03d36251 ("genetlink: start to validate reserved header bytes")
+> >
+> > I will be happy to test any patch or provide any extra log if needed.
+> >
+> >
+>
+> I posted a fix:
+> https://lore.kernel.org/netdev/20220830101237.22782-1-gal@nvidia.com/
 
-We should check the msg_namelen is not less than struct
-sockaddr_ieee802154 when addr_type is SHORT before calling
-ieee802154_addr_from_sa. So we define IEEE802154_MIN_NAMELEN.
-And in function ieee802154_addr_from_sa, when
-addr_type is LONG, we check msg_namelen is not less than
-sizeof(struct sockaddr_ieee802154). Meanwhile we check in the
-beginning of function dgram_sendmsg.
+Thanks. Fixed the failure for me.
 
-Also fixed in raw_bind, dgram_bind, dgram_connect.
 
-Signed-off-by: Haimin Zhang <tcs_kernel@tencent.com>
----
- include/net/ieee802154_netdev.h |  9 ++++--
- net/ieee802154/socket.c         | 51 ++++++++++++++++++++-------------
- 2 files changed, 38 insertions(+), 22 deletions(-)
-
-diff --git a/include/net/ieee802154_netdev.h b/include/net/ieee802154_netdev.h
-index d0d188c32..e1dc3fb02 100644
---- a/include/net/ieee802154_netdev.h
-+++ b/include/net/ieee802154_netdev.h
-@@ -165,8 +165,8 @@ static inline void ieee802154_devaddr_to_raw(void *raw, __le64 addr)
- 	memcpy(raw, &temp, IEEE802154_ADDR_LEN);
- }
- 
--static inline void ieee802154_addr_from_sa(struct ieee802154_addr *a,
--					   const struct ieee802154_addr_sa *sa)
-+static inline int ieee802154_addr_from_sa(struct ieee802154_addr *a,
-+					   const struct ieee802154_addr_sa *sa, int len)
- {
- 	a->mode = sa->addr_type;
- 	a->pan_id = cpu_to_le16(sa->pan_id);
-@@ -176,9 +176,14 @@ static inline void ieee802154_addr_from_sa(struct ieee802154_addr *a,
- 		a->short_addr = cpu_to_le16(sa->short_addr);
- 		break;
- 	case IEEE802154_ADDR_LONG:
-+		if (len > sizeof(struct sockaddr_ieee802154))
-+			return -EINVAL;
- 		a->extended_addr = ieee802154_devaddr_from_raw(sa->hwaddr);
- 		break;
-+	default:
-+		return -EINVAL;
- 	}
-+	return 0;
- }
- 
- static inline void ieee802154_addr_to_sa(struct ieee802154_addr_sa *sa,
-diff --git a/net/ieee802154/socket.c b/net/ieee802154/socket.c
-index 718fb77bb..f598a0241 100644
---- a/net/ieee802154/socket.c
-+++ b/net/ieee802154/socket.c
-@@ -27,6 +27,10 @@
- #include <net/af_ieee802154.h>
- #include <net/ieee802154_netdev.h>
- 
-+#define IEEE802154_MIN_NAMELEN \
-+	(offsetof(struct sockaddr_ieee802154, addr) + \
-+	 offsetofend(struct ieee802154_addr_sa, short_addr))
-+
- /* Utility function for families */
- static struct net_device*
- ieee802154_get_dev(struct net *net, const struct ieee802154_addr *addr)
-@@ -200,7 +204,7 @@ static int raw_bind(struct sock *sk, struct sockaddr *_uaddr, int len)
- 	int err = 0;
- 	struct net_device *dev = NULL;
- 
--	if (len < sizeof(*uaddr))
-+	if (len < IEEE802154_MIN_NAMELEN)
- 		return -EINVAL;
- 
- 	uaddr = (struct sockaddr_ieee802154 *)_uaddr;
-@@ -209,7 +213,9 @@ static int raw_bind(struct sock *sk, struct sockaddr *_uaddr, int len)
- 
- 	lock_sock(sk);
- 
--	ieee802154_addr_from_sa(&addr, &uaddr->addr);
-+	err = ieee802154_addr_from_sa(&addr, &uaddr->addr, len);
-+	if (err < 0)
-+		goto out;
- 	dev = ieee802154_get_dev(sock_net(sk), &addr);
- 	if (!dev) {
- 		err = -ENODEV;
-@@ -493,13 +499,15 @@ static int dgram_bind(struct sock *sk, struct sockaddr *uaddr, int len)
- 
- 	ro->bound = 0;
- 
--	if (len < sizeof(*addr))
-+	if (len < IEEE802154_MIN_NAMELEN)
- 		goto out;
- 
- 	if (addr->family != AF_IEEE802154)
- 		goto out;
- 
--	ieee802154_addr_from_sa(&haddr, &addr->addr);
-+	err = ieee802154_addr_from_sa(&haddr, &addr->addr, len);
-+	if (err < 0)
-+		goto out;
- 	dev = ieee802154_get_dev(sock_net(sk), &haddr);
- 	if (!dev) {
- 		err = -ENODEV;
-@@ -564,7 +572,7 @@ static int dgram_connect(struct sock *sk, struct sockaddr *uaddr,
- 	struct dgram_sock *ro = dgram_sk(sk);
- 	int err = 0;
- 
--	if (len < sizeof(*addr))
-+	if (len < IEEE802154_MIN_NAMELEN)
- 		return -EINVAL;
- 
- 	if (addr->family != AF_IEEE802154)
-@@ -577,7 +585,9 @@ static int dgram_connect(struct sock *sk, struct sockaddr *uaddr,
- 		goto out;
- 	}
- 
--	ieee802154_addr_from_sa(&ro->dst_addr, &addr->addr);
-+	err = ieee802154_addr_from_sa(&ro->dst_addr, &addr->addr, len);
-+	if (err < 0)
-+		goto out;
- 	ro->connected = 1;
- 
- out:
-@@ -604,6 +614,7 @@ static int dgram_sendmsg(struct sock *sk, struct msghdr *msg, size_t size)
- 	struct ieee802154_mac_cb *cb;
- 	struct dgram_sock *ro = dgram_sk(sk);
- 	struct ieee802154_addr dst_addr;
-+	DECLARE_SOCKADDR(struct sockaddr_ieee802154 *, daddr, msg->msg_name);
- 	int hlen, tlen;
- 	int err;
- 
-@@ -612,10 +623,20 @@ static int dgram_sendmsg(struct sock *sk, struct msghdr *msg, size_t size)
- 		return -EOPNOTSUPP;
- 	}
- 
--	if (!ro->connected && !msg->msg_name)
--		return -EDESTADDRREQ;
--	else if (ro->connected && msg->msg_name)
--		return -EISCONN;
-+	if (msg->msg_name) {
-+		if (ro->connected)
-+			return -EISCONN;
-+		if (msg->msg_namelen < IEEE802154_MIN_NAMELEN)
-+			return -EINVAL;
-+		err = ieee802154_addr_from_sa(&dst_addr, &daddr->addr,
-+					      msg->msg_namelen);
-+		if (err < 0)
-+			return err;
-+	} else {
-+		if (!ro->connected)
-+			return -EDESTADDRREQ;
-+		dst_addr = ro->dst_addr;
-+	}
- 
- 	if (!ro->bound)
- 		dev = dev_getfirstbyhwtype(sock_net(sk), ARPHRD_IEEE802154);
-@@ -651,16 +672,6 @@ static int dgram_sendmsg(struct sock *sk, struct msghdr *msg, size_t size)
- 	cb = mac_cb_init(skb);
- 	cb->type = IEEE802154_FC_TYPE_DATA;
- 	cb->ackreq = ro->want_ack;
--
--	if (msg->msg_name) {
--		DECLARE_SOCKADDR(struct sockaddr_ieee802154*,
--				 daddr, msg->msg_name);
--
--		ieee802154_addr_from_sa(&dst_addr, &daddr->addr);
--	} else {
--		dst_addr = ro->dst_addr;
--	}
--
- 	cb->secen = ro->secen;
- 	cb->secen_override = ro->secen_override;
- 	cb->seclevel = ro->seclevel;
 -- 
-2.27.0
-
+Regards
+Sudip
