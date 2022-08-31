@@ -2,115 +2,93 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 139F9ECAAD8
-	for <linux-wpan@archiver.kernel.org>; Wed, 31 Aug 2022 20:34:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3141CECAAD4
+	for <linux-wpan@archiver.kernel.org>; Wed, 31 Aug 2022 20:59:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229916AbiHaUeH (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 31 Aug 2022 16:34:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36452 "EHLO
+        id S231868AbiHaU7h (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 31 Aug 2022 16:59:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41834 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229749AbiHaUeE (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 31 Aug 2022 16:34:04 -0400
-Received: from mail-ej1-x633.google.com (mail-ej1-x633.google.com [IPv6:2a00:1450:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3726DFB58
-        for <linux-wpan@vger.kernel.org>; Wed, 31 Aug 2022 13:34:02 -0700 (PDT)
-Received: by mail-ej1-x633.google.com with SMTP id lx1so30649656ejb.12
-        for <linux-wpan@vger.kernel.org>; Wed, 31 Aug 2022 13:34:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc;
-        bh=BWCSto+d0Sdc3pu/dI6kfALxAxUh8nbvYhfQQse8Du4=;
-        b=UqbaQCMQ8Ir0eFvGxnTJYodezvei/7SOzMXpuyww0mYZ3xZ4NBiWOHcuGfUW3JFyx6
-         R9kOGei6YDc8ev/0UcWn+l1CYEt7H7an7s0unDOVanZTtppwMC/vEFfqNTie1tlekpiW
-         bNhtEh95IhzL1atWzqECkFsv0tRezF/kKuHKL6kf89H4D4OGlyxQJQ5gBmJQFqBH8xk/
-         T2ZZdn1ddK2rX1PgY25w1qd2Ae8olxOLVUy4GGw34dvLyCJT6IC86ek+E/DH3i0++g1n
-         LiF76NTYdlhO+1mG8Wr+gxS9znLiCMWDPcbk+zJZS7dFcMdp7u7kz7I8mbZ0iq+OS9Sz
-         M6bA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc;
-        bh=BWCSto+d0Sdc3pu/dI6kfALxAxUh8nbvYhfQQse8Du4=;
-        b=w0CGSmKIQkeYsshl6l0WL48Dcrb23RCNlNlvcX0jiEVWn2OZgapk/6+XtUzL52BhBJ
-         TbER+eEQ2M3wXhgTuNor1VbEqdFSKn3YbatjaA0n1QNbTRHcAWEM7gAeZrlYylgQcgV3
-         b56/NIyXJzxZYTRE0yCpSL2ogoQulUXFEnH8MehLaP9DJjFJUSS3dsxlrF//cyWWtDJg
-         qHn+ZueDjTFhDk0UisJc/aKgGlfEShGD862FLfURodlAv7nEbAgu3vr+3N3Twn5GKKJt
-         jOfRfxCOfre91ScvXUjinLyjjPwasQxOiITtKm1NnBnEu0ycjJRVwOCAoGmhJiPdNZth
-         Zpvg==
-X-Gm-Message-State: ACgBeo2IOAMvFoy3ltL1epBZ+rmcm6Iek8/KHHHyUtSGzRWzcXALLVdD
-        Am/x1s+RGQx7D9POjg4AxL8XUs0Fz0vBPaZ5dX6snw==
-X-Google-Smtp-Source: AA6agR7EtnTzAoLqrkdRQji8od/wdsUejedlsqe6yDsRzJ4GH4pBLANa9tDTlmIUZyZjCCW75+Y2PPCFUGpfNE6atE0=
-X-Received: by 2002:a17:907:7242:b0:741:770b:dfc6 with SMTP id
- ds2-20020a170907724200b00741770bdfc6mr12548822ejc.203.1661978041297; Wed, 31
- Aug 2022 13:34:01 -0700 (PDT)
+        with ESMTP id S232283AbiHaU7U (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 31 Aug 2022 16:59:20 -0400
+Received: from proxima.lasnet.de (proxima.lasnet.de [IPv6:2a01:4f8:121:31eb:3::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4543F2C86;
+        Wed, 31 Aug 2022 13:59:16 -0700 (PDT)
+Received: from [IPV6:2003:e9:d720:85aa:808b:c60d:ed1c:7084] (p200300e9d72085aa808bc60ded1c7084.dip0.t-ipconnect.de [IPv6:2003:e9:d720:85aa:808b:c60d:ed1c:7084])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: stefan@datenfreihafen.org)
+        by proxima.lasnet.de (Postfix) with ESMTPSA id 80D12C0253;
+        Wed, 31 Aug 2022 22:59:14 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
+        s=2021; t=1661979554;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=gBHjfiQIski5MtF0vRHo2Im/EFazYp9Zs587xZvZOZA=;
+        b=YHz2UTZ1QIjcNjWGlMeO0dst0Yx8sn95R35bGqqCZHcmyDizMPk2u9506w1sry4RDqPqwF
+        VBnPIUsVnItmw7og1TLjCnU5NmkFDk40iVzAGya+T02iOPLdU4EhoqoL32t867NEjKA686
+        Fyvvk6S0atl2I3SIF6ji9lr8EWmwC07y5p/dwhQYxi5agthtolM2Q5v6hfcBdac4EAeJ4a
+        iRVsND7SpNk4HFTiFSXGRi091vCpd7v1xgskECiJ9EvOxgD/RH+c4zaw7SfiebEc/O3Hqx
+        VRS6pCg4IpjDBW7zJvb+pxC09sY/5MygKuIkjQzkOoqzhUb9K2ONdCy544vHYA==
+Message-ID: <36f09967-b211-ef48-7360-b6dedfda73e3@datenfreihafen.org>
+Date:   Wed, 31 Aug 2022 22:59:14 +0200
 MIME-Version: 1.0
-References: <630fa8c5.moZxX4/JNtIfjYQO%lkp@intel.com>
-In-Reply-To: <630fa8c5.moZxX4/JNtIfjYQO%lkp@intel.com>
-From:   Linus Walleij <linus.walleij@linaro.org>
-Date:   Wed, 31 Aug 2022 22:33:50 +0200
-Message-ID: <CACRpkdb8bEyNrc7_gN+Lt-W_um56YfhOAcXgqEXsToGpvswmKA@mail.gmail.com>
-Subject: Re: [linux-next:master] BUILD REGRESSION 7fd22855300e693668c3397771b3a2b3948f827a
-To:     kernel test robot <lkp@intel.com>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Linux Memory Management List <linux-mm@kvack.org>,
-        linux-wpan@vger.kernel.org, amd-gfx@lists.freedesktop.org,
-        dri-devel@lists.freedesktop.org,
-        platform-driver-x86@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH net-next] net: ieee802154: Fix compilation error when
+ CONFIG_IEEE802154_NL802154_EXPERIMENTAL is disabled
+Content-Language: en-US
+To:     Jakub Kicinski <kuba@kernel.org>, Gal Pressman <gal@nvidia.com>
+Cc:     "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
+        Leon Romanovsky <leonro@nvidia.com>,
+        linux-wpan@vger.kernel.org, Alexander Aring <alex.aring@gmail.com>
+References: <20220830101237.22782-1-gal@nvidia.com>
+ <20220830231330.1c618258@kernel.org>
+ <4187e35d-0965-cf65-bff5-e4f71a04d272@nvidia.com>
+ <20220830233124.2770ffc2@kernel.org> <20220831112150.36e503bd@kernel.org>
+From:   Stefan Schmidt <stefan@datenfreihafen.org>
+In-Reply-To: <20220831112150.36e503bd@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-On Wed, Aug 31, 2022 at 8:32 PM kernel test robot <lkp@intel.com> wrote:
+Hello Jakub.
 
-> |-- alpha-allyesconfig
-> |   |-- drivers-base-regmap-regmap-mmio.c:error:implicit-declaration-of-function-readsb
-> |   |-- drivers-base-regmap-regmap-mmio.c:error:implicit-declaration-of-function-readsl
-> |   |-- drivers-base-regmap-regmap-mmio.c:error:implicit-declaration-of-function-readsq
-> |   |-- drivers-base-regmap-regmap-mmio.c:error:implicit-declaration-of-function-readsw
-> |   |-- drivers-base-regmap-regmap-mmio.c:error:implicit-declaration-of-function-writesb
-> |   |-- drivers-base-regmap-regmap-mmio.c:error:implicit-declaration-of-function-writesl
-> |   |-- drivers-base-regmap-regmap-mmio.c:error:implicit-declaration-of-function-writesq
-> |   `-- drivers-base-regmap-regmap-mmio.c:error:implicit-declaration-of-function-writesw
-> |-- alpha-randconfig-r024-20220830
-> |   |-- drivers-base-regmap-regmap-mmio.c:error:implicit-declaration-of-function-readsb
-> |   |-- drivers-base-regmap-regmap-mmio.c:error:implicit-declaration-of-function-readsl
-> |   |-- drivers-base-regmap-regmap-mmio.c:error:implicit-declaration-of-function-readsq
-> |   |-- drivers-base-regmap-regmap-mmio.c:error:implicit-declaration-of-function-readsw
-> |   |-- drivers-base-regmap-regmap-mmio.c:error:implicit-declaration-of-function-writesb
-> |   |-- drivers-base-regmap-regmap-mmio.c:error:implicit-declaration-of-function-writesl
-> |   |-- drivers-base-regmap-regmap-mmio.c:error:implicit-declaration-of-function-writesq
-> |   `-- drivers-base-regmap-regmap-mmio.c:error:implicit-declaration-of-function-writesw
+On 31.08.22 20:21, Jakub Kicinski wrote:
+> On Tue, 30 Aug 2022 23:31:24 -0700 Jakub Kicinski wrote:
+>> Hm, let me add 802154 folks.
+>>
+>> Either we should treat the commands as reserved in terms of uAPI
+>> even if they get removed the IDs won't be reused, or they are for
+>> testing purposes only.
+>>
+>> In the former case we should just remove the #ifdef around the values
+>> in the enum, it just leads to #ifdef proliferation while having no
+>> functional impact.
+>>
+>> In the latter case we should start error checking from the last
+>> non-experimental command, as we don't care about breaking the
+>> experimental ones.
+> 
+> I haven't gone thru all of my inbox yet, but I see no reply from Stefan
+> or Alexander. My vote is to un-hide the EXPERIMENTAL commands.
 
-Fixed in this patch:
-https://lore.kernel.org/linux-arch/20220818092059.103884-1-linus.walleij@linaro.org/
+I was swamped today and I am only now finding time to go through mail.
 
-> |-- parisc-randconfig-r012-20220831
-> |   |-- drivers-base-regmap-regmap-mmio.c:error:implicit-declaration-of-function-readsb
-> |   |-- drivers-base-regmap-regmap-mmio.c:error:implicit-declaration-of-function-readsl
-> |   |-- drivers-base-regmap-regmap-mmio.c:error:implicit-declaration-of-function-readsw
-> |   |-- drivers-base-regmap-regmap-mmio.c:error:implicit-declaration-of-function-writesb
-> |   |-- drivers-base-regmap-regmap-mmio.c:error:implicit-declaration-of-function-writesl
-> |   `-- drivers-base-regmap-regmap-mmio.c:error:implicit-declaration-of-function-writesw
+Given the problem these ifdef are raising I am ok with having these 
+commands exposed without them.
 
-Working on this one!
+Our main reason for having this feature marked as experimental is that 
+it does not have much exposure and we fear that some of it needs rewrites.
 
-> |-- sparc-allyesconfig
-> |   |-- drivers-base-regmap-regmap-mmio.c:error:implicit-declaration-of-function-readsq
-> |   `-- drivers-base-regmap-regmap-mmio.c:error:implicit-declaration-of-function-writesq
-> |-- sparc-buildonly-randconfig-r005-20220830
-> |   |-- drivers-base-regmap-regmap-mmio.c:error:implicit-declaration-of-function-readsq
-> |   `-- drivers-base-regmap-regmap-mmio.c:error:implicit-declaration-of-function-writesq
-> |-- sparc64-buildonly-randconfig-r006-20220830
-> |   |-- drivers-base-regmap-regmap-mmio.c:error:implicit-declaration-of-function-readsq
-> |   `-- drivers-base-regmap-regmap-mmio.c:error:implicit-declaration-of-function-writesq
-> |-- sparc64-randconfig-c042-20220830
-> |   |-- drivers-base-regmap-regmap-mmio.c:error:implicit-declaration-of-function-readsq
-> |   |-- drivers-base-regmap-regmap-mmio.c:error:implicit-declaration-of-function-writesq
+If that really is going to happen we will simply treat the current 
+commands as reserved/burned and come up with other ones if needed. While 
+I hope this will not be needed it is a fair plan for mitigating this.
 
-Fixed in this patch:
-https://lore.kernel.org/linux-arch/20220831195553.129866-1-linus.walleij@linaro.org/
-
-Yours,
-Linus Walleij
+regards
+Stefan Schmidt
