@@ -2,58 +2,70 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B81E9ECAAD1
-	for <linux-wpan@archiver.kernel.org>; Wed, 31 Aug 2022 15:17:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27AAEECAAD4
+	for <linux-wpan@archiver.kernel.org>; Wed, 31 Aug 2022 15:39:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231629AbiHaPRc (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 31 Aug 2022 11:17:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58188 "EHLO
+        id S231570AbiHaPjL (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 31 Aug 2022 11:39:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33578 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231313AbiHaPRb (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 31 Aug 2022 11:17:31 -0400
-Received: from relay11.mail.gandi.net (relay11.mail.gandi.net [217.70.178.231])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 496F3D741D
-        for <linux-wpan@vger.kernel.org>; Wed, 31 Aug 2022 08:17:28 -0700 (PDT)
+        with ESMTP id S231289AbiHaPjK (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 31 Aug 2022 11:39:10 -0400
+Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::227])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D150D8B07;
+        Wed, 31 Aug 2022 08:39:08 -0700 (PDT)
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id 5DBE210000C;
-        Wed, 31 Aug 2022 15:17:25 +0000 (UTC)
+        by mail.gandi.net (Postfix) with ESMTPSA id 6A5D620004;
+        Wed, 31 Aug 2022 15:39:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1661959047;
+        t=1661960346;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ZFClo7PE4tk4mmPKy6Sz9IE9EcIn8XrLmEwZWmykRtE=;
-        b=h6qnRbWM3ZQg78xh30AVmq9lBTSX1RzaSMaM4PUVGapdWj9XmY94RgNasZ0sYR0QIWOXY3
-        3NYCJ9tK8Y0AX0xLWDZRcaBOGdJe8LPBmlPiU4/LzS3vz3QynMeMMHdb5nirdOPjO0XQVf
-        OKXTjeCexU/mVqpQCKs5R7YDTfwnE3j6XXIbbEiyK6NKAnJD+wqrszJC32QeMXo6NMHswQ
-        OOcKK3AEYTnYTlWITXMJDMIcKZVk2iJHPzISdgII+24k1QohitgCppXyfISgA78dTerzQh
-        wq5FEttnEuPCOY/1SktRT0HKq19/0UvKMKXQd9iSjIhhzrl3PsAEhdjemVoJ8g==
-Date:   Wed, 31 Aug 2022 17:17:23 +0200
+        bh=JaN95KS1q/LjGpKWGX9qydG0jbE2xV4Q5Qxh/1+0e7Y=;
+        b=Vxgr48GWsGuwV1gKlAMLpd2GUpYU9blHwzRr1ftHviOBv26f2aNQYZPKR5q6lKpqsn3kv9
+        p1RZ20v5635v3T+PRD2rGkpDgXuCrp/dG9+aNyRhYbLWG9sgrRoOCdfvgob8Op0th6n++u
+        T4qZ2axU4u/liBuo1p0egNpcJVVV/bXQqv8RDYr1sSmLfwg4NGkFB9ZcA86G38QsAs6Xc7
+        7rKiPSChJBBA7e4xmxFJVfDySyPCR+BkbCykjhucfv3KrTzfEWYEZ9+2kuhA30F67IBHBS
+        7s+7EJtGssBF3aJUMXzJhyriIJBF7YX29RNklaoRdIGWhgrOnN5q8tP3LSE0XQ==
+Date:   Wed, 31 Aug 2022 17:39:03 +0200
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
 To:     Alexander Aring <aahringo@redhat.com>
 Cc:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
         linux-wpan - ML <linux-wpan@vger.kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Eric Dumazet <edumazet@google.com>,
+        Network Development <netdev@vger.kernel.org>,
         David Girault <david.girault@qorvo.com>,
         Romuald Despres <romuald.despres@qorvo.com>,
         Frederic Blain <frederic.blain@qorvo.com>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH wpan-tools 0/7] iwpan: Support scanning/beaconing
-Message-ID: <20220831171723.3ed4a8c8@xps-13>
-In-Reply-To: <CAK-6q+jxtxvkcmmfRnQad7NhsWJ1OSAsdhw1PsfgT2SDhwGNrw@mail.gmail.com>
-References: <20220701143434.1267864-1-miquel.raynal@bootlin.com>
-        <CAK-6q+hUc0Cm+_9OyLNqX=gKNOO-3TU4ERu_bZKm=Qf-c9F-ug@mail.gmail.com>
-        <20220819190654.6af62bca@xps-13>
-        <CAK-6q+gk2rt3crszskUOxxeTYb3OY+ybLsga6f6VC5RQmjY44w@mail.gmail.com>
-        <20220825145516.14bd5b45@xps-13>
-        <CAK-6q+jy75nUH1dzr5KCFnLJ=QALLv5keXboTtbjQ7uh-KWwGg@mail.gmail.com>
-        <20220826125020.414964fd@xps-13>
-        <CAK-6q+jjainnsMDm9tXjr7rD7--XjBFU8gg_FA65BrXYNkLNHw@mail.gmail.com>
-        <20220829103702.4cce4670@xps-13>
-        <CAK-6q+j3mak0exMnQT9kw3pu6zNkXwY6Fxbjz8akap3N04AEeQ@mail.gmail.com>
-        <CAK-6q+jxtxvkcmmfRnQad7NhsWJ1OSAsdhw1PsfgT2SDhwGNrw@mail.gmail.com>
+Subject: Re: [PATCH wpan-next 01/20] net: mac802154: Allow the creation of
+ coordinator interfaces
+Message-ID: <20220831173903.1a980653@xps-13>
+In-Reply-To: <CAK-6q+gJwm0bhHgMVBF_pmjD9zSrxxHvNGdTrTm0fG-hAmSaUQ@mail.gmail.com>
+References: <20220701143052.1267509-1-miquel.raynal@bootlin.com>
+        <20220701143052.1267509-2-miquel.raynal@bootlin.com>
+        <CAK-6q+jkUUjAGqEDgU1oJvRkigUbvSO5SXWRau6+320b=GbfxQ@mail.gmail.com>
+        <20220819191109.0e639918@xps-13>
+        <CAK-6q+gCY3ufaADHNQWJGNpNZJMwm=fhKfe02GWkfGEdgsMVzg@mail.gmail.com>
+        <20220823182950.1c722e13@xps-13>
+        <CAK-6q+jfva++dGkyX_h2zQGXnoJpiOu5+eofCto=KZ+u6KJbJA@mail.gmail.com>
+        <20220824122058.1c46e09a@xps-13>
+        <CAK-6q+gjgQ1BF-QrT01JWh+2b3oL3RU+SoxUf5t7h3Hc6R8pcg@mail.gmail.com>
+        <20220824152648.4bfb9a89@xps-13>
+        <CAK-6q+itA0C4zPAq5XGKXgCHW5znSFeB-YDMp3uB9W-kLV6WaA@mail.gmail.com>
+        <20220825145831.1105cb54@xps-13>
+        <CAK-6q+j3LMoSe_7u0WqhowdPV9KM-6g0z-+OmSumJXCZfo0CAw@mail.gmail.com>
+        <20220826095408.706438c2@xps-13>
+        <CAK-6q+gxD0TkXzUVTOiR4-DXwJrFUHKgvccOqF5QMGRjfZQwvw@mail.gmail.com>
+        <20220829100214.3c6dad63@xps-13>
+        <CAK-6q+gJwm0bhHgMVBF_pmjD9zSrxxHvNGdTrTm0fG-hAmSaUQ@mail.gmail.com>
 Organization: Bootlin
 X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
@@ -63,63 +75,98 @@ Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi Alexander,
+Hi Alexander & Stefan,
 
-aahringo@redhat.com wrote on Tue, 30 Aug 2022 23:17:35 -0400:
+aahringo@redhat.com wrote on Mon, 29 Aug 2022 22:23:09 -0400:
 
-> Hi,
+I am currently testing my code with the ATUSB devices, the association
+works, so it's a good news! However I am struggling to get the
+association working for a simple reason: the crafted ACKs are
+transmitted (the ATUSB in monitor mode sees it) but I get absolutely
+nothing on the receiver side.
+
+The logic is:
+
+coord0                 coord1
+association req ->
+                <-     ack
+                <-     association response
+ack             ->
+
+The first ack is sent by coord1 but coord0 never sees anything. In
+practice coord0 has sent an association request and received a single
+one-byte packet in return which I guess is the firmware saying "okay, Tx
+has been performed". Shall I interpret this byte differently? Does it
+mean that the ack has also been received?=20
+
+I could not find a documentation of the firmware interface, I went
+through the wiki but I did not find something clear about what to
+expect or "what the driver should do". But perhaps this will ring a
+bell on your side?
+
+[...]
+
+> I did not see the v2 until now. Sorry for that.
+
+Ah! Ok, no problem :)
+
 >=20
-> On Mon, Aug 29, 2022 at 8:57 AM Alexander Aring <aahringo@redhat.com> wro=
-te:
-> >
-> > Hi,
-> >
-> > On Mon, Aug 29, 2022 at 4:37 AM Miquel Raynal <miquel.raynal@bootlin.co=
-m> wrote: =20
-> > >
-> > > Hi Alexander,
-> > >
-> > > aahringo@redhat.com wrote on Sun, 28 Aug 2022 09:55:24 -0400:
-> > > =20
-> > > > Hi,
-> > > >
-> > > > On Fri, Aug 26, 2022 at 6:50 AM Miquel Raynal <miquel.raynal@bootli=
-n.com> wrote:
-> > > > ... =20
-> > > > >
-> > > > > I've updated the tools so that we have:
-> > > > >
-> > > > > * "scan trigger" which does not block
-> > > > > * "scan monitor" which displays with a pretty output the new
-> > > > >   coordinators and stops blocking when the scan is over (either b=
-ecause
-> > > > >   it reached the last channel to scan, or it got aborted)
-> > > > > * "scan abort" which stops an ongoing scan
-> > > > > * "scan" which is the same as "scan trigger; scan monitor", and w=
-ill =20
-> > > >
-> > > > no, there is a race in the design of "scan trigger; scan monitor". =
-=20
-> > >
-> > > Right, I've used pthread to first start the monitoring, before actual=
-ly
-> > > triggering the scan. That should be enough.
-> > > =20
-> >
-> > I think we should look at this, because it requires that all
-> > applications link to pthreads if we offer such an API. Any thoughts
-> > about alternative ways, can it not be done over libnl, that libnl
-> > internally used e.g. select()? The above example is only regarding the
-> > process context.
-> > =20
+> However I think there are missing bits here at the receive handling
+> side. Which are:
 >=20
-> I think pthreads are not necessary here. If we don't close and open
-> the nl socket everything should be queued.
-> Forget that with select(), just send() and recv() (whatever that is
-> underneath of libnl) should be enough.
+> 1. Do a stop_tx(), stop_rx(), start_rx(filtering_level) to go into
+> other filtering modes while ifup.
 
-That's way more clever. I've changed that, no more pthread and no more
-race, thanks!
+Who is supposed to change the filtering level?
+
+For now there is only the promiscuous mode being applied and the user
+has no knowledge about it, it's just something internal.
+
+Changing how the promiscuous mode is applied (using a filtering level
+instead of a "promiscuous on" boolean) would impact all the drivers
+and for now we don't really need it.
+
+> I don't want to see all filtering modes here, just what we currently
+> support with NONE (then with FCS check on software if necessary),
+> ?THIRD/FOURTH? LEVEL filtering and that's it. What I don't want to see
+> is runtime changes of phy flags. To tell the receive path what to
+> filter and what's not.
+
+Runtime changes on a dedicated "filtering" PHY flag is what I've used
+and it works okay for this situation, why don't you want that? It
+avoids the need for (yet) another rework of the API with the drivers,
+no?
+
+> 2. set the pan coordinator bit for hw address filter. And there is a
+> TODO about setting pkt_type in mac802154 receive path which we should
+> take a look into. This bit should be addressed for coordinator support
+> even if there is the question about coordinator vs pan coordinator,
+> then the kernel needs a bit as coordinator iface type parameter to
+> know if it's a pan coordinator and not coordinator.
+
+This is not really something that we can "set". Either the device
+had performed an association and it is a child device: it is not the
+PAN coordinator, or it initiated the PAN and it is the PAN coordinator.
+There are commands to change that later on but those are not supported.
+
+The "PAN coordinator" information is being added in the association
+series (which comes after the scan). I have handled the pkt_type you are
+mentioning.
+
+> I think it makes total sense to split this work in transmit handling,
+> where we had no support at all to send something besides the usual
+> data path, and receive handling, where we have no way to change the
+> filtering level besides interface type and ifup time of an interface.
+> We are currently trying to make a receive path working in a way that
+> "the other ideas flying around which are good" can be introduced in
+> future.
+> If this is done, then take care about how to add the rest of it.
+>=20
+> I will look into v2 the next few days.
+>=20
+> - Alex
+>=20
+
 
 Thanks,
 Miqu=C3=A8l
