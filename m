@@ -2,171 +2,71 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27AAEECAAD4
-	for <linux-wpan@archiver.kernel.org>; Wed, 31 Aug 2022 15:39:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FD38ECAAD1
+	for <linux-wpan@archiver.kernel.org>; Wed, 31 Aug 2022 18:26:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231570AbiHaPjL (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 31 Aug 2022 11:39:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33578 "EHLO
+        id S232893AbiHaS0D (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 31 Aug 2022 14:26:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60584 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231289AbiHaPjK (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 31 Aug 2022 11:39:10 -0400
-Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::227])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D150D8B07;
-        Wed, 31 Aug 2022 08:39:08 -0700 (PDT)
-Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id 6A5D620004;
-        Wed, 31 Aug 2022 15:39:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1661960346;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=JaN95KS1q/LjGpKWGX9qydG0jbE2xV4Q5Qxh/1+0e7Y=;
-        b=Vxgr48GWsGuwV1gKlAMLpd2GUpYU9blHwzRr1ftHviOBv26f2aNQYZPKR5q6lKpqsn3kv9
-        p1RZ20v5635v3T+PRD2rGkpDgXuCrp/dG9+aNyRhYbLWG9sgrRoOCdfvgob8Op0th6n++u
-        T4qZ2axU4u/liBuo1p0egNpcJVVV/bXQqv8RDYr1sSmLfwg4NGkFB9ZcA86G38QsAs6Xc7
-        7rKiPSChJBBA7e4xmxFJVfDySyPCR+BkbCykjhucfv3KrTzfEWYEZ9+2kuhA30F67IBHBS
-        7s+7EJtGssBF3aJUMXzJhyriIJBF7YX29RNklaoRdIGWhgrOnN5q8tP3LSE0XQ==
-Date:   Wed, 31 Aug 2022 17:39:03 +0200
-From:   Miquel Raynal <miquel.raynal@bootlin.com>
-To:     Alexander Aring <aahringo@redhat.com>
-Cc:     Alexander Aring <alex.aring@gmail.com>,
+        with ESMTP id S232808AbiHaSZr (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 31 Aug 2022 14:25:47 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26D0CF3250;
+        Wed, 31 Aug 2022 11:21:57 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id D79A6B8228A;
+        Wed, 31 Aug 2022 18:21:52 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06751C4315F;
+        Wed, 31 Aug 2022 18:21:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1661970111;
+        bh=15qKLOXBr9gyvyPYKeaT9xztSaZf1pTevNWoLxJ2uO4=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=bFkJrnTuqrxgQsNL8adKqEctethQLeYSVK+ihTV01vREtxfn0uIdqtI0w3A6ur4Qh
+         81w4wNef+Iu71Ll6TKldH5SA/vgO1fUSE2QcN6xPbnYGGAr1cXKGeZpAQBzCflaUcM
+         ZoETI1suPe6qdFhM3oa8jRK5aiv7DqA7K0p1INozvUx2YMx6YSwjblFGBQAN9eBSAY
+         RDXXY/d1H9pU92U+2hoUv1exNBofCE55WWDHeEwukMIrEHVWzQD2+g8Q6JfU3aw588
+         ZmEezoQURv2VZBRe8xODqwW8Zd5zavbOZW/Z5MfX3mxasIWrn+Pr7Lpjte9fZyH3qc
+         mm2gpJm7XAzzw==
+Date:   Wed, 31 Aug 2022 11:21:50 -0700
+From:   Jakub Kicinski <kuba@kernel.org>
+To:     Gal Pressman <gal@nvidia.com>
+Cc:     "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
+        Leon Romanovsky <leonro@nvidia.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
-        linux-wpan - ML <linux-wpan@vger.kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Eric Dumazet <edumazet@google.com>,
-        Network Development <netdev@vger.kernel.org>,
-        David Girault <david.girault@qorvo.com>,
-        Romuald Despres <romuald.despres@qorvo.com>,
-        Frederic Blain <frederic.blain@qorvo.com>,
-        Nicolas Schodet <nico@ni.fr.eu.org>,
-        Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH wpan-next 01/20] net: mac802154: Allow the creation of
- coordinator interfaces
-Message-ID: <20220831173903.1a980653@xps-13>
-In-Reply-To: <CAK-6q+gJwm0bhHgMVBF_pmjD9zSrxxHvNGdTrTm0fG-hAmSaUQ@mail.gmail.com>
-References: <20220701143052.1267509-1-miquel.raynal@bootlin.com>
-        <20220701143052.1267509-2-miquel.raynal@bootlin.com>
-        <CAK-6q+jkUUjAGqEDgU1oJvRkigUbvSO5SXWRau6+320b=GbfxQ@mail.gmail.com>
-        <20220819191109.0e639918@xps-13>
-        <CAK-6q+gCY3ufaADHNQWJGNpNZJMwm=fhKfe02GWkfGEdgsMVzg@mail.gmail.com>
-        <20220823182950.1c722e13@xps-13>
-        <CAK-6q+jfva++dGkyX_h2zQGXnoJpiOu5+eofCto=KZ+u6KJbJA@mail.gmail.com>
-        <20220824122058.1c46e09a@xps-13>
-        <CAK-6q+gjgQ1BF-QrT01JWh+2b3oL3RU+SoxUf5t7h3Hc6R8pcg@mail.gmail.com>
-        <20220824152648.4bfb9a89@xps-13>
-        <CAK-6q+itA0C4zPAq5XGKXgCHW5znSFeB-YDMp3uB9W-kLV6WaA@mail.gmail.com>
-        <20220825145831.1105cb54@xps-13>
-        <CAK-6q+j3LMoSe_7u0WqhowdPV9KM-6g0z-+OmSumJXCZfo0CAw@mail.gmail.com>
-        <20220826095408.706438c2@xps-13>
-        <CAK-6q+gxD0TkXzUVTOiR4-DXwJrFUHKgvccOqF5QMGRjfZQwvw@mail.gmail.com>
-        <20220829100214.3c6dad63@xps-13>
-        <CAK-6q+gJwm0bhHgMVBF_pmjD9zSrxxHvNGdTrTm0fG-hAmSaUQ@mail.gmail.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+        linux-wpan@vger.kernel.org, Alexander Aring <alex.aring@gmail.com>
+Subject: Re: [PATCH net-next] net: ieee802154: Fix compilation error when
+ CONFIG_IEEE802154_NL802154_EXPERIMENTAL is disabled
+Message-ID: <20220831112150.36e503bd@kernel.org>
+In-Reply-To: <20220830233124.2770ffc2@kernel.org>
+References: <20220830101237.22782-1-gal@nvidia.com>
+        <20220830231330.1c618258@kernel.org>
+        <4187e35d-0965-cf65-bff5-e4f71a04d272@nvidia.com>
+        <20220830233124.2770ffc2@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi Alexander & Stefan,
+On Tue, 30 Aug 2022 23:31:24 -0700 Jakub Kicinski wrote:
+> Hm, let me add 802154 folks.
+> 
+> Either we should treat the commands as reserved in terms of uAPI
+> even if they get removed the IDs won't be reused, or they are for
+> testing purposes only.
+> 
+> In the former case we should just remove the #ifdef around the values
+> in the enum, it just leads to #ifdef proliferation while having no
+> functional impact.
+> 
+> In the latter case we should start error checking from the last
+> non-experimental command, as we don't care about breaking the
+> experimental ones.
 
-aahringo@redhat.com wrote on Mon, 29 Aug 2022 22:23:09 -0400:
-
-I am currently testing my code with the ATUSB devices, the association
-works, so it's a good news! However I am struggling to get the
-association working for a simple reason: the crafted ACKs are
-transmitted (the ATUSB in monitor mode sees it) but I get absolutely
-nothing on the receiver side.
-
-The logic is:
-
-coord0                 coord1
-association req ->
-                <-     ack
-                <-     association response
-ack             ->
-
-The first ack is sent by coord1 but coord0 never sees anything. In
-practice coord0 has sent an association request and received a single
-one-byte packet in return which I guess is the firmware saying "okay, Tx
-has been performed". Shall I interpret this byte differently? Does it
-mean that the ack has also been received?=20
-
-I could not find a documentation of the firmware interface, I went
-through the wiki but I did not find something clear about what to
-expect or "what the driver should do". But perhaps this will ring a
-bell on your side?
-
-[...]
-
-> I did not see the v2 until now. Sorry for that.
-
-Ah! Ok, no problem :)
-
->=20
-> However I think there are missing bits here at the receive handling
-> side. Which are:
->=20
-> 1. Do a stop_tx(), stop_rx(), start_rx(filtering_level) to go into
-> other filtering modes while ifup.
-
-Who is supposed to change the filtering level?
-
-For now there is only the promiscuous mode being applied and the user
-has no knowledge about it, it's just something internal.
-
-Changing how the promiscuous mode is applied (using a filtering level
-instead of a "promiscuous on" boolean) would impact all the drivers
-and for now we don't really need it.
-
-> I don't want to see all filtering modes here, just what we currently
-> support with NONE (then with FCS check on software if necessary),
-> ?THIRD/FOURTH? LEVEL filtering and that's it. What I don't want to see
-> is runtime changes of phy flags. To tell the receive path what to
-> filter and what's not.
-
-Runtime changes on a dedicated "filtering" PHY flag is what I've used
-and it works okay for this situation, why don't you want that? It
-avoids the need for (yet) another rework of the API with the drivers,
-no?
-
-> 2. set the pan coordinator bit for hw address filter. And there is a
-> TODO about setting pkt_type in mac802154 receive path which we should
-> take a look into. This bit should be addressed for coordinator support
-> even if there is the question about coordinator vs pan coordinator,
-> then the kernel needs a bit as coordinator iface type parameter to
-> know if it's a pan coordinator and not coordinator.
-
-This is not really something that we can "set". Either the device
-had performed an association and it is a child device: it is not the
-PAN coordinator, or it initiated the PAN and it is the PAN coordinator.
-There are commands to change that later on but those are not supported.
-
-The "PAN coordinator" information is being added in the association
-series (which comes after the scan). I have handled the pkt_type you are
-mentioning.
-
-> I think it makes total sense to split this work in transmit handling,
-> where we had no support at all to send something besides the usual
-> data path, and receive handling, where we have no way to change the
-> filtering level besides interface type and ifup time of an interface.
-> We are currently trying to make a receive path working in a way that
-> "the other ideas flying around which are good" can be introduced in
-> future.
-> If this is done, then take care about how to add the rest of it.
->=20
-> I will look into v2 the next few days.
->=20
-> - Alex
->=20
-
-
-Thanks,
-Miqu=C3=A8l
+I haven't gone thru all of my inbox yet, but I see no reply from Stefan
+or Alexander. My vote is to un-hide the EXPERIMENTAL commands.
