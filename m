@@ -2,92 +2,82 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45433ECAAD8
-	for <linux-wpan@archiver.kernel.org>; Thu,  1 Sep 2022 16:07:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D83ADECAAD2
+	for <linux-wpan@archiver.kernel.org>; Thu,  1 Sep 2022 20:23:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234746AbiIAQHO (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Thu, 1 Sep 2022 12:07:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32986 "EHLO
+        id S232744AbiIAUXn (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Thu, 1 Sep 2022 16:23:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34870 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234813AbiIAQHN (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 1 Sep 2022 12:07:13 -0400
-Received: from mail-yw1-x1129.google.com (mail-yw1-x1129.google.com [IPv6:2607:f8b0:4864:20::1129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59F5878224
-        for <linux-wpan@vger.kernel.org>; Thu,  1 Sep 2022 09:07:11 -0700 (PDT)
-Received: by mail-yw1-x1129.google.com with SMTP id 00721157ae682-324ec5a9e97so341461357b3.7
-        for <linux-wpan@vger.kernel.org>; Thu, 01 Sep 2022 09:07:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc;
-        bh=aOX3b5WRndoOqWfMYuBPMSz6xrM2daGYXLX/7kwuwZ0=;
-        b=GwWs2TE101XCnPEP8wKR+dSw6GxCCnubsLKNO61paDv/b4aqGIMAG18YmmPLgM7tL/
-         9rxLGJP7ak9XNNnjdQbCzL5iB225ng61KZfyh3olNNwiXcwXq+h7ffsMnPZ6pAlJCtYZ
-         bLH1QVrBdzA4VVUk2XpxtrkSITAV/Ux4pJMcF2oCM9VlSnufDfkhwlUbtk195Gwro7U5
-         g7RY3vz6GYmUmLlUKiLSvS3ZL5u8vzZe1L4nTOO/3oih+NGg56PcP0RM+dkrg4Oj4lO2
-         Ba4ny5o4vVi/kMzPE7kpTqTkZZ2uDTniFuM40424qKlkBW1erqkUlj7BbmP4i5zxlw0+
-         FvYA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc;
-        bh=aOX3b5WRndoOqWfMYuBPMSz6xrM2daGYXLX/7kwuwZ0=;
-        b=0pVSE3NbMuE5GVvgrE+msjskx7133wB/bjnqEw6qLBID59ETYaR1nvjfhZ1B6ks+7G
-         KkWdBn1xlWFBY34k5MO5nhUjJ0gq9X6Kwf3xibvn32QMg5LK5k3f8IoxLGgeVqvAR+7t
-         QJYFmHXowz48spVEuj2GPhXm8ugaAufnA/smnQDbCWp01/XS7hOQJ1H+AJpGbpnLLa7E
-         KnndBZzMCJVGp8FYAlmOLzQS9fS/Qyozrn/NfasohpzrH2ddRGf2S0vMNRB1i/UaBm2/
-         Uh6/renJPLzoHw9tp/sOG3pkUcighY2QC6mhtbQyXla5V8vrnnnSmkuKvptUg5dPDl+e
-         DvyA==
-X-Gm-Message-State: ACgBeo2hMf8u32+m38eGMSsctzMcDcLXbHgJyFupRyqOjTz951lnmKP6
-        aXLX692oU6uNkC6dyNaHlnNGvTatgNME8leVMKbf0Q==
-X-Google-Smtp-Source: AA6agR4WWi3CPBRYCWEFVbnu2G8pTDzczJE8ASPxBsFd2QD0z+KnsqkUEdVwHr9uF0KxpAAczMEG+KuB9OxJUCT+Ths=
-X-Received: by 2002:a81:1c4b:0:b0:340:972f:abb0 with SMTP id
- c72-20020a811c4b000000b00340972fabb0mr23600297ywc.489.1662048430253; Thu, 01
- Sep 2022 09:07:10 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220829114648.GA2409@debian> <CANn89iLkfMUK8n5w00naST9J+KrLaAqqg2r0X9Sd-L0XzpLzSQ@mail.gmail.com>
- <20220901150115.GB31767@debian>
-In-Reply-To: <20220901150115.GB31767@debian>
-From:   Eric Dumazet <edumazet@google.com>
-Date:   Thu, 1 Sep 2022 09:06:59 -0700
-Message-ID: <CANn89iKMe7WZS-Q4rzqEUUD+ANL6Fmb6BnFo8TvX7y_EVi=HOw@mail.gmail.com>
-Subject: Re: [PATCH 3/4] net-next: frags: add inetpeer frag_mem tracking
-To:     Richard Gobert <richardbgobert@gmail.com>
-Cc:     David Miller <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        David Ahern <dsahern@kernel.org>,
+        with ESMTP id S232088AbiIAUXm (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 1 Sep 2022 16:23:42 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB40C7285D;
+        Thu,  1 Sep 2022 13:23:41 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 8D890B82934;
+        Thu,  1 Sep 2022 20:23:40 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 170CEC433D6;
+        Thu,  1 Sep 2022 20:23:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1662063819;
+        bh=DZet2g1JTuCOMZjHO51L2oDBFmnNX7de9n0/D5jATac=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=HjtXBYxssHpdX+ioUY/pQvnV7rZEjNef3L1Er6ytDW2hu3sERZg8CZCG/CzIBjoY5
+         f9TffmuV8aCckpJc4oojYAGPPjv6sB7TsGBiOsCo74bqSpXVzjwwH7aK2ulWd90FH+
+         8bkqXhpTLriLzPW3jq4diOfeAxEK5lHZoT4uMEcKQg7h4a9g3OGlMAOd9sp6k8KqQ6
+         l1HbhSxnvhiz5iD23BQ8LQg5nbo3JcIL5QBqjge4ljqiVy4Wt8udBHXPk5H2R2PAf0
+         kddC3QU8U+CIbQNg4tGp3fcnkcf1YnWFDQ8aiPGJbC9SDKvRS/uzj7b8h6bYZjuUKN
+         VyJbyNd28cWlQ==
+Date:   Thu, 1 Sep 2022 13:23:38 -0700
+From:   Jakub Kicinski <kuba@kernel.org>
+To:     Leon Romanovsky <leon@kernel.org>
+Cc:     Stefan Schmidt <stefan@datenfreihafen.org>,
         Alexander Aring <alex.aring@gmail.com>,
-        Stefan Schmidt <stefan@datenfreihafen.org>,
-        Pablo Neira Ayuso <pablo@netfilter.org>,
-        Jozsef Kadlecsik <kadlec@netfilter.org>,
-        Florian Westphal <fw@strlen.de>,
-        Martin KaFai Lau <kafai@fb.com>,
-        netdev <netdev@vger.kernel.org>,
-        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>, linux-wpan@vger.kernel.org,
-        netfilter-devel@vger.kernel.org, coreteam@netfilter.org
-Content-Type: text/plain; charset="UTF-8"
+        Gal Pressman <gal@nvidia.com>,
+        "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
+        linux-wpan@vger.kernel.org
+Subject: Re: [PATCH net-next] net: ieee802154: Fix compilation error when
+ CONFIG_IEEE802154_NL802154_EXPERIMENTAL is disabled
+Message-ID: <20220901132338.2953518c@kernel.org>
+In-Reply-To: <YxBTaxMmHKiLjcCo@unreal>
+References: <20220830101237.22782-1-gal@nvidia.com>
+        <20220830231330.1c618258@kernel.org>
+        <4187e35d-0965-cf65-bff5-e4f71a04d272@nvidia.com>
+        <20220830233124.2770ffc2@kernel.org>
+        <20220831112150.36e503bd@kernel.org>
+        <36f09967-b211-ef48-7360-b6dedfda73e3@datenfreihafen.org>
+        <20220831140947.7e8d06ee@kernel.org>
+        <YxBTaxMmHKiLjcCo@unreal>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-On Thu, Sep 1, 2022 at 8:03 AM Richard Gobert <richardbgobert@gmail.com> wrote:
->
-> On Mon, Aug 29, 2022 at 03:15:47PM -0700, Eric Dumazet wrote:
-> > We tried to get rid of any dependence over inetpeer, which is not
-> > resistant against DDOS attacks.
-> >
-> > So I would not add a new dependency.
->
-> I see your point. What do you suggest doing differently?
->
-> The inetpeer mechanism is used for IPv4 frags. If it isn't resistant
-> against DDoS attacks, can it perhaps be improved?
+On Thu, 1 Sep 2022 09:38:35 +0300 Leon Romanovsky wrote:
+> There is no such thing like experimental UAPI. Once you put something
+> in UAPI headers and/or allowed users to issue calls from userspace
+> to kernel, they can use it. We don't control how users compile their
+> kernels.
+> 
+> So it is not break "experimental commands", but break commands that
+> maybe shouldn't exist in first place.
+> 
+> nl802154 code suffers from two basic mistakes:
+> 1. User visible defines are not part of UAPI headers. For example,
+> include/net/nl802154.h should be in include/uapi/net/....
+> 2. Used Kconfig option for pseudo-UAPI header.
+> 
+> In this specific case, I checked that Fedora didn't enable this
+> CONFIG_IEEE802154_NL802154_EXPERIMENTAL knob, but someone needs
+> to check debian and other distros too.
+> 
+> Most likely it is not used at all.
 
-It can be disabled if needed, by changing ipfrag_max_dist sysctl.
-
-Quite frankly IPv4 reassembly unit is a toy, I am always surprised
-some applications are still relying on IP fragments.
+You're right, FWIW. I didn't want to get sidetracked into that before
+we fix the immediate build issue. It's not the only family playing uAPI
+games :(
