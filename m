@@ -2,95 +2,80 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6687AC54EE9
-	for <linux-wpan@archiver.kernel.org>; Fri,  2 Sep 2022 08:18:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9130AC38145
+	for <linux-wpan@archiver.kernel.org>; Fri,  2 Sep 2022 10:35:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235581AbiIBISu (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Fri, 2 Sep 2022 04:18:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38346 "EHLO
+        id S235543AbiIBKf3 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Fri, 2 Sep 2022 06:35:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53656 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235556AbiIBISs (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Fri, 2 Sep 2022 04:18:48 -0400
-Received: from mail-yw1-x112b.google.com (mail-yw1-x112b.google.com [IPv6:2607:f8b0:4864:20::112b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B49A6BFC5F;
-        Fri,  2 Sep 2022 01:18:47 -0700 (PDT)
-Received: by mail-yw1-x112b.google.com with SMTP id 00721157ae682-3321c2a8d4cso9620427b3.5;
-        Fri, 02 Sep 2022 01:18:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date;
-        bh=gmZKFJ5DMpy2RtHQdvY/1Lz7MZcgCDE8xgXM76Z0hg8=;
-        b=TQwul/xynxOeTE2Cigzd4d5AD9wMsm82TCSafmjN5d97B24VX3phFt2JMEa8SzJcGU
-         9nzB2lMX1CVCOhvDaA8xcGtq9XM4BeBtLI3/H0run1TeiRUbgRZkhCv1tOpRvBjCv9Q+
-         tB3hEaHVF9AKaMd1fm3LeEpeld5sP44RfJAQ83Qma+k+GyLvckpk/1xNdjgIGYgRV3yv
-         y1+DXG317UaAjpk9gx6aUm4f/60MF1YMtqSLpjVNWKIzI5myTAUB9HXIkiOPJO34J+Se
-         z2Yu/OoKQKRORWd14m5Mkpa1kDWUy1VukWJjetL9Sra3ljpWjc5yH+WfkhZzaA9lUJZS
-         IZ9Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=gmZKFJ5DMpy2RtHQdvY/1Lz7MZcgCDE8xgXM76Z0hg8=;
-        b=pvj21ddtV641gYop4os407gxJE1mzmyqUkV1cAuuLOZy+i5AdHzuYcqmQSoLOae2HG
-         tdYb7dWlLGsmCsxfzFdAYiyhpxdjvlhEkR10KPHHbu/mojHvicyQQXlAKFbegT1do664
-         TUz6yOf5lJUh81Pa9NTXrST+4fx7qMdzSJ4rWejPJNt1FBRD/yklgjinHHah2aDx+Lba
-         WxOmQ5fbvhbvZGmzzOk5zD9ctFV5ZgLtJRgUehhEzkVWiIM1mmHDubG5tzdoD26nagH3
-         N9ab8yFqhh/mHzKZCObx3PIxyeZ4jP4+W0wLkepbN7WQRA4EpOWjctyB3GmoGaLSzmeh
-         fQ+g==
-X-Gm-Message-State: ACgBeo0koBuIoW+iULgxIcF1NsBNTHrCFvQpGoWrYclgbTHRLQKmGMf1
-        Wr6+UaF9W41i33740I/SK5NAbQkWqy5i0olyQWA=
-X-Google-Smtp-Source: AA6agR675WB/EvALDcNCZ4yiWt5M/LckeJaBM1B3dqzAOKYYKlAo9ZjTJhtz5VZWhl0rGHc6NlXGSDHvFAohyp8Ed6o=
-X-Received: by 2002:a0d:c942:0:b0:337:5cf9:1c04 with SMTP id
- l63-20020a0dc942000000b003375cf91c04mr26790287ywd.39.1662106726933; Fri, 02
- Sep 2022 01:18:46 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220902030620.2737091-1-kuba@kernel.org>
-In-Reply-To: <20220902030620.2737091-1-kuba@kernel.org>
-From:   Sudip Mukherjee <sudipm.mukherjee@gmail.com>
-Date:   Fri, 2 Sep 2022 09:18:11 +0100
-Message-ID: <CADVatmOcuzx7RZHDG+7P31hfscpsVOc2wNS6DvEZifCpntRCsw@mail.gmail.com>
-Subject: Re: [PATCH net-next v2] net: ieee802154: Fix compilation error when
- CONFIG_IEEE802154_NL802154_EXPERIMENTAL is disabled
+        with ESMTP id S235910AbiIBKfR (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 2 Sep 2022 06:35:17 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF932DF7A;
+        Fri,  2 Sep 2022 03:35:09 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 2443261FEE;
+        Fri,  2 Sep 2022 10:35:08 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C07E7C433C1;
+        Fri,  2 Sep 2022 10:35:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1662114907;
+        bh=1xr+tD3UEq9EhbT6zfYwZjUnCwTrRwLZVOlJ4WPB244=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=o8lfskd/K3x2DZVa1RjQuJRF3U1IJh+pL1btht+6nJhDAExrbXKhgbPsqPUPzuPdS
+         OK4EHzINabp4M5wsLYXdPNAvMd5Q8dhxgAHc4/7H/9ZHk964k3fc5TIb1M4kKM9Phm
+         aR49ow3vRhvC7HgsM7sxQHxdNf3IKR5nA41F0cbigIzmpTH2DzYBCu7pkTFObubq/O
+         9qI+V4Mffx0lRieGaNkQHndaYuiaNuunjMDRfOiEhhepcgqV+AakC1s1YI3LG/fLb+
+         geQqEfhVWObpk9rhenX+4ujXkGxE61MSz1sD93ZMO3hpTwVK7tZwAUPsNqO/ItB75L
+         Ym+Y9CIEntdPA==
+Date:   Fri, 2 Sep 2022 13:35:02 +0300
+From:   Leon Romanovsky <leon@kernel.org>
 To:     Jakub Kicinski <kuba@kernel.org>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        netdev <netdev@vger.kernel.org>,
-        Eric Dumazet <edumazet@google.com>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        Gal Pressman <gal@nvidia.com>,
-        Alexander Aring <alex.aring@gmail.com>,
+Cc:     Alexander Aring <aahringo@redhat.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
-        paul@paul-moore.com, linux-wpan@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        Alexander Aring <alex.aring@gmail.com>,
+        Gal Pressman <gal@nvidia.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Network Development <netdev@vger.kernel.org>,
+        linux-wpan - ML <linux-wpan@vger.kernel.org>
+Subject: Re: [PATCH net-next] net: ieee802154: Fix compilation error when
+ CONFIG_IEEE802154_NL802154_EXPERIMENTAL is disabled
+Message-ID: <YxHcVohjMlgyC8TF@unreal>
+References: <20220830231330.1c618258@kernel.org>
+ <4187e35d-0965-cf65-bff5-e4f71a04d272@nvidia.com>
+ <20220830233124.2770ffc2@kernel.org>
+ <20220831112150.36e503bd@kernel.org>
+ <36f09967-b211-ef48-7360-b6dedfda73e3@datenfreihafen.org>
+ <20220831140947.7e8d06ee@kernel.org>
+ <YxBTaxMmHKiLjcCo@unreal>
+ <20220901132338.2953518c@kernel.org>
+ <CAK-6q+gtcDVCGB0KvhMjQ-WotWuyL7mpw99-36j_TcC7mc2qyA@mail.gmail.com>
+ <20220901200012.6f04466e@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220901200012.6f04466e@kernel.org>
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-On Fri, Sep 2, 2022 at 4:06 AM Jakub Kicinski <kuba@kernel.org> wrote:
->
-> From: Gal Pressman <gal@nvidia.com>
->
-> When CONFIG_IEEE802154_NL802154_EXPERIMENTAL is disabled,
-> NL802154_CMD_DEL_SEC_LEVEL is undefined and results in a compilation
-> error:
-> net/ieee802154/nl802154.c:2503:19: error: 'NL802154_CMD_DEL_SEC_LEVEL' undeclared here (not in a function); did you mean 'NL802154_CMD_SET_CCA_ED_LEVEL'?
->  2503 |  .resv_start_op = NL802154_CMD_DEL_SEC_LEVEL + 1,
->       |                   ^~~~~~~~~~~~~~~~~~~~~~~~~~
->       |                   NL802154_CMD_SET_CCA_ED_LEVEL
->
-> Unhide the experimental commands, having them defined in an enum
-> makes no difference.
->
-> Fixes: 9c5d03d36251 ("genetlink: start to validate reserved header bytes")
-> Signed-off-by: Gal Pressman <gal@nvidia.com>
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+On Thu, Sep 01, 2022 at 08:00:12PM -0700, Jakub Kicinski wrote:
+> On Thu, 1 Sep 2022 22:48:10 -0400 Alexander Aring wrote:
+> > > You're right, FWIW. I didn't want to get sidetracked into that before
+> > > we fix the immediate build issue. It's not the only family playing uAPI
+> > > games :(
+> > 
+> > I am not sure how to proceed here now, if removing the
+> > CONFIG_IEEE802154_NL802154_EXPERIMENTAL option is the way to go. Then
+> > do it?
+> 
+> Right, I was kinda expecting v2 from Gal but the weekend may have
+> started for him already, so let me send it myself.
 
-Fixes the build for me.
+We didn't know how v2 should look like and waited for some sort of
+resolution.
 
-Tested-by: Sudip Mukherjee <sudipm.mukherjee@gmail.com>
-
-
--- 
-Regards
-Sudip
+Thanks
