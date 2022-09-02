@@ -2,242 +2,198 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE04AC54EE9
-	for <linux-wpan@archiver.kernel.org>; Thu,  1 Sep 2022 21:02:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48217ECAAD2
+	for <linux-wpan@archiver.kernel.org>; Fri,  2 Sep 2022 02:09:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233871AbiIAVCf (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Thu, 1 Sep 2022 17:02:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56220 "EHLO
+        id S233716AbiIBCJ4 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Thu, 1 Sep 2022 22:09:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46912 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235121AbiIAVCW (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 1 Sep 2022 17:02:22 -0400
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE7099F1B3;
-        Thu,  1 Sep 2022 14:01:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1662066092; x=1693602092;
-  h=date:from:to:cc:subject:message-id:mime-version:
-   content-transfer-encoding;
-  bh=8QAwR+ZyD6oGQnGvMH3kTZlk5348sXsgEcmJ1jmRVBo=;
-  b=j5qiegXN+GsOIrN7e4wYlLqWsU9ys73R2xYiovNByBr5wZ8IoDwnJ1zA
-   qTmHpKlymsoBAQOmL9eMSO5LnbAYIqOFjYS6UuohkjQ4RP7H6RreoSUjG
-   I31maThky10lwsIs46+8ttRyEvykUcz2Nztl5owzAI5bP6JrEGZMiGRtd
-   Gwy8V7ZeMTB036YJXODoWLOM8cfUWiXMOos8yyvefuVMg7OWODNv+QNRA
-   MmekDGKBIF+Zxy2eLjFxWlpYH4PheYJZbL+NazZJTi6dzAPE2WN0ll0Tc
-   jr+eMmkLBEpxRGLWASsKEuWdG2+4Ae0qB6y7hb04d+b0Vzc0wbKRoXhX2
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10457"; a="359785961"
-X-IronPort-AV: E=Sophos;i="5.93,281,1654585200"; 
-   d="scan'208";a="359785961"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Sep 2022 14:01:00 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.93,281,1654585200"; 
-   d="scan'208";a="738636556"
-Received: from lkp-server02.sh.intel.com (HELO b138c9e8658c) ([10.239.97.151])
-  by orsmga004.jf.intel.com with ESMTP; 01 Sep 2022 14:00:57 -0700
-Received: from kbuild by b138c9e8658c with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1oTrJ2-0000lT-39;
-        Thu, 01 Sep 2022 21:00:56 +0000
-Date:   Fri, 02 Sep 2022 04:59:59 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Andrew Morton <akpm@linux-foundation.org>
-Cc:     platform-driver-x86@vger.kernel.org, linux-wpan@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-clk@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, amd-gfx@lists.freedesktop.org,
-        Linux Memory Management List <linux-mm@kvack.org>
-Subject: [linux-next:master] BUILD REGRESSION
- e47eb90a0a9ae20b82635b9b99a8d0979b757ad8
-Message-ID: <63111d4f.5mB6r1RTaskl8oUU%lkp@intel.com>
-User-Agent: Heirloom mailx 12.5 6/20/10
+        with ESMTP id S230313AbiIBCJy (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 1 Sep 2022 22:09:54 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67312EB1
+        for <linux-wpan@vger.kernel.org>; Thu,  1 Sep 2022 19:09:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1662084591;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Glclh5v/Wd515YHsUVu6CqjDmnWddkL3V2d3UpUAO5g=;
+        b=isOP0sX2pA7/Q7PAOsnEyu2z9u/bdQIb0hWPAgaxDJg/3d/BLHnXkMUifYErygMEQXjCAm
+        pwNjZec3JIVNAZkUwIqD2C6hToKSzl1cDjRmqz65w7dHHnzUWbLZSCHtyudANKceZu4Qxa
+        bl+9fmBesTL5JXqoex00kdApuwrNgpc=
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
+ [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-32-6w8m8nX3PWqSpqp6-6Agtw-1; Thu, 01 Sep 2022 22:09:50 -0400
+X-MC-Unique: 6w8m8nX3PWqSpqp6-6Agtw-1
+Received: by mail-qv1-f72.google.com with SMTP id nv16-20020a056214361000b00499023aff0bso411445qvb.12
+        for <linux-wpan@vger.kernel.org>; Thu, 01 Sep 2022 19:09:50 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date;
+        bh=Glclh5v/Wd515YHsUVu6CqjDmnWddkL3V2d3UpUAO5g=;
+        b=6ss4Z5BCpqDmxxyHSNxk6CjEYYy8btnjDST7Cbv1V2j9HC0+yikXL44x1pHR3YA7+k
+         JaBLq+NkthnFiAdTQdjw5YRPnvvVl0Zud02wQpW7pZf8NauXbn6vSP76u/kFKQo92DiV
+         BxKgTKJBw5wc9a874a/VE+fGUxv3T9CVbHnAcNrZf81Ti83llq7zaETVZ1DszAv8JA2a
+         rwUgcswdsChAZWNqTO/U3eRCfPiFk3Zh0wHCemgg2KZ6E0i+a/Lk7dTNbIVbrk1UDhbI
+         u8qgHzg0iO+M3k9WrBm01qEbdFFcxaZwIxYPnApQs3pJx1SWpVs15yMdWz/l5+RJolZo
+         uNJg==
+X-Gm-Message-State: ACgBeo0N0lWNBejZEcogDhnzvsu1fuXstjx53LtuSTyr//nv5b+B0zoo
+        aK3riUCZazbpVtXmojH2Iug+AyYyhLdVKyy49WovNY6xvWPbK17IFmqLy/AiZOX1eOeZ2dTmpmv
+        +Bes1l4XUV62VdB1kHiXkatDGe285p+0FYatiyA==
+X-Received: by 2002:a05:622a:1302:b0:344:8a9d:817d with SMTP id v2-20020a05622a130200b003448a9d817dmr26446570qtk.339.1662084590014;
+        Thu, 01 Sep 2022 19:09:50 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR4Un99Kv+7MWxTnnA6cj8sXjWtQ2lyfiPpnnHJEuN6JRm6toB3pjlq+PX8Vi1+jD4tyOJ4AWle0W/ExIHE7/3Y=
+X-Received: by 2002:a05:622a:1302:b0:344:8a9d:817d with SMTP id
+ v2-20020a05622a130200b003448a9d817dmr26446557qtk.339.1662084589801; Thu, 01
+ Sep 2022 19:09:49 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+References: <20220701143052.1267509-1-miquel.raynal@bootlin.com>
+ <20220701143052.1267509-2-miquel.raynal@bootlin.com> <CAK-6q+jkUUjAGqEDgU1oJvRkigUbvSO5SXWRau6+320b=GbfxQ@mail.gmail.com>
+ <20220819191109.0e639918@xps-13> <CAK-6q+gCY3ufaADHNQWJGNpNZJMwm=fhKfe02GWkfGEdgsMVzg@mail.gmail.com>
+ <20220823182950.1c722e13@xps-13> <CAK-6q+jfva++dGkyX_h2zQGXnoJpiOu5+eofCto=KZ+u6KJbJA@mail.gmail.com>
+ <20220824122058.1c46e09a@xps-13> <CAK-6q+gjgQ1BF-QrT01JWh+2b3oL3RU+SoxUf5t7h3Hc6R8pcg@mail.gmail.com>
+ <20220824152648.4bfb9a89@xps-13> <CAK-6q+itA0C4zPAq5XGKXgCHW5znSFeB-YDMp3uB9W-kLV6WaA@mail.gmail.com>
+ <20220825145831.1105cb54@xps-13> <CAK-6q+j3LMoSe_7u0WqhowdPV9KM-6g0z-+OmSumJXCZfo0CAw@mail.gmail.com>
+ <20220826095408.706438c2@xps-13> <CAK-6q+gxD0TkXzUVTOiR4-DXwJrFUHKgvccOqF5QMGRjfZQwvw@mail.gmail.com>
+ <20220829100214.3c6dad63@xps-13> <CAK-6q+gJwm0bhHgMVBF_pmjD9zSrxxHvNGdTrTm0fG-hAmSaUQ@mail.gmail.com>
+ <20220831173903.1a980653@xps-13>
+In-Reply-To: <20220831173903.1a980653@xps-13>
+From:   Alexander Aring <aahringo@redhat.com>
+Date:   Thu, 1 Sep 2022 22:09:38 -0400
+Message-ID: <CAK-6q+ghghhPeV1O57_Rp4YNAjcN-Z-1nPhNvmM1kSYHJSb4Uw@mail.gmail.com>
+Subject: Re: [PATCH wpan-next 01/20] net: mac802154: Allow the creation of
+ coordinator interfaces
+To:     Miquel Raynal <miquel.raynal@bootlin.com>
+Cc:     Alexander Aring <alex.aring@gmail.com>,
+        Stefan Schmidt <stefan@datenfreihafen.org>,
+        linux-wpan - ML <linux-wpan@vger.kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Eric Dumazet <edumazet@google.com>,
+        Network Development <netdev@vger.kernel.org>,
+        David Girault <david.girault@qorvo.com>,
+        Romuald Despres <romuald.despres@qorvo.com>,
+        Frederic Blain <frederic.blain@qorvo.com>,
+        Nicolas Schodet <nico@ni.fr.eu.org>,
+        Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git master
-branch HEAD: e47eb90a0a9ae20b82635b9b99a8d0979b757ad8  Add linux-next specific files for 20220901
+Hi,
 
-Error/Warning reports:
+On Wed, Aug 31, 2022 at 11:39 AM Miquel Raynal
+<miquel.raynal@bootlin.com> wrote:
+>
+> Hi Alexander & Stefan,
+>
+> aahringo@redhat.com wrote on Mon, 29 Aug 2022 22:23:09 -0400:
+>
+> I am currently testing my code with the ATUSB devices, the association
+> works, so it's a good news! However I am struggling to get the
+> association working for a simple reason: the crafted ACKs are
+> transmitted (the ATUSB in monitor mode sees it) but I get absolutely
 
-https://lore.kernel.org/linux-media/202209020437.eXEOdmfe-lkp@intel.com
-https://lore.kernel.org/llvm/202208312208.HjwleIeN-lkp@intel.com
+What is a crafted ACK here?
 
-Error/Warning: (recently discovered and may have been fixed)
+> nothing on the receiver side.
+>
+> The logic is:
+>
+> coord0                 coord1
+> association req ->
+>                 <-     ack
+>                 <-     association response
+> ack             ->
+>
+> The first ack is sent by coord1 but coord0 never sees anything. In
+> practice coord0 has sent an association request and received a single
+> one-byte packet in return which I guess is the firmware saying "okay, Tx
+> has been performed". Shall I interpret this byte differently? Does it
+> mean that the ack has also been received?
+>
+> I could not find a documentation of the firmware interface, I went
+> through the wiki but I did not find something clear about what to
+> expect or "what the driver should do". But perhaps this will ring a
+> bell on your side?
+>
+> [...]
+>
+> > I did not see the v2 until now. Sorry for that.
+>
+> Ah! Ok, no problem :)
+>
+> >
+> > However I think there are missing bits here at the receive handling
+> > side. Which are:
+> >
+> > 1. Do a stop_tx(), stop_rx(), start_rx(filtering_level) to go into
+> > other filtering modes while ifup.
+>
+> Who is supposed to change the filtering level?
+>
 
-drivers/base/regmap/regmap-mmio.c:221:17: error: implicit declaration of function 'writesb'; did you mean 'writeb'? [-Werror=implicit-function-declaration]
-drivers/base/regmap/regmap-mmio.c:224:17: error: implicit declaration of function 'writesw'; did you mean 'writew'? [-Werror=implicit-function-declaration]
-drivers/base/regmap/regmap-mmio.c:227:17: error: implicit declaration of function 'writesl'; did you mean 'writel'? [-Werror=implicit-function-declaration]
-drivers/base/regmap/regmap-mmio.c:231:17: error: implicit declaration of function 'writesq'; did you mean 'writeq'? [-Werror=implicit-function-declaration]
-drivers/base/regmap/regmap-mmio.c:231:17: error: implicit declaration of function 'writesq'; did you mean 'writesl'? [-Werror=implicit-function-declaration]
-drivers/base/regmap/regmap-mmio.c:358:17: error: implicit declaration of function 'readsb'; did you mean 'readb'? [-Werror=implicit-function-declaration]
-drivers/base/regmap/regmap-mmio.c:361:17: error: implicit declaration of function 'readsw'; did you mean 'readw'? [-Werror=implicit-function-declaration]
-drivers/base/regmap/regmap-mmio.c:364:17: error: implicit declaration of function 'readsl'; did you mean 'readl'? [-Werror=implicit-function-declaration]
-drivers/base/regmap/regmap-mmio.c:368:17: error: implicit declaration of function 'readsq'; did you mean 'readq'? [-Werror=implicit-function-declaration]
-drivers/base/regmap/regmap-mmio.c:368:17: error: implicit declaration of function 'readsq'; did you mean 'readsl'? [-Werror=implicit-function-declaration]
-drivers/clk/clk.c:1193:6: error: redefinition of 'clk_is_enabled_when_prepared'
-drivers/clk/clk.c:866:6: error: redefinition of 'clk_unprepare'
-drivers/clk/clk.c:947:5: error: redefinition of 'clk_prepare'
-drivers/gpu/drm/amd/amdgpu/imu_v11_0_3.c:139:6: warning: no previous prototype for 'imu_v11_0_3_program_rlc_ram' [-Wmissing-prototypes]
-drivers/platform/mellanox/mlxreg-lc.c:866 mlxreg_lc_probe() warn: passing zero to 'PTR_ERR'
-net/ieee802154/nl802154.c:2503:26: error: 'NL802154_CMD_DEL_SEC_LEVEL' undeclared here (not in a function); did you mean 'NL802154_CMD_SET_CCA_ED_LEVEL'?
+depending on what mac802154 is doing, for scan it's required to switch
+the filter level to promiscuous?
 
-Error/Warning ids grouped by kconfigs:
+> For now there is only the promiscuous mode being applied and the user
+> has no knowledge about it, it's just something internal.
+>
 
-gcc_recent_errors
-|-- alpha-allyesconfig
-|   |-- drivers-base-regmap-regmap-mmio.c:error:implicit-declaration-of-function-readsb
-|   |-- drivers-base-regmap-regmap-mmio.c:error:implicit-declaration-of-function-readsl
-|   |-- drivers-base-regmap-regmap-mmio.c:error:implicit-declaration-of-function-readsq
-|   |-- drivers-base-regmap-regmap-mmio.c:error:implicit-declaration-of-function-readsw
-|   |-- drivers-base-regmap-regmap-mmio.c:error:implicit-declaration-of-function-writesb
-|   |-- drivers-base-regmap-regmap-mmio.c:error:implicit-declaration-of-function-writesl
-|   |-- drivers-base-regmap-regmap-mmio.c:error:implicit-declaration-of-function-writesq
-|   |-- drivers-base-regmap-regmap-mmio.c:error:implicit-declaration-of-function-writesw
-|   `-- drivers-gpu-drm-amd-amdgpu-imu_v11_0_3.c:warning:no-previous-prototype-for-imu_v11_0_3_program_rlc_ram
-|-- alpha-buildonly-randconfig-r003-20220901
-|   |-- drivers-base-regmap-regmap-mmio.c:error:implicit-declaration-of-function-readsb
-|   |-- drivers-base-regmap-regmap-mmio.c:error:implicit-declaration-of-function-readsl
-|   |-- drivers-base-regmap-regmap-mmio.c:error:implicit-declaration-of-function-readsq
-|   |-- drivers-base-regmap-regmap-mmio.c:error:implicit-declaration-of-function-readsw
-|   |-- drivers-base-regmap-regmap-mmio.c:error:implicit-declaration-of-function-writesb
-|   |-- drivers-base-regmap-regmap-mmio.c:error:implicit-declaration-of-function-writesl
-|   |-- drivers-base-regmap-regmap-mmio.c:error:implicit-declaration-of-function-writesq
-|   `-- drivers-base-regmap-regmap-mmio.c:error:implicit-declaration-of-function-writesw
-|-- alpha-randconfig-r021-20220901
-|   |-- drivers-base-regmap-regmap-mmio.c:error:implicit-declaration-of-function-readsb
-|   |-- drivers-base-regmap-regmap-mmio.c:error:implicit-declaration-of-function-readsl
-|   |-- drivers-base-regmap-regmap-mmio.c:error:implicit-declaration-of-function-readsq
-|   |-- drivers-base-regmap-regmap-mmio.c:error:implicit-declaration-of-function-readsw
-|   |-- drivers-base-regmap-regmap-mmio.c:error:implicit-declaration-of-function-writesb
-|   |-- drivers-base-regmap-regmap-mmio.c:error:implicit-declaration-of-function-writesl
-|   |-- drivers-base-regmap-regmap-mmio.c:error:implicit-declaration-of-function-writesq
-|   `-- drivers-base-regmap-regmap-mmio.c:error:implicit-declaration-of-function-writesw
-|-- alpha-randconfig-s042-20220901
-|   |-- drivers-base-regmap-regmap-mmio.c:error:implicit-declaration-of-function-readsb
-|   |-- drivers-base-regmap-regmap-mmio.c:error:implicit-declaration-of-function-readsl
-|   |-- drivers-base-regmap-regmap-mmio.c:error:implicit-declaration-of-function-readsq
-|   |-- drivers-base-regmap-regmap-mmio.c:error:implicit-declaration-of-function-readsw
-|   |-- drivers-base-regmap-regmap-mmio.c:error:implicit-declaration-of-function-writesb
-|   |-- drivers-base-regmap-regmap-mmio.c:error:implicit-declaration-of-function-writesl
-|   |-- drivers-base-regmap-regmap-mmio.c:error:implicit-declaration-of-function-writesq
-|   |-- drivers-base-regmap-regmap-mmio.c:error:implicit-declaration-of-function-writesw
-|   |-- drivers-gpu-drm-amd-amdgpu-imu_v11_0_3.c:warning:no-previous-prototype-for-imu_v11_0_3_program_rlc_ram
-|   `-- net-ieee802154-nl802154.c:error:NL802154_CMD_DEL_SEC_LEVEL-undeclared-here-(not-in-a-function)
-|-- arc-allyesconfig
-|   `-- drivers-gpu-drm-amd-amdgpu-imu_v11_0_3.c:warning:no-previous-prototype-for-imu_v11_0_3_program_rlc_ram
-|-- arc-randconfig-r022-20220901
-|   `-- drivers-gpu-drm-amd-amdgpu-imu_v11_0_3.c:warning:no-previous-prototype-for-imu_v11_0_3_program_rlc_ram
-|-- arc-randconfig-r043-20220901
-|   `-- net-ieee802154-nl802154.c:error:NL802154_CMD_DEL_SEC_LEVEL-undeclared-here-(not-in-a-function)
-|-- arm-allyesconfig
-|   `-- drivers-gpu-drm-amd-amdgpu-imu_v11_0_3.c:warning:no-previous-prototype-for-imu_v11_0_3_program_rlc_ram
-|-- arm-randconfig-s033-20220901
-|   `-- net-ieee802154-nl802154.c:error:NL802154_CMD_DEL_SEC_LEVEL-undeclared-here-(not-in-a-function)
-|-- arm64-allyesconfig
-clang_recent_errors
-|-- riscv-randconfig-r026-20220901
-|   `-- drivers-staging-media-deprecated-cpia2-cpia2_usb.c:warning:variable-frame_count-set-but-not-used
-|-- s390-randconfig-r012-20220901
-|   `-- drivers-gpu-drm-amd-amdgpu-imu_v11_0_3.c:warning:no-previous-prototype-for-function-imu_v11_0_3_program_rlc_ram
-`-- s390-randconfig-r044-20220901
-    `-- drivers-gpu-drm-amd-amdgpu-imu_v11_0_3.c:warning:no-previous-prototype-for-function-imu_v11_0_3_program_rlc_ram
+Okay, sounds good.
 
-elapsed time: 732m
+> Changing how the promiscuous mode is applied (using a filtering level
+> instead of a "promiscuous on" boolean) would impact all the drivers
+> and for now we don't really need it.
+>
 
-configs tested: 82
-configs skipped: 2
+no, it does not. Okay, you can hide the promiscuous mode driver
+callback from start()... but yes the goal would be to remove the
+promiscuous mode op in future.
 
-gcc tested configs:
-powerpc                           allnoconfig
-x86_64                    rhel-8.3-kselftests
-x86_64                          rhel-8.3-func
-x86_64                         rhel-8.3-kunit
-x86_64                           rhel-8.3-syz
-i386                                defconfig
-x86_64                           rhel-8.3-kvm
-um                           x86_64_defconfig
-um                             i386_defconfig
-x86_64                              defconfig
-powerpc                     stx_gp3_defconfig
-powerpc                      pasemi_defconfig
-arm                                 defconfig
-arc                        vdk_hs38_defconfig
-x86_64                        randconfig-a013
-arm                     eseries_pxa_defconfig
-x86_64                               rhel-8.3
-arm                           stm32_defconfig
-mips                         bigsur_defconfig
-arc                  randconfig-r043-20220901
-x86_64                        randconfig-a011
-sh                             shx3_defconfig
-m68k                        m5307c3_defconfig
-sh                                  defconfig
-i386                          randconfig-a001
-x86_64                        randconfig-a015
-i386                          randconfig-a003
-powerpc                         wii_defconfig
-arm                           viper_defconfig
-arm                            pleb_defconfig
-sh                               allmodconfig
-x86_64                           allyesconfig
-sh                            hp6xx_defconfig
-mips                             allyesconfig
-sh                           se7712_defconfig
-s390                                defconfig
-i386                          randconfig-a014
-powerpc                          allmodconfig
-arm                          gemini_defconfig
-i386                             allyesconfig
-csky                              allnoconfig
-i386                          randconfig-a005
-arc                               allnoconfig
-m68k                             allmodconfig
-alpha                             allnoconfig
-riscv                             allnoconfig
-i386                          randconfig-a012
-i386                          randconfig-a016
-arc                              allyesconfig
-arm                              allyesconfig
-alpha                            allyesconfig
-arm64                            allyesconfig
-ia64                             allmodconfig
-powerpc                      ep88xc_defconfig
-powerpc                  storcenter_defconfig
-sparc                               defconfig
-m68k                             allyesconfig
-x86_64                        randconfig-a002
-x86_64                        randconfig-a004
-x86_64                        randconfig-a006
+> > I don't want to see all filtering modes here, just what we currently
+> > support with NONE (then with FCS check on software if necessary),
+> > ?THIRD/FOURTH? LEVEL filtering and that's it. What I don't want to see
+> > is runtime changes of phy flags. To tell the receive path what to
+> > filter and what's not.
+>
+> Runtime changes on a dedicated "filtering" PHY flag is what I've used
+> and it works okay for this situation, why don't you want that? It
+> avoids the need for (yet) another rework of the API with the drivers,
+> no?
+>
 
-clang tested configs:
-riscv                randconfig-r042-20220901
-hexagon              randconfig-r045-20220901
-x86_64                        randconfig-a012
-hexagon              randconfig-r041-20220901
-i386                          randconfig-a013
-x86_64                        randconfig-a016
-i386                          randconfig-a002
-mips                     cu1830-neo_defconfig
-s390                 randconfig-r044-20220901
-powerpc                      walnut_defconfig
-x86_64                        randconfig-a014
-i386                          randconfig-a011
-i386                          randconfig-a006
-i386                          randconfig-a004
-i386                          randconfig-a015
-x86_64                          rhel-8.3-rust
-x86_64                        randconfig-a001
-x86_64                        randconfig-a003
-x86_64                        randconfig-a005
-powerpc                  mpc866_ads_defconfig
-powerpc                    socrates_defconfig
-mips                     loongson2k_defconfig
+I am not sure what exactly here is "dedicated "filtering" PHY flag" if
+it's the hwflags it was never made to be changed during runtime.
 
--- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
+I also don't know what "yet another rework of the API" means here,
+there is a current behaviour which we can assume and only hwsim is a
+little bit out of range which should overwrite the "default".
+
+> > 2. set the pan coordinator bit for hw address filter. And there is a
+> > TODO about setting pkt_type in mac802154 receive path which we should
+> > take a look into. This bit should be addressed for coordinator support
+> > even if there is the question about coordinator vs pan coordinator,
+> > then the kernel needs a bit as coordinator iface type parameter to
+> > know if it's a pan coordinator and not coordinator.
+>
+> This is not really something that we can "set". Either the device
+> had performed an association and it is a child device: it is not the
+> PAN coordinator, or it initiated the PAN and it is the PAN coordinator.
+> There are commands to change that later on but those are not supported.
+>
+> The "PAN coordinator" information is being added in the association
+> series (which comes after the scan). I have handled the pkt_type you are
+> mentioning.
+>
+
+okay.
+
+- Alex
+
