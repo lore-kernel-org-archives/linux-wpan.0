@@ -2,182 +2,118 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63A31ECAAD3
-	for <linux-wpan@archiver.kernel.org>; Sun,  4 Sep 2022 17:14:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CCA42C6FA82
+	for <linux-wpan@archiver.kernel.org>; Mon,  5 Sep 2022 00:49:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230187AbiIDROG (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Sun, 4 Sep 2022 13:14:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49834 "EHLO
+        id S230514AbiIEAtv (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Sun, 4 Sep 2022 20:49:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56076 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230013AbiIDROG (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Sun, 4 Sep 2022 13:14:06 -0400
+        with ESMTP id S229480AbiIEAtu (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Sun, 4 Sep 2022 20:49:50 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6EC732AAA
-        for <linux-wpan@vger.kernel.org>; Sun,  4 Sep 2022 10:14:04 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB4D312A8C
+        for <linux-wpan@vger.kernel.org>; Sun,  4 Sep 2022 17:49:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1662311643;
+        s=mimecast20190719; t=1662338987;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=QGDoXzTF8Cb48mmT6A1DlkTHZU8f6c1pchx0hQUH288=;
-        b=E1elD4IUGSJkZL5HMzNuPp0IMWmy0t576U14o40OIwf8eF+z4e85W2lOx1IgX/cyV+5tFO
-        iq5QujkB/412Dk2SeQHmzmdrZ+WvJKc1eK7wgEKnvfFu/Dw+CBih5l0OHbZSz+e+DFoyLC
-        r4OmsH0WY6gyJs5WhA0n6ijmQfpfBhI=
-Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
- [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-155-TfvyupVXOdKJTsAGMvfc0g-1; Sun, 04 Sep 2022 13:14:02 -0400
-X-MC-Unique: TfvyupVXOdKJTsAGMvfc0g-1
-Received: by mail-qv1-f72.google.com with SMTP id mx9-20020a0562142e0900b004a1ddfe8ee3so1256461qvb.2
-        for <linux-wpan@vger.kernel.org>; Sun, 04 Sep 2022 10:14:02 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=QGDoXzTF8Cb48mmT6A1DlkTHZU8f6c1pchx0hQUH288=;
-        b=eRax1GQ1kxHrx4YfGUEzteZm/Zh2nyvRi187xR8p7O1Jw6L4MnXPmAAcaUoKYdWeon
-         wqc+Y2uoxwer/3Tz9lggC1ZlysGwK95QvMuoiivE2DAsFn2pi1xxxUwSM0vGJK5rDBju
-         8WC70xZ55kghIOAtow2+lZTEfjXAOsmx8gQKnVWP/5oC90DidSp+Q0EvGFKo+rywjaug
-         IUhePInCsl6y3RW/NaOtd8zhxXUa7a92sNblk7xAz3ZNtCT0VSLm71t70Y04GDy2NkLE
-         HOsPxq4tbV+jJiotbTacZBsLkbm2KLs4jYPHl1OqlF9SkpMeg0KUDtU9PI8LW4G+lItT
-         lzSg==
-X-Gm-Message-State: ACgBeo18e9xXS7tntJD9Q2lHDBjx/i0XWhenClZKZO1zd1hBla4k2uKr
-        mEDpDWOREDxjd5U13WxFZzyoXOdLutcTDEE9/YI3InfffVpyhFzVQJG200ZGaJgGsX4xPCcdvw8
-        q7UTVd4bArxQIIh5eyg62kEv9Bln7KkgbefBu6w==
-X-Received: by 2002:a05:6214:2581:b0:499:91e:2fb with SMTP id fq1-20020a056214258100b00499091e02fbmr28150551qvb.59.1662311642220;
-        Sun, 04 Sep 2022 10:14:02 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR4pXThVtobppU9X9eUJSxuuVCk6Tq7msI8oDx/JMtg93cLJvjqWexYSW3wu3FA0iGltSaZsb16aIKNwuBwDRaU=
-X-Received: by 2002:a05:6214:2581:b0:499:91e:2fb with SMTP id
- fq1-20020a056214258100b00499091e02fbmr28150537qvb.59.1662311642022; Sun, 04
- Sep 2022 10:14:02 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220826144049.256134-1-miquel.raynal@bootlin.com> <20220826144049.256134-2-miquel.raynal@bootlin.com>
-In-Reply-To: <20220826144049.256134-2-miquel.raynal@bootlin.com>
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=8+rUSd3kEdkocyYSn/+36CDpFjRIfG9CincEv+GxCFE=;
+        b=ONyJmYcy3SxgFyuMCSdSo6tbCIogU+narIDjLKwgBpl+u1QScVynljijnOYWGQS2aRlQ4r
+        5kF4rh4H8G5u3833sjReRgGa3hMmy1upbOeQOXRT8bPQElRaIfARQxgokRlLFCjb0EnaVe
+        K1wOmdNNCMUJd2T/VyCZuc5XW3RRy7s=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-607-18lEEF8BNsa7zB9hnVm9VQ-1; Sun, 04 Sep 2022 20:49:46 -0400
+X-MC-Unique: 18lEEF8BNsa7zB9hnVm9VQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4CCB63C16183;
+        Mon,  5 Sep 2022 00:49:46 +0000 (UTC)
+Received: from fs-i40c-03.fs.lab.eng.bos.redhat.com (fs-i40c-03.fs.lab.eng.bos.redhat.com [10.16.224.23])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 352251121314;
+        Mon,  5 Sep 2022 00:49:45 +0000 (UTC)
 From:   Alexander Aring <aahringo@redhat.com>
-Date:   Sun, 4 Sep 2022 13:13:51 -0400
-Message-ID: <CAK-6q+izdwhN=3VcB=oYJjMvkWh4YPWHPcJwmAktXe9FCQ1pAQ@mail.gmail.com>
-Subject: Re: [PATCH wpan-next v2 01/11] net: mac802154: Introduce filtering levels
-To:     Miquel Raynal <miquel.raynal@bootlin.com>
-Cc:     Alexander Aring <alex.aring@gmail.com>,
-        Stefan Schmidt <stefan@datenfreihafen.org>,
-        linux-wpan - ML <linux-wpan@vger.kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Eric Dumazet <edumazet@google.com>,
-        Network Development <netdev@vger.kernel.org>,
-        David Girault <david.girault@qorvo.com>,
-        Romuald Despres <romuald.despres@qorvo.com>,
-        Frederic Blain <frederic.blain@qorvo.com>,
-        Nicolas Schodet <nico@ni.fr.eu.org>,
-        Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Content-Type: text/plain; charset="UTF-8"
+To:     stefan@datenfreihafen.org
+Cc:     linux-wpan@vger.kernel.org
+Subject: [RFC ben-wpan] fw: add trac reg to tx done
+Date:   Sun,  4 Sep 2022 20:49:44 -0400
+Message-Id: <20220905004944.967757-1-aahringo@redhat.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.78 on 10.11.54.3
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi,
+This patch adds an additional byte for tx done for the trac status
+register which can then evaluated by the atusb Linux driver.
+---
 
-On Fri, Aug 26, 2022 at 10:41 AM Miquel Raynal
-<miquel.raynal@bootlin.com> wrote:
->
-> The 802154 specification details several filtering levels in which the
-> PHY and the MAC could be. The amount of filtering will vary if they are
-> in promiscuous mode or in scanning mode. Otherwise they are expected to
-> do some very basic checks, such as enforcing the frame validity. Either
-> the PHY is able to do so, and the MAC has nothing to do, or the PHY has
-> a lower filtering level than expected and the MAC should take over.
->
-> For now we define these levels in an enumeration, we add a per-PHY
-> parameter showing the PHY filtering level and we set it to a default
-> value. The drivers, if they cannot reach this level of filtering, should
-> overwrite this value so that it reflects what they do. Then, in the
-> core, this filtering level will be used to decide whether some
-> additional software processing is needed or not.
->
-> Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
-> ---
->  include/net/cfg802154.h |  3 +++
->  include/net/mac802154.h | 24 ++++++++++++++++++++++++
->  net/mac802154/iface.c   |  2 ++
->  3 files changed, 29 insertions(+)
->
-> diff --git a/include/net/cfg802154.h b/include/net/cfg802154.h
-> index 04b996895fc1..2f29e95da47a 100644
-> --- a/include/net/cfg802154.h
-> +++ b/include/net/cfg802154.h
-> @@ -223,6 +223,9 @@ struct wpan_phy {
->         atomic_t hold_txs;
->         wait_queue_head_t sync_txq;
->
-> +       /* Current filtering level on reception */
-> +       unsigned long filtering;
-> +
+Just an RFC, need another weekend to test it.
 
-enum ieee802154_filtering_level?
+ atusb/fw/mac.c | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
 
->         char priv[] __aligned(NETDEV_ALIGN);
->  };
->
-> diff --git a/include/net/mac802154.h b/include/net/mac802154.h
-> index 357d25ef627a..41c28118790c 100644
-> --- a/include/net/mac802154.h
-> +++ b/include/net/mac802154.h
-> @@ -130,6 +130,30 @@ enum ieee802154_hw_flags {
->  #define IEEE802154_HW_OMIT_CKSUM       (IEEE802154_HW_TX_OMIT_CKSUM | \
->                                          IEEE802154_HW_RX_OMIT_CKSUM)
->
-> +/**
-> + * enum ieee802154_filtering_level - Filtering levels applicable to a PHY
-> + *
-> + * @IEEE802154_FILTERING_NONE: No filtering at all, what is received is
-> + *     forwarded to the softMAC
-> + * @IEEE802154_FILTERING_1_FCS: First filtering level, frames with an invalid
-> + *     FCS should be dropped
-> + * @IEEE802154_FILTERING_2_PROMISCUOUS: Second filtering level, promiscuous
-> + *     mode, identical in terms of filtering to the first level at the PHY
-> + *     level, but no ACK should be transmitted automatically and at the MAC
-> + *     level the frame should be forwarded to the upper layer directly
-
-You have no ACK back in all filtering levels except in
-IEEE802154_FILTERING_4_FRAME_FIELDS. It is some kind of mixed thing
-between "receive mode and filtering mode" but I am fine with it.
-
-> + * @IEEE802154_FILTERING_3_SCAN: Third filtering level, enforced during scans,
-> + *     which only forwards beacons
-> + * @IEEE802154_FILTERING_4_FRAME_FIELDS: Fourth filtering level actually
-> + *     enforcing the validity of the content of the frame with various checks
-> + */
-> +enum ieee802154_filtering_level {
-> +       IEEE802154_FILTERING_NONE,
-> +       IEEE802154_FILTERING_1_FCS,
-> +       IEEE802154_FILTERING_2_PROMISCUOUS,
-> +       IEEE802154_FILTERING_3_SCAN,
-> +       IEEE802154_FILTERING_4_FRAME_FIELDS,
-> +};
-> +
->  /* struct ieee802154_ops - callbacks from mac802154 to the driver
->   *
->   * This structure contains various callbacks that the driver may
-> diff --git a/net/mac802154/iface.c b/net/mac802154/iface.c
-> index 500ed1b81250..4bab2807acbe 100644
-> --- a/net/mac802154/iface.c
-> +++ b/net/mac802154/iface.c
-> @@ -587,6 +587,7 @@ ieee802154_setup_sdata(struct ieee802154_sub_if_data *sdata,
->                 sdata->dev->netdev_ops = &mac802154_wpan_ops;
->                 sdata->dev->ml_priv = &mac802154_mlme_wpan;
->                 wpan_dev->promiscuous_mode = false;
-> +               wpan_dev->wpan_phy->filtering = IEEE802154_FILTERING_4_FRAME_FIELDS;
->                 wpan_dev->header_ops = &ieee802154_header_ops;
->
->                 mutex_init(&sdata->sec_mtx);
-> @@ -601,6 +602,7 @@ ieee802154_setup_sdata(struct ieee802154_sub_if_data *sdata,
->                 sdata->dev->needs_free_netdev = true;
->                 sdata->dev->netdev_ops = &mac802154_monitor_ops;
->                 wpan_dev->promiscuous_mode = true;
-> +               wpan_dev->wpan_phy->filtering = IEEE802154_FILTERING_2_PROMISCUOUS;
-
-In my opinion this is currently IEEE802154_FILTERING_NONE ?
-
-- Alex
+diff --git a/atusb/fw/mac.c b/atusb/fw/mac.c
+index 835002c..045d5fa 100644
+--- a/atusb/fw/mac.c
++++ b/atusb/fw/mac.c
+@@ -32,7 +32,7 @@ static uint8_t tx_buf[MAX_PSDU];
+ static uint8_t tx_size = 0;
+ static bool txing = 0;
+ static bool queued_tx_ack = 0;
+-static uint8_t next_seq, this_seq, queued_seq;
++static uint8_t next_seq, this_seq, queued_seq, queued_tx_trac;
+ 
+ 
+ /* ----- Receive buffer management ----------------------------------------- */
+@@ -57,6 +57,7 @@ static void tx_ack_done(void *user);
+ static void usb_next(void)
+ {
+ 	const uint8_t *buf;
++	uint8_t data[2];
+ 
+ 	if (rx_in != rx_out) {
+ 		buf = rx_buf[rx_out];
+@@ -65,7 +66,9 @@ static void usb_next(void)
+ 	}
+ 
+ 	if (queued_tx_ack) {
+-		usb_send(&eps[1], &queued_seq, 1, tx_ack_done, NULL);
++		data[0] = queued_seq;
++		data[1] = queued_tx_trac;
++		usb_send(&eps[1], data, sizeof(data), tx_ack_done, NULL);
+ 		queued_tx_ack = 0;	
+ 	}
+ }
+@@ -116,7 +119,7 @@ static void receive_frame(void)
+ 
+ static bool handle_irq(void)
+ {
+-	uint8_t irq;
++	uint8_t irq, data[2];
+ 
+ 	irq = reg_read(REG_IRQ_STATUS);
+ 	if (!(irq & IRQ_TRX_END))
+@@ -124,10 +127,13 @@ static bool handle_irq(void)
+ 
+ 	if (txing) {
+ 		if (eps[1].state == EP_IDLE) {
+-			usb_send(&eps[1], &this_seq, 1, tx_ack_done, NULL);
++			data[0] = this_seq;
++			data[1] = reg_read(REG_TRX_STATE);
++			usb_send(&eps[1], data, sizeof(data), tx_ack_done, NULL);
+ 		} else {
+ 			queued_tx_ack = 1;
+ 			queued_seq = this_seq;
++			queued_tx_trac = reg_read(REG_TRX_STATE);
+ 		}
+ 		txing = 0;
+ 		return 1;
+-- 
+2.31.1
 
