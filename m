@@ -2,33 +2,33 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A395C6FA89
-	for <linux-wpan@archiver.kernel.org>; Mon,  5 Sep 2022 20:34:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 654BAC6FA8C
+	for <linux-wpan@archiver.kernel.org>; Mon,  5 Sep 2022 20:34:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232416AbiIEUei (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 5 Sep 2022 16:34:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35836 "EHLO
+        id S232299AbiIEUek (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 5 Sep 2022 16:34:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35918 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232224AbiIEUe2 (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 5 Sep 2022 16:34:28 -0400
+        with ESMTP id S232312AbiIEUeh (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 5 Sep 2022 16:34:37 -0400
 Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::229])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49C85AE50;
-        Mon,  5 Sep 2022 13:34:26 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5B2E11C14;
+        Mon,  5 Sep 2022 13:34:31 -0700 (PDT)
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id 5A978FF80C;
-        Mon,  5 Sep 2022 20:34:23 +0000 (UTC)
+        by mail.gandi.net (Postfix) with ESMTPSA id 716D4FF810;
+        Mon,  5 Sep 2022 20:34:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1662410064;
+        t=1662410069;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=qOwEBqWSFv6kqHl05QgPEGEPciYgTjI5729Ojch0GuU=;
-        b=QB6eeuRDk0sSZfz7s8136xKWV7pJvOIif/bw71LWA1nJaqPx3GWttL+Zhmp1LJ3FbPWJwq
-        1KsxtYa18fuS6ZMqIpmYIJimjs6dv4lSky4hKBO2yf+4EYIf0rhPZ8Pb0lXia2ORxXo5jT
-        89+sTSgL1PFVQG5yOt59j5kDD2dXohpHrIjOiD37z03k2O3tBwHcoVk5XOxr/VPOcpVDgE
-        c3thoffn2j8YR1xcCjgEJsocnnNYcXr2UH5ZfjwWbh4A9lPqfO0sml2gVL+IYb/y0UGt7L
-        YzpREsMxli5tvqoUl1SHi343dPfQcqDN29z8axMx/uwnZmSQsnkY/hlIbKziVA==
+        bh=Slc468LkgD295RmgjsCMDnQxSjqHHsk9OAskcoT/osI=;
+        b=mEQCKY4LgagvNOTC2/zUD/oEjt0zguGgI7g78AGr6ycg3BBcnQln/keuViDD9VTDyvZ24P
+        NQwvPK13YthEabDCDH07BzraCQpnGPX3opBnnAqUwFdc9DiM0Qq5DSNOj4qf/DajsTos96
+        wT24Jh23TyxYRHnlAXXOXCbxL0WnBuPTjS/lXSDUyFCM6/dn16Wcty3vb7V+hsr6Zq4Y4v
+        z2MNKa2qbe1Zu80TNSSeLPXjDFlspmCWTrqNL01us3TwFWqrfbQqN9GP4JGiGFc+uGTG70
+        h+Y0HCBPcFXC4mNn93/EssTBEKaxycnNrxsYmxhX74I3O1+v62oYp9Mnio0OHQ==
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
 To:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
@@ -43,9 +43,9 @@ Cc:     "David S. Miller" <davem@davemloft.net>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
         Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: [PATCH wpan/next v3 4/9] net: mac802154: Don't limit the FILTER_NONE level to monitors
-Date:   Mon,  5 Sep 2022 22:34:07 +0200
-Message-Id: <20220905203412.1322947-5-miquel.raynal@bootlin.com>
+Subject: [PATCH wpan/next v3 7/9] net: mac802154: Ensure proper scan-level filtering
+Date:   Mon,  5 Sep 2022 22:34:10 +0200
+Message-Id: <20220905203412.1322947-8-miquel.raynal@bootlin.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20220905203412.1322947-1-miquel.raynal@bootlin.com>
 References: <20220905203412.1322947-1-miquel.raynal@bootlin.com>
@@ -56,50 +56,44 @@ Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Historically, only monitors were using promiscuous mode and this
-promiscuous mode was not the one from the spec but actually implied no
-filtering at all (sniffers). Now that we have a more fine grained
-approach, we can ensure all interfaces which would be expecting no
-filter at all could get it without being a monitor interface.
-
-Having this in place will allow us to clarify the additional software
-checks compared to the hardware capabilities.
+We now have a fine grained filtering information so let's ensure proper
+filtering in scan mode, which means that only beacons are processed.
 
 Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
 ---
- net/mac802154/rx.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ net/mac802154/rx.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
 diff --git a/net/mac802154/rx.c b/net/mac802154/rx.c
-index 369ffd800abf..26df79911f3e 100644
+index 8a8c5a4a2f28..c43289c0fdd7 100644
 --- a/net/mac802154/rx.c
 +++ b/net/mac802154/rx.c
-@@ -205,10 +205,10 @@ __ieee802154_rx_handle_packet(struct ieee802154_local *local,
- 	}
+@@ -34,6 +34,7 @@ ieee802154_subif_frame(struct ieee802154_sub_if_data *sdata,
+ 		       struct sk_buff *skb, const struct ieee802154_hdr *hdr)
+ {
+ 	struct wpan_dev *wpan_dev = &sdata->wpan_dev;
++	struct wpan_phy *wpan_phy = sdata->local->hw.phy;
+ 	__le16 span, sshort;
+ 	int rc;
  
- 	list_for_each_entry_rcu(sdata, &local->interfaces, list) {
--		if (sdata->wpan_dev.iftype != NL802154_IFTYPE_NODE)
-+		if (!ieee802154_sdata_running(sdata))
- 			continue;
+@@ -42,6 +43,17 @@ ieee802154_subif_frame(struct ieee802154_sub_if_data *sdata,
+ 	span = wpan_dev->pan_id;
+ 	sshort = wpan_dev->short_addr;
  
--		if (!ieee802154_sdata_running(sdata))
-+		if (sdata->required_filtering == IEEE802154_FILTERING_NONE)
- 			continue;
- 
- 		ieee802154_subif_frame(sdata, skb, &hdr);
-@@ -231,10 +231,10 @@ ieee802154_monitors_rx(struct ieee802154_local *local, struct sk_buff *skb)
- 	skb->protocol = htons(ETH_P_IEEE802154);
- 
- 	list_for_each_entry_rcu(sdata, &local->interfaces, list) {
--		if (sdata->wpan_dev.iftype != NL802154_IFTYPE_MONITOR)
-+		if (!ieee802154_sdata_running(sdata))
- 			continue;
- 
--		if (!ieee802154_sdata_running(sdata))
-+		if (sdata->required_filtering > IEEE802154_FILTERING_NONE)
- 			continue;
- 
- 		skb2 = skb_clone(skb, GFP_ATOMIC);
++	/* Level 3 filtering: Only beacons are accepted during scans */
++	if (sdata->required_filtering == IEEE802154_FILTERING_3_SCAN &&
++	    sdata->required_filtering > wpan_phy->filtering) {
++		if (mac_cb(skb)->type != IEEE802154_FC_TYPE_BEACON) {
++			dev_dbg(&sdata->dev->dev,
++				"drop !beacon frame (0x%x) during scan\n",
++				mac_cb(skb)->type);
++			goto fail;
++		}
++	}
++
+ 	switch (mac_cb(skb)->dest.mode) {
+ 	case IEEE802154_ADDR_NONE:
+ 		if (hdr->source.mode != IEEE802154_ADDR_NONE)
 -- 
 2.34.1
 
