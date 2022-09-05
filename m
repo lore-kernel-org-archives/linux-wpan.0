@@ -2,64 +2,75 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01367ECAAD5
-	for <linux-wpan@archiver.kernel.org>; Mon,  5 Sep 2022 01:11:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4279DC6FA82
+	for <linux-wpan@archiver.kernel.org>; Mon,  5 Sep 2022 01:34:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234810AbiIEBLL (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Sun, 4 Sep 2022 21:11:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49416 "EHLO
+        id S231540AbiIEBer (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Sun, 4 Sep 2022 21:34:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45154 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234742AbiIEBLJ (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Sun, 4 Sep 2022 21:11:09 -0400
+        with ESMTP id S235317AbiIEBer (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Sun, 4 Sep 2022 21:34:47 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB01C2716E
-        for <linux-wpan@vger.kernel.org>; Sun,  4 Sep 2022 18:11:08 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDE3F10562
+        for <linux-wpan@vger.kernel.org>; Sun,  4 Sep 2022 18:34:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1662340267;
+        s=mimecast20190719; t=1662341685;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=JrO09u2qKQjYI/XRl8sc5wIYxptIQ3bjIu488Hie+Tc=;
-        b=H96FKEqfPYl3KNuNwHP4DCdu96ifxF9P+YmdssWjTpPlQaYtQRSMoERdySpeaJlwX6v1ux
-        d9G9hG4/5GdHpFAM9IwI77OrY/55foexkunjLNwCINdL/bB9M5eUGsdNFz3kC7owiefyVf
-        Rz0P7Uk95EiK3gRTv9uXfGunJ/w9ZiA=
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
- [209.85.160.198]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=ETFgaft46ODpaKViq/0Cxuj5XpxgnYE+9qnLqCaNLLY=;
+        b=CuVV+fF5VEuRxnntI7qLkS40E27UGGe0F2h9IzoE0q2v+TFaR4vAGxtw+cWPYmIz0G1Agk
+        NkV8Hqetqn93NOYqxYL5fv97cmMrHiXjYabZgk7GJd466bPr2+y5G3rfl7yrGmBN6v/ZTk
+        gCj0ArJyCQ42FQ3lNlYmn7MYcmFqOHE=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-596-CxpAarTYPdiVvB3plSrtOQ-1; Sun, 04 Sep 2022 21:11:06 -0400
-X-MC-Unique: CxpAarTYPdiVvB3plSrtOQ-1
-Received: by mail-qt1-f198.google.com with SMTP id v5-20020ac873c5000000b003434ef0a8c7so5956591qtp.21
-        for <linux-wpan@vger.kernel.org>; Sun, 04 Sep 2022 18:11:06 -0700 (PDT)
+ us-mta-70-Z4u6XjymOtSxBTn6Db3H2w-1; Sun, 04 Sep 2022 21:34:43 -0400
+X-MC-Unique: Z4u6XjymOtSxBTn6Db3H2w-1
+Received: by mail-qk1-f197.google.com with SMTP id f1-20020a05620a280100b006bc4966f463so5984839qkp.4
+        for <linux-wpan@vger.kernel.org>; Sun, 04 Sep 2022 18:34:43 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=JrO09u2qKQjYI/XRl8sc5wIYxptIQ3bjIu488Hie+Tc=;
-        b=jjPYi4IaTvIIDIDiDHVREXJqD4QtRxxk2rRaGuQiVLg3ELshKxKLh66UkuqkM/SLLx
-         TOuHbv6p38eSBbdkiNfqydSup5mzsasohmjAPlbgSIIVAuMoXlg29iDBCmrxmTX2THst
-         grAFV13q54ThayYJmKKnGHYnUfm+jx+vuz6mfufo7aGc+ttJEEce7jTmLY31KjGZO1wF
-         fY+1UGTR2QuWbXxQrJvXa8HoUhetdU/LAzbsLDalcyAKaF0dHl8loC+KfiHRkuWho7pq
-         suL1YPFsf1zxEjZEX6Ghj5huI0n95bOxKGC5RpPiAZOSVyZYEkpvBO+CjuZsk7ukn/Uc
-         l5KQ==
-X-Gm-Message-State: ACgBeo2Y+I0wWGJDgA4ceKzN/tdaBIDn3/1iNmtkRomRy6Yrh3sr9lGN
-        zkbCef5vsjhsCAU+vAn24DslgeFVcojJbdPU5xPzQDKoROaWx2RlqvZLveJT8FaEr8Lpuv3kjiI
-        CVP23Nyspsx4qXXSjq+5oMfqvRP6vHbX3LKC6Ew==
-X-Received: by 2002:a05:6214:1bce:b0:499:504:7631 with SMTP id m14-20020a0562141bce00b0049905047631mr30091839qvc.92.1662340266328;
-        Sun, 04 Sep 2022 18:11:06 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR6DvVACzKqY33qQ1RV4gcJ0D18hDs9DqWCHwaehelcvNwctA2MC3uPpy/GK3RSEMUF5xdU51wOoJYtjhjgkK/8=
-X-Received: by 2002:a05:6214:1bce:b0:499:504:7631 with SMTP id
- m14-20020a0562141bce00b0049905047631mr30091834qvc.92.1662340266165; Sun, 04
- Sep 2022 18:11:06 -0700 (PDT)
+        bh=ETFgaft46ODpaKViq/0Cxuj5XpxgnYE+9qnLqCaNLLY=;
+        b=lsjmR39JIk2f053FgouOaQR6P3Z/24qO9Qnanyyh6Ks36+z1Z0enF4RpBx/NOks/lN
+         kBHvga+4uKa2aodk/yYjNTCAaXp4MJnFg8j3ccINo+iTch8d8DGr1HY47gbvd02bz4jg
+         6bgjx3fqu8aPCtYZbtoeARYToc294KQh4cos096Sqx6s4PWBpzsjVRvtZdwV99RiJHVP
+         Vh3GEZNTFr72jhKqGE9t9Ofm3sY7ALb5ptjus3BP+6jreaOGUl6AFsGWCAePCnMReuxc
+         gR+9u3SPnFyLvHKEjQBl9MVzx46W82QqXM9Zyv02uT+mk2HUE+/5QuUoNrOo2Qt3vszC
+         l15Q==
+X-Gm-Message-State: ACgBeo3yCIVwR77f2/SDMBAZMn227XHU1mvVlpH9rJGHb15FFqzcxuQh
+        G6Ba4KBCbOVmYzKKnho5wbxss3/2ztFzJi/5DIs/Jj6weC8ajtUWhXoYb4TtpRXbV+xk6N+mGX+
+        Ac0ocI+uKqz0bS3iJ7hu/LAGsUpvLhyqvwbB3Xg==
+X-Received: by 2002:a05:622a:4:b0:344:94b7:a396 with SMTP id x4-20020a05622a000400b0034494b7a396mr36797033qtw.123.1662341683567;
+        Sun, 04 Sep 2022 18:34:43 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR6MUrEFU3sxIKdHpQVkbH9ejXtBcvFdTFMTJ4qnE+HjMKJQ/9L4EzX5KkOYGVD0uBZpJV1TVHP/jEDuCjcWr6U=
+X-Received: by 2002:a05:622a:4:b0:344:94b7:a396 with SMTP id
+ x4-20020a05622a000400b0034494b7a396mr36797022qtw.123.1662341683373; Sun, 04
+ Sep 2022 18:34:43 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220905010810.1010911-1-aahringo@redhat.com> <20220905010810.1010911-2-aahringo@redhat.com>
-In-Reply-To: <20220905010810.1010911-2-aahringo@redhat.com>
+References: <20220826144049.256134-1-miquel.raynal@bootlin.com> <20220826144049.256134-3-miquel.raynal@bootlin.com>
+In-Reply-To: <20220826144049.256134-3-miquel.raynal@bootlin.com>
 From:   Alexander Aring <aahringo@redhat.com>
-Date:   Sun, 4 Sep 2022 21:10:55 -0400
-Message-ID: <CAK-6q+j8aQAPrj2HVUD2SmYijpt=bH=rheqqU0toZGNaPyj2YA@mail.gmail.com>
-Subject: Re: [RFC wpan-next 2/2] net: mac802154: set filter at drv_start()
+Date:   Sun, 4 Sep 2022 21:34:32 -0400
+Message-ID: <CAK-6q+gYTPOiGO5kmqdPUOySwtrL_vaWLav7ehbOWihvKhYevA@mail.gmail.com>
+Subject: Re: [PATCH wpan-next v2 02/11] net: mac802154: Drop IEEE802154_HW_RX_DROP_BAD_CKSUM
 To:     Miquel Raynal <miquel.raynal@bootlin.com>
-Cc:     linux-wpan - ML <linux-wpan@vger.kernel.org>,
-        Stefan Schmidt <stefan@datenfreihafen.org>
+Cc:     Alexander Aring <alex.aring@gmail.com>,
+        Stefan Schmidt <stefan@datenfreihafen.org>,
+        linux-wpan - ML <linux-wpan@vger.kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Eric Dumazet <edumazet@google.com>,
+        Network Development <netdev@vger.kernel.org>,
+        David Girault <david.girault@qorvo.com>,
+        Romuald Despres <romuald.despres@qorvo.com>,
+        Frederic Blain <frederic.blain@qorvo.com>,
+        Nicolas Schodet <nico@ni.fr.eu.org>,
+        Thomas Petazzoni <thomas.petazzoni@bootlin.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
@@ -67,41 +78,62 @@ X-Mailing-List: linux-wpan@vger.kernel.org
 
 Hi,
 
-On Sun, Sep 4, 2022 at 9:09 PM Alexander Aring <aahringo@redhat.com> wrote:
+On Fri, Aug 26, 2022 at 10:41 AM Miquel Raynal
+<miquel.raynal@bootlin.com> wrote:
 >
-> The current filtering level is set on the first interface up on a wpan
-> phy. If we support scan functionality we need to change the filtering
-> level on the fly on an operational phy and switching back again.
+> This IEEE802154_HW_RX_DROP_BAD_CKSUM flag was only used by hwsim to
+> reflect the fact that it would not validate the checksum (FCS). In other
+> words, the filtering level of hwsim is always "NONE" while the core
+> expects it to be higher.
 >
-> This patch will move the receive mode parameter e.g. address filter and
-> promiscuous mode to the drv_start() functionality to allow changing the
-> receive mode on an operational phy not on first ifup only. In future this
-> should be handled on driver layer because each hardware has it's own way
-> to enter a specific filtering level. However this should offer to switch
-> to mode IEEE802154_FILTERING_NONE and back to
-> IEEE802154_FILTERING_4_FRAME_FIELDS.
+> Now that we have access to real filtering levels, we can actually use
+> them and always enforce the "NONE" level in hwsim. Handling this case
+> correctly in the receive path permits to drop the above mentioned flag.
 >
-> Only IEEE802154_FILTERING_4_FRAME_FIELDS and IEEE802154_FILTERING_NONE
-> are somewhat supported by current hardware. All other filtering levels
-> can be supported in future but will end in IEEE802154_FILTERING_NONE as
-> the receive part can kind of "emulate" those receive paths by doing
-> additional filtering routines.
->
-> Signed-off-by: Alexander Aring <aahringo@redhat.com>
+> Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
 > ---
+>  drivers/net/ieee802154/mac802154_hwsim.c | 10 +++++++++-
+>  include/net/mac802154.h                  |  4 ----
+>  net/mac802154/rx.c                       |  6 ++----
+>  3 files changed, 11 insertions(+), 9 deletions(-)
 >
-> RFC as code snippet as requested to somehow deal with the current
-> driver-ops and switching between filters with address filtering (AACK on)
-> and non-address filtering (AACK off) which is necessary for scanning in
-> this case it will be NONE because that's what we currently support and I
-> hope it can useful for scanning receive mode.
+> diff --git a/drivers/net/ieee802154/mac802154_hwsim.c b/drivers/net/ieee802154/mac802154_hwsim.c
+> index 38c217bd7c82..d7e4048e8743 100644
+> --- a/drivers/net/ieee802154/mac802154_hwsim.c
+> +++ b/drivers/net/ieee802154/mac802154_hwsim.c
+> @@ -148,6 +148,8 @@ static int hwsim_hw_start(struct ieee802154_hw *hw)
+>         struct hwsim_phy *phy = hw->priv;
 >
+>         phy->suspended = false;
+> +       hw->phy->filtering = IEEE802154_FILTERING_NONE;
+> +
+>         return 0;
+>  }
+>
+> @@ -161,6 +163,9 @@ static void hwsim_hw_stop(struct ieee802154_hw *hw)
+>  static int
+>  hwsim_set_promiscuous_mode(struct ieee802154_hw *hw, const bool on)
+>  {
+> +       /* hwsim does not filter anything, so enforce the NONE level */
+> +       hw->phy->filtering = IEEE802154_FILTERING_NONE;
+> +
+>         return 0;
+>  }
+>
+> @@ -791,7 +796,10 @@ static int hwsim_add_one(struct genl_info *info, struct device *dev,
+>         phy->idx = idx;
+>         INIT_LIST_HEAD(&phy->edges);
+>
+> -       hw->flags = IEEE802154_HW_PROMISCUOUS | IEEE802154_HW_RX_DROP_BAD_CKSUM;
+> +       /* This is a lie, hwsim does not even filter bad FCS, but we need to
+> +        * advertize a PROMISCUOUS to be able to create COORD interfaces.
+> +        */
 
-based on wpan-next/master with:
+I think this is now different because PROMISCUOUS/any disable address
+filtering will disable AACK and this is not what we want, or? This
+comment was made with the assumption to deal with acks which we can't?
 
-[PATCH wpan-next v2 01/11] net: mac802154: Introduce filtering levels
-
-applied.
+I did not look further into this patch series yet.
 
 - Alex
 
