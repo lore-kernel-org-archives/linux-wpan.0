@@ -2,87 +2,65 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BEB2ECAAD3
-	for <linux-wpan@archiver.kernel.org>; Mon,  5 Sep 2022 22:35:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E818AC6FA8C
+	for <linux-wpan@archiver.kernel.org>; Mon,  5 Sep 2022 23:10:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232288AbiIEWfV (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 5 Sep 2022 18:35:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58942 "EHLO
+        id S232642AbiIEXKa (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 5 Sep 2022 19:10:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39736 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232284AbiIEWfU (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 5 Sep 2022 18:35:20 -0400
+        with ESMTP id S232667AbiIEXKW (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 5 Sep 2022 19:10:22 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD41B1EC76
-        for <linux-wpan@vger.kernel.org>; Mon,  5 Sep 2022 15:35:18 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84A2D24957
+        for <linux-wpan@vger.kernel.org>; Mon,  5 Sep 2022 16:10:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1662417317;
+        s=mimecast20190719; t=1662419416;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=C2/Mydp8vjCANndV/tTiRuz68eLKVMoiyb7tyhGhFWw=;
-        b=P+stzy0aAA9Lbi0gCOyln+KxV8QyDzA0WvbC1b2yE6fYxm54UjdGe+uq610AbWQogPAMwj
-        vV6OEWImCioXAD/ltCbaQB4CwSqdp8aYNVPrj9baFxyb+z8qDe52VK2P5c1kl9SCz2t0jt
-        i6d88I8x8qgfPGZWKUmJnUDgjbKiu48=
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
- [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=0npZnIK/J+p4/lIu59x+wBjjcEQWf7CJFTbKkIKyWXQ=;
+        b=c2J+bkWUlpf2jnloyHEI47BWzJ0/w4W98UpJYsTifV8qPIKwI8jL70R+GF1MDIZOScp2eS
+        5fctYxqa2Rq6QGpXJFUH/ruJa7wr3c0hKmA8q3OXWk5y3NfV4CVCjmxjW/jNU/ZfW2JsbV
+        emUCDnvUmgol8ZhaztaS8IMd+emrc7c=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-316-UDw2HVrDMOWsv8wJAFRi3A-1; Mon, 05 Sep 2022 18:35:16 -0400
-X-MC-Unique: UDw2HVrDMOWsv8wJAFRi3A-1
-Received: by mail-qt1-f199.google.com with SMTP id fy12-20020a05622a5a0c00b00344569022f7so7647882qtb.17
-        for <linux-wpan@vger.kernel.org>; Mon, 05 Sep 2022 15:35:16 -0700 (PDT)
+ us-mta-472-FasKDZGfMmOhrtQt7oKjvw-1; Mon, 05 Sep 2022 19:10:15 -0400
+X-MC-Unique: FasKDZGfMmOhrtQt7oKjvw-1
+Received: by mail-qv1-f69.google.com with SMTP id k10-20020ad4450a000000b004aa116eebe8so1172184qvu.5
+        for <linux-wpan@vger.kernel.org>; Mon, 05 Sep 2022 16:10:15 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=C2/Mydp8vjCANndV/tTiRuz68eLKVMoiyb7tyhGhFWw=;
-        b=gI8E9hfZ7vqFX+Zle6wMZZeqDatXA57tohlCSoc4DdJiERhjcQLO+EPHMWR2GM74DL
-         cRhvctrbb6eZpdZ/23GM2MQoDAiQEipGjwdwvA7L992llBdb4WfSkvtWD4L8LUJyrzDP
-         eBRDL7aiwd0ujV5bOr9zw9W93TbeNsAuU3uLmiFZWcKg4WIMKfuVJ/m3OsVvmBcQXhRn
-         shOeIHj1qPHiEsZwTd1ZS3b1rf1QmK7U0dCmo93nkRB/F9ExqXs4WcxFkj/UsjfS6Ma7
-         nyv7VRvkOjzSj6/M4dZgsgqU0g9jivqq8/TQoJQ/4Tn4BcZaAay3SgqEbhQc/EXj66bC
-         eE5A==
-X-Gm-Message-State: ACgBeo2ZeyrxamB6zLDnTrYlZQKkxBPq0AQuDl8vnT4g4IaANLHuUg94
-        hnMxB6XKjnmp7xh9nmoeKVgvo9thebVk5BKx2Kv0zovs+KNB1Dvqn/qVS7HrP0S/OwbPwMv1/aZ
-        00BXX54vKmgUWfPL7mNU6DJmEBhxy+PLIEDa3Rw==
-X-Received: by 2002:a05:620a:44cb:b0:6c9:c460:8838 with SMTP id y11-20020a05620a44cb00b006c9c4608838mr1080qkp.770.1662417315758;
-        Mon, 05 Sep 2022 15:35:15 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR4R3rST4GNyXnVICYcos5fM5YQx+lIc5De3VVYdshhff7fETZK+3CoD4oazZWFUJqNGaYUFsVaMBD7r9+VDZqA=
-X-Received: by 2002:a05:620a:44cb:b0:6c9:c460:8838 with SMTP id
- y11-20020a05620a44cb00b006c9c4608838mr1051qkp.770.1662417315363; Mon, 05 Sep
- 2022 15:35:15 -0700 (PDT)
+        bh=0npZnIK/J+p4/lIu59x+wBjjcEQWf7CJFTbKkIKyWXQ=;
+        b=lt2lnAelZKKg7UTbhoPZacUDfHjiwm/BFk9iC/v8yuStSaTkzJPYCuf6Cnazac+dU8
+         xWMV7hj91ILFBXJhSQZTmrTnKpXkKhBuSc1PQR3ph/UpMBosvr7O+CmagslpU+6SQ+Nc
+         LIAnoS9waewmpI0MQF4B721LVeEmbjKtD8D1XOQ58aG9cJ/Hg2ZXrqKPte1picIiysMZ
+         nSZZJWglWjSaB6A/vsC02chmErNqCjSLzYUauJLIFEPNXwSVQWw/nwc8xJ6A7TDiDQSh
+         VAdgZ/7q1tiQYlTWrwTKxzkhpGQYF6U0nUU1KU8kI7rczRpNGzWKiiqlvFCH8M8eJB1c
+         1qMg==
+X-Gm-Message-State: ACgBeo1vSuQnldy+VCA6zyVt4BgOv6Iscbhxb1OXRgr1hol6cgsYoJhf
+        2j/UWkKdWqOYL9bgUChAeqFpVh6Y/byDWGYpQi+g9/Bc93f3iNPlMeILzxiukiVfMqeXA5wDtHT
+        7iD5p+WaA5mDGUFVQ/pSVLdd308ycMYa/gPHBFQ==
+X-Received: by 2002:a05:6214:23c7:b0:492:2ada:11d7 with SMTP id hr7-20020a05621423c700b004922ada11d7mr41232538qvb.116.1662419415095;
+        Mon, 05 Sep 2022 16:10:15 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR5g1xv4CgOvdwVK4XYdl2TY3HD/YxgSqnzRoMaGqFOer8MdCe4J15y7PqZLBcs4nO7aNtnchY5PcmOcKP+OH7k=
+X-Received: by 2002:a05:6214:23c7:b0:492:2ada:11d7 with SMTP id
+ hr7-20020a05621423c700b004922ada11d7mr41232506qvb.116.1662419414704; Mon, 05
+ Sep 2022 16:10:14 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220701143052.1267509-1-miquel.raynal@bootlin.com>
- <CAK-6q+itA0C4zPAq5XGKXgCHW5znSFeB-YDMp3uB9W-kLV6WaA@mail.gmail.com>
- <20220825145831.1105cb54@xps-13> <CAK-6q+j3LMoSe_7u0WqhowdPV9KM-6g0z-+OmSumJXCZfo0CAw@mail.gmail.com>
- <20220826095408.706438c2@xps-13> <CAK-6q+gxD0TkXzUVTOiR4-DXwJrFUHKgvccOqF5QMGRjfZQwvw@mail.gmail.com>
- <20220829100214.3c6dad63@xps-13> <CAK-6q+gJwm0bhHgMVBF_pmjD9zSrxxHvNGdTrTm0fG-hAmSaUQ@mail.gmail.com>
- <20220831173903.1a980653@xps-13> <20220901020918.2a15a8f9@xps-13>
- <20220901150917.5246c2d0@xps-13> <CAK-6q+g1Gnew=zWsnW=HAcLTqFYHF+P94Q+Ywh7Rir8J8cgCgw@mail.gmail.com>
- <20220903020829.67db0af8@xps-13> <CAK-6q+hO1i=xvXx3wHo658ph93FwuVs_ssjG0=jnphEe8a+gxw@mail.gmail.com>
- <20220903180556.6430194b@xps-13> <CAK-6q+hXrUOzrsucOw3vJMu3UscOMG8X3E74px6bEZoDO4PLjw@mail.gmail.com>
- <CAK-6q+iA80oRi_NJODNkJTJmkVkcvMwO=HxRr-bPT3-u6f7iLA@mail.gmail.com>
- <CAK-6q+jiDcf_M6S+gWh_qms=dMPaSb4daPC7Afs6RZjQdHGinQ@mail.gmail.com> <20220905051608.5354637a@xps-13>
-In-Reply-To: <20220905051608.5354637a@xps-13>
+References: <20220905005544.994036-1-aahringo@redhat.com> <20220905052237.513e1889@xps-13>
+ <CAK-6q+g5VgMtMsgrws9PxbZkdp2Mw0w_8F6LRe7gjMhw67Z+Xg@mail.gmail.com> <20220905161951.6d439994@xps-13>
+In-Reply-To: <20220905161951.6d439994@xps-13>
 From:   Alexander Aring <aahringo@redhat.com>
-Date:   Mon, 5 Sep 2022 18:35:04 -0400
-Message-ID: <CAK-6q+jCWE_M+LXdToHy-kH91hZsD2qGycCU3tsSKqjjt=UjFw@mail.gmail.com>
-Subject: Re: [PATCH wpan-next 01/20] net: mac802154: Allow the creation of
- coordinator interfaces
+Date:   Mon, 5 Sep 2022 19:10:03 -0400
+Message-ID: <CAK-6q+jmuwxEDb9r-jmrZ+gZ5XXUkV1j22D0FBuxMzU5iJyUbw@mail.gmail.com>
+Subject: Re: [RFC wpan-next] atusb: add support for trac feature
 To:     Miquel Raynal <miquel.raynal@bootlin.com>
-Cc:     Alexander Aring <alex.aring@gmail.com>,
-        Stefan Schmidt <stefan@datenfreihafen.org>,
-        linux-wpan - ML <linux-wpan@vger.kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Eric Dumazet <edumazet@google.com>,
-        Network Development <netdev@vger.kernel.org>,
-        David Girault <david.girault@qorvo.com>,
-        Romuald Despres <romuald.despres@qorvo.com>,
-        Frederic Blain <frederic.blain@qorvo.com>,
-        Nicolas Schodet <nico@ni.fr.eu.org>,
-        Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-        werner@almesberger.net
+Cc:     Stefan Schmidt <stefan@datenfreihafen.org>,
+        linux-wpan - ML <linux-wpan@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
@@ -90,138 +68,125 @@ X-Mailing-List: linux-wpan@vger.kernel.org
 
 Hi,
 
-On Sun, Sep 4, 2022 at 11:16 PM Miquel Raynal <miquel.raynal@bootlin.com> wrote:
+On Mon, Sep 5, 2022 at 10:19 AM Miquel Raynal <miquel.raynal@bootlin.com> wrote:
 >
 > Hi Alexander,
 >
-> aahringo@redhat.com wrote on Sat, 3 Sep 2022 15:40:35 -0400:
+> aahringo@redhat.com wrote on Mon, 5 Sep 2022 07:16:42 -0400:
 >
 > > Hi,
 > >
-> > On Sat, Sep 3, 2022 at 3:10 PM Alexander Aring <aahringo@redhat.com> wrote:
+> > On Sun, Sep 4, 2022 at 11:22 PM Miquel Raynal <miquel.raynal@bootlin.com> wrote:
 > > >
-> > > On Sat, Sep 3, 2022 at 3:07 PM Alexander Aring <aahringo@redhat.com> wrote:
+> > > Hi Alexander,
+> > >
+> > > aahringo@redhat.com wrote on Sun,  4 Sep 2022 20:55:44 -0400:
+> > >
+> > > > This patch adds support for reading the trac register if atusb firmware
+> > > > reports tx done. There is currently a feature to compare a sequence
+> > > > number, if the payload is 1 it tells the driver only the sequence number
+> > > > is available if it's two there is additional the trac status register as
+> > > > payload.
 > > > >
-> > > > Hi,
+> > > > Currently the atusb_in_good() function determines if it's a tx done or
+> > > > rx done if according the payload length. This patch is doing the same
+> > > > and assumes this behaviour.
 > > > >
-> > > > On Sat, Sep 3, 2022 at 12:06 PM Miquel Raynal <miquel.raynal@bootlin.com> wrote:
-> > > > ...
-> > > > >
-> > > > > On the Tx side, when sending eg. an association request or an
-> > > > > association response, I must expect and wait for an ack. This is
-> > > > > what I am struggling to do. How can I know that a frame which I just
-> > > > > transmitted has been acked? Bonus points, how can I do that in such a
-> > > > > way that it will work with other devices? (hints below)
-> > > > >
-> > > > > > AACK will send a back if a frame with ack request bit was received.
-> > > > > >
-> > > > > > > say in a commit) I have seen no further updates about it so I guess
-> > > > > > > it's still not available. I don't see any other way to know if a
-> > > > > > > frame's ack has been received or not reliably.
-> > > > > >
-> > > > > > You implemented it for the at86rf230 driver (the spi one which is what
-> > > > > > also atusb uses). You implemented the
-> > > > > >
-> > > > > > ctx->trac = IEEE802154_NO_ACK;
-> > > > > >
-> > > > > > which signals the upper layer that if the ack request bit is set, that
-> > > > > > there was no ack.
-> > > > > >
-> > > > > > But yea, there is a missing feature for atusb yet which requires
-> > > > > > firmware changes as well.
-> > > > >
-> > > > > :'(
+> > > > Signed-off-by: Alexander Aring <aahringo@redhat.com>
+> > > > ---
 > > > >
-> > > > There is a sequence handling in tx done on atusb firmware and I think
-> > > > it should be pretty easy to add a byte for trac status.
+> > > > Just an RFC, need another weekend to test it.
 > > > >
-> > > > diff --git a/atusb/fw/mac.c b/atusb/fw/mac.c
-> > > > index 835002c..156bd95 100644
-> > > > --- a/atusb/fw/mac.c
-> > > > +++ b/atusb/fw/mac.c
-> > > > @@ -116,7 +116,7 @@ static void receive_frame(void)
+> > > >  drivers/net/ieee802154/atusb.c | 33 ++++++++++++++++++++++++++++-----
+> > > >  1 file changed, 28 insertions(+), 5 deletions(-)
 > > > >
-> > > >  static bool handle_irq(void)
+> > > > diff --git a/drivers/net/ieee802154/atusb.c b/drivers/net/ieee802154/atusb.c
+> > > > index 2c338783893d..95a4a3cdc8a4 100644
+> > > > --- a/drivers/net/ieee802154/atusb.c
+> > > > +++ b/drivers/net/ieee802154/atusb.c
+> > > > @@ -191,7 +191,7 @@ static void atusb_work_urbs(struct work_struct *work)
+> > > >
+> > > >  /* ----- Asynchronous USB -------------------------------------------------- */
+> > > >
+> > > > -static void atusb_tx_done(struct atusb *atusb, u8 seq)
+> > > > +static void atusb_tx_done(struct atusb *atusb, u8 seq, int reason)
 > > > >  {
-> > > > -       uint8_t irq;
-> > > > +       uint8_t irq, data[2];
+> > > >       struct usb_device *usb_dev = atusb->usb_dev;
+> > > >       u8 expect = atusb->tx_ack_seq;
+> > > > @@ -199,7 +199,10 @@ static void atusb_tx_done(struct atusb *atusb, u8 seq)
+> > > >       dev_dbg(&usb_dev->dev, "%s (0x%02x/0x%02x)\n", __func__, seq, expect);
+> > > >       if (seq == expect) {
+> > > >               /* TODO check for ifs handling in firmware */
+> > > > -             ieee802154_xmit_complete(atusb->hw, atusb->tx_skb, false);
+> > > > +             if (reason == IEEE802154_SUCCESS)
+> > > > +                     ieee802154_xmit_complete(atusb->hw, atusb->tx_skb, false);
+> > > > +             else
+> > > > +                     ieee802154_xmit_error(atusb->hw, atusb->tx_skb, reason);
+> > > >       } else {
+> > > >               /* TODO I experience this case when atusb has a tx complete
+> > > >                * irq before probing, we should fix the firmware it's an
+> > > > @@ -215,7 +218,8 @@ static void atusb_in_good(struct urb *urb)
+> > > >       struct usb_device *usb_dev = urb->dev;
+> > > >       struct sk_buff *skb = urb->context;
+> > > >       struct atusb *atusb = SKB_ATUSB(skb);
+> > > > -     u8 len, lqi;
+> > > > +     int result = IEEE802154_SUCCESS;
+> > > > +     u8 len, lqi, trac;
 > > > >
-> > > >         irq = reg_read(REG_IRQ_STATUS);
-> > > >         if (!(irq & IRQ_TRX_END))
-> > > > @@ -124,7 +124,15 @@ static bool handle_irq(void)
+> > > >       if (!urb->actual_length) {
+> > > >               dev_dbg(&usb_dev->dev, "atusb_in: zero-sized URB ?\n");
+> > > > @@ -224,8 +228,27 @@ static void atusb_in_good(struct urb *urb)
 > > > >
-> > > >         if (txing) {
-> > > >                 if (eps[1].state == EP_IDLE) {
-> > > > -                       usb_send(&eps[1], &this_seq, 1, tx_ack_done, NULL);
-> > > > +                       data[0] = tx_ack_done;
-> > > > +
-> > > > +                       spi_begin();
-> > > > +                       spi_io(REG_TRX_STATE);
-> > > > +
-> > > > +                       data[1] = spi_recv();
-> > > > +                       spi_end();
+> > > >       len = *skb->data;
+> > > >
+> > > > -     if (urb->actual_length == 1) {
+> > > > -             atusb_tx_done(atusb, len);
+> > > > +     switch (urb->actual_length) {
+> > > > +     case 2:
+> > > > +             trac = TRAC_MASK(*(skb->data + 1));
 > > >
-> > > data[1] = reg_read(REG_TRX_STATE) as seen above for REG_IRQ_STATUS
-> > > would be better here...
+> > > I've been fighting all night thinking the issues were on the atusb side
+> > > (it was horribly difficult to get the atusb toolchain up and running,
+> > > I'll send a patch to update the instructions), in particular because of
+> >
+> > Really? for me it was just apt install avr-gcc libc-avr (or what the
+> > debian packages name is).
+>
+> I feel so bad. All the instructions I could find (from 2011) advised to
+> download an old gcc, an old binutils and old avr-lib, to compile
+> everything by hand... 2 out of 3 archives returned a 404 error, the
+> builds were chaotic I had to disable -Werror and fix many issues
+> manually, then I had to fight with binutils assembler failing, I tried
+> 4 different versions before I got it right... I did write a commit to
+> update the instructions but if you say that just downloading the stock
+> pre-compiled binaries worked I am a bit disappointed because the
+> instructions specifically told not to do so.
+>
+
+I am sorry that you had those problems.
+
+> > Then the dfu-util and be sure you invoke
+> > dfu-util (as root because you might need some udev rules otherwise)
+> > when the atusb is booting up.
+>
+> Yes, dfu worked right away, very nice tool.
+>
+> > > the data[2] definition which needed to be declared static outside of
+> > > the functions (see the other mail) and, I guess, because of this
+> > > beginner error: I was using skb->data[1] but of course it can't work.
 > > >
 > >
-> > after digging the code more, there is another queue case which we
-> > should handle, also correct using buffer parameter instead of the
-> > callback parameter which was stupid... However I think the direction
-> > is clear. Sorry for the spam.
+> > mhh, I am sorry. I am not sure if I understand what you mean? Does the
+> > firmware patch have issues regarding data[2]?
 >
-> Don't be, your feedback is just super useful.
->
-> > diff --git a/atusb/fw/mac.c b/atusb/fw/mac.c
-> > index 835002c..b52ba1a 100644
-> > --- a/atusb/fw/mac.c
-> > +++ b/atusb/fw/mac.c
-> > @@ -32,7 +32,7 @@ static uint8_t tx_buf[MAX_PSDU];
-> >  static uint8_t tx_size = 0;
-> >  static bool txing = 0;
-> >  static bool queued_tx_ack = 0;
-> > -static uint8_t next_seq, this_seq, queued_seq;
-> > +static uint8_t next_seq, this_seq, queued_seq, queued_tx_trac;
-> >
-> >
-> >  /* ----- Receive buffer management ----------------------------------------- */
-> > @@ -57,6 +57,7 @@ static void tx_ack_done(void *user);
-> >  static void usb_next(void)
-> >  {
-> >         const uint8_t *buf;
-> > +       uint8_t data[2];
-> >
-> >         if (rx_in != rx_out) {
-> >                 buf = rx_buf[rx_out];
-> > @@ -65,7 +66,9 @@ static void usb_next(void)
-> >         }
-> >
-> >         if (queued_tx_ack) {
-> > -               usb_send(&eps[1], &queued_seq, 1, tx_ack_done, NULL);
-> > +               data[0] = queued_seq;
-> > +               data[1] = queued_tx_trac;
-> > +               usb_send(&eps[1], data, sizeof(data), tx_ack_done, NULL);
+> Actually I'm wrong.
+> You did: *(skb->data + 1), which works.
+> I did: skb->data[1], which does not.
+> I thought that my mistake was related to data being a void *, but it's
+> a char * so both should work. I don't know why it failed, maybe my
+> attention level was too low and I missed something else.
 
-This is also broken, see below.
-
-> >                 queued_tx_ack = 0;
-> >         }
-> >  }
-> > @@ -116,7 +119,7 @@ static void receive_frame(void)
-> >
-> >  static bool handle_irq(void)
-> >  {
-> > -       uint8_t irq;
-> > +       uint8_t irq, data[2];
->
-> I don't know why, but defining data on the stack just does not work.
-> Defining it above with the other static variables is okay. I won't
-> fight more for "today" but if someone has an explanation I am all hears.
-
-I can explain it... following the usb_send() it will end in usb_io()
-and this is an asynchronous function to use somehow the USB IP core
-API of the mcu... it's wrong to use a stack variable here because it
-can be overwritten. I am sorry, I did not keep that in mind...
+I don't see a difference. No idea...
 
 - Alex
 
