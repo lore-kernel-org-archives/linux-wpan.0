@@ -2,43 +2,43 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DFACCECAAA1
-	for <linux-wpan@archiver.kernel.org>; Tue,  6 Sep 2022 08:21:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 473EBC38145
+	for <linux-wpan@archiver.kernel.org>; Tue,  6 Sep 2022 08:21:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239015AbiIFIVO (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 6 Sep 2022 04:21:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42538 "EHLO
+        id S239098AbiIFIVS (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 6 Sep 2022 04:21:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42638 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237446AbiIFIVN (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 6 Sep 2022 04:21:13 -0400
+        with ESMTP id S237446AbiIFIVR (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 6 Sep 2022 04:21:17 -0400
 Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::229])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6736A6F55E
-        for <linux-wpan@vger.kernel.org>; Tue,  6 Sep 2022 01:21:09 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0AF0673325
+        for <linux-wpan@vger.kernel.org>; Tue,  6 Sep 2022 01:21:10 -0700 (PDT)
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id 9A73CFF809;
-        Tue,  6 Sep 2022 08:21:06 +0000 (UTC)
+        by mail.gandi.net (Postfix) with ESMTPSA id F3333FF80E;
+        Tue,  6 Sep 2022 08:21:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1662452467;
+        t=1662452469;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=1Mcfjnj2ZuQB3HNpcRKcW8RcC8PtWVzdy5RmTqUDokc=;
-        b=CVi5+bX1tMPP7i6W74jgO0KNp4+3+EYW9zPvYweqCNNlmur1blsP93MjV775vqaqRuSMdU
-        t5oKUf/Vxd+thHLq8zfscKdliTQLriWNy5jXSobGiFa0b1pt9wj757GnfQUqjx4xMj/RLu
-        XSwASXk7QnOQcm6D98zXCY5dTxoidga3qhncYhK0gCHD7Iom9eGuTILSWeM8JH3LDLZrt8
-        IuOVkrkCTvS2JDUA7t/wFworPg0WBc3bKtw/DzIrzyEI3nBE5EZA1EkkmcetyDhLbiQidQ
-        r4BC4jFY3TF/eTZYnv+QTav1odYaZYtjfomka5oQSgv/FUrjqlB9FyldgJBEXQ==
+        bh=2ALGGn/CduQXBnOtj94WFZrqbOzJRWr0CNwPvNW0tO8=;
+        b=H2nwUF/1cViTjq7/Lt1LdM2D8bPjAk1BJy315usLcvkFdr0O+NvXwy66NAc3BKlw6rc9HU
+        Him5WfGWGBCBWFaaWapJtygwf3yIobv/P3Z9NKhLVt9MAihYCy1oPuyviLkU1AyDdgILc4
+        RP0ua564ffbEZ8u3UyNs11GnEkpsy+8oLLBvI9Npz5KwaZfnZeXQlVIkYYgFazz2S/zoxv
+        CPDwFOZWlG2oPRMQSBtRDxkCUjJfHEqMusi8s3rEbufBBffniFGWQhKcJoxdogmuQpP+kr
+        FUzUXEWKW64HU/OsqlMqi8BLgcU1wZrouzRkt+Zr52MnX8hl+olwL+Q/Z8CP8g==
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
 To:     werner@almesberger.net
 Cc:     Stefan Schmidt <stefan@datenfreihafen.org>,
         Alexander Aring <alex.aring@gmail.com>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-        linux-wpan@vger.kernel.org,
+        linux-wpan@vger.kernel.org, Alexander Aring <aahringo@redhat.com>,
         Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: [PATCH atusb/fw v2 2/3] atusb: fw: Update toolchain instructions
-Date:   Tue,  6 Sep 2022 10:21:03 +0200
-Message-Id: <20220906082104.1338694-2-miquel.raynal@bootlin.com>
+Subject: [PATCH atusb/fw v2 3/3] atusb: fw: Provide TRAC status
+Date:   Tue,  6 Sep 2022 10:21:04 +0200
+Message-Id: <20220906082104.1338694-3-miquel.raynal@bootlin.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20220906082104.1338694-1-miquel.raynal@bootlin.com>
 References: <20220906082104.1338694-1-miquel.raynal@bootlin.com>
@@ -49,76 +49,105 @@ Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Those instructions do not work anymore for several reaons:
-- Two out of the three files to download return a 404 error:
-      * The binutils version does not exist, it was 2.21.1 or 2.21.1a
-        instead of just 2.21.
-      * The avr-libc is no longer hosted on the pointed website, I've
-        found an alternate.
-- The binutils version mentioned is not able to compile the firmware on
-  a recent distribution, the Internet advised to update its version and
-  it worked.
-- Most of these compilations will throw warnings if you use a recent
-  gcc. Sometimes -Werror is set and it fails the build. To avoid that,
-  just use --disable-werror in the ./configure options.
-- I had issues building the gcc doc but those issues are trivial to
-  fix inline.
+From: Alexander Aring <aahringo@redhat.com>
 
-Update the instructions for building the toolchain and while at it,
-start the file by mentioning that this is maybe not useful anymore, and
-provide the packets to install.
+Upon Tx done condition, returning the sequence number is useful but we
+might also return the TRAC value which is needed to ensure that the
+packet we sent got ACKed.
 
+We then need to read the TRAC status register upon Tx completion and
+send this information to the atusb Linux driver as part of the status
+message. First byte remains the sequence number for ensuring backward
+compatibility, a second byte is added to forward the TRAC register
+status.
+
+We need to move the transition to RX_AACK_ON after reading the trac
+register value. The current optimization by switchting to RX_AACK_ON
+after invoking transceiver transmission could have the side effect that
+the TRAC register is not read out before a frame is received. Receiving
+another frame will overwrite the TRAC register. We can only switch to
+RX_AACK_ON state after we read out the TRAC register.
+
+Signed-off-by: Alexander Aring <aahringo@redhat.com>
+Tested-by: Miquel Raynal <miquel.raynal@bootlin.com>
+[Miquel Raynal: Moved the data array out of the stack, rewrote commit log]
 Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
 ---
 
-Changes in v2:
-* Fix the avr package names.
+Changes since v1:
+* Fix race condition (Rx would mess with the TRAC value, so wait for the
+  transmission to have been signaled and the TRAC register to have been
+  read before changing the state to RX_AACK_ON (by Alexander).
 
- atusb/fw/README | 18 ++++++++++--------
- 1 file changed, 10 insertions(+), 8 deletions(-)
+ atusb/fw/mac.c | 24 ++++++++++++------------
+ 1 file changed, 12 insertions(+), 12 deletions(-)
 
-diff --git a/atusb/fw/README b/atusb/fw/README
-index 99ceb22..774dfeb 100644
---- a/atusb/fw/README
-+++ b/atusb/fw/README
-@@ -1,4 +1,6 @@
--Requires a very recent toolchain, because ATmega32U2 is relatively new.
-+- Toolchain:
-+
-+  apt install gcc-avr avr-libc binutils-avr
+diff --git a/atusb/fw/mac.c b/atusb/fw/mac.c
+index 835002c..165ce30 100644
+--- a/atusb/fw/mac.c
++++ b/atusb/fw/mac.c
+@@ -32,7 +32,7 @@ static uint8_t tx_buf[MAX_PSDU];
+ static uint8_t tx_size = 0;
+ static bool txing = 0;
+ static bool queued_tx_ack = 0;
+-static uint8_t next_seq, this_seq, queued_seq;
++static uint8_t next_seq, this_seq, this_data[2], queued_data[2];
  
- - Building:
  
-@@ -64,12 +66,13 @@ apt-get install libmpfr-dev libmpc-dev
+ /* ----- Receive buffer management ----------------------------------------- */
+@@ -65,7 +65,8 @@ static void usb_next(void)
+ 	}
  
- # binutils
+ 	if (queued_tx_ack) {
+-		usb_send(&eps[1], &queued_seq, 1, tx_ack_done, NULL);
++		usb_send(&eps[1], queued_data, sizeof(queued_data),
++			 tx_ack_done, NULL);
+ 		queued_tx_ack = 0;	
+ 	}
+ }
+@@ -124,11 +125,17 @@ static bool handle_irq(void)
  
--wget http://ftp.gnu.org/gnu/binutils/binutils-2.21.tar.bz2
--tar xfj binutils-2.21.tar.bz2 
--cd binutils-2.21
--./configure --target=avr --disable-nls
-+wget https://ftp.gnu.org/gnu/binutils/binutils-2.27.tar.bz2
-+tar xfj binutils-2.27.tar.bz2
-+cd binutils-2.27
-+./configure --target=avr --disable-nls --disable-werror
- make
- make install
-+ln -s /usr/local/bin/avr-as /usr/bin/avr-as
+ 	if (txing) {
+ 		if (eps[1].state == EP_IDLE) {
+-			usb_send(&eps[1], &this_seq, 1, tx_ack_done, NULL);
++			this_data[0] = this_seq;
++			this_data[1] = reg_read(REG_TRX_STATE);
++			usb_send(&eps[1], this_data, sizeof(this_data),
++				 tx_ack_done, NULL);
+ 		} else {
+ 			queued_tx_ack = 1;
+-			queued_seq = this_seq;
++			queued_data[0] = this_seq;
++			queued_data[1] = reg_read(REG_TRX_STATE);
+ 		}
++		change_state(TRX_CMD_PLL_ON);
++		change_state(TRX_CMD_RX_AACK_ON);
+ 		txing = 0;
+ 		return 1;
+ 	}
+@@ -215,13 +222,6 @@ static void do_tx(void *user)
  
- # gcc
+ 	txing = 1;
+ 	this_seq = next_seq;
+-
+-	/*
+-	 * Wait until we reach BUSY_TX_ARET, so that we command the transition to
+-	 * RX_AACK_ON which will be executed upon TX completion.
+-	 */
+-	change_state(TRX_CMD_PLL_ON);
+-	change_state(TRX_CMD_RX_AACK_ON);
+ }
  
-@@ -85,9 +88,8 @@ cd obj-avr
- make
- make install
  
--wget http://download.savannah.gnu.org/releases/avr-libc/avr-libc-1.7.1.tar.bz2
--tar xfj avr-libc-1.7.1.tar.bz2 
--cd avr-libc-1.7.1
-+wget https://android.googlesource.com/toolchain/avr-libc/+archive/master/avr-libc-1.7.1.tar.gz
-+tar xf avr-libc-1.7.1.tar.gz
- ./bootstrap	# the automake at the end takes a while
- ./configure --build=`./config.guess` --host=avr
- make
+@@ -242,7 +242,7 @@ void mac_reset(void)
+ 	txing = 0;
+ 	queued_tx_ack = 0;
+ 	rx_in = rx_out = 0;
+-	next_seq = this_seq = queued_seq = 0;
++	next_seq = this_seq = queued_data[0], queued_data[1] = 0;
+ 
+ 	/* enable CRC and PHY_RSSI (with RX_CRC_VALID) in SPI status return */
+ 	reg_write(REG_TRX_CTRL_1,
 -- 
 2.34.1
 
