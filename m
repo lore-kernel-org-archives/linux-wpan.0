@@ -2,152 +2,131 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 473EBC38145
-	for <linux-wpan@archiver.kernel.org>; Tue,  6 Sep 2022 08:21:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04BF5C38145
+	for <linux-wpan@archiver.kernel.org>; Thu,  8 Sep 2022 01:40:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239098AbiIFIVS (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 6 Sep 2022 04:21:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42638 "EHLO
+        id S229899AbiIHBk3 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 7 Sep 2022 21:40:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45530 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237446AbiIFIVR (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 6 Sep 2022 04:21:17 -0400
-Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::229])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0AF0673325
-        for <linux-wpan@vger.kernel.org>; Tue,  6 Sep 2022 01:21:10 -0700 (PDT)
-Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id F3333FF80E;
-        Tue,  6 Sep 2022 08:21:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1662452469;
+        with ESMTP id S229478AbiIHBk2 (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 7 Sep 2022 21:40:28 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47F79C6FC4
+        for <linux-wpan@vger.kernel.org>; Wed,  7 Sep 2022 18:40:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1662601226;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=2ALGGn/CduQXBnOtj94WFZrqbOzJRWr0CNwPvNW0tO8=;
-        b=H2nwUF/1cViTjq7/Lt1LdM2D8bPjAk1BJy315usLcvkFdr0O+NvXwy66NAc3BKlw6rc9HU
-        Him5WfGWGBCBWFaaWapJtygwf3yIobv/P3Z9NKhLVt9MAihYCy1oPuyviLkU1AyDdgILc4
-        RP0ua564ffbEZ8u3UyNs11GnEkpsy+8oLLBvI9Npz5KwaZfnZeXQlVIkYYgFazz2S/zoxv
-        CPDwFOZWlG2oPRMQSBtRDxkCUjJfHEqMusi8s3rEbufBBffniFGWQhKcJoxdogmuQpP+kr
-        FUzUXEWKW64HU/OsqlMqi8BLgcU1wZrouzRkt+Zr52MnX8hl+olwL+Q/Z8CP8g==
-From:   Miquel Raynal <miquel.raynal@bootlin.com>
-To:     werner@almesberger.net
-Cc:     Stefan Schmidt <stefan@datenfreihafen.org>,
-        Alexander Aring <alex.aring@gmail.com>,
-        Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-        linux-wpan@vger.kernel.org, Alexander Aring <aahringo@redhat.com>,
-        Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: [PATCH atusb/fw v2 3/3] atusb: fw: Provide TRAC status
-Date:   Tue,  6 Sep 2022 10:21:04 +0200
-Message-Id: <20220906082104.1338694-3-miquel.raynal@bootlin.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220906082104.1338694-1-miquel.raynal@bootlin.com>
-References: <20220906082104.1338694-1-miquel.raynal@bootlin.com>
+        bh=omTeNvcKp/F4WU/b2YX04Q0z1z9EGBUTXmAYav/J+8I=;
+        b=dOlM5IQmVAjNmmq5UzdWy4f9v+SJjLna1L6AprYd1zTZmzT+T/d3rfJsN6I46F0owtdjug
+        ZS8GrELwzqQ794F2eELd7mVhoChstEJvOyJnUs7i555zZwOLL42TY2FDGMZBhxIap3TzBb
+        F/CAl1h9BkxGxILCHMZCMZiAn39TGhk=
+Received: from mail-yb1-f197.google.com (mail-yb1-f197.google.com
+ [209.85.219.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-122-nmuYUTu7MGubD1tHs5KGiA-1; Wed, 07 Sep 2022 21:40:25 -0400
+X-MC-Unique: nmuYUTu7MGubD1tHs5KGiA-1
+Received: by mail-yb1-f197.google.com with SMTP id 62-20020a250341000000b006a93b57e2daso6976110ybd.2
+        for <linux-wpan@vger.kernel.org>; Wed, 07 Sep 2022 18:40:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date;
+        bh=omTeNvcKp/F4WU/b2YX04Q0z1z9EGBUTXmAYav/J+8I=;
+        b=UHLuP628M3qLvHc/RqncowN0ZIsJKT5suSMpw8kIz1TLvC0OTbEDdJrO7sgWd7doI7
+         +ou0XqHGqIecJp+BJ1sH2h0/K6uB955kC22Rt/j9Ex4cKVfKGoey/3mvOn47r8myYkFJ
+         3H9NLiYRDRJfpcr9fIdhTJl3Npt8f3jBwH3dC08DB5H6aLZbJtBwRdsuq8Av/5DARhBW
+         InjdujCkzJhMcrpe1h6RA4t7lMjtIINf6P23jNp/OsQ8bsT0tGN7dCPMZ738SnNHp8sz
+         ttJYXzfHecgIj1v5RQYuI/j7rR86ZRHHpixWGqB3qcxnrFRVKBFrIN58Nc+NWL394HQP
+         8hmQ==
+X-Gm-Message-State: ACgBeo3dzolOTf0+myaJzNl5+rnKf3oyBP9N6ynnrXCeKX8bi7MZJ/RO
+        9KCIK93tQpim0xzcm0KSQup7g51tfg9IrWSb1kIEfbLy5JZDlQwfGhLzSy4mAAm/GxyCmzBUQ1S
+        auVe8h2Hz8Sqk0yDBdYMcnPx/T9F7jPEWLG9D0w==
+X-Received: by 2002:a81:1353:0:b0:345:34b5:ad29 with SMTP id 80-20020a811353000000b0034534b5ad29mr5649142ywt.17.1662601224876;
+        Wed, 07 Sep 2022 18:40:24 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR5LZWdEKyps6F3LhUYn+aKdzCf042LfowbjEVJPv2xs6teQumCPjTo+wP371qgCXE/dW4wx5ZMJEoBMQXO4/y0=
+X-Received: by 2002:a81:1353:0:b0:345:34b5:ad29 with SMTP id
+ 80-20020a811353000000b0034534b5ad29mr5649140ywt.17.1662601224700; Wed, 07 Sep
+ 2022 18:40:24 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+References: <20220905203412.1322947-1-miquel.raynal@bootlin.com>
+In-Reply-To: <20220905203412.1322947-1-miquel.raynal@bootlin.com>
+From:   Alexander Aring <aahringo@redhat.com>
+Date:   Wed, 7 Sep 2022 21:40:13 -0400
+Message-ID: <CAK-6q+g64BTFsHKKwoCqRGEERRgwoMSTX2LJMQMmmRseWBi=hQ@mail.gmail.com>
+Subject: Re: [PATCH wpan/next v3 0/9] net: ieee802154: Support scanning/beaconing
+To:     Miquel Raynal <miquel.raynal@bootlin.com>
+Cc:     Alexander Aring <alex.aring@gmail.com>,
+        Stefan Schmidt <stefan@datenfreihafen.org>,
+        linux-wpan - ML <linux-wpan@vger.kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Eric Dumazet <edumazet@google.com>,
+        Network Development <netdev@vger.kernel.org>,
+        David Girault <david.girault@qorvo.com>,
+        Romuald Despres <romuald.despres@qorvo.com>,
+        Frederic Blain <frederic.blain@qorvo.com>,
+        Nicolas Schodet <nico@ni.fr.eu.org>,
+        Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-From: Alexander Aring <aahringo@redhat.com>
+Hi,
 
-Upon Tx done condition, returning the sequence number is useful but we
-might also return the TRAC value which is needed to ensure that the
-packet we sent got ACKed.
+On Mon, Sep 5, 2022 at 4:34 PM Miquel Raynal <miquel.raynal@bootlin.com> wrote:
+>
+> Hello,
+>
+> A third version of this series, dropping the scan patches for now
+> because before we need to settle on the filtering topic and the
+> coordinator interface topic. Here is just the filtering part, I've
+> integrated Alexander's patches, as well as the atusb fix. Once this is
+> merge there are a few coordinator-related patches, and finally the
+> scan.
 
-We then need to read the TRAC status register upon Tx completion and
-send this information to the atusb Linux driver as part of the status
-message. First byte remains the sequence number for ensuring backward
-compatibility, a second byte is added to forward the TRAC register
-status.
+I think we have a communication problem here and we should talk about
+what the problems are and agree on a way to solve them.
 
-We need to move the transition to RX_AACK_ON after reading the trac
-register value. The current optimization by switchting to RX_AACK_ON
-after invoking transceiver transmission could have the side effect that
-the TRAC register is not read out before a frame is received. Receiving
-another frame will overwrite the TRAC register. We can only switch to
-RX_AACK_ON state after we read out the TRAC register.
+The problems are:
 
-Signed-off-by: Alexander Aring <aahringo@redhat.com>
-Tested-by: Miquel Raynal <miquel.raynal@bootlin.com>
-[Miquel Raynal: Moved the data array out of the stack, rewrote commit log]
-Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
----
+1. We never supported switching from an operating phy (interfaces are
+up) into another filtering mode.
 
-Changes since v1:
-* Fix race condition (Rx would mess with the TRAC value, so wait for the
-  transmission to have been signaled and the TRAC register to have been
-  read before changing the state to RX_AACK_ON (by Alexander).
+2. Scan requires to be in "promiscuous mode" (according to the
+802.15.4 spec promiscuous mode). We don't support promiscuous mode
+(according to the 802.15.4 spec promiscuous mode). We "can" however
+use the currently supported mode which does not filter anything
+(IEEE802154_FILTERING_NONE) when we do additional filtering in
+mac802154. _But_ this is only required when the phy is scanning, it
+will also deliver anything to the upper layers.
 
- atusb/fw/mac.c | 24 ++++++++++++------------
- 1 file changed, 12 insertions(+), 12 deletions(-)
+This patch-series tries to do the second thing, okay that's fine. But
+I thought this should only be done while the phy is in "scanning
+mode"? The other receive path while not in promiscuous mode
+(phy->filtering == IEEE802154_FILTERING_4_FRAME_FIELDS) should never
+require any additional filtering. I somehow miss this point here.
 
-diff --git a/atusb/fw/mac.c b/atusb/fw/mac.c
-index 835002c..165ce30 100644
---- a/atusb/fw/mac.c
-+++ b/atusb/fw/mac.c
-@@ -32,7 +32,7 @@ static uint8_t tx_buf[MAX_PSDU];
- static uint8_t tx_size = 0;
- static bool txing = 0;
- static bool queued_tx_ack = 0;
--static uint8_t next_seq, this_seq, queued_seq;
-+static uint8_t next_seq, this_seq, this_data[2], queued_data[2];
- 
- 
- /* ----- Receive buffer management ----------------------------------------- */
-@@ -65,7 +65,8 @@ static void usb_next(void)
- 	}
- 
- 	if (queued_tx_ack) {
--		usb_send(&eps[1], &queued_seq, 1, tx_ack_done, NULL);
-+		usb_send(&eps[1], queued_data, sizeof(queued_data),
-+			 tx_ack_done, NULL);
- 		queued_tx_ack = 0;	
- 	}
- }
-@@ -124,11 +125,17 @@ static bool handle_irq(void)
- 
- 	if (txing) {
- 		if (eps[1].state == EP_IDLE) {
--			usb_send(&eps[1], &this_seq, 1, tx_ack_done, NULL);
-+			this_data[0] = this_seq;
-+			this_data[1] = reg_read(REG_TRX_STATE);
-+			usb_send(&eps[1], this_data, sizeof(this_data),
-+				 tx_ack_done, NULL);
- 		} else {
- 			queued_tx_ack = 1;
--			queued_seq = this_seq;
-+			queued_data[0] = this_seq;
-+			queued_data[1] = reg_read(REG_TRX_STATE);
- 		}
-+		change_state(TRX_CMD_PLL_ON);
-+		change_state(TRX_CMD_RX_AACK_ON);
- 		txing = 0;
- 		return 1;
- 	}
-@@ -215,13 +222,6 @@ static void do_tx(void *user)
- 
- 	txing = 1;
- 	this_seq = next_seq;
--
--	/*
--	 * Wait until we reach BUSY_TX_ARET, so that we command the transition to
--	 * RX_AACK_ON which will be executed upon TX completion.
--	 */
--	change_state(TRX_CMD_PLL_ON);
--	change_state(TRX_CMD_RX_AACK_ON);
- }
- 
- 
-@@ -242,7 +242,7 @@ void mac_reset(void)
- 	txing = 0;
- 	queued_tx_ack = 0;
- 	rx_in = rx_out = 0;
--	next_seq = this_seq = queued_seq = 0;
-+	next_seq = this_seq = queued_data[0], queued_data[1] = 0;
- 
- 	/* enable CRC and PHY_RSSI (with RX_CRC_VALID) in SPI status return */
- 	reg_write(REG_TRX_CTRL_1,
--- 
-2.34.1
+For 1), the driver should change the filtering mode" when we start to
+"listen", this is done by the start() driver callback. They should get
+all receive parameters and set up receiving to whatever mac802154,
+currently there is a bit of chaos there. To move it into drv_start()
+is just a workaround to begin this step that we move it at some point
+to the driver. I mention 1) here because that should be part of the
+picture how everything works together when the phy is switched to a
+different filter level while it's operating (I mean there are running
+interfaces on it which requires IEEE802154_FILTERING_4_FRAME_FIELDS)
+which then activates the different receive path for the use case of
+scanning (something like (phy->state & WPANPHY_SCANING) == true)?
+
+I am sorry, but I somehow miss the picture of how those things work
+together. It is not clear for me and I miss those parts to get a whole
+picture of this. For me it's not clear that those patches are going in
+this direction.
+
+- Alex
 
