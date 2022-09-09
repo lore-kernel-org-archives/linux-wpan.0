@@ -2,227 +2,211 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B592C38145
-	for <linux-wpan@archiver.kernel.org>; Thu,  8 Sep 2022 12:19:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F78FECAAD5
+	for <linux-wpan@archiver.kernel.org>; Fri,  9 Sep 2022 00:41:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230458AbiIHMTq (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Thu, 8 Sep 2022 08:19:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37806 "EHLO
+        id S229703AbiIIAlc (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Thu, 8 Sep 2022 20:41:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38250 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231283AbiIHMTn (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 8 Sep 2022 08:19:43 -0400
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCA4413EBF;
-        Thu,  8 Sep 2022 05:19:42 -0700 (PDT)
-Received: by mail-pl1-x62d.google.com with SMTP id jm11so17605194plb.13;
-        Thu, 08 Sep 2022 05:19:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date;
-        bh=7PKq4MZv2IFLI2hRaHSRAsoSfQ2wA+Rq0DFFdoFY1mU=;
-        b=ptpAf+B8TOlmihW3GRIVgOOobzp38VlL6uIJoQL9BO84EB6U81RGjzeNVHyxFPplNS
-         PhICddqhs/p5/DLmhdPhM20OzTzSXiMv9ZkvG39m8i/aQejDTBmTR+9WwPf5P7ALJFAs
-         ptDMJjdsiaSth+Yt9A6ufZW9O5jIiovT0LIrbGfrVkupGKdUy2g81Nn933MFjOro0Akz
-         PI0Bz/lWDEZ1ksZJaruXmnA6pOOgQQ8Os2qkM/Kmqn2BbC4TWDdimUkRX+DL5050EFiu
-         WdHXBEXUpgYarJr319Q04Oq+rZ4+YP7YziPv6PhEVV/NFTqiz67+oM1hgkDX3abTiJqF
-         J7aw==
+        with ESMTP id S229640AbiIIAlb (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 8 Sep 2022 20:41:31 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFFABE2908
+        for <linux-wpan@vger.kernel.org>; Thu,  8 Sep 2022 17:41:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1662684087;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=3p0bcJQG035HsXWycAwnGgDnLl1q8HGhDkPYp3sJwZA=;
+        b=fDniFILVV+KIlfr2YkLA2s+ev3FhLXAVXAzdm9TXy7XcqZInZzByaV8Dz8IovcA7Y8tRBW
+        pVYlPeXFRdvlEOjPOIfA1Ec2AePXxNbjGNkLFWIBwqcNy587aGh6g4OyKBQ3GyZALiuWAi
+        g3GSX5fIqAeuTmRoq/OphBl+22CyGBw=
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com
+ [209.85.166.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-210-j3S3plYVMlqnAOpmlGwJew-1; Thu, 08 Sep 2022 20:41:26 -0400
+X-MC-Unique: j3S3plYVMlqnAOpmlGwJew-1
+Received: by mail-il1-f198.google.com with SMTP id d18-20020a056e020c1200b002eaea8e6081so107015ile.6
+        for <linux-wpan@vger.kernel.org>; Thu, 08 Sep 2022 17:41:26 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date;
-        bh=7PKq4MZv2IFLI2hRaHSRAsoSfQ2wA+Rq0DFFdoFY1mU=;
-        b=vpuMTjAm7pSCmKBelzVtHKce5VkXFWBF3XrrPQRnVNfZ2ULc2qQijDcmoMmU/fpv4C
-         S1INY2i8sDX2i6FBK+PjJCxQOfm2Z0kByRQ68Hh1g/cb6TJV8cLKLRz6jWGjBx4zwAfx
-         HhLnrZxnVGlqOFalR+OyYl3v+4QiIu9tdbDO+j1GVjjtYPB9wAXeUpZe5BQb6QGGvcE8
-         XsUz1XrmhL8VDuQJXC5/DBxUiZ/03sF63DR7UMkoB8h9rED/lZfMX3l/Cc/0XoI7wNyQ
-         kIXRrti3/e5JWutTs4tGZND8fC4sztflfnCidh55zFUhxpzLvFJBKFmsOAbzKZ2EItjv
-         Ch5Q==
-X-Gm-Message-State: ACgBeo18RoHrl0QfvfzkJ7lFVtNCWi9ru45YwN5oBz+gCep2Tnq/i4S9
-        C3W0+NLdRfQr31a/PRtzATT9RN6OZSb6eg==
-X-Google-Smtp-Source: AA6agR6K+qjp/CPtBcZE5AVRQHDrEnz+6gdELLjdwlgT1FIikaNCRAtgs5CL6hHPtlKKDkjg4HUF0g==
-X-Received: by 2002:a17:902:e312:b0:176:9348:1f6e with SMTP id q18-20020a170902e31200b0017693481f6emr8836314plc.14.1662639582277;
-        Thu, 08 Sep 2022 05:19:42 -0700 (PDT)
-Received: from localhost.localdomain ([150.109.151.50])
-        by smtp.gmail.com with ESMTPSA id b16-20020a63d310000000b0042b5b036da4sm12477916pgg.68.2022.09.08.05.19.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Sep 2022 05:19:42 -0700 (PDT)
-From:   Haimin Zhang <tcs.kernel@gmail.com>
-X-Google-Original-From: Haimin Zhang <tcs_kernel@tencent.com>
-To:     alex.aring@gmail.com, stefan@datenfreihafen.org,
-        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-        pabeni@redhat.com, linux-wpan@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Haimin Zhang <tcs_kernel@tencent.com>
-Subject: [PATCH V3] net/ieee802154: fix uninit value bug in dgram_sendmsg
-Date:   Thu,  8 Sep 2022 20:19:27 +0800
-Message-Id: <20220908121927.3074843-1-tcs_kernel@tencent.com>
-X-Mailer: git-send-email 2.27.0
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date;
+        bh=3p0bcJQG035HsXWycAwnGgDnLl1q8HGhDkPYp3sJwZA=;
+        b=6zb+a/IC9RUUNrlBr02ieZzn5+RFommsRy5VSy99ZlDZlTiaHh8vxcI3tR6YZE5ju8
+         cOkw0uQ1HkG+Y5AefZli3TGHmzcG+9odi6bhgDcAEaREhPQzrtmqfndcJeKkuKSFuQKl
+         QnrhyolcoYBNhsQ0/WcbqVkO9wymhe6ngIxIJhlFtiCIxkMfnnSndBK8WL/HwWa7OST3
+         RxR7EAce2+KBXxVpyi6Oq4X7Ybr4QN49cUME8tvbQGV2jXBsDjQ3Nz6RGPl9o+MBXifH
+         ZKJSS1Z9uPDqnfXkrev9eoDL0Q951nPnYsM9CE/MTd47O+LR658QUyze63dY9uuUJmqo
+         0Wbg==
+X-Gm-Message-State: ACgBeo1i0s+AIjOx8p9a9cjzvwp6ruWzeXOZvPBR9QmxxOm19SlIa/ok
+        KxNFoeTufhjb6eUmX0H9VhgjFQY7aimN8KfKxBsf4QCKBQVBy/OAEpv8YUYObm/QOZ7PAgY50L4
+        jfF5N3ws7PtX526OgqrUo6+TCpDagQZEVtIPKfA==
+X-Received: by 2002:a05:6638:238a:b0:356:a525:b90f with SMTP id q10-20020a056638238a00b00356a525b90fmr5816985jat.232.1662684085727;
+        Thu, 08 Sep 2022 17:41:25 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR5C5IhxYHz7czH2YToNPS+MStIgIV3bZCHELjCzx1k8Dp12Xg95BF9G5NLAwpJELmMiMn6M1+GWBy5oXyihrow=
+X-Received: by 2002:a05:6638:238a:b0:356:a525:b90f with SMTP id
+ q10-20020a056638238a00b00356a525b90fmr5816971jat.232.1662684085456; Thu, 08
+ Sep 2022 17:41:25 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20220905203412.1322947-1-miquel.raynal@bootlin.com>
+ <CAK-6q+g64BTFsHKKwoCqRGEERRgwoMSTX2LJMQMmmRseWBi=hQ@mail.gmail.com> <20220908093648.5bae41b2@xps-13>
+In-Reply-To: <20220908093648.5bae41b2@xps-13>
+From:   Alexander Aring <aahringo@redhat.com>
+Date:   Thu, 8 Sep 2022 20:41:14 -0400
+Message-ID: <CAK-6q+jDM=ewcCYtuHuH7sHJjbOpa4SPjY_VyeaCnoF1g6KSFA@mail.gmail.com>
+Subject: Re: [PATCH wpan/next v3 0/9] net: ieee802154: Support scanning/beaconing
+To:     Miquel Raynal <miquel.raynal@bootlin.com>
+Cc:     Alexander Aring <alex.aring@gmail.com>,
+        Stefan Schmidt <stefan@datenfreihafen.org>,
+        linux-wpan - ML <linux-wpan@vger.kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Eric Dumazet <edumazet@google.com>,
+        Network Development <netdev@vger.kernel.org>,
+        David Girault <david.girault@qorvo.com>,
+        Romuald Despres <romuald.despres@qorvo.com>,
+        Frederic Blain <frederic.blain@qorvo.com>,
+        Nicolas Schodet <nico@ni.fr.eu.org>,
+        Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-There is uninit value bug in dgram_sendmsg function in
-net/ieee802154/socket.c when the length of valid data pointed by the
-msg->msg_name isn't verified.
+Hi,
 
-We introducing a helper function ieee802154_sockaddr_check_size to 
-check namelen. First we check there is addr_type in ieee802154_addr_sa.
-Then, we check namelen according to addr_type.
+On Thu, Sep 8, 2022 at 3:37 AM Miquel Raynal <miquel.raynal@bootlin.com> wrote:
+>
+> Hi Alexander,
+>
+> aahringo@redhat.com wrote on Wed, 7 Sep 2022 21:40:13 -0400:
+>
+> > Hi,
+> >
+> > On Mon, Sep 5, 2022 at 4:34 PM Miquel Raynal <miquel.raynal@bootlin.com> wrote:
+> > >
+> > > Hello,
+> > >
+> > > A third version of this series, dropping the scan patches for now
+> > > because before we need to settle on the filtering topic and the
+> > > coordinator interface topic. Here is just the filtering part, I've
+> > > integrated Alexander's patches, as well as the atusb fix. Once this is
+> > > merge there are a few coordinator-related patches, and finally the
+> > > scan.
+> >
+> > I think we have a communication problem here and we should talk about
+> > what the problems are and agree on a way to solve them.
+> >
+> > The problems are:
+> >
+> > 1. We never supported switching from an operating phy (interfaces are
+> > up) into another filtering mode.
+>
+> In the trigger scan path there is a:
+>
+>         mlme_op_pre() // stop Tx
+>         drv_stop() // stop Rx
+>         synchronize_net()
+>         drv_start(params) // restart Rx with another hw filtering level
+>
 
-Also fixed in raw_bind, dgram_bind, dgram_connect.
+Okay, that's looking good.
 
-Signed-off-by: Haimin Zhang <tcs_kernel@tencent.com>
----
- include/net/ieee802154_netdev.h | 37 +++++++++++++++++++++++++++++
- net/ieee802154/socket.c         | 42 ++++++++++++++++++---------------
- 2 files changed, 60 insertions(+), 19 deletions(-)
+> > 2. Scan requires to be in "promiscuous mode" (according to the
+> > 802.15.4 spec promiscuous mode). We don't support promiscuous mode
+> > (according to the 802.15.4 spec promiscuous mode). We "can" however
+> > use the currently supported mode which does not filter anything
+> > (IEEE802154_FILTERING_NONE) when we do additional filtering in
+> > mac802154. _But_ this is only required when the phy is scanning, it
+> > will also deliver anything to the upper layers.
+> >
+> > This patch-series tries to do the second thing, okay that's fine. But
+> > I thought this should only be done while the phy is in "scanning
+> > mode"?
+>
+> I don't understand what's wrong then. We ask for the "scan mode"
+> filtering level when starting the scan [1] and we ask for the normal
+> filtering level when it's done/aborted [2] [3].
+>
 
-diff --git a/include/net/ieee802154_netdev.h b/include/net/ieee802154_netdev.h
-index d0d188c32..a8994f307 100644
---- a/include/net/ieee802154_netdev.h
-+++ b/include/net/ieee802154_netdev.h
-@@ -15,6 +15,22 @@
- #ifndef IEEE802154_NETDEVICE_H
- #define IEEE802154_NETDEVICE_H
- 
-+#define IEEE802154_REQUIRED_SIZE(struct_type, member) \
-+	(offsetof(typeof(struct_type), member) + \
-+	sizeof(((typeof(struct_type) *)(NULL))->member))
-+
-+#define IEEE802154_ADDR_OFFSET \
-+	offsetof(typeof(struct sockaddr_ieee802154), addr)
-+
-+#define IEEE802154_MIN_NAMELEN (IEEE802154_ADDR_OFFSET + \
-+	IEEE802154_REQUIRED_SIZE(struct ieee802154_addr_sa, addr_type))
-+
-+#define IEEE802154_NAMELEN_SHORT (IEEE802154_ADDR_OFFSET + \
-+	IEEE802154_REQUIRED_SIZE(struct ieee802154_addr_sa, short_addr))
-+
-+#define IEEE802154_NAMELEN_LONG (IEEE802154_ADDR_OFFSET + \
-+	IEEE802154_REQUIRED_SIZE(struct ieee802154_addr_sa, hwaddr))
-+
- #include <net/af_ieee802154.h>
- #include <linux/netdevice.h>
- #include <linux/skbuff.h>
-@@ -165,6 +181,27 @@ static inline void ieee802154_devaddr_to_raw(void *raw, __le64 addr)
- 	memcpy(raw, &temp, IEEE802154_ADDR_LEN);
- }
- 
-+static inline int
-+ieee802154_sockaddr_check_size(struct sockaddr_ieee802154 *daddr, int len)
-+{
-+	struct ieee802154_addr_sa *sa;
-+
-+	sa = &daddr->addr;
-+	if (len < IEEE802154_MIN_NAMELEN)
-+		return -EINVAL;
-+	switch (sa->addr_type) {
-+	case IEEE802154_ADDR_SHORT:
-+		if (len < IEEE802154_NAMELEN_SHORT)
-+			return -EINVAL;
-+		break;
-+	case IEEE802154_ADDR_LONG:
-+		if (len < IEEE802154_NAMELEN_LONG)
-+			return -EINVAL;
-+		break;
-+	}
-+	return 0;
-+}
-+
- static inline void ieee802154_addr_from_sa(struct ieee802154_addr *a,
- 					   const struct ieee802154_addr_sa *sa)
- {
-diff --git a/net/ieee802154/socket.c b/net/ieee802154/socket.c
-index 718fb77bb..7889e1ef7 100644
---- a/net/ieee802154/socket.c
-+++ b/net/ieee802154/socket.c
-@@ -200,8 +200,9 @@ static int raw_bind(struct sock *sk, struct sockaddr *_uaddr, int len)
- 	int err = 0;
- 	struct net_device *dev = NULL;
- 
--	if (len < sizeof(*uaddr))
--		return -EINVAL;
-+	err = ieee802154_sockaddr_check_size(uaddr, len);
-+	if (err < 0)
-+		return err;
- 
- 	uaddr = (struct sockaddr_ieee802154 *)_uaddr;
- 	if (uaddr->family != AF_IEEE802154)
-@@ -493,7 +494,8 @@ static int dgram_bind(struct sock *sk, struct sockaddr *uaddr, int len)
- 
- 	ro->bound = 0;
- 
--	if (len < sizeof(*addr))
-+	err = ieee802154_sockaddr_check_size(addr, len);
-+	if (err < 0)
- 		goto out;
- 
- 	if (addr->family != AF_IEEE802154)
-@@ -564,8 +566,9 @@ static int dgram_connect(struct sock *sk, struct sockaddr *uaddr,
- 	struct dgram_sock *ro = dgram_sk(sk);
- 	int err = 0;
- 
--	if (len < sizeof(*addr))
--		return -EINVAL;
-+	err = ieee802154_sockaddr_check_size(addr, len);
-+	if (err < 0)
-+		return err;
- 
- 	if (addr->family != AF_IEEE802154)
- 		return -EINVAL;
-@@ -604,6 +607,7 @@ static int dgram_sendmsg(struct sock *sk, struct msghdr *msg, size_t size)
- 	struct ieee802154_mac_cb *cb;
- 	struct dgram_sock *ro = dgram_sk(sk);
- 	struct ieee802154_addr dst_addr;
-+	DECLARE_SOCKADDR(struct sockaddr_ieee802154*, daddr, msg->msg_name);
- 	int hlen, tlen;
- 	int err;
- 
-@@ -612,10 +616,20 @@ static int dgram_sendmsg(struct sock *sk, struct msghdr *msg, size_t size)
- 		return -EOPNOTSUPP;
- 	}
- 
--	if (!ro->connected && !msg->msg_name)
--		return -EDESTADDRREQ;
--	else if (ro->connected && msg->msg_name)
--		return -EISCONN;
-+	if (msg->msg_name) {
-+		if (ro->connected)
-+			return -EISCONN;
-+		if (msg->msg_namelen < IEEE802154_MIN_NAMELEN)
-+			return -EINVAL;
-+		err = ieee802154_sockaddr_check_size(daddr, msg->msg_namelen);
-+		if (err < 0)
-+			return err;
-+		ieee802154_addr_from_sa(&dst_addr, &daddr->addr);
-+	} else {
-+		if (!ro->connected)
-+			return -EDESTADDRREQ;
-+		dst_addr = ro->dst_addr;
-+	}
- 
- 	if (!ro->bound)
- 		dev = dev_getfirstbyhwtype(sock_net(sk), ARPHRD_IEEE802154);
-@@ -651,16 +665,6 @@ static int dgram_sendmsg(struct sock *sk, struct msghdr *msg, size_t size)
- 	cb = mac_cb_init(skb);
- 	cb->type = IEEE802154_FC_TYPE_DATA;
- 	cb->ackreq = ro->want_ack;
--
--	if (msg->msg_name) {
--		DECLARE_SOCKADDR(struct sockaddr_ieee802154*,
--				 daddr, msg->msg_name);
--
--		ieee802154_addr_from_sa(&dst_addr, &daddr->addr);
--	} else {
--		dst_addr = ro->dst_addr;
--	}
--
- 	cb->secen = ro->secen;
- 	cb->secen_override = ro->secen_override;
- 	cb->seclevel = ro->seclevel;
--- 
-2.27.0
+There is no problem with that. There is for me a problem with the
+receive path when certain filtering levels are active.
+
+> [1] https://github.com/miquelraynal/linux/blob/wpan-next/scan/net/mac802154/scan.c#L326
+> [2] https://github.com/miquelraynal/linux/blob/wpan-next/scan/net/mac802154/scan.c#L55
+>
+> > The other receive path while not in promiscuous mode
+> > (phy->filtering == IEEE802154_FILTERING_4_FRAME_FIELDS) should never
+> > require any additional filtering. I somehow miss this point here.
+>
+> Maybe the drv_start() function should receive an sdata pointer. This way
+> instead of changing the PHY filtering level to what has just be asked
+> blindly, the code should look at the filtering level of all the
+> interfaces up on the PHY and apply the lowest filtering level by
+> hardware, knowing that on a per interface basis, the software will
+> compensate.
+>
+> It should work just fine because local->phy->filtering shows the actual
+> filtering level of the PHY while sdata->requested_filtering shows the
+> level of filtering that was expected on each interface. If you don't
+> like the idea of having a mutable sdata->requested_filtering entry, I
+> can have an sdata->base_filtering which should only be set by
+> ieee802154_setup_sdata() and an sdata->expected_filtering which would
+> reflect what the mac expects on this interface at the present moment.
+>
+
+From my view is that if we disable address filters (all filtering
+modes except IEEE802154_FILTERING_4_FRAME_FIELDS) we never can call
+netif_receive_skb(). This patch series tries to "compensate" the
+missing filtering on phy which is fine only to handle things related
+for the scan operation but nothing else.
+
+The reason why we can't call netif_receive_skb() is because we don't
+have ackknowledge handling, whereas for scanning we ignore ack frames
+and that's why we don't need it.
+
+> > For 1), the driver should change the filtering mode" when we start to
+> > "listen", this is done by the start() driver callback. They should get
+> > all receive parameters and set up receiving to whatever mac802154,
+> > currently there is a bit of chaos there. To move it into drv_start()
+> > is just a workaround to begin this step that we move it at some point
+> > to the driver. I mention 1) here because that should be part of the
+> > picture how everything works together when the phy is switched to a
+> > different filter level while it's operating (I mean there are running
+> > interfaces on it which requires IEEE802154_FILTERING_4_FRAME_FIELDS)
+> > which then activates the different receive path for the use case of
+> > scanning (something like (phy->state & WPANPHY_SCANING) == true)?
+>
+> Scanning is a dedicated filtering level per-se because it must discard
+> !beacon frames, that's why I request this level of filtering (which
+> maybe I should do on a per-interface basis instead of using the *local
+> poiner).
+>
+
+We only can do a per filter level per interface if the hardware has
+support for such a thing. Currently there is one address filter and if
+it's disabled we lose ackknowledge handling (as general rule), we
+can't compensate by doing any additional filtering by software in this
+mode.
+
+> > I am sorry, but I somehow miss the picture of how those things work
+> > together. It is not clear for me and I miss those parts to get a whole
+> > picture of this. For me it's not clear that those patches are going in
+> > this direction.
+>
+> Please tell me if it's more clear and if you agree with this vision. I
+> don't have time to draft something this week.
+>
+
+That's fine. We should agree on things like compensate lower filter
+levels by doing additional softmac filtering to reach
+IEEE802154_FILTERING_4_FRAME_FIELDS filtering from others because we
+will lose AACK handling. It is only fine to do that in mac802154
+receive path but don't deliver it to the upper layer.
+
+- Alex
 
