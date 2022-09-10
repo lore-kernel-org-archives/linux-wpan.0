@@ -2,35 +2,35 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31AF9ECAAD3
-	for <linux-wpan@archiver.kernel.org>; Sat, 10 Sep 2022 21:18:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38A34ECAAD3
+	for <linux-wpan@archiver.kernel.org>; Sat, 10 Sep 2022 21:22:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230110AbiIJVSc (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Sat, 10 Sep 2022 17:18:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57876 "EHLO
+        id S230363AbiIJVWX (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Sat, 10 Sep 2022 17:22:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57244 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229777AbiIJVRz (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Sat, 10 Sep 2022 17:17:55 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0D4D4D839;
-        Sat, 10 Sep 2022 14:17:17 -0700 (PDT)
+        with ESMTP id S229947AbiIJVVg (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Sat, 10 Sep 2022 17:21:36 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B1244D170;
+        Sat, 10 Sep 2022 14:18:17 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id C098CB8091F;
-        Sat, 10 Sep 2022 21:17:07 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 504F0C433C1;
-        Sat, 10 Sep 2022 21:17:05 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id C160E60E86;
+        Sat, 10 Sep 2022 21:18:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F263DC433B5;
+        Sat, 10 Sep 2022 21:18:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1662844626;
-        bh=aP6TAb15tNPi4eXC5gCwEOp7OPAJcLAkJ95Ukb8I0hg=;
+        s=k20201202; t=1662844697;
+        bh=LiI4v9vBPc7mLT6eREo4zXLAyk3E8pYsOLWHLK96i/o=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=iEsHow/L36XYycuVPB6DCfEQvFgRoBVHc2rpXTJYutsxYpwmOQvwlz+yB+I60MppD
-         tJ8B8I+b2+n0LsNH4akwEnTg8u6SvtCvijl+hD+8982QtUoFukXpk6TO/hNtIy0e17
-         8bzpfAUtovx63pfrAdaZsa3jf1Szu2JJVQoQ95qzFP7MaJ18JVVia17wtLtDOukzJf
-         N333a4HY/WASFTd30NvqZTCVmjBNWEV3iyqhWs3R4/ygbTv3fdrSDB1IW49WTlHV4f
-         qLdiaqHyNH9Li7jPIC1Jf/XoA7NU/URrz5YehjvspeISs2LrECHLRlYVRVyC46/05p
-         KlwOS0GChBuuQ==
+        b=IoPjhHHBgDKQv+O7iiVxbQ/YWZFv05Z4tFwxfrnCvVAlSoDC1nWy29jSMs6Y+Q008
+         a+tYRC2+XmeEQeOIKfK49hCfCFJi0tgHZyiVmeChHYHptWFdIa0eb7XIg8Pco5nabi
+         2w7R2dTgScNKH0GMFeudzY/YZp7pg1f1mAHhg6PAozCa0VBhYm+11G3MmwZtNoHxGX
+         SrOix6hzlujYdXShXubUhae6JtMb46G/VkLP7uUHqv/xpQ+0E4kOUQbPZXqvlL7bJt
+         +q0nRrvTKzHoTgMKm+C96BWUQ/g11Wuhze2c0f8cEPRUCjWWsFXhmsSu3Un6m3SdR3
+         iT3vgvXHPRWtg==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Li Qiong <liqiong@nfschina.com>,
@@ -39,12 +39,12 @@ Cc:     Li Qiong <liqiong@nfschina.com>,
         alex.aring@gmail.com, davem@davemloft.net, edumazet@google.com,
         kuba@kernel.org, pabeni@redhat.com, linux-wpan@vger.kernel.org,
         netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.19 22/38] ieee802154: cc2520: add rc code in cc2520_tx()
-Date:   Sat, 10 Sep 2022 17:16:07 -0400
-Message-Id: <20220910211623.69825-22-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.15 14/21] ieee802154: cc2520: add rc code in cc2520_tx()
+Date:   Sat, 10 Sep 2022 17:17:45 -0400
+Message-Id: <20220910211752.70291-14-sashal@kernel.org>
 X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20220910211623.69825-1-sashal@kernel.org>
-References: <20220910211623.69825-1-sashal@kernel.org>
+In-Reply-To: <20220910211752.70291-1-sashal@kernel.org>
+References: <20220910211752.70291-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -69,7 +69,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 1 insertion(+)
 
 diff --git a/drivers/net/ieee802154/cc2520.c b/drivers/net/ieee802154/cc2520.c
-index 1e1f40f628a02..c69b87d3837da 100644
+index 89c046b204e0c..4517517215f2b 100644
 --- a/drivers/net/ieee802154/cc2520.c
 +++ b/drivers/net/ieee802154/cc2520.c
 @@ -504,6 +504,7 @@ cc2520_tx(struct ieee802154_hw *hw, struct sk_buff *skb)
