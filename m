@@ -2,153 +2,84 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69B9FC54EE9
-	for <linux-wpan@archiver.kernel.org>; Fri,  9 Sep 2022 01:02:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31AF9ECAAD3
+	for <linux-wpan@archiver.kernel.org>; Sat, 10 Sep 2022 21:18:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229577AbiIIBCp (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Thu, 8 Sep 2022 21:02:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41824 "EHLO
+        id S230110AbiIJVSc (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Sat, 10 Sep 2022 17:18:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57876 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229569AbiIIBCo (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 8 Sep 2022 21:02:44 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4866E9020
-        for <linux-wpan@vger.kernel.org>; Thu,  8 Sep 2022 18:02:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1662685362;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=q2d3x4Dkk5GcLF+MUMfDEfqQERDFnAItNweZdV/7zYI=;
-        b=SIOLTO6U7xjwbCfamYmqMfGtn8PGW6Ra96Kv31HYz57+0zkvRyMcyHGbRIqRmGlVmGfQL5
-        0kI+yIE0R0Mn8FM+f5OigqtZyPRNlrqewC8wkT5n52F+11m8sLbsQyDmk2C8Yh4Wsdjr3a
-        jyct33QmDoiDwREj5rFIfjVPUqrphsI=
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com
- [209.85.166.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-395-bI-JpuqUPj-Q1dMgTTwSbw-1; Thu, 08 Sep 2022 21:02:41 -0400
-X-MC-Unique: bI-JpuqUPj-Q1dMgTTwSbw-1
-Received: by mail-il1-f198.google.com with SMTP id h5-20020a056e021d8500b002eb09a4f7e6so124294ila.14
-        for <linux-wpan@vger.kernel.org>; Thu, 08 Sep 2022 18:02:40 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=q2d3x4Dkk5GcLF+MUMfDEfqQERDFnAItNweZdV/7zYI=;
-        b=ZZfNKDCfTDCGpoMlOigQwcmt6qeoznKldrp4yZYc+ieDgROUuts6m8l8qI8PF94NKo
-         +MfikZADtS577NlzMO2p/G8yD0NNAoLnEkDYVEBXzr6MKO7iIn4dLAP+FkQfjPZkClHw
-         kTCQF8htCR9s3rsW62sCAlRNBGGHnbzOUYxDbmPjBXONhnK60Tu4zekf8ywdCTiecO4C
-         W5cm1ut81yOMRiTF+9wH4I9FDKel8p8JBVbgFZBiE+Le1A0+CzYuJcIsWdxtAMJ5bfOc
-         AihsgrxdjIm817QA+OFvCKbDfnB2pbdrbjUDGU8N4UR2EXnD+lXgr8aaZXPov1Pf7x3p
-         5hWw==
-X-Gm-Message-State: ACgBeo0dyployTf2f0SCfyyiZd80Kog7LNsWjX1WeLTHPt2QWSVCmhDV
-        v2fyNBT8ENhn4iwnCefHXAviZraq7lKVOSYna3qpeHR13f26eoNwMYM2HBprr5LhgcplfJxft51
-        lgJ38i5iM8hzSJqXzSUtdXZMcSSbC9FtEfGJ2qQ==
-X-Received: by 2002:a05:6638:1492:b0:34c:d42:ac2f with SMTP id j18-20020a056638149200b0034c0d42ac2fmr6215632jak.305.1662685360473;
-        Thu, 08 Sep 2022 18:02:40 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR62dyumc5VIw/U1Eq33JEOqNluH1vr9meRl5SSu5X8hz16B1yL4d4EP8X7GmqQ43clxoWwpT3zufS9SSRaedZk=
-X-Received: by 2002:a05:6638:1492:b0:34c:d42:ac2f with SMTP id
- j18-20020a056638149200b0034c0d42ac2fmr6215619jak.305.1662685360286; Thu, 08
- Sep 2022 18:02:40 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220905203412.1322947-1-miquel.raynal@bootlin.com>
- <20220905203412.1322947-9-miquel.raynal@bootlin.com> <CAK-6q+jB0HQsU_wzr2T-qdGj=YSdf08DTZ0WTmRvDQt0Px7+Rg@mail.gmail.com>
-In-Reply-To: <CAK-6q+jB0HQsU_wzr2T-qdGj=YSdf08DTZ0WTmRvDQt0Px7+Rg@mail.gmail.com>
-From:   Alexander Aring <aahringo@redhat.com>
-Date:   Thu, 8 Sep 2022 21:02:29 -0400
-Message-ID: <CAK-6q+g4xhqY-5HOBdYc_s4sHgZxtpZjfoN0_wXeDTKC6LmBPQ@mail.gmail.com>
-Subject: Re: [PATCH wpan/next v3 8/9] net: mac802154: Ensure proper general
- purpose frame filtering
-To:     Miquel Raynal <miquel.raynal@bootlin.com>
-Cc:     Alexander Aring <alex.aring@gmail.com>,
+        with ESMTP id S229777AbiIJVRz (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Sat, 10 Sep 2022 17:17:55 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0D4D4D839;
+        Sat, 10 Sep 2022 14:17:17 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id C098CB8091F;
+        Sat, 10 Sep 2022 21:17:07 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 504F0C433C1;
+        Sat, 10 Sep 2022 21:17:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1662844626;
+        bh=aP6TAb15tNPi4eXC5gCwEOp7OPAJcLAkJ95Ukb8I0hg=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=iEsHow/L36XYycuVPB6DCfEQvFgRoBVHc2rpXTJYutsxYpwmOQvwlz+yB+I60MppD
+         tJ8B8I+b2+n0LsNH4akwEnTg8u6SvtCvijl+hD+8982QtUoFukXpk6TO/hNtIy0e17
+         8bzpfAUtovx63pfrAdaZsa3jf1Szu2JJVQoQ95qzFP7MaJ18JVVia17wtLtDOukzJf
+         N333a4HY/WASFTd30NvqZTCVmjBNWEV3iyqhWs3R4/ygbTv3fdrSDB1IW49WTlHV4f
+         qLdiaqHyNH9Li7jPIC1Jf/XoA7NU/URrz5YehjvspeISs2LrECHLRlYVRVyC46/05p
+         KlwOS0GChBuuQ==
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Li Qiong <liqiong@nfschina.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
-        linux-wpan@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
-        David Girault <david.girault@qorvo.com>,
-        Romuald Despres <romuald.despres@qorvo.com>,
-        Frederic Blain <frederic.blain@qorvo.com>,
-        Nicolas Schodet <nico@ni.fr.eu.org>,
-        Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Content-Type: text/plain; charset="UTF-8"
+        Sasha Levin <sashal@kernel.org>, varkabhadram@gmail.com,
+        alex.aring@gmail.com, davem@davemloft.net, edumazet@google.com,
+        kuba@kernel.org, pabeni@redhat.com, linux-wpan@vger.kernel.org,
+        netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.19 22/38] ieee802154: cc2520: add rc code in cc2520_tx()
+Date:   Sat, 10 Sep 2022 17:16:07 -0400
+Message-Id: <20220910211623.69825-22-sashal@kernel.org>
+X-Mailer: git-send-email 2.35.1
+In-Reply-To: <20220910211623.69825-1-sashal@kernel.org>
+References: <20220910211623.69825-1-sashal@kernel.org>
+MIME-Version: 1.0
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi,
+From: Li Qiong <liqiong@nfschina.com>
 
-On Thu, Sep 8, 2022 at 9:00 PM Alexander Aring <aahringo@redhat.com> wrote:
->
-> Hi,
->
-> On Mon, Sep 5, 2022 at 4:35 PM Miquel Raynal <miquel.raynal@bootlin.com> wrote:
-> >
-> > Most of the PHYs seem to cope with the standard filtering rules by
-> > default. Some of them might not, like hwsim which is only software, and
->
-> yes, as I said before hwsim should pretend to be like all other
-> hardware we have.
->
-> > in this case advertises its real filtering level with the new
-> > "filtering" internal value.
-> >
-> > The core then needs to check what is expected by looking at the PHY
-> > requested filtering level and possibly apply additional filtering
-> > rules.
-> >
-> > Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
-> > ---
-> >  include/net/ieee802154_netdev.h |  8 ++++
-> >  net/mac802154/rx.c              | 78 +++++++++++++++++++++++++++++++++
-> >  2 files changed, 86 insertions(+)
-> >
-> > diff --git a/include/net/ieee802154_netdev.h b/include/net/ieee802154_netdev.h
-> > index d0d188c3294b..1b82bbafe8c7 100644
-> > --- a/include/net/ieee802154_netdev.h
-> > +++ b/include/net/ieee802154_netdev.h
-> > @@ -69,6 +69,14 @@ struct ieee802154_hdr_fc {
-> >  #endif
-> >  };
-> >
-> > +enum ieee802154_frame_version {
-> > +       IEEE802154_2003_STD,
-> > +       IEEE802154_2006_STD,
-> > +       IEEE802154_STD,
-> > +       IEEE802154_RESERVED_STD,
-> > +       IEEE802154_MULTIPURPOSE_STD = IEEE802154_2003_STD,
-> > +};
-> > +
-> >  struct ieee802154_hdr {
-> >         struct ieee802154_hdr_fc fc;
-> >         u8 seq;
-> > diff --git a/net/mac802154/rx.c b/net/mac802154/rx.c
-> > index c43289c0fdd7..bc46e4a7669d 100644
-> > --- a/net/mac802154/rx.c
-> > +++ b/net/mac802154/rx.c
-> > @@ -52,6 +52,84 @@ ieee802154_subif_frame(struct ieee802154_sub_if_data *sdata,
-> >                                 mac_cb(skb)->type);
-> >                         goto fail;
-> >                 }
-> > +       } else if (sdata->required_filtering == IEEE802154_FILTERING_4_FRAME_FIELDS &&
->
-> We switch here from determine that receive path, means way we are
+[ Upstream commit ffd7bdddaab193c38416fd5dd416d065517d266e ]
 
-- way
+The rc code is 0 at the error path "status & CC2520_STATUS_TX_UNDERFLOW".
+Assign rc code with '-EINVAL' at this error path to fix it.
 
-> going from interface type to the required filtering value. Sure there
-> is currently a 1:1 mapping for them now but I don't know why we are
-> doing that and this is in my opinion wrong. The receive path should
-> depend on interface type as it was before and for scanning there is
-> some early check like:
->
-> if (wpan_phy_is_in_scan_mode_state(local)) {
->      do_receive_scanning(...)
->      /* don't do any other delivery because they provide it to upper layer */
+Signed-off-by: Li Qiong <liqiong@nfschina.com>
+Link: https://lore.kernel.org/r/20220829071259.18330-1-liqiong@nfschina.com
+Signed-off-by: Stefan Schmidt <stefan@datenfreihafen.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/net/ieee802154/cc2520.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-In the assumption we know if the condition above is true we have
-address filtering disabled.
-
-- Alex
+diff --git a/drivers/net/ieee802154/cc2520.c b/drivers/net/ieee802154/cc2520.c
+index 1e1f40f628a02..c69b87d3837da 100644
+--- a/drivers/net/ieee802154/cc2520.c
++++ b/drivers/net/ieee802154/cc2520.c
+@@ -504,6 +504,7 @@ cc2520_tx(struct ieee802154_hw *hw, struct sk_buff *skb)
+ 		goto err_tx;
+ 
+ 	if (status & CC2520_STATUS_TX_UNDERFLOW) {
++		rc = -EINVAL;
+ 		dev_err(&priv->spi->dev, "cc2520 tx underflow exception\n");
+ 		goto err_tx;
+ 	}
+-- 
+2.35.1
 
