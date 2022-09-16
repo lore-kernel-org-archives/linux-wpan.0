@@ -2,76 +2,80 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C73DBECAAD3
-	for <linux-wpan@archiver.kernel.org>; Thu, 15 Sep 2022 07:06:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9601CECAAD8
+	for <linux-wpan@archiver.kernel.org>; Fri, 16 Sep 2022 10:00:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229470AbiIOHG1 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Thu, 15 Sep 2022 03:06:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57746 "EHLO
+        id S230323AbiIPKAU (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Fri, 16 Sep 2022 06:00:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49570 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229498AbiIOHG0 (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 15 Sep 2022 03:06:26 -0400
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD42D40E29;
-        Thu, 15 Sep 2022 00:06:24 -0700 (PDT)
-Received: from dggpemm500022.china.huawei.com (unknown [172.30.72.53])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4MSp7c69FsznVHP;
-        Thu, 15 Sep 2022 15:03:08 +0800 (CST)
-Received: from dggpemm500007.china.huawei.com (7.185.36.183) by
- dggpemm500022.china.huawei.com (7.185.36.162) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Thu, 15 Sep 2022 15:05:51 +0800
-Received: from huawei.com (10.175.103.91) by dggpemm500007.china.huawei.com
- (7.185.36.183) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Thu, 15 Sep
- 2022 15:05:50 +0800
-From:   Yang Yingliang <yangyingliang@huawei.com>
-To:     <netdev@vger.kernel.org>, <linux-wpan@vger.kernel.org>
-CC:     <liuxuenetmail@gmail.com>, <alex.aring@gmail.com>,
-        <stefan@datenfreihafen.org>, <davem@davemloft.net>
-Subject: [PATCH -next] net: ieee802154: mcr20a: Switch to use dev_err_probe() helper
-Date:   Thu, 15 Sep 2022 15:12:58 +0800
-Message-ID: <20220915071258.678536-1-yangyingliang@huawei.com>
-X-Mailer: git-send-email 2.25.1
+        with ESMTP id S230320AbiIPKAT (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 16 Sep 2022 06:00:19 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 113564F682;
+        Fri, 16 Sep 2022 03:00:18 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id B1730B824F9;
+        Fri, 16 Sep 2022 10:00:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 5B4C9C433D7;
+        Fri, 16 Sep 2022 10:00:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1663322415;
+        bh=QuN1eFfsxYnLSx52QF1elJ0nSrhnmiSFkSaL18VzHXo=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=XoPrHj/duaNWxUjOW9FfXrhCmmljRQt2sxjao+fcz5b1EQ5mTNrg1EJRKkBX+gQvu
+         AhRNEHnxNHANgPzjuwbCOpvzQ6C8Pw2RyPXc8WdhTh5DpHOZ0g9IyfOmH1z99spmEc
+         4SunBai/37v7OrpvXdXOkQ/HlIl+1BN7TjSBHBSoUIIjGLirdJlfmxqyYV6cHGzdNJ
+         xOncBznbmKW7mK34U1S6b8jIlYkOPEBvrsHWZL2t3zRgBIlFIGgiwynumtOcZttWBr
+         rVbjeWf2lHa82soJzHphbece8wrth2Ujwle1HJ2yw9Rl5MZf5EZKXnL/pOOB5KbAcJ
+         +41hd842AUrUg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 36973C73FFC;
+        Fri, 16 Sep 2022 10:00:15 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.103.91]
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- dggpemm500007.china.huawei.com (7.185.36.183)
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH V3] net/ieee802154: fix uninit value bug in dgram_sendmsg
+From:   patchwork-bot+netdevbpf@kernel.org
+Message-Id: <166332241521.3955.11710579399956062313.git-patchwork-notify@kernel.org>
+Date:   Fri, 16 Sep 2022 10:00:15 +0000
+References: <20220908121927.3074843-1-tcs_kernel@tencent.com>
+In-Reply-To: <20220908121927.3074843-1-tcs_kernel@tencent.com>
+To:     Haimin Zhang <tcs.kernel@gmail.com>
+Cc:     alex.aring@gmail.com, stefan@datenfreihafen.org,
+        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com, linux-wpan@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        tcs_kernel@tencent.com
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-dev_err() can be replace with dev_err_probe() which will check if error
-code is -EPROBE_DEFER.
+Hello:
 
-Signed-off-by: Yang Yingliang <yangyingliang@huawei.com>
----
- drivers/net/ieee802154/mcr20a.c | 9 +++------
- 1 file changed, 3 insertions(+), 6 deletions(-)
+This patch was applied to netdev/net.git (master)
+by David S. Miller <davem@davemloft.net>:
 
-diff --git a/drivers/net/ieee802154/mcr20a.c b/drivers/net/ieee802154/mcr20a.c
-index 2fe0e4a0a0c4..f53d185e0568 100644
---- a/drivers/net/ieee802154/mcr20a.c
-+++ b/drivers/net/ieee802154/mcr20a.c
-@@ -1233,12 +1233,9 @@ mcr20a_probe(struct spi_device *spi)
- 	}
- 
- 	rst_b = devm_gpiod_get(&spi->dev, "rst_b", GPIOD_OUT_HIGH);
--	if (IS_ERR(rst_b)) {
--		ret = PTR_ERR(rst_b);
--		if (ret != -EPROBE_DEFER)
--			dev_err(&spi->dev, "Failed to get 'rst_b' gpio: %d", ret);
--		return ret;
--	}
-+	if (IS_ERR(rst_b))
-+		return dev_err_probe(&spi->dev, PTR_ERR(rst_b),
-+				     "Failed to get 'rst_b' gpio");
- 
- 	/* reset mcr20a */
- 	usleep_range(10, 20);
+On Thu,  8 Sep 2022 20:19:27 +0800 you wrote:
+> There is uninit value bug in dgram_sendmsg function in
+> net/ieee802154/socket.c when the length of valid data pointed by the
+> msg->msg_name isn't verified.
+> 
+> We introducing a helper function ieee802154_sockaddr_check_size to
+> check namelen. First we check there is addr_type in ieee802154_addr_sa.
+> Then, we check namelen according to addr_type.
+> 
+> [...]
+
+Here is the summary with links:
+  - [V3] net/ieee802154: fix uninit value bug in dgram_sendmsg
+    https://git.kernel.org/netdev/net/c/94160108a70c
+
+You are awesome, thank you!
 -- 
-2.25.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
