@@ -2,36 +2,64 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57609C6FA82
-	for <linux-wpan@archiver.kernel.org>; Wed, 21 Sep 2022 16:15:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD208C07E9D
+	for <linux-wpan@archiver.kernel.org>; Sat, 24 Sep 2022 19:51:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232537AbiIUQPY (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 21 Sep 2022 12:15:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50836 "EHLO
+        id S229929AbiIXTvM (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Sat, 24 Sep 2022 15:51:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58494 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232555AbiIUQO6 (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 21 Sep 2022 12:14:58 -0400
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::228])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 958709E8AA;
-        Wed, 21 Sep 2022 09:00:24 -0700 (PDT)
-Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id 306581BF205;
-        Wed, 21 Sep 2022 15:59:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1663775988;
+        with ESMTP id S229690AbiIXTvK (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Sat, 24 Sep 2022 15:51:10 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 715424BD38
+        for <linux-wpan@vger.kernel.org>; Sat, 24 Sep 2022 12:51:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1664049065;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=0n7aSrdrYSw+UI5ucpzj/zIatD/eWGzeiptQTDM8d0U=;
-        b=jGKZzSIXrWe5Vtdb0w9b4vZfzkgjnVuoZ6cCybhJQgyMvCd0kiAQ7nZJVAj0EqdE21SxeM
-        OHOBtt0W05XrHGFjMt+/r75/BcYxbNS9gojvV4Iq2i0yqndCp52m3LJkPyJOoIPIo4aYxe
-        0S+uKhpS10BUUrv0aVpxQs6NNaBwk728qH/hevtdchPKRg9aJTJU2u8ZjNMzrWXiF48WQY
-        A2GqbPKZeQGyrNhH2d60/R+edti8qaPDVjxG4GbHKq+56AaHHj3FfX/lRJ7neSHDFYnrT/
-        c1rmgCGvSjZtAzom1qEGpbhm5ELe+DfFcqgghUYoTNsbKYHfKTUr03yqDKh5jg==
-Date:   Wed, 21 Sep 2022 17:59:43 +0200
-From:   Miquel Raynal <miquel.raynal@bootlin.com>
-To:     Alexander Aring <aahringo@redhat.com>
+        bh=odn3sqVpyQr9YAIBdJl0sjpnZhEcZ6gddk067fbqm2I=;
+        b=jTMJKhNpvaLzeie1RH2+wY/9weTK5W3NEbUVVbQqjGXavf3rzUIRlFFyBEvgQsoVRLHhug
+        Fvjjr6na7DwcHb2QV/bSLcLJNqAf5CNCx4fXDBoof/zHQY5U5b17qPjj/tsaudfnG7xVhR
+        sb7QMC/SbKGUJHQjna6Lb0HZ41QVcGU=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-427-jIzG4jCQPVivoBqxNfsK4w-1; Sat, 24 Sep 2022 15:51:04 -0400
+X-MC-Unique: jIzG4jCQPVivoBqxNfsK4w-1
+Received: by mail-wm1-f72.google.com with SMTP id n32-20020a05600c3ba000b003b5054c71faso4147094wms.9
+        for <linux-wpan@vger.kernel.org>; Sat, 24 Sep 2022 12:51:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date;
+        bh=odn3sqVpyQr9YAIBdJl0sjpnZhEcZ6gddk067fbqm2I=;
+        b=mgQ+mV3X3PW+sgdcF7sYK/UcBy6Sfu6uSxeZuiUQgkuV653rFlsk2hEbxTDppG6REg
+         WOpVGTNX/8tcRVKkjfOGMNbffYMEA1v0DG3j3EUTq12tKRwTgajw/lAo5zKwJkio4sSN
+         lW0UNT+1tXx22AYR7hREa5CkJWVM5cNR1C/47PFIkjUzPrK4g7wfT8l1S50O/7FD7fl+
+         +AxOjb8Sqj2p2iL5Wo7UYNVKqVY/TastCF3jdqtYaNIdO3GE8RbhV5EKa1Uxpkeio2vo
+         cudggOzWIi8vbiELfMSIuMNvi2y79RLg02m8BQYRlf0DRlQqnqIOuTIKEUdU7Zfq44Qz
+         /bPA==
+X-Gm-Message-State: ACrzQf0h3+3g2oxokn0QQWhDUjBbBOw4RbALJLfIw5BNahnJqPi3JUV1
+        pGmDGlcZ3jOQItBTMEiD0Cbe0AP8x6MZUoHlmi6U9pUeSQ8f2exiGfFIz9XYp8LbQHphalKj6cz
+        fqypBABIt0LcqIYfy1tlfsy2gfYuMxKnVkRLAIg==
+X-Received: by 2002:a05:600c:4ec8:b0:3b4:bdc6:9b3d with SMTP id g8-20020a05600c4ec800b003b4bdc69b3dmr16854955wmq.181.1664049062817;
+        Sat, 24 Sep 2022 12:51:02 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM4eqAWG5MtLx9igHHMXUzF17iBbkbU3nppsljsH2P1nrwxtaai7gZOJqs6vPd9bABGg4AOxbpWbbUa/JDAtCDQ=
+X-Received: by 2002:a05:600c:4ec8:b0:3b4:bdc6:9b3d with SMTP id
+ g8-20020a05600c4ec800b003b4bdc69b3dmr16854945wmq.181.1664049062601; Sat, 24
+ Sep 2022 12:51:02 -0700 (PDT)
+MIME-Version: 1.0
+References: <20220905203412.1322947-1-miquel.raynal@bootlin.com>
+ <20220905203412.1322947-6-miquel.raynal@bootlin.com> <CAK-6q+gH3dRj6szUV6Add7G5nh1-5rBUpVLrrdbkjS22tz3ueA@mail.gmail.com>
+ <20220921174932.37f2938f@xps-13>
+In-Reply-To: <20220921174932.37f2938f@xps-13>
+From:   Alexander Aring <aahringo@redhat.com>
+Date:   Sat, 24 Sep 2022 15:50:51 -0400
+Message-ID: <CAK-6q+i64s=u-K3-t4So8jtQQxx_+FuWVc_THPxtFw6ruJ-zrg@mail.gmail.com>
+Subject: Re: [PATCH wpan/next v3 5/9] net: mac802154: Drop IEEE802154_HW_RX_DROP_BAD_CKSUM
+To:     Miquel Raynal <miquel.raynal@bootlin.com>
 Cc:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
         linux-wpan@vger.kernel.org,
@@ -44,131 +72,58 @@ Cc:     Alexander Aring <alex.aring@gmail.com>,
         Frederic Blain <frederic.blain@qorvo.com>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH wpan/next v3 8/9] net: mac802154: Ensure proper general
- purpose frame filtering
-Message-ID: <20220921175943.1f871b31@xps-13>
-In-Reply-To: <CAK-6q+jB0HQsU_wzr2T-qdGj=YSdf08DTZ0WTmRvDQt0Px7+Rg@mail.gmail.com>
-References: <20220905203412.1322947-1-miquel.raynal@bootlin.com>
-        <20220905203412.1322947-9-miquel.raynal@bootlin.com>
-        <CAK-6q+jB0HQsU_wzr2T-qdGj=YSdf08DTZ0WTmRvDQt0Px7+Rg@mail.gmail.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi Alexander,
+Hi,
 
-aahringo@redhat.com wrote on Thu, 8 Sep 2022 21:00:37 -0400:
-
-> Hi,
->=20
-> On Mon, Sep 5, 2022 at 4:35 PM Miquel Raynal <miquel.raynal@bootlin.com> =
-wrote:
+On Wed, Sep 21, 2022 at 11:49 AM Miquel Raynal
+<miquel.raynal@bootlin.com> wrote:
+>
+> Hi Alexander,
+>
+> aahringo@redhat.com wrote on Thu, 8 Sep 2022 20:49:36 -0400:
+>
+> > Hi,
 > >
-> > Most of the PHYs seem to cope with the standard filtering rules by
-> > default. Some of them might not, like hwsim which is only software, and=
- =20
->=20
-> yes, as I said before hwsim should pretend to be like all other
-> hardware we have.
->=20
-> > in this case advertises its real filtering level with the new
-> > "filtering" internal value.
+> > On Mon, Sep 5, 2022 at 4:34 PM Miquel Raynal <miquel.raynal@bootlin.com> wrote:
+> > >
+> > > This IEEE802154_HW_RX_DROP_BAD_CKSUM flag was only used by hwsim to
+> > > reflect the fact that it would not validate the checksum (FCS). In other
+> > > words, the filtering level of hwsim is always "NONE" while the core
+> > > expects it to be higher.
+> > >
+> > > Now that we have access to real filtering levels, we can actually use
+> > > them and always enforce the "NONE" level in hwsim. This case is already
+> > > correctly handled in the receive so we can drop the flag.
+> > >
 > >
-> > The core then needs to check what is expected by looking at the PHY
-> > requested filtering level and possibly apply additional filtering
-> > rules.
+> > I would say the whole hwsim driver currently only works because we
+> > don't transmit wrong frames on a virtual hardware... However this can
+> > be improved, yes. In my opinion the hwsim driver should pretend to
+> > work like other transceivers sending frames to mac802154. That means
+> > the filtering level should be implemented in hwsim not in mac802154 as
+> > on real hardware the hardware would do filtering.
 > >
-> > Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
-> > ---
-> >  include/net/ieee802154_netdev.h |  8 ++++
-> >  net/mac802154/rx.c              | 78 +++++++++++++++++++++++++++++++++
-> >  2 files changed, 86 insertions(+)
-> >
-> > diff --git a/include/net/ieee802154_netdev.h b/include/net/ieee802154_n=
-etdev.h
-> > index d0d188c3294b..1b82bbafe8c7 100644
-> > --- a/include/net/ieee802154_netdev.h
-> > +++ b/include/net/ieee802154_netdev.h
-> > @@ -69,6 +69,14 @@ struct ieee802154_hdr_fc {
-> >  #endif
-> >  };
-> >
-> > +enum ieee802154_frame_version {
-> > +       IEEE802154_2003_STD,
-> > +       IEEE802154_2006_STD,
-> > +       IEEE802154_STD,
-> > +       IEEE802154_RESERVED_STD,
-> > +       IEEE802154_MULTIPURPOSE_STD =3D IEEE802154_2003_STD,
-> > +};
-> > +
-> >  struct ieee802154_hdr {
-> >         struct ieee802154_hdr_fc fc;
-> >         u8 seq;
-> > diff --git a/net/mac802154/rx.c b/net/mac802154/rx.c
-> > index c43289c0fdd7..bc46e4a7669d 100644
-> > --- a/net/mac802154/rx.c
-> > +++ b/net/mac802154/rx.c
-> > @@ -52,6 +52,84 @@ ieee802154_subif_frame(struct ieee802154_sub_if_data=
- *sdata,
-> >                                 mac_cb(skb)->type);
-> >                         goto fail;
-> >                 }
-> > +       } else if (sdata->required_filtering =3D=3D IEEE802154_FILTERIN=
-G_4_FRAME_FIELDS && =20
->=20
-> We switch here from determine that receive path, means way we are
-> going from interface type to the required filtering value. Sure there
-> is currently a 1:1 mapping for them now but I don't know why we are
-> doing that and this is in my opinion wrong. The receive path should
-> depend on interface type as it was before and for scanning there is
-> some early check like:
+> > I think you should assume for now the previous behaviour that hwsim
+> > does not send bad frames out. Of course there is a bug but it was
+> > already there before, but the fix would be to change hwsim driver.
+>
+> Well, somehow I already implemented all the filtering by software in
+> one of the other patches. I now agree that it was not relevant (because
+> of the AACK issue you raised), but instead of fully dropping this code
+> I might just move it to hwsim because there it would perfectly make
+> sense?
+>
 
-Maybe on this one I am not fully convinced yet.
+Yes, I agree. You should make the "in-driver receive path" acting like
+other hardware (In sense what we currently agree on what filtering
+they do) if promiscuous mode is turned off/on.
 
-In your opinion (I try to rephrase so that we align on what you told
-me) the total lack of filtering is only something that is reserved to
-monitor interfaces, so you make an implicit link between interface type
-and filtering level.
+It makes sense and should be done there. The
+IEEE802154_HW_RX_DROP_BAD_CKSUM flag should still be dropped.
 
-I would argue that this is true today, but as the "no filtering at all"
-level is defined in the spec, I assumed it was a possible level that
-one would want to achieve some day (not sure for what purpose yet). So
-I assumed it would be more relevant to only work with the
-expected filtering level in the receive path rather than on the
-interface type, it makes more sense IMHO. In practice I agree it should
-be the same filtering-wise, but from a conceptual point of view I find
-the current logic partially satisfying.
+- Alex
 
-Would you agree with me only using "expected filtering levels" rather
-than:
-- sometimes the interface type
-- sometimes the mac state (scan)
-- otherwise, by default, the highest filtering level
-?
-
-I think it would clarify the receive path.
-
-I will of course get rid of most of all the other "nasty"
-software filtering additions you nacked in the other threads.
-
-> if (wpan_phy_is_in_scan_mode_state(local)) {
->      do_receive_scanning(...)
->      /* don't do any other delivery because they provide it to upper laye=
-r */
->      return;
-> }
->=20
-> Maybe you should do monitors receive that frame before as well, but
-> every other interface type should currently not receive it.
->=20
-> - Alex
->=20
-
-
-Thanks,
-Miqu=C3=A8l
