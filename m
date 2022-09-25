@@ -2,73 +2,72 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F9D6C04A95
-	for <linux-wpan@archiver.kernel.org>; Sun, 25 Sep 2022 18:57:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68E25C6FA82
+	for <linux-wpan@archiver.kernel.org>; Sun, 25 Sep 2022 22:27:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231521AbiIYS5H (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Sun, 25 Sep 2022 14:57:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48716 "EHLO
+        id S232759AbiIYW1h (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Sun, 25 Sep 2022 18:27:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35960 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229951AbiIYS5D (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Sun, 25 Sep 2022 14:57:03 -0400
+        with ESMTP id S229711AbiIYW1g (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Sun, 25 Sep 2022 18:27:36 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 485E025E94
-        for <linux-wpan@vger.kernel.org>; Sun, 25 Sep 2022 11:57:00 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08F2526AF6
+        for <linux-wpan@vger.kernel.org>; Sun, 25 Sep 2022 15:27:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1664132219;
+        s=mimecast20190719; t=1664144854;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=h3q66F9eT2aQVbMBk0CYVVCbEvOxteorCcX0C9uU+GM=;
-        b=Dzr36/jsvqxqhtNky7Vq/sNTddwMZuHVTXJasKvYXYdGxJ+wvXfqf3/xlGmitWWyv1wSYu
-        CKnbmeInCdMsxTWOdDn03k9mdMX6R1dxRYynN/5fccLmqIen6BZ2NByA3L6VrbQXW3UTNn
-        lKqRkInQLVZgMTZEWu7YNQig7HiCUoM=
+        bh=Q2h5D9tlYvoQ32Tv7pSPDuAg7L7Phfd+WArKfg7goCk=;
+        b=d6zaDSEwjHiBeEwpf5sbNQ8TEof3fhbAoiICBvX9GQBf8z0TTVIn/sh/kSso+30umeU583
+        O00cZLrQHY5muJ64FQbrDKWYAp5qz/RU5IWZCjw6D51ktj3JtWDv6jpRhhS+HEFxu937xV
+        i6XK2oNOnOGVybdO+wD89xhFULuW28U=
 Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
  [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-617-3QdmsUcdN_OpZSSlF2TaLw-1; Sun, 25 Sep 2022 14:56:58 -0400
-X-MC-Unique: 3QdmsUcdN_OpZSSlF2TaLw-1
-Received: by mail-wm1-f70.google.com with SMTP id k38-20020a05600c1ca600b003b49a809168so5853022wms.5
-        for <linux-wpan@vger.kernel.org>; Sun, 25 Sep 2022 11:56:57 -0700 (PDT)
+ us-mta-575-6WKtjP-kNfWPZoaBZlelzw-1; Sun, 25 Sep 2022 18:27:32 -0400
+X-MC-Unique: 6WKtjP-kNfWPZoaBZlelzw-1
+Received: by mail-wm1-f70.google.com with SMTP id 5-20020a05600c028500b003b4d2247d3eso5601844wmk.0
+        for <linux-wpan@vger.kernel.org>; Sun, 25 Sep 2022 15:27:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=h3q66F9eT2aQVbMBk0CYVVCbEvOxteorCcX0C9uU+GM=;
-        b=0t7PqJVn6mG6E7wgcft6OFaPbeiKq+RAVvWS2zcbHcrKO5laJQ3aBMHptdgY1oWzlL
-         lx7g9C/v9bjnxBxTGPlGWgkQF9OwcGFg6/p4Y1kHRicFpjGQ3mow4j0trOQ9YFOiwgMW
-         SeCiWS4ux2Yr9EpUCPtMEa42WsfiW1U8FFmps7NQi8Lodb9j5xiaHtlvrRRug2SSYysp
-         k/m6uAp4eM6cwf1zsM1pDIq7zcs6sWP3M840ZVux6M/W8IZifhcHdMClHg8TzC1sb/5w
-         3tYZPLfF1f39wNiXMVZzWqdYzrmKvPH6RLi33IyAYRIh0/YyiXB/4hEekTGMDI+9bxEp
-         8ubg==
-X-Gm-Message-State: ACrzQf0w0DIIHM/8G8322Za/iCaLQvYWUv8F27E5o94NASUv1KY72YA/
-        9Zc2D9Sx1/AzkD8lMG/Fm42VmisEurmDTjM1+tvy+rXRdpoj7vb2T6G1/OdW+EmzKLVRDEkZV3K
-        Asy4Ng7y2TdZXIRX+BeftRrOnmjEy8gmPeTlmJg==
-X-Received: by 2002:a5d:654d:0:b0:22a:ff55:e9c9 with SMTP id z13-20020a5d654d000000b0022aff55e9c9mr10992751wrv.14.1664132216578;
-        Sun, 25 Sep 2022 11:56:56 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM4Hxq2+aJc3CaZOu/REND+CeSK7bQM9g3c0mFiegmisk3BMMLDE88ZAbAEXNSBDXcCzTjoQ+Xj1sAZAU9RPke8=
-X-Received: by 2002:a5d:654d:0:b0:22a:ff55:e9c9 with SMTP id
- z13-20020a5d654d000000b0022aff55e9c9mr10992746wrv.14.1664132216314; Sun, 25
- Sep 2022 11:56:56 -0700 (PDT)
+        bh=Q2h5D9tlYvoQ32Tv7pSPDuAg7L7Phfd+WArKfg7goCk=;
+        b=Vph8H2MYzPAfkB9uAaVUxqiIrtmCIbggelnzgzraoqaOrBGhzzb1DRUpsOHGNtXk6F
+         uXgtxo8+KkfFF6XzZEDqETh21jhMkUZKzbEso+u0v7jZfhJZKp89ZQ53WuHAVLvGNwPT
+         NLYfjvgGA6E7lFpo0R0/KPe6FeZ+CJZf5iSFKrHcCnCsSQSEKEzfwUwRF4Gy1Ap0Y6go
+         ggqzsJstrpk6SVV+Vx9spsMEuq1jZb0xcGi87m0Gz8Mq7wwN5EZoYvz74DOfHXRwP3WR
+         a5NRvTH0WiNLcIUd8IABzOml1PCI8MKZFmq9khrHbAsFyAV7JVl34HzB1FyYEmkOBQ6Z
+         HMrg==
+X-Gm-Message-State: ACrzQf2QyP93sAEnv/ucYp8wNP/NCzIlu72r8WgE4k+Rp4toze2dHJ3V
+        XlOr6ghZP+Emn3m2eDcw6G4od4GTHx4QGBLoBBmIoB9C0ybhNMob3fKeVCw3LR8vmp5uwm5luQW
+        f5r+7V18yrLTPn3dYdtP3JjaeE3q5/ib70AVd1A==
+X-Received: by 2002:a05:600c:4211:b0:3b4:6334:9940 with SMTP id x17-20020a05600c421100b003b463349940mr13185732wmh.166.1664144851625;
+        Sun, 25 Sep 2022 15:27:31 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM4plqy4OGex8RGN5eqYRH4uS4LglYo6rSnGtBIp6ZJE8vd0ZmnoNqQfHaVkmTEzT/+De8F3iAFTWakvGvwEgWs=
+X-Received: by 2002:a05:600c:4211:b0:3b4:6334:9940 with SMTP id
+ x17-20020a05600c421100b003b463349940mr13185724wmh.166.1664144851368; Sun, 25
+ Sep 2022 15:27:31 -0700 (PDT)
 MIME-Version: 1.0
 References: <20220905203412.1322947-1-miquel.raynal@bootlin.com>
- <CAK-6q+g64BTFsHKKwoCqRGEERRgwoMSTX2LJMQMmmRseWBi=hQ@mail.gmail.com>
- <20220908093648.5bae41b2@xps-13> <CAK-6q+jDM=ewcCYtuHuH7sHJjbOpa4SPjY_VyeaCnoF1g6KSFA@mail.gmail.com>
- <20220921174554.266b04bc@xps-13>
-In-Reply-To: <20220921174554.266b04bc@xps-13>
+ <20220905203412.1322947-9-miquel.raynal@bootlin.com> <CAK-6q+jB0HQsU_wzr2T-qdGj=YSdf08DTZ0WTmRvDQt0Px7+Rg@mail.gmail.com>
+ <20220921175943.1f871b31@xps-13>
+In-Reply-To: <20220921175943.1f871b31@xps-13>
 From:   Alexander Aring <aahringo@redhat.com>
-Date:   Sun, 25 Sep 2022 14:56:44 -0400
-Message-ID: <CAK-6q+hsE5_6ZiZnq7Q8bMni8i0-Osiert=Y4qf=EFUjX44V2w@mail.gmail.com>
-Subject: Re: [PATCH wpan/next v3 0/9] net: ieee802154: Support scanning/beaconing
+Date:   Sun, 25 Sep 2022 18:27:19 -0400
+Message-ID: <CAK-6q+h4KDNqWMX+NNg+d-J7Pmi9HdmXbUqfiGedmFsHOEtMcA@mail.gmail.com>
+Subject: Re: [PATCH wpan/next v3 8/9] net: mac802154: Ensure proper general
+ purpose frame filtering
 To:     Miquel Raynal <miquel.raynal@bootlin.com>
 Cc:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
-        linux-wpan - ML <linux-wpan@vger.kernel.org>,
+        linux-wpan@vger.kernel.org,
         "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
         Paolo Abeni <pabeni@redhat.com>,
-        Eric Dumazet <edumazet@google.com>,
-        Network Development <netdev@vger.kernel.org>,
+        Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
         David Girault <david.girault@qorvo.com>,
         Romuald Despres <romuald.despres@qorvo.com>,
         Frederic Blain <frederic.blain@qorvo.com>,
@@ -81,176 +80,126 @@ X-Mailing-List: linux-wpan@vger.kernel.org
 
 Hi,
 
-On Wed, Sep 21, 2022 at 11:46 AM Miquel Raynal
+On Wed, Sep 21, 2022 at 11:59 AM Miquel Raynal
 <miquel.raynal@bootlin.com> wrote:
 >
 > Hi Alexander,
 >
-> aahringo@redhat.com wrote on Thu, 8 Sep 2022 20:41:14 -0400:
+> aahringo@redhat.com wrote on Thu, 8 Sep 2022 21:00:37 -0400:
 >
 > > Hi,
 > >
-> > On Thu, Sep 8, 2022 at 3:37 AM Miquel Raynal <miquel.raynal@bootlin.com> wrote:
+> > On Mon, Sep 5, 2022 at 4:35 PM Miquel Raynal <miquel.raynal@bootlin.com> wrote:
 > > >
-> > > Hi Alexander,
-> > >
-> > > aahringo@redhat.com wrote on Wed, 7 Sep 2022 21:40:13 -0400:
-> > >
-> > > > Hi,
-> > > >
-> > > > On Mon, Sep 5, 2022 at 4:34 PM Miquel Raynal <miquel.raynal@bootlin.com> wrote:
-> > > > >
-> > > > > Hello,
-> > > > >
-> > > > > A third version of this series, dropping the scan patches for now
-> > > > > because before we need to settle on the filtering topic and the
-> > > > > coordinator interface topic. Here is just the filtering part, I've
-> > > > > integrated Alexander's patches, as well as the atusb fix. Once this is
-> > > > > merge there are a few coordinator-related patches, and finally the
-> > > > > scan.
-> > > >
-> > > > I think we have a communication problem here and we should talk about
-> > > > what the problems are and agree on a way to solve them.
-> > > >
-> > > > The problems are:
-> > > >
-> > > > 1. We never supported switching from an operating phy (interfaces are
-> > > > up) into another filtering mode.
-> > >
-> > > In the trigger scan path there is a:
-> > >
-> > >         mlme_op_pre() // stop Tx
-> > >         drv_stop() // stop Rx
-> > >         synchronize_net()
-> > >         drv_start(params) // restart Rx with another hw filtering level
-> > >
+> > > Most of the PHYs seem to cope with the standard filtering rules by
+> > > default. Some of them might not, like hwsim which is only software, and
 > >
-> > Okay, that's looking good.
+> > yes, as I said before hwsim should pretend to be like all other
+> > hardware we have.
 > >
-> > > > 2. Scan requires to be in "promiscuous mode" (according to the
-> > > > 802.15.4 spec promiscuous mode). We don't support promiscuous mode
-> > > > (according to the 802.15.4 spec promiscuous mode). We "can" however
-> > > > use the currently supported mode which does not filter anything
-> > > > (IEEE802154_FILTERING_NONE) when we do additional filtering in
-> > > > mac802154. _But_ this is only required when the phy is scanning, it
-> > > > will also deliver anything to the upper layers.
-> > > >
-> > > > This patch-series tries to do the second thing, okay that's fine. But
-> > > > I thought this should only be done while the phy is in "scanning
-> > > > mode"?
+> > > in this case advertises its real filtering level with the new
+> > > "filtering" internal value.
 > > >
-> > > I don't understand what's wrong then. We ask for the "scan mode"
-> > > filtering level when starting the scan [1] and we ask for the normal
-> > > filtering level when it's done/aborted [2] [3].
+> > > The core then needs to check what is expected by looking at the PHY
+> > > requested filtering level and possibly apply additional filtering
+> > > rules.
 > > >
+> > > Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
+> > > ---
+> > >  include/net/ieee802154_netdev.h |  8 ++++
+> > >  net/mac802154/rx.c              | 78 +++++++++++++++++++++++++++++++++
+> > >  2 files changed, 86 insertions(+)
+> > >
+> > > diff --git a/include/net/ieee802154_netdev.h b/include/net/ieee802154_netdev.h
+> > > index d0d188c3294b..1b82bbafe8c7 100644
+> > > --- a/include/net/ieee802154_netdev.h
+> > > +++ b/include/net/ieee802154_netdev.h
+> > > @@ -69,6 +69,14 @@ struct ieee802154_hdr_fc {
+> > >  #endif
+> > >  };
+> > >
+> > > +enum ieee802154_frame_version {
+> > > +       IEEE802154_2003_STD,
+> > > +       IEEE802154_2006_STD,
+> > > +       IEEE802154_STD,
+> > > +       IEEE802154_RESERVED_STD,
+> > > +       IEEE802154_MULTIPURPOSE_STD = IEEE802154_2003_STD,
+> > > +};
+> > > +
+> > >  struct ieee802154_hdr {
+> > >         struct ieee802154_hdr_fc fc;
+> > >         u8 seq;
+> > > diff --git a/net/mac802154/rx.c b/net/mac802154/rx.c
+> > > index c43289c0fdd7..bc46e4a7669d 100644
+> > > --- a/net/mac802154/rx.c
+> > > +++ b/net/mac802154/rx.c
+> > > @@ -52,6 +52,84 @@ ieee802154_subif_frame(struct ieee802154_sub_if_data *sdata,
+> > >                                 mac_cb(skb)->type);
+> > >                         goto fail;
+> > >                 }
+> > > +       } else if (sdata->required_filtering == IEEE802154_FILTERING_4_FRAME_FIELDS &&
 > >
-> > There is no problem with that. There is for me a problem with the
-> > receive path when certain filtering levels are active.
-> >
-> > > [1] https://github.com/miquelraynal/linux/blob/wpan-next/scan/net/mac802154/scan.c#L326
-> > > [2] https://github.com/miquelraynal/linux/blob/wpan-next/scan/net/mac802154/scan.c#L55
-> > >
-> > > > The other receive path while not in promiscuous mode
-> > > > (phy->filtering == IEEE802154_FILTERING_4_FRAME_FIELDS) should never
-> > > > require any additional filtering. I somehow miss this point here.
-> > >
-> > > Maybe the drv_start() function should receive an sdata pointer. This way
-> > > instead of changing the PHY filtering level to what has just be asked
-> > > blindly, the code should look at the filtering level of all the
-> > > interfaces up on the PHY and apply the lowest filtering level by
-> > > hardware, knowing that on a per interface basis, the software will
-> > > compensate.
-> > >
-> > > It should work just fine because local->phy->filtering shows the actual
-> > > filtering level of the PHY while sdata->requested_filtering shows the
-> > > level of filtering that was expected on each interface. If you don't
-> > > like the idea of having a mutable sdata->requested_filtering entry, I
-> > > can have an sdata->base_filtering which should only be set by
-> > > ieee802154_setup_sdata() and an sdata->expected_filtering which would
-> > > reflect what the mac expects on this interface at the present moment.
-> > >
-> >
-> > From my view is that if we disable address filters (all filtering
-> > modes except IEEE802154_FILTERING_4_FRAME_FIELDS) we never can call
-> > netif_receive_skb(). This patch series tries to "compensate" the
-> > missing filtering on phy which is fine only to handle things related
-> > for the scan operation but nothing else.
-> >
-> > The reason why we can't call netif_receive_skb() is because we don't
-> > have ackknowledge handling, whereas for scanning we ignore ack frames
-> > and that's why we don't need it.
+> > We switch here from determine that receive path, means way we are
+> > going from interface type to the required filtering value. Sure there
+> > is currently a 1:1 mapping for them now but I don't know why we are
+> > doing that and this is in my opinion wrong. The receive path should
+> > depend on interface type as it was before and for scanning there is
+> > some early check like:
 >
-> I've digested all of that right before the conference so I think I now
-> understand all your fears regarding the possible absence of ACK in
-> certain situations. I even share them now.
+> Maybe on this one I am not fully convinced yet.
 >
-> > > > For 1), the driver should change the filtering mode" when we start to
-> > > > "listen", this is done by the start() driver callback. They should get
-> > > > all receive parameters and set up receiving to whatever mac802154,
-> > > > currently there is a bit of chaos there. To move it into drv_start()
-> > > > is just a workaround to begin this step that we move it at some point
-> > > > to the driver. I mention 1) here because that should be part of the
-> > > > picture how everything works together when the phy is switched to a
-> > > > different filter level while it's operating (I mean there are running
-> > > > interfaces on it which requires IEEE802154_FILTERING_4_FRAME_FIELDS)
-> > > > which then activates the different receive path for the use case of
-> > > > scanning (something like (phy->state & WPANPHY_SCANING) == true)?
-> > >
-> > > Scanning is a dedicated filtering level per-se because it must discard
-> > > !beacon frames, that's why I request this level of filtering (which
-> > > maybe I should do on a per-interface basis instead of using the *local
-> > > poiner).
-> > >
-> >
-> > We only can do a per filter level per interface if the hardware has
-> > support for such a thing. Currently there is one address filter and if
-> > it's disabled we lose ackknowledge handling (as general rule), we
-> > can't compensate by doing any additional filtering by software in this
-> > mode.
->
-> Yes.
->
-> >
-> > > > I am sorry, but I somehow miss the picture of how those things work
-> > > > together. It is not clear for me and I miss those parts to get a whole
-> > > > picture of this. For me it's not clear that those patches are going in
-> > > > this direction.
-> > >
-> > > Please tell me if it's more clear and if you agree with this vision. I
-> > > don't have time to draft something this week.
-> > >
-> >
-> > That's fine. We should agree on things like compensate lower filter
-> > levels by doing additional softmac filtering to reach
-> > IEEE802154_FILTERING_4_FRAME_FIELDS filtering from others because we
-> > will lose AACK handling. It is only fine to do that in mac802154
-> > receive path but don't deliver it to the upper layer.
->
-> So actually, if I try to summarize the situation.
->
-> I've tried to make several different subif working on a single PHY.
-> Unfortunately, today there is only one address filter per PHY, so
+> In your opinion (I try to rephrase so that we align on what you told
+> me) the total lack of filtering is only something that is reserved to
+> monitor interfaces, so you make an implicit link between interface type
+> and filtering level.
 
-correct. But you are assuming hardware which is currently around. As I
-said atusb is one candidate to make a more clever hardware because it
-has a co-processor which eventually could handle ack handling if done
-right.
+it always depends on the use case, but in the sense of filtering-level
+in "normal" operating mode and calling netif_skb_deliver_foo(), yes.
 
-> disabling the address filter on one interface would also disable it on
-> the other, leading to the ACKs not being handled anymore, which we
-> cannot afford.
+The use case for e.g. scan is different and mac802154 takes control of it.
+
+>
+> I would argue that this is true today, but as the "no filtering at all"
+> level is defined in the spec, I assumed it was a possible level that
+> one would want to achieve some day (not sure for what purpose yet). So
+> I assumed it would be more relevant to only work with the
+> expected filtering level in the receive path rather than on the
+> interface type, it makes more sense IMHO. In practice I agree it should
+> be the same filtering-wise, but from a conceptual point of view I find
+> the current logic partially satisfying.
 >
 
-For hardware which has such limitation of one address filter yes.
+I don't quite follow here. I would say we currently only support to
+tell the hardware the whole filtering level (with AACK support) or the
+non-filtering level. With both we should somehow able to support
+interface types which requires
 
-> So overall I guess we should settle on how we want to handle the
-> situation. I propose, to move forward, that we continue to assume that
-> it is *not* possible to have several different interfaces running at the
-> same time on a single PHY. This involves dropping all the "software
-> address filtering" which I proposed, but I guess that's fine.
+> Would you agree with me only using "expected filtering levels" rather
+> than:
+> - sometimes the interface type
+> - sometimes the mac state (scan)
+> - otherwise, by default, the highest filtering level
+> ?
 
-I agree here, but don't remove code which could add such handling and
-allow multiple monitors at the same time.
+I think so, yes? I don't know what "otherwise, by default, the highest
+filtering level" means, it is the interface type which declares what
+it's actually needs at netif_skb_deliver_foo(), e.g. monitors will
+call netif_skb_deliver_foo() even without AACK support... because
+that's how they working. They also don't have an address in the
+network. It is a kind of experimenting, debugging, or making chaos in
+your network interface type.
+
+For other node, or coordinator interfaces? They need at least AACK
+support (and they having a valid address filtering going on) they need
+it...
+
+however on scan I would say then they are in a kind of "hidden"
+non-operating interface and the phy will do some operation on phy
+level and do something and restore after it's done. Scan should not
+have anything todo with interfaces, BUT there might be the possibility
+to specify the interface on iwpan layer to make a scan, _however_ it
+will be only a shortcut to specify the phy which the interface is
+using...
 
 - Alex
 
