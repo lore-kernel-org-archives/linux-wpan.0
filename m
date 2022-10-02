@@ -2,35 +2,35 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF8F3C433F5
-	for <linux-wpan@archiver.kernel.org>; Sun,  2 Oct 2022 22:51:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60F5BC433FE
+	for <linux-wpan@archiver.kernel.org>; Sun,  2 Oct 2022 22:54:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230083AbiJBWvY (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Sun, 2 Oct 2022 18:51:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52792 "EHLO
+        id S230246AbiJBWy1 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Sun, 2 Oct 2022 18:54:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54174 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229609AbiJBWup (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Sun, 2 Oct 2022 18:50:45 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 055D215A39;
-        Sun,  2 Oct 2022 15:50:16 -0700 (PDT)
+        with ESMTP id S230260AbiJBWxm (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Sun, 2 Oct 2022 18:53:42 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29A8216592;
+        Sun,  2 Oct 2022 15:51:22 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id C1250B80D9A;
-        Sun,  2 Oct 2022 22:50:02 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3EB8CC4314E;
-        Sun,  2 Oct 2022 22:50:00 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id B9E6760F1F;
+        Sun,  2 Oct 2022 22:51:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C6EFAC433C1;
+        Sun,  2 Oct 2022 22:51:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1664751001;
-        bh=pXDGuA07sMKv8bo1AKnfsa/wE2d5OffbaPz69KQhWeY=;
+        s=k20201202; t=1664751081;
+        bh=J3qP/71WZE3twwF9thKP8f6NNZtN+8NAb36zETMPdVo=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=gyZJsQ5IXpwOmeyTnNhUFVyuZgG93SkxlP0t2KhTdvWXGYYssblA/tS7LadRwC/fR
-         xmuu+f4mWX+P/Jp2UQv7Uv5xQ+3VnyvsdGxfcSK3N6SGlFx6iNZdLBq1hbfU5b6aSj
-         UGjwhJKX6U6IDkz0DaQetLt4B4U55KpAr79cS3uQudRkq3QYPvNb7B+TKSmIRfES1M
-         ttgNorFkVyudFlwWZk3qpsqyWLliC8fUd/pNYaVipeJ4Bdi0dxN9tV/HziMbjzwdOY
-         CCF3owdLQiUHmhP0xitCOrl0PQQ5l9ZVnYBFSFPMHFh1KMrTBZzUtx6jYj2RN53Reb
-         K3DRxp5FmsIaQ==
+        b=Ne8F0wtIycjJhU7vnricQfH5GWv4Kw30n9t0VxXynd6DlkXGHUK14pUsv2bycRgOs
+         ry5ARj6cz/+mdhwd+Ch3GbPAFQtQk6zA2tPuY10wS0oskLWwigB/4pC+OymUrnU+HW
+         LxLGEsWeJvxKM6uTdZBmXyz0YkjJUxCAVBHLW7PEFTgGA/ZNoVYN7tz1NSPI8N7W/p
+         DCgCHoX1GaldTpsbQgKEmaK7h2ks+Np/gHhV1x7AiZAJRtDO1TDKZdwCfzz7OJtwH+
+         7TmgyQgF5+YJWqDxqztBKb6R2574n8WmwdLe4qb/U9hncX6twzNn/5BAsZ/P0BqajY
+         Hgh1RutkrdMsg==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Haimin Zhang <tcs.kernel@gmail.com>,
@@ -40,12 +40,12 @@ Cc:     Haimin Zhang <tcs.kernel@gmail.com>,
         stefan@datenfreihafen.org, edumazet@google.com, kuba@kernel.org,
         pabeni@redhat.com, linux-wpan@vger.kernel.org,
         netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.19 13/29] net/ieee802154: fix uninit value bug in dgram_sendmsg
-Date:   Sun,  2 Oct 2022 18:49:06 -0400
-Message-Id: <20221002224922.238837-13-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.15 10/20] net/ieee802154: fix uninit value bug in dgram_sendmsg
+Date:   Sun,  2 Oct 2022 18:50:49 -0400
+Message-Id: <20221002225100.239217-10-sashal@kernel.org>
 X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20221002224922.238837-1-sashal@kernel.org>
-References: <20221002224922.238837-1-sashal@kernel.org>
+In-Reply-To: <20221002225100.239217-1-sashal@kernel.org>
+References: <20221002225100.239217-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -132,7 +132,7 @@ index d0d188c3294b..a8994f307fc3 100644
  					   const struct ieee802154_addr_sa *sa)
  {
 diff --git a/net/ieee802154/socket.c b/net/ieee802154/socket.c
-index 718fb77bb372..7889e1ef7fad 100644
+index 7bb9ef35c570..fd5862f9e26a 100644
 --- a/net/ieee802154/socket.c
 +++ b/net/ieee802154/socket.c
 @@ -200,8 +200,9 @@ static int raw_bind(struct sock *sk, struct sockaddr *_uaddr, int len)
