@@ -2,35 +2,35 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74A52C433FE
-	for <linux-wpan@archiver.kernel.org>; Sun,  2 Oct 2022 23:06:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46793C433FE
+	for <linux-wpan@archiver.kernel.org>; Sun,  2 Oct 2022 23:12:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230497AbiJBXGh (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Sun, 2 Oct 2022 19:06:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35646 "EHLO
+        id S230171AbiJBXMn (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Sun, 2 Oct 2022 19:12:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60716 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231129AbiJBXGM (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Sun, 2 Oct 2022 19:06:12 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E21683FD5D;
-        Sun,  2 Oct 2022 16:01:35 -0700 (PDT)
+        with ESMTP id S230218AbiJBXMU (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Sun, 2 Oct 2022 19:12:20 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60CE44056A;
+        Sun,  2 Oct 2022 16:06:30 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 4B9F8B80DC4;
-        Sun,  2 Oct 2022 22:53:53 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9CB90C433C1;
-        Sun,  2 Oct 2022 22:53:50 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 22B45B80DAB;
+        Sun,  2 Oct 2022 22:52:52 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F39EC433D6;
+        Sun,  2 Oct 2022 22:52:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1664751232;
-        bh=ibTZulFZ4AcQAS0/p8EqYUPsDL5gNwPl9ujOOSjjNec=;
+        s=k20201202; t=1664751170;
+        bh=cQxfJ3qsYjvYJ9DIUiqLsyT626Q05v8l6z9zEIm+TSw=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=sXWiPNS547tNrnmUwoOgJU0KD+Gu30ojBzatYxfRvpWTuS9w/uiWvolQNiW+md1B+
-         7kv1aKd3UQbyaKxbxjiQHBj9csr4lAV/0pIkdQtitjtONnQ3wUQqB++DCFk8VIfUxs
-         c/14+AgMc0TwQf/C6BTwViUuaLmAt8ttCvqGLwHoufW1iWOxmQkMKGoQ1PJc6lUJsu
-         K1IaZwvjybZm+oAaGR8ibBEMl+Z2elyFvHlH82Y3IlPOEL9KPWCw6wXfZloR2CnTtr
-         CII4PFwQR0qi6pAaKdMTsawx2tc52M91PP2+yvfojyhMCFC9y+lj2r2vP+quyOCo+5
-         LAaFaqHbpoQhg==
+        b=pLgaVMGcmu0yd5ZfHDZ3x740O7DDN4DUL4JeQfFk3nlENoXYVDpyDIQYmVF6zidSr
+         VGLWSz5/kncDpn5bex38aMAO12+mFxoNTgxaTn29iz4GUkzL8AdGhP1wfK9qQeTNtc
+         ZE0g5K0Nb4hpMeSjQ5oAXao8niBqUxh4qLIcI8ncjOdizaksAHukjzDrKjObX/P2rx
+         vtlxBOQpEgFYO/g+MsPQc45/AdfbOIa2vj3nni2dCVVpRJFSbVgM5wod8cXuxiMNOz
+         /Kklm7cxJhPwczWm7aRICP8nNVXLVN3gLkzuc2TPhf5laW6ENkOmufx67BKV5PE/bX
+         Ij4SPkQA6tkqQ==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Haimin Zhang <tcs.kernel@gmail.com>,
@@ -40,12 +40,12 @@ Cc:     Haimin Zhang <tcs.kernel@gmail.com>,
         stefan@datenfreihafen.org, edumazet@google.com, kuba@kernel.org,
         pabeni@redhat.com, linux-wpan@vger.kernel.org,
         netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.9 4/6] net/ieee802154: fix uninit value bug in dgram_sendmsg
-Date:   Sun,  2 Oct 2022 18:53:38 -0400
-Message-Id: <20221002225342.240258-4-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.4 6/9] net/ieee802154: fix uninit value bug in dgram_sendmsg
+Date:   Sun,  2 Oct 2022 18:52:33 -0400
+Message-Id: <20221002225236.239675-6-sashal@kernel.org>
 X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20221002225342.240258-1-sashal@kernel.org>
-References: <20221002225342.240258-1-sashal@kernel.org>
+In-Reply-To: <20221002225236.239675-1-sashal@kernel.org>
+References: <20221002225236.239675-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -77,10 +77,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  2 files changed, 60 insertions(+), 19 deletions(-)
 
 diff --git a/include/net/ieee802154_netdev.h b/include/net/ieee802154_netdev.h
-index c4b31601cd53..fd1665baa179 100644
+index d0d188c3294b..a8994f307fc3 100644
 --- a/include/net/ieee802154_netdev.h
 +++ b/include/net/ieee802154_netdev.h
-@@ -23,6 +23,22 @@
+@@ -15,6 +15,22 @@
  #ifndef IEEE802154_NETDEVICE_H
  #define IEEE802154_NETDEVICE_H
  
@@ -103,7 +103,7 @@ index c4b31601cd53..fd1665baa179 100644
  #include <net/af_ieee802154.h>
  #include <linux/netdevice.h>
  #include <linux/skbuff.h>
-@@ -173,6 +189,27 @@ static inline void ieee802154_devaddr_to_raw(void *raw, __le64 addr)
+@@ -165,6 +181,27 @@ static inline void ieee802154_devaddr_to_raw(void *raw, __le64 addr)
  	memcpy(raw, &temp, IEEE802154_ADDR_LEN);
  }
  
@@ -132,10 +132,10 @@ index c4b31601cd53..fd1665baa179 100644
  					   const struct ieee802154_addr_sa *sa)
  {
 diff --git a/net/ieee802154/socket.c b/net/ieee802154/socket.c
-index 6383627b783e..c624a54502f3 100644
+index 9a675ba0bf0a..a92b11999e5f 100644
 --- a/net/ieee802154/socket.c
 +++ b/net/ieee802154/socket.c
-@@ -212,8 +212,9 @@ static int raw_bind(struct sock *sk, struct sockaddr *_uaddr, int len)
+@@ -201,8 +201,9 @@ static int raw_bind(struct sock *sk, struct sockaddr *_uaddr, int len)
  	int err = 0;
  	struct net_device *dev = NULL;
  
@@ -147,7 +147,7 @@ index 6383627b783e..c624a54502f3 100644
  
  	uaddr = (struct sockaddr_ieee802154 *)_uaddr;
  	if (uaddr->family != AF_IEEE802154)
-@@ -507,7 +508,8 @@ static int dgram_bind(struct sock *sk, struct sockaddr *uaddr, int len)
+@@ -498,7 +499,8 @@ static int dgram_bind(struct sock *sk, struct sockaddr *uaddr, int len)
  
  	ro->bound = 0;
  
@@ -157,7 +157,7 @@ index 6383627b783e..c624a54502f3 100644
  		goto out;
  
  	if (addr->family != AF_IEEE802154)
-@@ -578,8 +580,9 @@ static int dgram_connect(struct sock *sk, struct sockaddr *uaddr,
+@@ -569,8 +571,9 @@ static int dgram_connect(struct sock *sk, struct sockaddr *uaddr,
  	struct dgram_sock *ro = dgram_sk(sk);
  	int err = 0;
  
@@ -169,7 +169,7 @@ index 6383627b783e..c624a54502f3 100644
  
  	if (addr->family != AF_IEEE802154)
  		return -EINVAL;
-@@ -618,6 +621,7 @@ static int dgram_sendmsg(struct sock *sk, struct msghdr *msg, size_t size)
+@@ -609,6 +612,7 @@ static int dgram_sendmsg(struct sock *sk, struct msghdr *msg, size_t size)
  	struct ieee802154_mac_cb *cb;
  	struct dgram_sock *ro = dgram_sk(sk);
  	struct ieee802154_addr dst_addr;
@@ -177,7 +177,7 @@ index 6383627b783e..c624a54502f3 100644
  	int hlen, tlen;
  	int err;
  
-@@ -626,10 +630,20 @@ static int dgram_sendmsg(struct sock *sk, struct msghdr *msg, size_t size)
+@@ -617,10 +621,20 @@ static int dgram_sendmsg(struct sock *sk, struct msghdr *msg, size_t size)
  		return -EOPNOTSUPP;
  	}
  
@@ -202,7 +202,7 @@ index 6383627b783e..c624a54502f3 100644
  
  	if (!ro->bound)
  		dev = dev_getfirstbyhwtype(sock_net(sk), ARPHRD_IEEE802154);
-@@ -665,16 +679,6 @@ static int dgram_sendmsg(struct sock *sk, struct msghdr *msg, size_t size)
+@@ -656,16 +670,6 @@ static int dgram_sendmsg(struct sock *sk, struct msghdr *msg, size_t size)
  	cb = mac_cb_init(skb);
  	cb->type = IEEE802154_FC_TYPE_DATA;
  	cb->ackreq = ro->want_ack;
