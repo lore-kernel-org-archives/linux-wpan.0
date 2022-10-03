@@ -2,82 +2,85 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2BA2C433F5
-	for <linux-wpan@archiver.kernel.org>; Mon,  3 Oct 2022 12:30:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 829BFC433FE
+	for <linux-wpan@archiver.kernel.org>; Mon,  3 Oct 2022 12:35:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229539AbiJCMaS (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 3 Oct 2022 08:30:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48994 "EHLO
+        id S229515AbiJCMfa (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 3 Oct 2022 08:35:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57938 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229641AbiJCMaR (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 3 Oct 2022 08:30:17 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C8A227CCB;
-        Mon,  3 Oct 2022 05:30:16 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 2663C61038;
-        Mon,  3 Oct 2022 12:30:16 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 7D15DC433B5;
-        Mon,  3 Oct 2022 12:30:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1664800215;
-        bh=ra5p4TDbHH/MyogX7WQr6WkJNPkFdYxm41lh3797BPg=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=Cz2oNJSfn4osQO/eBtSLTJQdCNfQH1YJocaZGJLqLySd3Aq+81zMIxP7Ejinl8gMv
-         59CTj5IRh0yL2x/Is5fvpFQse7ba1h84Lsms/jZIJzUByrhrkmwm9wefb2sPPgdlwh
-         6SqtcxBN67zJb97ZopK9uPmSaXv9xV7mt36eNc6yo3sx3QGSBS78epeSFC7ApwfCFN
-         sz9DGmGZSJwGfiEVBboTuoQXrAwPE9H+z3r4Zyw0cxfOui2OxLREArTLEpGP6XLJyU
-         dxj8SD75n0eRkqLj4DdJSSW4reT4V3RWUQRSNHkUbFPJkWvQUrXbWSN+upemClDKAu
-         ClzmW2s8gDVUA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 594F3E524CD;
-        Mon,  3 Oct 2022 12:30:15 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+        with ESMTP id S229477AbiJCMf3 (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 3 Oct 2022 08:35:29 -0400
+Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C61A125581;
+        Mon,  3 Oct 2022 05:35:24 -0700 (PDT)
+Received: from fsav311.sakura.ne.jp (fsav311.sakura.ne.jp [153.120.85.142])
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 293CYikV093637;
+        Mon, 3 Oct 2022 21:34:44 +0900 (JST)
+        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from www262.sakura.ne.jp (202.181.97.72)
+ by fsav311.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav311.sakura.ne.jp);
+ Mon, 03 Oct 2022 21:34:44 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav311.sakura.ne.jp)
+Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+        (authenticated bits=0)
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 293CYiqb093633
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+        Mon, 3 Oct 2022 21:34:44 +0900 (JST)
+        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <4aae5e2b-f4d5-c260-5bf8-435c525f6c97@I-love.SAKURA.ne.jp>
+Date:   Mon, 3 Oct 2022 21:34:43 +0900
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.1
 Subject: Re: [PATCH] net/ieee802154: reject zero-sized raw_sendmsg()
-From:   patchwork-bot+netdevbpf@kernel.org
-Message-Id: <166480021535.14393.17575492399292423045.git-patchwork-notify@kernel.org>
-Date:   Mon, 03 Oct 2022 12:30:15 +0000
-References: <5e89b653-3fc6-25c5-324b-1b15909c0183@I-love.SAKURA.ne.jp>
-In-Reply-To: <5e89b653-3fc6-25c5-324b-1b15909c0183@I-love.SAKURA.ne.jp>
-To:     Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Content-Language: en-US
+To:     patchwork-bot+netdevbpf@kernel.org,
+        "David S. Miller" <davem@davemloft.net>
 Cc:     alex.aring@gmail.com, stefan@datenfreihafen.org,
         shaozhengchao@huawei.com, ast@kernel.org, sdf@google.com,
         linux-wpan@vger.kernel.org,
         syzbot+5ea725c25d06fb9114c4@syzkaller.appspotmail.com,
         syzkaller-bugs@googlegroups.com, bpf@vger.kernel.org,
         netdev@vger.kernel.org
+References: <5e89b653-3fc6-25c5-324b-1b15909c0183@I-love.SAKURA.ne.jp>
+ <166480021535.14393.17575492399292423045.git-patchwork-notify@kernel.org>
+From:   Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+In-Reply-To: <166480021535.14393.17575492399292423045.git-patchwork-notify@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello:
-
-This patch was applied to netdev/net.git (master)
-by David S. Miller <davem@davemloft.net>:
-
-On Sun, 2 Oct 2022 01:43:44 +0900 you wrote:
-> syzbot is hitting skb_assert_len() warning at raw_sendmsg() for ieee802154
-> socket. What commit dc633700f00f726e ("net/af_packet: check len when
-> min_header_len equals to 0") does also applies to ieee802154 socket.
+On 2022/10/03 21:30, patchwork-bot+netdevbpf@kernel.org wrote:
+> Hello:
 > 
-> Link: https://syzkaller.appspot.com/bug?extid=5ea725c25d06fb9114c4
-> Reported-by: syzbot <syzbot+5ea725c25d06fb9114c4@syzkaller.appspotmail.com>
-> Fixes: fd1894224407c484 ("bpf: Don't redirect packets with invalid pkt_len")
-> Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+> This patch was applied to netdev/net.git (master)
+> by David S. Miller <davem@davemloft.net>:
 > 
-> [...]
+> On Sun, 2 Oct 2022 01:43:44 +0900 you wrote:
+>> syzbot is hitting skb_assert_len() warning at raw_sendmsg() for ieee802154
+>> socket. What commit dc633700f00f726e ("net/af_packet: check len when
+>> min_header_len equals to 0") does also applies to ieee802154 socket.
+>>
+>> Link: https://syzkaller.appspot.com/bug?extid=5ea725c25d06fb9114c4
+>> Reported-by: syzbot <syzbot+5ea725c25d06fb9114c4@syzkaller.appspotmail.com>
+>> Fixes: fd1894224407c484 ("bpf: Don't redirect packets with invalid pkt_len")
+>> Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+>>
+>> [...]
+> 
+> Here is the summary with links:
+>   - net/ieee802154: reject zero-sized raw_sendmsg()
+>     https://git.kernel.org/netdev/net/c/3a4d061c699b
 
-Here is the summary with links:
-  - net/ieee802154: reject zero-sized raw_sendmsg()
-    https://git.kernel.org/netdev/net/c/3a4d061c699b
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Are you sure that returning -EINVAL is OK?
 
+In v2 patch, I changed to return 0, for PF_IEEE802154 socket's zero-sized
+raw_sendmsg() request was able to return 0.
+
+> 
+> You are awesome, thank you!
 
