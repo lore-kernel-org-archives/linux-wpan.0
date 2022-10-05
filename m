@@ -2,98 +2,67 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94FD4C433FE
-	for <linux-wpan@archiver.kernel.org>; Wed,  5 Oct 2022 11:04:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E1F6C433FE
+	for <linux-wpan@archiver.kernel.org>; Wed,  5 Oct 2022 14:45:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229531AbiJELEP (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 5 Oct 2022 07:04:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50862 "EHLO
+        id S229610AbiJEOpS (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 5 Oct 2022 10:45:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59096 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229917AbiJELEB (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 5 Oct 2022 07:04:01 -0400
-X-Greylist: delayed 61480 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 05 Oct 2022 04:03:51 PDT
-Received: from proxima.lasnet.de (proxima.lasnet.de [IPv6:2a01:4f8:121:31eb:3::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5B5877EA5;
-        Wed,  5 Oct 2022 04:03:51 -0700 (PDT)
-Received: from [IPV6:2003:e9:d724:a710:a294:cd8d:ff93:7c57] (p200300e9d724a710a294cd8dff937c57.dip0.t-ipconnect.de [IPv6:2003:e9:d724:a710:a294:cd8d:ff93:7c57])
+        with ESMTP id S229815AbiJEOpR (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 5 Oct 2022 10:45:17 -0400
+Received: from proxima.lasnet.de (proxima.lasnet.de [78.47.171.185])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 153D11C908;
+        Wed,  5 Oct 2022 07:45:15 -0700 (PDT)
+Received: from localhost.localdomain.datenfreihafen.local (p200300e9d724a76b99bd950755e0d439.dip0.t-ipconnect.de [IPv6:2003:e9:d724:a76b:99bd:9507:55e0:d439])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits))
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
         (No client certificate requested)
-        (Authenticated sender: stefan@datenfreihafen.org)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id C4875C034C;
-        Wed,  5 Oct 2022 13:03:48 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
-        s=2021; t=1664967829;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=67gn0Edl0Q7/1KNulPI/FvMfgfPE5WqQrUVHDSvVmOs=;
-        b=ELnnhAoU5wfILYXoYmBSHYGBUEFOcOZbGEZ9GWMd1KuuBHs+Im1zztAKoeFlvJNz5bz0Go
-        21tx9VPKLb1rAtLAu+sJd8Brnf6Mc1J3OmO2cgUmDXWnVsB9xSD0a1yUaGf4/sf0IfJdhn
-        oFmF7n/qkFI84KlGnGFN2G+dy5Sf1pllucn4mXaJaBi8ag+akr8ObY3cevPIARXfeELcWn
-        m+mO9kFDtr86RK/nftslHDeT7O5rq8jjCfByPGgB3q5jQ7ySbKO2zJLxPtTSbE2thKEL3C
-        AOUZv/QAQ5KO7jxyqFjbeaTCXmQyxO5a0PTZZxj/amNudZTqmO1NFjt3lMr4Zw==
-Message-ID: <5a3e81ce-32b4-c610-64e6-6fef62ac9913@datenfreihafen.org>
-Date:   Wed, 5 Oct 2022 13:03:48 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.1
-Subject: Re: [PATCH] net/ieee802154: reject zero-sized raw_sendmsg()
-Content-Language: en-US
-To:     Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
-        patchwork-bot+netdevbpf@kernel.org,
-        "David S. Miller" <davem@davemloft.net>
-Cc:     alex.aring@gmail.com, shaozhengchao@huawei.com, ast@kernel.org,
-        sdf@google.com, linux-wpan@vger.kernel.org,
-        syzbot+5ea725c25d06fb9114c4@syzkaller.appspotmail.com,
-        syzkaller-bugs@googlegroups.com, bpf@vger.kernel.org,
-        netdev@vger.kernel.org
-References: <5e89b653-3fc6-25c5-324b-1b15909c0183@I-love.SAKURA.ne.jp>
- <166480021535.14393.17575492399292423045.git-patchwork-notify@kernel.org>
- <4aae5e2b-f4d5-c260-5bf8-435c525f6c97@I-love.SAKURA.ne.jp>
+        (Authenticated sender: stefan@sostec.de)
+        by proxima.lasnet.de (Postfix) with ESMTPSA id 98F44C056B;
+        Wed,  5 Oct 2022 16:45:13 +0200 (CEST)
 From:   Stefan Schmidt <stefan@datenfreihafen.org>
-In-Reply-To: <4aae5e2b-f4d5-c260-5bf8-435c525f6c97@I-love.SAKURA.ne.jp>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+To:     davem@davemloft.net, kuba@kernel.org
+Cc:     linux-wpan@vger.kernel.org, alex.aring@gmail.com,
+        netdev@vger.kernel.org
+Subject: pull-request: ieee802154 for net 2022-10-05
+Date:   Wed,  5 Oct 2022 16:45:08 +0200
+Message-Id: <20221005144508.787376-1-stefan@datenfreihafen.org>
+X-Mailer: git-send-email 2.37.3
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello Tetsuo.
+Hello Dave, Jakub.
 
-On 03.10.22 14:34, Tetsuo Handa wrote:
-> On 2022/10/03 21:30, patchwork-bot+netdevbpf@kernel.org wrote:
->> Hello:
->>
->> This patch was applied to netdev/net.git (master)
->> by David S. Miller <davem@davemloft.net>:
->>
->> On Sun, 2 Oct 2022 01:43:44 +0900 you wrote:
->>> syzbot is hitting skb_assert_len() warning at raw_sendmsg() for ieee802154
->>> socket. What commit dc633700f00f726e ("net/af_packet: check len when
->>> min_header_len equals to 0") does also applies to ieee802154 socket.
->>>
->>> Link: https://syzkaller.appspot.com/bug?extid=5ea725c25d06fb9114c4
->>> Reported-by: syzbot <syzbot+5ea725c25d06fb9114c4@syzkaller.appspotmail.com>
->>> Fixes: fd1894224407c484 ("bpf: Don't redirect packets with invalid pkt_len")
->>> Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
->>>
->>> [...]
->>
->> Here is the summary with links:
->>    - net/ieee802154: reject zero-sized raw_sendmsg()
->>      https://git.kernel.org/netdev/net/c/3a4d061c699b
-> 
-> 
-> Are you sure that returning -EINVAL is OK?
-> 
-> In v2 patch, I changed to return 0, for PF_IEEE802154 socket's zero-sized
-> raw_sendmsg() request was able to return 0.
-> 
+An update from ieee802154 for your *net* tree:
 
-I pulled in the revert from Alex and your v2 patch into my wpan tree 
-now. It will go to net from there.
+Only two patches this time around. A revert from Alexander Aring to a patch
+that hit net and the updated patch to fix the problem from Tetsuo Handa.
 
 regards
 Stefan Schmidt
+
+The following changes since commit 0326074ff4652329f2a1a9c8685104576bd8d131:
+
+  Merge tag 'net-next-6.1' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next (2022-10-04 13:38:03 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/sschmidt/wpan.git tags/ieee802154-for-net-2022-10-05
+
+for you to fetch changes up to b12e924a2f5b960373459c8f8a514f887adf5cac:
+
+  net/ieee802154: don't warn zero-sized raw_sendmsg() (2022-10-05 12:37:10 +0200)
+
+----------------------------------------------------------------
+Alexander Aring (1):
+      Revert "net/ieee802154: reject zero-sized raw_sendmsg()"
+
+Tetsuo Handa (1):
+      net/ieee802154: don't warn zero-sized raw_sendmsg()
+
+ net/ieee802154/socket.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
