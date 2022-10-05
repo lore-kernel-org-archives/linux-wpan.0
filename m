@@ -2,126 +2,79 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D778CC433F5
-	for <linux-wpan@archiver.kernel.org>; Tue,  4 Oct 2022 18:09:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7F58C433FE
+	for <linux-wpan@archiver.kernel.org>; Wed,  5 Oct 2022 01:48:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229509AbiJDSJF (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 4 Oct 2022 14:09:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59004 "EHLO
+        id S229764AbiJEBsT (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 4 Oct 2022 21:48:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55498 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229525AbiJDSJE (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 4 Oct 2022 14:09:04 -0400
-X-Greylist: delayed 593 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 04 Oct 2022 11:09:02 PDT
-Received: from proxima.lasnet.de (proxima.lasnet.de [78.47.171.185])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EAE053D3F;
-        Tue,  4 Oct 2022 11:09:02 -0700 (PDT)
-Received: from [IPV6:2003:e9:d724:a710:a294:cd8d:ff93:7c57] (p200300e9d724a710a294cd8dff937c57.dip0.t-ipconnect.de [IPv6:2003:e9:d724:a710:a294:cd8d:ff93:7c57])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits))
-        (No client certificate requested)
-        (Authenticated sender: stefan@datenfreihafen.org)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id C78CEC025B;
-        Tue,  4 Oct 2022 19:59:05 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
-        s=2021; t=1664906346;
+        with ESMTP id S229754AbiJEBsS (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 4 Oct 2022 21:48:18 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79817233AD
+        for <linux-wpan@vger.kernel.org>; Tue,  4 Oct 2022 18:48:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1664934496;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=wcQMljzpOOiSlN6HV+EDTFylwRneGnH0ZIB/FLIMNIU=;
-        b=wtsmL4wq9w1ltQUAsLgeYQAz3E+qfsChB9tQ3cAxw9jZ+mWQJBgJk87KbtRX1bJ3pWo1EH
-        jdLZYLfg0uzKFwPlHeNrRAYYNwKD0JSleavzEuULYd2AnigWFCfVq1+3GYtF2Tw0Xz0ARv
-        kasuCWiyQ2twKaFcXDtigbkqNnRiq1e2sOLtWX8UWUIZR8Bte7sdEXTIp3ESsCnMpd8bvf
-        1h6yJdxC/6/9DH4KX8sYEnDmtfQypGiZi8EYjkCPYX3UD23LVs9kSowng3hF2Zw5+sCwMj
-        DCrJiaanoqeV/s9GdW2EJfTyckYcHVRPST6BFjqeu+65lgIHdnQAZ0OkY2bPNw==
-Message-ID: <1c374e71-f56e-540e-35d0-e6e82a4dc0e3@datenfreihafen.org>
-Date:   Tue, 4 Oct 2022 19:59:05 +0200
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=ZT2Bh5EJ8aDTIXWP41xEUHi99QpNsHb85YXZNNPYgmw=;
+        b=W37uGhZ3QrpnKuYF/bVXb7eKN9EzAjeMBa1DZs86RQvjxrqhUxF8Fw6cHeZVmH3cOkCfn7
+        CSrvD1frHNaOhFK9NwoG7r/cDqiSK4QFQpa7yW5Y0du++HTQS+SSFlkHRTNgasdO8sC0ze
+        Xqp5GY81q53fzjN1/CWevmEny5y2JYI=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-639-ImFFczhCON6UZDfk9e67MQ-1; Tue, 04 Oct 2022 21:48:13 -0400
+X-MC-Unique: ImFFczhCON6UZDfk9e67MQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 24169800B30;
+        Wed,  5 Oct 2022 01:48:13 +0000 (UTC)
+Received: from fs-i40c-03.fs.lab.eng.bos.redhat.com (fs-i40c-03.fs.lab.eng.bos.redhat.com [10.16.224.23])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2877940C6EC2;
+        Wed,  5 Oct 2022 01:48:09 +0000 (UTC)
+From:   Alexander Aring <aahringo@redhat.com>
+To:     penguin-kernel@i-love.sakura.ne.jp
+Cc:     stefan@datenfreihafen.org, davem@davemloft.net,
+        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+        linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
+        aahringo@redhat.com
+Subject: [PATCH net 1/2] Revert "net/ieee802154: reject zero-sized raw_sendmsg()"
+Date:   Tue,  4 Oct 2022 21:47:49 -0400
+Message-Id: <20221005014750.3685555-1-aahringo@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.1
-Subject: Re: [PATCH] net/ieee802154: reject zero-sized raw_sendmsg()
-Content-Language: en-US
-To:     Alexander Aring <aahringo@redhat.com>,
-        Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Cc:     patchwork-bot+netdevbpf@kernel.org,
-        "David S. Miller" <davem@davemloft.net>, alex.aring@gmail.com,
-        shaozhengchao@huawei.com, ast@kernel.org, sdf@google.com,
-        linux-wpan@vger.kernel.org,
-        syzbot+5ea725c25d06fb9114c4@syzkaller.appspotmail.com,
-        syzkaller-bugs@googlegroups.com, bpf@vger.kernel.org,
-        netdev@vger.kernel.org
-References: <5e89b653-3fc6-25c5-324b-1b15909c0183@I-love.SAKURA.ne.jp>
- <166480021535.14393.17575492399292423045.git-patchwork-notify@kernel.org>
- <4aae5e2b-f4d5-c260-5bf8-435c525f6c97@I-love.SAKURA.ne.jp>
- <CAK-6q+g7JQZkRJhp6qv_H9xGfD4DWnaChmQ7OaWJs3CAjfMnpA@mail.gmail.com>
-From:   Stefan Schmidt <stefan@datenfreihafen.org>
-In-Reply-To: <CAK-6q+g7JQZkRJhp6qv_H9xGfD4DWnaChmQ7OaWJs3CAjfMnpA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello.
+This reverts commit 3a4d061c699bd3eedc80dc97a4b2a2e1af83c6f5.
 
-On 04.10.22 00:29, Alexander Aring wrote:
-> Hi,
-> 
-> On Mon, Oct 3, 2022 at 8:35 AM Tetsuo Handa
-> <penguin-kernel@i-love.sakura.ne.jp> wrote:
->>
->> On 2022/10/03 21:30, patchwork-bot+netdevbpf@kernel.org wrote:
->>> Hello:
->>>
->>> This patch was applied to netdev/net.git (master)
->>> by David S. Miller <davem@davemloft.net>:
->>>
->>> On Sun, 2 Oct 2022 01:43:44 +0900 you wrote:
->>>> syzbot is hitting skb_assert_len() warning at raw_sendmsg() for ieee802154
->>>> socket. What commit dc633700f00f726e ("net/af_packet: check len when
->>>> min_header_len equals to 0") does also applies to ieee802154 socket.
->>>>
->>>> Link: https://syzkaller.appspot.com/bug?extid=5ea725c25d06fb9114c4
->>>> Reported-by: syzbot <syzbot+5ea725c25d06fb9114c4@syzkaller.appspotmail.com>
->>>> Fixes: fd1894224407c484 ("bpf: Don't redirect packets with invalid pkt_len")
->>>> Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
->>>>
->>>> [...]
->>>
->>> Here is the summary with links:
->>>    - net/ieee802154: reject zero-sized raw_sendmsg()
->>>      https://git.kernel.org/netdev/net/c/3a4d061c699b
->>
->>
->> Are you sure that returning -EINVAL is OK?
->>
->> In v2 patch, I changed to return 0, for PF_IEEE802154 socket's zero-sized
->> raw_sendmsg() request was able to return 0.
-> 
-> I currently try to get access to kernel.org wpan repositories and try
-> to rebase/apply your v2 on it. 
+There is a v2 which does return zero if zero length is given.
 
-This will only work once I merged net into wpan. Which I normally do 
-only after a pull request to avoid merge requests being created.
+Signed-off-by: Alexander Aring <aahringo@redhat.com>
+---
+ net/ieee802154/socket.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-We have two options here a) reverting this patch and applying v2 of it 
-b) Tetsu sending an incremental patch on top of the applied one to come 
-to the same state as after v2.
+diff --git a/net/ieee802154/socket.c b/net/ieee802154/socket.c
+index cbd0e2ac4ffe..7889e1ef7fad 100644
+--- a/net/ieee802154/socket.c
++++ b/net/ieee802154/socket.c
+@@ -251,9 +251,6 @@ static int raw_sendmsg(struct sock *sk, struct msghdr *msg, size_t size)
+ 		return -EOPNOTSUPP;
+ 	}
+ 
+-	if (!size)
+-		return -EINVAL;
+-
+ 	lock_sock(sk);
+ 	if (!sk->sk_bound_dev_if)
+ 		dev = dev_getfirstbyhwtype(sock_net(sk), ARPHRD_IEEE802154);
+-- 
+2.31.1
 
-
-Then it should be fixed in the next
-> pull request to net. For netdev maintainers, please don't apply wpan
-> patches. Stefan and I will care about it.
-
-Keep in mind that Dave and Jakub do this to help us out because we are 
-sometimes slow on applying patches and getting them to net. Normally 
-this is all fine for clear fixes.
-
-For -next material I agree this should only go through the wpan-next 
-tree for us to coordinate, but for the occasional fix its often faster 
-if it hits net directly. Normally I don't mind that. In this case v2 was 
-overlooked. But this is easily rectified with either of the two options 
-mentioned above.
-
-regards
-Stefan Schmidt
