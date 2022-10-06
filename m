@@ -2,100 +2,76 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E973EC433F5
-	for <linux-wpan@archiver.kernel.org>; Thu,  6 Oct 2022 02:03:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D065C433F5
+	for <linux-wpan@archiver.kernel.org>; Thu,  6 Oct 2022 04:00:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229972AbiJFCDA (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 5 Oct 2022 22:03:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35272 "EHLO
+        id S229729AbiJFEAV (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Thu, 6 Oct 2022 00:00:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43878 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229971AbiJFCC7 (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 5 Oct 2022 22:02:59 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 977EF3A15F
-        for <linux-wpan@vger.kernel.org>; Wed,  5 Oct 2022 19:02:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1665021777;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=clm0G3SVgDeMpOV22vjx43vbr2D8qyVRXAIjfIfzYVA=;
-        b=FOb96ihPjbfD/ucdo3JaXiQgNi1tyXOimCKUURwWrRyuShEpJmerXAMAojLk8Zqvg1IFWt
-        2xPu2Sz2fCHa3EwmfpqokISqmpL+Uo0P34gMnyqUEVsrhe+kyoVo+m9V4RVx8RkyDsVX9x
-        H1c+j6ug2zHtbsN6spE3qkgiDh0vJAI=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-549-Jpax0c9eMs-D-x9wM_899g-1; Wed, 05 Oct 2022 22:02:54 -0400
-X-MC-Unique: Jpax0c9eMs-D-x9wM_899g-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        with ESMTP id S229540AbiJFEAT (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 6 Oct 2022 00:00:19 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F4E858B4B;
+        Wed,  5 Oct 2022 21:00:18 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E890238164C0;
-        Thu,  6 Oct 2022 02:02:53 +0000 (UTC)
-Received: from fs-i40c-03.fs.lab.eng.bos.redhat.com (fs-i40c-03.fs.lab.eng.bos.redhat.com [10.16.224.23])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3F56D2166B26;
-        Thu,  6 Oct 2022 02:02:53 +0000 (UTC)
-From:   Alexander Aring <aahringo@redhat.com>
-To:     tcs.kernel@gmail.com
-Cc:     stefan@datenfreihafen.org, davem@davemloft.net,
-        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-        linux-wpan@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH net OR wpan] net: ieee802154: return -EINVAL for unknown addr type
-Date:   Wed,  5 Oct 2022 22:02:37 -0400
-Message-Id: <20221006020237.318511-1-aahringo@redhat.com>
+        by dfw.source.kernel.org (Postfix) with ESMTPS id BB817617FB;
+        Thu,  6 Oct 2022 04:00:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 2AA68C43142;
+        Thu,  6 Oct 2022 04:00:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1665028817;
+        bh=T+SwlxiKuBO+CE8538i8k26fdUZf0S8mRyqXrJDoUro=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=iZvGOLeh3kaDRTmeMOy3jtVnEBjYK5oy9GUan3K1Cbd7ErfDzmJq1pfpD+FDfIvKP
+         5C9Ne1KiWlrC4GTgr/IHSHzdvFbgs6uz7H3ffD1bmnQseCVfMageFsPvtLvyB1wNwS
+         qp3MvQAh2KC2+sGunfW28Dxnk4HIA2rJrd5TeGs4It6pBuaWgP4KlJRPhZoOFs6l3r
+         /6EvyOJPwqeIeTcfbtxy54f+fwtsXvQ2hR6JEK0XW1bF3vEbkJFvf9JCvMrBIrGF7G
+         g6Hzn90/MtfmlH2vmVwuwsD+Y1d9Zf1fPpS0TeqjRu2ag+zlYHW3J3E/0bSxMYF9E/
+         adHZ+UwCLJJDQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 07F07E4D011;
+        Thu,  6 Oct 2022 04:00:17 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
+Subject: Re: pull-request: ieee802154 for net 2022-10-05
+From:   patchwork-bot+netdevbpf@kernel.org
+Message-Id: <166502881701.31263.13846825290117849335.git-patchwork-notify@kernel.org>
+Date:   Thu, 06 Oct 2022 04:00:17 +0000
+References: <20221005144508.787376-1-stefan@datenfreihafen.org>
+In-Reply-To: <20221005144508.787376-1-stefan@datenfreihafen.org>
+To:     Stefan Schmidt <stefan@datenfreihafen.org>
+Cc:     davem@davemloft.net, kuba@kernel.org, linux-wpan@vger.kernel.org,
+        alex.aring@gmail.com, netdev@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-This patch adds handling to return -EINVAL for an unknown addr type. The
-current behaviour is to return 0 as successful but the size of an
-unknown addr type is not defined and should return an error like -EINVAL.
+Hello:
 
-Fixes: 94160108a70c ("net/ieee802154: fix uninit value bug in dgram_sendmsg")
-Signed-off-by: Alexander Aring <aahringo@redhat.com>
----
- include/net/ieee802154_netdev.h | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
+This pull request was applied to netdev/net.git (master)
+by Jakub Kicinski <kuba@kernel.org>:
 
-diff --git a/include/net/ieee802154_netdev.h b/include/net/ieee802154_netdev.h
-index a8994f307fc3..03b64bf876a4 100644
---- a/include/net/ieee802154_netdev.h
-+++ b/include/net/ieee802154_netdev.h
-@@ -185,21 +185,27 @@ static inline int
- ieee802154_sockaddr_check_size(struct sockaddr_ieee802154 *daddr, int len)
- {
- 	struct ieee802154_addr_sa *sa;
-+	int ret = 0;
- 
- 	sa = &daddr->addr;
- 	if (len < IEEE802154_MIN_NAMELEN)
- 		return -EINVAL;
- 	switch (sa->addr_type) {
-+	case IEEE802154_ADDR_NONE:
-+		break;
- 	case IEEE802154_ADDR_SHORT:
- 		if (len < IEEE802154_NAMELEN_SHORT)
--			return -EINVAL;
-+			ret = -EINVAL;
- 		break;
- 	case IEEE802154_ADDR_LONG:
- 		if (len < IEEE802154_NAMELEN_LONG)
--			return -EINVAL;
-+			ret = -EINVAL;
-+		break;
-+	default:
-+		ret = -EINVAL;
- 		break;
- 	}
--	return 0;
-+	return ret;
- }
- 
- static inline void ieee802154_addr_from_sa(struct ieee802154_addr *a,
+On Wed,  5 Oct 2022 16:45:08 +0200 you wrote:
+> Hello Dave, Jakub.
+> 
+> An update from ieee802154 for your *net* tree:
+> 
+> Only two patches this time around. A revert from Alexander Aring to a patch
+> that hit net and the updated patch to fix the problem from Tetsuo Handa.
+> 
+> [...]
+
+Here is the summary with links:
+  - pull-request: ieee802154 for net 2022-10-05
+    https://git.kernel.org/netdev/net/c/1d22f78d0573
+
+You are awesome, thank you!
 -- 
-2.31.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
