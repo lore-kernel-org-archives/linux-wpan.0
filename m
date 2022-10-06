@@ -2,106 +2,100 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F368C433F5
-	for <linux-wpan@archiver.kernel.org>; Wed,  5 Oct 2022 14:53:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E973EC433F5
+	for <linux-wpan@archiver.kernel.org>; Thu,  6 Oct 2022 02:03:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229804AbiJEOxH (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 5 Oct 2022 10:53:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41530 "EHLO
+        id S229972AbiJFCDA (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 5 Oct 2022 22:03:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35272 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229576AbiJEOxG (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 5 Oct 2022 10:53:06 -0400
-Received: from proxima.lasnet.de (proxima.lasnet.de [IPv6:2a01:4f8:121:31eb:3::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1299F39BA3;
-        Wed,  5 Oct 2022 07:53:05 -0700 (PDT)
-Received: from [IPV6:2003:e9:d724:a76b:99bd:9507:55e0:d439] (p200300e9d724a76b99bd950755e0d439.dip0.t-ipconnect.de [IPv6:2003:e9:d724:a76b:99bd:9507:55e0:d439])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: stefan@datenfreihafen.org)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id BD0E5C034C;
-        Wed,  5 Oct 2022 16:53:02 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
-        s=2021; t=1664981583;
+        with ESMTP id S229971AbiJFCC7 (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 5 Oct 2022 22:02:59 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 977EF3A15F
+        for <linux-wpan@vger.kernel.org>; Wed,  5 Oct 2022 19:02:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1665021777;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=pt0zhfgS5qs+aVmr37oKMneCBk+J0tB9uEZlqrTMhWc=;
-        b=Woaw/7eIrWqKVPbcz+xtUjt1fnlyRBjU6qwXIupP+s+7Td6t/Fteu2oIjL3ozTQhGpn6JR
-        peRiJuRXECOKRZOk8VTSsAyiUx1oExEiWRKHMQUEcZ9K6PG7IWLb0FrHI6W5XmA6EzsKo/
-        QrCRQZX6Lkowgk2YellnWbSzE4rGHtbYeO8sRhsRFyRC0ByPKmIdfXHoc6rd1lu7YR6n5p
-        iG0zcUyRK8MfMZ4xqdF/mbl4pL7deYmkkim/jCwW1WjtEDdt1puSiUJxSig7kfUXu0e01g
-        NtYUv54tyjhGyDFlZW5jl+9ltL7Gc5oaAsteNB3ci+bAhL8I3GEFImD00cGfEA==
-Message-ID: <5568f032-27f3-42c1-80b2-16b80bf55abd@datenfreihafen.org>
-Date:   Wed, 5 Oct 2022 16:53:02 +0200
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=clm0G3SVgDeMpOV22vjx43vbr2D8qyVRXAIjfIfzYVA=;
+        b=FOb96ihPjbfD/ucdo3JaXiQgNi1tyXOimCKUURwWrRyuShEpJmerXAMAojLk8Zqvg1IFWt
+        2xPu2Sz2fCHa3EwmfpqokISqmpL+Uo0P34gMnyqUEVsrhe+kyoVo+m9V4RVx8RkyDsVX9x
+        H1c+j6ug2zHtbsN6spE3qkgiDh0vJAI=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-549-Jpax0c9eMs-D-x9wM_899g-1; Wed, 05 Oct 2022 22:02:54 -0400
+X-MC-Unique: Jpax0c9eMs-D-x9wM_899g-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E890238164C0;
+        Thu,  6 Oct 2022 02:02:53 +0000 (UTC)
+Received: from fs-i40c-03.fs.lab.eng.bos.redhat.com (fs-i40c-03.fs.lab.eng.bos.redhat.com [10.16.224.23])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3F56D2166B26;
+        Thu,  6 Oct 2022 02:02:53 +0000 (UTC)
+From:   Alexander Aring <aahringo@redhat.com>
+To:     tcs.kernel@gmail.com
+Cc:     stefan@datenfreihafen.org, davem@davemloft.net,
+        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+        linux-wpan@vger.kernel.org, netdev@vger.kernel.org
+Subject: [PATCH net OR wpan] net: ieee802154: return -EINVAL for unknown addr type
+Date:   Wed,  5 Oct 2022 22:02:37 -0400
+Message-Id: <20221006020237.318511-1-aahringo@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.1
-Subject: Re: [PATCH] net/ieee802154: reject zero-sized raw_sendmsg()
-Content-Language: en-US
-To:     Alexander Aring <aahringo@redhat.com>
-Cc:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
-        patchwork-bot+netdevbpf@kernel.org,
-        "David S. Miller" <davem@davemloft.net>, alex.aring@gmail.com,
-        shaozhengchao@huawei.com, ast@kernel.org, sdf@google.com,
-        linux-wpan@vger.kernel.org,
-        syzbot+5ea725c25d06fb9114c4@syzkaller.appspotmail.com,
-        syzkaller-bugs@googlegroups.com, bpf@vger.kernel.org,
-        netdev@vger.kernel.org
-References: <5e89b653-3fc6-25c5-324b-1b15909c0183@I-love.SAKURA.ne.jp>
- <166480021535.14393.17575492399292423045.git-patchwork-notify@kernel.org>
- <4aae5e2b-f4d5-c260-5bf8-435c525f6c97@I-love.SAKURA.ne.jp>
- <CAK-6q+g7JQZkRJhp6qv_H9xGfD4DWnaChmQ7OaWJs3CAjfMnpA@mail.gmail.com>
- <1c374e71-f56e-540e-35d0-e6e82a4dc0e3@datenfreihafen.org>
- <CAK-6q+iqPFxrM7qdmi4xcF8e+2mgqXT9otEwRA+Vh-JfRQ18Wg@mail.gmail.com>
-From:   Stefan Schmidt <stefan@datenfreihafen.org>
-In-Reply-To: <CAK-6q+iqPFxrM7qdmi4xcF8e+2mgqXT9otEwRA+Vh-JfRQ18Wg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello.
+This patch adds handling to return -EINVAL for an unknown addr type. The
+current behaviour is to return 0 as successful but the size of an
+unknown addr type is not defined and should return an error like -EINVAL.
 
-On 05.10.22 03:49, Alexander Aring wrote:
-> Hi,
-> 
-> On Tue, Oct 4, 2022 at 1:59 PM Stefan Schmidt <stefan@datenfreihafen.org> wrote:
->>
->> Hello.
->>
->> On 04.10.22 00:29, Alexander Aring wrote:
->>> pull request to net. For netdev maintainers, please don't apply wpan
->>> patches. Stefan and I will care about it.
->>
->> Keep in mind that Dave and Jakub do this to help us out because we are
->> sometimes slow on applying patches and getting them to net. Normally
->> this is all fine for clear fixes.
->>
-> 
-> If we move getting patches for wpan to net then we should move it
-> completely to that behaviour and not having a mixed setup which does
-> not work, or it works and hope we don't have conflicts and if we have
-> conflicts we need to fix them when doing the pull-request that the
-> next instance has no conflicts because they touched maybe the same
-> code area.
+Fixes: 94160108a70c ("net/ieee802154: fix uninit value bug in dgram_sendmsg")
+Signed-off-by: Alexander Aring <aahringo@redhat.com>
+---
+ include/net/ieee802154_netdev.h | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
 
-I do disagree on this. I think there is no need to have it fixed to one 
-way or another (net OR wpan). It has been working fine with this mixed 
-approach for quite a long time. The current issue with v1 being applied 
-instead of v2 is something that could have happened to us when applying 
-to wpan as easily.
+diff --git a/include/net/ieee802154_netdev.h b/include/net/ieee802154_netdev.h
+index a8994f307fc3..03b64bf876a4 100644
+--- a/include/net/ieee802154_netdev.h
++++ b/include/net/ieee802154_netdev.h
+@@ -185,21 +185,27 @@ static inline int
+ ieee802154_sockaddr_check_size(struct sockaddr_ieee802154 *daddr, int len)
+ {
+ 	struct ieee802154_addr_sa *sa;
++	int ret = 0;
+ 
+ 	sa = &daddr->addr;
+ 	if (len < IEEE802154_MIN_NAMELEN)
+ 		return -EINVAL;
+ 	switch (sa->addr_type) {
++	case IEEE802154_ADDR_NONE:
++		break;
+ 	case IEEE802154_ADDR_SHORT:
+ 		if (len < IEEE802154_NAMELEN_SHORT)
+-			return -EINVAL;
++			ret = -EINVAL;
+ 		break;
+ 	case IEEE802154_ADDR_LONG:
+ 		if (len < IEEE802154_NAMELEN_LONG)
+-			return -EINVAL;
++			ret = -EINVAL;
++		break;
++	default:
++		ret = -EINVAL;
+ 		break;
+ 	}
+-	return 0;
++	return ret;
+ }
+ 
+ static inline void ieee802154_addr_from_sa(struct ieee802154_addr *a,
+-- 
+2.31.1
 
-If we are quick enough to ack/apply patches hitting the list (1-2 days) 
-its unlikely any of them will be applied to net. Dave and Jakub simply 
-help us to make sure nothing falls through the cracks.
-
-> I think a) would be the fastest way here and I just sent something.
-
-I applied the two patches earlier today and just send out a pull request 
-for net with them.
-
-regards
-Stefan Schmidt
