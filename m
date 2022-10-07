@@ -2,96 +2,79 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3400C433F5
-	for <linux-wpan@archiver.kernel.org>; Fri,  7 Oct 2022 07:45:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2475FC433FE
+	for <linux-wpan@archiver.kernel.org>; Fri,  7 Oct 2022 07:50:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229777AbiJGHpE (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Fri, 7 Oct 2022 03:45:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58908 "EHLO
+        id S229906AbiJGHuX (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Fri, 7 Oct 2022 03:50:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42432 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229838AbiJGHpD (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Fri, 7 Oct 2022 03:45:03 -0400
-Received: from proxima.lasnet.de (proxima.lasnet.de [IPv6:2a01:4f8:121:31eb:3::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB3DE28E2D;
-        Fri,  7 Oct 2022 00:45:00 -0700 (PDT)
-Received: from [IPV6:2003:e9:d724:a7dd:f566:73:8aea:58ff] (p200300e9d724a7ddf56600738aea58ff.dip0.t-ipconnect.de [IPv6:2003:e9:d724:a7dd:f566:73:8aea:58ff])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits))
+        with ESMTP id S229543AbiJGHuV (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 7 Oct 2022 03:50:21 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD41D6171A;
+        Fri,  7 Oct 2022 00:50:17 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        (Authenticated sender: stefan@datenfreihafen.org)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id 59072C05DE;
-        Fri,  7 Oct 2022 09:44:58 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
-        s=2021; t=1665128698;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Je6hpNQNnFX/1LEDxLhTD+Kr3K4vDzzOqJ5LyfWIuas=;
-        b=vlleGP6gfseQDPHOpgMVfPs7oZnQTtIqOY06/+giz8CigAn91dNc3FOMpyhE5GDsPsnMlt
-        RZynKewnOLqb1yLVTyJr8TjDYBiLcSyek351VYNI7GXPoCLUyQmgkOzjgcYorhURILeQ6g
-        H5uH2Cp4gZvu6Q33OSF/dDCFiaRyTm/mcrYbh4Ps3h+XrYuO430FX7IkJ48GWu+ZxaS/No
-        2b6z1LtKuAB3b5RxO2RnLg33pPMbKE0tIYdQmnlZSckAyrCN8q96IjghQ1KDrJBIaQ3dEA
-        zqaBKTNwkwFV9nIEBNFuoP0OKWmn/OIU7o3+CglrcncQ+Fli1f55+qEEr0GLPw==
-Message-ID: <fce4d1a0-5fa9-84b7-52af-4bef48ea90b0@datenfreihafen.org>
-Date:   Fri, 7 Oct 2022 09:44:58 +0200
+        by dfw.source.kernel.org (Postfix) with ESMTPS id BF3D261C21;
+        Fri,  7 Oct 2022 07:50:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 1B75DC43470;
+        Fri,  7 Oct 2022 07:50:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1665129016;
+        bh=1nUBHpGUxvugnyP17SSmTV7ldBfoTwF3/yGzMclH4/Y=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=eCTA0VLoTfVPuR994GyowOA4W1rSJ7Ndb1c59U2PHtcIB0+k/x1ahUiNbLzSDMccB
+         0Oir5450OKkIHd/W3cV7g7bK3kMERGmD+IIyMaYcERcuRmldZSTWqndMEJ+UvKXeFY
+         ub5RUcYnwIsJdbs3NFvqLI6UhJ8/kdshQHsNiYMTg1fo86ttrCB3zN2ulNoHWVl7mS
+         l/hKp7Toc7jYEcwt8Bcj2nekGzmOX/4b0YFAAhIu4btRGQtuPCZuzLx7NE+lHYpr0/
+         h5k6o2IyPLDkIh2N75FczQf63zlF4RRyWOInKyxrVkt+b3PVFPpzdJMMfZ370e3Iw4
+         bZdh7n1g6rpwg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id F21ADE43EFE;
+        Fri,  7 Oct 2022 07:50:15 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.1
-Subject: Re: [PATCH] net: ieee802154: fix error return code in dgram_bind()
-Content-Language: en-US
-To:     Wei Yongjun <weiyongjun@huaweicloud.com>,
-        Haimin Zhang <tcs.kernel@gmail.com>,
-        Alexander Aring <alex.aring@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>
-Cc:     Wei Yongjun <weiyongjun1@huawei.com>, linux-wpan@vger.kernel.org,
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net OR wpan] net: ieee802154: return -EINVAL for unknown addr
+ type
+From:   patchwork-bot+netdevbpf@kernel.org
+Message-Id: <166512901598.847.2508780876971390849.git-patchwork-notify@kernel.org>
+Date:   Fri, 07 Oct 2022 07:50:15 +0000
+References: <20221006020237.318511-1-aahringo@redhat.com>
+In-Reply-To: <20221006020237.318511-1-aahringo@redhat.com>
+To:     Alexander Aring <aahringo@redhat.com>
+Cc:     tcs.kernel@gmail.com, stefan@datenfreihafen.org,
+        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com, linux-wpan@vger.kernel.org,
         netdev@vger.kernel.org
-References: <20220919160830.1436109-1-weiyongjun@huaweicloud.com>
-From:   Stefan Schmidt <stefan@datenfreihafen.org>
-In-Reply-To: <20220919160830.1436109-1-weiyongjun@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello.
+Hello:
 
-On 19.09.22 18:08, Wei Yongjun wrote:
-> From: Wei Yongjun <weiyongjun1@huawei.com>
-> 
-> Fix to return error code -EINVAL from the error handling
-> case instead of 0, as done elsewhere in this function.
+This patch was applied to netdev/net.git (master)
+by David S. Miller <davem@davemloft.net>:
+
+On Wed,  5 Oct 2022 22:02:37 -0400 you wrote:
+> This patch adds handling to return -EINVAL for an unknown addr type. The
+> current behaviour is to return 0 as successful but the size of an
+> unknown addr type is not defined and should return an error like -EINVAL.
 > 
 > Fixes: 94160108a70c ("net/ieee802154: fix uninit value bug in dgram_sendmsg")
-> Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
-> ---
->   net/ieee802154/socket.c | 4 +++-
->   1 file changed, 3 insertions(+), 1 deletion(-)
+> Signed-off-by: Alexander Aring <aahringo@redhat.com>
 > 
-> diff --git a/net/ieee802154/socket.c b/net/ieee802154/socket.c
-> index 7889e1ef7fad..35c54dce74f9 100644
-> --- a/net/ieee802154/socket.c
-> +++ b/net/ieee802154/socket.c
-> @@ -498,8 +498,10 @@ static int dgram_bind(struct sock *sk, struct sockaddr *uaddr, int len)
->   	if (err < 0)
->   		goto out;
->   
-> -	if (addr->family != AF_IEEE802154)
-> +	if (addr->family != AF_IEEE802154) {
-> +		err = -EINVAL;
->   		goto out;
-> +	}
->   
->   	ieee802154_addr_from_sa(&haddr, &addr->addr);
->   	dev = ieee802154_get_dev(sock_net(sk), &haddr);
-> 
+> [...]
 
-This patch has been applied to the wpan tree and will be
-part of the next pull request to net. Thanks!
+Here is the summary with links:
+  - [net,OR,wpan] net: ieee802154: return -EINVAL for unknown addr type
+    https://git.kernel.org/netdev/net/c/30393181fdbc
 
-regards
-Stefan Schmidt
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
