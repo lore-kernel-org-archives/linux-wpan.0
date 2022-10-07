@@ -2,76 +2,109 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D065C433F5
-	for <linux-wpan@archiver.kernel.org>; Thu,  6 Oct 2022 04:00:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DD28C433FE
+	for <linux-wpan@archiver.kernel.org>; Fri,  7 Oct 2022 07:44:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229729AbiJFEAV (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Thu, 6 Oct 2022 00:00:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43878 "EHLO
+        id S229773AbiJGHo1 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Fri, 7 Oct 2022 03:44:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56854 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229540AbiJFEAT (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 6 Oct 2022 00:00:19 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F4E858B4B;
-        Wed,  5 Oct 2022 21:00:18 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        with ESMTP id S229777AbiJGHoZ (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 7 Oct 2022 03:44:25 -0400
+Received: from proxima.lasnet.de (proxima.lasnet.de [IPv6:2a01:4f8:121:31eb:3::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 173CBDED00;
+        Fri,  7 Oct 2022 00:44:22 -0700 (PDT)
+Received: from [IPV6:2003:e9:d724:a7dd:f566:73:8aea:58ff] (p200300e9d724a7ddf56600738aea58ff.dip0.t-ipconnect.de [IPv6:2003:e9:d724:a7dd:f566:73:8aea:58ff])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id BB817617FB;
-        Thu,  6 Oct 2022 04:00:17 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 2AA68C43142;
-        Thu,  6 Oct 2022 04:00:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1665028817;
-        bh=T+SwlxiKuBO+CE8538i8k26fdUZf0S8mRyqXrJDoUro=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=iZvGOLeh3kaDRTmeMOy3jtVnEBjYK5oy9GUan3K1Cbd7ErfDzmJq1pfpD+FDfIvKP
-         5C9Ne1KiWlrC4GTgr/IHSHzdvFbgs6uz7H3ffD1bmnQseCVfMageFsPvtLvyB1wNwS
-         qp3MvQAh2KC2+sGunfW28Dxnk4HIA2rJrd5TeGs4It6pBuaWgP4KlJRPhZoOFs6l3r
-         /6EvyOJPwqeIeTcfbtxy54f+fwtsXvQ2hR6JEK0XW1bF3vEbkJFvf9JCvMrBIrGF7G
-         g6Hzn90/MtfmlH2vmVwuwsD+Y1d9Zf1fPpS0TeqjRu2ag+zlYHW3J3E/0bSxMYF9E/
-         adHZ+UwCLJJDQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 07F07E4D011;
-        Thu,  6 Oct 2022 04:00:17 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+        (Authenticated sender: stefan@datenfreihafen.org)
+        by proxima.lasnet.de (Postfix) with ESMTPSA id BBE59C04DF;
+        Fri,  7 Oct 2022 09:44:20 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
+        s=2021; t=1665128661;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=SIfCLYWhDUFwzue6wEqXVr58o/uqP9e248unx6ieZT4=;
+        b=JmG/vBtX1OZfElT3wzDuzuNmQfLyGGprdLOsVWXFyqynGudWlEzHUKinC+IS1MgcNuKAc3
+        2CBDSCgN3dkuLpueGPY9KmzZ2VFG7XjcyoWlYLtKeksCoPraL5vSfM7ABEB/lduX4Ky7iM
+        eJXPgoAjYSn95Afmrrv/P6GggDVGsEoKE8FNgrXv4ZMjT2d+B26g957iLwOTGxzzUz/oLC
+        tqGbKFNIs0f948I+nexYrXnEwkvr5yuZmQjr5xJYLBtt+mMT9X1Av+MrIwx7In/8K1Q3AS
+        ya7GmvIAmNfFAjlBy4vHfDk3tSv/5pJq0QScMHwtUYVYaGL9Tv+bKZPHctpbvw==
+Message-ID: <75be7065-e9ca-cba0-43e8-e3e0ffae538e@datenfreihafen.org>
+Date:   Fri, 7 Oct 2022 09:44:18 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: pull-request: ieee802154 for net 2022-10-05
-From:   patchwork-bot+netdevbpf@kernel.org
-Message-Id: <166502881701.31263.13846825290117849335.git-patchwork-notify@kernel.org>
-Date:   Thu, 06 Oct 2022 04:00:17 +0000
-References: <20221005144508.787376-1-stefan@datenfreihafen.org>
-In-Reply-To: <20221005144508.787376-1-stefan@datenfreihafen.org>
-To:     Stefan Schmidt <stefan@datenfreihafen.org>
-Cc:     davem@davemloft.net, kuba@kernel.org, linux-wpan@vger.kernel.org,
-        alex.aring@gmail.com, netdev@vger.kernel.org
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.1
+Subject: Re: [PATCH net OR wpan] net: ieee802154: return -EINVAL for unknown
+ addr type
+Content-Language: en-US
+To:     Alexander Aring <aahringo@redhat.com>, tcs.kernel@gmail.com
+Cc:     davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com, linux-wpan@vger.kernel.org,
+        netdev@vger.kernel.org
+References: <20221006020237.318511-1-aahringo@redhat.com>
+From:   Stefan Schmidt <stefan@datenfreihafen.org>
+In-Reply-To: <20221006020237.318511-1-aahringo@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello:
+Hello.
 
-This pull request was applied to netdev/net.git (master)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Wed,  5 Oct 2022 16:45:08 +0200 you wrote:
-> Hello Dave, Jakub.
+On 06.10.22 04:02, Alexander Aring wrote:
+> This patch adds handling to return -EINVAL for an unknown addr type. The
+> current behaviour is to return 0 as successful but the size of an
+> unknown addr type is not defined and should return an error like -EINVAL.
 > 
-> An update from ieee802154 for your *net* tree:
+> Fixes: 94160108a70c ("net/ieee802154: fix uninit value bug in dgram_sendmsg")
+> Signed-off-by: Alexander Aring <aahringo@redhat.com>
+> ---
+>   include/net/ieee802154_netdev.h | 12 +++++++++---
+>   1 file changed, 9 insertions(+), 3 deletions(-)
 > 
-> Only two patches this time around. A revert from Alexander Aring to a patch
-> that hit net and the updated patch to fix the problem from Tetsuo Handa.
-> 
-> [...]
+> diff --git a/include/net/ieee802154_netdev.h b/include/net/ieee802154_netdev.h
+> index a8994f307fc3..03b64bf876a4 100644
+> --- a/include/net/ieee802154_netdev.h
+> +++ b/include/net/ieee802154_netdev.h
+> @@ -185,21 +185,27 @@ static inline int
+>   ieee802154_sockaddr_check_size(struct sockaddr_ieee802154 *daddr, int len)
+>   {
+>   	struct ieee802154_addr_sa *sa;
+> +	int ret = 0;
+>   
+>   	sa = &daddr->addr;
+>   	if (len < IEEE802154_MIN_NAMELEN)
+>   		return -EINVAL;
+>   	switch (sa->addr_type) {
+> +	case IEEE802154_ADDR_NONE:
+> +		break;
+>   	case IEEE802154_ADDR_SHORT:
+>   		if (len < IEEE802154_NAMELEN_SHORT)
+> -			return -EINVAL;
+> +			ret = -EINVAL;
+>   		break;
+>   	case IEEE802154_ADDR_LONG:
+>   		if (len < IEEE802154_NAMELEN_LONG)
+> -			return -EINVAL;
+> +			ret = -EINVAL;
+> +		break;
+> +	default:
+> +		ret = -EINVAL;
+>   		break;
+>   	}
+> -	return 0;
+> +	return ret;
+>   }
+>   
+>   static inline void ieee802154_addr_from_sa(struct ieee802154_addr *a,
 
-Here is the summary with links:
-  - pull-request: ieee802154 for net 2022-10-05
-    https://git.kernel.org/netdev/net/c/1d22f78d0573
+This patch has been applied to the wpan tree and will be
+part of the next pull request to net. Thanks!
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+regards
+Stefan Schmidt
