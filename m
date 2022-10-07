@@ -2,79 +2,119 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2475FC433FE
-	for <linux-wpan@archiver.kernel.org>; Fri,  7 Oct 2022 07:50:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 916F2C433F5
+	for <linux-wpan@archiver.kernel.org>; Fri,  7 Oct 2022 08:53:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229906AbiJGHuX (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Fri, 7 Oct 2022 03:50:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42432 "EHLO
+        id S229495AbiJGIx1 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Fri, 7 Oct 2022 04:53:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55360 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229543AbiJGHuV (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Fri, 7 Oct 2022 03:50:21 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD41D6171A;
-        Fri,  7 Oct 2022 00:50:17 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id BF3D261C21;
-        Fri,  7 Oct 2022 07:50:16 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 1B75DC43470;
-        Fri,  7 Oct 2022 07:50:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1665129016;
-        bh=1nUBHpGUxvugnyP17SSmTV7ldBfoTwF3/yGzMclH4/Y=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=eCTA0VLoTfVPuR994GyowOA4W1rSJ7Ndb1c59U2PHtcIB0+k/x1ahUiNbLzSDMccB
-         0Oir5450OKkIHd/W3cV7g7bK3kMERGmD+IIyMaYcERcuRmldZSTWqndMEJ+UvKXeFY
-         ub5RUcYnwIsJdbs3NFvqLI6UhJ8/kdshQHsNiYMTg1fo86ttrCB3zN2ulNoHWVl7mS
-         l/hKp7Toc7jYEcwt8Bcj2nekGzmOX/4b0YFAAhIu4btRGQtuPCZuzLx7NE+lHYpr0/
-         h5k6o2IyPLDkIh2N75FczQf63zlF4RRyWOInKyxrVkt+b3PVFPpzdJMMfZ370e3Iw4
-         bZdh7n1g6rpwg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id F21ADE43EFE;
-        Fri,  7 Oct 2022 07:50:15 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+        with ESMTP id S229797AbiJGIxV (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 7 Oct 2022 04:53:21 -0400
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A1C7FDB41;
+        Fri,  7 Oct 2022 01:53:17 -0700 (PDT)
+Received: (Authenticated sender: miquel.raynal@bootlin.com)
+        by mail.gandi.net (Postfix) with ESMTPSA id 6AA591BF208;
+        Fri,  7 Oct 2022 08:53:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+        t=1665132796;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=uh+P3R5zCB33IwZ4os0qwmtcfWBN2fhAjbxw11nSeYA=;
+        b=WiP7T7dC4Li9EAOgPEiduB+4pmb1KeQ00SJxPGSqLbpJ2zn/aGGBGC//B7SbmK9jo/X89u
+        Ul7f/MorqhFR+eLl7HMv0wsv69CEALwIO+o5pK4daSA9pg6YcLV/9LNgbsSMWc9NUNcAp5
+        1ahZplu1KSoFiHIKf+Z6n4u7G1xMhQXdR7oc3rQ/2SD3kruHlfnt3gmI0ms6Bem6IeWszr
+        njvxXufbHasfpvoEJVDj4Z9PVc5ZwZBKdeDIUqQhHLRY0XtCS40xMOI7reyZ6rtIs0oNTq
+        hDMkgqMz1GdG9UPbQ/smWFTRdi+17pL5g2EZxcJJrzv+xoonVGJMILctmHFyVg==
+From:   Miquel Raynal <miquel.raynal@bootlin.com>
+To:     Alexander Aring <alex.aring@gmail.com>,
+        Stefan Schmidt <stefan@datenfreihafen.org>,
+        linux-wpan@vger.kernel.org
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
+        David Girault <david.girault@qorvo.com>,
+        Romuald Despres <romuald.despres@qorvo.com>,
+        Frederic Blain <frederic.blain@qorvo.com>,
+        Nicolas Schodet <nico@ni.fr.eu.org>,
+        Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+        Miquel Raynal <miquel.raynal@bootlin.com>
+Subject: [PATCH wpan/next v4 0/8] net: ieee802154: Improve filtering support
+Date:   Fri,  7 Oct 2022 10:53:02 +0200
+Message-Id: <20221007085310.503366-1-miquel.raynal@bootlin.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net OR wpan] net: ieee802154: return -EINVAL for unknown addr
- type
-From:   patchwork-bot+netdevbpf@kernel.org
-Message-Id: <166512901598.847.2508780876971390849.git-patchwork-notify@kernel.org>
-Date:   Fri, 07 Oct 2022 07:50:15 +0000
-References: <20221006020237.318511-1-aahringo@redhat.com>
-In-Reply-To: <20221006020237.318511-1-aahringo@redhat.com>
-To:     Alexander Aring <aahringo@redhat.com>
-Cc:     tcs.kernel@gmail.com, stefan@datenfreihafen.org,
-        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-        pabeni@redhat.com, linux-wpan@vger.kernel.org,
-        netdev@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello:
+Hello,
 
-This patch was applied to netdev/net.git (master)
-by David S. Miller <davem@davemloft.net>:
+A fourth version of this series, where we try to improve filtering
+support to ease scan integration. Will then come a short series about
+the coordinator interfaces and then the proper scan series.
 
-On Wed,  5 Oct 2022 22:02:37 -0400 you wrote:
-> This patch adds handling to return -EINVAL for an unknown addr type. The
-> current behaviour is to return 0 as successful but the size of an
-> unknown addr type is not defined and should return an error like -EINVAL.
-> 
-> Fixes: 94160108a70c ("net/ieee802154: fix uninit value bug in dgram_sendmsg")
-> Signed-off-by: Alexander Aring <aahringo@redhat.com>
-> 
-> [...]
+Thanks,
+Miquèl
 
-Here is the summary with links:
-  - [net,OR,wpan] net: ieee802154: return -EINVAL for unknown addr type
-    https://git.kernel.org/netdev/net/c/30393181fdbc
+Changes in v4:
+* Added a condition upon which the packets for a given interface would be
+  dropped: in case AACK and/or address filtering was expected, but
+  another interface has disabled it on the PHY.
+* Changed the way Alexander's patch behaves regarding the handling of
+  the different filtering levels. I added a third variable which shows
+  the default filtering level for the interface. There is a second
+  (per-interface) field giving the expected filtering level for this
+  interface and finally we keep the per-PHY actual filtering level
+  information. With this we can safely go back to the right level after
+  a scan and also we can detect any wrong situation where ACKs would not
+  be sent while expected and drop the frames if in this situation.
+* Moved all the additional filtering logic out of the core and put it
+  into hwsim's in-driver receive path, so that it can act like any other
+  transceiver depending on the filtering level requested.
+* Dropped the addition of the support for the ieee802154 promiscuous
+  filtering mode which is anyway not usable yet.
+* Dropped the "net:" prefixes in many patches to fit what Alexander
+  does.
 
-You are awesome, thank you!
+Changes in v3:
+* Full rework of the way the promiscuous mode is handled, with new
+  filtering levels, one per-phy and the actual one on the device.
+* Dropped all the manual acking, everything is happenging on hardware.
+* Better handling of the Acks in atusb to report the trac status.
+
+
+
+Alexander Aring (2):
+  mac802154: move receive parameters above start
+  mac802154: set filter at drv_start()
+
+Miquel Raynal (6):
+  mac802154: Introduce filtering levels
+  ieee802154: hwsim: Record the address filter values
+  ieee802154: hwsim: Implement address filtering
+  mac802154: Drop IEEE802154_HW_RX_DROP_BAD_CKSUM
+  mac802154: Avoid delivering frames received in a non satisfying
+    filtering mode
+  mac802154: Ensure proper scan-level filtering
+
+ drivers/net/ieee802154/mac802154_hwsim.c | 150 +++++++++++-
+ include/linux/ieee802154.h               |  24 ++
+ include/net/cfg802154.h                  |   7 +-
+ include/net/ieee802154_netdev.h          |   8 +
+ include/net/mac802154.h                  |   4 -
+ net/mac802154/cfg.c                      |   2 +-
+ net/mac802154/driver-ops.h               | 281 ++++++++++++++---------
+ net/mac802154/ieee802154_i.h             |  12 +
+ net/mac802154/iface.c                    |  44 ++--
+ net/mac802154/rx.c                       |  25 +-
+ 10 files changed, 409 insertions(+), 148 deletions(-)
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.34.1
 
