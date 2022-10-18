@@ -2,63 +2,36 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B13FC4332F
-	for <linux-wpan@archiver.kernel.org>; Tue, 18 Oct 2022 20:54:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA1BCC4332F
+	for <linux-wpan@archiver.kernel.org>; Tue, 18 Oct 2022 22:04:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229665AbiJRUyb (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 18 Oct 2022 16:54:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54626 "EHLO
+        id S229777AbiJRWED (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 18 Oct 2022 18:04:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55210 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229763AbiJRUya (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 18 Oct 2022 16:54:30 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E03B631A
-        for <linux-wpan@vger.kernel.org>; Tue, 18 Oct 2022 13:54:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1666126468;
+        with ESMTP id S229760AbiJRWEC (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 18 Oct 2022 18:04:02 -0400
+Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4993ABE525;
+        Tue, 18 Oct 2022 15:03:35 -0700 (PDT)
+Received: (Authenticated sender: miquel.raynal@bootlin.com)
+        by mail.gandi.net (Postfix) with ESMTPSA id DD545FF806;
+        Tue, 18 Oct 2022 22:03:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+        t=1666130613;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=hO1LFELXQEUpYNdXEw0Kt4gZtU698gtGrVoO0zJ7b2o=;
-        b=fOjq6pAPc5M2mut1doNaAqbEClvS85ocZXYvrv1s0nP9OtAIwPqJX4gp2EEYYo4kPxm8kc
-        XOKpGUoBSqUC8kNoRjzdszqh44rb8IPkqWRJSjAlZip+PV5AHIGU6IPGVbalKHxsIdU+8X
-        dZ1uvoDwm+Wk5z8QtqJ4Hrmcgz0MJYE=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-411-atQhL-zHPk2irEFFUp-6fg-1; Tue, 18 Oct 2022 16:54:27 -0400
-X-MC-Unique: atQhL-zHPk2irEFFUp-6fg-1
-Received: by mail-wm1-f70.google.com with SMTP id p42-20020a05600c1daa00b003c6ee394f0dso6736795wms.5
-        for <linux-wpan@vger.kernel.org>; Tue, 18 Oct 2022 13:54:27 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=hO1LFELXQEUpYNdXEw0Kt4gZtU698gtGrVoO0zJ7b2o=;
-        b=o0oe0upvy44ISflNhlmOIzLPKqQ3vUGn2fJSGUBnHKno5UphNqaqVGsj6lbwbZm4z2
-         D06f9KLvz1F1VU1vINHxmfCa+5mfj4bqv3NWOWAZXDKFOkMPT5ktNxuOUaJHsSci6G55
-         VZ9Pmtyt7t6wJc5i+q9vAZWtQc23Wtq/5+Qtl+2xcFFalTxe4Cu6uXnxefdA65bS4Gbc
-         qkz+5a/Kf5UXJ5l+A+thm69bTeWdUx/a3Xy+FVlm0EY2IG+NGiScvmqykhYy8u4iW+W+
-         QN6Ff5+jc3ygV67Z1KbGVF7e70Pv38MfuS3H1SRTznYxJYstrUZJicyLJLrTSWeMBc1S
-         zlpA==
-X-Gm-Message-State: ACrzQf15tsOJHb0lZe2NoIF3+yH1HbY714mOHqCZxNjgHFuVSy+bPyo4
-        Su12nHsudC5YEdKjQpEArcIIefF8QOimvWUMHIGSTNcPhRlYRktPpDvS73gBkKB0SDhBk7+ITK6
-        nhcyBWB7pL+hSM/oIUcKvyCPltDs2EqqZ/ElEuw==
-X-Received: by 2002:adf:fad0:0:b0:22e:4998:fd5d with SMTP id a16-20020adffad0000000b0022e4998fd5dmr2986820wrs.267.1666126464684;
-        Tue, 18 Oct 2022 13:54:24 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM56AO+wk6RlK4KVfT9P3LmtwBvOvRZ6AIQAfU74yH274huUcfE7m3JRGMgA/Z6UR6c4Q7uE8soGGYtHsMbqYuw=
-X-Received: by 2002:adf:fad0:0:b0:22e:4998:fd5d with SMTP id
- a16-20020adffad0000000b0022e4998fd5dmr2986803wrs.267.1666126464448; Tue, 18
- Oct 2022 13:54:24 -0700 (PDT)
-MIME-Version: 1.0
-References: <20221018183540.806471-1-miquel.raynal@bootlin.com>
-In-Reply-To: <20221018183540.806471-1-miquel.raynal@bootlin.com>
-From:   Alexander Aring <aahringo@redhat.com>
-Date:   Tue, 18 Oct 2022 16:54:13 -0400
-Message-ID: <CAK-6q+gRMG64Ra9ghAUVHXkJoGB1b5Kd6rLTiUK+UArbYhP+BA@mail.gmail.com>
-Subject: Re: [PATCH wpan-next v5] mac802154: Ensure proper scan-level filtering
-To:     Miquel Raynal <miquel.raynal@bootlin.com>
+        bh=LcBqf03x+GtVudHxfqW+K/pUlgVsWxbPKfj6lE9Ye98=;
+        b=M5Z8r/jb+WWEP5EU8iH6OprPVUjcqb9OJIgd2JvHO/cR3C52tLc9hruaHwmolVPN20r57Z
+        Egv56PVrBnau9zd3WxzxfkyyfIBx8PkFvtNb75SoNriXXnoa0atYYTy8+0MRb8CkYWJSmB
+        3ayZOQmjtSmUpzuHjA9LTphAWHYTsd9W3NKyAZRvpnWTkAWlQ2e1EbEOSgzr4Vb/zB3snL
+        ndifvQ/et95awwjB+B/WSsyj8JyLdfOjFcgRJSuPBsBGJc5Bnps4/Q2vPm5zty42OKjRxi
+        BsRjkp2Om/K8y3pikAIN7QmaWoN1zdLs4qywx/ymwpbMAw0v3Ea8GJgcRcRfdA==
+Date:   Wed, 19 Oct 2022 00:03:29 +0200
+From:   Miquel Raynal <miquel.raynal@bootlin.com>
+To:     Alexander Aring <aahringo@redhat.com>
 Cc:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
         linux-wpan@vger.kernel.org,
@@ -72,20 +45,48 @@ Cc:     Alexander Aring <alex.aring@gmail.com>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
         Guilhem Imberton <guilhem.imberton@qorvo.com>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH wpan-next v5] mac802154: Ensure proper scan-level
+ filtering
+Message-ID: <20221019000329.2eacd502@xps-13>
+In-Reply-To: <CAK-6q+gRMG64Ra9ghAUVHXkJoGB1b5Kd6rLTiUK+UArbYhP+BA@mail.gmail.com>
+References: <20221018183540.806471-1-miquel.raynal@bootlin.com>
+        <CAK-6q+gRMG64Ra9ghAUVHXkJoGB1b5Kd6rLTiUK+UArbYhP+BA@mail.gmail.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi,
+Hi Alexander,
 
-On Tue, Oct 18, 2022 at 2:35 PM Miquel Raynal <miquel.raynal@bootlin.com> wrote:
->
-> We now have a fine grained filtering information so let's ensure proper
-> filtering in scan mode, which means that only beacons are processed.
->
+aahringo@redhat.com wrote on Tue, 18 Oct 2022 16:54:13 -0400:
 
-Is this a fixup? Can you resend the whole series please?
+> Hi,
+>=20
+> On Tue, Oct 18, 2022 at 2:35 PM Miquel Raynal <miquel.raynal@bootlin.com>=
+ wrote:
+> >
+> > We now have a fine grained filtering information so let's ensure proper
+> > filtering in scan mode, which means that only beacons are processed.
+> > =20
+>=20
+> Is this a fixup? Can you resend the whole series please?
 
-- Alex
+Hmm no? Unless I understood things the wrong way, Stefan applied
+patches 1 to 7 of my v4, and asked me to make a change on the 8th
+patch.
 
+This is v5 just for patch 8/8 of the previous series, I just changed
+a debug string actually...
+
+There was a conflict when he applied it but I believe this is because
+wpan-next did not contain one of the fixes which made it to Linus' tree
+a month ago. So in my branch I still have this fix prior to this patch,
+because otherwise there will be a conflict when merging v6.1-rc1 (which
+I believe was not done yet).=20
+
+Thanks,
+Miqu=C3=A8l
