@@ -2,33 +2,32 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E722CC4332F
-	for <linux-wpan@archiver.kernel.org>; Tue, 18 Oct 2022 18:33:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D26F6C433FE
+	for <linux-wpan@archiver.kernel.org>; Tue, 18 Oct 2022 18:35:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230153AbiJRSc6 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 18 Oct 2022 14:32:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38894 "EHLO
+        id S229898AbiJRSfs (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 18 Oct 2022 14:35:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47686 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230109AbiJRSc5 (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 18 Oct 2022 14:32:57 -0400
-Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::227])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90E3690817;
-        Tue, 18 Oct 2022 11:32:55 -0700 (PDT)
+        with ESMTP id S229885AbiJRSfs (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 18 Oct 2022 14:35:48 -0400
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::221])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CD8987FA5;
+        Tue, 18 Oct 2022 11:35:45 -0700 (PDT)
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id E1D2720005;
-        Tue, 18 Oct 2022 18:32:50 +0000 (UTC)
+        by mail.gandi.net (Postfix) with ESMTPSA id D9097240005;
+        Tue, 18 Oct 2022 18:35:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1666117972;
+        t=1666118144;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=XFEjhfGI7zVY3yb93JDUDXRMNuuwpASEFUI1ft70yyk=;
-        b=e3D4tyZ5oPxJyn/hsYFh16QZNgUP/TgQUK9CTVcFF6ryPES2DdCTMDwnzJcZw4GXQWu6pb
-        RiCDqjIx+6IDahHnwmsf8FXOsiNVpH56uGJvE4J4GVPF2JBMx/MZoZsS/qaAsTfLLGy2uj
-        hFTY8ZWlt/iMybRAm2a2GkGV+G6I1FL64SHTfODjbi2lGkUeRBBvwqbF0wEMa4pwvYldsR
-        fuTmCZZIaYKXAvUi8PkSRwFwonHEuUdb5MoBRN871LPkBJApJ/uWdORE/XjlXyVys4mN7v
-        rliYTDkLkDs8v8eDXAyOVQPQ8CoB5HdT3LYblBS+Tl1DG1P4Sa3xCiJWCUUeyw==
+         content-transfer-encoding:content-transfer-encoding;
+        bh=f9v9AXm9wprdn9biVpha9awd8UfQaoNNNblXXhJgyzg=;
+        b=FpbJ49GtvG4kRgpgFPSmJl1njhPmfEKcI38s+PzspaltBoxwtU+13bJHuM5mUneGqO/+1Y
+        F8bz5hkWxooJYkgn8NCgoOoIj4bBFxHSeBlWnMxtsvSxlGk4N4aTgk9qwx0c2Md2CBWLiK
+        5QnbF7wCgzoJcUzmYHDEGSdg4s5Baa4dj5J/Lk0cAXGjWTTH+sYYxTlVBbcVvIhN+iTW8x
+        WPex0/rq9Ug3je9gzUMujPckuYWIO9ca+FopPMs0dWvQnCIVEGAeWIwM5mz7/KFgtKUgOl
+        LUV4IvMvlj4jrNl3btgabd1OhAr/sa3PNUNwwRn2znPSjaHOM9j1dco9qSoOqA==
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
 To:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
@@ -44,12 +43,10 @@ Cc:     "David S. Miller" <davem@davemloft.net>,
         Guilhem Imberton <guilhem.imberton@qorvo.com>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
         Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: [PATCH wpan-next 2/2] ieee802154: hwsim: Save the current filtering level and use it
-Date:   Tue, 18 Oct 2022 20:32:47 +0200
-Message-Id: <20221018183247.806108-2-miquel.raynal@bootlin.com>
+Subject: [PATCH wpan-next v5] mac802154: Ensure proper scan-level filtering
+Date:   Tue, 18 Oct 2022 20:35:40 +0200
+Message-Id: <20221018183540.806471-1-miquel.raynal@bootlin.com>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20221018183247.806108-1-miquel.raynal@bootlin.com>
-References: <20221018183247.806108-1-miquel.raynal@bootlin.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
@@ -57,106 +54,62 @@ Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Save the requested filtering level in the ->set_promiscuous()
-helper. The logic is: either we want to enable promiscuous mode and we
-want to disable filters entirely, or we want to use the highest
-filtering level by default. This is of course an assumption that only
-works today, but if in the future intermediate levels (such as scan
-filtering level) are implemented in the core, this logic will need to be
-updated. This would imply replacing ->set_promiscuous() by something
-more fine grained anyway, so we are probably safe with this assumption.
+We now have a fine grained filtering information so let's ensure proper
+filtering in scan mode, which means that only beacons are processed.
 
-Once saved in the PIB structure, we can use this value instead of trying
-to access the PHY structure to know what hardware filtering level has
-been advertised.
-
-Suggested-by: Alexander Aring <alex.aring@gmail.com>
 Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
 ---
- drivers/net/ieee802154/mac802154_hwsim.c | 28 +++++++++++++++++++-----
- 1 file changed, 23 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/net/ieee802154/mac802154_hwsim.c b/drivers/net/ieee802154/mac802154_hwsim.c
-index 44dbd5f27dc5..9034706d4a53 100644
---- a/drivers/net/ieee802154/mac802154_hwsim.c
-+++ b/drivers/net/ieee802154/mac802154_hwsim.c
-@@ -49,6 +49,7 @@ struct hwsim_pib {
- 	u8 page;
- 	u8 channel;
- 	struct ieee802154_hw_addr_filt filt;
-+	enum ieee802154_filtering_level filt_level;
- 
- 	struct rcu_head rcu;
- };
-@@ -91,7 +92,8 @@ static int hwsim_hw_ed(struct ieee802154_hw *hw, u8 *level)
- }
- 
- static int hwsim_update_pib(struct ieee802154_hw *hw, u8 page, u8 channel,
--			    struct ieee802154_hw_addr_filt *filt)
-+			    struct ieee802154_hw_addr_filt *filt,
-+			    enum ieee802154_filtering_level filt_level)
+Changes in v4:
+* dev_dbg call with: s/!beacon/non-beacon/.
+* Rebased on top of wpan-next but there is still a commit that has not
+  been merged (went through a fixes PR), but is already in Linus' tree
+  and was present in my branch when I generated this patch.
+
+ net/mac802154/rx.c | 16 ++++++++++++----
+ 1 file changed, 12 insertions(+), 4 deletions(-)
+
+diff --git a/net/mac802154/rx.c b/net/mac802154/rx.c
+index 14bc646b9ab7..2ae23a2f4a09 100644
+--- a/net/mac802154/rx.c
++++ b/net/mac802154/rx.c
+@@ -34,6 +34,7 @@ ieee802154_subif_frame(struct ieee802154_sub_if_data *sdata,
+ 		       struct sk_buff *skb, const struct ieee802154_hdr *hdr)
  {
- 	struct hwsim_phy *phy = hw->priv;
- 	struct hwsim_pib *pib, *pib_old;
-@@ -108,6 +110,7 @@ static int hwsim_update_pib(struct ieee802154_hw *hw, u8 page, u8 channel,
- 	pib->filt.pan_id = filt->pan_id;
- 	pib->filt.ieee_addr = filt->ieee_addr;
- 	pib->filt.pan_coord = filt->pan_coord;
-+	pib->filt_level = filt_level;
+ 	struct wpan_dev *wpan_dev = &sdata->wpan_dev;
++	struct wpan_phy *wpan_phy = sdata->local->hw.phy;
+ 	__le16 span, sshort;
+ 	int rc;
  
- 	rcu_assign_pointer(phy->pib, pib);
- 	kfree_rcu(pib_old, rcu);
-@@ -122,7 +125,7 @@ static int hwsim_hw_channel(struct ieee802154_hw *hw, u8 page, u8 channel)
+@@ -42,6 +43,17 @@ ieee802154_subif_frame(struct ieee802154_sub_if_data *sdata,
+ 	span = wpan_dev->pan_id;
+ 	sshort = wpan_dev->short_addr;
  
- 	rcu_read_lock();
- 	pib = rcu_dereference(phy->pib);
--	ret = hwsim_update_pib(hw, page, channel, &pib->filt);
-+	ret = hwsim_update_pib(hw, page, channel, &pib->filt, pib->filt_level);
- 	rcu_read_unlock();
- 
- 	return ret;
-@@ -138,7 +141,7 @@ static int hwsim_hw_addr_filt(struct ieee802154_hw *hw,
- 
- 	rcu_read_lock();
- 	pib = rcu_dereference(phy->pib);
--	ret = hwsim_update_pib(hw, pib->page, pib->channel, filt);
-+	ret = hwsim_update_pib(hw, pib->page, pib->channel, filt, pib->filt_level);
- 	rcu_read_unlock();
- 
- 	return ret;
-@@ -162,7 +165,7 @@ static void hwsim_hw_receive(struct ieee802154_hw *hw, struct sk_buff *skb,
- 	memcpy(&hdr, skb->data, 3);
- 
- 	/* Level 4 filtering: Frame fields validity */
--	if (hw->phy->filtering == IEEE802154_FILTERING_4_FRAME_FIELDS) {
-+	if (pib->filt_level == IEEE802154_FILTERING_4_FRAME_FIELDS) {
- 		/* a) Drop reserved frame types */
- 		switch (mac_cb(skb)->type) {
- 		case IEEE802154_FC_TYPE_BEACON:
-@@ -305,7 +308,22 @@ static void hwsim_hw_stop(struct ieee802154_hw *hw)
- static int
- hwsim_set_promiscuous_mode(struct ieee802154_hw *hw, const bool on)
- {
--	return 0;
-+	enum ieee802154_filtering_level filt_level;
-+	struct hwsim_phy *phy = hw->priv;
-+	struct hwsim_pib *pib;
-+	int ret;
++	/* Level 3 filtering: Only beacons are accepted during scans */
++	if (sdata->required_filtering == IEEE802154_FILTERING_3_SCAN &&
++	    sdata->required_filtering > wpan_phy->filtering) {
++		if (mac_cb(skb)->type != IEEE802154_FC_TYPE_BEACON) {
++			dev_dbg(&sdata->dev->dev,
++				"drop non-beacon frame (0x%x) during scan\n",
++				mac_cb(skb)->type);
++			goto fail;
++		}
++	}
 +
-+	if (on)
-+		filt_level = IEEE802154_FILTERING_NONE;
-+	else
-+		filt_level = IEEE802154_FILTERING_4_FRAME_FIELDS;
-+
-+	rcu_read_lock();
-+	pib = rcu_dereference(phy->pib);
-+	ret = hwsim_update_pib(hw, pib->page, pib->channel, &pib->filt, filt_level);
-+	rcu_read_unlock();
-+
-+	return ret;
- }
+ 	switch (mac_cb(skb)->dest.mode) {
+ 	case IEEE802154_ADDR_NONE:
+ 		if (hdr->source.mode != IEEE802154_ADDR_NONE)
+@@ -277,10 +289,6 @@ void ieee802154_rx(struct ieee802154_local *local, struct sk_buff *skb)
  
- static const struct ieee802154_ops hwsim_ops = {
+ 	ieee802154_monitors_rx(local, skb);
+ 
+-	/* TODO: Handle upcomming receive path where the PHY is at the
+-	 * IEEE802154_FILTERING_NONE level during a scan.
+-	 */
+-
+ 	/* Level 1 filtering: Check the FCS by software when relevant */
+ 	if (local->hw.phy->filtering == IEEE802154_FILTERING_NONE) {
+ 		crc = crc_ccitt(0, skb->data, skb->len);
 -- 
 2.34.1
 
