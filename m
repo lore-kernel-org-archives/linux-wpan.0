@@ -2,37 +2,67 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05600C4332F
-	for <linux-wpan@archiver.kernel.org>; Tue, 18 Oct 2022 18:36:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B13FC4332F
+	for <linux-wpan@archiver.kernel.org>; Tue, 18 Oct 2022 20:54:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230170AbiJRSgq (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 18 Oct 2022 14:36:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48850 "EHLO
+        id S229665AbiJRUyb (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 18 Oct 2022 16:54:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54626 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230109AbiJRSgp (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 18 Oct 2022 14:36:45 -0400
-Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::227])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FD8F9D535;
-        Tue, 18 Oct 2022 11:36:42 -0700 (PDT)
-Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id A413E20008;
-        Tue, 18 Oct 2022 18:36:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1666118201;
+        with ESMTP id S229763AbiJRUya (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 18 Oct 2022 16:54:30 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E03B631A
+        for <linux-wpan@vger.kernel.org>; Tue, 18 Oct 2022 13:54:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1666126468;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=grM364ekM+RTKFnQQQrk0yN6QNYjgfQoSoxO5b/tbR0=;
-        b=XPADs/sp0Av3U5NC/xC26cXVlM1glgiIiiGrjCeEY87Q/Go5GHG+tSXwQlM28EvEq4laz6
-        DAqn9AFzK3DUnZ4tFJehK67G1kWkIjXlA6qLTaWmUUo9OplD+WOd96MNQXXwgcwvvrcXu5
-        tBqVzLHjd1D4ujcHBHKddkPE1qMHiSY+qpuu1bgUmPecYN1DzSaNS7v+RlasBzVuoPYPdb
-        B0f0Df9XTijjSN8TcYY1ny2cidRU/TCrBq9Scn0IyD7c8Z674cpAmy7D4bd0cLFvWKukY6
-        8xvDq54ffqsfdLaMY2E8UnfMt03JpYR9qU3qLdOivpccxR9tQNMamLKbuoK4BA==
-From:   Miquel Raynal <miquel.raynal@bootlin.com>
-To:     Alexander Aring <alex.aring@gmail.com>,
+         in-reply-to:in-reply-to:references:references;
+        bh=hO1LFELXQEUpYNdXEw0Kt4gZtU698gtGrVoO0zJ7b2o=;
+        b=fOjq6pAPc5M2mut1doNaAqbEClvS85ocZXYvrv1s0nP9OtAIwPqJX4gp2EEYYo4kPxm8kc
+        XOKpGUoBSqUC8kNoRjzdszqh44rb8IPkqWRJSjAlZip+PV5AHIGU6IPGVbalKHxsIdU+8X
+        dZ1uvoDwm+Wk5z8QtqJ4Hrmcgz0MJYE=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-411-atQhL-zHPk2irEFFUp-6fg-1; Tue, 18 Oct 2022 16:54:27 -0400
+X-MC-Unique: atQhL-zHPk2irEFFUp-6fg-1
+Received: by mail-wm1-f70.google.com with SMTP id p42-20020a05600c1daa00b003c6ee394f0dso6736795wms.5
+        for <linux-wpan@vger.kernel.org>; Tue, 18 Oct 2022 13:54:27 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hO1LFELXQEUpYNdXEw0Kt4gZtU698gtGrVoO0zJ7b2o=;
+        b=o0oe0upvy44ISflNhlmOIzLPKqQ3vUGn2fJSGUBnHKno5UphNqaqVGsj6lbwbZm4z2
+         D06f9KLvz1F1VU1vINHxmfCa+5mfj4bqv3NWOWAZXDKFOkMPT5ktNxuOUaJHsSci6G55
+         VZ9Pmtyt7t6wJc5i+q9vAZWtQc23Wtq/5+Qtl+2xcFFalTxe4Cu6uXnxefdA65bS4Gbc
+         qkz+5a/Kf5UXJ5l+A+thm69bTeWdUx/a3Xy+FVlm0EY2IG+NGiScvmqykhYy8u4iW+W+
+         QN6Ff5+jc3ygV67Z1KbGVF7e70Pv38MfuS3H1SRTznYxJYstrUZJicyLJLrTSWeMBc1S
+         zlpA==
+X-Gm-Message-State: ACrzQf15tsOJHb0lZe2NoIF3+yH1HbY714mOHqCZxNjgHFuVSy+bPyo4
+        Su12nHsudC5YEdKjQpEArcIIefF8QOimvWUMHIGSTNcPhRlYRktPpDvS73gBkKB0SDhBk7+ITK6
+        nhcyBWB7pL+hSM/oIUcKvyCPltDs2EqqZ/ElEuw==
+X-Received: by 2002:adf:fad0:0:b0:22e:4998:fd5d with SMTP id a16-20020adffad0000000b0022e4998fd5dmr2986820wrs.267.1666126464684;
+        Tue, 18 Oct 2022 13:54:24 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM56AO+wk6RlK4KVfT9P3LmtwBvOvRZ6AIQAfU74yH274huUcfE7m3JRGMgA/Z6UR6c4Q7uE8soGGYtHsMbqYuw=
+X-Received: by 2002:adf:fad0:0:b0:22e:4998:fd5d with SMTP id
+ a16-20020adffad0000000b0022e4998fd5dmr2986803wrs.267.1666126464448; Tue, 18
+ Oct 2022 13:54:24 -0700 (PDT)
+MIME-Version: 1.0
+References: <20221018183540.806471-1-miquel.raynal@bootlin.com>
+In-Reply-To: <20221018183540.806471-1-miquel.raynal@bootlin.com>
+From:   Alexander Aring <aahringo@redhat.com>
+Date:   Tue, 18 Oct 2022 16:54:13 -0400
+Message-ID: <CAK-6q+gRMG64Ra9ghAUVHXkJoGB1b5Kd6rLTiUK+UArbYhP+BA@mail.gmail.com>
+Subject: Re: [PATCH wpan-next v5] mac802154: Ensure proper scan-level filtering
+To:     Miquel Raynal <miquel.raynal@bootlin.com>
+Cc:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
-        linux-wpan@vger.kernel.org
-Cc:     "David S. Miller" <davem@davemloft.net>,
+        linux-wpan@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
         Paolo Abeni <pabeni@redhat.com>,
         Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
@@ -41,123 +71,21 @@ Cc:     "David S. Miller" <davem@davemloft.net>,
         Frederic Blain <frederic.blain@qorvo.com>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
         Guilhem Imberton <guilhem.imberton@qorvo.com>,
-        Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-        Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: [PATCH wpan-next] mac802154: Allow the creation of coordinator interfaces
-Date:   Tue, 18 Oct 2022 20:36:39 +0200
-Message-Id: <20221018183639.806719-1-miquel.raynal@bootlin.com>
-X-Mailer: git-send-email 2.34.1
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+        Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-As a first strep in introducing proper PAN management and association,
-we need to be able to create coordinator interfaces which might act as
-coordinator or PAN coordinator.
+Hi,
 
-Hence, let's add the minimum support to allow the creation of these
-interfaces. This support will be improved later, in particular regarding
-the filtering.
+On Tue, Oct 18, 2022 at 2:35 PM Miquel Raynal <miquel.raynal@bootlin.com> wrote:
+>
+> We now have a fine grained filtering information so let's ensure proper
+> filtering in scan mode, which means that only beacons are processed.
+>
 
-Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
----
- net/mac802154/iface.c | 14 ++++++++------
- net/mac802154/main.c  |  2 ++
- net/mac802154/rx.c    | 11 +++++++----
- 3 files changed, 17 insertions(+), 10 deletions(-)
+Is this a fixup? Can you resend the whole series please?
 
-diff --git a/net/mac802154/iface.c b/net/mac802154/iface.c
-index d9b50884d34e..682249f3369b 100644
---- a/net/mac802154/iface.c
-+++ b/net/mac802154/iface.c
-@@ -262,13 +262,13 @@ ieee802154_check_concurrent_iface(struct ieee802154_sub_if_data *sdata,
- 		if (nsdata != sdata && ieee802154_sdata_running(nsdata)) {
- 			int ret;
- 
--			/* TODO currently we don't support multiple node types
--			 * we need to run skb_clone at rx path. Check if there
--			 * exist really an use case if we need to support
--			 * multiple node types at the same time.
-+			/* TODO currently we don't support multiple node/coord
-+			 * types we need to run skb_clone at rx path. Check if
-+			 * there exist really an use case if we need to support
-+			 * multiple node/coord types at the same time.
- 			 */
--			if (wpan_dev->iftype == NL802154_IFTYPE_NODE &&
--			    nsdata->wpan_dev.iftype == NL802154_IFTYPE_NODE)
-+			if (wpan_dev->iftype != NL802154_IFTYPE_MONITOR &&
-+			    nsdata->wpan_dev.iftype != NL802154_IFTYPE_MONITOR)
- 				return -EBUSY;
- 
- 			/* check all phy mac sublayer settings are the same.
-@@ -565,6 +565,7 @@ ieee802154_setup_sdata(struct ieee802154_sub_if_data *sdata,
- 	wpan_dev->short_addr = cpu_to_le16(IEEE802154_ADDR_BROADCAST);
- 
- 	switch (type) {
-+	case NL802154_IFTYPE_COORD:
- 	case NL802154_IFTYPE_NODE:
- 		ieee802154_be64_to_le64(&wpan_dev->extended_addr,
- 					sdata->dev->dev_addr);
-@@ -624,6 +625,7 @@ ieee802154_if_add(struct ieee802154_local *local, const char *name,
- 	ieee802154_le64_to_be64(ndev->perm_addr,
- 				&local->hw.phy->perm_extended_addr);
- 	switch (type) {
-+	case NL802154_IFTYPE_COORD:
- 	case NL802154_IFTYPE_NODE:
- 		ndev->type = ARPHRD_IEEE802154;
- 		if (ieee802154_is_valid_extended_unicast_addr(extended_addr)) {
-diff --git a/net/mac802154/main.c b/net/mac802154/main.c
-index 40fab08df24b..d03ecb747afc 100644
---- a/net/mac802154/main.c
-+++ b/net/mac802154/main.c
-@@ -219,6 +219,8 @@ int ieee802154_register_hw(struct ieee802154_hw *hw)
- 
- 	if (hw->flags & IEEE802154_HW_PROMISCUOUS)
- 		local->phy->supported.iftypes |= BIT(NL802154_IFTYPE_MONITOR);
-+	else
-+		local->phy->supported.iftypes &= ~BIT(NL802154_IFTYPE_COORD);
- 
- 	rc = wpan_phy_register(local->phy);
- 	if (rc < 0)
-diff --git a/net/mac802154/rx.c b/net/mac802154/rx.c
-index 2ae23a2f4a09..aca348d7834b 100644
---- a/net/mac802154/rx.c
-+++ b/net/mac802154/rx.c
-@@ -208,6 +208,7 @@ __ieee802154_rx_handle_packet(struct ieee802154_local *local,
- 	int ret;
- 	struct ieee802154_sub_if_data *sdata;
- 	struct ieee802154_hdr hdr;
-+	struct sk_buff *skb2;
- 
- 	ret = ieee802154_parse_frame_start(skb, &hdr);
- 	if (ret) {
-@@ -217,7 +218,7 @@ __ieee802154_rx_handle_packet(struct ieee802154_local *local,
- 	}
- 
- 	list_for_each_entry_rcu(sdata, &local->interfaces, list) {
--		if (sdata->wpan_dev.iftype != NL802154_IFTYPE_NODE)
-+		if (sdata->wpan_dev.iftype == NL802154_IFTYPE_MONITOR)
- 			continue;
- 
- 		if (!ieee802154_sdata_running(sdata))
-@@ -230,9 +231,11 @@ __ieee802154_rx_handle_packet(struct ieee802154_local *local,
- 		    sdata->required_filtering == IEEE802154_FILTERING_4_FRAME_FIELDS)
- 			continue;
- 
--		ieee802154_subif_frame(sdata, skb, &hdr);
--		skb = NULL;
--		break;
-+		skb2 = skb_clone(skb, GFP_ATOMIC);
-+		if (skb2) {
-+			skb2->dev = sdata->dev;
-+			ieee802154_subif_frame(sdata, skb2, &hdr);
-+		}
- 	}
- 
- 	kfree_skb(skb);
--- 
-2.34.1
+- Alex
 
