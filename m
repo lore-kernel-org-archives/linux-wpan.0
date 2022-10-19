@@ -2,48 +2,42 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A0B9C433FE
-	for <linux-wpan@archiver.kernel.org>; Wed, 19 Oct 2022 08:20:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 509EFC433FE
+	for <linux-wpan@archiver.kernel.org>; Wed, 19 Oct 2022 12:54:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230050AbiJSIUL (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 19 Oct 2022 04:20:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50774 "EHLO
+        id S230348AbiJSMye (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 19 Oct 2022 08:54:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51078 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230064AbiJSIUJ (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 19 Oct 2022 04:20:09 -0400
-Received: from proxima.lasnet.de (proxima.lasnet.de [IPv6:2a01:4f8:121:31eb:3::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A99C31204;
-        Wed, 19 Oct 2022 01:20:08 -0700 (PDT)
-Received: from [IPV6:2003:e9:d737:8af6:4fc:668d:6ab2:2a74] (p200300e9d7378af604fc668d6ab22a74.dip0.t-ipconnect.de [IPv6:2003:e9:d737:8af6:4fc:668d:6ab2:2a74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits))
-        (No client certificate requested)
-        (Authenticated sender: stefan@datenfreihafen.org)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id 40146C0183;
-        Wed, 19 Oct 2022 10:20:05 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
-        s=2021; t=1666167606;
+        with ESMTP id S233717AbiJSMyT (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 19 Oct 2022 08:54:19 -0400
+X-Greylist: delayed 3036 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 19 Oct 2022 05:37:17 PDT
+Received: from mslow1.mail.gandi.net (mslow1.mail.gandi.net [IPv6:2001:4b98:dc4:8::240])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D22EE104D0C;
+        Wed, 19 Oct 2022 05:37:16 -0700 (PDT)
+Received: from relay3-d.mail.gandi.net (unknown [IPv6:2001:4b98:dc4:8::223])
+        by mslow1.mail.gandi.net (Postfix) with ESMTP id AEA26CED23;
+        Wed, 19 Oct 2022 09:54:21 +0000 (UTC)
+Received: (Authenticated sender: miquel.raynal@bootlin.com)
+        by mail.gandi.net (Postfix) with ESMTPSA id 176A660018;
+        Wed, 19 Oct 2022 09:52:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+        t=1666173165;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=dbl8/GS3EqwT/faWJN7V0W7xKoh44CdE8thTx4puhQU=;
-        b=H+VIRgazcwHafiQs9LsO6PBwr95+NZQMhuqXdJODOy3882SLGHQe6C7eGQtZTABK2XNhq4
-        woEiaEmVZaqTxzsoWpQlmKS8nXbPSMoCDN0ropvi8WVgHAGQsTc0R2kpeWqvP05i8OkwRy
-        4iSANhkhlV1zWCFq5a4UZ13VAEHH2RwOoPvViQqznx/p5Igw10xxxVsp4RJOofae6yGQ9D
-        M/mO76ru3hB1yArXq9Y0ararSDG8ydOyCrHlGBBahB4W7bofEC+EG3x4anm7Rcfh+07Ppe
-        iK1GEJwB72tEMejvMQjyKC50UkE926DdypfakHTJxDWk8EYVg9BjTuCqtEeguA==
-Message-ID: <078eaced-5084-8ea7-2c02-9e6492fb5463@datenfreihafen.org>
-Date:   Wed, 19 Oct 2022 10:20:04 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.1
-Subject: Re: [PATCH wpan-next v5] mac802154: Ensure proper scan-level
- filtering
-Content-Language: en-US
-To:     Miquel Raynal <miquel.raynal@bootlin.com>
-Cc:     Alexander Aring <aahringo@redhat.com>,
-        Alexander Aring <alex.aring@gmail.com>,
+        bh=S+xSpHnbSHJwUWAQJtI1fFnLN7XOJPIHWmq0NGHGk/g=;
+        b=H4CQLOvVkySpdfn9bvPUdJffgMEOxITZnC1qpEFjS5TqqN6JAaZwPVu7p0bZE0K+OpjA6+
+        qI6G/5U4iO5WmgdCv1mdlVdK9Dc0QOvLwc6sM/RnH/kEFesqAlGEH6yRzbTUqFPh0iw9/n
+        v1Q9aElj3dBfG6e3qsI4fxXrqVCDlgEwcm3su3ErMc07/AqufxycmWn7wCRWX+ZpFnt/oV
+        WDFH9Y09EqVKCD2Jl0UWEv4ou6pyuhWgzmxFMdthpvQ9dR1iq2X6JiB/UJ4n368Rkc/DZs
+        muaJDWTluuUfCr1FwqTkM6lDKC+i5Py655vSuoyGtVYeAQ6zCZVvPxOx+qy3Zw==
+Date:   Wed, 19 Oct 2022 11:52:42 +0200
+From:   Miquel Raynal <miquel.raynal@bootlin.com>
+To:     Alexander Aring <aahringo@redhat.com>
+Cc:     Alexander Aring <alex.aring@gmail.com>,
+        Stefan Schmidt <stefan@datenfreihafen.org>,
         linux-wpan@vger.kernel.org,
         "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
@@ -55,64 +49,260 @@ Cc:     Alexander Aring <aahringo@redhat.com>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
         Guilhem Imberton <guilhem.imberton@qorvo.com>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-References: <20221018183540.806471-1-miquel.raynal@bootlin.com>
- <CAK-6q+gRMG64Ra9ghAUVHXkJoGB1b5Kd6rLTiUK+UArbYhP+BA@mail.gmail.com>
- <20221019000329.2eacd502@xps-13>
- <154ea7ad-333e-cecd-517b-0a9cf9d1b390@datenfreihafen.org>
- <20221019101725.650cb04f@xps-13>
-From:   Stefan Schmidt <stefan@datenfreihafen.org>
-In-Reply-To: <20221019101725.650cb04f@xps-13>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH wpan-next] mac802154: Allow the creation of coordinator
+ interfaces
+Message-ID: <20221019115242.571c19bb@xps-13>
+In-Reply-To: <CAK-6q+hoJiLWyHNi90_7kbyGp9h_jV-bvRHYRQDVrEb1u_enEA@mail.gmail.com>
+References: <20221018183639.806719-1-miquel.raynal@bootlin.com>
+        <CAK-6q+hoJiLWyHNi90_7kbyGp9h_jV-bvRHYRQDVrEb1u_enEA@mail.gmail.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello.
+Hi Alexander,
 
-On 19.10.22 10:17, Miquel Raynal wrote:
-> Hi Stefan,
-> 
-> stefan@datenfreihafen.org wrote on Wed, 19 Oct 2022 10:06:05 +0200:
-> 
->> Hello.
->>
->> On 19.10.22 00:03, Miquel Raynal wrote:
->>> Hi Alexander,
->>>
->>> aahringo@redhat.com wrote on Tue, 18 Oct 2022 16:54:13 -0400:
->>>    
->>>> Hi,
->>>>
->>>> On Tue, Oct 18, 2022 at 2:35 PM Miquel Raynal <miquel.raynal@bootlin.com> wrote:
->>>>>
->>>>> We now have a fine grained filtering information so let's ensure proper
->>>>> filtering in scan mode, which means that only beacons are processed.
->>>>>    >>
->>>> Is this a fixup? Can you resend the whole series please?
->>>
->>> Hmm no? Unless I understood things the wrong way, Stefan applied
->>> patches 1 to 7 of my v4, and asked me to make a change on the 8th
->>> patch.
->>>
->>> This is v5 just for patch 8/8 of the previous series, I just changed
->>> a debug string actually...
->>>
->>> There was a conflict when he applied it but I believe this is because
->>> wpan-next did not contain one of the fixes which made it to Linus' tree
->>> a month ago. So in my branch I still have this fix prior to this patch,
->>> because otherwise there will be a conflict when merging v6.1-rc1 (which
->>> I believe was not done yet).
->>
->> You believe correctly. :-) In my workflow I normally do not merge in changes from net-next until after my latest pull-request was pulled in. I do this to avoid extra merge commits.
->>
->> In case I see a merge conflict in my testing before sending the pull request I add merge guidance to the pull. Which is my plan this time around as well.
-> 
-> Do you mean I should drop the fix from my branch and give you a patch
-> which applies on the current wpan-next instead?
+aahringo@redhat.com wrote on Tue, 18 Oct 2022 19:57:19 -0400:
 
-Yes, that is my understanding on rebasing a patch on wpan-next :-)
+> Hi,
+>=20
+> On Tue, Oct 18, 2022 at 2:36 PM Miquel Raynal <miquel.raynal@bootlin.com>=
+ wrote:
+> >
+> > As a first strep in introducing proper PAN management and association,
+> > we need to be able to create coordinator interfaces which might act as
+> > coordinator or PAN coordinator.
+> >
+> > Hence, let's add the minimum support to allow the creation of these
+> > interfaces. This support will be improved later, in particular regarding
+> > the filtering.
+> >
+> > Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
+> > ---
+> >  net/mac802154/iface.c | 14 ++++++++------
+> >  net/mac802154/main.c  |  2 ++
+> >  net/mac802154/rx.c    | 11 +++++++----
+> >  3 files changed, 17 insertions(+), 10 deletions(-)
+> >
+> > diff --git a/net/mac802154/iface.c b/net/mac802154/iface.c
+> > index d9b50884d34e..682249f3369b 100644
+> > --- a/net/mac802154/iface.c
+> > +++ b/net/mac802154/iface.c
+> > @@ -262,13 +262,13 @@ ieee802154_check_concurrent_iface(struct ieee8021=
+54_sub_if_data *sdata,
+> >                 if (nsdata !=3D sdata && ieee802154_sdata_running(nsdat=
+a)) {
+> >                         int ret;
+> >
+> > -                       /* TODO currently we don't support multiple nod=
+e types
+> > -                        * we need to run skb_clone at rx path. Check i=
+f there
+> > -                        * exist really an use case if we need to suppo=
+rt
+> > -                        * multiple node types at the same time.
+> > +                       /* TODO currently we don't support multiple nod=
+e/coord
+> > +                        * types we need to run skb_clone at rx path. C=
+heck if
+> > +                        * there exist really an use case if we need to=
+ support
+> > +                        * multiple node/coord types at the same time.
+> >                          */
+> > -                       if (wpan_dev->iftype =3D=3D NL802154_IFTYPE_NOD=
+E &&
+> > -                           nsdata->wpan_dev.iftype =3D=3D NL802154_IFT=
+YPE_NODE)
+> > +                       if (wpan_dev->iftype !=3D NL802154_IFTYPE_MONIT=
+OR &&
+> > +                           nsdata->wpan_dev.iftype !=3D NL802154_IFTYP=
+E_MONITOR)
+> >                                 return -EBUSY;
+> >
+> >                         /* check all phy mac sublayer settings are the =
+same.
+> > @@ -565,6 +565,7 @@ ieee802154_setup_sdata(struct ieee802154_sub_if_dat=
+a *sdata,
+> >         wpan_dev->short_addr =3D cpu_to_le16(IEEE802154_ADDR_BROADCAST);
+> >
+> >         switch (type) {
+> > +       case NL802154_IFTYPE_COORD:
+> >         case NL802154_IFTYPE_NODE:
+> >                 ieee802154_be64_to_le64(&wpan_dev->extended_addr,
+> >                                         sdata->dev->dev_addr);
+> > @@ -624,6 +625,7 @@ ieee802154_if_add(struct ieee802154_local *local, c=
+onst char *name,
+> >         ieee802154_le64_to_be64(ndev->perm_addr,
+> >                                 &local->hw.phy->perm_extended_addr);
+> >         switch (type) {
+> > +       case NL802154_IFTYPE_COORD:
+> >         case NL802154_IFTYPE_NODE:
+> >                 ndev->type =3D ARPHRD_IEEE802154;
+> >                 if (ieee802154_is_valid_extended_unicast_addr(extended_=
+addr)) {
+> > diff --git a/net/mac802154/main.c b/net/mac802154/main.c
+> > index 40fab08df24b..d03ecb747afc 100644
+> > --- a/net/mac802154/main.c
+> > +++ b/net/mac802154/main.c
+> > @@ -219,6 +219,8 @@ int ieee802154_register_hw(struct ieee802154_hw *hw)
+> >
+> >         if (hw->flags & IEEE802154_HW_PROMISCUOUS)
+> >                 local->phy->supported.iftypes |=3D BIT(NL802154_IFTYPE_=
+MONITOR);
+> > +       else
+> > +               local->phy->supported.iftypes &=3D ~BIT(NL802154_IFTYPE=
+_COORD);
+> > =20
+>=20
+> So this means if somebody in the driver sets iftype COORD is supported
+> but then IEEE802154_HW_PROMISCUOUS is not supported it will not
+> support COORD?
+>=20
+> Why is IEEE802154_HW_PROMISCUOUS required for COORD iftype? I thought
+> IEEE802154_HW_PROMISCUOUS is required to do a scan?
 
-regards
-Stefan Schmidt
+You are totally right this is inconsistent, I'll drop the else block
+entirely. The fact that HW_PROMISCUOUS is supported when starting a
+scan is handled by the -EOPNOTSUPP return code from
+drv_set_promiscuous_mode() called by drv_start() in
+mac802154_trigger_scan().
 
+However I need your input on the following topic: in my branch I
+have somewhere a patch adding IFTYPE_COORD to the list of
+phy->supported.iftypes in each individual driver. But right now, if we
+drop the promiscuous constraint as you suggest, I don't see anymore the
+need for setting this as a per-driver value.
+
+Should we make the possibility to create IFTYPE_COORD interfaces the
+default instead, something like this?
+
+--- a/net/mac802154/main.c
++++ b/net/mac802154/main.c
+@@ -118,7 +118,7 @@ ieee802154_alloc_hw(size_t priv_data_len, const struct =
+ieee802154_ops *ops)
+        phy->supported.lbt =3D NL802154_SUPPORTED_BOOL_FALSE;
+=20
+        /* always supported */
+-       phy->supported.iftypes =3D BIT(NL802154_IFTYPE_NODE);
++       phy->supported.iftypes =3D BIT(NL802154_IFTYPE_NODE) | BIT(NL802154=
+_IFTYPE_COORD);
+
+> >         rc =3D wpan_phy_register(local->phy);
+> >         if (rc < 0)
+> > diff --git a/net/mac802154/rx.c b/net/mac802154/rx.c
+> > index 2ae23a2f4a09..aca348d7834b 100644
+> > --- a/net/mac802154/rx.c
+> > +++ b/net/mac802154/rx.c
+> > @@ -208,6 +208,7 @@ __ieee802154_rx_handle_packet(struct
+> > ieee802154_local *local, int ret;
+> >         struct ieee802154_sub_if_data *sdata;
+> >         struct ieee802154_hdr hdr;
+> > +       struct sk_buff *skb2;
+> >
+> >         ret =3D ieee802154_parse_frame_start(skb, &hdr);
+> >         if (ret) {
+> > @@ -217,7 +218,7 @@ __ieee802154_rx_handle_packet(struct
+> > ieee802154_local *local, }
+> >
+> >         list_for_each_entry_rcu(sdata, &local->interfaces, list) {
+> > -               if (sdata->wpan_dev.iftype !=3D NL802154_IFTYPE_NODE)
+> > +               if (sdata->wpan_dev.iftype =3D=3D
+> > NL802154_IFTYPE_MONITOR) continue; =20
+>=20
+> I guess this will work but I would like to see no logic about if it's
+> not MONITOR it's NODE or COORD, because introducing others requires
+> updating those again... however I think it's fine.
+
+Actually I don't get why we would not want this logic, it seem very
+relevant to me. Do you want a helper instead and hide the condition
+inside? Or something else? Or is it just fine for now?
+
+> I would like to see
+> a different receive path for coord_rx() and node_rx(), but yea
+> currently I guess they are mostly the same... in future I think they
+> are required as PACKTE_HOST, etc. will be changed regarding pan
+> coordinator or just coordinator (so far I understood).
+
+I agree it is tempting, but yeah, there is really very little changes
+between the two, for me splitting the rx path would just darken the
+code without bringing much...
+
+About the way we handle the PAN coordinator role I have a couple of
+questions:
+- shall we consider only the PAN coordinator to be able to accept
+  associations or is any coordinator in the PAN able to do it? (this is
+  not clear to me)
+- If a coordinator receives a packet with no destination it should
+  expect it to be targeted at the PAN controller. Should we consider
+  relaying the packet?
+- Is relaying a hardware feature or should we do it in software?
+
+> >                 if (!ieee802154_sdata_running(sdata))
+> > @@ -230,9 +231,11 @@ __ieee802154_rx_handle_packet(struct
+> > ieee802154_local *local, sdata->required_filtering =3D=3D
+> > IEEE802154_FILTERING_4_FRAME_FIELDS) continue;
+> >
+> > -               ieee802154_subif_frame(sdata, skb, &hdr);
+> > -               skb =3D NULL;
+> > -               break;
+> > +               skb2 =3D skb_clone(skb, GFP_ATOMIC);
+> > +               if (skb2) {
+> > +                       skb2->dev =3D sdata->dev;
+> > +                       ieee802154_subif_frame(sdata, skb2, &hdr);
+> > +               }
+> >         }
+> >
+> >         kfree_skb(skb); =20
+>=20
+> If we do the clone above this kfree_skb() should be move to
+> ieee802154_rx() right after __ieee802154_rx_handle_packet().
+
+Ok!
+
+> This patch also changes that we deliver one skb to multiple interfaces if
+> there are more than one and I was not aware that we currently do that.
+> :/
+
+Just as a side note: we do that already if we have several MONITOR
+interfaces opened on the same PHY, it is possible to have them all open.
+
+Regarding the situation where we would have NODE + MONITOR or COORD +
+MONITOR, while the interface creation would work, both could not be
+open at the same time because the following happens:
+mac802154_wpan_open() {
+	ieee802154_check_concurrent_iface() {
+		ieee802154_check_mac_settings() {
+			/* prevent the two interface types from being
+			 * open at the same time because the filtering
+			 * needs are not compatible. */
+		}
+	}
+}
+
+Then, because you asked me to anticipate if we ever want to support more
+than one NODE or COORD interface at the same time, or at least not to
+do anything that would lead to a step back on this regard, I decided I
+would provide all the infrastructure to gracefully handle this
+situation in the Rx path, even though right now it still cannot happen
+because when opening an interface, ieee802154_check_concurrent_iface()
+will also prevent two NODE / COORD interfaces to be opened at the same
+time.
+
+TL;DR
+* MONITOR + MONITOR
+  =3D already supported and working
+* (NODE + MONITOR) || (COORD + MONITOR)
+  =3D iface creation allowed, but cannot be opened at the same time
+  because of the filtering level incompatibility on a single PHY
+* (NODE + NODE) || (COORD + COORD) || (NODE + COORD)
+  =3D iface creation allowed, but cannot be opened at the same time
+  because only one PHY available on the device
+
+So for me we are safe and future proof.
+
+Thanks,
+Miqu=C3=A8l
