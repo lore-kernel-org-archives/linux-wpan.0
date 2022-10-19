@@ -2,39 +2,48 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC62EC4332F
-	for <linux-wpan@archiver.kernel.org>; Wed, 19 Oct 2022 07:34:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9A0EC433FE
+	for <linux-wpan@archiver.kernel.org>; Wed, 19 Oct 2022 08:06:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230060AbiJSHeo (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 19 Oct 2022 03:34:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44876 "EHLO
+        id S229625AbiJSIGO (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 19 Oct 2022 04:06:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56844 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230049AbiJSHek (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 19 Oct 2022 03:34:40 -0400
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6C501572B;
-        Wed, 19 Oct 2022 00:34:37 -0700 (PDT)
-Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id D25451BF206;
-        Wed, 19 Oct 2022 07:34:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1666164876;
+        with ESMTP id S229484AbiJSIGN (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 19 Oct 2022 04:06:13 -0400
+Received: from proxima.lasnet.de (proxima.lasnet.de [78.47.171.185])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17C6674CEE;
+        Wed, 19 Oct 2022 01:06:12 -0700 (PDT)
+Received: from [IPV6:2003:e9:d737:8af6:4fc:668d:6ab2:2a74] (p200300e9d7378af604fc668d6ab22a74.dip0.t-ipconnect.de [IPv6:2003:e9:d737:8af6:4fc:668d:6ab2:2a74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: stefan@datenfreihafen.org)
+        by proxima.lasnet.de (Postfix) with ESMTPSA id A6E2CC0183;
+        Wed, 19 Oct 2022 10:06:09 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
+        s=2021; t=1666166770;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Csp3+K4ux0rFc1Qr1GkVBtAESoa/EJQLPPU3RZVQM/A=;
-        b=o/h5eYtnRObqGVd7gCkxO12KWUu4njTFzzpYQ4Yk3zV+Ml3FoTwfM58meT/YG6aiYDgOkI
-        oBGJ1Jl87RJWqARNhNMjL3o8xnqlXy/b+8fH9cfvKyOa6QxC6x0f8n9fgOHmqnAv9R8w9h
-        DKTjc2p3RVUEl2Uez1V2kTL3iqyf9cP+7LueepfV/s6hDox4bCkDdrPhppK/GNIO90jNVj
-        0QRRInk11SeOzOziHCX3E3/rP5rACFob/fOCvfdcZ/8SB0NPEKviX+I58C282GuYPf7Gyt
-        PwD/9MEcj6MxzhGOG7w/rUVS2LTii41ywHoFPrPuX8BdFp4AeY6AD9q5Ys7w6w==
-Date:   Wed, 19 Oct 2022 09:34:33 +0200
-From:   Miquel Raynal <miquel.raynal@bootlin.com>
-To:     Alexander Aring <aahringo@redhat.com>
-Cc:     Alexander Aring <alex.aring@gmail.com>,
-        Stefan Schmidt <stefan@datenfreihafen.org>,
-        linux-wpan@vger.kernel.org,
+        bh=Wle3jPpmkZ9Q6kR0RR4IH1KKfOOsPa+u9//L4s5BVCk=;
+        b=Yyi4l3mIwXmIGnp9OVvISygFVMhT9KAoKXL9rlxjH5vlnaTEJHr0S2r0yY9Qfaok4FpF6w
+        CaQNvm3IDgWkfnx3Uwx4T0Be9njcb6Ysidd7ANbuc7OO7bxaivfBcInlW6UaB6gFBpTi15
+        U2sYOAO3NU3MJDB9hnrUfsxwO3aGADMuNvhp3dRcj2A1vj7uzdc/CukdlFeA/Rz8w59cPD
+        iMGK3SefQu9v4HrHwuj/ZfZGwPMUjTP9F5vqlY6LgIfkyCQA7/ksQqgOeeLs6oShDRbBZA
+        UetGeIMBBKhuZiq6mp9vs949NaiEDQQvf63z2hgN3/NWtfd9r2cSA+XenaAScQ==
+Message-ID: <154ea7ad-333e-cecd-517b-0a9cf9d1b390@datenfreihafen.org>
+Date:   Wed, 19 Oct 2022 10:06:05 +0200
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.1
+Subject: Re: [PATCH wpan-next v5] mac802154: Ensure proper scan-level
+ filtering
+Content-Language: en-US
+To:     Miquel Raynal <miquel.raynal@bootlin.com>,
+        Alexander Aring <aahringo@redhat.com>
+Cc:     Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org,
         "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
         Paolo Abeni <pabeni@redhat.com>,
@@ -45,82 +54,56 @@ Cc:     Alexander Aring <alex.aring@gmail.com>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
         Guilhem Imberton <guilhem.imberton@qorvo.com>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH wpan-next v5] mac802154: Ensure proper scan-level
- filtering
-Message-ID: <20221019093433.76f07627@xps-13>
-In-Reply-To: <CAK-6q+hB2883Jb=X90-wSj9PAhaAMQtxhbc3y2nYsMW5pb4ZvA@mail.gmail.com>
 References: <20221018183540.806471-1-miquel.raynal@bootlin.com>
-        <CAK-6q+gRMG64Ra9ghAUVHXkJoGB1b5Kd6rLTiUK+UArbYhP+BA@mail.gmail.com>
-        <20221019000329.2eacd502@xps-13>
-        <CAK-6q+hB2883Jb=X90-wSj9PAhaAMQtxhbc3y2nYsMW5pb4ZvA@mail.gmail.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+ <CAK-6q+gRMG64Ra9ghAUVHXkJoGB1b5Kd6rLTiUK+UArbYhP+BA@mail.gmail.com>
+ <20221019000329.2eacd502@xps-13>
+From:   Stefan Schmidt <stefan@datenfreihafen.org>
+In-Reply-To: <20221019000329.2eacd502@xps-13>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi Alexander,
+Hello.
 
-aahringo@redhat.com wrote on Tue, 18 Oct 2022 18:56:49 -0400:
+On 19.10.22 00:03, Miquel Raynal wrote:
+> Hi Alexander,
+> 
+> aahringo@redhat.com wrote on Tue, 18 Oct 2022 16:54:13 -0400:
+> 
+>> Hi,
+>>
+>> On Tue, Oct 18, 2022 at 2:35 PM Miquel Raynal <miquel.raynal@bootlin.com> wrote:
+>>>
+>>> We now have a fine grained filtering information so let's ensure proper
+>>> filtering in scan mode, which means that only beacons are processed.
+>>>   
+>>
+>> Is this a fixup? Can you resend the whole series please?
+> 
+> Hmm no? Unless I understood things the wrong way, Stefan applied
+> patches 1 to 7 of my v4, and asked me to make a change on the 8th
+> patch.
+> 
+> This is v5 just for patch 8/8 of the previous series, I just changed
+> a debug string actually...
+> 
+> There was a conflict when he applied it but I believe this is because
+> wpan-next did not contain one of the fixes which made it to Linus' tree
+> a month ago. So in my branch I still have this fix prior to this patch,
+> because otherwise there will be a conflict when merging v6.1-rc1 (which
+> I believe was not done yet).
 
-> Hi,
->=20
-> On Tue, Oct 18, 2022 at 6:03 PM Miquel Raynal <miquel.raynal@bootlin.com>=
- wrote:
-> >
-> > Hi Alexander,
-> >
-> > aahringo@redhat.com wrote on Tue, 18 Oct 2022 16:54:13 -0400:
-> > =20
-> > > Hi,
-> > >
-> > > On Tue, Oct 18, 2022 at 2:35 PM Miquel Raynal <miquel.raynal@bootlin.=
-com> wrote: =20
-> > > >
-> > > > We now have a fine grained filtering information so let's ensure pr=
-oper
-> > > > filtering in scan mode, which means that only beacons are processed.
-> > > > =20
-> > >
-> > > Is this a fixup? Can you resend the whole series please? =20
-> >
-> > Hmm no? Unless I understood things the wrong way, Stefan applied
-> > patches 1 to 7 of my v4, and asked me to make a change on the 8th
-> > patch.
-> >
-> > This is v5 just for patch 8/8 of the previous series, I just changed
-> > a debug string actually...
-> > =20
->=20
-> Okay, I see there are multiple new patches on the list, can you resend
-> them in one series? Then we have the right order how they need to be
-> applied without figuring it "somehow" out.
+You believe correctly. :-) In my workflow I normally do not merge in 
+changes from net-next until after my latest pull-request was pulled in. 
+I do this to avoid extra merge commits.
 
-The order should not matter much, that's why I posted them as individual
-patches. But no problem, I'll resent the three "followup" patches in a
-series.
+In case I see a merge conflict in my testing before sending the pull 
+request I add merge guidance to the pull. Which is my plan this time 
+around as well.
 
-However, the patch for allowing coordinator interfaces should be
-considered something else, I've sent it to start discussing it as the
-other patches should not require a lot of review time I guess. I didn't
-think it made sense to wrap it in the followup series as this is
-mainly something new, but I'm fine doing it, the first patches can go
-in while we still discuss it further.
+regards
+Stefan Schmidt
 
-> > There was a conflict when he applied it but I believe this is because
-> > wpan-next did not contain one of the fixes which made it to Linus' tree
-> > a month ago. So in my branch I still have this fix prior to this patch,
-> > because otherwise there will be a conflict when merging v6.1-rc1 (which
-> > I believe was not done yet).
-> > =20
->=20
-> I see. Thanks.
->=20
-> - Alex
->=20
 
-Thanks,
-Miqu=C3=A8l
