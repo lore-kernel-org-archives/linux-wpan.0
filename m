@@ -2,77 +2,141 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8283ECAAA1
-	for <linux-wpan@archiver.kernel.org>; Mon, 24 Oct 2022 10:23:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78EE6ECAAA1
+	for <linux-wpan@archiver.kernel.org>; Mon, 24 Oct 2022 13:15:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229716AbiJXKXK (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 24 Oct 2022 06:23:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43894 "EHLO
+        id S235805AbiJXNPb (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 24 Oct 2022 09:15:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36886 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229629AbiJXKXJ (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 24 Oct 2022 06:23:09 -0400
-Received: from proxima.lasnet.de (proxima.lasnet.de [78.47.171.185])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C0DD57DC4;
-        Mon, 24 Oct 2022 03:23:08 -0700 (PDT)
-Received: from localhost.localdomain (unknown [217.17.28.204])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: stefan@sostec.de)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id B1797C0434;
-        Mon, 24 Oct 2022 12:23:06 +0200 (CEST)
-From:   Stefan Schmidt <stefan@datenfreihafen.org>
-To:     davem@davemloft.net, kuba@kernel.org
-Cc:     linux-wpan@vger.kernel.org, alex.aring@gmail.com,
-        netdev@vger.kernel.org
-Subject: pull-request: ieee802154 for net 2022-10-24
-Date:   Mon, 24 Oct 2022 12:23:01 +0200
-Message-Id: <20221024102301.9433-1-stefan@datenfreihafen.org>
-X-Mailer: git-send-email 2.37.3
+        with ESMTP id S236090AbiJXNOn (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 24 Oct 2022 09:14:43 -0400
+Received: from mslow1.mail.gandi.net (mslow1.mail.gandi.net [IPv6:2001:4b98:dc4:8::240])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90234A286E;
+        Mon, 24 Oct 2022 05:25:38 -0700 (PDT)
+Received: from relay5-d.mail.gandi.net (unknown [IPv6:2001:4b98:dc4:8::225])
+        by mslow1.mail.gandi.net (Postfix) with ESMTP id 0F692CEB89;
+        Mon, 24 Oct 2022 12:18:09 +0000 (UTC)
+Received: (Authenticated sender: miquel.raynal@bootlin.com)
+        by mail.gandi.net (Postfix) with ESMTPSA id E5C7A1C000A;
+        Mon, 24 Oct 2022 12:16:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+        t=1666613766;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=GADkgyfxmXlX6TdV6zf6SMGC4DVogV2LnJ1R/R8cq2I=;
+        b=TY+PywmlcxjDR1hNtVcM/XjPkRQMiPggkvxT0+tSnSHKuAZZ4h99Hsp9KbBXP4ywlKOuYB
+        dwZ+RIu4B5k/xWh2duYwOfMTU4YN27fU+Dhjel5tzgB/ul5NyAOXjlozHZm3I2euLfPT53
+        nCaWJfsh49lo3Fl7Bynxxw1hZi9Y3ReNyvVogS4buvinvcHzu6pS7MjgZGA71cntAhsd7k
+        rAeSHkZToIsv93huvtdeRDx+Z7l4So7yxgWnInUF7xQuhxVaKPKTDYzHdN5AVsT6xoCFEu
+        IbQ2vOzF5dtf8R8FjWB4BkaVoW69y8hIfD/9uSeiX1Q+CXQU49iOruGzBo9NVA==
+Date:   Mon, 24 Oct 2022 14:16:01 +0200
+From:   Miquel Raynal <miquel.raynal@bootlin.com>
+To:     Alexander Aring <aahringo@redhat.com>
+Cc:     Alexander Aring <alex.aring@gmail.com>,
+        Stefan Schmidt <stefan@datenfreihafen.org>,
+        linux-wpan@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
+        David Girault <david.girault@qorvo.com>,
+        Romuald Despres <romuald.despres@qorvo.com>,
+        Frederic Blain <frederic.blain@qorvo.com>,
+        Nicolas Schodet <nico@ni.fr.eu.org>,
+        Guilhem Imberton <guilhem.imberton@qorvo.com>,
+        Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH wpan-next] mac802154: Allow the creation of coordinator
+ interfaces
+Message-ID: <20221024141601.218b68e2@xps-13>
+In-Reply-To: <CAK-6q+jna-UXWVvTjnJnJ+LADB0oP_WmVJV0N5r00cb1tfhkpA@mail.gmail.com>
+References: <20221018183639.806719-1-miquel.raynal@bootlin.com>
+        <CAK-6q+hoJiLWyHNi90_7kbyGp9h_jV-bvRHYRQDVrEb1u_enEA@mail.gmail.com>
+        <20221019115242.571c19bb@xps-13>
+        <CAK-6q+jna-UXWVvTjnJnJ+LADB0oP_WmVJV0N5r00cb1tfhkpA@mail.gmail.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello Dave, Jakub.
+Hi Alexander,
 
-An update from ieee802154 for your *net* tree:
+> > About the way we handle the PAN coordinator role I have a couple of
+> > questions:
+> > - shall we consider only the PAN coordinator to be able to accept
+> >   associations or is any coordinator in the PAN able to do it? (this is
+> >   not clear to me) =20
+>=20
+> Me either, it sounds for me that coordinators are "leaves" and pan
+> coordinators are not. It is like in IPv6 level it is a host or router.
 
-Two fixup patches for return code changes of an earlier commit.
-Wei Yongjun fixed a missed -EINVAL return on the recent change, while
-Alexander Aring adds handling for unknown address type cases as well.
+I went through the spec once again and I actually (re)discovered
+Annexe E "Time-slot relaying based link extension (TRLE)" which indeed
+seems to tell us that relaying is an extension, so otherwise
+coordinators are "leaves" as you say.
 
-Miquel Raynal fixed a long standing issue with LQI value recording
-which got broken 8 years ago. (It got more attention with the work
-in progress enhancement in wpan).
+> > - If a coordinator receives a packet with no destination it should
+> >   expect it to be targeted at the PAN controller. Should we consider
+> >   relaying the packet? =20
+>=20
+> I guess it depends what the standard says here?
 
-regards
-Stefan Schmidt
+While we don't implement TRLE (and this is a project on its own) I
+guess we should not perform any relaying.
 
-The following changes since commit 1d22f78d05737ce21bff7b88b6e58873f35e65ba:
+> > - Is relaying a hardware feature or should we do it in software?
+> > =20
+>=20
+> I think for SoftMAC it is only the address filter which needs to be
+> changed. The rest is in software. So far what I can see here.
 
-  Merge tag 'ieee802154-for-net-2022-10-05' of git://git.kernel.org/pub/scm/linux/kernel/git/sschmidt/wpan (2022-10-05 20:38:46 -0700)
+If we need to change the address filters then I guess the hardware is
+broken, it would not be usable. The hardware must have a "PAN
+controller" bit to know whether or not the packet must be dropped or
+not when there is no destination field.
 
-are available in the Git repository at:
+> Question is what we are using here in the Linux kernel to provide such
+> functionality...
+>=20
+> e.g. see:
+>=20
+> include/net/dst.h
+>
+> > Regarding the situation where we would have NODE + MONITOR or COORD +
+> > MONITOR, while the interface creation would work, both could not be
+> > open at the same time because the following happens:
+> > mac802154_wpan_open() {
+> >         ieee802154_check_concurrent_iface() {
+> >                 ieee802154_check_mac_settings() {
+> >                         /* prevent the two interface types from being
+> >                          * open at the same time because the filtering
+> >                          * needs are not compatible. */
+> >                 }
+> >         }
+> > }
+> >
+> > Then, because you asked me to anticipate if we ever want to support more
+> > than one NODE or COORD interface at the same time, or at least not to
+> > do anything that would lead to a step back on this regard, I decided I
+> > would provide all the infrastructure to gracefully handle this
+> > situation in the Rx path, even though right now it still cannot happen
+> > because when opening an interface, ieee802154_check_concurrent_iface()
+> > will also prevent two NODE / COORD interfaces to be opened at the same
+> > time. =20
+>=20
+> yes, but you are assuming the actual hardware here. A hardware with
+> multiple address filters can indeed support other interfaces at the
+> same time. I can also name one, hwsim and a real one - atusb.
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/sschmidt/wpan.git tags/ieee802154-for-net-2022-10-24
+I have this use case in mind, I know the support for it may be
+brought at some point, and I think my proposal is future proof on this
+aspect. Isn't it?
 
-for you to fetch changes up to 5a5c4e06fd03b595542d5590f2bc05a6b7fc5c2b:
-
-  mac802154: Fix LQI recording (2022-10-24 11:07:39 +0200)
-
-----------------------------------------------------------------
-Alexander Aring (1):
-      net: ieee802154: return -EINVAL for unknown addr type
-
-Miquel Raynal (1):
-      mac802154: Fix LQI recording
-
-Wei Yongjun (1):
-      net: ieee802154: fix error return code in dgram_bind()
-
- include/net/ieee802154_netdev.h | 12 +++++++++---
- net/ieee802154/socket.c         |  4 +++-
- net/mac802154/rx.c              |  5 +++--
- 3 files changed, 15 insertions(+), 6 deletions(-)
+Thanks,
+Miqu=C3=A8l
