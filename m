@@ -2,43 +2,44 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B01DC38A2D
-	for <linux-wpan@archiver.kernel.org>; Mon, 24 Oct 2022 07:42:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD848ECAAA1
+	for <linux-wpan@archiver.kernel.org>; Mon, 24 Oct 2022 09:24:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229895AbiJXHmt (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 24 Oct 2022 03:42:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37206 "EHLO
+        id S229866AbiJXJY5 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 24 Oct 2022 05:24:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57600 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229876AbiJXHm1 (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 24 Oct 2022 03:42:27 -0400
+        with ESMTP id S229788AbiJXJY4 (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 24 Oct 2022 05:24:56 -0400
+X-Greylist: delayed 308 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 24 Oct 2022 02:24:54 PDT
 Received: from proxima.lasnet.de (proxima.lasnet.de [78.47.171.185])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECEBE60E85;
-        Mon, 24 Oct 2022 00:42:17 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C11B1EAD6;
+        Mon, 24 Oct 2022 02:24:50 -0700 (PDT)
 Received: from [10.1.64.117] (unknown [217.17.28.204])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
         (No client certificate requested)
         (Authenticated sender: stefan@datenfreihafen.org)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id 89F40C0434;
-        Mon, 24 Oct 2022 09:42:14 +0200 (CEST)
+        by proxima.lasnet.de (Postfix) with ESMTPSA id 85EC9C04DF;
+        Mon, 24 Oct 2022 11:19:34 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
-        s=2021; t=1666597335;
+        s=2021; t=1666603174;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=qTeI0QsB8Wty5iifFtznxJnrKumidiuEiElOyVPtyCM=;
-        b=pUeTvTVJI8o0zDxT6kkGGvQHQ95xIxC+EyooYinSj5Dw9ag/H6DdOFtmeWDCGKI03hyKkN
-        ZndrSQR1dfaNwHjHMOkleWIav+zT8WXGJrqmOOXZgrpgfWbe4e5NE2Ei5opyaIZMTXTm7F
-        3Zqgyo+DRFL8GSIGEr9QEF7g9qFkjf182Nf2RQNtuJEGMFz9/GomWPB1D5qtatie/f+WWr
-        z+LRGeTtgJKAyMDQYneXkdnD7YftCZ7rCHfLcTmZKuGbICU9+kix8bc/HTZvi4wrnJCFkx
-        Xi44dRauFYHp9QiQC6fIX2z8+ej9/lgZQlb6uPYr2e8Q/PmG9Q4YkE1NWlAMFQ==
-Message-ID: <22043b0d-ce42-15fa-98e1-a98e631b8def@datenfreihafen.org>
-Date:   Mon, 24 Oct 2022 09:42:13 +0200
+        bh=9C8n0HvPrUUkVdviYVLkXV4GrKjQbzZgaUI6KmUBM0Y=;
+        b=UMVXK1r6CFwVdCj9yvkl6C6P7OkNIQW/jO90c8X6/quJSuLHG9F90ReBiUM47jr1Ii9eQG
+        8Gk6n28wefuinqFKSsjxbdb3ipUijnGSCqwfTThW9bKCO/cxUwrOOC8iT873tS4cBJEd/F
+        ohHtcGEQmgIK3OIG+u3rZOnfXt2CN/Yvoskh9TxzfORKxfZ+REUt5lU9MZaRB5QqH8JVGp
+        syoWJSMsYszxKUlocrzFkKi7WScJ+ltCoq5XU4R9Y03RHIEh93COCtAUlhti3rHmZJP8Gh
+        /C8z6FJiWw4IrqvLfNI6eJyTQWP5xOn2MMkXA36Jb3Raff35QSCN0RGkX50WwA==
+Message-ID: <370df52d-8e9f-3628-36db-a59c1722e01f@datenfreihafen.org>
+Date:   Mon, 24 Oct 2022 11:19:34 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.2.1
-Subject: Re: [PATCH wpan-next v6 0/3] IEEE 802.15.4 filtering series followup
+Subject: Re: [PATCH wpan] mac802154: Fix LQI recording
 Content-Language: en-US
 To:     Miquel Raynal <miquel.raynal@bootlin.com>,
         Alexander Aring <alex.aring@gmail.com>,
@@ -52,10 +53,11 @@ Cc:     "David S. Miller" <davem@davemloft.net>,
         Frederic Blain <frederic.blain@qorvo.com>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
         Guilhem Imberton <guilhem.imberton@qorvo.com>,
-        Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-References: <20221019134423.877169-1-miquel.raynal@bootlin.com>
+        Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+        stable@vger.kernel.org
+References: <20221020142535.1038885-1-miquel.raynal@bootlin.com>
 From:   Stefan Schmidt <stefan@datenfreihafen.org>
-In-Reply-To: <20221019134423.877169-1-miquel.raynal@bootlin.com>
+In-Reply-To: <20221020142535.1038885-1-miquel.raynal@bootlin.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -64,35 +66,73 @@ X-Mailing-List: linux-wpan@vger.kernel.org
 
 Hello.
 
-On 19.10.22 15:44, Miquel Raynal wrote:
+On 20.10.22 16:25, Miquel Raynal wrote:
+> Back in 2014, the LQI was saved in the skb control buffer (skb->cb, or
+> mac_cb(skb)) without any actual reset of this area prior to its use.
+> 
+> As part of a useful rework of the use of this region, 32edc40ae65c
+> ("ieee802154: change _cb handling slightly") introduced mac_cb_init() to
+> basically memset the cb field to 0. In particular, this new function got
+> called at the beginning of mac802154_parse_frame_start(), right before
+> the location where the buffer got actually filled.
+> 
+> What went through unnoticed however, is the fact that the very first
+> helper called by device drivers in the receive path already used this
+> area to save the LQI value for later extraction. Resetting the cb field
+> "so late" led to systematically zeroing the LQI.
+> 
+> If we consider the reset of the cb field needed, we can make it as soon
+> as we get an skb from a device driver, right before storing the LQI,
+> as is the very first time we need to write something there.
+> 
+> Cc: stable@vger.kernel.org
+> Fixes: 32edc40ae65c ("ieee802154: change _cb handling slightly")
+> Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
+> ---
+> 
 > Hello,
 > 
-> The filtering series v4 [1] lead to a discussion about the use of a PIB
-> attribute to save the required PHY filtering level instead of accessing
-> the MAC internals, which is bein addressed in patch 1/3 and 2/3. The
-> last patch has been sent alone as a v5 because of a debug message
-> needing rewording. Actually Stefan wanted me to rebase on top of
-> wpan-next without keeping a patch sent as a fix which conflicts with it,
-> so here it is.
+> I am surprised the LQI was gone for all those years and nobody
+> noticed it, so perhaps I did misinterpret slightly the situation, but I
+> am pretty sure the cb area reset was erasing the LQI.
 > 
-> Once these three patches will be merged (I don't expect much discussions
-> on it to be honest?) I will send the next small series bringing support
-> for COORD interfaces.
+> About the backports, they will likely fail on the older kernels because
+> of some function/file moves, but I don't think we really care.
 > 
-> Cheers, Miquèl
+> Cheers,
+> Miquèl
 > 
-> Miquel Raynal (3):
->    ieee802154: hwsim: Introduce a helper to update all the PIB attributes
->    ieee802154: hwsim: Save the current filtering level and use it
->    mac802154: Ensure proper scan-level filtering
+>   net/mac802154/rx.c | 5 +++--
+>   1 file changed, 3 insertions(+), 2 deletions(-)
 > 
->   drivers/net/ieee802154/mac802154_hwsim.c | 88 +++++++++++++++---------
->   net/mac802154/rx.c                       | 16 +++--
->   2 files changed, 67 insertions(+), 37 deletions(-)
+> diff --git a/net/mac802154/rx.c b/net/mac802154/rx.c
+> index d1f7b8df41fe..a4733a62911f 100644
+> --- a/net/mac802154/rx.c
+> +++ b/net/mac802154/rx.c
+> @@ -134,7 +134,7 @@ static int
+>   ieee802154_parse_frame_start(struct sk_buff *skb, struct ieee802154_hdr *hdr)
+>   {
+>   	int hlen;
+> -	struct ieee802154_mac_cb *cb = mac_cb_init(skb);
+> +	struct ieee802154_mac_cb *cb = mac_cb(skb);
+>   
+>   	skb_reset_mac_header(skb);
+>   
+> @@ -305,8 +305,9 @@ void
+>   ieee802154_rx_irqsafe(struct ieee802154_hw *hw, struct sk_buff *skb, u8 lqi)
+>   {
+>   	struct ieee802154_local *local = hw_to_local(hw);
+> +	struct ieee802154_mac_cb *cb = mac_cb_init(skb);
+>   
+> -	mac_cb(skb)->lqi = lqi;
+> +	cb->lqi = lqi;
+>   	skb->pkt_type = IEEE802154_RX_MSG;
+>   	skb_queue_tail(&local->skb_queue, skb);
+>   	tasklet_schedule(&local->tasklet);
 
 
-These patches have been applied to the wpan-next tree and will be
-part of the next pull request to net-next. Thanks!
+This patch has been applied to the wpan tree and will be
+part of the next pull request to net. Thanks!
 
 regards
 Stefan Schmidt
