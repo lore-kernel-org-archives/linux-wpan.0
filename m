@@ -2,76 +2,129 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31F9AC38A02
-	for <linux-wpan@archiver.kernel.org>; Wed, 26 Oct 2022 02:59:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BFC0C433FE
+	for <linux-wpan@archiver.kernel.org>; Wed, 26 Oct 2022 07:56:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232362AbiJZC7X (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 25 Oct 2022 22:59:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46406 "EHLO
+        id S233236AbiJZH4z (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 26 Oct 2022 03:56:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57630 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232727AbiJZC7X (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 25 Oct 2022 22:59:23 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF0B09DDB1;
-        Tue, 25 Oct 2022 19:59:22 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        with ESMTP id S233034AbiJZH4w (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 26 Oct 2022 03:56:52 -0400
+Received: from proxima.lasnet.de (proxima.lasnet.de [IPv6:2a01:4f8:121:31eb:3::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82E7CA02C5;
+        Wed, 26 Oct 2022 00:56:44 -0700 (PDT)
+Received: from localhost.localdomain (unknown [92.79.119.98])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 4A83B61C5A;
-        Wed, 26 Oct 2022 02:59:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60ACEC433C1;
-        Wed, 26 Oct 2022 02:59:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1666753161;
-        bh=vllgs2AG1tpKI1gg0HcH4n7qUUkQY3HHXYq8K7dTrPA=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=JlCZLB/MPaRKUE4vvcIo/lC23QSE4ms+uuczeAQnf4Sx4SJyoXPASavQAjdRIQfBV
-         hsHhkPm01VU84zuam4KpPK9NryIhXw9sD2o/woqfBKey6gLmiXhRmlGfKqboRmNZt9
-         ZIly7wWkoCH+8hMUtm7T/uv/1eIjceuyz9b7BzUOiDrzfssL/SCdh4KCiqimI0SqVk
-         UJBFH93FiRvucr9wk7rFnJIlY1HqjuE5nmyg90/kQiWH8V/EmF7eSuJx9D6S5vgNKq
-         cq2rDzknKTYHWGbJTrfwE6YQmiyGR8JesAZIwTmHHX3aev4y5hY1/uzWihEFSjABPl
-         +rsi8KTsrrMjA==
-Date:   Tue, 25 Oct 2022 19:59:20 -0700
-From:   Jakub Kicinski <kuba@kernel.org>
-To:     Stefan Schmidt <stefan@datenfreihafen.org>
-Cc:     davem@davemloft.net, linux-wpan@vger.kernel.org,
-        alex.aring@gmail.com, netdev@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org
-Subject: Re: pull-request: ieee802154-next 2022-10-25
-Message-ID: <20221025195920.68849bdd@kernel.org>
-In-Reply-To: <20221025102029.534025-1-stefan@datenfreihafen.org>
-References: <20221025102029.534025-1-stefan@datenfreihafen.org>
+        (Authenticated sender: stefan@sostec.de)
+        by proxima.lasnet.de (Postfix) with ESMTPSA id 9C833C040C;
+        Wed, 26 Oct 2022 09:56:42 +0200 (CEST)
+From:   Stefan Schmidt <stefan@datenfreihafen.org>
+To:     davem@davemloft.net, kuba@kernel.org
+Cc:     linux-wpan@vger.kernel.org, alex.aring@gmail.com,
+        netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: pull-request v2: ieee802154-next 2022-10-26
+Date:   Wed, 26 Oct 2022 09:56:38 +0200
+Message-Id: <20221026075638.578840-1-stefan@datenfreihafen.org>
+X-Mailer: git-send-email 2.37.3
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-On Tue, 25 Oct 2022 12:20:29 +0200 Stefan Schmidt wrote:
-> Hello Dave, Jakub.
-> 
-> An update from ieee802154 for *net-next*
-> 
-> One of the biggest cycles for ieee802154 in a long time. We are landing the
-> first pieces of a big enhancements in managing PAN's. We might have another pull
-> request ready for this cycle later on, but I want to get this one out first.
-> 
-> Miquel Raynal added support for sending frames synchronously as a dependency
-> to handle MLME commands. Also introducing more filtering levels to match with
-> the needs of a device when scanning or operating as a pan coordinator.
-> To support development and testing the hwsim driver for ieee802154 was also
-> enhanced for the new filtering levels and to update the PIB attributes.
-> 
-> Alexander Aring fixed quite a few bugs spotted during reviewing changes. He
-> also added support for TRAC in the atusb driver to have better failure
-> handling if the firmware provides the needed information.
-> 
-> Jilin Yuan fixed a comment with a repeated word in it.
+Hello Dave, Jakub.
 
-nit: would you mind sorting these out before we pull ?
+An update from ieee802154 for *net-next*
 
-net/mac802154/util.c:27: warning: Function parameter or member 'hw' not described in 'ieee802154_wake_queue'
-net/mac802154/util.c:27: warning: Excess function parameter 'local' description in 'ieee802154_wake_queue'
-net/mac802154/util.c:53: warning: Function parameter or member 'hw' not described in 'ieee802154_stop_queue'
-net/mac802154/util.c:53: warning: Excess function parameter 'local' description in 'ieee802154_stop_queue'
+One of the biggest cycles for ieee802154 in a long time. We are landing the
+first pieces of a big enhancements in managing PAN's. We might have another pull
+request ready for this cycle later on, but I want to get this one out first.
+
+Miquel Raynal added support for sending frames synchronously as a dependency
+to handle MLME commands. Also introducing more filtering levels to match with
+the needs of a device when scanning or operating as a pan coordinator.
+To support development and testing the hwsim driver for ieee802154 was also
+enhanced for the new filtering levels and to update the PIB attributes.
+
+Alexander Aring fixed quite a few bugs spotted during reviewing changes. He
+also added support for TRAC in the atusb driver to have better failure
+handling if the firmware provides the needed information.
+
+Jilin Yuan fixed a comment with a repeated word in it.
+
+regards
+Stefan Schmidt
+
+The following changes since commit 6cbd05b2d07a651e00c76d287a5f44994cbafe60:
+
+  Merge tag 'ieee802154-for-net-next-2022-06-09' of git://git.kernel.org/pub/scm/linux/kernel/git/sschmidt/wpan-next (2022-06-09 23:21:29 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/sschmidt/wpan-next.git tags/ieee802154-for-net-next-2022-10-26
+
+for you to fetch changes up to 982e2b7329fe5c5387453524f40eec706d2c60bf:
+
+  net: mac802154: Fixup function parameter name in docs (2022-10-26 09:40:34 +0200)
+
+----------------------------------------------------------------
+Alexander Aring (5):
+      mac802154: util: fix release queue handling
+      mac802154: fix atomic_dec_and_test checks
+      mac802154: move receive parameters above start
+      mac802154: set filter at drv_start()
+      ieee802154: atusb: add support for trac feature
+
+Jilin Yuan (1):
+      net/ieee802154: fix repeated words in comments
+
+Miquel Raynal (21):
+      net: mac802154: Rename the synchronous xmit worker
+      net: mac802154: Rename the main tx_work struct
+      net: mac802154: Enhance the error path in the main tx helper
+      net: mac802154: Follow the count of ongoing transmissions
+      net: mac802154: Bring the ability to hold the transmit queue
+      net: mac802154: Create a hot tx path
+      net: mac802154: Introduce a helper to disable the queue
+      net: mac802154: Introduce a tx queue flushing mechanism
+      net: mac802154: Introduce a synchronous API for MLME commands
+      net: mac802154: Add a warning in the hot path
+      net: mac802154: Add a warning in the slow path
+      net: mac802154: Fix a Tx warning check
+      mac802154: Introduce filtering levels
+      ieee802154: hwsim: Record the address filter values
+      ieee802154: hwsim: Implement address filtering
+      mac802154: Drop IEEE802154_HW_RX_DROP_BAD_CKSUM
+      mac802154: Avoid delivering frames received in a non satisfying filtering mode
+      net: mac802154: Avoid displaying misleading debug information
+      ieee802154: hwsim: Introduce a helper to update all the PIB attributes
+      ieee802154: hwsim: Save the current filtering level and use it
+      mac802154: Ensure proper scan-level filtering
+
+Stefan Schmidt (1):
+      net: mac802154: Fixup function parameter name in docs
+
+Yang Yingliang (1):
+      net: ieee802154: mcr20a: Switch to use dev_err_probe() helper
+
+ drivers/net/ieee802154/atusb.c           |  33 +++-
+ drivers/net/ieee802154/ca8210.c          |   2 +-
+ drivers/net/ieee802154/mac802154_hwsim.c | 179 +++++++++++++++++++++-
+ drivers/net/ieee802154/mcr20a.c          |   9 +-
+ include/linux/ieee802154.h               |  24 +++
+ include/net/cfg802154.h                  |  20 ++-
+ include/net/ieee802154_netdev.h          |   8 +
+ include/net/mac802154.h                  |  31 ----
+ net/ieee802154/core.c                    |   3 +
+ net/mac802154/cfg.c                      |   6 +-
+ net/mac802154/driver-ops.h               | 253 ++++++++++++++++++++-----------
+ net/mac802154/ieee802154_i.h             |  56 ++++++-
+ net/mac802154/iface.c                    |  44 ++----
+ net/mac802154/main.c                     |   2 +-
+ net/mac802154/rx.c                       |  29 +++-
+ net/mac802154/tx.c                       | 132 ++++++++++++++--
+ net/mac802154/util.c                     |  71 ++++++++-
+ 17 files changed, 696 insertions(+), 206 deletions(-)
