@@ -2,98 +2,79 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8363C38A2D
-	for <linux-wpan@archiver.kernel.org>; Wed, 26 Oct 2022 07:58:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F57EC38A2D
+	for <linux-wpan@archiver.kernel.org>; Wed, 26 Oct 2022 09:35:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233056AbiJZH6S (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 26 Oct 2022 03:58:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59434 "EHLO
+        id S233108AbiJZJfL (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 26 Oct 2022 05:35:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44446 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232935AbiJZH6S (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 26 Oct 2022 03:58:18 -0400
-Received: from proxima.lasnet.de (proxima.lasnet.de [IPv6:2a01:4f8:121:31eb:3::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 456A2A98C7;
-        Wed, 26 Oct 2022 00:58:17 -0700 (PDT)
-Received: from [10.0.252.2] (unknown [92.79.119.98])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: stefan@datenfreihafen.org)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id BABE5C025B;
-        Wed, 26 Oct 2022 09:58:15 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
-        s=2021; t=1666771095;
+        with ESMTP id S233111AbiJZJfJ (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 26 Oct 2022 05:35:09 -0400
+Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::227])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE5215E66D;
+        Wed, 26 Oct 2022 02:35:07 -0700 (PDT)
+Received: (Authenticated sender: miquel.raynal@bootlin.com)
+        by mail.gandi.net (Postfix) with ESMTPSA id 415092001C;
+        Wed, 26 Oct 2022 09:35:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+        t=1666776906;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=DAHH6ooeSYjB8S/Chqr94kL7w8pMRqj/Lx1u8nNDfjE=;
-        b=XrXzJch8ujcFDz1/PPl3Esub/rn7dmzVcFO739g0V8hsiHoydHGsmTPVG6r1TKtlwGW68M
-        SPk0Mf1l3jbRfL1ml1VM2Z6scZGdDciHk+BmPtWDR5sjIBjgqGSYFuTm1bGOx24+65J0Gh
-        9bjLjpuWw4ii5sPrl4cXnSoZfb8f/zQH/xbZo8S+MakBzq3DbdkyuPCfViuNfADgtOVFGs
-        0m9affo58VA34qSlfTvw3Rx+KDHDz04+CiAu4R6GAjIq4qYUOAPptDzpyh8MeFGa56MNAi
-        m1iZbev1+m53yu5avkDyAMa0+kV2YdjGhs0AdoZ7+34xtAsgfcmkW+aucU3MAA==
-Message-ID: <6ff97af7-05ed-8659-ab25-63cd3591217c@datenfreihafen.org>
-Date:   Wed, 26 Oct 2022 09:58:15 +0200
+         content-transfer-encoding:content-transfer-encoding;
+        bh=XrzTkPIL8thiU5wCzH/+zPzFdA7kEidJic1LEXioe7I=;
+        b=FZq4nS58HyLF4eN2uGY3FBxr3IMxf6a3Iuer9iY3mOF6UtDKr72fgb0cA/P6kSwz3rckoj
+        sOMjrLtewnsjYD5xprf2Bqo9cfdXsuW2tW17ZLNQI50tf2L8TuuRx1thAUeN83WWsSIb04
+        drv01V0FxwZOQdiby/8SHeA3RzX3YhhnsuOzE3K5b6XmHNEZLDVzskVYQs6MFN2oqH/CgO
+        YF07wzcaJoshM0qnPClEr+WdpvEuVKXAr/fxAFU+UP0bqrOSyyj7GUBJBFmGi+agRLP79W
+        ktoqoEwwHeKpgsomyYGOq0JT4QU7+nkRYeDZGgCyYwsRteINDBx2vEbZmI5DSA==
+From:   Miquel Raynal <miquel.raynal@bootlin.com>
+To:     Alexander Aring <alex.aring@gmail.com>,
+        Stefan Schmidt <stefan@datenfreihafen.org>,
+        linux-wpan@vger.kernel.org
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
+        David Girault <david.girault@qorvo.com>,
+        Romuald Despres <romuald.despres@qorvo.com>,
+        Frederic Blain <frederic.blain@qorvo.com>,
+        Nicolas Schodet <nico@ni.fr.eu.org>,
+        Guilhem Imberton <guilhem.imberton@qorvo.com>,
+        Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+        Miquel Raynal <miquel.raynal@bootlin.com>
+Subject: [PATCH wpan-next v2 0/3] IEEE 802.15.4: Add coordinator interfaces
+Date:   Wed, 26 Oct 2022 11:34:59 +0200
+Message-Id: <20221026093502.602734-1-miquel.raynal@bootlin.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.1
-Subject: Re: pull-request: ieee802154-next 2022-10-25
-Content-Language: en-US
-To:     Jakub Kicinski <kuba@kernel.org>
-Cc:     davem@davemloft.net, linux-wpan@vger.kernel.org,
-        alex.aring@gmail.com, netdev@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org
-References: <20221025102029.534025-1-stefan@datenfreihafen.org>
- <20221025195920.68849bdd@kernel.org>
-From:   Stefan Schmidt <stefan@datenfreihafen.org>
-In-Reply-To: <20221025195920.68849bdd@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello.
+Hello,
+These three patches allow the creation of coordinator interfaces, which
+were already defined without being usable. The idea behind is to use
+them advertizing PANs through the beaconing feature.
 
-On 26.10.22 04:59, Jakub Kicinski wrote:
-> On Tue, 25 Oct 2022 12:20:29 +0200 Stefan Schmidt wrote:
->> Hello Dave, Jakub.
->> 
->> An update from ieee802154 for *net-next*
->> 
->> One of the biggest cycles for ieee802154 in a long time. We are
->> landing the first pieces of a big enhancements in managing PAN's.
->> We might have another pull request ready for this cycle later on,
->> but I want to get this one out first.
->> 
->> Miquel Raynal added support for sending frames synchronously as a
->> dependency to handle MLME commands. Also introducing more filtering
->> levels to match with the needs of a device when scanning or
->> operating as a pan coordinator. To support development and testing
->> the hwsim driver for ieee802154 was also enhanced for the new
->> filtering levels and to update the PIB attributes.
->> 
->> Alexander Aring fixed quite a few bugs spotted during reviewing
->> changes. He also added support for TRAC in the atusb driver to have
->> better failure handling if the firmware provides the needed
->> information.
->> 
->> Jilin Yuan fixed a comment with a repeated word in it.
-> 
-> nit: would you mind sorting these out before we pull ?
-> 
-> net/mac802154/util.c:27: warning: Function parameter or member 'hw'
-> not described in 'ieee802154_wake_queue' net/mac802154/util.c:27:
-> warning: Excess function parameter 'local' description in
-> 'ieee802154_wake_queue' net/mac802154/util.c:53: warning: Function
-> parameter or member 'hw' not described in 'ieee802154_stop_queue' 
-> net/mac802154/util.c:53: warning: Excess function parameter 'local'
-> description in 'ieee802154_stop_queue'
+Changes since v1:
+* Addition of patches 1 and 2.
+* Improved the commit message of patch 3.
+* Rebased.
+* Minor fixes.
 
-I certainly can fix this up. Sorry for missing it initially.
+Miquel Raynal (3):
+  mac802154: Move an skb free within the rx path
+  mac802154: Clarify an expression
+  mac802154: Allow the creation of coordinator interfaces
 
-Pushed a fix and sent a new pull request as v2 with today's date.
+ net/mac802154/iface.c | 15 ++++++++-------
+ net/mac802154/main.c  |  2 +-
+ net/mac802154/rx.c    | 24 +++++++++++-------------
+ 3 files changed, 20 insertions(+), 21 deletions(-)
 
-regards
-Stefan Schmidt
+-- 
+2.34.1
+
