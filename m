@@ -2,67 +2,48 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6AF8ECAAA1
-	for <linux-wpan@archiver.kernel.org>; Mon, 31 Oct 2022 22:08:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12684FA3743
+	for <linux-wpan@archiver.kernel.org>; Tue,  1 Nov 2022 10:28:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229798AbiJaWIP (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 31 Oct 2022 18:08:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56908 "EHLO
+        id S230006AbiKAK2I (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 1 Nov 2022 06:28:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55780 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229619AbiJaWIO (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 31 Oct 2022 18:08:14 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BE54140F4
-        for <linux-wpan@vger.kernel.org>; Mon, 31 Oct 2022 15:07:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1667254040;
+        with ESMTP id S229997AbiKAK2D (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 1 Nov 2022 06:28:03 -0400
+Received: from proxima.lasnet.de (proxima.lasnet.de [78.47.171.185])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36937186DA;
+        Tue,  1 Nov 2022 03:28:02 -0700 (PDT)
+Received: from [IPV6:2003:e9:d70d:1c31:377b:dae8:293d:d053] (p200300e9d70d1c31377bdae8293dd053.dip0.t-ipconnect.de [IPv6:2003:e9:d70d:1c31:377b:dae8:293d:d053])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: stefan@datenfreihafen.org)
+        by proxima.lasnet.de (Postfix) with ESMTPSA id EE16CC0373;
+        Tue,  1 Nov 2022 11:27:54 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
+        s=2021; t=1667298480;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=+iZ0pV3SBOzW1z26S60SpkgdQOzJ1jKWT7LgrMsWLSw=;
-        b=YHRVBpUAM41TLYu3MbFEVWy9kK+MreJ8KJlMhAX1fvVlKKj2ZfgezIarcpANgnvPK4yfBQ
-        jz1S3qaI3t5hrveg6Am+RlZdhnWNGOll/MefFvAy/lRf1e5efse/mPn+az9t+0cRGvd6sC
-        qcjYM2uESWpvio045y7fJ7nme6EYQCQ=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-357-q9s9cHI4MMePOIo1KaKIDA-1; Mon, 31 Oct 2022 18:07:19 -0400
-X-MC-Unique: q9s9cHI4MMePOIo1KaKIDA-1
-Received: by mail-ed1-f72.google.com with SMTP id m11-20020a056402510b00b00462e5d7688fso5762184edd.11
-        for <linux-wpan@vger.kernel.org>; Mon, 31 Oct 2022 15:07:18 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=+iZ0pV3SBOzW1z26S60SpkgdQOzJ1jKWT7LgrMsWLSw=;
-        b=6vBj1cfjrNLvnvHBdMWzbEPkwvNK+6pgiUHIEkiKCDl8YZ9zRUG6yNiNx0VneR0z1R
-         Y0znh2GPI/2jjr1fDACabIqxyxe67n6l0vog5gnvEorlzaL+16sMWyavah4j8VQiUVsm
-         1EqSPkEpjTWOmeZHNeQ3ZrbevsFslOyly3WdKj4qV7RNBzfkYXGnrgysST2ZN/KBfi8H
-         elAC4KzgASgQemf9Z6pDZj54DZSJR1xbP7Yw+/0BNtOzwWa2j0N0WsbkHD+1Y0td5i+Y
-         kXOhL9NFLZ+Y4B+dwBdrvnrzdObNjbP002Azylr3Q/rTVHqyrLq6pn7aJZgO1nrblnDq
-         a89Q==
-X-Gm-Message-State: ACrzQf2/I38cHaf+m/MOR/9M6z3gaeKjIUgVC9Go1yxRTRM7j0ltqTVM
-        290nu96+m2RHX5CguKBFHKovt+FS/D/MbSQtJiI4PSZpXOV+AHJyII93sDR0YEMVIx9vif/b8mq
-        WduER3jmLBNPje1AsNPfV56WUArowhxqOdQCbmA==
-X-Received: by 2002:a17:906:a246:b0:78d:ee08:1867 with SMTP id bi6-20020a170906a24600b0078dee081867mr15060ejb.123.1667254037496;
-        Mon, 31 Oct 2022 15:07:17 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM7808CBkgMpm2IjH8zlljCUguJuPX1x0B9oPTLTfUq3CiS9A72iS2SRvn8xSQPXLui8a1FHlXuRoePvlJ0JBYM=
-X-Received: by 2002:a17:906:a246:b0:78d:ee08:1867 with SMTP id
- bi6-20020a170906a24600b0078dee081867mr15052ejb.123.1667254037330; Mon, 31 Oct
- 2022 15:07:17 -0700 (PDT)
+        bh=s/Leu3k78Fk6bj5c/wAxoaMkKzuH9+bD0W7kXsBIx/U=;
+        b=gyz7jyN1UlJwnm10K/iFbf+Fr/fxJHZeH6hNKlAXhQlNC1OPL9ujkqlLA0lHzyDVe9KV7t
+        0SW0IfcKDMwQsFDfY8fNdpID0C0hgz2uWEUg0zl2wi1pOQUDnf/RVKJ8sNUAbc5BTsiO20
+        Ihpj72F4PYBFj5MWtE1uuqljR+00jnbsxxSVTmA18s+156IMPmM/Ihw8/uNJxPtLVNiBr4
+        nh3bJbIpTMSBgfwZ1WExdtvt6p1xfSpVG1KdHhBQIG8g1WGjFhSTs01W64xJeedSKiNfJd
+        WQtQb51TOWDt72zAVD6i73fv+9u81Rfu7aDCPO2lwMultCwD1SPd05bfAdDUlw==
+Message-ID: <0758fadf-d559-1383-3542-87bebf78e1e4@datenfreihafen.org>
+Date:   Tue, 1 Nov 2022 11:27:54 +0100
 MIME-Version: 1.0
-References: <20221026093502.602734-1-miquel.raynal@bootlin.com> <CAK-6q+jXPyruvdtS3jgzkuH=f599EiPk7vWTWLhREFCMj5ayNg@mail.gmail.com>
-In-Reply-To: <CAK-6q+jXPyruvdtS3jgzkuH=f599EiPk7vWTWLhREFCMj5ayNg@mail.gmail.com>
-From:   Alexander Aring <aahringo@redhat.com>
-Date:   Mon, 31 Oct 2022 18:07:05 -0400
-Message-ID: <CAK-6q+iRAjEPLQqH-_YSxNnobd7o=NLaF-4XB+zvNTXpWgpb8A@mail.gmail.com>
-Subject: Re: [PATCH wpan-next v2 0/3] IEEE 802.15.4: Add coordinator interfaces
-To:     Miquel Raynal <miquel.raynal@bootlin.com>
-Cc:     Alexander Aring <alex.aring@gmail.com>,
-        Stefan Schmidt <stefan@datenfreihafen.org>,
-        linux-wpan@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.1
+Subject: Re: [PATCH wpan-next v2 0/3] IEEE 802.15.4: Add coordinator
+ interfaces
+To:     Miquel Raynal <miquel.raynal@bootlin.com>,
+        Alexander Aring <alex.aring@gmail.com>,
+        linux-wpan@vger.kernel.org
+Cc:     "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
         Paolo Abeni <pabeni@redhat.com>,
         Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
@@ -72,48 +53,43 @@ Cc:     Alexander Aring <alex.aring@gmail.com>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
         Guilhem Imberton <guilhem.imberton@qorvo.com>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Content-Type: text/plain; charset="UTF-8"
+References: <20221026093502.602734-1-miquel.raynal@bootlin.com>
+Content-Language: en-US
+From:   Stefan Schmidt <stefan@datenfreihafen.org>
+In-Reply-To: <20221026093502.602734-1-miquel.raynal@bootlin.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi,
+Hello.
 
-On Sun, Oct 30, 2022 at 10:20 PM Alexander Aring <aahringo@redhat.com> wrote:
->
-> Hi,
->
-> On Wed, Oct 26, 2022 at 5:35 AM Miquel Raynal <miquel.raynal@bootlin.com> wrote:
-> >
-> > Hello,
-> > These three patches allow the creation of coordinator interfaces, which
-> > were already defined without being usable. The idea behind is to use
-> > them advertizing PANs through the beaconing feature.
-> >
->
-> I still don't know how exactly those "leaves" and "non-leaves" are
-> acting here regarding the coordinator interfaces. If this is just a
-> bit here to set in the interface I am fine with it. But yea,
-> "relaying" feature is a project on its own, as we said previously.
->
-> Another mail I was asking myself what a node interface is then,
-> currently it is a mesh interface with none of those 802.15.4 PAN
-> management functionality? Or can it act also as a "leave"
-> coordinator... I am not sure about that.
->
-> However I think we can think about something scheduled later as we can
-> still decide later if we really want that "node" can do that.
-> Regarding to 6LoWPAN I think the current type what "node" interface is
-> as a just a node in a mesh is required, it might depends on if you
-> want routing on IP or "relaying" on MAC (mesh-over vs mesh-under), but
+On 26.10.22 11:34, Miquel Raynal wrote:
+> Hello,
+> These three patches allow the creation of coordinator interfaces, which
+> were already defined without being usable. The idea behind is to use
+> them advertizing PANs through the beaconing feature.
+> 
+> Changes since v1:
+> * Addition of patches 1 and 2.
+> * Improved the commit message of patch 3.
+> * Rebased.
+> * Minor fixes.
+> 
+> Miquel Raynal (3):
+>    mac802154: Move an skb free within the rx path
+>    mac802154: Clarify an expression
+>    mac802154: Allow the creation of coordinator interfaces
+> 
+>   net/mac802154/iface.c | 15 ++++++++-------
+>   net/mac802154/main.c  |  2 +-
+>   net/mac802154/rx.c    | 24 +++++++++++-------------
+>   3 files changed, 20 insertions(+), 21 deletions(-)
 
-*route-over
 
-> I never saw mesh-under in 6LoWPAN.
->
+These patches have been applied to the wpan-next tree and will be
+part of the next pull request to net-next. Thanks!
 
-we will see how that works, because you can actually run a 6lowpan
-interface on the new coordinator type.
-
-- Alex
-
+regards
+Stefan Schmidt
