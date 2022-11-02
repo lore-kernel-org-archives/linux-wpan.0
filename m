@@ -2,48 +2,40 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12684FA3743
-	for <linux-wpan@archiver.kernel.org>; Tue,  1 Nov 2022 10:28:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BFB9C4332F
+	for <linux-wpan@archiver.kernel.org>; Wed,  2 Nov 2022 14:52:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230006AbiKAK2I (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 1 Nov 2022 06:28:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55780 "EHLO
+        id S230017AbiKBOwz (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 2 Nov 2022 10:52:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41698 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229997AbiKAK2D (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 1 Nov 2022 06:28:03 -0400
-Received: from proxima.lasnet.de (proxima.lasnet.de [78.47.171.185])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36937186DA;
-        Tue,  1 Nov 2022 03:28:02 -0700 (PDT)
-Received: from [IPV6:2003:e9:d70d:1c31:377b:dae8:293d:d053] (p200300e9d70d1c31377bdae8293dd053.dip0.t-ipconnect.de [IPv6:2003:e9:d70d:1c31:377b:dae8:293d:d053])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: stefan@datenfreihafen.org)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id EE16CC0373;
-        Tue,  1 Nov 2022 11:27:54 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
-        s=2021; t=1667298480;
+        with ESMTP id S229968AbiKBOws (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 2 Nov 2022 10:52:48 -0400
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::226])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D6F32AC49;
+        Wed,  2 Nov 2022 07:52:45 -0700 (PDT)
+Received: (Authenticated sender: miquel.raynal@bootlin.com)
+        by mail.gandi.net (Postfix) with ESMTPSA id BD413C000F;
+        Wed,  2 Nov 2022 14:52:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+        t=1667400764;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=s/Leu3k78Fk6bj5c/wAxoaMkKzuH9+bD0W7kXsBIx/U=;
-        b=gyz7jyN1UlJwnm10K/iFbf+Fr/fxJHZeH6hNKlAXhQlNC1OPL9ujkqlLA0lHzyDVe9KV7t
-        0SW0IfcKDMwQsFDfY8fNdpID0C0hgz2uWEUg0zl2wi1pOQUDnf/RVKJ8sNUAbc5BTsiO20
-        Ihpj72F4PYBFj5MWtE1uuqljR+00jnbsxxSVTmA18s+156IMPmM/Ihw8/uNJxPtLVNiBr4
-        nh3bJbIpTMSBgfwZ1WExdtvt6p1xfSpVG1KdHhBQIG8g1WGjFhSTs01W64xJeedSKiNfJd
-        WQtQb51TOWDt72zAVD6i73fv+9u81Rfu7aDCPO2lwMultCwD1SPd05bfAdDUlw==
-Message-ID: <0758fadf-d559-1383-3542-87bebf78e1e4@datenfreihafen.org>
-Date:   Tue, 1 Nov 2022 11:27:54 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.1
-Subject: Re: [PATCH wpan-next v2 0/3] IEEE 802.15.4: Add coordinator
- interfaces
-To:     Miquel Raynal <miquel.raynal@bootlin.com>,
-        Alexander Aring <alex.aring@gmail.com>,
-        linux-wpan@vger.kernel.org
-Cc:     "David S. Miller" <davem@davemloft.net>,
+        bh=cfNvnrYr/ItlWTT9DZxYiIOujMBGP4riRcwbnYZoqbM=;
+        b=Ezr0FF1nftRxdTz3hYfcYO8Voc7Z9E+Q761etlytsooXbdXbiKxEJPGGs/9u+gM/krNJ3g
+        8yFY02C9P7Pn5mwpzz/ZIv6IWNzaP04KckScGBRXphWpRsiFTvdnOR5itWx/7qnFit1bzz
+        nR7cD4VAN3s6kYwlp4dEmmxdTEyD4eK+iAmX1FHFSdHiuzCV5gf6B7LYpWes0QZ3mtQ4O4
+        qQz/sTpCiVX61HN09vcvd/anPnoebPKGwYEs40QsNXAQQPTcf0C33ZWlSrv2LMA1vMu/cC
+        U4Rl45TBB81R/mFw4pGZdjo1zTEzytQYlt5zUYwOw1RqFRvWMdj9vi4UgKsrdQ==
+Date:   Wed, 2 Nov 2022 15:52:40 +0100
+From:   Miquel Raynal <miquel.raynal@bootlin.com>
+To:     Alexander Aring <aahringo@redhat.com>
+Cc:     Alexander Aring <alex.aring@gmail.com>,
+        Stefan Schmidt <stefan@datenfreihafen.org>,
+        linux-wpan@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
         Paolo Abeni <pabeni@redhat.com>,
         Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
@@ -53,43 +45,70 @@ Cc:     "David S. Miller" <davem@davemloft.net>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
         Guilhem Imberton <guilhem.imberton@qorvo.com>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH wpan-next v2 0/3] IEEE 802.15.4: Add coordinator
+ interfaces
+Message-ID: <20221102155240.71a1d205@xps-13>
+In-Reply-To: <CAK-6q+jXPyruvdtS3jgzkuH=f599EiPk7vWTWLhREFCMj5ayNg@mail.gmail.com>
 References: <20221026093502.602734-1-miquel.raynal@bootlin.com>
-Content-Language: en-US
-From:   Stefan Schmidt <stefan@datenfreihafen.org>
-In-Reply-To: <20221026093502.602734-1-miquel.raynal@bootlin.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+        <CAK-6q+jXPyruvdtS3jgzkuH=f599EiPk7vWTWLhREFCMj5ayNg@mail.gmail.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello.
+Hi Alexander,
 
-On 26.10.22 11:34, Miquel Raynal wrote:
-> Hello,
-> These three patches allow the creation of coordinator interfaces, which
-> were already defined without being usable. The idea behind is to use
-> them advertizing PANs through the beaconing feature.
-> 
-> Changes since v1:
-> * Addition of patches 1 and 2.
-> * Improved the commit message of patch 3.
-> * Rebased.
-> * Minor fixes.
-> 
-> Miquel Raynal (3):
->    mac802154: Move an skb free within the rx path
->    mac802154: Clarify an expression
->    mac802154: Allow the creation of coordinator interfaces
-> 
->   net/mac802154/iface.c | 15 ++++++++-------
->   net/mac802154/main.c  |  2 +-
->   net/mac802154/rx.c    | 24 +++++++++++-------------
->   3 files changed, 20 insertions(+), 21 deletions(-)
+aahringo@redhat.com wrote on Sun, 30 Oct 2022 22:20:03 -0400:
 
+> Hi,
+>=20
+> On Wed, Oct 26, 2022 at 5:35 AM Miquel Raynal <miquel.raynal@bootlin.com>=
+ wrote:
+> >
+> > Hello,
+> > These three patches allow the creation of coordinator interfaces, which
+> > were already defined without being usable. The idea behind is to use
+> > them advertizing PANs through the beaconing feature.
+> > =20
+>=20
+> I still don't know how exactly those "leaves" and "non-leaves" are
+> acting here regarding the coordinator interfaces. If this is just a
+> bit here to set in the interface I am fine with it. But yea,
+> "relaying" feature is a project on its own, as we said previously.
+>=20
+> Another mail I was asking myself what a node interface is then,
+> currently it is a mesh interface with none of those 802.15.4 PAN
+> management functionality?
 
-These patches have been applied to the wpan-next tree and will be
-part of the next pull request to net-next. Thanks!
+Not "none", because I would expect a NODE to be able to perform minimal
+management operations, such as:
+- scanning
+- requesting an association
+But in no case it is supposed to:
+- send beacons
+- manage associations
+- be the PAN coordinator
+- act as a relay
 
-regards
-Stefan Schmidt
+> Or can it act also as a "leave"
+> coordinator... I am not sure about that.
+>=20
+> However I think we can think about something scheduled later as we can
+> still decide later if we really want that "node" can do that.
+> Regarding to 6LoWPAN I think the current type what "node" interface is
+> as a just a node in a mesh is required, it might depends on if you
+> want routing on IP or "relaying" on MAC (mesh-over vs mesh-under), but
+> I never saw mesh-under in 6LoWPAN.
+
+Yes.
+
+>=20
+> Acked-by: Alexander Aring <aahringo@redhat.com>
+
+Thanks!
+
+Miqu=C3=A8l
