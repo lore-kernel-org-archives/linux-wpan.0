@@ -2,106 +2,68 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DC71C4321E
-	for <linux-wpan@archiver.kernel.org>; Fri, 18 Nov 2022 22:11:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C18DC433FE
+	for <linux-wpan@archiver.kernel.org>; Sun, 20 Nov 2022 07:50:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231623AbiKRWLW (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Fri, 18 Nov 2022 17:11:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36122 "EHLO
+        id S229524AbiKTHuy (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Sun, 20 Nov 2022 02:50:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33894 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229452AbiKRWKv (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Fri, 18 Nov 2022 17:10:51 -0500
-Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E72A31EE2;
-        Fri, 18 Nov 2022 14:10:49 -0800 (PST)
-Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id 9FC43FF809;
-        Fri, 18 Nov 2022 22:10:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1668809448;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=1olgmhX/nzQdYt9m5dIM1iGrl1O8ewDG6zq4MYn3qUs=;
-        b=RlPsjtZ0HyJXBTrGUSLctWhqlOirUbCfUpFAPvFjqhGQCoAYR64Phz3WrBkysmO53WKJ0o
-        xweXsZ2A6/dR179l4/8s1PX1EYzcZoxvOXncH5Mqeng4wRaTWTowRVqVM9RX/2KSAK4pSN
-        IRQr8Y5xrOKUg5/NxUyYXSeNgTjXcAFQr7JP8gUt2pZcuKXgGiDVAz630XMVncWeY2yKsD
-        pJO5p2yzdYOOaWZ+hzZdO042BUxQZfn9K/FVnWkIATV7PGUW5tLjbOnbyhtHfqhfaZOm2z
-        IHK77zpxm2CvlvhXTjOYb0tLwMQuW3j/lzol96hYGmWlahf69ViAiqXyI5OpAg==
-From:   Miquel Raynal <miquel.raynal@bootlin.com>
-To:     Alexander Aring <alex.aring@gmail.com>,
-        Stefan Schmidt <stefan@datenfreihafen.org>,
-        linux-wpan@vger.kernel.org
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
-        David Girault <david.girault@qorvo.com>,
-        Romuald Despres <romuald.despres@qorvo.com>,
-        Frederic Blain <frederic.blain@qorvo.com>,
-        Nicolas Schodet <nico@ni.fr.eu.org>,
-        Guilhem Imberton <guilhem.imberton@qorvo.com>,
-        Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-        Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: [PATCH wpan-next v2 2/2] mac802154: Trace the registration of new PANs
-Date:   Fri, 18 Nov 2022 23:10:41 +0100
-Message-Id: <20221118221041.1402445-3-miquel.raynal@bootlin.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20221118221041.1402445-1-miquel.raynal@bootlin.com>
-References: <20221118221041.1402445-1-miquel.raynal@bootlin.com>
+        with ESMTP id S229513AbiKTHux (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Sun, 20 Nov 2022 02:50:53 -0500
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C32BDA3409;
+        Sat, 19 Nov 2022 23:50:51 -0800 (PST)
+Received: from canpemm500006.china.huawei.com (unknown [172.30.72.53])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4NFN3f0VbdzmVx6;
+        Sun, 20 Nov 2022 15:50:22 +0800 (CST)
+Received: from localhost.localdomain (10.175.104.82) by
+ canpemm500006.china.huawei.com (7.192.105.130) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Sun, 20 Nov 2022 15:50:49 +0800
+From:   Ziyang Xuan <william.xuanziyang@huawei.com>
+To:     <varkabhadram@gmail.com>, <alex.aring@gmail.com>,
+        <stefan@datenfreihafen.org>, <davem@davemloft.net>,
+        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+        <linux-wpan@vger.kernel.org>, <netdev@vger.kernel.org>
+CC:     <linux-kernel@vger.kernel.org>
+Subject: [PATCH] ieee802154: cc2520: Fix error return code in cc2520_hw_init()
+Date:   Sun, 20 Nov 2022 15:50:46 +0800
+Message-ID: <20221120075046.2213633-1-william.xuanziyang@huawei.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.104.82]
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ canpemm500006.china.huawei.com (7.192.105.130)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-From: David Girault <david.girault@qorvo.com>
+In cc2520_hw_init(), if oscillator start failed, the error code
+should be returned.
 
-Add an internal trace when valid beacons are received.
-
-Signed-off-by: David Girault <david.girault@qorvo.com>
-Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
+Fixes: 0da6bc8cc341 ("ieee802154: cc2520: adds driver for TI CC2520 radio")
+Signed-off-by: Ziyang Xuan <william.xuanziyang@huawei.com>
 ---
- net/mac802154/trace.h | 25 +++++++++++++++++++++++++
- 1 file changed, 25 insertions(+)
+ drivers/net/ieee802154/cc2520.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/mac802154/trace.h b/net/mac802154/trace.h
-index df855c33daf2..689396d6c76a 100644
---- a/net/mac802154/trace.h
-+++ b/net/mac802154/trace.h
-@@ -264,6 +264,31 @@ TRACE_EVENT(802154_drv_set_promiscuous_mode,
- 		  BOOL_TO_STR(__entry->on))
- );
+diff --git a/drivers/net/ieee802154/cc2520.c b/drivers/net/ieee802154/cc2520.c
+index c69b87d3837d..edc769daad07 100644
+--- a/drivers/net/ieee802154/cc2520.c
++++ b/drivers/net/ieee802154/cc2520.c
+@@ -970,7 +970,7 @@ static int cc2520_hw_init(struct cc2520_private *priv)
  
-+TRACE_EVENT(802154_new_scan_event,
-+	TP_PROTO(struct ieee802154_coord_desc *desc),
-+	TP_ARGS(desc),
-+	TP_STRUCT__entry(
-+		__field(__le16, pan_id)
-+		__field(__le64, addr)
-+		__field(u8, channel)
-+		__field(u8, page)
-+	),
-+	TP_fast_assign(
-+		__entry->page = desc->page;
-+		__entry->channel = desc->channel;
-+		__entry->pan_id = desc->addr.pan_id;
-+		__entry->addr = desc->addr.extended_addr;
-+	),
-+	TP_printk("panid: %u, coord_addr: 0x%llx, page: %u, channel: %u",
-+		  __le16_to_cpu(__entry->pan_id), __le64_to_cpu(__entry->addr),
-+		  __entry->page, __entry->channel)
-+);
-+
-+DEFINE_EVENT(802154_new_scan_event, 802154_scan_event,
-+	TP_PROTO(struct ieee802154_coord_desc *desc),
-+	TP_ARGS(desc)
-+);
-+
- #endif /* !__MAC802154_DRIVER_TRACE || TRACE_HEADER_MULTI_READ */
- 
- #undef TRACE_INCLUDE_PATH
+ 		if (timeout-- <= 0) {
+ 			dev_err(&priv->spi->dev, "oscillator start failed!\n");
+-			return ret;
++			return -ETIMEDOUT;
+ 		}
+ 		udelay(1);
+ 	} while (!(status & CC2520_STATUS_XOSC32M_STABLE));
 -- 
-2.34.1
+2.25.1
 
