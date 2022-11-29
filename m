@@ -2,88 +2,113 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72BEDC4321E
-	for <linux-wpan@archiver.kernel.org>; Tue, 29 Nov 2022 14:10:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E941EC4321E
+	for <linux-wpan@archiver.kernel.org>; Tue, 29 Nov 2022 14:39:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235101AbiK2OKe (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 29 Nov 2022 09:10:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45194 "EHLO
+        id S235728AbiK2OjS (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 29 Nov 2022 09:39:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47236 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235017AbiK2OKN (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 29 Nov 2022 09:10:13 -0500
-X-Greylist: delayed 538 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 29 Nov 2022 06:10:03 PST
+        with ESMTP id S234350AbiK2OjQ (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 29 Nov 2022 09:39:16 -0500
 Received: from proxima.lasnet.de (proxima.lasnet.de [IPv6:2a01:4f8:121:31eb:3::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 190275BD5B;
-        Tue, 29 Nov 2022 06:10:02 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73CF131ECC;
+        Tue, 29 Nov 2022 06:39:15 -0800 (PST)
 Received: from [IPV6:2003:e9:d724:11f3:6a8a:fec:d223:2c22] (p200300e9d72411f36a8a0fecd2232c22.dip0.t-ipconnect.de [IPv6:2003:e9:d724:11f3:6a8a:fec:d223:2c22])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (4096 bits))
         (No client certificate requested)
         (Authenticated sender: stefan@datenfreihafen.org)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id DEF59C0BFA;
-        Tue, 29 Nov 2022 15:01:01 +0100 (CET)
+        by proxima.lasnet.de (Postfix) with ESMTPSA id 521C8C057B;
+        Tue, 29 Nov 2022 15:39:13 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
-        s=2021; t=1669730462;
+        s=2021; t=1669732753;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=tuLukpKCzhM0X/X1MjQzYoVSveA4A5uOI5pwQmS2Yko=;
-        b=PWj4aadTGc7Muu7Ij1ZF4trLwr4EbxZDcfGIFBJjAfUyqkR3cjqP+Vj05UJ63A2+sKs4EO
-        nZINuKkXOAsl3dWuYE5KUS925zFOFeuzclTV0y80W1+VgEkX9BTWbG66bjqbUaHXgeOxjn
-        R51wNW4vSHSscRQmNP566K1D/fj4nMwvzpTOGU8i+uhHFfUdMAecJf6ER2bnkqdQqt9Otm
-        /UsRKL+X+pzxk2QqL5JQTMNC8tx7ul1o8DDhIcWS88ZeQoYRiizJAg2HfcduAry+z0Nmxq
-        iBLeiZYJ/V7W3E5FvvGCIa1dPUyQGjHdiZvV52BzX0yPu8TYlAFsF3g0eqb5WA==
-Message-ID: <fdbc3c12-71c8-16da-6b69-eb235964fcd7@datenfreihafen.org>
-Date:   Tue, 29 Nov 2022 15:01:01 +0100
+        bh=vi+BCc3epThewqbv7ZyWexyjDCAHINiW4A+/6dOUFEg=;
+        b=H8BxjRCeDjG2Jc9QMhYVDB8ucWbeHUPvNDF59Pdg8sVJ+WtgIQNQ/wmIjUpDSHjgV9o0Kh
+        wxxJ67JND63opPw2FtkCb7XyUrVsIIdPQotwUKQ8idVqWVe1Ymil4FpvwxlWLCIdenIPvw
+        hLCR1KrA4uVa0/JqGQb63AwYoWYBW4pMijJfc55tctvdThBfQ2dULbLqZJW0SoZEcH/ehf
+        nVyZqivXCmxsV9lDiOrUJe2gnOU7+akR7gr0/q7Gmt3weTNYM6XWabCIOBYwCmJiwyGKnU
+        hOhVwaLF2CZQfXX67/B55e/u0hx10csXihblAc7AzOu0zgwaWe1WbVRnAM5xrg==
+Message-ID: <04f7bc30-618d-db22-4b8f-8753f60d26b9@datenfreihafen.org>
+Date:   Tue, 29 Nov 2022 15:39:13 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.5.0
-Subject: Re: [PATCH] ieee802154: cc2520: Fix error return code in
- cc2520_hw_init()
+Subject: Re: [PATCH wpan-next v3 0/2] IEEE 802.15.4 PAN discovery handling
 Content-Language: en-US
-To:     Ziyang Xuan <william.xuanziyang@huawei.com>,
-        varkabhadram@gmail.com, alex.aring@gmail.com, davem@davemloft.net,
-        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-        linux-wpan@vger.kernel.org, netdev@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org
-References: <20221120075046.2213633-1-william.xuanziyang@huawei.com>
+To:     Miquel Raynal <miquel.raynal@bootlin.com>,
+        Alexander Aring <alex.aring@gmail.com>,
+        linux-wpan@vger.kernel.org
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
+        David Girault <david.girault@qorvo.com>,
+        Romuald Despres <romuald.despres@qorvo.com>,
+        Frederic Blain <frederic.blain@qorvo.com>,
+        Nicolas Schodet <nico@ni.fr.eu.org>,
+        Guilhem Imberton <guilhem.imberton@qorvo.com>,
+        Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+References: <20221129135535.532513-1-miquel.raynal@bootlin.com>
 From:   Stefan Schmidt <stefan@datenfreihafen.org>
-In-Reply-To: <20221120075046.2213633-1-william.xuanziyang@huawei.com>
+In-Reply-To: <20221129135535.532513-1-miquel.raynal@bootlin.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
 Hello.
 
-On 20.11.22 08:50, Ziyang Xuan wrote:
-> In cc2520_hw_init(), if oscillator start failed, the error code
-> should be returned.
+On 29.11.22 14:55, Miquel Raynal wrote:
+> Hello,
 > 
-> Fixes: 0da6bc8cc341 ("ieee802154: cc2520: adds driver for TI CC2520 radio")
-> Signed-off-by: Ziyang Xuan <william.xuanziyang@huawei.com>
-> ---
->   drivers/net/ieee802154/cc2520.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
+>>>> Just a resent of the v2, rebased <<<
 > 
-> diff --git a/drivers/net/ieee802154/cc2520.c b/drivers/net/ieee802154/cc2520.c
-> index c69b87d3837d..edc769daad07 100644
-> --- a/drivers/net/ieee802154/cc2520.c
-> +++ b/drivers/net/ieee802154/cc2520.c
-> @@ -970,7 +970,7 @@ static int cc2520_hw_init(struct cc2520_private *priv)
->   
->   		if (timeout-- <= 0) {
->   			dev_err(&priv->spi->dev, "oscillator start failed!\n");
-> -			return ret;
-> +			return -ETIMEDOUT;
->   		}
->   		udelay(1);
->   	} while (!(status & CC2520_STATUS_XOSC32M_STABLE));
+> Last preparation step before the introduction of the scanning feature
+> (really): generic helpers to handle PAN discovery upon beacon
+> reception. We need to tell user space about the discoveries.
+> 
+> In all the past, current and future submissions, David and Romuald from
+> Qorvo are credited in various ways (main author, co-author,
+> suggested-by) depending of the amount of rework that was involved on
+> each patch, reflecting as much as possible the open-source guidelines we
+> follow in the kernel. All this effort is made possible thanks to Qorvo
+> Inc which is pushing towards a featureful upstream WPAN support.
+> 
+> Cheers,
+> Miquèl
+> 
+> Changes in v3:
+> * Rebased on wpan-next/master.
+> 
+> Changes in v2:
+> * Dropped all the logic around the knowledge of PANs: we forward all
+>    beacons received to userspace and let the user decide whether or not
+>    the coordinator is new or not.
+> * Changed the coordinator descriptor address member to a proper
+>    structure (not a pointer).
+> 
+> David Girault (1):
+>    mac802154: Trace the registration of new PANs
+> 
+> Miquel Raynal (1):
+>    ieee802154: Advertize coordinators discovery
+> 
+>   include/net/cfg802154.h   |  18 +++++++
+>   include/net/nl802154.h    |  43 ++++++++++++++++
+>   net/ieee802154/nl802154.c | 103 ++++++++++++++++++++++++++++++++++++++
+>   net/ieee802154/nl802154.h |   2 +
+>   net/mac802154/trace.h     |  25 +++++++++
+>   5 files changed, 191 insertions(+)
+> 
 
-This patch has been applied to the wpan tree and will be
-part of the next pull request to net. Thanks!
+These patches have been applied to the wpan-next tree and will be
+part of the next pull request to net-next. Thanks!
 
 regards
 Stefan Schmidt
