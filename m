@@ -2,38 +2,37 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03648C4167B
-	for <linux-wpan@archiver.kernel.org>; Tue, 29 Nov 2022 14:49:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A910C433FE
+	for <linux-wpan@archiver.kernel.org>; Tue, 29 Nov 2022 16:02:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235798AbiK2OtG (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 29 Nov 2022 09:49:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52862 "EHLO
+        id S236068AbiK2QCe (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 29 Nov 2022 11:02:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53732 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232502AbiK2Osp (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 29 Nov 2022 09:48:45 -0500
-Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::227])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D030528A1;
-        Tue, 29 Nov 2022 06:47:52 -0800 (PST)
+        with ESMTP id S236176AbiK2QCD (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 29 Nov 2022 11:02:03 -0500
+Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::225])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11DAB69DC0;
+        Tue, 29 Nov 2022 08:00:52 -0800 (PST)
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id E498920018;
-        Tue, 29 Nov 2022 14:47:48 +0000 (UTC)
+        by mail.gandi.net (Postfix) with ESMTPSA id 6A36C1C0014;
+        Tue, 29 Nov 2022 16:00:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1669733271;
+        t=1669737651;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=dulSq1c/DoxOUidatg7Spr6v5kpSMwlX990B05mDQag=;
-        b=fI7yGwAhwYpAeKd12R0FCmhDiNNVqns0yNmovQd2ZidHFGQqkcId41MmxNFkDTGeeA6u/O
-        atHSgNesb+VkI6l4/FVL6SwC5+2VEmN0wIlQMNcqeQoP6JKxeGM+c09w+ePDtWylCX3Set
-        Ulv1+UMTfAQNVrzbxVRLAuxk71rOD7csMOEzjV4H7pEUhFxAKCrvzjYt7wcvQOFtKlD4YE
-        CX9j8wbqUcAWIgL/FcwMRXZyLwJu0elevOIe368WymVud7SKSEdzGOMzFKV7XUs9P4v17/
-        WvGgzsJ/lzU3ut6vyxnLcJg+b+kODlGBYRLzcOMmCmB/j9WpZf8rGQPr3un2fQ==
-Date:   Tue, 29 Nov 2022 15:47:47 +0100
+         content-transfer-encoding:content-transfer-encoding;
+        bh=PWrVBrgr0qlUu/E/9JfiYW88SJuanAXsEpngMFuZaJE=;
+        b=cGvAEddJUuSZ1yjGX/M0/e7WRqEQP20rZybyKWR+LZBDtidXPy22Vj9xbDdqHFIaPrIDfq
+        l5BoCg+gIp2s6ZCvh+vdfq5RtgXERCCm5UJ5ymRmd2cVi/lk57b46NEYJIrzNMIXuOEPiV
+        uOArpPPYTSHorX8KTNZtNl3xrSmSL6jHDmsB5NWvMvAqz6SpmBK8pAGgrHPQYW5UwpWjmY
+        IgjQcleA+t3mLJrOwNoL60ebi3cVTR43Y8MbODoVk5x1C11Uc4Tf/S+mpwMiVZPetHYGbR
+        tP0Qe68qQC88Zkn6IWXYDs48q7gO6Lxnc0BlOFTIBIvCyGkQcmR2Uvq+D8EM9A==
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
-To:     Stefan Schmidt <stefan@datenfreihafen.org>
-Cc:     Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
+To:     Alexander Aring <alex.aring@gmail.com>,
+        Stefan Schmidt <stefan@datenfreihafen.org>,
+        linux-wpan@vger.kernel.org
+Cc:     "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
         Paolo Abeni <pabeni@redhat.com>,
         Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
@@ -42,76 +41,68 @@ Cc:     Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org,
         Frederic Blain <frederic.blain@qorvo.com>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
         Guilhem Imberton <guilhem.imberton@qorvo.com>,
-        Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH wpan-next v3 0/2] IEEE 802.15.4 PAN discovery handling
-Message-ID: <20221129154747.572d4da7@xps-13>
-In-Reply-To: <04f7bc30-618d-db22-4b8f-8753f60d26b9@datenfreihafen.org>
-References: <20221129135535.532513-1-miquel.raynal@bootlin.com>
-        <04f7bc30-618d-db22-4b8f-8753f60d26b9@datenfreihafen.org>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+        Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+        Miquel Raynal <miquel.raynal@bootlin.com>
+Subject: [PATCH wpan-next 0/6] IEEE 802.15.4 passive scan support
+Date:   Tue, 29 Nov 2022 17:00:40 +0100
+Message-Id: <20221129160046.538864-1-miquel.raynal@bootlin.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi Stefan,
+Hello,
 
-stefan@datenfreihafen.org wrote on Tue, 29 Nov 2022 15:39:13 +0100:
+We now have the infrastructure to report beacons/PANs, we also have the
+capability to transmit MLME commands synchronously. It is time to use
+these to implement a proper scan implementation.
 
-> Hello.
->=20
-> On 29.11.22 14:55, Miquel Raynal wrote:
-> > Hello,
-> >  =20
-> >>>> Just a resent of the v2, rebased <<< =20
-> >=20
-> > Last preparation step before the introduction of the scanning feature
-> > (really): generic helpers to handle PAN discovery upon beacon
-> > reception. We need to tell user space about the discoveries.
-> >=20
-> > In all the past, current and future submissions, David and Romuald from
-> > Qorvo are credited in various ways (main author, co-author,
-> > suggested-by) depending of the amount of rework that was involved on
-> > each patch, reflecting as much as possible the open-source guidelines we
-> > follow in the kernel. All this effort is made possible thanks to Qorvo
-> > Inc which is pushing towards a featureful upstream WPAN support.
-> >=20
-> > Cheers,
-> > Miqu=C3=A8l
-> >=20
-> > Changes in v3:
-> > * Rebased on wpan-next/master.
-> >=20
-> > Changes in v2:
-> > * Dropped all the logic around the knowledge of PANs: we forward all
-> >    beacons received to userspace and let the user decide whether or not
-> >    the coordinator is new or not.
-> > * Changed the coordinator descriptor address member to a proper
-> >    structure (not a pointer).
-> >=20
-> > David Girault (1):
-> >    mac802154: Trace the registration of new PANs
-> >=20
-> > Miquel Raynal (1):
-> >    ieee802154: Advertize coordinators discovery
-> >=20
-> >   include/net/cfg802154.h   |  18 +++++++
-> >   include/net/nl802154.h    |  43 ++++++++++++++++
-> >   net/ieee802154/nl802154.c | 103 ++++++++++++++++++++++++++++++++++++++
-> >   net/ieee802154/nl802154.h |   2 +
-> >   net/mac802154/trace.h     |  25 +++++++++
-> >   5 files changed, 191 insertions(+)
-> >  =20
->=20
-> These patches have been applied to the wpan-next tree and will be
-> part of the next pull request to net-next. Thanks!
+There are a few side-changes which are necessary for the soft MAC scan
+implementation to compile/work, but nothing big. The two main changes
+are:
+* The introduction of a user API for managing scans.
+* The soft MAC implementation of a scan.
 
-Perfect, thanks for your responsiveness!
+In all the past, current and future submissions, David and Romuald from
+Qorvo are credited in various ways (main author, co-author,
+suggested-by) depending of the amount of rework that was involved on
+each patch, reflecting as much as possible the open-source guidelines we
+follow in the kernel. All this effort is made possible thanks to Qorvo
+Inc which is pushing towards a featureful upstream WPAN support.
 
-Next series with proper passive scan support is coming.
+Cheers,
+Miquèl
 
-Thanks,
-Miqu=C3=A8l
+Miquel Raynal (6):
+  ieee802154: Add support for user scanning requests
+  ieee802154: Define a beacon frame header
+  ieee802154: Introduce a helper to validate a channel
+  mac802154: Prepare forcing specific symbol duration
+  mac802154: Add MLME Tx locked helpers
+  mac802154: Handle passive scanning
+
+ include/linux/ieee802154.h      |   7 +
+ include/net/cfg802154.h         |  55 +++++-
+ include/net/ieee802154_netdev.h |  36 ++++
+ include/net/nl802154.h          |  49 ++++++
+ net/ieee802154/nl802154.c       | 218 +++++++++++++++++++++++-
+ net/ieee802154/nl802154.h       |   3 +
+ net/ieee802154/rdev-ops.h       |  28 ++++
+ net/ieee802154/trace.h          |  40 +++++
+ net/mac802154/Makefile          |   2 +-
+ net/mac802154/cfg.c             |  33 +++-
+ net/mac802154/ieee802154_i.h    |  43 ++++-
+ net/mac802154/iface.c           |   3 +
+ net/mac802154/main.c            |  36 ++--
+ net/mac802154/rx.c              |  36 +++-
+ net/mac802154/scan.c            | 286 ++++++++++++++++++++++++++++++++
+ net/mac802154/tx.c              |  42 +++--
+ 16 files changed, 885 insertions(+), 32 deletions(-)
+ create mode 100644 net/mac802154/scan.c
+
+-- 
+2.34.1
+
