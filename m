@@ -2,47 +2,39 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA976C4321E
-	for <linux-wpan@archiver.kernel.org>; Tue, 29 Nov 2022 12:41:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9493C4321E
+	for <linux-wpan@archiver.kernel.org>; Tue, 29 Nov 2022 13:13:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234274AbiK2Mlj (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 29 Nov 2022 07:41:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34530 "EHLO
+        id S233141AbiK2NNi (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 29 Nov 2022 08:13:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52246 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232559AbiK2Mli (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 29 Nov 2022 07:41:38 -0500
-Received: from proxima.lasnet.de (proxima.lasnet.de [78.47.171.185])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FBF65EFB6;
-        Tue, 29 Nov 2022 04:41:37 -0800 (PST)
-Received: from [IPV6:2003:e9:d724:11f3:6a8a:fec:d223:2c22] (p200300e9d72411f36a8a0fecd2232c22.dip0.t-ipconnect.de [IPv6:2003:e9:d724:11f3:6a8a:fec:d223:2c22])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: stefan@datenfreihafen.org)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id C577EC0438;
-        Tue, 29 Nov 2022 13:41:34 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
-        s=2021; t=1669725695;
+        with ESMTP id S233233AbiK2NMw (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 29 Nov 2022 08:12:52 -0500
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3DEF627C7;
+        Tue, 29 Nov 2022 05:11:41 -0800 (PST)
+Received: (Authenticated sender: miquel.raynal@bootlin.com)
+        by mail.gandi.net (Postfix) with ESMTPSA id 957AF24000C;
+        Tue, 29 Nov 2022 13:11:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+        t=1669727481;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=hgpY+NqQsulFa+2pWd5BcoI5h8CmCSGexzhvrO3xo+g=;
-        b=UHFUD0ggPNPLNVNfcd+a8r3l8qeqyshayAU+e30y4H4cxefuUNRDTzVj4kX/8OFD5m2rbK
-        KqPHaw+ThfqaJNkMfAKPNGzl9tq7voBfb8uAcF9JtsWhyX3qM4yKk1aGCMEkOP8RMUJSOt
-        XdgbD+ColMiE/53eFFanXZaMAv2DD3Uub4a4FM1KIg/jlCHFdIicea7heQedhdyL3Fird9
-        JZ+zFC3stx6OSC3wnH/UP9BAim8dd88puR5X38vz8RTHolOADl12mp8jvR6yjtFHHIo26m
-        QNA3ewa9FOQgBV04OyE5nsGnPgCjtsgfsLFYlXmc4WxArJA/9XsRmXhK+6Bflg==
-Message-ID: <ff0e20e9-687c-75f7-12ea-c927df39a1db@datenfreihafen.org>
-Date:   Tue, 29 Nov 2022 13:41:32 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Subject: Re: [PATCH wpan-next v2 0/2] IEEE 802.15.4 PAN discovery handling
-Content-Language: en-US
-To:     Miquel Raynal <miquel.raynal@bootlin.com>,
-        Alexander Aring <aahringo@redhat.com>
-Cc:     Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org,
+        bh=Lrk1obgdUKvQi0CZTnoZMlhVMRgBpVKOFvv7Qmw9fjY=;
+        b=TC/SjJq+PbLbVzoh2CtODMLF6ebVC1ekGk9qpfTQb8B0cf1vkY4OYLLpngY0BitxL+WuUK
+        93S+rTdx9Y0uFwqtICZesmR+Cxa9hz1TsGyPyZn00yxQbXXp3pQySCIMXrh5uvprKiMsSl
+        unCfzInDw9wJi5n5mxSoVT8l9dfxV1z9PBAWHR7kKVyjUbRRkucg9XvYK6oHfzCo/pD+wG
+        Olk7gfPJim8rgkCGwAQQdeYLkWeKDi+PKp+FKg4Aa6Z0rj+Zj2ocXMqeqMER2bu4xtOh7L
+        X3RLFxHbCG7dCFBfYg6gMLI8Bgw6CMI5iMzEo2K552yLV/sPu+rjbiWk0DbBLw==
+Date:   Tue, 29 Nov 2022 14:11:14 +0100
+From:   Miquel Raynal <miquel.raynal@bootlin.com>
+To:     Stefan Schmidt <stefan@datenfreihafen.org>
+Cc:     Alexander Aring <aahringo@redhat.com>,
+        Alexander Aring <alex.aring@gmail.com>,
+        linux-wpan@vger.kernel.org,
         "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
         Paolo Abeni <pabeni@redhat.com>,
@@ -53,67 +45,83 @@ Cc:     Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org,
         Nicolas Schodet <nico@ni.fr.eu.org>,
         Guilhem Imberton <guilhem.imberton@qorvo.com>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH wpan-next v2 0/2] IEEE 802.15.4 PAN discovery handling
+Message-ID: <20221129141114.2b78240b@xps-13>
+In-Reply-To: <ff0e20e9-687c-75f7-12ea-c927df39a1db@datenfreihafen.org>
 References: <20221118221041.1402445-1-miquel.raynal@bootlin.com>
- <CAK-6q+iLkYuz5csmbLt=tKcfGmdNGP+Sm42+DQRu5180jafEGw@mail.gmail.com>
- <20221129090321.132a4439@xps-13>
-From:   Stefan Schmidt <stefan@datenfreihafen.org>
-In-Reply-To: <20221129090321.132a4439@xps-13>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+        <CAK-6q+iLkYuz5csmbLt=tKcfGmdNGP+Sm42+DQRu5180jafEGw@mail.gmail.com>
+        <20221129090321.132a4439@xps-13>
+        <ff0e20e9-687c-75f7-12ea-c927df39a1db@datenfreihafen.org>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello.
+Hi Stefan,
 
-On 29.11.22 09:03, Miquel Raynal wrote:
-> Hi Alexander,
-> 
-> aahringo@redhat.com wrote on Mon, 28 Nov 2022 17:11:38 -0500:
-> 
->> Hi,
->>
->> On Fri, Nov 18, 2022 at 5:13 PM Miquel Raynal <miquel.raynal@bootlin.com> wrote:
->>>
->>> Hello,
->>>
->>> Last preparation step before the introduction of the scanning feature
->>> (really): generic helpers to handle PAN discovery upon beacon
->>> reception. We need to tell user space about the discoveries.
->>>
->>> In all the past, current and future submissions, David and Romuald from
->>> Qorvo are credited in various ways (main author, co-author,
->>> suggested-by) depending of the amount of rework that was involved on
->>> each patch, reflecting as much as possible the open-source guidelines we
->>> follow in the kernel. All this effort is made possible thanks to Qorvo
->>> Inc which is pushing towards a featureful upstream WPAN support.
->>>   
->>
->> Acked-by: Alexander Aring <aahringo@redhat.com>
->>
->> I am sorry, I saw this series today. Somehow I mess up my mails if we
->> are still writing something on v1 but v2 is already submitted. I will
->> try to keep up next time.
-> 
-> Haha I was asking myself wether or not you saw it, no problem :) I did
-> send it after your main review but we continued discussing on v1 (about
-> the preambles) so I did not ping for the time the discussion would
-> settle.
+stefan@datenfreihafen.org wrote on Tue, 29 Nov 2022 13:41:32 +0100:
 
-I was trying to apply these two patches, but the first one does not apply:
+> Hello.
+>=20
+> On 29.11.22 09:03, Miquel Raynal wrote:
+> > Hi Alexander,
+> >=20
+> > aahringo@redhat.com wrote on Mon, 28 Nov 2022 17:11:38 -0500:
+> >  =20
+> >> Hi,
+> >>
+> >> On Fri, Nov 18, 2022 at 5:13 PM Miquel Raynal <miquel.raynal@bootlin.c=
+om> wrote: =20
+> >>>
+> >>> Hello,
+> >>>
+> >>> Last preparation step before the introduction of the scanning feature
+> >>> (really): generic helpers to handle PAN discovery upon beacon
+> >>> reception. We need to tell user space about the discoveries.
+> >>>
+> >>> In all the past, current and future submissions, David and Romuald fr=
+om
+> >>> Qorvo are credited in various ways (main author, co-author,
+> >>> suggested-by) depending of the amount of rework that was involved on
+> >>> each patch, reflecting as much as possible the open-source guidelines=
+ we
+> >>> follow in the kernel. All this effort is made possible thanks to Qorvo
+> >>> Inc which is pushing towards a featureful upstream WPAN support. =20
+> >>>   >> =20
+> >> Acked-by: Alexander Aring <aahringo@redhat.com>
+> >>
+> >> I am sorry, I saw this series today. Somehow I mess up my mails if we
+> >> are still writing something on v1 but v2 is already submitted. I will
+> >> try to keep up next time. =20
+> >=20
+> > Haha I was asking myself wether or not you saw it, no problem :) I did
+> > send it after your main review but we continued discussing on v1 (about
+> > the preambles) so I did not ping for the time the discussion would
+> > settle. =20
+>=20
+> I was trying to apply these two patches, but the first one does not apply:
+>=20
+>=20
+> Failed to apply patch:
+> error: patch failed: include/net/nl802154.h:58
+> error: include/net/nl802154.h: patch does not apply
+> hint: Use 'git am --show-current-patch=3Ddiff' to see the failed patch
+> Applying: ieee802154: Advertize coordinators discovery
+> Patch failed at 0001 ieee802154: Advertize coordinators discovery
+>=20
+> It seems you need a rebase as there is commit 8254393663f9b8cb8b84cdce1ab=
+b118833c22a54 which touches this area of the file and removes a comment and=
+ ifdef. Should be fine to go in after the rebase.
 
+Oh crap, this is gonna conflict with a dozen of my patches /o\. Not hard
+to solve though. Let me fix this by moving all new commands in this
+header above the security commands.
 
-Failed to apply patch:
-error: patch failed: include/net/nl802154.h:58
-error: include/net/nl802154.h: patch does not apply
-hint: Use 'git am --show-current-patch=diff' to see the failed patch
-Applying: ieee802154: Advertize coordinators discovery
-Patch failed at 0001 ieee802154: Advertize coordinators discovery
+I'll also have to update the wpan tools to use the same commands.
 
-It seems you need a rebase as there is commit 
-8254393663f9b8cb8b84cdce1abb118833c22a54 which touches this area of the 
-file and removes a comment and ifdef. Should be fine to go in after the 
-rebase.
-
-regards
-Stefan Schmidt
+Thanks,
+Miqu=C3=A8l
