@@ -2,76 +2,72 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75FEAC4332F
-	for <linux-wpan@archiver.kernel.org>; Sun,  4 Dec 2022 22:45:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8231FC4332F
+	for <linux-wpan@archiver.kernel.org>; Sun,  4 Dec 2022 22:50:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230300AbiLDWpf (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Sun, 4 Dec 2022 17:45:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56934 "EHLO
+        id S230453AbiLDWu6 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Sun, 4 Dec 2022 17:50:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60294 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229970AbiLDWpe (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Sun, 4 Dec 2022 17:45:34 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0150EBE
-        for <linux-wpan@vger.kernel.org>; Sun,  4 Dec 2022 14:44:38 -0800 (PST)
+        with ESMTP id S230463AbiLDWuy (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Sun, 4 Dec 2022 17:50:54 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDE8460E9
+        for <linux-wpan@vger.kernel.org>; Sun,  4 Dec 2022 14:49:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1670193878;
+        s=mimecast20190719; t=1670194191;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=cDvp/36klGwDyLue/cazWo2NSGv84oNLZObnyySxhz8=;
-        b=X5wRU8raZkJlPIXKwe1O4yBGYPtw55AcETRuelwlmtzaHJavMUd5frJfAi/nS1mfX04yzF
-        cAFnLVAR5JXyobmPDunABEJHrGX3UJxj9CdWUzHmbuzVdJgXjTRthbwzESt2RJXqgdv5Vo
-        OHKKQGTZCu0I+/6UuxAfp9kNf24OTr4=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=UAH0a91c7U1jqtpok3gsbLLRM6v87SVVxbB37wK7DIA=;
+        b=f+6kzS7DRNIPG5uV8d3yMaN3jkgYyxJlPS2MojefeXKF5/Nij5BOxXYA1XNU+SuI79nttV
+        S1GAiwlbCI5qUaPViwOrnH2we/syEnMcz4H/CLq8UsyGHPUwNfq/TzRCw5a58c2wMe2hQM
+        oQGRWXs7MaPgWDq6IVao52wWn2JhM9Q=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-401-BHLE6YvsPvmgCHVh683J4g-1; Sun, 04 Dec 2022 17:44:36 -0500
-X-MC-Unique: BHLE6YvsPvmgCHVh683J4g-1
-Received: by mail-ed1-f69.google.com with SMTP id m13-20020a056402510d00b0046913fa9291so4603312edd.6
-        for <linux-wpan@vger.kernel.org>; Sun, 04 Dec 2022 14:44:36 -0800 (PST)
+ us-mta-168-JqClyYiHNPaKqIubqjGMFQ-1; Sun, 04 Dec 2022 17:49:47 -0500
+X-MC-Unique: JqClyYiHNPaKqIubqjGMFQ-1
+Received: by mail-ed1-f72.google.com with SMTP id z4-20020a05640240c400b0046c51875c17so2176031edb.1
+        for <linux-wpan@vger.kernel.org>; Sun, 04 Dec 2022 14:49:47 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=cDvp/36klGwDyLue/cazWo2NSGv84oNLZObnyySxhz8=;
-        b=cH7+qVDEXvTYASoNvHM8+Fl77hAnfycGfYxik6E+GJdEuXS2kcc9lHQ2lNJ8S2O6M3
-         wqtp4tQf/aYGqtQDMxKhuiVfPn8qQfAGiaC/esVyXMqs0cX/TZRu5Q7wWQLzncMX5lP0
-         Uki7q7y64tqnMOhfpi/PHQZQnKP3xWhLUyUad8BVe2XUPSxU6t7aPPhF/QxiIvVPqiVm
-         vSkEUOxfSQaQSafVEzKEWcQd5xzlcwDtEXRDWUHlCl95FBRYqISjacUFkgxXto8Ry31B
-         RvyHEvrTU5xh4EQvNu9vh8bx1ZkivwbMN4CSFy9/9iLyM49XbTJ/MRuzvl7ncbACFPN9
-         WmTQ==
-X-Gm-Message-State: ANoB5pmEN+ypC85CA4+L0rH/mM03flbEsE3friH5TFABwh1crPyXNHkN
-        3hgPBa8Wr768wMa7/i7FyCBHDYAWIREzQkGgksgS1EDCYALKCsOj1wut+Po6IrYiCdsUi1/7q05
-        GV/yb9cKOAj1ToCmZiPsPw3MCq7VbxuSiGxjiHA==
-X-Received: by 2002:a17:906:5213:b0:7b6:12ee:b7fc with SMTP id g19-20020a170906521300b007b612eeb7fcmr17284036ejm.265.1670193875674;
-        Sun, 04 Dec 2022 14:44:35 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf6kCdJcNQRRfjxBIFdzd1cFTpGwWUJ6sBNgrUju/qGfG0CbWm8k/QieZ0liB9R8ByDs4p5cOh8tp5oPGwuODws=
-X-Received: by 2002:a17:906:5213:b0:7b6:12ee:b7fc with SMTP id
- g19-20020a170906521300b007b612eeb7fcmr17284013ejm.265.1670193875449; Sun, 04
- Dec 2022 14:44:35 -0800 (PST)
+        bh=UAH0a91c7U1jqtpok3gsbLLRM6v87SVVxbB37wK7DIA=;
+        b=lOjkVNhkPLcQwdzXbUvJABSbzv2tiQlLyPe6PGu7jbm+GUXU+4JXXaWl7F9kYa3XLe
+         Hw2bXeEZVxux4LBb2jnDxDaLSnJdLP5/nopLTtfpi53Sz5zN4Pasx1jKqDckyPOhxyu7
+         yi/dhiNbQI8H/SAnZFofLehaGJzY6T6w9p7NIvAVvCH1reISgGYuqypetV2gsbASs3UP
+         LgG04g3Ey78ajAAl2EHtgbWJsJ2O/sy9Pxbd3H6qBD7IRNVSl0kU3MWpRkjLlzjTbX+z
+         qrEVcPWIN5t2/HbQoELel0tiJ4+6Z3JaVYNQB2J7JMq/otbrx8TH2mGU5tDgiaCO7IjE
+         DViA==
+X-Gm-Message-State: ANoB5pl3fiuPlV/8zUpoBAQwMZqTHu5h+C7bIAnHyA1YJe0i7i0IT512
+        TUEsMPsIGR2X1o5TeVU/L9rQM+ELHxQT+uvGyXbeXsJFpIthRog+zDyVbNhIi6/i1fKqLWZAGNL
+        pw/72majwFdPtf7CB54AgYO9AKh+8MCf/aK5KiA==
+X-Received: by 2002:a17:906:698f:b0:78d:93b1:b3ba with SMTP id i15-20020a170906698f00b0078d93b1b3bamr69575386ejr.66.1670194186291;
+        Sun, 04 Dec 2022 14:49:46 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf7TZ3aOChwOEI1M64XGnQEXCszIrZ0w3nmS13wa7e/xB9FJwTErCNwaGXgqxtnrEcH0zUQa48CYQ/nOY2Jts2Q=
+X-Received: by 2002:a17:906:698f:b0:78d:93b1:b3ba with SMTP id
+ i15-20020a170906698f00b0078d93b1b3bamr69575372ejr.66.1670194186091; Sun, 04
+ Dec 2022 14:49:46 -0800 (PST)
 MIME-Version: 1.0
-References: <20221129160046.538864-1-miquel.raynal@bootlin.com> <20221129160046.538864-2-miquel.raynal@bootlin.com>
-In-Reply-To: <20221129160046.538864-2-miquel.raynal@bootlin.com>
+References: <20221130091705.1831140-1-weiyongjun@huaweicloud.com>
+In-Reply-To: <20221130091705.1831140-1-weiyongjun@huaweicloud.com>
 From:   Alexander Aring <aahringo@redhat.com>
-Date:   Sun, 4 Dec 2022 17:44:24 -0500
-Message-ID: <CAK-6q+hjXKmOrf-p=hRzuD=4pOJeWNUu46iU8YAVL4BqWC437A@mail.gmail.com>
-Subject: Re: [PATCH wpan-next 1/6] ieee802154: Add support for user scanning requests
-To:     Miquel Raynal <miquel.raynal@bootlin.com>
+Date:   Sun, 4 Dec 2022 17:49:34 -0500
+Message-ID: <CAK-6q+gN9d2_=bN9tvCqCxSbymMfyJjF0j=gj4kUbi-bfSnF4g@mail.gmail.com>
+Subject: Re: [PATCH wpan] mac802154: fix missing INIT_LIST_HEAD in ieee802154_if_add()
+To:     Wei Yongjun <weiyongjun@huaweicloud.com>
 Cc:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
-        linux-wpan@vger.kernel.org,
         "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
         Jakub Kicinski <kuba@kernel.org>,
         Paolo Abeni <pabeni@redhat.com>,
-        Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
-        David Girault <david.girault@qorvo.com>,
-        Romuald Despres <romuald.despres@qorvo.com>,
-        Frederic Blain <frederic.blain@qorvo.com>,
-        Nicolas Schodet <nico@ni.fr.eu.org>,
-        Guilhem Imberton <guilhem.imberton@qorvo.com>,
-        Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+        Marcel Holtmann <marcel@holtmann.org>,
+        Wei Yongjun <weiyongjun1@huawei.com>,
+        linux-wpan@vger.kernel.org, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
@@ -79,113 +75,37 @@ X-Mailing-List: linux-wpan@vger.kernel.org
 
 Hi,
 
-On Tue, Nov 29, 2022 at 11:02 AM Miquel Raynal
-<miquel.raynal@bootlin.com> wrote:
+On Wed, Nov 30, 2022 at 4:19 AM Wei Yongjun <weiyongjun@huaweicloud.com> wrote:
 >
-> The ieee802154 layer should be able to scan a set of channels in order
-> to look for beacons advertizing PANs. Supporting this involves adding
-> two user commands: triggering scans and aborting scans. The user should
-> also be notified when a new beacon is received and also upon scan
-> termination.
+> From: Wei Yongjun <weiyongjun1@huawei.com>
 >
-> A scan request structure is created to list the requirements and to be
-> accessed asynchronously when changing channels or receiving beacons.
+> Kernel fault injection test reports null-ptr-deref as follows:
 >
-> Mac layers may now implement the ->trigger_scan() and ->abort_scan()
-> hooks.
+> BUG: kernel NULL pointer dereference, address: 0000000000000008
+> RIP: 0010:cfg802154_netdev_notifier_call+0x120/0x310 include/linux/list.h:114
+> Call Trace:
+>  <TASK>
+>  raw_notifier_call_chain+0x6d/0xa0 kernel/notifier.c:87
+>  call_netdevice_notifiers_info+0x6e/0xc0 net/core/dev.c:1944
+>  unregister_netdevice_many_notify+0x60d/0xcb0 net/core/dev.c:1982
+>  unregister_netdevice_queue+0x154/0x1a0 net/core/dev.c:10879
+>  register_netdevice+0x9a8/0xb90 net/core/dev.c:10083
+>  ieee802154_if_add+0x6ed/0x7e0 net/mac802154/iface.c:659
+>  ieee802154_register_hw+0x29c/0x330 net/mac802154/main.c:229
+>  mcr20a_probe+0xaaa/0xcb1 drivers/net/ieee802154/mcr20a.c:1316
 >
-> Co-developed-by: David Girault <david.girault@qorvo.com>
-> Signed-off-by: David Girault <david.girault@qorvo.com>
-> Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
-> ---
->  include/linux/ieee802154.h |   3 +
->  include/net/cfg802154.h    |  25 +++++
->  include/net/nl802154.h     |  49 +++++++++
->  net/ieee802154/nl802154.c  | 215 +++++++++++++++++++++++++++++++++++++
->  net/ieee802154/nl802154.h  |   3 +
->  net/ieee802154/rdev-ops.h  |  28 +++++
->  net/ieee802154/trace.h     |  40 +++++++
->  7 files changed, 363 insertions(+)
+> ieee802154_if_add() allocates wpan_dev as netdev's private data, but not
+> init the list in struct wpan_dev. cfg802154_netdev_notifier_call() manage
+> the list when device register/unregister, and may lead to null-ptr-deref.
 >
-> diff --git a/include/linux/ieee802154.h b/include/linux/ieee802154.h
-> index 0303eb84d596..b22e4147d334 100644
-> --- a/include/linux/ieee802154.h
-> +++ b/include/linux/ieee802154.h
-> @@ -44,6 +44,9 @@
->  #define IEEE802154_SHORT_ADDR_LEN      2
->  #define IEEE802154_PAN_ID_LEN          2
+> Use INIT_LIST_HEAD() on it to initialize it correctly.
 >
-> +/* Duration in superframe order */
-> +#define IEEE802154_MAX_SCAN_DURATION   14
-> +#define IEEE802154_ACTIVE_SCAN_DURATION        15
->  #define IEEE802154_LIFS_PERIOD         40
->  #define IEEE802154_SIFS_PERIOD         12
->  #define IEEE802154_MAX_SIFS_FRAME_SIZE 18
-> diff --git a/include/net/cfg802154.h b/include/net/cfg802154.h
-> index d09c393d229f..76d4f95e9974 100644
-> --- a/include/net/cfg802154.h
-> +++ b/include/net/cfg802154.h
-> @@ -18,6 +18,7 @@
->
->  struct wpan_phy;
->  struct wpan_phy_cca;
-> +struct cfg802154_scan_request;
->
->  #ifdef CONFIG_IEEE802154_NL802154_EXPERIMENTAL
->  struct ieee802154_llsec_device_key;
-> @@ -67,6 +68,10 @@ struct cfg802154_ops {
->                                 struct wpan_dev *wpan_dev, bool mode);
->         int     (*set_ackreq_default)(struct wpan_phy *wpan_phy,
->                                       struct wpan_dev *wpan_dev, bool ackreq);
-> +       int     (*trigger_scan)(struct wpan_phy *wpan_phy,
-> +                               struct cfg802154_scan_request *request);
-> +       int     (*abort_scan)(struct wpan_phy *wpan_phy,
-> +                             struct wpan_dev *wpan_dev);
->  #ifdef CONFIG_IEEE802154_NL802154_EXPERIMENTAL
->         void    (*get_llsec_table)(struct wpan_phy *wpan_phy,
->                                    struct wpan_dev *wpan_dev,
-> @@ -278,6 +283,26 @@ struct ieee802154_coord_desc {
->         bool gts_permit;
->  };
->
-> +/**
-> + * struct cfg802154_scan_request - Scan request
-> + *
-> + * @type: type of scan to be performed
-> + * @page: page on which to perform the scan
-> + * @channels: channels in te %page to be scanned
-> + * @duration: time spent on each channel, calculated with:
-> + *            aBaseSuperframeDuration * (2 ^ duration + 1)
-> + * @wpan_dev: the wpan device on which to perform the scan
-> + * @wpan_phy: the wpan phy on which to perform the scan
-> + */
-> +struct cfg802154_scan_request {
-> +       enum nl802154_scan_types type;
-> +       u8 page;
-> +       u32 channels;
-> +       u8 duration;
-> +       struct wpan_dev *wpan_dev;
-> +       struct wpan_phy *wpan_phy;
-> +};
-> +
->  struct ieee802154_llsec_key_id {
->         u8 mode;
->         u8 id;
-> diff --git a/include/net/nl802154.h b/include/net/nl802154.h
-> index b79a89d5207c..79fbd820b25a 100644
-> --- a/include/net/nl802154.h
-> +++ b/include/net/nl802154.h
-> @@ -73,6 +73,9 @@ enum nl802154_commands {
->         NL802154_CMD_DEL_SEC_LEVEL,
->
->         NL802154_CMD_SCAN_EVENT,
-> +       NL802154_CMD_TRIGGER_SCAN,
-> +       NL802154_CMD_ABORT_SCAN,
-> +       NL802154_CMD_SCAN_DONE,
+> Fixes: fcf39e6e88e9 ("ieee802154: add wpan_dev_list")
+> Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
 
-Is NL802154_CMD_SCAN_DONE reserved now? I don't see it implemented in
-this series and I think we had some discussion about the need of abort
-vs done. Is the event now?
+Nice catch. :)
+
+Acked-by: Alexander Aring <aahringo@redhat.com>
 
 - Alex
 
