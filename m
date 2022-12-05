@@ -2,32 +2,32 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C18FAC4321E
-	for <linux-wpan@archiver.kernel.org>; Mon,  5 Dec 2022 12:28:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49FFDC4321E
+	for <linux-wpan@archiver.kernel.org>; Mon,  5 Dec 2022 13:21:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229954AbiLEM2l (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 5 Dec 2022 07:28:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34254 "EHLO
+        id S232158AbiLENVX (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 5 Dec 2022 08:21:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46376 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230035AbiLEM2k (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 5 Dec 2022 07:28:40 -0500
-Received: from proxima.lasnet.de (proxima.lasnet.de [IPv6:2a01:4f8:121:31eb:3::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6BC5BE0C;
-        Mon,  5 Dec 2022 04:28:38 -0800 (PST)
+        with ESMTP id S230313AbiLENVU (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 5 Dec 2022 08:21:20 -0500
+Received: from proxima.lasnet.de (proxima.lasnet.de [78.47.171.185])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2009D1C404;
+        Mon,  5 Dec 2022 05:21:18 -0800 (PST)
 Received: from localhost.localdomain.datenfreihafen.local (p5dd0dfce.dip0.t-ipconnect.de [93.208.223.206])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
         (No client certificate requested)
         (Authenticated sender: stefan@sostec.de)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id BFC7AC0049;
-        Mon,  5 Dec 2022 13:28:36 +0100 (CET)
+        by proxima.lasnet.de (Postfix) with ESMTPSA id 2B6DBC05B3;
+        Mon,  5 Dec 2022 14:21:17 +0100 (CET)
 From:   Stefan Schmidt <stefan@datenfreihafen.org>
 To:     davem@davemloft.net, kuba@kernel.org
 Cc:     linux-wpan@vger.kernel.org, alex.aring@gmail.com,
-        netdev@vger.kernel.org
-Subject: pull-request: ieee802154 for net 2022-12-05
-Date:   Mon,  5 Dec 2022 13:25:15 +0100
-Message-Id: <20221205122515.1720539-1-stefan@datenfreihafen.org>
+        netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: pull-request: ieee802154-next 2022-12-05
+Date:   Mon,  5 Dec 2022 14:19:09 +0100
+Message-Id: <20221205131909.1871790-1-stefan@datenfreihafen.org>
 X-Mailer: git-send-email 2.38.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -37,44 +37,54 @@ X-Mailing-List: linux-wpan@vger.kernel.org
 
 Hello Dave, Jakub.
 
-An update from ieee802154 for your *net* tree:
+An update from ieee802154 for *net-next*
 
-Three small fixes this time around.
+This is the second pull request from wpan-next this cycle. Hoping its still on
+time we have a few follow ups from the first, bigger pull request.
 
-Ziyang Xuan fixed an error code for a timeout during initialization of the
-cc2520 driver.
-Hauke Mehrtens fixed a crash in the ca8210 driver SPI communication due
-uninitialized SPI structures.
-Wei Yongjun added INIT_LIST_HEAD ieee802154_if_add() to avoid a potential
-null pointer dereference.
+Miquel continued his work towards full scanning support. For this, we now allow
+the creation of dedicated coordinator interfaces to allow a PAN coordinator to
+serve in the network and set the needed address filters with the hardware.
+
+On top of this we have the first part to allow scanning for available 15.4
+networks. A new netlink scan group, within the existing nl802154 API, was added.
+
+In addition Miquel fixed two issues that have been introduced in the former
+patches to free an skb correctly and clarifying an expression in the stack.
+
+From David Girault we got tracing support when registering new PANs.
 
 regards
 Stefan Schmidt
 
+The following changes since commit 95d9a3dab109f2806980d55634972120824a5a5a:
 
-The following changes since commit baee5a14ab2c9a8f8df09d021885c8f5de458a38:
-
-  Merge tag 'ieee802154-for-net-2022-10-24' of git://git.kernel.org/pub/scm/linux/kernel/git/sschmidt/wpan (2022-10-24 21:17:03 -0700)
+  selftests: tc-testing: Add matchJSON to tdc (2022-10-26 20:22:33 -0700)
 
 are available in the Git repository at:
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/sschmidt/wpan.git tags/ieee802154-for-net-2022-12-05
+  git://git.kernel.org/pub/scm/linux/kernel/git/sschmidt/wpan-next.git tags/ieee802154-for-net-next-2022-12-05
 
-for you to fetch changes up to b3d72d3135d2ef68296c1ee174436efd65386f04:
+for you to fetch changes up to e29e3c7ce6d4b2f164ebd717e4794c626fc1c954:
 
-  mac802154: fix missing INIT_LIST_HEAD in ieee802154_if_add() (2022-12-05 09:53:08 +0100)
+  mac802154: Trace the registration of new PANs (2022-11-29 15:34:32 +0100)
 
 ----------------------------------------------------------------
-Hauke Mehrtens (1):
-      ca8210: Fix crash by zero initializing data
+David Girault (1):
+      mac802154: Trace the registration of new PANs
 
-Wei Yongjun (1):
-      mac802154: fix missing INIT_LIST_HEAD in ieee802154_if_add()
+Miquel Raynal (4):
+      mac802154: Move an skb free within the rx path
+      mac802154: Clarify an expression
+      mac802154: Allow the creation of coordinator interfaces
+      ieee802154: Advertize coordinators discovery
 
-Ziyang Xuan (1):
-      ieee802154: cc2520: Fix error return code in cc2520_hw_init()
-
- drivers/net/ieee802154/ca8210.c | 2 +-
- drivers/net/ieee802154/cc2520.c | 2 +-
- net/mac802154/iface.c           | 1 +
- 3 files changed, 3 insertions(+), 2 deletions(-)
+ include/net/cfg802154.h   |  18 ++++++++
+ include/net/nl802154.h    |  43 +++++++++++++++++++
+ net/ieee802154/nl802154.c | 103 ++++++++++++++++++++++++++++++++++++++++++++++
+ net/ieee802154/nl802154.h |   2 +
+ net/mac802154/iface.c     |  15 +++----
+ net/mac802154/main.c      |   2 +-
+ net/mac802154/rx.c        |  24 +++++------
+ net/mac802154/trace.h     |  25 +++++++++++
+ 8 files changed, 211 insertions(+), 21 deletions(-)
