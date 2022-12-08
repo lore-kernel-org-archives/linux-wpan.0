@@ -2,68 +2,77 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9362EC4708D
-	for <linux-wpan@archiver.kernel.org>; Thu,  8 Dec 2022 01:26:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F02CEC4708D
+	for <linux-wpan@archiver.kernel.org>; Thu,  8 Dec 2022 01:50:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229675AbiLHB0a (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 7 Dec 2022 20:26:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49102 "EHLO
+        id S229722AbiLHBuT (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 7 Dec 2022 20:50:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33864 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229735AbiLHB02 (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 7 Dec 2022 20:26:28 -0500
+        with ESMTP id S229507AbiLHBuS (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 7 Dec 2022 20:50:18 -0500
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6C4A8E5A6;
-        Wed,  7 Dec 2022 17:26:27 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 336739074B;
+        Wed,  7 Dec 2022 17:50:18 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 53C8B61D12;
-        Thu,  8 Dec 2022 01:26:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80312C433C1;
-        Thu,  8 Dec 2022 01:26:26 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id C4D3761C4F;
+        Thu,  8 Dec 2022 01:50:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 225BAC433D7;
+        Thu,  8 Dec 2022 01:50:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1670462786;
-        bh=3fXYsPC1fbYDxd/xYtvZBAzrsT7/Cn2L6Zj543M6XNw=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=gQVV9BFTEublja4Mdd5S1G6dI8lymevct4r0swz1XmhkGJ7HALzwI5tkcl85qLiDu
-         xxj2Kl14sxHHjwrEHKAj1ptSMsl6CQnato2NaQkPxCUqcXk9/MKH9TN2h6rznF4P5a
-         9hpkjQUOGz5hkIvq66bWsihzODybmJAitfeUn+A+vfniA+NhxyHhYp8gEcpMuU5pKg
-         el+HP47T+OUA4ubSp2DGnzak64IFXFT1VBrEomYtWJ46tYrb6MdlgQ9wX3fhuLvEcb
-         M4A3elCUKhK0kRqFVC8SdyVprI3Aw9xCljXW/iSMZ+Z3wW0NnezRseT313yIJgyZje
-         m35PJuZVuhp2w==
-Date:   Wed, 7 Dec 2022 17:26:25 -0800
-From:   Jakub Kicinski <kuba@kernel.org>
-To:     Stefan Schmidt <stefan@datenfreihafen.org>
-Cc:     davem@davemloft.net, linux-wpan@vger.kernel.org,
-        alex.aring@gmail.com, netdev@vger.kernel.org
-Subject: Re: pull-request: ieee802154 for net 2022-12-05
-Message-ID: <20221207172625.7da96708@kernel.org>
-In-Reply-To: <20221205122515.1720539-1-stefan@datenfreihafen.org>
-References: <20221205122515.1720539-1-stefan@datenfreihafen.org>
+        s=k20201202; t=1670464217;
+        bh=UIHtKtHvTL/2n27bUw1jPwdAPQCKa3/iuuM/BF33/kY=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=p0V45/98POz4vE5Lnesym4Q0XQEafZgG5t8YmQ/PDiSj7bYuL04f2rH7M/Y6xxXzz
+         9hCA+nZpxcQIkpI1SkP4EdusL5vBfk5KQDJ9g5chLhSpUQ1Do8DpOR1qBSrMnz0YX6
+         JxFLixfNNDqZKMHnSVIZjajN9uh7zcFwP52+Xv2Wm/WWI39FGByClWjsey31gsM/gc
+         ziQmoMzwP3alqWSqrljgt8SEd5MZ+BD0sRBYRbWCQUV88tM6XgAfH+92dCqM87ea/T
+         KLZcVt6DHF5iCC/uMdGOCOdiT8l+CcNJutJYnAvHAY3PfL/seQD5Ct2m3edjaHv2tf
+         nxa27wNKCtoUQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 06767E29F38;
+        Thu,  8 Dec 2022 01:50:17 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: pull-request: ieee802154-next 2022-12-05
+From:   patchwork-bot+netdevbpf@kernel.org
+Message-Id: <167046421701.13767.2311529768713425185.git-patchwork-notify@kernel.org>
+Date:   Thu, 08 Dec 2022 01:50:17 +0000
+References: <20221205131909.1871790-1-stefan@datenfreihafen.org>
+In-Reply-To: <20221205131909.1871790-1-stefan@datenfreihafen.org>
+To:     Stefan Schmidt <stefan@datenfreihafen.org>
+Cc:     davem@davemloft.net, kuba@kernel.org, linux-wpan@vger.kernel.org,
+        alex.aring@gmail.com, netdev@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-On Mon,  5 Dec 2022 13:25:15 +0100 Stefan Schmidt wrote:
+Hello:
+
+This pull request was applied to netdev/net-next.git (master)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Mon,  5 Dec 2022 14:19:09 +0100 you wrote:
 > Hello Dave, Jakub.
 > 
-> An update from ieee802154 for your *net* tree:
+> An update from ieee802154 for *net-next*
 > 
-> Three small fixes this time around.
+> This is the second pull request from wpan-next this cycle. Hoping its still on
+> time we have a few follow ups from the first, bigger pull request.
 > 
-> Ziyang Xuan fixed an error code for a timeout during initialization of the
-> cc2520 driver.
-> Hauke Mehrtens fixed a crash in the ca8210 driver SPI communication due
-> uninitialized SPI structures.
-> Wei Yongjun added INIT_LIST_HEAD ieee802154_if_add() to avoid a potential
-> null pointer dereference.
+> [...]
 
-Sorry for the lateness, we are backed up since the weekend :(
+Here is the summary with links:
+  - pull-request: ieee802154-next 2022-12-05
+    https://git.kernel.org/netdev/net-next/c/cfbf877a338c
 
-I believe this is now in net:
-https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git/commit/?id=92439a859000c6f4c74160a3c08c1a519e3ca125
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-But the bot has not replied?
+
