@@ -2,82 +2,77 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC2D4C4332F
-	for <linux-wpan@archiver.kernel.org>; Thu,  8 Dec 2022 08:13:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15656C00145
+	for <linux-wpan@archiver.kernel.org>; Mon, 12 Dec 2022 22:32:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229544AbiLHINu (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Thu, 8 Dec 2022 03:13:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53356 "EHLO
+        id S233792AbiLLWcV (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 12 Dec 2022 17:32:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37832 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229462AbiLHINh (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 8 Dec 2022 03:13:37 -0500
-Received: from proxima.lasnet.de (proxima.lasnet.de [IPv6:2a01:4f8:121:31eb:3::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D59565477A;
-        Thu,  8 Dec 2022 00:13:36 -0800 (PST)
-Received: from [IPV6:2003:e9:d707:bb64:2bb8:7d68:ff48:d4b2] (p200300e9d707bb642bb87d68ff48d4b2.dip0.t-ipconnect.de [IPv6:2003:e9:d707:bb64:2bb8:7d68:ff48:d4b2])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        with ESMTP id S233790AbiLLWcT (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 12 Dec 2022 17:32:19 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3849D13F5E;
+        Mon, 12 Dec 2022 14:32:19 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        (Authenticated sender: stefan@datenfreihafen.org)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id B7A52C042A;
-        Thu,  8 Dec 2022 09:13:34 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
-        s=2021; t=1670487214;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=n1R2BJ+a6CzIk8AqdhME0WgEMohI422Z6fCD3wTPRzw=;
-        b=XsH98MOXyfSsKjcV1S1X2gqb2JjDIFifZUBRq/Kh0Wy2HOnYz0waC2NZ0NAzxcjH5KNwGt
-        mJmWupwUKKL34oYLx2uU2mT1MuAslA3fNnY5DTKx6ilXFHu4O333UOQ6ZPOgRsPuatp5zr
-        NDuxF6/x1ZO9JlmKeoKRlBMjGAnSEAAuzShHrdE2/2aaFKCCNXvuF39if8haCT9bAAVb/t
-        OWaAilAUZOwHy/iaGPoDqb9yrKvDklhTZjBu66c2KQQQ/k7JtF9FugfwcbzdKryCB2TV4U
-        3EgYDca/aP/woOEVRBNvBMKiWGTFff7HaAPke9I5xhqzM8miZdszEaoL8lA42A==
-Message-ID: <2c754517-b9c7-cb2b-4a76-d95b377bfc55@datenfreihafen.org>
-Date:   Thu, 8 Dec 2022 09:13:33 +0100
+        by ams.source.kernel.org (Postfix) with ESMTPS id C81DEB80E8C;
+        Mon, 12 Dec 2022 22:32:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 5FB84C433D2;
+        Mon, 12 Dec 2022 22:32:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1670884336;
+        bh=YOaImormonIoIZyffcSD96XBtld1tUqKsVtY+seLJ3I=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=E7YV5/zdpp92oYoOPQwxYG0URZ/bgvSCcGwxpK1LhzoU/Expk8GW/WsMOQwUVnEMd
+         h/DMdLVPCEWUszgEtbEyjAUsp3VmcrQqcd4i0aVHl5J2i7/vlqoKlc4klOqWcYfm/3
+         StBplBntJohjovBadWvCW9fngWSZPmrQWeLRHm/XJS6nsvceskeTncCQHuYykthaxT
+         JoRHX/NMG5dhQA7fbSw4wHA9ySNVajzvbsykX2ah4Cdt6hLcDSVpQlY7IZjhSsWv+D
+         DOyGtxIQ9kR4tGzV7j7yHarSVKMnI1PIog2nY/qmzuyMquoRcjfqHFe/IaJisoOtYi
+         fHg81XKE2xJEQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 46553C00445;
+        Mon, 12 Dec 2022 22:32:16 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Subject: Re: pull-request: ieee802154 for net 2022-12-05
-Content-Language: en-US
-To:     Jakub Kicinski <kuba@kernel.org>
-Cc:     davem@davemloft.net, linux-wpan@vger.kernel.org,
-        alex.aring@gmail.com, netdev@vger.kernel.org
-References: <20221205122515.1720539-1-stefan@datenfreihafen.org>
- <20221207172625.7da96708@kernel.org>
-From:   Stefan Schmidt <stefan@datenfreihafen.org>
-In-Reply-To: <20221207172625.7da96708@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: pull-request: ieee802154-next 2022-12-05
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <167088433628.7987.8526740813712502909.git-patchwork-notify@kernel.org>
+Date:   Mon, 12 Dec 2022 22:32:16 +0000
+References: <20221205131909.1871790-1-stefan@datenfreihafen.org>
+In-Reply-To: <20221205131909.1871790-1-stefan@datenfreihafen.org>
+To:     Stefan Schmidt <stefan@datenfreihafen.org>
+Cc:     davem@davemloft.net, kuba@kernel.org, linux-wpan@vger.kernel.org,
+        alex.aring@gmail.com, netdev@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello Jakub.
+Hello:
 
-On 08.12.22 02:26, Jakub Kicinski wrote:
-> On Mon,  5 Dec 2022 13:25:15 +0100 Stefan Schmidt wrote:
->> Hello Dave, Jakub.
->>
->> An update from ieee802154 for your *net* tree:
->>
->> Three small fixes this time around.
->>
->> Ziyang Xuan fixed an error code for a timeout during initialization of the
->> cc2520 driver.
->> Hauke Mehrtens fixed a crash in the ca8210 driver SPI communication due
->> uninitialized SPI structures.
->> Wei Yongjun added INIT_LIST_HEAD ieee802154_if_add() to avoid a potential
->> null pointer dereference.
-> 
-> Sorry for the lateness, we are backed up since the weekend :(
-> 
-> I believe this is now in net:
-> https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git/commit/?id=92439a859000c6f4c74160a3c08c1a519e3ca125
-> 
-> But the bot has not replied?
+This pull request was applied to bluetooth/bluetooth-next.git (master)
+by Jakub Kicinski <kuba@kernel.org>:
 
-True, no bot reply but I can see the merge in the net tree. All good.
+On Mon,  5 Dec 2022 14:19:09 +0100 you wrote:
+> Hello Dave, Jakub.
+> 
+> An update from ieee802154 for *net-next*
+> 
+> This is the second pull request from wpan-next this cycle. Hoping its still on
+> time we have a few follow ups from the first, bigger pull request.
+> 
+> [...]
 
-regards
-Stefan Schmidt
+Here is the summary with links:
+  - pull-request: ieee802154-next 2022-12-05
+    https://git.kernel.org/bluetooth/bluetooth-next/c/cfbf877a338c
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
