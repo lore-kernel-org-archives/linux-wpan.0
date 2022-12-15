@@ -2,77 +2,118 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15656C00145
-	for <linux-wpan@archiver.kernel.org>; Mon, 12 Dec 2022 22:32:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93D33C4332F
+	for <linux-wpan@archiver.kernel.org>; Thu, 15 Dec 2022 08:06:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233792AbiLLWcV (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 12 Dec 2022 17:32:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37832 "EHLO
+        id S229544AbiLOIGC (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Thu, 15 Dec 2022 03:06:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54540 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233790AbiLLWcT (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 12 Dec 2022 17:32:19 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3849D13F5E;
-        Mon, 12 Dec 2022 14:32:19 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id C81DEB80E8C;
-        Mon, 12 Dec 2022 22:32:17 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 5FB84C433D2;
-        Mon, 12 Dec 2022 22:32:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1670884336;
-        bh=YOaImormonIoIZyffcSD96XBtld1tUqKsVtY+seLJ3I=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=E7YV5/zdpp92oYoOPQwxYG0URZ/bgvSCcGwxpK1LhzoU/Expk8GW/WsMOQwUVnEMd
-         h/DMdLVPCEWUszgEtbEyjAUsp3VmcrQqcd4i0aVHl5J2i7/vlqoKlc4klOqWcYfm/3
-         StBplBntJohjovBadWvCW9fngWSZPmrQWeLRHm/XJS6nsvceskeTncCQHuYykthaxT
-         JoRHX/NMG5dhQA7fbSw4wHA9ySNVajzvbsykX2ah4Cdt6hLcDSVpQlY7IZjhSsWv+D
-         DOyGtxIQ9kR4tGzV7j7yHarSVKMnI1PIog2nY/qmzuyMquoRcjfqHFe/IaJisoOtYi
-         fHg81XKE2xJEQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 46553C00445;
-        Mon, 12 Dec 2022 22:32:16 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+        with ESMTP id S229522AbiLOIGB (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 15 Dec 2022 03:06:01 -0500
+Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C35331DC9;
+        Thu, 15 Dec 2022 00:05:59 -0800 (PST)
+Received: by mail-wr1-x433.google.com with SMTP id m14so2177044wrh.7;
+        Thu, 15 Dec 2022 00:05:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=1BOtxxm4hSJIEL6wxTsNCBusLvyMX1O2ctAiD2U166U=;
+        b=qwLfbdTpPpDW3TZKpZjHqYluZ04OdRP4nfrp9PgjuCj6pVh7syntbkMFo95OxE0jd0
+         8w6CsaZ9JQvQnyqDnGgUsCdoWMegtXeruTzHI7HzE7Z4EA9A/QlqzvExz0Npz3C1KmBc
+         DKKT7CJFstdHgnnG7gwIc+UvF93CxWmSX+fXJLfAoWvxMrJQ5PqijSj98p/Lto6Y6rhi
+         MXgSSlL01Dl489bBvQWBwvJHZO8K6qqXxAEmYuQX9qMsI3uml2I08HngLuf7SOZnlgb/
+         m7J9I40rWLhmzo2GQrfcc+ld0CqBKTUYkdWApXtgpxd02Tpvs688qrW5dx1NmpCmuEm1
+         0H7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=1BOtxxm4hSJIEL6wxTsNCBusLvyMX1O2ctAiD2U166U=;
+        b=QmtNSy02St7FyUeBrfp00zaULy9kpFfdn3rDF8CUstZkDss5OXbA74932ykNu6kX7d
+         r9ZYcw+nmue9EdMkKVrETlPmEe1eHfaSloJGrtagCruLsJ1cEzBzwoApnU7Ev/R6kWo5
+         xhMCAng8qGcPFv8gwTKw8eVmPlqjRNmPuLeJzxzS/aV5OjjaBVQSYNCMIxKXS1m660zU
+         lvkBQ5lMfi3FKvPx22HjsG84EPl0dIj2xbU/TPSBB8tXY3qgqg6ymb4bg+eCpQnflRCp
+         WHknn6+YS5tHEXUgj4y6G2NJlk7aFQKFaWuZEw1Bp+8qVvGbKXXHclzvO1yHB9TcJkW2
+         ieTA==
+X-Gm-Message-State: ANoB5pm9cS5ZuFS/e53gznlieAIWg71nSGK6XEgow9N4NfZ8uFvboR2s
+        JtMs/v1Wj5s23LmItdJ1ZHE=
+X-Google-Smtp-Source: AA0mqf7vFP70Dy9aysz0sHb0joZrUkB4/zxZGB1oQh1CaPxICD2M8Ne+WYOpH6TSUFUV/c5CGfXnpA==
+X-Received: by 2002:a5d:61c9:0:b0:242:40de:332 with SMTP id q9-20020a5d61c9000000b0024240de0332mr15386068wrv.40.1671091557920;
+        Thu, 15 Dec 2022 00:05:57 -0800 (PST)
+Received: from localhost ([102.36.222.112])
+        by smtp.gmail.com with ESMTPSA id k17-20020adfb351000000b002423edd7e50sm5308497wrd.32.2022.12.15.00.05.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 15 Dec 2022 00:05:57 -0800 (PST)
+Date:   Thu, 15 Dec 2022 11:05:47 +0300
+From:   Dan Carpenter <error27@gmail.com>
+To:     miquel.raynal@bootlin.com
+Cc:     linux-wpan@vger.kernel.org, linux-wireless@vger.kernel.org
+Subject: [bug report] mac802154: Move an skb free within the rx path
+Message-ID: <Y5rVW/Mb8nw0MCF3@kili>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: pull-request: ieee802154-next 2022-12-05
-From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <167088433628.7987.8526740813712502909.git-patchwork-notify@kernel.org>
-Date:   Mon, 12 Dec 2022 22:32:16 +0000
-References: <20221205131909.1871790-1-stefan@datenfreihafen.org>
-In-Reply-To: <20221205131909.1871790-1-stefan@datenfreihafen.org>
-To:     Stefan Schmidt <stefan@datenfreihafen.org>
-Cc:     davem@davemloft.net, kuba@kernel.org, linux-wpan@vger.kernel.org,
-        alex.aring@gmail.com, netdev@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello:
+Hello Miquel Raynal,
 
-This pull request was applied to bluetooth/bluetooth-next.git (master)
-by Jakub Kicinski <kuba@kernel.org>:
+The patch 4d1c7d87030b: "mac802154: Move an skb free within the rx
+path" from Oct 26, 2022, leads to the following Smatch static checker
+warning:
 
-On Mon,  5 Dec 2022 14:19:09 +0100 you wrote:
-> Hello Dave, Jakub.
-> 
-> An update from ieee802154 for *net-next*
-> 
-> This is the second pull request from wpan-next this cycle. Hoping its still on
-> time we have a few follow ups from the first, bigger pull request.
-> 
-> [...]
+	net/mac802154/rx.c:307 ieee802154_rx()
+	warn: 'skb' was already freed.
 
-Here is the summary with links:
-  - pull-request: ieee802154-next 2022-12-05
-    https://git.kernel.org/bluetooth/bluetooth-next/c/cfbf877a338c
+net/mac802154/rx.c
+    271 void ieee802154_rx(struct ieee802154_local *local, struct sk_buff *skb)
+    272 {
+    273         u16 crc;
+    274 
+    275         WARN_ON_ONCE(softirq_count() == 0);
+    276 
+    277         if (local->suspended)
+    278                 goto free_skb;
+    279 
+    280         /* TODO: When a transceiver omits the checksum here, we
+    281          * add an own calculated one. This is currently an ugly
+    282          * solution because the monitor needs a crc here.
+    283          */
+    284         if (local->hw.flags & IEEE802154_HW_RX_OMIT_CKSUM) {
+    285                 crc = crc_ccitt(0, skb->data, skb->len);
+    286                 put_unaligned_le16(crc, skb_put(skb, 2));
+    287         }
+    288 
+    289         rcu_read_lock();
+    290 
+    291         ieee802154_monitors_rx(local, skb);
+    292 
+    293         /* Level 1 filtering: Check the FCS by software when relevant */
+    294         if (local->hw.phy->filtering == IEEE802154_FILTERING_NONE) {
+    295                 crc = crc_ccitt(0, skb->data, skb->len);
+    296                 if (crc)
+    297                         goto drop;
+    298         }
+    299         /* remove crc */
+    300         skb_trim(skb, skb->len - 2);
+    301 
+    302         __ieee802154_rx_handle_packet(local, skb);
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+This frees skb.
 
+    303 
+    304 drop:
+    305         rcu_read_unlock();
+    306 free_skb:
+--> 307         kfree_skb(skb);
 
+Double free.
+
+    308 }
+
+regards,
+dan carpenter
