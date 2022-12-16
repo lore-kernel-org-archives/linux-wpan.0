@@ -2,118 +2,123 @@ Return-Path: <linux-wpan-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93D33C4332F
-	for <linux-wpan@archiver.kernel.org>; Thu, 15 Dec 2022 08:06:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0B51C4332F
+	for <linux-wpan@archiver.kernel.org>; Fri, 16 Dec 2022 13:59:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229544AbiLOIGC (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Thu, 15 Dec 2022 03:06:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54540 "EHLO
+        id S229453AbiLPN7w (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Fri, 16 Dec 2022 08:59:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39718 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229522AbiLOIGB (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 15 Dec 2022 03:06:01 -0500
-Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C35331DC9;
-        Thu, 15 Dec 2022 00:05:59 -0800 (PST)
-Received: by mail-wr1-x433.google.com with SMTP id m14so2177044wrh.7;
-        Thu, 15 Dec 2022 00:05:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=1BOtxxm4hSJIEL6wxTsNCBusLvyMX1O2ctAiD2U166U=;
-        b=qwLfbdTpPpDW3TZKpZjHqYluZ04OdRP4nfrp9PgjuCj6pVh7syntbkMFo95OxE0jd0
-         8w6CsaZ9JQvQnyqDnGgUsCdoWMegtXeruTzHI7HzE7Z4EA9A/QlqzvExz0Npz3C1KmBc
-         DKKT7CJFstdHgnnG7gwIc+UvF93CxWmSX+fXJLfAoWvxMrJQ5PqijSj98p/Lto6Y6rhi
-         MXgSSlL01Dl489bBvQWBwvJHZO8K6qqXxAEmYuQX9qMsI3uml2I08HngLuf7SOZnlgb/
-         m7J9I40rWLhmzo2GQrfcc+ld0CqBKTUYkdWApXtgpxd02Tpvs688qrW5dx1NmpCmuEm1
-         0H7A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1BOtxxm4hSJIEL6wxTsNCBusLvyMX1O2ctAiD2U166U=;
-        b=QmtNSy02St7FyUeBrfp00zaULy9kpFfdn3rDF8CUstZkDss5OXbA74932ykNu6kX7d
-         r9ZYcw+nmue9EdMkKVrETlPmEe1eHfaSloJGrtagCruLsJ1cEzBzwoApnU7Ev/R6kWo5
-         xhMCAng8qGcPFv8gwTKw8eVmPlqjRNmPuLeJzxzS/aV5OjjaBVQSYNCMIxKXS1m660zU
-         lvkBQ5lMfi3FKvPx22HjsG84EPl0dIj2xbU/TPSBB8tXY3qgqg6ymb4bg+eCpQnflRCp
-         WHknn6+YS5tHEXUgj4y6G2NJlk7aFQKFaWuZEw1Bp+8qVvGbKXXHclzvO1yHB9TcJkW2
-         ieTA==
-X-Gm-Message-State: ANoB5pm9cS5ZuFS/e53gznlieAIWg71nSGK6XEgow9N4NfZ8uFvboR2s
-        JtMs/v1Wj5s23LmItdJ1ZHE=
-X-Google-Smtp-Source: AA0mqf7vFP70Dy9aysz0sHb0joZrUkB4/zxZGB1oQh1CaPxICD2M8Ne+WYOpH6TSUFUV/c5CGfXnpA==
-X-Received: by 2002:a5d:61c9:0:b0:242:40de:332 with SMTP id q9-20020a5d61c9000000b0024240de0332mr15386068wrv.40.1671091557920;
-        Thu, 15 Dec 2022 00:05:57 -0800 (PST)
-Received: from localhost ([102.36.222.112])
-        by smtp.gmail.com with ESMTPSA id k17-20020adfb351000000b002423edd7e50sm5308497wrd.32.2022.12.15.00.05.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Dec 2022 00:05:57 -0800 (PST)
-Date:   Thu, 15 Dec 2022 11:05:47 +0300
-From:   Dan Carpenter <error27@gmail.com>
-To:     miquel.raynal@bootlin.com
-Cc:     linux-wpan@vger.kernel.org, linux-wireless@vger.kernel.org
-Subject: [bug report] mac802154: Move an skb free within the rx path
-Message-ID: <Y5rVW/Mb8nw0MCF3@kili>
+        with ESMTP id S229620AbiLPN7w (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 16 Dec 2022 08:59:52 -0500
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::228])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABABB20BE1;
+        Fri, 16 Dec 2022 05:59:50 -0800 (PST)
+Received: (Authenticated sender: miquel.raynal@bootlin.com)
+        by mail.gandi.net (Postfix) with ESMTPSA id 0E7BE1BF20A;
+        Fri, 16 Dec 2022 13:59:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+        t=1671199189;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=hp6TfbRZV7OcQ21tpJuS9gcMMMZK3grtCUQP++mcrBA=;
+        b=NZe0Jr+99kUogF29pD8qI8MDP/nTg1tcjzmRLHVEngafoJ/xWgsWgW9pK4APGoW8DPixDT
+        VcIn3/FkbZt+XmxHTKXEfxAZG9SLbANQiXF4mg2K7Yj9Ckdq6fLBpXsNq5+iKsho7vfBJc
+        3/z3pvkQ0cjW7S49z99d+nqtw0Fdsfuve5l9kTD6U9d69Zt4Kbh3MIpgf595qylVD90bVo
+        Kd5ynIr7S1mYjQTWyZL3kSK7E2+eCYZuvVi4RavqYUwS3jNAgvvFlJILKKHy9HVQQo+/Cz
+        I0OMMUkoLrMWG5duJPZDO+cMEZn/5nrVeFZzlHBOcg78XEedQtjuJkWxtIUElg==
+Date:   Fri, 16 Dec 2022 14:59:46 +0100
+From:   Miquel Raynal <miquel.raynal@bootlin.com>
+To:     Dan Carpenter <error27@gmail.com>
+Cc:     linux-wpan@vger.kernel.org, linux-wireless@vger.kernel.org,
+        Alexander Aring <aahringo@redhat.com>,
+        Stefan Schmidt <stefan@datenfreihafen.org>
+Subject: Re: [bug report] mac802154: Move an skb free within the rx path
+Message-ID: <20221216145946.3b38c86f@xps-13>
+In-Reply-To: <Y5rVW/Mb8nw0MCF3@kili>
+References: <Y5rVW/Mb8nw0MCF3@kili>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello Miquel Raynal,
+Hi Dan,
 
-The patch 4d1c7d87030b: "mac802154: Move an skb free within the rx
-path" from Oct 26, 2022, leads to the following Smatch static checker
-warning:
+- wireless@ (not relevant for net/ieee802154 and net/mac802154 changes)
++ Alex and Stefan, the 802154 maintainers
 
-	net/mac802154/rx.c:307 ieee802154_rx()
-	warn: 'skb' was already freed.
+error27@gmail.com wrote on Thu, 15 Dec 2022 11:05:47 +0300:
 
-net/mac802154/rx.c
-    271 void ieee802154_rx(struct ieee802154_local *local, struct sk_buff *skb)
-    272 {
-    273         u16 crc;
-    274 
-    275         WARN_ON_ONCE(softirq_count() == 0);
-    276 
-    277         if (local->suspended)
-    278                 goto free_skb;
-    279 
-    280         /* TODO: When a transceiver omits the checksum here, we
-    281          * add an own calculated one. This is currently an ugly
-    282          * solution because the monitor needs a crc here.
-    283          */
-    284         if (local->hw.flags & IEEE802154_HW_RX_OMIT_CKSUM) {
-    285                 crc = crc_ccitt(0, skb->data, skb->len);
-    286                 put_unaligned_le16(crc, skb_put(skb, 2));
-    287         }
-    288 
-    289         rcu_read_lock();
-    290 
-    291         ieee802154_monitors_rx(local, skb);
-    292 
-    293         /* Level 1 filtering: Check the FCS by software when relevant */
-    294         if (local->hw.phy->filtering == IEEE802154_FILTERING_NONE) {
-    295                 crc = crc_ccitt(0, skb->data, skb->len);
-    296                 if (crc)
-    297                         goto drop;
-    298         }
-    299         /* remove crc */
-    300         skb_trim(skb, skb->len - 2);
-    301 
-    302         __ieee802154_rx_handle_packet(local, skb);
+> Hello Miquel Raynal,
+>=20
+> The patch 4d1c7d87030b: "mac802154: Move an skb free within the rx
+> path" from Oct 26, 2022, leads to the following Smatch static checker
+> warning:
+>=20
+> 	net/mac802154/rx.c:307 ieee802154_rx()
+> 	warn: 'skb' was already freed.
 
-This frees skb.
+It took me a good minute to figure this one out, actually the main
+purpose of commit 4d1c7d87030b ("mac802154: Move an skb free within the
+rx path") is to do the freeing in one part, that's why we no longer need to
+do it in __ieee802154_rx_handle_packet(). But, well, I forgot the very
+first check at the top which was still freeing the skb upon parsing error.
 
-    303 
-    304 drop:
-    305         rcu_read_unlock();
-    306 free_skb:
---> 307         kfree_skb(skb);
+I will immediately send a fix, thanks for the report.
 
-Double free.
+Miqu=C3=A8l
 
-    308 }
-
-regards,
-dan carpenter
+> net/mac802154/rx.c
+>     271 void ieee802154_rx(struct ieee802154_local *local, struct
+> sk_buff *skb) 272 {
+>     273         u16 crc;
+>     274=20
+>     275         WARN_ON_ONCE(softirq_count() =3D=3D 0);
+>     276=20
+>     277         if (local->suspended)
+>     278                 goto free_skb;
+>     279=20
+>     280         /* TODO: When a transceiver omits the checksum here,
+> we 281          * add an own calculated one. This is currently an ugly
+>     282          * solution because the monitor needs a crc here.
+>     283          */
+>     284         if (local->hw.flags & IEEE802154_HW_RX_OMIT_CKSUM) {
+>     285                 crc =3D crc_ccitt(0, skb->data, skb->len);
+>     286                 put_unaligned_le16(crc, skb_put(skb, 2));
+>     287         }
+>     288=20
+>     289         rcu_read_lock();
+>     290=20
+>     291         ieee802154_monitors_rx(local, skb);
+>     292=20
+>     293         /* Level 1 filtering: Check the FCS by software when
+> relevant */ 294         if (local->hw.phy->filtering =3D=3D
+> IEEE802154_FILTERING_NONE) { 295                 crc =3D crc_ccitt(0,
+> skb->data, skb->len); 296                 if (crc)
+>     297                         goto drop;
+>     298         }
+>     299         /* remove crc */
+>     300         skb_trim(skb, skb->len - 2);
+>     301=20
+>     302         __ieee802154_rx_handle_packet(local, skb);
+>=20
+> This frees skb.
+>=20
+>     303=20
+>     304 drop:
+>     305         rcu_read_unlock();
+>     306 free_skb:
+> --> 307         kfree_skb(skb); =20
+>=20
+> Double free.
+>=20
+>     308 }
+>=20
+> regards,
+> dan carpenter
