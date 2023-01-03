@@ -2,44 +2,43 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C2BEC46467
-	for <linux-wpan@archiver.kernel.org>; Tue,  3 Jan 2023 14:22:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5EBFC46467
+	for <linux-wpan@archiver.kernel.org>; Tue,  3 Jan 2023 14:43:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237898AbjACOWz (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 3 Jan 2023 09:22:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60022 "EHLO
+        id S233466AbjACOnQ (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 3 Jan 2023 09:43:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53870 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238011AbjACOOy (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 3 Jan 2023 09:14:54 -0500
+        with ESMTP id S237763AbjACOnB (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 3 Jan 2023 09:43:01 -0500
 Received: from proxima.lasnet.de (proxima.lasnet.de [IPv6:2a01:4f8:121:31eb:3::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 870B611445;
-        Tue,  3 Jan 2023 06:14:51 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E170BEE15;
+        Tue,  3 Jan 2023 06:42:59 -0800 (PST)
 Received: from [IPV6:2003:e9:d713:1514:accc:688a:efc9:2199] (p200300e9d7131514accc688aefc92199.dip0.t-ipconnect.de [IPv6:2003:e9:d713:1514:accc:688a:efc9:2199])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits))
         (No client certificate requested)
         (Authenticated sender: stefan@datenfreihafen.org)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id 8160BC03A4;
-        Tue,  3 Jan 2023 15:14:48 +0100 (CET)
+        by proxima.lasnet.de (Postfix) with ESMTPSA id A632EC016C;
+        Tue,  3 Jan 2023 15:42:57 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
-        s=2021; t=1672755288;
+        s=2021; t=1672756978;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=vvZwNHE5dRkWjxoSZ1IH7ISFZfsS1G+0GFlUsVX0Nbs=;
-        b=Nwc2URL0cBo7O4h8jcxqU8A0z5Pb2lWgMMPBGAXYk9yUDvhKzc7ZP1W25ioU+W8JCvVWtx
-        lZsjAGUcWuB2XoArhgNCHxKZW8WJ6+8LcqPX3EGc7QTZCqgFKbVsUfpFzpxE6UDCfH91RQ
-        Q8o2OWzM1gPvp/p6InznCPOaFSpQPWZFf4/jzH/RirvhhssmjP0tSMgLUcUhfLy+XKs4YL
-        ccW0PbwURMMBNXS4WEP2yYT656FmJiXPNiM34arU6Qk2stSbSNBXmWWPfQHH3Mxjf7/OOf
-        ORS4lYqDBX7EBbBL6R/keycxDh4xU3066o8P2XZ87RCgmQf2Z53aQPvRD81vFg==
-Message-ID: <b1c095d1-6dee-b49d-52d4-a5ea84f36cfd@datenfreihafen.org>
-Date:   Tue, 3 Jan 2023 15:14:46 +0100
+        bh=iycX61ZLgijIWaaHytHXbcnm9MJgdCBTIoH1EwQ5jl0=;
+        b=j4XqF/WGuAk8suTGHrR6LeoTw8iN44Qt5WxuxO3MvxMaPxKOFjUJl+HOhaBp7YCrKQy0fU
+        +bVEZdTWiI9KwBsO7u6OrCag8tlQb3BDdZbLi+oLgH99GDGd2KmIPG2YNa8vO8meHeupL8
+        r10WVn6dUJcS6JyceiCRFnRSWRH8vAZJLLPhqBkj/utRsREKUMDWUjMXbO6HhIcm14MbpC
+        X3AwZ94XP3uhoUGsBCFdVDRGfKL8Oxhtb2/SwdecTuBR0kXmp84XKVwN3iQULhtuQtN2GA
+        4zShsxP6qJs+rSxWwK+p0SuXY/zr7af7uelXNh7IAMhfwRfrc17tl6h2w8NI+w==
+Message-ID: <71a95ec1-a7c9-fc92-ddb2-4ada4df4ec01@datenfreihafen.org>
+Date:   Tue, 3 Jan 2023 15:42:57 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.5.0
-Subject: Re: [PATCH wpan-next v2 3/6] ieee802154: Introduce a helper to
- validate a channel
+Subject: Re: [PATCH wpan-next v2 6/6] mac802154: Handle passive scanning
 Content-Language: en-US
 To:     Miquel Raynal <miquel.raynal@bootlin.com>,
         Alexander Aring <alex.aring@gmail.com>,
@@ -55,97 +54,194 @@ Cc:     David Girault <david.girault@qorvo.com>,
         Paolo Abeni <pabeni@redhat.com>,
         Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org
 References: <20221217000226.646767-1-miquel.raynal@bootlin.com>
- <20221217000226.646767-4-miquel.raynal@bootlin.com>
+ <20221217000226.646767-7-miquel.raynal@bootlin.com>
 From:   Stefan Schmidt <stefan@datenfreihafen.org>
-In-Reply-To: <20221217000226.646767-4-miquel.raynal@bootlin.com>
+In-Reply-To: <20221217000226.646767-7-miquel.raynal@bootlin.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello Miquel.
+Hello Miquel
 
 On 17.12.22 01:02, Miquel Raynal wrote:
-> This helper for now only checks if the page member and channel member
-> are valid (in the specification range) and supported (by checking the
-> device capabilities). Soon two new parameters will be introduced and
-> having this helper will let us only modify its content rather than
-> modifying the logic everywhere else in the subsystem.
+> Implement the core hooks in order to provide the softMAC layer support
+> for passive scans. Scans are requested by the user and can be aborted.
 > 
-> There is not functional change.
+> Changing channels manually is prohibited during scans.
 > 
+> The implementation uses a workqueue triggered at a certain interval
+> depending on the symbol duration for the current channel and the
+> duration order provided. More advanced drivers with internal scheduling
+> capabilities might require additional care but there is none mainline
+> yet.
+> 
+> Received beacons during a passive scan are processed in a work queue and
+> their result forwarded to the upper layer.
+> 
+> Active scanning is not supported yet.
+> 
+> Co-developed-by: David Girault <david.girault@qorvo.com>
+> Signed-off-by: David Girault <david.girault@qorvo.com>
 > Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
 > ---
->   include/net/cfg802154.h   | 11 +++++++++++
->   net/ieee802154/nl802154.c |  3 +--
->   2 files changed, 12 insertions(+), 2 deletions(-)
-> 
-> diff --git a/include/net/cfg802154.h b/include/net/cfg802154.h
-> index 76d4f95e9974..11bedfa96371 100644
-> --- a/include/net/cfg802154.h
-> +++ b/include/net/cfg802154.h
-> @@ -246,6 +246,17 @@ static inline void wpan_phy_net_set(struct wpan_phy *wpan_phy, struct net *net)
->   	write_pnet(&wpan_phy->_net, net);
->   }
->   
-> +static inline bool ieee802154_chan_is_valid(struct wpan_phy *phy,
-> +                                            u8 page, u8 channel)
-> +{
-> +        if (page > IEEE802154_MAX_PAGE ||
-> +            channel > IEEE802154_MAX_CHANNEL ||
-> +            !(phy->supported.channels[page] & BIT(channel)))
-> +                return false;
-> +
-> +	return true;
-> +}
-> +
+>   include/linux/ieee802154.h   |   4 +
+>   include/net/cfg802154.h      |  16 ++
+>   net/mac802154/Makefile       |   2 +-
+>   net/mac802154/cfg.c          |  31 ++++
+>   net/mac802154/ieee802154_i.h |  37 ++++-
+>   net/mac802154/iface.c        |   3 +
+>   net/mac802154/main.c         |  16 +-
+>   net/mac802154/rx.c           |  36 ++++-
+>   net/mac802154/scan.c         | 289 +++++++++++++++++++++++++++++++++++
+>   9 files changed, 428 insertions(+), 6 deletions(-)
+>   create mode 100644 net/mac802154/scan.c
 
-This patch has some indent problems.
+Checkpatch found another set of problematic indents in this one:
 
-Commit 6bbb25ee282b ("ieee802154: Introduce a helper to validate a channel")
-----------------------------------------------------------------------------
-ERROR: code indent should use tabs where possible
-#31: FILE: include/net/cfg802154.h:250:
-+                                            u8 page, u8 channel)$
+Commit 216e51c90975 ("mac802154: Handle passive scanning")
+----------------------------------------------------------
+WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
+#361:
+new file mode 100644
 
-WARNING: please, no spaces at the start of a line
-#31: FILE: include/net/cfg802154.h:250:
-+                                            u8 page, u8 channel)$
+WARNING: networking block comments don't use an empty /* line, use /* 
+Comment...
+#385: FILE: net/mac802154/scan.c:20:
++/*
++ * mac802154_scan_cleanup_locked() must be called upon scan completion 
+or abort.
 
 ERROR: code indent should use tabs where possible
-#33: FILE: include/net/cfg802154.h:252:
-+        if (page > IEEE802154_MAX_PAGE ||$
+#475: FILE: net/mac802154/scan.c:110:
++                                struct cfg802154_scan_request *scan_req,$
 
 WARNING: please, no spaces at the start of a line
-#33: FILE: include/net/cfg802154.h:252:
-+        if (page > IEEE802154_MAX_PAGE ||$
+#475: FILE: net/mac802154/scan.c:110:
++                                struct cfg802154_scan_request *scan_req,$
 
 ERROR: code indent should use tabs where possible
-#34: FILE: include/net/cfg802154.h:253:
-+            channel > IEEE802154_MAX_CHANNEL ||$
+#479: FILE: net/mac802154/scan.c:114:
++        *channel = find_next_bit((const unsigned long 
+*)&scan_req->channels,$
 
 WARNING: please, no spaces at the start of a line
-#34: FILE: include/net/cfg802154.h:253:
-+            channel > IEEE802154_MAX_CHANNEL ||$
+#479: FILE: net/mac802154/scan.c:114:
++        *channel = find_next_bit((const unsigned long 
+*)&scan_req->channels,$
 
 ERROR: code indent should use tabs where possible
-#35: FILE: include/net/cfg802154.h:254:
-+            !(phy->supported.channels[page] & BIT(channel)))$
+#485: FILE: net/mac802154/scan.c:120:
++                                         struct cfg802154_scan_request 
+*scan_req,$
 
 WARNING: please, no spaces at the start of a line
-#35: FILE: include/net/cfg802154.h:254:
-+            !(phy->supported.channels[page] & BIT(channel)))$
+#485: FILE: net/mac802154/scan.c:120:
++                                         struct cfg802154_scan_request 
+*scan_req,$
 
 ERROR: code indent should use tabs where possible
-#36: FILE: include/net/cfg802154.h:255:
-+                return false;$
+#486: FILE: net/mac802154/scan.c:121:
++                                         u8 page, u8 *channel)$
 
 WARNING: please, no spaces at the start of a line
-#36: FILE: include/net/cfg802154.h:255:
-+                return false;$
+#486: FILE: net/mac802154/scan.c:121:
++                                         u8 page, u8 *channel)$
 
-total: 5 errors, 5 warnings, 0 checks, 26 lines checked
+ERROR: "foo* bar" should be "foo *bar"
+#502: FILE: net/mac802154/scan.c:137:
++	struct wpan_phy* wpan_phy;
+
+ERROR: code indent should use tabs where possible
+#539: FILE: net/mac802154/scan.c:174:
++                ret = mac802154_scan_find_next_chan(local, scan_req, 
+page, &channel);$
+
+WARNING: please, no spaces at the start of a line
+#539: FILE: net/mac802154/scan.c:174:
++                ret = mac802154_scan_find_next_chan(local, scan_req, 
+page, &channel);$
+
+ERROR: code indent should use tabs where possible
+#540: FILE: net/mac802154/scan.c:175:
++                if (ret) {$
+
+WARNING: please, no spaces at the start of a line
+#540: FILE: net/mac802154/scan.c:175:
++                if (ret) {$
+
+ERROR: code indent should use tabs where possible
+#542: FILE: net/mac802154/scan.c:177:
++                        goto end_scan;$
+
+WARNING: please, no spaces at the start of a line
+#542: FILE: net/mac802154/scan.c:177:
++                        goto end_scan;$
+
+ERROR: code indent should use tabs where possible
+#543: FILE: net/mac802154/scan.c:178:
++                }$
+
+WARNING: please, no spaces at the start of a line
+#543: FILE: net/mac802154/scan.c:178:
++                }$
+
+ERROR: code indent should use tabs where possible
+#544: FILE: net/mac802154/scan.c:179:
++        } while (!ieee802154_chan_is_valid(scan_req->wpan_phy, page, 
+channel));$
+
+WARNING: please, no spaces at the start of a line
+#544: FILE: net/mac802154/scan.c:179:
++        } while (!ieee802154_chan_is_valid(scan_req->wpan_phy, page, 
+channel));$
+
+ERROR: code indent should use tabs where possible
+#546: FILE: net/mac802154/scan.c:181:
++        rcu_read_unlock();$
+
+WARNING: please, no spaces at the start of a line
+#546: FILE: net/mac802154/scan.c:181:
++        rcu_read_unlock();$
+
+ERROR: code indent should use tabs where possible
+#553: FILE: net/mac802154/scan.c:188:
++                dev_err(&sdata->dev->dev,$
+
+WARNING: please, no spaces at the start of a line
+#553: FILE: net/mac802154/scan.c:188:
++                dev_err(&sdata->dev->dev,$
+
+ERROR: code indent should use tabs where possible
+#554: FILE: net/mac802154/scan.c:189:
++                        "Channel change failure during scan, aborting 
+(%d)\n", ret);$
+
+WARNING: please, no spaces at the start of a line
+#554: FILE: net/mac802154/scan.c:189:
++                        "Channel change failure during scan, aborting 
+(%d)\n", ret);$
+
+ERROR: code indent should use tabs where possible
+#565: FILE: net/mac802154/scan.c:200:
++                dev_err(&sdata->dev->dev,$
+
+WARNING: please, no spaces at the start of a line
+#565: FILE: net/mac802154/scan.c:200:
++                dev_err(&sdata->dev->dev,$
+
+ERROR: code indent should use tabs where possible
+#566: FILE: net/mac802154/scan.c:201:
++                        "Restarting failure after channel change, 
+aborting (%d)\n", ret);$
+
+WARNING: please, no spaces at the start of a line
+#566: FILE: net/mac802154/scan.c:201:
++                        "Restarting failure after channel change, 
+aborting (%d)\n", ret);$
+
+total: 15 errors, 16 warnings, 0 checks, 558 lines checked
 
 regards
 Stefan Schmidt
