@@ -2,203 +2,105 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33BA0C3DA7D
-	for <linux-wpan@archiver.kernel.org>; Thu,  5 Jan 2023 09:24:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CAD7DC3DA7A
+	for <linux-wpan@archiver.kernel.org>; Fri,  6 Jan 2023 11:18:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231207AbjAEJYi (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Thu, 5 Jan 2023 04:24:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38688 "EHLO
+        id S233184AbjAFLSn (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Fri, 6 Jan 2023 06:18:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57592 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230479AbjAEJYh (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 5 Jan 2023 04:24:37 -0500
-Received: from relay11.mail.gandi.net (relay11.mail.gandi.net [IPv6:2001:4b98:dc4:8::231])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D8B350E5D;
-        Thu,  5 Jan 2023 01:24:34 -0800 (PST)
+        with ESMTP id S233150AbjAFLSl (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 6 Jan 2023 06:18:41 -0500
+Received: from relay10.mail.gandi.net (relay10.mail.gandi.net [IPv6:2001:4b98:dc4:8::230])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68C4C625DC
+        for <linux-wpan@vger.kernel.org>; Fri,  6 Jan 2023 03:18:36 -0800 (PST)
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id ABD42100011;
-        Thu,  5 Jan 2023 09:24:28 +0000 (UTC)
+        by mail.gandi.net (Postfix) with ESMTPSA id EB37B240008;
+        Fri,  6 Jan 2023 11:18:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1672910672;
+        t=1673003914;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=yf/C1jtMXhm6+8Q2rGRdXwGkY3vHOGxKg3J0mHCLBYU=;
-        b=JmzBaUnkaUS5hX3cvRz24wBQcMFWdhOPE5j6M97DwFr5/PAN2ptrlHCARFLTSd0aayymIq
-        s0VObuyvr2/NB2rj61FM7OPKOYpbvtp79le0xzUUTmYTCrTLo8w9kSbfi98nS7PEaCLwLe
-        1FqSubSP+zqxvUioFpQYw1id8uhg6jAk4bCdWa4ZSdArSB1B4/8P2KyhxCMnRQjidpm80t
-        s1JR51j2rV8CT8GdRjDzn2MECqIob5rdqz6/RO1r11MLrrVisc/1k/f/mBnsDONeFmM4Dk
-        r7nxX2SngiIehPC3aV4keqWoyuoNbtcgmkZoz3/3fxB1Pln6gSZGoSz1Mxt5Kw==
-Date:   Thu, 5 Jan 2023 10:24:27 +0100
+         content-transfer-encoding:content-transfer-encoding;
+        bh=JGVSwsmNl5D9Z/XQ1EyUlJLNG9NaVhYTpoJOcrapQf4=;
+        b=QPtU91QRP5EpbtF9Yu+zMmx0+/CpE4NBTW21ZBGuSaY237zYzoPXo8y0RGOV4w8YyK5+q4
+        EJxEoketQJV7x6q+a76GqzbYl2hwJdOQWm31Es1TXvE3ySwnGLdT95kwYpWgnTyrtgiP+O
+        YE+a8qFt1tAlPRoanrn+qG8uT0wbiaVnJ8M8fhg+eSHd8a9I5Wt47u57zVTQ8L0+5d7td/
+        XUssGHl9eb+ofZRhvRBSpYep0mRqE9PuCUz9IU5C+PR91bC9r4bJ00YYmUdVEFrAYb+1MV
+        kCRbfhpl8Z1DW6ITIaLrI8N9U9QVXIovqNUmc1miwqeM3iSV3V2HuLciWLkqOA==
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
-To:     Alexander Aring <aahringo@redhat.com>
-Cc:     Alexander Aring <alex.aring@gmail.com>,
+To:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
-        linux-wpan@vger.kernel.org,
-        David Girault <david.girault@qorvo.com>,
+        linux-wpan@vger.kernel.org
+Cc:     David Girault <david.girault@qorvo.com>,
         Romuald Despres <romuald.despres@qorvo.com>,
         Frederic Blain <frederic.blain@qorvo.com>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
         Guilhem Imberton <guilhem.imberton@qorvo.com>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH wpan-next v2 6/6] mac802154: Handle passive scanning
-Message-ID: <20230105102427.4b836ea5@xps-13>
-In-Reply-To: <CAK-6q+hniz7tw74Nzvjs6VPA6Goc1ozi231PcdWpysCdLdaf4Q@mail.gmail.com>
-References: <20221217000226.646767-1-miquel.raynal@bootlin.com>
-        <20221217000226.646767-7-miquel.raynal@bootlin.com>
-        <CAK-6q+hJb-py2sNBGYBQeHLbyM_OWzi78-gOf0LcdTukFDO4MQ@mail.gmail.com>
-        <CAK-6q+gTQwS5n+YVFDeGTqEnSREt9KjC58zq9r2c8T456zXagQ@mail.gmail.com>
-        <20230103161047.4efc243c@xps-13>
-        <CAK-6q+hniz7tw74Nzvjs6VPA6Goc1ozi231PcdWpysCdLdaf4Q@mail.gmail.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+        Miquel Raynal <miquel.raynal@bootlin.com>
+Subject: [PATCH wpan-tools v2 0/8] iwpan: Scan support
+Date:   Fri,  6 Jan 2023 12:18:23 +0100
+Message-Id: <20230106111831.692202-1-miquel.raynal@bootlin.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi Alexander,
+Hello,
 
-aahringo@redhat.com wrote on Tue, 3 Jan 2023 20:00:41 -0500:
+This series follows the work done in the Linux kernel stack [1]: now
+that the core knows about the different netlink commands and attributes
+in order to support scanning requests, we can sync the userspace tools
+to use them.
 
-> Hi,
->=20
-> On Tue, Jan 3, 2023 at 10:15 AM Miquel Raynal <miquel.raynal@bootlin.com>=
- wrote:
-> >
-> > Hi Alexander,
-> >
-> > aahringo@redhat.com wrote on Mon, 2 Jan 2023 20:15:25 -0500:
-> > =20
-> > > Hi,
-> > >
-> > > On Mon, Jan 2, 2023 at 8:04 PM Alexander Aring <aahringo@redhat.com> =
-wrote: =20
-> > > >
-> > > > Hi,
-> > > >
-> > > > On Fri, Dec 16, 2022 at 7:04 PM Miquel Raynal <miquel.raynal@bootli=
-n.com> wrote:
-> > > > ... =20
-> > > > > +void mac802154_scan_worker(struct work_struct *work)
-> > > > > +{
-> > > > > +       struct ieee802154_local *local =3D
-> > > > > +               container_of(work, struct ieee802154_local, scan_=
-work.work);
-> > > > > +       struct cfg802154_scan_request *scan_req;
-> > > > > +       struct ieee802154_sub_if_data *sdata;
-> > > > > +       unsigned int scan_duration =3D 0;
-> > > > > +       struct wpan_phy* wpan_phy;
-> > > > > +       u8 scan_req_duration;
-> > > > > +       u8 page, channel;
-> > > > > +       int ret;
-> > > > > +
-> > > > > +       /* Ensure the device receiver is turned off when changing=
- channels
-> > > > > +        * because there is no atomic way to change the channel a=
-nd know on
-> > > > > +        * which one a beacon might have been received.
-> > > > > +        */
-> > > > > +       drv_stop(local);
-> > > > > +       synchronize_net(); =20
-> > > >
-> > > > Do we do that for every channel switch? I think this is not necessa=
-ry.
-> > > > It is necessary for bringing the transceiver into scan filtering mo=
-de,
-> > > > but we don't need to do that for switching the channel.
-> > > >
-> > > > And there is a difference why we need to do that for filtering. In =
-my
-> > > > mind I had the following reason that the MAC layer is handled in Li=
-nux
-> > > > (softMAC) and by offloaded parts on the transceiver, this needs to =
-be
-> > > > synchronized. The PHY layer is completely on the transceiver side,
-> > > > that's why you can switch channels during interface running. There
-> > > > exist some MAC parameters which are offloaded to the hardware and a=
-re
-> > > > currently not possible to synchronize while an interface is up,
-> > > > however this could change in future because the new helpers to
-> > > > synchronize softmac/transceiver mac handling.
-> > > >
-> > > > There is maybe a need here to be sure everything is transmitted on =
-the
-> > > > hardware before switching the channel, but this should be done by t=
-he
-> > > > new mlme functionality which does a synchronized transmit. However =
-we
-> > > > don't transmit anything here, so there is no need for that yet. We
-> > > > should never stop the transceiver being into receive mode and during
-> > > > scan we should always be into receive mode in
-> > > > IEEE802154_FILTERING_3_SCAN level without never leaving it.
-> > > >
-> > > > ... and happy new year.
-> > > >
-> > > > I wanted to ack this series but this came into my mind. I also want=
-ed
-> > > > to check what exactly happens when a mlme op returns an error like
-> > > > channel access failure? Do we ignore it? Do we do cond_resched() and
-> > > > retry again later? I guess these are questions only if we get into
-> > > > active scanning with more exciting sending of frames, because here =
-we
-> > > > don't transmit anything. =20
-> > >
-> > > Ignore that above about stopping the transceiver being in receive
-> > > mode, you are right... you cannot know on which channel/page
-> > > combination the beacon was received because as the comment says, it is
-> > > not atomic to switch it... sadly the transceiver does not tell us that
-> > > on a per frame basis. =20
-> >
-> > No problem ;)
-> > =20
-> > > Sorry for the noise. Still with my previous comments why it's still
-> > > valid to switch channels while phy is in receive mode but not in scan
-> > > mode, I would say if a user does that... then we don't care. Some
-> > > offloaded parts and softMAC handling still need indeed to be
-> > > synchronized because we don't know how a transceiver reacts on it to
-> > > change registers there while transmitting. =20
-> >
-> > In case of error during an MLME transmission the behavior depends on
-> > which MLME it is. As you said, for passive scanning it does not matter
-> > because we do not really transmit anything yet. However active scans
-> > and beacons sending need this feature and have to transmit frames. I
-> > assumed both actions should not have a very high importance and if the
-> > transmission fails, we will just wait for the next slot and try again.
-> > It was the simplest approach I could come up with (I will send the
-> > beacons part very soon). Should we consider retrying a fixed number of
-> > times immediately after the failure? 1 time? 2 times? Or should we, as
-> > it is implemented, wait for the next slot? =20
->=20
-> use the simplest approach. btw: 802.15.4 and ack handling has it's
-> "own" retransmit handling, but I think csma retries could happen
-> without setting the ack request bit. We should avoid that the user
-> gets an error "channel access failure" for doing an active scan, or
-> this maybe should be and the user can react to it? It would then
-> require that the user's implementation cares/is aware about such a
-> possibility and maybe does a simple retry on user level as well or
-> whatever they want then? However they are probably not happy to start
-> a whole scan again...
->=20
-> I am not sure what the right thing is... it is probably a rare case.
+As part of these additions, a few cleanup patches are introducing the
+series, including a first sync with a recent change in nl802154.h.
 
-I agree it should be very rare. As you said, the retransmission should
-be already attempted in the active scan case so I think if the channel
-is completely bloated, we could just ignore the issue and only wait for
-"passive" beacons to arrive, exceptionally.
+[1] https://lore.kernel.org/linux-wpan/ec93100f-8c55-2f54-d3d5-63f31c2602f4@datenfreihafen.org/T/#t
 
-In the Beacon sending case I guess it's not that important. On one side,
-if we dictate the active periods between each beacon then in theory no
-device should emit when we send it. On the other side if we are
-just sending these beacons without any kind of framing involved, we
-don't really care if one of them cannot be transmitted, there will
-be others.
+Cheers,
+Miquèl
 
-Thanks,
-Miqu=C3=A8l
+Changes in v2:
+* Adapted to the latest kernel changes.
+* Added a real "monitor" command in place of the scan done command.
+* Renamed iwpan event into iwpan monitor.
+* Dropped an unused function.
+* Changed the behavior of the scan monitor call.
+* Added SIGINT support to send an abort.
+* Avoided a race in the scan command by using pthread when starting to
+  monitor, before triggering the scan operation.
+* Dropped beaconing support for this first version.
+
+David Girault (4):
+  iwpan: Export iwpan_debug
+  iwpan: Remove duplicated SECTION
+  iwpan: Add scan support
+  iwpan: Add events support
+
+Miquel Raynal (3):
+  iwpan: Synchronize nl802154.h with the latest kernel
+  iwpan: Fix a comment
+  iwpan: Synchronize nl802154.h with the latest scan changes
+
+Romuald Despres (1):
+  iwpan: Fix the channels printing
+
+ src/Makefile.am |   2 +
+ src/event.c     | 230 ++++++++++++++++++++
+ src/info.c      |   2 +-
+ src/iwpan.c     |   2 +-
+ src/iwpan.h     |  10 +-
+ src/nl802154.h  | 107 +++++++++-
+ src/scan.c      | 548 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 7 files changed, 888 insertions(+), 13 deletions(-)
+ create mode 100644 src/event.c
+ create mode 100644 src/scan.c
+
+-- 
+2.34.1
+
