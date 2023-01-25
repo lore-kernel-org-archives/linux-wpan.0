@@ -2,128 +2,299 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AAE55C38142
-	for <linux-wpan@archiver.kernel.org>; Tue, 24 Jan 2023 10:08:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A6F2C38142
+	for <linux-wpan@archiver.kernel.org>; Wed, 25 Jan 2023 00:58:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233220AbjAXKI2 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 24 Jan 2023 05:08:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49874 "EHLO
+        id S234282AbjAYA6F (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 24 Jan 2023 19:58:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55782 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233318AbjAXKI1 (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 24 Jan 2023 05:08:27 -0500
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::226])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 402B0B75D;
-        Tue, 24 Jan 2023 02:08:19 -0800 (PST)
-Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id 4D418C000A;
-        Tue, 24 Jan 2023 10:08:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1674554898;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=3i5ohLf4wLNRAQx3kpGrIufjr8r+UzfPMXQjZwgDwzw=;
-        b=E8BePmz8bTzR9PGZnnziJdDhqQ7/o0QqqGdAJrH+7NsEHio6tibumlCNVVG0ejiGIMwIa4
-        bE4i0cwDc2VGUSSYBYy6M/OkYxoI5C+dlno6lmSbgRvLCiUDbWIbtbw5tJ5usXlCY3q6kb
-        RkfpEPPIm8aZTRwLiIJ6h29Oa7lhz057YmpNHNTKP9yFmR6YpjUIBPvn+ZM/zr7l2g2ySz
-        Qroj3Hqbui5tnsPNYVBOn5D0s1b+xTB6s/egRRUKWF/yY/V6kJ/eJIpJbWTMAZ+qMzJC+0
-        HtD5sOWWxtviFGueXs8XqZ6qs0nQyJBBeLeq3eZYfYbRlZ/mDJesBtVPkUYgMA==
-Date:   Tue, 24 Jan 2023 11:08:14 +0100
-From:   Miquel Raynal <miquel.raynal@bootlin.com>
-To:     Alexander Aring <aahringo@redhat.com>
-Cc:     Alexander Aring <alex.aring@gmail.com>,
-        Stefan Schmidt <stefan@datenfreihafen.org>,
-        linux-wpan@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
-        David Girault <david.girault@qorvo.com>,
-        Romuald Despres <romuald.despres@qorvo.com>,
-        Frederic Blain <frederic.blain@qorvo.com>,
-        Nicolas Schodet <nico@ni.fr.eu.org>,
-        Guilhem Imberton <guilhem.imberton@qorvo.com>,
-        Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH wpan-next 0/2] ieee802154: Beaconing support
-Message-ID: <20230124110814.6096ecbe@xps-13>
-In-Reply-To: <CAK-6q+gn7W9x2+ihSC41RzkhmBn1E44pKtJFHgqRdd8aBpLrVQ@mail.gmail.com>
-References: <20230106113129.694750-1-miquel.raynal@bootlin.com>
-        <CAK-6q+jNmvtBKKxSp1WepVXbaQ65CghZv3bS2ptjB9jyzOSGTA@mail.gmail.com>
-        <20230118102058.3b1f275b@xps-13>
-        <CAK-6q+gwP8P--5e9HKt2iPhjeefMXrXUVy-G+szGdFXZvgYKvg@mail.gmail.com>
-        <CAK-6q+gn7W9x2+ihSC41RzkhmBn1E44pKtJFHgqRdd8aBpLrVQ@mail.gmail.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+        with ESMTP id S233674AbjAYA6D (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 24 Jan 2023 19:58:03 -0500
+Received: from mail-vs1-xe34.google.com (mail-vs1-xe34.google.com [IPv6:2607:f8b0:4864:20::e34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 295D72364C
+        for <linux-wpan@vger.kernel.org>; Tue, 24 Jan 2023 16:57:55 -0800 (PST)
+Received: by mail-vs1-xe34.google.com with SMTP id p1so18328650vsr.5
+        for <linux-wpan@vger.kernel.org>; Tue, 24 Jan 2023 16:57:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google;
+        h=cc:to:subject:message-id:date:thread-index:mime-version:in-reply-to
+         :references:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=zxGcN7dSaPvA+q+B1abNy22OKsQwbZUPMQvE/jkstKU=;
+        b=XCQLJ+9lsQnWkPnLWbpNcx5pWoI3srGJU373UmsvvRXVtBOiG64gmCjXRc9vhR06+d
+         hMwyBvutlj3NAci2JQGhf/bYscbc4grcN7srKSc04wx1sRcJdZIqJpkzx6kizoa7TJv5
+         /GmN4AiThbsUvkahmSInMvHUvO8L4SPdCmoVo=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:thread-index:mime-version:in-reply-to
+         :references:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zxGcN7dSaPvA+q+B1abNy22OKsQwbZUPMQvE/jkstKU=;
+        b=HZTBYYwCiJF7agmJnBoxZiVMtGADCZj3M5dUvMsNlZrRMXGEv2CqCKbiFLrLmNhNaO
+         1aolOSVVH7QXn+uVPgp2Q72fCjZqYK0cB5iD9Mp0Osy8P4sNCr3+dmEUUtX5Ej6+97uZ
+         ukyyKRPilnMj5iJn20/e8GMgDUpQe2SZR62Y1b82gjkVvD1YQSuGfIkh6YO6CgZ/Uvei
+         ABRISSNNZQG/FAn4UN5v4y0knHX8giCE5rv1QnyaD9+OAMYK7fBULoXeXrTht2xNNNXc
+         W8GwZZMeP4tfzmNFepZ0XKf5jNXokxOqOSer/ExlxrxkFBban1icB4e4TNlNFAmnB0QO
+         b9SQ==
+X-Gm-Message-State: AFqh2kqrziBk6FkBgpQmQ5bSgfjtgPLLMRTwVEQtKVn1zi2tnaCVx/XN
+        HOfaHc+vufTfi42v6TwuyGTy3oaRwqmkHKg2/lUl3w==
+X-Google-Smtp-Source: AMrXdXu0WEVAHtkl/7WrGp7gsGmIxeNAjZACQY1znOQilpBjqALn5uFkSCuep3Y6cqMY533KDesP8Mmq99uNyBp2hTA=
+X-Received: by 2002:a67:f246:0:b0:3b1:5690:a240 with SMTP id
+ y6-20020a67f246000000b003b15690a240mr3921552vsm.68.1674608274113; Tue, 24 Jan
+ 2023 16:57:54 -0800 (PST)
+From:   William Zhang <william.zhang@broadcom.com>
+References: <20230119185342.2093323-1-amit.kumar-mahapatra@amd.com> <20230119185342.2093323-3-amit.kumar-mahapatra@amd.com>
+In-Reply-To: <20230119185342.2093323-3-amit.kumar-mahapatra@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+X-Mailer: Microsoft Outlook 16.0
+Thread-Index: AQGsd40KKMSPSaowQedOCmq8Q0lhhQIBWekOAbfQgXk=
+Date:   Tue, 24 Jan 2023 16:57:49 -0800
+Message-ID: <36840e0caeca5f53eef4fab615fc7976@mail.gmail.com>
+Subject: Re: [PATCH v2 02/13] spi: Replace all spi->chip_select and
+ spi->cs_gpiod references with function call
+To:     Amit Kumar Mahapatra <amit.kumar-mahapatra@amd.com>,
+        broonie@kernel.org, miquel.raynal@bootlin.com, richard@nod.at,
+        vigneshr@ti.com, jic23@kernel.org, tudor.ambarus@microchip.com,
+        pratyush@kernel.org, sanju.mehta@amd.com,
+        chin-ting_kuo@aspeedtech.com, clg@kaod.org, kdasu.kdev@gmail.com,
+        f.fainelli@gmail.com, rjui@broadcom.com, sbranden@broadcom.com,
+        eajames@linux.ibm.com, olteanv@gmail.com, han.xu@nxp.com,
+        john.garry@huawei.com, shawnguo@kernel.org, s.hauer@pengutronix.de,
+        narmstrong@baylibre.com, khilman@baylibre.com,
+        matthias.bgg@gmail.com, haibo.chen@nxp.com,
+        linus.walleij@linaro.org, daniel@zonque.org,
+        haojian.zhuang@gmail.com, robert.jarzmik@free.fr,
+        agross@kernel.org, bjorn.andersson@linaro.org, heiko@sntech.de,
+        krzysztof.kozlowski@linaro.org, andi@etezian.org,
+        mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
+        wens@csie.org, jernej.skrabec@gmail.com, samuel@sholland.org,
+        masahisa.kojima@linaro.org, jaswinder.singh@linaro.org,
+        rostedt@goodmis.org, mingo@redhat.com, l.stelmach@samsung.com,
+        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com, alex.aring@gmail.com, stefan@datenfreihafen.org,
+        kvalo@kernel.org, thierry.reding@gmail.com, jonathanh@nvidia.com,
+        skomatineni@nvidia.com, sumit.semwal@linaro.org,
+        christian.koenig@amd.com, j.neuschaefer@gmx.net,
+        vireshk@kernel.org, rmfrfs@gmail.com, johan@kernel.org,
+        elder@kernel.org, gregkh@linuxfoundation.org
+Cc:     git@amd.com, linux-spi@vger.kernel.org,
+        linux-kernel@vger.kernel.org, joel@jms.id.au, andrew@aj.id.au,
+        radu_nicolae.pirea@upb.ro, nicolas.ferre@microchip.com,
+        alexandre.belloni@bootlin.com, claudiu.beznea@microchip.com,
+        bcm-kernel-feedback-list@broadcom.com, fancer.lancer@gmail.com,
+        kernel@pengutronix.de, festevam@gmail.com, linux-imx@nxp.com,
+        jbrunet@baylibre.com, martin.blumenstingl@googlemail.com,
+        avifishman70@gmail.com, tmaimon77@gmail.com, tali.perry1@gmail.com,
+        venture@google.com, yuenn@google.com, benjaminfair@google.com,
+        yogeshgaur.83@gmail.com, konrad.dybcio@somainline.org,
+        alim.akhtar@samsung.com, ldewangan@nvidia.com,
+        michal.simek@amd.com, linux-aspeed@lists.ozlabs.org,
+        openbmc@lists.ozlabs.org, linux-arm-kernel@lists.infradead.org,
+        linux-rpi-kernel@lists.infradead.org,
+        linux-amlogic@lists.infradead.org,
+        linux-mediatek@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+        linux-rockchip@lists.infradead.org,
+        linux-samsung-soc@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-sunxi@lists.linux.dev, linux-tegra@vger.kernel.org,
+        netdev@vger.kernel.org, linux-wpan@vger.kernel.org,
+        libertas-dev@lists.infradead.org, linux-wireless@vger.kernel.org,
+        linux-mtd@lists.infradead.org, lars@metafoo.de,
+        Michael.Hennerich@analog.com, linux-iio@vger.kernel.org,
+        michael@walle.cc, palmer@dabbelt.com,
+        linux-riscv@lists.infradead.org, linux-media@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, greybus-dev@lists.linaro.org,
+        linux-staging@lists.linux.dev, amitrkcian2002@gmail.com
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+        boundary="00000000000056693205f30c1f46"
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi Alexander,
+--00000000000056693205f30c1f46
+Content-Type: text/plain; charset="UTF-8"
 
-aahringo@redhat.com wrote on Mon, 23 Jan 2023 09:02:48 -0500:
+On 01/19/2023 10:53 AM, 'Amit Kumar Mahapatra' via
+BCM-KERNEL-FEEDBACK-LIST,PDL wrote:
+> diff --git a/drivers/spi/spi-bcm63xx-hsspi.c
+> b/drivers/spi/spi-bcm63xx-hsspi.c
+> index b871fd810d80..dc179c4677d4 100644
+> --- a/drivers/spi/spi-bcm63xx-hsspi.c
+> +++ b/drivers/spi/spi-bcm63xx-hsspi.c
+> @@ -130,7 +130,7 @@ static void bcm63xx_hsspi_set_cs(struct bcm63xx_hsspi
+> *bs, unsigned int cs,
+>   static void bcm63xx_hsspi_set_clk(struct bcm63xx_hsspi *bs,
+>   				  struct spi_device *spi, int hz)
+>   {
+> -	unsigned int profile = spi->chip_select;
+> +	unsigned int profile = spi_get_chipselect(spi, 0);
+>   	u32 reg;
+>
+>   	reg = DIV_ROUND_UP(2048, DIV_ROUND_UP(bs->speed_hz, hz));
+> @@ -157,7 +157,7 @@ static void bcm63xx_hsspi_set_clk(struct bcm63xx_hsspi
+> *bs,
+>   static int bcm63xx_hsspi_do_txrx(struct spi_device *spi, struct
+> spi_transfer *t)
+>   {
+>   	struct bcm63xx_hsspi *bs = spi_master_get_devdata(spi->master);
+> -	unsigned int chip_select = spi->chip_select;
+> +	unsigned int chip_select = spi_get_chipselect(spi, 0);
+>   	u16 opcode = 0;
+>   	int pending = t->len;
+>   	int step_size = HSSPI_BUFFER_LEN;
+> @@ -165,7 +165,7 @@ static int bcm63xx_hsspi_do_txrx(struct spi_device
+> *spi, struct spi_transfer *t)
+>   	u8 *rx = t->rx_buf;
+>
+>   	bcm63xx_hsspi_set_clk(bs, spi, t->speed_hz);
+> -	bcm63xx_hsspi_set_cs(bs, spi->chip_select, true);
+> +	bcm63xx_hsspi_set_cs(bs, spi_get_chipselect(spi, 0), true);
+>
+>   	if (tx && rx)
+>   		opcode = HSSPI_OP_READ_WRITE;
+> @@ -228,14 +228,14 @@ static int bcm63xx_hsspi_setup(struct spi_device
+> *spi)
+>   	u32 reg;
+>
+>   	reg = __raw_readl(bs->regs +
+> -			  HSSPI_PROFILE_SIGNAL_CTRL_REG(spi->chip_select));
+> +			  HSSPI_PROFILE_SIGNAL_CTRL_REG(spi_get_chipselect(spi, 0)));
+>   	reg &= ~(SIGNAL_CTRL_LAUNCH_RISING | SIGNAL_CTRL_LATCH_RISING);
+>   	if (spi->mode & SPI_CPHA)
+>   		reg |= SIGNAL_CTRL_LAUNCH_RISING;
+>   	else
+>   		reg |= SIGNAL_CTRL_LATCH_RISING;
+>   	__raw_writel(reg, bs->regs +
+> -		     HSSPI_PROFILE_SIGNAL_CTRL_REG(spi->chip_select));
+> +		     HSSPI_PROFILE_SIGNAL_CTRL_REG(spi_get_chipselect(spi, 0)));
+>
+>   	mutex_lock(&bs->bus_mutex);
+>   	reg = __raw_readl(bs->regs + HSSPI_GLOBAL_CTRL_REG);
+> @@ -243,16 +243,16 @@ static int bcm63xx_hsspi_setup(struct spi_device
+> *spi)
+>   	/* only change actual polarities if there is no transfer */
+>   	if ((reg & GLOBAL_CTRL_CS_POLARITY_MASK) == bs->cs_polarity) {
+>   		if (spi->mode & SPI_CS_HIGH)
+> -			reg |= BIT(spi->chip_select);
+> +			reg |= BIT(spi_get_chipselect(spi, 0));
+>   		else
+> -			reg &= ~BIT(spi->chip_select);
+> +			reg &= ~BIT(spi_get_chipselect(spi, 0));
+>   		__raw_writel(reg, bs->regs + HSSPI_GLOBAL_CTRL_REG);
+>   	}
+>
+>   	if (spi->mode & SPI_CS_HIGH)
+> -		bs->cs_polarity |= BIT(spi->chip_select);
+> +		bs->cs_polarity |= BIT(spi_get_chipselect(spi, 0));
+>   	else
+> -		bs->cs_polarity &= ~BIT(spi->chip_select);
+> +		bs->cs_polarity &= ~BIT(spi_get_chipselect(spi, 0));
+>
+>   	mutex_unlock(&bs->bus_mutex);
+>
+> @@ -283,7 +283,7 @@ static int bcm63xx_hsspi_transfer_one(struct
+> spi_master *master,
+>   	 * e. At the end restore the polarities again to their default values.
+>   	 */
+>
+> -	dummy_cs = !spi->chip_select;
+> +	dummy_cs = !spi_get_chipselect(spi, 0);
+>   	bcm63xx_hsspi_set_cs(bs, dummy_cs, true);
+>
+>   	list_for_each_entry(t, &msg->transfers, transfer_list) {
+> @@ -296,7 +296,7 @@ static int bcm63xx_hsspi_transfer_one(struct
+> spi_master *master,
+>   		spi_transfer_delay_exec(t);
+>
+>   		if (t->cs_change)
+> -			bcm63xx_hsspi_set_cs(bs, spi->chip_select, false);
+> +			bcm63xx_hsspi_set_cs(bs, spi_get_chipselect(spi, 0), false);
+>   	}
+>
+>   	mutex_lock(&bs->bus_mutex);
 
-> Hi,
->=20
-> On Mon, Jan 23, 2023 at 9:01 AM Alexander Aring <aahringo@redhat.com> wro=
-te:
-> >
-> > Hi,
-> >
-> > On Wed, Jan 18, 2023 at 4:21 AM Miquel Raynal <miquel.raynal@bootlin.co=
-m> wrote: =20
-> > >
-> > > Hi Alexander,
-> > >
-> > > aahringo@redhat.com wrote on Sun, 15 Jan 2023 20:54:02 -0500:
-> > > =20
-> > > > Hi,
-> > > >
-> > > > On Fri, Jan 6, 2023 at 6:33 AM Miquel Raynal <miquel.raynal@bootlin=
-.com> wrote: =20
-> > > > >
-> > > > > Scanning being now supported, we can eg. play with hwsim to verify
-> > > > > everything works as soon as this series including beaconing suppo=
-rt gets
-> > > > > merged.
-> > > > > =20
-> > > >
-> > > > I am not sure if a beacon send should be handled by an mlme helper
-> > > > handling as this is a different use-case and the user does not trig=
-ger
-> > > > an mac command and is waiting for some reply and a more complex
-> > > > handling could be involved. There is also no need for hotpath xmit
-> > > > handling is disabled during this time. It is just an async messaging
-> > > > in some interval and just "try" to send it and don't care if it fai=
-ls,
-> > > > or? For mac802154 therefore I think we should use the dev_queue_xmi=
-t()
-> > > > function to queue it up to send it through the hotpath?
-> > > >
-> > > > I can ack those patches, it will work as well. But I think we should
-> > > > switch at some point to dev_queue_xmit(). It should be simple to
-> > > > switch it. Just want to mention there is a difference which will be
-> > > > there in mac-cmds like association. =20
-> > >
-> > > I see what you mean. That's indeed true, we might just switch to
-> > > a less constrained transmit path.
-> > > =20
-> >
-> > I would define the difference in bypass qdisc or not. Whereas the
-> > qdisc can drop or delay transmitting... For me, the qdisc is currently
-> > in a "works for now" state. =20
->=20
-> probably also bypass other hooks like tc, etc. :-/ Not sure if we want th=
-at.
+For bcm63xx-hsspi driver,
 
-Actually, IIUC, we no longer want to go through the entire net stack.
-We still want to bypass it but without stopping/flushing the full
-queue like with an mlme transmission, so what about using
-ieee802154_subif_start_xmit() instead of dev_queue_xmit()? I think it
-is more appropriate.
+Acked-by: William Zhang <william.zhang@broadcom.com>
 
-Thanks,
-Miqu=C3=A8l
+--00000000000056693205f30c1f46
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
+
+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
+YDZuuBJwnyCzevMoPtVYPharioL5H3BRnQi8YoTXH7/uRo33dewYFm474yFjwwnt82TFtveVZkVq
+6h4WIQ4wTcwFfET8zMkELnGzS5SHCl8sPD+lNxxJ1JDZYwIDAQABo4IB2zCCAdcwDgYDVR0PAQH/
+BAQDAgWgMIGjBggrBgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZCaHR0cDovL3NlY3VyZS5nbG9i
+YWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAuY3J0MEEGCCsGAQUF
+BzABhjVodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAy
+MDBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcCARYmaHR0cHM6Ly93d3cuZ2xv
+YmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNVHR8EQjBAMD6gPKA6hjhodHRw
+Oi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNybDAlBgNV
+HREEHjAcgRp3aWxsaWFtLnpoYW5nQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAf
+BgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQUq65GzwZxydFHjjYEU/9h
+xHhPWlwwDQYJKoZIhvcNAQELBQADggEBAA2hGG3JPAdGPH0ZdohGUCIVjKz+U+EFuIDbS6A/5jqX
+VhYAxZlzj7tSjUIM7G7IhyfqPC46GKJ/4x+Amz1Z6YxNGy71L68kYD6hIbBcA5AM42QBUufly6Oa
+/ppSz3WoflVyFFQ5YXniZ+eU+2/cdnYZg4aVUnFjimOF5o3NfMLzOkhQNxbaDjFUfUYD8hKmU6v4
+0vUBj8KZ9Gi1LIagLKUREn8jku0lcLsRbnJ5Ey5ScajC/FESPyYWasOW8j8/1EoJksmhbYGKNS6C
+urb/KlmDGfVrIRYDbL0ckhGQIP5c6L+kSQZ2sHnQK0e0WgIaZYxaPYeY5u0GLCOze+3vyRMxggJt
+MIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYD
+VQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwxuh2XG3FXRL1W
+JOEwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIPV0GPci7PjhkOLQr5YYlwfjp9bZ
+8n4Nhqy3DqNgqzROMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIz
+MDEyNTAwNTc1NFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsG
+CWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFl
+AwQCATANBgkqhkiG9w0BAQEFAASCAQCDeRwW7sqpu5MnOyyvjxmJvRUbfI/L5CP1JkPtuA2BZ0WX
+P6pe/eXLFP9A//7IMZwRnMYubkHF2KOwoW3nTAZfFZU1MJtjpUcUMyAey4sODSCw78wnDub+b0R4
+rbtgWN26AOILOF9V7rUdA5hd4ZZZWrSVlZOxQOnkEnrrXwRMTZ6H4LILkENVRytDPX6WcNSzofVt
+bTZisKrK4TQRGwagjsH1XbjDJQy3in8wE53Bemw/woVR/U5dKkgH5bIc7O+yvfRkg3Dze87oKtUn
+0jlTOX7lGBKRqMHxDVl2SRBQXJ+ytWpT1WR9l3AFCBIp4QCo4isjywLpWTF5YramMP+j
+--00000000000056693205f30c1f46--
