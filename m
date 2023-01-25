@@ -2,60 +2,36 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DF24C54E94
-	for <linux-wpan@archiver.kernel.org>; Wed, 25 Jan 2023 02:31:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33C56C54E94
+	for <linux-wpan@archiver.kernel.org>; Wed, 25 Jan 2023 10:00:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229918AbjAYCbx (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 24 Jan 2023 21:31:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56912 "EHLO
+        id S234005AbjAYKAE (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 25 Jan 2023 05:00:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44772 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232876AbjAYCbw (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 24 Jan 2023 21:31:52 -0500
-Received: from mail-oa1-x2e.google.com (mail-oa1-x2e.google.com [IPv6:2001:4860:4864:20::2e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5001F4FC3F;
-        Tue, 24 Jan 2023 18:31:45 -0800 (PST)
-Received: by mail-oa1-x2e.google.com with SMTP id 586e51a60fabf-1442977d77dso19911145fac.6;
-        Tue, 24 Jan 2023 18:31:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=8kCsukhVDS/c7tuRdeCrUX7U/E2xZNP5HI/GGFAaFiE=;
-        b=FEVbXRpHzyHt2qh1mEGig45KpGvRwYaEWRia/Wk2VYc4n02CR2HbqxXxWspb8tJt+z
-         LUAYWjdfxnC3HYGGKABdPjzeIUKHbESXeqQJzH0KNvGCqQyB/ZCJkkMtatHS+22PGyoW
-         8yBXFjXhM4QYbam8U4nUZKOgefWJ5PuJ6YnkqJEla+fEFrJAY3DYvuZjKE+vvxxfdyAx
-         OTYi2UB9EQhmzzaugLCfDNbYXfoZzcpc6oOyT93xHgt272deRCEF6eoGAqVNT8QXVmZH
-         2STj/eIiN5KNAe4D1jitEa0Fa+QsixMlUBtYVZdu4Xh7WnYvap5tOEukPTz7tK59ZOOX
-         Kdaw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=8kCsukhVDS/c7tuRdeCrUX7U/E2xZNP5HI/GGFAaFiE=;
-        b=bArhI+/wCkwIf4En2c95uRcnKEO0AOqEMs4i/NGqH8teVEk+txDAFHvdjbi0x35Rq2
-         mmCb419bk7471YuyhNeLwnbEcR5ZDrTlJe6fAeHfzNAZXt07UQghnjeLZr+QVzUNOkz1
-         1nt9FbWN26OVOUYHrpSI/BveP+FdvQeqGKp1jluCy35PHTmRIUNMisXFRl85R0BcSuU7
-         XtpG/k+cAALEOXXC4ZUrdvpgbiN3kN1dOhpPLQu2TVVArScPuAvg4rZy/mJu8XAxMxj3
-         mi+2seTSkTNrl3P71ocmuSOgcnwBzmxAWR/0k7TOne2u8Wubk03jYvccpbqrii9UM797
-         00yg==
-X-Gm-Message-State: AFqh2kre0spF/o5NWrQo323JXdwNc7mkvM0R9Pv19WQ1e5nIn+lKifid
-        To+TnCAIcZAeRetXu/7N2ET+FHpR0YE9xrUHicE=
-X-Google-Smtp-Source: AMrXdXsv/wYPwDlp2qCLvItL6QPtD2iv1rwhJgyk3VyrRoJE5hng6Qe0F6mF5pEESMydu87TUrmxgRP4o/kHb5eRV1c=
-X-Received: by 2002:a05:6870:2b18:b0:15f:4b09:ce85 with SMTP id
- ld24-20020a0568702b1800b0015f4b09ce85mr2124174oab.24.1674613904618; Tue, 24
- Jan 2023 18:31:44 -0800 (PST)
-MIME-Version: 1.0
-References: <20230106113129.694750-1-miquel.raynal@bootlin.com>
- <CAK-6q+jNmvtBKKxSp1WepVXbaQ65CghZv3bS2ptjB9jyzOSGTA@mail.gmail.com>
- <20230118102058.3b1f275b@xps-13> <CAK-6q+gwP8P--5e9HKt2iPhjeefMXrXUVy-G+szGdFXZvgYKvg@mail.gmail.com>
- <CAK-6q+gn7W9x2+ihSC41RzkhmBn1E44pKtJFHgqRdd8aBpLrVQ@mail.gmail.com> <20230124110814.6096ecbe@xps-13>
-In-Reply-To: <20230124110814.6096ecbe@xps-13>
-From:   Alexander Aring <alex.aring@gmail.com>
-Date:   Tue, 24 Jan 2023 21:31:33 -0500
-Message-ID: <CAB_54W69KcM0UJjf8py-VyRXx2iEUvcAKspXiAkykkQoF6ccDA@mail.gmail.com>
-Subject: Re: [PATCH wpan-next 0/2] ieee802154: Beaconing support
-To:     Miquel Raynal <miquel.raynal@bootlin.com>
+        with ESMTP id S230174AbjAYKAD (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 25 Jan 2023 05:00:03 -0500
+Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6846B4997B;
+        Wed, 25 Jan 2023 02:00:01 -0800 (PST)
+Received: (Authenticated sender: miquel.raynal@bootlin.com)
+        by mail.gandi.net (Postfix) with ESMTPSA id 19623FF80E;
+        Wed, 25 Jan 2023 09:59:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+        t=1674640799;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=b32jowcL09Pq3mOJpkXEjTseoNMw15SMTSszTjV1ZG0=;
+        b=Ve3aa/ssUj7kATRuuiCEZFjL13lKl7+3YXNoyJm+VO+bFStA4+KmggbzKIC3WqdjDfs/6q
+        UujqKFUa3O7ogc/LFMUSvGa1tagPqW2CMWpUTT8bfjtWOs1bWqH4ffO8eLfGzy6wT0fejo
+        R94dPGTlnE/9rqBvgnbePR2lcAKRidq/boc/gIDRgmCRua/OJ76ok2ZwycRT/yZ8qYgeMh
+        Dtix3aGeQJa0oTKmspmUYGRDFmD11ZfymNGdM1IN2i1C25u/zt/col+VksRElRwN0jt9uH
+        HPzpa61pVP0ds/ULaN7M7TxPO4eOpSMlhZ62+9lqhyu3kEqNTbXAzCcOBg1XIQ==
+Date:   Wed, 25 Jan 2023 10:59:56 +0100
+From:   Miquel Raynal <miquel.raynal@bootlin.com>
+To:     Alexander Aring <alex.aring@gmail.com>
 Cc:     Alexander Aring <aahringo@redhat.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
         linux-wpan@vger.kernel.org,
@@ -69,79 +45,137 @@ Cc:     Alexander Aring <aahringo@redhat.com>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
         Guilhem Imberton <guilhem.imberton@qorvo.com>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH wpan-next 0/2] ieee802154: Beaconing support
+Message-ID: <20230125105653.44e9498f@xps-13>
+In-Reply-To: <CAB_54W69KcM0UJjf8py-VyRXx2iEUvcAKspXiAkykkQoF6ccDA@mail.gmail.com>
+References: <20230106113129.694750-1-miquel.raynal@bootlin.com>
+        <CAK-6q+jNmvtBKKxSp1WepVXbaQ65CghZv3bS2ptjB9jyzOSGTA@mail.gmail.com>
+        <20230118102058.3b1f275b@xps-13>
+        <CAK-6q+gwP8P--5e9HKt2iPhjeefMXrXUVy-G+szGdFXZvgYKvg@mail.gmail.com>
+        <CAK-6q+gn7W9x2+ihSC41RzkhmBn1E44pKtJFHgqRdd8aBpLrVQ@mail.gmail.com>
+        <20230124110814.6096ecbe@xps-13>
+        <CAB_54W69KcM0UJjf8py-VyRXx2iEUvcAKspXiAkykkQoF6ccDA@mail.gmail.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi,
+Hi Alexander,
 
-On Tue, Jan 24, 2023 at 5:08 AM Miquel Raynal <miquel.raynal@bootlin.com> wrote:
->
-> Hi Alexander,
->
-> aahringo@redhat.com wrote on Mon, 23 Jan 2023 09:02:48 -0500:
->
-> > Hi,
+alex.aring@gmail.com wrote on Tue, 24 Jan 2023 21:31:33 -0500:
+
+> Hi,
+>=20
+> On Tue, Jan 24, 2023 at 5:08 AM Miquel Raynal <miquel.raynal@bootlin.com>=
+ wrote:
 > >
-> > On Mon, Jan 23, 2023 at 9:01 AM Alexander Aring <aahringo@redhat.com> wrote:
-> > >
+> > Hi Alexander,
+> >
+> > aahringo@redhat.com wrote on Mon, 23 Jan 2023 09:02:48 -0500:
+> > =20
 > > > Hi,
 > > >
-> > > On Wed, Jan 18, 2023 at 4:21 AM Miquel Raynal <miquel.raynal@bootlin.com> wrote:
+> > > On Mon, Jan 23, 2023 at 9:01 AM Alexander Aring <aahringo@redhat.com>=
+ wrote: =20
 > > > >
-> > > > Hi Alexander,
+> > > > Hi,
 > > > >
-> > > > aahringo@redhat.com wrote on Sun, 15 Jan 2023 20:54:02 -0500:
-> > > >
-> > > > > Hi,
+> > > > On Wed, Jan 18, 2023 at 4:21 AM Miquel Raynal <miquel.raynal@bootli=
+n.com> wrote: =20
 > > > > >
-> > > > > On Fri, Jan 6, 2023 at 6:33 AM Miquel Raynal <miquel.raynal@bootlin.com> wrote:
+> > > > > Hi Alexander,
+> > > > >
+> > > > > aahringo@redhat.com wrote on Sun, 15 Jan 2023 20:54:02 -0500:
+> > > > > =20
+> > > > > > Hi,
 > > > > > >
-> > > > > > Scanning being now supported, we can eg. play with hwsim to verify
-> > > > > > everything works as soon as this series including beaconing support gets
-> > > > > > merged.
+> > > > > > On Fri, Jan 6, 2023 at 6:33 AM Miquel Raynal <miquel.raynal@boo=
+tlin.com> wrote: =20
+> > > > > > >
+> > > > > > > Scanning being now supported, we can eg. play with hwsim to v=
+erify
+> > > > > > > everything works as soon as this series including beaconing s=
+upport gets
+> > > > > > > merged.
+> > > > > > > =20
 > > > > > >
+> > > > > > I am not sure if a beacon send should be handled by an mlme hel=
+per
+> > > > > > handling as this is a different use-case and the user does not =
+trigger
+> > > > > > an mac command and is waiting for some reply and a more complex
+> > > > > > handling could be involved. There is also no need for hotpath x=
+mit
+> > > > > > handling is disabled during this time. It is just an async mess=
+aging
+> > > > > > in some interval and just "try" to send it and don't care if it=
+ fails,
+> > > > > > or? For mac802154 therefore I think we should use the dev_queue=
+_xmit()
+> > > > > > function to queue it up to send it through the hotpath?
+> > > > > >
+> > > > > > I can ack those patches, it will work as well. But I think we s=
+hould
+> > > > > > switch at some point to dev_queue_xmit(). It should be simple to
+> > > > > > switch it. Just want to mention there is a difference which wil=
+l be
+> > > > > > there in mac-cmds like association. =20
 > > > > >
-> > > > > I am not sure if a beacon send should be handled by an mlme helper
-> > > > > handling as this is a different use-case and the user does not trigger
-> > > > > an mac command and is waiting for some reply and a more complex
-> > > > > handling could be involved. There is also no need for hotpath xmit
-> > > > > handling is disabled during this time. It is just an async messaging
-> > > > > in some interval and just "try" to send it and don't care if it fails,
-> > > > > or? For mac802154 therefore I think we should use the dev_queue_xmit()
-> > > > > function to queue it up to send it through the hotpath?
-> > > > >
-> > > > > I can ack those patches, it will work as well. But I think we should
-> > > > > switch at some point to dev_queue_xmit(). It should be simple to
-> > > > > switch it. Just want to mention there is a difference which will be
-> > > > > there in mac-cmds like association.
+> > > > > I see what you mean. That's indeed true, we might just switch to
+> > > > > a less constrained transmit path.
+> > > > > =20
 > > > >
-> > > > I see what you mean. That's indeed true, we might just switch to
-> > > > a less constrained transmit path.
-> > > >
+> > > > I would define the difference in bypass qdisc or not. Whereas the
+> > > > qdisc can drop or delay transmitting... For me, the qdisc is curren=
+tly
+> > > > in a "works for now" state. =20
 > > >
-> > > I would define the difference in bypass qdisc or not. Whereas the
-> > > qdisc can drop or delay transmitting... For me, the qdisc is currently
-> > > in a "works for now" state.
+> > > probably also bypass other hooks like tc, etc. :-/ Not sure if we wan=
+t that. =20
 > >
-> > probably also bypass other hooks like tc, etc. :-/ Not sure if we want that.
->
-> Actually, IIUC, we no longer want to go through the entire net stack.
-> We still want to bypass it but without stopping/flushing the full
-> queue like with an mlme transmission, so what about using
-> ieee802154_subif_start_xmit() instead of dev_queue_xmit()? I think it
-> is more appropriate.
+> > Actually, IIUC, we no longer want to go through the entire net stack.
+> > We still want to bypass it but without stopping/flushing the full
+> > queue like with an mlme transmission, so what about using
+> > ieee802154_subif_start_xmit() instead of dev_queue_xmit()? I think it
+> > is more appropriate. =20
+>=20
+> I do not understand, what do we currently do with mlme ops via the
+> ieee802154_subif_start_xmit() function, or? So we bypass everything
+> from dev_queue_xmit() until do_xmit() netdev callback.
 
-I do not understand, what do we currently do with mlme ops via the
-ieee802154_subif_start_xmit() function, or? So we bypass everything
-from dev_queue_xmit() until do_xmit() netdev callback.
+Yes, that's the plan. We don't want any of the net stack features when
+sending beacons.
 
-I think it is fine, also I think "mostly" only dataframes should go
-through dev_queue_xmit(). With a HardMAC transceiver we would have
-control about "mostly" other frames than data either. So we should do
-everything with mlme-ops do what the spec says (to match up with
-HardMAC behaviour?) and don't allow common net hooks/etc. to change
-this behaviour?
+> I think it is fine, also I think "mostly" only dataframes should go
+> through dev_queue_xmit(). With a HardMAC transceiver we would have
+> control about "mostly" other frames than data either. So we should do
+> everything with mlme-ops do what the spec says (to match up with
+> HardMAC behaviour?) and don't allow common net hooks/etc. to change
+> this behaviour?
 
-- Alex
+To summarize:
+- Data frames -> should go through dev_queue_xmit()
+- MLME ops with feedback constraints -> should go through the slow MLME
+  path, so ieee802154_mlme_tx*()
+- MLME ops without feedback constraints like beacons -> should go
+  through the hot path, but not through the whole net stack, so
+  ieee802154_subif_start_xmit()
+
+Right now only data frames have security support, I propose we merge
+the initial support like that. Right now I am focused on UWB support
+(coming next, after the whole active scan/association additions), and
+in a second time we would be interested in llsec support for MLME ops.
+
+Does that sounds like a plan? If yes, I'll send a v2 with the right
+transmit helper used.
+
+Thanks,
+Miqu=C3=A8l
+
+NB: Perhaps a prerequisites of bringing security to the MLME ops would
+be to have wpan-tools updated (it looks like the support was never
+merged?) as well as a simple example how to use it on linux-wpan.org.
