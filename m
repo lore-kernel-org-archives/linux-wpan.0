@@ -2,301 +2,121 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EBB23C54E94
-	for <linux-wpan@archiver.kernel.org>; Thu, 26 Jan 2023 14:35:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DCE69C05027
+	for <linux-wpan@archiver.kernel.org>; Thu, 26 Jan 2023 14:40:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230369AbjAZOfu (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Thu, 26 Jan 2023 09:35:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44354 "EHLO
+        id S229767AbjAZOkJ (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Thu, 26 Jan 2023 09:40:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48196 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229639AbjAZOfu (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 26 Jan 2023 09:35:50 -0500
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8F395245;
-        Thu, 26 Jan 2023 06:35:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1674743748; x=1706279748;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=xMEYVLDu50nKG2IiK5eKTT7BHkAd6czf20mZDOyXzZQ=;
-  b=MptPi0RDoBBvQHC+2br6MV6OARQR+fLv3D0VElB0f+rjSt+C0qWazX38
-   PRs9RCLFjoq6Tk2oimWnYCZgvpzNbGeteyw4euO+uTYDQx3wfOdROIEKO
-   xcWQK3RTgh+HBaPC/pjNmkPtZAxQqxIIFLdXPmjCvT+wmU7d3SyXV++XT
-   nrEwT4yGNJSbY1uVhj4QnFUG8DWMQr01ttCqNgBz6/tOBzyQTz3cBZ5Ow
-   tnaB7o0rsVo9h/jahmIYRszWB6iTluWCbVAUh/dxTFlIxgKmpeQSyH2GY
-   OgdRgGTzb+P1wd46G4LFiCzyQCuWFeVJ+SzZR/1CyEq+86b60VNENEZHh
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10602"; a="314739815"
-X-IronPort-AV: E=Sophos;i="5.97,248,1669104000"; 
-   d="scan'208";a="314739815"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2023 06:13:43 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10602"; a="786838650"
-X-IronPort-AV: E=Sophos;i="5.97,248,1669104000"; 
-   d="scan'208";a="786838650"
-Received: from smile.fi.intel.com ([10.237.72.54])
-  by orsmga004.jf.intel.com with ESMTP; 26 Jan 2023 06:13:39 -0800
-Received: from andy by smile.fi.intel.com with local (Exim 4.96)
-        (envelope-from <andriy.shevchenko@linux.intel.com>)
-        id 1pL30T-00FQxt-1b;
-        Thu, 26 Jan 2023 16:13:37 +0200
-Date:   Thu, 26 Jan 2023 16:13:37 +0200
-From:   Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To:     Arnd Bergmann <arnd@kernel.org>
-Cc:     Alexander Aring <alex.aring@gmail.com>,
-        Stefan Schmidt <stefan@datenfreihafen.org>,
-        linux-gpio@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
-        Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= 
-        <u.kleine-koenig@pengutronix.de>, linux-wpan@vger.kernel.org,
-        netdev@vger.kernel.org
-Subject: Re: [PATCH] at86rf230: convert to gpio descriptors
-Message-ID: <Y9KKkbSfz0P32P5/@smile.fi.intel.com>
+        with ESMTP id S229491AbjAZOkI (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 26 Jan 2023 09:40:08 -0500
+Received: from wout5-smtp.messagingengine.com (wout5-smtp.messagingengine.com [64.147.123.21])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6357B26BB;
+        Thu, 26 Jan 2023 06:40:07 -0800 (PST)
+Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
+        by mailout.west.internal (Postfix) with ESMTP id 0E6763200A69;
+        Thu, 26 Jan 2023 09:40:05 -0500 (EST)
+Received: from imap51 ([10.202.2.101])
+  by compute6.internal (MEProxy); Thu, 26 Jan 2023 09:40:07 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+        :cc:content-type:date:date:from:from:in-reply-to:in-reply-to
+        :message-id:mime-version:references:reply-to:sender:subject
+        :subject:to:to; s=fm2; t=1674744005; x=1674830405; bh=2y4ifRRBY2
+        zAJdRnpFIN5yh9VL5vAaJGv1a4q1ONRxY=; b=nmLi29PHmhe7Mt1UUCxqHDFwV8
+        Ydw/Al6jYtzGI9Fn5PDw67OEMYW/e54wH36cbLEcUsturGaSxLj0FizjrQ3bIwWh
+        ENEolmTgll+nzxxv7pYkagVf4V0TXti7ixi57adlpY6tUQEI/nKTbQ/4LbM0u9vo
+        mXp2Vlq2cT59FjaFUYykCUhycj85oKkl8efo9a/zJMrJCq/5i1qZer5DOG2679ma
+        4XtVDlYqonTPCKnuH6uw+2yueW/izFLHXBf7Voxgw/toR+Q6GVbvnVNWreRleCdi
+        zh04G1RP6FZuN6DGdEcXRjP63wOLjcUZVMc5IZxJDHne4EZwlU597xY1hNBA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
+        :feedback-id:from:from:in-reply-to:in-reply-to:message-id
+        :mime-version:references:reply-to:sender:subject:subject:to:to
+        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+        fm3; t=1674744005; x=1674830405; bh=2y4ifRRBY2zAJdRnpFIN5yh9VL5v
+        AaJGv1a4q1ONRxY=; b=ZOh7Ea7S7GeZG9kQ6b/qG3acCa+eJqb97eVnHWk+RX1D
+        my+5BC9JVi6PChQIcVRMrklJu3vLN9/pCqXhCMZeHloB1BqxjTSXJlrrD61RQx4U
+        ILHi8l7rvuOYAB8iZ6lWaJLnixKEiQDb2PO7sIpACKeCZpRaaV0C3pi/XpIys+4D
+        J6bgHWMIHvHRVkEUfzw684yeQQKW5nn+uv4gaM4DTV9rwmVLsxAZVGQLLnpBvhyw
+        VSrlc86hHeGtH9svDv64u6BMu3KK2/bKDxuBamOvxBknt4UtX0XKCsjZSAoowFmV
+        Qy3C2NAzylIKm76PJ99awpj2OohXBaohM0GDFlGq/w==
+X-ME-Sender: <xms:xJDSYyPxWsV1TGssLmf5RIN4Fh0wIhUBxRGXfCXDJ1xpcZSlbq3l2Q>
+    <xme:xJDSYw86mKpKCqL4tz6n2qN4xXcTtlFZW3vDH-c9UHDCGhfp0nybr9D00qqlP6tsa
+    9A9MsfVv1rkTdFGQog>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedruddvgedgieejucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepofgfggfkjghffffhvfevufgtsehttdertderredtnecuhfhrohhmpedftehr
+    nhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrth
+    htvghrnhepffehueegteeihfegtefhjefgtdeugfegjeelheejueethfefgeeghfektdek
+    teffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprg
+    hrnhgusegrrhhnuggsrdguvg
+X-ME-Proxy: <xmx:xZDSY5SKLuYNZiZSPZsQR9_ihFm60myxVARhVoI6UHwasfepJqoF4Q>
+    <xmx:xZDSYytlpS9pHzkxrF4e_2doCkeEZI4xnsVkGmJKefX6pcyNfdMgAg>
+    <xmx:xZDSY6d5OKwOOQfMTLo_Cp4goFQTntLsEGF0z90dvT3GS3cOvOEcZw>
+    <xmx:xZDSY7XDXHtwEtBIs7RLo0weclrHAsjjSfdsfKV1pJrvbLSb5nyP2Q>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+        id E670AB60086; Thu, 26 Jan 2023 09:40:04 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.9.0-alpha0-85-gd6d859e0cf-fm-20230116.001-gd6d859e0
+Mime-Version: 1.0
+Message-Id: <f83ae34a-b46a-47c8-817a-d82d43178eba@app.fastmail.com>
+In-Reply-To: <20230126151243.3acc1fe2@xps-13>
 References: <20230126135215.3387820-1-arnd@kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230126135215.3387820-1-arnd@kernel.org>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+ <20230126151243.3acc1fe2@xps-13>
+Date:   Thu, 26 Jan 2023 15:39:45 +0100
+From:   "Arnd Bergmann" <arnd@arndb.de>
+To:     "Miquel Raynal" <miquel.raynal@bootlin.com>,
+        "Arnd Bergmann" <arnd@kernel.org>
+Cc:     "Alexander Aring" <alex.aring@gmail.com>,
+        "Stefan Schmidt" <stefan@datenfreihafen.org>,
+        "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
+        "David S . Miller" <davem@davemloft.net>,
+        "Eric Dumazet" <edumazet@google.com>,
+        "Jakub Kicinski" <kuba@kernel.org>,
+        "Paolo Abeni" <pabeni@redhat.com>,
+        "Andy Shevchenko" <andriy.shevchenko@linux.intel.com>,
+        =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
+        linux-wpan@vger.kernel.org, Netdev <netdev@vger.kernel.org>
+Subject: Re: [PATCH] at86rf230: convert to gpio descriptors
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-On Thu, Jan 26, 2023 at 02:51:23PM +0100, Arnd Bergmann wrote:
-> From: Arnd Bergmann <arnd@arndb.de>
-> 
-> There are no remaining in-tree users of the platform_data,
-> so this driver can be converted to using the simpler gpiod
-> interfaces.
-> 
-> Any out-of-tree users that rely on the platform data can
-> provide the data using the device_property and gpio_lookup
-> interfaces instead.
+On Thu, Jan 26, 2023, at 15:12, Miquel Raynal wrote:
 
-Precisely!
+>> @@ -1682,7 +1650,7 @@ MODULE_DEVICE_TABLE(spi, at86rf230_device_id);
+>>  static struct spi_driver at86rf230_driver = {
+>>  	.id_table = at86rf230_device_id,
+>>  	.driver = {
+>> -		.of_match_table = of_match_ptr(at86rf230_of_match),
+>> +		.of_match_table = at86rf230_of_match,
+>
+> Looks like an unrelated change? Or is it a consequence of "not having
+> any in-tree users of platform_data" that plays a role here?
 
-Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+I probably did it because I thought I had removed the matching #ifdef
+for at86rf230_of_match in the process of making the driver DT-only.
 
-Some not-picks below.
+Without this trivial change, building the driver as built-in with
+CONFIG_OF=n can result in a warning like
 
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> ---
->  drivers/net/ieee802154/at86rf230.c | 82 +++++++++---------------------
->  include/linux/spi/at86rf230.h      | 20 --------
->  2 files changed, 25 insertions(+), 77 deletions(-)
->  delete mode 100644 include/linux/spi/at86rf230.h
-> 
-> diff --git a/drivers/net/ieee802154/at86rf230.c b/drivers/net/ieee802154/at86rf230.c
-> index 15f283b26721..66193756c891 100644
-> --- a/drivers/net/ieee802154/at86rf230.c
-> +++ b/drivers/net/ieee802154/at86rf230.c
-> @@ -15,14 +15,13 @@
->  #include <linux/jiffies.h>
->  #include <linux/interrupt.h>
->  #include <linux/irq.h>
-> -#include <linux/gpio.h>
-> +#include <linux/gpio/consumer.h>
->  #include <linux/delay.h>
->  #include <linux/spi/spi.h>
-> -#include <linux/spi/at86rf230.h>
->  #include <linux/regmap.h>
->  #include <linux/skbuff.h>
-> -#include <linux/of_gpio.h>
->  #include <linux/ieee802154.h>
-> +#include <linux/property.h>
+drivers/net/ieee802154/at86rf230.c:1632:28: error: unused variable 'at86rf230_of_match' [-Werror,-Wunused-variable]
 
-This can be sorted a bit better, i.e. squeezing property.h before regmap.h,
-gpio/consumer.h after delay.h.
+It looks like this was already removed in a8b66db804f0 ("at86rf230:
+remove #ifdef CONFIG_OF"), which was not technically correct, but
+nobody noticed, including me.
 
->  #include <net/mac802154.h>
->  #include <net/cfg802154.h>
-> @@ -82,7 +81,7 @@ struct at86rf230_local {
->  	struct ieee802154_hw *hw;
->  	struct at86rf2xx_chip_data *data;
->  	struct regmap *regmap;
-> -	int slp_tr;
-> +	struct gpio_desc *slp_tr;
->  	bool sleep;
->  
->  	struct completion state_complete;
-> @@ -107,8 +106,8 @@ at86rf230_async_state_change(struct at86rf230_local *lp,
->  static inline void
->  at86rf230_sleep(struct at86rf230_local *lp)
->  {
-> -	if (gpio_is_valid(lp->slp_tr)) {
-> -		gpio_set_value(lp->slp_tr, 1);
-> +	if (lp->slp_tr) {
-> +		gpiod_set_value(lp->slp_tr, 1);
->  		usleep_range(lp->data->t_off_to_sleep,
->  			     lp->data->t_off_to_sleep + 10);
->  		lp->sleep = true;
-> @@ -118,8 +117,8 @@ at86rf230_sleep(struct at86rf230_local *lp)
->  static inline void
->  at86rf230_awake(struct at86rf230_local *lp)
->  {
-> -	if (gpio_is_valid(lp->slp_tr)) {
-> -		gpio_set_value(lp->slp_tr, 0);
-> +	if (lp->slp_tr) {
-> +		gpiod_set_value(lp->slp_tr, 0);
->  		usleep_range(lp->data->t_sleep_to_off,
->  			     lp->data->t_sleep_to_off + 100);
->  		lp->sleep = false;
-> @@ -204,9 +203,9 @@ at86rf230_write_subreg(struct at86rf230_local *lp,
->  static inline void
->  at86rf230_slp_tr_rising_edge(struct at86rf230_local *lp)
->  {
-> -	gpio_set_value(lp->slp_tr, 1);
-> +	gpiod_set_value(lp->slp_tr, 1);
->  	udelay(1);
-> -	gpio_set_value(lp->slp_tr, 0);
-> +	gpiod_set_value(lp->slp_tr, 0);
->  }
->  
->  static bool
-> @@ -819,7 +818,7 @@ at86rf230_write_frame_complete(void *context)
->  
->  	ctx->trx.len = 2;
->  
-> -	if (gpio_is_valid(lp->slp_tr))
-> +	if (lp->slp_tr)
->  		at86rf230_slp_tr_rising_edge(lp);
->  	else
->  		at86rf230_async_write_reg(lp, RG_TRX_STATE, STATE_BUSY_TX, ctx,
-> @@ -1415,32 +1414,6 @@ static int at86rf230_hw_init(struct at86rf230_local *lp, u8 xtal_trim)
->  	return at86rf230_write_subreg(lp, SR_SLOTTED_OPERATION, 0);
->  }
->  
-> -static int
-> -at86rf230_get_pdata(struct spi_device *spi, int *rstn, int *slp_tr,
-> -		    u8 *xtal_trim)
-> -{
-> -	struct at86rf230_platform_data *pdata = spi->dev.platform_data;
-> -	int ret;
-> -
-> -	if (!IS_ENABLED(CONFIG_OF) || !spi->dev.of_node) {
-> -		if (!pdata)
-> -			return -ENOENT;
-> -
-> -		*rstn = pdata->rstn;
-> -		*slp_tr = pdata->slp_tr;
-> -		*xtal_trim = pdata->xtal_trim;
-> -		return 0;
-> -	}
-> -
-> -	*rstn = of_get_named_gpio(spi->dev.of_node, "reset-gpio", 0);
-> -	*slp_tr = of_get_named_gpio(spi->dev.of_node, "sleep-gpio", 0);
-> -	ret = of_property_read_u8(spi->dev.of_node, "xtal-trim", xtal_trim);
-> -	if (ret < 0 && ret != -EINVAL)
-> -		return ret;
-> -
-> -	return 0;
-> -}
-> -
->  static int
->  at86rf230_detect_device(struct at86rf230_local *lp)
->  {
-> @@ -1547,7 +1520,8 @@ static int at86rf230_probe(struct spi_device *spi)
->  	struct ieee802154_hw *hw;
->  	struct at86rf230_local *lp;
->  	unsigned int status;
-> -	int rc, irq_type, rstn, slp_tr;
-> +	int rc, irq_type;
-> +	struct gpio_desc *rstn, *slp_tr;
->  	u8 xtal_trim = 0;
->  
->  	if (!spi->irq) {
-> @@ -1555,32 +1529,26 @@ static int at86rf230_probe(struct spi_device *spi)
->  		return -EINVAL;
->  	}
->  
-> -	rc = at86rf230_get_pdata(spi, &rstn, &slp_tr, &xtal_trim);
-> -	if (rc < 0) {
-> -		dev_err(&spi->dev, "failed to parse platform_data: %d\n", rc);
-> +	rc = device_property_read_u8(&spi->dev, "xtal-trim", &xtal_trim);
-> +	if (rc < 0 && rc != -EINVAL) {
-> +		dev_err(&spi->dev, "failed to parse xtal-trim: %d\n", rc);
->  		return rc;
->  	}
->  
-> -	if (gpio_is_valid(rstn)) {
-> -		rc = devm_gpio_request_one(&spi->dev, rstn,
-> -					   GPIOF_OUT_INIT_HIGH, "rstn");
-> -		if (rc)
-> -			return rc;
-> -	}
-> +	rstn = devm_gpiod_get_optional(&spi->dev, "rstn", GPIOD_OUT_HIGH);
-> +	if (IS_ERR(rstn))
-> +		return PTR_ERR(rstn);
->  
-> -	if (gpio_is_valid(slp_tr)) {
-> -		rc = devm_gpio_request_one(&spi->dev, slp_tr,
-> -					   GPIOF_OUT_INIT_LOW, "slp_tr");
-> -		if (rc)
-> -			return rc;
-> -	}
-> +	slp_tr = devm_gpiod_get_optional(&spi->dev, "slp_tr", GPIOD_OUT_LOW);
-> +	if (IS_ERR(slp_tr))
-> +		return PTR_ERR(slp_tr);
->  
->  	/* Reset */
-> -	if (gpio_is_valid(rstn)) {
-> +	if (rstn) {
->  		udelay(1);
-> -		gpio_set_value_cansleep(rstn, 0);
-> +		gpiod_set_value_cansleep(rstn, 0);
->  		udelay(1);
-> -		gpio_set_value_cansleep(rstn, 1);
-> +		gpiod_set_value_cansleep(rstn, 1);
->  		usleep_range(120, 240);
->  	}
->  
-> @@ -1682,7 +1650,7 @@ MODULE_DEVICE_TABLE(spi, at86rf230_device_id);
->  static struct spi_driver at86rf230_driver = {
->  	.id_table = at86rf230_device_id,
->  	.driver = {
-> -		.of_match_table = of_match_ptr(at86rf230_of_match),
-> +		.of_match_table = at86rf230_of_match,
->  		.name	= "at86rf230",
->  	},
->  	.probe      = at86rf230_probe,
-> diff --git a/include/linux/spi/at86rf230.h b/include/linux/spi/at86rf230.h
-> deleted file mode 100644
-> index d278576ab692..000000000000
-> --- a/include/linux/spi/at86rf230.h
-> +++ /dev/null
-> @@ -1,20 +0,0 @@
-> -/* SPDX-License-Identifier: GPL-2.0-only */
-> -/*
-> - * AT86RF230/RF231 driver
-> - *
-> - * Copyright (C) 2009-2012 Siemens AG
-> - *
-> - * Written by:
-> - * Dmitry Eremin-Solenikov <dmitry.baryshkov@siemens.com>
-> - */
-> -#ifndef AT86RF230_H
-> -#define AT86RF230_H
-> -
-> -struct at86rf230_platform_data {
-> -	int rstn;
-> -	int slp_tr;
-> -	int dig2;
-> -	u8 xtal_trim;
-> -};
-> -
-> -#endif
-> -- 
-> 2.39.0
-> 
+I could split this out as a separate patch, but it's probably
+not worth it.
 
--- 
-With Best Regards,
-Andy Shevchenko
+> Anyhow, the changes in the driver look good, so:
+>
+> Reviewed-by: Miquel Raynal <miquel.raynal@bootlin.com>
 
+Thanks,
 
+    Arnd
