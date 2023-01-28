@@ -2,58 +2,57 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1AB9C38142
-	for <linux-wpan@archiver.kernel.org>; Sat, 28 Jan 2023 13:30:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69289C38142
+	for <linux-wpan@archiver.kernel.org>; Sat, 28 Jan 2023 13:39:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233423AbjA1NaW (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Sat, 28 Jan 2023 08:30:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35114 "EHLO
+        id S234486AbjA1Njx (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Sat, 28 Jan 2023 08:39:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40442 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230103AbjA1NaU (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Sat, 28 Jan 2023 08:30:20 -0500
-X-Greylist: delayed 138 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sat, 28 Jan 2023 05:30:20 PST
+        with ESMTP id S233810AbjA1Njr (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Sat, 28 Jan 2023 08:39:47 -0500
 Received: from proxima.lasnet.de (proxima.lasnet.de [IPv6:2a01:4f8:121:31eb:3::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D75D20057;
-        Sat, 28 Jan 2023 05:30:19 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8F353B0F7;
+        Sat, 28 Jan 2023 05:39:46 -0800 (PST)
 Received: from [192.168.2.51] (p4fe71212.dip0.t-ipconnect.de [79.231.18.18])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (4096 bits))
         (No client certificate requested)
         (Authenticated sender: stefan@datenfreihafen.org)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id 2F8D6C0B7D;
-        Sat, 28 Jan 2023 14:30:18 +0100 (CET)
+        by proxima.lasnet.de (Postfix) with ESMTPSA id B2869C02F8;
+        Sat, 28 Jan 2023 14:39:43 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
-        s=2021; t=1674912618;
+        s=2021; t=1674913184;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=4mdqGqv2BgX/GxZf2yMkOIhITBqaR1xv+UfObZcYJAs=;
-        b=twtC5u5k+Pj4DFgTKWHmW9bdmhMXmQ8fk/rOLBSpwcvKYidnvVgJQWW//Yjbz45CWrPH5A
-        8qxvoYAj4qPN3jxWhvJz191zgQ3fMWIyLBgDCMabO37zCFezW/zhA0icA1TxQ8hWX1oPqV
-        lDJBdVpnyCuvozVxlJJVaaBDFsAeelpNdBbJknpkxLuEwLozDOqLtdVidYGzSUoDFthjNM
-        Cq+jgmbbTcUuIfMjutRfZi3n95jK5XHbyYEEN6hiAqen5uqb5K5yXB07tGjHYKtRMUfnSi
-        +pXMVkt/EqFtQRYUnAyXN/ul1v9h196q0pUk2b4AlLGhshr1NMvxYInmEBdLDA==
-Message-ID: <9a09a41b-1eb9-edc9-28ad-acb920e04ae4@datenfreihafen.org>
-Date:   Sat, 28 Jan 2023 14:30:17 +0100
+        bh=2lHzHdq2L6BaFtLptilqoATr9v7yxnvCm9Ng6OEjiDE=;
+        b=dfwmY04X1490RrJhpw5/Scm8eWUJ7yD4wICWcY2JtOdE2c0rIKa9EsYHDRuhX6ALb6oIBh
+        cLFt+LvXT4HSNxndcArUZpOlX9UWioAzFIpmxvmluFs2dsz5ksfvVdWkVytODir4yMyCan
+        Rl2CcOuYPgnSMrNsQ1aifixeTI59KtaTeM4Pc5kHkKLz4Z2qAfUafeGZo+7Vbhur97JpeW
+        8eEer/z5gZMuoIcE5Eo8WJwAcEiLrrjWd2ZdmZo/9bFAFw0EdfzurIRJ/mgEKYHNolv2OL
+        6CMERGwk5qT8hgkfTuJeBZVb9VwbMBFdsexnAK/tbq+RePbdWYS9spQVHITOnA==
+Message-ID: <ee95c924-40fe-44c1-3a6a-d002aead3965@datenfreihafen.org>
+Date:   Sat, 28 Jan 2023 14:39:43 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.6.0
-Subject: Re: [PATCH] ca8210: move to gpio descriptors
+Subject: Re: [PATCH] [v2] at86rf230: convert to gpio descriptors
 Content-Language: en-US
-To:     Arnd Bergmann <arnd@arndb.de>, Arnd Bergmann <arnd@kernel.org>,
+To:     Arnd Bergmann <arnd@kernel.org>,
         Alexander Aring <alex.aring@gmail.com>
-Cc:     "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
-        "David S . Miller" <davem@davemloft.net>,
+Cc:     Arnd Bergmann <arnd@arndb.de>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        "David S. Miller" <davem@davemloft.net>,
         Eric Dumazet <edumazet@google.com>,
         Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Hauke Mehrtens <hauke@hauke-m.de>, linux-wpan@vger.kernel.org,
-        Netdev <netdev@vger.kernel.org>, linux-kernel@vger.kernel.org
-References: <20230126161737.2985704-1-arnd@kernel.org>
- <57e74219-d439-4d10-9bb5-53fe7b30b46f@app.fastmail.com>
+        Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
+        linux-wpan@vger.kernel.org, netdev@vger.kernel.org
+References: <20230126162323.2986682-1-arnd@kernel.org>
 From:   Stefan Schmidt <stefan@datenfreihafen.org>
-In-Reply-To: <57e74219-d439-4d10-9bb5-53fe7b30b46f@app.fastmail.com>
+In-Reply-To: <20230126162323.2986682-1-arnd@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
@@ -62,30 +61,29 @@ X-Mailing-List: linux-wpan@vger.kernel.org
 
 Hello Arnd.
 
-On 26.01.23 17:25, Arnd Bergmann wrote:
-> On Thu, Jan 26, 2023, at 17:17, Arnd Bergmann wrote:
+On 26.01.23 17:22, Arnd Bergmann wrote:
+> From: Arnd Bergmann <arnd@arndb.de>
 > 
->>   	if (ret) {
->> -		dev_crit(&spi->dev, "request_irq %d failed\n", pdata->irq_id);
->> -		gpiod_unexport(gpio_to_desc(pdata->gpio_irq));
->> -		gpio_free(pdata->gpio_irq);
->> +		dev_crit(&spi->dev, "request_irq %d failed\n", priv->irq_id);
->> +		gpiod_put(priv->gpio_irq);
->>   	}
+> There are no remaining in-tree users of the platform_data,
+> so this driver can be converted to using the simpler gpiod
+> interfaces.
 > 
-> I just realized that this bit depends on the "gpiolib: remove
-> legacy gpio_export" patch I sent to the gpio mailing list earlier.
+> Any out-of-tree users that rely on the platform data can
+> provide the data using the device_property and gpio_lookup
+> interfaces instead.
 > 
-> We can probably just defer this change until that is merged,
-> or alternatively I can rebase this patch to avoid the
-> dependency.
+> Reviewed-by: Miquel Raynal <miquel.raynal@bootlin.com>
+> Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> ---
+>   drivers/net/ieee802154/at86rf230.c | 82 +++++++++---------------------
+>   include/linux/spi/at86rf230.h      | 20 --------
+>   2 files changed, 25 insertions(+), 77 deletions(-)
+>   delete mode 100644 include/linux/spi/at86rf230.h
+> 
 
-Deferring the change until i picked it up from Linus or net-next in my 
-tree is fine. This driver is not heavily worked on (its actually marked 
-as orphaned) so the patch should still apply in a few days.
-
-I will keep it in my patchwork queue of patches to be applied. No extra 
-work needed from your side.
+This patch has been applied to the wpan-next tree and will be
+part of the next pull request to net-next. Thanks!
 
 regards
 Stefan Schmidt
