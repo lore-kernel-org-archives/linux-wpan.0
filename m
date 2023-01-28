@@ -2,106 +2,381 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D300C38142
-	for <linux-wpan@archiver.kernel.org>; Sat, 28 Jan 2023 13:15:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52B91C27C76
+	for <linux-wpan@archiver.kernel.org>; Sat, 28 Jan 2023 13:28:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231391AbjA1NPN (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Sat, 28 Jan 2023 08:15:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58512 "EHLO
+        id S231768AbjA1N2E (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Sat, 28 Jan 2023 08:28:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34350 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230502AbjA1NPM (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Sat, 28 Jan 2023 08:15:12 -0500
+        with ESMTP id S230104AbjA1N2D (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Sat, 28 Jan 2023 08:28:03 -0500
 Received: from proxima.lasnet.de (proxima.lasnet.de [IPv6:2a01:4f8:121:31eb:3::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40F949038;
-        Sat, 28 Jan 2023 05:15:11 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FAC71EBD1;
+        Sat, 28 Jan 2023 05:28:01 -0800 (PST)
 Received: from [192.168.2.51] (p4fe71212.dip0.t-ipconnect.de [79.231.18.18])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits))
         (No client certificate requested)
         (Authenticated sender: stefan@datenfreihafen.org)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id 8F9E6C03F6;
-        Sat, 28 Jan 2023 14:15:08 +0100 (CET)
+        by proxima.lasnet.de (Postfix) with ESMTPSA id 070C7C04A2;
+        Sat, 28 Jan 2023 14:27:59 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
-        s=2021; t=1674911708;
+        s=2021; t=1674912480;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=WPThA8F8arioRGKvheey6dkfAb8Qhp88RQrjp407wvY=;
-        b=PUzpKQEch93i20zMYOSP3iSZUoOjChzzHMyCw8mHsGs7m71RTdA4HpQeRqk1eGFA9rf/Wi
-        swtqSDU6jr7hJI0xBNQXtYM0y6VpBMkguW8nv5oGKlfTrlQP/I5cG1k+2h8cSL4B8TXTPH
-        s8d3YLYiKLe+2ipeoZoCleoebA1+v5mI65lGS6kFHqo0ievl5dZZ6Kgk3NCfqk6n1cj8fR
-        /LvbvYJlRhrcNHbYL/2rQRPxlOfWb7ESSRLBRtp4uoWX8d5WuP7A5SUBYomVilXpCONTa0
-        0+n/xbIide+lk0qpOsqLtkdT0ro1xMBvFe+v7MX2FDB8+te7AgfhoBXup+ZcKg==
-Message-ID: <d17b1f40-b878-28fa-f93d-37f7e5ba856c@datenfreihafen.org>
-Date:   Sat, 28 Jan 2023 14:15:07 +0100
+        bh=Ky19NcsjgawcANcCAEb96R21hwRnQqrSnm0w+jSUA/I=;
+        b=YePOYenraPPCNQA919np5O/PXofzv75qO00p+GUC35SqV1vKdh3XR6adrdBCT8SBJfTX1+
+        Xf/kIFjPIyzUuu04UOIv80sVX9LnOD3GGQ+Dkxlo5f3XiHEHkm005WsGUKIpd27maqdlXM
+        893HnqRDWiYW1XPJmjpxaGOLLiWLKh0Dzj41ilznJ+HsC2pX8krOPzYzq8V2OEmaWLshNh
+        061+O+xaOPa26VQbjXZM8rKq0Xm/mRbVBvc1ndjCrjf3R5Cr3K7VE7Pp9os6pQlbGctkPP
+        US2uRsadXf9g+AzqxtYboqRe1bmrmN42r4sNCloiyiZ7apQr1x9cOJnsMNl5oQ==
+Message-ID: <4157fc1c-a785-aa0c-b9d6-8236c2792ce6@datenfreihafen.org>
+Date:   Sat, 28 Jan 2023 14:27:59 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.6.0
-Subject: Re: [PATCH wpan-next v2 0/2] ieee802154: Beaconing support
+Subject: Re: [PATCH] cc2520: move to gpio descriptors
 Content-Language: en-US
-To:     Miquel Raynal <miquel.raynal@bootlin.com>,
-        Alexander Aring <alex.aring@gmail.com>,
-        linux-wpan@vger.kernel.org
-Cc:     "David S. Miller" <davem@davemloft.net>,
+To:     Arnd Bergmann <arnd@kernel.org>,
+        Varka Bhadram <varkabhadram@gmail.com>,
+        Alexander Aring <alex.aring@gmail.com>
+Cc:     linux-gpio@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
         Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
-        David Girault <david.girault@qorvo.com>,
-        Romuald Despres <romuald.despres@qorvo.com>,
-        Frederic Blain <frederic.blain@qorvo.com>,
-        Nicolas Schodet <nico@ni.fr.eu.org>,
-        Guilhem Imberton <guilhem.imberton@qorvo.com>,
-        Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-References: <20230125102923.135465-1-miquel.raynal@bootlin.com>
+        Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
+        linux-wpan@vger.kernel.org, netdev@vger.kernel.org
+References: <20230126161658.2983292-1-arnd@kernel.org>
 From:   Stefan Schmidt <stefan@datenfreihafen.org>
-In-Reply-To: <20230125102923.135465-1-miquel.raynal@bootlin.com>
+In-Reply-To: <20230126161658.2983292-1-arnd@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello.
+Hello Arnd.
 
-On 25.01.23 11:29, Miquel Raynal wrote:
-> Scanning being now supported, we can eg. play with hwsim to verify
-> everything works as soon as this series including beaconing support gets
-> merged.
-> 
-> Thanks,
-> Miquèl
-> 
-> Changes in v2:
-> * Clearly state in the commit log llsec is not supported yet.
-> * Do not use mlme transmission helpers because we don't really need to
->    stop the queue when sending a beacon, as we don't expect any feedback
->    from the PHY nor from the peers. However, we don't want to go through
->    the whole net stack either, so we bypass it calling the subif helper
->    directly.
-> 
-> Miquel Raynal (2):
->    ieee802154: Add support for user beaconing requests
->    mac802154: Handle basic beaconing
-> 
->   include/net/cfg802154.h         |  23 +++++
->   include/net/ieee802154_netdev.h |  16 ++++
->   include/net/nl802154.h          |   3 +
->   net/ieee802154/header_ops.c     |  24 +++++
->   net/ieee802154/nl802154.c       |  93 ++++++++++++++++++++
->   net/ieee802154/nl802154.h       |   1 +
->   net/ieee802154/rdev-ops.h       |  28 ++++++
->   net/ieee802154/trace.h          |  21 +++++
->   net/mac802154/cfg.c             |  31 ++++++-
->   net/mac802154/ieee802154_i.h    |  18 ++++
->   net/mac802154/iface.c           |   3 +
->   net/mac802154/llsec.c           |   5 +-
->   net/mac802154/main.c            |   1 +
->   net/mac802154/scan.c            | 151 ++++++++++++++++++++++++++++++++
->   14 files changed, 415 insertions(+), 3 deletions(-)
+Thanks for doing this maintenance and API update work on the driver!
 
-These patches have been applied to the wpan-next tree and will be
-part of the next pull request to net-next. Thanks!
+I think it is fair to assume there has been no use of the static 
+platform_data. I think this sneaked into all of the drivers and has been 
+copied around.
+
+Varka, are you still around as s driver maintainer to test this change?
+If not I will go and apply this patch in a few days as is. From a review 
+perspective it looks good.
 
 regards
 Stefan Schmidt
+
+
+On 26.01.23 17:15, Arnd Bergmann wrote:
+> From: Arnd Bergmann <arnd@arndb.de>
+> 
+> cc2520 supports both probing from static platform_data and
+> from devicetree, but there have never been any definitions
+> of the platform data in the mainline kernel, so it's safe
+> to assume that only the DT path is used.
+> 
+> After folding cc2520_platform_data into the driver itself,
+> the GPIO handling can be simplified by moving to the modern
+> gpiod interface.
+> 
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> ---
+>   MAINTAINERS                     |   1 -
+>   drivers/net/ieee802154/cc2520.c | 136 +++++++++-----------------------
+>   include/linux/spi/cc2520.h      |  21 -----
+>   3 files changed, 37 insertions(+), 121 deletions(-)
+>   delete mode 100644 include/linux/spi/cc2520.h
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index acda33cbd689..a36ead3ce7a3 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -4650,7 +4650,6 @@ L:	linux-wpan@vger.kernel.org
+>   S:	Maintained
+>   F:	Documentation/devicetree/bindings/net/ieee802154/cc2520.txt
+>   F:	drivers/net/ieee802154/cc2520.c
+> -F:	include/linux/spi/cc2520.h
+>   
+>   CCREE ARM TRUSTZONE CRYPTOCELL REE DRIVER
+>   M:	Gilad Ben-Yossef <gilad@benyossef.com>
+> diff --git a/drivers/net/ieee802154/cc2520.c b/drivers/net/ieee802154/cc2520.c
+> index edc769daad07..a94d8dd71aad 100644
+> --- a/drivers/net/ieee802154/cc2520.c
+> +++ b/drivers/net/ieee802154/cc2520.c
+> @@ -7,14 +7,13 @@
+>    */
+>   #include <linux/kernel.h>
+>   #include <linux/module.h>
+> -#include <linux/gpio.h>
+> +#include <linux/gpio/consumer.h>
+>   #include <linux/delay.h>
+>   #include <linux/spi/spi.h>
+> -#include <linux/spi/cc2520.h>
+> +#include <linux/property.h>
+>   #include <linux/workqueue.h>
+>   #include <linux/interrupt.h>
+>   #include <linux/skbuff.h>
+> -#include <linux/of_gpio.h>
+>   #include <linux/ieee802154.h>
+>   #include <linux/crc-ccitt.h>
+>   #include <asm/unaligned.h>
+> @@ -206,7 +205,7 @@ struct cc2520_private {
+>   	struct mutex buffer_mutex;	/* SPI buffer mutex */
+>   	bool is_tx;			/* Flag for sync b/w Tx and Rx */
+>   	bool amplified;			/* Flag for CC2591 */
+> -	int fifo_pin;			/* FIFO GPIO pin number */
+> +	struct gpio_desc *fifo_pin;	/* FIFO GPIO pin number */
+>   	struct work_struct fifop_irqwork;/* Workqueue for FIFOP */
+>   	spinlock_t lock;		/* Lock for is_tx*/
+>   	struct completion tx_complete;	/* Work completion for Tx */
+> @@ -875,7 +874,7 @@ static void cc2520_fifop_irqwork(struct work_struct *work)
+>   
+>   	dev_dbg(&priv->spi->dev, "fifop interrupt received\n");
+>   
+> -	if (gpio_get_value(priv->fifo_pin))
+> +	if (gpiod_get_value(priv->fifo_pin))
+>   		cc2520_rx(priv);
+>   	else
+>   		dev_dbg(&priv->spi->dev, "rxfifo overflow\n");
+> @@ -912,49 +911,11 @@ static irqreturn_t cc2520_sfd_isr(int irq, void *data)
+>   	return IRQ_HANDLED;
+>   }
+>   
+> -static int cc2520_get_platform_data(struct spi_device *spi,
+> -				    struct cc2520_platform_data *pdata)
+> -{
+> -	struct device_node *np = spi->dev.of_node;
+> -	struct cc2520_private *priv = spi_get_drvdata(spi);
+> -
+> -	if (!np) {
+> -		struct cc2520_platform_data *spi_pdata = spi->dev.platform_data;
+> -
+> -		if (!spi_pdata)
+> -			return -ENOENT;
+> -		*pdata = *spi_pdata;
+> -		priv->fifo_pin = pdata->fifo;
+> -		return 0;
+> -	}
+> -
+> -	pdata->fifo = of_get_named_gpio(np, "fifo-gpio", 0);
+> -	priv->fifo_pin = pdata->fifo;
+> -
+> -	pdata->fifop = of_get_named_gpio(np, "fifop-gpio", 0);
+> -
+> -	pdata->sfd = of_get_named_gpio(np, "sfd-gpio", 0);
+> -	pdata->cca = of_get_named_gpio(np, "cca-gpio", 0);
+> -	pdata->vreg = of_get_named_gpio(np, "vreg-gpio", 0);
+> -	pdata->reset = of_get_named_gpio(np, "reset-gpio", 0);
+> -
+> -	/* CC2591 front end for CC2520 */
+> -	if (of_property_read_bool(np, "amplified"))
+> -		priv->amplified = true;
+> -
+> -	return 0;
+> -}
+> -
+>   static int cc2520_hw_init(struct cc2520_private *priv)
+>   {
+>   	u8 status = 0, state = 0xff;
+>   	int ret;
+>   	int timeout = 100;
+> -	struct cc2520_platform_data pdata;
+> -
+> -	ret = cc2520_get_platform_data(priv->spi, &pdata);
+> -	if (ret)
+> -		goto err_ret;
+>   
+>   	ret = cc2520_read_register(priv, CC2520_FSMSTAT1, &state);
+>   	if (ret)
+> @@ -1071,7 +1032,11 @@ static int cc2520_hw_init(struct cc2520_private *priv)
+>   static int cc2520_probe(struct spi_device *spi)
+>   {
+>   	struct cc2520_private *priv;
+> -	struct cc2520_platform_data pdata;
+> +	struct gpio_desc *fifop;
+> +	struct gpio_desc *cca;
+> +	struct gpio_desc *sfd;
+> +	struct gpio_desc *reset;
+> +	struct gpio_desc *vreg;
+>   	int ret;
+>   
+>   	priv = devm_kzalloc(&spi->dev, sizeof(*priv), GFP_KERNEL);
+> @@ -1080,11 +1045,11 @@ static int cc2520_probe(struct spi_device *spi)
+>   
+>   	spi_set_drvdata(spi, priv);
+>   
+> -	ret = cc2520_get_platform_data(spi, &pdata);
+> -	if (ret < 0) {
+> -		dev_err(&spi->dev, "no platform data\n");
+> -		return -EINVAL;
+> -	}
+> +	/* CC2591 front end for CC2520 */
+> +	/* Assumption that CC2591 is not connected */
+> +	priv->amplified = false;
+> +	if (device_property_read_bool(&spi->dev, "amplified"))
+> +		priv->amplified = true;
+>   
+>   	priv->spi = spi;
+>   
+> @@ -1098,80 +1063,53 @@ static int cc2520_probe(struct spi_device *spi)
+>   	spin_lock_init(&priv->lock);
+>   	init_completion(&priv->tx_complete);
+>   
+> -	/* Assumption that CC2591 is not connected */
+> -	priv->amplified = false;
+> -
+>   	/* Request all the gpio's */
+> -	if (!gpio_is_valid(pdata.fifo)) {
+> +	priv->fifo_pin = devm_gpiod_get(&spi->dev, "fifo", GPIOD_IN);
+> +	if (IS_ERR(priv->fifo_pin)) {
+>   		dev_err(&spi->dev, "fifo gpio is not valid\n");
+> -		ret = -EINVAL;
+> +		ret = PTR_ERR(priv->fifo_pin);
+>   		goto err_hw_init;
+>   	}
+>   
+> -	ret = devm_gpio_request_one(&spi->dev, pdata.fifo,
+> -				    GPIOF_IN, "fifo");
+> -	if (ret)
+> -		goto err_hw_init;
+> -
+> -	if (!gpio_is_valid(pdata.cca)) {
+> +	cca = devm_gpiod_get(&spi->dev, "cca", GPIOD_IN);
+> +	if (IS_ERR(cca)) {
+>   		dev_err(&spi->dev, "cca gpio is not valid\n");
+> -		ret = -EINVAL;
+> +		ret = PTR_ERR(cca);
+>   		goto err_hw_init;
+>   	}
+>   
+> -	ret = devm_gpio_request_one(&spi->dev, pdata.cca,
+> -				    GPIOF_IN, "cca");
+> -	if (ret)
+> -		goto err_hw_init;
+> -
+> -	if (!gpio_is_valid(pdata.fifop)) {
+> +	fifop = devm_gpiod_get(&spi->dev, "fifop", GPIOD_IN);
+> +	if (IS_ERR(fifop)) {
+>   		dev_err(&spi->dev, "fifop gpio is not valid\n");
+> -		ret = -EINVAL;
+> +		ret = PTR_ERR(fifop);
+>   		goto err_hw_init;
+>   	}
+>   
+> -	ret = devm_gpio_request_one(&spi->dev, pdata.fifop,
+> -				    GPIOF_IN, "fifop");
+> -	if (ret)
+> -		goto err_hw_init;
+> -
+> -	if (!gpio_is_valid(pdata.sfd)) {
+> +	sfd = devm_gpiod_get(&spi->dev, "sfd", GPIOD_IN);
+> +	if (IS_ERR(sfd)) {
+>   		dev_err(&spi->dev, "sfd gpio is not valid\n");
+> -		ret = -EINVAL;
+> +		ret = PTR_ERR(sfd);
+>   		goto err_hw_init;
+>   	}
+>   
+> -	ret = devm_gpio_request_one(&spi->dev, pdata.sfd,
+> -				    GPIOF_IN, "sfd");
+> -	if (ret)
+> -		goto err_hw_init;
+> -
+> -	if (!gpio_is_valid(pdata.reset)) {
+> +	reset = devm_gpiod_get(&spi->dev, "reset", GPIOD_OUT_LOW);
+> +	if (IS_ERR(reset)) {
+>   		dev_err(&spi->dev, "reset gpio is not valid\n");
+> -		ret = -EINVAL;
+> +		ret = PTR_ERR(reset);
+>   		goto err_hw_init;
+>   	}
+>   
+> -	ret = devm_gpio_request_one(&spi->dev, pdata.reset,
+> -				    GPIOF_OUT_INIT_LOW, "reset");
+> -	if (ret)
+> -		goto err_hw_init;
+> -
+> -	if (!gpio_is_valid(pdata.vreg)) {
+> +	vreg = devm_gpiod_get(&spi->dev, "vreg", GPIOD_OUT_LOW);
+> +	if (IS_ERR(vreg)) {
+>   		dev_err(&spi->dev, "vreg gpio is not valid\n");
+> -		ret = -EINVAL;
+> +		ret = PTR_ERR(vreg);
+>   		goto err_hw_init;
+>   	}
+>   
+> -	ret = devm_gpio_request_one(&spi->dev, pdata.vreg,
+> -				    GPIOF_OUT_INIT_LOW, "vreg");
+> -	if (ret)
+> -		goto err_hw_init;
+> -
+> -	gpio_set_value(pdata.vreg, HIGH);
+> +	gpiod_set_value(vreg, HIGH);
+>   	usleep_range(100, 150);
+>   
+> -	gpio_set_value(pdata.reset, HIGH);
+> +	gpiod_set_value(reset, HIGH);
+>   	usleep_range(200, 250);
+>   
+>   	ret = cc2520_hw_init(priv);
+> @@ -1180,7 +1118,7 @@ static int cc2520_probe(struct spi_device *spi)
+>   
+>   	/* Set up fifop interrupt */
+>   	ret = devm_request_irq(&spi->dev,
+> -			       gpio_to_irq(pdata.fifop),
+> +			       gpiod_to_irq(fifop),
+>   			       cc2520_fifop_isr,
+>   			       IRQF_TRIGGER_RISING,
+>   			       dev_name(&spi->dev),
+> @@ -1192,7 +1130,7 @@ static int cc2520_probe(struct spi_device *spi)
+>   
+>   	/* Set up sfd interrupt */
+>   	ret = devm_request_irq(&spi->dev,
+> -			       gpio_to_irq(pdata.sfd),
+> +			       gpiod_to_irq(sfd),
+>   			       cc2520_sfd_isr,
+>   			       IRQF_TRIGGER_FALLING,
+>   			       dev_name(&spi->dev),
+> @@ -1241,7 +1179,7 @@ MODULE_DEVICE_TABLE(of, cc2520_of_ids);
+>   static struct spi_driver cc2520_driver = {
+>   	.driver = {
+>   		.name = "cc2520",
+> -		.of_match_table = of_match_ptr(cc2520_of_ids),
+> +		.of_match_table = cc2520_of_ids,
+>   	},
+>   	.id_table = cc2520_ids,
+>   	.probe = cc2520_probe,
+> diff --git a/include/linux/spi/cc2520.h b/include/linux/spi/cc2520.h
+> deleted file mode 100644
+> index 449bacf10700..000000000000
+> --- a/include/linux/spi/cc2520.h
+> +++ /dev/null
+> @@ -1,21 +0,0 @@
+> -/* SPDX-License-Identifier: GPL-2.0-or-later */
+> -/* Header file for cc2520 radio driver
+> - *
+> - * Copyright (C) 2014 Varka Bhadram <varkab@cdac.in>
+> - *                    Md.Jamal Mohiuddin <mjmohiuddin@cdac.in>
+> - *                    P Sowjanya <sowjanyap@cdac.in>
+> - */
+> -
+> -#ifndef __CC2520_H
+> -#define __CC2520_H
+> -
+> -struct cc2520_platform_data {
+> -	int fifo;
+> -	int fifop;
+> -	int cca;
+> -	int sfd;
+> -	int reset;
+> -	int vreg;
+> -};
+> -
+> -#endif
