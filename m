@@ -2,74 +2,48 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6ED74C38142
-	for <linux-wpan@archiver.kernel.org>; Sat, 28 Jan 2023 01:58:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D300C38142
+	for <linux-wpan@archiver.kernel.org>; Sat, 28 Jan 2023 13:15:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229731AbjA1B6M (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Fri, 27 Jan 2023 20:58:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59450 "EHLO
+        id S231391AbjA1NPN (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Sat, 28 Jan 2023 08:15:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58512 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229681AbjA1B6L (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Fri, 27 Jan 2023 20:58:11 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 512C87B7A6
-        for <linux-wpan@vger.kernel.org>; Fri, 27 Jan 2023 17:57:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1674871043;
+        with ESMTP id S230502AbjA1NPM (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Sat, 28 Jan 2023 08:15:12 -0500
+Received: from proxima.lasnet.de (proxima.lasnet.de [IPv6:2a01:4f8:121:31eb:3::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40F949038;
+        Sat, 28 Jan 2023 05:15:11 -0800 (PST)
+Received: from [192.168.2.51] (p4fe71212.dip0.t-ipconnect.de [79.231.18.18])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: stefan@datenfreihafen.org)
+        by proxima.lasnet.de (Postfix) with ESMTPSA id 8F9E6C03F6;
+        Sat, 28 Jan 2023 14:15:08 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
+        s=2021; t=1674911708;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ev6Iprgm0BfLCNvx4GMlcEnMLp0hyf/TajiPKchsa84=;
-        b=JYj2q57K+lcn26jTP6gz38CaDOUXjzV+mDItMzl6Kj+/PZKMYbVV7WNCbAJGHHSgyZ5lKc
-        RdCslDZMnL1dB7tHlMxEtCm1v1ejhUBpH8eDUDUTZonmiZrJ24XT1vbKMLjOqP6ep6NGVT
-        b4Ci/IuryCKq8KTIFjWXXPWg8AFt0Nc=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-630-Kp-roZRIOPaPbKQbkSMprw-1; Fri, 27 Jan 2023 20:57:20 -0500
-X-MC-Unique: Kp-roZRIOPaPbKQbkSMprw-1
-Received: by mail-ed1-f70.google.com with SMTP id h18-20020a05640250d200b0049e0e9382c2so4687465edb.13
-        for <linux-wpan@vger.kernel.org>; Fri, 27 Jan 2023 17:57:20 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ev6Iprgm0BfLCNvx4GMlcEnMLp0hyf/TajiPKchsa84=;
-        b=SNsP62B05VhiUhmHrbArxLuuKzABi14JCs3stzzWeonQOLYI3zTrShexaBVHw3vpRY
-         ez34lhpq6RGQDDU0iS+JXQp7yvdH7KhcdfMWgDKYCH4burwmCtHR6Mkxk881Pj8lwUbg
-         79Abqzg6SvldgmUN7yWg24pa+/w8EZLYIeSFmtxtnNGLErZKhXygtcp7ryAbDHuSwWgD
-         ev8hWqhLa2NdDB55eAkNyQFJEf9Wm2oMOqaWi8gMu7hDhMG0n7eCEI8xzSI3X/xcUsX7
-         Sg82tGvUmhafgsd2YrfntLg74XroY31v+Gd66H8ULK2tl6nIadr6/+bJut0jYN7tns45
-         qBuw==
-X-Gm-Message-State: AFqh2kqZkVaNWEZ2o823KqPsFf+fXW9dCXpH46T75kDWwaS27JDDOPqY
-        ryASu3q5cOEcjsHhIutWeaVZNYeX+8Kuf2aQmnLi24FnDFXUxRtlsRkVj1a9JLw3wUpFFxDLGd1
-        unvMxRRIUardKHqa2yhd2GnyFKA0QO5sVo9OYAQ==
-X-Received: by 2002:a17:906:3a5b:b0:870:baa6:676c with SMTP id a27-20020a1709063a5b00b00870baa6676cmr6119217ejf.132.1674871039888;
-        Fri, 27 Jan 2023 17:57:19 -0800 (PST)
-X-Google-Smtp-Source: AMrXdXtanqSd7MgToKGma445A3qz4TJxSYPH1M8+rA1DH+9zaVF6lXc4fT4gfM9QDUQKrssiLkQG8gIzdAgJAoggFxU=
-X-Received: by 2002:a17:906:3a5b:b0:870:baa6:676c with SMTP id
- a27-20020a1709063a5b00b00870baa6676cmr6119210ejf.132.1674871039681; Fri, 27
- Jan 2023 17:57:19 -0800 (PST)
+        bh=WPThA8F8arioRGKvheey6dkfAb8Qhp88RQrjp407wvY=;
+        b=PUzpKQEch93i20zMYOSP3iSZUoOjChzzHMyCw8mHsGs7m71RTdA4HpQeRqk1eGFA9rf/Wi
+        swtqSDU6jr7hJI0xBNQXtYM0y6VpBMkguW8nv5oGKlfTrlQP/I5cG1k+2h8cSL4B8TXTPH
+        s8d3YLYiKLe+2ipeoZoCleoebA1+v5mI65lGS6kFHqo0ievl5dZZ6Kgk3NCfqk6n1cj8fR
+        /LvbvYJlRhrcNHbYL/2rQRPxlOfWb7ESSRLBRtp4uoWX8d5WuP7A5SUBYomVilXpCONTa0
+        0+n/xbIide+lk0qpOsqLtkdT0ro1xMBvFe+v7MX2FDB8+te7AgfhoBXup+ZcKg==
+Message-ID: <d17b1f40-b878-28fa-f93d-37f7e5ba856c@datenfreihafen.org>
+Date:   Sat, 28 Jan 2023 14:15:07 +0100
 MIME-Version: 1.0
-References: <20230106113129.694750-1-miquel.raynal@bootlin.com>
- <CAK-6q+jNmvtBKKxSp1WepVXbaQ65CghZv3bS2ptjB9jyzOSGTA@mail.gmail.com>
- <20230118102058.3b1f275b@xps-13> <CAK-6q+gwP8P--5e9HKt2iPhjeefMXrXUVy-G+szGdFXZvgYKvg@mail.gmail.com>
- <CAK-6q+gn7W9x2+ihSC41RzkhmBn1E44pKtJFHgqRdd8aBpLrVQ@mail.gmail.com>
- <20230124110814.6096ecbe@xps-13> <CAB_54W69KcM0UJjf8py-VyRXx2iEUvcAKspXiAkykkQoF6ccDA@mail.gmail.com>
- <20230125105653.44e9498f@xps-13> <CAK-6q+irhYroxV_P5ORtO9Ui9-Bs=SNS+vO5bZ7_X-geab+XrA@mail.gmail.com>
- <1322777.1674848380@dyas>
-In-Reply-To: <1322777.1674848380@dyas>
-From:   Alexander Aring <aahringo@redhat.com>
-Date:   Fri, 27 Jan 2023 20:57:08 -0500
-Message-ID: <CAK-6q+ix3PybA-Af-QRRZ2BwSLYH76SnqhRCsmRpiy_6PFrorw@mail.gmail.com>
-Subject: Re: [PATCH wpan-next 0/2] ieee802154: Beaconing support
-To:     Michael Richardson <mcr@sandelman.ca>
-Cc:     Miquel Raynal <miquel.raynal@bootlin.com>,
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.0
+Subject: Re: [PATCH wpan-next v2 0/2] ieee802154: Beaconing support
+Content-Language: en-US
+To:     Miquel Raynal <miquel.raynal@bootlin.com>,
         Alexander Aring <alex.aring@gmail.com>,
-        Stefan Schmidt <stefan@datenfreihafen.org>,
-        linux-wpan@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
+        linux-wpan@vger.kernel.org
+Cc:     "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
         Paolo Abeni <pabeni@redhat.com>,
         Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
@@ -79,51 +53,55 @@ Cc:     Miquel Raynal <miquel.raynal@bootlin.com>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
         Guilhem Imberton <guilhem.imberton@qorvo.com>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Content-Type: text/plain; charset="UTF-8"
+References: <20230125102923.135465-1-miquel.raynal@bootlin.com>
+From:   Stefan Schmidt <stefan@datenfreihafen.org>
+In-Reply-To: <20230125102923.135465-1-miquel.raynal@bootlin.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi,
+Hello.
 
-On Fri, Jan 27, 2023 at 2:52 PM Michael Richardson <mcr@sandelman.ca> wrote:
->
->
-> Alexander Aring <aahringo@redhat.com> wrote:
->     >> - MLME ops without feedback constraints like beacons -> should go
->     >> through the hot path, but not through the whole net stack, so
->     >> ieee802154_subif_start_xmit()
->     >>
->
->     > it will bypass the qdisc handling (+ some other things which are around
->     > there). The current difference is what I see llsec handling and other
->     > things which might be around there? It depends if other "MLME-ops" need
->     > to be e.g. encrypted or not.
->
-> I haven't followed the whole thread.
-> So I am neither agreeing nor disagreeing, just clarifying.
-> Useful beacons are "signed" (have integrity applied), but not encrypted.
->
+On 25.01.23 11:29, Miquel Raynal wrote:
+> Scanning being now supported, we can eg. play with hwsim to verify
+> everything works as soon as this series including beaconing support gets
+> merged.
+> 
+> Thanks,
+> Miquèl
+> 
+> Changes in v2:
+> * Clearly state in the commit log llsec is not supported yet.
+> * Do not use mlme transmission helpers because we don't really need to
+>    stop the queue when sending a beacon, as we don't expect any feedback
+>    from the PHY nor from the peers. However, we don't want to go through
+>    the whole net stack either, so we bypass it calling the subif helper
+>    directly.
+> 
+> Miquel Raynal (2):
+>    ieee802154: Add support for user beaconing requests
+>    mac802154: Handle basic beaconing
+> 
+>   include/net/cfg802154.h         |  23 +++++
+>   include/net/ieee802154_netdev.h |  16 ++++
+>   include/net/nl802154.h          |   3 +
+>   net/ieee802154/header_ops.c     |  24 +++++
+>   net/ieee802154/nl802154.c       |  93 ++++++++++++++++++++
+>   net/ieee802154/nl802154.h       |   1 +
+>   net/ieee802154/rdev-ops.h       |  28 ++++++
+>   net/ieee802154/trace.h          |  21 +++++
+>   net/mac802154/cfg.c             |  31 ++++++-
+>   net/mac802154/ieee802154_i.h    |  18 ++++
+>   net/mac802154/iface.c           |   3 +
+>   net/mac802154/llsec.c           |   5 +-
+>   net/mac802154/main.c            |   1 +
+>   net/mac802154/scan.c            | 151 ++++++++++++++++++++++++++++++++
+>   14 files changed, 415 insertions(+), 3 deletions(-)
 
-I see. But that means they need to be going through llsec, just the
-payload isn't encrypted and the MIC is appended to provide integrity.
+These patches have been applied to the wpan-next tree and will be
+part of the next pull request to net-next. Thanks!
 
-> It's important for userspace to be able to receive them, even if we don't
-> have a key that can verify them.  AFAIK, we have no specific interface to
-> receive beacons.
->
-
-This can be done over multiple ways. Either over a socket
-communication or if they appear rarely we can put them into a netlink
-event. In my opinion we already put that in a higher level API in
-passive scan to interpret the receiving of a beacon on kernel level
-and trigger netlink events.
-
-I am not sure how HardMAC transceivers handle them on the transceiver
-side only or if they ever provide them to the next layer or not?
-For SoftMAC you can actually create a AF_PACKET raw socket, and you
-should see everything which bypass hardware address filters and kernel
-filters. Then an application can listen to them.
-
-- Alex
-
+regards
+Stefan Schmidt
