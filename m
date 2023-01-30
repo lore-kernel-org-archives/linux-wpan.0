@@ -2,112 +2,65 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EEE2C54EED
-	for <linux-wpan@archiver.kernel.org>; Mon, 30 Jan 2023 09:56:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2714EC54EED
+	for <linux-wpan@archiver.kernel.org>; Mon, 30 Jan 2023 09:58:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236210AbjA3J4H (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 30 Jan 2023 04:56:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58832 "EHLO
+        id S235966AbjA3J6I (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 30 Jan 2023 04:58:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33158 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236382AbjA3Jzt (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 30 Jan 2023 04:55:49 -0500
-Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D82032F7AC;
-        Mon, 30 Jan 2023 01:55:25 -0800 (PST)
-Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id BE88C20009;
-        Mon, 30 Jan 2023 09:55:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1675072514;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=D1q99COeEhSgAwyVTxW/RO7yjBL/O8JQ1iE+OT9BH0A=;
-        b=QIN7FUYzn0dtmRGBp0w2TVIW7uDeHwZcmXcfcPutBehGK13ZbLZKEc5pwaqrF9+AJEjB3y
-        BSKTgdxIEJa4lZZXkCNxf5mhTAX6am3nW5b6dAts/HViLKiLy5j4mQbWdE+1hL3x9oXWDS
-        h+1LWDaCCWZNDw/HxYIFukN2VOzn+G4MRw6JD7XPqD+dbE4u8mN/B0twRfw0sjC7S9NJd1
-        dKiQW3oeKppfl+VvXprV05BUH64jZq2b2gFwOKgg74KT1A07t5dQ5jIuitIlAejnVsbeQs
-        wNnLcc8+1kalJIy/UPfxEbbry1ca6EIlUSE6NfosMZkLN5gzeyCDrIO+jlcsMQ==
-Date:   Mon, 30 Jan 2023 10:55:08 +0100
-From:   Miquel Raynal <miquel.raynal@bootlin.com>
-To:     Alexander Aring <aahringo@redhat.com>
-Cc:     Alexander Aring <alex.aring@gmail.com>,
-        Stefan Schmidt <stefan@datenfreihafen.org>,
-        linux-wpan@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
-        David Girault <david.girault@qorvo.com>,
-        Romuald Despres <romuald.despres@qorvo.com>,
-        Frederic Blain <frederic.blain@qorvo.com>,
-        Nicolas Schodet <nico@ni.fr.eu.org>,
-        Guilhem Imberton <guilhem.imberton@qorvo.com>,
-        Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH wpan-next v2 0/2] ieee802154: Beaconing support
-Message-ID: <20230130105508.38a25780@xps-13>
-In-Reply-To: <CAK-6q+hoquVswZTm+juLasQzUJpGdO+aQ7Q3PCRRwYagge5dTw@mail.gmail.com>
-References: <20230125102923.135465-1-miquel.raynal@bootlin.com>
-        <CAK-6q+jN1bnP1FdneGrfDJuw3r3b=depEdEP49g_t3PKQ-F=Lw@mail.gmail.com>
-        <CAK-6q+hoquVswZTm+juLasQzUJpGdO+aQ7Q3PCRRwYagge5dTw@mail.gmail.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+        with ESMTP id S235978AbjA3J6F (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 30 Jan 2023 04:58:05 -0500
+Received: from proxima.lasnet.de (proxima.lasnet.de [IPv6:2a01:4f8:121:31eb:3::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 956A52A990;
+        Mon, 30 Jan 2023 01:57:24 -0800 (PST)
+Received: from localhost.localdomain.datenfreihafen.local (p200300e9d7411771ca887222dece182b.dip0.t-ipconnect.de [IPv6:2003:e9:d741:1771:ca88:7222:dece:182b])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: stefan@sostec.de)
+        by proxima.lasnet.de (Postfix) with ESMTPSA id 40BC3C01A9;
+        Mon, 30 Jan 2023 10:56:52 +0100 (CET)
+From:   Stefan Schmidt <stefan@datenfreihafen.org>
+To:     davem@davemloft.net, kuba@kernel.org
+Cc:     linux-wpan@vger.kernel.org, alex.aring@gmail.com,
+        netdev@vger.kernel.org
+Subject: pull-request: ieee802154 for net 2023-01-30
+Date:   Mon, 30 Jan 2023 10:56:46 +0100
+Message-Id: <20230130095646.301448-1-stefan@datenfreihafen.org>
+X-Mailer: git-send-email 2.39.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi Alexander,
+Hello Dave, Jakub.
 
-aahringo@redhat.com wrote on Thu, 26 Jan 2023 20:48:02 -0500:
+An update from ieee802154 for your *net* tree:
 
-> Hi,
->=20
-> On Thu, Jan 26, 2023 at 8:45 PM Alexander Aring <aahringo@redhat.com> wro=
-te:
-> >
-> > Hi,
-> >
-> > On Wed, Jan 25, 2023 at 5:31 AM Miquel Raynal <miquel.raynal@bootlin.co=
-m> wrote: =20
-> > >
-> > > Scanning being now supported, we can eg. play with hwsim to verify
-> > > everything works as soon as this series including beaconing support g=
-ets
-> > > merged.
-> > >
-> > > Thanks,
-> > > Miqu=C3=A8l
-> > >
-> > > Changes in v2:
-> > > * Clearly state in the commit log llsec is not supported yet.
-> > > * Do not use mlme transmission helpers because we don't really need to
-> > >   stop the queue when sending a beacon, as we don't expect any feedba=
-ck
-> > >   from the PHY nor from the peers. However, we don't want to go throu=
-gh
-> > >   the whole net stack either, so we bypass it calling the subif helper
-> > >   directly.
-> > > =20
->=20
-> moment, we use the mlme helpers to stop tx=20
+Only one fix this time around.
 
-No, we no longer use the mlme helpers to stop tx when sending beacons
-(but true MLME transmissions, we ack handling and return codes will be
-used for other purposes).
+Miquel Raynal fixed a potential double free spotted by Dan Carpenter.
 
-> but we use the
-> ieee802154_subif_start_xmit() because of the possibility to invoke
-> current 802.15.4 hooks like llsec? That's how I understand it.
+regards
+Stefan Schmidt
 
-We go through llsec (see ieee802154_subif_start_xmit() implementation)
-when we send data or beacons. When we send beacons, for now, we just
-discard the llsec logic. This needs of course to be improved. We will
-probably need some llsec handling in the mlme case as well in the near
-future.
+The following changes since commit 9cd3fd2054c3b3055163accbf2f31a4426f10317:
 
-Thanks,
-Miqu=C3=A8l
+  net_sched: reject TCF_EM_SIMPLE case for complex ematch module (2022-12-19 09:43:18 +0000)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/sschmidt/wpan.git tags/ieee802154-for-net-2023-01-30
+
+for you to fetch changes up to 71a06f1034b91e15d3ba6b5539c7d3a2d7f13030:
+
+  mac802154: Fix possible double free upon parsing error (2022-12-19 11:38:12 +0100)
+
+----------------------------------------------------------------
+Miquel Raynal (1):
+      mac802154: Fix possible double free upon parsing error
+
+ net/mac802154/rx.c | 1 -
+ 1 file changed, 1 deletion(-)
