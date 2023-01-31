@@ -2,126 +2,97 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20DBAC636CC
-	for <linux-wpan@archiver.kernel.org>; Tue, 31 Jan 2023 11:25:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31182C38142
+	for <linux-wpan@archiver.kernel.org>; Tue, 31 Jan 2023 23:53:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230006AbjAaLZf (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 31 Jan 2023 06:25:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57060 "EHLO
+        id S230007AbjAaXxL (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 31 Jan 2023 18:53:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43966 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229693AbjAaLZe (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 31 Jan 2023 06:25:34 -0500
-Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::227])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9113B49940;
-        Tue, 31 Jan 2023 03:25:32 -0800 (PST)
-Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id 0D98820011;
-        Tue, 31 Jan 2023 11:25:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1675164330;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=tAuea4GKGxpxlpyo6uDuczjlm4urx1r7jKAW9TwYw58=;
-        b=gVNzG7gXQ0X6Pzs6miC99X48DN/XicLuSE0DYYAaa/+Imvqn70W8KZ4rq3vLAvP/tahg3O
-        p4NqIdMTakYZyuWQcoJK/IgpauZCO5069+38mM7Jsizs7iOuOgyceYG6wMWCAXxRNmLfYR
-        dkeRd4fBvrpce5Yj2UwkJrfBMKZ2zLy0zj04NhCcPb2O+P6Pv9/FO85cHWi+zmtUv/Ekq8
-        wo4JBoHDtg8r3qpIdSZiVlx/aY4Jysd/Q/69j0YtuvT+g+zBsUszyQVrp0WrMbsBABhHru
-        /48KeGdIcVeGuvGY0yFhWyPkxB8a+Hz2BfioSwexSxhh6UTWTCCYzA6wQDIong==
-Date:   Tue, 31 Jan 2023 12:25:25 +0100
-From:   Miquel Raynal <miquel.raynal@bootlin.com>
-To:     Alexander Aring <aahringo@redhat.com>
+        with ESMTP id S229992AbjAaXxK (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 31 Jan 2023 18:53:10 -0500
+Received: from mail-oa1-x31.google.com (mail-oa1-x31.google.com [IPv6:2001:4860:4864:20::31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CC2E1815C;
+        Tue, 31 Jan 2023 15:53:09 -0800 (PST)
+Received: by mail-oa1-x31.google.com with SMTP id 586e51a60fabf-15085b8a2f7so21536080fac.2;
+        Tue, 31 Jan 2023 15:53:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=vYdEeqjNgoJHoM9SJT0m+2v5Gmt/A9maZs7Zf5eYT0U=;
+        b=CXfgZBjaN8iKI3nm7eBxc2m4WpogJtbLT+AgoHycgD3olULfXSwuI5j6/GiFc+jBob
+         VmUL2tKDllcVmP+K2CA7vvg2wZ8pgWhZQ9NCPjNqAmL+zoYygQdvvMS5aA+ysALBl0Ir
+         2kYQpf8bLQhF8b6euAOzPPPUgbN8bjJLUJEXBW/pCQhnKgc/u6aP3zDwfIHXEo22xUoT
+         bDaHWBfqKM1wwYwuE7T/aEGfOx3T8DGPefE270WKYN7FcFSwfmeNPYyFoK29oriJxSay
+         USjEZphJE7VRAjnw253uW3MnklxL2NtDu5vAAfR+wI2xdfwA15SrqJsubYA5m8Y2AiCY
+         yV3w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=vYdEeqjNgoJHoM9SJT0m+2v5Gmt/A9maZs7Zf5eYT0U=;
+        b=D1l+hragq5mQqffvXdZJ3k+IyveYt1zpRvTyJpFA4z7IWUcRU2njDnfKVgPDSJd7U4
+         S+d0dBuFch7Z/0bbBxG4NVwJl5Hnr1ZchMXPkEvW7PDGyywOwCaeVpwZf8q9qMvUintA
+         fuSY1SgRZLkUiaEqWwt4BDPCc2sFKB5uG5pCggyGWwGSU2LPRP/01ZpJQtOEkvlDKoij
+         EHaAchvL9OK6DeVKcYT8EkRGxTLjuB8g6D8E8GTDZnwufBoE479+cZePqdUw1BldbTrz
+         gSvrbRZM5o599K9CNPHZMQg1voWY7YYpdZagxtBKVMOo5WiV95Tmk2NyMHqfAnI8r0eg
+         lwTA==
+X-Gm-Message-State: AO0yUKUzK5eJ4PxR+jgDzRvnnvjmhagRGh3gkd6KTRyAB001fnWfV4SY
+        17WvkOg5w2eMbA5cNSY3yKHqVk/UCqabWi3lHfZYFJ9d/6Y=
+X-Google-Smtp-Source: AK7set9X0fMapUox6SkZRqxLHjb6kHYlavJvRHqQlWZX9LMKSI82Azfoc1BVOABrvqzOsDMgTuUiphTTOOsZEQJxB5E=
+X-Received: by 2002:a05:6870:3913:b0:163:4ae7:f200 with SMTP id
+ b19-20020a056870391300b001634ae7f200mr2021361oap.84.1675209188690; Tue, 31
+ Jan 2023 15:53:08 -0800 (PST)
+MIME-Version: 1.0
+References: <20230126162323.2986682-1-arnd@kernel.org>
+In-Reply-To: <20230126162323.2986682-1-arnd@kernel.org>
+From:   Dmitry Torokhov <dmitry.torokhov@gmail.com>
+Date:   Tue, 31 Jan 2023 15:52:55 -0800
+Message-ID: <CAKdAkRQT_Jk5yBeMZqh=M1JscVLFieZTQjLGOGxy8nHh8SnD3A@mail.gmail.com>
+Subject: Re: [PATCH] [v2] at86rf230: convert to gpio descriptors
+To:     Arnd Bergmann <arnd@kernel.org>
 Cc:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
-        linux-wpan@vger.kernel.org,
+        Arnd Bergmann <arnd@arndb.de>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
         "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
         Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
-        David Girault <david.girault@qorvo.com>,
-        Romuald Despres <romuald.despres@qorvo.com>,
-        Frederic Blain <frederic.blain@qorvo.com>,
-        Nicolas Schodet <nico@ni.fr.eu.org>,
-        Guilhem Imberton <guilhem.imberton@qorvo.com>,
-        Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH wpan-next v2 0/2] ieee802154: Beaconing support
-Message-ID: <20230131122525.7bd35c2b@xps-13>
-In-Reply-To: <CAK-6q+gqQgFxqBUAhHDMaWv9VfuKa=bCVee_oSLQeVtk_G8=ow@mail.gmail.com>
-References: <20230125102923.135465-1-miquel.raynal@bootlin.com>
-        <CAK-6q+jN1bnP1FdneGrfDJuw3r3b=depEdEP49g_t3PKQ-F=Lw@mail.gmail.com>
-        <CAK-6q+hoquVswZTm+juLasQzUJpGdO+aQ7Q3PCRRwYagge5dTw@mail.gmail.com>
-        <20230130105508.38a25780@xps-13>
-        <CAK-6q+gqQgFxqBUAhHDMaWv9VfuKa=bCVee_oSLQeVtk_G8=ow@mail.gmail.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+        Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
+        linux-wpan@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi Alexander,
+Hi Arnd,
 
-> > > > > Changes in v2:
-> > > > > * Clearly state in the commit log llsec is not supported yet.
-> > > > > * Do not use mlme transmission helpers because we don't really ne=
-ed to
-> > > > >   stop the queue when sending a beacon, as we don't expect any fe=
-edback
-> > > > >   from the PHY nor from the peers. However, we don't want to go t=
-hrough
-> > > > >   the whole net stack either, so we bypass it calling the subif h=
-elper
-> > > > >   directly.
-> > > > > =20
-> > >
-> > > moment, we use the mlme helpers to stop tx =20
-> >
-> > No, we no longer use the mlme helpers to stop tx when sending beacons
-> > (but true MLME transmissions, we ack handling and return codes will be
-> > used for other purposes).
-> > =20
->=20
-> then we run into an issue overwriting the framebuffer while the normal
-> transmit path is active?
+On Thu, Jan 26, 2023 at 8:32 AM Arnd Bergmann <arnd@kernel.org> wrote:
+>
+>         /* Reset */
+> -       if (gpio_is_valid(rstn)) {
+> +       if (rstn) {
+>                 udelay(1);
+> -               gpio_set_value_cansleep(rstn, 0);
+> +               gpiod_set_value_cansleep(rstn, 0);
+>                 udelay(1);
+> -               gpio_set_value_cansleep(rstn, 1);
+> +               gpiod_set_value_cansleep(rstn, 1);
 
-Crap, yes you're right. That's not gonna work.
+For gpiod conversions, if we are not willing to chase whether existing
+DTSes specify polarities
+properly and create workarounds in case they are wrong, we should use
+gpiod_set_raw_value*()
+(my preference would be to do the work and not use "raw" variants).
 
-The net core acquires HARD_TX_LOCK() to avoid these issues and we are
-no bypassing the net core without taking care of the proper frame
-transmissions either (which would have worked with mlme_tx_one()). So I
-guess there are two options:
+In this particular case, arch/arm/boot/dts/vf610-zii-dev-rev-c.dts
+defines reset line as active low,
+so you are leaving the device in reset state.
 
-* Either we deal with the extra penalty of stopping the queue and
-  waiting for the beacon to be transmitted with an mlme_tx_one() call,
-  as proposed initially.
+Please review your other conversion patches.
 
-* Or we hardcode our own "net" transmit helper, something like:
-
-mac802154_fast_mlme_tx() {
-	struct net_device *dev =3D skb->dev;
-	struct netdev_queue *txq;
-
-	txq =3D netdev_core_pick_tx(dev, skb, NULL);
-	cpu =3D smp_processor_id();
-	HARD_TX_LOCK(dev, txq, cpu);
-	if (!netif_xmit_frozen_or_drv_stopped(txq))
-		netdev_start_xmit(skb, dev, txq, 0);
-	HARD_TX_UNLOCK(dev, txq);
-}
-
-Note1: this is very close to generic_xdp_tx() which tries to achieve the
-same goal: sending packets, bypassing qdisc et al. I don't know whether
-it makes sense to define it under mac802154/tx.c or core/dev.c and give
-it another name, like generic_tx() or whatever would be more
-appropriate. Or even adapting generic_xdp_tx() to make it look more
-generic and use that function instead (without the xdp struct pointer).
-
-Note2: I am wondering if it makes sense to disable bh here as well?
-
-Once we settle, I send a patch.
-
-Thanks,
-Miqu=C3=A8l
+-- 
+Dmitry
