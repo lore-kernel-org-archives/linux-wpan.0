@@ -2,86 +2,79 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3755CC636CD
-	for <linux-wpan@archiver.kernel.org>; Tue, 31 Jan 2023 08:12:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25369C636CC
+	for <linux-wpan@archiver.kernel.org>; Tue, 31 Jan 2023 10:58:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230087AbjAaIMM (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 31 Jan 2023 03:12:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35092 "EHLO
+        id S231539AbjAaK6G (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 31 Jan 2023 05:58:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42198 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229909AbjAaIML (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 31 Jan 2023 03:12:11 -0500
-Received: from proxima.lasnet.de (proxima.lasnet.de [IPv6:2a01:4f8:121:31eb:3::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E0961CF6D;
-        Tue, 31 Jan 2023 00:12:08 -0800 (PST)
-Received: from [IPV6:2003:e9:d70f:e321:93b5:b690:4c5a:7ba9] (p200300e9d70fe32193b5b6904c5a7ba9.dip0.t-ipconnect.de [IPv6:2003:e9:d70f:e321:93b5:b690:4c5a:7ba9])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: stefan@datenfreihafen.org)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id F3A21C05C5;
-        Tue, 31 Jan 2023 09:12:05 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
-        s=2021; t=1675152726;
+        with ESMTP id S230516AbjAaK6F (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 31 Jan 2023 05:58:05 -0500
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC53DB469;
+        Tue, 31 Jan 2023 02:58:03 -0800 (PST)
+Received: (Authenticated sender: miquel.raynal@bootlin.com)
+        by mail.gandi.net (Postfix) with ESMTPSA id 26FDDC000A;
+        Tue, 31 Jan 2023 10:57:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+        t=1675162682;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=N6fHKbNyAuu3NT3+J3rUEqgwxmsgoIpDY8F/JL0e918=;
-        b=Ne4kMvDNm246q90EqWvHMrlDTpJpNLlPVOhyby/PEA1SRThikekRmSfBCDqz4HnQmXWmPQ
-        CU3a0mZXWRqwvPTtHzsEnzpRJxKCKVwRJTSz+mSl71qexM1wSUJ8OE/teU+/Wss7vYXOqh
-        9deieRRNX4azbtlHJIm51Ze00GUUPFYIoRrRepizyUXu6hvCp9KPN5jaFPvZhBDLNV9Lfy
-        QWYiOYXiHrdYJ5KKC+fi3bGzkGaemYLHOQqEsuCqnebd237FXqAlzxZYuoSmMQxjf5KXqd
-        Lr0YtehEKeUaRfeiwA6Q9V03lV4TdcjhB+9b20T51MJe2otw632FzAhNIN6dXQ==
-Message-ID: <d25400ef-6706-3dff-7f40-23ae561ff7f3@datenfreihafen.org>
-Date:   Tue, 31 Jan 2023 09:12:04 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Subject: Re: [PATCH] cc2520: move to gpio descriptors
-Content-Language: en-US
-To:     Arnd Bergmann <arnd@kernel.org>,
-        Varka Bhadram <varkabhadram@gmail.com>,
-        Alexander Aring <alex.aring@gmail.com>
-Cc:     linux-gpio@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
+         content-transfer-encoding:content-transfer-encoding;
+        bh=dwXbGWxyljGp3lNjRbwA7G7wCPaKvF9kyuYS7yoepok=;
+        b=Q0thTiuQH58l6D0C1TV5XfwoifURTvgyzWmh7ISqtoTG/hp7OhN6D0/lIMK23OIl3ab7Xj
+        AUdS9vqY8WenhFkPp5H110baDkuhIOY6m3fro7hTz2OsXVlE2lMrjeQbxMcJGIxu1eBh1b
+        l2sS+hSwur9/33wWsJSVqKx+2VIqXCZOzBFRp6r/OwQmlMPZdG5/6Yg/Q0JEnQd2FcFghk
+        IXK/AE5e8VbyWxHpka8h7K0V3Wh97Kig4oEYla04vQF0WZzoXHEE65G612OoirmjczsEMJ
+        jjpZqwgz43qrU+aNu2hRT7ucQfXbBApuNJbTD85c89bDdUAjpxD+EzkwcL9E1A==
+From:   Miquel Raynal <miquel.raynal@bootlin.com>
+To:     Alexander Aring <alex.aring@gmail.com>,
+        Stefan Schmidt <stefan@datenfreihafen.org>,
+        linux-wpan@vger.kernel.org
+Cc:     "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
-        linux-wpan@vger.kernel.org, netdev@vger.kernel.org
-References: <20230126161658.2983292-1-arnd@kernel.org>
-From:   Stefan Schmidt <stefan@datenfreihafen.org>
-In-Reply-To: <20230126161658.2983292-1-arnd@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+        Paolo Abeni <pabeni@redhat.com>,
+        Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
+        David Girault <david.girault@qorvo.com>,
+        Romuald Despres <romuald.despres@qorvo.com>,
+        Frederic Blain <frederic.blain@qorvo.com>,
+        Nicolas Schodet <nico@ni.fr.eu.org>,
+        Guilhem Imberton <guilhem.imberton@qorvo.com>,
+        Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+        Miquel Raynal <miquel.raynal@bootlin.com>
+Subject: [wpan-next 0/4] ieee802154: Active scan support
+Date:   Tue, 31 Jan 2023 11:57:53 +0100
+Message-Id: <20230131105757.163034-1-miquel.raynal@bootlin.com>
+X-Mailer: git-send-email 2.34.1
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello.
+Hello,
+Following the initial support for passive scan and beaconing, here is an
+addition to support active scans.
+Thanks,
+Miquèl
 
-On 26.01.23 17:15, Arnd Bergmann wrote:
-> From: Arnd Bergmann <arnd@arndb.de>
-> 
-> cc2520 supports both probing from static platform_data and
-> from devicetree, but there have never been any definitions
-> of the platform data in the mainline kernel, so it's safe
-> to assume that only the DT path is used.
-> 
-> After folding cc2520_platform_data into the driver itself,
-> the GPIO handling can be simplified by moving to the modern
-> gpiod interface.
-> 
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> ---
->   MAINTAINERS                     |   1 -
->   drivers/net/ieee802154/cc2520.c | 136 +++++++++-----------------------
->   include/linux/spi/cc2520.h      |  21 -----
->   3 files changed, 37 insertions(+), 121 deletions(-)
->   delete mode 100644 include/linux/spi/cc2520.h
+Miquel Raynal (4):
+  ieee802154: Add support for user active scan requests
+  mac802154: Handle active scanning
+  ieee802154: Add support for allowing to answer BEACON_REQ
+  mac802154: Handle received BEACON_REQ
 
-This patch has been applied to the wpan-next tree and will be
-part of the next pull request to net-next. Thanks!
+ include/net/ieee802154_netdev.h | 20 +++++++++-
+ net/ieee802154/header_ops.c     | 36 +++++++++++++++++
+ net/ieee802154/nl802154.c       |  3 +-
+ net/mac802154/ieee802154_i.h    | 21 ++++++++++
+ net/mac802154/main.c            |  2 +
+ net/mac802154/rx.c              | 70 ++++++++++++++++++++++++++++++++-
+ net/mac802154/scan.c            | 65 +++++++++++++++++++++++++++---
+ 7 files changed, 209 insertions(+), 8 deletions(-)
 
-regards
-Stefan Schmidt
+-- 
+2.34.1
+
