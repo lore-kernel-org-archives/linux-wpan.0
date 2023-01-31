@@ -2,77 +2,86 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 093B5C636CD
-	for <linux-wpan@archiver.kernel.org>; Tue, 31 Jan 2023 05:20:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3755CC636CD
+	for <linux-wpan@archiver.kernel.org>; Tue, 31 Jan 2023 08:12:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229681AbjAaFUU (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 31 Jan 2023 00:20:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59170 "EHLO
+        id S230087AbjAaIMM (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 31 Jan 2023 03:12:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35092 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229680AbjAaFUT (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 31 Jan 2023 00:20:19 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0780C65E;
-        Mon, 30 Jan 2023 21:20:18 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        with ESMTP id S229909AbjAaIML (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 31 Jan 2023 03:12:11 -0500
+Received: from proxima.lasnet.de (proxima.lasnet.de [IPv6:2a01:4f8:121:31eb:3::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E0961CF6D;
+        Tue, 31 Jan 2023 00:12:08 -0800 (PST)
+Received: from [IPV6:2003:e9:d70f:e321:93b5:b690:4c5a:7ba9] (p200300e9d70fe32193b5b6904c5a7ba9.dip0.t-ipconnect.de [IPv6:2003:e9:d70f:e321:93b5:b690:4c5a:7ba9])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 4B40B613F7;
-        Tue, 31 Jan 2023 05:20:18 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id A07BCC4339B;
-        Tue, 31 Jan 2023 05:20:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1675142417;
-        bh=Ilm19g62Meqe/3IhhpbZ3ncbsmcML0MNvJRB4S69npk=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=oPHDunN7/gmd3HvRsFk/BxdB4gqfU+e01JEsRyRwYhsJIVewf4bUxk3vOWwJp3QkI
-         ytQICGa8pH28bFByy8icgao2hYtb5mlml4p5rbKr2SJFVe351FURoAaVpiipfeHLKx
-         VD9NNz+w83wMmIm6cMhobLtCJcjtEBcCYOQSYx8yX6xdAtEVRWFCargxoB0tF/JwZV
-         vOaOANZYQ9y1DxG023MYdWJPxHvvqnHRanETu7Zc/Da9faN05t/wGAHar4QPgjR9pt
-         Z5ez4QWSjs2c7RnWRospS0jtDw7dTPJb2VejLME3KMKnMV38aXk6QzrT4Qz6rNJOO/
-         5mZktmZVEHOWA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 81CACC0C40E;
-        Tue, 31 Jan 2023 05:20:17 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+        (Authenticated sender: stefan@datenfreihafen.org)
+        by proxima.lasnet.de (Postfix) with ESMTPSA id F3A21C05C5;
+        Tue, 31 Jan 2023 09:12:05 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
+        s=2021; t=1675152726;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=N6fHKbNyAuu3NT3+J3rUEqgwxmsgoIpDY8F/JL0e918=;
+        b=Ne4kMvDNm246q90EqWvHMrlDTpJpNLlPVOhyby/PEA1SRThikekRmSfBCDqz4HnQmXWmPQ
+        CU3a0mZXWRqwvPTtHzsEnzpRJxKCKVwRJTSz+mSl71qexM1wSUJ8OE/teU+/Wss7vYXOqh
+        9deieRRNX4azbtlHJIm51Ze00GUUPFYIoRrRepizyUXu6hvCp9KPN5jaFPvZhBDLNV9Lfy
+        QWYiOYXiHrdYJ5KKC+fi3bGzkGaemYLHOQqEsuCqnebd237FXqAlzxZYuoSmMQxjf5KXqd
+        Lr0YtehEKeUaRfeiwA6Q9V03lV4TdcjhB+9b20T51MJe2otw632FzAhNIN6dXQ==
+Message-ID: <d25400ef-6706-3dff-7f40-23ae561ff7f3@datenfreihafen.org>
+Date:   Tue, 31 Jan 2023 09:12:04 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: pull-request: ieee802154 for net 2023-01-30
-From:   patchwork-bot+netdevbpf@kernel.org
-Message-Id: <167514241752.16180.14659503229725926088.git-patchwork-notify@kernel.org>
-Date:   Tue, 31 Jan 2023 05:20:17 +0000
-References: <20230130095646.301448-1-stefan@datenfreihafen.org>
-In-Reply-To: <20230130095646.301448-1-stefan@datenfreihafen.org>
-To:     Stefan Schmidt <stefan@datenfreihafen.org>
-Cc:     davem@davemloft.net, kuba@kernel.org, linux-wpan@vger.kernel.org,
-        alex.aring@gmail.com, netdev@vger.kernel.org
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.0
+Subject: Re: [PATCH] cc2520: move to gpio descriptors
+Content-Language: en-US
+To:     Arnd Bergmann <arnd@kernel.org>,
+        Varka Bhadram <varkabhadram@gmail.com>,
+        Alexander Aring <alex.aring@gmail.com>
+Cc:     linux-gpio@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
+        linux-wpan@vger.kernel.org, netdev@vger.kernel.org
+References: <20230126161658.2983292-1-arnd@kernel.org>
+From:   Stefan Schmidt <stefan@datenfreihafen.org>
+In-Reply-To: <20230126161658.2983292-1-arnd@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello:
+Hello.
 
-This pull request was applied to netdev/net.git (master)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Mon, 30 Jan 2023 10:56:46 +0100 you wrote:
-> Hello Dave, Jakub.
+On 26.01.23 17:15, Arnd Bergmann wrote:
+> From: Arnd Bergmann <arnd@arndb.de>
 > 
-> An update from ieee802154 for your *net* tree:
+> cc2520 supports both probing from static platform_data and
+> from devicetree, but there have never been any definitions
+> of the platform data in the mainline kernel, so it's safe
+> to assume that only the DT path is used.
 > 
-> Only one fix this time around.
+> After folding cc2520_platform_data into the driver itself,
+> the GPIO handling can be simplified by moving to the modern
+> gpiod interface.
 > 
-> Miquel Raynal fixed a potential double free spotted by Dan Carpenter.
-> 
-> [...]
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> ---
+>   MAINTAINERS                     |   1 -
+>   drivers/net/ieee802154/cc2520.c | 136 +++++++++-----------------------
+>   include/linux/spi/cc2520.h      |  21 -----
+>   3 files changed, 37 insertions(+), 121 deletions(-)
+>   delete mode 100644 include/linux/spi/cc2520.h
 
-Here is the summary with links:
-  - pull-request: ieee802154 for net 2023-01-30
-    https://git.kernel.org/netdev/net/c/9b3fc325c2a7
+This patch has been applied to the wpan-next tree and will be
+part of the next pull request to net-next. Thanks!
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+regards
+Stefan Schmidt
