@@ -2,85 +2,134 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01C82C05027
-	for <linux-wpan@archiver.kernel.org>; Wed,  1 Feb 2023 18:45:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81668C6379F
+	for <linux-wpan@archiver.kernel.org>; Wed,  1 Feb 2023 20:55:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230514AbjBASpf (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 1 Feb 2023 13:45:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50280 "EHLO
+        id S231335AbjBAUzd (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 1 Feb 2023 15:55:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38166 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229546AbjBASpe (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 1 Feb 2023 13:45:34 -0500
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD07444B9;
-        Wed,  1 Feb 2023 10:45:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1675277133; x=1706813133;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=p19pyjzp1EFUDT4hqnHuCHOq5ka+SXwLrgOqQTw0ekU=;
-  b=bz9fowcTEK1P5mt8bHzgQS7U99CGkyzVAZFTayAxsENSoX8UajGdxQ1N
-   jJ9DElRaqy9KhvxFt+hMtu9ajYVzs0IpDvwGMyK94TDRKsDK6P0ISafYZ
-   7RWz9Cw/QoEWSxcHOWjkBP9LjFfOgS1rVLSbxbS/eCAfQYBsUV1CotkCR
-   //zVzDo+JIEEVgLJARdyt8lzAH7ua5LDpM+iDRyAQJhhVeBRlyEkIERsy
-   Vp0qnkAId7Zkka1Eqh05ARIKM8wCews0Y+rLY+bKhsokGX7SrjEqL2FE/
-   5WTzZJUv8SKJfC94ew1p1UIWE8nougaXbNXJedo005ZJ71LDywlpsR53e
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10608"; a="316238243"
-X-IronPort-AV: E=Sophos;i="5.97,265,1669104000"; 
-   d="scan'208";a="316238243"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Feb 2023 10:45:12 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10608"; a="753778902"
-X-IronPort-AV: E=Sophos;i="5.97,265,1669104000"; 
-   d="scan'208";a="753778902"
-Received: from smile.fi.intel.com ([10.237.72.54])
-  by FMSMGA003.fm.intel.com with ESMTP; 01 Feb 2023 10:45:08 -0800
-Received: from andy by smile.fi.intel.com with local (Exim 4.96)
-        (envelope-from <andriy.shevchenko@linux.intel.com>)
-        id 1pNI6U-000pnk-0y;
-        Wed, 01 Feb 2023 20:45:06 +0200
-Date:   Wed, 1 Feb 2023 20:45:06 +0200
-From:   Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To:     Stefan Schmidt <stefan@datenfreihafen.org>
-Cc:     Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-        Arnd Bergmann <arnd@kernel.org>,
+        with ESMTP id S232223AbjBAUzL (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 1 Feb 2023 15:55:11 -0500
+Received: from proxima.lasnet.de (proxima.lasnet.de [IPv6:2a01:4f8:121:31eb:3::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43D157C704;
+        Wed,  1 Feb 2023 12:54:46 -0800 (PST)
+Received: from [IPV6:2003:e9:d70f:e348:e684:710d:4017:e1c4] (p200300e9d70fe348e684710d4017e1c4.dip0.t-ipconnect.de [IPv6:2003:e9:d70f:e348:e684:710d:4017:e1c4])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: stefan@datenfreihafen.org)
+        by proxima.lasnet.de (Postfix) with ESMTPSA id C7B1CC0149;
+        Wed,  1 Feb 2023 21:54:42 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
+        s=2021; t=1675284883;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=XWQe8ddurgsjYuPYrNczj6KquCmyVn8EYAjajevyWqk=;
+        b=jzHraYIKHzx4BETD/IDmd0PAaBBTHUKw9vvbq44WX2fM5Js567KGnWWJw2bTC3Rd5D1rf5
+        PzwN4donRPjc4xqKvv/oyyTRiS3mEv/aIZzuAP5YDm9FcxxJVc49V7uypUuMcowo4tcQT4
+        Zd1b9MDgAmLl6oqV5M6CnLJf6m/VhKZXqcVMwl+xequORUbnR8KC9/87oiv1azp8ADa36B
+        7JntKdm3zh0G+IYukVOstNpv7GREuCLOFm69Ms2A49xXCTuFUQ1uTqDn0L7xmTKeEm/6xs
+        ZgwFJslnOPlt/Ux6BhGFR49wMkU5wtdY6FI/BnM35ADCkZ9kL4H+3rzt0BzZTw==
+Message-ID: <274d24c0-67e1-cc33-4bf4-0072b97d7e36@datenfreihafen.org>
+Date:   Wed, 1 Feb 2023 21:54:42 +0100
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.0
+Subject: Re: [PATCH] [v2] at86rf230: convert to gpio descriptors
+Content-Language: en-US
+To:     Dmitry Torokhov <dmitry.torokhov@gmail.com>
+Cc:     Arnd Bergmann <arnd@kernel.org>,
         Alexander Aring <alex.aring@gmail.com>,
         Arnd Bergmann <arnd@arndb.de>,
         Miquel Raynal <miquel.raynal@bootlin.com>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
         "David S. Miller" <davem@davemloft.net>,
         Eric Dumazet <edumazet@google.com>,
         Jakub Kicinski <kuba@kernel.org>,
         Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
         linux-wpan@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH] [v2] at86rf230: convert to gpio descriptors
-Message-ID: <Y9qzMplAeEGSH1SW@smile.fi.intel.com>
 References: <20230126162323.2986682-1-arnd@kernel.org>
  <CAKdAkRQT_Jk5yBeMZqh=M1JscVLFieZTQjLGOGxy8nHh8SnD3A@mail.gmail.com>
  <CAKdAkRSuDJgdsSQqy9Cc_eUYuOfFsLmBJ8Rd93uQhY6HV8nN4w@mail.gmail.com>
  <77b78287-a352-85ae-0c3d-c3837be9bf1d@datenfreihafen.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <77b78287-a352-85ae-0c3d-c3837be9bf1d@datenfreihafen.org>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+ <Y9qRC2qz7ZbKslnb@google.com>
+From:   Stefan Schmidt <stefan@datenfreihafen.org>
+In-Reply-To: <Y9qRC2qz7ZbKslnb@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-On Wed, Feb 01, 2023 at 01:42:37PM +0100, Stefan Schmidt wrote:
-> On 01.02.23 01:50, Dmitry Torokhov wrote:
+Hello.
 
-...
+On 01.02.23 17:19, Dmitry Torokhov wrote:
+> On Wed, Feb 01, 2023 at 01:42:37PM +0100, Stefan Schmidt wrote:
+>> Hello Dmitry.
+>>
+>> On 01.02.23 01:50, Dmitry Torokhov wrote:
+>>> On Tue, Jan 31, 2023 at 3:52 PM Dmitry Torokhov
+>>> <dmitry.torokhov@gmail.com> wrote:
+>>>>
+>>>> Hi Arnd,
+>>>>
+>>>> On Thu, Jan 26, 2023 at 8:32 AM Arnd Bergmann <arnd@kernel.org> wrote:
+>>>>>
+>>>>>           /* Reset */
+>>>>> -       if (gpio_is_valid(rstn)) {
+>>>>> +       if (rstn) {
+>>>>>                   udelay(1);
+>>>>> -               gpio_set_value_cansleep(rstn, 0);
+>>>>> +               gpiod_set_value_cansleep(rstn, 0);
+>>>>>                   udelay(1);
+>>>>> -               gpio_set_value_cansleep(rstn, 1);
+>>>>> +               gpiod_set_value_cansleep(rstn, 1);
+>>>>
+>>>> For gpiod conversions, if we are not willing to chase whether existing
+>>>> DTSes specify polarities
+>>>> properly and create workarounds in case they are wrong, we should use
+>>>> gpiod_set_raw_value*()
+>>>> (my preference would be to do the work and not use "raw" variants).
+>>>>
+>>>> In this particular case, arch/arm/boot/dts/vf610-zii-dev-rev-c.dts
+>>>> defines reset line as active low,
+>>>> so you are leaving the device in reset state.
+>>>>
+>>>> Please review your other conversion patches.
+>>>
+>>> We also can not change the names of requested GPIOs from "reset-gpio"
+>>> to "rstn-gpios" and expect
+>>> this to work.
+>>>
+>>> Stefan, please consider reverting this and applying a couple of
+>>> patches I will send out shortly.
+>>
+>> Thanks for having another look at these patches. Do you have the same
+>> concern for the convesion patch to cc2520 that has been posted and applied
+>> as well?
+> 
+> There are no DT users of cc2520 in the tree, so while ideally reset line
+> should not be left in "logical active" state at the end of the probe, we
+> can deal with this in a follow up patch, I doubt it will lead to
+> regressions as it is.
+> 
+> If I were really nitpicky I would adjust error messages when we fail to
+> get GPIOs, but again, can be done as a followup.
 
-> Thanks for having another look at these patches.
+Feel free to send patches if you are in the mood on fixing this as well. :-)
 
-+1 here. I dunno where I was when reviewing these changes...
+>> Arnd, if you have any concerns about the revert please speak up soon as I am
+>> going to revert your patch and get these patches into my tree later today.
+>>
+> 
+> Thanks.
 
--- 
-With Best Regards,
-Andy Shevchenko
+Reverted and pushed now. Your patches are applied as well. Thanks again 
+for catching this early on.
 
+regards
+Stefan Schmidt
 
