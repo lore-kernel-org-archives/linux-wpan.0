@@ -2,114 +2,114 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E037C05027
-	for <linux-wpan@archiver.kernel.org>; Wed,  1 Feb 2023 08:33:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 962C9C05027
+	for <linux-wpan@archiver.kernel.org>; Wed,  1 Feb 2023 12:42:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230249AbjBAIdm (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 1 Feb 2023 03:33:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44072 "EHLO
+        id S232025AbjBAMmo (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 1 Feb 2023 07:42:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53096 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230043AbjBAIdl (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 1 Feb 2023 03:33:41 -0500
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16175E5;
-        Wed,  1 Feb 2023 00:33:39 -0800 (PST)
-Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id 28DFB24000D;
-        Wed,  1 Feb 2023 08:33:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1675240418;
+        with ESMTP id S232034AbjBAMmo (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 1 Feb 2023 07:42:44 -0500
+Received: from proxima.lasnet.de (proxima.lasnet.de [IPv6:2a01:4f8:121:31eb:3::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C91F9CDCF;
+        Wed,  1 Feb 2023 04:42:41 -0800 (PST)
+Received: from [IPV6:2003:e9:d70f:e348:e684:710d:4017:e1c4] (p200300e9d70fe348e684710d4017e1c4.dip0.t-ipconnect.de [IPv6:2003:e9:d70f:e348:e684:710d:4017:e1c4])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: stefan@datenfreihafen.org)
+        by proxima.lasnet.de (Postfix) with ESMTPSA id 288D3C03DD;
+        Wed,  1 Feb 2023 13:42:39 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
+        s=2021; t=1675255359;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=+TwIBzQlTlsvHwX2axmKcqN48NoRvr8/6w8iELtG+Mw=;
-        b=IPDX1/NGSdhPXvVTU9NKWXtDwTssz6XefD6k1CtYtFBBOecmkfZZElk9PZDWUv9+oiWx6P
-        HVE5Hj+UyUoK/LEXWu0rrbX4HcDC2bshcEK31ksWpmMFAs8jHR0XmyryjxRIuTsm8h7Val
-        ANOxbia9MkqfZrFp59CT1newgvmqWcOQLGoUImh1v7WeVgC446/SLejA5LuHi5QFyErv+s
-        w64zCMfZj5fB/oY+3NJ4bXyPf73CZ1CUOQlraOx62qFIcyKF5eUNRl81SfsHGyCydg6Ldt
-        dlLVCc7hQcjLHVPLB7j3ucW+tBAqTO/cbUNRo560pog8cdUPOStQmXN9NTAW4Q==
-Date:   Wed, 1 Feb 2023 09:33:32 +0100
-From:   Miquel Raynal <miquel.raynal@bootlin.com>
-To:     Dmitry Torokhov <dmitry.torokhov@gmail.com>
-Cc:     Arnd Bergmann <arnd@kernel.org>,
-        Alexander Aring <alex.aring@gmail.com>,
-        Stefan Schmidt <stefan@datenfreihafen.org>,
+        bh=pRZxwZKdvipSSAcGaNJknFkoRTNkO+3gbjfMX5XFILw=;
+        b=ZH4OQT1ONs1IsLzNhV5+ncHo4GH1tzmYk4rvqpi0BV+4/y0ds+Yq57ZVxsICT2PVyxN/+s
+        PUu9SP8t+JEfgBCTEp/FYC731wIdWX9kg246H6uM3jkOmi/whEaZXU4Xo+A3oCj2e9wmn7
+        Cnjs92bMAMoftCjVdYEruvCG9uM7qGrQevdqruLMo7tMpuikrYfHnMK0XrOC1c3mzyUIrn
+        BodVxepofVASjSRigB7jdHFTC3AzvMhcT6O0oYUfOvwlQDQRtiqK26EnRfZ5a0/TmAe2zE
+        qZ3Y45synhLbjcBf2NoHmrzMGg2RgOyBJD86C5aBG5nh+yURpRLcx/AQ9p4j3w==
+Message-ID: <77b78287-a352-85ae-0c3d-c3837be9bf1d@datenfreihafen.org>
+Date:   Wed, 1 Feb 2023 13:42:37 +0100
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.0
+Subject: Re: [PATCH] [v2] at86rf230: convert to gpio descriptors
+Content-Language: en-US
+To:     Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+        Arnd Bergmann <arnd@kernel.org>
+Cc:     Alexander Aring <alex.aring@gmail.com>,
         Arnd Bergmann <arnd@arndb.de>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
         Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
         "David S. Miller" <davem@davemloft.net>,
         Eric Dumazet <edumazet@google.com>,
         Jakub Kicinski <kuba@kernel.org>,
         Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
         linux-wpan@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH] [v2] at86rf230: convert to gpio descriptors
-Message-ID: <20230201093332.15b0ff9a@xps-13>
-In-Reply-To: <CAKdAkRSuDJgdsSQqy9Cc_eUYuOfFsLmBJ8Rd93uQhY6HV8nN4w@mail.gmail.com>
 References: <20230126162323.2986682-1-arnd@kernel.org>
-        <CAKdAkRQT_Jk5yBeMZqh=M1JscVLFieZTQjLGOGxy8nHh8SnD3A@mail.gmail.com>
-        <CAKdAkRSuDJgdsSQqy9Cc_eUYuOfFsLmBJ8Rd93uQhY6HV8nN4w@mail.gmail.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+ <CAKdAkRQT_Jk5yBeMZqh=M1JscVLFieZTQjLGOGxy8nHh8SnD3A@mail.gmail.com>
+ <CAKdAkRSuDJgdsSQqy9Cc_eUYuOfFsLmBJ8Rd93uQhY6HV8nN4w@mail.gmail.com>
+From:   Stefan Schmidt <stefan@datenfreihafen.org>
+In-Reply-To: <CAKdAkRSuDJgdsSQqy9Cc_eUYuOfFsLmBJ8Rd93uQhY6HV8nN4w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi Dmitry,
+Hello Dmitry.
 
-dmitry.torokhov@gmail.com wrote on Tue, 31 Jan 2023 16:50:07 -0800:
-
+On 01.02.23 01:50, Dmitry Torokhov wrote:
 > On Tue, Jan 31, 2023 at 3:52 PM Dmitry Torokhov
 > <dmitry.torokhov@gmail.com> wrote:
-> >
-> > Hi Arnd,
-> >
-> > On Thu, Jan 26, 2023 at 8:32 AM Arnd Bergmann <arnd@kernel.org> wrote: =
-=20
-> > >
-> > >         /* Reset */
-> > > -       if (gpio_is_valid(rstn)) {
-> > > +       if (rstn) {
-> > >                 udelay(1);
-> > > -               gpio_set_value_cansleep(rstn, 0);
-> > > +               gpiod_set_value_cansleep(rstn, 0);
-> > >                 udelay(1);
-> > > -               gpio_set_value_cansleep(rstn, 1);
-> > > +               gpiod_set_value_cansleep(rstn, 1); =20
-> >
-> > For gpiod conversions, if we are not willing to chase whether existing
-> > DTSes specify polarities
-> > properly and create workarounds in case they are wrong, we should use
-> > gpiod_set_raw_value*()
-> > (my preference would be to do the work and not use "raw" variants).
-> >
-> > In this particular case, arch/arm/boot/dts/vf610-zii-dev-rev-c.dts
-> > defines reset line as active low,
-> > so you are leaving the device in reset state.
-
-You mean the semantics of gpio_set_value() gpiod_set_value() are
-different? Looking at your patch it looks like gpio_set_value() asserts
-a physical line state (high or low) while gpiod_set_value() would
-actually try to assert a logical state (enabled or disabled) with the
-meaning of those being possibly inverted thanks to the DT polarities.
-Am I getting this right?
-
-> > Please review your other conversion patches. =20
->=20
+>>
+>> Hi Arnd,
+>>
+>> On Thu, Jan 26, 2023 at 8:32 AM Arnd Bergmann <arnd@kernel.org> wrote:
+>>>
+>>>          /* Reset */
+>>> -       if (gpio_is_valid(rstn)) {
+>>> +       if (rstn) {
+>>>                  udelay(1);
+>>> -               gpio_set_value_cansleep(rstn, 0);
+>>> +               gpiod_set_value_cansleep(rstn, 0);
+>>>                  udelay(1);
+>>> -               gpio_set_value_cansleep(rstn, 1);
+>>> +               gpiod_set_value_cansleep(rstn, 1);
+>>
+>> For gpiod conversions, if we are not willing to chase whether existing
+>> DTSes specify polarities
+>> properly and create workarounds in case they are wrong, we should use
+>> gpiod_set_raw_value*()
+>> (my preference would be to do the work and not use "raw" variants).
+>>
+>> In this particular case, arch/arm/boot/dts/vf610-zii-dev-rev-c.dts
+>> defines reset line as active low,
+>> so you are leaving the device in reset state.
+>>
+>> Please review your other conversion patches.
+> 
 > We also can not change the names of requested GPIOs from "reset-gpio"
 > to "rstn-gpios" and expect
 > this to work.
-
-Yep, missed that indeed.
-
->=20
+> 
 > Stefan, please consider reverting this and applying a couple of
 > patches I will send out shortly.
 
-If my above understanding is right, then, yeah, the current
-patches need to be fixed.
+Thanks for having another look at these patches. Do you have the same 
+concern for the convesion patch to cc2520 that has been posted and 
+applied as well?
 
-Thanks,
-Miqu=C3=A8l
+Arnd, if you have any concerns about the revert please speak up soon as 
+I am going to revert your patch and get these patches into my tree later 
+today.
+
+regards
+Stefan Schmidt
+
+
