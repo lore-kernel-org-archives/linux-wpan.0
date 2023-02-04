@@ -2,41 +2,42 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 036C9C61DA4
-	for <linux-wpan@archiver.kernel.org>; Fri,  3 Feb 2023 15:23:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 341DEC636D6
+	for <linux-wpan@archiver.kernel.org>; Sat,  4 Feb 2023 04:19:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232936AbjBCPXF (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Fri, 3 Feb 2023 10:23:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34810 "EHLO
+        id S233184AbjBDETc (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Fri, 3 Feb 2023 23:19:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60296 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233003AbjBCPWm (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Fri, 3 Feb 2023 10:22:42 -0500
-Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 573D4ADB9E;
-        Fri,  3 Feb 2023 07:20:35 -0800 (PST)
-Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id 6F43A40010;
-        Fri,  3 Feb 2023 15:19:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1675437586;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Tp5Vgf/Ob1ObcE6p8TL7YtXZJrFawIZnDEoObtmNSyk=;
-        b=PiSBPmBiZ+I+B7Y8bCZ03lCektGABZp9qf9MRVCCZG14QNT3/luANzY/ZjUr+hTTjagEv/
-        baP4iTTmvXnS/IVRC2C3JxHllbbF4Pv0Oba+A2L1OYsKYm8qqQu/QNWV1VwEkqr8I2IpxD
-        dDIWIx1gVlKKBl+/gfL3pSt01KLxLrK+bhreN26f745/DfXTWMBfr3l2MjmMACLmUo1CDF
-        gtAgpNC7p4al/lf2znIwfv6uKO/yt+E+e/DfqSh+p4KASnU0hjsNlWXjyEz0oasuOj2JVJ
-        9FCTcZQF40kNHsI1tpO22bqKTl8kJRUn5Jq1wR0H/Dn746wcfUVc6g2e7M6peQ==
-Date:   Fri, 3 Feb 2023 16:19:43 +0100
-From:   Miquel Raynal <miquel.raynal@bootlin.com>
-To:     Alexander Aring <aahringo@redhat.com>
+        with ESMTP id S233155AbjBDET2 (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 3 Feb 2023 23:19:28 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D5F91115E;
+        Fri,  3 Feb 2023 20:19:27 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 9916360691;
+        Sat,  4 Feb 2023 04:19:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 258C8C433D2;
+        Sat,  4 Feb 2023 04:19:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1675484366;
+        bh=+HQM6p4jd+8+N3fwrlSrbPWiaG3Sifyj6ZmwA/9SoJI=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=GA3PaC6gRBXUzC1hOOIiTK7rNIvk51SaFjeKTgLkH/11CVbUpd5peVFKFjs00QMVu
+         Bur9xU/7awGBFvNR2kc+ZvFEAKxdTzcTBm9SDBXtMjyh02z0wskzamTnYuZVAaZhBg
+         MLD1nLicGV5DGlf/mqQzzXgMXMCEDgsSjIFPruki3ogJ3mVqoNeiO2pxGKlI7mMa/z
+         8F0teD0OKG8rYOxSkV0E0rnc5jM90IrxTwAVPpOAeOUW1TbrNqFUQeqJ5rBbbbOEto
+         beOulxxlOmYoT1cRYJ8OUnuXEpZOqukTy534DjUrpvnfE1IEKcwFgv/Cur5ef3fXan
+         MjgNZNRcpueDA==
+Date:   Fri, 3 Feb 2023 20:19:23 -0800
+From:   Jakub Kicinski <kuba@kernel.org>
+To:     Miquel Raynal <miquel.raynal@bootlin.com>
 Cc:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
         linux-wpan@vger.kernel.org,
         "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
         Paolo Abeni <pabeni@redhat.com>,
         Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
         David Girault <david.girault@qorvo.com>,
@@ -45,18 +46,12 @@ Cc:     Alexander Aring <alex.aring@gmail.com>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
         Guilhem Imberton <guilhem.imberton@qorvo.com>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH wpan-next v2 0/2] ieee802154: Beaconing support
-Message-ID: <20230203161943.076ec169@xps-13>
-In-Reply-To: <CAK-6q+hAgyx3YML7Lw=MAkUX4i8PVqxSKiVzeAM-wGJOdL9aXA@mail.gmail.com>
-References: <20230125102923.135465-1-miquel.raynal@bootlin.com>
-        <CAK-6q+jN1bnP1FdneGrfDJuw3r3b=depEdEP49g_t3PKQ-F=Lw@mail.gmail.com>
-        <CAK-6q+hoquVswZTm+juLasQzUJpGdO+aQ7Q3PCRRwYagge5dTw@mail.gmail.com>
-        <20230130105508.38a25780@xps-13>
-        <CAK-6q+gqQgFxqBUAhHDMaWv9VfuKa=bCVee_oSLQeVtk_G8=ow@mail.gmail.com>
-        <20230131122525.7bd35c2b@xps-13>
-        <CAK-6q+hAgyx3YML7Lw=MAkUX4i8PVqxSKiVzeAM-wGJOdL9aXA@mail.gmail.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+Subject: Re: [PATCH wpan-next 1/6] ieee802154: Add support for user scanning
+ requests
+Message-ID: <20230203201923.6de5c692@kernel.org>
+In-Reply-To: <20221129160046.538864-2-miquel.raynal@bootlin.com>
+References: <20221129160046.538864-1-miquel.raynal@bootlin.com>
+        <20221129160046.538864-2-miquel.raynal@bootlin.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
@@ -64,120 +59,117 @@ Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi Alexander,
+On Tue, 29 Nov 2022 17:00:41 +0100 Miquel Raynal wrote:
+> +static int nl802154_trigger_scan(struct sk_buff *skb, struct genl_info *=
+info)
+> +{
+> +	struct cfg802154_registered_device *rdev =3D info->user_ptr[0];
+> +	struct net_device *dev =3D info->user_ptr[1];
+> +	struct wpan_dev *wpan_dev =3D dev->ieee802154_ptr;
+> +	struct wpan_phy *wpan_phy =3D &rdev->wpan_phy;
+> +	struct cfg802154_scan_request *request;
+> +	u8 type;
+> +	int err;
+> +
+> +	/* Monitors are not allowed to perform scans */
+> +	if (wpan_dev->iftype =3D=3D NL802154_IFTYPE_MONITOR)
 
-aahringo@redhat.com wrote on Wed, 1 Feb 2023 12:15:42 -0500:
+extack ?
 
-> Hi,
->=20
-> On Tue, Jan 31, 2023 at 6:25 AM Miquel Raynal <miquel.raynal@bootlin.com>=
- wrote:
-> >
-> > Hi Alexander,
-> > =20
-> > > > > > > Changes in v2:
-> > > > > > > * Clearly state in the commit log llsec is not supported yet.
-> > > > > > > * Do not use mlme transmission helpers because we don't reall=
-y need to
-> > > > > > >   stop the queue when sending a beacon, as we don't expect an=
-y feedback
-> > > > > > >   from the PHY nor from the peers. However, we don't want to =
-go through
-> > > > > > >   the whole net stack either, so we bypass it calling the sub=
-if helper
-> > > > > > >   directly.
-> > > > > > > =20
-> > > > >
-> > > > > moment, we use the mlme helpers to stop tx =20
-> > > >
-> > > > No, we no longer use the mlme helpers to stop tx when sending beaco=
-ns
-> > > > (but true MLME transmissions, we ack handling and return codes will=
- be
-> > > > used for other purposes).
-> > > > =20
-> > >
-> > > then we run into an issue overwriting the framebuffer while the normal
-> > > transmit path is active? =20
-> >
-> > Crap, yes you're right. That's not gonna work.
-> >
-> > The net core acquires HARD_TX_LOCK() to avoid these issues and we are
-> > no bypassing the net core without taking care of the proper frame
-> > transmissions either (which would have worked with mlme_tx_one()). So I
-> > guess there are two options:
-> >
-> > * Either we deal with the extra penalty of stopping the queue and
-> >   waiting for the beacon to be transmitted with an mlme_tx_one() call,
-> >   as proposed initially.
-> >
-> > * Or we hardcode our own "net" transmit helper, something like:
-> >
-> > mac802154_fast_mlme_tx() {
-> >         struct net_device *dev =3D skb->dev;
-> >         struct netdev_queue *txq;
-> >
-> >         txq =3D netdev_core_pick_tx(dev, skb, NULL);
-> >         cpu =3D smp_processor_id();
-> >         HARD_TX_LOCK(dev, txq, cpu);
-> >         if (!netif_xmit_frozen_or_drv_stopped(txq))
-> >                 netdev_start_xmit(skb, dev, txq, 0);
-> >         HARD_TX_UNLOCK(dev, txq);
-> > }
-> >
-> > Note1: this is very close to generic_xdp_tx() which tries to achieve the
-> > same goal: sending packets, bypassing qdisc et al. I don't know whether
-> > it makes sense to define it under mac802154/tx.c or core/dev.c and give
-> > it another name, like generic_tx() or whatever would be more
-> > appropriate. Or even adapting generic_xdp_tx() to make it look more
-> > generic and use that function instead (without the xdp struct pointer).
-> > =20
->=20
-> The problem here is that the transmit handling is completely
-> asynchronous. Calling netdev_start_xmit() is not "transmit and wait
-> until transmit is done", it is "start transmit here is the buffer" an
-> interrupt is coming up to report transmit is done. Until the time the
-> interrupt isn't arrived the framebuffer on the device is in use, we
-> don't know when the transceiver is done reading it. Only after tx done
-> isr. The time until the isr isn't arrived is for us a -EBUSY case due
-> hardware resource limitation. Currently we do that with stop/wake
-> queue to avoid calling of xmit_do() to not run into such -EBUSY
-> cases...
->=20
-> There might be clever things to do here to avoid this issue... I am
-> not sure how XDP does that.
->=20
-> > Note2: I am wondering if it makes sense to disable bh here as well? =20
->=20
-> May HARD_TX_LOCK() already do that? If they use spin_lock_bh() they
-> disable local softirqs until the lock isn't held anymore.
+> +		return -EPERM;
+> +
+> +	request =3D kzalloc(sizeof(*request), GFP_KERNEL);
+> +	if (!request)
+> +		return -ENOMEM;
+> +
+> +	request->wpan_dev =3D wpan_dev;
+> +	request->wpan_phy =3D wpan_phy;
+> +
+> +	type =3D nla_get_u8(info->attrs[NL802154_ATTR_SCAN_TYPE]);
 
-I saw a case where both are called so I guess the short answer is "no":
-https://elixir.bootlin.com/linux/latest/source/net/core/dev.c#L4307
+what checks info->attrs[NL802154_ATTR_SCAN_TYPE] is not NULL?
 
->=20
-> >
-> > Once we settle, I send a patch.
-> > =20
->=20
-> Not sure how to preceded here, but do see the problem? Or maybe I
-> overlooked something here...
+> +	switch (type) {
+> +	case NL802154_SCAN_PASSIVE:
+> +		request->type =3D type;
+> +		break;
+> +	default:
+> +		pr_err("Unsupported scan type: %d\n", type);
+> +		err =3D -EINVAL;
 
-No you clearly had a sharp eye on that one, I totally see the problem.
+extack (printfs are now supported)
 
-Maybe the safest and simplest approach would be to be back using
-the proper mlme transmission helpers for beacons (like in the initial
-proposal). TBH I don't think there is a huge performance hit because in
-both cases we wait for that ISR saying "the packet has been consumed by
-the transceiver". It's just that in one case we wait for the return
-code (MLME) and then return, in the other case we return but no
-more packets will go through until the queue is released by the ISR (as
-you said, in order to avoid the -EBUSY case). So in practice I don't
-expect any performance hit. It is true however that we might want to
-optimize this a little bit if we ever add something like an async
-callback saying "skb consumed by the transceiver, another can be
-queued" and gain a few us. Maybe a comment could be useful here (I'll
-add it to my fix if we agree).
+> +		goto free_request;
+> +	}
+> +
+> +	if (info->attrs[NL802154_ATTR_PAGE]) {
+> +		request->page =3D nla_get_u8(info->attrs[NL802154_ATTR_PAGE]);
+> +		if (request->page > IEEE802154_MAX_PAGE) {
 
-Thanks,
-Miqu=C3=A8l
+bound check should be part of the policy NLA_POLICY_MAX()
+
+> +			pr_err("Invalid page %d > %d\n",
+> +			       request->page, IEEE802154_MAX_PAGE);
+> +			err =3D -EINVAL;
+
+extack
+
+> +			goto free_request;
+> +		}
+> +	} else {
+> +		/* Use current page by default */
+> +		request->page =3D wpan_phy->current_page;
+> +	}
+> +
+> +	if (info->attrs[NL802154_ATTR_SCAN_CHANNELS]) {
+> +		request->channels =3D nla_get_u32(info->attrs[NL802154_ATTR_SCAN_CHANN=
+ELS]);
+> +		if (request->channels >=3D BIT(IEEE802154_MAX_CHANNEL + 1)) {
+
+policy as well
+
+> +			pr_err("Invalid channels bitfield %x =E2=89=A5 %lx\n",
+> +			       request->channels,
+> +			       BIT(IEEE802154_MAX_CHANNEL + 1));
+> +			err =3D -EINVAL;
+> +			goto free_request;
+> +		}
+> +	} else {
+> +		/* Scan all supported channels by default */
+> +		request->channels =3D wpan_phy->supported.channels[request->page];
+> +	}
+> +
+> +	if (info->attrs[NL802154_ATTR_SCAN_PREAMBLE_CODES] ||
+> +	    info->attrs[NL802154_ATTR_SCAN_MEAN_PRF]) {
+> +		pr_err("Preamble codes and mean PRF not supported yet\n");
+
+NLA_REJECT also in policy
+
+> +		err =3D -EINVAL;
+> +		goto free_request;
+> +	}
+> +
+> +	if (info->attrs[NL802154_ATTR_SCAN_DURATION]) {
+> +		request->duration =3D nla_get_u8(info->attrs[NL802154_ATTR_SCAN_DURATI=
+ON]);
+> +		if (request->duration > IEEE802154_MAX_SCAN_DURATION) {
+> +			pr_err("Duration is out of range\n");
+> +			err =3D -EINVAL;
+> +			goto free_request;
+> +		}
+> +	} else {
+> +		/* Use maximum duration order by default */
+> +		request->duration =3D IEEE802154_MAX_SCAN_DURATION;
+> +	}
+> +
+> +	if (wpan_dev->netdev)
+> +		dev_hold(wpan_dev->netdev);
+
+Can we put a tracker in the request and use netdev_hold() ?
+
+> +
+> +	err =3D rdev_trigger_scan(rdev, request);
+> +	if (err) {
+> +		pr_err("Failure starting scanning (%d)\n", err);
+> +		goto free_device;
+> +	}
