@@ -2,44 +2,44 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0446AC636CC
-	for <linux-wpan@archiver.kernel.org>; Tue,  7 Feb 2023 14:30:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80FC6C636D6
+	for <linux-wpan@archiver.kernel.org>; Tue,  7 Feb 2023 14:30:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232977AbjBGOai (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 7 Feb 2023 09:30:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44574 "EHLO
+        id S232984AbjBGOak (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 7 Feb 2023 09:30:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43808 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232858AbjBGOaU (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 7 Feb 2023 09:30:20 -0500
+        with ESMTP id S231203AbjBGO3m (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 7 Feb 2023 09:29:42 -0500
 Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 618A51E5F7;
-        Tue,  7 Feb 2023 06:29:40 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1EADF15CAE;
+        Tue,  7 Feb 2023 06:29:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1675780180; x=1707316180;
+  t=1675780175; x=1707316175;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=e84O/JP0nsYApruNgGahzcXA9L7vfDArZR+8C/DBBxM=;
-  b=MGC3dTJfgIDdzyauJs5ow+ewaeXICsbhZl1CF6cGg6AxMrGHXctKEsHa
-   h04g/kvGXfo6XDp6AJy6Rk/ral86pgY0xUdyaPstbrWFw7OmfdXPUfNu8
-   /cNmTeVdFk8/7Ob3VvngIM+8l1tjILjGyffN7ozn7iuUZDHarhttRDpKx
-   JXt9k2u3XLf3R1DENwV3hgKLRdJtHaTF4FZ9Ziruf2nMJ7YmOVJUEiivv
-   L8MXLoCihTrK6+38f40REOJeIb1SQxs+wxuSSYlC1v93QIQPPZsdsSeZD
-   /AOH20h7BdzEVHmIyuGUgPIrEovs6DgU8omNPFfCf/FxFVCiPUej11Jgy
+  bh=/KblTEhL3YpOqTWHe101UZEkEjtX7tVjnWOHZilZZaw=;
+  b=KcWgvhV5KNzMa1t9Y6gyOACgkXwOMjjhEz/PG8dxkZyFgqTErBnjCxNm
+   4dU/ZZC7bz+p62kBGUdCyX86V3Zi2C7AG3mPHi1G5nf4CqYEXipbBYVd6
+   RwfwKns/h69b7ady1xzCXjBUMagpaalP7XyehZ5KgP0zoPZBEH4V6T54B
+   nnwqn2fKvxMYjFCn1NHk/UxuV/cp0MvSTCCW+VWw6VgfFPiqvJnjPqexl
+   zOq4VoDzo7tjfo7XS+mGZEOLRCSxR/eEHELG5n0U109TXbc3JC4zOBF+3
+   9NRfsfZtJax9dVGesWXEORBztc7ZmfUpWFQBKUdcDMES63eeuIhpFq0Su
    A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10614"; a="391915628"
+X-IronPort-AV: E=McAfee;i="6500,9779,10614"; a="391915608"
 X-IronPort-AV: E=Sophos;i="5.97,278,1669104000"; 
-   d="scan'208";a="391915628"
+   d="scan'208";a="391915608"
 Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Feb 2023 06:29:39 -0800
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Feb 2023 06:29:34 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10614"; a="912355045"
+X-IronPort-AV: E=McAfee;i="6500,9779,10614"; a="912355032"
 X-IronPort-AV: E=Sophos;i="5.97,278,1669104000"; 
-   d="scan'208";a="912355045"
+   d="scan'208";a="912355032"
 Received: from black.fi.intel.com ([10.237.72.28])
-  by fmsmga006.fm.intel.com with ESMTP; 07 Feb 2023 06:29:35 -0800
+  by fmsmga006.fm.intel.com with ESMTP; 07 Feb 2023 06:29:30 -0800
 Received: by black.fi.intel.com (Postfix, from userid 1003)
-        id 851C137D; Tue,  7 Feb 2023 16:30:02 +0200 (EET)
+        id 528AA269; Tue,  7 Feb 2023 16:30:02 +0200 (EET)
 From:   Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 To:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
         Linus Walleij <linus.walleij@linaro.org>,
@@ -97,9 +97,9 @@ Cc:     Bartosz Golaszewski <brgl@bgdev.pl>,
         Li Yang <leoyang.li@nxp.com>, Lee Jones <lee@kernel.org>,
         Rob Herring <robh+dt@kernel.org>,
         Frank Rowand <frowand.list@gmail.com>
-Subject: [PATCH v3 06/12] gpiolib: split linux/gpio/driver.h out of linux/gpio.h
-Date:   Tue,  7 Feb 2023 16:29:46 +0200
-Message-Id: <20230207142952.51844-7-andriy.shevchenko@linux.intel.com>
+Subject: [PATCH v3 03/12] gpiolib: remove asm-generic/gpio.h
+Date:   Tue,  7 Feb 2023 16:29:43 +0200
+Message-Id: <20230207142952.51844-4-andriy.shevchenko@linux.intel.com>
 X-Mailer: git-send-email 2.39.1
 In-Reply-To: <20230207142952.51844-1-andriy.shevchenko@linux.intel.com>
 References: <20230207142952.51844-1-andriy.shevchenko@linux.intel.com>
@@ -111,125 +111,342 @@ X-Mailing-List: linux-wpan@vger.kernel.org
 
 From: Arnd Bergmann <arnd@arndb.de>
 
-Almost all gpio drivers include linux/gpio/driver.h, and other
-files should not rely on includes from this header.
+The asm-generic/gpio.h file is now always included when
+using gpiolib, so just move its contents into linux/gpio.h
+with a few minor simplifications.
 
-Remove the indirect include from here and include the correct
-headers directly from where they are used.
-
-Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
+Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 ---
- arch/arm/mach-omap1/irq.c                              | 1 +
- arch/arm/mach-orion5x/board-rd88f5182.c                | 1 +
- arch/arm/mach-s3c/s3c64xx.c                            | 1 +
- arch/arm/mach-sa1100/assabet.c                         | 1 +
- arch/arm/plat-orion/gpio.c                             | 1 +
- drivers/net/wireless/broadcom/brcm80211/brcmsmac/led.c | 1 +
- include/linux/gpio.h                                   | 2 --
- include/linux/mfd/ucb1x00.h                            | 1 +
- 8 files changed, 7 insertions(+), 2 deletions(-)
+ MAINTAINERS                     |   1 -
+ arch/m68k/include/asm/mcfgpio.h |   2 +-
+ drivers/gpio/gpio-davinci.c     |   2 -
+ drivers/pinctrl/core.c          |   1 -
+ include/asm-generic/gpio.h      | 147 --------------------------------
+ include/linux/gpio.h            |  93 ++++++++++++++++++--
+ 6 files changed, 85 insertions(+), 161 deletions(-)
+ delete mode 100644 include/asm-generic/gpio.h
 
-diff --git a/arch/arm/mach-omap1/irq.c b/arch/arm/mach-omap1/irq.c
-index 9ccc784fd614..bfc7ab010ae2 100644
---- a/arch/arm/mach-omap1/irq.c
-+++ b/arch/arm/mach-omap1/irq.c
-@@ -41,6 +41,7 @@
- #include <linux/sched.h>
- #include <linux/interrupt.h>
- #include <linux/io.h>
-+#include <linux/irqdomain.h>
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 4d6aa8076868..0469de4e5000 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -8730,7 +8730,6 @@ F:	Documentation/admin-guide/gpio/
+ F:	Documentation/devicetree/bindings/gpio/
+ F:	Documentation/driver-api/gpio/
+ F:	drivers/gpio/
+-F:	include/asm-generic/gpio.h
+ F:	include/dt-bindings/gpio/
+ F:	include/linux/gpio.h
+ F:	include/linux/gpio/
+diff --git a/arch/m68k/include/asm/mcfgpio.h b/arch/m68k/include/asm/mcfgpio.h
+index 27f32cc81da6..2cefe8445980 100644
+--- a/arch/m68k/include/asm/mcfgpio.h
++++ b/arch/m68k/include/asm/mcfgpio.h
+@@ -9,7 +9,7 @@
+ #define mcfgpio_h
  
- #include <asm/irq.h>
- #include <asm/exception.h>
-diff --git a/arch/arm/mach-orion5x/board-rd88f5182.c b/arch/arm/mach-orion5x/board-rd88f5182.c
-index 596601367989..1c14e49a90a6 100644
---- a/arch/arm/mach-orion5x/board-rd88f5182.c
-+++ b/arch/arm/mach-orion5x/board-rd88f5182.c
-@@ -9,6 +9,7 @@
- #include <linux/gpio.h>
- #include <linux/kernel.h>
- #include <linux/init.h>
-+#include <linux/of.h>
- #include <linux/platform_device.h>
- #include <linux/pci.h>
- #include <linux/irq.h>
-diff --git a/arch/arm/mach-s3c/s3c64xx.c b/arch/arm/mach-s3c/s3c64xx.c
-index e97bd59083a8..48fd5b0a3927 100644
---- a/arch/arm/mach-s3c/s3c64xx.c
-+++ b/arch/arm/mach-s3c/s3c64xx.c
-@@ -21,6 +21,7 @@
- #include <linux/ioport.h>
- #include <linux/serial_core.h>
- #include <linux/serial_s3c.h>
-+#include <linux/of.h>
- #include <linux/platform_device.h>
- #include <linux/reboot.h>
- #include <linux/io.h>
-diff --git a/arch/arm/mach-sa1100/assabet.c b/arch/arm/mach-sa1100/assabet.c
-index 2eba112f2ad8..d000c678b439 100644
---- a/arch/arm/mach-sa1100/assabet.c
-+++ b/arch/arm/mach-sa1100/assabet.c
-@@ -10,6 +10,7 @@
- #include <linux/kernel.h>
- #include <linux/module.h>
- #include <linux/errno.h>
-+#include <linux/gpio/driver.h>
- #include <linux/gpio/gpio-reg.h>
- #include <linux/gpio/machine.h>
- #include <linux/gpio_keys.h>
-diff --git a/arch/arm/plat-orion/gpio.c b/arch/arm/plat-orion/gpio.c
-index 3ef9ecdd6343..4946d8066f6a 100644
---- a/arch/arm/plat-orion/gpio.c
-+++ b/arch/arm/plat-orion/gpio.c
-@@ -19,6 +19,7 @@
- #include <linux/bitops.h>
- #include <linux/io.h>
- #include <linux/gpio.h>
-+#include <linux/gpio/driver.h>
- #include <linux/leds.h>
- #include <linux/of.h>
- #include <linux/of_irq.h>
-diff --git a/drivers/net/wireless/broadcom/brcm80211/brcmsmac/led.c b/drivers/net/wireless/broadcom/brcm80211/brcmsmac/led.c
-index 9540a05247c2..89c8829528c2 100644
---- a/drivers/net/wireless/broadcom/brcm80211/brcmsmac/led.c
-+++ b/drivers/net/wireless/broadcom/brcm80211/brcmsmac/led.c
-@@ -1,6 +1,7 @@
- // SPDX-License-Identifier: GPL-2.0
- #include <net/mac80211.h>
- #include <linux/bcma/bcma_driver_chipcommon.h>
+ #ifdef CONFIG_GPIOLIB
+-#include <asm-generic/gpio.h>
 +#include <linux/gpio.h>
- #include <linux/gpio/driver.h>
- #include <linux/gpio/machine.h>
- #include <linux/gpio/consumer.h>
+ #else
+ 
+ int __mcfgpio_get_value(unsigned gpio);
+diff --git a/drivers/gpio/gpio-davinci.c b/drivers/gpio/gpio-davinci.c
+index 26b1f7465e09..7fc83057990a 100644
+--- a/drivers/gpio/gpio-davinci.c
++++ b/drivers/gpio/gpio-davinci.c
+@@ -24,8 +24,6 @@
+ #include <linux/spinlock.h>
+ #include <linux/pm_runtime.h>
+ 
+-#include <asm-generic/gpio.h>
+-
+ #define MAX_REGS_BANKS 5
+ #define MAX_INT_PER_BANK 32
+ 
+diff --git a/drivers/pinctrl/core.c b/drivers/pinctrl/core.c
+index d6e6c751255f..401886c81344 100644
+--- a/drivers/pinctrl/core.c
++++ b/drivers/pinctrl/core.c
+@@ -30,7 +30,6 @@
+ 
+ #ifdef CONFIG_GPIOLIB
+ #include "../gpio/gpiolib.h"
+-#include <asm-generic/gpio.h>
+ #endif
+ 
+ #include "core.h"
+diff --git a/include/asm-generic/gpio.h b/include/asm-generic/gpio.h
+deleted file mode 100644
+index 22cb8c9efc1d..000000000000
+--- a/include/asm-generic/gpio.h
++++ /dev/null
+@@ -1,147 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0 */
+-#ifndef _ASM_GENERIC_GPIO_H
+-#define _ASM_GENERIC_GPIO_H
+-
+-#include <linux/types.h>
+-#include <linux/errno.h>
+-
+-#ifdef CONFIG_GPIOLIB
+-
+-#include <linux/compiler.h>
+-#include <linux/gpio/driver.h>
+-#include <linux/gpio/consumer.h>
+-
+-/*
+- * Platforms may implement their GPIO interface with library code,
+- * at a small performance cost for non-inlined operations and some
+- * extra memory (for code and for per-GPIO table entries).
+- */
+-
+-/*
+- * At the end we want all GPIOs to be dynamically allocated from 0.
+- * However, some legacy drivers still perform fixed allocation.
+- * Until they are all fixed, leave 0-512 space for them.
+- */
+-#define GPIO_DYNAMIC_BASE	512
+-
+-struct device;
+-struct gpio;
+-struct seq_file;
+-struct module;
+-struct device_node;
+-struct gpio_desc;
+-
+-/* Always use the library code for GPIO management calls,
+- * or when sleeping may be involved.
+- */
+-extern int gpio_request(unsigned gpio, const char *label);
+-extern void gpio_free(unsigned gpio);
+-
+-static inline int gpio_direction_input(unsigned gpio)
+-{
+-	return gpiod_direction_input(gpio_to_desc(gpio));
+-}
+-static inline int gpio_direction_output(unsigned gpio, int value)
+-{
+-	return gpiod_direction_output_raw(gpio_to_desc(gpio), value);
+-}
+-
+-static inline int gpio_set_debounce(unsigned gpio, unsigned debounce)
+-{
+-	return gpiod_set_debounce(gpio_to_desc(gpio), debounce);
+-}
+-
+-static inline int gpio_get_value_cansleep(unsigned gpio)
+-{
+-	return gpiod_get_raw_value_cansleep(gpio_to_desc(gpio));
+-}
+-static inline void gpio_set_value_cansleep(unsigned gpio, int value)
+-{
+-	return gpiod_set_raw_value_cansleep(gpio_to_desc(gpio), value);
+-}
+-
+-
+-/* A platform's <asm/gpio.h> code may want to inline the I/O calls when
+- * the GPIO is constant and refers to some always-present controller,
+- * giving direct access to chip registers and tight bitbanging loops.
+- */
+-static inline int __gpio_get_value(unsigned gpio)
+-{
+-	return gpiod_get_raw_value(gpio_to_desc(gpio));
+-}
+-static inline void __gpio_set_value(unsigned gpio, int value)
+-{
+-	return gpiod_set_raw_value(gpio_to_desc(gpio), value);
+-}
+-
+-static inline int __gpio_cansleep(unsigned gpio)
+-{
+-	return gpiod_cansleep(gpio_to_desc(gpio));
+-}
+-
+-static inline int __gpio_to_irq(unsigned gpio)
+-{
+-	return gpiod_to_irq(gpio_to_desc(gpio));
+-}
+-
+-extern int gpio_request_one(unsigned gpio, unsigned long flags, const char *label);
+-extern int gpio_request_array(const struct gpio *array, size_t num);
+-extern void gpio_free_array(const struct gpio *array, size_t num);
+-
+-/*
+- * A sysfs interface can be exported by individual drivers if they want,
+- * but more typically is configured entirely from userspace.
+- */
+-static inline int gpio_export(unsigned gpio, bool direction_may_change)
+-{
+-	return gpiod_export(gpio_to_desc(gpio), direction_may_change);
+-}
+-
+-static inline void gpio_unexport(unsigned gpio)
+-{
+-	gpiod_unexport(gpio_to_desc(gpio));
+-}
+-
+-#else	/* !CONFIG_GPIOLIB */
+-
+-#include <linux/kernel.h>
+-
+-/* platforms that don't directly support access to GPIOs through I2C, SPI,
+- * or other blocking infrastructure can use these wrappers.
+- */
+-
+-static inline int gpio_cansleep(unsigned gpio)
+-{
+-	return 0;
+-}
+-
+-static inline int gpio_get_value_cansleep(unsigned gpio)
+-{
+-	might_sleep();
+-	return __gpio_get_value(gpio);
+-}
+-
+-static inline void gpio_set_value_cansleep(unsigned gpio, int value)
+-{
+-	might_sleep();
+-	__gpio_set_value(gpio, value);
+-}
+-
+-#endif /* !CONFIG_GPIOLIB */
+-
+-/*
+- * "valid" GPIO numbers are nonnegative and may be passed to
+- * setup routines like gpio_request().  only some valid numbers
+- * can successfully be requested and used.
+- *
+- * Invalid GPIO numbers are useful for indicating no-such-GPIO in
+- * platform data and other tables.
+- */
+-
+-static inline bool gpio_is_valid(int number)
+-{
+-	/* only non-negative numbers are valid */
+-	return number >= 0;
+-}
+-
+-#endif /* _ASM_GENERIC_GPIO_H */
 diff --git a/include/linux/gpio.h b/include/linux/gpio.h
-index a1271526e489..84bb49939d6e 100644
+index 2b75017b3aad..6719a82eeec5 100644
 --- a/include/linux/gpio.h
 +++ b/include/linux/gpio.h
-@@ -54,9 +54,7 @@ struct gpio {
+@@ -54,26 +54,101 @@ struct gpio {
  };
  
  #ifdef CONFIG_GPIOLIB
--#include <linux/compiler.h>
- #include <linux/gpio/consumer.h>
--#include <linux/gpio/driver.h>
- 
- /*
-  * "valid" GPIO numbers are nonnegative and may be passed to
-diff --git a/include/linux/mfd/ucb1x00.h b/include/linux/mfd/ucb1x00.h
-index 43bcf35afe27..ede237384723 100644
---- a/include/linux/mfd/ucb1x00.h
-+++ b/include/linux/mfd/ucb1x00.h
-@@ -10,6 +10,7 @@
- #include <linux/device.h>
- #include <linux/mfd/mcp.h>
- #include <linux/gpio.h>
+-#include <asm-generic/gpio.h>
++#include <linux/compiler.h>
++#include <linux/gpio/consumer.h>
 +#include <linux/gpio/driver.h>
- #include <linux/mutex.h>
  
- #define UCB_IO_DATA	0x00
+-static inline int gpio_get_value(unsigned int gpio)
++/*
++ * "valid" GPIO numbers are nonnegative and may be passed to
++ * setup routines like gpio_request().  Only some valid numbers
++ * can successfully be requested and used.
++ *
++ * Invalid GPIO numbers are useful for indicating no-such-GPIO in
++ * platform data and other tables.
++ */
++static inline bool gpio_is_valid(int number)
++{
++	/* only non-negative numbers are valid */
++	return number >= 0;
++}
++
++/*
++ * Platforms may implement their GPIO interface with library code,
++ * at a small performance cost for non-inlined operations and some
++ * extra memory (for code and for per-GPIO table entries).
++ */
++
++/*
++ * At the end we want all GPIOs to be dynamically allocated from 0.
++ * However, some legacy drivers still perform fixed allocation.
++ * Until they are all fixed, leave 0-512 space for them.
++ */
++#define GPIO_DYNAMIC_BASE	512
++
++/* Always use the library code for GPIO management calls,
++ * or when sleeping may be involved.
++ */
++int gpio_request(unsigned gpio, const char *label);
++void gpio_free(unsigned gpio);
++
++static inline int gpio_direction_input(unsigned gpio)
++{
++	return gpiod_direction_input(gpio_to_desc(gpio));
++}
++static inline int gpio_direction_output(unsigned gpio, int value)
+ {
+-	return __gpio_get_value(gpio);
++	return gpiod_direction_output_raw(gpio_to_desc(gpio), value);
+ }
+ 
+-static inline void gpio_set_value(unsigned int gpio, int value)
++static inline int gpio_set_debounce(unsigned gpio, unsigned debounce)
+ {
+-	__gpio_set_value(gpio, value);
++	return gpiod_set_debounce(gpio_to_desc(gpio), debounce);
+ }
+ 
+-static inline int gpio_cansleep(unsigned int gpio)
++static inline int gpio_get_value_cansleep(unsigned gpio)
++{
++	return gpiod_get_raw_value_cansleep(gpio_to_desc(gpio));
++}
++static inline void gpio_set_value_cansleep(unsigned gpio, int value)
+ {
+-	return __gpio_cansleep(gpio);
++	return gpiod_set_raw_value_cansleep(gpio_to_desc(gpio), value);
+ }
+ 
+-static inline int gpio_to_irq(unsigned int gpio)
++static inline int gpio_get_value(unsigned gpio)
++{
++	return gpiod_get_raw_value(gpio_to_desc(gpio));
++}
++static inline void gpio_set_value(unsigned gpio, int value)
++{
++	return gpiod_set_raw_value(gpio_to_desc(gpio), value);
++}
++
++static inline int gpio_cansleep(unsigned gpio)
++{
++	return gpiod_cansleep(gpio_to_desc(gpio));
++}
++
++static inline int gpio_to_irq(unsigned gpio)
++{
++	return gpiod_to_irq(gpio_to_desc(gpio));
++}
++
++int gpio_request_one(unsigned gpio, unsigned long flags, const char *label);
++int gpio_request_array(const struct gpio *array, size_t num);
++void gpio_free_array(const struct gpio *array, size_t num);
++
++/*
++ * A sysfs interface can be exported by individual drivers if they want,
++ * but more typically is configured entirely from userspace.
++ */
++static inline int gpio_export(unsigned gpio, bool direction_may_change)
++{
++	return gpiod_export(gpio_to_desc(gpio), direction_may_change);
++}
++
++static inline void gpio_unexport(unsigned gpio)
+ {
+-	return __gpio_to_irq(gpio);
++	gpiod_unexport(gpio_to_desc(gpio));
+ }
+ 
+ /* CONFIG_GPIOLIB: bindings for managed devices that want to request gpios */
 -- 
 2.39.1
 
