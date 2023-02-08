@@ -2,50 +2,62 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A234C64EC4
-	for <linux-wpan@archiver.kernel.org>; Wed,  8 Feb 2023 17:46:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AB48C05027
+	for <linux-wpan@archiver.kernel.org>; Wed,  8 Feb 2023 17:56:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232278AbjBHRqF (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 8 Feb 2023 12:46:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49756 "EHLO
+        id S230103AbjBHR4N (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 8 Feb 2023 12:56:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34736 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231483AbjBHRp1 (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 8 Feb 2023 12:45:27 -0500
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94B7653E57;
-        Wed,  8 Feb 2023 09:44:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1675878265; x=1707414265;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=+jF3CDzzwW6yo4ozmXcRNVjpZY0lFCu8o1UhbMtHcsA=;
-  b=SYv0btPLcrot+UChAMRwARHn3CXimT7f/2LR3lF5GgIxtopUnSNGqEI/
-   uCTmvB0GZF9OqmVbxMCAIlSxRScx+CW8gjL/tefQ4BMP3h+CaBfMbxIFz
-   09T0WqyEU2mjZQ7rjiREme6729OTk3Pqa4K2OEJ8YW9gzCSXwyqJP6C7j
-   dHqmktyB04/L9tZOFWfh87uMZIqFHeuqdNqN+ueZnAp5NZD5Az5wdJ01O
-   akfrxkdozAi2/fcnjpUQDrxNF7UEjRK1RKsAivYGpe6k6mZbO2XX/OWJ+
-   gi3flI2++/RwwFEImMNj0SL6gXM/jo/Fd35odPzX8tiy2HfEO19vbhvup
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10615"; a="317876336"
-X-IronPort-AV: E=Sophos;i="5.97,281,1669104000"; 
-   d="scan'208";a="317876336"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Feb 2023 09:43:27 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10615"; a="996219805"
-X-IronPort-AV: E=Sophos;i="5.97,281,1669104000"; 
-   d="scan'208";a="996219805"
-Received: from smile.fi.intel.com ([10.237.72.54])
-  by fmsmga005.fm.intel.com with ESMTP; 08 Feb 2023 09:43:09 -0800
-Received: from andy by smile.fi.intel.com with local (Exim 4.96)
-        (envelope-from <andriy.shevchenko@linux.intel.com>)
-        id 1pPoTH-004EYe-0x;
-        Wed, 08 Feb 2023 19:43:03 +0200
-Date:   Wed, 8 Feb 2023 19:43:02 +0200
-From:   Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc:     Arnd Bergmann <arnd@arndb.de>,
+        with ESMTP id S231465AbjBHR4M (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 8 Feb 2023 12:56:12 -0500
+Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AF8B7AB7
+        for <linux-wpan@vger.kernel.org>; Wed,  8 Feb 2023 09:56:11 -0800 (PST)
+Received: by mail-lf1-x12f.google.com with SMTP id x40so28164151lfu.12
+        for <linux-wpan@vger.kernel.org>; Wed, 08 Feb 2023 09:56:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=BpljMohL8GLL9JNNZm5TNh7NQliOwfqEEgvKA1M8vPA=;
+        b=iSJy452+yQNDkj/XRpSJtdvrqV4Nc9SHmDUlIPEMcI7FsTBkg180jQi1F8xp6YW1iB
+         x+n5zVe4ua33Iptv3+3hIXXVPzCDMsaE+aiY5ZioYXS2QK7YcFrDLdAp2jdyqNCNAiuB
+         jOEvyRlDxjvya+Oe6QZshDBs21k3QFl/D0kQ9C/WADLHUUR3m08hnMM5D5Fh2ivALyk/
+         MfyowyYvxCwIcJkZ8wjZ8+6pip+4HEgfvld60+W6Z8mMTEGB2wvoc+UcpG17rGgizxEB
+         3jdEH391M/2wSjYcYiPL4nNwuw3AUeWO4FlI+ZrKLIUg3rr1b9AQb/hWfziar7N1D7kJ
+         2C5A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=BpljMohL8GLL9JNNZm5TNh7NQliOwfqEEgvKA1M8vPA=;
+        b=5ba6NWMLHKTYwxPC9uPuAdtj2jg/fU3hN/aFMzPePjCYq6+X0eDSSH+C5vupZpFVrt
+         EyPNO/c9SUR9eKLXjXYdoJjYQMYHe88MvH+iG/0+x2BKxTbIdq+/HdO+X+aBmfttUhGT
+         juenrEinOHub2xeLy3ravUhvbqKo/+q7Ef7qNczXc3ekr+PaoSoTx6baOwtAUjvuYt8O
+         fJgSoDyc0X3nkPBh+F16T6nH+eVZjruDoOfu3wYerxXtpDGv99kiqZHbJs92ZNbFd9vC
+         wtWhEQ83aUWkfKZnW4HfYj08rmgW3UCdeGL4laJ05AnZ/oFn6aCQRzekiIrfkLbTLLLu
+         qPEw==
+X-Gm-Message-State: AO0yUKXbcmpyKHb3SB8TDyV2GH/ZXSk0vTfHJC7A6Z+AN1SvDaIQdYbl
+        JKk1nBgVsWwSWGwk10sUUIX4CeEH2ht/K1bQ
+X-Google-Smtp-Source: AK7set/lK0dtz8rcHRt03yyNK2Vwc1Fz232Sf6dsRanegcNrGJ8x6yT7AAkYHUf260eQ8ib742Kj5Q==
+X-Received: by 2002:adf:f212:0:b0:2c3:dbe0:58ea with SMTP id p18-20020adff212000000b002c3dbe058eamr8107790wro.47.1675877957261;
+        Wed, 08 Feb 2023 09:39:17 -0800 (PST)
+Received: from [192.168.1.109] ([178.197.216.144])
+        by smtp.gmail.com with ESMTPSA id u10-20020adfdb8a000000b002bfb0c5527esm14273251wri.109.2023.02.08.09.39.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 08 Feb 2023 09:39:16 -0800 (PST)
+Message-ID: <30234963-33e5-e2d7-a6ef-112e89efbdd0@linaro.org>
+Date:   Wed, 8 Feb 2023 18:39:12 +0100
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [PATCH v4 02/18] ARM: s3c24xx: Use the right include
+Content-Language: en-US
+To:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Arnd Bergmann <arnd@arndb.de>,
         Linus Walleij <linus.walleij@linaro.org>,
         Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
         Tony Lindgren <tony@atomide.com>,
@@ -73,7 +85,8 @@ Cc:     Arnd Bergmann <arnd@arndb.de>,
         linux-wireless@vger.kernel.org,
         brcm80211-dev-list.pdl@broadcom.com,
         SHA-cyfmac-dev-list@infineon.com, linux-arch@vger.kernel.org,
-        devicetree@vger.kernel.org, Bartosz Golaszewski <brgl@bgdev.pl>,
+        devicetree@vger.kernel.org
+Cc:     Bartosz Golaszewski <brgl@bgdev.pl>,
         Jonathan Corbet <corbet@lwn.net>, Alex Shi <alexs@kernel.org>,
         Yanteng Si <siyanteng@loongson.cn>,
         Hu Haowen <src.res@email.cn>,
@@ -104,32 +117,32 @@ Cc:     Arnd Bergmann <arnd@arndb.de>,
         Kalle Valo <kvalo@kernel.org>, Qiang Zhao <qiang.zhao@nxp.com>,
         Li Yang <leoyang.li@nxp.com>, Rob Herring <robh+dt@kernel.org>,
         Frank Rowand <frowand.list@gmail.com>
-Subject: Re: [PATCH v4 02/18] ARM: s3c24xx: Use the right include
-Message-ID: <Y+PfJr4l4U3DYpWT@smile.fi.intel.com>
 References: <20230208173343.37582-1-andriy.shevchenko@linux.intel.com>
  <20230208173343.37582-3-andriy.shevchenko@linux.intel.com>
- <30234963-33e5-e2d7-a6ef-112e89efbdd0@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <30234963-33e5-e2d7-a6ef-112e89efbdd0@linaro.org>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+In-Reply-To: <20230208173343.37582-3-andriy.shevchenko@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-On Wed, Feb 08, 2023 at 06:39:12PM +0100, Krzysztof Kozlowski wrote:
-> On 08/02/2023 18:33, Andy Shevchenko wrote:
+On 08/02/2023 18:33, Andy Shevchenko wrote:
+> From: Linus Walleij <linus.walleij@linaro.org>
+> 
+> The file s3c64xx.c is including <linux/gpio.h> despite using no
+> symbols from the file, however it needs it to implicitly bring in
+> of_have_populated_dt() so include <linux/of.h> explicitly instead.
+> 
+> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+> Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+> ---
+>  arch/arm/mach-s3c/s3c64xx.c | 2 +-
 
-...
+It's not s3c24xx anymore, so subject prefix:
+ARM: s3c64xx:
 
-> It's not s3c24xx anymore, so subject prefix:
-> ARM: s3c64xx:
 
-Fixed locally, thanks.
-
--- 
-With Best Regards,
-Andy Shevchenko
-
+Best regards,
+Krzysztof
 
