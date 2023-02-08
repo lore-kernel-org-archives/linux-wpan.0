@@ -2,44 +2,44 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2918C05027
-	for <linux-wpan@archiver.kernel.org>; Wed,  8 Feb 2023 17:39:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3561DC678DB
+	for <linux-wpan@archiver.kernel.org>; Wed,  8 Feb 2023 17:39:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232066AbjBHRjF (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 8 Feb 2023 12:39:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44216 "EHLO
+        id S232263AbjBHRjN (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 8 Feb 2023 12:39:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41592 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232077AbjBHRhS (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 8 Feb 2023 12:37:18 -0500
+        with ESMTP id S232276AbjBHRhT (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 8 Feb 2023 12:37:19 -0500
 Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 344E0518F9;
-        Wed,  8 Feb 2023 09:34:39 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D892A4FCD2;
+        Wed,  8 Feb 2023 09:34:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1675877679; x=1707413679;
+  t=1675877693; x=1707413693;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=OVTbdvlRwsSopBDkL3jXldnhlbwob+iYhRWLjAyRiyk=;
-  b=lnttRk7c08jxjxkk3U+5stJriBVtv9hXLP5p5YzZ9vgXaDLD3XmnlNtB
-   L6Rc+FROFzFjNhI/Q7X11tQ88k0QNfOjTVxNB8qaOI6Tzy+kw/IREzI2U
-   4nzMEIKH2JrkGJ84Fbn2UZW7OL0mYxii8TFCvw8x8Njw0E5iLQ0atC8Zo
-   BJiE4RTCuBACtkyR9cA7dhOCpZSe6N7RkdtPJbONvUUV98RUk2pxrbkDA
-   UxLCbvPiPIZ74HuxiHdg2EJicKGt1wtec8iTVQqjt3YbjbAx6Xo40ZTaA
-   yNm7WK34v6d+MNVcbL4mtsM+ukOecy7kaUoI/mbmMjswLDPAID/hZ/ZF4
+  bh=e2HL48VZL68iHiIHMOw3KrWX1/vewPFZgcuY53UtAyY=;
+  b=l9kBc6ecKaMlTDOULFJKH75BwvzcZqOlVEmLmZyQ657FKD3DJmTv8w4o
+   51Kt99bJ1adqroS5+79UnJdbandYrBEH5JF+Em857/IwF+V7HPHGEVdVp
+   9Fk6ngQoeTwSyaLAJyJOb4qUi+nhKA271wH1tlf954ivjJ0XkTkWkMtod
+   L8jAysB3kAtMAACuWaVma3l8pSjAe5HfBgI4v6BSuEXCYWur/ctaM9ro+
+   NznYIZ29gp8X+lnI/fUp3vpgO9L5WkYVGWmvutj7tgESsLTQd/MUtcwdR
+   sESI3qzdsJRp0kMcKf7QApqJ0QgoiQMrGAAsDkACajih2C1qjS90NuBDk
    g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10615"; a="310225528"
+X-IronPort-AV: E=McAfee;i="6500,9779,10615"; a="310225579"
 X-IronPort-AV: E=Sophos;i="5.97,281,1669104000"; 
-   d="scan'208";a="310225528"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Feb 2023 09:33:35 -0800
+   d="scan'208";a="310225579"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Feb 2023 09:33:39 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10615"; a="660703962"
+X-IronPort-AV: E=McAfee;i="6500,9779,10615"; a="697723055"
 X-IronPort-AV: E=Sophos;i="5.97,281,1669104000"; 
-   d="scan'208";a="660703962"
+   d="scan'208";a="697723055"
 Received: from black.fi.intel.com ([10.237.72.28])
-  by orsmga007.jf.intel.com with ESMTP; 08 Feb 2023 09:33:28 -0800
+  by orsmga008.jf.intel.com with ESMTP; 08 Feb 2023 09:33:34 -0800
 Received: by black.fi.intel.com (Postfix, from userid 1003)
-        id 59E79556; Wed,  8 Feb 2023 19:33:48 +0200 (EET)
+        id 873635CC; Wed,  8 Feb 2023 19:33:48 +0200 (EET)
 From:   Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 To:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
         Arnd Bergmann <arnd@arndb.de>,
@@ -103,9 +103,9 @@ Cc:     Bartosz Golaszewski <brgl@bgdev.pl>,
         Kalle Valo <kvalo@kernel.org>, Qiang Zhao <qiang.zhao@nxp.com>,
         Li Yang <leoyang.li@nxp.com>, Rob Herring <robh+dt@kernel.org>,
         Frank Rowand <frowand.list@gmail.com>
-Subject: [PATCH v4 14/18] gpio: regmap: Add missing header(s)
-Date:   Wed,  8 Feb 2023 19:33:39 +0200
-Message-Id: <20230208173343.37582-15-andriy.shevchenko@linux.intel.com>
+Subject: [PATCH v4 17/18] gpiolib: Group forward declarations in consumer.h
+Date:   Wed,  8 Feb 2023 19:33:42 +0200
+Message-Id: <20230208173343.37582-18-andriy.shevchenko@linux.intel.com>
 X-Mailer: git-send-email 2.39.1
 In-Reply-To: <20230208173343.37582-1-andriy.shevchenko@linux.intel.com>
 References: <20230208173343.37582-1-andriy.shevchenko@linux.intel.com>
@@ -115,41 +115,34 @@ Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Do not imply that some of the generic headers may be always included.
-Instead, include explicitly what we are direct user of.
-
-While at it, split out the GPIO group of headers.
+For better maintenance group the forward declarations together.
 
 Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 ---
- drivers/gpio/gpio-regmap.c | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
+ include/linux/gpio/consumer.h | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/drivers/gpio/gpio-regmap.c b/drivers/gpio/gpio-regmap.c
-index fca17d478984..c08c8e528867 100644
---- a/drivers/gpio/gpio-regmap.c
-+++ b/drivers/gpio/gpio-regmap.c
-@@ -5,11 +5,17 @@
-  * Copyright 2020 Michael Walle <michael@walle.cc>
-  */
+diff --git a/include/linux/gpio/consumer.h b/include/linux/gpio/consumer.h
+index a7eb8aa1e54c..5432e5d5fbfb 100644
+--- a/include/linux/gpio/consumer.h
++++ b/include/linux/gpio/consumer.h
+@@ -7,6 +7,7 @@
+ #include <linux/compiler_types.h>
+ #include <linux/err.h>
  
--#include <linux/gpio/driver.h>
--#include <linux/gpio/regmap.h>
--#include <linux/kernel.h>
-+#include <linux/bits.h>
-+#include <linux/device.h>
-+#include <linux/err.h>
-+#include <linux/io.h>
- #include <linux/module.h>
- #include <linux/regmap.h>
-+#include <linux/slab.h>
-+#include <linux/types.h>
-+
-+#include <linux/gpio/driver.h>
-+#include <linux/gpio/regmap.h>
++struct acpi_device;
+ struct device;
+ struct fwnode_handle;
+ struct gpio_desc;
+@@ -602,8 +603,6 @@ struct acpi_gpio_mapping {
+ 	unsigned int quirks;
+ };
  
- struct gpio_regmap {
- 	struct device *parent;
+-struct acpi_device;
+-
+ #if IS_ENABLED(CONFIG_GPIOLIB) && IS_ENABLED(CONFIG_ACPI)
+ 
+ int acpi_dev_add_driver_gpios(struct acpi_device *adev,
 -- 
 2.39.1
 
