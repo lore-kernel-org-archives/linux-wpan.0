@@ -2,44 +2,44 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7BA6C76186
-	for <linux-wpan@archiver.kernel.org>; Wed,  8 Feb 2023 17:35:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BE2DC636D3
+	for <linux-wpan@archiver.kernel.org>; Wed,  8 Feb 2023 17:35:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232146AbjBHRfm (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 8 Feb 2023 12:35:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40284 "EHLO
+        id S232183AbjBHRfn (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 8 Feb 2023 12:35:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40038 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232063AbjBHReV (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 8 Feb 2023 12:34:21 -0500
+        with ESMTP id S231987AbjBHReM (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 8 Feb 2023 12:34:12 -0500
 Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12AC6518C6;
-        Wed,  8 Feb 2023 09:34:07 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 203674DBD8;
+        Wed,  8 Feb 2023 09:34:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1675877648; x=1707413648;
+  t=1675877646; x=1707413646;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=8Loz5frdfBtc0l4PlP9rbgkvfnulxYbRlKr/4QRrkgw=;
-  b=eFi8ChfT7++4L/EX4oeubArrcxrVDFm+apkv0gcgMX3ZzQBTdTgRBm3+
-   WcmmR8N5WOvyymDDzrXnCB7ZiwW+ebAQNX7uMvMtKtKINcZISmmJm/pg8
-   6fBMSvCW5nZqNn3It7FZrVu/4jN8/c5JnKoJUGuvh3Akxm7VRrmEXxhDk
-   BCzdzYxAathBeU7G4q8rUlDEAnVjLJw0q9Cl63pUuNdi5/COlISrvh2q8
-   F9iXs+iH+G9wJmX3LShCfSsoC7QZKv2/fOqfTDQxeW9K+uLxrQ1S3+eTt
-   RUXNG21KG3IsjaeSVxqWH/j1nKDXuURNOknXZm6rV1JCVWlX7pEOz7NQT
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10615"; a="310225405"
+  bh=9Dq4mU58s7wFVOS4xMQ0zOI9I/hT6Ikw0b7RarExmhA=;
+  b=HTNfkqNiJbCYkdOGF+aE2P2JBIpkEreU0kTfJrOzxHXLsHlRxG+VmLBP
+   0hlASogr6CNwoKDT3l97XNgwVcwoRthusV0XxG5tJ/Jn+2GSnDPF4vC/x
+   0okwcaqwRjdELi3vimK5VDq2PaEyc0iffmsFYc3VncJwsrUvUamA7ZyaM
+   wjYR5zXPDch+1rMRNnrdeZmmkmv3FE/9GarvXiLYgqmyNO4XBXqvAtC+o
+   R1WXlVzgXZVXYdbbnd+3MVUGs/uWLU7L3xI+iZl7KyhC0JoPdnolKA8iM
+   NKo9GJMinQ+YW0FZb3WKIfGgXd5/1E1byh5P6gp2tLh4kXAxq8uA0mW/P
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10615"; a="310225377"
 X-IronPort-AV: E=Sophos;i="5.97,281,1669104000"; 
-   d="scan'208";a="310225405"
+   d="scan'208";a="310225377"
 Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Feb 2023 09:33:28 -0800
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Feb 2023 09:33:27 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10615"; a="660703928"
+X-IronPort-AV: E=McAfee;i="6500,9779,10615"; a="660703926"
 X-IronPort-AV: E=Sophos;i="5.97,281,1669104000"; 
-   d="scan'208";a="660703928"
+   d="scan'208";a="660703926"
 Received: from black.fi.intel.com ([10.237.72.28])
-  by orsmga007.jf.intel.com with ESMTP; 08 Feb 2023 09:33:22 -0800
+  by orsmga007.jf.intel.com with ESMTP; 08 Feb 2023 09:33:21 -0800
 Received: by black.fi.intel.com (Postfix, from userid 1003)
-        id F316D37D; Wed,  8 Feb 2023 19:33:47 +0200 (EET)
+        id CF9FB299; Wed,  8 Feb 2023 19:33:47 +0200 (EET)
 From:   Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 To:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
         Arnd Bergmann <arnd@arndb.de>,
@@ -103,14 +103,13 @@ Cc:     Bartosz Golaszewski <brgl@bgdev.pl>,
         Kalle Valo <kvalo@kernel.org>, Qiang Zhao <qiang.zhao@nxp.com>,
         Li Yang <leoyang.li@nxp.com>, Rob Herring <robh+dt@kernel.org>,
         Frank Rowand <frowand.list@gmail.com>
-Subject: [PATCH v4 08/18] gpiolib: remove gpio_set_debounce()
-Date:   Wed,  8 Feb 2023 19:33:33 +0200
-Message-Id: <20230208173343.37582-9-andriy.shevchenko@linux.intel.com>
+Subject: [PATCH v4 06/18] gpiolib: coldfire: remove custom asm/gpio.h
+Date:   Wed,  8 Feb 2023 19:33:31 +0200
+Message-Id: <20230208173343.37582-7-andriy.shevchenko@linux.intel.com>
 X-Mailer: git-send-email 2.39.1
 In-Reply-To: <20230208173343.37582-1-andriy.shevchenko@linux.intel.com>
 References: <20230208173343.37582-1-andriy.shevchenko@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
@@ -118,109 +117,190 @@ X-Mailing-List: linux-wpan@vger.kernel.org
 
 From: Arnd Bergmann <arnd@arndb.de>
 
-gpio_set_debounce() only has a single user, which is trivially
-converted to gpiod_set_debounce().
+Now that coldfire is the only user of a custom asm/gpio.h, it seems
+better to remove this as well, and have the same interface everywhere.
 
+For the gpio_get_value()/gpio_set_value()/gpio_to_irq(), gpio_cansleep()
+functions, the custom version is only a micro-optimization to inline the
+function for constant GPIO numbers. However, in the coldfire defconfigs,
+I was unable to find a single instance where this micro-optimization
+was even used, and according to Geert the only user appears to be the
+QSPI chip that is disabled everywhere.
+
+The custom gpio_request_one() function is even less useful, as it is
+guarded by an #ifdef that is never true.
+
+Reviewed-by: Geert Uytterhoeven <geert@linux-m68k.org>
+Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Acked-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
-Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 ---
- Documentation/driver-api/gpio/legacy.rst               |  2 --
- .../translations/zh_CN/driver-api/gpio/legacy.rst      |  1 -
- Documentation/translations/zh_TW/gpio.txt              |  1 -
- drivers/input/touchscreen/ads7846.c                    |  5 +++--
- include/linux/gpio.h                                   | 10 ----------
- 5 files changed, 3 insertions(+), 16 deletions(-)
+ arch/m68k/Kconfig.cpu        |  1 -
+ arch/m68k/include/asm/gpio.h | 95 ------------------------------------
+ drivers/gpio/Kconfig         |  8 ---
+ include/linux/gpio.h         |  7 ---
+ 4 files changed, 111 deletions(-)
+ delete mode 100644 arch/m68k/include/asm/gpio.h
 
-diff --git a/Documentation/driver-api/gpio/legacy.rst b/Documentation/driver-api/gpio/legacy.rst
-index a0559d93efd1..e0306e78e34b 100644
---- a/Documentation/driver-api/gpio/legacy.rst
-+++ b/Documentation/driver-api/gpio/legacy.rst
-@@ -238,8 +238,6 @@ setup or driver probe/teardown code, so this is an easy constraint.)::
-         ## 	gpio_free_array()
+diff --git a/arch/m68k/Kconfig.cpu b/arch/m68k/Kconfig.cpu
+index 9380f6e3bb66..96a0fb4f1af5 100644
+--- a/arch/m68k/Kconfig.cpu
++++ b/arch/m68k/Kconfig.cpu
+@@ -24,7 +24,6 @@ config M68KCLASSIC
  
-                 gpio_free()
--                gpio_set_debounce()
+ config COLDFIRE
+ 	bool "Coldfire CPU family support"
+-	select ARCH_HAVE_CUSTOM_GPIO_H
+ 	select CPU_HAS_NO_BITFIELDS
+ 	select CPU_HAS_NO_CAS
+ 	select CPU_HAS_NO_MULDIV64
+diff --git a/arch/m68k/include/asm/gpio.h b/arch/m68k/include/asm/gpio.h
+deleted file mode 100644
+index 5cfc0996ba94..000000000000
+--- a/arch/m68k/include/asm/gpio.h
++++ /dev/null
+@@ -1,95 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0-only */
+-/*
+- * Coldfire generic GPIO support
+- *
+- * (C) Copyright 2009, Steven King <sfking@fdwdc.com>
+-*/
 -
+-#ifndef coldfire_gpio_h
+-#define coldfire_gpio_h
+-
+-#include <linux/io.h>
+-#include <asm/coldfire.h>
+-#include <asm/mcfsim.h>
+-#include <asm/mcfgpio.h>
+-/*
+- * The Generic GPIO functions
+- *
+- * If the gpio is a compile time constant and is one of the Coldfire gpios,
+- * use the inline version, otherwise dispatch thru gpiolib.
+- */
+-
+-static inline int gpio_get_value(unsigned gpio)
+-{
+-	if (__builtin_constant_p(gpio) && gpio < MCFGPIO_PIN_MAX)
+-		return mcfgpio_read(__mcfgpio_ppdr(gpio)) & mcfgpio_bit(gpio);
+-	else
+-		return __gpio_get_value(gpio);
+-}
+-
+-static inline void gpio_set_value(unsigned gpio, int value)
+-{
+-	if (__builtin_constant_p(gpio) && gpio < MCFGPIO_PIN_MAX) {
+-		if (gpio < MCFGPIO_SCR_START) {
+-			unsigned long flags;
+-			MCFGPIO_PORTTYPE data;
+-
+-			local_irq_save(flags);
+-			data = mcfgpio_read(__mcfgpio_podr(gpio));
+-			if (value)
+-				data |= mcfgpio_bit(gpio);
+-			else
+-				data &= ~mcfgpio_bit(gpio);
+-			mcfgpio_write(data, __mcfgpio_podr(gpio));
+-			local_irq_restore(flags);
+-		} else {
+-			if (value)
+-				mcfgpio_write(mcfgpio_bit(gpio),
+-						MCFGPIO_SETR_PORT(gpio));
+-			else
+-				mcfgpio_write(~mcfgpio_bit(gpio),
+-						MCFGPIO_CLRR_PORT(gpio));
+-		}
+-	} else
+-		__gpio_set_value(gpio, value);
+-}
+-
+-static inline int gpio_to_irq(unsigned gpio)
+-{
+-#if defined(MCFGPIO_IRQ_MIN)
+-	if ((gpio >= MCFGPIO_IRQ_MIN) && (gpio < MCFGPIO_IRQ_MAX))
+-#else
+-	if (gpio < MCFGPIO_IRQ_MAX)
+-#endif
+-		return gpio + MCFGPIO_IRQ_VECBASE;
+-	else
+-		return __gpio_to_irq(gpio);
+-}
+-
+-static inline int gpio_cansleep(unsigned gpio)
+-{
+-	return gpio < MCFGPIO_PIN_MAX ? 0 : __gpio_cansleep(gpio);
+-}
+-
+-#ifndef CONFIG_GPIOLIB
+-static inline int gpio_request_one(unsigned gpio, unsigned long flags, const char *label)
+-{
+-	int err;
+-
+-	err = gpio_request(gpio, label);
+-	if (err)
+-		return err;
+-
+-	if (flags & GPIOF_DIR_IN)
+-		err = gpio_direction_input(gpio);
+-	else
+-		err = gpio_direction_output(gpio,
+-			(flags & GPIOF_INIT_HIGH) ? 1 : 0);
+-
+-	if (err)
+-		gpio_free(gpio);
+-
+-	return err;
+-}
+-#endif /* !CONFIG_GPIOLIB */
+-#endif
+diff --git a/drivers/gpio/Kconfig b/drivers/gpio/Kconfig
+index 218d7e4c27ff..06a268d56800 100644
+--- a/drivers/gpio/Kconfig
++++ b/drivers/gpio/Kconfig
+@@ -3,14 +3,6 @@
+ # GPIO infrastructure and drivers
+ #
  
- 
- Claiming and Releasing GPIOs
-diff --git a/Documentation/translations/zh_CN/driver-api/gpio/legacy.rst b/Documentation/translations/zh_CN/driver-api/gpio/legacy.rst
-index 74fa473bb504..dee2a0517c1c 100644
---- a/Documentation/translations/zh_CN/driver-api/gpio/legacy.rst
-+++ b/Documentation/translations/zh_CN/driver-api/gpio/legacy.rst
-@@ -219,7 +219,6 @@ GPIO 值的命令需要等待其信息排到队首才发送命令，再获得其
-         ## 	gpio_free_array()
- 
-                 gpio_free()
--                gpio_set_debounce()
- 
- 
- 
-diff --git a/Documentation/translations/zh_TW/gpio.txt b/Documentation/translations/zh_TW/gpio.txt
-index 1b986bbb0909..dc608358d90a 100644
---- a/Documentation/translations/zh_TW/gpio.txt
-+++ b/Documentation/translations/zh_TW/gpio.txt
-@@ -226,7 +226,6 @@ GPIO 值的命令需要等待其信息排到隊首才發送命令，再獲得其
- ## 	gpio_free_array()
- 
- 	gpio_free()
--	gpio_set_debounce()
- 
- 
- 
-diff --git a/drivers/input/touchscreen/ads7846.c b/drivers/input/touchscreen/ads7846.c
-index 17f11bce8113..bb1058b1e7fd 100644
---- a/drivers/input/touchscreen/ads7846.c
-+++ b/drivers/input/touchscreen/ads7846.c
-@@ -27,6 +27,7 @@
- #include <linux/of.h>
- #include <linux/of_gpio.h>
- #include <linux/of_device.h>
-+#include <linux/gpio/consumer.h>
- #include <linux/gpio.h>
- #include <linux/spi/spi.h>
- #include <linux/spi/ads7846.h>
-@@ -1012,8 +1013,8 @@ static int ads7846_setup_pendown(struct spi_device *spi,
- 		ts->gpio_pendown = pdata->gpio_pendown;
- 
- 		if (pdata->gpio_pendown_debounce)
--			gpio_set_debounce(pdata->gpio_pendown,
--					  pdata->gpio_pendown_debounce);
-+			gpiod_set_debounce(gpio_to_desc(ts->gpio_pendown),
-+					   pdata->gpio_pendown_debounce);
- 	} else {
- 		dev_err(&spi->dev, "no get_pendown_state nor gpio_pendown?\n");
- 		return -EINVAL;
+-config ARCH_HAVE_CUSTOM_GPIO_H
+-	bool
+-	help
+-	  Selecting this config option from the architecture Kconfig allows
+-	  the architecture to provide a custom asm/gpio.h implementation
+-	  overriding the default implementations.  New uses of this are
+-	  strongly discouraged.
+-
+ menuconfig GPIOLIB
+ 	bool "GPIO Support"
+ 	help
 diff --git a/include/linux/gpio.h b/include/linux/gpio.h
-index d5ce78e2bdd9..fc56733e8514 100644
+index 85beb236c925..2b75017b3aad 100644
 --- a/include/linux/gpio.h
 +++ b/include/linux/gpio.h
-@@ -100,11 +100,6 @@ static inline int gpio_direction_output(unsigned gpio, int value)
- 	return gpiod_direction_output_raw(gpio_to_desc(gpio), value);
+@@ -54,11 +54,6 @@ struct gpio {
+ };
+ 
+ #ifdef CONFIG_GPIOLIB
+-
+-#ifdef CONFIG_ARCH_HAVE_CUSTOM_GPIO_H
+-#include <asm/gpio.h>
+-#else
+-
+ #include <asm-generic/gpio.h>
+ 
+ static inline int gpio_get_value(unsigned int gpio)
+@@ -81,8 +76,6 @@ static inline int gpio_to_irq(unsigned int gpio)
+ 	return __gpio_to_irq(gpio);
  }
  
--static inline int gpio_set_debounce(unsigned gpio, unsigned debounce)
--{
--	return gpiod_set_debounce(gpio_to_desc(gpio), debounce);
--}
+-#endif /* ! CONFIG_ARCH_HAVE_CUSTOM_GPIO_H */
 -
- static inline int gpio_get_value_cansleep(unsigned gpio)
- {
- 	return gpiod_get_raw_value_cansleep(gpio_to_desc(gpio));
-@@ -214,11 +209,6 @@ static inline int gpio_direction_output(unsigned gpio, int value)
- 	return -ENOSYS;
- }
+ /* CONFIG_GPIOLIB: bindings for managed devices that want to request gpios */
  
--static inline int gpio_set_debounce(unsigned gpio, unsigned debounce)
--{
--	return -ENOSYS;
--}
--
- static inline int gpio_get_value(unsigned gpio)
- {
- 	/* GPIO can never have been requested or set as {in,out}put */
+ struct device;
 -- 
 2.39.1
 
