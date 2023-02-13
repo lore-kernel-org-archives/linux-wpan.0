@@ -2,40 +2,38 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58EE4C636CC
-	for <linux-wpan@archiver.kernel.org>; Mon, 13 Feb 2023 10:16:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C86CC636D4
+	for <linux-wpan@archiver.kernel.org>; Mon, 13 Feb 2023 16:55:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229997AbjBMKQF (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 13 Feb 2023 05:16:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50890 "EHLO
+        id S229543AbjBMQzA (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 13 Feb 2023 11:55:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48934 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229477AbjBMKQE (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 13 Feb 2023 05:16:04 -0500
-Received: from relay10.mail.gandi.net (relay10.mail.gandi.net [217.70.178.230])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 322474C0C;
-        Mon, 13 Feb 2023 02:15:58 -0800 (PST)
+        with ESMTP id S230392AbjBMQy7 (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 13 Feb 2023 11:54:59 -0500
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::221])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83B507698;
+        Mon, 13 Feb 2023 08:54:23 -0800 (PST)
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id CDA7824000A;
-        Mon, 13 Feb 2023 10:15:54 +0000 (UTC)
+        by mail.gandi.net (Postfix) with ESMTPSA id 6581A240003;
+        Mon, 13 Feb 2023 16:54:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1676283357;
+        t=1676307261;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ZLSuRUYWEmq01XY9c0Hrrl81X+I4m+hB9cvE9ZNmpW0=;
-        b=T6keZ1eCmOH4RPASy5PnlIUsCjQ830L2CZGCbnHk9XpwEkWLGBRPIAU2JKZ1vHHb0rxq75
-        r6K/mIh1bVlA4/7yrbS9LHvXMlgfTsS/A90jUMHoVdso5MiaQxkRH3swK9My06LrWnnxNQ
-        zgjD8UKcENlIZF2FU0UIeIEqypVga8kT9U7bN9Z4iyLJnOkNXmWBVEJhJdrO6JBZo4dYMs
-        LdIGaqpU2PAWbJJvEE56d2rXjrWoulVi0/2QXIIQIBSL3Bkbn5WjHiuR3YUT9r23pV3mdC
-        GGOoXpntVJAusRRlKntLCU6FJnguj8vxc87RkX/K5f4b5aGXjjHs83K/UQk6og==
-Date:   Mon, 13 Feb 2023 11:15:53 +0100
+        bh=Ud52JoUUkqAzh5uPtXzBoHn5JC0T3wyNnvrXvG9wzQ8=;
+        b=Ea6BuM8fdHSr8Ej72WSKj4QIh+2CpcxU2F3HbB/J1I7gwgtlieuD6sFEgvw3CC3BXXxRK2
+        PnERRrO2p3mX/q1JTDD38cOj/BvcKmEk8a3C9yoaTMPM1oNh/jKs8Rc+0ejPH0cv+DhxB7
+        HcNxCzSCdoYviTva8nsYtZLATtysBW+Ljc8N97kg6xuUkVQRh8vNaL+w2ICLA+N5oOgV9X
+        a6rk3eB0gz1Vjmfe6eY5QN46DTMetSPK4ZW9Wr3/SpnQA4rT6rBw6QKeOu8ZXFEzt+GAA+
+        9F/eaqtV/5hCdgwKnF6adXPVXKmoEZh18oD4XVu9JNTbaN988MoGSKcHXnh0lQ==
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
-To:     Alexander Aring <aahringo@redhat.com>
-Cc:     Alexander Aring <alex.aring@gmail.com>,
+To:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
-        linux-wpan@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
+        linux-wpan@vger.kernel.org
+Cc:     "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
         Paolo Abeni <pabeni@redhat.com>,
         Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
@@ -44,104 +42,46 @@ Cc:     Alexander Aring <alex.aring@gmail.com>,
         Frederic Blain <frederic.blain@qorvo.com>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
         Guilhem Imberton <guilhem.imberton@qorvo.com>,
-        Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH wpan-next 1/6] ieee802154: Add support for user scanning
- requests
-Message-ID: <20230213111553.0dcce5c2@xps-13>
-In-Reply-To: <CAK-6q+jLKo1bLBie_xYZyZdyjNB_M8JvxDfr77RQAY9WYcQY8w@mail.gmail.com>
-References: <20221129160046.538864-1-miquel.raynal@bootlin.com>
-        <20221129160046.538864-2-miquel.raynal@bootlin.com>
-        <CAK-6q+iwqVx+6qQ-ctynykdrbN+SHxzk91gQCSdYCUD-FornZA@mail.gmail.com>
-        <20230206101235.0371da87@xps-13>
-        <CAK-6q+jav4yJD3MsOssyBobg1zGqKC5sm-xCRYX1SCkH9GhmHw@mail.gmail.com>
-        <20230210182129.77c1084d@xps-13>
-        <CAK-6q+jLKo1bLBie_xYZyZdyjNB_M8JvxDfr77RQAY9WYcQY8w@mail.gmail.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+        Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        Alexander Aring <aahringo@redhat.com>
+Subject: [PATCH wpan 3/6] ieee802154: Change error code on monitor scan netlink request
+Date:   Mon, 13 Feb 2023 17:54:11 +0100
+Message-Id: <20230213165414.1168401-4-miquel.raynal@bootlin.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230213165414.1168401-1-miquel.raynal@bootlin.com>
+References: <20230213165414.1168401-1-miquel.raynal@bootlin.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi Alexander,
+Returning EPERM gives the impression that "right now" it is not
+possible, but "later" it could be, while what we want to express is the
+fact that this is not currently supported at all (might change in the
+future). So let's return EOPNOTSUPP instead.
 
-> > > > > > +static int nl802154_trigger_scan(struct sk_buff *skb, struct g=
-enl_info *info)
-> > > > > > +{
-> > > > > > +       struct cfg802154_registered_device *rdev =3D info->user=
-_ptr[0];
-> > > > > > +       struct net_device *dev =3D info->user_ptr[1];
-> > > > > > +       struct wpan_dev *wpan_dev =3D dev->ieee802154_ptr;
-> > > > > > +       struct wpan_phy *wpan_phy =3D &rdev->wpan_phy;
-> > > > > > +       struct cfg802154_scan_request *request;
-> > > > > > +       u8 type;
-> > > > > > +       int err;
-> > > > > > +
-> > > > > > +       /* Monitors are not allowed to perform scans */
-> > > > > > +       if (wpan_dev->iftype =3D=3D NL802154_IFTYPE_MONITOR)
-> > > > > > +               return -EPERM; =20
-> > > > >
-> > > > > btw: why are monitors not allowed? =20
-> > > >
-> > > > I guess I had the "active scan" use case in mind which of course do=
-es
-> > > > not work with monitors. Maybe I can relax this a little bit indeed,
-> > > > right now I don't remember why I strongly refused scans on monitors=
-. =20
-> > >
-> > > Isn't it that scans really work close to phy level? Means in this case
-> > > we disable mostly everything of MAC filtering on the transceiver side.
-> > > Then I don't see any reasons why even monitors can't do anything, they
-> > > also can send something. But they really don't have any specific
-> > > source address set, so long addresses are none for source addresses, I
-> > > don't see any problem here. They also don't have AACK handling, but
-> > > it's not required for scan anyway... =20
-> >
-> > I think I remember why I did not want to enable scans on monitors: we
-> > actually change the filtering level to "scan", which is very
-> > different to what a monitor is supposed to receive, which means in scan
-> > mode a monitor would no longer receive all what it is supposed to
-> > receive. Nothing that cannot be workaround'ed by software, probably,
-> > but I believe it is safer right now to avoid introducing potential
-> > regressions. So I will just change the error code and still refuse
-> > scans on monitor interfaces for now, until we figure out if it's
-> > actually safe or not (and if we really want to allow it).
-> > =20
->=20
-> Okay, for scan yes we tell them to be in scan mode and then the
-> transceiver can filter whatever it delivers to the next level which is
-> necessary for filtering scan mac frames only. AACK handling is
-> disabled for scan mode for all types !=3D MONITORS.
->=20
-> For monitors we mostly allow everything and AACK is _always_ disabled.
-> The transceiver filter is completely disabled for at least what looks
-> like a 802.15.4 MAC header (even malformed). There are some frame
-> length checks which are necessary for specific hardware because
-> otherwise they would read out the frame buffer. For me it can still
-> feed the mac802154 stack for scanning (with filtering level as what
-> the monitor sets to, but currently our scan filter is equal to the
-> monitor filter mode anyway (which probably can be changed in
-> future?)). So in my opinion the monitor can do both -> feed the scan
-> mac802154 deliver path and the packet layer. And I also think that on
-> a normal interface type the packet layer should be feeded by those
-> frames as well and do not hit the mac802154 layer scan path only.
+Fixes: 45755ce4bf46 ("ieee802154: Add support for user scanning requests")
+Suggested-by: Alexander Aring <aahringo@redhat.com>
+Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
+---
+ net/ieee802154/nl802154.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Actually that would be an out-of-spec situation, here is a quote of
-chapter "6.3.1.3 Active and passive channel scan"
+diff --git a/net/ieee802154/nl802154.c b/net/ieee802154/nl802154.c
+index d3b6e9e80941..8ee7d2ef55ee 100644
+--- a/net/ieee802154/nl802154.c
++++ b/net/ieee802154/nl802154.c
+@@ -1409,7 +1409,7 @@ static int nl802154_trigger_scan(struct sk_buff *skb, struct genl_info *info)
+ 
+ 	if (wpan_dev->iftype == NL802154_IFTYPE_MONITOR) {
+ 		NL_SET_ERR_MSG(info->extack, "Monitors are not allowed to perform scans");
+-		return -EPERM;
++		return -EOPNOTSUPP;
+ 	}
+ 
+ 	if (!nla_get_u8(info->attrs[NL802154_ATTR_SCAN_TYPE])) {
+-- 
+2.34.1
 
-	During an active or passive scan, the MAC sublayer shall
-	discard all frames received over the PHY data service that are
-	not Beacon frames.
-
-I don't think this is possible to do anyway on devices with a single
-hardware filter setting?
-
-> However this can be done in future and I think, indeed there might be
-> other problems to tackle to enable such functionality.
-
-Indeed.
-
-Thanks,
-Miqu=C3=A8l
