@@ -2,38 +2,40 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2587AC6379F
-	for <linux-wpan@archiver.kernel.org>; Mon, 13 Feb 2023 16:55:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EEE1C636D4
+	for <linux-wpan@archiver.kernel.org>; Mon, 13 Feb 2023 17:35:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230331AbjBMQzU (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 13 Feb 2023 11:55:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49386 "EHLO
+        id S229733AbjBMRfs (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 13 Feb 2023 12:35:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49696 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229977AbjBMQzS (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 13 Feb 2023 11:55:18 -0500
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CEE2D1E5CA;
-        Mon, 13 Feb 2023 08:54:36 -0800 (PST)
+        with ESMTP id S229680AbjBMRfr (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 13 Feb 2023 12:35:47 -0500
+Received: from relay10.mail.gandi.net (relay10.mail.gandi.net [217.70.178.230])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79A755FFB;
+        Mon, 13 Feb 2023 09:35:45 -0800 (PST)
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id B632D24000C;
-        Mon, 13 Feb 2023 16:54:25 +0000 (UTC)
+        by mail.gandi.net (Postfix) with ESMTPSA id E0026240008;
+        Mon, 13 Feb 2023 17:35:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1676307267;
+        t=1676309744;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=1Rr687/4/EsEsD4W31jyRusTeG5lpNTR5Q6FhRygF1w=;
-        b=Yj1CptIP2Pb9000uc5hcUnnkozFLeOkOVkJE/jQ2QTONphRypsGGTygsLxL6FAR3MylQQ7
-        5b4YLS1beX+MiFd7VT/xq4pd53kZjHxYXHO8crZZ2rqDgeyeP6a3o31CrxdGWfyIqX4BIa
-        M29ZMyxm86TbBo3HHj2hAwHiWSiEmU+4hc3UG+RiBdQaY9epz3P7eEqvkTBT4lzbAwp01C
-        hwDTuB4m1AvbLQ5e22t5cMRud3iLYRe2Sn2xmAosohn7XsFVP4Jm0+eF6Xww1P03IrVssx
-        IjS3hUl7cxXDaNrqkEnDrT+KfpBUb8xrSw03ZXM/jbWUfMoy6psM4xsrmC1/vA==
+        bh=+XxkYe9ix/RRf5nv4U8b1q4K7UAx5tDijvFbItJ0wok=;
+        b=CUhm/tj063qhaoysFyALzycqPw4PNyPKYOYTK4EijRLa6LDFmrKEQ/uPTpk3l+Qba7xPcj
+        zgRIycoznWt22qlE4VbBI5Wu0rButDb+8t65fcoCSt7/2+cA5CAb6oFqTUf0c7vjahS7EP
+        sULYjCkwA1L6sH1hpIxC1E+I22nwzke6MSYsHX5ieK0fIbHTmFs1lN/bm3SLQ/iua7/SiM
+        fPIg5GE+SfVT43eHrDr1vL7MDe5R/7kEMtvIr2mpxaNGiH5pFgpmV3WzF5Beyts98ZPp4w
+        i3bbpsAxgj1/L8NjnEyrGbxZuk5h8t5E7iH9p8RiI0F+2w6XFs8JCT/5kf9ELg==
+Date:   Mon, 13 Feb 2023 18:35:35 +0100
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
-To:     Alexander Aring <alex.aring@gmail.com>,
+To:     Alexander Aring <aahringo@redhat.com>
+Cc:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
-        linux-wpan@vger.kernel.org
-Cc:     "David S. Miller" <davem@davemloft.net>,
+        linux-wpan@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
         Paolo Abeni <pabeni@redhat.com>,
         Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
@@ -42,107 +44,88 @@ Cc:     "David S. Miller" <davem@davemloft.net>,
         Frederic Blain <frederic.blain@qorvo.com>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
         Guilhem Imberton <guilhem.imberton@qorvo.com>,
-        Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-        Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: [PATCH wpan 6/6] ieee802154: Drop device trackers
-Date:   Mon, 13 Feb 2023 17:54:14 +0100
-Message-Id: <20230213165414.1168401-7-miquel.raynal@bootlin.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230213165414.1168401-1-miquel.raynal@bootlin.com>
-References: <20230213165414.1168401-1-miquel.raynal@bootlin.com>
+        Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH wpan-next 1/6] ieee802154: Add support for user scanning
+ requests
+Message-ID: <20230213183535.05e62c1c@xps-13>
+In-Reply-To: <CAK-6q+jbcMZK16pfZTb5v8-jvhmvk9-USr6hZE34H1MOrpF=JQ@mail.gmail.com>
+References: <20221129160046.538864-1-miquel.raynal@bootlin.com>
+        <20221129160046.538864-2-miquel.raynal@bootlin.com>
+        <CAK-6q+iwqVx+6qQ-ctynykdrbN+SHxzk91gQCSdYCUD-FornZA@mail.gmail.com>
+        <20230206101235.0371da87@xps-13>
+        <CAK-6q+jav4yJD3MsOssyBobg1zGqKC5sm-xCRYX1SCkH9GhmHw@mail.gmail.com>
+        <CAK-6q+jbcMZK16pfZTb5v8-jvhmvk9-USr6hZE34H1MOrpF=JQ@mail.gmail.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-In order to prevent a device from disappearing when a background job was
-started, dev_hold() and dev_put() calls were made. During the
-stabilization phase of the scan/beacon features, it was later decided
-that removing the device while a background job was ongoing was a valid use
-case, and we should instead stop the background job and then remove the
-device, rather than prevent the device from being removed. This is what
-is currently done, which means manually reference counting the device
-during background jobs is no longer needed.
+Hi Alexander,
 
-Fixes: 45755ce4bf46 ("ieee802154: Add support for user scanning requests")
-Fixes: 7ed3b259eca1 ("ieee802154: Add support for user beaconing requests")
-Reported-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
----
- net/ieee802154/nl802154.c | 24 ++++--------------------
- 1 file changed, 4 insertions(+), 20 deletions(-)
+> > > > > +static int nl802154_trigger_scan(struct sk_buff *skb, struct gen=
+l_info *info)
+> > > > > +{
+> > > > > +       struct cfg802154_registered_device *rdev =3D info->user_p=
+tr[0];
+> > > > > +       struct net_device *dev =3D info->user_ptr[1];
+> > > > > +       struct wpan_dev *wpan_dev =3D dev->ieee802154_ptr;
+> > > > > +       struct wpan_phy *wpan_phy =3D &rdev->wpan_phy;
+> > > > > +       struct cfg802154_scan_request *request;
+> > > > > +       u8 type;
+> > > > > +       int err;
+> > > > > +
+> > > > > +       /* Monitors are not allowed to perform scans */
+> > > > > +       if (wpan_dev->iftype =3D=3D NL802154_IFTYPE_MONITOR)
+> > > > > +               return -EPERM; =20
+> > > >
+> > > > btw: why are monitors not allowed? =20
+> > >
+> > > I guess I had the "active scan" use case in mind which of course does
+> > > not work with monitors. Maybe I can relax this a little bit indeed,
+> > > right now I don't remember why I strongly refused scans on monitors. =
+=20
+> >
+> > Isn't it that scans really work close to phy level? Means in this case
+> > we disable mostly everything of MAC filtering on the transceiver side.
+> > Then I don't see any reasons why even monitors can't do anything, they
+> > also can send something. But they really don't have any specific
+> > source address set, so long addresses are none for source addresses, I
+> > don't see any problem here. They also don't have AACK handling, but
+> > it's not required for scan anyway...
+> >
+> > If this gets too complicated right now, then I am also fine with
+> > returning an error here, we can enable it later but would it be better
+> > to use ENOTSUPP or something like that in this case? EPERM sounds like
+> > you can do that, but you don't have the permissions.
+> > =20
+>=20
+> For me a scan should also be possible from iwpan phy $PHY scan (or
+> whatever the scan command is, or just enable beacon)... to go over the
+> dev is just a shortcut for "I mean whatever the phy is under this dev"
+> ?
 
-diff --git a/net/ieee802154/nl802154.c b/net/ieee802154/nl802154.c
-index 8ee7d2ef55ee..88380606af2c 100644
---- a/net/ieee802154/nl802154.c
-+++ b/net/ieee802154/nl802154.c
-@@ -1453,20 +1453,14 @@ static int nl802154_trigger_scan(struct sk_buff *skb, struct genl_info *info)
- 	else
- 		request->duration = IEEE802154_MAX_SCAN_DURATION;
- 
--	if (wpan_dev->netdev)
--		dev_hold(wpan_dev->netdev);
--
- 	err = rdev_trigger_scan(rdev, request);
- 	if (err) {
- 		pr_err("Failure starting scanning (%d)\n", err);
--		goto free_device;
-+		goto free_request;
- 	}
- 
- 	return 0;
- 
--free_device:
--	if (wpan_dev->netdev)
--		dev_put(wpan_dev->netdev);
- free_request:
- 	kfree(request);
- 
-@@ -1555,9 +1549,6 @@ int nl802154_scan_done(struct wpan_phy *wpan_phy, struct wpan_dev *wpan_dev,
- 	if (err == -ESRCH)
- 		err = 0;
- 
--	if (wpan_dev->netdev)
--		dev_put(wpan_dev->netdev);
--
- 	return err;
- }
- EXPORT_SYMBOL_GPL(nl802154_scan_done);
-@@ -1605,21 +1596,15 @@ nl802154_send_beacons(struct sk_buff *skb, struct genl_info *info)
- 	else
- 		request->interval = IEEE802154_MAX_SCAN_DURATION;
- 
--	if (wpan_dev->netdev)
--		dev_hold(wpan_dev->netdev);
--
- 	err = rdev_send_beacons(rdev, request);
- 	if (err) {
- 		pr_err("Failure starting sending beacons (%d)\n", err);
--		goto free_device;
-+		goto free_request;
- 	}
- 
- 	return 0;
- 
--free_device:
--	if (wpan_dev->netdev)
--		dev_put(wpan_dev->netdev);
--
-+free_request:
- 	kfree(request);
- 
- 	return err;
-@@ -1627,8 +1612,7 @@ nl802154_send_beacons(struct sk_buff *skb, struct genl_info *info)
- 
- void nl802154_beaconing_done(struct wpan_dev *wpan_dev)
- {
--	if (wpan_dev->netdev)
--		dev_put(wpan_dev->netdev);
-+	/* NOP */
- }
- EXPORT_SYMBOL_GPL(nl802154_beaconing_done);
- 
--- 
-2.34.1
+Actually only coordinators (in a specific state) should be able to send
+beacons, so I am kind of against allowing that shortcut, because there
+are usually two dev interfaces on top of the phy's, a regular "NODE"
+and a "COORD", so I don't think we should go that way.
 
+For scans however it makes sense, I've added the necessary changes in
+wpan-tools. The TOP_LEVEL(scan) macro however does not support using
+the same command name twice because it creates a macro, so this one
+only supports a device name (the interface command has kind of the same
+situation and uses a HIDDEN() macro which cannot be used here).
+
+So in summary here is what is supported:
+- dev <dev> beacon
+- dev <dev> scan trigger|abort
+- phy <phy> scan trigger|abort
+- dev <dev> scan (the blocking one, which triggers, listens and returns)
+
+Do you agree?
+
+Thanks,
+Miqu=C3=A8l
