@@ -2,34 +2,33 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65034C6379F
-	for <linux-wpan@archiver.kernel.org>; Tue, 14 Feb 2023 13:39:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2D6AC61DA4
+	for <linux-wpan@archiver.kernel.org>; Tue, 14 Feb 2023 13:52:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231732AbjBNNj0 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 14 Feb 2023 08:39:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42962 "EHLO
+        id S229665AbjBNNwU (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 14 Feb 2023 08:52:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32778 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232627AbjBNNjO (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 14 Feb 2023 08:39:14 -0500
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7692725280;
-        Tue, 14 Feb 2023 05:39:11 -0800 (PST)
+        with ESMTP id S229617AbjBNNwU (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 14 Feb 2023 08:52:20 -0500
+Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::222])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98CB56A44;
+        Tue, 14 Feb 2023 05:51:51 -0800 (PST)
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id 71B851C0002;
-        Tue, 14 Feb 2023 13:39:08 +0000 (UTC)
+        by mail.gandi.net (Postfix) with ESMTPSA id 27D1F4001C;
+        Tue, 14 Feb 2023 13:50:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1676381950;
+        t=1676382648;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=JgmWVcYY++zbdCYmjM2dw0GxHj2M4hVN45uErNbPbqY=;
-        b=QGDZfWq6t8iswxp3eizIZqUbOMTzPWlDMxCG+nh17SSLE5fA+96UkTR1kLfT6spm9rAFIi
-        9k9Ng6FSZclB03w8DTS1dnpUIs2FaL5Fi67fZbhoBiwT3JzwHiTJPytDyWfXEMr3HWTbh+
-        AdJyoW5WRo2A9aN4CCeX0xFml2YZthaSCVC/tqbJh+KA6phPwIqPmTstIjhK/x74PFiLxg
-        +4//dhigKzx1kM9kxE68mfLA4qvyED1G5VmMVYXTz/Xac2KhurklZUJ0Rj3uo9rTiR86K5
-        xICG0x/g+KJ8FK4+5J3G/tbW0PedVb6OK3+cEZNgle0lMcqMvGKw49EKQnzpVw==
-Date:   Tue, 14 Feb 2023 14:39:04 +0100
+        bh=aFpeaht2YTkpF7k3aSsGfayRg82bAR8GM9wVS2OZdx8=;
+        b=d3Xz7QpaF6c4mCDDZIVw9sxiRTPUohjbFrFSGuxayj92gHn21dKT1mTIHRBAeGzVavHje1
+        c1rNjUPqbXW0suouoVJSlCVcnKgt+6lobLdqjFObbyHCxwHTw//D5s6+ipdWEtmIoEjj2w
+        rareXCu3tgpGpVQTBJaHpj8vXG9sVqUOSJ8i/0G29AA2gmXKkebwoapY0Zp5Z6EHYK35X7
+        GGcxWsJE+Uv+C0Ws3nd29Xk2kC156dPaIHbP3QfCpJrqQTxxt7MNTMbjtNuYY6wa0sxw/X
+        26pPAoVEMmhR0JpVIqDc7gwTF/c4LsxF4WkBIb6FDml85YlE9u2ufyBBgInVaw==
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
 To:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
@@ -43,56 +42,52 @@ Cc:     "David S. Miller" <davem@davemloft.net>,
         Frederic Blain <frederic.blain@qorvo.com>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
         Guilhem Imberton <guilhem.imberton@qorvo.com>,
-        Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH wpan 0/6] ieee802154: Scan/Beacon fixes
-Message-ID: <20230214143904.2a9eebb6@xps-13>
-In-Reply-To: <20230213165414.1168401-1-miquel.raynal@bootlin.com>
-References: <20230213165414.1168401-1-miquel.raynal@bootlin.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+        Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        kernel test robot <lkp@intel.com>
+Subject: [PATCH wpan v2 5/6] mac802154: Fix an always true condition
+Date:   Tue, 14 Feb 2023 14:50:34 +0100
+Message-Id: <20230214135035.1202471-6-miquel.raynal@bootlin.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230214135035.1202471-1-miquel.raynal@bootlin.com>
+References: <20230214135035.1202471-1-miquel.raynal@bootlin.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi all,
+At this stage we simply do not care about the delayed work value,
+because active scan is not yet supported, so we can blindly queue
+another work once a beacon has been sent.
 
-miquel.raynal@bootlin.com wrote on Mon, 13 Feb 2023 17:54:08 +0100:
+It fixes a smatch warning:
+    mac802154_beacon_worker() warn: always true condition
+    '(local->beacon_interval >= 0) => (0-u32max >= 0)'
 
-> Hello,
->=20
-> Following Jakub's review on Stefan's MR, a number of changes were
-> requested for him in order to pull the patches in net. In the mean time,
-> a couple of discussions happened with Alexander (return codes for
-> monitor scans and transmit helper used for beacons).
->=20
-> Hopefully this series addresses everything.
+Fixes: 3accf4762734 ("mac802154: Handle basic beaconing")
+Reported-by: kernel test robot <lkp@intel.com>
+Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
+---
+ net/mac802154/scan.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-Looks like my 'Fixes' commit hash lookups lead to local tree hits rather
-than matching the ones in the wpan-next tree, so these hashes won't
-point at any valid commit once in the upstream trees. I am sending a v2
-with nothing else than these commit hashes fixed.
+diff --git a/net/mac802154/scan.c b/net/mac802154/scan.c
+index fff41e59099e..9b0933a185eb 100644
+--- a/net/mac802154/scan.c
++++ b/net/mac802154/scan.c
+@@ -383,9 +383,8 @@ void mac802154_beacon_worker(struct work_struct *work)
+ 		dev_err(&sdata->dev->dev,
+ 			"Beacon could not be transmitted (%d)\n", ret);
+ 
+-	if (local->beacon_interval >= 0)
+-		queue_delayed_work(local->mac_wq, &local->beacon_work,
+-				   local->beacon_interval);
++	queue_delayed_work(local->mac_wq, &local->beacon_work,
++			   local->beacon_interval);
+ }
+ 
+ int mac802154_stop_beacons_locked(struct ieee802154_local *local,
+-- 
+2.34.1
 
-Sorry for the noise.
-
-Thanks,
-Miqu=C3=A8l
-
->=20
-> Thanks,
-> Miqu=C3=A8l
->=20
-> Miquel Raynal (6):
->   ieee802154: Use netlink policies when relevant on scan parameters
->   ieee802154: Convert scan error messages to extack
->   ieee802154: Change error code on monitor scan netlink request
->   mac802154: Send beacons using the MLME Tx path
->   mac802154: Fix an always true condition
->   ieee802154: Drop device trackers
->=20
->  net/ieee802154/nl802154.c | 125 ++++++++++++++------------------------
->  net/mac802154/scan.c      |  25 ++++++--
->  2 files changed, 65 insertions(+), 85 deletions(-)
->=20
