@@ -2,67 +2,36 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA673C61DA4
-	for <linux-wpan@archiver.kernel.org>; Tue, 14 Feb 2023 13:59:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD8D7C64EC7
+	for <linux-wpan@archiver.kernel.org>; Tue, 14 Feb 2023 14:06:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232518AbjBNN7K (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 14 Feb 2023 08:59:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41188 "EHLO
+        id S231789AbjBNOGI (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 14 Feb 2023 09:06:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48984 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232297AbjBNN7J (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 14 Feb 2023 08:59:09 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D30F26CE5
-        for <linux-wpan@vger.kernel.org>; Tue, 14 Feb 2023 05:58:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1676383080;
+        with ESMTP id S231608AbjBNOGH (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 14 Feb 2023 09:06:07 -0500
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::223])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8CB69EC5;
+        Tue, 14 Feb 2023 06:06:05 -0800 (PST)
+Received: (Authenticated sender: miquel.raynal@bootlin.com)
+        by mail.gandi.net (Postfix) with ESMTPSA id 4B42960008;
+        Tue, 14 Feb 2023 14:06:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+        t=1676383564;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=MIEkIiVTqaVyY4OQ1tNP7iNR8iBTofvIDcc0iTg4IAs=;
-        b=gumwZVZih9IVn4J4WwWswi8mNZEV3Tcw5XVVCXEYFcpXf6zi5D0P54SOvcZmF7IjTzm9xM
-        6HdQ+j2g3V7PZ4ofrR9lnHbTkCHlrZC8HdNre4ZeFIAS8sF9ah2EyXKQjTJOgRhSJ7Urg+
-        8FZZxBFpdRY7NrTDx3YWl/6GOTJpaaw=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-640-y4XI52DTNhu4ZC0EhppioQ-1; Tue, 14 Feb 2023 08:54:09 -0500
-X-MC-Unique: y4XI52DTNhu4ZC0EhppioQ-1
-Received: by mail-ed1-f69.google.com with SMTP id y17-20020a056402359100b004acc4f8aa3fso4423739edc.3
-        for <linux-wpan@vger.kernel.org>; Tue, 14 Feb 2023 05:54:09 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=MIEkIiVTqaVyY4OQ1tNP7iNR8iBTofvIDcc0iTg4IAs=;
-        b=3nxBMgzY0/sf+ROOpzv+hV8lTjIFkJgBlWeoShwORdPD9rnl4OQGm+iLKm30yfSR+S
-         54s9047m1IR88NKRkmL3PzEZhSQJCY3hmds/N1KSUTF6ICZ8VzFjtkj+OY6bvHQ8roit
-         A2QpFo9J/ji8NhzKuUGGG/D5SIfko6OCiISEtybrai3vefsNdMf3ENYFsmSCv0ovX8l5
-         9mhLN+GtuKtDGHXvDTiGp5ujRgHYiCaBdXplwU/TJaRnrFW3EPzSZL2dgRbYYiWTQqjY
-         9HxLLzOF2/zPLxHlIBy0QoublYgn1oghhO4XL5tL3GA9mNCjsPy3bO78dU3OlEOAxU0d
-         Zm5A==
-X-Gm-Message-State: AO0yUKXsifEsw0lkW2OXvb6OJBdlYmCwIz6zr17z7uaKbbA+x+6JJfzx
-        RZIqihnaTmqMiY7as3n0eS3+87kSbOU+873fnjwgX3pY1u0dHcg8p+wwoFwVbnc8By2orIEXbQ+
-        nr4Zhf34m3xRyDCRZHiCnAm4HKDsI8gKtINlBDg==
-X-Received: by 2002:a17:907:984a:b0:87b:dce7:c245 with SMTP id jj10-20020a170907984a00b0087bdce7c245mr1345471ejc.3.1676382848811;
-        Tue, 14 Feb 2023 05:54:08 -0800 (PST)
-X-Google-Smtp-Source: AK7set+7hadw1dxMPAFu31dJ7JmuVakzkY4sOW+RpBc7shHyANZKavUEiC33+IZbiihrMjT6nOWLp3Dzp5k6Uq9pLL8=
-X-Received: by 2002:a17:907:984a:b0:87b:dce7:c245 with SMTP id
- jj10-20020a170907984a00b0087bdce7c245mr1345456ejc.3.1676382848675; Tue, 14
- Feb 2023 05:54:08 -0800 (PST)
-MIME-Version: 1.0
-References: <20221129160046.538864-1-miquel.raynal@bootlin.com>
- <20221129160046.538864-2-miquel.raynal@bootlin.com> <CAK-6q+iwqVx+6qQ-ctynykdrbN+SHxzk91gQCSdYCUD-FornZA@mail.gmail.com>
- <20230206101235.0371da87@xps-13> <CAK-6q+jav4yJD3MsOssyBobg1zGqKC5sm-xCRYX1SCkH9GhmHw@mail.gmail.com>
- <CAK-6q+jbcMZK16pfZTb5v8-jvhmvk9-USr6hZE34H1MOrpF=JQ@mail.gmail.com>
- <20230213183535.05e62c1c@xps-13> <CAK-6q+hkJpqNG9nO_ugngjGQ_q9VdLu+xDjmD09MT+5=tvd0QA@mail.gmail.com>
-In-Reply-To: <CAK-6q+hkJpqNG9nO_ugngjGQ_q9VdLu+xDjmD09MT+5=tvd0QA@mail.gmail.com>
-From:   Alexander Aring <aahringo@redhat.com>
-Date:   Tue, 14 Feb 2023 08:53:57 -0500
-Message-ID: <CAK-6q+jU7-ETKeoM=MLmfyMUqywteBC8sUAndRF1vx0PgA+WAA@mail.gmail.com>
-Subject: Re: [PATCH wpan-next 1/6] ieee802154: Add support for user scanning requests
-To:     Miquel Raynal <miquel.raynal@bootlin.com>
+        bh=EiPPK/ws3wnJ831C31CfYEtnJbbFmvzW70yxtxUG7rI=;
+        b=fkWqTiSWzbfN/QwT1GO74MVuBocrUqDD5tkktQ0WkswOerYpznVL+qO5muaa5usvPNimAG
+        fO4YYPlGVVM6eI8BfOGSsIcoZkyoIknWT1gwUKzVIHYIUUBREXoooaOWHYnJejdKVr+WkQ
+        wtNkeoWXhF6gZVzWTR3HQtzo/iAwBw3FY2ue+Yg6hsv9+Kn+6CV7PKcW2FgSKbhbF3Bxab
+        gDrN87bEWCoqzXa8Dii1MzTF2zIomxDeL0PHYNEvWSlcpJ87tdP/S+8d/FMaf9XSYl6TlC
+        qeRTQk/jbyGn+Ne+G8pL6y6coyn5BTsxc2Jv5gfO6CwNJX06a9oclimRBc+e1Q==
+Date:   Tue, 14 Feb 2023 15:06:00 +0100
+From:   Miquel Raynal <miquel.raynal@bootlin.com>
+To:     Alexander Aring <aahringo@redhat.com>
 Cc:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
         linux-wpan@vger.kernel.org,
@@ -76,89 +45,133 @@ Cc:     Alexander Aring <alex.aring@gmail.com>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
         Guilhem Imberton <guilhem.imberton@qorvo.com>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH wpan-next 1/6] ieee802154: Add support for user scanning
+ requests
+Message-ID: <20230214150600.1c21066b@xps-13>
+In-Reply-To: <CAK-6q+jU7-ETKeoM=MLmfyMUqywteBC8sUAndRF1vx0PgA+WAA@mail.gmail.com>
+References: <20221129160046.538864-1-miquel.raynal@bootlin.com>
+        <20221129160046.538864-2-miquel.raynal@bootlin.com>
+        <CAK-6q+iwqVx+6qQ-ctynykdrbN+SHxzk91gQCSdYCUD-FornZA@mail.gmail.com>
+        <20230206101235.0371da87@xps-13>
+        <CAK-6q+jav4yJD3MsOssyBobg1zGqKC5sm-xCRYX1SCkH9GhmHw@mail.gmail.com>
+        <CAK-6q+jbcMZK16pfZTb5v8-jvhmvk9-USr6hZE34H1MOrpF=JQ@mail.gmail.com>
+        <20230213183535.05e62c1c@xps-13>
+        <CAK-6q+hkJpqNG9nO_ugngjGQ_q9VdLu+xDjmD09MT+5=tvd0QA@mail.gmail.com>
+        <CAK-6q+jU7-ETKeoM=MLmfyMUqywteBC8sUAndRF1vx0PgA+WAA@mail.gmail.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi,
+Hi Alexander,
 
-On Tue, Feb 14, 2023 at 8:34 AM Alexander Aring <aahringo@redhat.com> wrote:
->
+aahringo@redhat.com wrote on Tue, 14 Feb 2023 08:53:57 -0500:
+
 > Hi,
->
-> On Mon, Feb 13, 2023 at 12:35 PM Miquel Raynal
-> <miquel.raynal@bootlin.com> wrote:
+>=20
+> On Tue, Feb 14, 2023 at 8:34 AM Alexander Aring <aahringo@redhat.com> wro=
+te:
 > >
-> > Hi Alexander,
+> > Hi,
 > >
-> > > > > > > +static int nl802154_trigger_scan(struct sk_buff *skb, struct genl_info *info)
-> > > > > > > +{
-> > > > > > > +       struct cfg802154_registered_device *rdev = info->user_ptr[0];
-> > > > > > > +       struct net_device *dev = info->user_ptr[1];
-> > > > > > > +       struct wpan_dev *wpan_dev = dev->ieee802154_ptr;
-> > > > > > > +       struct wpan_phy *wpan_phy = &rdev->wpan_phy;
-> > > > > > > +       struct cfg802154_scan_request *request;
-> > > > > > > +       u8 type;
-> > > > > > > +       int err;
-> > > > > > > +
-> > > > > > > +       /* Monitors are not allowed to perform scans */
-> > > > > > > +       if (wpan_dev->iftype == NL802154_IFTYPE_MONITOR)
-> > > > > > > +               return -EPERM;
-> > > > > >
-> > > > > > btw: why are monitors not allowed?
-> > > > >
-> > > > > I guess I had the "active scan" use case in mind which of course does
-> > > > > not work with monitors. Maybe I can relax this a little bit indeed,
-> > > > > right now I don't remember why I strongly refused scans on monitors.
-> > > >
-> > > > Isn't it that scans really work close to phy level? Means in this case
-> > > > we disable mostly everything of MAC filtering on the transceiver side.
-> > > > Then I don't see any reasons why even monitors can't do anything, they
-> > > > also can send something. But they really don't have any specific
-> > > > source address set, so long addresses are none for source addresses, I
-> > > > don't see any problem here. They also don't have AACK handling, but
-> > > > it's not required for scan anyway...
-> > > >
-> > > > If this gets too complicated right now, then I am also fine with
-> > > > returning an error here, we can enable it later but would it be better
-> > > > to use ENOTSUPP or something like that in this case? EPERM sounds like
-> > > > you can do that, but you don't have the permissions.
-> > > >
+> > On Mon, Feb 13, 2023 at 12:35 PM Miquel Raynal
+> > <miquel.raynal@bootlin.com> wrote: =20
 > > >
-> > > For me a scan should also be possible from iwpan phy $PHY scan (or
-> > > whatever the scan command is, or just enable beacon)... to go over the
-> > > dev is just a shortcut for "I mean whatever the phy is under this dev"
-> > > ?
+> > > Hi Alexander,
+> > > =20
+> > > > > > > > +static int nl802154_trigger_scan(struct sk_buff *skb, stru=
+ct genl_info *info)
+> > > > > > > > +{
+> > > > > > > > +       struct cfg802154_registered_device *rdev =3D info->=
+user_ptr[0];
+> > > > > > > > +       struct net_device *dev =3D info->user_ptr[1];
+> > > > > > > > +       struct wpan_dev *wpan_dev =3D dev->ieee802154_ptr;
+> > > > > > > > +       struct wpan_phy *wpan_phy =3D &rdev->wpan_phy;
+> > > > > > > > +       struct cfg802154_scan_request *request;
+> > > > > > > > +       u8 type;
+> > > > > > > > +       int err;
+> > > > > > > > +
+> > > > > > > > +       /* Monitors are not allowed to perform scans */
+> > > > > > > > +       if (wpan_dev->iftype =3D=3D NL802154_IFTYPE_MONITOR)
+> > > > > > > > +               return -EPERM; =20
+> > > > > > >
+> > > > > > > btw: why are monitors not allowed? =20
+> > > > > >
+> > > > > > I guess I had the "active scan" use case in mind which of cours=
+e does
+> > > > > > not work with monitors. Maybe I can relax this a little bit ind=
+eed,
+> > > > > > right now I don't remember why I strongly refused scans on moni=
+tors. =20
+> > > > >
+> > > > > Isn't it that scans really work close to phy level? Means in this=
+ case
+> > > > > we disable mostly everything of MAC filtering on the transceiver =
+side.
+> > > > > Then I don't see any reasons why even monitors can't do anything,=
+ they
+> > > > > also can send something. But they really don't have any specific
+> > > > > source address set, so long addresses are none for source address=
+es, I
+> > > > > don't see any problem here. They also don't have AACK handling, b=
+ut
+> > > > > it's not required for scan anyway...
+> > > > >
+> > > > > If this gets too complicated right now, then I am also fine with
+> > > > > returning an error here, we can enable it later but would it be b=
+etter
+> > > > > to use ENOTSUPP or something like that in this case? EPERM sounds=
+ like
+> > > > > you can do that, but you don't have the permissions.
+> > > > > =20
+> > > >
+> > > > For me a scan should also be possible from iwpan phy $PHY scan (or
+> > > > whatever the scan command is, or just enable beacon)... to go over =
+the
+> > > > dev is just a shortcut for "I mean whatever the phy is under this d=
+ev"
+> > > > ? =20
+> > >
+> > > Actually only coordinators (in a specific state) should be able to se=
+nd
+> > > beacons, so I am kind of against allowing that shortcut, because there
+> > > are usually two dev interfaces on top of the phy's, a regular "NODE"
+> > > and a "COORD", so I don't think we should go that way.
+> > >
+> > > For scans however it makes sense, I've added the necessary changes in
+> > > wpan-tools. The TOP_LEVEL(scan) macro however does not support using
+> > > the same command name twice because it creates a macro, so this one
+> > > only supports a device name (the interface command has kind of the sa=
+me
+> > > situation and uses a HIDDEN() macro which cannot be used here).
+> > > =20
 > >
-> > Actually only coordinators (in a specific state) should be able to send
-> > beacons, so I am kind of against allowing that shortcut, because there
-> > are usually two dev interfaces on top of the phy's, a regular "NODE"
-> > and a "COORD", so I don't think we should go that way.
+> > Yes, I was thinking about scanning only.
+> > =20
+> > > So in summary here is what is supported:
+> > > - dev <dev> beacon
+> > > - dev <dev> scan trigger|abort
+> > > - phy <phy> scan trigger|abort
+> > > - dev <dev> scan (the blocking one, which triggers, listens and retur=
+ns)
+> > >
+> > > Do you agree?
+> > > =20
 > >
-> > For scans however it makes sense, I've added the necessary changes in
-> > wpan-tools. The TOP_LEVEL(scan) macro however does not support using
-> > the same command name twice because it creates a macro, so this one
-> > only supports a device name (the interface command has kind of the same
-> > situation and uses a HIDDEN() macro which cannot be used here).
-> >
->
-> Yes, I was thinking about scanning only.
->
-> > So in summary here is what is supported:
-> > - dev <dev> beacon
-> > - dev <dev> scan trigger|abort
-> > - phy <phy> scan trigger|abort
-> > - dev <dev> scan (the blocking one, which triggers, listens and returns)
-> >
-> > Do you agree?
-> >
->
-> Okay, yes. I trust you.
+> > Okay, yes. I trust you. =20
+>=20
+> btw: at the point when a scan requires a source address... it cannot
+> be done because then a scan is related to a MAC instance -> an wpan
+> interface and we need to bind to it. But I think it doesn't?
 
-btw: at the point when a scan requires a source address... it cannot
-be done because then a scan is related to a MAC instance -> an wpan
-interface and we need to bind to it. But I think it doesn't?
+I'm not sure I follow you here. You mean in case of active scan? The
+operation is always tight to a device in the end, even if you provide a
+phy in userspace. So I guess it's not a problem. Or maybe I didn't get
+the question right?
 
-- Alex
-
+Thanks,
+Miqu=C3=A8l
