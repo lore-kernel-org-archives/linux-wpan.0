@@ -2,71 +2,41 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8B65C61DA4
-	for <linux-wpan@archiver.kernel.org>; Tue, 14 Feb 2023 13:53:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E06FC05027
+	for <linux-wpan@archiver.kernel.org>; Tue, 14 Feb 2023 13:55:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232835AbjBNNxo (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 14 Feb 2023 08:53:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33900 "EHLO
+        id S229617AbjBNNzO (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 14 Feb 2023 08:55:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36716 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229617AbjBNNxn (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 14 Feb 2023 08:53:43 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 167BC28216
-        for <linux-wpan@vger.kernel.org>; Tue, 14 Feb 2023 05:52:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1676382686;
+        with ESMTP id S232868AbjBNNzO (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 14 Feb 2023 08:55:14 -0500
+Received: from mslow1.mail.gandi.net (mslow1.mail.gandi.net [IPv6:2001:4b98:dc4:8::240])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A170BBB7;
+        Tue, 14 Feb 2023 05:54:35 -0800 (PST)
+Received: from relay2-d.mail.gandi.net (unknown [217.70.183.194])
+        by mslow1.mail.gandi.net (Postfix) with ESMTP id 4CC23D31EF;
+        Tue, 14 Feb 2023 13:52:02 +0000 (UTC)
+Received: (Authenticated sender: miquel.raynal@bootlin.com)
+        by mail.gandi.net (Postfix) with ESMTPSA id 619F04000E;
+        Tue, 14 Feb 2023 13:50:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+        t=1676382641;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=83QmTK/OxRsSR+M63k5tbNt8PwWczCTZs++ini0mCYI=;
-        b=AuCtNNTWreNhB4jhLQYBF0pFoT9XZOEoN84NnFgeQ9UO9h4U6PP1qddVsBaATxMJh6HZct
-        nEk3aXuc5p18IDrC0fHXSU1MIl0A7HMah+K4a3/6BH/6MsZlIRAKj29kdrdF1eIZ+tS/SG
-        F1RxjSKiX/rE3PIZNuLz2GVotvAT4EY=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-403-DmMX8UhYPWiuOyWG5DSrHA-1; Tue, 14 Feb 2023 08:51:25 -0500
-X-MC-Unique: DmMX8UhYPWiuOyWG5DSrHA-1
-Received: by mail-ed1-f69.google.com with SMTP id y17-20020a056402359100b004acc4f8aa3fso4418443edc.3
-        for <linux-wpan@vger.kernel.org>; Tue, 14 Feb 2023 05:51:25 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=83QmTK/OxRsSR+M63k5tbNt8PwWczCTZs++ini0mCYI=;
-        b=rK+FPNBuDIR38zq0RlSJdBUwJWyAIk6DhHy2DeRNo4SC9Pgh5fR80G+yN8X9MdiK8V
-         F1NXzjl3N3JYKXtEDsD4B8N3pkjSzUZAmDHrVekyPZd3FsXxiODe4Q9cXjqjsADBWc8B
-         MPiMVZqtkA478epC4MGJL3diA1PB1eHYVlelghG0J3nDZLb1d8/2HIWCtnwKrKnoFzJ4
-         i8fPIkmXA1LA/mrMBpEwGf2B3yEa+corRztUcyR0ofQNcqgiVghl7TH9gS0Az80bYdC/
-         /hKb8Z4RD4PHFXfszyavPZrVCI8xYrEtNEF+1YkhONZeNhN7eQQMm+Xy1iNtlsJaFjXX
-         N7pw==
-X-Gm-Message-State: AO0yUKVo7o85IqxsBK+M7Cvc29kQlF4x35N0ksOLRMV6eGjw7aRvoZbi
-        1qaDfjWZRoSIW6zGff2G7aDXbkMe2ds0zfICYX/+QPauK4kRRxZYfBwmcwLpEakFfxbpakxJHi5
-        G0umTxnsRSfpAxsc4ItP/OyXYRN/hnarLGxEbJA==
-X-Received: by 2002:a17:906:c30f:b0:87a:56fc:9df1 with SMTP id s15-20020a170906c30f00b0087a56fc9df1mr1325588ejz.3.1676382684305;
-        Tue, 14 Feb 2023 05:51:24 -0800 (PST)
-X-Google-Smtp-Source: AK7set9m576Bio3TX1Ux+Z0xR6qbElZ1ec1kFotbUaFTfhNVnakbneez3NE3Vl9TsjQMlTrfFEqdQL5gZPUtRd6ldnY=
-X-Received: by 2002:a17:906:c30f:b0:87a:56fc:9df1 with SMTP id
- s15-20020a170906c30f00b0087a56fc9df1mr1325581ejz.3.1676382684065; Tue, 14 Feb
- 2023 05:51:24 -0800 (PST)
-MIME-Version: 1.0
-References: <20221129160046.538864-1-miquel.raynal@bootlin.com>
- <20221129160046.538864-2-miquel.raynal@bootlin.com> <CAK-6q+iwqVx+6qQ-ctynykdrbN+SHxzk91gQCSdYCUD-FornZA@mail.gmail.com>
- <20230206101235.0371da87@xps-13> <CAK-6q+jav4yJD3MsOssyBobg1zGqKC5sm-xCRYX1SCkH9GhmHw@mail.gmail.com>
- <20230210182129.77c1084d@xps-13> <CAK-6q+jLKo1bLBie_xYZyZdyjNB_M8JvxDfr77RQAY9WYcQY8w@mail.gmail.com>
- <20230213111553.0dcce5c2@xps-13>
-In-Reply-To: <20230213111553.0dcce5c2@xps-13>
-From:   Alexander Aring <aahringo@redhat.com>
-Date:   Tue, 14 Feb 2023 08:51:12 -0500
-Message-ID: <CAK-6q+jP55MaB-_ZbRHKESgEb-AW+kN3bU2SMWMtkozvoyfAwA@mail.gmail.com>
-Subject: Re: [PATCH wpan-next 1/6] ieee802154: Add support for user scanning requests
-To:     Miquel Raynal <miquel.raynal@bootlin.com>
-Cc:     Alexander Aring <alex.aring@gmail.com>,
+        bh=HsztToQbd/c/da2f/GeE28BshvPNpj2dFvQsZrMPEao=;
+        b=My5ROfsIgTgreliGvsnNjdfY5MVTgQrtKm51+AAkIOWH1nhrP4SjBr3k3CZ5M9cTEWbM0x
+        AHIcsMaZVsiioQAIqFSypHApG8E2nMz6pBvv+n4XYFraBjzrLzC0s9vSBkFkSIZWqflNwQ
+        2e6TFz/IUg6eVbeZaqejQIuey/kZQxp2rp0t7hCg6+wkWhpBk2IPOyWkij24WrLlQgx9W0
+        uD53VvGHhsUDlguYmdVT2Zfqk1k+B20xF8JyNFjC+T6zzizrAqGRpDgOuuJb5jEV+Fi0VD
+        SextRLr0QdDP0LC0RKJHgEvVBl+Q6wYwJvyZMPxQYs3VWWkzRc2Z97IPmdJlYA==
+From:   Miquel Raynal <miquel.raynal@bootlin.com>
+To:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
-        linux-wpan@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
+        linux-wpan@vger.kernel.org
+Cc:     "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
         Paolo Abeni <pabeni@redhat.com>,
         Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
@@ -75,129 +45,165 @@ Cc:     Alexander Aring <alex.aring@gmail.com>,
         Frederic Blain <frederic.blain@qorvo.com>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
         Guilhem Imberton <guilhem.imberton@qorvo.com>,
-        Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Content-Type: text/plain; charset="UTF-8"
+        Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+        Miquel Raynal <miquel.raynal@bootlin.com>
+Subject: [PATCH wpan v2 1/6] ieee802154: Use netlink policies when relevant on scan parameters
+Date:   Tue, 14 Feb 2023 14:50:30 +0100
+Message-Id: <20230214135035.1202471-2-miquel.raynal@bootlin.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230214135035.1202471-1-miquel.raynal@bootlin.com>
+References: <20230214135035.1202471-1-miquel.raynal@bootlin.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi,
+Instead of open-coding scan parameters (page, channels, duration, etc),
+let's use the existing NLA_POLICY* macros. This help greatly reducing
+the error handling and clarifying the overall logic.
 
-On Mon, Feb 13, 2023 at 5:16 AM Miquel Raynal <miquel.raynal@bootlin.com> wrote:
->
-> Hi Alexander,
->
-> > > > > > > +static int nl802154_trigger_scan(struct sk_buff *skb, struct genl_info *info)
-> > > > > > > +{
-> > > > > > > +       struct cfg802154_registered_device *rdev = info->user_ptr[0];
-> > > > > > > +       struct net_device *dev = info->user_ptr[1];
-> > > > > > > +       struct wpan_dev *wpan_dev = dev->ieee802154_ptr;
-> > > > > > > +       struct wpan_phy *wpan_phy = &rdev->wpan_phy;
-> > > > > > > +       struct cfg802154_scan_request *request;
-> > > > > > > +       u8 type;
-> > > > > > > +       int err;
-> > > > > > > +
-> > > > > > > +       /* Monitors are not allowed to perform scans */
-> > > > > > > +       if (wpan_dev->iftype == NL802154_IFTYPE_MONITOR)
-> > > > > > > +               return -EPERM;
-> > > > > >
-> > > > > > btw: why are monitors not allowed?
-> > > > >
-> > > > > I guess I had the "active scan" use case in mind which of course does
-> > > > > not work with monitors. Maybe I can relax this a little bit indeed,
-> > > > > right now I don't remember why I strongly refused scans on monitors.
-> > > >
-> > > > Isn't it that scans really work close to phy level? Means in this case
-> > > > we disable mostly everything of MAC filtering on the transceiver side.
-> > > > Then I don't see any reasons why even monitors can't do anything, they
-> > > > also can send something. But they really don't have any specific
-> > > > source address set, so long addresses are none for source addresses, I
-> > > > don't see any problem here. They also don't have AACK handling, but
-> > > > it's not required for scan anyway...
-> > >
-> > > I think I remember why I did not want to enable scans on monitors: we
-> > > actually change the filtering level to "scan", which is very
-> > > different to what a monitor is supposed to receive, which means in scan
-> > > mode a monitor would no longer receive all what it is supposed to
-> > > receive. Nothing that cannot be workaround'ed by software, probably,
-> > > but I believe it is safer right now to avoid introducing potential
-> > > regressions. So I will just change the error code and still refuse
-> > > scans on monitor interfaces for now, until we figure out if it's
-> > > actually safe or not (and if we really want to allow it).
-> > >
-> >
-> > Okay, for scan yes we tell them to be in scan mode and then the
-> > transceiver can filter whatever it delivers to the next level which is
-> > necessary for filtering scan mac frames only. AACK handling is
-> > disabled for scan mode for all types != MONITORS.
-> >
-> > For monitors we mostly allow everything and AACK is _always_ disabled.
-> > The transceiver filter is completely disabled for at least what looks
-> > like a 802.15.4 MAC header (even malformed). There are some frame
-> > length checks which are necessary for specific hardware because
-> > otherwise they would read out the frame buffer. For me it can still
-> > feed the mac802154 stack for scanning (with filtering level as what
-> > the monitor sets to, but currently our scan filter is equal to the
-> > monitor filter mode anyway (which probably can be changed in
-> > future?)). So in my opinion the monitor can do both -> feed the scan
-> > mac802154 deliver path and the packet layer. And I also think that on
-> > a normal interface type the packet layer should be feeded by those
-> > frames as well and do not hit the mac802154 layer scan path only.
->
-> Actually that would be an out-of-spec situation, here is a quote of
-> chapter "6.3.1.3 Active and passive channel scan"
->
->         During an active or passive scan, the MAC sublayer shall
->         discard all frames received over the PHY data service that are
->         not Beacon frames.
->
+Fixes: ed3557c947e1 ("ieee802154: Add support for user scanning requests")
+Suggested-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
+---
+ net/ieee802154/nl802154.c | 84 +++++++++++++--------------------------
+ 1 file changed, 28 insertions(+), 56 deletions(-)
 
-Monitor interfaces are not anything that the spec describes, it is
-some interface type which offers the user (mostly over AF_PACKET raw
-socket) full phy level access with the _default_ options. I already
-run user space stacks (for hacking/development only) on monitor
-interfaces to connect with Linux 802.15.4 interfaces, e.g. see [0]
-(newer came upstream, somewhere I have also a 2 years old updated
-version, use hwsim not fakelb).
-
-In other words, by default it should bypass 802.15.4 MAC and it still
-conforms with your spec, just that it is in user space. However, there
-exists problems to do that, but it kind of works for the most use
-cases. I said here by default because some people have different use
-cases of what they want to do in the kernel. e.g. encryption (so users
-only get encrypted frames, etc.) We don't support that but we can,
-same for doing a scan. It probably requires just more mac802154 layer
-filtering.
-
-There are enough examples in wireless that they do "crazy" things and
-you can do that only with SoftMAC transceivers because it uses more
-software parts like mac80211 and HardMAC transceivers only do what the
-spec says and delivers it to the next layer. Some of them have more
-functionality I guess, but then it depends on driver implementation
-and a lot of other things.
-
-Monitors also act as a sniffer device, but you _could_ also send
-frames out and then the fun part begins.
-
-> I don't think this is possible to do anyway on devices with a single
-> hardware filter setting?
->
-
-On SoftMAC it need to support a filtering level where we can disable
-all filtering and get 802.15.4 MAC frames like it's on air (even
-without non valid checksum, but we simply don't care if the
-driver/transceiver does not support it we will always confirm it is
-correct again until somebody comes around and say "oh we can do FCS
-level then mac802154 does not need to check on this because it is
-always correct")... This is currently the NONE filtering level I
-think?
-
-For HardMAC it is more complicated; they don't do that, they do the
-"scan" operation on their transceiver and you can dump the result and
-probably never forward any beacon related frames? (I had this question
-once when Michael Richardson replied).
-
-- Alex
-
-[0] https://github.com/RIOT-OS/RIOT/pull/5582
+diff --git a/net/ieee802154/nl802154.c b/net/ieee802154/nl802154.c
+index 0d9becd678e3..64fa811e1f0b 100644
+--- a/net/ieee802154/nl802154.c
++++ b/net/ieee802154/nl802154.c
+@@ -187,8 +187,8 @@ static const struct nla_policy nl802154_policy[NL802154_ATTR_MAX+1] = {
+ 
+ 	[NL802154_ATTR_WPAN_DEV] = { .type = NLA_U64 },
+ 
+-	[NL802154_ATTR_PAGE] = { .type = NLA_U8, },
+-	[NL802154_ATTR_CHANNEL] = { .type = NLA_U8, },
++	[NL802154_ATTR_PAGE] = NLA_POLICY_MAX(NLA_U8, IEEE802154_MAX_PAGE),
++	[NL802154_ATTR_CHANNEL] = NLA_POLICY_MAX(NLA_U8, IEEE802154_MAX_CHANNEL),
+ 
+ 	[NL802154_ATTR_TX_POWER] = { .type = NLA_S32, },
+ 
+@@ -221,13 +221,19 @@ static const struct nla_policy nl802154_policy[NL802154_ATTR_MAX+1] = {
+ 
+ 	[NL802154_ATTR_COORDINATOR] = { .type = NLA_NESTED },
+ 
+-	[NL802154_ATTR_SCAN_TYPE] = { .type = NLA_U8 },
+-	[NL802154_ATTR_SCAN_CHANNELS] = { .type = NLA_U32 },
+-	[NL802154_ATTR_SCAN_PREAMBLE_CODES] = { .type = NLA_U64 },
+-	[NL802154_ATTR_SCAN_MEAN_PRF] = { .type = NLA_U8 },
+-	[NL802154_ATTR_SCAN_DURATION] = { .type = NLA_U8 },
+-	[NL802154_ATTR_SCAN_DONE_REASON] = { .type = NLA_U8 },
+-	[NL802154_ATTR_BEACON_INTERVAL] = { .type = NLA_U8 },
++	[NL802154_ATTR_SCAN_TYPE] =
++		NLA_POLICY_RANGE(NLA_U8, NL802154_SCAN_ED, NL802154_SCAN_RIT_PASSIVE),
++	[NL802154_ATTR_SCAN_CHANNELS] =
++		NLA_POLICY_MASK(NLA_U32, GENMASK(IEEE802154_MAX_CHANNEL, 0)),
++	[NL802154_ATTR_SCAN_PREAMBLE_CODES] = { .type = NLA_REJECT },
++	[NL802154_ATTR_SCAN_MEAN_PRF] = { .type = NLA_REJECT },
++	[NL802154_ATTR_SCAN_DURATION] =
++		NLA_POLICY_MAX(NLA_U8, IEEE802154_MAX_SCAN_DURATION),
++	[NL802154_ATTR_SCAN_DONE_REASON] =
++		NLA_POLICY_RANGE(NLA_U8, NL802154_SCAN_DONE_REASON_FINISHED,
++				 NL802154_SCAN_DONE_REASON_ABORTED),
++	[NL802154_ATTR_BEACON_INTERVAL] =
++		NLA_POLICY_MAX(NLA_U8, IEEE802154_MAX_SCAN_DURATION),
+ 
+ #ifdef CONFIG_IEEE802154_NL802154_EXPERIMENTAL
+ 	[NL802154_ATTR_SEC_ENABLED] = { .type = NLA_U8, },
+@@ -1423,51 +1429,23 @@ static int nl802154_trigger_scan(struct sk_buff *skb, struct genl_info *info)
+ 		goto free_request;
+ 	}
+ 
+-	if (info->attrs[NL802154_ATTR_PAGE]) {
++	/* Use current page by default */
++	if (info->attrs[NL802154_ATTR_PAGE])
+ 		request->page = nla_get_u8(info->attrs[NL802154_ATTR_PAGE]);
+-		if (request->page > IEEE802154_MAX_PAGE) {
+-			pr_err("Invalid page %d > %d\n",
+-			       request->page, IEEE802154_MAX_PAGE);
+-			err = -EINVAL;
+-			goto free_request;
+-		}
+-	} else {
+-		/* Use current page by default */
++	else
+ 		request->page = wpan_phy->current_page;
+-	}
+ 
+-	if (info->attrs[NL802154_ATTR_SCAN_CHANNELS]) {
++	/* Scan all supported channels by default */
++	if (info->attrs[NL802154_ATTR_SCAN_CHANNELS])
+ 		request->channels = nla_get_u32(info->attrs[NL802154_ATTR_SCAN_CHANNELS]);
+-		if (request->channels >= BIT(IEEE802154_MAX_CHANNEL + 1)) {
+-			pr_err("Invalid channels bitfield %x ≥ %lx\n",
+-			       request->channels,
+-			       BIT(IEEE802154_MAX_CHANNEL + 1));
+-			err = -EINVAL;
+-			goto free_request;
+-		}
+-	} else {
+-		/* Scan all supported channels by default */
++	else
+ 		request->channels = wpan_phy->supported.channels[request->page];
+-	}
+ 
+-	if (info->attrs[NL802154_ATTR_SCAN_PREAMBLE_CODES] ||
+-	    info->attrs[NL802154_ATTR_SCAN_MEAN_PRF]) {
+-		pr_err("Preamble codes and mean PRF not supported yet\n");
+-		err = -EINVAL;
+-		goto free_request;
+-	}
+-
+-	if (info->attrs[NL802154_ATTR_SCAN_DURATION]) {
++	/* Use maximum duration order by default */
++	if (info->attrs[NL802154_ATTR_SCAN_DURATION])
+ 		request->duration = nla_get_u8(info->attrs[NL802154_ATTR_SCAN_DURATION]);
+-		if (request->duration > IEEE802154_MAX_SCAN_DURATION) {
+-			pr_err("Duration is out of range\n");
+-			err = -EINVAL;
+-			goto free_request;
+-		}
+-	} else {
+-		/* Use maximum duration order by default */
++	else
+ 		request->duration = IEEE802154_MAX_SCAN_DURATION;
+-	}
+ 
+ 	if (wpan_dev->netdev)
+ 		dev_hold(wpan_dev->netdev);
+@@ -1614,17 +1592,11 @@ nl802154_send_beacons(struct sk_buff *skb, struct genl_info *info)
+ 	request->wpan_dev = wpan_dev;
+ 	request->wpan_phy = wpan_phy;
+ 
+-	if (info->attrs[NL802154_ATTR_BEACON_INTERVAL]) {
++	/* Use maximum duration order by default */
++	if (info->attrs[NL802154_ATTR_BEACON_INTERVAL])
+ 		request->interval = nla_get_u8(info->attrs[NL802154_ATTR_BEACON_INTERVAL]);
+-		if (request->interval > IEEE802154_MAX_SCAN_DURATION) {
+-			pr_err("Interval is out of range\n");
+-			err = -EINVAL;
+-			goto free_request;
+-		}
+-	} else {
+-		/* Use maximum duration order by default */
++	else
+ 		request->interval = IEEE802154_MAX_SCAN_DURATION;
+-	}
+ 
+ 	if (wpan_dev->netdev)
+ 		dev_hold(wpan_dev->netdev);
+@@ -1640,7 +1612,7 @@ nl802154_send_beacons(struct sk_buff *skb, struct genl_info *info)
+ free_device:
+ 	if (wpan_dev->netdev)
+ 		dev_put(wpan_dev->netdev);
+-free_request:
++
+ 	kfree(request);
+ 
+ 	return err;
+-- 
+2.34.1
 
