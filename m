@@ -2,33 +2,33 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1CB7C05027
-	for <linux-wpan@archiver.kernel.org>; Tue, 14 Feb 2023 13:53:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41279C61DA4
+	for <linux-wpan@archiver.kernel.org>; Tue, 14 Feb 2023 13:53:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232708AbjBNNxS (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 14 Feb 2023 08:53:18 -0500
+        id S232742AbjBNNxU (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 14 Feb 2023 08:53:20 -0500
 Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34506 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231882AbjBNNxS (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 14 Feb 2023 08:53:18 -0500
+        with ESMTP id S229617AbjBNNxT (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 14 Feb 2023 08:53:19 -0500
 Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::222])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2BCA28D23;
-        Tue, 14 Feb 2023 05:52:37 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E03A29170;
+        Tue, 14 Feb 2023 05:52:39 -0800 (PST)
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id 075E640016;
-        Tue, 14 Feb 2023 13:50:41 +0000 (UTC)
+        by mail.gandi.net (Postfix) with ESMTPSA id 816A640015;
+        Tue, 14 Feb 2023 13:50:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1676382643;
+        t=1676382647;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ttQT6PrK+hAQq43MOEP7Y9u/hPR5qx2x6Cro9K6qgG4=;
-        b=Oy9L80i9DKsoQY4y14r1kAazDNb8IX8mpenXBBc5Aru16NsAUcwx0lhNosAGh87B1BX4PS
-        w+ICqKV1JaavTtx47wIF7/KrAmKHxXMOq+PfO1VAHT/gSf8/Mn5g0/MNfCiuy2k5ivueVv
-        ppb4LTXXj3pJt+s9pWRxSkvFkqpdO7EPNlf6cWQdoRxtZT3MCNmHL36WxUqLZ3lqJUNk/p
-        v/AR9+PIHgacqjuJLuGDVvwjODEI05WeTn424xAYn3upy//Tzcee4PEKZo8Y91a80+Evlp
-        XkzfDLXiwBisDK6wXvv8LUKrWNq18BZ+AtF4DlLiw+Q0szxrkNRfhssoiJdlig==
+        bh=wq+SKf3vf+lFAS/vWNOnFCny2dlF5S/lb2Dtsoo7REE=;
+        b=aHo/ikJCgHJ/df5EfpfRWkRMrRcLPS6ibBFcIuosEqotsGxFGCbA7dvkJHIYqsd3fSwlku
+        P5o14FCRKaoCwIZq2xXnbPS1pfqYWfSdPJqwglN/b97xrUJYy25Ra2yfw/aHDsfgTgl7Ug
+        BTQuo6Q0lUgZB3P7D6+r/lNkQxapoPyoaqzg7wD0GUJHTU24a51UAQp6qRHToNN6VNKfdr
+        x0Vac1Ah6DI6hhd6l/lb4hj1gMfhHtex9/bKxBhMLI9gc5tSeMwmFd+uoAwER8yPSoT/h2
+        3V5iO6V8A/8Cs9hthH74aobz4jCA4qm+oYQM5uT1iEA9PvExXzVNb8YGf78GIg==
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
 To:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
@@ -43,10 +43,11 @@ Cc:     "David S. Miller" <davem@davemloft.net>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
         Guilhem Imberton <guilhem.imberton@qorvo.com>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-        Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: [PATCH wpan v2 2/6] ieee802154: Convert scan error messages to extack
-Date:   Tue, 14 Feb 2023 14:50:31 +0100
-Message-Id: <20230214135035.1202471-3-miquel.raynal@bootlin.com>
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        Alexander Aring <aahringo@redhat.com>
+Subject: [PATCH wpan v2 4/6] mac802154: Send beacons using the MLME Tx path
+Date:   Tue, 14 Feb 2023 14:50:33 +0100
+Message-Id: <20230214135035.1202471-5-miquel.raynal@bootlin.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230214135035.1202471-1-miquel.raynal@bootlin.com>
 References: <20230214135035.1202471-1-miquel.raynal@bootlin.com>
@@ -56,68 +57,52 @@ Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Instead of printing error messages in the kernel log, let's use extack.
-When there is a netlink error returned that could be further specified
-with a string, use extack as well.
+Using ieee802154_subif_start_xmit() to bypass the net queue when
+sending beacons is broken because it does not acquire the
+HARD_TX_LOCK(), hence not preventing datagram buffers to be smashed by
+beacons upon contention situation. Using the mlme_tx helper is not the
+best fit either but at least it is not buggy and has little-to-no
+performance hit. More details are given in the comment explaining this
+choice in the code.
 
-Apply this logic to the very recent scan/beacon infrastructure.
-
-Fixes: ed3557c947e1 ("ieee802154: Add support for user scanning requests")
-Fixes: 9bc114504b07 ("ieee802154: Add support for user beaconing requests")
-Suggested-by: Jakub Kicinski <kuba@kernel.org>
+Fixes: 3accf4762734 ("mac802154: Handle basic beaconing")
+Reported-by: Alexander Aring <aahringo@redhat.com>
 Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
 ---
- net/ieee802154/nl802154.c | 19 +++++++++++++------
- 1 file changed, 13 insertions(+), 6 deletions(-)
+ net/mac802154/scan.c | 20 +++++++++++++++++++-
+ 1 file changed, 19 insertions(+), 1 deletion(-)
 
-diff --git a/net/ieee802154/nl802154.c b/net/ieee802154/nl802154.c
-index 64fa811e1f0b..d3b6e9e80941 100644
---- a/net/ieee802154/nl802154.c
-+++ b/net/ieee802154/nl802154.c
-@@ -1407,9 +1407,15 @@ static int nl802154_trigger_scan(struct sk_buff *skb, struct genl_info *info)
- 	u8 type;
- 	int err;
- 
--	/* Monitors are not allowed to perform scans */
--	if (wpan_dev->iftype == NL802154_IFTYPE_MONITOR)
-+	if (wpan_dev->iftype == NL802154_IFTYPE_MONITOR) {
-+		NL_SET_ERR_MSG(info->extack, "Monitors are not allowed to perform scans");
- 		return -EPERM;
-+	}
-+
-+	if (!nla_get_u8(info->attrs[NL802154_ATTR_SCAN_TYPE])) {
-+		NL_SET_ERR_MSG(info->extack, "Malformed request, missing scan type");
-+		return -EINVAL;
-+	}
- 
- 	request = kzalloc(sizeof(*request), GFP_KERNEL);
- 	if (!request)
-@@ -1424,7 +1430,7 @@ static int nl802154_trigger_scan(struct sk_buff *skb, struct genl_info *info)
- 		request->type = type;
- 		break;
- 	default:
--		pr_err("Unsupported scan type: %d\n", type);
-+		NL_SET_ERR_MSG_FMT(info->extack, "Unsupported scan type: %d", type);
- 		err = -EINVAL;
- 		goto free_request;
- 	}
-@@ -1576,12 +1582,13 @@ nl802154_send_beacons(struct sk_buff *skb, struct genl_info *info)
- 	struct cfg802154_beacon_request *request;
- 	int err;
- 
--	/* Only coordinators can send beacons */
--	if (wpan_dev->iftype != NL802154_IFTYPE_COORD)
-+	if (wpan_dev->iftype != NL802154_IFTYPE_COORD) {
-+		NL_SET_ERR_MSG(info->extack, "Only coordinators can send beacons");
- 		return -EOPNOTSUPP;
-+	}
- 
- 	if (wpan_dev->pan_id == cpu_to_le16(IEEE802154_PANID_BROADCAST)) {
--		pr_err("Device is not part of any PAN\n");
-+		NL_SET_ERR_MSG(info->extack, "Device is not part of any PAN");
- 		return -EPERM;
+diff --git a/net/mac802154/scan.c b/net/mac802154/scan.c
+index 8f98efec7753..fff41e59099e 100644
+--- a/net/mac802154/scan.c
++++ b/net/mac802154/scan.c
+@@ -326,7 +326,25 @@ static int mac802154_transmit_beacon(struct ieee802154_local *local,
+ 		return ret;
  	}
  
+-	return ieee802154_subif_start_xmit(skb, sdata->dev);
++	/* Using the MLME transmission helper for sending beacons is a bit
++	 * overkill because we do not really care about the final outcome.
++	 *
++	 * Even though, going through the whole net stack with a regular
++	 * dev_queue_xmit() is not relevant either because we want beacons to be
++	 * sent "now" rather than go through the whole net stack scheduling
++	 * (qdisc & co).
++	 *
++	 * Finally, using ieee802154_subif_start_xmit() would only be an option
++	 * if we had a generic transmit helper which would acquire the
++	 * HARD_TX_LOCK() to prevent buffer handling conflicts with regular
++	 * packets.
++	 *
++	 * So for now we keep it simple and send beacons with our MLME helper,
++	 * even if it stops the ieee802154 queue entirely during these
++	 * transmissions, wich anyway does not have a huge impact on the
++	 * performances given the current design of the stack.
++	 */
++	return ieee802154_mlme_tx(local, sdata, skb);
+ }
+ 
+ void mac802154_beacon_worker(struct work_struct *work)
 -- 
 2.34.1
 
