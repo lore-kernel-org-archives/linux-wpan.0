@@ -2,57 +2,49 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 103D2C64EC4
-	for <linux-wpan@archiver.kernel.org>; Wed, 15 Feb 2023 15:52:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC4F3C636CC
+	for <linux-wpan@archiver.kernel.org>; Wed, 15 Feb 2023 16:00:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229503AbjBOPwp (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 15 Feb 2023 10:52:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40184 "EHLO
+        id S229989AbjBOQAH (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 15 Feb 2023 11:00:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46802 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229635AbjBOPwo (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 15 Feb 2023 10:52:44 -0500
-Received: from mail-ua1-x932.google.com (mail-ua1-x932.google.com [IPv6:2607:f8b0:4864:20::932])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8EEA237573
-        for <linux-wpan@vger.kernel.org>; Wed, 15 Feb 2023 07:52:41 -0800 (PST)
-Received: by mail-ua1-x932.google.com with SMTP id b18so3670380uan.11
-        for <linux-wpan@vger.kernel.org>; Wed, 15 Feb 2023 07:52:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20210112.gappssmtp.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=QHEckESBmtanHoXNoCvk3gYsaCb3mmNnsjrBL0CHXHo=;
-        b=uFE2tcYXYvgsB0sRGahu4i6/jR0i1fWRumRbB6+LOj6E4ZTQeoJQKY+uir8dwyQAPf
-         0tFSiyKW/Fnvdx7G9YqrFDzJ5rpovQR98oqoI9mDNOHpQoG6qkudJ1v0/vpv9DTZyvHu
-         2FZ5pBhMrW+AwLQ0UHgvstufkVnkWswfeG6NT/qsFhsMW+RqE4zXszDTo9BrlFUTp25+
-         B7HTBOKfeZtBkRm441r7YFaJc0rXVKo3xjPJcpiXV6JNc9DsILiJLKJHBFrcxHls+m2Y
-         ZP+U/dMUytGegPXffNuxumCFe0jCae7w9HsecNZLfJZoIChNvNanAquRYPfNiHANjZr/
-         6auA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=QHEckESBmtanHoXNoCvk3gYsaCb3mmNnsjrBL0CHXHo=;
-        b=TjAE+tagElbAKGn/cL8SOSnPedj3QwJvMo1F6ohDSigNjINiZiSGTkRUv3U17mUmKG
-         BarnEJLgp8CW74kXA9bJRXGYLLLsseKAxM91QgdwoQ38t4zmCTOLg0svwbao80GLmsEZ
-         qlU+yjHnrDyHMNXEJylkqmqbqA41tz3P01uvVuJLGGLYRsweh2SrJvpaj+//okgZeoKG
-         qs6+NgaiPIlyw/5tAu1nQ0Ch3kA3McMQlWwo7j3HL0qgKaC9yxi4ODEJQToKihKizL7n
-         Glp9KwBGiqYwBFlwe+nS9kLWRLBevLstv7OBIqz7i4UrpNYyHDppv8JyEHPsk1jq22Ku
-         Q49w==
-X-Gm-Message-State: AO0yUKXj56ISFG8aamxC22hpF+wO5NILZymQ1X4NO3NOkaKttyVBi3G9
-        qRrFBxdfHSVsgfk+S6ygV/+3mk8poVphKqsKBLnmdQ==
-X-Google-Smtp-Source: AK7set+vnGRn5VJvyu0QxjkbABjPQvrEocRoV7wexNKYGw75YkBBJD0qPPmjAkmta0f6ajtUkrNDoiyJSIKAB5KOn4A=
-X-Received: by 2002:ab0:654d:0:b0:68a:7054:58a6 with SMTP id
- x13-20020ab0654d000000b0068a705458a6mr367631uap.22.1676476360679; Wed, 15 Feb
- 2023 07:52:40 -0800 (PST)
-MIME-Version: 1.0
-References: <20230208173343.37582-1-andriy.shevchenko@linux.intel.com>
-In-Reply-To: <20230208173343.37582-1-andriy.shevchenko@linux.intel.com>
-From:   Bartosz Golaszewski <brgl@bgdev.pl>
-Date:   Wed, 15 Feb 2023 16:52:29 +0100
-Message-ID: <CAMRc=MdsCZKh12QcqdWk+Zht5UDpA_G1+rx6+_3dzwjDYe6L+Q@mail.gmail.com>
-Subject: Re: [PATCH v4 00/18] gpiolib cleanups
-To:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+        with ESMTP id S229940AbjBOQAD (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 15 Feb 2023 11:00:03 -0500
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 594FA3A86E;
+        Wed, 15 Feb 2023 07:59:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1676476790; x=1708012790;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=rFzlPJjklUrRYXlztiXxbWF4vZTLJe24dy5KZSKBFTU=;
+  b=a2QbX3wd6aUC0XQJ2qfsU00tzCVvCSv9F3xqk4Z83a8t6xUnXvoVdf4i
+   NBxzdPdWCGWw2G0+a2FRuc48aS6+5zJjMUsAUU4x7VaRvR1kt0dzcZeE4
+   jHo1zYFgV07HaGAbi4BPBks+qZO9fn82e64Aa8yl7lKBMwgcsv+zV9IxW
+   OiuiwgzZBscUVew/h/YbZuv2dJSiEXos8iy5r5aT66TiKYAAe654m+i11
+   7/wVHEjSAu+ZufvrTjIJdAAaHjX6IYCkPCwqy3u3/8UDxpT3SMTZUn4cD
+   5pGtrG081KVPyAUVsBJtZcBo/nzky/lMvsHKB6yLBlnvLINeQJm0/k0wE
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10622"; a="331461160"
+X-IronPort-AV: E=Sophos;i="5.97,300,1669104000"; 
+   d="scan'208";a="331461160"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Feb 2023 07:59:49 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10622"; a="700017813"
+X-IronPort-AV: E=Sophos;i="5.97,300,1669104000"; 
+   d="scan'208";a="700017813"
+Received: from smile.fi.intel.com ([10.237.72.54])
+  by orsmga008.jf.intel.com with ESMTP; 15 Feb 2023 07:59:31 -0800
+Received: from andy by smile.fi.intel.com with local (Exim 4.96)
+        (envelope-from <andriy.shevchenko@linux.intel.com>)
+        id 1pSKBp-007KF7-0b;
+        Wed, 15 Feb 2023 17:59:25 +0200
+Date:   Wed, 15 Feb 2023 17:59:24 +0200
+From:   Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To:     Bartosz Golaszewski <brgl@bgdev.pl>
 Cc:     Arnd Bergmann <arnd@arndb.de>,
         Linus Walleij <linus.walleij@linaro.org>,
         Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
@@ -113,30 +105,48 @@ Cc:     Arnd Bergmann <arnd@arndb.de>,
         Kalle Valo <kvalo@kernel.org>, Qiang Zhao <qiang.zhao@nxp.com>,
         Li Yang <leoyang.li@nxp.com>, Rob Herring <robh+dt@kernel.org>,
         Frank Rowand <frowand.list@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH v4 00/18] gpiolib cleanups
+Message-ID: <Y+0BXGLf2n+dAi4v@smile.fi.intel.com>
+References: <20230208173343.37582-1-andriy.shevchenko@linux.intel.com>
+ <CAMRc=MdsCZKh12QcqdWk+Zht5UDpA_G1+rx6+_3dzwjDYe6L+Q@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAMRc=MdsCZKh12QcqdWk+Zht5UDpA_G1+rx6+_3dzwjDYe6L+Q@mail.gmail.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-On Wed, Feb 8, 2023 at 6:34 PM Andy Shevchenko
-<andriy.shevchenko@linux.intel.com> wrote:
->
-> These are some older patches Arnd did last year, rebased to
-> linux-next-20230208. On top there are Andy's patches regarding
-> similar topic. The series starts with Linus Walleij's patches.
->
-> The main goal is to remove some of the legacy bits of the gpiolib
-> interfaces, where the corner cases are easily avoided or replaced
-> with gpio descriptor based interfaces.
->
-> The idea is to get an immutable branch and route the whole series
-> via GPIO tree.
->
+On Wed, Feb 15, 2023 at 04:52:29PM +0100, Bartosz Golaszewski wrote:
+> On Wed, Feb 8, 2023 at 6:34 PM Andy Shevchenko
+> <andriy.shevchenko@linux.intel.com> wrote:
+> >
+> > These are some older patches Arnd did last year, rebased to
+> > linux-next-20230208. On top there are Andy's patches regarding
+> > similar topic. The series starts with Linus Walleij's patches.
+> >
+> > The main goal is to remove some of the legacy bits of the gpiolib
+> > interfaces, where the corner cases are easily avoided or replaced
+> > with gpio descriptor based interfaces.
+> >
+> > The idea is to get an immutable branch and route the whole series
+> > via GPIO tree.
+> 
+> Andy,
+> 
+> looks like this series has all the acks it needs but I decided to not
+> send it in the upcoming merge window, I'd prefer it gets some time in
+> next so I'll let it sit until the next release cycle.
 
-Andy,
+Ah, I forgot to mention that this is for the next cycle (v6.4).
+Hence it's fine. (Moreover it's based on Linux Next, so it will
+fail compilation in any certain tree except that one.)
 
-looks like this series has all the acks it needs but I decided to not
-send it in the upcoming merge window, I'd prefer it gets some time in
-next so I'll let it sit until the next release cycle.
+I will create an immutable branch after v6.3-rc1 is out.
 
-Bart
+-- 
+With Best Regards,
+Andy Shevchenko
+
+
