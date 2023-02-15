@@ -2,196 +2,139 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4716EC05027
-	for <linux-wpan@archiver.kernel.org>; Tue, 14 Feb 2023 14:46:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D15F3C636CC
+	for <linux-wpan@archiver.kernel.org>; Wed, 15 Feb 2023 14:19:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233238AbjBNOql (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 14 Feb 2023 09:46:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42476 "EHLO
+        id S229579AbjBOOTY (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 15 Feb 2023 09:19:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53974 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233278AbjBNOqj (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 14 Feb 2023 09:46:39 -0500
-Received: from relay11.mail.gandi.net (relay11.mail.gandi.net [217.70.178.231])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8328B3586;
-        Tue, 14 Feb 2023 06:46:37 -0800 (PST)
-Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id 4D876100002;
-        Tue, 14 Feb 2023 14:46:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1676385996;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=SPvjzojXQ8S13JvGk/gXuqmumm1P/PXJpYOc68WCiDo=;
-        b=CKHuUTv0AVaxcYKxL7UDhLeX2kE5L8SAPs1ySRf1X/aghkeo5F8uP/eRiDf0FPyjQ56f1e
-        FBlnHcDB6Up+m3LkbzPYsdMVO9cwtpYYZVCSnW2RkkRIEI4a/wNA8K9dtCIgh2hf9i2hjj
-        QDlyNAP24XfNa6mYLbVQmFzxbXVvBG1EDV/mWMn8+sVjs66meCarkOYFZNnqDzrA4hd02o
-        wZGBuiqexEohRYFf6AZ1MM+6f3PTYhnyzECX4yWnckbOjaYUMg9qXzNZLl6VIemoWZCusW
-        wtf0UGM3Os5W4LiIddnLlYukMWzAmoRYEnfjDXHSn+mKW7Lxp64nWYB7wuDXLg==
-Date:   Tue, 14 Feb 2023 15:46:32 +0100
-From:   Miquel Raynal <miquel.raynal@bootlin.com>
-To:     Alexander Aring <aahringo@redhat.com>
-Cc:     Alexander Aring <alex.aring@gmail.com>,
-        Stefan Schmidt <stefan@datenfreihafen.org>,
-        linux-wpan@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
-        David Girault <david.girault@qorvo.com>,
-        Romuald Despres <romuald.despres@qorvo.com>,
-        Frederic Blain <frederic.blain@qorvo.com>,
-        Nicolas Schodet <nico@ni.fr.eu.org>,
-        Guilhem Imberton <guilhem.imberton@qorvo.com>,
-        Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH wpan-next 1/6] ieee802154: Add support for user scanning
- requests
-Message-ID: <20230214154632.69e8e339@xps-13>
-In-Reply-To: <20230214150600.1c21066b@xps-13>
-References: <20221129160046.538864-1-miquel.raynal@bootlin.com>
-        <20221129160046.538864-2-miquel.raynal@bootlin.com>
-        <CAK-6q+iwqVx+6qQ-ctynykdrbN+SHxzk91gQCSdYCUD-FornZA@mail.gmail.com>
-        <20230206101235.0371da87@xps-13>
-        <CAK-6q+jav4yJD3MsOssyBobg1zGqKC5sm-xCRYX1SCkH9GhmHw@mail.gmail.com>
-        <CAK-6q+jbcMZK16pfZTb5v8-jvhmvk9-USr6hZE34H1MOrpF=JQ@mail.gmail.com>
-        <20230213183535.05e62c1c@xps-13>
-        <CAK-6q+hkJpqNG9nO_ugngjGQ_q9VdLu+xDjmD09MT+5=tvd0QA@mail.gmail.com>
-        <CAK-6q+jU7-ETKeoM=MLmfyMUqywteBC8sUAndRF1vx0PgA+WAA@mail.gmail.com>
-        <20230214150600.1c21066b@xps-13>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+        with ESMTP id S229462AbjBOOTW (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 15 Feb 2023 09:19:22 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 610FB6181;
+        Wed, 15 Feb 2023 06:19:21 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id EE53961C33;
+        Wed, 15 Feb 2023 14:19:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E56C4C4339B;
+        Wed, 15 Feb 2023 14:19:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1676470760;
+        bh=gQEel9EdWJL6nindAVV89iHXQOyC9ETUfqvkvbtD2gg=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=PEGQwrEr7+4WeFzY/RpUMkgnLnkz3fghVF7WJBwbfnBSFv/l/K9ykEmLj7kWn6gss
+         boN+28fkVXq2qh9YXa3j66y4Hj/kpEL9EYG3AiTTfxOrke1JcvDKQydudVbzQ17IGH
+         ZL4MG5W5BmvBAd6rx1y4zhrf/hs2iovXQ0Y1T2Z28UEqyKBjNDQkO60YWp04Z15os0
+         LITBxJhiNSW/UvxDu/uH5bdF9unqvUhGcL4wXv6m2shBXdbZI7J9XcZ3STxeTl72a0
+         U4bJYIhivyPi3krbtjRY1d/s/g+7MAdiLn1pDItsS9gGz71pmYvlLxV6SmGbJp+ikl
+         VT4QJaIeWDiZw==
+Date:   Wed, 15 Feb 2023 14:19:16 +0000
+From:   Mark Brown <broonie@kernel.org>
+To:     Amit Kumar Mahapatra <amit.kumar-mahapatra@amd.com>
+Cc:     miquel.raynal@bootlin.com, richard@nod.at, vigneshr@ti.com,
+        jic23@kernel.org, tudor.ambarus@microchip.com, pratyush@kernel.org,
+        sanju.mehta@amd.com, chin-ting_kuo@aspeedtech.com, clg@kaod.org,
+        kdasu.kdev@gmail.com, f.fainelli@gmail.com, rjui@broadcom.com,
+        sbranden@broadcom.com, eajames@linux.ibm.com, olteanv@gmail.com,
+        han.xu@nxp.com, john.garry@huawei.com, shawnguo@kernel.org,
+        s.hauer@pengutronix.de, narmstrong@baylibre.com,
+        khilman@baylibre.com, matthias.bgg@gmail.com, haibo.chen@nxp.com,
+        linus.walleij@linaro.org, daniel@zonque.org,
+        haojian.zhuang@gmail.com, robert.jarzmik@free.fr,
+        agross@kernel.org, bjorn.andersson@linaro.org, heiko@sntech.de,
+        krzysztof.kozlowski@linaro.org, andi@etezian.org,
+        mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
+        wens@csie.org, jernej.skrabec@gmail.com, samuel@sholland.org,
+        masahisa.kojima@linaro.org, jaswinder.singh@linaro.org,
+        rostedt@goodmis.org, mingo@redhat.com, l.stelmach@samsung.com,
+        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com, alex.aring@gmail.com, stefan@datenfreihafen.org,
+        kvalo@kernel.org, james.schulman@cirrus.com,
+        david.rhodes@cirrus.com, tanureal@opensource.cirrus.com,
+        rf@opensource.cirrus.com, perex@perex.cz, tiwai@suse.com,
+        npiggin@gmail.com, christophe.leroy@csgroup.eu, mpe@ellerman.id.au,
+        oss@buserror.net, windhl@126.com, yangyingliang@huawei.com,
+        git@amd.com, linux-spi@vger.kernel.org,
+        linux-kernel@vger.kernel.org, joel@jms.id.au, andrew@aj.id.au,
+        radu_nicolae.pirea@upb.ro, nicolas.ferre@microchip.com,
+        alexandre.belloni@bootlin.com, claudiu.beznea@microchip.com,
+        bcm-kernel-feedback-list@broadcom.com, fancer.lancer@gmail.com,
+        kernel@pengutronix.de, festevam@gmail.com, linux-imx@nxp.com,
+        jbrunet@baylibre.com, martin.blumenstingl@googlemail.com,
+        avifishman70@gmail.com, tmaimon77@gmail.com, tali.perry1@gmail.com,
+        venture@google.com, yuenn@google.com, benjaminfair@google.com,
+        yogeshgaur.83@gmail.com, konrad.dybcio@somainline.org,
+        alim.akhtar@samsung.com, ldewangan@nvidia.com,
+        thierry.reding@gmail.com, jonathanh@nvidia.com,
+        michal.simek@amd.com, linux-aspeed@lists.ozlabs.org,
+        openbmc@lists.ozlabs.org, linux-arm-kernel@lists.infradead.org,
+        linux-rpi-kernel@lists.infradead.org,
+        linux-amlogic@lists.infradead.org,
+        linux-mediatek@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+        linux-rockchip@lists.infradead.org,
+        linux-samsung-soc@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-sunxi@lists.linux.dev, linux-tegra@vger.kernel.org,
+        netdev@vger.kernel.org, linux-wpan@vger.kernel.org,
+        libertas-dev@lists.infradead.org, linux-wireless@vger.kernel.org,
+        linux-mtd@lists.infradead.org, lars@metafoo.de,
+        Michael.Hennerich@analog.com, linux-iio@vger.kernel.org,
+        michael@walle.cc, palmer@dabbelt.com,
+        linux-riscv@lists.infradead.org, alsa-devel@alsa-project.org,
+        patches@opensource.cirrus.com, linuxppc-dev@lists.ozlabs.org,
+        amitrkcian2002@gmail.com, Dhruva Gole <d-gole@ti.com>,
+        Patrice Chotard <patrice.chotard@foss.st.com>,
+        William Zhang <william.zhang@broadcom.com>
+Subject: Re: [PATCH v4 01/15] spi: Replace all spi->chip_select and
+ spi->cs_gpiod references with function call
+Message-ID: <Y+zp5F2l8pffEEvN@sirena.org.uk>
+References: <20230210193647.4159467-1-amit.kumar-mahapatra@amd.com>
+ <20230210193647.4159467-2-amit.kumar-mahapatra@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="mHMK7QDQWaz9I52Q"
+Content-Disposition: inline
+In-Reply-To: <20230210193647.4159467-2-amit.kumar-mahapatra@amd.com>
+X-Cookie: Serving suggestion.
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
 
-miquel.raynal@bootlin.com wrote on Tue, 14 Feb 2023 15:06:00 +0100:
+--mHMK7QDQWaz9I52Q
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-> Hi Alexander,
->=20
-> aahringo@redhat.com wrote on Tue, 14 Feb 2023 08:53:57 -0500:
->=20
-> > Hi,
-> >=20
-> > On Tue, Feb 14, 2023 at 8:34 AM Alexander Aring <aahringo@redhat.com> w=
-rote: =20
-> > >
-> > > Hi,
-> > >
-> > > On Mon, Feb 13, 2023 at 12:35 PM Miquel Raynal
-> > > <miquel.raynal@bootlin.com> wrote:   =20
-> > > >
-> > > > Hi Alexander,
-> > > >   =20
-> > > > > > > > > +static int nl802154_trigger_scan(struct sk_buff *skb, st=
-ruct genl_info *info)
-> > > > > > > > > +{
-> > > > > > > > > +       struct cfg802154_registered_device *rdev =3D info=
-->user_ptr[0];
-> > > > > > > > > +       struct net_device *dev =3D info->user_ptr[1];
-> > > > > > > > > +       struct wpan_dev *wpan_dev =3D dev->ieee802154_ptr;
-> > > > > > > > > +       struct wpan_phy *wpan_phy =3D &rdev->wpan_phy;
-> > > > > > > > > +       struct cfg802154_scan_request *request;
-> > > > > > > > > +       u8 type;
-> > > > > > > > > +       int err;
-> > > > > > > > > +
-> > > > > > > > > +       /* Monitors are not allowed to perform scans */
-> > > > > > > > > +       if (wpan_dev->iftype =3D=3D NL802154_IFTYPE_MONIT=
-OR)
-> > > > > > > > > +               return -EPERM;   =20
-> > > > > > > >
-> > > > > > > > btw: why are monitors not allowed?   =20
-> > > > > > >
-> > > > > > > I guess I had the "active scan" use case in mind which of cou=
-rse does
-> > > > > > > not work with monitors. Maybe I can relax this a little bit i=
-ndeed,
-> > > > > > > right now I don't remember why I strongly refused scans on mo=
-nitors.   =20
-> > > > > >
-> > > > > > Isn't it that scans really work close to phy level? Means in th=
-is case
-> > > > > > we disable mostly everything of MAC filtering on the transceive=
-r side.
-> > > > > > Then I don't see any reasons why even monitors can't do anythin=
-g, they
-> > > > > > also can send something. But they really don't have any specific
-> > > > > > source address set, so long addresses are none for source addre=
-sses, I
-> > > > > > don't see any problem here. They also don't have AACK handling,=
- but
-> > > > > > it's not required for scan anyway...
-> > > > > >
-> > > > > > If this gets too complicated right now, then I am also fine with
-> > > > > > returning an error here, we can enable it later but would it be=
- better
-> > > > > > to use ENOTSUPP or something like that in this case? EPERM soun=
-ds like
-> > > > > > you can do that, but you don't have the permissions.
-> > > > > >   =20
-> > > > >
-> > > > > For me a scan should also be possible from iwpan phy $PHY scan (or
-> > > > > whatever the scan command is, or just enable beacon)... to go ove=
-r the
-> > > > > dev is just a shortcut for "I mean whatever the phy is under this=
- dev"
-> > > > > ?   =20
-> > > >
-> > > > Actually only coordinators (in a specific state) should be able to =
-send
-> > > > beacons, so I am kind of against allowing that shortcut, because th=
-ere
-> > > > are usually two dev interfaces on top of the phy's, a regular "NODE"
-> > > > and a "COORD", so I don't think we should go that way.
-> > > >
-> > > > For scans however it makes sense, I've added the necessary changes =
-in
-> > > > wpan-tools. The TOP_LEVEL(scan) macro however does not support using
-> > > > the same command name twice because it creates a macro, so this one
-> > > > only supports a device name (the interface command has kind of the =
-same
-> > > > situation and uses a HIDDEN() macro which cannot be used here).
-> > > >   =20
-> > >
-> > > Yes, I was thinking about scanning only.
-> > >   =20
-> > > > So in summary here is what is supported:
-> > > > - dev <dev> beacon
-> > > > - dev <dev> scan trigger|abort
-> > > > - phy <phy> scan trigger|abort
-> > > > - dev <dev> scan (the blocking one, which triggers, listens and ret=
-urns)
-> > > >
-> > > > Do you agree?
-> > > >   =20
-> > >
-> > > Okay, yes. I trust you.   =20
-> >=20
-> > btw: at the point when a scan requires a source address... it cannot
-> > be done because then a scan is related to a MAC instance -> an wpan
-> > interface and we need to bind to it. But I think it doesn't? =20
->=20
-> I'm not sure I follow you here. You mean in case of active scan?
+On Sat, Feb 11, 2023 at 01:06:32AM +0530, Amit Kumar Mahapatra wrote:
+> Supporting multi-cs in spi drivers would require the chip_select & cs_gpiod
+> members of struct spi_device to be an array. But changing the type of these
+> members to array would break the spi driver functionality. To make the
+> transition smoother introduced four new APIs to get/set the
+> spi->chip_select & spi->cs_gpiod and replaced all spi->chip_select and
 
-Actually a beacon requests do not require any kind of source identifier,
-so what do you mean by source address?
+This again doesn't apply against my current code - I think the
+best thing to do here is going to be to rebase against -rc1 when
+it comes out and resend then, that will also make the issues
+integrating with other trees easier as then I can make a clean
+branch against -rc1 that other trees will be able to merge as
+needed.
 
-A regular beacon, however, does. Which means sending beacons would
-include being able to set an address into a monitor interface. So if we
-want to play with beacons on monitor interfaces, we should also relax
-the pan_id/addressing rules.
+--mHMK7QDQWaz9I52Q
+Content-Type: application/pgp-signature; name="signature.asc"
 
-> The operation is always tight to a device in the end, even if you
-> provide a phy in userspace. So I guess it's not a problem. Or maybe I
-> didn't get the question right?
->=20
-> Thanks,
-> Miqu=C3=A8l
+-----BEGIN PGP SIGNATURE-----
 
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmPs6eMACgkQJNaLcl1U
+h9DMTQf7BClrpZ6y6mPa14iVbIWKtokY4RW9qSMUPLjIFwC9eRXAa0tO9cEn7yie
+Dhg3Nh0HQil5b3ETrpYSZcezEkC0LjXhOcrQL2AaNPnYqp8rwD3n4tFQXOY7hA9R
+fhdZQcSulOPdvy2GDwF7fvgenpxkVDIZM0OyEYKr5amWKxjhGICMWTBjvHmWJWo5
+Kh34j6KD6URlG9Rlf2b8CSTbJrwj5bREjrjMOvUNQWTt775APe+cKcZF6Jp3IhOC
+q8wYya1VrWoegeXxgG6IJW/I5BYCmloUtbj8BTpW9CIHMuOTdeqMduuExe3cWHOx
+xEsHIS5meBbApEDmthwKyZw5q9xE6w==
+=3UQL
+-----END PGP SIGNATURE-----
 
-Thanks,
-Miqu=C3=A8l
+--mHMK7QDQWaz9I52Q--
