@@ -2,99 +2,83 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6834FC05027
-	for <linux-wpan@archiver.kernel.org>; Fri, 17 Feb 2023 09:11:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CAA2C636CC
+	for <linux-wpan@archiver.kernel.org>; Sat, 18 Feb 2023 15:27:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229688AbjBQJLJ (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Fri, 17 Feb 2023 04:11:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43054 "EHLO
+        id S229596AbjBRP1k (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Sat, 18 Feb 2023 10:27:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56338 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229582AbjBQJLI (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Fri, 17 Feb 2023 04:11:08 -0500
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::225])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 271EB8690;
-        Fri, 17 Feb 2023 01:11:03 -0800 (PST)
-Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id 409821C0005;
-        Fri, 17 Feb 2023 09:10:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1676625062;
+        with ESMTP id S229496AbjBRP1j (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Sat, 18 Feb 2023 10:27:39 -0500
+Received: from proxima.lasnet.de (proxima.lasnet.de [IPv6:2a01:4f8:121:31eb:3::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CD3915CB3
+        for <linux-wpan@vger.kernel.org>; Sat, 18 Feb 2023 07:27:37 -0800 (PST)
+Received: from [IPV6:2003:e9:d720:e79c:c160:8694:42f3:16db] (p200300e9d720e79cc160869442f316db.dip0.t-ipconnect.de [IPv6:2003:e9:d720:e79c:c160:8694:42f3:16db])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: stefan@datenfreihafen.org)
+        by proxima.lasnet.de (Postfix) with ESMTPSA id 745D8C01A9;
+        Sat, 18 Feb 2023 16:27:35 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
+        s=2021; t=1676734055;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Y4pAln/H63lw/LsUNGnO9M6BOkwcZBtic8ceAZoF4OU=;
-        b=HieIVIuEjLxptW1+ycMbfmYzjfg5yAJer64GeUthfyhu2/mnc0x48KEodVGk4BRkfq7M6j
-        fO+0T90cxKWE7+QtOqvl3EkH5eDAy1ezxTpOfLtoi01LDXw4O8aHXC8kkq126yU020ZHK5
-        Gi1obAGTE88COJRdGyWMzgv88vM8d6CVOLQ5C+UBmcNKZN7p0dQq/izS6lH4lbQLm8ZGLv
-        qelFCOEqHU2SMdrVpzmwIgyFHjSU7okqft+J83E27eicogdENav0Je2D7eSfJcen2zYo4D
-        EWuKJd/6+TVL/JuFohzCtLNxPuFQKXzyXEEfTAm0HN/jD7UmlBPc2voqLkgc4Q==
-Date:   Fri, 17 Feb 2023 10:10:58 +0100
-From:   Miquel Raynal <miquel.raynal@bootlin.com>
-To:     Alexander Aring <alex.aring@gmail.com>,
-        Stefan Schmidt <stefan@datenfreihafen.org>,
-        linux-wpan@vger.kernel.org
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
-        David Girault <david.girault@qorvo.com>,
-        Romuald Despres <romuald.despres@qorvo.com>,
-        Frederic Blain <frederic.blain@qorvo.com>,
-        Nicolas Schodet <nico@ni.fr.eu.org>,
-        Guilhem Imberton <guilhem.imberton@qorvo.com>,
-        Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH wpan v2 0/6] ieee802154: Scan/Beacon fixes
-Message-ID: <20230217101058.0bb5df34@xps-13>
-In-Reply-To: <20230214135035.1202471-1-miquel.raynal@bootlin.com>
-References: <20230214135035.1202471-1-miquel.raynal@bootlin.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+        bh=uO88gdoKY6We3Y39RM2dz1ze4/hpDZf3uwi5hX0I9BU=;
+        b=vlyJyTKcWCTVbBCZw/ZEOkozkPQWKAaduLashsGztgSCb/5VT2GftCz1p9b5xLk8No0qn6
+        6Tp2sXzqhCp0D5/tRw8uK8mngeQHat+tSbFeqDcFWdqZBVIrrtc/pu5y5KXEbsi++8LqfT
+        Q3aCJVtaZ88GwBDwLCfSb7lTzx4Lgt0lqPkooCXA4Ror5KGKuxVgxOY8Pk7YrLcQ4wAas7
+        JeUe1yJbDV1lsCubIMQ2wKjqhZbQHTBh1qVX7jC+ULHyhlBGvqYDjKeajWNn7CQG5Wh1+g
+        KskMIPgVn5PyAthMKx8jvi+7LYLsYa9vgMPrneZOkI98C1bN6Km/+16Cqw+/nA==
+Message-ID: <706b939f-8f84-6da1-38b0-9146874d19e1@datenfreihafen.org>
+Date:   Sat, 18 Feb 2023 16:27:33 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.0
+Subject: Re: [PATCH wpan] ca8210: fix mac_len negative array access
+To:     Alexander Aring <aahringo@redhat.com>, linux-wpan@vger.kernel.org
+Cc:     bluetlh@gmail.com
+References: <20230217042504.3303396-1-aahringo@redhat.com>
+Content-Language: en-US
+From:   Stefan Schmidt <stefan@datenfreihafen.org>
+In-Reply-To: <20230217042504.3303396-1-aahringo@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello Jakub, Stefan, Alexander,
+Hello.
 
-miquel.raynal@bootlin.com wrote on Tue, 14 Feb 2023 14:50:29 +0100:
+On 17.02.23 05:25, Alexander Aring wrote:
+> This patch fixes a buffer overflow access of skb->data if
+> ieee802154_hdr_peek_addrs() fails.
+> 
+> Reported-by: lianhui tang <bluetlh@gmail.com>
+> Signed-off-by: Alexander Aring <aahringo@redhat.com>
+> ---
+>   drivers/net/ieee802154/ca8210.c | 2 ++
+>   1 file changed, 2 insertions(+)
+> 
+> diff --git a/drivers/net/ieee802154/ca8210.c b/drivers/net/ieee802154/ca8210.c
+> index e1a569b99e4a..0b0c6c0764fe 100644
+> --- a/drivers/net/ieee802154/ca8210.c
+> +++ b/drivers/net/ieee802154/ca8210.c
+> @@ -1913,6 +1913,8 @@ static int ca8210_skb_tx(
+>   	 * packet
+>   	 */
+>   	mac_len = ieee802154_hdr_peek_addrs(skb, &header);
+> +	if (mac_len < 0)
+> +		return mac_len;
+>   
+>   	secspec.security_level = header.sec.level;
+>   	secspec.key_id_mode = header.sec.key_id_mode;
 
-> Hello,
->=20
-> Following Jakub's review on Stefan's MR, a number of changes were
-> requested for him in order to pull the patches in net. In the mean time,
-> a couple of discussions happened with Alexander (return codes for
-> monitor scans and transmit helper used for beacons).
->=20
-> Hopefully this series addresses everything.
+This patch has been applied to the wpan tree and will be
+part of the next pull request to net. Thanks!
 
-I know it's only been 3 working days since I sent this series but as we
-are approaching the closing of net-next and Stefan's MR was paused
-until these fixes arrived, I wanted to check whether these changes
-might be satisfying enough, in particular Jakub, if you found the
-answers you asked for.
-
-I mainly want to avoid the "Stefan waits for Alexander who waits for
-Jakub who waits for Stefan" dependency chain :)
-
-Thanks a lot for all the feedback anyway!
-Miqu=C3=A8l
-
-> Changes in v2:
-> * Fixes lines with upsteam commit hashes rather than local
->   hashes. Everything else is exactly the same.
->=20
-> Miquel Raynal (6):
->   ieee802154: Use netlink policies when relevant on scan parameters
->   ieee802154: Convert scan error messages to extack
->   ieee802154: Change error code on monitor scan netlink request
->   mac802154: Send beacons using the MLME Tx path
->   mac802154: Fix an always true condition
->   ieee802154: Drop device trackers
->=20
->  net/ieee802154/nl802154.c | 125 ++++++++++++++------------------------
->  net/mac802154/scan.c      |  25 ++++++--
->  2 files changed, 65 insertions(+), 85 deletions(-)
->=20
+regards
+Stefan Schmidt
