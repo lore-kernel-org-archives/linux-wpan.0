@@ -2,83 +2,97 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CAA2C636CC
-	for <linux-wpan@archiver.kernel.org>; Sat, 18 Feb 2023 15:27:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3CF5C636CC
+	for <linux-wpan@archiver.kernel.org>; Sat, 18 Feb 2023 17:20:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229596AbjBRP1k (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Sat, 18 Feb 2023 10:27:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56338 "EHLO
+        id S229766AbjBRRUb (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Sat, 18 Feb 2023 12:20:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45338 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229496AbjBRP1j (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Sat, 18 Feb 2023 10:27:39 -0500
+        with ESMTP id S229660AbjBRRU3 (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Sat, 18 Feb 2023 12:20:29 -0500
 Received: from proxima.lasnet.de (proxima.lasnet.de [IPv6:2a01:4f8:121:31eb:3::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CD3915CB3
-        for <linux-wpan@vger.kernel.org>; Sat, 18 Feb 2023 07:27:37 -0800 (PST)
-Received: from [IPV6:2003:e9:d720:e79c:c160:8694:42f3:16db] (p200300e9d720e79cc160869442f316db.dip0.t-ipconnect.de [IPv6:2003:e9:d720:e79c:c160:8694:42f3:16db])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADFFE15C95;
+        Sat, 18 Feb 2023 09:20:28 -0800 (PST)
+Received: from [IPV6:2003:e9:d720:e7fa:38ae:b66a:d415:7793] (p200300e9d720e7fa38aeb66ad4157793.dip0.t-ipconnect.de [IPv6:2003:e9:d720:e7fa:38ae:b66a:d415:7793])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
         (No client certificate requested)
         (Authenticated sender: stefan@datenfreihafen.org)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id 745D8C01A9;
-        Sat, 18 Feb 2023 16:27:35 +0100 (CET)
+        by proxima.lasnet.de (Postfix) with ESMTPSA id 6D5B4C01A9;
+        Sat, 18 Feb 2023 18:20:24 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
-        s=2021; t=1676734055;
+        s=2021; t=1676740824;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=uO88gdoKY6We3Y39RM2dz1ze4/hpDZf3uwi5hX0I9BU=;
-        b=vlyJyTKcWCTVbBCZw/ZEOkozkPQWKAaduLashsGztgSCb/5VT2GftCz1p9b5xLk8No0qn6
-        6Tp2sXzqhCp0D5/tRw8uK8mngeQHat+tSbFeqDcFWdqZBVIrrtc/pu5y5KXEbsi++8LqfT
-        Q3aCJVtaZ88GwBDwLCfSb7lTzx4Lgt0lqPkooCXA4Ror5KGKuxVgxOY8Pk7YrLcQ4wAas7
-        JeUe1yJbDV1lsCubIMQ2wKjqhZbQHTBh1qVX7jC+ULHyhlBGvqYDjKeajWNn7CQG5Wh1+g
-        KskMIPgVn5PyAthMKx8jvi+7LYLsYa9vgMPrneZOkI98C1bN6Km/+16Cqw+/nA==
-Message-ID: <706b939f-8f84-6da1-38b0-9146874d19e1@datenfreihafen.org>
-Date:   Sat, 18 Feb 2023 16:27:33 +0100
+        bh=sveXIeQr7Qq7VZuY4CA8UeCBPYAXxkE3n7+vx7weAeQ=;
+        b=AyFlRqE/Uy427q55HkhwbswbDznbZg0otuHvb4bzVyBRrGwkOxjzhEYfmjQuMbcnXMo1GX
+        08bTzPui/uQgX8q8TVFEIRnrQ0MRz2/ecf8Qr142ZHvksY6CH/sejhabO/1XEpVerJYXOW
+        vd8L6SCd+4bCyE4ypRs/KksBJO7PBLAbZF7eVSFXtn2IZWoK+TLtza5XZbflae2fGc1QiE
+        hX2pXCmizPYKFMvtdAeC3JdNgdxa7j5vhe67GtfgArZCxUdR6+1Iww05xyCugjPF07c7cp
+        5DdpSHmJ5mL35divTYsd6wAW7p24cA6fiEhV4diBwULCpe6rQRGnOCMj8LIEsg==
+Message-ID: <736c9250-ecfc-f9ce-7367-bd79e930f5c3@datenfreihafen.org>
+Date:   Sat, 18 Feb 2023 18:20:22 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.6.0
-Subject: Re: [PATCH wpan] ca8210: fix mac_len negative array access
-To:     Alexander Aring <aahringo@redhat.com>, linux-wpan@vger.kernel.org
-Cc:     bluetlh@gmail.com
-References: <20230217042504.3303396-1-aahringo@redhat.com>
+Subject: Re: [PATCH wpan v2 0/6] ieee802154: Scan/Beacon fixes
 Content-Language: en-US
+To:     Miquel Raynal <miquel.raynal@bootlin.com>,
+        Alexander Aring <alex.aring@gmail.com>,
+        linux-wpan@vger.kernel.org
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
+        David Girault <david.girault@qorvo.com>,
+        Romuald Despres <romuald.despres@qorvo.com>,
+        Frederic Blain <frederic.blain@qorvo.com>,
+        Nicolas Schodet <nico@ni.fr.eu.org>,
+        Guilhem Imberton <guilhem.imberton@qorvo.com>,
+        Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+References: <20230214135035.1202471-1-miquel.raynal@bootlin.com>
+ <20230217101058.0bb5df34@xps-13>
 From:   Stefan Schmidt <stefan@datenfreihafen.org>
-In-Reply-To: <20230217042504.3303396-1-aahringo@redhat.com>
+In-Reply-To: <20230217101058.0bb5df34@xps-13>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello.
+Hello Miquel.
 
-On 17.02.23 05:25, Alexander Aring wrote:
-> This patch fixes a buffer overflow access of skb->data if
-> ieee802154_hdr_peek_addrs() fails.
+On 17.02.23 10:10, Miquel Raynal wrote:
+> Hello Jakub, Stefan, Alexander,
 > 
-> Reported-by: lianhui tang <bluetlh@gmail.com>
-> Signed-off-by: Alexander Aring <aahringo@redhat.com>
-> ---
->   drivers/net/ieee802154/ca8210.c | 2 ++
->   1 file changed, 2 insertions(+)
+> miquel.raynal@bootlin.com wrote on Tue, 14 Feb 2023 14:50:29 +0100:
 > 
-> diff --git a/drivers/net/ieee802154/ca8210.c b/drivers/net/ieee802154/ca8210.c
-> index e1a569b99e4a..0b0c6c0764fe 100644
-> --- a/drivers/net/ieee802154/ca8210.c
-> +++ b/drivers/net/ieee802154/ca8210.c
-> @@ -1913,6 +1913,8 @@ static int ca8210_skb_tx(
->   	 * packet
->   	 */
->   	mac_len = ieee802154_hdr_peek_addrs(skb, &header);
-> +	if (mac_len < 0)
-> +		return mac_len;
->   
->   	secspec.security_level = header.sec.level;
->   	secspec.key_id_mode = header.sec.key_id_mode;
+>> Hello,
+>>
+>> Following Jakub's review on Stefan's MR, a number of changes were
+>> requested for him in order to pull the patches in net. In the mean time,
+>> a couple of discussions happened with Alexander (return codes for
+>> monitor scans and transmit helper used for beacons).
+>>
+>> Hopefully this series addresses everything.
+> 
+> I know it's only been 3 working days since I sent this series but as we
+> are approaching the closing of net-next and Stefan's MR was paused
+> until these fixes arrived, I wanted to check whether these changes
+> might be satisfying enough, in particular Jakub, if you found the
+> answers you asked for.
+> 
+> I mainly want to avoid the "Stefan waits for Alexander who waits for
+> Jakub who waits for Stefan" dependency chain :)
 
-This patch has been applied to the wpan tree and will be
-part of the next pull request to net. Thanks!
+I just reviewed and tested them and have no problem to take them in. For 
+patches 1 and 2 I would prefer an ack from Jakub to make sure we covered 
+all of this review feedback before. Let's hope we can get these on 
+Monday or Tuesday. Once we have them in I will re-spin a new pull 
+request for all the changes.
 
 regards
 Stefan Schmidt
