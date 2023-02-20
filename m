@@ -2,75 +2,66 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB254C05027
-	for <linux-wpan@archiver.kernel.org>; Mon, 20 Feb 2023 08:59:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95D1BC636D6
+	for <linux-wpan@archiver.kernel.org>; Mon, 20 Feb 2023 17:59:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231359AbjBTI7z (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 20 Feb 2023 03:59:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42588 "EHLO
+        id S231455AbjBTR7N (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 20 Feb 2023 12:59:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51418 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231343AbjBTI7y (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 20 Feb 2023 03:59:54 -0500
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6699714483;
-        Mon, 20 Feb 2023 00:59:48 -0800 (PST)
-Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id A31BA6000E;
-        Mon, 20 Feb 2023 08:59:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1676883587;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=bbKACJUx3qdyBcA1MKYjHgQRv8jx40Gz4iFN+i2oZBI=;
-        b=ZTeqcjr2XUhPB/cSrLTQlntMYWVGZ7PAMeSuqg3AXcrdjCtt0TU4prCuOGfozB7ZZbjBaN
-        nHb0linciD66P1KoQxCa+ZEMPspPdGmzFfUhcX0iZOLFV/Rxt5g+/d/6ZKaoFHJoVxHiDO
-        02Y/NAfE64Z+1R+Z50x1xOWeD6dC9aiNHQTRGncyqBRavYrpecMyXqqGhKyCSghoc4QZ7N
-        bbDeJwJF7mPdOTkdXqppWqEXEkD7S4NHL3lYIaM2BdgmQVogUSrFKmDJ91ibgtWazDdLNn
-        VPhZrVy8TEOHKBVckeDSY4FkbGhyBLm83zgn7UxJgrYvYkAFAOJ8IWYWE4EwcA==
-Date:   Mon, 20 Feb 2023 09:59:44 +0100
-From:   Miquel Raynal <miquel.raynal@bootlin.com>
+        with ESMTP id S229552AbjBTR7M (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 20 Feb 2023 12:59:12 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3173729E;
+        Mon, 20 Feb 2023 09:59:11 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id D605960EFB;
+        Mon, 20 Feb 2023 17:59:10 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA946C433EF;
+        Mon, 20 Feb 2023 17:59:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1676915950;
+        bh=mOYr6Avk2SxtiVgeq7SulCefbJpu6ZXbRx04zv0iAgM=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=osn1p6OS7zKw62KDMmgqZx22HraPYGn2VPVW4YiahjyWG0sZvq+WM9c4YKdn6I2XC
+         ByHw+f+j+/+Kg9cJMIPDq5tVyc+mwgxRu0VbiTXbHRFtwSm5dQ7aIcCNd3GX7muskO
+         UkhVUWVo6WEWm2bgISc6J6fRucs/RzNnDP9AJphB3WjfSQHLdx5X4ufSEcSFrKYAPF
+         J7RMlwM9ku0wdVEWEfHOd03frAZVv9xJoPfxE1D8FyxEkBW2icTc4Ew0AATBZNRZr4
+         3HHWUfBMEnwCiMcNpAbxMxHDmPKChdQdRjAQv2T7X+u8NOX14Eask5Ln7RG/51vQaT
+         ir/JSpaVONpZg==
+Date:   Mon, 20 Feb 2023 09:59:08 -0800
+From:   Jakub Kicinski <kuba@kernel.org>
 To:     Stefan Schmidt <stefan@datenfreihafen.org>
-Cc:     davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
-        netdev@vger.kernel.org, linux-wpan@vger.kernel.org,
-        alex.aring@gmail.com, linux-kernel@vger.kernel.org,
-        alan@signal11.us, liuxuenetmail@gmail.com, varkabhadram@gmail.com
-Subject: Re: [PATCH net 4/4] MAINTAINERS: Add Miquel Raynal as additional
- maintainer for ieee802154
-Message-ID: <20230220095944.6be3ceec@xps-13>
-In-Reply-To: <20230218211317.284889-4-stefan@datenfreihafen.org>
-References: <20230218211317.284889-1-stefan@datenfreihafen.org>
-        <20230218211317.284889-4-stefan@datenfreihafen.org>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+Cc:     Miquel Raynal <miquel.raynal@bootlin.com>,
+        Alexander Aring <alex.aring@gmail.com>,
+        linux-wpan@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
+        David Girault <david.girault@qorvo.com>,
+        Romuald Despres <romuald.despres@qorvo.com>,
+        Frederic Blain <frederic.blain@qorvo.com>,
+        Nicolas Schodet <nico@ni.fr.eu.org>,
+        Guilhem Imberton <guilhem.imberton@qorvo.com>,
+        Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH wpan v2 0/6] ieee802154: Scan/Beacon fixes
+Message-ID: <20230220095908.7b6946d5@kernel.org>
+In-Reply-To: <736c9250-ecfc-f9ce-7367-bd79e930f5c3@datenfreihafen.org>
+References: <20230214135035.1202471-1-miquel.raynal@bootlin.com>
+        <20230217101058.0bb5df34@xps-13>
+        <736c9250-ecfc-f9ce-7367-bd79e930f5c3@datenfreihafen.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi Stefan,
+On Sat, 18 Feb 2023 18:20:22 +0100 Stefan Schmidt wrote:
+> I just reviewed and tested them and have no problem to take them in. For 
+> patches 1 and 2 I would prefer an ack from Jakub to make sure we covered 
+> all of this review feedback before. 
 
-stefan@datenfreihafen.org wrote on Sat, 18 Feb 2023 22:13:17 +0100:
-
-> We are growing the maintainer team for ieee802154 to spread the load for
-> review and general maintenance. Miquel has been driving the subsystem
-> forward over the last year and we would like to welcome him as a
-> maintainer.
-
-Thanks a lot!
-
-Not sure this is needed but just in case:
-
-Acked-by: Miquel Raynal <miquel.raynal@bootlin.com>
-
->=20
-> Signed-off-by: Stefan Schmidt <stefan@datenfreihafen.org>
-> ---
->  MAINTAINERS | 1 +
->  1 file changed, 1 insertion(+)
-
-Cheers!
-Miqu=C3=A8l
+Sorry I was away, yes, patches 1 and 2 LGTM!
