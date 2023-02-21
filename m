@@ -2,70 +2,82 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BF1BC636D6
-	for <linux-wpan@archiver.kernel.org>; Tue, 21 Feb 2023 02:59:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DFB8C61DA3
+	for <linux-wpan@archiver.kernel.org>; Tue, 21 Feb 2023 03:06:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233305AbjBUC71 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 20 Feb 2023 21:59:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38228 "EHLO
+        id S233418AbjBUDGq (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 20 Feb 2023 22:06:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43304 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233015AbjBUC70 (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 20 Feb 2023 21:59:26 -0500
+        with ESMTP id S231708AbjBUDGo (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 20 Feb 2023 22:06:44 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7560FFF38
-        for <linux-wpan@vger.kernel.org>; Mon, 20 Feb 2023 18:58:41 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B26C1233F8
+        for <linux-wpan@vger.kernel.org>; Mon, 20 Feb 2023 19:05:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1676948320;
+        s=mimecast20190719; t=1676948757;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=cUGVQQU8ha9dToISO+nXbL4NaXJXQDIYfr67WAN1gbY=;
-        b=EO771WHcFVdkyFE0dneTFK9Jn9/p+ZvE0lTE2XbsewhAHkemM2dusfezM8fZzR6Vi+kiO0
-        UD23DktyFPVjX8qSDR5YurXb8w25X5bvW74wf6SlApXkkI88zvJhmdBx/zvKAvRjEQAool
-        cnyKYWvE3K5NLPHsO10jgF+iI/6asIc=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=BptwBvQo4kKBIsOLYiTztpRLcZRrp4WC3qd5w6Jr6p0=;
+        b=N0gNpQeEuoISpxBVWyaDMYsHVfg8YTppfT1t2P7PfeGzlMNe6U3O6HtQflQnl95sM/5kbn
+        n0TEf2zHXY64GuXCUWesP2jcYDwg2OCwFUIbh958yVEh9nB3UDwG5jlbOfHZD+cqWq5s1u
+        LO9Pw1Z8LDqPME+68g2baLKFTtxW6fk=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-316-C7xE5A7yNZ-ZmfO8swUu9Q-1; Mon, 20 Feb 2023 21:58:39 -0500
-X-MC-Unique: C7xE5A7yNZ-ZmfO8swUu9Q-1
-Received: by mail-ed1-f71.google.com with SMTP id cf11-20020a0564020b8b00b0049ec3a108beso3713877edb.7
-        for <linux-wpan@vger.kernel.org>; Mon, 20 Feb 2023 18:58:39 -0800 (PST)
+ us-mta-202-kH9Tj_EVPOWHK-iQR6kseg-1; Mon, 20 Feb 2023 22:05:56 -0500
+X-MC-Unique: kH9Tj_EVPOWHK-iQR6kseg-1
+Received: by mail-ed1-f70.google.com with SMTP id eg35-20020a05640228a300b004ad6e399b73so3058260edb.10
+        for <linux-wpan@vger.kernel.org>; Mon, 20 Feb 2023 19:05:56 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=cUGVQQU8ha9dToISO+nXbL4NaXJXQDIYfr67WAN1gbY=;
-        b=TUaZmUjAwUKBehaKOzni5v5ZwCxMSYqbhhF62fxPym2Qgfblp3YoOWTHLS/EzccXSU
-         FG4wbBgS0AX8w23HuSfqwUP0KCfHsYQ0Y+AN/OkxVu+FYzqp7JLs+TN7GNGQI1DMvPLu
-         rOjUVM/PAaLhf+BvEeSRkMGNBG9ZIp4mTl+tDQECIBrr2OknnkPcv0QffGf9WWb0gPuq
-         HeiKJ+0qnQYZCNn2VKfklvwXouh3SRz/l8KBaqlEnsU7yZIf7tH+UUd+jF8v7JvOp6Ym
-         o14/Fylh/cHIMJokgna9fiMGtapkLaHfpDnWIHq80tUSW4Mr0zfXxCbZ2YbzjxkBn5cZ
-         +G3Q==
-X-Gm-Message-State: AO0yUKU+hl/jXRGdEmoIbl8kXwXE5sOyeTSrTHdf94ZzmOCuAmySM7Di
-        kgWniuErGxQHWGRJBJL3Kh/FPYRkx716SaHDxlJ11EMJetLP/R05iul1GiT6ZZBzwEuVfsrXl8M
-        MHdN7RUHU8VO80bioEC5EnEvni2I4UJ9DRZAGng==
-X-Received: by 2002:a17:906:2495:b0:8b1:78b8:4207 with SMTP id e21-20020a170906249500b008b178b84207mr6514323ejb.3.1676948318204;
-        Mon, 20 Feb 2023 18:58:38 -0800 (PST)
-X-Google-Smtp-Source: AK7set+CvuVTnLCeVgyoWH144+JTZH3cGPtR6y81s08i+zAv8rU14G3AI8BBjVFPQPoDXxX/nq2OI2Y5rnkTQoFU6Go=
-X-Received: by 2002:a17:906:2495:b0:8b1:78b8:4207 with SMTP id
- e21-20020a170906249500b008b178b84207mr6514317ejb.3.1676948318004; Mon, 20 Feb
- 2023 18:58:38 -0800 (PST)
+        bh=BptwBvQo4kKBIsOLYiTztpRLcZRrp4WC3qd5w6Jr6p0=;
+        b=tEICWFfsPVdWA/Camc2cJxmujymQY8X4dIkXu8TMh7+Rgf9YYaSUEL/U8i6K3qy9xQ
+         HP+vd2/uzi8mP22u5W7nJ5HOmjC3H/StQeXtATypJIDz2nkReige7tC5eprwWZI0ZW5R
+         C1BXe3VzvKG04vMwaUO79VHcZuTaJAMUOjEorUuHyBpchT/uoXZPkjY1wcwG7AjeH/Al
+         dQVSFUkaN2Rq5mNVATSn8UjpIO5TjrKsJxA7rLC1cgerFDl92CxPa1cT/N/lEDVOC6G+
+         vMdnfAWmOi5+WUHpOrrzNfc6RO8TXZ+Xthb6tJIJPNQzNdS6+IXyVBFZyRHI7uD30yhz
+         96Fg==
+X-Gm-Message-State: AO0yUKUiwNDWcJAqedUG1MDtr6iIJOpk3vXU0LqdGTua6jL31Z+pkeUQ
+        Ds8yn5+rv6N6dyo/ia30J+hYlD5UwP7/BJfOkTHYIo2S5sjcfuqbEAOR1CSlhs6BGLmgXIoG6M9
+        LdG7mWadPU5RlDC9rxbTis+dbK+PYpMn/axLQUA==
+X-Received: by 2002:a17:906:5158:b0:883:ba3b:eb94 with SMTP id jr24-20020a170906515800b00883ba3beb94mr4978144ejc.3.1676948755273;
+        Mon, 20 Feb 2023 19:05:55 -0800 (PST)
+X-Google-Smtp-Source: AK7set9jVHY4ucufPijCs6AjzBOPHfLncdKqZbq5tEHTs0STTs/YYj17Ofabhrxm4vpCviGQ73FfqHt6h/syeV5b/P0=
+X-Received: by 2002:a17:906:5158:b0:883:ba3b:eb94 with SMTP id
+ jr24-20020a170906515800b00883ba3beb94mr4978134ejc.3.1676948755047; Mon, 20
+ Feb 2023 19:05:55 -0800 (PST)
 MIME-Version: 1.0
-References: <20230218211317.284889-1-stefan@datenfreihafen.org>
- <20230218211317.284889-4-stefan@datenfreihafen.org> <20230220095944.6be3ceec@xps-13>
-In-Reply-To: <20230220095944.6be3ceec@xps-13>
+References: <20221129160046.538864-1-miquel.raynal@bootlin.com>
+ <20221129160046.538864-2-miquel.raynal@bootlin.com> <CAK-6q+iwqVx+6qQ-ctynykdrbN+SHxzk91gQCSdYCUD-FornZA@mail.gmail.com>
+ <20230206101235.0371da87@xps-13> <CAK-6q+jav4yJD3MsOssyBobg1zGqKC5sm-xCRYX1SCkH9GhmHw@mail.gmail.com>
+ <20230210182129.77c1084d@xps-13> <CAK-6q+jLKo1bLBie_xYZyZdyjNB_M8JvxDfr77RQAY9WYcQY8w@mail.gmail.com>
+ <20230213111553.0dcce5c2@xps-13> <CAK-6q+jP55MaB-_ZbRHKESgEb-AW+kN3bU2SMWMtkozvoyfAwA@mail.gmail.com>
+ <20230214152849.5c3d196b@xps-13> <CAK-6q+i-QiDpFptFPwDv05mwURGVHzmABcEn2z2L9xakQwgw+w@mail.gmail.com>
+ <20230217095251.59c324d0@xps-13> <CAK-6q+ikVP2eWpT5xRkiJn_JoenmD6D5+xcc2RwwXTfC-zsobw@mail.gmail.com>
+In-Reply-To: <CAK-6q+ikVP2eWpT5xRkiJn_JoenmD6D5+xcc2RwwXTfC-zsobw@mail.gmail.com>
 From:   Alexander Aring <aahringo@redhat.com>
-Date:   Mon, 20 Feb 2023 21:58:26 -0500
-Message-ID: <CAK-6q+h+o8DFV07oFLHPbPF5nM+gexQFUnFwsC7+Z6e8v8J8Mw@mail.gmail.com>
-Subject: Re: [PATCH net 4/4] MAINTAINERS: Add Miquel Raynal as additional
- maintainer for ieee802154
+Date:   Mon, 20 Feb 2023 22:05:43 -0500
+Message-ID: <CAK-6q+h6ZKvw5qR7yb2bvRrLvqUw0Mf5zVuh5-=fF5OgwJOr+A@mail.gmail.com>
+Subject: Re: [PATCH wpan-next 1/6] ieee802154: Add support for user scanning requests
 To:     Miquel Raynal <miquel.raynal@bootlin.com>
-Cc:     Stefan Schmidt <stefan@datenfreihafen.org>, davem@davemloft.net,
-        kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
-        linux-wpan@vger.kernel.org, alex.aring@gmail.com,
-        linux-kernel@vger.kernel.org, alan@signal11.us,
-        liuxuenetmail@gmail.com, varkabhadram@gmail.com
+Cc:     Alexander Aring <alex.aring@gmail.com>,
+        Stefan Schmidt <stefan@datenfreihafen.org>,
+        linux-wpan@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
+        David Girault <david.girault@qorvo.com>,
+        Romuald Despres <romuald.despres@qorvo.com>,
+        Frederic Blain <frederic.blain@qorvo.com>,
+        Nicolas Schodet <nico@ni.fr.eu.org>,
+        Guilhem Imberton <guilhem.imberton@qorvo.com>,
+        Thomas Petazzoni <thomas.petazzoni@bootlin.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
@@ -73,20 +85,33 @@ X-Mailing-List: linux-wpan@vger.kernel.org
 
 Hi,
 
-On Mon, Feb 20, 2023 at 4:01 AM Miquel Raynal <miquel.raynal@bootlin.com> wrote:
+On Mon, Feb 20, 2023 at 9:54 PM Alexander Aring <aahringo@redhat.com> wrote:
 >
-> Hi Stefan,
+> Hi,
 >
-> stefan@datenfreihafen.org wrote on Sat, 18 Feb 2023 22:13:17 +0100:
+> On Fri, Feb 17, 2023 at 3:53 AM Miquel Raynal <miquel.raynal@bootlin.com> wrote:
+> ...
+> > >
+> > > ok, I am curious. Probably it is very driver/device specific but yea,
+> > > HardMAC needs to at least support what 802.15.4 says, the rest is
+> > > optional and result in -ENOTSUPP?
+> >
+> > TBH this is still a gray area in my mental model. I'm not sure what
+> > these devices will really offer in terms of interfaces.
 >
-> > We are growing the maintainer team for ieee802154 to spread the load for
-> > review and general maintenance. Miquel has been driving the subsystem
-> > forward over the last year and we would like to welcome him as a
-> > maintainer.
+> ca8210 is one. They use those SAP-commands (MCPS-SAP and MLME-SAP)
+> which are described by 802.15.4 spec... there is this cfg802154_ops
+> structure which will redirect netlink to either SoftMAC or HardMAC it
+> should somehow conform to this...
+> However I think it should be the minimum functionality inside of this,
+> there might be a lot of optional things which only SoftMAC supports.
+> Also nl802154 should be oriented to this.
 >
-> Thanks a lot!
+> Are you agreeing here?
 
-welcome :)
+it's just not nl802154/cfg802154 also sending specific kind of frames
+out added to cfg802154 which we don't have yet inside of this
+"callback structure to interfacing SoftMAC or HardMAC".
 
 - Alex
 
