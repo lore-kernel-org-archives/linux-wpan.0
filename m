@@ -2,81 +2,86 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C2B9C636D6
-	for <linux-wpan@archiver.kernel.org>; Mon, 20 Feb 2023 21:44:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47292C636D6
+	for <linux-wpan@archiver.kernel.org>; Tue, 21 Feb 2023 00:20:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232179AbjBTVoz (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 20 Feb 2023 16:44:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47240 "EHLO
+        id S231806AbjBUAUT (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 20 Feb 2023 19:20:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48558 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232445AbjBTVou (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 20 Feb 2023 16:44:50 -0500
-Received: from proxima.lasnet.de (proxima.lasnet.de [IPv6:2a01:4f8:121:31eb:3::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED1C3212BA;
-        Mon, 20 Feb 2023 13:44:48 -0800 (PST)
-Received: from [IPV6:2003:e9:d746:344d:8e4a:ccf0:3715:218] (p200300e9d746344d8e4accf037150218.dip0.t-ipconnect.de [IPv6:2003:e9:d746:344d:8e4a:ccf0:3715:218])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits))
+        with ESMTP id S231396AbjBUAUS (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 20 Feb 2023 19:20:18 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17FE62196A;
+        Mon, 20 Feb 2023 16:20:18 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        (Authenticated sender: stefan@datenfreihafen.org)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id 9A132C02EE;
-        Mon, 20 Feb 2023 22:44:45 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
-        s=2021; t=1676929485;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=VwEDbzZkKFU6YesWTOG/gWUwKBtOzeBHko+LlxGLZwQ=;
-        b=MAcvBQf3FIX3LOnWaPRvtDv/UHYgqEik2lJzCoyxVRCaq3VPMn0g0S9Uu37KC0Stn+NH6a
-        tk/XWD1LXrHvtcCD1furXMT93sfjs82yuFH92fWCPA5v5SRtNiXnpKiwufverDaQV4Q920
-        L5B2JbhYoXpAgsVmD25yTeZp0+iDEXOc1a3ZnJGfkEx80qAtTBeyUrmvwQoydhBwIzLl+L
-        9pb2crA2xeR+Y68JKzsIMYDFZ4i85mjUMs9dFQY2yEmPLJXuS6dJKUZ1qeqPksocRZ0IR1
-        uSMHKZETy0UdU6fJe4zVAg6NZYM/nZ99Qwgnh+NvA83Dj75EFKBpRVYfjSpe8A==
-Message-ID: <f8daefff-fe19-18f7-df57-f8e00ea1c7ad@datenfreihafen.org>
-Date:   Mon, 20 Feb 2023 22:44:45 +0100
+        by dfw.source.kernel.org (Postfix) with ESMTPS id A042260F53;
+        Tue, 21 Feb 2023 00:20:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 02130C4339C;
+        Tue, 21 Feb 2023 00:20:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1676938817;
+        bh=eoHQqHvYFQFCS0S+n7+j4PGFGtkiLOzxYGOfbYtGdHE=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=U7G0iyDhsAeV07i2t073kFXAP3+/N8JCsdls5iITk24JzM6rMjxgbECvIHPg8/n/B
+         unRCBa29e9gIqxSSuaauaVpoBhcQw9C9Dc6c6dSrfv3ou71fCudUVCv+ZgMwR03hv9
+         MhPjLOZ6Q8UaDb+0qeKjdnhrGzMQD2x4v19txa1z7/c2er0cIB6mfksN76S12EFWq6
+         Qt+vEox2Q3Y+CwP0Wj0zR+yRDdBR5CK/WVeYDG6A4djgTflRzJqm2DVQCMJbdw0KSO
+         cjGDP3PJdIF/Vn1ZU5gPawKcvNNwyD1+nA0/2qLbcPL6pZTyXa09YADl337V/MYsEO
+         uNRHtenySCeVw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id DB990C59A4C;
+        Tue, 21 Feb 2023 00:20:16 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Subject: Re: pull-request: ieee802154-next 2023-02-02
-Content-Language: en-US
-To:     Jakub Kicinski <kuba@kernel.org>,
-        Miquel Raynal <miquel.raynal@bootlin.com>
-Cc:     davem@davemloft.net, linux-wpan@vger.kernel.org,
-        alex.aring@gmail.com, netdev@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org
-References: <20230202153723.1554935-1-stefan@datenfreihafen.org>
- <20230203202147.56106b5b@kernel.org> <20230204124656.470db6b7@xps-13>
- <20230204111800.24d6e856@kernel.org>
-From:   Stefan Schmidt <stefan@datenfreihafen.org>
-In-Reply-To: <20230204111800.24d6e856@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 1/4] MAINTAINERS: Switch maintenance for cc2520 driver
+ over
+From:   patchwork-bot+netdevbpf@kernel.org
+Message-Id: <167693881689.28142.16088356100266329670.git-patchwork-notify@kernel.org>
+Date:   Tue, 21 Feb 2023 00:20:16 +0000
+References: <20230218211317.284889-1-stefan@datenfreihafen.org>
+In-Reply-To: <20230218211317.284889-1-stefan@datenfreihafen.org>
+To:     Stefan Schmidt <stefan@datenfreihafen.org>
+Cc:     davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+        netdev@vger.kernel.org, linux-wpan@vger.kernel.org,
+        alex.aring@gmail.com, miquel.raynal@bootlin.com,
+        linux-kernel@vger.kernel.org, alan@signal11.us,
+        liuxuenetmail@gmail.com, varkabhadram@gmail.com
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello Jakub.
+Hello:
 
-On 04.02.23 20:18, Jakub Kicinski wrote:
-> On Sat, 4 Feb 2023 12:46:56 +0100 Miquel Raynal wrote:
->>> I left some comments on the netlink part, sorry for not looking
->>> at it earlier.
->>
->> As I'm not extremely comfortable with all the netlink conventions I
->> might have squeezed "important" checks, I will try to make the code
->> more robust as you suggested.
->>
->> I will do my best to address these, probably next week, do you prefer
->> to wait for these additional changes to apply on top of wpan-next and
->> Stefan to rush with another PR before -rc8? Or do you accept to pull the
->> changes now and to receive a couple of patches in a following fixes
->> PR? (the latter would be the best IMHO, but it's of course up to you).
+This series was applied to netdev/net.git (master)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Sat, 18 Feb 2023 22:13:14 +0100 you wrote:
+> Varka Bhadram has not been actively working on the driver or reviewing
+> patches for several years. I have been taking odd fixes in through the
+> wpan/ieee802154 tree. Update the MAINTAINERS file to reflect this
+> reality. I wanted to thank Varka for his work on the driver.
 > 
-> I have a slight preference to wait with the pulling until the fixes/
-> refactoring arrives.
+> Signed-off-by: Stefan Schmidt <stefan@datenfreihafen.org>
+> 
+> [...]
 
-The new pull request as v2 has just been posted.
+Here is the summary with links:
+  - [net,1/4] MAINTAINERS: Switch maintenance for cc2520 driver over
+    https://git.kernel.org/netdev/net/c/c551c569e388
+  - [net,2/4] MAINTAINERS: Switch maintenance for mcr20a driver over
+    https://git.kernel.org/netdev/net/c/d1b4b4117f89
+  - [net,3/4] MAINTAINERS: Switch maintenance for mrf24j40 driver over
+    https://git.kernel.org/netdev/net/c/6b441772854f
+  - [net,4/4] MAINTAINERS: Add Miquel Raynal as additional maintainer for ieee802154
+    https://git.kernel.org/netdev/net/c/195d6cc9c3d1
 
-regards
-Stefan Schmidt
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
