@@ -2,58 +2,91 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00D65C61DA4
-	for <linux-wpan@archiver.kernel.org>; Wed, 22 Feb 2023 08:36:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03A45C61DA4
+	for <linux-wpan@archiver.kernel.org>; Thu, 23 Feb 2023 10:35:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229557AbjBVIgL (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 22 Feb 2023 03:36:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53320 "EHLO
+        id S233372AbjBWKfH (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Thu, 23 Feb 2023 05:35:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41390 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229560AbjBVIgE (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 22 Feb 2023 03:36:04 -0500
-Received: from mail.crawnon.pl (mail.crawnon.pl [51.68.198.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43AED2E810
-        for <linux-wpan@vger.kernel.org>; Wed, 22 Feb 2023 00:36:03 -0800 (PST)
-Received: by mail.crawnon.pl (Postfix, from userid 1002)
-        id E8DF4A48A7; Wed, 22 Feb 2023 08:35:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=crawnon.pl; s=mail;
-        t=1677054961; bh=C5hX24svv/9/TME4wPCHfYjl17BCtmuxEd1i9B4zdYs=;
-        h=Date:From:To:Subject:From;
-        b=V20RCps3GMBx/izE23lAnOTtnKV+0kT8TA/BU+4yReODHqGDjeO28SHnabJJHoUEg
-         32MjW9NjTB6BIT6m08OUjaNc5HrXxjOd++C/cmhkkGeUGrrRk0icYCzAui0Sd7qqyf
-         czUAZ4cQRuwB9Q9T14U/9G/yp8e1duZAaK2uqWRc2ZcIL7EsUM+iBElYPcl2hZF9VB
-         2GCpy0l4PpofQKTkSxljYdP95swplkwkYP6PGGOUV39G/jNTtpvvE2S6VQqukw+yRy
-         QrIqVIH9Cg211yNcmJFPzGzo7Ot08GUJ5TbOy4eYLucGgqtGwt6M9mbsiTSM+n1Sl/
-         XevuZLfSiS/0w==
-Received: by mail.crawnon.pl for <linux-wpan@vger.kernel.org>; Wed, 22 Feb 2023 08:34:35 GMT
-Message-ID: <20230222073001-0.1.9b.lv10.0.18vac2nayh@crawnon.pl>
-Date:   Wed, 22 Feb 2023 08:34:35 GMT
-From:   =?UTF-8?Q? "Miko=C5=82aj_Fiodorczyk" ?= 
-        <mikolaj.fiodorczyk@crawnon.pl>
-To:     <linux-wpan@vger.kernel.org>
-Subject: Fotowoltaika - nowe warunki
-X-Mailer: mail.crawnon.pl
+        with ESMTP id S229583AbjBWKfG (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 23 Feb 2023 05:35:06 -0500
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57F0C4988E
+        for <linux-wpan@vger.kernel.org>; Thu, 23 Feb 2023 02:35:04 -0800 (PST)
+Received: (Authenticated sender: miquel.raynal@bootlin.com)
+        by mail.gandi.net (Postfix) with ESMTPSA id 7B9E860007;
+        Thu, 23 Feb 2023 10:35:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+        t=1677148503;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=mxvRbvrmU+vCqnSNTxPqupDLWG4ixWBsPNajvBuI2hg=;
+        b=YJ19G0UnKhBZk9aS93y6jjrYIo5wxyB0i3Epqf4+dGgocFswPK47y1ImS+MXmcECJb+akB
+        /uB17CrLcbbt9C4gvxpud/hU+wmhkJLLnVGH1toVjOkZlJXRLU164j66UnZu+wWnl4xOXK
+        H/lnBTsTI/VMoEXgntfJ52FLGvNBEatbx1JM+T9D+WNRmVwmonDaMuk+VRLPNSTRwSYHKx
+        ZlWqEg6mMSX2HCZNHznJ17NLXsTaUgvYSezW1pf44joQJchTjpYTg04vKf67ey+VhMTqp4
+        RSMT3LNxYLIUoMNN81E6qwX9B8jzyvLy+sIZxJG1ZZN2wBjHHaYZRq8XD6ngew==
+Date:   Thu, 23 Feb 2023 11:35:00 +0100
+From:   Miquel Raynal <miquel.raynal@bootlin.com>
+To:     Alexander Aring <aahringo@redhat.com>
+Cc:     Stefan Schmidt <stefan@datenfreihafen.org>,
+        Linux Wpan Mailing List <linux-wpan@vger.kernel.org>
+Subject: Re: ieee802154: energy detection question
+Message-ID: <20230223113500.662d1624@xps-13>
+In-Reply-To: <CAK-6q+hUzbUi3quGW6_jvXyGm+cqv4aY6rnLOJ1B=QzOMUoH8A@mail.gmail.com>
+References: <20230217100059.58e92818@xps-13>
+        <CAK-6q+hUzbUi3quGW6_jvXyGm+cqv4aY6rnLOJ1B=QzOMUoH8A@mail.gmail.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Dzie=C5=84 dobry,
+Hi Alexander,
 
-chcia=C5=82bym poinformowa=C4=87, i=C5=BC mog=C4=85 Pa=C5=84stwo uzyska=C4=
-=87 dofinansowanie na systemy fotowoltaiczne w ramach nowej edycji progra=
-mu M=C3=B3j Pr=C4=85d.
+aahringo@redhat.com wrote on Mon, 20 Feb 2023 21:58:04 -0500:
 
-Program zapewnia 6000 z=C5=82 dofinansowania na instalacj=C4=99 paneli i =
-16 000 z=C5=82 na magazyn energii, ni=C5=BCsze cen pr=C4=85du i mo=C5=BCl=
-iwo=C5=9B=C4=87 odliczenia koszt=C3=B3w zwi=C4=85zanych z instalacj=C4=85=
- fotowoltaiki w ramach rozliczenia PIT (tzw. ulga termomodernizacyjna).
+> Hi,
+>=20
+> On Fri, Feb 17, 2023 at 4:01 AM Miquel Raynal <miquel.raynal@bootlin.com>=
+ wrote:
+> >
+> > Hello,
+> >
+> > I know this may sound like a silly question but while looking at the
+> > various drivers implementations I found no users (at all) of the ->ed()
+> > energy detection hook. Its comment says that the mac layer is supposed
+> > to use it but I couldn't find where. Of course, the fact that the
+> > abbreviation ends like half of the word in english "-ed" does not help
+> > grepping for that, but I could not figure out how useful this callback
+> > was. In particular since it is mandatory to provide.
+> > =20
+>=20
+> There is no user, there was never an upstream user.
 
-Czy s=C4=85 Pa=C5=84stwo otwarci na wst=C4=99pn=C4=85 rozmow=C4=99 w tym =
-temacie?
+Ah, thanks a lot for the confirmation.
 
+> > I am pretty sure I missed something, so perhaps someone has a pointer
+> > to help me there. =20
+>=20
+> I think there were some non-upstream users for code which never came
+> upstream. Please don't look into this code.
+>=20
+> What do you want to do with this functionality? But the finger out and
+> look for a suitable channel to switch and operate on?
 
-Pozdrawiam,
-Miko=C5=82aj Fiodorczyk
+Yeah, the idea of having a mac hook for that feels odd, but why not.
+What is bothering me actually is the fact that this hook seems mandatory
+(while mostly useless), see:
+https://elixir.bootlin.com/linux/latest/source/net/mac802154/main.c#L53
+
+I propose to remove that check regarding the ->ed() callback presence?
+
+Thanks,
+Miqu=C3=A8l
