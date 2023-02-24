@@ -2,43 +2,66 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03A45C61DA4
-	for <linux-wpan@archiver.kernel.org>; Thu, 23 Feb 2023 10:35:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23A78C61DA4
+	for <linux-wpan@archiver.kernel.org>; Fri, 24 Feb 2023 13:58:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233372AbjBWKfH (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Thu, 23 Feb 2023 05:35:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41390 "EHLO
+        id S229578AbjBXN6E (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Fri, 24 Feb 2023 08:58:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49766 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229583AbjBWKfG (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 23 Feb 2023 05:35:06 -0500
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57F0C4988E
-        for <linux-wpan@vger.kernel.org>; Thu, 23 Feb 2023 02:35:04 -0800 (PST)
+        with ESMTP id S229488AbjBXN6D (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 24 Feb 2023 08:58:03 -0500
+Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E82D193D3;
+        Fri, 24 Feb 2023 05:58:01 -0800 (PST)
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id 7B9E860007;
-        Thu, 23 Feb 2023 10:35:01 +0000 (UTC)
+        by mail.gandi.net (Postfix) with ESMTPSA id C57D040003;
+        Fri, 24 Feb 2023 13:57:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1677148503;
+        t=1677247079;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=mxvRbvrmU+vCqnSNTxPqupDLWG4ixWBsPNajvBuI2hg=;
-        b=YJ19G0UnKhBZk9aS93y6jjrYIo5wxyB0i3Epqf4+dGgocFswPK47y1ImS+MXmcECJb+akB
-        /uB17CrLcbbt9C4gvxpud/hU+wmhkJLLnVGH1toVjOkZlJXRLU164j66UnZu+wWnl4xOXK
-        H/lnBTsTI/VMoEXgntfJ52FLGvNBEatbx1JM+T9D+WNRmVwmonDaMuk+VRLPNSTRwSYHKx
-        ZlWqEg6mMSX2HCZNHznJ17NLXsTaUgvYSezW1pf44joQJchTjpYTg04vKf67ey+VhMTqp4
-        RSMT3LNxYLIUoMNN81E6qwX9B8jzyvLy+sIZxJG1ZZN2wBjHHaYZRq8XD6ngew==
-Date:   Thu, 23 Feb 2023 11:35:00 +0100
+        bh=VoPzW7n5a+mXABqnPHMAAB9/qWEnlbkkwf/8DgTN3FU=;
+        b=XdCbTgT372HdJ3JHLYf2HkanE6+aO7f0ytg/Q+lUid4cg1mTGtxvC3in+G9nEfONx3f1Ii
+        ojqkHxeaWRMAhmUfGkiPHa+nayznc5NSGFW0Axn6MC5lcLz22ZJIMfaG3CaevnkGoITzsb
+        jteh+SyF7T148q8xbhw/14y/Pp6PS7n2Paj3xCeqjhCjqd0kz6QpYP+BbeEoX/NmFhbhj2
+        Kb3FxjheW474N18VPwcJ7AO3MMFUXVVzKq2KOB46EXHM1ZV+/veC9PL6i9bi8UtPl66/VJ
+        WJ+tLkuxrFnfnszzkCyPE4TZ6B6OWR2L6o5qMgLnKzL/pdR5a6znrKfhyXJnCQ==
+Date:   Fri, 24 Feb 2023 14:57:56 +0100
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
 To:     Alexander Aring <aahringo@redhat.com>
-Cc:     Stefan Schmidt <stefan@datenfreihafen.org>,
-        Linux Wpan Mailing List <linux-wpan@vger.kernel.org>
-Subject: Re: ieee802154: energy detection question
-Message-ID: <20230223113500.662d1624@xps-13>
-In-Reply-To: <CAK-6q+hUzbUi3quGW6_jvXyGm+cqv4aY6rnLOJ1B=QzOMUoH8A@mail.gmail.com>
-References: <20230217100059.58e92818@xps-13>
-        <CAK-6q+hUzbUi3quGW6_jvXyGm+cqv4aY6rnLOJ1B=QzOMUoH8A@mail.gmail.com>
+Cc:     Alexander Aring <alex.aring@gmail.com>,
+        Stefan Schmidt <stefan@datenfreihafen.org>,
+        linux-wpan@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
+        David Girault <david.girault@qorvo.com>,
+        Romuald Despres <romuald.despres@qorvo.com>,
+        Frederic Blain <frederic.blain@qorvo.com>,
+        Nicolas Schodet <nico@ni.fr.eu.org>,
+        Guilhem Imberton <guilhem.imberton@qorvo.com>,
+        Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH wpan-next 1/6] ieee802154: Add support for user scanning
+ requests
+Message-ID: <20230224145756.39349d29@xps-13>
+In-Reply-To: <CAK-6q+ikVP2eWpT5xRkiJn_JoenmD6D5+xcc2RwwXTfC-zsobw@mail.gmail.com>
+References: <20221129160046.538864-1-miquel.raynal@bootlin.com>
+        <20221129160046.538864-2-miquel.raynal@bootlin.com>
+        <CAK-6q+iwqVx+6qQ-ctynykdrbN+SHxzk91gQCSdYCUD-FornZA@mail.gmail.com>
+        <20230206101235.0371da87@xps-13>
+        <CAK-6q+jav4yJD3MsOssyBobg1zGqKC5sm-xCRYX1SCkH9GhmHw@mail.gmail.com>
+        <20230210182129.77c1084d@xps-13>
+        <CAK-6q+jLKo1bLBie_xYZyZdyjNB_M8JvxDfr77RQAY9WYcQY8w@mail.gmail.com>
+        <20230213111553.0dcce5c2@xps-13>
+        <CAK-6q+jP55MaB-_ZbRHKESgEb-AW+kN3bU2SMWMtkozvoyfAwA@mail.gmail.com>
+        <20230214152849.5c3d196b@xps-13>
+        <CAK-6q+i-QiDpFptFPwDv05mwURGVHzmABcEn2z2L9xakQwgw+w@mail.gmail.com>
+        <20230217095251.59c324d0@xps-13>
+        <CAK-6q+ikVP2eWpT5xRkiJn_JoenmD6D5+xcc2RwwXTfC-zsobw@mail.gmail.com>
 Organization: Bootlin
 X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
@@ -50,43 +73,36 @@ X-Mailing-List: linux-wpan@vger.kernel.org
 
 Hi Alexander,
 
-aahringo@redhat.com wrote on Mon, 20 Feb 2023 21:58:04 -0500:
+aahringo@redhat.com wrote on Mon, 20 Feb 2023 21:54:41 -0500:
 
 > Hi,
 >=20
-> On Fri, Feb 17, 2023 at 4:01 AM Miquel Raynal <miquel.raynal@bootlin.com>=
+> On Fri, Feb 17, 2023 at 3:53 AM Miquel Raynal <miquel.raynal@bootlin.com>=
  wrote:
+> ...
+> > >
+> > > ok, I am curious. Probably it is very driver/device specific but yea,
+> > > HardMAC needs to at least support what 802.15.4 says, the rest is
+> > > optional and result in -ENOTSUPP? =20
 > >
-> > Hello,
-> >
-> > I know this may sound like a silly question but while looking at the
-> > various drivers implementations I found no users (at all) of the ->ed()
-> > energy detection hook. Its comment says that the mac layer is supposed
-> > to use it but I couldn't find where. Of course, the fact that the
-> > abbreviation ends like half of the word in english "-ed" does not help
-> > grepping for that, but I could not figure out how useful this callback
-> > was. In particular since it is mandatory to provide.
-> > =20
+> > TBH this is still a gray area in my mental model. I'm not sure what
+> > these devices will really offer in terms of interfaces. =20
 >=20
-> There is no user, there was never an upstream user.
+> ca8210 is one. They use those SAP-commands (MCPS-SAP and MLME-SAP)
+> which are described by 802.15.4 spec... there is this cfg802154_ops
+> structure which will redirect netlink to either SoftMAC or HardMAC it
+> should somehow conform to this...
 
-Ah, thanks a lot for the confirmation.
+Absolutely.
 
-> > I am pretty sure I missed something, so perhaps someone has a pointer
-> > to help me there. =20
+> However I think it should be the minimum functionality inside of this,
+> there might be a lot of optional things which only SoftMAC supports.
+> Also nl802154 should be oriented to this.
 >=20
-> I think there were some non-upstream users for code which never came
-> upstream. Please don't look into this code.
->=20
-> What do you want to do with this functionality? But the finger out and
-> look for a suitable channel to switch and operate on?
+> Are you agreeing here?
 
-Yeah, the idea of having a mac hook for that feels odd, but why not.
-What is bothering me actually is the fact that this hook seems mandatory
-(while mostly useless), see:
-https://elixir.bootlin.com/linux/latest/source/net/mac802154/main.c#L53
-
-I propose to remove that check regarding the ->ed() callback presence?
+Yes. That support can also be improved if we ever have to support
+advanced functionalities with "new" and compatible HardMAC devices.
 
 Thanks,
 Miqu=C3=A8l
