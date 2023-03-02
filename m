@@ -2,32 +2,34 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D1BDC7EE2F
-	for <linux-wpan@archiver.kernel.org>; Wed,  1 Mar 2023 15:45:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BDD30C6FA8E
+	for <linux-wpan@archiver.kernel.org>; Thu,  2 Mar 2023 08:48:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229632AbjCAPo7 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 1 Mar 2023 10:44:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36082 "EHLO
+        id S229697AbjCBIs4 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Thu, 2 Mar 2023 03:48:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56012 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230052AbjCAPo5 (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 1 Mar 2023 10:44:57 -0500
-Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::229])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD504113E1;
-        Wed,  1 Mar 2023 07:44:55 -0800 (PST)
+        with ESMTP id S229496AbjCBIsz (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 2 Mar 2023 03:48:55 -0500
+Received: from relay10.mail.gandi.net (relay10.mail.gandi.net [217.70.178.230])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8185F11664;
+        Thu,  2 Mar 2023 00:48:52 -0800 (PST)
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id C1225FF812;
-        Wed,  1 Mar 2023 15:44:50 +0000 (UTC)
+        by mail.gandi.net (Postfix) with ESMTPSA id 4929124000D;
+        Thu,  2 Mar 2023 08:48:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1677685493;
+        t=1677746931;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=7CBUJvpU2Rqxjw+zH4i747u1NOhNpaI2flcud4fIy+I=;
-        b=RlLwfxsbp6Es6yIM37X1QS9F5bsFk4o1relYUs2iY0gsKLKInyA9aAVmG/xm9FFoNeFrl/
-        toWvV6hag/m7i91Ud99Nv+1/p7V1y1uTcYT+5MhDQqJbpY5G+8pSBGupgI73JxLYyv/zPY
-        3Y3UB1Ke7a2SL/QxvGvypkvKJj8rYK7EKrfNA0jf53AIdwLSWOZGKQQACT6h7D1BpjptGW
-        8RXbo82DPqwQsDzPyE9xhPiAceHJb/2FNNrguvZea14LTvd6atibAYHZGOP7G/exoRrutJ
-        o7fUEfz69OXNZoBaiMiNNchSoDAZm3n3kz18KuLgACpcpYeeYv2qMxjO2fBYlA==
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=MuiZ6DAalCFX0pWZRSXORPzDV2NDJW8mufoPL0S2PjI=;
+        b=dLlXRK0eZnFh1oZ94fBZRhOpeGA22zxgYnp8ynPPBrkSDpMz/VEL2LpUeQbYThLYlFBAzA
+        pMsPlFqlDuYsCiAM9YLw5wmxp0Re/E5LF4T//4JecvmMenxXJ2P0nnQOMMjTJF3SS0cAw1
+        1u5xizByNYYl06GZRgmee3UGjgDAvm+tCivInM2ZB69/qb1EevYn2bHxDuTl8Gm3dVPX4S
+        p6vq3nUpBAVAEb8cycIO4Dn8fzjRG3AUDXW+UuDKPsxkfd1owJALie3Orb4/GK5P9DqBKZ
+        w3529T0xuBdCRB64tVeJiwxDHM44aN63eOKwqyL8W0JYiZtBOaXkjPZK2BCtqQ==
+Date:   Thu, 2 Mar 2023 09:48:48 +0100
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
 To:     "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
@@ -42,43 +44,53 @@ Cc:     Alexander Aring <alex.aring@gmail.com>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
         Guilhem Imberton <guilhem.imberton@qorvo.com>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
         Sanan Hasanov <sanan.hasanov@Knights.ucf.edu>
-Subject: [PATCH net] ieee802154: Prevent user from crashing the host
-Date:   Wed,  1 Mar 2023 16:44:50 +0100
-Message-Id: <20230301154450.547716-1-miquel.raynal@bootlin.com>
-X-Mailer: git-send-email 2.34.1
+Subject: Re: [PATCH net] ieee802154: Prevent user from crashing the host
+Message-ID: <20230302094848.206f35ae@xps-13>
+In-Reply-To: <20230301154450.547716-1-miquel.raynal@bootlin.com>
+References: <20230301154450.547716-1-miquel.raynal@bootlin.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Avoid crashing the machine by checking
-info->attrs[NL802154_ATTR_SCAN_TYPE] presence before de-referencing it,
-which was the primary intend of the blamed patch.
+Hello,
 
-Reported-by: Sanan Hasanov <sanan.hasanov@Knights.ucf.edu>
-Suggested-by: Eric Dumazet <edumazet@google.com>
-Fixes: a0b6106672b5 ("ieee802154: Convert scan error messages to extack")
-Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
----
- net/ieee802154/nl802154.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+miquel.raynal@bootlin.com wrote on Wed,  1 Mar 2023 16:44:50 +0100:
 
-diff --git a/net/ieee802154/nl802154.c b/net/ieee802154/nl802154.c
-index 88380606af2c..a18fb98a4b09 100644
---- a/net/ieee802154/nl802154.c
-+++ b/net/ieee802154/nl802154.c
-@@ -1412,7 +1412,7 @@ static int nl802154_trigger_scan(struct sk_buff *skb, struct genl_info *info)
- 		return -EOPNOTSUPP;
- 	}
- 
--	if (!nla_get_u8(info->attrs[NL802154_ATTR_SCAN_TYPE])) {
-+	if (!info->attrs[NL802154_ATTR_SCAN_TYPE]) {
- 		NL_SET_ERR_MSG(info->extack, "Malformed request, missing scan type");
- 		return -EINVAL;
- 	}
--- 
-2.34.1
+> Avoid crashing the machine by checking
+> info->attrs[NL802154_ATTR_SCAN_TYPE] presence before de-referencing it,
+> which was the primary intend of the blamed patch.
 
+Subject should have been wpan instead of net, sorry for the confusion.
+
+> Reported-by: Sanan Hasanov <sanan.hasanov@Knights.ucf.edu>
+> Suggested-by: Eric Dumazet <edumazet@google.com>
+> Fixes: a0b6106672b5 ("ieee802154: Convert scan error messages to extack")
+> Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
+> ---
+>  net/ieee802154/nl802154.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/net/ieee802154/nl802154.c b/net/ieee802154/nl802154.c
+> index 88380606af2c..a18fb98a4b09 100644
+> --- a/net/ieee802154/nl802154.c
+> +++ b/net/ieee802154/nl802154.c
+> @@ -1412,7 +1412,7 @@ static int nl802154_trigger_scan(struct sk_buff *sk=
+b, struct genl_info *info)
+>  		return -EOPNOTSUPP;
+>  	}
+> =20
+> -	if (!nla_get_u8(info->attrs[NL802154_ATTR_SCAN_TYPE])) {
+> +	if (!info->attrs[NL802154_ATTR_SCAN_TYPE]) {
+>  		NL_SET_ERR_MSG(info->extack, "Malformed request, missing scan type");
+>  		return -EINVAL;
+>  	}
+
+
+Thanks,
+Miqu=C3=A8l
