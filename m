@@ -2,38 +2,65 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDD30C6FA8E
-	for <linux-wpan@archiver.kernel.org>; Thu,  2 Mar 2023 08:48:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86499C678D4
+	for <linux-wpan@archiver.kernel.org>; Thu,  2 Mar 2023 10:21:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229697AbjCBIs4 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Thu, 2 Mar 2023 03:48:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56012 "EHLO
+        id S230002AbjCBKVV (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Thu, 2 Mar 2023 05:21:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40408 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229496AbjCBIsz (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 2 Mar 2023 03:48:55 -0500
-Received: from relay10.mail.gandi.net (relay10.mail.gandi.net [217.70.178.230])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8185F11664;
-        Thu,  2 Mar 2023 00:48:52 -0800 (PST)
-Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id 4929124000D;
-        Thu,  2 Mar 2023 08:48:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1677746931;
+        with ESMTP id S229765AbjCBKVU (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 2 Mar 2023 05:21:20 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0C0A2CC55
+        for <linux-wpan@vger.kernel.org>; Thu,  2 Mar 2023 02:20:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1677752433;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=MuiZ6DAalCFX0pWZRSXORPzDV2NDJW8mufoPL0S2PjI=;
-        b=dLlXRK0eZnFh1oZ94fBZRhOpeGA22zxgYnp8ynPPBrkSDpMz/VEL2LpUeQbYThLYlFBAzA
-        pMsPlFqlDuYsCiAM9YLw5wmxp0Re/E5LF4T//4JecvmMenxXJ2P0nnQOMMjTJF3SS0cAw1
-        1u5xizByNYYl06GZRgmee3UGjgDAvm+tCivInM2ZB69/qb1EevYn2bHxDuTl8Gm3dVPX4S
-        p6vq3nUpBAVAEb8cycIO4Dn8fzjRG3AUDXW+UuDKPsxkfd1owJALie3Orb4/GK5P9DqBKZ
-        w3529T0xuBdCRB64tVeJiwxDHM44aN63eOKwqyL8W0JYiZtBOaXkjPZK2BCtqQ==
-Date:   Thu, 2 Mar 2023 09:48:48 +0100
-From:   Miquel Raynal <miquel.raynal@bootlin.com>
-To:     "David S. Miller" <davem@davemloft.net>,
+        bh=rjrL2EXhz6JO0AkbHS6QYk5+IhLOU9nymJnzUdVn1xs=;
+        b=VAkd69Gs2JGdo6jSejXeDScf6u2CE1plj86WUwRxuC6Z1DvD1NTlVLk5vJogjVazIGSPR6
+        jnqRxlBAeyn5qMn8sTvGj85rnWrxnBNkCfwUHr86xvv5wyx+CQy0+9p7cOxPZgkQQ5NE1M
+        6qLxebsOzpMjwgK3KRxeXrpgjO6cfpM=
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
+ [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-611-4CEQz8aaNQG9xtmlTkB4Wg-1; Thu, 02 Mar 2023 05:20:32 -0500
+X-MC-Unique: 4CEQz8aaNQG9xtmlTkB4Wg-1
+Received: by mail-qt1-f199.google.com with SMTP id o10-20020a05622a138a00b003bfdabf3b89so6493991qtk.13
+        for <linux-wpan@vger.kernel.org>; Thu, 02 Mar 2023 02:20:31 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=rjrL2EXhz6JO0AkbHS6QYk5+IhLOU9nymJnzUdVn1xs=;
+        b=VFDYQat6Yr5Y9EG1U3BK8g53wzdXnqqsP5tYfppWl3OKZ4/BfooAHoLndTn6s2Cvlq
+         PVCCWZIxuv0+jz9n/KKLZKGfSblpDDtpxNskMmsRPrNL+z5VVarujIvIi1sg06gbv+gi
+         C35P2pXsAJaupKOpOTc8zdD9yCxeDYuuyofwZRxfjVm8LnIoCRSOebpWeuZ0YYUHxAJ9
+         HOiwmkSGX5D49CdZ99fPWFzlEbkUbuezZ5bJR1Vet+R+EAdA7XiDZUm9ugUo3Zk2Prko
+         hVew1zQJmVDIJeHQNHsKvTeG/f+6vmHDwCAd9zBpDcHtyTVVApAt38B1lmDtQaB1VW6F
+         8hgw==
+X-Gm-Message-State: AO0yUKUQ0LnVSSSydkGJDd1cs7qemVLl1byxpU/dT7DdoA7jSOTNi+BR
+        hP/cdpiOt2xf8mburfYccxvyBSi1IkMXP9S5hBE121H6iJUV44+oxE2wRRHKjdtUn68kNbIREuG
+        DMf5W5HG3+yP/AByUWn5IPA==
+X-Received: by 2002:a0c:9a0d:0:b0:56e:a69a:730 with SMTP id p13-20020a0c9a0d000000b0056ea69a0730mr14035353qvd.1.1677752431457;
+        Thu, 02 Mar 2023 02:20:31 -0800 (PST)
+X-Google-Smtp-Source: AK7set8QkPFQKK3jKhNe0n2G/KTJFzY1FXdoKaqbHMxgqBoWOUVkxwZcGtqZie9s4/8iajizaG9J5w==
+X-Received: by 2002:a0c:9a0d:0:b0:56e:a69a:730 with SMTP id p13-20020a0c9a0d000000b0056ea69a0730mr14035330qvd.1.1677752431130;
+        Thu, 02 Mar 2023 02:20:31 -0800 (PST)
+Received: from gerbillo.redhat.com (146-241-121-8.dyn.eolo.it. [146.241.121.8])
+        by smtp.gmail.com with ESMTPSA id e15-20020a05620a014f00b0074281812276sm10765098qkn.97.2023.03.02.02.20.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Mar 2023 02:20:30 -0800 (PST)
+Message-ID: <ac92a5f3e553e35a50119918ea0f2a833c124333.camel@redhat.com>
+Subject: Re: [PATCH net] ieee802154: Prevent user from crashing the host
+From:   Paolo Abeni <pabeni@redhat.com>
+To:     Miquel Raynal <miquel.raynal@bootlin.com>,
+        "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
         Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org
 Cc:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
@@ -45,52 +72,33 @@ Cc:     Alexander Aring <alex.aring@gmail.com>,
         Guilhem Imberton <guilhem.imberton@qorvo.com>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
         Sanan Hasanov <sanan.hasanov@Knights.ucf.edu>
-Subject: Re: [PATCH net] ieee802154: Prevent user from crashing the host
-Message-ID: <20230302094848.206f35ae@xps-13>
-In-Reply-To: <20230301154450.547716-1-miquel.raynal@bootlin.com>
+Date:   Thu, 02 Mar 2023 11:20:26 +0100
+In-Reply-To: <20230302094848.206f35ae@xps-13>
 References: <20230301154450.547716-1-miquel.raynal@bootlin.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+         <20230302094848.206f35ae@xps-13>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+MIME-Version: 1.0
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
 Hello,
 
-miquel.raynal@bootlin.com wrote on Wed,  1 Mar 2023 16:44:50 +0100:
-
-> Avoid crashing the machine by checking
-> info->attrs[NL802154_ATTR_SCAN_TYPE] presence before de-referencing it,
-> which was the primary intend of the blamed patch.
-
-Subject should have been wpan instead of net, sorry for the confusion.
-
-> Reported-by: Sanan Hasanov <sanan.hasanov@Knights.ucf.edu>
-> Suggested-by: Eric Dumazet <edumazet@google.com>
-> Fixes: a0b6106672b5 ("ieee802154: Convert scan error messages to extack")
-> Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
-> ---
->  net/ieee802154/nl802154.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+On Thu, 2023-03-02 at 09:48 +0100, Miquel Raynal wrote:
+> miquel.raynal@bootlin.com wrote on Wed,  1 Mar 2023 16:44:50 +0100:
 >=20
-> diff --git a/net/ieee802154/nl802154.c b/net/ieee802154/nl802154.c
-> index 88380606af2c..a18fb98a4b09 100644
-> --- a/net/ieee802154/nl802154.c
-> +++ b/net/ieee802154/nl802154.c
-> @@ -1412,7 +1412,7 @@ static int nl802154_trigger_scan(struct sk_buff *sk=
-b, struct genl_info *info)
->  		return -EOPNOTSUPP;
->  	}
-> =20
-> -	if (!nla_get_u8(info->attrs[NL802154_ATTR_SCAN_TYPE])) {
-> +	if (!info->attrs[NL802154_ATTR_SCAN_TYPE]) {
->  		NL_SET_ERR_MSG(info->extack, "Malformed request, missing scan type");
->  		return -EINVAL;
->  	}
+> > Avoid crashing the machine by checking
+> > info->attrs[NL802154_ATTR_SCAN_TYPE] presence before de-referencing it,
+> > which was the primary intend of the blamed patch.
+>=20
+> Subject should have been wpan instead of net, sorry for the confusion.
 
+I read the above as you intend this patch to go through
+Alexander/Stefan tree, thus dropping from netdev PW.
 
-Thanks,
-Miqu=C3=A8l
+LMK if you prefer otherwise, thanks!
+
+Paolo
+
