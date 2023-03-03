@@ -2,77 +2,78 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CE21C6FA8E
-	for <linux-wpan@archiver.kernel.org>; Thu,  2 Mar 2023 15:31:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB7B4C7EE36
+	for <linux-wpan@archiver.kernel.org>; Fri,  3 Mar 2023 06:30:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229861AbjCBPbO (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Thu, 2 Mar 2023 10:31:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60336 "EHLO
+        id S229653AbjCCGaZ (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Fri, 3 Mar 2023 01:30:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42050 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230050AbjCBPbF (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 2 Mar 2023 10:31:05 -0500
-Received: from proxima.lasnet.de (proxima.lasnet.de [IPv6:2a01:4f8:121:31eb:3::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4912E12BD0;
-        Thu,  2 Mar 2023 07:31:03 -0800 (PST)
-Received: from localhost.localdomain.datenfreihafen.local (p200300e9d718cfbb38f25c92aa892f41.dip0.t-ipconnect.de [IPv6:2003:e9:d718:cfbb:38f2:5c92:aa89:2f41])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        with ESMTP id S229764AbjCCGaX (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 3 Mar 2023 01:30:23 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D19B215568;
+        Thu,  2 Mar 2023 22:30:20 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        (Authenticated sender: stefan@sostec.de)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id 173C3C0151;
-        Thu,  2 Mar 2023 16:31:01 +0100 (CET)
-From:   Stefan Schmidt <stefan@datenfreihafen.org>
-To:     davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com
-Cc:     linux-wpan@vger.kernel.org, alex.aring@gmail.com,
-        miquel.raynal@bootlin.com, netdev@vger.kernel.org
-Subject: pull-request: ieee802154 for net 2023-03-02
-Date:   Thu,  2 Mar 2023 16:30:32 +0100
-Message-Id: <20230302153032.1312755-1-stefan@datenfreihafen.org>
-X-Mailer: git-send-email 2.39.2
+        by ams.source.kernel.org (Postfix) with ESMTPS id 80854B816A0;
+        Fri,  3 Mar 2023 06:30:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 3CE27C433A0;
+        Fri,  3 Mar 2023 06:30:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1677825018;
+        bh=zky7Bb/ZzQ7cdXxmSjVjtxqBYRhobFsu//CSVeKzQYs=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=sl1U+pI/udvxnfZyCC+zJb0i0bssqPzPiHsuo5grcOzPssUOhgIDXDPFqaulokpXw
+         Ua6H+6qmZ7fkrDLNx5Npp7tfxbttXujENFlpOKSU8Mp2AO1RncA281Cu62M3pew48s
+         u8z3SIkHPp6oF4X6XCoDP/RgUPVECK8tcb7qJFlBnmrQdl5j8nFxBFK0h3jLkND25Y
+         Zn5e4vHxRiyOqWNB1N3RDOad9dS9oupXPbRhzbGap7n8CAftbLj3n27LN66S2RGHUe
+         UPK37DCetN4nOg5IEefOJvLBuEo0QFfqOJW1UNc7eefJo6GSsSk9OFhjt8Hsk9fIu6
+         shQEwt8ERPUFg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 19FFCC00445;
+        Fri,  3 Mar 2023 06:30:18 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: pull-request: ieee802154 for net 2023-03-02
+From:   patchwork-bot+netdevbpf@kernel.org
+Message-Id: <167782501810.9922.9492641520311810184.git-patchwork-notify@kernel.org>
+Date:   Fri, 03 Mar 2023 06:30:18 +0000
+References: <20230302153032.1312755-1-stefan@datenfreihafen.org>
+In-Reply-To: <20230302153032.1312755-1-stefan@datenfreihafen.org>
+To:     Stefan Schmidt <stefan@datenfreihafen.org>
+Cc:     davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+        linux-wpan@vger.kernel.org, alex.aring@gmail.com,
+        miquel.raynal@bootlin.com, netdev@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello Dave, Jakub, Paolo.
+Hello:
 
-An update from ieee802154 for your *net* tree:
+This pull request was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Two small fixes this time.
+On Thu,  2 Mar 2023 16:30:32 +0100 you wrote:
+> Hello Dave, Jakub, Paolo.
+> 
+> An update from ieee802154 for your *net* tree:
+> 
+> Two small fixes this time.
+> 
+> Alexander Aring fixed a potential negative array access in the ca8210 driver.
+> 
+> [...]
 
-Alexander Aring fixed a potential negative array access in the ca8210 driver.
+Here is the summary with links:
+  - pull-request: ieee802154 for net 2023-03-02
+    https://git.kernel.org/netdev/net/c/ad93bab6b8d3
 
-Miquel Raynal fixed a crash that could have been triggered through the extended
-netlink API for 802154. This only came in this merge window. Found by syzkaller.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Please note the new git URL. We switched to team maintenance and thus the pull
-request will point to wpan instead of the former used sschmidt namespace on
-kernel.org. In the future you will also see pull requests coming from Alex and
-Miquel for ieee802154 for net and net-next.
 
-regards
-Stefan Schmidt
-
-The following changes since commit 044c8bf78db818b8c726eb47c560e05fbc71e128:
-
-  Merge git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf (2023-03-02 11:10:43 +0100)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/wpan/wpan.git tags/ieee802154-for-net-2023-03-02
-
-for you to fetch changes up to 02f18662f6c671382345fcb696e808d78f4c194a:
-
-  ieee802154: Prevent user from crashing the host (2023-03-02 14:39:48 +0100)
-
-----------------------------------------------------------------
-Alexander Aring (1):
-      ca8210: fix mac_len negative array access
-
-Miquel Raynal (1):
-      ieee802154: Prevent user from crashing the host
-
- drivers/net/ieee802154/ca8210.c | 2 ++
- net/ieee802154/nl802154.c       | 2 +-
- 2 files changed, 3 insertions(+), 1 deletion(-)
