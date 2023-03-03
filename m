@@ -2,78 +2,162 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB7B4C7EE36
-	for <linux-wpan@archiver.kernel.org>; Fri,  3 Mar 2023 06:30:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 961E6C678D4
+	for <linux-wpan@archiver.kernel.org>; Fri,  3 Mar 2023 14:30:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229653AbjCCGaZ (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Fri, 3 Mar 2023 01:30:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42050 "EHLO
+        id S230407AbjCCOaw (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Fri, 3 Mar 2023 09:30:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42290 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229764AbjCCGaX (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Fri, 3 Mar 2023 01:30:23 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D19B215568;
-        Thu,  2 Mar 2023 22:30:20 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 80854B816A0;
-        Fri,  3 Mar 2023 06:30:19 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 3CE27C433A0;
-        Fri,  3 Mar 2023 06:30:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1677825018;
-        bh=zky7Bb/ZzQ7cdXxmSjVjtxqBYRhobFsu//CSVeKzQYs=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=sl1U+pI/udvxnfZyCC+zJb0i0bssqPzPiHsuo5grcOzPssUOhgIDXDPFqaulokpXw
-         Ua6H+6qmZ7fkrDLNx5Npp7tfxbttXujENFlpOKSU8Mp2AO1RncA281Cu62M3pew48s
-         u8z3SIkHPp6oF4X6XCoDP/RgUPVECK8tcb7qJFlBnmrQdl5j8nFxBFK0h3jLkND25Y
-         Zn5e4vHxRiyOqWNB1N3RDOad9dS9oupXPbRhzbGap7n8CAftbLj3n27LN66S2RGHUe
-         UPK37DCetN4nOg5IEefOJvLBuEo0QFfqOJW1UNc7eefJo6GSsSk9OFhjt8Hsk9fIu6
-         shQEwt8ERPUFg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 19FFCC00445;
-        Fri,  3 Mar 2023 06:30:18 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+        with ESMTP id S229800AbjCCOav (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 3 Mar 2023 09:30:51 -0500
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 294FA11676
+        for <linux-wpan@vger.kernel.org>; Fri,  3 Mar 2023 06:30:50 -0800 (PST)
+Received: by mail-il1-f200.google.com with SMTP id h12-20020a92c08c000000b00316f82f1d98so1389548ile.7
+        for <linux-wpan@vger.kernel.org>; Fri, 03 Mar 2023 06:30:50 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=LYGC+w3AgQ/UuUT2/eT2BWbBygwSydLWl4GHGcTVjNo=;
+        b=E1OzxAa7vSZNE2vdA5FOHa0IZ8vCK11qgiEuOk2GNxysO6EZKy1q4yrV49+stfNyyB
+         eetg6eVfuzLDqwyvFRf9KYgvjtNtuCIYNUMMi9DcL72e+3SwvESecoHMyzVRIsHcrZd9
+         Zv7BeI+k65Y5mxEZgkj7eMFecw+nPSAm5J0DtCQeKMorDJJiKafCI1iQHBSDnRuAEcxY
+         W+qDFZsUXxzmbD/G7vT2brri/NpQttOyeNgnnaWtfwm5hOXDepeBhcQ5YU/5+PlqWQHJ
+         SC6Tey76fJEle0jZMRe8hsnINcYcanz7gobFAXt7PcmUEkiz4zXa8JX0hISRWuun54Kw
+         JuWw==
+X-Gm-Message-State: AO0yUKXyBhp1KnCB2lepuvF7kxfWy9Hr2tApKTRDDOssrh4DM9AqyRs/
+        4y4OJGpgW195r8wryY5K/lZpSbu7vAwwRuZcEBn2oPu76TMI
+X-Google-Smtp-Source: AK7set+5pL/ks78WMSUWEvMvnWV7ChM7/TKJx0o1E99E4/mH9RGRKxZV6Bkx44Xyf/KteatM84nkvix++dPQRsZcX/UOsvJwzJwa
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: pull-request: ieee802154 for net 2023-03-02
-From:   patchwork-bot+netdevbpf@kernel.org
-Message-Id: <167782501810.9922.9492641520311810184.git-patchwork-notify@kernel.org>
-Date:   Fri, 03 Mar 2023 06:30:18 +0000
-References: <20230302153032.1312755-1-stefan@datenfreihafen.org>
-In-Reply-To: <20230302153032.1312755-1-stefan@datenfreihafen.org>
-To:     Stefan Schmidt <stefan@datenfreihafen.org>
-Cc:     davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
-        linux-wpan@vger.kernel.org, alex.aring@gmail.com,
-        miquel.raynal@bootlin.com, netdev@vger.kernel.org
+X-Received: by 2002:a02:952e:0:b0:3c4:e84b:2a3a with SMTP id
+ y43-20020a02952e000000b003c4e84b2a3amr651104jah.4.1677853849412; Fri, 03 Mar
+ 2023 06:30:49 -0800 (PST)
+Date:   Fri, 03 Mar 2023 06:30:49 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000adec0205f5ffcaf4@google.com>
+Subject: [syzbot] [wpan?] general protection fault in nl802154_trigger_scan
+From:   syzbot <syzbot+bd85b31816913a32e473@syzkaller.appspotmail.com>
+To:     alex.aring@gmail.com, davem@davemloft.net, edumazet@google.com,
+        kuba@kernel.org, linux-kernel@vger.kernel.org,
+        linux-wpan@vger.kernel.org, miquel.raynal@bootlin.com,
+        netdev@vger.kernel.org, pabeni@redhat.com,
+        stefan@datenfreihafen.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello:
+Hello,
 
-This pull request was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+syzbot found the following issue on:
 
-On Thu,  2 Mar 2023 16:30:32 +0100 you wrote:
-> Hello Dave, Jakub, Paolo.
-> 
-> An update from ieee802154 for your *net* tree:
-> 
-> Two small fixes this time.
-> 
-> Alexander Aring fixed a potential negative array access in the ca8210 driver.
-> 
-> [...]
+HEAD commit:    f3a2439f20d9 Merge tag 'rproc-v6.3' of git://git.kernel.or..
+git tree:       upstream
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=12df1a7f480000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=81f5afa0c201c8de
+dashboard link: https://syzkaller.appspot.com/bug?extid=bd85b31816913a32e473
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1597f254c80000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15053e40c80000
 
-Here is the summary with links:
-  - pull-request: ieee802154 for net 2023-03-02
-    https://git.kernel.org/netdev/net/c/ad93bab6b8d3
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/0719d575f3ac/disk-f3a2439f.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/4176aabb67b5/vmlinux-f3a2439f.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/2b0e3c0ab205/bzImage-f3a2439f.xz
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+bd85b31816913a32e473@syzkaller.appspotmail.com
+
+general protection fault, probably for non-canonical address 0xdffffc0000000000: 0000 [#1] PREEMPT SMP KASAN
+KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
+CPU: 1 PID: 5076 Comm: syz-executor386 Not tainted 6.2.0-syzkaller-12485-gf3a2439f20d9 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/16/2023
+RIP: 0010:nla_get_u8 include/net/netlink.h:1658 [inline]
+RIP: 0010:nl802154_trigger_scan+0x132/0xc90 net/ieee802154/nl802154.c:1415
+Code: 48 c1 ea 03 80 3c 02 00 0f 85 3f 0a 00 00 48 8b ad f8 00 00 00 48 b8 00 00 00 00 00 fc ff df 48 8d 7d 04 48 89 fa 48 c1 ea 03 <0f> b6 04 02 48 89 fa 83 e2 07 38 d0 7f 08 84 c0 0f 85 d0 07 00 00
+RSP: 0018:ffffc90003397568 EFLAGS: 00010247
+RAX: dffffc0000000000 RBX: ffffc900033975d8 RCX: 0000000000000000
+RDX: 0000000000000000 RSI: ffffffff89cec1a1 RDI: 0000000000000004
+RBP: 0000000000000000 R08: 0000000000000005 R09: 0000000000000001
+R10: 0000000000000000 R11: 0000000000000000 R12: ffff888146fb4c90
+R13: ffff888146f82000 R14: ffff888146f820a0 R15: ffffc900033975f8
+FS:  0000555556c9b300(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000055be8d9c04f0 CR3: 0000000023513000 CR4: 00000000003506e0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ genl_family_rcv_msg_doit.isra.0+0x1e6/0x2d0 net/netlink/genetlink.c:968
+ genl_family_rcv_msg net/netlink/genetlink.c:1048 [inline]
+ genl_rcv_msg+0x4ff/0x7e0 net/netlink/genetlink.c:1065
+ netlink_rcv_skb+0x165/0x440 net/netlink/af_netlink.c:2574
+ genl_rcv+0x28/0x40 net/netlink/genetlink.c:1076
+ netlink_unicast_kernel net/netlink/af_netlink.c:1339 [inline]
+ netlink_unicast+0x547/0x7f0 net/netlink/af_netlink.c:1365
+ netlink_sendmsg+0x925/0xe30 net/netlink/af_netlink.c:1942
+ sock_sendmsg_nosec net/socket.c:722 [inline]
+ sock_sendmsg+0xde/0x190 net/socket.c:745
+ ____sys_sendmsg+0x71c/0x900 net/socket.c:2504
+ ___sys_sendmsg+0x110/0x1b0 net/socket.c:2558
+ __sys_sendmsg+0xf7/0x1c0 net/socket.c:2587
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+RIP: 0033:0x7f416cc9ee69
+Code: 28 c3 e8 5a 14 00 00 66 2e 0f 1f 84 00 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 c0 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fff243fe498 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007f416cd17380 RCX: 00007f416cc9ee69
+RDX: 0000000000000000 RSI: 0000000020000240 RDI: 0000000000000003
+RBP: 0000000000000001 R08: 0000000000000000 R09: 001d00000000000c
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000004
+R13: 0000000000000003 R14: 00007fff243fe4b7 R15: 00007fff243fe4ba
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:nla_get_u8 include/net/netlink.h:1658 [inline]
+RIP: 0010:nl802154_trigger_scan+0x132/0xc90 net/ieee802154/nl802154.c:1415
+Code: 48 c1 ea 03 80 3c 02 00 0f 85 3f 0a 00 00 48 8b ad f8 00 00 00 48 b8 00 00 00 00 00 fc ff df 48 8d 7d 04 48 89 fa 48 c1 ea 03 <0f> b6 04 02 48 89 fa 83 e2 07 38 d0 7f 08 84 c0 0f 85 d0 07 00 00
+RSP: 0018:ffffc90003397568 EFLAGS: 00010247
+RAX: dffffc0000000000 RBX: ffffc900033975d8 RCX: 0000000000000000
+RDX: 0000000000000000 RSI: ffffffff89cec1a1 RDI: 0000000000000004
+RBP: 0000000000000000 R08: 0000000000000005 R09: 0000000000000001
+R10: 0000000000000000 R11: 0000000000000000 R12: ffff888146fb4c90
+R13: ffff888146f82000 R14: ffff888146f820a0 R15: ffffc900033975f8
+FS:  0000555556c9b300(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000055be8d9c04f0 CR3: 0000000023513000 CR4: 00000000003506e0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+----------------
+Code disassembly (best guess):
+   0:	48 c1 ea 03          	shr    $0x3,%rdx
+   4:	80 3c 02 00          	cmpb   $0x0,(%rdx,%rax,1)
+   8:	0f 85 3f 0a 00 00    	jne    0xa4d
+   e:	48 8b ad f8 00 00 00 	mov    0xf8(%rbp),%rbp
+  15:	48 b8 00 00 00 00 00 	movabs $0xdffffc0000000000,%rax
+  1c:	fc ff df
+  1f:	48 8d 7d 04          	lea    0x4(%rbp),%rdi
+  23:	48 89 fa             	mov    %rdi,%rdx
+  26:	48 c1 ea 03          	shr    $0x3,%rdx
+* 2a:	0f b6 04 02          	movzbl (%rdx,%rax,1),%eax <-- trapping instruction
+  2e:	48 89 fa             	mov    %rdi,%rdx
+  31:	83 e2 07             	and    $0x7,%edx
+  34:	38 d0                	cmp    %dl,%al
+  36:	7f 08                	jg     0x40
+  38:	84 c0                	test   %al,%al
+  3a:	0f 85 d0 07 00 00    	jne    0x810
 
 
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+syzbot can test patches for this issue, for details see:
+https://goo.gl/tpsmEJ#testing-patches
