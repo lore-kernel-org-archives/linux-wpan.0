@@ -2,113 +2,170 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40CAFC64EC4
-	for <linux-wpan@archiver.kernel.org>; Mon,  6 Mar 2023 19:19:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4612C6FD20
+	for <linux-wpan@archiver.kernel.org>; Mon,  6 Mar 2023 20:01:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229806AbjCFTTY (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 6 Mar 2023 14:19:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42012 "EHLO
+        id S230283AbjCFUBV (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 6 Mar 2023 15:01:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40102 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230132AbjCFTTM (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 6 Mar 2023 14:19:12 -0500
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A3E46C6B4;
-        Mon,  6 Mar 2023 11:18:54 -0800 (PST)
-Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 326HSxkL019565;
-        Mon, 6 Mar 2023 19:18:30 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-transfer-encoding;
- s=corp-2022-7-12; bh=R0FC7S7XViyQ2hmVARJlnKVtSo6GEEVdDFw0OUgx8vA=;
- b=SRs9kPFj5N2Y1l2fMtjO6ly44K0h2ioVxXo3JzzvXwbOmiU9Cpn0app2twBwtL3zJ/Rt
- EAhHuh0Ny5iVYux6v3xS/xm+944jpEZpRFpZeY7PqEsFIlto5nEdP/kLK0JtDpi4Fpth
- WJq6G3dWegbfezAxbYcXddkIbJM6ZIkNFUs+wqfs6G0gAjwBlPB1HKTR42Dfe5yfOiR0
- xQepaZlIcsWmM6M8/zInMWYh927MnJwniBofEQVQTwbQEC0YkxGSp9cLHx24VxepeBcU
- MJBv7HRTFAMLHL+uqEhNF5bM5IW0UCn0r8FS6nA2ea3zr38+2w0nEhqdmAKFbtmA7yaB oA== 
-Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
-        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3p417cbrcy-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 06 Mar 2023 19:18:30 +0000
-Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-        by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.5/8.17.1.5) with ESMTP id 326HX0Ok029280;
-        Mon, 6 Mar 2023 19:18:29 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-        by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3p4u1dxcba-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 06 Mar 2023 19:18:29 +0000
-Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 326JFwKZ000582;
-        Mon, 6 Mar 2023 19:18:28 GMT
-Received: from ca-dev112.us.oracle.com (ca-dev112.us.oracle.com [10.129.136.47])
-        by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 3p4u1dxca8-1;
-        Mon, 06 Mar 2023 19:18:28 +0000
-From:   Harshit Mogalapalli <harshit.m.mogalapalli@oracle.com>
-Cc:     error27@gmail.com,
-        Harshit Mogalapalli <harshit.m.mogalapalli@oracle.com>,
-        Alexander Aring <alex.aring@gmail.com>,
-        Stefan Schmidt <stefan@datenfreihafen.org>,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Harry Morris <harrymorris12@gmail.com>,
-        linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH next] ca8210: Fix unsigned mac_len comparison with zero in ca8210_skb_tx()
-Date:   Mon,  6 Mar 2023 11:18:24 -0800
-Message-Id: <20230306191824.4115839-1-harshit.m.mogalapalli@oracle.com>
-X-Mailer: git-send-email 2.39.2
+        with ESMTP id S230144AbjCFUBO (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 6 Mar 2023 15:01:14 -0500
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC3EC67024;
+        Mon,  6 Mar 2023 12:00:56 -0800 (PST)
+Received: by mail-pj1-x102b.google.com with SMTP id qa18-20020a17090b4fd200b0023750b675f5so14280355pjb.3;
+        Mon, 06 Mar 2023 12:00:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112; t=1678132856;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=uXR1hBuNmG/TwC91AeVvsW1UVH/MwkAfhUSEnuvNaoY=;
+        b=o6hZefnQYEnFw3COvoTdyyoXo9Zv4P0LTShB301lkw0/gGr+x1ou0XeYCSdcXXLXoz
+         Ie/lwSIsRhh9vBh4c56fFPeCbh1Mg/u0f+SLHuOsNnA01L3iQxuD6tKvCodPDyUeqcUA
+         ipzyAtvRXWR1nR5U0W8m7xh6fPIYtpAYIZVYRkCJb0GTxixFtDSEeec8W6O4TIR9SFvb
+         8TyLwk+heXtYmzhntJcZ54SphmylZPrikYFa1PRdJ8V5j+VefclzJKcG1hcN/EBRiJ2z
+         A5LjdstbOHhVHAVRXA7o2dTcBNuVBc27QoVtU1tjX+Yepbtmilj428R4Os2Xd6WiLWnA
+         Of4A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1678132856;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=uXR1hBuNmG/TwC91AeVvsW1UVH/MwkAfhUSEnuvNaoY=;
+        b=aXlIsS33Jjsuul+qMNL2sbI/Xqukq2wbEWP7Zdwtlj7bv64XyL7zxFEoY23RZ0YQor
+         Bqbh5zVr8LntGonP2exW1FvIEe3AwE9XlYZmNS8BKWTAWJs46K5D88Cz1tVysYW6l+vP
+         FlMoMohxRfMxV4J+TUf+f7Bz1HpG6jA9mHubAYpMaJGTADnDWXZk6nHVD+RgpSfy8wnl
+         /+/YGrN5IjCieKDYZ32gkewHxI34PwOi60E7Fm7h+ZsDbXdaNQooMMjB7VEGiEr6rL0+
+         lQojxCgDm1YNLkaokb9PWqj3WmVVVML7lZp7/PlVkSmU5avaYieldMHSE8tJs0W+SvaY
+         B+Qw==
+X-Gm-Message-State: AO0yUKXAbIFP23mAPtL3C28xLpxvoISrBRzI+Kq+PG803rUuLclFekw1
+        m8OB/pmYca24tx4TYBNZYeUG77vaa6Wk3reLCVE=
+X-Google-Smtp-Source: AK7set/DxZtiZhO+z+A0Is7yokDniYYkETavBEcleYa7IPSvIEQBIV7zty9Y+UWe1CWFM73JZ5CBgh34wQSFC4iK+eg=
+X-Received: by 2002:a17:90a:5993:b0:233:b520:1544 with SMTP id
+ l19-20020a17090a599300b00233b5201544mr6625621pji.0.1678132856231; Mon, 06 Mar
+ 2023 12:00:56 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-03-06_12,2023-03-06_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 phishscore=0 bulkscore=0
- adultscore=0 suspectscore=0 spamscore=0 mlxlogscore=999 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2212070000
- definitions=main-2303060170
-X-Proofpoint-GUID: lqGlXhDw3PAOtAL1SHOcRMeTZe_LygDw
-X-Proofpoint-ORIG-GUID: lqGlXhDw3PAOtAL1SHOcRMeTZe_LygDw
-To:     unlisted-recipients:; (no To-header on input)
+References: <20230306172109.595464-1-amit.kumar-mahapatra@amd.com> <20230306172109.595464-10-amit.kumar-mahapatra@amd.com>
+In-Reply-To: <20230306172109.595464-10-amit.kumar-mahapatra@amd.com>
+From:   Jonas Gorski <jonas.gorski@gmail.com>
+Date:   Mon, 6 Mar 2023 21:00:44 +0100
+Message-ID: <CAOiHx=nmsAh3ADL3s0eZKpEZJqCB_POi=8YjfxrHYLEbjRfwHg@mail.gmail.com>
+Subject: Re: [PATCH V5 09/15] spi: Add stacked and parallel memories support
+ in SPI core
+To:     Amit Kumar Mahapatra <amit.kumar-mahapatra@amd.com>
+Cc:     broonie@kernel.org, miquel.raynal@bootlin.com, richard@nod.at,
+        vigneshr@ti.com, jic23@kernel.org, tudor.ambarus@microchip.com,
+        pratyush@kernel.org, Sanju.Mehta@amd.com,
+        chin-ting_kuo@aspeedtech.com, clg@kaod.org, kdasu.kdev@gmail.com,
+        f.fainelli@gmail.com, rjui@broadcom.com, sbranden@broadcom.com,
+        eajames@linux.ibm.com, olteanv@gmail.com, han.xu@nxp.com,
+        john.garry@huawei.com, shawnguo@kernel.org, s.hauer@pengutronix.de,
+        narmstrong@baylibre.com, khilman@baylibre.com,
+        matthias.bgg@gmail.com, haibo.chen@nxp.com,
+        linus.walleij@linaro.org, daniel@zonque.org,
+        haojian.zhuang@gmail.com, robert.jarzmik@free.fr,
+        agross@kernel.org, bjorn.andersson@linaro.org, heiko@sntech.de,
+        krzysztof.kozlowski@linaro.org, andi@etezian.org,
+        mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
+        wens@csie.org, jernej.skrabec@gmail.com, samuel@sholland.org,
+        masahisa.kojima@linaro.org, jaswinder.singh@linaro.org,
+        rostedt@goodmis.org, mingo@redhat.com, l.stelmach@samsung.com,
+        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com, alex.aring@gmail.com, stefan@datenfreihafen.org,
+        kvalo@kernel.org, james.schulman@cirrus.com,
+        david.rhodes@cirrus.com, tanureal@opensource.cirrus.com,
+        rf@opensource.cirrus.com, perex@perex.cz, tiwai@suse.com,
+        npiggin@gmail.com, christophe.leroy@csgroup.eu, mpe@ellerman.id.au,
+        oss@buserror.net, windhl@126.com, yangyingliang@huawei.com,
+        william.zhang@broadcom.com, kursad.oney@broadcom.com,
+        anand.gore@broadcom.com, rafal@milecki.pl, git@amd.com,
+        linux-spi@vger.kernel.org, linux-kernel@vger.kernel.org,
+        joel@jms.id.au, andrew@aj.id.au, radu_nicolae.pirea@upb.ro,
+        nicolas.ferre@microchip.com, alexandre.belloni@bootlin.com,
+        claudiu.beznea@microchip.com,
+        bcm-kernel-feedback-list@broadcom.com, fancer.lancer@gmail.com,
+        kernel@pengutronix.de, festevam@gmail.com, linux-imx@nxp.com,
+        jbrunet@baylibre.com, martin.blumenstingl@googlemail.com,
+        avifishman70@gmail.com, tmaimon77@gmail.com, tali.perry1@gmail.com,
+        venture@google.com, yuenn@google.com, benjaminfair@google.com,
+        yogeshgaur.83@gmail.com, konrad.dybcio@somainline.org,
+        alim.akhtar@samsung.com, ldewangan@nvidia.com,
+        thierry.reding@gmail.com, jonathanh@nvidia.com,
+        michal.simek@amd.com, linux-aspeed@lists.ozlabs.org,
+        openbmc@lists.ozlabs.org, linux-arm-kernel@lists.infradead.org,
+        linux-rpi-kernel@lists.infradead.org,
+        linux-amlogic@lists.infradead.org,
+        linux-mediatek@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+        linux-rockchip@lists.infradead.org,
+        linux-samsung-soc@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-sunxi@lists.linux.dev, linux-tegra@vger.kernel.org,
+        netdev@vger.kernel.org, linux-wpan@vger.kernel.org,
+        libertas-dev@lists.infradead.org, linux-wireless@vger.kernel.org,
+        linux-mtd@lists.infradead.org, lars@metafoo.de,
+        Michael.Hennerich@analog.com, linux-iio@vger.kernel.org,
+        michael@walle.cc, palmer@dabbelt.com,
+        linux-riscv@lists.infradead.org, alsa-devel@alsa-project.org,
+        patches@opensource.cirrus.com, linuxppc-dev@lists.ozlabs.org,
+        amitrkcian2002@gmail.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-mac_len is of type unsigned, which can never be less than zero.
+Hi,
 
-	mac_len = ieee802154_hdr_peek_addrs(skb, &header);
-	if (mac_len < 0)
-		return mac_len;
+On Mon, 6 Mar 2023 at 18:26, Amit Kumar Mahapatra
+<amit.kumar-mahapatra@amd.com> wrote:
+>
+> For supporting multiple CS the SPI device need to be aware of all the CS
+> values. So, the "chip_select" member in the spi_device structure is now an
+> array that holds all the CS values.
+>
+> spi_device structure now has a "cs_index_mask" member. This acts as an
+> index to the chip_select array. If nth bit of spi->cs_index_mask is set
+> then the driver would assert spi->chip_select[n].
+>
+> In parallel mode all the chip selects are asserted/de-asserted
+> simultaneously and each byte of data is stored in both devices, the even
+> bits in one, the odd bits in the other. The split is automatically handled
+> by the GQSPI controller. The GQSPI controller supports a maximum of two
+> flashes connected in parallel mode. A "multi-cs-cap" flag is added in the
+> spi controntroller data, through ctlr->multi-cs-cap the spi core will make
+> sure that the controller is capable of handling multiple chip selects at
+> once.
+>
+> For supporting multiple CS via GPIO the cs_gpiod member of the spi_device
+> structure is now an array that holds the gpio descriptor for each
+> chipselect.
+>
+> Multi CS support using GPIO is not tested due to unavailability of
+> necessary hardware setup.
+>
+> Signed-off-by: Amit Kumar Mahapatra <amit.kumar-mahapatra@amd.com>
+> ---
+>  drivers/spi/spi.c       | 213 +++++++++++++++++++++++++++-------------
+>  include/linux/spi/spi.h |  34 +++++--
+>  2 files changed, 173 insertions(+), 74 deletions(-)
+>
+> diff --git a/drivers/spi/spi.c b/drivers/spi/spi.c
+> index 5866bf5813a4..8ec7f58fa111 100644
+> --- a/drivers/spi/spi.c
+> +++ b/drivers/spi/spi.c
+> @@ -613,7 +613,8 @@ static int spi_dev_check(struct device *dev, void *data)
+>         struct spi_device *new_spi = data;
+>
+>         if (spi->controller == new_spi->controller &&
+> -           spi_get_chipselect(spi, 0) == spi_get_chipselect(new_spi, 0))
+> +           spi_get_chipselect(spi, 0) == spi_get_chipselect(new_spi, 0) &&
+> +           spi_get_chipselect(spi, 1) == spi_get_chipselect(new_spi, 1))
+>                 return -EBUSY;
 
-Change this to type int as ieee802154_hdr_peek_addrs() can return negative
-integers, this is found by static analysis with smatch.
+This will only reject new devices if both chip selects are identical,
+but not if they only share one, e.g. CS 1 + 2 vs 1 + 3, or 1 + 2 vs
+only 2, or if the order is different (1 + 2 vs 2 + 1 - haven't read
+the code too close to know if this is allowed/possible).
 
-Fixes: ded845a781a5 ("ieee802154: Add CA8210 IEEE 802.15.4 device driver")
-Signed-off-by: Harshit Mogalapalli <harshit.m.mogalapalli@oracle.com>
----
-Only compile tested.
----
- drivers/net/ieee802154/ca8210.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
-
-diff --git a/drivers/net/ieee802154/ca8210.c b/drivers/net/ieee802154/ca8210.c
-index 0b0c6c0764fe..d0b5129439ed 100644
---- a/drivers/net/ieee802154/ca8210.c
-+++ b/drivers/net/ieee802154/ca8210.c
-@@ -1902,10 +1902,9 @@ static int ca8210_skb_tx(
- 	struct ca8210_priv  *priv
- )
- {
--	int status;
- 	struct ieee802154_hdr header = { };
- 	struct secspec secspec;
--	unsigned int mac_len;
-+	int mac_len, status;
- 
- 	dev_dbg(&priv->spi->dev, "%s called\n", __func__);
- 
--- 
-2.38.1
-
+Regards,
+Jonas
