@@ -2,90 +2,119 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4504C678D5
-	for <linux-wpan@archiver.kernel.org>; Tue,  7 Mar 2023 18:52:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4C6AC6FA99
+	for <linux-wpan@archiver.kernel.org>; Tue,  7 Mar 2023 23:31:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233389AbjCGSwW (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 7 Mar 2023 13:52:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46212 "EHLO
+        id S229785AbjCGXbE (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 7 Mar 2023 18:31:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39924 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233270AbjCGSwG (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 7 Mar 2023 13:52:06 -0500
-Received: from mail-wr1-x42f.google.com (mail-wr1-x42f.google.com [IPv6:2a00:1450:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC531ABB10
-        for <linux-wpan@vger.kernel.org>; Tue,  7 Mar 2023 10:40:30 -0800 (PST)
-Received: by mail-wr1-x42f.google.com with SMTP id f11so13122689wrv.8
-        for <linux-wpan@vger.kernel.org>; Tue, 07 Mar 2023 10:40:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1678214425;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=75Oc8UNwWD0jYPxP17Nj5SkV82ayeB1gYR6cINmhH1Q=;
-        b=DzKJSGkIxNz2UWaUqVoky0eHIbRRra9KqHtCulCSFuXgxUYfaTzwqiGrtcbpFwJIGt
-         vxgmD+FLpHhThGox88Vb5pCUA6OZ8/z+DVFeZKGf5j409W62I0y47v/r4EtOdBPFk9Tc
-         RBlT1itiiJvSYuM3kHTwoNnIzYwQF41cRjJVyXQJ8vcZda8ExWHiKIcJUQTczhx2JVK/
-         Fpwyy5wxw6t+Nf/bLnZc6v8PsnSAEfxSCCoJ0AtrRHqyzsoHqQLYAymn4gO4zONe2BGG
-         cmCoSp2RCO5FLkxPK+IN0JbiM42w2p0JdfpSevuSd7a6iaLJs9egF6mWYjgndM86Fm7Y
-         PYLg==
+        with ESMTP id S229483AbjCGXbD (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 7 Mar 2023 18:31:03 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE133A8C6B
+        for <linux-wpan@vger.kernel.org>; Tue,  7 Mar 2023 15:30:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1678231807;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=J6PI1+iCyE6roSMv9xD9czxTetp5xB/wELaV59zECsA=;
+        b=UeqgWKznONFz3xjSZ5pOv1pxSYLnUK39MAPTNWsi4Z4GmB65ys1rndX1/pd8LJVE8MBVkj
+        5B3PuLBZ/dpvfO/TZjz1ymgWVhLrqJzf0mBr1yB8ToGGWmyyFhrH4DOISWAm0Z/L0Y9vu0
+        siLtUifLVgo7luvCZemQ+mWQ7n9sfZM=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-522-QJLnQ36IOXGJ2mse-yTwNg-1; Tue, 07 Mar 2023 18:30:05 -0500
+X-MC-Unique: QJLnQ36IOXGJ2mse-yTwNg-1
+Received: by mail-ed1-f69.google.com with SMTP id y24-20020aa7ccd8000000b004be3955a42eso21350221edt.22
+        for <linux-wpan@vger.kernel.org>; Tue, 07 Mar 2023 15:30:05 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678214425;
+        d=1e100.net; s=20210112; t=1678231804;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=75Oc8UNwWD0jYPxP17Nj5SkV82ayeB1gYR6cINmhH1Q=;
-        b=mTZoRUG6pj6Ku7YDNgWLHo9kGVK/twPfxxLSCj0/ryc/3bd/RiVlWWXpRc1H0yQsQi
-         vYaLeK6lex5rRpg2qDW4stZ2KmMAQRDhzO6q6Pxdz8cvdMDjdBLeWNnfufwqNgkID8qp
-         uY0NwH5Hh2madzLHbBJPpkEXIM+Re2dpecB4vhqXJFTXzc0lcoeewnbIpxGaX1JHQB5B
-         wbpTVNWy8ky9MBD62OwjjdRsz8ECQ3oUEtRa41UlnNeBcj8NOu2UowP1Y+bBK4ruMU5y
-         2Msfgaj8mAjpM1hotMA7j+Ux75zd6tMEfdLF3w+PxaKrHDKNpJoitrJih52xuoS4y3lt
-         /wYA==
-X-Gm-Message-State: AO0yUKWphhdEJHF20Wcc5vRaOd636Am+cmI3w+TilJenaxeUoqp0L8K9
-        0XziC952OQ8nDcye+6R2zQfig9nKpPEmWCaO76N0KQ==
-X-Google-Smtp-Source: AK7set9m1/qqH/9wDnJJWnQBo3huOpkDQCzDLDY2kiKPKKPBTUgzIGrPEfB+knMs/ozNgdaTX7lwaIJXzVCMYFxj7qI=
-X-Received: by 2002:a5d:4b03:0:b0:2c5:3fcb:682b with SMTP id
- v3-20020a5d4b03000000b002c53fcb682bmr2872897wrq.2.1678214425596; Tue, 07 Mar
- 2023 10:40:25 -0800 (PST)
+        bh=J6PI1+iCyE6roSMv9xD9czxTetp5xB/wELaV59zECsA=;
+        b=bjDe/jNxO41SLxnVfVQl6zp6mlME1/GiRZbisOqTl7E6GjEPfjeQS/gY6m9fZ5eDTm
+         uvH+WkN1C4P8nNNMVSflyrtjJkbmFa2pwn3XI5Nz2+TtWSUCbbMWY1pjN5StyKMgNkAv
+         EezGVWZLnwPMgSQLHSzsOyGyq38oHVD3rjMbr2C4eC1pbpE3LBg/OzCCBXbZrSRsvJjB
+         uB9LE8GZNF+oqku4JCSynDUzhi/Usn8Jrf+7KiOcELb7+3irjg6JFL7ZdlnOn9992d81
+         SADU9lXvBXojDL+CbObVIht5QPfsXXX31e7d2GxrHIRviUFqZIJJzNpqWsTZSjoHXI6A
+         gnaw==
+X-Gm-Message-State: AO0yUKXjm2bEcCCv/uc1tc/BDnI+25yHa24DGD08RitYjjse0jI0ul4L
+        /RIiE7/HbnqBjnEHFL5dABv0uVPA1YG+bR9HVOAg1kKxB4Yek/7McybHmVn06gyv6Io6n28zcwl
+        3YzgLn/jGVOQTatfGv2tylPNPXB9y49ytNtg1cA==
+X-Received: by 2002:a17:906:338e:b0:895:58be:963 with SMTP id v14-20020a170906338e00b0089558be0963mr8232076eja.3.1678231804501;
+        Tue, 07 Mar 2023 15:30:04 -0800 (PST)
+X-Google-Smtp-Source: AK7set9coWPUtSLheaorma3dgyMbSg7MoTxqNt3KtKyykwtN6bNRkYrNVGPELngFdSk7U65m5Hc5Z4Cg9GtbJewyOo8=
+X-Received: by 2002:a17:906:338e:b0:895:58be:963 with SMTP id
+ v14-20020a170906338e00b0089558be0963mr8232062eja.3.1678231804260; Tue, 07 Mar
+ 2023 15:30:04 -0800 (PST)
 MIME-Version: 1.0
-References: <000000000000adec0205f5ffcaf4@google.com> <ZAISIS/h9UV6Ox+r@corigine.com>
- <20230303164456.603c2ebd@xps-13>
-In-Reply-To: <20230303164456.603c2ebd@xps-13>
-From:   Aleksandr Nogikh <nogikh@google.com>
-Date:   Tue, 7 Mar 2023 19:40:13 +0100
-Message-ID: <CANp29Y6aaCVVg+3ezNzaw1nqvMbZhHooZ_DQRvv5YPbOmeprag@mail.gmail.com>
-Subject: Re: [syzbot] [wpan?] general protection fault in nl802154_trigger_scan
-To:     Miquel Raynal <miquel.raynal@bootlin.com>
-Cc:     Simon Horman <simon.horman@corigine.com>,
-        syzbot <syzbot+bd85b31816913a32e473@syzkaller.appspotmail.com>,
-        alex.aring@gmail.com, davem@davemloft.net, edumazet@google.com,
-        kuba@kernel.org, linux-kernel@vger.kernel.org,
+References: <20230306191824.4115839-1-harshit.m.mogalapalli@oracle.com> <ZAb5BlS+OgFfJM6t@corigine.com>
+In-Reply-To: <ZAb5BlS+OgFfJM6t@corigine.com>
+From:   Alexander Aring <aahringo@redhat.com>
+Date:   Tue, 7 Mar 2023 18:29:52 -0500
+Message-ID: <CAK-6q+gH-GzRNArVzrkdmrZ20qzGwAXRwhuc8XP0tpdDg3tvXw@mail.gmail.com>
+Subject: Re: [PATCH next] ca8210: Fix unsigned mac_len comparison with zero in ca8210_skb_tx()
+To:     Simon Horman <simon.horman@corigine.com>
+Cc:     Harshit Mogalapalli <harshit.m.mogalapalli@oracle.com>,
+        Dan Carpenter <error27@gmail.com>,
+        Alexander Aring <alex.aring@gmail.com>,
+        Stefan Schmidt <stefan@datenfreihafen.org>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Harry Morris <harrymorris12@gmail.com>,
         linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
-        pabeni@redhat.com, stefan@datenfreihafen.org,
-        syzkaller-bugs@googlegroups.com
+        linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-On Sat, Mar 4, 2023 at 9:16=E2=80=AFAM 'Miquel Raynal' via syzkaller-bugs
-<syzkaller-bugs@googlegroups.com> wrote:
->
-> > I believe this is fixed here:
-> >
-> > - [PATCH net] ieee802154: Prevent user from crashing the host
-> >   https://lore.kernel.org/netdev/20230301154450.547716-1-miquel.raynal@=
-bootlin.com/
-> >
-> > - pull-request: ieee802154 for net 2023-03-02
-> >   https://lore.kernel.org/netdev/20230302153032.1312755-1-stefan@datenf=
-reihafen.org/
->
-> Hopefully, yes :)
->
-> Thanks,
-> Miqu=C3=A8l
+Hi,
 
-Let's tell syzbot about the fix:
+On Tue, Mar 7, 2023 at 3:44=E2=80=AFAM Simon Horman <simon.horman@corigine.=
+com> wrote:
+>
+> On Mon, Mar 06, 2023 at 11:18:24AM -0800, Harshit Mogalapalli wrote:
+> > mac_len is of type unsigned, which can never be less than zero.
+> >
+> >       mac_len =3D ieee802154_hdr_peek_addrs(skb, &header);
+> >       if (mac_len < 0)
+> >               return mac_len;
+> >
+> > Change this to type int as ieee802154_hdr_peek_addrs() can return negat=
+ive
+> > integers, this is found by static analysis with smatch.
+> >
+> > Fixes: ded845a781a5 ("ieee802154: Add CA8210 IEEE 802.15.4 device drive=
+r")
+> > Signed-off-by: Harshit Mogalapalli <harshit.m.mogalapalli@oracle.com>
+>
+> I discussed this briefly with Harshit offline.
+>
+> The commit referenced above tag does add the call to
+> ieee802154_hdr_peek_addrs(), an there is a sign miss match between
+> the return value and the variable.
+>
+> The code to check the mac_len was added more recently, by the following
+> commit. However the fixes tag is probably fine as-is, because it's fixing
+> error handling of a call made in that commit.
+>
+> 6c993779ea1d ("ca8210: fix mac_len negative array access")
+>
+> Reviewed-by: Simon Horman <simon.horman@corigine.com>
+>
 
-#syz fix: ieee802154: Prevent user from crashing the host
+sure, thanks for catching this.
+
+- Alex
+
