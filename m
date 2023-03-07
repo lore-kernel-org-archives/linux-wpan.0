@@ -2,108 +2,108 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99FB6C678D5
-	for <linux-wpan@archiver.kernel.org>; Tue,  7 Mar 2023 08:43:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8969C678D5
+	for <linux-wpan@archiver.kernel.org>; Tue,  7 Mar 2023 09:09:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229593AbjCGInu (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 7 Mar 2023 03:43:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52902 "EHLO
+        id S230135AbjCGJJM (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 7 Mar 2023 04:09:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51692 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229558AbjCGInt (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 7 Mar 2023 03:43:49 -0500
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A12E1A946;
-        Tue,  7 Mar 2023 00:43:49 -0800 (PST)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id B6A031FE14;
-        Tue,  7 Mar 2023 08:43:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1678178627; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
+        with ESMTP id S229742AbjCGJJL (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 7 Mar 2023 04:09:11 -0500
+Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::227])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C34B521F0;
+        Tue,  7 Mar 2023 01:09:08 -0800 (PST)
+Received: (Authenticated sender: miquel.raynal@bootlin.com)
+        by mail.gandi.net (Postfix) with ESMTPSA id 72E5C2000F;
+        Tue,  7 Mar 2023 09:09:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+        t=1678180147;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=DN/mC5ywri8Tsr8fRJnnEanEH8sLUKMhH0fMNv5LE7Y=;
-        b=fWJINjvv/d1bPyDVsCT+SjeYPcy+aywiRxkhivpY9ybDJHt8CZHV5mlkjuMOkeCdMdckJe
-        ITMI21Wd4DBV8vcSKJ1UzU2XVR/PfLhxiSMBJXVONSk+jl4kYj54usdC8zMpWuiwPJc4CB
-        x0CKbthybB6/dILpkLmKnMuCHsmeW5o=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1678178627;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=DN/mC5ywri8Tsr8fRJnnEanEH8sLUKMhH0fMNv5LE7Y=;
-        b=26NSbNE9AJTm123tuDIcwVywsZC/oRTLii70lcvHsybEbJ7RntZuMe6nyoB/9/MrnysFn/
-        BFlJWQ5P4Yv1i4DA==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 07B2613440;
-        Tue,  7 Mar 2023 08:43:46 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id 6fEOOkL5BmRhIQAAMHmgww
-        (envelope-from <dkirjanov@suse.de>); Tue, 07 Mar 2023 08:43:46 +0000
-Message-ID: <782a6f2d-84ae-3530-7e3c-07f31a4f303b@suse.de>
-Date:   Tue, 7 Mar 2023 11:43:46 +0300
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.8.0
-Subject: Re: [PATCH] net: ieee802154: fix a null pointer in
- nl802154_trigger_scan
-To:     Dongliang Mu <dzm91@hust.edu.cn>,
+        bh=tfEXGeK3r8IepmXyCN3O+CQO+OTuTekK6f/XtQOU0sY=;
+        b=iZIt8MiYGDIUgrVnCV8xsRaDE3ZRy7LdSAcAV6CCOHg9qdeqsK9lcjZxfcwCmmkW3962b+
+        yzXAdLF7nyjmSUb9Km2tckxMuVg9nWeYS5sN5wpeKD10NHQ9dSuDS5VDvLfiJizNtvzZpS
+        L3HyqEdNVYXwlRMnrQ1dtPUuOY7i+btjcPPNn72c8JAcuU0SaHzbtCdwS8WHqEByv/gy2I
+        mervmjXY+o4cfJ3P2DRetAbQmfLqMXjXpKv9VsSo6+WZncLGdXzTZG9TY0erSy3VkIt9h+
+        bB3sIpaB4nUx3peEyvlrTYVL+0+Jm7tSQPvt+Nb36EhpVUcjHo0wdLf+C0nyaQ==
+Date:   Tue, 7 Mar 2023 10:09:03 +0100
+From:   Miquel Raynal <miquel.raynal@bootlin.com>
+To:     Denis Kirjanov <dkirjanov@suse.de>
+Cc:     Dongliang Mu <dzm91@hust.edu.cn>,
         Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
         "David S. Miller" <davem@davemloft.net>,
         Eric Dumazet <edumazet@google.com>,
         Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>
-Cc:     syzbot+bd85b31816913a32e473@syzkaller.appspotmail.com,
+        Paolo Abeni <pabeni@redhat.com>,
+        syzbot+bd85b31816913a32e473@syzkaller.appspotmail.com,
         linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
         linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: ieee802154: fix a null pointer in
+ nl802154_trigger_scan
+Message-ID: <20230307100903.71e2d9b2@xps-13>
+In-Reply-To: <782a6f2d-84ae-3530-7e3c-07f31a4f303b@suse.de>
 References: <20230307073004.74224-1-dzm91@hust.edu.cn>
-Content-Language: en-US
-From:   Denis Kirjanov <dkirjanov@suse.de>
-In-Reply-To: <20230307073004.74224-1-dzm91@hust.edu.cn>
+        <782a6f2d-84ae-3530-7e3c-07f31a4f303b@suse.de>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
+Hello,
+
+dkirjanov@suse.de wrote on Tue, 7 Mar 2023 11:43:46 +0300:
+
+> On 3/7/23 10:30, Dongliang Mu wrote:
+> > There is a null pointer dereference if NL802154_ATTR_SCAN_TYPE is
+> > not set by the user.
+> >=20
+> > Fix this by adding a null pointer check.
+
+Thanks for the patch! This has been fixed already:
+https://lore.kernel.org/linux-wpan/20230301154450.547716-1-miquel.raynal@bo=
+otlin.com/T/#u
+
+> > Reported-and-tested-by: syzbot+bd85b31816913a32e473@syzkaller.appspotma=
+il.com
+
+Just for reference, this tag shall not be used:
+
+	"Please do not use combined tags, e.g.
+	``Reported-and-tested-by``"
+	Documentation/process/maintainer-tip.rst
+
+> > Signed-off-by: Dongliang Mu <dzm91@hust.edu.cn> =20
+>=20
+> Please add a Fixes: tag=20
+>=20
+> > ---
+> >  net/ieee802154/nl802154.c | 3 ++-
+> >  1 file changed, 2 insertions(+), 1 deletion(-)
+> >=20
+> > diff --git a/net/ieee802154/nl802154.c b/net/ieee802154/nl802154.c
+> > index 2215f576ee37..1cf00cffd63f 100644
+> > --- a/net/ieee802154/nl802154.c
+> > +++ b/net/ieee802154/nl802154.c
+> > @@ -1412,7 +1412,8 @@ static int nl802154_trigger_scan(struct sk_buff *=
+skb, struct genl_info *info)
+> >  		return -EOPNOTSUPP;
+> >  	}
+> > =20
+> > -	if (!nla_get_u8(info->attrs[NL802154_ATTR_SCAN_TYPE])) {
+> > +	if (!info->attrs[NL802154_ATTR_SCAN_TYPE] ||
+> > +	    !nla_get_u8(info->attrs[NL802154_ATTR_SCAN_TYPE])) {
+> >  		NL_SET_ERR_MSG(info->extack, "Malformed request, missing scan type");
+> >  		return -EINVAL;
+> >  	} =20
 
 
-On 3/7/23 10:30, Dongliang Mu wrote:
-> There is a null pointer dereference if NL802154_ATTR_SCAN_TYPE is
-> not set by the user.
-> 
-> Fix this by adding a null pointer check.
-> 
-> Reported-and-tested-by: syzbot+bd85b31816913a32e473@syzkaller.appspotmail.com
-> Signed-off-by: Dongliang Mu <dzm91@hust.edu.cn>
-
-Please add a Fixes: tag 
-
-> ---
->  net/ieee802154/nl802154.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/net/ieee802154/nl802154.c b/net/ieee802154/nl802154.c
-> index 2215f576ee37..1cf00cffd63f 100644
-> --- a/net/ieee802154/nl802154.c
-> +++ b/net/ieee802154/nl802154.c
-> @@ -1412,7 +1412,8 @@ static int nl802154_trigger_scan(struct sk_buff *skb, struct genl_info *info)
->  		return -EOPNOTSUPP;
->  	}
->  
-> -	if (!nla_get_u8(info->attrs[NL802154_ATTR_SCAN_TYPE])) {
-> +	if (!info->attrs[NL802154_ATTR_SCAN_TYPE] ||
-> +	    !nla_get_u8(info->attrs[NL802154_ATTR_SCAN_TYPE])) {
->  		NL_SET_ERR_MSG(info->extack, "Malformed request, missing scan type");
->  		return -EINVAL;
->  	}
+Thanks,
+Miqu=C3=A8l
