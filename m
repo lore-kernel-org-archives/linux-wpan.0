@@ -2,152 +2,112 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12CBDC64EC4
-	for <linux-wpan@archiver.kernel.org>; Wed,  8 Mar 2023 09:38:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FBFAC64EC4
+	for <linux-wpan@archiver.kernel.org>; Fri, 10 Mar 2023 01:31:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230054AbjCHJi5 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 8 Mar 2023 04:38:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48444 "EHLO
+        id S229887AbjCJBbx (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Thu, 9 Mar 2023 20:31:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43662 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229720AbjCHJi4 (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 8 Mar 2023 04:38:56 -0500
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2111.outbound.protection.outlook.com [40.107.243.111])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D62CA2F0A;
-        Wed,  8 Mar 2023 01:38:52 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ILk7pDkLQvSif/0+znAOPsxcIAulTqlsq/a0efRlgcdmiCUXFOJPi98LFrKEsPEKNXkAiFD8KyhwVmcW17ks/ckwjdwR85T53OY1ssDLteUlxLElos0Ut1bGJcca8Lfv9DPCVuJUDSD/qh7Q8/0Nje1nua8ZxXbj/2r7Oc8WQPRCpE2u6G2jsjEzhCdOMg0e6HCgAyCkDX22s/X+yQupQI1QiiNOIgMTnRRinwIo/n2evRSrzyJyijS6YCTNuxoE4uQI5wsqtA62pklYwByTy+gqqcmbd159h95pjuuLT2IpFPLRCOPmXdW4YBDb95sjQheaR0vd/Es5KVT1WIZrCw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Ki0waFVjL66O/2Q48eer0CX+WaarIlrefGzuGwPw5oE=;
- b=BiT4GQYV3Fpvn9Uqh9PQPf83s2g1EazVldfxkcuoxqv4aVukHaDwV7RWVZVOa0zfBh/IpaoK6NZ+Prws9818JMu6GVwQDOPcuyTNoFNn20xhtrWwV9CNrl8MxhAs44ej0iyWjYW5QeUL6ZJvvtmoG8nLYQ4Cx3iXH9hz3DEg3gqD8T3Bcr6wEHz05NZIx5V18vHsorrZsZDOHaxny6iq5zu7S7nzqMeBIkBZ/euiBAKo+krMsXCi113W37oA+6WdcQyhILhzWNuBU0s+Q8E2d6n9Ep9QWDJp/3f9xI5miK4fOpI0NEwQIwM1VGg6DdCcBSxXosyEBIBxIlL+4tJ7Eg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
- dkim=pass header.d=corigine.com; arc=none
+        with ESMTP id S229552AbjCJBbw (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 9 Mar 2023 20:31:52 -0500
+Received: from mail-qt1-x831.google.com (mail-qt1-x831.google.com [IPv6:2607:f8b0:4864:20::831])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 492DA10113C
+        for <linux-wpan@vger.kernel.org>; Thu,  9 Mar 2023 17:31:51 -0800 (PST)
+Received: by mail-qt1-x831.google.com with SMTP id cf14so4225531qtb.10
+        for <linux-wpan@vger.kernel.org>; Thu, 09 Mar 2023 17:31:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Ki0waFVjL66O/2Q48eer0CX+WaarIlrefGzuGwPw5oE=;
- b=OddCB8hc41soh1Uvv68Wj6nikXmYnag4TBgmKPt12aMOGSw62AYyqm3rLaKMnp3EKrz2zrH5g2n2/TMplhOuelWDRpEOhlVHqwLrDkMG7VhnX2t2XbgBwoPxGwfaP0fDP+/YHhNlS5256ZKbd/1nm+tYYPgInJrZIk4k6ZrEJOg=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=corigine.com;
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
- by CH0PR13MB5114.namprd13.prod.outlook.com (2603:10b6:610:113::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6156.29; Wed, 8 Mar
- 2023 09:38:49 +0000
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::85f5:bdb:fb9e:294c]) by PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::85f5:bdb:fb9e:294c%2]) with mapi id 15.20.6156.029; Wed, 8 Mar 2023
- 09:38:49 +0000
-Date:   Wed, 8 Mar 2023 10:38:42 +0100
-From:   Simon Horman <simon.horman@corigine.com>
-To:     Aleksandr Nogikh <nogikh@google.com>
-Cc:     Miquel Raynal <miquel.raynal@bootlin.com>,
-        syzbot <syzbot+bd85b31816913a32e473@syzkaller.appspotmail.com>,
-        alex.aring@gmail.com, davem@davemloft.net, edumazet@google.com,
-        kuba@kernel.org, linux-kernel@vger.kernel.org,
-        linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
-        pabeni@redhat.com, stefan@datenfreihafen.org,
-        syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] [wpan?] general protection fault in
- nl802154_trigger_scan
-Message-ID: <ZAhXoqIIDSn+MzDL@corigine.com>
-References: <000000000000adec0205f5ffcaf4@google.com>
- <ZAISIS/h9UV6Ox+r@corigine.com>
- <20230303164456.603c2ebd@xps-13>
- <CANp29Y6aaCVVg+3ezNzaw1nqvMbZhHooZ_DQRvv5YPbOmeprag@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANp29Y6aaCVVg+3ezNzaw1nqvMbZhHooZ_DQRvv5YPbOmeprag@mail.gmail.com>
-X-ClientProxiedBy: AM4PR07CA0008.eurprd07.prod.outlook.com
- (2603:10a6:205:1::21) To PH0PR13MB4842.namprd13.prod.outlook.com
- (2603:10b6:510:78::6)
+        d=joelfernandes.org; s=google; t=1678411910;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=p9ofmXvi+yoEOTwnWtynDgK6IduRelA0tIhKQl7CdJ0=;
+        b=CJxs5Lm5QHQiquo4AjG5aaAVH5OhqI/2GaIz7xKhQCv5L93fTHuoAlZV9Gbitb2cfX
+         CBMq+NiVL3zFSA3n2CND0pLPRYIoGwn3fq+ggxyeqaj5wyFyfZjExYDDIEQwgS/vQEEC
+         0zhNVdHBKJDJB13tv1+mV7aosZqxR50uKMbNM=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1678411910;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=p9ofmXvi+yoEOTwnWtynDgK6IduRelA0tIhKQl7CdJ0=;
+        b=JfogWCi/Xxo8/lsCW4PP4YnVRrYsBxlqf2Z0/Zb+Sc83fLrSGIQTpC2SaHcfq0LkSa
+         Rqt62zftI0x7TzDTXDG1xilnH7aW6VYvkRMoH20zoYoSAfdKFhCnwMm57yJ8czOOhLQB
+         IL0zH6/bj8kp/QNdgEtDk9ouSs3aZyf9yalD6BWE9qfs9Cdlx5at6zbpaN46acWBYxR0
+         NW10k+w8mqs4t2u5PAf7nEf0OCEh42GJEgn82TwdaKjVEtEq+MN1ZQ4HJrNG3idggZ5W
+         VihFlNgdPgxRiisHGG5dYVHgNt3xqiHpYSxuop9wLSCmIA+Z07rHzKjTga/8tw6NEUf5
+         x8jA==
+X-Gm-Message-State: AO0yUKVQYoDwSnRlYZ6ehkNuNCyPgiC/AJCM7v524kNsMIHS/QwQVagq
+        hdjQsCwTVB23tWAVpXUn2C+YBw==
+X-Google-Smtp-Source: AK7set8CodEww+oJHx4uqK72YvDkSaUODFTaCcQVaKEOvvPIVqD7s5xth57+TKwSz+3SyIrjgQzrfg==
+X-Received: by 2002:ac8:594f:0:b0:3b8:68ef:d538 with SMTP id 15-20020ac8594f000000b003b868efd538mr4968923qtz.52.1678411910365;
+        Thu, 09 Mar 2023 17:31:50 -0800 (PST)
+Received: from joelboxx.c.googlers.com.com (129.239.188.35.bc.googleusercontent.com. [35.188.239.129])
+        by smtp.gmail.com with ESMTPSA id o21-20020a374115000000b0071a02d712b0sm356522qka.99.2023.03.09.17.31.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Mar 2023 17:31:49 -0800 (PST)
+From:   "Joel Fernandes (Google)" <joel@joelfernandes.org>
+To:     linux-kernel@vger.kernel.org
+Cc:     "Joel Fernandes (Google)" <joel@joelfernandes.org>,
+        Alexander Aring <alex.aring@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>, linux-wpan@vger.kernel.org,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+        Stefan Schmidt <stefan@datenfreihafen.org>,
+        boqun.feng@gmail.com, paulmck@kernel.org, urezki@gmail.com
+Subject: [PATCH] mac802154: Rename kfree_rcu() to kvfree_rcu_mightsleep()
+Date:   Fri, 10 Mar 2023 01:31:44 +0000
+Message-Id: <20230310013144.970964-1-joel@joelfernandes.org>
+X-Mailer: git-send-email 2.40.0.rc1.284.g88254d51c5-goog
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|CH0PR13MB5114:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3be0a007-5f30-49e9-bf99-08db1fb8ebb2
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: doSeJFVqILkLb5GaTzLZB2uL+dwfFlewJGQSFhLEQkyDbDUoDklDaJj5XfbRvPsJEC0VWlXWfJTl2PlGOVm9xXMw5MkCrDS6BOmf0UvEmE8rm4CBHw/0g5dPcql/ZYuk/8qhX5KpZsE7tmGQkbJCEzKGWqFM3OEMkenOQmU2LfGRJ/dm5SWdyrqw/nZJDec1ADPfX6N42Qw2FRc8+6S+5zlX1tXA88ALMKCW5z4Oobx6oBi4uV+Hn4TDGXYYaMpCPOD4p1k8HKH7nLxoZ4f8/Cn36KivbmGaYKiEgUgg9kFv+DMgW5esFtIBWqqFSoevSAqHzhNgYC62aHDZqYcQCnnIyF6IY2/gsmXfgHiNh+mgvl8PYmuCib3VMhlVbIlDyCuqzq5ApviG47h/ughejS7R3ZcIbFoRugk2MH1LBrhAl+eXpS+HUvCTeRaSypjSZ0FOWCDov2CKzy2Xct+2CyKydteMIPG01np85l/OyYbrwMg29Qb1B1vC7xj/p6WwOzrLJ0kQwyURXtu5HteOAA+UvXtArnc842NjwYGJ0oNIrdLrfeeIJzLFrPTcxk/AdYyZULAVksiOtNv0Z5I2+u5aZheT+K78b8qwlkxbVS3arle8VV0yT8lzvgjsUjUzsmgKAqRLIgD08c8uuUwlluxnpNUGpLCqFLndSqw/Z1E=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(136003)(39840400004)(396003)(346002)(366004)(376002)(451199018)(2906002)(2616005)(83380400001)(66574015)(44832011)(66946007)(4744005)(4326008)(7416002)(66556008)(66476007)(6916009)(5660300002)(186003)(6512007)(8676002)(36756003)(41300700001)(53546011)(8936002)(6666004)(38100700002)(6506007)(6486002)(54906003)(86362001)(478600001)(966005)(316002)(67856001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?d3RURndncXdvcEJtS282OXA4UmJJL3BxYnlabWpuOGdYSWNqZ2tCczBHNENN?=
- =?utf-8?B?V1QzVkFXYkZZa3lIWkVNTmNWYk1UY255UlIxOHdDZTR5SEdXcmxpZHlxSitv?=
- =?utf-8?B?bDV6aWZoMDhUZno3U21ncHJ4Z2pqMXUzKzB0cnlmQjVNTzV1SHhublBLdm1Z?=
- =?utf-8?B?Mkc4OEZLNkhGZVpEeExNY0lGTjk1SXdVT09mVG9xYXJTQ2lpdk1iMlNxQWsz?=
- =?utf-8?B?ZEFIOENMTnp2THhYVGNQZEp3RHhyQ2prek9aV3JVNG5YbzFuWjhtYXkzZTM0?=
- =?utf-8?B?Wml0MVZMcFZTYWNVemdyZENrZjRGTFNCZmhKRXg1UXVjQVpPNDlWOElsSnBi?=
- =?utf-8?B?QWpWUTNicW9yUEd5dFFOaWxpQXl6RVhwYzB2eGFJWGx0SVlvbXRrNVR4eTdP?=
- =?utf-8?B?Q1ljVCtVeUlGUkJySmJyL2JZN0VoYWxmaFFwVVhDamlhejZrUi9lYXgrcVZR?=
- =?utf-8?B?ZFFNTGNYTU8zbnQ1Nkd0dit3SEFJZkdmb3hzUXlhWkY2K1I2RmtzNkVaTjVQ?=
- =?utf-8?B?Vys0cDhxSTIrby9sOG04RUdsa0d6QndqajkwZEhTM2FxaEQraG5ueGdFdmNk?=
- =?utf-8?B?ME9QTEpoZUM1VG9JRkRPRGc3bHJUeXFmaEpUQVJ2eUpCeVNITVJtbmdTUHVn?=
- =?utf-8?B?elUwbG9rMGxaQ3RJc1FSUkJKUFltNGRlZDhDdXJqK3R5UG84UHlmdkZDWmNm?=
- =?utf-8?B?Q1NleUEyamJ1N1JzV2xQcTlmMGlkckhhNU1MMDVyRXpOS2JWamlxUjc3bi9h?=
- =?utf-8?B?eXVwUmlHMWtLVTY2Q1orS2Y1ekZGenBXYjEwYzZJZlozYktBalRNZ0wxZjBi?=
- =?utf-8?B?cUpTbFIyNHZjeTA4Z2x5TWJxYXV6Vlhtc1VFUW45QjdIeXBCdVp0L0NVWW91?=
- =?utf-8?B?Uk9HVjlVdHNOVi95V3pjMFQ1dmdxWGNmZE1GL1NMSjVPL1R3aDZLU2xNQWlo?=
- =?utf-8?B?VmJNQTNvVXJ2U0pySytmdWFxVTZNM1FBZ044aGRaSExkdzI5cDdsKytRaitp?=
- =?utf-8?B?dXhHb3Jmb0xpNE42dHQ5bzl3MjNzOVpUU3VONjFuOC8wY1hrY0NHWWE4elJE?=
- =?utf-8?B?WTNuWEoxb2l1TGNmYlo3M09oY09RL0o5T1ZSNjBaOUpVQktkeWI4cUY0cHNX?=
- =?utf-8?B?czN6Y3M3SUw4YWl6S1N4dEVjOWpZckdUdzVScXRDbTV6R0FoODgvc3M4N0Y1?=
- =?utf-8?B?QXZtNUEvS21SQldDUnRrQ1RNZStqL25SWTBsTDM4STk2UERmQnZLSmR2anV2?=
- =?utf-8?B?M2dLVFozbXhueHlBUFR0aDlyN0FmVlZ1Z25rNi80c3ZDNUwzMXVOSUMwMzF4?=
- =?utf-8?B?V25McUdpL3A2K2pQUlo5dk50cnlqYXpTaWNpVHdJSmFhYXV5MTJrSER2TmxS?=
- =?utf-8?B?Qzd3eEljZ1NhaElFcFl5dVo3VElIN1dKbnA0VGlzOGFUcUU1OUZPZFEwWFRC?=
- =?utf-8?B?eFZDYUVKeHFOdlJNb1diZ0dCSHpCb2x5bUdLTG94aFMyZ290RjE1bmc2a2dK?=
- =?utf-8?B?N0M2QnJQb2VJVUpOVnV1Uld0cVBPVmFDTUxwU0hZOE4zZjJ0R3Z6MGFtRlVl?=
- =?utf-8?B?bis1R1hPalRJL1N2L2d6WG9JeGdDRlRyVTArREx4SHlFUkRoWVVLbFpIREgz?=
- =?utf-8?B?YU1rSXdRVTdCbmZhUHZnRTlsWVR5RDdwWEJJdmVTOVdYOCtCNnZ4cmJBM1VJ?=
- =?utf-8?B?cVNUMUs4TGdpblY1L2RsN1U1Ums2KzlnanJpaVNvU094UXF2d0t1Ny9ncEpW?=
- =?utf-8?B?aDhiVUdzTytNbzFCNis2dXRrQnhDWmoycDJvUjRZemJheGZKc2NVbVBGSHdo?=
- =?utf-8?B?NExnTHYvTng0SWVNcm9EZ01IV2FrL0pHTzZvNFhIbFlrU0VCOUpUcTN3a2Uw?=
- =?utf-8?B?T3VBTE0wd1hTRzl5MzNTMnZoL2FsUnVYSUl6V1NORVRjZk9Ccnh6OFlpUHh2?=
- =?utf-8?B?cjF0Ris5dDBOM0hzMXJGWUsyNkxLMS9uaUg3aWFKbnRtVUltenMra3FSam9J?=
- =?utf-8?B?TTlHdWFnZHU2YzNMNk1JMWpOVWJDTTJjbTZnMlViMXpNcTVieFNDbUVSL0I1?=
- =?utf-8?B?QVNRU0tXV21ZYVRUZ0orQ1Vpd0J6dDlDVXAwZktwYzJCcFdSYStjTWVYT3lv?=
- =?utf-8?B?ZDBQS25CUUY1MmpHQ3J1eVlXVGFZSDM4Rk1VbkRnZUhLTEpPYjE2SnljSStN?=
- =?utf-8?B?TVpZYnZPWU5zL21MQzVsakp6OUlWN3hrN096aUZ5L0Qxa2k3U0svR2puK01w?=
- =?utf-8?B?QUVNemZxRjFuUXVqL2xQMVVRaWN3PT0=?=
-X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3be0a007-5f30-49e9-bf99-08db1fb8ebb2
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Mar 2023 09:38:49.4673
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: McsTlgwWWxBzkBUJAQr4zYxVfPaApxfX98u+J1OG9sebgYadcJb1ooB17vg4gyk/DEQM4PrE1gGxh6toUUO+naXSeinEUGOqnQB+9THWwOg=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR13MB5114
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-On Tue, Mar 07, 2023 at 07:40:13PM +0100, Aleksandr Nogikh wrote:
-> [You don't often get email from nogikh@google.com. Learn why this is important at https://aka.ms/LearnAboutSenderIdentification ]
-> 
-> On Sat, Mar 4, 2023 at 9:16 AM 'Miquel Raynal' via syzkaller-bugs
-> <syzkaller-bugs@googlegroups.com> wrote:
-> >
-> > > I believe this is fixed here:
-> > >
-> > > - [PATCH net] ieee802154: Prevent user from crashing the host
-> > >   https://lore.kernel.org/netdev/20230301154450.547716-1-miquel.raynal@bootlin.com/
-> > >
-> > > - pull-request: ieee802154 for net 2023-03-02
-> > >   https://lore.kernel.org/netdev/20230302153032.1312755-1-stefan@datenfreihafen.org/
-> >
-> > Hopefully, yes :)
-> >
-> > Thanks,
-> > Miquèl
-> 
-> Let's tell syzbot about the fix:
-> 
-> #syz fix: ieee802154: Prevent user from crashing the host
+The k[v]free_rcu() macro's single-argument form is deprecated.
+Therefore switch to the new k[v]free_rcu_mightsleep() variant. The goal
+is to avoid accidental use of the single-argument forms, which can
+introduce functionality bugs in atomic contexts and latency bugs in
+non-atomic contexts.
 
-Thanks, I was wondering about that.
+The callers are holding a mutex so the context allows blocking. Hence
+using the API with a single argument will be fine, but use its new name.
+
+There is no functionality change with this patch.
+
+Fixes: 57588c71177f ("mac802154: Handle passive scanning")
+Signed-off-by: Joel Fernandes (Google) <joel@joelfernandes.org>
+---
+Please Ack the patch but we can carry it through the RCU tree as well if
+needed, as it is not a bug per-se and we are not dropping the old API before
+the next release.
+
+ net/mac802154/scan.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/net/mac802154/scan.c b/net/mac802154/scan.c
+index 9b0933a185eb..5c191bedd72c 100644
+--- a/net/mac802154/scan.c
++++ b/net/mac802154/scan.c
+@@ -52,7 +52,7 @@ static int mac802154_scan_cleanup_locked(struct ieee802154_local *local,
+ 	request = rcu_replace_pointer(local->scan_req, NULL, 1);
+ 	if (!request)
+ 		return 0;
+-	kfree_rcu(request);
++	kvfree_rcu_mightsleep(request);
+ 
+ 	/* Advertize first, while we know the devices cannot be removed */
+ 	if (aborted)
+@@ -403,7 +403,7 @@ int mac802154_stop_beacons_locked(struct ieee802154_local *local,
+ 	request = rcu_replace_pointer(local->beacon_req, NULL, 1);
+ 	if (!request)
+ 		return 0;
+-	kfree_rcu(request);
++	kvfree_rcu_mightsleep(request);
+ 
+ 	nl802154_beaconing_done(wpan_dev);
+ 
+-- 
+2.40.0.rc1.284.g88254d51c5-goog
