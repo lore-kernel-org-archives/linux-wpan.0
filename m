@@ -2,53 +2,53 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1343AC74A4B
-	for <linux-wpan@archiver.kernel.org>; Sat, 11 Mar 2023 17:34:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CEF3EC61DA4
+	for <linux-wpan@archiver.kernel.org>; Sat, 11 Mar 2023 17:34:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230289AbjCKReH (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Sat, 11 Mar 2023 12:34:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59460 "EHLO
+        id S230033AbjCKReW (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Sat, 11 Mar 2023 12:34:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59358 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230103AbjCKRdc (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Sat, 11 Mar 2023 12:33:32 -0500
-Received: from mail-ed1-x536.google.com (mail-ed1-x536.google.com [IPv6:2a00:1450:4864:20::536])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3AD72B9C0
-        for <linux-wpan@vger.kernel.org>; Sat, 11 Mar 2023 09:33:22 -0800 (PST)
-Received: by mail-ed1-x536.google.com with SMTP id o12so33017160edb.9
-        for <linux-wpan@vger.kernel.org>; Sat, 11 Mar 2023 09:33:22 -0800 (PST)
+        with ESMTP id S230203AbjCKRdj (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Sat, 11 Mar 2023 12:33:39 -0500
+Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36CA84C6C3
+        for <linux-wpan@vger.kernel.org>; Sat, 11 Mar 2023 09:33:25 -0800 (PST)
+Received: by mail-ed1-x52b.google.com with SMTP id y4so3569880edo.2
+        for <linux-wpan@vger.kernel.org>; Sat, 11 Mar 2023 09:33:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1678556002;
+        d=linaro.org; s=google; t=1678556004;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=N0eIoQUlzBtNWdRZyomXaxMeOe08r5W6w3hU8zY2eLk=;
-        b=jQv/WlnODqsuHQabO1Micpq/pDWNovtU717/W3OPhTC7u6X2YK4ju3WLG6Dm2OWE1v
-         pMN87UD+/bZt6J5qcdcLAtM30x0ExopjeMuP0dvT7u7VCie9RtQLTKSIEuWWVaDUdvJh
-         AYvwEgUM5QDD3GArtIZvjbEj3KPJWwzHEl/Aa0GzUjLP3DlqbkQXnHkegC9HSFMWaorc
-         UWoZ+l9TcZ+pzB/pvnati+hCDNrdfcFMgj6Y9pqjBjheJLgtrJJ4NBM9lJc9VWC3f8Kg
-         yQXysQJfPkDAiJ2NqrSQtD32pdqe4mhGoetw0i3OUc30EoGH3NmEm8sn6cW2L2A11F8T
-         sKJQ==
+        bh=7jJaYEyuuO5/7ZmBgza2JAkACKERJJ9QG1PA2csTvP0=;
+        b=nHDAc+H0npIh3vNJGeXviuEBpr+1PK07dBrn05EJBUvz2aFDMgJvOjGJhwJ9LGamHz
+         JPRD0Qb8tsb1S9PolfMXoljCE/2hA+C7FdiAGb7bOL6xQLuew8ApejQSHL7of3r2k3uD
+         qK5TwReucG8XzqIaJZuWdsTWvtouWPD0GzHEOy8wh2MPUi05s+6ACQxR2ezI1T9bsZKO
+         LIcnlvavkjOzOPsKSD5UU5of0tR7Jf0OFrPz6EWp3ZYdyW2KyiOPQFGgyzIr+1hI6mo4
+         oVrQ/oE8Gc1Lp8IqRnERs2I/0QdhayI9u0T/gXiWG3FOOQB24F32ZuC5aTdKuVBuX2td
+         iM9Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678556002;
+        d=1e100.net; s=20210112; t=1678556004;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=N0eIoQUlzBtNWdRZyomXaxMeOe08r5W6w3hU8zY2eLk=;
-        b=hXAdgiGsxU7EeUqDoAcur9bVTLVxPaho3FiZqTAWQncQ8HtA/Sz/LyDeLS3phUXpCY
-         mDbW5tz9PYE/S9BmF1VRh7JOiRaMYdk0cZYny9xZstfRxLwR6RkusNfpWCq6IVp20irj
-         ZqN8GbC5as/q6Gr3ZIfsJ9r4bsp1wrg121zDp6G7OJsD0XMpESrFU8nhR+cKkmcsMBmb
-         SEQOJ0g1vtznT3blNFxlPFcblTVvXWYdsdhtzJ3Bn2/mnTaE9bZuM2rluoHdSuKOtKpu
-         PqbHuL6Dtih10fpKY2kOVHDazXK77ruFPUn+fd5dsR79pj9NXF5jgXJx6sbIMSpUsHbK
-         SdOA==
-X-Gm-Message-State: AO0yUKV9iSYe2BmyqeRuIJxGUapJNvX1O6YXKo3mGVxa6KJqARX8iOJ2
-        mOFu/GFAdp+lFm6VFXCF15nyUg==
-X-Google-Smtp-Source: AK7set+Gav2lc+k6TaNhMqr6MQ7LBRUpCtyMan24OMdeglwwbEjp77cTDzo8yi4QIiHgdjmq562JTA==
-X-Received: by 2002:a05:6402:384:b0:4af:6aa6:12d3 with SMTP id o4-20020a056402038400b004af6aa612d3mr23926913edv.40.1678556002238;
-        Sat, 11 Mar 2023 09:33:22 -0800 (PST)
+        bh=7jJaYEyuuO5/7ZmBgza2JAkACKERJJ9QG1PA2csTvP0=;
+        b=IKcTNQUsHKgzHJIDkKvTVEmpqglKwRMEZxhoArsRqqMuoNhwQyzuzyyaphBpy2lPqZ
+         RW++z4ZiNvqlqDU7NYlQ04jOUAIwlnf5BltslT2rfODksyYpLShNSUHxLx37jQYu0AZx
+         9kCMO6cwHD6+vMp4fBGmeSbUyyjiuqY2CAziAE3p45kEf48oCqWH+9D7eN3MXw1m3inx
+         gvX8m1IY8i0JyyHJYB6ZFFPhTPxnQueCDgLGKTrQjy2iCtL7OP0KEkxZI1BJW9DXTN9G
+         xoIQSdausnbEIqc/n7LFXJZpZGl68AjdCyNfHmRw7w4sq5go7OAnD2GpvEcJrxuINsEP
+         IOPA==
+X-Gm-Message-State: AO0yUKWjuTqqhFAHQD31Nk+G+JEHuy4/C/9sxo0awh3PHz/J7YBailIf
+        8LMwl0Ky4uXg0GuuC7CLAr2Npg==
+X-Google-Smtp-Source: AK7set9vWz++lxxJIbYAQ4X5NHrLZPNd1F+ADuCr+5KXfAjrxgYiw7uxgr7b8z1+/jim/f76Mp3bQQ==
+X-Received: by 2002:a17:907:6e25:b0:878:54e3:e3e1 with SMTP id sd37-20020a1709076e2500b0087854e3e3e1mr35447489ejc.73.1678556004615;
+        Sat, 11 Mar 2023 09:33:24 -0800 (PST)
 Received: from krzk-bin.. ([2a02:810d:15c0:828:6927:e94d:fc63:9d6e])
-        by smtp.gmail.com with ESMTPSA id k15-20020a50ce4f000000b004d8287c775fsm1440885edj.8.2023.03.11.09.33.21
+        by smtp.gmail.com with ESMTPSA id k15-20020a50ce4f000000b004d8287c775fsm1440885edj.8.2023.03.11.09.33.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 11 Mar 2023 09:33:21 -0800 (PST)
+        Sat, 11 Mar 2023 09:33:24 -0800 (PST)
 From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 To:     Andrew Lunn <andrew@lunn.ch>,
         Florian Fainelli <f.fainelli@gmail.com>,
@@ -71,9 +71,9 @@ To:     Andrew Lunn <andrew@lunn.ch>,
         Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-wpan@vger.kernel.org
 Cc:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Subject: [PATCH 08/12] net: ieee802154: mcr20a: drop of_match_ptr for ID table
-Date:   Sat, 11 Mar 2023 18:32:59 +0100
-Message-Id: <20230311173303.262618-8-krzysztof.kozlowski@linaro.org>
+Subject: [PATCH 10/12] net: ieee802154: ca8210: drop of_match_ptr for ID table
+Date:   Sat, 11 Mar 2023 18:33:01 +0100
+Message-Id: <20230311173303.262618-10-krzysztof.kozlowski@linaro.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230311173303.262618-1-krzysztof.kozlowski@linaro.org>
 References: <20230311173303.262618-1-krzysztof.kozlowski@linaro.org>
@@ -84,30 +84,30 @@ Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-The driver will match mostly by DT table (even thought there is regular
-ID table) so there is little benefit in of_match_ptr (this also allows
-ACPI matching via PRP0001, even though it might not be relevant here).
+The driver can match only via the DT table so the table should be always
+used and the of_match_ptr does not have any sense (this also allows ACPI
+matching via PRP0001, even though it might not be relevant here).
 
-  drivers/net/ieee802154/mcr20a.c:1340:34: error: ‘mcr20a_of_match’ defined but not used [-Werror=unused-const-variable=]
+  drivers/net/ieee802154/ca8210.c:3174:34: error: ‘ca8210_of_ids’ defined but not used [-Werror=unused-const-variable=]
 
 Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 ---
- drivers/net/ieee802154/mcr20a.c | 2 +-
+ drivers/net/ieee802154/ca8210.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ieee802154/mcr20a.c b/drivers/net/ieee802154/mcr20a.c
-index f53d185e0568..87abe3b46316 100644
---- a/drivers/net/ieee802154/mcr20a.c
-+++ b/drivers/net/ieee802154/mcr20a.c
-@@ -1352,7 +1352,7 @@ MODULE_DEVICE_TABLE(spi, mcr20a_device_id);
- static struct spi_driver mcr20a_driver = {
- 	.id_table = mcr20a_device_id,
+diff --git a/drivers/net/ieee802154/ca8210.c b/drivers/net/ieee802154/ca8210.c
+index ed6cb79072a8..65d28e8a87c9 100644
+--- a/drivers/net/ieee802154/ca8210.c
++++ b/drivers/net/ieee802154/ca8210.c
+@@ -3181,7 +3181,7 @@ static struct spi_driver ca8210_spi_driver = {
  	.driver = {
--		.of_match_table = of_match_ptr(mcr20a_of_match),
-+		.of_match_table = mcr20a_of_match,
- 		.name	= "mcr20a",
+ 		.name =                 DRIVER_NAME,
+ 		.owner =                THIS_MODULE,
+-		.of_match_table =       of_match_ptr(ca8210_of_ids),
++		.of_match_table =       ca8210_of_ids,
  	},
- 	.probe      = mcr20a_probe,
+ 	.probe  =                       ca8210_probe,
+ 	.remove =                       ca8210_remove
 -- 
 2.34.1
 
