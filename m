@@ -2,52 +2,53 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 167DCC61DA4
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E669FC74A4B
 	for <linux-wpan@archiver.kernel.org>; Sat, 11 Mar 2023 17:33:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230092AbjCKRd3 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Sat, 11 Mar 2023 12:33:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58208 "EHLO
+        id S230135AbjCKRdb (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Sat, 11 Mar 2023 12:33:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58972 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230071AbjCKRdS (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Sat, 11 Mar 2023 12:33:18 -0500
-Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C56A5E3A9
-        for <linux-wpan@vger.kernel.org>; Sat, 11 Mar 2023 09:33:13 -0800 (PST)
-Received: by mail-ed1-x52e.google.com with SMTP id r15so5841080edq.11
-        for <linux-wpan@vger.kernel.org>; Sat, 11 Mar 2023 09:33:13 -0800 (PST)
+        with ESMTP id S229768AbjCKRd1 (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Sat, 11 Mar 2023 12:33:27 -0500
+Received: from mail-ed1-x536.google.com (mail-ed1-x536.google.com [IPv6:2a00:1450:4864:20::536])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6374322DCE
+        for <linux-wpan@vger.kernel.org>; Sat, 11 Mar 2023 09:33:16 -0800 (PST)
+Received: by mail-ed1-x536.google.com with SMTP id o12so33016450edb.9
+        for <linux-wpan@vger.kernel.org>; Sat, 11 Mar 2023 09:33:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1678555992;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Wf3VcA12/YrUundcroeR6wyGdqPTMCPD8/QGoi4c1VQ=;
-        b=UlZRqvn12gq/jGCCnKeQnJcvhYq4mKfAWsv8joCF1SKk81V5nKo6bL4qnULGKxYSD5
-         B2YK/KjiT/rlm1xbIwn85ZKrc4c5jKwMcQLv0cv1YQTnYNYLj8AXVQMeP01QTZYrOVpf
-         Jp18EuL79aOIZ+Hn1V8XgZoi/kIP+++F4/Gfbh5nloPb73y1VGK+t4uKQ/p8h+Yv+SfS
-         Pcn7Pq4eq7a2t9MOj4lkEc9R3yRwiiZ8/xLmMkoHHRKXZZuFOM3Ti/RBu3sw/i5sTRie
-         O+ZU0ciUG2+ddhxbNO7pPID0i7DAj18EzJI8cQVD+MbBI5wRiig3+DhLGub5ZUyNjxLF
-         4Onw==
+        d=linaro.org; s=google; t=1678555995;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UwB85vi35W6JFbse/kCjhcZA/CxkEkODSyImYFi2+wU=;
+        b=QJZVFReUg7zrO73MLdqYRzpuYC4bl7zsy2iMOSOtYl5oRvPLj6V3IScX9xNhvF3qcU
+         lCQWEwdKfwmn1uhILsR4p5KVY41WXU6cZEZKEEewyFaYIR1OBjZzO7aWMLlmncsslmpl
+         tCnusxbxupvB3BaBOcuFcfDAgwNkUH4cBKSTTvQQACSpC1wsGpxovbasVJrdapSd32dD
+         guQxFSDTrHL6fil3naWSY7Yq5/1I7wZW2zYEdTnpNlZVCpDo5OOFuyqGmx/v8EYqd92X
+         kEASnGkR6jqA1AkQ/JckSaVIqpxgLEG4nTwS4WvxJO0/434fH6RdA5BN8E1XHEO9OtSh
+         OKWQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678555992;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Wf3VcA12/YrUundcroeR6wyGdqPTMCPD8/QGoi4c1VQ=;
-        b=KPPApRwiycNP78veo9umR1VTmBCIMoC/jkxngLmRFL4eg+YBP7qI/UtmhRuqtYTT80
-         41USZbnDBPvqBtJtCVfHEXf/AZu2JcgFpSymkI/TrwgZTSDUIIeHShRKzmPWSSC5+nas
-         kbiJ2FCDtrCMR0ZrDRhvRihs1ehLF1RysEhLh0QwMF4tKzmC3tif58t9DP9Eo6u/LK97
-         JX+oQXtt8hmPOJIUEh+0vJ08PYSDMzOsjtmpsnlPpZd4SvyHSLW/Ytce9da5bLHlPvEn
-         lmeECLbLIC45/p/kZI268651n5KrKyp0ExnrHaZeRBdU7ttXVsaWxqMwGqaF+FV3s5rA
-         EYMQ==
-X-Gm-Message-State: AO0yUKUFnVRqzJDTWF85QbqNILufKfFJeemoR6+gXKBXQp11PQ93eMlL
-        T5Ffd35DpOhuXvAoLp0BOqNVJA==
-X-Google-Smtp-Source: AK7set+f79dWDHOOxM5tf/Bi+yy9nY4COgvksaFhvAvFJlsDWV8YsvBROd1UMXS3rxmXEvfUyo2jmQ==
-X-Received: by 2002:aa7:c40c:0:b0:4fa:ac78:7f2a with SMTP id j12-20020aa7c40c000000b004faac787f2amr1891149edq.41.1678555992182;
-        Sat, 11 Mar 2023 09:33:12 -0800 (PST)
+        d=1e100.net; s=20210112; t=1678555995;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=UwB85vi35W6JFbse/kCjhcZA/CxkEkODSyImYFi2+wU=;
+        b=f80BCW5EnNKDMKDq1OuO4ng4KA826g2qJS01xYo9jEeYbO/9xeBgCExLQzYFJK+ZTt
+         wiwEYkjCkQOOm2TWudYv8AHvIA9Nci0M5gHkPiGYpOAgUtubAW6RWZTqjCFRM8tA+zRE
+         T9y5T7H4w6uogV2mqZTH5pl1lnFHggRdW0j1Dnc+j4YAg1WA/1fgq3mISDUn97awgM2o
+         07P7dYMc8DPNWSk1TLnJJTJ0sET5kQBeK5lOKndB/drHYOpq0Lmm0YSu0iT150r71Qt1
+         KSNXsJ3WnyuXRbHgCkupa/NIARAIiSmDDTs+0dw8/1mI8es8xxbfOUarC1mZKpbIFcW1
+         /6OA==
+X-Gm-Message-State: AO0yUKUxe66McpdyRZ9l57O/Ur8qGslcPgTOGDNJADrRX3wKz0Aa0eN6
+        ++s2sZt+BwRhH1inByspXsE+4g==
+X-Google-Smtp-Source: AK7set/dVlRnxLDT9ouunZ6UH9aeWxbXkHckg/IVN8HpBpPg2BP11f0i8gnuweQAwRI6Tc4MtCyTfA==
+X-Received: by 2002:a17:906:c79a:b0:924:9f65:8866 with SMTP id cw26-20020a170906c79a00b009249f658866mr284358ejb.64.1678555994857;
+        Sat, 11 Mar 2023 09:33:14 -0800 (PST)
 Received: from krzk-bin.. ([2a02:810d:15c0:828:6927:e94d:fc63:9d6e])
-        by smtp.gmail.com with ESMTPSA id k15-20020a50ce4f000000b004d8287c775fsm1440885edj.8.2023.03.11.09.33.10
+        by smtp.gmail.com with ESMTPSA id k15-20020a50ce4f000000b004d8287c775fsm1440885edj.8.2023.03.11.09.33.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 11 Mar 2023 09:33:11 -0800 (PST)
+        Sat, 11 Mar 2023 09:33:14 -0800 (PST)
 From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 To:     Andrew Lunn <andrew@lunn.ch>,
         Florian Fainelli <f.fainelli@gmail.com>,
@@ -70,10 +71,12 @@ To:     Andrew Lunn <andrew@lunn.ch>,
         Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-wpan@vger.kernel.org
 Cc:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Subject: [PATCH 01/12] net: dsa: lantiq_gswip: mark OF related data as maybe unused
-Date:   Sat, 11 Mar 2023 18:32:52 +0100
-Message-Id: <20230311173303.262618-1-krzysztof.kozlowski@linaro.org>
+Subject: [PATCH 03/12] net: dsa: seville_vsc9953: drop of_match_ptr for ID table
+Date:   Sat, 11 Mar 2023 18:32:54 +0100
+Message-Id: <20230311173303.262618-3-krzysztof.kozlowski@linaro.org>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230311173303.262618-1-krzysztof.kozlowski@linaro.org>
+References: <20230311173303.262618-1-krzysztof.kozlowski@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -81,29 +84,30 @@ Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-The driver can be compile tested with !CONFIG_OF making certain data
-unused:
+The driver can match only via the DT table so the table should be always
+used and the of_match_ptr does not have any sense (this also allows ACPI
+matching via PRP0001, even though it might not be relevant here).
 
-  drivers/net/dsa/lantiq_gswip.c:1888:34: error: ‘xway_gphy_match’ defined but not used [-Werror=unused-const-variable=]
+  drivers/net/dsa/ocelot/seville_vsc9953.c:1070:34: error: ‘seville_of_match’ defined but not used [-Werror=unused-const-variable=]
 
 Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 ---
- drivers/net/dsa/lantiq_gswip.c | 2 +-
+ drivers/net/dsa/ocelot/seville_vsc9953.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/dsa/lantiq_gswip.c b/drivers/net/dsa/lantiq_gswip.c
-index 05ecaa007ab1..3c76a1a14aee 100644
---- a/drivers/net/dsa/lantiq_gswip.c
-+++ b/drivers/net/dsa/lantiq_gswip.c
-@@ -1885,7 +1885,7 @@ static const struct xway_gphy_match_data xrx300_gphy_data = {
- 	.ge_firmware_name = "lantiq/xrx300_phy11g_a21.bin",
+diff --git a/drivers/net/dsa/ocelot/seville_vsc9953.c b/drivers/net/dsa/ocelot/seville_vsc9953.c
+index 563ad338da25..96d4972a62f0 100644
+--- a/drivers/net/dsa/ocelot/seville_vsc9953.c
++++ b/drivers/net/dsa/ocelot/seville_vsc9953.c
+@@ -1079,7 +1079,7 @@ static struct platform_driver seville_vsc9953_driver = {
+ 	.shutdown	= seville_shutdown,
+ 	.driver = {
+ 		.name		= "mscc_seville",
+-		.of_match_table	= of_match_ptr(seville_of_match),
++		.of_match_table	= seville_of_match,
+ 	},
  };
- 
--static const struct of_device_id xway_gphy_match[] = {
-+static const struct of_device_id xway_gphy_match[] __maybe_unused = {
- 	{ .compatible = "lantiq,xrx200-gphy-fw", .data = NULL },
- 	{ .compatible = "lantiq,xrx200a1x-gphy-fw", .data = &xrx200a1x_gphy_data },
- 	{ .compatible = "lantiq,xrx200a2x-gphy-fw", .data = &xrx200a2x_gphy_data },
+ module_platform_driver(seville_vsc9953_driver);
 -- 
 2.34.1
 
