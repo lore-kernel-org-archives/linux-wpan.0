@@ -2,57 +2,58 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11666C6FD1C
-	for <linux-wpan@archiver.kernel.org>; Sat, 11 Mar 2023 17:34:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F270C61DA4
+	for <linux-wpan@archiver.kernel.org>; Sat, 11 Mar 2023 18:14:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230300AbjCKRer (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Sat, 11 Mar 2023 12:34:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59058 "EHLO
+        id S229604AbjCKSOk (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Sat, 11 Mar 2023 13:14:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52488 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230157AbjCKReI (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Sat, 11 Mar 2023 12:34:08 -0500
-Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4BE83E0BC
-        for <linux-wpan@vger.kernel.org>; Sat, 11 Mar 2023 09:33:28 -0800 (PST)
-Received: by mail-ed1-x52d.google.com with SMTP id x3so32951681edb.10
-        for <linux-wpan@vger.kernel.org>; Sat, 11 Mar 2023 09:33:28 -0800 (PST)
+        with ESMTP id S229561AbjCKSOj (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Sat, 11 Mar 2023 13:14:39 -0500
+Received: from mail-ed1-x536.google.com (mail-ed1-x536.google.com [IPv6:2a00:1450:4864:20::536])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E11F6287A;
+        Sat, 11 Mar 2023 10:14:38 -0800 (PST)
+Received: by mail-ed1-x536.google.com with SMTP id da10so33347933edb.3;
+        Sat, 11 Mar 2023 10:14:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1678556007;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bb45CXv6pKtdqYtvpQnbjuwacdqrOSlJTgeuRVg38GM=;
-        b=sB0jHemmPnsrZbX5jq/nfP6dIGBR9zpynpPrwRAReydPckoMG1qUDHuOmjHsF+L+Yi
-         FXvnMXmqpYO8E9fFXLywnZZ9EK8mFas/VyFoLkUHCJjZ0AxLPvCE4JBtcQY/at8B4Om5
-         YwgqAo06jMK7oETpOssxg2MS10wQE6UL4JdHzsxMgj22D5zMBqhhnUsYfGZf6SPx87jA
-         r9dAOCCQs2chuoPJOnSSAwON5DqVa7Fd/1BSbw96vEw06+L+4SoRc3i1xCYmrpsODnc8
-         dWSHfPetw184oxgOPpb0Q5XFTIpZfWvrAciyNDeRwxZvrpKMGNeGZF9WDHSjCdcqq7Zr
-         fRRQ==
+        d=gmail.com; s=20210112; t=1678558477;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=z1fvfYknXX3s4BMvhdB9LJyWlF6Mhekj+R7eFWprXOE=;
+        b=ZfJAcF7uPhRJSAXwcid6/B7qfuPr/5cWlyH703KEZViuUAK8uf9OnSkBjNxK0F5/br
+         XCeoTPMn/AmpNYwlckwTGdkF+OFV2DvTBdwdtl/dbJj6vrPL7ZVqm9xO9aE7Z45s70Pc
+         TukRa+naUdtVfpFSA6wzzwmqXOGSZqK6SJsfr+NEJpACgSY37KVV3c8dedN8PY7tXk2a
+         PB0Kd8ZbH0+Yi8wB5fhEbvBSV7aw8SXL4Oll8ADCll1UgckSiFv9Qg7RbyzndBZthK3x
+         lYdGJqL1gq4DGvfWeJWoLQ/+SL13T6cjep6emnU+B4P2dOsFLJVKeAdee4nlsqj4Ozth
+         RYOg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678556007;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=bb45CXv6pKtdqYtvpQnbjuwacdqrOSlJTgeuRVg38GM=;
-        b=h4HB02QZ5ZuGmdXIgwa8FyOFyNYjF6VJxX89h046vXzosHyETBC0YIKStnWbY6k8tK
-         HiPj2tGpXH/MgSe5wU3tgIFOwiCveXOtT0etCzutZkYofeflOODMXn3GJLX3ZuZmFzNX
-         jvWYmjFeai/p1AveZhUni9pL0/LIiIZAkhJe3OvCI+zZbQu5CZ2ey4UAguezhAeNLqfd
-         wsm82C+9SF434/VfFZY2JhMEap3OZZm17kAhiuHgdzpAFUQfz0c4HZ5tytMpw4Yyeyuc
-         r+NLExCMX+E+2NIU1SmRxFvqxfWcGo3lZWuGTwGcqqyoaQAaLZajPomuBBV0ZhYdQczj
-         8Crw==
-X-Gm-Message-State: AO0yUKX63+MvpuYA0iyILILJJ6KvJqzMCbZ0gq9SnIUqhuVk2UPP3ptj
-        pf22vtKX8e0Nl5cK8JoA+9fiog==
-X-Google-Smtp-Source: AK7set++ux4zDvlZTZkBob7j+q8P/Nvl1U5PQw52g7pwTikQ/uSeogp80Ri1hXGWTgDvuE//f1qJ3w==
-X-Received: by 2002:aa7:cfd9:0:b0:4bc:403f:a7b3 with SMTP id r25-20020aa7cfd9000000b004bc403fa7b3mr5363100edy.3.1678556007257;
-        Sat, 11 Mar 2023 09:33:27 -0800 (PST)
-Received: from krzk-bin.. ([2a02:810d:15c0:828:6927:e94d:fc63:9d6e])
-        by smtp.gmail.com with ESMTPSA id k15-20020a50ce4f000000b004d8287c775fsm1440885edj.8.2023.03.11.09.33.26
+        d=1e100.net; s=20210112; t=1678558477;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=z1fvfYknXX3s4BMvhdB9LJyWlF6Mhekj+R7eFWprXOE=;
+        b=F/5ybCybR2PVGbf43Lfc3kEkwkm4A/bfaxzAVxHbnW4hdBb39f1jlk4frkB5ltRfJF
+         vNpC4nyhzhpETwvZfsEhzeQUthPCNi5Epf2P0AcM/7sW98HCMvs3C7rO2HpvQLqfuhsW
+         Og3t8wCDmjPGEKEB1SLi4etKHrM2OKI/9CmFezOpO4sbqKkl8mXauiJA6wp1isQy4hmy
+         woVc871KHuyTzg3Bf4ZFOvg+zPMBcH8Gm+LYRnwl+ig+4RlJT9TWrnuszMpTz+3g7z4W
+         i5tqGKzpmkVbkKM1IYNsL8OV92M8R1KS7YGMfPjlZJWuhukiCE4/IiQNupYPGcyXGQnH
+         1vQA==
+X-Gm-Message-State: AO0yUKXURT7qJgWGiqtRc63WCzVyIRN1OXIyKx+cLPGJYiUqpJYuyRFB
+        MChVBKQKdRrKCnig1yohU4Y=
+X-Google-Smtp-Source: AK7set8ClX79YIet7szK6WARyHNYMAjqItBvSIAUu8NA8wuQkIeFJ591KGFOSJFGJFNIBAbX2sQp4g==
+X-Received: by 2002:a17:906:fe43:b0:88f:9c29:d232 with SMTP id wz3-20020a170906fe4300b0088f9c29d232mr39454144ejb.57.1678558476965;
+        Sat, 11 Mar 2023 10:14:36 -0800 (PST)
+Received: from skbuf ([188.27.184.189])
+        by smtp.gmail.com with ESMTPSA id m15-20020a17090607cf00b00914fec9f40esm1338874ejc.71.2023.03.11.10.14.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 11 Mar 2023 09:33:26 -0800 (PST)
-From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-To:     Andrew Lunn <andrew@lunn.ch>,
+        Sat, 11 Mar 2023 10:14:36 -0800 (PST)
+Date:   Sat, 11 Mar 2023 20:14:34 +0200
+From:   Vladimir Oltean <olteanv@gmail.com>
+To:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc:     Andrew Lunn <andrew@lunn.ch>,
         Florian Fainelli <f.fainelli@gmail.com>,
-        Vladimir Oltean <olteanv@gmail.com>,
         "David S. Miller" <davem@davemloft.net>,
         Eric Dumazet <edumazet@google.com>,
         Jakub Kicinski <kuba@kernel.org>,
@@ -70,38 +71,43 @@ To:     Andrew Lunn <andrew@lunn.ch>,
         Heiner Kallweit <hkallweit1@gmail.com>,
         Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-wpan@vger.kernel.org
-Cc:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Subject: [PATCH 12/12] net: ieee802154: ca8210: drop owner from driver
-Date:   Sat, 11 Mar 2023 18:33:03 +0100
-Message-Id: <20230311173303.262618-12-krzysztof.kozlowski@linaro.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230311173303.262618-1-krzysztof.kozlowski@linaro.org>
+Subject: Re: [PATCH 01/12] net: dsa: lantiq_gswip: mark OF related data as
+ maybe unused
+Message-ID: <20230311181434.lycxr5h2f6xcmwdj@skbuf>
 References: <20230311173303.262618-1-krzysztof.kozlowski@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20230311173303.262618-1-krzysztof.kozlowski@linaro.org>
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Core already sets owner in spi_driver.
+On Sat, Mar 11, 2023 at 06:32:52PM +0100, Krzysztof Kozlowski wrote:
+> The driver can be compile tested with !CONFIG_OF making certain data
+> unused:
+> 
+>   drivers/net/dsa/lantiq_gswip.c:1888:34: error: ‘xway_gphy_match’ defined but not used [-Werror=unused-const-variable=]
+> 
+> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> ---
 
-Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
----
- drivers/net/ieee802154/ca8210.c | 1 -
- 1 file changed, 1 deletion(-)
+Do you happen to have any context as to why of_match_node() without
+CONFIG_OF is implemented as:
 
-diff --git a/drivers/net/ieee802154/ca8210.c b/drivers/net/ieee802154/ca8210.c
-index 65d28e8a87c9..ca1fa56cca68 100644
---- a/drivers/net/ieee802154/ca8210.c
-+++ b/drivers/net/ieee802154/ca8210.c
-@@ -3180,7 +3180,6 @@ MODULE_DEVICE_TABLE(of, ca8210_of_ids);
- static struct spi_driver ca8210_spi_driver = {
- 	.driver = {
- 		.name =                 DRIVER_NAME,
--		.owner =                THIS_MODULE,
- 		.of_match_table =       ca8210_of_ids,
- 	},
- 	.probe  =                       ca8210_probe,
--- 
-2.34.1
+#define of_match_node(_matches, _node)	NULL
 
+and not as:
+
+static inline const struct of_device_id *
+of_match_node(const struct of_device_id *matches,
+	      const struct device_node *node)
+{
+	return NULL;
+}
+
+?
+
+Generally, the static inline shim function model is nicer, because it
+allows us to not scatter __maybe_unused all around.
