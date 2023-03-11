@@ -2,53 +2,53 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E669FC74A4B
-	for <linux-wpan@archiver.kernel.org>; Sat, 11 Mar 2023 17:33:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 079A7C6FD1C
+	for <linux-wpan@archiver.kernel.org>; Sat, 11 Mar 2023 17:33:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230135AbjCKRdb (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Sat, 11 Mar 2023 12:33:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58972 "EHLO
+        id S230098AbjCKRdc (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Sat, 11 Mar 2023 12:33:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59108 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229768AbjCKRd1 (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Sat, 11 Mar 2023 12:33:27 -0500
-Received: from mail-ed1-x536.google.com (mail-ed1-x536.google.com [IPv6:2a00:1450:4864:20::536])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6374322DCE
-        for <linux-wpan@vger.kernel.org>; Sat, 11 Mar 2023 09:33:16 -0800 (PST)
-Received: by mail-ed1-x536.google.com with SMTP id o12so33016450edb.9
-        for <linux-wpan@vger.kernel.org>; Sat, 11 Mar 2023 09:33:16 -0800 (PST)
+        with ESMTP id S229767AbjCKRd2 (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Sat, 11 Mar 2023 12:33:28 -0500
+Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B8A529174
+        for <linux-wpan@vger.kernel.org>; Sat, 11 Mar 2023 09:33:17 -0800 (PST)
+Received: by mail-ed1-x534.google.com with SMTP id cy23so32927204edb.12
+        for <linux-wpan@vger.kernel.org>; Sat, 11 Mar 2023 09:33:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1678555995;
+        d=linaro.org; s=google; t=1678555996;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=UwB85vi35W6JFbse/kCjhcZA/CxkEkODSyImYFi2+wU=;
-        b=QJZVFReUg7zrO73MLdqYRzpuYC4bl7zsy2iMOSOtYl5oRvPLj6V3IScX9xNhvF3qcU
-         lCQWEwdKfwmn1uhILsR4p5KVY41WXU6cZEZKEEewyFaYIR1OBjZzO7aWMLlmncsslmpl
-         tCnusxbxupvB3BaBOcuFcfDAgwNkUH4cBKSTTvQQACSpC1wsGpxovbasVJrdapSd32dD
-         guQxFSDTrHL6fil3naWSY7Yq5/1I7wZW2zYEdTnpNlZVCpDo5OOFuyqGmx/v8EYqd92X
-         kEASnGkR6jqA1AkQ/JckSaVIqpxgLEG4nTwS4WvxJO0/434fH6RdA5BN8E1XHEO9OtSh
-         OKWQ==
+        bh=cV5jhwqAFb9J/sgkVfjUP7KhaalS+CKZT6hVt29t4R8=;
+        b=MYvjilFcpCdittD302lL2YjMwJ2qvaM+TOfrxTuATwXHJ1CfzEjqOmvaSvScCqmkin
+         pTnDZ5d2rOiT4dU1dZdXkgCPw+Covleytz7abYY23PlkYjskdqFG39/Y7ZSCIpoxgXlf
+         PeXzpD5kSyI+JJmWgeCFORKW1S9np8HnYzatbTyNAthhVQzk9si2w3X8tLVL3QW+VvVZ
+         ucE+S8IILRThkeL4sB1bDjwNLZa/k37MagG/E41twesL3QAeTRhWuv+B7FtdiicQVIW5
+         7m7opj8Qi4+juTxzE+C0FUuMelNeoewwPeqTez0Fwm5ZNQR0j+3L6jIcetbH+ngR/aLF
+         V6wA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678555995;
+        d=1e100.net; s=20210112; t=1678555996;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=UwB85vi35W6JFbse/kCjhcZA/CxkEkODSyImYFi2+wU=;
-        b=f80BCW5EnNKDMKDq1OuO4ng4KA826g2qJS01xYo9jEeYbO/9xeBgCExLQzYFJK+ZTt
-         wiwEYkjCkQOOm2TWudYv8AHvIA9Nci0M5gHkPiGYpOAgUtubAW6RWZTqjCFRM8tA+zRE
-         T9y5T7H4w6uogV2mqZTH5pl1lnFHggRdW0j1Dnc+j4YAg1WA/1fgq3mISDUn97awgM2o
-         07P7dYMc8DPNWSk1TLnJJTJ0sET5kQBeK5lOKndB/drHYOpq0Lmm0YSu0iT150r71Qt1
-         KSNXsJ3WnyuXRbHgCkupa/NIARAIiSmDDTs+0dw8/1mI8es8xxbfOUarC1mZKpbIFcW1
-         /6OA==
-X-Gm-Message-State: AO0yUKUxe66McpdyRZ9l57O/Ur8qGslcPgTOGDNJADrRX3wKz0Aa0eN6
-        ++s2sZt+BwRhH1inByspXsE+4g==
-X-Google-Smtp-Source: AK7set/dVlRnxLDT9ouunZ6UH9aeWxbXkHckg/IVN8HpBpPg2BP11f0i8gnuweQAwRI6Tc4MtCyTfA==
-X-Received: by 2002:a17:906:c79a:b0:924:9f65:8866 with SMTP id cw26-20020a170906c79a00b009249f658866mr284358ejb.64.1678555994857;
-        Sat, 11 Mar 2023 09:33:14 -0800 (PST)
+        bh=cV5jhwqAFb9J/sgkVfjUP7KhaalS+CKZT6hVt29t4R8=;
+        b=WA62BUW8ltI9aVurz2xpHlQMIts7YxFxqUshKB2vDmkEi4W4N4CholbksSHcvxJGO1
+         Dhowf92Qggr3pE3DrZ1RHQJt0zl85QyoKNOnu8zCFeWa6GRqB+inQAQ1ZD0xFOvVUPmf
+         Ypy7aTOY801dw4oLmwD5jgTigIXHjYeJwRgfc1ePfkZ7kSWeo2QbmzUs2Mk3j/0e7kkB
+         t5fcCKuiu2vxMRCerMugB8jCG6yaLT8YWAmaEDB5TIY9C8it0k+ApoL9Lb3M0HrP3p5L
+         sCslxTlREB2FZq9nrdyTAw9SXmMZg5pBDdmJRkcWEQ2zVmclHM6WSR+4oSDUdcUkc/O5
+         7XNg==
+X-Gm-Message-State: AO0yUKWI+OCrbEAlhPQhtyuF1HJkm6ttxBqTERxtrVwCp/Bleh5gdd1j
+        KKEPcuCcxKrCYLg6DdVk503gLA==
+X-Google-Smtp-Source: AK7set/PA0/E9yFuXJbNrBsBaZOrTV+sx32D7gEew2JFPqh8HWaLIK52psR0MV7S5RRnbLvgEyjCBA==
+X-Received: by 2002:a05:6402:35a:b0:4ab:4dc6:6f8c with SMTP id r26-20020a056402035a00b004ab4dc66f8cmr28767868edw.4.1678555996559;
+        Sat, 11 Mar 2023 09:33:16 -0800 (PST)
 Received: from krzk-bin.. ([2a02:810d:15c0:828:6927:e94d:fc63:9d6e])
-        by smtp.gmail.com with ESMTPSA id k15-20020a50ce4f000000b004d8287c775fsm1440885edj.8.2023.03.11.09.33.13
+        by smtp.gmail.com with ESMTPSA id k15-20020a50ce4f000000b004d8287c775fsm1440885edj.8.2023.03.11.09.33.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 11 Mar 2023 09:33:14 -0800 (PST)
+        Sat, 11 Mar 2023 09:33:16 -0800 (PST)
 From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 To:     Andrew Lunn <andrew@lunn.ch>,
         Florian Fainelli <f.fainelli@gmail.com>,
@@ -71,9 +71,9 @@ To:     Andrew Lunn <andrew@lunn.ch>,
         Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-wpan@vger.kernel.org
 Cc:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Subject: [PATCH 03/12] net: dsa: seville_vsc9953: drop of_match_ptr for ID table
-Date:   Sat, 11 Mar 2023 18:32:54 +0100
-Message-Id: <20230311173303.262618-3-krzysztof.kozlowski@linaro.org>
+Subject: [PATCH 04/12] net: dsa: ksz9477: drop of_match_ptr for ID table
+Date:   Sat, 11 Mar 2023 18:32:55 +0100
+Message-Id: <20230311173303.262618-4-krzysztof.kozlowski@linaro.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230311173303.262618-1-krzysztof.kozlowski@linaro.org>
 References: <20230311173303.262618-1-krzysztof.kozlowski@linaro.org>
@@ -84,30 +84,30 @@ Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-The driver can match only via the DT table so the table should be always
-used and the of_match_ptr does not have any sense (this also allows ACPI
-matching via PRP0001, even though it might not be relevant here).
+The driver will match mostly by DT table (even thought there is regular
+ID table) so there is little benefit in of_match_ptr (this also allows
+ACPI matching via PRP0001, even though it might not be relevant here).
 
-  drivers/net/dsa/ocelot/seville_vsc9953.c:1070:34: error: ‘seville_of_match’ defined but not used [-Werror=unused-const-variable=]
+  drivers/net/dsa/microchip/ksz9477_i2c.c:84:34: error: ‘ksz9477_dt_ids’ defined but not used [-Werror=unused-const-variable=]
 
 Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 ---
- drivers/net/dsa/ocelot/seville_vsc9953.c | 2 +-
+ drivers/net/dsa/microchip/ksz9477_i2c.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/dsa/ocelot/seville_vsc9953.c b/drivers/net/dsa/ocelot/seville_vsc9953.c
-index 563ad338da25..96d4972a62f0 100644
---- a/drivers/net/dsa/ocelot/seville_vsc9953.c
-+++ b/drivers/net/dsa/ocelot/seville_vsc9953.c
-@@ -1079,7 +1079,7 @@ static struct platform_driver seville_vsc9953_driver = {
- 	.shutdown	= seville_shutdown,
+diff --git a/drivers/net/dsa/microchip/ksz9477_i2c.c b/drivers/net/dsa/microchip/ksz9477_i2c.c
+index e315f669ec06..97a317263a2f 100644
+--- a/drivers/net/dsa/microchip/ksz9477_i2c.c
++++ b/drivers/net/dsa/microchip/ksz9477_i2c.c
+@@ -117,7 +117,7 @@ MODULE_DEVICE_TABLE(of, ksz9477_dt_ids);
+ static struct i2c_driver ksz9477_i2c_driver = {
  	.driver = {
- 		.name		= "mscc_seville",
--		.of_match_table	= of_match_ptr(seville_of_match),
-+		.of_match_table	= seville_of_match,
+ 		.name	= "ksz9477-switch",
+-		.of_match_table = of_match_ptr(ksz9477_dt_ids),
++		.of_match_table = ksz9477_dt_ids,
  	},
- };
- module_platform_driver(seville_vsc9953_driver);
+ 	.probe_new = ksz9477_i2c_probe,
+ 	.remove	= ksz9477_i2c_remove,
 -- 
 2.34.1
 
