@@ -2,62 +2,56 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60CE8C6FD1F
-	for <linux-wpan@archiver.kernel.org>; Sun, 12 Mar 2023 10:20:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1EC2C6FA99
+	for <linux-wpan@archiver.kernel.org>; Sun, 12 Mar 2023 10:57:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229929AbjCLKUo (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Sun, 12 Mar 2023 06:20:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56868 "EHLO
+        id S230123AbjCLK5g (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Sun, 12 Mar 2023 06:57:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50610 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229919AbjCLKUn (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Sun, 12 Mar 2023 06:20:43 -0400
+        with ESMTP id S229957AbjCLK5f (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Sun, 12 Mar 2023 06:57:35 -0400
 Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFE6E32E40
-        for <linux-wpan@vger.kernel.org>; Sun, 12 Mar 2023 03:20:41 -0700 (PDT)
-Received: by mail-ed1-x52f.google.com with SMTP id y4so8184790edo.2
-        for <linux-wpan@vger.kernel.org>; Sun, 12 Mar 2023 03:20:41 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33D7D42BF4;
+        Sun, 12 Mar 2023 03:57:34 -0700 (PDT)
+Received: by mail-ed1-x52f.google.com with SMTP id o12so37807952edb.9;
+        Sun, 12 Mar 2023 03:57:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1678616440;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=sbAbzZV/Xdq9oZ9db4qjyR7OAM8ISoHuQdD7Lk6uW9o=;
-        b=LeLPC3EEhzxRNxvRCH+b+d4kEih+ehxEiG2rXL5qSEAcOttdU4aXULt0tsRKPuCza3
-         a4zWL1S0wbIAisSm1DpkMjY03lTS4tPihYnhk7Gm1YjQK92APvyRcC8nklG3T6yGr/eB
-         cmYfO6IiI+lSpBExN9SZvLO/BEW9t7S9V6roCvbfm71F6OeinZvpXv7YsdI2sq3n5y3S
-         naTpfbe8huSCsAPBspw/c++7JG8ovvFyJ2lQXDxaVxcosqunaSAQHdVFkePGJafuZDC5
-         vyVlxtg9tFQUmMVIORvjh8TnVayopqMNlt8dEzQ3SyBjXt+WBr/6pGANCLgwwSdGLEtV
-         M0Yg==
+        d=gmail.com; s=20210112; t=1678618652;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=KFKsEtBamciJEqdCP5z0R3ZDXfVveXSOvSOmH/fc8C0=;
+        b=GTShrhhST40g9CDql+eUL0+VGFfeK8kYs0S0Zg2MNpn+DOkm4sKdDkskGG8saKOEZ8
+         cvYirnzM76YIWygBGehchNIr+LNkEEWJFi92Tx1OHrtgyMgUrmqI8E9wr8hCjAlXFTmA
+         pHHzIgVVhHwIlKqy/2/rNDwO33vJqi+wBLsyE7G+5Tbi9T//d98R/eHv4DnPFHExr1uL
+         iY+ccOVEhCEKYF7iwCOE7K3eBB1FX8sYTfPPR1NjAX/G3fG3GZyNVvMfsIEQUptDSOdI
+         5SLAqOaIoOZ9oA0a10KbLOGyt6VxSihU98KW9dzzWVJAToGshTSIIP86q0Gh0twBPUG2
+         nDyQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678616440;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20210112; t=1678618652;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=sbAbzZV/Xdq9oZ9db4qjyR7OAM8ISoHuQdD7Lk6uW9o=;
-        b=rE4SC2Mspf8l8hhUOjKfrLTNAq9WwQomiCmYVfj8xtx0AMSgWscwyItSA9ceYJlPuh
-         KH1yZ62pSBX9Mk8ZKee7XITa1NaiCrxgGkBVHvM/NEwbU+y4A38LT3gBaRiyt553+hQT
-         nIuieM1wO/sbBH6XzAo8tawzWIMNHPsj4PZse6Q9wb3hoeVDLqrjhLZHnPwDL2Z0RZoE
-         mwaFvHj1f2Fnw5IFE0RwQqOombTlvYoJ5/ghpZwOMeSwJI3nC1b2XnzXEiq0zn8xkhGr
-         mf60ep3LTURmOfyoiEIZfwu/BGk5UDVglq6bh6eH9jT3kXTq5AV3UcpskCQlOZS7/JUt
-         hrxQ==
-X-Gm-Message-State: AO0yUKWv/EH5P0MIeBDEfQ2MJs09IwokLwrmiCLZxREvxQl7tndXPbW8
-        hW6eje1SZa9h4HqsC5E8E/hiVg==
-X-Google-Smtp-Source: AK7set+j33mKv17cplWRaB2equIU/hTxgso/6lGoUsSghTcqcj9a6GMBKe+/zu/1DFJTN0Bl7w55cw==
-X-Received: by 2002:a17:907:6ea6:b0:8b1:7dea:cc40 with SMTP id sh38-20020a1709076ea600b008b17deacc40mr37985220ejc.9.1678616440275;
-        Sun, 12 Mar 2023 03:20:40 -0700 (PDT)
-Received: from ?IPV6:2a02:810d:15c0:828:d9f6:3e61:beeb:295a? ([2a02:810d:15c0:828:d9f6:3e61:beeb:295a])
-        by smtp.gmail.com with ESMTPSA id u21-20020a17090657d500b008b69aa62efcsm2094661ejr.62.2023.03.12.03.20.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 12 Mar 2023 03:20:39 -0700 (PDT)
-Message-ID: <d9b197c8-56fe-b59d-5fca-bc863ac1e7ed@linaro.org>
-Date:   Sun, 12 Mar 2023 11:20:38 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.8.0
-Subject: Re: [PATCH 01/12] net: dsa: lantiq_gswip: mark OF related data as
- maybe unused
-Content-Language: en-US
-To:     Vladimir Oltean <olteanv@gmail.com>
+        bh=KFKsEtBamciJEqdCP5z0R3ZDXfVveXSOvSOmH/fc8C0=;
+        b=qShyoK23PBQFNWUddtj8DuD6TUPZV83ucvNWk2RmgOYtJqScm5oeTPabJPplAPw/F5
+         ftu9yj/Pve0WqyOEBCRobNA2wUc5+ZTLBWW2fdMALVLuDui2M4T+iwdPIyqPp5CGADf9
+         g1qcEyvR/u665FIuU/x1lbnK+AJPZ3WDIrR+dysvzAN6xfnUuATShP3qNZo708NAUiCP
+         Gu6ggVHhzTtZD7GlaMfKWglLhYvcC0E72cTKbnJXgfVMwCGqvBMugZVMwO0T0tcFmJZD
+         GTvs01KpZo3FXIPWc0oEloRQcakc7OMBw1jF0VW/qsTvFa+464a0f8VKf0YffV+Bb+zf
+         2yow==
+X-Gm-Message-State: AO0yUKWBz4f4LAnl3++CTvlugHKK7lEB/YmLpbtYTlNM225AyIN5c17v
+        EAYJ4uh/UCGTC05ODqo8A5E=
+X-Google-Smtp-Source: AK7set+rQ0XJxwNPiv3G1/dJQTp8wYOVPnDjvgA69VPCXH+9QYy75GFlfxh0gWYjrH/xb8MLv1qlqw==
+X-Received: by 2002:a17:907:7f0b:b0:907:9470:b7ab with SMTP id qf11-20020a1709077f0b00b009079470b7abmr34337920ejc.71.1678618652543;
+        Sun, 12 Mar 2023 03:57:32 -0700 (PDT)
+Received: from skbuf ([188.27.184.189])
+        by smtp.gmail.com with ESMTPSA id by26-20020a170906a2da00b00923221f4062sm1257164ejb.112.2023.03.12.03.57.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 12 Mar 2023 03:57:32 -0700 (PDT)
+Date:   Sun, 12 Mar 2023 12:57:29 +0200
+From:   Vladimir Oltean <olteanv@gmail.com>
+To:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 Cc:     Andrew Lunn <andrew@lunn.ch>,
         Florian Fainelli <f.fainelli@gmail.com>,
         "David S. Miller" <davem@davemloft.net>,
@@ -77,49 +71,57 @@ Cc:     Andrew Lunn <andrew@lunn.ch>,
         Heiner Kallweit <hkallweit1@gmail.com>,
         Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-wpan@vger.kernel.org
+Subject: Re: [PATCH 01/12] net: dsa: lantiq_gswip: mark OF related data as
+ maybe unused
+Message-ID: <20230312105729.bnxn4a6mf2gav7ym@skbuf>
 References: <20230311173303.262618-1-krzysztof.kozlowski@linaro.org>
  <20230311181434.lycxr5h2f6xcmwdj@skbuf>
-From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-In-Reply-To: <20230311181434.lycxr5h2f6xcmwdj@skbuf>
-Content-Type: text/plain; charset=UTF-8
+ <d9b197c8-56fe-b59d-5fca-bc863ac1e7ed@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <d9b197c8-56fe-b59d-5fca-bc863ac1e7ed@linaro.org>
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-On 11/03/2023 19:14, Vladimir Oltean wrote:
-> On Sat, Mar 11, 2023 at 06:32:52PM +0100, Krzysztof Kozlowski wrote:
->> The driver can be compile tested with !CONFIG_OF making certain data
->> unused:
->>
->>   drivers/net/dsa/lantiq_gswip.c:1888:34: error: ‘xway_gphy_match’ defined but not used [-Werror=unused-const-variable=]
->>
->> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
->> ---
+On Sun, Mar 12, 2023 at 11:20:38AM +0100, Krzysztof Kozlowski wrote:
+> On 11/03/2023 19:14, Vladimir Oltean wrote:
+> > On Sat, Mar 11, 2023 at 06:32:52PM +0100, Krzysztof Kozlowski wrote:
+> >> The driver can be compile tested with !CONFIG_OF making certain data
+> >> unused:
+> >>
+> >>   drivers/net/dsa/lantiq_gswip.c:1888:34: error: ‘xway_gphy_match’ defined but not used [-Werror=unused-const-variable=]
+> >>
+> >> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> >> ---
+> > 
+> > Do you happen to have any context as to why of_match_node() without
+> > CONFIG_OF is implemented as:
+> > 
+> > #define of_match_node(_matches, _node)	NULL
+> > 
+> > and not as:
+> > 
+> > static inline const struct of_device_id *
+> > of_match_node(const struct of_device_id *matches,
+> > 	      const struct device_node *node)
+> > {
+> > 	return NULL;
+> > }
+> > 
+> > ?
+> > 
+> > Generally, the static inline shim function model is nicer, because it
+> > allows us to not scatter __maybe_unused all around.
 > 
-> Do you happen to have any context as to why of_match_node() without
-> CONFIG_OF is implemented as:
-> 
-> #define of_match_node(_matches, _node)	NULL
-> 
-> and not as:
-> 
-> static inline const struct of_device_id *
-> of_match_node(const struct of_device_id *matches,
-> 	      const struct device_node *node)
-> {
-> 	return NULL;
-> }
-> 
-> ?
-> 
-> Generally, the static inline shim function model is nicer, because it
-> allows us to not scatter __maybe_unused all around.
+> Sorry, I don't follow. I don't touch that wrappers, just fix errors
+> related to OF device ID tables, although in few cases it is indeed
+> related to of_match_node.
 
-Sorry, I don't follow. I don't touch that wrappers, just fix errors
-related to OF device ID tables, although in few cases it is indeed
-related to of_match_node.
-
-Best regards,
-Krzysztof
-
+I'm saying this because in lantiq_gswip.c, xway_gphy_match is accessed
+through of_match_node(). If the shim definition for of_match_node() was
+different, the variable wouldn't have been unused with CONFIG_OF=n.
+I guess it's worth considering changing that wrapper instead of adding
+the __maybe_unused.
