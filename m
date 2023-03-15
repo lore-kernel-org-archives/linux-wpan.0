@@ -2,107 +2,116 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2311C61DA4
-	for <linux-wpan@archiver.kernel.org>; Wed, 15 Mar 2023 08:20:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD5D0C74A5B
+	for <linux-wpan@archiver.kernel.org>; Wed, 15 Mar 2023 18:20:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231656AbjCOIUZ (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 15 Mar 2023 04:20:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41696 "EHLO
+        id S232709AbjCOSUS (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 15 Mar 2023 14:20:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54196 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229629AbjCOIUX (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 15 Mar 2023 04:20:23 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7B8F1A64C;
-        Wed, 15 Mar 2023 01:20:21 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 7F30961C06;
-        Wed, 15 Mar 2023 08:20:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E48FEC433D2;
-        Wed, 15 Mar 2023 08:20:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1678868420;
-        bh=T3IP+fhPBj/Uguzw4H58V6oNktuwYLOa2oeYjb8iGYs=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=H/HURorHz/x7wm4z1A/UBIVFxLoB1ZesZdMR+QJQjbYPM65Cn3B1N0D8zbX1Qkh36
-         QERizrZnvkoUhOQEaJxP5YA/76v9foEMZv4qo/FtePBlYOdq9onMS+RgWTdDuKIKvA
-         YJSdlYKSNpeI3wy6y8PQ9N+xOdp1m92Znu4X1P6dsq+A2Iwnghi7nGDpVXR+THHUs2
-         Vf+vvXtawcVoLh8sqs7V/78ri2eKdbdyBddoVfeAelP8bKrWbNbI1Xi6lnTig6qBqR
-         ZUp/neM0RMrpFbsRVGynQGO1ZjexibU9WRyduTUzjeprEGzlRpN8/l8Mg4k1SiEEv6
-         XiZOUZ0h7AxHw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id CFE0FE66CBA;
-        Wed, 15 Mar 2023 08:20:20 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+        with ESMTP id S232735AbjCOSTx (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 15 Mar 2023 14:19:53 -0400
+Received: from mail-qt1-x82e.google.com (mail-qt1-x82e.google.com [IPv6:2607:f8b0:4864:20::82e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CEF257EA18
+        for <linux-wpan@vger.kernel.org>; Wed, 15 Mar 2023 11:19:37 -0700 (PDT)
+Received: by mail-qt1-x82e.google.com with SMTP id r16so17191718qtx.9
+        for <linux-wpan@vger.kernel.org>; Wed, 15 Mar 2023 11:19:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=joelfernandes.org; s=google; t=1678904377;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2CvInQkgrtFswN6a5J7y2T4rUDkhwlp0YkwDUjcLdMc=;
+        b=KnGZSFdqJfe5cBkq4aueaxEmiLAtr5exCnajnLei2Srqi9rxmdUuZI63NoOHKdJ2+o
+         zHIUImu4xXpy20R3uMo162yktC1I33Kf0ShmUAEpgNBOOhn4IjHGJR07QliUY+ctVwZQ
+         HWm3wiihMoB3X4nUyfx7NPhrp6HpBq8pnQ1lE=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1678904377;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=2CvInQkgrtFswN6a5J7y2T4rUDkhwlp0YkwDUjcLdMc=;
+        b=j7dPYcY9dOB28fnkLs/o5hBB7+UTvr4gddwUPeuXv+d28RR34LnwA+lHU0qpnsEOIY
+         z8U6q3jE9bMuGdjR1rSyCaMFd6zMLoXo62dO4phnujSDV52oTiZpi1FcsVwjRW/KyGb1
+         j87b/X5hXEwCp9JzrNeNACXMxh4n5xF0ORhqexm7gxXLK+jFoDhlNtvwNZXhJ42Kd68f
+         XYvzR+X7QDjxjGHm2Qg3t0damSfd+FzxTlOsoEVcgo02Cuh3Bju4tFknRFSyO96Zxgks
+         TAQvPFH+yHhid7Af4CsHURcui5z5AJglsEiaL/dlRNTCOFKkAVXtA2MhS9GjPkW285EJ
+         MMUw==
+X-Gm-Message-State: AO0yUKUPf0Kx4pXpCVOFc+r3gZAF/SgYCH6d/HDQKIa4uAmpf4B310nc
+        uelFRRPyen+EtI8H/E88aun83A==
+X-Google-Smtp-Source: AK7set9oYtHUFfrwlWQH2asNzIQYPCQs5mupkZKf2svsaI8b0gVoCB+qZF/+IC8hu7UCi4R1iYnkCg==
+X-Received: by 2002:a05:622a:50c:b0:3d3:33bd:a29 with SMTP id l12-20020a05622a050c00b003d333bd0a29mr1523968qtx.16.1678904377358;
+        Wed, 15 Mar 2023 11:19:37 -0700 (PDT)
+Received: from joelboxx.c.googlers.com.com (129.239.188.35.bc.googleusercontent.com. [35.188.239.129])
+        by smtp.gmail.com with ESMTPSA id v125-20020a379383000000b007458ae32290sm4113974qkd.128.2023.03.15.11.19.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 Mar 2023 11:19:37 -0700 (PDT)
+From:   "Joel Fernandes (Google)" <joel@joelfernandes.org>
+To:     Alexander Aring <alex.aring@gmail.com>,
+        Stefan Schmidt <stefan@datenfreihafen.org>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        David Girault <david.girault@qorvo.com>
+Cc:     "Joel Fernandes (Google)" <joel@joelfernandes.org>,
+        "Paul E . McKenney" <paulmck@kernel.org>,
+        Alexander Aring <aahringo@redhat.com>,
+        linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH v2 12/14] mac802154: Rename kfree_rcu() to kvfree_rcu_mightsleep()
+Date:   Wed, 15 Mar 2023 18:18:59 +0000
+Message-Id: <20230315181902.4177819-12-joel@joelfernandes.org>
+X-Mailer: git-send-email 2.40.0.rc1.284.g88254d51c5-goog
+In-Reply-To: <20230315181902.4177819-1-joel@joelfernandes.org>
+References: <20230315181902.4177819-1-joel@joelfernandes.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH 01/12] net: dsa: lantiq_gswip: mark OF related data as maybe
- unused
-From:   patchwork-bot+netdevbpf@kernel.org
-Message-Id: <167886842083.29094.15777402773268782712.git-patchwork-notify@kernel.org>
-Date:   Wed, 15 Mar 2023 08:20:20 +0000
-References: <20230311173303.262618-1-krzysztof.kozlowski@linaro.org>
-In-Reply-To: <20230311173303.262618-1-krzysztof.kozlowski@linaro.org>
-To:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc:     andrew@lunn.ch, f.fainelli@gmail.com, olteanv@gmail.com,
-        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-        pabeni@redhat.com, hauke@hauke-m.de, woojung.huh@microchip.com,
-        UNGLinuxDriver@microchip.com, claudiu.manoil@nxp.com,
-        alexandre.belloni@bootlin.com, colin.foster@in-advantage.com,
-        michael.hennerich@analog.com, alex.aring@gmail.com,
-        stefan@datenfreihafen.org, miquel.raynal@bootlin.com,
-        hkallweit1@gmail.com, linux@armlinux.org.uk,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-wpan@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello:
+The k[v]free_rcu() macro's single-argument form is deprecated.
+Therefore switch to the new k[v]free_rcu_mightsleep() variant. The goal
+is to avoid accidental use of the single-argument forms, which can
+introduce functionality bugs in atomic contexts and latency bugs in
+non-atomic contexts.
 
-This series was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
+The callers are holding a mutex so the context allows blocking. Hence
+using the API with a single argument will be fine, but use its new name.
 
-On Sat, 11 Mar 2023 18:32:52 +0100 you wrote:
-> The driver can be compile tested with !CONFIG_OF making certain data
-> unused:
-> 
->   drivers/net/dsa/lantiq_gswip.c:1888:34: error: ‘xway_gphy_match’ defined but not used [-Werror=unused-const-variable=]
-> 
-> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-> 
-> [...]
+There is no functionality change with this patch.
 
-Here is the summary with links:
-  - [01/12] net: dsa: lantiq_gswip: mark OF related data as maybe unused
-    https://git.kernel.org/netdev/net-next/c/6ea1e67788f3
-  - [02/12] net: dsa: lan9303: drop of_match_ptr for ID table
-    https://git.kernel.org/netdev/net-next/c/ced5c5a0a2ea
-  - [03/12] net: dsa: seville_vsc9953: drop of_match_ptr for ID table
-    https://git.kernel.org/netdev/net-next/c/1eb8566dd08d
-  - [04/12] net: dsa: ksz9477: drop of_match_ptr for ID table
-    https://git.kernel.org/netdev/net-next/c/00923ff2e1ba
-  - [05/12] net: dsa: ocelot: drop of_match_ptr for ID table
-    https://git.kernel.org/netdev/net-next/c/0f17b42827ae
-  - [06/12] net: phy: ks8995: drop of_match_ptr for ID table
-    https://git.kernel.org/netdev/net-next/c/b0b7d1b6260b
-  - [07/12] net: ieee802154: adf7242: drop of_match_ptr for ID table
-    https://git.kernel.org/netdev/net-next/c/3df09beef650
-  - [08/12] net: ieee802154: mcr20a: drop of_match_ptr for ID table
-    https://git.kernel.org/netdev/net-next/c/3896c40b7824
-  - [09/12] net: ieee802154: at86rf230: drop of_match_ptr for ID table
-    https://git.kernel.org/netdev/net-next/c/32b7030681a4
-  - [10/12] net: ieee802154: ca8210: drop of_match_ptr for ID table
-    https://git.kernel.org/netdev/net-next/c/cdfe4fc4d946
-  - [11/12] net: ieee802154: adf7242: drop owner from driver
-    https://git.kernel.org/netdev/net-next/c/059fa9972340
-  - [12/12] net: ieee802154: ca8210: drop owner from driver
-    https://git.kernel.org/netdev/net-next/c/613a3c44a373
+Fixes: 57588c71177f ("mac802154: Handle passive scanning")
+Reviewed-by: Paul E. McKenney <paulmck@kernel.org>
+Signed-off-by: Joel Fernandes (Google) <joel@joelfernandes.org>
+---
+ net/mac802154/scan.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-You are awesome, thank you!
+diff --git a/net/mac802154/scan.c b/net/mac802154/scan.c
+index 9b0933a185eb..5c191bedd72c 100644
+--- a/net/mac802154/scan.c
++++ b/net/mac802154/scan.c
+@@ -52,7 +52,7 @@ static int mac802154_scan_cleanup_locked(struct ieee802154_local *local,
+ 	request = rcu_replace_pointer(local->scan_req, NULL, 1);
+ 	if (!request)
+ 		return 0;
+-	kfree_rcu(request);
++	kvfree_rcu_mightsleep(request);
+ 
+ 	/* Advertize first, while we know the devices cannot be removed */
+ 	if (aborted)
+@@ -403,7 +403,7 @@ int mac802154_stop_beacons_locked(struct ieee802154_local *local,
+ 	request = rcu_replace_pointer(local->beacon_req, NULL, 1);
+ 	if (!request)
+ 		return 0;
+-	kfree_rcu(request);
++	kvfree_rcu_mightsleep(request);
+ 
+ 	nl802154_beaconing_done(wpan_dev);
+ 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.40.0.rc1.284.g88254d51c5-goog
 
