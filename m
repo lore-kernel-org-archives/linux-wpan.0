@@ -2,83 +2,107 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DBF0C6FD1D
-	for <linux-wpan@archiver.kernel.org>; Wed, 15 Mar 2023 05:32:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2311C61DA4
+	for <linux-wpan@archiver.kernel.org>; Wed, 15 Mar 2023 08:20:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229648AbjCOFcy (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 15 Mar 2023 01:32:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51344 "EHLO
+        id S231656AbjCOIUZ (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 15 Mar 2023 04:20:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41696 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229818AbjCOFcx (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 15 Mar 2023 01:32:53 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 769052CC75;
-        Tue, 14 Mar 2023 22:32:35 -0700 (PDT)
+        with ESMTP id S229629AbjCOIUX (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 15 Mar 2023 04:20:23 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7B8F1A64C;
+        Wed, 15 Mar 2023 01:20:21 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id C5E7461AA3;
-        Wed, 15 Mar 2023 05:22:46 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 845ADC433EF;
-        Wed, 15 Mar 2023 05:22:45 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 7F30961C06;
+        Wed, 15 Mar 2023 08:20:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id E48FEC433D2;
+        Wed, 15 Mar 2023 08:20:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1678857766;
-        bh=Ho9vgqp2jyAVZx01d08QVZd9aMjXRu8aXf2qqWMyHgs=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=gfrqScDnSV2ajr9IDlCMnWcUlVQHuP91pjpKeNxRDwTGdOwpxeTJnBqI6FJDaIkU5
-         o8/WEUNdy8LQLBL65yVx2d9D7pZa+daLJlUWqMrweJG73zgQcrbJpxEnxzgHbHkttg
-         sNK/FSN/kLDomRmCDRm0qI0Vg6lsQYT6ojzMXOzGCa+DxbreIBMtY7K2lGY0ERPvpS
-         yYuwyo1Dk20SqB1Co+RFoIL5wpuFm81JEBx9OcfaTN0mTWt9Zx2+ThJIJMJLW0l0Ey
-         IC8gBqXtrqQ/xIERwXMCCNdkQQsC0ucHBwybZz4BkEjnHcychgzg/dIWTY42Dbf888
-         bW0a68bthbUmQ==
-Date:   Tue, 14 Mar 2023 22:22:44 -0700
-From:   Jakub Kicinski <kuba@kernel.org>
-To:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc:     Vladimir Oltean <olteanv@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Hauke Mehrtens <hauke@hauke-m.de>,
-        Woojung Huh <woojung.huh@microchip.com>,
-        UNGLinuxDriver@microchip.com,
-        Claudiu Manoil <claudiu.manoil@nxp.com>,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        Colin Foster <colin.foster@in-advantage.com>,
-        Michael Hennerich <michael.hennerich@analog.com>,
-        Alexander Aring <alex.aring@gmail.com>,
-        Stefan Schmidt <stefan@datenfreihafen.org>,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
-        Heiner Kallweit <hkallweit1@gmail.com>,
-        Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-wpan@vger.kernel.org
-Subject: Re: [PATCH 01/12] net: dsa: lantiq_gswip: mark OF related data as
- maybe unused
-Message-ID: <20230314222244.4325bb3f@kernel.org>
-In-Reply-To: <20230312105729.bnxn4a6mf2gav7ym@skbuf>
-References: <20230311173303.262618-1-krzysztof.kozlowski@linaro.org>
-        <20230311181434.lycxr5h2f6xcmwdj@skbuf>
-        <d9b197c8-56fe-b59d-5fca-bc863ac1e7ed@linaro.org>
-        <20230312105729.bnxn4a6mf2gav7ym@skbuf>
+        s=k20201202; t=1678868420;
+        bh=T3IP+fhPBj/Uguzw4H58V6oNktuwYLOa2oeYjb8iGYs=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=H/HURorHz/x7wm4z1A/UBIVFxLoB1ZesZdMR+QJQjbYPM65Cn3B1N0D8zbX1Qkh36
+         QERizrZnvkoUhOQEaJxP5YA/76v9foEMZv4qo/FtePBlYOdq9onMS+RgWTdDuKIKvA
+         YJSdlYKSNpeI3wy6y8PQ9N+xOdp1m92Znu4X1P6dsq+A2Iwnghi7nGDpVXR+THHUs2
+         Vf+vvXtawcVoLh8sqs7V/78ri2eKdbdyBddoVfeAelP8bKrWbNbI1Xi6lnTig6qBqR
+         ZUp/neM0RMrpFbsRVGynQGO1ZjexibU9WRyduTUzjeprEGzlRpN8/l8Mg4k1SiEEv6
+         XiZOUZ0h7AxHw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id CFE0FE66CBA;
+        Wed, 15 Mar 2023 08:20:20 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH 01/12] net: dsa: lantiq_gswip: mark OF related data as maybe
+ unused
+From:   patchwork-bot+netdevbpf@kernel.org
+Message-Id: <167886842083.29094.15777402773268782712.git-patchwork-notify@kernel.org>
+Date:   Wed, 15 Mar 2023 08:20:20 +0000
+References: <20230311173303.262618-1-krzysztof.kozlowski@linaro.org>
+In-Reply-To: <20230311173303.262618-1-krzysztof.kozlowski@linaro.org>
+To:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc:     andrew@lunn.ch, f.fainelli@gmail.com, olteanv@gmail.com,
+        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com, hauke@hauke-m.de, woojung.huh@microchip.com,
+        UNGLinuxDriver@microchip.com, claudiu.manoil@nxp.com,
+        alexandre.belloni@bootlin.com, colin.foster@in-advantage.com,
+        michael.hennerich@analog.com, alex.aring@gmail.com,
+        stefan@datenfreihafen.org, miquel.raynal@bootlin.com,
+        hkallweit1@gmail.com, linux@armlinux.org.uk,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-wpan@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-On Sun, 12 Mar 2023 12:57:29 +0200 Vladimir Oltean wrote:
-> > Sorry, I don't follow. I don't touch that wrappers, just fix errors
-> > related to OF device ID tables, although in few cases it is indeed
-> > related to of_match_node.  
-> 
-> I'm saying this because in lantiq_gswip.c, xway_gphy_match is accessed
-> through of_match_node(). If the shim definition for of_match_node() was
-> different, the variable wouldn't have been unused with CONFIG_OF=n.
-> I guess it's worth considering changing that wrapper instead of adding
-> the __maybe_unused.
+Hello:
 
-Hi Krzysztof, have you had a chance to check if using an empty static
-inline is enough to silence the compiler? Seems like it could save
-us quite some churn? Or do we want the of_match_node() decorations
-to go away in general?
+This series was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
+
+On Sat, 11 Mar 2023 18:32:52 +0100 you wrote:
+> The driver can be compile tested with !CONFIG_OF making certain data
+> unused:
+> 
+>   drivers/net/dsa/lantiq_gswip.c:1888:34: error: ‘xway_gphy_match’ defined but not used [-Werror=unused-const-variable=]
+> 
+> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> 
+> [...]
+
+Here is the summary with links:
+  - [01/12] net: dsa: lantiq_gswip: mark OF related data as maybe unused
+    https://git.kernel.org/netdev/net-next/c/6ea1e67788f3
+  - [02/12] net: dsa: lan9303: drop of_match_ptr for ID table
+    https://git.kernel.org/netdev/net-next/c/ced5c5a0a2ea
+  - [03/12] net: dsa: seville_vsc9953: drop of_match_ptr for ID table
+    https://git.kernel.org/netdev/net-next/c/1eb8566dd08d
+  - [04/12] net: dsa: ksz9477: drop of_match_ptr for ID table
+    https://git.kernel.org/netdev/net-next/c/00923ff2e1ba
+  - [05/12] net: dsa: ocelot: drop of_match_ptr for ID table
+    https://git.kernel.org/netdev/net-next/c/0f17b42827ae
+  - [06/12] net: phy: ks8995: drop of_match_ptr for ID table
+    https://git.kernel.org/netdev/net-next/c/b0b7d1b6260b
+  - [07/12] net: ieee802154: adf7242: drop of_match_ptr for ID table
+    https://git.kernel.org/netdev/net-next/c/3df09beef650
+  - [08/12] net: ieee802154: mcr20a: drop of_match_ptr for ID table
+    https://git.kernel.org/netdev/net-next/c/3896c40b7824
+  - [09/12] net: ieee802154: at86rf230: drop of_match_ptr for ID table
+    https://git.kernel.org/netdev/net-next/c/32b7030681a4
+  - [10/12] net: ieee802154: ca8210: drop of_match_ptr for ID table
+    https://git.kernel.org/netdev/net-next/c/cdfe4fc4d946
+  - [11/12] net: ieee802154: adf7242: drop owner from driver
+    https://git.kernel.org/netdev/net-next/c/059fa9972340
+  - [12/12] net: ieee802154: ca8210: drop owner from driver
+    https://git.kernel.org/netdev/net-next/c/613a3c44a373
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
