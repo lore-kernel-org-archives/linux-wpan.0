@@ -2,112 +2,107 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1ACB8C6FD1F
-	for <linux-wpan@archiver.kernel.org>; Thu, 16 Mar 2023 15:59:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8595C6FD19
+	for <linux-wpan@archiver.kernel.org>; Thu, 16 Mar 2023 16:32:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231715AbjCPP7R (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Thu, 16 Mar 2023 11:59:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37412 "EHLO
+        id S229674AbjCPQcG (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Thu, 16 Mar 2023 12:32:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38118 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231714AbjCPP7I (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 16 Mar 2023 11:59:08 -0400
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8612FA245
-        for <linux-wpan@vger.kernel.org>; Thu, 16 Mar 2023 08:59:03 -0700 (PDT)
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <mkl@pengutronix.de>)
-        id 1pcpzT-0001Wg-0O; Thu, 16 Mar 2023 16:58:07 +0100
-Received: from pengutronix.de (unknown [IPv6:2a00:20:3043:e035:5ae3:9609:678c:e1fb])
+        with ESMTP id S229597AbjCPQcF (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 16 Mar 2023 12:32:05 -0400
+Received: from proxima.lasnet.de (proxima.lasnet.de [IPv6:2a01:4f8:121:31eb:3::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC95134323;
+        Thu, 16 Mar 2023 09:32:02 -0700 (PDT)
+Received: from [192.168.2.51] (p5dd0da05.dip0.t-ipconnect.de [93.208.218.5])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (Client did not present a certificate)
-        (Authenticated sender: mkl-all@blackshift.org)
-        by smtp.blackshift.org (Postfix) with ESMTPSA id EEF27194E2F;
-        Thu, 16 Mar 2023 15:57:59 +0000 (UTC)
-Date:   Thu, 16 Mar 2023 16:57:58 +0100
-From:   Marc Kleine-Budde <mkl@pengutronix.de>
-To:     David Howells <dhowells@redhat.com>
-Cc:     Matthew Wilcox <willy@infradead.org>,
+         key-exchange X25519 server-signature RSA-PSS (4096 bits))
+        (No client certificate requested)
+        (Authenticated sender: stefan@datenfreihafen.org)
+        by proxima.lasnet.de (Postfix) with ESMTPSA id 2E736C0221;
+        Thu, 16 Mar 2023 17:32:00 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
+        s=2021; t=1678984320;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=cGWjnOpHWIVV1/IYEFbJX9ceWb2uuKW/Q/MSwoElVOA=;
+        b=SZlvYtkKHarib2iwU34+kGLYqEJE46tTKRi/LVbTkO7bfW5ZysLdngXepNqS7L7PTDH1ik
+        XDMWTndQCRQAdgBbHG7iOnCxl7u3RRFXwDPnGtylowV1bDOUE3lTX5Nalx9/6zIgVck75p
+        aRmomzFRh7lA5Cx7CRO+Mx2d2m0fXdT3jwI5GSYRSuy0is+00M629Gs1/Fr3scglbZJudu
+        5KEgkCN5iqAuH5BdI0+7J3QIydFa2nyeear8giTBhnlwcw/0jC6jhpuDMUh4/cL0EtEDAy
+        Oicu2r0MUhqUsQUUGJXTeWeTZvkTM4GEdq6m3l1XB1I04gdTmmDf1diV/nHIqw==
+Message-ID: <daee2ba3-effc-67d6-71f7-e99797f93aeb@datenfreihafen.org>
+Date:   Thu, 16 Mar 2023 17:31:59 +0100
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.8.0
+Subject: Re: [PATCH next] ca8210: Fix unsigned mac_len comparison with zero in
+ ca8210_skb_tx()
+Content-Language: en-US
+To:     Harshit Mogalapalli <harshit.m.mogalapalli@oracle.com>
+Cc:     error27@gmail.com, Alexander Aring <alex.aring@gmail.com>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
         "David S. Miller" <davem@davemloft.net>,
         Eric Dumazet <edumazet@google.com>,
         Jakub Kicinski <kuba@kernel.org>,
         Paolo Abeni <pabeni@redhat.com>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>, Jeff Layton <jlayton@kernel.org>,
-        Christian Brauner <brauner@kernel.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        netdev@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        bpf@vger.kernel.org, dccp@vger.kernel.org,
-        linux-afs@lists.infradead.org, linux-arm-msm@vger.kernel.org,
-        linux-can@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-hams@vger.kernel.org,
-        linux-rdma@vger.kernel.org, linux-sctp@vger.kernel.org,
-        linux-wpan@vger.kernel.org, linux-x25@vger.kernel.org,
-        mptcp@lists.linux.dev, rds-devel@oss.oracle.com,
-        tipc-discussion@lists.sourceforge.net,
-        virtualization@lists.linux-foundation.org
-Subject: Re: [RFC PATCH 28/28] sock: Remove ->sendpage*() in favour of
- sendmsg(MSG_SPLICE_PAGES)
-Message-ID: <20230316155758.5ylpybqjma7x4lbs@pengutronix.de>
-References: <20230316152618.711970-1-dhowells@redhat.com>
- <20230316152618.711970-29-dhowells@redhat.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="km5oeoth2y26yqyc"
-Content-Disposition: inline
-In-Reply-To: <20230316152618.711970-29-dhowells@redhat.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:b01:1d::7b
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-wpan@vger.kernel.org
+        Marcel Holtmann <marcel@holtmann.org>,
+        Harry Morris <harrymorris12@gmail.com>,
+        linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20230306191824.4115839-1-harshit.m.mogalapalli@oracle.com>
+From:   Stefan Schmidt <stefan@datenfreihafen.org>
+In-Reply-To: <20230306191824.4115839-1-harshit.m.mogalapalli@oracle.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
+Hello Harshit.
 
---km5oeoth2y26yqyc
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On 06.03.23 20:18, Harshit Mogalapalli wrote:
+> mac_len is of type unsigned, which can never be less than zero.
+> 
+> 	mac_len = ieee802154_hdr_peek_addrs(skb, &header);
+> 	if (mac_len < 0)
+> 		return mac_len;
+> 
+> Change this to type int as ieee802154_hdr_peek_addrs() can return negative
+> integers, this is found by static analysis with smatch.
+> 
+> Fixes: ded845a781a5 ("ieee802154: Add CA8210 IEEE 802.15.4 device driver")
+> Signed-off-by: Harshit Mogalapalli <harshit.m.mogalapalli@oracle.com>
+> ---
+> Only compile tested.
+> ---
+>   drivers/net/ieee802154/ca8210.c | 3 +--
+>   1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/ieee802154/ca8210.c b/drivers/net/ieee802154/ca8210.c
+> index 0b0c6c0764fe..d0b5129439ed 100644
+> --- a/drivers/net/ieee802154/ca8210.c
+> +++ b/drivers/net/ieee802154/ca8210.c
+> @@ -1902,10 +1902,9 @@ static int ca8210_skb_tx(
+>   	struct ca8210_priv  *priv
+>   )
+>   {
+> -	int status;
+>   	struct ieee802154_hdr header = { };
+>   	struct secspec secspec;
+> -	unsigned int mac_len;
+> +	int mac_len, status;
+>   
+>   	dev_dbg(&priv->spi->dev, "%s called\n", __func__);
+>   
 
-On 16.03.2023 15:26:18, David Howells wrote:
-> [!] Note: This is a work in progress.  At the moment, some things won't
->     build if this patch is applied.  nvme, kcm, smc, tls.
->=20
-> Remove ->sendpage() and ->sendpage_locked().  sendmsg() with
-> MSG_SPLICE_PAGES should be used instead.  This allows multiple pages and
-> multipage folios to be passed through.
->=20
-> Signed-off-by: David Howells <dhowells@redhat.com>
+This patch has been applied to the wpan tree and will be
+part of the next pull request to net. Thanks!
 
-> cc: linux-can@vger.kernel.org
+I took the liberty and changed the fixes tag to the change that 
+introduced the resaon for the mismatch recently. As suggested by Simon.
 
-Acked-by: Marc Kleine-Budde <mkl@pengutronix.de> # for net/can
-
-Marc
-
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde           |
-Embedded Linux                   | https://www.pengutronix.de  |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-5555 |
-
---km5oeoth2y26yqyc
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEDs2BvajyNKlf9TJQvlAcSiqKBOgFAmQTPIMACgkQvlAcSiqK
-BOj6JAgAtfBV5yq+uNvtDfdNTDCgUnr0pkrsEqo0Ygt0A84TUlJF1K9QFkFTlvFo
-NEtegJFeDvbE8EmvRgOnpoTRcMQwDClaw5c7O7TquCr3SEAcXECesFYUVLWR7hsf
-Mk3DzSWUNIqMeSUOAEPBPfWNGGQWdjut5IQHdhuIs2/irjgsb5GZJ27rYyV9F/+l
-daE1Ac6RGnKq9zV/UszZ7AbfKA7bI9TVioWBVmIFCQZeWJprHq5rD0LTH6+QjdyQ
-5AdUTjTbZ/YRTjr4KQQkISfoq8oMC/zVENiagYZ89SGTbciIaCeqBpvdgUVKTob6
-2Uoo/o+yUY90Dy8JPw9/gLSsthDGaw==
-=IhKV
------END PGP SIGNATURE-----
-
---km5oeoth2y26yqyc--
+regards
+Stefan Schmidt
