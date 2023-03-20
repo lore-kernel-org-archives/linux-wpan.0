@@ -2,35 +2,35 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6DEDC761AF
-	for <linux-wpan@archiver.kernel.org>; Mon, 20 Mar 2023 01:00:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88827C7618A
+	for <linux-wpan@archiver.kernel.org>; Mon, 20 Mar 2023 01:12:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230176AbjCTBAw (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Sun, 19 Mar 2023 21:00:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45646 "EHLO
+        id S231578AbjCTBMa (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Sun, 19 Mar 2023 21:12:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36410 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231317AbjCTBA0 (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Sun, 19 Mar 2023 21:00:26 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BEC3113E4;
-        Sun, 19 Mar 2023 17:56:44 -0700 (PDT)
+        with ESMTP id S231698AbjCTBLz (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Sun, 19 Mar 2023 21:11:55 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E729022C95;
+        Sun, 19 Mar 2023 18:03:49 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id CD6DEB80D58;
-        Mon, 20 Mar 2023 00:56:41 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A139C4339C;
-        Mon, 20 Mar 2023 00:56:39 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 1D1846114C;
+        Mon, 20 Mar 2023 00:57:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39513C43445;
+        Mon, 20 Mar 2023 00:57:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1679273800;
-        bh=JdwcpTaCPqGYqH8ZNW3V9wksl+MihmMVFGj0G9nc/R0=;
+        s=k20201202; t=1679273831;
+        bh=1nk0PhTZfDKtC9ZQn8drC0SRgRC+HY3my0PeA65mJIA=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=T9QlMp5U/0RQsBWdbcqfrOrGsJUuN1+XsDH9DG3JxVPH9U7Cd1+aKp+NRIIej4aI+
-         MW+jmUyndrmUwYSP5Yqri9pelagaHbRhX40DTuWirfo0uk5EhBrEBjXOPnQ2rxBBkj
-         CuXyJKDV1vbjBwgWImhB3fx+gI6Wt0qWFRqwH1eZmp+qQvxvZxL4DKnOSgGcbR0zBG
-         EC0YCYJIMPMnsBWJ2hnXJdyKzUGAlNpFUZUB2BmhMEnfxoCe2dXQ+yi3NXEYSbS735
-         +IrxSgCXJc5Zbg26GvRzDPzezN1aCxHbaHgad2dfsbCAk0rQkiMGYROSj6tBzFnlF0
-         WY69Ak4ICoVhQ==
+        b=dq5ogL5UfHZchS6u1vGeb3L6Zqydt1gG/bQK6kxrSD2YZJ/MBv6z8spMTSDWl3gV0
+         xqf37SjKkBk+KGO2+h0HwrkhDhL+sidUUO99yR4TvzlTzbOnkpARqDEY9SrUZ+c5mL
+         5xuQZ9UAhNA+o5bBRr2qAxNd/XzbVqXlNBMFTgeDHMFxY17PIuNXK9zeJ/DcokZzz5
+         hxCNrEb+K60O+0WL6ueoBBoy+MiS//7/qXILMOSgP11O7S5DFGbi7S5W/LYyPD8/le
+         AtCH918OFrVEqzXTZov89UlKsFQeRYBhbIpA6E9kiNvjEZTzVx4xKDc5OFu8d29ElP
+         QWOJoV+PnbQ4w==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Alexander Aring <aahringo@redhat.com>,
@@ -40,12 +40,12 @@ Cc:     Alexander Aring <aahringo@redhat.com>,
         miquel.raynal@bootlin.com, davem@davemloft.net,
         edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
         linux-wpan@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 02/12] ca8210: fix mac_len negative array access
-Date:   Sun, 19 Mar 2023 20:56:25 -0400
-Message-Id: <20230320005636.1429242-2-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 2/9] ca8210: fix mac_len negative array access
+Date:   Sun, 19 Mar 2023 20:57:00 -0400
+Message-Id: <20230320005707.1429405-2-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230320005636.1429242-1-sashal@kernel.org>
-References: <20230320005636.1429242-1-sashal@kernel.org>
+In-Reply-To: <20230320005707.1429405-1-sashal@kernel.org>
+References: <20230320005707.1429405-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -71,10 +71,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 2 insertions(+)
 
 diff --git a/drivers/net/ieee802154/ca8210.c b/drivers/net/ieee802154/ca8210.c
-index 66cf09e637e4e..498a82ab4eaf4 100644
+index 917edb3d04b78..2d4471b77fa7c 100644
 --- a/drivers/net/ieee802154/ca8210.c
 +++ b/drivers/net/ieee802154/ca8210.c
-@@ -1955,6 +1955,8 @@ static int ca8210_skb_tx(
+@@ -1954,6 +1954,8 @@ static int ca8210_skb_tx(
  	 * packet
  	 */
  	mac_len = ieee802154_hdr_peek_addrs(skb, &header);
