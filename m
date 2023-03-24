@@ -2,67 +2,47 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7212DC6FD20
-	for <linux-wpan@archiver.kernel.org>; Fri, 24 Mar 2023 13:58:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8C65C6FD20
+	for <linux-wpan@archiver.kernel.org>; Fri, 24 Mar 2023 16:21:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231215AbjCXN6G (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Fri, 24 Mar 2023 09:58:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49220 "EHLO
+        id S231655AbjCXQVY (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Fri, 24 Mar 2023 12:21:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57840 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231894AbjCXN6F (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Fri, 24 Mar 2023 09:58:05 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A9E0166C3
-        for <linux-wpan@vger.kernel.org>; Fri, 24 Mar 2023 06:57:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1679666231;
+        with ESMTP id S230025AbjCXQVX (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 24 Mar 2023 12:21:23 -0400
+Received: from proxima.lasnet.de (proxima.lasnet.de [IPv6:2a01:4f8:121:31eb:3::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3FF7AD06;
+        Fri, 24 Mar 2023 09:21:21 -0700 (PDT)
+Received: from [IPV6:2003:e9:d711:5f8f:7b5e:613a:60e4:7837] (p200300e9d7115f8f7b5e613a60e47837.dip0.t-ipconnect.de [IPv6:2003:e9:d711:5f8f:7b5e:613a:60e4:7837])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: stefan@datenfreihafen.org)
+        by proxima.lasnet.de (Postfix) with ESMTPSA id A7424C0871;
+        Fri, 24 Mar 2023 17:21:18 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
+        s=2021; t=1679674879;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=xvcJNrPQD5ooFYZurkB3yN9PFKDKP+vxBqfGV/npfuk=;
-        b=RSfMyDezSott8s1wkJWliTGwaB9MW4aIrfZWJ7OpxcwKNuppvBzsmq5gqN2kbDpWPRuHpd
-        6+4ftO4S5D0Qi4EDADJQ6iJb1bft9V7BBloz3o6HpzNYoV5+pGTHcjzCDhrY/Hp9sv5kTa
-        qPiDoLH77vz4ptMjOUwtxVQkGdN0IIs=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-246-ZTJfhWJFPJudLpwrRtyLYg-1; Fri, 24 Mar 2023 09:57:10 -0400
-X-MC-Unique: ZTJfhWJFPJudLpwrRtyLYg-1
-Received: by mail-ed1-f71.google.com with SMTP id p36-20020a056402502400b004bb926a3d54so3319829eda.2
-        for <linux-wpan@vger.kernel.org>; Fri, 24 Mar 2023 06:57:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679666229;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xvcJNrPQD5ooFYZurkB3yN9PFKDKP+vxBqfGV/npfuk=;
-        b=eoDa44v1vP+TGmk0mjBy2nL35iBDImAXFF4ViIqoLNF7B+v7Lgp2NrQLw36Jl11Ney
-         KT2B5Sw2hjvEVnPh/ry4TPBHmCLEVZ7mxkAiEuuSVLavyQHgRCjG1WmtdD8Mr9ZlzkVT
-         J8PEeBYZsArr8uxo19JmoSGhay4IoJsOnelPH3p7ZPgvCLit7MbEtVJLgNjffMXEdG/6
-         zu0qCem63/cRH/0BmZ0xN0bZ7CnpS8tA1OIu/k8pgbDuNs+RgsnfnGIhDNbAjjSm9Er+
-         4whM0JX4NDxMajX8wvathTAvDtWwLiwUNPI/wDQSPNRzYZ96TIu93V8LWXOqU/o5B9rb
-         tM6A==
-X-Gm-Message-State: AAQBX9ek9A0Z+dTm1dX+tUB0C5pSBEbui+vuhYc/OY5bWou+qLdF/NDe
-        Eyquc12QW4+r3V5lojOQ15xi1EJ0eqQvAwz0c79KHbJ66X3DY2e6ZtGezd6DWtEya0R02Cw7eo/
-        s9pQNSNjfjGeK/cue4VESbV4+6QAt0uPHwQZ98A==
-X-Received: by 2002:a50:f69e:0:b0:4fc:8749:cd77 with SMTP id d30-20020a50f69e000000b004fc8749cd77mr1542601edn.3.1679666229223;
-        Fri, 24 Mar 2023 06:57:09 -0700 (PDT)
-X-Google-Smtp-Source: AKy350bigzFWO3HLR1wBXdAmOWSmDdssXZvyhIoU+omNqJjNe4otSNeDTt3p1Ckx8dJADayo4lhlv4HE3l9QBDb44aI=
-X-Received: by 2002:a50:f69e:0:b0:4fc:8749:cd77 with SMTP id
- d30-20020a50f69e000000b004fc8749cd77mr1542584edn.3.1679666229026; Fri, 24 Mar
- 2023 06:57:09 -0700 (PDT)
+        bh=4NJHyznJr6ZLDpkCKs8DDjSRpVPxt7bDmUVXZBcNWzM=;
+        b=nJjw0Z0z/+/A6rshU6Rn/YcALPnmGYvo5rRPjy2q+oQCh7PUYy/CxUDouczx0gQDVFEJq8
+        KnsDRV9HBKQeSjner2oS5GJmBWevnZiz51G1jAsOCu28UrfcpUXtvCLNVhNEo2QKGE9lPP
+        iY0phh32Fi0bKhJBAeGrfGBYRDEyHk/3CrmJAF00Q+iyiWHln9NSsqGwX/df+bBekTH/Sr
+        SVzbeeYfbGWlD2SIFf8EFKmZo8sJbw5bkhpvrNZb0Hggyj4fAgXFFOgMPDDkCgKSbIaWuL
+        g6moc0vbGcKIverbeWvB82iVbL6m68/fYcYaQ0mdcux6akuK8cEpnwPD9foF3A==
+Message-ID: <2e4677aa-5262-189e-1ee6-ec333b7932b5@datenfreihafen.org>
+Date:   Fri, 24 Mar 2023 17:21:18 +0100
 MIME-Version: 1.0
-References: <20230324110558.90707-1-miquel.raynal@bootlin.com>
-In-Reply-To: <20230324110558.90707-1-miquel.raynal@bootlin.com>
-From:   Alexander Aring <aahringo@redhat.com>
-Date:   Fri, 24 Mar 2023 09:56:57 -0400
-Message-ID: <CAK-6q+gzwOFbpN4JfYdfUzmVfeF+YzNwamkEaF-gYeMY8bzNww@mail.gmail.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.8.0
 Subject: Re: [PATCH wpan-next 0/2] ieee802154: Handle imited devices
-To:     Miquel Raynal <miquel.raynal@bootlin.com>
-Cc:     Alexander Aring <alex.aring@gmail.com>,
-        Stefan Schmidt <stefan@datenfreihafen.org>,
-        linux-wpan@vger.kernel.org,
+Content-Language: en-US
+To:     Alexander Aring <aahringo@redhat.com>,
+        Miquel Raynal <miquel.raynal@bootlin.com>
+Cc:     Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org,
         "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
         Paolo Abeni <pabeni@redhat.com>,
@@ -73,31 +53,34 @@ Cc:     Alexander Aring <alex.aring@gmail.com>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
         Guilhem Imberton <guilhem.imberton@qorvo.com>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+References: <20230324110558.90707-1-miquel.raynal@bootlin.com>
+ <CAK-6q+gzwOFbpN4JfYdfUzmVfeF+YzNwamkEaF-gYeMY8bzNww@mail.gmail.com>
+From:   Stefan Schmidt <stefan@datenfreihafen.org>
+In-Reply-To: <CAK-6q+gzwOFbpN4JfYdfUzmVfeF+YzNwamkEaF-gYeMY8bzNww@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi,
+Hello.
 
-On Fri, Mar 24, 2023 at 7:07=E2=80=AFAM Miquel Raynal <miquel.raynal@bootli=
-n.com> wrote:
->
-> As rightly pointed out by Alexander a few months ago, ca8210 devices
-> will not support sending frames which are not pure datagrams (hardMAC
-> wired to the softMAC layer). In order to not confuse users and clarify
-> that scanning and beaconing is not supported on these devices, let's add
-> a flag to prevent them to be used with the new APIs.
->
+On 24.03.23 14:56, Alexander Aring wrote:
+> Hi,
+> 
+> On Fri, Mar 24, 2023 at 7:07 AM Miquel Raynal <miquel.raynal@bootlin.com> wrote:
+>>
+>> As rightly pointed out by Alexander a few months ago, ca8210 devices
+>> will not support sending frames which are not pure datagrams (hardMAC
+>> wired to the softMAC layer). In order to not confuse users and clarify
+>> that scanning and beaconing is not supported on these devices, let's add
+>> a flag to prevent them to be used with the new APIs.
+>>
+> 
+> Acked-by: Alexander Aring <aahringo@redhat.com>
 
-Acked-by: Alexander Aring <aahringo@redhat.com>
+This patch has been applied to the wpan-next tree and will be
+part of the next pull request to net-next. Thanks!
 
-I appreciate that you care about driver specific quirks which need to
-be done here. The users of this driver are getting aware now there is
-a lack of support here.
-
-Thanks.
-
-- Alex
-
+regards
+Stefan Schmidt
