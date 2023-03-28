@@ -2,98 +2,60 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38338C76196
-	for <linux-wpan@archiver.kernel.org>; Tue, 28 Mar 2023 16:14:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F67EC6FD18
+	for <linux-wpan@archiver.kernel.org>; Tue, 28 Mar 2023 22:14:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229654AbjC1QOO (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 28 Mar 2023 12:14:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50350 "EHLO
+        id S229805AbjC1WOY (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 28 Mar 2023 18:14:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36376 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232776AbjC1QOC (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 28 Mar 2023 12:14:02 -0400
-Received: from proxima.lasnet.de (proxima.lasnet.de [IPv6:2a01:4f8:121:31eb:3::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E811E054;
-        Tue, 28 Mar 2023 09:14:00 -0700 (PDT)
-Received: from [IPV6:2003:e9:d70f:381f:5e2f:3bee:d4cb:b76b] (p200300e9d70f381f5e2f3beed4cbb76b.dip0.t-ipconnect.de [IPv6:2003:e9:d70f:381f:5e2f:3bee:d4cb:b76b])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        with ESMTP id S229655AbjC1WOX (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 28 Mar 2023 18:14:23 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A801F2707;
+        Tue, 28 Mar 2023 15:14:22 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        (Authenticated sender: stefan@datenfreihafen.org)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id 21852C006B;
-        Tue, 28 Mar 2023 18:13:56 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
-        s=2021; t=1680020036;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=HFMN6mUuYlhsG7aylfMw3Vp+mnIu1G529c1t4N/Sfdw=;
-        b=GBK2ylDWhqNsIqksc0TxLHbl7294mSsrGhnxMD2iapNkDZuKX4RghYrDeZgR8bk6pjzUX4
-        LCx+KoHHn2MxF3AOFc5SQ/HyiqRK0JFlqZpXsCzIBuM5L60JmFgy64zcBhLUWVS4KQk9mE
-        zN+qskrudw8lvfSqsgW0AlP8M2wL8LaqrH0dt3JdLGADN/8LAyQiHisLioXHjSR6gl/qhi
-        U3eqk2Kw9ky/a/qqzlyuCgjQGWeQ/7ezGdunoHwWiRbA/02m34mkgAdtZJfUthhd7CtZP1
-        XmlV/adOLu57efxO2Qj81lFyhy0agMIBwKRPJQjko3n8k6G1NZlM0MI7rfpmAg==
-Message-ID: <0538598d-9821-91d7-d327-68e025084b3c@datenfreihafen.org>
-Date:   Tue, 28 Mar 2023 18:13:55 +0200
+        by ams.source.kernel.org (Postfix) with ESMTPS id 4AD07B81EB0;
+        Tue, 28 Mar 2023 22:14:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9016C433EF;
+        Tue, 28 Mar 2023 22:14:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1680041660;
+        bh=hLuZ/50x0mSWQ8pTzYjfgPepDySpned8IVT9STsRDkU=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=LZ4NtsWItx54qVA1c2Pw7JchI9wcW1z5N013vmBvf7rPRG0cwiaf1JZUHm3JIkIJW
+         pCoFY6g2Q9pQ3cfIq9odYaeTmCl0WjKiSN98hVruOlOLLQVFfc6P12YLo40+LWUqY5
+         LKSoaO6ZIS8XkK9TKXT9UgMnryd+gLN7d7E7tw48degq8eiNynQXfTQLRcyaWGBRxM
+         NFPv6HRYwZTISb5lGt6PMhtiACIY6ffNoZb9hC0ORTsMjx0JRBuaN46ZeT0Kb4rj0D
+         /rY/qvZJcyVLf9Tyci5CK+g05gVHUSAMAdt7cAn3cbjFGDc1Mz7nqOqoY8TVBIFrRo
+         q8LpzTlAf6ogA==
+Date:   Tue, 28 Mar 2023 15:14:18 -0700
+From:   Jakub Kicinski <kuba@kernel.org>
+To:     Stefan Schmidt <stefan@datenfreihafen.org>
+Cc:     davem@davemloft.net, pabeni@redhat.com, linux-wpan@vger.kernel.org,
+        alex.aring@gmail.com, miquel.raynal@bootlin.com,
+        netdev@vger.kernel.org
+Subject: Re: pull-request: ieee802154 for net 2023-03-24
+Message-ID: <20230328151418.699f7026@kernel.org>
+In-Reply-To: <605a1c16-0c03-a3be-9aec-12bb4d0113dc@datenfreihafen.org>
+References: <20230324173931.1812694-1-stefan@datenfreihafen.org>
+        <20230327193842.59631f11@kernel.org>
+        <605a1c16-0c03-a3be-9aec-12bb4d0113dc@datenfreihafen.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.8.0
-Subject: Re: [PATCH 07/12] net: ieee802154: adf7242: drop of_match_ptr for ID
- table
-Content-Language: en-US
-To:     Miquel Raynal <miquel.raynal@bootlin.com>,
-        Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc:     Andrew Lunn <andrew@lunn.ch>,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        Vladimir Oltean <olteanv@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Hauke Mehrtens <hauke@hauke-m.de>,
-        Woojung Huh <woojung.huh@microchip.com>,
-        UNGLinuxDriver@microchip.com,
-        Claudiu Manoil <claudiu.manoil@nxp.com>,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        Colin Foster <colin.foster@in-advantage.com>,
-        Michael Hennerich <michael.hennerich@analog.com>,
-        Alexander Aring <alex.aring@gmail.com>,
-        Heiner Kallweit <hkallweit1@gmail.com>,
-        Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-wpan@vger.kernel.org
-References: <20230311173303.262618-1-krzysztof.kozlowski@linaro.org>
- <20230311173303.262618-7-krzysztof.kozlowski@linaro.org>
- <20230328124859.12f3c329@xps-13>
-From:   Stefan Schmidt <stefan@datenfreihafen.org>
-In-Reply-To: <20230328124859.12f3c329@xps-13>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello.
-
-On 28.03.23 12:48, Miquel Raynal wrote:
-> Hi Krzysztof,
+On Tue, 28 Mar 2023 09:10:07 +0200 Stefan Schmidt wrote:
+> Sorry for that. I did not update my pull request script when changing 
+> the git tree URLs to our team tree. Updated now.
 > 
-> krzysztof.kozlowski@linaro.org wrote on Sat, 11 Mar 2023 18:32:58 +0100:
-> 
->> The driver will match mostly by DT table (even thought there is regular
->> ID table) so there is little benefit in of_match_ptr (this also allows
->> ACPI matching via PRP0001, even though it might not be relevant here).
->>
->>    drivers/net/ieee802154/adf7242.c:1322:34: error: ‘adf7242_of_match’ defined but not used [-Werror=unused-const-variable=]
->>
->> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-> 
-> I see Stefan already acked most of the ieee802154 patches, but I didn't
-> got notified for this one, so in case:
+> The tag is now on the tree above. You want me to send a new pull request 
+> or do you take it from here?
 
-The reason I did not ack the two patches for adf7242 is that Michael as 
-driver maintainer ack'ed them already.
-
-I only handled the ones where we have no active maintainer, as a fallback.
-
-regards
-Stefan Schmidt
+Thanks, fresh PR would be better, I can't re-trigger the patchwork
+checks on an existing one :(
