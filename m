@@ -2,83 +2,107 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C30BDC76196
-	for <linux-wpan@archiver.kernel.org>; Tue, 28 Mar 2023 07:10:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46D03C76196
+	for <linux-wpan@archiver.kernel.org>; Tue, 28 Mar 2023 10:49:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229809AbjC1HKM (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 28 Mar 2023 03:10:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51324 "EHLO
+        id S231151AbjC1KtL (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 28 Mar 2023 06:49:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53082 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229608AbjC1HKM (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 28 Mar 2023 03:10:12 -0400
-Received: from proxima.lasnet.de (proxima.lasnet.de [IPv6:2a01:4f8:121:31eb:3::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B30D1BE4;
-        Tue, 28 Mar 2023 00:10:10 -0700 (PDT)
-Received: from [IPV6:2003:e9:d70f:38af:8fa6:61a3:c689:f3f7] (p200300e9d70f38af8fa661a3c689f3f7.dip0.t-ipconnect.de [IPv6:2003:e9:d70f:38af:8fa6:61a3:c689:f3f7])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: stefan@datenfreihafen.org)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id 31052C006B;
-        Tue, 28 Mar 2023 09:10:08 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
-        s=2021; t=1679987408;
+        with ESMTP id S230380AbjC1KtK (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 28 Mar 2023 06:49:10 -0400
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E23DA6183;
+        Tue, 28 Mar 2023 03:49:08 -0700 (PDT)
+Received: (Authenticated sender: miquel.raynal@bootlin.com)
+        by mail.gandi.net (Postfix) with ESMTPSA id A5429240002;
+        Tue, 28 Mar 2023 10:49:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+        t=1680000547;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=DuBv8CUC+KVrr7fTs+K4LUeaLTIXU8XDSv8HwWaDwWU=;
-        b=MhSZCyhrb2yRFibanZkIbY445V/khVKyWJNbpY9Jomgz58ErUMkjkJXQMzB0IPKI43gLtR
-        OOmKilTpNyjhRP7XaBdwaRbhmo417LWdIBLpsvBPHXFddymO0aaVS50CqIhRbVVlhd7cAa
-        Irl+QDkwgNUhZNamkRyX9T2NBpZfX0mlSgRwY+X0JaoUYaP84ukqV0SAAL7GxIFEWK5uql
-        Ih8wtm4SaVCawYHfeAw6rwHQcKbqOsHS9/wDRsxVPQfMHhgfRVRm8Yg3j+ZfSEnZuKFyPk
-        MOETCVGVv+yfTk+Cc5YZgPOOuOWDezbK4jbvvL3kN9wK6waaFnh6c4vTvnvkxg==
-Message-ID: <605a1c16-0c03-a3be-9aec-12bb4d0113dc@datenfreihafen.org>
-Date:   Tue, 28 Mar 2023 09:10:07 +0200
+        bh=YcAVZxrol8sJCDpLcTmeIdWOWavc1Uiq8RyPwQ5WwwE=;
+        b=md988PTmh5TlAklTAHKZjQyEBHowcSxi5+GbphBOtqRbyFiG0KziKyv+ykf3lBl3tLEVcz
+        FTYP/ojqNXXOIZ1HD8ChM4f2A0kp1qnOjLnOdGh61r0ecwlQzvK93aINomHWm1GfcU76IA
+        EtNI9Wi2fHwEDXkPVttytjNgB9j9Ka3zTit/THwB5di9o5Spn4FlDQw9QE/Q/J38Ikoprw
+        v1EdOMPNOi9NJ/AWbVizUIU91pMDFeFVCQyTi1CicdSmITSVNJ0zP/0YCjJfvjfFS8cSbs
+        2tdopXaYj62KoOO9pJrddI+ciTSsM0HmK/q/3lglJtPwBIM6+ZNGs/0mLzCnIw==
+Date:   Tue, 28 Mar 2023 12:48:59 +0200
+From:   Miquel Raynal <miquel.raynal@bootlin.com>
+To:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc:     Andrew Lunn <andrew@lunn.ch>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        Vladimir Oltean <olteanv@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Hauke Mehrtens <hauke@hauke-m.de>,
+        Woojung Huh <woojung.huh@microchip.com>,
+        UNGLinuxDriver@microchip.com,
+        Claudiu Manoil <claudiu.manoil@nxp.com>,
+        Alexandre Belloni <alexandre.belloni@bootlin.com>,
+        Colin Foster <colin.foster@in-advantage.com>,
+        Michael Hennerich <michael.hennerich@analog.com>,
+        Alexander Aring <alex.aring@gmail.com>,
+        Stefan Schmidt <stefan@datenfreihafen.org>,
+        Heiner Kallweit <hkallweit1@gmail.com>,
+        Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-wpan@vger.kernel.org
+Subject: Re: [PATCH 07/12] net: ieee802154: adf7242: drop of_match_ptr for
+ ID table
+Message-ID: <20230328124859.12f3c329@xps-13>
+In-Reply-To: <20230311173303.262618-7-krzysztof.kozlowski@linaro.org>
+References: <20230311173303.262618-1-krzysztof.kozlowski@linaro.org>
+        <20230311173303.262618-7-krzysztof.kozlowski@linaro.org>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.8.0
-Subject: Re: pull-request: ieee802154 for net 2023-03-24
-Content-Language: en-US
-To:     Jakub Kicinski <kuba@kernel.org>
-Cc:     davem@davemloft.net, pabeni@redhat.com, linux-wpan@vger.kernel.org,
-        alex.aring@gmail.com, miquel.raynal@bootlin.com,
-        netdev@vger.kernel.org
-References: <20230324173931.1812694-1-stefan@datenfreihafen.org>
- <20230327193842.59631f11@kernel.org>
-From:   Stefan Schmidt <stefan@datenfreihafen.org>
-In-Reply-To: <20230327193842.59631f11@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello Jakub.
+Hi Krzysztof,
 
-On 28.03.23 04:38, Jakub Kicinski wrote:
-> On Fri, 24 Mar 2023 18:39:31 +0100 Stefan Schmidt wrote:
->> An update from ieee802154 for your *net* tree:
->>
->> Two small fixes this time.
->>
->> Dongliang Mu removed an unnecessary null pointer check.
->>
->> Harshit Mogalapalli fixed an int comparison unsigned against signed from a
->> recent other fix in the ca8210 driver.
-> 
-> Hi Stefan! I see a ieee802154-for-net-2023-03-02 tag in your tree but
-> no ieee802154-for-net-2023-03-24:
-> 
-> $ git pull git://git.kernel.org/pub/scm/linux/kernel/git/wpan/wpan.git \
-> 	tags/ieee802154-for-net-2023-03-24
-> fatal: couldn't find remote ref tags/ieee802154-for-net-2023-03-24
+krzysztof.kozlowski@linaro.org wrote on Sat, 11 Mar 2023 18:32:58 +0100:
 
-Sorry for that. I did not update my pull request script when changing 
-the git tree URLs to our team tree. Updated now.
+> The driver will match mostly by DT table (even thought there is regular
+> ID table) so there is little benefit in of_match_ptr (this also allows
+> ACPI matching via PRP0001, even though it might not be relevant here).
+>=20
+>   drivers/net/ieee802154/adf7242.c:1322:34: error: =E2=80=98adf7242_of_ma=
+tch=E2=80=99 defined but not used [-Werror=3Dunused-const-variable=3D]
+>=20
+> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
-The tag is now on the tree above. You want me to send a new pull request 
-or do you take it from here?
+I see Stefan already acked most of the ieee802154 patches, but I didn't
+got notified for this one, so in case:
 
-regards
-Stefan Schmidt
+Acked-by: Miquel Raynal <miquel.raynal@bootlin.com>
+
+> ---
+>  drivers/net/ieee802154/adf7242.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/drivers/net/ieee802154/adf7242.c b/drivers/net/ieee802154/ad=
+f7242.c
+> index 5cf218c674a5..509acc86001c 100644
+> --- a/drivers/net/ieee802154/adf7242.c
+> +++ b/drivers/net/ieee802154/adf7242.c
+> @@ -1336,7 +1336,7 @@ MODULE_DEVICE_TABLE(spi, adf7242_device_id);
+>  static struct spi_driver adf7242_driver =3D {
+>  	.id_table =3D adf7242_device_id,
+>  	.driver =3D {
+> -		   .of_match_table =3D of_match_ptr(adf7242_of_match),
+> +		   .of_match_table =3D adf7242_of_match,
+>  		   .name =3D "adf7242",
+>  		   .owner =3D THIS_MODULE,
+>  		   },
+
+
+Thanks,
+Miqu=C3=A8l
