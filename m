@@ -2,72 +2,65 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 807DEC6FD20
-	for <linux-wpan@archiver.kernel.org>; Fri, 24 Mar 2023 17:39:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1592C6FD1D
+	for <linux-wpan@archiver.kernel.org>; Tue, 28 Mar 2023 02:38:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230088AbjCXRjl (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Fri, 24 Mar 2023 13:39:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60956 "EHLO
+        id S229606AbjC1Civ (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 27 Mar 2023 22:38:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39810 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229649AbjCXRjk (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Fri, 24 Mar 2023 13:39:40 -0400
-Received: from proxima.lasnet.de (proxima.lasnet.de [78.47.171.185])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0565C170;
-        Fri, 24 Mar 2023 10:39:38 -0700 (PDT)
-Received: from localhost.localdomain.datenfreihafen.local (p200300e9d7115f8f7b5e613a60e47837.dip0.t-ipconnect.de [IPv6:2003:e9:d711:5f8f:7b5e:613a:60e4:7837])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        with ESMTP id S232134AbjC1Cit (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 27 Mar 2023 22:38:49 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1A4A268A;
+        Mon, 27 Mar 2023 19:38:46 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        (Authenticated sender: stefan@sostec.de)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id E9908C0871;
-        Fri, 24 Mar 2023 18:39:35 +0100 (CET)
-From:   Stefan Schmidt <stefan@datenfreihafen.org>
-To:     davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com
-Cc:     linux-wpan@vger.kernel.org, alex.aring@gmail.com,
-        miquel.raynal@bootlin.com, netdev@vger.kernel.org
-Subject: pull-request: ieee802154 for net 2023-03-24
-Date:   Fri, 24 Mar 2023 18:39:31 +0100
-Message-Id: <20230324173931.1812694-1-stefan@datenfreihafen.org>
-X-Mailer: git-send-email 2.39.2
+        by ams.source.kernel.org (Postfix) with ESMTPS id 4C775B81A21;
+        Tue, 28 Mar 2023 02:38:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60DE5C433D2;
+        Tue, 28 Mar 2023 02:38:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1679971124;
+        bh=haiNNCFIgU/36Qf7gUJ5gePna0haIPwwmpm8cjK1iRE=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=PURgN0HTfUbNhVGjrkrXlKWUkCXXSNbzTIPc1qXjQBIygoJUMhFVKTmxXVAWpulma
+         2V5/DZaS2+wGXFkTdR/9QBpu3s12kiR+CFriUXHFeQf99Q1KYswDJ+fDd0MzeF6GlU
+         ELy4yKp9E5W9RA4y88QrfOuO2IDX5uxLDpcyitDJ/WMy6z9xoyEYeb7nX/mis3HKfH
+         HudoPkGL8Uo0E0UJbPYyeeR+xRqVRIhRBwU4EZAK/JG/TfWxPL0Hr4X+8ytKz8QLiY
+         /8dsbx7sTbbd+dB33QiLle/+ohER2TAUxHEkJbnHZeHa5fc1tdn4mX9d22d+vpOndQ
+         BdGbFwlNPqHpA==
+Date:   Mon, 27 Mar 2023 19:38:42 -0700
+From:   Jakub Kicinski <kuba@kernel.org>
+To:     Stefan Schmidt <stefan@datenfreihafen.org>
+Cc:     davem@davemloft.net, pabeni@redhat.com, linux-wpan@vger.kernel.org,
+        alex.aring@gmail.com, miquel.raynal@bootlin.com,
+        netdev@vger.kernel.org
+Subject: Re: pull-request: ieee802154 for net 2023-03-24
+Message-ID: <20230327193842.59631f11@kernel.org>
+In-Reply-To: <20230324173931.1812694-1-stefan@datenfreihafen.org>
+References: <20230324173931.1812694-1-stefan@datenfreihafen.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello Dave, Jakub, Paolo.
+On Fri, 24 Mar 2023 18:39:31 +0100 Stefan Schmidt wrote:
+> An update from ieee802154 for your *net* tree:
+> 
+> Two small fixes this time.
+> 
+> Dongliang Mu removed an unnecessary null pointer check.
+> 
+> Harshit Mogalapalli fixed an int comparison unsigned against signed from a
+> recent other fix in the ca8210 driver.
 
-An update from ieee802154 for your *net* tree:
+Hi Stefan! I see a ieee802154-for-net-2023-03-02 tag in your tree but
+no ieee802154-for-net-2023-03-24:
 
-Two small fixes this time.
-
-Dongliang Mu removed an unnecessary null pointer check.
-
-Harshit Mogalapalli fixed an int comparison unsigned against signed from a
-recent other fix in the ca8210 driver.
-
-regards
-Stefan Schmidt
-
-The following changes since commit cd356010ce4c69ac7e1a40586112df24d22c6a4b:
-
-  net: phy: mscc: fix deadlock in phy_ethtool_{get,set}_wol() (2023-03-15 21:33:22 -0700)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/wpan/wpan.git tags/ieee802154-for-net-2023-03-24
-
-for you to fetch changes up to 984cfd55e0c99e80b2e5b1dc6b2bf98608af7ff9:
-
-  net: ieee802154: remove an unnecessary null pointer check (2023-03-17 09:13:53 +0100)
-
-----------------------------------------------------------------
-Dongliang Mu (1):
-      net: ieee802154: remove an unnecessary null pointer check
-
-Harshit Mogalapalli (1):
-      ca8210: Fix unsigned mac_len comparison with zero in ca8210_skb_tx()
-
- drivers/net/ieee802154/ca8210.c | 3 +--
- net/ieee802154/nl802154.c       | 3 +--
- 2 files changed, 2 insertions(+), 4 deletions(-)
+$ git pull git://git.kernel.org/pub/scm/linux/kernel/git/wpan/wpan.git \
+	tags/ieee802154-for-net-2023-03-24 
+fatal: couldn't find remote ref tags/ieee802154-for-net-2023-03-24
