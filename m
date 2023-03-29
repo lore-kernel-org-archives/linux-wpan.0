@@ -2,74 +2,56 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D3D7C6FD18
-	for <linux-wpan@archiver.kernel.org>; Wed, 29 Mar 2023 06:48:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 262ABC74A5B
+	for <linux-wpan@archiver.kernel.org>; Wed, 29 Mar 2023 07:37:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229573AbjC2GsN (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 29 Mar 2023 02:48:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53112 "EHLO
+        id S230185AbjC2HhQ (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 29 Mar 2023 03:37:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51180 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229456AbjC2GsM (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 29 Mar 2023 02:48:12 -0400
-Received: from proxima.lasnet.de (proxima.lasnet.de [IPv6:2a01:4f8:121:31eb:3::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2D4F183;
-        Tue, 28 Mar 2023 23:48:10 -0700 (PDT)
-Received: from [IPV6:2003:e9:d70f:381f:5e2f:3bee:d4cb:b76b] (p200300e9d70f381f5e2f3beed4cbb76b.dip0.t-ipconnect.de [IPv6:2003:e9:d70f:381f:5e2f:3bee:d4cb:b76b])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: stefan@datenfreihafen.org)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id C4D71C055C;
-        Wed, 29 Mar 2023 08:48:08 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
-        s=2021; t=1680072489;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=FzpBKVenZRln9tqXGuSSzQR6z7GWvXYzvV9DnLXT7rs=;
-        b=Fz/BIxj5CIx16ISljnVjcUN8Hq7lgJbDcZL8VthVsB0KQAgWBW7ZXdCDJwgERgpQtP6gCA
-        R3Af4qPV1VtPwiPv/uutDrdeXQOKb/jC22jqRq0XROdhnu0cvKPy465+lOzSjEvdGe98JZ
-        uDPNJEX+qGWme08zdmPKKBhxui0XzEl6N+15bbnjfdP/CdpGW+LW0DOCMFpQ50ajVx9LQ4
-        m8RMWfmohOy5esjCtWQCwOs+tcJ6Nodz33TK8ciIuXQ6hTuQHq8tmQ0FBzm81kSyMx9wlt
-        VkCmdnulpw7OXLCeFFajr8R1P7ztjmw0z79VliKPDACg6lFm9nCWhpV9oOo9Cg==
-Message-ID: <364aac26-21a0-ec36-c549-602b4126296d@datenfreihafen.org>
-Date:   Wed, 29 Mar 2023 08:48:08 +0200
+        with ESMTP id S230189AbjC2Hg5 (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 29 Mar 2023 03:36:57 -0400
+Received: from mail.craftsplex.pl (mail.craftsplex.pl [162.19.155.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A41504EFF
+        for <linux-wpan@vger.kernel.org>; Wed, 29 Mar 2023 00:34:49 -0700 (PDT)
+Received: by mail.craftsplex.pl (Postfix, from userid 1002)
+        id 3806B22AB4; Wed, 29 Mar 2023 07:34:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=craftsplex.pl;
+        s=mail; t=1680075288;
+        bh=PcMncQpBfIZCnTOfZJY5G1G+gaLn4c9QPfFvoXrE4rA=;
+        h=Date:From:To:Subject:From;
+        b=JASpqzQA0inwYInz+VmZ1ghRNjTg6xzfU0iRj5HjVVc5ia6O/lmCQjDWZxMjG+XO1
+         32bz9hFKGAgLH66m/Ob2Ech7fCpijiU1jygxgdxAP22pv7UUduELhKJbNNz+4tpQo+
+         aMb0Qy4PLYXPBgAHjMzrXVd7dxfk//n8PtuBWUJgWZiBcKw6QmNok8xpDv2vDGaux8
+         T7ZHGzz7LIIHt9+20jrtDSUGgQFZZ+FnIaIn7Kl0spkFG3iOUXUmO57gJuhB51kJUz
+         I5H/DFM0YkMukzu69CBrItcmw4FCoyYe4rzXElSp2JVH+BuF16yqpymCHj35UpfJSR
+         o5km/CaqTyVmQ==
+Received: by mail.craftsplex.pl for <linux-wpan@vger.kernel.org>; Wed, 29 Mar 2023 07:34:46 GMT
+Message-ID: <20230329072937-0.1.58.krx8.0.7753c1ilq3@craftsplex.pl>
+Date:   Wed, 29 Mar 2023 07:34:46 GMT
+From:   "Kamil Tralewski" <kamil.tralewski@craftsplex.pl>
+To:     <linux-wpan@vger.kernel.org>
+Subject: =?UTF-8?Q?S=C5=82owa_kluczowe_do_wypozycjonowania?=
+X-Mailer: mail.craftsplex.pl
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.8.0
-Subject: Re: pull-request: ieee802154 for net 2023-03-24
-Content-Language: en-US
-To:     Jakub Kicinski <kuba@kernel.org>
-Cc:     davem@davemloft.net, pabeni@redhat.com, linux-wpan@vger.kernel.org,
-        alex.aring@gmail.com, miquel.raynal@bootlin.com,
-        netdev@vger.kernel.org
-References: <20230324173931.1812694-1-stefan@datenfreihafen.org>
- <20230327193842.59631f11@kernel.org>
- <605a1c16-0c03-a3be-9aec-12bb4d0113dc@datenfreihafen.org>
- <20230328151418.699f7026@kernel.org>
-From:   Stefan Schmidt <stefan@datenfreihafen.org>
-In-Reply-To: <20230328151418.699f7026@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello.
+Dzie=C5=84 dobry,
 
-On 29.03.23 00:14, Jakub Kicinski wrote:
-> On Tue, 28 Mar 2023 09:10:07 +0200 Stefan Schmidt wrote:
->> Sorry for that. I did not update my pull request script when changing
->> the git tree URLs to our team tree. Updated now.
->>
->> The tag is now on the tree above. You want me to send a new pull request
->> or do you take it from here?
-> 
-> Thanks, fresh PR would be better, I can't re-trigger the patchwork
-> checks on an existing one :(
+zapozna=C5=82em si=C4=99 z Pa=C5=84stwa ofert=C4=85 i z przyjemno=C5=9Bci=
+=C4=85 przyznaj=C4=99, =C5=BCe przyci=C4=85ga uwag=C4=99 i zach=C4=99ca d=
+o dalszych rozm=C3=B3w.=20
 
-Sure, no problem. Sent a v2 just now.
+Pomy=C5=9Bla=C5=82em, =C5=BCe mo=C5=BCe m=C3=B3g=C5=82bym mie=C4=87 sw=C3=
+=B3j wk=C5=82ad w Pa=C5=84stwa rozw=C3=B3j i pom=C3=B3c dotrze=C4=87 z t=C4=
+=85 ofert=C4=85 do wi=C4=99kszego grona odbiorc=C3=B3w. Pozycjonuj=C4=99 =
+strony www, dzi=C4=99ki czemu generuj=C4=85 =C5=9Bwietny ruch w sieci.
 
-regards
-Stefan Schmidt
+Mo=C5=BCemy porozmawia=C4=87 w najbli=C5=BCszym czasie?
+
+Pozdrawiam
+Kamil Tralewski
