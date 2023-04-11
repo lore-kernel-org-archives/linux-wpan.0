@@ -2,32 +2,33 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47AEDC7619A
-	for <linux-wpan@archiver.kernel.org>; Tue, 11 Apr 2023 09:01:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1406EC77B6F
+	for <linux-wpan@archiver.kernel.org>; Tue, 11 Apr 2023 09:01:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229508AbjDKJB3 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        id S229510AbjDKJB3 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
         Tue, 11 Apr 2023 05:01:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52140 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52156 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229450AbjDKJB2 (ORCPT
+        with ESMTP id S229484AbjDKJB2 (ORCPT
         <rfc822;linux-wpan@vger.kernel.org>); Tue, 11 Apr 2023 05:01:28 -0400
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C58CED;
-        Tue, 11 Apr 2023 02:01:26 -0700 (PDT)
+Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::225])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95169F2;
+        Tue, 11 Apr 2023 02:01:27 -0700 (PDT)
 Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id 6400B1C0004;
-        Tue, 11 Apr 2023 09:01:23 +0000 (UTC)
+        by mail.gandi.net (Postfix) with ESMTPSA id D185F1C0012;
+        Tue, 11 Apr 2023 09:01:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1681203684;
+        t=1681203685;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=Autr71rVrAI9fDs2kzDM/24yploQZEPQoKPQVk564z0=;
-        b=Fq1H5CTfOqckwZc5UZXALpKVpgmAaOe3t0uTP14PvIRGdeQ7VyAIwRrfUZCxfi/MgvCjb8
-        fA2dDBUfMw+MDw2EbvIG5VM6WPC1zOnmyMxqYv/rX0Rm3xG94tfIPXrqAdrAUP2EhnTL0z
-        NBrzG1ErdI2ihasHK/Wst3u+Cc7oGY1ebtF7Um7h6J+hzLXjm9NOxtniSaRS4M7YQo8pYz
-        W1dbIaQOClCa1EvTXAokCJe9sZMWzbsJtxSyYSc8bjTsepdUfyKwQZG8NvjDFaN3fskJfp
-        rofZv+Jl/c4mFCfyGxMRbMWHqu6yRYCXSXLYswRGbp38AoPuLCb2Kqiw1BCM+Q==
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=r6MsnXyxapAJi/yR+D3gA/Fog4MlS6Jv6XqIQ/lYi5U=;
+        b=EYoUi0TXg2Fc9Ub947TOwWG5Hnu9GqLJ6UjDBICJJ05I+/1V4JIXDGgYZhyISJNWwwcmT2
+        RJSeRZtU6GVVsm5kDZYE5EJKBWbG6rGQIVashiS2jNraFOHsGv41pEvS9Hk/I9cJhNVqqj
+        fo9GOvzHMU/tZ3wjTY+be+BTa0hKl58GXF1f6B6bgbT6uKJoQL4fF1ZzjR2bBxWUwkIe27
+        JAE8S1zU4OwNUpfw+4p/fqBZw0UT0zKLqqUruGrx0ivxF/xiIaeb1C/A1OlzK3535ueUsC
+        CWBBJHjeZWb1+urGSUukkUcq/bTRj08J2yQ0unKKnUt9/m2B3AzkvkGh8Hh/Kw==
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
 To:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
@@ -37,48 +38,38 @@ Cc:     "David S. Miller" <davem@davemloft.net>,
         Paolo Abeni <pabeni@redhat.com>,
         Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
         Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: [PATCH wpan-next 1/2] MAINTAINERS: Update wpan tree
-Date:   Tue, 11 Apr 2023 11:01:21 +0200
-Message-Id: <20230411090122.419761-1-miquel.raynal@bootlin.com>
+Subject: [PATCH wpan-next 2/2] MAINTAINERS: Add wpan patchwork
+Date:   Tue, 11 Apr 2023 11:01:22 +0200
+Message-Id: <20230411090122.419761-2-miquel.raynal@bootlin.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230411090122.419761-1-miquel.raynal@bootlin.com>
+References: <20230411090122.419761-1-miquel.raynal@bootlin.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-The wpan maintainers group is switching from Stefan's tree to a group
-tree called 'wpan'. We will now maintain:
-* wpan/wpan.git master:
-  Fixes targetting the 'net' tree
-* wpan/wpan-next.git master:
-  Features targetting the 'net-next' tree
-* wpan/wpan-next.git staging:
-  Same as the wpan-next master branch, but we will push there first,
-  expecting robots to parse the tree and report mistakes we would have
-  not catch. This branch can be rebased and force pushed, unlike the
-  others.
+This patchwork instance is hosted on kernel.org and has been used for a
+long time already, it was just not mentioned in MAINTAINERS.
 
 Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
 ---
- MAINTAINERS | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ MAINTAINERS | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/MAINTAINERS b/MAINTAINERS
-index 54a2a8122a97..26d0edc024a7 100644
+index 26d0edc024a7..75baf27a3ff7 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -9889,8 +9889,8 @@ M:	Miquel Raynal <miquel.raynal@bootlin.com>
+@@ -9889,6 +9889,7 @@ M:	Miquel Raynal <miquel.raynal@bootlin.com>
  L:	linux-wpan@vger.kernel.org
  S:	Maintained
  W:	https://linux-wpan.org/
--T:	git git://git.kernel.org/pub/scm/linux/kernel/git/sschmidt/wpan.git
--T:	git git://git.kernel.org/pub/scm/linux/kernel/git/sschmidt/wpan-next.git
-+T:	git git://git.kernel.org/pub/scm/linux/kernel/git/wpan/wpan.git
-+T:	git git://git.kernel.org/pub/scm/linux/kernel/git/wpan/wpan-next.git
++Q:	https://patchwork.kernel.org/project/linux-wpan/list/
+ T:	git git://git.kernel.org/pub/scm/linux/kernel/git/wpan/wpan.git
+ T:	git git://git.kernel.org/pub/scm/linux/kernel/git/wpan/wpan-next.git
  F:	Documentation/networking/ieee802154.rst
- F:	drivers/net/ieee802154/
- F:	include/linux/ieee802154.h
 -- 
 2.34.1
 
