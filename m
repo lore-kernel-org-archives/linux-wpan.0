@@ -2,78 +2,80 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD905C77B6E
-	for <linux-wpan@archiver.kernel.org>; Wed, 12 Apr 2023 19:52:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 738CEC7619A
+	for <linux-wpan@archiver.kernel.org>; Wed, 12 Apr 2023 19:53:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229878AbjDLTw2 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 12 Apr 2023 15:52:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39250 "EHLO
+        id S229492AbjDLTxP (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 12 Apr 2023 15:53:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43756 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229989AbjDLTwV (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 12 Apr 2023 15:52:21 -0400
+        with ESMTP id S229679AbjDLTxO (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 12 Apr 2023 15:53:14 -0400
 Received: from proxima.lasnet.de (proxima.lasnet.de [IPv6:2a01:4f8:121:31eb:3::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BB01768B;
-        Wed, 12 Apr 2023 12:51:46 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB1281FFE;
+        Wed, 12 Apr 2023 12:52:45 -0700 (PDT)
 Received: from [192.168.2.51] (p4fc2f435.dip0.t-ipconnect.de [79.194.244.53])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (4096 bits))
         (No client certificate requested)
         (Authenticated sender: stefan@datenfreihafen.org)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id 1A8C7C08A3;
-        Wed, 12 Apr 2023 21:50:33 +0200 (CEST)
+        by proxima.lasnet.de (Postfix) with ESMTPSA id 0E639C042A;
+        Wed, 12 Apr 2023 21:51:15 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
-        s=2021; t=1681329033;
+        s=2021; t=1681329075;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=N0mmHvziHXPPkSMv4GUPva5dnH20AV1HPLFo2iqYQWc=;
-        b=M8SXG2SJM3AYm4AibzsKVLUCdbCSUYx7wtwbGG1MiIeJF7fYINvaRmb3PlNYzrGMJ8cx2l
-        RgO7EuSPTnuW004LJtV7/HbcZ+Cw0dnAPiB5ut2E3UtXiv+wFObh+2J9/g/fh161KeXZsf
-        asxXeCWUPWVKlqK+Ua7fhuRpAtWYbPJO9Cza0rg16stLd/TbHSrBS+0FljGytlRvTH2hx1
-        cCAxeoQWTfbgBUPzawmeOpV9adKUkFkPZWNmqH5i03TY4JdDkx8zA4XA8ekr+2NVYm4zFF
-        f+KHqInfLS6ws0v0Q6Yv3pN2d6w8cmRBlXrYAy7CQgbzW7RGM9gjjPDdE14AVw==
-Message-ID: <cdad4dbe-ec72-627b-901a-213be82db5a1@datenfreihafen.org>
-Date:   Wed, 12 Apr 2023 21:50:32 +0200
+        bh=rHhIv4XRWuvy0SOWZF0k4Hfl2JiKD/56whRvSjhKz9E=;
+        b=pgd0CnYchBrUg9IrnuBJXh8qHrspvfwlAKkJncEANg6JarE5CBfb20giSOXEZ1rXvAypDI
+        e5ZvA0wA7v6wBQpj+QtXFeY+SP64AMmbLtvUv7NrAN3zgJT8olOg2FxRXZNdCuT2EwgARY
+        XJ3Yp2HTlkmG4LFYDORUPerFhuSaVyIZEEdUPaX3xgNV75aZkWFr31AMhG8NaOJ9uJmuZ2
+        i5uqEyPMYjdbKnWJu7SrApkvTyxnBv0afxLS6V5EuNo7WlxB0UhjsFHgnOFrYeUE7F7mf5
+        Hh+ojStCllCzzHakZstwj/wkzxVhpPYaOLn6/ReFfdAikVU7l3k7XQ+yYIyDtA==
+Message-ID: <7978e5ed-56aa-dc01-957c-3f110a92ce5f@datenfreihafen.org>
+Date:   Wed, 12 Apr 2023 21:51:14 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.8.0
-Subject: Re: [PATCH wpan-next 2/2] MAINTAINERS: Add wpan patchwork
+Subject: Re: [PATCH wpan-next 1/2] MAINTAINERS: Update wpan tree
 Content-Language: en-US
-To:     Alexander Aring <aahringo@redhat.com>,
+To:     Jakub Kicinski <kuba@kernel.org>,
         Miquel Raynal <miquel.raynal@bootlin.com>
 Cc:     Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org,
         "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
         Paolo Abeni <pabeni@redhat.com>,
         Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org
 References: <20230411090122.419761-1-miquel.raynal@bootlin.com>
- <20230411090122.419761-2-miquel.raynal@bootlin.com>
- <CAK-6q+gNq_dX0_EVrc1Sa8OxBUCFV6hpqmMokLiBbRLDUzXiMg@mail.gmail.com>
+ <20230411130209.6ffe1d21@kernel.org>
 From:   Stefan Schmidt <stefan@datenfreihafen.org>
-In-Reply-To: <CAK-6q+gNq_dX0_EVrc1Sa8OxBUCFV6hpqmMokLiBbRLDUzXiMg@mail.gmail.com>
+In-Reply-To: <20230411130209.6ffe1d21@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
 Hello.
 
-On 11.04.23 14:13, Alexander Aring wrote:
-> Hi,
+On 11.04.23 22:02, Jakub Kicinski wrote:
+> On Tue, 11 Apr 2023 11:01:21 +0200 Miquel Raynal wrote:
+>> The wpan maintainers group is switching from Stefan's tree to a group
+>> tree called 'wpan'. We will now maintain:
+>> * wpan/wpan.git master:
+>>    Fixes targetting the 'net' tree
+>> * wpan/wpan-next.git master:
+>>    Features targetting the 'net-next' tree
+>> * wpan/wpan-next.git staging:
+>>    Same as the wpan-next master branch, but we will push there first,
+>>    expecting robots to parse the tree and report mistakes we would have
+>>    not catch. This branch can be rebased and force pushed, unlike the
+>>    others.
 > 
-> On Tue, Apr 11, 2023 at 5:03 AM Miquel Raynal <miquel.raynal@bootlin.com> wrote:
->>
->> This patchwork instance is hosted on kernel.org and has been used for a
->> long time already, it was just not mentioned in MAINTAINERS.
->>
->> Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
-> 
-> Acked-by: Alexander Aring <aahringo@redhat.com>
+> Very nice, feel free to ship these two with fixes.
+> We often fast track MAINTAINERS updates.
 
-This patch has been applied to the wpan tree and will be
-part of the next pull request to net. Thanks!
+That's what I did. Coming with the next ieee802154 pull request to net.
 
 regards
 Stefan Schmidt
