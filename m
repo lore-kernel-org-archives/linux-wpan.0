@@ -2,102 +2,86 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C2C2C77B6E
-	for <linux-wpan@archiver.kernel.org>; Wed, 12 Apr 2023 12:30:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 613ACC77B6E
+	for <linux-wpan@archiver.kernel.org>; Wed, 12 Apr 2023 19:51:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229647AbjDLMaH (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 12 Apr 2023 08:30:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40464 "EHLO
+        id S230243AbjDLTvZ (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 12 Apr 2023 15:51:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39248 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230236AbjDLMaD (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 12 Apr 2023 08:30:03 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2F637ED7
-        for <linux-wpan@vger.kernel.org>; Wed, 12 Apr 2023 05:28:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1681302537;
+        with ESMTP id S230220AbjDLTvI (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 12 Apr 2023 15:51:08 -0400
+Received: from proxima.lasnet.de (proxima.lasnet.de [78.47.171.185])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3F601FFE;
+        Wed, 12 Apr 2023 12:50:20 -0700 (PDT)
+Received: from [192.168.2.51] (p4fc2f435.dip0.t-ipconnect.de [79.194.244.53])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits))
+        (No client certificate requested)
+        (Authenticated sender: stefan@datenfreihafen.org)
+        by proxima.lasnet.de (Postfix) with ESMTPSA id BA816C006B;
+        Wed, 12 Apr 2023 21:50:07 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
+        s=2021; t=1681329007;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-        bh=5FVpC581NkDfmYWpDRH3nTVPOQR2/syvKG58JcNVmQo=;
-        b=D12KmZZizxw98zwot0iIdXbbszCtChqB5dWL6pPmNgF0v4uSHmtFNb79WN4MR7uLq109qH
-        Vl9cBVwKSwwoftjqCpTjDtAgJ7SPPJhXbKZIpSwUrMyv0Z3gAYA9jvS1zsqrUz1XK5+zW7
-        AxQEe2aE96LPMZWgl6kGc7XJHcxOBHY=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-461-PqnPnxEiNdy75T9jANQ33w-1; Wed, 12 Apr 2023 08:28:55 -0400
-X-MC-Unique: PqnPnxEiNdy75T9jANQ33w-1
-Received: by mail-ed1-f70.google.com with SMTP id c64-20020a509fc6000000b004a26cc7f6cbso6425462edf.4
-        for <linux-wpan@vger.kernel.org>; Wed, 12 Apr 2023 05:28:55 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1681302534; x=1683894534;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=5FVpC581NkDfmYWpDRH3nTVPOQR2/syvKG58JcNVmQo=;
-        b=v959ZVu8C0BCwm/0PeXu5YiAVj5HkAsk4mWbBwxXnHH1P8QXkkEsvGM0HnTmDNQgAh
-         zrPni+tscrQHxt+TocM0loHGgmc+vDB2EQedZtqH/BEIKtTsNlXm+dNlSinRJn9RQnTi
-         bRi4bi3HzlsXjFraDLsDDkI1yJzq6B/QYNlg2SpQ9MzDT110SNx/Yz1PYsK/GgJ8Eesw
-         Vv+StcdB9T6WMv1SEAidqGCVY6olwo8jaFN1EkWqJBAYi0nfBujPPsLjWv1lH4MXYR4F
-         EhaTrVAGXZ1hduQWORXhHJZBs3fgXl12S9XVwI/rbKgINWDGfjeV0m++QauRW7s/pdHH
-         7ayA==
-X-Gm-Message-State: AAQBX9eQGAkSXr7If1+cswmva6WgvjpdsCo2pUK/dj+R5zOiLOzBkfFx
-        jsNylQpY2ITMOG2nGpXCp2LRdqNVshlCslGiQ429naZlJHD0bMGbgCduOovgo/4f8vUzHEdUo11
-        FaqEmxPdDWaSTRvs4ZhgoCNLIn5h2iUq1k7lS+R+FVdj0CL0x
-X-Received: by 2002:a17:907:60d0:b0:933:3a22:8513 with SMTP id hv16-20020a17090760d000b009333a228513mr16048258ejc.53.1681302534088;
-        Wed, 12 Apr 2023 05:28:54 -0700 (PDT)
-X-Google-Smtp-Source: AKy350YbGtcUMbHzABOHQFX3bdDAKwzNCq+UNn4bVmmFuUESY4oFYN2YfgGf72fAsfV5WoAFh5tGl2wnOjP35dffj/g=
-X-Received: by 2002:a17:907:60d0:b0:933:3a22:8513 with SMTP id
- hv16-20020a17090760d000b009333a228513mr16048239ejc.53.1681302533755; Wed, 12
- Apr 2023 05:28:53 -0700 (PDT)
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=OYszXDQDEy+KRWGHuZZ9FLDb+crUAan5/S25sGaF/ds=;
+        b=NECSaBbG/6dTXqm/DJpE6+NslcQJx3nLxUMz/L0QFx+KS4+lZH1IqywXTk+HS/GVyuPymt
+        W03xYv1miv5Ex0rD6QjTzPt8aZiHxzTTTIzMDQbXWsI2LiWZvXdec94Ml3tZr+1L93DHOZ
+        HNSHsj2s4WTQqLITOE3qEd8dpesEcjhSKUzk67AFo95zVnSbEquyZvtXZaTWXv82aKOrpz
+        S96y4qwdLKaENJt3XqcGYwlhaVwk9Gx7U7tXqX/JFWH23IcswA52csuGmGDtEV1Feq7VRn
+        u0pXDU0jYTx1SPkREqhVBoXPRvb7ZeC0pPmyYDIw3EalS2AR0e9srixyj1wMbw==
+Message-ID: <992405e3-c2d2-95ae-a937-a501baf06f2c@datenfreihafen.org>
+Date:   Wed, 12 Apr 2023 21:50:07 +0200
 MIME-Version: 1.0
-From:   Alexander Aring <aahringo@redhat.com>
-Date:   Wed, 12 Apr 2023 08:28:42 -0400
-Message-ID: <CAK-6q+j8T0WFX0XSFk+=7R4=LHOYLo87AN0bHFy=nZc8YkbQ+A@mail.gmail.com>
-Subject: ieee802154_hot_tx() and return value TX_BUSY/TX_OK
-To:     linux-wpan - ML <linux-wpan@vger.kernel.org>
-Cc:     Miquel Raynal <miquel.raynal@bootlin.com>,
-        Stefan Schmidt <stefan@datenfreihafen.org>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.8.0
+Subject: Re: [PATCH wpan-next 1/2] MAINTAINERS: Update wpan tree
+Content-Language: en-US
+To:     Alexander Aring <alex.aring@gmail.com>,
+        Miquel Raynal <miquel.raynal@bootlin.com>
+Cc:     linux-wpan@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org
+References: <20230411090122.419761-1-miquel.raynal@bootlin.com>
+ <CAB_54W6tnKmjmRAmA=pZPUucDvmROTx-Xx3V1k2Ms=nemC_Vjw@mail.gmail.com>
+From:   Stefan Schmidt <stefan@datenfreihafen.org>
+In-Reply-To: <CAB_54W6tnKmjmRAmA=pZPUucDvmROTx-Xx3V1k2Ms=nemC_Vjw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi,
+Hello.
 
-I am asking myself if we do the right return value in
-ieee802154_hot_tx(). Currently we transmit and stop the queue as we
-know the transceiver (currently only has one tx buffer (sometimes
-tx/rx is the same buffer)) is busy. As:
+On 11.04.23 14:11, Alexander Aring wrote:
+> Hi,
+> 
+> On Tue, Apr 11, 2023 at 5:01 AM Miquel Raynal <miquel.raynal@bootlin.com> wrote:
+>>
+>> The wpan maintainers group is switching from Stefan's tree to a group
+>> tree called 'wpan'. We will now maintain:
+>> * wpan/wpan.git master:
+>>    Fixes targetting the 'net' tree
+>> * wpan/wpan-next.git master:
+>>    Features targetting the 'net-next' tree
+>> * wpan/wpan-next.git staging:
+>>    Same as the wpan-next master branch, but we will push there first,
+>>    expecting robots to parse the tree and report mistakes we would have
+>>    not catch. This branch can be rebased and force pushed, unlike the
+>>    others.
+>>
+>> Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
+> 
+> Acked-by: Alexander Aring <aahringo@redhat.com>
 
-ieee802154_hot_tx() - we transmit
-ieee802154_hold_queue()
-return NETDEV_TX_OK
+This patch has been applied to the wpan tree and will be
+part of the next pull request to net. Thanks!
 
-but I think or I have the feeling it should be run like this:
-
-ieee802154_hot_tx() - we transmit
-return NETDEV_TX_OK
-ieee802154_hot_tx() - we are busy
-ieee802154_hold_queue()
-return NETDEV_TX_BUSY
-
-The side effects are probably how the qdisc implementation handles the
-different return values. Some qdisc implementations are evaluating
-this and need to know that it hits hardware limitation... Some qdiscs
-don't evaluate this value.
-
-This is just a brainstorming here to find if what we do is currently
-correct or not correct... we can move this discussion to netdev to
-clarify this... or we figure it out by ourselves? Somehow it bothers
-me that there is an additional extra callback to detect it is busy and
-I can't believe this is not optimized yet.
-
-However we should keep that in mind that I think there is some
-clarification needed.
-
-btw: I also have some other things in my mind that currently could
-make problems in the qdisc handling related to 802.15.4 (and may with
-6LoWPAN on top).
-
-- Alex
-
+regards
+Stefan Schmidt
