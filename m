@@ -2,136 +2,86 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E35E7C7EE2C
-	for <linux-wpan@archiver.kernel.org>; Fri, 26 May 2023 14:10:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF4F8C77B7E
+	for <linux-wpan@archiver.kernel.org>; Sun, 28 May 2023 14:09:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243831AbjEZOKd (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Fri, 26 May 2023 10:10:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50514 "EHLO
+        id S229526AbjE1OJm (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Sun, 28 May 2023 10:09:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59894 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237413AbjEZOKc (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Fri, 26 May 2023 10:10:32 -0400
-Received: from mail-ua1-x930.google.com (mail-ua1-x930.google.com [IPv6:2607:f8b0:4864:20::930])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B4D3DF;
-        Fri, 26 May 2023 07:10:31 -0700 (PDT)
-Received: by mail-ua1-x930.google.com with SMTP id a1e0cc1a2514c-786efb5ff24so44161241.0;
-        Fri, 26 May 2023 07:10:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1685110230; x=1687702230;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fG713w/n5a4Y4ViFtXQB/KYC9f0zPKWxoGiBTJxDL+k=;
-        b=m9DMWB2dnvhFdAq3/ujAYrL5BhwankhnPGSChUOWq8m3xfFLLE583TzVjx3bZgXsVS
-         kDlkULz9eDZ+xlKaLWpGgTdiOpqYohDhGGeKxmsS4WJPsMABy6VT/AyrEGa0Ts7vWZ8W
-         A8CXCpqyYuS7gJ0Ye0/5BXs7vrQrA9bmMEBcrFsWU/htHHYv1/no9yan/8P15XemaUax
-         BWdurVADFOe5XbQ6+PwCU7da2D/zhDHr055LRVAAA9vjXzvvVtzRFZqQuCBCFAfdtEV4
-         4W62mBBFz/lrUSjRLFfKJRDcvBdbIuteeK4gY5r/a0DjatF/qsVeGujZyAyCHRVQDqg+
-         rDsw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685110230; x=1687702230;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fG713w/n5a4Y4ViFtXQB/KYC9f0zPKWxoGiBTJxDL+k=;
-        b=i8X5cAt6V315xbStmo9GskMgyDZVOJL8V1JG7Dvp3REc6RP23L6KTGj4SAmB3/WjSc
-         09CtISyw+tV/eHutWssvgrYe6Qu9GTkCpJRGgvkd3aQoPmq/1x8Gywvsl08jYvHbIgmP
-         t3c2b+6YiozsyT3UXlOGJppS7/gLza4QvVHBRpmmUzg7n2hYiQcGZZlh3p501BMwkFrF
-         3FlRgaaXTxE+dg7s2lDkEmZJaSbE8UaYfQ7G0g/xqBzgYil5Z7tMAMDsLi1tJxWppShG
-         Pek1zly4RNnwscq3dAtf19yBOu/ipIqvRJfVFGBQ94c59ZvKMj5c1L36bX55ZHQvcE6s
-         y0ow==
-X-Gm-Message-State: AC+VfDxLNdo8zWywY/QpaSrDtJ8YF2F3u2dby9k98CC+t6POBxlB411j
-        w+ZALPvkcRNSZICUGAItz0nrF+AZf34+r4eAQkk=
-X-Google-Smtp-Source: ACHHUZ6eVTZtnPu5x20WxcO0d18Lw5T2t9skn4lv62QG/WAk5aDS9ISiUWFT9zur/ylXW9J4eGBSPWcNqP+mXC3o1P0=
-X-Received: by 2002:a67:ffc9:0:b0:42f:18d9:a602 with SMTP id
- w9-20020a67ffc9000000b0042f18d9a602mr462435vsq.32.1685110230556; Fri, 26 May
- 2023 07:10:30 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230525125503.400797-1-leitao@debian.org> <CAF=yD-LHQNkgPb-R==53-2auVxkP9r=xqrz2A8oe61vkoDdWjg@mail.gmail.com>
- <a1074987-c3ce-56cd-3005-beb5a3c55ef9@kernel.org> <CAF=yD-LXcufhJBpkEcUuphFpR1TA4=QwUXw4sKFsSiEL_mwG4Q@mail.gmail.com>
- <ZHB3BNopbx+5AnIa@gmail.com>
-In-Reply-To: <ZHB3BNopbx+5AnIa@gmail.com>
-From:   Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Date:   Fri, 26 May 2023 10:09:53 -0400
-Message-ID: <CAF=yD-LO8fZJfayJoFPO_wvMw=FLGbf_DYUcaBpKv81OEOQVUA@mail.gmail.com>
-Subject: Re: [PATCH net-next v3] net: ioctl: Use kernel memory on protocol
- ioctl callbacks
-To:     Breno Leitao <leitao@debian.org>
-Cc:     David Ahern <dsahern@kernel.org>,
-        Remi Denis-Courmont <courmisch@gmail.com>,
+        with ESMTP id S229524AbjE1OJl (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Sun, 28 May 2023 10:09:41 -0400
+Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33926BC;
+        Sun, 28 May 2023 07:09:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1685282980; x=1716818980;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=cIR2fr2WmJ//GgKu/Pqss/i9kXIikU40iGweAC9yfuQ=;
+  b=Sr+lEvtQqyQKDaSj0IsRTxppFFSZ+IsNi2g1H6FtOPcjX8dS1B142GMh
+   feNBGvL8bmAjhLHUhGdAYHl6IOS4sUjBByJ3D2E8Ponyf174joM0Avcl9
+   3YdVLKK/yau2LVVcwyCZggutst+QPs3af8/GPAvAVvE+uIgHEqdNAJmA8
+   FzI+j01avGV+ohN5fByiclcUNJdMfTWcVHOO85hIcmUubAmvvu7rKzQvZ
+   WNkIW4QCF+1HcLoesUw8GE/c+rOWE/n9JFijLQSbU+KY6u4ldq8m4pLF/
+   3LMGhcXte+gVb4ByD7SBL/iWGjxDCdYu/Ax1D+B4UreGThijlDF0TvD/z
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10724"; a="357766867"
+X-IronPort-AV: E=Sophos;i="6.00,198,1681196400"; 
+   d="scan'208";a="357766867"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 May 2023 07:09:39 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10724"; a="699947158"
+X-IronPort-AV: E=Sophos;i="6.00,198,1681196400"; 
+   d="scan'208";a="699947158"
+Received: from black.fi.intel.com ([10.237.72.28])
+  by orsmga007.jf.intel.com with ESMTP; 28 May 2023 07:09:36 -0700
+Received: by black.fi.intel.com (Postfix, from userid 1003)
+        id 6578924F; Sun, 28 May 2023 17:09:41 +0300 (EEST)
+From:   Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To:     Stefan Schmidt <stefan@datenfreihafen.org>,
+        linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     Alexander Aring <alex.aring@gmail.com>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
         "David S. Miller" <davem@davemloft.net>,
         Eric Dumazet <edumazet@google.com>,
         Jakub Kicinski <kuba@kernel.org>,
         Paolo Abeni <pabeni@redhat.com>,
-        Alexander Aring <alex.aring@gmail.com>,
-        Stefan Schmidt <stefan@datenfreihafen.org>,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
-        Matthieu Baerts <matthieu.baerts@tessares.net>,
-        Mat Martineau <martineau@kernel.org>,
-        Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
-        Xin Long <lucien.xin@gmail.com>, leit@fb.com, axboe@kernel.dk,
-        asml.silence@gmail.com, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org, dccp@vger.kernel.org,
-        linux-wpan@vger.kernel.org, mptcp@lists.linux.dev,
-        linux-sctp@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Subject: [PATCH net-next v1 1/1] ieee802154: ca8210: Remove stray gpiod_unexport() call
+Date:   Sun, 28 May 2023 17:09:38 +0300
+Message-Id: <20230528140938.34034-1-andriy.shevchenko@linux.intel.com>
+X-Mailer: git-send-email 2.40.0.1.gaa8946217a0b
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-On Fri, May 26, 2023 at 5:08=E2=80=AFAM Breno Leitao <leitao@debian.org> wr=
-ote:
->
-> On Thu, May 25, 2023 at 12:06:00PM -0400, Willem de Bruijn wrote:
-> > On Thu, May 25, 2023 at 11:34=E2=80=AFAM David Ahern <dsahern@kernel.or=
-g> wrote:
-> > > On 5/25/23 9:05 AM, Willem de Bruijn wrote:
-> > > > I don't understand what this buys us vs testing the sk_family,
-> > > > sk_protocol and cmd here.
-> > >
-> > > To keep protocol specific code out of core files is the reason I
-> > > suggested it.
-> >
-> > I guess you object to demultiplexing based on per-family
-> > protocol and ioctl cmd constants directly in this file?
-> >
-> > That only requires including the smaller uapi headers.
-> >
-> > But now net/core/sock.h now still has to add includes
-> > linux/mroute.h, linux/mroute6.h and net/phonet/phonet.h.
-> >
-> > Aside on phonet_is_sk, if we're keeping this: this should be
-> > sk_is_phonet? Analogous to sk_is_tcp and such. And, it should suffice
-> > to  demultiplex based on the protocol family, without testing the
-> > type or protocol. The family is defined in protocol-independent header
-> > linux/socket.h. The differences between
-> > PN_PROTO_PHONET and PN_PROTO_PIPE should be handled inside the family
-> > code. So I think it is cleaner just to open-coded as `if
-> > (sk->sk_family =3D=3D PF_PHONET)`
->
-> Should we do the same for ipmr as well? Currently I am checking it
-> using:
->
->         return sk->sk_type =3D=3D SOCK_RAW && inet_sk(sk)->inet_num =3D=
-=3D IPPROTO_ICMPV6;
->
-> This is what ip{6}mr functions[1] are use to check if `sk` is using ip{6}=
-mr.
-> If we just use `sk->family`, then I suppose that `sk_is_ip6mr` would be
-> something as coded below. Is this correct?
->
->         static inline int sk_is_ip6mr(struct sock *sk)
->         {
->                 return sk->sk_family =3D=3D PF_INET6;
->         }
+There is no gpiod_export() and gpiod_unexport() looks pretty much stray.
+The gpiod_export() and gpiod_unexport() shouldn't be used in the code,
+GPIO sysfs is deprecated. That said, simply drop the stray call.
 
-Actually, for multicast routing, the protocol check is required.
+Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+---
+ drivers/net/ieee802154/ca8210.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-> Anyway, should we continue with the current (V3) approach, where we keep
-> the protocol code out of core files, or, should I come back to the
-> previous (V2) approach, where the protocol checks is coded directly in
-> the core file?
+diff --git a/drivers/net/ieee802154/ca8210.c b/drivers/net/ieee802154/ca8210.c
+index a2d242034220..f9b10e84de06 100644
+--- a/drivers/net/ieee802154/ca8210.c
++++ b/drivers/net/ieee802154/ca8210.c
+@@ -2855,7 +2855,6 @@ static int ca8210_interrupt_init(struct spi_device *spi)
+ 	);
+ 	if (ret) {
+ 		dev_crit(&spi->dev, "request_irq %d failed\n", pdata->irq_id);
+-		gpiod_unexport(gpio_to_desc(pdata->gpio_irq));
+ 		gpio_free(pdata->gpio_irq);
+ 	}
+ 
+-- 
+2.40.0.1.gaa8946217a0b
 
-David expressed preference for the current approach. So let's stay with tha=
-t.
