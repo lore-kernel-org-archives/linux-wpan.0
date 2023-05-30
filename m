@@ -2,100 +2,126 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5553C77B7E
-	for <linux-wpan@archiver.kernel.org>; Mon, 29 May 2023 08:12:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13D72C7EE23
+	for <linux-wpan@archiver.kernel.org>; Tue, 30 May 2023 07:43:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231680AbjE2IMV (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 29 May 2023 04:12:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39212 "EHLO
+        id S231169AbjE3HnO (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 30 May 2023 03:43:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38710 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230168AbjE2IMU (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 29 May 2023 04:12:20 -0400
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C2A890;
-        Mon, 29 May 2023 01:12:16 -0700 (PDT)
-X-GND-Sasl: miquel.raynal@bootlin.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1685347935;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=gDcQFJJFfV1Siup4q6p4OZgQniQ046aFw0ogwoYkvUs=;
-        b=IJcLwSpdqY/S84uOjPw4mCXhRQWiUo2wiEp6u12X0zgjXdUfl6QFEMfT6iSI4RpjDwgrr6
-        zQpruIZUAGkBu8NkfM0mLoEglwlMO5gK4glbPp6jkOBwOpcr36RjULZNtXefw/qrjxZH5J
-        d2EEfJUjcGDrcRllXYnasz8rittgSOac7nbyFdkRmDuNN++OPMBP9lJqZAvl+cxQtgKI+Q
-        lQeYypHwFMI/3KfRmm1XMlIkRrK+UczFia+7js0ErmgoUGcUJK5t4YB7otsnwYts/X5VX9
-        HBrBlL/prkHHBEUvMM4E6kUHaFQddwcRGAp7jsyPMx/9iSFwsQXXOlIPXMxjmw==
-X-GND-Sasl: miquel.raynal@bootlin.com
-X-GND-Sasl: miquel.raynal@bootlin.com
-X-GND-Sasl: miquel.raynal@bootlin.com
-X-GND-Sasl: miquel.raynal@bootlin.com
-X-GND-Sasl: miquel.raynal@bootlin.com
-X-GND-Sasl: miquel.raynal@bootlin.com
-X-GND-Sasl: miquel.raynal@bootlin.com
-X-GND-Sasl: miquel.raynal@bootlin.com
-X-GND-Sasl: miquel.raynal@bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 2184660002;
-        Mon, 29 May 2023 08:12:13 +0000 (UTC)
-Date:   Mon, 29 May 2023 10:12:13 +0200
-From:   Miquel Raynal <miquel.raynal@bootlin.com>
+        with ESMTP id S230472AbjE3HnH (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 30 May 2023 03:43:07 -0400
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2124.outbound.protection.outlook.com [40.107.93.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FCD4E46;
+        Tue, 30 May 2023 00:42:37 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ZUA/TKDOtgLVZP5+7JrD8J6OblR06w8s63NJJ8xraumWO8/bEnJq8WUOE6wuVXaBHhyZgRixRbnYfwFFFk7IRpfr6wRqF+kkivz54p/lp3yFQMH9m6Rv3o+50X1B2I9sGowhsSC5XmrQO3HFaYxOerd39b8EEzcm62D4wFThuK154tWmPbogUsqzxi6rhlSlWmJ9NMcdMHrdKSkEv+pb4whZZT093dOof+U6UCULRhPmOxSJFdS7WZPz4VRAxN2cWdOgO7G5Pv2BG2S7KOGTUmBEhHu2WIpr4o3z7hK1JlwasLCIX9tgkypjVaKgNc5GkJw31YdDeR2iy4LiJzXMhQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=A0iTJoOUKYcCHUVonbCEsrr0Qn+TXSrDhfbjQeh8Mgs=;
+ b=IjpuOAqa6dCQVoUIvdjwmtadplDBZWd5YK5fE4tJaj3zZ+r0m58bYRmHLW1fMD3Px6zVadEYgGai/R5LxitrWCZ50k/LNI9XTLEdYZl5dr9BdIoWpLbFiLrsFHFjfaN0FaQ5X5uI2uCfehN5WR6lmxwDOQgc96Ttguj9xRIQrgpmyWOFnrqUqc+ZFWPjJ4gANTD9viTBNRTRTpatZi4q6qmcUQvjXRyh+4ywyKsY+Y7osJAdEfk1RPS9qTnO8DUzL/n0vg/DwdBn8LqPFHUiq3SY2nT21bxwACThRyxrPNeQ8xglnt2e2BxS0bpJWb2wXh3xEEUgmGzUjJgTbGecog==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=A0iTJoOUKYcCHUVonbCEsrr0Qn+TXSrDhfbjQeh8Mgs=;
+ b=aXvzQD3Zyn27kXKCq9DC8R+23hhMrRKXtoXRep0wUJFFbEFhm/xpKAAduRVl/lGY2Us6F8paXlE+IksTs0OqESqySv0Rn3QH/lWLYf6d1N5UY/AiTLLHFHQ2hJvH33QuX18oTVMWCJhnqBhel0bM8En6P0YDe0T4RoO3f1L4Lbk=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=corigine.com;
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
+ by LV8PR13MB6494.namprd13.prod.outlook.com (2603:10b6:408:190::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6455.21; Tue, 30 May
+ 2023 07:42:26 +0000
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::5e55:9a39:751f:55f6]) by PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::5e55:9a39:751f:55f6%3]) with mapi id 15.20.6433.022; Tue, 30 May 2023
+ 07:42:26 +0000
+Date:   Tue, 30 May 2023 09:42:20 +0200
+From:   Simon Horman <simon.horman@corigine.com>
 To:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 Cc:     Stefan Schmidt <stefan@datenfreihafen.org>,
         linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
         linux-kernel@vger.kernel.org,
         Alexander Aring <alex.aring@gmail.com>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
         "David S. Miller" <davem@davemloft.net>,
         Eric Dumazet <edumazet@google.com>,
         Jakub Kicinski <kuba@kernel.org>,
         Paolo Abeni <pabeni@redhat.com>
 Subject: Re: [PATCH net-next v1 1/1] ieee802154: ca8210: Remove stray
  gpiod_unexport() call
-Message-ID: <20230529101213.46f4f2b1@xps-13>
-In-Reply-To: <20230528140938.34034-1-andriy.shevchenko@linux.intel.com>
+Message-ID: <ZHWo3LHLunOkXaqW@corigine.com>
 References: <20230528140938.34034-1-andriy.shevchenko@linux.intel.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230528140938.34034-1-andriy.shevchenko@linux.intel.com>
+X-ClientProxiedBy: AS4P189CA0019.EURP189.PROD.OUTLOOK.COM
+ (2603:10a6:20b:5db::10) To PH0PR13MB4842.namprd13.prod.outlook.com
+ (2603:10b6:510:78::6)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|LV8PR13MB6494:EE_
+X-MS-Office365-Filtering-Correlation-Id: 147bafe8-0630-40b2-7bd6-08db60e169b9
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: yIx8WZlsgCbrXKLR2DHKBdZmyv8lMGjLelfncKv9MItdhM1nZnIjxzAnh5lvBdcZoNSolHQGnvpIT9/552RN7rfX7d6TMnxPUBVa62vyXKx4egf4cHjBFljMYv7Wda2GpFBZfl9b2wb9Z69UR4Csffx5Rmiqo02gpeiZD4NehiwVnURuQiDVhAzdlfruXXyB1oztAOPOU9KIjxyzi/qmZzaki4+Matawi4ewvpX3/HkVHC4sMTPFthu622pasCGlt929q9j8s4bJWK6wAofiojO1lAw4Tpm8hxSk8Kg2pZomHRlCR0eIjxcMArK5zDkCYhTsgMwtX80WKXv1NugOqK5qja12h9LybzVYkmu6cTfEXVM3UCql74gb2fb7HAYwpY4N7coBFnIDwjdg7DZb9V148XEbQ9Tj0rxN9kD5b3UzNNNqfLAvZzfoFP+5JsgpNrbLs8e1tO/9M2/+BLV96Mn6+oDdadT326c2CpnW02Q7RB/xzNR9wqqcwwXHOSS/uHIVzhLs+6v57q1M0IbXpuX7lHRjWFR0pv+Ix2Rve4Hw7Kr60wYNECiidrgOUxPm
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39840400004)(396003)(346002)(376002)(366004)(136003)(451199021)(478600001)(54906003)(8676002)(8936002)(7416002)(44832011)(5660300002)(36756003)(2906002)(4744005)(86362001)(4326008)(6916009)(66556008)(66476007)(66946007)(316002)(38100700002)(41300700001)(2616005)(186003)(6506007)(6512007)(6486002)(6666004);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?JmCjG4Sp4T1ByPBNA06rVgXOe1TpcqGHATgK2Cc8tqItJWPzbOMMv1wcoFg6?=
+ =?us-ascii?Q?J6dUNCylMD1opbaNPuX+yPs+0maNDk5Zkv/jg92FFz8SouWHy23KkEk4Idfs?=
+ =?us-ascii?Q?JzzB6fi+jlq1hYqDGUDeZWWLWRZenFarb82NvdtyF5m28E8BVvApHHQ0Ka7M?=
+ =?us-ascii?Q?liE9dareWgbFhZFM3A+JY1rx/V3HzZJDf9mDvjg9GUQwHQ3G/j1zGXkt2pDg?=
+ =?us-ascii?Q?jwx78SYTtHXZKzE+uwh36unP2dyttZqEy/4TjK70HXKSNzTKG4smU66JQVh1?=
+ =?us-ascii?Q?okvzga/53sxwyiEcQ6CxXQ9atxHkg2LWqS2iBZ86niQKC65XTZLN7bVvFfon?=
+ =?us-ascii?Q?JQTfsr5TWagyij9U0vMLy8mOa/+2N7RjayMwQMUI9w+7u65JuULxB90mXvMS?=
+ =?us-ascii?Q?QB0AvDSDeIx1ihHuMjDFkRSf5KrkmbCjT2cXjFiivGA9aIEzirfAOAaF7WOw?=
+ =?us-ascii?Q?e5Y6Alhia9Z33j/PO2Pub/mlHObaozLtybxPq+1PMsh/QLSZK62nNGB36HrQ?=
+ =?us-ascii?Q?hBaqC4I4nhuO4KHZGp7+YYnVDAvj9iSLtbsCaMB3ZQibA8gZlLYUeDmbqKNl?=
+ =?us-ascii?Q?naN+MFrO7f0ntLoD7v1lFRulBnQvQkqR34PJU3RnnKXvCM11Zhr9bOOr3AGm?=
+ =?us-ascii?Q?QarZNxnsNCyELT3EvUHeM+2bm5mMdF0HvSDnxosV97o7JPxkSPfgcxht1kxQ?=
+ =?us-ascii?Q?tmba8pRzsVZvYaVYr105FjuWDwgONGyNC9af+fdZmM+z4Fuez8XrITnLlRnY?=
+ =?us-ascii?Q?Kl7GDxyz5pNRo5/gpXl625XJ/0ig5Tt94/a6emOAuVAtrwls+WcUC3iCGTcJ?=
+ =?us-ascii?Q?uSOKoPd3U8eX3Uot+L0a8k6SaAbsihcPBzDuUfSfSEJsN71wb7Fr8W7TnVDj?=
+ =?us-ascii?Q?cfttr/uuFPzAc+nyd6ktxxGac4VUemtjIdw5vSDKGK9T08ipuibeW2hXPDUu?=
+ =?us-ascii?Q?o+3Y5lC7MGysIb5+BbygblVhlX4g6JT9fQbD5zKDoGo/M8JNaf7Xx4WyT2vm?=
+ =?us-ascii?Q?GVKJcQCgjI3qkyq5xw1u02PHPOpD/+SLerJv8A9P+VNWxwF8AN6wSWOLXDbe?=
+ =?us-ascii?Q?IrPgiLMaO615Fra5ZI2oLuwGHrlaRYbnZzUoWRm3I+r1gamUAqzm6RuvbiKC?=
+ =?us-ascii?Q?HwuaBYGCbPLm7YDhWeJvOQBJzGCHrNtqDXfsePGiaGVeziOY5EEKH7ysFYCt?=
+ =?us-ascii?Q?TayICZRytZhPQ2LstB3AxHEPH+lPShjAe1CCewGa/4WRmTVYowcKbI1H5ej7?=
+ =?us-ascii?Q?t6NBx1tHnIEj7+w99uekdAtvuiL8XOusmScUAlsRsp9eXyFk2eoCmELpkYg6?=
+ =?us-ascii?Q?Pe42VF66PeLPWn3DCzgfjnXfyVlYEslqsP3Rpw1QDJnaDLK3I5phC9DlAeu0?=
+ =?us-ascii?Q?EBN9v/COZgYV77W4V0ltjWG7IxIWMPYUdITzDCDuetuAvRgkaksJBYfYPgqH?=
+ =?us-ascii?Q?Ll2P8jnKnhBpRD/umMhACMY4thGnxd5Xr2y1+sRLrH/8UfZf0RfQKjdP85pI?=
+ =?us-ascii?Q?MKQvx+wWnaXl1YzJzvVdDLiKWCX59hbXXPSk/V9sc1bVi+7NJ1yZU56wc2A3?=
+ =?us-ascii?Q?gg9Ro7zC4TF7Y6eYkEPbUCbBcKmWwz5/NzvJNfQaCHym80Z/IRZtBuJYfuC5?=
+ =?us-ascii?Q?xrNrmBmVRG7u1ZQ1bYEWt9pmlJ8L2FwrSrWKGjgINBG8QWH3qag/WxTMZyjQ?=
+ =?us-ascii?Q?mYjaKA=3D=3D?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 147bafe8-0630-40b2-7bd6-08db60e169b9
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 May 2023 07:42:26.2517
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Etn4apLQLs655MVtJCHO1BpWYEhPV3srsuCRCss9M+n0BHOEo5Ouq/GwtehdNyK7EyB2zV/RI5ynTxgVBBwFJJ7avpyFQGJEbRx5P14hEX4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR13MB6494
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi Andy,
-
-andriy.shevchenko@linux.intel.com wrote on Sun, 28 May 2023 17:09:38
-+0300:
-
+On Sun, May 28, 2023 at 05:09:38PM +0300, Andy Shevchenko wrote:
 > There is no gpiod_export() and gpiod_unexport() looks pretty much stray.
 > The gpiod_export() and gpiod_unexport() shouldn't be used in the code,
 > GPIO sysfs is deprecated. That said, simply drop the stray call.
->=20
+> 
 > Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 
-Any reason not to consider a backport into stable kernels?
-Cc: stable + Fixes would certainly be welcome in this case?
+Reviewed-by: Simon Horman <simon.horman@corigine.com>
 
-> ---
->  drivers/net/ieee802154/ca8210.c | 1 -
->  1 file changed, 1 deletion(-)
->=20
-> diff --git a/drivers/net/ieee802154/ca8210.c b/drivers/net/ieee802154/ca8=
-210.c
-> index a2d242034220..f9b10e84de06 100644
-> --- a/drivers/net/ieee802154/ca8210.c
-> +++ b/drivers/net/ieee802154/ca8210.c
-> @@ -2855,7 +2855,6 @@ static int ca8210_interrupt_init(struct spi_device =
-*spi)
->  	);
->  	if (ret) {
->  		dev_crit(&spi->dev, "request_irq %d failed\n", pdata->irq_id);
-> -		gpiod_unexport(gpio_to_desc(pdata->gpio_irq));
->  		gpio_free(pdata->gpio_irq);
->  	}
-> =20
-
-
-Thanks,
-Miqu=C3=A8l
