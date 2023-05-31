@@ -2,61 +2,113 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6E01C7EE32
-	for <linux-wpan@archiver.kernel.org>; Wed, 31 May 2023 07:51:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7457C7EE23
+	for <linux-wpan@archiver.kernel.org>; Wed, 31 May 2023 13:37:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234851AbjEaHvp (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 31 May 2023 03:51:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54956 "EHLO
+        id S235905AbjEaNhl (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 31 May 2023 09:37:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53332 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234347AbjEaHvP (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 31 May 2023 03:51:15 -0400
-X-Greylist: delayed 483 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 31 May 2023 00:50:56 PDT
-Received: from mail.durme.pl (mail.durme.pl [217.182.69.186])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3245119B
-        for <linux-wpan@vger.kernel.org>; Wed, 31 May 2023 00:50:56 -0700 (PDT)
-Received: by mail.durme.pl (Postfix, from userid 1002)
-        id 8480349AFA; Wed, 31 May 2023 07:41:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=durme.pl; s=mail;
-        t=1685518972; bh=hFxZwVw4rIL+JwfEOGI47p+fdoVOAeqVswP6NWoHSHQ=;
-        h=Date:From:To:Subject:From;
-        b=LuH2ZKD9HcvSjbCBaq8Ew3xExz88jzfy9DFt5NjpyGLaJ/Vt6z/LvMejBqSgtdyBv
-         cSX928E67Zd+BvhbjixjrPhBFJCl2H1uEtqV5IUytE+6mxHByTFHwae6pPY3A6R+fY
-         YPKeJ+zfVtVv0KXBpA74loRKmkOMCgHNp08EKQ0M+vAGjKXnfCIDVYhdmKevlqhPCw
-         ZAoZHeWxwbMTHf9QkGgzsXWEob5lG2PbPsdu+nhgdV/E7M5JhDxoNBszbuofba/Z/n
-         Y6TGgl5xEm+iRqgNIVnuHtAbUQ4HMeVewsnuzektVWvH5lps/TvCXw+rzBm9q0m/1F
-         u+QxDweRWT9lQ==
-Received: by mail.durme.pl for <linux-wpan@vger.kernel.org>; Wed, 31 May 2023 07:41:00 GMT
-Message-ID: <20230531064500-0.1.28.9j9r.0.8j41kkjanm@durme.pl>
-Date:   Wed, 31 May 2023 07:41:00 GMT
-From:   "Krystian Wieczorek" <krystian.wieczorek@durme.pl>
-To:     <linux-wpan@vger.kernel.org>
-Subject: W sprawie samochodu
-X-Mailer: mail.durme.pl
+        with ESMTP id S235992AbjEaNhc (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 31 May 2023 09:37:32 -0400
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6761F13D;
+        Wed, 31 May 2023 06:37:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1685540251; x=1717076251;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=4j+SR6j6Y91MTRtLsgAmtEiec0cpzY168prO2t2ffXI=;
+  b=QwiOrhxXqu8xzIkBlfyR1A4WYFd0Zlhe2q+F1oe/KDJVD4A1Js4SnhGp
+   0sneh+JEp/EW7Py/XTnxmneL3TLE3lJjknty80kmnLqYxIWc7/BPav+GX
+   yPxKCxDdCMtdxNLjNMJQF6ZmgUUxTxys7imWPJ51zVOwGcVsvWcIdbR8f
+   VDFORMg90Oh2y74i8vVuwQ3G8cIQyrVc8C9ZOaLaZYFSKpu8qAuF+OkkX
+   0hmn4dMk4x7ZnlMkZUA9H55tIXeSnAbCU/ZnMaX1GO1Nz2HxfczxHbYMN
+   +BUivC13agqRZmlw/e9aO6dzqC30ZPpf+DojIB8DD3zMD8+LHx+RHipsi
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10727"; a="421005390"
+X-IronPort-AV: E=Sophos;i="6.00,207,1681196400"; 
+   d="scan'208";a="421005390"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 May 2023 06:37:30 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10727"; a="736673988"
+X-IronPort-AV: E=Sophos;i="6.00,207,1681196400"; 
+   d="scan'208";a="736673988"
+Received: from lkp-server01.sh.intel.com (HELO fb1ced2c09fb) ([10.239.97.150])
+  by orsmga008.jf.intel.com with ESMTP; 31 May 2023 06:37:25 -0700
+Received: from kbuild by fb1ced2c09fb with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1q4M0y-0001Mx-1R;
+        Wed, 31 May 2023 13:37:24 +0000
+Date:   Wed, 31 May 2023 21:36:39 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Breno Leitao <leitao@debian.org>, dsahern@kernel.org,
+        willemdebruijn.kernel@gmail.com,
+        Remi Denis-Courmont <courmisch@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Alexander Aring <alex.aring@gmail.com>,
+        Stefan Schmidt <stefan@datenfreihafen.org>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        Matthieu Baerts <matthieu.baerts@tessares.net>,
+        Mat Martineau <martineau@kernel.org>,
+        Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+        Xin Long <lucien.xin@gmail.com>
+Cc:     oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org, leit@fb.com,
+        axboe@kernel.dk, asml.silence@gmail.com,
+        linux-kernel@vger.kernel.org, dccp@vger.kernel.org,
+        linux-wpan@vger.kernel.org, mptcp@lists.linux.dev,
+        linux-sctp@vger.kernel.org
+Subject: Re: [PATCH net-next v4] net: ioctl: Use kernel memory on protocol
+ ioctl callbacks
+Message-ID: <202305312111.1m4i6rKU-lkp@intel.com>
+References: <20230530175403.2434218-1-leitao@debian.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230530175403.2434218-1-leitao@debian.org>
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Dzie=C5=84 dobry,
+Hi Breno,
 
-chcieliby=C5=9Bmy zapewni=C4=87 Pa=C5=84stwu kompleksowe rozwi=C4=85zania=
-, je=C5=9Bli chodzi o system monitoringu GPS.
+kernel test robot noticed the following build errors:
 
-Precyzyjne monitorowanie pojazd=C3=B3w na mapach cyfrowych, =C5=9Bledzeni=
-e ich parametr=C3=B3w eksploatacyjnych w czasie rzeczywistym oraz kontrol=
-a paliwa to kluczowe funkcjonalno=C5=9Bci naszego systemu.=20
+[auto build test ERROR on net-next/main]
 
-Organizowanie pracy pracownik=C3=B3w jest dzi=C4=99ki temu prostsze i bar=
-dziej efektywne, a oszcz=C4=99dno=C5=9Bci i optymalizacja w zakresie pono=
-szonych koszt=C3=B3w, maj=C4=85 dla ka=C5=BCdego przedsi=C4=99biorcy ogro=
-mne znaczenie.
+url:    https://github.com/intel-lab-lkp/linux/commits/Breno-Leitao/net-ioctl-Use-kernel-memory-on-protocol-ioctl-callbacks/20230531-015554
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20230530175403.2434218-1-leitao%40debian.org
+patch subject: [PATCH net-next v4] net: ioctl: Use kernel memory on protocol ioctl callbacks
+config: m68k-allmodconfig (https://download.01.org/0day-ci/archive/20230531/202305312111.1m4i6rKU-lkp@intel.com/config)
+compiler: m68k-linux-gcc (GCC) 12.3.0
+reproduce (this is a W=1 build):
+        mkdir -p ~/bin
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://github.com/intel-lab-lkp/linux/commit/f97a3206f5ae59ecb0c7105225c5230b343c6c54
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Breno-Leitao/net-ioctl-Use-kernel-memory-on-protocol-ioctl-callbacks/20230531-015554
+        git checkout f97a3206f5ae59ecb0c7105225c5230b343c6c54
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.3.0 ~/bin/make.cross W=1 O=build_dir ARCH=m68k olddefconfig
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.3.0 ~/bin/make.cross W=1 O=build_dir ARCH=m68k SHELL=/bin/bash
 
-Dopasujemy nasz=C4=85 ofert=C4=99 do Pa=C5=84stwa oczekiwa=C5=84 i potrze=
-b organizacji. Czy mogliby=C5=9Bmy porozmawia=C4=87 o naszej propozycji?
+If you fix the issue, kindly add following tag where applicable
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202305312111.1m4i6rKU-lkp@intel.com/
 
+All errors (new ones prefixed by >>):
 
-Pozdrawiam
-Krystian Wieczorek
+   m68k-linux-ld: net/core/sock.o: in function `sk_ioctl':
+>> sock.c:(.text+0xc7e): undefined reference to `ip6mr_sk_ioctl'
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
