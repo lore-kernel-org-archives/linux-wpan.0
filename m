@@ -2,31 +2,31 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8038CC7EE2E
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92C21C7EE33
 	for <linux-wpan@archiver.kernel.org>; Thu,  1 Jun 2023 15:50:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233469AbjFAPuU (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Thu, 1 Jun 2023 11:50:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49236 "EHLO
+        id S233694AbjFAPuV (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Thu, 1 Jun 2023 11:50:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50058 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235166AbjFAPtX (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 1 Jun 2023 11:49:23 -0400
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3DED10DC;
-        Thu,  1 Jun 2023 08:48:48 -0700 (PDT)
+        with ESMTP id S235132AbjFAPtV (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 1 Jun 2023 11:49:21 -0400
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::226])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E812910CA;
+        Thu,  1 Jun 2023 08:48:44 -0700 (PDT)
 X-GND-Sasl: miquel.raynal@bootlin.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1685634527;
+        t=1685634523;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=7gtO8YzcVvtdc2HoI0634FJxvpThUhRmuHAgUwSgguM=;
-        b=WScSjCz3pit9oz9ThBsTSd9g1t3ozxUnTrLIz8WnJbBy2IIeNGCDfn5OisY/D7XWtBIJCK
-        KL6nO+8//+0SqsC2A4/1EBCFuMx1kZOH+VZSxPRsDBQpXWoDfNW/tYdLoYPnWjGDsVbSrj
-        E9oPL5GFhpr4v/G11CBn9zdZh6ENCYhiX9/ci2yjZRHYb8HCAN4QmMrE8MI5vx7CGd7Vt+
-        VSI12J2btEAdOn3clQKTWS+GqYk4II/U3uSfrGoP9gRCJPswGvWYSLCVxaVfkmJ53BzXv/
-        DXLHTt96zMfBEUwXBnT8qKUk+Cd0xPulr/ekP8fJXrdM+GEABIvQwzRK6EpeNw==
+        bh=yPBMLO2dNP0CXIke8fl23X5eOuCKHmb7r4HqmpjMBHE=;
+        b=AAZuaTk+xtlyOdDWfotePXsuPbOcSWYJupXU6j1zfsbD9B20pzDtzTeEuuk3RvKtI5cKFz
+        fjlAIveJ0GZdnWwDGYeVgC684sa/lQmsjt0xw3tNoZQGs3SXomEpXYnCJQ/nsSq1jelZBG
+        jDY5Y6zpfV97BssHTxGisai0w8WNhgpGRhCCEU0v26PejFiOV20o9ZafvapOniAKo5WIkb
+        bZGsPVWY0HiXD3azCM41u3pRyYjtpl4wrc3uLjUd+kqdykWiIYd4RbiXw/J9Grr0WqWbl1
+        0Y8l0Uy68CIy8k2WhB2T8MdlzwDDisxbItgi3HM0Bq34sKqO8ITBsDAhi6+vuA==
 X-GND-Sasl: miquel.raynal@bootlin.com
 X-GND-Sasl: miquel.raynal@bootlin.com
 X-GND-Sasl: miquel.raynal@bootlin.com
@@ -41,8 +41,8 @@ X-GND-Sasl: miquel.raynal@bootlin.com
 X-GND-Sasl: miquel.raynal@bootlin.com
 X-GND-Sasl: miquel.raynal@bootlin.com
 X-GND-Sasl: miquel.raynal@bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id ACD12C0018;
-        Thu,  1 Jun 2023 15:48:45 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 4D4BAC000F;
+        Thu,  1 Jun 2023 15:48:41 +0000 (UTC)
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
 To:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
@@ -58,9 +58,9 @@ Cc:     "David S. Miller" <davem@davemloft.net>,
         Guilhem Imberton <guilhem.imberton@qorvo.com>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
         Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: [PATCH wpan-next 11/11] ieee802154: Give the user the association list
-Date:   Thu,  1 Jun 2023 17:48:17 +0200
-Message-Id: <20230601154817.754519-12-miquel.raynal@bootlin.com>
+Subject: [PATCH wpan-next 09/11] mac802154: Follow the number of associated devices
+Date:   Thu,  1 Jun 2023 17:48:15 +0200
+Message-Id: <20230601154817.754519-10-miquel.raynal@bootlin.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230601154817.754519-1-miquel.raynal@bootlin.com>
 References: <20230601154817.754519-1-miquel.raynal@bootlin.com>
@@ -70,204 +70,112 @@ Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Upon request, we must be able to provide to the user the list of
-associations currently in place. Let's add a new netlink command and
-attribute for this purpose.
+Track the count of associated devices. Limit the number of associations
+using the value provided by the user if any. If we reach the maximum
+number of associations, we tell the device we are at capacity. If the
+user do not want to accept any more associations, it may specify the
+value 0 to the maximum number of associations, which will lead to an
+access denied error status returned to the peers trying to associate.
 
 Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
 ---
- include/net/nl802154.h    |  18 ++++++-
- net/ieee802154/nl802154.c | 107 ++++++++++++++++++++++++++++++++++++++
- 2 files changed, 123 insertions(+), 2 deletions(-)
+ include/net/cfg802154.h |  1 +
+ net/ieee802154/core.c   |  1 +
+ net/mac802154/cfg.c     |  1 +
+ net/mac802154/scan.c    | 33 +++++++++++++++++++++++----------
+ 4 files changed, 26 insertions(+), 10 deletions(-)
 
-diff --git a/include/net/nl802154.h b/include/net/nl802154.h
-index 8b26faae49e8..4c752f799957 100644
---- a/include/net/nl802154.h
-+++ b/include/net/nl802154.h
-@@ -81,6 +81,7 @@ enum nl802154_commands {
- 	NL802154_CMD_ASSOCIATE,
- 	NL802154_CMD_DISASSOCIATE,
- 	NL802154_CMD_SET_MAX_ASSOCIATIONS,
-+	NL802154_CMD_LIST_ASSOCIATIONS,
- 
- 	/* add new commands above here */
- 
-@@ -151,6 +152,7 @@ enum nl802154_attrs {
- 	NL802154_ATTR_SCAN_DONE_REASON,
- 	NL802154_ATTR_BEACON_INTERVAL,
- 	NL802154_ATTR_MAX_ASSOCIATIONS,
-+	NL802154_ATTR_PEER,
- 
- 	/* add attributes here, update the policy in nl802154.c */
- 
-@@ -389,8 +391,6 @@ enum nl802154_supported_bool_states {
- 	NL802154_SUPPORTED_BOOL_MAX = __NL802154_SUPPORTED_BOOL_AFTER_LAST - 1
+diff --git a/include/net/cfg802154.h b/include/net/cfg802154.h
+index d7583598b290..f18b93f9684f 100644
+--- a/include/net/cfg802154.h
++++ b/include/net/cfg802154.h
+@@ -507,6 +507,7 @@ struct wpan_dev {
+ 	struct list_head children;
+ 	unsigned int association_generation;
+ 	unsigned int max_associations;
++	unsigned int nchildren;
  };
  
--#ifdef CONFIG_IEEE802154_NL802154_EXPERIMENTAL
--
- enum nl802154_dev_addr_modes {
- 	NL802154_DEV_ADDR_NONE,
- 	__NL802154_DEV_ADDR_INVALID,
-@@ -410,12 +410,26 @@ enum nl802154_dev_addr_attrs {
- 	NL802154_DEV_ADDR_ATTR_SHORT,
- 	NL802154_DEV_ADDR_ATTR_EXTENDED,
- 	NL802154_DEV_ADDR_ATTR_PAD,
-+	NL802154_DEV_ADDR_ATTR_PEER_TYPE,
+ #define to_phy(_dev)	container_of(_dev, struct wpan_phy, dev)
+diff --git a/net/ieee802154/core.c b/net/ieee802154/core.c
+index 65bb656db9b4..6f7eecdc4067 100644
+--- a/net/ieee802154/core.c
++++ b/net/ieee802154/core.c
+@@ -212,6 +212,7 @@ static void cfg802154_free_peer_structures(struct wpan_dev *wpan_dev)
+ 		kfree(child);
+ 	}
  
- 	/* keep last */
- 	__NL802154_DEV_ADDR_ATTR_AFTER_LAST,
- 	NL802154_DEV_ADDR_ATTR_MAX = __NL802154_DEV_ADDR_ATTR_AFTER_LAST - 1
- };
++	wpan_dev->nchildren = 0;
+ 	wpan_dev->association_generation++;
  
-+enum nl802154_peer_type {
-+	NL802154_PEER_TYPE_UNSPEC,
-+
-+	NL802154_PEER_TYPE_PARENT,
-+	NL802154_PEER_TYPE_CHILD,
-+
-+	/* keep last */
-+	__NL802154_PEER_TYPE_AFTER_LAST,
-+	NL802154_PEER_TYPE_MAX = __NL802154_PEER_TYPE_AFTER_LAST - 1
-+};
-+
-+#ifdef CONFIG_IEEE802154_NL802154_EXPERIMENTAL
-+
- enum nl802154_key_id_modes {
- 	NL802154_KEY_ID_MODE_IMPLICIT,
- 	NL802154_KEY_ID_MODE_INDEX,
-diff --git a/net/ieee802154/nl802154.c b/net/ieee802154/nl802154.c
-index e16e57fc34d0..e26d7cec02ce 100644
---- a/net/ieee802154/nl802154.c
-+++ b/net/ieee802154/nl802154.c
-@@ -235,6 +235,7 @@ static const struct nla_policy nl802154_policy[NL802154_ATTR_MAX+1] = {
- 	[NL802154_ATTR_BEACON_INTERVAL] =
- 		NLA_POLICY_MAX(NLA_U8, IEEE802154_ACTIVE_SCAN_DURATION),
- 	[NL802154_ATTR_MAX_ASSOCIATIONS] = { .type = NLA_U32 },
-+	[NL802154_ATTR_PEER] = { .type = NLA_NESTED },
+ 	mutex_unlock(&wpan_dev->association_lock);
+diff --git a/net/mac802154/cfg.c b/net/mac802154/cfg.c
+index c27c05e825ff..65a8806f9ddb 100644
+--- a/net/mac802154/cfg.c
++++ b/net/mac802154/cfg.c
+@@ -458,6 +458,7 @@ static int mac802154_disassociate_child(struct wpan_phy *wpan_phy,
+ 		return ret;
  
- #ifdef CONFIG_IEEE802154_NL802154_EXPERIMENTAL
- 	[NL802154_ATTR_SEC_ENABLED] = { .type = NLA_U8, },
-@@ -1717,6 +1718,107 @@ static int nl802154_set_max_associations(struct sk_buff *skb, struct genl_info *
- 	return 0;
- }
+ 	list_del(&child->node);
++	wpan_dev->nchildren--;
+ 	wpan_dev->association_generation++;
+ 	kfree(child);
  
-+static int nl802154_send_peer_info(struct sk_buff *msg,
-+				   struct netlink_callback *cb,
-+				   u32 seq, int flags,
-+				   struct cfg802154_registered_device *rdev,
-+				   struct wpan_dev *wpan_dev,
-+				   struct ieee802154_pan_device *peer,
-+				   enum nl802154_peer_type type)
-+{
-+	struct nlattr *nla;
-+	void *hdr;
-+
-+	ASSERT_RTNL();
-+
-+	hdr = nl802154hdr_put(msg, NETLINK_CB(cb->skb).portid, seq, flags,
-+			      NL802154_CMD_LIST_ASSOCIATIONS);
-+	if (!hdr)
-+		return -ENOBUFS;
-+
-+	genl_dump_check_consistent(cb, hdr);
-+
-+	if (nla_put_u32(msg, NL802154_ATTR_GENERATION,
-+			wpan_dev->association_generation))
-+		goto nla_put_failure;
-+
-+	nla = nla_nest_start_noflag(msg, NL802154_ATTR_PEER);
-+	if (!nla)
-+		goto nla_put_failure;
-+
-+	if (nla_put_u8(msg, NL802154_DEV_ADDR_ATTR_PEER_TYPE, type))
-+		goto nla_put_failure;
-+
-+	if (nla_put_u8(msg, NL802154_DEV_ADDR_ATTR_MODE, peer->mode))
-+		goto nla_put_failure;
-+
-+	if (nla_put(msg, NL802154_DEV_ADDR_ATTR_SHORT,
-+		    IEEE802154_SHORT_ADDR_LEN, &peer->short_addr))
-+		goto nla_put_failure;
-+
-+	if (nla_put(msg, NL802154_DEV_ADDR_ATTR_EXTENDED,
-+		    IEEE802154_EXTENDED_ADDR_LEN, &peer->extended_addr))
-+		goto nla_put_failure;
-+
-+	nla_nest_end(msg, nla);
-+
-+	genlmsg_end(msg, hdr);
-+
-+	return 0;
-+
-+ nla_put_failure:
-+	genlmsg_cancel(msg, hdr);
-+	return -EMSGSIZE;
-+}
-+
-+static int nl802154_list_associations(struct sk_buff *skb,
-+				      struct netlink_callback *cb)
-+{
-+	struct cfg802154_registered_device *rdev;
-+	struct ieee802154_pan_device *child;
-+	struct wpan_dev *wpan_dev;
-+	int err;
-+
-+	err = nl802154_prepare_wpan_dev_dump(skb, cb, &rdev, &wpan_dev);
-+	if (err)
-+		return err;
-+
-+	mutex_lock(&wpan_dev->association_lock);
-+
-+	if (cb->args[2])
-+		goto out;
-+
-+	cb->seq = wpan_dev->association_generation;
-+
-+	if (wpan_dev->parent) {
-+		err = nl802154_send_peer_info(skb, cb, cb->nlh->nlmsg_seq,
-+					      NLM_F_MULTI, rdev, wpan_dev,
-+					      wpan_dev->parent,
-+					      NL802154_PEER_TYPE_PARENT);
-+		if (err < 0)
-+			goto out_err;
-+	}
-+
-+	list_for_each_entry(child, &wpan_dev->children, node) {
-+		err = nl802154_send_peer_info(skb, cb, cb->nlh->nlmsg_seq,
-+					      NLM_F_MULTI, rdev, wpan_dev,
-+					      child,
-+					      NL802154_PEER_TYPE_CHILD);
-+		if (err < 0)
-+			goto out_err;
-+	}
-+
-+	cb->args[2] = 1;
-+out:
-+	err = skb->len;
-+out_err:
-+	mutex_unlock(&wpan_dev->association_lock);
-+
-+	nl802154_finish_wpan_dev_dump(rdev);
-+
-+	return err;
-+}
-+
- #ifdef CONFIG_IEEE802154_NL802154_EXPERIMENTAL
- static const struct nla_policy nl802154_dev_addr_policy[NL802154_DEV_ADDR_ATTR_MAX + 1] = {
- 	[NL802154_DEV_ADDR_ATTR_PAN_ID] = { .type = NLA_U16 },
-@@ -2861,6 +2963,11 @@ static const struct genl_ops nl802154_ops[] = {
- 		.internal_flags = NL802154_FLAG_NEED_NETDEV |
- 				  NL802154_FLAG_NEED_RTNL,
- 	},
-+	{
-+		.cmd = NL802154_CMD_LIST_ASSOCIATIONS,
-+		.dumpit = nl802154_list_associations,
-+		/* can be retrieved by unprivileged users */
-+	},
- #ifdef CONFIG_IEEE802154_NL802154_EXPERIMENTAL
- 	{
- 		.cmd = NL802154_CMD_SET_SEC_PARAMS,
+diff --git a/net/mac802154/scan.c b/net/mac802154/scan.c
+index 9f55b2314fe5..fbbae7586ab1 100644
+--- a/net/mac802154/scan.c
++++ b/net/mac802154/scan.c
+@@ -801,20 +801,32 @@ int mac802154_process_association_req(struct ieee802154_sub_if_data *sdata,
+ 	child->mode = IEEE802154_EXTENDED_ADDRESSING;
+ 	ceaddr = swab64((__force u64)child->extended_addr);
+ 
+-	assoc_resp_pl.status = IEEE802154_ASSOCIATION_SUCCESSFUL;
+-	if (assoc_req_pl.alloc_addr) {
+-		assoc_resp_pl.short_addr = cfg802154_get_free_short_addr(wpan_dev);
+-		child->mode = IEEE802154_SHORT_ADDRESSING;
++	if (wpan_dev->nchildren >= wpan_dev->max_associations) {
++		if (!wpan_dev->max_associations)
++			assoc_resp_pl.status = IEEE802154_PAN_ACCESS_DENIED;
++		else
++			assoc_resp_pl.status = IEEE802154_PAN_AT_CAPACITY;
++		assoc_resp_pl.short_addr = cpu_to_le16(IEEE802154_ADDR_SHORT_BROADCAST);
++		dev_dbg(&sdata->dev->dev,
++			"Refusing ASSOC REQ from child %8phC, %s\n", &ceaddr,
++			assoc_resp_pl.status == IEEE802154_PAN_ACCESS_DENIED ?
++			"access denied" : "too many children");
+ 	} else {
+-		assoc_resp_pl.short_addr = cpu_to_le16(IEEE802154_ADDR_SHORT_UNSPEC);
++		assoc_resp_pl.status = IEEE802154_ASSOCIATION_SUCCESSFUL;
++		if (assoc_req_pl.alloc_addr) {
++			assoc_resp_pl.short_addr = cfg802154_get_free_short_addr(wpan_dev);
++			child->mode = IEEE802154_SHORT_ADDRESSING;
++		} else {
++			assoc_resp_pl.short_addr = cpu_to_le16(IEEE802154_ADDR_SHORT_UNSPEC);
++		}
++		child->short_addr = assoc_resp_pl.short_addr;
++		dev_dbg(&sdata->dev->dev,
++			"Accepting ASSOC REQ from child %8phC, providing short address 0x%04x\n",
++			&ceaddr, le16_to_cpu(child->short_addr));
+ 	}
+-	child->short_addr = assoc_resp_pl.short_addr;
+-	dev_dbg(&sdata->dev->dev,
+-		"Accepting ASSOC REQ from child %8phC, providing short address 0x%04x\n",
+-		&ceaddr, le16_to_cpu(child->short_addr));
+ 
+ 	ret = mac802154_send_association_resp_locked(sdata, child, &assoc_resp_pl);
+-	if (ret) {
++	if (ret || assoc_resp_pl.status != IEEE802154_ASSOCIATION_SUCCESSFUL) {
+ 		kfree(child);
+ 		goto unlock;
+ 	}
+@@ -838,6 +850,7 @@ int mac802154_process_association_req(struct ieee802154_sub_if_data *sdata,
+ 	}
+ 
+ 	list_add(&child->node, &wpan_dev->children);
++	wpan_dev->nchildren++;
+ 	wpan_dev->association_generation++;
+ 
+ unlock:
 -- 
 2.34.1
 
