@@ -2,168 +2,104 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B521DC7EE24
-	for <linux-wpan@archiver.kernel.org>; Fri,  2 Jun 2023 15:54:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A3C3C7EE2A
+	for <linux-wpan@archiver.kernel.org>; Fri,  2 Jun 2023 16:19:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235672AbjFBPyy (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Fri, 2 Jun 2023 11:54:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56852 "EHLO
+        id S236607AbjFBQTP (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Fri, 2 Jun 2023 12:19:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44464 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234143AbjFBPyw (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Fri, 2 Jun 2023 11:54:52 -0400
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2104.outbound.protection.outlook.com [40.107.220.104])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 293CB197;
-        Fri,  2 Jun 2023 08:54:51 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=SVk2qzI4jV9b+M3kXy3sK1ECPIlqm7PT7+Fk4Iae9Y/iyhyKlKIMlYLZG2wvGFiuoW7Hm+Hcdj0jQEfuPlqhehyQyRzm/jex5oYdhl35tq/UGMI/JEDRL4H4d3cijNRLtbIu83TyJAR6J/FvJgPkWyXbu7W3gHkHTNP4PAa+q0UAi57DCvvzaQeIMYjJp9PyLhahztan86OncERRrkdmGPqgTt9j1PuhpU54J2D2Ftq3T3KueR3EchzXnyC6pCiGe1Jahd3RDHWSjj90Yvsc24BoWvkCSkDH4vv/QyMtqfc+dwL9H5zlJnKhCSlEJIdWM3mry5GG1AvGcAanSQ2a+w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=qQWT5j6agbxv/nLRvMNWHb+NADvCANDxTx3NySUGsf4=;
- b=mkpCYTKNKe7a5urmaN9m6aDA/OAgPZ1d5fMsO57S+OBZMKyAL4s1FGvCEniQhJedJ2zPypfFxxJo7FQVafAovgwCenlD56KS8qnyUW+Py8nhuLbn/QGNMFgsrRDoQ/hO/IdxhESjsdVXKVfaICdY0i7DRlfm+2CygqULYN3GXVz+6vXEOXpnJA9Umk0RldJBx0kXAbWziKZ1AMec4c+hYcQscO4oqLnjtBRn3ormCBPVdfaRzFjm1E8q3L57+/0p8JDnL60Ewulwnbf2/P3jyVgA3U3VhsD0a0TBpOwqq4SqKwHKhCT2X4Rxa4sfXMUuPTOW8etCaIetMSp9HOjztA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
- dkim=pass header.d=corigine.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=qQWT5j6agbxv/nLRvMNWHb+NADvCANDxTx3NySUGsf4=;
- b=Codth0+ZUKYDYhG53y1Fy+yYPgjeiqQgA1GXaYntHg0JNnIs1FtreN6Vu5zUKCDlBSnBvE/HWo6PKA+Gw55IYKWRD3lAPElTB+gD90bNvc/h3eoLmmO+/t2KJ4MRWyHErwG1qAzCWhanvhfpYWNWt4Uzv0FbiWAPnSG/atalcVY=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=corigine.com;
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
- by CO6PR13MB5291.namprd13.prod.outlook.com (2603:10b6:303:146::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6455.24; Fri, 2 Jun
- 2023 15:54:48 +0000
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::5e55:9a39:751f:55f6]) by PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::5e55:9a39:751f:55f6%3]) with mapi id 15.20.6455.026; Fri, 2 Jun 2023
- 15:54:47 +0000
-Date:   Fri, 2 Jun 2023 17:54:40 +0200
-From:   Simon Horman <simon.horman@corigine.com>
-To:     Miquel Raynal <miquel.raynal@bootlin.com>
-Cc:     Alexander Aring <alex.aring@gmail.com>,
-        Stefan Schmidt <stefan@datenfreihafen.org>,
-        linux-wpan@vger.kernel.org,
+        with ESMTP id S236596AbjFBQTO (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 2 Jun 2023 12:19:14 -0400
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5CA61AB;
+        Fri,  2 Jun 2023 09:19:10 -0700 (PDT)
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-3078cc99232so2053910f8f.3;
+        Fri, 02 Jun 2023 09:19:10 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1685722749; x=1688314749;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Df45G13freHV7qKaooKW3cbNcYiTjIevZWnDBJV0Ngs=;
+        b=hUEnD0Ofsj+rzl64sA0vaThqsrkqYoUsUTISenW0qLKAQ6C2Tj+Ai/OLheoQunlaZm
+         PgY00AZi/c/BBWf2gvi5+EOJIAiLgEVFv8EFysrxkP6vDXpGXCWf/eDyY4KTXetUalQi
+         C9PLWxGVedEaoH7U13Lfthaak9DuD+EOg64RDjVtHrBQ8lh24+j4hec3Xg5brqQTY+5A
+         /QpBQKwpwY8phDgnTuKsxSv31Xotp/weBsvGpSDUMiOsIAHJgtNoNk8toAXNrV/LNtNo
+         d3EGoUkTfSHZarrhxesSlnafEdD/F8g7cWQfaqUVNtJe+0VdjORtShHTm1LKlJrkeJqc
+         UCCw==
+X-Gm-Message-State: AC+VfDw6i4lLwfE81t/W2aMQPrNK/X90TvuHKIyBpfavNNIXD9tzio1l
+        Yxvi1yh3A2QGxJGeonJ225o=
+X-Google-Smtp-Source: ACHHUZ7V6s1LqVdQdevjsk3RKa1VPwpouEu01j6+gnTKwWbWp9RyusXrlmogJW9nb4M2BtQB8hHwHg==
+X-Received: by 2002:a5d:65c2:0:b0:30a:dfb4:e300 with SMTP id e2-20020a5d65c2000000b0030adfb4e300mr389381wrw.28.1685722749158;
+        Fri, 02 Jun 2023 09:19:09 -0700 (PDT)
+Received: from gmail.com (fwdproxy-cln-116.fbsv.net. [2a03:2880:31ff:74::face:b00c])
+        by smtp.gmail.com with ESMTPSA id k2-20020a5d4282000000b003047ea78b42sm2075225wrq.43.2023.06.02.09.19.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 02 Jun 2023 09:19:08 -0700 (PDT)
+Date:   Fri, 2 Jun 2023 09:19:06 -0700
+From:   Breno Leitao <leitao@debian.org>
+To:     Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc:     dsahern@kernel.org, Remi Denis-Courmont <courmisch@gmail.com>,
         "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
         Jakub Kicinski <kuba@kernel.org>,
         Paolo Abeni <pabeni@redhat.com>,
-        Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
-        David Girault <david.girault@qorvo.com>,
-        Romuald Despres <romuald.despres@qorvo.com>,
-        Frederic Blain <frederic.blain@qorvo.com>,
-        Nicolas Schodet <nico@ni.fr.eu.org>,
-        Guilhem Imberton <guilhem.imberton@qorvo.com>,
-        Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH wpan-next 04/11] mac802154: Handle associating
-Message-ID: <ZHoQwKiiAhfu74/U@corigine.com>
-References: <20230601154817.754519-1-miquel.raynal@bootlin.com>
- <20230601154817.754519-5-miquel.raynal@bootlin.com>
+        Alexander Aring <alex.aring@gmail.com>,
+        Stefan Schmidt <stefan@datenfreihafen.org>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        Matthieu Baerts <matthieu.baerts@tessares.net>,
+        Mat Martineau <martineau@kernel.org>,
+        Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+        Xin Long <lucien.xin@gmail.com>, leit@fb.com, axboe@kernel.dk,
+        asml.silence@gmail.com, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org, dccp@vger.kernel.org,
+        linux-wpan@vger.kernel.org, mptcp@lists.linux.dev,
+        linux-sctp@vger.kernel.org
+Subject: Re: [PATCH net-next v4] net: ioctl: Use kernel memory on protocol
+ ioctl callbacks
+Message-ID: <ZHoWeiDVoLV1VMpT@gmail.com>
+References: <20230530175403.2434218-1-leitao@debian.org>
+ <6476f0e4b0182_3c8862294b2@willemb.c.googlers.com.notmuch>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230601154817.754519-5-miquel.raynal@bootlin.com>
-X-ClientProxiedBy: AM9P250CA0023.EURP250.PROD.OUTLOOK.COM
- (2603:10a6:20b:21c::28) To PH0PR13MB4842.namprd13.prod.outlook.com
- (2603:10b6:510:78::6)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|CO6PR13MB5291:EE_
-X-MS-Office365-Filtering-Correlation-Id: 147ea2b8-232b-4ca0-af7f-08db6381b131
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: nDyOSmtbJ9rN+bp7zdtteg0FctxrDkYKWpXFsAa7HK4wo9vC5ntwYRn8/UmdTyto9uXfvl2XDg3fabYEzHOIIpjMD0uxl3TP1GMuLwGx1rMIRBio4zVlowJnFwFhB/C0dQ9yMHEJBswRJb20zX8RdblZJKLEmGRNfqw1KNVmUJlDnCIC+7SJhkuoFxk/ysVDXcbpU8Pm+WqLWq588N9+znrMve5bZhDwx+opPLr3tMmpHgQux0vw6qid4OVVV6cA5Z78+llLovE2dM4jC5afSQfJ5cLZKndef5lBNywoLwsYGdR4nGe7FQoTPPCqE5V7M4hsIgHjZQz+j5ZcRmlUPseDLFS8bSyasqcQZvAmGOLafXZItijE53WDIhi45jKZM0H23h5P8afd9UIIVNlfoAOAKEjgVPaTpyP7b7z5H3WKETvEi2nuFkdSFP5SjO9Wwnj+dtH8nd/ZHsEfP+mJbb98JmWrq31Cu7mVAagilN7xj1+gGGTrMK/og9Kq5yhoAvE96k8bRuHZJ9MNWCE7Q5vI2Oe1IZNRyVIXv6n0ph70ymymPRP4T2CCaIN9Z9Dh
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(376002)(366004)(136003)(346002)(396003)(39830400003)(451199021)(36756003)(2616005)(83380400001)(2906002)(86362001)(38100700002)(6486002)(41300700001)(316002)(6666004)(5660300002)(8676002)(8936002)(478600001)(54906003)(66556008)(4326008)(66946007)(6506007)(6512007)(66476007)(26005)(6916009)(186003)(7416002)(44832011);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Dd8ir9jVnW0CbSaX3VOPsGpEmS3stoPqA5UnVzCLITu1ahM2p2evbchrmsQu?=
- =?us-ascii?Q?nuUOQ+s59e+xEfD0m3HpD8mzp9qz9Cr2HINoPLWP4C3gPU1v3cw/5NEBMiJz?=
- =?us-ascii?Q?6wQ1SDBe9tU4nqKtcv100OYg0gIk/JqSFKnCzuIBOCsxBH0xV82t8f2EHwDO?=
- =?us-ascii?Q?uSUtOijBxv7M2qNYoppjJrqiX34IkfWsuhbHSx3wX1YZ8lz7yVkdEbXP8uZ3?=
- =?us-ascii?Q?YnMCqjRcqvYj9YpwZCWzqqUpSrqIhA8F3cxObBMGqKfv/2BW+1uae79Fuk3c?=
- =?us-ascii?Q?uG3Dyx9jSVxx1mqtxyGfvCzCgJb/iml+fjtC/2d11WDyMpvVhzAXuq93Lzzz?=
- =?us-ascii?Q?X+XisuuwVlF357WqTxz6sHjlqUcw78MkCHZmkOo+7cnRpygAgCSw7QWtuGGH?=
- =?us-ascii?Q?CGNStpJKsVQS17T66ba5qPr9KO1JmrTi4GRMeQ5eiILylhEjiyppAnaQyQGs?=
- =?us-ascii?Q?aIjtOljhHHKZBp5blvBIN2WeyXymCeCmkJU8tmoVSm3sB++R0Uucrk6xIEqa?=
- =?us-ascii?Q?mbeUGGg1YVE0oOYpomGfAdMTUki9Nka3MZzCj7+nGEAqFuVtkjkUPKrN+nOF?=
- =?us-ascii?Q?gSIalVkdXtNNxAGJS7/xD25poGeSmI3+EDhbLbjpshWhDltZPsrr0AGvppbG?=
- =?us-ascii?Q?u3u4sOCJK+h8+bQG5KgOdYvyrS3KNUPlxCLd8NMZhmNnXm899NIY7ZU+1W1R?=
- =?us-ascii?Q?UM86LY75zqnnK13QOc+l95i/s/c0FXbMhjWddmZ7kFXWji1/4a+zJ9YVu754?=
- =?us-ascii?Q?O5u7POKFGpEj57EKCRRHIYRM1WTkeCU2f6Dbx7dlwAvPl+d/XzR5cH7PohuT?=
- =?us-ascii?Q?fE/nzh8yfG23K5/MZdmsxjn9Ry8uu1Fer4BdyghCqa4J7pXf+ZelCBX3vdWc?=
- =?us-ascii?Q?qbQXZbYWbc+LEGnec2GrlZng3H7kJy3w/uYuWfNNulsSGhVlMa1x6l8/KMNx?=
- =?us-ascii?Q?NK9lk6tHcmY/hofbzZwgekN1wMrFXY3ZU6fmL6P0rCwb2dnWOcxl90bzi3sf?=
- =?us-ascii?Q?HREnLkTm4pwwsaa09K9p0hmL5rMR41MZqlUR7viukkaWp3kO4PZnkYa+2QYQ?=
- =?us-ascii?Q?4/tfg4TjeAHkmTgGTrnBZGddZC1ALjJIyK4++DtccgWRmTb1Lo1up5Hr10Z4?=
- =?us-ascii?Q?zMHOs7QpOqFCGi6VKZcdqpa5JKouSjJ6Z89J/1nU0sAS532u28Ai9wdx0Rz8?=
- =?us-ascii?Q?gNE3eEQ9HUbg+QoR6jfdzlvKB1+7FwWyMwOI4iaUS3dsDyLohvsoMqEK3yZI?=
- =?us-ascii?Q?zEZOsnG+oNCArZT4Tz5DFX+jbre4wZ4kYSP0BB0pHto9X469c8Sw0bFs2g4f?=
- =?us-ascii?Q?vxfU6kLWxMLMK0YHiGof+5s+MPKa+AGndJpnA4pAkJEjwoe/EBZKKQd07Jjf?=
- =?us-ascii?Q?vRje15raUAsR+oUC1GoOhS5wVh4UY5DK2TbsjpRY4N0DJyY21YP7SD0iv38K?=
- =?us-ascii?Q?tAzr/NRTQgSiVbUdBqGFx+qQsmmHT2qon+6mK17PjlezNvPaWIRVoX8eBglK?=
- =?us-ascii?Q?PfuEi//h/fOxzZzTNrlQnvsmSzRaSy1zPLtQEovIAj9G1ZGFarOOIhZkJizQ?=
- =?us-ascii?Q?Ao0CMYyP74Op+8woeDbb0r7wFvzFDv2uJj9/Pa1jq21uhY5gA/6gxw20CbEu?=
- =?us-ascii?Q?uQ=3D=3D?=
-X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 147ea2b8-232b-4ca0-af7f-08db6381b131
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jun 2023 15:54:47.9058
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: EoGQgMn4iOFsT+QHmkX0YCaCpvyq7bVhmSn4kebXpMmPNchVcb0JoE9qOKPnNxH5DefPh5Rn72MnMR4+vrx74aeWV67JOzOu834ggdtAp1s=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO6PR13MB5291
+In-Reply-To: <6476f0e4b0182_3c8862294b2@willemb.c.googlers.com.notmuch>
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-On Thu, Jun 01, 2023 at 05:48:10PM +0200, Miquel Raynal wrote:
-> Joining a PAN officially goes by associating with a coordinator. This
-> coordinator may have been discovered thanks to the beacons it sent in
-> the past. Add support to the MAC layer for these associations, which
-> require:
-> - Sending an association request
-> - Receiving an association response
+On Wed, May 31, 2023 at 03:01:56AM -0400, Willem de Bruijn wrote:
+> Breno Leitao wrote:
+> > +int ip6mr_sk_ioctl(struct sock *sk, unsigned int cmd, void __user *arg);
+> > +static inline int sk_is_ip6mr(struct sock *sk)
+> > +{
+> > +	return sk->sk_family == AF_INET6 &&
+> > +		inet_sk(sk)->inet_num == IPPROTO_ICMPV6;
+> > +}
+ 
+> Technically, this is just sk_is_icmpv6, which is broader than IPv6
+> multicast routing.
+
+Right, let me rename it to reflect this properly.
+
+> No other concerns from me.
+
+Thanks for the detailed review.
+
+> Two small asides, that are fine to ignore.
 > 
-> The association response contains the association status, eventually a
-> reason if the association was unsuccessful, and finally a short address
-> that we should use for intra-PAN communication from now on, if we
-> required one (which is the default, and not yet configurable).
+> The $PROTO_sk_ioctl functions could conceivably call directly into
+> the $PROTO_ioctl functions without the indirect function pointer.
+> But that would require open coding the sock_sk_ioctl_inout helpers.
 > 
-> Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
+> The demux now first checks relatively unlikely multicast routing
+> and phonet before falling through to the more common protocols. But
+> ioctl is not a hot path operation.
 
-...
+I am more than happy to open code sock_sk_ioctl_inout into protocol
+functions, but, I would prefer to do it in a follow up patch, since this
+one is close (I hope) to address the original problem. I hope it works
+for you.
 
-> diff --git a/net/ieee802154/core.c b/net/ieee802154/core.c
-> index cd69bdbfd59f..8bf01bb7e858 100644
-> --- a/net/ieee802154/core.c
-> +++ b/net/ieee802154/core.c
-> @@ -198,6 +198,18 @@ void wpan_phy_free(struct wpan_phy *phy)
->  }
->  EXPORT_SYMBOL(wpan_phy_free);
->  
-> +static void cfg802154_free_peer_structures(struct wpan_dev *wpan_dev)
-> +{
-> +	mutex_lock(&wpan_dev->association_lock);
-> +
-> +	if (wpan_dev->parent)
-> +		kfree(wpan_dev->parent);
-
-Hi Miquel,
-
-a minor nit from my side: There no need to check for NULL before calling
-kfree, because kfree will do nothing with a NULL argument.
-
-> +
-> +	wpan_dev->association_generation++;
-> +
-> +	mutex_unlock(&wpan_dev->association_lock);
-> +}
-> +
->  int cfg802154_switch_netns(struct cfg802154_registered_device *rdev,
->  			   struct net *net)
->  {
-
-...
+Thanks!
