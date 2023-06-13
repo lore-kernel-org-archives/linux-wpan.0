@@ -2,119 +2,89 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D045C88CB2
-	for <linux-wpan@archiver.kernel.org>; Tue, 13 Jun 2023 00:33:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE2BBEB64D7
+	for <linux-wpan@archiver.kernel.org>; Tue, 13 Jun 2023 19:25:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232921AbjFMAdc (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 12 Jun 2023 20:33:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36554 "EHLO
+        id S239641AbjFMTZl (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 13 Jun 2023 15:25:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33880 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229742AbjFMAdc (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 12 Jun 2023 20:33:32 -0400
-Received: from mail-io1-xd2f.google.com (mail-io1-xd2f.google.com [IPv6:2607:f8b0:4864:20::d2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80CEE135;
-        Mon, 12 Jun 2023 17:33:31 -0700 (PDT)
-Received: by mail-io1-xd2f.google.com with SMTP id ca18e2360f4ac-77ae3db633cso244524539f.2;
-        Mon, 12 Jun 2023 17:33:31 -0700 (PDT)
+        with ESMTP id S230017AbjFMTZh (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 13 Jun 2023 15:25:37 -0400
+Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33D041FCE
+        for <linux-wpan@vger.kernel.org>; Tue, 13 Jun 2023 12:25:25 -0700 (PDT)
+Received: by mail-pl1-x62f.google.com with SMTP id d9443c01a7336-1b3d800f671so18146095ad.0
+        for <linux-wpan@vger.kernel.org>; Tue, 13 Jun 2023 12:25:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1686616411; x=1689208411;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=orvTaM05vfNG9foEK/hqh+cEN5/5QXQGjI4W0NarmSc=;
-        b=sVN/hHFn2mCnqJsDV1/wf/tvkHMku434xIkskNn8dQRPf3VpS1giJRuSSObFQKRF2O
-         aKDWo5ch1KU1X5vV/TyOBBLcP9hk/G93wzzs62//+uqGpF3xCc85dhxjZieUAQ0LWQ3D
-         jV+SxYtFY2bx5J+yROGHgJIJ/FeB6IQ25n3frvdYIBaYvVrutJXT940ZAWrdq4/pO5T+
-         alrIAI5BhJbLz9PRADEqjOYkIqpQZSF+kaE1YIb1ropgJw9zdCVEDn6x/mOgT/O5dyvc
-         bAJuOfuYpPNDvUyijxlKxxTDX1b45Tconltk8AG/FSdQnulMIXMB5OJh0Yd9pNaEVmk4
-         aX+Q==
+        d=chromium.org; s=google; t=1686684325; x=1689276325;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=FqljQgltrTWXp4tBsVykV34K/W0vrExZI9E6BwVeYrk=;
+        b=Vuk5lprGVMjZyBqOAnxPZ1cP0qnAz1VOxXLVHd6COwWrk6uWeCNnFqJLd5ZlTB4xBN
+         dzgZf7Jh9tixFAfZz3fmSPAlXZ/It7xgz3OZdv0ga4USAGY4venLvhA6oqd85Vcqq+o1
+         kX6/a+xeL6i8dTiBdduqpe2IX31UD9Xg8A/SY=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686616411; x=1689208411;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=orvTaM05vfNG9foEK/hqh+cEN5/5QXQGjI4W0NarmSc=;
-        b=JU60LHGeciNyfJZn+4rkdNKC19l4vlcD8m7YCzZpQBW17VsNlf20MV/KTo4MPbpxgA
-         OJAOKcrcVI3cuAQsWIp2hA9jyKRkWm5//LWMrujP1xx6HPf/eLXCwjrNwKLS+CxExukS
-         iHot+1+/hGKmqcpWNZ4HFioB88V4N11P/5d6lm92pAvusTeqN6KmT7K5ccC++5x9/ax2
-         2BG0CiDG4SCI0gVoeydGja3o/Ge0/ndNKs/vzlGmwRWTjfUBreYzptEqGkD+xXLnazSn
-         Bq+uSS3i4pnJV6GgrMWKqsO9PCrJ2ecw/Jw+oW/2EcLhdyHJug1uPq+aQ4aXidRq1Hwu
-         TMbg==
-X-Gm-Message-State: AC+VfDyqcXTOq3JJ+yseBmp+IItCy5M9ao6eVGca/OxDNglwBHYqYxjq
-        jfxnpA5SAnOgQVXE3Z4kB/w=
-X-Google-Smtp-Source: ACHHUZ5qJiyzIl6fNy5Eta9rZ0A75u23IN2Wh+JvlLGlqiBYaTyZWLejZ20IYu4ylFcuIDX5ED7ofQ==
-X-Received: by 2002:a5e:da0a:0:b0:775:8241:724a with SMTP id x10-20020a5eda0a000000b007758241724amr9316288ioj.16.1686616410765;
-        Mon, 12 Jun 2023 17:33:30 -0700 (PDT)
-Received: from azeems-kspp.c.googlers.com.com (54.70.188.35.bc.googleusercontent.com. [35.188.70.54])
-        by smtp.gmail.com with ESMTPSA id g11-20020a02c54b000000b0041f4f8094ddsm3194983jaj.106.2023.06.12.17.33.30
+        d=1e100.net; s=20221208; t=1686684325; x=1689276325;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FqljQgltrTWXp4tBsVykV34K/W0vrExZI9E6BwVeYrk=;
+        b=crMgZ2OT+RTZZBXGyTHzGMZICHFSvsPm/Jo6+jw/l4Qt5bXnK/WhOHwT/uZEvzbQNT
+         FTvDukIWlQOv9Bs6rYJtZT+F7tEiVC5oLiBPAMTJB7Gi78yRGf7P78CP+PfCea8JtQxr
+         S8XGK0FcHoYVISylQmrXMxSN3RPJh2eOmuDfadiMHn5UuR8p+f7ggupS66jkWtfWyj0e
+         fuvHSMh52sViFlh8c+fz9O4WUIYuLZJbq06jhCmthfT7wiG77xOSxKwc7enrNg6cQw0w
+         T57xtGe29m87Hd34LGJjaKuYKcEKgB9MAz3kDnNsmzM2y02GOIYVZ196VHG0iC8dW0QN
+         3XMg==
+X-Gm-Message-State: AC+VfDzP9Xnw+2QfaGKwCugKcicxxKJz9XL8yBHwI0KH2misF2LW3yAM
+        ffZn5oH+c6IOfHJ5mnRGKYTnWQ==
+X-Google-Smtp-Source: ACHHUZ7qXyztF8y1MkcPh+Rc6qnYC3E972aaXz8caME05mHnNSqufHjosMNobu5acZ7aPD5pnWR3Bg==
+X-Received: by 2002:a17:902:e887:b0:1b0:f8:9b2d with SMTP id w7-20020a170902e88700b001b000f89b2dmr12528414plg.29.1686684325037;
+        Tue, 13 Jun 2023 12:25:25 -0700 (PDT)
+Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id l10-20020a170902f68a00b001a072aedec7sm10714545plg.75.2023.06.13.12.25.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Jun 2023 17:33:30 -0700 (PDT)
-From:   Azeem Shaikh <azeemshaikh38@gmail.com>
-To:     Alexander Aring <alex.aring@gmail.com>,
+        Tue, 13 Jun 2023 12:25:24 -0700 (PDT)
+Date:   Tue, 13 Jun 2023 12:25:24 -0700
+From:   Kees Cook <keescook@chromium.org>
+To:     Azeem Shaikh <azeemshaikh38@gmail.com>
+Cc:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
-        Miquel Raynal <miquel.raynal@bootlin.com>
-Cc:     linux-hardening@vger.kernel.org,
-        Azeem Shaikh <azeemshaikh38@gmail.com>,
-        linux-wpan@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        linux-hardening@vger.kernel.org, linux-wpan@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
         "David S. Miller" <davem@davemloft.net>,
         Eric Dumazet <edumazet@google.com>,
         Jakub Kicinski <kuba@kernel.org>,
         Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-Subject: [PATCH] ieee802154: Replace strlcpy with strscpy
-Date:   Tue, 13 Jun 2023 00:33:25 +0000
-Message-ID: <20230613003326.3538391-1-azeemshaikh38@gmail.com>
-X-Mailer: git-send-email 2.41.0.162.gfafddb0af9-goog
+Subject: Re: [PATCH] ieee802154: Replace strlcpy with strscpy
+Message-ID: <202306131225.779997E@keescook>
+References: <20230613003326.3538391-1-azeemshaikh38@gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230613003326.3538391-1-azeemshaikh38@gmail.com>
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-strlcpy() reads the entire source buffer first.
-This read may exceed the destination size limit.
-This is both inefficient and can lead to linear read
-overflows if a source string is not NUL-terminated [1].
-In an effort to remove strlcpy() completely [2], replace
-strlcpy() here with strscpy().
+On Tue, Jun 13, 2023 at 12:33:25AM +0000, Azeem Shaikh wrote:
+> strlcpy() reads the entire source buffer first.
+> This read may exceed the destination size limit.
+> This is both inefficient and can lead to linear read
+> overflows if a source string is not NUL-terminated [1].
+> In an effort to remove strlcpy() completely [2], replace
+> strlcpy() here with strscpy().
+> 
+> Direct replacement is safe here since the return values
+> from the helper macros are ignored by the callers.
+> 
+> [1] https://www.kernel.org/doc/html/latest/process/deprecated.html#strlcpy
+> [2] https://github.com/KSPP/linux/issues/89
+> 
+> Signed-off-by: Azeem Shaikh <azeemshaikh38@gmail.com>
 
-Direct replacement is safe here since the return values
-from the helper macros are ignored by the callers.
+Reviewed-by: Kees Cook <keescook@chromium.org>
 
-[1] https://www.kernel.org/doc/html/latest/process/deprecated.html#strlcpy
-[2] https://github.com/KSPP/linux/issues/89
-
-Signed-off-by: Azeem Shaikh <azeemshaikh38@gmail.com>
----
- net/ieee802154/trace.h |    2 +-
- net/mac802154/trace.h  |    2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/net/ieee802154/trace.h b/net/ieee802154/trace.h
-index e5d8439b9e45..c16db0b326fa 100644
---- a/net/ieee802154/trace.h
-+++ b/net/ieee802154/trace.h
-@@ -13,7 +13,7 @@
- 
- #define MAXNAME		32
- #define WPAN_PHY_ENTRY	__array(char, wpan_phy_name, MAXNAME)
--#define WPAN_PHY_ASSIGN	strlcpy(__entry->wpan_phy_name,	 \
-+#define WPAN_PHY_ASSIGN	strscpy(__entry->wpan_phy_name,	 \
- 				wpan_phy_name(wpan_phy), \
- 				MAXNAME)
- #define WPAN_PHY_PR_FMT	"%s"
-diff --git a/net/mac802154/trace.h b/net/mac802154/trace.h
-index 689396d6c76a..1574ecc48075 100644
---- a/net/mac802154/trace.h
-+++ b/net/mac802154/trace.h
-@@ -14,7 +14,7 @@
- 
- #define MAXNAME		32
- #define LOCAL_ENTRY	__array(char, wpan_phy_name, MAXNAME)
--#define LOCAL_ASSIGN	strlcpy(__entry->wpan_phy_name, \
-+#define LOCAL_ASSIGN	strscpy(__entry->wpan_phy_name, \
- 				wpan_phy_name(local->hw.phy), MAXNAME)
- #define LOCAL_PR_FMT	"%s"
- #define LOCAL_PR_ARG	__entry->wpan_phy_name
 -- 
-2.41.0.162.gfafddb0af9-goog
-
-
+Kees Cook
