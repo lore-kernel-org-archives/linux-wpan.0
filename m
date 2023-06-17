@@ -2,115 +2,216 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A36CAEB64D7
-	for <linux-wpan@archiver.kernel.org>; Fri, 16 Jun 2023 22:09:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AE01C001DC
+	for <linux-wpan@archiver.kernel.org>; Sat, 17 Jun 2023 12:15:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232130AbjFPWJb (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Fri, 16 Jun 2023 18:09:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53076 "EHLO
+        id S1346293AbjFQMPB (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Sat, 17 Jun 2023 08:15:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46406 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230008AbjFPWJb (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Fri, 16 Jun 2023 18:09:31 -0400
-X-Greylist: delayed 1197 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 16 Jun 2023 15:09:29 PDT
-Received: from proxima.lasnet.de (proxima.lasnet.de [IPv6:2a01:4f8:121:31eb:3::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDDE7B5
-        for <linux-wpan@vger.kernel.org>; Fri, 16 Jun 2023 15:09:29 -0700 (PDT)
-Received: from [IPV6:2003:e9:d710:7c92:fc77:12a4:52e5:4e01] (p200300e9d7107c92fc7712a452e54e01.dip0.t-ipconnect.de [IPv6:2003:e9:d710:7c92:fc77:12a4:52e5:4e01])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: stefan@datenfreihafen.org)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id C1744C0144;
-        Fri, 16 Jun 2023 23:32:49 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
-        s=2021; t=1686951170;
+        with ESMTP id S1346294AbjFQMOp (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Sat, 17 Jun 2023 08:14:45 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD6051B7
+        for <linux-wpan@vger.kernel.org>; Sat, 17 Jun 2023 05:13:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1687003989;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=sdxCqBl7J5TyGt6xLYgsGc0Y2cygd5RnxZTzgOT8fsk=;
-        b=l73Fxqs3erVsnGjPoX7NAxYqG0JEv76CcAcfhhW2xcAembKT2Li4D7bADb3FBjwqQ9MA6U
-        ssT03A0wNVHJf/ONu4jEGiuHR1y1F/bbHFYw/+JEC0idlX2rymcD16ccDqEKGxhRdrVzvz
-        xHrISZCbQypEzsQ96LOHOdqkykITe6xZ5xHCzMtIEojAtXXEVA7cpYpMSsr6pRIT2gvUqT
-        e1bgKpJSRfkJdX1ESnnOOtBoSqnbWJRtlr2zF8yM1BBme2gD7ITUoZjlIIa8YD5Fi1jfjn
-        IiOT/uk9yb3MszqQHD+aeAMgns1i3yygAeGx/FtB0XDeO1edELEAD6drSjqG1g==
-Message-ID: <6ec8cf42-aff0-a832-87f2-1526ff00c42d@datenfreihafen.org>
-Date:   Fri, 16 Jun 2023 23:32:48 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.8.0
-Subject: Re: [PATCH] ieee802154: Replace strlcpy with strscpy
-To:     Azeem Shaikh <azeemshaikh38@gmail.com>,
-        Alexander Aring <alex.aring@gmail.com>,
-        Miquel Raynal <miquel.raynal@bootlin.com>
-Cc:     linux-hardening@vger.kernel.org, linux-wpan@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
+        bh=MKaOCCzXJedIVdLsu0rWphyHTQRA+RfNYbfx/yO3kzQ=;
+        b=QMQqazolU26HzaIt/RrZ72SvDzbxN/Z4FEF6JATgaB4pGjHK4+BZX6kmQAlXvMSE6nQlul
+        0eUCDTn03Z78bgArqn/jccUNZvF6Z20VlyG5oHhp9jMhyZJTsMbQOiQ2Z1eqWI9pGb8H5o
+        tVMnfuTiUMDahxrfqEHuDjb/kVhXht4=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-557-0frgcycTO9ec3FXSZq0ViQ-1; Sat, 17 Jun 2023 08:13:03 -0400
+X-MC-Unique: 0frgcycTO9ec3FXSZq0ViQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 687B780006E;
+        Sat, 17 Jun 2023 12:13:02 +0000 (UTC)
+Received: from warthog.procyon.org.com (unknown [10.42.28.51])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 422AD1415102;
+        Sat, 17 Jun 2023 12:12:59 +0000 (UTC)
+From:   David Howells <dhowells@redhat.com>
+To:     netdev@vger.kernel.org
+Cc:     David Howells <dhowells@redhat.com>,
+        Alexander Duyck <alexander.duyck@gmail.com>,
         "David S. Miller" <davem@davemloft.net>,
         Eric Dumazet <edumazet@google.com>,
         Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-References: <20230613003326.3538391-1-azeemshaikh38@gmail.com>
-Content-Language: en-US
-From:   Stefan Schmidt <stefan@datenfreihafen.org>
-In-Reply-To: <20230613003326.3538391-1-azeemshaikh38@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+        Paolo Abeni <pabeni@redhat.com>,
+        Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+        David Ahern <dsahern@kernel.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
+        dccp@vger.kernel.org, linux-afs@lists.infradead.org,
+        linux-arm-msm@vger.kernel.org, linux-can@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-hams@vger.kernel.org, linux-perf-users@vger.kernel.org,
+        linux-rdma@vger.kernel.org, linux-sctp@vger.kernel.org,
+        linux-wpan@vger.kernel.org, linux-x25@vger.kernel.org,
+        mptcp@lists.linux.dev, rds-devel@oss.oracle.com,
+        tipc-discussion@lists.sourceforge.net,
+        virtualization@lists.linux-foundation.org
+Subject: [PATCH net-next v2 17/17] net: Kill MSG_SENDPAGE_NOTLAST
+Date:   Sat, 17 Jun 2023 13:11:46 +0100
+Message-ID: <20230617121146.716077-18-dhowells@redhat.com>
+In-Reply-To: <20230617121146.716077-1-dhowells@redhat.com>
+References: <20230617121146.716077-1-dhowells@redhat.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello.
+Now that ->sendpage() has been removed, MSG_SENDPAGE_NOTLAST can be cleaned
+up.  Things were converted to use MSG_MORE instead, but the protocol
+sendpage stubs still convert MSG_SENDPAGE_NOTLAST to MSG_MORE, which is now
+unnecessary.
 
-On 13.06.23 02:33, Azeem Shaikh wrote:
-> strlcpy() reads the entire source buffer first.
-> This read may exceed the destination size limit.
-> This is both inefficient and can lead to linear read
-> overflows if a source string is not NUL-terminated [1].
-> In an effort to remove strlcpy() completely [2], replace
-> strlcpy() here with strscpy().
-> 
-> Direct replacement is safe here since the return values
-> from the helper macros are ignored by the callers.
-> 
-> [1] https://www.kernel.org/doc/html/latest/process/deprecated.html#strlcpy
-> [2] https://github.com/KSPP/linux/issues/89
-> 
-> Signed-off-by: Azeem Shaikh <azeemshaikh38@gmail.com>
-> ---
->   net/ieee802154/trace.h |    2 +-
->   net/mac802154/trace.h  |    2 +-
->   2 files changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/net/ieee802154/trace.h b/net/ieee802154/trace.h
-> index e5d8439b9e45..c16db0b326fa 100644
-> --- a/net/ieee802154/trace.h
-> +++ b/net/ieee802154/trace.h
-> @@ -13,7 +13,7 @@
->   
->   #define MAXNAME		32
->   #define WPAN_PHY_ENTRY	__array(char, wpan_phy_name, MAXNAME)
-> -#define WPAN_PHY_ASSIGN	strlcpy(__entry->wpan_phy_name,	 \
-> +#define WPAN_PHY_ASSIGN	strscpy(__entry->wpan_phy_name,	 \
->   				wpan_phy_name(wpan_phy), \
->   				MAXNAME)
->   #define WPAN_PHY_PR_FMT	"%s"
-> diff --git a/net/mac802154/trace.h b/net/mac802154/trace.h
-> index 689396d6c76a..1574ecc48075 100644
-> --- a/net/mac802154/trace.h
-> +++ b/net/mac802154/trace.h
-> @@ -14,7 +14,7 @@
->   
->   #define MAXNAME		32
->   #define LOCAL_ENTRY	__array(char, wpan_phy_name, MAXNAME)
-> -#define LOCAL_ASSIGN	strlcpy(__entry->wpan_phy_name, \
-> +#define LOCAL_ASSIGN	strscpy(__entry->wpan_phy_name, \
->   				wpan_phy_name(local->hw.phy), MAXNAME)
->   #define LOCAL_PR_FMT	"%s"
->   #define LOCAL_PR_ARG	__entry->wpan_phy_name
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: "David S. Miller" <davem@davemloft.net>
+cc: Eric Dumazet <edumazet@google.com>
+cc: Jakub Kicinski <kuba@kernel.org>
+cc: Paolo Abeni <pabeni@redhat.com>
+cc: Jens Axboe <axboe@kernel.dk>
+cc: Matthew Wilcox <willy@infradead.org>
+cc: bpf@vger.kernel.org
+cc: dccp@vger.kernel.org
+cc: linux-afs@lists.infradead.org
+cc: linux-arm-msm@vger.kernel.org
+cc: linux-can@vger.kernel.org
+cc: linux-crypto@vger.kernel.org
+cc: linux-doc@vger.kernel.org
+cc: linux-hams@vger.kernel.org
+cc: linux-perf-users@vger.kernel.org
+cc: linux-rdma@vger.kernel.org
+cc: linux-sctp@vger.kernel.org
+cc: linux-wpan@vger.kernel.org
+cc: linux-x25@vger.kernel.org
+cc: mptcp@lists.linux.dev
+cc: netdev@vger.kernel.org
+cc: rds-devel@oss.oracle.com
+cc: tipc-discussion@lists.sourceforge.net
+cc: virtualization@lists.linux-foundation.org
+---
+ include/linux/socket.h                         | 4 +---
+ net/ipv4/tcp_bpf.c                             | 4 +++-
+ net/tls/tls_device.c                           | 3 +--
+ net/tls/tls_main.c                             | 2 +-
+ net/tls/tls_sw.c                               | 2 +-
+ tools/perf/trace/beauty/include/linux/socket.h | 1 -
+ tools/perf/trace/beauty/msg_flags.c            | 3 ---
+ 7 files changed, 7 insertions(+), 12 deletions(-)
 
+diff --git a/include/linux/socket.h b/include/linux/socket.h
+index 58204700018a..39b74d83c7c4 100644
+--- a/include/linux/socket.h
++++ b/include/linux/socket.h
+@@ -319,7 +319,6 @@ struct ucred {
+ #define MSG_MORE	0x8000	/* Sender will send more */
+ #define MSG_WAITFORONE	0x10000	/* recvmmsg(): block until 1+ packets avail */
+ #define MSG_SENDPAGE_NOPOLICY 0x10000 /* sendpage() internal : do no apply policy */
+-#define MSG_SENDPAGE_NOTLAST 0x20000 /* sendpage() internal : not the last page */
+ #define MSG_BATCH	0x40000 /* sendmmsg(): more messages coming */
+ #define MSG_EOF         MSG_FIN
+ #define MSG_NO_SHARED_FRAGS 0x80000 /* sendpage() internal : page frags are not shared */
+@@ -341,8 +340,7 @@ struct ucred {
+ 
+ /* Flags to be cleared on entry by sendmsg and sendmmsg syscalls */
+ #define MSG_INTERNAL_SENDMSG_FLAGS \
+-	(MSG_SPLICE_PAGES | MSG_SENDPAGE_NOPOLICY | MSG_SENDPAGE_NOTLAST | \
+-	 MSG_SENDPAGE_DECRYPTED)
++	(MSG_SPLICE_PAGES | MSG_SENDPAGE_NOPOLICY | MSG_SENDPAGE_DECRYPTED)
+ 
+ /* Setsockoptions(2) level. Thanks to BSD these must match IPPROTO_xxx */
+ #define SOL_IP		0
+diff --git a/net/ipv4/tcp_bpf.c b/net/ipv4/tcp_bpf.c
+index 870c1cde4010..8f535e436ea3 100644
+--- a/net/ipv4/tcp_bpf.c
++++ b/net/ipv4/tcp_bpf.c
+@@ -90,7 +90,9 @@ static int tcp_bpf_push(struct sock *sk, struct sk_msg *msg, u32 apply_bytes,
+ {
+ 	bool apply = apply_bytes;
+ 	struct scatterlist *sge;
+-	struct msghdr msghdr = { .msg_flags = flags | MSG_SPLICE_PAGES, };
++	struct msghdr msghdr = {
++		.msg_flags = flags | MSG_SPLICE_PAGES | MSG_MORE,
++	};
+ 	struct page *page;
+ 	int size, ret = 0;
+ 	u32 off;
+diff --git a/net/tls/tls_device.c b/net/tls/tls_device.c
+index 840ee06f1708..2021fe557e50 100644
+--- a/net/tls/tls_device.c
++++ b/net/tls/tls_device.c
+@@ -441,8 +441,7 @@ static int tls_push_data(struct sock *sk,
+ 	long timeo;
+ 
+ 	if (flags &
+-	    ~(MSG_MORE | MSG_DONTWAIT | MSG_NOSIGNAL | MSG_SENDPAGE_NOTLAST |
+-	      MSG_SPLICE_PAGES))
++	    ~(MSG_MORE | MSG_DONTWAIT | MSG_NOSIGNAL | MSG_SPLICE_PAGES))
+ 		return -EOPNOTSUPP;
+ 
+ 	if (unlikely(sk->sk_err))
+diff --git a/net/tls/tls_main.c b/net/tls/tls_main.c
+index d5ed4d47b16e..b6896126bb92 100644
+--- a/net/tls/tls_main.c
++++ b/net/tls/tls_main.c
+@@ -127,7 +127,7 @@ int tls_push_sg(struct sock *sk,
+ {
+ 	struct bio_vec bvec;
+ 	struct msghdr msg = {
+-		.msg_flags = MSG_SENDPAGE_NOTLAST | MSG_SPLICE_PAGES | flags,
++		.msg_flags = MSG_SPLICE_PAGES | flags,
+ 	};
+ 	int ret = 0;
+ 	struct page *p;
+diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
+index 9b3aa89a4292..53f944e6d8ef 100644
+--- a/net/tls/tls_sw.c
++++ b/net/tls/tls_sw.c
+@@ -1194,7 +1194,7 @@ int tls_sw_sendmsg(struct sock *sk, struct msghdr *msg, size_t size)
+ 
+ 	if (msg->msg_flags & ~(MSG_MORE | MSG_DONTWAIT | MSG_NOSIGNAL |
+ 			       MSG_CMSG_COMPAT | MSG_SPLICE_PAGES |
+-			       MSG_SENDPAGE_NOTLAST | MSG_SENDPAGE_NOPOLICY))
++			       MSG_SENDPAGE_NOPOLICY))
+ 		return -EOPNOTSUPP;
+ 
+ 	ret = mutex_lock_interruptible(&tls_ctx->tx_lock);
+diff --git a/tools/perf/trace/beauty/include/linux/socket.h b/tools/perf/trace/beauty/include/linux/socket.h
+index 13c3a237b9c9..3bef212a24d7 100644
+--- a/tools/perf/trace/beauty/include/linux/socket.h
++++ b/tools/perf/trace/beauty/include/linux/socket.h
+@@ -318,7 +318,6 @@ struct ucred {
+ #define MSG_MORE	0x8000	/* Sender will send more */
+ #define MSG_WAITFORONE	0x10000	/* recvmmsg(): block until 1+ packets avail */
+ #define MSG_SENDPAGE_NOPOLICY 0x10000 /* sendpage() internal : do no apply policy */
+-#define MSG_SENDPAGE_NOTLAST 0x20000 /* sendpage() internal : not the last page */
+ #define MSG_BATCH	0x40000 /* sendmmsg(): more messages coming */
+ #define MSG_EOF         MSG_FIN
+ #define MSG_NO_SHARED_FRAGS 0x80000 /* sendpage() internal : page frags are not shared */
+diff --git a/tools/perf/trace/beauty/msg_flags.c b/tools/perf/trace/beauty/msg_flags.c
+index ea68db08b8e7..b5b580e5a77e 100644
+--- a/tools/perf/trace/beauty/msg_flags.c
++++ b/tools/perf/trace/beauty/msg_flags.c
+@@ -8,9 +8,6 @@
+ #ifndef MSG_WAITFORONE
+ #define MSG_WAITFORONE		   0x10000
+ #endif
+-#ifndef MSG_SENDPAGE_NOTLAST
+-#define MSG_SENDPAGE_NOTLAST	   0x20000
+-#endif
+ #ifndef MSG_FASTOPEN
+ #define MSG_FASTOPEN		0x20000000
+ #endif
 
-This patch has been applied to the wpan tree and will be
-part of the next pull request to net. Thanks!
-
-regards
-Stefan Schmidt
