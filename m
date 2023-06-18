@@ -2,79 +2,151 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 614D6EB64DA
-	for <linux-wpan@archiver.kernel.org>; Sun, 18 Jun 2023 10:20:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1204C001DD
+	for <linux-wpan@archiver.kernel.org>; Sun, 18 Jun 2023 16:54:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229573AbjFRKUW (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Sun, 18 Jun 2023 06:20:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46882 "EHLO
+        id S229525AbjFRQyp (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Sun, 18 Jun 2023 12:54:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42840 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229489AbjFRKUV (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Sun, 18 Jun 2023 06:20:21 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 685538F;
-        Sun, 18 Jun 2023 03:20:20 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id F2E7C61148;
-        Sun, 18 Jun 2023 10:20:19 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 4B60DC433C9;
-        Sun, 18 Jun 2023 10:20:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1687083619;
-        bh=l6Xo8X/qXpyCuetv0nWpu2k2NybFKErZPdAP74m9f44=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=DGaDPtwcMFP68PIH2clT8HBixCjnps/XnWPQbhY7vXLsbxuQDPtVkoqCm1wbAwOWm
-         wYL72EGWm//l4dyxFErujSiinqDYHmLI62lA3W1jPBL3qstSayUkJAv4tBM9slcGah
-         6lOQ3M0K/dIIGk465jAIZpxMA+3H16jJW6ySJ5dWBQMlQGhBukn/0BkmBK8qqELnF9
-         qsTzdulUVM84BTvm6EvjliFGAAl961tWnkDs1MWEgjH8pkggq12aixNngAECOBsMFs
-         B1RZo4Gh2X5GfGUwTlN9JKZB4aOCA6/mK0zbZ5MKQtIHw4zc4aziB8h5ASAUdugjdM
-         0iCGlRuVVTFFg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3037BC395C7;
-        Sun, 18 Jun 2023 10:20:19 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] ieee802154/adf7242: Add MODULE_FIRMWARE macro
-From:   patchwork-bot+netdevbpf@kernel.org
-Message-Id: <168708361919.30416.7304884252982729819.git-patchwork-notify@kernel.org>
-Date:   Sun, 18 Jun 2023 10:20:19 +0000
-References: <20230616121807.1034050-1-juerg.haefliger@canonical.com>
-In-Reply-To: <20230616121807.1034050-1-juerg.haefliger@canonical.com>
-To:     Juerg Haefliger <juerg.haefliger@canonical.com>
-Cc:     michael.hennerich@analog.com, alex.aring@gmail.com,
-        stefan@datenfreihafen.org, miquel.raynal@bootlin.com,
-        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-        pabeni@redhat.com, linux-wpan@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+        with ESMTP id S229470AbjFRQym (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Sun, 18 Jun 2023 12:54:42 -0400
+Received: from mail-qk1-x72e.google.com (mail-qk1-x72e.google.com [IPv6:2607:f8b0:4864:20::72e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDD2610B;
+        Sun, 18 Jun 2023 09:54:41 -0700 (PDT)
+Received: by mail-qk1-x72e.google.com with SMTP id af79cd13be357-76344f8140dso23198385a.3;
+        Sun, 18 Jun 2023 09:54:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1687107281; x=1689699281;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4sK61SVjYCcgummf/cy7pNsLb9SbPBeqU0f1FYDFMyI=;
+        b=rY8QSvEl6p4fIeB+cNXrfBx3Qi8Q0oRZm5VoS2BoCgfjuYRQQUwrdFGEDdU23IrXo0
+         chGoGHKPwP0LXmrfTl3qHlcCmo1sRYapzINEnQSow+fzi+pFn5PGiApYOrJ50HKaB68T
+         utE+yg2GnzRQ30Bj8a8L69p3c374+UtcDkNfJR34GIn05f0b7+0AmEbyApvKm1DNJWT/
+         bJcRj7sz29ir/3TzVW+gzb/qTkz7VnAPSgi9enEEZ3+K74hSxYqhdeSEvqiAsjKKoCqT
+         OzoP6N5BMK7b0x2JfdgrfrTiD4DoK57jW0lPFco02d1KYyD6s/pMa/qc2P6IX40592qx
+         JtnA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687107281; x=1689699281;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=4sK61SVjYCcgummf/cy7pNsLb9SbPBeqU0f1FYDFMyI=;
+        b=PvJr6nOajjEg6nBWopPUvyV3lClFlhSHKoj82QChhFMt5m0zUes7J2L5PDvWmtiU3f
+         Tkv7uvyfCLXXiQ9UPnBzG/c6gN5imTqXeq9eqnmsEbpxASViHl5pamiWZ0b7bpDy2N6Y
+         fcJUj1N5qzG+TiD8kZVzEMYgLTHHhkDjpw7BR1RZFfxEgoS8HpnUf10BLt0IUKVKR3G7
+         0kR/tp/e+qFdY9jwf4y2q2Pv5xkb6q7bwXujC6jzKuS7YBTEiz7t7roz6cNe1O24RMDL
+         +MaqHuMQhHqZqG7iQqUsM5DAz5ENn/nqB8rnM4cj0NgZp94pX3zzfjSfOmAJSRD0fvoE
+         wT8A==
+X-Gm-Message-State: AC+VfDwwVj5h13DIgF4ld/PJoPOX85Y7FxEt4vVz5VMfxDa5ThP1KLpo
+        AfAazsDXyLUe6K6DxIRLknI=
+X-Google-Smtp-Source: ACHHUZ7rD2n8b5vnYB/xOzS5BAQNWYuxXJrQo4BmBND6gWZP6jCAnPQahStFSM7LauZ1ZKr4AefxaQ==
+X-Received: by 2002:ad4:5be2:0:b0:626:33bb:3fd3 with SMTP id k2-20020ad45be2000000b0062633bb3fd3mr8290593qvc.19.1687107280821;
+        Sun, 18 Jun 2023 09:54:40 -0700 (PDT)
+Received: from localhost (172.174.245.35.bc.googleusercontent.com. [35.245.174.172])
+        by smtp.gmail.com with ESMTPSA id t3-20020ac85303000000b003f7a54fa72fsm1857340qtn.0.2023.06.18.09.54.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 18 Jun 2023 09:54:40 -0700 (PDT)
+Date:   Sun, 18 Jun 2023 12:54:40 -0400
+From:   Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To:     David Howells <dhowells@redhat.com>, netdev@vger.kernel.org
+Cc:     David Howells <dhowells@redhat.com>,
+        Alexander Duyck <alexander.duyck@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+        David Ahern <dsahern@kernel.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
+        dccp@vger.kernel.org, linux-afs@lists.infradead.org,
+        linux-arm-msm@vger.kernel.org, linux-can@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-hams@vger.kernel.org, linux-perf-users@vger.kernel.org,
+        linux-rdma@vger.kernel.org, linux-sctp@vger.kernel.org,
+        linux-wpan@vger.kernel.org, linux-x25@vger.kernel.org,
+        mptcp@lists.linux.dev, rds-devel@oss.oracle.com,
+        tipc-discussion@lists.sourceforge.net,
+        virtualization@lists.linux-foundation.org
+Message-ID: <648f36d02fe6e_33cfbc2944f@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20230617121146.716077-18-dhowells@redhat.com>
+References: <20230617121146.716077-1-dhowells@redhat.com>
+ <20230617121146.716077-18-dhowells@redhat.com>
+Subject: RE: [PATCH net-next v2 17/17] net: Kill MSG_SENDPAGE_NOTLAST
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by David S. Miller <davem@davemloft.net>:
-
-On Fri, 16 Jun 2023 14:18:07 +0200 you wrote:
-> The module loads firmware so add a MODULE_FIRMWARE macro to provide that
-> information via modinfo.
+David Howells wrote:
+> Now that ->sendpage() has been removed, MSG_SENDPAGE_NOTLAST can be cleaned
+> up.  Things were converted to use MSG_MORE instead, but the protocol
+> sendpage stubs still convert MSG_SENDPAGE_NOTLAST to MSG_MORE, which is now
+> unnecessary.
 > 
-> Signed-off-by: Juerg Haefliger <juerg.haefliger@canonical.com>
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: "David S. Miller" <davem@davemloft.net>
+> cc: Eric Dumazet <edumazet@google.com>
+> cc: Jakub Kicinski <kuba@kernel.org>
+> cc: Paolo Abeni <pabeni@redhat.com>
+> cc: Jens Axboe <axboe@kernel.dk>
+> cc: Matthew Wilcox <willy@infradead.org>
+> cc: bpf@vger.kernel.org
+> cc: dccp@vger.kernel.org
+> cc: linux-afs@lists.infradead.org
+> cc: linux-arm-msm@vger.kernel.org
+> cc: linux-can@vger.kernel.org
+> cc: linux-crypto@vger.kernel.org
+> cc: linux-doc@vger.kernel.org
+> cc: linux-hams@vger.kernel.org
+> cc: linux-perf-users@vger.kernel.org
+> cc: linux-rdma@vger.kernel.org
+> cc: linux-sctp@vger.kernel.org
+> cc: linux-wpan@vger.kernel.org
+> cc: linux-x25@vger.kernel.org
+> cc: mptcp@lists.linux.dev
+> cc: netdev@vger.kernel.org
+> cc: rds-devel@oss.oracle.com
+> cc: tipc-discussion@lists.sourceforge.net
+> cc: virtualization@lists.linux-foundation.org
 > ---
->  drivers/net/ieee802154/adf7242.c | 2 ++
->  1 file changed, 2 insertions(+)
+>  include/linux/socket.h                         | 4 +---
+>  net/ipv4/tcp_bpf.c                             | 4 +++-
+>  net/tls/tls_device.c                           | 3 +--
+>  net/tls/tls_main.c                             | 2 +-
+>  net/tls/tls_sw.c                               | 2 +-
+>  tools/perf/trace/beauty/include/linux/socket.h | 1 -
+>  tools/perf/trace/beauty/msg_flags.c            | 3 ---
+>  7 files changed, 7 insertions(+), 12 deletions(-)
+>
+ 
+> @@ -90,7 +90,9 @@ static int tcp_bpf_push(struct sock *sk, struct sk_msg *msg, u32 apply_bytes,
+>  {
+>  	bool apply = apply_bytes;
+>  	struct scatterlist *sge;
+> -	struct msghdr msghdr = { .msg_flags = flags | MSG_SPLICE_PAGES, };
+> +	struct msghdr msghdr = {
+> +		.msg_flags = flags | MSG_SPLICE_PAGES | MSG_MORE,
+> +	};
+>  	struct page *page;
+>  	int size, ret = 0;
+>  	u32 off;
 
-Here is the summary with links:
-  - ieee802154/adf7242: Add MODULE_FIRMWARE macro
-    https://git.kernel.org/netdev/net/c/f593a94b530a
+Is it intentional to add MSG_MORE here in this patch?
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+I do see that patch 3 removes this branch:
 
-
+@@ -111,9 +111,6 @@  static int tcp_bpf_push(struct sock *sk, struct sk_msg *msg, u32 apply_bytes,
+ 		if (has_tx_ulp)
+ 			msghdr.msg_flags |= MSG_SENDPAGE_NOPOLICY;
+ 
+-		if (flags & MSG_SENDPAGE_NOTLAST)
+-			msghdr.msg_flags |= MSG_MORE;
+-
