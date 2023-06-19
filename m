@@ -2,82 +2,60 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 161D3EB64D9
-	for <linux-wpan@archiver.kernel.org>; Mon, 19 Jun 2023 07:09:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87B56EB64D9
+	for <linux-wpan@archiver.kernel.org>; Mon, 19 Jun 2023 09:43:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229579AbjFSHJg (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 19 Jun 2023 03:09:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56702 "EHLO
+        id S231526AbjFSJnN (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 19 Jun 2023 05:43:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34408 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229789AbjFSHJf (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 19 Jun 2023 03:09:35 -0400
-Received: from proxima.lasnet.de (proxima.lasnet.de [IPv6:2a01:4f8:121:31eb:3::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 449EC106
-        for <linux-wpan@vger.kernel.org>; Mon, 19 Jun 2023 00:09:34 -0700 (PDT)
-Received: from localhost.localdomain.datenfreihafen.local (p200300e9d715954d26b5d993c1929d94.dip0.t-ipconnect.de [IPv6:2003:e9:d715:954d:26b5:d993:c192:9d94])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: stefan@sostec.de)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id 80CE2C0244;
-        Mon, 19 Jun 2023 09:09:31 +0200 (CEST)
-From:   Stefan Schmidt <stefan@datenfreihafen.org>
-To:     davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com
-Cc:     linux-wpan@vger.kernel.org, alex.aring@gmail.com,
-        miquel.raynal@bootlin.com, netdev@vger.kernel.org
-Subject: pull-request: ieee802154 for net 2023-06-19
-Date:   Mon, 19 Jun 2023 09:09:27 +0200
-Message-Id: <20230619070927.825332-1-stefan@datenfreihafen.org>
-X-Mailer: git-send-email 2.39.2
+        with ESMTP id S229513AbjFSJnM (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 19 Jun 2023 05:43:12 -0400
+Received: from mail.durme.pl (mail.durme.pl [217.182.69.186])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42EAE83
+        for <linux-wpan@vger.kernel.org>; Mon, 19 Jun 2023 02:43:12 -0700 (PDT)
+Received: by mail.durme.pl (Postfix, from userid 1002)
+        id C8F164A443; Mon, 19 Jun 2023 09:41:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=durme.pl; s=mail;
+        t=1687167701; bh=hFxZwVw4rIL+JwfEOGI47p+fdoVOAeqVswP6NWoHSHQ=;
+        h=Date:From:To:Subject:From;
+        b=b4CYDv54ul+Rsm7SlcIDQi30OQ446Vz/x9VI+WuqNxTo2vvq8XUgXwPAZGS22Zkad
+         LhZJ6G0YOYoReXgElHU2WXkVQSEF09bOSJjXvKkfCscyZZQbIR3O44DumibecKn44A
+         CAFOCu4+jkEHGNKdkhCa+MvP3qc99LU84XNHr9C94TpT4swbMMUy2rOkaVo6z8JtKF
+         aDFeA5HFFW9rGO5Nu4SvzKJtWUoNXy/V9Ki0IJHZ0tNiErmJDFLSy1a/5BkD+Su2wG
+         5JKevDoilD9JkhrOoyKi4RysV9a4SQCdqkH5rbSBHwsAUPyVYQobA5wBUiZRCsycNe
+         c5sSIMmXFrFyw==
+Received: by mail.durme.pl for <linux-wpan@vger.kernel.org>; Mon, 19 Jun 2023 09:41:18 GMT
+Message-ID: <20230619090058-0.1.2k.cm57.0.2tm1xzygry@durme.pl>
+Date:   Mon, 19 Jun 2023 09:41:18 GMT
+From:   "Krystian Wieczorek" <krystian.wieczorek@durme.pl>
+To:     <linux-wpan@vger.kernel.org>
+Subject: W sprawie samochodu
+X-Mailer: mail.durme.pl
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello Dave, Jakub, Paolo.
+Dzie=C5=84 dobry,
 
-An update from ieee802154 for your *net* tree:
+chcieliby=C5=9Bmy zapewni=C4=87 Pa=C5=84stwu kompleksowe rozwi=C4=85zania=
+, je=C5=9Bli chodzi o system monitoringu GPS.
 
-Two small fixes and MAINTAINERS update this time.
+Precyzyjne monitorowanie pojazd=C3=B3w na mapach cyfrowych, =C5=9Bledzeni=
+e ich parametr=C3=B3w eksploatacyjnych w czasie rzeczywistym oraz kontrol=
+a paliwa to kluczowe funkcjonalno=C5=9Bci naszego systemu.=20
 
-Azeem Shaikh ensured consistent use of strscpy through the tree and fixed
-the usage in our trace.h.
+Organizowanie pracy pracownik=C3=B3w jest dzi=C4=99ki temu prostsze i bar=
+dziej efektywne, a oszcz=C4=99dno=C5=9Bci i optymalizacja w zakresie pono=
+szonych koszt=C3=B3w, maj=C4=85 dla ka=C5=BCdego przedsi=C4=99biorcy ogro=
+mne znaczenie.
 
-Chen Aotian fixed a potential memory leak in the hwsim simulator for
-ieee802154.
+Dopasujemy nasz=C4=85 ofert=C4=99 do Pa=C5=84stwa oczekiwa=C5=84 i potrze=
+b organizacji. Czy mogliby=C5=9Bmy porozmawia=C4=87 o naszej propozycji?
 
-Miquel Raynal updated the MAINATINERS file with the new team git tree
-locations and patchwork URLs.
 
-regards
-Stefan Schmidt
-
-The following changes since commit 209373537648d815a104c3af787663d7db06bd5d:
-
-  Merge branch 'bnxt_en-3-bug-fixes' (2023-03-29 21:48:18 -0700)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/wpan/wpan.git tags/ieee802154-for-net-2023-06-19
-
-for you to fetch changes up to cd9125030689dda69f73f6c2843d63135cb383f0:
-
-  ieee802154: Replace strlcpy with strscpy (2023-06-16 22:14:24 +0200)
-
-----------------------------------------------------------------
-Azeem Shaikh (1):
-      ieee802154: Replace strlcpy with strscpy
-
-Chen Aotian (1):
-      ieee802154: hwsim: Fix possible memory leaks
-
-Miquel Raynal (2):
-      MAINTAINERS: Update wpan tree
-      MAINTAINERS: Add wpan patchwork
-
- MAINTAINERS                              | 5 +++--
- drivers/net/ieee802154/mac802154_hwsim.c | 6 ++++--
- net/ieee802154/trace.h                   | 2 +-
- net/mac802154/trace.h                    | 2 +-
- 4 files changed, 9 insertions(+), 6 deletions(-)
+Pozdrawiam
+Krystian Wieczorek
