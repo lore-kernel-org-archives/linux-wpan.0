@@ -2,151 +2,82 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1204C001DD
-	for <linux-wpan@archiver.kernel.org>; Sun, 18 Jun 2023 16:54:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 161D3EB64D9
+	for <linux-wpan@archiver.kernel.org>; Mon, 19 Jun 2023 07:09:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229525AbjFRQyp (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Sun, 18 Jun 2023 12:54:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42840 "EHLO
+        id S229579AbjFSHJg (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 19 Jun 2023 03:09:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56702 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229470AbjFRQym (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Sun, 18 Jun 2023 12:54:42 -0400
-Received: from mail-qk1-x72e.google.com (mail-qk1-x72e.google.com [IPv6:2607:f8b0:4864:20::72e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDD2610B;
-        Sun, 18 Jun 2023 09:54:41 -0700 (PDT)
-Received: by mail-qk1-x72e.google.com with SMTP id af79cd13be357-76344f8140dso23198385a.3;
-        Sun, 18 Jun 2023 09:54:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687107281; x=1689699281;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4sK61SVjYCcgummf/cy7pNsLb9SbPBeqU0f1FYDFMyI=;
-        b=rY8QSvEl6p4fIeB+cNXrfBx3Qi8Q0oRZm5VoS2BoCgfjuYRQQUwrdFGEDdU23IrXo0
-         chGoGHKPwP0LXmrfTl3qHlcCmo1sRYapzINEnQSow+fzi+pFn5PGiApYOrJ50HKaB68T
-         utE+yg2GnzRQ30Bj8a8L69p3c374+UtcDkNfJR34GIn05f0b7+0AmEbyApvKm1DNJWT/
-         bJcRj7sz29ir/3TzVW+gzb/qTkz7VnAPSgi9enEEZ3+K74hSxYqhdeSEvqiAsjKKoCqT
-         OzoP6N5BMK7b0x2JfdgrfrTiD4DoK57jW0lPFco02d1KYyD6s/pMa/qc2P6IX40592qx
-         JtnA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687107281; x=1689699281;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=4sK61SVjYCcgummf/cy7pNsLb9SbPBeqU0f1FYDFMyI=;
-        b=PvJr6nOajjEg6nBWopPUvyV3lClFlhSHKoj82QChhFMt5m0zUes7J2L5PDvWmtiU3f
-         Tkv7uvyfCLXXiQ9UPnBzG/c6gN5imTqXeq9eqnmsEbpxASViHl5pamiWZ0b7bpDy2N6Y
-         fcJUj1N5qzG+TiD8kZVzEMYgLTHHhkDjpw7BR1RZFfxEgoS8HpnUf10BLt0IUKVKR3G7
-         0kR/tp/e+qFdY9jwf4y2q2Pv5xkb6q7bwXujC6jzKuS7YBTEiz7t7roz6cNe1O24RMDL
-         +MaqHuMQhHqZqG7iQqUsM5DAz5ENn/nqB8rnM4cj0NgZp94pX3zzfjSfOmAJSRD0fvoE
-         wT8A==
-X-Gm-Message-State: AC+VfDwwVj5h13DIgF4ld/PJoPOX85Y7FxEt4vVz5VMfxDa5ThP1KLpo
-        AfAazsDXyLUe6K6DxIRLknI=
-X-Google-Smtp-Source: ACHHUZ7rD2n8b5vnYB/xOzS5BAQNWYuxXJrQo4BmBND6gWZP6jCAnPQahStFSM7LauZ1ZKr4AefxaQ==
-X-Received: by 2002:ad4:5be2:0:b0:626:33bb:3fd3 with SMTP id k2-20020ad45be2000000b0062633bb3fd3mr8290593qvc.19.1687107280821;
-        Sun, 18 Jun 2023 09:54:40 -0700 (PDT)
-Received: from localhost (172.174.245.35.bc.googleusercontent.com. [35.245.174.172])
-        by smtp.gmail.com with ESMTPSA id t3-20020ac85303000000b003f7a54fa72fsm1857340qtn.0.2023.06.18.09.54.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 18 Jun 2023 09:54:40 -0700 (PDT)
-Date:   Sun, 18 Jun 2023 12:54:40 -0400
-From:   Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To:     David Howells <dhowells@redhat.com>, netdev@vger.kernel.org
-Cc:     David Howells <dhowells@redhat.com>,
-        Alexander Duyck <alexander.duyck@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-        David Ahern <dsahern@kernel.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
-        dccp@vger.kernel.org, linux-afs@lists.infradead.org,
-        linux-arm-msm@vger.kernel.org, linux-can@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-hams@vger.kernel.org, linux-perf-users@vger.kernel.org,
-        linux-rdma@vger.kernel.org, linux-sctp@vger.kernel.org,
-        linux-wpan@vger.kernel.org, linux-x25@vger.kernel.org,
-        mptcp@lists.linux.dev, rds-devel@oss.oracle.com,
-        tipc-discussion@lists.sourceforge.net,
-        virtualization@lists.linux-foundation.org
-Message-ID: <648f36d02fe6e_33cfbc2944f@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20230617121146.716077-18-dhowells@redhat.com>
-References: <20230617121146.716077-1-dhowells@redhat.com>
- <20230617121146.716077-18-dhowells@redhat.com>
-Subject: RE: [PATCH net-next v2 17/17] net: Kill MSG_SENDPAGE_NOTLAST
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+        with ESMTP id S229789AbjFSHJf (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 19 Jun 2023 03:09:35 -0400
+Received: from proxima.lasnet.de (proxima.lasnet.de [IPv6:2a01:4f8:121:31eb:3::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 449EC106
+        for <linux-wpan@vger.kernel.org>; Mon, 19 Jun 2023 00:09:34 -0700 (PDT)
+Received: from localhost.localdomain.datenfreihafen.local (p200300e9d715954d26b5d993c1929d94.dip0.t-ipconnect.de [IPv6:2003:e9:d715:954d:26b5:d993:c192:9d94])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: stefan@sostec.de)
+        by proxima.lasnet.de (Postfix) with ESMTPSA id 80CE2C0244;
+        Mon, 19 Jun 2023 09:09:31 +0200 (CEST)
+From:   Stefan Schmidt <stefan@datenfreihafen.org>
+To:     davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com
+Cc:     linux-wpan@vger.kernel.org, alex.aring@gmail.com,
+        miquel.raynal@bootlin.com, netdev@vger.kernel.org
+Subject: pull-request: ieee802154 for net 2023-06-19
+Date:   Mon, 19 Jun 2023 09:09:27 +0200
+Message-Id: <20230619070927.825332-1-stefan@datenfreihafen.org>
+X-Mailer: git-send-email 2.39.2
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-David Howells wrote:
-> Now that ->sendpage() has been removed, MSG_SENDPAGE_NOTLAST can be cleaned
-> up.  Things were converted to use MSG_MORE instead, but the protocol
-> sendpage stubs still convert MSG_SENDPAGE_NOTLAST to MSG_MORE, which is now
-> unnecessary.
-> 
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> cc: "David S. Miller" <davem@davemloft.net>
-> cc: Eric Dumazet <edumazet@google.com>
-> cc: Jakub Kicinski <kuba@kernel.org>
-> cc: Paolo Abeni <pabeni@redhat.com>
-> cc: Jens Axboe <axboe@kernel.dk>
-> cc: Matthew Wilcox <willy@infradead.org>
-> cc: bpf@vger.kernel.org
-> cc: dccp@vger.kernel.org
-> cc: linux-afs@lists.infradead.org
-> cc: linux-arm-msm@vger.kernel.org
-> cc: linux-can@vger.kernel.org
-> cc: linux-crypto@vger.kernel.org
-> cc: linux-doc@vger.kernel.org
-> cc: linux-hams@vger.kernel.org
-> cc: linux-perf-users@vger.kernel.org
-> cc: linux-rdma@vger.kernel.org
-> cc: linux-sctp@vger.kernel.org
-> cc: linux-wpan@vger.kernel.org
-> cc: linux-x25@vger.kernel.org
-> cc: mptcp@lists.linux.dev
-> cc: netdev@vger.kernel.org
-> cc: rds-devel@oss.oracle.com
-> cc: tipc-discussion@lists.sourceforge.net
-> cc: virtualization@lists.linux-foundation.org
-> ---
->  include/linux/socket.h                         | 4 +---
->  net/ipv4/tcp_bpf.c                             | 4 +++-
->  net/tls/tls_device.c                           | 3 +--
->  net/tls/tls_main.c                             | 2 +-
->  net/tls/tls_sw.c                               | 2 +-
->  tools/perf/trace/beauty/include/linux/socket.h | 1 -
->  tools/perf/trace/beauty/msg_flags.c            | 3 ---
->  7 files changed, 7 insertions(+), 12 deletions(-)
->
- 
-> @@ -90,7 +90,9 @@ static int tcp_bpf_push(struct sock *sk, struct sk_msg *msg, u32 apply_bytes,
->  {
->  	bool apply = apply_bytes;
->  	struct scatterlist *sge;
-> -	struct msghdr msghdr = { .msg_flags = flags | MSG_SPLICE_PAGES, };
-> +	struct msghdr msghdr = {
-> +		.msg_flags = flags | MSG_SPLICE_PAGES | MSG_MORE,
-> +	};
->  	struct page *page;
->  	int size, ret = 0;
->  	u32 off;
+Hello Dave, Jakub, Paolo.
 
-Is it intentional to add MSG_MORE here in this patch?
+An update from ieee802154 for your *net* tree:
 
-I do see that patch 3 removes this branch:
+Two small fixes and MAINTAINERS update this time.
 
-@@ -111,9 +111,6 @@  static int tcp_bpf_push(struct sock *sk, struct sk_msg *msg, u32 apply_bytes,
- 		if (has_tx_ulp)
- 			msghdr.msg_flags |= MSG_SENDPAGE_NOPOLICY;
- 
--		if (flags & MSG_SENDPAGE_NOTLAST)
--			msghdr.msg_flags |= MSG_MORE;
--
+Azeem Shaikh ensured consistent use of strscpy through the tree and fixed
+the usage in our trace.h.
+
+Chen Aotian fixed a potential memory leak in the hwsim simulator for
+ieee802154.
+
+Miquel Raynal updated the MAINATINERS file with the new team git tree
+locations and patchwork URLs.
+
+regards
+Stefan Schmidt
+
+The following changes since commit 209373537648d815a104c3af787663d7db06bd5d:
+
+  Merge branch 'bnxt_en-3-bug-fixes' (2023-03-29 21:48:18 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/wpan/wpan.git tags/ieee802154-for-net-2023-06-19
+
+for you to fetch changes up to cd9125030689dda69f73f6c2843d63135cb383f0:
+
+  ieee802154: Replace strlcpy with strscpy (2023-06-16 22:14:24 +0200)
+
+----------------------------------------------------------------
+Azeem Shaikh (1):
+      ieee802154: Replace strlcpy with strscpy
+
+Chen Aotian (1):
+      ieee802154: hwsim: Fix possible memory leaks
+
+Miquel Raynal (2):
+      MAINTAINERS: Update wpan tree
+      MAINTAINERS: Add wpan patchwork
+
+ MAINTAINERS                              | 5 +++--
+ drivers/net/ieee802154/mac802154_hwsim.c | 6 ++++--
+ net/ieee802154/trace.h                   | 2 +-
+ net/mac802154/trace.h                    | 2 +-
+ 4 files changed, 9 insertions(+), 6 deletions(-)
