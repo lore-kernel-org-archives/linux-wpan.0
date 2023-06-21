@@ -2,1671 +2,1189 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62D93EB64D7
-	for <linux-wpan@archiver.kernel.org>; Tue, 20 Jun 2023 15:06:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7155EB64DD
+	for <linux-wpan@archiver.kernel.org>; Wed, 21 Jun 2023 09:12:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233304AbjFTPGM (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 20 Jun 2023 11:06:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34986 "EHLO
+        id S230262AbjFUJLv (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 21 Jun 2023 05:11:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49498 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233120AbjFTPF4 (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 20 Jun 2023 11:05:56 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99DD4199E
-        for <linux-wpan@vger.kernel.org>; Tue, 20 Jun 2023 08:04:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1687273490;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=O4BeeShTAxgKz2QzPCzlja5T5FtGvmauABSkyx/PwCY=;
-        b=Vq9GePwinbQ905Vs51hqPPIMVoB7eWBUa89WhQiADDdgr4Q92GW69e+dfFCECb5/reSzej
-        XiATNh9VcaYnyd1UObs8F77NLAOD7TDxyLv+fWTG4OkiTMBeAtOKWdECD95vCidtlJlp5E
-        dO3kT7I3FkwzeNhu6ekq6I9B5fZQYOQ=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-253-Ba6D230jMVOpJAGoxZJQFw-1; Tue, 20 Jun 2023 10:58:02 -0400
-X-MC-Unique: Ba6D230jMVOpJAGoxZJQFw-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4AEF9296A62D;
-        Tue, 20 Jun 2023 14:54:46 +0000 (UTC)
-Received: from warthog.procyon.org.com (unknown [10.42.28.4])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B6E5F492B01;
-        Tue, 20 Jun 2023 14:54:42 +0000 (UTC)
-From:   David Howells <dhowells@redhat.com>
-To:     netdev@vger.kernel.org
-Cc:     David Howells <dhowells@redhat.com>,
-        Alexander Duyck <alexander.duyck@gmail.com>,
+        with ESMTP id S231477AbjFUJK7 (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 21 Jun 2023 05:10:59 -0400
+Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF1011BF5;
+        Wed, 21 Jun 2023 02:10:25 -0700 (PDT)
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+        by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20230621091023euoutp01ec65ee83be0b4972b071be6b6ce46ddd~qoYnSztar1413414134euoutp01V;
+        Wed, 21 Jun 2023 09:10:23 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20230621091023euoutp01ec65ee83be0b4972b071be6b6ce46ddd~qoYnSztar1413414134euoutp01V
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1687338623;
+        bh=1jgxo9l2TtPgCBIdPe/y+ojPYkgw4g2+N3N/h90OAdE=;
+        h=From:To:CC:Subject:Date:In-Reply-To:References:From;
+        b=rc2oPNlJp42Fpp8u3rDtoPvzPqisaQYsIMpfprmtb7MP8tuJ9U2DITmdFrRyh/Qzc
+         pT0tpbD15aITOcFnJmRIyANBOAePJqI0eBRt9OPkUkkR8nwz853xesTVcq38ltVct+
+         co62GQHfMbXW3m9DCqqdfu7acJ67HlfjK3RPgyGg=
+Received: from eusmges2new.samsung.com (unknown [203.254.199.244]) by
+        eucas1p1.samsung.com (KnoxPortal) with ESMTP id
+        20230621091023eucas1p122d19ce002f66c6e8a0adbd2e3a30ad4~qoYmz9mgx2848828488eucas1p1W;
+        Wed, 21 Jun 2023 09:10:23 +0000 (GMT)
+Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
+        eusmges2new.samsung.com (EUCPMTA) with SMTP id BF.8E.11320.E7EB2946; Wed, 21
+        Jun 2023 10:10:23 +0100 (BST)
+Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
+        eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
+        20230621091022eucas1p1c097da50842b23e902e1a674e117e1aa~qoYmASvrd0547605476eucas1p1v;
+        Wed, 21 Jun 2023 09:10:22 +0000 (GMT)
+Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
+        eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20230621091022eusmtrp236bd2250119bdac5fe33daa3c529b4fd~qoYl7iO_G2182221822eusmtrp2g;
+        Wed, 21 Jun 2023 09:10:22 +0000 (GMT)
+X-AuditID: cbfec7f4-993ff70000022c38-c8-6492be7e5d77
+Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
+        eusmgms1.samsung.com (EUCPMTA) with SMTP id CF.0F.10549.D7EB2946; Wed, 21
+        Jun 2023 10:10:22 +0100 (BST)
+Received: from CAMSVWEXC02.scsc.local (unknown [106.1.227.72]) by
+        eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
+        20230621091021eusmtip237d1f3e24e19ae8cad088c863d5c07c2~qoYlj-NWC1796317963eusmtip2T;
+        Wed, 21 Jun 2023 09:10:21 +0000 (GMT)
+Received: from localhost (106.210.248.248) by CAMSVWEXC02.scsc.local
+        (2002:6a01:e348::6a01:e348) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
+        Wed, 21 Jun 2023 10:10:20 +0100
+From:   Joel Granados <j.granados@samsung.com>
+To:     <mcgrof@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
+        Leon Romanovsky <leon@kernel.org>,
+        David Ahern <dsahern@kernel.org>,
         "David S. Miller" <davem@davemloft.net>,
         Eric Dumazet <edumazet@google.com>,
         Jakub Kicinski <kuba@kernel.org>,
         Paolo Abeni <pabeni@redhat.com>,
-        Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-        David Ahern <dsahern@kernel.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org,
-        Marc Kleine-Budde <mkl@pengutronix.de>, bpf@vger.kernel.org,
-        dccp@vger.kernel.org, linux-afs@lists.infradead.org,
-        linux-arm-msm@vger.kernel.org, linux-can@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-hams@vger.kernel.org,
-        linux-nfs@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linux-sctp@vger.kernel.org, linux-wpan@vger.kernel.org,
-        linux-x25@vger.kernel.org, mptcp@lists.linux.dev,
-        rds-devel@oss.oracle.com, tipc-discussion@lists.sourceforge.net,
-        virtualization@lists.linux-foundation.org
-Subject: [PATCH net-next v3 17/18] sock: Remove ->sendpage*() in favour of sendmsg(MSG_SPLICE_PAGES)
-Date:   Tue, 20 Jun 2023 15:53:36 +0100
-Message-ID: <20230620145338.1300897-18-dhowells@redhat.com>
-In-Reply-To: <20230620145338.1300897-1-dhowells@redhat.com>
-References: <20230620145338.1300897-1-dhowells@redhat.com>
+        Joerg Reuter <jreuter@yaina.de>,
+        Ralf Baechle <ralf@linux-mips.org>,
+        Pablo Neira Ayuso <pablo@netfilter.org>,
+        Jozsef Kadlecsik <kadlec@netfilter.org>,
+        Florian Westphal <fw@strlen.de>,
+        Roopa Prabhu <roopa@nvidia.com>,
+        Nikolay Aleksandrov <razor@blackwall.org>,
+        Alexander Aring <alex.aring@gmail.com>,
+        Stefan Schmidt <stefan@datenfreihafen.org>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Matthieu Baerts <matthieu.baerts@tessares.net>,
+        Mat Martineau <martineau@kernel.org>,
+        Simon Horman <horms@verge.net.au>,
+        Julian Anastasov <ja@ssi.bg>,
+        Remi Denis-Courmont <courmisch@gmail.com>,
+        Santosh Shilimkar <santosh.shilimkar@oracle.com>,
+        David Howells <dhowells@redhat.com>,
+        Marc Dionne <marc.dionne@auristor.com>,
+        Neil Horman <nhorman@tuxdriver.com>,
+        Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+        Xin Long <lucien.xin@gmail.com>,
+        Karsten Graul <kgraul@linux.ibm.com>,
+        Wenjia Zhang <wenjia@linux.ibm.com>,
+        Jan Karcher <jaka@linux.ibm.com>,
+        Jon Maloy <jmaloy@redhat.com>,
+        Ying Xue <ying.xue@windriver.com>,
+        Martin Schiller <ms@dev.tdt.de>
+CC:     Joel Granados <j.granados@samsung.com>,
+        <linux-rdma@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <linux-hams@vger.kernel.org>,
+        <netfilter-devel@vger.kernel.org>, <coreteam@netfilter.org>,
+        <bridge@lists.linux-foundation.org>, <dccp@vger.kernel.org>,
+        <linux-wpan@vger.kernel.org>, <mptcp@lists.linux.dev>,
+        <lvs-devel@vger.kernel.org>, <rds-devel@oss.oracle.com>,
+        <linux-afs@lists.infradead.org>, <linux-sctp@vger.kernel.org>,
+        <linux-s390@vger.kernel.org>,
+        <tipc-discussion@lists.sourceforge.net>,
+        <linux-x25@vger.kernel.org>
+Subject: [PATCH 06/11] sysctl: Add size to register_net_sysctl function
+Date:   Wed, 21 Jun 2023 11:09:55 +0200
+Message-ID: <20230621091000.424843-7-j.granados@samsung.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20230621091000.424843-1-j.granados@samsung.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+Content-Type: text/plain
+X-Originating-IP: [106.210.248.248]
+X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
+        CAMSVWEXC02.scsc.local (2002:6a01:e348::6a01:e348)
+X-Brightmail-Tracker: H4sIAAAAAAAAA01TaVBTVxid++7LAkzkERy5RTtMUWq1LRZb8ZtWOtBlfNp2yg+tDD+0EV4R
+        FGQIoNRRgYCyFA1LoQHKYlmCbDMQgoACpcomNVbQIIIoEEVEoixKokAJoR3+nfOd79x7zp25
+        QiwuFdgL/YNCuZAgyRFHviWtbjVoPjzdmOL7UWwlBS2R26G97J4A5urOYph6+JgH2ZoYGua0
+        iXyYiH5NQ0V9LAW61iEBqJNKESSOrQNZzQyCkfNDPOgpes4HxW/tCAZnhmgwnLMCRYKMAn16
+        FgU31ed4kGYsxCDvdIE7tQMUdNdn8+FRSxIN8nwZBl3eUx70pxbR0HwlF8FQpZ4CWe4kBtnU
+        MAajso0HN5IWMCi7HlHQK9ch+OtsIw+6KqMF8DKnHUNr3hqQV3TS0Cfr4MPL6+MIMsZvY7h1
+        eQN0Ti9QcKN6igdT2e/BQ7mGhlSlioKG+FkBqDQBENWlFsCwVovdXdm+oRnMTtzoQGxO2QnW
+        aNjMqkruUmzi1THM1mUOCFh1sxObVxXGVl2M57PXSsopVn6hGbHVBafZ1N5ixI5WKxDbkDdF
+        eTp4W+7w5Y74h3MhWz7/0fLQ6O9dvGB1CXVc+SKNF4nyZ1ACEgoJ8wkxGkITkKVQzCgRKczN
+        wAnIYpFMI6L/daNZmEJk5FYXbRJMhgdpSsosFCNinE+j/t96cvvJMqlBpCy1gGey8JkPiGa8
+        H5uE1UyOFSnOmRSYCGau0ORxZhFlSmLL7CTqGGuTgWaciGoslmcai5gdpP+O0Hy1AzmjzUAm
+        bMG4Ec2wfimSiLEhHYqRJYwXd2Q1WdiMCflzdBSbveuJtvEPvhmfJJ2qPsqM9VZkrvpbM/6K
+        jCruL+/bkrE2lcCM15GFutylYoRJRaRp/rnATEoRKYqaWT7pMxLTM7Ls8CDRcxew+YVXkd5n
+        NuZAq0iKOmN5LCJxZ8RytCFzRYXMFRUyV1TIQ/gisuPCpIF+nHRrEHfMWSoJlIYF+Tn7HA2s
+        Qov/6fp82/QlVDz2wrkFUULUgogQO64WvV2V4isW+UoifuZCjh4ICTvCSVvQWiHtaCd6363D
+        R8z4SUK5wxwXzIX8p1JCC/tIyvNpcsMbL/pVc7mkLa4x3Ekp13dPBrpHnYg/Tpef8radb5H/
+        MpB8UFjwd8pYrf5gfOZPuq3Z/JtNYtWnxn8qXUq/uV87Z19z7UtdhIe2ljWuv3VYa+0Qli7u
+        H4zw2Ktz3/46TnjbiZu3hWqbQG2Ev0Xz7E0fJ7cqvCkyumGbNPwL2URP39fus4mhl04OezQd
+        +z6gUOP6YEtFyu7OWpFdZNpghiu+t7vWUO/bp6vbv59Ys3d69/WRtxw7ug2Wz15t3JNwzv7U
+        AYMyFIK91m9amyTJz756frJAMbqnS1/i7bUvOpn4GiPu7tr17jvayHS+4s13nmF7mYCsdBy+
+        5uNtl38YdKSlhyQum3GIVPIv28QTHr4EAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA02TeVDUZRzGfX/H7iKz+QOW/A3pqEtYGaws55dAImvs1zQ1/GFZNgQ7sMMR
+        V7vgeJCgCxhnyzEqy7WgLKAGscAKkgxuxH1Eq2AGIfcZhwskJBKw0wz/Pe/zfT/PM9+Z9+Xg
+        pg9ZFpzA0AixJFQUzGftJtpfNv9lc7E+3c92Xo2DNsYZWu78yYb12is46IcmSMjpjiVgvS+J
+        BXOX/yWg7F4cBmNNw2zQpNxGkDS9D2TVywhGfxgm4aFqgQVZ11sQDC4PE7CaagxZiTIM5q9m
+        Y/CbJpWEzLUiHORtQui9O4CB7l4OC8a1KQTIC2Q4jClnSOjPUBHQcD8fwXD5PAay/Gc4yPQj
+        OKyVNJPQlbKBQ0nHOAaP5WMIfrlST0JH+WU2rOS14NCkfBXkZW0EPJG1smClfRbBtdlHOPz+
+        8+vQtrSBQVelngR9zpswJO8mIKOkCoO6hOdsqOoOgksdGjaM9PXhHk7Mk+FlnJnrakVM3p0L
+        zNrqEaaq9A+MSWqcxplaxQCb0TRYMUp1JKO+lcBifi39EWPkhQ2IqbwZzWQ8LkbMZGUWYuqU
+        eszzwGmBmyQsMkJ8MCBMGnGM/5UQ7ARCFxDYObgIhPbOXu/YOfKPurv5iYMDz4glR919BAGT
+        uR1kuKYUO1uymEnGoIJllIiMODTlQD/NLMES0W6OKVWE6J7SGcIw2EdXLD0iDdqMftGbyNrS
+        ptQiouOVbxuAakSX5hZsJ7Eoa7p7th/fGvCoPGM65YEabR1w6j5BTyhUmx0cjhn1Ia2J3bMF
+        EJQVXTUdR27ZXMqN7u/lGMoO0PF917YzjahjdPfIPGEodqPzF3TbPpcyoVuzRrd9fPO+rDob
+        N2iafjA5iRtyLOm++hssg/6O1q+PIzniKXbgih24YgeuRPgtxBNHSkP8Q6RCgVQUIo0M9Rf4
+        hoWo0ebz1jStVtagvOlFgRZhHKRFNAfn87j71el+plw/0bnzYkmYtyQyWCzVIsfNNdNwC3Pf
+        sM3/ERrhLXSydRQ6OLnYOro42fP3cj8K/15kSvmLIsTfiMXhYsn/HMYxsojBvLt7M4JOnH2r
+        2KLY5j0vOdc9jLt/pfOzqpc45XB4lPw73Z1su/u5wuU1XkXduVPmlqocRfuS32K1t03jnEnO
+        UM8XDdY14Vjyt++vFjakuk40HzRz5fo4G/8zsRoVFTuYFH7d47z9lMdYWeMnz4KOm4x0jgbW
+        VA/q0vy9Ooem9lCiyhszU1DYHo2F6Po9V6wORUzE5bv5Rx3+8hVeboD2ZO0uvU70xs2NtEMX
+        651VuxoaVwpfnOr6+ulAI7snWmVaHP/Buz72DubJ3Pi1QF3STx6Lamte0VR22oWPyxM7LCMr
+        Tie7Xuriw4nahU8Him+3HUpkzBLO+F59njem8TxZNJe8F+MT0gCR8AgukYr+A/zhRFhnBAAA
+X-CMS-MailID: 20230621091022eucas1p1c097da50842b23e902e1a674e117e1aa
+X-Msg-Generator: CA
+X-RootMTR: 20230621091022eucas1p1c097da50842b23e902e1a674e117e1aa
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20230621091022eucas1p1c097da50842b23e902e1a674e117e1aa
+References: <20230621091000.424843-1-j.granados@samsung.com>
+        <CGME20230621091022eucas1p1c097da50842b23e902e1a674e117e1aa@eucas1p1.samsung.com>
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Remove ->sendpage() and ->sendpage_locked().  sendmsg() with
-MSG_SPLICE_PAGES should be used instead.  This allows multiple pages and
-multipage folios to be passed through.
+In order to remove the end element from the ctl_table struct arrays, we
+explicitly define the size when registering the targets.
+The register_net_sysctl function is an indirection function that gets a
+new argument. All the functions that call into regster_net_sysctl, in
+turn, pass a new size of array argument.
 
-Signed-off-by: David Howells <dhowells@redhat.com>
-Acked-by: Marc Kleine-Budde <mkl@pengutronix.de> # for net/can
-cc: "David S. Miller" <davem@davemloft.net>
-cc: Eric Dumazet <edumazet@google.com>
-cc: Jakub Kicinski <kuba@kernel.org>
-cc: Paolo Abeni <pabeni@redhat.com>
-cc: Jens Axboe <axboe@kernel.dk>
-cc: Matthew Wilcox <willy@infradead.org>
-cc: bpf@vger.kernel.org
-cc: dccp@vger.kernel.org
-cc: linux-afs@lists.infradead.org
-cc: linux-arm-msm@vger.kernel.org
-cc: linux-can@vger.kernel.org
-cc: linux-crypto@vger.kernel.org
-cc: linux-doc@vger.kernel.org
-cc: linux-fsdevel@vger.kernel.org
-cc: linux-hams@vger.kernel.org
-cc: linux-nfs@vger.kernel.org
-cc: linux-rdma@vger.kernel.org
-cc: linux-sctp@vger.kernel.org
-cc: linux-wpan@vger.kernel.org
-cc: linux-x25@vger.kernel.org
-cc: mptcp@lists.linux.dev
-cc: netdev@vger.kernel.org
-cc: rds-devel@oss.oracle.com
-cc: tipc-discussion@lists.sourceforge.net
-cc: virtualization@lists.linux-foundation.org
+In general the callers of register_net_sysctl need to add a size
+argument calculated by ARRAY_size on the ctl_table array. The following
+files are the ones that fall in this "easy" category:
+	drivers/infiniband/core/iwcm.c
+	drivers/infiniband/core/ucma.c
+	drivers/net/vrf.c
+	include/net/net_namespace.h
+	net/appletalk/sysctl_net_atalk.c
+	net/ax25/sysctl_net_ax25.c
+	net/bridge/br_netfilter_hooks.c
+	net/core/neighbour.c
+	net/core/sysctl_net_core.c
+	net/dccp/sysctl.c
+	net/ieee802154/6lowpan/reassembly.c
+	net/ipv4/devinet.c
+	net/ipv4/ip_fragment.c
+	net/ipv4/route.c
+	net/ipv4/sysctl_net_ipv4.c
+	net/ipv4/xfrm4_policy.c
+	net/ipv6/addrconf.c
+	net/ipv6/netfilter/nf_conntrack_reasm.c
+	net/ipv6/reassembly.c
+	net/ipv6/xfrm6_policy.c
+	net/llc/sysctl_net_llc.c
+	net/mpls/af_mpls.c
+	net/mptcp/ctrl.c
+	net/netfilter/ipvs/ip_vs_ctl.c
+	net/netfilter/ipvs/ip_vs_lblc.c
+	net/netfilter/ipvs/ip_vs_lblcr.c
+	net/netfilter/nf_conntrack_standalone.c
+	net/netfilter/nf_log.c
+	net/netrom/sysctl_net_netrom.c
+	net/phonet/sysctl.c
+	net/rds/ib_sysctl.c
+	net/rds/sysctl.c
+	net/rds/tcp.c
+	net/rose/sysctl_net_rose.c
+	net/rxrpc/sysctl.c
+	net/sctp/sysctl.c
+	net/smc/smc_sysctl.c
+	net/tipc/sysctl.c
+	net/unix/sysctl_net_unix.c
+	net/x25/sysctl_net_x25.c
+	net/xfrm/xfrm_sysctl.c
+
+An additional size function was added to the following files in order to
+calculate the size of an array that is defined in another file:
+	include/net/ipv6.h
+	net/ipv6/icmp.c
+	net/ipv6/route.c
+	net/ipv6/sysctl_net_ipv6.c
+
+In this file we add the additional argument:
+	net/sysctl_net.c
+
+Signed-off-by: Joel Granados <j.granados@samsung.com>
 ---
+ drivers/infiniband/core/iwcm.c          |  3 +-
+ drivers/infiniband/core/ucma.c          |  4 +-
+ drivers/net/vrf.c                       |  3 +-
+ include/net/ipv6.h                      |  2 +
+ include/net/net_namespace.h             |  4 +-
+ net/appletalk/sysctl_net_atalk.c        |  4 +-
+ net/ax25/sysctl_net_ax25.c              |  3 +-
+ net/bridge/br_netfilter_hooks.c         |  2 +-
+ net/core/neighbour.c                    |  3 +-
+ net/core/sysctl_net_core.c              |  5 +-
+ net/dccp/sysctl.c                       |  3 +-
+ net/ieee802154/6lowpan/reassembly.c     |  6 +-
+ net/ipv4/devinet.c                      |  6 +-
+ net/ipv4/ip_fragment.c                  |  6 +-
+ net/ipv4/route.c                        |  6 +-
+ net/ipv4/sysctl_net_ipv4.c              |  6 +-
+ net/ipv4/xfrm4_policy.c                 |  3 +-
+ net/ipv6/addrconf.c                     |  3 +-
+ net/ipv6/icmp.c                         |  5 ++
+ net/ipv6/netfilter/nf_conntrack_reasm.c |  3 +-
+ net/ipv6/reassembly.c                   |  6 +-
+ net/ipv6/route.c                        |  5 ++
+ net/ipv6/sysctl_net_ipv6.c              | 13 +++--
+ net/ipv6/xfrm6_policy.c                 |  3 +-
+ net/llc/sysctl_net_llc.c                |  9 ++-
+ net/mpls/af_mpls.c                      | 75 +++++++++++++------------
+ net/mptcp/ctrl.c                        |  3 +-
+ net/netfilter/ipvs/ip_vs_ctl.c          |  3 +-
+ net/netfilter/ipvs/ip_vs_lblc.c         |  5 +-
+ net/netfilter/ipvs/ip_vs_lblcr.c        |  5 +-
+ net/netfilter/nf_conntrack_standalone.c |  8 ++-
+ net/netfilter/nf_log.c                  |  5 +-
+ net/netrom/sysctl_net_netrom.c          |  3 +-
+ net/phonet/sysctl.c                     |  4 +-
+ net/rds/ib_sysctl.c                     |  4 +-
+ net/rds/sysctl.c                        |  5 +-
+ net/rds/tcp.c                           |  3 +-
+ net/rose/sysctl_net_rose.c              |  4 +-
+ net/rxrpc/sysctl.c                      |  3 +-
+ net/sctp/sysctl.c                       |  7 ++-
+ net/smc/smc_sysctl.c                    |  3 +-
+ net/sysctl_net.c                        | 10 +---
+ net/tipc/sysctl.c                       |  3 +-
+ net/unix/sysctl_net_unix.c              |  3 +-
+ net/x25/sysctl_net_x25.c                |  4 +-
+ net/xfrm/xfrm_sysctl.c                  |  3 +-
+ 46 files changed, 176 insertions(+), 103 deletions(-)
 
-Notes:
-    ver #2)
-     - Removed duplicate word in comment.
-
- Documentation/bpf/map_sockmap.rst             | 10 ++--
- Documentation/filesystems/locking.rst         |  2 -
- Documentation/filesystems/vfs.rst             |  1 -
- Documentation/networking/scaling.rst          |  4 +-
- crypto/af_alg.c                               | 28 -----------
- crypto/algif_aead.c                           | 22 ++-------
- crypto/algif_rng.c                            |  2 -
- crypto/algif_skcipher.c                       | 14 ------
- .../chelsio/inline_crypto/chtls/chtls.h       |  2 -
- .../chelsio/inline_crypto/chtls/chtls_io.c    | 14 ------
- .../chelsio/inline_crypto/chtls/chtls_main.c  |  1 -
- fs/nfsd/vfs.c                                 |  2 +-
- include/crypto/if_alg.h                       |  2 -
- include/linux/net.h                           |  8 ----
- include/net/inet_common.h                     |  2 -
- include/net/sock.h                            |  6 ---
- include/net/tcp.h                             |  4 --
- net/appletalk/ddp.c                           |  1 -
- net/atm/pvc.c                                 |  1 -
- net/atm/svc.c                                 |  1 -
- net/ax25/af_ax25.c                            |  1 -
- net/caif/caif_socket.c                        |  2 -
- net/can/bcm.c                                 |  1 -
- net/can/isotp.c                               |  1 -
- net/can/j1939/socket.c                        |  1 -
- net/can/raw.c                                 |  1 -
- net/core/sock.c                               | 35 +-------------
- net/dccp/ipv4.c                               |  1 -
- net/dccp/ipv6.c                               |  1 -
- net/ieee802154/socket.c                       |  2 -
- net/ipv4/af_inet.c                            | 21 --------
- net/ipv4/tcp.c                                | 43 ++---------------
- net/ipv4/tcp_bpf.c                            | 23 +--------
- net/ipv4/tcp_ipv4.c                           |  1 -
- net/ipv4/udp.c                                | 15 ------
- net/ipv4/udp_impl.h                           |  2 -
- net/ipv4/udplite.c                            |  1 -
- net/ipv6/af_inet6.c                           |  3 --
- net/ipv6/raw.c                                |  1 -
- net/ipv6/tcp_ipv6.c                           |  1 -
- net/kcm/kcmsock.c                             | 20 --------
- net/key/af_key.c                              |  1 -
- net/l2tp/l2tp_ip.c                            |  1 -
- net/l2tp/l2tp_ip6.c                           |  1 -
- net/llc/af_llc.c                              |  1 -
- net/mctp/af_mctp.c                            |  1 -
- net/mptcp/protocol.c                          |  2 -
- net/netlink/af_netlink.c                      |  1 -
- net/netrom/af_netrom.c                        |  1 -
- net/packet/af_packet.c                        |  2 -
- net/phonet/socket.c                           |  2 -
- net/qrtr/af_qrtr.c                            |  1 -
- net/rds/af_rds.c                              |  1 -
- net/rose/af_rose.c                            |  1 -
- net/rxrpc/af_rxrpc.c                          |  1 -
- net/sctp/protocol.c                           |  1 -
- net/socket.c                                  | 48 -------------------
- net/tipc/socket.c                             |  3 --
- net/tls/tls.h                                 |  6 ---
- net/tls/tls_device.c                          | 17 -------
- net/tls/tls_main.c                            |  7 ---
- net/tls/tls_sw.c                              | 35 --------------
- net/unix/af_unix.c                            | 19 --------
- net/vmw_vsock/af_vsock.c                      |  3 --
- net/x25/af_x25.c                              |  1 -
- net/xdp/xsk.c                                 |  1 -
- 66 files changed, 20 insertions(+), 442 deletions(-)
-
-diff --git a/Documentation/bpf/map_sockmap.rst b/Documentation/bpf/map_sockmap.rst
-index cc92047c6630..2d630686a00b 100644
---- a/Documentation/bpf/map_sockmap.rst
-+++ b/Documentation/bpf/map_sockmap.rst
-@@ -240,11 +240,11 @@ offsets into ``msg``, respectively.
- If a program of type ``BPF_PROG_TYPE_SK_MSG`` is run on a ``msg`` it can only
- parse data that the (``data``, ``data_end``) pointers have already consumed.
- For ``sendmsg()`` hooks this is likely the first scatterlist element. But for
--calls relying on the ``sendpage`` handler (e.g., ``sendfile()``) this will be
--the range (**0**, **0**) because the data is shared with user space and by
--default the objective is to avoid allowing user space to modify data while (or
--after) BPF verdict is being decided. This helper can be used to pull in data
--and to set the start and end pointers to given values. Data will be copied if
-+calls relying on MSG_SPLICE_PAGES (e.g., ``sendfile()``) this will be the
-+range (**0**, **0**) because the data is shared with user space and by default
-+the objective is to avoid allowing user space to modify data while (or after)
-+BPF verdict is being decided. This helper can be used to pull in data and to
-+set the start and end pointers to given values. Data will be copied if
- necessary (i.e., if data was not linear and if start and end pointers do not
- point to the same chunk).
+diff --git a/drivers/infiniband/core/iwcm.c b/drivers/infiniband/core/iwcm.c
+index 2b47073c61a6..20627a894c89 100644
+--- a/drivers/infiniband/core/iwcm.c
++++ b/drivers/infiniband/core/iwcm.c
+@@ -1193,7 +1193,8 @@ static int __init iw_cm_init(void)
+ 		goto err_alloc;
  
-diff --git a/Documentation/filesystems/locking.rst b/Documentation/filesystems/locking.rst
-index aa1a233b0fa8..ed148919e11a 100644
---- a/Documentation/filesystems/locking.rst
-+++ b/Documentation/filesystems/locking.rst
-@@ -521,8 +521,6 @@ prototypes::
- 	int (*fsync) (struct file *, loff_t start, loff_t end, int datasync);
- 	int (*fasync) (int, struct file *, int);
- 	int (*lock) (struct file *, int, struct file_lock *);
--	ssize_t (*sendpage) (struct file *, struct page *, int, size_t,
--			loff_t *, int);
- 	unsigned long (*get_unmapped_area)(struct file *, unsigned long,
- 			unsigned long, unsigned long, unsigned long);
- 	int (*check_flags)(int);
-diff --git a/Documentation/filesystems/vfs.rst b/Documentation/filesystems/vfs.rst
-index 769be5230210..cb2a97e49872 100644
---- a/Documentation/filesystems/vfs.rst
-+++ b/Documentation/filesystems/vfs.rst
-@@ -1086,7 +1086,6 @@ This describes how the VFS can manipulate an open file.  As of kernel
- 		int (*fsync) (struct file *, loff_t, loff_t, int datasync);
- 		int (*fasync) (int, struct file *, int);
- 		int (*lock) (struct file *, int, struct file_lock *);
--		ssize_t (*sendpage) (struct file *, struct page *, int, size_t, loff_t *, int);
- 		unsigned long (*get_unmapped_area)(struct file *, unsigned long, unsigned long, unsigned long, unsigned long);
- 		int (*check_flags)(int);
- 		int (*flock) (struct file *, int, struct file_lock *);
-diff --git a/Documentation/networking/scaling.rst b/Documentation/networking/scaling.rst
-index 3d435caa3ef2..92c9fb46d6a2 100644
---- a/Documentation/networking/scaling.rst
-+++ b/Documentation/networking/scaling.rst
-@@ -269,8 +269,8 @@ a single application thread handles flows with many different flow hashes.
- rps_sock_flow_table is a global flow table that contains the *desired* CPU
- for flows: the CPU that is currently processing the flow in userspace.
- Each table value is a CPU index that is updated during calls to recvmsg
--and sendmsg (specifically, inet_recvmsg(), inet_sendmsg(), inet_sendpage()
--and tcp_splice_read()).
-+and sendmsg (specifically, inet_recvmsg(), inet_sendmsg() and
-+tcp_splice_read()).
- 
- When the scheduler moves a thread to a new CPU while it has outstanding
- receive packets on the old CPU, packets may arrive out of order. To
-diff --git a/crypto/af_alg.c b/crypto/af_alg.c
-index 7d4b6016b83d..11229f3bcf84 100644
---- a/crypto/af_alg.c
-+++ b/crypto/af_alg.c
-@@ -482,7 +482,6 @@ static const struct proto_ops alg_proto_ops = {
- 	.listen		=	sock_no_listen,
- 	.shutdown	=	sock_no_shutdown,
- 	.mmap		=	sock_no_mmap,
--	.sendpage	=	sock_no_sendpage,
- 	.sendmsg	=	sock_no_sendmsg,
- 	.recvmsg	=	sock_no_recvmsg,
- 
-@@ -1106,33 +1105,6 @@ int af_alg_sendmsg(struct socket *sock, struct msghdr *msg, size_t size,
- }
- EXPORT_SYMBOL_GPL(af_alg_sendmsg);
- 
--/**
-- * af_alg_sendpage - sendpage system call handler
-- * @sock: socket of connection to user space to write to
-- * @page: data to send
-- * @offset: offset into page to begin sending
-- * @size: length of data
-- * @flags: message send/receive flags
-- *
-- * This is a generic implementation of sendpage to fill ctx->tsgl_list.
-- */
--ssize_t af_alg_sendpage(struct socket *sock, struct page *page,
--			int offset, size_t size, int flags)
--{
--	struct bio_vec bvec;
--	struct msghdr msg = {
--		.msg_flags = flags | MSG_SPLICE_PAGES,
--	};
--
--	if (flags & MSG_SENDPAGE_NOTLAST)
--		msg.msg_flags |= MSG_MORE;
--
--	bvec_set_page(&bvec, page, size, offset);
--	iov_iter_bvec(&msg.msg_iter, ITER_SOURCE, &bvec, 1, size);
--	return sock_sendmsg(sock, &msg);
--}
--EXPORT_SYMBOL_GPL(af_alg_sendpage);
--
- /**
-  * af_alg_free_resources - release resources required for crypto request
-  * @areq: Request holding the TX and RX SGL
-diff --git a/crypto/algif_aead.c b/crypto/algif_aead.c
-index 35bfa283748d..7d58cbbce4af 100644
---- a/crypto/algif_aead.c
-+++ b/crypto/algif_aead.c
-@@ -9,10 +9,10 @@
-  * The following concept of the memory management is used:
-  *
-  * The kernel maintains two SGLs, the TX SGL and the RX SGL. The TX SGL is
-- * filled by user space with the data submitted via sendpage. Filling up
-- * the TX SGL does not cause a crypto operation -- the data will only be
-- * tracked by the kernel. Upon receipt of one recvmsg call, the caller must
-- * provide a buffer which is tracked with the RX SGL.
-+ * filled by user space with the data submitted via sendmsg (maybe with
-+ * MSG_SPLICE_PAGES).  Filling up the TX SGL does not cause a crypto operation
-+ * -- the data will only be tracked by the kernel. Upon receipt of one recvmsg
-+ * call, the caller must provide a buffer which is tracked with the RX SGL.
-  *
-  * During the processing of the recvmsg operation, the cipher request is
-  * allocated and prepared. As part of the recvmsg operation, the processed
-@@ -370,7 +370,6 @@ static struct proto_ops algif_aead_ops = {
- 
- 	.release	=	af_alg_release,
- 	.sendmsg	=	aead_sendmsg,
--	.sendpage	=	af_alg_sendpage,
- 	.recvmsg	=	aead_recvmsg,
- 	.poll		=	af_alg_poll,
- };
-@@ -422,18 +421,6 @@ static int aead_sendmsg_nokey(struct socket *sock, struct msghdr *msg,
- 	return aead_sendmsg(sock, msg, size);
- }
- 
--static ssize_t aead_sendpage_nokey(struct socket *sock, struct page *page,
--				       int offset, size_t size, int flags)
--{
--	int err;
--
--	err = aead_check_key(sock);
--	if (err)
--		return err;
--
--	return af_alg_sendpage(sock, page, offset, size, flags);
--}
--
- static int aead_recvmsg_nokey(struct socket *sock, struct msghdr *msg,
- 				  size_t ignored, int flags)
- {
-@@ -461,7 +448,6 @@ static struct proto_ops algif_aead_ops_nokey = {
- 
- 	.release	=	af_alg_release,
- 	.sendmsg	=	aead_sendmsg_nokey,
--	.sendpage	=	aead_sendpage_nokey,
- 	.recvmsg	=	aead_recvmsg_nokey,
- 	.poll		=	af_alg_poll,
- };
-diff --git a/crypto/algif_rng.c b/crypto/algif_rng.c
-index 407408c43730..10c41adac3b1 100644
---- a/crypto/algif_rng.c
-+++ b/crypto/algif_rng.c
-@@ -174,7 +174,6 @@ static struct proto_ops algif_rng_ops = {
- 	.bind		=	sock_no_bind,
- 	.accept		=	sock_no_accept,
- 	.sendmsg	=	sock_no_sendmsg,
--	.sendpage	=	sock_no_sendpage,
- 
- 	.release	=	af_alg_release,
- 	.recvmsg	=	rng_recvmsg,
-@@ -192,7 +191,6 @@ static struct proto_ops __maybe_unused algif_rng_test_ops = {
- 	.mmap		=	sock_no_mmap,
- 	.bind		=	sock_no_bind,
- 	.accept		=	sock_no_accept,
--	.sendpage	=	sock_no_sendpage,
- 
- 	.release	=	af_alg_release,
- 	.recvmsg	=	rng_test_recvmsg,
-diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
-index b1f321b9f846..9ada9b741af8 100644
---- a/crypto/algif_skcipher.c
-+++ b/crypto/algif_skcipher.c
-@@ -194,7 +194,6 @@ static struct proto_ops algif_skcipher_ops = {
- 
- 	.release	=	af_alg_release,
- 	.sendmsg	=	skcipher_sendmsg,
--	.sendpage	=	af_alg_sendpage,
- 	.recvmsg	=	skcipher_recvmsg,
- 	.poll		=	af_alg_poll,
- };
-@@ -246,18 +245,6 @@ static int skcipher_sendmsg_nokey(struct socket *sock, struct msghdr *msg,
- 	return skcipher_sendmsg(sock, msg, size);
- }
- 
--static ssize_t skcipher_sendpage_nokey(struct socket *sock, struct page *page,
--				       int offset, size_t size, int flags)
--{
--	int err;
--
--	err = skcipher_check_key(sock);
--	if (err)
--		return err;
--
--	return af_alg_sendpage(sock, page, offset, size, flags);
--}
--
- static int skcipher_recvmsg_nokey(struct socket *sock, struct msghdr *msg,
- 				  size_t ignored, int flags)
- {
-@@ -285,7 +272,6 @@ static struct proto_ops algif_skcipher_ops_nokey = {
- 
- 	.release	=	af_alg_release,
- 	.sendmsg	=	skcipher_sendmsg_nokey,
--	.sendpage	=	skcipher_sendpage_nokey,
- 	.recvmsg	=	skcipher_recvmsg_nokey,
- 	.poll		=	af_alg_poll,
- };
-diff --git a/drivers/net/ethernet/chelsio/inline_crypto/chtls/chtls.h b/drivers/net/ethernet/chelsio/inline_crypto/chtls/chtls.h
-index da4818d2c856..68562a82d036 100644
---- a/drivers/net/ethernet/chelsio/inline_crypto/chtls/chtls.h
-+++ b/drivers/net/ethernet/chelsio/inline_crypto/chtls/chtls.h
-@@ -569,8 +569,6 @@ int chtls_sendmsg(struct sock *sk, struct msghdr *msg, size_t size);
- int chtls_recvmsg(struct sock *sk, struct msghdr *msg,
- 		  size_t len, int flags, int *addr_len);
- void chtls_splice_eof(struct socket *sock);
--int chtls_sendpage(struct sock *sk, struct page *page,
--		   int offset, size_t size, int flags);
- int send_tx_flowc_wr(struct sock *sk, int compl,
- 		     u32 snd_nxt, u32 rcv_nxt);
- void chtls_tcp_push(struct sock *sk, int flags);
-diff --git a/drivers/net/ethernet/chelsio/inline_crypto/chtls/chtls_io.c b/drivers/net/ethernet/chelsio/inline_crypto/chtls/chtls_io.c
-index e08ac960c967..5fc64e47568a 100644
---- a/drivers/net/ethernet/chelsio/inline_crypto/chtls/chtls_io.c
-+++ b/drivers/net/ethernet/chelsio/inline_crypto/chtls/chtls_io.c
-@@ -1246,20 +1246,6 @@ void chtls_splice_eof(struct socket *sock)
- 	release_sock(sk);
- }
- 
--int chtls_sendpage(struct sock *sk, struct page *page,
--		   int offset, size_t size, int flags)
--{
--	struct msghdr msg = { .msg_flags = flags | MSG_SPLICE_PAGES, };
--	struct bio_vec bvec;
--
--	if (flags & MSG_SENDPAGE_NOTLAST)
--		msg.msg_flags |= MSG_MORE;
--
--	bvec_set_page(&bvec, page, size, offset);
--	iov_iter_bvec(&msg.msg_iter, ITER_SOURCE, &bvec, 1, size);
--	return chtls_sendmsg(sk, &msg, size);
--}
--
- static void chtls_select_window(struct sock *sk)
- {
- 	struct chtls_sock *csk = rcu_dereference_sk_user_data(sk);
-diff --git a/drivers/net/ethernet/chelsio/inline_crypto/chtls/chtls_main.c b/drivers/net/ethernet/chelsio/inline_crypto/chtls/chtls_main.c
-index 6b6787eafd2f..455a54708be4 100644
---- a/drivers/net/ethernet/chelsio/inline_crypto/chtls/chtls_main.c
-+++ b/drivers/net/ethernet/chelsio/inline_crypto/chtls/chtls_main.c
-@@ -607,7 +607,6 @@ static void __init chtls_init_ulp_ops(void)
- 	chtls_cpl_prot.shutdown		= chtls_shutdown;
- 	chtls_cpl_prot.sendmsg		= chtls_sendmsg;
- 	chtls_cpl_prot.splice_eof	= chtls_splice_eof;
--	chtls_cpl_prot.sendpage		= chtls_sendpage;
- 	chtls_cpl_prot.recvmsg		= chtls_recvmsg;
- 	chtls_cpl_prot.setsockopt	= chtls_setsockopt;
- 	chtls_cpl_prot.getsockopt	= chtls_getsockopt;
-diff --git a/fs/nfsd/vfs.c b/fs/nfsd/vfs.c
-index db67f8e19344..8879e207ff5a 100644
---- a/fs/nfsd/vfs.c
-+++ b/fs/nfsd/vfs.c
-@@ -936,7 +936,7 @@ nfsd_open_verified(struct svc_rqst *rqstp, struct svc_fh *fhp, int may_flags,
- 
- /*
-  * Grab and keep cached pages associated with a file in the svc_rqst
-- * so that they can be passed to the network sendmsg/sendpage routines
-+ * so that they can be passed to the network sendmsg routines
-  * directly. They will be released after the sending has completed.
-  *
-  * Return values: Number of bytes consumed, or -EIO if there are no
-diff --git a/include/crypto/if_alg.h b/include/crypto/if_alg.h
-index 34224e77f5a2..ef8ce86b1f78 100644
---- a/include/crypto/if_alg.h
-+++ b/include/crypto/if_alg.h
-@@ -229,8 +229,6 @@ void af_alg_wmem_wakeup(struct sock *sk);
- int af_alg_wait_for_data(struct sock *sk, unsigned flags, unsigned min);
- int af_alg_sendmsg(struct socket *sock, struct msghdr *msg, size_t size,
- 		   unsigned int ivsize);
--ssize_t af_alg_sendpage(struct socket *sock, struct page *page,
--			int offset, size_t size, int flags);
- void af_alg_free_resources(struct af_alg_async_req *areq);
- void af_alg_async_cb(void *data, int err);
- __poll_t af_alg_poll(struct file *file, struct socket *sock,
-diff --git a/include/linux/net.h b/include/linux/net.h
-index 23324e9a2b3d..41c608c1b02c 100644
---- a/include/linux/net.h
-+++ b/include/linux/net.h
-@@ -207,8 +207,6 @@ struct proto_ops {
- 				      size_t total_len, int flags);
- 	int		(*mmap)	     (struct file *file, struct socket *sock,
- 				      struct vm_area_struct * vma);
--	ssize_t		(*sendpage)  (struct socket *sock, struct page *page,
--				      int offset, size_t size, int flags);
- 	ssize_t 	(*splice_read)(struct socket *sock,  loff_t *ppos,
- 				       struct pipe_inode_info *pipe, size_t len, unsigned int flags);
- 	void		(*splice_eof)(struct socket *sock);
-@@ -222,8 +220,6 @@ struct proto_ops {
- 				     sk_read_actor_t recv_actor);
- 	/* This is different from read_sock(), it reads an entire skb at a time. */
- 	int		(*read_skb)(struct sock *sk, skb_read_actor_t recv_actor);
--	int		(*sendpage_locked)(struct sock *sk, struct page *page,
--					   int offset, size_t size, int flags);
- 	int		(*sendmsg_locked)(struct sock *sk, struct msghdr *msg,
- 					  size_t size);
- 	int		(*set_rcvlowat)(struct sock *sk, int val);
-@@ -341,10 +337,6 @@ int kernel_connect(struct socket *sock, struct sockaddr *addr, int addrlen,
- 		   int flags);
- int kernel_getsockname(struct socket *sock, struct sockaddr *addr);
- int kernel_getpeername(struct socket *sock, struct sockaddr *addr);
--int kernel_sendpage(struct socket *sock, struct page *page, int offset,
--		    size_t size, int flags);
--int kernel_sendpage_locked(struct sock *sk, struct page *page, int offset,
--			   size_t size, int flags);
- int kernel_sock_shutdown(struct socket *sock, enum sock_shutdown_cmd how);
- 
- /* Routine returns the IP overhead imposed by a (caller-protected) socket. */
-diff --git a/include/net/inet_common.h b/include/net/inet_common.h
-index a75333342c4e..b86b8e21de7f 100644
---- a/include/net/inet_common.h
-+++ b/include/net/inet_common.h
-@@ -36,8 +36,6 @@ void __inet_accept(struct socket *sock, struct socket *newsock,
- int inet_send_prepare(struct sock *sk);
- int inet_sendmsg(struct socket *sock, struct msghdr *msg, size_t size);
- void inet_splice_eof(struct socket *sock);
--ssize_t inet_sendpage(struct socket *sock, struct page *page, int offset,
--		      size_t size, int flags);
- int inet_recvmsg(struct socket *sock, struct msghdr *msg, size_t size,
- 		 int flags);
- int inet_shutdown(struct socket *sock, int how);
-diff --git a/include/net/sock.h b/include/net/sock.h
-index 62a1b99da349..121284f455a8 100644
---- a/include/net/sock.h
-+++ b/include/net/sock.h
-@@ -1277,8 +1277,6 @@ struct proto {
- 					   size_t len);
- 	int			(*recvmsg)(struct sock *sk, struct msghdr *msg,
- 					   size_t len, int flags, int *addr_len);
--	int			(*sendpage)(struct sock *sk, struct page *page,
--					int offset, size_t size, int flags);
- 	void			(*splice_eof)(struct socket *sock);
- 	int			(*bind)(struct sock *sk,
- 					struct sockaddr *addr, int addr_len);
-@@ -1919,10 +1917,6 @@ int sock_no_sendmsg_locked(struct sock *sk, struct msghdr *msg, size_t len);
- int sock_no_recvmsg(struct socket *, struct msghdr *, size_t, int);
- int sock_no_mmap(struct file *file, struct socket *sock,
- 		 struct vm_area_struct *vma);
--ssize_t sock_no_sendpage(struct socket *sock, struct page *page, int offset,
--			 size_t size, int flags);
--ssize_t sock_no_sendpage_locked(struct sock *sk, struct page *page,
--				int offset, size_t size, int flags);
- 
- /*
-  * Functions to fill in entries in struct proto_ops when a protocol
-diff --git a/include/net/tcp.h b/include/net/tcp.h
-index 9c08eab647a2..95e4507febed 100644
---- a/include/net/tcp.h
-+++ b/include/net/tcp.h
-@@ -328,10 +328,6 @@ int tcp_sendmsg_locked(struct sock *sk, struct msghdr *msg, size_t size);
- int tcp_sendmsg_fastopen(struct sock *sk, struct msghdr *msg, int *copied,
- 			 size_t size, struct ubuf_info *uarg);
- void tcp_splice_eof(struct socket *sock);
--int tcp_sendpage(struct sock *sk, struct page *page, int offset, size_t size,
--		 int flags);
--int tcp_sendpage_locked(struct sock *sk, struct page *page, int offset,
--			size_t size, int flags);
- int tcp_send_mss(struct sock *sk, int *size_goal, int flags);
- int tcp_wmem_schedule(struct sock *sk, int copy);
- void tcp_push(struct sock *sk, int flags, int mss_now, int nonagle,
-diff --git a/net/appletalk/ddp.c b/net/appletalk/ddp.c
-index a06f4d4a6f47..8978fb6212ff 100644
---- a/net/appletalk/ddp.c
-+++ b/net/appletalk/ddp.c
-@@ -1929,7 +1929,6 @@ static const struct proto_ops atalk_dgram_ops = {
- 	.sendmsg	= atalk_sendmsg,
- 	.recvmsg	= atalk_recvmsg,
- 	.mmap		= sock_no_mmap,
--	.sendpage	= sock_no_sendpage,
- };
- 
- static struct notifier_block ddp_notifier = {
-diff --git a/net/atm/pvc.c b/net/atm/pvc.c
-index 53e7d3f39e26..66d9a9bd5896 100644
---- a/net/atm/pvc.c
-+++ b/net/atm/pvc.c
-@@ -126,7 +126,6 @@ static const struct proto_ops pvc_proto_ops = {
- 	.sendmsg =	vcc_sendmsg,
- 	.recvmsg =	vcc_recvmsg,
- 	.mmap =		sock_no_mmap,
--	.sendpage =	sock_no_sendpage,
- };
- 
- 
-diff --git a/net/atm/svc.c b/net/atm/svc.c
-index d83556d8beb9..36a814f1fbd1 100644
---- a/net/atm/svc.c
-+++ b/net/atm/svc.c
-@@ -654,7 +654,6 @@ static const struct proto_ops svc_proto_ops = {
- 	.sendmsg =	vcc_sendmsg,
- 	.recvmsg =	vcc_recvmsg,
- 	.mmap =		sock_no_mmap,
--	.sendpage =	sock_no_sendpage,
- };
- 
- 
-diff --git a/net/ax25/af_ax25.c b/net/ax25/af_ax25.c
-index d8da400cb4de..5db805d5f74d 100644
---- a/net/ax25/af_ax25.c
-+++ b/net/ax25/af_ax25.c
-@@ -2022,7 +2022,6 @@ static const struct proto_ops ax25_proto_ops = {
- 	.sendmsg	= ax25_sendmsg,
- 	.recvmsg	= ax25_recvmsg,
- 	.mmap		= sock_no_mmap,
--	.sendpage	= sock_no_sendpage,
- };
- 
- /*
-diff --git a/net/caif/caif_socket.c b/net/caif/caif_socket.c
-index 4eebcc66c19a..9c82698da4f5 100644
---- a/net/caif/caif_socket.c
-+++ b/net/caif/caif_socket.c
-@@ -976,7 +976,6 @@ static const struct proto_ops caif_seqpacket_ops = {
- 	.sendmsg = caif_seqpkt_sendmsg,
- 	.recvmsg = caif_seqpkt_recvmsg,
- 	.mmap = sock_no_mmap,
--	.sendpage = sock_no_sendpage,
- };
- 
- static const struct proto_ops caif_stream_ops = {
-@@ -996,7 +995,6 @@ static const struct proto_ops caif_stream_ops = {
- 	.sendmsg = caif_stream_sendmsg,
- 	.recvmsg = caif_stream_recvmsg,
- 	.mmap = sock_no_mmap,
--	.sendpage = sock_no_sendpage,
- };
- 
- /* This function is called when a socket is finally destroyed. */
-diff --git a/net/can/bcm.c b/net/can/bcm.c
-index a962ec2b8ba5..9ba35685b043 100644
---- a/net/can/bcm.c
-+++ b/net/can/bcm.c
-@@ -1703,7 +1703,6 @@ static const struct proto_ops bcm_ops = {
- 	.sendmsg       = bcm_sendmsg,
- 	.recvmsg       = bcm_recvmsg,
- 	.mmap          = sock_no_mmap,
--	.sendpage      = sock_no_sendpage,
- };
- 
- static struct proto bcm_proto __read_mostly = {
-diff --git a/net/can/isotp.c b/net/can/isotp.c
-index 84f9aba02901..1f25b45868cf 100644
---- a/net/can/isotp.c
-+++ b/net/can/isotp.c
-@@ -1699,7 +1699,6 @@ static const struct proto_ops isotp_ops = {
- 	.sendmsg = isotp_sendmsg,
- 	.recvmsg = isotp_recvmsg,
- 	.mmap = sock_no_mmap,
--	.sendpage = sock_no_sendpage,
- };
- 
- static struct proto isotp_proto __read_mostly = {
-diff --git a/net/can/j1939/socket.c b/net/can/j1939/socket.c
-index 35970c25496a..feaec4ad6d16 100644
---- a/net/can/j1939/socket.c
-+++ b/net/can/j1939/socket.c
-@@ -1306,7 +1306,6 @@ static const struct proto_ops j1939_ops = {
- 	.sendmsg = j1939_sk_sendmsg,
- 	.recvmsg = j1939_sk_recvmsg,
- 	.mmap = sock_no_mmap,
--	.sendpage = sock_no_sendpage,
- };
- 
- static struct proto j1939_proto __read_mostly = {
-diff --git a/net/can/raw.c b/net/can/raw.c
-index f64469b98260..15c79b079184 100644
---- a/net/can/raw.c
-+++ b/net/can/raw.c
-@@ -962,7 +962,6 @@ static const struct proto_ops raw_ops = {
- 	.sendmsg       = raw_sendmsg,
- 	.recvmsg       = raw_recvmsg,
- 	.mmap          = sock_no_mmap,
--	.sendpage      = sock_no_sendpage,
- };
- 
- static struct proto raw_proto __read_mostly = {
-diff --git a/net/core/sock.c b/net/core/sock.c
-index cff3e82514d1..5c4948fe8ab1 100644
---- a/net/core/sock.c
-+++ b/net/core/sock.c
-@@ -3267,36 +3267,6 @@ void __receive_sock(struct file *file)
+ 	iwcm_ctl_table_hdr = register_net_sysctl(&init_net, "net/iw_cm",
+-						 iwcm_ctl_table);
++						 iwcm_ctl_table,
++						 ARRAY_SIZE(iwcm_ctl_table));
+ 	if (!iwcm_ctl_table_hdr) {
+ 		pr_err("iw_cm: couldn't register sysctl paths\n");
+ 		goto err_sysctl;
+diff --git a/drivers/infiniband/core/ucma.c b/drivers/infiniband/core/ucma.c
+index bf42650f125b..f737ab0de883 100644
+--- a/drivers/infiniband/core/ucma.c
++++ b/drivers/infiniband/core/ucma.c
+@@ -1863,7 +1863,9 @@ static int __init ucma_init(void)
+ 		goto err1;
  	}
- }
  
--ssize_t sock_no_sendpage(struct socket *sock, struct page *page, int offset, size_t size, int flags)
--{
--	ssize_t res;
--	struct msghdr msg = {.msg_flags = flags};
--	struct kvec iov;
--	char *kaddr = kmap(page);
--	iov.iov_base = kaddr + offset;
--	iov.iov_len = size;
--	res = kernel_sendmsg(sock, &msg, &iov, 1, size);
--	kunmap(page);
--	return res;
--}
--EXPORT_SYMBOL(sock_no_sendpage);
--
--ssize_t sock_no_sendpage_locked(struct sock *sk, struct page *page,
--				int offset, size_t size, int flags)
--{
--	ssize_t res;
--	struct msghdr msg = {.msg_flags = flags};
--	struct kvec iov;
--	char *kaddr = kmap(page);
--
--	iov.iov_base = kaddr + offset;
--	iov.iov_len = size;
--	res = kernel_sendmsg_locked(sk, &msg, &iov, 1, size);
--	kunmap(page);
--	return res;
--}
--EXPORT_SYMBOL(sock_no_sendpage_locked);
--
- /*
-  *	Default Socket Callbacks
-  */
-@@ -4052,7 +4022,7 @@ static void proto_seq_printf(struct seq_file *seq, struct proto *proto)
+-	ucma_ctl_table_hdr = register_net_sysctl(&init_net, "net/rdma_ucm", ucma_ctl_table);
++	ucma_ctl_table_hdr = register_net_sysctl(&init_net, "net/rdma_ucm",
++						 ucma_ctl_table,
++						 ARRAY_SIZE(ucma_ctl_table));
+ 	if (!ucma_ctl_table_hdr) {
+ 		pr_err("rdma_ucm: couldn't register sysctl paths\n");
+ 		ret = -ENOMEM;
+diff --git a/drivers/net/vrf.c b/drivers/net/vrf.c
+index bdb3a76a352e..edd8f2ba5595 100644
+--- a/drivers/net/vrf.c
++++ b/drivers/net/vrf.c
+@@ -1979,7 +1979,8 @@ static int vrf_netns_init_sysctl(struct net *net, struct netns_vrf *nn_vrf)
+ 	/* init the extra1 parameter with the reference to current netns */
+ 	table[0].extra1 = net;
+ 
+-	nn_vrf->ctl_hdr = register_net_sysctl(net, "net/vrf", table);
++	nn_vrf->ctl_hdr = register_net_sysctl(net, "net/vrf", table,
++					      ARRAY_SIZE(vrf_table));
+ 	if (!nn_vrf->ctl_hdr) {
+ 		kfree(table);
+ 		return -ENOMEM;
+diff --git a/include/net/ipv6.h b/include/net/ipv6.h
+index 7332296eca44..37c2737be083 100644
+--- a/include/net/ipv6.h
++++ b/include/net/ipv6.h
+@@ -1274,7 +1274,9 @@ static inline int snmp6_unregister_dev(struct inet6_dev *idev) { return 0; }
+ 
+ #ifdef CONFIG_SYSCTL
+ struct ctl_table *ipv6_icmp_sysctl_init(struct net *net);
++size_t ipv6_icmp_sysctl_table_size(void);
+ struct ctl_table *ipv6_route_sysctl_init(struct net *net);
++size_t ipv6_route_sysctl_table_size(void);
+ int ipv6_sysctl_register(void);
+ void ipv6_sysctl_unregister(void);
+ #endif
+diff --git a/include/net/net_namespace.h b/include/net/net_namespace.h
+index 78beaa765c73..e6ffe77516eb 100644
+--- a/include/net/net_namespace.h
++++ b/include/net/net_namespace.h
+@@ -472,12 +472,12 @@ struct ctl_table;
+ #ifdef CONFIG_SYSCTL
+ int net_sysctl_init(void);
+ struct ctl_table_header *register_net_sysctl(struct net *net, const char *path,
+-					     struct ctl_table *table);
++					     struct ctl_table *table, size_t table_size);
+ void unregister_net_sysctl_table(struct ctl_table_header *header);
+ #else
+ static inline int net_sysctl_init(void) { return 0; }
+ static inline struct ctl_table_header *register_net_sysctl(struct net *net,
+-	const char *path, struct ctl_table *table)
++	const char *path, struct ctl_table *table, size_t table_size)
  {
+ 	return NULL;
+ }
+diff --git a/net/appletalk/sysctl_net_atalk.c b/net/appletalk/sysctl_net_atalk.c
+index d945b7c0176d..30dcbbb8aeff 100644
+--- a/net/appletalk/sysctl_net_atalk.c
++++ b/net/appletalk/sysctl_net_atalk.c
+@@ -47,7 +47,9 @@ static struct ctl_table_header *atalk_table_header;
  
- 	seq_printf(seq, "%-9s %4u %6d  %6ld   %-3s %6u   %-3s  %-10s "
--			"%2c %2c %2c %2c %2c %2c %2c %2c %2c %2c %2c %2c %2c %2c %2c %2c %2c %2c %2c\n",
-+			"%2c %2c %2c %2c %2c %2c %2c %2c %2c %2c %2c %2c %2c %2c %2c %2c %2c %2c\n",
- 		   proto->name,
- 		   proto->obj_size,
- 		   sock_prot_inuse_get(seq_file_net(seq), proto),
-@@ -4073,7 +4043,6 @@ static void proto_seq_printf(struct seq_file *seq, struct proto *proto)
- 		   proto_method_implemented(proto->getsockopt),
- 		   proto_method_implemented(proto->sendmsg),
- 		   proto_method_implemented(proto->recvmsg),
--		   proto_method_implemented(proto->sendpage),
- 		   proto_method_implemented(proto->bind),
- 		   proto_method_implemented(proto->backlog_rcv),
- 		   proto_method_implemented(proto->hash),
-@@ -4094,7 +4063,7 @@ static int proto_seq_show(struct seq_file *seq, void *v)
- 			   "maxhdr",
- 			   "slab",
- 			   "module",
--			   "cl co di ac io in de sh ss gs se re sp bi br ha uh gp em\n");
-+			   "cl co di ac io in de sh ss gs se re bi br ha uh gp em\n");
- 	else
- 		proto_seq_printf(seq, list_entry(v, struct proto, node));
+ int __init atalk_register_sysctl(void)
+ {
+-	atalk_table_header = register_net_sysctl(&init_net, "net/appletalk", atalk_table);
++	atalk_table_header = register_net_sysctl(&init_net, "net/appletalk",
++						 atalk_table,
++						 ARRAY_SIZE(atalk_table));
+ 	if (!atalk_table_header)
+ 		return -ENOMEM;
  	return 0;
-diff --git a/net/dccp/ipv4.c b/net/dccp/ipv4.c
-index 3ab68415d121..fa8079303cb0 100644
---- a/net/dccp/ipv4.c
-+++ b/net/dccp/ipv4.c
-@@ -1010,7 +1010,6 @@ static const struct proto_ops inet_dccp_ops = {
- 	.sendmsg	   = inet_sendmsg,
- 	.recvmsg	   = sock_common_recvmsg,
- 	.mmap		   = sock_no_mmap,
--	.sendpage	   = sock_no_sendpage,
- };
+diff --git a/net/ax25/sysctl_net_ax25.c b/net/ax25/sysctl_net_ax25.c
+index 2154d004d3dc..06afbc14b783 100644
+--- a/net/ax25/sysctl_net_ax25.c
++++ b/net/ax25/sysctl_net_ax25.c
+@@ -159,7 +159,8 @@ int ax25_register_dev_sysctl(ax25_dev *ax25_dev)
+ 		table[k].data = &ax25_dev->values[k];
  
- static struct inet_protosw dccp_v4_protosw = {
-diff --git a/net/dccp/ipv6.c b/net/dccp/ipv6.c
-index 93c98990d726..7249ef218178 100644
---- a/net/dccp/ipv6.c
-+++ b/net/dccp/ipv6.c
-@@ -1087,7 +1087,6 @@ static const struct proto_ops inet6_dccp_ops = {
- 	.sendmsg	   = inet_sendmsg,
- 	.recvmsg	   = sock_common_recvmsg,
- 	.mmap		   = sock_no_mmap,
--	.sendpage	   = sock_no_sendpage,
- #ifdef CONFIG_COMPAT
- 	.compat_ioctl	   = inet6_compat_ioctl,
- #endif
-diff --git a/net/ieee802154/socket.c b/net/ieee802154/socket.c
-index 9c124705120d..00302e8b9615 100644
---- a/net/ieee802154/socket.c
-+++ b/net/ieee802154/socket.c
-@@ -426,7 +426,6 @@ static const struct proto_ops ieee802154_raw_ops = {
- 	.sendmsg	   = ieee802154_sock_sendmsg,
- 	.recvmsg	   = sock_common_recvmsg,
- 	.mmap		   = sock_no_mmap,
--	.sendpage	   = sock_no_sendpage,
- };
+ 	snprintf(path, sizeof(path), "net/ax25/%s", ax25_dev->dev->name);
+-	ax25_dev->sysheader = register_net_sysctl(&init_net, path, table);
++	ax25_dev->sysheader = register_net_sysctl(&init_net, path, table,
++						  ARRAY_SIZE(ax25_param_table));
+ 	if (!ax25_dev->sysheader) {
+ 		kfree(table);
+ 		return -ENOMEM;
+diff --git a/net/bridge/br_netfilter_hooks.c b/net/bridge/br_netfilter_hooks.c
+index 1a801fab9543..ebbaef748a48 100644
+--- a/net/bridge/br_netfilter_hooks.c
++++ b/net/bridge/br_netfilter_hooks.c
+@@ -1135,7 +1135,7 @@ static int br_netfilter_sysctl_init_net(struct net *net)
  
- /* DGRAM Sockets (802.15.4 dataframes) */
-@@ -989,7 +988,6 @@ static const struct proto_ops ieee802154_dgram_ops = {
- 	.sendmsg	   = ieee802154_sock_sendmsg,
- 	.recvmsg	   = sock_common_recvmsg,
- 	.mmap		   = sock_no_mmap,
--	.sendpage	   = sock_no_sendpage,
- };
+ 	br_netfilter_sysctl_default(brnet);
  
- static void ieee802154_sock_destruct(struct sock *sk)
-diff --git a/net/ipv4/af_inet.c b/net/ipv4/af_inet.c
-index 38e649fb4474..9b2ca2fcc5a1 100644
---- a/net/ipv4/af_inet.c
-+++ b/net/ipv4/af_inet.c
-@@ -847,23 +847,6 @@ void inet_splice_eof(struct socket *sock)
- }
- EXPORT_SYMBOL_GPL(inet_splice_eof);
+-	brnet->ctl_hdr = register_net_sysctl(net, "net/bridge", table);
++	brnet->ctl_hdr = register_net_sysctl(net, "net/bridge", table, ARRAY_SIZE(brnf_table));
+ 	if (!brnet->ctl_hdr) {
+ 		if (!net_eq(net, &init_net))
+ 			kfree(table);
+diff --git a/net/core/neighbour.c b/net/core/neighbour.c
+index ddd0f32de20e..aa5ad1cfc9b1 100644
+--- a/net/core/neighbour.c
++++ b/net/core/neighbour.c
+@@ -3842,7 +3842,8 @@ int neigh_sysctl_register(struct net_device *dev, struct neigh_parms *p,
+ 	snprintf(neigh_path, sizeof(neigh_path), "net/%s/neigh/%s",
+ 		p_name, dev_name_source);
+ 	t->sysctl_header =
+-		register_net_sysctl(neigh_parms_net(p), neigh_path, t->neigh_vars);
++		register_net_sysctl(neigh_parms_net(p), neigh_path, t->neigh_vars,
++				    ARRAY_SIZE(t->neigh_vars));
+ 	if (!t->sysctl_header)
+ 		goto free;
  
--ssize_t inet_sendpage(struct socket *sock, struct page *page, int offset,
--		      size_t size, int flags)
--{
--	struct sock *sk = sock->sk;
--	const struct proto *prot;
--
--	if (unlikely(inet_send_prepare(sk)))
--		return -EAGAIN;
--
--	/* IPV6_ADDRFORM can change sk->sk_prot under us. */
--	prot = READ_ONCE(sk->sk_prot);
--	if (prot->sendpage)
--		return prot->sendpage(sk, page, offset, size, flags);
--	return sock_no_sendpage(sock, page, offset, size, flags);
--}
--EXPORT_SYMBOL(inet_sendpage);
--
- INDIRECT_CALLABLE_DECLARE(int udp_recvmsg(struct sock *, struct msghdr *,
- 					  size_t, int, int *));
- int inet_recvmsg(struct socket *sock, struct msghdr *msg, size_t size,
-@@ -1067,12 +1050,10 @@ const struct proto_ops inet_stream_ops = {
- 	.mmap		   = tcp_mmap,
- #endif
- 	.splice_eof	   = inet_splice_eof,
--	.sendpage	   = inet_sendpage,
- 	.splice_read	   = tcp_splice_read,
- 	.read_sock	   = tcp_read_sock,
- 	.read_skb	   = tcp_read_skb,
- 	.sendmsg_locked    = tcp_sendmsg_locked,
--	.sendpage_locked   = tcp_sendpage_locked,
- 	.peek_len	   = tcp_peek_len,
- #ifdef CONFIG_COMPAT
- 	.compat_ioctl	   = inet_compat_ioctl,
-@@ -1102,7 +1083,6 @@ const struct proto_ops inet_dgram_ops = {
- 	.recvmsg	   = inet_recvmsg,
- 	.mmap		   = sock_no_mmap,
- 	.splice_eof	   = inet_splice_eof,
--	.sendpage	   = inet_sendpage,
- 	.set_peek_off	   = sk_set_peek_off,
- #ifdef CONFIG_COMPAT
- 	.compat_ioctl	   = inet_compat_ioctl,
-@@ -1134,7 +1114,6 @@ static const struct proto_ops inet_sockraw_ops = {
- 	.recvmsg	   = inet_recvmsg,
- 	.mmap		   = sock_no_mmap,
- 	.splice_eof	   = inet_splice_eof,
--	.sendpage	   = inet_sendpage,
- #ifdef CONFIG_COMPAT
- 	.compat_ioctl	   = inet_compat_ioctl,
- #endif
-diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index 0e21ea92dc1d..38f9250999cc 100644
---- a/net/ipv4/tcp.c
-+++ b/net/ipv4/tcp.c
-@@ -923,11 +923,10 @@ int tcp_send_mss(struct sock *sk, int *size_goal, int flags)
- 	return mss_now;
+diff --git a/net/core/sysctl_net_core.c b/net/core/sysctl_net_core.c
+index 782273bb93c2..aa615f22507b 100644
+--- a/net/core/sysctl_net_core.c
++++ b/net/core/sysctl_net_core.c
+@@ -712,7 +712,8 @@ static __net_init int sysctl_core_net_init(struct net *net)
+ 			tmp->data += (char *)net - (char *)&init_net;
+ 	}
+ 
+-	net->core.sysctl_hdr = register_net_sysctl(net, "net/core", tbl);
++	net->core.sysctl_hdr = register_net_sysctl(net, "net/core", tbl,
++						   ARRAY_SIZE(netns_core_table));
+ 	if (net->core.sysctl_hdr == NULL)
+ 		goto err_reg;
+ 
+@@ -745,7 +746,7 @@ static __net_initdata struct pernet_operations sysctl_core_ops = {
+ 
+ static __init int sysctl_core_init(void)
+ {
+-	register_net_sysctl(&init_net, "net/core", net_core_table);
++	register_net_sysctl(&init_net, "net/core", net_core_table, ARRAY_SIZE(net_core_table));
+ 	return register_pernet_subsys(&sysctl_core_ops);
  }
  
--/* In some cases, both sendpage() and sendmsg() could have added
-- * an skb to the write queue, but failed adding payload on it.
-- * We need to remove it to consume less memory, but more
-- * importantly be able to generate EPOLLOUT for Edge Trigger epoll()
-- * users.
-+/* In some cases, both sendmsg() could have added an skb to the write queue,
-+ * but failed adding payload on it.  We need to remove it to consume less
-+ * memory, but more importantly be able to generate EPOLLOUT for Edge Trigger
-+ * epoll() users.
+diff --git a/net/dccp/sysctl.c b/net/dccp/sysctl.c
+index ee8d4f5afa72..1140748858b0 100644
+--- a/net/dccp/sysctl.c
++++ b/net/dccp/sysctl.c
+@@ -99,7 +99,8 @@ static struct ctl_table_header *dccp_table_header;
+ int __init dccp_sysctl_init(void)
+ {
+ 	dccp_table_header = register_net_sysctl(&init_net, "net/dccp/default",
+-			dccp_default_table);
++						dccp_default_table,
++						ARRAY_SIZE(dccp_default_table));
+ 
+ 	return dccp_table_header != NULL ? 0 : -ENOMEM;
+ }
+diff --git a/net/ieee802154/6lowpan/reassembly.c b/net/ieee802154/6lowpan/reassembly.c
+index a91283d1e5bf..7b717434368c 100644
+--- a/net/ieee802154/6lowpan/reassembly.c
++++ b/net/ieee802154/6lowpan/reassembly.c
+@@ -379,7 +379,8 @@ static int __net_init lowpan_frags_ns_sysctl_register(struct net *net)
+ 	table[1].extra2	= &ieee802154_lowpan->fqdir->high_thresh;
+ 	table[2].data	= &ieee802154_lowpan->fqdir->timeout;
+ 
+-	hdr = register_net_sysctl(net, "net/ieee802154/6lowpan", table);
++	hdr = register_net_sysctl(net, "net/ieee802154/6lowpan", table,
++				  ARRAY_SIZE(lowpan_frags_ns_ctl_table));
+ 	if (hdr == NULL)
+ 		goto err_reg;
+ 
+@@ -411,7 +412,8 @@ static int __init lowpan_frags_sysctl_register(void)
+ {
+ 	lowpan_ctl_header = register_net_sysctl(&init_net,
+ 						"net/ieee802154/6lowpan",
+-						lowpan_frags_ctl_table);
++						lowpan_frags_ctl_table,
++						ARRAY_SIZE(lowpan_frags_ctl_table));
+ 	return lowpan_ctl_header == NULL ? -ENOMEM : 0;
+ }
+ 
+diff --git a/net/ipv4/devinet.c b/net/ipv4/devinet.c
+index 5deac0517ef7..6360425dfcb2 100644
+--- a/net/ipv4/devinet.c
++++ b/net/ipv4/devinet.c
+@@ -2587,7 +2587,8 @@ static int __devinet_sysctl_register(struct net *net, char *dev_name,
+ 
+ 	snprintf(path, sizeof(path), "net/ipv4/conf/%s", dev_name);
+ 
+-	t->sysctl_header = register_net_sysctl(net, path, t->devinet_vars);
++	t->sysctl_header = register_net_sysctl(net, path, t->devinet_vars,
++					       ARRAY_SIZE(t->devinet_vars));
+ 	if (!t->sysctl_header)
+ 		goto free;
+ 
+@@ -2720,7 +2721,8 @@ static __net_init int devinet_init_net(struct net *net)
+ 		goto err_reg_dflt;
+ 
+ 	err = -ENOMEM;
+-	forw_hdr = register_net_sysctl(net, "net/ipv4", tbl);
++	forw_hdr = register_net_sysctl(net, "net/ipv4", tbl,
++				       ARRAY_SIZE(ctl_forward_entry));
+ 	if (!forw_hdr)
+ 		goto err_reg_ctl;
+ 	net->ipv4.forw_hdr = forw_hdr;
+diff --git a/net/ipv4/ip_fragment.c b/net/ipv4/ip_fragment.c
+index 69c00ffdcf3e..3d7a82a900b5 100644
+--- a/net/ipv4/ip_fragment.c
++++ b/net/ipv4/ip_fragment.c
+@@ -615,7 +615,8 @@ static int __net_init ip4_frags_ns_ctl_register(struct net *net)
+ 	table[2].data	= &net->ipv4.fqdir->timeout;
+ 	table[3].data	= &net->ipv4.fqdir->max_dist;
+ 
+-	hdr = register_net_sysctl(net, "net/ipv4", table);
++	hdr = register_net_sysctl(net, "net/ipv4", table,
++				  ARRAY_SIZE(ip4_frags_ns_ctl_table));
+ 	if (!hdr)
+ 		goto err_reg;
+ 
+@@ -640,7 +641,8 @@ static void __net_exit ip4_frags_ns_ctl_unregister(struct net *net)
+ 
+ static void __init ip4_frags_ctl_register(void)
+ {
+-	register_net_sysctl(&init_net, "net/ipv4", ip4_frags_ctl_table);
++	register_net_sysctl(&init_net, "net/ipv4", ip4_frags_ctl_table,
++			    ARRAY_SIZE(ip4_frags_ctl_table));
+ }
+ #else
+ static int ip4_frags_ns_ctl_register(struct net *net)
+diff --git a/net/ipv4/route.c b/net/ipv4/route.c
+index 98d7e6ba7493..883f4f1ee056 100644
+--- a/net/ipv4/route.c
++++ b/net/ipv4/route.c
+@@ -3615,7 +3615,8 @@ static __net_init int sysctl_route_net_init(struct net *net)
+ 	}
+ 	tbl[0].extra1 = net;
+ 
+-	net->ipv4.route_hdr = register_net_sysctl(net, "net/ipv4/route", tbl);
++	net->ipv4.route_hdr = register_net_sysctl(net, "net/ipv4/route", tbl,
++						  ARRAY_SIZE(ipv4_route_netns_table));
+ 	if (!net->ipv4.route_hdr)
+ 		goto err_reg;
+ 	return 0;
+@@ -3775,6 +3776,7 @@ int __init ip_rt_init(void)
   */
- void tcp_remove_empty_skb(struct sock *sk)
+ void __init ip_static_sysctl_init(void)
  {
-@@ -975,40 +974,6 @@ int tcp_wmem_schedule(struct sock *sk, int copy)
- 	return min(copy, sk->sk_forward_alloc);
+-	register_net_sysctl(&init_net, "net/ipv4/route", ipv4_route_table);
++	register_net_sysctl(&init_net, "net/ipv4/route", ipv4_route_table,
++			    ARRAY_SIZE(ipv4_route_table));
+ }
+ #endif
+diff --git a/net/ipv4/sysctl_net_ipv4.c b/net/ipv4/sysctl_net_ipv4.c
+index 40fe70fc2015..1821f403efc0 100644
+--- a/net/ipv4/sysctl_net_ipv4.c
++++ b/net/ipv4/sysctl_net_ipv4.c
+@@ -1500,7 +1500,8 @@ static __net_init int ipv4_sysctl_init_net(struct net *net)
+ 		}
+ 	}
+ 
+-	net->ipv4.ipv4_hdr = register_net_sysctl(net, "net/ipv4", table);
++	net->ipv4.ipv4_hdr = register_net_sysctl(net, "net/ipv4", table,
++						 ARRAY_SIZE(ipv4_net_table));
+ 	if (!net->ipv4.ipv4_hdr)
+ 		goto err_reg;
+ 
+@@ -1538,7 +1539,8 @@ static __init int sysctl_ipv4_init(void)
+ {
+ 	struct ctl_table_header *hdr;
+ 
+-	hdr = register_net_sysctl(&init_net, "net/ipv4", ipv4_table);
++	hdr = register_net_sysctl(&init_net, "net/ipv4", ipv4_table,
++				  ARRAY_SIZE(ipv4_table));
+ 	if (!hdr)
+ 		return -ENOMEM;
+ 
+diff --git a/net/ipv4/xfrm4_policy.c b/net/ipv4/xfrm4_policy.c
+index 9403bbaf1b61..ec1d68dbffc3 100644
+--- a/net/ipv4/xfrm4_policy.c
++++ b/net/ipv4/xfrm4_policy.c
+@@ -178,7 +178,8 @@ static __net_init int xfrm4_net_sysctl_init(struct net *net)
+ 		table[0].data = &net->xfrm.xfrm4_dst_ops.gc_thresh;
+ 	}
+ 
+-	hdr = register_net_sysctl(net, "net/ipv4", table);
++	hdr = register_net_sysctl(net, "net/ipv4", table,
++				  ARRAY_SIZE(xfrm4_policy_table));
+ 	if (!hdr)
+ 		goto err_reg;
+ 
+diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
+index 3797917237d0..68a2925c66a5 100644
+--- a/net/ipv6/addrconf.c
++++ b/net/ipv6/addrconf.c
+@@ -7086,7 +7086,8 @@ static int __addrconf_sysctl_register(struct net *net, char *dev_name,
+ 
+ 	snprintf(path, sizeof(path), "net/ipv6/conf/%s", dev_name);
+ 
+-	p->sysctl_header = register_net_sysctl(net, path, table);
++	p->sysctl_header = register_net_sysctl(net, path, table,
++					       ARRAY_SIZE(addrconf_sysctl));
+ 	if (!p->sysctl_header)
+ 		goto free;
+ 
+diff --git a/net/ipv6/icmp.c b/net/ipv6/icmp.c
+index 9edf1f45b1ed..4159662fa214 100644
+--- a/net/ipv6/icmp.c
++++ b/net/ipv6/icmp.c
+@@ -1226,4 +1226,9 @@ struct ctl_table * __net_init ipv6_icmp_sysctl_init(struct net *net)
+ 	}
+ 	return table;
+ }
++
++size_t ipv6_icmp_sysctl_table_size(void)
++{
++	return ARRAY_SIZE(ipv6_icmp_table_template);
++}
+ #endif
+diff --git a/net/ipv6/netfilter/nf_conntrack_reasm.c b/net/ipv6/netfilter/nf_conntrack_reasm.c
+index d13240f13607..dca8e0aabc51 100644
+--- a/net/ipv6/netfilter/nf_conntrack_reasm.c
++++ b/net/ipv6/netfilter/nf_conntrack_reasm.c
+@@ -87,7 +87,8 @@ static int nf_ct_frag6_sysctl_register(struct net *net)
+ 	table[2].data	= &nf_frag->fqdir->high_thresh;
+ 	table[2].extra1	= &nf_frag->fqdir->low_thresh;
+ 
+-	hdr = register_net_sysctl(net, "net/netfilter", table);
++	hdr = register_net_sysctl(net, "net/netfilter", table,
++				  ARRAY_SIZE(nf_ct_frag6_sysctl_table));
+ 	if (hdr == NULL)
+ 		goto err_reg;
+ 
+diff --git a/net/ipv6/reassembly.c b/net/ipv6/reassembly.c
+index 5bc8a28e67f9..0688261202de 100644
+--- a/net/ipv6/reassembly.c
++++ b/net/ipv6/reassembly.c
+@@ -470,7 +470,8 @@ static int __net_init ip6_frags_ns_sysctl_register(struct net *net)
+ 	table[1].extra2	= &net->ipv6.fqdir->high_thresh;
+ 	table[2].data	= &net->ipv6.fqdir->timeout;
+ 
+-	hdr = register_net_sysctl(net, "net/ipv6", table);
++	hdr = register_net_sysctl(net, "net/ipv6", table,
++				  ARRAY_SIZE(ip6_frags_ns_ctl_table));
+ 	if (!hdr)
+ 		goto err_reg;
+ 
+@@ -499,7 +500,8 @@ static struct ctl_table_header *ip6_ctl_header;
+ static int ip6_frags_sysctl_register(void)
+ {
+ 	ip6_ctl_header = register_net_sysctl(&init_net, "net/ipv6",
+-			ip6_frags_ctl_table);
++					     ip6_frags_ctl_table,
++					     ARRAY_SIZE(ip6_frags_ctl_table));
+ 	return ip6_ctl_header == NULL ? -ENOMEM : 0;
  }
  
--int tcp_sendpage_locked(struct sock *sk, struct page *page, int offset,
--			size_t size, int flags)
--{
--	struct bio_vec bvec;
--	struct msghdr msg = { .msg_flags = flags | MSG_SPLICE_PAGES, };
--
--	if (!(sk->sk_route_caps & NETIF_F_SG))
--		return sock_no_sendpage_locked(sk, page, offset, size, flags);
--
--	tcp_rate_check_app_limited(sk);  /* is sending application-limited? */
--
--	bvec_set_page(&bvec, page, size, offset);
--	iov_iter_bvec(&msg.msg_iter, ITER_SOURCE, &bvec, 1, size);
--
--	if (flags & MSG_SENDPAGE_NOTLAST)
--		msg.msg_flags |= MSG_MORE;
--
--	return tcp_sendmsg_locked(sk, &msg, size);
--}
--EXPORT_SYMBOL_GPL(tcp_sendpage_locked);
--
--int tcp_sendpage(struct sock *sk, struct page *page, int offset,
--		 size_t size, int flags)
--{
--	int ret;
--
--	lock_sock(sk);
--	ret = tcp_sendpage_locked(sk, page, offset, size, flags);
--	release_sock(sk);
--
--	return ret;
--}
--EXPORT_SYMBOL(tcp_sendpage);
--
- void tcp_free_fastopen_req(struct tcp_sock *tp)
- {
- 	if (tp->fastopen_req) {
-diff --git a/net/ipv4/tcp_bpf.c b/net/ipv4/tcp_bpf.c
-index 31d6005cea9b..81f0dff69e0b 100644
---- a/net/ipv4/tcp_bpf.c
-+++ b/net/ipv4/tcp_bpf.c
-@@ -486,7 +486,7 @@ static int tcp_bpf_sendmsg(struct sock *sk, struct msghdr *msg, size_t size)
- 	long timeo;
- 	int flags;
+diff --git a/net/ipv6/route.c b/net/ipv6/route.c
+index e3aec46bd466..a35470576077 100644
+--- a/net/ipv6/route.c
++++ b/net/ipv6/route.c
+@@ -6450,6 +6450,11 @@ struct ctl_table * __net_init ipv6_route_sysctl_init(struct net *net)
  
--	/* Don't let internal sendpage flags through */
-+	/* Don't let internal flags through */
- 	flags = (msg->msg_flags & ~MSG_SENDPAGE_DECRYPTED);
- 	flags |= MSG_NO_SHARED_FRAGS;
- 
-@@ -566,23 +566,6 @@ static int tcp_bpf_sendmsg(struct sock *sk, struct msghdr *msg, size_t size)
- 	return copied ? copied : err;
+ 	return table;
  }
++
++size_t ipv6_route_sysctl_table_size(void)
++{
++	return ARRAY_SIZE(ipv6_route_table_template);
++}
+ #endif
  
--static int tcp_bpf_sendpage(struct sock *sk, struct page *page, int offset,
--			    size_t size, int flags)
--{
--	struct bio_vec bvec;
--	struct msghdr msg = {
--		.msg_flags = flags | MSG_SPLICE_PAGES,
--	};
--
--	bvec_set_page(&bvec, page, size, offset);
--	iov_iter_bvec(&msg.msg_iter, ITER_SOURCE, &bvec, 1, size);
--
--	if (flags & MSG_SENDPAGE_NOTLAST)
--		msg.msg_flags |= MSG_MORE;
--
--	return tcp_bpf_sendmsg(sk, &msg, size);
--}
--
- enum {
- 	TCP_BPF_IPV4,
- 	TCP_BPF_IPV6,
-@@ -612,7 +595,6 @@ static void tcp_bpf_rebuild_protos(struct proto prot[TCP_BPF_NUM_CFGS],
+ static int __net_init ip6_route_net_init(struct net *net)
+diff --git a/net/ipv6/sysctl_net_ipv6.c b/net/ipv6/sysctl_net_ipv6.c
+index 94a0a294c6a1..29f121f513a6 100644
+--- a/net/ipv6/sysctl_net_ipv6.c
++++ b/net/ipv6/sysctl_net_ipv6.c
+@@ -275,17 +275,21 @@ static int __net_init ipv6_sysctl_net_init(struct net *net)
+ 	if (!ipv6_icmp_table)
+ 		goto out_ipv6_route_table;
  
- 	prot[TCP_BPF_TX]			= prot[TCP_BPF_BASE];
- 	prot[TCP_BPF_TX].sendmsg		= tcp_bpf_sendmsg;
--	prot[TCP_BPF_TX].sendpage		= tcp_bpf_sendpage;
+-	net->ipv6.sysctl.hdr = register_net_sysctl(net, "net/ipv6", ipv6_table);
++	net->ipv6.sysctl.hdr = register_net_sysctl(net, "net/ipv6",
++						   ipv6_table,
++						   ARRAY_SIZE(ipv6_table_template));
+ 	if (!net->ipv6.sysctl.hdr)
+ 		goto out_ipv6_icmp_table;
  
- 	prot[TCP_BPF_RX]			= prot[TCP_BPF_BASE];
- 	prot[TCP_BPF_RX].recvmsg		= tcp_bpf_recvmsg_parser;
-@@ -647,8 +629,7 @@ static int tcp_bpf_assert_proto_ops(struct proto *ops)
- 	 * indeed valid assumptions.
+ 	net->ipv6.sysctl.route_hdr =
+-		register_net_sysctl(net, "net/ipv6/route", ipv6_route_table);
++		register_net_sysctl(net, "net/ipv6/route", ipv6_route_table,
++				    ipv6_route_sysctl_table_size());
+ 	if (!net->ipv6.sysctl.route_hdr)
+ 		goto out_unregister_ipv6_table;
+ 
+ 	net->ipv6.sysctl.icmp_hdr =
+-		register_net_sysctl(net, "net/ipv6/icmp", ipv6_icmp_table);
++		register_net_sysctl(net, "net/ipv6/icmp", ipv6_icmp_table,
++				    ipv6_icmp_sysctl_table_size());
+ 	if (!net->ipv6.sysctl.icmp_hdr)
+ 		goto out_unregister_route_table;
+ 
+@@ -335,7 +339,8 @@ int ipv6_sysctl_register(void)
+ {
+ 	int err = -ENOMEM;
+ 
+-	ip6_header = register_net_sysctl(&init_net, "net/ipv6", ipv6_rotable);
++	ip6_header = register_net_sysctl(&init_net, "net/ipv6", ipv6_rotable,
++					 ARRAY_SIZE(ipv6_rotable));
+ 	if (!ip6_header)
+ 		goto out;
+ 
+diff --git a/net/ipv6/xfrm6_policy.c b/net/ipv6/xfrm6_policy.c
+index eecc5e59da17..27efdb18a018 100644
+--- a/net/ipv6/xfrm6_policy.c
++++ b/net/ipv6/xfrm6_policy.c
+@@ -205,7 +205,8 @@ static int __net_init xfrm6_net_sysctl_init(struct net *net)
+ 		table[0].data = &net->xfrm.xfrm6_dst_ops.gc_thresh;
+ 	}
+ 
+-	hdr = register_net_sysctl(net, "net/ipv6", table);
++	hdr = register_net_sysctl(net, "net/ipv6", table,
++				  ARRAY_SIZE(xfrm6_policy_table));
+ 	if (!hdr)
+ 		goto err_reg;
+ 
+diff --git a/net/llc/sysctl_net_llc.c b/net/llc/sysctl_net_llc.c
+index 8443a6d841b0..195296ba29f0 100644
+--- a/net/llc/sysctl_net_llc.c
++++ b/net/llc/sysctl_net_llc.c
+@@ -56,8 +56,13 @@ static struct ctl_table_header *llc_station_header;
+ 
+ int __init llc_sysctl_init(void)
+ {
+-	llc2_timeout_header = register_net_sysctl(&init_net, "net/llc/llc2/timeout", llc2_timeout_table);
+-	llc_station_header = register_net_sysctl(&init_net, "net/llc/station", llc_station_table);
++	llc2_timeout_header = register_net_sysctl(&init_net,
++						  "net/llc/llc2/timeout",
++						  llc2_timeout_table,
++						  ARRAY_SIZE(llc2_timeout_table));
++	llc_station_header = register_net_sysctl(&init_net, "net/llc/station",
++						 llc_station_table,
++						 ARRAY_SIZE(llc_station_table));
+ 
+ 	if (!llc2_timeout_header || !llc_station_header) {
+ 		llc_sysctl_exit();
+diff --git a/net/mpls/af_mpls.c b/net/mpls/af_mpls.c
+index dc5165d3eec4..6f96aae76537 100644
+--- a/net/mpls/af_mpls.c
++++ b/net/mpls/af_mpls.c
+@@ -1395,6 +1395,40 @@ static const struct ctl_table mpls_dev_table[] = {
+ 	{ }
+ };
+ 
++static int mpls_platform_labels(struct ctl_table *table, int write,
++				void *buffer, size_t *lenp, loff_t *ppos);
++#define MPLS_NS_SYSCTL_OFFSET(field)		\
++	(&((struct net *)0)->field)
++
++static const struct ctl_table mpls_table[] = {
++	{
++		.procname	= "platform_labels",
++		.data		= NULL,
++		.maxlen		= sizeof(int),
++		.mode		= 0644,
++		.proc_handler	= mpls_platform_labels,
++	},
++	{
++		.procname	= "ip_ttl_propagate",
++		.data		= MPLS_NS_SYSCTL_OFFSET(mpls.ip_ttl_propagate),
++		.maxlen		= sizeof(int),
++		.mode		= 0644,
++		.proc_handler	= proc_dointvec_minmax,
++		.extra1		= SYSCTL_ZERO,
++		.extra2		= SYSCTL_ONE,
++	},
++	{
++		.procname	= "default_ttl",
++		.data		= MPLS_NS_SYSCTL_OFFSET(mpls.default_ttl),
++		.maxlen		= sizeof(int),
++		.mode		= 0644,
++		.proc_handler	= proc_dointvec_minmax,
++		.extra1		= SYSCTL_ONE,
++		.extra2		= &ttl_max,
++	},
++	{ }
++};
++
+ static int mpls_dev_sysctl_register(struct net_device *dev,
+ 				    struct mpls_dev *mdev)
+ {
+@@ -1410,7 +1444,7 @@ static int mpls_dev_sysctl_register(struct net_device *dev,
+ 	/* Table data contains only offsets relative to the base of
+ 	 * the mdev at this point, so make them absolute.
  	 */
- 	return ops->recvmsg  == tcp_recvmsg &&
--	       ops->sendmsg  == tcp_sendmsg &&
--	       ops->sendpage == tcp_sendpage ? 0 : -ENOTSUPP;
-+	       ops->sendmsg  == tcp_sendmsg ? 0 : -ENOTSUPP;
+-	for (i = 0; i < ARRAY_SIZE(mpls_dev_table); i++) {
++	for (i = 0; i < ARRAY_SIZE(mpls_dev_table) - 1; i++) {
+ 		table[i].data = (char *)mdev + (uintptr_t)table[i].data;
+ 		table[i].extra1 = mdev;
+ 		table[i].extra2 = net;
+@@ -1418,7 +1452,8 @@ static int mpls_dev_sysctl_register(struct net_device *dev,
+ 
+ 	snprintf(path, sizeof(path), "net/mpls/conf/%s", dev->name);
+ 
+-	mdev->sysctl = register_net_sysctl(net, path, table);
++	mdev->sysctl = register_net_sysctl(net, path, table,
++					   ARRAY_SIZE(mpls_dev_table));
+ 	if (!mdev->sysctl)
+ 		goto free;
+ 
+@@ -1432,6 +1467,7 @@ static int mpls_dev_sysctl_register(struct net_device *dev,
+ 	return -ENOBUFS;
  }
  
- int tcp_bpf_update_proto(struct sock *sk, struct sk_psock *psock, bool restore)
-diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-index 84a5d557dc1a..a228cdb23831 100644
---- a/net/ipv4/tcp_ipv4.c
-+++ b/net/ipv4/tcp_ipv4.c
-@@ -3117,7 +3117,6 @@ struct proto tcp_prot = {
- 	.recvmsg		= tcp_recvmsg,
- 	.sendmsg		= tcp_sendmsg,
- 	.splice_eof		= tcp_splice_eof,
--	.sendpage		= tcp_sendpage,
- 	.backlog_rcv		= tcp_v4_do_rcv,
- 	.release_cb		= tcp_release_cb,
- 	.hash			= inet_hash,
-diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-index 48fdcd3cad9c..42a96b3547c9 100644
---- a/net/ipv4/udp.c
-+++ b/net/ipv4/udp.c
-@@ -1340,20 +1340,6 @@ void udp_splice_eof(struct socket *sock)
- }
- EXPORT_SYMBOL_GPL(udp_splice_eof);
- 
--int udp_sendpage(struct sock *sk, struct page *page, int offset,
--		 size_t size, int flags)
--{
--	struct bio_vec bvec;
--	struct msghdr msg = { .msg_flags = flags | MSG_SPLICE_PAGES };
--
--	if (flags & MSG_SENDPAGE_NOTLAST)
--		msg.msg_flags |= MSG_MORE;
--
--	bvec_set_page(&bvec, page, size, offset);
--	iov_iter_bvec(&msg.msg_iter, ITER_SOURCE, &bvec, 1, size);
--	return udp_sendmsg(sk, &msg, size);
--}
--
- #define UDP_SKB_IS_STATELESS 0x80000000
- 
- /* all head states (dst, sk, nf conntrack) except skb extensions are
-@@ -2933,7 +2919,6 @@ struct proto udp_prot = {
- 	.sendmsg		= udp_sendmsg,
- 	.recvmsg		= udp_recvmsg,
- 	.splice_eof		= udp_splice_eof,
--	.sendpage		= udp_sendpage,
- 	.release_cb		= ip4_datagram_release_cb,
- 	.hash			= udp_lib_hash,
- 	.unhash			= udp_lib_unhash,
-diff --git a/net/ipv4/udp_impl.h b/net/ipv4/udp_impl.h
-index 4ba7a88a1b1d..e1ff3a375996 100644
---- a/net/ipv4/udp_impl.h
-+++ b/net/ipv4/udp_impl.h
-@@ -19,8 +19,6 @@ int udp_getsockopt(struct sock *sk, int level, int optname,
- 
- int udp_recvmsg(struct sock *sk, struct msghdr *msg, size_t len, int flags,
- 		int *addr_len);
--int udp_sendpage(struct sock *sk, struct page *page, int offset, size_t size,
--		 int flags);
- void udp_destroy_sock(struct sock *sk);
- 
- #ifdef CONFIG_PROC_FS
-diff --git a/net/ipv4/udplite.c b/net/ipv4/udplite.c
-index 143f93a12f25..39ecdad1b50c 100644
---- a/net/ipv4/udplite.c
-+++ b/net/ipv4/udplite.c
-@@ -56,7 +56,6 @@ struct proto 	udplite_prot = {
- 	.getsockopt	   = udp_getsockopt,
- 	.sendmsg	   = udp_sendmsg,
- 	.recvmsg	   = udp_recvmsg,
--	.sendpage	   = udp_sendpage,
- 	.hash		   = udp_lib_hash,
- 	.unhash		   = udp_lib_unhash,
- 	.rehash		   = udp_v4_rehash,
-diff --git a/net/ipv6/af_inet6.c b/net/ipv6/af_inet6.c
-index b3451cf47d29..5d593ddc0347 100644
---- a/net/ipv6/af_inet6.c
-+++ b/net/ipv6/af_inet6.c
-@@ -696,9 +696,7 @@ const struct proto_ops inet6_stream_ops = {
- 	.mmap		   = tcp_mmap,
- #endif
- 	.splice_eof	   = inet_splice_eof,
--	.sendpage	   = inet_sendpage,
- 	.sendmsg_locked    = tcp_sendmsg_locked,
--	.sendpage_locked   = tcp_sendpage_locked,
- 	.splice_read	   = tcp_splice_read,
- 	.read_sock	   = tcp_read_sock,
- 	.read_skb	   = tcp_read_skb,
-@@ -729,7 +727,6 @@ const struct proto_ops inet6_dgram_ops = {
- 	.recvmsg	   = inet6_recvmsg,		/* retpoline's sake */
- 	.read_skb	   = udp_read_skb,
- 	.mmap		   = sock_no_mmap,
--	.sendpage	   = sock_no_sendpage,
- 	.set_peek_off	   = sk_set_peek_off,
- #ifdef CONFIG_COMPAT
- 	.compat_ioctl	   = inet6_compat_ioctl,
-diff --git a/net/ipv6/raw.c b/net/ipv6/raw.c
-index c9caeb5a43ed..ac1cef094c5f 100644
---- a/net/ipv6/raw.c
-+++ b/net/ipv6/raw.c
-@@ -1296,7 +1296,6 @@ const struct proto_ops inet6_sockraw_ops = {
- 	.sendmsg	   = inet_sendmsg,		/* ok		*/
- 	.recvmsg	   = sock_common_recvmsg,	/* ok		*/
- 	.mmap		   = sock_no_mmap,
--	.sendpage	   = sock_no_sendpage,
- #ifdef CONFIG_COMPAT
- 	.compat_ioctl	   = inet6_compat_ioctl,
- #endif
-diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
-index c17c8ff94b79..40dd92a2f480 100644
---- a/net/ipv6/tcp_ipv6.c
-+++ b/net/ipv6/tcp_ipv6.c
-@@ -2151,7 +2151,6 @@ struct proto tcpv6_prot = {
- 	.recvmsg		= tcp_recvmsg,
- 	.sendmsg		= tcp_sendmsg,
- 	.splice_eof		= tcp_splice_eof,
--	.sendpage		= tcp_sendpage,
- 	.backlog_rcv		= tcp_v6_do_rcv,
- 	.release_cb		= tcp_release_cb,
- 	.hash			= inet6_hash,
-diff --git a/net/kcm/kcmsock.c b/net/kcm/kcmsock.c
-index d75d775e9462..b512f9958e43 100644
---- a/net/kcm/kcmsock.c
-+++ b/net/kcm/kcmsock.c
-@@ -961,24 +961,6 @@ static void kcm_splice_eof(struct socket *sock)
- 	release_sock(sk);
- }
- 
--static ssize_t kcm_sendpage(struct socket *sock, struct page *page,
--			    int offset, size_t size, int flags)
--
--{
--	struct bio_vec bvec;
--	struct msghdr msg = { .msg_flags = flags | MSG_SPLICE_PAGES, };
--
--	if (flags & MSG_SENDPAGE_NOTLAST)
--		msg.msg_flags |= MSG_MORE;
--
--	if (flags & MSG_OOB)
--		return -EOPNOTSUPP;
--
--	bvec_set_page(&bvec, page, size, offset);
--	iov_iter_bvec(&msg.msg_iter, ITER_SOURCE, &bvec, 1, size);
--	return kcm_sendmsg(sock, &msg, size);
--}
--
- static int kcm_recvmsg(struct socket *sock, struct msghdr *msg,
- 		       size_t len, int flags)
++
+ static void mpls_dev_sysctl_unregister(struct net_device *dev,
+ 				       struct mpls_dev *mdev)
  {
-@@ -1767,7 +1749,6 @@ static const struct proto_ops kcm_dgram_ops = {
- 	.recvmsg =	kcm_recvmsg,
- 	.mmap =		sock_no_mmap,
- 	.splice_eof =	kcm_splice_eof,
--	.sendpage =	kcm_sendpage,
- };
- 
- static const struct proto_ops kcm_seqpacket_ops = {
-@@ -1789,7 +1770,6 @@ static const struct proto_ops kcm_seqpacket_ops = {
- 	.recvmsg =	kcm_recvmsg,
- 	.mmap =		sock_no_mmap,
- 	.splice_eof =	kcm_splice_eof,
--	.sendpage =	kcm_sendpage,
- 	.splice_read =	kcm_splice_read,
- };
- 
-diff --git a/net/key/af_key.c b/net/key/af_key.c
-index 31ab12fd720a..ede3c6a60353 100644
---- a/net/key/af_key.c
-+++ b/net/key/af_key.c
-@@ -3761,7 +3761,6 @@ static const struct proto_ops pfkey_ops = {
- 	.listen		=	sock_no_listen,
- 	.shutdown	=	sock_no_shutdown,
- 	.mmap		=	sock_no_mmap,
--	.sendpage	=	sock_no_sendpage,
- 
- 	/* Now the operations that really occur. */
- 	.release	=	pfkey_release,
-diff --git a/net/l2tp/l2tp_ip.c b/net/l2tp/l2tp_ip.c
-index 2b795c1064f5..f9073bc7281f 100644
---- a/net/l2tp/l2tp_ip.c
-+++ b/net/l2tp/l2tp_ip.c
-@@ -624,7 +624,6 @@ static const struct proto_ops l2tp_ip_ops = {
- 	.sendmsg	   = inet_sendmsg,
- 	.recvmsg	   = sock_common_recvmsg,
- 	.mmap		   = sock_no_mmap,
--	.sendpage	   = sock_no_sendpage,
- };
- 
- static struct inet_protosw l2tp_ip_protosw = {
-diff --git a/net/l2tp/l2tp_ip6.c b/net/l2tp/l2tp_ip6.c
-index 5137ea1861ce..b1623f9c4f92 100644
---- a/net/l2tp/l2tp_ip6.c
-+++ b/net/l2tp/l2tp_ip6.c
-@@ -751,7 +751,6 @@ static const struct proto_ops l2tp_ip6_ops = {
- 	.sendmsg	   = inet_sendmsg,
- 	.recvmsg	   = sock_common_recvmsg,
- 	.mmap		   = sock_no_mmap,
--	.sendpage	   = sock_no_sendpage,
- #ifdef CONFIG_COMPAT
- 	.compat_ioctl	   = inet6_compat_ioctl,
- #endif
-diff --git a/net/llc/af_llc.c b/net/llc/af_llc.c
-index 9ffbc667be6c..57c35c960b2c 100644
---- a/net/llc/af_llc.c
-+++ b/net/llc/af_llc.c
-@@ -1232,7 +1232,6 @@ static const struct proto_ops llc_ui_ops = {
- 	.sendmsg     = llc_ui_sendmsg,
- 	.recvmsg     = llc_ui_recvmsg,
- 	.mmap	     = sock_no_mmap,
--	.sendpage    = sock_no_sendpage,
- };
- 
- static const char llc_proc_err_msg[] __initconst =
-diff --git a/net/mctp/af_mctp.c b/net/mctp/af_mctp.c
-index bb4bd0b6a4f7..f6be58b68c6f 100644
---- a/net/mctp/af_mctp.c
-+++ b/net/mctp/af_mctp.c
-@@ -485,7 +485,6 @@ static const struct proto_ops mctp_dgram_ops = {
- 	.sendmsg	= mctp_sendmsg,
- 	.recvmsg	= mctp_recvmsg,
- 	.mmap		= sock_no_mmap,
--	.sendpage	= sock_no_sendpage,
- #ifdef CONFIG_COMPAT
- 	.compat_ioctl	= mctp_compat_ioctl,
- #endif
-diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
-index 992b89c75631..e67983bd3bc7 100644
---- a/net/mptcp/protocol.c
-+++ b/net/mptcp/protocol.c
-@@ -3891,7 +3891,6 @@ static const struct proto_ops mptcp_stream_ops = {
- 	.sendmsg	   = inet_sendmsg,
- 	.recvmsg	   = inet_recvmsg,
- 	.mmap		   = sock_no_mmap,
--	.sendpage	   = inet_sendpage,
- };
- 
- static struct inet_protosw mptcp_protosw = {
-@@ -3986,7 +3985,6 @@ static const struct proto_ops mptcp_v6_stream_ops = {
- 	.sendmsg	   = inet6_sendmsg,
- 	.recvmsg	   = inet6_recvmsg,
- 	.mmap		   = sock_no_mmap,
--	.sendpage	   = inet_sendpage,
- #ifdef CONFIG_COMPAT
- 	.compat_ioctl	   = inet6_compat_ioctl,
- #endif
-diff --git a/net/netlink/af_netlink.c b/net/netlink/af_netlink.c
-index cbd9aa7ee24a..39cfb778ebc5 100644
---- a/net/netlink/af_netlink.c
-+++ b/net/netlink/af_netlink.c
-@@ -2815,7 +2815,6 @@ static const struct proto_ops netlink_ops = {
- 	.sendmsg =	netlink_sendmsg,
- 	.recvmsg =	netlink_recvmsg,
- 	.mmap =		sock_no_mmap,
--	.sendpage =	sock_no_sendpage,
- };
- 
- static const struct net_proto_family netlink_family_ops = {
-diff --git a/net/netrom/af_netrom.c b/net/netrom/af_netrom.c
-index 5a4cb796150f..eb8ccbd58df7 100644
---- a/net/netrom/af_netrom.c
-+++ b/net/netrom/af_netrom.c
-@@ -1364,7 +1364,6 @@ static const struct proto_ops nr_proto_ops = {
- 	.sendmsg	=	nr_sendmsg,
- 	.recvmsg	=	nr_recvmsg,
- 	.mmap		=	sock_no_mmap,
--	.sendpage	=	sock_no_sendpage,
- };
- 
- static struct notifier_block nr_dev_notifier = {
-diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
-index a2dbeb264f26..85ff90a03b0c 100644
---- a/net/packet/af_packet.c
-+++ b/net/packet/af_packet.c
-@@ -4621,7 +4621,6 @@ static const struct proto_ops packet_ops_spkt = {
- 	.sendmsg =	packet_sendmsg_spkt,
- 	.recvmsg =	packet_recvmsg,
- 	.mmap =		sock_no_mmap,
--	.sendpage =	sock_no_sendpage,
- };
- 
- static const struct proto_ops packet_ops = {
-@@ -4643,7 +4642,6 @@ static const struct proto_ops packet_ops = {
- 	.sendmsg =	packet_sendmsg,
- 	.recvmsg =	packet_recvmsg,
- 	.mmap =		packet_mmap,
--	.sendpage =	sock_no_sendpage,
- };
- 
- static const struct net_proto_family packet_family_ops = {
-diff --git a/net/phonet/socket.c b/net/phonet/socket.c
-index 967f9b4dc026..1018340d89a7 100644
---- a/net/phonet/socket.c
-+++ b/net/phonet/socket.c
-@@ -441,7 +441,6 @@ const struct proto_ops phonet_dgram_ops = {
- 	.sendmsg	= pn_socket_sendmsg,
- 	.recvmsg	= sock_common_recvmsg,
- 	.mmap		= sock_no_mmap,
--	.sendpage	= sock_no_sendpage,
- };
- 
- const struct proto_ops phonet_stream_ops = {
-@@ -462,7 +461,6 @@ const struct proto_ops phonet_stream_ops = {
- 	.sendmsg	= pn_socket_sendmsg,
- 	.recvmsg	= sock_common_recvmsg,
- 	.mmap		= sock_no_mmap,
--	.sendpage	= sock_no_sendpage,
- };
- EXPORT_SYMBOL(phonet_stream_ops);
- 
-diff --git a/net/qrtr/af_qrtr.c b/net/qrtr/af_qrtr.c
-index 76f0434d3d06..78beb74146e7 100644
---- a/net/qrtr/af_qrtr.c
-+++ b/net/qrtr/af_qrtr.c
-@@ -1244,7 +1244,6 @@ static const struct proto_ops qrtr_proto_ops = {
- 	.shutdown	= sock_no_shutdown,
- 	.release	= qrtr_release,
- 	.mmap		= sock_no_mmap,
--	.sendpage	= sock_no_sendpage,
- };
- 
- static struct proto qrtr_proto = {
-diff --git a/net/rds/af_rds.c b/net/rds/af_rds.c
-index 3ff6995244e5..01c4cdfef45d 100644
---- a/net/rds/af_rds.c
-+++ b/net/rds/af_rds.c
-@@ -653,7 +653,6 @@ static const struct proto_ops rds_proto_ops = {
- 	.sendmsg =	rds_sendmsg,
- 	.recvmsg =	rds_recvmsg,
- 	.mmap =		sock_no_mmap,
--	.sendpage =	sock_no_sendpage,
- };
- 
- static void rds_sock_destruct(struct sock *sk)
-diff --git a/net/rose/af_rose.c b/net/rose/af_rose.c
-index ca2b17f32670..49dafe9ac72f 100644
---- a/net/rose/af_rose.c
-+++ b/net/rose/af_rose.c
-@@ -1496,7 +1496,6 @@ static const struct proto_ops rose_proto_ops = {
- 	.sendmsg	=	rose_sendmsg,
- 	.recvmsg	=	rose_recvmsg,
- 	.mmap		=	sock_no_mmap,
--	.sendpage	=	sock_no_sendpage,
- };
- 
- static struct notifier_block rose_dev_notifier = {
-diff --git a/net/rxrpc/af_rxrpc.c b/net/rxrpc/af_rxrpc.c
-index da0b3b5157d5..f2cf4aa99db2 100644
---- a/net/rxrpc/af_rxrpc.c
-+++ b/net/rxrpc/af_rxrpc.c
-@@ -954,7 +954,6 @@ static const struct proto_ops rxrpc_rpc_ops = {
- 	.sendmsg	= rxrpc_sendmsg,
- 	.recvmsg	= rxrpc_recvmsg,
- 	.mmap		= sock_no_mmap,
--	.sendpage	= sock_no_sendpage,
- };
- 
- static struct proto rxrpc_proto = {
-diff --git a/net/sctp/protocol.c b/net/sctp/protocol.c
-index 664d1f2e9121..274d07bd774f 100644
---- a/net/sctp/protocol.c
-+++ b/net/sctp/protocol.c
-@@ -1133,7 +1133,6 @@ static const struct proto_ops inet_seqpacket_ops = {
- 	.sendmsg	   = inet_sendmsg,
- 	.recvmsg	   = inet_recvmsg,
- 	.mmap		   = sock_no_mmap,
--	.sendpage	   = sock_no_sendpage,
- };
- 
- /* Registration with AF_INET family.  */
-diff --git a/net/socket.c b/net/socket.c
-index b778fc03c6e0..8c3c8b29995a 100644
---- a/net/socket.c
-+++ b/net/socket.c
-@@ -3552,54 +3552,6 @@ int kernel_getpeername(struct socket *sock, struct sockaddr *addr)
- }
- EXPORT_SYMBOL(kernel_getpeername);
- 
--/**
-- *	kernel_sendpage - send a &page through a socket (kernel space)
-- *	@sock: socket
-- *	@page: page
-- *	@offset: page offset
-- *	@size: total size in bytes
-- *	@flags: flags (MSG_DONTWAIT, ...)
-- *
-- *	Returns the total amount sent in bytes or an error.
-- */
--
--int kernel_sendpage(struct socket *sock, struct page *page, int offset,
--		    size_t size, int flags)
--{
--	if (sock->ops->sendpage) {
--		/* Warn in case the improper page to zero-copy send */
--		WARN_ONCE(!sendpage_ok(page), "improper page for zero-copy send");
--		return sock->ops->sendpage(sock, page, offset, size, flags);
--	}
--	return sock_no_sendpage(sock, page, offset, size, flags);
--}
--EXPORT_SYMBOL(kernel_sendpage);
--
--/**
-- *	kernel_sendpage_locked - send a &page through the locked sock (kernel space)
-- *	@sk: sock
-- *	@page: page
-- *	@offset: page offset
-- *	@size: total size in bytes
-- *	@flags: flags (MSG_DONTWAIT, ...)
-- *
-- *	Returns the total amount sent in bytes or an error.
-- *	Caller must hold @sk.
-- */
--
--int kernel_sendpage_locked(struct sock *sk, struct page *page, int offset,
--			   size_t size, int flags)
--{
--	struct socket *sock = sk->sk_socket;
--
--	if (sock->ops->sendpage_locked)
--		return sock->ops->sendpage_locked(sk, page, offset, size,
--						  flags);
--
--	return sock_no_sendpage_locked(sk, page, offset, size, flags);
--}
--EXPORT_SYMBOL(kernel_sendpage_locked);
--
- /**
-  *	kernel_sock_shutdown - shut down part of a full-duplex connection (kernel space)
-  *	@sock: socket
-diff --git a/net/tipc/socket.c b/net/tipc/socket.c
-index dd73d71c02a9..ef8e5139a873 100644
---- a/net/tipc/socket.c
-+++ b/net/tipc/socket.c
-@@ -3375,7 +3375,6 @@ static const struct proto_ops msg_ops = {
- 	.sendmsg	= tipc_sendmsg,
- 	.recvmsg	= tipc_recvmsg,
- 	.mmap		= sock_no_mmap,
--	.sendpage	= sock_no_sendpage
- };
- 
- static const struct proto_ops packet_ops = {
-@@ -3396,7 +3395,6 @@ static const struct proto_ops packet_ops = {
- 	.sendmsg	= tipc_send_packet,
- 	.recvmsg	= tipc_recvmsg,
- 	.mmap		= sock_no_mmap,
--	.sendpage	= sock_no_sendpage
- };
- 
- static const struct proto_ops stream_ops = {
-@@ -3417,7 +3415,6 @@ static const struct proto_ops stream_ops = {
- 	.sendmsg	= tipc_sendstream,
- 	.recvmsg	= tipc_recvstream,
- 	.mmap		= sock_no_mmap,
--	.sendpage	= sock_no_sendpage
- };
- 
- static const struct net_proto_family tipc_family_ops = {
-diff --git a/net/tls/tls.h b/net/tls/tls.h
-index d002c3af1966..86cef1c68e03 100644
---- a/net/tls/tls.h
-+++ b/net/tls/tls.h
-@@ -98,10 +98,6 @@ void tls_sw_strparser_arm(struct sock *sk, struct tls_context *ctx);
- void tls_sw_strparser_done(struct tls_context *tls_ctx);
- int tls_sw_sendmsg(struct sock *sk, struct msghdr *msg, size_t size);
- void tls_sw_splice_eof(struct socket *sock);
--int tls_sw_sendpage_locked(struct sock *sk, struct page *page,
--			   int offset, size_t size, int flags);
--int tls_sw_sendpage(struct sock *sk, struct page *page,
--		    int offset, size_t size, int flags);
- void tls_sw_cancel_work_tx(struct tls_context *tls_ctx);
- void tls_sw_release_resources_tx(struct sock *sk);
- void tls_sw_free_ctx_tx(struct tls_context *tls_ctx);
-@@ -117,8 +113,6 @@ ssize_t tls_sw_splice_read(struct socket *sock, loff_t *ppos,
- 
- int tls_device_sendmsg(struct sock *sk, struct msghdr *msg, size_t size);
- void tls_device_splice_eof(struct socket *sock);
--int tls_device_sendpage(struct sock *sk, struct page *page,
--			int offset, size_t size, int flags);
- int tls_tx_records(struct sock *sk, int flags);
- 
- void tls_sw_write_space(struct sock *sk, struct tls_context *ctx);
-diff --git a/net/tls/tls_device.c b/net/tls/tls_device.c
-index 975299d7213b..840ee06f1708 100644
---- a/net/tls/tls_device.c
-+++ b/net/tls/tls_device.c
-@@ -621,23 +621,6 @@ void tls_device_splice_eof(struct socket *sock)
- 	mutex_unlock(&tls_ctx->tx_lock);
+@@ -2636,38 +2672,6 @@ static int mpls_platform_labels(struct ctl_table *table, int write,
+ 	return ret;
  }
  
--int tls_device_sendpage(struct sock *sk, struct page *page,
--			int offset, size_t size, int flags)
--{
--	struct bio_vec bvec;
--	struct msghdr msg = { .msg_flags = flags | MSG_SPLICE_PAGES, };
+-#define MPLS_NS_SYSCTL_OFFSET(field)		\
+-	(&((struct net *)0)->field)
 -
--	if (flags & MSG_SENDPAGE_NOTLAST)
--		msg.msg_flags |= MSG_MORE;
+-static const struct ctl_table mpls_table[] = {
+-	{
+-		.procname	= "platform_labels",
+-		.data		= NULL,
+-		.maxlen		= sizeof(int),
+-		.mode		= 0644,
+-		.proc_handler	= mpls_platform_labels,
+-	},
+-	{
+-		.procname	= "ip_ttl_propagate",
+-		.data		= MPLS_NS_SYSCTL_OFFSET(mpls.ip_ttl_propagate),
+-		.maxlen		= sizeof(int),
+-		.mode		= 0644,
+-		.proc_handler	= proc_dointvec_minmax,
+-		.extra1		= SYSCTL_ZERO,
+-		.extra2		= SYSCTL_ONE,
+-	},
+-	{
+-		.procname	= "default_ttl",
+-		.data		= MPLS_NS_SYSCTL_OFFSET(mpls.default_ttl),
+-		.maxlen		= sizeof(int),
+-		.mode		= 0644,
+-		.proc_handler	= proc_dointvec_minmax,
+-		.extra1		= SYSCTL_ONE,
+-		.extra2		= &ttl_max,
+-	},
+-	{ }
+-};
 -
--	if (flags & MSG_OOB)
--		return -EOPNOTSUPP;
--
--	bvec_set_page(&bvec, page, size, offset);
--	iov_iter_bvec(&msg.msg_iter, ITER_SOURCE, &bvec, 1, size);
--	return tls_device_sendmsg(sk, &msg, size);
--}
--
- struct tls_record_info *tls_get_record(struct tls_offload_context_tx *context,
- 				       u32 seq, u64 *p_record_sn)
+ static int mpls_net_init(struct net *net)
  {
-diff --git a/net/tls/tls_main.c b/net/tls/tls_main.c
-index 7b9c83dd7de2..d5ed4d47b16e 100644
---- a/net/tls/tls_main.c
-+++ b/net/tls/tls_main.c
-@@ -958,7 +958,6 @@ static void build_proto_ops(struct proto_ops ops[TLS_NUM_CONFIG][TLS_NUM_CONFIG]
+ 	struct ctl_table *table;
+@@ -2688,7 +2692,8 @@ static int mpls_net_init(struct net *net)
+ 	for (i = 0; i < ARRAY_SIZE(mpls_table) - 1; i++)
+ 		table[i].data = (char *)net + (uintptr_t)table[i].data;
  
- 	ops[TLS_SW  ][TLS_BASE] = ops[TLS_BASE][TLS_BASE];
- 	ops[TLS_SW  ][TLS_BASE].splice_eof	= tls_sw_splice_eof;
--	ops[TLS_SW  ][TLS_BASE].sendpage_locked	= tls_sw_sendpage_locked;
+-	net->mpls.ctl = register_net_sysctl(net, "net/mpls", table);
++	net->mpls.ctl = register_net_sysctl(net, "net/mpls", table,
++					    ARRAY_SIZE(mpls_table));
+ 	if (net->mpls.ctl == NULL) {
+ 		kfree(table);
+ 		return -ENOMEM;
+diff --git a/net/mptcp/ctrl.c b/net/mptcp/ctrl.c
+index ae20b7d92e28..42dfc834e5c6 100644
+--- a/net/mptcp/ctrl.c
++++ b/net/mptcp/ctrl.c
+@@ -150,7 +150,8 @@ static int mptcp_pernet_new_table(struct net *net, struct mptcp_pernet *pernet)
+ 	table[4].data = &pernet->stale_loss_cnt;
+ 	table[5].data = &pernet->pm_type;
  
- 	ops[TLS_BASE][TLS_SW  ] = ops[TLS_BASE][TLS_BASE];
- 	ops[TLS_BASE][TLS_SW  ].splice_read	= tls_sw_splice_read;
-@@ -970,17 +969,14 @@ static void build_proto_ops(struct proto_ops ops[TLS_NUM_CONFIG][TLS_NUM_CONFIG]
+-	hdr = register_net_sysctl(net, MPTCP_SYSCTL_PATH, table);
++	hdr = register_net_sysctl(net, MPTCP_SYSCTL_PATH, table,
++				  ARRAY_SIZE(mptcp_sysctl_table));
+ 	if (!hdr)
+ 		goto err_reg;
  
- #ifdef CONFIG_TLS_DEVICE
- 	ops[TLS_HW  ][TLS_BASE] = ops[TLS_BASE][TLS_BASE];
--	ops[TLS_HW  ][TLS_BASE].sendpage_locked	= NULL;
- 
- 	ops[TLS_HW  ][TLS_SW  ] = ops[TLS_BASE][TLS_SW  ];
--	ops[TLS_HW  ][TLS_SW  ].sendpage_locked	= NULL;
- 
- 	ops[TLS_BASE][TLS_HW  ] = ops[TLS_BASE][TLS_SW  ];
- 
- 	ops[TLS_SW  ][TLS_HW  ] = ops[TLS_SW  ][TLS_SW  ];
- 
- 	ops[TLS_HW  ][TLS_HW  ] = ops[TLS_HW  ][TLS_SW  ];
--	ops[TLS_HW  ][TLS_HW  ].sendpage_locked	= NULL;
+diff --git a/net/netfilter/ipvs/ip_vs_ctl.c b/net/netfilter/ipvs/ip_vs_ctl.c
+index 62606fb44d02..abbd30ee3ce0 100644
+--- a/net/netfilter/ipvs/ip_vs_ctl.c
++++ b/net/netfilter/ipvs/ip_vs_ctl.c
+@@ -4353,7 +4353,8 @@ static int __net_init ip_vs_control_net_init_sysctl(struct netns_ipvs *ipvs)
  #endif
- #ifdef CONFIG_TLS_TOE
- 	ops[TLS_HW_RECORD][TLS_HW_RECORD] = *base;
-@@ -1029,7 +1025,6 @@ static void build_protos(struct proto prot[TLS_NUM_CONFIG][TLS_NUM_CONFIG],
- 	prot[TLS_SW][TLS_BASE] = prot[TLS_BASE][TLS_BASE];
- 	prot[TLS_SW][TLS_BASE].sendmsg		= tls_sw_sendmsg;
- 	prot[TLS_SW][TLS_BASE].splice_eof	= tls_sw_splice_eof;
--	prot[TLS_SW][TLS_BASE].sendpage		= tls_sw_sendpage;
  
- 	prot[TLS_BASE][TLS_SW] = prot[TLS_BASE][TLS_BASE];
- 	prot[TLS_BASE][TLS_SW].recvmsg		  = tls_sw_recvmsg;
-@@ -1045,12 +1040,10 @@ static void build_protos(struct proto prot[TLS_NUM_CONFIG][TLS_NUM_CONFIG],
- 	prot[TLS_HW][TLS_BASE] = prot[TLS_BASE][TLS_BASE];
- 	prot[TLS_HW][TLS_BASE].sendmsg		= tls_device_sendmsg;
- 	prot[TLS_HW][TLS_BASE].splice_eof	= tls_device_splice_eof;
--	prot[TLS_HW][TLS_BASE].sendpage		= tls_device_sendpage;
+ 	ret = -ENOMEM;
+-	ipvs->sysctl_hdr = register_net_sysctl(net, "net/ipv4/vs", tbl);
++	ipvs->sysctl_hdr = register_net_sysctl(net, "net/ipv4/vs", tbl,
++					       ARRAY_SIZE(vs_vars));
+ 	if (!ipvs->sysctl_hdr)
+ 		goto err;
+ 	ipvs->sysctl_tbl = tbl;
+diff --git a/net/netfilter/ipvs/ip_vs_lblc.c b/net/netfilter/ipvs/ip_vs_lblc.c
+index 1b87214d385e..254eb3b61e15 100644
+--- a/net/netfilter/ipvs/ip_vs_lblc.c
++++ b/net/netfilter/ipvs/ip_vs_lblc.c
+@@ -570,8 +570,9 @@ static int __net_init __ip_vs_lblc_init(struct net *net)
+ 	ipvs->sysctl_lblc_expiration = DEFAULT_EXPIRATION;
+ 	ipvs->lblc_ctl_table[0].data = &ipvs->sysctl_lblc_expiration;
  
- 	prot[TLS_HW][TLS_SW] = prot[TLS_BASE][TLS_SW];
- 	prot[TLS_HW][TLS_SW].sendmsg		= tls_device_sendmsg;
- 	prot[TLS_HW][TLS_SW].splice_eof		= tls_device_splice_eof;
--	prot[TLS_HW][TLS_SW].sendpage		= tls_device_sendpage;
+-	ipvs->lblc_ctl_header =
+-		register_net_sysctl(net, "net/ipv4/vs", ipvs->lblc_ctl_table);
++	ipvs->lblc_ctl_header = register_net_sysctl(net, "net/ipv4/vs",
++						    ipvs->lblc_ctl_table,
++						    ARRAY_SIZE(vs_vars_table));
+ 	if (!ipvs->lblc_ctl_header) {
+ 		if (!net_eq(net, &init_net))
+ 			kfree(ipvs->lblc_ctl_table);
+diff --git a/net/netfilter/ipvs/ip_vs_lblcr.c b/net/netfilter/ipvs/ip_vs_lblcr.c
+index ad8f5fea6d3a..0e39a4fd421f 100644
+--- a/net/netfilter/ipvs/ip_vs_lblcr.c
++++ b/net/netfilter/ipvs/ip_vs_lblcr.c
+@@ -755,8 +755,9 @@ static int __net_init __ip_vs_lblcr_init(struct net *net)
+ 	ipvs->sysctl_lblcr_expiration = DEFAULT_EXPIRATION;
+ 	ipvs->lblcr_ctl_table[0].data = &ipvs->sysctl_lblcr_expiration;
  
- 	prot[TLS_BASE][TLS_HW] = prot[TLS_BASE][TLS_SW];
+-	ipvs->lblcr_ctl_header =
+-		register_net_sysctl(net, "net/ipv4/vs", ipvs->lblcr_ctl_table);
++	ipvs->lblcr_ctl_header = register_net_sysctl(net, "net/ipv4/vs",
++						     ipvs->lblcr_ctl_table,
++						     ARRAY_SIZE(vs_vars_table));
+ 	if (!ipvs->lblcr_ctl_header) {
+ 		if (!net_eq(net, &init_net))
+ 			kfree(ipvs->lblcr_ctl_table);
+diff --git a/net/netfilter/nf_conntrack_standalone.c b/net/netfilter/nf_conntrack_standalone.c
+index 169e16fc2bce..a3b2029ef098 100644
+--- a/net/netfilter/nf_conntrack_standalone.c
++++ b/net/netfilter/nf_conntrack_standalone.c
+@@ -1106,7 +1106,8 @@ static int nf_conntrack_standalone_init_sysctl(struct net *net)
+ 		table[NF_SYSCTL_CT_BUCKETS].mode = 0444;
+ 	}
  
-diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
-index 319f61590d2c..9b3aa89a4292 100644
---- a/net/tls/tls_sw.c
-+++ b/net/tls/tls_sw.c
-@@ -1281,41 +1281,6 @@ void tls_sw_splice_eof(struct socket *sock)
- 	mutex_unlock(&tls_ctx->tx_lock);
- }
+-	cnet->sysctl_header = register_net_sysctl(net, "net/netfilter", table);
++	cnet->sysctl_header = register_net_sysctl(net, "net/netfilter", table,
++						  ARRAY_SIZE(nf_ct_sysctl_table));
+ 	if (!cnet->sysctl_header)
+ 		goto out_unregister_netfilter;
  
--int tls_sw_sendpage_locked(struct sock *sk, struct page *page,
--			   int offset, size_t size, int flags)
--{
--	struct bio_vec bvec;
--	struct msghdr msg = { .msg_flags = flags | MSG_SPLICE_PAGES, };
--
--	if (flags & ~(MSG_MORE | MSG_DONTWAIT | MSG_NOSIGNAL |
--		      MSG_SENDPAGE_NOTLAST | MSG_SENDPAGE_NOPOLICY |
--		      MSG_NO_SHARED_FRAGS))
--		return -EOPNOTSUPP;
--	if (flags & MSG_SENDPAGE_NOTLAST)
--		msg.msg_flags |= MSG_MORE;
--
--	bvec_set_page(&bvec, page, size, offset);
--	iov_iter_bvec(&msg.msg_iter, ITER_SOURCE, &bvec, 1, size);
--	return tls_sw_sendmsg_locked(sk, &msg, size);
--}
--
--int tls_sw_sendpage(struct sock *sk, struct page *page,
--		    int offset, size_t size, int flags)
--{
--	struct bio_vec bvec;
--	struct msghdr msg = { .msg_flags = flags | MSG_SPLICE_PAGES, };
--
--	if (flags & ~(MSG_MORE | MSG_DONTWAIT | MSG_NOSIGNAL |
--		      MSG_SENDPAGE_NOTLAST | MSG_SENDPAGE_NOPOLICY))
--		return -EOPNOTSUPP;
--	if (flags & MSG_SENDPAGE_NOTLAST)
--		msg.msg_flags |= MSG_MORE;
--
--	bvec_set_page(&bvec, page, size, offset);
--	iov_iter_bvec(&msg.msg_iter, ITER_SOURCE, &bvec, 1, size);
--	return tls_sw_sendmsg(sk, &msg, size);
--}
--
- static int
- tls_rx_rec_wait(struct sock *sk, struct sk_psock *psock, bool nonblock,
- 		bool released)
-diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-index 73c61a010b01..3953daa2e1d0 100644
---- a/net/unix/af_unix.c
-+++ b/net/unix/af_unix.c
-@@ -758,8 +758,6 @@ static int unix_compat_ioctl(struct socket *sock, unsigned int cmd, unsigned lon
- static int unix_shutdown(struct socket *, int);
- static int unix_stream_sendmsg(struct socket *, struct msghdr *, size_t);
- static int unix_stream_recvmsg(struct socket *, struct msghdr *, size_t, int);
--static ssize_t unix_stream_sendpage(struct socket *, struct page *, int offset,
--				    size_t size, int flags);
- static ssize_t unix_stream_splice_read(struct socket *,  loff_t *ppos,
- 				       struct pipe_inode_info *, size_t size,
- 				       unsigned int flags);
-@@ -852,7 +850,6 @@ static const struct proto_ops unix_stream_ops = {
- 	.recvmsg =	unix_stream_recvmsg,
- 	.read_skb =	unix_stream_read_skb,
- 	.mmap =		sock_no_mmap,
--	.sendpage =	unix_stream_sendpage,
- 	.splice_read =	unix_stream_splice_read,
- 	.set_peek_off =	unix_set_peek_off,
- 	.show_fdinfo =	unix_show_fdinfo,
-@@ -878,7 +875,6 @@ static const struct proto_ops unix_dgram_ops = {
- 	.read_skb =	unix_read_skb,
- 	.recvmsg =	unix_dgram_recvmsg,
- 	.mmap =		sock_no_mmap,
--	.sendpage =	sock_no_sendpage,
- 	.set_peek_off =	unix_set_peek_off,
- 	.show_fdinfo =	unix_show_fdinfo,
- };
-@@ -902,7 +898,6 @@ static const struct proto_ops unix_seqpacket_ops = {
- 	.sendmsg =	unix_seqpacket_sendmsg,
- 	.recvmsg =	unix_seqpacket_recvmsg,
- 	.mmap =		sock_no_mmap,
--	.sendpage =	sock_no_sendpage,
- 	.set_peek_off =	unix_set_peek_off,
- 	.show_fdinfo =	unix_show_fdinfo,
- };
-@@ -2294,20 +2289,6 @@ static int unix_stream_sendmsg(struct socket *sock, struct msghdr *msg,
- 	return sent ? : err;
- }
+@@ -1207,8 +1208,9 @@ static int __init nf_conntrack_standalone_init(void)
+ 	BUILD_BUG_ON(NFCT_INFOMASK <= IP_CT_NUMBER);
  
--static ssize_t unix_stream_sendpage(struct socket *socket, struct page *page,
--				    int offset, size_t size, int flags)
--{
--	struct bio_vec bvec;
--	struct msghdr msg = { .msg_flags = flags | MSG_SPLICE_PAGES };
--
--	if (flags & MSG_SENDPAGE_NOTLAST)
--		msg.msg_flags |= MSG_MORE;
--
--	bvec_set_page(&bvec, page, size, offset);
--	iov_iter_bvec(&msg.msg_iter, ITER_SOURCE, &bvec, 1, size);
--	return unix_stream_sendmsg(socket, &msg, size);
--}
--
- static int unix_seqpacket_sendmsg(struct socket *sock, struct msghdr *msg,
- 				  size_t len)
+ #ifdef CONFIG_SYSCTL
+-	nf_ct_netfilter_header =
+-		register_net_sysctl(&init_net, "net", nf_ct_netfilter_table);
++	nf_ct_netfilter_header = register_net_sysctl(&init_net, "net",
++						     nf_ct_netfilter_table,
++						     ARRAY_SIZE(nf_ct_netfilter_table));
+ 	if (!nf_ct_netfilter_header) {
+ 		pr_err("nf_conntrack: can't register to sysctl.\n");
+ 		ret = -ENOMEM;
+diff --git a/net/netfilter/nf_log.c b/net/netfilter/nf_log.c
+index 8a29290149bd..755f9cf570ce 100644
+--- a/net/netfilter/nf_log.c
++++ b/net/netfilter/nf_log.c
+@@ -479,7 +479,8 @@ static int netfilter_log_sysctl_init(struct net *net)
+ 				(void *)(unsigned long) i;
+ 		}
+ 		nf_log_sysctl_fhdr = register_net_sysctl(net, "net/netfilter",
+-							 nf_log_sysctl_ftable);
++							 nf_log_sysctl_ftable,
++							 ARRAY_SIZE(nf_log_sysctl_ftable));
+ 		if (!nf_log_sysctl_fhdr)
+ 			goto err_freg;
+ 	}
+@@ -489,7 +490,7 @@ static int netfilter_log_sysctl_init(struct net *net)
+ 
+ 	net->nf.nf_log_dir_header = register_net_sysctl(net,
+ 						"net/netfilter/nf_log",
+-						table);
++						table, ARRAY_SIZE(nf_log_sysctl_table));
+ 	if (!net->nf.nf_log_dir_header)
+ 		goto err_reg;
+ 
+diff --git a/net/netrom/sysctl_net_netrom.c b/net/netrom/sysctl_net_netrom.c
+index 79fb2d3f477b..c02b93fd9d4f 100644
+--- a/net/netrom/sysctl_net_netrom.c
++++ b/net/netrom/sysctl_net_netrom.c
+@@ -145,7 +145,8 @@ static struct ctl_table nr_table[] = {
+ 
+ int __init nr_register_sysctl(void)
  {
-diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
-index efb8a0937a13..020cf17ab7e4 100644
---- a/net/vmw_vsock/af_vsock.c
-+++ b/net/vmw_vsock/af_vsock.c
-@@ -1306,7 +1306,6 @@ static const struct proto_ops vsock_dgram_ops = {
- 	.sendmsg = vsock_dgram_sendmsg,
- 	.recvmsg = vsock_dgram_recvmsg,
- 	.mmap = sock_no_mmap,
--	.sendpage = sock_no_sendpage,
- 	.read_skb = vsock_read_skb,
- };
+-	nr_table_header = register_net_sysctl(&init_net, "net/netrom", nr_table);
++	nr_table_header = register_net_sysctl(&init_net, "net/netrom",
++					      nr_table, ARRAY_SIZE(nr_table));
+ 	if (!nr_table_header)
+ 		return -ENOMEM;
+ 	return 0;
+diff --git a/net/phonet/sysctl.c b/net/phonet/sysctl.c
+index 0d0bf41381c2..0fd0fcb00505 100644
+--- a/net/phonet/sysctl.c
++++ b/net/phonet/sysctl.c
+@@ -86,7 +86,9 @@ static struct ctl_table phonet_table[] = {
  
-@@ -2234,7 +2233,6 @@ static const struct proto_ops vsock_stream_ops = {
- 	.sendmsg = vsock_connectible_sendmsg,
- 	.recvmsg = vsock_connectible_recvmsg,
- 	.mmap = sock_no_mmap,
--	.sendpage = sock_no_sendpage,
- 	.set_rcvlowat = vsock_set_rcvlowat,
- 	.read_skb = vsock_read_skb,
- };
-@@ -2257,7 +2255,6 @@ static const struct proto_ops vsock_seqpacket_ops = {
- 	.sendmsg = vsock_connectible_sendmsg,
- 	.recvmsg = vsock_connectible_recvmsg,
- 	.mmap = sock_no_mmap,
--	.sendpage = sock_no_sendpage,
- 	.read_skb = vsock_read_skb,
- };
+ int __init phonet_sysctl_init(void)
+ {
+-	phonet_table_hrd = register_net_sysctl(&init_net, "net/phonet", phonet_table);
++	phonet_table_hrd = register_net_sysctl(&init_net, "net/phonet",
++					       phonet_table,
++					       ARRAY_SIZE(phonet_table));
+ 	return phonet_table_hrd == NULL ? -ENOMEM : 0;
+ }
  
-diff --git a/net/x25/af_x25.c b/net/x25/af_x25.c
-index 5c7ad301d742..0fb5143bec7a 100644
---- a/net/x25/af_x25.c
-+++ b/net/x25/af_x25.c
-@@ -1757,7 +1757,6 @@ static const struct proto_ops x25_proto_ops = {
- 	.sendmsg =	x25_sendmsg,
- 	.recvmsg =	x25_recvmsg,
- 	.mmap =		sock_no_mmap,
--	.sendpage =	sock_no_sendpage,
- };
+diff --git a/net/rds/ib_sysctl.c b/net/rds/ib_sysctl.c
+index e4e41b3afce7..102fd4a18df7 100644
+--- a/net/rds/ib_sysctl.c
++++ b/net/rds/ib_sysctl.c
+@@ -114,7 +114,9 @@ void rds_ib_sysctl_exit(void)
  
- static struct packet_type x25_packet_type __read_mostly = {
-diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
-index cc1e7f15fa73..5a8c0dd250af 100644
---- a/net/xdp/xsk.c
-+++ b/net/xdp/xsk.c
-@@ -1389,7 +1389,6 @@ static const struct proto_ops xsk_proto_ops = {
- 	.sendmsg	= xsk_sendmsg,
- 	.recvmsg	= xsk_recvmsg,
- 	.mmap		= xsk_mmap,
--	.sendpage	= sock_no_sendpage,
- };
+ int rds_ib_sysctl_init(void)
+ {
+-	rds_ib_sysctl_hdr = register_net_sysctl(&init_net, "net/rds/ib", rds_ib_sysctl_table);
++	rds_ib_sysctl_hdr = register_net_sysctl(&init_net, "net/rds/ib",
++						rds_ib_sysctl_table,
++						ARRAY_SIZE(rds_ib_sysctl_table));
+ 	if (!rds_ib_sysctl_hdr)
+ 		return -ENOMEM;
+ 	return 0;
+diff --git a/net/rds/sysctl.c b/net/rds/sysctl.c
+index e381bbcd9cc1..5abd2730a1bc 100644
+--- a/net/rds/sysctl.c
++++ b/net/rds/sysctl.c
+@@ -102,8 +102,9 @@ int rds_sysctl_init(void)
+ 	rds_sysctl_reconnect_min = msecs_to_jiffies(1);
+ 	rds_sysctl_reconnect_min_jiffies = rds_sysctl_reconnect_min;
  
- static void xsk_destruct(struct sock *sk)
+-	rds_sysctl_reg_table =
+-		register_net_sysctl(&init_net, "net/rds", rds_sysctl_rds_table);
++	rds_sysctl_reg_table = register_net_sysctl(&init_net, "net/rds",
++						   rds_sysctl_rds_table,
++						   ARRAY_SIZE(rds_sysctl_rds_table));
+ 	if (!rds_sysctl_reg_table)
+ 		return -ENOMEM;
+ 	return 0;
+diff --git a/net/rds/tcp.c b/net/rds/tcp.c
+index c5b86066ff66..2e90a2570d3b 100644
+--- a/net/rds/tcp.c
++++ b/net/rds/tcp.c
+@@ -565,7 +565,8 @@ static __net_init int rds_tcp_init_net(struct net *net)
+ 	}
+ 	tbl[RDS_TCP_SNDBUF].data = &rtn->sndbuf_size;
+ 	tbl[RDS_TCP_RCVBUF].data = &rtn->rcvbuf_size;
+-	rtn->rds_tcp_sysctl = register_net_sysctl(net, "net/rds/tcp", tbl);
++	rtn->rds_tcp_sysctl = register_net_sysctl(net, "net/rds/tcp", tbl,
++						  ARRAY_SIZE(rds_tcp_sysctl_table));
+ 	if (!rtn->rds_tcp_sysctl) {
+ 		pr_warn("could not register sysctl\n");
+ 		err = -ENOMEM;
+diff --git a/net/rose/sysctl_net_rose.c b/net/rose/sysctl_net_rose.c
+index d391d7758f52..4f5a1e8b6c54 100644
+--- a/net/rose/sysctl_net_rose.c
++++ b/net/rose/sysctl_net_rose.c
+@@ -117,7 +117,9 @@ static struct ctl_table rose_table[] = {
+ 
+ void __init rose_register_sysctl(void)
+ {
+-	rose_table_header = register_net_sysctl(&init_net, "net/rose", rose_table);
++	rose_table_header = register_net_sysctl(&init_net, "net/rose",
++						rose_table,
++						ARRAY_SIZE(rose_table));
+ }
+ 
+ void rose_unregister_sysctl(void)
+diff --git a/net/rxrpc/sysctl.c b/net/rxrpc/sysctl.c
+index ecaeb4ecfb58..2b5824416036 100644
+--- a/net/rxrpc/sysctl.c
++++ b/net/rxrpc/sysctl.c
+@@ -131,7 +131,8 @@ static struct ctl_table rxrpc_sysctl_table[] = {
+ int __init rxrpc_sysctl_init(void)
+ {
+ 	rxrpc_sysctl_reg_table = register_net_sysctl(&init_net, "net/rxrpc",
+-						     rxrpc_sysctl_table);
++						     rxrpc_sysctl_table,
++						     ARRAY_SIZE(rxrpc_sysctl_table));
+ 	if (!rxrpc_sysctl_reg_table)
+ 		return -ENOMEM;
+ 	return 0;
+diff --git a/net/sctp/sysctl.c b/net/sctp/sysctl.c
+index a7a9136198fd..233f37f0fa28 100644
+--- a/net/sctp/sysctl.c
++++ b/net/sctp/sysctl.c
+@@ -612,7 +612,8 @@ int sctp_sysctl_net_register(struct net *net)
+ 	table[SCTP_PF_RETRANS_IDX].extra2 = &net->sctp.ps_retrans;
+ 	table[SCTP_PS_RETRANS_IDX].extra1 = &net->sctp.pf_retrans;
+ 
+-	net->sctp.sysctl_header = register_net_sysctl(net, "net/sctp", table);
++	net->sctp.sysctl_header = register_net_sysctl(net, "net/sctp", table,
++						      ARRAY_SIZE(sctp_net_table));
+ 	if (net->sctp.sysctl_header == NULL) {
+ 		kfree(table);
+ 		return -ENOMEM;
+@@ -634,7 +635,9 @@ static struct ctl_table_header *sctp_sysctl_header;
+ /* Sysctl registration.  */
+ void sctp_sysctl_register(void)
+ {
+-	sctp_sysctl_header = register_net_sysctl(&init_net, "net/sctp", sctp_table);
++	sctp_sysctl_header = register_net_sysctl(&init_net, "net/sctp",
++						 sctp_table,
++						 ARRAY_SIZE(sctp_table));
+ }
+ 
+ /* Sysctl deregistration.  */
+diff --git a/net/smc/smc_sysctl.c b/net/smc/smc_sysctl.c
+index b6f79fabb9d3..9404123883c0 100644
+--- a/net/smc/smc_sysctl.c
++++ b/net/smc/smc_sysctl.c
+@@ -81,7 +81,8 @@ int __net_init smc_sysctl_net_init(struct net *net)
+ 			table[i].data += (void *)net - (void *)&init_net;
+ 	}
+ 
+-	net->smc.smc_hdr = register_net_sysctl(net, "net/smc", table);
++	net->smc.smc_hdr = register_net_sysctl(net, "net/smc", table,
++					       ARRAY_SIZE(smc_table));
+ 	if (!net->smc.smc_hdr)
+ 		goto err_reg;
+ 
+diff --git a/net/sysctl_net.c b/net/sysctl_net.c
+index 8ee4b74bc009..1757c18ea065 100644
+--- a/net/sysctl_net.c
++++ b/net/sysctl_net.c
+@@ -161,18 +161,12 @@ static void ensure_safe_net_sysctl(struct net *net, const char *path,
+ }
+ 
+ struct ctl_table_header *register_net_sysctl(struct net *net,
+-	const char *path, struct ctl_table *table)
++	const char *path, struct ctl_table *table, size_t table_size)
+ {
+-	int count = 0;
+-	struct ctl_table *entry;
+-
+ 	if (!net_eq(net, &init_net))
+ 		ensure_safe_net_sysctl(net, path, table);
+ 
+-	for (entry = table; entry->procname; entry++)
+-		count++;
+-
+-	return __register_sysctl_table(&net->sysctls, path, table, count);
++	return __register_sysctl_table(&net->sysctls, path, table, table_size);
+ }
+ EXPORT_SYMBOL_GPL(register_net_sysctl);
+ 
+diff --git a/net/tipc/sysctl.c b/net/tipc/sysctl.c
+index 9fb65c988f7f..b9cbc3b359aa 100644
+--- a/net/tipc/sysctl.c
++++ b/net/tipc/sysctl.c
+@@ -96,7 +96,8 @@ static struct ctl_table tipc_table[] = {
+ 
+ int tipc_register_sysctl(void)
+ {
+-	tipc_ctl_hdr = register_net_sysctl(&init_net, "net/tipc", tipc_table);
++	tipc_ctl_hdr = register_net_sysctl(&init_net, "net/tipc", tipc_table,
++					   ARRAY_SIZE(tipc_table));
+ 	if (tipc_ctl_hdr == NULL)
+ 		return -ENOMEM;
+ 	return 0;
+diff --git a/net/unix/sysctl_net_unix.c b/net/unix/sysctl_net_unix.c
+index 500129aa710c..92f3bc3cd704 100644
+--- a/net/unix/sysctl_net_unix.c
++++ b/net/unix/sysctl_net_unix.c
+@@ -36,7 +36,8 @@ int __net_init unix_sysctl_register(struct net *net)
+ 		table[0].data = &net->unx.sysctl_max_dgram_qlen;
+ 	}
+ 
+-	net->unx.ctl = register_net_sysctl(net, "net/unix", table);
++	net->unx.ctl = register_net_sysctl(net, "net/unix", table,
++					   ARRAY_SIZE(unix_table));
+ 	if (net->unx.ctl == NULL)
+ 		goto err_reg;
+ 
+diff --git a/net/x25/sysctl_net_x25.c b/net/x25/sysctl_net_x25.c
+index e9802afa43d0..4d7c2ee41943 100644
+--- a/net/x25/sysctl_net_x25.c
++++ b/net/x25/sysctl_net_x25.c
+@@ -76,7 +76,9 @@ static struct ctl_table x25_table[] = {
+ 
+ int __init x25_register_sysctl(void)
+ {
+-	x25_table_header = register_net_sysctl(&init_net, "net/x25", x25_table);
++	x25_table_header = register_net_sysctl(&init_net, "net/x25",
++					       x25_table,
++					       ARRAY_SIZE(x25_table));
+ 	if (!x25_table_header)
+ 		return -ENOMEM;
+ 	return 0;
+diff --git a/net/xfrm/xfrm_sysctl.c b/net/xfrm/xfrm_sysctl.c
+index 0c6c5ef65f9d..d04b25a47575 100644
+--- a/net/xfrm/xfrm_sysctl.c
++++ b/net/xfrm/xfrm_sysctl.c
+@@ -59,7 +59,8 @@ int __net_init xfrm_sysctl_init(struct net *net)
+ 	if (net->user_ns != &init_user_ns)
+ 		table[0].procname = NULL;
+ 
+-	net->xfrm.sysctl_hdr = register_net_sysctl(net, "net/core", table);
++	net->xfrm.sysctl_hdr = register_net_sysctl(net, "net/core", table,
++						   ARRAY_SIZE(xfrm_table));
+ 	if (!net->xfrm.sysctl_hdr)
+ 		goto out_register;
+ 	return 0;
+-- 
+2.30.2
 
