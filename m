@@ -2,78 +2,60 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE68EEB64DA
-	for <linux-wpan@archiver.kernel.org>; Mon, 26 Jun 2023 10:40:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AFB7EB64D9
+	for <linux-wpan@archiver.kernel.org>; Tue, 27 Jun 2023 08:03:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229877AbjFZKkG (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 26 Jun 2023 06:40:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34580 "EHLO
+        id S230169AbjF0IDg (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 27 Jun 2023 04:03:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50016 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229815AbjFZKkE (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 26 Jun 2023 06:40:04 -0400
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A7F9E6E;
-        Mon, 26 Jun 2023 03:40:03 -0700 (PDT)
-X-GND-Sasl: miquel.raynal@bootlin.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1687776001;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=jauNiTUVecaU7uoq65G3YgC4ySxzMEbBq59VXsu48VA=;
-        b=lcCBn1mLmnLYOzbu+vaPLnje+7jSBQ2CFMqETX5GIUgDcGZKS0KTtE8YCvPm06D2LAt+gP
-        qy7uRZ+yO2UsbKKPB3mGNYXayhOuFRV4BKKWw0r3ZUdGHHuYm+ODQAPp+UW2l/vhEi2HcH
-        sLjvp+TrgiJDtFkvcS8Iv7fSjLEcsJQZ1xCPt1JMLZHo+/wXU+ONA6jsUpFkXzfkbE3mJE
-        iw/0CDdztIYBZ7B9nrxIvnc5/WnXn3pw5uYIFxAxRegcvLcCkel5XVrJyZ9fz8ewrQ2Xn6
-        qbXXp9kzMHJrijMS1kmjcHRoxqnpoRq7z4XxRA6J5hKakAYuzQGMC0L18bL6jQ==
-X-GND-Sasl: miquel.raynal@bootlin.com
-X-GND-Sasl: miquel.raynal@bootlin.com
-X-GND-Sasl: miquel.raynal@bootlin.com
-X-GND-Sasl: miquel.raynal@bootlin.com
-X-GND-Sasl: miquel.raynal@bootlin.com
-X-GND-Sasl: miquel.raynal@bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 294366000C;
-        Mon, 26 Jun 2023 10:40:00 +0000 (UTC)
-Date:   Mon, 26 Jun 2023 12:39:57 +0200
-From:   Miquel Raynal <miquel.raynal@bootlin.com>
-To:     Jakub Kicinski <kuba@kernel.org>
-Cc:     davem@davemloft.net, pabeni@redhat.com, alex.aring@gmail.com,
-        stefan@datenfreihafen.org, netdev@vger.kernel.org,
-        linux-wpan@vger.kernel.org
-Subject: Re: pull-request: ieee802154 for net-next 2023-06-23
-Message-ID: <20230626123957.2f9bb4c9@xps-13>
-In-Reply-To: <20230624155947.1b94903e@kernel.org>
-References: <20230623195506.40b87b5f@xps-13>
-        <20230624155947.1b94903e@kernel.org>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+        with ESMTP id S230195AbjF0IDf (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 27 Jun 2023 04:03:35 -0400
+Received: from mail.durme.pl (mail.durme.pl [217.182.69.186])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5092CC
+        for <linux-wpan@vger.kernel.org>; Tue, 27 Jun 2023 01:03:34 -0700 (PDT)
+Received: by mail.durme.pl (Postfix, from userid 1002)
+        id 87A9D4C30D; Tue, 27 Jun 2023 08:01:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=durme.pl; s=mail;
+        t=1687852918; bh=hFxZwVw4rIL+JwfEOGI47p+fdoVOAeqVswP6NWoHSHQ=;
+        h=Date:From:To:Subject:From;
+        b=TSWHUU65COEMeIeoFxeY99dn3QOP0DfLTDHg6qblDmGGFUw3kTRMcLqBsMFTFQexr
+         82AvczIQMCM0RYXrvV0yFJWdIgAe92Z3CgEkXfGvcnUfRestBana2cBeoGbiqOA1Bn
+         u0/2CUS6C15ZLKSAzRTfyACxiNywvuVyw9uEZUag0wM33L/riXO2bU7WT3ZAH7U4mo
+         WQStdUfwjBd67uX9Gq6ZTSUyqGjAk+RKg0ft+sKqNQd6VYh48dDUgL9ZjAY+4aZobS
+         S1nCYnU67HBP0Plw+bB4gKNg/iKjnQySb55+wVk4uuAbXWqiVRlXwuaNu8vUPbaMpU
+         xiLTd9Yiqftlg==
+Received: by mail.durme.pl for <linux-wpan@vger.kernel.org>; Tue, 27 Jun 2023 08:01:03 GMT
+Message-ID: <20230627064501-0.1.2q.cm57.0.1nb5gn9f27@durme.pl>
+Date:   Tue, 27 Jun 2023 08:01:03 GMT
+From:   "Krystian Wieczorek" <krystian.wieczorek@durme.pl>
+To:     <linux-wpan@vger.kernel.org>
+Subject: W sprawie samochodu
+X-Mailer: mail.durme.pl
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi Jakub,
+Dzie=C5=84 dobry,
 
-kuba@kernel.org wrote on Sat, 24 Jun 2023 15:59:47 -0700:
+chcieliby=C5=9Bmy zapewni=C4=87 Pa=C5=84stwu kompleksowe rozwi=C4=85zania=
+, je=C5=9Bli chodzi o system monitoringu GPS.
 
-> On Fri, 23 Jun 2023 19:55:06 +0200 Miquel Raynal wrote:
-> > As you know, we are trying to build a wpan maintainers group so here is
-> > my first ieee802154 pull-request for your *net-next* tree. =20
->=20
-> Pulled thanks!
->=20
-> In the future, please try to avoid merging in tags from Linus's tree
-> directly. You can send a PR to net-next and fast forward, that results
-> in a more straightforward shape of the history, and avoids getting=20
-> the back-merging wrong (Linus said a couple of times that any cross-
-> -merge must have an explanation in the commit message, for example).
+Precyzyjne monitorowanie pojazd=C3=B3w na mapach cyfrowych, =C5=9Bledzeni=
+e ich parametr=C3=B3w eksploatacyjnych w czasie rzeczywistym oraz kontrol=
+a paliwa to kluczowe funkcjonalno=C5=9Bci naszego systemu.=20
 
-I agree merging upstream tags darkens the history. So IIUC, it's fine
-to have an -rc tag higher than -rc1 as base, but you prefer to receive
-one merge request per "base tag". Duly noted.
+Organizowanie pracy pracownik=C3=B3w jest dzi=C4=99ki temu prostsze i bar=
+dziej efektywne, a oszcz=C4=99dno=C5=9Bci i optymalizacja w zakresie pono=
+szonych koszt=C3=B3w, maj=C4=85 dla ka=C5=BCdego przedsi=C4=99biorcy ogro=
+mne znaczenie.
 
-Thanks!
-Miqu=C3=A8l
+Dopasujemy nasz=C4=85 ofert=C4=99 do Pa=C5=84stwa oczekiwa=C5=84 i potrze=
+b organizacji. Czy mogliby=C5=9Bmy porozmawia=C4=87 o naszej propozycji?
+
+
+Pozdrawiam
+Krystian Wieczorek
