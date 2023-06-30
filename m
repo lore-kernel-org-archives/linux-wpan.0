@@ -2,38 +2,38 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7C82EB64DD
-	for <linux-wpan@archiver.kernel.org>; Fri, 30 Jun 2023 07:50:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DC90EB64DA
+	for <linux-wpan@archiver.kernel.org>; Fri, 30 Jun 2023 08:02:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230233AbjF3HuE (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Fri, 30 Jun 2023 03:50:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57062 "EHLO
+        id S232302AbjF3ICq (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Fri, 30 Jun 2023 04:02:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59922 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231984AbjF3Htt (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Fri, 30 Jun 2023 03:49:49 -0400
-X-Greylist: delayed 509 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 30 Jun 2023 00:49:45 PDT
-Received: from mail.stardalselva.pl (mail.stardalselva.pl [217.61.105.231])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE411E77
-        for <linux-wpan@vger.kernel.org>; Fri, 30 Jun 2023 00:49:45 -0700 (PDT)
-Received: by mail.stardalselva.pl (Postfix, from userid 1002)
-        id 6408C82DED; Fri, 30 Jun 2023 09:40:48 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=stardalselva.pl;
-        s=mail; t=1688110875;
-        bh=K+tVSZ+/RJhQkwh90Jc8eurfMzR4hfabTVxOBoYH8R8=;
+        with ESMTP id S232330AbjF3ICn (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 30 Jun 2023 04:02:43 -0400
+X-Greylist: delayed 435 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 30 Jun 2023 01:02:31 PDT
+Received: from mail.tradeharbor.pl (mail.tradeharbor.pl [217.61.97.53])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E4F93A8F
+        for <linux-wpan@vger.kernel.org>; Fri, 30 Jun 2023 01:02:31 -0700 (PDT)
+Received: by mail.tradeharbor.pl (Postfix, from userid 1002)
+        id D5B058341F; Fri, 30 Jun 2023 09:55:06 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tradeharbor.pl;
+        s=mail; t=1688111714;
+        bh=+8JR9pbZKhAL6uRH+3YthTnulvnmSqiK0eDpljLgYE8=;
         h=Date:From:To:Subject:From;
-        b=NjqOz9o56FbP7OSYz8a0ZTUAMqAO9W6YMFlwyQenlXztt1y0UrpCbV2K9aN+fGLBr
-         iWN5/c4bYzZT62LqjgKuSlWi0tfILKBPJ2fvofzphwShhFpqlV0LIiAaWxGzN5cCFQ
-         VTRhThCHJ/LK5aciDE1JZGKDwKg20HBQXyi/JRh8AJKnrkvMOo0rBX7x2ynAA83zRT
-         8UBRsbIdowe+3y5d1hXdjZ/ChdZfe5XtUSnCU0EwmZ16txeiMxk5LE/tbW6bBN8H1b
-         yr8VhQx2gDn/AGCpujQypxWwIbUds1HSH+TK+aqU2Cr5sGqA24VnubVwbR2d3MLByp
-         HKqYW++4Ua0TQ==
-Received: by mail.stardalselva.pl for <linux-wpan@vger.kernel.org>; Fri, 30 Jun 2023 07:40:23 GMT
-Message-ID: <20230630084501-0.1.1m.cb2q.0.q978zh7i99@stardalselva.pl>
-Date:   Fri, 30 Jun 2023 07:40:23 GMT
-From:   "Mateusz Suchocki" <mateusz.suchocki@stardalselva.pl>
+        b=AxPZABDHwduhCtSZf1UGdVKXmUaUcgbUp2wDLF1XLUunZnVB1P6X8qzVxEXyR+u56
+         lti1fYgReiu42+ULa6mBXZv9VZR30Z7VvuXtm1iLo5DUlIod8dQvkZVN2YRXpOeIWF
+         2KVcSvFa3rs5gYqLSVhmePd6non2BkHOP00SWADq/4r3/eWFHIK+NpQr4l/fT6GN6W
+         EfzkG+PvnzEpW+VdzNWzl91ADd6lU0u0EQPVQwjuL1kwGyBMdTvqL/zOcNOw+Gs62r
+         vGW3Qwj4LZ6l+lzBl9B7Cp513wZEbaTxjbE5L1fp2bLjJoC8dw582DeRthuRCOFc7e
+         P88qxkcg0ZDCw==
+Received: by mail.tradeharbor.pl for <linux-wpan@vger.kernel.org>; Fri, 30 Jun 2023 07:54:19 GMT
+Message-ID: <20230630083000-0.1.6.4s4.0.04cr4ojp6v@tradeharbor.pl>
+Date:   Fri, 30 Jun 2023 07:54:19 GMT
+From:   "Piotr Firek" <piotr.firek@tradeharbor.pl>
 To:     <linux-wpan@vger.kernel.org>
 Subject: =?UTF-8?Q?Prosz=C4=99_o_kontakt?=
-X-Mailer: mail.stardalselva.pl
+X-Mailer: mail.tradeharbor.pl
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
@@ -55,4 +55,4 @@ Zapraszam do kontaktu.
 
 
 Pozdrawiam
-Mateusz Suchocki
+Piotr Firek
