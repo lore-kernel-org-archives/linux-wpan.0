@@ -2,60 +2,89 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EB8BEB64DD
-	for <linux-wpan@archiver.kernel.org>; Wed,  5 Jul 2023 07:37:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F04EEB64D9
+	for <linux-wpan@archiver.kernel.org>; Mon, 10 Jul 2023 23:03:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231688AbjGEHhI (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 5 Jul 2023 03:37:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52400 "EHLO
+        id S230301AbjGJXDX (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 10 Jul 2023 19:03:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42038 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230521AbjGEHhH (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 5 Jul 2023 03:37:07 -0400
-Received: from mail.durme.pl (mail.durme.pl [217.182.69.186])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8B70E4F
-        for <linux-wpan@vger.kernel.org>; Wed,  5 Jul 2023 00:37:06 -0700 (PDT)
-Received: by mail.durme.pl (Postfix, from userid 1002)
-        id 0B4CB4B998; Wed,  5 Jul 2023 07:35:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=durme.pl; s=mail;
-        t=1688542611; bh=hFxZwVw4rIL+JwfEOGI47p+fdoVOAeqVswP6NWoHSHQ=;
-        h=Date:From:To:Subject:From;
-        b=R1hpH27E8aiDGeejnfvEIzg6V091unFwis3Ee5UcevDIkPlrtNzD/L113qfqRfoFL
-         TBeTM16EH9RmjIPYd24C4MQutjE1mT+ut62mLoMVfM7goZ+6LgqV+8rsl4tNbk4JjG
-         wsFEmdMQ8tSib2Fb2QmqeWDGhbIUFvnRsxUAeoVd0ctx31dnd+y43WZT4lk2eau3iO
-         agpJq4NSR3qC+ns6UwIHRCdPMrlZReYkNbX+atPJ4zjJWhAi9l7dFdLbj8aJ0ZEMvK
-         BrFQOLNQ9hXMoSdSK0OWl9vsh1l3d8XZIqtoBMlTCoNizRe8i/gfKa+/k31/ej/8BS
-         f+KItTWazECpg==
-Received: by mail.durme.pl for <linux-wpan@vger.kernel.org>; Wed,  5 Jul 2023 07:35:24 GMT
-Message-ID: <20230705064501-0.1.2w.cm57.0.ub4te70618@durme.pl>
-Date:   Wed,  5 Jul 2023 07:35:24 GMT
-From:   "Krystian Wieczorek" <krystian.wieczorek@durme.pl>
-To:     <linux-wpan@vger.kernel.org>
-Subject: W sprawie samochodu
-X-Mailer: mail.durme.pl
+        with ESMTP id S230335AbjGJXDV (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 10 Jul 2023 19:03:21 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BF11E46;
+        Mon, 10 Jul 2023 16:03:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
+        :Reply-To:Content-Type:Content-ID:Content-Description;
+        bh=129Ywr62GUsnB8fd4+dQPU9Qo62f2KA3pJRQUQ+UrIA=; b=furZUQOYyinrwWKEPxe+fq/sll
+        NyISzldSKhJcVhzfPIf5zPZJZhhh1Q8sTWzgnZg+QpvMNteYMEWmG1qW7P5ksEt9fFv9zyopPCLe4
+        WFEDJI5b0DTesdRF809fODhcM3MnVXTqKAmN1Sv0M6yyYaYkaJ57naiW/cghV17geEh58FJ0BN3k4
+        UfegI5VCBXIpAPcIEpofclEyOqB+uohf+VRvvt5fFyKuoTBsRgSKQKL5HJtlR6vvk61QLfB+5kB5S
+        ePIZYb1TmouazCdq4Cr17qKM+SGb6qEtjpW0975ts5cjJfeR3k7wXyrx56Z7/Nw/KOd0zWvLWZypj
+        kSwd3KNQ==;
+Received: from [2601:1c2:980:9ec0::2764] (helo=bombadil.infradead.org)
+        by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+        id 1qIzuV-00CuO1-22;
+        Mon, 10 Jul 2023 23:03:15 +0000
+From:   Randy Dunlap <rdunlap@infradead.org>
+To:     netdev@vger.kernel.org
+Cc:     Randy Dunlap <rdunlap@infradead.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Alexander Aring <alex.aring@gmail.com>,
+        Stefan Schmidt <stefan@datenfreihafen.org>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        linux-wpan@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>
+Subject: [PATCH net 03/12] net: cfg802154: fix kernel-doc notation warnings
+Date:   Mon, 10 Jul 2023 16:03:03 -0700
+Message-ID: <20230710230312.31197-4-rdunlap@infradead.org>
+X-Mailer: git-send-email 2.41.0
+In-Reply-To: <20230710230312.31197-1-rdunlap@infradead.org>
+References: <20230710230312.31197-1-rdunlap@infradead.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Dzie=C5=84 dobry,
+Add an enum heading to the kernel-doc comments to prevent
+kernel-doc warnings.
 
-chcieliby=C5=9Bmy zapewni=C4=87 Pa=C5=84stwu kompleksowe rozwi=C4=85zania=
-, je=C5=9Bli chodzi o system monitoringu GPS.
+cfg802154.h:174: warning: Cannot understand  * @WPAN_PHY_FLAG_TRANSMIT_POWER: Indicates that transceiver will support
+ on line 174 - I thought it was a doc line
 
-Precyzyjne monitorowanie pojazd=C3=B3w na mapach cyfrowych, =C5=9Bledzeni=
-e ich parametr=C3=B3w eksploatacyjnych w czasie rzeczywistym oraz kontrol=
-a paliwa to kluczowe funkcjonalno=C5=9Bci naszego systemu.=20
+cfg802154.h:192: warning: Enum value 'WPAN_PHY_FLAG_TXPOWER' not described in enum 'wpan_phy_flags'
+cfg802154.h:192: warning: Excess enum value 'WPAN_PHY_FLAG_TRANSMIT_POWER' description in 'wpan_phy_flags'
 
-Organizowanie pracy pracownik=C3=B3w jest dzi=C4=99ki temu prostsze i bar=
-dziej efektywne, a oszcz=C4=99dno=C5=9Bci i optymalizacja w zakresie pono=
-szonych koszt=C3=B3w, maj=C4=85 dla ka=C5=BCdego przedsi=C4=99biorcy ogro=
-mne znaczenie.
+Fixes: edea8f7c75ec ("cfg802154: introduce wpan phy flags")
+Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: Alexander Aring <alex.aring@gmail.com>
+Cc: Stefan Schmidt <stefan@datenfreihafen.org>
+Cc: Miquel Raynal <miquel.raynal@bootlin.com>
+Cc: linux-wpan@vger.kernel.org
+Cc: Marcel Holtmann <marcel@holtmann.org>
+---
+ include/net/cfg802154.h |    3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Dopasujemy nasz=C4=85 ofert=C4=99 do Pa=C5=84stwa oczekiwa=C5=84 i potrze=
-b organizacji. Czy mogliby=C5=9Bmy porozmawia=C4=87 o naszej propozycji?
-
-
-Pozdrawiam
-Krystian Wieczorek
+diff -- a/include/net/cfg802154.h b/include/net/cfg802154.h
+--- a/include/net/cfg802154.h
++++ b/include/net/cfg802154.h
+@@ -170,7 +170,8 @@ wpan_phy_cca_cmp(const struct wpan_phy_c
+ }
+ 
+ /**
+- * @WPAN_PHY_FLAG_TRANSMIT_POWER: Indicates that transceiver will support
++ * enum wpan_phy_flags - WPAN PHY state flags
++ * @WPAN_PHY_FLAG_TXPOWER: Indicates that transceiver will support
+  *	transmit power setting.
+  * @WPAN_PHY_FLAG_CCA_ED_LEVEL: Indicates that transceiver will support cca ed
+  *	level setting.
