@@ -2,135 +2,66 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B51EAC00528
-	for <linux-wpan@archiver.kernel.org>; Mon, 17 Jul 2023 06:43:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C090EB64DA
+	for <linux-wpan@archiver.kernel.org>; Tue, 18 Jul 2023 09:28:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229885AbjGQGnr (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 17 Jul 2023 02:43:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41874 "EHLO
+        id S232335AbjGRJ2L (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 18 Jul 2023 05:28:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35484 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229815AbjGQGnl (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 17 Jul 2023 02:43:41 -0400
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03466E79;
-        Sun, 16 Jul 2023 23:43:39 -0700 (PDT)
-From:   Kurt Kanzenbach <kurt@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1689576217;
+        with ESMTP id S232336AbjGRJ2H (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 18 Jul 2023 05:28:07 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20C8810C4
+        for <linux-wpan@vger.kernel.org>; Tue, 18 Jul 2023 02:27:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1689672437;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=uboJEUKSahjdAVYpA+pF5+aSJ07v5EaQ349H/nsSHfw=;
-        b=JtWPLPlrsuM3RupOo5UUWtyEXwtzvhKqw/HW1UHwDOMmbBRQ/QmJZgZBjar4KOos/ATHBN
-        FVeRzyNa7e5MqS/vQpfZt+vcENuhhxsj2My8mYiL4fphLiPMtlOU6HdcMsxDqnQ1sEhNQz
-        NJjlbA026w0upxHlxBwNcBU5hgbd2qeeHGi0nDLJoGJyPHOkWNXGPfPEXK/lOb2QseiD0a
-        MRWYBkNWwkdz+j+H/qEC6XJscdi2JmQUkd9yvuFLKjPWqIzPFXtt0KNjzN/rZhI15vxlNH
-        DEVIwUHuNrU6jwJkdOWTM6D4LtFyGxEwGD5Hy8NKo36a44VqsUYSFgXDPqbH+A==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1689576217;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=uboJEUKSahjdAVYpA+pF5+aSJ07v5EaQ349H/nsSHfw=;
-        b=SWiZ2ZAWDV2WrTFAOBDomuHgk89Qm6iY5G2ULlukqd9M8oXoTTZbgD1XRFh7LF0KLB/zVm
-        e5qJVtMqyKfxhiAQ==
-To:     Rob Herring <robh@kernel.org>,
-        Dario Binacchi <dario.binacchi@amarulasolutions.com>,
-        Wolfgang Grandegger <wg@grandegger.com>,
-        Marc Kleine-Budde <mkl@pengutronix.de>,
+        bh=z0vyMeOfw7fSC/qxKnZBBj+xlz8lL8pZMksMNnnuzCg=;
+        b=Q2+7fGF0YkjJPjxBfiXUIFkyFK5IRcBIC8/xhlL+kpaCbfiCSxwWapD7JXhNS7srOtvUqS
+        idSrC9/xzjOeMZ/M8q6XgyTv9hMgFnvyY/sllrd8LeFgIm4k5nuBQ93iP4SiKvPFB6UUz+
+        ZN478OsyWDXLgMv7hDKdnoKQ5HpMCPE=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-208-Z1vq21maN22beOWKnNneiw-1; Tue, 18 Jul 2023 05:27:16 -0400
+X-MC-Unique: Z1vq21maN22beOWKnNneiw-1
+Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-635eb5b04e1so13842206d6.1
+        for <linux-wpan@vger.kernel.org>; Tue, 18 Jul 2023 02:27:16 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689672436; x=1690277236;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=z0vyMeOfw7fSC/qxKnZBBj+xlz8lL8pZMksMNnnuzCg=;
+        b=eADW9xvGWByfhg125LmKxfDmegXRI4KqhbqSa/6m8iCdUxMuN6T6//SODnj03q79xg
+         3+NbobNIi1DXCZoUq89qpWRftRKz7CpMAd5vVX1ZINkLknXeMcplmFhwBlUhaWcE9jC9
+         809+oHnUgMb8T2hK4cHxbI1rf5wTkLXzdQHRGBYN/6jFgaS1IFa8VDSS3MmuPj1A5FsJ
+         YghsLHUllS4EKn65kuF0t0UeWYiiek2rszoa1T1lzDzVK+3U/kX9T1OoAY8Hz0ddgWh0
+         RMnNjVM5CNlzhKZu+6GZRNPP2XUjwEZb47BkpFKUqRP/JT2bXH1wF/wDHM9lJOEokPbh
+         isGQ==
+X-Gm-Message-State: ABy/qLarOeu5IV3atZ9KDLCG2iN7/4bUQBJVQ9vjVFYlGIOVJYO2wHhB
+        9YaJ9DbUE12T9d6cnEMVZ80gapKvCGaYxVpBjqiyn+e9XvyyeA6AYf0PFfOq4jWm60AC97rK59i
+        KMV+erbxY1mj/y5OKp1C8kQ==
+X-Received: by 2002:a05:6214:509d:b0:63c:7427:e7e9 with SMTP id kk29-20020a056214509d00b0063c7427e7e9mr12261345qvb.6.1689672436180;
+        Tue, 18 Jul 2023 02:27:16 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlFYFNw7x3jThmvZICEe6iXFu0qG+zQql7vEpRKMvc0qVPxJUK7o8zW+ji84Z85dUEkIw+qD2g==
+X-Received: by 2002:a05:6214:509d:b0:63c:7427:e7e9 with SMTP id kk29-20020a056214509d00b0063c7427e7e9mr12261327qvb.6.1689672435965;
+        Tue, 18 Jul 2023 02:27:15 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-226-170.dyn.eolo.it. [146.241.226.170])
+        by smtp.gmail.com with ESMTPSA id h10-20020a0cf20a000000b00635fc10afd6sm592785qvk.70.2023.07.18.02.27.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Jul 2023 02:27:15 -0700 (PDT)
+Message-ID: <ee31215ededd386eba19fb62b0de8d0bad78d687.camel@redhat.com>
+Subject: Re: [PATCH] net: Explicitly include correct DT includes
+From:   Paolo Abeni <pabeni@redhat.com>
+To:     Alex Elder <elder@ieee.org>, Rob Herring <robh@kernel.org>,
         "David S. Miller" <davem@davemloft.net>,
         Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Chandrasekar Ramakrishnan <rcsekar@samsung.com>,
-        Chen-Yu Tsai <wens@csie.org>,
-        Jernej Skrabec <jernej.skrabec@gmail.com>,
-        Samuel Holland <samuel@sholland.org>,
-        Florian Fainelli <florian.fainelli@broadcom.com>,
-        Andrew Lunn <andrew@lunn.ch>,
-        Vladimir Oltean <olteanv@gmail.com>,
-        Woojung Huh <woojung.huh@microchip.com>,
-        UNGLinuxDriver@microchip.com,
-        =?utf-8?B?QXI=?= =?utf-8?B?xLFuw6cgw5xOQUw=?= 
-        <arinc.unal@arinc9.com>, Daniel Golle <daniel@makrotopia.org>,
-        Landen Chao <Landen.Chao@mediatek.com>,
-        DENG Qingfang <dqfext@gmail.com>,
-        Sean Wang <sean.wang@mediatek.com>,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        AngeloGioacchino Del Regno 
-        <angelogioacchino.delregno@collabora.com>,
-        Cla udiu Manoil <claudiu.manoil@nxp.com>,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Alvin =?utf-8?Q?=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
-        George McCollister <george.mccollister@gmail.com>,
-        Andreas Larsson <andreas@gaisler.com>,
-        Iyappan Subramanian <iyappan@os.amperecomputing.com>,
-        Keyur Chudgar <keyur@os.amperecomputing.com>,
-        Chris Snook <chris.snook@gmail.com>,
-        Nicolas Ferre <nicolas.ferre@microchip.com>,
-        Claudiu Beznea <claudiu.beznea@microchip.com>,
-        Madalin Bucur <madalin.bucur@nxp.com>,
-        Wei Fang <wei.fang@nxp.com>,
-        Shenwei Wang <shenwei.wang@nxp.com>,
-        Clark Wang <xiaoning.wang@nxp.com>,
-        NXP Linux Team <linux-imx@nxp.com>,
-        Sean Anderson <sean.anderson@seco.com>,
-        Pantelis Antoniou <pantelis.antoniou@gmail.com>,
-        Li Yang <leoyang.li@nxp.com>,
-        Yisen Zhuang <yisen.zhuang@huawei.com>,
-        Salil Mehta <salil.mehta@huawei.com>,
-        Douglas Miller <dougmill@linux.ibm.com>,
-        Marcin Wojtas <mw@semihalf.com>,
-        Russell King <linux@armlinux.org.uk>,
-        Tara s Chornyi <taras.chornyi@plvision.eu>,
-        Mirko Lindner <mlindner@marvell.com>,
-        Stephen Hemminger <stephen@networkplumber.org>,
-        Felix Fietkau <nbd@nbd.name>, John Crispin <john@phrozen.org>,
-        Mark Lee <Mark-MC.Lee@mediatek.com>,
-        Lorenzo Bianconi <lorenzo@kernel.org>,
-        Horatiu Vultur <horatiu.vultur@microchip.com>,
-        Timur Tabi <timur@kernel.org>,
-        Sergey Shtylyov <s.shtylyov@omp.ru>,
-        Steve Glendinning <steve.glendinning@shawell.net>,
-        Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
-        Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-        Alexandre Torgue <alexandre.torgue@foss.st.com>,
-        Jose Abreu <joabreu@synopsys.com>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Shawn Guo <shawnguo@kernel.org>,
-        Sascha Hauer <s.hauer@pengutronix.de>,
-        Pengutronix Kernel Team <kernel@pengutronix.de>,
-        Fabio Estevam <festevam@gmail.com>,
-        Neil Armstrong <neil.armstrong@linaro.org>,
-        Kevin Hilman <khilman@baylibre.com>,
-        Jerome Brunet <jbrunet@baylibre.com>,
-        Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
-        Vinod Ko ul <vkoul@kernel.org>,
-        Bhupesh Sharma <bhupesh.sharma@linaro.org>,
-        Emil Renner Berthing <kernel@esmil.dk>,
-        Samin Guo <samin.guo@starfivetech.com>,
-        Thierry Reding <thierry.reding@gmail.com>,
-        Jonathan Hunter <jonathanh@nvidia.com>,
-        Nobuhiro Iwamatsu <nobuhiro1.iwamatsu@toshiba.co.jp>,
-        Grygorii Strashko <grygorii.strashko@ti.com>,
-        Kevin Brace <kevinbrace@bracecomputerlab.com>,
-        Francois Romieu <romieu@fr.zoreil.com>,
-        Michal Simek <michal.simek@amd.com>,
-        Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
-        Alexander Aring <alex.aring@gmail.com>,
-        Stefan Schmidt <stefan@datenfreihafen.org>,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
-        Alex Elder <elder@kernel.org>,
-        =?utf-8?Q?Cl=C3=A9ment_L=C3=A9ger?= <clement.leger@bootlin.com>,
-        Heiner Kallweit <hkallweit1@gmail.com>,
-        SkyLake Huang <SkyLake.Huang@mediatek.com>,
-        Kalle Valo <kvalo@kernel.org>,
-        Loic Poulain <loic.poulain@linaro.org>,
-        Ryder Lee <ryder.lee@mediatek.com>,
-        Shayne Chen <shayne.chen@mediatek.com>,
-        =?utf-8?B?SsOpcsO0bWU=?= Pouille r <jerome.pouiller@silabs.com>,
-        Richard Cochran <richardcochran@gmail.com>
+        Jakub Kicinski <kuba@kernel.org>, Alex Elder <elder@kernel.org>
 Cc:     devicetree@vger.kernel.org, linux-can@vger.kernel.org,
         netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org, linux-sunxi@lists.linux.dev,
@@ -142,59 +73,47 @@ Cc:     devicetree@vger.kernel.org, linux-can@vger.kernel.org,
         linux-wpan@vger.kernel.org, ath10k@lists.infradead.org,
         linux-wireless@vger.kernel.org, ath11k@lists.infradead.org,
         wcn36xx@lists.infradead.org
-Subject: Re: [PATCH] net: Explicitly include correct DT includes
-In-Reply-To: <20230714174809.4060885-1-robh@kernel.org>
+Date:   Tue, 18 Jul 2023 11:27:10 +0200
+In-Reply-To: <1c6175fc-496a-843c-c8c5-2173e065eaa8@ieee.org>
 References: <20230714174809.4060885-1-robh@kernel.org>
-Date:   Mon, 17 Jul 2023 08:43:32 +0200
-Message-ID: <87r0p7597v.fsf@kurt>
+         <1c6175fc-496a-843c-c8c5-2173e065eaa8@ieee.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-        micalg=pgp-sha512; protocol="application/pgp-signature"
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
---=-=-=
-Content-Type: text/plain
+Hi,
 
-On Fri Jul 14 2023, Rob Herring wrote:
-> The DT of_device.h and of_platform.h date back to the separate
-> of_platform_bus_type before it as merged into the regular platform bus.
-> As part of that merge prepping Arm DT support 13 years ago, they
-> "temporarily" include each other. They also include platform_device.h
-> and of.h. As a result, there's a pretty much random mix of those include
-> files used throughout the tree. In order to detangle these headers and
-> replace the implicit includes with struct declarations, users need to
-> explicitly include the correct includes.
->
-> Signed-off-by: Rob Herring <robh@kernel.org>
-> ---
+On Sat, 2023-07-15 at 10:11 -0500, Alex Elder wrote:
+> On 7/14/23 12:48 PM, Rob Herring wrote:
+> > The DT of_device.h and of_platform.h date back to the separate
+> > of_platform_bus_type before it as merged into the regular platform bus.
+> > As part of that merge prepping Arm DT support 13 years ago, they
+> > "temporarily" include each other. They also include platform_device.h
+> > and of.h. As a result, there's a pretty much random mix of those includ=
+e
+> > files used throughout the tree. In order to detangle these headers and
+> > replace the implicit includes with struct declarations, users need to
+> > explicitly include the correct includes.
+> >=20
+> > Signed-off-by: Rob Herring <robh@kernel.org>
+>=20
+> (I significantly reduced the addressee list to permit the message
+> to be sent.)
+>=20
+> For "drivers/net/ipa/ipa_main.c":
+>=20
+> Acked-by: Alex Elder <elder@linaro.org>
 
-[...]
+The patch does not apply cleanly to net-next. Rob, could you please re-
+spin it? While at that, have you considered splitting it in a few
+smaller patches (e.g. can, dsa, freescale, ibm, marvel, mediatek,
+stmmicro,  sun, ti, xilinx, wireless, remaining)?
 
->  drivers/net/dsa/hirschmann/hellcreek.c                  | 1 -
->  drivers/net/dsa/hirschmann/hellcreek_ptp.c              | 1 +
+Thanks!
 
-Acked-by: Kurt Kanzenbach <kurt@linutronix.de> # hellcreek
+Paolo
 
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAmS04xQTHGt1cnRAbGlu
-dXRyb25peC5kZQAKCRDBk9HyqkZzgtQ+D/4rxLrP90HZoMklo1bSDPz4shsBjqNI
-WnulP+nkfb+Qtwn8rBKcJezrFK9O6lJpYTq33kAJwEX/SE8b961KoY/V9s6ssagq
-UBdww2O31sKDjd4MbmNjsULZi1BpRmVBJLaxkTQRy/i1JQlHN3rNZtQBT9ZPLcus
-oYN4pegQ+WymkHI/KQtmFpPpTMNZjPn6ItB8g5uh6LFWgVIOZi5L13KC4mus7SFP
-ujD3Fe0Y2ya/EOyjT4NpcS2IQjTacbYk/z/hB3fuFp0mW5l1X8TKVKz2zquZ01ef
-armvD+bjs+3emvjNDs4/9yBd6kJ/4RHP6BkYJMWIHuYxxM62qOJvr3O6JV2FRKug
-CKGvmYJBedVkf4RAEc1nQrMH8U4H8ktjYYUKsMp2JdQ5mrDI0xS5Mrfzf4vsonpe
-OZXf5Z0CrehMlal4X5Y330gU0iVuZmUARGWKSGFmzWDV5A7vn3jubM8FqCJtiB0X
-wD9w4pdsJ+jRp+35GluO4anayr9lDPU3w8Y+4KDmwafuzG2VUajeUSWmBxiDgGh9
-6WB5lWsI0Oa+Llb6DzrALRkwXzJPDzZ7YULwb2v37sOq9xma8cce3W9N967on0bX
-YcnqpBdEg3tncRq58oK9uDJtdggXzTSO7C78b09WvIa2l5G2JkaM77I/VXhGgvGt
-BXSqDM8imlVRFg==
-=8lun
------END PGP SIGNATURE-----
---=-=-=--
