@@ -2,49 +2,113 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AF0AC41513
-	for <linux-wpan@archiver.kernel.org>; Mon,  7 Aug 2023 08:11:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9CF5C41513
+	for <linux-wpan@archiver.kernel.org>; Mon,  7 Aug 2023 21:45:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229578AbjHGILm (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 7 Aug 2023 04:11:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52504 "EHLO
+        id S230329AbjHGVpA (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 7 Aug 2023 17:45:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33374 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229515AbjHGILl (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 7 Aug 2023 04:11:41 -0400
-Received: from mail.loanfly.pl (mail.loanfly.pl [141.94.250.68])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D464F170A
-        for <linux-wpan@vger.kernel.org>; Mon,  7 Aug 2023 01:11:40 -0700 (PDT)
-Received: by mail.loanfly.pl (Postfix, from userid 1002)
-        id 7112DA579A; Mon,  7 Aug 2023 08:10:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=loanfly.pl; s=mail;
-        t=1691395841; bh=Y0HnXqH+26AP5Uq6M8BQXaj1HIAPQY/WndV9tkpAHHU=;
-        h=Date:From:To:Subject:From;
-        b=bulGB746MzuAkLdE6xeKBS6Wqf+6Yce17ZbXlyuNn9zpDqFko4VzEkPKIZUQhiPJb
-         uz3/ka79kcJOq69vq41iE7zL+Hf7WiEscaFysqC7K9JM7hYfL3dNwRhIEx3DYP2gsY
-         6iZnvwpecOpsS5dO2gMOsks1d0YMMGRZY+OUacl4HTxYDFItL61L2deWcTihns9hXr
-         fuWSLGxBq9t48/ffYSZkGZw+Wg7/03oR1jaV/AbHZdnXX4wJqTDP0bXYdbN8ObTr0q
-         69ByPpuZT+3/SrQs+F0Yn+ya89xOYu2t77UOgOR5fgOp9VHYK53nmWqCCHjGFFuBou
-         OS6PeyINZd/cA==
-Received: by mail.loanfly.pl for <linux-wpan@vger.kernel.org>; Mon,  7 Aug 2023 08:10:18 GMT
-Message-ID: <20230807064501-0.1.br.1cmuu.0.f872h3h7me@loanfly.pl>
-Date:   Mon,  7 Aug 2023 08:10:18 GMT
-From:   "Damian Cichocki" <damian.cichocki@loanfly.pl>
-To:     <linux-wpan@vger.kernel.org>
-Subject: =?UTF-8?Q?Pytanie_o_samoch=C3=B3d?=
-X-Mailer: mail.loanfly.pl
+        with ESMTP id S229615AbjHGVo6 (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 7 Aug 2023 17:44:58 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA5B0199C;
+        Mon,  7 Aug 2023 14:44:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=g+VsSpIIvTZp+OYSzc71ePgWKvh9dbj0dOgrtfhVY08=; b=nv3YiaN+c2/xvyBTT2Scu3RVHn
+        Tj4b/HyzInNj8yGoInNGOYxe01yyjWs033Jma+vixDeIw5QdEW3/KFTOOcij/qjKWMuu5yJugNPak
+        5bGUWL8QxbO2hds1oMmC1dHP1V6cQK2D4CaALau+vpGeX5XE9OvQJDFIO1Yi21zaO8HE2+pk34l2n
+        BVyUdtZzZvxBzsi1joxY+1qA9ciAyv62012YcPxmBErjy0ZIa5JCIYEpqbx+tuJU0O0v/7lnUWQPd
+        Rgxo3BYCj2n7RrlkjDHbuZtr8gKU8wmwOtvkewC4c71qhu+pMW57ycko0SZ5Zi0jULdqh4x1zPD/o
+        G0OdFzXQ==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
+        id 1qT81L-000nZJ-0p;
+        Mon, 07 Aug 2023 21:44:11 +0000
+Date:   Mon, 7 Aug 2023 14:44:11 -0700
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Joel Granados <joel.granados@gmail.com>
+Cc:     Catalin Marinas <catalin.marinas@arm.com>,
+        Iurii Zaikin <yzaikin@google.com>,
+        Jozsef Kadlecsik <kadlec@netfilter.org>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        Kees Cook <keescook@chromium.org>,
+        "D. Wythe" <alibuda@linux.alibaba.com>, mptcp@lists.linux.dev,
+        Jakub Kicinski <kuba@kernel.org>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Paolo Abeni <pabeni@redhat.com>, coreteam@netfilter.org,
+        Jan Karcher <jaka@linux.ibm.com>,
+        Alexander Aring <alex.aring@gmail.com>,
+        Will Deacon <will@kernel.org>,
+        Stefan Schmidt <stefan@datenfreihafen.org>,
+        Matthieu Baerts <matthieu.baerts@tessares.net>,
+        bridge@lists.linux-foundation.org,
+        linux-arm-kernel@lists.infradead.org,
+        Joerg Reuter <jreuter@yaina.de>, Julian Anastasov <ja@ssi.bg>,
+        David Ahern <dsahern@kernel.org>,
+        netfilter-devel@vger.kernel.org, Wen Gu <guwen@linux.alibaba.com>,
+        linux-kernel@vger.kernel.org,
+        Santosh Shilimkar <santosh.shilimkar@oracle.com>,
+        linux-wpan@vger.kernel.org, lvs-devel@vger.kernel.org,
+        Karsten Graul <kgraul@linux.ibm.com>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-sctp@vger.kernel.org, Tony Lu <tonylu@linux.alibaba.com>,
+        Pablo Neira Ayuso <pablo@netfilter.org>,
+        Ralf Baechle <ralf@linux-mips.org>,
+        Florian Westphal <fw@strlen.de>, willy@infradead.org,
+        Heiko Carstens <hca@linux.ibm.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-rdma@vger.kernel.org, Roopa Prabhu <roopa@nvidia.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Simon Horman <horms@verge.net.au>,
+        Mat Martineau <martineau@kernel.org>, josh@joshtriplett.org,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Eric Dumazet <edumazet@google.com>, linux-hams@vger.kernel.org,
+        Wenjia Zhang <wenjia@linux.ibm.com>,
+        linux-fsdevel@vger.kernel.org, linux-s390@vger.kernel.org,
+        Xin Long <lucien.xin@gmail.com>,
+        Nikolay Aleksandrov <razor@blackwall.org>,
+        netdev@vger.kernel.org, rds-devel@oss.oracle.com,
+        Joel Granados <j.granados@samsung.com>
+Subject: Re: [PATCH v2 00/14] sysctl: Add a size argument to register
+ functions in sysctl
+Message-ID: <ZNFlqwwvE6w6HyHl@bombadil.infradead.org>
+References: <20230731071728.3493794-1-j.granados@samsung.com>
+ <ZMgpck0rjqHR74sl@bombadil.infradead.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZMgpck0rjqHR74sl@bombadil.infradead.org>
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Dzie=C5=84 dobry,
+On Mon, Jul 31, 2023 at 02:36:50PM -0700, Luis Chamberlain wrote:
+> > Joel Granados (14):
+> >   sysctl: Prefer ctl_table_header in proc_sysctl
+> >   sysctl: Use ctl_table_header in list_for_each_table_entry
+> >   sysctl: Add ctl_table_size to ctl_table_header
+> >   sysctl: Add size argument to init_header
+> >   sysctl: Add a size arg to __register_sysctl_table
+> >   sysctl: Add size to register_sysctl
+> >   sysctl: Add size arg to __register_sysctl_init
+> 
+> This is looking great thanks, I've taken the first 7 patches above
+> to sysctl-next to get more exposure / testing and since we're already
+> on rc4.
 
-Czy interesuje Pa=C5=84stwa rozwi=C4=85zanie umo=C5=BCliwiaj=C4=85ce moni=
-torowanie samochod=C3=B3w firmowych oraz optymalizacj=C4=99 koszt=C3=B3w =
-ich utrzymania?=20
+Ok I havent't heard much more feedback from networking folks, and
+since this is mostly sysctl love I've taken in the rest of these
+patches. Thanks to Jani Nikula for the reviews and to Greg KH for
+the suggestion on simplifying things.
 
+Let's see what busts in linux-next, and if anything does I can reset
+my tree back to only the first 7 patches.
 
-Pozdrawiam,
-Damian Cichocki
+  Luis
