@@ -2,251 +2,395 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A93C0C05051
-	for <linux-wpan@archiver.kernel.org>; Wed,  9 Aug 2023 07:13:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7E0FC0015E
+	for <linux-wpan@archiver.kernel.org>; Wed,  9 Aug 2023 10:50:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231572AbjHIHN3 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 9 Aug 2023 03:13:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42722 "EHLO
+        id S232310AbjHIKuN (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 9 Aug 2023 06:50:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35322 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231509AbjHIHNZ (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 9 Aug 2023 03:13:25 -0400
-Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B13421B6;
-        Wed,  9 Aug 2023 00:13:24 -0700 (PDT)
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-        by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20230809071321euoutp01daffd5f6a01edf39fc36d5af9cc9ab2d~5pZa-JLBS0907609076euoutp01F;
-        Wed,  9 Aug 2023 07:13:21 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20230809071321euoutp01daffd5f6a01edf39fc36d5af9cc9ab2d~5pZa-JLBS0907609076euoutp01F
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1691565202;
-        bh=V7AXA3XKbCTJdCLCEcFa9yONVo03/VAYcmjCmAIVm/0=;
-        h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-        b=PbTANdOUFchwh/zQnW95iisuOL+LirFf8CuGNyW/Oa7KXicswQbaSCFd0qWjoU5sm
-         TwaZARytYxnAfU11yAZNn/ZXPrBy/vqVu84xMjebQSH0XOYXEuG/Zh0hyMdQcUrAaU
-         jrG4mDGWwLdWv3/TIZjPL8jtNkNRvz2u9E9bbhkg=
-Received: from eusmges3new.samsung.com (unknown [203.254.199.245]) by
-        eucas1p1.samsung.com (KnoxPortal) with ESMTP id
-        20230809071321eucas1p14bd8234289c1ffc5ba343a02aac42e26~5pZauQs4l2464524645eucas1p10;
-        Wed,  9 Aug 2023 07:13:21 +0000 (GMT)
-Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
-        eusmges3new.samsung.com (EUCPMTA) with SMTP id DA.34.37758.19C33D46; Wed,  9
-        Aug 2023 08:13:21 +0100 (BST)
-Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
-        eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
-        20230809071320eucas1p109d62cad1d2d37692305b4229f42ebe7~5pZZ_3Q6s2824028240eucas1p1p;
-        Wed,  9 Aug 2023 07:13:20 +0000 (GMT)
-Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
-        eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20230809071320eusmtrp2ccf3d42b918a7af1410041dd3126c848~5pZZ77wIF1895118951eusmtrp2J;
-        Wed,  9 Aug 2023 07:13:20 +0000 (GMT)
-X-AuditID: cbfec7f5-815ff7000002937e-3b-64d33c91d398
-Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
-        eusmgms2.samsung.com (EUCPMTA) with SMTP id B2.74.14344.09C33D46; Wed,  9
-        Aug 2023 08:13:20 +0100 (BST)
-Received: from CAMSVWEXC02.scsc.local (unknown [106.1.227.72]) by
-        eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
-        20230809071320eusmtip1458e135fa6711b22ecfe89f8a3278e9c~5pZZkpiyW0118901189eusmtip1W;
-        Wed,  9 Aug 2023 07:13:20 +0000 (GMT)
-Received: from localhost (106.110.32.133) by CAMSVWEXC02.scsc.local
-        (2002:6a01:e348::6a01:e348) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
-        Wed, 9 Aug 2023 08:13:19 +0100
-Date:   Tue, 8 Aug 2023 15:58:47 +0200
-From:   Joel Granados <j.granados@samsung.com>
-To:     Chris Maness <christopher.maness@gmail.com>
-CC:     Luis Chamberlain <mcgrof@kernel.org>,
-        Alexander Aring <alex.aring@gmail.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        "D. Wythe" <alibuda@linux.alibaba.com>,
-        David Ahern <dsahern@kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Florian Westphal <fw@strlen.de>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Iurii Zaikin <yzaikin@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
+        with ESMTP id S232290AbjHIKuM (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 9 Aug 2023 06:50:12 -0400
+Received: from mail-wr1-x429.google.com (mail-wr1-x429.google.com [IPv6:2a00:1450:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7725C10FF;
+        Wed,  9 Aug 2023 03:50:10 -0700 (PDT)
+Received: by mail-wr1-x429.google.com with SMTP id ffacd0b85a97d-31763b2c5a4so5612879f8f.3;
+        Wed, 09 Aug 2023 03:50:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1691578209; x=1692183009;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=E4x9TN1BPWkXoUM+5Mv9NIrnx1wNOUjHnPlZkiCKhfE=;
+        b=Qt44TE+kHZzw7gdgLwBeDvLFRx5oA7F4f/l9YxcAJAZzlvh8ls0lSxYRKEDzwkcJhi
+         aFR8lC8I1W1hdRRaK3WP1oCKvXjvWr4AKAzuHGJUin+MRuPv2YLAJLtjjtfJtznGaz8w
+         gCgjU+uXRvgzXhkT3nzC8J98BAQiU/JIxVdkSlAE7gt2clUG+1xJdv54F97KHD0cUsY+
+         ijWkpJ3bi5c76mpfeZ57wOsQA9aM1hiaOeAYHrZS2Di6bwrcxYvDtNHvEZwt03euhgly
+         WlbXy87S/dME0r0rP3nXB8+ZOVebgJoYn0fGU10WBEx71zjVbQz0taIXZ5pAc735cpJE
+         gIug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691578209; x=1692183009;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=E4x9TN1BPWkXoUM+5Mv9NIrnx1wNOUjHnPlZkiCKhfE=;
+        b=a8onWgUTXlRMl99pgBAt6Ied3Boid72oSf0djrKK48//r6um5zT/bv3paXj1b1QIGR
+         Z52hQDmAGMvV44tGlegt+uCJNs+dWfQeG+knFlAkBAfPwaLkd3zO85cVhtiKdgOvlojo
+         Wn7xpp/o0tzgLc3PTJl4xthX21Bkz+FxSLNc7PDoJLfD06h+ybR1VClKkdrfxUDmoOYC
+         /tho2qC4q6Fslw38mzsOM3U+9EkDYQcTlrlCjRfYCWtuT7DZ1L7aBdSbfNEGfKFk3nCr
+         lyd4SHFtz3+r0AnR0vcfrcvPWVxihLN2BWN7cgQXfnL84YeGhpkbfxlhHqLUg6/15b3P
+         gIVA==
+X-Gm-Message-State: AOJu0YykNJmpkFdGKGLpJ4813wkEYFhyXUgTMlThEE2ZHdhIn8pehAwL
+        qV9E9nOps2FA2hZ6ubQ8nIw=
+X-Google-Smtp-Source: AGHT+IFhJHmpZ5qLTRyhmoFOlGo8Gun0RkcHNucpNxZxNFPNPvFp20lu7CAyes2VJikI1Ps5LhonBA==
+X-Received: by 2002:a5d:63c1:0:b0:317:6a83:767a with SMTP id c1-20020a5d63c1000000b003176a83767amr1725366wrw.51.1691578208582;
+        Wed, 09 Aug 2023 03:50:08 -0700 (PDT)
+Received: from localhost ([165.225.194.193])
+        by smtp.gmail.com with ESMTPSA id x12-20020adfec0c000000b0031274a184d5sm16338329wrn.109.2023.08.09.03.50.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 09 Aug 2023 03:50:07 -0700 (PDT)
+From:   Joel Granados <joel.granados@gmail.com>
+X-Google-Original-From: Joel Granados <j.granados@samsung.com>
+To:     mcgrof@kernel.org
+Cc:     rds-devel@oss.oracle.com, "David S. Miller" <davem@davemloft.net>,
+        Florian Westphal <fw@strlen.de>, willy@infradead.org,
         Jan Karcher <jaka@linux.ibm.com>,
-        Joerg Reuter <jreuter@yaina.de>,
-        Jozsef Kadlecsik <kadlec@netfilter.org>,
-        Julian Anastasov <ja@ssi.bg>,
-        Karsten Graul <kgraul@linux.ibm.com>,
-        Kees Cook <keescook@chromium.org>,
-        Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
-        Mat Martineau <martineau@kernel.org>,
-        Matthieu Baerts <matthieu.baerts@tessares.net>,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
-        Nikolay Aleksandrov <razor@blackwall.org>,
-        Pablo Neira Ayuso <pablo@netfilter.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Ralf Baechle <ralf@linux-mips.org>,
-        Roopa Prabhu <roopa@nvidia.com>,
-        Santosh Shilimkar <santosh.shilimkar@oracle.com>,
-        Simon Horman <horms@verge.net.au>,
-        Stefan Schmidt <stefan@datenfreihafen.org>,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Tony Lu <tonylu@linux.alibaba.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
         Wen Gu <guwen@linux.alibaba.com>,
-        Wenjia Zhang <wenjia@linux.ibm.com>,
-        Will Deacon <will@kernel.org>, Xin Long <lucien.xin@gmail.com>,
-        <bridge@lists.linux-foundation.org>, <coreteam@netfilter.org>,
-        <josh@joshtriplett.org>, <linux-arm-kernel@lists.infradead.org>,
-        <linux-fsdevel@vger.kernel.org>, <linux-hams@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-        <linux-s390@vger.kernel.org>, <linux-sctp@vger.kernel.org>,
-        <linux-wpan@vger.kernel.org>, <lvs-devel@vger.kernel.org>,
-        <mptcp@lists.linux.dev>, <netdev@vger.kernel.org>,
-        <netfilter-devel@vger.kernel.org>, <rds-devel@oss.oracle.com>,
-        <willy@infradead.org>
-Subject: Re: [PATCH v2 00/14] sysctl: Add a size argument to register
- functions in sysctl
-Message-ID: <20230808135847.46ln434mbpiiklvz@localhost>
+        Simon Horman <horms@verge.net.au>,
+        Tony Lu <tonylu@linux.alibaba.com>, linux-wpan@vger.kernel.org,
+        Matthieu Baerts <matthieu.baerts@tessares.net>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        mptcp@lists.linux.dev, Heiko Carstens <hca@linux.ibm.com>,
+        Stefan Schmidt <stefan@datenfreihafen.org>,
+        Will Deacon <will@kernel.org>, Julian Anastasov <ja@ssi.bg>,
+        netfilter-devel@vger.kernel.org, Joerg Reuter <jreuter@yaina.de>,
+        linux-kernel@vger.kernel.org,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        linux-sctp@vger.kernel.org, Xin Long <lucien.xin@gmail.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-hams@vger.kernel.org, Vasily Gorbik <gor@linux.ibm.com>,
+        coreteam@netfilter.org, Ralf Baechle <ralf@linux-mips.org>,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        Pablo Neira Ayuso <pablo@netfilter.org>,
+        keescook@chromium.org, Roopa Prabhu <roopa@nvidia.com>,
+        David Ahern <dsahern@kernel.org>,
+        linux-arm-kernel@lists.infradead.org,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Jozsef Kadlecsik <kadlec@netfilter.org>,
+        Wenjia Zhang <wenjia@linux.ibm.com>, josh@joshtriplett.org,
+        linux-fsdevel@vger.kernel.org,
+        Alexander Aring <alex.aring@gmail.com>,
+        Nikolay Aleksandrov <razor@blackwall.org>,
+        netdev@vger.kernel.org,
+        Santosh Shilimkar <santosh.shilimkar@oracle.com>,
+        linux-s390@vger.kernel.org, Sven Schnelle <svens@linux.ibm.com>,
+        "D. Wythe" <alibuda@linux.alibaba.com>,
+        Eric Dumazet <edumazet@google.com>, lvs-devel@vger.kernel.org,
+        linux-rdma@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+        Iurii Zaikin <yzaikin@google.com>,
+        Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+        bridge@lists.linux-foundation.org,
+        Karsten Graul <kgraul@linux.ibm.com>,
+        Mat Martineau <martineau@kernel.org>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Joel Granados <j.granados@samsung.com>
+Subject: [PATCH v3 00/14] sysctl: Add a size argument to register functions in sysctl
+Date:   Wed,  9 Aug 2023 12:49:52 +0200
+Message-Id: <20230809105006.1198165-1-j.granados@samsung.com>
+X-Mailer: git-send-email 2.30.2
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg="pgp-sha512";
-        protocol="application/pgp-signature"; boundary="x4zdqo2w6ogqmllb"
-Content-Disposition: inline
-In-Reply-To: <CANnsUMGRBnatKB4-3eYjb5aG7YnXDiZG6cjuwSgtjvVF6ErJNg@mail.gmail.com>
-X-Originating-IP: [106.110.32.133]
-X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
-        CAMSVWEXC02.scsc.local (2002:6a01:e348::6a01:e348)
-X-Brightmail-Tracker: H4sIAAAAAAAAA1VTa1CUZRTu/S67Cwh+ro6+A2iJUIkFYSonlQyHZr5opotljkpTG3yDEjdZ
-        SUKYMBDivsgAsQIujazIbYHFNVAEV0G5tCACwQbNyM1yEdAFAR2ghQ+z/j3nnOd5znPemVdE
-        ih8JrUVHA49zIYESfzuBOaVpnNW9mbb7rs9bJZM2UNHytwC0Ua5w72oCDYNzWgHcLvlDCOPK
-        JARz5Woa5qrjSMhpi6GgrOY0AcONA0LQJBcjaJc/oeHy/WkBGPKKECQ+sIXoS1MIhlIHaOhU
-        TghgQREEsykWkJ0QTUBrYgCMZ54loF2TQkPlYDcNV2ubKOi+3E/A3ZocAYxokymQ5UeTMKww
-        0NCXrqRgQDVOQPS5xyQ8LbxFgy55gYTC1hECemTDCG7EXaOhVfWjEBoVa0FW1kzBk5ZRBFmj
-        XSR0XLWH5skFAnRqIw3GnNfhnqyNgvTCKgKuxM8IQakqFcLg9H0BnGrVCCGmbzs8mzHlUFZ/
-        9N5OtiSvBLFjuibE5pWcZM9G3aHYp7OObNXFXoKtlvcLWU29A6uoDGXVhY6s3uDGVhbFC9iG
-        i6Wm8b13WNkv9YhVn//hkw2HzHf7cP5Hv+NCnN/92vzIYJYKBVetDauRK4gopBMnIDMRZrbh
-        1Fo9mYDMRWKmEGFjbgfFF5MIT6flIL4wIhyXk0k/lyQ1DBL84ALC7Tmdgn9ZMwVDy2ZqhJPm
-        G4hFCcXY47hn/UtyAfMGbhvtIxfxGsYZX5tULFmRTCODY9vGlgSrmcM4Pvq6YBFbMq54IXGO
-        5PEq3JQ9ZEooMgnC8M+JJ3hogy/MixYZZsyneLjhNMEntcNTo8nLqSNxc5V+aRVmlCuwJitz
-        yQYzHviM7Auesxo/uFUl5LEtXqg+t8xPR7hufkLIF8UIK09NLW/YhWM6h5YV7vhGbj3Nm1rh
-        noerFtukCZ7RZJF82xL/FLv88K/i4j9HKRnaJP/PYfIXh8lfHMbDzVhV4/y/7qL7FqzMN5A8
-        dsNlZeOUAgmL0DouVBrgy0nfDuROOEklAdLQQF8n76CASmT6iS3zt6Z+RYUPHjlpESFCWmRv
-        Eg+UF7cjayowKJCzW2Pp9lmHj9jSR/J9OBcS9FVIqD8n1SIbEWW3znKLW5O3mPGVHOe+5bhg
-        LuT5lBCZWUcRx/Y6lDcYjnnt6Puyd4+43OxEqhU3nbzKe2Jlb0dmONZVTI1VPMyNrFUH/5a5
-        8oCfYfCD29sPlO8LqxpOL8gV90dQqa0rUm73/O5QYnReeK3I7PNI/QavYccNwbR7mkf+E2OX
-        bX2/ffQxl9jmrZ6bTm7N0J83WHy4Ed38K2hnilVGsP2lGp07py4Ycbg81KMvjXhGWRt1Be97
-        zpdmd1tktXo5ZNwsNvrX6TynbQhV3cN9EWWC8vURfmnCi/17PA7HHUzXUvmqXYa5V0Zw9myF
-        eWNWx9b9fuLN4eac5ErswPrH+zMzKuUvfeNaqk+77tvVO793m0vEy16NOw7e0WsOtYjOf2xH
-        SY9IXBzJEKnkHxEe0t0EBQAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA2VTa0xTZxj2O+f0nKJhKzf5gsJcRceAFQoUXhwYzZJ52IyZbj82kGgnJ+CE
-        lrTAdIvKQIaUiyU4nMUg6uwKcpO6yqUQRUERBgwB5wAddxUmKKCAXFbolpns3/O9z+V98iUv
-        n7TOZBz4+2UxnEImjRTSK6nGhVs976kD7oZ5Xteth8uNj2mojfeDXqOKB/3ztTTcLuxiYEyb
-        hmC+VM+D+YpkEs60HKOguDKJgMH6PgYM6ZcQtGpe8ODq8EsaRnILEKQ+WQuJv0whGDjRx4N2
-        7TgNi3lymMlYBadViQQ0pUbBWHYOAa2GDB6U9XfywFjdQEHn1R4C7laeoWGoNp0C9blEEgbz
-        RnjQnaWloK9kjIDEs89JmNXd4kFz+iIJuqYhAn5XDyK4kVzDg6aSBAbq81aDuvgOBS8aRxGc
-        Gu0goc3oDHcmFwlo1k/wYOKMC/SqWyjI0l0hoCplmgFtSRED/S+HafiuycDAsW4JvJo29dBW
-        7NiyiS3MLUTs0+YGxOYWfsvmxP9GsbMzruyV/PsEW6HpYVjDtQ1sXlksq9e5sn+MBLJlBSk0
-        W5dfZKJ7/Vn1+WuI1f909BOnYFGAQh4bw62LkCtjAoUhYvASif1B5OXjLxJ7+4Vu8pIIPTYH
-        hHGR++M4hcfmvaKIpw3ZTHTZ6oM/qIxEPGqyViELPhb44LS6fkKFVvKtBRcRzrjdTJuJtfjy
-        ZAfPjG3wXKeKNoueIXyv4gJjfugRbqlKZJZUlMAZJ7/qWXbQAnfcMtpNLmFbgQeumcxbXkEK
-        6gXY+OfN5RU2ghCcknh9GVsK/PBi6jxpTr1A4vT8k8hMWOGG0wPUEiYFcbj35AOTiG/Ca/DP
-        C/ylsYVgJx6sSyLMVYV4ajT9n9qH8cT8EFIjG81rSZrXkjT/JZnH7+C53Lb/j92w9twIacaB
-        uLh4jMpDTAGy5WKVUeFRSi+RUhqljJWFi/bJo8qQ6R4M9TNXylH+k2eiWkTwUS1yNjn7Si+1
-        IgdKJpdxQlvLwE/bwqwtw6SHvuEU8j2K2EhOWYskpm/MJB3s9slNxyWL2SP29ZSIfXz9PSX+
-        vt5Ce8ug6ONSa0G4NIY7wHHRnOJfH8G3cIgnPq5+63a9quPLlodpG99Ylfquu26davbsxl/t
-        Vgz7tvOTqg4/3mHV8Vl3yOSpap596faFwA+CP/rCYk25s2Lvpbou9fa/sjNyoGZFasStOLsP
-        p0VHb2jGEx4Hy6YelG/Q7MZWoaHCcy6O24LGC3R9qlN+ioGLJ7YXF3onGHI4pVV4tvFr7fcO
-        tDg5jZHfz6xh9duaQ3btdgpiUi3bjVvVvmHhVmMt9IXSmvAtFjk7KTeJ/shBx3LZwXu+gzbb
-        LN92c0lIe3Rce9Hd0WO906O2H7/yH37/5pEU1/O2XRVzhucHtmoeZRU1xHUrJJWf7zaWt2H7
-        5CehuDL3oV1b+q7hQ92Fb87UCyllhFTsSiqU0r8BZ8mLvKQEAAA=
-X-CMS-MailID: 20230809071320eucas1p109d62cad1d2d37692305b4229f42ebe7
-X-Msg-Generator: CA
-X-RootMTR: 20230808025059eucas1p24caeb224edb8f4fce693364913a37841
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20230808025059eucas1p24caeb224edb8f4fce693364913a37841
-References: <20230731071728.3493794-1-j.granados@samsung.com>
-        <ZMgpck0rjqHR74sl@bombadil.infradead.org>
-        <ZNFlqwwvE6w6HyHl@bombadil.infradead.org>
-        <CANnsUMG3WO_19GpnsNaXPqu6eEnpBvYUpkrf1QbHwsc9wEoCZQ@mail.gmail.com>
-        <ZNGBrkP7J2g/BAWV@bombadil.infradead.org>
-        <CGME20230808025059eucas1p24caeb224edb8f4fce693364913a37841@eucas1p2.samsung.com>
-        <CANnsUMGRBnatKB4-3eYjb5aG7YnXDiZG6cjuwSgtjvVF6ErJNg@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
---x4zdqo2w6ogqmllb
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+What?
+These commits set things up so we can start removing the sentinel elements.
+They modify sysctl and net_sysctl internals so that registering a ctl_table
+that contains a sentinel gives the same result as passing a table_size
+calculated from the ctl_table array without a sentinel. We accomplish this by
+introducing a table_size argument in the same place where procname is checked
+for NULL. The idea is for it to keep stopping when it hits ->procname == NULL,
+while the sentinel is still present. And when the sentinel is removed, it will
+stop on the table_size (thx to jani.nikula@linux.intel.com for the discussion
+that led to this). This allows us to remove sentinels from one (or several)
+files at a time.
 
-Hey Chris
+These commits are part of a bigger set containing the removal of ctl_table sentinel
+(https://github.com/Joelgranados/linux/tree/tag/sysctl_remove_empty_elem_V3).
+The idea is to make the review process easier by chunking the 65+ commits into
+manageable pieces.
 
-My questions inline
-On Mon, Aug 07, 2023 at 07:50:44PM -0700, Chris Maness wrote:
-> I tried running the current mainline kernel (current Arch Linux) with
-What kernel version are we talking about exactly here? Please notice the
-base that I used in the cover letter (rc2 or rc3). They should also
-rebase cleanly on top of v6.5-rc5.
+My idea is to send out one chunk at a time so it can be reviewed separately
+from the others without the noise from parallel related sets. After this first
+chunk will come 6 that remove the sentinel element from "arch/*, drivers/*,
+fs/*, kernel/*, net/* and miscellaneous. And then a final one that removes the
+->procname == NULL check. You can see all commits here
+(https://github.com/Joelgranados/linux/tree/tag/sysctl_remove_empty_elem_V3).
 
-I'm not sure what the patches will do if you apply them to an older
-kernel.
+Why?
+This is a preparation patch set that will make it easier for us to apply
+subsequent patches that will remove the sentinel element (last empty element)
+in the ctl_table arrays.
 
-> simple single MUX socket (ax0) using LinFBB.  I was a happy camper as
-> it seemed to work fine at first, then the system just slowed to a
-> crawl.  I am wondering if any of these patches are addressing this
-> behavior.  No kernel panic like before, but not what I was hoping for.
-So you have been experiencing kernel panics from before? What does
-before mean? And can you bisect to pinpoint what commit fixed it?
+In itself, it does not remove any sentinels but it is needed to bring all the
+advantages of the removal to fruition which is to help reduce the overall build
+time size of the kernel and run time memory bloat by about ~64 bytes per
+declared ctl_table array. It also ensures that future moves of sysctl arrays
+out from kernel/sysctl.c to their own subsystem won't penalize in enlarging the
+kernel build size or run time memory consumption. Without this patch set we
+would have to put everything into one big commit making the review process that
+much longer and harder for everyone.
 
-> I have also tried sixpack, and that explodes instantly the last time I
-> have checked.   That goes all the way back to the v4 kernels.  v2 is
-> fine there.
-You mean that 6pack is broken in all the major versions up until v2? If
-this is the case, then it might be an issue that is not related to this
-patchset.I see that Andreas Koensgen <ajk@comnets.uni-bremen.de> is the
-maintainer of 6pack, maybe he can chime in on the issue?
+Since it is so related to the removal of the sentinel element, its worth while
+to give a bit of context on this:
+* Good summary from Luis about why we want to remove the sentinels.
+  https://lore.kernel.org/all/ZMFizKFkVxUFtSqa@bombadil.infradead.org/
+* This is a patch set that replaces register_sysctl_table with register_sysctl
+  https://lore.kernel.org/all/20230302204612.782387-1-mcgrof@kernel.org/
+* Patch set to deprecate register_sysctl_paths()
+  https://lore.kernel.org/all/20230302202826.776286-1-mcgrof@kernel.org/
+* Here there is an explicit expectation for the removal of the sentinel element.
+  https://lore.kernel.org/all/20230321130908.6972-1-frank.li@vivo.com
+* The "ARRAY_SIZE" approach was mentioned (proposed?) in this thread
+  https://lore.kernel.org/all/20220220060626.15885-1-tangmeng@uniontech.com
 
->=20
-> 73 de Chris KQ6UP
->=20
-> On Mon, Aug 7, 2023 at 4:43=E2=80=AFPM Luis Chamberlain <mcgrof@kernel.or=
-g> wrote:
-> >
-> > On Mon, Aug 07, 2023 at 04:00:49PM -0700, Chris Maness wrote:
-> > > When are these likely to hit the mainline release code?
-> >
-> > linux-next tomorrow. The first 7 patches are scheduled for mainline
-> > as they were merged + tested without any hiccups. These last few patches
-> > I'll wait and see. If nothing blows up on linux-next perhaps I'll
-> > include them to Linux for mainline during the next merge window.
-> >
-> >   Luis
->=20
->=20
->=20
-> --=20
-> Thanks,
-> Chris Maness
+Commits in this chunk:
+* Preparation commits:
+    start : sysctl: Prefer ctl_table_header in proc_sysct
+    end   : sysctl: Add size argument to init_header
+  These are preparation commits that make sure that we have the
+  ctl_table_header where we need the array size.
 
---=20
+* Add size to __register_sysctl_table, __register_sysctl_init and register_sysctl
+    start : sysctl: Add a size arg to __register_sysctl_table
+    end   : sysctl: Add size arg to __register_sysctl_init
+  Here we replace the existing register functions with macros that add the
+  ARRAY_SIZE automatically. Unfortunately these macros cannot be used for the
+  register calls that pass a pointer; in this situation we add register
+  functions with an table_size argument (thx to greg@kroah.com for bringing
+  this to my attention)
 
-Joel Granados
+* Add size to register_net_sysctl
+    start : sysctl: Add size to register_net_sysctl function
+    end   : sysctl: SIZE_MAX->ARRAY_SIZE in register_net_sysctl
+  register_net_sysctl is an indirection function to the sysctl registrations
+  and needed a several commits to add table_size to all its callers. We
+  temporarily use SIZE_MAX to avoid compiler warnings while we change to
+  register_net_sysctl to register_net_sysctl_sz; we remove it with the
+  penultimate patch of this set. Finally, we make sure to adjust the calculated
+  size every time there is a check for unprivileged users.
 
---x4zdqo2w6ogqmllb
-Content-Type: application/pgp-signature; name="signature.asc"
+* Add size as additional stopping criteria
+    commit : sysctl: Use ctl_table_size as stopping criteria for list macro
+  We add table_size check in the main macro within proc_sysctl.c. This commit
+  allows the removal of the sentinel element by chunks.
 
------BEGIN PGP SIGNATURE-----
+Testing:
+* Ran sysctl selftests (./tools/testing/selftests/sysctl/sysctl.sh)
+* Successfully ran this through 0-day
 
-iQGzBAABCgAdFiEErkcJVyXmMSXOyyeQupfNUreWQU8FAmTSShUACgkQupfNUreW
-QU9V5Qv9EPEpi2TR8AnLqIPU7OhWjIi17BiRDGt3v4ld7gPtc9IDscWkSVOlkMHp
-CJsDbzP6uifAXxWYA/eqroOI7XNJn4YT96BVArmjzPBNAtMyqIyKQtqWvtlmLxnQ
-1XsF8kk8rkIguKbfvLeU26KBKXpy4ET8XODODPl1jVqo+/ztgRB85ZujCqeqwLah
-Qk249z8JImXEI4zYMoh7TPqKNSWFCkWoyRsVc+nlDPoPvl82b0pDATR5N5j4uU9+
-QB1sNVZkgWXqu7Z+Pfmy7UgtSd5AO9juaaCpVdROh6FXtrP1xxnIS4qdL71H4n57
-hpLxWSjLlm4S24sfl46pbCAfGU5iWM1QSe0nMquMfG+SR0uLyuDs3FvHsEeXzATE
-KzjhrFGiEXkBUtJW4L/rKGMa2vJBs6TWEuA9tlWvJF7U6E6WapKJNI8TrZjt1DlX
-TeV+PipASlYIhVb2o+ZRbbSJIVkr88vGBEBlsn8LOODSL/BACgWfhvrwmVDFqf8m
-LXyRMUq6
-=mpca
------END PGP SIGNATURE-----
+Size saving estimates:
+A consequence of eventually removing all the sentinels (64 bytes per sentinel)
+is the bytes we save. These are *not* numbers that we will get after this patch
+set; these are the numbers that we will get after removing all the sentinels. I
+included them here because they are relevant and to get an idea of just how
+much memory we are talking about.
+  * bloat-o-meter:
+    The "yesall" configuration results save 9158 bytes (you can see the output here
+    https://lore.kernel.org/all/20230621091000.424843-1-j.granados@samsung.com/.
+    The "tiny" configuration + CONFIG_SYSCTL save 1215 bytes (you can see the
+    output here [2])
+  * memory usage:
+    As we no longer need the sentinel element within proc_sysctl.c, we save some
+    bytes in main memory as well. In my testing kernel I measured a difference of
+    6720 bytes. I include the way to measure this in [1]
 
---x4zdqo2w6ogqmllb--
+Comments/feedback greatly appreciated
+
+V3:
+* Updated tags from mailing list
+* Corrected an off-by-one error in
+  https://lore.kernel.org/all/22e0e672-f9f6-6afe-6ce6-63de264e7b6d@intel.com
+* Fixed a bug where we would have erroneously registered ctl_table to
+  unprivileged ipv6 users
+* Rebased on v6.5-rc5
+* Rebase the bigger patchset located at
+  https://github.com/Joelgranados/linux/tree/tag/sysctl_remove_empty_elem_V3 on
+  top of this version
+
+V2:
+* Dropped moving mpls_table up the af_mpls.c file. We don't need it any longer
+  as it is not really used before its current location.
+* Added/Clarified the why in several commit messages that were missing it.
+* Clarified the why in the cover letter to be "to make it easier to apply
+  subsequent patches that will remove the sentinels"
+* Added documentation for table_size
+* Added suggested by tags (Greg and Jani) to relevant commits
+
+Best
+Joel
+
+[1]
+To measure the in memory savings apply this patch on top of
+https://github.com/Joelgranados/linux/tree/tag/sysctl_remove_empty_elem_V1
+"
+diff --git a/fs/proc/proc_sysctl.c b/fs/proc/proc_sysctl.c
+index 5f413bfd6271..9aa8374c0ef1 100644
+--- a/fs/proc/proc_sysctl.c
++++ b/fs/proc/proc_sysctl.c
+@@ -975,6 +975,7 @@ static struct ctl_dir *new_dir(struct ctl_table_set *set,
+        table[0].procname = new_name;
+        table[0].mode = S_IFDIR|S_IRUGO|S_IXUGO;
+        init_header(&new->header, set->dir.header.root, set, node, table, 1);
++       printk("%ld sysctl saved mem kzalloc \n", sizeof(struct ctl_table));
+
+        return new;
+ }
+@@ -1202,6 +1203,7 @@ static struct ctl_table_header *new_links(struct ctl_dir *dir, struct ctl_table_
+                    head->ctl_table_size);
+        links->nreg = head->ctl_table_size;
+
++       printk("%ld sysctl saved mem kzalloc \n", sizeof(struct ctl_table));
+        return links;
+ }
+
+"
+and then run the following bash script in the kernel:
+
+accum=0
+for n in $(dmesg | grep kzalloc | awk '{print $3}') ; do
+    echo $n
+    accum=$(calc "$accum + $n")
+done
+echo $accum
+
+[2]
+bloat-o-meter with "tiny" config:
+add/remove: 0/2 grow/shrink: 33/24 up/down: 470/-1685 (-1215)
+Function                                     old     new   delta
+insert_header                                831     966    +135
+__register_sysctl_table                      971    1092    +121
+get_links                                    177     226     +49
+put_links                                    167     186     +19
+erase_header                                  55      66     +11
+sysctl_init_bases                             59      69     +10
+setup_sysctl_set                              65      73      +8
+utsname_sysctl_init                           26      31      +5
+sld_mitigate_sysctl_init                      33      38      +5
+setup_userns_sysctls                         158     163      +5
+sched_rt_sysctl_init                          33      38      +5
+sched_fair_sysctl_init                        33      38      +5
+sched_dl_sysctl_init                          33      38      +5
+random_sysctls_init                           33      38      +5
+page_writeback_init                          122     127      +5
+oom_init                                      73      78      +5
+kernel_panic_sysctls_init                     33      38      +5
+kernel_exit_sysctls_init                      33      38      +5
+init_umh_sysctls                              33      38      +5
+init_signal_sysctls                           33      38      +5
+init_pipe_fs                                  94      99      +5
+init_fs_sysctls                               33      38      +5
+init_fs_stat_sysctls                          33      38      +5
+init_fs_namespace_sysctls                     33      38      +5
+init_fs_namei_sysctls                         33      38      +5
+init_fs_inode_sysctls                         33      38      +5
+init_fs_exec_sysctls                          33      38      +5
+init_fs_dcache_sysctls                        33      38      +5
+register_sysctl                               22      25      +3
+__register_sysctl_init                         9      12      +3
+user_namespace_sysctl_init                   149     151      +2
+sched_core_sysctl_init                        38      40      +2
+register_sysctl_mount_point                   13      15      +2
+vm_table                                    1344    1280     -64
+vm_page_writeback_sysctls                    512     448     -64
+vm_oom_kill_table                            256     192     -64
+uts_kern_table                               448     384     -64
+usermodehelper_table                         192     128     -64
+user_table                                   576     512     -64
+sld_sysctls                                  128      64     -64
+signal_debug_table                           128      64     -64
+sched_rt_sysctls                             256     192     -64
+sched_fair_sysctls                           128      64     -64
+sched_dl_sysctls                             192     128     -64
+sched_core_sysctls                            64       -     -64
+root_table                                   128      64     -64
+random_table                                 448     384     -64
+namei_sysctls                                320     256     -64
+kern_table                                  1792    1728     -64
+kern_panic_table                             128      64     -64
+kern_exit_table                              128      64     -64
+inodes_sysctls                               192     128     -64
+fs_stat_sysctls                              256     192     -64
+fs_shared_sysctls                            192     128     -64
+fs_pipe_sysctls                              256     192     -64
+fs_namespace_sysctls                         128      64     -64
+fs_exec_sysctls                              128      64     -64
+fs_dcache_sysctls                            128      64     -64
+init_header                                   85       -     -85
+Total: Before=1877669, After=1876454, chg -0.06%
+
+base:  fdf0eaf11452
+
+Joel Granados (14):
+  sysctl: Prefer ctl_table_header in proc_sysctl
+  sysctl: Use ctl_table_header in list_for_each_table_entry
+  sysctl: Add ctl_table_size to ctl_table_header
+  sysctl: Add size argument to init_header
+  sysctl: Add a size arg to __register_sysctl_table
+  sysctl: Add size to register_sysctl
+  sysctl: Add size arg to __register_sysctl_init
+  sysctl: Add size to register_net_sysctl function
+  ax.25: Update to register_net_sysctl_sz
+  netfilter: Update to register_net_sysctl_sz
+  networking: Update to register_net_sysctl_sz
+  vrf: Update to register_net_sysctl_sz
+  sysctl: SIZE_MAX->ARRAY_SIZE in register_net_sysctl
+  sysctl: Use ctl_table_size as stopping criteria for list macro
+
+ arch/arm64/kernel/armv8_deprecated.c    |  2 +-
+ arch/s390/appldata/appldata_base.c      |  2 +-
+ drivers/net/vrf.c                       |  3 +-
+ fs/proc/proc_sysctl.c                   | 90 +++++++++++++------------
+ include/linux/sysctl.h                  | 31 +++++++--
+ include/net/ipv6.h                      |  2 +
+ include/net/net_namespace.h             | 10 +--
+ ipc/ipc_sysctl.c                        |  4 +-
+ ipc/mq_sysctl.c                         |  4 +-
+ kernel/ucount.c                         |  5 +-
+ net/ax25/sysctl_net_ax25.c              |  3 +-
+ net/bridge/br_netfilter_hooks.c         |  3 +-
+ net/core/neighbour.c                    |  8 ++-
+ net/core/sysctl_net_core.c              |  3 +-
+ net/ieee802154/6lowpan/reassembly.c     |  8 ++-
+ net/ipv4/devinet.c                      |  3 +-
+ net/ipv4/ip_fragment.c                  |  3 +-
+ net/ipv4/route.c                        |  8 ++-
+ net/ipv4/sysctl_net_ipv4.c              |  3 +-
+ net/ipv4/xfrm4_policy.c                 |  3 +-
+ net/ipv6/addrconf.c                     |  3 +-
+ net/ipv6/icmp.c                         |  5 ++
+ net/ipv6/netfilter/nf_conntrack_reasm.c |  3 +-
+ net/ipv6/reassembly.c                   |  3 +-
+ net/ipv6/route.c                        |  9 +++
+ net/ipv6/sysctl_net_ipv6.c              | 16 +++--
+ net/ipv6/xfrm6_policy.c                 |  3 +-
+ net/mpls/af_mpls.c                      |  6 +-
+ net/mptcp/ctrl.c                        |  3 +-
+ net/netfilter/ipvs/ip_vs_ctl.c          |  8 ++-
+ net/netfilter/ipvs/ip_vs_lblc.c         | 10 ++-
+ net/netfilter/ipvs/ip_vs_lblcr.c        | 10 ++-
+ net/netfilter/nf_conntrack_standalone.c |  4 +-
+ net/netfilter/nf_log.c                  |  7 +-
+ net/rds/tcp.c                           |  3 +-
+ net/sctp/sysctl.c                       |  4 +-
+ net/smc/smc_sysctl.c                    |  3 +-
+ net/sysctl_net.c                        | 26 ++++---
+ net/unix/sysctl_net_unix.c              |  3 +-
+ net/xfrm/xfrm_sysctl.c                  |  8 ++-
+ 40 files changed, 222 insertions(+), 113 deletions(-)
+
+-- 
+2.30.2
+
