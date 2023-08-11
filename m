@@ -2,108 +2,60 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65BDBC001B0
-	for <linux-wpan@archiver.kernel.org>; Tue, 15 Aug 2023 22:28:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C28EC001DE
+	for <linux-wpan@archiver.kernel.org>; Wed, 16 Aug 2023 02:17:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239982AbjHOW1j (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 15 Aug 2023 18:27:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52274 "EHLO
+        id S241216AbjHPCRT (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 15 Aug 2023 22:17:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59782 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240396AbjHOW1e (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 15 Aug 2023 18:27:34 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3D881BFF;
-        Tue, 15 Aug 2023 15:27:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=aFm90R+tDTFvDBLdwRCYQE4Y41kg8AEvvcWG6AcDlHc=; b=m+Hvj3w2nGUh/z5FvuS2WaFvCP
-        E9VTMTriBBsaYE1DW7gg45cfxPOHyZo+qnJy5YDlRNwx/8IEd6QSy1kFsWmCaI6Ayn2U1e18uzlwr
-        1+Iy9qd60pMllaFg/MtWE7G1QlLCx82ZCCAIzB8O5VbfxRwp9DMOrRwt9Ca10lMltY10Km8PtNXu/
-        L6WobTanJRf/8tEi6GPMdzrRmGdH4Dw9KByfrbTqLo06X3hWeNkANUIM+i1BPRo1BIMLMC8dpsrXD
-        Hz59LovBcm5X+3VH7+EtsxrFP7ARkSjVCRHEyC2IZkI52jv17UdFdX7UcYwBUjCHLaKBVrUaPumbs
-        W9PGgB4A==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1qW2VM-002iR6-1x;
-        Tue, 15 Aug 2023 22:27:12 +0000
-Date:   Tue, 15 Aug 2023 15:27:12 -0700
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Joel Granados <joel.granados@gmail.com>
-Cc:     rds-devel@oss.oracle.com, "David S. Miller" <davem@davemloft.net>,
-        Florian Westphal <fw@strlen.de>, willy@infradead.org,
-        Jan Karcher <jaka@linux.ibm.com>,
-        Wen Gu <guwen@linux.alibaba.com>,
-        Simon Horman <horms@verge.net.au>,
-        Tony Lu <tonylu@linux.alibaba.com>, linux-wpan@vger.kernel.org,
-        Matthieu Baerts <matthieu.baerts@tessares.net>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        mptcp@lists.linux.dev, Heiko Carstens <hca@linux.ibm.com>,
-        Stefan Schmidt <stefan@datenfreihafen.org>,
-        Will Deacon <will@kernel.org>, Julian Anastasov <ja@ssi.bg>,
-        netfilter-devel@vger.kernel.org, Joerg Reuter <jreuter@yaina.de>,
-        linux-kernel@vger.kernel.org,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        linux-sctp@vger.kernel.org, Xin Long <lucien.xin@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-hams@vger.kernel.org, Vasily Gorbik <gor@linux.ibm.com>,
-        coreteam@netfilter.org, Ralf Baechle <ralf@linux-mips.org>,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        Pablo Neira Ayuso <pablo@netfilter.org>,
-        keescook@chromium.org, Roopa Prabhu <roopa@nvidia.com>,
-        David Ahern <dsahern@kernel.org>,
-        linux-arm-kernel@lists.infradead.org,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Jozsef Kadlecsik <kadlec@netfilter.org>,
-        Wenjia Zhang <wenjia@linux.ibm.com>, josh@joshtriplett.org,
-        linux-fsdevel@vger.kernel.org,
-        Alexander Aring <alex.aring@gmail.com>,
-        Nikolay Aleksandrov <razor@blackwall.org>,
-        netdev@vger.kernel.org,
-        Santosh Shilimkar <santosh.shilimkar@oracle.com>,
-        linux-s390@vger.kernel.org, Sven Schnelle <svens@linux.ibm.com>,
-        "D. Wythe" <alibuda@linux.alibaba.com>,
-        Eric Dumazet <edumazet@google.com>, lvs-devel@vger.kernel.org,
-        linux-rdma@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
-        Iurii Zaikin <yzaikin@google.com>,
-        Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
-        bridge@lists.linux-foundation.org,
-        Karsten Graul <kgraul@linux.ibm.com>,
-        Mat Martineau <martineau@kernel.org>,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Joel Granados <j.granados@samsung.com>
-Subject: Re: [PATCH v3 00/14] sysctl: Add a size argument to register
- functions in sysctl
-Message-ID: <ZNv7wOmUPpCUFnHA@bombadil.infradead.org>
-References: <20230809105006.1198165-1-j.granados@samsung.com>
+        with ESMTP id S241252AbjHPCRQ (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 15 Aug 2023 22:17:16 -0400
+Received: from mail.durme.pl (mail.durme.pl [217.182.69.186])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DAAFE5
+        for <linux-wpan@vger.kernel.org>; Tue, 15 Aug 2023 19:17:14 -0700 (PDT)
+Received: by mail.durme.pl (Postfix, from userid 1002)
+        id 7A229628D6; Fri, 11 Aug 2023 07:36:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=durme.pl; s=mail;
+        t=1691739768; bh=hFxZwVw4rIL+JwfEOGI47p+fdoVOAeqVswP6NWoHSHQ=;
+        h=Date:From:To:Subject:From;
+        b=bNfusEdVJxMVj1ZpuKwSH94tXkbdbTJhqRRpW75fl4bczL7X3sv33xoM6mOuD8K+8
+         ztdv6Y1urZXCxtyudljtuGMH58IPgV0dY9bQ1CaeA8AdeHvGDPC1RZoUraHSrged/u
+         gXL4RQAUqwu0i3m+va8PERBpGhNP5uXEzNsCSgSrd+pdixgCso8EYvEyJ2q1H6EEHe
+         v9OMwA1A6p7nUM3KBO/RVWwUXK296vs2lxNT9M3UcQobqsixxr2j/e6BKAEUSEjVkK
+         ixYqc5y2x7ySTmzb1LdTW+JhGxdnoDi05LV6BBpnZ0nMpnRAwTv77YUMHYYVd/BsnF
+         lXgt5f39E8DMw==
+Received: by mail.durme.pl for <linux-wpan@vger.kernel.org>; Fri, 11 Aug 2023 07:36:00 GMT
+Message-ID: <20230811064501-0.1.3n.cm57.0.rehv1jr01s@durme.pl>
+Date:   Fri, 11 Aug 2023 07:36:00 GMT
+From:   "Krystian Wieczorek" <krystian.wieczorek@durme.pl>
+To:     <linux-wpan@vger.kernel.org>
+Subject: W sprawie samochodu
+X-Mailer: mail.durme.pl
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230809105006.1198165-1-j.granados@samsung.com>
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-On Wed, Aug 09, 2023 at 12:49:52PM +0200, Joel Granados wrote:
-> What?
-> These commits set things up so we can start removing the sentinel elements.
-> They modify sysctl and net_sysctl internals so that registering a ctl_table
-> that contains a sentinel gives the same result as passing a table_size
-> calculated from the ctl_table array without a sentinel. We accomplish this by
-> introducing a table_size argument in the same place where procname is checked
-> for NULL. The idea is for it to keep stopping when it hits ->procname == NULL,
-> while the sentinel is still present. And when the sentinel is removed, it will
-> stop on the table_size (thx to jani.nikula@linux.intel.com for the discussion
-> that led to this). This allows us to remove sentinels from one (or several)
-> files at a time.
-> 
-> These commits are part of a bigger set containing the removal of ctl_table sentinel
-> (https://github.com/Joelgranados/linux/tree/tag/sysctl_remove_empty_elem_V3).
-> The idea is to make the review process easier by chunking the 65+ commits into
-> manageable pieces.
+Dzie=C5=84 dobry,
 
-Thanks, I've dropped the old set and merged this updated one onto sysctl-next.
+chcieliby=C5=9Bmy zapewni=C4=87 Pa=C5=84stwu kompleksowe rozwi=C4=85zania=
+, je=C5=9Bli chodzi o system monitoringu GPS.
 
-  Luis
+Precyzyjne monitorowanie pojazd=C3=B3w na mapach cyfrowych, =C5=9Bledzeni=
+e ich parametr=C3=B3w eksploatacyjnych w czasie rzeczywistym oraz kontrol=
+a paliwa to kluczowe funkcjonalno=C5=9Bci naszego systemu.=20
+
+Organizowanie pracy pracownik=C3=B3w jest dzi=C4=99ki temu prostsze i bar=
+dziej efektywne, a oszcz=C4=99dno=C5=9Bci i optymalizacja w zakresie pono=
+szonych koszt=C3=B3w, maj=C4=85 dla ka=C5=BCdego przedsi=C4=99biorcy ogro=
+mne znaczenie.
+
+Dopasujemy nasz=C4=85 ofert=C4=99 do Pa=C5=84stwa oczekiwa=C5=84 i potrze=
+b organizacji. Czy mogliby=C5=9Bmy porozmawia=C4=87 o naszej propozycji?
+
+
+Pozdrawiam
+Krystian Wieczorek
