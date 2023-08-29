@@ -2,61 +2,197 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1E30C6FA8F
-	for <linux-wpan@archiver.kernel.org>; Tue, 29 Aug 2023 08:16:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E3ACC83F1A
+	for <linux-wpan@archiver.kernel.org>; Tue, 29 Aug 2023 20:46:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230161AbjH2IQY (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 29 Aug 2023 04:16:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56374 "EHLO
+        id S240542AbjH2Up3 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 29 Aug 2023 16:45:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33098 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234175AbjH2IQB (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 29 Aug 2023 04:16:01 -0400
-Received: from mail.bizcodes.pl (mail.bizcodes.pl [151.80.57.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A6B4E4C
-        for <linux-wpan@vger.kernel.org>; Tue, 29 Aug 2023 01:15:39 -0700 (PDT)
-Received: by mail.bizcodes.pl (Postfix, from userid 1002)
-        id 0DE4EA40B2; Tue, 29 Aug 2023 08:15:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=bizcodes.pl; s=mail;
-        t=1693296921; bh=5QPMt7jNntM5ZbstM20BWsHIeLbmRE8lVU4Iu89IleQ=;
-        h=Date:From:To:Subject:From;
-        b=MhiViOXDtThmttoiDtrDM5+632tvG93S7zOewGc5tngVM0VBGI+SFpA0Nnuf0pLTe
-         1cscv7oDIt17nnwV4pAmyl0ZowgUcT83y6gXpimMVJ4Vusd5iWwzby6dQNVu8gVqhZ
-         kUUPoF77lv9FDA0zaMKUv9p02yqOJtW7HXdgKdB7VBGkVaP+3ZV1Aw11SaUf8S31ii
-         T6eOoqWe4T3EYGYif5H+y/EZL6sV79/PovW8EPIxCyvKm7xuFcIs9BDI20ouB4Iwc3
-         YFUuvc7+iGffUu023EgXFUyYqGry9GCUDVKBVzvjQHJ305M27T6Pa7Q6ItJ2/AW0IR
-         rPkPvd2byve2Q==
-Received: by mail.bizcodes.pl for <linux-wpan@vger.kernel.org>; Tue, 29 Aug 2023 08:15:14 GMT
-Message-ID: <20230829064500-0.1.bc.1dv8j.0.l6fcerjqif@bizcodes.pl>
-Date:   Tue, 29 Aug 2023 08:15:14 GMT
-From:   "Marcin Chruszcz" <marcin.chruszcz@bizcodes.pl>
-To:     <linux-wpan@vger.kernel.org>
-Subject: Prezentacja
-X-Mailer: mail.bizcodes.pl
+        with ESMTP id S240188AbjH2UpM (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 29 Aug 2023 16:45:12 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5FD21BB;
+        Tue, 29 Aug 2023 13:45:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Sender:Content-Transfer-Encoding:
+        Content-Type:MIME-Version:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=qqpCUFR3P/c8X+gNxuXmGaV/FqFgRToVQytMVMpzzZU=; b=Dve5+6o8hMnkJ5nWqXTD/1k5Ig
+        c+eL+0Tiv6N9rCEFJgeCjKJ4omPyPHn9fnqB3Jf8MqMaOyZqL+1UBHqlsS5YXH7+VQoXGOrthij6U
+        wXE8kb0bhwdeKsa8zyMuKPbVXAZmTXwfMMt3f1XiBd7bIzJsMtP+il1X36DMva9FrwpSsxX2Bbm+7
+        EuvcibeFMzWbVd3TNrqT4ZRzkQJ0Q9NQiatktpBmVWsXjDxGZFkVQEKbevr1IsN647m6SvvMo+viz
+        Yvy04a63uv+YPdHNtPwsUdAKlVbW2MWxd4cief6pa6kf+sxylyo5091Al/BfKdZkegt5uFBdYqewR
+        nJDOB6Og==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
+        id 1qb5a3-00CF5F-1u;
+        Tue, 29 Aug 2023 20:44:55 +0000
+Date:   Tue, 29 Aug 2023 13:44:55 -0700
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     Joel Granados <joel.granados@gmail.com>,
+        linux-fsdevel@vger.kernel.org, rds-devel@oss.oracle.com,
+        "David S. Miller" <davem@davemloft.net>,
+        Florian Westphal <fw@strlen.de>, willy@infradead.org,
+        Jan Karcher <jaka@linux.ibm.com>,
+        Wen Gu <guwen@linux.alibaba.com>,
+        Simon Horman <horms@verge.net.au>,
+        Tony Lu <tonylu@linux.alibaba.com>, linux-wpan@vger.kernel.org,
+        Matthieu Baerts <matthieu.baerts@tessares.net>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        mptcp@lists.linux.dev, Heiko Carstens <hca@linux.ibm.com>,
+        Stefan Schmidt <stefan@datenfreihafen.org>,
+        Will Deacon <will@kernel.org>, Julian Anastasov <ja@ssi.bg>,
+        netfilter-devel@vger.kernel.org, Joerg Reuter <jreuter@yaina.de>,
+        linux-kernel@vger.kernel.org,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        linux-sctp@vger.kernel.org, Xin Long <lucien.xin@gmail.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-hams@vger.kernel.org, Vasily Gorbik <gor@linux.ibm.com>,
+        coreteam@netfilter.org, Ralf Baechle <ralf@linux-mips.org>,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        Pablo Neira Ayuso <pablo@netfilter.org>,
+        keescook@chromium.org, Roopa Prabhu <roopa@nvidia.com>,
+        David Ahern <dsahern@kernel.org>,
+        linux-arm-kernel@lists.infradead.org,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Jozsef Kadlecsik <kadlec@netfilter.org>,
+        Wenjia Zhang <wenjia@linux.ibm.com>, josh@joshtriplett.org,
+        Alexander Aring <alex.aring@gmail.com>,
+        Nikolay Aleksandrov <razor@blackwall.org>,
+        netdev@vger.kernel.org,
+        Santosh Shilimkar <santosh.shilimkar@oracle.com>,
+        linux-s390@vger.kernel.org, Sven Schnelle <svens@linux.ibm.com>,
+        "D. Wythe" <alibuda@linux.alibaba.com>,
+        Eric Dumazet <edumazet@google.com>, lvs-devel@vger.kernel.org,
+        linux-rdma@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+        Iurii Zaikin <yzaikin@google.com>,
+        Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+        bridge@lists.linux-foundation.org,
+        Karsten Graul <kgraul@linux.ibm.com>,
+        Mat Martineau <martineau@kernel.org>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Joel Granados <j.granados@samsung.com>, mcgrof@kernel.org
+Subject: [GIT PULL] sysctl changes for v6.6-rc1
+Message-ID: <ZO5Yx5JFogGi/cBo@bombadil.infradead.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Dzie=C5=84 dobry!
+The following changes since commit 06c2afb862f9da8dc5efa4b6076a0e48c3fbaaa5:
 
-Czy m=C3=B3g=C5=82bym przedstawi=C4=87 rozwi=C4=85zanie, kt=C3=B3re umo=C5=
-=BCliwia monitoring ka=C5=BCdego auta w czasie rzeczywistym w tym jego po=
-zycj=C4=99, zu=C5=BCycie paliwa i przebieg?
+  Linux 6.5-rc1 (2023-07-09 13:53:13 -0700)
 
-Dodatkowo nasze narz=C4=99dzie minimalizuje koszty utrzymania samochod=C3=
-=B3w, skraca czas przejazd=C3=B3w, a tak=C5=BCe tworzenie planu tras czy =
-dostaw.
+are available in the Git repository at:
 
-Z naszej wiedzy i do=C5=9Bwiadczenia korzysta ju=C5=BC ponad 49 tys. Klie=
-nt=C3=B3w. Monitorujemy 809 000 pojazd=C3=B3w na ca=C5=82ym =C5=9Bwiecie,=
- co jest nasz=C4=85 najlepsz=C4=85 wizyt=C3=B3wk=C4=85.
+  git://git.kernel.org/pub/scm/linux/kernel/git/mcgrof/linux.git/ tags/sysctl-6.6-rc1
 
-Bardzo prosz=C4=99 o e-maila zwrotnego, je=C5=9Bli mogliby=C5=9Bmy wsp=C3=
-=B3lnie om=C3=B3wi=C4=87 potencja=C5=82 wykorzystania takiego rozwi=C4=85=
-zania w Pa=C5=84stwa firmie.
+for you to fetch changes up to 53f3811dfd5e39507ee3aaea1be09aabce8f9c98:
 
+  sysctl: Use ctl_table_size as stopping criteria for list macro (2023-08-15 15:26:18 -0700)
 
-Pozdrawiam
-Marcin Chruszcz
+----------------------------------------------------------------
+sysctl-6.6-rc1
+
+Long ago we set out to remove the kitchen sink on kernel/sysctl.c arrays and
+placings sysctls to their own sybsystem or file to help avoid merge conflicts.
+Matthew Wilcox pointed out though that if we're going to do that we might as
+well also *save* space while at it and try to remove the extra last sysctl
+entry added at the end of each array, a sentintel, instead of bloating the
+kernel by adding a new sentinel with each array moved.
+
+Doing that was not so trivial, and has required slowing down the moves of
+kernel/sysctl.c arrays and measuring the impact on size by each new move.
+
+The complex part of the effort to help reduce the size of each sysctl is being
+done by the patient work of el señor Don Joel Granados. A lot of this is truly
+painful code refactoring and testing and then trying to measure the savings of
+each move and removing the sentinels. Although Joel already has code which does
+most of this work, experience with sysctl moves in the past shows is we need to
+be careful due to the slew of odd build failures that are possible due to the
+amount of random Kconfig options sysctls use.
+
+To that end Joel's work is split by first addressing the major housekeeping
+needed to remove the sentinels, which is part of this merge request. The rest
+of the work to actually remove the sentinels will be done later in future
+kernel releases.
+
+At first I was only going to send his first 7 patches of his patch series,
+posted 1 month ago, but in retrospect due to the testing the changes have
+received in linux-next and the minor changes they make this goes with the
+entire set of patches Joel had planned: just sysctl house keeping. There are
+networking changes but these are part of the house keeping too.
+
+The preliminary math is showing this will all help reduce the overall build
+time size of the kernel and run time memory consumed by the kernel by about
+~64 bytes per array where we are able to remove each sentinel in the future.
+That also means there is no more bloating the kernel with the extra ~64 bytes
+per array moved as no new sentinels are created.
+
+Most of this has been in linux-next for about a month, the last 7 patches took
+a minor refresh 2 week ago based on feedback.
+
+----------------------------------------------------------------
+Joel Granados (14):
+      sysctl: Prefer ctl_table_header in proc_sysctl
+      sysctl: Use ctl_table_header in list_for_each_table_entry
+      sysctl: Add ctl_table_size to ctl_table_header
+      sysctl: Add size argument to init_header
+      sysctl: Add a size arg to __register_sysctl_table
+      sysctl: Add size to register_sysctl
+      sysctl: Add size arg to __register_sysctl_init
+      sysctl: Add size to register_net_sysctl function
+      ax.25: Update to register_net_sysctl_sz
+      netfilter: Update to register_net_sysctl_sz
+      networking: Update to register_net_sysctl_sz
+      vrf: Update to register_net_sysctl_sz
+      sysctl: SIZE_MAX->ARRAY_SIZE in register_net_sysctl
+      sysctl: Use ctl_table_size as stopping criteria for list macro
+
+ arch/arm64/kernel/armv8_deprecated.c    |  2 +-
+ arch/s390/appldata/appldata_base.c      |  2 +-
+ drivers/net/vrf.c                       |  3 +-
+ fs/proc/proc_sysctl.c                   | 90 +++++++++++++++++----------------
+ include/linux/sysctl.h                  | 31 +++++++++---
+ include/net/ipv6.h                      |  2 +
+ include/net/net_namespace.h             | 10 ++--
+ ipc/ipc_sysctl.c                        |  4 +-
+ ipc/mq_sysctl.c                         |  4 +-
+ kernel/ucount.c                         |  5 +-
+ net/ax25/sysctl_net_ax25.c              |  3 +-
+ net/bridge/br_netfilter_hooks.c         |  3 +-
+ net/core/neighbour.c                    |  8 ++-
+ net/core/sysctl_net_core.c              |  3 +-
+ net/ieee802154/6lowpan/reassembly.c     |  8 ++-
+ net/ipv4/devinet.c                      |  3 +-
+ net/ipv4/ip_fragment.c                  |  3 +-
+ net/ipv4/route.c                        |  8 ++-
+ net/ipv4/sysctl_net_ipv4.c              |  3 +-
+ net/ipv4/xfrm4_policy.c                 |  3 +-
+ net/ipv6/addrconf.c                     |  3 +-
+ net/ipv6/icmp.c                         |  5 ++
+ net/ipv6/netfilter/nf_conntrack_reasm.c |  3 +-
+ net/ipv6/reassembly.c                   |  3 +-
+ net/ipv6/route.c                        |  9 ++++
+ net/ipv6/sysctl_net_ipv6.c              | 16 ++++--
+ net/ipv6/xfrm6_policy.c                 |  3 +-
+ net/mpls/af_mpls.c                      |  6 ++-
+ net/mptcp/ctrl.c                        |  3 +-
+ net/netfilter/ipvs/ip_vs_ctl.c          |  8 ++-
+ net/netfilter/ipvs/ip_vs_lblc.c         | 10 ++--
+ net/netfilter/ipvs/ip_vs_lblcr.c        | 10 ++--
+ net/netfilter/nf_conntrack_standalone.c |  4 +-
+ net/netfilter/nf_log.c                  |  7 +--
+ net/rds/tcp.c                           |  3 +-
+ net/sctp/sysctl.c                       |  4 +-
+ net/smc/smc_sysctl.c                    |  3 +-
+ net/sysctl_net.c                        | 26 +++++++---
+ net/unix/sysctl_net_unix.c              |  3 +-
+ net/xfrm/xfrm_sysctl.c                  |  8 ++-
+ 40 files changed, 222 insertions(+), 113 deletions(-)
