@@ -2,66 +2,61 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC647C6FA8F
-	for <linux-wpan@archiver.kernel.org>; Thu, 24 Aug 2023 15:19:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1E30C6FA8F
+	for <linux-wpan@archiver.kernel.org>; Tue, 29 Aug 2023 08:16:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231547AbjHXPTL (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Thu, 24 Aug 2023 11:19:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37528 "EHLO
+        id S230161AbjH2IQY (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 29 Aug 2023 04:16:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56374 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231972AbjHXPSk (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 24 Aug 2023 11:18:40 -0400
-X-Greylist: delayed 598 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 24 Aug 2023 08:18:36 PDT
-Received: from proxima.lasnet.de (proxima.lasnet.de [78.47.171.185])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B22FE19B4;
-        Thu, 24 Aug 2023 08:18:36 -0700 (PDT)
-Received: from [192.168.2.51] (p5dd0dcba.dip0.t-ipconnect.de [93.208.220.186])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: stefan@datenfreihafen.org)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id 88B29C03A4;
-        Thu, 24 Aug 2023 17:03:13 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
-        s=2021; t=1692889393;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=RbA4Hzmbogps30G44qtaF2RIRLvuX4cRjMRVc/i1haA=;
-        b=J0StBk/P2UW+kFTK7AYQdExrb+owhDBMjl3aZrfx5MUJ/6nkWDYBJIxBXwpYjnCf3OKJd1
-        u5cDHfcOTyiI+682qC8e+dkYmezMaQUCEorSw+Af1dPdcqmJ6yCoZkwm2Kz1MOFbt51aBv
-        DDsIPr91K8RIWiqI3HGkEsdRQZYQ9PR3mA+iVMQs9AUHCozl2soV/+R/z5W9W40sAOsJgs
-        8E7Ost6qZ9WN67gRelct+gAMLgx0/dDDdF82yOC1sGSdFgS7bUFSaSZyHxqVYi38pRKVcj
-        EImx0if6RSfqqAGX1+tB1sAzb8h2Q4Ji3SC4TQtCP6IkDPzVDG9vhvtkiaQrmg==
-Message-ID: <40b9467b-a9e8-bff7-5291-6200fbe9dd34@datenfreihafen.org>
-Date:   Thu, 24 Aug 2023 17:03:13 +0200
+        with ESMTP id S234175AbjH2IQB (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 29 Aug 2023 04:16:01 -0400
+Received: from mail.bizcodes.pl (mail.bizcodes.pl [151.80.57.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A6B4E4C
+        for <linux-wpan@vger.kernel.org>; Tue, 29 Aug 2023 01:15:39 -0700 (PDT)
+Received: by mail.bizcodes.pl (Postfix, from userid 1002)
+        id 0DE4EA40B2; Tue, 29 Aug 2023 08:15:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=bizcodes.pl; s=mail;
+        t=1693296921; bh=5QPMt7jNntM5ZbstM20BWsHIeLbmRE8lVU4Iu89IleQ=;
+        h=Date:From:To:Subject:From;
+        b=MhiViOXDtThmttoiDtrDM5+632tvG93S7zOewGc5tngVM0VBGI+SFpA0Nnuf0pLTe
+         1cscv7oDIt17nnwV4pAmyl0ZowgUcT83y6gXpimMVJ4Vusd5iWwzby6dQNVu8gVqhZ
+         kUUPoF77lv9FDA0zaMKUv9p02yqOJtW7HXdgKdB7VBGkVaP+3ZV1Aw11SaUf8S31ii
+         T6eOoqWe4T3EYGYif5H+y/EZL6sV79/PovW8EPIxCyvKm7xuFcIs9BDI20ouB4Iwc3
+         YFUuvc7+iGffUu023EgXFUyYqGry9GCUDVKBVzvjQHJ305M27T6Pa7Q6ItJ2/AW0IR
+         rPkPvd2byve2Q==
+Received: by mail.bizcodes.pl for <linux-wpan@vger.kernel.org>; Tue, 29 Aug 2023 08:15:14 GMT
+Message-ID: <20230829064500-0.1.bc.1dv8j.0.l6fcerjqif@bizcodes.pl>
+Date:   Tue, 29 Aug 2023 08:15:14 GMT
+From:   "Marcin Chruszcz" <marcin.chruszcz@bizcodes.pl>
+To:     <linux-wpan@vger.kernel.org>
+Subject: Prezentacja
+X-Mailer: mail.bizcodes.pl
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.8.0
-Content-Language: en-US
-To:     "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>,
-        BlueZ development <linux-bluetooth@vger.kernel.org>
-Cc:     Christopher Friedt <chris@friedt.co>
-From:   Stefan Schmidt <stefan@datenfreihafen.org>
-Subject: Linux Plumber IoT micro conference call for submissions
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello,
+Dzie=C5=84 dobry!
 
-Chris Friedt and myself will host the fifth iteration of the IoT micro 
-conference at Linux Plumbers in November this year.
+Czy m=C3=B3g=C5=82bym przedstawi=C4=87 rozwi=C4=85zanie, kt=C3=B3re umo=C5=
+=BCliwia monitoring ka=C5=BCdego auta w czasie rzeczywistym w tym jego po=
+zycj=C4=99, zu=C5=BCycie paliwa i przebieg?
 
-We are still looking for speakers and discussion topics to round out the 
-MC. Bluetooth and 802.15.4 being two of the usual suspects, we wanted to 
-bring this to your attention. If you have an interesting topic you want 
-to raise and discuss feel free to submit to the submission system before 
-September 15th.
+Dodatkowo nasze narz=C4=99dzie minimalizuje koszty utrzymania samochod=C3=
+=B3w, skraca czas przejazd=C3=B3w, a tak=C5=BCe tworzenie planu tras czy =
+dostaw.
 
-https://lpc.events/blog/current/index.php/2023/08/23/iot-mc-cfp/
+Z naszej wiedzy i do=C5=9Bwiadczenia korzysta ju=C5=BC ponad 49 tys. Klie=
+nt=C3=B3w. Monitorujemy 809 000 pojazd=C3=B3w na ca=C5=82ym =C5=9Bwiecie,=
+ co jest nasz=C4=85 najlepsz=C4=85 wizyt=C3=B3wk=C4=85.
 
-regards
-Chris & Stefan
+Bardzo prosz=C4=99 o e-maila zwrotnego, je=C5=9Bli mogliby=C5=9Bmy wsp=C3=
+=B3lnie om=C3=B3wi=C4=87 potencja=C5=82 wykorzystania takiego rozwi=C4=85=
+zania w Pa=C5=84stwa firmie.
+
+
+Pozdrawiam
+Marcin Chruszcz
