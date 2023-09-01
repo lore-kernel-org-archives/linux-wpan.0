@@ -2,33 +2,33 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66956CA0FE4
-	for <linux-wpan@archiver.kernel.org>; Fri,  1 Sep 2023 15:01:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A8A5CA0FE4
+	for <linux-wpan@archiver.kernel.org>; Fri,  1 Sep 2023 15:31:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243392AbjIAPB0 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Fri, 1 Sep 2023 11:01:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37618 "EHLO
+        id S1350252AbjIAPbQ (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Fri, 1 Sep 2023 11:31:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43554 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232461AbjIAPBY (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Fri, 1 Sep 2023 11:01:24 -0400
-Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDE7910CF;
-        Fri,  1 Sep 2023 08:01:20 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 50F55E0005;
-        Fri,  1 Sep 2023 15:01:13 +0000 (UTC)
+        with ESMTP id S1350271AbjIAPbQ (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 1 Sep 2023 11:31:16 -0400
+Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E1BD10D2;
+        Fri,  1 Sep 2023 08:31:11 -0700 (PDT)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 277081C0002;
+        Fri,  1 Sep 2023 15:31:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1693580479;
+        t=1693582269;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
         bh=+w+byWYQqXZJ9Sez01ZbkF+4eCxNbTGizWdl7E0uv/Q=;
-        b=E3K365W/cPCnYwKttb3BVoUFamUNiP8W33czaFg5OkSlpsz9V9uh2LpqkKtkUH7HjVD6ps
-        IcG1ctab1FvsSGKZEhbpZQh/GQzdw0uz+dicyg5n/wwpwW1H1q8PkdV/dpBZ/HHfmKbMXD
-        xaR63jhVyKLocGHGJyv1MZW3+gFqyka1uPMIbC+xyLr/aiEAiP++ytpx7X/IGLQej8W7E2
-        809kL3K148/mLmygpw0pyL7N+enWddY5CW9opfhQxmEeBUMSDgo8NzOlZcDpauylsSFNnL
-        iqcnh2U+yK/9nmRlYTj8gV+qgmK1OFlIptppue9KN+xOpD0hbsJK0I2uWqGF8g==
-Date:   Fri, 1 Sep 2023 17:01:11 +0200
+        b=cuPB34J8/xdRj/wbtIGQ3SJAy7sy6I6EoOnC6Wi3K0ua5PzdLa9Gm5rIlf4yHAFncdmmf5
+        UO1wTqLZadfhxYohwAOicB6VqZ7GSNV1Euf138s44HQGtPVdWVEZ6g5hcTuxkkyg05qHAe
+        FvjpKpayrw4eqfeiq+KbpTAhp4sjJejN9Ya6ugMYJzFIFOVXlFqwMVXsOcYKaX1HJdA3xp
+        Rzt526AobOLtcohIBAJj0G8pD3BPR/cZD/Bpd6cXtAIf8I5Y9aMn9NGP9WFq/QIf472vnh
+        WUqeQqAis3i1/OBtCvqTqR9Fux3iKV3FoTbgCGvVktcRTg98e5VqbEWbByuyAw==
+Date:   Fri, 1 Sep 2023 17:31:01 +0200
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
 To:     Alexander Aring <aahringo@redhat.com>
 Cc:     Alexander Aring <alex.aring@gmail.com>,
@@ -45,11 +45,11 @@ Cc:     Alexander Aring <alex.aring@gmail.com>,
         Guilhem Imberton <guilhem.imberton@qorvo.com>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>
 Subject: Re: [PATCH wpan-next 04/11] mac802154: Handle associating
-Message-ID: <20230901165113.7c434c8e@xps-13>
+Message-ID: <20230901173101.27312bec@xps-13>
 In-Reply-To: <CAK-6q+ibbYBbvbGK9ehJJoaJAw4hubh6Ff=q2P4mq+Z07ZgR0A@mail.gmail.com>
 References: <20230601154817.754519-1-miquel.raynal@bootlin.com>
-        <20230601154817.754519-5-miquel.raynal@bootlin.com>
-        <CAK-6q+ibbYBbvbGK9ehJJoaJAw4hubh6Ff=q2P4mq+Z07ZgR0A@mail.gmail.com>
+ <20230601154817.754519-5-miquel.raynal@bootlin.com>
+ <CAK-6q+ibbYBbvbGK9ehJJoaJAw4hubh6Ff=q2P4mq+Z07ZgR0A@mail.gmail.com>
 Organization: Bootlin
 X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
