@@ -2,197 +2,204 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E3ACC83F1A
-	for <linux-wpan@archiver.kernel.org>; Tue, 29 Aug 2023 20:46:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66956CA0FE4
+	for <linux-wpan@archiver.kernel.org>; Fri,  1 Sep 2023 15:01:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240542AbjH2Up3 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 29 Aug 2023 16:45:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33098 "EHLO
+        id S243392AbjIAPB0 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Fri, 1 Sep 2023 11:01:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37618 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240188AbjH2UpM (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 29 Aug 2023 16:45:12 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5FD21BB;
-        Tue, 29 Aug 2023 13:45:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Sender:Content-Transfer-Encoding:
-        Content-Type:MIME-Version:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-ID:Content-Description:In-Reply-To:References;
-        bh=qqpCUFR3P/c8X+gNxuXmGaV/FqFgRToVQytMVMpzzZU=; b=Dve5+6o8hMnkJ5nWqXTD/1k5Ig
-        c+eL+0Tiv6N9rCEFJgeCjKJ4omPyPHn9fnqB3Jf8MqMaOyZqL+1UBHqlsS5YXH7+VQoXGOrthij6U
-        wXE8kb0bhwdeKsa8zyMuKPbVXAZmTXwfMMt3f1XiBd7bIzJsMtP+il1X36DMva9FrwpSsxX2Bbm+7
-        EuvcibeFMzWbVd3TNrqT4ZRzkQJ0Q9NQiatktpBmVWsXjDxGZFkVQEKbevr1IsN647m6SvvMo+viz
-        Yvy04a63uv+YPdHNtPwsUdAKlVbW2MWxd4cief6pa6kf+sxylyo5091Al/BfKdZkegt5uFBdYqewR
-        nJDOB6Og==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1qb5a3-00CF5F-1u;
-        Tue, 29 Aug 2023 20:44:55 +0000
-Date:   Tue, 29 Aug 2023 13:44:55 -0700
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     Joel Granados <joel.granados@gmail.com>,
-        linux-fsdevel@vger.kernel.org, rds-devel@oss.oracle.com,
-        "David S. Miller" <davem@davemloft.net>,
-        Florian Westphal <fw@strlen.de>, willy@infradead.org,
-        Jan Karcher <jaka@linux.ibm.com>,
-        Wen Gu <guwen@linux.alibaba.com>,
-        Simon Horman <horms@verge.net.au>,
-        Tony Lu <tonylu@linux.alibaba.com>, linux-wpan@vger.kernel.org,
-        Matthieu Baerts <matthieu.baerts@tessares.net>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        mptcp@lists.linux.dev, Heiko Carstens <hca@linux.ibm.com>,
+        with ESMTP id S232461AbjIAPBY (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 1 Sep 2023 11:01:24 -0400
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDE7910CF;
+        Fri,  1 Sep 2023 08:01:20 -0700 (PDT)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 50F55E0005;
+        Fri,  1 Sep 2023 15:01:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+        t=1693580479;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=+w+byWYQqXZJ9Sez01ZbkF+4eCxNbTGizWdl7E0uv/Q=;
+        b=E3K365W/cPCnYwKttb3BVoUFamUNiP8W33czaFg5OkSlpsz9V9uh2LpqkKtkUH7HjVD6ps
+        IcG1ctab1FvsSGKZEhbpZQh/GQzdw0uz+dicyg5n/wwpwW1H1q8PkdV/dpBZ/HHfmKbMXD
+        xaR63jhVyKLocGHGJyv1MZW3+gFqyka1uPMIbC+xyLr/aiEAiP++ytpx7X/IGLQej8W7E2
+        809kL3K148/mLmygpw0pyL7N+enWddY5CW9opfhQxmEeBUMSDgo8NzOlZcDpauylsSFNnL
+        iqcnh2U+yK/9nmRlYTj8gV+qgmK1OFlIptppue9KN+xOpD0hbsJK0I2uWqGF8g==
+Date:   Fri, 1 Sep 2023 17:01:11 +0200
+From:   Miquel Raynal <miquel.raynal@bootlin.com>
+To:     Alexander Aring <aahringo@redhat.com>
+Cc:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
-        Will Deacon <will@kernel.org>, Julian Anastasov <ja@ssi.bg>,
-        netfilter-devel@vger.kernel.org, Joerg Reuter <jreuter@yaina.de>,
-        linux-kernel@vger.kernel.org,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        linux-sctp@vger.kernel.org, Xin Long <lucien.xin@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-hams@vger.kernel.org, Vasily Gorbik <gor@linux.ibm.com>,
-        coreteam@netfilter.org, Ralf Baechle <ralf@linux-mips.org>,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        Pablo Neira Ayuso <pablo@netfilter.org>,
-        keescook@chromium.org, Roopa Prabhu <roopa@nvidia.com>,
-        David Ahern <dsahern@kernel.org>,
-        linux-arm-kernel@lists.infradead.org,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Jozsef Kadlecsik <kadlec@netfilter.org>,
-        Wenjia Zhang <wenjia@linux.ibm.com>, josh@joshtriplett.org,
-        Alexander Aring <alex.aring@gmail.com>,
-        Nikolay Aleksandrov <razor@blackwall.org>,
-        netdev@vger.kernel.org,
-        Santosh Shilimkar <santosh.shilimkar@oracle.com>,
-        linux-s390@vger.kernel.org, Sven Schnelle <svens@linux.ibm.com>,
-        "D. Wythe" <alibuda@linux.alibaba.com>,
-        Eric Dumazet <edumazet@google.com>, lvs-devel@vger.kernel.org,
-        linux-rdma@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
-        Iurii Zaikin <yzaikin@google.com>,
-        Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
-        bridge@lists.linux-foundation.org,
-        Karsten Graul <kgraul@linux.ibm.com>,
-        Mat Martineau <martineau@kernel.org>,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
+        linux-wpan@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
-        Joel Granados <j.granados@samsung.com>, mcgrof@kernel.org
-Subject: [GIT PULL] sysctl changes for v6.6-rc1
-Message-ID: <ZO5Yx5JFogGi/cBo@bombadil.infradead.org>
+        Paolo Abeni <pabeni@redhat.com>,
+        Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
+        David Girault <david.girault@qorvo.com>,
+        Romuald Despres <romuald.despres@qorvo.com>,
+        Frederic Blain <frederic.blain@qorvo.com>,
+        Nicolas Schodet <nico@ni.fr.eu.org>,
+        Guilhem Imberton <guilhem.imberton@qorvo.com>,
+        Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH wpan-next 04/11] mac802154: Handle associating
+Message-ID: <20230901165113.7c434c8e@xps-13>
+In-Reply-To: <CAK-6q+ibbYBbvbGK9ehJJoaJAw4hubh6Ff=q2P4mq+Z07ZgR0A@mail.gmail.com>
+References: <20230601154817.754519-1-miquel.raynal@bootlin.com>
+        <20230601154817.754519-5-miquel.raynal@bootlin.com>
+        <CAK-6q+ibbYBbvbGK9ehJJoaJAw4hubh6Ff=q2P4mq+Z07ZgR0A@mail.gmail.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: miquel.raynal@bootlin.com
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-The following changes since commit 06c2afb862f9da8dc5efa4b6076a0e48c3fbaaa5:
+Hi Alexander,
 
-  Linux 6.5-rc1 (2023-07-09 13:53:13 -0700)
+> > @@ -293,6 +305,8 @@ static int cfg802154_netdev_notifier_call(struct no=
+tifier_block *nb,
+> >                 rdev->opencount++;
+> >                 break;
+> >         case NETDEV_UNREGISTER:
+> > +               cfg802154_free_peer_structures(wpan_dev);
+> > + =20
+>=20
+> I think the comment below is not relevant here, but I have also no
+> idea if this is still the case.
 
-are available in the Git repository at:
+Yeah, I did not bother with it as it was off topic. I believe the call
+above would anyway not be affected.
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/mcgrof/linux.git/ tags/sysctl-6.6-rc1
+> >                 /* It is possible to get NETDEV_UNREGISTER
+> >                  * multiple times. To detect that, check
+> >                  * that the interface is still on the list
+> > diff --git a/net/mac802154/cfg.c b/net/mac802154/cfg.c
+> > index 5c3cb019f751..89112d2bcee7 100644
+> > --- a/net/mac802154/cfg.c
+> > +++ b/net/mac802154/cfg.c
+> > @@ -315,6 +315,77 @@ static int mac802154_stop_beacons(struct wpan_phy =
+*wpan_phy,
+> >         return mac802154_stop_beacons_locked(local, sdata);
+> >  }
+> >
+> > +static int mac802154_associate(struct wpan_phy *wpan_phy,
+> > +                              struct wpan_dev *wpan_dev,
+> > +                              struct ieee802154_addr *coord)
+> > +{
+> > +       struct ieee802154_local *local =3D wpan_phy_priv(wpan_phy);
+> > +       u64 ceaddr =3D swab64((__force u64)coord->extended_addr);
+> > +       struct ieee802154_sub_if_data *sdata;
+> > +       struct ieee802154_pan_device *parent;
+> > +       __le16 short_addr;
+> > +       int ret;
+> > +
+> > +       ASSERT_RTNL();
+> > +
+> > +       sdata =3D IEEE802154_WPAN_DEV_TO_SUB_IF(wpan_dev);
+> > +
+> > +       if (wpan_dev->parent) {
+> > +               dev_err(&sdata->dev->dev,
+> > +                       "Device %8phC is already associated\n", &ceaddr=
+);
+> > +               return -EPERM;
+> > +       }
+> > +
+> > +       parent =3D kzalloc(sizeof(*parent), GFP_KERNEL);
+> > +       if (!parent)
+> > +               return -ENOMEM;
+> > +
+> > +       parent->pan_id =3D coord->pan_id;
+> > +       parent->mode =3D coord->mode;
+> > +       if (parent->mode =3D=3D IEEE802154_SHORT_ADDRESSING) {
+> > +               parent->short_addr =3D coord->short_addr;
+> > +               parent->extended_addr =3D cpu_to_le64(IEEE802154_ADDR_L=
+ONG_BROADCAST); =20
+>=20
+> There is no IEEE802154_ADDR_LONG_BROADCAST (extended address) address.
+> The broadcast address is always a short address 0xffff. (Talkin about
+> destination addresses).
 
-for you to fetch changes up to 53f3811dfd5e39507ee3aaea1be09aabce8f9c98:
+You're totally right, this is misleading. I will just drop this
+definition and its use, see below.
 
-  sysctl: Use ctl_table_size as stopping criteria for list macro (2023-08-15 15:26:18 -0700)
+> Just to clarify we can have here two different types/length of mac
+> addresses being used, whereas the extended address is always present.
+> We have the monitor interface set to an invalid extended address
+> 0x0...0 (talking about source address) which is a reserved EUI64 (what
+> long/extended address is) address, 0xffff...ffff is also being
+> reserved. Monitors get their address from the socket interface.
+>=20
+> If there is a parent, an extended address is always present and known.
+> A short address can be set, but is not required as a node to have.
+> Sure if a node has a short address, you want to use a short address
+> because it saves payload.
+> Also remember when an address is unique in the network, an extended
+> address (LONG) is always being unique, a short address is unique in
+> combination of pan id + short address.
 
-----------------------------------------------------------------
-sysctl-6.6-rc1
+Absolutely.
 
-Long ago we set out to remove the kitchen sink on kernel/sysctl.c arrays and
-placings sysctls to their own sybsystem or file to help avoid merge conflicts.
-Matthew Wilcox pointed out though that if we're going to do that we might as
-well also *save* space while at it and try to remove the extra last sysctl
-entry added at the end of each array, a sentintel, instead of bloating the
-kernel by adding a new sentinel with each array moved.
+> If you save some neighbors you want to store the extended and if
+> present panid/shortaddress.
 
-Doing that was not so trivial, and has required slowing down the moves of
-kernel/sysctl.c arrays and measuring the impact on size by each new move.
+The code above was misleading, I will clarify it to only accept NL
+association commands with an extended address. In fact the coord
+structure is created in the nl802154 layer and it already only accepts
+extended addresses (we don't expect the short address through the nl
+command) so to answer your request: yes, the extended address will
+always be there because we must know it.
 
-The complex part of the effort to help reduce the size of each sysctl is being
-done by the patient work of el señor Don Joel Granados. A lot of this is truly
-painful code refactoring and testing and then trying to measure the savings of
-each move and removing the sentinels. Although Joel already has code which does
-most of this work, experience with sysctl moves in the past shows is we need to
-be careful due to the slew of odd build failures that are possible due to the
-amount of random Kconfig options sysctls use.
+Regarding the possibility to provide a short address, as we no longer
+keep details about the surrounding devices inside the kernel (we only
+keep the associated devices, either the parent or the children) keeping
+this information would be useless. I don't see a need for it. The
+NL interface can evolve later without breaking the compatibility if we
+ever want to provide a short address as well and make something with it
+(actually even today one could send the short address, it would simply
+be ingored).
 
-To that end Joel's work is split by first addressing the major housekeeping
-needed to remove the sentinels, which is part of this merge request. The rest
-of the work to actually remove the sentinels will be done later in future
-kernel releases.
+One thing however regarding the fact that we might want to store both a
+short *and* an extended address in some cases: I created a "PAN device"
+structure which allows this (because otherwise we had a union) as we
+need to do it when we are parent as we are in charge of allocating the
+short addresses:
 
-At first I was only going to send his first 7 patches of his patch series,
-posted 1 month ago, but in retrospect due to the testing the changes have
-received in linux-next and the minor changes they make this goes with the
-entire set of patches Joel had planned: just sysctl house keeping. There are
-networking changes but these are part of the house keeping too.
++/**
++ * struct ieee802154_pan_device - PAN device information
++ * @pan_id: the PAN ID of this device
++ * @mode: the preferred mode to reach the device
++ * @short_addr: the short address of this device
++ * @extended_addr: the extended address of this device
++ * @node: the list node
++ */
++struct ieee802154_pan_device {
++       __le16 pan_id;
++       u8 mode;
++       __le16 short_addr;
++       __le64 extended_addr;
++       struct list_head node;
++};
 
-The preliminary math is showing this will all help reduce the overall build
-time size of the kernel and run time memory consumed by the kernel by about
-~64 bytes per array where we are able to remove each sentinel in the future.
-That also means there is no more bloating the kernel with the extra ~64 bytes
-per array moved as no new sentinels are created.
+> Or I do not understand something here?
 
-Most of this has been in linux-next for about a month, the last 7 patches took
-a minor refresh 2 week ago based on feedback.
+No no, I think we are fully aligned :-)
 
-----------------------------------------------------------------
-Joel Granados (14):
-      sysctl: Prefer ctl_table_header in proc_sysctl
-      sysctl: Use ctl_table_header in list_for_each_table_entry
-      sysctl: Add ctl_table_size to ctl_table_header
-      sysctl: Add size argument to init_header
-      sysctl: Add a size arg to __register_sysctl_table
-      sysctl: Add size to register_sysctl
-      sysctl: Add size arg to __register_sysctl_init
-      sysctl: Add size to register_net_sysctl function
-      ax.25: Update to register_net_sysctl_sz
-      netfilter: Update to register_net_sysctl_sz
-      networking: Update to register_net_sysctl_sz
-      vrf: Update to register_net_sysctl_sz
-      sysctl: SIZE_MAX->ARRAY_SIZE in register_net_sysctl
-      sysctl: Use ctl_table_size as stopping criteria for list macro
+> btw: as you probably noticed, the netdev interface dev_addr is an
+> extended address (because it's always present). Now there comes the
+> ugly part, netdevs cannot deal with other dev_addrs with different
+> length, that's why it's stored in the wpan specific dev structure and
+> things don't get easy and solutions need to be found how to make it
+> working... get prepared to get crazy...
 
- arch/arm64/kernel/armv8_deprecated.c    |  2 +-
- arch/s390/appldata/appldata_base.c      |  2 +-
- drivers/net/vrf.c                       |  3 +-
- fs/proc/proc_sysctl.c                   | 90 +++++++++++++++++----------------
- include/linux/sysctl.h                  | 31 +++++++++---
- include/net/ipv6.h                      |  2 +
- include/net/net_namespace.h             | 10 ++--
- ipc/ipc_sysctl.c                        |  4 +-
- ipc/mq_sysctl.c                         |  4 +-
- kernel/ucount.c                         |  5 +-
- net/ax25/sysctl_net_ax25.c              |  3 +-
- net/bridge/br_netfilter_hooks.c         |  3 +-
- net/core/neighbour.c                    |  8 ++-
- net/core/sysctl_net_core.c              |  3 +-
- net/ieee802154/6lowpan/reassembly.c     |  8 ++-
- net/ipv4/devinet.c                      |  3 +-
- net/ipv4/ip_fragment.c                  |  3 +-
- net/ipv4/route.c                        |  8 ++-
- net/ipv4/sysctl_net_ipv4.c              |  3 +-
- net/ipv4/xfrm4_policy.c                 |  3 +-
- net/ipv6/addrconf.c                     |  3 +-
- net/ipv6/icmp.c                         |  5 ++
- net/ipv6/netfilter/nf_conntrack_reasm.c |  3 +-
- net/ipv6/reassembly.c                   |  3 +-
- net/ipv6/route.c                        |  9 ++++
- net/ipv6/sysctl_net_ipv6.c              | 16 ++++--
- net/ipv6/xfrm6_policy.c                 |  3 +-
- net/mpls/af_mpls.c                      |  6 ++-
- net/mptcp/ctrl.c                        |  3 +-
- net/netfilter/ipvs/ip_vs_ctl.c          |  8 ++-
- net/netfilter/ipvs/ip_vs_lblc.c         | 10 ++--
- net/netfilter/ipvs/ip_vs_lblcr.c        | 10 ++--
- net/netfilter/nf_conntrack_standalone.c |  4 +-
- net/netfilter/nf_log.c                  |  7 +--
- net/rds/tcp.c                           |  3 +-
- net/sctp/sysctl.c                       |  4 +-
- net/smc/smc_sysctl.c                    |  3 +-
- net/sysctl_net.c                        | 26 +++++++---
- net/unix/sysctl_net_unix.c              |  3 +-
- net/xfrm/xfrm_sysctl.c                  |  8 ++-
- 40 files changed, 222 insertions(+), 113 deletions(-)
+Yeah but I believe once we have proper PAN IDs/short address vs
+extended address mappings we could have the translation internally at
+least. I haven't investigated this for now.
+
+Thanks,
+Miqu=C3=A8l
