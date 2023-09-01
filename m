@@ -2,32 +2,32 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5930FCA0FE4
-	for <linux-wpan@archiver.kernel.org>; Fri,  1 Sep 2023 17:05:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D357BCA0FEC
+	for <linux-wpan@archiver.kernel.org>; Fri,  1 Sep 2023 17:05:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348846AbjIARFX (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Fri, 1 Sep 2023 13:05:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33162 "EHLO
+        id S1348874AbjIARFZ (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Fri, 1 Sep 2023 13:05:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33190 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348747AbjIARFX (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Fri, 1 Sep 2023 13:05:23 -0400
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A33C010F4;
-        Fri,  1 Sep 2023 10:05:18 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 791D5C0007;
-        Fri,  1 Sep 2023 17:05:15 +0000 (UTC)
+        with ESMTP id S1348648AbjIARFY (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 1 Sep 2023 13:05:24 -0400
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::226])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC1E110FC;
+        Fri,  1 Sep 2023 10:05:20 -0700 (PDT)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 94DEEC0009;
+        Fri,  1 Sep 2023 17:05:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1693587917;
+        t=1693587919;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ZpvmNftpYlqHdq6IWLGRShnFGiVqIHUHkvYQMKHxhUY=;
-        b=fnETrQxEdLBLXimzLJi7RWYQJFD0YpJ3EIb78XQr6vpgX8aFRRYXUL6Lnt4TLkkKNJ6zfm
-        AainMyFOktrRBSckTEayTW9DRDKKAVQzPCJk0A+9QIpc9KtngZh0d9TvaRnMIR5uHdQzrK
-        njJCyq8OdhQmVMaXHtg8Db2SliYdCOXxPSauxO4AkvznNJ3klxJhZEqz203DdE4Xjakrrh
-        LR3E3FQq/98zFR0vNP9090uscSesryZtFF/QKWAyCeAIOme4pjJMbuwhbUx5kB9dYd3Pqu
-        og4hA+LJu2tlJC6uZHF3DGwUiUgmky3mc7uceP5ohudn8PQad7ZRn1nmerW3WA==
+        bh=MQP2tpnzmwAXMucnb0L9ZBCPDi/cC9OYiUxqDll0HQI=;
+        b=LcMJK0WA83RLwMswNzmFgGPo3rQCzefZ7aspcLfTYRvTbyA3No7kL4bBOTLrjh5q7Kk4SH
+        CWXLH0vQge00BBpopSkvPm20e+eKGMcKVXEdCWpx6tDMYsNmAz0+oehdJCGfUmwCRXV/4e
+        Q1aVzMENaZzfLUih2VLj+SpSEuGpRfwnNKi7DBwl68EmjqZJZ2MqbsaIw4JMSa+qal+W7s
+        6QFdds7TIa8s55+yQNq9ajbjdTwXzdchksiLphwpGPoYOmqVaw5guQ/7bYayB9tw8XDoK2
+        NWX6wJG2NTM/50A22QTMidn7Q2XVODQgl7e1sUR+7X36IeF366gCsEsd2r3vzA==
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
 To:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
@@ -43,9 +43,9 @@ Cc:     "David S. Miller" <davem@davemloft.net>,
         Guilhem Imberton <guilhem.imberton@qorvo.com>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
         Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: [PATCH wpan-next v2 04/11] mac802154: Handle associating
-Date:   Fri,  1 Sep 2023 19:04:54 +0200
-Message-Id: <20230901170501.1066321-5-miquel.raynal@bootlin.com>
+Subject: [PATCH wpan-next v2 05/11] ieee802154: Add support for user disassociation requests
+Date:   Fri,  1 Sep 2023 19:04:55 +0200
+Message-Id: <20230901170501.1066321-6-miquel.raynal@bootlin.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230901170501.1066321-1-miquel.raynal@bootlin.com>
 References: <20230901170501.1066321-1-miquel.raynal@bootlin.com>
@@ -56,390 +56,189 @@ Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Joining a PAN officially goes by associating with a coordinator. This
-coordinator may have been discovered thanks to the beacons it sent in
-the past. Add support to the MAC layer for these associations, which
-require:
-- Sending an association request
-- Receiving an association response
-
-The association response contains the association status, eventually a
-reason if the association was unsuccessful, and finally a short address
-that we should use for intra-PAN communication from now on, if we
-required one (which is the default, and not yet configurable).
+A device may decide at some point to disassociate from a PAN, let's
+introduce a netlink command for this purpose.
 
 Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
 ---
- include/net/cfg802154.h         |   1 +
- include/net/ieee802154_netdev.h |   5 ++
- net/ieee802154/core.c           |  14 ++++
- net/mac802154/cfg.c             |  70 ++++++++++++++++++
- net/mac802154/ieee802154_i.h    |  19 +++++
- net/mac802154/main.c            |   2 +
- net/mac802154/rx.c              |   9 +++
- net/mac802154/scan.c            | 127 ++++++++++++++++++++++++++++++++
- 8 files changed, 247 insertions(+)
+ include/net/cfg802154.h         |  3 +++
+ include/net/ieee802154_netdev.h | 11 +++++++++
+ include/net/nl802154.h          |  1 +
+ net/ieee802154/nl802154.c       | 41 +++++++++++++++++++++++++++++++++
+ net/ieee802154/rdev-ops.h       | 15 ++++++++++++
+ net/ieee802154/trace.h          | 19 +++++++++++++++
+ 6 files changed, 90 insertions(+)
 
 diff --git a/include/net/cfg802154.h b/include/net/cfg802154.h
-index 1c22cef77425..df1f6c905c2d 100644
+index df1f6c905c2d..c79ff560f400 100644
 --- a/include/net/cfg802154.h
 +++ b/include/net/cfg802154.h
-@@ -503,6 +503,7 @@ struct wpan_dev {
- 	struct mutex association_lock;
- 	struct ieee802154_pan_device *parent;
- 	struct list_head children;
-+	unsigned int association_generation;
- };
- 
- #define to_phy(_dev)	container_of(_dev, struct wpan_phy, dev)
+@@ -81,6 +81,9 @@ struct cfg802154_ops {
+ 	int	(*associate)(struct wpan_phy *wpan_phy,
+ 			     struct wpan_dev *wpan_dev,
+ 			     struct ieee802154_addr *coord);
++	int	(*disassociate)(struct wpan_phy *wpan_phy,
++				struct wpan_dev *wpan_dev,
++				struct ieee802154_addr *target);
+ #ifdef CONFIG_IEEE802154_NL802154_EXPERIMENTAL
+ 	void	(*get_llsec_table)(struct wpan_phy *wpan_phy,
+ 				   struct wpan_dev *wpan_dev,
 diff --git a/include/net/ieee802154_netdev.h b/include/net/ieee802154_netdev.h
-index ca8c827d0d7f..e26ffd079556 100644
+index e26ffd079556..16194356cfe7 100644
 --- a/include/net/ieee802154_netdev.h
 +++ b/include/net/ieee802154_netdev.h
-@@ -149,6 +149,11 @@ struct ieee802154_assoc_req_pl {
- #endif
- } __packed;
- 
-+struct ieee802154_assoc_resp_pl {
-+	__le16 short_addr;
-+	u8 status;
-+} __packed;
-+
- enum ieee802154_frame_version {
- 	IEEE802154_2003_STD,
- 	IEEE802154_2006_STD,
-diff --git a/net/ieee802154/core.c b/net/ieee802154/core.c
-index cd69bdbfd59f..be958727ccdf 100644
---- a/net/ieee802154/core.c
-+++ b/net/ieee802154/core.c
-@@ -198,6 +198,18 @@ void wpan_phy_free(struct wpan_phy *phy)
- }
- EXPORT_SYMBOL(wpan_phy_free);
- 
-+static void cfg802154_free_peer_structures(struct wpan_dev *wpan_dev)
-+{
-+	mutex_lock(&wpan_dev->association_lock);
-+
-+	kfree(wpan_dev->parent);
-+	wpan_dev->parent = NULL;
-+
-+	wpan_dev->association_generation++;
-+
-+	mutex_unlock(&wpan_dev->association_lock);
-+}
-+
- int cfg802154_switch_netns(struct cfg802154_registered_device *rdev,
- 			   struct net *net)
- {
-@@ -293,6 +305,8 @@ static int cfg802154_netdev_notifier_call(struct notifier_block *nb,
- 		rdev->opencount++;
- 		break;
- 	case NETDEV_UNREGISTER:
-+		cfg802154_free_peer_structures(wpan_dev);
-+
- 		/* It is possible to get NETDEV_UNREGISTER
- 		 * multiple times. To detect that, check
- 		 * that the interface is still on the list
-diff --git a/net/mac802154/cfg.c b/net/mac802154/cfg.c
-index 5c3cb019f751..d39b9024ec5a 100644
---- a/net/mac802154/cfg.c
-+++ b/net/mac802154/cfg.c
-@@ -315,6 +315,75 @@ static int mac802154_stop_beacons(struct wpan_phy *wpan_phy,
- 	return mac802154_stop_beacons_locked(local, sdata);
- }
- 
-+static int mac802154_associate(struct wpan_phy *wpan_phy,
-+			       struct wpan_dev *wpan_dev,
-+			       struct ieee802154_addr *coord)
-+{
-+	struct ieee802154_local *local = wpan_phy_priv(wpan_phy);
-+	u64 ceaddr = swab64((__force u64)coord->extended_addr);
-+	struct ieee802154_sub_if_data *sdata;
-+	struct ieee802154_pan_device *parent;
-+	__le16 short_addr;
-+	int ret;
-+
-+	ASSERT_RTNL();
-+
-+	sdata = IEEE802154_WPAN_DEV_TO_SUB_IF(wpan_dev);
-+
-+	if (wpan_dev->parent) {
-+		dev_err(&sdata->dev->dev,
-+			"Device %8phC is already associated\n", &ceaddr);
-+		return -EPERM;
-+	}
-+
-+	if (coord->mode == IEEE802154_SHORT_ADDRESSING)
-+		return -EINVAL;
-+
-+	parent = kzalloc(sizeof(*parent), GFP_KERNEL);
-+	if (!parent)
-+		return -ENOMEM;
-+
-+	parent->pan_id = coord->pan_id;
-+	parent->mode = coord->mode;
-+	parent->extended_addr = coord->extended_addr;
-+	parent->short_addr = cpu_to_le16(IEEE802154_ADDR_SHORT_BROADCAST);
-+
-+	/* Set the PAN ID hardware address filter beforehand to avoid dropping
-+	 * the association response with a destination PAN ID field set to the
-+	 * "new" PAN ID.
-+	 */
-+	if (local->hw.flags & IEEE802154_HW_AFILT) {
-+		ret = drv_set_pan_id(local, coord->pan_id);
-+		if (ret < 0)
-+			goto free_parent;
-+	}
-+
-+	ret = mac802154_perform_association(sdata, parent, &short_addr);
-+	if (ret)
-+		goto reset_panid;
-+
-+	if (local->hw.flags & IEEE802154_HW_AFILT) {
-+		ret = drv_set_short_addr(local, short_addr);
-+		if (ret < 0)
-+			goto reset_panid;
-+	}
-+
-+	wpan_dev->pan_id = coord->pan_id;
-+	wpan_dev->short_addr = short_addr;
-+	wpan_dev->parent = parent;
-+	wpan_dev->association_generation++;
-+
-+	return 0;
-+
-+reset_panid:
-+	if (local->hw.flags & IEEE802154_HW_AFILT)
-+		drv_set_pan_id(local, IEEE802154_PAN_ID_BROADCAST);
-+
-+free_parent:
-+	kfree(parent);
-+	return ret;
-+}
-+
- #ifdef CONFIG_IEEE802154_NL802154_EXPERIMENTAL
- static void
- ieee802154_get_llsec_table(struct wpan_phy *wpan_phy,
-@@ -526,6 +595,7 @@ const struct cfg802154_ops mac802154_config_ops = {
- 	.abort_scan = mac802154_abort_scan,
- 	.send_beacons = mac802154_send_beacons,
- 	.stop_beacons = mac802154_stop_beacons,
-+	.associate = mac802154_associate,
- #ifdef CONFIG_IEEE802154_NL802154_EXPERIMENTAL
- 	.get_llsec_table = ieee802154_get_llsec_table,
- 	.lock_llsec_table = ieee802154_lock_llsec_table,
-diff --git a/net/mac802154/ieee802154_i.h b/net/mac802154/ieee802154_i.h
-index c347ec9ff8c9..fff67676b400 100644
---- a/net/mac802154/ieee802154_i.h
-+++ b/net/mac802154/ieee802154_i.h
-@@ -24,6 +24,7 @@
- enum ieee802154_ongoing {
- 	IEEE802154_IS_SCANNING = BIT(0),
- 	IEEE802154_IS_BEACONING = BIT(1),
-+	IEEE802154_IS_ASSOCIATING = BIT(2),
+@@ -177,6 +177,11 @@ enum ieee802154_association_status {
+ 	IEEE802154_FAST_ASSOCIATION_SUCCESSFUL = 0x80,
  };
  
- /* mac802154 device private data */
-@@ -74,6 +75,13 @@ struct ieee802154_local {
- 	struct list_head rx_mac_cmd_list;
- 	struct work_struct rx_mac_cmd_work;
++enum ieee802154_disassociation_reason {
++	IEEE802154_COORD_WISHES_DEVICE_TO_LEAVE = 0x1,
++	IEEE802154_DEVICE_WISHES_TO_LEAVE = 0x2,
++};
++
+ struct ieee802154_hdr {
+ 	struct ieee802154_hdr_fc fc;
+ 	u8 seq;
+@@ -206,6 +211,12 @@ struct ieee802154_association_req_frame {
+ 	struct ieee802154_assoc_req_pl assoc_req_pl;
+ };
  
-+	/* Association */
-+	struct ieee802154_pan_device *assoc_dev;
-+	struct completion assoc_done;
-+	__le16 assoc_addr;
-+	u8 assoc_status;
-+	struct work_struct assoc_work;
++struct ieee802154_disassociation_notif_frame {
++	struct ieee802154_hdr mhr;
++	struct ieee802154_mac_cmd_pl mac_pl;
++	u8 disassoc_pl;
++};
 +
- 	bool started;
- 	bool suspended;
- 	unsigned long ongoing;
-@@ -296,6 +304,17 @@ static inline bool mac802154_is_beaconing(struct ieee802154_local *local)
+ /* pushes hdr onto the skb. fields of hdr->fc that can be calculated from
+  * the contents of hdr will be, and the actual value of those bits in
+  * hdr->fc will be ignored. this includes the INTRA_PAN bit and the frame
+diff --git a/include/net/nl802154.h b/include/net/nl802154.h
+index 830e1c51d3df..8a47c14c72f0 100644
+--- a/include/net/nl802154.h
++++ b/include/net/nl802154.h
+@@ -79,6 +79,7 @@ enum nl802154_commands {
+ 	NL802154_CMD_SEND_BEACONS,
+ 	NL802154_CMD_STOP_BEACONS,
+ 	NL802154_CMD_ASSOCIATE,
++	NL802154_CMD_DISASSOCIATE,
  
- void mac802154_rx_mac_cmd_worker(struct work_struct *work);
+ 	/* add new commands above here */
  
-+int mac802154_perform_association(struct ieee802154_sub_if_data *sdata,
-+				  struct ieee802154_pan_device *coord,
-+				  __le16 *short_addr);
-+int mac802154_process_association_resp(struct ieee802154_sub_if_data *sdata,
-+				       struct sk_buff *skb);
-+
-+static inline bool mac802154_is_associating(struct ieee802154_local *local)
-+{
-+	return test_bit(IEEE802154_IS_ASSOCIATING, &local->ongoing);
-+}
-+
- /* interface handling */
- int ieee802154_iface_init(void);
- void ieee802154_iface_exit(void);
-diff --git a/net/mac802154/main.c b/net/mac802154/main.c
-index 357ece67432b..9ab7396668d2 100644
---- a/net/mac802154/main.c
-+++ b/net/mac802154/main.c
-@@ -103,6 +103,8 @@ ieee802154_alloc_hw(size_t priv_data_len, const struct ieee802154_ops *ops)
- 	INIT_DELAYED_WORK(&local->beacon_work, mac802154_beacon_worker);
- 	INIT_WORK(&local->rx_mac_cmd_work, mac802154_rx_mac_cmd_worker);
- 
-+	init_completion(&local->assoc_done);
-+
- 	/* init supported flags with 802.15.4 default ranges */
- 	phy->supported.max_minbe = 8;
- 	phy->supported.min_maxbe = 3;
-diff --git a/net/mac802154/rx.c b/net/mac802154/rx.c
-index e2434b4fe514..d0e08613a36b 100644
---- a/net/mac802154/rx.c
-+++ b/net/mac802154/rx.c
-@@ -93,6 +93,15 @@ void mac802154_rx_mac_cmd_worker(struct work_struct *work)
- 
- 		queue_delayed_work(local->mac_wq, &local->beacon_work, 0);
- 		break;
-+
-+	case IEEE802154_CMD_ASSOCIATION_RESP:
-+		dev_dbg(&mac_pkt->sdata->dev->dev, "processing ASSOC RESP\n");
-+		if (!mac802154_is_associating(local))
-+			break;
-+
-+		mac802154_process_association_resp(mac_pkt->sdata, mac_pkt->skb);
-+		break;
-+
- 	default:
- 		break;
- 	}
-diff --git a/net/mac802154/scan.c b/net/mac802154/scan.c
-index d9658f2c4ae6..5dd50e1ce329 100644
---- a/net/mac802154/scan.c
-+++ b/net/mac802154/scan.c
-@@ -510,3 +510,130 @@ int mac802154_send_beacons_locked(struct ieee802154_sub_if_data *sdata,
- 
- 	return 0;
+diff --git a/net/ieee802154/nl802154.c b/net/ieee802154/nl802154.c
+index 2c28e0e9fdda..5820fe425ddd 100644
+--- a/net/ieee802154/nl802154.c
++++ b/net/ieee802154/nl802154.c
+@@ -1663,6 +1663,39 @@ static int nl802154_associate(struct sk_buff *skb, struct genl_info *info)
+ 	return err;
  }
-+
-+int mac802154_perform_association(struct ieee802154_sub_if_data *sdata,
-+				  struct ieee802154_pan_device *coord,
-+				  __le16 *short_addr)
+ 
++static int nl802154_disassociate(struct sk_buff *skb, struct genl_info *info)
 +{
-+	u64 ceaddr = swab64((__force u64)coord->extended_addr);
-+	struct ieee802154_association_req_frame frame = {};
-+	struct ieee802154_local *local = sdata->local;
-+	struct wpan_dev *wpan_dev = &sdata->wpan_dev;
-+	struct sk_buff *skb;
-+	int ret;
++	struct cfg802154_registered_device *rdev = info->user_ptr[0];
++	struct net_device *dev = info->user_ptr[1];
++	struct wpan_dev *wpan_dev = dev->ieee802154_ptr;
++	struct wpan_phy *wpan_phy = &rdev->wpan_phy;
++	struct ieee802154_addr target;
 +
-+	frame.mhr.fc.type = IEEE802154_FC_TYPE_MAC_CMD;
-+	frame.mhr.fc.security_enabled = 0;
-+	frame.mhr.fc.frame_pending = 0;
-+	frame.mhr.fc.ack_request = 1; /* We always expect an ack here */
-+	frame.mhr.fc.intra_pan = 0;
-+	frame.mhr.fc.dest_addr_mode = (coord->mode == IEEE802154_ADDR_LONG) ?
-+		IEEE802154_EXTENDED_ADDRESSING : IEEE802154_SHORT_ADDRESSING;
-+	frame.mhr.fc.version = IEEE802154_2003_STD;
-+	frame.mhr.fc.source_addr_mode = IEEE802154_EXTENDED_ADDRESSING;
-+	frame.mhr.source.mode = IEEE802154_ADDR_LONG;
-+	frame.mhr.source.pan_id = cpu_to_le16(IEEE802154_PANID_BROADCAST);
-+	frame.mhr.source.extended_addr = wpan_dev->extended_addr;
-+	frame.mhr.dest.mode = coord->mode;
-+	frame.mhr.dest.pan_id = coord->pan_id;
-+	if (coord->mode == IEEE802154_ADDR_LONG)
-+		frame.mhr.dest.extended_addr = coord->extended_addr;
-+	else
-+		frame.mhr.dest.short_addr = coord->short_addr;
-+	frame.mhr.seq = atomic_inc_return(&wpan_dev->dsn) & 0xFF;
-+	frame.mac_pl.cmd_id = IEEE802154_CMD_ASSOCIATION_REQ;
-+	frame.assoc_req_pl.device_type = 1;
-+	frame.assoc_req_pl.power_source = 1;
-+	frame.assoc_req_pl.rx_on_when_idle = 1;
-+	frame.assoc_req_pl.alloc_addr = 1;
-+
-+	skb = alloc_skb(IEEE802154_MAC_CMD_SKB_SZ + sizeof(frame.assoc_req_pl),
-+			GFP_KERNEL);
-+	if (!skb)
-+		return -ENOBUFS;
-+
-+	skb->dev = sdata->dev;
-+
-+	ret = ieee802154_mac_cmd_push(skb, &frame, &frame.assoc_req_pl,
-+				      sizeof(frame.assoc_req_pl));
-+	if (ret) {
-+		kfree_skb(skb);
-+		return ret;
++	if (wpan_phy->flags & WPAN_PHY_FLAG_DATAGRAMS_ONLY) {
++		NL_SET_ERR_MSG(info->extack, "PHY only supports datagrams");
++		return -EOPNOTSUPP;
 +	}
 +
-+	local->assoc_dev = coord;
-+	reinit_completion(&local->assoc_done);
-+	set_bit(IEEE802154_IS_ASSOCIATING, &local->ongoing);
++	target.pan_id = wpan_dev->pan_id;
 +
-+	ret = ieee802154_mlme_tx_one_locked(local, sdata, skb);
-+	if (ret) {
-+		if (ret > 0)
-+			ret = (ret == IEEE802154_NO_ACK) ? -EREMOTEIO : -EIO;
-+		dev_warn(&sdata->dev->dev,
-+			 "No ASSOC REQ ACK received from %8phC\n", &ceaddr);
-+		goto clear_assoc;
-+	}
-+
-+	ret = wait_for_completion_killable_timeout(&local->assoc_done, 10 * HZ);
-+	if (ret <= 0) {
-+		dev_warn(&sdata->dev->dev,
-+			 "No ASSOC RESP received from %8phC\n", &ceaddr);
-+		ret = -ETIMEDOUT;
-+		goto clear_assoc;
-+	}
-+
-+	if (local->assoc_status != IEEE802154_ASSOCIATION_SUCCESSFUL) {
-+		if (local->assoc_status == IEEE802154_PAN_AT_CAPACITY)
-+			ret = -ERANGE;
-+		else
-+			ret = -EPERM;
-+
-+		dev_warn(&sdata->dev->dev,
-+			 "Negative ASSOC RESP received from %8phC: %s\n", &ceaddr,
-+			 local->assoc_status == IEEE802154_PAN_AT_CAPACITY ?
-+			 "PAN at capacity" : "access denied");
-+	}
-+
-+	ret = 0;
-+	*short_addr = local->assoc_addr;
-+
-+clear_assoc:
-+	clear_bit(IEEE802154_IS_ASSOCIATING, &local->ongoing);
-+	local->assoc_dev = NULL;
-+
-+	return ret;
-+}
-+
-+int mac802154_process_association_resp(struct ieee802154_sub_if_data *sdata,
-+				       struct sk_buff *skb)
-+{
-+	struct ieee802154_addr *src = &mac_cb(skb)->source;
-+	struct ieee802154_addr *dest = &mac_cb(skb)->dest;
-+	u64 deaddr = swab64((__force u64)dest->extended_addr);
-+	struct ieee802154_local *local = sdata->local;
-+	struct wpan_dev *wpan_dev = &sdata->wpan_dev;
-+	struct ieee802154_assoc_resp_pl resp_pl = {};
-+
-+	if (skb->len != sizeof(resp_pl))
++	if (info->attrs[NL802154_ATTR_EXTENDED_ADDR]) {
++		target.mode = IEEE802154_ADDR_LONG;
++		target.extended_addr = nla_get_le64(info->attrs[NL802154_ATTR_EXTENDED_ADDR]);
++	} else if (info->attrs[NL802154_ATTR_SHORT_ADDR]) {
++		target.mode = IEEE802154_ADDR_SHORT;
++		target.short_addr = nla_get_le16(info->attrs[NL802154_ATTR_SHORT_ADDR]);
++	} else {
++		NL_SET_ERR_MSG(info->extack, "Device address is missing");
 +		return -EINVAL;
++	}
 +
-+	if (unlikely(src->mode != IEEE802154_EXTENDED_ADDRESSING ||
-+		     dest->mode != IEEE802154_EXTENDED_ADDRESSING))
-+		return -EINVAL;
-+
-+	if (unlikely(dest->extended_addr != wpan_dev->extended_addr ||
-+		     src->extended_addr != local->assoc_dev->extended_addr))
-+		return -ENODEV;
-+
-+	memcpy(&resp_pl, skb->data, sizeof(resp_pl));
-+	local->assoc_addr = resp_pl.short_addr;
-+	local->assoc_status = resp_pl.status;
-+
-+	dev_dbg(&skb->dev->dev,
-+		"ASSOC RESP 0x%x received from %8phC, getting short address %04x\n",
-+		local->assoc_status, &deaddr, local->assoc_addr);
-+
-+	complete(&local->assoc_done);
++	mutex_lock(&wpan_dev->association_lock);
++	rdev_disassociate(rdev, wpan_dev, &target);
++	mutex_unlock(&wpan_dev->association_lock);
 +
 +	return 0;
 +}
++
+ #ifdef CONFIG_IEEE802154_NL802154_EXPERIMENTAL
+ static const struct nla_policy nl802154_dev_addr_policy[NL802154_DEV_ADDR_ATTR_MAX + 1] = {
+ 	[NL802154_DEV_ADDR_ATTR_PAN_ID] = { .type = NLA_U16 },
+@@ -2792,6 +2825,14 @@ static const struct genl_ops nl802154_ops[] = {
+ 				  NL802154_FLAG_CHECK_NETDEV_UP |
+ 				  NL802154_FLAG_NEED_RTNL,
+ 	},
++	{
++		.cmd = NL802154_CMD_DISASSOCIATE,
++		.doit = nl802154_disassociate,
++		.flags = GENL_ADMIN_PERM,
++		.internal_flags = NL802154_FLAG_NEED_NETDEV |
++				  NL802154_FLAG_CHECK_NETDEV_UP |
++				  NL802154_FLAG_NEED_RTNL,
++	},
+ #ifdef CONFIG_IEEE802154_NL802154_EXPERIMENTAL
+ 	{
+ 		.cmd = NL802154_CMD_SET_SEC_PARAMS,
+diff --git a/net/ieee802154/rdev-ops.h b/net/ieee802154/rdev-ops.h
+index 4843d52f1ee0..64071ef6f57b 100644
+--- a/net/ieee802154/rdev-ops.h
++++ b/net/ieee802154/rdev-ops.h
+@@ -280,6 +280,21 @@ static inline int rdev_associate(struct cfg802154_registered_device *rdev,
+ 	return ret;
+ }
+ 
++static inline int rdev_disassociate(struct cfg802154_registered_device *rdev,
++				    struct wpan_dev *wpan_dev,
++				    struct ieee802154_addr *target)
++{
++	int ret;
++
++	if (!rdev->ops->disassociate)
++		return -EOPNOTSUPP;
++
++	trace_802154_rdev_disassociate(&rdev->wpan_phy, wpan_dev, target);
++	ret = rdev->ops->disassociate(&rdev->wpan_phy, wpan_dev, target);
++	trace_802154_rdev_return_int(&rdev->wpan_phy, ret);
++	return ret;
++}
++
+ #ifdef CONFIG_IEEE802154_NL802154_EXPERIMENTAL
+ /* TODO this is already a nl802154, so move into ieee802154 */
+ static inline void
+diff --git a/net/ieee802154/trace.h b/net/ieee802154/trace.h
+index 2e1d4f456316..62aa6465253a 100644
+--- a/net/ieee802154/trace.h
++++ b/net/ieee802154/trace.h
+@@ -375,6 +375,25 @@ TRACE_EVENT(802154_rdev_associate,
+ 		  WPAN_PHY_PR_ARG, WPAN_DEV_PR_ARG, __entry->addr)
+ );
+ 
++TRACE_EVENT(802154_rdev_disassociate,
++	TP_PROTO(struct wpan_phy *wpan_phy,
++		 struct wpan_dev *wpan_dev,
++		 struct ieee802154_addr *target),
++	TP_ARGS(wpan_phy, wpan_dev, target),
++	TP_STRUCT__entry(
++		WPAN_PHY_ENTRY
++		WPAN_DEV_ENTRY
++		__field(__le64, addr)
++	),
++	TP_fast_assign(
++		WPAN_PHY_ASSIGN;
++		WPAN_DEV_ASSIGN;
++		__entry->addr = target->extended_addr;
++	),
++	TP_printk(WPAN_PHY_PR_FMT ", " WPAN_DEV_PR_FMT ", disassociating with: 0x%llx",
++		  WPAN_PHY_PR_ARG, WPAN_DEV_PR_ARG, __entry->addr)
++);
++
+ TRACE_EVENT(802154_rdev_return_int,
+ 	TP_PROTO(struct wpan_phy *wpan_phy, int ret),
+ 	TP_ARGS(wpan_phy, ret),
 -- 
 2.34.1
 
