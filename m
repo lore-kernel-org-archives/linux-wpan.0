@@ -2,49 +2,69 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A24FEC2BA12
-	for <linux-wpan@archiver.kernel.org>; Sat, 16 Sep 2023 15:37:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5944DCD37B3
+	for <linux-wpan@archiver.kernel.org>; Sun, 17 Sep 2023 11:53:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231954AbjIPPgw (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Sat, 16 Sep 2023 11:36:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40242 "EHLO
+        id S235312AbjIQLwe (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Sun, 17 Sep 2023 07:52:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57652 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232744AbjIPPgl (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Sat, 16 Sep 2023 11:36:41 -0400
-Received: from proxima.lasnet.de (proxima.lasnet.de [78.47.171.185])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78D08CE3
-        for <linux-wpan@vger.kernel.org>; Sat, 16 Sep 2023 08:36:36 -0700 (PDT)
-Received: from [192.168.2.51] (p4fe718a3.dip0.t-ipconnect.de [79.231.24.163])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits))
-        (No client certificate requested)
-        (Authenticated sender: stefan@datenfreihafen.org)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id 593BFC0DE5;
-        Sat, 16 Sep 2023 17:36:34 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
-        s=2021; t=1694878594;
+        with ESMTP id S231377AbjIQLwC (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Sun, 17 Sep 2023 07:52:02 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70979F7
+        for <linux-wpan@vger.kernel.org>; Sun, 17 Sep 2023 04:51:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1694951470;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Z+pWnZGcjrSaHoFebC9fPz9ELWwEFtCKjK1r3e3OnXM=;
-        b=OvVl5wEMcBL7nS5T4qdGyP643NjLRUqB+8AZMo1pm4b3NCZmC1+keHv/xipTfbtXF5g42L
-        cNwaoBwv5JqorK5TzmC9IPLUEGc800whz691VdPswal/pMkIRlkbzlSMl+WcsSNT7I8tG2
-        TEdKuBkkdmLn4wABJEDXwy6/a5hu7ei1Xns35Tn53GkoFy1oBsvQacvlDLUR0e0sSOA9bB
-        vNOiLu2O7Zt/TLZwQcZdQ8QANGmTuofiDbiGvm9yleI+9GwR0yL8M7bi58ojQKt8qO4IaQ
-        aSIyGQxh4Rd2wYIOdJaZkYPy8Dk4IS4WUg0ku6jaCXqhU705s1mlZfvWNsZZmw==
-Message-ID: <7b9b1b97-7c02-06b3-7a84-db1f33784be3@datenfreihafen.org>
-Date:   Sat, 16 Sep 2023 17:36:33 +0200
+        bh=KTAUl3MxkxMzRLvthhHrinXr0DGTE9HMQ6lKXfM/moc=;
+        b=gvkfN/1HOnouuQCQKmBeccrRPypENrUe9wWC9JlPJJK/NrUbd9/J7Z6IrVEf7zrwNXdrh2
+        r7Z356l2sNKvqfIG783lQYrAreBmuQb33YevzQeP91s0YkGGv05XVtod/mMqfx1rs3B6JA
+        UKyEXUFNCvdfYYEm9UCYozGUoVwX5N0=
+Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com
+ [209.85.167.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-116-tAwv6k-GOu6V2a21iWpUtQ-1; Sun, 17 Sep 2023 07:51:09 -0400
+X-MC-Unique: tAwv6k-GOu6V2a21iWpUtQ-1
+Received: by mail-lf1-f69.google.com with SMTP id 2adb3069b0e04-502aafb8ae7so4090964e87.1
+        for <linux-wpan@vger.kernel.org>; Sun, 17 Sep 2023 04:51:08 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694951467; x=1695556267;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=KTAUl3MxkxMzRLvthhHrinXr0DGTE9HMQ6lKXfM/moc=;
+        b=oJv/btxP6XGyAjvlfX3+zzNDyjk8EkaKy3H3Qoh4nO4zhPw9nodsanxyD/uYAg/O2Z
+         3TBTSlNcd1ZvnU3w/z8mC3CnTLINYTMlXgP67H2Da+hD5R8QnyQS8qCuei8Ro0iBk9MI
+         mZg/QPa4ygNXMVsVCDq5lOuBOaNExsYl0U311wdOfUCPiVMxcknciXEHJJsWF/fHrAJ1
+         Z3wf7ZoI1vuXxB23zAhyoyTr2BD7qRqj8j9P+/uiydLe8HV4LBz9t+dmGoMOxXtLA7Hy
+         x7Hn9tspPT7ZNd/X3auK5kFuOHfRZHD/xoxfIg0Jq+UmbV5pjD1IsO+TBJh8+U9mpIsu
+         Myag==
+X-Gm-Message-State: AOJu0Yz30mQm2Wn6BgARBVC1Jh1lpZTU/ssde95WI4mKgE3MEicumoOi
+        8yIBeJPzL1abAI4ejeqTKOhCYKd69eNb6hz92B5QKgrq6LlC2YxaGqB20y1gmAUh7+zsCtrfVYO
+        N6TZ9OTATE8RHV96kMEMY/wgJ7WIeox1zuavvMA==
+X-Received: by 2002:a05:651c:1207:b0:2bf:aba1:d951 with SMTP id i7-20020a05651c120700b002bfaba1d951mr5787698lja.10.1694951467673;
+        Sun, 17 Sep 2023 04:51:07 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFvgcuYUeeQvN/TE5OihHoj0Rk8IsxlIiUoWPObpauFRACf4R2FjwLvQlFysf8xsyCHxXvl5ifRFwbsI/vJNr4=
+X-Received: by 2002:a05:651c:1207:b0:2bf:aba1:d951 with SMTP id
+ i7-20020a05651c120700b002bfaba1d951mr5787689lja.10.1694951467323; Sun, 17 Sep
+ 2023 04:51:07 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-From:   Stefan Schmidt <stefan@datenfreihafen.org>
-Subject: Re: [PATCH wpan-next v2 07/11] mac802154: Handle association requests
- from peers
-To:     Miquel Raynal <miquel.raynal@bootlin.com>,
+References: <20230901170501.1066321-1-miquel.raynal@bootlin.com>
+ <20230901170501.1066321-3-miquel.raynal@bootlin.com> <32cfbf0f-7ac8-5a4c-d9cd-9650a64fc0ea@datenfreihafen.org>
+In-Reply-To: <32cfbf0f-7ac8-5a4c-d9cd-9650a64fc0ea@datenfreihafen.org>
+From:   Alexander Aring <aahringo@redhat.com>
+Date:   Sun, 17 Sep 2023 07:50:55 -0400
+Message-ID: <CAK-6q+h1rbG+6=M+ZZfUznHq9GxOwtA1i0c=C9dgQH1qC7sQ=A@mail.gmail.com>
+Subject: Re: [PATCH wpan-next v2 02/11] ieee802154: Internal PAN management
+To:     Stefan Schmidt <stefan@datenfreihafen.org>
+Cc:     Miquel Raynal <miquel.raynal@bootlin.com>,
         Alexander Aring <alex.aring@gmail.com>,
-        linux-wpan@vger.kernel.org
-Cc:     "David S. Miller" <davem@davemloft.net>,
+        linux-wpan@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
         Paolo Abeni <pabeni@redhat.com>,
         Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
@@ -54,199 +74,186 @@ Cc:     "David S. Miller" <davem@davemloft.net>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
         Guilhem Imberton <guilhem.imberton@qorvo.com>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-References: <20230901170501.1066321-1-miquel.raynal@bootlin.com>
- <20230901170501.1066321-8-miquel.raynal@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <20230901170501.1066321-8-miquel.raynal@bootlin.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello Miquel
+Hi,
 
-On 01.09.23 19:04, Miquel Raynal wrote:
-> Coordinators may have to handle association requests from peers which
-> want to join the PAN. The logic involves:
-> - Acknowledging the request (done by hardware)
-> - If requested, a random short address that is free on this PAN should
->    be chosen for the device.
-> - Sending an association response with the short address allocated for
->    the peer and expecting it to be ack'ed.
-> 
-> If anything fails during this procedure, the peer is considered not
-> associated.
-> 
-> Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
-> ---
->   include/net/cfg802154.h         |   7 ++
->   include/net/ieee802154_netdev.h |   6 ++
->   net/ieee802154/core.c           |   7 ++
->   net/ieee802154/pan.c            |  30 +++++++
->   net/mac802154/ieee802154_i.h    |   2 +
->   net/mac802154/rx.c              |   8 ++
->   net/mac802154/scan.c            | 147 ++++++++++++++++++++++++++++++++
->   7 files changed, 207 insertions(+)
-> 
-> diff --git a/include/net/cfg802154.h b/include/net/cfg802154.h
-> index c79ff560f400..20ccc8f5da87 100644
-> --- a/include/net/cfg802154.h
-> +++ b/include/net/cfg802154.h
-> @@ -583,4 +583,11 @@ struct ieee802154_pan_device *
->   cfg802154_device_is_child(struct wpan_dev *wpan_dev,
->   			  struct ieee802154_addr *target);
->   
-> +/**
-> + * cfg802154_get_free_short_addr - Get a free address among the known devices
-> + * @wpan_dev: the wpan device
-> + * @return: a random short address expectedly unused on our PAN
-> + */
-> +__le16 cfg802154_get_free_short_addr(struct wpan_dev *wpan_dev);
-> +
->   #endif /* __NET_CFG802154_H */
-> diff --git a/include/net/ieee802154_netdev.h b/include/net/ieee802154_netdev.h
-> index 16194356cfe7..4de858f9929e 100644
-> --- a/include/net/ieee802154_netdev.h
-> +++ b/include/net/ieee802154_netdev.h
-> @@ -211,6 +211,12 @@ struct ieee802154_association_req_frame {
->   	struct ieee802154_assoc_req_pl assoc_req_pl;
->   };
->   
-> +struct ieee802154_association_resp_frame {
-> +	struct ieee802154_hdr mhr;
-> +	struct ieee802154_mac_cmd_pl mac_pl;
-> +	struct ieee802154_assoc_resp_pl assoc_resp_pl;
-> +};
-> +
->   struct ieee802154_disassociation_notif_frame {
->   	struct ieee802154_hdr mhr;
->   	struct ieee802154_mac_cmd_pl mac_pl;
-> diff --git a/net/ieee802154/core.c b/net/ieee802154/core.c
-> index be958727ccdf..790965018118 100644
-> --- a/net/ieee802154/core.c
-> +++ b/net/ieee802154/core.c
-> @@ -200,11 +200,18 @@ EXPORT_SYMBOL(wpan_phy_free);
->   
->   static void cfg802154_free_peer_structures(struct wpan_dev *wpan_dev)
->   {
-> +	struct ieee802154_pan_device *child, *tmp;
-> +
->   	mutex_lock(&wpan_dev->association_lock);
->   
->   	kfree(wpan_dev->parent);
->   	wpan_dev->parent = NULL;
->   
-> +	list_for_each_entry_safe(child, tmp, &wpan_dev->children, node) {
-> +		list_del(&child->node);
-> +		kfree(child);
-> +	}
-> +
->   	wpan_dev->association_generation++;
->   
->   	mutex_unlock(&wpan_dev->association_lock);
-> diff --git a/net/ieee802154/pan.c b/net/ieee802154/pan.c
-> index 477e8dad0cf0..364abb89d156 100644
-> --- a/net/ieee802154/pan.c
-> +++ b/net/ieee802154/pan.c
-> @@ -66,3 +66,33 @@ cfg802154_device_is_child(struct wpan_dev *wpan_dev,
->   	return NULL;
->   }
->   EXPORT_SYMBOL_GPL(cfg802154_device_is_child);
-> +
-> +__le16 cfg802154_get_free_short_addr(struct wpan_dev *wpan_dev)
-> +{
-> +	struct ieee802154_pan_device *child;
-> +	__le16 addr;
-> +
-> +	lockdep_assert_held(&wpan_dev->association_lock);
-> +
-> +	do {
-> +		get_random_bytes(&addr, 2);
-> +		if (addr == cpu_to_le16(IEEE802154_ADDR_SHORT_BROADCAST) ||
-> +		    addr == cpu_to_le16(IEEE802154_ADDR_SHORT_UNSPEC))
-> +			continue;
-> +
-> +		if (wpan_dev->short_addr == addr)
-> +			continue;
-> +
-> +		if (wpan_dev->parent && wpan_dev->parent->short_addr == addr)
-> +			continue;
-> +
-> +		list_for_each_entry(child, &wpan_dev->children, node)
-> +			if (child->short_addr == addr)
-> +				continue;
-> +
-> +		break;
-> +	} while (1);
-> +
-> +	return addr;
-> +}
-> +EXPORT_SYMBOL_GPL(cfg802154_get_free_short_addr);
-> diff --git a/net/mac802154/ieee802154_i.h b/net/mac802154/ieee802154_i.h
-> index 92252f86c69c..432bfa87249e 100644
-> --- a/net/mac802154/ieee802154_i.h
-> +++ b/net/mac802154/ieee802154_i.h
-> @@ -318,6 +318,8 @@ static inline bool mac802154_is_associating(struct ieee802154_local *local)
->   int mac802154_send_disassociation_notif(struct ieee802154_sub_if_data *sdata,
->   					struct ieee802154_pan_device *target,
->   					u8 reason);
-> +int mac802154_process_association_req(struct ieee802154_sub_if_data *sdata,
-> +				      struct sk_buff *skb);
->   
->   /* interface handling */
->   int ieee802154_iface_init(void);
-> diff --git a/net/mac802154/rx.c b/net/mac802154/rx.c
-> index d0e08613a36b..96040b63a4fc 100644
-> --- a/net/mac802154/rx.c
-> +++ b/net/mac802154/rx.c
-> @@ -102,6 +102,14 @@ void mac802154_rx_mac_cmd_worker(struct work_struct *work)
->   		mac802154_process_association_resp(mac_pkt->sdata, mac_pkt->skb);
->   		break;
->   
-> +	case IEEE802154_CMD_ASSOCIATION_REQ:
-> +		dev_dbg(&mac_pkt->sdata->dev->dev, "processing ASSOC REQ\n");
-> +		if (mac_pkt->sdata->wpan_dev.iftype != NL802154_IFTYPE_COORD)
-> +			break;
-> +
-> +		mac802154_process_association_req(mac_pkt->sdata, mac_pkt->skb);
-> +		break;
-> +
->   	default:
->   		break;
->   	}
-> diff --git a/net/mac802154/scan.c b/net/mac802154/scan.c
-> index e2f2e1235ec6..9f55b2314fe5 100644
-> --- a/net/mac802154/scan.c
-> +++ b/net/mac802154/scan.c
-> @@ -697,3 +697,150 @@ int mac802154_send_disassociation_notif(struct ieee802154_sub_if_data *sdata,
->   	dev_dbg(&sdata->dev->dev, "DISASSOC ACK received from %8phC\n", &teaddr);
->   	return 0;
->   }
-> +
-> +static int
-> +mac802154_send_association_resp_locked(struct ieee802154_sub_if_data *sdata,
-> +				       struct ieee802154_pan_device *target,
-> +				       struct ieee802154_assoc_resp_pl *assoc_resp_pl)
-> +{
-> +	u64 teaddr = swab64((__force u64)target->extended_addr);
-> +	struct ieee802154_association_resp_frame frame = {};
-> +	struct ieee802154_local *local = sdata->local;
-> +	struct wpan_dev *wpan_dev = &sdata->wpan_dev;
-> +	struct sk_buff *skb;
-> +	int ret;
-> +
-> +	frame.mhr.fc.type = IEEE802154_FC_TYPE_MAC_CMD;
-> +	frame.mhr.fc.security_enabled = 0;
-> +	frame.mhr.fc.frame_pending = 0;
-> +	frame.mhr.fc.ack_request = 1; /* We always expect an ack here */
-> +	frame.mhr.fc.intra_pan = 1;
-> +	frame.mhr.fc.dest_addr_mode = IEEE802154_EXTENDED_ADDRESSING;
-> +	frame.mhr.fc.version = IEEE802154_2003_STD;
-> +	frame.mhr.fc.source_addr_mode = IEEE802154_EXTENDED_ADDRESSING;
-> +	frame.mhr.seq = 10;
+On Sat, Sep 16, 2023 at 11:39=E2=80=AFAM Stefan Schmidt
+<stefan@datenfreihafen.org> wrote:
+>
+> Hello Miquel.
+>
+> On 01.09.23 19:04, Miquel Raynal wrote:
+> > Introduce structures to describe peer devices in a PAN as well as a few
+> > related helpers. We basically care about:
+> > - Our unique parent after associating with a coordinator.
+> > - Peer devices, children, which successfully associated with us.
+> >
+> > Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
+> > ---
+> >   include/net/cfg802154.h | 46 ++++++++++++++++++++++++++++
+> >   net/ieee802154/Makefile |  2 +-
+> >   net/ieee802154/core.c   |  2 ++
+> >   net/ieee802154/pan.c    | 66 ++++++++++++++++++++++++++++++++++++++++=
++
+> >   4 files changed, 115 insertions(+), 1 deletion(-)
+> >   create mode 100644 net/ieee802154/pan.c
+> >
+> > diff --git a/include/net/cfg802154.h b/include/net/cfg802154.h
+> > index f79ce133e51a..6c7193b4873c 100644
+> > --- a/include/net/cfg802154.h
+> > +++ b/include/net/cfg802154.h
+> > @@ -303,6 +303,22 @@ struct ieee802154_coord_desc {
+> >       bool gts_permit;
+> >   };
+> >
+> > +/**
+> > + * struct ieee802154_pan_device - PAN device information
+> > + * @pan_id: the PAN ID of this device
+> > + * @mode: the preferred mode to reach the device
+> > + * @short_addr: the short address of this device
+> > + * @extended_addr: the extended address of this device
+> > + * @node: the list node
+> > + */
+> > +struct ieee802154_pan_device {
+> > +     __le16 pan_id;
+> > +     u8 mode;
+> > +     __le16 short_addr;
+> > +     __le64 extended_addr;
+> > +     struct list_head node;
+> > +};
+> > +
+> >   /**
+> >    * struct cfg802154_scan_request - Scan request
+> >    *
+> > @@ -478,6 +494,11 @@ struct wpan_dev {
+> >
+> >       /* fallback for acknowledgment bit setting */
+> >       bool ackreq;
+> > +
+> > +     /* Associations */
+> > +     struct mutex association_lock;
+> > +     struct ieee802154_pan_device *parent;
+> > +     struct list_head children;
+> >   };
+> >
+> >   #define to_phy(_dev)        container_of(_dev, struct wpan_phy, dev)
+> > @@ -529,4 +550,29 @@ static inline const char *wpan_phy_name(struct wpa=
+n_phy *phy)
+> >   void ieee802154_configure_durations(struct wpan_phy *phy,
+> >                                   unsigned int page, unsigned int chann=
+el);
+> >
+> > +/**
+> > + * cfg802154_device_is_associated - Checks whether we are associated t=
+o any device
+> > + * @wpan_dev: the wpan device
+>
+> Missing return value documentation.
+>
+> > + */
+> > +bool cfg802154_device_is_associated(struct wpan_dev *wpan_dev);
+> > +
+> > +/**
+> > + * cfg802154_device_is_parent - Checks if a device is our coordinator
+> > + * @wpan_dev: the wpan device
+> > + * @target: the expected parent
+> > + * @return: true if @target is our coordinator
+> > + */
+> > +bool cfg802154_device_is_parent(struct wpan_dev *wpan_dev,
+> > +                             struct ieee802154_addr *target);
+> > +
+> > +/**
+> > + * cfg802154_device_is_child - Checks whether a device is associated t=
+o us
+> > + * @wpan_dev: the wpan device
+> > + * @target: the expected child
+> > + * @return: the PAN device
+> > + */
+> > +struct ieee802154_pan_device *
+> > +cfg802154_device_is_child(struct wpan_dev *wpan_dev,
+> > +                       struct ieee802154_addr *target);
+> > +
+> >   #endif /* __NET_CFG802154_H */
+> > diff --git a/net/ieee802154/Makefile b/net/ieee802154/Makefile
+> > index f05b7bdae2aa..7bce67673e83 100644
+> > --- a/net/ieee802154/Makefile
+> > +++ b/net/ieee802154/Makefile
+> > @@ -4,7 +4,7 @@ obj-$(CONFIG_IEEE802154_SOCKET) +=3D ieee802154_socket.=
+o
+> >   obj-y +=3D 6lowpan/
+> >
+> >   ieee802154-y :=3D netlink.o nl-mac.o nl-phy.o nl_policy.o core.o \
+> > -                header_ops.o sysfs.o nl802154.o trace.o
+> > +                header_ops.o sysfs.o nl802154.o trace.o pan.o
+> >   ieee802154_socket-y :=3D socket.o
+> >
+> >   CFLAGS_trace.o :=3D -I$(src)
+> > diff --git a/net/ieee802154/core.c b/net/ieee802154/core.c
+> > index 57546e07e06a..cd69bdbfd59f 100644
+> > --- a/net/ieee802154/core.c
+> > +++ b/net/ieee802154/core.c
+> > @@ -276,6 +276,8 @@ static int cfg802154_netdev_notifier_call(struct no=
+tifier_block *nb,
+> >               wpan_dev->identifier =3D ++rdev->wpan_dev_id;
+> >               list_add_rcu(&wpan_dev->list, &rdev->wpan_dev_list);
+> >               rdev->devlist_generation++;
+> > +             mutex_init(&wpan_dev->association_lock);
+> > +             INIT_LIST_HEAD(&wpan_dev->children);
+> >
+> >               wpan_dev->netdev =3D dev;
+> >               break;
+> > diff --git a/net/ieee802154/pan.c b/net/ieee802154/pan.c
+> > new file mode 100644
+> > index 000000000000..e2a12a42ba2b
+> > --- /dev/null
+> > +++ b/net/ieee802154/pan.c
+> > @@ -0,0 +1,66 @@
+> > +// SPDX-License-Identifier: GPL-2.0
+> > +/*
+> > + * IEEE 802.15.4 PAN management
+> > + *
+> > + * Copyright (C) 2021 Qorvo US, Inc
+> > + * Authors:
+> > + *   - David Girault <david.girault@qorvo.com>
+> > + *   - Miquel Raynal <miquel.raynal@bootlin.com>
+> > + */
+> > +
+> > +#include <linux/kernel.h>
+> > +#include <net/cfg802154.h>
+> > +#include <net/af_ieee802154.h>
+> > +
+> > +static bool cfg802154_same_addr(struct ieee802154_pan_device *a,
+> > +                             struct ieee802154_addr *b)
+> > +{
+> > +     if (!a || !b)
+> > +             return false;
+> > +
+> > +     switch (b->mode) {
+> > +     case IEEE802154_ADDR_SHORT:
+> > +             return a->short_addr =3D=3D b->short_addr;
+> > +     case IEEE802154_ADDR_LONG:
+> > +             return a->extended_addr =3D=3D b->extended_addr;
+> > +     default:
+> > +             return false;
+> > +     }
+> > +}
+>
+> Don't we already have such a helper already?
 
-Where does the 10 come from and what is the meaning?
+There must also be a check on (a->mode !=3D b->mode) because short_addr
+and extended_addr share memory in this struct.
 
-regards
-Stefan Schmidt
+We have something "similar" [0] to this with also checks on panid,
+however it depends what Miquel tries to do here. I can imagine that we
+extend the helper with an enum opt about what to compare.
+
+- Alex
+
+[0] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree=
+/include/net/ieee802154_netdev.h?h=3Dv6.6-rc1#n232
+
