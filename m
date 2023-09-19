@@ -2,53 +2,40 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E621FCD342E
-	for <linux-wpan@archiver.kernel.org>; Tue, 19 Sep 2023 03:11:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4F4AEE6441
+	for <linux-wpan@archiver.kernel.org>; Tue, 19 Sep 2023 07:14:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231217AbjISDLc (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 18 Sep 2023 23:11:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43590 "EHLO
+        id S231683AbjISHO3 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 19 Sep 2023 03:14:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52722 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229522AbjISDLb (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 18 Sep 2023 23:11:31 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 197D8119;
-        Mon, 18 Sep 2023 20:11:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1695093085; x=1726629085;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=//n56qSOGpYjB+Tw3lFwSa+S8fDa2+ZU1y1haKxm4iY=;
-  b=Y0vJSIAda41cB6a6hMxsIjLKf9s3B1PhNoOhlqDuucQVgRWksxHavu3x
-   YoIdXXZ3rtzS16mUye5cSU1TwIxodUBM0Kszf4XqW0qfuosrlPDC7FJQy
-   T4o3ggEOxRYDemaSLKGUQD0GTMCJ/1b39xv5fffdI/+t0BTtbQYCil3wA
-   D+xXrIHJsZvcuyt9ClQswdqPb0ITU4yDgqGuYsoEHH5B/Lcc6bNQgF5vK
-   2ruj48wUTz35WGGfrhotwMz/QleuNjcOiltqQNuzQpO3ZTqkozgru2HDP
-   nYWtonTAJh+gF9ujTo/DFIMvudtj3bLctbv0UVUC5b2goX0QCIHtFjmMv
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10837"; a="378740633"
-X-IronPort-AV: E=Sophos;i="6.02,158,1688454000"; 
-   d="scan'208";a="378740633"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2023 20:11:24 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10837"; a="992995676"
-X-IronPort-AV: E=Sophos;i="6.02,158,1688454000"; 
-   d="scan'208";a="992995676"
-Received: from lkp-server02.sh.intel.com (HELO 9ef86b2655e5) ([10.239.97.151])
-  by fmsmga006.fm.intel.com with ESMTP; 18 Sep 2023 20:11:20 -0700
-Received: from kbuild by 9ef86b2655e5 with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1qiR8w-0006pQ-1V;
-        Tue, 19 Sep 2023 03:11:18 +0000
-Date:   Tue, 19 Sep 2023 11:10:44 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Miquel Raynal <miquel.raynal@bootlin.com>,
+        with ESMTP id S231657AbjISHO1 (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 19 Sep 2023 03:14:27 -0400
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::223])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85F13102;
+        Tue, 19 Sep 2023 00:14:20 -0700 (PDT)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 480FE60003;
+        Tue, 19 Sep 2023 07:14:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+        t=1695107659;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=q/l6e1g7s+stIU++yB3rvtk24THhxw3ngPa5W19YaV0=;
+        b=X4C/yxSC23VIzIuozz1ygE1Z25wRYmvqTiHDMKnlq1Wm/QiGMB5IJlymvQmZeRnflpNsm+
+        thSAPtD16x0mhbdbxgHqrOAspQUMAUat64+uYTUcLC1V5s+tf0vQcvK4E9LJK0vd5OJ+jN
+        bGwky8sxD9dHyl+uZqI6q0Izn6qhBpAHQrbIxHDslJJ+CBJ0ftcZRpOGBjS2SVWnh++6UD
+        8u687IP6O0xBIFIxocHmbqSRlEtkdxuZXgwAh0+2CTIz2XdnJtA5oWZsX8Y2R0QBPI0Mvj
+        ZoyP0eAfDM1CjGvIeIkFkXpdecOCHBlwp4TeARs2f872u65Oq1ZQ6xdheF6ERA==
+Date:   Tue, 19 Sep 2023 09:14:15 +0200
+From:   Miquel Raynal <miquel.raynal@bootlin.com>
+To:     Alexander Aring <aahringo@redhat.com>
+Cc:     Stefan Schmidt <stefan@datenfreihafen.org>,
         Alexander Aring <alex.aring@gmail.com>,
-        Stefan Schmidt <stefan@datenfreihafen.org>,
-        linux-wpan@vger.kernel.org
-Cc:     oe-kbuild-all@lists.linux.dev, Jakub Kicinski <kuba@kernel.org>,
+        linux-wpan@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
         Paolo Abeni <pabeni@redhat.com>,
         Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
         David Girault <david.girault@qorvo.com>,
@@ -56,105 +43,141 @@ Cc:     oe-kbuild-all@lists.linux.dev, Jakub Kicinski <kuba@kernel.org>,
         Frederic Blain <frederic.blain@qorvo.com>,
         Nicolas Schodet <nico@ni.fr.eu.org>,
         Guilhem Imberton <guilhem.imberton@qorvo.com>,
-        Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-        Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: Re: [PATCH wpan-next v3 11/11] ieee802154: Give the user the
- association list
-Message-ID: <202309191044.4ABvPP5X-lkp@intel.com>
-References: <20230918150809.275058-12-miquel.raynal@bootlin.com>
+        Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH wpan-next v2 02/11] ieee802154: Internal PAN management
+Message-ID: <20230919091415.786a8200@xps-13>
+In-Reply-To: <CAK-6q+g5d=LNfqTLpFTTPcscjHqoGGyUOtb+M9unTbE-Jpwxbg@mail.gmail.com>
+References: <20230901170501.1066321-1-miquel.raynal@bootlin.com>
+        <20230901170501.1066321-3-miquel.raynal@bootlin.com>
+        <32cfbf0f-7ac8-5a4c-d9cd-9650a64fc0ea@datenfreihafen.org>
+        <CAK-6q+h1rbG+6=M+ZZfUznHq9GxOwtA1i0c=C9dgQH1qC7sQ=A@mail.gmail.com>
+        <20230918110102.19a43db1@xps-13>
+        <CAK-6q+gcqr=Sgswgzd1pzMQoPEV1jG=_0m51+HsKU_=1b7NYUg@mail.gmail.com>
+        <20230918161502.69818794@xps-13>
+        <CAK-6q+g5d=LNfqTLpFTTPcscjHqoGGyUOtb+M9unTbE-Jpwxbg@mail.gmail.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230918150809.275058-12-miquel.raynal@bootlin.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: miquel.raynal@bootlin.com
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi Miquel,
+Hi Alexander,
 
-kernel test robot noticed the following build errors:
+aahringo@redhat.com wrote on Mon, 18 Sep 2023 19:01:14 -0400:
 
-[auto build test ERROR on net-next/main]
-[also build test ERROR on net/main linus/master v6.6-rc2 next-20230918]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+> Hi,
+>=20
+> On Mon, Sep 18, 2023 at 10:15=E2=80=AFAM Miquel Raynal
+> <miquel.raynal@bootlin.com> wrote:
+> >
+> > Hi Alexander,
+> >
+> > =20
+> > > > > > > +// SPDX-License-Identifier: GPL-2.0
+> > > > > > > +/*
+> > > > > > > + * IEEE 802.15.4 PAN management
+> > > > > > > + *
+> > > > > > > + * Copyright (C) 2021 Qorvo US, Inc
+> > > > > > > + * Authors:
+> > > > > > > + *   - David Girault <david.girault@qorvo.com>
+> > > > > > > + *   - Miquel Raynal <miquel.raynal@bootlin.com>
+> > > > > > > + */
+> > > > > > > +
+> > > > > > > +#include <linux/kernel.h>
+> > > > > > > +#include <net/cfg802154.h>
+> > > > > > > +#include <net/af_ieee802154.h>
+> > > > > > > +
+> > > > > > > +static bool cfg802154_same_addr(struct ieee802154_pan_device=
+ *a,
+> > > > > > > +                             struct ieee802154_addr *b)
+> > > > > > > +{
+> > > > > > > +     if (!a || !b)
+> > > > > > > +             return false;
+> > > > > > > +
+> > > > > > > +     switch (b->mode) {
+> > > > > > > +     case IEEE802154_ADDR_SHORT:
+> > > > > > > +             return a->short_addr =3D=3D b->short_addr;
+> > > > > > > +     case IEEE802154_ADDR_LONG:
+> > > > > > > +             return a->extended_addr =3D=3D b->extended_addr;
+> > > > > > > +     default:
+> > > > > > > +             return false;
+> > > > > > > +     }
+> > > > > > > +} =20
+> > > > > >
+> > > > > > Don't we already have such a helper already? =20
+> > > > >
+> > > > > There must also be a check on (a->mode !=3D b->mode) because shor=
+t_addr
+> > > > > and extended_addr share memory in this struct. =20
+> > > >
+> > > > True.
+> > > >
+> > > > Actually the ieee802154_addr structure uses an enum to store either
+> > > > the short address or the extended addres, while at the MAC level I'd
+> > > > like to compare with what I call a ieee802154_pan_device: the PAN
+> > > > device is part of a list defining the associated neighbors and cont=
+ains
+> > > > both an extended address and a short address once associated.
+> > > >
+> > > > I do not want to compare the PAN ID here and I do not need to compa=
+re
+> > > > if the modes are different because the device the code is running on
+> > > > is known to have both an extended address and a short address field
+> > > > which have been initialized.
+> > > > =20
+> > >
+> > > I see, so it is guaranteed that the mode value is the same? =20
+> >
+> > I looked more carefully at the code of the association section,
+> > we will always know the extended address of the devices which are
+> > associated to us, however there may be situations where the second
+> > device to compare with this list only comes with a short address and pan
+> > ID, so your initial comment needs to be addressed.
+> > =20
+> > > > With all these constraints, I think it would require more code to
+> > > > re-use that small function than just writing a slightly different o=
+ne
+> > > > here which fully covers the "under association/disassociation" case=
+, no?
+> > > > =20
+> > >
+> > > I am questioning here currently myself if it's enough to uniquely
+> > > identify devices with only short or extended. For extended I would say
+> > > yes, for short I would say no. =20
+> >
+> > As long as we know the PAN ID, it should be fine.
+> > =20
+>=20
+> yep, so you will add a check of panid when mode is short address type?
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Miquel-Raynal/ieee802154-Let-PAN-IDs-be-reset/20230919-002634
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20230918150809.275058-12-miquel.raynal%40bootlin.com
-patch subject: [PATCH wpan-next v3 11/11] ieee802154: Give the user the association list
-config: powerpc64-randconfig-001-20230919 (https://download.01.org/0day-ci/archive/20230919/202309191044.4ABvPP5X-lkp@intel.com/config)
-compiler: powerpc64-linux-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20230919/202309191044.4ABvPP5X-lkp@intel.com/reproduce)
+The above sentence was meant "in the common case". But here we are in a
+very specific location which does not really apply to the common case.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202309191044.4ABvPP5X-lkp@intel.com/
+During associations (because this is all what this is about), the stack
+always saves the extended address, and when it is known, the short
+address as well.
 
-All errors (new ones prefixed by >>):
+When I need these comparisons, it is because a device (parent or
+children) has requested an association or a disassociation, and I want
+to find the local "structure" which matches it. I looked again at the
+specification, it says:
+- In the case of an association request, the device will use its
+  extended address only.
+- In the case of a disassociation notification, the device will also
+  use its extended address only and will address it to the
+  coordinator using the right PAN ID. So actually, on one side, the
+  "we might use the short address" never applies and on the other
+  side, checking the PAN ID *here* is not relevant either as it
+  should be done earlier (and the disassociation canceled if the wrong
+  PAN ID is used).
 
-   net/ieee802154/nl802154.c: In function 'nl802154_list_associations':
->> net/ieee802154/nl802154.c:1778:15: error: implicit declaration of function 'nl802154_prepare_wpan_dev_dump' [-Werror=implicit-function-declaration]
-    1778 |         err = nl802154_prepare_wpan_dev_dump(skb, cb, &rdev, &wpan_dev);
-         |               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->> net/ieee802154/nl802154.c:1811:9: error: implicit declaration of function 'nl802154_finish_wpan_dev_dump' [-Werror=implicit-function-declaration]
-    1811 |         nl802154_finish_wpan_dev_dump(rdev);
-         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   cc1: some warnings being treated as errors
+So in v4 I will just error out if one uses short addressing in this
+function, because it would make no sense at all. I will also check the
+PAN ID in the disassociation procedure.
 
-
-vim +/nl802154_prepare_wpan_dev_dump +1778 net/ieee802154/nl802154.c
-
-  1769	
-  1770	static int nl802154_list_associations(struct sk_buff *skb,
-  1771					      struct netlink_callback *cb)
-  1772	{
-  1773		struct cfg802154_registered_device *rdev;
-  1774		struct ieee802154_pan_device *child;
-  1775		struct wpan_dev *wpan_dev;
-  1776		int err;
-  1777	
-> 1778		err = nl802154_prepare_wpan_dev_dump(skb, cb, &rdev, &wpan_dev);
-  1779		if (err)
-  1780			return err;
-  1781	
-  1782		mutex_lock(&wpan_dev->association_lock);
-  1783	
-  1784		if (cb->args[2])
-  1785			goto out;
-  1786	
-  1787		if (wpan_dev->parent) {
-  1788			err = nl802154_send_peer_info(skb, cb, cb->nlh->nlmsg_seq,
-  1789						      NLM_F_MULTI, rdev, wpan_dev,
-  1790						      wpan_dev->parent,
-  1791						      NL802154_PEER_TYPE_PARENT);
-  1792			if (err < 0)
-  1793				goto out_err;
-  1794		}
-  1795	
-  1796		list_for_each_entry(child, &wpan_dev->children, node) {
-  1797			err = nl802154_send_peer_info(skb, cb, cb->nlh->nlmsg_seq,
-  1798						      NLM_F_MULTI, rdev, wpan_dev,
-  1799						      child,
-  1800						      NL802154_PEER_TYPE_CHILD);
-  1801			if (err < 0)
-  1802				goto out_err;
-  1803		}
-  1804	
-  1805		cb->args[2] = 1;
-  1806	out:
-  1807		err = skb->len;
-  1808	out_err:
-  1809		mutex_unlock(&wpan_dev->association_lock);
-  1810	
-> 1811		nl802154_finish_wpan_dev_dump(rdev);
-  1812	
-  1813		return err;
-  1814	}
-  1815	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Thanks,
+Miqu=C3=A8l
