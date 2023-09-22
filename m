@@ -2,32 +2,32 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B373AE6FE52
-	for <linux-wpan@archiver.kernel.org>; Fri, 22 Sep 2023 15:50:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71D8FE6FE58
+	for <linux-wpan@archiver.kernel.org>; Fri, 22 Sep 2023 15:50:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231477AbjIVPu4 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        id S231462AbjIVPu4 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
         Fri, 22 Sep 2023 11:50:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58316 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58338 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231449AbjIVPuz (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Fri, 22 Sep 2023 11:50:55 -0400
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::223])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61CB8122;
-        Fri, 22 Sep 2023 08:50:48 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 6A1F160003;
-        Fri, 22 Sep 2023 15:50:45 +0000 (UTC)
+        with ESMTP id S231551AbjIVPu4 (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 22 Sep 2023 11:50:56 -0400
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EBA2139;
+        Fri, 22 Sep 2023 08:50:49 -0700 (PDT)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 07BAB6000C;
+        Fri, 22 Sep 2023 15:50:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1695397846;
+        t=1695397848;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=OxrcaWjW3sTUa6UJSQzcptgX3Fr1ugD71QaKu8KFjBY=;
-        b=IEpkzFJQf/VNIZkif3JVyc4XmrTn0mbKC/0Hd40Ppt1LBsVwn/7TjSViiOjGvndjwY13+2
-        2mRvweYlUpGO4jx+TiXI0YXlEdtogd0qOYW5/NY7aONZeQC7/LQZ4im1MfOxAQZ3W2A2Ir
-        4RSsxaRW65TvdSpNIMDryLKwOPVSFZyHRvdguj/DUEooFf+a+dEsfwbnrgmdAITFMAShZP
-        nzcZ//xEUolLtj4gaWnIbsvlbPbmk3wDMQ/6RBLiM5HNZMqOT0aXovNTPPC4YU+eQ6uNww
-        VZx0r+FRXkz6kZkmNyZJnwUA6M3bEpeYpPjH+KpfbxNd3H/Hr5bULVb5RGZzYA==
+        bh=D2g9n9lswzcBo3flKXhguoGxDZMbhMWh7yiUi9YGpu0=;
+        b=ADavqCvWjAx9wXwleasIQolQr9dnjP7StpQ6vgtG+IMpIILWPSVrQCgAF4W87kGnF6M+80
+        KvrgwLApL3t0gGEC451MJGfwatIpyeC/b5ISlphD1gnENm0Hc2gGT6133ZYTwMxK8Mbqiw
+        yVI4ONBwmthD5KowzVvmYjaxV8JxoVu7LaheicTtK3Ego7umbCEEITH03Gnl37iIsb6HUe
+        QGZzVD6rAYDuBdmclFcdbb0/WGMOj6WF6AqPXVfpd02TUXgGgVILiQJ9hLtHxoJF8PJYcf
+        a3HYVdSdhSDjyHaqUl8bSCu6W3S7cxqlZ4HcCyC+AJW1qR0muATlts+xsAAypw==
 From:   Miquel Raynal <miquel.raynal@bootlin.com>
 To:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
@@ -43,9 +43,9 @@ Cc:     "David S. Miller" <davem@davemloft.net>,
         Guilhem Imberton <guilhem.imberton@qorvo.com>,
         Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
         Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: [PATCH wpan-next v4 09/11] mac802154: Follow the number of associated devices
-Date:   Fri, 22 Sep 2023 17:50:27 +0200
-Message-Id: <20230922155029.592018-10-miquel.raynal@bootlin.com>
+Subject: [PATCH wpan-next v4 10/11] mac802154: Handle disassociation notifications from peers
+Date:   Fri, 22 Sep 2023 17:50:28 +0200
+Message-Id: <20230922155029.592018-11-miquel.raynal@bootlin.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230922155029.592018-1-miquel.raynal@bootlin.com>
 References: <20230922155029.592018-1-miquel.raynal@bootlin.com>
@@ -56,113 +56,114 @@ Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Track the count of associated devices. Limit the number of associations
-using the value provided by the user if any. If we reach the maximum
-number of associations, we tell the device we are at capacity. If the
-user do not want to accept any more associations, it may specify the
-value 0 to the maximum number of associations, which will lead to an
-access denied error status returned to the peers trying to associate.
+Peers may decided to disassociate from us, their coordinator, in this
+case they will send a disassociation notification which we must
+acknowledge. If we don't, the peer device considers itself disassociated
+anyway. We also need to drop the reference to this child from our
+internal structures.
 
 Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
 ---
- include/net/cfg802154.h |  1 +
- net/ieee802154/core.c   |  2 ++
- net/mac802154/cfg.c     |  1 +
- net/mac802154/scan.c    | 33 +++++++++++++++++++++++----------
- 4 files changed, 27 insertions(+), 10 deletions(-)
+ net/mac802154/ieee802154_i.h |  2 ++
+ net/mac802154/rx.c           |  8 ++++++
+ net/mac802154/scan.c         | 55 ++++++++++++++++++++++++++++++++++++
+ 3 files changed, 65 insertions(+)
 
-diff --git a/include/net/cfg802154.h b/include/net/cfg802154.h
-index 0d3e9af00198..a64bbcd71f10 100644
---- a/include/net/cfg802154.h
-+++ b/include/net/cfg802154.h
-@@ -507,6 +507,7 @@ struct wpan_dev {
- 	struct ieee802154_pan_device *parent;
- 	struct list_head children;
- 	unsigned int max_associations;
-+	unsigned int nchildren;
- };
+diff --git a/net/mac802154/ieee802154_i.h b/net/mac802154/ieee802154_i.h
+index 432bfa87249e..08dd521a51a5 100644
+--- a/net/mac802154/ieee802154_i.h
++++ b/net/mac802154/ieee802154_i.h
+@@ -318,6 +318,8 @@ static inline bool mac802154_is_associating(struct ieee802154_local *local)
+ int mac802154_send_disassociation_notif(struct ieee802154_sub_if_data *sdata,
+ 					struct ieee802154_pan_device *target,
+ 					u8 reason);
++int mac802154_process_disassociation_notif(struct ieee802154_sub_if_data *sdata,
++					   struct sk_buff *skb);
+ int mac802154_process_association_req(struct ieee802154_sub_if_data *sdata,
+ 				      struct sk_buff *skb);
  
- #define to_phy(_dev)	container_of(_dev, struct wpan_phy, dev)
-diff --git a/net/ieee802154/core.c b/net/ieee802154/core.c
-index 2d6fe45efa05..60e8fff1347e 100644
---- a/net/ieee802154/core.c
-+++ b/net/ieee802154/core.c
-@@ -212,6 +212,8 @@ static void cfg802154_free_peer_structures(struct wpan_dev *wpan_dev)
- 		kfree(child);
- 	}
+diff --git a/net/mac802154/rx.c b/net/mac802154/rx.c
+index 96040b63a4fc..0024341ef9c5 100644
+--- a/net/mac802154/rx.c
++++ b/net/mac802154/rx.c
+@@ -110,6 +110,14 @@ void mac802154_rx_mac_cmd_worker(struct work_struct *work)
+ 		mac802154_process_association_req(mac_pkt->sdata, mac_pkt->skb);
+ 		break;
  
-+	wpan_dev->nchildren = 0;
++	case IEEE802154_CMD_DISASSOCIATION_NOTIFY:
++		dev_dbg(&mac_pkt->sdata->dev->dev, "processing DISASSOC NOTIF\n");
++		if (mac_pkt->sdata->wpan_dev.iftype != NL802154_IFTYPE_COORD)
++			break;
 +
- 	mutex_unlock(&wpan_dev->association_lock);
- }
- 
-diff --git a/net/mac802154/cfg.c b/net/mac802154/cfg.c
-index 0d0aed788f57..4a85fa674f66 100644
---- a/net/mac802154/cfg.c
-+++ b/net/mac802154/cfg.c
-@@ -454,6 +454,7 @@ static int mac802154_disassociate_child(struct wpan_phy *wpan_phy,
- 		return ret;
- 
- 	list_del(&child->node);
-+	wpan_dev->nchildren--;
- 	kfree(child);
- 
- 	return 0;
++		mac802154_process_disassociation_notif(mac_pkt->sdata, mac_pkt->skb);
++		break;
++
+ 	default:
+ 		break;
+ 	}
 diff --git a/net/mac802154/scan.c b/net/mac802154/scan.c
-index d5f66c204bc5..81d2c2bb1f09 100644
+index 81d2c2bb1f09..7597072aed57 100644
 --- a/net/mac802154/scan.c
 +++ b/net/mac802154/scan.c
-@@ -800,20 +800,32 @@ int mac802154_process_association_req(struct ieee802154_sub_if_data *sdata,
- 	child->mode = IEEE802154_EXTENDED_ADDRESSING;
- 	ceaddr = swab64((__force u64)child->extended_addr);
- 
--	assoc_resp_pl.status = IEEE802154_ASSOCIATION_SUCCESSFUL;
--	if (assoc_req_pl.alloc_addr) {
--		assoc_resp_pl.short_addr = cfg802154_get_free_short_addr(wpan_dev);
--		child->mode = IEEE802154_SHORT_ADDRESSING;
-+	if (wpan_dev->nchildren >= wpan_dev->max_associations) {
-+		if (!wpan_dev->max_associations)
-+			assoc_resp_pl.status = IEEE802154_PAN_ACCESS_DENIED;
-+		else
-+			assoc_resp_pl.status = IEEE802154_PAN_AT_CAPACITY;
-+		assoc_resp_pl.short_addr = cpu_to_le16(IEEE802154_ADDR_SHORT_BROADCAST);
-+		dev_dbg(&sdata->dev->dev,
-+			"Refusing ASSOC REQ from child %8phC, %s\n", &ceaddr,
-+			assoc_resp_pl.status == IEEE802154_PAN_ACCESS_DENIED ?
-+			"access denied" : "too many children");
- 	} else {
--		assoc_resp_pl.short_addr = cpu_to_le16(IEEE802154_ADDR_SHORT_UNSPEC);
-+		assoc_resp_pl.status = IEEE802154_ASSOCIATION_SUCCESSFUL;
-+		if (assoc_req_pl.alloc_addr) {
-+			assoc_resp_pl.short_addr = cfg802154_get_free_short_addr(wpan_dev);
-+			child->mode = IEEE802154_SHORT_ADDRESSING;
-+		} else {
-+			assoc_resp_pl.short_addr = cpu_to_le16(IEEE802154_ADDR_SHORT_UNSPEC);
-+		}
-+		child->short_addr = assoc_resp_pl.short_addr;
-+		dev_dbg(&sdata->dev->dev,
-+			"Accepting ASSOC REQ from child %8phC, providing short address 0x%04x\n",
-+			&ceaddr, le16_to_cpu(child->short_addr));
- 	}
--	child->short_addr = assoc_resp_pl.short_addr;
--	dev_dbg(&sdata->dev->dev,
--		"Accepting ASSOC REQ from child %8phC, providing short address 0x%04x\n",
--		&ceaddr, le16_to_cpu(child->short_addr));
- 
- 	ret = mac802154_send_association_resp_locked(sdata, child, &assoc_resp_pl);
--	if (ret) {
-+	if (ret || assoc_resp_pl.status != IEEE802154_ASSOCIATION_SUCCESSFUL) {
- 		kfree(child);
- 		goto unlock;
- 	}
-@@ -834,6 +846,7 @@ int mac802154_process_association_req(struct ieee802154_sub_if_data *sdata,
- 	}
- 
- 	list_add(&child->node, &wpan_dev->children);
-+	wpan_dev->nchildren++;
- 
- unlock:
+@@ -852,3 +852,58 @@ int mac802154_process_association_req(struct ieee802154_sub_if_data *sdata,
  	mutex_unlock(&wpan_dev->association_lock);
+ 	return ret;
+ }
++
++int mac802154_process_disassociation_notif(struct ieee802154_sub_if_data *sdata,
++					   struct sk_buff *skb)
++{
++	struct ieee802154_addr *src = &mac_cb(skb)->source;
++	struct ieee802154_addr *dest = &mac_cb(skb)->dest;
++	struct wpan_dev *wpan_dev = &sdata->wpan_dev;
++	struct ieee802154_pan_device *child;
++	struct ieee802154_addr target;
++	bool parent;
++	u64 teaddr;
++
++	if (skb->len != sizeof(u8))
++		return -EINVAL;
++
++	if (unlikely(src->mode != IEEE802154_EXTENDED_ADDRESSING))
++		return -EINVAL;
++
++	if (dest->mode == IEEE802154_EXTENDED_ADDRESSING &&
++	    unlikely(dest->extended_addr != wpan_dev->extended_addr))
++		return -ENODEV;
++	else if (dest->mode == IEEE802154_SHORT_ADDRESSING &&
++		 unlikely(dest->short_addr != wpan_dev->short_addr))
++		return -ENODEV;
++
++	if (dest->pan_id != wpan_dev->pan_id)
++		return -ENODEV;
++
++	target.mode = IEEE802154_EXTENDED_ADDRESSING;
++	target.extended_addr = src->extended_addr;
++	teaddr = swab64((__force u64)target.extended_addr);
++	dev_dbg(&skb->dev->dev, "Processing DISASSOC NOTIF from %8phC\n", &teaddr);
++
++	mutex_lock(&wpan_dev->association_lock);
++	parent = cfg802154_device_is_parent(wpan_dev, &target);
++	if (!parent)
++		child = cfg802154_device_is_child(wpan_dev, &target);
++	if (!parent && !child) {
++		mutex_unlock(&wpan_dev->association_lock);
++		return -EINVAL;
++	}
++
++	if (parent) {
++		kfree(wpan_dev->parent);
++		wpan_dev->parent = NULL;
++	} else {
++		list_del(&child->node);
++		kfree(child);
++		wpan_dev->nchildren--;
++	}
++
++	mutex_unlock(&wpan_dev->association_lock);
++
++	return 0;
++}
 -- 
 2.34.1
 
