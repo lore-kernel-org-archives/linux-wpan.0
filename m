@@ -2,183 +2,209 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBC14C04FE8
-	for <linux-wpan@archiver.kernel.org>; Wed, 20 Sep 2023 18:48:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27679E7D0BC
+	for <linux-wpan@archiver.kernel.org>; Fri, 22 Sep 2023 01:55:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229563AbjITSsi (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 20 Sep 2023 14:48:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41640 "EHLO
+        id S230128AbjIVBz7 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Thu, 21 Sep 2023 21:55:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43160 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229527AbjITSsh (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 20 Sep 2023 14:48:37 -0400
-Received: from proxima.lasnet.de (proxima.lasnet.de [78.47.171.185])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CA62B4;
-        Wed, 20 Sep 2023 11:48:31 -0700 (PDT)
-Received: from [192.168.2.51] (p4fe71b42.dip0.t-ipconnect.de [79.231.27.66])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits))
-        (No client certificate requested)
-        (Authenticated sender: stefan@datenfreihafen.org)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id 671F7C0280;
-        Wed, 20 Sep 2023 20:48:29 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
-        s=2021; t=1695235709;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=m15CFo9E09aSbx3+WeJa2pRTiKle109AiaXE5EDQYpo=;
-        b=KZHpXJbjpAD2NTkr7v2RitCTXcTGonOiziFs1YLfKaYZhOGpDb6riClU/h2EXJ1qHXiqYR
-        LF9ACGG9vos5peiafaBtRElIylzxWDz++3hnuWhX+Udsxh9q/GAEUZb/Y/bPFvMsR7v8Aj
-        V34Apgy8rNo/IIYb0L8YgrRH+aBylyQCXmwoMz5A14tPKKbkVAP2liTe/azLqDEBiOOoY4
-        xOjVYWA5DqKrqAfDxdPhXAHTEUOXedO3b6ajAJ7x5QxV+WOIkx9G9YaEcA7jxSJtzP3MId
-        NqPPO1e4GlyaktSAWYrKXtTaZVSvqcOpO7Fh9w/zYVSsGwJtMIKPUwDMGiRTOw==
-Message-ID: <92d125a3-bd3f-63ba-0a5f-9f05068a6282@datenfreihafen.org>
-Date:   Wed, 20 Sep 2023 20:46:20 +0200
+        with ESMTP id S229550AbjIVBz7 (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 21 Sep 2023 21:55:59 -0400
+Received: from mail-oi1-f206.google.com (mail-oi1-f206.google.com [209.85.167.206])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2B9DF1
+        for <linux-wpan@vger.kernel.org>; Thu, 21 Sep 2023 18:55:52 -0700 (PDT)
+Received: by mail-oi1-f206.google.com with SMTP id 5614622812f47-3ae10875717so1144461b6e.1
+        for <linux-wpan@vger.kernel.org>; Thu, 21 Sep 2023 18:55:52 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695347752; x=1695952552;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=UMGcT7azSmaIpI7Mr5U/Wl+GeL1wdTGUzossfsv3VgA=;
+        b=BBIdJIKe4TE7w4S+koHyEZ9VKsKNvVGHEg5IFEkBgdjnq8HUHfe//+PJ9XffX6259o
+         azST1NguMIsqUh80SPWajkL7Ha1WKXAlBHGc3Un1JzR/rdanmWYBrf0IZcMkPqQUHDHF
+         tlFryCQpq/ng4+18vTt7HLX6qE/Sgl2shbKEq1J7XdrBS31b4IY9TNeqmuj+xCnY7uAW
+         JXNI6AcrDY3FLMJV3jibJhpFQo5mg/O9w6ML5QoQ2TWYI6kLJdlWuy9+EEofnpqBFTx6
+         y0bWWD4ooI/Iq2F5f/snMJ4m5ODYD+PaviYQBvC7mIqSa2uZ9jcL6+19m11Jwb9rA+vZ
+         tZwA==
+X-Gm-Message-State: AOJu0Yxh4ZMN7t5LDclk3+CDqfs1NBSIJw5Yy/jYZIWT4IJwyquh9ThO
+        mi2+KYWV5Fqpw507xcTTVTlMPHuqJjcjmNSvBAuTxo9RZUXQ
+X-Google-Smtp-Source: AGHT+IG7C+7JIRSlG/ocN4yRtFdfHebIRpyMNTtFV9qU88kUAUQkPjJe3iVwBDRaTkLiGd18g1q711Iton0ri/WRyLjPVIwKI5xa
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH wpan-next v3 00/11] ieee802154: Associations between
- devices
-Content-Language: en-US
-To:     Miquel Raynal <miquel.raynal@bootlin.com>,
-        Alexander Aring <alex.aring@gmail.com>,
-        linux-wpan@vger.kernel.org
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
-        David Girault <david.girault@qorvo.com>,
-        Romuald Despres <romuald.despres@qorvo.com>,
-        Frederic Blain <frederic.blain@qorvo.com>,
-        Nicolas Schodet <nico@ni.fr.eu.org>,
-        Guilhem Imberton <guilhem.imberton@qorvo.com>,
-        Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-References: <20230918150809.275058-1-miquel.raynal@bootlin.com>
-From:   Stefan Schmidt <stefan@datenfreihafen.org>
-In-Reply-To: <20230918150809.275058-1-miquel.raynal@bootlin.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6808:308e:b0:3ae:16a8:f441 with SMTP id
+ bl14-20020a056808308e00b003ae16a8f441mr489962oib.11.1695347752268; Thu, 21
+ Sep 2023 18:55:52 -0700 (PDT)
+Date:   Thu, 21 Sep 2023 18:55:52 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000008b78c00605e8e8aa@google.com>
+Subject: [syzbot] [wpan?] [input?] [usb?] memory leak in hwsim_add_one (2)
+From:   syzbot <syzbot+d2aa0f55c4ae66a9b75d@syzkaller.appspotmail.com>
+To:     alex.aring@gmail.com, davem@davemloft.net, edumazet@google.com,
+        kuba@kernel.org, linux-input@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
+        linux-wpan@vger.kernel.org, miquel.raynal@bootlin.com,
+        netdev@vger.kernel.org, pabeni@redhat.com,
+        stefan@datenfreihafen.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello Miquel
+Hello,
 
-On 18.09.23 17:07, Miquel Raynal wrote:
-> Hello,
-> 
-> [I know we are in the middle of the merge window, I don't think it
-> matters on the wpan side, so as the wpan subsystem did not evolve
-> much since the previous merge window I figured I would not delay the
-> sending of this series given the fact that I should have send it at the
-> beginning of the summer...]
-> 
-> Now that we can discover our peer coordinators or make ourselves
-> dynamically discoverable, we may use the information about surrounding
-> devices to create PANs dynamically. This involves of course:
-> * Requesting an association to a coordinator, waiting for the response
-> * Sending a disassociation notification to a coordinator
-> * Receiving an association request when we are coordinator, answering
->    the request (for now all devices are accepted up to a limit, to be
->    refined)
-> * Sending a disassociation notification to a child
-> * Users may request the list of associated devices (the parent and the
->    children).
-> 
-> Here are a few example of userspace calls that can be made:
-> iwpan dev <dev> associate pan_id 2 coord $COORD
-> iwpan dev <dev> list_associations
-> iwpan dev <dev> disassociate ext_addr $COORD
-> 
-> I used a small using hwsim to scan for a coordinator, associate with
-> it, look at the associations on both sides, disassociate from it and
-> check the associations again:
-> ./assoc-demo
-> *** Scan ***
-> PAN 0x0002 (on wpan1)
-> 	coordinator 0x060f3b35169a498f
-> 	page 0
-> 	channel 13
-> 	preamble code 0
-> 	mean prf 0
-> 	superframe spec. 0xcf11
-> 	LQI ff
-> *** End of scan ***
-> Associating wpan1 with coord0 0x060f3b35169a498f...
-> Dumping coord0 assoc:
-> child : 0x0b6f / 0xba7633ae47ccfb21
-> Dumping wpan1 assoc:
-> parent: 0xffff / 0x060f3b35169a498f
-> Disassociating from wpan1
-> Dumping coord0 assoc:
-> Dumping wpan1 assoc:
-> 
-> I could also successfully interact with a smaller device running Zephir,
-> using its command line interface to associate and then disassociate from
-> the Linux coordinator.
-> 
-> Thanks!
-> Miquèl
-> 
-> Changes in v3:
-> * Clarify a helper which compares if two devices seem to be identical by
->    adding two comments. This is a static function that is only used by
->    the PAN management core to operate or not an
->    association/disassociation request. In this helper, a new check is
->    introduced to be sure we compare fields which have been populated.
-> * Dropped the "association_generation" counter and all its uses along
->    the code. I tried to mimic some other counter but I agree it is not
->    super useful and could be dropped anyway.
-> * Dropped a faulty sequence number hardcoded to 10. This had no impact
->    because a few lines later the same entry was set to a valid value.
-> 
-> Changes in v2:
-> * Drop the misleading IEEE802154_ADDR_LONG_BROADCAST definition and its
->    only use which was useless anyway.
-> * Clarified how devices are defined when the user requests to associate
->    with a coordinator: for now only the extended address of the
->    coordinator is relevant so this is the only address we care about.
-> * Drop a useless NULL check before a kfree() call.
-> * Add a check when allocating a child short address: it must be
->    different than ours.
-> * Rebased on top of v6.5.
-> 
-> Miquel Raynal (11):
->    ieee802154: Let PAN IDs be reset
->    ieee802154: Internal PAN management
->    ieee802154: Add support for user association requests
->    mac802154: Handle associating
->    ieee802154: Add support for user disassociation requests
->    mac802154: Handle disassociations
->    mac802154: Handle association requests from peers
->    ieee802154: Add support for limiting the number of associated devices
->    mac802154: Follow the number of associated devices
->    mac802154: Handle disassociation notifications from peers
->    ieee802154: Give the user the association list
-> 
->   include/net/cfg802154.h         |  69 ++++++
->   include/net/ieee802154_netdev.h |  60 +++++
->   include/net/nl802154.h          |  22 +-
->   net/ieee802154/Makefile         |   2 +-
->   net/ieee802154/core.c           |  24 ++
->   net/ieee802154/nl802154.c       | 223 +++++++++++++++++-
->   net/ieee802154/pan.c            | 115 +++++++++
->   net/ieee802154/rdev-ops.h       |  30 +++
->   net/ieee802154/trace.h          |  38 +++
->   net/mac802154/cfg.c             | 170 ++++++++++++++
->   net/mac802154/ieee802154_i.h    |  27 +++
->   net/mac802154/main.c            |   2 +
->   net/mac802154/rx.c              |  25 ++
->   net/mac802154/scan.c            | 397 ++++++++++++++++++++++++++++++++
->   14 files changed, 1191 insertions(+), 13 deletions(-)
->   create mode 100644 net/ieee802154/pan.c
+syzbot found the following issue on:
 
-With my requests for patch 02/11 taken into account and the fallout for 
-the experimental config options fixed (as krobot detected) I am happy 
-with this patchset.
+HEAD commit:    e789286468a9 Merge tag 'x86-urgent-2023-09-17' of git://gi..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=16db487fa80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=943a94479fa8e863
+dashboard link: https://syzkaller.appspot.com/bug?extid=d2aa0f55c4ae66a9b75d
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15cc8372680000
 
-Acked-by: Stefan Schmidt <stefan@datenfreihafen.org>
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/60bec5b60566/disk-e7892864.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/509a449f2ff0/vmlinux-e7892864.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/36581da19789/bzImage-e7892864.xz
 
-regards
-Stefan Schmidt
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+d2aa0f55c4ae66a9b75d@syzkaller.appspotmail.com
+
+BUG: memory leak
+unreferenced object 0xffff8881042a8940 (size 64):
+  comm "swapper/0", pid 1, jiffies 4294937901 (age 1085.750s)
+  hex dump (first 32 bytes):
+    00 0d 00 00 00 00 00 00 ff ff ff ff 00 00 00 00  ................
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+  backtrace:
+    [<ffffffff81573dc5>] kmalloc_trace+0x25/0x90 mm/slab_common.c:1114
+    [<ffffffff831b5a6a>] kmalloc include/linux/slab.h:599 [inline]
+    [<ffffffff831b5a6a>] kzalloc include/linux/slab.h:720 [inline]
+    [<ffffffff831b5a6a>] hwsim_add_one+0x14a/0x650 drivers/net/ieee802154/mac802154_hwsim.c:949
+    [<ffffffff831b5f93>] hwsim_probe+0x23/0xe0 drivers/net/ieee802154/mac802154_hwsim.c:1022
+    [<ffffffff82c14f93>] platform_probe+0x83/0x110 drivers/base/platform.c:1404
+    [<ffffffff82c10fc6>] call_driver_probe drivers/base/dd.c:579 [inline]
+    [<ffffffff82c10fc6>] really_probe+0x126/0x440 drivers/base/dd.c:658
+    [<ffffffff82c113a3>] __driver_probe_device+0xc3/0x190 drivers/base/dd.c:800
+    [<ffffffff82c1149a>] driver_probe_device+0x2a/0x120 drivers/base/dd.c:830
+    [<ffffffff82c117f7>] __driver_attach drivers/base/dd.c:1216 [inline]
+    [<ffffffff82c117f7>] __driver_attach+0x107/0x1f0 drivers/base/dd.c:1156
+    [<ffffffff82c0e2f3>] bus_for_each_dev+0xb3/0x110 drivers/base/bus.c:368
+    [<ffffffff82c0fdf6>] bus_add_driver+0x126/0x2a0 drivers/base/bus.c:673
+    [<ffffffff82c12ee5>] driver_register+0x85/0x180 drivers/base/driver.c:246
+    [<ffffffff8756e3a6>] hwsim_init_module+0xc6/0x110 drivers/net/ieee802154/mac802154_hwsim.c:1073
+    [<ffffffff81001cb6>] do_one_initcall+0x76/0x430 init/main.c:1232
+    [<ffffffff874d76ea>] do_initcall_level init/main.c:1294 [inline]
+    [<ffffffff874d76ea>] do_initcalls init/main.c:1310 [inline]
+    [<ffffffff874d76ea>] do_basic_setup init/main.c:1329 [inline]
+    [<ffffffff874d76ea>] kernel_init_freeable+0x25a/0x460 init/main.c:1547
+    [<ffffffff84b3628b>] kernel_init+0x1b/0x290 init/main.c:1437
+    [<ffffffff81149e35>] ret_from_fork+0x45/0x50 arch/x86/kernel/process.c:147
+
+BUG: memory leak
+unreferenced object 0xffff8881042a8780 (size 64):
+  comm "swapper/0", pid 1, jiffies 4294937902 (age 1085.740s)
+  hex dump (first 32 bytes):
+    00 0d 00 00 00 00 00 00 ff ff ff ff 00 00 00 00  ................
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+  backtrace:
+    [<ffffffff81573dc5>] kmalloc_trace+0x25/0x90 mm/slab_common.c:1114
+    [<ffffffff831b5a6a>] kmalloc include/linux/slab.h:599 [inline]
+    [<ffffffff831b5a6a>] kzalloc include/linux/slab.h:720 [inline]
+    [<ffffffff831b5a6a>] hwsim_add_one+0x14a/0x650 drivers/net/ieee802154/mac802154_hwsim.c:949
+    [<ffffffff831b5fb6>] hwsim_probe+0x46/0xe0 drivers/net/ieee802154/mac802154_hwsim.c:1022
+    [<ffffffff82c14f93>] platform_probe+0x83/0x110 drivers/base/platform.c:1404
+    [<ffffffff82c10fc6>] call_driver_probe drivers/base/dd.c:579 [inline]
+    [<ffffffff82c10fc6>] really_probe+0x126/0x440 drivers/base/dd.c:658
+    [<ffffffff82c113a3>] __driver_probe_device+0xc3/0x190 drivers/base/dd.c:800
+    [<ffffffff82c1149a>] driver_probe_device+0x2a/0x120 drivers/base/dd.c:830
+    [<ffffffff82c117f7>] __driver_attach drivers/base/dd.c:1216 [inline]
+    [<ffffffff82c117f7>] __driver_attach+0x107/0x1f0 drivers/base/dd.c:1156
+    [<ffffffff82c0e2f3>] bus_for_each_dev+0xb3/0x110 drivers/base/bus.c:368
+    [<ffffffff82c0fdf6>] bus_add_driver+0x126/0x2a0 drivers/base/bus.c:673
+    [<ffffffff82c12ee5>] driver_register+0x85/0x180 drivers/base/driver.c:246
+    [<ffffffff8756e3a6>] hwsim_init_module+0xc6/0x110 drivers/net/ieee802154/mac802154_hwsim.c:1073
+    [<ffffffff81001cb6>] do_one_initcall+0x76/0x430 init/main.c:1232
+    [<ffffffff874d76ea>] do_initcall_level init/main.c:1294 [inline]
+    [<ffffffff874d76ea>] do_initcalls init/main.c:1310 [inline]
+    [<ffffffff874d76ea>] do_basic_setup init/main.c:1329 [inline]
+    [<ffffffff874d76ea>] kernel_init_freeable+0x25a/0x460 init/main.c:1547
+    [<ffffffff84b3628b>] kernel_init+0x1b/0x290 init/main.c:1437
+    [<ffffffff81149e35>] ret_from_fork+0x45/0x50 arch/x86/kernel/process.c:147
+
+BUG: memory leak
+unreferenced object 0xffff8881007cc000 (size 768):
+  comm "udevd", pid 4480, jiffies 4295045154 (age 13.270s)
+  hex dump (first 32 bytes):
+    01 00 00 00 03 00 00 00 08 00 00 00 00 00 00 00  ................
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+  backtrace:
+    [<ffffffff83e8ff95>] alloc_inode_sb include/linux/fs.h:2909 [inline]
+    [<ffffffff83e8ff95>] sock_alloc_inode+0x25/0x90 net/socket.c:308
+    [<ffffffff816c39d3>] alloc_inode+0x23/0x100 fs/inode.c:259
+    [<ffffffff816c4bf6>] new_inode_pseudo+0x16/0x50 fs/inode.c:1004
+    [<ffffffff83e8f2ab>] sock_alloc+0x1b/0x90 net/socket.c:634
+    [<ffffffff83e8f8cd>] __sock_create+0xbd/0x2e0 net/socket.c:1516
+    [<ffffffff83e92d58>] sock_create net/socket.c:1603 [inline]
+    [<ffffffff83e92d58>] __sys_socket_create net/socket.c:1640 [inline]
+    [<ffffffff83e92d58>] __sys_socket+0xb8/0x1a0 net/socket.c:1691
+    [<ffffffff83e92e5b>] __do_sys_socket net/socket.c:1705 [inline]
+    [<ffffffff83e92e5b>] __se_sys_socket net/socket.c:1703 [inline]
+    [<ffffffff83e92e5b>] __x64_sys_socket+0x1b/0x20 net/socket.c:1703
+    [<ffffffff84b30fc8>] do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+    [<ffffffff84b30fc8>] do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:80
+    [<ffffffff84c0008b>] entry_SYSCALL_64_after_hwframe+0x63/0xcd
+
+BUG: memory leak
+unreferenced object 0xffff88810c7019a0 (size 32):
+  comm "udevd", pid 4480, jiffies 4295045154 (age 13.270s)
+  hex dump (first 32 bytes):
+    b8 c1 7c 00 81 88 ff ff 70 3d 34 82 ff ff ff ff  ..|.....p=4.....
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+  backtrace:
+    [<ffffffff823457a2>] kmem_cache_zalloc include/linux/slab.h:710 [inline]
+    [<ffffffff823457a2>] lsm_inode_alloc security/security.c:633 [inline]
+    [<ffffffff823457a2>] security_inode_alloc+0x32/0xd0 security/security.c:1494
+    [<ffffffff816c01ad>] inode_init_always+0x1ed/0x230 fs/inode.c:230
+    [<ffffffff816c39f0>] alloc_inode+0x40/0x100 fs/inode.c:266
+    [<ffffffff816c4bf6>] new_inode_pseudo+0x16/0x50 fs/inode.c:1004
+    [<ffffffff83e8f2ab>] sock_alloc+0x1b/0x90 net/socket.c:634
+    [<ffffffff83e8f8cd>] __sock_create+0xbd/0x2e0 net/socket.c:1516
+    [<ffffffff83e92d58>] sock_create net/socket.c:1603 [inline]
+    [<ffffffff83e92d58>] __sys_socket_create net/socket.c:1640 [inline]
+    [<ffffffff83e92d58>] __sys_socket+0xb8/0x1a0 net/socket.c:1691
+    [<ffffffff83e92e5b>] __do_sys_socket net/socket.c:1705 [inline]
+    [<ffffffff83e92e5b>] __se_sys_socket net/socket.c:1703 [inline]
+    [<ffffffff83e92e5b>] __x64_sys_socket+0x1b/0x20 net/socket.c:1703
+    [<ffffffff84b30fc8>] do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+    [<ffffffff84b30fc8>] do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:80
+    [<ffffffff84c0008b>] entry_SYSCALL_64_after_hwframe+0x63/0xcd
+
+[ 
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the bug is already fixed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite bug's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the bug is a duplicate of another bug, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
