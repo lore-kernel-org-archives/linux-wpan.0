@@ -2,32 +2,32 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18CFACE7A8D
-	for <linux-wpan@archiver.kernel.org>; Sun, 24 Sep 2023 12:23:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D971CE7A92
+	for <linux-wpan@archiver.kernel.org>; Sun, 24 Sep 2023 12:23:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229498AbjIXMXE (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Sun, 24 Sep 2023 08:23:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60116 "EHLO
+        id S229482AbjIXMXG (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Sun, 24 Sep 2023 08:23:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60164 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229606AbjIXMXD (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Sun, 24 Sep 2023 08:23:03 -0400
+        with ESMTP id S229570AbjIXMXF (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Sun, 24 Sep 2023 08:23:05 -0400
 Received: from proxima.lasnet.de (proxima.lasnet.de [78.47.171.185])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B345109
-        for <linux-wpan@vger.kernel.org>; Sun, 24 Sep 2023 05:22:57 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D102101
+        for <linux-wpan@vger.kernel.org>; Sun, 24 Sep 2023 05:22:55 -0700 (PDT)
 Received: from localhost.localdomain.datenfreihafen.local (p200300e9d71918519b00d9454c2dda6a.dip0.t-ipconnect.de [IPv6:2003:e9:d719:1851:9b00:d945:4c2d:da6a])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
         (No client certificate requested)
         (Authenticated sender: stefan@sostec.de)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id 46183C0EB6;
-        Sun, 24 Sep 2023 14:22:49 +0200 (CEST)
+        by proxima.lasnet.de (Postfix) with ESMTPSA id F02F7C0E5B;
+        Sun, 24 Sep 2023 14:22:48 +0200 (CEST)
 From:   Stefan Schmidt <stefan@datenfreihafen.org>
 To:     linux-wpan@vger.kernel.org
 Cc:     alex.aring@gmail.com, miquel.raynal@bootlin.com,
         david.girault@qorvo.com, Stefan Schmidt <stefan@datenfreihafen.org>
-Subject: [PATCH 4/9] wpan-hwsim: switch files to SPDX header for license and copyright
-Date:   Sun, 24 Sep 2023 14:22:26 +0200
-Message-ID: <20230924122231.716878-5-stefan@datenfreihafen.org>
+Subject: [PATCH 3/9] wpan-ping: switch files to SPDX header for license and copyright
+Date:   Sun, 24 Sep 2023 14:22:25 +0200
+Message-ID: <20230924122231.716878-4-stefan@datenfreihafen.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230924122231.716878-1-stefan@datenfreihafen.org>
 References: <20230924122231.716878-1-stefan@datenfreihafen.org>
@@ -39,44 +39,56 @@ X-Mailing-List: linux-wpan@vger.kernel.org
 
 Signed-off-by: Stefan Schmidt <stefan@datenfreihafen.org>
 ---
- wpan-hwsim/Makefile.am       |  4 ++++
- wpan-hwsim/mac802154_hwsim.h |  4 ++++
- wpan-hwsim/wpan-hwsim.c      | 22 +++++-----------------
- 3 files changed, 13 insertions(+), 17 deletions(-)
+ wpan-ping/.gitignore       |  4 ++++
+ wpan-ping/Makefile.am      |  4 ++++
+ wpan-ping/README.wpan-ping |  4 ++++
+ wpan-ping/wpan-ping.c      | 22 +++++-----------------
+ 4 files changed, 17 insertions(+), 17 deletions(-)
 
-diff --git a/wpan-hwsim/Makefile.am b/wpan-hwsim/Makefile.am
-index 0587178..e7ff242 100644
---- a/wpan-hwsim/Makefile.am
-+++ b/wpan-hwsim/Makefile.am
-@@ -1,3 +1,7 @@
-+# SPDX-FileCopyrightText: 2018 Alexander Aring <aring@mojatatu.com>
+diff --git a/wpan-ping/.gitignore b/wpan-ping/.gitignore
+index 0e2e07a..4d78615 100644
+--- a/wpan-ping/.gitignore
++++ b/wpan-ping/.gitignore
+@@ -1,2 +1,6 @@
++# SPDX-FileCopyrightText: 2015 Stefan Schmidt <stefan@datenfreihafen.org>
 +#
 +# SPDX-License-Identifier: ISC
 +
- bin_PROGRAMS = wpan-hwsim
- 
- wpan_hwsim_SOURCES = wpan-hwsim.c \
-diff --git a/wpan-hwsim/mac802154_hwsim.h b/wpan-hwsim/mac802154_hwsim.h
-index 6c6e30e..62e6962 100644
---- a/wpan-hwsim/mac802154_hwsim.h
-+++ b/wpan-hwsim/mac802154_hwsim.h
+ .deps/
+ wpan-ping
+diff --git a/wpan-ping/Makefile.am b/wpan-ping/Makefile.am
+index 6021c95..5003205 100644
+--- a/wpan-ping/Makefile.am
++++ b/wpan-ping/Makefile.am
 @@ -1,3 +1,7 @@
-+// SPDX-FileCopyrightText: 2018 Alexander Aring <aring@mojatatu.com>
++# SPDX-FileCopyrightText: 2015 Stefan Schmidt <stefan@datenfreihafen.org>
++#
++# SPDX-License-Identifier: ISC
++
+ bin_PROGRAMS = wpan-ping
+ 
+ wpan_ping_SOURCES = wpan-ping.c
+diff --git a/wpan-ping/README.wpan-ping b/wpan-ping/README.wpan-ping
+index 4827e21..5d18661 100644
+--- a/wpan-ping/README.wpan-ping
++++ b/wpan-ping/README.wpan-ping
+@@ -1,3 +1,7 @@
++// SPDX-FileCopyrightText: 2015 Stefan Schmidt <stefan@datenfreihafen.org>
 +//
 +// SPDX-License-Identifier: ISC
 +
- #ifndef __MAC802154_HWSIM_H
- #define __MAC802154_HWSIM_H
+ wpan-ping aims to offer ping/ping6 like functionality on a IEEE 802.15.4 level.
  
-diff --git a/wpan-hwsim/wpan-hwsim.c b/wpan-hwsim/wpan-hwsim.c
-index 0a7c492..e1f2fe5 100644
---- a/wpan-hwsim/wpan-hwsim.c
-+++ b/wpan-hwsim/wpan-hwsim.c
+ No control message protocol is defined so we will simply use DGRAM's over a
+diff --git a/wpan-ping/wpan-ping.c b/wpan-ping/wpan-ping.c
+index 791346c..d82b1f0 100644
+--- a/wpan-ping/wpan-ping.c
++++ b/wpan-ping/wpan-ping.c
 @@ -1,20 +1,8 @@
 -/*
-- * Linux IEEE 802.15.4 hwsim tool
+- * Linux IEEE 802.15.4 ping tool
 - *
-- * Copyright (C) 2018 Alexander Aring <aring@mojatatu.com>
+- * Copyright (C) 2015 Stefan Schmidt <stefan@datenfreihafen.org>
 - *
 - * Permission to use, copy, modify, and/or distribute this software for any
 - * purpose with or without fee is hereby granted, provided that the above
@@ -90,14 +102,14 @@ index 0a7c492..e1f2fe5 100644
 - * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 - * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 - */
-+// SPDX-FileCopyrightText: 2018 Alexander Aring <aring@mojatatu.com>
++// SPDX-FileCopyrightText: 2015 Stefan Schmidt <stefan@datenfreihafen.org>
 +//
 +// SPDX-License-Identifier: ISC
 +
-+/* Linux IEEE 802.15.4 hwsim tool */
++/* Linux IEEE 802.15.4 ping tool */
  
- #include <inttypes.h>
- #include <stdbool.h>
+ #ifdef HAVE_CONFIG_H
+ #include <config.h>
 -- 
 2.41.0
 
