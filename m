@@ -2,61 +2,108 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A50CCE7A89
-	for <linux-wpan@archiver.kernel.org>; Mon, 25 Sep 2023 07:52:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96093CE7A81
+	for <linux-wpan@archiver.kernel.org>; Mon, 25 Sep 2023 08:29:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232003AbjIYHwz (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 25 Sep 2023 03:52:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47124 "EHLO
+        id S232810AbjIYI3b (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 25 Sep 2023 04:29:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59806 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229473AbjIYHwy (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 25 Sep 2023 03:52:54 -0400
-Received: from mail.bizcodes.pl (mail.bizcodes.pl [151.80.57.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04CE1EE
-        for <linux-wpan@vger.kernel.org>; Mon, 25 Sep 2023 00:52:47 -0700 (PDT)
-Received: by mail.bizcodes.pl (Postfix, from userid 1002)
-        id BC573A4F6B; Mon, 25 Sep 2023 07:51:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=bizcodes.pl; s=mail;
-        t=1695628318; bh=5QPMt7jNntM5ZbstM20BWsHIeLbmRE8lVU4Iu89IleQ=;
-        h=Date:From:To:Subject:From;
-        b=UDnex3e2MSP1i3srYEZ+H66q7gN0gqpVp+EErSuXdhuWmG7hmelG/JjvP++RoP1se
-         wA9/eC/I9F0rik0comuHVdDRLFf78pgc0porxO0tpDVhEcfSxU10vmcu7Wl872Vc6d
-         Ob6KYeZqDZE3F8bMaKo8dGaOAa9k6wdP1wtZmCQsVeA+fPTgGXFZPANxmrVdR71/Sj
-         Bj2euuKhwh04L/edExqYsO3qMevTQq88CwrffMm5ql/bUX/HGHe9G3VHofvO1WcqtZ
-         XAM8uEXuf66hMGIHVMR9KSj7oP+Kq0SksT5w96kcWfd16iGqiz6YMmSfkSHSkWNsx2
-         04BPa/8XGV9Kw==
-Received: by mail.bizcodes.pl for <linux-wpan@vger.kernel.org>; Mon, 25 Sep 2023 07:50:47 GMT
-Message-ID: <20230925064500-0.1.bw.1gq7z.0.odofop9ry9@bizcodes.pl>
-Date:   Mon, 25 Sep 2023 07:50:47 GMT
-From:   "Marcin Chruszcz" <marcin.chruszcz@bizcodes.pl>
-To:     <linux-wpan@vger.kernel.org>
-Subject: Prezentacja
-X-Mailer: mail.bizcodes.pl
+        with ESMTP id S232664AbjIYI3a (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 25 Sep 2023 04:29:30 -0400
+Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E94A9D;
+        Mon, 25 Sep 2023 01:29:23 -0700 (PDT)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 59D431C0011;
+        Mon, 25 Sep 2023 08:29:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+        t=1695630562;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=BETUE3RcO2izRKuzFet0qGTNc4Tx8tBroVhfQaFja4M=;
+        b=CoAUieulogXjKaWvt/53Nr27hPmJCYgbgpgtpvTWdxfeuSQObY+TxPZ6e8XNeMb3xMdFQ/
+        kWasErliE/rkTA9bsfAzWShxLCoSf2vd0eOUygOBU/J+BFucsiVZ0Ys85Wl6ll/3bXKoEM
+        nP/v7ZV88VPVeMLoluryuPMwXR7B/N5uDuq8ZkpiLIp0D2ym8Tx1jEmNj9Roy4m+xz+Ba5
+        zgDa6xTFUIHRWiFmMHuVp5Nx5vNKCrnyHNjPuO+7OrdqyNpXkOjzH0f2ItUF4P0vyB+xQg
+        EL+0860POWWsexkowpKD3TIJ4gd4afx6ZAjmB/0jgEN4wZa2xLRpDweDSVkh9A==
+Date:   Mon, 25 Sep 2023 10:29:19 +0200
+From:   Miquel Raynal <miquel.raynal@bootlin.com>
+To:     Dinghao Liu <dinghao.liu@zju.edu.cn>
+Cc:     Alexander Aring <alex.aring@gmail.com>,
+        Stefan Schmidt <stefan@datenfreihafen.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Harry Morris <harrymorris12@gmail.com>,
+        linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] ieee802154: ca8210: Fix a potential UAF in ca8210_probe
+Message-ID: <20230925102919.356b45ab@xps-13>
+In-Reply-To: <20230925072423.24772-1-dinghao.liu@zju.edu.cn>
+References: <20230925072423.24772-1-dinghao.liu@zju.edu.cn>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: miquel.raynal@bootlin.com
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Dzie=C5=84 dobry!
+Hi Dinghao,
 
-Czy m=C3=B3g=C5=82bym przedstawi=C4=87 rozwi=C4=85zanie, kt=C3=B3re umo=C5=
-=BCliwia monitoring ka=C5=BCdego auta w czasie rzeczywistym w tym jego po=
-zycj=C4=99, zu=C5=BCycie paliwa i przebieg?
+dinghao.liu@zju.edu.cn wrote on Mon, 25 Sep 2023 15:24:22 +0800:
 
-Dodatkowo nasze narz=C4=99dzie minimalizuje koszty utrzymania samochod=C3=
-=B3w, skraca czas przejazd=C3=B3w, a tak=C5=BCe tworzenie planu tras czy =
-dostaw.
+> If of_clk_add_provider() fails in ca8210_register_ext_clock(),
+> it calls clk_unregister() to release priv->clk and returns an
+> error. However, the caller ca8210_probe() then calls ca8210_remove(),
+> where priv->clk is freed again in ca8210_unregister_ext_clock(). In
+> this case, a use-after-free may happen in the second time we call
+> clk_unregister().
+>=20
+> Fix this by nulling priv->clk after the first clk_unregister(). Also
+> refine the pointer checking in ca8210_unregister_ext_clock().
+>=20
+> Fixes: ded845a781a5 ("ieee802154: Add CA8210 IEEE 802.15.4 device driver")
+> Signed-off-by: Dinghao Liu <dinghao.liu@zju.edu.cn>
+> ---
+>  drivers/net/ieee802154/ca8210.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/drivers/net/ieee802154/ca8210.c b/drivers/net/ieee802154/ca8=
+210.c
+> index aebb19f1b3a4..1d545879c000 100644
+> --- a/drivers/net/ieee802154/ca8210.c
+> +++ b/drivers/net/ieee802154/ca8210.c
+> @@ -2760,6 +2760,7 @@ static int ca8210_register_ext_clock(struct spi_dev=
+ice *spi)
+>  	ret =3D of_clk_add_provider(np, of_clk_src_simple_get, priv->clk);
+>  	if (ret) {
+>  		clk_unregister(priv->clk);
+> +		priv->clk =3D NULL;
 
-Z naszej wiedzy i do=C5=9Bwiadczenia korzysta ju=C5=BC ponad 49 tys. Klie=
-nt=C3=B3w. Monitorujemy 809 000 pojazd=C3=B3w na ca=C5=82ym =C5=9Bwiecie,=
- co jest nasz=C4=85 najlepsz=C4=85 wizyt=C3=B3wk=C4=85.
+This function is a bit convoluted. You could just return the result of
+of_clk_add_provider() (keep the printk's if you want, they don't seem
+very useful) and let ca8210_unregister_ext_clock() do the cleanup.
 
-Bardzo prosz=C4=99 o e-maila zwrotnego, je=C5=9Bli mogliby=C5=9Bmy wsp=C3=
-=B3lnie om=C3=B3wi=C4=87 potencja=C5=82 wykorzystania takiego rozwi=C4=85=
-zania w Pa=C5=84stwa firmie.
+>  		dev_crit(
+>  			&spi->dev,
+>  			"Failed to register external clock as clock provider\n"
+> @@ -2780,7 +2781,7 @@ static void ca8210_unregister_ext_clock(struct spi_=
+device *spi)
+>  {
+>  	struct ca8210_priv *priv =3D spi_get_drvdata(spi);
+> =20
+> -	if (!priv->clk)
+> +	if (IS_ERR_OR_NULL(priv->clk))
 
+Does not look useful as you are enforcing priv->clock to be valid or
+NULL, it cannot be an error code.
 
-Pozdrawiam
-Marcin Chruszcz
+Thanks,
+Miqu=C3=A8l
