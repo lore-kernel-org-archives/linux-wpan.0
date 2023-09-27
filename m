@@ -2,76 +2,80 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75679E7E652
-	for <linux-wpan@archiver.kernel.org>; Tue, 26 Sep 2023 16:42:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CCFBE7F150
+	for <linux-wpan@archiver.kernel.org>; Wed, 27 Sep 2023 02:13:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235352AbjIZQmM (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 26 Sep 2023 12:42:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48740 "EHLO
+        id S233061AbjI0CNB (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 26 Sep 2023 22:13:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38428 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235361AbjIZQmC (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 26 Sep 2023 12:42:02 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A58761B0
-        for <linux-wpan@vger.kernel.org>; Tue, 26 Sep 2023 09:41:06 -0700 (PDT)
+        with ESMTP id S232167AbjI0CLB (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 26 Sep 2023 22:11:01 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA00D1F23
+        for <linux-wpan@vger.kernel.org>; Tue, 26 Sep 2023 18:31:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1695746465;
+        s=mimecast20190719; t=1695778283;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=9YAyRg25y1ds+4WMOQ2HhwyFuV1Nm/hS+8w3y9qqUyQ=;
-        b=ZKerJDtjqwgwk7OOFSz2q/lUaiN7G5diUcDWRF6AO8uOFmLyjwkcnx/7lZIv0EBGcnYsoL
-        39TFpfJpUZ/d9+KegKhycJqOgeQyCA2f78khQ9aYijgvm+jYFRwksHTub/KsMnHF4r/GVN
-        SVF/mzLuQd69yH+M5cuvWDhz5xGcqUM=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=QKKWgd5VsqXZ/BIG1sZfFJbYnkYOL9oMt5Zq9rtrFwA=;
+        b=Ib5g9FbVIvQaz6yWzEi/EPZ8Y4HAu7xsrCanMRQSx0F7JqdoweoZcYdGWsMntElTmYr7OQ
+        zlzfnRMAqMbZKrwIlklwILdF9Tcc92M/gKBQYqSve3G/egWoQcGPnZCA028vN1zEEq/41W
+        kSUE3eXSRoAqesrbK6wmB3s5iekuxmA=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-57-Nneqa78oORCr0F7goF7eXQ-1; Tue, 26 Sep 2023 12:41:04 -0400
-X-MC-Unique: Nneqa78oORCr0F7goF7eXQ-1
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-9ae0bf9c0b4so795822766b.0
-        for <linux-wpan@vger.kernel.org>; Tue, 26 Sep 2023 09:41:03 -0700 (PDT)
+ us-mta-696-2Vu1YqD3Nsi_fB3mXOxfjw-1; Tue, 26 Sep 2023 21:31:22 -0400
+X-MC-Unique: 2Vu1YqD3Nsi_fB3mXOxfjw-1
+Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-94a355cf318so858343866b.2
+        for <linux-wpan@vger.kernel.org>; Tue, 26 Sep 2023 18:31:21 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695746463; x=1696351263;
+        d=1e100.net; s=20230601; t=1695778281; x=1696383081;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=9YAyRg25y1ds+4WMOQ2HhwyFuV1Nm/hS+8w3y9qqUyQ=;
-        b=CMy+bDweR8r5ayjyqqYx2JjRUmy05comOnSd6cKHaFXx76f+dhq6x/Y+51Ufzx0SQg
-         wnlZ7z3v4l8d433Tko00osANgI5Me7ddULGhs7fiX+Z1cTHt5IggdxN9sFtZ48RsN6Cm
-         DEUfctuS3J39azhpkfWE1CRC3xnbbnW6VFja+04g5H6vVAx0T75TE7jpdRAJzCJr/8DD
-         03/h5G655S1fMey6gVjbb+bW9IWC6U2xpe/V9abAaFBlbzlBhhJkWocAPJEtXGmAH9Al
-         h9lfLHqsbbkHy9yXThQaEX+zmnRHhBjSLXD7lh4QTQzS/mUklW3VPpeTKKw9GLjGoZPP
-         +APw==
-X-Gm-Message-State: AOJu0YyVjQerk6csAVmpwl+Z10Cw0wUoJNGEq3d2gTmLqFvTAH2BQLpD
-        sD475ig/zk+FCsCvScKuycpdffCvApXVe3VLRATKA/r3V04ILa7SZyTE6n7w5Mtx4J8dO6qX2jW
-        9FnM/sDuKxKooYp2464almSpXaqiDEhnMFBvUXw==
-X-Received: by 2002:a17:906:218a:b0:9ad:7d5c:3d4b with SMTP id 10-20020a170906218a00b009ad7d5c3d4bmr9170361eju.35.1695746462968;
-        Tue, 26 Sep 2023 09:41:02 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFyLnGtjl16ZbEydnXM+tv4CysWF7HTsyNruFiTtg08cjTqOpFUagw9oPsSkwzQbGl91B9XtcGprebhtCWXQ+0=
-X-Received: by 2002:a17:906:218a:b0:9ad:7d5c:3d4b with SMTP id
- 10-20020a170906218a00b009ad7d5c3d4bmr9170343eju.35.1695746462665; Tue, 26 Sep
- 2023 09:41:02 -0700 (PDT)
+        bh=QKKWgd5VsqXZ/BIG1sZfFJbYnkYOL9oMt5Zq9rtrFwA=;
+        b=Q2C4beu5nbmtGGemleL9q/+iXruKii/Of3EM16/Yj3F4H7OAVkTUIVAR8XJ5eX0Vb6
+         77JrqtiD3jn2s9Pc1HPzLAe8z5+8wzDmAE26b2cvBrdhuu1zVH4bWnjzx6bXWJ6QgvGW
+         GSYtqke7/NjEetPNNxVhaZ7FJkMAkRIEh+AIEhJIwKPsCKMzrPJnmqY1YAbhWtaQnDBo
+         +czZgzE+4L0b8XlMi0H+3MZ1mjfKmbVvlHpik2q60hH2i0aIWHBdJNl2hlmjP49knkVw
+         a2GiBHT50T96TDQaSIxrod3ykG3jV1HYqBtfklUwNFJkr9oRAnxhVqJHKvCy5hEbKM2i
+         55kw==
+X-Gm-Message-State: AOJu0YwpoO7jYJ5upyiqiW3OBTAocQH2sErph+YXCrTu/O0WryPRJJio
+        C2KOhxY6UbiQ0GoxcouxE0blrBG1pk3zUEqBjR0ushylWQFyStKp3BVgJrPCx75AJwtRE1B8nKA
+        u5L0YChgQfW8tDGm6vt+yKM9/1il3XO9XIgQYRA==
+X-Received: by 2002:a17:906:3112:b0:9ae:6388:e09b with SMTP id 18-20020a170906311200b009ae6388e09bmr324716ejx.40.1695778280955;
+        Tue, 26 Sep 2023 18:31:20 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGGieOngArYKjbDZq9ItVo4lMu8KHH9bkbQTWHVzS+VH7ZAmNietCpu1nvdDCLEVyOAgGWGkqlAqAMKupLcDZM=
+X-Received: by 2002:a17:906:3112:b0:9ae:6388:e09b with SMTP id
+ 18-20020a170906311200b009ae6388e09bmr324708ejx.40.1695778280682; Tue, 26 Sep
+ 2023 18:31:20 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230926032244.11560-1-dinghao.liu@zju.edu.cn>
- <20230926100202.011ab841@xps-13> <adf9d668-0906-3004-d4e8-a7775844a985@datenfreihafen.org>
-In-Reply-To: <adf9d668-0906-3004-d4e8-a7775844a985@datenfreihafen.org>
+References: <20230922155029.592018-1-miquel.raynal@bootlin.com>
+ <20230922155029.592018-8-miquel.raynal@bootlin.com> <CAK-6q+iTOapHF7ftqtRQBsNUYEKqjS0Mkq4O-A2C2tbupStk0A@mail.gmail.com>
+ <20230925094343.598c81d1@xps-13>
+In-Reply-To: <20230925094343.598c81d1@xps-13>
 From:   Alexander Aring <aahringo@redhat.com>
-Date:   Tue, 26 Sep 2023 12:40:51 -0400
-Message-ID: <CAK-6q+gfN7GtwfpUvOjNsNE9LSMTGrdLE6+-dgUEkVaA6SK1zw@mail.gmail.com>
-Subject: Re: [PATCH] [v2] ieee802154: ca8210: Fix a potential UAF in ca8210_probe
-To:     Stefan Schmidt <stefan@datenfreihafen.org>
-Cc:     Miquel Raynal <miquel.raynal@bootlin.com>,
-        Dinghao Liu <dinghao.liu@zju.edu.cn>,
-        Alexander Aring <alex.aring@gmail.com>,
+Date:   Tue, 26 Sep 2023 21:31:09 -0400
+Message-ID: <CAK-6q+jFmvXGWOJFvHagC06mnbu6O1=Ndg8auNkGXTaqSf-7rg@mail.gmail.com>
+Subject: Re: [PATCH wpan-next v4 07/11] mac802154: Handle association requests
+ from peers
+To:     Miquel Raynal <miquel.raynal@bootlin.com>
+Cc:     Alexander Aring <alex.aring@gmail.com>,
+        Stefan Schmidt <stefan@datenfreihafen.org>,
+        linux-wpan@vger.kernel.org,
         "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
         Jakub Kicinski <kuba@kernel.org>,
         Paolo Abeni <pabeni@redhat.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Harry Morris <harrymorris12@gmail.com>,
-        linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
+        Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
+        David Girault <david.girault@qorvo.com>,
+        Romuald Despres <romuald.despres@qorvo.com>,
+        Frederic Blain <frederic.blain@qorvo.com>,
+        Nicolas Schodet <nico@ni.fr.eu.org>,
+        Guilhem Imberton <guilhem.imberton@qorvo.com>,
+        Thomas Petazzoni <thomas.petazzoni@bootlin.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
@@ -80,77 +84,174 @@ X-Mailing-List: linux-wpan@vger.kernel.org
 
 Hi,
 
-On Tue, Sep 26, 2023 at 4:29=E2=80=AFAM Stefan Schmidt
-<stefan@datenfreihafen.org> wrote:
+On Mon, Sep 25, 2023 at 3:43=E2=80=AFAM Miquel Raynal <miquel.raynal@bootli=
+n.com> wrote:
 >
-> Hello.
+> Hi Alexander,
 >
-> On 26.09.23 10:02, Miquel Raynal wrote:
-> > Hi Dinghao,
-> >
-> > dinghao.liu@zju.edu.cn wrote on Tue, 26 Sep 2023 11:22:44 +0800:
-> >
-> >> If of_clk_add_provider() fails in ca8210_register_ext_clock(),
-> >> it calls clk_unregister() to release priv->clk and returns an
-> >> error. However, the caller ca8210_probe() then calls ca8210_remove(),
-> >> where priv->clk is freed again in ca8210_unregister_ext_clock(). In
-> >> this case, a use-after-free may happen in the second time we call
-> >> clk_unregister().
-> >>
-> >> Fix this by removing the first clk_unregister(). Also, priv->clk could
-> >> be an error code on failure of clk_register_fixed_rate(). Use
-> >> IS_ERR_OR_NULL to catch this case in ca8210_unregister_ext_clock().
-> >>
-> >> Fixes: ded845a781a5 ("ieee802154: Add CA8210 IEEE 802.15.4 device driv=
-er")
-> >
-> > Missing Cc stable, this needs to be backported.
-> >
-> >> Signed-off-by: Dinghao Liu <dinghao.liu@zju.edu.cn>
-> >> ---
-> >>
-> >> Changelog:
-> >>
-> >> v2: -Remove the first clk_unregister() instead of nulling priv->clk.
-> >> ---
-> >>   drivers/net/ieee802154/ca8210.c | 3 +--
-> >>   1 file changed, 1 insertion(+), 2 deletions(-)
-> >>
-> >> diff --git a/drivers/net/ieee802154/ca8210.c b/drivers/net/ieee802154/=
-ca8210.c
-> >> index aebb19f1b3a4..b35c6f59bd1a 100644
-> >> --- a/drivers/net/ieee802154/ca8210.c
-> >> +++ b/drivers/net/ieee802154/ca8210.c
-> >> @@ -2759,7 +2759,6 @@ static int ca8210_register_ext_clock(struct spi_=
-device *spi)
-> >>      }
-> >>      ret =3D of_clk_add_provider(np, of_clk_src_simple_get, priv->clk)=
-;
-> >>      if (ret) {
-> >> -            clk_unregister(priv->clk);
-> >>              dev_crit(
-> >>                      &spi->dev,
-> >>                      "Failed to register external clock as clock provi=
-der\n"
-> >
-> > I was hoping you would simplify this function a bit more.
-> >
-> >> @@ -2780,7 +2779,7 @@ static void ca8210_unregister_ext_clock(struct s=
-pi_device *spi)
-> >>   {
-> >>      struct ca8210_priv *priv =3D spi_get_drvdata(spi);
-> >>
-> >> -    if (!priv->clk)
-> >> +    if (IS_ERR_OR_NULL(priv->clk))
-> >>              return
-> >>
-> >>      of_clk_del_provider(spi->dev.of_node);
-> >
-> > Alex, Stefan, who handles wpan and wpan/next this release?
+> aahringo@redhat.com wrote on Sun, 24 Sep 2023 20:13:34 -0400:
 >
-> IIRC it would be me for wpan and Alex for wpan-next.
+> > Hi,
+> >
+> > On Fri, Sep 22, 2023 at 11:51=E2=80=AFAM Miquel Raynal
+> > <miquel.raynal@bootlin.com> wrote:
+> > >
+> > > Coordinators may have to handle association requests from peers which
+> > > want to join the PAN. The logic involves:
+> > > - Acknowledging the request (done by hardware)
+> > > - If requested, a random short address that is free on this PAN shoul=
+d
+> > >   be chosen for the device.
+> > > - Sending an association response with the short address allocated fo=
+r
+> > >   the peer and expecting it to be ack'ed.
+> > >
+> > > If anything fails during this procedure, the peer is considered not
+> > > associated.
+> > >
+> > > Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
+> > > ---
+> > >  include/net/cfg802154.h         |   7 ++
+> > >  include/net/ieee802154_netdev.h |   6 ++
+> > >  net/ieee802154/core.c           |   7 ++
+> > >  net/ieee802154/pan.c            |  30 +++++++
+> > >  net/mac802154/ieee802154_i.h    |   2 +
+> > >  net/mac802154/rx.c              |   8 ++
+> > >  net/mac802154/scan.c            | 142 ++++++++++++++++++++++++++++++=
+++
+> > >  7 files changed, 202 insertions(+)
+> > >
+> > > diff --git a/include/net/cfg802154.h b/include/net/cfg802154.h
+> > > index 9b036ab20079..c844ae63bc04 100644
+> > > --- a/include/net/cfg802154.h
+> > > +++ b/include/net/cfg802154.h
+> > > @@ -583,4 +583,11 @@ struct ieee802154_pan_device *
+> > >  cfg802154_device_is_child(struct wpan_dev *wpan_dev,
+> > >                           struct ieee802154_addr *target);
+> > >
+> > > +/**
+> > > + * cfg802154_get_free_short_addr - Get a free address among the know=
+n devices
+> > > + * @wpan_dev: the wpan device
+> > > + * @return: a random short address expectedly unused on our PAN
+> > > + */
+> > > +__le16 cfg802154_get_free_short_addr(struct wpan_dev *wpan_dev);
+> > > +
+> > >  #endif /* __NET_CFG802154_H */
+> > > diff --git a/include/net/ieee802154_netdev.h b/include/net/ieee802154=
+_netdev.h
+> > > index 16194356cfe7..4de858f9929e 100644
+> > > --- a/include/net/ieee802154_netdev.h
+> > > +++ b/include/net/ieee802154_netdev.h
+> > > @@ -211,6 +211,12 @@ struct ieee802154_association_req_frame {
+> > >         struct ieee802154_assoc_req_pl assoc_req_pl;
+> > >  };
+> > >
+> > > +struct ieee802154_association_resp_frame {
+> > > +       struct ieee802154_hdr mhr;
+> > > +       struct ieee802154_mac_cmd_pl mac_pl;
+> > > +       struct ieee802154_assoc_resp_pl assoc_resp_pl;
+> > > +};
+> > > +
+> > >  struct ieee802154_disassociation_notif_frame {
+> > >         struct ieee802154_hdr mhr;
+> > >         struct ieee802154_mac_cmd_pl mac_pl;
+> > > diff --git a/net/ieee802154/core.c b/net/ieee802154/core.c
+> > > index a08d75dd56ad..1670a71327a7 100644
+> > > --- a/net/ieee802154/core.c
+> > > +++ b/net/ieee802154/core.c
+> > > @@ -200,11 +200,18 @@ EXPORT_SYMBOL(wpan_phy_free);
+> > >
+> > >  static void cfg802154_free_peer_structures(struct wpan_dev *wpan_dev=
+)
+> > >  {
+> > > +       struct ieee802154_pan_device *child, *tmp;
+> > > +
+> > >         mutex_lock(&wpan_dev->association_lock);
+> > >
+> > >         kfree(wpan_dev->parent);
+> > >         wpan_dev->parent =3D NULL;
+> > >
+> > > +       list_for_each_entry_safe(child, tmp, &wpan_dev->children, nod=
+e) {
+> > > +               list_del(&child->node);
+> > > +               kfree(child);
+> > > +       }
+> > > +
+> > >         mutex_unlock(&wpan_dev->association_lock);
+> > >  }
+> > >
+> > > diff --git a/net/ieee802154/pan.c b/net/ieee802154/pan.c
+> > > index 9e1f1973c294..e99c64054dcb 100644
+> > > --- a/net/ieee802154/pan.c
+> > > +++ b/net/ieee802154/pan.c
+> > > @@ -73,3 +73,33 @@ cfg802154_device_is_child(struct wpan_dev *wpan_de=
+v,
+> > >         return NULL;
+> > >  }
+> > >  EXPORT_SYMBOL_GPL(cfg802154_device_is_child);
+> > > +
+> > > +__le16 cfg802154_get_free_short_addr(struct wpan_dev *wpan_dev)
+> > > +{
+> > > +       struct ieee802154_pan_device *child;
+> > > +       __le16 addr;
+> > > +
+> > > +       lockdep_assert_held(&wpan_dev->association_lock);
+> > > +
+> > > +       do {
+> > > +               get_random_bytes(&addr, 2);
+> > > +               if (addr =3D=3D cpu_to_le16(IEEE802154_ADDR_SHORT_BRO=
+ADCAST) ||
+> > > +                   addr =3D=3D cpu_to_le16(IEEE802154_ADDR_SHORT_UNS=
+PEC))
+> > > +                       continue;
+> > > +
+> > > +               if (wpan_dev->short_addr =3D=3D addr)
+> > > +                       continue;
+> > > +
+> > > +               if (wpan_dev->parent && wpan_dev->parent->short_addr =
+=3D=3D addr)
+> > > +                       continue;
+> > > +
+> > > +               list_for_each_entry(child, &wpan_dev->children, node)
+> > > +                       if (child->short_addr =3D=3D addr)
+> > > +                               continue;
+> > > +
+> > > +               break;
+> > > +       } while (1);
+> > > +
+> >
+> > I still believe that this random 2 bytes and check if it's already
+> > being used is wrong here. We need something to use the next free
+> > available number according to the data we are storing here.
+>
+> This issue I still have in mind is when you have this typology:
+>
+> device A -------> device B --------> device C <-------- device D
+> (leaf)            (coord)            (PAN coord)            (leaf)
+>
+> B associates with C
+> A associates with B
+> D associates with C
+>
+> If B and C run Linux's stack, they will always have the same short
+> address. Yes this can be handled (realignment procedure). But any time
+> this happens, you'll have a load of predictable realignments when A and
+> D get in range with B or C.
+>
 
-That's okay for me.
+I see that it can be "more" predictable, but what happens when there
+is the same short address case with the random number generator? It
+sounds to me like there needs to be a kind of duplicate address
+detection going on and then choose another one, if 802.15.4 even
+handles this case...
+
+I am also thinking that there is only one number left and the random
+generator runs multiple times to find the last one aka "it's random
+you can never be sure", when it always returns the same address.
+
+However, that's only my thoughts about it and hopefully can be
+improved in future.
 
 - Alex
 
