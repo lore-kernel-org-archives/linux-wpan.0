@@ -2,149 +2,120 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8056E743D0
-	for <linux-wpan@archiver.kernel.org>; Fri, 29 Sep 2023 00:23:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E24BE748E9
+	for <linux-wpan@archiver.kernel.org>; Sun,  1 Oct 2023 05:51:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229653AbjI2AX1 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Thu, 28 Sep 2023 20:23:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55256 "EHLO
+        id S234292AbjJAFvO (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Sun, 1 Oct 2023 01:51:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42700 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229541AbjI2AX1 (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 28 Sep 2023 20:23:27 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9347F3
-        for <linux-wpan@vger.kernel.org>; Thu, 28 Sep 2023 17:22:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1695946958;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=666yXX+Rj9/y3DrZAVThOB3jlkyaoQEETt9yyPl70zw=;
-        b=f9hhpxzWkcGMkvYq1mhpePDRMaC+7Hd/ok4mtHb+L8l/Tqqt+E9csjtyOmmUNZ7IlPbf0w
-        YELZG22smG9JHwo+z2iaWV/9g3niU9cQrBz/xzOpp2CjYQy/sannvZrysK8CGA+J/K1co9
-        4rsaRi/CrDcOkn+ZcFZUTotdkBSLXQM=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-78-2IwOA_MYNqGVom9be6nTow-1; Thu, 28 Sep 2023 20:22:37 -0400
-X-MC-Unique: 2IwOA_MYNqGVom9be6nTow-1
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-9a1cf3e6c04so1195190866b.3
-        for <linux-wpan@vger.kernel.org>; Thu, 28 Sep 2023 17:22:37 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695946956; x=1696551756;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=666yXX+Rj9/y3DrZAVThOB3jlkyaoQEETt9yyPl70zw=;
-        b=X3uWOkzAuIY2RZSWoFAkJPs5mze15eKn8Ht9ZC5gBDM2O5jV6Mq/sgap1prxp3Rd9a
-         4cFWqwPdlNdmhwXyZk2KiHJOSqmedYP3UtZa4/ZXEORfRUyVBrciJzofzPazlSXVUkQY
-         TiederpHwFqggBSmkHvHOtCk/OWHyHkpFGAT5P/aRulPk/YOpG3DtNZ3Vd9HNq9s4sy2
-         GbyKO80g2ZFtbPy9u+6e1PdXevrEu1HzLYJ5UY9zu9lWLJEaPISN3pzTfaptsDH1Z0pt
-         FfpvbVt3xUU6YLLlSXDLy/A8CJUI/SN2X7ODk1jwCDQU0MuPPPDTCDBaW+rk6dx+WhFx
-         evlw==
-X-Gm-Message-State: AOJu0YxeDycpUs5ef26pm+KbqLDQe6548nPOM3NfYx5Ky+xFFmSTRbEN
-        5ij2k6UK0QHZOxCrSJp4wC+NxY39O2M8ZOUCk+AuMgSdcoh/t82772RGfMRV537fw0Zw7jMnYA2
-        suriLMR3c7UTl0LbH74yFxQayEwhNivdtqFYBIs/u9Uw5Mw==
-X-Received: by 2002:a17:906:6a19:b0:9a9:eef6:434a with SMTP id qw25-20020a1709066a1900b009a9eef6434amr3035475ejc.36.1695946935881;
-        Thu, 28 Sep 2023 17:22:15 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEuppoHwvTpg1KFZiUtD4X/AbtaNHLSnQmyb2ostcKahHEJUcmjUOWI8ySL6L2H5t5oBG/K96u1mTGkfAeXB9Y=
-X-Received: by 2002:a17:906:6a19:b0:9a9:eef6:434a with SMTP id
- qw25-20020a1709066a1900b009a9eef6434amr3035448ejc.36.1695946935564; Thu, 28
- Sep 2023 17:22:15 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230922155029.592018-1-miquel.raynal@bootlin.com>
- <20230922155029.592018-3-miquel.raynal@bootlin.com> <CAK-6q+h_03Gnb+kz3NgumcxS99TV=W_0de2TCLXAk4uPg5W7BA@mail.gmail.com>
- <20230927175635.2404e28a@xps-13>
-In-Reply-To: <20230927175635.2404e28a@xps-13>
-From:   Alexander Aring <aahringo@redhat.com>
-Date:   Thu, 28 Sep 2023 20:22:04 -0400
-Message-ID: <CAK-6q+iWit1KoHfz-sQOLD3MiONcaHXAJHbL02V3srLx4C7X2Q@mail.gmail.com>
-Subject: Re: [PATCH wpan-next v4 02/11] ieee802154: Internal PAN management
-To:     Miquel Raynal <miquel.raynal@bootlin.com>
-Cc:     Alexander Aring <alex.aring@gmail.com>,
+        with ESMTP id S229455AbjJAFvN (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Sun, 1 Oct 2023 01:51:13 -0400
+Received: from zg8tmja2lje4os4yms4ymjma.icoremail.net (zg8tmja2lje4os4yms4ymjma.icoremail.net [206.189.21.223])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E5C39D3;
+        Sat, 30 Sep 2023 22:51:06 -0700 (PDT)
+Received: from localhost.localdomain (unknown [10.192.195.11])
+        by mail-app3 (Coremail) with SMTP id cC_KCgDHz8N_CBlllGwtAQ--.64662S4;
+        Sun, 01 Oct 2023 13:50:07 +0800 (CST)
+From:   Dinghao Liu <dinghao.liu@zju.edu.cn>
+To:     dinghao.liu@zju.edu.cn
+Cc:     stable@vger.kernel.org, Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
-        linux-wpan@vger.kernel.org,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
         "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
         Jakub Kicinski <kuba@kernel.org>,
         Paolo Abeni <pabeni@redhat.com>,
-        Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
-        David Girault <david.girault@qorvo.com>,
-        Romuald Despres <romuald.despres@qorvo.com>,
-        Frederic Blain <frederic.blain@qorvo.com>,
-        Nicolas Schodet <nico@ni.fr.eu.org>,
-        Guilhem Imberton <guilhem.imberton@qorvo.com>,
-        Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        Harry Morris <harrymorris12@gmail.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] [v3] ieee802154: ca8210: Fix a potential UAF in ca8210_probe
+Date:   Sun,  1 Oct 2023 13:49:49 +0800
+Message-Id: <20231001054949.14624-1-dinghao.liu@zju.edu.cn>
+X-Mailer: git-send-email 2.17.1
+X-CM-TRANSID: cC_KCgDHz8N_CBlllGwtAQ--.64662S4
+X-Coremail-Antispam: 1UD129KBjvJXoW7WF4fGFW5ury5Cry5JFW3GFg_yoW8uF4fpa
+        1Ska4UJryqvF4jga18Ar48Zr98C3W7KayruF95K392k3ZxuryxKanrAFW3JF4rAFWUCan8
+        C3yUJ3y5uFs5AF7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUvm1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AE
+        w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
+        IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVWxJVW8Jr1l84ACjcxK6I8E
+        87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c
+        8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_
+        Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwI
+        xGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1l42xK82IY
+        c2Ij64vIr41l42xK82IY6x8ErcxFaVAv8VW8uw4UJr1UMxC20s026xCaFVCjc4AY6r1j6r
+        4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF
+        67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2I
+        x0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2
+        z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnU
+        UI43ZEXa7VUbXdbUUUUUU==
+X-CM-SenderInfo: qrrzjiaqtzq6lmxovvfxof0/1tbiAgMPBmUYLyEI2QADsp
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi,
+If of_clk_add_provider() fails in ca8210_register_ext_clock(),
+it calls clk_unregister() to release priv->clk and returns an
+error. However, the caller ca8210_probe() then calls ca8210_remove(),
+where priv->clk is freed again in ca8210_unregister_ext_clock(). In
+this case, a use-after-free may happen in the second time we call
+clk_unregister().
 
-On Wed, Sep 27, 2023 at 12:10=E2=80=AFPM Miquel Raynal
-<miquel.raynal@bootlin.com> wrote:
->
-> Hi Alexander,
->
-> > > +
-> > > +#include <linux/kernel.h>
-> > > +#include <net/cfg802154.h>
-> > > +#include <net/af_ieee802154.h>
-> > > +
-> > > +/* Checks whether a device address matches one from the PAN list.
-> > > + * This helper is meant to be used only during PAN management, when =
-we expect
-> > > + * extended addresses to be used.
-> > > + */
-> > > +static bool cfg802154_device_in_pan(struct ieee802154_pan_device *pa=
-n_dev,
-> > > +                                   struct ieee802154_addr *ext_dev)
-> > > +{
-> > > +       if (!pan_dev || !ext_dev)
-> > > +               return false;
-> > > +
-> > > +       if (ext_dev->mode =3D=3D IEEE802154_ADDR_SHORT)
-> > > +               return false;
-> > > +
-> > > +       switch (ext_dev->mode) {
-> > > +       case IEEE802154_ADDR_SHORT:
-> > > +               return pan_dev->short_addr =3D=3D ext_dev->short_addr=
-;
-> >
-> > This is dead code now, it will never be reached, it's checked above
-> > (Or I don't see it)? I want to help you here. What exactly do you try
-> > to reach here again?
->
-> It's a left over. All association/disassociation operation so far which
-> need these checks are operated using extended addressing (from the
-> spec). I will simplify further this helper.
->
+Fix this by removing the first clk_unregister(). Also, priv->clk could
+be an error code on failure of clk_register_fixed_rate(). Use
+IS_ERR_OR_NULL to catch this case in ca8210_unregister_ext_clock().
 
-I see, it makes sense to me.
+Fixes: ded845a781a5 ("ieee802154: Add CA8210 IEEE 802.15.4 device driver")
+Signed-off-by: Dinghao Liu <dinghao.liu@zju.edu.cn>
+---
 
->
-> > > +bool cfg802154_device_is_parent(struct wpan_dev *wpan_dev,
-> > > +                               struct ieee802154_addr *target)
-> > > +{
-> > > +       lockdep_assert_held(&wpan_dev->association_lock);
-> > > +
-> > > +       if (cfg802154_device_in_pan(wpan_dev->parent, target))
-> > > +               return true;
-> > > +
-> > > +       return false;
-> >
-> > return cfg802154_device_in_pan(...); Why isn't checkpatch warning about=
- that?
->
-> checkpatch does not care I guess, but I can definitely simplify this
-> return path as well, you're right.
->
+Changelog:
 
-ok. Was a nitpick.
+v2: -Remove the first clk_unregister() instead of nulling priv->clk.
 
-Thanks.
+v3: -Simplify ca8210_register_ext_clock().
+    -Add a ';' after return in ca8210_unregister_ext_clock().
+---
+ drivers/net/ieee802154/ca8210.c | 16 +++-------------
+ 1 file changed, 3 insertions(+), 13 deletions(-)
 
-- Alex
+diff --git a/drivers/net/ieee802154/ca8210.c b/drivers/net/ieee802154/ca8210.c
+index aebb19f1b3a4..ae44a9133937 100644
+--- a/drivers/net/ieee802154/ca8210.c
++++ b/drivers/net/ieee802154/ca8210.c
+@@ -2757,18 +2757,8 @@ static int ca8210_register_ext_clock(struct spi_device *spi)
+ 		dev_crit(&spi->dev, "Failed to register external clk\n");
+ 		return PTR_ERR(priv->clk);
+ 	}
+-	ret = of_clk_add_provider(np, of_clk_src_simple_get, priv->clk);
+-	if (ret) {
+-		clk_unregister(priv->clk);
+-		dev_crit(
+-			&spi->dev,
+-			"Failed to register external clock as clock provider\n"
+-		);
+-	} else {
+-		dev_info(&spi->dev, "External clock set as clock provider\n");
+-	}
+ 
+-	return ret;
++	return of_clk_add_provider(np, of_clk_src_simple_get, priv->clk);
+ }
+ 
+ /**
+@@ -2780,8 +2770,8 @@ static void ca8210_unregister_ext_clock(struct spi_device *spi)
+ {
+ 	struct ca8210_priv *priv = spi_get_drvdata(spi);
+ 
+-	if (!priv->clk)
+-		return
++	if (IS_ERR_OR_NULL(priv->clk))
++		return;
+ 
+ 	of_clk_del_provider(spi->dev.of_node);
+ 	clk_unregister(priv->clk);
+-- 
+2.17.1
 
