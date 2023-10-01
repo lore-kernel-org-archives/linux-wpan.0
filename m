@@ -2,139 +2,88 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E731E748ED
-	for <linux-wpan@archiver.kernel.org>; Sun,  1 Oct 2023 07:19:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81F17E784A6
+	for <linux-wpan@archiver.kernel.org>; Sun,  1 Oct 2023 23:34:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234388AbjJAHT7 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Sun, 1 Oct 2023 03:19:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41930 "EHLO
+        id S229557AbjJAXfA (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Sun, 1 Oct 2023 19:35:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49130 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234371AbjJAHT7 (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Sun, 1 Oct 2023 03:19:59 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAF7FBE;
-        Sun,  1 Oct 2023 00:19:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1696144796; x=1727680796;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=+g5KE4gh1O3a8Y0AQj1BwOgU82tkX7gBe++A91tBvWI=;
-  b=VFgqdVsjxT7inrnuc3ablRJbwRkCevTgstMhn/FDhfx4FJclgrDVrtmq
-   2F6Pu5kH78LuYTcajzVflhIM9VKRFPj3hMWzAkMmE7kqE/zdbySe+08go
-   ZOiVgzYGwYHwB1OxMS2IGmM0LFJoBb8N8MfqQKybxKFk7yReb40HsvVxc
-   mKol7NEgKBS1000Uy0K4JbJRJ/8mU5BvJPMYfO/DMNj4buhQF4J47TP52
-   TSqHthz+/baKeYG60sN46zyXfUJUQIKLuu0/eDk+/LEhSNcAdI5LFBOlz
-   VXRpuGT1bPC8Vl8aYcy7GrqJECF6ffvAbVETnTUXwCg0HpmXmPS8ZHwES
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10849"; a="413409366"
-X-IronPort-AV: E=Sophos;i="6.03,191,1694761200"; 
-   d="scan'208";a="413409366"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Oct 2023 00:19:55 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10849"; a="866181047"
-X-IronPort-AV: E=Sophos;i="6.03,191,1694761200"; 
-   d="scan'208";a="866181047"
-Received: from lkp-server02.sh.intel.com (HELO c3b01524d57c) ([10.239.97.151])
-  by fmsmga002.fm.intel.com with ESMTP; 01 Oct 2023 00:19:52 -0700
-Received: from kbuild by c3b01524d57c with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1qmqk1-0004sX-32;
-        Sun, 01 Oct 2023 07:19:49 +0000
-Date:   Sun, 1 Oct 2023 15:19:46 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Dinghao Liu <dinghao.liu@zju.edu.cn>
-Cc:     oe-kbuild-all@lists.linux.dev, stable@vger.kernel.org,
-        Alexander Aring <alex.aring@gmail.com>,
-        Stefan Schmidt <stefan@datenfreihafen.org>,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Harry Morris <harrymorris12@gmail.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] [v3] ieee802154: ca8210: Fix a potential UAF in
- ca8210_probe
-Message-ID: <202310011548.qyQMuodI-lkp@intel.com>
-References: <20231001054949.14624-1-dinghao.liu@zju.edu.cn>
+        with ESMTP id S229476AbjJAXe7 (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Sun, 1 Oct 2023 19:34:59 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA527BD
+        for <linux-wpan@vger.kernel.org>; Sun,  1 Oct 2023 16:34:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1696203250;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=DwJG0Y5sytb0MznGWtUDKTAoJSwDn3GmQx41e5AajOU=;
+        b=fQzFoFr9Y9g3jBbImtKn60dMUQpFP2HYtwxP9CEMMHPxtWB/0BRP3pYTNfTO7qcF7zytkf
+        IFxCLrSaBCtUa2TwOhaCiYIcPuq+vGDFc6QkR+qfscGIqgbZ+3aOXouYO26A+4WpTKRj6B
+        q0KqeZLaex12LU2ZGeFU86G+bkZU1qY=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-517-NxgSRPlxMQebyw-ja8sMLQ-1; Sun, 01 Oct 2023 19:34:08 -0400
+X-MC-Unique: NxgSRPlxMQebyw-ja8sMLQ-1
+Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-9a62adedadbso1365009466b.1
+        for <linux-wpan@vger.kernel.org>; Sun, 01 Oct 2023 16:34:08 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696203247; x=1696808047;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=DwJG0Y5sytb0MznGWtUDKTAoJSwDn3GmQx41e5AajOU=;
+        b=F3cosfWu2zz3bEWTMJ53vj3TTjiqQCaGUY5sMb6mp0vOQRyoJaCrGlCpEbiteQdl1B
+         bRjjMedzR/lE0bwZQLlYaScqyw7vcbNfENrm0h9SCrcZ4zOyuskYtZr0re72pRxdVzrZ
+         ionX5kJAUPagWKuiFS/xtn6J7bTmRMdBBtVPTZufsSHSX/oQC+amndoGvCs7gh/3hswV
+         JNYsvgUlCSczg1wNcr2PzO4M4G66Y0ROytsvs0J5c3JhP5KmbAVMDi199HFXv7ahLE7g
+         xOTeC1DCEfGVNgEAGEV1JEIBGXvnKzlm8EYSoES7ztmC6RHEdxOW+iog41qFWinFgmUc
+         H0SA==
+X-Gm-Message-State: AOJu0Yy5FxEy2UTTGa6glqnoeaQFhhY/SuWuj0LX13ivnEHoQrUx+sZR
+        I6n8upDGTVfdKSLBtXPReKcblESW95RtKg8nOAH9d3PI5kcqI7LSY3K0e+Z/HtHUuDFmslfKtL4
+        yksCa4jme9CFduZpte+8b3LTGJCnAhrHZnqvI0A==
+X-Received: by 2002:a17:906:20d6:b0:9ae:7870:1522 with SMTP id c22-20020a17090620d600b009ae78701522mr8658791ejc.53.1696203247567;
+        Sun, 01 Oct 2023 16:34:07 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IExngVT5wUc9C0is6PUWQbq2ldP0VG2ft4oj5HXM6EHGFaOnukOgCOH0ZffGNERSSTq/pQrTSBMYaDux+eHC5c=
+X-Received: by 2002:a17:906:20d6:b0:9ae:7870:1522 with SMTP id
+ c22-20020a17090620d600b009ae78701522mr8658786ejc.53.1696203247299; Sun, 01
+ Oct 2023 16:34:07 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231001054949.14624-1-dinghao.liu@zju.edu.cn>
+References: <20230924122231.716878-1-stefan@datenfreihafen.org> <20230924122231.716878-6-stefan@datenfreihafen.org>
+In-Reply-To: <20230924122231.716878-6-stefan@datenfreihafen.org>
+From:   Alexander Aring <aahringo@redhat.com>
+Date:   Sun, 1 Oct 2023 19:33:55 -0400
+Message-ID: <CAK-6q+gsfJqyNUGsyuQkk=b4eTBEEJ_SHEaXLqz7jrr_6bEu8Q@mail.gmail.com>
+Subject: Re: [PATCH 5/9] src/nl802154.h: switch file to SPDX header for
+ license and copyright
+To:     Stefan Schmidt <stefan@datenfreihafen.org>
+Cc:     linux-wpan@vger.kernel.org, alex.aring@gmail.com,
+        miquel.raynal@bootlin.com, david.girault@qorvo.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi Dinghao,
+Hi,
 
-kernel test robot noticed the following build warnings:
+On Sun, Sep 24, 2023 at 8:24=E2=80=AFAM Stefan Schmidt
+<stefan@datenfreihafen.org> wrote:
+>
+> This file has its own commit as we are syncing it between the Linux
+> kernel and this project when new netlink functionality is added.
+>
+> The same change needs to be done on the iLinux kernel side as well to
+> avoid conflicts.
+>
 
-[auto build test WARNING on linus/master]
-[also build test WARNING on v6.6-rc3 next-20230929]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+the iLinux kernel? :) The Linux fork running on an iPhone?
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Dinghao-Liu/ieee802154-ca8210-Fix-a-potential-UAF-in-ca8210_probe/20231001-135130
-base:   linus/master
-patch link:    https://lore.kernel.org/r/20231001054949.14624-1-dinghao.liu%40zju.edu.cn
-patch subject: [PATCH] [v3] ieee802154: ca8210: Fix a potential UAF in ca8210_probe
-config: m68k-allyesconfig (https://download.01.org/0day-ci/archive/20231001/202310011548.qyQMuodI-lkp@intel.com/config)
-compiler: m68k-linux-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231001/202310011548.qyQMuodI-lkp@intel.com/reproduce)
+It's okay... you don't need to fix it.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202310011548.qyQMuodI-lkp@intel.com/
+- Alex
 
-All warnings (new ones prefixed by >>):
-
-   drivers/net/ieee802154/ca8210.c: In function 'ca8210_register_ext_clock':
->> drivers/net/ieee802154/ca8210.c:2743:13: warning: unused variable 'ret' [-Wunused-variable]
-    2743 |         int ret = 0;
-         |             ^~~
-
-
-vim +/ret +2743 drivers/net/ieee802154/ca8210.c
-
-ded845a781a578 Harry Morris 2017-03-28  2731  
-ded845a781a578 Harry Morris 2017-03-28  2732  /**
-ded845a781a578 Harry Morris 2017-03-28  2733   * ca8210_register_ext_clock() - Register ca8210's external clock with kernel
-ded845a781a578 Harry Morris 2017-03-28  2734   * @spi:  Pointer to target ca8210 spi device
-ded845a781a578 Harry Morris 2017-03-28  2735   *
-ded845a781a578 Harry Morris 2017-03-28  2736   * Return: 0 or linux error code
-ded845a781a578 Harry Morris 2017-03-28  2737   */
-ded845a781a578 Harry Morris 2017-03-28  2738  static int ca8210_register_ext_clock(struct spi_device *spi)
-ded845a781a578 Harry Morris 2017-03-28  2739  {
-ded845a781a578 Harry Morris 2017-03-28  2740  	struct device_node *np = spi->dev.of_node;
-ded845a781a578 Harry Morris 2017-03-28  2741  	struct ca8210_priv *priv = spi_get_drvdata(spi);
-ded845a781a578 Harry Morris 2017-03-28  2742  	struct ca8210_platform_data *pdata = spi->dev.platform_data;
-ded845a781a578 Harry Morris 2017-03-28 @2743  	int ret = 0;
-ded845a781a578 Harry Morris 2017-03-28  2744  
-ded845a781a578 Harry Morris 2017-03-28  2745  	if (!np)
-ded845a781a578 Harry Morris 2017-03-28  2746  		return -EFAULT;
-ded845a781a578 Harry Morris 2017-03-28  2747  
-ded845a781a578 Harry Morris 2017-03-28  2748  	priv->clk = clk_register_fixed_rate(
-ded845a781a578 Harry Morris 2017-03-28  2749  		&spi->dev,
-ded845a781a578 Harry Morris 2017-03-28  2750  		np->name,
-ded845a781a578 Harry Morris 2017-03-28  2751  		NULL,
-ded845a781a578 Harry Morris 2017-03-28  2752  		0,
-ded845a781a578 Harry Morris 2017-03-28  2753  		pdata->extclockfreq
-ded845a781a578 Harry Morris 2017-03-28  2754  	);
-ded845a781a578 Harry Morris 2017-03-28  2755  
-ded845a781a578 Harry Morris 2017-03-28  2756  	if (IS_ERR(priv->clk)) {
-ded845a781a578 Harry Morris 2017-03-28  2757  		dev_crit(&spi->dev, "Failed to register external clk\n");
-ded845a781a578 Harry Morris 2017-03-28  2758  		return PTR_ERR(priv->clk);
-ded845a781a578 Harry Morris 2017-03-28  2759  	}
-ded845a781a578 Harry Morris 2017-03-28  2760  
-d0603f3c78f0aa Dinghao Liu  2023-10-01  2761  	return of_clk_add_provider(np, of_clk_src_simple_get, priv->clk);
-ded845a781a578 Harry Morris 2017-03-28  2762  }
-ded845a781a578 Harry Morris 2017-03-28  2763  
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
