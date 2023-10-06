@@ -2,64 +2,56 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8ADAE92FCB
-	for <linux-wpan@archiver.kernel.org>; Thu,  5 Oct 2023 22:11:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E902E92FCD
+	for <linux-wpan@archiver.kernel.org>; Fri,  6 Oct 2023 04:07:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229843AbjJEWL3 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Thu, 5 Oct 2023 18:11:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47346 "EHLO
+        id S229900AbjJFEHm (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Fri, 6 Oct 2023 00:07:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59144 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229800AbjJEWL2 (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 5 Oct 2023 18:11:28 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D8CBE4
-        for <linux-wpan@vger.kernel.org>; Thu,  5 Oct 2023 15:10:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1696543841;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=6aHMrxnKFRL8eZP2ZR9DPlVMl+BHWqD42jAitaZoUq8=;
-        b=JrI/W0ru/uUR5od3wmiGIbdWb52RCYcYDB37k1Vcl490zOzq2tVPAFzlkhoRPElpZ5Tg/x
-        mvH9ImPXMKatJCkgUaMrAncneD1flToICHlZiPVwRn/VBDLXXJXnarRNhpT8ji9u/BeoZr
-        9dJVM2c2kKRAy7W1GNPWWUchXImbdSs=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-111-ojfDY2AePTa5URKxgIaKBw-1; Thu, 05 Oct 2023 18:10:25 -0400
-X-MC-Unique: ojfDY2AePTa5URKxgIaKBw-1
-Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-5346626c1c5so1190481a12.1
-        for <linux-wpan@vger.kernel.org>; Thu, 05 Oct 2023 15:10:25 -0700 (PDT)
+        with ESMTP id S229894AbjJFEHm (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 6 Oct 2023 00:07:42 -0400
+Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0A64E7
+        for <linux-wpan@vger.kernel.org>; Thu,  5 Oct 2023 21:07:38 -0700 (PDT)
+Received: by mail-wm1-x336.google.com with SMTP id 5b1f17b1804b1-40535597f01so15242535e9.3
+        for <linux-wpan@vger.kernel.org>; Thu, 05 Oct 2023 21:07:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1696565257; x=1697170057; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=SfmJdBPydu0BZJi6LE/RTqA11QEqZm0bT62TNJwMfLU=;
+        b=rr70CsHtSYjU0JhuGFjffW8UqdVt7tisVHvQjKqRBq0ngNi2560ND07JBb+qwjAHuZ
+         FTyXL1EfPNruFYt1199hZkF3Pc42WhFfSp8pFKkrg5ZauTM2rfd/H++JJ3JQnXfwM+85
+         qfwUlLdsK96KiJn86HWiKTihhbNswz6n9ecgKERdqi/5UyFq8+6VigFSl+ajV1Alm2Zb
+         ndm76/3PMRJc9uosUdccTwV4XMJw4hEhnYr9TkNoR04ixKiektOVp30QIxprJN7/7ojQ
+         gFyqEPNYJCe1DVexm+scSgh7JUQZaQM2FeX9IKBF12mkqO82yEX0RHTWhBJzmYWvHgzK
+         nPqg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696543824; x=1697148624;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6aHMrxnKFRL8eZP2ZR9DPlVMl+BHWqD42jAitaZoUq8=;
-        b=lBeMWiIHr/sfkxJZcrN2pvjxzIPrjHppYNmGtXajoVv2l1dsRM+H96R57Smf7UKqFR
-         CwUqZscREXOgBLaxfk0KKs8OAfD766OdS3Z8VZ1qAT1M8L/0aEU4wsZReaDzdcUq7dSy
-         xUuJbhvY4NBqLxAzzbjXWuIrxSZOCWnuThZnRcIKR7xhAd6o/rcA0Y7I/Fy6j4m5t2KD
-         RoWSxKGRNJ3xSqFNCiVrGxGKjnlTzohnLRiU5LlIV0CKUovOzHzGuaA/O2MQwbMUdpfT
-         wX50AVXZ0aqD1RIk1OHdZAe7b0Xl6YhQlew877NYtxZV0+wc/DkfqMGKdenPAEKR+qYT
-         p94Q==
-X-Gm-Message-State: AOJu0YwA0iGuumfrwA4JqQnoo17QiE+hs0j44xNs6SVmrxwgM1yI7Cv1
-        DdeErvcv4+S55uWCTR+j0qfykTZGjmJMfPm7vH10kTCQOcvrDGT32yRGNIeWTm2QW1XnQNSlw+l
-        f2JlYn7xj5VNa3M7YJWqF1XlNSMYy4Y70J8rFXg==
-X-Received: by 2002:aa7:d615:0:b0:52b:db31:3c48 with SMTP id c21-20020aa7d615000000b0052bdb313c48mr5783975edr.0.1696543824461;
-        Thu, 05 Oct 2023 15:10:24 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGpNdCbvG6JhfAS3lwMZiyvboAoUGjRJHfOGjkHcza1InSbT5oi3sklaEIketz0hkFWheMaLuZomkliQzgw6to=
-X-Received: by 2002:aa7:d615:0:b0:52b:db31:3c48 with SMTP id
- c21-20020aa7d615000000b0052bdb313c48mr5783968edr.0.1696543824238; Thu, 05 Oct
- 2023 15:10:24 -0700 (PDT)
-MIME-Version: 1.0
-References: <3c91e145-5cd5-4d9d-9590-3b74b811436a@moroto.mountain>
-In-Reply-To: <3c91e145-5cd5-4d9d-9590-3b74b811436a@moroto.mountain>
-From:   Alexander Aring <aahringo@redhat.com>
-Date:   Thu, 5 Oct 2023 18:10:13 -0400
-Message-ID: <CAK-6q+iG=jX0qudCcszP64HxCwYSpmx7=Fh+Kf3qVft7Z8hBfg@mail.gmail.com>
-Subject: Re: [PATCH net] 6lowpan: fix double free in lowpan_frag_rcv()
-To:     Dan Carpenter <dan.carpenter@linaro.org>
+        d=1e100.net; s=20230601; t=1696565257; x=1697170057;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=SfmJdBPydu0BZJi6LE/RTqA11QEqZm0bT62TNJwMfLU=;
+        b=pTVIZhICN+S7/LYFjR8/eLu/1NxAj+nlGde0Kwfu6BxaAtmdvzUNYp2UAzsZFLbr+S
+         9Pof9kpz3A5AUrz24lbkamR14qPNxDpzC95xDaCwDnSVRrVgs3lauyTIBJufK03WqQP3
+         QIghplTQ/DZVQsog1L3/gzIw5/6J3IlJQOQRj6D42l4YMRaz1hbzlKuWMN8N4y0K9nC8
+         0pIMw7Ll1oV6nEz+bDff4Bj02/5T4rMeUWmVYpx7TybGvQPLN2oTN4k7ePbGdLQeFHsG
+         ZH3L8a9v2xUb/btskicvqHWOWMVwzULPOG9Dmm7A2048dITYA/zihZ5+amECctu4ELTj
+         pjBg==
+X-Gm-Message-State: AOJu0Yx8ZI+5Nhm9pIh5gKWT154L3bsGqOLKNW5Iq2UxjCzaz2cS3iFW
+        5/Ni6qBAhTIAHGNvppw2EIy7TA==
+X-Google-Smtp-Source: AGHT+IFjeXrQUs7p/saYuWWFYACMu2/fI8dWiPv6wIANSyumueY5p9GrWNrq8I5Iy/tR2cn2JV/ZzQ==
+X-Received: by 2002:a05:600c:2117:b0:402:f55c:faee with SMTP id u23-20020a05600c211700b00402f55cfaeemr5918406wml.26.1696565257030;
+        Thu, 05 Oct 2023 21:07:37 -0700 (PDT)
+Received: from localhost ([102.36.222.112])
+        by smtp.gmail.com with ESMTPSA id s26-20020a7bc39a000000b004064cd71aa8sm2784785wmj.34.2023.10.05.21.07.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Oct 2023 21:07:36 -0700 (PDT)
+Date:   Fri, 6 Oct 2023 07:07:34 +0300
+From:   Dan Carpenter <dan.carpenter@linaro.org>
+To:     Alexander Aring <aahringo@redhat.com>
 Cc:     Alexander Aring <alex.aring@gmail.com>,
         Stefan Schmidt <stefan@datenfreihafen.org>,
         Miquel Raynal <miquel.raynal@bootlin.com>,
@@ -72,24 +64,43 @@ Cc:     Alexander Aring <alex.aring@gmail.com>,
         Joel Granados <joel.granados@gmail.com>,
         linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
         kernel-janitors@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH net] 6lowpan: fix double free in lowpan_frag_rcv()
+Message-ID: <e438fc67-665a-48b6-b414-0641821e0bf3@kadam.mountain>
+References: <3c91e145-5cd5-4d9d-9590-3b74b811436a@moroto.mountain>
+ <CAK-6q+iG=jX0qudCcszP64HxCwYSpmx7=Fh+Kf3qVft7Z8hBfg@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAK-6q+iG=jX0qudCcszP64HxCwYSpmx7=Fh+Kf3qVft7Z8hBfg@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi,
+On Thu, Oct 05, 2023 at 06:10:13PM -0400, Alexander Aring wrote:
+> Hi,
+> 
+> On Wed, Oct 4, 2023 at 5:22 AM Dan Carpenter <dan.carpenter@linaro.org> wrote:
+> >
+> > The skb() is freed by the caller in lowpan_invoke_rx_handlers() so this
+> > free is a double free.
+> >
+> 
+> lowpan_frag_rcv() does not call lowpan_invoke_rx_handlers(), it calls
+> lowpan_invoke_frag_rx_handlers(), or is there something I overlooked
+> here?
 
-On Wed, Oct 4, 2023 at 5:22=E2=80=AFAM Dan Carpenter <dan.carpenter@linaro.=
-org> wrote:
->
-> The skb() is freed by the caller in lowpan_invoke_rx_handlers() so this
-> free is a double free.
->
+Actually now that I look at it more closely this isn't a bug.
 
-lowpan_frag_rcv() does not call lowpan_invoke_rx_handlers(), it calls
-lowpan_invoke_frag_rx_handlers(), or is there something I overlooked
-here?
+The way I was looking at it was that it was the other way around.
+lowpan_invoke_rx_handlers() is the caller.  But actually this returns
+-1.  lowpan_invoke_rx_handlers() will pass the freed skb to
+lowpan_rx_handlers_result() but the -1 gets translated to RX_DROP in
+lowpan_rx_h_frag() then it just returns NET_RX_DROP.  It's a no-op and
+not a double free.
 
-- Alex
+Sorry!
+
+regards,
+dan carpenter
 
