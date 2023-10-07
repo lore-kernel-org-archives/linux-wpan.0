@@ -2,105 +2,92 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E902E92FCD
-	for <linux-wpan@archiver.kernel.org>; Fri,  6 Oct 2023 04:07:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4F92E94139
+	for <linux-wpan@archiver.kernel.org>; Sat,  7 Oct 2023 01:36:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229900AbjJFEHm (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Fri, 6 Oct 2023 00:07:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59144 "EHLO
+        id S233981AbjJGBgT (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Fri, 6 Oct 2023 21:36:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60916 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229894AbjJFEHm (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Fri, 6 Oct 2023 00:07:42 -0400
-Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0A64E7
-        for <linux-wpan@vger.kernel.org>; Thu,  5 Oct 2023 21:07:38 -0700 (PDT)
-Received: by mail-wm1-x336.google.com with SMTP id 5b1f17b1804b1-40535597f01so15242535e9.3
-        for <linux-wpan@vger.kernel.org>; Thu, 05 Oct 2023 21:07:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1696565257; x=1697170057; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=SfmJdBPydu0BZJi6LE/RTqA11QEqZm0bT62TNJwMfLU=;
-        b=rr70CsHtSYjU0JhuGFjffW8UqdVt7tisVHvQjKqRBq0ngNi2560ND07JBb+qwjAHuZ
-         FTyXL1EfPNruFYt1199hZkF3Pc42WhFfSp8pFKkrg5ZauTM2rfd/H++JJ3JQnXfwM+85
-         qfwUlLdsK96KiJn86HWiKTihhbNswz6n9ecgKERdqi/5UyFq8+6VigFSl+ajV1Alm2Zb
-         ndm76/3PMRJc9uosUdccTwV4XMJw4hEhnYr9TkNoR04ixKiektOVp30QIxprJN7/7ojQ
-         gFyqEPNYJCe1DVexm+scSgh7JUQZaQM2FeX9IKBF12mkqO82yEX0RHTWhBJzmYWvHgzK
-         nPqg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696565257; x=1697170057;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SfmJdBPydu0BZJi6LE/RTqA11QEqZm0bT62TNJwMfLU=;
-        b=pTVIZhICN+S7/LYFjR8/eLu/1NxAj+nlGde0Kwfu6BxaAtmdvzUNYp2UAzsZFLbr+S
-         9Pof9kpz3A5AUrz24lbkamR14qPNxDpzC95xDaCwDnSVRrVgs3lauyTIBJufK03WqQP3
-         QIghplTQ/DZVQsog1L3/gzIw5/6J3IlJQOQRj6D42l4YMRaz1hbzlKuWMN8N4y0K9nC8
-         0pIMw7Ll1oV6nEz+bDff4Bj02/5T4rMeUWmVYpx7TybGvQPLN2oTN4k7ePbGdLQeFHsG
-         ZH3L8a9v2xUb/btskicvqHWOWMVwzULPOG9Dmm7A2048dITYA/zihZ5+amECctu4ELTj
-         pjBg==
-X-Gm-Message-State: AOJu0Yx8ZI+5Nhm9pIh5gKWT154L3bsGqOLKNW5Iq2UxjCzaz2cS3iFW
-        5/Ni6qBAhTIAHGNvppw2EIy7TA==
-X-Google-Smtp-Source: AGHT+IFjeXrQUs7p/saYuWWFYACMu2/fI8dWiPv6wIANSyumueY5p9GrWNrq8I5Iy/tR2cn2JV/ZzQ==
-X-Received: by 2002:a05:600c:2117:b0:402:f55c:faee with SMTP id u23-20020a05600c211700b00402f55cfaeemr5918406wml.26.1696565257030;
-        Thu, 05 Oct 2023 21:07:37 -0700 (PDT)
-Received: from localhost ([102.36.222.112])
-        by smtp.gmail.com with ESMTPSA id s26-20020a7bc39a000000b004064cd71aa8sm2784785wmj.34.2023.10.05.21.07.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Oct 2023 21:07:36 -0700 (PDT)
-Date:   Fri, 6 Oct 2023 07:07:34 +0300
-From:   Dan Carpenter <dan.carpenter@linaro.org>
-To:     Alexander Aring <aahringo@redhat.com>
-Cc:     Alexander Aring <alex.aring@gmail.com>,
-        Stefan Schmidt <stefan@datenfreihafen.org>,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Angus Chen <angus.chen@jaguarmicro.com>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Joel Granados <joel.granados@gmail.com>,
+        with ESMTP id S233822AbjJGBgS (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 6 Oct 2023 21:36:18 -0400
+Received: from zg8tmja2lje4os4yms4ymjma.icoremail.net (zg8tmja2lje4os4yms4ymjma.icoremail.net [206.189.21.223])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id BA7CAB6;
+        Fri,  6 Oct 2023 18:36:14 -0700 (PDT)
+Received: from dinghao.liu$zju.edu.cn ( [10.190.65.233] ) by
+ ajax-webmail-mail-app4 (Coremail) ; Sat, 7 Oct 2023 09:35:16 +0800
+ (GMT+08:00)
+X-Originating-IP: [10.190.65.233]
+Date:   Sat, 7 Oct 2023 09:35:16 +0800 (GMT+08:00)
+X-CM-HeaderCharset: UTF-8
+From:   dinghao.liu@zju.edu.cn
+To:     "Stefan Schmidt" <stefan@datenfreihafen.org>
+Cc:     "kernel test robot" <lkp@intel.com>, oe-kbuild-all@lists.linux.dev,
+        stable@vger.kernel.org, "Alexander Aring" <alex.aring@gmail.com>,
+        "Miquel Raynal" <miquel.raynal@bootlin.com>,
+        "Eric Dumazet" <edumazet@google.com>,
+        "Jakub Kicinski" <kuba@kernel.org>,
+        "Paolo Abeni" <pabeni@redhat.com>,
+        "Harry Morris" <harrymorris12@gmail.com>,
+        "Marcel Holtmann" <marcel@holtmann.org>,
         linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
-        kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH net] 6lowpan: fix double free in lowpan_frag_rcv()
-Message-ID: <e438fc67-665a-48b6-b414-0641821e0bf3@kadam.mountain>
-References: <3c91e145-5cd5-4d9d-9590-3b74b811436a@moroto.mountain>
- <CAK-6q+iG=jX0qudCcszP64HxCwYSpmx7=Fh+Kf3qVft7Z8hBfg@mail.gmail.com>
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] [v3] ieee802154: ca8210: Fix a potential UAF in
+ ca8210_probe
+X-Priority: 3
+X-Mailer: Coremail Webmail Server Version 2023.2-cmXT5 build
+ 20230825(e13b6a3b) Copyright (c) 2002-2023 www.mailtech.cn
+ mispb-4df6dc2c-e274-4d1c-b502-72c5c3dfa9ce-zj.edu.cn
+In-Reply-To: <1ed2f41f-ac5a-0b76-1012-410857d4da54@datenfreihafen.org>
+References: <20231001054949.14624-1-dinghao.liu@zju.edu.cn>
+ <202310011548.qyQMuodI-lkp@intel.com>
+ <1ed2f41f-ac5a-0b76-1012-410857d4da54@datenfreihafen.org>
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=UTF-8
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAK-6q+iG=jX0qudCcszP64HxCwYSpmx7=Fh+Kf3qVft7Z8hBfg@mail.gmail.com>
+Message-ID: <364ac434.4e95.18b07c644b7.Coremail.dinghao.liu@zju.edu.cn>
+X-Coremail-Locale: zh_CN
+X-CM-TRANSID: cS_KCgCHWPXUtSBlDLgmAA--.2669W
+X-CM-SenderInfo: qrrzjiaqtzq6lmxovvfxof0/1tbiAgIABmUexqIjNQAEsL
+X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
+        CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
+        daVFxhVjvjDU=
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-On Thu, Oct 05, 2023 at 06:10:13PM -0400, Alexander Aring wrote:
-> Hi,
-> 
-> On Wed, Oct 4, 2023 at 5:22 AM Dan Carpenter <dan.carpenter@linaro.org> wrote:
-> >
-> > The skb() is freed by the caller in lowpan_invoke_rx_handlers() so this
-> > free is a double free.
-> >
-> 
-> lowpan_frag_rcv() does not call lowpan_invoke_rx_handlers(), it calls
-> lowpan_invoke_frag_rx_handlers(), or is there something I overlooked
-> here?
-
-Actually now that I look at it more closely this isn't a bug.
-
-The way I was looking at it was that it was the other way around.
-lowpan_invoke_rx_handlers() is the caller.  But actually this returns
--1.  lowpan_invoke_rx_handlers() will pass the freed skb to
-lowpan_rx_handlers_result() but the -1 gets translated to RX_DROP in
-lowpan_rx_h_frag() then it just returns NET_RX_DROP.  It's a no-op and
-not a double free.
-
-Sorry!
-
-regards,
-dan carpenter
-
+Cj4gSGVsbG8gRGluZ2hhbywKPiAKPiAKPiBPbiAwMS4xMC4yMyAwOToxOSwga2VybmVsIHRlc3Qg
+cm9ib3Qgd3JvdGU6Cj4gPiBIaSBEaW5naGFvLAo+ID4gCj4gPiBrZXJuZWwgdGVzdCByb2JvdCBu
+b3RpY2VkIHRoZSBmb2xsb3dpbmcgYnVpbGQgd2FybmluZ3M6Cj4gPiAKPiA+IFthdXRvIGJ1aWxk
+IHRlc3QgV0FSTklORyBvbiBsaW51cy9tYXN0ZXJdCj4gPiBbYWxzbyBidWlsZCB0ZXN0IFdBUk5J
+Tkcgb24gdjYuNi1yYzMgbmV4dC0yMDIzMDkyOV0KPiA+IFtJZiB5b3VyIHBhdGNoIGlzIGFwcGxp
+ZWQgdG8gdGhlIHdyb25nIGdpdCB0cmVlLCBraW5kbHkgZHJvcCB1cyBhIG5vdGUuCj4gPiBBbmQg
+d2hlbiBzdWJtaXR0aW5nIHBhdGNoLCB3ZSBzdWdnZXN0IHRvIHVzZSAnLS1iYXNlJyBhcyBkb2N1
+bWVudGVkIGluCj4gPiBodHRwczovL2dpdC1zY20uY29tL2RvY3MvZ2l0LWZvcm1hdC1wYXRjaCNf
+YmFzZV90cmVlX2luZm9ybWF0aW9uXQo+ID4gCj4gPiB1cmw6ICAgIGh0dHBzOi8vZ2l0aHViLmNv
+bS9pbnRlbC1sYWItbGtwL2xpbnV4L2NvbW1pdHMvRGluZ2hhby1MaXUvaWVlZTgwMjE1NC1jYTgy
+MTAtRml4LWEtcG90ZW50aWFsLVVBRi1pbi1jYTgyMTBfcHJvYmUvMjAyMzEwMDEtMTM1MTMwCj4g
+PiBiYXNlOiAgIGxpbnVzL21hc3Rlcgo+ID4gcGF0Y2ggbGluazogICAgaHR0cHM6Ly9sb3JlLmtl
+cm5lbC5vcmcvci8yMDIzMTAwMTA1NDk0OS4xNDYyNC0xLWRpbmdoYW8ubGl1JTQwemp1LmVkdS5j
+bgo+ID4gcGF0Y2ggc3ViamVjdDogW1BBVENIXSBbdjNdIGllZWU4MDIxNTQ6IGNhODIxMDogRml4
+IGEgcG90ZW50aWFsIFVBRiBpbiBjYTgyMTBfcHJvYmUKPiA+IGNvbmZpZzogbTY4ay1hbGx5ZXNj
+b25maWcgKGh0dHBzOi8vZG93bmxvYWQuMDEub3JnLzBkYXktY2kvYXJjaGl2ZS8yMDIzMTAwMS8y
+MDIzMTAwMTE1NDgucXlRTXVvZEktbGtwQGludGVsLmNvbS9jb25maWcpCj4gPiBjb21waWxlcjog
+bTY4ay1saW51eC1nY2MgKEdDQykgMTMuMi4wCj4gPiByZXByb2R1Y2UgKHRoaXMgaXMgYSBXPTEg
+YnVpbGQpOiAoaHR0cHM6Ly9kb3dubG9hZC4wMS5vcmcvMGRheS1jaS9hcmNoaXZlLzIwMjMxMDAx
+LzIwMjMxMDAxMTU0OC5xeVFNdW9kSS1sa3BAaW50ZWwuY29tL3JlcHJvZHVjZSkKPiA+IAo+ID4g
+SWYgeW91IGZpeCB0aGUgaXNzdWUgaW4gYSBzZXBhcmF0ZSBwYXRjaC9jb21taXQgKGkuZS4gbm90
+IGp1c3QgYSBuZXcgdmVyc2lvbiBvZgo+ID4gdGhlIHNhbWUgcGF0Y2gvY29tbWl0KSwga2luZGx5
+IGFkZCBmb2xsb3dpbmcgdGFncwo+ID4gfCBSZXBvcnRlZC1ieToga2VybmVsIHRlc3Qgcm9ib3Qg
+PGxrcEBpbnRlbC5jb20+Cj4gPiB8IENsb3NlczogaHR0cHM6Ly9sb3JlLmtlcm5lbC5vcmcvb2Ut
+a2J1aWxkLWFsbC8yMDIzMTAwMTE1NDgucXlRTXVvZEktbGtwQGludGVsLmNvbS8KPiA+IAo+ID4g
+QWxsIHdhcm5pbmdzIChuZXcgb25lcyBwcmVmaXhlZCBieSA+Pik6Cj4gPiAKPiA+ICAgICBkcml2
+ZXJzL25ldC9pZWVlODAyMTU0L2NhODIxMC5jOiBJbiBmdW5jdGlvbiAnY2E4MjEwX3JlZ2lzdGVy
+X2V4dF9jbG9jayc6Cj4gPj4+IGRyaXZlcnMvbmV0L2llZWU4MDIxNTQvY2E4MjEwLmM6Mjc0Mzox
+Mzogd2FybmluZzogdW51c2VkIHZhcmlhYmxlICdyZXQnIFstV3VudXNlZC12YXJpYWJsZV0KPiA+
+ICAgICAgMjc0MyB8ICAgICAgICAgaW50IHJldCA9IDA7Cj4gPiAgICAgICAgICAgfCAgICAgICAg
+ICAgICBefn4KPiA+IAo+IAo+IFBsZWFzZSB0YWtlIGNhcmUgb2YgdGhpcyBub3cgdW51c2VkIHZh
+cmlhYmxlIGFmdGVyIHlvdXIgcmUtZmFjdG9yLgo+IFdpdGggdGhpcyBmaXhlZCBhbmQgc2VuZCBv
+dXQgYXMgdjQgSSBhbSBoYXBweSB0byBnZXQgdGhpcyBhcHBsaWVkIHRvIHRoZSAKPiB3cGFuIHRy
+ZWUuCgpJIHdpbGwgcmVzZW5kIHRoZSB2NCBwYXRjaCBzb29uLCB0aGFua3MhCgpSZWdhcmRzLApE
+aW5naGFvCg==
