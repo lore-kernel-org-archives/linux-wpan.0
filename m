@@ -2,34 +2,31 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68226E95A8E
-	for <linux-wpan@archiver.kernel.org>; Mon,  9 Oct 2023 14:20:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BC2DE95A96
+	for <linux-wpan@archiver.kernel.org>; Mon,  9 Oct 2023 15:24:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1377618AbjJIOUa (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 9 Oct 2023 10:20:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60370 "EHLO
+        id S1376538AbjJIPYI (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 9 Oct 2023 11:24:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46898 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1377633AbjJIOUK (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 9 Oct 2023 10:20:10 -0400
+        with ESMTP id S1377636AbjJIPYB (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 9 Oct 2023 11:24:01 -0400
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D726A191;
-        Mon,  9 Oct 2023 07:19:55 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 496DEC433CC;
-        Mon,  9 Oct 2023 14:19:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1696861195;
-        bh=zrhlLGL/7VohDIuN/EnFdfDCdV/hjo/fxSU8flcn0tg=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=uG8joQhwT/J1Qi0GHNNGTaNerkrxmX7PXQ4llCcftLvkJc1z1xg8Tj2Rs/7fqKB0R
-         T6i+1HX38DKH0hHNEHjjc1qjs7vbU7dkiGvdvpfOvpuUjjBwiuDVWbqnL5yraXXhXT
-         WK1m3es7CZkSw5r0n9c02z5ykEYRY3UIJQ3+vnMGWUathqPiUr8r8Nt3sEnzdaLMdr
-         e/c+5K89ZslM57E8aEaURB2daDUOW3SY1KlTCDMAhCEjGW2RmMR/hgCO7Il9k3g/Yw
-         UM6T+cnQ/pj6lGMfcMBi9xtJwMIPO8ZYeg3nOsNsXfpBGJjTJ8/xlgmkXAzXX4mgLu
-         U4XvAZk1WPXiw==
-From:   Arnd Bergmann <arnd@kernel.org>
-To:     Jakub Kicinski <kuba@kernel.org>
-Cc:     netdev@vger.kernel.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4743AC;
+        Mon,  9 Oct 2023 08:24:00 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC265C433C8;
+        Mon,  9 Oct 2023 15:23:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1696865040;
+        bh=c+LVTQX5zg+keyPvguZV4kyGAzn9+JPENSKqzOGE7hE=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=2c633xjx7Mcpya6U253bbXQQlkd0hCs2abRXezhj03ehtaSpOdrL0DK0/SMcIVTKq
+         4lGsx1SegTxLvvsIKGJ6fa1OFODDtv3fydxEIqeKRVFf1924btTe7bjkoG0lCaB0MI
+         oNez1/TAVgZmjtDn0+XT6SCdizxojYZCgf8tEzIU=
+Date:   Mon, 9 Oct 2023 17:23:57 +0200
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Arnd Bergmann <arnd@kernel.org>
+Cc:     Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
         linux-wireless@vger.kernel.org,
         Johannes Berg <johannes@sipsolutions.net>,
         linux-wpan@vger.kernel.org,
@@ -39,73 +36,30 @@ Cc:     netdev@vger.kernel.org,
         "David S . Miller" <davem@davemloft.net>,
         linux-kernel@vger.kernel.org, Doug Brown <doug@schmorgal.com>,
         Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH 10/10] net: remove ndo_do_ioctl handler
-Date:   Mon,  9 Oct 2023 16:19:08 +0200
-Message-Id: <20231009141908.1767241-10-arnd@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20231009141908.1767241-1-arnd@kernel.org>
+Subject: Re: [PATCH 06/10] staging: rtl8712: remove unused legacy ioctl
+ handlers
+Message-ID: <2023100953-ungraded-tutu-6128@gregkh>
 References: <20231009141908.1767241-1-arnd@kernel.org>
+ <20231009141908.1767241-6-arnd@kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231009141908.1767241-6-arnd@kernel.org>
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-From: Arnd Bergmann <arnd@arndb.de>
+On Mon, Oct 09, 2023 at 04:19:04PM +0200, Arnd Bergmann wrote:
+> From: Arnd Bergmann <arnd@arndb.de>
+> 
+> The .ndo_do_ioctl functions are never called, and can just be removed,
+> especially since this is a staging driver.
+> 
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> ---
+>  drivers/staging/rtl8712/os_intfs.c            |   1 -
+>  drivers/staging/rtl8712/osdep_intf.h          |   2 -
+>  drivers/staging/rtl8712/rtl871x_ioctl_linux.c | 124 ------------------
+>  3 files changed, 127 deletions(-)
 
-All of the references to the callback pointer are gone, so remove the
-pointer itself before we grow new references to it.
-
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- Documentation/networking/netdevices.rst | 8 --------
- include/linux/netdevice.h               | 7 -------
- 2 files changed, 15 deletions(-)
-
-diff --git a/Documentation/networking/netdevices.rst b/Documentation/networking/netdevices.rst
-index 9e4cccb90b870..6f9b71c5d37b8 100644
---- a/Documentation/networking/netdevices.rst
-+++ b/Documentation/networking/netdevices.rst
-@@ -218,14 +218,6 @@ ndo_stop:
- 	Context: process
- 	Note: netif_running() is guaranteed false
- 
--ndo_do_ioctl:
--	Synchronization: rtnl_lock() semaphore.
--	Context: process
--
--        This is only called by network subsystems internally,
--        not by user space calling ioctl as it was in before
--        linux-5.14.
--
- ndo_siocbond:
-         Synchronization: rtnl_lock() semaphore.
-         Context: process
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index e070a4540fbaf..8d1cc8f195cb6 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -1121,11 +1121,6 @@ struct netdev_net_notifier {
-  * int (*ndo_validate_addr)(struct net_device *dev);
-  *	Test if Media Access Control address is valid for the device.
-  *
-- * int (*ndo_do_ioctl)(struct net_device *dev, struct ifreq *ifr, int cmd);
-- *	Old-style ioctl entry point. This is used internally by the
-- *	appletalk and ieee802154 subsystems but is no longer called by
-- *	the device ioctl handler.
-- *
-  * int (*ndo_siocbond)(struct net_device *dev, struct ifreq *ifr, int cmd);
-  *	Used by the bonding driver for its device specific ioctls:
-  *	SIOCBONDENSLAVE, SIOCBONDRELEASE, SIOCBONDSETHWADDR, SIOCBONDCHANGEACTIVE,
-@@ -1429,8 +1424,6 @@ struct net_device_ops {
- 	int			(*ndo_set_mac_address)(struct net_device *dev,
- 						       void *addr);
- 	int			(*ndo_validate_addr)(struct net_device *dev);
--	int			(*ndo_do_ioctl)(struct net_device *dev,
--					        struct ifreq *ifr, int cmd);
- 	int			(*ndo_eth_ioctl)(struct net_device *dev,
- 						 struct ifreq *ifr, int cmd);
- 	int			(*ndo_siocbond)(struct net_device *dev,
--- 
-2.39.2
-
+Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
