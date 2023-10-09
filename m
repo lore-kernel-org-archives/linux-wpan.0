@@ -2,96 +2,61 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A37ABE95A62
-	for <linux-wpan@archiver.kernel.org>; Sat,  7 Oct 2023 18:42:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FF4FE95A8E
+	for <linux-wpan@archiver.kernel.org>; Mon,  9 Oct 2023 08:21:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233065AbjJGSmw (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Sat, 7 Oct 2023 14:42:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35462 "EHLO
+        id S234375AbjJIIVE (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 9 Oct 2023 04:21:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54810 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229446AbjJGSmw (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Sat, 7 Oct 2023 14:42:52 -0400
-Received: from proxima.lasnet.de (proxima.lasnet.de [78.47.171.185])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB529BC;
-        Sat,  7 Oct 2023 11:42:50 -0700 (PDT)
-Received: from [IPV6:2003:e9:d743:5c31:3105:419d:bcff:11c7] (p200300e9d7435c313105419dbcff11c7.dip0.t-ipconnect.de [IPv6:2003:e9:d743:5c31:3105:419d:bcff:11c7])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: stefan@datenfreihafen.org)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id A9B5FC018D;
-        Sat,  7 Oct 2023 20:42:46 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
-        s=2021; t=1696704167;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=EPgzJpN+KSTuOzQ3xY/vszJbchz47yeonl0DRQJME30=;
-        b=jXhPRJ0iXYmaQCXG3Z910vQRe/gBwBVtk5SLWoak+NGfuKK6D9+7AJQfyC2Z3UHsFelL4c
-        3kaw92Co2LihIDymaKx7g0gaK3QvbNfU9RZ+Pm24SJ7JHZXAL8IQ5/21NTsDSpghBRqvxd
-        /XDp8xuqFEUHt+sglqW7M/ZAaojsYPO3/j6Sdl6WM9YsTLiA4hYb3lxVxECVJNiArM4+ao
-        y3G2ksL+b5rJs7EeGmPqXw0YU+FYEuBH5YNbLxFnS60XPKtfYBIGRaNJNw3yUSgdp3Pn3L
-        v6BnP0dho/ZNEPMonOuoQUqyohWZ/0lGYGPo3gp6zhAXXa48YvuQ7yH5RV3qZQ==
-Message-ID: <c2b7264f-c533-2d80-e41e-a7019aefb602@datenfreihafen.org>
-Date:   Sat, 7 Oct 2023 20:42:46 +0200
+        with ESMTP id S232759AbjJIIVD (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 9 Oct 2023 04:21:03 -0400
+X-Greylist: delayed 315 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 09 Oct 2023 01:21:00 PDT
+Received: from mail.durme.pl (mail.durme.pl [217.182.69.186])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 559B18F
+        for <linux-wpan@vger.kernel.org>; Mon,  9 Oct 2023 01:21:00 -0700 (PDT)
+Received: by mail.durme.pl (Postfix, from userid 1002)
+        id F01C44C14D; Mon,  9 Oct 2023 08:15:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=durme.pl; s=mail;
+        t=1696839343; bh=hFxZwVw4rIL+JwfEOGI47p+fdoVOAeqVswP6NWoHSHQ=;
+        h=Date:From:To:Subject:From;
+        b=YitALw+j9AfG4pYtPYXnPGdTYHPvZvVP9qDv0YhUisDKPPzAwc1T0Tb6O7Dnzik2Q
+         xLfn7oAVyIGuMTQpjY60zbExTUR579yYxsg8vT0rL934amRMJKSxRIYw+HItGYdpey
+         WcKDRGbGBxQEJvo5jGE7Dnx16pxT4IbGeM00eURI+uzv0q1HfFlvR5dHPhC5Uzb7sf
+         H5QMfrwBvVryTEqhm/ZRoEWh2t/ffkUpsQiLX2Kp6vKgaWkUJ0GbZsTrzfJ5v1gnpT
+         fZ24CKsAXBcOXMSLecQuQHsdkWCj/IIyuld0blacnfDLB8cEjMWSjPQY3DaI32Dspu
+         0JYzhVZrU/LQg==
+Received: by mail.durme.pl for <linux-wpan@vger.kernel.org>; Mon,  9 Oct 2023 08:15:04 GMT
+Message-ID: <20231009064501-0.1.4t.nm9n.0.198o17gbvc@durme.pl>
+Date:   Mon,  9 Oct 2023 08:15:04 GMT
+From:   "Krystian Wieczorek" <krystian.wieczorek@durme.pl>
+To:     <linux-wpan@vger.kernel.org>
+Subject: W sprawie samochodu
+X-Mailer: mail.durme.pl
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH] [v4] ieee802154: ca8210: Fix a potential UAF in
- ca8210_probe
-Content-Language: en-US
-To:     Dinghao Liu <dinghao.liu@zju.edu.cn>
-Cc:     stable@vger.kernel.org, Alexander Aring <alex.aring@gmail.com>,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Harry Morris <harrymorris12@gmail.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20231007033049.22353-1-dinghao.liu@zju.edu.cn>
-From:   Stefan Schmidt <stefan@datenfreihafen.org>
-In-Reply-To: <20231007033049.22353-1-dinghao.liu@zju.edu.cn>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello.
+Dzie=C5=84 dobry,
 
-On 07.10.23 05:30, Dinghao Liu wrote:
-> If of_clk_add_provider() fails in ca8210_register_ext_clock(),
-> it calls clk_unregister() to release priv->clk and returns an
-> error. However, the caller ca8210_probe() then calls ca8210_remove(),
-> where priv->clk is freed again in ca8210_unregister_ext_clock(). In
-> this case, a use-after-free may happen in the second time we call
-> clk_unregister().
-> 
-> Fix this by removing the first clk_unregister(). Also, priv->clk could
-> be an error code on failure of clk_register_fixed_rate(). Use
-> IS_ERR_OR_NULL to catch this case in ca8210_unregister_ext_clock().
-> 
-> Fixes: ded845a781a5 ("ieee802154: Add CA8210 IEEE 802.15.4 device driver")
-> Signed-off-by: Dinghao Liu <dinghao.liu@zju.edu.cn>
-> ---
-> 
-> Changelog:
-> 
-> v2: -Remove the first clk_unregister() instead of nulling priv->clk.
-> 
-> v3: -Simplify ca8210_register_ext_clock().
->      -Add a ';' after return in ca8210_unregister_ext_clock().
-> 
-> v4: -Remove an unused variable 'ret'.
+chcieliby=C5=9Bmy zapewni=C4=87 Pa=C5=84stwu kompleksowe rozwi=C4=85zania=
+, je=C5=9Bli chodzi o system monitoringu GPS.
+
+Precyzyjne monitorowanie pojazd=C3=B3w na mapach cyfrowych, =C5=9Bledzeni=
+e ich parametr=C3=B3w eksploatacyjnych w czasie rzeczywistym oraz kontrol=
+a paliwa to kluczowe funkcjonalno=C5=9Bci naszego systemu.=20
+
+Organizowanie pracy pracownik=C3=B3w jest dzi=C4=99ki temu prostsze i bar=
+dziej efektywne, a oszcz=C4=99dno=C5=9Bci i optymalizacja w zakresie pono=
+szonych koszt=C3=B3w, maj=C4=85 dla ka=C5=BCdego przedsi=C4=99biorcy ogro=
+mne znaczenie.
+
+Dopasujemy nasz=C4=85 ofert=C4=99 do Pa=C5=84stwa oczekiwa=C5=84 i potrze=
+b organizacji. Czy mogliby=C5=9Bmy porozmawia=C4=87 o naszej propozycji?
 
 
-This patch has been applied to the wpan tree and will be
-part of the next pull request to net. Thanks!
-
-regards
-Stefan Schmidt
-
+Pozdrawiam
+Krystian Wieczorek
