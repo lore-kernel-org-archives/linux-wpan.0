@@ -2,28 +2,28 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E32EE95A9B
-	for <linux-wpan@archiver.kernel.org>; Mon,  9 Oct 2023 15:24:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5AA7E95A96
+	for <linux-wpan@archiver.kernel.org>; Mon,  9 Oct 2023 15:24:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1376776AbjJIPYI (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 9 Oct 2023 11:24:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50186 "EHLO
+        id S1376842AbjJIPYS (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Mon, 9 Oct 2023 11:24:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33352 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1376599AbjJIPXy (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 9 Oct 2023 11:23:54 -0400
+        with ESMTP id S1376771AbjJIPYR (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Mon, 9 Oct 2023 11:24:17 -0400
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 363629E;
-        Mon,  9 Oct 2023 08:23:53 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55786C433C7;
-        Mon,  9 Oct 2023 15:23:52 +0000 (UTC)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C002B6;
+        Mon,  9 Oct 2023 08:24:14 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 638CEC433C8;
+        Mon,  9 Oct 2023 15:24:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1696865032;
-        bh=ObvrkQNowN6D9lhZvrmX8Q8RKyFQ6TGkfKqLJZbpLMA=;
+        s=korg; t=1696865054;
+        bh=Kaj3Z1tW1udqMMePJvXDVKy+9Nhy223eBQjA1Yw3D5s=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=yVVe3U5s4a6nvK4Cw7WftLl1t96uUaXLOc/CtJwGzyzOdTc80E2y/k9l5Jz+LIiEW
-         VhjMe6aZrayIu2SH6tzH06ElK4Kb0Drsou4KmDvvWVqcm2Ndr0IdwS/Q2zp8AkBtZF
-         RIhXV2nZBV3vlDdAqPF1I4SyysK5jr9pF/3eQ1+0=
-Date:   Mon, 9 Oct 2023 17:23:50 +0200
+        b=AxoGdX7zxlhxGhhl4Ah1dOAeE6EEl6CLB1lqKjtaOEU3JWTvuk9WNEfZLCVV2gZUv
+         kWMswm4XyKMW4cVei9WtelWjjj5Rg72d/IBLSizDicH2x2QSVrYL9AguKfTBmL7oDG
+         uWZmUpbPo6ICEE2NutNLqzGIFhjeJsxQSE8qvosM=
+Date:   Mon, 9 Oct 2023 17:24:11 +0200
 From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To:     Arnd Bergmann <arnd@kernel.org>
 Cc:     Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
@@ -36,28 +36,33 @@ Cc:     Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
         "David S . Miller" <davem@davemloft.net>,
         linux-kernel@vger.kernel.org, Doug Brown <doug@schmorgal.com>,
         Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [PATCH 07/10] staging: rtl8723bs: remove dead code
-Message-ID: <2023100941-luminous-hula-7551@gregkh>
+Subject: Re: [PATCH 05/10] staging: rtl8192: remove unused legacy ioctl
+ handlers
+Message-ID: <2023100900-plunging-pajamas-2d7a@gregkh>
 References: <20231009141908.1767241-1-arnd@kernel.org>
- <20231009141908.1767241-7-arnd@kernel.org>
+ <20231009141908.1767241-5-arnd@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231009141908.1767241-7-arnd@kernel.org>
+In-Reply-To: <20231009141908.1767241-5-arnd@kernel.org>
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-On Mon, Oct 09, 2023 at 04:19:05PM +0200, Arnd Bergmann wrote:
+On Mon, Oct 09, 2023 at 04:19:03PM +0200, Arnd Bergmann wrote:
 > From: Arnd Bergmann <arnd@arndb.de>
 > 
-> The .ndo_do_ioctl functions are never called, so the three implementation here
-> is useless but only works as a way to identify the device in the notifiers,
-> which can really be removed as well.
-> 
-> Looking through the exported functions, I found a bunch more that have
-> no callers, so just drop all of those.
+> The .ndo_do_ioctl functions are never called, and can just be removed,
+> especially since this is a staging driver.
 > 
 > Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> ---
+>  drivers/staging/rtl8192u/ieee80211/dot11d.c   |  41 --
+>  drivers/staging/rtl8192u/ieee80211/dot11d.h   |   2 -
+>  .../staging/rtl8192u/ieee80211/ieee80211.h    |  12 -
+>  .../rtl8192u/ieee80211/ieee80211_softmac.c    | 563 ------------------
+>  drivers/staging/rtl8192u/r8192U.h             |   2 -
+>  drivers/staging/rtl8192u/r8192U_core.c        | 109 ----
+>  6 files changed, 729 deletions(-)
 
 Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
