@@ -2,40 +2,33 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04F42CD68F5
-	for <linux-wpan@archiver.kernel.org>; Tue, 10 Oct 2023 07:11:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1036CCD68F8
+	for <linux-wpan@archiver.kernel.org>; Tue, 10 Oct 2023 07:53:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1379428AbjJJHLg (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 10 Oct 2023 03:11:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37068 "EHLO
+        id S1442525AbjJJHxw (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 10 Oct 2023 03:53:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52446 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1377808AbjJJHLg (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 10 Oct 2023 03:11:36 -0400
-X-Greylist: delayed 60 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 10 Oct 2023 00:11:33 PDT
-Received: from smtpcmd0883.aruba.it (smtpcmd0883.aruba.it [62.149.156.83])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EE1299
-        for <linux-wpan@vger.kernel.org>; Tue, 10 Oct 2023 00:11:33 -0700 (PDT)
-Received: from smtpclient.apple ([178.197.206.108])
-        by Aruba Outgoing Smtp  with ESMTPA
-        id q6suqxIxki9R4q6svqPMRa; Tue, 10 Oct 2023 09:10:30 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=aruba.it; s=a1;
-        t=1696921830; bh=gEXjtagqpqyynIWjFMSuP5JkLJk6Z4DuAC3b0cTet3U=;
-        h=Content-Type:Mime-Version:Subject:From:Date:To;
-        b=NSm7/M5hQSK2qsd6hw9qO0u9abrJ+jSzYsPwirRGzfXewecsH08hOwKe1Oo8ucPsJ
-         y0oyVkraU/Zrf/VeCtoDcL9S9WXWX42STnUqlYvaTcf41TsvqeX3YqjWRHLWc17Aoe
-         PlfmuDZHldPdW4xa2mKOOoY1qD4Mkr7nM8qT/afm10d+PrKkY8zwNidg2ZbsWi4Sbk
-         qknfrH/PRefhKd0Ym/TWrYiWlk2NKYvC34p8t3s8N0LYMRas+3ZzCHP3v5NlvdEGMr
-         YWa8ncNxYRrJJWQBGyC7iwWjUgUpuDXPToPquMrGpRxU/LO7bweTAgsHQPKxJJDPMr
-         D5ppYk9juahVQ==
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.120.0.1.15\))
-Subject: Re: [PATCH 01/10] appletalk: remove localtalk and ppp support
-From:   Rodolfo Zitellini <rwz@xhero.org>
-In-Reply-To: <3cb4bb96-1651-4179-9c32-507937282d7d@app.fastmail.com>
-Date:   Tue, 10 Oct 2023 09:10:28 +0200
-Cc:     Arnd Bergmann <arnd@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
-        Netdev <netdev@vger.kernel.org>,
+        with ESMTP id S1442480AbjJJHxv (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 10 Oct 2023 03:53:51 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 245BF92;
+        Tue, 10 Oct 2023 00:53:50 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9CBDC433C7;
+        Tue, 10 Oct 2023 07:53:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1696924429;
+        bh=gh+wF2cOm71mHLeriwt1ClLG5cXqexAVx/dzA0lWn7Q=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=mMI+ffJ9AN/y2qJ9AO9MU2AgEBE2589Kk1bIOq7YWkAqx0RkIlzhYh+Ao4AX8SWbE
+         ZGZqrhh99+Fc+JLDnzskHqNAwMN/XXxPBZvpYNaysSBwHFteSyO4bBzXAVlDXtEhaI
+         AwMLnIym/vAicYnaFHcrBk/S15Ts20bfzNZ7Q4N+fpxyL2tCAvBhvTarqvAvquH1uQ
+         IlelyzJ8gkUCzxvPdsa56+zfyZWYS/6f6iDlsAkp69k4+iPB6l0BLP5G+JJ0f7qJLh
+         +gtPdZXxSiOURBYlwBG/AMGd9Yv3YoydGu7xKaELp2uDkCpSeIH50t6xxNsoEWzczC
+         h4QEDqjDnez+A==
+From:   Arnd Bergmann <arnd@kernel.org>
+To:     Rodolfo Zitellini <rwz@xhero.org>
+Cc:     Jakub Kicinski <kuba@kernel.org>, Netdev <netdev@vger.kernel.org>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         linux-wireless@vger.kernel.org,
         Johannes Berg <johannes@sipsolutions.net>,
@@ -44,144 +37,217 @@ Cc:     Arnd Bergmann <arnd@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
         Paolo Abeni <pabeni@redhat.com>,
         Eric Dumazet <edumazet@google.com>,
         "David S . Miller" <davem@davemloft.net>,
-        linux-kernel@vger.kernel.org, Doug Brown <doug@schmorgal.com>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <DE61EEA5-D560-40B6-8F4D-22F299AC61ED@xhero.org>
-References: <20231009141908.1767241-1-arnd@kernel.org>
- <790BA488-B6F6-41ED-96EF-2089EF1C043B@xhero.org>
- <3cb4bb96-1651-4179-9c32-507937282d7d@app.fastmail.com>
-To:     Arnd Bergmann <arnd@arndb.de>
-X-Mailer: Apple Mail (2.3654.120.0.1.15)
-X-CMAE-Envelope: MS4xfHaXEfCIAhkSs0tsjb+YZNldBBGkq0Qz33d9TLc3sdp/647xEnlcFyPLsWPtHwDgl+ZnrBiZEU4PUgye4kZxtVDhPsFDW0vXeYf7+fioTb/Y1+YHM0+S
- 4QYs2KC2ur50/kfdPt9XLm4Q9vF06uT32m3oGSwtJqzasFX4TOuiwQmiAdWTtr/rbSJWo/LnZDmzUYpucj/LRQDbXs2e2Cmuou2RB6tBCODnxN4FzycSM2+o
- j865lcv6ukBr3FB8mg9c7tqJ9vjnKNRsMwujPZR9gkVBKwm+1d4+L5v0NYHAbCTbgMyefVEPjekvnVbMR30K2GXjs/Pi5YAy898ye14B8Fw/cDqnTlcJPyM9
- CAGSRnWNDcfA/WI9tCF2011rhbEPvAZTiPscfjhS2HGj5+bQMjE/srGP/xoeN/196/4EKvnsvJjpg26zFXjYc7ps1AUQqtXalMlWgHWvrJXDpYNvWzcnm9oC
- 1E5G26PirT+aduxDVnBQh1aGXGx7WcS28KPKy9bUPqVVMvm6GJ0Gcn3Ysr33ZmlyfgE6doYUoIrwYgmZwBEUWOQ3Imci6z9b3J1FqcdGogdYreeS95iYBVqS
- SMGBbDSxA4519nsLop0Wo3ppOIjDyODNtIX4eCLTyiXD9g==
+        linux-kernel@vger.kernel.org, Doug Brown <doug@schmorgal.com>,
+        Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH v2] appletalk: make localtalk and ppp support conditional
+Date:   Tue, 10 Oct 2023 09:53:37 +0200
+Message-Id: <20231010075337.3100563-1-arnd@kernel.org>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <DE61EEA5-D560-40B6-8F4D-22F299AC61ED@xhero.org>
+References: <DE61EEA5-D560-40B6-8F4D-22F299AC61ED@xhero.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
+From: Arnd Bergmann <arnd@arndb.de>
 
+The last localtalk driver is gone now, and ppp support was never fully
+merged, but the code to support them for phase1 networking still calls
+the deprecated .ndo_do_ioctl() helper.
 
-> Il giorno 9 ott 2023, alle ore 19:29, Arnd Bergmann <arnd@arndb.de> ha =
-scritto:
->=20
-> On Mon, Oct 9, 2023, at 18:49, Rodolfo Zitellini wrote:
->>> From: Arnd Bergmann <arnd@arndb.de>
->>>=20
->>> The last localtalk driver is gone now, and ppp support was never =
-fully
->>> merged, so clean up the appletalk code by removing the obvious dead
->>> code paths.
->>>=20
->>> Notably, this removes one of the two callers of the old =
-.ndo_do_ioctl()
->>> callback that was abused for getting device addresses and is now
->>> only used in the ieee802154 subsystem, which still uses the same =
-trick.
->>>=20
->>> The include/uapi/linux/if_ltalk.h header might still be required
->>> for building userspace programs, but I made sure that debian code
->>> search and the netatalk upstream have no references it it, so it
->>> should be fine to remove.
->>>=20
->>> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
->>=20
->> Hi!
->> I=E2=80=99ve been working on a new LocalTalk interface driver for the =
-last=20
->> couple months, do you think it would be possible to at least postpone=20=
+In order to better isolate the localtalk and ppp portions of appletalk,
+guard all of the corresponding code with CONFIG_DEV_APPLETALK checks,
+including a preprocessor conditional that guards the internal ioctl calls.
 
->> the removal of LT a bit?
->>=20
->> It is a driver for an open source device called TashTalk=20
->> (https://github.com/lampmerchant/tashtalk), which runs on a PIC micro=20=
+This is currently all dead code and will now be left out of the
+module since this Kconfig symbol is always undefined, but there are
+plans to add a new driver for localtalk again in the future. When
+that happens, the logic can be cleaned up to work properly without
+the need for the ioctl.
 
->> that does all the LT interfacing, and communicates back via serial to=20=
+Link: https://lore.kernel.org/lkml/790BA488-B6F6-41ED-96EF-2089EF1C043B@xhero.org/
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+v2: don't actually remove the code, just make it conditional since we
+are likely to need it again.
 
->> the host system. My driver is relatively simple and works very well=20=
+ include/linux/atalk.h  |  1 -
+ net/appletalk/Makefile |  3 ++-
+ net/appletalk/aarp.c   | 24 +++++++++++++++---------
+ net/appletalk/ddp.c    | 24 +++++++++++++-----------
+ 4 files changed, 30 insertions(+), 22 deletions(-)
 
->> with netatalk 2.2 (which is still maintained and still has support =
-for=20
->> AppleTalk). The driver is basically complete and trsted and I was=20
->> preparing to submit a patch.
->>=20
->> Still having LocalTalk in my view has many advantages for us=20
->> enthusiasts that still want to bridge old machines to the current =
-world=20
->> without modifications, for example for printing on modern printers,=20=
-
->> netbooting, sharing files and even tcp/ip. All this basically works =
-out=20
->> of the box via the driver, Linux and available userspace tools=20
->> (netatalk, macipgw).
->>=20
->> The old ISA cards supported by COPS were basically unobtanium even 20=20=
-
->> years ago, but the solution of using a PIC and a serial port is very=20=
-
->> robust and much more furure-proof. We also already have a device that=20=
-
->> can interface a modern machine directly via USB to LocalTalk.
->>=20
->> The development of the TashTalk has been also extensively discussed =
-on=20
->> thr 68KMLA forum=20
->> =
-(https://68kmla.org/bb/index.php?threads/modtashtalk-lt0-driver-for-linux.=
-45031/)
->>=20
->> I hope the decision to remove LocalTalk can be reconsidered at least=20=
-
->> for the time being so there is a chance to submit a new, modern =
-device=20
->> making use of this stack.
->=20
-> Nothing is decided, I'm just proposing my patch as a cleanup
-> for now. It would be nice to still drop the ndo_do_ioctl function
-> though, at least in some form. When your driver actually makes
-> it into the kernel, you can find a different method of communicating
-> the address between the socket interface and the device driver.
-
-Yes I too think it is good to remove ndo_do_ioctl, I designed the =
-TashTalk driver to be a drop-in replacement for COPS mostly for =
-compatibility with netatalk 2.2. My plan was to propose it like this (so =
-nothing else needed to be changed) and the propose some patches in the =
-kernel part and userspace part (netatalk).
-
-> I can see a few ways this could work out:
->=20
-> - add a custom callback pointer to struct atalk_iface to
->  get and set the address for phase1 probing instead of going
->  through the ioctl
-
-This was my initial thought, at least for the moment, mostly to keep =
-netatalk happy and make sure I don=E2=80=99t break other stuff that =
-makes assumptions on how the address probing worked. There are other =
-bits I would like to improve, for example tcpdump (which parses =
-correctly appetalk packets!) is broken in the current implementation.
-
-> - rewrite the probing logic in aarp.c more widely, and improve
->  the userspace interface in the process by introducing a netlink
->  interface
-
-This is sorta the =E2=80=9Csecond step=E2=80=9D I was planning, I think =
-the logic for probing could be redesigned and simplified (it also does =
-not work 100% correctly), and it could be a good chance to improve the =
-interface with netatalk too.
-
-> - Move your entire driver into userspace and go to the kernel
->  using tun/tap. This has the added benefit of avoiding a lot
->  of the complexity of the tty line discipline code you have.
-
-We had some discussion too if to just make the lt an userspace stack, I =
-personally like how it is currently implemented because existing code =
-can run basically without modification.
-
-I would propose at this stage to change the TashTalk driver to remove =
-ndo_do_ioctl and to use a custom callback, if this ok.
-
-Many thanks,
-Rodolfo
+diff --git a/include/linux/atalk.h b/include/linux/atalk.h
+index a55bfc6567d01..2896f2ac9568e 100644
+--- a/include/linux/atalk.h
++++ b/include/linux/atalk.h
+@@ -121,7 +121,6 @@ static inline struct atalk_iface *atalk_find_dev(struct net_device *dev)
+ #endif
+ 
+ extern struct atalk_addr *atalk_find_dev_addr(struct net_device *dev);
+-extern struct net_device *atrtr_get_dev(struct atalk_addr *sa);
+ extern int		 aarp_send_ddp(struct net_device *dev,
+ 				       struct sk_buff *skb,
+ 				       struct atalk_addr *sa, void *hwaddr);
+diff --git a/net/appletalk/Makefile b/net/appletalk/Makefile
+index 33164d972d379..410d52f9113e2 100644
+--- a/net/appletalk/Makefile
++++ b/net/appletalk/Makefile
+@@ -5,6 +5,7 @@
+ 
+ obj-$(CONFIG_ATALK) += appletalk.o
+ 
+-appletalk-y			:= aarp.o ddp.o dev.o
++appletalk-y			:= aarp.o ddp.o
+ appletalk-$(CONFIG_PROC_FS)	+= atalk_proc.o
+ appletalk-$(CONFIG_SYSCTL)	+= sysctl_net_atalk.o
++appletalk-$(CONFIG_DEV_APPLETALK) += dev.o
+diff --git a/net/appletalk/aarp.c b/net/appletalk/aarp.c
+index 9fa0b246902be..b15f67293ac4c 100644
+--- a/net/appletalk/aarp.c
++++ b/net/appletalk/aarp.c
+@@ -438,14 +438,17 @@ static struct atalk_addr *__aarp_proxy_find(struct net_device *dev,
+  */
+ static void aarp_send_probe_phase1(struct atalk_iface *iface)
+ {
++#if IS_ENABLED(CONFIG_DEV_APPLETALK)
+ 	struct ifreq atreq;
+ 	struct sockaddr_at *sa = (struct sockaddr_at *)&atreq.ifr_addr;
+ 	const struct net_device_ops *ops = iface->dev->netdev_ops;
+ 
+ 	sa->sat_addr.s_node = iface->address.s_node;
+ 	sa->sat_addr.s_net = ntohs(iface->address.s_net);
+-
+-	/* We pass the Net:Node to the drivers/cards by a Device ioctl. */
++	/*
++	 * We used to pass the address via device ioctl, this has to
++	 *  be rewritten if we bring back localtalk.
++	 */
+ 	if (!(ops->ndo_do_ioctl(iface->dev, &atreq, SIOCSIFADDR))) {
+ 		ops->ndo_do_ioctl(iface->dev, &atreq, SIOCGIFADDR);
+ 		if (iface->address.s_net != htons(sa->sat_addr.s_net) ||
+@@ -455,13 +458,15 @@ static void aarp_send_probe_phase1(struct atalk_iface *iface)
+ 		iface->address.s_net  = htons(sa->sat_addr.s_net);
+ 		iface->address.s_node = sa->sat_addr.s_node;
+ 	}
++#endif
+ }
+ 
+ 
+ void aarp_probe_network(struct atalk_iface *atif)
+ {
+-	if (atif->dev->type == ARPHRD_LOCALTLK ||
+-	    atif->dev->type == ARPHRD_PPP)
++	if (IS_ENABLED(CONFIG_DEV_APPLETALK) &&
++	    (atif->dev->type == ARPHRD_LOCALTLK ||
++	     atif->dev->type == ARPHRD_PPP))
+ 		aarp_send_probe_phase1(atif);
+ 	else {
+ 		unsigned int count;
+@@ -488,8 +493,9 @@ int aarp_proxy_probe_network(struct atalk_iface *atif, struct atalk_addr *sa)
+ 	 * we don't currently support LocalTalk or PPP for proxy AARP;
+ 	 * if someone wants to try and add it, have fun
+ 	 */
+-	if (atif->dev->type == ARPHRD_LOCALTLK ||
+-	    atif->dev->type == ARPHRD_PPP)
++	if (IS_ENABLED(CONFIG_DEV_APPLETALK) &&
++	    (atif->dev->type == ARPHRD_LOCALTLK ||
++	     atif->dev->type == ARPHRD_PPP))
+ 		goto out;
+ 
+ 	/*
+@@ -550,7 +556,8 @@ int aarp_send_ddp(struct net_device *dev, struct sk_buff *skb,
+ 	skb_reset_network_header(skb);
+ 
+ 	/* Check for LocalTalk first */
+-	if (dev->type == ARPHRD_LOCALTLK) {
++	if (IS_ENABLED(CONFIG_DEV_APPLETALK) &&
++	    dev->type == ARPHRD_LOCALTLK) {
+ 		struct atalk_addr *at = atalk_find_dev_addr(dev);
+ 		struct ddpehdr *ddp = (struct ddpehdr *)skb->data;
+ 		int ft = 2;
+@@ -588,7 +595,7 @@ int aarp_send_ddp(struct net_device *dev, struct sk_buff *skb,
+ 	}
+ 
+ 	/* On a PPP link we neither compress nor aarp.  */
+-	if (dev->type == ARPHRD_PPP) {
++	if (IS_ENABLED(CONFIG_DEV_APPLETALK) && dev->type == ARPHRD_PPP) {
+ 		skb->protocol = htons(ETH_P_PPPTALK);
+ 		skb->dev = dev;
+ 		goto sendit;
+@@ -674,7 +681,6 @@ int aarp_send_ddp(struct net_device *dev, struct sk_buff *skb,
+ drop:
+ 	return NET_XMIT_DROP;
+ }
+-EXPORT_SYMBOL(aarp_send_ddp);
+ 
+ /*
+  *	An entry in the aarp unresolved queue has become resolved. Send
+diff --git a/net/appletalk/ddp.c b/net/appletalk/ddp.c
+index 8978fb6212ffb..d4dc6a9fd3b6b 100644
+--- a/net/appletalk/ddp.c
++++ b/net/appletalk/ddp.c
+@@ -473,7 +473,7 @@ static struct atalk_route *atrtr_find(struct atalk_addr *target)
+  * Given an AppleTalk network, find the device to use. This can be
+  * a simple lookup.
+  */
+-struct net_device *atrtr_get_dev(struct atalk_addr *sa)
++static struct net_device *atrtr_get_dev(struct atalk_addr *sa)
+ {
+ 	struct atalk_route *atr = atrtr_find(sa);
+ 	return atr ? atr->dev : NULL;
+@@ -1947,10 +1947,6 @@ static struct packet_type ppptalk_packet_type __read_mostly = {
+ 
+ static unsigned char ddp_snap_id[] = { 0x08, 0x00, 0x07, 0x80, 0x9B };
+ 
+-/* Export symbols for use by drivers when AppleTalk is a module */
+-EXPORT_SYMBOL(atrtr_get_dev);
+-EXPORT_SYMBOL(atalk_find_dev_addr);
+-
+ /* Called by proto.c on kernel start up */
+ static int __init atalk_init(void)
+ {
+@@ -1971,8 +1967,10 @@ static int __init atalk_init(void)
+ 		goto out_sock;
+ 	}
+ 
+-	dev_add_pack(&ltalk_packet_type);
+-	dev_add_pack(&ppptalk_packet_type);
++	if (IS_ENABLED(CONFIG_DEV_APPLETALK)) {
++		dev_add_pack(&ltalk_packet_type);
++		dev_add_pack(&ppptalk_packet_type);
++	}
+ 
+ 	rc = register_netdevice_notifier(&ddp_notifier);
+ 	if (rc)
+@@ -1998,8 +1996,10 @@ static int __init atalk_init(void)
+ out_dev:
+ 	unregister_netdevice_notifier(&ddp_notifier);
+ out_snap:
+-	dev_remove_pack(&ppptalk_packet_type);
+-	dev_remove_pack(&ltalk_packet_type);
++	if (IS_ENABLED(CONFIG_DEV_APPLETALK)) {
++		dev_remove_pack(&ppptalk_packet_type);
++		dev_remove_pack(&ltalk_packet_type);
++	}
+ 	unregister_snap_client(ddp_dl);
+ out_sock:
+ 	sock_unregister(PF_APPLETALK);
+@@ -2026,8 +2026,10 @@ static void __exit atalk_exit(void)
+ 	atalk_proc_exit();
+ 	aarp_cleanup_module();	/* General aarp clean-up. */
+ 	unregister_netdevice_notifier(&ddp_notifier);
+-	dev_remove_pack(&ltalk_packet_type);
+-	dev_remove_pack(&ppptalk_packet_type);
++	if (IS_ENABLED(CONFIG_DEV_APPLETALK)) {
++		dev_remove_pack(&ltalk_packet_type);
++		dev_remove_pack(&ppptalk_packet_type);
++	}
+ 	unregister_snap_client(ddp_dl);
+ 	sock_unregister(PF_APPLETALK);
+ 	proto_unregister(&ddp_proto);
+-- 
+2.39.2
 
