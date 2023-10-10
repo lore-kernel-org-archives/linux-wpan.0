@@ -2,145 +2,66 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EBA67CD6910
-	for <linux-wpan@archiver.kernel.org>; Tue, 10 Oct 2023 09:24:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB964CD8CB4
+	for <linux-wpan@archiver.kernel.org>; Tue, 10 Oct 2023 20:11:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229777AbjJJJYH (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 10 Oct 2023 05:24:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58128 "EHLO
+        id S234270AbjJJUL6 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 10 Oct 2023 16:11:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56630 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230411AbjJJJXi (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 10 Oct 2023 05:23:38 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9939310A;
-        Tue, 10 Oct 2023 02:22:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1696929756; x=1728465756;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=pe28AkaWQOFbPDoeW0f0UL3u+esQjxzrmxDbQGIXd+k=;
-  b=bijAnBjhFSfwl40qC5elRccbOLCwGz8zb+82bedu8RzMV9OWNm3beuOv
-   4mhCT0zlMURcj15KvsiWkuRv67LGReq/pX0JOiqhKX/SD3zKIKaE5kXsB
-   DJK3G867QD4AIjyFTwHo2HJgA2BsIiPWGpt2blCobg8tFd7tbfpvztsGK
-   75JycjMS81ufYliB2peDgz5KGH4hbrHRznXiVmi3FjdOE3Ays1iEZsHoW
-   D9U/sMpEkICSBQ4rvOmk2H6gaPJv2qdtrXzJ9Jzg42MoD/uXSaZO5uNj2
-   oqdk3PLyuZmuaDWjZ+tgwQNtXVloYd11H5F2CfTMXjF3OB1TAXp+DymWh
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10858"; a="369414287"
-X-IronPort-AV: E=Sophos;i="6.03,212,1694761200"; 
-   d="scan'208";a="369414287"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Oct 2023 02:22:35 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10858"; a="788512822"
-X-IronPort-AV: E=Sophos;i="6.03,212,1694761200"; 
-   d="scan'208";a="788512822"
-Received: from lkp-server02.sh.intel.com (HELO f64821696465) ([10.239.97.151])
-  by orsmga001.jf.intel.com with ESMTP; 10 Oct 2023 02:22:32 -0700
-Received: from kbuild by f64821696465 with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1qq8wg-0000EE-0A;
-        Tue, 10 Oct 2023 09:22:30 +0000
-Date:   Tue, 10 Oct 2023 17:21:54 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Arnd Bergmann <arnd@kernel.org>, Jakub Kicinski <kuba@kernel.org>
-Cc:     oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-wireless@vger.kernel.org,
-        Johannes Berg <johannes@sipsolutions.net>,
-        linux-wpan@vger.kernel.org,
-        Michael Hennerich <michael.hennerich@analog.com>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Eric Dumazet <edumazet@google.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        linux-kernel@vger.kernel.org, Doug Brown <doug@schmorgal.com>,
-        Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [PATCH 01/10] appletalk: remove localtalk and ppp support
-Message-ID: <202310101724.iRnAoP3r-lkp@intel.com>
-References: <20231009141908.1767241-1-arnd@kernel.org>
+        with ESMTP id S230499AbjJJUL5 (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 10 Oct 2023 16:11:57 -0400
+Received: from proxima.lasnet.de (proxima.lasnet.de [IPv6:2a01:4f8:121:31eb:3::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5AA2999;
+        Tue, 10 Oct 2023 13:11:54 -0700 (PDT)
+Received: from localhost.localdomain.datenfreihafen.local (p4fc2fcbd.dip0.t-ipconnect.de [79.194.252.189])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: stefan@sostec.de)
+        by proxima.lasnet.de (Postfix) with ESMTPSA id 85BF7C0695;
+        Tue, 10 Oct 2023 22:11:50 +0200 (CEST)
+From:   Stefan Schmidt <stefan@datenfreihafen.org>
+To:     davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com
+Cc:     linux-wpan@vger.kernel.org, alex.aring@gmail.com,
+        miquel.raynal@bootlin.com, netdev@vger.kernel.org
+Subject: pull-request: ieee802154 for net 2023-10-10
+Date:   Tue, 10 Oct 2023 22:09:43 +0200
+Message-ID: <20231010200943.82225-1-stefan@datenfreihafen.org>
+X-Mailer: git-send-email 2.41.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231009141908.1767241-1-arnd@kernel.org>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi Arnd,
+Hello Dave, Jakub, Paolo.
 
-kernel test robot noticed the following build errors:
+An update from ieee802154 for your *net* tree:
 
-[auto build test ERROR on next-20231009]
-[cannot apply to linus/master v6.6-rc5 v6.6-rc4 v6.6-rc3 v6.6-rc5]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Just one small fix this time around.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Arnd-Bergmann/ieee802154-avoid-deprecated-ndo_do_ioctl-callback/20231009-222305
-base:   next-20231009
-patch link:    https://lore.kernel.org/r/20231009141908.1767241-1-arnd%40kernel.org
-patch subject: [PATCH 01/10] appletalk: remove localtalk and ppp support
-config: nios2-randconfig-001-20231010 (https://download.01.org/0day-ci/archive/20231010/202310101724.iRnAoP3r-lkp@intel.com/config)
-compiler: nios2-linux-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231010/202310101724.iRnAoP3r-lkp@intel.com/reproduce)
+Dinghao Liu fixed a potential use-after-free in the ca8210 driver probe
+function.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202310101724.iRnAoP3r-lkp@intel.com/
+regards
+Stefan Schmidt
 
-All error/warnings (new ones prefixed by >>):
+The following changes since commit a2e52554c710b388df2d9d95b51cc1059af2aa22:
 
-   drivers/net/appletalk/ipddp.c: In function 'ipddp_create':
->> drivers/net/appletalk/ipddp.c:207:24: error: implicit declaration of function 'atrtr_get_dev'; did you mean 'to_net_dev'? [-Werror=implicit-function-declaration]
-     207 |         if ((rt->dev = atrtr_get_dev(&rt->at)) == NULL) {
-         |                        ^~~~~~~~~~~~~
-         |                        to_net_dev
->> drivers/net/appletalk/ipddp.c:207:22: warning: assignment to 'struct net_device *' from 'int' makes pointer from integer without a cast [-Wint-conversion]
-     207 |         if ((rt->dev = atrtr_get_dev(&rt->at)) == NULL) {
-         |                      ^
-   cc1: some warnings being treated as errors
+  Merge branch 'ravb-fix-use-after-free-issues' (2023-10-06 16:19:15 -0700)
 
+are available in the Git repository at:
 
-vim +207 drivers/net/appletalk/ipddp.c
+  git://git.kernel.org/pub/scm/linux/kernel/git/wpan/wpan.git tags/ieee802154-for-net-2023-10-10
 
-^1da177e4c3f41 Linus Torvalds   2005-04-16  192  
-^1da177e4c3f41 Linus Torvalds   2005-04-16  193  /*
-^1da177e4c3f41 Linus Torvalds   2005-04-16  194   * Create a routing entry. We first verify that the
-^1da177e4c3f41 Linus Torvalds   2005-04-16  195   * record does not already exist. If it does we return -EEXIST
-^1da177e4c3f41 Linus Torvalds   2005-04-16  196   */
-^1da177e4c3f41 Linus Torvalds   2005-04-16  197  static int ipddp_create(struct ipddp_route *new_rt)
-^1da177e4c3f41 Linus Torvalds   2005-04-16  198  {
-ce7e40c432ba84 Vlad Tsyrklevich 2017-01-09  199          struct ipddp_route *rt = kzalloc(sizeof(*rt), GFP_KERNEL);
-^1da177e4c3f41 Linus Torvalds   2005-04-16  200  
-^1da177e4c3f41 Linus Torvalds   2005-04-16  201          if (rt == NULL)
-^1da177e4c3f41 Linus Torvalds   2005-04-16  202                  return -ENOMEM;
-^1da177e4c3f41 Linus Torvalds   2005-04-16  203  
-^1da177e4c3f41 Linus Torvalds   2005-04-16  204          rt->ip = new_rt->ip;
-^1da177e4c3f41 Linus Torvalds   2005-04-16  205          rt->at = new_rt->at;
-^1da177e4c3f41 Linus Torvalds   2005-04-16  206          rt->next = NULL;
-^1da177e4c3f41 Linus Torvalds   2005-04-16 @207          if ((rt->dev = atrtr_get_dev(&rt->at)) == NULL) {
-^1da177e4c3f41 Linus Torvalds   2005-04-16  208  		kfree(rt);
-^1da177e4c3f41 Linus Torvalds   2005-04-16  209                  return -ENETUNREACH;
-^1da177e4c3f41 Linus Torvalds   2005-04-16  210          }
-^1da177e4c3f41 Linus Torvalds   2005-04-16  211  
-5615968a708451 David S. Miller  2009-05-27  212  	spin_lock_bh(&ipddp_route_lock);
-5615968a708451 David S. Miller  2009-05-27  213  	if (__ipddp_find_route(rt)) {
-5615968a708451 David S. Miller  2009-05-27  214  		spin_unlock_bh(&ipddp_route_lock);
-^1da177e4c3f41 Linus Torvalds   2005-04-16  215  		kfree(rt);
-^1da177e4c3f41 Linus Torvalds   2005-04-16  216  		return -EEXIST;
-^1da177e4c3f41 Linus Torvalds   2005-04-16  217  	}
-^1da177e4c3f41 Linus Torvalds   2005-04-16  218  
-^1da177e4c3f41 Linus Torvalds   2005-04-16  219          rt->next = ipddp_route_list;
-^1da177e4c3f41 Linus Torvalds   2005-04-16  220          ipddp_route_list = rt;
-^1da177e4c3f41 Linus Torvalds   2005-04-16  221  
-5615968a708451 David S. Miller  2009-05-27  222  	spin_unlock_bh(&ipddp_route_lock);
-5615968a708451 David S. Miller  2009-05-27  223  
-^1da177e4c3f41 Linus Torvalds   2005-04-16  224          return 0;
-^1da177e4c3f41 Linus Torvalds   2005-04-16  225  }
-^1da177e4c3f41 Linus Torvalds   2005-04-16  226  
+for you to fetch changes up to f990874b1c98fe8e57ee9385669f501822979258:
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+  ieee802154: ca8210: Fix a potential UAF in ca8210_probe (2023-10-07 20:37:38 +0200)
+
+----------------------------------------------------------------
+Dinghao Liu (1):
+      ieee802154: ca8210: Fix a potential UAF in ca8210_probe
+
+ drivers/net/ieee802154/ca8210.c | 17 +++--------------
+ 1 file changed, 3 insertions(+), 14 deletions(-)
