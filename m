@@ -2,149 +2,145 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F3F9CD68FE
-	for <linux-wpan@archiver.kernel.org>; Tue, 10 Oct 2023 08:16:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBA67CD6910
+	for <linux-wpan@archiver.kernel.org>; Tue, 10 Oct 2023 09:24:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1442713AbjJJIQJ (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 10 Oct 2023 04:16:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52312 "EHLO
+        id S229777AbjJJJYH (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 10 Oct 2023 05:24:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58128 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1442712AbjJJIQG (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 10 Oct 2023 04:16:06 -0400
-Received: from wout4-smtp.messagingengine.com (wout4-smtp.messagingengine.com [64.147.123.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84E4197;
-        Tue, 10 Oct 2023 01:16:03 -0700 (PDT)
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-        by mailout.west.internal (Postfix) with ESMTP id 44FD13200A7A;
-        Tue, 10 Oct 2023 04:15:59 -0400 (EDT)
-Received: from imap51 ([10.202.2.101])
-  by compute5.internal (MEProxy); Tue, 10 Oct 2023 04:16:00 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-        :cc:content-transfer-encoding:content-type:content-type:date
-        :date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-        :references:reply-to:sender:subject:subject:to:to; s=fm2; t=
-        1696925758; x=1697012158; bh=37O+bLcXHzAtlGTxAl7BM9VidjbxHB5bNg3
-        Khnx7FEY=; b=VX5fC4Q/Fwzp47Fe1GjiddDyNK6GDmgxx9AnAlw4N6tKQ9xxeBk
-        zFlj2nlHzuctJSCQlBv2ocNWNH2aGJ6TkRsuPsCPAmGsEwNdqNQfnfXyjQFdLmC2
-        p20GdS9jwh1UhwKKIhrVXTgpEO66+qw4ocoezSvp+Hk+zWMDywZxkPKfwM8WKWNX
-        30DuzJc7DSxQoCHRrnZAjwPrYfD65PQI/ZzQa/2hVyrj+dEd5bc8MzAN09+K7VOi
-        IMZHBtT2nuMB+UyNtJTp4PVF6VbA+0wPZd6RHDkEoyMSwk3r2sSiyAs5nztOiIQ6
-        ye+LVryb4ZqiKVba2ZACFlsWyGGFjAn3pvg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-transfer-encoding
-        :content-type:content-type:date:date:feedback-id:feedback-id
-        :from:from:in-reply-to:in-reply-to:message-id:mime-version
-        :references:reply-to:sender:subject:subject:to:to:x-me-proxy
-        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-        1696925758; x=1697012158; bh=37O+bLcXHzAtlGTxAl7BM9VidjbxHB5bNg3
-        Khnx7FEY=; b=h28zTzFXfFrEIvsbBtlAfMw0eohC+N8xcl2PZe9Kt3YlxfrZqXG
-        LEBluCJSUym0hj2jGGfiAeqFNWkxjl7aDHJ+X+JYVr4kE3+QAp5EZ+JmY/jd4GHM
-        ydK2HCjCxGdSuhF6dg5YgVhVw3jOis7wUxmVozKbKDcj8OhoEwB1rzuaP3PwYzjs
-        7EY+jFPyrt1HKFHC+EXe16a8K8+vfRk7SdHowKaYYof6YDLEUEXVjzK0VHZG2H+r
-        J18d9S0uNBjcariQVw4gZ2yDZuc6dI2cfR3MAc3wyM+dku8Mt+Nk9iXMD6Q0eGkK
-        Om4hmkiXa5LPS3H4J/Yma2LN7KxrTu0EmXw==
-X-ME-Sender: <xms:PgglZTAGcVIWHAnllWjXsXLzjrKuM5Ia5b6pURc-mYQz2Q4Se0aVBg>
-    <xme:PgglZZje5EFxgF098kwzO0XJE0zxvlw8wplo68kuRsgPo5ZKmIgbbzTw5pXfWSk2t
-    foH45KKGLoglj8-kiE>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrheehucetufdoteggodetrfdotffvucfrrh
-    hofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgenuceurghi
-    lhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurh
-    epofgfggfkjghffffhvfevufgtgfesthhqredtreerjeenucfhrhhomhepfdetrhhnugcu
-    uegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrghtthgvrh
-    hnpeegfeejhedvledvffeijeeijeeivddvhfeliedvleevheejleetgedukedtgfejveen
-    ucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrrhhnug
-    esrghrnhgusgdruggv
-X-ME-Proxy: <xmx:PgglZemu76nlIQmFWr9QTNdfapasFxAjU4ddnU8Sq_F_XhYxQNBl0A>
-    <xmx:PgglZVw74kOKcxNCm28y3EDpsrNJ90A1UHaex7izTALL6caigKZOoQ>
-    <xmx:PgglZYSyu-Up5FKPRurAXX-XE-pfpCH4V0bFBhnfJjxnEXKAu3tPiA>
-    <xmx:PgglZcb2rHKW8mgK4EV70Q9Ym7cs5vMZJmjRUQjAuSuoc7zvNhZeqw>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-        id 2C21EB60089; Tue, 10 Oct 2023 04:15:58 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.9.0-alpha0-958-g1b1b911df8-fm-20230927.002-g1b1b911d
-MIME-Version: 1.0
-Message-Id: <2d325867-95c9-4bff-8f24-9083c730d7ba@app.fastmail.com>
-In-Reply-To: <DE61EEA5-D560-40B6-8F4D-22F299AC61ED@xhero.org>
-References: <20231009141908.1767241-1-arnd@kernel.org>
- <790BA488-B6F6-41ED-96EF-2089EF1C043B@xhero.org>
- <3cb4bb96-1651-4179-9c32-507937282d7d@app.fastmail.com>
- <DE61EEA5-D560-40B6-8F4D-22F299AC61ED@xhero.org>
-Date:   Tue, 10 Oct 2023 10:15:37 +0200
-From:   "Arnd Bergmann" <arnd@arndb.de>
-To:     "Rodolfo Zitellini" <rwz@xhero.org>
-Cc:     "Arnd Bergmann" <arnd@kernel.org>,
-        "Jakub Kicinski" <kuba@kernel.org>,
-        Netdev <netdev@vger.kernel.org>,
-        "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
+        with ESMTP id S230411AbjJJJXi (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 10 Oct 2023 05:23:38 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9939310A;
+        Tue, 10 Oct 2023 02:22:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1696929756; x=1728465756;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=pe28AkaWQOFbPDoeW0f0UL3u+esQjxzrmxDbQGIXd+k=;
+  b=bijAnBjhFSfwl40qC5elRccbOLCwGz8zb+82bedu8RzMV9OWNm3beuOv
+   4mhCT0zlMURcj15KvsiWkuRv67LGReq/pX0JOiqhKX/SD3zKIKaE5kXsB
+   DJK3G867QD4AIjyFTwHo2HJgA2BsIiPWGpt2blCobg8tFd7tbfpvztsGK
+   75JycjMS81ufYliB2peDgz5KGH4hbrHRznXiVmi3FjdOE3Ays1iEZsHoW
+   D9U/sMpEkICSBQ4rvOmk2H6gaPJv2qdtrXzJ9Jzg42MoD/uXSaZO5uNj2
+   oqdk3PLyuZmuaDWjZ+tgwQNtXVloYd11H5F2CfTMXjF3OB1TAXp+DymWh
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10858"; a="369414287"
+X-IronPort-AV: E=Sophos;i="6.03,212,1694761200"; 
+   d="scan'208";a="369414287"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Oct 2023 02:22:35 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10858"; a="788512822"
+X-IronPort-AV: E=Sophos;i="6.03,212,1694761200"; 
+   d="scan'208";a="788512822"
+Received: from lkp-server02.sh.intel.com (HELO f64821696465) ([10.239.97.151])
+  by orsmga001.jf.intel.com with ESMTP; 10 Oct 2023 02:22:32 -0700
+Received: from kbuild by f64821696465 with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1qq8wg-0000EE-0A;
+        Tue, 10 Oct 2023 09:22:30 +0000
+Date:   Tue, 10 Oct 2023 17:21:54 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Arnd Bergmann <arnd@kernel.org>, Jakub Kicinski <kuba@kernel.org>
+Cc:     oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         linux-wireless@vger.kernel.org,
-        "Johannes Berg" <johannes@sipsolutions.net>,
+        Johannes Berg <johannes@sipsolutions.net>,
         linux-wpan@vger.kernel.org,
-        "Michael Hennerich" <michael.hennerich@analog.com>,
-        "Paolo Abeni" <pabeni@redhat.com>,
-        "Eric Dumazet" <edumazet@google.com>,
+        Michael Hennerich <michael.hennerich@analog.com>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Eric Dumazet <edumazet@google.com>,
         "David S . Miller" <davem@davemloft.net>,
-        linux-kernel@vger.kernel.org, "Doug Brown" <doug@schmorgal.com>
+        linux-kernel@vger.kernel.org, Doug Brown <doug@schmorgal.com>,
+        Arnd Bergmann <arnd@arndb.de>
 Subject: Re: [PATCH 01/10] appletalk: remove localtalk and ppp support
-Content-Type: text/plain;charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Message-ID: <202310101724.iRnAoP3r-lkp@intel.com>
+References: <20231009141908.1767241-1-arnd@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231009141908.1767241-1-arnd@kernel.org>
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-On Tue, Oct 10, 2023, at 09:10, Rodolfo Zitellini wrote:
->> Il giorno 9 ott 2023, alle ore 19:29, Arnd Bergmann <arnd@arndb.de> h=
-a scritto:
->> On Mon, Oct 9, 2023, at 18:49, Rodolfo Zitellini wrote:
->> I can see a few ways this could work out:
->>=20
->> - add a custom callback pointer to struct atalk_iface to
->>  get and set the address for phase1 probing instead of going
->>  through the ioctl
->
-> This was my initial thought, at least for the moment, mostly to keep=20
-> netatalk happy and make sure I don=E2=80=99t break other stuff that ma=
-kes=20
-> assumptions on how the address probing worked. There are other bits I=20
-> would like to improve, for example tcpdump (which parses correctly=20
-> appetalk packets!) is broken in the current implementation.
->
->> - rewrite the probing logic in aarp.c more widely, and improve
->>  the userspace interface in the process by introducing a netlink
->>  interface
->
-> This is sorta the =E2=80=9Csecond step=E2=80=9D I was planning, I thin=
-k the logic for=20
-> probing could be redesigned and simplified (it also does not work 100%=20
-> correctly), and it could be a good chance to improve the interface wit=
-h=20
-> netatalk too.
+Hi Arnd,
 
-Ok, I've adapted my patch now to not actually drop the
-localtalk code for now, and sent that out, I hope that works
-for you. Even if we go with the v1 patch that removes it all,
-you could just as well start with a revert of my patch when
-you add your driver, so in the end it shouldn't make much
-of a difference.
+kernel test robot noticed the following build errors:
 
->> - Move your entire driver into userspace and go to the kernel
->>  using tun/tap. This has the added benefit of avoiding a lot
->>  of the complexity of the tty line discipline code you have.
->
-> We had some discussion too if to just make the lt an userspace stack, =
-I=20
-> personally like how it is currently implemented because existing code=20
-> can run basically without modification.
->
-> I would propose at this stage to change the TashTalk driver to remove=20
-> ndo_do_ioctl and to use a custom callback, if this ok.
+[auto build test ERROR on next-20231009]
+[cannot apply to linus/master v6.6-rc5 v6.6-rc4 v6.6-rc3 v6.6-rc5]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-It looks like you still need a custom userspace tool to set up
-the uart for your new driver, so my feeling would be that having a
-userspace bridge to implement the localtalk/uart to ethertalk/tap
-driver would actually be nicer for both usability and maintenance.
+url:    https://github.com/intel-lab-lkp/linux/commits/Arnd-Bergmann/ieee802154-avoid-deprecated-ndo_do_ioctl-callback/20231009-222305
+base:   next-20231009
+patch link:    https://lore.kernel.org/r/20231009141908.1767241-1-arnd%40kernel.org
+patch subject: [PATCH 01/10] appletalk: remove localtalk and ppp support
+config: nios2-randconfig-001-20231010 (https://download.01.org/0day-ci/archive/20231010/202310101724.iRnAoP3r-lkp@intel.com/config)
+compiler: nios2-linux-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231010/202310101724.iRnAoP3r-lkp@intel.com/reproduce)
 
-It's not something we need to decide now though, and is up to
-you in the end.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202310101724.iRnAoP3r-lkp@intel.com/
 
-      Arnd
+All error/warnings (new ones prefixed by >>):
+
+   drivers/net/appletalk/ipddp.c: In function 'ipddp_create':
+>> drivers/net/appletalk/ipddp.c:207:24: error: implicit declaration of function 'atrtr_get_dev'; did you mean 'to_net_dev'? [-Werror=implicit-function-declaration]
+     207 |         if ((rt->dev = atrtr_get_dev(&rt->at)) == NULL) {
+         |                        ^~~~~~~~~~~~~
+         |                        to_net_dev
+>> drivers/net/appletalk/ipddp.c:207:22: warning: assignment to 'struct net_device *' from 'int' makes pointer from integer without a cast [-Wint-conversion]
+     207 |         if ((rt->dev = atrtr_get_dev(&rt->at)) == NULL) {
+         |                      ^
+   cc1: some warnings being treated as errors
+
+
+vim +207 drivers/net/appletalk/ipddp.c
+
+^1da177e4c3f41 Linus Torvalds   2005-04-16  192  
+^1da177e4c3f41 Linus Torvalds   2005-04-16  193  /*
+^1da177e4c3f41 Linus Torvalds   2005-04-16  194   * Create a routing entry. We first verify that the
+^1da177e4c3f41 Linus Torvalds   2005-04-16  195   * record does not already exist. If it does we return -EEXIST
+^1da177e4c3f41 Linus Torvalds   2005-04-16  196   */
+^1da177e4c3f41 Linus Torvalds   2005-04-16  197  static int ipddp_create(struct ipddp_route *new_rt)
+^1da177e4c3f41 Linus Torvalds   2005-04-16  198  {
+ce7e40c432ba84 Vlad Tsyrklevich 2017-01-09  199          struct ipddp_route *rt = kzalloc(sizeof(*rt), GFP_KERNEL);
+^1da177e4c3f41 Linus Torvalds   2005-04-16  200  
+^1da177e4c3f41 Linus Torvalds   2005-04-16  201          if (rt == NULL)
+^1da177e4c3f41 Linus Torvalds   2005-04-16  202                  return -ENOMEM;
+^1da177e4c3f41 Linus Torvalds   2005-04-16  203  
+^1da177e4c3f41 Linus Torvalds   2005-04-16  204          rt->ip = new_rt->ip;
+^1da177e4c3f41 Linus Torvalds   2005-04-16  205          rt->at = new_rt->at;
+^1da177e4c3f41 Linus Torvalds   2005-04-16  206          rt->next = NULL;
+^1da177e4c3f41 Linus Torvalds   2005-04-16 @207          if ((rt->dev = atrtr_get_dev(&rt->at)) == NULL) {
+^1da177e4c3f41 Linus Torvalds   2005-04-16  208  		kfree(rt);
+^1da177e4c3f41 Linus Torvalds   2005-04-16  209                  return -ENETUNREACH;
+^1da177e4c3f41 Linus Torvalds   2005-04-16  210          }
+^1da177e4c3f41 Linus Torvalds   2005-04-16  211  
+5615968a708451 David S. Miller  2009-05-27  212  	spin_lock_bh(&ipddp_route_lock);
+5615968a708451 David S. Miller  2009-05-27  213  	if (__ipddp_find_route(rt)) {
+5615968a708451 David S. Miller  2009-05-27  214  		spin_unlock_bh(&ipddp_route_lock);
+^1da177e4c3f41 Linus Torvalds   2005-04-16  215  		kfree(rt);
+^1da177e4c3f41 Linus Torvalds   2005-04-16  216  		return -EEXIST;
+^1da177e4c3f41 Linus Torvalds   2005-04-16  217  	}
+^1da177e4c3f41 Linus Torvalds   2005-04-16  218  
+^1da177e4c3f41 Linus Torvalds   2005-04-16  219          rt->next = ipddp_route_list;
+^1da177e4c3f41 Linus Torvalds   2005-04-16  220          ipddp_route_list = rt;
+^1da177e4c3f41 Linus Torvalds   2005-04-16  221  
+5615968a708451 David S. Miller  2009-05-27  222  	spin_unlock_bh(&ipddp_route_lock);
+5615968a708451 David S. Miller  2009-05-27  223  
+^1da177e4c3f41 Linus Torvalds   2005-04-16  224          return 0;
+^1da177e4c3f41 Linus Torvalds   2005-04-16  225  }
+^1da177e4c3f41 Linus Torvalds   2005-04-16  226  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
