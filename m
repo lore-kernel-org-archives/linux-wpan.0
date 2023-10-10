@@ -2,34 +2,33 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84FF9CD68E2
-	for <linux-wpan@archiver.kernel.org>; Tue, 10 Oct 2023 00:47:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98DA3CD68F4
+	for <linux-wpan@archiver.kernel.org>; Tue, 10 Oct 2023 06:56:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1379218AbjJJAr2 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Mon, 9 Oct 2023 20:47:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57702 "EHLO
+        id S1442319AbjJJG4h (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Tue, 10 Oct 2023 02:56:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47288 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1378721AbjJJAr1 (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Mon, 9 Oct 2023 20:47:27 -0400
+        with ESMTP id S1442233AbjJJG4g (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Tue, 10 Oct 2023 02:56:36 -0400
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDE4C99;
-        Mon,  9 Oct 2023 17:47:26 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4AA1C433C9;
-        Tue, 10 Oct 2023 00:47:25 +0000 (UTC)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0215099;
+        Mon,  9 Oct 2023 23:56:36 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05159C433C7;
+        Tue, 10 Oct 2023 06:56:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1696898846;
-        bh=U6LEJYuUeVc0ijopRiWP1lyH7WNEe7pADKgTe1SDe80=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=Zn5tjchbfOIbLTsxVx9nsT5GsC1moZatY656JBJxwH77OnOe+vUCNNTWWB+GteyKZ
-         60thf5w+lh/S4firKUBP6mb+qCZq0DMHhRmxTcUr6h6ROVeFyxHbWiw6iHly+YlwQ7
-         Dd29A3803LA6/Yxlp3O7Kn2Yx2IZ+RmwSBGssyKvD51T+YjAOy3+n8k/JqyWxuJZl6
-         ymGQ+BBRDPMWGe20THjmdKcK2UOYgXUKACG511v3itsK0V0/foyYm7OnpqxXb+fbMB
-         0MgEiA6g8o3mpT8ruar9mzBGCru3gPpAHUy6nZs74wpGKMhGGH1NQxpqH816U1mduO
-         zIdUZMKkI62gw==
-Date:   Mon, 9 Oct 2023 17:47:24 -0700
-From:   Jakub Kicinski <kuba@kernel.org>
+        s=k20201202; t=1696920995;
+        bh=l9c92wWaaUlL412ziyk84LFOr/63o2bETtDk0X6EBBA=;
+        h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
+        b=mSnAx1cJ2tXbkPJDmce/e+Yy4go10RrHu4x650kLfqEAXwWWmpcT0ihmLphmtqK7E
+         09RQwYuIRROk3F45mk6xIAD+bK8S274BmefacWsy8ChMk4mIsglJgtSqE7+DFUsU98
+         6giQVCMtiv+6iuzToRofql/G8roZjHhhlOtaf2MVJLkycpyZ5itKLwRt2dftwYHaDW
+         Kwvq0kGYUzowhzLPd/bb2QhHNYAQc3MfEd2gVyLwPTMeCwTCzRJr4jdvig5ZopgtxU
+         wv2YZgpfJjf3awObRRfybEHwDShK1aVVxh4vW0oP+VSCYE55bclxgDyMoET4xQs7b1
+         5Kjg24lXwnSNw==
+From:   Kalle Valo <kvalo@kernel.org>
 To:     Arnd Bergmann <arnd@kernel.org>
-Cc:     netdev@vger.kernel.org,
+Cc:     Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         linux-wireless@vger.kernel.org,
         Johannes Berg <johannes@sipsolutions.net>,
@@ -40,32 +39,37 @@ Cc:     netdev@vger.kernel.org,
         "David S . Miller" <davem@davemloft.net>,
         linux-kernel@vger.kernel.org, Doug Brown <doug@schmorgal.com>,
         Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [PATCH 01/10] appletalk: remove localtalk and ppp support
-Message-ID: <20231009174724.1e42b9ad@kernel.org>
-In-Reply-To: <20231009141908.1767241-1-arnd@kernel.org>
+Subject: Re: [PATCH 08/10] wireless: atmel: remove unused ioctl function
 References: <20231009141908.1767241-1-arnd@kernel.org>
+        <20231009141908.1767241-8-arnd@kernel.org>
+Date:   Tue, 10 Oct 2023 09:59:01 +0300
+In-Reply-To: <20231009141908.1767241-8-arnd@kernel.org> (Arnd Bergmann's
+        message of "Mon, 9 Oct 2023 16:19:06 +0200")
+Message-ID: <87zg0rezey.fsf@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-On Mon,  9 Oct 2023 16:18:59 +0200 Arnd Bergmann wrote:
-> The last localtalk driver is gone now, and ppp support was never fully
-> merged, so clean up the appletalk code by removing the obvious dead
-> code paths.
-> 
-> Notably, this removes one of the two callers of the old .ndo_do_ioctl()
-> callback that was abused for getting device addresses and is now
-> only used in the ieee802154 subsystem, which still uses the same trick.
-> 
-> The include/uapi/linux/if_ltalk.h header might still be required
-> for building userspace programs, but I made sure that debian code
-> search and the netatalk upstream have no references it it, so it
-> should be fine to remove.
+Arnd Bergmann <arnd@kernel.org> writes:
 
-Looks like it depends on the ipddp driver removal.
-Could you repost once that one is merged (~tomorrow)?
+> From: Arnd Bergmann <arnd@arndb.de>
+>
+> This function has no callers, and for the past 20 years, the request_firmware
+> interface has been in place instead of the custom firmware loader.
+>
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+
+Yuck, good riddance. In the title we prefer "wifi:" over "wireless:" but
+that's nitpicking. I assume this goes via a net tree so:
+
+Acked-by: Kalle Valo <kvalo@kernel.org>
+
+Let me know if I should take this to wireless-next instead.
+
 -- 
-pw-bot: cr
+https://patchwork.kernel.org/project/linux-wireless/list/
+
+https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
