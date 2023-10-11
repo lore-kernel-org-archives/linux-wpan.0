@@ -2,66 +2,139 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB964CD8CB4
-	for <linux-wpan@archiver.kernel.org>; Tue, 10 Oct 2023 20:11:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41E1ACD98F5
+	for <linux-wpan@archiver.kernel.org>; Wed, 11 Oct 2023 07:09:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234270AbjJJUL6 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Tue, 10 Oct 2023 16:11:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56630 "EHLO
+        id S1344494AbjJKHJM (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 11 Oct 2023 03:09:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44784 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230499AbjJJUL5 (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Tue, 10 Oct 2023 16:11:57 -0400
-Received: from proxima.lasnet.de (proxima.lasnet.de [IPv6:2a01:4f8:121:31eb:3::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5AA2999;
-        Tue, 10 Oct 2023 13:11:54 -0700 (PDT)
-Received: from localhost.localdomain.datenfreihafen.local (p4fc2fcbd.dip0.t-ipconnect.de [79.194.252.189])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: stefan@sostec.de)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id 85BF7C0695;
-        Tue, 10 Oct 2023 22:11:50 +0200 (CEST)
-From:   Stefan Schmidt <stefan@datenfreihafen.org>
-To:     davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com
-Cc:     linux-wpan@vger.kernel.org, alex.aring@gmail.com,
-        miquel.raynal@bootlin.com, netdev@vger.kernel.org
-Subject: pull-request: ieee802154 for net 2023-10-10
-Date:   Tue, 10 Oct 2023 22:09:43 +0200
-Message-ID: <20231010200943.82225-1-stefan@datenfreihafen.org>
-X-Mailer: git-send-email 2.41.0
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        with ESMTP id S1344185AbjJKHJM (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 11 Oct 2023 03:09:12 -0400
+Received: from smtpcmd11128.aruba.it (smtpcmd11128.aruba.it [62.149.156.128])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1528C98
+        for <linux-wpan@vger.kernel.org>; Wed, 11 Oct 2023 00:09:07 -0700 (PDT)
+Received: from smtpclient.apple ([178.197.207.108])
+        by Aruba Outgoing Smtp  with ESMTPA
+        id qTL5qhUPwT2S6qTL5qdYwG; Wed, 11 Oct 2023 09:09:05 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=aruba.it; s=a1;
+        t=1697008145; bh=OFZaDkGYXLAqctRIWUHK2zLsfn3fVaLLoVZLlGB7ECs=;
+        h=Content-Type:Mime-Version:Subject:From:Date:To;
+        b=gSITyVIPmvPqIY+TI/ONWy67LBXZJoWfIYTOxHdmsrkexV5uF3oHAFAJWUwRfNUex
+         j73xgyR6znKwSVHy1RAp9pRRozrw88QIOVSnCx0pnZ308W3zN7bQKPTIpFDOUKF/yU
+         wy/ycug6rFPjx4esbpCrQuR8jY1CtwpoeH++e96ag2voR6rjA+ImmPhaOMdbGarIuu
+         /8HtmJ8YEXI4okreyZ1nlUj40sCcw+IyLVSEhygfb8IUnK+Cri7sBnyzXdB0cgYD3f
+         YF44wNUfGmNBsyl/LWOIegybCxd43Kb4G3qYzngFfYyBtApVWgJUahjCQSTgDuN2ry
+         n+AXx1jYXy87A==
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.120.0.1.15\))
+Subject: Re: [PATCH 01/10] appletalk: remove localtalk and ppp support
+From:   Rodolfo Zitellini <rwz@xhero.org>
+In-Reply-To: <2d325867-95c9-4bff-8f24-9083c730d7ba@app.fastmail.com>
+Date:   Wed, 11 Oct 2023 09:09:02 +0200
+Cc:     Arnd Bergmann <arnd@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
+        Netdev <netdev@vger.kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-wireless@vger.kernel.org,
+        Johannes Berg <johannes@sipsolutions.net>,
+        linux-wpan@vger.kernel.org,
+        Michael Hennerich <michael.hennerich@analog.com>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Eric Dumazet <edumazet@google.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        linux-kernel@vger.kernel.org, Doug Brown <doug@schmorgal.com>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <D4934680-DFB5-471F-893F-32FEA9A6C26C@xhero.org>
+References: <20231009141908.1767241-1-arnd@kernel.org>
+ <790BA488-B6F6-41ED-96EF-2089EF1C043B@xhero.org>
+ <3cb4bb96-1651-4179-9c32-507937282d7d@app.fastmail.com>
+ <DE61EEA5-D560-40B6-8F4D-22F299AC61ED@xhero.org>
+ <2d325867-95c9-4bff-8f24-9083c730d7ba@app.fastmail.com>
+To:     Arnd Bergmann <arnd@arndb.de>
+X-Mailer: Apple Mail (2.3654.120.0.1.15)
+X-CMAE-Envelope: MS4xfJ+NY3qkgFTiuA0L32HFj+5woru5XqLJ2Z2A2TqBSyNMJjn9LTpk+PwA/TopQdGSgZemVGvpmWUkrlezKQaaSorGUs9nrzbOLTMBAdAjKxcCKnQ07IS3
+ MjQ6AI+8VVwJBvQpEn3Xv82MRQiQmMkCGgXJ19Y7pPt0j21usz3a1MYa4c7pNjY0/woBJG3IAUohLs0BK1DVJo+2DDCNWeZhjrqBgXEzJeKtiuXAEusogHqk
+ Kv/XrrLNv82hS8KstVy59xpwj+1mUKhMvH4JdRDUFsxdVUFBcvqcL0WRsGhtnfzcCdyA/TygYOtuOVrl6o5UlSbzo0ebTHp3Y8W0PaKbEdOsGLlpnixo4bm7
+ KgcsyGX1T/poBUvWCUxFJPJ1fPYcC0GUM2BgGPYOuH7rm4lf6GntqES+VwZNZbwhoyq74t4PC/Pz1vtF1pC9eTeJm1utj9fotl8OGUQhd3CLuHGAGnMNwOIe
+ xBDzmq8bC0rDCVKWXr26+qe3YPQHq1JbDi2yYPEerMcJigv+JZLrzidZ51bE2WiqMsfJG8guomcqd2+GcBgf6rxC/SYB7kx5sM1LnUAl8lhu4h0bEIs+zk4N
+ xaQHjZItQCeMyU264BiSV9NbEwikOv9u7uR7tnhC9x80EA==
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello Dave, Jakub, Paolo.
 
-An update from ieee802154 for your *net* tree:
 
-Just one small fix this time around.
+> Il giorno 10 ott 2023, alle ore 10:15, Arnd Bergmann <arnd@arndb.de> =
+ha scritto:
+>=20
+> On Tue, Oct 10, 2023, at 09:10, Rodolfo Zitellini wrote:
+>>> Il giorno 9 ott 2023, alle ore 19:29, Arnd Bergmann <arnd@arndb.de> =
+ha scritto:
+>>> On Mon, Oct 9, 2023, at 18:49, Rodolfo Zitellini wrote:
+>>> I can see a few ways this could work out:
+>>>=20
+>>> - add a custom callback pointer to struct atalk_iface to
+>>> get and set the address for phase1 probing instead of going
+>>> through the ioctl
+>>=20
+>> This was my initial thought, at least for the moment, mostly to keep=20=
 
-Dinghao Liu fixed a potential use-after-free in the ca8210 driver probe
-function.
+>> netatalk happy and make sure I don=E2=80=99t break other stuff that =
+makes=20
+>> assumptions on how the address probing worked. There are other bits I=20=
 
-regards
-Stefan Schmidt
+>> would like to improve, for example tcpdump (which parses correctly=20
+>> appetalk packets!) is broken in the current implementation.
+>>=20
+>>> - rewrite the probing logic in aarp.c more widely, and improve
+>>> the userspace interface in the process by introducing a netlink
+>>> interface
+>>=20
+>> This is sorta the =E2=80=9Csecond step=E2=80=9D I was planning, I =
+think the logic for=20
+>> probing could be redesigned and simplified (it also does not work =
+100%=20
+>> correctly), and it could be a good chance to improve the interface =
+with=20
+>> netatalk too.
+>=20
+> Ok, I've adapted my patch now to not actually drop the
+> localtalk code for now, and sent that out, I hope that works
+> for you. Even if we go with the v1 patch that removes it all,
+> you could just as well start with a revert of my patch when
+> you add your driver, so in the end it shouldn't make much
+> of a difference.
 
-The following changes since commit a2e52554c710b388df2d9d95b51cc1059af2aa22:
+Thank you very much! I will try to make my patch ready to be submitted =
+soon, and I will add the proper reverts if needed.
 
-  Merge branch 'ravb-fix-use-after-free-issues' (2023-10-06 16:19:15 -0700)
+>>> - Move your entire driver into userspace and go to the kernel
+>>> using tun/tap. This has the added benefit of avoiding a lot
+>>> of the complexity of the tty line discipline code you have.
+>>=20
+>> We had some discussion too if to just make the lt an userspace stack, =
+I=20
+>> personally like how it is currently implemented because existing code=20=
 
-are available in the Git repository at:
+>> can run basically without modification.
+>>=20
+>> I would propose at this stage to change the TashTalk driver to remove=20=
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/wpan/wpan.git tags/ieee802154-for-net-2023-10-10
+>> ndo_do_ioctl and to use a custom callback, if this ok.
+>=20
+> It looks like you still need a custom userspace tool to set up
+> the uart for your new driver, so my feeling would be that having a
+> userspace bridge to implement the localtalk/uart to ethertalk/tap
+> driver would actually be nicer for both usability and maintenance.
+>=20
+> It's not something we need to decide now though, and is up to
+> you in the end.
 
-for you to fetch changes up to f990874b1c98fe8e57ee9385669f501822979258:
+I will experiment with this too, as it will require a bit of work to =
+morph localtalk packets to ethertalk/aarp ones, and the code in the =
+kernel has some specialized bits for localtalk here and there.
 
-  ieee802154: ca8210: Fix a potential UAF in ca8210_probe (2023-10-07 20:37:38 +0200)
+In any case, many thanks!
+Rodolfo
 
-----------------------------------------------------------------
-Dinghao Liu (1):
-      ieee802154: ca8210: Fix a potential UAF in ca8210_probe
-
- drivers/net/ieee802154/ca8210.c | 17 +++--------------
- 1 file changed, 3 insertions(+), 14 deletions(-)
