@@ -2,33 +2,56 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83A31CD6E76
-	for <linux-wpan@archiver.kernel.org>; Wed, 11 Oct 2023 14:24:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4889CD6E7E
+	for <linux-wpan@archiver.kernel.org>; Wed, 11 Oct 2023 15:04:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232597AbjJKOYA (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 11 Oct 2023 10:24:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55516 "EHLO
+        id S1346731AbjJKPEX (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 11 Oct 2023 11:04:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45366 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235072AbjJKODi (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 11 Oct 2023 10:03:38 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 754F792;
-        Wed, 11 Oct 2023 07:03:24 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 17310C433CC;
-        Wed, 11 Oct 2023 14:03:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1697033004;
-        bh=zrhlLGL/7VohDIuN/EnFdfDCdV/hjo/fxSU8flcn0tg=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Fv1HVdZCtl1nJlrYvL4pbAyBWkP5ONV8qajJUP3MxqjnmH7ue9v7qW5IY/d5p+JX0
-         XzuLDOSvYdqyJqrMue4njz27bUrf3is+UQkG+0Q30EQsfZtTHlO3p+vWGTF9182BkG
-         UUZPGRKBvYwBTr5nY88nGPXcup+2wbUzlxEAQvEMiapopqvV58MnfdZ/sW10zJPlYl
-         E70dw4/UxSSM1nf7fdjyNjc8LI/n6v2crN/Rbnix/VMb6o8TlrAZtLo1t6rNB+Yq83
-         wlti2jF0kEbgmTnPqjaS6F5CjSxANi7pncq0av/3EA5s/UOfO5+eMuDlCeAIB06ZzP
-         aRvesvlAVww2Q==
-From:   Arnd Bergmann <arnd@kernel.org>
-To:     Jakub Kicinski <kuba@kernel.org>
-Cc:     netdev@vger.kernel.org,
+        with ESMTP id S235041AbjJKPEV (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 11 Oct 2023 11:04:21 -0400
+Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDF14A4
+        for <linux-wpan@vger.kernel.org>; Wed, 11 Oct 2023 08:04:16 -0700 (PDT)
+Received: by mail-wr1-x42a.google.com with SMTP id ffacd0b85a97d-32d895584f1so470845f8f.1
+        for <linux-wpan@vger.kernel.org>; Wed, 11 Oct 2023 08:04:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1697036655; x=1697641455; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=hRkqB8/peQlqSu9v9E/Jxgpb5iu6r7QHy0PIjTwaP3U=;
+        b=Wa/rr+qYC8sSKEtftymBPnBFWOwtAUwirmBF/93mEazjvXl182v0aK/83guW5UIg+3
+         LvIf0WO9xMZYUcWGqndZvFQyNv3fquN1seN1VZvwOeirw4vPCD7MDh12zjxaLqd9ffQv
+         hN1748m3vSN+fdR/RdIdpJuTpkvGYFb9zcEzQ5yh1s3quTAsF0YbklAEQZED/94QYLTb
+         0m6DI96wUlDwZ3MAWvcoUhHkTMbZKej9YJLJIma7++uCinn0aA865VUb8loQQtr96Ots
+         AcZBjmyijGPOuiqDGYB6aF/oV5RpLoPrOd+J8FCLK/Bwwq6otnAV9CeslfrBz0WZAJ9C
+         DpnQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697036655; x=1697641455;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hRkqB8/peQlqSu9v9E/Jxgpb5iu6r7QHy0PIjTwaP3U=;
+        b=wANq6LUQMGvuhWEkdVw+rPs4bMzALfXLBBsDfaz6pU7hH/WHZ4gEA2tLUb3eKlFHrF
+         cFdDkY4yyPYVplCtO35JkbTDO+Eb8jUhBZ6/j4Qr5HKnDGQ2dQBclPYtWrYqsrdAZzeW
+         AvHYALI8TXnQdwe/K30mKzGaLALmRA6/BYM9YXCUGhRWKgcHlorSffOak4cQRVGnJSfk
+         fRPrmuMsHRQTLaTPJmAwaWZU16XzjORJXqMD0yQ+V5xU6ET+fUPyeW5VsWJgnfJwQjb1
+         RojVa8yGmLPiJ0v0UjzrXQF5P+huUhfAkFcq/Qm+AjfeEbQbv1jo/wa2T8XtxRvDXWzn
+         6A+g==
+X-Gm-Message-State: AOJu0YyAEPBdC8cBVf6Sgpowc6VmsI5plxto5VPCLNKGwClqXpu3GFZC
+        SMPQ0J7h1WXw1qVWjh6RbqN4yQ==
+X-Google-Smtp-Source: AGHT+IFfZQ1SiRV7geQ0Uqaa1luLtMmhs2/HZDlMTol8OQRTChK4x+uxynd3PWFf8uF8nkr/44Pylg==
+X-Received: by 2002:a5d:548f:0:b0:31d:d48f:12a3 with SMTP id h15-20020a5d548f000000b0031dd48f12a3mr16620164wrv.43.1697036655189;
+        Wed, 11 Oct 2023 08:04:15 -0700 (PDT)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id f11-20020a5d50cb000000b00325c7295450sm15782616wrt.3.2023.10.11.08.04.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Oct 2023 08:04:14 -0700 (PDT)
+Date:   Wed, 11 Oct 2023 17:04:12 +0200
+From:   Jiri Pirko <jiri@resnulli.us>
+To:     Arnd Bergmann <arnd@kernel.org>
+Cc:     Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         linux-wireless@vger.kernel.org,
         Johannes Berg <johannes@sipsolutions.net>,
@@ -39,73 +62,17 @@ Cc:     netdev@vger.kernel.org,
         "David S . Miller" <davem@davemloft.net>,
         Rodolfo Zitellini <rwz@xhero.org>, linux-doc@vger.kernel.org,
         linux-kernel@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH v2 10/10] net: remove ndo_do_ioctl handler
-Date:   Wed, 11 Oct 2023 16:02:25 +0200
-Message-Id: <20231011140225.253106-10-arnd@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20231011140225.253106-1-arnd@kernel.org>
+Subject: Re: [PATCH v2 01/10] appletalk: make localtalk and ppp support
+ conditional
+Message-ID: <ZSa5bIcISlvW3zo5@nanopsycho>
 References: <20231011140225.253106-1-arnd@kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231011140225.253106-1-arnd@kernel.org>
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-From: Arnd Bergmann <arnd@arndb.de>
 
-All of the references to the callback pointer are gone, so remove the
-pointer itself before we grow new references to it.
-
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- Documentation/networking/netdevices.rst | 8 --------
- include/linux/netdevice.h               | 7 -------
- 2 files changed, 15 deletions(-)
-
-diff --git a/Documentation/networking/netdevices.rst b/Documentation/networking/netdevices.rst
-index 9e4cccb90b870..6f9b71c5d37b8 100644
---- a/Documentation/networking/netdevices.rst
-+++ b/Documentation/networking/netdevices.rst
-@@ -218,14 +218,6 @@ ndo_stop:
- 	Context: process
- 	Note: netif_running() is guaranteed false
- 
--ndo_do_ioctl:
--	Synchronization: rtnl_lock() semaphore.
--	Context: process
--
--        This is only called by network subsystems internally,
--        not by user space calling ioctl as it was in before
--        linux-5.14.
--
- ndo_siocbond:
-         Synchronization: rtnl_lock() semaphore.
-         Context: process
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index e070a4540fbaf..8d1cc8f195cb6 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -1121,11 +1121,6 @@ struct netdev_net_notifier {
-  * int (*ndo_validate_addr)(struct net_device *dev);
-  *	Test if Media Access Control address is valid for the device.
-  *
-- * int (*ndo_do_ioctl)(struct net_device *dev, struct ifreq *ifr, int cmd);
-- *	Old-style ioctl entry point. This is used internally by the
-- *	appletalk and ieee802154 subsystems but is no longer called by
-- *	the device ioctl handler.
-- *
-  * int (*ndo_siocbond)(struct net_device *dev, struct ifreq *ifr, int cmd);
-  *	Used by the bonding driver for its device specific ioctls:
-  *	SIOCBONDENSLAVE, SIOCBONDRELEASE, SIOCBONDSETHWADDR, SIOCBONDCHANGEACTIVE,
-@@ -1429,8 +1424,6 @@ struct net_device_ops {
- 	int			(*ndo_set_mac_address)(struct net_device *dev,
- 						       void *addr);
- 	int			(*ndo_validate_addr)(struct net_device *dev);
--	int			(*ndo_do_ioctl)(struct net_device *dev,
--					        struct ifreq *ifr, int cmd);
- 	int			(*ndo_eth_ioctl)(struct net_device *dev,
- 						 struct ifreq *ifr, int cmd);
- 	int			(*ndo_siocbond)(struct net_device *dev,
--- 
-2.39.2
-
+Could you provide a cover letter for the set please?
