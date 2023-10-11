@@ -2,77 +2,116 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4889CD6E7E
-	for <linux-wpan@archiver.kernel.org>; Wed, 11 Oct 2023 15:04:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 532FCCD6E7F
+	for <linux-wpan@archiver.kernel.org>; Wed, 11 Oct 2023 15:58:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346731AbjJKPEX (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 11 Oct 2023 11:04:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45366 "EHLO
+        id S232345AbjJKP6H (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 11 Oct 2023 11:58:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56678 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235041AbjJKPEV (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 11 Oct 2023 11:04:21 -0400
-Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDF14A4
-        for <linux-wpan@vger.kernel.org>; Wed, 11 Oct 2023 08:04:16 -0700 (PDT)
-Received: by mail-wr1-x42a.google.com with SMTP id ffacd0b85a97d-32d895584f1so470845f8f.1
-        for <linux-wpan@vger.kernel.org>; Wed, 11 Oct 2023 08:04:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1697036655; x=1697641455; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=hRkqB8/peQlqSu9v9E/Jxgpb5iu6r7QHy0PIjTwaP3U=;
-        b=Wa/rr+qYC8sSKEtftymBPnBFWOwtAUwirmBF/93mEazjvXl182v0aK/83guW5UIg+3
-         LvIf0WO9xMZYUcWGqndZvFQyNv3fquN1seN1VZvwOeirw4vPCD7MDh12zjxaLqd9ffQv
-         hN1748m3vSN+fdR/RdIdpJuTpkvGYFb9zcEzQ5yh1s3quTAsF0YbklAEQZED/94QYLTb
-         0m6DI96wUlDwZ3MAWvcoUhHkTMbZKej9YJLJIma7++uCinn0aA865VUb8loQQtr96Ots
-         AcZBjmyijGPOuiqDGYB6aF/oV5RpLoPrOd+J8FCLK/Bwwq6otnAV9CeslfrBz0WZAJ9C
-         DpnQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697036655; x=1697641455;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hRkqB8/peQlqSu9v9E/Jxgpb5iu6r7QHy0PIjTwaP3U=;
-        b=wANq6LUQMGvuhWEkdVw+rPs4bMzALfXLBBsDfaz6pU7hH/WHZ4gEA2tLUb3eKlFHrF
-         cFdDkY4yyPYVplCtO35JkbTDO+Eb8jUhBZ6/j4Qr5HKnDGQ2dQBclPYtWrYqsrdAZzeW
-         AvHYALI8TXnQdwe/K30mKzGaLALmRA6/BYM9YXCUGhRWKgcHlorSffOak4cQRVGnJSfk
-         fRPrmuMsHRQTLaTPJmAwaWZU16XzjORJXqMD0yQ+V5xU6ET+fUPyeW5VsWJgnfJwQjb1
-         RojVa8yGmLPiJ0v0UjzrXQF5P+huUhfAkFcq/Qm+AjfeEbQbv1jo/wa2T8XtxRvDXWzn
-         6A+g==
-X-Gm-Message-State: AOJu0YyAEPBdC8cBVf6Sgpowc6VmsI5plxto5VPCLNKGwClqXpu3GFZC
-        SMPQ0J7h1WXw1qVWjh6RbqN4yQ==
-X-Google-Smtp-Source: AGHT+IFfZQ1SiRV7geQ0Uqaa1luLtMmhs2/HZDlMTol8OQRTChK4x+uxynd3PWFf8uF8nkr/44Pylg==
-X-Received: by 2002:a5d:548f:0:b0:31d:d48f:12a3 with SMTP id h15-20020a5d548f000000b0031dd48f12a3mr16620164wrv.43.1697036655189;
-        Wed, 11 Oct 2023 08:04:15 -0700 (PDT)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id f11-20020a5d50cb000000b00325c7295450sm15782616wrt.3.2023.10.11.08.04.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Oct 2023 08:04:14 -0700 (PDT)
-Date:   Wed, 11 Oct 2023 17:04:12 +0200
-From:   Jiri Pirko <jiri@resnulli.us>
-To:     Arnd Bergmann <arnd@kernel.org>
-Cc:     Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-wireless@vger.kernel.org,
-        Johannes Berg <johannes@sipsolutions.net>,
-        linux-wpan@vger.kernel.org,
-        Michael Hennerich <michael.hennerich@analog.com>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Eric Dumazet <edumazet@google.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Rodolfo Zitellini <rwz@xhero.org>, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [PATCH v2 01/10] appletalk: make localtalk and ppp support
- conditional
-Message-ID: <ZSa5bIcISlvW3zo5@nanopsycho>
-References: <20231011140225.253106-1-arnd@kernel.org>
+        with ESMTP id S230226AbjJKP6H (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 11 Oct 2023 11:58:07 -0400
+Received: from wout3-smtp.messagingengine.com (wout3-smtp.messagingengine.com [64.147.123.19])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90DFD8F;
+        Wed, 11 Oct 2023 08:58:05 -0700 (PDT)
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+        by mailout.west.internal (Postfix) with ESMTP id 4DD8C3200945;
+        Wed, 11 Oct 2023 11:58:01 -0400 (EDT)
+Received: from imap51 ([10.202.2.101])
+  by compute5.internal (MEProxy); Wed, 11 Oct 2023 11:58:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+        :cc:content-type:content-type:date:date:from:from:in-reply-to
+        :in-reply-to:message-id:mime-version:references:reply-to:sender
+        :subject:subject:to:to; s=fm2; t=1697039880; x=1697126280; bh=7H
+        Jkg/z8yMK6BHAYpmQDPyFjBK9Xn+ituvuEwAuZ1sU=; b=UVrZGTUIN/c+wOrjog
+        V4H1MycpdvOstYDdYmz6kQvmlXMauPc9wG4HupXP9G/ReLiXafAkUjS+sZEbRN0f
+        jZYR39UNK2581JykJ0XJeyTsMpe/huU9w18VgyyKp6JwnNi7Tx9B8QhovC0NlI81
+        hYf/r/qoMxEMTUwWznAh7j7NCxugCnHq860yJk4U81Uqq0qSgQAFlWeMiCdTsRe4
+        WeS1otq5untWkPF34AdO27vX/Y62ovQR1+O6n/lg7bjQYE+pazHxI3k6c6Os0RcD
+        MHn1EWGlZMobVxq/d1A7+fB+wdL8DkYfmj6MwSDv1b+SMvxPWxV9DwV4Y3P1NuRV
+        P6sw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-type:content-type:date:date
+        :feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+        :message-id:mime-version:references:reply-to:sender:subject
+        :subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+        :x-sasl-enc; s=fm2; t=1697039880; x=1697126280; bh=7HJkg/z8yMK6B
+        HAYpmQDPyFjBK9Xn+ituvuEwAuZ1sU=; b=DuqgHXuRkjGzv+sTVQXosPn4qx3IG
+        pp0FiLiqn0YzKA4Exz530ss62tkJ0JcrBK7OWeQz14oG3MEAAtZGcqzI0V+21941
+        xFof5XUuSDb+0m4kwAzSKruypnuL188xCt70zp7dvyoLhT45IbrhJz/q3ySNn4cK
+        /An+FzaHKbvg1iE9uK02O9ejiEjUBdoYHEdcXb00bzzjHaIx3foxvoQhSv3a8EIH
+        TsguJLzeGl9vRBq1hT+9ugqXZvc6SGrPf8K7TqHwZQ4RO+oaoaS3TIS46KHel7rW
+        oyoBMWFuQvAqQd7G1hLQ/j4P1h4zZwATDfcwwJGKZZ0/rDyGwt4dBPDAQ==
+X-ME-Sender: <xms:CMYmZV0XE_EsNbv0M22Xjk7OczozGwze6bo3NRK15HHwsRKTwUu2Iw>
+    <xme:CMYmZcGc0ENyppHryqZhpcyV0hOOcxjuTXA42bBoLODDCTcQEtXH2PAr1RIuPrqTi
+    IB0IEPFtpOKWSCOL60>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrheekgdelvdcutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+    fjughrpefofgggkfgjfhffhffvvefutgesthdtredtreertdenucfhrhhomhepfdetrhhn
+    ugcuuegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrghtth
+    gvrhhnpeevhfffledtgeehfeffhfdtgedvheejtdfgkeeuvefgudffteettdekkeeufeeh
+    udenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
+    enucfrrghrrghmpehmrghilhhfrhhomheprghrnhgusegrrhhnuggsrdguvg
+X-ME-Proxy: <xmx:CMYmZV589CMQPoU21g8abAl3zQiB30Rq5SFLxdDrBC0XlvrFP_5y5A>
+    <xmx:CMYmZS3UYGaaj_dDsRqeO5bwzM73qo2MfAiY8fjWT39O9vFI2ikiCA>
+    <xmx:CMYmZYGJmnHAdwzedxXPSUko0KfLjLOGgtM7CAl8R2UN-HOCj08sgg>
+    <xmx:CMYmZfcEwbKy8YlJQgLXNdgzXoi3YSodyaYkJuapJr-ijNW9VXkIoQ>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+        id E845BB60089; Wed, 11 Oct 2023 11:57:59 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.9.0-alpha0-1019-ged83ad8595-fm-20231002.001-ged83ad85
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231011140225.253106-1-arnd@kernel.org>
+Message-Id: <82527b7f-4509-4a59-a9cf-2df47e6e1a7c@app.fastmail.com>
+In-Reply-To: <ZSa5bIcISlvW3zo5@nanopsycho>
+References: <20231011140225.253106-1-arnd@kernel.org>
+ <ZSa5bIcISlvW3zo5@nanopsycho>
+Date:   Wed, 11 Oct 2023 17:57:38 +0200
+From:   "Arnd Bergmann" <arnd@arndb.de>
+To:     "Jiri Pirko" <jiri@resnulli.us>, "Arnd Bergmann" <arnd@kernel.org>
+Cc:     "Jakub Kicinski" <kuba@kernel.org>,
+        Netdev <netdev@vger.kernel.org>,
+        "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
+        linux-wireless@vger.kernel.org,
+        "Johannes Berg" <johannes@sipsolutions.net>,
+        linux-wpan@vger.kernel.org,
+        "Michael Hennerich" <michael.hennerich@analog.com>,
+        "Paolo Abeni" <pabeni@redhat.com>,
+        "Eric Dumazet" <edumazet@google.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        "Rodolfo Zitellini" <rwz@xhero.org>, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 01/10] appletalk: make localtalk and ppp support conditional
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
+On Wed, Oct 11, 2023, at 17:04, Jiri Pirko wrote:
+> Could you provide a cover letter for the set please?
 
-Could you provide a cover letter for the set please?
+Subject: [PATCH v2 00/10] remove final .ndo_do_ioctl references
+
+The .ndo_do_ioctl() netdev operation used to be how one communicates
+with a network driver from userspace, but since my previous cleanup [1],
+it is purely internal to the kernel.
+
+Removing the cops appletalk/localtalk driver made me revisit the
+missing pieces from that older series, removing all the unused
+implementations in wireless drivers as well as the two kernel-internal
+callers in the ieee802154 and appletalk stacks.
+
+One ethernet driver was already merged in the meantime that should
+have used .ndo_eth_ioctl instead of .ndo_do_ioctl, so fix that as well.
+With the complete removal, any future drivers making this mistake
+cause build failures that are easier to spot.
+
+[1] https://lore.kernel.org/netdev/20201106221743.3271965-1-arnd@kernel.org/
+
+----
+Hope that helps, I had commented on the cops removal about sending
+this but of course not everyone here saw that. Let me know if I should
+resend the patches together with the cover letter.
+
+    Arnd
