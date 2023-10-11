@@ -2,39 +2,50 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41E1ACD98F5
-	for <linux-wpan@archiver.kernel.org>; Wed, 11 Oct 2023 07:09:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78EB7CD6E54
+	for <linux-wpan@archiver.kernel.org>; Wed, 11 Oct 2023 09:29:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344494AbjJKHJM (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 11 Oct 2023 03:09:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44784 "EHLO
+        id S231356AbjJKJ3B (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 11 Oct 2023 05:29:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35140 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344185AbjJKHJM (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 11 Oct 2023 03:09:12 -0400
-Received: from smtpcmd11128.aruba.it (smtpcmd11128.aruba.it [62.149.156.128])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1528C98
-        for <linux-wpan@vger.kernel.org>; Wed, 11 Oct 2023 00:09:07 -0700 (PDT)
-Received: from smtpclient.apple ([178.197.207.108])
-        by Aruba Outgoing Smtp  with ESMTPA
-        id qTL5qhUPwT2S6qTL5qdYwG; Wed, 11 Oct 2023 09:09:05 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=aruba.it; s=a1;
-        t=1697008145; bh=OFZaDkGYXLAqctRIWUHK2zLsfn3fVaLLoVZLlGB7ECs=;
-        h=Content-Type:Mime-Version:Subject:From:Date:To;
-        b=gSITyVIPmvPqIY+TI/ONWy67LBXZJoWfIYTOxHdmsrkexV5uF3oHAFAJWUwRfNUex
-         j73xgyR6znKwSVHy1RAp9pRRozrw88QIOVSnCx0pnZ308W3zN7bQKPTIpFDOUKF/yU
-         wy/ycug6rFPjx4esbpCrQuR8jY1CtwpoeH++e96ag2voR6rjA+ImmPhaOMdbGarIuu
-         /8HtmJ8YEXI4okreyZ1nlUj40sCcw+IyLVSEhygfb8IUnK+Cri7sBnyzXdB0cgYD3f
-         YF44wNUfGmNBsyl/LWOIegybCxd43Kb4G3qYzngFfYyBtApVWgJUahjCQSTgDuN2ry
-         n+AXx1jYXy87A==
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.120.0.1.15\))
-Subject: Re: [PATCH 01/10] appletalk: remove localtalk and ppp support
-From:   Rodolfo Zitellini <rwz@xhero.org>
-In-Reply-To: <2d325867-95c9-4bff-8f24-9083c730d7ba@app.fastmail.com>
-Date:   Wed, 11 Oct 2023 09:09:02 +0200
-Cc:     Arnd Bergmann <arnd@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
-        Netdev <netdev@vger.kernel.org>,
+        with ESMTP id S231144AbjJKJ3A (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 11 Oct 2023 05:29:00 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6CD391;
+        Wed, 11 Oct 2023 02:28:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1697016538; x=1728552538;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=ZpC0uCRDOByLh94gi2iX/h5gJtZPBcvba+Hl6b4tHOk=;
+  b=LWVdQJYofk4Z0UI4JkWRiZbhT7p5bifxD57zSuAqyBDltgUyAT/HCRB/
+   tNgLoeZb8V7UEU6E2Pk9JxZhmkSiLvoUyhPVWSyAtJ5/g6acZHRBrPm8p
+   rQFMY0wjVw5YdwDyOsT2GU5xbCYeyyiZAdTeXjayjtxAfMYUEtGDY0e8M
+   V/jWuOUDmE6chgX+75+hm1i0fjp2yLqibtjAEOvWnzGfpiPX082RRkrd5
+   qDqbCABa6/B0ZYhPJYhHq77Uym+LVVk+NCdDB/It76SNNQ9jcRHBAnrlf
+   ZHufT028/GB9HtlYBlDfH9tBD5muUKrdJGiUR8ybcpKCK7ZBm5wFXkkzr
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10859"; a="387463709"
+X-IronPort-AV: E=Sophos;i="6.03,214,1694761200"; 
+   d="scan'208";a="387463709"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Oct 2023 02:28:57 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10859"; a="788936139"
+X-IronPort-AV: E=Sophos;i="6.03,214,1694761200"; 
+   d="scan'208";a="788936139"
+Received: from lkp-server02.sh.intel.com (HELO f64821696465) ([10.239.97.151])
+  by orsmga001.jf.intel.com with ESMTP; 11 Oct 2023 02:28:52 -0700
+Received: from kbuild by f64821696465 with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1qqVVv-00024D-1z;
+        Wed, 11 Oct 2023 09:28:25 +0000
+Date:   Wed, 11 Oct 2023 17:27:17 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Arnd Bergmann <arnd@kernel.org>, Jakub Kicinski <kuba@kernel.org>
+Cc:     oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         linux-wireless@vger.kernel.org,
         Johannes Berg <johannes@sipsolutions.net>,
@@ -43,98 +54,93 @@ Cc:     Arnd Bergmann <arnd@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
         Paolo Abeni <pabeni@redhat.com>,
         Eric Dumazet <edumazet@google.com>,
         "David S . Miller" <davem@davemloft.net>,
-        linux-kernel@vger.kernel.org, Doug Brown <doug@schmorgal.com>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <D4934680-DFB5-471F-893F-32FEA9A6C26C@xhero.org>
+        linux-kernel@vger.kernel.org, Doug Brown <doug@schmorgal.com>,
+        Arnd Bergmann <arnd@arndb.de>
+Subject: Re: [PATCH 01/10] appletalk: remove localtalk and ppp support
+Message-ID: <202310111736.4mh6Cf5C-lkp@intel.com>
 References: <20231009141908.1767241-1-arnd@kernel.org>
- <790BA488-B6F6-41ED-96EF-2089EF1C043B@xhero.org>
- <3cb4bb96-1651-4179-9c32-507937282d7d@app.fastmail.com>
- <DE61EEA5-D560-40B6-8F4D-22F299AC61ED@xhero.org>
- <2d325867-95c9-4bff-8f24-9083c730d7ba@app.fastmail.com>
-To:     Arnd Bergmann <arnd@arndb.de>
-X-Mailer: Apple Mail (2.3654.120.0.1.15)
-X-CMAE-Envelope: MS4xfJ+NY3qkgFTiuA0L32HFj+5woru5XqLJ2Z2A2TqBSyNMJjn9LTpk+PwA/TopQdGSgZemVGvpmWUkrlezKQaaSorGUs9nrzbOLTMBAdAjKxcCKnQ07IS3
- MjQ6AI+8VVwJBvQpEn3Xv82MRQiQmMkCGgXJ19Y7pPt0j21usz3a1MYa4c7pNjY0/woBJG3IAUohLs0BK1DVJo+2DDCNWeZhjrqBgXEzJeKtiuXAEusogHqk
- Kv/XrrLNv82hS8KstVy59xpwj+1mUKhMvH4JdRDUFsxdVUFBcvqcL0WRsGhtnfzcCdyA/TygYOtuOVrl6o5UlSbzo0ebTHp3Y8W0PaKbEdOsGLlpnixo4bm7
- KgcsyGX1T/poBUvWCUxFJPJ1fPYcC0GUM2BgGPYOuH7rm4lf6GntqES+VwZNZbwhoyq74t4PC/Pz1vtF1pC9eTeJm1utj9fotl8OGUQhd3CLuHGAGnMNwOIe
- xBDzmq8bC0rDCVKWXr26+qe3YPQHq1JbDi2yYPEerMcJigv+JZLrzidZ51bE2WiqMsfJG8guomcqd2+GcBgf6rxC/SYB7kx5sM1LnUAl8lhu4h0bEIs+zk4N
- xaQHjZItQCeMyU264BiSV9NbEwikOv9u7uR7tnhC9x80EA==
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231009141908.1767241-1-arnd@kernel.org>
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
+Hi Arnd,
+
+kernel test robot noticed the following build warnings:
+
+[auto build test WARNING on next-20231009]
+[cannot apply to linus/master v6.6-rc5 v6.6-rc4 v6.6-rc3 v6.6-rc5]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Arnd-Bergmann/ieee802154-avoid-deprecated-ndo_do_ioctl-callback/20231009-222305
+base:   next-20231009
+patch link:    https://lore.kernel.org/r/20231009141908.1767241-1-arnd%40kernel.org
+patch subject: [PATCH 01/10] appletalk: remove localtalk and ppp support
+config: x86_64-randconfig-002-20231011 (https://download.01.org/0day-ci/archive/20231011/202310111736.4mh6Cf5C-lkp@intel.com/config)
+compiler: gcc-7 (Ubuntu 7.5.0-6ubuntu2) 7.5.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231011/202310111736.4mh6Cf5C-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202310111736.4mh6Cf5C-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   drivers/net/appletalk/ipddp.c: In function 'ipddp_create':
+   drivers/net/appletalk/ipddp.c:207:24: error: implicit declaration of function 'atrtr_get_dev'; did you mean 'to_net_dev'? [-Werror=implicit-function-declaration]
+            if ((rt->dev = atrtr_get_dev(&rt->at)) == NULL) {
+                           ^~~~~~~~~~~~~
+                           to_net_dev
+>> drivers/net/appletalk/ipddp.c:207:22: warning: assignment makes pointer from integer without a cast [-Wint-conversion]
+            if ((rt->dev = atrtr_get_dev(&rt->at)) == NULL) {
+                         ^
+   cc1: some warnings being treated as errors
 
 
-> Il giorno 10 ott 2023, alle ore 10:15, Arnd Bergmann <arnd@arndb.de> =
-ha scritto:
->=20
-> On Tue, Oct 10, 2023, at 09:10, Rodolfo Zitellini wrote:
->>> Il giorno 9 ott 2023, alle ore 19:29, Arnd Bergmann <arnd@arndb.de> =
-ha scritto:
->>> On Mon, Oct 9, 2023, at 18:49, Rodolfo Zitellini wrote:
->>> I can see a few ways this could work out:
->>>=20
->>> - add a custom callback pointer to struct atalk_iface to
->>> get and set the address for phase1 probing instead of going
->>> through the ioctl
->>=20
->> This was my initial thought, at least for the moment, mostly to keep=20=
+vim +207 drivers/net/appletalk/ipddp.c
 
->> netatalk happy and make sure I don=E2=80=99t break other stuff that =
-makes=20
->> assumptions on how the address probing worked. There are other bits I=20=
+^1da177e4c3f41 Linus Torvalds   2005-04-16  192  
+^1da177e4c3f41 Linus Torvalds   2005-04-16  193  /*
+^1da177e4c3f41 Linus Torvalds   2005-04-16  194   * Create a routing entry. We first verify that the
+^1da177e4c3f41 Linus Torvalds   2005-04-16  195   * record does not already exist. If it does we return -EEXIST
+^1da177e4c3f41 Linus Torvalds   2005-04-16  196   */
+^1da177e4c3f41 Linus Torvalds   2005-04-16  197  static int ipddp_create(struct ipddp_route *new_rt)
+^1da177e4c3f41 Linus Torvalds   2005-04-16  198  {
+ce7e40c432ba84 Vlad Tsyrklevich 2017-01-09  199          struct ipddp_route *rt = kzalloc(sizeof(*rt), GFP_KERNEL);
+^1da177e4c3f41 Linus Torvalds   2005-04-16  200  
+^1da177e4c3f41 Linus Torvalds   2005-04-16  201          if (rt == NULL)
+^1da177e4c3f41 Linus Torvalds   2005-04-16  202                  return -ENOMEM;
+^1da177e4c3f41 Linus Torvalds   2005-04-16  203  
+^1da177e4c3f41 Linus Torvalds   2005-04-16  204          rt->ip = new_rt->ip;
+^1da177e4c3f41 Linus Torvalds   2005-04-16  205          rt->at = new_rt->at;
+^1da177e4c3f41 Linus Torvalds   2005-04-16  206          rt->next = NULL;
+^1da177e4c3f41 Linus Torvalds   2005-04-16 @207          if ((rt->dev = atrtr_get_dev(&rt->at)) == NULL) {
+^1da177e4c3f41 Linus Torvalds   2005-04-16  208  		kfree(rt);
+^1da177e4c3f41 Linus Torvalds   2005-04-16  209                  return -ENETUNREACH;
+^1da177e4c3f41 Linus Torvalds   2005-04-16  210          }
+^1da177e4c3f41 Linus Torvalds   2005-04-16  211  
+5615968a708451 David S. Miller  2009-05-27  212  	spin_lock_bh(&ipddp_route_lock);
+5615968a708451 David S. Miller  2009-05-27  213  	if (__ipddp_find_route(rt)) {
+5615968a708451 David S. Miller  2009-05-27  214  		spin_unlock_bh(&ipddp_route_lock);
+^1da177e4c3f41 Linus Torvalds   2005-04-16  215  		kfree(rt);
+^1da177e4c3f41 Linus Torvalds   2005-04-16  216  		return -EEXIST;
+^1da177e4c3f41 Linus Torvalds   2005-04-16  217  	}
+^1da177e4c3f41 Linus Torvalds   2005-04-16  218  
+^1da177e4c3f41 Linus Torvalds   2005-04-16  219          rt->next = ipddp_route_list;
+^1da177e4c3f41 Linus Torvalds   2005-04-16  220          ipddp_route_list = rt;
+^1da177e4c3f41 Linus Torvalds   2005-04-16  221  
+5615968a708451 David S. Miller  2009-05-27  222  	spin_unlock_bh(&ipddp_route_lock);
+5615968a708451 David S. Miller  2009-05-27  223  
+^1da177e4c3f41 Linus Torvalds   2005-04-16  224          return 0;
+^1da177e4c3f41 Linus Torvalds   2005-04-16  225  }
+^1da177e4c3f41 Linus Torvalds   2005-04-16  226  
 
->> would like to improve, for example tcpdump (which parses correctly=20
->> appetalk packets!) is broken in the current implementation.
->>=20
->>> - rewrite the probing logic in aarp.c more widely, and improve
->>> the userspace interface in the process by introducing a netlink
->>> interface
->>=20
->> This is sorta the =E2=80=9Csecond step=E2=80=9D I was planning, I =
-think the logic for=20
->> probing could be redesigned and simplified (it also does not work =
-100%=20
->> correctly), and it could be a good chance to improve the interface =
-with=20
->> netatalk too.
->=20
-> Ok, I've adapted my patch now to not actually drop the
-> localtalk code for now, and sent that out, I hope that works
-> for you. Even if we go with the v1 patch that removes it all,
-> you could just as well start with a revert of my patch when
-> you add your driver, so in the end it shouldn't make much
-> of a difference.
-
-Thank you very much! I will try to make my patch ready to be submitted =
-soon, and I will add the proper reverts if needed.
-
->>> - Move your entire driver into userspace and go to the kernel
->>> using tun/tap. This has the added benefit of avoiding a lot
->>> of the complexity of the tty line discipline code you have.
->>=20
->> We had some discussion too if to just make the lt an userspace stack, =
-I=20
->> personally like how it is currently implemented because existing code=20=
-
->> can run basically without modification.
->>=20
->> I would propose at this stage to change the TashTalk driver to remove=20=
-
->> ndo_do_ioctl and to use a custom callback, if this ok.
->=20
-> It looks like you still need a custom userspace tool to set up
-> the uart for your new driver, so my feeling would be that having a
-> userspace bridge to implement the localtalk/uart to ethertalk/tap
-> driver would actually be nicer for both usability and maintenance.
->=20
-> It's not something we need to decide now though, and is up to
-> you in the end.
-
-I will experiment with this too, as it will require a bit of work to =
-morph localtalk packets to ethertalk/aarp ones, and the code in the =
-kernel has some specialized bits for localtalk here and there.
-
-In any case, many thanks!
-Rodolfo
-
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
