@@ -2,30 +2,30 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 798ADCD6E74
-	for <linux-wpan@archiver.kernel.org>; Wed, 11 Oct 2023 14:03:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CE15CD6E6E
+	for <linux-wpan@archiver.kernel.org>; Wed, 11 Oct 2023 14:03:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347056AbjJKODV (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Wed, 11 Oct 2023 10:03:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54594 "EHLO
+        id S1346919AbjJKODk (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Wed, 11 Oct 2023 10:03:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51344 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346999AbjJKODR (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Wed, 11 Oct 2023 10:03:17 -0400
+        with ESMTP id S1347061AbjJKODX (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Wed, 11 Oct 2023 10:03:23 -0400
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B0BAC4;
-        Wed, 11 Oct 2023 07:03:09 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32CB3C433CC;
-        Wed, 11 Oct 2023 14:03:06 +0000 (UTC)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 751AAE5;
+        Wed, 11 Oct 2023 07:03:17 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F4D7C433CB;
+        Wed, 11 Oct 2023 14:03:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1697032989;
-        bh=k4v64vdXlavEo9kLUWLKxx3pHDNDWQxvczexvxtQbZ8=;
+        s=k20201202; t=1697032996;
+        bh=N/HC4aN9VSOyAziYJUcabvcvg/4uj3ZeRvuFPX72uUg=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=oK3IFg/pFE4zGL1/r/Ct+4u3hGS8StfN/uiWbC/n8TvbMVsHb3gKi7yzdteb91f67
-         Y8an+OreGiSvHgVCR6ykm3uODlHrl+zH57eCRnNVH2CQxUpRnLDHrjJX5l2p3pwcZ1
-         OEBucTPuvF9Pghus2KylDa9kV73fRw8MPf1naZO2zJXHC6IqVh5vwkV+kmLHGRZQeX
-         7hgEq0saCgubgmTWXvUedHbYkjt1In2YhFtgSUY8/iOfHfcaP2KBkU1mSXsrEZpBk/
-         0KP9LX610aszxOye0d+NVcSLirMxUDPRPYgSakwWC7hGkR+o+ddsMgjMsBiEyw7r7m
-         RbWV4f5ADf8qA==
+        b=OURP0UMv6EgweTj0Rs590/LwjwTau2qo9h2IdP8oq7Lq97yicqRuDZrF8QR8zOpJk
+         760QbfnousJd7q2sYcoh8cs6PFw3zNVsgoUIOTx3Zx2zTjjaaqvPaybtMOJkUNXrzm
+         0bDPxJVsdOR3EEWDtJ3886RKmBArz3CXm7mTt1Yz61ImKQFzd7/gpiJ5p9rdsdvWDy
+         LefCqIwwWMwFNXs0pOid5iOLu8WkDXpiMdJYDc20wkEQOKD4o0HEvjFOx3EG3iieDZ
+         eRHRPoh8uTfdVGjsxjN663MzrRwnyjNZZwq6Pv4R0Q1fbkxM1scmh7UZlQ7m20Z9vA
+         J7gwh9KhoByEA==
 From:   Arnd Bergmann <arnd@kernel.org>
 To:     Jakub Kicinski <kuba@kernel.org>
 Cc:     netdev@vger.kernel.org,
@@ -38,10 +38,11 @@ Cc:     netdev@vger.kernel.org,
         Eric Dumazet <edumazet@google.com>,
         "David S . Miller" <davem@davemloft.net>,
         Rodolfo Zitellini <rwz@xhero.org>, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH v2 06/10] staging: rtl8712: remove unused legacy ioctl handlers
-Date:   Wed, 11 Oct 2023 16:02:21 +0200
-Message-Id: <20231011140225.253106-6-arnd@kernel.org>
+        linux-kernel@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>,
+        Kalle Valo <kvalo@kernel.org>
+Subject: [PATCH v2 08/10] wifi: atmel: remove unused ioctl function
+Date:   Wed, 11 Oct 2023 16:02:23 +0200
+Message-Id: <20231011140225.253106-8-arnd@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20231011140225.253106-1-arnd@kernel.org>
 References: <20231011140225.253106-1-arnd@kernel.org>
@@ -53,182 +54,112 @@ X-Mailing-List: linux-wpan@vger.kernel.org
 
 From: Arnd Bergmann <arnd@arndb.de>
 
-The .ndo_do_ioctl functions are never called, and can just be removed,
-especially since this is a staging driver.
+This function has no callers, and for the past 20 years, the request_firmware
+interface has been in place instead of the custom firmware loader.
 
-Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Acked-by: Kalle Valo <kvalo@kernel.org>
 Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 ---
- drivers/staging/rtl8712/os_intfs.c            |   1 -
- drivers/staging/rtl8712/osdep_intf.h          |   2 -
- drivers/staging/rtl8712/rtl871x_ioctl_linux.c | 124 ------------------
- 3 files changed, 127 deletions(-)
+ drivers/staging/wireless/atmel/atmel.c | 72 --------------------------
+ 1 file changed, 72 deletions(-)
 
-diff --git a/drivers/staging/rtl8712/os_intfs.c b/drivers/staging/rtl8712/os_intfs.c
-index b18e6d9c832b8..121edffbd2507 100644
---- a/drivers/staging/rtl8712/os_intfs.c
-+++ b/drivers/staging/rtl8712/os_intfs.c
-@@ -191,7 +191,6 @@ static const struct net_device_ops rtl8712_netdev_ops = {
- 	.ndo_start_xmit = r8712_xmit_entry,
- 	.ndo_set_mac_address = r871x_net_set_mac_address,
- 	.ndo_get_stats = r871x_net_get_stats,
--	.ndo_do_ioctl = r871x_ioctl,
+diff --git a/drivers/staging/wireless/atmel/atmel.c b/drivers/staging/wireless/atmel/atmel.c
+index 7c2d1c588156d..461dce21de2b0 100644
+--- a/drivers/staging/wireless/atmel/atmel.c
++++ b/drivers/staging/wireless/atmel/atmel.c
+@@ -571,7 +571,6 @@ static const struct {
+ 		      { REG_DOMAIN_ISRAEL, 3, 9, "Israel"} };
+ 
+ static void build_wpa_mib(struct atmel_private *priv);
+-static int atmel_ioctl(struct net_device *dev, struct ifreq *rq, int cmd);
+ static void atmel_copy_to_card(struct net_device *dev, u16 dest,
+ 			       const unsigned char *src, u16 len);
+ static void atmel_copy_to_host(struct net_device *dev, unsigned char *dest,
+@@ -1487,7 +1486,6 @@ static const struct net_device_ops atmel_netdev_ops = {
+ 	.ndo_stop		= atmel_close,
+ 	.ndo_set_mac_address 	= atmel_set_mac_address,
+ 	.ndo_start_xmit 	= start_tx,
+-	.ndo_do_ioctl 		= atmel_ioctl,
+ 	.ndo_validate_addr	= eth_validate_addr,
  };
  
- struct net_device *r8712_init_netdev(void)
-diff --git a/drivers/staging/rtl8712/osdep_intf.h b/drivers/staging/rtl8712/osdep_intf.h
-index 9e75116c987ec..ce823030bfec2 100644
---- a/drivers/staging/rtl8712/osdep_intf.h
-+++ b/drivers/staging/rtl8712/osdep_intf.h
-@@ -27,6 +27,4 @@ struct intf_priv {
- 	struct completion io_retevt_comp;
+@@ -2616,76 +2614,6 @@ static const struct iw_handler_def atmel_handler_def = {
+ 	.get_wireless_stats = atmel_get_wireless_stats
  };
  
--int r871x_ioctl(struct net_device *dev, struct ifreq *rq, int cmd);
--
- #endif	/*_OSDEP_INTF_H_*/
-diff --git a/drivers/staging/rtl8712/rtl871x_ioctl_linux.c b/drivers/staging/rtl8712/rtl871x_ioctl_linux.c
-index 36f6904d25abc..a4a34c9f00b84 100644
---- a/drivers/staging/rtl8712/rtl871x_ioctl_linux.c
-+++ b/drivers/staging/rtl8712/rtl871x_ioctl_linux.c
-@@ -36,8 +36,6 @@
- #include <linux/if_arp.h>
- #include <linux/etherdevice.h>
- 
--#define RTL_IOCTL_WPA_SUPPLICANT	(SIOCIWFIRSTPRIV + 0x1E)
--
- #define SCAN_ITEM_SIZE 768
- #define MAX_CUSTOM_LEN 64
- #define RATE_COUNT 4
-@@ -2066,128 +2064,6 @@ static int r871x_wps_start(struct net_device *dev,
- 	return 0;
- }
- 
--static int wpa_set_param(struct net_device *dev, u8 name, u32 value)
+-static int atmel_ioctl(struct net_device *dev, struct ifreq *rq, int cmd)
 -{
--	struct _adapter *padapter = netdev_priv(dev);
--
--	switch (name) {
--	case IEEE_PARAM_WPA_ENABLED:
--		padapter->securitypriv.AuthAlgrthm = 2; /* 802.1x */
--		switch ((value) & 0xff) {
--		case 1: /* WPA */
--			padapter->securitypriv.ndisauthtype =
--				Ndis802_11AuthModeWPAPSK; /* WPA_PSK */
--			padapter->securitypriv.ndisencryptstatus =
--				Ndis802_11Encryption2Enabled;
--			break;
--		case 2: /* WPA2 */
--			padapter->securitypriv.ndisauthtype =
--				Ndis802_11AuthModeWPA2PSK; /* WPA2_PSK */
--			padapter->securitypriv.ndisencryptstatus =
--				Ndis802_11Encryption3Enabled;
--			break;
--		}
--		break;
--	case IEEE_PARAM_TKIP_COUNTERMEASURES:
--		break;
--	case IEEE_PARAM_DROP_UNENCRYPTED:
--		/* HACK:
--		 *
--		 * wpa_supplicant calls set_wpa_enabled when the driver
--		 * is loaded and unloaded, regardless of if WPA is being
--		 * used.  No other calls are made which can be used to
--		 * determine if encryption will be used or not prior to
--		 * association being expected.  If encryption is not being
--		 * used, drop_unencrypted is set to false, else true -- we
--		 * can use this to determine if the CAP_PRIVACY_ON bit should
--		 * be set.
--		 */
--		break;
--	case IEEE_PARAM_PRIVACY_INVOKED:
--		break;
--	case IEEE_PARAM_AUTH_ALGS:
--		return wpa_set_auth_algs(dev, value);
--	case IEEE_PARAM_IEEE_802_1X:
--		break;
--	case IEEE_PARAM_WPAX_SELECT:
--		/* added for WPA2 mixed mode */
--		break;
--	default:
--		return -EOPNOTSUPP;
--	}
--	return 0;
--}
--
--static int wpa_mlme(struct net_device *dev, u32 command, u32 reason)
--{
--	struct _adapter *padapter = netdev_priv(dev);
--
--	switch (command) {
--	case IEEE_MLME_STA_DEAUTH:
--		if (!r8712_set_802_11_disassociate(padapter))
--			return -1;
--		break;
--	case IEEE_MLME_STA_DISASSOC:
--		if (!r8712_set_802_11_disassociate(padapter))
--			return -1;
--		break;
--	default:
--		return -EOPNOTSUPP;
--	}
--	return 0;
--}
--
--static int wpa_supplicant_ioctl(struct net_device *dev, struct iw_point *p)
--{
--	struct ieee_param *param;
--	int ret = 0;
--	struct _adapter *padapter = netdev_priv(dev);
--
--	if (p->length < sizeof(struct ieee_param) || !p->pointer)
--		return -EINVAL;
--	param = memdup_user(p->pointer, p->length);
--	if (IS_ERR(param))
--		return PTR_ERR(param);
--	switch (param->cmd) {
--	case IEEE_CMD_SET_WPA_PARAM:
--		ret = wpa_set_param(dev, param->u.wpa_param.name,
--		      param->u.wpa_param.value);
--		break;
--	case IEEE_CMD_SET_WPA_IE:
--		ret =  r871x_set_wpa_ie(padapter, (char *)param->u.wpa_ie.data,
--		       (u16)param->u.wpa_ie.len);
--		break;
--	case IEEE_CMD_SET_ENCRYPTION:
--		ret = wpa_set_encryption(dev, param, p->length);
--		break;
--	case IEEE_CMD_MLME:
--		ret = wpa_mlme(dev, param->u.mlme.command,
--		      param->u.mlme.reason_code);
--		break;
--	default:
--		ret = -EOPNOTSUPP;
--		break;
--	}
--	if (ret == 0 && copy_to_user(p->pointer, param, p->length))
--		ret = -EFAULT;
--	kfree(param);
--	return ret;
--}
--
--/* based on "driver_ipw" and for hostapd */
--int r871x_ioctl(struct net_device *dev, struct ifreq *rq, int cmd)
--{
--	struct iwreq *wrq = (struct iwreq *)rq;
+-	int i, rc = 0;
+-	struct atmel_private *priv = netdev_priv(dev);
+-	struct atmel_priv_ioctl com;
+-	struct iwreq *wrq = (struct iwreq *) rq;
+-	unsigned char *new_firmware;
+-	char domain[REGDOMAINSZ + 1];
 -
 -	switch (cmd) {
--	case RTL_IOCTL_WPA_SUPPLICANT:
--		return wpa_supplicant_ioctl(dev, &wrq->u.data);
+-	case ATMELIDIFC:
+-		wrq->u.param.value = ATMELMAGIC;
+-		break;
+-
+-	case ATMELFWL:
+-		if (copy_from_user(&com, rq->ifr_data, sizeof(com))) {
+-			rc = -EFAULT;
+-			break;
+-		}
+-
+-		if (!capable(CAP_NET_ADMIN)) {
+-			rc = -EPERM;
+-			break;
+-		}
+-
+-		new_firmware = memdup_user(com.data, com.len);
+-		if (IS_ERR(new_firmware)) {
+-			rc = PTR_ERR(new_firmware);
+-			break;
+-		}
+-
+-		kfree(priv->firmware);
+-
+-		priv->firmware = new_firmware;
+-		priv->firmware_length = com.len;
+-		strncpy(priv->firmware_id, com.id, 31);
+-		priv->firmware_id[31] = '\0';
+-		break;
+-
+-	case ATMELRD:
+-		if (copy_from_user(domain, rq->ifr_data, REGDOMAINSZ)) {
+-			rc = -EFAULT;
+-			break;
+-		}
+-
+-		if (!capable(CAP_NET_ADMIN)) {
+-			rc = -EPERM;
+-			break;
+-		}
+-
+-		domain[REGDOMAINSZ] = 0;
+-		rc = -EINVAL;
+-		for (i = 0; i < ARRAY_SIZE(channel_table); i++) {
+-			if (!strcasecmp(channel_table[i].name, domain)) {
+-				priv->config_reg_domain = channel_table[i].reg_domain;
+-				rc = 0;
+-			}
+-		}
+-
+-		if (rc == 0 &&  priv->station_state != STATION_STATE_DOWN)
+-			rc = atmel_open(dev);
+-		break;
+-
 -	default:
--		return -EOPNOTSUPP;
+-		rc = -EOPNOTSUPP;
 -	}
--	return 0;
+-
+-	return rc;
 -}
 -
- static iw_handler r8711_handlers[] = {
- 	NULL,				/* SIOCSIWCOMMIT */
- 	r8711_wx_get_name,		/* SIOCGIWNAME */
+ struct auth_body {
+ 	__le16 alg;
+ 	__le16 trans_seq;
 -- 
 2.39.2
 
