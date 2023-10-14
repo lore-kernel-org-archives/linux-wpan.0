@@ -2,114 +2,76 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35E81CDB46E
-	for <linux-wpan@archiver.kernel.org>; Thu, 12 Oct 2023 13:46:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14B62CDB47E
+	for <linux-wpan@archiver.kernel.org>; Sat, 14 Oct 2023 00:07:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1378679AbjJLNqP (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Thu, 12 Oct 2023 09:46:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59302 "EHLO
+        id S232576AbjJNAHg (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Fri, 13 Oct 2023 20:07:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56024 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347198AbjJLNqO (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 12 Oct 2023 09:46:14 -0400
-Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23078CC
-        for <linux-wpan@vger.kernel.org>; Thu, 12 Oct 2023 06:46:12 -0700 (PDT)
-Received: by mail-ed1-x52a.google.com with SMTP id 4fb4d7f45d1cf-533df112914so1654877a12.0
-        for <linux-wpan@vger.kernel.org>; Thu, 12 Oct 2023 06:46:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1697118370; x=1697723170; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=WL4o0PnlTALPx2JWXQcQVAR5wsdcklh2Oh9j6J5p78o=;
-        b=s8s5pySfVGsOvbqrWvK2k8LuNwRuOVSZz33KIMLX/3ba1xPeA2UmJWZqChehN3e92F
-         v04YzDGP7HVwEwYO5OWlA8ULMTru471sNQIbYNZww5xDJ311BvdxnWp1JFavlr9QOQLf
-         wC/w7VNQabGsjUdburO0JP/G+GUbeKJJ4uZQrjlnFo0qJh0PJ21z3ZX7+2VlF9Hn7OZL
-         Gvz3aGCRnONbfH7npfPypuDvMH4DqykZB0E0Rpx/XH88v8KC+ORzMTLPDWnvINrQxqAb
-         v3k/b6+ljnzNqPNLgl5zsOELAweH2VCP9Q+e6yIAbQ/thAECha6Ai1PRSJJPeNa1EG1d
-         bx3g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697118370; x=1697723170;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WL4o0PnlTALPx2JWXQcQVAR5wsdcklh2Oh9j6J5p78o=;
-        b=Ct1KwhyRWEO4aV+P5NEswCk85+SFnGUxp8NSrMyI1yHWkqUqFkTdUZpNVBZ8wUDTIq
-         R2CltdfYf7+0ba503AdYkbRq0ILr/+3JB+1PRYzHAVwVQwZCUVJKhBxmmFziBVO4sOHM
-         FTrDAPj0xi58QUNx64AYFaHGhTAVY2n+iuh2lKAvxbF4urPR8dSKLkBKV8yWgZaLIUa9
-         vEzgBbJwRdoK5Veeji3JFrGzqHXb6nlRlJYPCTATDu9L/2obvcpRA+p73MPKUWMZiJUG
-         O5keC3GqHdpBBuK9EVbsIuyfv70FJxvKyRqwobXu00bYEzTw8cFSgGOdxe49qSsYO7do
-         +Kcw==
-X-Gm-Message-State: AOJu0Yx5FjSoWEgKI1KsPjM1uaajcNLkvlbGDPNqHEqoEt53OEevZFFK
-        s1UdhjcvmOw3GswDmqHN2408MQ==
-X-Google-Smtp-Source: AGHT+IH59hmoDS+3N9HnCWrAqCjVPZ4ryC0EzwYrla5+l9OzTXH6ATWKCWWbfSW9us9NhxA/rflDvg==
-X-Received: by 2002:aa7:d14c:0:b0:533:2327:1eed with SMTP id r12-20020aa7d14c000000b0053323271eedmr23591165edo.24.1697118370561;
-        Thu, 12 Oct 2023 06:46:10 -0700 (PDT)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id er24-20020a056402449800b0052febc781bfsm2998183edb.36.2023.10.12.06.46.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Oct 2023 06:46:09 -0700 (PDT)
-Date:   Thu, 12 Oct 2023 15:46:08 +0200
-From:   Jiri Pirko <jiri@resnulli.us>
-To:     Arnd Bergmann <arnd@arndb.de>
-Cc:     Arnd Bergmann <arnd@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
-        Netdev <netdev@vger.kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-wireless@vger.kernel.org,
-        Johannes Berg <johannes@sipsolutions.net>,
-        linux-wpan@vger.kernel.org,
-        Michael Hennerich <michael.hennerich@analog.com>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Eric Dumazet <edumazet@google.com>,
+        with ESMTP id S232559AbjJNAHf (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 13 Oct 2023 20:07:35 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 888DEAD;
+        Fri, 13 Oct 2023 17:07:34 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 744BCC433C7;
+        Sat, 14 Oct 2023 00:07:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1697242054;
+        bh=6kpMwlfSNasU9AQMtLitDygCjCpDKwjI+adsPbqa9OA=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=UdBr2wcD9YbkjCo7SyrOU7C2P7cOL79UAKLiM1BqeppHoumCz76G9EbxX7WR2a7v0
+         Y60I+lH6kFJnJziGqDlxqaLZNQaM/awAaSidgcGYR+9q83BJ2QxSZEZjTjIuk348Pi
+         ffyBwFqzUhY++R8GyWNdABQ2xssKv/CC5BMpYdyuVHIv/3fh2UddcuGDzzePUzM0Zj
+         ZFZNP9zKbvbYP8evuVMaLBq3Uhtdj7X0PFkWqqfqRdG+UIQQ5Ycc52CB8UiFnpBAQL
+         Xh9FykSlCiuWrvhF9vOqoSKQIaFP4aVwTfh1v/CEpEBtX9JaFGG1pCzHzRUPMxahBz
+         kL3fZdQ9ejoyw==
+Date:   Fri, 13 Oct 2023 17:07:32 -0700
+From:   Jakub Kicinski <kuba@kernel.org>
+To:     "Johannes Berg" <johannes@sipsolutions.net>,
+        Kalle Valo <kvalo@kernel.org>
+Cc:     "Arnd Bergmann" <arnd@arndb.de>, "Jiri Pirko" <jiri@resnulli.us>,
+        "Arnd Bergmann" <arnd@kernel.org>, Netdev <netdev@vger.kernel.org>,
+        "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
+        linux-wireless@vger.kernel.org, linux-wpan@vger.kernel.org,
+        "Michael Hennerich" <michael.hennerich@analog.com>,
+        "Paolo Abeni" <pabeni@redhat.com>,
+        "Eric Dumazet" <edumazet@google.com>,
         "David S . Miller" <davem@davemloft.net>,
-        Rodolfo Zitellini <rwz@xhero.org>, linux-doc@vger.kernel.org,
+        "Rodolfo Zitellini" <rwz@xhero.org>, linux-doc@vger.kernel.org,
         linux-kernel@vger.kernel.org
 Subject: Re: [PATCH v2 01/10] appletalk: make localtalk and ppp support
  conditional
-Message-ID: <ZSf4oCBXZGi2BfqC@nanopsycho>
-References: <20231011140225.253106-1-arnd@kernel.org>
- <ZSa5bIcISlvW3zo5@nanopsycho>
- <82527b7f-4509-4a59-a9cf-2df47e6e1a7c@app.fastmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Message-ID: <20231013170732.587afd86@kernel.org>
 In-Reply-To: <82527b7f-4509-4a59-a9cf-2df47e6e1a7c@app.fastmail.com>
+References: <20231011140225.253106-1-arnd@kernel.org>
+        <ZSa5bIcISlvW3zo5@nanopsycho>
+        <82527b7f-4509-4a59-a9cf-2df47e6e1a7c@app.fastmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Wed, Oct 11, 2023 at 05:57:38PM CEST, arnd@arndb.de wrote:
->On Wed, Oct 11, 2023, at 17:04, Jiri Pirko wrote:
->> Could you provide a cover letter for the set please?
->
->Subject: [PATCH v2 00/10] remove final .ndo_do_ioctl references
->
->The .ndo_do_ioctl() netdev operation used to be how one communicates
->with a network driver from userspace, but since my previous cleanup [1],
->it is purely internal to the kernel.
->
->Removing the cops appletalk/localtalk driver made me revisit the
->missing pieces from that older series, removing all the unused
->implementations in wireless drivers as well as the two kernel-internal
->callers in the ieee802154 and appletalk stacks.
->
->One ethernet driver was already merged in the meantime that should
->have used .ndo_eth_ioctl instead of .ndo_do_ioctl, so fix that as well.
->With the complete removal, any future drivers making this mistake
->cause build failures that are easier to spot.
+On Wed, 11 Oct 2023 17:57:38 +0200 Arnd Bergmann wrote:
+> The .ndo_do_ioctl() netdev operation used to be how one communicates
+> with a network driver from userspace, but since my previous cleanup [1],
+> it is purely internal to the kernel.
+> 
+> Removing the cops appletalk/localtalk driver made me revisit the
+> missing pieces from that older series, removing all the unused
+> implementations in wireless drivers as well as the two kernel-internal
+> callers in the ieee802154 and appletalk stacks.
+> 
+> One ethernet driver was already merged in the meantime that should
+> have used .ndo_eth_ioctl instead of .ndo_do_ioctl, so fix that as well.
+> With the complete removal, any future drivers making this mistake
+> cause build failures that are easier to spot.
+> 
+> [1] https://lore.kernel.org/netdev/20201106221743.3271965-1-arnd@kernel.org/
 
-Looks fine.
-
-
->
->[1] https://lore.kernel.org/netdev/20201106221743.3271965-1-arnd@kernel.org/
->
->----
->Hope that helps, I had commented on the cops removal about sending
->this but of course not everyone here saw that. Let me know if I should
->resend the patches together with the cover letter.
-
-Yes please. Thanks!
-
-
->
->    Arnd
+Kalle, Johannes, do these apply for you?
+I'm getting a small conflict on patch 8 and bigger one on patch 9.
+If this applies for you maybe you can take it and flush out
+wireless-next soon after?
