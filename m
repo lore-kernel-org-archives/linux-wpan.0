@@ -2,102 +2,124 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F42AC25B67
-	for <linux-wpan@archiver.kernel.org>; Thu, 26 Oct 2023 14:05:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11B6CC25B48
+	for <linux-wpan@archiver.kernel.org>; Thu, 26 Oct 2023 16:45:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230330AbjJZOFR (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Thu, 26 Oct 2023 10:05:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40964 "EHLO
+        id S230340AbjJZQpT (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Thu, 26 Oct 2023 12:45:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52330 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230507AbjJZOFQ (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 26 Oct 2023 10:05:16 -0400
-X-Greylist: delayed 540 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 26 Oct 2023 07:05:13 PDT
-Received: from relay.sandelman.ca (relay.cooperix.net [IPv6:2a01:7e00:e000:2bb::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB6F71A2
-        for <linux-wpan@vger.kernel.org>; Thu, 26 Oct 2023 07:05:13 -0700 (PDT)
-Received: from dyas.sandelman.ca (unknown [206.108.166.29])
-        by relay.sandelman.ca (Postfix) with ESMTPS id ADFAD209C2;
-        Thu, 26 Oct 2023 13:56:09 +0000 (UTC)
-Received: by dyas.sandelman.ca (Postfix, from userid 1000)
-        id 9565BA135D; Thu, 26 Oct 2023 09:56:08 -0400 (EDT)
-Received: from dyas (localhost [127.0.0.1])
-        by dyas.sandelman.ca (Postfix) with ESMTP id 924B2A1346;
-        Thu, 26 Oct 2023 09:56:08 -0400 (EDT)
-From:   Michael Richardson <mcr@sandelman.ca>
-To:     Alexander Aring <aahringo@redhat.com>,
-        Mathis Marion <mathis.marion@silabs.com>,
-        linux-wpan@vger.kernel.org,
-        =?us-ascii?Q?=3D=3FUTF-8=3FB=3FSsOpcsO0bWUgUG91aWxsZXI=3D=3F=3D?= 
-        <jerome.pouiller@silabs.com>
-Subject: Re: RPL lwtunnel encapsulation
-In-reply-to: <CAK-6q+jCpWpoaX5acNEdOv=CybGUXUzNJ6Saa-s7ADevi5LjSA@mail.gmail.com>
-References: <d25926f8-84bd-4eef-9e44-86fb1e3e5932@silabs.com> <13794.1698248146@localhost> <CAK-6q+jCpWpoaX5acNEdOv=CybGUXUzNJ6Saa-s7ADevi5LjSA@mail.gmail.com>
-Comments: In-reply-to Alexander Aring <aahringo@redhat.com>
-   message dated "Wed, 25 Oct 2023 21:03:36 -0400."
-X-Mailer: MH-E 8.6+git; nmh 1.7+dev; GNU Emacs 26.3
+        with ESMTP id S230078AbjJZQpT (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 26 Oct 2023 12:45:19 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BBE8187
+        for <linux-wpan@vger.kernel.org>; Thu, 26 Oct 2023 09:44:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1698338670;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=37b3dn9cm1bBKiOW0lI0W7gKZiHYc7304OkSbsYuH4I=;
+        b=VeIjUFiNucABICzFPk9Qk2zevasI5ZTzcT6WK5AAy2lGrQtBAShg1eck7ydbM8TL/Vyd+f
+        RKU+NYwN2dCnQPHc0t1fpuQMNiok1d1t+Gy0Bs0S+pjw2dPypzAObBj6FyxPWDpJktD9RX
+        7gwtnOC0X4wLMSHkdPbhu79oR/V4m0s=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-163-haojV-nsOI2M7JLdtsAgCQ-1; Thu, 26 Oct 2023 12:44:28 -0400
+X-MC-Unique: haojV-nsOI2M7JLdtsAgCQ-1
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-9ae686dafedso79834366b.3
+        for <linux-wpan@vger.kernel.org>; Thu, 26 Oct 2023 09:44:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698338667; x=1698943467;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=37b3dn9cm1bBKiOW0lI0W7gKZiHYc7304OkSbsYuH4I=;
+        b=pFYKTb8dWlKgXn4UmZ5NFhyqRWBfodu4coiV3a/xZHmmTH6drtS7Dqs2soD0vbpToo
+         ezpGEDHPJyFN8p5PaP3KXOMe9wXs/hpQyEq3tboN92w/tjIBFOpsv+lwG98GMxRA4IKY
+         i4X9bAiI1k1n+1+qFWekr1A6zTyGiq0hm5LZhAN0PbzxQhKQkAWnbQsmYhmSRHZLdQLx
+         JTrHYc+jGuAv0O0XlY300JYpqZutqvkgkgzVOWQrpQnppPR7rdigU/UflkAacYdPw/kj
+         A+ZcEuMEn/RS/JL8dJ6THjAzayH4s8oKcJSJ7CsuAMp1h0ociKW9VfmMF0iwHtXfaY3F
+         HTlA==
+X-Gm-Message-State: AOJu0YztGv0oDHpNEcJcKQ0InBUYIGdrmRQVvC9W1n6KeICNXraQs6E5
+        XWqkpDLNsQr1pW/WD5HROfJecuoGiPfYCL24jPWXHnujWXPHVXwnb3FFU3duSuZ6ugIa6+s2M5d
+        iJt21ZoIa1BoTN+epS72hvekgPOdZQyqMwtKC2Q==
+X-Received: by 2002:a17:907:984:b0:9c7:56ee:b6e5 with SMTP id bf4-20020a170907098400b009c756eeb6e5mr190457ejc.40.1698338667297;
+        Thu, 26 Oct 2023 09:44:27 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFy5ycRoinEnIVnF9Q2DCuPF54iN7BVh/sOMB47+2vZCS0hoISmwTS34+zwIkps9PhmneSjjJsckx2fc2PgKac=
+X-Received: by 2002:a17:907:984:b0:9c7:56ee:b6e5 with SMTP id
+ bf4-20020a170907098400b009c756eeb6e5mr190443ejc.40.1698338666957; Thu, 26 Oct
+ 2023 09:44:26 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-        micalg=pgp-sha512; protocol="application/pgp-signature"
-Date:   Thu, 26 Oct 2023 09:56:08 -0400
-Message-ID: <3098774.1698328568@dyas>
+References: <d25926f8-84bd-4eef-9e44-86fb1e3e5932@silabs.com>
+ <13794.1698248146@localhost> <CAK-6q+jCpWpoaX5acNEdOv=CybGUXUzNJ6Saa-s7ADevi5LjSA@mail.gmail.com>
+ <3098774.1698328568@dyas>
+In-Reply-To: <3098774.1698328568@dyas>
+From:   Alexander Aring <aahringo@redhat.com>
+Date:   Thu, 26 Oct 2023 12:44:15 -0400
+Message-ID: <CAK-6q+hbr5r9GOAOJ=L9Sj68u8xh356iVtBOgsjMzFBZ7_mM0w@mail.gmail.com>
+Subject: Re: RPL lwtunnel encapsulation
+To:     Michael Richardson <mcr@sandelman.ca>
+Cc:     Mathis Marion <mathis.marion@silabs.com>,
+        linux-wpan@vger.kernel.org,
+        =?UTF-8?B?SsOpcsO0bWUgUG91aWxsZXI=?= <jerome.pouiller@silabs.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
---=-=-=
-Content-Type: text/plain
+Hi,
 
+On Thu, Oct 26, 2023 at 9:56=E2=80=AFAM Michael Richardson <mcr@sandelman.c=
+a> wrote:
+>
+>
+> Alexander Aring <aahringo@redhat.com> wrote:
+>     >> Mathis Marion <mathis.marion@silabs.com> wrote: > However, my
+>     >> observations suggest that it is actually not the case when >
+>     >> forwarding packets. Instead, the IPv6 header of the packet is modi=
+fied
+>     >> > in a way which violates the IPv6 specification (RFC 8200 section=
+ 4):
+>     >>
+>     >> I have not sat down to read the code to understand what it actuall=
+y
+>     >> does, so I can't really comment at this point.  I salute you for
+>     >> having gotten into whether the code is compliant.
+>     >>
+>     >> But, I did write spend way too much of my life writing
+>     >> https://datatracker.ietf.org/doc/rfc9008/ to deal with the percept=
+ion
+>     >> that RPL networks had to violate 8200.
+>     >>
+>     >> I know that Linux does not (yet) deal with all the minutia in 9008=
+.  I
+>     >> wish that I had time to fix that.
+>
+>     > To put everything into IPIP and back is not a question of doing a
+>     > iptunnel ip6tnl [0] and doing the right configuration... just do ge=
+t
+>     > everything over "the internet" which I think is the whole reason wh=
+y
+>     > putting everything into IPIP?
+>
+> I agree that modelling it an infinite series of iptunnel/ip6tnl is the wr=
+ong approach.
+> I would model it akin to how ND and ARP work: something that happens whic=
+h
+> then resolves into some bytes that get prefixed and/or removed.
 
-Alexander Aring <aahringo@redhat.com> wrote:
-    >> Mathis Marion <mathis.marion@silabs.com> wrote: > However, my
-    >> observations suggest that it is actually not the case when >
-    >> forwarding packets. Instead, the IPv6 header of the packet is modified
-    >> > in a way which violates the IPv6 specification (RFC 8200 section 4):
-    >>
-    >> I have not sat down to read the code to understand what it actually
-    >> does, so I can't really comment at this point.  I salute you for
-    >> having gotten into whether the code is compliant.
-    >>
-    >> But, I did write spend way too much of my life writing
-    >> https://datatracker.ietf.org/doc/rfc9008/ to deal with the perception
-    >> that RPL networks had to violate 8200.
-    >>
-    >> I know that Linux does not (yet) deal with all the minutia in 9008.  I
-    >> wish that I had time to fix that.
+then it is currently possible, but not in a nice way (you will
+configure yourself to death)... there might be new config options of
+iptunnel/ip6tnl to do your ND approach (maybe with accessing ND
+cache?).
 
-    > To put everything into IPIP and back is not a question of doing a
-    > iptunnel ip6tnl [0] and doing the right configuration... just do get
-    > everything over "the internet" which I think is the whole reason why
-    > putting everything into IPIP?
+It is not that the rpl tunnel for source routing header needs to deal
+with IP6IP6, it already exists in the kernel with ip6tnl
+implementation... it's just terrible to configure it.
 
-I agree that modelling it an infinite series of iptunnel/ip6tnl is the wrong approach.
-I would model it akin to how ND and ARP work: something that happens which
-then resolves into some bytes that get prefixed and/or removed.
+- Alex
 
---
-]               Never tell me the odds!                 | ipv6 mesh networks [
-]   Michael Richardson, Sandelman Software Works        | network architect  [
-]     mcr@sandelman.ca  http://www.sandelman.ca/        |   ruby on rails    [
-
-
-
-
-
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQGzBAEBCgAdFiEEow/1qDVgAbWL2zxYcAKuwszYgEMFAmU6b/gACgkQcAKuwszY
-gEO8iQwAwwZ3q9K02EWbjZe7SiYKTlpCyZv7jVktDN114Se6NtZEitYvch8CRvHM
-IYLduxg9CvYFpun8ELlZICjQX86b8K4d0ikGvB4SaU1OGf4UrB7Mo222hl7TBst9
-8Xum7wIuouh17o8c0oLQRE6bvYXS/Bxg8JsbSLA6tbOXNOM6v4d3DnU8g748ijHx
-YrSlIXmjGkcoUSJC3v21CMMwngL5CzbAdgY6k24ZXneMC6fuT75K2uwpWjcmBYQn
-zW0q33+UaL0ljqj+/NPjw2Mx2JWo/HL+Z8SHl+xQZsdMtmFP38cO3XGHoolSGvoZ
-NgGsn8umatXG6eDDtRwwibkQWZJsbA/q6io52RQ5ya+/6UdU7076LNziILAR7N58
-1VyYVIbqfDBryWCNmmQEmIcqYvyxUI8/uiah3vPAX09aoS6nt2sEXAtvZkjlM4pz
-gn7xoGheMbk0xEbTFIge9JPsAc+Lligw2A+gcfPa5O+CnN1+fdVurjVRM36kGpbv
-repUL9BP
-=I+HC
------END PGP SIGNATURE-----
---=-=-=--
