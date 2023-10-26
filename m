@@ -2,120 +2,102 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BB58C25B48
-	for <linux-wpan@archiver.kernel.org>; Thu, 26 Oct 2023 12:40:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F42AC25B67
+	for <linux-wpan@archiver.kernel.org>; Thu, 26 Oct 2023 14:05:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230507AbjJZMk4 (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Thu, 26 Oct 2023 08:40:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40246 "EHLO
+        id S230330AbjJZOFR (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Thu, 26 Oct 2023 10:05:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40964 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231127AbjJZMkz (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Thu, 26 Oct 2023 08:40:55 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B757910E
-        for <linux-wpan@vger.kernel.org>; Thu, 26 Oct 2023 05:40:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1698324009;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=xGu3rbQKn8+hwo2dXu04vv81c64gHLRd1reIvEj8x3w=;
-        b=TtFRcgr/IJ1PLifMCVuD5Aq00x0SHMy7fjULaQdrBdnxOhRHYIQOQw4v+DNqiOeDFyZAKv
-        R0xuQHGgttiJ//f+l2GdUpyurEm0/r19dQ5rZQU+Zexm1KaQqwLfti3c26mHpXENpwSdtO
-        bLjsGoquWmgAmd1VInjKRMr9ImxXvu0=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-614-AuW_zjCyOrCq-JKPiqd5lw-1; Thu, 26 Oct 2023 08:40:08 -0400
-X-MC-Unique: AuW_zjCyOrCq-JKPiqd5lw-1
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-9c7558b838aso62963366b.2
-        for <linux-wpan@vger.kernel.org>; Thu, 26 Oct 2023 05:40:08 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698324007; x=1698928807;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xGu3rbQKn8+hwo2dXu04vv81c64gHLRd1reIvEj8x3w=;
-        b=ZsOyefPucWeQywHj5pc90hUS+NFkunbQjnuHZicTlsUq4dgl/VkwfC0Y73BzkNbH6N
-         YwhgU4xCndkyHsl7xArpWEzJ8CFkyVZaxTDFsJ1zoPGC1pY3AcKJII3VV5V4TEBLOcI2
-         HyL09QO86BWd79GtmNCKjuur3nil+n+Of0QIXkmIMeqmXvZYO1AiplUDXKnzC/tLttjv
-         hqnqht+EduAQU8S1/KCXIfmb0BBgy9hCFHdXuKdffj4ayVNhG/Z5WsqpVEX6Tt+SL8RP
-         Ez86YpjK4T7Xg5mYbo/pFLAl7swclMN5j5tLIV/fCfOo+jFkCflmY9+acV4MEwv5LH3Q
-         /c2A==
-X-Gm-Message-State: AOJu0Ywva/tswg2lgb+LHcXGlew++ceFDZzdvKQcb7CmQ0aCWp0kZ5Hs
-        88uX1K7cD/dylpZVvLD44mQprxXElPdB0W6r8SbNBqgn3F4N8hWfaZ/6B6+YHiADeOlWtPyJjl5
-        rT89K8Ks8Zq8f9AJefherDtpXmGZSDgTx1/tUchyqPYREyw==
-X-Received: by 2002:a17:906:fe4c:b0:9b8:7709:6360 with SMTP id wz12-20020a170906fe4c00b009b877096360mr15561757ejb.40.1698324006956;
-        Thu, 26 Oct 2023 05:40:06 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHbO82fcLQT0RB/hSqWG2LjR0kLLbrirYB53KbY0ezj1atc8PvF4d9Mmgw1LHLyOzb53j1yeXQzWtin/MahmPQ=
-X-Received: by 2002:a17:906:fe4c:b0:9b8:7709:6360 with SMTP id
- wz12-20020a170906fe4c00b009b877096360mr15561739ejb.40.1698324006686; Thu, 26
- Oct 2023 05:40:06 -0700 (PDT)
-MIME-Version: 1.0
-References: <d25926f8-84bd-4eef-9e44-86fb1e3e5932@silabs.com>
- <13794.1698248146@localhost> <CAK-6q+jCpWpoaX5acNEdOv=CybGUXUzNJ6Saa-s7ADevi5LjSA@mail.gmail.com>
-In-Reply-To: <CAK-6q+jCpWpoaX5acNEdOv=CybGUXUzNJ6Saa-s7ADevi5LjSA@mail.gmail.com>
-From:   Alexander Aring <aahringo@redhat.com>
-Date:   Thu, 26 Oct 2023 08:39:55 -0400
-Message-ID: <CAK-6q+jygLMq3Seso_SxFYYn3DKSJx0T+c77pYro_5RTMoB58A@mail.gmail.com>
-Subject: Re: RPL lwtunnel encapsulation
-To:     Michael Richardson <mcr@sandelman.ca>
-Cc:     Mathis Marion <mathis.marion@silabs.com>,
+        with ESMTP id S230507AbjJZOFQ (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Thu, 26 Oct 2023 10:05:16 -0400
+X-Greylist: delayed 540 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 26 Oct 2023 07:05:13 PDT
+Received: from relay.sandelman.ca (relay.cooperix.net [IPv6:2a01:7e00:e000:2bb::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB6F71A2
+        for <linux-wpan@vger.kernel.org>; Thu, 26 Oct 2023 07:05:13 -0700 (PDT)
+Received: from dyas.sandelman.ca (unknown [206.108.166.29])
+        by relay.sandelman.ca (Postfix) with ESMTPS id ADFAD209C2;
+        Thu, 26 Oct 2023 13:56:09 +0000 (UTC)
+Received: by dyas.sandelman.ca (Postfix, from userid 1000)
+        id 9565BA135D; Thu, 26 Oct 2023 09:56:08 -0400 (EDT)
+Received: from dyas (localhost [127.0.0.1])
+        by dyas.sandelman.ca (Postfix) with ESMTP id 924B2A1346;
+        Thu, 26 Oct 2023 09:56:08 -0400 (EDT)
+From:   Michael Richardson <mcr@sandelman.ca>
+To:     Alexander Aring <aahringo@redhat.com>,
+        Mathis Marion <mathis.marion@silabs.com>,
         linux-wpan@vger.kernel.org,
-        =?UTF-8?B?SsOpcsO0bWUgUG91aWxsZXI=?= <jerome.pouiller@silabs.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        =?us-ascii?Q?=3D=3FUTF-8=3FB=3FSsOpcsO0bWUgUG91aWxsZXI=3D=3F=3D?= 
+        <jerome.pouiller@silabs.com>
+Subject: Re: RPL lwtunnel encapsulation
+In-reply-to: <CAK-6q+jCpWpoaX5acNEdOv=CybGUXUzNJ6Saa-s7ADevi5LjSA@mail.gmail.com>
+References: <d25926f8-84bd-4eef-9e44-86fb1e3e5932@silabs.com> <13794.1698248146@localhost> <CAK-6q+jCpWpoaX5acNEdOv=CybGUXUzNJ6Saa-s7ADevi5LjSA@mail.gmail.com>
+Comments: In-reply-to Alexander Aring <aahringo@redhat.com>
+   message dated "Wed, 25 Oct 2023 21:03:36 -0400."
+X-Mailer: MH-E 8.6+git; nmh 1.7+dev; GNU Emacs 26.3
+MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="=-=-=";
+        micalg=pgp-sha512; protocol="application/pgp-signature"
+Date:   Thu, 26 Oct 2023 09:56:08 -0400
+Message-ID: <3098774.1698328568@dyas>
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hi,
+--=-=-=
+Content-Type: text/plain
 
-On Wed, Oct 25, 2023 at 9:03=E2=80=AFPM Alexander Aring <aahringo@redhat.co=
-m> wrote:
->
-> Hi Michael,
->
-> On Wed, Oct 25, 2023 at 11:45=E2=80=AFAM Michael Richardson <mcr@sandelma=
-n.ca> wrote:
-> >
-> >
-> > Mathis Marion <mathis.marion@silabs.com> wrote:
-> >     > However, my observations suggest that it is actually not the case=
- when
-> >     > forwarding packets. Instead, the IPv6 header of the packet is mod=
-ified
-> >     > in a way which violates the IPv6 specification (RFC 8200 section =
-4):
-> >
-> > I have not sat down to read the code to understand what it actually doe=
-s, so
-> > I can't really comment at this point.  I salute you for having gotten i=
-nto
-> > whether the code is compliant.
-> >
-> > But, I did write spend way too much of my life writing
-> >      https://datatracker.ietf.org/doc/rfc9008/
-> > to deal with the perception that RPL networks had to violate 8200.
-> >
-> > I know that Linux does not (yet) deal with all the minutia in 9008.
-> > I wish that I had time to fix that.
->
-> To put everything into IPIP and back is not a question of doing a
-> iptunnel ip6tnl [0] and doing the right configuration... just do get
-> everything over "the internet" which I think is the whole reason why
-> putting everything into IPIP?
->
 
-what I mean is, that encap rpl will never do any IPIP itself, you need
-to use existing iptunnel implementation [0] to make it working like
-you want to work and this is in my opinion "if we have luck" only a
-matter of configure everything "right".
+Alexander Aring <aahringo@redhat.com> wrote:
+    >> Mathis Marion <mathis.marion@silabs.com> wrote: > However, my
+    >> observations suggest that it is actually not the case when >
+    >> forwarding packets. Instead, the IPv6 header of the packet is modified
+    >> > in a way which violates the IPv6 specification (RFC 8200 section 4):
+    >>
+    >> I have not sat down to read the code to understand what it actually
+    >> does, so I can't really comment at this point.  I salute you for
+    >> having gotten into whether the code is compliant.
+    >>
+    >> But, I did write spend way too much of my life writing
+    >> https://datatracker.ietf.org/doc/rfc9008/ to deal with the perception
+    >> that RPL networks had to violate 8200.
+    >>
+    >> I know that Linux does not (yet) deal with all the minutia in 9008.  I
+    >> wish that I had time to fix that.
 
-- Alex
+    > To put everything into IPIP and back is not a question of doing a
+    > iptunnel ip6tnl [0] and doing the right configuration... just do get
+    > everything over "the internet" which I think is the whole reason why
+    > putting everything into IPIP?
 
->
-> [0] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tr=
-ee/net/ipv6/ip6_tunnel.c
+I agree that modelling it an infinite series of iptunnel/ip6tnl is the wrong approach.
+I would model it akin to how ND and ARP work: something that happens which
+then resolves into some bytes that get prefixed and/or removed.
 
+--
+]               Never tell me the odds!                 | ipv6 mesh networks [
+]   Michael Richardson, Sandelman Software Works        | network architect  [
+]     mcr@sandelman.ca  http://www.sandelman.ca/        |   ruby on rails    [
+
+
+
+
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQGzBAEBCgAdFiEEow/1qDVgAbWL2zxYcAKuwszYgEMFAmU6b/gACgkQcAKuwszY
+gEO8iQwAwwZ3q9K02EWbjZe7SiYKTlpCyZv7jVktDN114Se6NtZEitYvch8CRvHM
+IYLduxg9CvYFpun8ELlZICjQX86b8K4d0ikGvB4SaU1OGf4UrB7Mo222hl7TBst9
+8Xum7wIuouh17o8c0oLQRE6bvYXS/Bxg8JsbSLA6tbOXNOM6v4d3DnU8g748ijHx
+YrSlIXmjGkcoUSJC3v21CMMwngL5CzbAdgY6k24ZXneMC6fuT75K2uwpWjcmBYQn
+zW0q33+UaL0ljqj+/NPjw2Mx2JWo/HL+Z8SHl+xQZsdMtmFP38cO3XGHoolSGvoZ
+NgGsn8umatXG6eDDtRwwibkQWZJsbA/q6io52RQ5ya+/6UdU7076LNziILAR7N58
+1VyYVIbqfDBryWCNmmQEmIcqYvyxUI8/uiah3vPAX09aoS6nt2sEXAtvZkjlM4pz
+gn7xoGheMbk0xEbTFIge9JPsAc+Lligw2A+gcfPa5O+CnN1+fdVurjVRM36kGpbv
+repUL9BP
+=I+HC
+-----END PGP SIGNATURE-----
+--=-=-=--
