@@ -2,36 +2,38 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59FD3C25B70
-	for <linux-wpan@archiver.kernel.org>; Sat, 28 Oct 2023 02:37:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91781C4332F
+	for <linux-wpan@archiver.kernel.org>; Fri,  3 Nov 2023 09:05:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232932AbjJ1ChJ (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Fri, 27 Oct 2023 22:37:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37226 "EHLO
+        id S235795AbjKCJFe (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Fri, 3 Nov 2023 05:05:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43014 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232936AbjJ1ChJ (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Fri, 27 Oct 2023 22:37:09 -0400
-Received: from mail.durme.pl (mail.durme.pl [217.182.69.186])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 370FECC
-        for <linux-wpan@vger.kernel.org>; Fri, 27 Oct 2023 19:37:07 -0700 (PDT)
-Received: by mail.durme.pl (Postfix, from userid 1002)
-        id 95D7285AF0; Fri, 27 Oct 2023 08:01:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=durme.pl; s=mail;
-        t=1698398892; bh=hFxZwVw4rIL+JwfEOGI47p+fdoVOAeqVswP6NWoHSHQ=;
+        with ESMTP id S235200AbjKCJFd (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 3 Nov 2023 05:05:33 -0400
+X-Greylist: delayed 576 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 03 Nov 2023 02:05:25 PDT
+Received: from mail.virtuosogains.pl (mail.virtuosogains.pl [217.61.23.190])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBFA0D42
+        for <linux-wpan@vger.kernel.org>; Fri,  3 Nov 2023 02:05:25 -0700 (PDT)
+Received: by mail.virtuosogains.pl (Postfix, from userid 1002)
+        id 41A028283A; Fri,  3 Nov 2023 09:55:44 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=virtuosogains.pl;
+        s=mail; t=1699001747;
+        bh=xfCxG2PwL4Soyu/txE3kDbffBY80YcuDtnfTg/uF7DU=;
         h=Date:From:To:Subject:From;
-        b=f8MFcmvFIZyS//B+xQmiw9UTPLE8lNeQqwqGip9zbdhS5CC87FD2hraJtobdNJrZi
-         bIg6TFOnKTsNkQ+zWNdwzgnNrsBcZWiBW1megm22s0MzxbwoeJa8Vw7GjPhEvrhWRI
-         XIfwZD3ggEtyB1OXgaL8pEtXhko8Yw3b6Tjmy+Jz09HIh4pZ6E44T9Rx1mMTEgUkIp
-         1uS04iw4D4BeHIldAdoShJDoeNCNVuyFZT/tHOUhMbtH1MPJ9s8Q+ff1JROFDIE2Ii
-         XuooQOojo4pGPUDIHsyikjfQxzUgx8Ddy+IjojJ5EhsJe157dw1zMA+a4s2gfC/9/Y
-         Oc+uprVR/H7ZQ==
-Received: by mail.durme.pl for <linux-wpan@vger.kernel.org>; Fri, 27 Oct 2023 08:01:11 GMT
-Message-ID: <20231027064500-0.1.57.rprg.0.7d2i46q4dn@durme.pl>
-Date:   Fri, 27 Oct 2023 08:01:11 GMT
-From:   "Krystian Wieczorek" <krystian.wieczorek@durme.pl>
+        b=RZ84q7aVXjMCAQ4wuqIyNtZXXmfwnqTKI8lrV63E6J3jJ29tsq8mCluFfT0/qZLa7
+         +8N00A59s9cfRVo/E6JR64p6bgmzuGucU0PcITwavAaDFhD2M6yDe8lm0GiAKwhOd1
+         aC4ZCbydlHcbHmvkr2Y/5QupcTDobAiVEX9bvScKinI+SXX0cvgA/u7OO0d7hDpYJh
+         DVk4pocycKmduUfji+dU6iDVUfik0993oUriqCVBFgyNTMixGnl5y5YZqGYelTLEQY
+         jq2gSofCHLW67dLsQRMPGLp4f0rb+8/xYeJTD0QcB2E6GpmQ3DRot/ACGkjiyOAG3g
+         58HtVVhX7dYbg==
+Received: by mail.virtuosogains.pl for <linux-wpan@vger.kernel.org>; Fri,  3 Nov 2023 08:55:39 GMT
+Message-ID: <20231103084500-0.1.1l.3sri.0.zd4z4qbjmk@virtuosogains.pl>
+Date:   Fri,  3 Nov 2023 08:55:39 GMT
+From:   "Renata Tarabasz" <renata.tarabasz@virtuosogains.pl>
 To:     <linux-wpan@vger.kernel.org>
-Subject: W sprawie samochodu
-X-Mailer: mail.durme.pl
+Subject: =?UTF-8?Q?Udzia=C5=82_w_post=C4=99powaniu?=
+X-Mailer: mail.virtuosogains.pl
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
@@ -41,21 +43,15 @@ X-Mailing-List: linux-wpan@vger.kernel.org
 
 Dzie=C5=84 dobry,
 
-chcieliby=C5=9Bmy zapewni=C4=87 Pa=C5=84stwu kompleksowe rozwi=C4=85zania=
-, je=C5=9Bli chodzi o system monitoringu GPS.
+czy odnotowuj=C4=85 Pa=C5=84stwo zaleg=C5=82e p=C5=82atno=C5=9Bci od Klie=
+nt=C3=B3w?
 
-Precyzyjne monitorowanie pojazd=C3=B3w na mapach cyfrowych, =C5=9Bledzeni=
-e ich parametr=C3=B3w eksploatacyjnych w czasie rzeczywistym oraz kontrol=
-a paliwa to kluczowe funkcjonalno=C5=9Bci naszego systemu.=20
+Pomagamy wszystkim przedsi=C4=99biorcom, kt=C3=B3rzy szukaj=C4=85 gwaranc=
+ji bezpiecze=C5=84stwa i p=C5=82ynno=C5=9Bci finansowej.
 
-Organizowanie pracy pracownik=C3=B3w jest dzi=C4=99ki temu prostsze i bar=
-dziej efektywne, a oszcz=C4=99dno=C5=9Bci i optymalizacja w zakresie pono=
-szonych koszt=C3=B3w, maj=C4=85 dla ka=C5=BCdego przedsi=C4=99biorcy ogro=
-mne znaczenie.
-
-Dopasujemy nasz=C4=85 ofert=C4=99 do Pa=C5=84stwa oczekiwa=C5=84 i potrze=
-b organizacji. Czy mogliby=C5=9Bmy porozmawia=C4=87 o naszej propozycji?
+B=C4=99d=C4=99 wdzi=C4=99czna za informacj=C4=99 czy s=C4=85 Pa=C5=84stwo=
+ zainteresowani odzyskaniem swoich nale=C5=BCno=C5=9Bci.
 
 
-Pozdrawiam
-Krystian Wieczorek
+Z powa=C5=BCaniem
+Renata Tarabasz
