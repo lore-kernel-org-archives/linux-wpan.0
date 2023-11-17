@@ -2,129 +2,117 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E30CC197A0
-	for <linux-wpan@archiver.kernel.org>; Fri, 17 Nov 2023 10:00:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 193E3C197A0
+	for <linux-wpan@archiver.kernel.org>; Fri, 17 Nov 2023 12:11:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230452AbjKQKBA (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Fri, 17 Nov 2023 05:01:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39932 "EHLO
+        id S231286AbjKQMLi (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Fri, 17 Nov 2023 07:11:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57996 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229952AbjKQKA7 (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Fri, 17 Nov 2023 05:00:59 -0500
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCAE3A7
-        for <linux-wpan@vger.kernel.org>; Fri, 17 Nov 2023 02:00:55 -0800 (PST)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-        by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1r3vdd-0000CZ-8i; Fri, 17 Nov 2023 10:59:49 +0100
-Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
-        by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1r3vda-009eFY-MI; Fri, 17 Nov 2023 10:59:46 +0100
-Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1r3vda-002zVo-C1; Fri, 17 Nov 2023 10:59:46 +0100
-From:   =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= 
-        <u.kleine-koenig@pengutronix.de>
-To:     Alex Elder <elder@kernel.org>,
+        with ESMTP id S230377AbjKQMLi (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Fri, 17 Nov 2023 07:11:38 -0500
+X-Greylist: delayed 337 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 17 Nov 2023 04:11:34 PST
+Received: from proxima.lasnet.de (proxima.lasnet.de [IPv6:2a01:4f8:121:31eb:3::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73B96BC;
+        Fri, 17 Nov 2023 04:11:34 -0800 (PST)
+Received: from [192.168.2.51] (p4fe71630.dip0.t-ipconnect.de [79.231.22.48])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits))
+        (No client certificate requested)
+        (Authenticated sender: stefan@datenfreihafen.org)
+        by proxima.lasnet.de (Postfix) with ESMTPSA id E9CEBC0D81;
+        Fri, 17 Nov 2023 13:06:09 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
+        s=2021; t=1700222770;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=hvWfBuY8zILDhRg65fSk2vABR2JIQ9meo5junjfeFUI=;
+        b=YF50WvbB8xln0pfsf5scbODzhHqN4MrB04NZjb9QQ55EhGOMAQgApC/WmCnSF1ChTpusfX
+        cpCYTLKAG+nPjvFh90nehbayhgfi1v5LDzENDzBP89x1HRKaRQFqnqpJuMMb9pI1/Pv9kQ
+        VmR9S6zM36y7uIP5SzVjyYX/Fuubxy78lBdwTOKiwkdcke/WgDx7wflKOea3Q23iIxvkyu
+        IX3Lowcq5oy9BRnzDy+l53calLxgxoRRf2Miu/LRSdd2c9vNG6e5TPeMmJI5MOWy4yeb8t
+        Lj158CUM2YzIgLMdKX7S7U+7evtUwfWjMOkDAigVmDRkQ3OXKEUoxX/8MPEnMA==
+Message-ID: <559092f8-6b50-b816-99dc-109555cf872a@datenfreihafen.org>
+Date:   Fri, 17 Nov 2023 13:06:09 +0100
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH net-next 10/10] ieee802154: hwsim: Convert to platform
+ remove callback returning void
+Content-Language: en-US
+To:     =?UTF-8?Q?Uwe_Kleine-K=c3=b6nig?= <u.kleine-koenig@pengutronix.de>,
+        Alexander Aring <alex.aring@gmail.com>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
         "David S. Miller" <davem@davemloft.net>,
         Eric Dumazet <edumazet@google.com>,
         Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
-        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-        Tariq Toukan <tariqt@nvidia.com>,
-        Christian Marangi <ansuelsmth@gmail.com>,
-        Dawei Li <set_pte_at@outlook.com>,
-        =?utf-8?b?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>,
-        Andrew Lunn <andrew@lunn.ch>,
-        Heiner Kallweit <hkallweit1@gmail.com>,
-        Russell King <linux@armlinux.org.uk>,
-        Zhao Qiang <qiang.zhao@nxp.com>,
-        Linus Walleij <linusw@kernel.org>,
-        Imre Kaloz <kaloz@openwrt.org>,
-        Stephan Gerhold <stephan@gerhold.net>,
-        Andy Gross <agross@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konrad.dybcio@linaro.org>,
-        Loic Poulain <loic.poulain@linaro.org>,
-        Sergey Ryazanov <ryazanov.s.a@gmail.com>,
-        Alexander Aring <alex.aring@gmail.com>,
-        Stefan Schmidt <stefan@datenfreihafen.org>,
-        Miquel Raynal <miquel.raynal@bootlin.com>
-Cc:     netdev@vger.kernel.org, kernel@pengutronix.de,
-        linux-renesas-soc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-arm-kernel@lists.infradead.org,
-        Johannes Berg <johannes@sipsolutions.net>,
-        linux-arm-msm@vger.kernel.org, linux-wpan@vger.kernel.org
-Subject: [PATCH net-next 00/10] net*: Convert to platform remove callback returning void
-Date:   Fri, 17 Nov 2023 10:59:23 +0100
-Message-ID: <20231117095922.876489-1-u.kleine-koenig@pengutronix.de>
-X-Mailer: git-send-email 2.42.0.586.gbc5204569f7d.dirty
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2113; i=u.kleine-koenig@pengutronix.de; h=from:subject; bh=9oXuqsWt/RvURX9K94NXCtM0NJ0gIte8yeS/fqhGQB0=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBlVzl7texqFwXoT5gAbvyECD9jkLIXHxLs+T/Jr /qMt/rFfeOJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZVc5ewAKCRCPgPtYfRL+ TvahB/wJQF9QJN/JIp3OWpqrOqErXY/3mGrH+LrcSAyWTQmW3IbON/tzsf0OudQ3GS4JGLYwrwf lr86btNOOf5otyzkyde9JO4eLJ8avvimGDtuJVCJeaYTcGT6IlHjm21zCMoNIxH3XlKMkrUmMYH 0oqnlR2AfeZP6cAxUjo5jJP1AG1OJ/Xt8losaCvn7bsz0CB5zYnZLJq+MNrGc9F0Bf/31+nYK54 8M2gDMXOJ3xh7IST9jk8chwWjoFy2mfa/rYWeB+ctDGzmvj2yQT+QW8WTFasq3UdajLrFen0s7I UHp9cIprBwWEtE2SBKNHHSiRAX7ph979/7RuQaY5V4oAWRFf
-X-Developer-Key: i=u.kleine-koenig@pengutronix.de; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
+        Paolo Abeni <pabeni@redhat.com>
+Cc:     linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
+        kernel@pengutronix.de
+References: <20231117095922.876489-1-u.kleine-koenig@pengutronix.de>
+ <20231117095922.876489-11-u.kleine-koenig@pengutronix.de>
+From:   Stefan Schmidt <stefan@datenfreihafen.org>
+In-Reply-To: <20231117095922.876489-11-u.kleine-koenig@pengutronix.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ukl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-wpan@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello,
+Hello.
 
-this series converts the platform drivers below drivers/net that are not
-covered in the two other series converting drivers/net/ethernet and
-drivers/net/wireless. I put them all in a single series even though they
-are not maintained together. I thought that to be better than sending
-them out individually, I hope you agree.
+On 17.11.23 10:59, Uwe Kleine-König wrote:
+> The .remove() callback for a platform driver returns an int which makes
+> many driver authors wrongly assume it's possible to do error handling by
+> returning an error code. However the value returned is ignored (apart
+> from emitting a warning) and this typically results in resource leaks.
+> 
+> To improve here there is a quest to make the remove callback return
+> void. In the first step of this quest all drivers are converted to
+> .remove_new(), which already returns void. Eventually after all drivers
+> are converted, .remove_new() will be renamed to .remove().
+> 
+> Trivially convert this driver from always returning zero in the remove
+> callback to the void returning variant.
+> 
+> Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+> ---
+>   drivers/net/ieee802154/mac802154_hwsim.c | 6 ++----
+>   1 file changed, 2 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/net/ieee802154/mac802154_hwsim.c b/drivers/net/ieee802154/mac802154_hwsim.c
+> index 31cba9aa7636..2c2483bbe780 100644
+> --- a/drivers/net/ieee802154/mac802154_hwsim.c
+> +++ b/drivers/net/ieee802154/mac802154_hwsim.c
+> @@ -1035,7 +1035,7 @@ static int hwsim_probe(struct platform_device *pdev)
+>   	return err;
+>   }
+>   
+> -static int hwsim_remove(struct platform_device *pdev)
+> +static void hwsim_remove(struct platform_device *pdev)
+>   {
+>   	struct hwsim_phy *phy, *tmp;
+>   
+> @@ -1043,13 +1043,11 @@ static int hwsim_remove(struct platform_device *pdev)
+>   	list_for_each_entry_safe(phy, tmp, &hwsim_phys, list)
+>   		hwsim_del(phy);
+>   	mutex_unlock(&hwsim_phys_lock);
+> -
+> -	return 0;
+>   }
+>   
+>   static struct platform_driver mac802154hwsim_driver = {
+>   	.probe = hwsim_probe,
+> -	.remove = hwsim_remove,
+> +	.remove_new = hwsim_remove,
+>   	.driver = {
+>   			.name = "mac802154_hwsim",
+>   	},
 
-See commit 5c5a7680e67b ("platform: Provide a remove callback that
-returns no value") for an extended explanation and the eventual goal.
-The TL;DR; is to make it harder for driver authors to leak resources
-without noticing.
 
-The first patch is a fix, but I don't think it's worth to add that to
-stable, it was broken since v5.7-rc1 and nobody seems to have hit the
-problem.
+Acked-by: Stefan Schmidt <stefan@datenfreihafen.org>
 
-Best regards
-Uwe
-
-Uwe Kleine-König (10):
-  net: ipa: Don't error out in .remove()
-  net: ipa: Convert to platform remove callback returning void
-  net: fjes: Convert to platform remove callback returning void
-  net: pcs: rzn1-miic: Convert to platform remove callback returning
-    void
-  net: sfp: Convert to platform remove callback returning void
-  net: wan/fsl_ucc_hdlc: Convert to platform remove callback returning
-    void
-  net: wan/ixp4xx_hss: Convert to platform remove callback returning
-    void
-  net: wwan: qcom_bam_dmux: Convert to platform remove callback
-    returning void
-  ieee802154: fakelb: Convert to platform remove callback returning void
-  ieee802154: hwsim: Convert to platform remove callback returning void
-
- drivers/net/fjes/fjes_main.c             |  6 ++----
- drivers/net/ieee802154/fakelb.c          |  5 ++---
- drivers/net/ieee802154/mac802154_hwsim.c |  6 ++----
- drivers/net/ipa/ipa_main.c               | 20 +++++---------------
- drivers/net/pcs/pcs-rzn1-miic.c          |  6 ++----
- drivers/net/phy/sfp.c                    |  6 ++----
- drivers/net/wan/fsl_ucc_hdlc.c           |  6 ++----
- drivers/net/wan/ixp4xx_hss.c             |  5 ++---
- drivers/net/wwan/qcom_bam_dmux.c         |  6 ++----
- 9 files changed, 21 insertions(+), 45 deletions(-)
-
-base-commit: eff99d8edbed7918317331ebd1e365d8e955d65e
--- 
-2.42.0
-
+regards
+Stefan Schmidt
