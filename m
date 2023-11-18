@@ -2,118 +2,114 @@ Return-Path: <linux-wpan-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37046C072A2
-	for <linux-wpan@archiver.kernel.org>; Fri, 17 Nov 2023 12:11:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4CC9C5ACB3
+	for <linux-wpan@archiver.kernel.org>; Sat, 18 Nov 2023 15:51:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230377AbjKQMLj (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
-        Fri, 17 Nov 2023 07:11:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58006 "EHLO
+        id S229650AbjKRPvF (ORCPT <rfc822;linux-wpan@archiver.kernel.org>);
+        Sat, 18 Nov 2023 10:51:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35164 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230379AbjKQMLi (ORCPT
-        <rfc822;linux-wpan@vger.kernel.org>); Fri, 17 Nov 2023 07:11:38 -0500
-X-Greylist: delayed 339 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 17 Nov 2023 04:11:34 PST
-Received: from proxima.lasnet.de (proxima.lasnet.de [78.47.171.185])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D28E196;
-        Fri, 17 Nov 2023 04:11:34 -0800 (PST)
-Received: from [192.168.2.51] (p4fe71630.dip0.t-ipconnect.de [79.231.22.48])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: stefan@datenfreihafen.org)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id 48B82C0979;
-        Fri, 17 Nov 2023 13:05:52 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
-        s=2021; t=1700222752;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Tjp8QbfFX1V9Jgb0mU/KGvDIlzk+uM7B4fwMIunZXXw=;
-        b=BidlP4MEVMK+Px6Eqeub5GZlV+GjxUso4VEbjATeX4nICduDsSK8CTroZBsah/h9W+jMiB
-        raETlsQIq07EN/ySZy1Aj+ji4D/H4VsyBFIvfJ7dUmc5L0LsIx04Od+JMWpip6XlpqHe4L
-        Xcm07vmDW+uZyo9C/HDtgX24Yuya0EASgt4G66K0gnlAI2UQLhB8xwO3SJX/9n0VH7++IF
-        5mGHgdoJrp3+kiWrkluSlYRi6jrBwvzYBV4OyoZEbnEDmwinLH3ynGaS+P33Z6oivUtsSV
-        WwwnOI+n044PqA2/oI9N814AMjv+4Z2wBohzpCWSFGlcmRaUYICHSIvfQTXy+w==
-Message-ID: <27dadb9d-e905-e019-a320-c078325724f8@datenfreihafen.org>
-Date:   Fri, 17 Nov 2023 13:05:51 +0100
+        with ESMTP id S229469AbjKRPvF (ORCPT
+        <rfc822;linux-wpan@vger.kernel.org>); Sat, 18 Nov 2023 10:51:05 -0500
+Received: from out162-62-57-49.mail.qq.com (out162-62-57-49.mail.qq.com [162.62.57.49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85766182;
+        Sat, 18 Nov 2023 07:50:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
+        s=s201512; t=1700322646;
+        bh=+4tkXT2Y0ZJNldwcYbIGmHyE8OJNqApK4fyYv38niwQ=;
+        h=From:To:Cc:Subject:Date;
+        b=Ph7IJCtdffearbam84VOXcy9Cr4E1x26MWaX/sorrGBpPdDkvUzx2oeVFdE1F+8QW
+         VMmHOxdM/M2+irGIqdplAjEuBi14dLYzChlYnLZLRk22EPxI7VPLmuMxMPj6wZmtkP
+         qa4WgpgxnX/SFY9ebzLdly2c05YGxi7OLRz8jbpU=
+Received: from KernelDevBox.byted.org ([180.184.51.70])
+        by newxmesmtplogicsvrsza7-0.qq.com (NewEsmtp) with SMTP
+        id A7591AC6; Sat, 18 Nov 2023 23:41:53 +0800
+X-QQ-mid: xmsmtpt1700322113t5fkws5zs
+Message-ID: <tencent_6BA2BE4A64DD6CD5B66D9D8079789829000A@qq.com>
+X-QQ-XMAILINFO: NfADz11w1YkvGFaZejPHtoEFsxSTRk8Iq0ST/4MclPPTXeprz1fCG8iAMPVEp1
+         KE2E8eDpie5P8qZOM6eWcNst1uuqvVq7Sf/q0RUHWJ/dEt/c7xicWKmNcnPmKxXAjbP8vp8qZqyG
+         FPVktayu0ZmNo/oj/41i2AcE+dJRvpch65kHf1xw4TWxpr60hSdp/GidOLQsBqspPOTvIRpf1Vus
+         Az8lnCJc+p9m/MvGp32KJ9nWfoPPln7LvBUIbWl3Izm5pZSCqoAd/bgLwSU4Uwev6G4PyVj/BzpG
+         0HY+67f4Q/KpBtlNwd/6Q6E4NG7617GydjeqSh9EYDhMVkITjPrkICJWaGdGHOhK2kdFIytw/H14
+         7OprbTyPXOkCoXitWTKY91Fpaf8ZFA0JaIQ+ogRuE2IiQW3vSCIbK471H7pfEjzAei6EkTab4JBO
+         LltpLgx27Pbc8jnjOyG0F5qDfN5WhZinuFs5IxJWnaUdSsab93vwn6UT7Cv2c3Cx3M3yYrM0pnJL
+         9j2c+q0O9+H5h91Xo3CMvKyNnKUpT2bSewVAc3B8MedXtJ1lmPXSkHt9pBZ7MQOL4yEA7FEDErB8
+         NhcjnR02GVPka7qmy7JV5bJEicpFQcQcC9GpRn58Doy/O0o4p7OQHOZu+mnFgsTZBrox3GFiUmXk
+         nTZ0S4LwjIU3+6r9ooZ/5hnmilYXW0NbnfT07CdoCPPWoDJQpZy9ZJdMaKZwZOMNPrilvrO/81Xg
+         5EI30fr8BxBSETW+NfeuRH7snQH/tIvFooS7V4eIk2f/kUFcU+wIIJQ+Qf3sjx4h4jH3FUS7Rn5D
+         EZC6xItuOV025OyUAdqqHX/82KT0pk6FYJz7rUUIQGydw7aBws1wBGQ6el+PUCx8H/+pEccNvBHC
+         ApURqEatnWSbgopuN+GZ/ez8Ig7tBvlzgO8PEXQ8X4iMuh/VyilH19LD7GyAJPfUjzALOuJhvdql
+         mbU4Lpj2CyvNmVI8ku6e7halg4cYLYw1m/0dFpCDmnJNAob6mJjT2ivEpVAP/Gj0RJJZXl578=
+X-QQ-XMRINFO: Mp0Kj//9VHAxr69bL5MkOOs=
+From:   Zhang Shurong <zhang_shurong@foxmail.com>
+To:     alex.aring@gmail.com
+Cc:     stefan@datenfreihafen.org, miquel.raynal@bootlin.com,
+        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com, linux-wpan@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        harperchen1110@gmail.com, Zhang Shurong <zhang_shurong@foxmail.com>
+Subject: [PATCH] mac802154: Fix uninit-value access in ieee802154_hdr_push_sechdr
+Date:   Sat, 18 Nov 2023 23:41:50 +0800
+X-OQ-MSGID: <20231118154150.1450251-1-zhang_shurong@foxmail.com>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH net-next 09/10] ieee802154: fakelb: Convert to platform
- remove callback returning void
-Content-Language: en-US
-To:     =?UTF-8?Q?Uwe_Kleine-K=c3=b6nig?= <u.kleine-koenig@pengutronix.de>,
-        Alexander Aring <alex.aring@gmail.com>,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>
-Cc:     linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
-        kernel@pengutronix.de
-References: <20231117095922.876489-1-u.kleine-koenig@pengutronix.de>
- <20231117095922.876489-10-u.kleine-koenig@pengutronix.de>
-From:   Stefan Schmidt <stefan@datenfreihafen.org>
-In-Reply-To: <20231117095922.876489-10-u.kleine-koenig@pengutronix.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-wpan.vger.kernel.org>
 X-Mailing-List: linux-wpan@vger.kernel.org
 
-Hello.
+The syzkaller reported an issue:
 
-On 17.11.23 10:59, Uwe Kleine-König wrote:
-> The .remove() callback for a platform driver returns an int which makes
-> many driver authors wrongly assume it's possible to do error handling by
-> returning an error code. However the value returned is ignored (apart
-> from emitting a warning) and this typically results in resource leaks.
-> 
-> To improve here there is a quest to make the remove callback return
-> void. In the first step of this quest all drivers are converted to
-> .remove_new(), which already returns void. Eventually after all drivers
-> are converted, .remove_new() will be renamed to .remove().
-> 
-> Trivially convert this driver from always returning zero in the remove
-> callback to the void returning variant.
-> 
-> Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
-> ---
->   drivers/net/ieee802154/fakelb.c | 5 ++---
->   1 file changed, 2 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/net/ieee802154/fakelb.c b/drivers/net/ieee802154/fakelb.c
-> index 523d13ee02bf..35e55f198e05 100644
-> --- a/drivers/net/ieee802154/fakelb.c
-> +++ b/drivers/net/ieee802154/fakelb.c
-> @@ -221,7 +221,7 @@ static int fakelb_probe(struct platform_device *pdev)
->   	return err;
->   }
->   
-> -static int fakelb_remove(struct platform_device *pdev)
-> +static void fakelb_remove(struct platform_device *pdev)
->   {
->   	struct fakelb_phy *phy, *tmp;
->   
-> @@ -229,14 +229,13 @@ static int fakelb_remove(struct platform_device *pdev)
->   	list_for_each_entry_safe(phy, tmp, &fakelb_phys, list)
->   		fakelb_del(phy);
->   	mutex_unlock(&fakelb_phys_lock);
-> -	return 0;
->   }
->   
->   static struct platform_device *ieee802154fake_dev;
->   
->   static struct platform_driver ieee802154fake_driver = {
->   	.probe = fakelb_probe,
-> -	.remove = fakelb_remove,
-> +	.remove_new = fakelb_remove,
->   	.driver = {
->   			.name = "ieee802154fakelb",
->   	},
+BUG: KMSAN: uninit-value in ieee802154_hdr_push_sechdr net/ieee802154/header_ops.c:54 [inline]
+BUG: KMSAN: uninit-value in ieee802154_hdr_push+0x971/0xb90 net/ieee802154/header_ops.c:108
+ ieee802154_hdr_push_sechdr net/ieee802154/header_ops.c:54 [inline]
+ ieee802154_hdr_push+0x971/0xb90 net/ieee802154/header_ops.c:108
+ ieee802154_header_create+0x9c0/0xc00 net/mac802154/iface.c:396
+ wpan_dev_hard_header include/net/cfg802154.h:494 [inline]
+ dgram_sendmsg+0xd1d/0x1500 net/ieee802154/socket.c:677
+ ieee802154_sock_sendmsg+0x91/0xc0 net/ieee802154/socket.c:96
+ sock_sendmsg_nosec net/socket.c:725 [inline]
+ sock_sendmsg net/socket.c:748 [inline]
+ ____sys_sendmsg+0x9c2/0xd60 net/socket.c:2494
+ ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2548
+ __sys_sendmsg+0x225/0x3c0 net/socket.c:2577
+ __compat_sys_sendmsg net/compat.c:346 [inline]
+ __do_compat_sys_sendmsg net/compat.c:353 [inline]
+ __se_compat_sys_sendmsg net/compat.c:350 [inline]
 
+We found hdr->key_id_mode is uninitialized in mac802154_set_header_security()
+which indicates hdr.fc.security_enabled should be 0. However, it is set to be cb->secen before.
+Later, ieee802154_hdr_push_sechdr is invoked, causing KMSAN complains uninit-value issue.
+Since mac802154_set_header_security() sets hdr.fc.security_enabled based on the variables
+ieee802154_sub_if_data *sdata and ieee802154_mac_cb *cb in a collaborative manner.
+Therefore, we should not set security_enabled prior to mac802154_set_header_security().
 
-Acked-by: Stefan Schmidt <stefan@datenfreihafen.org>
+Fixed it by removing the line that sets the hdr.fc.security_enabled.
 
-regards
-Stefan Schmidt
+Syzkaller don't provide repro, and I provide a syz repro like:
+r0 = syz_init_net_socket$802154_dgram(0x24, 0x2, 0x0)
+setsockopt$WPAN_SECURITY(r0, 0x0, 0x1, &(0x7f0000000000)=0x2, 0x4)
+setsockopt$WPAN_SECURITY(r0, 0x0, 0x1, &(0x7f0000000080), 0x4)
+sendmsg$802154_dgram(r0, &(0x7f0000000100)={&(0x7f0000000040)={0x24, @short}, 0x14, &(0x7f00000000c0)={0x0}}, 0x0)
+
+Fixes: 32edc40ae65c ("ieee802154: change _cb handling slightly")
+Signed-off-by: Zhang Shurong <zhang_shurong@foxmail.com>
+---
+ net/mac802154/iface.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/net/mac802154/iface.c b/net/mac802154/iface.c
+index c0e2da5072be..c99b6e40a5db 100644
+--- a/net/mac802154/iface.c
++++ b/net/mac802154/iface.c
+@@ -368,7 +368,6 @@ static int ieee802154_header_create(struct sk_buff *skb,
+ 
+ 	memset(&hdr.fc, 0, sizeof(hdr.fc));
+ 	hdr.fc.type = cb->type;
+-	hdr.fc.security_enabled = cb->secen;
+ 	hdr.fc.ack_request = cb->ackreq;
+ 	hdr.seq = atomic_inc_return(&dev->ieee802154_ptr->dsn) & 0xFF;
+ 
+-- 
+2.30.2
+
