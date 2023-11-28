@@ -1,22 +1,22 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="lM3SiAEB"
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::226])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A8971A5;
-	Tue, 28 Nov 2023 03:17:02 -0800 (PST)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id F405EC000C;
-	Tue, 28 Nov 2023 11:16:59 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="RVRvW61c"
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9200DD6;
+	Tue, 28 Nov 2023 03:17:03 -0800 (PST)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 4C018C0006;
+	Tue, 28 Nov 2023 11:17:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1701170221;
+	t=1701170222;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=DHdGd2zzkKYvEZysTBsYqr5HfSWPcxyAVoJcqSobQ9g=;
-	b=lM3SiAEBiKoKC6fToOH5g7dgKhjwcrv06zEayNvk79IaZX4Bi8BB+ki/1WRj0XnGLcD9L+
-	qUeM4dTlD7G/4qjUbXX3WFV3k8MIq9jShzOSo/Rs/eMi3znBu8yd4HNr3OZH6n2mF16uzW
-	YCwTfxkF+GlVzNPkPEW3EZexA+XbqcZw43XohyB3hCzrHlGGAxhBHd1xoM3dKwcQAIM4h2
-	dN8zXEtrJRcR3C7jLjb0ZDp6TpgswiJmWXFID8HYWIdpUpgbe72ndLFO77362Th2cxFCAb
-	4Av4YJ8mQB8WaDeQHCKR+3IlThCFddnHkUwkI+uO4VYGO4W2pH4GefyEzKPFYQ==
+	bh=9iBZtX0anCTLAf+AwYFYTLyMCZwBIcSzyfNNx7MAlns=;
+	b=RVRvW61cnZWSwOBY42XNQW84SmWKFinNae68YCtEy2gHgFJNW0gX/NM0sfwAcmQFfXqhZJ
+	exwHNWHChGQG5cqQHgrMxDd+CdtY6eJ+98aA8ndr4iDKcjSXHbaw6kARoVC6t9/gZW725j
+	iIjr8vRJ1qa2s+drj2ZO9TWMLlM1SS/YdaOfWRRQycZLRZ2uIitBj7kyF47rfpIa6Xk2qy
+	HSlkszwtD/vWGQ1/LXenZA07GOMGM3/S6l9JcAJo9rl4/6WGF9qZy9CtDXKwVe0bAj/FWd
+	ZD/B2MJFTeFhYjQ2o6EaHUbyBtqdqc7CBndFsObAsO0E1RFRGcF0hLm85aQRLA==
 From: Miquel Raynal <miquel.raynal@bootlin.com>
 To: Alexander Aring <alex.aring@gmail.com>,
 	Stefan Schmidt <stefan@datenfreihafen.org>,
@@ -33,9 +33,9 @@ Cc: David Girault <david.girault@qorvo.com>,
 	Eric Dumazet <edumazet@google.com>,
 	netdev@vger.kernel.org,
 	Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: [PATCH wpan-next 2/5] mac802154: Use the PAN coordinator parameter when stamping packets
-Date: Tue, 28 Nov 2023 12:16:52 +0100
-Message-Id: <20231128111655.507479-3-miquel.raynal@bootlin.com>
+Subject: [PATCH wpan-next 3/5] mac802154: Only allow PAN controllers to process association requests
+Date: Tue, 28 Nov 2023 12:16:53 +0100
+Message-Id: <20231128111655.507479-4-miquel.raynal@bootlin.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20231128111655.507479-1-miquel.raynal@bootlin.com>
 References: <20231128111655.507479-1-miquel.raynal@bootlin.com>
@@ -48,46 +48,34 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-GND-Sasl: miquel.raynal@bootlin.com
 
-ACKs come with the source and destination address empty, this has been
-clarified already. But there is something else: if the destination
-address is empty but the source address is valid, it may be a way to
-reach the PAN coordinator. Either the device receiving this frame is the
-PAN coordinator itself and should process what it just received
-(PACKET_HOST) or it is not and may, if supported, relay the packet as it
-is targeted to another device in the network.
-
-Right now we do not support relaying so the packet should be dropped in
-the first place, but the stamping looks more accurate this way.
+It is not very clear in the specification whether simple coordinators
+are allowed or not to answer to association requests themselves. As
+there is no synchronization mechanism, it is probably best to rely on
+the relay feature of these coordinators and avoid processing them in
+this case.
 
 Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
 ---
- net/mac802154/rx.c | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
+ net/mac802154/scan.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/net/mac802154/rx.c b/net/mac802154/rx.c
-index 0024341ef9c5..e40a988d6c80 100644
---- a/net/mac802154/rx.c
-+++ b/net/mac802154/rx.c
-@@ -156,12 +156,15 @@ ieee802154_subif_frame(struct ieee802154_sub_if_data *sdata,
+diff --git a/net/mac802154/scan.c b/net/mac802154/scan.c
+index 5873da634fb4..1c0eeaa76560 100644
+--- a/net/mac802154/scan.c
++++ b/net/mac802154/scan.c
+@@ -781,6 +781,12 @@ int mac802154_process_association_req(struct ieee802154_sub_if_data *sdata,
+ 		 unlikely(dest->short_addr != wpan_dev->short_addr))
+ 		return -ENODEV;
  
- 	switch (mac_cb(skb)->dest.mode) {
- 	case IEEE802154_ADDR_NONE:
--		if (hdr->source.mode != IEEE802154_ADDR_NONE)
--			/* FIXME: check if we are PAN coordinator */
--			skb->pkt_type = PACKET_OTHERHOST;
--		else
-+		if (hdr->source.mode == IEEE802154_ADDR_NONE)
- 			/* ACK comes with both addresses empty */
- 			skb->pkt_type = PACKET_HOST;
-+		else if (!wpan_dev->parent)
-+			/* No dest means PAN coordinator is the recipient */
-+			skb->pkt_type = PACKET_HOST;
-+		else
-+			/* We are not the PAN coordinator, just relaying */
-+			skb->pkt_type = PACKET_OTHERHOST;
- 		break;
- 	case IEEE802154_ADDR_LONG:
- 		if (mac_cb(skb)->dest.pan_id != span &&
++	if (wpan_dev->parent) {
++		dev_dbg(&sdata->dev->dev,
++			"Ignoring ASSOC REQ, not the PAN coordinator\n");
++		return -ENODEV;
++	}
++
+ 	mutex_lock(&wpan_dev->association_lock);
+ 
+ 	memcpy(&assoc_req_pl, skb->data, sizeof(assoc_req_pl));
 -- 
 2.34.1
 
