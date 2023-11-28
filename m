@@ -1,38 +1,36 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="hjJHvO3A"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="ILYWzC33"
 Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::228])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 049461A2
-	for <linux-wpan@vger.kernel.org>; Tue, 28 Nov 2023 03:27:19 -0800 (PST)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 3AFAF1BF212;
-	Tue, 28 Nov 2023 11:27:16 +0000 (UTC)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6EFAA1B5
+	for <linux-wpan@vger.kernel.org>; Tue, 28 Nov 2023 03:29:48 -0800 (PST)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 4F7591BF20B;
+	Tue, 28 Nov 2023 11:29:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1701170837;
+	t=1701170987;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=++Zycas2TRu7LlPfUZxrr4IkvQeefo47IMQxeTLRlVk=;
-	b=hjJHvO3A1TuBJcHfVioRkgcGBfJ/cNXKVJWiroAkCIhUu0Ztz8mH4DACkDUZMlN82r9J09
-	lbN9zuJMLwrNK6kMtMv/ImIBqmEHzmLmoBZE0JBWHHhsaiBoOu+upqkAjQ+7knvTcCRiPm
-	i+h8z84DJb55rch3LMcOMDZ1gkpo0YlVtyQHq3HbQUOI0gCuIqZi7AaCQ/bZS/4fXiUfe8
-	UbG/IE4cQyzqVUkJX9IXR0T9Tf9K7K1VeN7YxeqzvoFBPAunKRbcR0bylUyD1pozXCYlNi
-	kz2ZaXY5IvWzIy8lv/0x3OqK77ITQ0cEOfzOnjbAG92zxTle44TpKok3d6W3LA==
-Date: Tue, 28 Nov 2023 12:27:14 +0100
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=L48v1Q02BYnnfBIkGpR00jADNuLYVR0kvaFaGQLGIe0=;
+	b=ILYWzC33Eyc8HWgTtogBxwQ88smTiNMs/ynWWOFQimZSGUFWDrtD8nKplbxhd02lgov6wf
+	/5pTd6+OqiPivAfKscVAkB0cszVoL6M1cE5eZx+i3A9GXo+7N+HBd5Ztfk46obhiZpo3qx
+	CikAUSzZLfSAUa1qrlIXWZgTIpmPg/1WRN3Uc+Nq4EBUrjGcLv0SlhLpYrI51Rxiw3lHwx
+	t+u2oyxzZdzwm3VXRHNQ1qsGBW0CXxifO7uixBbDDnFXbmuirUgOexVCVtWBZ2FTnrn1M1
+	H9RuLaHv0vf+PDUFdhU0B5Sp0HmL+3e7HtGV+0b+SlPcd/Xf0ttDA3Jh6wtr2g==
 From: Miquel Raynal <miquel.raynal@bootlin.com>
-To: Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt
- <stefan@datenfreihafen.org>, linux-wpan@vger.kernel.org
-Cc: David Girault <david.girault@qorvo.com>, Romuald Despres
- <romuald.despres@qorvo.com>, Frederic Blain <frederic.blain@qorvo.com>,
- Nicolas Schodet <nico@ni.fr.eu.org>, Guilhem Imberton
- <guilhem.imberton@qorvo.com>, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH wpan-tools] iwpan: Allow the phy shortcut for scanning
- commands
-Message-ID: <20231128122714.10efea31@xps-13>
-In-Reply-To: <20230213174703.1172423-1-miquel.raynal@bootlin.com>
-References: <20230213174703.1172423-1-miquel.raynal@bootlin.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+To: Alexander Aring <alex.aring@gmail.com>,
+	Stefan Schmidt <stefan@datenfreihafen.org>,
+	linux-wpan@vger.kernel.org
+Cc: David Girault <david.girault@qorvo.com>,
+	Romuald Despres <romuald.despres@qorvo.com>,
+	Frederic Blain <frederic.blain@qorvo.com>,
+	Nicolas Schodet <nico@ni.fr.eu.org>,
+	Guilhem Imberton <guilhem.imberton@qorvo.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	Miquel Raynal <miquel.raynal@bootlin.com>
+Subject: [PATCH wpan-tools 0/2] Associations support
+Date: Tue, 28 Nov 2023 12:29:43 +0100
+Message-Id: <20231128112945.509331-1-miquel.raynal@bootlin.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
@@ -40,59 +38,26 @@ List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-GND-Sasl: miquel.raynal@bootlin.com
 
-Hi Stefan,
+Hello,
 
-miquel.raynal@bootlin.com wrote on Mon, 13 Feb 2023 18:47:03 +0100:
-
-> Allow running:
-> iwpan phy <phy> scan trigger ...
-> iwpan phy <phy> scan abort ...
->=20
-> Aside with the existing:
-> iwpan dev <dev> scan trigger ...
-> iwpan dev <dev> scan abort ...
->=20
-> This change does not apply easily to the TOPLEVEL(scan) command, so we
-> keep this one more constrained for simplicity.
-
-I believe this patch felt into the cracks, I think I remember it came
-from a request from Alex, maybe you will want to consider it for merge
-despite its "age"? Or maybe I missed some feedback in the SPAMS /o\
-
-> Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
-> ---
->  src/scan.c | 4 ++++
->  1 file changed, 4 insertions(+)
->=20
-> diff --git a/src/scan.c b/src/scan.c
-> index e92702d..8bc21ca 100644
-> --- a/src/scan.c
-> +++ b/src/scan.c
-> @@ -541,11 +541,15 @@ TOPLEVEL(scan, "type <type> [page <page>] [channels=
- <bitfield>] [duration <durat
->  	SCAN_TYPES);
->  COMMAND(scan, abort, NULL, NL802154_CMD_ABORT_SCAN, 0, CIB_NETDEV, scan_=
-abort_handler,
->  	"Abort ongoing scanning on this virtual interface");
-> +COMMAND(scan, abort, NULL, NL802154_CMD_ABORT_SCAN, 0, CIB_PHY, scan_abo=
-rt_handler, NULL);
->  COMMAND(scan, trigger,
->  	"type <type> [page <page>] [channels <bitfield>] [duration <duration-or=
-der>]",
->  	NL802154_CMD_TRIGGER_SCAN, 0, CIB_NETDEV, scan_trigger_handler,
->  	"Launch scanning on this virtual interface with the given configuration=
-.\n"
->  	SCAN_TYPES);
-> +COMMAND(scan, trigger,
-> +	"type <type> [page <page>] [channels <bitfield>] [duration <duration-or=
-der>]",
-> +	NL802154_CMD_TRIGGER_SCAN, 0, CIB_PHY, scan_trigger_handler, NULL);
-> =20
->  SECTION(beacons);
-> =20
+Associations will be part of the next kernel merge window, so here is
+the userspace part to interact with it.
 
 Thanks,
-Miqu=C3=A8l
+Miquèl
+
+Miquel Raynal (2):
+  iwpan: Synchronize nl802154.h with the latest association changes
+  iwpan: Add associations support
+
+ src/info.c     |   4 ++
+ src/mac.c      | 187 +++++++++++++++++++++++++++++++++++++++++++++++++
+ src/nl802154.h |  22 +++++-
+ 3 files changed, 211 insertions(+), 2 deletions(-)
+
+-- 
+2.34.1
+
