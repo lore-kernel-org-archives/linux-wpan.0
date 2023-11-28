@@ -1,44 +1,76 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48F8317C4
-	for <linux-wpan@vger.kernel.org>; Thu, 23 Nov 2023 02:42:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="aQ+aYWZh"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A074FC433C7;
-	Thu, 23 Nov 2023 02:42:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1700707334;
-	bh=rRbIXqjq8DKBA6vW+7glleky65j8TQodsqrm6IeWtY0=;
-	h=Date:From:To:Subject:From;
-	b=aQ+aYWZhTEc0P8fVZzuyh5cPbGTGp3IqAsAhAJHPTTTUEp2cYIBrYNt83rd4iDIST
-	 SbaRwVsgMifu2xuYFddTtBHqXXOhtch+T0KB8iXEATV4+//90cQo2EJ/CCdhpMrwJS
-	 +N9HOF5rdrUEhIXNG6Tz4YZ4jGrwhBh7/zsbbSL0=
-Date: Wed, 22 Nov 2023 21:42:13 -0500
-From: Konstantin Ryabitsev <konstantin@linuxfoundation.org>
-To: linux-wpan@vger.kernel.org
-Subject: PSA: this list has moved to new vger infra (no action required)
-Message-ID: <20231122-prudent-ferret-of-action-5af9df@nitro>
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Q5BZDqSL"
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::226])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC24ED6;
+	Tue, 28 Nov 2023 03:16:59 -0800 (PST)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id C3C56C000A;
+	Tue, 28 Nov 2023 11:16:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1701170218;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=bwSOSEy0Nrk7Z4MK3Ma1HzJQsew5/R4JHeCSbA3yyO8=;
+	b=Q5BZDqSLz7xhixGnBCM0LOgKnq6NyEhMY7yz879MzB4Vk81GOWtZ7HsYzHz+yb6/oBs+v1
+	N+2MhoWtXw0cHQ5C4vv11n0dGf1WdNCzyiEo0c5CmEcg9M4xmcX6qbfhdTw6h9zNDh5YH8
+	aEQYbcbrxHEJyy2lbAFNCxUTnca9Fq3oNbxfmeyE7H0PBUHqwAYQPOlih+v5cLRftUgehv
+	VOv/U9q0brUgxZm/Uu9PEwyAOgN4+qt0lTVvGNqy1Ejuv8zXE31vxV5ctb/BIy6G682Sqi
+	N4/Ko/pwp8S5Vp/6eAq8aznHim8Mn1H9xBFa1ffEo3tRnZ0aXi+RubA8/y/kCg==
+From: Miquel Raynal <miquel.raynal@bootlin.com>
+To: Alexander Aring <alex.aring@gmail.com>,
+	Stefan Schmidt <stefan@datenfreihafen.org>,
+	linux-wpan@vger.kernel.org
+Cc: David Girault <david.girault@qorvo.com>,
+	Romuald Despres <romuald.despres@qorvo.com>,
+	Frederic Blain <frederic.blain@qorvo.com>,
+	Nicolas Schodet <nico@ni.fr.eu.org>,
+	Guilhem Imberton <guilhem.imberton@qorvo.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	netdev@vger.kernel.org,
+	Miquel Raynal <miquel.raynal@bootlin.com>
+Subject: [PATCH wpan-next 0/5] ieee802154: Association tweaks
+Date: Tue, 28 Nov 2023 12:16:50 +0100
+Message-Id: <20231128111655.507479-1-miquel.raynal@bootlin.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: miquel.raynal@bootlin.com
 
-Hello, all:
+Hello,
 
-This list has been migrated to the new vger infrastructure. No action is
-required on your part and there should be no change in how you interact with
-this list.
+Last serie on this area to clarify a few points and avoid to confuse the
+network too much. I believe more will come while using this stack, but
+that's a first round I kept aside. Nothing particularly problematic
+here, just a few clarifications.
 
-This message acts as a verification test that the archives are properly
-updating.
+Thanks,
+Miquèl
 
-If something isn't working or looking right, please reach out to
-helpdesk@kernel.org.
+Miquel Raynal (5):
+  mac80254: Provide real PAN coordinator info in beacons
+  mac802154: Use the PAN coordinator parameter when stamping packets
+  mac802154: Only allow PAN controllers to process association requests
+  ieee802154: Avoid confusing changes after associating
+  mac802154: Avoid new associations while disassociating
 
-Best regards,
--K
+ include/net/cfg802154.h   |  4 +++-
+ net/ieee802154/nl802154.c | 30 ++++++++++++++++++------------
+ net/ieee802154/pan.c      |  8 +++++++-
+ net/mac802154/cfg.c       | 11 ++++++++---
+ net/mac802154/rx.c        | 11 +++++++----
+ net/mac802154/scan.c      | 10 ++++++++--
+ 6 files changed, 51 insertions(+), 23 deletions(-)
+
+-- 
+2.34.1
+
