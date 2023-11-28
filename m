@@ -1,22 +1,22 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="RVRvW61c"
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9200DD6;
-	Tue, 28 Nov 2023 03:17:03 -0800 (PST)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 4C018C0006;
-	Tue, 28 Nov 2023 11:17:01 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="G2Dxk8Qu"
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::226])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4656109;
+	Tue, 28 Nov 2023 03:17:04 -0800 (PST)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 819CCC0007;
+	Tue, 28 Nov 2023 11:17:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1701170222;
+	t=1701170223;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=9iBZtX0anCTLAf+AwYFYTLyMCZwBIcSzyfNNx7MAlns=;
-	b=RVRvW61cnZWSwOBY42XNQW84SmWKFinNae68YCtEy2gHgFJNW0gX/NM0sfwAcmQFfXqhZJ
-	exwHNWHChGQG5cqQHgrMxDd+CdtY6eJ+98aA8ndr4iDKcjSXHbaw6kARoVC6t9/gZW725j
-	iIjr8vRJ1qa2s+drj2ZO9TWMLlM1SS/YdaOfWRRQycZLRZ2uIitBj7kyF47rfpIa6Xk2qy
-	HSlkszwtD/vWGQ1/LXenZA07GOMGM3/S6l9JcAJo9rl4/6WGF9qZy9CtDXKwVe0bAj/FWd
-	ZD/B2MJFTeFhYjQ2o6EaHUbyBtqdqc7CBndFsObAsO0E1RFRGcF0hLm85aQRLA==
+	bh=F+Ca0i6LS9EErxIJcnfDTMGUbmzhckltyA1nENhzjEE=;
+	b=G2Dxk8Qur2PT0FS20ThRlbIYV8LVyg55LGKiLObgI6cZgEtEwHnNBMfrHkPS7YOq58W+UL
+	zdWABnrVsoAuDYFlXZOi17fH+5iVeA/+NH9SEYu0ddDEVFhCYv8TaGnj2+lqDwXP3waPWH
+	uEw1Qfe3uDTnmAewTRVr/wKGgTxFpoCqNTeC3cdP735QblUrilJPvuSp/mF1N7BJDmoUwH
+	03TbgzXLs4z2d9qaRhHsrAzHL/ia8qBYSkVE1JLPLD5+42on8HRx7AOTqnnjop3XZep8s0
+	C2HF8SlbXI6mj0bmpZSFPlPsHyN/0kTc6b0KN7IRU+Ji2QRmsoJ3TVJTaM9Rzg==
 From: Miquel Raynal <miquel.raynal@bootlin.com>
 To: Alexander Aring <alex.aring@gmail.com>,
 	Stefan Schmidt <stefan@datenfreihafen.org>,
@@ -33,9 +33,9 @@ Cc: David Girault <david.girault@qorvo.com>,
 	Eric Dumazet <edumazet@google.com>,
 	netdev@vger.kernel.org,
 	Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: [PATCH wpan-next 3/5] mac802154: Only allow PAN controllers to process association requests
-Date: Tue, 28 Nov 2023 12:16:53 +0100
-Message-Id: <20231128111655.507479-4-miquel.raynal@bootlin.com>
+Subject: [PATCH wpan-next 4/5] ieee802154: Avoid confusing changes after associating
+Date: Tue, 28 Nov 2023 12:16:54 +0100
+Message-Id: <20231128111655.507479-5-miquel.raynal@bootlin.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20231128111655.507479-1-miquel.raynal@bootlin.com>
 References: <20231128111655.507479-1-miquel.raynal@bootlin.com>
@@ -48,34 +48,66 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-GND-Sasl: miquel.raynal@bootlin.com
 
-It is not very clear in the specification whether simple coordinators
-are allowed or not to answer to association requests themselves. As
-there is no synchronization mechanism, it is probably best to rely on
-the relay feature of these coordinators and avoid processing them in
-this case.
+Once associated with any device, we are part of a PAN (with a specific
+PAN ID), and we are expected to be present on a particular
+channel. Let's avoid confusing other devices by preventing any PAN
+ID/channel change once associated.
 
 Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
 ---
- net/mac802154/scan.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ net/ieee802154/nl802154.c | 30 ++++++++++++++++++------------
+ 1 file changed, 18 insertions(+), 12 deletions(-)
 
-diff --git a/net/mac802154/scan.c b/net/mac802154/scan.c
-index 5873da634fb4..1c0eeaa76560 100644
---- a/net/mac802154/scan.c
-+++ b/net/mac802154/scan.c
-@@ -781,6 +781,12 @@ int mac802154_process_association_req(struct ieee802154_sub_if_data *sdata,
- 		 unlikely(dest->short_addr != wpan_dev->short_addr))
- 		return -ENODEV;
+diff --git a/net/ieee802154/nl802154.c b/net/ieee802154/nl802154.c
+index e4d290d0e0a0..5c73b5fcadc0 100644
+--- a/net/ieee802154/nl802154.c
++++ b/net/ieee802154/nl802154.c
+@@ -1087,6 +1087,15 @@ static int nl802154_set_pan_id(struct sk_buff *skb, struct genl_info *info)
  
-+	if (wpan_dev->parent) {
-+		dev_dbg(&sdata->dev->dev,
-+			"Ignoring ASSOC REQ, not the PAN coordinator\n");
-+		return -ENODEV;
+ 	pan_id = nla_get_le16(info->attrs[NL802154_ATTR_PAN_ID]);
+ 
++	/* Only allow changing the PAN ID when the device has no more
++	 * associations ongoing to avoid confusing peers.
++	 */
++	if (cfg802154_device_is_associated(wpan_dev)) {
++		NL_SET_ERR_MSG(info->extack,
++			       "Existing associations, changing PAN ID forbidden");
++		return -EINVAL;
 +	}
 +
- 	mutex_lock(&wpan_dev->association_lock);
+ 	return rdev_set_pan_id(rdev, wpan_dev, pan_id);
+ }
  
- 	memcpy(&assoc_req_pl, skb->data, sizeof(assoc_req_pl));
+@@ -1113,20 +1122,17 @@ static int nl802154_set_short_addr(struct sk_buff *skb, struct genl_info *info)
+ 
+ 	short_addr = nla_get_le16(info->attrs[NL802154_ATTR_SHORT_ADDR]);
+ 
+-	/* TODO
+-	 * I am not sure about to check here on broadcast short_addr.
+-	 * Broadcast is a valid setting, comment from 802.15.4:
+-	 * A value of 0xfffe indicates that the device has
+-	 * associated but has not been allocated an address. A
+-	 * value of 0xffff indicates that the device does not
+-	 * have a short address.
+-	 *
+-	 * I think we should allow to set these settings but
+-	 * don't allow to allow socket communication with it.
++	/* The short address only has a meaning when part of a PAN, after a
++	 * proper association procedure. However, we want to still offer the
++	 * possibility to create static networks so changing the short address
++	 * is only allowed when not already associated to other devices with
++	 * the official handshake.
+ 	 */
+-	if (short_addr == cpu_to_le16(IEEE802154_ADDR_SHORT_UNSPEC) ||
+-	    short_addr == cpu_to_le16(IEEE802154_ADDR_SHORT_BROADCAST))
++	if (cfg802154_device_is_associated(wpan_dev)) {
++		NL_SET_ERR_MSG(info->extack,
++			       "Existing associations, changing short address forbidden");
+ 		return -EINVAL;
++	}
+ 
+ 	return rdev_set_short_addr(rdev, wpan_dev, short_addr);
+ }
 -- 
 2.34.1
 
