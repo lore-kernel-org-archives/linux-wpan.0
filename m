@@ -1,39 +1,53 @@
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="U9sSTkEo"
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::228])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F327D63
-	for <linux-wpan@vger.kernel.org>; Tue, 28 Nov 2023 03:29:50 -0800 (PST)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 2B0341BF20E;
-	Tue, 28 Nov 2023 11:29:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1701170988;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RzcGMClqwGuoiKTrbp1FVMovVQLOOnkL6gPOA4UUcnk=;
-	b=U9sSTkEo5HSJjRRB9eGC4I1rKX8cUfiwWKDTGPyeWYFU534G7Bsm/TeXJrdlhUcEeAr/wU
-	mN151E90s74Ajgdq53geNqDHyjMF7AiTn1e1TgoEBZZIL3f8kmGBG5lRDrO5VP1iOVjd3M
-	ZlP8+xGGL46+RP6Wzue2372TkqAIB21IDUp1TLZ73DhLNQPIRTcSs0MjUeUgdGH4Y/w1n8
-	EXwFDZ/KeUxt0CszDGag7IqajcoM7wDmM6pTsYxcFRYZLgZ9dumk2eBp3APVccPM7lr5Le
-	cI9Mw3wFsZ8ozw0i+wkD9IVUf/KEIJEWEqUa8fh0LAW+dbVy3kCEZNm0EB+QLA==
-From: Miquel Raynal <miquel.raynal@bootlin.com>
-To: Alexander Aring <alex.aring@gmail.com>,
-	Stefan Schmidt <stefan@datenfreihafen.org>,
-	linux-wpan@vger.kernel.org
-Cc: David Girault <david.girault@qorvo.com>,
-	Romuald Despres <romuald.despres@qorvo.com>,
-	Frederic Blain <frederic.blain@qorvo.com>,
-	Nicolas Schodet <nico@ni.fr.eu.org>,
-	Guilhem Imberton <guilhem.imberton@qorvo.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: [PATCH wpan-tools 2/2] iwpan: Add associations support
-Date: Tue, 28 Nov 2023 12:29:45 +0100
-Message-Id: <20231128112945.509331-3-miquel.raynal@bootlin.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231128112945.509331-1-miquel.raynal@bootlin.com>
-References: <20231128112945.509331-1-miquel.raynal@bootlin.com>
+	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="GUBi5Fha"
+X-Greylist: delayed 370 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sat, 02 Dec 2023 07:05:09 PST
+Received: from out203-205-221-173.mail.qq.com (out203-205-221-173.mail.qq.com [203.205.221.173])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DB8B102;
+	Sat,  2 Dec 2023 07:05:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
+	s=s201512; t=1701529506;
+	bh=+4tkXT2Y0ZJNldwcYbIGmHyE8OJNqApK4fyYv38niwQ=;
+	h=From:To:Cc:Subject:Date;
+	b=GUBi5Fha+OHP29KFzB+au403WHJ9kax2BT4WP5zoXnLxcl2y5HtsinAz7zmO3Mlpl
+	 2N9FKfFLzOoRrOqLYBM7dJuu3JRMQ0dUHnw5ZAT8PwLuyzVYq+/fmVOOrjdIk6dS16
+	 CEw0lqdTvyj4ZdxIdkqKHDkInu7QlJwdve63Dl7A=
+Received: from KernelDevBox.byted.org ([180.184.49.4])
+	by newxmesmtplogicsvrszb9-1.qq.com (NewEsmtp) with SMTP
+	id EB51FC1C; Sat, 02 Dec 2023 22:58:53 +0800
+X-QQ-mid: xmsmtpt1701529133tmz3ieq44
+Message-ID: <tencent_1C04CA8D66ADC45608D89687B4020B2A8706@qq.com>
+X-QQ-XMAILINFO: MIHMmFPOQW9Xwuxg219KDH2tOJ9xY5IPqVV5LYIize3GgkHCsQ7U0mx5nSYkzi
+	 yIo8eJVrtOHShJqG4/qHU1EVMvth1+D7N/gaQqZGlmOVGcrm65ydZ0TZ5CEOqsMZNl4b0wE31gpd
+	 T/YHSGDqME7yHtIGbpOYCP7mrr1X+Pc/FIv+BfMGGVb/5oxtpO25xQpcDEg6nodoibM1cIAxQjqE
+	 9kHxBDNIKtD0uXzv1vSdK67VEcf2xKYeW/uoeixXBMhm9cIhKEfAzp7jUUjZOcjw2KUTljWlC+yO
+	 n1HliH+0SUx1RupK8T2duLqSZyC8rpnjT1SPb6NQ7MsSERjoALEdZM6bQOUIVBfuiQyo7gKEZ9b3
+	 ZqCcdlEjfMTo/6DKMPtBdo8fZX4Q20XvC6zCBDfsOk1rNiMhGNKoUvICFqOF9AXvoJ/SgZ8yxg+B
+	 V3kUK2NEkf4TCGo1XjidMDuNDJt6fYQwaHgJIEKAna6Ulu9LFGeksKIovGsjm/ET3zMOZHjZuYuX
+	 HtPJhapVtj4iDe898/wGNEDRTmE21fL28xUamfGY8ZsCy2/7IzwaJ349haBZbh68Jt0ZVjjA+ZaD
+	 OVYipUnHFHNvLVJU96SFnbRwikfUk6avPWCWcXtS67DkgeNmkEyFHt7C1S+qRuHHTIA4fn+MFv4F
+	 AQjij1XUOgCT6XolUo8Stnin1tQV9WTb5WGtC+HKAjYU+OUPSNn/M6cD4TO4yur3XUBWD1HkKqBm
+	 jZSZDxhpUTjbh2FEJjxG9lAlrKUhhuZeYK6VstgIkpAosSyNlm4eAXIlxdzWqfMFPtjy5IzfO8q7
+	 8kLvmB2QwEJMQmlNtaNHFiUlV2uqAXknI03ZhSbS/EuLuYsPmiK9H8ExMNwjC3yWcSNFp+nO+Fm8
+	 lhlxgf6d0nP3+W9tSfQB5YejFyxZGhOzISSk2O7rkuNX/IST8Kw6VBbLHmJ4XIGYaDBElC+Gjrgf
+	 nJUC9nxrxBMORxrZ6axc/5EjFLTDsUBKBRKceBKvfOIUX3Cp+jCOq+KrA7r80a
+X-QQ-XMRINFO: NI4Ajvh11aEj8Xl/2s1/T8w=
+From: Zhang Shurong <zhang_shurong@foxmail.com>
+To: alex.aring@gmail.com
+Cc: stefan@datenfreihafen.org,
+	miquel.raynal@bootlin.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-wpan@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	harperchen1110@gmail.com,
+	Zhang Shurong <zhang_shurong@foxmail.com>
+Subject: [PATCH RESEND] mac802154: Fix uninit-value access in ieee802154_hdr_push_sechdr
+Date: Sat,  2 Dec 2023 22:58:52 +0800
+X-OQ-MSGID: <20231202145852.505410-1-zhang_shurong@foxmail.com>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
@@ -41,227 +55,59 @@ List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-GND-Sasl: miquel.raynal@bootlin.com
 
-Show how to interact with the kernel to request an
-association/disassociation or listing the associated devices.
+The syzkaller reported an issue:
 
-Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
+BUG: KMSAN: uninit-value in ieee802154_hdr_push_sechdr net/ieee802154/header_ops.c:54 [inline]
+BUG: KMSAN: uninit-value in ieee802154_hdr_push+0x971/0xb90 net/ieee802154/header_ops.c:108
+ ieee802154_hdr_push_sechdr net/ieee802154/header_ops.c:54 [inline]
+ ieee802154_hdr_push+0x971/0xb90 net/ieee802154/header_ops.c:108
+ ieee802154_header_create+0x9c0/0xc00 net/mac802154/iface.c:396
+ wpan_dev_hard_header include/net/cfg802154.h:494 [inline]
+ dgram_sendmsg+0xd1d/0x1500 net/ieee802154/socket.c:677
+ ieee802154_sock_sendmsg+0x91/0xc0 net/ieee802154/socket.c:96
+ sock_sendmsg_nosec net/socket.c:725 [inline]
+ sock_sendmsg net/socket.c:748 [inline]
+ ____sys_sendmsg+0x9c2/0xd60 net/socket.c:2494
+ ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2548
+ __sys_sendmsg+0x225/0x3c0 net/socket.c:2577
+ __compat_sys_sendmsg net/compat.c:346 [inline]
+ __do_compat_sys_sendmsg net/compat.c:353 [inline]
+ __se_compat_sys_sendmsg net/compat.c:350 [inline]
+
+We found hdr->key_id_mode is uninitialized in mac802154_set_header_security()
+which indicates hdr.fc.security_enabled should be 0. However, it is set to be cb->secen before.
+Later, ieee802154_hdr_push_sechdr is invoked, causing KMSAN complains uninit-value issue.
+Since mac802154_set_header_security() sets hdr.fc.security_enabled based on the variables
+ieee802154_sub_if_data *sdata and ieee802154_mac_cb *cb in a collaborative manner.
+Therefore, we should not set security_enabled prior to mac802154_set_header_security().
+
+Fixed it by removing the line that sets the hdr.fc.security_enabled.
+
+Syzkaller don't provide repro, and I provide a syz repro like:
+r0 = syz_init_net_socket$802154_dgram(0x24, 0x2, 0x0)
+setsockopt$WPAN_SECURITY(r0, 0x0, 0x1, &(0x7f0000000000)=0x2, 0x4)
+setsockopt$WPAN_SECURITY(r0, 0x0, 0x1, &(0x7f0000000080), 0x4)
+sendmsg$802154_dgram(r0, &(0x7f0000000100)={&(0x7f0000000040)={0x24, @short}, 0x14, &(0x7f00000000c0)={0x0}}, 0x0)
+
+Fixes: 32edc40ae65c ("ieee802154: change _cb handling slightly")
+Signed-off-by: Zhang Shurong <zhang_shurong@foxmail.com>
 ---
- src/info.c |   4 ++
- src/mac.c  | 187 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 191 insertions(+)
+ net/mac802154/iface.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/src/info.c b/src/info.c
-index 8b7e98e..1386624 100644
---- a/src/info.c
-+++ b/src/info.c
-@@ -217,6 +217,10 @@ static const char *commands[NL802154_CMD_MAX + 1] = {
- 	[NL802154_CMD_SET_MAX_CSMA_BACKOFFS] = "set_max_csma_backoffs",
- 	[NL802154_CMD_SET_LBT_MODE] = "set_lbt_mode",
- 	[NL802154_CMD_SET_ACKREQ_DEFAULT] = "set_ackreq_default",
-+	[NL802154_CMD_LIST_ASSOCIATIONS] = "list_associations",
-+	[NL802154_CMD_SET_MAX_ASSOCIATIONS] = "set_max_associations",
-+	[NL802154_CMD_ASSOCIATE] = "associate",
-+	[NL802154_CMD_DISASSOCIATE] = "disassociate",
- };
+diff --git a/net/mac802154/iface.c b/net/mac802154/iface.c
+index c0e2da5072be..c99b6e40a5db 100644
+--- a/net/mac802154/iface.c
++++ b/net/mac802154/iface.c
+@@ -368,7 +368,6 @@ static int ieee802154_header_create(struct sk_buff *skb,
  
- static char cmdbuf[100];
-diff --git a/src/mac.c b/src/mac.c
-index 79b3ab9..48f6be4 100644
---- a/src/mac.c
-+++ b/src/mac.c
-@@ -238,3 +238,190 @@ nla_put_failure:
- COMMAND(set, ackreq_default, "<1|0>",
- 	NL802154_CMD_SET_ACKREQ_DEFAULT, 0, CIB_NETDEV, handle_ackreq_default,
- 	NULL);
-+
-+static int handle_set_max_associations(struct nl802154_state *state,
-+				      struct nl_cb *cb,
-+				      struct nl_msg *msg,
-+				      int argc, char **argv,
-+				      enum id_input id)
-+{
-+	unsigned long max_associations;
-+	char *end;
-+
-+	if (argc < 1)
-+		return 1;
-+
-+	/* Maximum number of PAN entries */
-+	max_associations = strtoul(argv[0], &end, 0);
-+	if (*end != '\0')
-+		return 1;
-+
-+	NLA_PUT_U32(msg, NL802154_ATTR_MAX_ASSOCIATIONS, max_associations);
-+
-+	return 0;
-+
-+nla_put_failure:
-+	return -ENOBUFS;
-+}
-+COMMAND(set, max_associations, "<max_associations>",
-+	NL802154_CMD_SET_MAX_ASSOCIATIONS, 0, CIB_NETDEV,
-+	handle_set_max_associations, NULL);
-+
-+int parse_associated_devices(struct nlattr *nestedassoc)
-+{
-+	struct nlattr *assoc[NL802154_DEV_ADDR_ATTR_MAX + 1];
-+	static struct nla_policy assoc_policy[NL802154_DEV_ADDR_ATTR_MAX + 1] = {
-+		[NL802154_DEV_ADDR_ATTR_PEER_TYPE] = { .type = NLA_U8, },
-+		[NL802154_DEV_ADDR_ATTR_MODE] = { .type = NLA_U8, },
-+		[NL802154_DEV_ADDR_ATTR_SHORT] = { .type = NLA_U16, },
-+		[NL802154_DEV_ADDR_ATTR_EXTENDED] = { .type = NLA_U64, },
-+	};
-+	bool short_addressing;
-+	uint8_t peer_type;
-+	int ret;
-+
-+	ret = nla_parse_nested(assoc, NL802154_DEV_ADDR_ATTR_MAX, nestedassoc,
-+			       assoc_policy);
-+	if (ret < 0) {
-+		fprintf(stderr, "failed to parse nested attributes! (ret = %d)\n",
-+			ret);
-+		return NL_SKIP;
-+	}
-+
-+	if (!assoc[NL802154_DEV_ADDR_ATTR_PEER_TYPE] ||
-+	    !assoc[NL802154_DEV_ADDR_ATTR_SHORT] ||
-+	    !assoc[NL802154_DEV_ADDR_ATTR_EXTENDED])
-+		return NL_SKIP;
-+
-+	peer_type = nla_get_u8(assoc[NL802154_DEV_ADDR_ATTR_PEER_TYPE]);
-+	printf("%s: 0x%04x / 0x%016llx\n",
-+	       peer_type == NL802154_PEER_TYPE_PARENT ? "parent" : "child ",
-+	       nla_get_u16(assoc[NL802154_DEV_ADDR_ATTR_SHORT]),
-+	       nla_get_u64(assoc[NL802154_DEV_ADDR_ATTR_EXTENDED]));
-+
-+	return NL_OK;
-+}
-+
-+static int print_association_list_handler(struct nl_msg *msg, void *arg)
-+{
-+	struct genlmsghdr *gnlh = nlmsg_data(nlmsg_hdr(msg));
-+	struct nlattr *tb[NL802154_ATTR_MAX + 1];
-+	struct nlattr *nestedassoc;
-+
-+	nla_parse(tb, NL802154_ATTR_MAX, genlmsg_attrdata(gnlh, 0),
-+		  genlmsg_attrlen(gnlh, 0), NULL);
-+	nestedassoc = tb[NL802154_ATTR_PEER];
-+	if (!nestedassoc) {
-+		fprintf(stderr, "peer info missing!\n");
-+		return NL_SKIP;
-+	}
-+	return parse_associated_devices(nestedassoc);
-+}
-+
-+static int list_associations_handler(struct nl802154_state *state,
-+				     struct nl_cb *cb,
-+				     struct nl_msg *msg,
-+				     int argc, char **argv,
-+				     enum id_input id)
-+{
-+	nl_cb_set(cb, NL_CB_VALID, NL_CB_CUSTOM, print_association_list_handler, NULL);
-+
-+	return 0;
-+}
-+TOPLEVEL(list_associations, NULL, NL802154_CMD_LIST_ASSOCIATIONS,
-+	NLM_F_DUMP, CIB_NETDEV,	list_associations_handler,
-+	"List the associated devices on this virtual interface");
-+
-+static int associate_handler(struct nl802154_state *state,
-+			     struct nl_cb *cb,
-+			     struct nl_msg *msg,
-+			     int argc, char **argv,
-+			     enum id_input id)
-+{
-+	unsigned int pan_id;
-+	uint64_t laddr = 0;
-+	char *end;
-+	int tpset;
-+
-+	if (argc < 4)
-+		return 1;
-+
-+	/* PAN ID */
-+	if (strcmp(argv[0], "pan_id"))
-+		return 1;
-+
-+	pan_id = strtoul(argv[1], &end, 0);
-+	if (*end != '\0')
-+		return 1;
-+
-+	if (pan_id > UINT16_MAX)
-+		return 1;
-+
-+	argc -= 2;
-+	argv += 2;
-+
-+	/* Coordinator */
-+	if (strcmp(argv[0], "coord"))
-+		return 1;
-+
-+	laddr = strtoull(argv[1], &end, 0);
-+	if (*end != '\0')
-+		return 1;
-+
-+	NLA_PUT_U16(msg, NL802154_ATTR_PAN_ID, htole16(pan_id));
-+	NLA_PUT_U64(msg, NL802154_ATTR_EXTENDED_ADDR, htole64(laddr));
-+
-+	return 0;
-+
-+nla_put_failure:
-+	return -ENOBUFS;
-+}
-+TOPLEVEL(associate, "pan_id <pan_id> coord <coord>", NL802154_CMD_ASSOCIATE, 0,
-+	 CIB_NETDEV, associate_handler,
-+	 "Join a PAN by sending an association request to the given coordinator");
-+
-+static int disassociate_handler(struct nl802154_state *state,
-+				struct nl_cb *cb,
-+				struct nl_msg *msg,
-+				int argc, char **argv,
-+				enum id_input id)
-+{
-+	bool use_extended_addressing;
-+	uint64_t laddr;
-+	unsigned int saddr;
-+	char *end;
-+	int tpset;
-+
-+	if (argc < 2)
-+		return 1;
-+
-+	if (!strcmp(argv[0], "ext_addr")) {
-+		use_extended_addressing = true;
-+		laddr = strtoull(argv[1], &end, 0);
-+		if (*end != '\0')
-+			return 1;
-+	} else if (!strcmp(argv[0], "short_addr")) {
-+		use_extended_addressing = false;
-+		saddr = strtoul(argv[1], &end, 0);
-+		if (*end != '\0')
-+			return 1;
-+
-+		if (saddr > UINT16_MAX - 2)
-+			return 1;
-+	} else {
-+		return 1;
-+	}
-+
-+	if (use_extended_addressing)
-+		NLA_PUT_U64(msg, NL802154_ATTR_EXTENDED_ADDR, htole64(laddr));
-+	else
-+		NLA_PUT_U16(msg, NL802154_ATTR_SHORT_ADDR, htole16(saddr));
-+
-+	return 0;
-+
-+nla_put_failure:
-+	return -ENOBUFS;
-+}
-+TOPLEVEL(disassociate, "short_addr|ext_addr <addr>", NL802154_CMD_DISASSOCIATE,
-+	 0, CIB_NETDEV, disassociate_handler,
-+	 "Send a disassociation notification to a device");
+ 	memset(&hdr.fc, 0, sizeof(hdr.fc));
+ 	hdr.fc.type = cb->type;
+-	hdr.fc.security_enabled = cb->secen;
+ 	hdr.fc.ack_request = cb->ackreq;
+ 	hdr.seq = atomic_inc_return(&dev->ieee802154_ptr->dsn) & 0xFF;
+ 
 -- 
-2.34.1
+2.30.2
 
