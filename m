@@ -1,56 +1,49 @@
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91502D2
-	for <linux-wpan@vger.kernel.org>; Mon,  4 Dec 2023 10:32:24 -0800 (PST)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ukl@pengutronix.de>)
-	id 1rADj4-00038w-0z; Mon, 04 Dec 2023 19:31:26 +0100
-Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ukl@pengutronix.de>)
-	id 1rADj1-00DZmP-KD; Mon, 04 Dec 2023 19:31:23 +0100
-Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
-	(envelope-from <ukl@pengutronix.de>)
-	id 1rADj1-00EE78-9y; Mon, 04 Dec 2023 19:31:23 +0100
-From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Alex Elder <elder@kernel.org>,
-	netdev@vger.kernel.org,
-	kernel@pengutronix.de,
-	Marc Kleine-Budde <mkl@pengutronix.de>,
-	Nick Child <nnac123@linux.ibm.com>,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	=?utf-8?b?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	linux-renesas-soc@vger.kernel.org,
-	Zhao Qiang <qiang.zhao@nxp.com>,
-	linuxppc-dev@lists.ozlabs.org,
-	Linus Walleij <linusw@kernel.org>,
-	Imre Kaloz <kaloz@openwrt.org>,
-	linux-arm-kernel@lists.infradead.org,
-	Stephan Gerhold <stephan@gerhold.net>,
-	Andy Gross <agross@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Loic Poulain <loic.poulain@linaro.org>,
-	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	linux-arm-msm@vger.kernel.org,
-	Alexander Aring <alex.aring@gmail.com>,
-	Stefan Schmidt <stefan@datenfreihafen.org>,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	linux-wpan@vger.kernel.org
-Subject: [PATCH net-next v2 0/9] net*: Convert to platform remove callback returning void
-Date: Mon,  4 Dec 2023 19:30:40 +0100
-Message-ID: <cover.1701713943.git.u.kleine-koenig@pengutronix.de>
-X-Mailer: git-send-email 2.42.0
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="HzwMXPNm"
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::226])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9D20FF;
+	Mon,  4 Dec 2023 22:51:21 -0800 (PST)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 6524CC0006;
+	Tue,  5 Dec 2023 06:51:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1701759080;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HmV/ix9amwJ7r86i5eKjinKKZ2rsJiuszC6Rdqdxvkc=;
+	b=HzwMXPNmz6whc7Lpk85Qn6zY/OATY25BeMWTJQcAXyjnM7VJJ2VXeAX+YWpdVRQT5Vur3R
+	QhFZ7m94EhMmFpc68Pu+TvXUbkN3AaCfoqMJ0YM3jNWfTv11ZKeKS7C84B6FNIcMZ89Qdd
+	f89dxnTRE9h3fG5NI+WkwypaPQVKVGnFiIr48c7zyn6ybn2r/QuBMHWvDYFzi6znO8Y3qN
+	XPXYuxTqDh3Xqrxv3JjU1Am74IpMqk2rwYgmjR25xwAIZbpmMtvveNvFwlEljiCzPDcsKq
+	xIkKhTMqxIgnw5KCI9gpuOxkCqGDN40qtrKms0AhQXax6Bc4/UCoa1hw6m14cg==
+Date: Tue, 5 Dec 2023 07:51:10 +0100
+From: Miquel Raynal <miquel.raynal@bootlin.com>
+To: Uwe =?UTF-8?B?S2xlaW5lLUvDtm5pZw==?= <u.kleine-koenig@pengutronix.de>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Alex Elder <elder@kernel.org>, netdev@vger.kernel.org,
+ kernel@pengutronix.de, Marc Kleine-Budde <mkl@pengutronix.de>, Nick Child
+ <nnac123@linux.ibm.com>, Christian Marangi <ansuelsmth@gmail.com>,
+ =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>, Andrew Lunn
+ <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, linux-renesas-soc@vger.kernel.org, Zhao Qiang
+ <qiang.zhao@nxp.com>, linuxppc-dev@lists.ozlabs.org, Linus Walleij
+ <linusw@kernel.org>, Imre Kaloz <kaloz@openwrt.org>,
+ linux-arm-kernel@lists.infradead.org, Stephan Gerhold
+ <stephan@gerhold.net>, Andy Gross <agross@kernel.org>, Bjorn Andersson
+ <andersson@kernel.org>, Konrad Dybcio <konrad.dybcio@linaro.org>, Loic
+ Poulain <loic.poulain@linaro.org>, Sergey Ryazanov
+ <ryazanov.s.a@gmail.com>, Johannes Berg <johannes@sipsolutions.net>,
+ linux-arm-msm@vger.kernel.org, Alexander Aring <alex.aring@gmail.com>,
+ Stefan Schmidt <stefan@datenfreihafen.org>, linux-wpan@vger.kernel.org
+Subject: Re: [PATCH net-next v2 0/9] net*: Convert to platform remove
+ callback returning void
+Message-ID: <20231205075110.795b88d2@xps-13>
+In-Reply-To: <cover.1701713943.git.u.kleine-koenig@pengutronix.de>
+References: <cover.1701713943.git.u.kleine-koenig@pengutronix.de>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
@@ -58,56 +51,44 @@ List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1746; i=u.kleine-koenig@pengutronix.de; h=from:subject:message-id; bh=OVvQ8uYjxLMYTaZSJq1OCfRdtPS4cvgLm8vM3BejMRM=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBlbhrRA9QNL9A6/+EC/b+KUL8ByuRJhbrVgnSOG 4TWQn68YNaJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZW4a0QAKCRCPgPtYfRL+ TjVDB/0eG4VYbw9drfz2A1JiSQIiH+SED39TRg3MQbSa1i7JvhthEdJz3RsgmHJGxuIbvTEaf+G pE3/IiK/WYsAVNlWURx8F58h1MaKSgcCxB6UkK3F13nFcsSdkYViabIu/cyHooy2wVyyCDL31/D kmn9dtqyNwosyXWaN7VXQpLtM+q3Smw5Tl9HVpWdfAenzfShrzn6h5h1vT6pkXsWjucByaEjmjO Ep/nxUhk6mkRawEkvZ2rMZ7/IgkiQ/KfWaIVwkGYHngmAUDeMcuHd3+70YIw50qlOokbuV/k5yW CVge3kM7/CpnqYDmiBU/n7A3crLTVVTN0roUGmeLUQIG0uxJ
-X-Developer-Key: i=u.kleine-koenig@pengutronix.de; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ukl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-wpan@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: miquel.raynal@bootlin.com
 
-Hello,
+Hi Uwe,
 
-(implicit) v1 of this series can be found at
-https://lore.kernel.org/netdev/20231117095922.876489-1-u.kleine-koenig@pengutronix.de.
-Changes since then:
+u.kleine-koenig@pengutronix.de wrote on Mon,  4 Dec 2023 19:30:40 +0100:
 
- - Dropped patch #1 as Alex objected. Patch #1 (was #2 before) now
-   converts ipa to remove_new() and introduces an error message in the
-   error path that failed before.
+> Hello,
+>=20
+> (implicit) v1 of this series can be found at
+> https://lore.kernel.org/netdev/20231117095922.876489-1-u.kleine-koenig@pe=
+ngutronix.de.
+> Changes since then:
+>=20
+>  - Dropped patch #1 as Alex objected. Patch #1 (was #2 before) now
+>    converts ipa to remove_new() and introduces an error message in the
+>    error path that failed before.
+>=20
+>  - Rebased to today's next
+>=20
+>  - Add the tags received in the previous round.
+>=20
+> Uwe Kleine-K=C3=B6nig (9):
+>   net: ipa: Convert to platform remove callback returning void
+>   net: fjes: Convert to platform remove callback returning void
+>   net: pcs: rzn1-miic: Convert to platform remove callback returning
+>     void
+>   net: sfp: Convert to platform remove callback returning void
+>   net: wan/fsl_ucc_hdlc: Convert to platform remove callback returning
+>     void
+>   net: wan/ixp4xx_hss: Convert to platform remove callback returning
+>     void
+>   net: wwan: qcom_bam_dmux: Convert to platform remove callback
+>     returning void
+>   ieee802154: fakelb: Convert to platform remove callback returning void
+>   ieee802154: hwsim: Convert to platform remove callback returning void
 
- - Rebased to today's next
+FYI, I plan on taking patches 8 and 9 through wpan-next.
 
- - Add the tags received in the previous round.
-
-Uwe Kleine-König (9):
-  net: ipa: Convert to platform remove callback returning void
-  net: fjes: Convert to platform remove callback returning void
-  net: pcs: rzn1-miic: Convert to platform remove callback returning
-    void
-  net: sfp: Convert to platform remove callback returning void
-  net: wan/fsl_ucc_hdlc: Convert to platform remove callback returning
-    void
-  net: wan/ixp4xx_hss: Convert to platform remove callback returning
-    void
-  net: wwan: qcom_bam_dmux: Convert to platform remove callback
-    returning void
-  ieee802154: fakelb: Convert to platform remove callback returning void
-  ieee802154: hwsim: Convert to platform remove callback returning void
-
- drivers/net/fjes/fjes_main.c             |  6 ++---
- drivers/net/ieee802154/fakelb.c          |  5 ++--
- drivers/net/ieee802154/mac802154_hwsim.c |  6 ++---
- drivers/net/ipa/ipa_main.c               | 29 +++++++++++-------------
- drivers/net/pcs/pcs-rzn1-miic.c          |  6 ++---
- drivers/net/phy/sfp.c                    |  6 ++---
- drivers/net/wan/fsl_ucc_hdlc.c           |  6 ++---
- drivers/net/wan/ixp4xx_hss.c             |  5 ++--
- drivers/net/wwan/qcom_bam_dmux.c         |  6 ++---
- 9 files changed, 29 insertions(+), 46 deletions(-)
-
-
-base-commit: 629a3b49f3f957e975253c54846090b8d5ed2e9b
--- 
-2.42.0
-
+Thanks,
+Miqu=C3=A8l
