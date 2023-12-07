@@ -1,97 +1,72 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3EB9D52D;
-	Wed,  6 Dec 2023 04:00:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZYE/lnhN"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 4EAC3C433C7;
-	Wed,  6 Dec 2023 04:00:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1701835226;
-	bh=Ch1hvqB7GoU/Da3vC7CIzaXtBMwgu6lLK49eDRsfEOE=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ZYE/lnhNZ3fA7P/wA+eB9LFbhPHXs3kAIOnr+YOv9rCZ7ppJ3BYKlspx+veJIu9IR
-	 1tlRQS64na1gSBNEEIFPG9UqDgeWg3Pzkh7R/92HmqN1NPxi17zWLTaO9Y61cgTzXF
-	 ImL8dzW3qa2OpjM0VveLuVfHJ74VtOrtCgufpD1OwFK9ndVEF0GNaKnIrnG6pqU5R5
-	 Jbz4BGfJON0+RNpKFFJFdJBwzRVA0W5LIzCXZ1yCu+rM2YNdydCpYqGZxpJ9duTFKY
-	 pxXFLizsaqjyP1mldslbUD4XscngoE7J7MOFl2QNIYfkK+YxeNha9XX74dRmWfsoLm
-	 C1zuuBh2FM9WQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 30028C41671;
-	Wed,  6 Dec 2023 04:00:26 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (2048-bit key) header.d=datenfreihafen.org header.i=@datenfreihafen.org header.b="WF5eaCD6"
+Received: from proxima.lasnet.de (proxima.lasnet.de [78.47.171.185])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6390C1713;
+	Thu,  7 Dec 2023 12:28:03 -0800 (PST)
+Received: from [IPV6:2003:e9:d746:9cf9:ea55:93e0:2b2c:f5b6] (p200300e9d7469cf9ea5593e02b2cf5b6.dip0.t-ipconnect.de [IPv6:2003:e9:d746:9cf9:ea55:93e0:2b2c:f5b6])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: stefan@datenfreihafen.org)
+	by proxima.lasnet.de (Postfix) with ESMTPSA id 2CD58C084A;
+	Thu,  7 Dec 2023 21:28:00 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
+	s=2021; t=1701980880;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=knbgzvbIyj1cmWisBX7JA49IkOd+jI1IhNDx7hQJRXw=;
+	b=WF5eaCD6TQKYAoG3ujF3p1lYGjqmYh6ZHW67phLCTPVxcnubR+KnTCnYSqS0znlejinwF9
+	8FBkErzVSdnWYHrYelYNnN9L/jiVo3vjGFN2FyjHcylzdqqRcGQaUN7VAirYwblb5c89/N
+	UjBOkVQ+SANmiQ8E4RMXEEneywL8Oqt5QPoSs91SsafKQkLaXmrjLpPJeb01Tdd3ffpWOe
+	KT/HBydmZBskhIt8BPuaAuOBYCdhFK6XD+ZgW9RBhkjSDPTEQ1BMtI6JY+iX/89Sv1bZKW
+	Sxy8m8g66wFaX1ZL9UL97qexz5+U/Z7gMwmGr5OTqMjtwHl3/hhOIxfkAx0gxQ==
+Message-ID: <51de3b76-78cf-5ee4-ec31-6cf368b584b7@datenfreihafen.org>
+Date: Thu, 7 Dec 2023 21:27:59 +0100
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 0/9] net*: Convert to platform remove callback
- returning void
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170183522618.32207.8967841669098706210.git-patchwork-notify@kernel.org>
-Date: Wed, 06 Dec 2023 04:00:26 +0000
-References: <cover.1701713943.git.u.kleine-koenig@pengutronix.de>
-In-Reply-To: <cover.1701713943.git.u.kleine-koenig@pengutronix.de>
-To: =?utf-8?q?Uwe_Kleine-K=C3=B6nig_=3Cu=2Ekleine-koenig=40pengutronix=2Ede=3E?=@ci.codeaurora.org
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, elder@kernel.org, netdev@vger.kernel.org,
- kernel@pengutronix.de, mkl@pengutronix.de, nnac123@linux.ibm.com,
- ansuelsmth@gmail.com, clement.leger@bootlin.com, andrew@lunn.ch,
- hkallweit1@gmail.com, linux@armlinux.org.uk,
- linux-renesas-soc@vger.kernel.org, qiang.zhao@nxp.com,
- linuxppc-dev@lists.ozlabs.org, linusw@kernel.org, kaloz@openwrt.org,
- linux-arm-kernel@lists.infradead.org, stephan@gerhold.net, agross@kernel.org,
- andersson@kernel.org, konrad.dybcio@linaro.org, loic.poulain@linaro.org,
- ryazanov.s.a@gmail.com, johannes@sipsolutions.net,
- linux-arm-msm@vger.kernel.org, alex.aring@gmail.com,
- stefan@datenfreihafen.org, miquel.raynal@bootlin.com,
- linux-wpan@vger.kernel.org
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH wpan-next v5 01/11] ieee802154: Let PAN IDs be reset
+Content-Language: en-US
+To: Miquel Raynal <miquel.raynal@bootlin.com>,
+ Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
+ David Girault <david.girault@qorvo.com>,
+ Romuald Despres <romuald.despres@qorvo.com>,
+ Frederic Blain <frederic.blain@qorvo.com>,
+ Nicolas Schodet <nico@ni.fr.eu.org>,
+ Guilhem Imberton <guilhem.imberton@qorvo.com>,
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+References: <20231120110100.3808292-1-miquel.raynal@bootlin.com>
+From: Stefan Schmidt <stefan@datenfreihafen.org>
+In-Reply-To: <20231120110100.3808292-1-miquel.raynal@bootlin.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hello:
+Hello Miquel,
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon,  4 Dec 2023 19:30:40 +0100 you wrote:
-> Hello,
+On 20.11.23 12:01, Miquel Raynal wrote:
+> On Wed, 2023-09-27 at 18:12:04 UTC, Miquel Raynal wrote:
+>> Soon association and disassociation will be implemented, which will
+>> require to be able to either change the PAN ID from 0xFFFF to a real
+>> value when association succeeded, or to reset the PAN ID to 0xFFFF upon
+>> disassociation. Let's allow to do that manually for now.
+>>
+>> Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
 > 
-> (implicit) v1 of this series can be found at
-> https://lore.kernel.org/netdev/20231117095922.876489-1-u.kleine-koenig@pengutronix.de.
-> Changes since then:
-> 
->  - Dropped patch #1 as Alex objected. Patch #1 (was #2 before) now
->    converts ipa to remove_new() and introduces an error message in the
->    error path that failed before.
-> 
-> [...]
+> Applied to https://git.kernel.org/pub/scm/linux/kernel/git/wpan/wpan-next.git staging.
 
-Here is the summary with links:
-  - [net-next,v2,1/9] net: ipa: Convert to platform remove callback returning void
-    https://git.kernel.org/netdev/net-next/c/a92dbb9cdf04
-  - [net-next,v2,2/9] net: fjes: Convert to platform remove callback returning void
-    https://git.kernel.org/netdev/net-next/c/2ce19934a4dc
-  - [net-next,v2,3/9] net: pcs: rzn1-miic: Convert to platform remove callback returning void
-    https://git.kernel.org/netdev/net-next/c/e36dc85c245f
-  - [net-next,v2,4/9] net: sfp: Convert to platform remove callback returning void
-    https://git.kernel.org/netdev/net-next/c/bb1afee98466
-  - [net-next,v2,5/9] net: wan/fsl_ucc_hdlc: Convert to platform remove callback returning void
-    https://git.kernel.org/netdev/net-next/c/2d0c06fd39be
-  - [net-next,v2,6/9] net: wan/ixp4xx_hss: Convert to platform remove callback returning void
-    https://git.kernel.org/netdev/net-next/c/2d8590858753
-  - [net-next,v2,7/9] net: wwan: qcom_bam_dmux: Convert to platform remove callback returning void
-    https://git.kernel.org/netdev/net-next/c/a06041e2f4ae
-  - [net-next,v2,8/9] ieee802154: fakelb: Convert to platform remove callback returning void
-    (no matching commit)
-  - [net-next,v2,9/9] ieee802154: hwsim: Convert to platform remove callback returning void
-    (no matching commit)
+I can't see this, or any other patch from the series, in the staging 
+branch. Did you forget to push this out to kernel.org?
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+regards
+Stefan Schmidt
