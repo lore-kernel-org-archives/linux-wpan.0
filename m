@@ -1,133 +1,125 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5C3F3FE6
-	for <linux-wpan@vger.kernel.org>; Fri, 15 Dec 2023 02:46:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7170353A0
+	for <linux-wpan@vger.kernel.org>; Fri, 15 Dec 2023 03:01:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jBii8/Yn"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RMGTTjPR"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1702608380;
+	s=mimecast20190719; t=1702609285;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=I6MvzYJ+Tuc25iOuYxEw7osTduMdwqYG2WLkbzsMfI8=;
-	b=jBii8/YnRZRGnoju8/UzNkl3xsUYUnrXucswtbYlaHYEoyU+t24VKqitM8tLH8KoiZdNjg
-	gwFaAxNZZ4uweDsIWEOFnXCFMGfmH45z+D2KVikEv+7otc0rBsL2V65mG5Rd2yGMY9k9ML
-	w9lgaiuiuemlqw9hpzJb9ubF9T5OOkQ=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=7rdlNcO/JWYksYB1jcKo0fPtS6Vss5TqjF5nT+vHiAA=;
+	b=RMGTTjPRvbd8xCh/opLheOmDgnPnInotHHwEdScWdfNlhbNVHtD9KuRbE9+yffSQzaZJAR
+	/EE++//Md7fSXnXEjq31WqYpKKg/4mIU/+1Ml7w3ExxTSCjLRKTq/dP9luU5Yt71ZLTXAc
+	vBpUgLd9So+gRvOPXnF3d3vj2SMkyZ0=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-471-5RBmFcRHMsGUxKQhx0WGKA-1; Thu, 14 Dec 2023 21:46:19 -0500
-X-MC-Unique: 5RBmFcRHMsGUxKQhx0WGKA-1
-Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-55239b77a2dso186577a12.1
-        for <linux-wpan@vger.kernel.org>; Thu, 14 Dec 2023 18:46:18 -0800 (PST)
+ us-mta-601-WZaYDc0DPBSbVJhKwiy8-g-1; Thu, 14 Dec 2023 22:01:23 -0500
+X-MC-Unique: WZaYDc0DPBSbVJhKwiy8-g-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-40c49cb08fcso1345725e9.2
+        for <linux-wpan@vger.kernel.org>; Thu, 14 Dec 2023 19:01:23 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702608378; x=1703213178;
+        d=1e100.net; s=20230601; t=1702609282; x=1703214082;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=I6MvzYJ+Tuc25iOuYxEw7osTduMdwqYG2WLkbzsMfI8=;
-        b=HdoXy6vufWmegs82r0lbqhWtt6VHMxVtOAIUIkCsxPvNz8HzJ8Q+KFOQzWi7FlVVY+
-         eBn2o+hwNH7kHrKEJx+hIsnkZDpfJGRrSmEfueL4gYFcGmNJS7u7rlvQr7q7OSirJMjZ
-         35RBFgto699kEBRHbhI8wrMYUv6jYdkLR2rkprWkMYIALONgZ80M7x9xHCatfwacHf06
-         TTEC/Yryg2EGKlO1zObHMGfX9kEFn2eUvLNjDwHdJM9Jm/Yv2xBJRKRiqrj2iPl7q59X
-         99ZQtz025l2KdU6JV8ZE1oqcxg+lFq24wybWeDcEqcnvtNQk7RS9vPmOOrvNjRhCz6/q
-         mkew==
-X-Gm-Message-State: AOJu0Yx8oSQOkrsSFAID0kxiAB3ojXa1OUMLstJgj2raKYB5iCkk9Tg/
-	RzffSkUi0Btd2+oNVw3OdExKW3tFRkp7fOF4PqBodUBSxi2tkMIuj6Rxj0WHJSLYwFnX1szIUd0
-	nptADF9oUfQxrO2J4REhpydnD0CB9N1YOCC9Dyg==
-X-Received: by 2002:a50:ccc1:0:b0:552:1317:20c9 with SMTP id b1-20020a50ccc1000000b00552131720c9mr3410093edj.6.1702608377936;
-        Thu, 14 Dec 2023 18:46:17 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEgkai9nX9g/iyGVSVklLMquI+ZTR0oK7PxeFT8KOSnBE/feZxtGHFWvqOUajCR0D6jlJ6VUtqmexSbolbImMc=
-X-Received: by 2002:a50:ccc1:0:b0:552:1317:20c9 with SMTP id
- b1-20020a50ccc1000000b00552131720c9mr3410079edj.6.1702608377631; Thu, 14 Dec
- 2023 18:46:17 -0800 (PST)
+        bh=7rdlNcO/JWYksYB1jcKo0fPtS6Vss5TqjF5nT+vHiAA=;
+        b=kr5Yj5Mrcq5n1SIH/v+RRuRPRABB8fsQI+hkzOZ0X/Zo/yHijDRjC8nE6ArB28qBh0
+         IjWLSmi+FieLWsKy+VnQeiTXT/BNczt2wHYyYhM8HK6/9oudKQHOQgJgY1ABmprCYUiH
+         nJAKnQRWzPbZyp17r3ORCaFkxl8y/DTD+OO1UopmbuN9EWENx3ToEXIvDRUxgLpU6vrO
+         2tfU7hapdfzVgFIj2glioxdFkHzBIXEJXt/ytKAA4mcHrrWAyIAumLiWrzhjJ4ZHDsCn
+         wxdKaJSMpkEHmFwsxaDDpeuEdL4njhrQO/PnSQhw6qXXozgEYe97TFE0G8ZkHzp8mzyL
+         Rc2w==
+X-Gm-Message-State: AOJu0Yw6hRh/Cb+Nwug2+XQmphrFXQmRg+vYbfuPPi8Jkyv2hg4j9d4v
+	3CyVFsaLb0VHJOv04nkNTTBaqrRsGgldZtPh37R+0ws8lHEMoDrb87fKfK2gt86hTEJ9YYSUcSl
+	a7bv5ZUpnCfYQ2DT62ZGkw04c6zGCjYRTmzGCRQ==
+X-Received: by 2002:a05:600c:2184:b0:40b:5e59:c559 with SMTP id e4-20020a05600c218400b0040b5e59c559mr5913414wme.131.1702609282595;
+        Thu, 14 Dec 2023 19:01:22 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHrpNJr0/F3OqeFp75QF7xFP1iMDXIr63AKRWXIeGZPp4quZ+IVEFnm0fP4y9WmifH9K7YrvDp2pNwoa9mH1PQ=
+X-Received: by 2002:a05:600c:2184:b0:40b:5e59:c559 with SMTP id
+ e4-20020a05600c218400b0040b5e59c559mr5913408wme.131.1702609282310; Thu, 14
+ Dec 2023 19:01:22 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231128111655.507479-1-miquel.raynal@bootlin.com> <20231128111655.507479-3-miquel.raynal@bootlin.com>
-In-Reply-To: <20231128111655.507479-3-miquel.raynal@bootlin.com>
+References: <tencent_1C04CA8D66ADC45608D89687B4020B2A8706@qq.com> <20231204095718.40ccb1ee@xps-13>
+In-Reply-To: <20231204095718.40ccb1ee@xps-13>
 From: Alexander Aring <aahringo@redhat.com>
-Date: Thu, 14 Dec 2023 21:46:06 -0500
-Message-ID: <CAK-6q+jpmhhARPcjkbfFVR7tRFQqYwXAdngebyUt+BzpFcgUGw@mail.gmail.com>
-Subject: Re: [PATCH wpan-next 2/5] mac802154: Use the PAN coordinator
- parameter when stamping packets
+Date: Thu, 14 Dec 2023 22:01:11 -0500
+Message-ID: <CAK-6q+jsZ13Cs9iuk_WjFeYFCEnnj-dJ9QYkWaw4fh6Gi=JtHA@mail.gmail.com>
+Subject: Re: [PATCH RESEND] mac802154: Fix uninit-value access in ieee802154_hdr_push_sechdr
 To: Miquel Raynal <miquel.raynal@bootlin.com>
-Cc: Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt <stefan@datenfreihafen.org>, 
-	linux-wpan@vger.kernel.org, David Girault <david.girault@qorvo.com>, 
-	Romuald Despres <romuald.despres@qorvo.com>, Frederic Blain <frederic.blain@qorvo.com>, 
-	Nicolas Schodet <nico@ni.fr.eu.org>, Guilhem Imberton <guilhem.imberton@qorvo.com>, 
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, 
-	netdev@vger.kernel.org
+Cc: Zhang Shurong <zhang_shurong@foxmail.com>, alex.aring@gmail.com, 
+	stefan@datenfreihafen.org, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, linux-wpan@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	harperchen1110@gmail.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 Hi,
 
-On Tue, Nov 28, 2023 at 6:17=E2=80=AFAM Miquel Raynal <miquel.raynal@bootli=
-n.com> wrote:
+On Mon, Dec 4, 2023 at 3:57=E2=80=AFAM Miquel Raynal <miquel.raynal@bootlin=
+.com> wrote:
 >
-> ACKs come with the source and destination address empty, this has been
-> clarified already. But there is something else: if the destination
-> address is empty but the source address is valid, it may be a way to
-> reach the PAN coordinator. Either the device receiving this frame is the
-> PAN coordinator itself and should process what it just received
-> (PACKET_HOST) or it is not and may, if supported, relay the packet as it
-> is targeted to another device in the network.
+> Hi Zhang,
 >
-> Right now we do not support relaying so the packet should be dropped in
-> the first place, but the stamping looks more accurate this way.
+> zhang_shurong@foxmail.com wrote on Sat,  2 Dec 2023 22:58:52 +0800:
 >
-> Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
-> ---
->  net/mac802154/rx.c | 11 +++++++----
->  1 file changed, 7 insertions(+), 4 deletions(-)
+> > The syzkaller reported an issue:
 >
-> diff --git a/net/mac802154/rx.c b/net/mac802154/rx.c
-> index 0024341ef9c5..e40a988d6c80 100644
-> --- a/net/mac802154/rx.c
-> +++ b/net/mac802154/rx.c
-> @@ -156,12 +156,15 @@ ieee802154_subif_frame(struct ieee802154_sub_if_dat=
-a *sdata,
+> Subject should start with [PATCH wpan]
 >
->         switch (mac_cb(skb)->dest.mode) {
->         case IEEE802154_ADDR_NONE:
-> -               if (hdr->source.mode !=3D IEEE802154_ADDR_NONE)
-> -                       /* FIXME: check if we are PAN coordinator */
-> -                       skb->pkt_type =3D PACKET_OTHERHOST;
-> -               else
-> +               if (hdr->source.mode =3D=3D IEEE802154_ADDR_NONE)
->                         /* ACK comes with both addresses empty */
->                         skb->pkt_type =3D PACKET_HOST;
-> +               else if (!wpan_dev->parent)
-> +                       /* No dest means PAN coordinator is the recipient=
- */
-> +                       skb->pkt_type =3D PACKET_HOST;
-> +               else
-> +                       /* We are not the PAN coordinator, just relaying =
-*/
-> +                       skb->pkt_type =3D PACKET_OTHERHOST;
->                 break;
->         case IEEE802154_ADDR_LONG:
->                 if (mac_cb(skb)->dest.pan_id !=3D span &&
+> >
+> > BUG: KMSAN: uninit-value in ieee802154_hdr_push_sechdr net/ieee802154/h=
+eader_ops.c:54 [inline]
+> > BUG: KMSAN: uninit-value in ieee802154_hdr_push+0x971/0xb90 net/ieee802=
+154/header_ops.c:108
+> >  ieee802154_hdr_push_sechdr net/ieee802154/header_ops.c:54 [inline]
+> >  ieee802154_hdr_push+0x971/0xb90 net/ieee802154/header_ops.c:108
+> >  ieee802154_header_create+0x9c0/0xc00 net/mac802154/iface.c:396
+> >  wpan_dev_hard_header include/net/cfg802154.h:494 [inline]
+> >  dgram_sendmsg+0xd1d/0x1500 net/ieee802154/socket.c:677
+> >  ieee802154_sock_sendmsg+0x91/0xc0 net/ieee802154/socket.c:96
+> >  sock_sendmsg_nosec net/socket.c:725 [inline]
+> >  sock_sendmsg net/socket.c:748 [inline]
+> >  ____sys_sendmsg+0x9c2/0xd60 net/socket.c:2494
+> >  ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2548
+> >  __sys_sendmsg+0x225/0x3c0 net/socket.c:2577
+> >  __compat_sys_sendmsg net/compat.c:346 [inline]
+> >  __do_compat_sys_sendmsg net/compat.c:353 [inline]
+> >  __se_compat_sys_sendmsg net/compat.c:350 [inline]
+> >
+> > We found hdr->key_id_mode is uninitialized in mac802154_set_header_secu=
+rity()
+> > which indicates hdr.fc.security_enabled should be 0. However, it is set=
+ to be cb->secen before.
+> > Later, ieee802154_hdr_push_sechdr is invoked, causing KMSAN complains u=
+ninit-value issue.
+>
+> I am not too deeply involved in the security header but for me it feels
+> like your patch does the opposite of what's needed. We should maybe
+> initialize hdr->key_id_mode based on the value in cb->secen, no? (maybe
+> Alexander will have a better understanding than I have).
 
-So if I understand it correctly, the "wpan_dev->parent" check acts
-like a "forwarding" setting on an IP capable interface here? The
-"forwarding" setting changes the interface to act as a router, which
-is fine... but we have a difference here with the actual hardware and
-the address filtering setting which we don't have in e.g. ethernet. My
-concern is here that this code is probably interface type specific,
-e.g. node vs coordinator type and currently we handle both in one
-receive part.
+I can't help yet with a better answer why syzkaller reports it but it
+will break things as we using skb->cb to pass additional parameters
+through header_ops->create()... in this case it is some sockopts of
+af802154, I guess.
 
-I am fine with that and probably it is just a thing to change in future...
+side note: we should stop doing that with skb->cb and introduce some
+802.15.4 specific header_ops callback structure and not depend on such
+generic callback which does not fit here (and maybe somebody does a
+wrapper around that and reuse skb->cb for their needs, etc.)
 
 - Alex
 
