@@ -1,63 +1,62 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D2FB6AB7
-	for <linux-wpan@vger.kernel.org>; Fri, 15 Dec 2023 03:17:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 802125672
+	for <linux-wpan@vger.kernel.org>; Fri, 15 Dec 2023 03:18:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fJC/K21K"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PdcM1b+b"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1702610251;
+	s=mimecast20190719; t=1702610295;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=j5xoVNAc3uN7zDhUP5/XuZ9lvsG13QS+0NjaofDIv+A=;
-	b=fJC/K21K5gUow8YKpi9gUPvNw35TSo9zTpZx9924J8d22bgE+isLvCHfNLMh00sP9d+aRc
-	kTGg4EvuL8TfULSvBzUshdnwll7MZkRTmeWK8UX648AnrD+flzSVaVVeb+vnTsx14XHV6T
-	hSSsXO+8FnMqO95abEbfp1CYNgjWlao=
+	bh=GU6XR3jlZFj9LBTMMxQsE/bFIXz44r7Zm39uegVLGgU=;
+	b=PdcM1b+bauzCzdxg/R2KKrrW6qWs41jkW87ACYKxWLbbx9beyVpnyY9NKmI6c0/KHI0Su5
+	y1ITQjq7NZFwaOyFzQbYVR4sWps4UN796UHhPkxrxcW9uxfvkW2bui83ZJYG2SjtiKw4RI
+	ExFFfkROJHSnS8cvG7IXbTP8d6XhWGw=
 Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
  [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-116-N3l4h4hXMjaw__fsIiHuUg-1; Thu, 14 Dec 2023 22:17:29 -0500
-X-MC-Unique: N3l4h4hXMjaw__fsIiHuUg-1
-Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-55223c5b428so83395a12.0
-        for <linux-wpan@vger.kernel.org>; Thu, 14 Dec 2023 19:17:29 -0800 (PST)
+ us-mta-327-_1hoSoGQOj6ML7ex2IAJfA-1; Thu, 14 Dec 2023 22:18:13 -0500
+X-MC-Unique: _1hoSoGQOj6ML7ex2IAJfA-1
+Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-55262d6782bso1506448a12.0
+        for <linux-wpan@vger.kernel.org>; Thu, 14 Dec 2023 19:18:12 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1702610248; x=1703215048;
+        d=1e100.net; s=20230601; t=1702610292; x=1703215092;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=j5xoVNAc3uN7zDhUP5/XuZ9lvsG13QS+0NjaofDIv+A=;
-        b=po5eH5ReAt7pqdYU7Ihqc/ynMk32/v8eDVFA9l7tnZ4ElXo3ABSkAFjL4XST/+Jz+P
-         2V4ec/r85FssTh57dXDNFre92krZ2dyBtnChoZC9qfhU5f/4rMipg+XnFQMcuphc19LT
-         cKn4loQFIB/Z+JdSjvkgOe1vlyje5drQm2QQZefh59kmDSVcG+81mm9tNuqnztUACrij
-         EVVBkz9hla+Y/M4AsuoOd2aamQU1dFrIrImG+J0rqPKoqClBeGkSnVP8BNW2CSmIshXA
-         z9Snzk6qpW+jEl2s8BbU54R6vaOY37zPGeEWMttTZOU5fVjtXMuGZ/GP7KwVSDlVgtwu
-         VLSg==
-X-Gm-Message-State: AOJu0YxUZSflQyLKqAtwQICXeXtzVbP7EKQ/dZigu+cYovkr/xG3M1yJ
-	0GtIguQE/rOoPENKQmKVpbIRDFFOc8y2EyTi49UE4j9fW6j422Uc9RaqMaY2c+FpZwF6PSiLw+g
-	NGrFTbjpWUFOMCsBt5eN27vK8keeKwuoho6OPNA==
-X-Received: by 2002:a05:6402:2051:b0:54c:5f17:1163 with SMTP id bc17-20020a056402205100b0054c5f171163mr5362520edb.58.1702610248404;
-        Thu, 14 Dec 2023 19:17:28 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGYodYhdQRjwTPKLzEFZ/TKE0p3OPU7KHSXvbX5fsSIF4Lkasnl2mVXc2fCW1tS1Gcpf2YF5YJ462UZHLzptwE=
-X-Received: by 2002:a05:6402:2051:b0:54c:5f17:1163 with SMTP id
- bc17-20020a056402205100b0054c5f171163mr5362509edb.58.1702610248119; Thu, 14
- Dec 2023 19:17:28 -0800 (PST)
+        bh=GU6XR3jlZFj9LBTMMxQsE/bFIXz44r7Zm39uegVLGgU=;
+        b=knGR8UyzOGqpNjVDsCUao0Zy/T08xzIwD8mE58nFXOWeARqF8SZ8g5FeWMtPHQJwJe
+         tYWxtRBBxP+VUJfBi9nrWvqJbFr5IJ6u0lxYdFj9FBn7pJUBz7HJ6DrkSs2zb+NiVpkZ
+         /IHjTowNhilpQhPHqVOSs8LdhHs6oNbUOfUqGXrWdwDm382Qy+Fpt3+bk/hq220Y/gNs
+         sIzUY+kk6m9kcMjYBCylSWNsGBPgC/c0DX5LPkXD0qaVjuYGD9Wi/VxtekHmcNqexcVv
+         WF+au8tGa/tW02wD1XUpBZSp5aQSjRbO5+UXKd7S+fk9RaOgjs76yhyHd/XyC5wMpE9a
+         V2Hg==
+X-Gm-Message-State: AOJu0YzzGwgNec9rgBK2Tm5+0+YlZVmc2Pucs/UnxpwHs9v/Pj1hET7A
+	egPqaX9Kjo6xvc7rHMP1KHzsdIPjFpOVfFSUMyZNH0qk9zX0INj2+eCumz6OxingOeKNUbBDZs1
+	tBHYosPWLoWPi4NQGreIOx9TovQLxSlxSpmx4Yg==
+X-Received: by 2002:a05:6402:324:b0:54d:d0c5:4f53 with SMTP id q4-20020a056402032400b0054dd0c54f53mr12331616edw.11.1702610292113;
+        Thu, 14 Dec 2023 19:18:12 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFEwmS0vcN1VG7p2MzdbnRZT2VT7sNeOOxpCkPhbzjD+VkiECTLviq6iTxQSJAE2rXbfhZy7m96f3Y4Fer/J3c=
+X-Received: by 2002:a05:6402:324:b0:54d:d0c5:4f53 with SMTP id
+ q4-20020a056402032400b0054dd0c54f53mr12331612edw.11.1702610291991; Thu, 14
+ Dec 2023 19:18:11 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231128111655.507479-1-miquel.raynal@bootlin.com> <20231128111655.507479-4-miquel.raynal@bootlin.com>
-In-Reply-To: <20231128111655.507479-4-miquel.raynal@bootlin.com>
+References: <20231128111655.507479-1-miquel.raynal@bootlin.com> <20231128111655.507479-5-miquel.raynal@bootlin.com>
+In-Reply-To: <20231128111655.507479-5-miquel.raynal@bootlin.com>
 From: Alexander Aring <aahringo@redhat.com>
-Date: Thu, 14 Dec 2023 22:17:17 -0500
-Message-ID: <CAK-6q+jThrZJBK4qRknODnNoaPMxrDp2rwWETi2SJV=Di1VQGw@mail.gmail.com>
-Subject: Re: [PATCH wpan-next 3/5] mac802154: Only allow PAN controllers to
- process association requests
+Date: Thu, 14 Dec 2023 22:18:01 -0500
+Message-ID: <CAK-6q+gd20PfRQdyLHHCdwqOsUMThm2_V6HW9VqUpzhisHdF4w@mail.gmail.com>
+Subject: Re: [PATCH wpan-next 4/5] ieee802154: Avoid confusing changes after associating
 To: Miquel Raynal <miquel.raynal@bootlin.com>
 Cc: Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt <stefan@datenfreihafen.org>, 
 	linux-wpan@vger.kernel.org, David Girault <david.girault@qorvo.com>, 
@@ -74,11 +73,10 @@ Hi,
 On Tue, Nov 28, 2023 at 6:17=E2=80=AFAM Miquel Raynal <miquel.raynal@bootli=
 n.com> wrote:
 >
-> It is not very clear in the specification whether simple coordinators
-> are allowed or not to answer to association requests themselves. As
-> there is no synchronization mechanism, it is probably best to rely on
-> the relay feature of these coordinators and avoid processing them in
-> this case.
+> Once associated with any device, we are part of a PAN (with a specific
+> PAN ID), and we are expected to be present on a particular
+> channel. Let's avoid confusing other devices by preventing any PAN
+> ID/channel change once associated.
 >
 > Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
 
