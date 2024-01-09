@@ -1,87 +1,79 @@
-Received: from tuna.sandelman.ca (tuna.sandelman.ca [209.87.249.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4E3439876
-	for <linux-wpan@vger.kernel.org>; Tue,  9 Jan 2024 14:03:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sandelman.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sandelman.ca
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sandelman.ca header.i=@sandelman.ca header.b="LsXRoKcE"
-Received: from localhost (localhost [127.0.0.1])
-	by tuna.sandelman.ca (Postfix) with ESMTP id 94D7F1800D;
-	Tue,  9 Jan 2024 08:57:11 -0500 (EST)
-Received: from tuna.sandelman.ca ([127.0.0.1])
-	by localhost (localhost [127.0.0.1]) (amavisd-new, port 10024)
-	with LMTP id IpMy0AFmxY-o; Tue,  9 Jan 2024 08:57:09 -0500 (EST)
-Received: from sandelman.ca (obiwan.sandelman.ca [IPv6:2607:f0b0:f:2::247])
-	by tuna.sandelman.ca (Postfix) with ESMTP id A68251800C;
-	Tue,  9 Jan 2024 08:57:09 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sandelman.ca;
-	s=mail; t=1704808629;
-	bh=Ba8UPpR/r101zEvMds6lmpXs0erMZSONKp83cTFfjEI=;
-	h=From:To:cc:Subject:In-Reply-To:References:Date:From;
-	b=LsXRoKcEJxmH24cIvPpfRGT0itM5SQ3c7oXdD0GnsneTRL3yW6qeW2Yf3cc7QEt+R
-	 FAP5pm0T70ZLzY0R1IXC69dYxe3n1/yFyGJt1mgJYh8VH+djr76Sl1NA9KaO6vBZ0k
-	 TAeRrA7ntUj0UqK5HkEOgRHssco7Il9Kuc90QBLa91KLu4WgjTQIqV3eb6QDmB3e4I
-	 exbaSXZaOcMmQ/f4T5wWwWt2HuEgpS6LNE+WmuJYrbPW8xMnkAI3hCxTs0PBiYY/ju
-	 dxeTC0zOOiet1BG+pB1vzdupS01KBmUMIsCsF/gkNgm3yJFx0wV7u2ZO5/uM2if68q
-	 Qsupb0wE6zYfA==
-Received: from obiwan.sandelman.ca (localhost [IPv6:::1])
-	by sandelman.ca (Postfix) with ESMTP id 9BFFF14F;
-	Tue,  9 Jan 2024 08:57:09 -0500 (EST)
-From: Michael Richardson <mcr@sandelman.ca>
-To: Marek =?us-ascii?Q?=3D=3FUTF-8=3FB=3FS8O8dGhl=3F=3D?= <m-k-mailling-list@mk16.de>
-cc: linux-wpan@vger.kernel.org
-Subject: Re: Linux WPAN and Contiki NG
-In-Reply-To: <20240108170928.2b1d0fd9@ciel>
-References: <20240108170928.2b1d0fd9@ciel>
-X-Mailer: MH-E 8.6+git; nmh 1.7+dev; GNU Emacs 28.2
-X-Face: $\n1pF)h^`}$H>Hk{L"x@)JS7<%Az}5RyS@k9X%29-lHB$Ti.V>2bi.~ehC0;<'$9xN5Ub#
- z!G,p`nR&p7Fz@^UXIn156S8.~^@MJ*mMsD7=QFeq%AL4m<nPbLgmtKK-5dC@#:k
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A8B339ACB;
+	Tue,  9 Jan 2024 14:29:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-55770379ed4so2934381a12.3;
+        Tue, 09 Jan 2024 06:29:53 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704810592; x=1705415392;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=l+JEdot1C2wy41EbgID07d5DatcMtHbmHDaS5rfc6aA=;
+        b=mBTCh0Pd3HWH/pOX2cWYMFy15XxrDWQmrZmx27E+YYr0xrk7MYry6TJqOSfaYlO3Cr
+         yf+NjTkvVUmD5dV/flTDrfPUnmYfKqzkSH8dwZ2lOowM3A16xEJDsbeNaXDCNKfNsLXv
+         lLX/mYyxkLQLC8oQBPDsMp1ONm1rGJjW6O88En+VtnoGnWxuNXQf5ZAYnbKeFEnmT6dr
+         lspOR7IZlH6Qrci8CvyFfZu7a0UZhD4nM0B1DRnDtDvF2Twua3FtkNvaCNxK7Pk84pNg
+         sx4ZbkCWSYJtwVbgZ+6iBXxxNXV/Fm/D5/fTfLHehNJORSrvVEclVF/qm42/8UoeVVgC
+         Sl/Q==
+X-Gm-Message-State: AOJu0Yzq/e8p+Gl3FpicXpJ1RKL1RzfF8qFYHRiXyz3OAoULtOj4XlVw
+	SMk2PiubBfKwMqqOn1K7WRY=
+X-Google-Smtp-Source: AGHT+IGU14+WX8vx3R9NsxrdK0yVQf5tEVFZPyghsTxzKm/sx8Drlwwz2boIWJwFOQjI9KuUOcITPw==
+X-Received: by 2002:a17:907:987a:b0:a27:f0da:f6d8 with SMTP id ko26-20020a170907987a00b00a27f0daf6d8mr455832ejc.104.1704810591370;
+        Tue, 09 Jan 2024 06:29:51 -0800 (PST)
+Received: from gmail.com (fwdproxy-cln-023.fbsv.net. [2a03:2880:31ff:17::face:b00c])
+        by smtp.gmail.com with ESMTPSA id gr5-20020a170906e2c500b00a2327e826ccsm1082737ejb.201.2024.01.09.06.29.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 09 Jan 2024 06:29:50 -0800 (PST)
+Date: Tue, 9 Jan 2024 06:29:49 -0800
+From: Breno Leitao <leitao@debian.org>
+To: Stefan Schmidt <stefan@datenfreihafen.org>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, Alexander Aring <alex.aring@gmail.com>,
+	Miquel Raynal <miquel.raynal@bootlin.com>, netdev@vger.kernel.org,
+	"open list:IEEE 802.15.4 SUBSYSTEM" <linux-wpan@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next 06/10] net: fill in MODULE_DESCRIPTION()s for
+ ieee802154
+Message-ID: <ZZ1YXTEgZePZW5Dh@gmail.com>
+References: <20240108181610.2697017-1-leitao@debian.org>
+ <20240108181610.2697017-7-leitao@debian.org>
+ <45711bec-e0f3-43c2-b8f2-b9a55654710b@datenfreihafen.org>
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha512; protocol="application/pgp-signature"
-Date: Tue, 09 Jan 2024 08:57:09 -0500
-Message-ID: <26711.1704808629@obiwan.sandelman.ca>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <45711bec-e0f3-43c2-b8f2-b9a55654710b@datenfreihafen.org>
 
---=-=-=
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Tue, Jan 09, 2024 at 08:25:21AM +0100, Stefan Schmidt wrote:
+> Hello.
+> 
+> On 08.01.24 19:16, Breno Leitao wrote:
+> > W=1 builds now warn if module is built without a MODULE_DESCRIPTION().
+> > Add descriptions to ieee802154 modules.
+> > 
+> > Signed-off-by: Breno Leitao <leitao@debian.org>
+> > ---
+> >   net/ieee802154/6lowpan/core.c | 1 +
+> >   net/ieee802154/socket.c       | 1 +
+> >   2 files changed, 2 insertions(+)
+> > 
+> > diff --git a/net/ieee802154/6lowpan/core.c b/net/ieee802154/6lowpan/core.c
+> > index 2c087b7f17c5..b88f6a96d961 100644
+> > --- a/net/ieee802154/6lowpan/core.c
+> > +++ b/net/ieee802154/6lowpan/core.c
+> > @@ -280,5 +280,6 @@ static void __exit lowpan_cleanup_module(void)
+> >   module_init(lowpan_init_module);
+> >   module_exit(lowpan_cleanup_module);
+> > +MODULE_DESCRIPTION("IPv6 over Low power Wireless Personal Area Network IEEE802154.4 core");
+> 
+> If we want to nitpick you could write it as IEEE 802.15.4.
 
-
-Marek K=C3=BCthe <m-k-mailling-list@mk16.de> wrote:
-    > I would like to try Linux WPAN with Contriki NG and have some questio=
-ns
-    > (I am new to the topic, so the questions may be quite stupid): Contiki
-    > NG, as I understand it, implements various 6lowpan standards -
-    > including 6TiSCH, TSCH and 6TOP. Which of these are also implemented =
-in
-
-As Stefan said, you can not yet run TSCH on Linux.
-Many of us would like to make it happen, and a few (Alex!) are writing code,
-but there hasn't been a resources to allow anyone to spend real time on it.
-Typically, people combine a Linux host (like a openwrt router) with a USB
-connection to a Contiki or RIOTOS (or maybe Zephyr now) device that acts as
-the 6TISCH device.
-
-
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFFBAEBCgAvFiEEbsyLEzg/qUTA43uogItw+93Q3WUFAmWdULURHG1jckBzYW5k
-ZWxtYW4uY2EACgkQgItw+93Q3WWhdwf/VJJaSUyiXI+Xy/eQ/1ZEPhptXNB3aNSR
-J8L/IlNhxf412lT8oXmTBmFLc126bZbDFKay9dKDYIfUtXpKBtjl1V5GBBMZ731Z
-OL14yT4kEEQLZtQAJa799HLToihyKnAF8JIrWUpHZe0+UsyJmko76TfqgC+0ymvw
-p2G9AWbBTPrB3DXFOOvMOorb3LT14OqoJTOT73aGp+b84TfM4krB0MSnE3GyaqTV
-V2DJ1FtTnBghTVfJd79aJH2d/bTJrgUUmn0Q1fjTYTDtOVIAw/Sl1g3JPEn66Y5K
-xaGNaa+JHTaOcM/r+HISNr028LFrMF69RajMUD1laUft6gsxjkRC+A==
-=Gcca
------END PGP SIGNATURE-----
---=-=-=--
+Thanks. I will update.
