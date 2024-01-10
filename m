@@ -1,100 +1,99 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 900283D3B7
-	for <linux-wpan@vger.kernel.org>; Tue,  9 Jan 2024 19:44:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F7F4656
+	for <linux-wpan@vger.kernel.org>; Wed, 10 Jan 2024 01:05:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I0WQNPJI"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G8pUQUww"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1704829441;
+	s=mimecast20190719; t=1704848702;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=p6mR+9SL9QG885yBOOeygrNdvHoPQ+gcxDs/w36x2vM=;
-	b=I0WQNPJIaObLcS+hibe1eS4TYDPq7EjNPW80TyMjBke8tXiaq20rStgMzedgZYggRuHtQ8
-	e1coFdUMRoo72SwAxR1Dsi+2tT+PVmUPvGVP5Uw+BwaZTgoWeFh5Mr2CHNezSd07eNWb52
-	zlBNgVdJoCAj4rB3oQMVj8BHsMA7Zsg=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=XDAJkCct0QqlJ2J1QN5K4XkP3EqrDChHOlqcjsZZ3Ok=;
+	b=G8pUQUwwlaZYOUQEtI0WYclxDEP1aM9ELZqvS4vdlIET8fYI/8/WJnM5Fa5Cc6yH1AYKxl
+	PqYE5oKUOlcLgnlO7l430RiiB9LJwhGmuCTtqg4LzT+TUjikknHScSxo+TAR+R+FKW2su4
+	K4aNVBmjS24kvwoOVvxrenJnUCgk3GQ=
+Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
+ [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-670-7do9JY8WPwKVyyN4wmteJw-1; Tue, 09 Jan 2024 14:44:00 -0500
-X-MC-Unique: 7do9JY8WPwKVyyN4wmteJw-1
-Received: by mail-ed1-f70.google.com with SMTP id 4fb4d7f45d1cf-54554ea191bso1886781a12.2
-        for <linux-wpan@vger.kernel.org>; Tue, 09 Jan 2024 11:43:59 -0800 (PST)
+ us-mta-34-ElENrvYFMtK9UO8jheV3Wg-1; Tue, 09 Jan 2024 20:05:00 -0500
+X-MC-Unique: ElENrvYFMtK9UO8jheV3Wg-1
+Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-50eaa746598so2735502e87.1
+        for <linux-wpan@vger.kernel.org>; Tue, 09 Jan 2024 17:05:00 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704829438; x=1705434238;
+        d=1e100.net; s=20230601; t=1704848699; x=1705453499;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=p6mR+9SL9QG885yBOOeygrNdvHoPQ+gcxDs/w36x2vM=;
-        b=IIHi7YRvkhixVf+gG7wKQSBBTn6+7L/2UUrILAsfkdbPjSV8HpKoTwatvWZm0inP+r
-         mCIRbtKq/cZVbCBBHoHawzc3P8+z/Zg8mlJ8bjyh50WSbQZciG9ydvx4GbCMtE9jQcM8
-         JBOBaLjYkftyUgjOlwtPZR1Y3dTihNeWk+lCsKTgyGC4CjM97gLgr61nh+yWlYyJR3KN
-         x8M4dcWG1LMkWvTGfzWWvzZAtIYAPiz6HPHzyRYeD5NLTytXJYNVN36NMutvHMXN3lTB
-         hM+Xqy7XE+bbPjG5vSRnbliYEuWpRGGnqa8Rz8criljZxRnEJov2QCQ6WxjhqfXTLIvC
-         dfBg==
-X-Gm-Message-State: AOJu0Yy9xyrUVFqLIb15gQuiP14WqfhvdIEHK3n+7nx/kfIiCHWx6KNW
-	kKoDHBbUP1ZhRZtPkssV9T7un2Mx1NCUsw+KafFOtzUFXXZ+6iIoMZcfOJIVGYkzM22f8j6U//Y
-	k/CwphnrmWXEOCVtcN+h9m00+/HyyG1QZN7TCM5W6vTO+xO1mRbtvxg==
-X-Received: by 2002:a50:fb07:0:b0:557:41c4:cbdf with SMTP id d7-20020a50fb07000000b0055741c4cbdfmr3647653edq.49.1704829438599;
-        Tue, 09 Jan 2024 11:43:58 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IG1ZPkndcCFqRcbxpYgkpvM5v/fUVlg5GKJn3dBbuqid4trbvGSL6W2MGwgKqi8DyUMon6c8ShNqj8OddwSGYI=
-X-Received: by 2002:a50:fb07:0:b0:557:41c4:cbdf with SMTP id
- d7-20020a50fb07000000b0055741c4cbdfmr3647650edq.49.1704829438347; Tue, 09 Jan
- 2024 11:43:58 -0800 (PST)
+        bh=XDAJkCct0QqlJ2J1QN5K4XkP3EqrDChHOlqcjsZZ3Ok=;
+        b=Q5Jsgex70FowZSQlOZJPbjKD7p1pS8/IxXMk42NJr1tkRuZMmHGM+QhNrJZZ8J7xrl
+         tH1YqfnSYBKuQ9+LebotMPWqLKB2YWaJlay2RcCPAWVkW4wOgb2DOXPqnIw85xxgPefx
+         I5NQ8bW2Uppzv8LCsoB3Fq+xgTUA74uvk0kUfuy0HRflSeMBPCpzgYprrdStZOVoOYii
+         cG3joJ9h0s7sKVqtjIrwbXYFdwG+9mbMbwTGxHSmao0CJr7QdXRIf81tf3zT5LBb91j2
+         ZgFS1UbkNjlRSM34DeBr5tmIhFY6qb2HQN5Lcke1qtNJLFOLaoo+xjvGId5y3358cOgB
+         nr9Q==
+X-Gm-Message-State: AOJu0YwrYu93BURcSGHFy+RldFBYjqQEc9kAercmacpxKaFPE/vwp5GR
+	tCl3G5bW5HvsPuQUfsd+rFqd/BElYUjUn5hw4uOOQMJc5vHFbBL78xy+swEhSwZns9mv+UpiD4G
+	CXx0U+gnAI8G1RbNMSb5flzQ5QnvOZglHUJNfa+7FOUJk4w==
+X-Received: by 2002:a05:651c:1047:b0:2cd:3487:9a05 with SMTP id x7-20020a05651c104700b002cd34879a05mr98281ljm.88.1704848699513;
+        Tue, 09 Jan 2024 17:04:59 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGKqSK/YybrS4hqOkpNnDVEZbPGMecxKjNnfERUMKoTvZqBP1EhGdJBrkbTbH5Ki7NxC6cHcaGGQZdKcc7uVcA=
+X-Received: by 2002:a05:651c:1047:b0:2cd:3487:9a05 with SMTP id
+ x7-20020a05651c104700b002cd34879a05mr98276ljm.88.1704848699158; Tue, 09 Jan
+ 2024 17:04:59 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240108170928.2b1d0fd9@ciel> <26711.1704808629@obiwan.sandelman.ca>
- <20240109183549.13908ccf@ciel>
-In-Reply-To: <20240109183549.13908ccf@ciel>
+References: <20240108181610.2697017-1-leitao@debian.org> <20240108181610.2697017-8-leitao@debian.org>
+In-Reply-To: <20240108181610.2697017-8-leitao@debian.org>
 From: Alexander Aring <aahringo@redhat.com>
-Date: Tue, 9 Jan 2024 14:43:47 -0500
-Message-ID: <CAK-6q+iPF7dUXM=Uvu9Uh+ux36A3nf1t=kA92fT5gOJCnK82Ow@mail.gmail.com>
-Subject: Re: Linux WPAN and Contiki NG
-To: =?UTF-8?B?TWFyZWsgS8O8dGhl?= <m-k-mailling-list@mk16.de>
-Cc: linux-wpan@vger.kernel.org
+Date: Tue, 9 Jan 2024 20:04:47 -0500
+Message-ID: <CAK-6q+jy-0+bZRUKhRsB2RMtpJ=Sw1A5qHk+rpnYaOzV8WFD5A@mail.gmail.com>
+Subject: Re: [PATCH net-next 07/10] net: fill in MODULE_DESCRIPTION()s for 6LoWPAN
+To: Breno Leitao <leitao@debian.org>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, Alexander Aring <alex.aring@gmail.com>, netdev@vger.kernel.org, 
+	"open list:6LOWPAN GENERIC (BTLE/IEEE 802.15.4)" <linux-bluetooth@vger.kernel.org>, 
+	"open list:6LOWPAN GENERIC (BTLE/IEEE 802.15.4)" <linux-wpan@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 Hi,
 
-On Tue, Jan 9, 2024 at 1:36=E2=80=AFPM Marek K=C3=BCthe <m-k-mailling-list@=
-mk16.de> wrote:
+On Mon, Jan 8, 2024 at 1:21=E2=80=AFPM Breno Leitao <leitao@debian.org> wro=
+te:
 >
-> On Tue, 09 Jan 2024 08:57:09 -0500
-> Michael Richardson <mcr@sandelman.ca> wrote:
+> W=3D1 builds now warn if module is built without a MODULE_DESCRIPTION().
+> Add descriptions to IPv6 over Low power Wireless Personal Area Network.
 >
-> > As Stefan said, you can not yet run TSCH on Linux.
-> > Many of us would like to make it happen, and a few (Alex!) are writing =
-code,
-> > but there hasn't been a resources to allow anyone to spend real time on=
- it.
-> > Typically, people combine a Linux host (like a openwrt router) with a U=
-SB
-> > connection to a Contiki or RIOTOS (or maybe Zephyr now) device that act=
-s as
-> > the 6TISCH device.
-> >
+> Signed-off-by: Breno Leitao <leitao@debian.org>
+> ---
+>  net/6lowpan/core.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> Thanks for the answer! However, when I create a new wpan0 interface,
-> `coordinator` also appears for choice. Is this not TSCH related?
+> diff --git a/net/6lowpan/core.c b/net/6lowpan/core.c
+> index 7b3341cef926..80d83151ef29 100644
+> --- a/net/6lowpan/core.c
+> +++ b/net/6lowpan/core.c
+> @@ -178,5 +178,5 @@ static void __exit lowpan_module_exit(void)
 >
+>  module_init(lowpan_module_init);
+>  module_exit(lowpan_module_exit);
+> -
+> +MODULE_DESCRIPTION("IPv6 over Low power Wireless Personal Area Network m=
+odule");
 
-no, it's not TSCH related. You can probably have a tun interface and
-speak with a contiki co-processor to forward raw IPv6 from/to a
-contiki device. Google keyword is "slip", but then you don't use any
-of Linux 802.15.4 or 6LoWPAN functionality.
+Here is a nitpick as well. The correct acronym [0] is "IPv6 over
+Low-Power Wireless Personal Area Network", otherwise it is okay.
 
-If you use 802.15.4 contiki without TSCH or what we at least support
-"legacy devices", be sure you disable ContikiMAC which is an
-out-of-spec duty contiki specific duty cycle thing.
+Acked-by: Alexander Aring <aahringo@redhat.com>
 
 - Alex
 
