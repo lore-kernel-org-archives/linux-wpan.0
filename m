@@ -1,91 +1,108 @@
-Received: from proxima.lasnet.de (proxima.lasnet.de [78.47.171.185])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from exchange.fintech.ru (exchange.fintech.ru [195.54.195.159])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16E3C4CDE5
-	for <linux-wpan@vger.kernel.org>; Wed, 10 Jan 2024 16:23:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=datenfreihafen.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=datenfreihafen.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=datenfreihafen.org header.i=@datenfreihafen.org header.b="g+A0TDqV"
-Received: from [192.168.2.51] (p4fc2fde0.dip0.t-ipconnect.de [79.194.253.224])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: stefan@datenfreihafen.org)
-	by proxima.lasnet.de (Postfix) with ESMTPSA id CDDB9C0A55;
-	Wed, 10 Jan 2024 17:23:28 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
-	s=2021; t=1704903808;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=UACgsXLxICmWMPGPrPLaIVlsGEnyK6+SzNi9HeeSSn0=;
-	b=g+A0TDqVCyr5eDrQGv9MOfYtKkUeqfvMN2sL75EAWROVnKTr7ayIw7ZFdgcjqmgSTnFztk
-	P7nK5192qHnOf8u9E4DYC2O/l5lGa3SHksI7VAo6yclhteVBhYYvxdxFVZojXkfgvtC2Jc
-	hEfSOBUOzjXbI2nz/LMaVjQujUwse+JLmZ+Hlo8iNrRMD7pMNwN5ahQ7HWlg4A7MqD7WrO
-	d+wiuRe4pOZkUEfb2hGD7b4i7A1MdRdN81xnb60E3I1sMcoabGPfp+mYGi5xfhvniLUK2H
-	NmNM5UufzHWtWzG8m14tpPPEZkfZxuNE6lv9L2Lqp/8Rsuq5CbZeNmVZdiCW5A==
-Message-ID: <75132f84-091b-4814-a080-82aeb47550da@datenfreihafen.org>
-Date: Wed, 10 Jan 2024 17:23:28 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84A3A2AEEC;
+	Fri, 12 Jan 2024 13:16:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fintech.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fintech.ru
+Received: from Ex16-01.fintech.ru (10.0.10.18) by exchange.fintech.ru
+ (195.54.195.159) with Microsoft SMTP Server (TLS) id 14.3.498.0; Fri, 12 Jan
+ 2024 16:16:06 +0300
+Received: from localhost (10.0.253.138) by Ex16-01.fintech.ru (10.0.10.18)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2242.4; Fri, 12 Jan
+ 2024 16:16:06 +0300
+From: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
+To: Alexander Aring <aahringo@redhat.com>
+CC: Nikita Zhandarovich <n.zhandarovich@fintech.ru>, Zhang Shurong
+	<zhang_shurong@foxmail.com>, <alex.aring@gmail.com>,
+	<stefan@datenfreihafen.org>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <linux-wpan@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<harperchen1110@gmail.com>
+Subject: Re: [PATCH RESEND] mac802154: Fix uninit-value access in ieee802154_hdr_push_sechdr
+Date: Fri, 12 Jan 2024 05:15:54 -0800
+Message-ID: <20240112131554.10352-1-n.zhandarovich@fintech.ru>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <CAK-6q+jsZ13Cs9iuk_WjFeYFCEnnj-dJ9QYkWaw4fh6Gi=JtHA@mail.gmail.com>
+References:
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Linux WPAN and Contiki NG
-Content-Language: en-US
-To: =?UTF-8?Q?Marek_K=C3=BCthe?= <m-k-mailling-list@mk16.de>
-References: <20240108170928.2b1d0fd9@ciel>
- <4f4ae371-9993-4964-a61e-a88d885e1161@datenfreihafen.org>
- <20240109183245.0b8b2352@ciel>
-From: Stefan Schmidt <stefan@datenfreihafen.org>
-Cc: "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>
-In-Reply-To: <20240109183245.0b8b2352@ciel>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: Ex16-02.fintech.ru (10.0.10.19) To Ex16-01.fintech.ru
+ (10.0.10.18)
 
-Hello Marek,
-
-[I added the list back into cc as I think is could be of interest to 
-more people. Also your blog post for people interested in trying out 
-Contiki NG with Linux]
-
-On 09.01.24 19:32, Marek Küthe wrote:
-> On Tue, 9 Jan 2024 08:34:47 +0100
-> Stefan Schmidt <stefan@datenfreihafen.org> wrote:
+>> > >
+>> > > BUG: KMSAN: uninit-value in ieee802154_hdr_push_sechdr net/ieee802154=
+> /header_ops.c:54 [inline]
+>> > > BUG: KMSAN: uninit-value in ieee802154_hdr_push+0x971/0xb90 net/ieee8=
+> 02154/header_ops.c:108
+>> > >  ieee802154_hdr_push_sechdr net/ieee802154/header_ops.c:54 [inline]
+>> > >  ieee802154_hdr_push+0x971/0xb90 net/ieee802154/header_ops.c:108
+>> > >  ieee802154_header_create+0x9c0/0xc00 net/mac802154/iface.c:396
+>> > >  wpan_dev_hard_header include/net/cfg802154.h:494 [inline]
+>> > >  dgram_sendmsg+0xd1d/0x1500 net/ieee802154/socket.c:677
+>> > >  ieee802154_sock_sendmsg+0x91/0xc0 net/ieee802154/socket.c:96
+>> > >  sock_sendmsg_nosec net/socket.c:725 [inline]
+>> > >  sock_sendmsg net/socket.c:748 [inline]
+>> > >  ____sys_sendmsg+0x9c2/0xd60 net/socket.c:2494
+>> > >  ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2548
+>> > >  __sys_sendmsg+0x225/0x3c0 net/socket.c:2577
+>> > >  __compat_sys_sendmsg net/compat.c:346 [inline]
+>> > >  __do_compat_sys_sendmsg net/compat.c:353 [inline]
+>> > >  __se_compat_sys_sendmsg net/compat.c:350 [inline]
+>> > >
+>> > > We found hdr->key_id_mode is uninitialized in mac802154_set_header_se=
+> curity()
+>> > > which indicates hdr.fc.security_enabled should be 0. However, it is s=
+> et to be cb->secen before.
+>> > > Later, ieee802154_hdr_push_sechdr is invoked, causing KMSAN complains=
+>  uninit-value issue.
+>> >
+>> > I am not too deeply involved in the security header but for me it feels
+>> > like your patch does the opposite of what's needed. We should maybe
+>> > initialize hdr->key_id_mode based on the value in cb->secen, no? (maybe
+>> > Alexander will have a better understanding than I have).
+>>
+>> I can't help yet with a better answer why syzkaller reports it but it
+>> will break things as we using skb->cb to pass additional parameters
+>> through header_ops->create()... in this case it is some sockopts of
+>> af802154, I guess.
+>>
 > 
->> Would be happy to hear findings when you tried it. :-)
+> Maybe we just need to init some "more" defaults in [0]
 > 
-> I have written a small blog entry about my configuration. It may not be
-> particularly beautiful (written) - but I think you can understand it.
+> - Alex
 > 
-> TLDR: Linux and Contriki NG only work together when Contriki NG is in
-> CSMA mode.
-> 
-> English: https://mk16.de/blog/contiki-ng-linux-wpan-6lowpan-en/
-> German: https://mk16.de/blog/contiki-ng-linux-wpan-6lowpan-de/
+> [0] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree=
+> /net/ieee802154/socket.c?h=3Dv6.7-rc5#n474
 
-Thanks, it was a good read.
+Hello,
 
-To address some of your implicit questions in the post. Yes, the first 
-missing pings could be due to ND. To be sure you would need to check out 
-the packets with wireshark or similar.
+I was looking into the same issue (now present in syzbot [1]) and since it has a
+C-repro, the error is easy to recreate. Apparently, despite cb->secen (and
+hdr.fc.security_enabled accordingly) being equal 1, mac802154_set_header_security()
+finishes with 0 in:
 
-As for the MAC access mode needed to be CSMA, yes this is the only one 
-supported. The biggest problem, for Linux, with other modes like 6Tisch 
-is the hard timing requirements. If it is possible to work in these 
-real-time requirements would have to be tested. Nobody stepped up to do 
-the implementation yet to try it out.
+	if (!params.enabled ||
+	    (cb->secen_override && !cb->secen) ||
+	    !params.out_level)
+	    return 0;
 
-One could start with simple implementation, if that fails, make use of 
-preempt-rt features, if that fails see what hardware timers or other 
-capabilities of the transceivers could be used. On the ATUSB, time 
-critical pathes could also be offloaded into the firmware.
+Not presuming to understand the issue fully but if we do end up leaving
+mac802154_set_header_security() early, should we init hdr->key_id_mode
+with IEEE802154_SCF_KEY_IMPLICIT before returning with 0?
+I imagine that reseting hdr.fc.security_enabled to 0 ourselves in this
+case is a wrong way to go too.
 
-It all depends on interest, motivation and time :-)
+[1] https://syzkaller.appspot.com/bug?extid=60a66d44892b66b56545
 
-regards
-Stefan Schmidt
+Hoping not to have spewed too much nonsense here...
+
+With regards,
+Nikita
