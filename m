@@ -1,50 +1,50 @@
 Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B8EE77638;
-	Wed, 24 Jan 2024 16:48:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 927D47CF3D;
+	Wed, 24 Jan 2024 16:52:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706114889; cv=none; b=aD/jhEFbdsKDTiGkJ64YD/S17lCq56fDvFgMA7EVLdWCNTu9A1BzatDEjBsV9O2lB4r0X7WnZOaeVqUmEYJayovkG8Drknnt4fObrx4hyIlMu06dG1Sg+l0JpaaNed9NlkU8uW26XbiVpIs2eykVSenVKfEMNp6HgDAi3ybP6Q0=
+	t=1706115125; cv=none; b=nVwM6X/ZNhePB2fhlrWzTie43/CNzeXZ1lW1Wno210cccKGHuGRaXs4NfbFodc6kXcgUJNjEtzXo9GXFREapN7Q1CMndF4dWHKlxXQe89su6pDKWhsFvM+yOO+si2E5mx5i0x273InggAj1dB9nwHX8gL0yQVulz0vq+ae2Cbkk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706114889; c=relaxed/simple;
-	bh=S7DJ3+JCBTXNJeT3R+rQ9rFrdxAQ0AW7yvX18psweRM=;
+	s=arc-20240116; t=1706115125; c=relaxed/simple;
+	bh=QIeTCTHch/7rOF4+4kHAvCpl/cSG69Q6EDBjClEVtbc=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NUVchtMeWbz840I5O/FxxH5lXuIZAXGAB2BF6YYTkhn+ZQwYwZ+SmWBNyBhG+5ukidZRQFmsS52/lncD+m0BLW2kw7FI2zaGSePPIj3/gxkX0K+LTVFUL0xqNNJXCaWDWb/ZF2lJu4UeW/58dCpwBEHn8ASElL9UeeTHDHvkz+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=ZP+vhr00; arc=none smtp.client-ip=217.70.183.195
+	 MIME-Version:Content-Type; b=IT82N34O8km4FAv0UzApoL3teUMqNDEt/lyDJkuvNhKkfMkq7G18vOwwsbi/N2R09XT51ct6eC5Ia5nPDPc8vr1Uh64o5AhPRlh58UmVDOPQdO++7oFdZEhbHEuV7Xd0H1TfzAp0g3SRd5l5xFpICSTUtI1VxAWlg2H8wgcHi8k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=YVulQNXr; arc=none smtp.client-ip=217.70.183.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="ZP+vhr00"
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 681F260006;
-	Wed, 24 Jan 2024 16:48:03 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="YVulQNXr"
+Received: by mail.gandi.net (Postfix) with ESMTPSA id DA75A60002;
+	Wed, 24 Jan 2024 16:51:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1706114884;
+	t=1706115120;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Hve7mVwzFpKlUFRjGUurQPnaxwP0/IowvX0am3el6Vc=;
-	b=ZP+vhr00cn+7xRAMlu/e3C3oKegJdereg0UiMsYWIOFkp/kXdX7C0czffAtbcw0mCJvj9t
-	4FXEo2tEHTcTX0O9CQshe8PJJu6j/DtBETUyDU1o3szcdZBVskVKrJ7CvCZKDPiKW03JUa
-	PpJ7sJI0I4FuHwr53IMtFmqgd9zaZ2cq5KQjq63grYm4B2Wv3KZO94Q23IpGcoPqyo3dsv
-	0XBizSKr+MDTD3LASFpdWYe1xEDep4L4ELywcImBWNXnLqc+MxbR/XFrXUjz8S6CCxeD7S
-	DFhGCNOkUo7WgwV4YsrrYZd0n+MxTePiuUQsi8jn0necVuv6n8lHDwwo/G7sjw==
-Date: Wed, 24 Jan 2024 17:48:02 +0100
+	bh=QIeTCTHch/7rOF4+4kHAvCpl/cSG69Q6EDBjClEVtbc=;
+	b=YVulQNXrMfl14MdSxUApNWPw0NIwcmJGbHWtvMskD3Pvs2BhQyF16n9TAUzlO2e/MAirEs
+	QU/nI8VKQPwcvm2P4YfH+huycdRBjReTB/pfb3yUPUwfuzgAw5dyafHMRQUqywx4nlPkza
+	sc81Q7cNMWy18gzZEQwB2DUJXrIwU2XdWoBs818W7Z+5tNKKs+AkESX720BYevAjyns/mg
+	WoYH3jtb1IoUeyCVrWm8wzwr3tuTRN5foQh+J1GcFolPL/ER9YSS9SiHQ6yX9p9STfUXMH
+	SvDJiAy1Fk9kcKgh/pKC6t4GkMbPzqH4IsEERcb2RTVagvRitFUuKAz7D1y6Jg==
+Date: Wed, 24 Jan 2024 17:51:58 +0100
 From: Miquel Raynal <miquel.raynal@bootlin.com>
-To: Stefan Schmidt <stefan@datenfreihafen.org>
-Cc: Breno Leitao <leitao@debian.org>, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, Alexander Aring
- <alex.aring@gmail.com>, netdev@vger.kernel.org, "open list:IEEE 802.15.4
- SUBSYSTEM" <linux-wpan@vger.kernel.org>, open list
- <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next 06/10] net: fill in MODULE_DESCRIPTION()s for
+To: Breno Leitao <leitao@debian.org>
+Cc: kuba@kernel.org, davem@davemloft.net, abeni@redhat.com,
+ edumazet@google.com, Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt
+ <stefan@datenfreihafen.org>, Paolo Abeni <pabeni@redhat.com>,
+ dsahern@kernel.org, weiwan@google.com, linux-wpan@vger.kernel.org (open
+ list:IEEE 802.15.4 SUBSYSTEM), netdev@vger.kernel.org (open list:NETWORKING
+ [GENERAL]), linux-kernel@vger.kernel.org (open list)
+Subject: Re: [PATCH net-next 02/22] net: fill in MODULE_DESCRIPTION()s for
  ieee802154
-Message-ID: <20240124174802.0b5910a5@xps-13>
-In-Reply-To: <45711bec-e0f3-43c2-b8f2-b9a55654710b@datenfreihafen.org>
-References: <20240108181610.2697017-1-leitao@debian.org>
-	<20240108181610.2697017-7-leitao@debian.org>
-	<45711bec-e0f3-43c2-b8f2-b9a55654710b@datenfreihafen.org>
+Message-ID: <20240124175158.7c8b9490@xps-13>
+In-Reply-To: <20240122184543.2501493-3-leitao@debian.org>
+References: <20240122184543.2501493-1-leitao@debian.org>
+	<20240122184543.2501493-3-leitao@debian.org>
 Organization: Bootlin
 X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
@@ -57,36 +57,20 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-GND-Sasl: miquel.raynal@bootlin.com
 
-Hi,
+Hi Breno,
 
-stefan@datenfreihafen.org wrote on Tue, 9 Jan 2024 08:25:21 +0100:
+leitao@debian.org wrote on Mon, 22 Jan 2024 10:45:23 -0800:
 
-> Hello.
+> W=3D1 builds now warn if module is built without a MODULE_DESCRIPTION().
+> Add descriptions to ieee802154 modules.
 >=20
-> On 08.01.24 19:16, Breno Leitao wrote:
-> > W=3D1 builds now warn if module is built without a MODULE_DESCRIPTION().
-> > Add descriptions to ieee802154 modules.
-> >=20
-> > Signed-off-by: Breno Leitao <leitao@debian.org>
-> > ---
-> >   net/ieee802154/6lowpan/core.c | 1 +
-> >   net/ieee802154/socket.c       | 1 +
-> >   2 files changed, 2 insertions(+)
-> >=20
-> > diff --git a/net/ieee802154/6lowpan/core.c b/net/ieee802154/6lowpan/cor=
-e.c
-> > index 2c087b7f17c5..b88f6a96d961 100644
-> > --- a/net/ieee802154/6lowpan/core.c
-> > +++ b/net/ieee802154/6lowpan/core.c
-> > @@ -280,5 +280,6 @@ static void __exit lowpan_cleanup_module(void) =20
-> >   >   module_init(lowpan_init_module); =20
-> >   module_exit(lowpan_cleanup_module);
-> > +MODULE_DESCRIPTION("IPv6 over Low power Wireless Personal Area Network=
- IEEE802154.4 core"); =20
->=20
-> If we want to nitpick you could write it as IEEE 802.15.4.
+> Signed-off-by: Breno Leitao <leitao@debian.org>
+> Acked-by: Stefan Schmidt <stefan@datenfreihafen.org>
 
-Also agreed, can you please post an update?
+I just see the v2 now. Please use "v2" in your commit title using -v or
+git-format-patch.
+
+I'll take it through wpan.
 
 Thanks,
 Miqu=C3=A8l
