@@ -1,76 +1,137 @@
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 927D47CF3D;
-	Wed, 24 Jan 2024 16:52:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68C897E762;
+	Wed, 24 Jan 2024 17:13:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706115125; cv=none; b=nVwM6X/ZNhePB2fhlrWzTie43/CNzeXZ1lW1Wno210cccKGHuGRaXs4NfbFodc6kXcgUJNjEtzXo9GXFREapN7Q1CMndF4dWHKlxXQe89su6pDKWhsFvM+yOO+si2E5mx5i0x273InggAj1dB9nwHX8gL0yQVulz0vq+ae2Cbkk=
+	t=1706116431; cv=none; b=ldVV+G7fdPUxCIS4fpEOMS+Fv6XwlVWrEIAYgJIv9QDfxbyV58XpDgsZnnXBxngYztY/PUz4IRj10hnSZRew86hTNjtcgs+A9zv8uobOEjPc+frQ7U4PHivmRGrr1+nrgrFpqCT1uaW0B5CkQ1VHK+TRaw6Waz95WjNIrtDGgFc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706115125; c=relaxed/simple;
-	bh=QIeTCTHch/7rOF4+4kHAvCpl/cSG69Q6EDBjClEVtbc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IT82N34O8km4FAv0UzApoL3teUMqNDEt/lyDJkuvNhKkfMkq7G18vOwwsbi/N2R09XT51ct6eC5Ia5nPDPc8vr1Uh64o5AhPRlh58UmVDOPQdO++7oFdZEhbHEuV7Xd0H1TfzAp0g3SRd5l5xFpICSTUtI1VxAWlg2H8wgcHi8k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=YVulQNXr; arc=none smtp.client-ip=217.70.183.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+	s=arc-20240116; t=1706116431; c=relaxed/simple;
+	bh=jvo5IXYlQYdIU6VCmACeGNP4xo23ZIbLfeE2jvqqluI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fVWsi+KevSWn+BcFviAfQvoVjSaUypMoub+WfWbIRbf9bcZDKr9RZD2lZhBD0I5ikc5Nb6eGoQTJxEbLuHu50ZkmGEUuj600qr79/331zMu57eOlgI3CH80shvpNyCg5bwpPZnfXy2MWJvQ/Iy59YFpDindHDu2AwQFT0sgA3qA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=v2pVfufL; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="YVulQNXr"
-Received: by mail.gandi.net (Postfix) with ESMTPSA id DA75A60002;
-	Wed, 24 Jan 2024 16:51:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1706115120;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QIeTCTHch/7rOF4+4kHAvCpl/cSG69Q6EDBjClEVtbc=;
-	b=YVulQNXrMfl14MdSxUApNWPw0NIwcmJGbHWtvMskD3Pvs2BhQyF16n9TAUzlO2e/MAirEs
-	QU/nI8VKQPwcvm2P4YfH+huycdRBjReTB/pfb3yUPUwfuzgAw5dyafHMRQUqywx4nlPkza
-	sc81Q7cNMWy18gzZEQwB2DUJXrIwU2XdWoBs818W7Z+5tNKKs+AkESX720BYevAjyns/mg
-	WoYH3jtb1IoUeyCVrWm8wzwr3tuTRN5foQh+J1GcFolPL/ER9YSS9SiHQ6yX9p9STfUXMH
-	SvDJiAy1Fk9kcKgh/pKC6t4GkMbPzqH4IsEERcb2RTVagvRitFUuKAz7D1y6Jg==
-Date: Wed, 24 Jan 2024 17:51:58 +0100
-From: Miquel Raynal <miquel.raynal@bootlin.com>
-To: Breno Leitao <leitao@debian.org>
-Cc: kuba@kernel.org, davem@davemloft.net, abeni@redhat.com,
- edumazet@google.com, Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt
- <stefan@datenfreihafen.org>, Paolo Abeni <pabeni@redhat.com>,
- dsahern@kernel.org, weiwan@google.com, linux-wpan@vger.kernel.org (open
- list:IEEE 802.15.4 SUBSYSTEM), netdev@vger.kernel.org (open list:NETWORKING
- [GENERAL]), linux-kernel@vger.kernel.org (open list)
-Subject: Re: [PATCH net-next 02/22] net: fill in MODULE_DESCRIPTION()s for
- ieee802154
-Message-ID: <20240124175158.7c8b9490@xps-13>
-In-Reply-To: <20240122184543.2501493-3-leitao@debian.org>
-References: <20240122184543.2501493-1-leitao@debian.org>
-	<20240122184543.2501493-3-leitao@debian.org>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="v2pVfufL"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B096C43390;
+	Wed, 24 Jan 2024 17:13:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1706116430;
+	bh=jvo5IXYlQYdIU6VCmACeGNP4xo23ZIbLfeE2jvqqluI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=v2pVfufLGd3lCfp0CeG2fpxzUUsvpwbElgNFofM1ZPehhJ3gSyI8DyqjujjS7qB28
+	 HIx8X5ThDTkPR0Ay0PzOQVdIcq5n2pTAL/fkyg4/FCf2V3zKeABMVcc+DS8MIJ/Ztv
+	 A8j4KVPuFkJX9pHjYFH5A/rDYDM6TICeR0rlV7yw=
+Date: Wed, 24 Jan 2024 09:13:49 -0800
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>
+Cc: Mark Brown <broonie@kernel.org>, kernel@pengutronix.de,
+	Moritz Fischer <mdf@kernel.org>, Wu Hao <hao.wu@intel.com>,
+	Xu Yilun <yilun.xu@intel.com>, Tom Rix <trix@redhat.com>,
+	linux-fpga@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Alexander Aring <alex.aring@gmail.com>,
+	Stefan Schmidt <stefan@datenfreihafen.org>,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
+	Lars-Peter Clausen <lars@metafoo.de>,
+	Michael Hennerich <Michael.Hennerich@analog.com>,
+	Jonathan Cameron <jic23@kernel.org>, linux-iio@vger.kernel.org,
+	Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+	linux-input@vger.kernel.org, Ulf Hansson <ulf.hansson@linaro.org>,
+	Rayyan Ansari <rayyan@ansari.sh>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Martin Tuma <martin.tuma@digiteqautomotive.com>,
+	Mauro Carvalho Chehab <mchehab@kernel.org>,
+	linux-media@vger.kernel.org, Sergey Kozlov <serjk@netup.ru>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Yang Yingliang <yangyingliang@huawei.com>,
+	linux-mmc@vger.kernel.org, Richard Weinberger <richard@nod.at>,
+	Vignesh Raghavendra <vigneshr@ti.com>,
+	Rob Herring <robh@kernel.org>, Heiko Stuebner <heiko@sntech.de>,
+	Michal Simek <michal.simek@amd.com>,
+	Amit Kumar Mahapatra via Alsa-devel <alsa-devel@alsa-project.org>,
+	linux-mtd@lists.infradead.org,
+	Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Pali =?iso-8859-1?Q?Roh=E1r?= <pali@kernel.org>,
+	Simon Horman <horms@kernel.org>,
+	Ronald Wahl <ronald.wahl@raritan.com>,
+	Benson Leung <bleung@chromium.org>,
+	Tzung-Bi Shih <tzungbi@kernel.org>,
+	Guenter Roeck <groeck@chromium.org>,
+	chrome-platform@lists.linux.dev, Max Filippov <jcmvbkbc@gmail.com>,
+	linux-spi@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	linux-arm-msm@vger.kernel.org,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	linux-mediatek@lists.infradead.org,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	Javier Martinez Canillas <javierm@redhat.com>,
+	Amit Kumar Mahapatra <amit.kumar-mahapatra@amd.com>,
+	dri-devel@lists.freedesktop.org, linux-fbdev@vger.kernel.org,
+	linux-staging@lists.linux.dev, Viresh Kumar <vireshk@kernel.org>,
+	Rui Miguel Silva <rmfrfs@gmail.com>,
+	Johan Hovold <johan@kernel.org>, Alex Elder <elder@kernel.org>,
+	greybus-dev@lists.linaro.org, Peter Huewe <peterhuewe@gmx.de>,
+	Jarkko Sakkinen <jarkko@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
+	linux-integrity@vger.kernel.org,
+	Herve Codina <herve.codina@bootlin.com>,
+	Alan Stern <stern@rowland.harvard.edu>,
+	Aaro Koskinen <aaro.koskinen@iki.fi>,
+	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+	linux-usb@vger.kernel.org, Helge Deller <deller@gmx.de>,
+	Dario Binacchi <dario.binacchi@amarulasolutions.com>,
+	Kalle Valo <kvalo@kernel.org>, Dmitry Antipov <dmantipov@yandex.ru>,
+	libertas-dev@lists.infradead.org, linux-wireless@vger.kernel.org,
+	Jonathan Corbet <corbet@lwn.net>, James Clark <james.clark@arm.com>,
+	Bjorn Helgaas <bhelgaas@google.com>, linux-doc@vger.kernel.org
+Subject: Re: [PATCH v2 00/33] spi: get rid of some legacy macros
+Message-ID: <2024012417-prissy-sworn-bc55@gregkh>
+References: <cover.1705944943.git.u.kleine-koenig@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: miquel.raynal@bootlin.com
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <cover.1705944943.git.u.kleine-koenig@pengutronix.de>
 
-Hi Breno,
+On Mon, Jan 22, 2024 at 07:06:55PM +0100, Uwe Kleine-König wrote:
+> Hello,
+> 
+> this is v2 of this patch set.
+> 
+> Changes since (implicit) v1, sent with Message-Id:
+> cover.1705348269.git.u.kleine-koenig@pengutronix.de:
+> 
+>  - Rebase to v6.8-rc1
+>  - Fix a build failure on sh
+>  - Added the tags received in (implicit) v1.
+> 
+> The slave-mt27xx driver needs some more work. The patch presented here
+> is enough however to get rid of the defines handled in patch 32.
+> Cleaning that up is out-of-scope for this series, so I'll delay that
+> until later.
+> 
+> Note that Jonathan Cameron has already applied patch 3 to his tree, it
+> didn't appear in a public tree though yet. I still included it here to
+> make the kernel build bots happy.
 
-leitao@debian.org wrote on Mon, 22 Jan 2024 10:45:23 -0800:
+Are we supposed to take the individual changes in our different
+subsystem trees, or do you want them all to go through the spi tree?
 
-> W=3D1 builds now warn if module is built without a MODULE_DESCRIPTION().
-> Add descriptions to ieee802154 modules.
->=20
-> Signed-off-by: Breno Leitao <leitao@debian.org>
-> Acked-by: Stefan Schmidt <stefan@datenfreihafen.org>
+Either is fine with me, just need to know.
 
-I just see the v2 now. Please use "v2" in your commit title using -v or
-git-format-patch.
+thanks,
 
-I'll take it through wpan.
-
-Thanks,
-Miqu=C3=A8l
+greg k-h
