@@ -1,104 +1,101 @@
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 182AF73170;
-	Thu, 25 Jan 2024 15:36:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB6F613E23D;
+	Thu, 25 Jan 2024 19:35:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706196978; cv=none; b=BDuxp8kcmTonmdI7PKIFpC3O/Sa5NBOqnNzu5nw0uqLQweQ40gZJsAagyJK5BKOR4jvT/zCrISFWkj2lJdhoHbn+YCE7Tpi5vPY8UxP9TUpas/sO+YXvozi43iVLLiu5qgVjKNjQFxRT8UlN1Ifqm4yedjQ5RQ9jEFc4/jO4Gzo=
+	t=1706211322; cv=none; b=upVdF5cHZSGgDlzEg71VEra6dqriHniiHZnddHA65y4zgDA6Y2FPq4UdumyO117X2kPkgk9nZAsxn4CnqSLTQ4TNM/923X1UC0aok97L6ddy433e2Gi7cPAVEuFy/AZAlT9LU80Vku5d7+WRIoFLVWnDROpfIlPvCgL4AoMTkJs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706196978; c=relaxed/simple;
-	bh=Fxq6kkiG+dJZ/VNJkEc06gi+jmyZF2rGKm1JWnpOm5c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Rp7n9F4Wq9Lfycs/8GCvmGoEXkh0gj1aMW9OQMhoYOnuL/j+cSLXao4+lY1T4lYEc8H0sCXQ2GvouvgVFKLik3TaN+vHptoPJlI1rEZl/glL9osuzAsTlIcpcuisSoZZ0sLus/zwXb4f5dW1LTvc03yDmYfmQd0dyKGa+wveqzA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.42
+	s=arc-20240116; t=1706211322; c=relaxed/simple;
+	bh=XixT/EeMt1VQDS/UYuewQ732sIL2ZBkXmKEbtFoZgtQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=N9Ng1UOk2uQENbtpki+Tkpb0BaN+luPDbcF4a+obeOZaafevk8HYfgQwIImx14DZdz+2gCT1YR4jdlUqBTFxGU8j7M8bRUmRbjy1OElQ+tq9uvGvU7izenqi5xYWBc/x6X3MDrezjgVpiRPXCP0zwv7CH20ClBt/JU4IPKqccNA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a2dc7827a97so769416266b.2;
-        Thu, 25 Jan 2024 07:36:15 -0800 (PST)
+Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a33735d22fcso60174766b.2;
+        Thu, 25 Jan 2024 11:35:20 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706196972; x=1706801772;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XpAh/AgeLA3yAZ+8/BxWrNJnaxhn5Tb3BytJoAv2i+I=;
-        b=Tke0OwVeOdw6hoyjXGF9hSnCp2sNa/ij4ivJZ6nBk325bxPTbRPHepAkUtwa/mTRfm
-         SNg9MHAvMGHERBgwsLED3+l3Ej9x7vAF+DZrRWLvO3nMZgfnxAnwVUKwl0RousstugyF
-         NsZmfaOm03oiuz/qcigdqJOLTJSQI1BA3QQHglBOT+VA5g4rZJq5eQRC0FxYxXvCsNDS
-         GwoT10pGPxf0kcb8fxAtCBhw441eubP5+zBkg5nBn0v+T5v09Vltf4XFuTvaQXIqakxo
-         ilEPNCfNv+uLJQL3BtBqlWgtSbvMDAq3ZpTguVbjHYGs3PdiAJHcdUFqaU+Deq++B9KT
-         4Acw==
-X-Gm-Message-State: AOJu0YwPYPDBU6IevzdW4WkmlaQK7yPiOb86m53NIH/0o37lWlztHjzm
-	rm40tMuziTT6YcVYJahnMgUbf0i9mXwTBqJ0zwFR7jLY6rqHKRlx
-X-Google-Smtp-Source: AGHT+IGIRMS6s46BQQttwTEKXx/01hU23t7uTsm4HcMNUcNWqctF9c1iZDS50ehb/W0/fsXPZZQcEQ==
-X-Received: by 2002:a17:906:b7c3:b0:a31:b59:9cec with SMTP id fy3-20020a170906b7c300b00a310b599cecmr690538ejb.16.1706196972374;
-        Thu, 25 Jan 2024 07:36:12 -0800 (PST)
-Received: from gmail.com (fwdproxy-cln-116.fbsv.net. [2a03:2880:31ff:74::face:b00c])
-        by smtp.gmail.com with ESMTPSA id ep21-20020a1709069b5500b00a2ae7fb3fc6sm1161842ejc.93.2024.01.25.07.36.11
+        d=1e100.net; s=20230601; t=1706211319; x=1706816119;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Rh6KXnjYgc+1gbet7ap0t7DO3UQ1gK+zr3y4G8Q78qA=;
+        b=DIjovK1NTw2z2/zFOCHil7M8sj5yoorytk12QBxdaR2O5TfVt25cMhf7f/TyTmNiqC
+         FJCXb22Wt1W3FOmSSJFABAPqQMg/D1EdX/jKmP+f/bipQJQ0j7lE2/heiQNMH4eqap0/
+         Yi9dA9sUwDBtbZGy5AaHYonMN7rKGscv93WnhFeqkK+POOGhU3frMp7H+Hl8LIvE8Ca/
+         hZ+b41oXZBX2BX0klD7vIDibtbkjahJuz5qPS9HlUcgz3pd/O0bjah3G0+Uno0N5/6Py
+         9W/JcgC+MDJBM2nyVHnQs5M2BkQzzFTUy6S7l0tiCt+KwiDBCDwqGMDFtHG/k2r/pUI4
+         jVKA==
+X-Gm-Message-State: AOJu0YyJCrIEAMqv2n2NCOrE13tUUMI65GBXms/mYhaRqZlQvZuL0Wc8
+	Put9nRSYIwB3nW5dw4N8aP67bRJCsqc858wbDY9jPzHNddX94H7f
+X-Google-Smtp-Source: AGHT+IFy2MngrrMeMHNBpvEhENufa0ktPIXPrgm36Uv17pcnuYA720ma1pn9VbdyvPgHZMTooirMNg==
+X-Received: by 2002:a17:906:a9b:b0:a31:68e2:1438 with SMTP id y27-20020a1709060a9b00b00a3168e21438mr27176ejf.310.1706211319178;
+        Thu, 25 Jan 2024 11:35:19 -0800 (PST)
+Received: from localhost (fwdproxy-lla-120.fbsv.net. [2a03:2880:30ff:78::face:b00c])
+        by smtp.gmail.com with ESMTPSA id gh10-20020a170906e08a00b00a311a360433sm1356580ejb.143.2024.01.25.11.35.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Jan 2024 07:36:12 -0800 (PST)
-Date: Thu, 25 Jan 2024 07:36:10 -0800
+        Thu, 25 Jan 2024 11:35:18 -0800 (PST)
 From: Breno Leitao <leitao@debian.org>
-To: Miquel Raynal <miquel.raynal@bootlin.com>
-Cc: kuba@kernel.org, davem@davemloft.net, abeni@redhat.com,
-	edumazet@google.com, Alexander Aring <alex.aring@gmail.com>,
+To: kuba@kernel.org,
+	davem@davemloft.net,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	Alexander Aring <alex.aring@gmail.com>,
 	Stefan Schmidt <stefan@datenfreihafen.org>,
-	Paolo Abeni <pabeni@redhat.com>, dsahern@kernel.org,
+	Miquel Raynal <miquel.raynal@bootlin.com>
+Cc: dsahern@kernel.org,
 	weiwan@google.com,
-	"open list:IEEE 802.15.4 SUBSYSTEM" <linux-wpan@vger.kernel.org>,
-	"open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next 02/22] net: fill in MODULE_DESCRIPTION()s for
- ieee802154
-Message-ID: <ZbJ/6saj5Rn20x1N@gmail.com>
-References: <20240122184543.2501493-1-leitao@debian.org>
- <20240122184543.2501493-3-leitao@debian.org>
- <20240124175158.7c8b9490@xps-13>
- <ZbIxYnEbFXi6NBMU@gmail.com>
- <20240125155532.285a2bbd@xps-13>
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-wpan@vger.kernel.org (open list:IEEE 802.15.4 SUBSYSTEM)
+Subject: [PATCH net 09/10] net: fill in MODULE_DESCRIPTION()s for ieee802154
+Date: Thu, 25 Jan 2024 11:34:19 -0800
+Message-Id: <20240125193420.533604-10-leitao@debian.org>
+X-Mailer: git-send-email 2.39.3
+In-Reply-To: <20240125193420.533604-1-leitao@debian.org>
+References: <20240125193420.533604-1-leitao@debian.org>
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240125155532.285a2bbd@xps-13>
 
-On Thu, Jan 25, 2024 at 03:55:32PM +0100, Miquel Raynal wrote:
-> Hi Breno,
-> 
-> leitao@debian.org wrote on Thu, 25 Jan 2024 02:01:06 -0800:
-> 
-> > Hello Miquèl,
-> > 
-> > On Wed, Jan 24, 2024 at 05:51:58PM +0100, Miquel Raynal wrote:
-> > > Hi Breno,
-> > > 
-> > > leitao@debian.org wrote on Mon, 22 Jan 2024 10:45:23 -0800:
-> > >   
-> > > > W=1 builds now warn if module is built without a MODULE_DESCRIPTION().
-> > > > Add descriptions to ieee802154 modules.
-> > > > 
-> > > > Signed-off-by: Breno Leitao <leitao@debian.org>
-> > > > Acked-by: Stefan Schmidt <stefan@datenfreihafen.org>  
-> > > 
-> > > I just see the v2 now. Please use "v2" in your commit title using -v or
-> > > git-format-patch.  
-> > 
-> > Sorry, I am not sure I followed what you meant.  I've sent the v2, which
-> > contains the 'v2' _tag_:
-> 
-> I believe *this* is a v2 because you fixed your initial patch,
-> following Stefan's suggestion.
-> 
-> Anyway, it's fine for me to merge this patch through net directly (I
-> don't know if net maintainers want W=1 fixes to go through net or
-> net-next) so:
+W=1 builds now warn if module is built without a MODULE_DESCRIPTION().
+Add descriptions to ieee802154 modules.
 
-Thanks Miquèl. Jakub convinced Paolo that these fixes should go through
-net, that is why I am targeting `net`.
+Signed-off-by: Breno Leitao <leitao@debian.org>
+Acked-by: Miquel Raynal <miquel.raynal@bootlin.com>
+Acked-by: Stefan Schmidt <stefan@datenfreihafen.org>
+---
+ net/ieee802154/6lowpan/core.c | 1 +
+ net/ieee802154/socket.c       | 1 +
+ 2 files changed, 2 insertions(+)
 
-https://lore.kernel.org/all/20240122105708.52d33fa0@kernel.org/
+diff --git a/net/ieee802154/6lowpan/core.c b/net/ieee802154/6lowpan/core.c
+index 2c087b7f17c5..e643f52663f9 100644
+--- a/net/ieee802154/6lowpan/core.c
++++ b/net/ieee802154/6lowpan/core.c
+@@ -280,5 +280,6 @@ static void __exit lowpan_cleanup_module(void)
+ 
+ module_init(lowpan_init_module);
+ module_exit(lowpan_cleanup_module);
++MODULE_DESCRIPTION("IPv6 over Low power Wireless Personal Area Network IEEE 802.15.4 core");
+ MODULE_LICENSE("GPL");
+ MODULE_ALIAS_RTNL_LINK("lowpan");
+diff --git a/net/ieee802154/socket.c b/net/ieee802154/socket.c
+index 00302e8b9615..990a83455dcf 100644
+--- a/net/ieee802154/socket.c
++++ b/net/ieee802154/socket.c
+@@ -1137,4 +1137,5 @@ module_init(af_ieee802154_init);
+ module_exit(af_ieee802154_remove);
+ 
+ MODULE_LICENSE("GPL");
++MODULE_DESCRIPTION("IEEE 802.15.4 socket interface");
+ MODULE_ALIAS_NETPROTO(PF_IEEE802154);
+-- 
+2.39.3
+
