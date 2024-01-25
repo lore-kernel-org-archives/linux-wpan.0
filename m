@@ -1,126 +1,104 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 797C6133985;
-	Wed, 24 Jan 2024 20:02:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC79B1C69A;
+	Thu, 25 Jan 2024 10:00:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706126562; cv=none; b=iF8NcSRmX5jYJfEKs2DSY3wb2nvf0BvuIrnHMxBn8K3c1G1gYmsKf6wwbrWx/SGKAxc1mLDlyaIDtOT8FgiUVOj6p4O59UwZdAarm+Za7iscpku3F2yhWWc3c6Ql7zwPzewIvCAKsR9cdyBiJo1NO8gxVHryMUW0IO0Qr42y1yI=
+	t=1706176853; cv=none; b=XfMQe9KF1DW4aZjYQ6jdbtCCFw/JuI2cjLRFjZ0K3dyvt6jdRo6xClBFGx3S6vN58t3YPOcAX3prwpYN61kM25gM8hlNxkWOl+YJ/P3I0eT2r2tuiyVjPuNfW5zxMfMV7jSUsbrc/96xZ48/Z6tXBaDFACiY3ImgLOkfe/Pj8XM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706126562; c=relaxed/simple;
-	bh=jfXWrPM5ALhDnKgFnFkdz4CMio32hmCt3xWSsf12HKU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=C57I24B3iGHxq4RC1uR7Z4VOqayNXANOWtpZUKYn/jWdtALZMmthT64kMeDRf+r5j8VM4gqMsyADXVZqlj+XzBYowmN0G/oEOP7N4OPbfF32hOAuymA8mvoJUEPk/uZjeb5+EVmjchaXdsDD3LOKC9Sks3n+UKF5BI9SgTDN6uw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TIXWtyFH; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TIXWtyFH"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D9C4C433F1;
-	Wed, 24 Jan 2024 20:02:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706126562;
-	bh=jfXWrPM5ALhDnKgFnFkdz4CMio32hmCt3xWSsf12HKU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=TIXWtyFH5yxUa2sKS25qW3wOvsP8Ed2klnxIK0jQEvMXqnYVHZWCU0zqLjO7+ilCR
-	 JWdnVZmbglYShezSvqIcZWDN/Vh46HywERZIGBwdalc9QELX9rTL+upLtWfATkdWgT
-	 WOJSdLKuC7J9/6NYjh+DNGAalqkPr+gBHAK+jK1uAFFeeu8RJwLSBlu58kMYFUoEl1
-	 Yp7MPDfACwXPwjaV1u4/U968HoLm30T94Tl/mdr2QRYc4fOG1E9E30BuK8sKFpJ4U8
-	 n+9CHV5JSYN6y7zhCegxJ1IM+OVstyfug/6ZJ17Jvqz0l9lgm0LjUJl94LQR9K86D2
-	 ni5ld1wGOGq1w==
-Date: Wed, 24 Jan 2024 20:02:07 +0000
-From: Jonathan Cameron <jic23@kernel.org>
-To: Mark Brown <broonie@kernel.org>, linux-spi@vger.kernel.org
-Cc: Uwe =?UTF-8?B?S2xlaW5lLUvDtm5pZw==?= <u.kleine-koenig@pengutronix.de>,
- kernel@pengutronix.de, Moritz Fischer <mdf@kernel.org>, Wu Hao
- <hao.wu@intel.com>, Xu Yilun <yilun.xu@intel.com>, Tom Rix
- <trix@redhat.com>, linux-fpga@vger.kernel.org,
- linux-kernel@vger.kernel.org, Alexander Aring <alex.aring@gmail.com>,
- Stefan Schmidt <stefan@datenfreihafen.org>, Miquel Raynal
- <miquel.raynal@bootlin.com>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, linux-wpan@vger.kernel.org,
- netdev@vger.kernel.org, Lars-Peter Clausen <lars@metafoo.de>, Michael
- Hennerich <Michael.Hennerich@analog.com>, linux-iio@vger.kernel.org, Dmitry
- Torokhov <dmitry.torokhov@gmail.com>, linux-input@vger.kernel.org, Ulf
- Hansson <ulf.hansson@linaro.org>, Rayyan Ansari <rayyan@ansari.sh>, Andy
- Shevchenko <andriy.shevchenko@linux.intel.com>, Jonathan Cameron
- <Jonathan.Cameron@huawei.com>, Martin Tuma
- <martin.tuma@digiteqautomotive.com>, Mauro Carvalho Chehab
- <mchehab@kernel.org>, linux-media@vger.kernel.org, Sergey Kozlov
- <serjk@netup.ru>, Arnd Bergmann <arnd@arndb.de>, Greg Kroah-Hartman
- <gregkh@linuxfoundation.org>, Yang Yingliang <yangyingliang@huawei.com>,
- linux-mmc@vger.kernel.org, Richard Weinberger <richard@nod.at>, Vignesh
- Raghavendra <vigneshr@ti.com>, Rob Herring <robh@kernel.org>, Heiko
- Stuebner <heiko@sntech.de>, Michal Simek <michal.simek@amd.com>, Amit Kumar
- Mahapatra via Alsa-devel <alsa-devel@alsa-project.org>,
- linux-mtd@lists.infradead.org, Martin Blumenstingl
- <martin.blumenstingl@googlemail.com>, Geert Uytterhoeven
- <geert+renesas@glider.be>, Pali =?UTF-8?B?Um9ow6Fy?= <pali@kernel.org>,
- Simon Horman <horms@kernel.org>, Ronald Wahl <ronald.wahl@raritan.com>,
- Benson Leung <bleung@chromium.org>, Tzung-Bi Shih <tzungbi@kernel.org>,
- Guenter Roeck <groeck@chromium.org>, chrome-platform@lists.linux.dev, Max
- Filippov <jcmvbkbc@gmail.com>, linux-arm-kernel@lists.infradead.org, Bjorn
- Andersson <andersson@kernel.org>, Konrad Dybcio <konrad.dybcio@linaro.org>,
- linux-arm-msm@vger.kernel.org, Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- linux-mediatek@lists.infradead.org, Thomas Zimmermann
- <tzimmermann@suse.de>, Javier Martinez Canillas <javierm@redhat.com>, Amit
- Kumar Mahapatra <amit.kumar-mahapatra@amd.com>,
- dri-devel@lists.freedesktop.org, linux-fbdev@vger.kernel.org,
- linux-staging@lists.linux.dev, Viresh Kumar <vireshk@kernel.org>, Rui
- Miguel Silva <rmfrfs@gmail.com>, Johan Hovold <johan@kernel.org>, Alex
- Elder <elder@kernel.org>, greybus-dev@lists.linaro.org, Peter Huewe
- <peterhuewe@gmx.de>, Jarkko Sakkinen <jarkko@kernel.org>, Jason Gunthorpe
- <jgg@ziepe.ca>, linux-integrity@vger.kernel.org, Herve Codina
- <herve.codina@bootlin.com>, Alan Stern <stern@rowland.harvard.edu>, Aaro
- Koskinen <aaro.koskinen@iki.fi>, Krzysztof Kozlowski
- <krzysztof.kozlowski@linaro.org>, linux-usb@vger.kernel.org, Helge Deller
- <deller@gmx.de>, Dario Binacchi <dario.binacchi@amarulasolutions.com>,
- Kalle Valo <kvalo@kernel.org>, Dmitry Antipov <dmantipov@yandex.ru>,
- libertas-dev@lists.infradead.org, linux-wireless@vger.kernel.org, Jonathan
- Corbet <corbet@lwn.net>, James Clark <james.clark@arm.com>, Bjorn Helgaas
- <bhelgaas@google.com>, linux-doc@vger.kernel.org
-Subject: Re: [PATCH v2 00/33] spi: get rid of some legacy macros
-Message-ID: <20240124200207.7e02b501@jic23-huawei>
-In-Reply-To: <20240122192343.148a0b6d@jic23-huawei>
-References: <cover.1705944943.git.u.kleine-koenig@pengutronix.de>
-	<e62cdf7f-ce58-4f46-a0a0-25ce9fb271b1@sirena.org.uk>
-	<20240122192343.148a0b6d@jic23-huawei>
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.40; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1706176853; c=relaxed/simple;
+	bh=CGbHSIy071zY/1LZ1hb5hUgREb+h6t2K1eNPkQDWDMU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JHgJ89qMcMiJd2nJ7I5C1Amb+xoWMuHlJ39upfM9LlkWL9kUBG0+D9Th86ktjvAck/26q9tSARZ24822sivrF2JeO43H+vtcpCpM8M3QkYjQtyFxkak+shxDAosPRld7pQ3UZF66J8HtWBrAakj7A3SGiEi5FLwFJib1UdRCysU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.167.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-5100cb64e7dso2886936e87.0;
+        Thu, 25 Jan 2024 02:00:51 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706176850; x=1706781650;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=tIe6Br5ZKFh1Sn5GNQpAVH37kfCPS835GRt3i3xglEw=;
+        b=EAhhImPV79h73+MaO0ZPLnlAy1ayMJcAQuaHlTX9nkzhsTkudYK1Qk9jxclQvNk71C
+         J9cCmjy1ZINRNHvgmUoVGrcp4TP4STRE582anURo1sRlPDpqOp3v25llRHhc5B5sVfhD
+         GusEJ9avDB9Lmrz7gc0Ty9AXHgfAN2T14WeScBBrOg5OvXCjW8IA1MvwHtlH//TN02TC
+         k7n9MykYuApxecs9i0BX9hmYvfcSPVK+bCSGyadvlaIKIgkwPViDOmmmqndvFOAqiA6E
+         42MZ9ttC3/n7wSbaHL8cVacZXYFX8z7pEZRI2uPEMHiwm+jO6UxhDhXHbeEwl/AJDI0H
+         6HoA==
+X-Gm-Message-State: AOJu0Yxhdq3JMO6stAy6R5xti3kS1CYriWUVN0eSH5E9u+HuXYItBt4t
+	IFDBDzSL6AkNf8xsEPwfxp38SfdNHwbzCFY2SHtq63Vo4mVnfYaS
+X-Google-Smtp-Source: AGHT+IFwSfVo1AJFrmB/o+ycNXmm5veZY78/OMODtOeGl0vmLCuMZwo4PaCV4KdREkZNrm0kt1OawQ==
+X-Received: by 2002:a05:6512:3ba1:b0:50e:62b1:f67b with SMTP id g33-20020a0565123ba100b0050e62b1f67bmr246350lfv.134.1706176849890;
+        Thu, 25 Jan 2024 02:00:49 -0800 (PST)
+Received: from gmail.com (fwdproxy-cln-119.fbsv.net. [2a03:2880:31ff:77::face:b00c])
+        by smtp.gmail.com with ESMTPSA id rf22-20020a1709076a1600b00a2fb9c0337esm834121ejc.112.2024.01.25.02.00.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 25 Jan 2024 02:00:49 -0800 (PST)
+Date: Thu, 25 Jan 2024 02:00:47 -0800
+From: Breno Leitao <leitao@debian.org>
+To: Miquel Raynal <miquel.raynal@bootlin.com>
+Cc: Stefan Schmidt <stefan@datenfreihafen.org>, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	Alexander Aring <alex.aring@gmail.com>, netdev@vger.kernel.org,
+	"open list:IEEE 802.15.4 SUBSYSTEM" <linux-wpan@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next 06/10] net: fill in MODULE_DESCRIPTION()s for
+ ieee802154
+Message-ID: <ZbIxT54XYLzVWx/i@gmail.com>
+References: <20240108181610.2697017-1-leitao@debian.org>
+ <20240108181610.2697017-7-leitao@debian.org>
+ <45711bec-e0f3-43c2-b8f2-b9a55654710b@datenfreihafen.org>
+ <20240124174802.0b5910a5@xps-13>
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240124174802.0b5910a5@xps-13>
 
-On Mon, 22 Jan 2024 19:23:43 +0000
-Jonathan Cameron <jic23@kernel.org> wrote:
+Hello Miquèl,
 
-> On Mon, 22 Jan 2024 18:18:22 +0000
-> Mark Brown <broonie@kernel.org> wrote:
->=20
-> > On Mon, Jan 22, 2024 at 07:06:55PM +0100, Uwe Kleine-K=C3=B6nig wrote:
-> >  =20
-> > > Note that Jonathan Cameron has already applied patch 3 to his tree, it
-> > > didn't appear in a public tree though yet. I still included it here to
-> > > make the kernel build bots happy.   =20
-> >=20
-> > It's also going to be needed for buildability of the end of the series.=
- =20
->=20
-> Ah.  I thought intent was to split this across all the different trees
-> then do the final patch only after they were all gone?
->=20
-> I'm fine with it going all in one go if people prefer that.
->=20
-> My tree will be out in a few mins. Was just waiting to rebase on rc1
-> which I've just done.
->=20
-> Jonathan
->=20
+On Wed, Jan 24, 2024 at 05:48:02PM +0100, Miquel Raynal wrote:
+> Hi,
+> 
+> stefan@datenfreihafen.org wrote on Tue, 9 Jan 2024 08:25:21 +0100:
+> 
+> > Hello.
+> > 
+> > On 08.01.24 19:16, Breno Leitao wrote:
+> > > W=1 builds now warn if module is built without a MODULE_DESCRIPTION().
+> > > Add descriptions to ieee802154 modules.
+> > > 
+> > > Signed-off-by: Breno Leitao <leitao@debian.org>
+> > > ---
+> > >   net/ieee802154/6lowpan/core.c | 1 +
+> > >   net/ieee802154/socket.c       | 1 +
+> > >   2 files changed, 2 insertions(+)
+> > > 
+> > > diff --git a/net/ieee802154/6lowpan/core.c b/net/ieee802154/6lowpan/core.c
+> > > index 2c087b7f17c5..b88f6a96d961 100644
+> > > --- a/net/ieee802154/6lowpan/core.c
+> > > +++ b/net/ieee802154/6lowpan/core.c
+> > > @@ -280,5 +280,6 @@ static void __exit lowpan_cleanup_module(void)  
+> > >   >   module_init(lowpan_init_module);  
+> > >   module_exit(lowpan_cleanup_module);
+> > > +MODULE_DESCRIPTION("IPv6 over Low power Wireless Personal Area Network IEEE802154.4 core");  
+> > 
+> > If we want to nitpick you could write it as IEEE 802.15.4.
+> 
+> Also agreed, can you please post an update?
 
-Dropped from my tree.
+Sure. I will send it soon, since I am splitting the patches in a set of
+10. According to the maintainer's request:
+https://lore.kernel.org/all/20240122105708.52d33fa0@kernel.org/
 
-Acked-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+For now, I am focusing on Ethernet drivers.
+
+Thanks!
