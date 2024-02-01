@@ -1,146 +1,122 @@
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8369154BFD
-	for <linux-wpan@vger.kernel.org>; Mon, 29 Jan 2024 09:15:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.69
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4B0F39AE1;
+	Thu,  1 Feb 2024 21:47:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706519734; cv=none; b=bpsw3sW46IZY43Ay4cGLW6IVI+TUB3kO7xexqbhMUl1SC6poWdSxXN0iBynNLvGBzbc9/9XRxpYGZwq00bug1lioostnvyuoiDE7knR+ENv4xzBkxRV8EbnDrKq0/bi7AdLtGZnWDsZDTnKRQtKH0vDzglg+kVkdLJBLUCR5Dbo=
+	t=1706824053; cv=none; b=Uak3q6fovuTrGQ6irIPfGICYVR6/6afdPLjz5lGScydMdAvIKR/Ha7ZIPGsrj8heY0Ul5oFuu9USIkaIAmsbS2Wh/ipeb4gjhrXDLzP7rEYiWVRvrELSdlwX1XSIfR1w2P79RKfrvzAbn89EXGPA6OMhjEYh+YXMgar4h6gDgzs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706519734; c=relaxed/simple;
-	bh=DGad/o37HIMAGBYDyNh3jpA/66Z9p0xy2IhLHPaEOcA=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=W7Rq8K1xJvlHNZ27jWBO7vmv941503f3tHUl/NSm2Pe+SMrr1B37ZpZ+SMxPl42QhakLDiIZ6TnDZ3mDn0QvGnWJR1Er3vQEbAs9jMJQsmJCN01Uu4jzbNCN5+NFugRHDOw1eG+gptbF9Xc62lkJbbec9DwmNmAih7Qqrp9gYx8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-7bfd755ae39so116441939f.1
-        for <linux-wpan@vger.kernel.org>; Mon, 29 Jan 2024 01:15:32 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706519731; x=1707124531;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=rA7MQzHTNTKt3vH2tDpSPNQkDZUjxTZ8kKLyNS4BEOs=;
-        b=iCaRA8/T3QRPzcd+Yx/AljJTd2osIobj1rXnh7CCgztpieW+Z2V0XKm7iLZJeB66qZ
-         nNqvmHWzacGAjEHSeCsqDZQtuH13lrngNzSh6+qPFjW9/VVD8m0FxAiD7+EKI8B3CLgU
-         PVwAbcF+Fv44uDNU8ywR5wriUrswgpNTpuT8rb6E6KtK66vi/UwL/QCn9wP3m4MLhSX0
-         3HBVLgsFX6DO8A18fx3sR1uBJSkXE3t2IWxCL61CUsYQnVhgbsGbAL7eOJFjROQt9GZN
-         68RdNAgIsviD5EnHMl18c1DKM2a37Mo4EJAXs9lBY6q3T+7I6NooVx1U9Yp2X5LnFcTu
-         upIQ==
-X-Gm-Message-State: AOJu0Yy7rg1jwf1bhWl9i3LIiLbmF9bQb/LFoUuM+1ZZLRm2pstFXmQj
-	3u5co+ByGAHqMXV9oqAaXa+vRyDMj1Ihrd4LOaxfIhYrce1VX/idKjTOvkQuJQdJCRl8IO+GhcP
-	poorv7e3swPE8GkAxGgSfZNBopQBBscSy6zjq2hgJUgWBR6XSdbYfb8Q=
-X-Google-Smtp-Source: AGHT+IFz8E/eYwJb34tFie3IVz/chhD0gY5PI++lAmm7xV6pHMtRfpYr5rXAQCn2FLpzvWZ1L/7Cn9EPgbGJy2KN2p7nEge0xniV
+	s=arc-20240116; t=1706824053; c=relaxed/simple;
+	bh=ONdXqAS27cKeOgWX4XGTKCxg4rE0mzWElHVnnYMMb0Y=;
+	h=Mime-Version:Content-Type:Date:Message-Id:From:To:Cc:Subject:
+	 References:In-Reply-To; b=khxhwSxLDnLzjIdYRf0JZGlz3N+SgDTU1UeUf+6SBoSQeUBK47wAcA3uuk18bvU3k9yTfrG83HMqz2/VEq/jaA28iuim+dgoqHSgNBcucMECnn/FwC7u904JZr5lKQUlIl0uxu6CALvToLATsy7OmaqQxjriTPztTHU9S2cVVvc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KYhAJw//; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KYhAJw//"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EEEB5C433C7;
+	Thu,  1 Feb 2024 21:47:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706824052;
+	bh=ONdXqAS27cKeOgWX4XGTKCxg4rE0mzWElHVnnYMMb0Y=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=KYhAJw//yARcM3TA6pVCkI4LUiBLE5XWbQdyIJ2IOE9XeeW9PXuRT0u1fpPxxrkwp
+	 Hurjt/dBf8xwi23T1FksMdv9e36XHyjvhrDNFhBSr1xRnTYLMYbJE3ILCL/Xokm/MD
+	 5zQO0eFXQidwjXeacacwmmo5pMdGivYcXVl5OsSlyzb4uDD6zF3QHkW/ipNCSyCrkX
+	 ruFySuh4tDJV4Rf4YFiYpBgTsdWdhvZKAcl5M+3wneiWVFJ2zo1QtBfWDecyRoxa73
+	 fETXEmGDyXWVSu/j1Xloaznpi7OcrAoyx70CgInqn+hTw2H52XDK3rA5SorsXzUwVT
+	 KByKrTZWMbAOA==
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-Received: by 2002:a05:6638:1403:b0:470:ae57:e1e0 with SMTP id
- k3-20020a056638140300b00470ae57e1e0mr49708jad.0.1706519731683; Mon, 29 Jan
- 2024 01:15:31 -0800 (PST)
-Date: Mon, 29 Jan 2024 01:15:31 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000068c70c061012160c@google.com>
-Subject: [syzbot] [wpan?] WARNING in cfg802154_switch_netns
-From: syzbot <syzbot+6fbfe8fc7634822d0446@syzkaller.appspotmail.com>
-To: alex.aring@gmail.com, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-wpan@vger.kernel.org, 
-	miquel.raynal@bootlin.com, netdev@vger.kernel.org, pabeni@redhat.com, 
-	stefan@datenfreihafen.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Thu, 01 Feb 2024 23:47:13 +0200
+Message-Id: <CYU2MG4IOJ0Q.2UJOTK999FCCC@suppilovahvero>
+From: "Jarkko Sakkinen" <jarkko@kernel.org>
+To: "Mark Brown" <broonie@kernel.org>, "Greg Kroah-Hartman"
+ <gregkh@linuxfoundation.org>
+Cc: =?utf-8?q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
+ <kernel@pengutronix.de>, "Moritz Fischer" <mdf@kernel.org>, "Wu Hao"
+ <hao.wu@intel.com>, "Xu Yilun" <yilun.xu@intel.com>, "Tom Rix"
+ <trix@redhat.com>, <linux-fpga@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, "Alexander Aring" <alex.aring@gmail.com>,
+ "Stefan Schmidt" <stefan@datenfreihafen.org>, "Miquel Raynal"
+ <miquel.raynal@bootlin.com>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>, "Paolo
+ Abeni" <pabeni@redhat.com>, <linux-wpan@vger.kernel.org>,
+ <netdev@vger.kernel.org>, "Lars-Peter Clausen" <lars@metafoo.de>, "Michael
+ Hennerich" <Michael.Hennerich@analog.com>, "Jonathan Cameron"
+ <jic23@kernel.org>, <linux-iio@vger.kernel.org>, "Dmitry Torokhov"
+ <dmitry.torokhov@gmail.com>, <linux-input@vger.kernel.org>, "Ulf Hansson"
+ <ulf.hansson@linaro.org>, "Rayyan Ansari" <rayyan@ansari.sh>, "Andy
+ Shevchenko" <andriy.shevchenko@linux.intel.com>, "Jonathan Cameron"
+ <Jonathan.Cameron@huawei.com>, "Martin Tuma"
+ <martin.tuma@digiteqautomotive.com>, "Mauro Carvalho Chehab"
+ <mchehab@kernel.org>, <linux-media@vger.kernel.org>, "Sergey Kozlov"
+ <serjk@netup.ru>, "Arnd Bergmann" <arnd@arndb.de>, "Yang Yingliang"
+ <yangyingliang@huawei.com>, <linux-mmc@vger.kernel.org>, "Richard
+ Weinberger" <richard@nod.at>, "Vignesh Raghavendra" <vigneshr@ti.com>, "Rob
+ Herring" <robh@kernel.org>, "Heiko Stuebner" <heiko@sntech.de>, "Michal
+ Simek" <michal.simek@amd.com>, "Amit Kumar Mahapatra via Alsa-devel"
+ <alsa-devel@alsa-project.org>, <linux-mtd@lists.infradead.org>, "Martin
+ Blumenstingl" <martin.blumenstingl@googlemail.com>, "Geert Uytterhoeven"
+ <geert+renesas@glider.be>, =?utf-8?q?Pali_Roh=C3=A1r?= <pali@kernel.org>,
+ "Simon Horman" <horms@kernel.org>, "Ronald Wahl" <ronald.wahl@raritan.com>,
+ "Benson Leung" <bleung@chromium.org>, "Tzung-Bi Shih" <tzungbi@kernel.org>,
+ "Guenter Roeck" <groeck@chromium.org>, <chrome-platform@lists.linux.dev>,
+ "Max Filippov" <jcmvbkbc@gmail.com>, <linux-spi@vger.kernel.org>,
+ <linux-arm-kernel@lists.infradead.org>, "Bjorn Andersson"
+ <andersson@kernel.org>, "Konrad Dybcio" <konrad.dybcio@linaro.org>,
+ <linux-arm-msm@vger.kernel.org>, "Matthias Brugger"
+ <matthias.bgg@gmail.com>, "AngeloGioacchino Del Regno"
+ <angelogioacchino.delregno@collabora.com>,
+ <linux-mediatek@lists.infradead.org>, "Thomas Zimmermann"
+ <tzimmermann@suse.de>, "Javier Martinez Canillas" <javierm@redhat.com>,
+ "Amit Kumar Mahapatra" <amit.kumar-mahapatra@amd.com>,
+ <dri-devel@lists.freedesktop.org>, <linux-fbdev@vger.kernel.org>,
+ <linux-staging@lists.linux.dev>, "Viresh Kumar" <vireshk@kernel.org>, "Rui
+ Miguel Silva" <rmfrfs@gmail.com>, "Johan Hovold" <johan@kernel.org>, "Alex
+ Elder" <elder@kernel.org>, <greybus-dev@lists.linaro.org>, "Peter Huewe"
+ <peterhuewe@gmx.de>, "Jason Gunthorpe" <jgg@ziepe.ca>,
+ <linux-integrity@vger.kernel.org>, "Herve Codina"
+ <herve.codina@bootlin.com>, "Alan Stern" <stern@rowland.harvard.edu>, "Aaro
+ Koskinen" <aaro.koskinen@iki.fi>, "Krzysztof Kozlowski"
+ <krzysztof.kozlowski@linaro.org>, <linux-usb@vger.kernel.org>, "Helge
+ Deller" <deller@gmx.de>, "Dario Binacchi"
+ <dario.binacchi@amarulasolutions.com>, "Kalle Valo" <kvalo@kernel.org>,
+ "Dmitry Antipov" <dmantipov@yandex.ru>, <libertas-dev@lists.infradead.org>,
+ <linux-wireless@vger.kernel.org>, "Jonathan Corbet" <corbet@lwn.net>,
+ "James Clark" <james.clark@arm.com>, "Bjorn Helgaas" <bhelgaas@google.com>,
+ <linux-doc@vger.kernel.org>
+Subject: Re: [PATCH v2 00/33] spi: get rid of some legacy macros
+X-Mailer: aerc 0.15.2
+References: <cover.1705944943.git.u.kleine-koenig@pengutronix.de>
+ <2024012417-prissy-sworn-bc55@gregkh>
+ <c1e38a30-5075-4d01-af24-ac684e77cf29@sirena.org.uk>
+In-Reply-To: <c1e38a30-5075-4d01-af24-ac684e77cf29@sirena.org.uk>
 
-Hello,
+On Wed Jan 24, 2024 at 7:22 PM EET, Mark Brown wrote:
+> On Wed, Jan 24, 2024 at 09:13:49AM -0800, Greg Kroah-Hartman wrote:
+> > On Mon, Jan 22, 2024 at 07:06:55PM +0100, Uwe Kleine-K=C3=B6nig wrote:
+>
+> > > Note that Jonathan Cameron has already applied patch 3 to his tree, i=
+t
+> > > didn't appear in a public tree though yet. I still included it here t=
+o
+> > > make the kernel build bots happy.
+>
+> > Are we supposed to take the individual changes in our different
+> > subsystem trees, or do you want them all to go through the spi tree?
+>
+> Given that the final patch removes the legacy interfaces I'm expecting
+> to take them via SPI.
 
-syzbot found the following issue on:
++1
 
-HEAD commit:    beb53f32698f Merge branch 'txgbe-irq_domain'
-git tree:       net-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=1559e64be80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=bc36d99546fe9035
-dashboard link: https://syzkaller.appspot.com/bug?extid=6fbfe8fc7634822d0446
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+least fuss approach
 
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/131a55ff2911/disk-beb53f32.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/71ead9361bc3/vmlinux-beb53f32.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/2d210795a45c/bzImage-beb53f32.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+6fbfe8fc7634822d0446@syzkaller.appspotmail.com
-
-RBP: 00007f1270356120 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000001
-R13: 000000000000000b R14: 00007f126f7abf80 R15: 00007ffe576000f8
- </TASK>
-------------[ cut here ]------------
-WARNING: CPU: 0 PID: 26030 at net/ieee802154/core.c:258 cfg802154_switch_netns+0x38b/0x450 net/ieee802154/core.c:258
-Modules linked in:
-CPU: 0 PID: 26030 Comm: syz-executor.1 Not tainted 6.8.0-rc1-syzkaller-00454-gbeb53f32698f #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
-RIP: 0010:cfg802154_switch_netns+0x38b/0x450 net/ieee802154/core.c:258
-Code: df ff ff 48 8b 7b 20 e8 e3 69 3b fe 31 ff 89 c5 89 c6 e8 78 ac 47 f7 85 ed 0f 84 1f ff ff ff e9 11 ff ff ff e8 f6 b0 47 f7 90 <0f> 0b 90 e9 42 fe ff ff 4c 89 ef e8 25 d3 9f f7 e9 d3 fc ff ff e8
-RSP: 0018:ffffc9000360f4f8 EFLAGS: 00010246
-RAX: 0000000000040000 RBX: 00000000fffffff4 RCX: ffffc90010bf8000
-RDX: 0000000000040000 RSI: ffffffff8a4072da RDI: 0000000000000005
-RBP: ffff8880219a4198 R08: 0000000000000005 R09: 0000000000000000
-R10: 00000000fffffff4 R11: 00000000001cf128 R12: 0000000000000000
-R13: ffff88802adc9000 R14: ffff8880219a4078 R15: ffff8880219a4000
-FS:  00007f12703566c0(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f29ebda8008 CR3: 000000007affe000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- nl802154_wpan_phy_netns+0x134/0x2d0 net/ieee802154/nl802154.c:1292
- genl_family_rcv_msg_doit+0x1fc/0x2e0 net/netlink/genetlink.c:1113
- genl_family_rcv_msg net/netlink/genetlink.c:1193 [inline]
- genl_rcv_msg+0x561/0x800 net/netlink/genetlink.c:1208
- netlink_rcv_skb+0x16b/0x440 net/netlink/af_netlink.c:2543
- genl_rcv+0x28/0x40 net/netlink/genetlink.c:1217
- netlink_unicast_kernel net/netlink/af_netlink.c:1341 [inline]
- netlink_unicast+0x53b/0x810 net/netlink/af_netlink.c:1367
- netlink_sendmsg+0x8b7/0xd70 net/netlink/af_netlink.c:1908
- sock_sendmsg_nosec net/socket.c:730 [inline]
- __sock_sendmsg+0xd5/0x180 net/socket.c:745
- ____sys_sendmsg+0x6ac/0x940 net/socket.c:2584
- ___sys_sendmsg+0x135/0x1d0 net/socket.c:2638
- __sys_sendmsg+0x117/0x1e0 net/socket.c:2667
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xd3/0x250 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x63/0x6b
-RIP: 0033:0x7f126f67cda9
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 20 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f12703560c8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007f126f7abf80 RCX: 00007f126f67cda9
-RDX: 0000000000000000 RSI: 00000000200000c0 RDI: 0000000000000004
-RBP: 00007f1270356120 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000001
-R13: 000000000000000b R14: 00007f126f7abf80 R15: 00007ffe576000f8
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+BR, Jarkko
