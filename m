@@ -1,58 +1,59 @@
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E289A17748;
-	Mon,  5 Feb 2024 10:14:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 954481A28C;
+	Mon,  5 Feb 2024 10:14:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707128060; cv=none; b=kxIeNJbUhbOU2IJnWq9PADddfK8H4F47uf91AjVS6lJbsVe7FtmGqsrnoZpWonHIeupUBNtMsDr3txSbSDltqkP22D8iVv5aPoZlJtjwQLN/vx4nRfKck85++SKSU7kCeb1ewd80mLRDPiYHTKSrGCsC1LmDAnGfXddgYcDOs9Q=
+	t=1707128071; cv=none; b=gALknU3pOLjmb+JwKTXaQINyezMIGcqja7/pft38RW1NT1hnRSgfO34Hf9Ot5hpd73k5z6a91O3XN46SBR5QxEjx40q3Ze3E3yakth5sh0/dx0WGIgQtFpKwRwTRr0lKXyHuEIwBlCRWNxmMzCcVPSfzxG/V9o8nDVILoExKhF0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707128060; c=relaxed/simple;
-	bh=h09XmzjAYrmpBl0iTXX+I7W1xNVXxPK2RnBfV9Jz0b8=;
+	s=arc-20240116; t=1707128071; c=relaxed/simple;
+	bh=kTipcvln+EVFZhPdY2sRGGExTejqwAm0zYzxNgcQiCI=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=THb+ZIIP1Y+m8+ssuVm6S+YaHlAhF0derLLGUw0A0537ZL0lXM92VjnXhhRRHbEAsYhDw8fcc99pgKQ23kwhMf2blBo+TBkKeVefIqzQ1BAWkpMnaeF2Zg/lYLiDbhLTP6ZqSdxZ0yG2wgUlUZP/FaD1zYilobczf525JyplgHk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.45
+	 MIME-Version; b=FVSeCAKoer3dJ5x03lAg2UC/otgQTSBDF0FcgS8+leTYcq9KLCTIGr6V3Hao8sznQVTwWlf1h8EMZ7bw3nV6vwwmZUVwAulszEbY0DDbu4MDs48E35eBxqlKtOv/ri+w34mPdPDX+1qqSvq3aPio5yKz+5zOnQg8L1RdZN6feVg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-556c3f0d6c5so4725906a12.2;
-        Mon, 05 Feb 2024 02:14:18 -0800 (PST)
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-55a035669d5so5934874a12.2;
+        Mon, 05 Feb 2024 02:14:29 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707128057; x=1707732857;
+        d=1e100.net; s=20230601; t=1707128068; x=1707732868;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=SSPKPWb2+X/fBYPYBCyjcjI4u65FLsU0K06sqValewc=;
-        b=piasBwFovWv7rTVqaTy7JzVGE14kd7fwBIstBzDLVl1TIrEHkWkN1+QHYNqoQVb2TH
-         mzC5cDECHXVswuH2QOGMeWhiw7PTOOkKsLkSet0xxuZrZjP+W8z+jGN2C3iLPXauYqhZ
-         /tmkqgcB1PFwsjzwM5yjli9R2XJzUrGZCtYKTUHNa60TPTXBXHcZwB+uH4v9zJUf/qUQ
-         6xqsuAeeR5LMxc9BMdwAb+foziBsWsyK0qAo3u0DH9jQuS92D43WMbxsY5TuzKeSwycO
-         7n+WZX2sgtT9v/t7+NVcWn07XpDz1Ag5f4sWz0mLNCy5YE7W3JzzTZN2TNBUuydZZJpt
-         XRAQ==
-X-Gm-Message-State: AOJu0YwFN72YtOeknixxm+DczeCwHcpKHTeEpKs3aQzIs5QFRIsLbf9a
-	u4K7/WR04kQDivWvYVBBfRHjJ4m68exuMRv+9I2xfN+XuxGOv+5abKf6DVQThC0=
-X-Google-Smtp-Source: AGHT+IHpSdEdJG+y6/RQl2v5HHUAg2S21JQgGwWx6JYCDZCHfsdugZu+Jyu7mIbS5ZeEu4Xvo53N+w==
-X-Received: by 2002:a17:906:f8cd:b0:a35:a71d:81fe with SMTP id lh13-20020a170906f8cd00b00a35a71d81femr8389492ejb.43.1707128057126;
-        Mon, 05 Feb 2024 02:14:17 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCXok/aJvnbl/8tGiGBS4afqslCcV0MduWxPL/Dil2nqyGXS4zoIeMwBP8NzrOqtEVNNn3/KPVQPgBDd089QS728HIBBJ+cjHYx+EShhWKu1QFKMNbqEO+ORcHo6O3HOLv96S3Ay+RHMUYcVkFbm16n84CXZt+6S/hr8BKF89fiV8ar6QytA/UxkXFLhpd9kY3A4MqVyEZBKftApslBYMXfDzaqWjVXIN2497IBuaNffIKFvm1cHqOiHyA0joX9SonRQkf249G/Nquf9EEpZyhCbWYVKCMPzKNR822R+VTiacYaZq9QZEUCdJ69QLFcuqzm/QyTHtib2V/Ub91BlBw==
-Received: from localhost (fwdproxy-lla-118.fbsv.net. [2a03:2880:30ff:76::face:b00c])
-        by smtp.gmail.com with ESMTPSA id x20-20020a170906135400b00a376804704asm2416875ejb.177.2024.02.05.02.14.16
+        bh=KyrTVeg8VkhwoX9oeILNq8yjbD6EKV2tgaLB2i1nF2U=;
+        b=eGurriju3ZmXn42TWIr1fVIBC+0obScTcDONyyVnpHMkAQq4gHCAXVp5BCzP1RAHtg
+         IYTKkJV4Xrf38AXGA12vNfDGFTSu1EFq6xS0AlJHlx52cY0XPAbRzb7zvmI8exWuEvE/
+         gph0P0vF7GsOK8K4T13B40zkl2lQR4+oiUOiO63PnB7H/4cA5dLIqZs2IU+AHGA9GxTO
+         mFcVuY7yHQwLgjrNidawpGvsW+PqAfqMGkrK54qLd7r4LNqw/forpQcSU4SYuF77QFoN
+         +IZknwKnF/QhQ/vgbKmjTWnxxPDAcLOFc8lxshmgDqdjkszJnwu6wOHsEmwC5iIURl8W
+         YxkQ==
+X-Gm-Message-State: AOJu0Yyo9z77i9gQ4h4BCNoXscKRl8mKfmCEJszOyJ0Jr5Ybsu4pdYz6
+	64NBYC57988HtEEpBU32N6TVBo4nNVSkEQ2/7lC0aK3YtEmR6i4l
+X-Google-Smtp-Source: AGHT+IFFoo1bicgUxJRU6yudtS0kn+98FE/ubRwj8ruPDcdsbnfXLFwsnbWhG95PggJRGJoSUqQWfQ==
+X-Received: by 2002:a17:906:304e:b0:a30:4189:4e10 with SMTP id d14-20020a170906304e00b00a3041894e10mr5981958ejd.53.1707128067838;
+        Mon, 05 Feb 2024 02:14:27 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCWs2Hr8vLGGE/d2DoB6woVRkJZ570evwi+DciUEPtUYjMi4eR95zM53Hymb7EL7nN8H3MtiX8XFllbfP6rUkjuw8JN7g1j7qFvpDglnI5V3Hzn3LZsZ1UA7MEotaqEnkc9W6prQC4tESNFGrELL8EJ2WcrclKfEItBoJjCxkZP7Sx2Ar0KeBRUFomGdorwgIegiPP95P85gtWy0HbRcHcGKeza7LUpFL1iQx5UWbK4iDdpLIQbOPDoK2Y4S7TqOv/joA8JSq/EWo3f70lZ2xx21+pSCTkkGEsx9pxdYgrfeNRgxLIIBopV/hbR8ob3981VLUuKfr+av8TkA1MF4fUBnChpeYcV7VL4NJuSM+LNAsxIU+Q==
+Received: from localhost (fwdproxy-lla-006.fbsv.net. [2a03:2880:30ff:6::face:b00c])
+        by smtp.gmail.com with ESMTPSA id h8-20020a1709063b4800b00a369b47996esm4158576ejf.80.2024.02.05.02.14.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Feb 2024 02:14:16 -0800 (PST)
+        Mon, 05 Feb 2024 02:14:27 -0800 (PST)
 From: Breno Leitao <leitao@debian.org>
 To: kuba@kernel.org,
 	davem@davemloft.net,
 	pabeni@redhat.com,
 	edumazet@google.com,
-	Alexander Aring <alex.aring@gmail.com>
+	Alexander Aring <alex.aring@gmail.com>,
+	Stefan Schmidt <stefan@datenfreihafen.org>,
+	Miquel Raynal <miquel.raynal@bootlin.com>
 Cc: netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	horms@kernel.org,
 	andrew@lunn.ch,
-	linux-bluetooth@vger.kernel.org (open list:6LOWPAN GENERIC (BTLE/IEEE 802.15.4)),
-	linux-wpan@vger.kernel.org (open list:6LOWPAN GENERIC (BTLE/IEEE 802.15.4))
-Subject: [PATCH net 04/10] net: fill in MODULE_DESCRIPTION()s for 6LoWPAN
-Date: Mon,  5 Feb 2024 02:13:53 -0800
-Message-Id: <20240205101400.1480521-5-leitao@debian.org>
+	linux-wpan@vger.kernel.org (open list:IEEE 802.15.4 SUBSYSTEM)
+Subject: [PATCH net 08/10] net: fill in MODULE_DESCRIPTION()s for ieee802154
+Date: Mon,  5 Feb 2024 02:13:57 -0800
+Message-Id: <20240205101400.1480521-9-leitao@debian.org>
 X-Mailer: git-send-email 2.39.3
 In-Reply-To: <20240205101400.1480521-1-leitao@debian.org>
 References: <20240205101400.1480521-1-leitao@debian.org>
@@ -65,23 +66,36 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
 W=1 builds now warn if module is built without a MODULE_DESCRIPTION().
-Add descriptions to IPv6 over Low power Wireless Personal Area Network.
+Add descriptions to the IEEE 802.15.4 socket and 6lowpan modules.
 
 Signed-off-by: Breno Leitao <leitao@debian.org>
 ---
- net/6lowpan/core.c | 1 +
- 1 file changed, 1 insertion(+)
+ net/ieee802154/6lowpan/core.c | 1 +
+ net/ieee802154/socket.c       | 1 +
+ 2 files changed, 2 insertions(+)
 
-diff --git a/net/6lowpan/core.c b/net/6lowpan/core.c
-index 7b3341cef926..850d4a185f55 100644
---- a/net/6lowpan/core.c
-+++ b/net/6lowpan/core.c
-@@ -179,4 +179,5 @@ static void __exit lowpan_module_exit(void)
- module_init(lowpan_module_init);
- module_exit(lowpan_module_exit);
+diff --git a/net/ieee802154/6lowpan/core.c b/net/ieee802154/6lowpan/core.c
+index 2c087b7f17c5..d19bc9314374 100644
+--- a/net/ieee802154/6lowpan/core.c
++++ b/net/ieee802154/6lowpan/core.c
+@@ -280,5 +280,6 @@ static void __exit lowpan_cleanup_module(void)
  
-+MODULE_DESCRIPTION("IPv6 over Low-Power Wireless Personal Area Network core module");
+ module_init(lowpan_init_module);
+ module_exit(lowpan_cleanup_module);
++MODULE_DESCRIPTION("IEEE 802.15.4 IPv6 over Low-Power Wireless Personal Area Network module");
  MODULE_LICENSE("GPL");
+ MODULE_ALIAS_RTNL_LINK("lowpan");
+diff --git a/net/ieee802154/socket.c b/net/ieee802154/socket.c
+index 00302e8b9615..a93b592c2f83 100644
+--- a/net/ieee802154/socket.c
++++ b/net/ieee802154/socket.c
+@@ -1136,5 +1136,6 @@ static void __exit af_ieee802154_remove(void)
+ module_init(af_ieee802154_init);
+ module_exit(af_ieee802154_remove);
+ 
++MODULE_DESCRIPTION("IEEE 802.15.4 socket interface");
+ MODULE_LICENSE("GPL");
+ MODULE_ALIAS_NETPROTO(PF_IEEE802154);
 -- 
 2.39.3
 
