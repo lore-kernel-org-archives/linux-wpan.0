@@ -1,92 +1,127 @@
-Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from exchange.fintech.ru (exchange.fintech.ru [195.54.195.159])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 145477C089;
-	Tue,  6 Feb 2024 09:25:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28E4E134B4;
+	Tue,  6 Feb 2024 18:15:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.54.195.159
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707211512; cv=none; b=s8tXVOM95qlbpsY9ypTr5WqxLbbTBMf4uHWpXt4hbkt8YUyh8vrasBCCSmNZY11WQpI13PrX/zFtK9MPCmlNFLPWg2woZ/e2zzPJnxehFu1QO0CG2tq1jBxnWR9FwEOcq2/9tuWdMLPGJoM3aE67kGCbcLXmPflQTjxso/YWSxo=
+	t=1707243353; cv=none; b=mRkcmd9bF7TDFAD3dGRPTZAZoHnDxnfHrs0BpdguCy/4slsvH8oOhJFmUYjYNKoponNRG5vjsxqoVtzq6glEYXdhRSivrhata+q0jN8iJqWxkr+VjuMiB4sHJpJtD42Gk59vpM5ef3vyrk97lXjVAaZqFbcIakGMxVFE1y1sczM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707211512; c=relaxed/simple;
-	bh=riKlsk6DpHbTsX/xEYw4fkuGAFJRzfFBHy5xenHiV9w=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mMHdN9s69Q8KPRf6ZhEjFbSR/vE3iDWEs9rNQiVIpxFCgoI2h8/MQEacLs9+5H6zCCR1HNveMYUUCd6QoQOB9CKwpKtwWDh7tJqwzyBKKx+pydY0wr6PGFoSiVzCE2oVuiJnInkhZLfP5cNbsBKtk9VLocG9vyJ4tDEsTKKvITw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Iw4KdpID; arc=none smtp.client-ip=217.70.183.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Iw4KdpID"
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 56FAE20009;
-	Tue,  6 Feb 2024 09:25:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1707211507;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=riKlsk6DpHbTsX/xEYw4fkuGAFJRzfFBHy5xenHiV9w=;
-	b=Iw4KdpIDslEDAAsEdPCzzvsVRq1AoSGBy/Iei8CbkA2o1EFI0wSDi9kDiGUDXjxRS2GWIt
-	vqBWBXNKlcGulSAIbG50DQcFusf6tUIh5tw6YgRJS087tE4QEzZ+W10030xlPMNvl2HQJH
-	M+DrESUwaHV6Zk1ofs5zNM0GBng3nh6q5McKIy1UKA+E3BGbz3iGjrlQDIPe6owgKXi+fc
-	lBdL+4RCZW0GlQQ5iSia53vwAdT0MKeUk2zst11d/ChM57H9hjCpzwv8LFH2cXR9wYEZEf
-	tHILslCnTsAg/W5fVVALFkG93WwvscrQUcfE0um2DpDr5eiEG1yE8D7Z5DwgvQ==
-Date: Tue, 6 Feb 2024 10:25:03 +0100
-From: Miquel Raynal <miquel.raynal@bootlin.com>
-To: Alexander Aring <aahringo@redhat.com>
-Cc: Bo Liu <liubo03@inspur.com>, alex.aring@gmail.com,
- stefan@datenfreihafen.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, linux-wpan@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: ieee802154: at86rf230: convert to use maple tree
- register cache
-Message-ID: <20240206102503.760ecb64@xps-13>
-In-Reply-To: <CAK-6q+jnZOkSAM8_BQH=CaQhfCQwm0P+segZ+0E6oLeX=BhLHQ@mail.gmail.com>
-References: <20240202064512.39259-1-liubo03@inspur.com>
-	<20240202085547.46c81c96@xps-13>
-	<CAK-6q+jnZOkSAM8_BQH=CaQhfCQwm0P+segZ+0E6oLeX=BhLHQ@mail.gmail.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1707243353; c=relaxed/simple;
+	bh=PNSprH9eWLH60SllEMizCLaXGIo9pxrBofe0UJpcjSQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=u3gSVYeH9w/CELXKzV1uS1DaOWhzyjpVxjPYE675hz6q90hgXADDPOSdY8WBUX05X6/gffN70h7X8gSIkaP+830TL3Gk0njAhFmsg44XmRsux/rb3tsrRnPk7ymkW/sSdagq5nlvHHrft3NM6KMrzpTA1USn2vIgQbmiGUdlabw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fintech.ru; spf=pass smtp.mailfrom=fintech.ru; arc=none smtp.client-ip=195.54.195.159
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fintech.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fintech.ru
+Received: from Ex16-01.fintech.ru (10.0.10.18) by exchange.fintech.ru
+ (195.54.195.169) with Microsoft SMTP Server (TLS) id 14.3.498.0; Tue, 6 Feb
+ 2024 21:15:41 +0300
+Received: from [192.168.211.130] (10.0.253.138) by Ex16-01.fintech.ru
+ (10.0.10.18) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2242.4; Tue, 6 Feb 2024
+ 21:15:41 +0300
+Message-ID: <95702cc6-187e-4ce9-b9b8-6320c9ddc7da@fintech.ru>
+Date: Tue, 6 Feb 2024 10:15:37 -0800
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: miquel.raynal@bootlin.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RESEND] mac802154: Fix uninit-value access in
+ ieee802154_hdr_push_sechdr
+To: Alexander Aring <aahringo@redhat.com>
+CC: Zhang Shurong <zhang_shurong@foxmail.com>, <alex.aring@gmail.com>,
+	<stefan@datenfreihafen.org>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <linux-wpan@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<harperchen1110@gmail.com>
+References: <CAK-6q+jsZ13Cs9iuk_WjFeYFCEnnj-dJ9QYkWaw4fh6Gi=JtHA@mail.gmail.com>
+ <20240112131554.10352-1-n.zhandarovich@fintech.ru>
+ <CAK-6q+gcs2djQfKRsuGpD7WERmbLhzjkHEm80MRe+2UE3bteKw@mail.gmail.com>
+ <CAK-6q+hRbsFkQec3O8FnT-G9Mx07rdhEMfmTE2Q0SDN0kKN-8g@mail.gmail.com>
+ <64dbd05c-4939-49ba-a8d5-807fe3ff2987@fintech.ru>
+ <CAK-6q+gEjqCrnFkpKSuQiuhpx9zyuWr6y0tQpJOLquoz2pnmzw@mail.gmail.com>
+Content-Language: en-US
+From: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
+In-Reply-To: <CAK-6q+gEjqCrnFkpKSuQiuhpx9zyuWr6y0tQpJOLquoz2pnmzw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: Ex16-02.fintech.ru (10.0.10.19) To Ex16-01.fintech.ru
+ (10.0.10.18)
 
 Hi,
 
-aahringo@redhat.com wrote on Mon, 5 Feb 2024 14:42:09 -0500:
-
+On 2/5/24 11:49, Alexander Aring wrote:
 > Hi,
->=20
-> On Fri, Feb 2, 2024 at 2:56=E2=80=AFAM Miquel Raynal <miquel.raynal@bootl=
-in.com> wrote:
-> >
-> > Hi Bo,
-> >
-> > liubo03@inspur.com wrote on Fri, 2 Feb 2024 01:45:12 -0500:
-> > =20
-> > > The maple tree register cache is based on a much more modern data str=
-ucture
-> > > than the rbtree cache and makes optimisation choices which are probab=
-ly
-> > > more appropriate for modern systems than those made by the rbtree cac=
-he. =20
-> >
-> > What are the real intended benefits? Shall we expect any drawbacks?
-> > =20
->=20
-> I doubt it has really any benefits, only the slowpath is using regmap
-> to set some registers. Maybe if you change phy setting frequently it
-> might have an impact, but this isn't even a path considered to run
-> fast.
+> 
+> On Thu, Jan 18, 2024 at 8:00 AM Nikita Zhandarovich
+> <n.zhandarovich@fintech.ru> wrote:
+> ...
+>>
+>> I was curious whether a smaller change would suffice since I might be
+>> too green to see the full picture here.
+>>
+>> In all honesty I am failing to see how exactly it happens that cb->secen
+>> == 1 and cb->secen_override == 0 (which is exactly what occurs during
+>> this error repro) at the start of mac802154_set_header_security().
+>> Since there is a check in mac802154_set_header_security()
+>>
+>>         if (!params.enabled && cb->secen_override && cb->secen)
+>>
+>> maybe we take off 'cb->secen_override' part of the condition? That way
+>> we catch the case when security is supposedly enabled without parameters
+>> being available (not enabled) and return with error. Or is this approach
+>> too lazy?
+> 
+> I need to see the full patch for this. In my opinion there are two patches here:
+> 
 
-Ok, thanks Alex for the info; in this case I'm fine:
+Alex, I am gonna try to test your version and send out patches before
+the end of week, thank you for reminding me.
 
-Reviewed-by: Miquel Raynal <miquel.raynal@bootlin.com>
+> 1. fix uninit values
+> 2. return an error with some mismatched security parameters. (I think
+> this is where your approach comes in place)
+> 
+> The 1. case is what syzbot is complaining about and in my opinion easy
+> to fix at [0] to init some more default values of "struct dgram_sock"
+> [1].
 
-Thanks,
-Miqu=C3=A8l
+However, if I may, I am still worried that initing stuff in [0] won't
+help much. They way I see it, there are mismatched sec. parameters that
+lead to the actual uninit issue, but are not victim of it themselves.
+
+Specifically, once we enter mac802154_set_header_security() all fields
+of 'cb' have values (albeit a possibly wrong combo of them), values
+copied from 'ro' seemingly w/o a hitch; the function ends early (cause
+of mismatch); we end up NOT filling values in ieee802154_hdr *hdr, at
+the very least these:
+
+	hdr->sec.level = level;
+	hdr->sec.key_id_mode = params.out_key.mode;
+
+Then we are back in ieee802154_header_create():
+ieee802154_header_create -> ieee802154_hdr_push ->
+ieee802154_hdr_push_sechdr, where we finally access aforementioned
+values despite putting nothing in them.
+
+In other words, I am unsure that mismatch in sec. parameters (cb->secen,
+params.enabled etc.), which leads to uninit issues in hdr->sec.XXX
+fields, is itself caused by the uninit values in dgram_sock (since KMSAN
+should have caught it earlier). But if you are certain, I don't mind
+taking on the patches you suggested.
+
+> 
+> Then 2. can be fixed afterwards.
+> 
+> - Alex
+> 
+> [0] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/net/ieee802154/socket.c#n474
+> [1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/net/ieee802154/socket.c#n435
+> 
+
+Thank you for your patience,
+Nikita
