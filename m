@@ -1,62 +1,38 @@
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from exchange.fintech.ru (exchange.fintech.ru [195.54.195.159])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A806C50249;
-	Tue, 13 Feb 2024 11:21:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D64C75D902;
+	Tue, 13 Feb 2024 15:24:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.54.195.159
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707823299; cv=none; b=QDdFPevdpsu3I3OIR3bZFmtAZv6TYOzYZtmLC8NI1LKjmXg/hHooAo+kfQ7TgNzqKRj45C1SoBzcaEB3pzn6wuNrPOL//7CHL4vHA9uduqeIk/b46QYxMOz6Jr3MLC2zDVaZBC/+0c90YdDy17MkOk6cRHBCbY13OmPpD9WDwhQ=
+	t=1707837873; cv=none; b=jN1XVInVt+IDSuoqDkojjr4l8WqktzTV8rSdNCYPXhch5iZJWNB9uTHpS9rEYMEliHk4J7MFTXtK999EjSvb8l4Gsa96oFKQwALlXUVZs2QHeYvE8mOSZeFxFQNoUB7KY6EnD/xOsnSKrKU5t29QOXZdY/rD4gfdjYyE8IHQwZg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707823299; c=relaxed/simple;
-	bh=ATeujqNTxGZ7Buahdh3oQZdOez0THha3F4P6l0NgA4M=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=tCCWKCGfrYS2MgU7rjxynO3uS0tyNyWAXAoKezzk7PqLPvWqdtwQBz4pjiHf8H+oD9gufZnOTFT3o75NcoxzXhbUPu0U/Fjpa+iW0wARm9MmbaLkGmckIL1F/HI0hw5WLyMkD8An76do9d/yb8FEnnpTy1JllKuqXNLAnoKUNOM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a26ed1e05c7so115134266b.2;
-        Tue, 13 Feb 2024 03:21:37 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707823296; x=1708428096;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7+NDfFH0YYmBs1BkIUepda9MZ/fKCEXrnoPMYFzSoWw=;
-        b=XS2hb0rJ/auqvMk0sJs3IVLHVSrF8MjD4hRyZWMhjuPiSNB74NALYt+GWWPA7r8Gt1
-         0YIhdbFicQzI7HCZDoCvJ+Z0/BQqrYZfDY78MI7v+Xp5pkGHjnkMkC2KTQxJU0OUHrE5
-         zq4U611jWWn8bZUzPZCl47UX1sRqwONe8F9icwMdzVrI78O8Foh7TkuMN1372/MOBNeP
-         YIXBpUSBUoH/Q50JDc5f1fHN2+bGCJE+WzZZisimZG67SYSTegwRkgfE0+L+afjvJIT8
-         hP2cUfe69MZq8EQVfaAJ5T1yF32ZIi9mF3+L/XtWM4IfGWdewxYlTUu+NuwpivnMy4Hj
-         kZAA==
-X-Forwarded-Encrypted: i=1; AJvYcCW7pZl7yYRyd9zDErfoLVN0Tz6Ml1gwg6LOCHnnKhzVX0iXILOLEGOp3p+uzPhDZNfcX7bWvQipz8bOkX839TSTWA9mDsuLdtWm8zVrsRo3CQlfS2FPNMDkKMr9r7QLj3eeZHqgL8pnSg==
-X-Gm-Message-State: AOJu0YzGN1+WsGNve0BY2B010dfvDwrP/h+Est7HZh9LQm31qVbvHmol
-	Y2ZBNP4Un7EsCm06xyLYBLHrFd4SEELdKTowKzs5rwakUfszZ5Rf
-X-Google-Smtp-Source: AGHT+IE5gsXas6kdKZhwJmDWlDfSMfXI2qPBHnsU4sFsofzr2h2eCaSsVtrv46YcecIgd1jl4uVknQ==
-X-Received: by 2002:a17:906:80c:b0:a38:8d35:c8b4 with SMTP id e12-20020a170906080c00b00a388d35c8b4mr6499600ejd.46.1707823295630;
-        Tue, 13 Feb 2024 03:21:35 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCVfKxqAlQPAPM/E19AQlrm0geiBqzNdpK0eVXc1v4+6TtAY2+LC94VNGgsROd4XOJeWmS9kIL4mCuRVwvIVO4Xh9IYFiDGAaJYlLd3vcW96g7ED0+km0eQcKRVF0s71MczlOMezqeiWL6zj3c7x4mmCh+h5ojuDXIKzia1DmtvvwFsa9OPSpLvE1XqBmsae1I1esAezMkght9l3J355kOYJvB6IhyafHm0SmPZbUjiMW5hVnjyIi3Lrd1LRv3BUr5/i4w+5FhaYGUG4IFkDXPTuA+evkmWtsTvLCJDhkkabDkIv3OdI3+WPdXzR6fYNajxCPqF5Vn8b4vashqh1Zzuqjfek
-Received: from localhost (fwdproxy-lla-002.fbsv.net. [2a03:2880:30ff:2::face:b00c])
-        by smtp.gmail.com with ESMTPSA id vh2-20020a170907d38200b00a3d08f3283fsm442607ejc.104.2024.02.13.03.21.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Feb 2024 03:21:35 -0800 (PST)
-From: Breno Leitao <leitao@debian.org>
-To: kuba@kernel.org,
-	davem@davemloft.net,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	Alexander Aring <alex.aring@gmail.com>,
-	Stefan Schmidt <stefan@datenfreihafen.org>,
-	Miquel Raynal <miquel.raynal@bootlin.com>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	horms@kernel.org,
-	linux-wpan@vger.kernel.org (open list:IEEE 802.15.4 SUBSYSTEM)
-Subject: [PATCH net 2/7] net: fill in MODULE_DESCRIPTION()s for ieee802154/fakelb
-Date: Tue, 13 Feb 2024 03:21:17 -0800
-Message-Id: <20240213112122.404045-3-leitao@debian.org>
-X-Mailer: git-send-email 2.39.3
-In-Reply-To: <20240213112122.404045-1-leitao@debian.org>
-References: <20240213112122.404045-1-leitao@debian.org>
+	s=arc-20240116; t=1707837873; c=relaxed/simple;
+	bh=CwNvQx4cKxm4wTveQJa2fF9BF88LSILbE5saxxP+eqw=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=F/iKuI7y2Tx+QDSFsr35EzvXa2uBbqET3fJGxfLlw26ZRPGh9ScS9JYaG6X++0e7BeerQmKcObFJa8O6ae4zwwXjEKERg8ULvVffvXLha3ddMxjiPWPT8rL0Vo/wyOQhyrlhLayGINkKUo5aDMjUEQMu5p1Ii1i9mU4In9298bU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fintech.ru; spf=pass smtp.mailfrom=fintech.ru; arc=none smtp.client-ip=195.54.195.159
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fintech.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fintech.ru
+Received: from Ex16-01.fintech.ru (10.0.10.18) by exchange.fintech.ru
+ (195.54.195.169) with Microsoft SMTP Server (TLS) id 14.3.498.0; Tue, 13 Feb
+ 2024 18:24:20 +0300
+Received: from localhost (10.0.253.138) by Ex16-01.fintech.ru (10.0.10.18)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2242.4; Tue, 13 Feb
+ 2024 18:24:20 +0300
+From: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
+To: Alexander Aring <alex.aring@gmail.com>
+CC: Nikita Zhandarovich <n.zhandarovich@fintech.ru>, Stefan Schmidt
+	<stefan@datenfreihafen.org>, Miquel Raynal <miquel.raynal@bootlin.com>,
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	<linux-wpan@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <syzkaller-bugs@googlegroups.com>,
+	<syzbot+60a66d44892b66b56545@syzkaller.appspotmail.com>
+Subject: [PATCH wpan] mac802154: fix uninit-value issue in ieee802154_header_create()
+Date: Tue, 13 Feb 2024 07:24:14 -0800
+Message-ID: <20240213152414.3703-1-n.zhandarovich@fintech.ru>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
@@ -64,25 +40,81 @@ List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: Ex16-02.fintech.ru (10.0.10.19) To Ex16-01.fintech.ru
+ (10.0.10.18)
 
-W=1 builds now warn if module is built without a MODULE_DESCRIPTION().
-Add descriptions to the IEEE 802.15.4 loopback driver.
+Syzkaller with KMSAN reported [1] a problem with uninitialized value
+access in ieee802154_header_create().
 
-Signed-off-by: Breno Leitao <leitao@debian.org>
+The issue arises from a weird combination of cb->secen == 1 and
+cb->secen_override == 0, while other required security parameters
+are not found enabled in mac802154_set_header_security().
+
+Ideally such case is expected to be caught by starting check at the
+beginning of mac802154_set_header_security():
+
+	if (!params.enabled && cb->secen_override && cb->secen)
+		return -EINVAL;
+
+However, since secen_override is zero, the function in question
+passes this check and returns with success early, without having
+set values to ieee802154_sechdr fields such as key_id_mode. This in
+turn leads to uninitialized access of such values in
+ieee802154_hdr_push_sechdr() and other places.
+
+Fix this problem by only checking for secen value and presence of
+security parameters (and ignoring secen_override). Exit early with
+error if necessary requirements are not met.
+
+[1]
+BUG: KMSAN: uninit-value in ieee802154_hdr_push_sechdr net/ieee802154/header_ops.c:54 [inline]
+BUG: KMSAN: uninit-value in ieee802154_hdr_push+0x971/0xb90 net/ieee802154/header_ops.c:108
+ ieee802154_hdr_push_sechdr net/ieee802154/header_ops.c:54 [inline]
+ ieee802154_hdr_push+0x971/0xb90 net/ieee802154/header_ops.c:108
+ ieee802154_header_create+0x9c0/0xc00 net/mac802154/iface.c:396
+ wpan_dev_hard_header include/net/cfg802154.h:494 [inline]
+ dgram_sendmsg+0xd1d/0x1500 net/ieee802154/socket.c:677
+ ieee802154_sock_sendmsg+0x91/0xc0 net/ieee802154/socket.c:96
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg net/socket.c:745 [inline]
+ ____sys_sendmsg+0x9c2/0xd60 net/socket.c:2584
+ ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2638
+ __sys_sendmsg net/socket.c:2667 [inline]
+ __do_sys_sendmsg net/socket.c:2676 [inline]
+ __se_sys_sendmsg net/socket.c:2674 [inline]
+ __x64_sys_sendmsg+0x307/0x490 net/socket.c:2674
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0x44/0x110 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
+
+Local variable hdr created at:
+ ieee802154_header_create+0x4e/0xc00 net/mac802154/iface.c:360
+ wpan_dev_hard_header include/net/cfg802154.h:494 [inline]
+ dgram_sendmsg+0xd1d/0x1500 net/ieee802154/socket.c:677
+
+Fixes: f30be4d53cad ("mac802154: integrate llsec with wpan devices")
+Reported-and-tested-by: syzbot+60a66d44892b66b56545@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=60a66d44892b66b56545
+Signed-off-by: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
 ---
- drivers/net/ieee802154/fakelb.c | 1 +
- 1 file changed, 1 insertion(+)
+P.S. Link to previous similar discussion:
+https://lore.kernel.org/all/tencent_1C04CA8D66ADC45608D89687B4020B2A8706@qq.com/
+P.P.S. This issue may affect stable versions, at least up to 6.1.
 
-diff --git a/drivers/net/ieee802154/fakelb.c b/drivers/net/ieee802154/fakelb.c
-index 35e55f198e05..2930141d7dd2 100644
---- a/drivers/net/ieee802154/fakelb.c
-+++ b/drivers/net/ieee802154/fakelb.c
-@@ -259,4 +259,5 @@ static __exit void fake_remove_module(void)
+ net/mac802154/iface.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/mac802154/iface.c b/net/mac802154/iface.c
+index c0e2da5072be..ad799d349625 100644
+--- a/net/mac802154/iface.c
++++ b/net/mac802154/iface.c
+@@ -328,7 +328,7 @@ static int mac802154_set_header_security(struct ieee802154_sub_if_data *sdata,
  
- module_init(fakelb_init_module);
- module_exit(fake_remove_module);
-+MODULE_DESCRIPTION("IEEE 802.15.4 loopback driver");
- MODULE_LICENSE("GPL");
--- 
-2.39.3
-
+ 	mac802154_llsec_get_params(&sdata->sec, &params);
+ 
+-	if (!params.enabled && cb->secen_override && cb->secen)
++	if (!params.enabled && cb->secen)
+ 		return -EINVAL;
+ 	if (!params.enabled ||
+ 	    (cb->secen_override && !cb->secen) ||
