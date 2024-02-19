@@ -1,88 +1,88 @@
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 073F25D90E;
-	Wed, 14 Feb 2024 15:29:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36F3F225D6;
+	Mon, 19 Feb 2024 10:47:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707924543; cv=none; b=scp5zFgBQz9LaQZw0RjYFF1+gePKG/wgTNC/dEM8Q1+uMXz8q60B78j3GhC4g8FcH5AFhTEKJcoeKqbnCaUhZv64LS1oh4kYenWvlX8OVa+uuoLkjU7+ymD6OyjSY0RHKRG9McNskbdAVbRvBpC+PnvcLHzUNSfoH7uN4aHU4Vw=
+	t=1708339664; cv=none; b=GX712Bsbm4tQ7sBpeGVjTR6aBDBxOdYle9yVME+1Cfqb8NDQTell5OquzCzzMdkUPnC7Vv+7GcQdFuZ03DDM0F6S+pBUgRdjmPu4+oniKahrVNzAPC9FHcamiXRL6uCKObO5CH7o1KJoEqRsQwyo3aoWQWR2furySSpbetll9sw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707924543; c=relaxed/simple;
-	bh=ATeujqNTxGZ7Buahdh3oQZdOez0THha3F4P6l0NgA4M=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=XM0txPOvuxMrJWYvkOqP2JVI20qAGJcUq0ztjmnlpVRemNn/v5Q3fmDU0Qukobvm37RwfdgRXTaPp++8tzltaC8G4lF6kVJTizJnED5kcjh6QCKr2YBMKWk79FAoBWbKVaTkDhID/z5xa2Gip8eBG3qe2KN4LEAYUcbt3M7hFyo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-562131bb958so1654089a12.2;
-        Wed, 14 Feb 2024 07:29:01 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707924540; x=1708529340;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7+NDfFH0YYmBs1BkIUepda9MZ/fKCEXrnoPMYFzSoWw=;
-        b=d9XJc3Wlw8T4WHV8tdcIDAEH7x3/TIkCa3dNYgxgn60NuvqclnacxoBENCtc/gmIBP
-         x+bdjb8YGlDwArCs2T9Xs+WqqH4Wy2SalXyWvAVkYx+PRfcT947Q1DkmEJd6OYreZFpQ
-         HSVwZWrovhy2h8Sps8bGbcByx7644hVYpYqI4fb+tceXRtYNruO16MVjzVfPdjBQs+xm
-         WmZCznltiZ/oNNHKZ6/PivzQYpYnW40FZ8K2iGCR7lwxFVpDxXNP5lqIgBKOJBKeoMT8
-         uUQR11xlitOhKSiYtIkK63ZKgKe/UpY1G9PECXxYPOQOLRXq9mJ3TA0YTvQ/BzZhXtZy
-         ya/w==
-X-Forwarded-Encrypted: i=1; AJvYcCUkhUxunn84+sX/hTDDmefFgOP/0L92hU0r8bjPO6GvZGiias5qYIj6SuHjDVABUIY7Rp1p1EHVdQrQ1lrpfet0RhbVFKZITbBZuXxNv1g/iVEEVEcMZ9UzfjnO4A7kFY1phScgv7fCwA==
-X-Gm-Message-State: AOJu0Yyl6YVijHXEddHfmQIAg2dM+L73RDo2rwMgjH7vv5ZXfW7Zfu07
-	OqmQbGCGxUEk6KERk0QMySW+mtwegbWBarqUkMd1xEb0bmXW3ZbJ
-X-Google-Smtp-Source: AGHT+IHn2hRhp+3Wv/pQxVUA9681xKLxCQCY322uIg1fNQ5XPNfEjdKLkxQkxnCrzUIxFee3zz1sbw==
-X-Received: by 2002:a05:6402:8d8:b0:55f:e936:b495 with SMTP id d24-20020a05640208d800b0055fe936b495mr2073704edz.0.1707924540058;
-        Wed, 14 Feb 2024 07:29:00 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUU4q3o7WrB5Df6c8gfCO2uZlaY6pvaHqqcY4u4wfQl2ocpHTb99wjlpJFortRfpkTSPB8WSnO81NK2blmR+gDFCsSaUG4UppQUMVeXwDL9z4z5gmbxMmjjrL+4J1IFxTKidgZ91bumSN5zjCtFapL5RZlI2jqTUg+iL+6YOlF1hhi9znl037r/a3Atu8t0KAHCiQvlH93GHnVm0xMPQZ3VF+uIouGApQgPHqFDEw1qaBxkrsAlHrz21m6rX8236csG0Bw+uL6Ca6fDykMUUmIdwmc2L/A/Er20nBdIJS3AWuBknJGxjIhofI5+ESzw37KzOjLNdjN1pSiaC41+zMmUB2kp
-Received: from localhost (fwdproxy-lla-007.fbsv.net. [2a03:2880:30ff:7::face:b00c])
-        by smtp.gmail.com with ESMTPSA id a22-20020aa7d756000000b0056140d51b7asm4768826eds.83.2024.02.14.07.28.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Feb 2024 07:28:59 -0800 (PST)
-From: Breno Leitao <leitao@debian.org>
-To: kuba@kernel.org,
-	davem@davemloft.net,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	Alexander Aring <alex.aring@gmail.com>,
-	Stefan Schmidt <stefan@datenfreihafen.org>,
-	Miquel Raynal <miquel.raynal@bootlin.com>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	horms@kernel.org,
-	linux-wpan@vger.kernel.org (open list:IEEE 802.15.4 SUBSYSTEM)
-Subject: [PATCH net v2 2/7] net: fill in MODULE_DESCRIPTION()s for ieee802154/fakelb
-Date: Wed, 14 Feb 2024 07:27:36 -0800
-Message-Id: <20240214152741.670178-3-leitao@debian.org>
-X-Mailer: git-send-email 2.39.3
-In-Reply-To: <20240214152741.670178-1-leitao@debian.org>
+	s=arc-20240116; t=1708339664; c=relaxed/simple;
+	bh=IjD3KjlInPdC9j3gqlAjiWwXuf8HhsRsxG2eOie2kZg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=h+cm/igvze+usi60LfFrCz16CRBLZ23FTN/s2NOnkD3K71961Lh5SAG7Sghq5n+Pi3IYTVGRvfj1FHq0gKuh7eqFaflPUwMc22+IkSxlqEpAPkAOTx/qTPIp4rovmKAlx2GflgfFLi8DdyPbJkdC/7AWECT0DNRVMvfhD3BXQyA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=ChvL16FM; arc=none smtp.client-ip=217.70.183.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="ChvL16FM"
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 4B0D1C000F;
+	Mon, 19 Feb 2024 10:47:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1708339660;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6/8X8MqPF3pfDiFGXEDHHnwpDDYSllQCPO/MEgL1lXU=;
+	b=ChvL16FM29AidITMPbL97+0a2Snuu4mSkwT2AR92JDYr+LEynE1KRbqFNsVuCey8MD+Nyq
+	cQWGHhEfoF75UIQRIxWGaFrDAXCZVmK3oA4icyF2NNnUhNtQcrU+34ojHLrz/hjt6NOBSE
+	RFRsiWbt1KZPUrb5xZpz02cdlrVgWlamHTXGF39P0vhxv+KzAY6IorbEIClBDSomIh52zX
+	zcCtV4hqAS6CkXtiFoLOir8nu1LNYA/VDJ/n98UJALAaTyxzHMjfoC+9iRudkCHkjEgUAP
+	u2CYcIWqJg6+/pgAz2wsYWMjG9oKRtZh9ieSdo58WNv1/DTf8uRSjgVoGuSeSg==
+Date: Mon, 19 Feb 2024 11:47:37 +0100
+From: Miquel Raynal <miquel.raynal@bootlin.com>
+To: Breno Leitao <leitao@debian.org>
+Cc: kuba@kernel.org, davem@davemloft.net, pabeni@redhat.com,
+ edumazet@google.com, Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt
+ <stefan@datenfreihafen.org>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, horms@kernel.org, linux-wpan@vger.kernel.org
+ (open list:IEEE 802.15.4 SUBSYSTEM)
+Subject: Re: [PATCH net v2 2/7] net: fill in MODULE_DESCRIPTION()s for
+ ieee802154/fakelb
+Message-ID: <20240219114737.79eb9ff6@xps-13>
+In-Reply-To: <20240214152741.670178-3-leitao@debian.org>
 References: <20240214152741.670178-1-leitao@debian.org>
+	<20240214152741.670178-3-leitao@debian.org>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: miquel.raynal@bootlin.com
 
-W=1 builds now warn if module is built without a MODULE_DESCRIPTION().
-Add descriptions to the IEEE 802.15.4 loopback driver.
+Hi Breno,
 
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
- drivers/net/ieee802154/fakelb.c | 1 +
- 1 file changed, 1 insertion(+)
+leitao@debian.org wrote on Wed, 14 Feb 2024 07:27:36 -0800:
 
-diff --git a/drivers/net/ieee802154/fakelb.c b/drivers/net/ieee802154/fakelb.c
-index 35e55f198e05..2930141d7dd2 100644
---- a/drivers/net/ieee802154/fakelb.c
-+++ b/drivers/net/ieee802154/fakelb.c
-@@ -259,4 +259,5 @@ static __exit void fake_remove_module(void)
- 
- module_init(fakelb_init_module);
- module_exit(fake_remove_module);
-+MODULE_DESCRIPTION("IEEE 802.15.4 loopback driver");
- MODULE_LICENSE("GPL");
--- 
-2.39.3
+> W=3D1 builds now warn if module is built without a MODULE_DESCRIPTION().
+> Add descriptions to the IEEE 802.15.4 loopback driver.
 
+Acked-by: Miquel Raynal <miquel.raynal@bootlin.com>
+
+>=20
+> Signed-off-by: Breno Leitao <leitao@debian.org>
+> ---
+>  drivers/net/ieee802154/fakelb.c | 1 +
+>  1 file changed, 1 insertion(+)
+>=20
+> diff --git a/drivers/net/ieee802154/fakelb.c b/drivers/net/ieee802154/fak=
+elb.c
+> index 35e55f198e05..2930141d7dd2 100644
+> --- a/drivers/net/ieee802154/fakelb.c
+> +++ b/drivers/net/ieee802154/fakelb.c
+> @@ -259,4 +259,5 @@ static __exit void fake_remove_module(void)
+> =20
+>  module_init(fakelb_init_module);
+>  module_exit(fake_remove_module);
+> +MODULE_DESCRIPTION("IEEE 802.15.4 loopback driver");
+>  MODULE_LICENSE("GPL");
+
+
+Thanks,
+Miqu=C3=A8l
