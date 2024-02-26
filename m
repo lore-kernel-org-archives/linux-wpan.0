@@ -1,42 +1,42 @@
 Received: from proxima.lasnet.de (proxima.lasnet.de [78.47.171.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFC5D2AD0F;
-	Mon, 26 Feb 2024 20:55:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0482612F388;
+	Mon, 26 Feb 2024 21:00:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.47.171.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708980957; cv=none; b=XS49tVPjDDruoxZz5951KNH35BGHLqFIL7+43EmAkI9mb7JWybV78PIb5hrR7BrITYEy9RSM9fdeLe3SYuJNtPuJJq1kK5lCPdG7EtbORRgSMHv/s0GWBWuBpeSXrDrwJGTBalxEguJ8kzcl/X/7Mr0yVdpYReB02kp48lDFtss=
+	t=1708981212; cv=none; b=Jc40W0UozmvDxpwmHvAlBW4g6b3xOQUMb1agzGVG0JaFlE/jWpObmnwvPIGm6M+3KY8e6snVxj7/bx6fyHpMxaW9R1eFo3zmUUB5ii80G4TNNpchfgqjP18HVE+RgVKJ+BG9u7lCDcVmpc6UQKHRqmHSaZeADCJGcpgO0iRt3Ag=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708980957; c=relaxed/simple;
-	bh=02zprmOhLIbgChsRDiWJHbDY7QAwsInduXqZqDxFSDU=;
+	s=arc-20240116; t=1708981212; c=relaxed/simple;
+	bh=Hk66Ru/hxzpxeboKp+8Fx6WMw3mVrtFmp58Noh1Dpms=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KGpsDy7xIClgjz7O7Fp0sgNfFyykJpOJITX/m90CxLuXUEHe5iWG5q7Ik0bP/FV5la5G5A2M4Z1xmPVwLJsUNjQGe7QVWzxwF2oDWAoiIdFxpXoGagPNl9vkSooS1Jvhuk+8zHSQ5vSC5bk4cGMgs8OniiVPC2cAv59W6OIfVOA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=datenfreihafen.org; spf=pass smtp.mailfrom=datenfreihafen.org; dkim=pass (2048-bit key) header.d=datenfreihafen.org header.i=@datenfreihafen.org header.b=hbhyWQdG; arc=none smtp.client-ip=78.47.171.185
+	 In-Reply-To:Content-Type; b=MxS7pvAZSUbVDKQRQ468uDFQzzIz6nyijFMZazdN2H9R9ETDmDfbHi8MHHlEO3c6oFg6FsiZy0tX/n6jwsj6Fw7g6kNEV07sl40qL9iz/NHEPUmZt+P4KlHgBxT4EeItC9L2xVfXBMiH7rTq3lIXiLXkk2gYaIkEUdCPp5aaWn0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=datenfreihafen.org; spf=pass smtp.mailfrom=datenfreihafen.org; dkim=pass (2048-bit key) header.d=datenfreihafen.org header.i=@datenfreihafen.org header.b=AN44pfrW; arc=none smtp.client-ip=78.47.171.185
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=datenfreihafen.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=datenfreihafen.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=datenfreihafen.org header.i=@datenfreihafen.org header.b="hbhyWQdG"
+	dkim=pass (2048-bit key) header.d=datenfreihafen.org header.i=@datenfreihafen.org header.b="AN44pfrW"
 Received: from [IPV6:2003:e9:d739:bb29:632d:d63:dac0:8169] (p200300e9d739bb29632d0d63dac08169.dip0.t-ipconnect.de [IPv6:2003:e9:d739:bb29:632d:d63:dac0:8169])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: stefan@datenfreihafen.org)
-	by proxima.lasnet.de (Postfix) with ESMTPSA id CA816C0924;
-	Mon, 26 Feb 2024 21:49:49 +0100 (CET)
+	by proxima.lasnet.de (Postfix) with ESMTPSA id 70DC0C0924;
+	Mon, 26 Feb 2024 22:00:08 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
-	s=2021; t=1708980590;
+	s=2021; t=1708981208;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=W7OAuuFC+fmZ1nPUbf+yUsQuGL64Qf+7Ju4BkHDCQyU=;
-	b=hbhyWQdGtF1jVC6oFeUWMiEA/2Uib6EkQ9ecEZuw5ktZEAFcoeRjg36hFd+fjGEi1Ry3bg
-	FTfFLjiNkbsHpRnwGCAeDr2kmyJBzchfBRjEvRgYrdFiwHk7DggMh3tsa/+m7nSN1s10XT
-	UhA49YuCE0Ctac11Zadx53QbVWQ5NMcvmHEgLTirVGWm4ne24wyQ8/KjK5uhcl51EVowba
-	0keODdJYk1JEG8emE9DsER76SyIIPL59ZpukYG29wPjDYuuI83vm4JUFzjJG9/PL2XX32S
-	MtuKOcZmiNQ7oPhMf0kgl5lel3SFTruW3U6U+YmSO4QaY509Mpb708uVTPkURg==
-Message-ID: <87cc872f-d6f9-47d6-b579-f0412430889c@datenfreihafen.org>
-Date: Mon, 26 Feb 2024 21:48:40 +0100
+	bh=/8Apb+j/UNpSz6gcuGX4ccTZ+NAAhK5iZmSsj/IGxm8=;
+	b=AN44pfrWdBgwbs5UfS5MkZz2X/hOYH578DX7DWdbYhNPiInI24tREWy0svpYNPKzfBTOSu
+	dXUcJYU7mWKUD2EeIAMQoeaZTzOInXn+SaUhk0iGhTtBIfuXowZi7HdEBbhQcXSoObW5qu
+	QIxIkzPRpQBdSr0O6RHIhPhUCTqC3ti4SoJ8PrDLBtG52Dna/DAKLI4ftQMlxrYkZjo4UR
+	v3srk8ggrBdSYN527581PLLQnyz7i1i2nasljrdouTb2FzHiCtbuC2amoByqg6Gm4L8gLM
+	zQrvYr7jqaI/cNWaBNereqJPBB00oAcApb/fXtlDMATtPiPUV3P5qKA+codhGg==
+Message-ID: <f0280912-6423-494f-8d61-28216551ebb9@datenfreihafen.org>
+Date: Mon, 26 Feb 2024 22:00:07 +0100
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
@@ -44,45 +44,58 @@ List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: ieee802154: at86rf230: convert to use maple tree
- register cache
+Subject: Re: [PATCH] ieee802154: ca8210: Drop spurious WQ_UNBOUND from
+ alloc_ordered_workqueue() call
 Content-Language: en-US
-To: Bo Liu <liubo03@inspur.com>, alex.aring@gmail.com,
- miquel.raynal@bootlin.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com
+To: Tejun Heo <tj@kernel.org>, Alexander Aring <alex.aring@gmail.com>,
+ Miquel Raynal <miquel.raynal@bootlin.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
 Cc: linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
  linux-kernel@vger.kernel.org
-References: <20240202064512.39259-1-liubo03@inspur.com>
+References: <ZcF1El7fn5xkeoB1@slm.duckdns.org>
 From: Stefan Schmidt <stefan@datenfreihafen.org>
-In-Reply-To: <20240202064512.39259-1-liubo03@inspur.com>
+In-Reply-To: <ZcF1El7fn5xkeoB1@slm.duckdns.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 Hello,
 
-On 02.02.24 07:45, Bo Liu wrote:
-> The maple tree register cache is based on a much more modern data structure
-> than the rbtree cache and makes optimisation choices which are probably
-> more appropriate for modern systems than those made by the rbtree cache.
+On 06.02.24 00:53, Tejun Heo wrote:
+> Workqueue is in the process of cleaning up the distinction between unbound
+> workqueues w/ @nr_active==1 and ordered workqueues. Explicit WQ_UNBOUND
+> isn't needed for alloc_ordered_workqueue() and will trigger a warning in the
+> future. Let's remove it. This doesn't cause any functional changes.
 > 
-> Signed-off-by: Bo Liu <liubo03@inspur.com>
+> Signed-off-by: Tejun Heo <tj@kernel.org>
 > ---
->   drivers/net/ieee802154/at86rf230.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
+>   drivers/net/ieee802154/ca8210.c |   10 ++--------
+>   1 file changed, 2 insertions(+), 8 deletions(-)
 > 
-> diff --git a/drivers/net/ieee802154/at86rf230.c b/drivers/net/ieee802154/at86rf230.c
-> index 164c7f605af5..6212164ffb36 100644
-> --- a/drivers/net/ieee802154/at86rf230.c
-> +++ b/drivers/net/ieee802154/at86rf230.c
-> @@ -316,7 +316,7 @@ static const struct regmap_config at86rf230_regmap_spi_config = {
->   	.val_bits = 8,
->   	.write_flag_mask = CMD_REG | CMD_WRITE,
->   	.read_flag_mask = CMD_REG,
-> -	.cache_type = REGCACHE_RBTREE,
-> +	.cache_type = REGCACHE_MAPLE,
->   	.max_register = AT86RF2XX_NUMREGS,
->   	.writeable_reg = at86rf230_reg_writeable,
->   	.readable_reg = at86rf230_reg_readable,
+> --- a/drivers/net/ieee802154/ca8210.c
+> +++ b/drivers/net/ieee802154/ca8210.c
+> @@ -2857,19 +2857,13 @@ static int ca8210_interrupt_init(struct
+>    */
+>   static int ca8210_dev_com_init(struct ca8210_priv *priv)
+>   {
+> -	priv->mlme_workqueue = alloc_ordered_workqueue(
+> -		"MLME work queue",
+> -		WQ_UNBOUND
+> -	);
+> +	priv->mlme_workqueue = alloc_ordered_workqueue("MLME work queue", 0);
+>   	if (!priv->mlme_workqueue) {
+>   		dev_crit(&priv->spi->dev, "alloc of mlme_workqueue failed!\n");
+>   		return -ENOMEM;
+>   	}
+>   
+> -	priv->irq_workqueue = alloc_ordered_workqueue(
+> -		"ca8210 irq worker",
+> -		WQ_UNBOUND
+> -	);
+> +	priv->irq_workqueue = alloc_ordered_workqueue("ca8210 irq worker", 0);
+>   	if (!priv->irq_workqueue) {
+>   		dev_crit(&priv->spi->dev, "alloc of irq_workqueue failed!\n");
+>   		destroy_workqueue(priv->mlme_workqueue);
 
 This patch has been applied to the wpan-next tree and will be
 part of the next pull request to net-next. Thanks!
