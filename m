@@ -1,104 +1,76 @@
-Received: from proxima.lasnet.de (proxima.lasnet.de [78.47.171.185])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0482612F388;
-	Mon, 26 Feb 2024 21:00:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.47.171.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FB6A1487DC;
+	Wed, 28 Feb 2024 15:44:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1708981212; cv=none; b=Jc40W0UozmvDxpwmHvAlBW4g6b3xOQUMb1agzGVG0JaFlE/jWpObmnwvPIGm6M+3KY8e6snVxj7/bx6fyHpMxaW9R1eFo3zmUUB5ii80G4TNNpchfgqjP18HVE+RgVKJ+BG9u7lCDcVmpc6UQKHRqmHSaZeADCJGcpgO0iRt3Ag=
+	t=1709135053; cv=none; b=e0uLu47Nts1zr/1OGkbs7mnlYTqihiaIhhz2S//Y4MNp7wFGMxBniDnBvELTM+pWA0+jqs3lPTpbDjdzpdIrCb771SMpNmMiiu2GKLp/qnpLzmJnVVP8zL5QYxLMcWf+jymqJvuKPgXz4eUuHNU10F6e1jY2Em0IUgXi8xuIUgE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1708981212; c=relaxed/simple;
-	bh=Hk66Ru/hxzpxeboKp+8Fx6WMw3mVrtFmp58Noh1Dpms=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MxS7pvAZSUbVDKQRQ468uDFQzzIz6nyijFMZazdN2H9R9ETDmDfbHi8MHHlEO3c6oFg6FsiZy0tX/n6jwsj6Fw7g6kNEV07sl40qL9iz/NHEPUmZt+P4KlHgBxT4EeItC9L2xVfXBMiH7rTq3lIXiLXkk2gYaIkEUdCPp5aaWn0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=datenfreihafen.org; spf=pass smtp.mailfrom=datenfreihafen.org; dkim=pass (2048-bit key) header.d=datenfreihafen.org header.i=@datenfreihafen.org header.b=AN44pfrW; arc=none smtp.client-ip=78.47.171.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=datenfreihafen.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=datenfreihafen.org
+	s=arc-20240116; t=1709135053; c=relaxed/simple;
+	bh=EpJLYJ6b85rFa9J1XyueUdyMW3coYJ0CvhXOXMVsYvA=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=TsyfAjr8xqcxjWAveGw5yQme4sKjEhdW0TIVfeAMW2srQ16sxVxKe7xxSjhdTc9TLLCbiVTaxVJQOgWtTQJwWyOALKNWu7fe9pGO6RX/Qb29Hopntp3o0tmybYmUYLGZpA4elB7xDk5YZnNI0iMi0lhR4ktqc3ZI8BvB/Enbb+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aonVDHv0; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=datenfreihafen.org header.i=@datenfreihafen.org header.b="AN44pfrW"
-Received: from [IPV6:2003:e9:d739:bb29:632d:d63:dac0:8169] (p200300e9d739bb29632d0d63dac08169.dip0.t-ipconnect.de [IPv6:2003:e9:d739:bb29:632d:d63:dac0:8169])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: stefan@datenfreihafen.org)
-	by proxima.lasnet.de (Postfix) with ESMTPSA id 70DC0C0924;
-	Mon, 26 Feb 2024 22:00:08 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
-	s=2021; t=1708981208;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/8Apb+j/UNpSz6gcuGX4ccTZ+NAAhK5iZmSsj/IGxm8=;
-	b=AN44pfrWdBgwbs5UfS5MkZz2X/hOYH578DX7DWdbYhNPiInI24tREWy0svpYNPKzfBTOSu
-	dXUcJYU7mWKUD2EeIAMQoeaZTzOInXn+SaUhk0iGhTtBIfuXowZi7HdEBbhQcXSoObW5qu
-	QIxIkzPRpQBdSr0O6RHIhPhUCTqC3ti4SoJ8PrDLBtG52Dna/DAKLI4ftQMlxrYkZjo4UR
-	v3srk8ggrBdSYN527581PLLQnyz7i1i2nasljrdouTb2FzHiCtbuC2amoByqg6Gm4L8gLM
-	zQrvYr7jqaI/cNWaBNereqJPBB00oAcApb/fXtlDMATtPiPUV3P5qKA+codhGg==
-Message-ID: <f0280912-6423-494f-8d61-28216551ebb9@datenfreihafen.org>
-Date: Mon, 26 Feb 2024 22:00:07 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aonVDHv0"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id C7E12C433C7;
+	Wed, 28 Feb 2024 15:44:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709135052;
+	bh=EpJLYJ6b85rFa9J1XyueUdyMW3coYJ0CvhXOXMVsYvA=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=aonVDHv0+gIs5d0kGPhHMl0GVrq1JvYpJCjkSx/6KoCHay79Kh4ev2K2T+VedOOeq
+	 AkxYnfFsQqe71Snxdkd4IMfmIiJZ55b81xRaU0s3a0DmDvLHkw/U4HJqYqRULcQ2j0
+	 /fB0fGLwYe6eGT5SxOFBoVtio2nHjtTmDsv7doLlFk5VPjUye3GdwLBoOQENduIEkf
+	 DpRX8hVhkeIgo/bi46tkFLbAHYgseOTT9o+a1n32G+UU32XNJX5yIU9UgahWK7yTuc
+	 IRiPMR05Nh2ym41CSCOgzNpF61zJze0tFud+VK6knCcB7xH1la7j4zFCzt6XLDDxkd
+	 l4y0byx/fv6kw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A8BD4D88FAF;
+	Wed, 28 Feb 2024 15:44:12 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] ieee802154: ca8210: Drop spurious WQ_UNBOUND from
- alloc_ordered_workqueue() call
-Content-Language: en-US
-To: Tejun Heo <tj@kernel.org>, Alexander Aring <alex.aring@gmail.com>,
- Miquel Raynal <miquel.raynal@bootlin.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <ZcF1El7fn5xkeoB1@slm.duckdns.org>
-From: Stefan Schmidt <stefan@datenfreihafen.org>
-In-Reply-To: <ZcF1El7fn5xkeoB1@slm.duckdns.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 04/10] net: fill in MODULE_DESCRIPTION()s for 6LoWPAN
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <170913505268.28471.3417707935881083049.git-patchwork-notify@kernel.org>
+Date: Wed, 28 Feb 2024 15:44:12 +0000
+References: <20240205101400.1480521-5-leitao@debian.org>
+In-Reply-To: <20240205101400.1480521-5-leitao@debian.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: kuba@kernel.org, davem@davemloft.net, pabeni@redhat.com,
+ edumazet@google.com, alex.aring@gmail.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, horms@kernel.org, andrew@lunn.ch,
+ linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org
 
-Hello,
+Hello:
 
-On 06.02.24 00:53, Tejun Heo wrote:
-> Workqueue is in the process of cleaning up the distinction between unbound
-> workqueues w/ @nr_active==1 and ordered workqueues. Explicit WQ_UNBOUND
-> isn't needed for alloc_ordered_workqueue() and will trigger a warning in the
-> future. Let's remove it. This doesn't cause any functional changes.
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Mon,  5 Feb 2024 02:13:53 -0800 you wrote:
+> W=1 builds now warn if module is built without a MODULE_DESCRIPTION().
+> Add descriptions to IPv6 over Low power Wireless Personal Area Network.
 > 
-> Signed-off-by: Tejun Heo <tj@kernel.org>
+> Signed-off-by: Breno Leitao <leitao@debian.org>
 > ---
->   drivers/net/ieee802154/ca8210.c |   10 ++--------
->   1 file changed, 2 insertions(+), 8 deletions(-)
-> 
-> --- a/drivers/net/ieee802154/ca8210.c
-> +++ b/drivers/net/ieee802154/ca8210.c
-> @@ -2857,19 +2857,13 @@ static int ca8210_interrupt_init(struct
->    */
->   static int ca8210_dev_com_init(struct ca8210_priv *priv)
->   {
-> -	priv->mlme_workqueue = alloc_ordered_workqueue(
-> -		"MLME work queue",
-> -		WQ_UNBOUND
-> -	);
-> +	priv->mlme_workqueue = alloc_ordered_workqueue("MLME work queue", 0);
->   	if (!priv->mlme_workqueue) {
->   		dev_crit(&priv->spi->dev, "alloc of mlme_workqueue failed!\n");
->   		return -ENOMEM;
->   	}
->   
-> -	priv->irq_workqueue = alloc_ordered_workqueue(
-> -		"ca8210 irq worker",
-> -		WQ_UNBOUND
-> -	);
-> +	priv->irq_workqueue = alloc_ordered_workqueue("ca8210 irq worker", 0);
->   	if (!priv->irq_workqueue) {
->   		dev_crit(&priv->spi->dev, "alloc of irq_workqueue failed!\n");
->   		destroy_workqueue(priv->mlme_workqueue);
+>  net/6lowpan/core.c | 1 +
+>  1 file changed, 1 insertion(+)
 
-This patch has been applied to the wpan-next tree and will be
-part of the next pull request to net-next. Thanks!
+Here is the summary with links:
+  - [net,04/10] net: fill in MODULE_DESCRIPTION()s for 6LoWPAN
+    https://git.kernel.org/bluetooth/bluetooth-next/c/2898f3075e6a
 
-regards
-Stefan Schmidt
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
