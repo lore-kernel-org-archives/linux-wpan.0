@@ -1,90 +1,75 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 689984CE1F;
-	Mon,  4 Mar 2024 17:53:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 854437EEED;
+	Tue,  5 Mar 2024 07:30:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709574819; cv=none; b=rpubvf6aK4HF6p91e3oqnBay40ZNp08dUDGQ566UNAsIKqvIswlbl3LcP8eTBtFWyd85nb58XuuEjEdgumNRR3oq4y4myDyS8lULk1FliI1GJzGaZY0fH9Cebee0uZrvKZz6BSNFwehKuc87HBLDccYNYB2Ny58LzVLo88u5bR4=
+	t=1709623841; cv=none; b=iwQRDUW0gbQH9OshXHRvEF1g+ca5Od6UzzFwNq0fltFTNWUlVJsIRf0Ef8pgtWwhnPBlG0HSgVxOTPnOG8yE3EwDORMZzrC/wcxeYs0/trYDjZ4ZpStFoQaHHzCioOHO6FQ1FJHtyJLw1BHHkWLdvNflVFk4B92LA5OXvv3WyJ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709574819; c=relaxed/simple;
-	bh=VmPBQAo+O4pSeKZpfQTbNLjLkFoqxXjZB3tUorREFJA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kgnG/1qkkzYY4QCSLWJwCiNYW5TfBvB27d2JfhhBEWoX+kFN4QGkOMiWSPdKWyf2EmFKMD4IYTeR5d40lE+ky62JQK4iXj5PnMzy7QkBGR0B1Q2+AzlVbnkvkxIUgo14oaJNEJNr0ULzFaSl6s7eedqzI7TIvkKmWoGB9vMhMB0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kf171TZ3; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+	s=arc-20240116; t=1709623841; c=relaxed/simple;
+	bh=yQIBy0qAVUfBRKGIK+sYwyQgV6nkRizUnW41Ib6QBHk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=KhvFUp7XSidQif8sSFTt9Wl6lUCsg2oFvezVku8a8EXuA3HTmNyD7uSA0B+tqH3S0hiyQv2GAlWR1+lInFK7Vwou1xryq8ZS1CCK86xg8gZVR7pap0UkuyV5oxTtNLTBJSbqDupyGxhhmKH5jTJl71+4n7PhIgL3nxRdvyvq8no=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=HZldMEhT; arc=none smtp.client-ip=217.70.183.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kf171TZ3"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1709574818; x=1741110818;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=VmPBQAo+O4pSeKZpfQTbNLjLkFoqxXjZB3tUorREFJA=;
-  b=kf171TZ3n9lVKgc4yM1cM4AvPdtv431CbBeG2+O/57ef2acykkmM00nB
-   Xm0CanldwkxaiUWBg0TJsh6vVHbiyokNvtdfZypZ8sKPdY6kdWKAf/HE3
-   Npv8YC35h/mHh02O56yKHEF8Ffe1vJnw2aEXBjWBK5Ea6tdAZtq7vUJyj
-   JRp+xTqPLo1B6Kns7YeIKa4TlFiA4whL8bNMnmoDsSAPxnHMAklBGpGBh
-   WM1uKSq3AweVBxk+tFYK2ZAdrmzE7Gs2G8ZbKuvlAyGwRnCyLNVvPSVEP
-   Gn+EJAMACMr/7iRxUtPZaRspFNH2yR2AYrzJsTYu93SzOJQD9haQXgiHY
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11003"; a="4210015"
-X-IronPort-AV: E=Sophos;i="6.06,204,1705392000"; 
-   d="scan'208";a="4210015"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2024 09:53:25 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,11003"; a="937040906"
-X-IronPort-AV: E=Sophos;i="6.06,204,1705392000"; 
-   d="scan'208";a="937040906"
-Received: from black.fi.intel.com ([10.237.72.28])
-  by fmsmga001.fm.intel.com with ESMTP; 04 Mar 2024 09:53:22 -0800
-Received: by black.fi.intel.com (Postfix, from userid 1003)
-	id 3C80915C; Mon,  4 Mar 2024 19:53:21 +0200 (EET)
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: linux-wpan@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Stefan Schmidt <stefan@datenfreihafen.org>,
-	Alexander Aring <alex.aring@gmail.com>,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Subject: [PATCH net-next v1 1/1] ieee802154: mcr20a: Remove unused of_gpio.h
-Date: Mon,  4 Mar 2024 19:53:20 +0200
-Message-ID: <20240304175320.1199496-1-andriy.shevchenko@linux.intel.com>
-X-Mailer: git-send-email 2.43.0.rc1.1.gbec44491f096
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="HZldMEhT"
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 18AB61BF206;
+	Tue,  5 Mar 2024 07:30:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1709623836;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nC0cWtvmF5x1A+WyJrGetk0ETMalgbT5tTFrwZ1CtpE=;
+	b=HZldMEhTv5Go3jOyftYUklwgkm6m/xxeoYgWRP1nQtE1Db0IUTnQoaWVGjjNG9t1NaTsDp
+	5NoOl3J7ecTs/+elZVygkdpDowZ7mA3mPg9IgbRWCQJoPJyRktpBbG3KAAXJbjqq7Ga36E
+	kzkVSRmJqkP8PTJqo2hBtw2VUH7EQf6tVPX8H984J62JFeZDHG6EUPLb474lOo4sLmT20I
+	TnpQP7ZZBHewKCMykJbEtYtj1/QI82+famTJpUoMBHiWuh8yku6mDmmpPByPNkD8T0l4yR
+	XNlYEFN0R0FA7HWISFfxC54VTRIxAVe5yxrosmdT6N1ZsCUMl3XnwT2Vdr75MQ==
+Date: Tue, 5 Mar 2024 08:30:34 +0100
+From: Miquel Raynal <miquel.raynal@bootlin.com>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc: linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Alexander Aring <alex.aring@gmail.com>,
+ Stefan Schmidt <stefan@datenfreihafen.org>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next v1 1/1] ieee802154: at86rf230: Replace
+ of_gpio.h by proper one
+Message-ID: <20240305083034.3fa0c5ec@xps-13>
+In-Reply-To: <20240304174218.1198411-1-andriy.shevchenko@linux.intel.com>
+References: <20240304174218.1198411-1-andriy.shevchenko@linux.intel.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: miquel.raynal@bootlin.com
 
-of_gpio.h is deprecated and subject to remove.
-The driver doesn't use it, simply remove the unused header.
+Hi Andy,
 
-Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
----
- drivers/net/ieee802154/mcr20a.c | 1 -
- 1 file changed, 1 deletion(-)
+andriy.shevchenko@linux.intel.com wrote on Mon,  4 Mar 2024 19:42:17
++0200:
 
-diff --git a/drivers/net/ieee802154/mcr20a.c b/drivers/net/ieee802154/mcr20a.c
-index efb1be3c644e..433fb5839203 100644
---- a/drivers/net/ieee802154/mcr20a.c
-+++ b/drivers/net/ieee802154/mcr20a.c
-@@ -12,7 +12,6 @@
- #include <linux/interrupt.h>
- #include <linux/irq.h>
- #include <linux/skbuff.h>
--#include <linux/of_gpio.h>
- #include <linux/regmap.h>
- #include <linux/ieee802154.h>
- #include <linux/debugfs.h>
--- 
-2.43.0.rc1.1.gbec44491f096
+> of_gpio.h is deprecated and subject to remove.
+> The driver doesn't use it directly, replace it
+> with what is really being used.
+>=20
+> Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 
+Acked-by: Miquel Raynal <miquel.raynal@bootlin.com>
+
+I guess this will be queued in wpan/next after the merge window,
+probably by Stefan.
+
+Thanks,
+Miqu=C3=A8l
