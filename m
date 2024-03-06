@@ -1,75 +1,230 @@
-Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 363E2171D1;
-	Wed,  6 Mar 2024 08:18:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE195131746
+	for <linux-wpan@vger.kernel.org>; Wed,  6 Mar 2024 13:52:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709713093; cv=none; b=DgNhftloU5MKoltNEFF43laNd/qh1IM/7wSpXCpfdxMSyFs80irstg2IsDzusPCE+LsXKgc4ngKorVznqnY8zICAVemcC73ly8xk1n1GD94i/aKOQ9y2YoM2F10XY1CWpXp5djDal5hDvs5dLgdqJp7hqTCV10KPjmnDiDxh6Ms=
+	t=1709733124; cv=none; b=Eb1QeXEBp/muak9NOTAVA/8AVfy+qz10H7lsExPT+1BQvL7VXC5AbMsu4TGKUVKByedH5Kt5RKkpxoxmzxk55YtCyTtWCxttYfju2SiE7h0B+/uK4BA7V3zbIyBgqVwG4gRV37Nu7Yi+yxI0ULCElcpwtr5/ymN0sCAuTrpt2r0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709713093; c=relaxed/simple;
-	bh=RQharEHEYWoPma76ARZR3AdbTSGUP1YPwJ6YXDDDB04=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mdO53jsoXjh24CHmQt8Z9C8E2LeypvPpm9iFuLfs/K4uxt6+IcD76JlDKhkJGVI8t51Lm4nIUbZTaC1rpyMLeAbRo8AJK33RgQY/LvQnVmZD1SPtRwV6hT9k07xxGa6o5QtwZIhQK7tssuXgGUfeAG5Ex1BqT+IhbZRlF1NC/ns=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=gN6lJXYr; arc=none smtp.client-ip=217.70.183.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+	s=arc-20240116; t=1709733124; c=relaxed/simple;
+	bh=Pxuf4kWuWzCb907EKPmxfs1oR1d6VL2ka9aNysDX23s=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Hfl8aHAnDYtwUdtDmCoIKcBg88HSXCbQ7xMpMsHwP1s/A2iOetDmHb2uyLMAA/NZ/asTFNWv999H61nBJqsMUovx1QwzLtsVDUHq7KQii5ZtVDX0KEFN70EhEyCQ3qX7V2iH55VnBaKQZD10MYD1nMNMohCWf8u2/UBltP+nOnI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HTOFj1nH; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="gN6lJXYr"
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 3DCDC40002;
-	Wed,  6 Mar 2024 08:18:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1709713089;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HTOFj1nH"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1709733121;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=RQharEHEYWoPma76ARZR3AdbTSGUP1YPwJ6YXDDDB04=;
-	b=gN6lJXYrVjraonAorfjFbeu7zHFeBxGvARW6ndXzV4XLAUPjJvGpxMIUq+iFToy2iUBGgw
-	IwhLLERxMg/5AjsejODXwLhh8X70PfrKIlW5xiaQSKxhfMl1tyIP7E4LwvCeM0Co8qH3nj
-	hpctzJnH7ekEqjf9q/qRe41uJBwOZy93Z5bMKoHD1pcU8SlYGOt9rc/5/v2tplJMzvo45T
-	DmJEGL1jlJg1khqZcy+JzuVnnRADeRtR9iiR0Ektd+d/0pCbvXe6E97K9ikS5tXGe/Z0+N
-	zut/Jdx0XW7wJTmPrhUcqBPyZwtFgx2MJZABVcwmtblB/gar2toakAZVhlt6VA==
-Date: Wed, 6 Mar 2024 09:18:07 +0100
-From: Miquel Raynal <miquel.raynal@bootlin.com>
-To: "Ricardo B. Marliere" <ricardo@marliere.net>
-Cc: Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt
- <stefan@datenfreihafen.org>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, linux-wpan@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Greg Kroah-Hartman
- <gregkh@linuxfoundation.org>
-Subject: Re: [PATCH wpan-next] wifi: cfg802154: make wpan_phy_class constant
-Message-ID: <20240306091807.4fd6a6a7@xps-13>
-In-Reply-To: <20240305-class_cleanup-wpan-v1-1-376f751fd481@marliere.net>
-References: <20240305-class_cleanup-wpan-v1-1-376f751fd481@marliere.net>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-pc-linux-gnu)
+	bh=w7Yd3qo5csWtOP+JW348rWjfTnDZ/UW2hhiQwJnJC6s=;
+	b=HTOFj1nHrAGdsvkNijFnhnHz3d4wbRJ+p27sJT4Bvc/UDt1bXHPvKczWcyilCK6RvhxmR8
+	bHamw48lZ8PqiWwBhAWKB+vxIw/sBRgR5c9ib6RMcyDNac99rGbupk8H/h8/HgETIdW6fz
+	06B9HYQAEdy2CVIyj3dIEV7u21arbg8=
+Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
+ [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-541-drsCUbUeMqyUdSpQqUVj3w-1; Wed, 06 Mar 2024 08:52:00 -0500
+X-MC-Unique: drsCUbUeMqyUdSpQqUVj3w-1
+Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-2d2a53cb0bbso5149061fa.0
+        for <linux-wpan@vger.kernel.org>; Wed, 06 Mar 2024 05:51:59 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709733119; x=1710337919;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=w7Yd3qo5csWtOP+JW348rWjfTnDZ/UW2hhiQwJnJC6s=;
+        b=H9c5iT8nhxODxNCyFP7j3nw7LHqrSLD6RcSM2qG+i/ZgFnNTd9JfiLy338zouH3XGv
+         YyI18IOy1vq3wJz0X5ch4nTMssXRXikrhTVMuecJG4XCUJkD0RoRrgVm/UZiCMuxhPzK
+         aDwdoH6nE2sZ4WhXw+/B9HGqYEEhOkwNrBdcAr/slUAIcLlAZl8QM8fDVk2nQWFKVExq
+         N170p/Uik1wPLC0vscbAUhELAvm0M+1lZqfYQLWRxBP8QF3YVgib5NmcVuldb19BjgDy
+         8JOu4+ZQFBy4a3m/rDislFxp/UclwmoliI3IbkydJJStiDD3Hy1rj2/ed3uLVQcyJ1hb
+         Vueg==
+X-Forwarded-Encrypted: i=1; AJvYcCUsbSRILW0wrmz+B8pvOZLZhJVRPrb0+WSMNPwqqxQZcFjF63HysEnBrjSUfTieRoLUbMF5SVgG75pmYIaJSaCo6Kl4radLDZ2RYQ==
+X-Gm-Message-State: AOJu0YwYV6ppS3a927VIr7BVvKSdQKn8yoX8PxVDnFsiuDmLufe1eyjd
+	jml6m1L+c0Nqgfg3HNoWWs2Qmcd/O9guijr6OcEWaPbkANbvtZKgbJexkImSV90wy3AHvdZXLfE
+	LcqMnPCMTKM7rWJCMfhGVxucyHt2rsThAR35+H4JATA2axMWoKAz7pZDKbSglzbHEsL5M9PjBMu
+	ezYIHoBVxZBZQ3yNq4yFF/q9dSh8DgC8nMIg==
+X-Received: by 2002:a2e:9942:0:b0:2d2:c7f5:fae2 with SMTP id r2-20020a2e9942000000b002d2c7f5fae2mr1781861ljj.26.1709733118771;
+        Wed, 06 Mar 2024 05:51:58 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IG0kxlPv7MKqvikorSw89RvO/D/lU1MbiJt2PjJ3n+6LW2N2RMRt0xyRaqK0m7jiit7OlWGsi0pF9XihXhWeL0=
+X-Received: by 2002:a2e:9942:0:b0:2d2:c7f5:fae2 with SMTP id
+ r2-20020a2e9942000000b002d2c7f5fae2mr1781850ljj.26.1709733118291; Wed, 06 Mar
+ 2024 05:51:58 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+References: <20240228163840.6667-1-pchelkin@ispras.ru> <CAK-6q+i4v94uF9BEeZ0zNWtutOn35pzstiY7jMBetCJ0PHOD3w@mail.gmail.com>
+ <95eecd55-378c-4a55-96d8-fa74ec59e76a-pchelkin@ispras.ru>
+In-Reply-To: <95eecd55-378c-4a55-96d8-fa74ec59e76a-pchelkin@ispras.ru>
+From: Alexander Aring <aahringo@redhat.com>
+Date: Wed, 6 Mar 2024 08:51:47 -0500
+Message-ID: <CAK-6q+gwfVdVtezj+v982KQH+oUg=4F_-27Fczq-K5iVuY3MSA@mail.gmail.com>
+Subject: Re: Re: [PATCH wpan] mac802154: fix llsec key resources release in mac802154_llsec_key_del
+To: Fedor Pchelkin <pchelkin@ispras.ru>
+Cc: Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt <stefan@datenfreihafen.org>, 
+	Miquel Raynal <miquel.raynal@bootlin.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Phoebe Buckheister <phoebe.buckheister@itwm.fraunhofer.de>, linux-wpan@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Alexey Khoroshilov <khoroshilov@ispras.ru>, lvc-project@linuxtesting.org, 
+	stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: miquel.raynal@bootlin.com
 
-Hi Ricardo,
+Hi,
 
-ricardo@marliere.net wrote on Tue, 05 Mar 2024 16:55:24 -0300:
+On Mon, Mar 4, 2024 at 2:25=E2=80=AFAM Fedor Pchelkin <pchelkin@ispras.ru> =
+wrote:
+>
+> Hello Alexander,
+>
+> Thanks for review!
+>
+> On 24/03/03 06:19PM, Alexander Aring wrote:
+> > Hi,
+> >
+> > On Wed, Feb 28, 2024 at 11:44=E2=80=AFAM Fedor Pchelkin <pchelkin@ispra=
+s.ru> wrote:
+> > >
+> > > mac802154_llsec_key_del() can free resources of a key directly withou=
+t
+> > > following the RCU rules for waiting before the end of a grace period.=
+ This
+> > > may lead to use-after-free in case llsec_lookup_key() is traversing t=
+he
+> > > list of keys in parallel with a key deletion:
+> > >
+> > > refcount_t: addition on 0; use-after-free.
+> > > WARNING: CPU: 4 PID: 16000 at lib/refcount.c:25 refcount_warn_saturat=
+e+0x162/0x2a0
+> > > Modules linked in:
+> > > CPU: 4 PID: 16000 Comm: wpan-ping Not tainted 6.7.0 #19
+> > > Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.2-de=
+bian-1.16.2-1 04/01/2014
+> > > RIP: 0010:refcount_warn_saturate+0x162/0x2a0
+> > > Call Trace:
+> > >  <TASK>
+> > >  llsec_lookup_key.isra.0+0x890/0x9e0
+> > >  mac802154_llsec_encrypt+0x30c/0x9c0
+> > >  ieee802154_subif_start_xmit+0x24/0x1e0
+> > >  dev_hard_start_xmit+0x13e/0x690
+> > >  sch_direct_xmit+0x2ae/0xbc0
+> > >  __dev_queue_xmit+0x11dd/0x3c20
+> > >  dgram_sendmsg+0x90b/0xd60
+> > >  __sys_sendto+0x466/0x4c0
+> > >  __x64_sys_sendto+0xe0/0x1c0
+> > >  do_syscall_64+0x45/0xf0
+> > >  entry_SYSCALL_64_after_hwframe+0x6e/0x76
+> > >
+> > > Also, ieee802154_llsec_key_entry structures are not freed by
+> > > mac802154_llsec_key_del():
+> > >
+> > > unreferenced object 0xffff8880613b6980 (size 64):
+> > >   comm "iwpan", pid 2176, jiffies 4294761134 (age 60.475s)
+> > >   hex dump (first 32 bytes):
+> > >     78 0d 8f 18 80 88 ff ff 22 01 00 00 00 00 ad de  x.......".......
+> > >     00 00 00 00 00 00 00 00 03 00 cd ab 00 00 00 00  ................
+> > >   backtrace:
+> > >     [<ffffffff81dcfa62>] __kmem_cache_alloc_node+0x1e2/0x2d0
+> > >     [<ffffffff81c43865>] kmalloc_trace+0x25/0xc0
+> > >     [<ffffffff88968b09>] mac802154_llsec_key_add+0xac9/0xcf0
+> > >     [<ffffffff8896e41a>] ieee802154_add_llsec_key+0x5a/0x80
+> > >     [<ffffffff8892adc6>] nl802154_add_llsec_key+0x426/0x5b0
+> > >     [<ffffffff86ff293e>] genl_family_rcv_msg_doit+0x1fe/0x2f0
+> > >     [<ffffffff86ff46d1>] genl_rcv_msg+0x531/0x7d0
+> > >     [<ffffffff86fee7a9>] netlink_rcv_skb+0x169/0x440
+> > >     [<ffffffff86ff1d88>] genl_rcv+0x28/0x40
+> > >     [<ffffffff86fec15c>] netlink_unicast+0x53c/0x820
+> > >     [<ffffffff86fecd8b>] netlink_sendmsg+0x93b/0xe60
+> > >     [<ffffffff86b91b35>] ____sys_sendmsg+0xac5/0xca0
+> > >     [<ffffffff86b9c3dd>] ___sys_sendmsg+0x11d/0x1c0
+> > >     [<ffffffff86b9c65a>] __sys_sendmsg+0xfa/0x1d0
+> > >     [<ffffffff88eadbf5>] do_syscall_64+0x45/0xf0
+> > >     [<ffffffff890000ea>] entry_SYSCALL_64_after_hwframe+0x6e/0x76
+> > >
+> > > Handle the proper resource release in the RCU callback function
+> > > mac802154_llsec_key_del_rcu().
+> > >
+> > > Note that if llsec_lookup_key() finds a key, it gets a refcount via
+> > > llsec_key_get() and locally copies key id from key_entry (which is a
+> > > list element). So it's safe to call llsec_key_put() and free the list
+> > > entry after the RCU grace period elapses.
+> > >
+> > > Found by Linux Verification Center (linuxtesting.org).
+> > >
+> > > Fixes: 5d637d5aabd8 ("mac802154: add llsec structures and mutators")
+> > > Cc: stable@vger.kernel.org
+> > > Signed-off-by: Fedor Pchelkin <pchelkin@ispras.ru>
+> > > ---
+> > > Should the patch be targeted to "net" tree directly?
+> > >
+> > >  include/net/cfg802154.h |  1 +
+> > >  net/mac802154/llsec.c   | 18 +++++++++++++-----
+> > >  2 files changed, 14 insertions(+), 5 deletions(-)
+> > >
+> > > diff --git a/include/net/cfg802154.h b/include/net/cfg802154.h
+> > > index cd95711b12b8..76d2cd2e2b30 100644
+> > > --- a/include/net/cfg802154.h
+> > > +++ b/include/net/cfg802154.h
+> > > @@ -401,6 +401,7 @@ struct ieee802154_llsec_key {
+> > >
+> > >  struct ieee802154_llsec_key_entry {
+> > >         struct list_head list;
+> > > +       struct rcu_head rcu;
+> > >
+> > >         struct ieee802154_llsec_key_id id;
+> > >         struct ieee802154_llsec_key *key;
+> > > diff --git a/net/mac802154/llsec.c b/net/mac802154/llsec.c
+> > > index 8d2eabc71bbe..f13b07ebfb98 100644
+> > > --- a/net/mac802154/llsec.c
+> > > +++ b/net/mac802154/llsec.c
+> > > @@ -265,19 +265,27 @@ int mac802154_llsec_key_add(struct mac802154_ll=
+sec *sec,
+> > >         return -ENOMEM;
+> > >  }
+> > >
+> > > +static void mac802154_llsec_key_del_rcu(struct rcu_head *rcu)
+> > > +{
+> > > +       struct ieee802154_llsec_key_entry *pos;
+> > > +       struct mac802154_llsec_key *mkey;
+> > > +
+> > > +       pos =3D container_of(rcu, struct ieee802154_llsec_key_entry, =
+rcu);
+> > > +       mkey =3D container_of(pos->key, struct mac802154_llsec_key, k=
+ey);
+> > > +
+> > > +       llsec_key_put(mkey);
+> > > +       kfree_sensitive(pos);
+> >
+> > I don't think this kfree is right, "struct ieee802154_llsec_key_entry"
+> > is declared as "non pointer" in "struct mac802154_llsec_key". The
+> > memory that is part of "struct ieee802154_llsec_key_entry" should be
+> > freed when llsec_key_put(), llsec_key_release() hits.
+> >
+> > Or is there something I am missing here?
+>
+> `struct ieee802154_llsec_key_entry` is not included into any other
+> struct. It is a standalone entity describing an entry in the
+> `ieee802154_llsec_table.keys` list.
+>
+> Maybe you are confusing it with `struct ieee802154_llsec_key`?
+>
 
-> Since commit 43a7206b0963 ("driver core: class: make class_register() take
-> a const *"), the driver core allows for struct class to be in read-only
-> memory, so move the wpan_phy_class structure to be declared at build time
-> placing it into read-only memory, instead of having to be dynamically
-> allocated at boot time.
->=20
-> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Suggested-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Signed-off-by: Ricardo B. Marliere <ricardo@marliere.net>
+Yes, I was confused about "ieee802154_llsec_key_entry" vs
+"ieee802154_llsec_key".
 
-Acked-by: Miquel Raynal <miquel.raynal@bootlin.com>
+Acked-by: Alexander Aring <aahringo@redhat.com>
 
-Thanks,
-Miqu=C3=A8l
+Thanks.
+
+- Alex
+
