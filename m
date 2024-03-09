@@ -1,37 +1,35 @@
-Received: from proxima.lasnet.de (proxima.lasnet.de [78.47.171.185])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D095137C39;
-	Thu,  7 Mar 2024 19:51:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.47.171.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 816B210A34;
+	Sat,  9 Mar 2024 04:40:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709841092; cv=none; b=bByI9k6A/CBG6KO200GOB/SKwjkyNOxrJJyBdo7VwZ0SXNTTsb4KIulq1+7zGy2IKZRDDoLwGr2+BV6QQ9RgkoDT2p/+CERf/Zme7AldrY42eIbYLt5T+5MlRN+DXDD56AsD3O7/f9lvFcFNH0quw8Va+3bery4sjPhkrK1v7HM=
+	t=1709959231; cv=none; b=YVCAtNUd3tENXIkbQvvwBCUVcENQ8+CtyihaMbqmULp6AlI0W7chbIfJTnaGm/a76JnqALUrDJ/HX+CK9fyY7J1jURsCSXk9s6gZkBJGsDqCNI9BOgT3Wpvzlf61BWza+HL4SoFD4quDfnGTMT7JeSYOK5S88HHyEeMBP3NJFiU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709841092; c=relaxed/simple;
-	bh=a1xb1mMQy8YqL8oScQ6h8lSK/elVzB3caUVbGFJlCSM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UfDljUVKDbuDiyydz7Dp6egD6gDJnjHMjE4fDI2TnjyGEpeF+7+qK/T7NECooWSlNKdD/eQuh83v+C9WhYwxV5MQMs72V3xKfTMVYBG5keOxZwsy4HTRtZgPBm/srFwa1gHbFNuI7TVsa0c+qJTmX48/ti8L5J3mkcFm6fmCk3I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=datenfreihafen.org; spf=pass smtp.mailfrom=datenfreihafen.org; arc=none smtp.client-ip=78.47.171.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=datenfreihafen.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=datenfreihafen.org
-Received: from localhost.localdomain (unknown [45.118.184.53])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: stefan@sostec.de)
-	by proxima.lasnet.de (Postfix) with ESMTPSA id 37CC3C08B2;
-	Thu,  7 Mar 2024 20:51:25 +0100 (CET)
-From: Stefan Schmidt <stefan@datenfreihafen.org>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: linux-wpan@vger.kernel.org,
-	alex.aring@gmail.com,
-	miquel.raynal@bootlin.com,
-	netdev@vger.kernel.org
-Subject: pull-request: ieee802154-next 2024-03-07
-Date: Thu,  7 Mar 2024 20:51:05 +0100
-Message-ID: <20240307195105.292085-1-stefan@datenfreihafen.org>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1709959231; c=relaxed/simple;
+	bh=fJIPG9UQLUAFLhv0yJud14lWN7eoQYLxdALEouubRUE=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=T/qU8Ig2p0o7MuOIE1MPUBo1Gad6hTkI6f/L0loQHVGfGPNY3RlNCsuRDh6s/B7n3k33W6GYi9TbEYytUXFIG5/RNaIkYDfrqBl5M9GuCSMsNbA8NUsP4U55oq+rv02XPSNx76RMaohjE/kvDZIibJGFPDLFAyxej5Dz3IE+46w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Xk4PJx9d; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xk4PJx9d"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id E66A6C433C7;
+	Sat,  9 Mar 2024 04:40:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709959231;
+	bh=fJIPG9UQLUAFLhv0yJud14lWN7eoQYLxdALEouubRUE=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Xk4PJx9djjhz5mE7qYKmmK/5ulO/LQfdhh7EAn6vrWNs5fSjwuf1HJ+Ls1MIYTwub
+	 Gwe8YEW7jYBLrb7aAT/5DITX1Rgekpnfax7db2+kmkgIHIdOdXmSDEiujmiqqDVRQx
+	 flNhJTphgGtduSNA7uLIAYlhuYSBleiKwNBVE8nuYhH28bKT0TE+W29hvcKeN0RHjP
+	 T6U73IG/pwkzqGaupvRcbzpoTRu7sHqUYSQbRpFT7XjIbiwxMIeENPHLc0cIFcAKOB
+	 l18C8DIDbxVZLQ1gL5ieOPS5HAow/RflYwCReCn0Iwm7m2CRxG+VkdYF620Ne+FkcH
+	 pY2XV3UqqTbVg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C6D3AC04D3F;
+	Sat,  9 Mar 2024 04:40:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
@@ -39,68 +37,42 @@ List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: pull-request: ieee802154-next 2024-03-07
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170995923080.2022.5674268528661372119.git-patchwork-notify@kernel.org>
+Date: Sat, 09 Mar 2024 04:40:30 +0000
+References: <20240307195105.292085-1-stefan@datenfreihafen.org>
+In-Reply-To: <20240307195105.292085-1-stefan@datenfreihafen.org>
+To: Stefan Schmidt <stefan@datenfreihafen.org>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ linux-wpan@vger.kernel.org, alex.aring@gmail.com, miquel.raynal@bootlin.com,
+ netdev@vger.kernel.org
 
-Hello Dave, Jakub, Paolo.
+Hello:
 
-A little late, but hopefully still in time.
+This pull request was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-An update from ieee802154 for your *net-next* tree:
+On Thu,  7 Mar 2024 20:51:05 +0100 you wrote:
+> Hello Dave, Jakub, Paolo.
+> 
+> A little late, but hopefully still in time.
+> 
+> An update from ieee802154 for your *net-next* tree:
+> 
+> Various cross tree patches for ieee802154v drivers and a resource leak
+> fix for ieee802154 llsec.
+> 
+> [...]
 
-Various cross tree patches for ieee802154v drivers and a resource leak
-fix for ieee802154 llsec.
+Here is the summary with links:
+  - pull-request: ieee802154-next 2024-03-07
+    https://git.kernel.org/netdev/net-next/c/2612b9f10c5f
 
-Andy Shevchenko changed GPIO header usage for at86rf230 and mcr20a to
-only include needed headers.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Bo Liu converted the at86rf230, mcr20a and mrf24j40 driver regmap
-support to use the maple tree register cache.
 
-Fedor Pchelkin fixed a resource leak in the llsec key deletion path.
-
-Ricardo B. Marliere made wpan_phy_class const.
-
-Tejun Heo removed WQ_UNBOUND from a workqueue call in ca8210.
-
-regards
-Stefan Schmidt
-
-The following changes since commit 2373699560a754079579b7722b50d1d38de1960e:
-
-  mac802154: Avoid new associations while disassociating (2023-12-15 11:14:57 +0100)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/wpan/wpan-next.git tags/ieee802154-for-net-next-2024-03-07
-
-for you to fetch changes up to b2d23256615c8f8b3215f0155b0234f0e310dfde:
-
-  ieee802154: cfg802154: make wpan_phy_class constant (2024-03-06 21:23:10 +0100)
-
-----------------------------------------------------------------
-Andy Shevchenko (2):
-      ieee802154: at86rf230: Replace of_gpio.h by proper one
-      ieee802154: mcr20a: Remove unused of_gpio.h
-
-Bo Liu (3):
-      net: ieee802154: at86rf230: convert to use maple tree register cache
-      net: ieee802154: mcr20a: convert to use maple tree register cache
-      net: ieee802154: mrf24j40: convert to use maple tree register cache
-
-Fedor Pchelkin (1):
-      mac802154: fix llsec key resources release in mac802154_llsec_key_del
-
-Ricardo B. Marliere (1):
-      ieee802154: cfg802154: make wpan_phy_class constant
-
-Tejun Heo (1):
-      ieee802154: ca8210: Drop spurious WQ_UNBOUND from alloc_ordered_workqueue() call
-
- drivers/net/ieee802154/at86rf230.c |  5 ++---
- drivers/net/ieee802154/ca8210.c    | 10 ++--------
- drivers/net/ieee802154/mcr20a.c    |  5 ++---
- drivers/net/ieee802154/mrf24j40.c  |  4 ++--
- include/net/cfg802154.h            |  1 +
- net/ieee802154/sysfs.c             |  2 +-
- net/ieee802154/sysfs.h             |  2 +-
- net/mac802154/llsec.c              | 18 +++++++++++++-----
- 8 files changed, 24 insertions(+), 23 deletions(-)
