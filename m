@@ -1,109 +1,192 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11502153568;
-	Mon, 25 Mar 2024 02:13:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C44F84A2A;
+	Wed, 27 Mar 2024 12:21:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711332789; cv=none; b=u7REQ7lAzJE27FtSPJ1eSaA5qN0mvEhGELx5KLu7mFDtGkmiWdlIWfp21k78JdllIhO//sDXhPAUsfbh/vMkGt+dQGEXXgrUdx41IkRb3wCemAJnrlLDvob0Dfn42azqF+4jn3mVSMq6+MYtJGIMuO5JDf6RhBDkk/o2r9S0UbU=
+	t=1711542101; cv=none; b=WsqCq3Hci96J6yupHf03BaXUfCbEF/jjfQGYEA9Ue7wZixRfPYkiicbdNCojq9NUGjM9+LXZUokM7yaRlThxZkpU8suJnhuupdqQ0UkJjOnc47sGal8Nb/DntqLLdaOBH0eky49px/Xc1kSr+58ayrSVfHj9X8tvWn9uX02wA1s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711332789; c=relaxed/simple;
-	bh=OQ6DaWqLtLK0mHL2i6HS0EPqyqAvookaS2ecZGz/nWM=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=g43doJD1Zwd+SjGFr2tDawQRyGxaqDWtHOLzHbbPbdlZEifs5MViBVSEdcqAq4MXmI+EdlTb8RCW8B/c0Gl7UUu7O5d1K+qyZXe2jCfHGN1ApxYSjBtyyzvY+nuAnF/lYyilRgmLDNgJoFct7k0iusd1Lr+w+/W9TO8YCmiI934=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IW3oS+vk; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1711542101; c=relaxed/simple;
+	bh=514VihN7HTjayh9xyJcQI5+v7iE9V456I+tNFAZOXwI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=isxyLPmc3xhmFcHNkHgu9G+VTvx2k6ASXzPHCnEd6tbsyHPui+lGDpz+VFmeMqOuSzy0XtsMnm2uFDRrjwBSpLJwD1zwTHf/0DcQ3mosPg4rRf4+xznrxu9hY4sxN3OQv46k8KijPppUMSf5fMT1bldwnr3A40a8Vhb7feE5RcQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dUhFazWR; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IW3oS+vk"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id A56A5C4166B;
-	Mon, 25 Mar 2024 02:13:07 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dUhFazWR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 63D2EC433C7;
+	Wed, 27 Mar 2024 12:21:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711332787;
-	bh=OQ6DaWqLtLK0mHL2i6HS0EPqyqAvookaS2ecZGz/nWM=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=IW3oS+vkvE1rg2omkWdnXg451W2R8QWxmUug1tn/Bg6l3cfmeu1XEIle4W9BtNPp4
-	 0oal/S4apZS+BzY3gBaCjlntTY0jgQlz1t3PTdy9XjaTcskT+il7ElSZAp+JWMzJPx
-	 t4H/ihZGECuHFrRbX8V87SXD5ftRGwC5bn6CdPejAvtWiLKQtnbNuipuyb5sBYBBYm
-	 r76u6K1eEb3PqAdmigNT4nSlFA/s5U3UgALZVL8Mu6HumRAnW3tR7xT39q806nrvhq
-	 m7JZPsTIIGWptqQY1qCZ3jSIb5cnxMaBAWbnn/lCp4J/k3we+Ge3Bv+ms0rQoNcWaw
-	 NOIkisLFJZphg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 90BCDD2D0E3;
-	Mon, 25 Mar 2024 02:13:07 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1711542101;
+	bh=514VihN7HTjayh9xyJcQI5+v7iE9V456I+tNFAZOXwI=;
+	h=From:To:Cc:Subject:Date:From;
+	b=dUhFazWRLas9UWUrQjJluZlDollpaLgKGmIhcQ8+SAWM+fBHZy/fxwsf7hgBNvzEW
+	 Qcu6UcXEaGqug5JESbKP1SKgyIA2S09OKCZjVOzxm07h8Ytqa6szTRmQMQGv1PK/VM
+	 m2epzMeUZPSvwF/mxC73nzIxGqqXAgGYmZG89DlheSnu5bQ9W8Z0CHT67IoYbQmXwi
+	 GYD9iOvaQsNJMxo5OcXLzLf6xFSddtTg4WlWAU9Q+ynPI6ol0cAkBiFWWP/Zxd80c1
+	 qWb/rPQzdR7CRRYiwFYANRCmcKehkNQyIZhjjxcvVAQtGBsGFoX4MlFS1+5WXD1jG+
+	 EAvW4Rrg8Kfhw==
+From: Sasha Levin <sashal@kernel.org>
+To: stable@vger.kernel.org,
+	pchelkin@ispras.ru
+Cc: Alexander Aring <aahringo@redhat.com>,
+	Stefan Schmidt <stefan@datenfreihafen.org>,
+	linux-wpan@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: FAILED: Patch "mac802154: fix llsec key resources release in mac802154_llsec_key_del" failed to apply to 5.4-stable tree
+Date: Wed, 27 Mar 2024 08:21:39 -0400
+Message-ID: <20240327122139.2837021-1-sashal@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-Patchwork-Hint: ignore
+X-stable: review
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v3 00/32] spi: get rid of some legacy macros
-From: patchwork-bot+chrome-platform@kernel.org
-Message-Id: 
- <171133278756.9916.16032493309661657935.git-patchwork-notify@kernel.org>
-Date: Mon, 25 Mar 2024 02:13:07 +0000
-References: <cover.1707324793.git.u.kleine-koenig@pengutronix.de>
-In-Reply-To: <cover.1707324793.git.u.kleine-koenig@pengutronix.de>
-To: =?utf-8?q?Uwe_Kleine-K=C3=B6nig_=3Cu=2Ekleine-koenig=40pengutronix=2Ede=3E?=@ci.codeaurora.org
-Cc: broonie@kernel.org, kernel@pengutronix.de, mdf@kernel.org,
- hao.wu@intel.com, yilun.xu@intel.com, trix@redhat.com,
- linux-fpga@vger.kernel.org, linux-kernel@vger.kernel.org,
- alex.aring@gmail.com, stefan@datenfreihafen.org, miquel.raynal@bootlin.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- linux-wpan@vger.kernel.org, netdev@vger.kernel.org, lars@metafoo.de,
- Michael.Hennerich@analog.com, jic23@kernel.org, linux-iio@vger.kernel.org,
- dmitry.torokhov@gmail.com, Jonathan.Cameron@huawei.com,
- linux-input@vger.kernel.org, gregkh@linuxfoundation.org,
- andriy.shevchenko@linux.intel.com, ulf.hansson@linaro.org,
- martin.tuma@digiteqautomotive.com, mchehab@kernel.org,
- linux-media@vger.kernel.org, serjk@netup.ru, arnd@arndb.de,
- yangyingliang@huawei.com, linux-mmc@vger.kernel.org, richard@nod.at,
- vigneshr@ti.com, robh@kernel.org, amit.kumar-mahapatra@amd.com,
- alsa-devel@alsa-project.org, linux-mtd@lists.infradead.org, horms@kernel.org,
- ronald.wahl@raritan.com, bleung@chromium.org, tzungbi@kernel.org,
- groeck@chromium.org, chrome-platform@lists.linux.dev, michal.simek@amd.com,
- jcmvbkbc@gmail.com, linux-spi@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, andersson@kernel.org,
- konrad.dybcio@linaro.org, linux-arm-msm@vger.kernel.org,
- matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
- linux-mediatek@lists.infradead.org, tzimmermann@suse.de, javierm@redhat.com,
- sam@ravnborg.org, dri-devel@lists.freedesktop.org,
- linux-fbdev@vger.kernel.org, linux-staging@lists.linux.dev,
- vireshk@kernel.org, rmfrfs@gmail.com, johan@kernel.org, elder@kernel.org,
- greybus-dev@lists.linaro.org, peterhuewe@gmx.de, jarkko@kernel.org,
- jgg@ziepe.ca, linux-integrity@vger.kernel.org, herve.codina@bootlin.com,
- krzysztof.kozlowski@linaro.org, linux-usb@vger.kernel.org, deller@gmx.de,
- dario.binacchi@amarulasolutions.com, kvalo@kernel.org, dmantipov@yandex.ru,
- libertas-dev@lists.infradead.org, linux-wireless@vger.kernel.org,
- corbet@lwn.net, bhelgaas@google.com, james.clark@arm.com,
- linux-doc@vger.kernel.org
 
-Hello:
+The patch below does not apply to the 5.4-stable tree.
+If someone wants it applied there, or to any other stable or longterm
+tree, then please email the backport, including the original git commit
+id to <stable@vger.kernel.org>.
 
-This patch was applied to chrome-platform/linux.git (for-next)
-by Mark Brown <broonie@kernel.org>:
+Thanks,
+Sasha
 
-On Wed,  7 Feb 2024 19:40:14 +0100 you wrote:
-> Changes since v2
-> (https://lore.kernel.org/linux-spi/cover.1705944943.git.u.kleine-koenig@pengutronix.de):
-> 
->  - Drop patch "mtd: rawnand: fsl_elbc: Let .probe retry if local bus is
->    missing" which doesn't belong into this series.
->  - Fix a build failure noticed by the kernel build bot in
->    drivers/spi/spi-au1550.c. (I failed to catch this because this driver
->    is mips only, but not enabled in a mips allmodconfig. That's a bit
->    unfortunate, but not easily fixable.)
->  - Add the Reviewed-by: and Acked-by: tags I received for v2.
-> 
-> [...]
+------------------ original commit in Linus's tree ------------------
 
-Here is the summary with links:
-  - [v3,15/32] platform/chrome: cros_ec_spi: Follow renaming of SPI "master" to "controller"
-    https://git.kernel.org/chrome-platform/c/85ad0ec049a7
+From e8a1e58345cf40b7b272e08ac7b32328b2543e40 Mon Sep 17 00:00:00 2001
+From: Fedor Pchelkin <pchelkin@ispras.ru>
+Date: Wed, 28 Feb 2024 19:38:39 +0300
+Subject: [PATCH] mac802154: fix llsec key resources release in
+ mac802154_llsec_key_del
 
-You are awesome, thank you!
+mac802154_llsec_key_del() can free resources of a key directly without
+following the RCU rules for waiting before the end of a grace period. This
+may lead to use-after-free in case llsec_lookup_key() is traversing the
+list of keys in parallel with a key deletion:
+
+refcount_t: addition on 0; use-after-free.
+WARNING: CPU: 4 PID: 16000 at lib/refcount.c:25 refcount_warn_saturate+0x162/0x2a0
+Modules linked in:
+CPU: 4 PID: 16000 Comm: wpan-ping Not tainted 6.7.0 #19
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+RIP: 0010:refcount_warn_saturate+0x162/0x2a0
+Call Trace:
+ <TASK>
+ llsec_lookup_key.isra.0+0x890/0x9e0
+ mac802154_llsec_encrypt+0x30c/0x9c0
+ ieee802154_subif_start_xmit+0x24/0x1e0
+ dev_hard_start_xmit+0x13e/0x690
+ sch_direct_xmit+0x2ae/0xbc0
+ __dev_queue_xmit+0x11dd/0x3c20
+ dgram_sendmsg+0x90b/0xd60
+ __sys_sendto+0x466/0x4c0
+ __x64_sys_sendto+0xe0/0x1c0
+ do_syscall_64+0x45/0xf0
+ entry_SYSCALL_64_after_hwframe+0x6e/0x76
+
+Also, ieee802154_llsec_key_entry structures are not freed by
+mac802154_llsec_key_del():
+
+unreferenced object 0xffff8880613b6980 (size 64):
+  comm "iwpan", pid 2176, jiffies 4294761134 (age 60.475s)
+  hex dump (first 32 bytes):
+    78 0d 8f 18 80 88 ff ff 22 01 00 00 00 00 ad de  x.......".......
+    00 00 00 00 00 00 00 00 03 00 cd ab 00 00 00 00  ................
+  backtrace:
+    [<ffffffff81dcfa62>] __kmem_cache_alloc_node+0x1e2/0x2d0
+    [<ffffffff81c43865>] kmalloc_trace+0x25/0xc0
+    [<ffffffff88968b09>] mac802154_llsec_key_add+0xac9/0xcf0
+    [<ffffffff8896e41a>] ieee802154_add_llsec_key+0x5a/0x80
+    [<ffffffff8892adc6>] nl802154_add_llsec_key+0x426/0x5b0
+    [<ffffffff86ff293e>] genl_family_rcv_msg_doit+0x1fe/0x2f0
+    [<ffffffff86ff46d1>] genl_rcv_msg+0x531/0x7d0
+    [<ffffffff86fee7a9>] netlink_rcv_skb+0x169/0x440
+    [<ffffffff86ff1d88>] genl_rcv+0x28/0x40
+    [<ffffffff86fec15c>] netlink_unicast+0x53c/0x820
+    [<ffffffff86fecd8b>] netlink_sendmsg+0x93b/0xe60
+    [<ffffffff86b91b35>] ____sys_sendmsg+0xac5/0xca0
+    [<ffffffff86b9c3dd>] ___sys_sendmsg+0x11d/0x1c0
+    [<ffffffff86b9c65a>] __sys_sendmsg+0xfa/0x1d0
+    [<ffffffff88eadbf5>] do_syscall_64+0x45/0xf0
+    [<ffffffff890000ea>] entry_SYSCALL_64_after_hwframe+0x6e/0x76
+
+Handle the proper resource release in the RCU callback function
+mac802154_llsec_key_del_rcu().
+
+Note that if llsec_lookup_key() finds a key, it gets a refcount via
+llsec_key_get() and locally copies key id from key_entry (which is a
+list element). So it's safe to call llsec_key_put() and free the list
+entry after the RCU grace period elapses.
+
+Found by Linux Verification Center (linuxtesting.org).
+
+Fixes: 5d637d5aabd8 ("mac802154: add llsec structures and mutators")
+Cc: stable@vger.kernel.org
+Signed-off-by: Fedor Pchelkin <pchelkin@ispras.ru>
+Acked-by: Alexander Aring <aahringo@redhat.com>
+Message-ID: <20240228163840.6667-1-pchelkin@ispras.ru>
+Signed-off-by: Stefan Schmidt <stefan@datenfreihafen.org>
+---
+ include/net/cfg802154.h |  1 +
+ net/mac802154/llsec.c   | 18 +++++++++++++-----
+ 2 files changed, 14 insertions(+), 5 deletions(-)
+
+diff --git a/include/net/cfg802154.h b/include/net/cfg802154.h
+index cd95711b12b8e..76d2cd2e2b309 100644
+--- a/include/net/cfg802154.h
++++ b/include/net/cfg802154.h
+@@ -401,6 +401,7 @@ struct ieee802154_llsec_key {
+ 
+ struct ieee802154_llsec_key_entry {
+ 	struct list_head list;
++	struct rcu_head rcu;
+ 
+ 	struct ieee802154_llsec_key_id id;
+ 	struct ieee802154_llsec_key *key;
+diff --git a/net/mac802154/llsec.c b/net/mac802154/llsec.c
+index 8d2eabc71bbeb..f13b07ebfb98a 100644
+--- a/net/mac802154/llsec.c
++++ b/net/mac802154/llsec.c
+@@ -265,19 +265,27 @@ int mac802154_llsec_key_add(struct mac802154_llsec *sec,
+ 	return -ENOMEM;
+ }
+ 
++static void mac802154_llsec_key_del_rcu(struct rcu_head *rcu)
++{
++	struct ieee802154_llsec_key_entry *pos;
++	struct mac802154_llsec_key *mkey;
++
++	pos = container_of(rcu, struct ieee802154_llsec_key_entry, rcu);
++	mkey = container_of(pos->key, struct mac802154_llsec_key, key);
++
++	llsec_key_put(mkey);
++	kfree_sensitive(pos);
++}
++
+ int mac802154_llsec_key_del(struct mac802154_llsec *sec,
+ 			    const struct ieee802154_llsec_key_id *key)
+ {
+ 	struct ieee802154_llsec_key_entry *pos;
+ 
+ 	list_for_each_entry(pos, &sec->table.keys, list) {
+-		struct mac802154_llsec_key *mkey;
+-
+-		mkey = container_of(pos->key, struct mac802154_llsec_key, key);
+-
+ 		if (llsec_key_id_equal(&pos->id, key)) {
+ 			list_del_rcu(&pos->list);
+-			llsec_key_put(mkey);
++			call_rcu(&pos->rcu, mac802154_llsec_key_del_rcu);
+ 			return 0;
+ 		}
+ 	}
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+2.43.0
+
+
 
 
