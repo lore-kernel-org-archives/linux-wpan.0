@@ -1,30 +1,30 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C44F84A2A;
-	Wed, 27 Mar 2024 12:21:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A6CB18522E;
+	Wed, 27 Mar 2024 12:25:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711542101; cv=none; b=WsqCq3Hci96J6yupHf03BaXUfCbEF/jjfQGYEA9Ue7wZixRfPYkiicbdNCojq9NUGjM9+LXZUokM7yaRlThxZkpU8suJnhuupdqQ0UkJjOnc47sGal8Nb/DntqLLdaOBH0eky49px/Xc1kSr+58ayrSVfHj9X8tvWn9uX02wA1s=
+	t=1711542337; cv=none; b=OLum/NfpOla9s8QE80i5BhnpAWh39GccANteF35oFPOfIBcfBYVFMyPWTK6o4PN/loV40PGPAqtWFusB1VUjuXxicngs/DyPMbsJT18oRCd5MFdmHp94VtVA8dT8chuLTtvpepvJZ44XmnQ1Ui4jadGWCUrPaJEMAwXjUdhHHH4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711542101; c=relaxed/simple;
-	bh=514VihN7HTjayh9xyJcQI5+v7iE9V456I+tNFAZOXwI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=isxyLPmc3xhmFcHNkHgu9G+VTvx2k6ASXzPHCnEd6tbsyHPui+lGDpz+VFmeMqOuSzy0XtsMnm2uFDRrjwBSpLJwD1zwTHf/0DcQ3mosPg4rRf4+xznrxu9hY4sxN3OQv46k8KijPppUMSf5fMT1bldwnr3A40a8Vhb7feE5RcQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dUhFazWR; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1711542337; c=relaxed/simple;
+	bh=IXGj7gDGkyso8Gc8zTpkguwTv7FyFRFp+3Fdl7+V+V8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=EgYPKIvZQjBEQbeh2Uzq/EjVOZ7Z3XVcN5jtbEYWN7jU+QamUYr8sfh/NDiMI23KqHkXlFKOmayii8mumj3sTFS1QI9hIrFfrhHHcuWb3XXlvsGCV080ELfT2I2eIiG53o9NhCFt0v7eTPB8ElLudsU1TrgkTLt5hq1+FJJCQpc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Mjdpvojb; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dUhFazWR"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 63D2EC433C7;
-	Wed, 27 Mar 2024 12:21:40 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Mjdpvojb"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE8E2C433F1;
+	Wed, 27 Mar 2024 12:25:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711542101;
-	bh=514VihN7HTjayh9xyJcQI5+v7iE9V456I+tNFAZOXwI=;
+	s=k20201202; t=1711542336;
+	bh=IXGj7gDGkyso8Gc8zTpkguwTv7FyFRFp+3Fdl7+V+V8=;
 	h=From:To:Cc:Subject:Date:From;
-	b=dUhFazWRLas9UWUrQjJluZlDollpaLgKGmIhcQ8+SAWM+fBHZy/fxwsf7hgBNvzEW
-	 Qcu6UcXEaGqug5JESbKP1SKgyIA2S09OKCZjVOzxm07h8Ytqa6szTRmQMQGv1PK/VM
-	 m2epzMeUZPSvwF/mxC73nzIxGqqXAgGYmZG89DlheSnu5bQ9W8Z0CHT67IoYbQmXwi
-	 GYD9iOvaQsNJMxo5OcXLzLf6xFSddtTg4WlWAU9Q+ynPI6ol0cAkBiFWWP/Zxd80c1
-	 qWb/rPQzdR7CRRYiwFYANRCmcKehkNQyIZhjjxcvVAQtGBsGFoX4MlFS1+5WXD1jG+
-	 EAvW4Rrg8Kfhw==
+	b=Mjdpvojb9cQR9hQ5DD4xKu8Irp06zfdugQQxvdsplxjcWcnlPUQLjKRCYJZxVohPX
+	 SL1Abrg2el9cmw5Fc6aXTqQbIhO+I2URuY8RPBo/VC3FGBjKF1ip16V80bXU9og2Lz
+	 vUlDCJYi6X7C5V1wggxGYlZGKoiOxH2MWkQIer+557xzw2j2nsCL1SBHhmGa+vbtrF
+	 UD8lrTl9jWbKERmCfO+J56JkUKf5uAog0jhSexP/ahs83lpEL/wL6FrumO1QoIiZHS
+	 M/ZGyfVD9F2ELw27Y8OaoSITecdqxuSzFtdsu64cjhTktlKGkKRMvXJeqsam6ZPUlt
+	 Q/kfQeFPw4mcQ==
 From: Sasha Levin <sashal@kernel.org>
 To: stable@vger.kernel.org,
 	pchelkin@ispras.ru
@@ -33,9 +33,9 @@ Cc: Alexander Aring <aahringo@redhat.com>,
 	linux-wpan@vger.kernel.org,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: FAILED: Patch "mac802154: fix llsec key resources release in mac802154_llsec_key_del" failed to apply to 5.4-stable tree
-Date: Wed, 27 Mar 2024 08:21:39 -0400
-Message-ID: <20240327122139.2837021-1-sashal@kernel.org>
+Subject: FAILED: Patch "mac802154: fix llsec key resources release in mac802154_llsec_key_del" failed to apply to 4.19-stable tree
+Date: Wed, 27 Mar 2024 08:25:34 -0400
+Message-ID: <20240327122535.2840351-1-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
@@ -47,7 +47,7 @@ X-Patchwork-Hint: ignore
 X-stable: review
 Content-Transfer-Encoding: 8bit
 
-The patch below does not apply to the 5.4-stable tree.
+The patch below does not apply to the 4.19-stable tree.
 If someone wants it applied there, or to any other stable or longterm
 tree, then please email the backport, including the original git commit
 id to <stable@vger.kernel.org>.
