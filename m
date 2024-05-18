@@ -1,42 +1,42 @@
 Received: from proxima.lasnet.de (proxima.lasnet.de [78.47.171.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 632853FB9F
-	for <linux-wpan@vger.kernel.org>; Sat, 18 May 2024 21:49:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 632C6DDA6
+	for <linux-wpan@vger.kernel.org>; Sat, 18 May 2024 21:54:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.47.171.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716068989; cv=none; b=HDkTqH08nMsIM1wYA2LyjFlkaYOo0W1bcIg7JzWL1KsBpIzxCLN78H/1ScE9335FQNDEf0ZG5cRIQRsdga9GS01JY1OuyR4vIpEriOIg60ER7mXEuWW8xOsbPt47Dpu9f6GpVwg+2crCx3Xgnsl6yiOb/IkW7LszhSuy5sQOh6s=
+	t=1716069297; cv=none; b=kyMr8eHAsvKqHIowxk1lJsjFr7rSvRbEJYBZYNWnSfLpbnej1jGci5rCgd+flzl8HXUjjL3THwqPSxSlcO6ihMLMa9ol7cLK0kReKrrtzy98uX6uxJQjYPLJdyDqwowvgUklcSMBF91tADDcMl989YH7zKfQwxBqNWQrjHFznFA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716068989; c=relaxed/simple;
-	bh=y+3z/0SImEatttbQhITqfCW09q4Zp7imB/p3uFkwFRQ=;
+	s=arc-20240116; t=1716069297; c=relaxed/simple;
+	bh=UtGMvVghZ+z1W5Ms64TwgYzM7WgThLy/1gHebR53mSk=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OahdHzG+TJa8buv7bGQjMZOU94zc19UQP07/5xWFdSjdMPMLRMqmLNdq7Bb5vpaT3r4Hz9ndXC+DwM+0xUiny+g59FkvoEDr6z+0q6LqUZfW0JuhYXYY+zKFpYj9HpMlDv7zMqfVpd0dgO3fmvKDLFJrFP71+LDQnjb5hwVYPl8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=datenfreihafen.org; spf=pass smtp.mailfrom=datenfreihafen.org; dkim=pass (2048-bit key) header.d=datenfreihafen.org header.i=@datenfreihafen.org header.b=H/n9r1mR; arc=none smtp.client-ip=78.47.171.185
+	 In-Reply-To:Content-Type; b=mXTNu7/CmbjuvVsiPl/SgogjAPBjOvc3tNWJ4gZ4b2K6nr6K/MLDTv+SWEw1V97Era7d5sPSAU6h6o6BVsoREgCDb5s6rXWRZQvVoKYLl64uCc7oWOAqkC0C5HS4RQQ1B7JKkc4d0RxUY1xqRFXRPf72Hbqn6w0jWGlbKZ/j8Ec=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=datenfreihafen.org; spf=pass smtp.mailfrom=datenfreihafen.org; dkim=pass (2048-bit key) header.d=datenfreihafen.org header.i=@datenfreihafen.org header.b=b/9xBVgj; arc=none smtp.client-ip=78.47.171.185
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=datenfreihafen.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=datenfreihafen.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=datenfreihafen.org header.i=@datenfreihafen.org header.b="H/n9r1mR"
+	dkim=pass (2048-bit key) header.d=datenfreihafen.org header.i=@datenfreihafen.org header.b="b/9xBVgj"
 Received: from [192.168.2.51] (unknown [45.118.184.53])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: stefan@datenfreihafen.org)
-	by proxima.lasnet.de (Postfix) with ESMTPSA id 9EB9DC0221;
-	Sat, 18 May 2024 23:49:41 +0200 (CEST)
+	by proxima.lasnet.de (Postfix) with ESMTPSA id 5FDA4C044D;
+	Sat, 18 May 2024 23:48:57 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
-	s=2021; t=1716068981;
+	s=2021; t=1716068937;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=7PCHHEMOb8i3hUZ/FWEtsjaH2np1ZTMEfKL0DAyC66Q=;
-	b=H/n9r1mRNNIC9Gaj0FEuqYY4YlkH5nNcZ9W3H8M99oDrDmLJiMW9ZcHoX5v1Fl2iU6DsWN
-	luladh3bHlTPDIiLMDEDKKvvVVLH1h6PiRTDJw/PRCVoeRgaSvXa+2+mioUSG5F7Sms/q7
-	XqmPkPzEu5gH4kv/jNymZaahA1HZ4I2BtZrrCinGOi2L9JyC2/8YCpoIIRuKoxKRuxXjhq
-	WcJZVhEHbjpBVz+VxoWUFwSAHP6GZiPj62HDaC+B/cWJtCrF33qaX/uJhBqDrDtqv7/iEE
-	2YZBe+M1NOpG9+moy9OccPh47kx6TAm3uF5KFJuZH3xxfy8iYVjCItNd92DWXQ==
-Message-ID: <ea13c022-11f7-4474-88f3-9ff9169600f9@datenfreihafen.org>
-Date: Sat, 18 May 2024 23:49:41 +0200
+	bh=KdCYnDZAV1N69k7+FU6fOqlt3H2UPuvcQLF5P0qUZn4=;
+	b=b/9xBVgjqgzA35RomvCDtYFVkk+9xSIcWKnqUdOj7zgRRdZSPY3CpNFJ+/VoJ0K271SQh7
+	evPsuLzaFz0H87NG7iBbuGwBOPsaD6HKE4EfHuaiuhuJLzPA3dnT7i8cVu+kZR4XBSOhne
+	uiWtibF8okcXUoO+o8qWQqDoUaWvBU4RQTo1yqINEv+Pc4oCMXSdVpI7gc04gNuLwrz4x9
+	hji4o2B2OkZB7qERTYwVn3ywkCz3GiMtexvvr7oS/e7weD3WSid0nRDtxl4P8szjREXpLD
+	JWuGevydrnG1XuVVeWujUD4z0+ua8vBYRhTmZ+rmt9YKZt/Mv/gOgDcT4o5plg==
+Message-ID: <6d3eab3e-7fa9-45ca-a02a-312f8be2af37@datenfreihafen.org>
+Date: Sat, 18 May 2024 23:48:56 +0200
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
@@ -46,39 +46,71 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH] mac802154: fix time calculation in
  ieee802154_configure_durations()
-To: Miquel Raynal <miquel.raynal@bootlin.com>,
- Dmitry Antipov <dmantipov@yandex.ru>
+To: Dmitry Antipov <dmantipov@yandex.ru>,
+ Miquel Raynal <miquel.raynal@bootlin.com>
 Cc: Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org,
  lvc-project@linuxtesting.org
 References: <20240508114010.219527-1-dmantipov@yandex.ru>
- <20240513090902.2d61ca02@xps-13>
 Content-Language: en-US
 From: Stefan Schmidt <stefan@datenfreihafen.org>
-In-Reply-To: <20240513090902.2d61ca02@xps-13>
+In-Reply-To: <20240508114010.219527-1-dmantipov@yandex.ru>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Hello Miquel,
+Hello Dmitry,
 
-On 13.05.24 09:09, Miquel Raynal wrote:
-> Hi Dmitry,
+On 08.05.24 13:40, Dmitry Antipov wrote:
+> Since 'symbol_duration' of 'struct wpan_phy' is in nanoseconds but
+> 'lifs_period' and 'sifs_period' are both in microseconds, fix time
+> calculation in 'ieee802154_configure_durations()' and use convenient
+> 'NSEC_PER_USEC' in 'ieee802154_setup_wpan_phy_pib()' as well.
+> Compile tested only.
 > 
-> + Stefan
+> Found by Linux Verification Center (linuxtesting.org) with SVACE.
 > 
-> dmantipov@yandex.ru wrote on Wed,  8 May 2024 14:40:10 +0300:
+> Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
+> ---
+>   net/mac802154/main.c | 14 ++++++++------
+>   1 file changed, 8 insertions(+), 6 deletions(-)
 > 
->> Since 'symbol_duration' of 'struct wpan_phy' is in nanoseconds but
->> 'lifs_period' and 'sifs_period' are both in microseconds, fix time
->> calculation in 'ieee802154_configure_durations()' and use convenient
->> 'NSEC_PER_USEC' in 'ieee802154_setup_wpan_phy_pib()' as well.
->> Compile tested only.
->>
->> Found by Linux Verification Center (linuxtesting.org) with SVACE.
->>
-> 
-> Requires Fixes and Cc: stable I guess.
+> diff --git a/net/mac802154/main.c b/net/mac802154/main.c
+> index 9ab7396668d2..21b7c3b280b4 100644
+> --- a/net/mac802154/main.c
+> +++ b/net/mac802154/main.c
+> @@ -161,8 +161,10 @@ void ieee802154_configure_durations(struct wpan_phy *phy,
+>   	}
+>   
+>   	phy->symbol_duration = duration;
+> -	phy->lifs_period = (IEEE802154_LIFS_PERIOD * phy->symbol_duration) / NSEC_PER_SEC;
+> -	phy->sifs_period = (IEEE802154_SIFS_PERIOD * phy->symbol_duration) / NSEC_PER_SEC;
+> +	phy->lifs_period =
+> +		(IEEE802154_LIFS_PERIOD * phy->symbol_duration) / NSEC_PER_USEC;
+> +	phy->sifs_period =
+> +		(IEEE802154_SIFS_PERIOD * phy->symbol_duration) / NSEC_PER_USEC;
+>   }
+>   EXPORT_SYMBOL(ieee802154_configure_durations);
+>   
+> @@ -184,10 +186,10 @@ static void ieee802154_setup_wpan_phy_pib(struct wpan_phy *wpan_phy)
+>   	 * Should be done when all drivers sets this value.
+>   	 */
+>   
+> -	wpan_phy->lifs_period =
+> -		(IEEE802154_LIFS_PERIOD * wpan_phy->symbol_duration) / 1000;
+> -	wpan_phy->sifs_period =
+> -		(IEEE802154_SIFS_PERIOD * wpan_phy->symbol_duration) / 1000;
+> +	wpan_phy->lifs_period =	(IEEE802154_LIFS_PERIOD *
+> +				 wpan_phy->symbol_duration) / NSEC_PER_USEC;
+> +	wpan_phy->sifs_period =	(IEEE802154_SIFS_PERIOD *
+> +				 wpan_phy->symbol_duration) / NSEC_PER_USEC;
+>   }
+>   
+>   int ieee802154_register_hw(struct ieee802154_hw *hw)
 
-Fixes should be enough to get picked up. Added before pushing.
+I added a Fixes tag for you here before pushing so stable can decide if 
+they want to pick this.
+
+This patch has been applied to the wpan tree and will be
+part of the next pull request to net. Thanks!
 
 regards
 Stefan Schmidt
