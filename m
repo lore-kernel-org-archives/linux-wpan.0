@@ -1,97 +1,104 @@
-Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65710208A0
-	for <linux-wpan@vger.kernel.org>; Mon, 20 May 2024 08:53:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3355077F10;
+	Fri, 31 May 2024 08:07:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716195240; cv=none; b=C5O7t8EbSnrA9SEBikt573v8PEMJCdyhgvB9iZtPWBu0Ax5sz50VZdN8ph3kTslwK7c5pgZovae8Y4l7u/YzbS/7I3BMPHS4eYXVQ/eo+t1qJO9SNSeMvdVn/0VNAjCVjUJuJwAbfuLjfC2itsCz0Rhm/+CSgk4sxakQwBVo8+M=
+	t=1717142874; cv=none; b=UW4EXn/RzCYNhlP2Ne5qTFg7GNmKVatzCsc7BtMm1qE3vUbg9NN78MNXdyE+3n3ryH//tK5/1ctPLlYRHxCmswfrLClLmcsgDiylhDs1DRlqaziWzvboeKC7vyz0mjTL/pjG6nzeu0CLculI9FjHw06LRBxv8ebq8ti0EMEp5HI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716195240; c=relaxed/simple;
-	bh=yrZmRFcu/5GiA9nuhAfepZM11DVZbT7a12GsU7Kgzyc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TRuIQ9oKoOjAjxqvd62gX2uwNPdmYFgTHdsyPjGt94sohIX+kWXn+1/Z29L6LDzENsScoHSY0l5zYYt+WmMGhT0wlcNHrLhrSia6FCZS87w/d23Hxe00Vqu+ge7Ds0o5ckx1kpvGyW+G4KgFWfcltiTim8/iyj/l3gphgyy5cSY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=jcHU2hJr; arc=none smtp.client-ip=217.70.183.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="jcHU2hJr"
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 4C29E40008;
-	Mon, 20 May 2024 08:53:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1716195230;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2VjofWda1hWsGOH9j5iwF7nU1rS4Bo+qxQVveXUpteg=;
-	b=jcHU2hJrz0hZsd6hRNizGQ+kb5EaaJLoftIuqcngMrxVr1P1FnBaGvD12L69lUdFcqlyih
-	Z93h9d9f5/+FtfM3znbJFPDZKQcjuHQltBtcn/mEWDdv0+NBwghCuC4Jn28254g9PER3KC
-	rC02Ugj5Z2NgPgeExoK+91HqYHwzoNGbxodDZQ9mqz6rki1R3M9C8qVfScVkbsyVds+iK+
-	cS0O26TiU+fPMk78ik4VkM3d2rT6xijA6rTukABqCYfT6yQrF1hYxcmP9mz46EODXD2xvW
-	KhWDfhfvrg79hcY1W33o9aR3ctPQScG6qPpo5X1XCxUUNtEH+nCpF9hZELZklQ==
-Date: Mon, 20 May 2024 10:53:49 +0200
-From: Miquel Raynal <miquel.raynal@bootlin.com>
-To: Stefan Schmidt <stefan@datenfreihafen.org>
-Cc: Dmitry Antipov <dmantipov@yandex.ru>, Alexander Aring
- <alex.aring@gmail.com>, linux-wpan@vger.kernel.org,
- lvc-project@linuxtesting.org
-Subject: Re: [PATCH] mac802154: fix time calculation in
- ieee802154_configure_durations()
-Message-ID: <20240520105349.3c5620a2@xps-13>
-In-Reply-To: <ea13c022-11f7-4474-88f3-9ff9169600f9@datenfreihafen.org>
-References: <20240508114010.219527-1-dmantipov@yandex.ru>
-	<20240513090902.2d61ca02@xps-13>
-	<ea13c022-11f7-4474-88f3-9ff9169600f9@datenfreihafen.org>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1717142874; c=relaxed/simple;
+	bh=vsNgwHvZRQwmQctv8l3O/7QfMvyCgHzZeFs9HeynMFw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=jt3oAybZAH5k0j6a8phv5qjQlF6bFAFR8m8TV+WVovneb1iQnuSt5sYAe+YSuLkSw3Qc8sNTBHgCnMTHMomTkdMxPa0K5zUYlZPtaIHOT3u5OJ8i7YDqhmDlZsprdRFn8Ukh9A6q7fyqRd5wM+JH4Q9eQNzuuw6EDt3py9fFTcs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: dc4ececc1f2411ef9305a59a3cc225df-20240531
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.38,REQID:71caded7-58ec-4b1f-8584-4f013905d8e5,IP:10,
+	URL:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTI
+	ON:release,TS:-5
+X-CID-INFO: VERSION:1.1.38,REQID:71caded7-58ec-4b1f-8584-4f013905d8e5,IP:10,UR
+	L:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+	:release,TS:-5
+X-CID-META: VersionHash:82c5f88,CLOUDID:d5a16ab178cbfb61a30cf038e50e53f0,BulkI
+	D:2405311607473M99V4K1,BulkQuantity:0,Recheck:0,SF:66|24|17|19|44|102,TC:n
+	il,Content:0,EDM:-3,IP:-2,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,CO
+	L:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
+X-CID-BVR: 0
+X-CID-BAS: 0,_,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_FAS,TF_CID_SPAM_FSD,TF_CID_SPAM_FSI
+X-UUID: dc4ececc1f2411ef9305a59a3cc225df-20240531
+Received: from mail.kylinos.cn [(39.156.73.10)] by mailgw.kylinos.cn
+	(envelope-from <jiangyunshui@kylinos.cn>)
+	(Generic MTA)
+	with ESMTP id 558551494; Fri, 31 May 2024 16:07:44 +0800
+Received: from mail.kylinos.cn (localhost [127.0.0.1])
+	by mail.kylinos.cn (NSMail) with SMTP id 78DF3E000EB9;
+	Fri, 31 May 2024 16:07:44 +0800 (CST)
+X-ns-mid: postfix-66598550-342445703
+Received: from kylin-pc.. (unknown [172.25.130.133])
+	by mail.kylinos.cn (NSMail) with ESMTPA id 4CDE2E000EB9;
+	Fri, 31 May 2024 16:07:42 +0800 (CST)
+From: Yunshui Jiang <jiangyunshui@kylinos.cn>
+To: linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-wpan@vger.kernel.org
+Cc: alex.aring@gmail.com,
+	stefan@datenfreihafen.org,
+	miquel.raynal@bootlin.com,
+	davem@davemloft.net,
+	Yunshui Jiang <jiangyunshui@kylinos.cn>
+Subject: [PATCH] net: mac802154: Fix racy device stats updates by DEV_STATS_INC() and DEV_STATS_ADD()
+Date: Fri, 31 May 2024 16:07:39 +0800
+Message-Id: <20240531080739.2608969-1-jiangyunshui@kylinos.cn>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: miquel.raynal@bootlin.com
 
-Hi Stefan,
+mac802154 devices update their dev->stats fields locklessly. Therefore
+these counters should be updated atomically. Adopt SMP safe DEV_STATS_INC=
+()
+and DEV_STATS_ADD() to achieve this.
 
-stefan@datenfreihafen.org wrote on Sat, 18 May 2024 23:49:41 +0200:
+Signed-off-by: Yunshui Jiang <jiangyunshui@kylinos.cn>
+---
+ net/mac802154/tx.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-> Hello Miquel,
->=20
-> On 13.05.24 09:09, Miquel Raynal wrote:
-> > Hi Dmitry,
-> >=20
-> > + Stefan
-> >=20
-> > dmantipov@yandex.ru wrote on Wed,  8 May 2024 14:40:10 +0300:
-> >  =20
-> >> Since 'symbol_duration' of 'struct wpan_phy' is in nanoseconds but
-> >> 'lifs_period' and 'sifs_period' are both in microseconds, fix time
-> >> calculation in 'ieee802154_configure_durations()' and use convenient
-> >> 'NSEC_PER_USEC' in 'ieee802154_setup_wpan_phy_pib()' as well.
-> >> Compile tested only.
-> >>
-> >> Found by Linux Verification Center (linuxtesting.org) with SVACE.
-> >> =20
-> >=20
-> > Requires Fixes and Cc: stable I guess. =20
->=20
-> Fixes should be enough to get picked up. Added before pushing.
+diff --git a/net/mac802154/tx.c b/net/mac802154/tx.c
+index 2a6f1ed763c9..6fbed5bb5c3e 100644
+--- a/net/mac802154/tx.c
++++ b/net/mac802154/tx.c
+@@ -34,8 +34,8 @@ void ieee802154_xmit_sync_worker(struct work_struct *wo=
+rk)
+ 	if (res)
+ 		goto err_tx;
+=20
+-	dev->stats.tx_packets++;
+-	dev->stats.tx_bytes +=3D skb->len;
++	DEV_STATS_INC(dev, tx_packets);
++	DEV_STATS_ADD(dev, tx_bytes, skb->len);
+=20
+ 	ieee802154_xmit_complete(&local->hw, skb, false);
+=20
+@@ -90,8 +90,8 @@ ieee802154_tx(struct ieee802154_local *local, struct sk=
+_buff *skb)
+ 		if (ret)
+ 			goto err_wake_netif_queue;
+=20
+-		dev->stats.tx_packets++;
+-		dev->stats.tx_bytes +=3D len;
++		DEV_STATS_INC(dev, tx_packets);
++		DEV_STATS_ADD(dev, tx_bytes, len);
+ 	} else {
+ 		local->tx_skb =3D skb;
+ 		queue_work(local->workqueue, &local->sync_tx_work);
+--=20
+2.34.1
 
-Actually, unless the process changed recently, IIRC we should add Cc:
-stable when we think it should be backported (like this patch). The
-stable team indeed introduced an algorithm to collect patches not
-flagged with this tag "by mistake", but they ask us to continue Cc'ing
-them. Of course a Fixes tag is a good hint for the algorithm that the
-patch should be backported, and most of the time the patch will be
-backported anyway. Also rules being often different in net/, I think
-even net maintainers now comply with this and not longer do the
-cherry-picks themselves.
-
-But maybe this changed recently again and my just lost :-)
-
-Thanks,
-Miqu=C3=A8l
