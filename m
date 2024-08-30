@@ -1,117 +1,92 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from proxima.lasnet.de (proxima.lasnet.de [78.47.171.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7021E136353;
-	Fri, 30 Aug 2024 18:33:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9D541BF819;
+	Fri, 30 Aug 2024 20:35:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.47.171.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725042822; cv=none; b=cUKRRPjFT9UXEw9UhW19oWQcKWQjPmGY1M4367RjhA1Ci/I8Fyh90nC4LZS6kulKdppfaRQQCD8utgZuBAL5lcl36YSY25fViGgQBalWL2Pk3H3/C/WqM5ulii2ab5ypUyxKi38gigDkyjZISmAuMN+9/G8NKPReXr3rayq5nEo=
+	t=1725050127; cv=none; b=p41sf/dzrCkimnC3qmjJEp5m4d5wDNDJYHMXZhJ8QmxFZj16RMCo1eXG/KS+rt9VUi1acK6UZ7GXqxWlb9BS/SyghW3ITbWaWfUbonpqFOWcyfhklPJJ6VHdHHp4Y8K5QXYfrQLEA2oPuMJ488L+K4nuIogQDmHHZoJMFiIRZgs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725042822; c=relaxed/simple;
-	bh=jyNW/B6IwX0dc05FsIycRog/dbgRkTJ8KMkJ+70Y+RA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=g/wGHiK3k7KdbCzYtNOAyFS8Acan5UB9pK4tsDkXZLR4WPiOpo6VDx59H8NNEFjwMlhCVaBSjzZUNX3KnjkkbtyFtFN2CwZWint1b5/WIb7QC9GBhGkQGgCIqrx63MHNC6lQ+V5nJ4dMOh9lZR4swpOGpqgmio7cAazJIDIBRww=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DEr97Gw2; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1725050127; c=relaxed/simple;
+	bh=8FCr1Z8j8HyNnaKfoBvqkPP5DW/x8KkUlYWhvMPZJT8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=iCJ4nesd/dXLhJLhgIOX/LWAzBg5Flr6zSjsJFzML37RCyWKnYbQ4DayQPTa1bNB+Pk05wOW11MNeBNRY4u7182/+Km4Dki6CAWbP+isFX1NC2W5ArlbOLCyxsE0U4ioGmyNPGIcZts3Z/QRF0dBbbNBgJKepX2FWLBmClj3Ick=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=datenfreihafen.org; spf=pass smtp.mailfrom=datenfreihafen.org; dkim=pass (2048-bit key) header.d=datenfreihafen.org header.i=@datenfreihafen.org header.b=GM0++EeY; arc=none smtp.client-ip=78.47.171.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=datenfreihafen.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=datenfreihafen.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DEr97Gw2"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7CBC9C4CEC2;
-	Fri, 30 Aug 2024 18:33:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725042822;
-	bh=jyNW/B6IwX0dc05FsIycRog/dbgRkTJ8KMkJ+70Y+RA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=DEr97Gw297SQrBxo6TEztgHZWSrTFaBhW65TOIw0M+eje04S5x0Fehr9EIsfNu/Yo
-	 cAKZhGXb2bX4V+YXauvKvw+0cXTlAmsnmkDjCelW8e2JeZ39yE/GzaGNsRG5uGVrc7
-	 v8U1wRrLBlE+emqEVVzHzS1WFD2um+aCoZ4aPldtzK76vjX3uApmNuRKOtc6GOjarG
-	 8EYre9NvXdhRkmQpgru+kK1p+1/4llfLQA6Mcmr8tV7sH/+MKd0rKK7HIRpaJnRWjV
-	 JvFEFPLxTHl4M7PN1vfR0MDykkCRMmRzNrdN46Lk8cMQGfFWhG9PSSKFiPC9kZR749
-	 j4VzuC33+ti/Q==
-Date: Fri, 30 Aug 2024 19:33:37 +0100
-From: Simon Horman <horms@kernel.org>
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: Shen Lichuan <shenlichuan@vivo.com>, alex.aring@gmail.com,
-	stefan@datenfreihafen.org, miquel.raynal@bootlin.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, linux-wpan@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	opensource.kernel@vivo.com
-Subject: Re: [PATCH v1] ieee802154: at86rf230: Simplify with dev_err_probe()
-Message-ID: <20240830183337.GF1368797@kernel.org>
-References: <20240830081402.21716-1-shenlichuan@vivo.com>
- <20240830160228.GU1368797@kernel.org>
- <c87f7ab7-2c8c-4c08-b686-12c56fe3edeb@kernel.org>
- <20240830181625.GD1368797@kernel.org>
- <b4026df9-059e-447a-ace3-340ba32cb62f@kernel.org>
+	dkim=pass (2048-bit key) header.d=datenfreihafen.org header.i=@datenfreihafen.org header.b="GM0++EeY"
+Received: from [192.168.2.107] (unknown [45.118.184.53])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: stefan@datenfreihafen.org)
+	by proxima.lasnet.de (Postfix) with ESMTPSA id C1255C02E1;
+	Fri, 30 Aug 2024 22:35:20 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
+	s=2021; t=1725050121;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Tn+46Kr3b06tsrlhXAV/Oojqb1oCroARJ+Cr669JF+Y=;
+	b=GM0++EeYUiVXsWW106altA9C3EATFjSCGD49KHOsPj3i4EEI5VYPEbVsCgsM4NyYrPxjOG
+	InAbWOSWDHXNL56x/9GoBwrWkNnhQWPTjhm42asgBKIa+8Hc37VpcG0pxIvPaYDafrN1uN
+	+Z5pWg74jiUsGYj05atT2oRBhsslJhDDcMU9R9JeTz14bfbni8oRHn0TuNOziRYrNbjLN+
+	lXJ40YOaBAQcYsK8Kdmom5M5MHvaxzZK8qvjolQdW5DL4JNbjrer3Eh8CTPb59IU1vDIfz
+	Lo6IZJ9idL9kMVLWwzi86GfWIFjYF8pyKMJomhFeBRZDuaw1hd9f1KymONeMwQ==
+Message-ID: <9f9e14aa-f809-4bcb-98c6-840e41729877@datenfreihafen.org>
+Date: Fri, 30 Aug 2024 22:35:20 +0200
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b4026df9-059e-447a-ace3-340ba32cb62f@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH wpan-next 2/2] ieee802154: Correct spelling in nl802154.h
+To: Simon Horman <horms@kernel.org>, Alexander Aring <alex.aring@gmail.com>,
+ Miquel Raynal <miquel.raynal@bootlin.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, linux-wpan@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20240829-wpan-spell-v1-0-799d840e02c4@kernel.org>
+ <20240829-wpan-spell-v1-2-799d840e02c4@kernel.org>
+Content-Language: en-US
+From: Stefan Schmidt <stefan@datenfreihafen.org>
+In-Reply-To: <20240829-wpan-spell-v1-2-799d840e02c4@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Aug 30, 2024 at 08:27:02PM +0200, Krzysztof Kozlowski wrote:
-> On 30/08/2024 20:16, Simon Horman wrote:
-> > On Fri, Aug 30, 2024 at 07:43:30PM +0200, Krzysztof Kozlowski wrote:
-> >> On 30/08/2024 18:02, Simon Horman wrote:
-> >>> On Fri, Aug 30, 2024 at 04:14:02PM +0800, Shen Lichuan wrote:
-> >>>> Use dev_err_probe() to simplify the error path and unify a message
-> >>>> template.
-> >>>>
-> >>>> Using this helper is totally fine even if err is known to never
-> >>>> be -EPROBE_DEFER.
-> >>>>
-> >>>> The benefit compared to a normal dev_err() is the standardized format
-> >>>> of the error code, it being emitted symbolically and the fact that
-> >>>> the error code is returned which allows more compact error paths.
-> >>>>
-> >>>> Signed-off-by: Shen Lichuan <shenlichuan@vivo.com>
-> >>>
-> >>> ...
-> >>>
-> >>>> @@ -1576,9 +1574,8 @@ static int at86rf230_probe(struct spi_device *spi)
-> >>>>  
-> >>>>  	lp->regmap = devm_regmap_init_spi(spi, &at86rf230_regmap_spi_config);
-> >>>>  	if (IS_ERR(lp->regmap)) {
-> >>>> -		rc = PTR_ERR(lp->regmap);
-> >>>> -		dev_err(&spi->dev, "Failed to allocate register map: %d\n",
-> >>>> -			rc);
-> >>>> +		dev_err_probe(&spi->dev, PTR_ERR(lp->regmap),
-> >>>> +			      "Failed to allocate register map\n");
-> >>>>  		goto free_dev;
-> >>>
-> >>> After branching to dev_free the function will return rc.
-> >>> So I think it still needs to be set a in this error path.
-> >>
-> >> Another bug introduced by @vivo.com.
-> >>
-> >> Since ~2 weeks there is tremendous amount of trivial patches coming from
-> >> vivo.com. I identified at least 5 buggy, where the contributor did not
-> >> understand the code.
-> >>
-> >> All these "trivial" improvements should be really double-checked.
-> > 
-> > Are you concerned about those that have been accepted?
+Hello Simon,
+
+On 8/29/24 6:10 PM, Simon Horman wrote:
+> Correct spelling in nl802154.h.
+> As reported by codespell.
 > 
-> Yes, both posted and accepted. I was doing brief review (amazingly
-> useless 2 hours...) what's on the list and so far I think there are 6
-> cases of wrong/malicious dev_err_probe(). One got accepted, I sent a revert:
-> https://lore.kernel.org/all/20240830170014.15389-1-krzysztof.kozlowski@linaro.org/
+> Signed-off-by: Simon Horman <horms@kernel.org>
+> ---
+>   include/net/nl802154.h | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/include/net/nl802154.h b/include/net/nl802154.h
+> index 4c752f799957..a994dea74596 100644
+> --- a/include/net/nl802154.h
+> +++ b/include/net/nl802154.h
+> @@ -192,7 +192,7 @@ enum nl802154_iftype {
+>    * @NL802154_CAP_ATTR_TX_POWERS: a nested attribute for
+>    *	nl802154_wpan_phy_tx_power
+>    * @NL802154_CAP_ATTR_MIN_CCA_ED_LEVEL: minimum value for cca_ed_level
+> - * @NL802154_CAP_ATTR_MAX_CCA_ED_LEVEL: maxmimum value for cca_ed_level
+> + * @NL802154_CAP_ATTR_MAX_CCA_ED_LEVEL: maximum value for cca_ed_level
+>    * @NL802154_CAP_ATTR_CCA_MODES: nl802154_cca_modes flags
+>    * @NL802154_CAP_ATTR_CCA_OPTS: nl802154_cca_opts flags
+>    * @NL802154_CAP_ATTR_MIN_MINBE: minimum of minbe value
+> 
 
-Thanks, I see that.
+This patch has been applied to the wpan tree and will be
+part of the next pull request to net. Thanks!
 
-> But the amount of flood from vivo.com started somehow around 20th of
-> August (weirdly after I posted set of cleanups and got review from
-> Jonathan...), is just over-whelming. And many are just ridiculously
-> split, like converting one dev_err->dev_err_probe in the driver, leaving
-> rest untouched.
-
-Yes, I have also noticed a significant number of patches.
-
-> I think this was some sort of trivial automation, thus none of the
-> patches were actually reviewed before posting.
-
-Interesting theory.
-
+regards
+Stefan Schmidt
