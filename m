@@ -1,63 +1,78 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F5FE1CC8BA;
-	Tue,  3 Sep 2024 19:00:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 337D51D5CC0;
+	Tue,  3 Sep 2024 19:10:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725390039; cv=none; b=I+esr+w4YkYj6GilvzXLrGazKQf1QvxkaaghVCXHQ4F//fThSRJ48JqGD+3Rr3mGTrca2Vr3ulnWw+asxs+4odzrJradd+pXh4j2vQUMNsGI+feWtkdoQSEnH7qawNQTIN7mfwyk1pzHGYYroMf5+copBmgfomFakqkXzvuXZUg=
+	t=1725390628; cv=none; b=aeV+W3mjZPdRHkXicm+smEhfpg7f023+1hJp3aOeVRDZ4bP1gOp+/CjSQma8cjezCFBFcvSgGj/rTotxqz+5jd2FZIB5dDuFS3VGuTOlwZHIt+tbWae16dA2WESAyB9bkXMPNyj6eOcoYdgnCmiawIOhc6Jcllo6ARXoIV6Kga8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725390039; c=relaxed/simple;
-	bh=+Lt56Uk6FYMW9PVWHGuZjqRvAMZmTAgKqQWZA3zUEik=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=uibikVyr+SN16IiZfQJc0iZGl5dP2fwr5eP/iDDoJv9cuVHSUWOMfl6KD6Mo4Ekuxu4yTRHLIdHVf7OQ0Pe65Gsg0CONIdSw+Ti9nlBz9J7gE+4HGfUy7aareMjjv4leDQAE6stmKNhQsem5yWunVdZBYWqcXwOXEUBhJIFGJWo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ip1p4Gdp; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1725390628; c=relaxed/simple;
+	bh=c8nYbOPawLoO1JYsTEp9Xsg/XNh27k9hR48mh1dHua8=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=mN0e1x5Yp1mKmutrUG7HfBk2bmtr4xGVKhKtrBqaUVtu9QjoH1v8szc8eP2kTt66euNwFvSUi8yiuZ+XVwH6FRiGLL21yfB1rGp2642WtwHPPPL7KidlRIhZjka9CkebdgjG+xUCSBxVjIa94PcEebGv4dGdQfbKO6QEpL6PrMw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IzNwEMw3; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ip1p4Gdp"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A455EC4CECA;
-	Tue,  3 Sep 2024 19:00:38 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IzNwEMw3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B2F2C4CEC4;
+	Tue,  3 Sep 2024 19:10:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725390039;
-	bh=+Lt56Uk6FYMW9PVWHGuZjqRvAMZmTAgKqQWZA3zUEik=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ip1p4Gdp5U9+ip/8Wb7+sno+pxsOCIW/6prvbAZZkr/le9gsb8g/WkqrX+b9GnHYW
-	 obeh+Cp4LHvl665TdJ3u6vHznuwL8Xwd6usXYgOTQgFnsKeaTPQvf1ENPAHQf6inDp
-	 4nfQq3534FHcq+03J1IB6OO2Eaf7S/UV7CuebNCR1quyiA/kMdwzG5ruNTGfwGolt3
-	 +1WNgE1DKc4BD3QBB69KUeM+tu1nHNLThfoZCvvE9k5DFzTtn9U+sr51lyjzQrYI5S
-	 F1TTHAeATDUf9acRS9u/SFmwezcoXGOuptJyZJYwscwdPKODExmzHwsBkVWynltmSU
-	 TV1dx/Zhpsy9Q==
-Date: Tue, 3 Sep 2024 12:00:37 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Stefan Schmidt <stefan@datenfreihafen.org>
-Cc: davem@davemloft.net, pabeni@redhat.com, linux-wpan@vger.kernel.org,
- alex.aring@gmail.com, miquel.raynal@bootlin.com, netdev@vger.kernel.org
-Subject: Re: pull-request: ieee802154 for net 2024-09-01
-Message-ID: <20240903120037.66998934@kernel.org>
-In-Reply-To: <750caf49-c4e0-43f7-a89f-5b9af96fc0f9@datenfreihafen.org>
-References: <20240901184213.2303047-1-stefan@datenfreihafen.org>
-	<20240903114257.7b906da2@kernel.org>
-	<750caf49-c4e0-43f7-a89f-5b9af96fc0f9@datenfreihafen.org>
+	s=k20201202; t=1725390628;
+	bh=c8nYbOPawLoO1JYsTEp9Xsg/XNh27k9hR48mh1dHua8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=IzNwEMw3DvCVohBk08UE5S7SSHn+nnTWmoAoCEH/tD/E+SFhq05YTYvYeoVSznASc
+	 uv9zAnPnIsfgl4V1VNjEtnVvuSNxhhBN2R5NYoI/78F8fh8OZsJUQHqp+peQeTRTb7
+	 UpuI5F8StCm6XQ9g/K+0liUN+16EjdmRskjVRtzA4Tc1z27Q857aTBfazzCQ78X7m8
+	 8qQADLCssydnQU5QRt9F4lXYTRvCgFnofrY3sMS8YJND9iy93aZ2bsFx0yJGI+MHwR
+	 B8oLk+onv1w3XoC+UHQLBwX+QLdACnLUVWfRfe76gtDrpAMdDmrvg1ekyebsQhd0VC
+	 rUQnCoQHU3Wwg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EDDAE3822D69;
+	Tue,  3 Sep 2024 19:10:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: pull-request: ieee802154 for net 2024-09-01
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172539062877.409367.12269030715500042500.git-patchwork-notify@kernel.org>
+Date: Tue, 03 Sep 2024 19:10:28 +0000
+References: <20240901184213.2303047-1-stefan@datenfreihafen.org>
+In-Reply-To: <20240901184213.2303047-1-stefan@datenfreihafen.org>
+To: Stefan Schmidt <stefan@datenfreihafen.org>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ linux-wpan@vger.kernel.org, alex.aring@gmail.com, miquel.raynal@bootlin.com,
+ netdev@vger.kernel.org
 
-On Tue, 3 Sep 2024 20:52:03 +0200 Stefan Schmidt wrote:
-> On 9/3/24 8:42 PM, Jakub Kicinski wrote:
-> > On Sun,  1 Sep 2024 20:42:13 +0200 Stefan Schmidt wrote:  
-> >> Simon Horman catched two typos in our headers. No functional change.  
-> > 
-> > Is it okay if we merge these into net-next ?
-> > On one hand they are unlikely^w guaranteed not to introduce
-> > regressions, but on the other such trivial spelling fixes are
-> > not at all urgent.  
+Hello:
+
+This pull request was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Sun,  1 Sep 2024 20:42:13 +0200 you wrote:
+> Hello Dave, Jakub, Paolo.
 > 
-> Sure, no problem. They just landed in my fixes queue and thus wpan. They 
-> can easily go through net-next. Can you merge the pull directly or do 
-> need a new one against net-next?
+> An update from ieee802154 for your *net* tree:
+> 
+> Simon Horman catched two typos in our headers. No functional change.
+> 
+> regards
+> Stefan Schmidt
+> 
+> [...]
 
-I'll pull this one, thanks!
+Here is the summary with links:
+  - pull-request: ieee802154 for net 2024-09-01
+    https://git.kernel.org/netdev/net-next/c/7f85b11203dd
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
