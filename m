@@ -1,29 +1,29 @@
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EF5B1B86E6;
-	Mon,  9 Sep 2024 13:21:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 164771BA298;
+	Mon,  9 Sep 2024 13:21:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.35
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725888105; cv=none; b=V5Wn0Pwunj2v3Sb6zy0JMI8D84eGk971jc+bt2iNZ6cXf+LvubpC4LvuHRS8DUCZFkpqhwrM7thcq1xPKogcstEV0zdeCBplEsomlYqwibnbhL2PByln2frZW+6cId6QAZWJWQFAwJyELb0wuMDJ3ZKpCR5QXkaU529OsyPKo8c=
+	t=1725888105; cv=none; b=mzHcc/l7/vWlNd9aRlyLAvPe2xAFhuqN55CBhOrZfKwXj3CPopH7zHNcujUj+gnxstwq+MY4OqQz76a8ZKcEFL4qegLr2i5JbwYzF66H9B9YGezcrOFxfva8agjCEqlg8+2u+9KgUxs+Gh9E85eVJ5EjWxxWKbg1VJ9Yb/O3G40=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1725888105; c=relaxed/simple;
-	bh=14G2yxnR16Xq95zsXhnuAQ+zX26+M91rNzW+wVNNaKo=;
+	bh=ihRTKbVI2ZRyuxy8BMSx4NLm61GELiCe6L3+Llr4Pjs=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BWwdwqbOoABZQhYlsxJEugwUQ7OYjRwggEo7WWPONy9NM59Gm+UeNXV40v8erFEPEilSpUVMhov0R2lVKipEW/Xm3IF4AZtVdcbqLhATmSJk2cLGnLVEk6vp8jOcjh/m51Rwgk4Im9PMCKvw+h/nIBEUJYqjv+9gxPA+uqTwFbs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
+	 MIME-Version:Content-Type; b=shgqBwIeGO5+fhfDMwG3Wox7Ag7MZdSGPnv1pdI9If/Nl9X93UDNV7u8S9xf+SZ0Kty5T5yhnq8TeqI+61ONY60/D8dQLYa/Vd6rgXIWRd3ziav3oI8YjyaYMqHT30bpM13U1FhiW7fwq098WaII4pLhPkun4Gc9S+Li1CkI09I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.35
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.105])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4X2SCh0JQtz69Ns;
-	Mon,  9 Sep 2024 21:21:36 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.88.163])
+	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4X2SCG2SjGz1SB4l;
+	Mon,  9 Sep 2024 21:21:14 +0800 (CST)
 Received: from kwepemh500013.china.huawei.com (unknown [7.202.181.146])
-	by mail.maildlp.com (Postfix) with ESMTPS id 2490B1402CF;
-	Mon,  9 Sep 2024 21:21:40 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id C36F8180041;
+	Mon,  9 Sep 2024 21:21:41 +0800 (CST)
 Received: from huawei.com (10.90.53.73) by kwepemh500013.china.huawei.com
  (7.202.181.146) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Mon, 9 Sep
- 2024 21:21:39 +0800
+ 2024 21:21:40 +0800
 From: Jinjie Ruan <ruanjinjie@huawei.com>
 To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
 	<pabeni@redhat.com>, <claudiu.manoil@nxp.com>, <vladimir.oltean@nxp.com>,
@@ -38,9 +38,9 @@ To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
 	<liuxuenetmail@gmail.com>, <netdev@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>, <oss-drivers@corigine.com>,
 	<linux-wpan@vger.kernel.org>, <linux-wireless@vger.kernel.org>
-Subject: [PATCH 2/7] net: enetc: Use IRQF_NO_AUTOEN flag in request_irq()
-Date: Mon, 9 Sep 2024 21:30:29 +0800
-Message-ID: <20240909133034.1296930-3-ruanjinjie@huawei.com>
+Subject: [PATCH 4/7] net: ieee802154: mcr20a: Use IRQF_NO_AUTOEN flag in request_irq()
+Date: Mon, 9 Sep 2024 21:30:31 +0800
+Message-ID: <20240909133034.1296930-5-ruanjinjie@huawei.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240909133034.1296930-1-ruanjinjie@huawei.com>
 References: <20240909133034.1296930-1-ruanjinjie@huawei.com>
@@ -59,30 +59,34 @@ disable_irq() after request_irq() still has a time gap in which
 interrupts can come. request_irq() with IRQF_NO_AUTOEN flag will
 disable IRQ auto-enable when request IRQ.
 
-Fixes: bbb96dc7fa1a ("enetc: Factor out the traffic start/stop procedures")
+Fixes: 8c6ad9cc5157 ("ieee802154: Add NXP MCR20A IEEE 802.15.4 transceiver driver")
 Signed-off-by: Jinjie Ruan <ruanjinjie@huawei.com>
 ---
- drivers/net/ethernet/freescale/enetc/enetc.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ drivers/net/ieee802154/mcr20a.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc.c b/drivers/net/ethernet/freescale/enetc/enetc.c
-index 5c45f42232d3..f04f42ea60c0 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc.c
-+++ b/drivers/net/ethernet/freescale/enetc/enetc.c
-@@ -2305,12 +2305,11 @@ static int enetc_setup_irqs(struct enetc_ndev_priv *priv)
+diff --git a/drivers/net/ieee802154/mcr20a.c b/drivers/net/ieee802154/mcr20a.c
+index 433fb5839203..020d392a98b6 100644
+--- a/drivers/net/ieee802154/mcr20a.c
++++ b/drivers/net/ieee802154/mcr20a.c
+@@ -1302,16 +1302,13 @@ mcr20a_probe(struct spi_device *spi)
+ 		irq_type = IRQF_TRIGGER_FALLING;
  
- 		snprintf(v->name, sizeof(v->name), "%s-rxtx%d",
- 			 priv->ndev->name, i);
--		err = request_irq(irq, enetc_msix, 0, v->name, v);
-+		err = request_irq(irq, enetc_msix, IRQF_NO_AUTOEN, v->name, v);
- 		if (err) {
- 			dev_err(priv->dev, "request_irq() failed!\n");
- 			goto irq_err;
- 		}
--		disable_irq(irq);
+ 	ret = devm_request_irq(&spi->dev, spi->irq, mcr20a_irq_isr,
+-			       irq_type, dev_name(&spi->dev), lp);
++			       irq_type | IRQF_NO_AUTOEN, dev_name(&spi->dev), lp);
+ 	if (ret) {
+ 		dev_err(&spi->dev, "could not request_irq for mcr20a\n");
+ 		ret = -ENODEV;
+ 		goto free_dev;
+ 	}
  
- 		v->tbier_base = hw->reg + ENETC_BDR(TX, 0, ENETC_TBIER);
- 		v->rbier = hw->reg + ENETC_BDR(RX, i, ENETC_RBIER);
+-	/* disable_irq by default and wait for starting hardware */
+-	disable_irq(spi->irq);
+-
+ 	ret = ieee802154_register_hw(hw);
+ 	if (ret) {
+ 		dev_crit(&spi->dev, "ieee802154_register_hw failed\n");
 -- 
 2.34.1
 
