@@ -1,99 +1,70 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from proxima.lasnet.de (proxima.lasnet.de [78.47.171.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FE181B5EB7;
-	Mon,  9 Sep 2024 14:39:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 675FE3BB47;
+	Mon,  9 Sep 2024 19:41:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.47.171.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725892772; cv=none; b=j30kFamDpIxlpwAu7pnyXuKyQta+FZqCbR/PvRwSQbpRd8tRNOHaIW4lI9MrEPnppuA10mK+YaaXlNzpUHO+GDdDesk8e4zOrQWZWhC+POLJFOTY7z4unYcwsgiCUmf2ppV1RXQ49j6cTlK1TzBjvnT9rU67I6hWlmplK09r5vs=
+	t=1725910866; cv=none; b=N1tokSKW1LljzVqgodPrpra67hbvHcrsG5Aq0vCt4DMvGnWkvU/buTWlU7m4zcYOdqIxNL4FY7Apnswht4gQG0kyQtoz1CWuqRWOjOTDNxJ8btR16fkeu3yjqRlFI+uFxa+uEihJEyXZxb2ojjP8nW6VdYY2X88Xp5VXlEsa0vE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725892772; c=relaxed/simple;
-	bh=8FeXibhiPA67qxomm7l8x3gLeT2tSXAYWaxMb2sDIrg=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=UeHjNWMrBlAMbz9eFzX+XhdajcdR0XLerhLCgQyJtT7GE+QgdLJOn+0we+CQeWZlcV2jGEgh61uBSF4o4kOyb2YsL0mhEEg2hS9meBw0xJu/5dCX9pkuJ53Wn+6EKEueCyZRECn2EZz0+Ip6p30fu9Pqdbc/N+OH2vnDoWHTyUA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BcYK562c; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BcYK562c"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A643AC4CEC5;
-	Mon,  9 Sep 2024 14:39:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725892771;
-	bh=8FeXibhiPA67qxomm7l8x3gLeT2tSXAYWaxMb2sDIrg=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
-	b=BcYK562clRLjPjIL1TwE/GoqBY2kxlMSNzUj59e7A+yhPSZdwYKOGE+dpidRLGcl/
-	 px1TecD19E+oGfU/e7zMQYHdj6NHAJNDfjgyU7QlIx7iW+X1EdLROFqspdTfUvrdHJ
-	 0nxkYFvVw91g1gckgpj8b5QhOkfi5xzCHEhMpVxPxjwOJuWhmoxDzPorjvHDAGkdb9
-	 efFi1Fvb596hLzjOZmBYZljhXZllGM2Fct9oYgBCru/pz4f8cey0oSsz8pt7Irtjmd
-	 KyOabJkFUEY/o2SjQ1GNZfVeHjOnPXc7lypu4HX6isipZhy8uFCGTWH+T8GSOo2cCP
-	 V//AaIE2qOKRg==
-From: Kalle Valo <kvalo@kernel.org>
-To: Jinjie Ruan <ruanjinjie@huawei.com>
-Cc: <davem@davemloft.net>,  <edumazet@google.com>,  <kuba@kernel.org>,
-  <pabeni@redhat.com>,  <claudiu.manoil@nxp.com>,
-  <vladimir.oltean@nxp.com>,  <louis.peens@corigine.com>,
-  <stefan@datenfreihafen.org>,  <alex.aring@gmail.com>,
-  <miquel.raynal@bootlin.com>,  <chunkeey@googlemail.com>,
-  <briannorris@chromium.org>,  <francesco@dolcini.it>,
-  <set_pte_at@outlook.com>,  <damien.lemoal@opensource.wdc.com>,
-  <mpe@ellerman.id.au>,  <horms@kernel.org>,  <yinjun.zhang@corigine.com>,
-  <fei.qin@corigine.com>,  <johannes.berg@intel.com>,
-  <ryno.swart@corigine.com>,  <krzysztof.kozlowski@linaro.org>,
-  <leitao@debian.org>,  <liuxuenetmail@gmail.com>,
-  <netdev@vger.kernel.org>,  <linux-kernel@vger.kernel.org>,
-  <oss-drivers@corigine.com>,  <linux-wpan@vger.kernel.org>,
-  <linux-wireless@vger.kernel.org>
-Subject: Re: [PATCH 0/7] net: Use IRQF_NO_AUTOEN flag in request_irq()
-References: <20240909133034.1296930-1-ruanjinjie@huawei.com>
-Date: Mon, 09 Sep 2024 17:39:24 +0300
-In-Reply-To: <20240909133034.1296930-1-ruanjinjie@huawei.com> (Jinjie Ruan's
-	message of "Mon, 9 Sep 2024 21:30:27 +0800")
-Message-ID: <87seu8c2n7.fsf@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+	s=arc-20240116; t=1725910866; c=relaxed/simple;
+	bh=1i7y9HGuAGumMZJjH5rcHVo7M235u278917IPiUAFxo=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=QpT5/EtKz7+xILAz4LIcRWmdp7iC7z/57sgEiP9Xk1XIHJE+68gmtUUjx4RPUYYfUNNjmpNqiG8wGWaoYNQ9h0iUBAxBLuvAu2Ad8pRsExdCT8Xj5rB6qq8d6HAKZ178342SlcTIvOQWvcr08seWkGBBRpteoU7gS6kURwAlgJY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=datenfreihafen.org; spf=pass smtp.mailfrom=datenfreihafen.org; arc=none smtp.client-ip=78.47.171.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=datenfreihafen.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=datenfreihafen.org
+Received: from localhost.localdomain (unknown [45.118.184.53])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: stefan@sostec.de)
+	by proxima.lasnet.de (Postfix) with ESMTPSA id 97B22C07D3;
+	Mon,  9 Sep 2024 21:40:52 +0200 (CEST)
+From: Stefan Schmidt <stefan@datenfreihafen.org>
+To: alex.aring@gmail.com,
+	miquel.raynal@bootlin.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	liuxuenetmail@gmail.com,
+	linux-wpan@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Jinjie Ruan <ruanjinjie@huawei.com>
+Cc: Stefan Schmidt <stefan@datenfreihafen.org>
+Subject: Re: [PATCH] ieee802154: Fix build error
+Date: Mon,  9 Sep 2024 21:40:04 +0200
+Message-ID: <172591052663.45799.15009721032954430797.b4-ty@datenfreihafen.org>
+X-Mailer: git-send-email 2.46.0
+In-Reply-To: <20240909131740.1296608-1-ruanjinjie@huawei.com>
+References: <20240909131740.1296608-1-ruanjinjie@huawei.com>
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-Jinjie Ruan <ruanjinjie@huawei.com> writes:
+Hello Jinjie.
 
-> As commit cbe16f35bee6 ("genirq: Add IRQF_NO_AUTOEN for request_irq/nmi()")
-> said, reqeust_irq() and then disable_irq() is unsafe.
->
-> And the code below is subobtimal:
-> 	 irq_set_status_flags(irq, IRQ_NOAUTOEN);
-> 	 request_irq(dev, irq...);
->
-> IRQF_NO_AUTOEN flag can be used by drivers to request_irq(). It prevents
-> the automatic enabling of the requested interrupt in the same safe way.
-> With that the usage can be simplified and corrected.
->
-> Only compile-tested.
->
-> Jinjie Ruan (7):
->   net: apple: bmac: Use IRQF_NO_AUTOEN flag in request_irq()
->   net: enetc: Use IRQF_NO_AUTOEN flag in request_irq()
->   nfp: Use IRQF_NO_AUTOEN flag in request_irq()
->   net: ieee802154: mcr20a: Use IRQF_NO_AUTOEN flag in request_irq()
->   wifi: p54: Use IRQF_NO_AUTOEN flag in request_irq()
->   wifi: mwifiex: Use IRQF_NO_AUTOEN flag in request_irq()
->   wifi: wl1251: Use IRQF_NO_AUTOEN flag in request_irq()
->
->  drivers/net/ethernet/apple/bmac.c                   | 3 +--
->  drivers/net/ethernet/freescale/enetc/enetc.c        | 3 +--
->  drivers/net/ethernet/netronome/nfp/nfp_net_common.c | 5 ++---
->  drivers/net/ieee802154/mcr20a.c                     | 5 +----
->  drivers/net/wireless/intersil/p54/p54spi.c          | 4 +---
->  drivers/net/wireless/marvell/mwifiex/main.c         | 4 ++--
->  drivers/net/wireless/ti/wl1251/sdio.c               | 4 ++--
->  7 files changed, 10 insertions(+), 18 deletions(-)
+On Mon, 09 Sep 2024 21:17:40 +0800, Jinjie Ruan wrote:
+> If REGMAP_SPI is m and IEEE802154_MCR20A is y,
+> 
+> 	mcr20a.c:(.text+0x3ed6c5b): undefined reference to `__devm_regmap_init_spi'
+> 	ld: mcr20a.c:(.text+0x3ed6cb5): undefined reference to `__devm_regmap_init_spi'
+> 
+> Select REGMAP_SPI for IEEE802154_MCR20A to fix it.
+> 
+> [...]
 
-Wireless patches go to wireless-next, please submit them in a separate
-patchset.
+Applied, thanks!
 
--- 
-https://patchwork.kernel.org/project/linux-wireless/list/
+[1/1] ieee802154: Fix build error
+      commit: addf89774e48c992316449ffab4f29c2309ebefb
 
-https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
+Best regards,
+Stefan Schmidt <stefan@datenfreihafen.org>
