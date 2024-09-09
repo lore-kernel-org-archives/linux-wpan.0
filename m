@@ -1,29 +1,29 @@
-Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71A6E1BA286;
-	Mon,  9 Sep 2024 13:21:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13A3D1B9859;
+	Mon,  9 Sep 2024 13:21:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725888104; cv=none; b=LFxyOiW6dHH8dpM1OY5tXM3GH1XgHHszejksAqqHwfAHSCA8u6iOgYZr7CWeU6FLaES2kY4EGKNJDDKqQPPMkmoZMewnnvflxyv6kKk876AmPcrVjDPEpAdiYJt5axJzQ3WSf2FDW1RXKQ1WEBek2uZvezCo/L35QQOKgbuNy/A=
+	t=1725888104; cv=none; b=FSY98avxKyrI8A7QhljQIGmn0iX5185TNkf5YyiS8n6UnlXx3wP+qD4eetaYhR/OwOc2f26MOGiU1WNxkBJb87sC2nx69brURh56YmGy+2/FZUQ3WKQ1hb2ueogbwfmQeQ9HhYKUNkpzT202clP0zR2hDCE4HJWodUVCCSJ1FP4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1725888104; c=relaxed/simple;
-	bh=y601in2hbLggRcDATiq6SPBqagAjG+jhatLQtvv2dI0=;
+	bh=0b4C/Vuwv4I8ylfIxQnqvclm7T7YhfibBjMkZOyYo4k=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=d4Or4NQwVB9ziInu/x1htSqY2BnufHO4/yaGz3IYVkKwNpDuduy2pjqu1GlxEevoUmfWY+T2WwOUfoKzOYUCEs2eRqwuv25cDU/MZzLleEZbhWyeEU+K1+19KB4y0Q9cpONxTKVYhdyVF8e8t190WMI5EE5lJeDoG/1m+BYtZAA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
+	 MIME-Version:Content-Type; b=lR5RwsvJN73I7f+bFO54zbXrnCBtV1qfJQL9by0kSOtfKY3JLmjbeTxzcfZqhbuEMffLe0u7rsHJyclCbr+351jtXM6uNPcVQrpjyFbn1wHqTVz80Y6ike3gk0kO9rgGpxabNp3f1HU9aNaMROZx2Klh7iJzeNFTP51W3lOO8hE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.234])
-	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4X2SCl2Z6Mz1xxBX;
-	Mon,  9 Sep 2024 21:21:39 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.163.44])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4X2SCD4Gpzz1j8Mb;
+	Mon,  9 Sep 2024 21:21:12 +0800 (CST)
 Received: from kwepemh500013.china.huawei.com (unknown [7.202.181.146])
-	by mail.maildlp.com (Postfix) with ESMTPS id EC672140134;
-	Mon,  9 Sep 2024 21:21:40 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 4C19A140361;
+	Mon,  9 Sep 2024 21:21:39 +0800 (CST)
 Received: from huawei.com (10.90.53.73) by kwepemh500013.china.huawei.com
  (7.202.181.146) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Mon, 9 Sep
- 2024 21:21:39 +0800
+ 2024 21:21:38 +0800
 From: Jinjie Ruan <ruanjinjie@huawei.com>
 To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
 	<pabeni@redhat.com>, <claudiu.manoil@nxp.com>, <vladimir.oltean@nxp.com>,
@@ -38,9 +38,9 @@ To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
 	<liuxuenetmail@gmail.com>, <netdev@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>, <oss-drivers@corigine.com>,
 	<linux-wpan@vger.kernel.org>, <linux-wireless@vger.kernel.org>
-Subject: [PATCH 3/7] nfp: Use IRQF_NO_AUTOEN flag in request_irq()
-Date: Mon, 9 Sep 2024 21:30:30 +0800
-Message-ID: <20240909133034.1296930-4-ruanjinjie@huawei.com>
+Subject: [PATCH 1/7] net: apple: bmac: Use IRQF_NO_AUTOEN flag in request_irq()
+Date: Mon, 9 Sep 2024 21:30:28 +0800
+Message-ID: <20240909133034.1296930-2-ruanjinjie@huawei.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240909133034.1296930-1-ruanjinjie@huawei.com>
 References: <20240909133034.1296930-1-ruanjinjie@huawei.com>
@@ -61,30 +61,30 @@ disable IRQ auto-enable when request IRQ.
 
 Signed-off-by: Jinjie Ruan <ruanjinjie@huawei.com>
 ---
- drivers/net/ethernet/netronome/nfp/nfp_net_common.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ drivers/net/ethernet/apple/bmac.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/netronome/nfp/nfp_net_common.c b/drivers/net/ethernet/netronome/nfp/nfp_net_common.c
-index 182ba0a8b095..6e0929af0f72 100644
---- a/drivers/net/ethernet/netronome/nfp/nfp_net_common.c
-+++ b/drivers/net/ethernet/netronome/nfp/nfp_net_common.c
-@@ -821,14 +821,13 @@ nfp_net_prepare_vector(struct nfp_net *nn, struct nfp_net_r_vector *r_vec,
+diff --git a/drivers/net/ethernet/apple/bmac.c b/drivers/net/ethernet/apple/bmac.c
+index 292b1f9cd9e7..785f4b4ff758 100644
+--- a/drivers/net/ethernet/apple/bmac.c
++++ b/drivers/net/ethernet/apple/bmac.c
+@@ -1317,7 +1317,7 @@ static int bmac_probe(struct macio_dev *mdev, const struct of_device_id *match)
  
- 	snprintf(r_vec->name, sizeof(r_vec->name),
- 		 "%s-rxtx-%d", nfp_net_name(nn), idx);
--	err = request_irq(r_vec->irq_vector, r_vec->handler, 0, r_vec->name,
--			  r_vec);
-+	err = request_irq(r_vec->irq_vector, r_vec->handler, IRQF_NO_AUTOEN,
-+			  r_vec->name, r_vec);
- 	if (err) {
- 		nfp_net_napi_del(&nn->dp, r_vec);
- 		nn_err(nn, "Error requesting IRQ %d\n", r_vec->irq_vector);
- 		return err;
- 	}
--	disable_irq(r_vec->irq_vector);
+ 	timer_setup(&bp->tx_timeout, bmac_tx_timeout, 0);
  
- 	irq_set_affinity_hint(r_vec->irq_vector, &r_vec->affinity_mask);
+-	ret = request_irq(dev->irq, bmac_misc_intr, 0, "BMAC-misc", dev);
++	ret = request_irq(dev->irq, bmac_misc_intr, IRQF_NO_AUTOEN, "BMAC-misc", dev);
+ 	if (ret) {
+ 		printk(KERN_ERR "BMAC: can't get irq %d\n", dev->irq);
+ 		goto err_out_iounmap_rx;
+@@ -1336,7 +1336,6 @@ static int bmac_probe(struct macio_dev *mdev, const struct of_device_id *match)
+ 	/* Mask chip interrupts and disable chip, will be
+ 	 * re-enabled on open()
+ 	 */
+-	disable_irq(dev->irq);
+ 	pmac_call_feature(PMAC_FTR_BMAC_ENABLE, macio_get_of_node(bp->mdev), 0, 0);
  
+ 	if (register_netdev(dev) != 0) {
 -- 
 2.34.1
 
