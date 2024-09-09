@@ -1,28 +1,29 @@
 Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 369A91B86F3;
-	Mon,  9 Sep 2024 13:21:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71A6E1BA286;
+	Mon,  9 Sep 2024 13:21:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725888102; cv=none; b=ZwjMo8yAk6eSo2LQva4OgcqUVJi5ZOnNW3Kktxcf2kKjUjNkdJk1NGt3qnfa/H8y23POsb3Uk6ZRKhQUq/FMSa/M2NL4mjd1ExvqlYpB/vULZWkFsTCNuD0bMl7Wfg+kQVUYKIJvVU1h1WaXbH7KWuYVi2WtQIwGUtyFY2aNaRE=
+	t=1725888104; cv=none; b=LFxyOiW6dHH8dpM1OY5tXM3GH1XgHHszejksAqqHwfAHSCA8u6iOgYZr7CWeU6FLaES2kY4EGKNJDDKqQPPMkmoZMewnnvflxyv6kKk876AmPcrVjDPEpAdiYJt5axJzQ3WSf2FDW1RXKQ1WEBek2uZvezCo/L35QQOKgbuNy/A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725888102; c=relaxed/simple;
-	bh=aTSi26tKgP7Y9F7SzLX3HsXGP6KJBJZDLW+4YRlPO/Y=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=tmS8toNuPRel6mBD7HzyOKuWe/csVbceNV7DyHMwjSsyWMhY2WYqxokHvQKIxECI0ZKiRDkAXWSadUKE+TySHlwzJZVL0WkuAT0JvT4OUYUB+uwNrsPCfwcmOx2RkbIZ1ADUiPGDpmYakIDqcYAZo3gPNH3YySglH1v6cX20l50=
+	s=arc-20240116; t=1725888104; c=relaxed/simple;
+	bh=y601in2hbLggRcDATiq6SPBqagAjG+jhatLQtvv2dI0=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=d4Or4NQwVB9ziInu/x1htSqY2BnufHO4/yaGz3IYVkKwNpDuduy2pjqu1GlxEevoUmfWY+T2WwOUfoKzOYUCEs2eRqwuv25cDU/MZzLleEZbhWyeEU+K1+19KB4y0Q9cpONxTKVYhdyVF8e8t190WMI5EE5lJeDoG/1m+BYtZAA=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.17])
-	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4X2SCh66wKz1xx9s;
-	Mon,  9 Sep 2024 21:21:36 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.88.234])
+	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4X2SCl2Z6Mz1xxBX;
+	Mon,  9 Sep 2024 21:21:39 +0800 (CST)
 Received: from kwepemh500013.china.huawei.com (unknown [7.202.181.146])
-	by mail.maildlp.com (Postfix) with ESMTPS id 718CD1A0188;
-	Mon,  9 Sep 2024 21:21:38 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id EC672140134;
+	Mon,  9 Sep 2024 21:21:40 +0800 (CST)
 Received: from huawei.com (10.90.53.73) by kwepemh500013.china.huawei.com
  (7.202.181.146) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Mon, 9 Sep
- 2024 21:21:37 +0800
+ 2024 21:21:39 +0800
 From: Jinjie Ruan <ruanjinjie@huawei.com>
 To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
 	<pabeni@redhat.com>, <claudiu.manoil@nxp.com>, <vladimir.oltean@nxp.com>,
@@ -37,10 +38,12 @@ To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
 	<liuxuenetmail@gmail.com>, <netdev@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>, <oss-drivers@corigine.com>,
 	<linux-wpan@vger.kernel.org>, <linux-wireless@vger.kernel.org>
-Subject: [PATCH 0/7] net: Use IRQF_NO_AUTOEN flag in request_irq()
-Date: Mon, 9 Sep 2024 21:30:27 +0800
-Message-ID: <20240909133034.1296930-1-ruanjinjie@huawei.com>
+Subject: [PATCH 3/7] nfp: Use IRQF_NO_AUTOEN flag in request_irq()
+Date: Mon, 9 Sep 2024 21:30:30 +0800
+Message-ID: <20240909133034.1296930-4-ruanjinjie@huawei.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20240909133034.1296930-1-ruanjinjie@huawei.com>
+References: <20240909133034.1296930-1-ruanjinjie@huawei.com>
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
@@ -52,37 +55,36 @@ Content-Type: text/plain
 X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
  kwepemh500013.china.huawei.com (7.202.181.146)
 
-As commit cbe16f35bee6 ("genirq: Add IRQF_NO_AUTOEN for request_irq/nmi()")
-said, reqeust_irq() and then disable_irq() is unsafe.
+disable_irq() after request_irq() still has a time gap in which
+interrupts can come. request_irq() with IRQF_NO_AUTOEN flag will
+disable IRQ auto-enable when request IRQ.
 
-And the code below is subobtimal:
-	 irq_set_status_flags(irq, IRQ_NOAUTOEN);
-	 request_irq(dev, irq...);
-
-IRQF_NO_AUTOEN flag can be used by drivers to request_irq(). It prevents
-the automatic enabling of the requested interrupt in the same safe way.
-With that the usage can be simplified and corrected.
-
-Only compile-tested.
-
-Jinjie Ruan (7):
-  net: apple: bmac: Use IRQF_NO_AUTOEN flag in request_irq()
-  net: enetc: Use IRQF_NO_AUTOEN flag in request_irq()
-  nfp: Use IRQF_NO_AUTOEN flag in request_irq()
-  net: ieee802154: mcr20a: Use IRQF_NO_AUTOEN flag in request_irq()
-  wifi: p54: Use IRQF_NO_AUTOEN flag in request_irq()
-  wifi: mwifiex: Use IRQF_NO_AUTOEN flag in request_irq()
-  wifi: wl1251: Use IRQF_NO_AUTOEN flag in request_irq()
-
- drivers/net/ethernet/apple/bmac.c                   | 3 +--
- drivers/net/ethernet/freescale/enetc/enetc.c        | 3 +--
+Signed-off-by: Jinjie Ruan <ruanjinjie@huawei.com>
+---
  drivers/net/ethernet/netronome/nfp/nfp_net_common.c | 5 ++---
- drivers/net/ieee802154/mcr20a.c                     | 5 +----
- drivers/net/wireless/intersil/p54/p54spi.c          | 4 +---
- drivers/net/wireless/marvell/mwifiex/main.c         | 4 ++--
- drivers/net/wireless/ti/wl1251/sdio.c               | 4 ++--
- 7 files changed, 10 insertions(+), 18 deletions(-)
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
+diff --git a/drivers/net/ethernet/netronome/nfp/nfp_net_common.c b/drivers/net/ethernet/netronome/nfp/nfp_net_common.c
+index 182ba0a8b095..6e0929af0f72 100644
+--- a/drivers/net/ethernet/netronome/nfp/nfp_net_common.c
++++ b/drivers/net/ethernet/netronome/nfp/nfp_net_common.c
+@@ -821,14 +821,13 @@ nfp_net_prepare_vector(struct nfp_net *nn, struct nfp_net_r_vector *r_vec,
+ 
+ 	snprintf(r_vec->name, sizeof(r_vec->name),
+ 		 "%s-rxtx-%d", nfp_net_name(nn), idx);
+-	err = request_irq(r_vec->irq_vector, r_vec->handler, 0, r_vec->name,
+-			  r_vec);
++	err = request_irq(r_vec->irq_vector, r_vec->handler, IRQF_NO_AUTOEN,
++			  r_vec->name, r_vec);
+ 	if (err) {
+ 		nfp_net_napi_del(&nn->dp, r_vec);
+ 		nn_err(nn, "Error requesting IRQ %d\n", r_vec->irq_vector);
+ 		return err;
+ 	}
+-	disable_irq(r_vec->irq_vector);
+ 
+ 	irq_set_affinity_hint(r_vec->irq_vector, &r_vec->affinity_mask);
+ 
 -- 
 2.34.1
 
