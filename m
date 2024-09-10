@@ -1,112 +1,103 @@
-Received: from proxima.lasnet.de (proxima.lasnet.de [78.47.171.185])
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D2F1C8DF;
-	Tue, 10 Sep 2024 10:49:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.47.171.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8821B17799F;
+	Tue, 10 Sep 2024 11:46:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725965376; cv=none; b=LsVR8FtQYSWcTe8lH/JmchCilxpwxF4jdsZ/8fb3wX7UQ99qPSnQZxySb5y3S4DJ06Tz/N7UR7CTJnoaDaIQszYGW5GYI6olOHu0FkOBjeUA2t5t8+rIMbvlY8OO34xhOjkfLnT4rsi5JC4bvL7bDt25U0T/Ele6vCCQCCvOD1M=
+	t=1725968786; cv=none; b=TpKDmU4k1alZojan5SErDkX9P4ZdLXrGX/8FCoTEeY7qpLp4v41nBEKE523z0iRqdrYDGiNa99A6bShpyWeoCX6j8AZNJqzc+642+xA37yPOx1ZaZtGRtGcuunJghWOX92HQBwg06ZQuyYK3PYNMgmxmLKZ+olc0IaM31SZcl3s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725965376; c=relaxed/simple;
-	bh=4h9ugKqamWguH6j/Qqkh5uCQAVj+/GDplf6he6MaF4M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=h5w3BnxKunl3NAaUOWepOYCJfIkPl66aZYXIxMH+KT7MykSOT8cTIEgyLPRvSfOzBtcSvr/Qh/bNuXv+2UGOgRr6CrVZeftVNz0qmmSn0yW73FfrS0oLvgG1V/MZzfXrMM9MowjQ+LQ0Bn+49CnKofrE5xCDi59Ovovxw5K4sC4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=datenfreihafen.org; spf=pass smtp.mailfrom=datenfreihafen.org; dkim=pass (2048-bit key) header.d=datenfreihafen.org header.i=@datenfreihafen.org header.b=BSKZ3agC; arc=none smtp.client-ip=78.47.171.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=datenfreihafen.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=datenfreihafen.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=datenfreihafen.org header.i=@datenfreihafen.org header.b="BSKZ3agC"
-Received: from [192.168.2.107] (unknown [45.118.184.53])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: stefan@datenfreihafen.org)
-	by proxima.lasnet.de (Postfix) with ESMTPSA id 65B8AC04EC;
-	Tue, 10 Sep 2024 12:49:28 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
-	s=2021; t=1725965369;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=F4Njp4aZmAUi+ZgiJdMyb8GGh61pN9VCyJUoqbzXl1U=;
-	b=BSKZ3agC4GpavxSIHoc/ZoYIB6yBE8Kwp4xzIlpt1EgbCaWjRRucXutcGpi9ZBYNQMkc17
-	xZgmGcDOEr/Qw5ikntGCiq2JVvVt4yuNF2bae8oygxsvG4xdbkHGMIXj3dv0FoH3lW7e5E
-	Mz2Gs9DWSMPQG9Cu+1uRjf3BEkzqTp9bhYTURDLIBy16p9DUvXaoR4wPrvIAbXkJvySXgM
-	tlMkZvsBPl17hgYSSzN8Mtp/iU0bMWjz8Loc5QPLXm0gtx3+LKZFuoVitSQ7L20xgvX09S
-	y/k1ahmrogEDp8oZry3tIF8WQ+6Qut7c9rI+QuAGybu5jZs+DA4r74vKxWUAWQ==
-Message-ID: <75bfcd83-4b71-4fee-a560-5ca112e6fbb0@datenfreihafen.org>
-Date: Tue, 10 Sep 2024 12:49:28 +0200
+	s=arc-20240116; t=1725968786; c=relaxed/simple;
+	bh=O4bdGN4itFRdrEchX6jrIZMLRZVHhoa0rJ9xkGwid6U=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=cA7+OzN1WYOX2BmUBpQf6iAi0EflB72ohYJOf8vVUu79a4EkTY6oZPuwfh3xjzuH17kBQy4miScrqu+KPzC11mwBFSt0gaPKgS0RuUkJRHTzFBIvfdElXTXvZH9zhtkB3onLmriUF3KY8s5Q743JM+u0FE6PULsy2XWG0J6f7S0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.17])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4X322m1WsRz2Dbyy;
+	Tue, 10 Sep 2024 19:45:52 +0800 (CST)
+Received: from kwepemh500013.china.huawei.com (unknown [7.202.181.146])
+	by mail.maildlp.com (Postfix) with ESMTPS id 4D2A61A0188;
+	Tue, 10 Sep 2024 19:46:20 +0800 (CST)
+Received: from [10.67.109.254] (10.67.109.254) by
+ kwepemh500013.china.huawei.com (7.202.181.146) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Tue, 10 Sep 2024 19:46:19 +0800
+Message-ID: <22f16fbc-c370-9ca2-dc6c-5ed0ee4f3007@huawei.com>
+Date: Tue, 10 Sep 2024 19:46:18 +0800
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 4/7] net: ieee802154: mcr20a: Use IRQF_NO_AUTOEN flag in
- request_irq()
-To: Jinjie Ruan <ruanjinjie@huawei.com>, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- claudiu.manoil@nxp.com, vladimir.oltean@nxp.com, louis.peens@corigine.com,
- alex.aring@gmail.com, miquel.raynal@bootlin.com, chunkeey@googlemail.com,
- kvalo@kernel.org, briannorris@chromium.org, francesco@dolcini.it,
- set_pte_at@outlook.com, damien.lemoal@opensource.wdc.com,
- mpe@ellerman.id.au, horms@kernel.org, yinjun.zhang@corigine.com,
- fei.qin@corigine.com, johannes.berg@intel.com, ryno.swart@corigine.com,
- krzysztof.kozlowski@linaro.org, leitao@debian.org, liuxuenetmail@gmail.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- oss-drivers@corigine.com, linux-wpan@vger.kernel.org,
- linux-wireless@vger.kernel.org
-References: <20240909133034.1296930-1-ruanjinjie@huawei.com>
- <20240909133034.1296930-5-ruanjinjie@huawei.com>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.0
+Subject: Re: [PATCH 0/7] net: Use IRQF_NO_AUTOEN flag in request_irq()
 Content-Language: en-US
-From: Stefan Schmidt <stefan@datenfreihafen.org>
-In-Reply-To: <20240909133034.1296930-5-ruanjinjie@huawei.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To: Kalle Valo <kvalo@kernel.org>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <claudiu.manoil@nxp.com>, <vladimir.oltean@nxp.com>,
+	<louis.peens@corigine.com>, <stefan@datenfreihafen.org>,
+	<alex.aring@gmail.com>, <miquel.raynal@bootlin.com>,
+	<chunkeey@googlemail.com>, <briannorris@chromium.org>,
+	<francesco@dolcini.it>, <set_pte_at@outlook.com>,
+	<damien.lemoal@opensource.wdc.com>, <mpe@ellerman.id.au>, <horms@kernel.org>,
+	<yinjun.zhang@corigine.com>, <fei.qin@corigine.com>,
+	<johannes.berg@intel.com>, <ryno.swart@corigine.com>,
+	<krzysztof.kozlowski@linaro.org>, <leitao@debian.org>,
+	<liuxuenetmail@gmail.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <oss-drivers@corigine.com>,
+	<linux-wpan@vger.kernel.org>, <linux-wireless@vger.kernel.org>
+References: <20240909133034.1296930-1-ruanjinjie@huawei.com>
+ <87seu8c2n7.fsf@kernel.org>
+From: Jinjie Ruan <ruanjinjie@huawei.com>
+In-Reply-To: <87seu8c2n7.fsf@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ kwepemh500013.china.huawei.com (7.202.181.146)
 
-Hello Jinjie Ruan.
 
-On 9/9/24 3:30 PM, Jinjie Ruan wrote:
-> disable_irq() after request_irq() still has a time gap in which
-> interrupts can come. request_irq() with IRQF_NO_AUTOEN flag will
-> disable IRQ auto-enable when request IRQ.
+
+On 2024/9/9 22:39, Kalle Valo wrote:
+> Jinjie Ruan <ruanjinjie@huawei.com> writes:
 > 
-> Fixes: 8c6ad9cc5157 ("ieee802154: Add NXP MCR20A IEEE 802.15.4 transceiver driver")
-> Signed-off-by: Jinjie Ruan <ruanjinjie@huawei.com>
-> ---
->   drivers/net/ieee802154/mcr20a.c | 5 +----
->   1 file changed, 1 insertion(+), 4 deletions(-)
+>> As commit cbe16f35bee6 ("genirq: Add IRQF_NO_AUTOEN for request_irq/nmi()")
+>> said, reqeust_irq() and then disable_irq() is unsafe.
+>>
+>> And the code below is subobtimal:
+>> 	 irq_set_status_flags(irq, IRQ_NOAUTOEN);
+>> 	 request_irq(dev, irq...);
+>>
+>> IRQF_NO_AUTOEN flag can be used by drivers to request_irq(). It prevents
+>> the automatic enabling of the requested interrupt in the same safe way.
+>> With that the usage can be simplified and corrected.
+>>
+>> Only compile-tested.
+>>
+>> Jinjie Ruan (7):
+>>   net: apple: bmac: Use IRQF_NO_AUTOEN flag in request_irq()
+>>   net: enetc: Use IRQF_NO_AUTOEN flag in request_irq()
+>>   nfp: Use IRQF_NO_AUTOEN flag in request_irq()
+>>   net: ieee802154: mcr20a: Use IRQF_NO_AUTOEN flag in request_irq()
+>>   wifi: p54: Use IRQF_NO_AUTOEN flag in request_irq()
+>>   wifi: mwifiex: Use IRQF_NO_AUTOEN flag in request_irq()
+>>   wifi: wl1251: Use IRQF_NO_AUTOEN flag in request_irq()
+>>
+>>  drivers/net/ethernet/apple/bmac.c                   | 3 +--
+>>  drivers/net/ethernet/freescale/enetc/enetc.c        | 3 +--
+>>  drivers/net/ethernet/netronome/nfp/nfp_net_common.c | 5 ++---
+>>  drivers/net/ieee802154/mcr20a.c                     | 5 +----
+>>  drivers/net/wireless/intersil/p54/p54spi.c          | 4 +---
+>>  drivers/net/wireless/marvell/mwifiex/main.c         | 4 ++--
+>>  drivers/net/wireless/ti/wl1251/sdio.c               | 4 ++--
+>>  7 files changed, 10 insertions(+), 18 deletions(-)
 > 
-> diff --git a/drivers/net/ieee802154/mcr20a.c b/drivers/net/ieee802154/mcr20a.c
-> index 433fb5839203..020d392a98b6 100644
-> --- a/drivers/net/ieee802154/mcr20a.c
-> +++ b/drivers/net/ieee802154/mcr20a.c
-> @@ -1302,16 +1302,13 @@ mcr20a_probe(struct spi_device *spi)
->   		irq_type = IRQF_TRIGGER_FALLING;
->   
->   	ret = devm_request_irq(&spi->dev, spi->irq, mcr20a_irq_isr,
-> -			       irq_type, dev_name(&spi->dev), lp);
-> +			       irq_type | IRQF_NO_AUTOEN, dev_name(&spi->dev), lp);
->   	if (ret) {
->   		dev_err(&spi->dev, "could not request_irq for mcr20a\n");
->   		ret = -ENODEV;
->   		goto free_dev;
->   	}
->   
-> -	/* disable_irq by default and wait for starting hardware */
-> -	disable_irq(spi->irq);
-> -
->   	ret = ieee802154_register_hw(hw);
->   	if (ret) {
->   		dev_crit(&spi->dev, "ieee802154_register_hw failed\n");
+> Wireless patches go to wireless-next, please submit them in a separate
+> patchset.
 
+Thank you very much!
 
-Dave, Eric, Jakub, if you are taking them into net/net-next directly 
-here is my ack (and Miquel's review as well).
-
-Acked-by: Stefan Schmidt <stefan@datenfreihafen.org>
-
-regards
-Stefan Schmidt
+> 
