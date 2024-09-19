@@ -1,132 +1,122 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from out162-62-57-252.mail.qq.com (out162-62-57-252.mail.qq.com [162.62.57.252])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47A1B79CC
-	for <linux-wpan@vger.kernel.org>; Sat, 14 Sep 2024 00:30:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA72D193418;
+	Thu, 19 Sep 2024 07:27:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.57.252
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726273854; cv=none; b=hnjmydtwDdHVQwVAZbq43xxqo9LVPSy2QBMfpVWCYIIB25pqdEuf0lZFKNM4Fodmgg7aRUTwewUCZgkxWUf5Gk9EuNpTOh7t4+XbUYMOoawEo0bz36XqEO6wQdl+o2zKsueILn9h4Du4sRRgUfF0KB98DBWMBK802ZXGpaTpS0g=
+	t=1726730857; cv=none; b=YXQRSCRZcxKUOEY/okTTzijZGtriuM4rv43+S5dfOhVKDTOE3oz0ZVC6IhnT0U+AOoVnGJYj4w9R6tHWgAqqSBbwSDnSxn9Jfca7xHxiuReIjIEhSl2Qau5bFAkz5XrIHCuVTmnLHc7jA4kRg6H0gXOV9yYsU5tL+6Jlla5ECHw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726273854; c=relaxed/simple;
-	bh=k4YAmmg1pQMjIUxIATwur13dEEfIgBafdOXmFWCqspc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=r2BcHXygCGDHlvcCEtdhM79yrV2Eo0+SX+2DATg2n3QBRkaS+0TiFbViFlmED9ko3e0jSV2wr+TllEvOQtUdQ9K+1A1dbcRVTW89AMsh9wwh3eXRtnSVDyVVpKAS/ZxZJCZ0e9InytsIdS8vAmlG6fjg45pyl4xC+mwDov10WLU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DX3f8gmJ; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1726730857; c=relaxed/simple;
+	bh=GVjuTIwkdsz4YHVBTRhSWjHQ/dDR05dJ+3peEJosjgg=;
+	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=I4hoOjAsFaRR0vFfaKMTvz0OcQgF0CWm5RgKXyzsPLyl5K63qGIe6jFu+WLRlR6VGDCHCu7Q3dnQ8I20t72NErsq3S/Ep9vU4Hzehw59qjuC6iBKO31pj8y7/lmbEoq3ypoCQUZrggPitswV9B7inuupeZ9yfDTROxaLq6ycfwE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com; spf=pass smtp.mailfrom=foxmail.com; dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b=vuPv0Wcw; arc=none smtp.client-ip=162.62.57.252
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foxmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DX3f8gmJ"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1726273851;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=GHu0E3915VZc7k8b5iDDKfSwz7c23iq2LTgz4JKa4RA=;
-	b=DX3f8gmJKUTuHsMaRx2dyspiv1vVyV5+FjPuDYe9CHFJiLcSgZMLr8rz8PE0Nza7w4bK1O
-	pIXep8QkUmJMML6r3gGX01P8U4xG6x80zhWoP2+IwpIDGerujOKGv61UjfVcsB/FKW4KOn
-	/oE2XEo14J6kbf/eYYTcPOo8gVqzIdU=
-Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
- [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-531-4JRBRgzJOQWqYVWxMKMuBA-1; Fri, 13 Sep 2024 20:30:49 -0400
-X-MC-Unique: 4JRBRgzJOQWqYVWxMKMuBA-1
-Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-2f75b13c2c5so20922471fa.1
-        for <linux-wpan@vger.kernel.org>; Fri, 13 Sep 2024 17:30:49 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726273848; x=1726878648;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=GHu0E3915VZc7k8b5iDDKfSwz7c23iq2LTgz4JKa4RA=;
-        b=eqZT9II6UCuG4qd901Hw/aGrw9in7Tsz7j7Cs6upbRW0qO6iFengGNj9s6OzFfXqN2
-         v9HDgVdGTSPHcGu9V2HJVk3R8j9bbqu/Kom7s+pTF/kHYoxtUe7fkxaUav7rdIawRhIX
-         uNSz892Ny3oMNkmE2JTyFVVNPyY/8zPQCO014Pvqz23dEskqfCaFyR9BH8aNFEsXzwPf
-         jUPWcETdPFrznSniloyR2XO3fqyRq6JzUhVXkK2lz4uRPbBwWWKcZrVY750cDXO2DMfa
-         0L3FAWATIoKB7MHj4Qdy3SkxKrM31FF+InJE9+o4PdbYNgAR58UPEZ82+JhyCdswAIJr
-         GL8g==
-X-Forwarded-Encrypted: i=1; AJvYcCU6LGIg5ublhToE9IckbAXEa3BRtFAqz6zsBx0QmJPhAOQ63V0wL0E4BNE4SIW7aGHuP6GIijtZ9yM/@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxetjq4Dhb4UaiIuN4HMPXrM0FBc8QoFEI1hhJfyAQ7LzkYKkOd
-	fHyKO38XYmEPKHGGTXbyJriq9QTDsJL7I9FZYlRsUweTSyl9RNr4Ap4v4DcnesiISWGb3HpG0tv
-	uy9zUeYLP1wqCGNrAn+tWynd10WT5gvqexeTJxrH+61YiT8aaXsU2ZBI2fce+WivRwG0UQhRYdT
-	FtrbBQilGzehdMagYg6rKsr7/JzSlQQh6bmXJeaK4jWs2xUGs=
-X-Received: by 2002:a2e:b889:0:b0:2f3:fa99:4bab with SMTP id 38308e7fff4ca-2f787dbf520mr55371561fa.15.1726273847553;
-        Fri, 13 Sep 2024 17:30:47 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGR74E2TdnCv2Af7MA6B76Q46yZZuM8g/cRXAOgZ55E7BaLNzyFNnXvzQQrLT6b187xSpL2EOAqZr5VJR898kE=
-X-Received: by 2002:a2e:b889:0:b0:2f3:fa99:4bab with SMTP id
- 38308e7fff4ca-2f787dbf520mr55371341fa.15.1726273846960; Fri, 13 Sep 2024
- 17:30:46 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="vuPv0Wcw"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
+	s=s201512; t=1726730543;
+	bh=WVNu8AiV9G8393mFYa1TtjTVMD7rCrQTbszT2HczlEQ=;
+	h=From:To:Cc:Subject:Date;
+	b=vuPv0Wcwdoicp14iTbyOB1Yeubc/2Qizga93E+w3BphIoIpvQORRDeKc5AkGXnqtT
+	 Vymia5XPMcCbqebGTO/y/iQ7GFx9iJsWPnAMhxpSiCDND/zrEUY/v/R8m1U7LvH1C+
+	 KqiU9Bh9QksY5Ze4dQQMWz96rbRlyPOgVrQXoVMQ=
+Received: from localhost.localdomain ([114.246.200.160])
+	by newxmesmtplogicsvrsza15-1.qq.com (NewEsmtp) with SMTP
+	id 4093144F; Thu, 19 Sep 2024 15:16:09 +0800
+X-QQ-mid: xmsmtpt1726730169t92x1i33o
+Message-ID: <tencent_24586A9E52F56C5C12E9535AD3F243C98B06@qq.com>
+X-QQ-XMAILINFO: M4wVjRC01ue09gv8wxMJnKV3gXmV+vNnebMTHEZ2/+ALg1OBD+uHWsDyqihdMH
+	 T25+DQJk2dnTCYuw37iaRXzDqvx36WUNqqJQG1YWiCU++8nALikm3nBq+cBwTSmxFCcXS+EkMZ+v
+	 w+7lnJhhvMoANmSL+QvJ2cGB7BYVWe8l/vlDElE3k2en0M+CfqmWT+qax3H3yJY/4zwNrqw6MmYb
+	 Ns3O01phe7+GRzX++6Sis71rnusRDjcbGaOHhiwqNsMxUpcvO2SzPeJl/wb1kATvDxVMo9uqfxum
+	 baNubbIz74GA4CVi6OK2UsQEKRPvKabjr/JJaPvmMBF78rf/iQvRdsMv6N1ei91U9RW57e7wsATc
+	 RkbURfVSpA+ce7VsJmd/k3LItbgagmL5qa+gMxCWFokVhtDThPzjc4SlDJAJHtSzMniEaAquTHnX
+	 IFXop4/TIpAM0L1w+Ll9FDR0zUWYCx0ieYvAtlzZR69xg2vNnAwt3rGPLH/GGsbNsNVxbWh6hRGZ
+	 FqjXFvlquUBBsR/uyXosWOdXUjmu8bN07xJ3gXb2xICdlrqZAGLvmIdSdNh5+88XO/1G1M/tygvg
+	 eT7Ca8ymoz5+s5tl7stk+U8H5TVZZNSejHCHqVmbyVLw9duhxtii1W6QOv8OspVK9RIjqndd6M1W
+	 E/gyx69dJD1aFxa2XbK1pwb4qDbbvhQkAboJUl0VoowyAyxWpYsNJk5OED0Mg/Eh/aLe3wAN9ilx
+	 k+g5LMZU1SstF5Gu1yfmnfvKrIEM/qJELJaSZco6TViv94ZLooqiv67G0cZTNEmxJib3JigUdFJP
+	 4dfHXmiHQFhFIaG849E5QWceZL7r47/KUoPKjfTue+DzqAyJsCpzYFoLkhaYwJfBtzKcYo/TPySu
+	 F3N1UBruL8lBcf555z0Wk1LoT0qHOji3PQFR/VOpb57XpXZQlcQWT3glvxCmiAzrutygymxCzZRs
+	 77ZwUM90LL7iltzaKdvHsCfsen/DWNXTKGUl4+HA0AtvVFA7/d6eAGRVCpwjxHTb54wIp+iVsvbL
+	 viXSbbSjUMNEZzQWsYuuCf3YIRtLBZkZXZBNgakn5rkm8hQjK1KdE1awlxIr8=
+X-QQ-XMRINFO: OD9hHCdaPRBwq3WW+NvGbIU=
+From: Jiawei Ye <jiawei.ye@foxmail.com>
+To: alex.aring@gmail.com,
+	stefan@datenfreihafen.org,
+	miquel.raynal@bootlin.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	david.girault@qorvo.com
+Cc: linux-wpan@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] mac802154: Fix potential RCU dereference issue in mac802154_scan_worker
+Date: Thu, 19 Sep 2024 07:16:09 +0000
+X-OQ-MSGID: <20240919071609.985069-1-jiawei.ye@foxmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <A99422D6-46AE-42D1-852D-85D3EC3AFD53@dgtlrift.com>
- <CAK-6q+jqJ=xaLH_G08hU0qNVXqoeqaA+_u20s4H+aiqt_70sFg@mail.gmail.com> <96117fb8-0f2c-4bd4-ae0e-6e4b3034a7c9@datenfreihafen.org>
-In-Reply-To: <96117fb8-0f2c-4bd4-ae0e-6e4b3034a7c9@datenfreihafen.org>
-From: Alexander Aring <aahringo@redhat.com>
-Date: Fri, 13 Sep 2024 20:30:35 -0400
-Message-ID: <CAK-6q+izp6ykY4XT0MjYzzVXvj6-QknP5aNEDPR8ex=Ret9+5g@mail.gmail.com>
-Subject: Re: 802.15.4-2020 PHR field changes
-To: Stefan Schmidt <stefan@datenfreihafen.org>
-Cc: James Hanley <jhanley@dgtlrift.com>, linux-wpan@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi,
+In the `mac802154_scan_worker` function, the `scan_req->type` field was
+accessed after the RCU read-side critical section was unlocked. According
+to RCU usage rules, this is illegal and can lead to unpredictable
+behavior, such as accessing memory that has been updated or causing
+use-after-free issues.
 
-On Fri, Sep 13, 2024 at 3:53=E2=80=AFPM Stefan Schmidt
-<stefan@datenfreihafen.org> wrote:
->
-> Hello,
->
-> On 9/13/24 12:59 AM, Alexander Aring wrote:
-> > Hi,
-> >
-> > On Mon, Sep 9, 2024 at 8:19=E2=80=AFPM James Hanley <jhanley@dgtlrift.c=
-om> wrote:
-> >>
-> >> Has there been any effort to understand the changes needed to include/=
-net/ieee802154.h and associated files within drivers/net/ieee802154 to supp=
-ort the ratification of 15.4-2020?  One prime example is the "Extended PHR"=
- bit which was previously reserved to now allow extend the PHR of 2 more oc=
-tets giving bits 8-11 to be used for "Frame Length MSB" and bits 12-15 mark=
-ed as "Reserved" - this in combination of the legacy PHR bits 0-6 labeled a=
-s "Frame Length LSB" now allows for a frame MTU of 2048 octets.
-> >>
-> >> The 802.15.4-2020 is available individually free of charge through the=
- IEEE website through the IEEE Get Program. https://ieeexplore.ieee.org/doc=
-ument/9144691
-> >>
-> >> Is there a way to prototype these new changes to the spec with the mac=
-802154_hwsim driver?
-> >>
-> >
-> > mac802154_hwsim driver uses mac802154 the SoftMAC implementation.
-> > There are quite more changes necessary as the whole mac802154 stack
-> > deals with static 127 bytes MTU defines, etc. Unfortunately, it isn't
-> > just a driver change.
->
-> I understand it the way that James actually wanted to try prototyping
-> stack changes and verify with hwsim. James, could you clarify?
->
+This possible bug was identified using a static analysis tool developed
+by myself, specifically designed to detect RCU-related issues.
 
-Why shouldn't this be possible? Of course it should and I would
-definitely want to see it when adding any support for that for the
-rest that's being involved. The "rest" is probably most of the work.
+To address this, the `scan_req->type` value is now stored in a local
+variable `scan_req_type` while still within the RCU read-side critical
+section. The `scan_req_type` is then used after the RCU lock is released,
+ensuring that the type value is safely accessed without violating RCU
+rules.
 
-> To answer your question, we currently have no support for any of the
-> newer 802154 specs. :/ Bigger MTU was brought up before (IIRC in the
-> subGHz context) but nobody started to actually work on it.
->
-> We are happy to take changes in, but currently we have no plans on our
-> side to get this going.
->
+Fixes: e2c3e6f53a7a ("mac802154: Handle active scanning")
+Signed-off-by: Jiawei Ye <jiawei.ye@foxmail.com>
+---
+ net/mac802154/scan.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-yea, just send patches. I am open to starting with hwsim to support
-kind of such a "bigger mtu" phy "type" as long it doesn't break the
-kernel and finding the spots that need to be somehow changed.
-
-- Alex
+diff --git a/net/mac802154/scan.c b/net/mac802154/scan.c
+index 1c0eeaa76560..29cd84c9f69c 100644
+--- a/net/mac802154/scan.c
++++ b/net/mac802154/scan.c
+@@ -180,6 +180,7 @@ void mac802154_scan_worker(struct work_struct *work)
+ 	unsigned int scan_duration = 0;
+ 	struct wpan_phy *wpan_phy;
+ 	u8 scan_req_duration;
++	enum nl802154_scan_types scan_req_type;
+ 	u8 page, channel;
+ 	int ret;
+ 
+@@ -210,6 +211,7 @@ void mac802154_scan_worker(struct work_struct *work)
+ 
+ 	wpan_phy = scan_req->wpan_phy;
+ 	scan_req_duration = scan_req->duration;
++	scan_req_type = scan_req->type;
+ 
+ 	/* Look for the next valid chan */
+ 	page = local->scan_page;
+@@ -246,7 +248,7 @@ void mac802154_scan_worker(struct work_struct *work)
+ 		goto end_scan;
+ 	}
+ 
+-	if (scan_req->type == NL802154_SCAN_ACTIVE) {
++	if (scan_req_type == NL802154_SCAN_ACTIVE) {
+ 		ret = mac802154_transmit_beacon_req(local, sdata);
+ 		if (ret)
+ 			dev_err(&sdata->dev->dev,
+-- 
+2.34.1
 
