@@ -1,110 +1,131 @@
-Received: from proxima.lasnet.de (proxima.lasnet.de [78.47.171.185])
+Received: from out162-62-57-49.mail.qq.com (out162-62-57-49.mail.qq.com [162.62.57.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB35C19E7D1;
-	Thu, 19 Sep 2024 13:05:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.47.171.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 009DD22092
+	for <linux-wpan@vger.kernel.org>; Fri, 20 Sep 2024 04:09:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.57.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726751141; cv=none; b=N4xmuM/CW6kxzd1dMUiXtdzon5KQU95z2eNktFh0B4LK7AWNGUMcOUNvRE+W/NwJtts49URN7PebRD118W9mUCX6J2sRTRkq5Mk64i/MW5h8H9SpEKf7fgPW16u4gm1iMldL421KZFOAfCxUvZGJbdLdask54OKQM6DhCBGcSHw=
+	t=1726805397; cv=none; b=TT5Q9b+lVjeFFj3MI/pMvgcaAqcqJehyFornNAU9NmgzVJi/0Su500IsLTfhGWX2ZWAu+mYklOjrR+AwPqcUVwwvS6nl6wQZFbGtgh22buvcviAAEgXLwShdyzoyTgxNZM57V8ZVO/k9NiCI5vZeZzqBh2/INurUYKgU9iDj3cs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726751141; c=relaxed/simple;
-	bh=FiGre3xQQE6hhmjM+oLWLYutnnKrJlKisaObM0PtP1w=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=in0TLhMLyRTruLHgyWV0cPDf5e7zXbGYzf7r8y5tTOsWKAbjnWXVqmouf4JRY+DBq31KJQs9zH/NLfckoFWcrYgDpSKUyBDF+ydaUo03SapCwwss0H2ocx0v4r0wNur0v3+yHhFcptDG0lQ318TWefEIIa8veFT7lzwS3iP0ZZU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=datenfreihafen.org; spf=pass smtp.mailfrom=datenfreihafen.org; dkim=pass (2048-bit key) header.d=datenfreihafen.org header.i=@datenfreihafen.org header.b=thVROKO8; arc=none smtp.client-ip=78.47.171.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=datenfreihafen.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=datenfreihafen.org
+	s=arc-20240116; t=1726805397; c=relaxed/simple;
+	bh=njQRqLG7wlH/zIXBSY4tiDaObLehSkaocznA1qc1A38=;
+	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=eDY8e1gySsD0djJvw+IWljw+IripE75RozT7s6hkv6wSNxLL9xl3vdXPqaThpgRk0C+4H2w5twFgG7c3Qq/gdewTLsGZN5OCHjnXGt8yx/jbwFjI7LrZHVHqDu2H23iSJs+sW3J6bg5klApzjXUU5PN9ZXf2FAQTlac78fK3ax0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com; spf=pass smtp.mailfrom=foxmail.com; dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b=NCt9qBdE; arc=none smtp.client-ip=162.62.57.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foxmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=datenfreihafen.org header.i=@datenfreihafen.org header.b="thVROKO8"
-Received: from [10.136.2.92] (unknown [83.68.141.146])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: stefan@datenfreihafen.org)
-	by proxima.lasnet.de (Postfix) with ESMTPSA id 22EF4C00E0;
-	Thu, 19 Sep 2024 15:05:27 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
-	s=2021; t=1726751127;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5Y57BPJyLA/lM4BrWgu/heI5PAlRBELA1lH/W+055F4=;
-	b=thVROKO8bl3415p4kWDD4FfRfBV8q2SfH3d2AeaHinRNwf3p/LaOfWuoQoH1YmkPuFTv4p
-	66Uwz2KutqGzYr31lUdxqbv8BtWwI4ADGzqmHRrL5xM+z6EhZtt9QRkA2CopjjPton0LOZ
-	L/1NgQ3vGWKfyl4OWyoVgiL4kwJSfNzYq9JMVK0E3kLL396aX5773kat/SXASLV8HXEyfh
-	52CqEprWVKQGenlKPs899uQ4Oe6sgpgY9fhj0uM4g7bnDiYPTZsKygbMcJZVWZ0ViAL3RE
-	bW6JUzSBuRLX+QHZNI515/jkWPy2hpWNWL1nRaOd6SqfuL63bDH8y/a9ImdHNg==
-Message-ID: <11239363-1608-44a4-bfab-d188f6e0934e@datenfreihafen.org>
-Date: Thu, 19 Sep 2024 15:05:26 +0200
+	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="NCt9qBdE"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
+	s=s201512; t=1726805388;
+	bh=Z2Z3+yeR3SnFTYap5T0uUA9hdSiUIk+aWXvfdPP8fwE=;
+	h=From:To:Cc:Subject:Date;
+	b=NCt9qBdE2wvZv+UGjJn19QxiVwhlmr+BGTGqhomYahGVXscOPqMCsNd9oBKBr300+
+	 pW5RPrv7f3AXWMCF5lKuibsCrxSsf4ym3DQ0dIq3ZFLzzqATiMdvWl0RmCkQki2YfA
+	 L7VZQNTx9fnufVc3tNOUxYyEVJwOIeOX35/k2MOY=
+Received: from localhost.localdomain ([114.246.200.160])
+	by newxmesmtplogicsvrszc5-2.qq.com (NewEsmtp) with SMTP
+	id E100020; Fri, 20 Sep 2024 12:03:33 +0800
+X-QQ-mid: xmsmtpt1726805013tyuqqrxw2
+Message-ID: <tencent_3D3535F93CE8BC48A50E29D1CF7A25E93D0A@qq.com>
+X-QQ-XMAILINFO: N7h1OCCDntujycmiipQosCyokqx0fKwi+k8zgQnMhO1Z7x0x0lPClOiQ9Msa1n
+	 DseKo74Mc2PEjZIkrxyWvHLu4XL4cDZf6xIG+V6TvZW1+i3Dcd+egQs/KMDYH5D80HEW9hh7oNuQ
+	 neGB0j72f4cyCyR8gyMflrE9Y/vKVP7qQI91MBgJ1vdQnS1T5bxL8JhKezYHCPVqQMHNk5YLKHEh
+	 sANwQJjg6SOAW4B3UowINMbvgKLCmt9cKJvW/F6t0jMFQmOQRrrSG1O8OYlD0A/a2mo08Lndr25Z
+	 7t3V8d0L0+OaZa5eQLqOpAL1/92LQlLDNbhV4tR0FdAolSSd1KackhCM9+bUg16+eVF7OnqRB95h
+	 WTrmNYJmvPqemW2He9Ybhyhi/AN/PVNkrUBI4TQM7HkMEJiJEU0jinK+bHoEbL9y8Fsm9dqoxhDH
+	 6uAgg9lG6so4LnDicpfgqrSFTf0QWEgDkN8ScitewHfPBDwyGf3k8xSDNJLkNgj+wyquNU6WOSCv
+	 lR7cfAPv7yKP5/J9v04E/ONYI3dZI3PmJ0GhTLHR9eF3UCx/1IYDzCeD/pBrKpzfldvLAEjdlZ7p
+	 WfqKMM55OAQLNI8MJDjzxkAh+KY7EuO3qcbKqa7wcDPAkay9wxzrPyO7UkcKsCZogIlz13fznxU6
+	 wuAWX+p06d1QO1s5Kjt0IvmjdVRL+TOx1HvH3cZdJMLNGMrS1EGkpq/NfAbp+w1yAoh/NmRz4sjo
+	 fhsm+xu8BRg6+o1VaoN1JG/LE2iBotG8IvVmaDLXb9NsMZNhIyTKFa924PGFHOe37wfgDiY0zOOu
+	 WiLK37sk2A38rU/xqpL5hzM29UyhRpwZ+oOF2uKtI9dDpR3TfowFvnFis+6+I145fxJgUafbk0AQ
+	 VJlXKr/UDeS3IFWfLFsvUE1dXsoHeDfSMte+jJ+B6WtQWCMliJx6tdDwIa9MHOEHyQyU94avB7Qg
+	 p8LoqZB78kpQZLo7OZ7ekSXsG2LwQEuYTaZGJ4BDJc0n4NqK6OCLtEJavjQPsbEIzaK4c4toy4o+
+	 wrevh2V2234CxkW4F4UsZJ6G0fKrqzywevkVEtcRhQLtsekz5iCgYdWGZyhzTrk4faON4Bkw==
+X-QQ-XMRINFO: M/715EihBoGSf6IYSX1iLFg=
+From: Jiawei Ye <jiawei.ye@foxmail.com>
+To: przemyslaw.kitszel@intel.com
+Cc: alex.aring@gmail.com,
+	stefan@datenfreihafen.org,
+	miquel.raynal@bootlin.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	david.girault@qorvo.com,
+	linux-wpan@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2] mac802154: Fix potential RCU dereference issue in mac802154_scan_worker
+Date: Fri, 20 Sep 2024 04:03:32 +0000
+X-OQ-MSGID: <20240920040332.1706036-1-jiawei.ye@foxmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] Fix the RCU usage in mac802154_scan_worker
-To: Jiawei Ye <jiawei.ye@foxmail.com>, przemyslaw.kitszel@intel.com
-Cc: alex.aring@gmail.com, davem@davemloft.net, david.girault@qorvo.com,
- edumazet@google.com, kuba@kernel.org, linux-kernel@vger.kernel.org,
- linux-wpan@vger.kernel.org, miquel.raynal@bootlin.com,
- netdev@vger.kernel.org, pabeni@redhat.com
-References: <f3c26426-7ebb-4b8b-9443-f604292a53a9@intel.com>
- <tencent_8C653C3534893CF0BC88A43A2831CDA2260A@qq.com>
-Content-Language: en-US
-From: Stefan Schmidt <stefan@datenfreihafen.org>
-In-Reply-To: <tencent_8C653C3534893CF0BC88A43A2831CDA2260A@qq.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hello Jiawei,
+In the `mac802154_scan_worker` function, the `scan_req->type` field was
+accessed after the RCU read-side critical section was unlocked. According
+to RCU usage rules, this is illegal and can lead to unpredictable
+behavior, such as accessing memory that has been updated or causing
+use-after-free issues.
 
-On 9/19/24 14:26, Jiawei Ye wrote:
-> On 9/19/24 17:01, Przemek Kitszel wrote:
->>> In the `mac802154_scan_worker` function, the `scan_req->type` field was
->>> accessed after the RCU read-side critical section was unlocked. According
->>> to RCU usage rules, this is illegal and can lead to unpredictable
->>> behavior, such as accessing memory that has been updated or causing
->>> use-after-free issues.
->>>
->>> This possible bug was identified using a static analysis tool developed
->>> by myself, specifically designed to detect RCU-related issues.
->>>
->>> To address this, the `scan_req->type` value is now stored in a local
->>> variable `scan_req_type` while still within the RCU read-side critical
->>> section. The `scan_req_type` is then used after the RCU lock is released,
->>> ensuring that the type value is safely accessed without violating RCU
->>> rules.
->>>
->>> Fixes: e2c3e6f53a7a ("mac802154: Handle active scanning")
->>> Signed-off-by: Jiawei Ye <jiawei.ye@foxmail.com>
->>> ---
->>>    net/mac802154/scan.c | 4 +++-
->>>    1 file changed, 3 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/net/mac802154/scan.c b/net/mac802154/scan.c
->>> index 1c0eeaa76560..29cd84c9f69c 100644
->>> --- a/net/mac802154/scan.c
->>> +++ b/net/mac802154/scan.c
->>> @@ -180,6 +180,7 @@ void mac802154_scan_worker(struct work_struct *work)
->>>    	unsigned int scan_duration = 0;
->>>    	struct wpan_phy *wpan_phy;
->>>    	u8 scan_req_duration;
->>> +	enum nl802154_scan_types scan_req_type;
->>
->> this line violates the reverse X-mass tree rule of code formatting
-> 
-> Thank you for pointing out the concern regarding the violation of the
-> reverse Christmas tree rule. I will adjust the placement of
-> `enum nl802154_scan_types scan_req_type` to be between
-> `struct cfg802154_scan_request *scan_req` and
-> `struct ieee802154_sub_if_data *sdata`. If this change is suitable,
-> should I resend the patch as a v2 patch?
+This possible bug was identified using a static analysis tool developed
+by myself, specifically designed to detect RCU-related issues.
 
-Yes, please always increase the version whenever you change something 
-and re-send. Also a ChangeLog of the changes makes it a lot easier for 
-the reviewer.
+To address this, the `scan_req->type` value is now stored in a local
+variable `scan_req_type` while still within the RCU read-side critical
+section. The `scan_req_type` is then used after the RCU lock is released,
+ensuring that the type value is safely accessed without violating RCU
+rules.
 
-regards
-Stefan Schmidt
+Fixes: e2c3e6f53a7a ("mac802154: Handle active scanning")
+Signed-off-by: Jiawei Ye <jiawei.ye@foxmail.com>
+
+---
+Changelog:
+
+v1->v2: -Repositioned the enum nl802154_scan_types scan_req_type
+declaration between struct cfg802154_scan_request *scan_req and struct
+ieee802154_sub_if_data *sdata to comply with the reverse Christmas tree
+rule.
+---
+ net/mac802154/scan.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/net/mac802154/scan.c b/net/mac802154/scan.c
+index 1c0eeaa76560..a6dab3cc3ad8 100644
+--- a/net/mac802154/scan.c
++++ b/net/mac802154/scan.c
+@@ -176,6 +176,7 @@ void mac802154_scan_worker(struct work_struct *work)
+ 	struct ieee802154_local *local =
+ 		container_of(work, struct ieee802154_local, scan_work.work);
+ 	struct cfg802154_scan_request *scan_req;
++	enum nl802154_scan_types scan_req_type;
+ 	struct ieee802154_sub_if_data *sdata;
+ 	unsigned int scan_duration = 0;
+ 	struct wpan_phy *wpan_phy;
+@@ -209,6 +210,7 @@ void mac802154_scan_worker(struct work_struct *work)
+ 	}
+ 
+ 	wpan_phy = scan_req->wpan_phy;
++	scan_req_type = scan_req->type;
+ 	scan_req_duration = scan_req->duration;
+ 
+ 	/* Look for the next valid chan */
+@@ -246,7 +248,7 @@ void mac802154_scan_worker(struct work_struct *work)
+ 		goto end_scan;
+ 	}
+ 
+-	if (scan_req->type == NL802154_SCAN_ACTIVE) {
++	if (scan_req_type == NL802154_SCAN_ACTIVE) {
+ 		ret = mac802154_transmit_beacon_req(local, sdata);
+ 		if (ret)
+ 			dev_err(&sdata->dev->dev,
+-- 
+2.34.1
+
