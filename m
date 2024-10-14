@@ -1,57 +1,57 @@
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B29721C7B77
-	for <linux-wpan@vger.kernel.org>; Mon, 14 Oct 2024 15:38:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A92471C9DFD
+	for <linux-wpan@vger.kernel.org>; Mon, 14 Oct 2024 15:38:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728920317; cv=none; b=asxOboO7N3WxloSh1qikTzo3+Je3gikNXdmVfNkMYOFHsZqT7zseMumh3Pf2cWVytclqiRoeP1jEgp8FQaQnTmm+oZimNISP2g+ogKEXVz+pbzKxudzE54yIarGRSfyLvnI3COYXCagYtMkU1w/xYyzOCQ37ubqhF4157iimAxc=
+	t=1728920319; cv=none; b=d3J45Wj/A2efVYRaQLa3bvvf3FB+nET+iqMB2Uv7qOWidtTjLkhmERqvp+rWkFNGDRNnElY2zxFoQaDbZOaTOSq6in/ZQuavs4Z2oXD/KanxcRzLgEpOWPOoqdZ0b0jLA84AWY29ZHsiZvoRkqjT8piOrnMf71iZodGQdOU7Q+M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728920317; c=relaxed/simple;
-	bh=TykJJMM5IzwfbahmKZJTnRFTzpHvJ80eOgoE0YjZMYM=;
+	s=arc-20240116; t=1728920319; c=relaxed/simple;
+	bh=B2jIOs9L3gzL5PsTv6zAjfQ7uhJ1V7bXBI/aVWUwbYc=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=QK/igDEJE5AUEShOPQKgNCqx9qGdygQxpATIb7U546G0aH8zHGGeoprciVIWvKvffpbOHTaZn7qtw7w/CBNlhEXoFRpr7lQT1nzTCIF38rUKa4Fu02je/SIU2q/qIISjr/eRsif7/+Uv/Nze/ETkUhOhPprNH3RWk6bkkICB2KA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=c3QI9aUK; arc=none smtp.client-ip=209.85.221.52
+	 MIME-Version; b=SEyEW7ValQQ4NakAqHkDP6wHicDOgeLvxd+JEMSO05WCAmSM6VP2ZBwcYDSYtbkRP08J5102uxuJSUB7rvac60gJ8w///m+a92ZVA9P6J9Hq4Ert4NfH/aV1JQir7JFDRhJ+6sZYKs51iYTZoIikTqaiuVsDVl9bKmKG63E3SV0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=SPE1k1J7; arc=none smtp.client-ip=209.85.128.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="c3QI9aUK"
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-37d533b5412so2047597f8f.2
-        for <linux-wpan@vger.kernel.org>; Mon, 14 Oct 2024 08:38:35 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="SPE1k1J7"
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-4311c285bc9so30789255e9.3
+        for <linux-wpan@vger.kernel.org>; Mon, 14 Oct 2024 08:38:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1728920314; x=1729525114; darn=vger.kernel.org;
+        d=cloudflare.com; s=google09082023; t=1728920316; x=1729525116; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=49ytr3oVzMOQdVnJdbtLDkZg4U2+YqG6lYXkOtuknMY=;
-        b=c3QI9aUKu6Bi2Q+b8cXS2JW0XWkQrdIxfWRocPjUJ4ipX/DnkFkgfFSoH96GxQjskv
-         H+s5a4sZHs/D1d604fpqEK01TyCQyKdFJfgkd5WKBzAQ4YFDKPAuRNsEujbfaEd0wOhk
-         U2hsj7sc/AdfjvUi3lHThlaDFMkKysLdxdMTn4G92x94laSnlToVfQ6jeu7c7CEluJLR
-         X7FY8MsnnN/Lg7qWc2A6dzJdJOp1vw6kW+mXrHEJdVrmmt/tKVS+YhzaH1YxoMHJrjNA
-         ENQozVzUkLa+X1wb/Djdwd/P4v7UX4Lz8Znxc0zcjnVBrmGvRw90fT6hrOYEPY+RxGlk
-         mttA==
+        bh=lc//y1BjgJvxxX3rGB4aDZ3xX09SUgENBX50qA84hL0=;
+        b=SPE1k1J7Xyw6fn9/LNdrjheqnufXMsYV46py4ESfUl8mdSQlzej5qYsDZxYEqdy3Up
+         lST2arihYhJAwrVaDiWxPAFAr4Kt4TnwUQphBB3t4qBwZYf1XR3RwMypulxICZ3wuFBd
+         uuWzv8EwfsWL4c32V/yhFBeLUCCJGJIqzyhx/JssqBwUi4gXm/ldf5EUnFUgUBtqenBj
+         EPr/x3GYJnXxTHj31QR3Modr7kjEEwkfF7siPzXobiFKcN3OktPrDOhQCo9rb5onB6+c
+         G7h/H0h3VT7biQSEsl7BXXKHnMFuRWKbaC9AG2jhYAwwEd7N3E9fIgoJOP9oEFjoxwWb
+         r+sw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728920314; x=1729525114;
+        d=1e100.net; s=20230601; t=1728920316; x=1729525116;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=49ytr3oVzMOQdVnJdbtLDkZg4U2+YqG6lYXkOtuknMY=;
-        b=sMJaNNayxctC+tgmLIHmGSPwU8/SMHSeEIMuMi+mBn1z3CU2P5bE39EZKhjEhFAgvv
-         Rx1gNaHsFk9jPtw2SPSD0OedxMkQoE9JpuHnWOGwOl0dgP1SFZ9mWt6wkz8PQ2qW5Zbg
-         8vm/KZniAfmljQ/RntGgXvMkmwCGXg4TaKOHj+oR64ubXJKHWKZs2ZeR1rcs6gr6Gzij
-         GLhNO223h9TGfMMsYrl80m3VQn4m2Do8k59sDbkBpJzxgoOJBt6MIAOF2yx+xkTprzvG
-         HPu1ml2ffMsuxmtvgg0E8PnU54YIDWiyU4ZA214MTUzYNgg8ZfqJOIS6DWQVHs+7fqlU
-         PspQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUbTbPpg1vZrLRxPtpEt4Rqf6NlFUsJspB5eDhKQy4wWzg4F407KC1sT0hGqh4dVCHvWo/Ov3Gq0KyZ@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz5JTqnANB6lYxqdQFBbaq/PPTlSZWtllDn12oGjDcF5Kg7hPPS
-	hHUzBvlAogpk+jifBEvpHO6uDnmTSvy6MdcZ3yi1UxIc0bsxvsybti6Ygh7QGrM=
-X-Google-Smtp-Source: AGHT+IEK1fXfdN4ULr/3sLohnKiPnjVrQV68cRQbTA59WSVC//oUJKPx9zNQVb7mUdYnIwSncrGyLA==
-X-Received: by 2002:a5d:688f:0:b0:37d:50e1:b3e1 with SMTP id ffacd0b85a97d-37d551b79c7mr8936288f8f.16.1728920313945;
-        Mon, 14 Oct 2024 08:38:33 -0700 (PDT)
+        bh=lc//y1BjgJvxxX3rGB4aDZ3xX09SUgENBX50qA84hL0=;
+        b=Qnmt2YeWqldWfnUCczeOTTk6jDiGftgYy35PWR1h4p1GgsbpuECz8pPekcHXu+tiMb
+         RbyUJbGg1LskQAR3kow2o6J46oTUvybME2yqT/56Tt+FBBvKwNvvkjF9pd0UXmyGpQzX
+         drv20x3QGFqaCMVemG/eF3uFb8SxzbAAXfvTtAH9XBzf6FWXV5vw8cajpCR62/lQzDc3
+         sAq8Pq4p0dCuYTk4gG41ZEyrQnV+/NtaPWhd1g1d/UhyHOqgke2xsVBNzKFqPgo8b6v1
+         o2TDYx2F1ukGfkqbNKBkobxHSWOZjoMoBrEwy/el54tWY6VtIJ6bQtS3/e1A43OWa/4E
+         qKcQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWRMhQvouMfqJ1kZPFiTWSnJY9wuqBWCgyFK3fG3II8CtrUXfJKcpN4B4YNNdE9kAJmwex30x1mfC9t@vger.kernel.org
+X-Gm-Message-State: AOJu0Yys95h2Rdq4zCmu5wtQnv6BvedaR7zwQDY77P72YQqhkdJtsDYF
+	Fx5iC7clEPd6n30xMEPSwtVLi2XMJstxoETOVCO8ZYyJNZ2khIpRsoajItWjZsc=
+X-Google-Smtp-Source: AGHT+IEIDg1NkYP+jkdfN8/Qy2bbNOJCew4tzqQ4wU+J4Bx2YgcvD/tGgxkQdWC68y3Hu3c+jOjjEA==
+X-Received: by 2002:a05:600c:1d0b:b0:42c:ba83:3f01 with SMTP id 5b1f17b1804b1-4311ded4265mr95708305e9.8.1728920315951;
+        Mon, 14 Oct 2024 08:38:35 -0700 (PDT)
 Received: from localhost.localdomain ([2a09:bac5:50cb:432::6b:93])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37d4b6a8940sm11725913f8f.6.2024.10.14.08.38.32
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37d4b6a8940sm11725913f8f.6.2024.10.14.08.38.34
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 14 Oct 2024 08:38:33 -0700 (PDT)
+        Mon, 14 Oct 2024 08:38:35 -0700 (PDT)
 From: Ignat Korchagin <ignat@cloudflare.com>
 To: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
@@ -76,9 +76,9 @@ Cc: kernel-team@cloudflare.com,
 	kuniyu@amazon.com,
 	alibuda@linux.alibaba.com,
 	Ignat Korchagin <ignat@cloudflare.com>
-Subject: [PATCH net-next v3 6/9] net: inet: do not leave a dangling sk pointer in inet_create()
-Date: Mon, 14 Oct 2024 16:38:05 +0100
-Message-Id: <20241014153808.51894-7-ignat@cloudflare.com>
+Subject: [PATCH net-next v3 7/9] net: inet6: do not leave a dangling sk pointer in inet6_create()
+Date: Mon, 14 Oct 2024 16:38:06 +0100
+Message-Id: <20241014153808.51894-8-ignat@cloudflare.com>
 X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 In-Reply-To: <20241014153808.51894-1-ignat@cloudflare.com>
 References: <20241014153808.51894-1-ignat@cloudflare.com>
@@ -90,25 +90,25 @@ List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-sock_init_data() attaches the allocated sk object to the provided sock
-object. If inet_create() fails later, the sk object is freed, but the
-sock object retains the dangling pointer, which may create use-after-free
+sock_init_data() attaches the allocated sk pointer to the provided sock
+object. If inet6_create() fails later, the sk object is released, but the
+sock object retains the dangling sk pointer, which may cause use-after-free
 later.
 
-Clear the sk pointer in the sock object on error.
+Clear the sock sk pointer on error.
 
 Signed-off-by: Ignat Korchagin <ignat@cloudflare.com>
 ---
- net/ipv4/af_inet.c | 22 ++++++++++------------
+ net/ipv6/af_inet6.c | 22 ++++++++++------------
  1 file changed, 10 insertions(+), 12 deletions(-)
 
-diff --git a/net/ipv4/af_inet.c b/net/ipv4/af_inet.c
-index b24d74616637..8095e82de808 100644
---- a/net/ipv4/af_inet.c
-+++ b/net/ipv4/af_inet.c
-@@ -376,32 +376,30 @@ static int inet_create(struct net *net, struct socket *sock, int protocol,
+diff --git a/net/ipv6/af_inet6.c b/net/ipv6/af_inet6.c
+index ba69b86f1c7d..f60ec8b0f8ea 100644
+--- a/net/ipv6/af_inet6.c
++++ b/net/ipv6/af_inet6.c
+@@ -252,31 +252,29 @@ static int inet6_create(struct net *net, struct socket *sock, int protocol,
+ 		 */
  		inet->inet_sport = htons(inet->inet_num);
- 		/* Add to protocol hash chains. */
  		err = sk->sk_prot->hash(sk);
 -		if (err) {
 -			sk_common_release(sk);
@@ -117,7 +117,6 @@ index b24d74616637..8095e82de808 100644
 +		if (err)
 +			goto out_sk_release;
  	}
- 
  	if (sk->sk_prot->init) {
  		err = sk->sk_prot->init(sk);
 -		if (err) {
@@ -148,7 +147,7 @@ index b24d74616637..8095e82de808 100644
 +	goto out;
  }
  
- 
+ static int __inet6_bind(struct sock *sk, struct sockaddr *uaddr, int addr_len,
 -- 
 2.39.5
 
