@@ -1,82 +1,147 @@
-Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BBC71DACBE;
-	Tue,  8 Oct 2024 08:12:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 822811CAB8
+	for <linux-wpan@vger.kernel.org>; Mon, 14 Oct 2024 15:38:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728375160; cv=none; b=lIDGfUEP7nwwDMuzdLL4dyX4uNq7Osp+MmHvsp/77bYcoLMHHsOzHrr6H2ZUUzoiWHq/81PtRJcAI8KkqtKSmhYwmSsZbPZbPhs8fthPIkG1Y6WAKqzgOl5JaucG0F3mc2t/zHrdGEzIriW4MHXa1Va9EQpIwqkNNR531m6TP08=
+	t=1728920304; cv=none; b=UzPoJrqNjd8b/zu1Y8ZrV94KrHSXknf1+tijsD4hTfSSk5R3/GtlIR5NWakp4tiAjlzlG6ABhXuk5v5nS6wE80P/yCFhELVEaeelbDW3dUxw2JauSAmnQKyHq6yNG/qRAzOJOiTt/7d8Ye0jdcQTyCKRN06gJ4o6qBg+m02StqA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728375160; c=relaxed/simple;
-	bh=B3ysfxiqFRhVVNCstervNndWXGwXlQgXohHe/DyQ+g8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=titD5ljhx8i8PVLRQCjg/YUVG+IYadTXPd4RYgQpLMrtCoYg/0CgdIFcPC3B0ct4S+2PCG0nOT33gydu1YZgxe4EWw4bPpJm1DlM2n3elgHdegmz8LniextXNY9fQlyGmTe/Im3jZEIw3zF5uccG07nEO3ajl88pAuGR90CZy5I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=oARTCco1; arc=none smtp.client-ip=217.70.183.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+	s=arc-20240116; t=1728920304; c=relaxed/simple;
+	bh=wnFLfn5BeeZ3wPCN20V30mk4CTpYaz6K85DjdS+HiHk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=VWT0TCBDX1S9tOoyPsVJzYMQCQhpUcHRU+PjD1N9uZe3BGUFn1LV58gTQ+rNe/iVgw6hBnoCsXsf7oP7b0bbVhZ2NbWLI4vLLsSCMeHdcL88NXmkLpBgr8O8omTvKBtfdqW9L/0UQoBqNDdheqd9knTwuJ3BhjZowC1+xqaS2KQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=JJP39igI; arc=none smtp.client-ip=209.85.221.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="oARTCco1"
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 56F2F40005;
-	Tue,  8 Oct 2024 08:12:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1728375155;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WxOr0+Orzjei2/3t3Lr8z6xjWY7VkO+u4ngNgmdCxmk=;
-	b=oARTCco1tu8VcZP2stCjjo6TSwMv7A8HWGKO2gATZmkeIp75C/KpMPHPZuFEIlq9DB7Cj1
-	9uDVKYJD2XG3ktFd7MsS0R2dbXBBxbf6TJT8mRWgw0zZyE433PQ7CDYTYu7kplprzkYbdZ
-	69ifxQMzF/M4jj6qbxv0Ta4vJkn2Jp3eYwWhjbKtroaob067OblmAa86jwxZ9JqgaKi0Xn
-	0bXqR4Tz2REqsdWUP7VfsSD6aQGAMC9bz2qjMRs6KYN92luQEu64YE/UWjQ7nyaag/38Ct
-	AkKFICym00WreIWFMgqqtSEfi42XGF/VCdxYh+ooK58fW5LNvERbf1ctEmstQQ==
-Date: Tue, 8 Oct 2024 10:12:32 +0200
-From: Miquel Raynal <miquel.raynal@bootlin.com>
-To: Ignat Korchagin <ignat@cloudflare.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
- <johan.hedberg@gmail.com>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Oliver Hartkopp <socketcan@hartkopp.net>, Marc Kleine-Budde
- <mkl@pengutronix.de>, Alexander Aring <alex.aring@gmail.com>, Stefan
- Schmidt <stefan@datenfreihafen.org>, David Ahern <dsahern@kernel.org>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- linux-bluetooth@vger.kernel.org, linux-can@vger.kernel.org,
- linux-wpan@vger.kernel.org, kernel-team@cloudflare.com, kuniyu@amazon.com,
- alibuda@linux.alibaba.com
-Subject: Re: [PATCH v2 6/8] net: ieee802154: do not leave a dangling sk
- pointer in ieee802154_create()
-Message-ID: <20241008101232.123389e1@xps-13>
-In-Reply-To: <20241007213502.28183-7-ignat@cloudflare.com>
-References: <20241007213502.28183-1-ignat@cloudflare.com>
-	<20241007213502.28183-7-ignat@cloudflare.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="JJP39igI"
+Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-37d325beee2so2682767f8f.2
+        for <linux-wpan@vger.kernel.org>; Mon, 14 Oct 2024 08:38:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1728920301; x=1729525101; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=xHzMyBjSo/EDcGPVYKinoicVUAUc6s3aklub75jR0Lw=;
+        b=JJP39igIjYtLhphYpdRanLZToLY8t29Od5fQ3cNLQlpEtOkd70DfFC9y2+RTae+bf/
+         aGVv38VnD8A/SqcDsvUB/2BaO4erZMEjqzUJTY2KpYzbHuFneqWqkJuemj8nwmZcywRg
+         UOCD+2/xcVoVam8A3vbALfUroDSUzcsxEmmai47j0QhHr71NgDnMoD2ExQH60Lp5zOcg
+         Jl0E66/VWFg7fO78E5BF3Gk8VErtbtmOjWj29ARCWialCcNVlkzSobpBUPeQ4T1wCgy2
+         UXPw5QLbPyTIQ6JRQZcW5gG9Sj8QYq4k9NSULBc8Z8XBshDd3nEv4B+g3If1kjidm9o9
+         uakA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728920301; x=1729525101;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=xHzMyBjSo/EDcGPVYKinoicVUAUc6s3aklub75jR0Lw=;
+        b=wGbBUft8vBeSb6zVRzAofKw8iuarNqat4mvQaYG62Mh0nLcwhXSIFD+zNDAMMZ69Qf
+         WDAlvgWEax06TAAY49grdN3IzxFXc/fw5N39p+R4BA3TM0dBJk08K1UG9xXd5C31z+/9
+         FL3TWHhj+ohJ9W3ZDm/7sJ4VjeJtoXZIsZQP7GTXOrGUyzzhHWJAx1ZlNo2m4bl3k5qY
+         bIbjDqP5Jld7TUQGf0GH3YQjUDeCNQpt/rGzCWHC+R98jrAxr8ZxCpBZ9Jz0GPwn0jzF
+         rzE6lWNcGRD74UEo+l6siuf4dgEXlJOCxb2zMmLBYLMBAaoqp7AevIj+VQoNc4+YsxdZ
+         4EyA==
+X-Forwarded-Encrypted: i=1; AJvYcCXJd5lMzcCOc2ePzTfiqXfzrYTsopy3D9DL5C+cfWWyBNzcPaKh6nw5fk+CK6eirpor9VUNVuo3ckPH@vger.kernel.org
+X-Gm-Message-State: AOJu0YzcTVn1ZJICB5Ha4UMJCmqwV6TzCrR9j7C0u010gtLmsBlaDMLt
+	Ip2yFY6Qv5Kpr/YkP/eaRwGltZGJT743LdAqbD/bli/pNvbEHiKVYAEONG9LDOg=
+X-Google-Smtp-Source: AGHT+IFTv9Ec0x1pgYaAzfXLeF4AIIb/MZM5qOa/pOg2VUZq5MjMIBM3l7s9Bf7wq9KEq9mdpqLhRg==
+X-Received: by 2002:adf:f686:0:b0:37d:5232:a963 with SMTP id ffacd0b85a97d-37d5fef48abmr5709371f8f.14.1728920300822;
+        Mon, 14 Oct 2024 08:38:20 -0700 (PDT)
+Received: from localhost.localdomain ([2a09:bac5:50cb:432::6b:93])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37d4b6a8940sm11725913f8f.6.2024.10.14.08.38.19
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Mon, 14 Oct 2024 08:38:20 -0700 (PDT)
+From: Ignat Korchagin <ignat@cloudflare.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Oliver Hartkopp <socketcan@hartkopp.net>,
+	Marc Kleine-Budde <mkl@pengutronix.de>,
+	Alexander Aring <alex.aring@gmail.com>,
+	Stefan Schmidt <stefan@datenfreihafen.org>,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	David Ahern <dsahern@kernel.org>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	linux-bluetooth@vger.kernel.org,
+	linux-can@vger.kernel.org,
+	linux-wpan@vger.kernel.org
+Cc: kernel-team@cloudflare.com,
+	kuniyu@amazon.com,
+	alibuda@linux.alibaba.com,
+	Ignat Korchagin <ignat@cloudflare.com>
+Subject: [PATCH net-next v3 0/9] do not leave dangling sk pointers in pf->create functions
+Date: Mon, 14 Oct 2024 16:37:59 +0100
+Message-Id: <20241014153808.51894-1-ignat@cloudflare.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: miquel.raynal@bootlin.com
+Content-Transfer-Encoding: 8bit
 
-Hi Ignat,
+Some protocol family create() implementations have an error path after
+allocating the sk object and calling sock_init_data(). sock_init_data()
+attaches the allocated sk object to the sock object, provided by the
+caller.
 
-ignat@cloudflare.com wrote on Mon,  7 Oct 2024 22:35:00 +0100:
+If the create() implementation errors out after calling sock_init_data(),
+it releases the allocated sk object, but the caller ends up having a
+dangling sk pointer in its sock object on return. Subsequent manipulations
+on this sock object may try to access the sk pointer, because it is not
+NULL thus creating a use-after-free scenario.
 
-> sock_init_data() attaches the allocated sk object to the provided sock
-> object. If ieee802154_create() fails later, the allocated sk object is
-> freed, but the dangling pointer remains in the provided sock object, which
-> may allow use-after-free.
->=20
-> Clear the sk pointer in the sock object on error.
->=20
-> Signed-off-by: Ignat Korchagin <ignat@cloudflare.com>
+We have implemented a stable hotfix in commit 631083143315
+("net: explicitly clear the sk pointer, when pf->create fails"), but this
+series aims to fix it properly by going through each of the pf->create()
+implementations and making sure they all don't return a sock object with
+a dangling pointer on error.
 
-Reviewed-by: Miquel Raynal <miquel.raynal@bootlin.com>
+Changes in V3:
+  * retargeted the series to net-next
+  * dropped the hotfix patch, which was merged into net already
+  * replaced the hotfix code with DEBUG_NET_WARN_ON_ONCE() to catch future
+    violations
 
-Thanks,
-Miqu=C3=A8l
+Changes in V2:
+  * reverted the change introduced in 6cd4a78d962b ("net: do not leave a
+    dangling sk pointer, when socket creation fails")
+  * added optional commits to all pf->create implementaions to clear the
+    sk pointer on error after sock_init_data()
+
+Ignat Korchagin (9):
+  af_packet: avoid erroring out after sock_init_data() in
+    packet_create()
+  Bluetooth: L2CAP: do not leave dangling sk pointer on error in
+    l2cap_sock_create()
+  Bluetooth: RFCOMM: avoid leaving dangling sk pointer in
+    rfcomm_sock_alloc()
+  net: af_can: do not leave a dangling sk pointer in can_create()
+  net: ieee802154: do not leave a dangling sk pointer in
+    ieee802154_create()
+  net: inet: do not leave a dangling sk pointer in inet_create()
+  net: inet6: do not leave a dangling sk pointer in inet6_create()
+  net: warn, if pf->create does not clear sock->sk on error
+  Revert "net: do not leave a dangling sk pointer, when socket creation
+    fails"
+
+ net/bluetooth/l2cap_sock.c  |  1 +
+ net/bluetooth/rfcomm/sock.c | 10 +++++-----
+ net/can/af_can.c            |  1 +
+ net/core/sock.c             |  3 ---
+ net/ieee802154/socket.c     | 12 +++++++-----
+ net/ipv4/af_inet.c          | 22 ++++++++++------------
+ net/ipv6/af_inet6.c         | 22 ++++++++++------------
+ net/packet/af_packet.c      | 12 ++++++------
+ net/socket.c                |  4 ++--
+ 9 files changed, 42 insertions(+), 45 deletions(-)
+
+-- 
+2.39.5
+
