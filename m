@@ -1,84 +1,62 @@
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from forward203b.mail.yandex.net (forward203b.mail.yandex.net [178.154.239.154])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A707D202640
-	for <linux-wpan@vger.kernel.org>; Wed,  6 Nov 2024 16:53:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65F121E32B6;
+	Fri,  8 Nov 2024 12:48:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730912006; cv=none; b=s9iWHQ69yLTvwoOdq3zGeVcM7dru2DcI4A8kplrd5XCZW31uzCezdgcIX5Of4fEGMFc5jEcPeE3peWHCEqHmtOWwvDt2px13SpnK5Br4G3+NSU7bBgxpsHCB4N+B1HHCIyYdUJYr8lXO+IxEXQl6cwma+G5qQJBYICigPnIzE6g=
+	t=1731070120; cv=none; b=BpshmlwcFlKMtEpbva287PFRZhnY1SgmCK5fensi5kCaauS7uv9le8IqJwoJeYKnNf7EuOXcKVClYMP19S2kl3EF4k5PqhGgFIoa8W41hkEa2roEpeOTNodnpdqBnsbLCvZAIeoo21O5fqdtTElQK1Yg8LkvLVWfECAA1O0LA+M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730912006; c=relaxed/simple;
-	bh=xnQ4Y5OkLDw7+kpBIjjDpj/d4KDArPXb58DSwWlk9/c=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=nNTfUauG4fBvhp5t20ZnXo+clazsXjWapIzAnmUMJYoWwGJjzrNGdgTKKOIts041WelLOJV69wJSMsHvcP3qfyD1GN8v7RuEiZNgIi9dH0ZIUampDB/HEbZoDFN5+hBOG4Fyhr7giFxsJZR8Hz2XdnLkhL9CKebNGw4dPbzDd3I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-3a6b37c6dd4so490345ab.3
-        for <linux-wpan@vger.kernel.org>; Wed, 06 Nov 2024 08:53:24 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730912003; x=1731516803;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=wAuJyuZyW3fwlKbDhzM6Z2xlWYFISeiwXKrwvgPNhqc=;
-        b=OPqGKf4CShaNHchY72CMR4llnvVzyje+/gsRE2Py2prDj7iY23TQHBk4kMui0JLb7O
-         eEqcXjhtkdJLnx+PHIfFqalggzVInT3Yt2t7EejgKRFAGLz9bcFADiuWQF+nglQRkRwh
-         bhzKvltk4bhO/h2m4K/rW9oZvyMlBSpqfS7ZrqW1H9f5UoH0RcfZ5aXNvkwzWVq5TV9l
-         KYe5r9cURMrxrrhOgr4VKGLPaw91TPUkDbtyCzngfZkMRgOoxxIZb4mDdl3eI+WIvwEN
-         TwnczQluOMpHTT7mbQ9cClpuP5owGSvpbKX23zgE13bk7vbvr9KtULxe3dY0OHNWWXoP
-         C1eg==
-X-Forwarded-Encrypted: i=1; AJvYcCXPY8+/n5TSu+aZKa85EBoGE3gaWC4R7FTZ/NMDzDbFIQ3zhGb44eJCwwUonVVahnFRJhYj7Fjyhf4I@vger.kernel.org
-X-Gm-Message-State: AOJu0YzN6STXu+YqkeskwyMz0XMAumKt4dOu6SvC3cU5WLy4LCexVo7p
-	bLVclnTX/FNEQWjpO1zwx12Oij9V2gcb7M95R9BfVye3Zt4InWFChlCJlaLMV4wUSlSlUlM7YR9
-	/DJEoZJCrTMrTq3n3wrUviWP5HGDISGIsG8meSxA+a4s+UKQ6vwMmTIc=
-X-Google-Smtp-Source: AGHT+IHdPpKyWCNZXHoI1XBOWe8fIhCxF9cGjMgOMB/oUdi2ooOGWuK5QOMQ/He+FwMCTi3itzqPKo3pDdjNU1AKn8H67+g7mkQ1
+	s=arc-20240116; t=1731070120; c=relaxed/simple;
+	bh=BrM+QekzMB2T8860EPHWnK0U+ToiG8m9uCbPJhCJYXw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mupp99or/27a+/1U7i3mqONnLlnKLIr1DrBvL5MW1OQsxjkyQ7rShv1qa3nMPMKS8jzX0KwZj4F6RDCw9/XvT+33LQtSSe+3CptUmPfGr4CPOdmedpOfMPLzSL4dWHZ5AJWrSfSt0uOkZ9HTQUHno2S9EVrogJ4+gKToWO0oxcE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=JSY1eLGR; arc=none smtp.client-ip=178.154.239.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="JSY1eLGR"
+Received: from forward103b.mail.yandex.net (forward103b.mail.yandex.net [IPv6:2a02:6b8:c02:900:1:45:d181:d103])
+	by forward203b.mail.yandex.net (Yandex) with ESMTPS id 04C256B738;
+	Fri,  8 Nov 2024 15:42:28 +0300 (MSK)
+Received: from mail-nwsmtp-smtp-production-main-91.sas.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-91.sas.yp-c.yandex.net [IPv6:2a02:6b8:c10:2d9f:0:640:f6ce:0])
+	by forward103b.mail.yandex.net (Yandex) with ESMTPS id EF63B60AA0;
+	Fri,  8 Nov 2024 15:42:18 +0300 (MSK)
+Received: by mail-nwsmtp-smtp-production-main-91.sas.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id HgiwQ5RXpeA0-owJRxKUK;
+	Fri, 08 Nov 2024 15:42:18 +0300
+X-Yandex-Fwd: 1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
+	t=1731069738; bh=1DnT2TQayxFeydxyvNIUVRqNEl2DB4hWlBNBuik8Qns=;
+	h=Message-ID:Date:Cc:Subject:To:From;
+	b=JSY1eLGR1rRtuO+2JScsHIjXXci90Rv07R4roaHf0fBhVUU/hbjRRQ7MYcFxBXwh2
+	 LX5l3Wdl80h8Mh9nVcRkW/f9R1aX7txXA2Qs2tnK2vz94qqZ0TxNORmp96i5N7x2LX
+	 cvTWFhoGMUbCRek2vIAYzAohe80MR1q71Y/4b39Q=
+Authentication-Results: mail-nwsmtp-smtp-production-main-91.sas.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
+From: Dmitry Antipov <dmantipov@yandex.ru>
+To: Alexander Aring <alex.aring@gmail.com>,
+	Stefan Schmidt <stefan@datenfreihafen.org>,
+	Miquel Raynal <miquel.raynal@bootlin.com>
+Cc: linux-wpan@vger.kernel.org,
+	netdev@vger.kernel.org,
+	lvc-project@linuxtesting.org,
+	Dmitry Antipov <dmantipov@yandex.ru>,
+	syzbot+985f827280dc3a6e7e92@syzkaller.appspotmail.com
+Subject: [PATCH] mac802154: fix interface deletion
+Date: Fri,  8 Nov 2024 15:40:51 +0300
+Message-ID: <20241108124051.415090-1-dmantipov@yandex.ru>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1b07:b0:3a5:e5cf:c5b6 with SMTP id
- e9e14a558f8ab-3a5e5cfc68bmr286814735ab.10.1730912003663; Wed, 06 Nov 2024
- 08:53:23 -0800 (PST)
-Date: Wed, 06 Nov 2024 08:53:23 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <672b9f03.050a0220.350062.0276.GAE@google.com>
-Subject: [syzbot] [wpan?] [usb?] BUG: corrupted list in ieee802154_if_remove
-From: syzbot <syzbot+985f827280dc3a6e7e92@syzkaller.appspotmail.com>
-To: alex.aring@gmail.com, davem@davemloft.net, edumazet@google.com, 
-	horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	linux-usb@vger.kernel.org, linux-wpan@vger.kernel.org, 
-	miquel.raynal@bootlin.com, netdev@vger.kernel.org, pabeni@redhat.com, 
-	stefan@datenfreihafen.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hello,
-
-syzbot found the following issue on:
-
-HEAD commit:    557329bcecc2 Merge tag 'mmc-v6.12-rc3' of git://git.kernel..
-git tree:       upstream
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=14a9f740580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=921b01cbfd887a9b
-dashboard link: https://syzkaller.appspot.com/bug?extid=985f827280dc3a6e7e92
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15d76d5f980000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12a9f740580000
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/2b44e0081eb5/disk-557329bc.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/15b6a52c8e11/vmlinux-557329bc.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/ab40912bec45/bzImage-557329bc.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+985f827280dc3a6e7e92@syzkaller.appspotmail.com
-
-------------[ cut here ]------------
+Syzbot has reported the following BUG:
 kernel BUG at lib/list_debug.c:58!
 Oops: invalid opcode: 0000 [#1] PREEMPT SMP KASAN PTI
 CPU: 0 UID: 0 PID: 6277 Comm: syz-executor157 Not tainted 6.12.0-rc6-syzkaller-00005-g557329bcecc2 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
+Hardware name: Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
 RIP: 0010:__list_del_entry_valid_or_report+0xf4/0x140 lib/list_debug.c:56
 Code: e8 a1 7e 00 07 90 0f 0b 48 c7 c7 e0 37 60 8c 4c 89 fe e8 8f 7e 00 07 90 0f 0b 48 c7 c7 40 38 60 8c 4c 89 fe e8 7d 7e 00 07 90 <0f> 0b 48 c7 c7 a0 38 60 8c 4c 89 fe e8 6b 7e 00 07 90 0f 0b 48 c7
 RSP: 0018:ffffc9000490f3d0 EFLAGS: 00010246
@@ -125,44 +103,92 @@ RBP: 00000000000f4240 R08: 0000000000000000 R09: 00000000000000a0
 R10: 0000000000000000 R11: 0000000000000246 R12: 00000000000161b7
 R13: 00007ffec50063bc R14: 00007ffec50063d0 R15: 00007ffec50063c0
  </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:__list_del_entry_valid_or_report+0xf4/0x140 lib/list_debug.c:56
-Code: e8 a1 7e 00 07 90 0f 0b 48 c7 c7 e0 37 60 8c 4c 89 fe e8 8f 7e 00 07 90 0f 0b 48 c7 c7 40 38 60 8c 4c 89 fe e8 7d 7e 00 07 90 <0f> 0b 48 c7 c7 a0 38 60 8c 4c 89 fe e8 6b 7e 00 07 90 0f 0b 48 c7
-RSP: 0018:ffffc9000490f3d0 EFLAGS: 00010246
-RAX: 000000000000004e RBX: dead000000000122 RCX: d211eee56bb28d00
-RDX: 0000000000000000 RSI: 0000000080000000 RDI: 0000000000000000
-RBP: ffff88805b278dd8 R08: ffffffff8174a12c R09: 1ffffffff2852f0d
-R10: dffffc0000000000 R11: fffffbfff2852f0e R12: dffffc0000000000
-R13: dffffc0000000000 R14: dead000000000100 R15: ffff88805b278cc0
-FS:  0000555572f94380(0000) GS:ffff8880b8600000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000056262e4a3000 CR3: 0000000078496000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
 
+Since 'ieee802154_remove_interfaces()' and 'ieee802154_if_remove()' may try
+to process the same 'struct ieee802154_sub_if_data' object concurrently,
+there are two problems:
 
+1) list of 'struct ieee802154_sub_if_data' objects linked via 'interfaces'
+   field of 'struct ieee802154_local' should remain consistent;
+2) 'unregister_netdevice()' should not be called for the same
+   'struct net_device' concurrently.
+
+IIUC RCU can guarantee 1) but not 2), so discard RCU quirks and prefer
+explicit SDATA_STATE_REMOVED flag used via atomic and fully-ordered
+'test_and_set_bit()' to mark 'struct ieee802154_sub_if_data' instance
+which has entered the reclamation.
+
+Reported-by: syzbot+985f827280dc3a6e7e92@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=985f827280dc3a6e7e92
+Fixes: b210b18747cb ("mac802154: move interface del handling in iface")
+Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ net/mac802154/ieee802154_i.h |  6 +++---
+ net/mac802154/iface.c        | 10 +++++++---
+ 2 files changed, 10 insertions(+), 6 deletions(-)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+diff --git a/net/mac802154/ieee802154_i.h b/net/mac802154/ieee802154_i.h
+index 08dd521a51a5..7afcea3447c1 100644
+--- a/net/mac802154/ieee802154_i.h
++++ b/net/mac802154/ieee802154_i.h
+@@ -40,9 +40,8 @@ struct ieee802154_local {
+ 	int open_count;
+ 
+ 	/* As in mac80211 slaves list is modified:
+-	 * 1) under the RTNL
+-	 * 2) protected by slaves_mtx;
+-	 * 3) in an RCU manner
++	 * 1) under the RTNL;
++	 * 2) protected by iflist_mtx.
+ 	 *
+ 	 * So atomic readers can use any of this protection methods.
+ 	 */
+@@ -101,6 +100,7 @@ enum {
+ 
+ enum ieee802154_sdata_state_bits {
+ 	SDATA_STATE_RUNNING,
++	SDATA_STATE_REMOVED,
+ };
+ 
+ /* Slave interface definition.
+diff --git a/net/mac802154/iface.c b/net/mac802154/iface.c
+index c0e2da5072be..700c80e94bb2 100644
+--- a/net/mac802154/iface.c
++++ b/net/mac802154/iface.c
+@@ -669,7 +669,7 @@ ieee802154_if_add(struct ieee802154_local *local, const char *name,
+ 		goto err;
+ 
+ 	mutex_lock(&local->iflist_mtx);
+-	list_add_tail_rcu(&sdata->list, &local->interfaces);
++	list_add_tail(&sdata->list, &local->interfaces);
+ 	mutex_unlock(&local->iflist_mtx);
+ 
+ 	return ndev;
+@@ -683,11 +683,13 @@ void ieee802154_if_remove(struct ieee802154_sub_if_data *sdata)
+ {
+ 	ASSERT_RTNL();
+ 
++	if (test_and_set_bit(SDATA_STATE_REMOVED, &sdata->state))
++		return;
++
+ 	mutex_lock(&sdata->local->iflist_mtx);
+-	list_del_rcu(&sdata->list);
++	list_del(&sdata->list);
+ 	mutex_unlock(&sdata->local->iflist_mtx);
+ 
+-	synchronize_rcu();
+ 	unregister_netdevice(sdata->dev);
+ }
+ 
+@@ -697,6 +699,8 @@ void ieee802154_remove_interfaces(struct ieee802154_local *local)
+ 
+ 	mutex_lock(&local->iflist_mtx);
+ 	list_for_each_entry_safe(sdata, tmp, &local->interfaces, list) {
++		if (test_and_set_bit(SDATA_STATE_REMOVED, &sdata->state))
++			continue;
+ 		list_del(&sdata->list);
+ 
+ 		unregister_netdevice(sdata->dev);
+-- 
+2.47.0
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
