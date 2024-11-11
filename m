@@ -1,55 +1,48 @@
-Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4F321547C6;
-	Mon, 11 Nov 2024 19:36:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0F068468;
+	Mon, 11 Nov 2024 19:41:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731353782; cv=none; b=O1zvkvE/r9kr8oiGueXotGY3suKDZFuFvXpIKRwBvcpgseiJkR3pdHi+euVhNFGhY9a2xA81C+UlMOUR0g7N6Gu1GexUBIg6SuEdmjRrp7YHnMDEh9NwzBnMUfPnWOh6TjpzSuhAbr6UmWtspVVtaGzNMQUYkCiCgk8b6eEYL+c=
+	t=1731354114; cv=none; b=bLUXOeKDYC7e+nBa6hXx9HYr+N3Gaw15R8fdl8DWVHi1oVdzQaf7+fIp6E5Le70hztbG+CWiitYzSTsUIquOCmLiQsU3xV0cVriWVH/xIVW2cTwsVD5aIoNKEpDJAQ7eAgUp8XUhqal7odQ0wN4Ijz19q3s/AfluH3npxq13tMo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731353782; c=relaxed/simple;
-	bh=LnkuvdD0+r7N3sZkQwtrXzagH/HtIkKyubxpFKob8RY=;
+	s=arc-20240116; t=1731354114; c=relaxed/simple;
+	bh=HvtbSZZwW/94hc0yedSvevfCyjQJvBnL2Oi436I266o=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=usmYMxfHmzj4uLxiaL7OoU7mrfpEYP7+AUJYmjqndDq28Q5RD/C56slhfXG5X1zyFarZTXT+imVKuqfgD1uyi7Xbzg82ozRYtUvrKiyn3h8+ZJ70tLM6SYu+aKT5Z+eVfIsv/dDrQfdqcBT5+abTJkqipxysZMCygO8qPZPaY/8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=WTW9Qgm6; arc=none smtp.client-ip=217.70.183.194
+	 MIME-Version:Content-Type; b=lxPGiQoDYgXb1/RiB8aUmNapx9lQyj5N748ayGXaOwQCBttytM6HZwvqXUq6hOKHl99g6JFIut6jCANG40w6Rue4hGbhZHVXB4OA0rgtxRbdMGeEJtcmpezrrCG3pwjwCZKpFsKmSxviuBIdnCea1RG7LihYla0hablokYPtnAo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=O72Npz6G; arc=none smtp.client-ip=217.70.183.196
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="WTW9Qgm6"
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 10E7640003;
-	Mon, 11 Nov 2024 19:36:16 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="O72Npz6G"
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 22980E0004;
+	Mon, 11 Nov 2024 19:41:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1731353777;
+	t=1731354109;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=LnkuvdD0+r7N3sZkQwtrXzagH/HtIkKyubxpFKob8RY=;
-	b=WTW9Qgm6YjBnGCGsfvhxhnQ1JZtj9w4Ouv7kGviu1+vhs57Hr44kapYO1UHDlmb/2nrpzh
-	IsOZ/gG66308+Y2hQXdVnuLmV/ypq/DTzIrUaiD2JenEJuvTmC0Zw0dOHzERNcmo/X4AD/
-	4n6kmH0DcRZeOwl32NCCSfu2Ej2/EX3KKbWhVKHip8O4RMKWeRPoQzf4JUdY5CNLG4GqWq
-	M9nAgi52fxkUV/n7M9PTg7rNvS6367F2pm2KbkTfWFfhuJswhS9ip1lc/dmK3UNhFuyJun
-	OQjG+AThdS42qJHeAO0kIdt2V+0n6ajYjUVsmq0JUY1x3PcsWhfqj6DUTd7XVA==
+	bh=CT6DCB0BsRdVNbP12kPjuQ2yR+q5zf5Qpbswmr5NQcc=;
+	b=O72Npz6GNJpksSqaVGLcoSBRhty5hOtH4TnWqoPv+l0UOIsohr4BLORmzjfsUnGHy7fpIG
+	QYCk4sUycbjJ/IIRoZBXotzHdA4gk39UvT2U7xbZLF7ShV7QmFgREesxWxJaEE/IPThb1S
+	Sv0nd4S3POUWScHPU6bDIEIOfp/rja5Bn24mzEELfKLdQuqmlAWXJAkt/fvfsSe8v7RKrD
+	JBmTa/FxAMkzUynjogVaZzQdgVia3CH1n+sEEmE4ImQHTJuEKO20bYAoPzhtYtyVwNLvKP
+	7z6ynJgxmn/+TInhAB3JBEQ4Am5jQ+zvAcBqj3Y1OVlZpuN3G21oDMZ2mkuZuA==
 From: Miquel Raynal <miquel.raynal@bootlin.com>
-To: Simon Horman <horms@kernel.org>
-Cc: Keisuke Nishimura <keisuke.nishimura@inria.fr>,  Alexander Aring
- <alex.aring@gmail.com>,  Stefan Schmidt <stefan@datenfreihafen.org>,
-  Andrew Lunn <andrew+netdev@lunn.ch>,  "David S. Miller"
- <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Jakub
- Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,
-  linux-wpan@vger.kernel.org,  netdev@vger.kernel.org,  Marcel Holtmann
- <marcel@holtmann.org>
-Subject: Re: [PATCH] ieee802154: ca8210: Add missing check for kfifo_alloc()
- in ca8210_probe()
-In-Reply-To: <20241108133901.GD4507@kernel.org> (Simon Horman's message of
-	"Fri, 8 Nov 2024 13:39:01 +0000")
-References: <20241029182712.318271-1-keisuke.nishimura@inria.fr>
-	<20241104121216.GD2118587@kernel.org>
-	<e004c360-0325-4bab-953d-58376fdbd634@inria.fr>
-	<20241108133901.GD4507@kernel.org>
+To: Dmitry Antipov <dmantipov@yandex.ru>
+Cc: Alexander Aring <alex.aring@gmail.com>,  Stefan Schmidt
+ <stefan@datenfreihafen.org>,  linux-wpan@vger.kernel.org,
+  netdev@vger.kernel.org,  lvc-project@linuxtesting.org,
+  syzbot+985f827280dc3a6e7e92@syzkaller.appspotmail.com
+Subject: Re: [PATCH] mac802154: fix interface deletion
+In-Reply-To: <20241108124051.415090-1-dmantipov@yandex.ru> (Dmitry Antipov's
+	message of "Fri, 8 Nov 2024 15:40:51 +0300")
+References: <20241108124051.415090-1-dmantipov@yandex.ru>
 User-Agent: mu4e 1.12.1; emacs 29.4
-Date: Mon, 11 Nov 2024 20:36:16 +0100
-Message-ID: <874j4dr2a7.fsf@bootlin.com>
+Date: Mon, 11 Nov 2024 20:41:48 +0100
+Message-ID: <87v7wtpngj.fsf@bootlin.com>
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
@@ -60,20 +53,50 @@ Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 X-GND-Sasl: miquel.raynal@bootlin.com
 
-Hello,
+Hello Dmitry,
 
->> > On Tue, Oct 29, 2024 at 07:27:12PM +0100, Keisuke Nishimura wrote:
->> >> ca8210_test_interface_init() returns the result of kfifo_alloc(),
->> >> which can be non-zero in case of an error. The caller, ca8210_probe(),
->> >> should check the return value and do error-handling if it fails.
->> >>
->> >> Fixes: ded845a781a5 ("ieee802154: Add CA8210 IEEE 802.15.4 device dri=
-ver")
+> --- a/net/mac802154/iface.c
+> +++ b/net/mac802154/iface.c
+> @@ -669,7 +669,7 @@ ieee802154_if_add(struct ieee802154_local *local, con=
+st char *name,
+>  		goto err;
+>=20=20
+>  	mutex_lock(&local->iflist_mtx);
+> -	list_add_tail_rcu(&sdata->list, &local->interfaces);
+> +	list_add_tail(&sdata->list, &local->interfaces);
+>  	mutex_unlock(&local->iflist_mtx);
+>=20=20
+>  	return ndev;
+> @@ -683,11 +683,13 @@ void ieee802154_if_remove(struct ieee802154_sub_if_=
+data *sdata)
+>  {
+>  	ASSERT_RTNL();
+>=20=20
+> +	if (test_and_set_bit(SDATA_STATE_REMOVED, &sdata->state))
+> +		return;
+> +
+>  	mutex_lock(&sdata->local->iflist_mtx);
+> -	list_del_rcu(&sdata->list);
+> +	list_del(&sdata->list);
+>  	mutex_unlock(&sdata->local->iflist_mtx);
+>=20=20
+> -	synchronize_rcu();
+>  	unregister_netdevice(sdata->dev);
+>  }
+>=20=20
+> @@ -697,6 +699,8 @@ void ieee802154_remove_interfaces(struct ieee802154_l=
+ocal *local)
+>=20=20
+>  	mutex_lock(&local->iflist_mtx);
+>  	list_for_each_entry_safe(sdata, tmp, &local->interfaces, list) {
+> +		if (test_and_set_bit(SDATA_STATE_REMOVED, &sdata->state))
+> +			continue;
+>  		list_del(&sdata->list);
 
-Stable tag missing.
-
-With this fixed,
-Reviewed-by: Miquel Raynal <miquel.raynal@bootlin.com>
+Why not just enclose this list_del() within a mutex_lock(iflist_mtx)
+like the others? Would probably make more sense and prevent the use of
+yet another protection mechanism? Is there anything preventing the use
+of this mutex here?
 
 Thanks,
 Miqu=C3=A8l
