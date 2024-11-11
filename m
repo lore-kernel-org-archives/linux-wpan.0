@@ -1,48 +1,52 @@
-Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0F068468;
-	Mon, 11 Nov 2024 19:41:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36E3F2AEE0;
+	Mon, 11 Nov 2024 19:47:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731354114; cv=none; b=bLUXOeKDYC7e+nBa6hXx9HYr+N3Gaw15R8fdl8DWVHi1oVdzQaf7+fIp6E5Le70hztbG+CWiitYzSTsUIquOCmLiQsU3xV0cVriWVH/xIVW2cTwsVD5aIoNKEpDJAQ7eAgUp8XUhqal7odQ0wN4Ijz19q3s/AfluH3npxq13tMo=
+	t=1731354426; cv=none; b=QLokDvPnuTKBdY/4YSOSbvL64eCAM4AMYVAcfMXIBtocevmDM20uZkpT/yfqvcvqFvLdKNrGbJzBLFuRhPNp5+YlD5W0E2UkZFPs14KGGoNAh8z1+gWifpkvZ8L+B9Qlbr03huKOmolGs3FwX0bBM9V84b9TeLwcxwpEV+w3ycI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731354114; c=relaxed/simple;
-	bh=HvtbSZZwW/94hc0yedSvevfCyjQJvBnL2Oi436I266o=;
+	s=arc-20240116; t=1731354426; c=relaxed/simple;
+	bh=waIrtis7FuR7Y1TSuVP41KBpxAm+KAfN9/b1pnq4nsI=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=lxPGiQoDYgXb1/RiB8aUmNapx9lQyj5N748ayGXaOwQCBttytM6HZwvqXUq6hOKHl99g6JFIut6jCANG40w6Rue4hGbhZHVXB4OA0rgtxRbdMGeEJtcmpezrrCG3pwjwCZKpFsKmSxviuBIdnCea1RG7LihYla0hablokYPtnAo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=O72Npz6G; arc=none smtp.client-ip=217.70.183.196
+	 MIME-Version:Content-Type; b=pMW8QcLkOkWwh+pmYpW6ES4F7A/viHriUCrKG08kHbH5OUfLcO5c/eUoAIajn4ajqTsiQSEGqwTfVEeFVsudTtTS+8k/+coRHK2jO7UqN5PPhIdTvvI+tFXgATOBVcXhwCCUY6tYox+TIAVSSMDQDjl4RgMeJt3G7gWvvChx5oQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=IL/vZUxi; arc=none smtp.client-ip=217.70.183.193
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="O72Npz6G"
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 22980E0004;
-	Mon, 11 Nov 2024 19:41:48 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="IL/vZUxi"
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 5B446240003;
+	Mon, 11 Nov 2024 19:46:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1731354109;
+	t=1731354420;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=CT6DCB0BsRdVNbP12kPjuQ2yR+q5zf5Qpbswmr5NQcc=;
-	b=O72Npz6GNJpksSqaVGLcoSBRhty5hOtH4TnWqoPv+l0UOIsohr4BLORmzjfsUnGHy7fpIG
-	QYCk4sUycbjJ/IIRoZBXotzHdA4gk39UvT2U7xbZLF7ShV7QmFgREesxWxJaEE/IPThb1S
-	Sv0nd4S3POUWScHPU6bDIEIOfp/rja5Bn24mzEELfKLdQuqmlAWXJAkt/fvfsSe8v7RKrD
-	JBmTa/FxAMkzUynjogVaZzQdgVia3CH1n+sEEmE4ImQHTJuEKO20bYAoPzhtYtyVwNLvKP
-	7z6ynJgxmn/+TInhAB3JBEQ4Am5jQ+zvAcBqj3Y1OVlZpuN3G21oDMZ2mkuZuA==
+	bh=g6LitTWAgz24VNApIoun+JJSEVyh1XHLlrSrHK1MMSQ=;
+	b=IL/vZUxi6rK1Dv1dIs5JYGW4WrA/+dbJ3FQVaSV4YJqsLfSaTj+YXSaX8JvX+3tjU5rL60
+	/JoCG5XACc5Xrv1qyECGgsQNVC5FoYeBGqYjCLD2l3VJefUbeLUUc1AUyHMLdsdHTZKlu3
+	88e7m0P+Jtj6gLDq6Hc78XqewP4yzCff9A4yn1pSPHUi1AaSVxJ3kMPgclBUlEzgaP8kIq
+	UqMODls0FJtTPkkvQN+fuX5mbIKLWRJfljM3KVUq36RS35hs/zHJ3YkCfjLs7bdd2YjQdt
+	P8u3aE+C2sRiZkNq1HjHeEo2klTaEgZNmJ4O9wGoQWfR0HDL7yZ5dy3uXgU8aw==
 From: Miquel Raynal <miquel.raynal@bootlin.com>
-To: Dmitry Antipov <dmantipov@yandex.ru>
-Cc: Alexander Aring <alex.aring@gmail.com>,  Stefan Schmidt
- <stefan@datenfreihafen.org>,  linux-wpan@vger.kernel.org,
-  netdev@vger.kernel.org,  lvc-project@linuxtesting.org,
-  syzbot+985f827280dc3a6e7e92@syzkaller.appspotmail.com
-Subject: Re: [PATCH] mac802154: fix interface deletion
-In-Reply-To: <20241108124051.415090-1-dmantipov@yandex.ru> (Dmitry Antipov's
-	message of "Fri, 8 Nov 2024 15:40:51 +0300")
-References: <20241108124051.415090-1-dmantipov@yandex.ru>
+To: Lizhi Xu <lizhi.xu@windriver.com>
+Cc: <syzbot+985f827280dc3a6e7e92@syzkaller.appspotmail.com>,
+  <alex.aring@gmail.com>,  <davem@davemloft.net>,  <edumazet@google.com>,
+  <horms@kernel.org>,  <kuba@kernel.org>,  <linux-kernel@vger.kernel.org>,
+  <linux-usb@vger.kernel.org>,  <linux-wpan@vger.kernel.org>,
+  <netdev@vger.kernel.org>,  <pabeni@redhat.com>,
+  <stefan@datenfreihafen.org>,  <syzkaller-bugs@googlegroups.com>, Dmitry
+ Antipov <dmantipov@yandex.ru>
+Subject: Re: [PATCH] mac802154: add a check for slave data list before delete
+In-Reply-To: <20241108145420.2445641-1-lizhi.xu@windriver.com> (Lizhi Xu's
+	message of "Fri, 8 Nov 2024 22:54:20 +0800")
+References: <672b9f03.050a0220.350062.0276.GAE@google.com>
+	<20241108145420.2445641-1-lizhi.xu@windriver.com>
 User-Agent: mu4e 1.12.1; emacs 29.4
-Date: Mon, 11 Nov 2024 20:41:48 +0100
-Message-ID: <87v7wtpngj.fsf@bootlin.com>
+Date: Mon, 11 Nov 2024 20:46:57 +0100
+Message-ID: <87msi5pn7y.fsf@bootlin.com>
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
@@ -53,50 +57,127 @@ Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 X-GND-Sasl: miquel.raynal@bootlin.com
 
-Hello Dmitry,
+Hello,
 
-> --- a/net/mac802154/iface.c
-> +++ b/net/mac802154/iface.c
-> @@ -669,7 +669,7 @@ ieee802154_if_add(struct ieee802154_local *local, con=
-st char *name,
->  		goto err;
->=20=20
->  	mutex_lock(&local->iflist_mtx);
-> -	list_add_tail_rcu(&sdata->list, &local->interfaces);
-> +	list_add_tail(&sdata->list, &local->interfaces);
->  	mutex_unlock(&local->iflist_mtx);
->=20=20
->  	return ndev;
-> @@ -683,11 +683,13 @@ void ieee802154_if_remove(struct ieee802154_sub_if_=
-data *sdata)
->  {
->  	ASSERT_RTNL();
->=20=20
-> +	if (test_and_set_bit(SDATA_STATE_REMOVED, &sdata->state))
-> +		return;
-> +
->  	mutex_lock(&sdata->local->iflist_mtx);
-> -	list_del_rcu(&sdata->list);
-> +	list_del(&sdata->list);
->  	mutex_unlock(&sdata->local->iflist_mtx);
->=20=20
-> -	synchronize_rcu();
->  	unregister_netdevice(sdata->dev);
->  }
->=20=20
-> @@ -697,6 +699,8 @@ void ieee802154_remove_interfaces(struct ieee802154_l=
-ocal *local)
->=20=20
->  	mutex_lock(&local->iflist_mtx);
->  	list_for_each_entry_safe(sdata, tmp, &local->interfaces, list) {
-> +		if (test_and_set_bit(SDATA_STATE_REMOVED, &sdata->state))
-> +			continue;
->  		list_del(&sdata->list);
+On 08/11/2024 at 22:54:20 +08, Lizhi Xu <lizhi.xu@windriver.com> wrote:
 
-Why not just enclose this list_del() within a mutex_lock(iflist_mtx)
-like the others? Would probably make more sense and prevent the use of
-yet another protection mechanism? Is there anything preventing the use
-of this mutex here?
+> syzkaller reported a corrupted list in ieee802154_if_remove. [1]
+>
+> Remove an IEEE 802.15.4 network interface after unregister an IEEE 802.15=
+.4
+> hardware device from the system.
+>
+> CPU0					CPU1
+> =3D=3D=3D=3D					=3D=3D=3D=3D
+> genl_family_rcv_msg_doit		ieee802154_unregister_hw
+> ieee802154_del_iface			ieee802154_remove_interfaces
+> rdev_del_virtual_intf_deprecated	list_del(&sdata->list)
+> ieee802154_if_remove
+> list_del_rcu
+
+FYI this is a "duplicate" but with a different approach than:
+https://lore.kernel.org/linux-wpan/87v7wtpngj.fsf@bootlin.com/T/#m02cebe86e=
+c0171fc4d3350676bbdd4a7e3827077
 
 Thanks,
 Miqu=C3=A8l
+
+>
+> Avoid this issue, by adding slave data state bit SDATA_STATE_LISTDONE, set
+> SDATA_STATE_LISTDONE when unregistering the hardware from the system, and
+> add state bit SDATA_STATE_LISTDONE judgment before removing the interface
+> to delete the list.=20
+>
+> [1]
+> kernel BUG at lib/list_debug.c:58!
+> Oops: invalid opcode: 0000 [#1] PREEMPT SMP KASAN PTI
+> CPU: 0 UID: 0 PID: 6277 Comm: syz-executor157 Not tainted 6.12.0-rc6-syzk=
+aller-00005-g557329bcecc2 #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS G=
+oogle 09/13/2024
+> RIP: 0010:__list_del_entry_valid_or_report+0xf4/0x140 lib/list_debug.c:56
+> Code: e8 a1 7e 00 07 90 0f 0b 48 c7 c7 e0 37 60 8c 4c 89 fe e8 8f 7e 00 0=
+7 90 0f 0b 48 c7 c7 40 38 60 8c 4c 89 fe e8 7d 7e 00 07 90 <0f> 0b 48 c7 c7=
+ a0 38 60 8c 4c 89 fe e8 6b 7e 00 07 90 0f 0b 48 c7
+> RSP: 0018:ffffc9000490f3d0 EFLAGS: 00010246
+> RAX: 000000000000004e RBX: dead000000000122 RCX: d211eee56bb28d00
+> RDX: 0000000000000000 RSI: 0000000080000000 RDI: 0000000000000000
+> RBP: ffff88805b278dd8 R08: ffffffff8174a12c R09: 1ffffffff2852f0d
+> R10: dffffc0000000000 R11: fffffbfff2852f0e R12: dffffc0000000000
+> R13: dffffc0000000000 R14: dead000000000100 R15: ffff88805b278cc0
+> FS:  0000555572f94380(0000) GS:ffff8880b8600000(0000) knlGS:0000000000000=
+000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 000056262e4a3000 CR3: 0000000078496000 CR4: 00000000003526f0
+> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> Call Trace:
+>  <TASK>
+>  __list_del_entry_valid include/linux/list.h:124 [inline]
+>  __list_del_entry include/linux/list.h:215 [inline]
+>  list_del_rcu include/linux/rculist.h:157 [inline]
+>  ieee802154_if_remove+0x86/0x1e0 net/mac802154/iface.c:687
+>  rdev_del_virtual_intf_deprecated net/ieee802154/rdev-ops.h:24 [inline]
+>  ieee802154_del_iface+0x2c0/0x5c0 net/ieee802154/nl-phy.c:323
+>  genl_family_rcv_msg_doit net/netlink/genetlink.c:1115 [inline]
+>  genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
+>  genl_rcv_msg+0xb14/0xec0 net/netlink/genetlink.c:1210
+>  netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2551
+>  genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
+>  netlink_unicast_kernel net/netlink/af_netlink.c:1331 [inline]
+>  netlink_unicast+0x7f6/0x990 net/netlink/af_netlink.c:1357
+>  netlink_sendmsg+0x8e4/0xcb0 net/netlink/af_netlink.c:1901
+>  sock_sendmsg_nosec net/socket.c:729 [inline]
+>  __sock_sendmsg+0x221/0x270 net/socket.c:744
+>  ____sys_sendmsg+0x52a/0x7e0 net/socket.c:2607
+>  ___sys_sendmsg net/socket.c:2661 [inline]
+>  __sys_sendmsg+0x292/0x380 net/socket.c:2690
+>  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+>  do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+>  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+>
+> Reported-and-tested-by: syzbot+985f827280dc3a6e7e92@syzkaller.appspotmail=
+.com
+> Closes: https://syzkaller.appspot.com/bug?extid=3D985f827280dc3a6e7e92
+> Signed-off-by: Lizhi Xu <lizhi.xu@windriver.com>
+> ---
+>  net/mac802154/ieee802154_i.h | 1 +
+>  net/mac802154/iface.c        | 4 ++++
+>  2 files changed, 5 insertions(+)
+>
+> diff --git a/net/mac802154/ieee802154_i.h b/net/mac802154/ieee802154_i.h
+> index 08dd521a51a5..6771c0569516 100644
+> --- a/net/mac802154/ieee802154_i.h
+> +++ b/net/mac802154/ieee802154_i.h
+> @@ -101,6 +101,7 @@ enum {
+>=20=20
+>  enum ieee802154_sdata_state_bits {
+>  	SDATA_STATE_RUNNING,
+> +	SDATA_STATE_LISTDONE,
+>  };
+>=20=20
+>  /* Slave interface definition.
+> diff --git a/net/mac802154/iface.c b/net/mac802154/iface.c
+> index c0e2da5072be..aed2fc63395d 100644
+> --- a/net/mac802154/iface.c
+> +++ b/net/mac802154/iface.c
+> @@ -683,6 +683,9 @@ void ieee802154_if_remove(struct ieee802154_sub_if_da=
+ta *sdata)
+>  {
+>  	ASSERT_RTNL();
+>=20=20
+> +	if (test_bit(SDATA_STATE_LISTDONE, &sdata->state))
+> +		return;
+> +
+>  	mutex_lock(&sdata->local->iflist_mtx);
+>  	list_del_rcu(&sdata->list);
+>  	mutex_unlock(&sdata->local->iflist_mtx);
+> @@ -698,6 +701,7 @@ void ieee802154_remove_interfaces(struct ieee802154_l=
+ocal *local)
+>  	mutex_lock(&local->iflist_mtx);
+>  	list_for_each_entry_safe(sdata, tmp, &local->interfaces, list) {
+>  		list_del(&sdata->list);
+> +		set_bit(SDATA_STATE_LISTDONE, &sdata->state);
+>=20=20
+>  		unregister_netdevice(sdata->dev);
+>  	}
