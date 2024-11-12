@@ -1,101 +1,90 @@
-Received: from forward501a.mail.yandex.net (forward501a.mail.yandex.net [178.154.239.81])
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F85120C02B;
-	Tue, 12 Nov 2024 09:11:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AA9E1F77A7;
+	Tue, 12 Nov 2024 11:01:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731402690; cv=none; b=Lt/G/u8Xt6pBY/RmOUt3Az3Bbiqhzjjs6RXWYhCvc6Jy8VNDZtuMCSofZ4qVsgZhNXZh+27i4WZovVOrZ2wVeZbfYBifwRKB3feFM9uwGJBDazw7ilx5sDrWNiClivPixcfC6IRCuqm+9mLE/aHauy4VFhSE8rprW/qdb0GePC4=
+	t=1731409293; cv=none; b=hYqgRMS0iqQxydKRQ58aLloY6SQI9RVCyAryIeZ7aWEtpJ4i8+YTRGgMilxg7SsV4zX8gQX1yvhEZp/JnQwh4VH7PLxZh2lnHEntSn/cRHaZgW6AgTo1k/gbfGOzpqJgK+t5AT2HuECAf9c9in8Ilh2XYze5RURDqoIrGK71fx8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731402690; c=relaxed/simple;
-	bh=3b93khVocMMeVT+rtt18GVq9XmGBbDvPS2abcBoLWMY=;
-	h=Message-ID:Date:MIME-Version:From:To:Cc:References:Subject:
-	 In-Reply-To:Content-Type; b=jO37dpNu8khNk6tkbnUDPN8hFoy1TJwO3i0QbffNsGlh1T1sh0fvEGkTe8E9/ClA6ET6VXiAxSRKuVt04RHJkGeJcyWGQzQ7IxLE/EmOPWuq2ry4sRM76y+gDHZrAXvQ1zC892Th2GQGoHhtx9KhZIi5vx/fXuS+cjWpTUYD/vQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=AGpu0wd/; arc=none smtp.client-ip=178.154.239.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
+	s=arc-20240116; t=1731409293; c=relaxed/simple;
+	bh=A/1yp0LaJZZY/+agPEY0mYZ96StMCvDdlakH86oaiKE=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=JOuCvYc7L8tD2npllVgSSviJ2HC3BsOFZlTipq/bihF7yN3uc1KrCzQC31Z5sv74k7ONNm9FudBNUsomQB6WTpP6STJUwSvy0Y+v7sFfmcfTdK6nQToK6FoQqcCt8GQ1IcG0zm5MRff2wvJWMaDXm7y/E1GfOYglff6BfzyQ1/I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=CUyFtoHF; arc=none smtp.client-ip=217.70.183.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="AGpu0wd/"
-Received: from mail-nwsmtp-smtp-production-main-46.myt.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-46.myt.yp-c.yandex.net [IPv6:2a02:6b8:c12:98e:0:640:650f:0])
-	by forward501a.mail.yandex.net (Yandex) with ESMTPS id 8095A615F2;
-	Tue, 12 Nov 2024 12:11:18 +0300 (MSK)
-Received: by mail-nwsmtp-smtp-production-main-46.myt.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id GBjglJ9OpKo0-xEMzxQYd;
-	Tue, 12 Nov 2024 12:11:17 +0300
-X-Yandex-Fwd: 1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
-	t=1731402677; bh=3b93khVocMMeVT+rtt18GVq9XmGBbDvPS2abcBoLWMY=;
-	h=In-Reply-To:Subject:Cc:Date:References:To:From:Message-ID;
-	b=AGpu0wd/C3e/MjHDHcMPu6zR9OazxuAQYsrNQoF6KAP2zkDxKAwrmLU+offcbeEkF
-	 4dsYT/XViMWkD+JCSRm0WIN6XQcSZ5jQnotPU3xYyzqBexNdcWU6CIp98cvI72d3n/
-	 xcN0pbyk5VbC8NgQp4WrVjLLHoryNAPIL7SQ+xAw=
-Authentication-Results: mail-nwsmtp-smtp-production-main-46.myt.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
-Message-ID: <6f5d9c1c-cc13-47fa-871d-156f33d595a5@yandex.ru>
-Date: Tue, 12 Nov 2024 12:11:16 +0300
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="CUyFtoHF"
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 38001240011;
+	Tue, 12 Nov 2024 11:01:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1731409283;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=osagrrumfDGl8S19V6hpWE8fnqHAIqSNeF5380MEu3w=;
+	b=CUyFtoHF/08sM1eEggzqP7IJe6O8R0TkpW63Bs9QPbEdltpEwqx575feeKDvJIgjExRxu3
+	S58bXqI/Fj8kpAt8YxV2ziwbVUsg4FlPj0VGcqr7rlpTal2QUPme2eDLdB9kA7cURMN91e
+	QE5SagNWrT2yPA7s6OpZS+2GegGVlbaiawgxOYKVCvHX3RkOa5drKDAwjcIsIjpej1LcXp
+	mZcddRk18xaXwz269r4UdXdckjewdoNEExtNIHl50eu0UCwTkrTkTHKj7E3TleHq+VTeYF
+	AWYg+8wZTVjqZz1phg+9KSXGxV8QsyY1eheqFBVjP4mC4by7oORFMmrW9gBXrg==
+From: Miquel Raynal <miquel.raynal@bootlin.com>
+To: Lizhi Xu <lizhi.xu@windriver.com>
+Cc: <alex.aring@gmail.com>,  <davem@davemloft.net>,  <dmantipov@yandex.ru>,
+  <edumazet@google.com>,  <horms@kernel.org>,  <kuba@kernel.org>,
+  <linux-kernel@vger.kernel.org>,  <linux-usb@vger.kernel.org>,
+  <linux-wpan@vger.kernel.org>,  <netdev@vger.kernel.org>,
+  <pabeni@redhat.com>,  <stefan@datenfreihafen.org>,
+  <syzbot+985f827280dc3a6e7e92@syzkaller.appspotmail.com>,
+  <syzkaller-bugs@googlegroups.com>
+Subject: Re: [PATCH] mac802154: add a check for slave data list before delete
+In-Reply-To: <20241112002134.2003089-1-lizhi.xu@windriver.com> (Lizhi Xu's
+	message of "Tue, 12 Nov 2024 08:21:33 +0800")
+References: <87msi5pn7y.fsf@bootlin.com>
+	<20241112002134.2003089-1-lizhi.xu@windriver.com>
+User-Agent: mu4e 1.12.1; emacs 29.4
+Date: Tue, 12 Nov 2024 12:01:21 +0100
+Message-ID: <87a5e4u35q.fsf@bootlin.com>
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Dmitry Antipov <dmantipov@yandex.ru>
-To: Miquel Raynal <miquel.raynal@bootlin.com>
-Cc: Alexander Aring <alex.aring@gmail.com>,
- Stefan Schmidt <stefan@datenfreihafen.org>, linux-wpan@vger.kernel.org,
- netdev@vger.kernel.org, lvc-project@linuxtesting.org,
- syzbot+985f827280dc3a6e7e92@syzkaller.appspotmail.com
-References: <20241108124051.415090-1-dmantipov@yandex.ru>
- <87v7wtpngj.fsf@bootlin.com>
-Content-Language: en-MW
-Autocrypt: addr=dmantipov@yandex.ru; keydata=
- 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
- A/UwwXBRuvydGV0=
-Subject: Re: [PATCH] mac802154: fix interface deletion
-In-Reply-To: <87v7wtpngj.fsf@bootlin.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: miquel.raynal@bootlin.com
 
-On 11/11/24 10:41 PM, Miquel Raynal wrote:
+On 12/11/2024 at 08:21:33 +08, Lizhi Xu <lizhi.xu@windriver.com> wrote:
 
-> Why not just enclose this list_del() within a mutex_lock(iflist_mtx)
-> like the others? Would probably make more sense and prevent the use of
-> yet another protection mechanism? Is there anything preventing the use
-> of this mutex here?
+> On Mon, 11 Nov 2024 20:46:57 +0100, Miquel Raynal wrote:
+>> On 08/11/2024 at 22:54:20 +08, Lizhi Xu <lizhi.xu@windriver.com> wrote:
+>>=20
+>> > syzkaller reported a corrupted list in ieee802154_if_remove. [1]
+>> >
+>> > Remove an IEEE 802.15.4 network interface after unregister an IEEE 802=
+.15.4
+>> > hardware device from the system.
+>> >
+>> > CPU0					CPU1
+>> > =3D=3D=3D=3D					=3D=3D=3D=3D
+>> > genl_family_rcv_msg_doit		ieee802154_unregister_hw
+>> > ieee802154_del_iface			ieee802154_remove_interfaces
+>> > rdev_del_virtual_intf_deprecated	list_del(&sdata->list)
+>> > ieee802154_if_remove
+>> > list_del_rcu
+>>=20
+>> FYI this is a "duplicate" but with a different approach than:
+>> https://lore.kernel.org/linux-wpan/87v7wtpngj.fsf@bootlin.com/T/#m02cebe=
+86ec0171fc4d3350676bbdd4a7e3827077
+> No, my patch was the first to fix it, someone else copied my
+> patch. Here is my patch:
 
-Moreover, if we manage interfaces list with RCU and device status with
-an extra status bit, do we need 'iflist_mtx' at all? I've tried this
-in https://syzkaller.appspot.com/text?tag=Patch&x=17b1f4e8580000 and
-it looks good.
+Ok, so same question as to the other contributor, why not enclosing the
+remaining list_del_rcu() within mutex protection? Can we avoid the
+creation of the LISTDONE state bit?
 
-Dmitry
+Thanks,
+Miqu=C3=A8l
