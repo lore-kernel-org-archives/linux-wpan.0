@@ -1,106 +1,193 @@
-Received: from forward501b.mail.yandex.net (forward501b.mail.yandex.net [178.154.239.145])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC26217B401;
-	Wed, 13 Nov 2024 12:45:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.145
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EC8C1DEFF6;
+	Wed, 13 Nov 2024 12:57:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731501946; cv=none; b=CmKcvuzaLtGXviFowVpCwKjQ7C4IHo0ksZnc9nqkjwctumxK8i4ZG0Bvr9m8Y81aq7VLcJQ80u6bsy6S2Kspw/hTVad0w+wQ6a+N8/BoUiqeOX6cC3Hic4Mma+UmGL9zvVdnBeWc83Kopa0aZIVds6W9XOmzUCVljcEUwmepgtg=
+	t=1731502659; cv=none; b=AMl85MASIoWbZguwvOhIQwJN33wpUg9XrCKoaQZ8RSNnFP+0u8Owe20HPfd6XJzCHxlHEHo9zfqR10eyh3tObksJesYWS3DO+h6sFzbblig+bupqxzZYXPO4PK5piHxVKYHh789LrZZTr9/moF7dbDPlHOk/AKjUGkeX93E4AyE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731501946; c=relaxed/simple;
-	bh=opOR9YZw0CrxnZL8RhalgHFJTGq5vO6cD7H/VXGcPu4=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:From:Subject:
-	 In-Reply-To:Content-Type; b=hH+0TOFZMN3trLVDaDsfinKwpH1J/+8Eck6V65TjtgKq7xYI7uTzNXnKNfF8fO2VjI5U99jMtLq+lJT15lutfhw8DOYMBEpqiEHHNW7pYdkIXXM7WCaYDn0UhnUI0QKlhplPxXhNHtbK9BevpI2Xex/Ox69qjSsBW3qM94ARY4M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=qHIP4Nfy; arc=none smtp.client-ip=178.154.239.145
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
+	s=arc-20240116; t=1731502659; c=relaxed/simple;
+	bh=LGhloGeZIC0Mz+li19UMoWZ/7zMlCQSy38g2HbfQ70Y=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gxF2iVQSO92x5lhc1E8XdrYNxU2w7JgUNuvdvwev+I0eYtED3lm+XK65v1iXRuRmvXm1C2smKLMNym6bYQ6Ogfr0dzYO38J7rzn7VuQ20qz98zmvWtWfzuobFanUJzEHLxRSeMVNAAkGRt63DVo3CkQqTDfEQKhwwcOQaN08CdI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UjzSmDnp; arc=none smtp.client-ip=209.85.210.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="qHIP4Nfy"
-Received: from mail-nwsmtp-smtp-production-main-25.sas.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-25.sas.yp-c.yandex.net [IPv6:2a02:6b8:c1c:2911:0:640:4396:0])
-	by forward501b.mail.yandex.net (Yandex) with ESMTPS id E4A5161F87;
-	Wed, 13 Nov 2024 15:45:40 +0300 (MSK)
-Received: by mail-nwsmtp-smtp-production-main-25.sas.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id ajKC13TOcmI0-xlO3GQTV;
-	Wed, 13 Nov 2024 15:45:39 +0300
-X-Yandex-Fwd: 1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
-	t=1731501939; bh=xzUnup9lsF7Yn/7hev8VMKJhTvZiuEGUzU5++USG4P4=;
-	h=In-Reply-To:Subject:To:From:Cc:Date:References:Message-ID;
-	b=qHIP4Nfy0wnszrh4pBfyv421lwlhJNGBreWoiM0kpM28G/Z2qbrCOznZIX2GycGzN
-	 vfDqz1Lni1rrxFCFjbJA8Vt0WhefcYzAdtaQUdE+z4caRkyGLAYBwjpa3cyXiRtS/s
-	 ZmoCHu1XIv5vQj3SvcYRe4mnpNcmAMTooeOEScyc=
-Authentication-Results: mail-nwsmtp-smtp-production-main-25.sas.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
-Message-ID: <130193b3-6172-4fb0-b799-4e05d676f1dd@yandex.ru>
-Date: Wed, 13 Nov 2024 15:45:36 +0300
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UjzSmDnp"
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-72458c0e0d5so566514b3a.1;
+        Wed, 13 Nov 2024 04:57:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1731502656; x=1732107456; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=16RIG7XtmkaIMsGLfFdWcl8EYTUAA5lDQMgC+uoAVXA=;
+        b=UjzSmDnpwXE41Xd2KIqsEuxJDaBCwJPB9vw19B/xyRF6xOFcSqSaKAJp40KW7kh5R7
+         cGviJWk0qqKbUm0I1JGgUbJNjIMLyorki6ahqU/wECMF+wA/Hw2iAQiCty8MdXW63ZvS
+         QUErb1N4VqXPkPPzwAIbYy9NhIYCCAT226CCmD7lw87FB6ttik9CLKfu+Ya/4mIKyl9u
+         7H0QD/iXMAr7Qwcs75ue/lx6CKTAfmXa53YRwrd3dk3ByN763O54z3WFQxoEwwWysKMp
+         dlLpcO7Fr/OgdUC6ngzwTu/VYst2KAO2QWHNfmQNMstQ7fo7TAKMDWlcEJox9+nHJ5b1
+         UStQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731502656; x=1732107456;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=16RIG7XtmkaIMsGLfFdWcl8EYTUAA5lDQMgC+uoAVXA=;
+        b=bDgfXcmBMoAjJg0urwLHbRFCu/fmt4JVWQwwOpBLS5/uV8AJWzQfon5348Gr6ApSo4
+         098/kU2uYLwDzuh8r8hlssKaA0A9d5AS0+ZS+JnMNhsSyI3nijTv9n20kX3D/29KMyF+
+         Ran/ERc8bXhTY3WGG+RJSELhgAuhPye+i8Uw7uB+2Bkf0q02DpFCpctYASd4XIbEHJ2f
+         UlwDApbqoN71dTEDt3/pZzJAZUTad/+/lzVFmOmMjnPT/TvnQdogB3+tjRQAH3CIeKkP
+         N8StZBrKvyJMFuErurzkuO9ZjNvALiFwevTABFKYxR8snFNtmsefiNx8FExgGCk37Ix6
+         zQNA==
+X-Forwarded-Encrypted: i=1; AJvYcCUGQ8GGbcYOKciM5No/nu6396j6Zsw6JVa1Bj/3k9HQPkMFPK2E5yC1ZOJeZaRHNS7X9Stl4dQ2Dh9LLw==@vger.kernel.org, AJvYcCULqAlWGm82M/N6dBaKZ07eJmp+AhJLgJqYPATY2qJNQEKKT3EB7iwo5ZqOTH/Px/kvZ/Yi/LHANaAM@vger.kernel.org, AJvYcCUoN2RkJt0kQ+ehTQPL+/I1FL8NmRqpPW4VfNVTjLLI6ACjFArx+g0kjXicFzzDKCgw5ZOOp5VWtyuP@vger.kernel.org, AJvYcCUxYmhqf5CGSkZLK5vQxP/zPLK4RDvusawvYt+f5Dhpmgh54LSOB/3SLafBwWxpOxQdJJz5mhcgWN8ZvOHa@vger.kernel.org, AJvYcCVDXeCuiF+Gux+afvyA8i3sfM7ImP5BcZQDR6r3POy404dSCe870SuNaaLOzY98d4I42r56qTih2f4AyaTQ1UNF@vger.kernel.org, AJvYcCVQW5iRhmrkqJtrIfG2U+ehBmrB/SUFZLtJX/La/cPiDWWF9s3vXKDEL41vo42Xqf2SFILZk8Bio3heGCN91gU=@vger.kernel.org, AJvYcCWA8D1JhXYu1/ghOT+HCbrjS6zo09k5NGwm6sC4mfRrHTIKrusWe02MgJo35x63SplZA442zU3dO8z1Xw==@vger.kernel.org, AJvYcCXHXe1n08eySLKK4QSTqCEbJNUKmxJ1cjuohBUWP/YaTomsWxtsbwrgKSMR3rkdb7NVExA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxQFaTOpeCygy+0DYLXCXJ83USyAXqce9F7kLGdDCwaGOD1cmTK
+	iYurcismgEpBx7TOV9mKhtA27ugK7BKKz9TWDhQX66MofB8ttKKTFMED+Ct/VLg=
+X-Google-Smtp-Source: AGHT+IG1llNssb9d3itpdlPx9GEqMX+Zp38UcErZg9PjxNGttUHCL6O3wsgZQ/zCnjJA57EpkRZP1g==
+X-Received: by 2002:a17:90b:2789:b0:2e2:bb32:73e7 with SMTP id 98e67ed59e1d1-2e9b1f844damr30704968a91.15.1731502656393;
+        Wed, 13 Nov 2024 04:57:36 -0800 (PST)
+Received: from nova-ws.. ([103.167.140.11])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e9f3f8ed0esm1398632a91.40.2024.11.13.04.57.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Nov 2024 04:57:35 -0800 (PST)
+From: Xiao Liang <shaw.leon@gmail.com>
+To: netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Donald Hunter <donald.hunter@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Ido Schimmel <idosch@nvidia.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Simon Horman <horms@kernel.org>,
+	Shuah Khan <shuah@kernel.org>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Hangbin Liu <liuhangbin@gmail.com>,
+	linux-rdma@vger.kernel.org,
+	linux-can@vger.kernel.org,
+	osmocom-net-gprs@lists.osmocom.org,
+	bpf@vger.kernel.org,
+	linux-ppp@vger.kernel.org,
+	wireguard@lists.zx2c4.com,
+	linux-wireless@vger.kernel.org,
+	b.a.t.m.a.n@lists.open-mesh.org,
+	bridge@lists.linux.dev,
+	linux-wpan@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v3 0/6] net: Improve netns handling in RTNL and ip_tunnel
+Date: Wed, 13 Nov 2024 20:57:09 +0800
+Message-ID: <20241113125715.150201-1-shaw.leon@gmail.com>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-MW
-To: Miquel Raynal <miquel.raynal@bootlin.com>
-Cc: Lizhi Xu <lizhi.xu@windriver.com>, alex.aring@gmail.com,
- davem@davemloft.net, edumazet@google.com, horms@kernel.org, kuba@kernel.org,
- linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
- linux-wpan@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
- stefan@datenfreihafen.org,
- syzbot+985f827280dc3a6e7e92@syzkaller.appspotmail.com,
- syzkaller-bugs@googlegroups.com
-References: <87a5e4u35q.fsf@bootlin.com>
- <20241112134145.959501-1-lizhi.xu@windriver.com>
- <6ff1052f-76d5-42a4-bf0c-ec587ca4faa4@yandex.ru> <87y11npfhj.fsf@bootlin.com>
-From: Dmitry Antipov <dmantipov@yandex.ru>
-Autocrypt: addr=dmantipov@yandex.ru; keydata=
- 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
- A/UwwXBRuvydGV0=
-Subject: Re: [PATCH] mac802154: add a check for slave data list before delete
-In-Reply-To: <87y11npfhj.fsf@bootlin.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 11/13/24 1:58 PM, Miquel Raynal wrote:
+This patch series includes some netns-related improvements and fixes for
+RTNL and ip_tunnel, to make link creation more intuitive:
 
->> Note https://syzkaller.appspot.com/text?tag=ReproC&x=12a9f740580000 makes an
->> attempt to connect the only device. How this is expected to work if there are
->> more than one device?
-> 
-> Isn't sdata already specific enough? What do you mean by "device"?
+ - Creating link in another net namespace doesn't conflict with link names
+   in current one.
+ - Refector rtnetlink link creation. Create link in target namespace
+   directly. Pass both source and link netns to drivers via newlink()
+   callback.
 
-Well, syzbot's reproducer triggers this issue via USB Raw Gadget API. IIUC this
-is a debugging feature and it is possible to have the only raw gadget device.
-So when running syzbot's reproducer, 'list_count_nodes(&sdata->local->interfaces)'
-is always <= 1. But how this is expected to work for >1 case?
+So that
 
-Dmitry
+  # ip link add netns ns1 link-netns ns2 tun0 type gre ...
+
+will create tun0 in ns1, rather than create it in ns2 and move to ns1.
+And don't conflict with another interface named "tun0" in current netns.
+
+Patch 1 from Donald is included just as a dependency.
+
+---
+
+v3:
+ - Drop "netns_atomic" flag and module parameter. Add netns parameter to
+   newlink() instead, and convert drivers accordingly.
+ - Move python NetNSEnter helper to net selftest lib.
+
+v2:
+ link: https://lore.kernel.org/all/20241107133004.7469-1-shaw.leon@gmail.com/
+ - Check NLM_F_EXCL to ensure only link creation is affected.
+ - Add self tests for link name/ifindex conflict and notifications
+   in different netns.
+ - Changes in dummy driver and ynl in order to add the test case.
+
+v1:
+ link: https://lore.kernel.org/all/20241023023146.372653-1-shaw.leon@gmail.com/
+
+
+Donald Hunter (1):
+  Revert "tools/net/ynl: improve async notification handling"
+
+Xiao Liang (5):
+  net: ip_tunnel: Build flow in underlay net namespace
+  rtnetlink: Lookup device in target netns when creating link
+  rtnetlink: Decouple net namespaces in rtnl_newlink_create()
+  selftests: net: Add python context manager for netns entering
+  selftests: net: Add two test cases for link netns
+
+ drivers/infiniband/ulp/ipoib/ipoib_netlink.c  |  6 ++-
+ drivers/net/amt.c                             |  6 +--
+ drivers/net/bareudp.c                         |  4 +-
+ drivers/net/bonding/bond_netlink.c            |  3 +-
+ drivers/net/can/dev/netlink.c                 |  2 +-
+ drivers/net/can/vxcan.c                       |  4 +-
+ .../ethernet/qualcomm/rmnet/rmnet_config.c    |  5 +-
+ drivers/net/geneve.c                          |  4 +-
+ drivers/net/gtp.c                             |  4 +-
+ drivers/net/ipvlan/ipvlan.h                   |  2 +-
+ drivers/net/ipvlan/ipvlan_main.c              |  5 +-
+ drivers/net/ipvlan/ipvtap.c                   |  4 +-
+ drivers/net/macsec.c                          |  5 +-
+ drivers/net/macvlan.c                         |  5 +-
+ drivers/net/macvtap.c                         |  5 +-
+ drivers/net/netkit.c                          |  4 +-
+ drivers/net/pfcp.c                            |  4 +-
+ drivers/net/ppp/ppp_generic.c                 |  4 +-
+ drivers/net/team/team_core.c                  |  2 +-
+ drivers/net/veth.c                            |  4 +-
+ drivers/net/vrf.c                             |  2 +-
+ drivers/net/vxlan/vxlan_core.c                |  4 +-
+ drivers/net/wireguard/device.c                |  4 +-
+ drivers/net/wireless/virtual/virt_wifi.c      |  5 +-
+ drivers/net/wwan/wwan_core.c                  |  6 ++-
+ include/net/ip_tunnels.h                      |  5 +-
+ include/net/rtnetlink.h                       | 22 ++++++++-
+ net/8021q/vlan_netlink.c                      |  5 +-
+ net/batman-adv/soft-interface.c               |  5 +-
+ net/bridge/br_netlink.c                       |  2 +-
+ net/caif/chnl_net.c                           |  2 +-
+ net/core/rtnetlink.c                          | 25 ++++++----
+ net/hsr/hsr_netlink.c                         |  8 +--
+ net/ieee802154/6lowpan/core.c                 |  5 +-
+ net/ipv4/ip_gre.c                             | 13 +++--
+ net/ipv4/ip_tunnel.c                          | 16 +++---
+ net/ipv4/ip_vti.c                             |  5 +-
+ net/ipv4/ipip.c                               |  5 +-
+ net/ipv6/ip6_gre.c                            | 17 ++++---
+ net/ipv6/ip6_tunnel.c                         | 11 ++---
+ net/ipv6/ip6_vti.c                            | 11 ++---
+ net/ipv6/sit.c                                | 11 ++---
+ net/xfrm/xfrm_interface_core.c                | 13 +++--
+ tools/net/ynl/cli.py                          | 10 ++--
+ tools/net/ynl/lib/ynl.py                      | 49 ++++++++-----------
+ tools/testing/selftests/net/Makefile          |  1 +
+ .../testing/selftests/net/lib/py/__init__.py  |  2 +-
+ tools/testing/selftests/net/lib/py/netns.py   | 18 +++++++
+ tools/testing/selftests/net/netns-name.sh     | 10 ++++
+ tools/testing/selftests/net/netns_atomic.py   | 38 ++++++++++++++
+ 50 files changed, 255 insertions(+), 157 deletions(-)
+ create mode 100755 tools/testing/selftests/net/netns_atomic.py
+
+-- 
+2.47.0
+
