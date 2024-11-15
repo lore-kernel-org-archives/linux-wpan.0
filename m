@@ -1,90 +1,78 @@
-Received: from mx0a-0064b401.pphosted.com (mx0a-0064b401.pphosted.com [205.220.166.238])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51BA61D54FE;
-	Thu, 14 Nov 2024 01:17:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.166.238
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CC5216631C;
+	Fri, 15 Nov 2024 23:35:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731547060; cv=none; b=FUgO9B3/HrvH53Z2UyrSZnaYdwLiOvZOuU2pbLk9SGVkJQHj5E99zK/bS3C42wx5pRhNw/Qvv3gs0vW15O5z1uRycuT+fDAesBn7uYBj5zb9ABRrJPn2Kf/7esT2T968L4yqHSUhbdzt72DMpR/cRUPfMeCC8aWlUWGtCvSnSG8=
+	t=1731713728; cv=none; b=BOv/nfrJNV5J0AB0LdLgzQ9y8Sau2Kuey+i55pi+Xm9GIRRDEI8aBlpqearghPLCezsISwccNrcFhO5VFsAIKw7OQaR6G+FNbev+CP8gQOEDf626oJidpD+msQUMqf37lL4fNVq7d3IkyBbRljd9KP1o4V6viWjbKmPmC3o7HfM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731547060; c=relaxed/simple;
-	bh=o4npxX6gfTKYDKFakWYLsF0YGp/i5nXfFpX5sGLtVPU=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DMbde0OdBpKdgaEcAekwXTS17hvYBATWgJ3TdG/zN7gdSsMSv1joeg34Z119tT9wjuM0LPDphbuKLcB2nhT1S4CQmt87cJzvHPRN83gtof0hTAr0xVBVQbYJYlHYrz+IrqoR8YsCHwkgPWiLYbVRKtOCW/LagUTJZmEQ2NeibMA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=pass smtp.mailfrom=windriver.com; arc=none smtp.client-ip=205.220.166.238
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=windriver.com
-Received: from pps.filterd (m0250810.ppops.net [127.0.0.1])
-	by mx0a-0064b401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4AE0dgSs018597;
-	Wed, 13 Nov 2024 17:17:13 -0800
-Received: from ala-exchng01.corp.ad.wrs.com (ala-exchng01.wrs.com [147.11.82.252])
-	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 42uwpmjtb9-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Wed, 13 Nov 2024 17:17:13 -0800 (PST)
-Received: from ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) by
- ala-exchng01.corp.ad.wrs.com (147.11.82.252) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.43; Wed, 13 Nov 2024 17:17:12 -0800
-Received: from pek-lpd-ccm6.wrs.com (147.11.136.210) by
- ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) with Microsoft SMTP Server id
- 15.1.2507.43 via Frontend Transport; Wed, 13 Nov 2024 17:17:08 -0800
-From: Lizhi Xu <lizhi.xu@windriver.com>
-To: <lizhi.xu@windriver.com>
-CC: <alex.aring@gmail.com>, <davem@davemloft.net>, <dmantipov@yandex.ru>,
-        <edumazet@google.com>, <horms@kernel.org>, <kuba@kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-usb@vger.kernel.org>,
-        <linux-wpan@vger.kernel.org>, <miquel.raynal@bootlin.com>,
-        <netdev@vger.kernel.org>, <pabeni@redhat.com>,
-        <stefan@datenfreihafen.org>,
-        <syzbot+985f827280dc3a6e7e92@syzkaller.appspotmail.com>,
-        <syzkaller-bugs@googlegroups.com>
-Subject: Re: [PATCH] mac802154: add a check for slave data list before delete
-Date: Thu, 14 Nov 2024 09:17:08 +0800
-Message-ID: <20241114011708.3420819-1-lizhi.xu@windriver.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20241114010025.3390836-1-lizhi.xu@windriver.com>
-References: <20241114010025.3390836-1-lizhi.xu@windriver.com>
+	s=arc-20240116; t=1731713728; c=relaxed/simple;
+	bh=+0nSqXJMNPJie6Agi0DCflpUksVQqJLNIcznPm67J68=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=pzWJtHq4vv1JbdBbp338G1ATWPxqT0zYhS6MQQ4nBW+a/ydVEA9MP3/VTKSYZdcc8+inR/P3q6DWGf6KtTB4OerM4ajRPMUUzczEFZEQKCcT4h6WyuAAwwuUcJphUvZPdxme75H0BwZKTO4JvJCpePHYHIS2Xi4c4f0qQ1c9+r0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SWd4Fyxc; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SWd4Fyxc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 018E7C4CECF;
+	Fri, 15 Nov 2024 23:35:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731713727;
+	bh=+0nSqXJMNPJie6Agi0DCflpUksVQqJLNIcznPm67J68=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=SWd4Fyxcy6vkPAs/DoAyKv+eu9nnqiy9VDr1E7w6DAOPjGk3sTNyu3CQVJ1ftQ1Vl
+	 KQx7V76ZwBrflcMdU07dZ08pvCiVuMniy4GhDYMkJ/3vahjg0pawSvaX+3JhHfGywU
+	 5B5tE+7wI6tq8XfAriVL28lj/YBhGHcMmGeFVzCIrjSd9YzsgSS8omaH0MLx3DWaMn
+	 /8V/Hup5AfF5QtyTL3sde4ia3ZIuFa+PC0Cl0GrtcqcB8u0C+PbGN/aNnGXfwN1oRZ
+	 wKyFrTPI/2pLhWCxOGsAbPXDBSZL+32gxSUIudNzbcxe8lV0SDX6LcluNtG1LiyPmb
+	 wMVTTXTFPHQrg==
+Date: Fri, 15 Nov 2024 15:35:26 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Xiao Liang <shaw.leon@gmail.com>
+Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, Kuniyuki
+ Iwashima <kuniyu@amazon.com>, Donald Hunter <donald.hunter@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Ido
+ Schimmel <idosch@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>, Simon
+ Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>, Jiri Pirko
+ <jiri@resnulli.us>, Hangbin Liu <liuhangbin@gmail.com>,
+ linux-rdma@vger.kernel.org, linux-can@vger.kernel.org,
+ osmocom-net-gprs@lists.osmocom.org, bpf@vger.kernel.org,
+ linux-ppp@vger.kernel.org, wireguard@lists.zx2c4.com,
+ linux-wireless@vger.kernel.org, b.a.t.m.a.n@lists.open-mesh.org,
+ bridge@lists.linux.dev, linux-wpan@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v3 4/6] rtnetlink: Decouple net namespaces in
+ rtnl_newlink_create()
+Message-ID: <20241115153526.3582ebcd@kernel.org>
+In-Reply-To: <20241113125715.150201-5-shaw.leon@gmail.com>
+References: <20241113125715.150201-1-shaw.leon@gmail.com>
+	<20241113125715.150201-5-shaw.leon@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: qUHfnZFI8ih3WUYLQIHO0ADb1963tMNQ
-X-Authority-Analysis: v=2.4 cv=ZdlPNdVA c=1 sm=1 tr=0 ts=67354f99 cx=c_pps a=/ZJR302f846pc/tyiSlYyQ==:117 a=/ZJR302f846pc/tyiSlYyQ==:17 a=VlfZXiiP6vEA:10 a=edf1wS77AAAA:8 a=1qqy2SNDD57gUU2HqXEA:9 a=DcSpbTIhAlouE1Uv7lRv:22
-X-Proofpoint-ORIG-GUID: qUHfnZFI8ih3WUYLQIHO0ADb1963tMNQ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-11-13_17,2024-11-13_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 bulkscore=0
- adultscore=0 mlxlogscore=550 clxscore=1015 impostorscore=0
- lowpriorityscore=0 phishscore=0 mlxscore=0 priorityscore=1501 spamscore=0
- suspectscore=0 classifier=spam authscore=0 adjust=0 reason=mlx scancount=1
- engine=8.21.0-2409260000 definitions=main-2411140007
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, 14 Nov 2024 09:00:25 +0800, Lizhi Xu wrote:
-> On Wed, 13 Nov 2024 13:29:55 +0300, Dmitry Antipov wrote:
-> > On 11/12/24 4:41 PM, Lizhi Xu wrote:
-> >
-> > >   	mutex_lock(&sdata->local->iflist_mtx);
-> > > +	if (list_empty(&sdata->local->interfaces)) {
-> > > +		mutex_unlock(&sdata->local->iflist_mtx);
-> > > +		return;
-> > > +	}
-> > >   	list_del_rcu(&sdata->list);
-> > >   	mutex_unlock(&sdata->local->iflist_mtx);
-> >
-> > Note https://syzkaller.appspot.com/text?tag=ReproC&x=12a9f740580000 makes an
-> > attempt to connect the only device. How this is expected to work if there are
-> > more than one device?
-> There are two locks (rtnl and iflist_mtx) to protection and synchronization
-> local->interfaces, so no need to worry about multiple devices.
-In other words, this case is a race between removing the 802154 master
-and the user sendmsg actively deleting the slave.
-Then when the master is removed, there is no need to execute the latter to
-remove the slave, because all the slave devices have been deleted when the
-master device is removed..
+On Wed, 13 Nov 2024 20:57:13 +0800 Xiao Liang wrote:
+> +/**
+> + *	struct rtnl_link_nets - net namespace context of newlink.
+> + *
+> + *	@src_net: Source netns of rtnetlink socket
+> + *	@link_net: Link netns by IFLA_LINK_NETNSID, NULL if not specified.
+> + */
+> +struct rtnl_link_nets {
+> +	struct net *src_net;
+> +	struct net *link_net;
+> +};
 
-Lizhi
+Let's not limit ourselves to passing just netns via this struct.
+Let's call it rtnl_newlink_args or params.
+
+The first patch of the series got merged independently so you'll
+need to respin.
+-- 
+pw-bot: cr
