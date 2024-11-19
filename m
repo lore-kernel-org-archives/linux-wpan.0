@@ -1,89 +1,66 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from proxima.lasnet.de (proxima.lasnet.de [78.47.171.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEB7D13775E;
-	Tue, 19 Nov 2024 03:07:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CEF91876;
+	Tue, 19 Nov 2024 10:15:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.47.171.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731985623; cv=none; b=J/nYG2R5emdrf/B6Qxy3Dl2KSYZ4F9NsyllYHkj7yoySGJR7DnYpoPij/1OiRvUaD+7+RsN3Mk2Fe3116qE2u/q0oL0QshQqpQvBEZiBqGmp9S4Tl9TJs9gSJ+wjbd+WZO1Irjked3EPtpg5MZXfnx2PwkrIcT8JwpVf0UCHdyk=
+	t=1732011307; cv=none; b=qc0F9PdF1XF7VL9jTXuhE656MzXt5L6ZgMHQlxMsIz9fKqVrmpAyaRA2HFko7+4VKMeLIaeb/2slIf72Nl9vo0KNS1WyKP8Q+yWcYntsnAN3wjwfeRCgurjugx+3F1P2hHH35Ub6FE8zQaeD2UAnXftI0wL9IEusDN3nFQDUVCc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731985623; c=relaxed/simple;
-	bh=PGoG8fEB7llM322/jpcOwn3LGAi0gafsk5SM9vL39KQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=H9KUdDdg2Pywl0c/wAu2E7DH5nMKCEX8sNTgvGUmZ/DWaNLS+RDwx9R/DRSGoVlKnr9uib+00w3veqmIB97V8s7WNkAk2YMIr03I8FHs3J45z8Km4wqwr6mRNvA6Gl9VV940/X9STBtscGXroR0mjpZ3XmSFmzGBhnVJ2yyKl18=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oGWzVf9f; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oGWzVf9f"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AAD48C4CECF;
-	Tue, 19 Nov 2024 03:07:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731985622;
-	bh=PGoG8fEB7llM322/jpcOwn3LGAi0gafsk5SM9vL39KQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=oGWzVf9fm47IURqF82sBjxlSLSQaSxQvnftln+sAaadyrOaTpKmG1QB1++Q+XtGq2
-	 iqnrNBO0CyTqqEwlU/q+011kC2hwIrbq/6K0SGXImw3qfRg1+XKGoOsssJ5vIMkYcz
-	 Z6YQRFxP4izqrZoqEbsdoy+taGRJqRWgfpsrekJKESn6nbT7e6NOHGhh6GN5IbeTmn
-	 lzthFeg7CnYNFnEs0XFbrLEZd2ql/Jl9IGwusT5cDv1Qr6Psf8Q5n6XqbkH/peqmPn
-	 uwk0TjN/tbOC/IkQ2CmF/L5xISUzVUBpQQlxdujGCk9lYUVk7IvT7QmP1ZZAPQtMkX
-	 AVNlOOjcQBmSw==
-Date: Mon, 18 Nov 2024 19:07:00 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Xiao Liang <shaw.leon@gmail.com>
-Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, Kuniyuki
- Iwashima <kuniyu@amazon.com>, Donald Hunter <donald.hunter@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Ido
- Schimmel <idosch@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>, Simon
- Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>, Jiri Pirko
- <jiri@resnulli.us>, Hangbin Liu <liuhangbin@gmail.com>,
- linux-rdma@vger.kernel.org, linux-can@vger.kernel.org,
- osmocom-net-gprs@lists.osmocom.org, bpf@vger.kernel.org,
- linux-ppp@vger.kernel.org, wireguard@lists.zx2c4.com,
- linux-wireless@vger.kernel.org, b.a.t.m.a.n@lists.open-mesh.org,
- bridge@lists.linux.dev, linux-wpan@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v4 0/5] net: Improve netns handling in RTNL and
- ip_tunnel
-Message-ID: <20241118190700.4c1b8156@kernel.org>
-In-Reply-To: <20241118143244.1773-1-shaw.leon@gmail.com>
-References: <20241118143244.1773-1-shaw.leon@gmail.com>
+	s=arc-20240116; t=1732011307; c=relaxed/simple;
+	bh=adwGfsilUMi3V5aZhM2GAj65SgLVx75+TCUVrp+qcyc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=hHf6uaBmpOyUbNRQyVrEzzOXdduig3LAKE0GAFIGJanfwpmq4hw7c5+1wwsAgOxyP/+aWe3DJ/LWI0MnR0rdXtdcHRhlOJWIcSDPxl4B7dWQ8yPvJFOc+CEZlif7SyLjRtMrUSLReTyU3Y539Ams+Ntz0C1Od+tcmDiZoeMST4E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=datenfreihafen.org; spf=pass smtp.mailfrom=datenfreihafen.org; arc=none smtp.client-ip=78.47.171.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=datenfreihafen.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=datenfreihafen.org
+Received: from localhost.localdomain (unknown [45.118.184.53])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: stefan@sostec.de)
+	by proxima.lasnet.de (Postfix) with ESMTPSA id 8C16EC08A3;
+	Tue, 19 Nov 2024 11:07:09 +0100 (CET)
+From: Stefan Schmidt <stefan@datenfreihafen.org>
+To: Alexander Aring <alex.aring@gmail.com>,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Keisuke Nishimura <keisuke.nishimura@inria.fr>
+Cc: Stefan Schmidt <stefan@datenfreihafen.org>,
+	linux-wpan@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH] ieee802154: ca8210: Add missing check for kfifo_alloc() in ca8210_probe()
+Date: Tue, 19 Nov 2024 11:06:46 +0100
+Message-ID: <173201035742.581024.16670824289268407863.b4-ty@datenfreihafen.org>
+X-Mailer: git-send-email 2.47.0
+In-Reply-To: <20241029182712.318271-1-keisuke.nishimura@inria.fr>
+References: <20241029182712.318271-1-keisuke.nishimura@inria.fr>
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-On Mon, 18 Nov 2024 22:32:39 +0800 Xiao Liang wrote:
-> This patch series includes some netns-related improvements and fixes for
-> RTNL and ip_tunnel, to make link creation more intuitive:
+Hello Keisuke Nishimura.
+
+On Tue, 29 Oct 2024 19:27:12 +0100, Keisuke Nishimura wrote:
+> ca8210_test_interface_init() returns the result of kfifo_alloc(),
+> which can be non-zero in case of an error. The caller, ca8210_probe(),
+> should check the return value and do error-handling if it fails.
 > 
->  - Creating link in another net namespace doesn't conflict with link names
->    in current one.
->  - Refector rtnetlink link creation. Create link in target namespace
->    directly. Pass both source and link netns to drivers via newlink()
->    callback.
 > 
-> So that
-> 
->   # ip link add netns ns1 link-netns ns2 tun0 type gre ...
-> 
-> will create tun0 in ns1, rather than create it in ns2 and move to ns1.
-> And don't conflict with another interface named "tun0" in current netns.
 
-## Form letter - net-next-closed
+Applied to wpan/wpan.git, thanks!
 
-The merge window for v6.13 has begun and net-next is closed for new drivers,
-features, code refactoring and optimizations. We are currently accepting
-bug fixes only.
+[1/1] ieee802154: ca8210: Add missing check for kfifo_alloc() in ca8210_probe()
+      https://git.kernel.org/wpan/wpan/c/2c87309ea741
 
-Please repost when net-next reopens after Dec 2nd.
-
-RFC patches sent for review only are welcome at any time.
-
-See: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#development-cycle
--- 
-pw-bot: defer
-
+regards,
+Stefan Schmidt
