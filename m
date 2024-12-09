@@ -1,84 +1,200 @@
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 603A413D29A
-	for <linux-wpan@vger.kernel.org>; Sat,  7 Dec 2024 16:12:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.69
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F62435971;
+	Mon,  9 Dec 2024 14:02:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733587948; cv=none; b=Oopt2+5UKd4SU/vDAYCwfuxKUKaruaBoKC2cTlhWEET/GviOxAVnTv6rS+WdrgEz4mymKqqOG6A64P2wLRANQl6rM67edC1JKvKuD0dQM3GqfcFeOtIKbxkZmrMJ4Cly1gkEw8d4ejHGfTn7QsLCWOt//9N2lsbsj2Npy0qiocA=
+	t=1733752950; cv=none; b=Lz+3oGG15a7YMNKobOSXtZ0zVd2DWFloBdr31RSN6TLFP/gKqg/jpdJG8dFmZ5HZR9xgm9vd9xmWS5plCh2tGaiSXs8yH4M8ls9L61o2OsUoKSSz0IjMYn7582rkbbtAY5e9ALIMjhmseDgj2EG1V3vpRDljiEcXrqpluD7S0Ew=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733587948; c=relaxed/simple;
-	bh=BM0qNEKyoqiw5u8Eq/oGv7Qwv3jU51gvmnBUjHvD21M=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=MX3TLUEa/MBUwBB8xnhvKQIeDNHGvlt1xZaMTtuGkLHkuFCcQqpNnDfXoyG9MTKwIIJFR/W/bDg5xDPiSxAsT1gowKPICzHI/KUDjWwD5Jh9h9S+dHUYE2FEeU581iJanH3YhGZiTeuPruuUseZX+rGxhQWy3e5mazBUwBgFsr4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-8418307b4f9so323276339f.1
-        for <linux-wpan@vger.kernel.org>; Sat, 07 Dec 2024 08:12:27 -0800 (PST)
+	s=arc-20240116; t=1733752950; c=relaxed/simple;
+	bh=03xiu9pYOCrdNfcv/qw+gwiZHTNUJB2+YIld69kTu/Y=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hYRgf5hx29N50KuLNLiVN89h/etY7Dcf5MY0SZPfjXCiRNzHcC66qbPdOFMVZitH/J1KY/hPl7eVYyfcnFKeO0hHc2G/rrujEi2f2hFUPe/gvHxDdF44M9VJ+eoaycnWquvD55Y/OjdnAq3O7Tfto8b6Ecfte3gHmOF0PRyrzHk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Zo1QlyJu; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zo1QlyJu"
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-2165448243fso9431105ad.1;
+        Mon, 09 Dec 2024 06:02:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1733752948; x=1734357748; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=OAhPp2pGpsvDTqVI2eQ221kABd4Y8/kh7k1mWyeQzTw=;
+        b=Zo1QlyJu+XBbTOO3w8tdc1A3K2lJwyV/8N78TenKl/WSv6/43Mh7ynbcJQrT7vuJEB
+         VZit3+tvX2NY/mI42fkzQoSLYEW3NT/9F2egqk0KFHPOCbC6N0K6X1e1r586nvaa2Yng
+         Btx9WB9mwHnpmkyoB5eUWqQz1r8gNo4MmlxqhoGWoJapaff6XG/oBURLapB2gsYB/yKZ
+         dE44RyCUSMneeMPQYUhg3wpdx73MVunOvpT+K+ThEnmI1lwrGGZqg3ybUXBJFkSr/h4U
+         Y58cYcTR3OdBAR09eBO3kUrvEIbxNMdIPybE1boYdMKyQEzLCqKzPX43Qe7DNxizHkFz
+         tmOw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733587946; x=1734192746;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=NrkbXyO1gWQb08Qbhw9tuE++tiqxf0uwJSolasA1Xvo=;
-        b=fiq1NC8xIKilvf4y0qVtzRanxnE7SbYp01nZ6yIJqBHx11qgVJs5qc2joaxO9Vk2FT
-         D1NXVf5p9N9XJ49hDp0YaD+gD1Y0T+KqHTTSfq2kY2soPg8BxP93L1HT59+q8gLMv41z
-         gynv7SFMOJWpQ7OXOAg4wFnjspGzxixB8AW3EQ2OxxQ5ZkVwYzEO2OFuGOf+xKk1+d+x
-         NjO6aPVWPqECB3JLrF+WFT5DDHPFsXCV9/OAIic9Kob2/SY6yvWLCEepUQnOdRX5JSPk
-         dNoZu7hbTYoQfhbIz+i9kYfcvHpiXQDb0Vpz23XOVoM0JchUEbETsSI//q4bvwlA4iYp
-         GwTg==
-X-Forwarded-Encrypted: i=1; AJvYcCVcKKN2etf1jHQpHe0/SNimMs6s0TF9mqo8PQI/NMdyL3dnCxEGhBAmFlTur4S8hivUye7vGUq+Z+Xy@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyp0D2VTbajaF6fC2qQmia/Zt67RfREWkmaHt7+rl1h/kc5fdyw
-	7As18MCAOq6XSRVPXIlBFst/TSwE9cNDFwx3+kKSdhKh3Jr0Dd1znOh71hd3oLciNeIKzpyciRG
-	im3JX+Xda5nk1hbVIe/1bdTpu5qps7eBoirYRJ6qc8qbf53jc+CH+i3I=
-X-Google-Smtp-Source: AGHT+IEZvxHxO79IMt43jnaEdxnKpXMfM/Z9I2CvNRBeP7EJ7AX8ZUHeQbrJi/5uV4buEbpFDP73/EVVEsOs/FkrIU3QxTpW4/wp
+        d=1e100.net; s=20230601; t=1733752948; x=1734357748;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=OAhPp2pGpsvDTqVI2eQ221kABd4Y8/kh7k1mWyeQzTw=;
+        b=viUPrGf0LTdi2fKoIcPWM6KEiBrdjAbXkS7TyclAjmP5uaG4ASY5zbYncggROaOgWz
+         AIw17krdv5HlX91kMP1v+AIBVIim3dVPaeaFFcatxTlkOc7xTmJ77ajDjTyKEPiAlppx
+         zmrkbLl+PeVfhrQp+nUKzNfIWgtMfE4mQ6i1JIcNtV2mWpYfgVxtQG1D0lgRmQJVpSqh
+         W0O12xyCmoMV58k/ErBXZrHNaN/Oi2yBDxaqAUDAcmIGfec3xLoHBizX1v5Sn1GXovm9
+         4B39Klvm5eZXO9t7QX8IbcGmpXafpZSFaz5vHWZi4cJC6DoEwm1dnL87dpL8WpRQlDJM
+         1KBA==
+X-Forwarded-Encrypted: i=1; AJvYcCU0lTN3rPXi3GK74dAIoY+HvFm2QvDwqGRWibMh3iUyvuK8z9AtURRUTg1XrQuiJXnjuv8=@vger.kernel.org, AJvYcCU8zqng2OpiE4vF46u6tgfE0IiNPcMXclVlVkGR1a+l2E49IxSxOGK9HnZuHwVBiSrjexlQ5ZQ3yHq65Q==@vger.kernel.org, AJvYcCUut6kck6f7uekoEuNhbB+dMXd4pNcViDq+Xt0z+Q8bXjY7AGzwurKu4Li2rsGWmP6tjSNyIfrzWmq7TQP5@vger.kernel.org, AJvYcCVP5UPLy/lrrB+k231xlOjSzzsrEL0VSPAVimVEzQjKEQ/XekITzjBmddfFmNxRv/TASU7ctTSdh71Y/RzR0L0=@vger.kernel.org, AJvYcCVd87fNDyW6jeItN+eFfXEW3vY78KV05tGRUWfG9kTW6ptS8j/vAaplk4MDQEKUzcDSeX5OC+JV4nTE@vger.kernel.org, AJvYcCWTDJdpCu/thTEae5mrZaHodfTkRkdESIjSKkYYkKoRpfV/+9PCLlK2oEgK3i7dL4jYVNVRZD3V496uhQ==@vger.kernel.org, AJvYcCWeqcqxbgFTCL/2FbBgD0RIawwsIUdaUc2OKMjU+fCcVtNOn9m/DBpyoN0iGN/3OqPuZxVlUKEDKrEXlgFvknQ7@vger.kernel.org, AJvYcCWqr0rJjQoksMWKY1Rbp3RDMyUZRfRqzepzLYxuDUwdOaX9FHMMlL0gQ/5MaK0vHTR23IENwoaeUsqI@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx8Y2iJ6sjZX0kqTyUavxQoPxS+LN7DE9T4BpL9iEH9f/ZtlDxe
+	rLO+azhVPQKKYXayWI/Qo+U7nTHa64llceccduYhdUFZpeV1Kak8TIpUMdOfvnY=
+X-Gm-Gg: ASbGncvT4vtOE3nJYWZzhvSf/xsuFhmXbmcOEWuKpbAgae6Dtc/WY1q/zZw8yw65iFq
+	iKlooPPJE1cc+grS0rKaoCVdrpa6+rL3OLTctBwB56koLbRtTofkzdn/tI47k2OzxPdzkYrWssN
+	l1rLpC/5ElH0lmP34DMBWD1BhwE6hOmp+UecQ22yxrj7uuDyI4AMtai07Xx7Gzj0RVTPJLHlzQU
+	PcQbXKemkhmX2sceCS4pjKPmq2SUWmtwOqPqNfYvIfqTQ4=
+X-Google-Smtp-Source: AGHT+IEziqjANISe8V7T1b1Vo9dS8nge43qoErTxjCtNhfTplDp9qnHGPIzO4tjQCtyFccSJFTBRCw==
+X-Received: by 2002:a17:902:e74f:b0:216:4122:925f with SMTP id d9443c01a7336-21641229442mr90363145ad.14.1733752948110;
+        Mon, 09 Dec 2024 06:02:28 -0800 (PST)
+Received: from nova-ws.. ([103.167.140.11])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-216221db645sm49605645ad.46.2024.12.09.06.02.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Dec 2024 06:02:26 -0800 (PST)
+From: Xiao Liang <shaw.leon@gmail.com>
+To: netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Donald Hunter <donald.hunter@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Ido Schimmel <idosch@nvidia.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Simon Horman <horms@kernel.org>,
+	Shuah Khan <shuah@kernel.org>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Hangbin Liu <liuhangbin@gmail.com>,
+	linux-rdma@vger.kernel.org,
+	linux-can@vger.kernel.org,
+	osmocom-net-gprs@lists.osmocom.org,
+	bpf@vger.kernel.org,
+	linux-ppp@vger.kernel.org,
+	wireguard@lists.zx2c4.com,
+	linux-wireless@vger.kernel.org,
+	b.a.t.m.a.n@lists.open-mesh.org,
+	bridge@lists.linux.dev,
+	linux-wpan@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v5 0/5] net: Improve netns handling in RTNL and ip_tunnel
+Date: Mon,  9 Dec 2024 22:01:46 +0800
+Message-ID: <20241209140151.231257-1-shaw.leon@gmail.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a92:c249:0:b0:3a7:bc2a:2522 with SMTP id
- e9e14a558f8ab-3a811d915demr65071415ab.7.1733587946625; Sat, 07 Dec 2024
- 08:12:26 -0800 (PST)
-Date: Sat, 07 Dec 2024 08:12:26 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <675473ea.050a0220.a30f1.015a.GAE@google.com>
-Subject: [syzbot] Monthly wpan report (Dec 2024)
-From: syzbot <syzbot+list298a2131cad081a6c900@syzkaller.appspotmail.com>
-To: alex.aring@gmail.com, linux-kernel@vger.kernel.org, 
-	linux-wpan@vger.kernel.org, miquel.raynal@bootlin.com, netdev@vger.kernel.org, 
-	stefan@datenfreihafen.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hello wpan maintainers/developers,
+This patch series includes some netns-related improvements and fixes for
+RTNL and ip_tunnel, to make link creation more intuitive:
 
-This is a 31-day syzbot report for the wpan subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/wpan
+ - Creating link in another net namespace doesn't conflict with link names
+   in current one.
+ - Refector rtnetlink link creation. Create link in target namespace
+   directly. Pass both source and link netns to drivers via newlink()
+   callback.
 
-During the period, 2 new issues were detected and 0 were fixed.
-In total, 5 issues are still open and 25 have already been fixed.
+So that
 
-Some of the still happening issues:
+  # ip link add netns ns1 link-netns ns2 tun0 type gre ...
 
-Ref Crashes Repro Title
-<1> 120     Yes   KMSAN: uninit-value in ieee802154_hdr_push (2)
-                  https://syzkaller.appspot.com/bug?extid=60a66d44892b66b56545
-<2> 4       No    KASAN: global-out-of-bounds Read in mac802154_header_create (2)
-                  https://syzkaller.appspot.com/bug?extid=844d670c418e0353c6a8
-<3> 4       No    WARNING in __dev_change_net_namespace (3)
-                  https://syzkaller.appspot.com/bug?extid=3344d668bbbc12996d46
+will create tun0 in ns1, rather than create it in ns2 and move to ns1.
+And don't conflict with another interface named "tun0" in current netns.
 
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
+v5:
+ - Fix function doc in batman-adv.
+ - Include peer_net in rtnl newlink parameters.
 
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
+v4:
+ link: https://lore.kernel.org/all/20241118143244.1773-1-shaw.leon@gmail.com/
+ - Pack newlink() parameters to a single struct.
+ - Use ynl async_msg_queue.empty() in selftest.
 
-You may send multiple commands in a single email message.
+v3:
+ link: https://lore.kernel.org/all/20241113125715.150201-1-shaw.leon@gmail.com/
+ - Drop "netns_atomic" flag and module parameter. Add netns parameter to
+   newlink() instead, and convert drivers accordingly.
+ - Move python NetNSEnter helper to net selftest lib.
+
+v2:
+ link: https://lore.kernel.org/all/20241107133004.7469-1-shaw.leon@gmail.com/
+ - Check NLM_F_EXCL to ensure only link creation is affected.
+ - Add self tests for link name/ifindex conflict and notifications
+   in different netns.
+ - Changes in dummy driver and ynl in order to add the test case.
+
+v1:
+ link: https://lore.kernel.org/all/20241023023146.372653-1-shaw.leon@gmail.com/
+
+
+Xiao Liang (5):
+  net: ip_tunnel: Build flow in underlay net namespace
+  rtnetlink: Lookup device in target netns when creating link
+  rtnetlink: Decouple net namespaces in rtnl_newlink_create()
+  selftests: net: Add python context manager for netns entering
+  selftests: net: Add two test cases for link netns
+
+ drivers/infiniband/ulp/ipoib/ipoib_netlink.c  | 11 +++--
+ drivers/net/amt.c                             | 13 +++---
+ drivers/net/bareudp.c                         | 11 +++--
+ drivers/net/bonding/bond_netlink.c            |  8 ++--
+ drivers/net/can/dev/netlink.c                 |  4 +-
+ drivers/net/can/vxcan.c                       |  9 ++--
+ .../ethernet/qualcomm/rmnet/rmnet_config.c    | 11 +++--
+ drivers/net/geneve.c                          | 11 +++--
+ drivers/net/gtp.c                             |  9 ++--
+ drivers/net/ipvlan/ipvlan.h                   |  4 +-
+ drivers/net/ipvlan/ipvlan_main.c              | 11 +++--
+ drivers/net/ipvlan/ipvtap.c                   |  7 ++-
+ drivers/net/macsec.c                          | 11 +++--
+ drivers/net/macvlan.c                         |  8 ++--
+ drivers/net/macvtap.c                         |  8 ++--
+ drivers/net/netkit.c                          |  9 ++--
+ drivers/net/pfcp.c                            |  8 ++--
+ drivers/net/ppp/ppp_generic.c                 | 10 +++--
+ drivers/net/team/team_core.c                  |  7 +--
+ drivers/net/veth.c                            |  9 ++--
+ drivers/net/vrf.c                             |  7 +--
+ drivers/net/vxlan/vxlan_core.c                | 11 +++--
+ drivers/net/wireguard/device.c                |  8 ++--
+ drivers/net/wireless/virtual/virt_wifi.c      | 10 +++--
+ drivers/net/wwan/wwan_core.c                  | 15 +++++--
+ include/net/ip_tunnels.h                      |  5 ++-
+ include/net/rtnetlink.h                       | 44 ++++++++++++++++---
+ net/8021q/vlan_netlink.c                      | 11 +++--
+ net/batman-adv/soft-interface.c               | 12 ++---
+ net/bridge/br_netlink.c                       |  8 ++--
+ net/caif/chnl_net.c                           |  6 +--
+ net/core/rtnetlink.c                          | 35 ++++++++-------
+ net/hsr/hsr_netlink.c                         | 14 +++---
+ net/ieee802154/6lowpan/core.c                 |  9 ++--
+ net/ipv4/ip_gre.c                             | 27 ++++++++----
+ net/ipv4/ip_tunnel.c                          | 16 ++++---
+ net/ipv4/ip_vti.c                             | 10 +++--
+ net/ipv4/ipip.c                               | 10 +++--
+ net/ipv6/ip6_gre.c                            | 28 +++++++-----
+ net/ipv6/ip6_tunnel.c                         | 16 +++----
+ net/ipv6/ip6_vti.c                            | 15 +++----
+ net/ipv6/sit.c                                | 16 +++----
+ net/xfrm/xfrm_interface_core.c                | 14 +++---
+ tools/testing/selftests/net/Makefile          |  1 +
+ .../testing/selftests/net/lib/py/__init__.py  |  2 +-
+ tools/testing/selftests/net/lib/py/netns.py   | 18 ++++++++
+ tools/testing/selftests/net/netns-name.sh     | 10 +++++
+ tools/testing/selftests/net/netns_atomic.py   | 39 ++++++++++++++++
+ 48 files changed, 385 insertions(+), 211 deletions(-)
+ create mode 100755 tools/testing/selftests/net/netns_atomic.py
+
+-- 
+2.47.1
+
