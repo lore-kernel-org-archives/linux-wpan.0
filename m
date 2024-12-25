@@ -1,110 +1,113 @@
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48B6D1FAC26;
-	Thu, 19 Dec 2024 05:54:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70BB0182;
+	Wed, 25 Dec 2024 01:24:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734587685; cv=none; b=ruu0/ap8rVbmHHO1qx5nIYZjryt9iwShIpFhSdpTUMDzl36/TGaJgO09i7EUIG+P6GCy07Fk+ijvUT3L5ARxqeO1jCvi8AHXMUtQ5QMzAflEF0eY8ArQugAM7Xb/CVwNKkzA+3blUo4gBru/Y/ifB1HnKBSuDTnLEpaZF8fKgu8=
+	t=1735089885; cv=none; b=UPeLAhBX6vScYijX8gmOf3SG5buWfO5KxD+QAP3JR2qB1oX74qaEpPZ3rf+qeAMMTvFcTAeazEAUXTncj/zw7/x/xHvQLUKFSGPGFsP74c+EE1ixshTwc+7uj1KMBKX5+Vc4E8UU/TcAELoz08QqWXKsn/07wQ11KlyLvzyVl3I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734587685; c=relaxed/simple;
-	bh=VsNY71lG5lYULBvFXVp0KhrDlqgduRP+ORPVKzySpuo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=a4TG8q2+fM+C1GGV8wDPlnogH8WkLThbfP4//vTctqqkUP/XcGXbDjb0KMptYl3zCV1EeKuncOboS1JwqfNFcVKrngKDNHO3voZ6AP0e0ji4qUR2bfuSIQR4CL4n8oeJyMNTmaR/7gvyKamgkA+jDvPgWsKVY23t1gGot2D32Pk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DlvsVA+w; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1735089885; c=relaxed/simple;
+	bh=hKaf7lIuqNPc3ZB9WeQq9vNqcHXHsrVNlgn6L7OdGdo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lXz+/gHYk01Q+hvm2SZyVN0DndOe77/An/bLbM0uNYBs/zVAPknyANYuLF8Gg/L+o+A1PltVmfGkuZohPbk1XpQ0HrRq/yMPtfLkpotHo75+gaHaBVb31Pf/7queb8l7bRKiizFac/OyLFnkeh+n7VEhmEn4tPWalwWyyQDjurs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=bPCfM0oa; arc=none smtp.client-ip=46.235.229.95
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DlvsVA+w"
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-4361f664af5so4374875e9.1;
-        Wed, 18 Dec 2024 21:54:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1734587681; x=1735192481; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZfCpfOoSh8ogvEFAzzK5Sh/fDzaPC/IoHjTWRLgy2Xc=;
-        b=DlvsVA+wXI6i1KZT9lm7VOFI7czigiGhZADLOrnKSV9b0EIZkwsKPjMCneGSwuWDNt
-         tqSzzXqZLPu/ECOYzRmlJMx5TxWB50zZtgcQYQwd00cCAAqit7VeMa0yS9/3VjGpDH7I
-         aXHKaysIBOGFkpqv0A/T9dOWYLdk1i1eyf5oypzdcnQK5xxmnibQdENbKYeDBYrtv6zg
-         bFXv9iGDXju6rmkqMIIhNGHPPfYld1g1CnkPcw2RNERa6hqxFIMHoo3nlwPQBOAKXOlm
-         JwwRtlm7CHhEXquivsuy+qSh/XNDxr4FJU/feblYVePstfyNOuwfH+sZaj9J2SWprcVX
-         8QYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734587681; x=1735192481;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZfCpfOoSh8ogvEFAzzK5Sh/fDzaPC/IoHjTWRLgy2Xc=;
-        b=QEtqVhzAQ/htuy3UdwVCI9wz3xFSH/YZXUrq2ssfztulmKLlACSaMMcYwM1EksIK9W
-         rYTwqSsxc5STOXr/GMXKoD2xlw5fjFC2w//CSxPt2UsLML//475E6H2C187VXx80Thbo
-         DY1oYvPhcixJaMigAabuLYtFCWhtbMMcaG4MCJvv8F8q8gdT4nOY0dhoKTvk9Fiypg3c
-         YQlrHRD1CPUyfS23ywQDl++xhhjIR+fdrpr05UNwHipUh/NsdDa0FCaxNJudmECJ+IT/
-         XTygTtRpvjGyEo7rDLwiIIaIoWo1AfjJtzKH21C1sG9XKu7BrRgYRo4nqwrdQKrubQ0z
-         77cw==
-X-Forwarded-Encrypted: i=1; AJvYcCVE5bHAOCx/Ir+omCK/lQzi9/AKeI0MfusOWgeR8jU+pdzKacdpBqgrlyFxpUJHrkK+9VCPvpSeWvAzbA==@vger.kernel.org, AJvYcCVfBhM8rQsUyVYa1/0G4Q6wp5MY/j2NipK6zBW3dmMuj9Fcmju2sH6onzKzvNS72pAkR1z9qwDRzfJDbsn+jEc=@vger.kernel.org, AJvYcCW1U7pZvhGGMm/7WhY7P0Uja0Gqr3SGChRplnFcA5Mnc0co6IRs2eaDfxQziT0P+NgsCglEV7sWGljH@vger.kernel.org, AJvYcCWIy/bZ8E3sgs4RrDQ8cBVzi2jTtq0DxvDbnX7FO0St5MnqI5hOD45D0T5FMgSsAcPaPt9CTKUoqL1rZCOWyPTi@vger.kernel.org, AJvYcCWxKszMr7PTK+BCVN9NRxXreNBPFmpMU/QlfJ8eCyCxBtRTcS8hjeC+3tUB6CLOCd6AhQ7szXXmsIV/uOBw@vger.kernel.org, AJvYcCWxP9c4je4LN3uGv9+iTmdoCKXhZeduAAE1sqFi/3AB7nJoIgQ0bWahIo7hEOohoqw8JKc=@vger.kernel.org, AJvYcCX1P+Q3cTk3NwKYPdVvgMl++Wq3l10sZDSv/rGv7Cd/HTqSulNgLTAuN19s3+vxOqsdnmI3BBCsrZpo@vger.kernel.org, AJvYcCXwrBTBjEvqf6JEMth4HSrxTjXzxMoE49szMpq2a5xxZ7BgpIw+xe4CgB/7BjOvpEICioeyAzbGKH7UMQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwcLyNPLdbpZd06rIRvErliYm7TJ5cL/U+sTDGKIVSqQMEtWluS
-	mniKrys5qq8zNEK5vI6G2dzGh15CwMP1wQ1ychhjB3Q1xPIEjdQ8HBtahJ1nmQON4xs/q7yxMFY
-	kxeS0V+KHWYS+n7HUtE/jMhTqUIU=
-X-Gm-Gg: ASbGncuEH4Xw7pYcaU7E0g48nMEwu7wJLKkQNK6vE4KRklbTj3MkfvV2crG3Qz+XCJX
-	SiJ6VFiibV4z6q0c0KXLQrKNndFVw3dcRLZoj
-X-Google-Smtp-Source: AGHT+IFXswhNY3wf74HiVRQ6mWtI+LQ0dYPzH2WDbrTkg0k3vCjw9PHsmFSj9uux2yKPzKWzDIYRJF3gX8R2i5iXHRM=
-X-Received: by 2002:a05:600c:4ed2:b0:434:f7ea:fb44 with SMTP id
- 5b1f17b1804b1-4365535c6a3mr52447275e9.14.1734587681279; Wed, 18 Dec 2024
- 21:54:41 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="bPCfM0oa"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
+	; s=bytemarkmx; h=MIME-Version:Message-ID:Date:Subject:From:Content-Type:From
+	:Subject; bh=MTGyQnrnGUuBrgjv5kbsHz5k8pWZRa+UBdMpaL41sqw=; b=bPCfM0oadqAG3mne
+	kmXngdlKed61OG7qP9UWCRTebyYLZauJgqsFZ/IG432UuSfC2G3E3lZ3j3YJi9vfubNj9I19vGDwt
+	+fGnYBgDAeHW9bWTF7rqSdKuPJ72TZJaW4Xlc7aNUlQS3dcajGBFnsH7CHF2x4aAgd5UkBlIYUzx9
+	i2fDjlKHyWaLhrMwJ8Bl83QhaGe/GqHlh2M+H0/SIuBOIXHDXlym355seh+xmLc9T2Xh2bTxXhDa1
+	17L/eLKwVabOOhaNzn240kWU1q0Kwrn83+hg3Trr3MgO5EmoL8KWErMilYlky0IGHl+buUYDwLZSQ
+	Z8FRFPTZejw1lq4dYA==;
+Received: from localhost ([127.0.0.1] helo=dalek.home.treblig.org)
+	by mx.treblig.org with esmtp (Exim 4.96)
+	(envelope-from <linux@treblig.org>)
+	id 1tQG8N-0073eA-2t;
+	Wed, 25 Dec 2024 01:24:23 +0000
+From: linux@treblig.org
+To: alex.aring@gmail.com,
+	stefan@datenfreihafen.org,
+	miquel.raynal@bootlin.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	linux-wpan@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	"Dr. David Alan Gilbert" <linux@treblig.org>
+Subject: [RFC net-next] net: mac802154: Remove unused ieee802154_mlme_tx_one
+Date: Wed, 25 Dec 2024 01:24:23 +0000
+Message-ID: <20241225012423.439229-1-linux@treblig.org>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241218130909.2173-1-shaw.leon@gmail.com> <20241218130909.2173-12-shaw.leon@gmail.com>
- <20241218153759.672b7014@kernel.org>
-In-Reply-To: <20241218153759.672b7014@kernel.org>
-From: Xiao Liang <shaw.leon@gmail.com>
-Date: Thu, 19 Dec 2024 13:54:03 +0800
-Message-ID: <CABAhCORszq9ao3OCVW-1EBsxsnLxbQ096eV+cbs12Es2HvCgUA@mail.gmail.com>
-Subject: Re: [PATCH net-next v6 11/11] selftests: net: Add test cases for link
- and peer netns
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	Kuniyuki Iwashima <kuniyu@amazon.com>, Donald Hunter <donald.hunter@gmail.com>, 
-	Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>, 
-	David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, 
-	Ido Schimmel <idosch@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>, Jiri Pirko <jiri@resnulli.us>, 
-	Hangbin Liu <liuhangbin@gmail.com>, linux-rdma@vger.kernel.org, 
-	linux-can@vger.kernel.org, osmocom-net-gprs@lists.osmocom.org, 
-	bpf@vger.kernel.org, linux-ppp@vger.kernel.org, wireguard@lists.zx2c4.com, 
-	linux-wireless@vger.kernel.org, b.a.t.m.a.n@lists.open-mesh.org, 
-	bridge@lists.linux.dev, linux-wpan@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Thu, Dec 19, 2024 at 7:38=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Wed, 18 Dec 2024 21:09:09 +0800 Xiao Liang wrote:
-> >  - Add test for creating link in another netns when a link of the same
-> >    name and ifindex exists in current netns.
-> >  - Add test to verify that link is created in target netns directly -
-> >    no link new/del events should be generated in link netns or current
-> >    netns.
-> >  - Add test cases to verify that link-netns is set as expected for
-> >    various drivers and combination of namespace-related parameters.
->
-> Nice work!
->
-> You need to make sure all the drivers the test is using are enabled by
-> the selftest kernel config: tools/testing/selftests/net/config
->
-> This may be helpful:
-> https://github.com/linux-netdev/nipa/wiki/How-to-run-netdev-selftests-CI-=
-style#how-to-build
+From: "Dr. David Alan Gilbert" <linux@treblig.org>
 
-Thanks for pointing it out. And vng is really cool. I will add
-the missing config in the next version.
+ieee802154_mlme_tx_one() was added in 2022 by
+commit ddd9ee7cda12 ("net: mac802154: Introduce a synchronous API for MLME
+commands") but has remained unused.
 
-> --
-> pw-bot: cr
+Remove it.
+
+Note, there's still a ieee802154_mlme_tx_one_locked()
+variant that is used.
+
+Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
+---
+ net/mac802154/ieee802154_i.h |  3 ---
+ net/mac802154/tx.c           | 13 -------------
+ 2 files changed, 16 deletions(-)
+
+diff --git a/net/mac802154/ieee802154_i.h b/net/mac802154/ieee802154_i.h
+index 08dd521a51a5..8f2bff268392 100644
+--- a/net/mac802154/ieee802154_i.h
++++ b/net/mac802154/ieee802154_i.h
+@@ -194,9 +194,6 @@ int ieee802154_mlme_tx_locked(struct ieee802154_local *local,
+ 			      struct ieee802154_sub_if_data *sdata,
+ 			      struct sk_buff *skb);
+ void ieee802154_mlme_op_post(struct ieee802154_local *local);
+-int ieee802154_mlme_tx_one(struct ieee802154_local *local,
+-			   struct ieee802154_sub_if_data *sdata,
+-			   struct sk_buff *skb);
+ int ieee802154_mlme_tx_one_locked(struct ieee802154_local *local,
+ 				  struct ieee802154_sub_if_data *sdata,
+ 				  struct sk_buff *skb);
+diff --git a/net/mac802154/tx.c b/net/mac802154/tx.c
+index 337d6faf0d2a..4d13f18f6f2c 100644
+--- a/net/mac802154/tx.c
++++ b/net/mac802154/tx.c
+@@ -178,19 +178,6 @@ void ieee802154_mlme_op_post(struct ieee802154_local *local)
+ 	ieee802154_release_queue(local);
+ }
+ 
+-int ieee802154_mlme_tx_one(struct ieee802154_local *local,
+-			   struct ieee802154_sub_if_data *sdata,
+-			   struct sk_buff *skb)
+-{
+-	int ret;
+-
+-	ieee802154_mlme_op_pre(local);
+-	ret = ieee802154_mlme_tx(local, sdata, skb);
+-	ieee802154_mlme_op_post(local);
+-
+-	return ret;
+-}
+-
+ int ieee802154_mlme_tx_one_locked(struct ieee802154_local *local,
+ 				  struct ieee802154_sub_if_data *sdata,
+ 				  struct sk_buff *skb)
+-- 
+2.47.1
+
