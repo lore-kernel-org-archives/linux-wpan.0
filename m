@@ -1,77 +1,96 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0C6C184F;
-	Sun,  5 Jan 2025 01:50:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D06F0158DD8;
+	Mon,  6 Jan 2025 12:39:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736041812; cv=none; b=GskWFl3g9RO4iVj1Wae3MzdavzdNBRBF++Ujm0gfOeQR4WrNjS/SG6Zarw4ewZzLFHdimJZoHSy5QjO6RlytTakorywjioDwlBm8sKxKkY6ke8eV1jsBrodXJW/xOonhAjaQh3BbfDy8DoeiAPVLbzaH0fcmTUnBgPP+lw3i6Fc=
+	t=1736167175; cv=none; b=Cj721qcBqQuq1c0VevDtGNerNFHa+HeNaUgQcCjksRmyAIaYI90H5rMfv+FPXpDTRRVSvPOfm8AygsmPvetZpw4jD08l7SHxCInDhUHP+fGQehXP95l27wHcFScIptHgdrrOXairPCv6UNz28wxUFQfQubXNi/CzRmDhIwXmZpo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736041812; c=relaxed/simple;
-	bh=fHsK3Juz2eebVci9ayXiUNBsoGNnMe3IgVMzlGIZCto=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=B8kPvOG7Oh248C3UX2noEbBIQQmrTHtM4A4/NTA+RmAV/vZzs+60fndQ5QhO0MvMX8JO/wQOa8YxKEY00cRGCTHLqAc4NF2fz0mpyDI1Lhopms92YPpRX18qY0EEFbCzhh00eu9kxgW8Z5RIhdC5NSL1gKwrZsOoCCpLhbk8EKA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D4Xer+J6; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1736167175; c=relaxed/simple;
+	bh=tzGD0pqACbmGcYthf+ZPKDGjYEgWIHP3/sZnHCbYKkI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pZt0QRwXK65noHbva2PSkHb2oqgXvbCEJbDHoyRX3I3+2eN8zGLCGG8yXBsWZVwvUPGT5JC/3/dJJ5JDCrsfJrDiWvwBPweW/sl/HVzDzKjeGQxGUfVk7U5B+ywNWIdWefyrxeiH/dDfWZ/PESchsM3cKA61KJ9wa37sX8O1+AA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=DH/DdVsC; arc=none smtp.client-ip=46.235.229.95
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D4Xer+J6"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2FFDEC4CED1;
-	Sun,  5 Jan 2025 01:50:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736041812;
-	bh=fHsK3Juz2eebVci9ayXiUNBsoGNnMe3IgVMzlGIZCto=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=D4Xer+J6bpii8+UxwCQjOtG/P/FeDdUJ8QXKHiEcz+dhbqbBo6I7sxmGYxzyzw0v7
-	 vWVkoVruFu1YeLKP81GNm7yluOEuxfs8k8c2aWQCnY8WJ+YjbU8ZTOP25VVNHfXVlG
-	 uHOedQbIKFf6HqMTSSQFP5nOIqdQnMDL0drRXHoBvw89QacLUPgeVoTjD+osddaMty
-	 /u67Ra+DGuZv+ZbQD4veBwI4B9tXXXgDB5A+2jVw+Kc1LZPDpJrWRN3NPEQpNlHGB2
-	 wMwmeEXvHqLjDDeJIlfUmHVxP+6yXC27ZiSLXZWX50PjF1diNjwsHHPBFW1iuJAfw+
-	 /XgDhAzVzxeew==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33B2B380A96F;
-	Sun,  5 Jan 2025 01:50:34 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="DH/DdVsC"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
+	; s=bytemarkmx; h=Content-Type:MIME-Version:Message-ID:Subject:From:Date:From
+	:Subject; bh=MZSs4WxxKTQVijRga2eJlG9YqFLSRLxeN1q+dZjSaN0=; b=DH/DdVsCsol27MP1
+	pB62e4bXMTBzeNsnkpJyAhzMf3mN/PcvdrO4IeBsg40zbLqV6vssWZRqnj0wAE/zztJNHr4+V4PFG
+	+eUG3OUc2LirmeKP/0be5N1cpN8LPbt7TqUQ4TOArY/m0KWmCvWwAU6BdxKlMLAYAUkoqT8SOyiSc
+	a+vCLt4MxWuvH/l7vpn0JZVmJFtnAtiqQGwyBdxWjk3ehBH1lYOhWDTmk1Uu0UHTcNDWbCcKippiO
+	Aj9usVd2SUJGgnjVR1NzKEO3hLEJ8I2oE9pZwz8Cyt/ox62UXKPYSA3dEQkvV3eyXMRaHe9H38xB0
+	PgSyfaKGq/vShPmI1g==;
+Received: from dg by mx.treblig.org with local (Exim 4.96)
+	(envelope-from <dg@treblig.org>)
+	id 1tUmO4-008L9D-2P;
+	Mon, 06 Jan 2025 12:39:16 +0000
+Date: Mon, 6 Jan 2025 12:39:16 +0000
+From: "Dr. David Alan Gilbert" <linux@treblig.org>
+To: Stefan Schmidt <stefan@datenfreihafen.org>
+Cc: alex.aring@gmail.com, miquel.raynal@bootlin.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	horms@kernel.org, linux-wpan@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [RFC net-next] net: mac802154: Remove unused
+ ieee802154_mlme_tx_one
+Message-ID: <Z3vO9NAThqOM1kdM@gallifrey>
+References: <20241225012423.439229-1-linux@treblig.org>
+ <173557391812.3760501.8550596228761441624.b4-ty@datenfreihafen.org>
+ <Z3LcEIO8cRAHUUsG@gallifrey>
+ <409c1c7c-dbee-4c10-acbe-4aca98ac720c@datenfreihafen.org>
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: pull-request: ieee802154-next 2025-01-03
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173604183274.2530845.4792479222536964181.git-patchwork-notify@kernel.org>
-Date: Sun, 05 Jan 2025 01:50:32 +0000
-References: <20250103154605.440478-1-stefan@datenfreihafen.org>
-In-Reply-To: <20250103154605.440478-1-stefan@datenfreihafen.org>
-To: Stefan Schmidt <stefan@datenfreihafen.org>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- linux-wpan@vger.kernel.org, alex.aring@gmail.com, miquel.raynal@bootlin.com,
- netdev@vger.kernel.org
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <409c1c7c-dbee-4c10-acbe-4aca98ac720c@datenfreihafen.org>
+X-Chocolate: 70 percent or better cocoa solids preferably
+X-Operating-System: Linux/6.1.0-21-amd64 (x86_64)
+X-Uptime: 12:38:59 up 242 days, 23:53,  1 user,  load average: 0.00, 0.00,
+ 0.00
+User-Agent: Mutt/2.2.12 (2023-09-09)
 
-Hello:
-
-This pull request was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Fri,  3 Jan 2025 16:46:05 +0100 you wrote:
-> Hello Dave, Jakub, Paolo.
+* Stefan Schmidt (stefan@datenfreihafen.org) wrote:
+> Hello Dave,
 > 
-> An update from ieee802154 for your *net-next* tree:
+> On 30.12.24 18:44, Dr. David Alan Gilbert wrote:
+> > * Stefan Schmidt (stefan@datenfreihafen.org) wrote:
+> > > Hello linux@treblig.org.
+> > > 
+> > > On Wed, 25 Dec 2024 01:24:23 +0000, linux@treblig.org wrote:
+> > > > ieee802154_mlme_tx_one() was added in 2022 by
+> > > > commit ddd9ee7cda12 ("net: mac802154: Introduce a synchronous API for MLME
+> > > > commands") but has remained unused.
+> > > > 
+> > > > Remove it.
+> > > > 
+> > > > Note, there's still a ieee802154_mlme_tx_one_locked()
+> > > > variant that is used.
+> > > > 
+> > > > [...]
+> > > 
+> > > Applied to wpan/wpan-next.git, thanks!
+> > 
+> > Thanks! I'd been thinking I had to wait for net-next to reopen.
 > 
-> Leo Stone provided a documatation fix to improve the grammar.
-> 
-> David Gilbert spotted a non-used fucntion we can safely remove.
-> 
-> [...]
+> It's in my wpan-next tree and I will send a pull request to net-next when it
+> opens up again.
 
-Here is the summary with links:
-  - pull-request: ieee802154-next 2025-01-03
-    https://git.kernel.org/netdev/net-next/c/3e5908172c05
+Thanks, I see it in linux-next.
 
-You are awesome, thank you!
+Dave
+
+> regards
+> Stefan Schmidt
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+ -----Open up your eyes, open up your mind, open up your code -------   
+/ Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy  \ 
+\        dave @ treblig.org |                               | In Hex /
+ \ _________________________|_____ http://www.treblig.org   |_______/
