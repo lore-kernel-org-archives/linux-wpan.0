@@ -1,86 +1,75 @@
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 241E91F1301
-	for <linux-wpan@vger.kernel.org>; Tue,  7 Jan 2025 14:54:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE70F1F63E7;
+	Tue,  7 Jan 2025 20:38:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736261670; cv=none; b=EsVxt7VMe7LKkco57DlOU4MLqs9473LsoV6B1zyyDh62joUk+aUKgPF3M08Vv9bnITJChr2NUpCABcTmZlWtiagkxdTg6hbMv9io5U35a/aM2J0T6Y6QodtrgLPVp7IYorkDGXNnGJr1YYqCG1xpD8jq5fNpaSgGBXarrNpcrus=
+	t=1736282288; cv=none; b=VAFZVz54otiSFrvgspvOsHRhhdSKY6YGtyZEz+ilrB7VAhWOqQveKL9u6DCR1DM5OhXNDxxexIj1JIYjEWELOGnVISnUqDHvyieOccG2KfQI7jLz/sOna87UprnzMxvxwMO4DhsWUksL+fJFY7WYfyf6s7mclZ+Wm9/hbzDxVFw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736261670; c=relaxed/simple;
-	bh=q/UTUd4wGepvnY3I65+DtC59TAsbKPAC1wXLZNgjpsQ=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=g15V7symW+VvWNDxVN+XuA+Xm+VijavwDXqGf7ZihEK7C426ZfOwBEpg/DkqCybczYz5eVZBevsfm0DWWQnGnUB6Nc6fRMZZq0u5q4Q2wqhBgl0JEJQZbospRfnDByhPNRFJ0rb7+jSWJsxt1veI0sBMj08S2nc+xhq1TumRgxs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3a9d195e6e5so140732645ab.2
-        for <linux-wpan@vger.kernel.org>; Tue, 07 Jan 2025 06:54:26 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736261666; x=1736866466;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=nQNBTv/v8FF/k1N4jHYNKUzYslup0/Ac3YRstwEghs8=;
-        b=IyOCXhAVLRXwGFcNmZo+FTaLSS+XZ9+VNWjslUOJAJMrlOGqAf9rvvgwQwC++mDHSz
-         Qfh6NWyAkNmYNYtuv7WvhwTx1+Nwr3xSri+KWdcJ4QNSP3QDtB6Qc1/C6JC9Eoc882nL
-         FzTYxPtD9qQm7Z9c9/2oZSAyeXipVNjxXFKilwkx5YovStLEDrkCmCYP5E44GouBx/6Z
-         r6/6ENxFQ2a3f/0KcHomDv1AJFfP58CkCUsH3avzkmfdc/MSFU/M8vjzTUowRDZUc+Ly
-         xlG7YY1U8YBNwO431az6hanXRFB+2wMrmfT2GM2or4+KVpQBLXCGS7x6+xo1xJ49w5AU
-         9a2Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVL6GHjU8JtyHU38JDD+t87sBkpsaDs6+M4EgIRJ0b6KNWVKW31GiDp3Y8eW39AZP2GEYN+jXIY5uyT@vger.kernel.org
-X-Gm-Message-State: AOJu0YyxYa+zEdRluQwyWwcS9uj1ziJHfBxhIb6AhhKxoj3tjJkTAXhX
-	KKOo+43+H3v10APS5OshTI9f1mXsgrxhYynR4jVZLbH5K7SaFzyZbzkOf2K0NIjEn7wn13hZOPn
-	pI2o62mlXapLa+XCvRNw6/DUH33S/MLwcelam9yN8XBjT3nl1e7ZvSfE=
-X-Google-Smtp-Source: AGHT+IGSpDpIM7Y8UQT2RsbOUsEUEAWNg7z8znh7lgWQEMnUHf9SL8KLITjuRB/zcPlU609cYm95XZIHl49sRBAuXMp4TTEoyRiS
+	s=arc-20240116; t=1736282288; c=relaxed/simple;
+	bh=xVENo9muNO/TQ5xVqUKOs/5Q4+G96PW1sKSnQr73q9Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=U14vuusbfwKnu2pH69MbVBc1eKEdkMX/chwVTNtajetkhO6xwi7m74cLY/k8ac5c+MX0RrI206b704qlUqOaXdM+aV6iQbzq5lSl28FpER3LUPzbZkMsV6KrnqF5mB4CstaLafwPTymWoZzNYnWuqkUx3PnksWlv/MrGPfzQJ4Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IincHyk5; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IincHyk5"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 582D5C4CED6;
+	Tue,  7 Jan 2025 20:38:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736282287;
+	bh=xVENo9muNO/TQ5xVqUKOs/5Q4+G96PW1sKSnQr73q9Q=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=IincHyk5dnHSj14WBxB3nZ8H+ad7Wv7JCDFqB3ioz1CyxVIL28f/wayA5OfnPboFy
+	 w4bYeV8oyIpNsDF2th/1YTvksDeeiWBKLOGweUN5unnHCsYuY6UO9/ov33L1S7sVm+
+	 1K3BnLtTw6iZPtOBVnjoMMzolL2SbZULRRKu+YNbYACOMPPIofT1Am+zEPd/PAx/vs
+	 ld0p/Rkjj2unh6Png65S7WHaBoyC3nNe0ZjG8UBnxGV+bt8cBPNwF55J92ceGMmf0M
+	 9p3XnJzVS37fvnQRlLFc7Do5qJjEPxgQYy5375IiG9MyjZthi5D9QPQCuQtvR2QVYT
+	 LbPjcwrrJqcnA==
+Date: Tue, 7 Jan 2025 12:38:05 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Xiao Liang <shaw.leon@gmail.com>
+Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, Kuniyuki
+ Iwashima <kuniyu@amazon.com>, Donald Hunter <donald.hunter@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Ido
+ Schimmel <idosch@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>, Simon
+ Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>, Jiri Pirko
+ <jiri@resnulli.us>, Hangbin Liu <liuhangbin@gmail.com>,
+ linux-rdma@vger.kernel.org, linux-can@vger.kernel.org,
+ osmocom-net-gprs@lists.osmocom.org, bpf@vger.kernel.org,
+ linux-ppp@vger.kernel.org, wireguard@lists.zx2c4.com,
+ linux-wireless@vger.kernel.org, b.a.t.m.a.n@lists.open-mesh.org,
+ bridge@lists.linux.dev, linux-wpan@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v7 02/11] rtnetlink: Pack newlink() params into
+ struct
+Message-ID: <20250107123805.748080ab@kernel.org>
+In-Reply-To: <20250104125732.17335-3-shaw.leon@gmail.com>
+References: <20250104125732.17335-1-shaw.leon@gmail.com>
+	<20250104125732.17335-3-shaw.leon@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:3b87:b0:3a7:e86a:e812 with SMTP id
- e9e14a558f8ab-3c2d48a2f66mr445254125ab.17.1736261666273; Tue, 07 Jan 2025
- 06:54:26 -0800 (PST)
-Date: Tue, 07 Jan 2025 06:54:26 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <677d4022.050a0220.a40f5.0021.GAE@google.com>
-Subject: [syzbot] Monthly wpan report (Jan 2025)
-From: syzbot <syzbot+list99b8af0ec3a670fc3fa5@syzkaller.appspotmail.com>
-To: alex.aring@gmail.com, linux-kernel@vger.kernel.org, 
-	linux-wpan@vger.kernel.org, miquel.raynal@bootlin.com, netdev@vger.kernel.org, 
-	stefan@datenfreihafen.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello wpan maintainers/developers,
+On Sat,  4 Jan 2025 20:57:23 +0800 Xiao Liang wrote:
+> -static int amt_newlink(struct net *net, struct net_device *dev,
+> -		       struct nlattr *tb[], struct nlattr *data[],
+> -		       struct netlink_ext_ack *extack)
+> +static int amt_newlink(struct rtnl_newlink_params *params)
+>  {
+> -	struct amt_dev *amt = netdev_priv(dev);
+> +	struct netlink_ext_ack *extack = params->extack;
+> +	struct net_device *dev = params->dev;
+> +	struct nlattr **data = params->data;
+> +	struct nlattr **tb = params->tb;
+> +	struct net *net = params->net;
+> +	struct amt_dev *amt;
 
-This is a 31-day syzbot report for the wpan subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/wpan
-
-During the period, 0 new issues were detected and 0 were fixed.
-In total, 4 issues are still open and 25 have already been fixed.
-
-Some of the still happening issues:
-
-Ref Crashes Repro Title
-<1> 170     Yes   KMSAN: uninit-value in ieee802154_hdr_push (2)
-                  https://syzkaller.appspot.com/bug?extid=60a66d44892b66b56545
-<2> 12      No    KASAN: global-out-of-bounds Read in mac802154_header_create (2)
-                  https://syzkaller.appspot.com/bug?extid=844d670c418e0353c6a8
-<3> 7       No    WARNING in __dev_change_net_namespace (3)
-                  https://syzkaller.appspot.com/bug?extid=3344d668bbbc12996d46
-<4> 3       Yes   WARNING in cfg802154_switch_netns (3)
-                  https://syzkaller.appspot.com/bug?extid=bd5829ba3619f08e2341
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
-
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
-
-You may send multiple commands in a single email message.
+IMHO you packed a little too much into the struct.
+Could you take the dev and the extack back out?
