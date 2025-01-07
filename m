@@ -1,229 +1,86 @@
-Received: from smtp-fw-52002.amazon.com (smtp-fw-52002.amazon.com [52.119.213.150])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6D241F2370;
-	Tue,  7 Jan 2025 14:47:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.150
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 241E91F1301
+	for <linux-wpan@vger.kernel.org>; Tue,  7 Jan 2025 14:54:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736261262; cv=none; b=YoVE2gSx2HhylkvRnx6kkVBPw0ibIcgi3r3k1o9DEUZQJj9OcE9O1z1jYyCgcsYl8fCJN2m2EkNtnLva/oJIQJsAkCBOhbCo/KA+0rSm2U5VREeLAnlQHRWfK18p2Nae+zfLd6qXaFbK9SFGcTybtdkyWgosoeM/snviu/bdyH0=
+	t=1736261670; cv=none; b=EsVxt7VMe7LKkco57DlOU4MLqs9473LsoV6B1zyyDh62joUk+aUKgPF3M08Vv9bnITJChr2NUpCABcTmZlWtiagkxdTg6hbMv9io5U35a/aM2J0T6Y6QodtrgLPVp7IYorkDGXNnGJr1YYqCG1xpD8jq5fNpaSgGBXarrNpcrus=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736261262; c=relaxed/simple;
-	bh=z9AcZKXBTCewxT8SPTS20nArEMQztrWlt8OFGIyL2io=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IYlnjIW7o4aNmRmVeS0JaJ5Uh6EujVNUGkJ9Ygn04NB2/390iCUiYARKA7P/Uu2Jr4DtsG6lOS4B4weDtUUMpIyfX1fam4kfZw+po38N7cBMuWVLAyLAirv5cMnVf0seWDibaH+POxuZL1YV35uRUrQWqkSJ/5bNbgqZ9am+f7k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=CMnk2QAv; arc=none smtp.client-ip=52.119.213.150
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="CMnk2QAv"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1736261260; x=1767797260;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=kzqP3KWquCSCvitwLtozsomdOR3PJTWU3++JR+6rcS0=;
-  b=CMnk2QAv+JNq4OBfRUrZVbBCfKqza9z7TrdKUxm27DJAaahnb4CdtgBL
-   66LHR5midZDHrrm8oIXMyF5ikBKH2LApxfvYcOYC6+0zc4YJM0S4TKT2L
-   lPtHkepVHwolN1flxAXBoyBkNqmTyN38Oge7fpqLBYh7BsASJ4Ce7KpB2
-   Q=;
-X-IronPort-AV: E=Sophos;i="6.12,295,1728950400"; 
-   d="scan'208";a="687495332"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52002.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jan 2025 14:47:34 +0000
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.21.151:43223]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.51.48:2525] with esmtp (Farcaster)
- id 9b48386a-8619-40f1-8b35-660ddef4cf53; Tue, 7 Jan 2025 14:47:33 +0000 (UTC)
-X-Farcaster-Flow-ID: 9b48386a-8619-40f1-8b35-660ddef4cf53
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Tue, 7 Jan 2025 14:47:33 +0000
-Received: from 6c7e67c6786f.amazon.com (10.118.249.113) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Tue, 7 Jan 2025 14:47:24 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <shaw.leon@gmail.com>
-CC: <andrew+netdev@lunn.ch>, <b.a.t.m.a.n@lists.open-mesh.org>,
-	<bpf@vger.kernel.org>, <bridge@lists.linux.dev>, <davem@davemloft.net>,
-	<donald.hunter@gmail.com>, <dsahern@kernel.org>, <edumazet@google.com>,
-	<horms@kernel.org>, <idosch@nvidia.com>, <jiri@resnulli.us>,
-	<kuba@kernel.org>, <kuniyu@amazon.com>, <linux-can@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-	<linux-ppp@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-	<linux-wireless@vger.kernel.org>, <linux-wpan@vger.kernel.org>,
-	<liuhangbin@gmail.com>, <netdev@vger.kernel.org>,
-	<osmocom-net-gprs@lists.osmocom.org>, <pabeni@redhat.com>,
-	<shuah@kernel.org>, <wireguard@lists.zx2c4.com>
-Subject: Re: [PATCH net-next v7 00/11] net: Improve netns handling in rtnetlink
-Date: Tue, 7 Jan 2025 23:47:14 +0900
-Message-ID: <20250107144714.74446-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <CABAhCOQdBL6h9M2C+kd+bGivRJ9Q72JUxW+-gur0nub_=PmFPA@mail.gmail.com>
-References: <CABAhCOQdBL6h9M2C+kd+bGivRJ9Q72JUxW+-gur0nub_=PmFPA@mail.gmail.com>
+	s=arc-20240116; t=1736261670; c=relaxed/simple;
+	bh=q/UTUd4wGepvnY3I65+DtC59TAsbKPAC1wXLZNgjpsQ=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=g15V7symW+VvWNDxVN+XuA+Xm+VijavwDXqGf7ZihEK7C426ZfOwBEpg/DkqCybczYz5eVZBevsfm0DWWQnGnUB6Nc6fRMZZq0u5q4Q2wqhBgl0JEJQZbospRfnDByhPNRFJ0rb7+jSWJsxt1veI0sBMj08S2nc+xhq1TumRgxs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3a9d195e6e5so140732645ab.2
+        for <linux-wpan@vger.kernel.org>; Tue, 07 Jan 2025 06:54:26 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736261666; x=1736866466;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=nQNBTv/v8FF/k1N4jHYNKUzYslup0/Ac3YRstwEghs8=;
+        b=IyOCXhAVLRXwGFcNmZo+FTaLSS+XZ9+VNWjslUOJAJMrlOGqAf9rvvgwQwC++mDHSz
+         Qfh6NWyAkNmYNYtuv7WvhwTx1+Nwr3xSri+KWdcJ4QNSP3QDtB6Qc1/C6JC9Eoc882nL
+         FzTYxPtD9qQm7Z9c9/2oZSAyeXipVNjxXFKilwkx5YovStLEDrkCmCYP5E44GouBx/6Z
+         r6/6ENxFQ2a3f/0KcHomDv1AJFfP58CkCUsH3avzkmfdc/MSFU/M8vjzTUowRDZUc+Ly
+         xlG7YY1U8YBNwO431az6hanXRFB+2wMrmfT2GM2or4+KVpQBLXCGS7x6+xo1xJ49w5AU
+         9a2Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVL6GHjU8JtyHU38JDD+t87sBkpsaDs6+M4EgIRJ0b6KNWVKW31GiDp3Y8eW39AZP2GEYN+jXIY5uyT@vger.kernel.org
+X-Gm-Message-State: AOJu0YyxYa+zEdRluQwyWwcS9uj1ziJHfBxhIb6AhhKxoj3tjJkTAXhX
+	KKOo+43+H3v10APS5OshTI9f1mXsgrxhYynR4jVZLbH5K7SaFzyZbzkOf2K0NIjEn7wn13hZOPn
+	pI2o62mlXapLa+XCvRNw6/DUH33S/MLwcelam9yN8XBjT3nl1e7ZvSfE=
+X-Google-Smtp-Source: AGHT+IGSpDpIM7Y8UQT2RsbOUsEUEAWNg7z8znh7lgWQEMnUHf9SL8KLITjuRB/zcPlU609cYm95XZIHl49sRBAuXMp4TTEoyRiS
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-Received: by 2002:a05:6e02:3b87:b0:3a7:e86a:e812 with SMTP id
+ e9e14a558f8ab-3c2d48a2f66mr445254125ab.17.1736261666273; Tue, 07 Jan 2025
+ 06:54:26 -0800 (PST)
+Date: Tue, 07 Jan 2025 06:54:26 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <677d4022.050a0220.a40f5.0021.GAE@google.com>
+Subject: [syzbot] Monthly wpan report (Jan 2025)
+From: syzbot <syzbot+list99b8af0ec3a670fc3fa5@syzkaller.appspotmail.com>
+To: alex.aring@gmail.com, linux-kernel@vger.kernel.org, 
+	linux-wpan@vger.kernel.org, miquel.raynal@bootlin.com, netdev@vger.kernel.org, 
+	stefan@datenfreihafen.org, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: EX19D045UWC004.ant.amazon.com (10.13.139.203) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-From: Xiao Liang <shaw.leon@gmail.com>
-Date: Tue, 7 Jan 2025 20:53:19 +0800
-> On Tue, Jan 7, 2025 at 4:57 PM Kuniyuki Iwashima <kuniyu@amazon.com> wrote:
-> [...]
-> >
-> > We can fix this by linking the dev to the socket's netns and
-> > clean them up in __net_exit hook as done in bareudp and geneve.
-> >
-> > ---8<---
-> > diff --git a/drivers/net/gtp.c b/drivers/net/gtp.c
-> > index 89a996ad8cd0..77638a815873 100644
-> > --- a/drivers/net/gtp.c
-> > +++ b/drivers/net/gtp.c
-> > @@ -70,6 +70,7 @@ struct pdp_ctx {
-> >  /* One instance of the GTP device. */
-> >  struct gtp_dev {
-> >         struct list_head        list;
-> > +       struct list_head        sock_list;
-> >
-> >         struct sock             *sk0;
-> >         struct sock             *sk1u;
-> > @@ -102,6 +103,7 @@ static unsigned int gtp_net_id __read_mostly;
-> >
-> >  struct gtp_net {
-> >         struct list_head gtp_dev_list;
-> > +       struct list_head gtp_sock_list;
-> 
-> After a closer look at the GTP driver, I'm confused about
-> the gtp_dev_list here. GTP device is linked to this list at
-> creation time, but netns can be changed afterwards.
-> The list is used in gtp_net_exit_batch_rtnl(), but to my
-> understanding net devices can already be deleted in
-> default_device_exit_batch() by default.
-> And I wonder if the use in gtp_genl_dump_pdp() can be
-> replaced by something like for_each_netdev_rcu().
+Hello wpan maintainers/developers,
 
-Right, it should be, or we need to set netns_local.
-Will include this diff in the fix series.
+This is a 31-day syzbot report for the wpan subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/wpan
 
----8<---
-diff --git a/drivers/net/gtp.c b/drivers/net/gtp.c
-index 2460a2c13c32..f9186eda36f0 100644
---- a/drivers/net/gtp.c
-+++ b/drivers/net/gtp.c
-@@ -2278,6 +2278,7 @@ static int gtp_genl_dump_pdp(struct sk_buff *skb,
- 	struct gtp_dev *last_gtp = (struct gtp_dev *)cb->args[2], *gtp;
- 	int i, j, bucket = cb->args[0], skip = cb->args[1];
- 	struct net *net = sock_net(skb->sk);
-+	struct net_device *dev;
- 	struct pdp_ctx *pctx;
- 	struct gtp_net *gn;
- 
-@@ -2287,7 +2288,10 @@ static int gtp_genl_dump_pdp(struct sk_buff *skb,
- 		return 0;
- 
- 	rcu_read_lock();
--	list_for_each_entry_rcu(gtp, &gn->gtp_dev_list, list) {
-+	for_each_netdev_rcu(net, dev) {
-+		if (dev->rtnl_link_ops != &gtp_link_ops)
-+			continue;
-+
- 		if (last_gtp && last_gtp != gtp)
- 			continue;
- 		else
----8<---
+During the period, 0 new issues were detected and 0 were fixed.
+In total, 4 issues are still open and 25 have already been fixed.
 
-Otherwise, we need to move it manually like this, which is
-apparently overkill and unnecessary :p
+Some of the still happening issues:
 
----8<---
-diff --git a/drivers/net/gtp.c b/drivers/net/gtp.c
-index 2460a2c13c32..90b410b73c89 100644
---- a/drivers/net/gtp.c
-+++ b/drivers/net/gtp.c
-@@ -2501,6 +2501,46 @@ static struct pernet_operations gtp_net_ops = {
- 	.size	= sizeof(struct gtp_net),
- };
- 
-+static int gtp_device_event(struct notifier_block *nb,
-+			    unsigned long event, void *ptr)
-+{
-+	struct net_device *dev = netdev_notifier_info_to_dev(ptr);
-+	struct gtp_dev *gtp;
-+	struct gtp_net *gn;
-+
-+	if (dev->rtnl_link_ops != &gtp_link_ops)
-+		goto out;
-+
-+	gtp = netdev_priv(dev);
-+
-+	switch (event) {
-+	case NETDEV_UNREGISTER:
-+		if (dev->reg_state != NETREG_REGISTERED)
-+			goto out;
-+
-+		/* dev_net(dev) is changed, see __dev_change_net_namespace().
-+		 * rcu_barrier() after NETDEV_UNREGISTER guarantees that no
-+		 * one traversing a list in the old netns jumps to another
-+		 * list in the new netns.
-+		 */
-+		list_del_rcu(&gtp->list);
-+		break;
-+	case NETDEV_REGISTER:
-+		if (gtp->list.prev != LIST_POISON2)
-+			goto out;
-+
-+		/* complete netns change. */
-+		gn = net_generic(dev_net(dev), gtp_net_id);
-+		list_add_rcu(&gtp->list, &gn->gtp_dev_list);
-+	}
-+out:
-+	return NOTIFY_DONE;
-+}
-+
-+static struct notifier_block gtp_notifier_block = {
-+	.notifier_call = gtp_device_event,
-+};
-+
- static int __init gtp_init(void)
- {
- 	int err;
-@@ -2511,10 +2551,14 @@ static int __init gtp_init(void)
- 	if (err < 0)
- 		goto error_out;
- 
--	err = rtnl_link_register(&gtp_link_ops);
-+	err = register_netdevice_notifier(&gtp_notifier_block);
- 	if (err < 0)
- 		goto unreg_pernet_subsys;
- 
-+	err = rtnl_link_register(&gtp_link_ops);
-+	if (err < 0)
-+		goto unreg_netdev_notifier;
-+
- 	err = genl_register_family(&gtp_genl_family);
- 	if (err < 0)
- 		goto unreg_rtnl_link;
-@@ -2525,6 +2569,8 @@ static int __init gtp_init(void)
- 
- unreg_rtnl_link:
- 	rtnl_link_unregister(&gtp_link_ops);
-+unreg_netdev_notifier:
-+	register_netdevice_notifier(&gtp_notifier_block);
- unreg_pernet_subsys:
- 	unregister_pernet_subsys(&gtp_net_ops);
- error_out:
-@@ -2537,6 +2583,7 @@ static void __exit gtp_fini(void)
- {
- 	genl_unregister_family(&gtp_genl_family);
- 	rtnl_link_unregister(&gtp_link_ops);
-+	register_netdevice_notifier(&gtp_notifier_block);
- 	unregister_pernet_subsys(&gtp_net_ops);
- 
- 	pr_info("GTP module unloaded\n");
----8<---
+Ref Crashes Repro Title
+<1> 170     Yes   KMSAN: uninit-value in ieee802154_hdr_push (2)
+                  https://syzkaller.appspot.com/bug?extid=60a66d44892b66b56545
+<2> 12      No    KASAN: global-out-of-bounds Read in mac802154_header_create (2)
+                  https://syzkaller.appspot.com/bug?extid=844d670c418e0353c6a8
+<3> 7       No    WARNING in __dev_change_net_namespace (3)
+                  https://syzkaller.appspot.com/bug?extid=3344d668bbbc12996d46
+<4> 3       Yes   WARNING in cfg802154_switch_netns (3)
+                  https://syzkaller.appspot.com/bug?extid=bd5829ba3619f08e2341
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
+
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
