@@ -1,134 +1,284 @@
-Received: from mail-il1-f208.google.com (mail-il1-f208.google.com [209.85.166.208])
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B15524B22C
-	for <linux-wpan@vger.kernel.org>; Sat, 11 Jan 2025 07:37:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.208
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 427F522F169;
+	Mon, 13 Jan 2025 14:37:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736581046; cv=none; b=OwcKDAzqHWKMrTTCTVs//LMLc/eeoYE9sXsvOzBcYX3keK8rJsfsO7Sy1MV3TJyw2cCRtnlOj9CU9TzypdTqrfuSGDbNxGU2UZhVwV1oku7qA10eRDjvaq+6pOdgzH8sKqZQKWowRO9nStgK7W70KDbk1f/gXXj3LBmv7omevKI=
+	t=1736779060; cv=none; b=pXA9grKE7W0XshdB0IcuPs+lnrlSR2LrQOmQbwwCQFZGzesC4Awq1TCPKCi+lJiORDUJ4vyzlc7mhxMptRSl3DYy/OKtXHVLFEHw90/5iafe9emSZglXZTxzakdVgjwkfQld8hk0Vx/h0uTtbQj3S28R9HvdJBWoJfkvYv+xiEI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736581046; c=relaxed/simple;
-	bh=uWLwMe3jqvdDdW77L2W6yrwWc8KABM0SMkwPyStqy/k=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=g3IUDgKiZFInsY3df50wWOGrz01IqCOjO0WHHG2N8MGwBiImCcm7pfI02kBP9977LoGR5OqwJ9AlQkNdJoNF1f6vJ41vQtlb5kl4AgxTfK/kt4vfdt+Ayg7XLe/CfnAlXdrqS/dyzQMbwkXls86lWgTpy94ts6HR1z+JvEBh9Yw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.208
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f208.google.com with SMTP id e9e14a558f8ab-3a9d3e48637so22718985ab.1
-        for <linux-wpan@vger.kernel.org>; Fri, 10 Jan 2025 23:37:24 -0800 (PST)
+	s=arc-20240116; t=1736779060; c=relaxed/simple;
+	bh=16kL3RVzuXIueY/K9e2GktTYeQobat2MyiA31sOZcIo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FUDEjFF3y8eJnpG97cB6gvW9PllaIOu6TVp3B6RJHZ5En5jRjOu7Ax+VMDSej8Y2FQ6QNaQmv+8ArtXy8afLRB+IcDkNdIOeG1J2CA5L7pMfhlkZylcN/GijkmKpELhhhrRy+dzfj3FeLg2oAADx15mAyfCPX/yp4OF7T4Y9xwM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Opa9gMWf; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Opa9gMWf"
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-21628b3fe7dso73443125ad.3;
+        Mon, 13 Jan 2025 06:37:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1736779058; x=1737383858; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=1beorUTBDb9d2ovAB2s5mK/OAF8szMbbImDZC22QQM8=;
+        b=Opa9gMWfj3RYOHeaddobAVWdrifv5kmnGJHZ63XyKLTg8VhusTIR+7U6JjuRTthz67
+         vcqnK3ZNY0FkADw99L0SaZ/MeQPrW4fgq103LTzjSS6ozw47qgWViVwYmi1JOHfuchZs
+         dOHDhBuwPZgmBnahFlRbK3krQTS6t3b6yYxw6aXC8pxx26zeZL7TbnUsuyaoFXm8/Ccd
+         6H4AV5RtEUqcjl1xb7uA7cBOu3zImO90pTcqH42vc07hBChycOSpxWS2HcHGYPO/qLTN
+         i0s/beqWTdfxis0iF60D6i3SOPMPAOVllFqgf5//BhBc7CQw1u8z3XALp3+Ea8/yONBs
+         T2ug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736581044; x=1737185844;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=IVOH7tDTP8ZL++lwFRoxsPgQDJutOGJQ9WtGPMYZmxQ=;
-        b=VELw4G4ewEWSfcMrMC9b151IPK9QjXiPXN+5C3hB8o/NLtFR1lOa0/QrZM4swLtCRp
-         vNlevBz5nhv/lOt54Qidnq949Lac6t4kxcorjh1U5OuqRz+S02py2YzgMWM+Zi/pjksL
-         D6ZhRh2D+aDDSRDN3gVyVDU6aIvwJ09ngLU8YRddxIA1EDpqHaZ+jGHxNOoO5zHIXGTp
-         GfqxklfJCxVf/ASjd5NZCDu+hzLJqdO6Y/gF9TLWAJFz3c7r0N0oJJ1g9SFAznj1KY8n
-         EdOvGl5DDGCwuI/YmDU4QLe1FpqYgELIVq0defe6sfuZ5YAisM+9/2+7N8u24TvXdbo3
-         sTPg==
-X-Forwarded-Encrypted: i=1; AJvYcCW+0NOIIwAIEZz9lV5qKkKOCm0gaCWsXupZlpfg4nRXRWRP+HQkVVlojsZGmAyKIb/sp4otvcXMwRyw@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx1z0OYh3PFs8I0uZNetZvQ3bNOPxSbQDpdKB73H5MITOa5/c1K
-	PDTkgv+b/yFaxAyF4tqsrjzkqkik/TuiU1XTL3nvSiWovqRPjCFNRGRFlUr1W1vdc+1OKNR83Iu
-	7ECRsOh4vhV4fQfbEUAk7lSQouMMYnbqlknrbzJFkN610y3WuxK3mQEs=
-X-Google-Smtp-Source: AGHT+IE9P1EFBLnetNXAkGjLXG316YIdDLRM4OvcX9DSgGuwLL7Vfci+bWxKezN+MnEDDPhfWuQHYn1b0qd2XssrjwP3lCS62DMa
+        d=1e100.net; s=20230601; t=1736779058; x=1737383858;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=1beorUTBDb9d2ovAB2s5mK/OAF8szMbbImDZC22QQM8=;
+        b=us9FZszvpPv9wz9eeHBAKKqzLhFp2xkvbO4jwT39Ie7vnHmtlQZGJygTBLZrBvyd5p
+         78HC/vLQsw4Ihe4uIq512P7L7dXAdkJUiYbjLuv4rHwqNi7AC/DInQNfDS6F8GZXtVtR
+         F3dnhxUbguDn4Mh1wRDhP0oNrZ176SnJIQ1oEFWNvL9gMeYibx8OSLcZm2xvZo4uMXZG
+         aBGCMhlvWrWZGQu1BC/W1lh4n2gIqf3aelWDvURy8juf73AGAIbldkBs+Dt+RcZCF0nR
+         sux3WiXoA8IPowLCNc79peMm28rQYMICQno3lM5J5a1Wl6sZDryh9p8wsf6Tx57zktTS
+         XjGQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU/0Fv2ZXHEvl2IL0/in3JQfZHK7typWIqGahS6IaIYcIlDNFT8i43jH2/OpLOJd34amj1XsVvoz0hP@vger.kernel.org, AJvYcCUT5Ey1FNzctVIwJ+BMHtwxpZZTyIaUM1DWPUunsuvaDsrnvY9L/Vdx20BeHcOm+SdY811J0iQtaHb03q4i0ygO@vger.kernel.org, AJvYcCUwDJDWeDQDMFH5z+LCAGNMN/4uVhwcmVLmMQ53dqhVUfBor63zOX1qUYu7EgVh8S3jgPo=@vger.kernel.org, AJvYcCVivqiRVAgtUwoYBPBmStg0TP9k1cBu7WllYmlq3GYs2w7XCXulN1GCir8cnLYedko95uZXhSSAQEMQGA==@vger.kernel.org, AJvYcCX9EQ0h4jX70ZX/R04joFE8ZfULcbugB/k5xLqcolIyN1/ONrFiG1ZVjJXqf+pVIVRmCj7ObjY9k7VpcDqcJPg=@vger.kernel.org, AJvYcCXC+YsiUJYg5BgP2DqpKEvvHTAzYjGCTfsiT4MLZeQpFa7SPPsL7gvF0tW/0dJilIOD1qWo+nMIMzHm@vger.kernel.org, AJvYcCXchsVKqFv1iQNUgTgYPUcrG2PRvSG7hBVZr48ZW98xaSwWOmwHYwJY+8BiqWi78z6eUQcFKjJz0rLyTVLj@vger.kernel.org, AJvYcCXoIHX2MwI5GSCAl8Bpb+M5jvqfQEs88Zx0F9CSgg2LsrpiH3XjKw8QDdnjeUZwY7yTNFURcmqys/IY+w==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwZ/j0ynsvs4j8kT0yTUJd9QuZl3XBM4I8SqBb0KXCOWkRIbkig
+	w3UlqJiPiIcF5ZXaRDKY1fx7fopDzNMj+TSG4FzHP9tSt1o0yjq3o+8blh7UO4Q=
+X-Gm-Gg: ASbGnctXUyQub1HFrrRBH6CTXm8itNsONq9vcqt69oirVGGpPMcZ1juYxLmjue0HPRT
+	QTeG0c+g+KA4QuMfkD/1EyVRBB1ywkErQTkeUm75BZUIBu4DB4b1aJGPCOIwOcAwQ8AiUN9m8v9
+	e8ymqlKq/OHqwgHRvV/FpEnUnqmEYUNYEpnxDNGN8u1xWRE+A8kCIA0sgIIAIi38zHh7L0eOQhg
+	XC6H+tymh6FJj8+3GJVuzfD25MD22L5G20ZGCKNFXjzcQc=
+X-Google-Smtp-Source: AGHT+IF50iamtynxwVleVNAyS8mxO44RNkBtHV9bN/5WAHxvooRDGqm4UnZoDFbT5fV4mFafHkIg+Q==
+X-Received: by 2002:a17:903:1206:b0:216:59ed:1ab0 with SMTP id d9443c01a7336-21a83f5d8c3mr269255565ad.27.1736779057926;
+        Mon, 13 Jan 2025 06:37:37 -0800 (PST)
+Received: from ws.. ([103.167.140.11])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21a9f155e00sm54328715ad.103.2025.01.13.06.37.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Jan 2025 06:37:37 -0800 (PST)
+From: Xiao Liang <shaw.leon@gmail.com>
+To: netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Jakub Kicinski <kuba@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Simon Horman <horms@kernel.org>,
+	Shuah Khan <shuah@kernel.org>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Alexander Aring <alex.aring@gmail.com>,
+	Stefan Schmidt <stefan@datenfreihafen.org>,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-rdma@vger.kernel.org,
+	linux-can@vger.kernel.org,
+	osmocom-net-gprs@lists.osmocom.org,
+	bpf@vger.kernel.org,
+	linux-ppp@vger.kernel.org,
+	wireguard@lists.zx2c4.com,
+	linux-wireless@vger.kernel.org,
+	b.a.t.m.a.n@lists.open-mesh.org,
+	bridge@lists.linux.dev,
+	linux-wpan@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v8 00/11] net: Improve netns handling in rtnetlink
+Date: Mon, 13 Jan 2025 22:37:08 +0800
+Message-ID: <20250113143719.7948-1-shaw.leon@gmail.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a92:cda3:0:b0:3cd:d02b:d1f3 with SMTP id
- e9e14a558f8ab-3ce3aa5af2fmr86195905ab.17.1736581043908; Fri, 10 Jan 2025
- 23:37:23 -0800 (PST)
-Date: Fri, 10 Jan 2025 23:37:23 -0800
-In-Reply-To: <675021af.050a0220.17bd51.0061.GAE@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67821fb3.050a0220.216c54.001a.GAE@google.com>
-Subject: Re: [syzbot] [wpan?] WARNING in cfg802154_switch_netns (3)
-From: syzbot <syzbot+bd5829ba3619f08e2341@syzkaller.appspotmail.com>
-To: alex.aring@gmail.com, davem@davemloft.net, edumazet@google.com, 
-	horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	linux-wpan@vger.kernel.org, miquel.raynal@bootlin.com, netdev@vger.kernel.org, 
-	pabeni@redhat.com, stefan@datenfreihafen.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-syzbot has found a reproducer for the following issue on:
+This patch series includes some netns-related improvements and fixes for
+rtnetlink, to make link creation more intuitive:
 
-HEAD commit:    7b24f164cf00 Merge tag 'ipsec-next-2025-01-09' of git://gi..
-git tree:       net-next
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=168791df980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=28dc37e0ec0dfc41
-dashboard link: https://syzkaller.appspot.com/bug?extid=bd5829ba3619f08e2341
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=122fef0f980000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=16c9ccb0580000
+ 1) Creating link in another net namespace doesn't conflict with link
+    names in current one.
+ 2) Refector rtnetlink link creation. Create link in target namespace
+    directly.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/73892b055b77/disk-7b24f164.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/d6a3f606bee9/vmlinux-7b24f164.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/4d3108a02573/bzImage-7b24f164.xz
+So that
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+bd5829ba3619f08e2341@syzkaller.appspotmail.com
+  # ip link add netns ns1 link-netns ns2 tun0 type gre ...
 
-RSP: 002b:00007ffe8eee9248 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007ffe8eee9260 RCX: 00007f255ac67da9
-RDX: 000000000004c084 RSI: 0000000020000100 RDI: 0000000000000006
-RBP: 0000000000000001 R08: 00007ffe8eee8fe7 R09: 000055556b883610
-R10: 0000000000000001 R11: 0000000000000246 R12: 00007f255acafe7c
-R13: 00007f255acaa10f R14: 0000000000000001 R15: 0000000000000001
- </TASK>
-------------[ cut here ]------------
-WARNING: CPU: 0 PID: 5837 at net/ieee802154/core.c:258 cfg802154_switch_netns+0x3c7/0x3d0 net/ieee802154/core.c:258
-Modules linked in:
-CPU: 0 UID: 0 PID: 5837 Comm: syz-executor125 Not tainted 6.13.0-rc6-syzkaller-00918-g7b24f164cf00 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
-RIP: 0010:cfg802154_switch_netns+0x3c7/0x3d0 net/ieee802154/core.c:258
-Code: e1 07 38 c1 7c 92 48 89 ef e8 35 dd 86 f6 eb 88 e8 9e 79 20 f6 e9 66 fe ff ff e8 94 79 20 f6 e9 5c fe ff ff e8 8a 79 20 f6 90 <0f> 0b 90 e9 4e fe ff ff 90 90 90 90 90 90 90 90 90 90 90 90 90 90
-RSP: 0018:ffffc9000406f3c8 EFLAGS: 00010293
-RAX: ffffffff8b7f0a96 RBX: 00000000fffffff4 RCX: ffff88802e890000
-RDX: 0000000000000000 RSI: 00000000fffffff4 RDI: 0000000000000000
-RBP: ffff88814479e198 R08: ffffffff8b7f08e0 R09: 1ffffffff2858111
-R10: dffffc0000000000 R11: fffffbfff2858112 R12: 0000000000000000
-R13: 0000000000000000 R14: ffff88814479e078 R15: dffffc0000000000
-FS:  000055556b882380(0000) GS:ffff8880b8600000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f255acbe5e7 CR3: 000000007e970000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- nl802154_wpan_phy_netns+0x13d/0x210 net/ieee802154/nl802154.c:1292
- genl_family_rcv_msg_doit net/netlink/genetlink.c:1115 [inline]
- genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
- genl_rcv_msg+0xb14/0xec0 net/netlink/genetlink.c:1210
- netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2543
- genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
- netlink_unicast_kernel net/netlink/af_netlink.c:1322 [inline]
- netlink_unicast+0x7f6/0x990 net/netlink/af_netlink.c:1348
- netlink_sendmsg+0x8e4/0xcb0 net/netlink/af_netlink.c:1892
- sock_sendmsg_nosec net/socket.c:711 [inline]
- __sock_sendmsg+0x221/0x270 net/socket.c:726
- ____sys_sendmsg+0x52a/0x7e0 net/socket.c:2594
- ___sys_sendmsg net/socket.c:2648 [inline]
- __sys_sendmsg+0x269/0x350 net/socket.c:2680
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f255ac67da9
-Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffe8eee9248 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007ffe8eee9260 RCX: 00007f255ac67da9
-RDX: 000000000004c084 RSI: 0000000020000100 RDI: 0000000000000006
-RBP: 0000000000000001 R08: 00007ffe8eee8fe7 R09: 000055556b883610
-R10: 0000000000000001 R11: 0000000000000246 R12: 00007f255acafe7c
-R13: 00007f255acaa10f R14: 0000000000000001 R15: 0000000000000001
- </TASK>
+will create tun0 in ns1, rather than create it in ns2 and move to ns1.
+And don't conflict with another interface named "tun0" in current netns.
 
+Patch 01 serves for 1) to avoids link name conflict in different netns.
+
+To achieve 2), there're mainly 3 steps:
+
+ - Patch 02 packs newlink() parameters into a struct, including
+   the original "src_net" along with more netns context. No semantic
+   changes are introduced.
+ - Patch 03 ~ 07 converts device drivers to use the explicit netns
+   extracted from params.
+ - Patch 08 ~ 09 removes the old netns parameter, and converts
+   rtnetlink to create device in target netns directly.
+
+Patch 10 ~ 11 adds some tests for link name and link netns.
+
+
+BTW please note there're some issues found in current code:
+
+- In amt_newlink() drivers/net/amt.c:
+
+    amt->net = net;
+    ...
+    amt->stream_dev = dev_get_by_index(net, ...
+
+  Uses net, but amt_lookup_upper_dev() only searches in dev_net.
+  So the AMT device may not be properly deleted if it's in a different
+  netns from lower dev.
+
+- In gtp_newlink() in drivers/net/gtp.c:
+
+    gtp->net = src_net;
+    ...
+    gn = net_generic(dev_net(dev), gtp_net_id);
+    list_add_rcu(&gtp->list, &gn->gtp_dev_list);
+
+  Uses src_net, but priv is linked to list in dev_net. So it may not be
+  properly deleted on removal of link netns.
+
+- In pfcp_newlink() in drivers/net/pfcp.c:
+
+    pfcp->net = net;
+    ...
+    pn = net_generic(dev_net(dev), pfcp_net_id);
+    list_add_rcu(&pfcp->list, &pn->pfcp_dev_list);
+
+  Same as above.
+
+- In lowpan_newlink() in net/ieee802154/6lowpan/core.c:
+
+    wdev = dev_get_by_index(dev_net(ldev), nla_get_u32(tb[IFLA_LINK]));
+
+  Looks for IFLA_LINK in dev_net, but in theory the ifindex is defined
+  in link netns.
+
+
+Kuniyuki has a patchset to address the issues of gtp and pfcp:
+https://lore.kernel.org/netdev/20250110014754.33847-1-kuniyu@amazon.com/
 
 ---
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+
+v8:
+ - Move dev and ext_ack out from param struct.
+ - Validate link_net and dev_net are identical for 6lowpan.
+
+v7:
+ link: https://lore.kernel.org/all/20250104125732.17335-1-shaw.leon@gmail.com/
+ - Add selftest kconfig.
+ - Remove a duplicated test of ip6gre.
+
+v6:
+ link: https://lore.kernel.org/all/20241218130909.2173-1-shaw.leon@gmail.com/
+ - Split prototype, driver and rtnetlink changes.
+ - Add more tests for link netns.
+ - Fix IPv6 tunnel net overwriten in ndo_init().
+ - Reorder variable declarations.
+ - Exclude a ip_tunnel-specific patch.
+
+v5:
+ link: https://lore.kernel.org/all/20241209140151.231257-1-shaw.leon@gmail.com/
+ - Fix function doc in batman-adv.
+ - Include peer_net in rtnl newlink parameters.
+
+v4:
+ link: https://lore.kernel.org/all/20241118143244.1773-1-shaw.leon@gmail.com/
+ - Pack newlink() parameters to a single struct.
+ - Use ynl async_msg_queue.empty() in selftest.
+
+v3:
+ link: https://lore.kernel.org/all/20241113125715.150201-1-shaw.leon@gmail.com/
+ - Drop "netns_atomic" flag and module parameter. Add netns parameter to
+   newlink() instead, and convert drivers accordingly.
+ - Move python NetNSEnter helper to net selftest lib.
+
+v2:
+ link: https://lore.kernel.org/all/20241107133004.7469-1-shaw.leon@gmail.com/
+ - Check NLM_F_EXCL to ensure only link creation is affected.
+ - Add self tests for link name/ifindex conflict and notifications
+   in different netns.
+ - Changes in dummy driver and ynl in order to add the test case.
+
+v1:
+ link: https://lore.kernel.org/all/20241023023146.372653-1-shaw.leon@gmail.com/
+
+
+
+Xiao Liang (11):
+  rtnetlink: Lookup device in target netns when creating link
+  rtnetlink: Pack newlink() params into struct
+  net: Use link netns in newlink() of rtnl_link_ops
+  ieee802154: 6lowpan: Validate link netns in newlink() of rtnl_link_ops
+  net: ip_tunnel: Use link netns in newlink() of rtnl_link_ops
+  net: ipv6: Use link netns in newlink() of rtnl_link_ops
+  net: xfrm: Use link netns in newlink() of rtnl_link_ops
+  rtnetlink: Remove "net" from newlink params
+  rtnetlink: Create link directly in target net namespace
+  selftests: net: Add python context manager for netns entering
+  selftests: net: Add test cases for link and peer netns
+
+ drivers/infiniband/ulp/ipoib/ipoib_netlink.c  |   9 +-
+ drivers/net/amt.c                             |  11 +-
+ drivers/net/bareudp.c                         |   9 +-
+ drivers/net/bonding/bond_netlink.c            |   6 +-
+ drivers/net/can/dev/netlink.c                 |   4 +-
+ drivers/net/can/vxcan.c                       |   7 +-
+ .../ethernet/qualcomm/rmnet/rmnet_config.c    |   9 +-
+ drivers/net/geneve.c                          |   9 +-
+ drivers/net/gtp.c                             |   8 +-
+ drivers/net/ipvlan/ipvlan.h                   |   3 +-
+ drivers/net/ipvlan/ipvlan_main.c              |   8 +-
+ drivers/net/ipvlan/ipvtap.c                   |   6 +-
+ drivers/net/macsec.c                          |   9 +-
+ drivers/net/macvlan.c                         |   7 +-
+ drivers/net/macvtap.c                         |   7 +-
+ drivers/net/netkit.c                          |   7 +-
+ drivers/net/pfcp.c                            |   7 +-
+ drivers/net/ppp/ppp_generic.c                 |   9 +-
+ drivers/net/team/team_core.c                  |   6 +-
+ drivers/net/veth.c                            |   7 +-
+ drivers/net/vrf.c                             |   5 +-
+ drivers/net/vxlan/vxlan_core.c                |   9 +-
+ drivers/net/wireguard/device.c                |   7 +-
+ drivers/net/wireless/virtual/virt_wifi.c      |   8 +-
+ drivers/net/wwan/wwan_core.c                  |  16 +-
+ include/net/ip_tunnels.h                      |   5 +-
+ include/net/rtnetlink.h                       |  40 ++++-
+ net/8021q/vlan_netlink.c                      |   9 +-
+ net/batman-adv/soft-interface.c               |   9 +-
+ net/bridge/br_netlink.c                       |   6 +-
+ net/caif/chnl_net.c                           |   5 +-
+ net/core/rtnetlink.c                          |  33 ++--
+ net/hsr/hsr_netlink.c                         |  12 +-
+ net/ieee802154/6lowpan/core.c                 |   7 +-
+ net/ipv4/ip_gre.c                             |  24 ++-
+ net/ipv4/ip_tunnel.c                          |  10 +-
+ net/ipv4/ip_vti.c                             |   9 +-
+ net/ipv4/ipip.c                               |   9 +-
+ net/ipv6/ip6_gre.c                            |  30 ++--
+ net/ipv6/ip6_tunnel.c                         |  19 ++-
+ net/ipv6/ip6_vti.c                            |  15 +-
+ net/ipv6/sit.c                                |  17 ++-
+ net/xfrm/xfrm_interface_core.c                |  15 +-
+ tools/testing/selftests/net/Makefile          |   1 +
+ tools/testing/selftests/net/config            |   5 +
+ .../testing/selftests/net/lib/py/__init__.py  |   2 +-
+ tools/testing/selftests/net/lib/py/netns.py   |  18 +++
+ tools/testing/selftests/net/link_netns.py     | 141 ++++++++++++++++++
+ tools/testing/selftests/net/netns-name.sh     |  10 ++
+ 49 files changed, 479 insertions(+), 165 deletions(-)
+ create mode 100755 tools/testing/selftests/net/link_netns.py
+
+-- 
+2.47.1
+
