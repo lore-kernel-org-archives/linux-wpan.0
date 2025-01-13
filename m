@@ -1,30 +1,30 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EAD31D0E20;
-	Mon, 13 Jan 2025 18:36:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4368A1D417B;
+	Mon, 13 Jan 2025 18:36:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736793385; cv=none; b=Jp6Mg5J0l0zj4AHlOxqdtZd04WpVa9r8KZ+gybo5/4erakiqF89uH3+inA67WCVEboPngCPmqZ6/5pUbksSvlOoFjWitXJLLMoAg00bxwp0eOAV+bVitFkaHVyVpFTGVUm/AU+hqAfDCpC6dxS/yK4rkUSGr+mTYpUxyu7/bseQ=
+	t=1736793399; cv=none; b=HBxqigzd20F8Tfn1G50f5w/ZnJ+QS9euCky4eeqibk7W8rQ6OG4OF2M34ZKcyURJ6DToU3dQ9MoIKUWyn+2xVldZon9vDeugJclFY8fkqGXTrAhkIyT4mpYEiSjIeEBZV2AWydi5532KG++i2O3aM3Y59IIqUkNG8L9zCIN9wuc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736793385; c=relaxed/simple;
+	s=arc-20240116; t=1736793399; c=relaxed/simple;
 	bh=u1P41QJuzQbMJl1DNKfanFr1JkI8JdcxmczMYl5SzOk=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=b3XoAeBgIPfZmudlS9K9HE9V3rBmJT8g9vvAXkQZlFMTs0MmgIZuDDFxAKRLYCOg6vkFzjw05LQjMwqDO41qbXvhcAYrmkJvRojaywt9JxU488c7vOpcccNz+Fi+N9Ha9ZwHOwj8aloxPdek5SX8TCBERvie6Un0by+Vs2cpXgU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A2zfy0oS; arc=none smtp.client-ip=10.30.226.201
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=J3XHUYg4rZau7SvbbgBaH6KlYBFiJJ6WJNvB4O5CuEkW+jYkPIlie7P3ylrfWzSei9HT+wwmwope6jgGsb+IBkhBKPC+Lqe1fiU+NTZlnoF7DRKdoEdbov7ByF+0w8rdfSaLPKrYozgK1ymb66aBi9C/Y8U9IQt9Xntxqe94HII=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VXP3Qm/d; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A2zfy0oS"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 474FEC4CED6;
-	Mon, 13 Jan 2025 18:36:23 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VXP3Qm/d"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A687FC4CED6;
+	Mon, 13 Jan 2025 18:36:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736793384;
+	s=k20201202; t=1736793399;
 	bh=u1P41QJuzQbMJl1DNKfanFr1JkI8JdcxmczMYl5SzOk=;
 	h=From:To:Cc:Subject:Date:From;
-	b=A2zfy0oSBSW5D/hzXmLDcW96Cal90u2tLiUGxsxq2AFLyEogAeJUD8OnD7RnrXPUT
-	 vCQ9cRUSsPbIoS8r+qtSLUSO6mjzu3XZaH7Ho36q5wbR2Wih9neKrII9xeEyrLy1V5
-	 IDOS/3qnzNgycXF/UYD5OG9uW+AdtmmQFIXFjr19mOoaiJL2BwXCaTpa0ktJRajLbW
-	 BOjH+7cuTmvgt14aCefwNRTOlQdKdyKOxdJ7BX+5vdCgOs7eQH7bgr3PmJsbySkHrd
-	 5Zz7rQOexoFnXcf3vzc7/cHhU8HLnNsNj1NWcTaRBoWgP2QqTcO8v8APZcIpxl12nH
-	 7+Yd9lG1oX8tA==
+	b=VXP3Qm/dxMmf5yu+FJGcF6PglDj1jL+47RX1Gg6FCEZtXu4CTrAODjXA7guCE0Vg3
+	 Rjp86qjg4fMO9u6cWMl2dyn2vusLBQDWkPh6EE6dR0w7Z8dGA3FqGdNcOXNZSJOHSP
+	 o+wYVvPLu00U6WdDI9d2+WODAa5fUZ3l1JknY955Fgn7qtKRZb4Yw+G/zyDm7L6dGs
+	 Uo4SuaH8SDJJtwxysCyy991BykwulstHKg7sg+ag1zmktF9mYCzt4WielA3azy25HA
+	 HghcVvgDddlYWrvgqSFbKE8oweXekzNwHelzhd1MyfcluwXPVxE/OVmQ0l7C/QndSj
+	 AAN2q/95Virqw==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -40,9 +40,9 @@ Cc: Lizhi Xu <lizhi.xu@windriver.com>,
 	pabeni@redhat.com,
 	linux-wpan@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 1/5] mac802154: check local interfaces before deleting sdata list
-Date: Mon, 13 Jan 2025 13:36:15 -0500
-Message-Id: <20250113183619.1784510-1-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.4 1/4] mac802154: check local interfaces before deleting sdata list
+Date: Mon, 13 Jan 2025 13:36:30 -0500
+Message-Id: <20250113183633.1784590-1-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
@@ -52,7 +52,7 @@ List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 5.10.233
+X-stable-base: Linux 5.4.289
 Content-Transfer-Encoding: 8bit
 
 From: Lizhi Xu <lizhi.xu@windriver.com>
