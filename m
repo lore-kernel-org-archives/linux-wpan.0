@@ -1,30 +1,30 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73BF61C5496;
-	Mon, 13 Jan 2025 18:35:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19E3D1C54AA;
+	Mon, 13 Jan 2025 18:36:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736793342; cv=none; b=WF80HhPlFie/a1CxyWfYSDoQNJLPBbdapPy3zSXJFG4gh1kB4H5ZM9UqYaO+LMfdjza9ojBZX1er480MylKP/Vd776UJl+vtg3Sl9pNEBf6nHSABOwEsNuDaezBcH01JpXh0SUKNI6YFhUoddhUjo+sdssqFd9Id4DBDZjA9xXw=
+	t=1736793368; cv=none; b=B1WiQudZQ8ejw4dysTuT/+cj1qS5jgU67mCXiJVO00ScmWK0IBM5xXMpwSCJy1QrbZiBZ9QiDEvLD4oBKtLFhsPeolmyzJOT9uiaLlMAA7V92GsTpO0cORrSeLzi22goptE2IXPt5GNUI3rX/OUf30bV3tk2Ola9lIAigo3nwbI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736793342; c=relaxed/simple;
-	bh=g4m3iqCCHuo24pi498OinOOvT/DqOGwtiBqHKv/yM3g=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Jo0qhoKwflaaLpltgK5s9vNA4Y7gTkXZem/9npafDedREwiSnaYqCnHUmflkCOrlVjphVHO+vezKvKHTbumsADtLFb4NCkrm7Y446+6Ohgy+1bixyYq8jNbZhFXDn5YF9AKKgFv8mf1zsIgUsHKugPyLVfNXUEYCSlBe9VI/y4c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ava6OrM/; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1736793368; c=relaxed/simple;
+	bh=KbJVlbsgxjJMVGOe66q0daSbNCI98hltcAoq7x18yE8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=G9HutHaFWkiHZj4inMvv/VXtn4liA4tl1IuOZeEwt342em0bBnGEGEKipCL4anF4SC2ZbxYHIkjS/HyPbTYPjL6WaNZcJUEuBLOPhJD6BnAAGG2+w+so7RfS/dN1V7N5LEH2IBa9+jOpDdhBhub4QfxwQp2JQFOLDITucji7+KU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Xu8AU63i; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ava6OrM/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7572C4CED6;
-	Mon, 13 Jan 2025 18:35:40 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xu8AU63i"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F221C4CED6;
+	Mon, 13 Jan 2025 18:36:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736793342;
-	bh=g4m3iqCCHuo24pi498OinOOvT/DqOGwtiBqHKv/yM3g=;
+	s=k20201202; t=1736793368;
+	bh=KbJVlbsgxjJMVGOe66q0daSbNCI98hltcAoq7x18yE8=;
 	h=From:To:Cc:Subject:Date:From;
-	b=Ava6OrM/t1tH9ygEMnkcZCXfriZS2aK76ynuHpTuFp5aD7mG1/0ysN+tZufnjyJXd
-	 r5XlLju3ksukS03BWg30/7EHTT/dIqUbVIQWQIXG66msRsB25ih+lmqv6qV23JZdk8
-	 9aBjb4hJucusiHAq5Kq1X/I/u16leSMQIY9oJbeJMNs+NThqtMwt1UnO+n6iI0crsn
-	 Xorg3E67jyic5ptAKs6sk3v09IKbEE6AdxtB5jx6jPnLoL0xnwZc+y+o32WOlSOWH/
-	 6a0+IpIh5AgHuhMx41Gzp5gZXx71+gPBeeQCYRQ7bfDSARr4rOWXqBp5mWTLDKA/Pi
-	 372uc0uAc+rhg==
+	b=Xu8AU63iU2lOOKVL2Hge/qxSSnlPW40ne8C9InPF6fjNRhD5f+zRMrQsR81dSpn++
+	 P3WakI1lOtgai/orQDb9zDr+6NbgkgHehqGVowaVsutcfQlEYbzeVdVUymM3PGZFDo
+	 e2wcHhQewpyDaiXNSRjtoQ9ycIIjTU7ZFbeZRLbg+BGe3nq9PvS8jzEr5TsTsltNt7
+	 +oYD4hD92NsM4NzaOm0Fi//J2lVtotHtXtH35gPirD5v7LvdUdFXboScF9xUnsAcco
+	 p9z2Z0GR71XFMnb0RFPVXJ374FjIKrh2RROr8mbx94v7/3rgKCCYnwVABfYWjgjkhM
+	 OEYnLzY/VJ6Lg==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -40,9 +40,9 @@ Cc: Lizhi Xu <lizhi.xu@windriver.com>,
 	pabeni@redhat.com,
 	linux-wpan@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.1 01/10] mac802154: check local interfaces before deleting sdata list
-Date: Mon, 13 Jan 2025 13:35:27 -0500
-Message-Id: <20250113183537.1784136-1-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.15 1/6] mac802154: check local interfaces before deleting sdata list
+Date: Mon, 13 Jan 2025 13:35:55 -0500
+Message-Id: <20250113183601.1784402-1-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
@@ -52,7 +52,7 @@ List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.1.124
+X-stable-base: Linux 5.15.176
 Content-Transfer-Encoding: 8bit
 
 From: Lizhi Xu <lizhi.xu@windriver.com>
@@ -133,10 +133,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 4 insertions(+)
 
 diff --git a/net/mac802154/iface.c b/net/mac802154/iface.c
-index 7e2065e72915..0233929502ec 100644
+index 3e510664fc89..ecc084e2e5dd 100644
 --- a/net/mac802154/iface.c
 +++ b/net/mac802154/iface.c
-@@ -689,6 +689,10 @@ void ieee802154_if_remove(struct ieee802154_sub_if_data *sdata)
+@@ -688,6 +688,10 @@ void ieee802154_if_remove(struct ieee802154_sub_if_data *sdata)
  	ASSERT_RTNL();
  
  	mutex_lock(&sdata->local->iflist_mtx);
