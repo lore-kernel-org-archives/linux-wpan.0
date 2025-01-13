@@ -1,314 +1,152 @@
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C44622DFB1;
-	Mon, 13 Jan 2025 14:39:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EF901C2457;
+	Mon, 13 Jan 2025 18:34:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736779156; cv=none; b=sBNJGu8C+OFoEtVvyJ7hsQ0etH12VvX+5ykHpHNvcjxqQK4ceJhkBHYtwR4LbLHqWUBpQKQ9nxtwWMvMWMZwBm49UwFj8Vwwe6y1EfH9WKtxjrCW6eWZXOAcz53D2Ctv9NdiNvCgJDjQ6V0/5iCM4Vh1y/0tW3cC+n4mpPwwe54=
+	t=1736793272; cv=none; b=Ru+5f2hC7bERH4n5nTUW/R9cTZ/8TcQBzoiQUxLhbSKHw55+2iryM0vFAVwb/Ol5urTXmUvPGuSBCgzbARYAm/Dnk2ijpDE2AEkLop6F/HRCk8bd0/LMzoK7KyrEHmg2dnXb7GlB2jGceASOgADCFnbyiKDcIrN1nGjNzfwZ+uo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736779156; c=relaxed/simple;
-	bh=0G+WJHelzbbjtgv/Zbgactw+yzF4V+X8MJldF12Uf7A=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BOLWsJS5luNWaQ+/zuM/zTvfqBrZuPwxp5NB/Lrr4Ayks0T6L4MlWQh8bm1D7YCaxHP/MEem8HuToVskqs/rUEsWUg7gYFFaepO9cKzGReRsFE2Yz7nGG9HZxnm41LZAmdmmecRefsJqxIDcEcp966o6LFN93uCL3HJCUbu/VP4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mdhV9hqD; arc=none smtp.client-ip=209.85.214.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1736793272; c=relaxed/simple;
+	bh=kQRZmjgXyx0pLE1ZhNfiAV93WPz/Kxd2lUA0pD7TF9k=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=i1sOqQXCrkiOWstSGdxWEzkOENJP6FA4AHxQudmaWUUFYxvGw1m5xkURXwrdqcLjePMBos6JNvHhPbI77RGeHhP8qdEtY3xm5pSBQAz1DVbbWoID7mXbVWbVozhargQnQvFJREIAjigd2UQuYj2uEtDWlz3ZbCC7IWCcJW95NLE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SkFBd4/V; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mdhV9hqD"
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-21644aca3a0so95936325ad.3;
-        Mon, 13 Jan 2025 06:39:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736779153; x=1737383953; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=R0TVXDX/Oq9IB0mhgmi61TXIFVtPNPu1PWKjPd5bzuM=;
-        b=mdhV9hqDkGVkVHMv0B5JnL14GjXjp3LSB6fFUzLsJUGCasBB8mLgesFEOKv28jfDQd
-         Dzv9tytKyUQmeNmr0+wcbcXOgQNMFfYqZUI5zSj9chuix98ydumZFVItYR7h3Smk8JY6
-         qy9WYM4CWnIklxZUKa2JhV5aXokm3Al7xOQSm7mWYdVmiVV+1TJqPaoICAo+SL/hCtu0
-         CxxPKId7EHV4QmxfhygiXApf3kS57jsAH/+Sd0XgB2iliWc223bWim26um12wtE/LfMD
-         w+VpxgfWK0BuRYPqQC8P0mCE8sevD/v8WCBPHiUMxbyMtMZNi945f2zAWPCU0dClTA+z
-         5OkA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736779153; x=1737383953;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=R0TVXDX/Oq9IB0mhgmi61TXIFVtPNPu1PWKjPd5bzuM=;
-        b=WiuFY5ERx4fZpmkVLLqT3P0vHJpVZTD4HhV2mAT1D0QBAnwulvqAvaNRcn64O5blyc
-         hDj4RpT+Plp04Pu7UlmXy4MjtAGn2kNUQ61hmsC/OCSzVaA4s5Ze1zVwqwn5qvfsgWpr
-         Pfr78T+22PAEgiES06BHBq9kn31SQTsW7eVc8hshLjM0qcpJDgoGEu6NpGdTdFMpU5Zz
-         D7MVUMDRqz63KPY1fgKYHlrduGQiLzSYH08AUovaad12NMUc7EQcHF2plZ0ltC3c+d0v
-         5p7Nz9b1ZICM4g6+cjkFfwU/c+izLfUAGhSLB8/1nqZV7jB5nwJx0ya24+p9abalJ2d0
-         HuNA==
-X-Forwarded-Encrypted: i=1; AJvYcCUFLHbYOydfU9es94NceemO6MeaBLSuau8MGS8Q5YQESD11JXXOC6rSc+YvLCR3Sm/AtRsdSlk2ET7xLVFg@vger.kernel.org, AJvYcCUH1F2mkybZW4CxDUuGB3TjgjLWxQydaIAE9tOJaQOi7MkoP/SfNHUdxjdW4qpAQUVoGNoa+FGzyN/GUKDUC/4D@vger.kernel.org, AJvYcCWTd2MAO6ANCPBs8qvzHuKtQr7/4ogS81msGHChhwaaOHylmBnmZEfpzWj/C2B3Wto1KaHxpg6R1mv90w==@vger.kernel.org, AJvYcCWjqDRNJI/jmkdmeioMn0CMfVjTK0VRKBw6M//Z3e7KCOGNSoK7rJiRJvIhJLX+FS4hekz2ZHpKtPMf+Q==@vger.kernel.org, AJvYcCWtBh8hPHYqbJoqQIYIihjXOAyYSagAbJi018tUytgJ7p/OowWk5/IwCB84dXwLc0vdo7Aw1uGolxVcuC44rE4=@vger.kernel.org, AJvYcCX/B+yT7GmPsoczL3aqi1Ex3PWFXFf2fwhq0bQr9Ju83Cme6A1xfCrGJsjdfbl4JhOGr4U67PP41/T+@vger.kernel.org, AJvYcCXGoICj+Ow8nY1RV5ZEW8Ggph/NaOfyzM7/vU//PECyYsVQnZIZ/FLkNup8ASnFgz7cdPCzfdCMSLy/@vger.kernel.org, AJvYcCXHOCpOX4LkVkZd5kinYzLin1oVXQ0qV5luP8ZG8OoSBCU0QLSE5VkZEBxMETIKIrOTGOU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxfpaCXHld9uVlEVWr3bQ3IJQ4VPT89um+69Bp60rvdb1FGnt1J
-	A/LqcgXWNaulD7HtHYQnzs/aYAYG83MQONpWAhkwBKdmTun6Ax1ojdA0tyVvWqw=
-X-Gm-Gg: ASbGncuuf7feJL582A2xBsiBfUhssO5EqfS1JSB43mvXNmmx5ZE2+FugdrD+meMcQy0
-	33I/DELTcM7BVkf37+aQxv9+BqRj2JU3OJUY6JhCzGjyfDWPvV8irsFxYCT60fQmyU+E8bDA9ra
-	vlNzm+eqjvcN7it1Hxz9q53DPLxrfNgFSWfJvXCLf9PCehp/DfP3Mw5peDu/iWVk0CTkhJDix8V
-	kotEJlHrksrYu7h3Sa+jyQNyZBqRrI7UO0oddpCDHCTBzg=
-X-Google-Smtp-Source: AGHT+IFt4cEJz+p42bYm31EfJt3Zb0JLb+qW+6vXHsT58zE4AWUF4ed/u79zsBlznytyW2KBQMyVfw==
-X-Received: by 2002:a17:902:d511:b0:215:6489:cfbf with SMTP id d9443c01a7336-21a83f48cc0mr313835205ad.11.1736779153175;
-        Mon, 13 Jan 2025 06:39:13 -0800 (PST)
-Received: from ws.. ([103.167.140.11])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21a9f155e00sm54328715ad.103.2025.01.13.06.39.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Jan 2025 06:39:12 -0800 (PST)
-From: Xiao Liang <shaw.leon@gmail.com>
-To: netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Jakub Kicinski <kuba@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Simon Horman <horms@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Alexander Aring <alex.aring@gmail.com>,
-	Stefan Schmidt <stefan@datenfreihafen.org>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SkFBd4/V"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24D66C4CED6;
+	Mon, 13 Jan 2025 18:34:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736793271;
+	bh=kQRZmjgXyx0pLE1ZhNfiAV93WPz/Kxd2lUA0pD7TF9k=;
+	h=From:To:Cc:Subject:Date:From;
+	b=SkFBd4/V6rPJNCWNIluT4QflNNNEyZnKpRcRdpdeoBejnv9bw446kCBmhEtNsGAeH
+	 +6GYjjVMPCdH5nG4TpQbm87M4Q1yivMPQR3Gm6VeYwSp2l4xrEVfV3Q5pvpdEWQEfb
+	 N/WqUpvFt6zXuvQb3VQ3IuJM5Wy83AupxeRz0d1ukCX53ZsHC7Jn2fA6tGEs2pwFEY
+	 n1zus4U9upyTcLmhHN5XEHOATXfXysgAjs+bUDLeyzsjxkcjzq8HOAzcagGJuiz0qr
+	 cbUL+GzDb7j4cWdOVGbr7cg8zOcLkz8wtHZG00AOkFzywKLRTp/GiWuhwmCmWTvgAL
+	 TzFQ9kXFYDpQA==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Lizhi Xu <lizhi.xu@windriver.com>,
+	syzbot+985f827280dc3a6e7e92@syzkaller.appspotmail.com,
 	Miquel Raynal <miquel.raynal@bootlin.com>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-rdma@vger.kernel.org,
-	linux-can@vger.kernel.org,
-	osmocom-net-gprs@lists.osmocom.org,
-	bpf@vger.kernel.org,
-	linux-ppp@vger.kernel.org,
-	wireguard@lists.zx2c4.com,
-	linux-wireless@vger.kernel.org,
-	b.a.t.m.a.n@lists.open-mesh.org,
-	bridge@lists.linux.dev,
+	Stefan Schmidt <stefan@datenfreihafen.org>,
+	Sasha Levin <sashal@kernel.org>,
+	alex.aring@gmail.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
 	linux-wpan@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v8 11/11] selftests: net: Add test cases for link and peer netns
-Date: Mon, 13 Jan 2025 22:37:19 +0800
-Message-ID: <20250113143719.7948-12-shaw.leon@gmail.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20250113143719.7948-1-shaw.leon@gmail.com>
-References: <20250113143719.7948-1-shaw.leon@gmail.com>
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.12 01/20] mac802154: check local interfaces before deleting sdata list
+Date: Mon, 13 Jan 2025 13:34:06 -0500
+Message-Id: <20250113183425.1783715-1-sashal@kernel.org>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.12.9
 Content-Transfer-Encoding: 8bit
 
- - Add test for creating link in another netns when a link of the same
-   name and ifindex exists in current netns.
- - Add test to verify that link is created in target netns directly -
-   no link new/del events should be generated in link netns or current
-   netns.
- - Add test cases to verify that link-netns is set as expected for
-   various drivers and combination of namespace-related parameters.
+From: Lizhi Xu <lizhi.xu@windriver.com>
 
-Signed-off-by: Xiao Liang <shaw.leon@gmail.com>
+[ Upstream commit eb09fbeb48709fe66c0d708aed81e910a577a30a ]
+
+syzkaller reported a corrupted list in ieee802154_if_remove. [1]
+
+Remove an IEEE 802.15.4 network interface after unregister an IEEE 802.15.4
+hardware device from the system.
+
+CPU0					CPU1
+====					====
+genl_family_rcv_msg_doit		ieee802154_unregister_hw
+ieee802154_del_iface			ieee802154_remove_interfaces
+rdev_del_virtual_intf_deprecated	list_del(&sdata->list)
+ieee802154_if_remove
+list_del_rcu
+
+The net device has been unregistered, since the rcu grace period,
+unregistration must be run before ieee802154_if_remove.
+
+To avoid this issue, add a check for local->interfaces before deleting
+sdata list.
+
+[1]
+kernel BUG at lib/list_debug.c:58!
+Oops: invalid opcode: 0000 [#1] PREEMPT SMP KASAN PTI
+CPU: 0 UID: 0 PID: 6277 Comm: syz-executor157 Not tainted 6.12.0-rc6-syzkaller-00005-g557329bcecc2 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
+RIP: 0010:__list_del_entry_valid_or_report+0xf4/0x140 lib/list_debug.c:56
+Code: e8 a1 7e 00 07 90 0f 0b 48 c7 c7 e0 37 60 8c 4c 89 fe e8 8f 7e 00 07 90 0f 0b 48 c7 c7 40 38 60 8c 4c 89 fe e8 7d 7e 00 07 90 <0f> 0b 48 c7 c7 a0 38 60 8c 4c 89 fe e8 6b 7e 00 07 90 0f 0b 48 c7
+RSP: 0018:ffffc9000490f3d0 EFLAGS: 00010246
+RAX: 000000000000004e RBX: dead000000000122 RCX: d211eee56bb28d00
+RDX: 0000000000000000 RSI: 0000000080000000 RDI: 0000000000000000
+RBP: ffff88805b278dd8 R08: ffffffff8174a12c R09: 1ffffffff2852f0d
+R10: dffffc0000000000 R11: fffffbfff2852f0e R12: dffffc0000000000
+R13: dffffc0000000000 R14: dead000000000100 R15: ffff88805b278cc0
+FS:  0000555572f94380(0000) GS:ffff8880b8600000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000056262e4a3000 CR3: 0000000078496000 CR4: 00000000003526f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ __list_del_entry_valid include/linux/list.h:124 [inline]
+ __list_del_entry include/linux/list.h:215 [inline]
+ list_del_rcu include/linux/rculist.h:157 [inline]
+ ieee802154_if_remove+0x86/0x1e0 net/mac802154/iface.c:687
+ rdev_del_virtual_intf_deprecated net/ieee802154/rdev-ops.h:24 [inline]
+ ieee802154_del_iface+0x2c0/0x5c0 net/ieee802154/nl-phy.c:323
+ genl_family_rcv_msg_doit net/netlink/genetlink.c:1115 [inline]
+ genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
+ genl_rcv_msg+0xb14/0xec0 net/netlink/genetlink.c:1210
+ netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2551
+ genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
+ netlink_unicast_kernel net/netlink/af_netlink.c:1331 [inline]
+ netlink_unicast+0x7f6/0x990 net/netlink/af_netlink.c:1357
+ netlink_sendmsg+0x8e4/0xcb0 net/netlink/af_netlink.c:1901
+ sock_sendmsg_nosec net/socket.c:729 [inline]
+ __sock_sendmsg+0x221/0x270 net/socket.c:744
+ ____sys_sendmsg+0x52a/0x7e0 net/socket.c:2607
+ ___sys_sendmsg net/socket.c:2661 [inline]
+ __sys_sendmsg+0x292/0x380 net/socket.c:2690
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Reported-and-tested-by: syzbot+985f827280dc3a6e7e92@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=985f827280dc3a6e7e92
+Signed-off-by: Lizhi Xu <lizhi.xu@windriver.com>
+Reviewed-by: Miquel Raynal <miquel.raynal@bootlin.com>
+Link: https://lore.kernel.org/20241113095129.1457225-1-lizhi.xu@windriver.com
+Signed-off-by: Stefan Schmidt <stefan@datenfreihafen.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- tools/testing/selftests/net/Makefile      |   1 +
- tools/testing/selftests/net/config        |   5 +
- tools/testing/selftests/net/link_netns.py | 141 ++++++++++++++++++++++
- tools/testing/selftests/net/netns-name.sh |  10 ++
- 4 files changed, 157 insertions(+)
- create mode 100755 tools/testing/selftests/net/link_netns.py
+ net/mac802154/iface.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-index 73ee88d6b043..df07a38f884f 100644
---- a/tools/testing/selftests/net/Makefile
-+++ b/tools/testing/selftests/net/Makefile
-@@ -35,6 +35,7 @@ TEST_PROGS += cmsg_so_mark.sh
- TEST_PROGS += cmsg_so_priority.sh
- TEST_PROGS += cmsg_time.sh cmsg_ipv6.sh
- TEST_PROGS += netns-name.sh
-+TEST_PROGS += link_netns.py
- TEST_PROGS += nl_netdev.py
- TEST_PROGS += srv6_end_dt46_l3vpn_test.sh
- TEST_PROGS += srv6_end_dt4_l3vpn_test.sh
-diff --git a/tools/testing/selftests/net/config b/tools/testing/selftests/net/config
-index 5b9baf708950..ab55270669ec 100644
---- a/tools/testing/selftests/net/config
-+++ b/tools/testing/selftests/net/config
-@@ -107,3 +107,8 @@ CONFIG_XFRM_INTERFACE=m
- CONFIG_XFRM_USER=m
- CONFIG_IP_NF_MATCH_RPFILTER=m
- CONFIG_IP6_NF_MATCH_RPFILTER=m
-+CONFIG_IPVLAN=m
-+CONFIG_CAN=m
-+CONFIG_CAN_DEV=m
-+CONFIG_CAN_VXCAN=m
-+CONFIG_NETKIT=y
-diff --git a/tools/testing/selftests/net/link_netns.py b/tools/testing/selftests/net/link_netns.py
-new file mode 100755
-index 000000000000..aab043c59d69
---- /dev/null
-+++ b/tools/testing/selftests/net/link_netns.py
-@@ -0,0 +1,141 @@
-+#!/usr/bin/env python3
-+# SPDX-License-Identifier: GPL-2.0
-+
-+import time
-+
-+from lib.py import ksft_run, ksft_exit, ksft_true
-+from lib.py import ip
-+from lib.py import NetNS, NetNSEnter
-+from lib.py import RtnlFamily
-+
-+
-+LINK_NETNSID = 100
-+
-+
-+def test_event() -> None:
-+    with NetNS() as ns1, NetNS() as ns2:
-+        with NetNSEnter(str(ns2)):
-+            rtnl = RtnlFamily()
-+
-+        rtnl.ntf_subscribe("rtnlgrp-link")
-+
-+        ip(f"netns set {ns2} {LINK_NETNSID}", ns=str(ns1))
-+        ip(f"link add netns {ns1} link-netnsid {LINK_NETNSID} dummy1 type dummy")
-+        ip(f"link add netns {ns1} dummy2 type dummy", ns=str(ns2))
-+
-+        ip("link del dummy1", ns=str(ns1))
-+        ip("link del dummy2", ns=str(ns1))
-+
-+        time.sleep(1)
-+        rtnl.check_ntf()
-+        ksft_true(rtnl.async_msg_queue.empty(),
-+                  "Received unexpected link notification")
-+
-+
-+def validate_link_netns(netns, ifname, link_netnsid) -> bool:
-+    link_info = ip(f"-d link show dev {ifname}", ns=netns, json=True)
-+    if not link_info:
-+        return False
-+    return link_info[0].get("link_netnsid") == link_netnsid
-+
-+
-+def test_link_net() -> None:
-+    configs = [
-+        # type, common args, type args, fallback to dev_net
-+        ("ipvlan", "link dummy1", "", False),
-+        ("macsec", "link dummy1", "", False),
-+        ("macvlan", "link dummy1", "", False),
-+        ("macvtap", "link dummy1", "", False),
-+        ("vlan", "link dummy1", "id 100", False),
-+        ("gre", "", "local 192.0.2.1", True),
-+        ("vti", "", "local 192.0.2.1", True),
-+        ("ipip", "", "local 192.0.2.1", True),
-+        ("ip6gre", "", "local 2001:db8::1", True),
-+        ("ip6tnl", "", "local 2001:db8::1", True),
-+        ("vti6", "", "local 2001:db8::1", True),
-+        ("sit", "", "local 192.0.2.1", True),
-+        ("xfrm", "", "if_id 1", True),
-+    ]
-+
-+    with NetNS() as ns1, NetNS() as ns2, NetNS() as ns3:
-+        net1, net2, net3 = str(ns1), str(ns2), str(ns3)
-+
-+        # prepare link netnsid  and a dummy link needed by certain drivers
-+        ip(f"netns set {net3} {LINK_NETNSID}", ns=str(net2))
-+        ip("link add dummy1 type dummy", ns=net3)
-+
-+        cases = [
-+            # source, "netns", "link-netns", expected link-netns
-+            (net3, None, None, None, None),
-+            (net3, net2, None, None, LINK_NETNSID),
-+            (net2, None, net3, LINK_NETNSID, LINK_NETNSID),
-+            (net1, net2, net3, LINK_NETNSID, LINK_NETNSID),
-+        ]
-+
-+        for src_net, netns, link_netns, exp1, exp2 in cases:
-+            tgt_net = netns or src_net
-+            for typ, cargs, targs, fb_dev_net in configs:
-+                cmd = "link add"
-+                if netns:
-+                    cmd += f" netns {netns}"
-+                if link_netns:
-+                    cmd += f" link-netns {link_netns}"
-+                cmd += f" {cargs} foo type {typ} {targs}"
-+                ip(cmd, ns=src_net)
-+                if fb_dev_net:
-+                    ksft_true(validate_link_netns(tgt_net, "foo", exp1),
-+                              f"{typ} link_netns validation failed")
-+                else:
-+                    ksft_true(validate_link_netns(tgt_net, "foo", exp2),
-+                              f"{typ} link_netns validation failed")
-+                ip(f"link del foo", ns=tgt_net)
-+
-+
-+def test_peer_net() -> None:
-+    types = [
-+        "vxcan",
-+        "netkit",
-+        "veth",
-+    ]
-+
-+    with NetNS() as ns1, NetNS() as ns2, NetNS() as ns3, NetNS() as ns4:
-+        net1, net2, net3, net4 = str(ns1), str(ns2), str(ns3), str(ns4)
-+
-+        ip(f"netns set {net3} {LINK_NETNSID}", ns=str(net2))
-+
-+        cases = [
-+            # source, "netns", "link-netns", "peer netns", expected
-+            (net1, None, None, None, None),
-+            (net1, net2, None, None, None),
-+            (net2, None, net3, None, LINK_NETNSID),
-+            (net1, net2, net3, None, None),
-+            (net2, None, None, net3, LINK_NETNSID),
-+            (net1, net2, None, net3, LINK_NETNSID),
-+            (net2, None, net2, net3, LINK_NETNSID),
-+            (net1, net2, net4, net3, LINK_NETNSID),
-+        ]
-+
-+        for src_net, netns, link_netns, peer_netns, exp in cases:
-+            tgt_net = netns or src_net
-+            for typ in types:
-+                cmd = "link add"
-+                if netns:
-+                    cmd += f" netns {netns}"
-+                if link_netns:
-+                    cmd += f" link-netns {link_netns}"
-+                cmd += f" foo type {typ}"
-+                if peer_netns:
-+                    cmd += f" peer netns {peer_netns}"
-+                ip(cmd, ns=src_net)
-+                ksft_true(validate_link_netns(tgt_net, "foo", exp),
-+                          f"{typ} peer_netns validation failed")
-+                ip(f"link del foo", ns=tgt_net)
-+
-+
-+def main() -> None:
-+    ksft_run([test_event, test_link_net, test_peer_net])
-+    ksft_exit()
-+
-+
-+if __name__ == "__main__":
-+    main()
-diff --git a/tools/testing/selftests/net/netns-name.sh b/tools/testing/selftests/net/netns-name.sh
-index 6974474c26f3..0be1905d1f2f 100755
---- a/tools/testing/selftests/net/netns-name.sh
-+++ b/tools/testing/selftests/net/netns-name.sh
-@@ -78,6 +78,16 @@ ip -netns $NS link show dev $ALT_NAME 2> /dev/null &&
-     fail "Can still find alt-name after move"
- ip -netns $test_ns link del $DEV || fail
+diff --git a/net/mac802154/iface.c b/net/mac802154/iface.c
+index c0e2da5072be..9e4631fade90 100644
+--- a/net/mac802154/iface.c
++++ b/net/mac802154/iface.c
+@@ -684,6 +684,10 @@ void ieee802154_if_remove(struct ieee802154_sub_if_data *sdata)
+ 	ASSERT_RTNL();
  
-+#
-+# Test no conflict of the same name/ifindex in different netns
-+#
-+ip -netns $NS link add name $DEV index 100 type dummy || fail
-+ip -netns $NS link add netns $test_ns name $DEV index 100 type dummy ||
-+    fail "Can create in netns without moving"
-+ip -netns $test_ns link show dev $DEV >> /dev/null || fail "Device not found"
-+ip -netns $NS link del $DEV || fail
-+ip -netns $test_ns link del $DEV || fail
-+
- echo -ne "$(basename $0) \t\t\t\t"
- if [ $RET_CODE -eq 0 ]; then
-     echo "[  OK  ]"
+ 	mutex_lock(&sdata->local->iflist_mtx);
++	if (list_empty(&sdata->local->interfaces)) {
++		mutex_unlock(&sdata->local->iflist_mtx);
++		return;
++	}
+ 	list_del_rcu(&sdata->list);
+ 	mutex_unlock(&sdata->local->iflist_mtx);
+ 
 -- 
-2.47.1
+2.39.5
 
