@@ -1,102 +1,114 @@
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42497215043;
-	Mon,  3 Mar 2025 16:06:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E1EB213227;
+	Mon,  3 Mar 2025 16:12:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741017999; cv=none; b=STIGNtFCr/yVMmMPgpb9pDkI64Vxxu1SkstaH2/1geeZaH9BYZd+EDvZ9R6mM5G8yldewoy9SD/pHKagTVzbpHpAgeC1bUv5JN350+skCXKXSmzMCgLU4b9BswZUEyCDhXjIpuqixngppQyv3SDlUj1ygJjF3Zm75PSdmG4Pyf0=
+	t=1741018369; cv=none; b=Hc23F1NkB4ASJVuEoXbSCJZ58ppoWgyAa9Z7YU5saXzLJl5CFNDEaXbxakvUteuZYbzRGXUxl7AMxGSO3Gi9pogR3b+u8PbRckfTDrlN1OeZ6SV1suPwuV2DF10y2h33s0kOXQv+72hazuBnz15l0OCewtlUT9n39SlnsOKy4/U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741017999; c=relaxed/simple;
-	bh=0o/eLy1rhcIG2D9DbO5Vv2RfGE5XdW9XH+TnUEAbStY=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=FUzpDv+jD04v366otnpqquhY0yo6X3/tkBs/EGZzVggEGAq14+ZHWKINlE6NVnPIiAr+cI0qggmktKpBY7NZgmwjNtgHBVBJFE96QiwFfMSshgrOBcLR0PaOTaYMmhuUFCrgx2St406ZDTNvKrXdr20yGx2lMD1Vzuu2JSu9WjY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=N6yCfVR8; arc=none smtp.client-ip=217.70.183.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+	s=arc-20240116; t=1741018369; c=relaxed/simple;
+	bh=/ghFgI/MaEP2uWJLGRydPD82IY9KviAq8ItyxZP3F3I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QwLU42WOgAx36hQMsGxiBJyUBrOOIA4gKa6EdoyAaYD9PotiFOvYsdw6pKe0hT68Ck2HOWWiRB7M8o47ePERG7ezKNT0UJCzLaHRZEWC2uhTBRZoLPTrOqgsFtkIfigaCAtmFGdFo5evuV0MUksy3CC9vVmT5H27LNGi/Q5JBxU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=frYhSB76; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="N6yCfVR8"
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 1A55444319;
-	Mon,  3 Mar 2025 16:06:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1741017994;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=t5ZXzMX1/ykUU6pr/kSKc0XUxU+Kw7kuEgt8sySazL0=;
-	b=N6yCfVR852JO4sAGmx+EWlLVcGPCi4iQqEr3qvnd6nWeZO1PAaXRIvYad5O0oOwOJZs7vN
-	OsczmmoAOyH8/VIjNDHU3Mb/lqqQzzHU3nZAGoUBX8XwRtNyaXfhy9orvJ5BbywOv6IaWv
-	H116Fzl2m98+fQuI5aRfAniIbVCSea6sFoZQ6t0h32ipfRh8tuwhckRp48Wu69L1WBLyVI
-	47KtN7nyc+9+bvDrfR2EfEiVMS0cjhNqHgW+gelli50yR2qZ/tJ3cMjqeO2Ck8oya5zReM
-	cAo6Jx2ozblE91/XmM/71ChfwyJ3YwvxDl5UFgvF8S2w8YTHiwYerPpBWQPy7g==
-From: Miquel Raynal <miquel.raynal@bootlin.com>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc: linux-wpan@vger.kernel.org,  netdev@vger.kernel.org,
-  linux-kernel@vger.kernel.org,  linux-gpio@vger.kernel.org,  Alexander
- Aring <alex.aring@gmail.com>,  Stefan Schmidt <stefan@datenfreihafen.org>,
-  Andrew Lunn <andrew+netdev@lunn.ch>,  "David S. Miller"
- <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Jakub
- Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,  Linus
- Walleij <linus.walleij@linaro.org>,  Bartosz Golaszewski <brgl@bgdev.pl>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="frYhSB76"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1741018368; x=1772554368;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=/ghFgI/MaEP2uWJLGRydPD82IY9KviAq8ItyxZP3F3I=;
+  b=frYhSB76pyHrOeso6DSErgn2BK5IBWqfLXUoEm2Evyrif396SGYovTN4
+   9/g2maF7dYUW3rH+UselsWJl89Ozkg7SjcU3UzLBPFnvrbGmk0gTzBoYW
+   vFnQzozXPnaui+zOyGM2elLnHgM8JBySI83ri2NifrVnlUCZyQBDi5ZZ1
+   jN5Fu2FxxYzUfs4ibnG3NJEoco3haQ63NccS39YuJMPVKDoVA7OUzwQf9
+   vE4DSWFAYqXoSKmhtYcXQylvHKZoB9pjY0emTcVZ0xVaSIxu6Jsp5XbPN
+   TMVJqJrD1o/jf1occPLoHAKb8q5uYP7H5uq0ue5n1F3SebQrdvPqUKAs2
+   g==;
+X-CSE-ConnectionGUID: VQCwBHdKQWiBBrbLs8cvcA==
+X-CSE-MsgGUID: UluX1RN4QmWLkgsFIS+Ujw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11362"; a="29487887"
+X-IronPort-AV: E=Sophos;i="6.13,330,1732608000"; 
+   d="scan'208";a="29487887"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2025 08:12:40 -0800
+X-CSE-ConnectionGUID: ti4rvz4KQDmph+7VX9bzAA==
+X-CSE-MsgGUID: KMs/TJwKR1qSrtq8RTCfCQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="155252358"
+Received: from smile.fi.intel.com ([10.237.72.58])
+  by orviesa001.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2025 08:12:36 -0800
+Received: from andy by smile.fi.intel.com with local (Exim 4.98)
+	(envelope-from <andriy.shevchenko@linux.intel.com>)
+	id 1tp8PA-0000000GrNj-45Uh;
+	Mon, 03 Mar 2025 18:12:32 +0200
+Date: Mon, 3 Mar 2025 18:12:32 +0200
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Miquel Raynal <miquel.raynal@bootlin.com>
+Cc: linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
+	Alexander Aring <alex.aring@gmail.com>,
+	Stefan Schmidt <stefan@datenfreihafen.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Bartosz Golaszewski <brgl@bgdev.pl>
 Subject: Re: [PATCH net-next v1 1/2] ieee802154: ca8210: Use proper setter
  and getters for bitwise types
-In-Reply-To: <20250303150855.1294188-2-andriy.shevchenko@linux.intel.com>
-	(Andy Shevchenko's message of "Mon, 3 Mar 2025 17:07:39 +0200")
+Message-ID: <Z8XU8Dh6Ks5Eao6d@smile.fi.intel.com>
 References: <20250303150855.1294188-1-andriy.shevchenko@linux.intel.com>
-	<20250303150855.1294188-2-andriy.shevchenko@linux.intel.com>
-User-Agent: mu4e 1.12.7; emacs 29.4
-Date: Mon, 03 Mar 2025 17:06:32 +0100
-Message-ID: <87mse285fb.fsf@bootlin.com>
+ <20250303150855.1294188-2-andriy.shevchenko@linux.intel.com>
+ <87mse285fb.fsf@bootlin.com>
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdelleehjecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvvefujghffgffkfggtgfgsehtqhertddtreejnecuhfhrohhmpefoihhquhgvlhcutfgrhihnrghluceomhhiqhhuvghlrdhrrgihnhgrlhessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepiedtleehfeeggeegtddvgffftdeutdetiedvgfelgeegkeefieefgfffieeuheffnecuffhomhgrihhnpegtrghstghouggrrdgtohhmnecukfhppeeltddrkeelrdduieefrdduvdejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepledtrdekledrudeifedruddvjedphhgvlhhopehlohgtrghlhhhoshhtpdhmrghilhhfrhhomhepmhhiqhhuvghlrdhrrgihnhgrlhessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepudegpdhrtghpthhtoheprghnughrihihrdhshhgvvhgthhgvnhhkoheslhhinhhugidrihhnthgvlhdrtghomhdprhgtphhtthhopehlihhnuhigqdifphgrnhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrr
- dhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhgphhiohesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopegrlhgvgidrrghrihhnghesghhmrghilhdrtghomhdprhgtphhtthhopehsthgvfhgrnhesuggrthgvnhhfrhgvihhhrghfvghnrdhorhhgpdhrtghpthhtoheprghnughrvgifodhnvghtuggvvheslhhunhhnrdgthh
-X-GND-Sasl: miquel.raynal@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87mse285fb.fsf@bootlin.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 
-Hello,
+On Mon, Mar 03, 2025 at 05:06:32PM +0100, Miquel Raynal wrote:
+> On 03/03/2025 at 17:07:39 +02, Andy Shevchenko <andriy.shevchenko@linux.intel.com> wrote:
+> 
+> > Sparse complains that the driver doesn't respect the bitwise types:
+> >
+> > drivers/net/ieee802154/ca8210.c:1796:27: warning: incorrect type in assignment (different base types)
+> > drivers/net/ieee802154/ca8210.c:1796:27:    expected restricted __le16 [addressable] [assigned] [usertype] pan_id
+> > drivers/net/ieee802154/ca8210.c:1796:27:    got unsigned short [usertype]
+> > drivers/net/ieee802154/ca8210.c:1801:25: warning: incorrect type in assignment (different base types)
+> > drivers/net/ieee802154/ca8210.c:1801:25:    expected restricted __le16 [addressable] [assigned] [usertype] pan_id
+> > drivers/net/ieee802154/ca8210.c:1801:25:    got unsigned short [usertype]
+> > drivers/net/ieee802154/ca8210.c:1928:28: warning: incorrect type in argument 3 (different base types)
+> > drivers/net/ieee802154/ca8210.c:1928:28:    expected unsigned short [usertype] dst_pan_id
+> > drivers/net/ieee802154/ca8210.c:1928:28:    got restricted __le16 [addressable] [usertype] pan_id
+> >
+> > Use proper setter and getters for bitwise types.
+> >
+> > Note, in accordance with [1] the protocol is little endian.
+> >
+> > Link: https://www.cascoda.com/wp-content/uploads/2018/11/CA-8210_datasheet_0418.pdf [1]
+> > Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+> 
+> Looks correct indeed,
 
-On 03/03/2025 at 17:07:39 +02, Andy Shevchenko <andriy.shevchenko@linux.int=
-el.com> wrote:
+TBH, my guts feeling is that this driver was never tested on BE platforms...
 
-> Sparse complains that the driver doesn't respect the bitwise types:
->
-> drivers/net/ieee802154/ca8210.c:1796:27: warning: incorrect type in assig=
-nment (different base types)
-> drivers/net/ieee802154/ca8210.c:1796:27:    expected restricted __le16 [a=
-ddressable] [assigned] [usertype] pan_id
-> drivers/net/ieee802154/ca8210.c:1796:27:    got unsigned short [usertype]
-> drivers/net/ieee802154/ca8210.c:1801:25: warning: incorrect type in assig=
-nment (different base types)
-> drivers/net/ieee802154/ca8210.c:1801:25:    expected restricted __le16 [a=
-ddressable] [assigned] [usertype] pan_id
-> drivers/net/ieee802154/ca8210.c:1801:25:    got unsigned short [usertype]
-> drivers/net/ieee802154/ca8210.c:1928:28: warning: incorrect type in argum=
-ent 3 (different base types)
-> drivers/net/ieee802154/ca8210.c:1928:28:    expected unsigned short [user=
-type] dst_pan_id
-> drivers/net/ieee802154/ca8210.c:1928:28:    got restricted __le16 [addres=
-sable] [usertype] pan_id
->
-> Use proper setter and getters for bitwise types.
->
-> Note, in accordance with [1] the protocol is little endian.
->
-> Link: https://www.cascoda.com/wp-content/uploads/2018/11/CA-8210_datashee=
-t_0418.pdf [1]
-> Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+> Reviewed-by: Miquel Raynal <miquel.raynal@bootlin.com>
 
-Looks correct indeed,
+Thanks for review!
 
-Reviewed-by: Miquel Raynal <miquel.raynal@bootlin.com>
+-- 
+With Best Regards,
+Andy Shevchenko
 
-Thanks,
-Miqu=C3=A8l
+
