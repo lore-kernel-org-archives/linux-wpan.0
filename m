@@ -1,145 +1,135 @@
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 565C8215191;
-	Mon,  3 Mar 2025 16:36:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B969253F24;
+	Mon,  3 Mar 2025 16:49:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741019789; cv=none; b=PJX8ENmzZW0Zu5TH3/azRfRRx5ygeycbWnvR2v8ZHjKv5ZqRDNPZILQ3oUV2jaA0AY0AkzzcM+e24K+U4ZijMesyKlIKjxaak4pYq+h0qMTg2nvNzeK05ETiVLhb10Ow7nStWNTq7PqtPrJuFgkj3AQ+G/mOsqo6pBQuYBz93kk=
+	t=1741020576; cv=none; b=Fl6Q4O9nmv6qP2sObo5LAS1aZfuBiOMZA1WwrBZubLHnNhbtO/UgXfvWvAZ2JuoaAFSQx6sxzE/YnVpB1weutSGbQw0PjTbA7DBlEo8WIc1AFF4FPUAtdxC6rBh+qkpeim4wF3nQEGaBeFmDVPgs0NK8V8YjLFmgKm79+3dETMg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741019789; c=relaxed/simple;
-	bh=xaN0Z9STeRU3x7d05JOsDuCx42/1AlGaaAsdDktb1YY=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=XttWGI2nRPdaZ4yX7SSjyihVTA1D8Lr8pGs4omIeHJ05EdG9csoTAMz0sWcQzXkraF8kesr2wns4ZoUBCgMDUk4Bu29P8BhHNbQgZS+gxMir5pCL7UXdJq5FZ0iNEkqsp18gbDpZtsAMAfpZK+hLP+E2Gf59U70saw6gtJYb1fg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=azrHG4+U; arc=none smtp.client-ip=217.70.183.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+	s=arc-20240116; t=1741020576; c=relaxed/simple;
+	bh=PgymxrapIwEkqIJnDFsAgZKjAOuBSrz6G8oyvNtMtgE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Q7vgM6JpQ7bDgTwQNCIM+iOj9H14UiAqTGy7bbyCUMuGqkbYGxcx2PN7bzeQTcBNJQ/ZtQrUK2FTs0Hak1c14bKOyWaFCN7N3QcHbcrvqtq8cmWzcWiTR43kZb2ox0VHnGruHvu0k0gBMHJOy3ANEYC92uQIIS1vMhxxWwB7XdE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Xy0QtwKE; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="azrHG4+U"
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 306E9204D3;
-	Mon,  3 Mar 2025 16:36:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1741019780;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=S6RTe4/EaQ9JN6jTa2Zt6y/07I+0OzAWBVKZO29P9Yo=;
-	b=azrHG4+U+TrJfwpTjCXkZMz/cp4WTInac2QQvtNhQ+BZbolsf6qfTaM5RvnLo/Onhzek9o
-	HZ6D5t1doWHHvswS2t1x1ZByie19oLGvM9YbeB8xNweq2GolI/vDP77cpYaHUuh67J4rQL
-	fl7zIqVMIE+8ocfJoo7NLNAN+23bdsiSfmDTo9SQ0I7uP6G/WgIFyXT5At1Le3jOkP7ei0
-	vVwshgAS8nLgRjqoSrz5X4vNufYdjsey7H++GaitLcLsj+jBP+zYHJk4jCfzWaNa15H+Fs
-	+xbvG6wJZqqhLqhIKF/aMhJKarlmV4VfYzMcqUtBoa6dTK0JhVqvKk6MdzEDnw==
-From: Miquel Raynal <miquel.raynal@bootlin.com>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc: linux-wpan@vger.kernel.org,  netdev@vger.kernel.org,
-  linux-kernel@vger.kernel.org,  linux-gpio@vger.kernel.org,  Alexander
- Aring <alex.aring@gmail.com>,  Stefan Schmidt <stefan@datenfreihafen.org>,
-  Andrew Lunn <andrew+netdev@lunn.ch>,  "David S. Miller"
- <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Jakub
- Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,  Linus
- Walleij <linus.walleij@linaro.org>,  Bartosz Golaszewski <brgl@bgdev.pl>
-Subject: Re: [PATCH net-next v1 2/2] ieee802154: ca8210: Switch to using
- gpiod API
-In-Reply-To: <Z8XYuY2idCVrAfdm@smile.fi.intel.com> (Andy Shevchenko's message
-	of "Mon, 3 Mar 2025 18:28:41 +0200")
-References: <20250303150855.1294188-1-andriy.shevchenko@linux.intel.com>
-	<20250303150855.1294188-3-andriy.shevchenko@linux.intel.com>
-	<8734fu84r8.fsf@bootlin.com> <Z8XYuY2idCVrAfdm@smile.fi.intel.com>
-User-Agent: mu4e 1.12.7; emacs 29.4
-Date: Mon, 03 Mar 2025 17:36:18 +0100
-Message-ID: <87v7sq5awt.fsf@bootlin.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Xy0QtwKE"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1741020575; x=1772556575;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=PgymxrapIwEkqIJnDFsAgZKjAOuBSrz6G8oyvNtMtgE=;
+  b=Xy0QtwKErWR86mLuXz237W1dv1xLaoDTSdgbw0IYqSQQMEhom+EbArQx
+   p/1jGazZ5YMJEmLOHTv14kfVeU4DEcAU++n2VGhv8ON9F2wFOR4T5sHZc
+   TD9DjwR2x0HsGOGrX8S08qyxwP4G7V8tGk4lSSh8IIR42u1WkUrwFoPxf
+   s6ssbNpHsZ9Z7NZLRLwPuHAwTaFHoJK0UgNsSbGdgnfbO2YaS+HMGE+mv
+   zZGmFY/IVjuh/kp99M+smU3WZdvmb5DwcPOQ6tbiOXGApT2LDVqHkbBRG
+   B8k/92L0q1PPCRijhxbdzygK83xrVtT4+UxsUPWJv84EzH4OEJRNG/HjV
+   A==;
+X-CSE-ConnectionGUID: FwRlmoF4Q1empaeOKODJ6A==
+X-CSE-MsgGUID: xAiP2uKNQSKLADbw0zmbUA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11362"; a="41761391"
+X-IronPort-AV: E=Sophos;i="6.13,330,1732608000"; 
+   d="scan'208";a="41761391"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2025 08:49:34 -0800
+X-CSE-ConnectionGUID: rGlG1Fp1SLiLANdqv5KXaQ==
+X-CSE-MsgGUID: XzTS+SNlQoe7unm3L7cOUQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,330,1732608000"; 
+   d="scan'208";a="123212197"
+Received: from black.fi.intel.com ([10.237.72.28])
+  by fmviesa004.fm.intel.com with ESMTP; 03 Mar 2025 08:49:30 -0800
+Received: by black.fi.intel.com (Postfix, from userid 1003)
+	id A7309224; Mon, 03 Mar 2025 18:49:29 +0200 (EET)
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	linux-wpan@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-gpio@vger.kernel.org
+Cc: Alexander Aring <alex.aring@gmail.com>,
+	Stefan Schmidt <stefan@datenfreihafen.org>,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Bartosz Golaszewski <brgl@bgdev.pl>
+Subject: [PATCH net-next v2 2/3] ieee802154: ca8210: Get platform data via dev_get_platdata()
+Date: Mon,  3 Mar 2025 18:49:09 +0200
+Message-ID: <20250303164928.1466246-3-andriy.shevchenko@linux.intel.com>
+X-Mailer: git-send-email 2.47.2
+In-Reply-To: <20250303164928.1466246-1-andriy.shevchenko@linux.intel.com>
+References: <20250303164928.1466246-1-andriy.shevchenko@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdelleeivdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvvefujghffgffkfggtgesthdtredttdertdenucfhrhhomhepofhiqhhuvghlucftrgihnhgrlhcuoehmihhquhgvlhdrrhgrhihnrghlsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpefhleekvdevffeluefhiefgvdevhffgjefggffhieetgeetiedugeeftdejheekfeenucfkphepledtrdekledrudeifedruddvjeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpeeltddrkeelrdduieefrdduvdejpdhhvghloheplhhotggrlhhhohhsthdpmhgrihhlfhhrohhmpehmihhquhgvlhdrrhgrhihnrghlsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopedugedprhgtphhtthhopegrnhgurhhihidrshhhvghvtghhvghnkhhosehlihhnuhigrdhinhhtvghlrdgtohhmpdhrtghpthhtoheplhhinhhugidqfihprghnsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhin
- hhugidqghhpihhosehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprghlvgigrdgrrhhinhhgsehgmhgrihhlrdgtohhmpdhrtghpthhtohepshhtvghfrghnsegurghtvghnfhhrvghihhgrfhgvnhdrohhrghdprhgtphhtthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghh
-X-GND-Sasl: miquel.raynal@bootlin.com
+Content-Transfer-Encoding: 8bit
 
-On 03/03/2025 at 18:28:41 +02, Andy Shevchenko <andriy.shevchenko@linux.intel.com> wrote:
+Access to platform data via dev_get_platdata() getter to make code cleaner.
 
-> On Mon, Mar 03, 2025 at 05:20:59PM +0100, Miquel Raynal wrote:
->
-> ...
->
->> > - * @gpio_reset:     gpio number of ca8210 reset line
->> > - * @gpio_irq:       gpio number of ca8210 interrupt line
->> > + * @reset_gpio:     GPIO of ca8210 reset line
->> 
->> What about "CA8210 Reset GPIO line"? Or Just "Reset GPIO line"? Or even
->> "Reset GPIO descriptor" (whatever).
->> 
->> > + * @irq_gpio:       GPIO of ca8210 interrupt line
->> 
->> Same
->
-> Sure.
->
-> [...]
->
->> > -	int ret;
->> > -	struct ca8210_platform_data *pdata = spi->dev.platform_data;
->> > +	struct device *dev = &spi->dev;
->> > +	struct ca8210_platform_data *pdata = dev_get_platdata(dev);
->> 
->> Can you either mention the additional cleanup that you do in the commit
->> log or split it in a separate commit? (splitting is probably not
->> necessary here given that most of the cleanup anyway is related to the
->> actual changes.
->
-> Do you mean the platform_data accessors?
+Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+---
+ drivers/net/ieee802154/ca8210.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
 
-Yes.
+diff --git a/drivers/net/ieee802154/ca8210.c b/drivers/net/ieee802154/ca8210.c
+index a036910f6082..65f042c8734b 100644
+--- a/drivers/net/ieee802154/ca8210.c
++++ b/drivers/net/ieee802154/ca8210.c
+@@ -627,7 +627,8 @@ static int ca8210_spi_transfer(
+  */
+ static void ca8210_reset_send(struct spi_device *spi, unsigned int ms)
+ {
+-	struct ca8210_platform_data *pdata = spi->dev.platform_data;
++	struct device *dev = &spi->dev;
++	struct ca8210_platform_data *pdata = dev_get_platdata(dev);
+ 	struct ca8210_priv *priv = spi_get_drvdata(spi);
+ 	long status;
+ 
+@@ -2736,9 +2737,10 @@ static int ca8210_config_extern_clk(
+  */
+ static int ca8210_register_ext_clock(struct spi_device *spi)
+ {
++	struct device *dev = &spi->dev;
++	struct ca8210_platform_data *pdata = dev_get_platdata(dev);
+ 	struct device_node *np = spi->dev.of_node;
+ 	struct ca8210_priv *priv = spi_get_drvdata(spi);
+-	struct ca8210_platform_data *pdata = spi->dev.platform_data;
+ 
+ 	if (!np)
+ 		return -EFAULT;
+@@ -2784,8 +2786,9 @@ static void ca8210_unregister_ext_clock(struct spi_device *spi)
+  */
+ static int ca8210_reset_init(struct spi_device *spi)
+ {
++	struct device *dev = &spi->dev;
++	struct ca8210_platform_data *pdata = dev_get_platdata(dev);
+ 	int ret;
+-	struct ca8210_platform_data *pdata = spi->dev.platform_data;
+ 
+ 	pdata->gpio_reset = of_get_named_gpio(
+ 		spi->dev.of_node,
+@@ -2813,8 +2816,9 @@ static int ca8210_reset_init(struct spi_device *spi)
+  */
+ static int ca8210_interrupt_init(struct spi_device *spi)
+ {
++	struct device *dev = &spi->dev;
++	struct ca8210_platform_data *pdata = dev_get_platdata(dev);
+ 	int ret;
+-	struct ca8210_platform_data *pdata = spi->dev.platform_data;
+ 
+ 	pdata->gpio_irq = of_get_named_gpio(
+ 		spi->dev.of_node,
+-- 
+2.47.2
 
-> I can actually split it to a separate
-> change as I had done some of that in the past in other drivers.
-
-Up to you, either way, as long as it is mentioned in the commit log, I'm
-happy.
-
->
-> ...
->
->> > -	ret = gpio_direction_output(pdata->gpio_reset, 1);
->> > -	if (ret < 0) {
->> > -		dev_crit(
->> > -			&spi->dev,
->> > -			"Reset GPIO %d did not set to output mode\n",
->> > -			pdata->gpio_reset
->> > -		);
->> > -	}
->> > -
->> > -	return ret;
->> > +	return PTR_ERR_OR_ZERO(pdata->reset_gpio);
->> 
->> This is not a strong request, but in general I think it is preferred to return
->> immediately, so this looks easier to understand:
->
-> I used the same logic as in the original flow.
-
-That's true, and I understand your choice in the first place. But given
-that you're also doing a bit of cleanup, one more misc change feels okay.
-
->
->> +	pdata->reset_gpio = devm_gpiod_get(dev, "reset", GPIOD_OUT_HIGH);
->> +	if (IS_ERR(pdata->reset_gpio)) {
->> +		dev_crit(dev, "Reset GPIO did not set to output mode\n");
->> +                return PTR_ERR(pdata->reset_pgio);
->> +       }
->> +
->> +       return 0;
->
-> Sure I can do this in v2.
-
-Great!
-
-> ...
->
->> Otherwise the rest lgtm.
->
-> Thank you for the review!
