@@ -1,50 +1,50 @@
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 217001FFC67;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3712200BB5;
 	Tue,  4 Mar 2025 11:24:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741087473; cv=none; b=CngVrmhiVd/mEhvooxDZkNnWY97EZOaBsYwHRri5vBPL1VpJT/jpEsFsBjFeOjTMzCZMWpzZn7a1TlLtJD2DWJjEM2FheNefSQVxpS1FbTuMO68rXhtuTSlAou7Me2Gz0NOGA5lLEwDmKiaH7sdtc+AqNlFmNpDciBVkvYX7bdo=
+	t=1741087474; cv=none; b=qVEm4SBag1gTkPxs350dDoGfGikdht49YQybM/PE4HqynautMfigiHKvcH85AKEUvyrEaR1lbvnxA5reTlD05Ub0vxmkwlo+efGyybCj3Q7I6Ygn0z/fwq1yr7OsbmcJ1UJOi8pDVCuL4+NUe8Q/dx8ZoAs8K00lAu04Ymbw5Ms=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741087473; c=relaxed/simple;
-	bh=7nohAw0bWsd6obQUX7U+tOIRobhxal0W9DKsjxcd/NQ=;
+	s=arc-20240116; t=1741087474; c=relaxed/simple;
+	bh=AVOtAA9lkDaW8AbschwBeHIwKhC76Yqk7DrOBIvNl3U=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mhtuCWJD+v20vf4NRhCl6806TWjSEJCiFAGoPNj50u/nA6BU9s5piVgKkyZkVxz1YUbMmeRsvcMamLy9KIjqhadC4ndsHIbjbiDlbsG+1h1lPTsebhddvMzJflsOwQeO2EvR8Ag3/+J2QMKf0ZN4CqtWJUt3aDEBr7TWXqZ/RK4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=f/PJT3iJ; arc=none smtp.client-ip=192.198.163.17
+	 MIME-Version; b=gG5DnEK1huG6Wf0Xxy8f771VYEB9HYqRLtSIt1m4NabfdywK4Dghp8+sPhbkU8B9/VwnY+eE6cYMUPa0wZLJU3DO+EZFg4bnlwiFVN9zP9zKEtA1oFcHZ3nPJRbJRFPUmyHMcO8f0E/Tgcf0KVoQSzYMp3kOdvt3qZGuF9LhER4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VliFpgPE; arc=none smtp.client-ip=192.198.163.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="f/PJT3iJ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VliFpgPE"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741087472; x=1772623472;
+  t=1741087473; x=1772623473;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=7nohAw0bWsd6obQUX7U+tOIRobhxal0W9DKsjxcd/NQ=;
-  b=f/PJT3iJyJUcSEfW8b21zjMvIe7llgKeYM7zM4O1l0EwKo+lA6ARRg2Q
-   K6Yhp2sEaeFyy5K/7mBryEK5ZZhSmW6AfcWxhwiYuDrOSdllFw2MZm4T5
-   U0Soy3P8NqaX5hsTw/djFo/gWIj7PetEFJVPSQpW8BG8ViMMJH66IPj/o
-   AGoZSHNR1EpIv2mN2eSvJOiEATvGrIfzC+fn/NkvFwn5JD4hnVV6ZhoGH
-   O5wus1RwxRilntIeMefrUKmln64nnhMOGEHHXlXLUFL/YiCJ8OhOpyoPi
-   vPPZIKzl5tZSe4cpr5y0I9wUpjZBzO8CrDbdayqxtu3B/yYvVDl0AFJxQ
-   A==;
-X-CSE-ConnectionGUID: PgrnrSpsTD2BVbpPJnzdVg==
-X-CSE-MsgGUID: EF4U61EZSo2qO7ycA70Lgg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11362"; a="41897792"
+  bh=AVOtAA9lkDaW8AbschwBeHIwKhC76Yqk7DrOBIvNl3U=;
+  b=VliFpgPESEwfva91vjdg3dzFEbnAJ4SA519ElqDFElXZGN7719qO5fZ/
+   TgcBWZsvsuJPg/71nToS47zfeM76G+Kpm/xf5e8g4/IItIbdYcJzPg8+a
+   wxKzkqv9FgdXnvkg6bGaxuAs5HknLzbV83D/Qkei6Aa83TBsmBnUgZDge
+   372zA1Akb8lbsNvjcDG9T6AnDn5J/yF9gk/YZrKm9YxADsRiYNNtNZJct
+   194JAUScwhTlexzspUgBmj00w65G1/QzSPLp71wlQg80+DrSKlH8X7+sy
+   W07Ey8bOLTB0XtfZR/Mr0y+2xnyVAnqSgotHJCXmX0g2OLjLgLcbWRvzI
+   w==;
+X-CSE-ConnectionGUID: NXH0HgU+S4ijmvlIXHQkuw==
+X-CSE-MsgGUID: k5wjNNNvS52sYLhzThHwYw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11362"; a="41897804"
 X-IronPort-AV: E=Sophos;i="6.13,331,1732608000"; 
-   d="scan'208";a="41897792"
+   d="scan'208";a="41897804"
 Received: from fmviesa002.fm.intel.com ([10.60.135.142])
   by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2025 03:24:28 -0800
-X-CSE-ConnectionGUID: ccPscuNNTNSWt4AvY0E8sQ==
-X-CSE-MsgGUID: PS4x1KcCRO+fsU65//b09A==
+X-CSE-ConnectionGUID: kGKNXj8dQ/W+lL5KEPG3ig==
+X-CSE-MsgGUID: h1mUKegNRyuCaJH2UxnkfQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.13,331,1732608000"; 
-   d="scan'208";a="141578428"
+   d="scan'208";a="141578426"
 Received: from black.fi.intel.com ([10.237.72.28])
-  by fmviesa002.fm.intel.com with ESMTP; 04 Mar 2025 03:24:24 -0800
+  by fmviesa002.fm.intel.com with ESMTP; 04 Mar 2025 03:24:23 -0800
 Received: by black.fi.intel.com (Postfix, from userid 1003)
-	id 0196C2FB; Tue, 04 Mar 2025 13:24:22 +0200 (EET)
+	id D48F318F; Tue, 04 Mar 2025 13:24:22 +0200 (EET)
 From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
 	Linus Walleij <linus.walleij@linaro.org>,
@@ -65,9 +65,9 @@ Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	Alexander Aring <alex.aring@gmail.com>,
 	Stefan Schmidt <stefan@datenfreihafen.org>,
 	Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: [PATCH net-next v3 3/3] ieee802154: ca8210: Switch to using gpiod API
-Date: Tue,  4 Mar 2025 13:22:34 +0200
-Message-ID: <20250304112418.1774869-4-andriy.shevchenko@linux.intel.com>
+Subject: [PATCH net-next v3 1/3] ieee802154: ca8210: Use proper setter and getters for bitwise types
+Date: Tue,  4 Mar 2025 13:22:32 +0200
+Message-ID: <20250304112418.1774869-2-andriy.shevchenko@linux.intel.com>
 X-Mailer: git-send-email 2.47.2
 In-Reply-To: <20250304112418.1774869-1-andriy.shevchenko@linux.intel.com>
 References: <20250304112418.1774869-1-andriy.shevchenko@linux.intel.com>
@@ -79,175 +79,68 @@ List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This updates the driver to gpiod API, and removes yet another use of
-of_get_named_gpio().
+Sparse complains that the driver doesn't respect the bitwise types:
 
-With this, invert the logic of the reset pin which is active low
-and add a quirk for the legacy and incorrect device tree descriptions.
+drivers/net/ieee802154/ca8210.c:1796:27: warning: incorrect type in assignment (different base types)
+drivers/net/ieee802154/ca8210.c:1796:27:    expected restricted __le16 [addressable] [assigned] [usertype] pan_id
+drivers/net/ieee802154/ca8210.c:1796:27:    got unsigned short [usertype]
+drivers/net/ieee802154/ca8210.c:1801:25: warning: incorrect type in assignment (different base types)
+drivers/net/ieee802154/ca8210.c:1801:25:    expected restricted __le16 [addressable] [assigned] [usertype] pan_id
+drivers/net/ieee802154/ca8210.c:1801:25:    got unsigned short [usertype]
+drivers/net/ieee802154/ca8210.c:1928:28: warning: incorrect type in argument 3 (different base types)
+drivers/net/ieee802154/ca8210.c:1928:28:    expected unsigned short [usertype] dst_pan_id
+drivers/net/ieee802154/ca8210.c:1928:28:    got restricted __le16 [addressable] [usertype] pan_id
 
+Use proper setter and getters for bitwise types.
+
+Note, in accordance with [1] the protocol is little endian.
+
+Link: https://www.cascoda.com/wp-content/uploads/2018/11/CA-8210_datasheet_0418.pdf [1]
+Reviewed-by: Miquel Raynal <miquel.raynal@bootlin.com>
 Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
 Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 ---
- .../bindings/net/ieee802154/ca8210.txt        |  2 +-
- drivers/gpio/gpiolib-of.c                     |  9 +++
- drivers/net/ieee802154/ca8210.c               | 57 +++++++------------
- 3 files changed, 29 insertions(+), 39 deletions(-)
+ drivers/net/ieee802154/ca8210.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
 
-diff --git a/Documentation/devicetree/bindings/net/ieee802154/ca8210.txt b/Documentation/devicetree/bindings/net/ieee802154/ca8210.txt
-index a1046e636fa1..f1bd07a0097d 100644
---- a/Documentation/devicetree/bindings/net/ieee802154/ca8210.txt
-+++ b/Documentation/devicetree/bindings/net/ieee802154/ca8210.txt
-@@ -20,7 +20,7 @@ Example:
- 		reg = <0>;
- 		spi-max-frequency = <3000000>;
- 		spi-cpol;
--		reset-gpio = <&gpio1 1 GPIO_ACTIVE_HIGH>;
-+		reset-gpio = <&gpio1 1 GPIO_ACTIVE_LOW>;
- 		irq-gpio = <&gpio1 2 GPIO_ACTIVE_HIGH>;
- 		extclock-enable;
- 		extclock-freq = 16000000;
-diff --git a/drivers/gpio/gpiolib-of.c b/drivers/gpio/gpiolib-of.c
-index df351b1d6628..54e916d4c03e 100644
---- a/drivers/gpio/gpiolib-of.c
-+++ b/drivers/gpio/gpiolib-of.c
-@@ -203,6 +203,15 @@ static void of_gpio_try_fixup_polarity(const struct device_node *np,
- 		 */
- 		{ "qi,lb60",		"rb-gpios",	true },
- #endif
-+#if IS_ENABLED(CONFIG_IEEE802154_CA8210)
-+		/*
-+		 * According to the datasheet, the NRST pin 27 is an active-low
-+		 * signal. However, the device tree schema and admittedly
-+		 * the out-of-tree implementations have been used for a long
-+		 * time incorrectly by describing reset GPIO as active-high.
-+		 */
-+		{ "cascoda,ca8210",	"reset-gpio",	false },
-+#endif
- #if IS_ENABLED(CONFIG_PCI_LANTIQ)
- 		/*
- 		 * According to the PCI specification, the RST# pin is an
 diff --git a/drivers/net/ieee802154/ca8210.c b/drivers/net/ieee802154/ca8210.c
-index 65f042c8734b..ebc4f1b18e7b 100644
+index 753215ebc67c..a036910f6082 100644
 --- a/drivers/net/ieee802154/ca8210.c
 +++ b/drivers/net/ieee802154/ca8210.c
-@@ -52,12 +52,10 @@
- #include <linux/debugfs.h>
- #include <linux/delay.h>
- #include <linux/gpio/consumer.h>
--#include <linux/gpio.h>
- #include <linux/ieee802154.h>
- #include <linux/io.h>
- #include <linux/kfifo.h>
- #include <linux/of.h>
--#include <linux/of_gpio.h>
- #include <linux/module.h>
- #include <linux/mutex.h>
- #include <linux/poll.h>
-@@ -350,8 +348,8 @@ struct work_priv_container {
-  * @extclockenable: true if the external clock is to be enabled
-  * @extclockfreq:   frequency of the external clock
-  * @extclockgpio:   ca8210 output gpio of the external clock
-- * @gpio_reset:     gpio number of ca8210 reset line
-- * @gpio_irq:       gpio number of ca8210 interrupt line
-+ * @reset_gpio:     ca8210 reset GPIO descriptor
-+ * @irq_gpio:       ca8210 interrupt GPIO descriptor
-  * @irq_id:         identifier for the ca8210 irq
-  *
-  */
-@@ -359,8 +357,8 @@ struct ca8210_platform_data {
- 	bool extclockenable;
- 	unsigned int extclockfreq;
- 	unsigned int extclockgpio;
--	int gpio_reset;
--	int gpio_irq;
-+	struct gpio_desc *reset_gpio;
-+	struct gpio_desc *irq_gpio;
- 	int irq_id;
- };
- 
-@@ -632,10 +630,10 @@ static void ca8210_reset_send(struct spi_device *spi, unsigned int ms)
- 	struct ca8210_priv *priv = spi_get_drvdata(spi);
- 	long status;
- 
--	gpio_set_value(pdata->gpio_reset, 0);
-+	gpiod_set_value(pdata->reset_gpio, 1);
- 	reinit_completion(&priv->ca8210_is_awake);
- 	msleep(ms);
--	gpio_set_value(pdata->gpio_reset, 1);
-+	gpiod_set_value(pdata->reset_gpio, 0);
- 	priv->promiscuous = false;
- 
- 	/* Wait until wakeup indication seen */
-@@ -2788,24 +2786,14 @@ static int ca8210_reset_init(struct spi_device *spi)
- {
- 	struct device *dev = &spi->dev;
- 	struct ca8210_platform_data *pdata = dev_get_platdata(dev);
--	int ret;
- 
--	pdata->gpio_reset = of_get_named_gpio(
--		spi->dev.of_node,
--		"reset-gpio",
--		0
--	);
--
--	ret = gpio_direction_output(pdata->gpio_reset, 1);
--	if (ret < 0) {
--		dev_crit(
--			&spi->dev,
--			"Reset GPIO %d did not set to output mode\n",
--			pdata->gpio_reset
--		);
-+	pdata->reset_gpio = devm_gpiod_get(dev, "reset", GPIOD_OUT_LOW);
-+	if (IS_ERR(pdata->reset_gpio)) {
-+		dev_crit(dev, "Reset GPIO did not set to output mode\n");
-+		return PTR_ERR(pdata->reset_gpio);
+@@ -1446,8 +1446,7 @@ static u8 mcps_data_request(
+ 	command.pdata.data_req.src_addr_mode = src_addr_mode;
+ 	command.pdata.data_req.dst.mode = dst_address_mode;
+ 	if (dst_address_mode != MAC_MODE_NO_ADDR) {
+-		command.pdata.data_req.dst.pan_id[0] = LS_BYTE(dst_pan_id);
+-		command.pdata.data_req.dst.pan_id[1] = MS_BYTE(dst_pan_id);
++		put_unaligned_le16(dst_pan_id, command.pdata.data_req.dst.pan_id);
+ 		if (dst_address_mode == MAC_MODE_SHORT_ADDR) {
+ 			command.pdata.data_req.dst.address[0] = LS_BYTE(
+ 				dst_addr->short_address
+@@ -1795,12 +1794,12 @@ static int ca8210_skb_rx(
  	}
+ 	hdr.source.mode = data_ind[0];
+ 	dev_dbg(&priv->spi->dev, "srcAddrMode: %#03x\n", hdr.source.mode);
+-	hdr.source.pan_id = *(u16 *)&data_ind[1];
++	hdr.source.pan_id = cpu_to_le16(get_unaligned_le16(&data_ind[1]));
+ 	dev_dbg(&priv->spi->dev, "srcPanId: %#06x\n", hdr.source.pan_id);
+ 	memcpy(&hdr.source.extended_addr, &data_ind[3], 8);
+ 	hdr.dest.mode = data_ind[11];
+ 	dev_dbg(&priv->spi->dev, "dstAddrMode: %#03x\n", hdr.dest.mode);
+-	hdr.dest.pan_id = *(u16 *)&data_ind[12];
++	hdr.dest.pan_id = cpu_to_le16(get_unaligned_le16(&data_ind[12]));
+ 	dev_dbg(&priv->spi->dev, "dstPanId: %#06x\n", hdr.dest.pan_id);
+ 	memcpy(&hdr.dest.extended_addr, &data_ind[14], 8);
  
--	return ret;
-+	return 0;
- }
- 
- /**
-@@ -2820,20 +2808,15 @@ static int ca8210_interrupt_init(struct spi_device *spi)
- 	struct ca8210_platform_data *pdata = dev_get_platdata(dev);
- 	int ret;
- 
--	pdata->gpio_irq = of_get_named_gpio(
--		spi->dev.of_node,
--		"irq-gpio",
--		0
--	);
-+	pdata->irq_gpio = devm_gpiod_get(dev, "irq", GPIOD_IN);
-+	if (IS_ERR(pdata->irq_gpio)) {
-+		dev_crit(dev, "Could not retrieve IRQ GPIO\n");
-+		return PTR_ERR(pdata->irq_gpio);
-+	}
- 
--	pdata->irq_id = gpio_to_irq(pdata->gpio_irq);
-+	pdata->irq_id = gpiod_to_irq(pdata->irq_gpio);
- 	if (pdata->irq_id < 0) {
--		dev_crit(
--			&spi->dev,
--			"Could not get irq for gpio pin %d\n",
--			pdata->gpio_irq
--		);
--		gpio_free(pdata->gpio_irq);
-+		dev_crit(dev, "Could not get irq for IRQ GPIO\n");
- 		return pdata->irq_id;
- 	}
- 
-@@ -2844,10 +2827,8 @@ static int ca8210_interrupt_init(struct spi_device *spi)
- 		"ca8210-irq",
- 		spi_get_drvdata(spi)
- 	);
--	if (ret) {
-+	if (ret)
- 		dev_crit(&spi->dev, "request_irq %d failed\n", pdata->irq_id);
--		gpio_free(pdata->gpio_irq);
--	}
- 
- 	return ret;
- }
+@@ -1927,7 +1926,7 @@ static int ca8210_skb_tx(
+ 	status =  mcps_data_request(
+ 		header.source.mode,
+ 		header.dest.mode,
+-		header.dest.pan_id,
++		le16_to_cpu(header.dest.pan_id),
+ 		(union macaddr *)&header.dest.extended_addr,
+ 		skb->len - mac_len,
+ 		&skb->data[mac_len],
 -- 
 2.47.2
 
