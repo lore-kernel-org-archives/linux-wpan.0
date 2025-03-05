@@ -1,49 +1,50 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9638221F25;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9437223714;
 	Wed,  5 Mar 2025 10:57:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741172227; cv=none; b=e7kHlLEW2aGQE5lAD66IOwVYMq9Mb9TWci5hlVdZLSuXa8a6nUzJXDD3aQeS9H5g4o9BOEkJZMqm5vpvKRkPdhLwo8mUB9h4nrWUXfAqbpUlhWvTJ3QLZqCZI+Pwvtsh4LTLBhI1U1uzaG8u2qxGMVGCOmL07YIMvUH8MqAKLcA=
+	t=1741172227; cv=none; b=LXW5NsFo6vkijZAYjwCoTZ5aHTwVZRsf4twGSIYcH50GmL+W2IrIZ7cy1lODV2HGGX3IY+ofF66LjqqxUTsYmYUJYjdkYh6MozYlKGq3SsEdV2Ep87V8F13p7HkJfGiF/f5TS32OZz7RjNy2EsYirpLklRXfAix6jD2U59Ji6kE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1741172227; c=relaxed/simple;
-	bh=BjIOGsCQRES/ExqNCYJJO+XG6bSvGhNddzBXGqV6COw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=e1SmHEECo6PnZgdRbQEg8i+iEv4WvhTcqJsgxMFYzbRK/76y+Gy5uZwJoppMN1nrW5lfvwfpOZmkMnN2hZN3NQUHxWEsP8T3dMnpn2KHUaDqZTDYF8Bpw5alJtd4ktvYIPZ/WjMUoWTuklasGDGi6AqboNGQ831u5zwZOlfGH5k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YPilVwMw; arc=none smtp.client-ip=198.175.65.15
+	bh=WX8dmil2AirHqiEUBrw0AiYasFZtpK3RZuuWUW3dBzI=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=FqFc/RKHIvRvaGhFEAmdPysGKgcHGC65+0ZZvld27NqUdkoz7xFVmk43qatYZm1raU6Fmn0fOvkPG76929bUHJ7Jb9RHmIEe4hRFm6elbFnszHOhKzJSnR40pzo9cv8gJwo9I8daxr3rBbCamt0/+kUaOVQL59z3Pe40NFY5RsA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GsyFrjkj; arc=none smtp.client-ip=192.198.163.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YPilVwMw"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GsyFrjkj"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1741172226; x=1772708226;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=BjIOGsCQRES/ExqNCYJJO+XG6bSvGhNddzBXGqV6COw=;
-  b=YPilVwMwrtxFyBnzRpKJumvJ/p6SnaZ2cukrZm3FRYBNO38EmOZNM2ZT
-   e8ni7yItXNFvs4RqeIjsx4JG9WGRb+YNitHX7j8mEs/it5Zc9tFFaU0nL
-   1bHdwA2MV3hMzXnUcWyKoJteG6sXNiekz1FP1H7myX7i2xd25PT53yTau
-   C1Ky+bK5V6zlCzWJS8dypK8SXccZ3wXZ7SR9O/3w4rq8gfcQC66OPu0Fj
-   FMiNwnx5lA0da0XfId7ICYv3ZVobCMS6mNhBI3rYQOjBYWwtDTEB44+qu
-   QgwADTIA6hPeBJTQBcEuGwHA1HJ9q5He/AJGWwrQwOG8hy9FIdaHb45Sr
-   Q==;
-X-CSE-ConnectionGUID: 8r1dx8A9RG+YKoNpSjKMWQ==
-X-CSE-MsgGUID: H9rGOT7KRw+pjabX9V8QIA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11363"; a="45783918"
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=WX8dmil2AirHqiEUBrw0AiYasFZtpK3RZuuWUW3dBzI=;
+  b=GsyFrjkjCYC8nQc2TaHUIDIEYp0dPgQ7G8nSwePkUbEsoBlmnrtHwQe8
+   5TYOXmy79tG6VyB9oddoM8P4V+iF/BHx86U+x3R1mTDEotzCOoiAVhJ14
+   wtfYDfrcaKntwfn9A9s7kOCPLJeIWWbv5Ybwm5ehlFahdVVXpgEfV6NAx
+   Uyf8OM6dqPvmsHFChhrktZYXEXFebk9cybHyuRi5/zsDbgixKaXz0s//T
+   OEVaJEpa03EKRxuEOrs4Iiy+dmzbUA4ZvQ56Awvna4H5ayrg3myorbgpa
+   BGCsV8kfnUFVHhkYxpAK6DX8b+62H9be53R4cI4DJA9WBsssuSQtepP6Z
+   w==;
+X-CSE-ConnectionGUID: 0ynDwd3WTS25sSRPZoPFoQ==
+X-CSE-MsgGUID: Izd3iMrwToqyJxr493D2tg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11363"; a="67497646"
 X-IronPort-AV: E=Sophos;i="6.14,222,1736841600"; 
-   d="scan'208";a="45783918"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2025 02:57:04 -0800
-X-CSE-ConnectionGUID: TgDlQLKUS0qbOj309VqQ9g==
-X-CSE-MsgGUID: z2IATWY8TNGmnBaneidGEw==
+   d="scan'208";a="67497646"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2025 02:57:03 -0800
+X-CSE-ConnectionGUID: Di/Q7k2RSK65jce0wtbufA==
+X-CSE-MsgGUID: 2FkXNLdUTT6xks+0slydOA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.14,222,1736841600"; 
-   d="scan'208";a="123245747"
+   d="scan'208";a="118483428"
 Received: from black.fi.intel.com ([10.237.72.28])
-  by fmviesa005.fm.intel.com with ESMTP; 05 Mar 2025 02:56:58 -0800
+  by fmviesa006.fm.intel.com with ESMTP; 05 Mar 2025 02:56:58 -0800
 Received: by black.fi.intel.com (Postfix, from userid 1003)
-	id 7334521F; Wed, 05 Mar 2025 12:56:57 +0200 (EET)
+	id B16F6324; Wed, 05 Mar 2025 12:56:57 +0200 (EET)
 From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
 	Miquel Raynal <miquel.raynal@bootlin.com>,
@@ -64,10 +65,12 @@ Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	Bartosz Golaszewski <brgl@bgdev.pl>,
 	Alexander Aring <alex.aring@gmail.com>,
 	Stefan Schmidt <stefan@datenfreihafen.org>
-Subject: [PATCH net-next v4 0/4] ieee802154: ca8210: Sparse fix and GPIOd conversion
-Date: Wed,  5 Mar 2025 12:55:33 +0200
-Message-ID: <20250305105656.2133487-1-andriy.shevchenko@linux.intel.com>
+Subject: [PATCH net-next v4 4/4] dt-bindings: ieee802154: ca8210: Update polarity of the reset pin
+Date: Wed,  5 Mar 2025 12:55:37 +0200
+Message-ID: <20250305105656.2133487-5-andriy.shevchenko@linux.intel.com>
 X-Mailer: git-send-email 2.47.2
+In-Reply-To: <20250305105656.2133487-1-andriy.shevchenko@linux.intel.com>
+References: <20250305105656.2133487-1-andriy.shevchenko@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
@@ -76,36 +79,28 @@ List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The main part is the patch 3 that converts the driver to GPIO descriptor APIs,
-the first one is just an ad-hoc fix WRT sparse complains on the bitwise
-types misuse. The second one is a small cleanup that helps patch 3 to be nicer.
+The code has been updated to follow what datasheet says about
+the polarity of the reset pin, which is active-low. Update
+the device tree bindings accordingly.
 
-In v4:
-- split DT patch (Krzysztof)
-- collected tags (Miquel)
+Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+---
+ Documentation/devicetree/bindings/net/ieee802154/ca8210.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-In v3:
-- inverted polarity of the reset line in accordance with datasheet (Linus)
-- added quirk for the out-of-tree admittedly wrong DTS implementations
-- collected tags (Linus)
-
-In v2:
-- split and extended cleanup pieces into patch 2 (Miquel)
-- updated kernel doc for changed members (Miquel)
-- unfolded PTR_ERR_OR_ZERO() to the preferred pattern (Miquel)
-- collected tags (Miquel)
-
-Andy Shevchenko (4):
-  ieee802154: ca8210: Use proper setters and getters for bitwise types
-  ieee802154: ca8210: Get platform data via dev_get_platdata()
-  ieee802154: ca8210: Switch to using gpiod API
-  dt-bindings: ieee802154: ca8210: Update polarity of the reset pin
-
- .../bindings/net/ieee802154/ca8210.txt        |  2 +-
- drivers/gpio/gpiolib-of.c                     |  9 +++
- drivers/net/ieee802154/ca8210.c               | 78 ++++++++-----------
- 3 files changed, 41 insertions(+), 48 deletions(-)
-
+diff --git a/Documentation/devicetree/bindings/net/ieee802154/ca8210.txt b/Documentation/devicetree/bindings/net/ieee802154/ca8210.txt
+index a1046e636fa1..f1bd07a0097d 100644
+--- a/Documentation/devicetree/bindings/net/ieee802154/ca8210.txt
++++ b/Documentation/devicetree/bindings/net/ieee802154/ca8210.txt
+@@ -20,7 +20,7 @@ Example:
+ 		reg = <0>;
+ 		spi-max-frequency = <3000000>;
+ 		spi-cpol;
+-		reset-gpio = <&gpio1 1 GPIO_ACTIVE_HIGH>;
++		reset-gpio = <&gpio1 1 GPIO_ACTIVE_LOW>;
+ 		irq-gpio = <&gpio1 2 GPIO_ACTIVE_HIGH>;
+ 		extclock-enable;
+ 		extclock-freq = 16000000;
 -- 
 2.47.2
 
