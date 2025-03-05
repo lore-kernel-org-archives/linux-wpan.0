@@ -1,112 +1,141 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E5881FBEA6;
-	Wed,  5 Mar 2025 10:47:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5B03212FBC;
+	Wed,  5 Mar 2025 10:57:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741171645; cv=none; b=A0wjVK01/XVgfwOi3YWurpzKhD19pe1rZXXE618eWTHzj1tT/ca5q0G0jaWK+daPPiGQYYHgsh2chRChdXadZksbz2z+iJWDXwLaKx3KB6NV7WDQOmF9cNacEka1UVYMVHrf0lVpzlJyqdDszBUPOSV/TEc1FqrtxJLqpthw978=
+	t=1741172225; cv=none; b=CKYXezlR4V1JjKDwwmguAhyhwktB0O9yP6bBzZV0TzpjBXbwo+P8g9cMAb6zXiBwQxTv4CkTjCLNox0yZDmlUqbP/oWjdnx7f4kt+8xeSzSW4ik3zqavPl1kZXrESar+PhIOPedTVkNv5qpmrxmE57haZ/JJrqDkhNjdCMcsgts=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741171645; c=relaxed/simple;
-	bh=UWZD1uJYcxYoUdXpa+LU3Lmk9/jwAXhWGiSry/q8qSw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nWf91hR5e9Nt1nYclXphDvz2S/TKRqNC8MOl6zDTUlju7Z+c3j2REhoeaM5HPAdsswtY+Ao2pdGdRLMcO3vA3xsW2NoDVuIISTYOixRFc9SXPm0hrwZwP+zgYhAU+QvWdc6BJrrCFgglR5yHEDX36hAEnyE2Tzep6oc4zUAmqp4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WGIN5YK+; arc=none smtp.client-ip=192.198.163.7
+	s=arc-20240116; t=1741172225; c=relaxed/simple;
+	bh=Y2DxWO9SVL0K/7sX3lxmLJs8FOiKJR3NxXXhMoLiKJc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=nJ7HQFasdqBUpIkZFFHS9K3LEi/iVyjB/8mOArrGYvcdCC45NDYK2L6XXVLgTUD2TIrjBy8+HANSSimQc33HSKMwTdeR258J1A9tsjjyKiDikB/LKzn11/2YbIbvZv+h6dQduBXC+AgF6/uv+qn1B03DOIX5fzLoywL5u3czOFc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UmyNqYFm; arc=none smtp.client-ip=198.175.65.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WGIN5YK+"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UmyNqYFm"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741171643; x=1772707643;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=UWZD1uJYcxYoUdXpa+LU3Lmk9/jwAXhWGiSry/q8qSw=;
-  b=WGIN5YK+71oXoHVe02TEsrtuvjYaO4VP/KkZs7RcApmeBZWgDcqBrOmq
-   I5odh6aLGLrDyVWzZ1utocTQtlZ8H9QCLgjN6Z+APjUP2+i1GqVlhPSpE
-   JFBk20bYemxOXdOUn5xxoLsxhGFU6c2+yq2qXDOHLsMbtkA3CE79nGfFd
-   pW4XEsIOEK7030jey1LEoSfIN4GrJjh5S1NLVmt4voCd5nuOlrCilcKP7
-   sic3KZWVX/HW4Cus7HwQLFT6lRb/4D46e9fw3YH70aypac1kuPm8Efwyw
-   jxnAOCJFepBapti57nnvYvjM1fmr54ZJh21JIATXrcZaok25hZrtaqvMI
-   w==;
-X-CSE-ConnectionGUID: dL/C8xPjTaOsttHdd8NCKQ==
-X-CSE-MsgGUID: a0HxiHTvR8GZFfV0z0G/5Q==
-X-IronPort-AV: E=McAfee;i="6700,10204,11363"; a="67496838"
+  t=1741172224; x=1772708224;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=Y2DxWO9SVL0K/7sX3lxmLJs8FOiKJR3NxXXhMoLiKJc=;
+  b=UmyNqYFm8R0idLSBQ2Q6X+K4VtPAHulO0dhdCPVBENnGWSWv4FAvjZIh
+   FLTqBkXpod08hTKE16xP/kEeDGP89b1sI18zXPJ6DJMme8aURmrzgSjpP
+   A6zQ1ymquzmRmNTbyBroBalR1r1VCqdh3lqiH/S49PzSEKEJnBoZlyaje
+   8ELD90qCk+07GdRlrot3TI4b6FbZYskyWO3KXd3a2WcZKvYYttoxUj64t
+   YdVxxOvP0P96s0Y4EmPZJaQlxPBRDjQtgKyWBVTzj/I4BmZvW/w8EDYsP
+   u9CDCBey3k8vL6xN7fm9cKYalbtkvkI09WpScmu4ifsC9LkoeJjUjO0qj
+   g==;
+X-CSE-ConnectionGUID: sXnWUcU6TLKpxEyY2tyhzw==
+X-CSE-MsgGUID: FiNIwXSwRqSVeAyv8bSyLQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11363"; a="45783897"
 X-IronPort-AV: E=Sophos;i="6.14,222,1736841600"; 
-   d="scan'208";a="67496838"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2025 02:47:22 -0800
-X-CSE-ConnectionGUID: f+GAgpAJQRKlq/MjDfgmwQ==
-X-CSE-MsgGUID: le6KLnbFQ9OL5Wk3bkAIRA==
+   d="scan'208";a="45783897"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2025 02:57:03 -0800
+X-CSE-ConnectionGUID: xLex4o6FRe+ZXqdDwTS+Zg==
+X-CSE-MsgGUID: upi6mBhWRgujJF6ntR6ceA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.14,222,1736841600"; 
-   d="scan'208";a="118482708"
-Received: from smile.fi.intel.com ([10.237.72.58])
-  by fmviesa006.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2025 02:47:18 -0800
-Received: from andy by smile.fi.intel.com with local (Exim 4.98)
-	(envelope-from <andriy.shevchenko@linux.intel.com>)
-	id 1tpmHT-0000000HO5v-1wQx;
-	Wed, 05 Mar 2025 12:47:15 +0200
-Date: Wed, 5 Mar 2025 12:47:15 +0200
+   d="scan'208";a="123245746"
+Received: from black.fi.intel.com ([10.237.72.28])
+  by fmviesa005.fm.intel.com with ESMTP; 05 Mar 2025 02:56:58 -0800
+Received: by black.fi.intel.com (Postfix, from userid 1003)
+	id 93305296; Wed, 05 Mar 2025 12:56:57 +0200 (EET)
 From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: Linus Walleij <linus.walleij@linaro.org>, linux-wpan@vger.kernel.org,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	linux-wpan@vger.kernel.org,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-gpio@vger.kernel.org
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
 	Rob Herring <robh@kernel.org>,
 	Krzysztof Kozlowski <krzk+dt@kernel.org>,
 	Conor Dooley <conor+dt@kernel.org>,
 	Bartosz Golaszewski <brgl@bgdev.pl>,
 	Alexander Aring <alex.aring@gmail.com>,
-	Stefan Schmidt <stefan@datenfreihafen.org>,
-	Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: Re: [PATCH net-next v3 3/3] ieee802154: ca8210: Switch to using
- gpiod API
-Message-ID: <Z8grs3uva8j2qrKP@smile.fi.intel.com>
-References: <20250304112418.1774869-1-andriy.shevchenko@linux.intel.com>
- <20250304112418.1774869-4-andriy.shevchenko@linux.intel.com>
- <20250305-rebel-mysterious-falcon-de1f7d@krzk-bin>
+	Stefan Schmidt <stefan@datenfreihafen.org>
+Subject: [PATCH net-next v4 2/4] ieee802154: ca8210: Get platform data via dev_get_platdata()
+Date: Wed,  5 Mar 2025 12:55:35 +0200
+Message-ID: <20250305105656.2133487-3-andriy.shevchenko@linux.intel.com>
+X-Mailer: git-send-email 2.47.2
+In-Reply-To: <20250305105656.2133487-1-andriy.shevchenko@linux.intel.com>
+References: <20250305105656.2133487-1-andriy.shevchenko@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250305-rebel-mysterious-falcon-de1f7d@krzk-bin>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+Content-Transfer-Encoding: 8bit
 
-On Wed, Mar 05, 2025 at 08:04:17AM +0100, Krzysztof Kozlowski wrote:
-> On Tue, Mar 04, 2025 at 01:22:34PM +0200, Andy Shevchenko wrote:
-> > This updates the driver to gpiod API, and removes yet another use of
-> > of_get_named_gpio().
-> > 
-> > With this, invert the logic of the reset pin which is active low
-> > and add a quirk for the legacy and incorrect device tree descriptions.
-> > 
-> > Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
-> > Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-> > ---
-> >  .../bindings/net/ieee802154/ca8210.txt        |  2 +-
-> 
-> Bindings are always separate patches.
+Access to platform data via dev_get_platdata() getter to make code cleaner.
 
-Okay.
+Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
+Reviewed-by: Miquel Raynal <miquel.raynal@bootlin.com>
+Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+---
+ drivers/net/ieee802154/ca8210.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
 
-> Please run scripts/checkpatch.pl and fix reported warnings.
-> After that,
-> run also 'scripts/checkpatch.pl --strict' and (probably) fix more
-> warnings. Some warnings can be ignored, especially from --strict run,
-> but the code here looks like it needs a fix. Feel free to get in touch
-> if the warning is not clear.
-
+diff --git a/drivers/net/ieee802154/ca8210.c b/drivers/net/ieee802154/ca8210.c
+index a036910f6082..65f042c8734b 100644
+--- a/drivers/net/ieee802154/ca8210.c
++++ b/drivers/net/ieee802154/ca8210.c
+@@ -627,7 +627,8 @@ static int ca8210_spi_transfer(
+  */
+ static void ca8210_reset_send(struct spi_device *spi, unsigned int ms)
+ {
+-	struct ca8210_platform_data *pdata = spi->dev.platform_data;
++	struct device *dev = &spi->dev;
++	struct ca8210_platform_data *pdata = dev_get_platdata(dev);
+ 	struct ca8210_priv *priv = spi_get_drvdata(spi);
+ 	long status;
+ 
+@@ -2736,9 +2737,10 @@ static int ca8210_config_extern_clk(
+  */
+ static int ca8210_register_ext_clock(struct spi_device *spi)
+ {
++	struct device *dev = &spi->dev;
++	struct ca8210_platform_data *pdata = dev_get_platdata(dev);
+ 	struct device_node *np = spi->dev.of_node;
+ 	struct ca8210_priv *priv = spi_get_drvdata(spi);
+-	struct ca8210_platform_data *pdata = spi->dev.platform_data;
+ 
+ 	if (!np)
+ 		return -EFAULT;
+@@ -2784,8 +2786,9 @@ static void ca8210_unregister_ext_clock(struct spi_device *spi)
+  */
+ static int ca8210_reset_init(struct spi_device *spi)
+ {
++	struct device *dev = &spi->dev;
++	struct ca8210_platform_data *pdata = dev_get_platdata(dev);
+ 	int ret;
+-	struct ca8210_platform_data *pdata = spi->dev.platform_data;
+ 
+ 	pdata->gpio_reset = of_get_named_gpio(
+ 		spi->dev.of_node,
+@@ -2813,8 +2816,9 @@ static int ca8210_reset_init(struct spi_device *spi)
+  */
+ static int ca8210_interrupt_init(struct spi_device *spi)
+ {
++	struct device *dev = &spi->dev;
++	struct ca8210_platform_data *pdata = dev_get_platdata(dev);
+ 	int ret;
+-	struct ca8210_platform_data *pdata = spi->dev.platform_data;
+ 
+ 	pdata->gpio_irq = of_get_named_gpio(
+ 		spi->dev.of_node,
 -- 
-With Best Regards,
-Andy Shevchenko
-
+2.47.2
 
