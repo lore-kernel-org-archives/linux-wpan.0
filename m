@@ -1,102 +1,112 @@
-Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D3FF1EEA33
-	for <linux-wpan@vger.kernel.org>; Wed,  5 Mar 2025 07:40:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E5881FBEA6;
+	Wed,  5 Mar 2025 10:47:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741160441; cv=none; b=dtHSC2ow4uz34w29PcRewnFMTgduTQKJ8AXSPimFk3R0qr0xsHccPvyzLIGxGVArh9rFtWkt1XNDQVExbJYg5gTAOBSMdZLfsWJ0Kr76CLfC1Dw9kh+7fdOMIHgaM0IndL+VPSZja4IvHQ89Nd7vdj98i/VvuWtK1dObZjBUGps=
+	t=1741171645; cv=none; b=A0wjVK01/XVgfwOi3YWurpzKhD19pe1rZXXE618eWTHzj1tT/ca5q0G0jaWK+daPPiGQYYHgsh2chRChdXadZksbz2z+iJWDXwLaKx3KB6NV7WDQOmF9cNacEka1UVYMVHrf0lVpzlJyqdDszBUPOSV/TEc1FqrtxJLqpthw978=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741160441; c=relaxed/simple;
-	bh=VDTDjXL2VmXwu5SJw3B4Qg8I7zdkWtnn7A7EnShICWQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BmyxZ09nTNvdx3TxZnN1gT/IVUOhkfDUUkzGYMcAIRmFOE5T+oV1+bbsau2707K0R2W1SEEVyDDCOh6uPFhA0P8797xqMvswj5PONrzZMeibai8h6vJUuFQcK5LDlyNPNZrPPoZUPTN7pEPoZdF3nytS2SRpP6YCWFx7LV9eX+Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=BLnx6i7j; arc=none smtp.client-ip=209.85.208.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1741171645; c=relaxed/simple;
+	bh=UWZD1uJYcxYoUdXpa+LU3Lmk9/jwAXhWGiSry/q8qSw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nWf91hR5e9Nt1nYclXphDvz2S/TKRqNC8MOl6zDTUlju7Z+c3j2REhoeaM5HPAdsswtY+Ao2pdGdRLMcO3vA3xsW2NoDVuIISTYOixRFc9SXPm0hrwZwP+zgYhAU+QvWdc6BJrrCFgglR5yHEDX36hAEnyE2Tzep6oc4zUAmqp4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WGIN5YK+; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BLnx6i7j"
-Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-30761be8fcfso70414711fa.0
-        for <linux-wpan@vger.kernel.org>; Tue, 04 Mar 2025 23:40:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1741160438; x=1741765238; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VDTDjXL2VmXwu5SJw3B4Qg8I7zdkWtnn7A7EnShICWQ=;
-        b=BLnx6i7jGlmHnQuSbg0Mesv+Qbc8vu8kKur26c+UmhcRUaUE+QUMmkgjqK8DcpidNS
-         HkqZFwSXw+C55RUszX46OC9J441awi6L/Q1nYtsOZyIrWrgeKirkAID34j0CNvGLfgKf
-         HNDXzKSiSWM1NtbfliWcUqWpEHkobfPIOoO6f5AJ1UCv3VefQ2A/3I5wo74Dmvgz8z6c
-         nMMHIAbiwX+7w0DZi/WitzGmg7Z6XRr1640lUjZFI3UkQFxRQQ8Gnf1RRF65YBb+eObP
-         Ui5UZeL7982Ub01JPiX0MyohOuKLYIayN9gixaH8LQhYaWif//IkH4lfEf1SDby9Luy2
-         B2NQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741160438; x=1741765238;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=VDTDjXL2VmXwu5SJw3B4Qg8I7zdkWtnn7A7EnShICWQ=;
-        b=h91AujIBqEnma5HsfDMcgvDJoGlN24Upqn93/8KyXbWuuLBPEa4lNU6ikYZZvOnqxf
-         WlePjodDFPKMS3FugSWvglXl3xW5gKKvMvminw///RBpoKvGmtozOO/Kioe1dtuA7xhf
-         ETlmpCXmOAWLA3EJaGrVEl6xrkNDuMWFD6tPnepM1en+2MffX3dsVneD2TgqhhK90O9g
-         5G04goo4dsGxttpuRu9HKDgXWRxqq8/9DYl4PsqVp9QHlL0YU6HjoIBybfd3YZT0yQge
-         Cv17FuZTRQi1oiq4MrhyMXGSWoYNtEUPgiwbRi/mWed90sBeXaM2E8jhB0i+aeS0bc+D
-         uP9w==
-X-Gm-Message-State: AOJu0YwD++YhBhhar9M7KGYabDGm8pq1z208IW1ss+cZARNbbsMBtwOo
-	umsE3ITmaqQi+sKShM7MO5ZB0AggEQZi83Jgf57SVlczCSqKw5J/Sy12F2smklL1zOtQek1sHIZ
-	i3/B3teUoArSTjYSNm77O1d1joebAWaOcNJIg9Q==
-X-Gm-Gg: ASbGnctoU5oYenuefiwdNEPodlK8+KO5kUf1XFAiDCe6X2BV6qsGlCnZmA8Mj24LLwi
-	rUtveX5pXmNGzA0Xog+VBhRUSwcw60buLJW4jVDtK6lva4xaDuWMqXvxW6eniXv974DpE78AoNl
-	sHeOZeRYrCXZX29siHKsGGOrlW3g==
-X-Google-Smtp-Source: AGHT+IGcwWgEry+6tzHBD+mNnxIVE6sKBlzFgi1RRA6m0uvCysoF6DsDJJB/fX8qwDEYMA9UPY6ZXQV3WzLO+Ixih90=
-X-Received: by 2002:a05:651c:556:b0:30b:d44d:e76a with SMTP id
- 38308e7fff4ca-30bd7acab1bmr7711201fa.25.1741160438099; Tue, 04 Mar 2025
- 23:40:38 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WGIN5YK+"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1741171643; x=1772707643;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=UWZD1uJYcxYoUdXpa+LU3Lmk9/jwAXhWGiSry/q8qSw=;
+  b=WGIN5YK+71oXoHVe02TEsrtuvjYaO4VP/KkZs7RcApmeBZWgDcqBrOmq
+   I5odh6aLGLrDyVWzZ1utocTQtlZ8H9QCLgjN6Z+APjUP2+i1GqVlhPSpE
+   JFBk20bYemxOXdOUn5xxoLsxhGFU6c2+yq2qXDOHLsMbtkA3CE79nGfFd
+   pW4XEsIOEK7030jey1LEoSfIN4GrJjh5S1NLVmt4voCd5nuOlrCilcKP7
+   sic3KZWVX/HW4Cus7HwQLFT6lRb/4D46e9fw3YH70aypac1kuPm8Efwyw
+   jxnAOCJFepBapti57nnvYvjM1fmr54ZJh21JIATXrcZaok25hZrtaqvMI
+   w==;
+X-CSE-ConnectionGUID: dL/C8xPjTaOsttHdd8NCKQ==
+X-CSE-MsgGUID: a0HxiHTvR8GZFfV0z0G/5Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11363"; a="67496838"
+X-IronPort-AV: E=Sophos;i="6.14,222,1736841600"; 
+   d="scan'208";a="67496838"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2025 02:47:22 -0800
+X-CSE-ConnectionGUID: f+GAgpAJQRKlq/MjDfgmwQ==
+X-CSE-MsgGUID: le6KLnbFQ9OL5Wk3bkAIRA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.14,222,1736841600"; 
+   d="scan'208";a="118482708"
+Received: from smile.fi.intel.com ([10.237.72.58])
+  by fmviesa006.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2025 02:47:18 -0800
+Received: from andy by smile.fi.intel.com with local (Exim 4.98)
+	(envelope-from <andriy.shevchenko@linux.intel.com>)
+	id 1tpmHT-0000000HO5v-1wQx;
+	Wed, 05 Mar 2025 12:47:15 +0200
+Date: Wed, 5 Mar 2025 12:47:15 +0200
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: Linus Walleij <linus.walleij@linaro.org>, linux-wpan@vger.kernel.org,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Bartosz Golaszewski <brgl@bgdev.pl>,
+	Alexander Aring <alex.aring@gmail.com>,
+	Stefan Schmidt <stefan@datenfreihafen.org>,
+	Miquel Raynal <miquel.raynal@bootlin.com>
+Subject: Re: [PATCH net-next v3 3/3] ieee802154: ca8210: Switch to using
+ gpiod API
+Message-ID: <Z8grs3uva8j2qrKP@smile.fi.intel.com>
+References: <20250304112418.1774869-1-andriy.shevchenko@linux.intel.com>
+ <20250304112418.1774869-4-andriy.shevchenko@linux.intel.com>
+ <20250305-rebel-mysterious-falcon-de1f7d@krzk-bin>
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250303164928.1466246-1-andriy.shevchenko@linux.intel.com>
- <20250303164928.1466246-4-andriy.shevchenko@linux.intel.com>
- <CACRpkdbCfhqRGOGrCgP-e3AnK_tmHX+eUpZKjitbfemzAXCcWg@mail.gmail.com>
- <Z8YThNku95-oPPNB@surfacebook.localdomain> <CACRpkdbqYoY1vYGii1SyPL1mkULGXYX7vFwu+U9u2w9--EYAsQ@mail.gmail.com>
- <Z8bgYFUds3UU96Mo@smile.fi.intel.com>
-In-Reply-To: <Z8bgYFUds3UU96Mo@smile.fi.intel.com>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Wed, 5 Mar 2025 08:40:27 +0100
-X-Gm-Features: AQ5f1JqBv5lkq_yKaz9gG-53y85X9EsVUbvHy0t75prGe4GI8Z-EcKjHUiR6o4k
-Message-ID: <CACRpkdYCxPjF2E-jd1OkdYawYJLnFfHUDSL737sr_Zkjz9gVkQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 3/3] ieee802154: ca8210: Switch to using gpiod API
-To: Andy Shevchenko <andy.shevchenko@gmail.com>
-Cc: linux-wpan@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
-	Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt <stefan@datenfreihafen.org>, 
-	Miquel Raynal <miquel.raynal@bootlin.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Bartosz Golaszewski <brgl@bgdev.pl>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250305-rebel-mysterious-falcon-de1f7d@krzk-bin>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 
-On Tue, Mar 4, 2025 at 12:13=E2=80=AFPM Andy Shevchenko
-<andy.shevchenko@gmail.com> wrote:
-> On Tue, Mar 04, 2025 at 01:03:41AM +0100, Linus Walleij wrote:
-> > On Mon, Mar 3, 2025 at 9:39=E2=80=AFPM Andy Shevchenko
-> > <andy.shevchenko@gmail.com> wrote:
-> >
-> > > > Maybe add a comment in the code that this is wrong and the
-> > > > driver and DTS files should be fixed.
-> > >
-> > > Or maybe fix in the driver and schema and add a quirk to gpiolib-of.c=
-?
-> >
-> > Even better!
->
-> I am about to send a v3, I'm going to leave your tag despite a few change=
-s as
-> discussed. I hope this is okay with you.
+On Wed, Mar 05, 2025 at 08:04:17AM +0100, Krzysztof Kozlowski wrote:
+> On Tue, Mar 04, 2025 at 01:22:34PM +0200, Andy Shevchenko wrote:
+> > This updates the driver to gpiod API, and removes yet another use of
+> > of_get_named_gpio().
+> > 
+> > With this, invert the logic of the reset pin which is active low
+> > and add a quirk for the legacy and incorrect device tree descriptions.
+> > 
+> > Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
+> > Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+> > ---
+> >  .../bindings/net/ieee802154/ca8210.txt        |  2 +-
+> 
+> Bindings are always separate patches.
 
-Of course!
+Okay.
 
-Linus Walleij
+> Please run scripts/checkpatch.pl and fix reported warnings.
+> After that,
+> run also 'scripts/checkpatch.pl --strict' and (probably) fix more
+> warnings. Some warnings can be ignored, especially from --strict run,
+> but the code here looks like it needs a fix. Feel free to get in touch
+> if the warning is not clear.
+
+-- 
+With Best Regards,
+Andy Shevchenko
+
+
