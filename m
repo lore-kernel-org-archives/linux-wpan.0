@@ -1,112 +1,103 @@
-Received: from proxima.lasnet.de (proxima.lasnet.de [78.47.171.185])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DD1F1E520D;
-	Wed, 19 Mar 2025 16:56:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.47.171.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32F0F25FA1B
+	for <linux-wpan@vger.kernel.org>; Mon, 24 Mar 2025 14:22:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742403389; cv=none; b=Apb+2mnUM8LL1bBsmC+uzG6Tg5YMZnhHCKeiDKJVQaDlRNl6H8u542vNzJ9qkGDNNv71qVxK8M4KnrMFWZeHMaWFsDxJkZeJNH8qUvcb4OuZDVihLGplZ/0qpxPc3iU/Nwpzf+/NjlG5UHt9nOa+T4bjiWynDPDwWlMRqJ7RC/Q=
+	t=1742826135; cv=none; b=oTGW6SwP/v6T1xcOAzufTEZGSpG0Ja1aTMHlAOsm5IljInRHSQTRuAC25zI3Ka3FLmFcTNr42zVM85JngEbw5oa9pzcbFaAcsP9g/EbGC3Am5zDoCzjRlJXnXZSSbN+o2wBbKOKbdM4QT3f7Wnht0asTVXh5PowkxQX6VlgMi7c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742403389; c=relaxed/simple;
-	bh=RwMY2A6TE8KPkV9oIN0tHDRAPp0fPsCc52F7JIiKjW4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZpRHz5XWeJ+3oN35gropBwa9Ye9HFnAWaNipuZm2Ey87mW9PQq6EbGV70j8aK/UidjwZV91F+2ZfTcixVRhIqppsavOmbxgBZiVidbQNjhk0TF6i4PNbdaTps1izKdRk/aX1ZtgFvllkWD3sXUiUyF6a7P63zi7KB5PUu+LYvq8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=datenfreihafen.org; spf=pass smtp.mailfrom=datenfreihafen.org; dkim=pass (2048-bit key) header.d=datenfreihafen.org header.i=@datenfreihafen.org header.b=sHbyR/WS; arc=none smtp.client-ip=78.47.171.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=datenfreihafen.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=datenfreihafen.org
+	s=arc-20240116; t=1742826135; c=relaxed/simple;
+	bh=rK8TirxxevAbPD9uU+OigP2T7fTiYa4YAEaDMWlh9FQ=;
+	h=Message-ID:Date:Content-Type:MIME-Version:to:from:subject; b=r2G61HmQZ083C4aUzX6SILHiI1nZZjZESvTqoZ+Ywa628X0BOpoA/VzSGbbpCJC+HiUi034qLOke85p0MJHRvQ4x4uhVqPHAK/m4aTaC/Atypp2z4MQsOmvRCA+ePArwFx9h6bSPZvK7za2GihImrhYp9nSdnqcnOEs9fJEMLKs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MPWb50PT; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=datenfreihafen.org header.i=@datenfreihafen.org header.b="sHbyR/WS"
-Received: from [192.168.2.30] (unknown [45.118.184.53])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: stefan@datenfreihafen.org)
-	by proxima.lasnet.de (Postfix) with ESMTPSA id C1E0AC05A4;
-	Wed, 19 Mar 2025 17:56:16 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
-	s=2021; t=1742403377;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xcgptT5JlLGVr/LMQ37kerorcLQmJz9N3ply/i/XhCw=;
-	b=sHbyR/WSgOE4AJx5+jCEj7yNxufJN4XS+iQs/XCuQrWNFrLFyFD9DQNHQ5Yo49valJxwIj
-	TDS+gJ35A+YppuWfNb0FpsamYvm/LhhjVQrHINStskgqHDn9O9CzFZi0vKflYBFPPQmLZt
-	TRDUbx3WaXIQ9ClDp0rZ2lwEkH8NLyIa3fGFvqsFrS9vTnprQSTnj022R8LUnXJByhRCAC
-	Bxb6UbnbIDX2pkhenYUCb67eMPaTE/AEsSjxjNOQY3FGudFHJiGL8XgXxzRP8/nfQunwai
-	D6wnkM+4eV6bEP4+nDu3TTepvfmMLBiLveSBJUkoAUAq9qRsnmBUYAy/tr5ATw==
-Message-ID: <ca515b13-f48c-43fe-b1c4-3fd2d9506083@datenfreihafen.org>
-Date: Wed, 19 Mar 2025 17:56:16 +0100
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MPWb50PT"
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-227aaa82fafso27913015ad.2
+        for <linux-wpan@vger.kernel.org>; Mon, 24 Mar 2025 07:22:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1742826133; x=1743430933; darn=vger.kernel.org;
+        h=priority:importance:subject:from:to:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=rK8TirxxevAbPD9uU+OigP2T7fTiYa4YAEaDMWlh9FQ=;
+        b=MPWb50PTgNTTzseySm4FY1KQnlVOYR4j5dDEZ/tHeQuwqDaGQSyfTUG5zmu2W9qIIn
+         eP/2AJqbCd81hG7atdJdS5KonAvoQGxq7POq7NX9ND+DiHV3H1cZstgTfg5IYet+WZHA
+         2WIgZlAO5B1TUHgbCysrAf2oChfvNi6MgfWBXz8NuEfQD0py0oKrRd1+HTi3LwNLtrK8
+         Pm1nF20+V0OrNqxpOimq7ciJ6A7MWpwxDOpcF0a5CR77zBN7p+qQgEGDTK1JZyOcIze8
+         vG/uSNnRC34zCFxbt1FOwgg8RCjbJga/nffr6mrs0V8HnF77N7G3d8UXxKC7CBwNNQ16
+         ivkw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742826133; x=1743430933;
+        h=priority:importance:subject:from:to:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rK8TirxxevAbPD9uU+OigP2T7fTiYa4YAEaDMWlh9FQ=;
+        b=ZdzlImmCukurvP4/ysPUh6wSJcsXXJuu+5l2aGPqaj133ikIh5vgW5+EyPCvpZYntG
+         9sVRvQevhCDoUdOp7gmWtKL5i21ouH1ckJ3hjATSht+JmQLzy8Hv+Z/kItvoIEQsZRBw
+         qrUKb5LctfgXtjVNw/6kVVcr+2RL5vfpUJFBfBmc+iYojbGYvaP+9THdBtbJaLq/Msh1
+         Ori5AmHdHfxQPYBDmAjKO+h0pwOLcar5TjYykAqL7IZOApcRxJQNQBEQqGNE+UqmuRBq
+         mHiXkRkjWFxB5kvXexsk9SFsvWlNg4Hma8rUIZ84ZMHINsb7jcLVSIw2HU+PtrLDMmYT
+         5JzQ==
+X-Gm-Message-State: AOJu0YzahebMFxlaRsy9ksfIbCk6RNfp5MIUAIIpn0vvjw8T+fZICP2p
+	OPXcJQcVRvaKd82utXxnljmR2WylmSlD3L7IgqrXAddYVjPPmnVC/FsR+Rl7uX4=
+X-Gm-Gg: ASbGncssvGkNAXlzK7Q4CkJJ/59L5tuLEXPfNS5YvG/a9L1E9UwWI2UDPWyAfkRz0mD
+	AtR5zwsnFLdQkzinifUrto9FZc9wOLSC9GKfphurjtP1+dpTfN8PozXD3/MH4RrCo3hy+Iqr09a
+	CQzkr9eQkwOUWRV+j8cpAR/W7342Rcgzg/CvfCkl/fPpxX6ntAxtVCE0vvJedzYAy7Q9MiLHn+X
+	xE1VYNfJnweyrZj3hUlW8QeqXqXGWu8/VNehYArwvG4qEoS5iVWmpV3ODTAoHkQZqsxeKOKesFu
+	OiD9WhWLmtp2ADOpvDb6S+X5iZbXbFiYT4E8TO8n71PPYQXMarClrEXe5nTidr5AmIB7dLyxXpw
+	M2g==
+X-Google-Smtp-Source: AGHT+IF1wIU2t7nWu8JkrzCh/61j41+mz8g5EzzJyCLNws1fHBbufvFIPIhf61BW9FrOl2iz0OzpwA==
+X-Received: by 2002:a17:902:d4c5:b0:216:53fa:634f with SMTP id d9443c01a7336-22780e206a3mr220091425ad.48.1742826132819;
+        Mon, 24 Mar 2025 07:22:12 -0700 (PDT)
+Received: from [172.22.17.136] ([43.133.63.133])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-227811f14easm70950045ad.222.2025.03.24.07.22.11
+        for <linux-wpan@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 24 Mar 2025 07:22:12 -0700 (PDT)
+Message-ID: <67e16a94.170a0220.3150a5.e092@mx.google.com>
+Date: Mon, 24 Mar 2025 07:22:12 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6504833913141074538=="
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: pull-request: ieee802154-next 2025-03-10
-To: Paolo Abeni <pabeni@redhat.com>, davem@davemloft.net, kuba@kernel.org
-Cc: linux-wpan@vger.kernel.org, alex.aring@gmail.com,
- miquel.raynal@bootlin.com, netdev@vger.kernel.org
-References: <20250310185752.2683890-1-stefan@datenfreihafen.org>
- <91648005-0bf9-4839-8b8f-5151056c9f9a@datenfreihafen.org>
- <ae626131-20e6-4d7b-b5ec-5a9804917e51@redhat.com>
-Content-Language: en-US
-From: Stefan Schmidt <stefan@datenfreihafen.org>
-In-Reply-To: <ae626131-20e6-4d7b-b5ec-5a9804917e51@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+to: Dear Customer <linux-wpan@vger.kernel.org>
+from: Dear Customer <akajeaneudes11@gmail.com>
+subject: Shipment 782792718083 tracking ID is now generated.
+Importance: normal
+Priority: normal
+X-Mailer: CosmicMailer X-Mailer [v1.0]
+X-MimeOLE: X-MimeOLE RocketMailer
+
+--===============6504833913141074538==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 
-Hello Paolo,
+Subject: Successful Renewal of Your McAfee Subscription for 48 Months
 
-On 19.03.25 17:53, Paolo Abeni wrote:
-> On 3/14/25 7:37 AM, Stefan Schmidt wrote:
->> On 10.03.25 19:57, Stefan Schmidt wrote:
->>> Hello Dave, Jakub, Paolo.
->>>
->>> An update from ieee802154 for your *net-next* tree:
->>>
->>> Andy Shevchenko reworked the ca8210 driver to use the gpiod API and fixed
->>> a few problems of the driver along the way.
->>>
->>> regards
->>> Stefan Schmidt
->>>
->>> The following changes since commit f130a0cc1b4ff1ef28a307428d40436032e2b66e:
->>>
->>>     inet: fix lwtunnel_valid_encap_type() lock imbalance (2025-03-05 19:16:56 -0800)
->>>
->>> are available in the Git repository at:
->>>
->>>     git://git.kernel.org/pub/scm/linux/kernel/git/wpan/wpan-next.git tags/ieee802154-for-net-next-2025-03-10
->>>
->>> for you to fetch changes up to a5d4d993fac4925410991eac3b427ea6b86e4872:
->>>
->>>     dt-bindings: ieee802154: ca8210: Update polarity of the reset pin (2025-03-06 21:55:18 +0100)
->>>
->>> ----------------------------------------------------------------
->>> Andy Shevchenko (4):
->>>         ieee802154: ca8210: Use proper setters and getters for bitwise types
->>>         ieee802154: ca8210: Get platform data via dev_get_platdata()
->>>         ieee802154: ca8210: Switch to using gpiod API
->>>         dt-bindings: ieee802154: ca8210: Update polarity of the reset pin
->>>
->>>    .../devicetree/bindings/net/ieee802154/ca8210.txt  |  2 +-
->>>    drivers/gpio/gpiolib-of.c                          |  9 +++
->>>    drivers/net/ieee802154/ca8210.c                    | 78 +++++++++-------------
->>>    3 files changed, 41 insertions(+), 48 deletions(-)
->>>
->>
->> Friendly reminder on this pull request. If anything blocks you from
->> pulling this, please let me know.
-> 
-> I'm just lagging behind the PW backlog quite a bit. The PR should be
-> merged soon.
-> 
-> Thanks for your patience,
+Dear Dear Customer,
 
-No worries. As long as I know its in the queue and not fallen through 
-the cracks I have all the time needed. :-)
+We are pleased to announce that the renewal of your McAfee subscription for the year 48 Months has been successfully processed. Thank you for your continued partnership with McAfee. Your loyalty means the world to us.
 
-regards
-StefanSchmidt
+Renewal Details:
+
+Product Code: 5929-poxzhqt
+
+Service/Product: Cyber Barrier-ABC
+
+Amount Due: USD319.10
+
+Please note that the renewal fee of USD319.10 will be processed within 12 business hours and credited to your account. You will also see this charge reflected on your next billing cycle.
+
+If you have any questions or need further assistance, our customer support team is available to assist you at +1888-350-2394.
+
+We are grateful to have you as part of the McAfee community!
+
+Warm regards,
+McAfee LLC.
+(c) 2025 All rights reserved.
+--===============6504833913141074538==--
