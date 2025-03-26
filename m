@@ -1,169 +1,182 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f53.google.com (mail-ua1-f53.google.com [209.85.222.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A260818BC2F
-	for <linux-wpan@vger.kernel.org>; Wed, 26 Mar 2025 22:49:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C4C61537CB;
+	Wed, 26 Mar 2025 23:24:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743029360; cv=none; b=LewtgBPlviYvsHHRZ4mVupc08kGelsIg/CjczLhyvosuUpG3My0As7AXqF2+CHvBRrp+xUCNJXDP+Ezq4R5bHeqLZvBELXoP9Iycnh1eR6sLTyK8xkkj+Wl5BzkKMBvDA/FbOz/vOkEDf3+z7jWseG14f4QMsp0/QQ1lp26JD0c=
+	t=1743031493; cv=none; b=Q2TS7M909xkBOBuU4GuSmYeL/2yk1O8iIcJbzm+7YUrL0Pkae/D216xSeHvqYG8b2E/eI48H5VO3nns+6J+2eUk8BLQMpsHmRxTOg1HWRVt8FOR+DRVOqQOtwuBzMIoCk+JXz7aqIdVkzK/YbMuIDkvzG2Tu++0sIyZdEme2Pzg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743029360; c=relaxed/simple;
-	bh=pb62k3uPmcrFUbNnneW6CR+k/UDgFy/e/C8H10DakC4=;
+	s=arc-20240116; t=1743031493; c=relaxed/simple;
+	bh=PIIdWtyAj4inA4YTOvxkfRz0aC+wXBaEEXAJg8EBuzc=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pwR/ucKLwwQuU8aAET4Obq8tVg1Lfim201JnFPwB1X/sMwLHhIJyH4Rf4n6GPD1LstSUmYAfPkNzUkbetfzzopZo8Lvslo19Ku5FSEPr3gIEzG8oabWzJshqXT2Blf3h4VFDn2FwCNyS6dyk3kJu5dXkQRj6ywAQpt1rzmr1sTk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bD9KEe58; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 To:Cc:Content-Type; b=Q0XSSOSvMDf7s6tklbDYSPzNdRRD2fjrlZ+436wQ+On3w5JP4Phpzemh0GYoN1s7OxNFvu+E9ocfDqsi20/XFn5P4z5gT7yzvMgv8d5sQizyelEFE0rgAFgHizjgi8IAItkS74Z+dLJIJ69tnlwCrNtMJQRdkk5IwZsLzTwq8og=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DkHcYsrr; arc=none smtp.client-ip=209.85.222.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bD9KEe58"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1743029357;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qi8wdhM7rmWkvLOlU6keCbGUfSvgCk1Wxsh4f3EOl8Y=;
-	b=bD9KEe58TqXlL1NTKKsDohpe16dzJDDPtPiWfb5WUcodsgBk8xHT35hzipZ7jzT61zf5WS
-	os/S4dFSbdRuwiV1+/c6vh2d/4gTLI1yR+C8nKPyejfyrU8fgX8YGsmbeF5DpWCd2piAMn
-	bMxW/ercXFabafAIA62v/CbMqfd5dOE=
-Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com
- [209.85.208.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-427-bEt7K-SnOw-ctJ650ek_EA-1; Wed, 26 Mar 2025 18:49:16 -0400
-X-MC-Unique: bEt7K-SnOw-ctJ650ek_EA-1
-X-Mimecast-MFC-AGG-ID: bEt7K-SnOw-ctJ650ek_EA_1743029355
-Received: by mail-lj1-f199.google.com with SMTP id 38308e7fff4ca-30c2d4271c7so2057881fa.0
-        for <linux-wpan@vger.kernel.org>; Wed, 26 Mar 2025 15:49:15 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DkHcYsrr"
+Received: by mail-ua1-f53.google.com with SMTP id a1e0cc1a2514c-86d69774081so190269241.0;
+        Wed, 26 Mar 2025 16:24:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1743031490; x=1743636290; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QvBYyj5m6bTFhPpu5G3kmoFiNR4fomHkjxdoYP9tVZQ=;
+        b=DkHcYsrrbcACbxKNGT8YIgeBuDysJoDR9rrtpqYFeq138M2HYo/tx6n5v76gnpb/Qd
+         E7dAJ7dOdTBUBm4MnM9HMehFsYDVA3DSBfPANjtKAbFWo89/VkpRBPi6IQWwXgKWSk4J
+         fTxfaoUkd6techeye9kzRO6Zi3UmDFWiUNyh4MkQwC1uNR03bpkJFRvxwlSNFVFdAMmq
+         4hzVI7x5yT6NlOyBcPUaoplk0dmsfyPeigPGAezcSs3WanQLgSwvEaaxFfV/4ybuj9Ix
+         6082cnOC3zkkFG/MKvzYE/gL/86f8djvAjiaZMWXNhg01y4SNB00d6BK48Hnk40rA/kG
+         H7BQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743029354; x=1743634154;
+        d=1e100.net; s=20230601; t=1743031490; x=1743636290;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=qi8wdhM7rmWkvLOlU6keCbGUfSvgCk1Wxsh4f3EOl8Y=;
-        b=D4+Ir6mDPNjrqB7+hYoYhFt8piAlRFTy+gyRXnJQd+WqEr5eki0L9ax8t4BhIYP9wq
-         1qQLf9FWKqctBOavA2MNFVJWtqp7XN5DnY77AGGpPQAjNJ8mbexyQ5zJn2VN705GLutf
-         Tk8dN9jzXFPjWAC042OD7Bv+BHy2sSZuFnMRqjWIDaoWMlnyU/gn1DsWAWvElLJUiw6U
-         oUV6TJ2pJpHaO22Je1Lb3gbG1r1pEURvnVhVon+CRXuleHx4r4DFHWQQuTVBsrdAE8IL
-         CD4kO2CELiM7vptpjZfijJPUV0CNavURAsw/LRlUpal+3YGrFrisf0TjnZl6/etlrmiF
-         dZ3A==
-X-Forwarded-Encrypted: i=1; AJvYcCWXyu3tE46+RaRYc2/sbmYI6Py//WQmaxsWjIYp/bnl+qrPoeN47HK0G9UT6xwEnrjctvrDyU8ygZdp@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz8T0fVnRx2DxELYt7tOrUaoBjgR3gzARKM784/c9Gqovim26+e
-	79qm6l+haqV2KEuCKpDQd4eborF+xTDpEXJlqwWyffU+q0SKp4HItvp/dQotKL4DExDlat7pfp7
-	4U0+rG3La1U0rr5USD63uK/35Y4kTvVkbvXfjGiWpX3DHAPhKIDODH+bOVI70gywqwCCpcprWoS
-	XExlITCqoPOOOEyvBrheoCQ0dHA6+40qcHhuIm+UqsNJCS
-X-Gm-Gg: ASbGncsOQ5PuDD+1Ihbcpl2AcQnF9IDhJqoWF3Ycng3qXbS6tCLOhauEWMhqn8uXeoW
-	cxUoSR1zY/uE5l6YU2LkFwTrhn6OdyEeanPh0d/y4CelzdeibQZMc3nFcYcjbDv1pU/6TCxluKo
-	Ab3n9Jz63eFYzsH935Uk42uQbdZmnFWg==
-X-Received: by 2002:a05:651c:2050:b0:30b:bdb0:f09d with SMTP id 38308e7fff4ca-30dc5f515bbmr5510351fa.32.1743029354115;
-        Wed, 26 Mar 2025 15:49:14 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE8cMCyuMwWy76IQjJTWRHtr9mD0i57Aua495nDnRXXsLw6FXvJjoQX0xrXHm47p5VgTZevUnfzjDqhw/Un7Cc=
-X-Received: by 2002:a05:651c:2050:b0:30b:bdb0:f09d with SMTP id
- 38308e7fff4ca-30dc5f515bbmr5510251fa.32.1743029353699; Wed, 26 Mar 2025
- 15:49:13 -0700 (PDT)
+        bh=QvBYyj5m6bTFhPpu5G3kmoFiNR4fomHkjxdoYP9tVZQ=;
+        b=JCUqmXCYauoHmXj0hEt1cB55qWn5bm44YjpqUIFVRfWI2D/yVbfpjY94cyXFxaOnr/
+         Hy8jUCz4tmvlzUJZDnLD9qxoXfCGmwWh16e9lDUQdzCSFR5MXADOCUUAIo6X+SG2Lxu0
+         nktf3GuV9A3eeUpXLWcx9yu7UwXi1gOM/UEMl1vaVBwyVuPNUmw2swnp/Q5/eu15RB/F
+         6Db983mp1Lhw12dHj6eeIZHVt2GhXzjSMr3seqkCZO+ERibVuf4BhTuLCs9FgglWQNFP
+         b76lc89S9/Jpe0sY1kqcxoZ/rrGeGOkm+/2uuxSuCC3xHKZ5QfgzT4Ys0DGcS+WT2Mep
+         sfDA==
+X-Forwarded-Encrypted: i=1; AJvYcCWJmrdXk4HCJU9ScEwYQhktOAjrVKULlYmgAwxL2Fg3KT+pj8uHJvnK0MYQdlxp+aUdVzYnaVe9bUq+@vger.kernel.org, AJvYcCWjnOqHIhIoHRPr+kb6PvaQgzdI7N6oeB56sYJ10E1ghmCn5hJ8BfL2GJBj+BtjE3e+dm9Y2pO4@vger.kernel.org
+X-Gm-Message-State: AOJu0YyR9TCpc9I/YeWq8iXfPf/C8S23oZQTy5n0asgjC8NlgCQH2mwl
+	hZRWev3ai8/GuD3WL1lorwbf32vDTPx45ZwpFPAoglosYxt0WHSZb+CsQ89/Iq9eLiIfnY1YSmp
+	vJxWiZ0pdwccclsTdPBQUEb3fx/94h12wdo0=
+X-Gm-Gg: ASbGncvfU7oEQn9VIbbhjkX/5mDoiUPeG4ROqbL8Asq7mQGj8f9HVh6AahE65MrbWMb
+	ntl3y9JvE39O87o/G0r5LrHEc0SKHRbou25szwLSU95QF166hxv7wdLOMc0q2j4KrIwS2Pgc/iL
+	vL/GFmS991quE3IQP9zYK7wdYFSA==
+X-Google-Smtp-Source: AGHT+IEsQQMt8gitdBLnl/0w5gq/Nsc6vtr9ogoz6eLE8IKe8VR4aQF9YhMbwJAMNEZhxJSnWGafZeXeKVnWdBhlfMI=
+X-Received: by 2002:a05:6102:1498:b0:4c4:e414:b4eb with SMTP id
+ ada2fe7eead31-4c586fa2324mr2094400137.12.1743031490142; Wed, 26 Mar 2025
+ 16:24:50 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250326180909.10406-1-ramonreisfontes@gmail.com>
-In-Reply-To: <20250326180909.10406-1-ramonreisfontes@gmail.com>
-From: Alexander Aring <aahringo@redhat.com>
-Date: Wed, 26 Mar 2025 18:49:02 -0400
-X-Gm-Features: AQ5f1JpGqx_OPjvXDypDk2rq6InmEg7NNHY5U7uN3dc0VBCMkBBj7u5F0xqSZks
-Message-ID: <CAK-6q+hkHByFK2hWkrbZqFT5=h9U9nXuZJNF+_LhqmqeEC+Sng@mail.gmail.com>
+References: <20250326180909.10406-1-ramonreisfontes@gmail.com> <CAK-6q+hkHByFK2hWkrbZqFT5=h9U9nXuZJNF+_LhqmqeEC+Sng@mail.gmail.com>
+In-Reply-To: <CAK-6q+hkHByFK2hWkrbZqFT5=h9U9nXuZJNF+_LhqmqeEC+Sng@mail.gmail.com>
+From: Ramon Fontes <ramonreisfontes@gmail.com>
+Date: Wed, 26 Mar 2025 20:24:38 -0300
+X-Gm-Features: AQ5f1Jp0Azqb5K7EaxmMbHhobiCsizAD-Mz8tigmPzQaIQ1NMzOy8TBP2akRh9s
+Message-ID: <CAK8U23Ydy8jC+7ZUfHaa+sQzECo3MYiDFwFY=MjP9z3GBjtQQw@mail.gmail.com>
 Subject: Re: [PATCH] mac802154_hwsim: define perm_extended_addr initialization
-To: Ramon Fontes <ramonreisfontes@gmail.com>
+To: Alexander Aring <aahringo@redhat.com>
 Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
 	linux-wpan@vger.kernel.org, alex.aring@gmail.com, miquel.raynal@bootlin.com, 
 	netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
-
-On Wed, Mar 26, 2025 at 2:09=E2=80=AFPM Ramon Fontes <ramonreisfontes@gmail=
-.com> wrote:
+On Wed, Mar 26, 2025 at 7:49=E2=80=AFPM, Alexander Aring <aahringo@redhat.c=
+om> wrote:
 >
-> This establishes an initialization method for perm_extended_addr, alignin=
-g it with the approach used in mac80211_hwsim.
+> Hi,
 >
-
-that is based on the phy index value instead of a random generated one?
-
-> Signed-off-by: Ramon Fontes <ramonreisfontes@gmail.com>
-> ---
->  drivers/net/ieee802154/mac802154_hwsim.c | 18 +++++++++++++++++-
->  drivers/net/ieee802154/mac802154_hwsim.h |  2 ++
->  2 files changed, 19 insertions(+), 1 deletion(-)
+> On Wed, Mar 26, 2025 at 2:09=E2=80=AFPM Ramon Fontes <ramonreisfontes@gma=
+il.com> wrote:
+> >
+> > This establishes an initialization method for perm_extended_addr, align=
+ing it with the approach used in mac80211_hwsim.
+> >
 >
-> diff --git a/drivers/net/ieee802154/mac802154_hwsim.c b/drivers/net/ieee8=
-02154/mac802154_hwsim.c
-> index 1cab20b5a..400cdac1f 100644
-> --- a/drivers/net/ieee802154/mac802154_hwsim.c
-> +++ b/drivers/net/ieee802154/mac802154_hwsim.c
-> @@ -41,6 +41,17 @@ enum hwsim_multicast_groups {
->         HWSIM_MCGRP_CONFIG,
->  };
+> that is based on the phy index value instead of a random generated one?
+
+Yes, that's based on the phy index value.
+
 >
-> +__le64 addr_to_le64(u8 *addr) {
-> +    return cpu_to_le64(((u64)addr[0] << 56) |
-> +                        ((u64)addr[1] << 48) |
-> +                        ((u64)addr[2] << 40) |
-> +                        ((u64)addr[3] << 32) |
-> +                        ((u64)addr[4] << 24) |
-> +                        ((u64)addr[5] << 16) |
-> +                        ((u64)addr[6] << 8)  |
-> +                        ((u64)addr[7]));
-> +}
-> +
->  static const struct genl_multicast_group hwsim_mcgrps[] =3D {
->         [HWSIM_MCGRP_CONFIG] =3D { .name =3D "config", },
->  };
-> @@ -896,6 +907,7 @@ static int hwsim_subscribe_all_others(struct hwsim_ph=
-y *phy)
->  static int hwsim_add_one(struct genl_info *info, struct device *dev,
->                          bool init)
->  {
-> +       u8 addr[8];
-
-why not using directly __le64?
-
->         struct ieee802154_hw *hw;
->         struct hwsim_phy *phy;
->         struct hwsim_pib *pib;
-> @@ -942,7 +954,11 @@ static int hwsim_add_one(struct genl_info *info, str=
-uct device *dev,
->         /* 950 MHz GFSK 802.15.4d-2009 */
->         hw->phy->supported.channels[6] |=3D 0x3ffc00;
+> > Signed-off-by: Ramon Fontes <ramonreisfontes@gmail.com>
+> > ---
+> >  drivers/net/ieee802154/mac802154_hwsim.c | 18 +++++++++++++++++-
+> >  drivers/net/ieee802154/mac802154_hwsim.h |  2 ++
+> >  2 files changed, 19 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/drivers/net/ieee802154/mac802154_hwsim.c b/drivers/net/iee=
+e802154/mac802154_hwsim.c
+> > index 1cab20b5a..400cdac1f 100644
+> > --- a/drivers/net/ieee802154/mac802154_hwsim.c
+> > +++ b/drivers/net/ieee802154/mac802154_hwsim.c
+> > @@ -41,6 +41,17 @@ enum hwsim_multicast_groups {
+> >         HWSIM_MCGRP_CONFIG,
+> >  };
+> >
+> > +__le64 addr_to_le64(u8 *addr) {
+> > +    return cpu_to_le64(((u64)addr[0] << 56) |
+> > +                        ((u64)addr[1] << 48) |
+> > +                        ((u64)addr[2] << 40) |
+> > +                        ((u64)addr[3] << 32) |
+> > +                        ((u64)addr[4] << 24) |
+> > +                        ((u64)addr[5] << 16) |
+> > +                        ((u64)addr[6] << 8)  |
+> > +                        ((u64)addr[7]));
+> > +}
+> > +
+> >  static const struct genl_multicast_group hwsim_mcgrps[] =3D {
+> >         [HWSIM_MCGRP_CONFIG] =3D { .name =3D "config", },
+> >  };
+> > @@ -896,6 +907,7 @@ static int hwsim_subscribe_all_others(struct hwsim_=
+phy *phy)
+> >  static int hwsim_add_one(struct genl_info *info, struct device *dev,
+> >                          bool init)
+> >  {
+> > +       u8 addr[8];
 >
-> -       ieee802154_random_extended_addr(&hw->phy->perm_extended_addr);
-> +       memset(addr, 0, sizeof(addr));
-> +       /* give a specific prefix to the address */
-> +       addr[0] =3D 0x02;
-> +       addr[7] =3D idx;
-> +       hw->phy->perm_extended_addr =3D addr_to_le64(addr);
+> why not using directly
+
+Yes, we don't need it.
+
 >
->         /* hwsim phy channel 13 as default */
->         hw->phy->current_channel =3D 13;
-> diff --git a/drivers/net/ieee802154/mac802154_hwsim.h b/drivers/net/ieee8=
-02154/mac802154_hwsim.h
-> index 6c6e30e38..536d95eb1 100644
-> --- a/drivers/net/ieee802154/mac802154_hwsim.h
-> +++ b/drivers/net/ieee802154/mac802154_hwsim.h
-> @@ -1,6 +1,8 @@
->  #ifndef __MAC802154_HWSIM_H
->  #define __MAC802154_HWSIM_H
+> >         struct ieee802154_hw *hw;
+> >         struct hwsim_phy *phy;
+> >         struct hwsim_pib *pib;
+> > @@ -942,7 +954,11 @@ static int hwsim_add_one(struct genl_info *info, s=
+truct device *dev,
+> >         /* 950 MHz GFSK 802.15.4d-2009 */
+> >         hw->phy->supported.channels[6] |=3D 0x3ffc00;
+> >
+> > -       ieee802154_random_extended_addr(&hw->phy->perm_extended_addr);
+> > +       memset(addr, 0, sizeof(addr));
+> > +       /* give a specific prefix to the address */
+> > +       addr[0] =3D 0x02;
+> > +       addr[7] =3D idx;
+> > +       hw->phy->perm_extended_addr =3D addr_to_le64(addr);
+
+I think we can replace everything with only one line of code:
+
+hw->phy->perm_extended_addr =3D cpu_to_le64(((u64)0x02 << 56) | ((u64)idx))=
+;
+
+This does the trick! What do you think?
+
+> >
+> >         /* hwsim phy channel 13 as default */
+> >         hw->phy->current_channel =3D 13;
+> > diff --git a/drivers/net/ieee802154/mac802154_hwsim.h b/drivers/net/iee=
+e802154/mac802154_hwsim.h
+> > index 6c6e30e38..536d95eb1 100644
+> > --- a/drivers/net/ieee802154/mac802154_hwsim.h
+> > +++ b/drivers/net/ieee802154/mac802154_hwsim.h
+> > @@ -1,6 +1,8 @@
+> >  #ifndef __MAC802154_HWSIM_H
+> >  #define __MAC802154_HWSIM_H
+> >
+> > +__le64 addr_to_le64(u8 *addr);
+> > +
 >
-> +__le64 addr_to_le64(u8 *addr);
-> +
+> This is a uapi header for netlink which is not yet delivered through
+> kernel-headers installation.
+>
+> Why do we need this prototype declaration here?
 
-This is a uapi header for netlink which is not yet delivered through
-kernel-headers installation.
+We don't need it.
 
-Why do we need this prototype declaration here?
-
-Thanks.
-
-- Alex
-
+>
+> Thanks.
+>
+> - Alex
+>
