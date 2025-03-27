@@ -1,182 +1,132 @@
-Received: from mail-ua1-f53.google.com (mail-ua1-f53.google.com [209.85.222.53])
+Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C4C61537CB;
-	Wed, 26 Mar 2025 23:24:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAE8B7E105
+	for <linux-wpan@vger.kernel.org>; Thu, 27 Mar 2025 05:31:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743031493; cv=none; b=Q2TS7M909xkBOBuU4GuSmYeL/2yk1O8iIcJbzm+7YUrL0Pkae/D216xSeHvqYG8b2E/eI48H5VO3nns+6J+2eUk8BLQMpsHmRxTOg1HWRVt8FOR+DRVOqQOtwuBzMIoCk+JXz7aqIdVkzK/YbMuIDkvzG2Tu++0sIyZdEme2Pzg=
+	t=1743053494; cv=none; b=Mw59G93L6BFy4GE5cEUM0vY5UoXMHWx9jygkiBvyMatozSioRi0Wa/wQbLzEqx3RX1Ncxcnbya19HqWAHDNpF6lPCgZCMEswP+U1a/o80aSE5TuZBDu7o2phlUEN7DcTeTvs0vHx9YaKCN+bmfRV5sqknB3Mbjv8CyiBWuVqYjI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743031493; c=relaxed/simple;
-	bh=PIIdWtyAj4inA4YTOvxkfRz0aC+wXBaEEXAJg8EBuzc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Q0XSSOSvMDf7s6tklbDYSPzNdRRD2fjrlZ+436wQ+On3w5JP4Phpzemh0GYoN1s7OxNFvu+E9ocfDqsi20/XFn5P4z5gT7yzvMgv8d5sQizyelEFE0rgAFgHizjgi8IAItkS74Z+dLJIJ69tnlwCrNtMJQRdkk5IwZsLzTwq8og=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DkHcYsrr; arc=none smtp.client-ip=209.85.222.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DkHcYsrr"
-Received: by mail-ua1-f53.google.com with SMTP id a1e0cc1a2514c-86d69774081so190269241.0;
-        Wed, 26 Mar 2025 16:24:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743031490; x=1743636290; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QvBYyj5m6bTFhPpu5G3kmoFiNR4fomHkjxdoYP9tVZQ=;
-        b=DkHcYsrrbcACbxKNGT8YIgeBuDysJoDR9rrtpqYFeq138M2HYo/tx6n5v76gnpb/Qd
-         E7dAJ7dOdTBUBm4MnM9HMehFsYDVA3DSBfPANjtKAbFWo89/VkpRBPi6IQWwXgKWSk4J
-         fTxfaoUkd6techeye9kzRO6Zi3UmDFWiUNyh4MkQwC1uNR03bpkJFRvxwlSNFVFdAMmq
-         4hzVI7x5yT6NlOyBcPUaoplk0dmsfyPeigPGAezcSs3WanQLgSwvEaaxFfV/4ybuj9Ix
-         6082cnOC3zkkFG/MKvzYE/gL/86f8djvAjiaZMWXNhg01y4SNB00d6BK48Hnk40rA/kG
-         H7BQ==
+	s=arc-20240116; t=1743053494; c=relaxed/simple;
+	bh=cWKH2vFV0tX18Wz2aMHSdUvIAsgE6vzo8FOkAW8lLBg=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=AOFHczFoaHCAxVRfkldKQCnxBV2KObxnPieKow1lhS8KOjjXnfucEix/4BVELWHojy+Zc5t+LlrWnoLYYIDm+ZFYlMVR2AoLqOEenGmNoSvUKD3Z6yi7QFRJCR6aULBaWGHhrFRke7SE6ggRN8qEoIkLnYWctRxKIWkpfiDGh6M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-3d43d3338d7so10668715ab.0
+        for <linux-wpan@vger.kernel.org>; Wed, 26 Mar 2025 22:31:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743031490; x=1743636290;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QvBYyj5m6bTFhPpu5G3kmoFiNR4fomHkjxdoYP9tVZQ=;
-        b=JCUqmXCYauoHmXj0hEt1cB55qWn5bm44YjpqUIFVRfWI2D/yVbfpjY94cyXFxaOnr/
-         Hy8jUCz4tmvlzUJZDnLD9qxoXfCGmwWh16e9lDUQdzCSFR5MXADOCUUAIo6X+SG2Lxu0
-         nktf3GuV9A3eeUpXLWcx9yu7UwXi1gOM/UEMl1vaVBwyVuPNUmw2swnp/Q5/eu15RB/F
-         6Db983mp1Lhw12dHj6eeIZHVt2GhXzjSMr3seqkCZO+ERibVuf4BhTuLCs9FgglWQNFP
-         b76lc89S9/Jpe0sY1kqcxoZ/rrGeGOkm+/2uuxSuCC3xHKZ5QfgzT4Ys0DGcS+WT2Mep
-         sfDA==
-X-Forwarded-Encrypted: i=1; AJvYcCWJmrdXk4HCJU9ScEwYQhktOAjrVKULlYmgAwxL2Fg3KT+pj8uHJvnK0MYQdlxp+aUdVzYnaVe9bUq+@vger.kernel.org, AJvYcCWjnOqHIhIoHRPr+kb6PvaQgzdI7N6oeB56sYJ10E1ghmCn5hJ8BfL2GJBj+BtjE3e+dm9Y2pO4@vger.kernel.org
-X-Gm-Message-State: AOJu0YyR9TCpc9I/YeWq8iXfPf/C8S23oZQTy5n0asgjC8NlgCQH2mwl
-	hZRWev3ai8/GuD3WL1lorwbf32vDTPx45ZwpFPAoglosYxt0WHSZb+CsQ89/Iq9eLiIfnY1YSmp
-	vJxWiZ0pdwccclsTdPBQUEb3fx/94h12wdo0=
-X-Gm-Gg: ASbGncvfU7oEQn9VIbbhjkX/5mDoiUPeG4ROqbL8Asq7mQGj8f9HVh6AahE65MrbWMb
-	ntl3y9JvE39O87o/G0r5LrHEc0SKHRbou25szwLSU95QF166hxv7wdLOMc0q2j4KrIwS2Pgc/iL
-	vL/GFmS991quE3IQP9zYK7wdYFSA==
-X-Google-Smtp-Source: AGHT+IEsQQMt8gitdBLnl/0w5gq/Nsc6vtr9ogoz6eLE8IKe8VR4aQF9YhMbwJAMNEZhxJSnWGafZeXeKVnWdBhlfMI=
-X-Received: by 2002:a05:6102:1498:b0:4c4:e414:b4eb with SMTP id
- ada2fe7eead31-4c586fa2324mr2094400137.12.1743031490142; Wed, 26 Mar 2025
- 16:24:50 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1743053492; x=1743658292;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=D+XI+Z+k/9cyGXpcpvELUu6pEI9pnj2OVm8/c+ZH5H8=;
+        b=Kj0xx5h2ltbliBSV0xJe7goWSovjX5O1zkzh7uwKK1UDXJJ6USwOHkjatXfHN4oJnl
+         qrRv15BbjmqeF4lGPq+aQs4Yo6cEDgKaTZMtwKosRx+cmuqrFY1GRxJ5IU5zSyDgPQ8U
+         1+p2i/vmNi1WRlGw1qTE0iRUJ5ckUvAtiJQh/0pyBzh2MsfMMHzubHnoeo1uCFObohXN
+         h/WU/anRr26meXkr2IQVaprKicTx7RkOp3xbRjTSDuqKNzA5j9BpGgay4lwvz5A1cM++
+         r/rLJ6jMR+dwTrKGQy7OFKukKxB1RwYKAOgDOublTiaA9l8td3GPW5t5fwFWIY6luDJh
+         dJmw==
+X-Forwarded-Encrypted: i=1; AJvYcCWetz4ok6ZKkEsCXUFGmMNdE7O20IN/qoD3/U/vWd15ZGSdZbY90FToukyC8q4epPSdb8yIfNX6JE6f@vger.kernel.org
+X-Gm-Message-State: AOJu0YyFAunxKjzpcIdNHakPx8rTLPkvik6aAtCsz13+3wbvj0myoS6f
+	F55OejpntJMVTtoXJiBwrw8xlv847KQan5JgvkwXBCyV0/1nrjbhw8SfNDodozoOq11+UCUnOJ0
+	scrYdxprVj9onXaIgT488gockwv/HDy/rf+adBScUojT0b/G2yo1v/AU=
+X-Google-Smtp-Source: AGHT+IGyvnT+vm84j7lLHRM+O4q8cSsIrX4kls8FwqiU9KsTBPDp+0QCIRr/j7JnOP0uOC25rpa/bVyBAH7/v/y+gIxoLH5zScLm
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250326180909.10406-1-ramonreisfontes@gmail.com> <CAK-6q+hkHByFK2hWkrbZqFT5=h9U9nXuZJNF+_LhqmqeEC+Sng@mail.gmail.com>
-In-Reply-To: <CAK-6q+hkHByFK2hWkrbZqFT5=h9U9nXuZJNF+_LhqmqeEC+Sng@mail.gmail.com>
-From: Ramon Fontes <ramonreisfontes@gmail.com>
-Date: Wed, 26 Mar 2025 20:24:38 -0300
-X-Gm-Features: AQ5f1Jp0Azqb5K7EaxmMbHhobiCsizAD-Mz8tigmPzQaIQ1NMzOy8TBP2akRh9s
-Message-ID: <CAK8U23Ydy8jC+7ZUfHaa+sQzECo3MYiDFwFY=MjP9z3GBjtQQw@mail.gmail.com>
-Subject: Re: [PATCH] mac802154_hwsim: define perm_extended_addr initialization
-To: Alexander Aring <aahringo@redhat.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	linux-wpan@vger.kernel.org, alex.aring@gmail.com, miquel.raynal@bootlin.com, 
-	netdev@vger.kernel.org
+X-Received: by 2002:a05:6e02:1fe6:b0:3d4:3d63:e076 with SMTP id
+ e9e14a558f8ab-3d5cce1d546mr27504645ab.18.1743053491885; Wed, 26 Mar 2025
+ 22:31:31 -0700 (PDT)
+Date: Wed, 26 Mar 2025 22:31:31 -0700
+In-Reply-To: <6749aac3.050a0220.253251.00b0.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <67e4e2b3.050a0220.2f068f.0021.GAE@google.com>
+Subject: Re: [syzbot] [wpan?] WARNING in __dev_change_net_namespace (3)
+From: syzbot <syzbot+3344d668bbbc12996d46@syzkaller.appspotmail.com>
+To: alex.aring@gmail.com, davem@davemloft.net, edumazet@google.com, 
+	horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	linux-wpan@vger.kernel.org, miquel.raynal@bootlin.com, netdev@vger.kernel.org, 
+	pabeni@redhat.com, stefan@datenfreihafen.org, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, Mar 26, 2025 at 7:49=E2=80=AFPM, Alexander Aring <aahringo@redhat.c=
-om> wrote:
->
-> Hi,
->
-> On Wed, Mar 26, 2025 at 2:09=E2=80=AFPM Ramon Fontes <ramonreisfontes@gma=
-il.com> wrote:
-> >
-> > This establishes an initialization method for perm_extended_addr, align=
-ing it with the approach used in mac80211_hwsim.
-> >
->
-> that is based on the phy index value instead of a random generated one?
+syzbot has found a reproducer for the following issue on:
 
-Yes, that's based on the phy index value.
+HEAD commit:    f6e0150b2003 Merge tag 'mtd/for-6.15' of git://git.kernel...
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=10256198580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=46a07195688b794b
+dashboard link: https://syzkaller.appspot.com/bug?extid=3344d668bbbc12996d46
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10b2d804580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=14256198580000
 
->
-> > Signed-off-by: Ramon Fontes <ramonreisfontes@gmail.com>
-> > ---
-> >  drivers/net/ieee802154/mac802154_hwsim.c | 18 +++++++++++++++++-
-> >  drivers/net/ieee802154/mac802154_hwsim.h |  2 ++
-> >  2 files changed, 19 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/drivers/net/ieee802154/mac802154_hwsim.c b/drivers/net/iee=
-e802154/mac802154_hwsim.c
-> > index 1cab20b5a..400cdac1f 100644
-> > --- a/drivers/net/ieee802154/mac802154_hwsim.c
-> > +++ b/drivers/net/ieee802154/mac802154_hwsim.c
-> > @@ -41,6 +41,17 @@ enum hwsim_multicast_groups {
-> >         HWSIM_MCGRP_CONFIG,
-> >  };
-> >
-> > +__le64 addr_to_le64(u8 *addr) {
-> > +    return cpu_to_le64(((u64)addr[0] << 56) |
-> > +                        ((u64)addr[1] << 48) |
-> > +                        ((u64)addr[2] << 40) |
-> > +                        ((u64)addr[3] << 32) |
-> > +                        ((u64)addr[4] << 24) |
-> > +                        ((u64)addr[5] << 16) |
-> > +                        ((u64)addr[6] << 8)  |
-> > +                        ((u64)addr[7]));
-> > +}
-> > +
-> >  static const struct genl_multicast_group hwsim_mcgrps[] =3D {
-> >         [HWSIM_MCGRP_CONFIG] =3D { .name =3D "config", },
-> >  };
-> > @@ -896,6 +907,7 @@ static int hwsim_subscribe_all_others(struct hwsim_=
-phy *phy)
-> >  static int hwsim_add_one(struct genl_info *info, struct device *dev,
-> >                          bool init)
-> >  {
-> > +       u8 addr[8];
->
-> why not using directly
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7feb34a89c2a/non_bootable_disk-f6e0150b.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/7ade4c34c9b1/vmlinux-f6e0150b.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/1fe37b97ec9d/bzImage-f6e0150b.xz
 
-Yes, we don't need it.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+3344d668bbbc12996d46@syzkaller.appspotmail.com
 
->
-> >         struct ieee802154_hw *hw;
-> >         struct hwsim_phy *phy;
-> >         struct hwsim_pib *pib;
-> > @@ -942,7 +954,11 @@ static int hwsim_add_one(struct genl_info *info, s=
-truct device *dev,
-> >         /* 950 MHz GFSK 802.15.4d-2009 */
-> >         hw->phy->supported.channels[6] |=3D 0x3ffc00;
-> >
-> > -       ieee802154_random_extended_addr(&hw->phy->perm_extended_addr);
-> > +       memset(addr, 0, sizeof(addr));
-> > +       /* give a specific prefix to the address */
-> > +       addr[0] =3D 0x02;
-> > +       addr[7] =3D idx;
-> > +       hw->phy->perm_extended_addr =3D addr_to_le64(addr);
+R10: 0000000000000002 R11: 0000000000000246 R12: 00007fca2f73a048
+R13: 00007fca2f73fffc R14: 00007fca2f73a167 R15: 0000000000000001
+ </TASK>
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 5302 at net/core/dev.c:12104 __dev_change_net_namespace+0x16f9/0x1890 net/core/dev.c:12104
+Modules linked in:
+CPU: 0 UID: 0 PID: 5302 Comm: syz-executor142 Not tainted 6.14.0-syzkaller-03565-gf6e0150b2003 #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
+RIP: 0010:__dev_change_net_namespace+0x16f9/0x1890 net/core/dev.c:12104
+Code: 01 90 48 c7 c7 80 88 2e 8d 48 c7 c6 60 88 2e 8d ba dd 2e 00 00 e8 47 60 a6 f7 90 0f 0b 90 90 e9 9d ea ff ff e8 b8 3b e7 f7 90 <0f> 0b 90 e9 06 fb ff ff e8 aa 3b e7 f7 90 0f 0b 90 e9 8b fe ff ff
+RSP: 0018:ffffc9000d336fa0 EFLAGS: 00010293
+RAX: ffffffff89dc3ad8 RBX: dffffc0000000000 RCX: ffff88800032c880
+RDX: 0000000000000000 RSI: 00000000fffffff4 RDI: 0000000000000000
+RBP: ffffc9000d3373b8 R08: ffffffff89dc35d9 R09: 1ffffffff2079d4e
+R10: dffffc0000000000 R11: fffffbfff2079d4f R12: dffffc0000000000
+R13: 1ffff92001a66e68 R14: ffff888043c7871c R15: 00000000fffffff4
+FS:  0000555581f64380(0000) GS:ffff88808c824000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007ffdafa37008 CR3: 0000000043cc2000 CR4: 0000000000352ef0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ dev_change_net_namespace include/linux/netdevice.h:4163 [inline]
+ cfg802154_switch_netns+0xc5/0x3d0 net/ieee802154/core.c:230
+ nl802154_wpan_phy_netns+0x13d/0x210 net/ieee802154/nl802154.c:1292
+ genl_family_rcv_msg_doit net/netlink/genetlink.c:1115 [inline]
+ genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
+ genl_rcv_msg+0xb38/0xf00 net/netlink/genetlink.c:1210
+ netlink_rcv_skb+0x208/0x480 net/netlink/af_netlink.c:2533
+ genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
+ netlink_unicast_kernel net/netlink/af_netlink.c:1312 [inline]
+ netlink_unicast+0x7f8/0x9a0 net/netlink/af_netlink.c:1338
+ netlink_sendmsg+0x8e8/0xce0 net/netlink/af_netlink.c:1882
+ sock_sendmsg_nosec net/socket.c:718 [inline]
+ __sock_sendmsg+0x221/0x270 net/socket.c:733
+ ____sys_sendmsg+0x53c/0x870 net/socket.c:2573
+ ___sys_sendmsg net/socket.c:2627 [inline]
+ __sys_sendmsg+0x271/0x360 net/socket.c:2659
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fca2f6f7e99
+Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fffc5fcdf18 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007fffc5fcdf30 RCX: 00007fca2f6f7e99
+RDX: 0000000000000000 RSI: 0000200000000280 RDI: 0000000000000006
+RBP: 0000000000000002 R08: 00007fffc5fcdcb6 R09: 0000555581f65610
+R10: 0000000000000002 R11: 0000000000000246 R12: 00007fca2f73a048
+R13: 00007fca2f73fffc R14: 00007fca2f73a167 R15: 0000000000000001
+ </TASK>
 
-I think we can replace everything with only one line of code:
 
-hw->phy->perm_extended_addr =3D cpu_to_le64(((u64)0x02 << 56) | ((u64)idx))=
-;
-
-This does the trick! What do you think?
-
-> >
-> >         /* hwsim phy channel 13 as default */
-> >         hw->phy->current_channel =3D 13;
-> > diff --git a/drivers/net/ieee802154/mac802154_hwsim.h b/drivers/net/iee=
-e802154/mac802154_hwsim.h
-> > index 6c6e30e38..536d95eb1 100644
-> > --- a/drivers/net/ieee802154/mac802154_hwsim.h
-> > +++ b/drivers/net/ieee802154/mac802154_hwsim.h
-> > @@ -1,6 +1,8 @@
-> >  #ifndef __MAC802154_HWSIM_H
-> >  #define __MAC802154_HWSIM_H
-> >
-> > +__le64 addr_to_le64(u8 *addr);
-> > +
->
-> This is a uapi header for netlink which is not yet delivered through
-> kernel-headers installation.
->
-> Why do we need this prototype declaration here?
-
-We don't need it.
-
->
-> Thanks.
->
-> - Alex
->
+---
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
