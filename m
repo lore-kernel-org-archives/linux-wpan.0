@@ -1,58 +1,61 @@
-Received: from ksmg01.maxima.ru (ksmg01.mt-integration.ru [81.200.124.38])
+Received: from smtp-fw-52002.amazon.com (smtp-fw-52002.amazon.com [52.119.213.150])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2CCC21364;
-	Fri, 28 Mar 2025 01:10:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.200.124.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 930C11DD0F6;
+	Fri, 28 Mar 2025 02:30:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743124224; cv=none; b=okmpNcf2JrS/azeb8ZuasLiOxLVz0j4UK2a/oSV3fI+prJgAHEFLHChanCIqaPIfQuldbG7lDV7no9Vug3mdBjKKbDWNdfMEBkZKTP/gXtXK1pErCZmi9DGS8QKACzMkKYI+410PxiNaSaY6+olPbbOy8XEJbkygsJ4So1rkWfo=
+	t=1743129048; cv=none; b=JtGtfBeNTxk0noLYAwnVl4HvUK+QF8TbHTQQ6afVW8htIJTrhHZ9O/8OCVcYOa1qcZwbtZIEopwGXVgiQCOy2Z6tCQIH+Y3Q1YSnWHmtl1g2KQnfehHMceFBTJhE9Tn9FHpDRez3hZD5avbIEre3iU3Aec7gqwrPlk4dxA0ZP2M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743124224; c=relaxed/simple;
-	bh=ZYDK33aHWQ+PXsPtPZFe7TwUWap15rqWdv95RjLqwdE=;
+	s=arc-20240116; t=1743129048; c=relaxed/simple;
+	bh=SzZGuMa6O49QtkMtvYLA+m6rqUUJ8TnCsKUMX/PQ1fM=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qeBHOsubqCF8FRO4ofwrxk2m8ZrOi5xrsYGJeRLRDeB3C6ac7AuAx+fnJ2W0p9Bs+YLeUjghKHOtzz30XEX6cgUIjJhUZmrpR5w3+k+H7PvKHDzPyPVdIUVy/aN1DGdnCZbmurDlCScq3l44byWtlNEzzqHF++ak0aSOi9TiOeg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mt-integration.ru; spf=pass smtp.mailfrom=mt-integration.ru; dkim=pass (2048-bit key) header.d=mt-integration.ru header.i=@mt-integration.ru header.b=BP0t4sgK; arc=none smtp.client-ip=81.200.124.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mt-integration.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mt-integration.ru
+	 MIME-Version:Content-Type; b=eBlzkHOCXHtCAL/N8dx5jddHf2hMVWYS/vLUlFO77NTHPV7rfZ0EGSHlZViznRaxxzb6MqreVT3cBku1BjucVMf7ZT0o526QCabaHjAQDXsAV7lfdyZm9h9BrgCEPzl+wt6+lFkBxaTPJzUgGlzRP05aKHe6in9aQT1fLALt9/M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=hPO/7+Kp; arc=none smtp.client-ip=52.119.213.150
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mt-integration.ru header.i=@mt-integration.ru header.b="BP0t4sgK"
-Received: from ksmg01.maxima.ru (localhost [127.0.0.1])
-	by ksmg01.maxima.ru (Postfix) with ESMTP id 08EEBC0005;
-	Fri, 28 Mar 2025 04:10:21 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 ksmg01.maxima.ru 08EEBC0005
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mt-integration.ru;
-	s=sl; t=1743124221; bh=vqFZhAA/2R7AhQtjel9kkyQ8fbZQ3Dq3TC6zai8BcTc=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
-	b=BP0t4sgK7yHyBgIw9pI1eOuONE1Z/piFt6Ud9JEPvcC1px1iztb2mI8N9j7FkkB5t
-	 VU/hygvPAMSwIx50q7iNqHMPqIXrzVVynC0gNux/HNf1OK6xnuXKgRMhoT6YI7KMnL
-	 lL2gwlwRbEdAKVMcmpw9Xb79nUdgQ5Stv3P081mxyMQR966HSnfi3A6tWBC16vtd0w
-	 WAcxh2yHCuRCJ+wqXuNxdtDLWbNT4DtUH5xJ9O3TmskYceaw+BwLy6a7P+qRAgBY0x
-	 KWACyom2CzXpm7a62ICyHZkdrIY4CYL7eDsUNOGzTR+hA//kAoEey3QgZ0hqj9KsMx
-	 2Y9EoTLUvcskQ==
-Received: from ksmg01.maxima.ru (autodiscover.maxima.ru [81.200.124.61])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(Client CN "*.maxima.ru", Issuer "GlobalSign GCC R3 DV TLS CA 2020" (verified OK))
-	by ksmg01.maxima.ru (Postfix) with ESMTPS;
-	Fri, 28 Mar 2025 04:10:20 +0300 (MSK)
-Received: from db126-1-abramov-14-d-mosos.mti-lab.com (172.25.20.118) by
- mmail-p-exch01.mt.ru (81.200.124.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Fri, 28 Mar 2025 04:10:20 +0300
-From: Ivan Abramov <i.abramov@mt-integration.ru>
-To: Alexander Aring <alex.aring@gmail.com>
-CC: Ivan Abramov <i.abramov@mt-integration.ru>, Stefan Schmidt
-	<stefan@datenfreihafen.org>, Miquel Raynal <miquel.raynal@bootlin.com>,
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon
- Horman <horms@kernel.org>, <linux-wpan@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<lvc-project@linuxtesting.org>
-Subject: [PATCH 3/3] ieee802154: Remove WARN_ON() in cfg802154_pernet_exit()
-Date: Fri, 28 Mar 2025 04:04:27 +0300
-Message-ID: <20250328010427.735657-4-i.abramov@mt-integration.ru>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250328010427.735657-1-i.abramov@mt-integration.ru>
-References: <20250328010427.735657-1-i.abramov@mt-integration.ru>
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="hPO/7+Kp"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1743129048; x=1774665048;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=xuyC9tRIyCHv9mGz4HeexQdHyItb9SPLN1QQARs1t9s=;
+  b=hPO/7+KpKCwgbGumbnN1OK2nX5nxks09cwF233ar8fQxHpFgk/+QT7IC
+   kwcC0reVLXZT5o8eGyIc0juuJsK8L99FnTl87pT835Dz1gBW4CA03yEBs
+   IW9uRgJL1U7CTd3TOwDDctkpgOtDucdikqMW7LLqq+42gmg5sFmbz087i
+   k=;
+X-IronPort-AV: E=Sophos;i="6.14,282,1736812800"; 
+   d="scan'208";a="708865167"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52002.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Mar 2025 02:30:43 +0000
+Received: from EX19MTAUWB002.ant.amazon.com [10.0.21.151:45012]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.55.83:2525] with esmtp (Farcaster)
+ id 5067ac5d-06a6-43df-9352-1023f4a4f172; Fri, 28 Mar 2025 02:30:41 +0000 (UTC)
+X-Farcaster-Flow-ID: 5067ac5d-06a6-43df-9352-1023f4a4f172
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Fri, 28 Mar 2025 02:30:40 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.187.171.35) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Fri, 28 Mar 2025 02:30:37 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <i.abramov@mt-integration.ru>
+CC: <alex.aring@gmail.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<horms@kernel.org>, <kuba@kernel.org>, <kuniyu@amazon.com>,
+	<linux-kernel@vger.kernel.org>, <linux-wpan@vger.kernel.org>,
+	<lvc-project@linuxtesting.org>, <miquel.raynal@bootlin.com>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <stefan@datenfreihafen.org>,
+	<syzbot+e0bd4e4815a910c0daa8@syzkaller.appspotmail.com>
+Subject: Re: [PATCH 2/3] ieee802154: Avoid calling WARN_ON() on -ENOMEM in cfg802154_switch_netns()
+Date: Thu, 27 Mar 2025 19:30:02 -0700
+Message-ID: <20250328023029.14249-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.48.1
+In-Reply-To: <20250328010427.735657-3-i.abramov@mt-integration.ru>
+References: <20250328010427.735657-3-i.abramov@mt-integration.ru>
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
@@ -61,49 +64,27 @@ List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: mmail-p-exch02.mt.ru (81.200.124.62) To
- mmail-p-exch01.mt.ru (81.200.124.61)
-X-KSMG-AntiPhishing: NotDetected
-X-KSMG-AntiSpam-Auth: dmarc=none header.from=mt-integration.ru;spf=none smtp.mailfrom=mt-integration.ru;dkim=none
-X-KSMG-AntiSpam-Envelope-From: i.abramov@mt-integration.ru
-X-KSMG-AntiSpam-Info: LuaCore: 51 0.3.51 68896fb0083a027476849bf400a331a2d5d94398, {rep_avail}, {Tracking_from_domain_doesnt_match_to}, 81.200.124.61:7.1.2;ksmg01.maxima.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;mt-integration.ru:7.1.1;127.0.0.199:7.1.2, FromAlignment: s, ApMailHostAddress: 81.200.124.61
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiSpam-Lua-Profiles: 192175 [Mar 27 2025]
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Version: 6.1.1.11
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.1.1.8310, bases: 2025/03/27 22:37:00 #27871126
-X-KSMG-AntiVirus-Status: NotDetected, skipped
-X-KSMG-LinksScanning: NotDetected
-X-KSMG-Message-Action: skipped
-X-KSMG-Rule-ID: 7
+X-ClientProxiedBy: EX19D037UWC003.ant.amazon.com (10.13.139.231) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-There's no need to call WARN_ON() in cfg802154_pernet_exit(), since
-every point of failure in cfg802154_switch_netns() is covered with
-WARN_ON(), so remove it.
+From: Ivan Abramov <i.abramov@mt-integration.ru>
+Date: Fri, 28 Mar 2025 04:04:26 +0300
+> It's pointless to call WARN_ON() in case of an allocation failure in
+> dev_change_net_namespace() and device_rename(), since it only leads to
+> useless splats caused by deliberate fault injections, so avoid it.
+> 
+> Found by Linux Verification Center (linuxtesting.org) with Syzkaller.
+> 
+> Fixes: 66e5c2672cd1 ("ieee802154: add netns support")
+> Suggested-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
-Found by Linux Verification Center (linuxtesting.org) with Syzkaller.
+I suggested using net_warn_ratelimited() so this tag is not needed.
+The patch itself looks good to me:
 
-Fixes: 66e5c2672cd1 ("ieee802154: add netns support")
-Signed-off-by: Ivan Abramov <i.abramov@mt-integration.ru>
----
- net/ieee802154/core.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
-diff --git a/net/ieee802154/core.c b/net/ieee802154/core.c
-index 8c47957f5df7..274112ff2955 100644
---- a/net/ieee802154/core.c
-+++ b/net/ieee802154/core.c
-@@ -358,7 +358,7 @@ static void __net_exit cfg802154_pernet_exit(struct net *net)
- 	rtnl_lock();
- 	list_for_each_entry(rdev, &cfg802154_rdev_list, list) {
- 		if (net_eq(wpan_phy_net(&rdev->wpan_phy), net))
--			WARN_ON(cfg802154_switch_netns(rdev, &init_net));
-+			cfg802154_switch_netns(rdev, &init_net);
- 	}
- 	rtnl_unlock();
- }
--- 
-2.39.5
 
+> Signed-off-by: Ivan Abramov <i.abramov@mt-integration.ru>
+
+Reported-by: syzbot+e0bd4e4815a910c0daa8@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/netdev/000000000000f4a1b7061f9421de@google.com/#t
