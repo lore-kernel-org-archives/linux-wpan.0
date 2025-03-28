@@ -1,132 +1,125 @@
-Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from ksmg01.maxima.ru (ksmg01.maxima.ru [81.200.124.38])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAE8B7E105
-	for <linux-wpan@vger.kernel.org>; Thu, 27 Mar 2025 05:31:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.207
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18CB014F70;
+	Fri, 28 Mar 2025 01:08:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.200.124.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743053494; cv=none; b=Mw59G93L6BFy4GE5cEUM0vY5UoXMHWx9jygkiBvyMatozSioRi0Wa/wQbLzEqx3RX1Ncxcnbya19HqWAHDNpF6lPCgZCMEswP+U1a/o80aSE5TuZBDu7o2phlUEN7DcTeTvs0vHx9YaKCN+bmfRV5sqknB3Mbjv8CyiBWuVqYjI=
+	t=1743124136; cv=none; b=WSL4A9HP/4AGzODvyt1OohtuY9G+iV+TnAsnhnnRKz3j75raHZm58fOEY8nBL0mtRMt5LnFRt1eVLHJr+2FJmjJCdp9fCFxxexgHG01Tcn+Rh1zSllM1ChnwyqsB9b6AOqTXBHDxEqibRqxdePHMl0OGwx52Jk+GEFRmIa8F2y4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743053494; c=relaxed/simple;
-	bh=cWKH2vFV0tX18Wz2aMHSdUvIAsgE6vzo8FOkAW8lLBg=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=AOFHczFoaHCAxVRfkldKQCnxBV2KObxnPieKow1lhS8KOjjXnfucEix/4BVELWHojy+Zc5t+LlrWnoLYYIDm+ZFYlMVR2AoLqOEenGmNoSvUKD3Z6yi7QFRJCR6aULBaWGHhrFRke7SE6ggRN8qEoIkLnYWctRxKIWkpfiDGh6M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-3d43d3338d7so10668715ab.0
-        for <linux-wpan@vger.kernel.org>; Wed, 26 Mar 2025 22:31:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743053492; x=1743658292;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=D+XI+Z+k/9cyGXpcpvELUu6pEI9pnj2OVm8/c+ZH5H8=;
-        b=Kj0xx5h2ltbliBSV0xJe7goWSovjX5O1zkzh7uwKK1UDXJJ6USwOHkjatXfHN4oJnl
-         qrRv15BbjmqeF4lGPq+aQs4Yo6cEDgKaTZMtwKosRx+cmuqrFY1GRxJ5IU5zSyDgPQ8U
-         1+p2i/vmNi1WRlGw1qTE0iRUJ5ckUvAtiJQh/0pyBzh2MsfMMHzubHnoeo1uCFObohXN
-         h/WU/anRr26meXkr2IQVaprKicTx7RkOp3xbRjTSDuqKNzA5j9BpGgay4lwvz5A1cM++
-         r/rLJ6jMR+dwTrKGQy7OFKukKxB1RwYKAOgDOublTiaA9l8td3GPW5t5fwFWIY6luDJh
-         dJmw==
-X-Forwarded-Encrypted: i=1; AJvYcCWetz4ok6ZKkEsCXUFGmMNdE7O20IN/qoD3/U/vWd15ZGSdZbY90FToukyC8q4epPSdb8yIfNX6JE6f@vger.kernel.org
-X-Gm-Message-State: AOJu0YyFAunxKjzpcIdNHakPx8rTLPkvik6aAtCsz13+3wbvj0myoS6f
-	F55OejpntJMVTtoXJiBwrw8xlv847KQan5JgvkwXBCyV0/1nrjbhw8SfNDodozoOq11+UCUnOJ0
-	scrYdxprVj9onXaIgT488gockwv/HDy/rf+adBScUojT0b/G2yo1v/AU=
-X-Google-Smtp-Source: AGHT+IGyvnT+vm84j7lLHRM+O4q8cSsIrX4kls8FwqiU9KsTBPDp+0QCIRr/j7JnOP0uOC25rpa/bVyBAH7/v/y+gIxoLH5zScLm
+	s=arc-20240116; t=1743124136; c=relaxed/simple;
+	bh=LUHJHhnqVBiwHBE5eSLmgxG3OCJV2W+nHjSRfGSeZ8c=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=kl1rjdDxop8CM+J5G051WW4PWGX14qeNIQxnvuAfUk68tKAuSkM5ayz1mp2IGvYfBlDE6FY4CQTLdi3wdoJh1aXNk9drPXe38fFsNaOz1G6JvrFILu1jTDPjFQW7uqbF2WibD5Ap2L7bcGfrCt4ZzIVYlR7D2MCLhhh6PrI1Mck=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mt-integration.ru; spf=pass smtp.mailfrom=mt-integration.ru; dkim=pass (2048-bit key) header.d=mt-integration.ru header.i=@mt-integration.ru header.b=Unlyh/aj; arc=none smtp.client-ip=81.200.124.38
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mt-integration.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mt-integration.ru
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=mt-integration.ru header.i=@mt-integration.ru header.b="Unlyh/aj"
+Received: from ksmg01.maxima.ru (localhost [127.0.0.1])
+	by ksmg01.maxima.ru (Postfix) with ESMTP id 314DAC0005;
+	Fri, 28 Mar 2025 04:08:41 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 ksmg01.maxima.ru 314DAC0005
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mt-integration.ru;
+	s=sl; t=1743124121; bh=x1a84lhOoPi7swJh4YdTyk1IokBrEf8C3V5kv5KxOwc=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
+	b=Unlyh/ajz2Lr8bPXMpARp2I6qOa8XzquX1Tl4zVvlD4ASdsSgUKyNF2AIcDFs59R6
+	 Fz0p9zR/O4NoNCubcbMG6HsNXePjOCgmIH5jiVxwanEVFy1GZBaAmG17U3S2LpAIV4
+	 YnXnrwRfmvRqNbVWp40gK1P0bG1pu1H+GtFINmiO7QksWGnV1SKdxhZcSoBYiIAwmt
+	 z0d/hTiygulmyfSIPBeWu52rXsS6nEcGH5OgoPMImYk4YDzN2kbzbDj2Wxcoq8F8fa
+	 9CNtyFzHA/4vlxHu5Tm91ujKskprKL9wLT8ktbO7j25ySfh9QCvCH38sN1BdaSl+KT
+	 j8Dzsj6WYBmhA==
+Received: from ksmg01.maxima.ru (autodiscover.maxima.ru [81.200.124.61])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(Client CN "*.maxima.ru", Issuer "GlobalSign GCC R3 DV TLS CA 2020" (verified OK))
+	by ksmg01.maxima.ru (Postfix) with ESMTPS;
+	Fri, 28 Mar 2025 04:08:41 +0300 (MSK)
+Received: from db126-1-abramov-14-d-mosos.mti-lab.com (172.25.20.118) by
+ mmail-p-exch01.mt.ru (81.200.124.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Fri, 28 Mar 2025 04:08:40 +0300
+From: Ivan Abramov <i.abramov@mt-integration.ru>
+To: Alexander Aring <alex.aring@gmail.com>
+CC: Ivan Abramov <i.abramov@mt-integration.ru>, Stefan Schmidt
+	<stefan@datenfreihafen.org>, Miquel Raynal <miquel.raynal@bootlin.com>,
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon
+ Horman <horms@kernel.org>, <linux-wpan@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<lvc-project@linuxtesting.org>
+Subject: [PATCH 0/3] Avoid calling WARN_ON() on allocation failure in cfg802154_switch_netns()
+Date: Fri, 28 Mar 2025 04:04:24 +0300
+Message-ID: <20250328010427.735657-1-i.abramov@mt-integration.ru>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1fe6:b0:3d4:3d63:e076 with SMTP id
- e9e14a558f8ab-3d5cce1d546mr27504645ab.18.1743053491885; Wed, 26 Mar 2025
- 22:31:31 -0700 (PDT)
-Date: Wed, 26 Mar 2025 22:31:31 -0700
-In-Reply-To: <6749aac3.050a0220.253251.00b0.GAE@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67e4e2b3.050a0220.2f068f.0021.GAE@google.com>
-Subject: Re: [syzbot] [wpan?] WARNING in __dev_change_net_namespace (3)
-From: syzbot <syzbot+3344d668bbbc12996d46@syzkaller.appspotmail.com>
-To: alex.aring@gmail.com, davem@davemloft.net, edumazet@google.com, 
-	horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	linux-wpan@vger.kernel.org, miquel.raynal@bootlin.com, netdev@vger.kernel.org, 
-	pabeni@redhat.com, stefan@datenfreihafen.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: mmail-p-exch02.mt.ru (81.200.124.62) To
+ mmail-p-exch01.mt.ru (81.200.124.61)
+X-KSMG-AntiPhishing: NotDetected
+X-KSMG-AntiSpam-Auth: dmarc=none header.from=mt-integration.ru;spf=none smtp.mailfrom=mt-integration.ru;dkim=none
+X-KSMG-AntiSpam-Envelope-From: i.abramov@mt-integration.ru
+X-KSMG-AntiSpam-Info: LuaCore: 51 0.3.51 68896fb0083a027476849bf400a331a2d5d94398, {rep_avail}, {Tracking_from_domain_doesnt_match_to}, 81.200.124.61:7.1.2;ksmg01.maxima.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;mt-integration.ru:7.1.1;127.0.0.199:7.1.2, FromAlignment: s, ApMailHostAddress: 81.200.124.61
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiSpam-Lua-Profiles: 192175 [Mar 27 2025]
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Version: 6.1.1.11
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.1.1.8310, bases: 2025/03/27 22:37:00 #27871126
+X-KSMG-AntiVirus-Status: NotDetected, skipped
+X-KSMG-LinksScanning: NotDetected
+X-KSMG-Message-Action: skipped
+X-KSMG-Rule-ID: 7
 
-syzbot has found a reproducer for the following issue on:
+This series was inspired by Syzkaller report on warning in
+cfg802154_switch_netns().
 
-HEAD commit:    f6e0150b2003 Merge tag 'mtd/for-6.15' of git://git.kernel...
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=10256198580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=46a07195688b794b
-dashboard link: https://syzkaller.appspot.com/bug?extid=3344d668bbbc12996d46
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10b2d804580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=14256198580000
-
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7feb34a89c2a/non_bootable_disk-f6e0150b.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/7ade4c34c9b1/vmlinux-f6e0150b.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/1fe37b97ec9d/bzImage-f6e0150b.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+3344d668bbbc12996d46@syzkaller.appspotmail.com
-
-R10: 0000000000000002 R11: 0000000000000246 R12: 00007fca2f73a048
-R13: 00007fca2f73fffc R14: 00007fca2f73a167 R15: 0000000000000001
- </TASK>
-------------[ cut here ]------------
-WARNING: CPU: 0 PID: 5302 at net/core/dev.c:12104 __dev_change_net_namespace+0x16f9/0x1890 net/core/dev.c:12104
+WARNING: CPU: 0 PID: 5837 at net/ieee802154/core.c:258 cfg802154_switch_netns+0x3c7/0x3d0 net/ieee802154/core.c:258
 Modules linked in:
-CPU: 0 UID: 0 PID: 5302 Comm: syz-executor142 Not tainted 6.14.0-syzkaller-03565-gf6e0150b2003 #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-RIP: 0010:__dev_change_net_namespace+0x16f9/0x1890 net/core/dev.c:12104
-Code: 01 90 48 c7 c7 80 88 2e 8d 48 c7 c6 60 88 2e 8d ba dd 2e 00 00 e8 47 60 a6 f7 90 0f 0b 90 90 e9 9d ea ff ff e8 b8 3b e7 f7 90 <0f> 0b 90 e9 06 fb ff ff e8 aa 3b e7 f7 90 0f 0b 90 e9 8b fe ff ff
-RSP: 0018:ffffc9000d336fa0 EFLAGS: 00010293
-RAX: ffffffff89dc3ad8 RBX: dffffc0000000000 RCX: ffff88800032c880
-RDX: 0000000000000000 RSI: 00000000fffffff4 RDI: 0000000000000000
-RBP: ffffc9000d3373b8 R08: ffffffff89dc35d9 R09: 1ffffffff2079d4e
-R10: dffffc0000000000 R11: fffffbfff2079d4f R12: dffffc0000000000
-R13: 1ffff92001a66e68 R14: ffff888043c7871c R15: 00000000fffffff4
-FS:  0000555581f64380(0000) GS:ffff88808c824000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007ffdafa37008 CR3: 0000000043cc2000 CR4: 0000000000352ef0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+CPU: 0 UID: 0 PID: 5837 Comm: syz-executor125 Not tainted 6.13.0-rc6-syzkaller-00918-g7b24f164cf00 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
+RIP: 0010:cfg802154_switch_netns+0x3c7/0x3d0 net/ieee802154/core.c:258
 Call Trace:
  <TASK>
- dev_change_net_namespace include/linux/netdevice.h:4163 [inline]
- cfg802154_switch_netns+0xc5/0x3d0 net/ieee802154/core.c:230
  nl802154_wpan_phy_netns+0x13d/0x210 net/ieee802154/nl802154.c:1292
  genl_family_rcv_msg_doit net/netlink/genetlink.c:1115 [inline]
  genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
- genl_rcv_msg+0xb38/0xf00 net/netlink/genetlink.c:1210
- netlink_rcv_skb+0x208/0x480 net/netlink/af_netlink.c:2533
+ genl_rcv_msg+0xb14/0xec0 net/netlink/genetlink.c:1210
+ netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2543
  genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
- netlink_unicast_kernel net/netlink/af_netlink.c:1312 [inline]
- netlink_unicast+0x7f8/0x9a0 net/netlink/af_netlink.c:1338
- netlink_sendmsg+0x8e8/0xce0 net/netlink/af_netlink.c:1882
- sock_sendmsg_nosec net/socket.c:718 [inline]
- __sock_sendmsg+0x221/0x270 net/socket.c:733
- ____sys_sendmsg+0x53c/0x870 net/socket.c:2573
- ___sys_sendmsg net/socket.c:2627 [inline]
- __sys_sendmsg+0x271/0x360 net/socket.c:2659
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/syscall_64.c:94
+ netlink_unicast_kernel net/netlink/af_netlink.c:1322 [inline]
+ netlink_unicast+0x7f6/0x990 net/netlink/af_netlink.c:1348
+ netlink_sendmsg+0x8e4/0xcb0 net/netlink/af_netlink.c:1892
+ sock_sendmsg_nosec net/socket.c:711 [inline]
+ __sock_sendmsg+0x221/0x270 net/socket.c:726
+ ____sys_sendmsg+0x52a/0x7e0 net/socket.c:2594
+ ___sys_sendmsg net/socket.c:2648 [inline]
+ __sys_sendmsg+0x269/0x350 net/socket.c:2680
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fca2f6f7e99
-Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fffc5fcdf18 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007fffc5fcdf30 RCX: 00007fca2f6f7e99
-RDX: 0000000000000000 RSI: 0000200000000280 RDI: 0000000000000006
-RBP: 0000000000000002 R08: 00007fffc5fcdcb6 R09: 0000555581f65610
-R10: 0000000000000002 R11: 0000000000000246 R12: 00007fca2f73a048
-R13: 00007fca2f73fffc R14: 00007fca2f73a167 R15: 0000000000000001
- </TASK>
 
+This warning is caused by Syzkaller's fault injection, which causes
+kstrdup() in device_rename() to fail, so device_rename() returns -ENOMEM.
 
----
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+Since practically such failure is not possible, avoid it, additionally
+fixing similar pointless allocation-related warnings.
+
+Ivan Abramov (3):
+  ieee802154: Restore initial state on failed device_rename() in
+    cfg802154_switch_netns()
+  ieee802154: Avoid calling WARN_ON() on -ENOMEM in
+    cfg802154_switch_netns()
+  ieee802154: Remove WARN_ON() in cfg802154_pernet_exit()
+
+ net/ieee802154/core.c | 51 ++++++++++++++++++++++++-------------------
+ 1 file changed, 29 insertions(+), 22 deletions(-)
+
+-- 
+2.39.5
+
