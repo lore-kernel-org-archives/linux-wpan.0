@@ -1,75 +1,129 @@
-Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
+Received: from ksmg01.maxima.ru (ksmg01.mt-integration.ru [81.200.124.38])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C84051A0731;
-	Thu,  3 Apr 2025 08:34:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 543BC1D5151;
+	Thu,  3 Apr 2025 10:19:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.200.124.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743669259; cv=none; b=jjoDkYcOWEYTH9zNYruSVpxCp2njBEGm+Bh6zmzqQUCjvuEKPnJdXw81A/yyrY2JUe+kVglOxeLtVBFHuNj9Aib6cCiqzhBE4x+HgxONrrOchiJ3Ipww/3jZB1mvXvyqLbtR2UX2jN+5PAgdF1gjWHZq8Zoid3a8C+yvg81SvvE=
+	t=1743675600; cv=none; b=mdjJtH8Jd+gbhcRMXJ7pmv6eWwDSgyqp1tj9lAOkDKZpJONEaVTv/Hb1FtQBlG6F5lTApYBEDDGpsvb2NHurDAVpzEO6Tx8LKKv5lXS8GVU4oorwk853voDSK1XKWrsoJbQuFELXJYxjU26l2FzWq7fiOD4fh9FyMQ9Zkfbj1mo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743669259; c=relaxed/simple;
-	bh=wsQILO7hA49jzp8HRadJYXymQRE4ziUNrNRVayRBDFM=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=twdKpq+wxPvVqsPr/ZutX1Fx66Ab+eN9pxb/7PX9pfODE68jzgu1kxbmD5uZ4NCq/7eIsKVXvPWFe3T5cVp7ooSgxT8BCl0iHL6awZLvxkPq96I9zibpZQtdZWDyxrdGqEw7Ba2ZVWL049ZeJfiqOQ7/8Z/1NKeLe7CBJk5ngUI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=UvRQap42; arc=none smtp.client-ip=217.70.183.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+	s=arc-20240116; t=1743675600; c=relaxed/simple;
+	bh=MEgieEGu/DNGGosiku1sSeXKZZChjRLGqaUcfPw5g6g=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=YvHcqzVWSST82wrDAC8oKx9pPQpt4R/QL7cMz5Z7qVSLBN3QCxDSalBxE1niDvyaB90YhXSYPVt2ek5Nat3TbYY3tOnu2DVmrN4dl1QHikZzRfmOWmvaK053Lia0JSzgDYoK14pdlRC/RgulOwvyDC3WS7PKizdnZQpEJATbsxQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mt-integration.ru; spf=pass smtp.mailfrom=mt-integration.ru; dkim=pass (2048-bit key) header.d=mt-integration.ru header.i=@mt-integration.ru header.b=DMUN5n41; arc=none smtp.client-ip=81.200.124.38
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mt-integration.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mt-integration.ru
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="UvRQap42"
-Received: by mail.gandi.net (Postfix) with ESMTPSA id D30DF4314D;
-	Thu,  3 Apr 2025 08:34:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1743669248;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wsQILO7hA49jzp8HRadJYXymQRE4ziUNrNRVayRBDFM=;
-	b=UvRQap427zmxaiWhYahVbFqmNWa61FRKhjZQkeZct7xnRE5tb0GbVKvIZHWZ9e18RdcLx0
-	tEMtVvdMfZ98W7nAZT0sWmylth0yFpFOHnCDNn4fA6UfydGxyrQIlHzgYEjTqAJymqP/fL
-	SlhA7NWn633IdcYY5pkofOuBwyjvjyt9wolYrxVw9IF8qxlGdje/PPHdpvk5RDNGyKlebv
-	KpOqZElnQzBfcgDbPXoH2HxUl0ymxstZIJDGjrjjh6kGm7VGleUzUwBRC/xUb2kMx2DXIU
-	qQssf2U3w+8chvvK9kP+7kzPDurS5YUG/to5QJ1vO1B+YNmvwyBEDAfUBrnWrQ==
-From: Miquel Raynal <miquel.raynal@bootlin.com>
-To: Ivan Abramov <i.abramov@mt-integration.ru>
-Cc: Alexander Aring <alex.aring@gmail.com>,  Stefan Schmidt
- <stefan@datenfreihafen.org>,  "David S. Miller" <davem@davemloft.net>,
-  Eric Dumazet <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,
-  Paolo Abeni <pabeni@redhat.com>,  Simon Horman <horms@kernel.org>,
-  <linux-wpan@vger.kernel.org>,  <netdev@vger.kernel.org>,
-  <linux-kernel@vger.kernel.org>,  <lvc-project@linuxtesting.org>
-Subject: Re: [PATCH net v2 0/3] Avoid calling WARN_ON() on allocation
- failure in cfg802154_switch_netns()
-In-Reply-To: <20250403082021.990667-1-i.abramov@mt-integration.ru> (Ivan
-	Abramov's message of "Thu, 3 Apr 2025 11:20:18 +0300")
-References: <20250403082021.990667-1-i.abramov@mt-integration.ru>
-User-Agent: mu4e 1.12.7; emacs 29.4
-Date: Thu, 03 Apr 2025 10:34:06 +0200
-Message-ID: <87plhtmyo1.fsf@bootlin.com>
+	dkim=pass (2048-bit key) header.d=mt-integration.ru header.i=@mt-integration.ru header.b="DMUN5n41"
+Received: from ksmg01.maxima.ru (localhost [127.0.0.1])
+	by ksmg01.maxima.ru (Postfix) with ESMTP id 0E859C000F;
+	Thu,  3 Apr 2025 13:19:53 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 ksmg01.maxima.ru 0E859C000F
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mt-integration.ru;
+	s=sl; t=1743675593; bh=xu2/op96M4UZKUGOoZx6d80jkPfOQ7sA2Rj2U+BXhUg=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
+	b=DMUN5n41L5vvYqZY42SlXnoMyStJpyGmDvrrIGK2lDAhjfXwLzcqdMmfxP+yFn1fK
+	 owfsDny8NWkcPeHWsgSJVGGK7iazc0mWVE5tjJvgPjrPcA4PK8nJI6rS8WTVTPILA3
+	 psWi1akSPI6hGJvHwMOKrxxqL2L8/BhVIGxhJnDnFBnV2ZLG40RK+wN7oSY//Xyrcd
+	 PKecT7P0JL35fElbtPnuG4MFQ6rKZq7GTRHV6jr4o3Dw4Pfnyll/QFirlwyF7eF7gZ
+	 SO5FlrkIrdHF54gX+mJcTyrIhJKCSI8oiT0cl9iXbLDZ/y9xOlAAh30m8Er7oS9e6R
+	 MCXMEO80B8SBA==
+Received: from ksmg01.maxima.ru (mail.maxima.ru [81.200.124.61])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(Client CN "*.maxima.ru", Issuer "GlobalSign GCC R3 DV TLS CA 2020" (verified OK))
+	by ksmg01.maxima.ru (Postfix) with ESMTPS;
+	Thu,  3 Apr 2025 13:19:52 +0300 (MSK)
+Received: from db126-1-abramov-14-d-mosos.mti-lab.com (172.25.20.118) by
+ mmail-p-exch01.mt.ru (81.200.124.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Thu, 3 Apr 2025 13:19:52 +0300
+From: Ivan Abramov <i.abramov@mt-integration.ru>
+To: Alexander Aring <alex.aring@gmail.com>
+CC: Ivan Abramov <i.abramov@mt-integration.ru>, Stefan Schmidt
+	<stefan@datenfreihafen.org>, Miquel Raynal <miquel.raynal@bootlin.com>,
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon
+ Horman <horms@kernel.org>, <linux-wpan@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<lvc-project@linuxtesting.org>
+Subject: [PATCH net v3 0/3] Avoid calling WARN_ON() on allocation failure in cfg802154_switch_netns()
+Date: Thu, 3 Apr 2025 13:19:31 +0300
+Message-ID: <20250403101935.991385-1-i.abramov@mt-integration.ru>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddukeektdelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhvfevufgjfhgffffkgggtgfesthhqredttderjeenucfhrhhomhepofhiqhhuvghlucftrgihnhgrlhcuoehmihhquhgvlhdrrhgrhihnrghlsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeffgefhjedtfeeigeduudekudejkedtiefhleelueeiueevheekvdeludehiedvfeenucfkphepledvrddukeegrdduuddtrdduleelnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepledvrddukeegrdduuddtrdduleelpdhhvghloheplhhotggrlhhhohhsthdpmhgrihhlfhhrohhmpehmihhquhgvlhdrrhgrhihnrghlsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopeduvddprhgtphhtthhopehirdgrsghrrghmohhvsehmthdqihhnthgvghhrrghtihhonhdrrhhupdhrtghpthhtoheprghlvgigrdgrrhhinhhgsehgmhgrihhlrdgtohhmpdhrtghpthhtohepshhtvghfrghnsegurghtvghnfhhrvghihhgrfhgvnhdrohhrghdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrt
- ghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehhohhrmhhssehkvghrnhgvlhdrohhrgh
-X-GND-Sasl: miquel.raynal@bootlin.com
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: mmail-p-exch02.mt.ru (81.200.124.62) To
+ mmail-p-exch01.mt.ru (81.200.124.61)
+X-KSMG-AntiPhishing: NotDetected
+X-KSMG-AntiSpam-Auth: dmarc=none header.from=mt-integration.ru;spf=none smtp.mailfrom=mt-integration.ru;dkim=none
+X-KSMG-AntiSpam-Envelope-From: i.abramov@mt-integration.ru
+X-KSMG-AntiSpam-Info: LuaCore: 54 0.3.54 464169e973265e881193cca5ab7aa5055e5b7016, {rep_avail}, {Tracking_from_domain_doesnt_match_to}, ksmg01.maxima.ru:7.1.1;mt-integration.ru:7.1.1;127.0.0.199:7.1.2;81.200.124.61:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1, FromAlignment: s, ApMailHostAddress: 81.200.124.61
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiSpam-Lua-Profiles: 192331 [Apr 03 2025]
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Version: 6.1.1.11
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.1.1.8310, bases: 2025/04/03 07:23:00 #27851719
+X-KSMG-AntiVirus-Status: NotDetected, skipped
+X-KSMG-LinksScanning: NotDetected
+X-KSMG-Message-Action: skipped
+X-KSMG-Rule-ID: 7
 
-On 03/04/2025 at 11:20:18 +03, Ivan Abramov <i.abramov@mt-integration.ru> w=
-rote:
+This series was inspired by Syzkaller report on warning in
+cfg802154_switch_netns().
 
-> This series was inspired by Syzkaller report on warning in
-> cfg802154_switch_netns().
+WARNING: CPU: 0 PID: 5837 at net/ieee802154/core.c:258 cfg802154_switch_netns+0x3c7/0x3d0 net/ieee802154/core.c:258
+Modules linked in:
+CPU: 0 UID: 0 PID: 5837 Comm: syz-executor125 Not tainted 6.13.0-rc6-syzkaller-00918-g7b24f164cf00 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
+RIP: 0010:cfg802154_switch_netns+0x3c7/0x3d0 net/ieee802154/core.c:258
+Call Trace:
+ <TASK>
+ nl802154_wpan_phy_netns+0x13d/0x210 net/ieee802154/nl802154.c:1292
+ genl_family_rcv_msg_doit net/netlink/genetlink.c:1115 [inline]
+ genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
+ genl_rcv_msg+0xb14/0xec0 net/netlink/genetlink.c:1210
+ netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2543
+ genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
+ netlink_unicast_kernel net/netlink/af_netlink.c:1322 [inline]
+ netlink_unicast+0x7f6/0x990 net/netlink/af_netlink.c:1348
+ netlink_sendmsg+0x8e4/0xcb0 net/netlink/af_netlink.c:1892
+ sock_sendmsg_nosec net/socket.c:711 [inline]
+ __sock_sendmsg+0x221/0x270 net/socket.c:726
+ ____sys_sendmsg+0x52a/0x7e0 net/socket.c:2594
+ ___sys_sendmsg net/socket.c:2648 [inline]
+ __sys_sendmsg+0x269/0x350 net/socket.c:2680
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-This series has received reviews under the form of Reviewed-by tags. You
-are in charge of carrying those tags over versions. Please collect and
-resubmit the series with all of them (a tag on the cover letter applies
-to all patches).
+This warning is caused by Syzkaller's fault injection, which causes
+kstrdup() in device_rename() to fail, so device_rename() returns -ENOMEM.
 
-Thanks,
-Miqu=C3=A8l
+Since practically such failure is not possible, avoid it, additionally
+fixing similar pointless allocation-related warnings.
+
+v3: Add Reviewed-by tags to patches as per Miquel Raynal's observation.
+v2: Add tags to patch 2. Also make sure to commit against latest
+netdev/net.
+
+Ivan Abramov (3):
+  ieee802154: Restore initial state on failed device_rename() in
+    cfg802154_switch_netns()
+  ieee802154: Avoid calling WARN_ON() on -ENOMEM in
+    cfg802154_switch_netns()
+  ieee802154: Remove WARN_ON() in cfg802154_pernet_exit()
+
+ net/ieee802154/core.c | 51 ++++++++++++++++++++++++-------------------
+ 1 file changed, 29 insertions(+), 22 deletions(-)
+
+-- 
+2.39.5
+
