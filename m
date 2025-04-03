@@ -1,43 +1,43 @@
 Received: from ksmg01.maxima.ru (ksmg01.mt-integration.ru [81.200.124.38])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2EC81EF092;
-	Thu,  3 Apr 2025 08:20:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00CDD1EF092;
+	Thu,  3 Apr 2025 08:20:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.200.124.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743668450; cv=none; b=NshUltrjcK7w/W4oQEnmcRB6GfYdJwwZevyKqrxrWWfMb+TlCv54pT4Cyv3jGxwVcV5CwG0VB04AweLTxKVziEifP/lF5gviE7q8MsMGINVWHhOVASVCLUAffidNs4+DCH898ip4knsVhJR9AGbH3N+oEaaK7QrLp33lx131xZ0=
+	t=1743668455; cv=none; b=XOFVyaohMQW+0o3XrBMgzPq096KSGI0G7sy74BanoGNMFcbWnwh9JFx7cyZjn1QJO7S9dIRkhUxx1S1uuxPOw3e6rlLysIUbVrHJfrNk/GUXXe2e0BQr6XNVPRaCzv4Pvsvfpef0eGRQZCoLpixWSRSoYV1MKsRB3tSfkycSSuI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743668450; c=relaxed/simple;
-	bh=oOy9SaCetbLIxPQj/SNMUa2FKbe0MxO6KmEYLKcGSDE=;
+	s=arc-20240116; t=1743668455; c=relaxed/simple;
+	bh=hYguFZf3M2XdqtUWTyrLfBqwL6zkdSKwtDJgLxELEms=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SijKz92KhGt9BpLVx97Eb6EaEFC7Ge9Q75JprWDbWU0UYrl8maGmffg7FjBApXGwXynPdBwEQIbTRP+TAM/9tr85oLBDiq65P1iebYe9FqfSs+/5UoQwe7yD3N1eZ4xEcSZlKh3EkEpuOEQi5wsWnXGjqR8MMZ4Xf70edZIocUw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mt-integration.ru; spf=pass smtp.mailfrom=mt-integration.ru; dkim=pass (2048-bit key) header.d=mt-integration.ru header.i=@mt-integration.ru header.b=geHrIMk1; arc=none smtp.client-ip=81.200.124.38
+	 MIME-Version:Content-Type; b=niJt4g4n5iPBFcNTUBs75WyKRE8fSOqkFo3s3DtzeZpUYnkEW+OzlPhrSwxjJApTPhqvBWdf9zH0Q8NbUqTkF/1ypy5zfxc4gZFf3vm//K/RTiER7UPimSV8MN2l8wFeXzix9AkAOeVXHYpBhkIjeAK0KoYOWRNAqS38V2eogiQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mt-integration.ru; spf=pass smtp.mailfrom=mt-integration.ru; dkim=pass (2048-bit key) header.d=mt-integration.ru header.i=@mt-integration.ru header.b=SE7G4reX; arc=none smtp.client-ip=81.200.124.38
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mt-integration.ru
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mt-integration.ru
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mt-integration.ru header.i=@mt-integration.ru header.b="geHrIMk1"
+	dkim=pass (2048-bit key) header.d=mt-integration.ru header.i=@mt-integration.ru header.b="SE7G4reX"
 Received: from ksmg01.maxima.ru (localhost [127.0.0.1])
-	by ksmg01.maxima.ru (Postfix) with ESMTP id CCCB8C0019;
-	Thu,  3 Apr 2025 11:20:39 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 ksmg01.maxima.ru CCCB8C0019
+	by ksmg01.maxima.ru (Postfix) with ESMTP id B1AACC0004;
+	Thu,  3 Apr 2025 11:20:51 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 ksmg01.maxima.ru B1AACC0004
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mt-integration.ru;
-	s=sl; t=1743668439; bh=YTS2HHkGl6vv90e1u0OfipkGJc4P/NO4h3v6E9uRqq4=;
+	s=sl; t=1743668451; bh=0eT+To4WS8QTolUNabbkxlBAmdHPmc3Q+qNiBLxRA/g=;
 	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
-	b=geHrIMk1MGDCl+aVe19qoNl946keFH3Np8EziP6hHBi2NgIICG6cAUi/XpTRUCQ5U
-	 G9frMkHkTw5Y7dDyeMeGfzeqMk2edT2K/2x2UGyyzgQ4M5xkt29Mwmlp2TL+nAb30q
-	 1nHltz/X5y/oZXp/bMeSwvNKN0ACrksGmGQhjr7k0kYF6ymRIWrBdYs9fJu4abrLpp
-	 28FduAw2yvOTnkcYON4HDy2PYxCzfBuW35+5XYwE6dbmLysiKbMGh+dLH6ZlyX0aJS
-	 CkzPOMahqac3Yi1EISt0ZvTLlFrysqVuBBqsEOtkGcLzCP2+Rg8VNg53A0t4F02fyB
-	 ZeH8BSGbFWG8Q==
-Received: from ksmg01.maxima.ru (autodiscover.maxima.ru [81.200.124.61])
+	b=SE7G4reX6EOLjSR20sYKhGdMnDrN3rSskQgAnzvbTu8/dr8RtGFvgV5vmj/1VOfm3
+	 WNMHFwSY1HoxfkQATdTfOmAppZ4WHAZNm5MRvqUDCw+R3qLoUTkLJQrValQLzSE4NX
+	 gnLSoobElCpoU4rNEDu1Q4rE8aa7U3TT1Ot677z8Uy73BYJg7giLzZwWopbUwGK7Lh
+	 KZ9raGobo+bYRyp0ZbDtYXcIzeqPc1v99yLUNFwhi2Hv8BVqu/QQ/63TkU9VkqYuum
+	 Abevqk69zjNjS7SQbn2948uKgPU2H/kKT2QJzdxHHonXyHH4b0zD4aL/wHlR3xV6pH
+	 wtPpHVFNvt6IQ==
+Received: from ksmg01.maxima.ru (mail.maxima.ru [81.200.124.61])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(Client CN "*.maxima.ru", Issuer "GlobalSign GCC R3 DV TLS CA 2020" (verified OK))
 	by ksmg01.maxima.ru (Postfix) with ESMTPS;
-	Thu,  3 Apr 2025 11:20:39 +0300 (MSK)
+	Thu,  3 Apr 2025 11:20:51 +0300 (MSK)
 Received: from db126-1-abramov-14-d-mosos.mti-lab.com (172.25.20.118) by
  mmail-p-exch01.mt.ru (81.200.124.61) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Thu, 3 Apr 2025 11:20:39 +0300
+ 15.2.1544.4; Thu, 3 Apr 2025 11:20:50 +0300
 From: Ivan Abramov <i.abramov@mt-integration.ru>
 To: Alexander Aring <alex.aring@gmail.com>
 CC: Ivan Abramov <i.abramov@mt-integration.ru>, Stefan Schmidt
@@ -47,9 +47,9 @@ CC: Ivan Abramov <i.abramov@mt-integration.ru>, Stefan Schmidt
  Horman <horms@kernel.org>, <linux-wpan@vger.kernel.org>,
 	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
 	<lvc-project@linuxtesting.org>
-Subject: [PATCH net v2 1/3] ieee802154: Restore initial state on failed device_rename() in cfg802154_switch_netns()
-Date: Thu, 3 Apr 2025 11:20:19 +0300
-Message-ID: <20250403082021.990667-2-i.abramov@mt-integration.ru>
+Subject: [PATCH net v2 3/3] ieee802154: Remove WARN_ON() in cfg802154_pernet_exit()
+Date: Thu, 3 Apr 2025 11:20:21 +0300
+Message-ID: <20250403082021.990667-4-i.abramov@mt-integration.ru>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250403082021.990667-1-i.abramov@mt-integration.ru>
 References: <20250403082021.990667-1-i.abramov@mt-integration.ru>
@@ -79,10 +79,9 @@ X-KSMG-LinksScanning: NotDetected
 X-KSMG-Message-Action: skipped
 X-KSMG-Rule-ID: 7
 
-Currently, the return value of device_rename() is not acted upon.
-
-To avoid an inconsistent state in case of failure, roll back the changes
-made before the device_rename() call.
+There's no need to call WARN_ON() in cfg802154_pernet_exit(), since
+every point of failure in cfg802154_switch_netns() is covered with
+WARN_ON(), so remove it.
 
 Found by Linux Verification Center (linuxtesting.org) with Syzkaller.
 
@@ -91,70 +90,22 @@ Signed-off-by: Ivan Abramov <i.abramov@mt-integration.ru>
 ---
 v2: Make sure to commit against latest netdev/net.
 
- net/ieee802154/core.c | 45 ++++++++++++++++++++++++-------------------
- 1 file changed, 25 insertions(+), 20 deletions(-)
+ net/ieee802154/core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/net/ieee802154/core.c b/net/ieee802154/core.c
-index 89b671b12600..84d514430e45 100644
+index 987c633e2c54..c0b8712018a1 100644
 --- a/net/ieee802154/core.c
 +++ b/net/ieee802154/core.c
-@@ -233,31 +233,36 @@ int cfg802154_switch_netns(struct cfg802154_registered_device *rdev,
- 		wpan_dev->netdev->netns_immutable = true;
+@@ -358,7 +358,7 @@ static void __net_exit cfg802154_pernet_exit(struct net *net)
+ 	rtnl_lock();
+ 	list_for_each_entry(rdev, &cfg802154_rdev_list, list) {
+ 		if (net_eq(wpan_phy_net(&rdev->wpan_phy), net))
+-			WARN_ON(cfg802154_switch_netns(rdev, &init_net));
++			cfg802154_switch_netns(rdev, &init_net);
  	}
- 
--	if (err) {
--		/* failed -- clean up to old netns */
--		net = wpan_phy_net(&rdev->wpan_phy);
--
--		list_for_each_entry_continue_reverse(wpan_dev,
--						     &rdev->wpan_dev_list,
--						     list) {
--			if (!wpan_dev->netdev)
--				continue;
--			wpan_dev->netdev->netns_immutable = false;
--			err = dev_change_net_namespace(wpan_dev->netdev, net,
--						       "wpan%d");
--			WARN_ON(err);
--			wpan_dev->netdev->netns_immutable = true;
--		}
--
--		return err;
--	}
--
--	wpan_phy_net_set(&rdev->wpan_phy, net);
-+	if (err)
-+		goto errout;
- 
- 	err = device_rename(&rdev->wpan_phy.dev, dev_name(&rdev->wpan_phy.dev));
- 	WARN_ON(err);
- 
-+	if (err)
-+		goto errout;
-+
-+	wpan_phy_net_set(&rdev->wpan_phy, net);
-+
- 	return 0;
-+
-+errout:
-+	/* failed -- clean up to old netns */
-+	net = wpan_phy_net(&rdev->wpan_phy);
-+
-+	list_for_each_entry_continue_reverse(wpan_dev,
-+					     &rdev->wpan_dev_list,
-+					     list) {
-+		if (!wpan_dev->netdev)
-+			continue;
-+		wpan_dev->netdev->netns_immutable = false;
-+		err = dev_change_net_namespace(wpan_dev->netdev, net,
-+					       "wpan%d");
-+		WARN_ON(err);
-+		wpan_dev->netdev->netns_immutable = true;
-+	}
-+
-+	return err;
+ 	rtnl_unlock();
  }
- 
- void cfg802154_dev_free(struct cfg802154_registered_device *rdev)
 -- 
 2.39.5
 
