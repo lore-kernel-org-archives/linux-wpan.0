@@ -1,96 +1,86 @@
-Received: from proxima.lasnet.de (proxima.lasnet.de [78.47.171.185])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 010F42E62C;
-	Sun,  6 Apr 2025 21:02:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.47.171.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5A8327735
+	for <linux-wpan@vger.kernel.org>; Fri, 11 Apr 2025 13:07:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743973347; cv=none; b=RJjpGQwitUwLNH+C7uNyQg8aPQ4tA5VsIa/GgCoI3aghcxWTXpeX0pHxlBIVSgrX813mYx05/OzeCVNbDjKugpe22oN4DTEC7zy1JN6jiTwEvTdcz5mb0NGQhzDlQfYnAOUOZHaJ3DZPHMCZENFIlPCgVer6A3/MNjotALPf9VE=
+	t=1744376843; cv=none; b=u7La85WpCiVj0WZfkCHSe5eMf8a/PughP6aohw1xE27m7tvzEMjaGb1pnWPgw++Vv83gOMQNVVposokuaih3BtTeQLxPeTVxQHfDD/OdkYeQSGISltgNwpPJhL285zNUiHe1f1sYkVZQW2JFNDUbo6g5VPipKE272BW27aG7ASE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743973347; c=relaxed/simple;
-	bh=hgbsDOhjw3V037U3V+mAfnetYxi0YWfG7CG2z5z52y0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jpPw2UXA6ZA6MhzWSx6S8Whgqpo/dUJ5vUEOyvGtO4CzVLfs3pyC/joip0ZAW6/uk9Zr/Lf+sIqH6friCSPYOFPyEfXV9s3PmtkbXye+cdwIa9MlqM7w8hYDShvqHaJz7/rfNdIF51VuQ0VA7pqpRrxekWhtmEPD3f/8jrHs5t0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=datenfreihafen.org; spf=pass smtp.mailfrom=datenfreihafen.org; arc=none smtp.client-ip=78.47.171.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=datenfreihafen.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=datenfreihafen.org
-Received: from work.datenfreihafen.local (unknown [45.118.184.53])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: stefan@sostec.de)
-	by proxima.lasnet.de (Postfix) with ESMTPSA id 24ACEC06A3;
-	Sun,  6 Apr 2025 22:56:30 +0200 (CEST)
-From: Stefan Schmidt <stefan@datenfreihafen.org>
-To: Alexander Aring <alex.aring@gmail.com>,
-	Ivan Abramov <i.abramov@mt-integration.ru>
-Cc: Stefan Schmidt <stefan@datenfreihafen.org>,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	linux-wpan@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	lvc-project@linuxtesting.org
-Subject: Re: [PATCH net v3 0/3] Avoid calling WARN_ON() on allocation failure in cfg802154_switch_netns()
-Date: Sun,  6 Apr 2025 22:56:06 +0200
-Message-ID: <174397292971.730911.915730343205428534.b4-ty@datenfreihafen.org>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20250403101935.991385-1-i.abramov@mt-integration.ru>
-References: <20250403101935.991385-1-i.abramov@mt-integration.ru>
+	s=arc-20240116; t=1744376843; c=relaxed/simple;
+	bh=spH96PgGCe3FyPMJbH7IqkgbG26PXyo76sOr+JoBPS8=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=XLvdZ2ZQoxRBsEgsVCdtWe/iE/ffMNRYmI6h9sReJ1G0QPOnzjtfFDAs7M6uPwrjeY1Jd44UxW0Swe9begoDm5vTgP8vi1y4DJQX+7ourQkmy64rI3UgjLcjJu9z5ZqfnAH8DdShSv/0bRyZfim4jcUD8vHJWdWkgiSWcQFQb80=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-3d43b460962so38222845ab.2
+        for <linux-wpan@vger.kernel.org>; Fri, 11 Apr 2025 06:07:21 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744376841; x=1744981641;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=v5t+V+PJBNrCRf7SuNBoLNK8zVU0kFwToI+VtpEMXY4=;
+        b=FOmm93qH6zxE5+pB5am8awqIAjYRM6Mm0uSVcWNRpy3LjS18mJorS4eEHnmmPupO1e
+         P0dCIwbGWWQqlieryiSdh5IgITS4sTntYyUZvcyaok7x9v29fnpR2Ky0w8+V5qPWW3fX
+         ZSkJsoBGJReWL0LrGfKgoRtOX0VaWAppE0G2ied6Msr4UkotZ6aRQ4utEOqtO13k3AIe
+         oCLJIjmab4VCpys0xIlVmMPN0aQm42sF/N2HNnRn5M2siNfjw44oQAtwpsnspM1phvvA
+         nY1dX0jHW0RJwlGhDtEnYmw76ADSioX70AkgvVNGQ+eHNgE7G/sP2ZdLloA2tkihmK8a
+         9YWQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV2yl5Dl54yjBaDasfP3hlEH/nsbPqYkI3kAzi7i4CthKmH73JQokY/SqkgtzmaayjXYKKXIdBfwREw@vger.kernel.org
+X-Gm-Message-State: AOJu0YxX315dTteWIXRZz4jUHaxyP5Gh0pnNWlrzRSL98Sk03rgqsju2
+	DW7KXMhNbO6FwVuuEhp2SOcqJs4RMpnfM1OfragEpo/cXBIaQphEjVu4s4KpCVaZwKC37WvL5FJ
+	fi3N5ZKjHMqDOcSj5Y2W7F4VQFCH4Xr9eceJeq/CbZ9LmNjo/u2jiEM4=
+X-Google-Smtp-Source: AGHT+IHylQSQLPuTufArzk4fimUu3VvUqWSvI7rPJeLl7KDcZ0xfZf/P8RL8ka9hymqKn2mPM/LuDeJZGEgwSL5mj/z8hLh+fTgK
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6e02:3792:b0:3d4:337f:121b with SMTP id
+ e9e14a558f8ab-3d7ec1f3fb5mr32697045ab.8.1744376840793; Fri, 11 Apr 2025
+ 06:07:20 -0700 (PDT)
+Date: Fri, 11 Apr 2025 06:07:20 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <67f91408.050a0220.355867.0025.GAE@google.com>
+Subject: [syzbot] Monthly wpan report (Apr 2025)
+From: syzbot <syzbot+listab49c99c53036ef082c3@syzkaller.appspotmail.com>
+To: alex.aring@gmail.com, linux-kernel@vger.kernel.org, 
+	linux-wpan@vger.kernel.org, miquel.raynal@bootlin.com, netdev@vger.kernel.org, 
+	stefan@datenfreihafen.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hello Ivan Abramov.
+Hello wpan maintainers/developers,
 
-On Thu, 03 Apr 2025 13:19:31 +0300, Ivan Abramov wrote:
-> This series was inspired by Syzkaller report on warning in
-> cfg802154_switch_netns().
-> 
-> WARNING: CPU: 0 PID: 5837 at net/ieee802154/core.c:258 cfg802154_switch_netns+0x3c7/0x3d0 net/ieee802154/core.c:258
-> Modules linked in:
-> CPU: 0 UID: 0 PID: 5837 Comm: syz-executor125 Not tainted 6.13.0-rc6-syzkaller-00918-g7b24f164cf00 #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
-> RIP: 0010:cfg802154_switch_netns+0x3c7/0x3d0 net/ieee802154/core.c:258
-> Call Trace:
->  <TASK>
->  nl802154_wpan_phy_netns+0x13d/0x210 net/ieee802154/nl802154.c:1292
->  genl_family_rcv_msg_doit net/netlink/genetlink.c:1115 [inline]
->  genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
->  genl_rcv_msg+0xb14/0xec0 net/netlink/genetlink.c:1210
->  netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2543
->  genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
->  netlink_unicast_kernel net/netlink/af_netlink.c:1322 [inline]
->  netlink_unicast+0x7f6/0x990 net/netlink/af_netlink.c:1348
->  netlink_sendmsg+0x8e4/0xcb0 net/netlink/af_netlink.c:1892
->  sock_sendmsg_nosec net/socket.c:711 [inline]
->  __sock_sendmsg+0x221/0x270 net/socket.c:726
->  ____sys_sendmsg+0x52a/0x7e0 net/socket.c:2594
->  ___sys_sendmsg net/socket.c:2648 [inline]
->  __sys_sendmsg+0x269/0x350 net/socket.c:2680
->  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
->  do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
->  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> 
-> [...]
+This is a 31-day syzbot report for the wpan subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/wpan
 
-Applied to wpan/wpan-next.git, thanks!
+During the period, 0 new issues were detected and 0 were fixed.
+In total, 5 issues are still open and 26 have already been fixed.
 
-[1/3] ieee802154: Restore initial state on failed device_rename() in cfg802154_switch_netns()
-      https://git.kernel.org/wpan/wpan-next/c/32d90bcea6c3
-[2/3] ieee802154: Avoid calling WARN_ON() on -ENOMEM in cfg802154_switch_netns()
-      https://git.kernel.org/wpan/wpan-next/c/44dcb0bbc4a4
-[3/3] ieee802154: Remove WARN_ON() in cfg802154_pernet_exit()
-      https://git.kernel.org/wpan/wpan-next/c/1dd9291eb903
+Some of the still happening issues:
 
-regards,
-Stefan Schmidt
+Ref Crashes Repro Title
+<1> 265     Yes   KMSAN: uninit-value in ieee802154_hdr_push (2)
+                  https://syzkaller.appspot.com/bug?extid=60a66d44892b66b56545
+<2> 32      No    KASAN: global-out-of-bounds Read in mac802154_header_create (2)
+                  https://syzkaller.appspot.com/bug?extid=844d670c418e0353c6a8
+<3> 14      Yes   WARNING in __dev_change_net_namespace (3)
+                  https://syzkaller.appspot.com/bug?extid=3344d668bbbc12996d46
+<4> 11      Yes   WARNING in cfg802154_switch_netns (3)
+                  https://syzkaller.appspot.com/bug?extid=bd5829ba3619f08e2341
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
+
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
