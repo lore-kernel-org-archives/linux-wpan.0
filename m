@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87B772EFBA4;
-	Mon,  5 May 2025 22:23:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 509BF360A71;
+	Mon,  5 May 2025 22:45:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746483814; cv=none; b=QuqirnJT7qK8eSL/XjAKt4LTLCSTyXtzMSfFoY6lNOiOcRXFH5pvVNamkEJKuIcjXCq09KirJrQEn7PgfOa97bkfJ3p2cLJcq0V9AqItcdKa4kAWVxW8PROHAZ13g8mEPeeY9bV0HwRxHPcLaUKhL6hNhk4Dvna5sBztbIE2g3k=
+	t=1746485145; cv=none; b=GrvHqvxgjtgzms5CAzOsRgLfRDGsjDGIx7d4k6qiLZSipVdD5/iM4b2HJWvJlXW73PeF9JfTmEeGRmZz4cL/QyaHEE7p8x1d+aJk5k0Fw4AQZ06binNaPzWy0V1gSgZYB4JoWImNL0zlKOddJEGJX2b05HNRJbAGO6q1doMw41s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746483814; c=relaxed/simple;
+	s=arc-20240116; t=1746485145; c=relaxed/simple;
 	bh=SgLEUyTjEn/ONPzkIoL52jJRgKC8KFCGTZ1fMwifZu0=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=CP5EQzhQ8Eb6IiuEU9NMey0IPN1jnEU4ZRK28pY0iImq0OZRIgE9g/A1r1fTzRarGBIvSqCY+zwGYc/lhLM9VY/XF6yc4GkEQ+3As+yacHiMf0tDnAQY5AP+5Jqb0H8tQkzndzzUg+46WRzjI0Oe96SOEqEIW3VfwnUxpfpUXHo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ybm0p4xd; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=KBqHqGtMkMMtJg6HtoxrqYeQrJpFR6u54wQXl3rlvJ4cbul8/MRk3a3kfIqgGwxQluVfvb7FtBIuAkv6+oTXUT422Aoihb+w3NWvjxCV5t+xNZfSS8tDja+vpR0ckE1q9XuWt/aFMPcpojniqvE04hSKgXWgkZzFyFDQl7+cK94=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ThkyvxRU; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ybm0p4xd"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 732DDC4CEE4;
-	Mon,  5 May 2025 22:23:32 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ThkyvxRU"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36E03C4CEEE;
+	Mon,  5 May 2025 22:45:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746483814;
+	s=k20201202; t=1746485143;
 	bh=SgLEUyTjEn/ONPzkIoL52jJRgKC8KFCGTZ1fMwifZu0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Ybm0p4xde5hBf9+Ds9FLkigG/fbPmxC1MC1l+ihGaZdpj6ws/FX+PhVal1rPPWX1s
-	 L2x2BkIKEOdB/Kouv9bSu4IY/D4Cd86sJh/oV1bI9OzZhKRXLP5ywTdCNsMb1o5VyM
-	 rWosxE65gpMIfzcPZJ5Vc4s805BIlFAEOJ6Rx5xAmVuDgWlPe8yy9fGZvNfZDoZ3vE
-	 SlgBLg1enZ8cv4c4i5eBoRTAG9qDzJ626aiKkaTKx+uhM/axDs1V+TCFY6lp6mBvOm
-	 MubDv/6FDmWJQGTfsScpSMxFZAJ1Y0el1aPLuoWru+xrC8ZeY3D8HkwuQVfbjHCg+7
-	 kTAEs2cFCjYzA==
+	b=ThkyvxRUJvjocGoGx/NoEMUoZjKmiuy4HA8+HuwS132IyLeDwEI8mT/ATn8DJTcYc
+	 GNf+d6RLP7o/tflRUeC9uLtpt+/5cAsy1u4G33rCFHXbailTNL+/GkzjX9pbX40Ws+
+	 JM0m1jdupsbjdIN5tWIxCYqZBlunB0kSxzKO4/Cc8iJF6yNZ+VQFfIwtm9+cFOv61t
+	 gB7vNlVZ+Tm+7Ody9OODKYnlZbJp58iiVMHcRsaiosf8Th38sb5wA4Y6JlP+lhXV8/
+	 zyGiNcOL65LW8pgKEskX6sHtfZ+Nc7B97uKVeg/dTlyxLtDPYxeyR3I0zkJgKgnAHB
+	 o8wTCcxlneoVg==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -42,12 +42,12 @@ Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
 	pabeni@redhat.com,
 	linux-wpan@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.14 230/642] ieee802154: ca8210: Use proper setters and getters for bitwise types
-Date: Mon,  5 May 2025 18:07:26 -0400
-Message-Id: <20250505221419.2672473-230-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.12 182/486] ieee802154: ca8210: Use proper setters and getters for bitwise types
+Date: Mon,  5 May 2025 18:34:18 -0400
+Message-Id: <20250505223922.2682012-182-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250505221419.2672473-1-sashal@kernel.org>
-References: <20250505221419.2672473-1-sashal@kernel.org>
+In-Reply-To: <20250505223922.2682012-1-sashal@kernel.org>
+References: <20250505223922.2682012-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
@@ -56,7 +56,7 @@ List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.14.5
+X-stable-base: Linux 6.12.26
 Content-Transfer-Encoding: 8bit
 
 From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
