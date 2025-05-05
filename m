@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 081C02FA13C;
-	Mon,  5 May 2025 23:22:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D54F2F7C3F;
+	Mon,  5 May 2025 23:19:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746487362; cv=none; b=Eqmh3C8yMY4WFaqXgWlD+9Rck0KYemXbGxCEtAJXa2hxE4ydEd8KvIee9+DO3BmUevcR9vcWZdRhWr6rOqeLZV/4mr9DXR5KNHolQyaPie62Hn9vw5U+69ZXNK3CDmNkMpi1RsDBG7QwyP0wOMiTakJ0wv5jXe/1EuELTUgQhyY=
+	t=1746487174; cv=none; b=i9I203JC7KQl8ydDDIURh51lbS2CXD4v4bhboOTz8yTmX/Df7WxpwDEQIhEtCXUmGEwSfTgjPm7zak4UspNY60WMg6/5EbaXb61+WFl++T1BSWK2336oH82VOwO1P2yhiWUxlKSWlhv6TKgPhrLSLMRDZe3cFgpRPsw2F7aL9Vs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746487362; c=relaxed/simple;
-	bh=+cOW+XFNyEKWT9XmO3vjFm6O5F1Xpb7lUdZAFlUF9iQ=;
+	s=arc-20240116; t=1746487174; c=relaxed/simple;
+	bh=hjO4GH6Uz3olfgGGUDJtPMJURRiLIfr0zPtlx2M1YqE=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=thXM5MoOL0NESEwwoGkcG/G7dJ9/F/eEfUCdevFwf73Fs/JhCpRlfhPJsVq9a68vOMEp05K6TQvZ6/82H0V/E8u/UkJCiJksnDSenUXua86bkLUmNiHa+Tp7eUr4G2T66lRvhHjMKrIKC8/Phr1l47TfZLrHGENFfW6GL0lkZz0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AscTYczO; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=fzxrF3BJq6NWjcMNX1g0fVBwI7NYqImcjIPNaGu9nnvXhfOayGd9qUbiLbfz8QP3Su4/I1+6hbr5kDciKYR6jksrF2DahwtkMLS8wcV7plI2q050nOggzenyus8CHkco9GHNsyuRZ8YulEAAfG0Honsu2ebultJsf212ZrssFaA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f4pWdRN7; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AscTYczO"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0BD83C4CEE4;
-	Mon,  5 May 2025 23:22:38 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f4pWdRN7"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8CBEC4CEEF;
+	Mon,  5 May 2025 23:19:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746487360;
-	bh=+cOW+XFNyEKWT9XmO3vjFm6O5F1Xpb7lUdZAFlUF9iQ=;
+	s=k20201202; t=1746487174;
+	bh=hjO4GH6Uz3olfgGGUDJtPMJURRiLIfr0zPtlx2M1YqE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=AscTYczOcAKMe0pBIyUn9Ohii7ldaFb7dO3iKLB1It/GydxhMqFIPWNMwnAFl1kQv
-	 k/GCHUsjgMxpj4xQ1RV35Kdd6WvurVUpUokiVb351drwUIucf85P6HzDdnSZv4YeCb
-	 od1W3al1X6Umh1KtVh1vxMtQpdpwQva4e1KP6Ljw6cJMJ+Dvft7vbMTGS8IED3WO88
-	 gp0H/0VvNeQ+SpIUd5lcF0e4IEZ8gxfgAQ6zYbwUXRyket55sxusZrDsdHQPbop+bK
-	 ULyOgtLaVz0VMyJdRHw6gSqqOi1ORLicc2xRhKWIx2c27QXIyrszoWAEfY05hgx9zS
-	 FfNC7ODY+3J2Q==
+	b=f4pWdRN7oqKZ+BabPG7c6oO+1/HWIiXKG1vEr4PgA5WZvKNayAJm7VGSHghS1qFid
+	 tPcW0aytj630L9xDKqV7kzT+QtwB1mTj+dMEixlacdgLatRZ+rtwOGZPXEaxvk/pXT
+	 Sh22P6hCeaILGQxt3EeM/UH5QtcGb7rVXhbExSzICMOP1g4fNSjpMO5m4d97n33/xc
+	 fjE4+9G3hULNq2lSZRi4ZbQA3ET7ccH0wQi+ji/SQJcdiZqUoEwCW/xnfCe1YQ3oEt
+	 sUJ5F236H3XxKJyb+MgIkfKnycefWWbEiQaEtJPyteV1nDS+9LoOLey3Pm1N1ppfvu
+	 IIZPmm7ketoJQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -42,12 +42,12 @@ Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
 	pabeni@redhat.com,
 	linux-wpan@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 29/79] ieee802154: ca8210: Use proper setters and getters for bitwise types
-Date: Mon,  5 May 2025 19:21:01 -0400
-Message-Id: <20250505232151.2698893-29-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.10 041/114] ieee802154: ca8210: Use proper setters and getters for bitwise types
+Date: Mon,  5 May 2025 19:17:04 -0400
+Message-Id: <20250505231817.2697367-41-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250505232151.2698893-1-sashal@kernel.org>
-References: <20250505232151.2698893-1-sashal@kernel.org>
+In-Reply-To: <20250505231817.2697367-1-sashal@kernel.org>
+References: <20250505231817.2697367-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
@@ -56,7 +56,7 @@ List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 5.4.293
+X-stable-base: Linux 5.10.237
 Content-Transfer-Encoding: 8bit
 
 From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
@@ -91,10 +91,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 4 insertions(+), 5 deletions(-)
 
 diff --git a/drivers/net/ieee802154/ca8210.c b/drivers/net/ieee802154/ca8210.c
-index d394e2b65054d..d99976034027c 100644
+index 9a082910ec59f..35e2b7eb30761 100644
 --- a/drivers/net/ieee802154/ca8210.c
 +++ b/drivers/net/ieee802154/ca8210.c
-@@ -1487,8 +1487,7 @@ static u8 mcps_data_request(
+@@ -1488,8 +1488,7 @@ static u8 mcps_data_request(
  	command.pdata.data_req.src_addr_mode = src_addr_mode;
  	command.pdata.data_req.dst.mode = dst_address_mode;
  	if (dst_address_mode != MAC_MODE_NO_ADDR) {
@@ -104,7 +104,7 @@ index d394e2b65054d..d99976034027c 100644
  		if (dst_address_mode == MAC_MODE_SHORT_ADDR) {
  			command.pdata.data_req.dst.address[0] = LS_BYTE(
  				dst_addr->short_address
-@@ -1837,12 +1836,12 @@ static int ca8210_skb_rx(
+@@ -1838,12 +1837,12 @@ static int ca8210_skb_rx(
  	}
  	hdr.source.mode = data_ind[0];
  	dev_dbg(&priv->spi->dev, "srcAddrMode: %#03x\n", hdr.source.mode);
@@ -119,7 +119,7 @@ index d394e2b65054d..d99976034027c 100644
  	dev_dbg(&priv->spi->dev, "dstPanId: %#06x\n", hdr.dest.pan_id);
  	memcpy(&hdr.dest.extended_addr, &data_ind[14], 8);
  
-@@ -1969,7 +1968,7 @@ static int ca8210_skb_tx(
+@@ -1970,7 +1969,7 @@ static int ca8210_skb_tx(
  	status =  mcps_data_request(
  		header.source.mode,
  		header.dest.mode,
