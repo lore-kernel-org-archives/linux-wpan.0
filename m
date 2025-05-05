@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6401438097A;
-	Mon,  5 May 2025 23:00:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DA981FC0F3;
+	Mon,  5 May 2025 23:09:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746486015; cv=none; b=i7It+gqt3e3a3iYwEBbPM6kq2aTiUyV/WeFxGS/cpVtOYpwb1nqMnENuvrY4/pb/NRvb8C75v6HWwj2csoPiZfp22ra8QrosYmqT8TiGpma3SFxXWHNFBcEn7P4lCciQqqVEBJZkR5Kc/XymCezDoiZP3vShZTuY6qoA/31JutU=
+	t=1746486551; cv=none; b=NUQxallpMQd7C+Zo7B0hDkQOExGt8DyOumbnGWm5xGrtjfxe+I4Ti9tZSX6DQWUf/p/he/TGbH5CAAPuwwUGmhVO/NTOxod8pTrJEk1LBIDDKvsrxCHPWNnfePgsMhUP4VACNG9CbstcJnOI8RAfUkrokkXQ88viqhWekjTDmMw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746486015; c=relaxed/simple;
-	bh=o3KuwVmsFoNNM5uAAtIqemYd1E85pxI1xkOZlR7TRfE=;
+	s=arc-20240116; t=1746486551; c=relaxed/simple;
+	bh=n4WQEQwPb+ZzLzVq8CWpcD6IoD6dGppEYZ734mPkslg=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ZW+/8Egd3pzgNpSCBExXvclBxsYPuXRXyMyodjqemYpqaa56XKIChhnb9aUm42SSRzuqfC0p1Af37qhvlnsHzju826gdgpNLwhaqk8EHbBqesv9ueQ+Lw/CFaKDKemyCL3B4WcLP2azEONFCK7DwXxwoFlU7WjDsjGUiqDu0NTs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fZ0VWQgv; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=RghhetHcO+m+aSfRB6tPLhyewxwj5cN7ph4WXbbZgHW1t8S9/9qjv8FNUTt2g2xUEG1JZjvFM2uk31J5/dIQRsnpSfPKtwH35ufsqx3PST1PyymShA8UtUbGq4cshu3RY4xpy9EunDX/kXPw3u+/aWmDTwQORnFMHSPTC/GfsBU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rlGiXTsx; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fZ0VWQgv"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F566C4CEEF;
-	Mon,  5 May 2025 23:00:12 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rlGiXTsx"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6BD6DC4CEE4;
+	Mon,  5 May 2025 23:09:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746486013;
-	bh=o3KuwVmsFoNNM5uAAtIqemYd1E85pxI1xkOZlR7TRfE=;
+	s=k20201202; t=1746486550;
+	bh=n4WQEQwPb+ZzLzVq8CWpcD6IoD6dGppEYZ734mPkslg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=fZ0VWQgvDaIB8S6TruHcxXvwizvFBJruUQEzMlAP+X83C/s7ocNDEGSR+bIwRgiiK
-	 EHmd7sn7kfYqpVj0p1u1Nm7xin1/QA607/YSm6Eb46fvzM3KaMw6Vvry5acw72pnIQ
-	 pX4a1cepzCSTptKCuYMZ75nPq/c6GY90SdQlfLVsmVhRwCIev6DS4xvhR8OEYndMly
-	 qxWD8FJ9jvEt5LCioYKyMVW7QrbaX8wi8MHrkn9ZfT80KC/MHbIpFNsYEd4WHYHcEt
-	 W+Dt6VYpkWxibtCznV5Qis9HLLw5NmLA9yiBwNmlQttfQX5j0juhfJvdyj5kuTjoOS
-	 9iLNjh/xyqQew==
+	b=rlGiXTsxhMncYiW96FHDNKHICITlyTJKSV+IbM/V964XX5UgpoJZ0EJfwkY6wyJ8h
+	 JAeAw5LI9iVUuZ2DU2abBYcrIp3AjgC6GcIE1VdHqV3LEOsglnkUBAW5aO5NGA/bRa
+	 bn9ueKIBFHmwuGp+QxJiUeVODi3Z7UJbT7YvXl/BP1HSQItw1Uq2GZIcQcCJo580uA
+	 iiYSJS9PSPgUB51Ij/zWt4RfruRmTKb1Q4/+fRGAM11nBk8O6R/PPr0uB+gTrh+npi
+	 HBK/T7h/ccEeM0jL9moJaX2BuP02FL6/+/vVaoQ2rrh1T7mGdarxpXcR9KWPeZbNn9
+	 JroYHUSDh1INQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -42,12 +42,12 @@ Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
 	pabeni@redhat.com,
 	linux-wpan@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.6 110/294] ieee802154: ca8210: Use proper setters and getters for bitwise types
-Date: Mon,  5 May 2025 18:53:30 -0400
-Message-Id: <20250505225634.2688578-110-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.1 085/212] ieee802154: ca8210: Use proper setters and getters for bitwise types
+Date: Mon,  5 May 2025 19:04:17 -0400
+Message-Id: <20250505230624.2692522-85-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250505225634.2688578-1-sashal@kernel.org>
-References: <20250505225634.2688578-1-sashal@kernel.org>
+In-Reply-To: <20250505230624.2692522-1-sashal@kernel.org>
+References: <20250505230624.2692522-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
@@ -56,7 +56,7 @@ List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.6.89
+X-stable-base: Linux 6.1.136
 Content-Transfer-Encoding: 8bit
 
 From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
@@ -91,7 +91,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 4 insertions(+), 5 deletions(-)
 
 diff --git a/drivers/net/ieee802154/ca8210.c b/drivers/net/ieee802154/ca8210.c
-index 0a0ad3d77557f..587643a371de3 100644
+index 1659bbffdb91c..463be34a4ca4c 100644
 --- a/drivers/net/ieee802154/ca8210.c
 +++ b/drivers/net/ieee802154/ca8210.c
 @@ -1446,8 +1446,7 @@ static u8 mcps_data_request(
