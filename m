@@ -1,133 +1,84 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D54F2F7C3F;
-	Mon,  5 May 2025 23:19:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9681128F95F
+	for <linux-wpan@vger.kernel.org>; Tue, 13 May 2025 12:36:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1746487174; cv=none; b=i9I203JC7KQl8ydDDIURh51lbS2CXD4v4bhboOTz8yTmX/Df7WxpwDEQIhEtCXUmGEwSfTgjPm7zak4UspNY60WMg6/5EbaXb61+WFl++T1BSWK2336oH82VOwO1P2yhiWUxlKSWlhv6TKgPhrLSLMRDZe3cFgpRPsw2F7aL9Vs=
+	t=1747139790; cv=none; b=oHJlJX5GNZ95yNHPhpCyQdEzP5eScsb8Pn46eB+mNvP7X6vwwdZhPL4hOARWneTiOoesOrAacGt4ERQ2ZC3DNzBdtjfZE8Pg65ZXu4YtoeFZVcKWCJOlXxnO7LlUtXp1y9bAK1X72CNpfUFuJgm94ssx5SYtSeUnKtpGGh+fwqw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1746487174; c=relaxed/simple;
-	bh=hjO4GH6Uz3olfgGGUDJtPMJURRiLIfr0zPtlx2M1YqE=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=fzxrF3BJq6NWjcMNX1g0fVBwI7NYqImcjIPNaGu9nnvXhfOayGd9qUbiLbfz8QP3Su4/I1+6hbr5kDciKYR6jksrF2DahwtkMLS8wcV7plI2q050nOggzenyus8CHkco9GHNsyuRZ8YulEAAfG0Honsu2ebultJsf212ZrssFaA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f4pWdRN7; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f4pWdRN7"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8CBEC4CEEF;
-	Mon,  5 May 2025 23:19:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1746487174;
-	bh=hjO4GH6Uz3olfgGGUDJtPMJURRiLIfr0zPtlx2M1YqE=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=f4pWdRN7oqKZ+BabPG7c6oO+1/HWIiXKG1vEr4PgA5WZvKNayAJm7VGSHghS1qFid
-	 tPcW0aytj630L9xDKqV7kzT+QtwB1mTj+dMEixlacdgLatRZ+rtwOGZPXEaxvk/pXT
-	 Sh22P6hCeaILGQxt3EeM/UH5QtcGb7rVXhbExSzICMOP1g4fNSjpMO5m4d97n33/xc
-	 fjE4+9G3hULNq2lSZRi4ZbQA3ET7ccH0wQi+ji/SQJcdiZqUoEwCW/xnfCe1YQ3oEt
-	 sUJ5F236H3XxKJyb+MgIkfKnycefWWbEiQaEtJPyteV1nDS+9LoOLey3Pm1N1ppfvu
-	 IIZPmm7ketoJQ==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Stefan Schmidt <stefan@datenfreihafen.org>,
-	Sasha Levin <sashal@kernel.org>,
-	alex.aring@gmail.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-wpan@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 041/114] ieee802154: ca8210: Use proper setters and getters for bitwise types
-Date: Mon,  5 May 2025 19:17:04 -0400
-Message-Id: <20250505231817.2697367-41-sashal@kernel.org>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250505231817.2697367-1-sashal@kernel.org>
-References: <20250505231817.2697367-1-sashal@kernel.org>
+	s=arc-20240116; t=1747139790; c=relaxed/simple;
+	bh=2Hp279qOKoUwK53A0IlWl9Z6A9oGh6aPql8Id7/C4ec=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=NeGwoOPnkvroi7v0znDlWoOQCW1qPsD6tfgUirRegYD1CRejyFetgZB8gLjZ4TgRkhvVbBg8fNNz5hwXroXYJbgHWEt+uAtn6DrKPrRfkyZ2OuVqAp6Pd2MZ9pBW7ha7vwtNhGBHNLwF0p3Bb1pi7/7Py9bwzQfW5lRVxsoeDUA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3db6dc76193so1484575ab.2
+        for <linux-wpan@vger.kernel.org>; Tue, 13 May 2025 05:36:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1747139788; x=1747744588;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=DYgHQ98etugRn9nrFF/Y396tZ8D+/Ig7ihfcqGgA2as=;
+        b=qwipq282be2yJ/TXFVGbv+Tw2q/ltain7spffDHiK9Fwfz6gD3lvawAOPQLKOsbKCe
+         nCIMECx9VDodTKkuGoze2OWdZO4+ylhHzvvSvO8fXuwYC/ZL9u7/zkVPfCC5t9wZsVJa
+         IDs6fMdqCte8wc7jN3wZ9pEZE69uF3GBL/utlUVb1G9248E5aXI7/IjN0asTonodeDoF
+         aYekFdAtM4/8gNaCTDwsQf2knwFbmnS3aOYhoPa5f7WuVq7V2kvVKL6KswiyxW/d8zjf
+         bRhs4CEQt+JXwQ5qXCbJgpGteYH4pMKsMJzOcRIddmwxK3qOk4U10ryy6zTGhtqtJ1ZR
+         j1Sw==
+X-Forwarded-Encrypted: i=1; AJvYcCUsoTJxSqWKF8Olrft4PNIbH70ETuQYZ4vP11LUwa4heFgjFUv4Yv1KL5EAshRnP2MVH0DcQObpMKr+@vger.kernel.org
+X-Gm-Message-State: AOJu0YzFL+fZJ8qz2Bp9qzn/HgYGQTNtmkltYdSMQrLH4TMiZanShkFt
+	U+E2JKaJuCeJmYs8LgeVXWL4GFpCyzmktEuBuIKTbmDAfAbSBS+jN8CSGdxK74FKq4ZmiNCX0Vz
+	hfiMxHEm1DYlQ3VnC4YyLNa/HeMX2qetrzhonwzF11Qo5jseggRn0JG4=
+X-Google-Smtp-Source: AGHT+IEKhD87ADuvIbZqF3IVuejXHxQwIrZ9v7DshXQN7uxn/CK9a/0SWGRW3VsRb8nou7/Bfipq9krzeFmYzST4ehdVQLjh7HaS
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 5.10.237
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6e02:398f:b0:3d4:e6:d872 with SMTP id
+ e9e14a558f8ab-3da7e1e3ab8mr192584185ab.9.1747139787612; Tue, 13 May 2025
+ 05:36:27 -0700 (PDT)
+Date: Tue, 13 May 2025 05:36:27 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68233ccb.050a0220.f2294.09f8.GAE@google.com>
+Subject: [syzbot] Monthly wpan report (May 2025)
+From: syzbot <syzbot+list1679a20fcec2fc473afb@syzkaller.appspotmail.com>
+To: alex.aring@gmail.com, linux-kernel@vger.kernel.org, 
+	linux-wpan@vger.kernel.org, miquel.raynal@bootlin.com, netdev@vger.kernel.org, 
+	stefan@datenfreihafen.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Hello wpan maintainers/developers,
 
-[ Upstream commit 169b2262205836a5d1213ff44dca2962276bece1 ]
+This is a 31-day syzbot report for the wpan subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/wpan
 
-Sparse complains that the driver doesn't respect the bitwise types:
+During the period, 0 new issues were detected and 0 were fixed.
+In total, 5 issues are still open and 26 have already been fixed.
 
-drivers/net/ieee802154/ca8210.c:1796:27: warning: incorrect type in assignment (different base types)
-drivers/net/ieee802154/ca8210.c:1796:27:    expected restricted __le16 [addressable] [assigned] [usertype] pan_id
-drivers/net/ieee802154/ca8210.c:1796:27:    got unsigned short [usertype]
-drivers/net/ieee802154/ca8210.c:1801:25: warning: incorrect type in assignment (different base types)
-drivers/net/ieee802154/ca8210.c:1801:25:    expected restricted __le16 [addressable] [assigned] [usertype] pan_id
-drivers/net/ieee802154/ca8210.c:1801:25:    got unsigned short [usertype]
-drivers/net/ieee802154/ca8210.c:1928:28: warning: incorrect type in argument 3 (different base types)
-drivers/net/ieee802154/ca8210.c:1928:28:    expected unsigned short [usertype] dst_pan_id
-drivers/net/ieee802154/ca8210.c:1928:28:    got restricted __le16 [addressable] [usertype] pan_id
+Some of the still happening issues:
 
-Use proper setters and getters for bitwise types.
+Ref Crashes Repro Title
+<1> 273     Yes   KMSAN: uninit-value in ieee802154_hdr_push (2)
+                  https://syzkaller.appspot.com/bug?extid=60a66d44892b66b56545
+<2> 33      No    KASAN: global-out-of-bounds Read in mac802154_header_create (2)
+                  https://syzkaller.appspot.com/bug?extid=844d670c418e0353c6a8
+<3> 13      Yes   KMSAN: kernel-infoleak in move_addr_to_user (7)
+                  https://syzkaller.appspot.com/bug?extid=346474e3bf0b26bd3090
 
-Note, in accordance with [1] the protocol is little endian.
-
-Link: https://www.cascoda.com/wp-content/uploads/2018/11/CA-8210_datasheet_0418.pdf [1]
-Reviewed-by: Miquel Raynal <miquel.raynal@bootlin.com>
-Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
-Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Link: https://lore.kernel.org/20250305105656.2133487-2-andriy.shevchenko@linux.intel.com
-Signed-off-by: Stefan Schmidt <stefan@datenfreihafen.org>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/ieee802154/ca8210.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/drivers/net/ieee802154/ca8210.c b/drivers/net/ieee802154/ca8210.c
-index 9a082910ec59f..35e2b7eb30761 100644
---- a/drivers/net/ieee802154/ca8210.c
-+++ b/drivers/net/ieee802154/ca8210.c
-@@ -1488,8 +1488,7 @@ static u8 mcps_data_request(
- 	command.pdata.data_req.src_addr_mode = src_addr_mode;
- 	command.pdata.data_req.dst.mode = dst_address_mode;
- 	if (dst_address_mode != MAC_MODE_NO_ADDR) {
--		command.pdata.data_req.dst.pan_id[0] = LS_BYTE(dst_pan_id);
--		command.pdata.data_req.dst.pan_id[1] = MS_BYTE(dst_pan_id);
-+		put_unaligned_le16(dst_pan_id, command.pdata.data_req.dst.pan_id);
- 		if (dst_address_mode == MAC_MODE_SHORT_ADDR) {
- 			command.pdata.data_req.dst.address[0] = LS_BYTE(
- 				dst_addr->short_address
-@@ -1838,12 +1837,12 @@ static int ca8210_skb_rx(
- 	}
- 	hdr.source.mode = data_ind[0];
- 	dev_dbg(&priv->spi->dev, "srcAddrMode: %#03x\n", hdr.source.mode);
--	hdr.source.pan_id = *(u16 *)&data_ind[1];
-+	hdr.source.pan_id = cpu_to_le16(get_unaligned_le16(&data_ind[1]));
- 	dev_dbg(&priv->spi->dev, "srcPanId: %#06x\n", hdr.source.pan_id);
- 	memcpy(&hdr.source.extended_addr, &data_ind[3], 8);
- 	hdr.dest.mode = data_ind[11];
- 	dev_dbg(&priv->spi->dev, "dstAddrMode: %#03x\n", hdr.dest.mode);
--	hdr.dest.pan_id = *(u16 *)&data_ind[12];
-+	hdr.dest.pan_id = cpu_to_le16(get_unaligned_le16(&data_ind[12]));
- 	dev_dbg(&priv->spi->dev, "dstPanId: %#06x\n", hdr.dest.pan_id);
- 	memcpy(&hdr.dest.extended_addr, &data_ind[14], 8);
- 
-@@ -1970,7 +1969,7 @@ static int ca8210_skb_tx(
- 	status =  mcps_data_request(
- 		header.source.mode,
- 		header.dest.mode,
--		header.dest.pan_id,
-+		le16_to_cpu(header.dest.pan_id),
- 		(union macaddr *)&header.dest.extended_addr,
- 		skb->len - mac_len,
- 		&skb->data[mac_len],
--- 
-2.39.5
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
 
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
