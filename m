@@ -1,91 +1,150 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 425341A5B85;
-	Wed, 21 May 2025 05:18:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBB9E27D763;
+	Wed, 21 May 2025 13:43:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747804697; cv=none; b=PcLhupM+bXFWp+COW4I8ygZiU5AeZCBMgCpp/TZTGSWW4qFubLTs9kh7iqHyksLhdp+656kh/RCpQjLbJHFn4FF5QK0+aQmTVVHLStMUL9v5cYGy6IwK8dBDvBRW5Ct2ZJAqyJaKCnQMhizmIbQfKfAygo/DSLLII9ktB5M3Z+Y=
+	t=1747834993; cv=none; b=T0YB9jX5J4Z72FL1TOLG1vmvZG10R5+omXNwdSIRrMSPxKKyq8OD+m6bjNNtPVFm18xabKgY1Mle1UfNc1kQQsY6c7aP92YlxjZoU5ga24AN0ssgSwfl0BoRLc0EJLGWaKUuxmVI03lxhPXumfhiKgJxoCJPAUKXT/ctalhTQ/g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747804697; c=relaxed/simple;
-	bh=u7/3KY1Kz6KkAfhTKudlFFJOir6E8UHZ7GaPRxnGVG0=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=STEQVYShTCUat/lFDOWX5pXy0pH7zXc4G/ifE3591082TLvwjZ3rvSo/NFCwDmqqcx/asQAiLuUNLr236/AtPc2iqxgY3bULAvm3FnMOe8H802/TRzdLVXuVGpn8S130QRFkAKaA8rhBketzFLsv0h5wspz5o7OyYqBw8ry9jRw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EgLmllFK; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1747834993; c=relaxed/simple;
+	bh=bJ5mEdZwI1kOkQeq6MOsfoKYiUuW+SVq7Hv8nRuVGYM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uimSnUW6aYwMqcVwrFfBcGCzZ/SQ3+lfh9MzYB1OimfoPnSpa9ezwxejQ3BuUnTNij8ninH3VtQPPFgwBTuufToXm3sM9Sj8E2o7Ge0n/Wz422/LG9MaJcZPUzFLFS1mAXISi0nzYSVDEs4PCBHAIYlH/GZN0jwrQIMrYJ0NSWk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WqQTnP8i; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EgLmllFK"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85763C4CEE4;
-	Wed, 21 May 2025 05:18:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1747804695;
-	bh=u7/3KY1Kz6KkAfhTKudlFFJOir6E8UHZ7GaPRxnGVG0=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-	b=EgLmllFK8fwvA9p9id9HO7R4iI6aKQsfDw/X/h2+hfPmpkQ4DxvO881/tl+XpcCJC
-	 5oQFMAy3BrZh7rbm2O7tXqo70WumhO6wz3lSF/pIcmWHDahcv04G7RVxIAqRu6ZRzy
-	 BpDwShIP2aI5p40uo2K/YjKCMk4xjVe051SnhFz58o6blPfFVcx8jNTp8Y9LLln2nO
-	 SD/q1UOiIcM8zkEg6kY9MJBgaBL/tbj9Y6SdzEe3Mi8iGLrVxlnVueP7SM/LQXqAsn
-	 fw5T9KMJ7HjPfWWxACu/HIAdhc/hnY4EyLwE2uXwdONaICh7Iq84FBAhHkuR7NljEV
-	 uupqc0PXuoqjw==
-Date: Tue, 20 May 2025 22:18:10 -0700
-From: Kees Cook <kees@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: Kuniyuki Iwashima <kuniyu@amazon.com>, ahmed.zaki@intel.com,
- aleksander.lobakin@intel.com, alex.aring@gmail.com, andrew+netdev@lunn.ch,
- ardb@kernel.org, christophe.leroy@csgroup.eu, cratiu@nvidia.com,
- d.bogdanov@yadro.com, davem@davemloft.net, decui@microsoft.com,
- dianders@chromium.org, ebiggers@google.com, edumazet@google.com,
- fercerpav@gmail.com, gmazyland@gmail.com, grundler@chromium.org,
- haiyangz@microsoft.com, hayeswang@realtek.com, hch@lst.de, horms@kernel.org,
- idosch@nvidia.com, jiri@resnulli.us, jv@jvosburgh.net, kch@nvidia.com,
- kys@microsoft.com, leiyang@redhat.com, linux-hardening@vger.kernel.org,
- linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
- linux-usb@vger.kernel.org, linux-wpan@vger.kernel.org, linux@treblig.org,
- martin.petersen@oracle.com, mgurtovoy@nvidia.com,
- michael.christie@oracle.com, mingzhe.zou@easystack.cn,
- miquel.raynal@bootlin.com, mlombard@redhat.com, netdev@vger.kernel.org,
- pabeni@redhat.com, phahn-oss@avm.de, sagi@grimberg.me, sam@mendozajonas.com,
- sdf@fomichev.me, shaw.leon@gmail.com, stefan@datenfreihafen.org,
- target-devel@vger.kernel.org, viro@zeniv.linux.org.uk, wei.liu@kernel.org
-Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_0/7=5D_net=3A_Convert_dev=5Fset=5Fm?=
- =?US-ASCII?Q?ac=5Faddress=28=29_to_struct_sockaddr=5Fstorage?=
-User-Agent: K-9 Mail for Android
-In-Reply-To: <20250520200929.1b9ae5ec@kernel.org>
-References: <20250520222452.work.063-kees@kernel.org> <20250521001931.7761-1-kuniyu@amazon.com> <202505201741.AFA146E7F6@keescook> <20250520200929.1b9ae5ec@kernel.org>
-Message-ID: <935B5950-190B-47D8-BF45-1CBAE904DB71@kernel.org>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WqQTnP8i"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1747834992; x=1779370992;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=bJ5mEdZwI1kOkQeq6MOsfoKYiUuW+SVq7Hv8nRuVGYM=;
+  b=WqQTnP8i3f67Q72Pqc8YxuUYmgu6RKT4N+4O9cIDY7/Wtefzj4Vt1Zk4
+   DDM9usP1qdAeE12ReO4VKkCMJv9GaT0iwiRu1nh/tO9OGuk2hCTHXUXLd
+   F5+fSdVaS7oVRV1N9T09CcOFiAEK+AHS3QvQJsp0K0/8dmYnYbN0Gp0vN
+   gIl7oolku48J9ip5sjJdYxLg8s7nNXoHcfc8KRbtoN77CkrgVP4iV/lgT
+   5Xdoj/a7BUBEFNJMi1NxB7uoUodsfm4fR9VszkjI81fFT1TUVN0xoZ5tR
+   sF0Chfc5Y8gi/GUbQj2ueujCIa435fPdLpvDhWn5RwSlLUSbTEcQW95Gd
+   A==;
+X-CSE-ConnectionGUID: Vt0JyZpES4aSYOwweoucag==
+X-CSE-MsgGUID: XmomrRa8Sya0tdcI7R6HPg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11440"; a="49073342"
+X-IronPort-AV: E=Sophos;i="6.15,303,1739865600"; 
+   d="scan'208";a="49073342"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 May 2025 06:43:11 -0700
+X-CSE-ConnectionGUID: QqoCNcCuS8OQgpkyvNjCpw==
+X-CSE-MsgGUID: Ochuz+B7RTO2SewZ7HfXJg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,303,1739865600"; 
+   d="scan'208";a="171083948"
+Received: from lkp-server01.sh.intel.com (HELO 1992f890471c) ([10.239.97.150])
+  by fmviesa001.fm.intel.com with ESMTP; 21 May 2025 06:43:04 -0700
+Received: from kbuild by 1992f890471c with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uHjio-000OJo-0S;
+	Wed, 21 May 2025 13:43:02 +0000
+Date: Wed, 21 May 2025 21:42:23 +0800
+From: kernel test robot <lkp@intel.com>
+To: Kees Cook <kees@kernel.org>, Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: oe-kbuild-all@lists.linux.dev, Kees Cook <kees@kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>, Jay Vosburgh <jv@jvosburgh.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	Jiri Pirko <jiri@resnulli.us>, Simon Horman <horms@kernel.org>,
+	Alexander Aring <alex.aring@gmail.com>,
+	Stefan Schmidt <stefan@datenfreihafen.org>,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	Samuel Mendoza-Jonas <sam@mendozajonas.com>,
+	Paul Fertser <fercerpav@gmail.com>,
+	Hayes Wang <hayeswang@realtek.com>,
+	Douglas Anderson <dianders@chromium.org>,
+	Grant Grundler <grundler@chromium.org>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Cosmin Ratiu <cratiu@nvidia.com>, Lei Yang <leiyang@redhat.com>,
+	netdev@vger.kernel.org, linux-hyperv@vger.kernel.org,
+	linux-usb@vger.kernel.org, linux-wpan@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>
+Subject: Re: [PATCH 6/7] net: core: Convert dev_set_mac_address() to struct
+ sockaddr_storage
+Message-ID: <202505212149.6QGSFucw-lkp@intel.com>
+References: <20250520223108.2672023-6-kees@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250520223108.2672023-6-kees@kernel.org>
+
+Hi Kees,
+
+kernel test robot noticed the following build errors:
+
+[auto build test ERROR on linux-nvme/for-next]
+[also build test ERROR on mkp-scsi/for-next kees/for-next/pstore kees/for-next/kspp linus/master v6.15-rc7 next-20250521]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Kees-Cook/net-core-Convert-inet_addr_is_any-to-sockaddr_storage/20250521-063445
+base:   git://git.infradead.org/nvme.git for-next
+patch link:    https://lore.kernel.org/r/20250520223108.2672023-6-kees%40kernel.org
+patch subject: [PATCH 6/7] net: core: Convert dev_set_mac_address() to struct sockaddr_storage
+config: arc-randconfig-001-20250521 (https://download.01.org/0day-ci/archive/20250521/202505212149.6QGSFucw-lkp@intel.com/config)
+compiler: arc-linux-gcc (GCC) 10.5.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250521/202505212149.6QGSFucw-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202505212149.6QGSFucw-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   net/core/dev_api.c: In function 'dev_set_mac_address':
+>> net/core/dev_api.c:318:35: error: 'sa' undeclared (first use in this function); did you mean 'ss'?
+     318 |  ret = netif_set_mac_address(dev, sa, extack);
+         |                                   ^~
+         |                                   ss
+   net/core/dev_api.c:318:35: note: each undeclared identifier is reported only once for each function it appears in
 
 
+vim +318 net/core/dev_api.c
 
-On May 20, 2025 8:09:29 PM PDT, Jakub Kicinski <kuba@kernel=2Eorg> wrote:
->On Tue, 20 May 2025 17:42:32 -0700 Kees Cook wrote:
->> Ah yes, I can include that in the next version if you want? I was tryin=
-g
->> to find a stopping point since everything kind of touches everything =
-=2E=2E=2E
->
->Looks like the build considers -Wincompatible-pointer-types to always
->imply -Werror or some such? We explicitly disable CONFIG_WERROR in our
->CI, but we still get:
->
->drivers/net/macvlan=2Ec:1302:34: error: incompatible pointer types passin=
-g 'struct sockaddr *' to parameter of type 'struct __kernel_sockaddr_storag=
-e *' [-Werror,-Wincompatible-pointer-types]
-> 1302 |                 dev_set_mac_address(port->dev, &sa, NULL);
->      |                                                ^~~
->
->on this series :(
+   301	
+   302	/**
+   303	 * dev_set_mac_address() - change Media Access Control Address
+   304	 * @dev: device
+   305	 * @ss: new address
+   306	 * @extack: netlink extended ack
+   307	 *
+   308	 * Change the hardware (MAC) address of the device
+   309	 *
+   310	 * Return: 0 on success, -errno on failure.
+   311	 */
+   312	int dev_set_mac_address(struct net_device *dev, struct sockaddr_storage *ss,
+   313				struct netlink_ext_ack *extack)
+   314	{
+   315		int ret;
+   316	
+   317		netdev_lock_ops(dev);
+ > 318		ret = netif_set_mac_address(dev, sa, extack);
+   319		netdev_unlock_ops(dev);
+   320	
+   321		return ret;
+   322	}
+   323	EXPORT_SYMBOL(dev_set_mac_address);
+   324	
 
-I'll get this fixed and add dev_set_mac_address_user() for v3=2E=2E=2E
-
-
---=20
-Kees Cook
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
