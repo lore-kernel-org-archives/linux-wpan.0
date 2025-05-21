@@ -1,150 +1,163 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBB9E27D763;
-	Wed, 21 May 2025 13:43:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87CA4233156;
+	Wed, 21 May 2025 20:46:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1747834993; cv=none; b=T0YB9jX5J4Z72FL1TOLG1vmvZG10R5+omXNwdSIRrMSPxKKyq8OD+m6bjNNtPVFm18xabKgY1Mle1UfNc1kQQsY6c7aP92YlxjZoU5ga24AN0ssgSwfl0BoRLc0EJLGWaKUuxmVI03lxhPXumfhiKgJxoCJPAUKXT/ctalhTQ/g=
+	t=1747860383; cv=none; b=V4Qn1oqDLrO03jJYQg1v8gcU50i0gkFmje1r92NiVIa++CidQiXKzW15hz8aGVrM+0uNjeLhVg0eX0vPmcVUdoQuCLpol0HsYJRjPs+j6ciCRJLA0eP5N2EQaCBVJfpQA5ntuVctM9m35r2SMY6UJCW9QY1kv2Pp1BuZGOMoVpg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1747834993; c=relaxed/simple;
-	bh=bJ5mEdZwI1kOkQeq6MOsfoKYiUuW+SVq7Hv8nRuVGYM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uimSnUW6aYwMqcVwrFfBcGCzZ/SQ3+lfh9MzYB1OimfoPnSpa9ezwxejQ3BuUnTNij8ninH3VtQPPFgwBTuufToXm3sM9Sj8E2o7Ge0n/Wz422/LG9MaJcZPUzFLFS1mAXISi0nzYSVDEs4PCBHAIYlH/GZN0jwrQIMrYJ0NSWk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WqQTnP8i; arc=none smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1747860383; c=relaxed/simple;
+	bh=TB5RrtCE3tLkkWSSZvlSdGdEuB83W94mJusyAgZ8cTE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=AHrxqXsKYCQOc2NSsYaWeiWFYFoWSZaF6hX0Wbr2toFpzE33rpo99nc/ezDZgspFdnuW7jX5YoZTIhQ0yUcft6yERPT7HM8BT4ruw4NwGIkdQDhTBNWsgnzRC6R4biMde+zbRlBm26EDUPV4WMNuprISR3x8dIJZ+62qQ5lgooo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=azKxmU9y; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WqQTnP8i"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1747834992; x=1779370992;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=bJ5mEdZwI1kOkQeq6MOsfoKYiUuW+SVq7Hv8nRuVGYM=;
-  b=WqQTnP8i3f67Q72Pqc8YxuUYmgu6RKT4N+4O9cIDY7/Wtefzj4Vt1Zk4
-   DDM9usP1qdAeE12ReO4VKkCMJv9GaT0iwiRu1nh/tO9OGuk2hCTHXUXLd
-   F5+fSdVaS7oVRV1N9T09CcOFiAEK+AHS3QvQJsp0K0/8dmYnYbN0Gp0vN
-   gIl7oolku48J9ip5sjJdYxLg8s7nNXoHcfc8KRbtoN77CkrgVP4iV/lgT
-   5Xdoj/a7BUBEFNJMi1NxB7uoUodsfm4fR9VszkjI81fFT1TUVN0xoZ5tR
-   sF0Chfc5Y8gi/GUbQj2ueujCIa435fPdLpvDhWn5RwSlLUSbTEcQW95Gd
-   A==;
-X-CSE-ConnectionGUID: Vt0JyZpES4aSYOwweoucag==
-X-CSE-MsgGUID: XmomrRa8Sya0tdcI7R6HPg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11440"; a="49073342"
-X-IronPort-AV: E=Sophos;i="6.15,303,1739865600"; 
-   d="scan'208";a="49073342"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 May 2025 06:43:11 -0700
-X-CSE-ConnectionGUID: QqoCNcCuS8OQgpkyvNjCpw==
-X-CSE-MsgGUID: Ochuz+B7RTO2SewZ7HfXJg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,303,1739865600"; 
-   d="scan'208";a="171083948"
-Received: from lkp-server01.sh.intel.com (HELO 1992f890471c) ([10.239.97.150])
-  by fmviesa001.fm.intel.com with ESMTP; 21 May 2025 06:43:04 -0700
-Received: from kbuild by 1992f890471c with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uHjio-000OJo-0S;
-	Wed, 21 May 2025 13:43:02 +0000
-Date: Wed, 21 May 2025 21:42:23 +0800
-From: kernel test robot <lkp@intel.com>
-To: Kees Cook <kees@kernel.org>, Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: oe-kbuild-all@lists.linux.dev, Kees Cook <kees@kernel.org>,
-	Jakub Kicinski <kuba@kernel.org>, Jay Vosburgh <jv@jvosburgh.net>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="azKxmU9y"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 17535C4CEE4;
+	Wed, 21 May 2025 20:46:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1747860383;
+	bh=TB5RrtCE3tLkkWSSZvlSdGdEuB83W94mJusyAgZ8cTE=;
+	h=From:To:Cc:Subject:Date:From;
+	b=azKxmU9yy7Izy99ARGU0CwcQd4sF4KPMD1aOQ//cIUDTuPCHSVJo6VQexSwPahcCY
+	 RaB+/ec6twf4muJqtblNNKS/GpDDD2XG3WtK/YVf5pHdY030dyLCSc8h4ij0bAqyxG
+	 XhMzcNbqL8jIseK0RS+FeGkfPecDLFgtEPxMgAOfvEscrYZNh+S4Apfj3U9piEHogG
+	 y9AGdGlc3O0MHidOMqYgAwp7Okoo3zWYOYIkWqEJ9lP3XE3rJP/2gpLAJ+KJG3hZi0
+	 kPJez90sL/EYEcH5kWO6CvWwcrgZuWC6+OgAByhtJvtb+9BzJ98rYQ164KEaiHbnwN
+	 Wk4GR0fftc4bQ==
+From: Kees Cook <kees@kernel.org>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: Kees Cook <kees@kernel.org>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Chaitanya Kulkarni <kch@nvidia.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Mike Christie <michael.christie@oracle.com>,
+	Max Gurtovoy <mgurtovoy@nvidia.com>,
+	Maurizio Lombardi <mlombard@redhat.com>,
+	Dmitry Bogdanov <d.bogdanov@yadro.com>,
+	Mingzhe Zou <mingzhe.zou@easystack.cn>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Simon Horman <horms@kernel.org>,
+	"Dr. David Alan Gilbert" <linux@treblig.org>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Jiri Pirko <jiri@resnulli.us>, Simon Horman <horms@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Cosmin Ratiu <cratiu@nvidia.com>,
+	Lei Yang <leiyang@redhat.com>,
+	Ido Schimmel <idosch@nvidia.com>,
+	Samuel Mendoza-Jonas <sam@mendozajonas.com>,
+	Paul Fertser <fercerpav@gmail.com>,
 	Alexander Aring <alex.aring@gmail.com>,
 	Stefan Schmidt <stefan@datenfreihafen.org>,
 	Miquel Raynal <miquel.raynal@bootlin.com>,
-	Samuel Mendoza-Jonas <sam@mendozajonas.com>,
-	Paul Fertser <fercerpav@gmail.com>,
 	Hayes Wang <hayeswang@realtek.com>,
 	Douglas Anderson <dianders@chromium.org>,
 	Grant Grundler <grundler@chromium.org>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Cosmin Ratiu <cratiu@nvidia.com>, Lei Yang <leiyang@redhat.com>,
-	netdev@vger.kernel.org, linux-hyperv@vger.kernel.org,
-	linux-usb@vger.kernel.org, linux-wpan@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>
-Subject: Re: [PATCH 6/7] net: core: Convert dev_set_mac_address() to struct
- sockaddr_storage
-Message-ID: <202505212149.6QGSFucw-lkp@intel.com>
-References: <20250520223108.2672023-6-kees@kernel.org>
+	Jay Vosburgh <jv@jvosburgh.net>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>,
+	Dexuan Cui <decui@microsoft.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Jason Wang <jasowang@redhat.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	Maxim Georgiev <glipus@gmail.com>,
+	Aleksander Jan Bajkowski <olek2@wp.pl>,
+	Philipp Hahn <phahn-oss@avm.de>,
+	Eric Biggers <ebiggers@google.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Al Viro <viro@zeniv.linux.org.uk>,
+	Ahmed Zaki <ahmed.zaki@intel.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Xiao Liang <shaw.leon@gmail.com>,
+	linux-kernel@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	linux-scsi@vger.kernel.org,
+	target-devel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-wpan@vger.kernel.org,
+	linux-usb@vger.kernel.org,
+	linux-hyperv@vger.kernel.org,
+	linux-hardening@vger.kernel.org
+Subject: [PATCH net-next v2 0/8] net: Convert dev_set_mac_address() to struct sockaddr_storage
+Date: Wed, 21 May 2025 13:46:08 -0700
+Message-Id: <20250521204310.it.500-kees@kernel.org>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250520223108.2672023-6-kees@kernel.org>
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2500; i=kees@kernel.org; h=from:subject:message-id; bh=TB5RrtCE3tLkkWSSZvlSdGdEuB83W94mJusyAgZ8cTE=; b=owGbwMvMwCVmps19z/KJym7G02pJDBl61lMn8Rlk/WQ5tG/fnM3cc3mE/hqzZ3+yr2D0L1GRf iekt16jo5SFQYyLQVZMkSXIzj3OxeNte7j7XEWYOaxMIEMYuDgFYCIe3Az//f2rG3P6DZ5UOD7/ tuvKqRbdCQfV0q4oJrdt32d7xpNJhZFhldYdQ86QnhUK32dnBp/7eZFtyvJNKkZbN6/8239RZs9 5TgA=
+X-Developer-Key: i=kees@kernel.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
+Content-Transfer-Encoding: 8bit
 
-Hi Kees,
+ v2:
+  - add conversion of dev_set_mac_address_user() (kuniyu)
+  - fix missed sockaddr/sockaddr_storage conversion (kuba)
+ v1: https://lore.kernel.org/all/20250520222452.work.063-kees@kernel.org/
 
-kernel test robot noticed the following build errors:
+Hi,
 
-[auto build test ERROR on linux-nvme/for-next]
-[also build test ERROR on mkp-scsi/for-next kees/for-next/pstore kees/for-next/kspp linus/master v6.15-rc7 next-20250521]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+As part of the effort to allow the compiler to reason about object sizes,
+we need to deal with the problematic variably sized struct sockaddr,
+which has no internal runtime size tracking. In much of the network
+stack the use of struct sockaddr_storage has been adopted. Continue the
+transition toward this for more of the internal APIs. Specifically:
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Kees-Cook/net-core-Convert-inet_addr_is_any-to-sockaddr_storage/20250521-063445
-base:   git://git.infradead.org/nvme.git for-next
-patch link:    https://lore.kernel.org/r/20250520223108.2672023-6-kees%40kernel.org
-patch subject: [PATCH 6/7] net: core: Convert dev_set_mac_address() to struct sockaddr_storage
-config: arc-randconfig-001-20250521 (https://download.01.org/0day-ci/archive/20250521/202505212149.6QGSFucw-lkp@intel.com/config)
-compiler: arc-linux-gcc (GCC) 10.5.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250521/202505212149.6QGSFucw-lkp@intel.com/reproduce)
+- inet_addr_is_any()
+- netif_set_mac_address()
+- dev_set_mac_address()
+- dev_set_mac_address_user()
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202505212149.6QGSFucw-lkp@intel.com/
+Only a few callers of dev_set_mac_address() needed adjustment; all others
+were already using struct sockaddr_storage internally.
 
-All errors (new ones prefixed by >>):
+-Kees
 
-   net/core/dev_api.c: In function 'dev_set_mac_address':
->> net/core/dev_api.c:318:35: error: 'sa' undeclared (first use in this function); did you mean 'ss'?
-     318 |  ret = netif_set_mac_address(dev, sa, extack);
-         |                                   ^~
-         |                                   ss
-   net/core/dev_api.c:318:35: note: each undeclared identifier is reported only once for each function it appears in
+Kees Cook (8):
+  net: core: Convert inet_addr_is_any() to sockaddr_storage
+  net: core: Switch netif_set_mac_address() to struct sockaddr_storage
+  net/ncsi: Use struct sockaddr_storage for pending_mac
+  ieee802154: Use struct sockaddr_storage with dev_set_mac_address()
+  net: usb: r8152: Convert to use struct sockaddr_storage internally
+  net: core: Convert dev_set_mac_address() to struct sockaddr_storage
+  rtnetlink: do_setlink: Use struct sockaddr_storage
+  net: core: Convert dev_set_mac_address_user() to use struct
+    sockaddr_storage
 
-
-vim +318 net/core/dev_api.c
-
-   301	
-   302	/**
-   303	 * dev_set_mac_address() - change Media Access Control Address
-   304	 * @dev: device
-   305	 * @ss: new address
-   306	 * @extack: netlink extended ack
-   307	 *
-   308	 * Change the hardware (MAC) address of the device
-   309	 *
-   310	 * Return: 0 on success, -errno on failure.
-   311	 */
-   312	int dev_set_mac_address(struct net_device *dev, struct sockaddr_storage *ss,
-   313				struct netlink_ext_ack *extack)
-   314	{
-   315		int ret;
-   316	
-   317		netdev_lock_ops(dev);
- > 318		ret = netif_set_mac_address(dev, sa, extack);
-   319		netdev_unlock_ops(dev);
-   320	
-   321		return ret;
-   322	}
-   323	EXPORT_SYMBOL(dev_set_mac_address);
-   324	
+ include/linux/inet.h                |  2 +-
+ include/linux/netdevice.h           |  6 ++--
+ net/ncsi/internal.h                 |  2 +-
+ drivers/net/bonding/bond_alb.c      |  8 ++---
+ drivers/net/bonding/bond_main.c     | 15 ++++-----
+ drivers/net/hyperv/netvsc_drv.c     |  6 ++--
+ drivers/net/macvlan.c               | 18 +++++-----
+ drivers/net/tap.c                   | 14 +++++---
+ drivers/net/team/team_core.c        |  2 +-
+ drivers/net/tun.c                   |  8 ++++-
+ drivers/net/usb/r8152.c             | 52 +++++++++++++++--------------
+ drivers/nvme/target/rdma.c          |  2 +-
+ drivers/nvme/target/tcp.c           |  2 +-
+ drivers/target/iscsi/iscsi_target.c |  2 +-
+ net/core/dev.c                      | 11 +++---
+ net/core/dev_api.c                  | 11 +++---
+ net/core/dev_ioctl.c                |  6 ++--
+ net/core/rtnetlink.c                | 19 +++--------
+ net/core/utils.c                    |  8 ++---
+ net/ieee802154/nl-phy.c             |  6 ++--
+ net/ncsi/ncsi-rsp.c                 | 18 +++++-----
+ 21 files changed, 109 insertions(+), 109 deletions(-)
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.34.1
+
