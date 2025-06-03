@@ -1,125 +1,131 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f180.google.com (mail-vk1-f180.google.com [209.85.221.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88CDF27C854;
-	Tue, 27 May 2025 18:43:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2DBA24DCEE;
+	Tue,  3 Jun 2025 18:33:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1748371392; cv=none; b=RUWDeZlQUqpCC++jbTqovwYlNKI6HMjdEpYe0pCKLNrK2kHaAtAhT7hiVB3Pdm+6OhJosNOSB2s+0KxLp5bLC015sUOPWp2CkkKUtpxEIFHuBSS66q/2RXHyuhoOXQqXp+bQP8fBDSDabkxFDNEuOk1E9Iwntvu1dyD3ToFayu4=
+	t=1748975616; cv=none; b=sHFKVbirHXlNRBqQGCiGbZsAsotF9tF+hyCaqJKfIEvf413EIdn63UeF44/R3L1uhu6DztQok5ikX0Q/boHw2fOKwMBATkTT/wyTSLcuRv+q8oRT48MeT52Sd2SFOsHCrHicWRFb4YyVtr8Hy/PaU6DQYEx0XspOhiiWzGya/1k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1748371392; c=relaxed/simple;
-	bh=unrEi+Z8Vcid2frmRc00TpoL+pz62h5Wsf8KIjX1MAI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mfV8VJxNi/USAC+PEZeRUtNWnRYUO4jmF+ImjSIVibgz88fh9BeTUWJtpk9tP4U1A9FIosoix8bCpgwOY3HF8tTM5yS0BxCrsBSNSorpnIeJXBxo8oNH0BfDl7//Hbjpbr88kcZ/DmkJujm7JNlB1hv11DcmMHK5zWx/6RYhcmU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SAJg/lTs; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1748975616; c=relaxed/simple;
+	bh=SbVxL37hTpZZJQwCWoGZsd5uDgWGt9zPQQhWwF9+SQI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bYkjQrzk2/oODpMcLrx9D5P0KdHsZ2/CamnQ+B3b9G9WmqlPJS1hSDcAediRPGU3EJDG3gpwtLB9tDZ+1uBKoEgV0NNNAzbkxSU4ZkM/MVGzT40QfJ/OGkrUU4vPuaLXyB3bL4Q3y7xxFy5f1QFPbLPkKovf/mTg1dNDc9uJTDY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Zilf2ppC; arc=none smtp.client-ip=209.85.221.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SAJg/lTs"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1049DC4CEEA;
-	Tue, 27 May 2025 18:43:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1748371392;
-	bh=unrEi+Z8Vcid2frmRc00TpoL+pz62h5Wsf8KIjX1MAI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=SAJg/lTsHFPpMmZvVmP+0XJugy76N/WOctdJIssWWs7qNHSBbzmSYg8xkWQak4g5C
-	 LfZgHKgxVCZb8p0qamVGEV/1YiZTk2afQEafhl37cp97dLgGRdjvi7trKjD2XXdMuP
-	 LbrGzfua9UHyhqt54e4WAAnlTo1NpBqK2l+IKnh1JQUdMKF4EbO60uwu4lUOeBUiiD
-	 wKIfF3Uo87tWndWoi9LDxjhMwmt61Lxnq3QWSMVbr06JAV1rHQ9XUs10fwb75pWBr3
-	 anGW5bNZOirMCaMIcgBCgcjqJ5Vcm09HGhEIuw7KuVAzISErwpzi7uyi2a2hStymIg
-	 Mw76bx9c3WLMA==
-Date: Tue, 27 May 2025 11:43:08 -0700
-From: Kees Cook <kees@kernel.org>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Cosmin Ratiu <cratiu@nvidia.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Kory Maincent <kory.maincent@bootlin.com>,
-	Maxim Georgiev <glipus@gmail.com>, netdev@vger.kernel.org,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
-	Chaitanya Kulkarni <kch@nvidia.com>,
-	Mike Christie <michael.christie@oracle.com>,
-	Max Gurtovoy <mgurtovoy@nvidia.com>,
-	Maurizio Lombardi <mlombard@redhat.com>,
-	Dmitry Bogdanov <d.bogdanov@yadro.com>,
-	Mingzhe Zou <mingzhe.zou@easystack.cn>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	"Dr. David Alan Gilbert" <linux@treblig.org>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	Lei Yang <leiyang@redhat.com>, Ido Schimmel <idosch@nvidia.com>,
-	Samuel Mendoza-Jonas <sam@mendozajonas.com>,
-	Paul Fertser <fercerpav@gmail.com>,
-	Alexander Aring <alex.aring@gmail.com>,
-	Stefan Schmidt <stefan@datenfreihafen.org>,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	Hayes Wang <hayeswang@realtek.com>,
-	Douglas Anderson <dianders@chromium.org>,
-	Grant Grundler <grundler@chromium.org>,
-	Jay Vosburgh <jv@jvosburgh.net>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Aleksander Jan Bajkowski <olek2@wp.pl>,
-	Philipp Hahn <phahn-oss@avm.de>, Eric Biggers <ebiggers@google.com>,
-	Ard Biesheuvel <ardb@kernel.org>, Al Viro <viro@zeniv.linux.org.uk>,
-	Ahmed Zaki <ahmed.zaki@intel.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Xiao Liang <shaw.leon@gmail.com>, linux-kernel@vger.kernel.org,
-	linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
-	target-devel@vger.kernel.org, linux-wpan@vger.kernel.org,
-	linux-usb@vger.kernel.org, linux-hyperv@vger.kernel.org,
-	linux-hardening@vger.kernel.org
-Subject: Re: [PATCH net-next v2 8/8] net: core: Convert
- dev_set_mac_address_user() to use struct sockaddr_storage
-Message-ID: <202505271142.EA78EAB04@keescook>
-References: <20250521204310.it.500-kees@kernel.org>
- <20250521204619.2301870-8-kees@kernel.org>
- <e1429351-3c9b-40e0-b50d-de6527d0a05b@redhat.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zilf2ppC"
+Received: by mail-vk1-f180.google.com with SMTP id 71dfb90a1353d-52d9a275c27so3997339e0c.0;
+        Tue, 03 Jun 2025 11:33:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1748975613; x=1749580413; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=OxQQ0sWmsf4MOVzjdoqBgrpQlQTXaeSyUJ30E02i+Fw=;
+        b=Zilf2ppChnp95itA9O+JclCd9AUAOD729o6rBSCKN0AGU6GnsOm/xaK0AWlT4eAE0G
+         byESDpqKKWfrBhNIQX5PsgtlTUUm7Zfi8zAbUSH4BW7zwkJsCZ0EBiR9j/SMMrilud6d
+         Jd9tH9Et30umP8N1PGC3QkMrEKR7ENeWDnqYU395Wc/BRJGJoCHPHUoabomHXXtqCj7y
+         ShxDRep5R4kJmdGlj+bb88x07UbobLEe/IDgwaPKkw3qbfW+/0j2V8fm8bSl5jBaTSq8
+         xijqfmRezS3ptfQWDrjsMY3j0r2vbQfWc5Xs1O3mdCWuCbYyvJPJ+U7lMfLmqhBGT4eE
+         FzSw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1748975613; x=1749580413;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=OxQQ0sWmsf4MOVzjdoqBgrpQlQTXaeSyUJ30E02i+Fw=;
+        b=sszd2BxnP5ZU7F+6Y3z7hc6HhWEi4DnFbYh8bgLo4r5TytY3y2Y5dktoqIk2WIc0gs
+         N1Qk4hsEm2Nmnbd3jMjaOYlz5sMvbLZMX3RvFaAj5y1kziZPM+ZOj3s3AZSuIUbNbOkI
+         kHChDK729Zp18KTJVj/fFmDat+3OgyBYmUFti9Jchvqbt0ICEG8PU+z6Wq+h7QK//+Gz
+         KOE5PuSeTAmjpQ2YNh6EpY3xdLTbLg8W1lJIxPiK8JtnjTzM+pcCQiJ0MbBk/uLHa0pZ
+         Xf64N0TfAzZl8g77LughLQ6rGCepjnJJJCo4b7YyfJaB+byPQVuuNwipsptAk1kTplZm
+         o87A==
+X-Forwarded-Encrypted: i=1; AJvYcCVzajA32ZuCAWlzvY1qNzj7oSguyl8aaCQTUyPSSKi4w8uaN6eBqvwwMxJTB/OhdD3F2zHQ7Y0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YweYxa+AplwyKmCB+iDXTNeZ8L48IcPLftlwAeljwOVIBtxA+nR
+	J2rmhriOzpRrTFQmT3mMc8h9tqedm1ZF16qaH0guvsFNtuykzHPypVaT
+X-Gm-Gg: ASbGncvX90M7GbVuN2+WeOncmqfZBeKUvjtyZbaxzFQb4eB5y7QhsWUR0I7mY1Tiymp
+	IWtHlg2jCDU7d8/rd78Q2OSRNiSfHqN1Latanw0nWnH2avOt9cIWPKcbVZpStRF87bkXtDnUpNC
+	KCxZq6RZ+RLsSrM5slLQZiZBaS2XVkpru+hRUSvhcx0dIDo3u52QKo9bp/SxW+fLckzgy0EGXzk
+	3v5sv6Dvq8Jux5qjvNcYrQgG3/P/Yg8I0pDA/jZzWvU5KARh/BQ0O5cDLKv70QuGsTrtxWwLtIK
+	NiBw1s7j30MzezNtYFbeIGZbthFsmrHxT+4U4UyEVRyD9c/nuhpJSh9OyRC6HgsEAx9gWIs=
+X-Google-Smtp-Source: AGHT+IHx+5qSMSfcrUaoTqZqfxugPU3f9II+et+C/as46fNkimrXOLRMiZp4kz1NF3Du9TpX5HSWPg==
+X-Received: by 2002:a05:6122:469b:b0:52a:79fd:34bd with SMTP id 71dfb90a1353d-530c73031b5mr21533e0c.4.1748975613326;
+        Tue, 03 Jun 2025 11:33:33 -0700 (PDT)
+Received: from localhost.localdomain ([187.61.150.61])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-53074aaf305sm9609248e0c.4.2025.06.03.11.33.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 Jun 2025 11:33:33 -0700 (PDT)
+From: Ramon Fontes <ramonreisfontes@gmail.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: linux-wpan@vger.kernel.org,
+	alex.aring@gmail.com,
+	miquel.raynal@bootlin.com,
+	netdev@vger.kernel.org,
+	Ramon Fontes <ramonreisfontes@gmail.com>
+Subject: [PATCH] mac802154_hwsim: allow users to specify the number of simulated radios dinamically instead of the previously hardcoded value of 2
+Date: Tue,  3 Jun 2025 15:33:21 -0300
+Message-ID: <20250603183321.18151-1-ramonreisfontes@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e1429351-3c9b-40e0-b50d-de6527d0a05b@redhat.com>
+Content-Transfer-Encoding: 8bit
 
-On Tue, May 27, 2025 at 09:02:28AM +0200, Paolo Abeni wrote:
-> On 5/21/25 10:46 PM, Kees Cook wrote:
-> > diff --git a/net/core/dev_ioctl.c b/net/core/dev_ioctl.c
-> > index fff13a8b48f1..616479e71466 100644
-> > --- a/net/core/dev_ioctl.c
-> > +++ b/net/core/dev_ioctl.c
-> > @@ -572,9 +572,11 @@ static int dev_ifsioc(struct net *net, struct ifreq *ifr, void __user *data,
-> >  		return dev_set_mtu(dev, ifr->ifr_mtu);
-> >  
-> >  	case SIOCSIFHWADDR:
-> > -		if (dev->addr_len > sizeof(struct sockaddr))
-> > +		if (dev->addr_len > sizeof(ifr->ifr_hwaddr))
-> >  			return -EINVAL;
-> > -		return dev_set_mac_address_user(dev, &ifr->ifr_hwaddr, NULL);
-> > +		return dev_set_mac_address_user(dev,
-> > +						(struct sockaddr_storage *)&ifr->ifr_hwaddr,
-> > +						NULL);
-> 
-> Side note for a possible follow-up: the above pattern is repeated a
-> couple of times: IMHO consolidating it into an helper would be nice.
+* Added a new module parameter radios
+* Modified the loop in hwsim_probe()
+* Updated log message in hwsim_probe()
 
-Yeah, I will look at that.
+Signed-off-by: Ramon Fontes <ramonreisfontes@gmail.com>
+---
+ drivers/net/ieee802154/mac802154_hwsim.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
-> Also such helper could/should explicitly convert ifr->ifr_hwaddr to
-> sockaddr_storage and avoid the cast.
-
-It's UAPI, so it looked verrrry painful to change.
-
+diff --git a/drivers/net/ieee802154/mac802154_hwsim.c b/drivers/net/ieee802154/mac802154_hwsim.c
+index 2f7520454..dadae6247 100644
+--- a/drivers/net/ieee802154/mac802154_hwsim.c
++++ b/drivers/net/ieee802154/mac802154_hwsim.c
+@@ -27,6 +27,10 @@
+ MODULE_DESCRIPTION("Software simulator of IEEE 802.15.4 radio(s) for mac802154");
+ MODULE_LICENSE("GPL");
+ 
++static int radios = 2;
++module_param(radios, int, 0444);
++MODULE_PARM_DESC(radios, "Number of simulated radios");
++
+ static LIST_HEAD(hwsim_phys);
+ static DEFINE_MUTEX(hwsim_phys_lock);
+ 
+@@ -1018,13 +1022,13 @@ static int hwsim_probe(struct platform_device *pdev)
+ 	struct hwsim_phy *phy, *tmp;
+ 	int err, i;
+ 
+-	for (i = 0; i < 2; i++) {
++	for (i = 0; i < radios; i++) {
+ 		err = hwsim_add_one(NULL, &pdev->dev, true);
+ 		if (err < 0)
+ 			goto err_slave;
+ 	}
+ 
+-	dev_info(&pdev->dev, "Added 2 mac802154 hwsim hardware radios\n");
++	dev_info(&pdev->dev, "Added %d mac802154 hwsim hardware radios\n", radios);
+ 	return 0;
+ 
+ err_slave:
+@@ -1057,6 +1061,9 @@ static __init int hwsim_init_module(void)
+ {
+ 	int rc;
+ 
++	if (radios < 0)
++		return -EINVAL;
++
+ 	rc = genl_register_family(&hwsim_genl_family);
+ 	if (rc)
+ 		return rc;
 -- 
-Kees Cook
+2.43.0
+
