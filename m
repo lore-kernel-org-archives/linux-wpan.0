@@ -1,78 +1,79 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ADC418A921
-	for <linux-wpan@vger.kernel.org>; Sat,  7 Jun 2025 17:27:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DA603594C
+	for <linux-wpan@vger.kernel.org>; Sat,  7 Jun 2025 17:34:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749317278; cv=none; b=j/0+RZQbDzMaaxpu3f6+GG/sjM3C3OLuK0sUTFMcbVEUJNWZcyDH5W9NeB6s8LdQwHuM7dnNUDFdANje34MeHXQLU6fmdw0BJ45GUCyBILMuWO+su3zqt+6TQV2jo5Wy1/vNJLpBwzmINERKchW2EGeevyueMzGFMk/tqcQ4rts=
+	t=1749317674; cv=none; b=YVelpng4YvTOAAfr+SO4dT8lW1KS8+KJxNXrQeuKTyUw4pQhjWJbtzR0OlGakhIIfapJ8AAtolJsTJ+LZwYuLkNiMToKv80KFKrxW+LNUsWxYr3oybhfJlq6bDhwSa+XUl8Z8xwBgjKeHCoIhmlkOYwQRznv/XCZUqN2tA28SE8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749317278; c=relaxed/simple;
-	bh=cD2FhQ14affurROU12rOLT/My6dz8ifCZ0xwnHu0jPw=;
+	s=arc-20240116; t=1749317674; c=relaxed/simple;
+	bh=Khy63nd1RGiALdVp3OZyYI1Xjdnf94tL0g0gM86xV24=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rOMFIoNWujsIlHOoHjEh8nxKICvt4/Iy3BpLy/rcZtelcYEWmErHf3aCsB7XxO7mXPDLV7dfb9pIpUHJ2KT6Eb+KqGovVWKV/yjfVmUeFFx67FmGZkv+nyZYq5bJOaLqGFMgpw7COJ8QRXMSE9vKbPF4S4DddZQagDMD9AxMB74=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UVQKsZVX; arc=none smtp.client-ip=170.10.133.124
+	 To:Cc:Content-Type; b=Scx+oDwt96YwCVvUPzZvLLWVPVUKenzQY3Ewt239yjU5QpcdV5EhQpGpW9hiETW9YoygKlRguEDOgs/UWqJdmlsuZxCjFTyA/oWxTOIMTzYLkpstUw5TOK5PTK9fe2GfEDbSP0b8oPhabmLjAaeAnKfl2ktBPGC/xZy48YG2JRU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=i+64PQlc; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UVQKsZVX"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i+64PQlc"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1749317275;
+	s=mimecast20190719; t=1749317671;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=cD2FhQ14affurROU12rOLT/My6dz8ifCZ0xwnHu0jPw=;
-	b=UVQKsZVXLAGj9MbyGiuTBFgM9BvkB87dbkGw4whU3uS6csDKcbCjIt9FDULokH9vjEV5vm
-	oF/Y2H5aPtcF0vMtPlqYimzo07SZO69P8uHQfZ3EG7igj6wZEQypBbQ98nh88XNROtrFrP
-	SriDKj+9zSNPnjgX897YQcDbZYZicHc=
-Received: from mail-lj1-f200.google.com (mail-lj1-f200.google.com
- [209.85.208.200]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=ZnUegQI509/idcGeE7W1jddXf341qwR1ZMf5fTzdFVA=;
+	b=i+64PQlcFvCjg6CSSRfS2TKuagEYAAWYQhW6KUoRvSrfaysgcIEaJPcGZhkUUmS/R0N4FW
+	F++skXGFDbcqPvNk+8dnn0TeM5ARaZAhsufB75Q4X2AazablQDhzLcxBBpp3eM1UerjN1C
+	a2nej9rRqL6Zj9egZjB0QiOsu1CPqCc=
+Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com
+ [209.85.208.199]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-660-8PFBDTTyNu6P3JR2BzVqFw-1; Sat, 07 Jun 2025 13:27:54 -0400
-X-MC-Unique: 8PFBDTTyNu6P3JR2BzVqFw-1
-X-Mimecast-MFC-AGG-ID: 8PFBDTTyNu6P3JR2BzVqFw_1749317272
-Received: by mail-lj1-f200.google.com with SMTP id 38308e7fff4ca-32a64f93c68so19945871fa.0
-        for <linux-wpan@vger.kernel.org>; Sat, 07 Jun 2025 10:27:53 -0700 (PDT)
+ us-mta-468-SmaB08qmMLSreO6w-pB3BQ-1; Sat, 07 Jun 2025 13:34:30 -0400
+X-MC-Unique: SmaB08qmMLSreO6w-pB3BQ-1
+X-Mimecast-MFC-AGG-ID: SmaB08qmMLSreO6w-pB3BQ_1749317669
+Received: by mail-lj1-f199.google.com with SMTP id 38308e7fff4ca-32a7009e242so13972961fa.0
+        for <linux-wpan@vger.kernel.org>; Sat, 07 Jun 2025 10:34:29 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749317272; x=1749922072;
+        d=1e100.net; s=20230601; t=1749317668; x=1749922468;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=cD2FhQ14affurROU12rOLT/My6dz8ifCZ0xwnHu0jPw=;
-        b=CgQMW8id9CP78YqLWwwv7VSEFqgG9/2wuJUU6DQCxzoYSMbGZUpqhUBfDShBpAt5LI
-         /aNZapN4cqYtLc76+FwwUonUIW7bxo2R/rKHJzQnJFaR3x1pV9Iqt99DSlqBNNqHu5wB
-         AdDK/l53uoDCOIyIuYgFeAnfHF59pjIoME253ZsHpx8BI4MHxSzCvqF3IdcEvNDaHCvb
-         8WHCmfQF2j2AJEfreGSL1Eqsefn0PQk/RLV8vzEIdWsMIdCSEbfKNwgiQcB8bArp3+X/
-         jCWPdrrf3saS969OY8p+a0sb0ma6g13DJeHiOZoxU8JKvUowWrjmbVCRzOWZnsjMfqnb
-         DhRg==
-X-Forwarded-Encrypted: i=1; AJvYcCWX0fj4d+obEvGcpVB9anhp7zQjyBzQ5By/NBwtvgLWO+bCQsVM9B4rHaKtfbax9OI2j8Mc9Se3ftMM@vger.kernel.org
-X-Gm-Message-State: AOJu0YxNn8uS4PVphwVO20F+86hTIsliRAD0UMgIOmipu1Ih0+JJ50z+
-	rbCX/pZJKg+ZKqu7sR//D4u+6g/Tyj86R4Z2n/2M3M4l652gEzujKjelk+xhkmziCfdk/miMK4B
-	4rfgaSG2Np0VIDhyrWPwFPGASStZrtpAR5yP0TCzQiBGAa7w+M0hEHfpD7gXLHVcO1rwvsHUIAR
-	EIf8amzQzwnd6c1ckQp8xiZN+Z6XjObKA6tWK0LA==
-X-Gm-Gg: ASbGnctP26Ec9pUkDhPLfjenBGnYD0T3qRXeC5Lrd/byms8B6lh9WoDTGiRp2s4eTt2
-	T6ZSCQyafh2JHnjroqzG5o+c7ftJRNhruIz9/QA1Ub4gnRP8WoQY6txr62aElbfcWG8eKidt/4W
-	ykG3B3ZXqhxcdW4wAiyVP2bfinsxk=
-X-Received: by 2002:a2e:a7c1:0:b0:30b:f0dd:9096 with SMTP id 38308e7fff4ca-32ad11c45eamr32017261fa.12.1749317272361;
-        Sat, 07 Jun 2025 10:27:52 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IH+zpwj9G1edp2Bsl1ab3woHoEWm+jazmDLnjVVK6XqpM0EucVPM8pz8yU8LxGQzUjl1q7U2w6L/fGRgVTbAAg=
-X-Received: by 2002:a2e:a7c1:0:b0:30b:f0dd:9096 with SMTP id
- 38308e7fff4ca-32ad11c45eamr32017141fa.12.1749317271950; Sat, 07 Jun 2025
- 10:27:51 -0700 (PDT)
+        bh=ZnUegQI509/idcGeE7W1jddXf341qwR1ZMf5fTzdFVA=;
+        b=i0bEqrKFf/mhXY1ucfxV78OZ8PzH3dqHXwbneKDDIUO66W+n7liSsrmt1P8bTgIeAL
+         Dl4e+yR8NOEhJiCPE7SL2K9wiKmwhm1vlJItwUY8pAMY4BmbbeDb+c6ozYo8EtYCr0MX
+         nwU13FbhCphmWZVO94wf2kqogBrlLRyOCexC/shou9bzGgeQgYklvx4zvDHMzTGgLi0J
+         osIy19lE5yP8WPXjCY8BtDuRjhwO2yqadA6gvEOiBR0e6M2CF2zN9OrlSvCElAuk9tkQ
+         3PpmEs3zWD0119ZGHeNieYeLUcLru5br7DZMheXLULiE9vLkVRw544d82QNdwvBM1wCp
+         NrGQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU/H1N7s/k6+4akVGMNHiprhILS5hgfEkraEyt5IE1HNv5qr2m10sy/W+MYHBmY8cXotUbT/R7b2o+w@vger.kernel.org
+X-Gm-Message-State: AOJu0YwwLbJHYiYEXepFOlCNSSiw5vlD2RQEFyNsCBcVC0G/whNvHJju
+	LVLpwl3BJnQIWxfIVoDjzRrhEzHiWOWA1XQnRK/nHYlC4yBhvhtKy7oOm9PUUTf0PZT4SfBFtZM
+	64iitSKz+/8qgQYrLVFW6o9YIkJDrUKKexNlZE8IzQAz9v8AlDJ1jsakjhy5uUUv8gOfqDV4tJW
+	jg9XFzkFvqEzsx1M7Cd3ZOBTcgKNzDmP4U7elH0Q==
+X-Gm-Gg: ASbGncvyFQjcTddKEJDCpmNJ+KG1Y/DUOcbiTY4jp/MydlhfLK9eXr/lb0+HauS0hoo
+	uaEddkNFSUWzIfix39JyqTd247O0epgryl6KX9TTnKZgCkr5yhb+xxteLOHNlws3QqhsoMxAi9i
+	wdJHJJQJy5no6l9N4EsYQ/C5RwxGY=
+X-Received: by 2002:a05:651c:a0b:b0:32a:82d7:6d58 with SMTP id 38308e7fff4ca-32adfb42ff9mr16779001fa.12.1749317668565;
+        Sat, 07 Jun 2025 10:34:28 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHtC3c93aA7ULuZgbCwIO/dGKD+fgOTRSOTT0EmvA3/tCTSJg/zgm8NZrjrYEwlOXupRC69VDK+VG5Uv3CJm7U=
+X-Received: by 2002:a05:651c:a0b:b0:32a:82d7:6d58 with SMTP id
+ 38308e7fff4ca-32adfb42ff9mr16778921fa.12.1749317668128; Sat, 07 Jun 2025
+ 10:34:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250603190506.6382-1-ramonreisfontes@gmail.com>
-In-Reply-To: <20250603190506.6382-1-ramonreisfontes@gmail.com>
+References: <20250603183321.18151-1-ramonreisfontes@gmail.com>
+In-Reply-To: <20250603183321.18151-1-ramonreisfontes@gmail.com>
 From: Alexander Aring <aahringo@redhat.com>
-Date: Sat, 7 Jun 2025 13:27:40 -0400
-X-Gm-Features: AX0GCFsGLLw1WundbTAUWIBMgZmvFwkloh8KHcWuqaZA4MvUrjqbJ5laC3-Fwmo
-Message-ID: <CAK-6q+hLqQcVSqW7NOxS8hQbM1Az-De11-vGvxXT1+RNcUZx0g@mail.gmail.com>
-Subject: Re: [PATCH] Integration with the user space
+Date: Sat, 7 Jun 2025 13:34:16 -0400
+X-Gm-Features: AX0GCFuAPUGHT9bEhzv0LiVRX1BItG95qelZs8iFBI33oWtprASD4D0WSvG0igw
+Message-ID: <CAK-6q+i1BAtsYbMHMBfYK89HfiyQbXONjivt51GDA_ihhe4-oA@mail.gmail.com>
+Subject: Re: [PATCH] mac802154_hwsim: allow users to specify the number of
+ simulated radios dinamically instead of the previously hardcoded value of 2
 To: Ramon Fontes <ramonreisfontes@gmail.com>
 Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
 	linux-wpan@vger.kernel.org, alex.aring@gmail.com, miquel.raynal@bootlin.com, 
@@ -82,24 +83,68 @@ Content-Transfer-Encoding: quoted-printable
 
 Hi,
 
-On Tue, Jun 3, 2025 at 3:05=E2=80=AFPM Ramon Fontes <ramonreisfontes@gmail.=
+On Tue, Jun 3, 2025 at 2:33=E2=80=AFPM Ramon Fontes <ramonreisfontes@gmail.=
 com> wrote:
 >
-> This PR introduces support for use space tools such as wmediumd in the ma=
-c802154_hwsim kernel module, similar to the existing support for Wi-Fi simu=
-lations via mac80211_hwsim. With this addition, it becomes possible to simu=
-late interference and control transmission behavior in IEEE 802.15.4 networ=
-ks using a userspace backend.
+> * Added a new module parameter radios
+> * Modified the loop in hwsim_probe()
+> * Updated log message in hwsim_probe()
 >
 
-that is already being possible by using raw sockets, what is the
-difference here? Depending on your use case it might depend on what
-kind of mac instance "wpan_dev" is created on top of your phy. If you
-just want to have bare phy access you are looking into monitor wpan
-dev types and using AF_PACKET raw sockets. I already connected user
-space stacks (only for development) with it.
+no problem with this patch, just a note see below.
 
-If you want to have ARET/AACK support, the answer is more complicated.
+Acked-by: Alexander Aring <aahringo@redhat.com>
+
+> Signed-off-by: Ramon Fontes <ramonreisfontes@gmail.com>
+> ---
+>  drivers/net/ieee802154/mac802154_hwsim.c | 11 +++++++++--
+>  1 file changed, 9 insertions(+), 2 deletions(-)
+>
+> diff --git a/drivers/net/ieee802154/mac802154_hwsim.c b/drivers/net/ieee8=
+02154/mac802154_hwsim.c
+> index 2f7520454..dadae6247 100644
+> --- a/drivers/net/ieee802154/mac802154_hwsim.c
+> +++ b/drivers/net/ieee802154/mac802154_hwsim.c
+> @@ -27,6 +27,10 @@
+>  MODULE_DESCRIPTION("Software simulator of IEEE 802.15.4 radio(s) for mac=
+802154");
+>  MODULE_LICENSE("GPL");
+>
+> +static int radios =3D 2;
+> +module_param(radios, int, 0444);
+> +MODULE_PARM_DESC(radios, "Number of simulated radios");
+> +
+>  static LIST_HEAD(hwsim_phys);
+>  static DEFINE_MUTEX(hwsim_phys_lock);
+>
+> @@ -1018,13 +1022,13 @@ static int hwsim_probe(struct platform_device *pd=
+ev)
+>         struct hwsim_phy *phy, *tmp;
+>         int err, i;
+>
+> -       for (i =3D 0; i < 2; i++) {
+> +       for (i =3D 0; i < radios; i++) {
+>                 err =3D hwsim_add_one(NULL, &pdev->dev, true);
+>                 if (err < 0)
+>                         goto err_slave;
+>         }
+>
+> -       dev_info(&pdev->dev, "Added 2 mac802154 hwsim hardware radios\n")=
+;
+> +       dev_info(&pdev->dev, "Added %d mac802154 hwsim hardware radios\n"=
+, radios);
+>         return 0;
+>
+>  err_slave:
+> @@ -1057,6 +1061,9 @@ static __init int hwsim_init_module(void)
+>  {
+>         int rc;
+>
+> +       if (radios < 0)
+> +               return -EINVAL;
+> +
+
+handle as unsigned then this check would not be necessary?
 
 - Alex
 
