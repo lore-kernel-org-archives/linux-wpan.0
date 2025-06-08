@@ -1,58 +1,65 @@
-Received: from mail-vs1-f45.google.com (mail-vs1-f45.google.com [209.85.217.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B34531AC88B;
-	Sat,  7 Jun 2025 21:42:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68F9970830
+	for <linux-wpan@vger.kernel.org>; Sun,  8 Jun 2025 15:57:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749332543; cv=none; b=Qig7cpMZ45KH3+fM+EFuatuwT21WQbgXBQQnzgXl3RT9C4XGjF7fkMQZzfwLN/r2iwceZPQJccCsBGegI9CYM5LgkUMiDPkOnuiQKgebsiRAZkhlfhBhxUC3tZav8cJZAthb1Z9wsbf8mOELURMXDwRwRJ+x0eo0ZG3OS/70orw=
+	t=1749398247; cv=none; b=mt0uhYYzF3vd2TepAmUl8nwuwc4lC6tqHGwLNgmgr4Am8z7OhvIxdyrd2FV/CKufZHSmZvQLaKVpyTbFd+VChLumsdv9SmAgRj/0rRck3YumVlp4PTx0WJcvYm923KUVQArv56jcyxUbBljcydD7zW74hGKFp+ZvdpWjqK7Y9sg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749332543; c=relaxed/simple;
-	bh=pauCeS0EJZD/FTktO7RvGI9OVXfyv3h41pyC2H2w2cI=;
+	s=arc-20240116; t=1749398247; c=relaxed/simple;
+	bh=ohdeAPDZDhDZZcG1b54Sh+o8d02OBfJCZfALWp9FB6Y=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UiVcemBAO7aGCWZn1J4YljjX+pbOfrt63J5O6FKQX+wM936lpM/fPWBPgwc32KCz1BiQVxM/z6boOX2xm06D3Enbyy50Z62Jn2yPdQ5m4S/6nSpiyoM4wTujCPFLD1paNdcHbY2Rdo7Lf6zlf2y6hG6ZGD7VBvY6N8iHSaKBLps=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kyRxrc5r; arc=none smtp.client-ip=209.85.217.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 To:Cc:Content-Type; b=JeddLrO4SL7gxWVYVsNTm1B1vgza1BAxqj0AhLrqfsVzfQr/XzhQn2IlBXrdgEJCI9I17G/fz/blVpvJUKFA78TGc4pByaeN5QVdXWyiZSD2tpZKVB1t3eIpbUDKe8UzM+qWKkY4ndlufA16LvimPxZ1aZ9djhe6iSKEYntktPE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IGvJFoK9; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kyRxrc5r"
-Received: by mail-vs1-f45.google.com with SMTP id ada2fe7eead31-4e592443229so1017459137.1;
-        Sat, 07 Jun 2025 14:42:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1749332540; x=1749937340; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eUEFTcUbSkQLJ43hZPLV+2GZum/ztVJHLmBcrHIjKsc=;
-        b=kyRxrc5rXJcG9CXbxSEEBA2RW5td+IApQKNdus0hXtKUV/pPrlwjyxGz/QXIhU/kuC
-         hDJGw5QRkDrrPOUtjt2Ia2rLM1YLrQHN3jP/LkplfphtUTrYD3zYvetpL2dhZwYX6GdN
-         WPb7yr7cJ2spXgZfS5NnY/8wxD3sYwwSqgf86ua4mopDkt/5CwlrXuvZ1vBePDf2c0C+
-         vn03hePQeHK8U3srgcnq4AwGJkxCAnaKL1YovHIOWtKrFANVkkqGYQeOXjI8y8m1Rnug
-         RXO+qGWk9hal67HxDmfbGLkQZEmKERdgKW7w+Lg5Pjnhe7cjuzhPmAYzUpyBXO7E3xIY
-         WWFQ==
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IGvJFoK9"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1749398244;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ohdeAPDZDhDZZcG1b54Sh+o8d02OBfJCZfALWp9FB6Y=;
+	b=IGvJFoK9buaWxQeSNAkqyE3rUtORYEnTgX8ivKLive29ba22Xshx0tSTvGslbjssBmA1LG
+	B5e5jikfzRUaLfqYvVb0uFiq73Re/L3PPj0wxnijGKbkEzFISzvvDSTBCEmLi+oRhQi1eH
+	AcaY9hgQ7w5ExIi7Nbwnvy1oLNnpwuw=
+Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
+ [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-519-v9KKkaXBMXq_8o37nuP3sw-1; Sun, 08 Jun 2025 11:57:23 -0400
+X-MC-Unique: v9KKkaXBMXq_8o37nuP3sw-1
+X-Mimecast-MFC-AGG-ID: v9KKkaXBMXq_8o37nuP3sw_1749398241
+Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-32a5ed03b92so19654561fa.3
+        for <linux-wpan@vger.kernel.org>; Sun, 08 Jun 2025 08:57:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749332540; x=1749937340;
+        d=1e100.net; s=20230601; t=1749398241; x=1750003041;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=eUEFTcUbSkQLJ43hZPLV+2GZum/ztVJHLmBcrHIjKsc=;
-        b=Aj+dsITrPRdFv5oE0jAXaOTx5E6rPAdannimgb+3ymwJAfVvAVfQT81xiRspbo7GNK
-         zAdezwvK38K6yhvxg/EfbNBFrjVKnsf53roUKnqTws9CI0AHy+5dZAgQP584H47a2ZKg
-         01OKb/4FKQMUtKhTGGrCvOTEIrxYUQer6Tphk/bHPooHthlsQ8Hc9dSSa/LyC4/e0fGz
-         I0FFZLfq+Hsm+4Uq1D4tAgC2hbIf2CLev1WxqYb+mc/M0XE4nWBsURt2zzK7flIV+Lfn
-         OoFJr1cZbnjgEAWHvQ0/honm4CIQw1XIIfCVul15Gddw9yCAizr01IIorhBn98JdT0x2
-         evYQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV81n15bmi7qx6uowgkJRHkcFrq5m5Y2u91E4dUbLRp/Yc3pkdP6loyBiU7sHZ7CJ2x4miiTEja0LTA@vger.kernel.org, AJvYcCX+zZGK4RUl2fq4PS+BMukLsXnGtcsaIDooqqshu2zZ2eD2es1cKwU3k3XoTNTMgnfnq8czGA6h@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy/eZ7lnzJVIcfxMuMmZYTJmieddlv9+ukgiUVNa31ptPR3AeZi
-	tztM/DKahk2zvzbsiSwbZPBKieLqC9eOCaU4Bu/kAcQznSBQ2kvmTkx79yCnT5zwcg3XPo4SkbU
-	IS5yp8sh9xXGvE4qcInVrcAUs90RCgik=
-X-Gm-Gg: ASbGncvhZRJGrxYZFxDm81fUa6uphriJLHZGZfrMDt+GvA9GI5N2pkv21A4i53AtUrz
-	/Nna9RAS7RV/i0lBMGLVbDKMKr8tQCPx+/7LsqbsVYdwn++GZqSGDKq91r0rzYTf58a/fqJW/6F
-	bt0U0T5IYS1llw0se7cVoeqHxbfU4ttg9vUlgRjcxwwpk=
-X-Google-Smtp-Source: AGHT+IGyP2aHnlSuagxZ5yttUXL8obOQtZvYrGkFDANjroqpvNljK8OXHZR7vtLSVLO5eAKOCUojDwR4d2nFrx3UTAg=
-X-Received: by 2002:a05:6102:c12:b0:4b1:1eb5:8ee3 with SMTP id
- ada2fe7eead31-4e772ac55fbmr6961789137.22.1749332540514; Sat, 07 Jun 2025
- 14:42:20 -0700 (PDT)
+        bh=ohdeAPDZDhDZZcG1b54Sh+o8d02OBfJCZfALWp9FB6Y=;
+        b=cVZh/MHH3iCrQuZawOwo3UYnJVf/XQAJ5zYlRI1U5iiK67wE3CKMHPrYhReBkHpk0Y
+         BfEJRq2AAQMZ1AL81tlkiV413LXLsRrLAdsR3MxMPd0TcdrGXNtMdxt0dK+8PNoziVyy
+         pt23wg8RnFid5kLTKHi/m/ArT6iFt6zygHzhBX1hWgI+roZvoH5aVeWOfHNWmKluPwum
+         +hQz2/OfUB00hZsT3jnI8OUJ75K+Ly51RZglMFlOrvO9sWhTs191BEZUg9sdddW+5iTE
+         sYVxULlygb6waAo7QCrdVv8Tf+3gEuZozQQN12vsS4ChDBKUAG4xP+4zsvQ3jGK4U+nt
+         mRew==
+X-Forwarded-Encrypted: i=1; AJvYcCWVwKlwX4a8oWqzj4obJuZWM1HiCkVPhc4T/r0R/O+GJKW9IpM44laqJalIelaOluVRz45/IvDdCNa3@vger.kernel.org
+X-Gm-Message-State: AOJu0YxOK6eJ4KE00+6UictBKu/Dzcpy7fbeONAGUwnq/N39nLj+N1F7
+	SGxHqA1OWfz07wuFK4TrjDpNUF+rATHqE2C3DhLPfvPfCkxaV6JvOfK7LVh/YCCNT2Pd9Mz5Flk
+	XjoGSMUX1WZGCurdLE4VkYFN54M9Je7LkDt8eftCuV1StmFLZ/oAO+wJMHjkeyy46HGvRj/9T1P
+	q6jqKEZYuxhTb4eSYnDtJCMhm6byt0rCLuRAcYNA==
+X-Gm-Gg: ASbGncuD0KWU827JNXF5XZOaGTnfQDgglgktMSLqd50+sLpWCHHzOlm/mPLHwfylb4p
+	xxCpXBPwFeCcqWNTnB2QvlOBVNJEKvowIoR1Su0nwD5Wz7vzpFqQz9tVYtkm3IHjbGtWwZRczYr
+	UfN4DWsCJjm5XFiXKuZBf5Bp6cQKV5RqozjPW4
+X-Received: by 2002:a05:651c:2125:b0:32a:88db:f257 with SMTP id 38308e7fff4ca-32adfc0cc63mr22376171fa.31.1749398241435;
+        Sun, 08 Jun 2025 08:57:21 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGQ92pDCTQGVUd+R73ZAPBWMpMSpFvxZRdi0lJDDTAwdZD7T6D5c+yJ74WYS4BOrdyFNAyTdhpXWCX1bHQi7kE=
+X-Received: by 2002:a05:651c:2125:b0:32a:88db:f257 with SMTP id
+ 38308e7fff4ca-32adfc0cc63mr22376121fa.31.1749398241033; Sun, 08 Jun 2025
+ 08:57:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
@@ -61,47 +68,36 @@ List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <20250603183321.18151-1-ramonreisfontes@gmail.com>
  <CAK-6q+i1BAtsYbMHMBfYK89HfiyQbXONjivt51GDA_ihhe4-oA@mail.gmail.com>
- <CAK8U23YF53F0-zMbq5mk2kY4nkS1L0NH9j-UJrdaS5VUZ5JZdA@mail.gmail.com> <54980160-6e46-4ac4-b87f-41b7dccba1d3@lunn.ch>
-In-Reply-To: <54980160-6e46-4ac4-b87f-41b7dccba1d3@lunn.ch>
-From: Ramon Fontes <ramonreisfontes@gmail.com>
-Date: Sat, 7 Jun 2025 18:42:09 -0300
-X-Gm-Features: AX0GCFvsXSWU3mlKCe2to0Ib9H8Tz-A6j5lcYINHQaAgHERqjFxX3aSXi2LiS6A
-Message-ID: <CAK8U23aRrvC4wC6WvcBRPA4YuyC1MPvOj8FO=cWfi43_Fdh4Zw@mail.gmail.com>
+ <CAK8U23YF53F0-zMbq5mk2kY4nkS1L0NH9j-UJrdaS5VUZ5JZdA@mail.gmail.com>
+ <54980160-6e46-4ac4-b87f-41b7dccba1d3@lunn.ch> <CAK8U23aRrvC4wC6WvcBRPA4YuyC1MPvOj8FO=cWfi43_Fdh4Zw@mail.gmail.com>
+In-Reply-To: <CAK8U23aRrvC4wC6WvcBRPA4YuyC1MPvOj8FO=cWfi43_Fdh4Zw@mail.gmail.com>
+From: Alexander Aring <aahringo@redhat.com>
+Date: Sun, 8 Jun 2025 11:57:09 -0400
+X-Gm-Features: AX0GCFsqG832Kq3kP_9JJ4OsbpseJv4f7JiSDEeHcFGaDfX1uUo8TfC0qw-LJHM
+Message-ID: <CAK-6q+hO7byb-MRSd1U64-CMLrjrDdHfV5WLjK4dscCgxFSMOA@mail.gmail.com>
 Subject: Re: [PATCH] mac802154_hwsim: allow users to specify the number of
  simulated radios dinamically instead of the previously hardcoded value of 2
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Alexander Aring <aahringo@redhat.com>, davem@davemloft.net, kuba@kernel.org, 
-	pabeni@redhat.com, linux-wpan@vger.kernel.org, alex.aring@gmail.com, 
-	miquel.raynal@bootlin.com, netdev@vger.kernel.org
+To: Ramon Fontes <ramonreisfontes@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	linux-wpan@vger.kernel.org, alex.aring@gmail.com, miquel.raynal@bootlin.com, 
+	netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Ok! Just a last question:
+Hi,
 
-Shouldn't we define a maximum number of supported radios when using
-unsigned? A value like -1 would wrap around and result in thousands of
-radios, right?
-That said, wouldn't it be simpler and safer to just use int instead?
+On Sat, Jun 7, 2025 at 5:42=E2=80=AFPM Ramon Fontes <ramonreisfontes@gmail.=
+com> wrote:
+>
+> Ok! Just a last question:
+>
+> Shouldn't we define a maximum number of supported radios when using
+> unsigned? A value like -1 would wrap around and result in thousands of
+> radios, right?
+> That said, wouldn't it be simpler and safer to just use int instead?
 
+there is no limitation to add some during runtime. It requires root
+permissions and you need to know what you are doing when you are root.
 
-Em s=C3=A1b., 7 de jun. de 2025 =C3=A0s 16:22, Andrew Lunn <andrew@lunn.ch>=
- escreveu:
->
-> On Sat, Jun 07, 2025 at 02:54:57PM -0300, Ramon Fontes wrote:
-> > > handle as unsigned then this check would not be necessary?
-> >
-> > Yeah, it does make sense. However, I have a bit of an embarrassing
-> > question. How do I submit an updated patch in this same thread?
->
-> You don't. You should submit a new patchset, as a new thread.
->
-> The CI tooling works on one patchset per thread, and if you deviate
-> from that, the CI won't test it. And if it is not tested, it is pretty
-> much an automatic reject.
->
-> https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
->
-> It is also the merge windows right now, so anything you post will get
-> rejected anyway, so please post as RFC.
->
->         Andrew
+- Alex
+
