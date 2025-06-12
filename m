@@ -1,125 +1,123 @@
-Received: from mail-il1-f206.google.com (mail-il1-f206.google.com [209.85.166.206])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 456DB280013
-	for <linux-wpan@vger.kernel.org>; Wed, 11 Jun 2025 12:36:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.206
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEF2B18C91F
+	for <linux-wpan@vger.kernel.org>; Thu, 12 Jun 2025 12:20:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1749645398; cv=none; b=Mp8BnNHpq66M9tqaIFSL8K0RFlGCzhe9VLaT43vjyJPfe7m7qlI0UVqaFGOogNdQFMst3eV20Ra9i56GLHfWw5z67tcJDX6am5CMBf6LAGbSJ4F6XlEIkIhCvVZHbjFwS7d0MZfIaAD9jFJAZmRH9H5+uxMUn3FLir3djWhuQlM=
+	t=1749730842; cv=none; b=kAKSbPkcGkQrRBrrCKgclHcU+Z8oQDy1bgKg/qzyZ08/FSZVdMvuu1oJQu00uP7L2l+lVnbU+0srB0pRGgowLGIM0LoGCKcaCzoAu0BB5qE1G/lzecAvwL6GkeMV5HRkqqBNLVgJHytLHR9rsS8N7z9cAtKv2bAYdE0JyCpjKEY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1749645398; c=relaxed/simple;
-	bh=uCvKZDotiP9ZjEzoiagEp86OqFBjkyOM3QpgLpJB/5M=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=RYKwp+eviYDION/OQufjaLudToMzucBAPRCLlhbyq5lbz7uQxze1QRPHGW0RK78hO+gx+g958xT9VdTesvItnSQdzorb9XH53mtlRju146YEtDyk6+p/lemLM+pH1OOA7QyK/eD8+MofxxD+331wNoYor3UFBIFR7bA9GF1pEDE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.206
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f206.google.com with SMTP id e9e14a558f8ab-3ddb4a92e80so85553935ab.3
-        for <linux-wpan@vger.kernel.org>; Wed, 11 Jun 2025 05:36:37 -0700 (PDT)
+	s=arc-20240116; t=1749730842; c=relaxed/simple;
+	bh=5bRrnNEVmzlKHFuvGJz829HCaC9P8gvdVF/SVBGl75A=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=bB+9smRP69pbeXIOxxFEUD+kLdcsIYqLG/aa/qWGSKdtAOr2Pf8xoirCyzG3r+v4h57eIebyjp4SaK1jvK3/6oeY+tX/BOT7bPSagiKjyAHpKiVkVjj81ssTF91/7C9M+TUWZ9SLuH+dBA8GgVbAkpUbTdu0qdzWXAW+eZ+v4IQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CPVFUpT9; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CPVFUpT9"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1749730839;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=wPfKLRrYHfLESVYSuhn1tsLnMTuW/HBaOWGxzDd/vYM=;
+	b=CPVFUpT9mvqPlZ6feu4S4ReUXG1tng/nR3bv5AaUFNL/voUI71QK7qJTMWFnZSn/Mbn9KY
+	Lmoilbh0NMgrKCObK1vW+k3T38g/acF2GciiI+olOEFRqUKNStssp85lm1L5o6KF2KCzf3
+	vS5do7WPgFtS45THnbutJMUccEb8K68=
+Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com
+ [209.85.208.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-116-n7nqUstuO3qeDNTrg4H_LQ-1; Thu, 12 Jun 2025 08:20:38 -0400
+X-MC-Unique: n7nqUstuO3qeDNTrg4H_LQ-1
+X-Mimecast-MFC-AGG-ID: n7nqUstuO3qeDNTrg4H_LQ_1749730837
+Received: by mail-lj1-f199.google.com with SMTP id 38308e7fff4ca-32ac7176fc6so4350701fa.2
+        for <linux-wpan@vger.kernel.org>; Thu, 12 Jun 2025 05:20:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1749645396; x=1750250196;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=vng/YzV4Bzb6RRDIX+KXOBf9o2CxIKJMdOrtad0eo1E=;
-        b=RJNENynxyFvxaqjjf8v/e7ydZAc9sIEBoX613aXNontEIB7CIKUzOktYoce5mYeWPv
-         HXnZTeJn5TWXgiRoRXgKSmtCGUJ3hpu8EIb56ySQ4aeCnevYTJCSlWM+YzlBXSXlXYiv
-         lNZYvT29Km06rkXQB05daw5Lz+YI6CWr+KvYWHaJMcRe2xIvJUIR6BKDyohUfzxtx8Cg
-         hcWX34cRuMrLU9J4GXbrkimtHRbOa/FDAMXX+rFRaH5hAAHWkhZifN6OLRaqhYMgmcim
-         XUiSEYnpiOkci6mSJH1wEdjsjhEQJkr/+oxwjsajyl014MZY18MrNdm3u5LkaO9zjE8w
-         4x3Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUQRBIN67/ZRrqz0RSdp52L8zGp6xTl9V/oDDOeJT/Tzur7qcPSYgw7o5/Ovhsg1R5Bu/RIzQp23pe3@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzaa/E3lR3MHO4E46MB3y77tMuIr+nAG1Qky4LUSs93VjmVglM7
-	s2zvw9F1VLQwrM61qoIGPn6xJYiOGEydQjilx7aVStd4RQ0zABgoREY5JtTtnHHWckVQLslPN6x
-	vBYT2UE6J6AtPnLqQp1/aIESr8+VadrlmB/Bzw7Z8cJ/COeH2gyYTEHHJCBQ=
-X-Google-Smtp-Source: AGHT+IEbaV9OobI4y3/HlQ3UpH4KVgxxud1pe3uzFkgBOj6OhGhqJCvoimSBn3WgN3hJwve+Y8P3FGFf+FRQvXicv53Nz12B7jts
+        d=1e100.net; s=20230601; t=1749730837; x=1750335637;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=wPfKLRrYHfLESVYSuhn1tsLnMTuW/HBaOWGxzDd/vYM=;
+        b=tvlVakugch1brO5JcUdCzGI3g668n18puDLzgrMybTSy+DDW/AyeLHc3Qy3+7zlshK
+         2OuN3nkmmDujehC4wL9IODQd5Do5C9qQZ3Uymqkt1M2nIW2OlYmUBAl+7mbxQ3Jvo0SQ
+         d2mkM5Edp2Y/svAjbnXhU0TlkQXOQEnYGLwtUUfkl+Z+9Wz8XRsCnxtrk9b1+Zy9ICvM
+         hHO0Juso8mqMd/LyKALCzx5aIDj6BMMZ0Yt1ef61rsBsk66htkNCfzgxRAWTV786/DDE
+         vH/qd0q0wlSLSYMV4yadfrRaWRRmDDUxB+HwcZCyEI7AjjGCZi1FRPQgDtb0381eduH+
+         bA/A==
+X-Forwarded-Encrypted: i=1; AJvYcCUbX1ty9315XPXjT1kdq44NACceDJXdz7qA8RjIwshIS++en1PMKF52w4VxQL/bYIHUSE0fYWrAcZ7w@vger.kernel.org
+X-Gm-Message-State: AOJu0YyrhqSHTqA7LdzoiVDJ96UQZre4VZH7qJwgY+/c7aBiGdX7epa7
+	2V7j9NaYs7+10iEaADQTT6X7r+0U0zkQXEpAvnqip0K83Ax4vAXCHmjXU8K+rAd8kTvHrS9qsQ0
+	r2/xmEAjW00uTNJvyiDFqo4298UFEqnoA6AUHSz4E772MmtX+OvBinBUQWO1wKXrxAakp7suJLm
+	TL+u5C6KiZptY6wGAWuuSiVLYQ0HKcda8jTEoeDQ==
+X-Gm-Gg: ASbGnctukWMLOkJ/IFFyPy8bC55ULEjZc+EPFEVV50/a1CYCD0I6LzqYogOBvmd8JYr
+	5wIyZHkVRZZInKRr7jv+pqVA1zzq/djbNGVBjj5/0GP/5yuyrJQbbMAkxO80xv6UHbNxPCnV1fu
+	KkD1nkoT6Uro6pa7zGvhwrpRJa50nyUTvxJvI7
+X-Received: by 2002:a2e:bc06:0:b0:32a:8764:ecf1 with SMTP id 38308e7fff4ca-32b305a2930mr8945091fa.4.1749730836609;
+        Thu, 12 Jun 2025 05:20:36 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG/BRLhB+dI1MyJZUrONMgznWLw3sFvTM95ZQN6Otaa7RRDpDwmHoTs3n884g8T5EAi+/5hXHBR3+PFLpM5qLc=
+X-Received: by 2002:a2e:bc06:0:b0:32a:8764:ecf1 with SMTP id
+ 38308e7fff4ca-32b305a2930mr8945001fa.4.1749730836240; Thu, 12 Jun 2025
+ 05:20:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1fe5:b0:3dd:b762:ed1b with SMTP id
- e9e14a558f8ab-3ddf42f060fmr33724955ab.16.1749645396357; Wed, 11 Jun 2025
- 05:36:36 -0700 (PDT)
-Date: Wed, 11 Jun 2025 05:36:36 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68497854.050a0220.33aa0e.036c.GAE@google.com>
-Subject: [syzbot] [wpan?] KMSAN: uninit-value in ieee802154_max_payload
-From: syzbot <syzbot+fe68c78fbbd3c0ad70ee@syzkaller.appspotmail.com>
-To: alex.aring@gmail.com, davem@davemloft.net, edumazet@google.com, 
-	horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	linux-wpan@vger.kernel.org, miquel.raynal@bootlin.com, netdev@vger.kernel.org, 
-	pabeni@redhat.com, stefan@datenfreihafen.org, syzkaller-bugs@googlegroups.com
+References: <20250610105338.8166-1-ramonreisfontes@gmail.com>
+In-Reply-To: <20250610105338.8166-1-ramonreisfontes@gmail.com>
+From: Alexander Aring <aahringo@redhat.com>
+Date: Thu, 12 Jun 2025 08:20:24 -0400
+X-Gm-Features: AX0GCFt_G8IDREkiLGFZvfp8ckIRZQKTzQ1w2HU0-HtCyraui5l54w_Y5s2s7H4
+Message-ID: <CAK-6q+jDa4=DFndeQVzpaWemDPxf5Pr6Mrimm8ruDSsTriOmSw@mail.gmail.com>
+Subject: Re: [PATCH] mac802154_hwsim: allow users to specify the number of
+ simulated radios dynamically instead of the previously hardcoded value of 2
+To: Ramon Fontes <ramonreisfontes@gmail.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	linux-wpan@vger.kernel.org, alex.aring@gmail.com, miquel.raynal@bootlin.com, 
+	netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+Hi,
 
-syzbot found the following issue on:
+On Tue, Jun 10, 2025 at 6:54=E2=80=AFAM Ramon Fontes <ramonreisfontes@gmail=
+.com> wrote:
+>
+> Add a module parameter radios to allow users to configure the number
+> of virtual radios created by mac802154_hwsim at module load time.
+> This replaces the previously hardcoded value of 2.
+>
+> * Added a new module parameter radios
+> * Modified the loop in hwsim_probe()
+> * Updated log message in hwsim_probe()
+>
+> Signed-off-by: Ramon Fontes <ramonreisfontes@gmail.com>
+> ---
+>  drivers/net/ieee802154/mac802154_hwsim.c | 11 ++++++++---
+>  1 file changed, 8 insertions(+), 3 deletions(-)
+>
+> diff --git a/drivers/net/ieee802154/mac802154_hwsim.c b/drivers/net/ieee8=
+02154/mac802154_hwsim.c
+> index 1cab20b5a..bf6554669 100644
+> --- a/drivers/net/ieee802154/mac802154_hwsim.c
+> +++ b/drivers/net/ieee802154/mac802154_hwsim.c
+> @@ -27,6 +27,10 @@
+>  MODULE_DESCRIPTION("Software simulator of IEEE 802.15.4 radio(s) for mac=
+802154");
+>  MODULE_LICENSE("GPL");
+>
+> +static unsigned int radios =3D 2;
+> +module_param(radios, int, 0444);
 
-HEAD commit:    5b032cac6225 Merge tag 'ubifs-for-linus-6.16-rc1' of git:/..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=14d0820c580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=529cf323140e1748
-dashboard link: https://syzkaller.appspot.com/bug?extid=fe68c78fbbd3c0ad70ee
-compiler:       Debian clang version 20.1.6 (++20250514063057+1e4d39e07757-1~exp1~20250514183223.118), Debian LLD 20.1.6
+this needs to be uint, and I think you had that in the last versions
+as I said in the last version.
 
-Unfortunately, I don't have any reproducer for this issue yet.
+Sorry but letting that through there will be the next bot detecting
+this and somebody else fixing it and I kind of was aware of it.
+(Now I have some half of an idea to maybe get rid of that parameter).
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/2e197ad38b02/disk-5b032cac.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/f05af0a6e9f6/vmlinux-5b032cac.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/d7c0456f7931/bzImage-5b032cac.xz
+- Alex
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+fe68c78fbbd3c0ad70ee@syzkaller.appspotmail.com
-
-=====================================================
-BUG: KMSAN: uninit-value in ieee802154_max_payload+0x399/0x3c0 net/ieee802154/header_ops.c:372
- ieee802154_max_payload+0x399/0x3c0 net/ieee802154/header_ops.c:372
- ieee802154_header_create+0x99b/0xb90 net/mac802154/iface.c:403
- wpan_dev_hard_header include/net/cfg802154.h:525 [inline]
- dgram_sendmsg+0xb3d/0x16d0 net/ieee802154/socket.c:677
- ieee802154_sock_sendmsg+0x92/0xd0 net/ieee802154/socket.c:96
- sock_sendmsg_nosec net/socket.c:712 [inline]
- __sock_sendmsg+0x330/0x3d0 net/socket.c:727
- ____sys_sendmsg+0x7e0/0xd80 net/socket.c:2566
- ___sys_sendmsg+0x271/0x3b0 net/socket.c:2620
- __sys_sendmsg net/socket.c:2652 [inline]
- __do_sys_sendmsg net/socket.c:2657 [inline]
- __se_sys_sendmsg net/socket.c:2655 [inline]
- __x64_sys_sendmsg+0x211/0x3e0 net/socket.c:2655
- x64_sys_call+0x32fb/0x3db0 arch/x86/include/generated/asm/syscalls_64.h:47
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xd9/0x210 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Local variable hdr created at:
- ieee802154_header_create+0x4e/0xb90 net/mac802154/iface.c:360
- wpan_dev_hard_header include/net/cfg802154.h:525 [inline]
- dgram_sendmsg+0xb3d/0x16d0 net/ieee802154/socket.c:677
-
-CPU: 1 UID: 0 PID: 17215 Comm: syz.9.2647 Not tainted 6.15.0-syzkaller-13659-g5b032cac6225 #0 PREEMPT(undef) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/07/2025
-=====================================================
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
