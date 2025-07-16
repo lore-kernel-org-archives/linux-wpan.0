@@ -1,78 +1,86 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11CB739ACC;
-	Fri, 11 Jul 2025 00:30:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C50A01A4E70
+	for <linux-wpan@vger.kernel.org>; Wed, 16 Jul 2025 13:32:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.69
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752193845; cv=none; b=sKG2A7nqw/9ytkTM4T2MtxINCs0MQZp2lHk+dOVOsaxDTQ+eipW8cHrzOHHrZh7LrxldTMYzDyhXy3JCrqrDcyRInwX/5Fr21Wj5hVfriaMgWXcvUSmBgEvUu09oWROpuVwD6rFCG+fw6LzDQyabb995+Z40tG7q+KcO8icjp/4=
+	t=1752672756; cv=none; b=bOYBQv9nbF2qRoHiNEWwPhbnu0VmoMC44Flz+mkKhLRB3LePFHiqQ+5of2yHX5UfcNPxGReRf3rQTCXcbMWhiphXUGT+THrP1aKd73bvo9av0LbUXK5xeHsF55LWpmI0eqSpW89uwPZqVVOFlo/WXu1J4MIQ/SW5bo1Hdjpj3UE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752193845; c=relaxed/simple;
-	bh=4TcUQRKoGXD7lDinYTHq6z5jiftadbgG7wdz5mhdvsQ=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=llzLjpAjeihNIWDkZXVdr/tA0EC5QHikASzTFXeVnb//3YxXjho5HNwQU1TNZCt+xMkMtLzHfrBju0yrW0kG28HLSZcb6PAz5JWMpuq/uqpkqGwU7PB78xFxtUY4Z1a6MgdqLo+CpXfBnzBloEWw5tdCeixiISpjpHdmzcfXG7c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Lsj1gscz; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Lsj1gscz"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C1D8C4CEE3;
-	Fri, 11 Jul 2025 00:30:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752193844;
-	bh=4TcUQRKoGXD7lDinYTHq6z5jiftadbgG7wdz5mhdvsQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Lsj1gsczFIMUMLfnOrCeoOjNxR0+SFVyGpnX2etxaDdyJNppZIcdb5jz0JKcXJMzC
-	 Gp9swqJ2Ajsd7A6ZhaN2KRNcNsvABZCsUo8BfdJrj22sXG0rs5PRZ2BH4fQ9a/bCzh
-	 lrsrJutyU+uEXczsFdblK41OLhK6ax+bcdowAvtTRETlMw6IAt7ebhLjqhJJdQF6dD
-	 o0ZxrNAW31UROQe23Hg5BW35iC7Eg4xzlJ5GwZlSbpK2qAPotN9PMZKrNh/jPY4ZJJ
-	 4NokIKWxHSQ/o5Cf0u9mLONB4ixEHqVO1OaMF/NqdEiqnPa0wHuoDy3duCZT6ps2W6
-	 ku8DoxZZxfh6w==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EACFE383B266;
-	Fri, 11 Jul 2025 00:31:07 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1752672756; c=relaxed/simple;
+	bh=0LjF+WEpfWxbMuI94iSle2uStVAP8+DyETXP7hJ2nWE=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=JGN+3bKvzPkD5qQfNhXuYK1Jio0wIr+zZqMbJfhNQ/2e/kZSF2nu+WDD0OTTLwkaLiQWoYRYlamgcWW1r3YR4q2pnz1cj26AKP1JV/wXyf2akPSlCES+GivuML1dgHbENh7AJHuhav8DWKlHACber6G/PwsHi+N3xGF9WXZjjAA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-86d01ff56ebso1123770939f.1
+        for <linux-wpan@vger.kernel.org>; Wed, 16 Jul 2025 06:32:34 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752672754; x=1753277554;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=8FKo4QvDVoH70iqyD4IXeGiSxCF2PDv2mvb9DgjsTuQ=;
+        b=r9YNLPZ22IZEnQZ0MPcA7EBiaDvdrlySeac+D4evesmCW49uJnFuwkYXNTXzyEJHI2
+         yXXdu0+MYDCy3OgxN+hEi3ubLKaLAMIiy/wVbxCFUtl7nfkjG0btIud2jJ/LwyabHOXe
+         2Nij1JA3AlYHeYcVTrHsqTA6hPCmWsSyhHD56zUSvCP3Nwxgvs8p8Qiose1MjtZ2GbNB
+         rBGbqSWBbppOo/GfZ2u/8rrY8zYW9anrcEiHBUlFRZIjnjUp6lNiRXMtM1DJvX/blLyE
+         +eqP849GDUQjwp7awKM0YggDVUb6ExXWcu2RbnMRqnQCb0F+4qNaXrBWcpEeGBeu06cA
+         9ldw==
+X-Forwarded-Encrypted: i=1; AJvYcCXG2lR7kGywJo90thUGStg1rQ3wy4TroTacGqQ34t7JcegBlpYv16uG5PjJflJOfYEEFcclbhH9z9vZ@vger.kernel.org
+X-Gm-Message-State: AOJu0YwD6bQj2Z7b38hM7XyO2xvNCqJ5SFdGfMuBy/qb8xKBdzIbhBv/
+	WKWNpbB716mil5DTLknNJ1/+PnfJNu2SFJvejDPvtJQ7XraLIEl6tMdEyJ4B4z0aGRnHLdf99ck
+	S234Ad8PC/m1DLzNM5t4SWtWUFjeAzmwo1r9EtIl1vDO5hCO1+HnOAYeaXCA=
+X-Google-Smtp-Source: AGHT+IGF/kwqN7mja3XdkF3JMxQnYsfIzdVe8SJG2JlSEMJrev647LnGXH+ZgnnCfb6c21qzpSjvMFXxHCtaE/I2Xx80WB5mV8aY
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v3] net: replace ND_PRINTK with dynamic debug
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175219386649.1715084.6809706721646089401.git-patchwork-notify@kernel.org>
-Date: Fri, 11 Jul 2025 00:31:06 +0000
-References: <20250708033342.1627636-1-wangliang74@huawei.com>
-In-Reply-To: <20250708033342.1627636-1-wangliang74@huawei.com>
-To: Wang Liang <wangliang74@huawei.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, alex.aring@gmail.com,
- dsahern@kernel.org, yuehaibing@huawei.com, zhangchangzhong@huawei.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org
+X-Received: by 2002:a05:6602:6305:b0:879:72d5:96e7 with SMTP id
+ ca18e2360f4ac-879c28da0b2mr283284239f.8.1752672753981; Wed, 16 Jul 2025
+ 06:32:33 -0700 (PDT)
+Date: Wed, 16 Jul 2025 06:32:33 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6877a9f1.a70a0220.693ce.002a.GAE@google.com>
+Subject: [syzbot] Monthly wpan report (Jul 2025)
+From: syzbot <syzbot+list57b57add8873522eb296@syzkaller.appspotmail.com>
+To: alex.aring@gmail.com, linux-kernel@vger.kernel.org, 
+	linux-wpan@vger.kernel.org, miquel.raynal@bootlin.com, netdev@vger.kernel.org, 
+	stefan@datenfreihafen.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hello:
+Hello wpan maintainers/developers,
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+This is a 31-day syzbot report for the wpan subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/wpan
 
-On Tue, 8 Jul 2025 11:33:42 +0800 you wrote:
-> ND_PRINTK with val > 1 only works when the ND_DEBUG was set in compilation
-> phase. Replace it with dynamic debug. Convert ND_PRINTK with val <= 1 to
-> net_{err,warn}_ratelimited, and convert the rest to net_dbg_ratelimited.
-> 
-> Suggested-by: Ido Schimmel <idosch@idosch.org>
-> Signed-off-by: Wang Liang <wangliang74@huawei.com>
-> 
-> [...]
+During the period, 1 new issues were detected and 0 were fixed.
+In total, 7 issues are still open and 26 have already been fixed.
 
-Here is the summary with links:
-  - [net-next,v3] net: replace ND_PRINTK with dynamic debug
-    https://git.kernel.org/netdev/net-next/c/96698d1898bc
+Some of the still happening issues:
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Ref Crashes Repro Title
+<1> 286     Yes   KMSAN: uninit-value in ieee802154_hdr_push (2)
+                  https://syzkaller.appspot.com/bug?extid=60a66d44892b66b56545
+<2> 36      No    KASAN: global-out-of-bounds Read in mac802154_header_create (2)
+                  https://syzkaller.appspot.com/bug?extid=844d670c418e0353c6a8
+<3> 23      Yes   WARNING in __dev_change_net_namespace (3)
+                  https://syzkaller.appspot.com/bug?extid=3344d668bbbc12996d46
+<4> 10      No    KMSAN: uninit-value in ieee802154_max_payload
+                  https://syzkaller.appspot.com/bug?extid=fe68c78fbbd3c0ad70ee
 
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
+
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
