@@ -1,72 +1,78 @@
-Received: from mail.growora.pl (mail.growora.pl [51.254.119.49])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B381280A5A
-	for <linux-wpan@vger.kernel.org>; Mon, 21 Jul 2025 07:36:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=51.254.119.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62A5F1F3D54;
+	Wed, 23 Jul 2025 15:59:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1753083419; cv=none; b=uKwDKui3JnywEv3tr6klhMQNlXDldV/RulPRjTNLdMyF+ujRR2vdP2Q0MyqiX8jTeZIy8LefOGk62Lbar993q7M5Nc5zCy/B+mchn1SFCq6nue6zOGYMXh+idDNqZu10CJomWfWDz19CiiWB+hVjJtVdpa1jopnYWobRIJqqjIg=
+	t=1753286349; cv=none; b=QMR19NNhK6eCJ3h2wM1S2JeEHZ0HR5DijbfdESDJb59ffwc5siziDRk3CuN95coWj27UmaQEqrdYdc2Q98XBmxDsuuDQeIbsxuXAZKex4sva7Yk50ywp4+xcLXb+MHKVNDoSxsc+mVJLLIDfQL5eZY9k9mmBANzC5oPirOpaNIw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1753083419; c=relaxed/simple;
-	bh=RSy3akR1+Z0TK1MqUcCTAhuNDshd4oA9g7Cu4aFIABY=;
-	h=Message-ID:Date:From:To:Subject:MIME-Version:Content-Type; b=EKFkzwJ5Z2nzeMBMpoB+8/Xapqx99uLPox1bV5DMWWlBkk2MDlencpQAYwZpOCwSKnG4UYxdj5HBHpzenjxLmY1Tgr6WumPQ1Qi0Y+8Exbo4Gx7QVFhcvb2jOvrUjyaDX3ZeJcL5vVViLkl+lo5BLnC+YCtbgLZ+TpzS/2NdTcI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=growora.pl; spf=pass smtp.mailfrom=growora.pl; dkim=pass (2048-bit key) header.d=growora.pl header.i=@growora.pl header.b=ReH7cwo0; arc=none smtp.client-ip=51.254.119.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=growora.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=growora.pl
+	s=arc-20240116; t=1753286349; c=relaxed/simple;
+	bh=l5L+lEz1dNbThjL45OGEhpHZYEbWBADkvh3KY+K3ZnU=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=REM20wvY0es/LdZG+kHmc1J6nwshRB4or6ONeYvQWSUAQam5KgSeJK81BfgZansZGG7S2om4XDx/gyUj4Ew05RJt0eikKQ8FOuzE0OLM5zfkT31jKABmN5CPKKheegmSmp4jlv5sk6nuw1rQmYDx6Vnkda+C7Y1LVdgL1PBwC2k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=clcv19b5; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=growora.pl header.i=@growora.pl header.b="ReH7cwo0"
-Received: by mail.growora.pl (Postfix, from userid 1002)
-	id 656AB22D0C; Mon, 21 Jul 2025 09:36:15 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=growora.pl; s=mail;
-	t=1753083414; bh=RSy3akR1+Z0TK1MqUcCTAhuNDshd4oA9g7Cu4aFIABY=;
-	h=Date:From:To:Subject:From;
-	b=ReH7cwo0w6n3H+6GXyeJNCfDH+wVTuspE/p33ioywqzWa/vJvda2ijOoIN/+QGs3U
-	 nij1pYO7NT2M5OJcmPlqa+GHWaPTZI7JR34sn4Cck8SDeLZdRBtztL0/r5oj11+21A
-	 Hj3w5JNBF/ZBKGHDEyiIHv75UgKgSPWlDPy86PW/Env1rPJdL5MtwDcOIyuhx1bpHB
-	 9/6oo/0d2eWhOeapEYrLWKh0Wvqp6/XhjRk+6ZpGP8ovUYSxa5JzzcEEw5SG91+kH3
-	 U4gdjUHLKI8lgkaIcUIul2kGipxUgjnQK0U5CMR4RU+IO6QY9QdIi6m9Bmfruyf4y3
-	 r4vMjcmfB91/g==
-Received: by mail.growora.pl for <linux-wpan@vger.kernel.org>; Mon, 21 Jul 2025 07:35:59 GMT
-Message-ID: <20250721084500-0.1.kq.29qdz.0.f711b273bx@growora.pl>
-Date: Mon, 21 Jul 2025 07:35:59 GMT
-From: "Mateusz Hopczak" <mateusz.hopczak@growora.pl>
-To: <linux-wpan@vger.kernel.org>
-Subject: Wsparcie programistyczne - termin spotkania 
-X-Mailer: mail.growora.pl
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="clcv19b5"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01D03C4CEE7;
+	Wed, 23 Jul 2025 15:59:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1753286349;
+	bh=l5L+lEz1dNbThjL45OGEhpHZYEbWBADkvh3KY+K3ZnU=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=clcv19b5pzoVv7wydv9hmQlP0xAzUhE8NzZNIK7svu2xarRS/llEdBMrbt+g3Fqo1
+	 6hpDJw7Ag8L6a908RMv5pcprf0uWPW/MN903PocRH7GJp7+Xu4Y18GjJdmVIwrWyi1
+	 WoOkUPHsoaBqFpVn/ZEj+HAbd1mQwWwK8rhG4VSxyThHqUsLQPYt/PKt8iSZ/JGJRy
+	 z7iPdWDa0KFp2NJXg/q5IKnD/ZSKr2Yy35SgXwKqqhUhBRZ/HsEMphJi2tW7nlozri
+	 gj7eklvObBRvKiad/Q4FxzVnPQwddv+LLfFN2mdgoNgivhHZQMS2wC/iuZ1dmaAYAW
+	 /aXQ24F65vGvQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70F21383BF4E;
+	Wed, 23 Jul 2025 15:59:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v3] net: replace ND_PRINTK with dynamic debug
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <175328636724.1599213.15305193300784446965.git-patchwork-notify@kernel.org>
+Date: Wed, 23 Jul 2025 15:59:27 +0000
+References: <20250708033342.1627636-1-wangliang74@huawei.com>
+In-Reply-To: <20250708033342.1627636-1-wangliang74@huawei.com>
+To: Wang Liang <wangliang74@huawei.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, alex.aring@gmail.com,
+ dsahern@kernel.org, yuehaibing@huawei.com, zhangchangzhong@huawei.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org
 
-Szanowni Pa=C5=84stwo,
+Hello:
 
-czy w Pa=C5=84stwa firmie rozwa=C5=BCaj=C4=85 Pa=C5=84stwo rozw=C3=B3j no=
-wego oprogramowania lub potrzebuj=C4=85 zaufanego zespo=C5=82u, kt=C3=B3r=
-y przejmie odpowiedzialno=C5=9B=C4=87 za stron=C4=99 technologiczn=C4=85 =
-projektu?
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Jeste=C5=9Bmy butikowym software housem z 20-osobowym zespo=C5=82em in=C5=
-=BCynier=C3=B3w. Specjalizujemy si=C4=99 w projektach high-tech i deeptec=
-h =E2=80=93 od zaawansowanych system=C3=B3w AI/ML, przez blockchain i IoT=
-, a=C5=BC po aplikacje mobilne, webowe i symulacyjne (m.in. Unreal Engine=
-).
+On Tue, 8 Jul 2025 11:33:42 +0800 you wrote:
+> ND_PRINTK with val > 1 only works when the ND_DEBUG was set in compilation
+> phase. Replace it with dynamic debug. Convert ND_PRINTK with val <= 1 to
+> net_{err,warn}_ratelimited, and convert the rest to net_dbg_ratelimited.
+> 
+> Suggested-by: Ido Schimmel <idosch@idosch.org>
+> Signed-off-by: Wang Liang <wangliang74@huawei.com>
+> 
+> [...]
 
-Wspieramy firmy technologiczne oraz startupy na r=C3=B3=C5=BCnych etapach=
-: od koncepcji, przez development, po skalowanie i optymalizacj=C4=99. Dz=
-ia=C5=82amy elastycznie =E2=80=93 jako partnerzy, podwykonawcy lub ventur=
-e builderzy.
+Here is the summary with links:
+  - [net-next,v3] net: replace ND_PRINTK with dynamic debug
+    https://git.kernel.org/bluetooth/bluetooth-next/c/96698d1898bc
 
-Je=C5=9Bli szukaj=C4=85 Pa=C5=84stwo zespo=C5=82u, kt=C3=B3ry rozumie z=C5=
-=82o=C5=BCono=C5=9B=C4=87 projekt=C3=B3w i wnosi realn=C4=85 warto=C5=9B=C4=
-=87 technologiczn=C4=85 =E2=80=93 ch=C4=99tnie porozmawiamy.
-
-Czy mogliby=C5=9Bmy um=C3=B3wi=C4=87 si=C4=99 na kr=C3=B3tk=C4=85 rozmow=C4=
-=99, by sprawdzi=C4=87 potencja=C5=82 wsp=C3=B3=C5=82pracy?
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-Z pozdrowieniami
-Mateusz Hopczak
