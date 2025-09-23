@@ -1,86 +1,73 @@
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from sender4-g3-154.zohomail360.com (sender4-g3-154.zohomail360.com [136.143.188.154])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD3C3309DA8
-	for <linux-wpan@vger.kernel.org>; Wed, 17 Sep 2025 08:29:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1758097768; cv=none; b=oOqdqOq9pd3ma0gn3T2y7l5Opoxiu/aOcDMSlq6A4AVER6MQQpUz+ikzT6/XJxOi06YV3IU/TLjM+5ttoCtHcu67fD1lbw0UmLfNjXGkRf1RmFb1SaPmPP0TgNwk7B284hjteCq5OY5FpWYR0vOb3QR7lNUZQwMkk4BJE5NnnkM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1758097768; c=relaxed/simple;
-	bh=n59laAWVXht+XSJwX+Rx/sSiBmHzbFIhT7eyu/CjkeY=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=El7F9ofjlJHQ/YNz+nsEKo3Hl52NJOZeGY4+tkzS4cIaaIWmSdSMW9mQhniDTiDQrUX2Kib17XoKqEi3Swr+KrP2yzH0z1Sgc7sb+C1MhM2+4MuUzF+HaEn0imutb1fT8/D0KHPkDomnykkpkDW/269K0hnObRdJNSar4i8V0J8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-424074f3f83so85754615ab.2
-        for <linux-wpan@vger.kernel.org>; Wed, 17 Sep 2025 01:29:26 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1758097766; x=1758702566;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=2J8GtT+BO7dplocXTbSJWE7GTVxB1AxvhITY82Zhu38=;
-        b=dG0B4w1fgnGQE0FYqCHBH1PSfy4YyATwfjNmOItL9S3TH/bxKXtvQaI6lEg+y4R8F0
-         9eEz+udMMg651/2sJmzwNKaJipwRE6vHINi0mqCZFYDp6D92Mz4Z929CIHnp5He6FjVi
-         9KRm/SymJMw3YmI81nvtoneHRdSyf8Sdt++AlVzmOVUmC5IMmrQ4M8iuUISXcSyJ93JV
-         gmpJq5LBoUOUEmrZEHWEkPENo25QMW2UNisIGjogLuH93bV1Fv8nBSUInvP1no3wExi7
-         P0onuS+DtGeafu9gZRDRWXJHpNkpe4sz/yjQ3KhVqLVwcyhjiOFssnGvCRXUd3A9XwsS
-         nWMA==
-X-Forwarded-Encrypted: i=1; AJvYcCUevc8znW2z1pbmS3b+ZKqEyfJHzfOtV4sltN/L5gR7AVAqYDSBHvR/NGf+rQ18p62ndiJj2p/krleg@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw4Pu4Gn5b6sb5cJR3T+mShkLn3Bsw0rSCAmqW9HXQXjk6K9YrY
-	MnDesqmUvP4xYvHRoxvtUiRsQTd875Ckd8LgEBFNZOMs0xh30CefLslMCM/kw/Z0SOM9zj4F0sg
-	SDNSHhssEN0TBLj1YY6gYHmvoEBTr06wcdcvxS9lPYjg3qKauZZPb9i1akGE=
-X-Google-Smtp-Source: AGHT+IG3kZ/PgMbkZjXiMB1OoMvpiayLLIxDSFGcBjyf/EHLPDkXxRSwkZbtc46UAmaIN7WisPVG1wdEmVR2PIc75EmKZIAVH2kg
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17EB613C3F2
+	for <linux-wpan@vger.kernel.org>; Wed, 24 Sep 2025 00:34:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.154
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1758674079; cv=pass; b=GnLSZxuoxKs7GZK9w02eT9fTt1NxxS3yS96NrBGWsaF9CBJZhp9tuXyqfeOnYrmJdUfJdIcLXOo3wi0YXlHRqP3CDb1WVzb9InHYiH6cTejC7A3O8D3aydXFLE4YKdhoiiP0/eu6EEmqRla2JNXpQbcu61wmt+oJ8TgOvcF96Sk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1758674079; c=relaxed/simple;
+	bh=j+eotSuHpnN4g+1i6jUoAX8BftZrtYBXWwnBzaM/3Ck=;
+	h=Date:From:To:Message-ID:Subject:MIME-Version:Content-Type; b=VuWJtaCrewPiNB7fHi/qQj0SadC1aeKOKy8BOajF7vjw9YmQ3mGyAC/rissG+KLrDbi/bVghefdyPI829YnNv41y7PDU0H/nubJ9eiv+gDx1ZxAKpb+2KkO2luGSs09FeoViBdfVe5iRR96GTPRFUORCWrdJbO2JLUE4jeqAJnc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=maguitec.com.mx; spf=pass smtp.mailfrom=bounce-zem.maguitec.com.mx; dkim=pass (1024-bit key) header.d=maguitec.com.mx header.i=@maguitec.com.mx header.b=F75wxKV9; arc=pass smtp.client-ip=136.143.188.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=maguitec.com.mx
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bounce-zem.maguitec.com.mx
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=maguitec.com.mx header.i=@maguitec.com.mx header.b="F75wxKV9"
+ARC-Seal: i=1; a=rsa-sha256; t=1758674077; cv=none; 
+	d=us.zohomail360.com; s=zohoarc; 
+	b=B12k7G/p5Bu4x+uNMruwuCEUtzzuuNv5dXO0SUTqTUSk8lU7jzKmI2/FDz6ZBdXsj1UIARk+Nv85mAVddWWfRmnOFYuwpU0gulpr3bC2kudTwqy5OCXT+BBhi+mvW9fOxdmCCKF0IRyqAphlDDcxnm5Cu2gUgGCTIPn9AZBqE8o=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=us.zohomail360.com; s=zohoarc; 
+	t=1758674077; h=Content-Type:Content-Transfer-Encoding:Date:Date:From:From:MIME-Version:Message-ID:Reply-To:Reply-To:Subject:Subject:To:To:Message-Id:Cc; 
+	bh=j+eotSuHpnN4g+1i6jUoAX8BftZrtYBXWwnBzaM/3Ck=; 
+	b=XYFkYhV8djkMUPEHobJuxsPhKIsyz2pIFHbFBAEiiBFN2ssqZBXXAYausDG55RhF8st2jk6R2s1GLxxray4QQljgJslCBaHuGh8MdvSze2TemjylgS2n++rbCELc6TmwZuvfCPHHNjbcOA7sk7jJnnj6yt0sptX2Cv+lQPMHUNg=
+ARC-Authentication-Results: i=1; mx.us.zohomail360.com;
+	dkim=pass  header.i=maguitec.com.mx;
+	spf=pass  smtp.mailfrom=investorrelations+9ac672a0-98d8-11f0-9ce0-52540088df93_vt1@bounce-zem.maguitec.com.mx;
+	dmarc=pass header.from=<investorrelations@maguitec.com.mx>
+Received: by mx.zohomail.com with SMTPS id 175867165343671.40932547301634;
+	Tue, 23 Sep 2025 16:54:13 -0700 (PDT)
+DKIM-Signature: a=rsa-sha256; b=F75wxKV9sv2RtUIkuOh5hy96NOzcGOSCpE9lPrMbG49d24SZEu5fRh8pr+cdcrT0Yv18//E6fw5+s9qMqDtdexhrvxdCirpzV/vsaRYLSL3ZkkiQlJdCkkqmDb4DTPU4aPpKPm1nyp6exsEt01lg9PJLVxWl1RO4zcLaW31PiSA=; c=relaxed/relaxed; s=15205840; d=maguitec.com.mx; v=1; bh=j+eotSuHpnN4g+1i6jUoAX8BftZrtYBXWwnBzaM/3Ck=; h=date:from:reply-to:to:message-id:subject:mime-version:content-type:content-transfer-encoding:date:from:reply-to:to:message-id:subject;
+Date: Tue, 23 Sep 2025 16:54:13 -0700 (PDT)
+From: Al Sayyid Sultan <investorrelations@maguitec.com.mx>
+Reply-To: investorrelations@alhaitham-investment.ae
+To: linux-wpan@vger.kernel.org
+Message-ID: <2d6f.1aedd99b146bc1ac.m1.9ac672a0-98d8-11f0-9ce0-52540088df93.19978ffc6ca@bounce-zem.maguitec.com.mx>
+Subject: Thematic Funds Letter Of Intent
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:3809:b0:404:c21a:466e with SMTP id
- e9e14a558f8ab-4241a528271mr12754805ab.21.1758097765821; Wed, 17 Sep 2025
- 01:29:25 -0700 (PDT)
-Date: Wed, 17 Sep 2025 01:29:25 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68ca7165.050a0220.3c6139.0fa0.GAE@google.com>
-Subject: [syzbot] Monthly wpan report (Sep 2025)
-From: syzbot <syzbot+listc85250626370904755c9@syzkaller.appspotmail.com>
-To: alex.aring@gmail.com, linux-kernel@vger.kernel.org, 
-	linux-wpan@vger.kernel.org, miquel.raynal@bootlin.com, netdev@vger.kernel.org, 
-	stefan@datenfreihafen.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain;
+	charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+content-transfer-encoding-Orig: quoted-printable
+content-type-Orig: text/plain;\r\n\tcharset="utf-8"
+Original-Envelope-Id: 2d6f.1aedd99b146bc1ac.m1.9ac672a0-98d8-11f0-9ce0-52540088df93.19978ffc6ca
+X-JID: 2d6f.1aedd99b146bc1ac.s1.9ac672a0-98d8-11f0-9ce0-52540088df93.19978ffc6ca
+TM-MAIL-JID: 2d6f.1aedd99b146bc1ac.m1.9ac672a0-98d8-11f0-9ce0-52540088df93.19978ffc6ca
+X-App-Message-ID: 2d6f.1aedd99b146bc1ac.m1.9ac672a0-98d8-11f0-9ce0-52540088df93.19978ffc6ca
+X-Report-Abuse: <abuse+2d6f.1aedd99b146bc1ac.m1.9ac672a0-98d8-11f0-9ce0-52540088df93.19978ffc6ca@zeptomail.com>
+X-ZohoMailClient: External
 
-Hello wpan maintainers/developers,
+To: linux-wpan@vger.kernel.org
+Date: 24-09-2025
+Thematic Funds Letter Of Intent
 
-This is a 31-day syzbot report for the wpan subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/wpan
+It's a pleasure to connect with you
 
-During the period, 2 new issues were detected and 0 were fixed.
-In total, 8 issues are still open and 26 have already been fixed.
+Having been referred to your investment by my team, we would be=20
+honored to review your available investment projects for onward=20
+referral to my principal investors who can allocate capital for=20
+the financing of it.
 
-Some of the still happening issues:
+kindly advise at your convenience
 
-Ref Crashes Repro Title
-<1> 42      No    KASAN: global-out-of-bounds Read in mac802154_header_create (2)
-                  https://syzkaller.appspot.com/bug?extid=844d670c418e0353c6a8
-<2> 31      Yes   WARNING in __dev_change_net_namespace (3)
-                  https://syzkaller.appspot.com/bug?extid=3344d668bbbc12996d46
-<3> 4       Yes   WARNING in lowpan_xmit (2)
-                  https://syzkaller.appspot.com/bug?extid=5b74e0e96f12e3728ec8
-<4> 1       No    KMSAN: uninit-value in crc_ccitt (3)
-                  https://syzkaller.appspot.com/bug?extid=29d74bf076f40407a62a
+Best Regards,
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
-
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
-
-You may send multiple commands in a single email message.
+Respectfully,
+Al Sayyid Sultan Yarub Al Busaidi
+Director
