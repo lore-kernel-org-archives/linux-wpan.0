@@ -1,81 +1,84 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40C0B334380;
-	Thu, 16 Oct 2025 12:53:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DEC22FDC59
+	for <linux-wpan@vger.kernel.org>; Mon, 20 Oct 2025 11:38:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.71
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1760619237; cv=none; b=Zf1BZoJPo59oxEougx5Ww9VPc4Ybk/ZJWrYcbrfMpr7TfO3zlPNu3xyAWMQACMzOTckcxhGg7h3lVvytcA0VMOrOXQmGVR86m9IB5kJzlckXwrxc975X06wk7AGbatWrTUZp7k+MTno36zKgzG7Wo9gEHyvWAQh8hPu0iK3ubAc=
+	t=1760960311; cv=none; b=Un5uKaJBGtcscwnqrGj/OnQwt7Ps5DMI19eK71iH1W7EPsRdab90tyGk5fRy/NY+c/mCdRXP5ohpR7e0cFXFjQZWsP+9FZFAkAmC7vHTSwx835s9gh+uFYKYbicWLDtUm/yCOJawxg1CvN4mvaKIYxxPtFt0nNcMYANKNsvU1dE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1760619237; c=relaxed/simple;
-	bh=2jg4Av+zM7tjDY5Z5S63NnnEZORlkA02wuvFoD/B2pQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Qh9SRSddqZOdJ2qg7mKiP2+cj0UjIpPHbxmRRypYz5KQQDLStMFk97ktEylo5kMy+0wFguoYPPY6NKzYgYBILodtnCtP+vapRf0+nZ4nJs0cpOQzC0MQ6bC4tcofN1sIFR3YgNggLQyS2TVOeP92BOz1C+4xVky/iBdQU0kU2yg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n6X3R08q; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n6X3R08q"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0DC13C4CEF1;
-	Thu, 16 Oct 2025 12:53:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1760619237;
-	bh=2jg4Av+zM7tjDY5Z5S63NnnEZORlkA02wuvFoD/B2pQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=n6X3R08q28qXx/1Nd+oOpcO9AQZ3bc4cBO8iLWxP1QRpWvSHYmdrXXBjim3cMlPAZ
-	 0La41EQ5ANylxrlxlZ5RRpzr8gIy6/pQm6XaD0WfE1PnevOnxHHVvyL4C5gt1OYpzZ
-	 dgH1Q+H5Wba7DFHNx4vXox8Csq5AZ/ly5EKnqwnzbvw9vQLk8f3Copc28Dgr+4dpMi
-	 +aSN6pB3UU6IdwoFqn8HP/AfjkhBtjn3M023hTHD5i2qHW23y5EFd2xQjACLDNijH6
-	 lK+Io7R0Y/uur7Unl7VDGGb7jiVzb91EFZ9uS7h2C1GQqSip7M2y1TQk0W6n3herOW
-	 Za4/QZ/xQJVww==
-Date: Thu, 16 Oct 2025 13:53:52 +0100
-From: Simon Horman <horms@kernel.org>
-To: Randy Dunlap <rdunlap@infradead.org>
-Cc: netdev@vger.kernel.org, Alexander Aring <alex.aring@gmail.com>,
-	Stefan Schmidt <stefan@datenfreihafen.org>,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	linux-wpan@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH] nl802154: fix some kernel-doc warnings
-Message-ID: <aPDq4BJnxji5mTxc@horms.kernel.org>
-References: <20251016035917.1148012-1-rdunlap@infradead.org>
+	s=arc-20240116; t=1760960311; c=relaxed/simple;
+	bh=UZ/VKJ+pN2yig+GvLBIqSb6Ut6P9Eohn0TODs04PIH4=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=mp9AUBbOxCgXKeJ7eU/BjSOEIfPk4oHJY8uw7vYu0gPory0M2NsgLgZy162cEcUHz2p6yTl0SWE4gBaXeDjZMwXrd1FRBJVkXOqmrlgBm6kUt8YNZ0pIVFGRZv3tABoHVYbLvjAENeRdZAGyjeQbU+84A/RD7GdRFq4IZTaQPGQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-93e8d8d2617so169739339f.0
+        for <linux-wpan@vger.kernel.org>; Mon, 20 Oct 2025 04:38:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1760960309; x=1761565109;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=pgb7OtlYnMQoM90V6NabwiO23RskwmJJ0h2MWLGQTV4=;
+        b=xLixUtzItmCmbdCEvdbh5h8bEgpZ+3rnFuAdUlp3wtvlxlZm+daq0GPMs5G7YQ8DYd
+         0hITUtmzdPah0w2voAzrCwYPeee+zeD5VpVwfq02TqIQwgGajgyTLXFB1mvUg+3kyPMr
+         xJDCwd7ipec4IlnqALLJv4qIBgoPDYnXMiHTjy7raQNTtCt/jJoDCoSEMyiYCBb7imnv
+         rJedz0QRwj6Etv/I7vC0VUUILsJVFY31SN++xMDo8M/wPost0o6YFzU/MgqZ2Ib3PPpG
+         aYcIyiOq9WLh8NlfRNybapP8fUADEnq06BYZrkdilAPmIYUN29m4vNVOFtrpE4cFvx4r
+         AtWw==
+X-Forwarded-Encrypted: i=1; AJvYcCV9klrDaSMA2ohPM7EIOU3k8h8GrsOeJ0iXDqQpLrCdn5E/zVzbkbKpqZGh0vnag8Wu5fEy1B4wglyb@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy13OHzPszyDdOPkw7DSmCmnIT5V/djA7y0Ubb+1RJJ19nw/CIv
+	Dt6HLuSbTgJZiOZM4Qyo34Ux02DbodRa2xGAnV3+PJ48Io4a5UDX0FnQEAfsqyinyeCjSsv3HJy
+	AWmAAa1nV45MqQWRq4yXza7SKIYBMKuSrtaZMzr1xU96aKB4/BOy/MOjL2Mo=
+X-Google-Smtp-Source: AGHT+IGNhxcWHTK2o061+zSJWgTbgedgGJQ7DlHF5OInK8gPKeca53b3HERWWsC4cASlO1Uxc3OLuvUzSLuQO4RTeyYNoL1bv51g
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251016035917.1148012-1-rdunlap@infradead.org>
+X-Received: by 2002:a05:6602:27c5:b0:883:fc4a:ea55 with SMTP id
+ ca18e2360f4ac-93e75321bc7mr2257904739f.3.1760960309088; Mon, 20 Oct 2025
+ 04:38:29 -0700 (PDT)
+Date: Mon, 20 Oct 2025 04:38:29 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68f61f35.a70a0220.205af.0031.GAE@google.com>
+Subject: [syzbot] Monthly wpan report (Oct 2025)
+From: syzbot <syzbot+listefd84cff8486e6c23cb2@syzkaller.appspotmail.com>
+To: alex.aring@gmail.com, linux-kernel@vger.kernel.org, 
+	linux-wpan@vger.kernel.org, miquel.raynal@bootlin.com, netdev@vger.kernel.org, 
+	stefan@datenfreihafen.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Thanks Randy,
+Hello wpan maintainers/developers,
 
-On Wed, Oct 15, 2025 at 08:59:17PM -0700, Randy Dunlap wrote:
-> Correct multiple kernel-doc warnings in nl802154.h:
-> 
-> - Fix a typo on one enum name to avoid a kernel-doc warning.
-> - Drop 2 enum descriptions that are no longer needed.
+This is a 31-day syzbot report for the wpan subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/wpan
 
-According to my brief dig into git history,
-it seems those were added but never used.
+During the period, 0 new issues were detected and 0 were fixed.
+In total, 9 issues are still open and 26 have already been fixed.
 
-> - Mark 2 internal enums as "private:" so that kernel-doc is not needed
->   for them.
-> 
-> Warning: nl802154.h:239 Enum value 'NL802154_CAP_ATTR_MAX_MAXBE' not described in enum 'nl802154_wpan_phy_capability_attr'
-> Warning: nl802154.h:239 Excess enum value '%NL802154_CAP_ATTR_MIN_CCA_ED_LEVEL' description in 'nl802154_wpan_phy_capability_attr'
-> Warning: nl802154.h:239 Excess enum value '%NL802154_CAP_ATTR_MAX_CCA_ED_LEVEL' description in 'nl802154_wpan_phy_capability_attr'
-> Warning: nl802154.h:369 Enum value '__NL802154_CCA_OPT_ATTR_AFTER_LAST' not described in enum 'nl802154_cca_opts'
-> Warning: nl802154.h:369 Enum value 'NL802154_CCA_OPT_ATTR_MAX' not described in enum 'nl802154_cca_opts'
+Some of the still happening issues:
 
-I do still see:
-Warning: include/net/nl802154.h:237 Enum value 'NL802154_CAP_ATTR_CCA_ED_LEVELS' not described in enum 'nl802154_wpan_phy_capability_attr'
+Ref Crashes Repro Title
+<1> 46      No    KASAN: global-out-of-bounds Read in mac802154_header_create (2)
+                  https://syzkaller.appspot.com/bug?extid=844d670c418e0353c6a8
+<2> 39      Yes   KMSAN: kernel-infoleak in move_addr_to_user (7)
+                  https://syzkaller.appspot.com/bug?extid=346474e3bf0b26bd3090
+<3> 35      Yes   WARNING in __dev_change_net_namespace (3)
+                  https://syzkaller.appspot.com/bug?extid=3344d668bbbc12996d46
 
-And that enum does seem to be used. So it would be nice to address this
-by documenting it. But I think that can be left as a separate task.
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-> 
-> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
 
+You may send multiple commands in a single email message.
