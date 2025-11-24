@@ -1,61 +1,84 @@
-Received: from mail.fintiq.pl (mail.fintiq.pl [51.75.79.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADE172EA154
-	for <linux-wpan@vger.kernel.org>; Tue, 28 Oct 2025 09:06:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=51.75.79.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF25B2F5A2B
+	for <linux-wpan@vger.kernel.org>; Mon, 24 Nov 2025 12:38:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.71
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761642413; cv=none; b=RsmmygxEj2S6z8ozpgSgND5FbabUavCxg/YAJvDkT8+psDmSDrbby8btj630eQY2dnXzR50QD+xxsjPyd16fO0hwc+cBOEwk2QpL8QqCVMAP465HbhJO1tLqDNFoL4ujFjZSg7Aljg0gWWguiPsbwiyZ71M/Io/aChqG/vnBOlc=
+	t=1763987908; cv=none; b=t4k43aKauwXwCE/QfRiUGpYQaXMX3OXTnCNAPcDcHlMB0az8LP/ZlSwYdhQBb/Ib0WFvW55Ria8z4gS9w2/hAmEb+w+eDCVmFVrHchtOW2XXvjSfiUGtY8kUhTv/eC2aE6xfvOW6eX+YzedRVGzMzQ6hL9oXDpc9lBMPgMz7xrU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761642413; c=relaxed/simple;
-	bh=3CQw6vG6r2PiRBm1qyVm7l2qaTk19/9GEfHBKdEQH+g=;
-	h=Message-ID:Date:From:To:Subject:MIME-Version:Content-Type; b=chpcPlq/g7HQ72mL/V5o12gAqclS3xfI1WzvJdhr0HNcB35IHvw2CHcXSIWuH6diXgvwF7sd6khENoG8EC1kJzfOX1YA52Tzwo43hjdjitz0zlkiSWnePiDL5XZQ4NRyslyeDBT6+qWTy2Nvqt396ZXd7aay4UVxjfX2400oY+o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fintiq.pl; spf=pass smtp.mailfrom=fintiq.pl; dkim=pass (2048-bit key) header.d=fintiq.pl header.i=@fintiq.pl header.b=QO61NufE; arc=none smtp.client-ip=51.75.79.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fintiq.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fintiq.pl
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fintiq.pl header.i=@fintiq.pl header.b="QO61NufE"
-Received: by mail.fintiq.pl (Postfix, from userid 1002)
-	id 5BFC3A5BA2; Tue, 28 Oct 2025 10:06:25 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fintiq.pl; s=mail;
-	t=1761642403; bh=3CQw6vG6r2PiRBm1qyVm7l2qaTk19/9GEfHBKdEQH+g=;
-	h=Date:From:To:Subject:From;
-	b=QO61NufEcajIsf/VjhM7iabDmrvteq5LWyCWhLR5o3160148forogOv7n3SqXRWfu
-	 iL6BhBqeieClyI3oBtLNKWN5NW1hTrYlUBNqFhUdeeQc3Kp+q2fmGaqqC/5/drBOoE
-	 tNp5KyCkOgE0iOyWLaS+siiL1E37xo0dktCgw1mQb0jbxy23cPfuugZcHIZuDsGzoo
-	 iqbwit5m1cIKtIxq3MOxroKH8myNcdQ73z/b5UtpRy1bUE15BibpaIeRszD0lR62Ir
-	 9NM9tI+nUF1bWzqMbwDQzXU7C6A07zf+Ive5jssmdtsw8KsL6f4++cBx3dQV00SLfq
-	 +2oa7sVYAgSYA==
-Received: by mail.fintiq.pl for <linux-wpan@vger.kernel.org>; Tue, 28 Oct 2025 09:06:13 GMT
-Message-ID: <20251028084500-0.1.r7.4ipj0.0.mbrbio6m3r@fintiq.pl>
-Date: Tue, 28 Oct 2025 09:06:13 GMT
-From: "Marcin Naronowicz" <marcin.naronowicz@fintiq.pl>
-To: <linux-wpan@vger.kernel.org>
-Subject: =?UTF-8?Q?Dodatkowe_=C5=9Brodki_?=
-X-Mailer: mail.fintiq.pl
+	s=arc-20240116; t=1763987908; c=relaxed/simple;
+	bh=CfxO/FUQ8DqY+cNpjG2OI0u6zJ/KGMj326kbDe3qeVA=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=dekSdHeyTL2eHtzKsKED+1B63D9Pp2f8ziYLQiXRE+avSsv/bHk1Y49cxrkkVO4CLlrQ1tAiflF05AiOj4vFIuDmUWYX/UOPlfwgvt8Ix5gk9llvny/tSsXnqbLAIIBWVG4AKfQWTRMSc0I+hIi36jYjD6gpMVSq+vxHdLcfr7s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-9489a3f6e3dso272911339f.0
+        for <linux-wpan@vger.kernel.org>; Mon, 24 Nov 2025 04:38:26 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1763987906; x=1764592706;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=VAkQq1oo8IepXmnYI2hCQyZo9yD9Lb0GzWqHEDsTZQ8=;
+        b=J5ymdBP8W1wVlzPbVzcidya7SDN9ARwOgtyOi0DKHdOAjjzxXhosX0Z7xM0Izp+jSk
+         mxTMh7Hax332yjb10AxcBU4cjovGB+DtrmnSesW3FFkcZv/xl2RMbLhTBbbvZeLwecG/
+         iYvVVWFEze0oPeHfP31dFAPL235+nqM3n2MW6delfMFu2qWhHu2tY9iZglTD7iMaVSbg
+         hrcJIUwzjtbqsh3g4nk3mVYdXc2IkKRxnHAG9IQe4bzk7Q150PMNFcvaUMwKY7ZLglA+
+         mOfmKReHoPBicDpQENPtk0zVFAjrJB/3t0Lww+T9sG4Z6l9Dwem620zvZnH04phjBDue
+         mn4w==
+X-Forwarded-Encrypted: i=1; AJvYcCXklQMLUyaDJcqOXcdvGEhz5BYXDpBZ92GyNVL9wlwICSfKnmg3LEjnvI8oM899PBUqaE5bhcHLFxMS@vger.kernel.org
+X-Gm-Message-State: AOJu0YwHO1bdDRwNH2Pu9Ps7ddMvpRumJe2bzAoelva3DEVN0oH/IU+4
+	8oV+zRTaQXvwRsa+Dsv3QDlu7AFguALta+G0/0TorrvKX+yOGOc3iMmP0TDkaSF878uadzhvcJs
+	47MR6dfGmbAIaDuCPHYinm1YUQ/36kLtyAgnnnkqelH003yn6UgcHjTUfhQc=
+X-Google-Smtp-Source: AGHT+IEM+mYlFU8a9XelweezEAs+iFIgGm2XwV2zcVOIEaSuXtmjWxFTq1JTNX8m0y/zbxr2j+HZcW8N9cCaBHDaeUBriMzZNpa9
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-Received: by 2002:a05:6e02:b47:b0:433:2389:e0ad with SMTP id
+ e9e14a558f8ab-435b9845ecbmr103067995ab.8.1763987906075; Mon, 24 Nov 2025
+ 04:38:26 -0800 (PST)
+Date: Mon, 24 Nov 2025 04:38:26 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <692451c2.a70a0220.d98e3.008b.GAE@google.com>
+Subject: [syzbot] Monthly wpan report (Nov 2025)
+From: syzbot <syzbot+list74e86652e292993654c3@syzkaller.appspotmail.com>
+To: alex.aring@gmail.com, linux-kernel@vger.kernel.org, 
+	linux-wpan@vger.kernel.org, miquel.raynal@bootlin.com, netdev@vger.kernel.org, 
+	stefan@datenfreihafen.org, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Dzie=C5=84 dobry,
+Hello wpan maintainers/developers,
 
-czy aktualnie rozwa=C5=BCaj=C4=85 Pa=C5=84stwo dodatkowe =C5=BAr=C3=B3d=C5=
-=82o kapita=C5=82u?
+This is a 31-day syzbot report for the wpan subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/wpan
 
-Zapewniamy finansowanie dla firm z sektora M=C5=9AP =E2=80=93 nawet do 40=
-0 000 z=C5=82 bez zb=C4=99dnej biurokracji.=20
+During the period, 0 new issues were detected and 0 were fixed.
+In total, 9 issues are still open and 26 have already been fixed.
 
-Decyzj=C4=99 otrzymuj=C4=85 Pa=C5=84stwo w 24 godziny, a wniosek mo=C5=BC=
-na z=C5=82o=C5=BCy=C4=87 ca=C5=82kowicie online.
+Some of the still happening issues:
 
-Czy mog=C4=99 przedstawi=C4=87 szczeg=C3=B3=C5=82y dotycz=C4=85ce warunk=C3=
-=B3w i procesu uzyskania finansowania?
+Ref Crashes Repro Title
+<1> 345     Yes   KMSAN: uninit-value in ieee802154_hdr_push (2)
+                  https://syzkaller.appspot.com/bug?extid=60a66d44892b66b56545
+<2> 42      Yes   WARNING in __dev_change_net_namespace (3)
+                  https://syzkaller.appspot.com/bug?extid=3344d668bbbc12996d46
+<3> 16      Yes   WARNING in cfg802154_switch_netns (3)
+                  https://syzkaller.appspot.com/bug?extid=bd5829ba3619f08e2341
 
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-Pozdrawiam
-Marcin Naronowicz
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
+
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
