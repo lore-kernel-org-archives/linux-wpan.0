@@ -1,84 +1,106 @@
-Received: from mail-ot1-f69.google.com (mail-ot1-f69.google.com [209.85.210.69])
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D463A308F3E
-	for <linux-wpan@vger.kernel.org>; Fri, 26 Dec 2025 07:48:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.69
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE6B834B41C
+	for <linux-wpan@vger.kernel.org>; Tue,  6 Jan 2026 17:19:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766735307; cv=none; b=ucSE89AcwJrVxxi1f4HKeJ7W70pinWDizcxqLC0e+h/MLkbc2c2+1O3Tj2ZcPZmgTKVx11UUf7v4UMBoRwYbdtbJPAtz73lMSdlv1IPf9uzm1S/ZjtGJ20zaSDW+DtmvVSsLFavWTr8SckzPM+d6i6lQAvAqnVR9FXmX4/QAl2s=
+	t=1767719970; cv=none; b=HiG/PAwB1DNIXHEeWbRGZGON4AltznyYICkzoSjk6MqkoTJbyyGyt2CI+v0ZLvlWK5AhdWDNmgq6hkDvA7UCyqACd0dF7nsKIDaqIb+tg2HC8djqDVhWWiPlVSIgvHvmYujFTZwZkjUTapj5ZW/q+Lh4uIVgbGWmdK9P4a6Ge74=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766735307; c=relaxed/simple;
-	bh=4G3Gk8BSJMdDNtUzvBUVhRxLNT5rZEqpN2SsPHQCXK8=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=KNnn20OaDIL9rxwkbzqYDOCO5XbX9DB6+1DU9vNL+jqTnd6p4YjMtAU6RnOhKs9EFUgMv6Uu+C4rkJCvyNnz3JvYpX6a0ajNF/Bw2gJ4kf6qza8ulQyADzJrI7c/CrZTVT78iEoGPV56/l+TYvzBG4EhU00UFWgMVAYzDArPsxE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.210.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-ot1-f69.google.com with SMTP id 46e09a7af769-7c765a491bdso6912374a34.2
-        for <linux-wpan@vger.kernel.org>; Thu, 25 Dec 2025 23:48:24 -0800 (PST)
+	s=arc-20240116; t=1767719970; c=relaxed/simple;
+	bh=XCtkft8bohaeimnq+lp2cMogo+aH8B2GI3J6/21tYXo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bvnH1w9pP3gZHiE/Z47ghfX9tBCDX4rqejgV7DMXdfaiYIPSQGVdeXjb5tfUhNRvdGLes4aoH+T4qu3mdpxiwj8ezrdj/X8Vn1EtREoVpAp/Yz5e3KoTRS7BHc4L3K40iaJYNvBb4GxaiHMT4Jceos6hmOXHXoXv18ypxh7P8+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Pwe4Tu9b; arc=none smtp.client-ip=209.85.210.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Pwe4Tu9b"
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-7e2762ad850so1221432b3a.3
+        for <linux-wpan@vger.kernel.org>; Tue, 06 Jan 2026 09:19:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1767719968; x=1768324768; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=8+OyAyzrGoNWAXYfPY2DX52zu0b6XYq9idfXYiJBSBM=;
+        b=Pwe4Tu9b0OaLmgLmvZmaVKTP0GmkRSi2lgsvI92d9NCFsr2H7z5Q+T6Oy28n24qt43
+         xsxW3qoSb0kUbT8oxK4rXLWgk9L+HdARJ8ddjxiUFv8ilBF29NYLgKlbX3kHDaiZpQ+e
+         jM3g+03FP4bC3FYW5IZgHzkLztw5t5OCWgw4L66hF3huiCI9pq2ZuwqSemhdCpX9wLdU
+         g1CWdjFmpqOcNFFMmNXalXkF7t+1Vb5Ul5K7sgFrsyjZ2zrqfQNEoRoCuUQJI0Ks5Qzk
+         IKlk5OR/vVeQ46/7IGrqQ/WOU/4OQwz9z3sH7tVX4Fidfk9cwr+pEJppDGJ7byI5E+Xx
+         njpA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766735303; x=1767340103;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=6h858IFkNIDNDucXKHl3NQ/6iIv4DUqYS1WvnPgvU6o=;
-        b=XqEzF49lOVGIiHBvNDJt1gDlNgOF4lmkUqxmd1X9IrGAF+de1nEO/hBZTe+6cwyfyj
-         ZWjUSx5yzeH/dwvVYOe8ns0V5i8pZ8JsSNrlfF0wgkSc3dVNsmQF5FM+w7BeOcxP+SWW
-         7X5/h+u2ekaCqjr6eB3QNzICcqJ1dTYH0t3d+VYf2cQ2XXnUs4yaBSLH56FpjEZiCyPp
-         W7RWMvliCt3lkUEt9FR5o0mLlLky7BIauNb8VQVAfZ4tkP9vKwMYPnRPRj3bhY8Z+sPh
-         ufwkc7rCtClUYiKt3QAusfo2rb6ZuQIErUQg3N+ZKRkW7GitTU5LPfyBdptwfpRGWQob
-         Z+Cw==
-X-Forwarded-Encrypted: i=1; AJvYcCV5HpeptD/1n0uUEX+0JpoQc9WBKoZUH3GytbCVtcCO9kCFvVtLXBmEFrpzujOnV9G6e4ZCSqFWhdcG@vger.kernel.org
-X-Gm-Message-State: AOJu0YwBzA/2As6DSz8Qv7Z1zv3/2/BrRL+9+Sch144ipcYe4ujHAB3F
-	nriURFN2NrX2Gx36JmrtWuKzRJs4DNdlC+deQ25xp9Rw0Q7FPBnLnW3C/DvTAVQNCPAldlqYYDL
-	Ve/EOy+4i0BcOfISGAdq8frzS2JAvy094w+k1X+X3uQ3QdCDFKdE2BfESIOE=
-X-Google-Smtp-Source: AGHT+IHtxiqDKuziOWwIZ8U3mJEfS4Q8sOehAkPTpKr6dIGsLILiUSt3vQMPqrvPykLl88Ctq8WT09xe2Dg4ke4tEYR/xQ9/tnMZ
+        d=1e100.net; s=20230601; t=1767719968; x=1768324768;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8+OyAyzrGoNWAXYfPY2DX52zu0b6XYq9idfXYiJBSBM=;
+        b=PBQIy43YNB/kKXDIGTfrYo4l7VBPXjEXV6qXIwFUQLYNk0Q4pEH0y+XSMV0+gY56Hs
+         R4sFcqdSQ2t7hPIWJr6SyvRBGCRxohl2Vv4T+W2fvUXCuqTTEqWH3KzQyQFonmMCskOF
+         XY/Y/tbeP5acJrCWdqCamBqlSv4hDKI1bmDzx4Bis+JsBg3OTP9ojyS0QR5i4XSGSPbp
+         nkMS1/jvq6ih91QllV4JM3DQy1di7WH/aECSSCxYuXTi9GcYVcA1KdaAb3esXOgU1C/Y
+         3Ck7ub+V24mKS+/bPpJJ9eLzfFAwhFy3HiN5Tp/+o8y80FdMC3yIz4AshGrKxTOjY3NZ
+         y+1g==
+X-Forwarded-Encrypted: i=1; AJvYcCX0G6EX5ppI9deo9vtGQ/vN1NKbHTTezYt5BThERNMmEQ5EYVLWVK0yTX8CXbrl0XW9qlV6mDTpt5Fi@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxr2EjYijhF+X6aqcyjZ7KR5FbdTltBKo87bXt8S38orgadUfS8
+	Gz2fpZUxxEgcOFfPexSRYuGOgqrXsDwMXGuYdR6iArwSAA+2+/gfMAcA
+X-Gm-Gg: AY/fxX65g6CpKRA16L8SlsiWw/ioUN9OakqeuNj/2IkFoUn7zhaVnW4rB2Zd9dLI6b3
+	faRTcZB9ztsKpkA8acXKbRaVd4Fl0FG3vWodQuG0U3aruWeLsKVeZzzV8iFfMvjH351gadP+6n9
+	pxT5QD4QsNa07jfdSjrWsZNgDpYkNnSUBDy+HbJ9QzvtuGM9eHe2AeozaS733V2x/LyAoufDb4c
+	rpbVbw7PSfIsJJDSLtwQ5IDPFN2ZkMmoE5dBq4w4xsLQx/XP2BQFvFXQGTszgFT5ejDlkRGXffL
+	vUauW00UiL0QaBghTr7PCusXXcXYOS0jRkZTabU1K5guw2vVQJ6YQDxrzUYvOE+57zUoxOZQ0Zv
+	nWIJvwZXxiTeUIuL4x5VEq5usB/2B/L8QM91PniiqJuMLPOXDovHdtB3a64SFJ5fP9W7+JT0aia
+	INHbEAVhpyKVa+4nVOwRy3LNnRqxQRrLwI6LQ7JRm2nQ==
+X-Google-Smtp-Source: AGHT+IGYSvTn1Ci9vinRdw7r0xeSkSd2eacLOLCfjsA7K6i+z4Vc1na+KoVQcKiKdfAdirkFse65rg==
+X-Received: by 2002:a05:6a20:9183:b0:363:e391:38a2 with SMTP id adf61e73a8af0-389823a7fa6mr3325497637.46.1767719968136;
+        Tue, 06 Jan 2026 09:19:28 -0800 (PST)
+Received: from localhost.localdomain ([2401:4900:8838:65fe:636c:fbb8:d9e1:61f2])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c4cbfc2f481sm2875157a12.10.2026.01.06.09.19.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 06 Jan 2026 09:19:27 -0800 (PST)
+Received: (nullmailer pid 124163 invoked by uid 1000);
+	Tue, 06 Jan 2026 17:16:29 -0000
+From: Kathara Sasikumar <katharasasikumar007@gmail.com>
+To: alex.aring@gmail.com, horms@kernel.org
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Kathara Sasikumar <katharasasikumar007@gmail.com>
+Subject: [PATCH v2 net-next] net: 6lowpan: replace sprintf() with scnprintf() in debugfs
+Date: Tue,  6 Jan 2026 17:16:11 +0000
+Message-ID: <20260106171610.124138-2-katharasasikumar007@gmail.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a4a:cb0f:0:b0:659:9a49:8dcf with SMTP id
- 006d021491bc7-65d0e9e7f76mr6472723eaf.17.1766735303469; Thu, 25 Dec 2025
- 23:48:23 -0800 (PST)
-Date: Thu, 25 Dec 2025 23:48:23 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <694e3dc7.050a0220.35954c.006b.GAE@google.com>
-Subject: [syzbot] Monthly wpan report (Dec 2025)
-From: syzbot <syzbot+list22154e6adebbf6ad3dbc@syzkaller.appspotmail.com>
-To: alex.aring@gmail.com, linux-kernel@vger.kernel.org, 
-	linux-wpan@vger.kernel.org, miquel.raynal@bootlin.com, netdev@vger.kernel.org, 
-	stefan@datenfreihafen.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hello wpan maintainers/developers,
+sprintf() does not perform bounds checking on the destination buffer.
+Replace it with scnprintf() to ensure the write stays within bounds.
 
-This is a 31-day syzbot report for the wpan subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/wpan
+No functional change intended.
 
-During the period, 0 new issues were detected and 0 were fixed.
-In total, 7 issues are still open and 26 have already been fixed.
-
-Some of the still happening issues:
-
-Ref Crashes Repro Title
-<1> 48      Yes   WARNING in __dev_change_net_namespace (3)
-                  https://syzkaller.appspot.com/bug?extid=3344d668bbbc12996d46
-<2> 39      Yes   KMSAN: kernel-infoleak in move_addr_to_user (7)
-                  https://syzkaller.appspot.com/bug?extid=346474e3bf0b26bd3090
-<3> 4       Yes   WARNING in lowpan_xmit (2)
-                  https://syzkaller.appspot.com/bug?extid=5b74e0e96f12e3728ec8
-
+Signed-off-by: Kathara Sasikumar <katharasasikumar007@gmail.com>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+v2:
+ - Updated commit message wording
+ - Targeted the patch to net-next
+---
+ net/6lowpan/debugfs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
+diff --git a/net/6lowpan/debugfs.c b/net/6lowpan/debugfs.c
+index 600b9563bfc5..d45ace484143 100644
+--- a/net/6lowpan/debugfs.c
++++ b/net/6lowpan/debugfs.c
+@@ -173,7 +173,7 @@ static void lowpan_dev_debugfs_ctx_init(struct net_device *dev,
+ 	if (WARN_ON_ONCE(id >= LOWPAN_IPHC_CTX_TABLE_SIZE))
+ 		return;
+ 
+-	sprintf(buf, "%d", id);
++	scnprintf(buf, sizeof(buf), "%d", id);
+ 
+ 	root = debugfs_create_dir(buf, ctx);
+ 
+-- 
+2.51.0
 
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
-
-You may send multiple commands in a single email message.
