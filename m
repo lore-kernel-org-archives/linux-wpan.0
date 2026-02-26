@@ -1,50 +1,50 @@
-Received: from mail-oo1-f70.google.com (mail-oo1-f70.google.com [209.85.161.70])
+Received: from mail-ot1-f70.google.com (mail-ot1-f70.google.com [209.85.210.70])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E8CE28C2DD
-	for <linux-wpan@vger.kernel.org>; Mon, 26 Jan 2026 07:12:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AB732DA769
+	for <linux-wpan@vger.kernel.org>; Thu, 26 Feb 2026 12:59:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1769411548; cv=none; b=aV91Ka5NrSgCNV7lfyj9dGGwgGm2TWDEruVZ+U9WEBORU2Ju88vQ+VqMJYadFzJAFcED5pjwxrOS4GtJi0PwyM6CTOZQC4MUmt4gOS2fRQvVIhT13CRpHbH1cqfbTL+KvcVtNiguJJL3K8vHxgFLY/OTl+b2RPPL6b1akUEcKik=
+	t=1772110761; cv=none; b=p+9orMDDOPJB52i6Zz24sHIpHQi/o5XN//qUwvseO/+Sy2q2yPmrBpdZvxdLq3Nqc063ZyQjp9GWrnsmo00Cyu0o8AMvF402jMBQZmAwPz4uzhtF7LWCtyt6qZHT2f6wcmzLIaBWTW0z3mSstOvMy+4LohDKFoXnS1AWM8+ASpk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1769411548; c=relaxed/simple;
-	bh=b3PwR7PZHDFl7bFHeYlMJtw+smhcSG6Fx0pXGqGjQOA=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=ibnApJu//4cVvXINihyT2EeqrNwgCldPp7RTbXrGxVbmcU8CjJ0gzUFVLJt5ElC/d5EdGrxJ6V4vqgMIFs0h/ACR0RbRAbUR2s0Yo+Op58itcnbjNkd0gPbnqpwDVfHLbqFPTAkAg23pSGDP7ZZMh9Iq+isPpIAZC5CjPXR1VDk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.70
+	s=arc-20240116; t=1772110761; c=relaxed/simple;
+	bh=six8rnEJiQPYWzcQX1THF1cLIU6oDaq+bzhspJ/Nb5o=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=gdxISyCwbtc65ujidfGZHC/QtDCRwIjdlKRGKcM4Q9EpNonClWUKC2NDRwVRajPOD6VaFrs4dum4OfAnTn1Gh+gttTtcW1kIm/rUaG8/OvCz8LQoM4kaWPTC3KAN4hJ68iT+xTtH6bFkebsJDwrQOX2sj9f5P3s5/Ut8uJl24tc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.210.70
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oo1-f70.google.com with SMTP id 006d021491bc7-662c1759118so10400292eaf.0
-        for <linux-wpan@vger.kernel.org>; Sun, 25 Jan 2026 23:12:26 -0800 (PST)
+Received: by mail-ot1-f70.google.com with SMTP id 46e09a7af769-7d4c14c60faso3436293a34.1
+        for <linux-wpan@vger.kernel.org>; Thu, 26 Feb 2026 04:59:20 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1769411546; x=1770016346;
+        d=1e100.net; s=20230601; t=1772110759; x=1772715559;
         h=to:from:subject:message-id:date:mime-version:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=R6dMLiRQAKLWaXNSJ9qzlzVwL/ShJ+BkMJnyUWmKp5Y=;
-        b=jfsawFBHITabYgGrnlw3QkSbOjJgks2B9I5HuOFWEld5NCzdz9tH/e3eVBVLOu3316
-         +4yBbjRPZAbt78LC1WanCw++ioOEckyTIrV8aoF85IfzxhHjgSIqnN47TUbTbLa+kcW5
-         kJm7SoV6w8sCA/AUOrCIYGGAe6ZJKBzyXAUSXB0gfbzvkFsra1aHhNd290Z21QNhbRBu
-         dk8U99a4M5fNG2HCJdqsf+CUq5RJhV+EJPCkBlXuNqaJHXnzg+V5jsXc1op3kCMsbaTM
-         K10Ca6Cc4ojl8IgN1WGMf4c4THUd8MaqK6dd89PqQGvBza08OGXbFd6e2dFHmhJNgASg
-         ieWg==
-X-Forwarded-Encrypted: i=1; AJvYcCVZq3JFGbcFE2lbcWywttc+SU9npA8lejpcogIZGrfXE3+hg6r9pd/dduZ+/SORyeDDQPq/KE8xTiRu@vger.kernel.org
-X-Gm-Message-State: AOJu0YxVqPHzzknfjhgtWH+01rRzR8zt5B36YcR2xD/UJDsNYADmWJfF
-	+eklil8X9PXcDCP/am8Lzk97el+LkqeEd8kx2KX27+d1kTtYcRzKVxYn4O3ALnUoM0Qceqm1FTT
-	4bLcxHt4MNvpw9JJYvhzzeX12qSBrmxTmHsuNMawEyVr3WXPwzOFpVk1YZ9g=
+        bh=oDdEeTN4Szojn/rjG8dW2fuRWLH4QpxpS/wKHni5q4o=;
+        b=a/ELe+4B5qnkB+/+t09p1PBilWCLJBNyJlg7Vi2UjBYRCFe/qRzS9eZFyfv/We/hMB
+         eWOCicpqQcgrWSk431QMty309tLEdbjKJgdXM9XFqDQprl8BBzARz9r92ytNppP5RkVb
+         pyO5Aepv9I4d/JM6L127r5xud0ty+mIzHamuel9snhjCiWCAZZTVZBKOY19kUHlZn/+9
+         skLDjoIqqFGkCuK4fZxdVDVvfUxqQlARrglb1QK/P2X61T7H/EzTBwL3tFAkpxEbaWnC
+         2CPeF/e7swRDmJzABpDARBWY1UAyZx6Pu5Zga89kjmLtpzkIXb1St7eZQ8lO8ly1HIYs
+         HZxg==
+X-Forwarded-Encrypted: i=1; AJvYcCU0tgKqf3FOz8Pv4hGqdDJceJK+juKgksObvI39NlCPp5K/YyujBczxTTwurn0nD1nqeu1XUBb1+ofu@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywvjoxda3z49QEh94jKyzOcTlW9sbbxD3/9SUhqM6/DwdhSeXn3
+	CJLU7FGWNeKZva09Dn0G5aGzPOvW177WutxVs4+xZ/xaRI/pffWYSSHQeNNCZopXkKKYsYeHB8k
+	v59lNhqezdtEODDpmV1OaLGW15cBzLxr6YTpdtPHJI9SkyCwnjUv132hnpjg=
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:985:b0:65f:cda0:e00d with SMTP id
- 006d021491bc7-662e0a2ad14mr1722709eaf.17.1769411545834; Sun, 25 Jan 2026
- 23:12:25 -0800 (PST)
-Date: Sun, 25 Jan 2026 23:12:25 -0800
+X-Received: by 2002:a05:6820:1391:b0:679:e9c1:a91b with SMTP id
+ 006d021491bc7-679f3d0378fmr1014279eaf.22.1772110759502; Thu, 26 Feb 2026
+ 04:59:19 -0800 (PST)
+Date: Thu, 26 Feb 2026 04:59:19 -0800
 X-Google-Appengine-App-Id: s~syzkaller
 X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <697713d9.050a0220.226181.0018.GAE@google.com>
-Subject: [syzbot] Monthly wpan report (Jan 2026)
-From: syzbot <syzbot+list7f6cf3fce3443642c016@syzkaller.appspotmail.com>
+Message-ID: <69a043a7.050a0220.2fcbed.0009.GAE@google.com>
+Subject: [syzbot] Monthly wpan report (Feb 2026)
+From: syzbot <syzbot+list29614c14e531b35da2e2@syzkaller.appspotmail.com>
 To: alex.aring@gmail.com, linux-kernel@vger.kernel.org, 
 	linux-wpan@vger.kernel.org, miquel.raynal@bootlin.com, netdev@vger.kernel.org, 
 	stefan@datenfreihafen.org, syzkaller-bugs@googlegroups.com
@@ -57,19 +57,17 @@ All related reports/information can be found at:
 https://syzkaller.appspot.com/upstream/s/wpan
 
 During the period, 0 new issues were detected and 0 were fixed.
-In total, 6 issues are still open and 26 have already been fixed.
+In total, 5 issues are still open and 26 have already been fixed.
 
 Some of the still happening issues:
 
 Ref Crashes Repro Title
-<1> 374     Yes   KMSAN: uninit-value in ieee802154_hdr_push (2)
+<1> 398     Yes   KMSAN: uninit-value in ieee802154_hdr_push (2)
                   https://syzkaller.appspot.com/bug?extid=60a66d44892b66b56545
-<2> 346     Yes   WARNING in lowpan_xmit (2)
+<2> 347     Yes   WARNING in lowpan_xmit (2)
                   https://syzkaller.appspot.com/bug?extid=5b74e0e96f12e3728ec8
 <3> 43      Yes   KMSAN: kernel-infoleak in move_addr_to_user (7)
                   https://syzkaller.appspot.com/bug?extid=346474e3bf0b26bd3090
-<4> 19      Yes   WARNING in cfg802154_switch_netns (3)
-                  https://syzkaller.appspot.com/bug?extid=bd5829ba3619f08e2341
 
 ---
 This report is generated by a bot. It may contain errors.
