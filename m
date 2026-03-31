@@ -1,80 +1,83 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f71.google.com (mail-oo1-f71.google.com [209.85.161.71])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B40CD2C326F;
-	Tue, 24 Mar 2026 00:50:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 243543DA5DC
+	for <linux-wpan@vger.kernel.org>; Tue, 31 Mar 2026 08:07:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.71
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774313425; cv=none; b=h9m7+s3/cAyZvM8IluygmRllSMkxh6BLmEARj5TNWc5e8rgfE2nIK6rokaWiCb7Ky6DDqcjtR/RL6ShCM0bELDZoNwwQFxsu4uQO4byBmEOkQOK5WqSq3eqHX6IjhyvoM07UBE2pUk8vDNh+OXV+dOOEaH3ofplqhi1VGnNZg7Y=
+	t=1774944447; cv=none; b=Bemuif9v7liWAbmptD6oMIzfYxVREGHraSXw1QK9u2Xt7Lu9gYjBGVhnkhjEV+qY4NYEpepdwg7nuVBYH+swZldiIJrLTJK6JhppC8SEFqOAJQJTJsfxpECA/+1J6KTzhNPE/vQxH+V15QyXRSB75c6ftFQt8UId9rcT3BbTXSM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774313425; c=relaxed/simple;
-	bh=krx1trM2EwRhUXASRjrcczPnAsg8kGAhhKVfUyBmAyc=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=TARHGg4CTRcfu+a9aKVIBd8KpqHaV2B1Gmivnxj0o7WhNgN/NOgSoPDr3WwRKUnTr/G4ROSKLzCrIlqnYzDHPXW8l/eeVcSiaYljVMPHdrCXwcWoonACO5I7XorKw///BbcwOiBHKxEcwdHJLI85Jf8CSpa07BeLrTpMBLtpA4s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QbBWjCKt; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QbBWjCKt"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94B2FC4CEF7;
-	Tue, 24 Mar 2026 00:50:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774313425;
-	bh=krx1trM2EwRhUXASRjrcczPnAsg8kGAhhKVfUyBmAyc=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=QbBWjCKtwaEg+bEQnuK1+QOcjehdQI1VC/qpqULXoOSKM3RYkAPHFGn3oM0JGTC7G
-	 edJZHxH6E0va4CTWztfTzBCCHtVnOCUPNN7eRMQvgbYhncZmrw170NAzEvr5svMRYj
-	 KFWl52/53KjTXZP6j9oKEcp0aAIbKH7SA/RxMo8qadaOvI9tISxtXD53EQVg5FvCt0
-	 i/XQR4+xrTxzeQLOj9SXArud6jEQnghOptGSR74AmAcdl6ezW+ajhCxWK7TjNTXZnR
-	 quJvkGtJgBcpK3xAmv3Kxge3jvQvRJO5WLmKYB1EPKdiUqe6ICKGdBSl4ssdAqaRpT
-	 JBG40gMdQBhUQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 02DDD3808200;
-	Tue, 24 Mar 2026 00:50:15 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1774944447; c=relaxed/simple;
+	bh=dgLNqVyiq4rJK7inbNEq1N31z/NGSsmDfpAVHUogY/Q=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Zuibyqnm+5lD2hWsU1Kutet3HY17vlEsDddKru5EjZl6Si79e7oJKaOUrrUuJOexa5BcFweSTNS66lzzHusMq3fSqD1Brrzseb9ieKHQ3EQXAEEV5phyTM2wTC2ucUnrp/tkCqvutO1rN2JOX8T5SUV+RI8qT+7AoYZ5Txdbd5o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oo1-f71.google.com with SMTP id 006d021491bc7-67e1381ac1dso19667899eaf.1
+        for <linux-wpan@vger.kernel.org>; Tue, 31 Mar 2026 01:07:22 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774944441; x=1775549241;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+Falw6vbbyCbmrRDrjdbavA0kWxpOh6dMsGLFaJojcc=;
+        b=AkHr3TC7+VKWg3YB9DkDDFzLGJEM9JKlW/19X38HPMuEO+lN0FG6eppNEbIUns1kd9
+         0Cj7SD3pr2saTeAH4pNSYhbAT72ohxzDp5yFU1Std2Egq7WEz/PGZOzPJ22oNjmbD7Fq
+         kFLuTLsPoAMaUOeEZmBzRJvmaQ2pcxnG7SoGJg/FXApo+gJ7rMsdZHtJZJWkrjQ3WuNV
+         Cv8dHbBGF/j2XKi/W6xctxo306Ar15cS2I7dnaS3rJX9AAWJO/fz41YPByFgToJjqGC/
+         Q5HfZQ9jUdOBtgIHxOPO1WpbMtPRz/Eb3j6PLWJKPw5M/KuV4coNB41nkjW4mubH0As4
+         hYhQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWJIrmIsW1ftNzl+sMiEK/3Yn2mDLHywGfKF0+/1e1VRMim4JWiDM+ns1UlXhIyObkut3RYuSxY9R7B@vger.kernel.org
+X-Gm-Message-State: AOJu0YzbqxHFKb5+qlggnLng3BoyySzWSyk9eFWVCOL/x3Kfp1eIT2jd
+	D+TKnp2RMBUZ0k8IrvM617LbFQDP/o0eF4KdvbxD24xpmm+dpI4MB73uEZuwPDVWP0Xzj+inAd7
+	4v5S321/uCEHzY7Z2WaUjTqZWAm9zh8sGACVSnRuV+prVSblqcCti6mMJ3c8=
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] ieee802154: atusb: drop redundant device reference
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177431341353.395707.10248845346932260597.git-patchwork-notify@kernel.org>
-Date: Tue, 24 Mar 2026 00:50:13 +0000
-References: <20260305104313.15898-1-johan@kernel.org>
-In-Reply-To: <20260305104313.15898-1-johan@kernel.org>
-To: Johan Hovold <johan@kernel.org>
-Cc: stefan@datenfreihafen.org, alex.aring@gmail.com,
- miquel.raynal@bootlin.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
+X-Received: by 2002:a05:6820:179a:b0:67b:a667:f53e with SMTP id
+ 006d021491bc7-67e185ed405mr8132037eaf.1.1774944441679; Tue, 31 Mar 2026
+ 01:07:21 -0700 (PDT)
+Date: Tue, 31 Mar 2026 01:07:21 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <69cb80b9.a70a0220.97f31.0282.GAE@google.com>
+Subject: [syzbot] Monthly wpan report (Mar 2026)
+From: syzbot <syzbot+list2ec276fed9b7f4fd3ec7@syzkaller.appspotmail.com>
+To: alex.aring@gmail.com, linux-kernel@vger.kernel.org, 
+	linux-wpan@vger.kernel.org, miquel.raynal@bootlin.com, netdev@vger.kernel.org, 
+	stefan@datenfreihafen.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hello:
+Hello wpan maintainers/developers,
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+This is a 31-day syzbot report for the wpan subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/wpan
 
-On Thu,  5 Mar 2026 11:43:13 +0100 you wrote:
-> Driver core holds a reference to the USB interface and its parent USB
-> device while the interface is bound to a driver and there is no need to
-> take additional references unless the structures are needed after
-> disconnect.
-> 
-> Drop the redundant device reference to reduce cargo culting, make it
-> easier to spot drivers where an extra reference is needed, and reduce
-> the risk of memory leaks when drivers fail to release it.
-> 
-> [...]
+During the period, 0 new issues were detected and 0 were fixed.
+In total, 5 issues are still open and 26 have already been fixed.
 
-Here is the summary with links:
-  - ieee802154: atusb: drop redundant device reference
-    https://git.kernel.org/netdev/net-next/c/4e9b1994a105
+Some of the still happening issues:
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Ref Crashes Repro Title
+<1> 436     Yes   KMSAN: uninit-value in ieee802154_hdr_push (2)
+                  https://syzkaller.appspot.com/bug?extid=60a66d44892b66b56545
+<2> 350     Yes   WARNING in lowpan_xmit (2)
+                  https://syzkaller.appspot.com/bug?extid=5b74e0e96f12e3728ec8
+<3> 46      Yes   KMSAN: kernel-infoleak in move_addr_to_user (7)
+                  https://syzkaller.appspot.com/bug?extid=346474e3bf0b26bd3090
 
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
+
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
