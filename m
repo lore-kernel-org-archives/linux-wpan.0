@@ -1,90 +1,83 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f70.google.com (mail-oo1-f70.google.com [209.85.161.70])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEA70302750;
-	Wed, 29 Apr 2026 11:26:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 853A02FF657
+	for <linux-wpan@vger.kernel.org>; Wed, 29 Apr 2026 20:32:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777462002; cv=none; b=T4w88c8pfdui+uKTZ/A75N54vv5+ygt6XtOs+c3C834wo0jn3RKHbz8ymm034YMsyjybqeQRh4/Pkv4+hdKrXyhNd6+FeEmf1vc8g4TePtP2zeSpc7qPPwVv/agvMsclMeZvSkFsu2dIiPIE3NOV7HwPXDkT9IpDdJth3Fb3HrQ=
+	t=1777494759; cv=none; b=bfJNaUIqJ/3ltu8CTT7cpZUITjCebb5hMr8Kp22DWTLKybAwaukHJ/a/1TcwuhsZexTPvgNZ8OiYKjQc6l+4GZUURquYomECZu0kwR9ls8qDAnKdUo878Oqgv0GFruaUqB6LcoOcYkaqaupGpqwzudPHoBjz8zjp2DJ/xgfGaWs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777462002; c=relaxed/simple;
-	bh=HgV0q/+gZ9n2giWTxhUD6P3yQ6wEmY66ZwCWQHhgQ2g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kKGPImIqofHhHWkrh4obt4PWgAsqITzuUZVnGNDkfXyNLSZcsDoFgpxWWpSmbc5g0edrzTytstBlWuiMROxKCSnCuFDN5vsyWoqKkpkiSdJCcn9sghnNkWFaAx9gXkuVuHeVxtZuU4tcBqXoQ9JIGTcKIDXLTkfHvbQdDMgSy0U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ejvHWE1z; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ejvHWE1z"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 158D1C19425;
-	Wed, 29 Apr 2026 11:26:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777462002;
-	bh=HgV0q/+gZ9n2giWTxhUD6P3yQ6wEmY66ZwCWQHhgQ2g=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ejvHWE1zJ0tb1KwQu/gVCMj0KcNhlMqCOjLI4kQmWC01EPIO4HFDTFQg5PpNyMx2F
-	 7OMWgwbyfp16yd5ZKGLwfDDMuBlWK8CK9qcSIqUHZRxyhnWE4iAN+OK+xmr5WBtr4T
-	 BgqmCB7r/rsFvwFu/mT2z67QkDE/mDzOf7GDi68KHsQjYM3r7svy7TXqJDW5kWsfNa
-	 xYHmkznhflijvwvOUJkH6AcM42ZHWo8kZp7k26fwbFC82N/jHC8/F/rL8GlM8z6Ksh
-	 UMOZ5KVH94exo80oAIrmoHKOK/k/qke5mU8V2uOXUW3Mlxuf7JynBO/Edq8wMcfI5M
-	 twwrBSWDcoLLw==
-Date: Wed, 29 Apr 2026 12:26:30 +0100
-From: Will Deacon <will@kernel.org>
-To: "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>
-Cc: Yury Norov <ynorov@nvidia.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	David Laight <david.laight.linux@gmail.com>,
-	Thomas Gleixner <tglx@linutronix.de>, linux-alpha@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-snps-arc@lists.infradead.org,
-	linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
-	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-	sparclinux@vger.kernel.org, linux-um@lists.infradead.org,
-	dmaengine@vger.kernel.org, linux-efi@vger.kernel.org,
-	linux-fsi@lists.ozlabs.org, amd-gfx@lists.freedesktop.org,
-	dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
-	linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
-	linux-wireless@vger.kernel.org, linux-spi@vger.kernel.org,
-	linux-media@vger.kernel.org, linux-staging@lists.linux.dev,
-	linux-serial@vger.kernel.org, linux-usb@vger.kernel.org,
-	xen-devel@lists.xenproject.org, linux-fsdevel@vger.kernel.org,
-	ocfs2-devel@lists.linux.dev, bpf@vger.kernel.org,
-	kasan-dev@googlegroups.com, linux-mm@kvack.org,
-	linux-x25@vger.kernel.org, rust-for-linux@vger.kernel.org,
-	linux-sound@vger.kernel.org, sound-open-firmware@alsa-project.org,
-	linux-csky@vger.kernel.org, linux-hexagon@vger.kernel.org,
-	loongarch@lists.linux.dev, linux-m68k@lists.linux-m68k.org,
-	linux-openrisc@vger.kernel.org, linux-parisc@vger.kernel.org,
-	linux-sh@vger.kernel.org, linux-arch@vger.kernel.org,
-	catalin.marinas@arm.com
-Subject: Re: [RFC PATCH v1 8/9] arm64: Add unsafe_copy_from_user()
-Message-ID: <afHq5vyNUJzxVwDV@willie-the-truck>
-References: <cover.1777306795.git.chleroy@kernel.org>
- <5b09e58a84c9edcfe5724db5cd57e45d96a96bfa.1777306795.git.chleroy@kernel.org>
+	s=arc-20240116; t=1777494759; c=relaxed/simple;
+	bh=xiRXsiO3W/9uU8aPNFezc3qHFbf+yUCJnyeh4Fk9QcQ=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Pcymkth5DXJ+7hFJpAyubN9fn4Ueicyh4iNzkSD9HCVaJRwuBVicWaeSNMN7DXhhMTSsavo0mc6e5nZ5mVCOQ/9qal7AGNhMvZ3Sh269E2terz1c5RhNn44JAWFywU9DOk+/EL68upEAMpKJdLPcKgtIzFSRVOA03uGLUIlWkYw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oo1-f70.google.com with SMTP id 006d021491bc7-696266291d6so382420eaf.1
+        for <linux-wpan@vger.kernel.org>; Wed, 29 Apr 2026 13:32:38 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777494757; x=1778099557;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=fJOViW9ZqXgJfTCarUw22NKpcmj3qAVWjjSA+y5d1Jw=;
+        b=VNfkts/FsQhWkJdAYyLpc9/QkSL/H1xFLQ+S1GhqyNG89ccb6FjKwEiSCRsElCN32m
+         wIuJ5Vp45rmAmuCqGZD551WEdYjkmYtZScleKcB9rftA0B/VQTDatShxdhQyzZm5j/Ia
+         G9g0/OSmDhzhb9VcXgKuuWO6rXPIVLak4Rck0hjgc/w07enxsR8DG3xIuczCksxR7vVx
+         oICMNUvMIq/fRBDKfCfINiyka5zqHImzZQsqO58GzzJ5+MiD1BWqbIEyjv1yJ+UjIC+m
+         RnfwoyMa9s/8J/3QmA05cxF4A9fXNFjo7S9hv5dGYN0FmWaqnEsgcwrtmbbNFW0COqBk
+         OIqA==
+X-Forwarded-Encrypted: i=1; AFNElJ9vNw8q8FCJ1wrzfHkgcdqf/zzUm5rbnqlQFhliP7pxyD4eimpO8BbFMD0/HZC0KM4QhbdcLWWmlNCc@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw3wuSz0bmXuYZ9PR/TdvPFaMoAC2l6Y3qjB4PpH9nRtOLmmacD
+	9NXNt6hcjGH4+qStfQvToFtyrOFLZfM487LqSS7s89A5IFSCusi5MhAqsU0Y52Z9/s3gVwSkjcr
+	I6u164cPXR9ozY2JfyZmApTnhPEgRvi31j+LgYS/O/nCcyZaGAcQARuKMq20=
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5b09e58a84c9edcfe5724db5cd57e45d96a96bfa.1777306795.git.chleroy@kernel.org>
+X-Received: by 2002:a05:6820:16a8:b0:694:8683:3860 with SMTP id
+ 006d021491bc7-6967a625551mr83622eaf.48.1777494757575; Wed, 29 Apr 2026
+ 13:32:37 -0700 (PDT)
+Date: Wed, 29 Apr 2026 13:32:37 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <69f26ae5.170a0220.3c4978.000b.GAE@google.com>
+Subject: [syzbot] Monthly wpan report (Apr 2026)
+From: syzbot <syzbot+list6f39c4e3ba0bb706b158@syzkaller.appspotmail.com>
+To: alex.aring@gmail.com, linux-kernel@vger.kernel.org, 
+	linux-wpan@vger.kernel.org, miquel.raynal@bootlin.com, netdev@vger.kernel.org, 
+	stefan@datenfreihafen.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-[+Catalin]
+Hello wpan maintainers/developers,
 
-On Mon, Apr 27, 2026 at 07:13:49PM +0200, Christophe Leroy (CS GROUP) wrote:
-> At the time being, x86 and arm64 are missing unsafe_copy_from_user().
-> 
-> Add it.
-> 
-> Signed-off-by: Christophe Leroy (CS GROUP) <chleroy@kernel.org>
-> ---
->  arch/arm64/include/asm/uaccess.h | 29 ++++++++++++++++++++++++-----
->  1 file changed, 24 insertions(+), 5 deletions(-)
+This is a 31-day syzbot report for the wpan subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/wpan
 
-Why?
+During the period, 0 new issues were detected and 0 were fixed.
+In total, 5 issues are still open and 26 have already been fixed.
 
-And please cc the arm64 maintainers on arm64 patches next time. You've
-managed to cc most of the world apart from us.
+Some of the still happening issues:
 
-Will
+Ref Crashes Repro Title
+<1> 460     Yes   KMSAN: uninit-value in ieee802154_hdr_push (2)
+                  https://syzkaller.appspot.com/bug?extid=60a66d44892b66b56545
+<2> 366     Yes   WARNING in lowpan_xmit (2)
+                  https://syzkaller.appspot.com/bug?extid=5b74e0e96f12e3728ec8
+<3> 55      Yes   WARNING in __dev_change_net_namespace (3)
+                  https://syzkaller.appspot.com/bug?extid=3344d668bbbc12996d46
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
+
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
