@@ -1,147 +1,109 @@
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3FEA40DFA7;
-	Tue,  5 May 2026 13:01:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+Received: from zg8tmtyylji0my4xnjqumte4.icoremail.net (zg8tmtyylji0my4xnjqumte4.icoremail.net [162.243.164.118])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A2CC48B373;
+	Tue,  5 May 2026 16:32:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.243.164.118
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777986105; cv=none; b=OxWw/kouaP1F6/UCeLtSq1Ft5RVwDgNdnpkwqRAsBmjbJDNb+TjKQUqJ+Z21SbyX+bxOCcOsYHsEohbN6CeHtjma5VAfF9M/iI6DsS7GfaRdTS7ZXu7nqCidGpoEm2vJkZ09+QX5qrjei7daF6s0S9m8FSaE2fYif0nmAZkHcqI=
+	t=1777998737; cv=none; b=si7ujyMRfgZdRrdKC0t1C6CNHO6VSenryi8y3IX59htXta1YIpw1UY4ZIwy/qgHcQ327Dgcfhfei6NVRK2wWIPzR+cWrDViCRn9p9VWjA5neHMYGpYt5WXmYrNzh63vvJWyGYFaEaXGhISpUqkYwVNqN3mMJjVL5KZKstXj44k4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777986105; c=relaxed/simple;
-	bh=MxhEpN0uqJq2tCB7cr3hxj4eDiQbli3EAh40AyItXnc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BND+cf/qeKMCEIbIidqeisIAttLgsEQsvuBEKbA94OS96o8K7CFZjuReADOLvkCfMjv7cZl6ItURk2q+zHSgAUaJMrTF1ZT1Lb5+MMjPSV+VpiJCgnhZxCQ32+tZJVVgqkHbH9fRnpeMdqHnW88G9hPlIUm3p1207vb39CWaOUc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=3olMDa8X; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+	s=arc-20240116; t=1777998737; c=relaxed/simple;
+	bh=+vyMnTr6IFtuhr4rM71FSbUsO13s44dHnGjiFObo7C0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=asOYsvp5VIfSgXRmKQN65UPGP0L3OOxMMci7GnZJ41UCQdJXIlK1fQxyzmuoZkPyMS0ozEWoweM+Uy4O3Bf+Dl+LY+v9SM7IxDF3jDkSfHLwI3vny43HLaTjB3BdT5xmszojS1YVL0Evq3hAKQrBv7jvO+qvXC5olLCnqUr/uC0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=std.uestc.edu.cn; spf=pass smtp.mailfrom=std.uestc.edu.cn; dkim=fail (0-bit key) header.d=std.uestc.edu.cn header.i=@std.uestc.edu.cn header.b=iMaRd/U0 reason="key not found in DNS"; arc=none smtp.client-ip=162.243.164.118
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=std.uestc.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=std.uestc.edu.cn
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="3olMDa8X"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=IIY91kLlEleq6plR14V65czQR3JFpr8yElhtwpNztiI=; b=3olMDa8XCZi/Uwg3KdaFc5w/tp
-	oxhdQZkGoKbsx7qVwCLAVjDYGzjJB1Lz6/HJNU1Z2gvL/ajjM9t6VRYq8nUxIuaFa/bJyDgpeto+b
-	0LhkVCZIMcqrnVznD9mPWUiu5A23g7w4pgzBNyLwZeHTSByYNHNgNNjZeamR9btaCfo8=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1wKFP7-001Sep-PE; Tue, 05 May 2026 15:01:37 +0200
-Date: Tue, 5 May 2026 15:01:37 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Quan Sun <2022090917019@std.uestc.edu.cn>
-Cc: linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
-	alex.aring@gmail.com, davem@davemloft.net, edumazet@google.com
-Subject: Re: Vulnerability Report: Logical Error in 6LoWPAN Multicast Context
- Address Compression
-Message-ID: <003a541e-2e74-4ab1-9002-92a17e78362e@lunn.ch>
-References: <15e69058-da2e-4a4d-8bda-ad89da0ae6f7@std.uestc.edu.cn>
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=std.uestc.edu.cn header.i=@std.uestc.edu.cn header.b="iMaRd/U0"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=std.uestc.edu.cn; s=dkim; h=Received:From:To:Cc:Subject:Date:
+	Message-ID:MIME-Version:Content-Transfer-Encoding; bh=9XCk0dD/T5
+	M1QjuGGaDOicMCn8hxUlDRWh0a8bw58Jg=; b=iMaRd/U0wG0TjU9d175Q+NLaiT
+	MgOixab8wJpKhyiOyUaBFb8hT/RlGQBY399Q+0D51xTc+Mq97lNaR9nk1BcytHe1
+	yfoRGjxCD++Ib660XQF2wDnFdAPaT/cVuTr6jaby72bWbiqaN8uxAltwW9rCwmjD
+	W8z6ID71v8DpDb3cA=
+Received: from hotaru.tailb307d0.ts.net (unknown [183.94.22.109])
+	by hzbj-edu-front-2.icoremail.net (Coremail) with SMTP id BLQMCkCWfLx_G_ppCgHsAQ--.28515S2;
+	Wed, 06 May 2026 00:32:00 +0800 (CST)
+From: Quan Sun <2022090917019@std.uestc.edu.cn>
+To: linux-wpan@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: alex.aring@gmail.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	andrew@lunn.ch,
+	Quan Sun <2022090917019@std.uestc.edu.cn>
+Subject: [PATCH] net: iphc: fix offset errors in multicast context compression
+Date: Wed,  6 May 2026 00:31:46 +0800
+Message-ID: <20260505163146.432309-1-2022090917019@std.uestc.edu.cn>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <15e69058-da2e-4a4d-8bda-ad89da0ae6f7@std.uestc.edu.cn>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:BLQMCkCWfLx_G_ppCgHsAQ--.28515S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7CFykCr1kury7Zr4rKF17Wrg_yoW8Aw47pr
+	WxG3y0yFZ7Jw15C393Kr4vvr17ZFs5Jr1jgFW8C3WFk3W3Krna9F1qkry8GasFvr4rZ34q
+	gry5KrZ8AanakFDanT9S1TB71UUUUUDqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9v14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26r1j6r1xM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
+	6F4UM28EF7xvwVC2z280aVAFwI0_Jr0_Gr1l84ACjcxK6I8E87Iv6xkF7I0E14v26r4j6r
+	4UJwAac4AC62xK8xCEY4vEwIxC4wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC
+	0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Jr0_Gr
+	1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IE
+	rcIFxwCY1x0262kKe7AKxVWUAVWUtwCY02Avz4vE14v_JwCF04k20xvY0x0EwIxGrwCFx2
+	IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v2
+	6r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67
+	AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IY
+	s7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr
+	0_GrUvcSsGvfC2KfnxnUUI43ZEXa7VUUmhF7UUUUU==
+X-CM-SenderInfo: asqsjiyzqzilqqrzq21wgo3vxvwfhvlgxou0/
 
-On Tue, May 05, 2026 at 05:18:34PM +0800, Quan Sun wrote:
-> ## 1. Summary
-> A logical vulnerability exists in the 6LoWPAN IPHC (IP Header Compression)
-> subsystem of the Linux kernel, specifically within the
-> `lowpan_iphc_mcast_ctx_addr_compress` function in `net/6lowpan/iphc.c`.
-> 
-> The function uses incorrect memory offsets during the `memcpy` operations
-> intended to compress an IPv6 multicast address. This mismatch in offsets
-> results in an incorrectly formed compressed address being transmitted over
-> the network, which is incompatible with the corresponding decompression
-> logic. Consequently, context-based multicast address compression in 6LoWPAN
-> is broken and fails to operate as defined by the protocol.
-> 
-> ## 2. Vulnerability Details
-> 
-> According to 6LoWPAN address compression standards (and aligning with the
-> decompression function `lowpan_uncompress_multicast_ctx_daddr`), a
-> context-based compressed multicast address should be represented by exactly
-> 6 bytes:
-> *   **Bytes 0-1:** Derived from `s6_addr[1]` and `s6_addr[2]` (Flags, Scope,
-> and Reserved bits).
-> *   **Bytes 2-5:** Derived from `s6_addr[12]` to `s6_addr[15]` (The 4-byte
-> Group ID).
-> 
-> However, in the compression function `lowpan_iphc_mcast_ctx_addr_compress`,
-> the offsets provided to the `memcpy` calls are flawed:
-> 
-> ```c
-> static u8 lowpan_iphc_mcast_ctx_addr_compress(u8 **hc_ptr,
-> 					      const struct lowpan_iphc_ctx *ctx,
-> 					      const struct in6_addr *ipaddr)
-> {
-> 	u8 data[6];
-> 
-> 	/* flags/scope, reserved (RIID) */
-> 	memcpy(data, &ipaddr->s6_addr[1], 2);
-> 	/* group ID */
-> 	memcpy(&data[1], &ipaddr->s6_addr[11], 4);
-> 	lowpan_push_hc_data(hc_ptr, data, 6);
-> 
-> 	return LOWPAN_IPHC_DAM_00;
-> }
-> ```
-> 
-> ### Analysis of the Error:
-> 1.  **Incorrect Destination Offset:** The second `memcpy` writes to
-> `&data[1]` instead of `&data[2]`. This overwrites the byte previously copied
-> from `s6_addr[2]` into `data[1]`.
-> 2.  **Incorrect Source Offset:** The source address is specified as
-> `&ipaddr->s6_addr[11]` instead of `&ipaddr->s6_addr[12]`. This means it
-> begins reading from the last byte of the network prefix rather than the
-> start of the 4-byte Group ID.
-> 
-> Because the compression formatting does not match the expected structure
-> required by the decompression function, multicast packets utilizing
-> context-based compression will be corrupted upon transmission.
-> 
-> ## 3. Impact
-> This vulnerability breaks the Context-Based Multicast Address Compression
-> feature (`LOWPAN_IPHC_DAM_00` when `M` and `DAC` bits are set) in 6LoWPAN
-> networks. Nodes receiving these packets will incorrectly decompress the
-> destination multicast address, leading to dropped packets and communication
-> failures within the multicast group.
-> 
-> ## 4. Suggested Fix
-> The fix requires adjusting both the destination and source offsets in the
-> second `memcpy` call to correctly place the 4-byte Group ID into the
-> compressed `data` buffer.
-> 
-> ### Proposed Patch:
-> 
-> ```diff
-> --- a/net/6lowpan/iphc.c
-> +++ b/net/6lowpan/iphc.c
-> @@ -1084,9 +1084,9 @@ static u8 lowpan_iphc_mcast_ctx_addr_compress(u8
-> **hc_ptr,
->  	u8 data[6];
-> 
->  	/* flags/scope, reserved (RIID) */
->  	memcpy(data, &ipaddr->s6_addr[1], 2);
->  	/* group ID */
-> -	memcpy(&data[1], &ipaddr->s6_addr[11], 4);
-> +	memcpy(&data[2], &ipaddr->s6_addr[12], 4);
->  	lowpan_push_hc_data(hc_ptr, data, 6);
-> 
->  	return LOWPAN_IPHC_DAM_00;
->  }
+The function lowpan_iphc_mcast_ctx_addr_compress() contains two offset
+errors that break context-based multicast address compression
+(LOWPAN_IPHC_DAM_00).
 
-Since you have a fix, why not just submit a proper patch in the usual
-way?
+When compressing the multicast address, the compressed format expects
+exactly 6 bytes:
+  - Bytes 0-1: Flags, scope, and reserved bits (from s6_addr[1..2])
+  - Bytes 2-5: The 4-byte Group ID (from s6_addr[12..15])
 
-https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
-https://docs.kernel.org/process/submitting-patches.html
+Currently, the memcpy() operations use incorrect offsets:
+1. The destination offset for the Group ID is &data[1] instead of
+   &data[2]. This overwrites the previously copied scope byte.
+2. The source offset for the Group ID is &ipaddr->s6_addr[11] instead
+   of &ipaddr->s6_addr[12].
 
-    Andrew
+This mismatch results in a corrupted compressed address being
+transmitted. Consequently, the receiving side fails to reconstruct the
+original IPv6 address via lowpan_uncompress_multicast_ctx_daddr() since
+it expects the Group ID to start at data[2].
 
+Fix the logic by correcting both the destination and source offsets
+so that the 6-byte compressed representation is assembled correctly.
+
+Signed-off-by: Quan Sun <2022090917019@std.uestc.edu.cn>
 ---
-pw-bot: cr
+ net/6lowpan/iphc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
+index e116d308a8df6..29ae68ca3ec15 100644
+--- a/net/6lowpan/iphc.c
++++ b/net/6lowpan/iphc.c
+@@ -1091,7 +1091,7 @@ static u8 lowpan_iphc_mcast_ctx_addr_compress(u8 **hc_ptr,
+ 	/* flags/scope, reserved (RIID) */
+ 	memcpy(data, &ipaddr->s6_addr[1], 2);
+ 	/* group ID */
+-	memcpy(&data[1], &ipaddr->s6_addr[11], 4);
++	memcpy(&data[2], &ipaddr->s6_addr[12], 4);
+ 	lowpan_push_hc_data(hc_ptr, data, 6);
+ 
+ 	return LOWPAN_IPHC_DAM_00;
+
+base-commit: 95084f1883a760e0d4290698346759d58e2b944a
+-- 
+2.43.0
 
