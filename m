@@ -1,102 +1,150 @@
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E61BE42314D
-	for <linux-wpan@vger.kernel.org>; Fri,  1 May 2026 20:09:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
+Received: from zg8tmtyylji0my4xnjqumte4.icoremail.net (zg8tmtyylji0my4xnjqumte4.icoremail.net [162.243.164.118])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CC9B2DB7BA;
+	Tue,  5 May 2026 09:18:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.243.164.118
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777666172; cv=none; b=cP093bOdxJWcFXchJ/qKEBh2cV2w8XHV2K73yTuSYIcBEGQuvHP8s2unQZmfiLeMUUl+pIrfxN1/ikYGyyXlmSZ95lP/WagPnYPGDZY5PvHUXU0vPp2Z88r9vRL5urGneenlzTV/Bt4k0fKsy8Jlw9cGoZIOfRvmElkPKHvp9+s=
+	t=1777972725; cv=none; b=TqPNLdVxItGC9r6Z8RYXL112BQ1FYVDeuP2rvZ/wljtqX1zhjamQ+0N5xrSqDbPAUBZKOqkaaEMSEgsjqOjpV4jBPfSLto6OuOPIy9riZJPq9xyhjqduuSCdzGUbeCxFTA420r//z133ntIyYjEyVsRJZrSXYqFwcnrl4uK9f8w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777666172; c=relaxed/simple;
-	bh=8urvMXkl24OSZEB0wpWz9ry6TWKjiahjJExaXhP1+c4=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=m9R3dyxVgSvPtWFDEFc8BEFUosJDvlR9e+isTSkxZp6n2+/DnxqrVX5Bg+1Nd78qCUabW79QQ88YOpVplhuZu2udvaGBNFGANLK3n96gOc+leH6z++OlEIRatdL3vNxoeEBFtL/iVn4jNsfajtOCqWkiQWPhQz7bw+T6Y7zV5zk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GnDC7fr4; arc=none smtp.client-ip=209.85.216.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1777972725; c=relaxed/simple;
+	bh=9SNRQ96W42J5zCIfhW/YTNFrj8QMT4xG0K9xiri0yyk=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=kXj1kH0yJ8pN6G1vbdkhfKhB+9ddAePj96p5rDBw1lm/JbXvFSEirrPix3S3Kze28dz3yQs62xRc1iOD2dJLb+oX2Ydim/BOMPVhQBczL9K7641QFPpGlK+vnZtEMUbBw634aoa8QUecXQLoLK2uqWDhsQ1jtyLhgOIXCUF+1eM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=std.uestc.edu.cn; spf=pass smtp.mailfrom=std.uestc.edu.cn; dkim=fail (0-bit key) header.d=std.uestc.edu.cn header.i=@std.uestc.edu.cn header.b=GXdQ65Ke reason="key not found in DNS"; arc=none smtp.client-ip=162.243.164.118
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=std.uestc.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=std.uestc.edu.cn
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GnDC7fr4"
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-35da9692ec3so2801422a91.1
-        for <linux-wpan@vger.kernel.org>; Fri, 01 May 2026 13:09:29 -0700 (PDT)
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=std.uestc.edu.cn header.i=@std.uestc.edu.cn header.b="GXdQ65Ke"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777666169; x=1778270969; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9efDW0M+5+xCAVk/QjLEYc7GQc94XnH8yiFV36Yucj0=;
-        b=GnDC7fr4mCgs3WLus0hMXkXLcgMjItLxAOBAxo8KSQhgZ7n1aHBDiShJPfzyXe4GeH
-         imv/FQi/U1In7yp9WDCQNP89HRi4XJX27q+bwjiMHKewHgYZNEmWWnmcFVicwmFsKZ8I
-         iCbfuNToL9tQB/Rbvftwn9W0OgTgHMX/mjwhJQ2LHzMBRDCJF5iRDqbinKCFcFTDsrz4
-         3F9x417kEV3NaSQEPx8TF1qePG0wxs6uoNwudx+P1IfOcjdZZ8YwiRgnw5wbM3lpltxA
-         Zvn8lp/HFxlBpZNsxFjLpr2J3m1DMCq7p95J2l/1IJLHg8qD9T4ka4OgUtKp+RAOJxEy
-         RT6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777666169; x=1778270969;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=9efDW0M+5+xCAVk/QjLEYc7GQc94XnH8yiFV36Yucj0=;
-        b=Qm+Vvlk1QuTt3W61sK5S4z9WzozGsY4Ods4y304AdYd/vgakVit41xLhOhjJDQhzRa
-         FmyCehpQ6Le/i95kXQEL0ae0MjkZbhgcdgcZ9YjnAKQvc4UofUWHqAFdN+fQ2Gi3irHA
-         khfalvZYccdt6robaW0B81TbFVjDl855EGXVE7/sUS0fGUddHRoNeomj+1TXZ1AMdUrs
-         7GuZ/7pzJgSG9a3Nlc79ppdNUp5Nbiy7/4nX375nP65tOAQgDmh9mZPLI1vlFDANsVY7
-         F7jErcT7W8z76AaISTHQmQs7oFeXIn/nqIbb87+R/VHIrU9ZW6vTS3JsUQfIUnNmfR3k
-         ASSg==
-X-Forwarded-Encrypted: i=1; AFNElJ+vgisZ7BVV5JAIiYYWibTgOxvRqYjIrmJccJ6c+0fuExRjFj+H7kfnMnNwsp43ymTpq7/insUQHo/M@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx+54IhYE9fj7CasbEvCEG8draMTdNF/eOxS6TXbgwJBZWYAcKP
-	qmlIiMUjvInui+ykF5kF3rI1ZzBJYD3w5lmag6CTj3SC4tSFY3pCqOWb
-X-Gm-Gg: AeBDietA6AFEeMLYbySTmYgwl4VC7PPaGj0H3pDna5QLC0XgeIbvdncsT9Xv9DWgZrr
-	Ubkili8xjtkYOLKy2fcoYn2iZTVCQ0D1ONNetnQmH8DwCRI0TO5e+pSzsr8pRIQPw0TjXwWnohN
-	G8qHks07CWOrpje51eEU4rTycKZVDyJdN7ynSaOX3nXYLzAxItiy74mmwJIHA3Dl3K4VAxq0Bsx
-	nBM4rxppe5WSucfreUf0wDem3BFUzAHpK/zJjiBSY/yynV9LhJD+6HaPCrGJncn988BoTsjjSXX
-	EjJqFCZPpDm4e5tydodBCp4aTsO5rQveJj2o9G6NZjv7sSrR0zIvLxtwOJJlq3SJYF13o6zsAfn
-	+oFM+T3NsgJhJiOVWErs/suIf0IUI1SA4NnUOBdZCapGepctAq6GTBw6krOUjUX3kX2582p3I2U
-	d8VEL2LRndLq74WD5uLYVzjS4NV14iL2s6CueQ4kIRFuUafuoY8gqbGeBgq8DnWua6+tc91Lh4
-X-Received: by 2002:a17:90a:d444:b0:364:74c1:53b7 with SMTP id 98e67ed59e1d1-3650cda5d5dmr628144a91.2.1777666168755;
-        Fri, 01 May 2026 13:09:28 -0700 (PDT)
-Received: from localhost.localdomain ([115.110.225.242])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-364bdf2ac19sm8253866a91.3.2026.05.01.13.09.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 May 2026 13:09:28 -0700 (PDT)
-From: Shitalkumar Gandhi <shital.gandhi45@gmail.com>
-X-Google-Original-From: Shitalkumar Gandhi <shitalkumar.gandhi@cambiumnetworks.com>
-To: stefan@datenfreihafen.org,
-	alex.aring@gmail.com
-Cc: miquel.raynal@bootlin.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-wpan@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH] ieee802154: ca8210: fix cas_ctl leak on spi_async failure
-Date: Sat,  2 May 2026 01:38:03 +0530
-Message-Id: <20260501200803.3371428-1-shitalkumar.gandhi@cambiumnetworks.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20260421073259.12345-1-shitalkumar.gandhi@cambiumnetworks.com>
-References: <20260421073259.12345-1-shitalkumar.gandhi@cambiumnetworks.com>
+	d=std.uestc.edu.cn; s=dkim; h=Received:Message-ID:Date:
+	MIME-Version:User-Agent:From:Subject:To:Cc:Content-Type:
+	Content-Transfer-Encoding; bh=/aXJtrqXl1XXzWhV4If7NN+Y9lfxYLoMa8
+	LrVHQmIl4=; b=GXdQ65KeeOgnfYw5ErQfYJDXjNoCQzg3VAQomD+LEar6YFvn9E
+	s3YQRdvIGFrClymYqjfS9zA+BYJLpXlbDdoG4e+yaX0KOY01fB3xEyE+9lCUAcBz
+	aoyrmnOH8V6e5L75BEZDAdfiFPhrN5elOkaJ0NXYaRrDll7fu4LZn4kfA=
+Received: from [IPV6:240c:c983:9:4350:6499:1928:c2e4:4a99] (unknown [240c:c983:9:4350:6499:1928:c2e4:4a99])
+	by hzbj-edu-front-3.icoremail.net (Coremail) with SMTP id BbQMCkD2GjXqtflpMevqAQ--.45991S3;
+	Tue, 05 May 2026 17:18:37 +0800 (CST)
+Message-ID: <15e69058-da2e-4a4d-8bda-ad89da0ae6f7@std.uestc.edu.cn>
+Date: Tue, 5 May 2026 17:18:34 +0800
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+From: Quan Sun <2022090917019@std.uestc.edu.cn>
+Subject: Vulnerability Report: Logical Error in 6LoWPAN Multicast Context
+ Address Compression
+To: linux-wpan@vger.kernel.org, netdev@vger.kernel.org
+Cc: alex.aring@gmail.com, davem@davemloft.net, edumazet@google.com
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-CM-TRANSID:BbQMCkD2GjXqtflpMevqAQ--.45991S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxAr4xAryUtw4xWryfGF15Arb_yoW5uF4Dpr
+	WrG39Yyr97Xr13A3yvyr4v9r1xZrs5tr1UKry8C3s09a1Ygr1IvF4DKFy8Aa45Ar1ru34q
+	vw4Uu398AwsIkaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvqb7Iv0xC_Kw4lb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I2
+	0VC2zVCF04k26cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rw
+	A2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xII
+	jxv20xvEc7CjxVAFwI0_Jr0_Gr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwV
+	C2z280aVCY1x0267AKxVW8Jr0_Cr1UM2vYz4IE04k24VAvwVAKI4IrM2AIxVAIcxkEcVAq
+	07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r
+	18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41l
+	c7CjxVAaw2AFwI0_JF0_Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr
+	1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE
+	14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7
+	IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E
+	87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIdaVFxhVjvjDU0x
+	ZFpf9x07boE_iUUUUU=
+X-CM-SenderInfo: asqsjiyzqzilqqrzq21wgo3vxvwfhvlgxou0/
 
-Hi Stefan, Alex,
+## 1. Summary
+A logical vulnerability exists in the 6LoWPAN IPHC (IP Header 
+Compression) subsystem of the Linux kernel, specifically within the 
+`lowpan_iphc_mcast_ctx_addr_compress` function in `net/6lowpan/iphc.c`.
 
-Friendly ping on the patch below.  It still applies cleanly to net/master
-as of today (verified against torvalds/master), and Miquèl provided
-Reviewed-by on Apr 21.
+The function uses incorrect memory offsets during the `memcpy` 
+operations intended to compress an IPv6 multicast address. This mismatch 
+in offsets results in an incorrectly formed compressed address being 
+transmitted over the network, which is incompatible with the 
+corresponding decompression logic. Consequently, context-based multicast 
+address compression in 6LoWPAN is broken and fails to operate as defined 
+by the protocol.
 
-If you would prefer this split into two patches per Markus's suggestion
-(one for the leak fix with Fixes:/Cc: stable, one for the misleading
-error-string cleanup), please let me know and I will resend as a v2
-series.
+## 2. Vulnerability Details
 
-Thanks,
-Shitalkumar
+According to 6LoWPAN address compression standards (and aligning with 
+the decompression function `lowpan_uncompress_multicast_ctx_daddr`), a 
+context-based compressed multicast address should be represented by 
+exactly 6 bytes:
+*   **Bytes 0-1:** Derived from `s6_addr[1]` and `s6_addr[2]` (Flags, 
+Scope, and Reserved bits).
+*   **Bytes 2-5:** Derived from `s6_addr[12]` to `s6_addr[15]` (The 
+4-byte Group ID).
+
+However, in the compression function 
+`lowpan_iphc_mcast_ctx_addr_compress`, the offsets provided to the 
+`memcpy` calls are flawed:
+
+```c
+static u8 lowpan_iphc_mcast_ctx_addr_compress(u8 **hc_ptr,
+					      const struct lowpan_iphc_ctx *ctx,
+					      const struct in6_addr *ipaddr)
+{
+	u8 data[6];
+
+	/* flags/scope, reserved (RIID) */
+	memcpy(data, &ipaddr->s6_addr[1], 2);
+	/* group ID */
+	memcpy(&data[1], &ipaddr->s6_addr[11], 4);
+	lowpan_push_hc_data(hc_ptr, data, 6);
+
+	return LOWPAN_IPHC_DAM_00;
+}
+```
+
+### Analysis of the Error:
+1.  **Incorrect Destination Offset:** The second `memcpy` writes to 
+`&data[1]` instead of `&data[2]`. This overwrites the byte previously 
+copied from `s6_addr[2]` into `data[1]`.
+2.  **Incorrect Source Offset:** The source address is specified as 
+`&ipaddr->s6_addr[11]` instead of `&ipaddr->s6_addr[12]`. This means it 
+begins reading from the last byte of the network prefix rather than the 
+start of the 4-byte Group ID.
+
+Because the compression formatting does not match the expected structure 
+required by the decompression function, multicast packets utilizing 
+context-based compression will be corrupted upon transmission.
+
+## 3. Impact
+This vulnerability breaks the Context-Based Multicast Address 
+Compression feature (`LOWPAN_IPHC_DAM_00` when `M` and `DAC` bits are 
+set) in 6LoWPAN networks. Nodes receiving these packets will incorrectly 
+decompress the destination multicast address, leading to dropped packets 
+and communication failures within the multicast group.
+
+## 4. Suggested Fix
+The fix requires adjusting both the destination and source offsets in 
+the second `memcpy` call to correctly place the 4-byte Group ID into the 
+compressed `data` buffer.
+
+### Proposed Patch:
+
+```diff
+--- a/net/6lowpan/iphc.c
++++ b/net/6lowpan/iphc.c
+@@ -1084,9 +1084,9 @@ static u8 lowpan_iphc_mcast_ctx_addr_compress(u8 
+**hc_ptr,
+  	u8 data[6];
+
+  	/* flags/scope, reserved (RIID) */
+  	memcpy(data, &ipaddr->s6_addr[1], 2);
+  	/* group ID */
+-	memcpy(&data[1], &ipaddr->s6_addr[11], 4);
++	memcpy(&data[2], &ipaddr->s6_addr[12], 4);
+  	lowpan_push_hc_data(hc_ptr, data, 6);
+
+  	return LOWPAN_IPHC_DAM_00;
+  }
+```
+
