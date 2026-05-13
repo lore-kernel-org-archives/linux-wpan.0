@@ -1,123 +1,139 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 118F037DE8D;
-	Fri,  8 May 2026 13:21:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 133B847D949
+	for <linux-wpan@vger.kernel.org>; Wed, 13 May 2026 15:35:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778246478; cv=none; b=JDHOkfrt64CMncUCwYguGz4cokdkrrmEb9AVdqosXmcwpIXdlBmqaYHKiymCfYHHhpl63LXSV+QO9s45unJ4anjiNM9/VBtoobGw2RcbABD4wXtHWdecOcyRfSPuJocMd+t7IeYlIDZ4IQltld5HPcqSBs//jHQ/83tv2uVEoQA=
+	t=1778686506; cv=none; b=JKJqCfyysKY5tzhYaIZf3+hF0ezwPg2QZf4WR3d51uxAz1FtbRL9bOIjKYn7/KtuNphRu47MpcDaqjj1sls6AsrOjq4LtTbJjciz13ETa+YCJX8Ng0uhKx9oPlUc8yCLXs7yaJuKAtFuxkqU708o5KE8hvwAznkbC/+V1GvIgcs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778246478; c=relaxed/simple;
-	bh=XsLfUZzfG8Zb4SNGXPeC/V0k5XAE9VokINR/PbQYcFQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=S0X5xA2WuhckXA+VQLNlkWJIz54sOraCAQSiIR4Khn2wgbygUcTaN/lF4jnJ2yjexGfxs/F9dmiT+8gbTcNtHn/flgl3+qokBqSEqJkXkWRpvvkU9TpgoYg49zCpbAF9bjjbxI5CUvdfGok3xCWwh8juQKpqetHGhncJ8tYJEq4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qFjXLEaV; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1778686506; c=relaxed/simple;
+	bh=380OIoxziQ8FlKx1mJdOpqZlW6QTVqBF+ru5RUN6Y8U=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ak9DJKYNzHR7lgVkaatMHCEkq0QnnqrqcV+RSjqobfr3ZMg5KghcBO65vmNbgapdULtBR+OCD1n9De55mpEOvkdtmKvWw891USdLot5im78G2RHQuYeg53sTd24mRWdbhv1K150ddC2SHSCxW1wdShsR6nPanhLpq+B/yBASRug=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=npRkMkoU; arc=none smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qFjXLEaV"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 615F3C2BCB0;
-	Fri,  8 May 2026 13:21:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778246477;
-	bh=XsLfUZzfG8Zb4SNGXPeC/V0k5XAE9VokINR/PbQYcFQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=qFjXLEaVQZdM6rzDT6ZS0LwxW8LaCuRC7gpoUF64uyolRdrDRhhcjwnL0TR8iUsHr
-	 cQ0OEh2mU7Fwr8qTYLvIJJv7JUdZJk/4yrmp4imvbjF+CPe4hfRsZJ41+1LIoWV8MR
-	 +xEL8hLEdq6/ZuNp7Z42cQV5B4jQwQw3w1EKOyDPkdpG9ua4rQJgdJJTkqpZW6Yw0m
-	 hyIPYNdN+pm3dNElUn4HQlYmBr+49jtxIUuc5TF1tBPtN3FsR8W50f/ZOF2FVuefmm
-	 e1Pn1dVvyMlN3Q57tcKHuHBICFVmJW8jmNiEyxyIrgibj3DOQskqJVCUkquA5WUOc/
-	 9FDjU8uAHhI+w==
-Date: Fri, 8 May 2026 14:21:13 +0100
-From: Simon Horman <horms@kernel.org>
-To: Quan Sun <2022090917019@std.uestc.edu.cn>
-Cc: linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
-	alex.aring@gmail.com, davem@davemloft.net, edumazet@google.com,
-	andrew@lunn.ch
-Subject: Re: [PATCH] net: iphc: fix offset errors in multicast context
- compression
-Message-ID: <20260508132113.GN15617@horms.kernel.org>
-References: <20260505163146.432309-1-2022090917019@std.uestc.edu.cn>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="npRkMkoU"
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2b45cb89f7eso44646635ad.0
+        for <linux-wpan@vger.kernel.org>; Wed, 13 May 2026 08:35:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1778686501; x=1779291301; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=1ruAzbMeVdqPrvuygkIYeYyoYSoRcGERUW0xC+xQv0o=;
+        b=npRkMkoUGnX70IhNC8M/ofOyKtFVwAiVdmWCIefbzRBhb9ApUHkAZn/LSblKzBFCRA
+         wlOTJp3WKEN6cxWpj32fSDOxvmJSFeTaxHXGELTCZkENr8/dsHQWW/BOJoD+RiPc4Wcn
+         ZHiMizZfcam6yOMHqJjLkpz1EZFQxJlQNPObFaG3u+1Gc+WXSMhmbCySzPER2zv5gqNz
+         0uWCMkz3b/u06VCJzxJY4G4G/nJghKTash9R/knJHy53JLg5TKFtcJ2Hdt+pZs+3b3bZ
+         +pv541wOv/ki2bCzgMngHRTw55QDIm5EekSXN0fiV8dWHh5YU5mK2PsXZaii7QyhbjRg
+         KZgQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778686501; x=1779291301;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1ruAzbMeVdqPrvuygkIYeYyoYSoRcGERUW0xC+xQv0o=;
+        b=Qa8tOzpeYtuLXkTotMaTzB5QiaE93VGtSSik5/DLJgqVWUtCXbnktbKnKKBpV9zdtk
+         svcDaCgzDl/YDWWNOAeATh01GSAJH6YlcjsZG4843pxzRGaDGFLt071qa/INL3s05pAG
+         QeKQefnOGVk9XiuVlUxOMyoB1Gy7/HNYbfoBgj17NT9qEtTCNU9KGb/CU77iG+EfnjJL
+         4hlUq+WX30xaNAI0q1Evz0Czeom2iUvDBkdC7Kfi227KFktG/H0HuDXQmuFzXXKUMoN/
+         b7r3fscqQwXWGFpPoiY0dxs0A8YlHkg5xNkiuJKZMKvlBfKKQ4ScisVnmoJKH52DsuV/
+         dU9Q==
+X-Forwarded-Encrypted: i=1; AFNElJ8lrSBb1Swqf2JdbJsuLJFuT19fAsY4+uyoyO253hucPJaM4tuYn0cX7oNU9d2LbnMByZCaxZrQ4UMu@vger.kernel.org
+X-Gm-Message-State: AOJu0YyvXFbxu3AYZ07N2lU93zKSYjvjp2AUNRmhEb9MPIrMduEb7GRm
+	aSy1SKT6krjwivMT1lA/qcn+55lU1VF1awCcobJVaFwF1vhaM++8NUej
+X-Gm-Gg: Acq92OFqzABnnHZPqakqRlpfMNwwoPU9vEB1v7sGJGBcSYU2P+U0M+lXprfdRjOaKwN
+	jmvZZZs3nhtollx4d4+MKQP6J5HAESmxMVfrLygFjoFnVQKkMr+1Iqgym3pTyWihLndDWp9klKm
+	lZx6GZpwIdL+679d37yuyVKhwT8ukXfKXLXgagu2J2y0gWWhzh/e+YQyEPAPY1FxZta4pto0Zon
+	36gp1ypXoeDudmD7kdvQ8mBkZqzO3uaLoF6fWOuLucB4j/F3snOfT3Gttcu7yOxPHYpMDu6WIwm
+	7UFkTW5DgMqIiFXXASJ9yAbTqN5o41Te0ZZdJLLb5v3OU6m5cUIvgjfLxYKkDlgdpsvE0KxDaCO
+	LwpDF2aedty7qBS4SQcDzOze88+d7qywBb9uB7DDH2rI60vw1e+36RwY74rGCNw1tcchgzKipDU
+	IrVKbNN17VAX/W3V9sKpx5cRtMrh1ctf+h3afg9nYgFl/acg5DWHuHLlsbU2rkOQ==
+X-Received: by 2002:a17:903:f8c:b0:2bd:147d:c712 with SMTP id d9443c01a7336-2bd27133c75mr44261705ad.1.1778686500924;
+        Wed, 13 May 2026 08:35:00 -0700 (PDT)
+Received: from localhost.localdomain ([115.110.225.242])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2baf1d27055sm173821065ad.6.2026.05.13.08.34.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 May 2026 08:34:58 -0700 (PDT)
+From: Shitalkumar Gandhi <shital.gandhi45@gmail.com>
+X-Google-Original-From: Shitalkumar Gandhi <shitalkumar.gandhi@cambiumnetworks.com>
+To: Alexander Aring <alex.aring@gmail.com>,
+	Stefan Schmidt <stefan@datenfreihafen.org>,
+	Miquel Raynal <miquel.raynal@bootlin.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-wpan@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org,
+	Shitalkumar Gandhi <shitalkumar.gandhi@cambiumnetworks.com>
+Subject: [PATCH wpan] ieee802154: ca8210: fix pointer truncation in kfifo on 64-bit
+Date: Wed, 13 May 2026 21:04:12 +0530
+Message-Id: <20260513153412.1284549-1-shitalkumar.gandhi@cambiumnetworks.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260505163146.432309-1-2022090917019@std.uestc.edu.cn>
+Content-Transfer-Encoding: 8bit
 
-On Wed, May 06, 2026 at 12:31:46AM +0800, Quan Sun wrote:
-> The function lowpan_iphc_mcast_ctx_addr_compress() contains two offset
-> errors that break context-based multicast address compression
-> (LOWPAN_IPHC_DAM_00).
-> 
-> When compressing the multicast address, the compressed format expects
-> exactly 6 bytes:
->   - Bytes 0-1: Flags, scope, and reserved bits (from s6_addr[1..2])
->   - Bytes 2-5: The 4-byte Group ID (from s6_addr[12..15])
-> 
-> Currently, the memcpy() operations use incorrect offsets:
-> 1. The destination offset for the Group ID is &data[1] instead of
->    &data[2]. This overwrites the previously copied scope byte.
-> 2. The source offset for the Group ID is &ipaddr->s6_addr[11] instead
->    of &ipaddr->s6_addr[12].
-> 
-> This mismatch results in a corrupted compressed address being
-> transmitted. Consequently, the receiving side fails to reconstruct the
-> original IPv6 address via lowpan_uncompress_multicast_ctx_daddr() since
-> it expects the Group ID to start at data[2].
-> 
-> Fix the logic by correcting both the destination and source offsets
-> so that the 6-byte compressed representation is assembled correctly.
+ca8210_test_int_driver_write() and ca8210_test_int_user_read() exchange
+a kmalloc'd buffer pointer through a struct kfifo, but pass a literal
+'4' as the byte count to kfifo_in()/kfifo_out().
 
-Thanks,
+This is correct on 32-bit (pointer = 4 bytes), but on 64-bit only the
+low 4 bytes of the 8-byte pointer are written into the FIFO. The reader
+then reads back 4 bytes into an 8-byte local pointer variable, leaving
+the upper 4 bytes uninitialized stack data. The first dereference of
+the reconstructed pointer (fifo_buffer[1]) accesses an arbitrary kernel
+address and generally results in an oops.
 
-This matches my understanding of:
+Use sizeof(fifo_buffer) so the byte count matches pointer width on every
+architecture.
 
-RFC 6382 Compression Format for IPv6 Datagrams over IEEE 802.15.4-Based Networks
--> Section  3.2.4. Stateful Multicast Address Compression
-   https://www.rfc-editor.org/rfc/rfc6282#section-3.2.4
+The driver has no architecture restriction in Kconfig, so any 64-bit
+build with CONFIG_IEEE802154_CA8210_DEBUGFS=y is exposed. Issue has
+been latent since the driver was added in 2017 because it is most
+commonly deployed on 32-bit MCUs.
 
-And it's reference to 
+Found via a custom Coccinelle semantic patch hunting for short-byte
+kfifo I/O on byte-mode kfifos used to shuttle pointers.
 
-RFC 3306 Unicast-Prefix-based IPv6 Multicast Addresses
--> Section 4. Multicast Address Format
-   https://www.rfc-editor.org/rfc/rfc3306#section-4
+Fixes: ded845a781a5 ("ieee802154: Add CA8210 IEEE 802.15.4 device driver")
+Signed-off-by: Shitalkumar Gandhi <shitalkumar.gandhi@cambiumnetworks.com>
+---
+ drivers/net/ieee802154/ca8210.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-RFC 6382 is referred to by
-RFC 6775 Neighbor Discovery Optimization for IPv6 over Low-Power Wireless
-         Personal Area Networks (6LoWPANs)
-- https://www.rfc-editor.org/rfc/rfc6775.html
+diff --git a/drivers/net/ieee802154/ca8210.c b/drivers/net/ieee802154/ca8210.c
+index 753215ebc67c..154af346c936 100644
+--- a/drivers/net/ieee802154/ca8210.c
++++ b/drivers/net/ieee802154/ca8210.c
+@@ -597,7 +597,7 @@ static int ca8210_test_int_driver_write(
+ 	fifo_buffer = kmemdup(buf, len, GFP_KERNEL);
+ 	if (!fifo_buffer)
+ 		return -ENOMEM;
+-	kfifo_in(&test->up_fifo, &fifo_buffer, 4);
++	kfifo_in(&test->up_fifo, &fifo_buffer, sizeof(fifo_buffer));
+ 	wake_up_interruptible(&priv->test.readq);
+ 
+ 	return 0;
+@@ -2541,7 +2541,8 @@ static ssize_t ca8210_test_int_user_read(
+ 		);
+ 	}
+ 
+-	if (kfifo_out(&priv->test.up_fifo, &fifo_buffer, 4) != 4) {
++	if (kfifo_out(&priv->test.up_fifo, &fifo_buffer, sizeof(fifo_buffer))
++	    != sizeof(fifo_buffer)) {
+ 		dev_err(
+ 			&priv->spi->dev,
+ 			"test_interface: Wrong number of elements popped from upstream fifo\n"
+-- 
+2.25.1
 
-Which is in turn referred to by
-RFC 8138 IPv6 over Low-Power Wireless Personal Area Network (6LoWPAN)
-         Routing Header
--> Section 4.3.  Compressing Addresses
-   https://www.rfc-editor.org/rfc/rfc8138.html#section-4.3
-
-
-> Signed-off-by: Quan Sun <2022090917019@std.uestc.edu.cn>
-
-As a fix this should have a fixes tag.
-I think this one is appropriate.
-
-Fixes: 5609c185f24d ("6lowpan: iphc: add support for stateful compression")
-
-I don't think you need to repost because of this, but for future reference,
-fixes for Networking code present in the net tree should be targeted at
-that tree. This includes making sure the patch applies to that tree
-(I assume this one does) and including net, as opposed to net-next,
-in the patch subject like this:
-
-Subject: [PATCH net] ...
-
-Also, as a fix this probably waranted being CCed to stable.
-
-For more information on Networking development process please see
-https://docs.kernel.org/process/maintainer-netdev.html
-
-The last two points not withstanding, this looks good to me.
-
-Reviewed-by: Simon Horman <horms@kernel.org>
-
-...
