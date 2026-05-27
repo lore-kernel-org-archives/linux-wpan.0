@@ -1,127 +1,119 @@
-Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [207.46.229.174])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39E603BB10A;
-	Wed, 27 May 2026 08:18:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.46.229.174
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EC713B47EE;
+	Wed, 27 May 2026 20:18:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779869929; cv=none; b=LJcBstPyRqu3Ih0rs0pC7K9RF41Gg1A/61bLyGo8DQkNK9bOroqzS/TNTtjHWU5i7RhFpcGp+td6Nx5ZYzIZRxceVr0Df934rgP7pCGG/58Iqje6jxDS6nqmJempENllrPiGeV/fLYK2Ex61yyPvPdn7LzbTLNIzWcl7sgSAMx0=
+	t=1779913100; cv=none; b=bMxXBNPh8r8Xsx40b3TJoW0cqeX9fVol8V+1RZTujqq8CaUqNPOd8Yk0cCfoE16G7bALw4sEeqd1Zwmv9b3hXSVRxa2vTCM3gEKYwYKmu05eep7ssfaCBzXrhGsYcmDd6FQD8+LvVEyChIqpsvSSBSo4zhGCirRNZJwpHsazS2s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779869929; c=relaxed/simple;
-	bh=syfk5959tJHAPWULL5+nOqHgS2Vt+pN5sQcrmx2+q1w=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WHKIT5QSQ2c08rz9FPxOZdEVZkOnSnB4ScZFDswvWX7XaXpiV767hXZTkYkEOhFYPoI718TjP49OJfSGcvwNgLTxD6/xnr5SLT7U91OZ36Ywb4XE42aDZArq4/+D908oJaYY5EvwIHt5GVdGD7qkM75kKeqCrUT9cpXi7vFJC9c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mails.tsinghua.edu.cn; spf=pass smtp.mailfrom=mails.tsinghua.edu.cn; dkim=pass (1024-bit key) header.d=mails.tsinghua.edu.cn header.i=@mails.tsinghua.edu.cn header.b=QEL+pgSx; arc=none smtp.client-ip=207.46.229.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mails.tsinghua.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mails.tsinghua.edu.cn
+	s=arc-20240116; t=1779913100; c=relaxed/simple;
+	bh=DNWK8fWvqEZ0UHlUCqs9f738tVYWPqYCOIF175utZ7o=;
+	h=From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:Date; b=EYiMqaQ1lW4wMgVNWVadRMvYoi3GdCz7mu42Z1gClXGY6bKsQBUY8aMT04vb/TU4ovYyRJXLOhyZzo9peCyfcltK8bUQhl8vv7kOzFAMfm+RQLRDdNMLSuDsmBFoHia22tL0p9WftVvquBIq6GhMjCOsP3M7+WheF05jZE535FE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YNFt3UpC; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mails.tsinghua.edu.cn header.i=@mails.tsinghua.edu.cn header.b="QEL+pgSx"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=mails.tsinghua.edu.cn; s=dkim; h=Received:From:To:Cc:Subject:
-	Date:Message-ID:MIME-Version:Content-Transfer-Encoding; bh=2rub8
-	xVFH79HgKRt47yMxbSOY6mYiviajCZO6Mf7T5k=; b=QEL+pgSxblLp9DWSugux8
-	gguAPIWCC+lsykNdN3bz1BL63x+vsVOwTjA62HksH9jrMuYD54Yj7Mtut3mH1Pqd
-	wxyrG3bG67SiNfygShp1SRDqdUk7cRJgGmjOCwCwszoDMS0jF+AO5IGOXgRhOHay
-	HQeun4ksVS8WI1vq+BcCjI=
-Received: from localhost.localdomain (unknown [211.102.241.99])
-	by web3 (Coremail) with SMTP id ygQGZQA3go_ZqBZqOrztAQ--.39780S2;
-	Wed, 27 May 2026 16:18:33 +0800 (CST)
-From: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
-To: netdev@vger.kernel.org
-Cc: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>,
-	Alexander Aring <alex.aring@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	linux-bluetooth@vger.kernel.org,
-	linux-wpan@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>,
-	Ao Wang <wangao@seu.edu.cn>,
-	Xuewei Feng <fengxw06@126.com>,
-	Qi Li <qli01@tsinghua.edu.cn>,
-	Ke Xu <xuke@tsinghua.edu.cn>
-Subject: [PATCH net] 6lowpan: fix off-by-one in multicast context address compression
-Date: Wed, 27 May 2026 16:18:01 +0800
-Message-ID: <20260527081806.42747-1-zhaoyz24@mails.tsinghua.edu.cn>
-X-Mailer: git-send-email 2.46.2
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YNFt3UpC"
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 8B63F1F00A3D;
+	Wed, 27 May 2026 20:18:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1779913099;
+	bh=DYLUd3afQlwG7kekyWqFmew86E2EaHaXJzEC9U/N4kA=;
+	h=From:To:Cc:Subject:Date;
+	b=YNFt3UpCsb3yvvjUPevQafClycXtg1fUH8clXiVLfUhixPC6qpmX8bXvmVi7uittl
+	 Ntu8S63lx6TVXn39jVDFKbFDShZkZUu6wNEWkbP8Zf41Ws9U0URIoCiuU2bjSxI8J0
+	 FmnjsAsd9s+AdjojN4vZVl183WTS+YqSSUB52rD8HMlidCKRnafERy4Gs1Q3qKISv3
+	 kcQANJy+DtNEcsa8mm0203Yy7t0iZ+TPAs0wi5mtxaKxEraziH5cmQLxI7sKvGXvrI
+	 isTQfOS7zXE4TGCOoqcKvHFRG54sR7Bzx+JrykWdIKc5FpGGUBO2CLNZN3wi07ktH6
+	 kIPb8C6IW2kYQ==
+From: "syzbot" <syzbot@kernel.org>
+To: syzkaller-bugs@googlegroups.com, "Alexander Aring" <alex.aring@gmail.com>, "David S. Miller" <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>, <linux-wpan@vger.kernel.org>, "Miquel Raynal" <miquel.raynal@bootlin.com>, <netdev@vger.kernel.org>, "Paolo Abeni" <pabeni@redhat.com>, "Stefan Schmidt" <stefan@datenfreihafen.org>
+Cc: horms@kernel.org, linux-kernel@vger.kernel.org, syzbot@lists.linux.dev
+Subject: [PATCH] ieee802154: fix kernel-infoleak in dgram_recvmsg()
+Message-ID: <62795fd9-fc0c-48eb-bb82-05ffc5a57104@mail.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:ygQGZQA3go_ZqBZqOrztAQ--.39780S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7tw1rtw18tw45WF4UJr4rAFb_yoW8Zry3pa
-	s7A3s0yF97JrW3u392yw1jvw17uF4kJrWay340ya4YvFn0gF10yr18KFWkJas0yrWYk34j
-	qFWUCrWYyan8GrDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUP014x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1lnxkEFVAIw20F6cxK64vIFxWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xv
-	F2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r
-	4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I
-	648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAaw2AFwI0_Jw0_GFylc2xSY4AK67
-	AK6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAF
-	wI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc4
-	0Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AK
-	xVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr
-	1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUjXTm3UU
-	UUU==
-X-CM-SenderInfo: 52kd05r2suqzpdlo2hxwvl0wxkxdhvlgxou0/1tbiAQEAAWoWnq0YHQAAsL
+Date: Wed, 27 May 2026 20:18:18 +0000 (UTC)
 
-The second memcpy in lowpan_iphc_mcast_ctx_addr_compress() uses
-&data[1] as destination and &ipaddr->s6_addr[11] as source, but
-both should be offset by one: &data[2] and &ipaddr->s6_addr[12]
-respectively.
+From: Aleksandr Nogikh <nogikh@google.com>
 
-This off-by-one has two consequences:
-1. data[1] is overwritten with s6_addr[11], corrupting the RIID
-   field in the compressed multicast address
-2. data[5] is never written, so uninitialized kernel stack memory
-   is transmitted over the network via lowpan_push_hc_data(),
-   leaking kernel stack contents
+KMSAN reported a kernel-infoleak in move_addr_to_user():
 
-The correct inline data layout must match what the decompression
-function lowpan_uncompress_multicast_ctx_daddr() expects:
-  data[0..1] = s6_addr[1..2]  (flags/scope + RIID)
-  data[2..5] = s6_addr[12..15] (group ID)
+BUG: KMSAN: kernel-infoleak in instrument_copy_to_user
+include/linux/instrumented.h:131 [inline]
+BUG: KMSAN: kernel-infoleak in _inline_copy_to_user
+include/linux/uaccess.h:205 [inline]
+BUG: KMSAN: kernel-infoleak in _copy_to_user+0xcc/0x120
+lib/usercopy.c:26
+ instrument_copy_to_user include/linux/instrumented.h:131 [inline]
+ _inline_copy_to_user include/linux/uaccess.h:205 [inline]
+ _copy_to_user+0xcc/0x120 lib/usercopy.c:26
+ copy_to_user include/linux/uaccess.h:236 [inline]
+ move_addr_to_user+0x2e7/0x440 net/socket.c:302
+ ____sys_recvmsg+0x232/0x610 net/socket.c:2925
+ ...
+ Uninit was stored to memory at:
+ ieee802154_addr_to_sa include/net/ieee802154_netdev.h:369 [inline]
+ dgram_recvmsg+0xa09/0xbe0 net/ieee802154/socket.c:739
 
-Also zero-initialize the data array as a defensive measure against
-similar bugs in the future.
+The issue occurs because the `pan_id` field of `struct ieee802154_addr`
+is left uninitialized when the address mode is `IEEE802154_ADDR_NONE`.
+The execution flow is as follows:
 
-Fixes: 5609c185f24d ("6lowpan: iphc: add support for stateful compression")
-Reported-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
-Reported-by: Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>
-Reported-by: Ao Wang <wangao@seu.edu.cn>
-Reported-by: Xuewei Feng <fengxw06@126.com>
-Reported-by: Qi Li <qli01@tsinghua.edu.cn>
-Reported-by: Ke Xu <xuke@tsinghua.edu.cn>
-Assisted-by: GLM:GLM-5.1
-Signed-off-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
+1. `__ieee802154_rx_handle_packet()` declares a local `struct
+ieee802154_hdr hdr` on the stack.
+2. `ieee802154_hdr_pull()` calls `ieee802154_hdr_get_addr()` to parse
+the source and destination addresses into this structure.
+3. If the address mode is `IEEE802154_ADDR_NONE`,
+`ieee802154_hdr_get_addr()` previously only set the `mode` field,
+leaving the `pan_id` field containing uninitialized stack memory.
+4. This uninitialized `pan_id` is later copied into a `struct
+sockaddr_ieee802154` in `dgram_recvmsg()` via `ieee802154_addr_to_sa()`.
+5. Finally, `move_addr_to_user()` copies the socket address structure to
+user space, leaking the uninitialized bytes.
+
+Fix this by using `memset` to zero out the address structure in
+`ieee802154_hdr_get_addr()` when the mode is `IEEE802154_ADDR_NONE`.
+
+Fixes: 94b4f6c21cf5 ("ieee802154: add header structs with endiannes and operations")
+Assisted-by: Gemini:gemini-3.1-pro-preview Gemini:gemini-3-flash-preview syzbot
+Reported-by: syzbot+346474e3bf0b26bd3090@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=346474e3bf0b26bd3090
+Link: https://syzkaller.appspot.com/ai_job?id=a507a109-d683-4a2c-bc03-93394f491b17
+Signed-off-by: Aleksandr Nogikh <nogikh@google.com>
+
 ---
-diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
-index e116d30..37eaff3 100644
---- a/net/6lowpan/iphc.c
-+++ b/net/6lowpan/iphc.c
-@@ -1086,12 +1086,12 @@ static u8 lowpan_iphc_mcast_ctx_addr_compress(u8 **hc_ptr,
- 					      const struct lowpan_iphc_ctx *ctx,
- 					      const struct in6_addr *ipaddr)
+diff --git a/net/ieee802154/header_ops.c b/net/ieee802154/header_ops.c
+index 41a556be1..a9f0c8df5 100644
+--- a/net/ieee802154/header_ops.c
++++ b/net/ieee802154/header_ops.c
+@@ -173,10 +173,13 @@ ieee802154_hdr_get_addr(const u8 *buf, int mode, bool omit_pan,
  {
--	u8 data[6];
-+	u8 data[6] = {};
+ 	int pos = 0;
  
- 	/* flags/scope, reserved (RIID) */
- 	memcpy(data, &ipaddr->s6_addr[1], 2);
- 	/* group ID */
--	memcpy(&data[1], &ipaddr->s6_addr[11], 4);
-+	memcpy(&data[2], &ipaddr->s6_addr[12], 4);
- 	lowpan_push_hc_data(hc_ptr, data, 6);
+-	addr->mode = mode;
+-
+-	if (mode == IEEE802154_ADDR_NONE)
++	if (mode == IEEE802154_ADDR_NONE) {
++		memset(addr, 0, sizeof(*addr));
++		addr->mode = IEEE802154_ADDR_NONE;
+ 		return 0;
++	}
++
++	addr->mode = mode;
  
- 	return LOWPAN_IPHC_DAM_00;
+ 	if (!omit_pan) {
+ 		memcpy(&addr->pan_id, buf + pos, 2);
 
 
---
-2.43.0
-
+base-commit: 5200f5f493f79f14bbdc349e402a40dfb32f23c8
+-- 
+See https://github.com/google/syzkaller/blob/master/docs/syzbot_ai_patches.md for information about AI-generated patches.
+You can comment on the patch as usual, syzbot will try to address
+the comments and send a new version of the patch if necessary.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
