@@ -1,187 +1,104 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6793F35675C
-	for <linux-wpan@vger.kernel.org>; Sun, 31 May 2026 22:41:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=170.10.129.124
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780267313; cv=pass; b=b4ucgIIYLtrNI4fHDUd5GpHExtt0V1MUq748jSLqecqoluNgBFI1eCxIiOq17apC+9rVnxMKHKXWIhdQX/JxrzP896oD8rdrihFTDBbXA0b7a0Tjy7oDoUwIckaKBfYf/VIVaAlfncIIW7w7XyfJ7aVqXGDsWtRiSI8VagobBIc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780267313; c=relaxed/simple;
-	bh=DwqmmYGhzLJZcKctFbT7fQlI57XOCuUvJS2TlMvi4UU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Kf9R4qDe2/dyP1/5lMhRRg+VLrE2iTWG3KSGVKYEbtHTe4/3Uv9b9nSxfB6oCS+HAK0R8b1hLMp7MlmU2/zirbqhkxqHsSw72BaM4/320VBasO2DiO2RRRUi9rSTLb+2Ki4qQffFUf3xvChWp24r9j6XkOmtjpjz3gEvaotgsjs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iWHS0PuR; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=asuJOGG5; arc=pass smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9F993DCDA4;
+	Mon,  1 Jun 2026 20:43:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780346594; cv=none; b=o91JN4H6FNvWr+C/YfoYHgKLZgdXnLGKXntAgwn2Ciu5BBi6j/3LZJ+U9rA7UDRpq4inn0G67agJomuE81HkCI+d4QmPXv37Fo03W2Qa0LEZGPxmGsxigTJajU+ewVI2r/5hIMrUH2GvoKjH8dtxsBkaKJvMhngPA+0/LjUkUBI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780346594; c=relaxed/simple;
+	bh=fOGSZLe6merD5rMvEEGhH7/QQJN7eja4hCCkHPCcY+A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bT02rGWGcY9CGWnAd+TWIGuZZu0qbAD6BhnIQ7bNMHPJKTsbbY6++vav5U/Is0+qyWWgTpNf6iQCoQJmh5It2+qtHn9qrUCVPFEmMhVmV0b8cf4LOOroZqTU2YqM3viB5SBkwHtJlmlF3hMLxV5LS6fLiJXZn6xmve3GqsSBWW0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GXgPVvfs; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iWHS0PuR";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="asuJOGG5"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1780267309;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fE4JU+gsz+ECemqk45eUb2e+nliPviu8zBW1jL7IQco=;
-	b=iWHS0PuRQMVKWsQHW0nujbf2mH5MmuBfxMsb+u+3db+FSSS6HsrPqnndrvXrw3sZmp9JO+
-	qps48KQDmb2xHGXUMBYHDcOzDkKI+z2ENMDmEn0A7FHLH8So6udDdbLwvvFF0cASHtqMS2
-	M69V2G8jc0+mnkOKD2we3HJQ9sl7t5o=
-Received: from mail-lj1-f200.google.com (mail-lj1-f200.google.com
- [209.85.208.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-295-CFW7KldxP86cXKq9zvNkeg-1; Sun, 31 May 2026 18:41:47 -0400
-X-MC-Unique: CFW7KldxP86cXKq9zvNkeg-1
-X-Mimecast-MFC-AGG-ID: CFW7KldxP86cXKq9zvNkeg_1780267306
-Received: by mail-lj1-f200.google.com with SMTP id 38308e7fff4ca-3967720a727so3148451fa.1
-        for <linux-wpan@vger.kernel.org>; Sun, 31 May 2026 15:41:47 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1780267306; cv=none;
-        d=google.com; s=arc-20240605;
-        b=T7hXIL3xdkbNMn+XlaYImGzyoFEkn4KtjSqwWP7uqheWQhpfgf7EuZI9eQJlbEYiee
-         sHaS/ss6pSCDJcOQXDGNA56B/hfmFTiwdCRQEi8xzZ6JUEnl4Y1LZHi4zQ97fkRTEvjB
-         EZBUYvPdhzkzLn8ae3PF30tCi4pIue+wp6mD8q6YwIZ8WOA93+iw1495JdW/VnZBHG8U
-         1MmVrlK3zhBEcmPxB/j7DoDZ6P8+LfrfNpc/BuTIGrZa5oP+XcrNiB4c4MRCLTseCBiH
-         QZi1zrdO2MXR+pTVCESiRVsL95Xjirn48snRl6rT60EwzsokaJm0pECV/gndwcfPCQX/
-         Z0Mw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=fE4JU+gsz+ECemqk45eUb2e+nliPviu8zBW1jL7IQco=;
-        fh=Z5RWiJH2Mg3P32G1YC3dZS3gcT+fInFrE+m4IZL6Wyc=;
-        b=k5jvX1tWhujnapX3U0Nf9vQ8Ca4WM+cgIqxwwNLQMhAMZmX+WZCpBLimLc2Xy+227M
-         o4o9FiDbF5y2ZE+NNutlavO1Ptvx6eaV9/JvQEHLICyw0e4dpv5D1mRQyygB45eh6eO/
-         AFRssYAn6V+RHgjU1f5p1Rt5sS7leYWJ/cg/EzvG+cowt30mQH7dkYPytps0/wuFKbm7
-         QsMoQu3A8RwjmHkPnibMWnqqJk6m/Sp5PmTkJsstSoeiv+KiBZw3eo4gFOo3U1FXoqM5
-         C9gt+6ppaq173Wm+BZMDDHVKL1Zp4WiHHvyqvgqRPybtvWC5G9Zn10ezBO4Yy5zuGPZd
-         SCKA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1780267306; x=1780872106; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fE4JU+gsz+ECemqk45eUb2e+nliPviu8zBW1jL7IQco=;
-        b=asuJOGG5Ik+X70IysGdueIpobpCYSEe/esN26gT3Z0vJVThLoj7gKsee82cG2EpCi5
-         A1yBepsAKfxLZNWa3OcXzDGQu8whGgdXzi2BAPrN6BDPVp6a2WjpaHtXI1VuIswdImMA
-         OS5ZEoCdRxD4ikZ9XRP84KspwOXo7viFs7FATe3Jj+NOP8PJbQx0HVrkcWkNVoLfJjOv
-         dVNa8xjhTwV91vNSk9pJ8JRyz0nnaVGjjKhdngPrBhQJAhW0bvqstscXfn9ann70rbBn
-         TNR+q08Oy0ZvwRQl02NxZWQUKYa+5qTkSfQTkSauD/DVwdcf+ZIDCKa3wJmSpZMUmCGP
-         V33g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780267306; x=1780872106;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=fE4JU+gsz+ECemqk45eUb2e+nliPviu8zBW1jL7IQco=;
-        b=E409kVO3q9+Jf2wBLMnWI4H7MHXXulv6+ltIDG4vIlXmBV2Dgn5wzYqxrkEbxsdjuF
-         +HG9Hyt2u1g1GuIPxUZiMqkNF2ttWRB7jDW8zzAlewlX15BgYn1gq9I/VdvgEF4Fah0K
-         ckZzk/Jad3S970bNEWYz1iT5ZMUSKnFWGIY2gJMHn9p+M6trW7PHbES/cfeRSG81gMBB
-         eKAS5wo+uoieYvbIT0NsA+ZXGqHoueGRA8v13jM0s4ANBkdu6/mgkrb84B2Iys4fJSWm
-         cFx99lx17VJqjLjyrHFncRkasM5PezJNoCCkEZgycPCyr7bGpO90XXsvBIrF0nCkc7fm
-         nGJw==
-X-Forwarded-Encrypted: i=1; AFNElJ/H2CmcmYhzBT+5qqcfuTwbfaweEJmMaUmI8EQvms5x5gF3S3uPFCpMoMIbModxd6g+xglm6xwWinUD@vger.kernel.org
-X-Gm-Message-State: AOJu0YxkUZBVmGUzIiBSfJUHCWGhSKa1rhJb80YatSDvaBJdmA7YQGvv
-	y7Qo6FSPa9JH2xNg/y2GbVzarYsyHAXLV0tF4ugcwV7ZpCAp34FwOELC/TwrKgBULIK+3ZPzMjf
-	NSssfhTx5GJuUK4P+yypWSvOyjw1nxnyH3Uz6ZhIEPuFMNr6+rdaOJjwSpe9ji1EDRU8/aueMZN
-	8vlXRRnV5aXBPNHgSfTTvfbj/iI2tc64EW9qQ1Cw==
-X-Gm-Gg: Acq92OH8zC0yKfNgplCHvlH8zj8ZqMJYNGCnRcEsse4meowMLhsDlfmjj00rMPiAgG0
-	hOtQL80jWG1+EDK2wEWfIRtwVV//ubluMqJT4iAROS33zBuhyJjUuY/ekJtv9APyx4WuXhx3iB7
-	Fvw63mf3BNtXB4BeqnmDSFf4WE6STbQj3SHNv5UhWWrdGAv4Y0QaIXJDYAC2ajE9In9bJ9QQONl
-	sNMYrGQd0h6JcLvj043Zc6VZfBxC0ROOf3DoTaWcqaUe3aKWg==
-X-Received: by 2002:a05:651c:23c4:20b0:394:642:c648 with SMTP id 38308e7fff4ca-39664eaa587mr13988551fa.7.1780267305628;
-        Sun, 31 May 2026 15:41:45 -0700 (PDT)
-X-Received: by 2002:a05:651c:23c4:20b0:394:642:c648 with SMTP id
- 38308e7fff4ca-39664eaa587mr13988491fa.7.1780267305279; Sun, 31 May 2026
- 15:41:45 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GXgPVvfs"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1B7D1F00893;
+	Mon,  1 Jun 2026 20:43:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780346593;
+	bh=+uw086cjFZdYmPMPQz8ZpiQh3kOo1lbXDBzkinb0UZY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=GXgPVvfsVXGA9rI4vI8Bf8Qgxsc7GKAT2k+osTb3bAsjRjBTn9ty9u9rv9gGaG2R/
+	 NfJdYECPlPknmaPjewBW1EhrfhfWJn3o2A67PdrdIXYEwvWGEPbbEH+zouk2L1H6zu
+	 1TSMG2FTmBY1DEApLI14bHpjdfKTAIdgxEeo/6j8Z9peQud/5hg0gPJetEfHmNj/zi
+	 +AynVzF2BI2ICb8wTkjItoO5qjCRtudT8cbBlpRNRcJb0X3lPpCBi3sTYRJ+u5m8Xq
+	 h3iYwFvhCgMI0pCmQi5vFCpPJgB8sPKhBi2+nock8O+oLQB4WOv3rwyBXQMY4JgW5s
+	 Tbm1XVfOILP1Q==
+Date: Mon, 1 Jun 2026 21:43:09 +0100
+From: Simon Horman <horms@kernel.org>
+To: Doruk Tan Ozturk <doruk@0sec.ai>
+Cc: alex.aring@gmail.com, stefan@datenfreihafen.org,
+	miquel.raynal@bootlin.com, aleksander.lobakin@intel.com,
+	linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
+	security@kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH net v2] mac802154: llsec: add skb_cow_data() before
+ in-place crypto
+Message-ID: <20260601204309.GA3410996@horms.kernel.org>
+References: <20260525161806.96158-1-doruk@0sec.ai>
+ <20260526183726.56100-1-doruk@0sec.ai>
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260527081806.42747-1-zhaoyz24@mails.tsinghua.edu.cn>
-In-Reply-To: <20260527081806.42747-1-zhaoyz24@mails.tsinghua.edu.cn>
-From: Alexander Aring <aahringo@redhat.com>
-Date: Sun, 31 May 2026 18:41:34 -0400
-X-Gm-Features: AVHnY4LJsPgo1bw4BMrZmqSj2uYEh9dzW3bfFOpiMMU9XPGtTORtUTQD6jb1c5c
-Message-ID: <CAK-6q+i6JsNA0twRp29P_wotODGr98rxo_CcE0n_BAhH_ofUsQ@mail.gmail.com>
-Subject: Re: [PATCH net] 6lowpan: fix off-by-one in multicast context address compression
-To: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
-Cc: netdev@vger.kernel.org, Alexander Aring <alex.aring@gmail.com>, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>, 
-	Ao Wang <wangao@seu.edu.cn>, Xuewei Feng <fengxw06@126.com>, Qi Li <qli01@tsinghua.edu.cn>, 
-	Ke Xu <xuke@tsinghua.edu.cn>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260526183726.56100-1-doruk@0sec.ai>
 
-Hi,
-
-On Wed, May 27, 2026 at 4:19=E2=80=AFAM Yizhou Zhao
-<zhaoyz24@mails.tsinghua.edu.cn> wrote:
->
-> The second memcpy in lowpan_iphc_mcast_ctx_addr_compress() uses
-> &data[1] as destination and &ipaddr->s6_addr[11] as source, but
-> both should be offset by one: &data[2] and &ipaddr->s6_addr[12]
-> respectively.
->
-> This off-by-one has two consequences:
-> 1. data[1] is overwritten with s6_addr[11], corrupting the RIID
->    field in the compressed multicast address
-> 2. data[5] is never written, so uninitialized kernel stack memory
->    is transmitted over the network via lowpan_push_hc_data(),
->    leaking kernel stack contents
->
-> The correct inline data layout must match what the decompression
-> function lowpan_uncompress_multicast_ctx_daddr() expects:
->   data[0..1] =3D s6_addr[1..2]  (flags/scope + RIID)
->   data[2..5] =3D s6_addr[12..15] (group ID)
->
-> Also zero-initialize the data array as a defensive measure against
-> similar bugs in the future.
->
-> Fixes: 5609c185f24d ("6lowpan: iphc: add support for stateful compression=
-")
-> Reported-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
-> Reported-by: Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>
-> Reported-by: Ao Wang <wangao@seu.edu.cn>
-> Reported-by: Xuewei Feng <fengxw06@126.com>
-> Reported-by: Qi Li <qli01@tsinghua.edu.cn>
-> Reported-by: Ke Xu <xuke@tsinghua.edu.cn>
-> Assisted-by: GLM:GLM-5.1
-> Signed-off-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
+On Tue, May 26, 2026 at 08:37:26PM +0200, Doruk Tan Ozturk wrote:
+> llsec_do_encrypt_unauth(), llsec_do_encrypt_auth(),
+> llsec_do_decrypt_unauth(), and llsec_do_decrypt_auth() all perform
+> in-place cryptographic transformations on skb data.  They build a
+> scatterlist with sg_init_one() pointing into the skb's linear data area
+> and then pass the same scatterlist as both src and dst to the crypto API
+> (e.g. crypto_skcipher_encrypt/decrypt, crypto_aead_encrypt/decrypt).
+> 
+> On the RX path, __ieee802154_rx_handle_packet() clones the received skb
+> before handing it to each subscriber via ieee802154_subif_frame().  The
+> cloned skb shares the same underlying data buffer via reference
+> counting.  When llsec_do_decrypt() subsequently modifies this shared
+> buffer in place, it corrupts data that other clones -- potentially
+> belonging to other sockets or subsystems -- still reference.
+> 
+> On the TX path, similar data sharing can occur when an skb's head has
+> been cloned (skb_cloned() returns true).
+> 
+> The fix is to call skb_cow_data() before performing any in-place crypto
+> operation.  skb_cow_data() ensures that the skb's data area is not
+> shared: if the skb head is cloned or the data spans multiple fragments,
+> it copies the data into a private buffer that can be safely modified in
+> place.  This is the same pattern used by:
+> 
+>   - ESP (net/ipv4/esp4.c, net/ipv6/esp6.c)
+>   - MACsec (drivers/net/macsec.c)
+>   - WireGuard (drivers/net/wireguard/receive.c)
+>   - TIPC (net/tipc/crypto.c)
+> 
+> Without this guard, in-place crypto on shared skb data leads to:
+>   - Silent data corruption of other skb clones
+>   - Use-after-free when the crypto API scatterwalk writes through a
+>     page that has already been freed by another clone's kfree_skb()
+>   - Kernel crashes under concurrent 802.15.4 traffic with security
+>     enabled (KASAN/KMSAN reports slab-use-after-free)
+> 
+> Found by 0sec (https://0sec.ai) using automated source analysis.
+> 
+> Fixes: 4c14a2fb5d14 ("mac802154: add llsec decryption method")
+> Fixes: 03556e4d0dbb ("mac802154: add llsec encryption method")
+> Cc: stable@vger.kernel.org
+> Reported-by: Doruk Tan Ozturk <doruk@0sec.ai>
+> Closes: https://lore.kernel.org/linux-wpan/20260525161806.96158-1-doruk@0sec.ai/
+> Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+> Signed-off-by: Doruk Tan Ozturk <doruk@0sec.ai>
 > ---
-> diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
-> index e116d30..37eaff3 100644
-> --- a/net/6lowpan/iphc.c
-> +++ b/net/6lowpan/iphc.c
-> @@ -1086,12 +1086,12 @@ static u8 lowpan_iphc_mcast_ctx_addr_compress(u8 =
-**hc_ptr,
->                                               const struct lowpan_iphc_ct=
-x *ctx,
->                                               const struct in6_addr *ipad=
-dr)
->  {
-> -       u8 data[6];
-> +       u8 data[6] =3D {};
->
->         /* flags/scope, reserved (RIID) */
->         memcpy(data, &ipaddr->s6_addr[1], 2);
->         /* group ID */
-> -       memcpy(&data[1], &ipaddr->s6_addr[11], 4);
-> +       memcpy(&data[2], &ipaddr->s6_addr[12], 4);
->         lowpan_push_hc_data(hc_ptr, data, 6);
->
->         return LOWPAN_IPHC_DAM_00;
+> v2:
+>   - mark as net fix per Olek's review
+>   - add Closes tag
+>   - add Reviewed-by
 
-Looks good to me.
-
-Acked-by: Alexander Aring <aahringo@redhat.com>
-
-Thanks.
-
-- Alex
-
+FTR: An AI generated review of this patch is available on sashiko.dev.
+I believe that review can be treated in the context of possible follow-up
+and should not effect the progress of this patch.
