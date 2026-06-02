@@ -1,104 +1,85 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9F993DCDA4;
-	Mon,  1 Jun 2026 20:43:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C8D8360EFF;
+	Tue,  2 Jun 2026 02:30:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780346594; cv=none; b=o91JN4H6FNvWr+C/YfoYHgKLZgdXnLGKXntAgwn2Ciu5BBi6j/3LZJ+U9rA7UDRpq4inn0G67agJomuE81HkCI+d4QmPXv37Fo03W2Qa0LEZGPxmGsxigTJajU+ewVI2r/5hIMrUH2GvoKjH8dtxsBkaKJvMhngPA+0/LjUkUBI=
+	t=1780367404; cv=none; b=Xxi2EE8XzmzVe133r3EyJQDi9GKyciWhuUdevuSUZvgLsinX4ryQ6NGiFtO/5KV7F9ZLsKOAK4HA0bocOJDrn1wN3Ig2aTyJrzrxKDBD6d7LPqoOfkoRSLHGujvxREB5FWdgwmKmS7NP7F1CJLa8IzuFW/3Pjnsj/LbBfS0Nvvs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780346594; c=relaxed/simple;
-	bh=fOGSZLe6merD5rMvEEGhH7/QQJN7eja4hCCkHPCcY+A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bT02rGWGcY9CGWnAd+TWIGuZZu0qbAD6BhnIQ7bNMHPJKTsbbY6++vav5U/Is0+qyWWgTpNf6iQCoQJmh5It2+qtHn9qrUCVPFEmMhVmV0b8cf4LOOroZqTU2YqM3viB5SBkwHtJlmlF3hMLxV5LS6fLiJXZn6xmve3GqsSBWW0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GXgPVvfs; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1780367404; c=relaxed/simple;
+	bh=nw9/t1jHsZZPhclU5hIT7EIOeyHOsBRGb5Vs4GKUqxU=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=KxWVFIVXlBawW0fRcMHu9MMvqrqluTghGYdPTU1dWWvuUGAbePddD98vCThmH6OHTPcJ7CwrHSNKBWNHChnLnj2ObsSLoz6d+q+J6dH3OzOpnmGAVO0WhmEcv33cKrxKcPt6x9qG7n4TWqLuJonnsHC8bfk3/3Zru3Udj1xma4o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c7fwm83B; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GXgPVvfs"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1B7D1F00893;
-	Mon,  1 Jun 2026 20:43:11 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c7fwm83B"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 704531F00893;
+	Tue,  2 Jun 2026 02:30:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780346593;
-	bh=+uw086cjFZdYmPMPQz8ZpiQh3kOo1lbXDBzkinb0UZY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=GXgPVvfsVXGA9rI4vI8Bf8Qgxsc7GKAT2k+osTb3bAsjRjBTn9ty9u9rv9gGaG2R/
-	 NfJdYECPlPknmaPjewBW1EhrfhfWJn3o2A67PdrdIXYEwvWGEPbbEH+zouk2L1H6zu
-	 1TSMG2FTmBY1DEApLI14bHpjdfKTAIdgxEeo/6j8Z9peQud/5hg0gPJetEfHmNj/zi
-	 +AynVzF2BI2ICb8wTkjItoO5qjCRtudT8cbBlpRNRcJb0X3lPpCBi3sTYRJ+u5m8Xq
-	 h3iYwFvhCgMI0pCmQi5vFCpPJgB8sPKhBi2+nock8O+oLQB4WOv3rwyBXQMY4JgW5s
-	 Tbm1XVfOILP1Q==
-Date: Mon, 1 Jun 2026 21:43:09 +0100
-From: Simon Horman <horms@kernel.org>
-To: Doruk Tan Ozturk <doruk@0sec.ai>
-Cc: alex.aring@gmail.com, stefan@datenfreihafen.org,
-	miquel.raynal@bootlin.com, aleksander.lobakin@intel.com,
-	linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
-	security@kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH net v2] mac802154: llsec: add skb_cow_data() before
- in-place crypto
-Message-ID: <20260601204309.GA3410996@horms.kernel.org>
-References: <20260525161806.96158-1-doruk@0sec.ai>
- <20260526183726.56100-1-doruk@0sec.ai>
+	s=k20260515; t=1780367403;
+	bh=yAq2xlBKXNJacMsYTq0rhFMMvLLHesg2+GnmPVXK+dI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=c7fwm83BcNBRwMcMBnhXNMYryVlyOvLekouG+MMvyYiMLuD8NKddEBWNX6/HPl4Mt
+	 w20/+DLdLeFfQFQAUD50Ybl1h9zKGe3B8IpAw/y8J7Vfzafo4V9oIbdretzVgq+R9B
+	 +Gd+6VWw0ERLpLRxWQVpqvteA89VmLWNADkYuQOQ+Aaim6fN6V+xvxDcRMERIFou2o
+	 3l75Mm0e9vtCea/E+4tc1YP4YzUahkeVizrjL8kNuk9ZqryUptOSp285m2BpHx0uap
+	 ViVsltMI8tVs35tpvOnMIRjZLC/rP2Ui7RzBKuwIRfr73y8gvgxUp7hU+J82WuzD4i
+	 /dRQmxcTVNxXg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id D0A7238119F9;
+	Tue,  2 Jun 2026 02:30:06 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260526183726.56100-1-doruk@0sec.ai>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] 6lowpan: fix off-by-one in multicast context address
+ compression
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <178036740541.211970.3874244656503204922.git-patchwork-notify@kernel.org>
+Date: Tue, 02 Jun 2026 02:30:05 +0000
+References: <20260527081806.42747-1-zhaoyz24@mails.tsinghua.edu.cn>
+In-Reply-To: <20260527081806.42747-1-zhaoyz24@mails.tsinghua.edu.cn>
+To: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
+Cc: netdev@vger.kernel.org, alex.aring@gmail.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
+ linux-kernel@vger.kernel.org, yangyx22@mails.tsinghua.edu.cn,
+ wangao@seu.edu.cn, fengxw06@126.com, qli01@tsinghua.edu.cn,
+ xuke@tsinghua.edu.cn
 
-On Tue, May 26, 2026 at 08:37:26PM +0200, Doruk Tan Ozturk wrote:
-> llsec_do_encrypt_unauth(), llsec_do_encrypt_auth(),
-> llsec_do_decrypt_unauth(), and llsec_do_decrypt_auth() all perform
-> in-place cryptographic transformations on skb data.  They build a
-> scatterlist with sg_init_one() pointing into the skb's linear data area
-> and then pass the same scatterlist as both src and dst to the crypto API
-> (e.g. crypto_skcipher_encrypt/decrypt, crypto_aead_encrypt/decrypt).
-> 
-> On the RX path, __ieee802154_rx_handle_packet() clones the received skb
-> before handing it to each subscriber via ieee802154_subif_frame().  The
-> cloned skb shares the same underlying data buffer via reference
-> counting.  When llsec_do_decrypt() subsequently modifies this shared
-> buffer in place, it corrupts data that other clones -- potentially
-> belonging to other sockets or subsystems -- still reference.
-> 
-> On the TX path, similar data sharing can occur when an skb's head has
-> been cloned (skb_cloned() returns true).
-> 
-> The fix is to call skb_cow_data() before performing any in-place crypto
-> operation.  skb_cow_data() ensures that the skb's data area is not
-> shared: if the skb head is cloned or the data spans multiple fragments,
-> it copies the data into a private buffer that can be safely modified in
-> place.  This is the same pattern used by:
-> 
->   - ESP (net/ipv4/esp4.c, net/ipv6/esp6.c)
->   - MACsec (drivers/net/macsec.c)
->   - WireGuard (drivers/net/wireguard/receive.c)
->   - TIPC (net/tipc/crypto.c)
-> 
-> Without this guard, in-place crypto on shared skb data leads to:
->   - Silent data corruption of other skb clones
->   - Use-after-free when the crypto API scatterwalk writes through a
->     page that has already been freed by another clone's kfree_skb()
->   - Kernel crashes under concurrent 802.15.4 traffic with security
->     enabled (KASAN/KMSAN reports slab-use-after-free)
-> 
-> Found by 0sec (https://0sec.ai) using automated source analysis.
-> 
-> Fixes: 4c14a2fb5d14 ("mac802154: add llsec decryption method")
-> Fixes: 03556e4d0dbb ("mac802154: add llsec encryption method")
-> Cc: stable@vger.kernel.org
-> Reported-by: Doruk Tan Ozturk <doruk@0sec.ai>
-> Closes: https://lore.kernel.org/linux-wpan/20260525161806.96158-1-doruk@0sec.ai/
-> Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-> Signed-off-by: Doruk Tan Ozturk <doruk@0sec.ai>
-> ---
-> v2:
->   - mark as net fix per Olek's review
->   - add Closes tag
->   - add Reviewed-by
+Hello:
 
-FTR: An AI generated review of this patch is available on sashiko.dev.
-I believe that review can be treated in the context of possible follow-up
-and should not effect the progress of this patch.
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Wed, 27 May 2026 16:18:01 +0800 you wrote:
+> The second memcpy in lowpan_iphc_mcast_ctx_addr_compress() uses
+> &data[1] as destination and &ipaddr->s6_addr[11] as source, but
+> both should be offset by one: &data[2] and &ipaddr->s6_addr[12]
+> respectively.
+> 
+> This off-by-one has two consequences:
+> 1. data[1] is overwritten with s6_addr[11], corrupting the RIID
+>    field in the compressed multicast address
+> 2. data[5] is never written, so uninitialized kernel stack memory
+>    is transmitted over the network via lowpan_push_hc_data(),
+>    leaking kernel stack contents
+> 
+> [...]
+
+Here is the summary with links:
+  - [net] 6lowpan: fix off-by-one in multicast context address compression
+    https://git.kernel.org/netdev/net/c/2a58899d1100
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
