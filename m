@@ -1,66 +1,130 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED4194C77AA;
-	Thu,  4 Jun 2026 17:28:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [13.76.78.106])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47DE72D7DC6;
+	Tue,  9 Jun 2026 08:01:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.76.78.106
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780594126; cv=none; b=BhE8LLrX38yBQ4AdkvdvqAS5XT3HrAYZcUCMigvfGowzYBHmDz/cIlaClC3lf0tzLhzQihym5kHn+xYr9PGjkNPDo2r3iqhA0hC0sFQcVWbzFiBOysFXOFtJikyO1VaRF8mqg3FK9QNtWFW5ErM2pITW3wAqZINLJagLWW7q/K8=
+	t=1780992115; cv=none; b=fcU1EkkGijvHWvvQtUSUJEcG5QFi/55SgQxMUmbel5X0dZcxZ755I2ajVcNsMwmytzLbNNBAdOuGw074IKncg7L3uL3mSBhiQwnoeaXyXfYc6p4mygMGoTe9OOBV7gTHeval6iR1f7vjwzvRyZHsZEiT9sFSVX6VJYd3ytI4OLU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780594126; c=relaxed/simple;
-	bh=FE/zpAIJ3+uA18zKSazKJm+9T9PyK7kLMINlO/kRdrs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ObaxksVd9+8Wx9/dh41t6UCgH87PT08s/p4FbVtUU5xqlbvVGbo2kLFdbOgSd7YgBrBfLUUT/F+PPQ7bYNBzvUGd3OClmgKI5hzvd/WhX+4ihOogKriB+ddfEUV+Q3HXHoAGCO9HaeklZ1Sa12CoO5pCJJ6UddiEPKCo8O8LZPs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hKC1thbz; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1780992115; c=relaxed/simple;
+	bh=GF/2fKS5++wTq9aTQx1jHjXP5ARLwa2s5AV5w0K2fpA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=flA56FHJxn24sui+V5RVMbtyggg7X1W8RrA6LGLR5vFNH6J+PS7tLyE8+8g1O/VzhNgc0lNhI2LS1Tqx6wmTmoNsoLBizOHWBHAv8serSi+H5eBzvlClpf5bakrh+b6YZeQnzomCEAtZW61V3bSxH9ljBZuI+ojDB24wjHE9fwI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mails.tsinghua.edu.cn; spf=pass smtp.mailfrom=mails.tsinghua.edu.cn; dkim=pass (1024-bit key) header.d=mails.tsinghua.edu.cn header.i=@mails.tsinghua.edu.cn header.b=QlVBfVfQ; arc=none smtp.client-ip=13.76.78.106
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mails.tsinghua.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mails.tsinghua.edu.cn
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hKC1thbz"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E350A1F00898;
-	Thu,  4 Jun 2026 17:28:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780594125;
-	bh=7im0k5oW5XfUrXHH99zBcEKuYwrSW9WmaNTeeDdHU6g=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=hKC1thbzicUfYEznOZQjP8v3o0MykMvpy8aNDZ2HICZbqfqyuykI/CQKdLpQovnMk
-	 g6bO/deQYdXem8HKUhPUuiK44853VxmMdifZRzi+h9YAG1U2v/054Fr/tComocdigm
-	 Uc4BfTHo6pPqJig1DsVE8fSpP+/kGtkRA+7toSz0l5S8uC7mQn6v/b8NJHX0Ou0Rsc
-	 qJfoOV9Fx6KoLZmOzbYxaepwa6YO2ZjtyI5jZHSv6KcFwNzumi6sUcjZXP2OIaKjCi
-	 pQpQYVThxH0ZsiVl9BCRtDOQrv9ifPgpBDoZsrOQFKOlndl3w9XD/9KeCrrjraG8pm
-	 mvLF3K39AIZFA==
-Date: Thu, 4 Jun 2026 18:28:40 +0100
-From: Simon Horman <horms@kernel.org>
-To: Robertus Diawan Chris <robertusdchris@gmail.com>
-Cc: alex.aring@gmail.com, stefan@datenfreihafen.org,
-	miquel.raynal@bootlin.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, linux-wpan@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-kernel-mentees@lists.linuxfoundation.org,
-	skhan@linuxfoundation.org, me@brighamcampbell.com
-Subject: Re: [PATCH] mac802154: Prevent overwrite return code in
- mac802154_perform_association()
-Message-ID: <20260604172840.GE3920875@horms.kernel.org>
-References: <20260602054133.470293-1-robertusdchris@gmail.com>
+	dkim=pass (1024-bit key) header.d=mails.tsinghua.edu.cn header.i=@mails.tsinghua.edu.cn header.b="QlVBfVfQ"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=mails.tsinghua.edu.cn; s=dkim; h=Received:From:To:Cc:Subject:
+	Date:Message-ID:MIME-Version:Content-Transfer-Encoding; bh=PXzN1
+	xAkeifUktlK/Qjjuspvc1N/0VC1hBVqxaAmblY=; b=QlVBfVfQlf+IugKux90DG
+	9WF2FTv2H3MlmqK5UHZiT5nLMwdxnMNxaT8mNeSYrB+r0iiR1dP8uOBZOBNVrbWh
+	HFo8N4h+P5XDoXCxhEVvsA/Tr6HL7gW4fgsYDbbjwdVnh6+kAT9mCssuhDGivgxx
+	3EepL3gsK06fIQoQj6f8jI=
+Received: from localhost.localdomain (unknown [101.5.13.135])
+	by web3 (Coremail) with SMTP id ygQGZQDnNJJZyCdqCLtCAg--.14269S2;
+	Tue, 09 Jun 2026 16:01:29 +0800 (CST)
+From: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
+To: linux-bluetooth@vger.kernel.org
+Cc: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>,
+	Alexander Aring <alex.aring@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	linux-wpan@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>,
+	Ao Wang <wangao@seu.edu.cn>,
+	Xuewei Feng <fengxw06@126.com>,
+	Qi Li <qli01@tsinghua.edu.cn>,
+	Ke Xu <xuke@tsinghua.edu.cn>,
+	stable@vger.kernel.org
+Subject: [PATCH] 6lowpan: fix NHC entry use-after-free on error path
+Date: Tue,  9 Jun 2026 16:00:52 +0800
+Message-ID: <20260609080054.4541-1-zhaoyz24@mails.tsinghua.edu.cn>
+X-Mailer: git-send-email 2.46.2
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260602054133.470293-1-robertusdchris@gmail.com>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:ygQGZQDnNJJZyCdqCLtCAg--.14269S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7uF1rJr45Aw4fJF4UJF4rGrg_yoW8tryfpa
+	y3K39ayFyDZry3Zw4vyw409w17AF4DJr1fKF1rKa4UZ3Z8Gr1Sqr93Kr97Za9IvFs3Ca4D
+	XrWDX3s0yws8CrJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9v1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l8cAvFVAK
+	0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4
+	x0Y4vE2Ix0cI8IcVCY1x0267AKxVWxJr0_GcWl84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2
+	z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1lnxkEFVAIw20F6cxK64vIFxWle2I262IYc4
+	CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E74AGY7Cv6cx26r4r
+	Kr1UJr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc
+	8vx2IErcIFxwACI402YVCY1x02628vn2kIc2xKxwCY1x0262kKe7AKxVW8ZVWrXwCY02Av
+	z4vE14v_GFyl42xK82IYc2Ij64vIr41l42xK82IY6x8ErcxFaVAv8VW8Ww4UJr1UMxC20s
+	026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_
+	JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14
+	v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xva
+	j40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JV
+	W8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbRVbPUUUUU==
+X-CM-SenderInfo: 52kd05r2suqzpdlo2hxwvl0wxkxdhvlgxou0/1tbiAgMNAWonQZv0bwAAsB
 
-On Tue, Jun 02, 2026 at 12:41:33PM +0700, Robertus Diawan Chris wrote:
-> When assoc_status not equal to IEEE802154_ASSOCIATION_SUCCESSFUL, the
-> return value assigned to either "-ERANGE" or "-EPERM" but this return
-> value will be overwritten to 0 after exiting the conditional scope.
-> So, jump to clear_assoc label to preserve the return value when
-> assoc_status not equal to IEEE802154_ASSOCIATION_SUCCESSFUL.
-> 
-> This is reported by Coverity Scan as "Unused value".
-> 
-> Fixes: fefd19807fe9 ("mac802154: Handle associating")
-> Signed-off-by: Robertus Diawan Chris <robertusdchris@gmail.com>
+lowpan_nhc_do_uncompression() looks up an NHC descriptor while holding
+lowpan_nhc_lock.  If the descriptor has no uncompress callback, the error
+path drops the lock before printing nhc->name.
 
-FTR: An AI generated review of this patch is available on sashiko.dev.
-I believe that review can be treated in the context of possible follow-up
-and should not effect the progress of this patch.
+lowpan_nhc_del() removes descriptors under the same lock and then relies
+on synchronize_net() before the owning module can be unloaded.  That only
+waits for net RX RCU readers.  lowpan_header_decompress() is also exported
+and can be reached from callers that are not necessarily covered by the net
+core RX critical section, for example the Bluetooth 6LoWPAN L2CAP receive
+path.
+
+This leaves a race where one task drops lowpan_nhc_lock in the error path,
+another task unregisters and frees the matching descriptor after
+synchronize_net() returns, and the first task then dereferences nhc->name
+for the warning.
+
+With the post-unlock window widened, KASAN reports:
+
+  BUG: KASAN: slab-use-after-free in lowpan_nhc_do_uncompression+0x1f4/0x220
+  Read of size 8
+  lowpan_nhc_do_uncompression
+  lowpan_header_decompress
+
+Fix this by printing the warning before dropping lowpan_nhc_lock, so the
+descriptor name is read while unregister is still excluded.  The malformed
+packet is still rejected with -ENOTSUPP.
+
+Fixes: 92aa7c65d295 ("6lowpan: add generic nhc layer interface")
+Cc: stable@vger.kernel.org
+Reported-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
+Reported-by: Yuxiang Yang <yangyx22@mails.tsinghua.edu.cn>
+Reported-by: Ao Wang <wangao@seu.edu.cn>
+Reported-by: Xuewei Feng <fengxw06@126.com>
+Reported-by: Qi Li <qli01@tsinghua.edu.cn>
+Reported-by: Ke Xu <xuke@tsinghua.edu.cn>
+Assisted-by: GLM:GLM-5.1
+Signed-off-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
+---
+diff --git a/net/6lowpan/nhc.c b/net/6lowpan/nhc.c
+index 7b374595328d..a4dde85664f2 100644
+--- a/net/6lowpan/nhc.c
++++ b/net/6lowpan/nhc.c
+@@ -117,9 +117,9 @@ int lowpan_nhc_do_uncompression(struct sk_buff *skb,
+ 				return ret;
+ 			}
+ 		} else {
+-			spin_unlock_bh(&lowpan_nhc_lock);
+ 			netdev_warn(dev, "received nhc id for %s which is not implemented.\n",
+ 				    nhc->name);
++			spin_unlock_bh(&lowpan_nhc_lock);
+ 			return -ENOTSUPP;
+ 		}
+ 	} else {
+
+--
+2.43.0
+
