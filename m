@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE0DF423147;
-	Thu, 11 Jun 2026 17:58:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E54472D1303;
+	Thu, 11 Jun 2026 22:30:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781200692; cv=none; b=MDNnPQhPVfDBbS9Fvwqmc2a9nPIJltmY8oZj1rnD7Wa4vAjfJ3i6gkJ4tsI/izZTCr877MALYv/j6YWFgs3wKCcWkSt/hnqFTujN2b/0UPQ0XCuOZsBy+2uDbRzkWBV9BdIdcAdiT5gByhnJUb1FXtW+3pJ2N6/VrlmRTXJVpLg=
+	t=1781217020; cv=none; b=NOir6LvFH/ilhqFhLnoKMRzA+/nCMBwByIAZAEvTPU/NCIlVBzAS5ew3YtJNSN3vaEYY023gwtF3D/mnXtW5g4sWKZdT1XaTed4xBJJ/M1lArUsaGr1L0xUa4K9vvF47Qf84ZyZZpp+1ePpCdobn3Ee1nY7B1pI5q7Ldb3WOoW0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781200692; c=relaxed/simple;
-	bh=bDUkAmYtmD4pItY4TPuaNON76nZaykXKFC5g+En4bJU=;
+	s=arc-20240116; t=1781217020; c=relaxed/simple;
+	bh=eiT7h/e3FoeYoNZj6W0e0ctH5vKCvLL5rqIVcRkUu48=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=jAagCbv7yUKaCSX1UoVKFHOW/ob3zWUb/7nwuUk0R2SPcywukBCOMGYo5JOT7B6qDj54wnswB5RD+SIjdxLVbNkIu0ftp6MaqajQsEdK0EGF/9Hjxpx0nTtT4gBOVer0O5+LnGDTKyaejM810zwd7hqqAboqOBvATcsxo5QwHAQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Vlv46Rf1; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:To:Cc; b=gnsacmLzHPnJb2H2HPS29i1WIrzH2qVN4CbMiwEsQzsAOm+HWo6PRFG6RQHg4uctBFNUDbPM/MUS589VbHoRrUW77UHAB2gk6YaYSRbb9crLd4jPntcbzezcOpsIqJYct+fFV7JqT1xyhvWGpsh4jvQeXJKMIHD8kqubNEQhABA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DLwn2qea; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Vlv46Rf1"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90E411F00893;
-	Thu, 11 Jun 2026 17:58:11 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DLwn2qea"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8A901F00A3A;
+	Thu, 11 Jun 2026 22:30:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781200691;
-	bh=U/3zkkWJvcg3IxQG2o7h/eCFA2CXQIxPRH111Q5EBT0=;
+	s=k20260515; t=1781217018;
+	bh=USld46YDXirMgWtuzZU2ioEbXHi6IBJv4M4nBp60DEE=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=Vlv46Rf1BEJGLGrXMQWM6NHG/IxWBDJDmIxbiVW3GUKU8BjyT+eFBMPfP6LZ7cDci
-	 HvVwW+ae19bLNK+S3Ahf7tpDnju6Fo7ja/DTAmNp2vwzx2ddG6A52uPutriq5eSZT7
-	 Jyur2dVX9mUMtunk2DzgQi6chOGht+6yhHeufIbIRmucUvjmN9qjBIOmyD8uKxxzCr
-	 WVpZHrh457ucOJ48tMPG8IWAk/3lEf/0RuU306QWOz0dlBMh1/E/f+RWVYx9dojCgV
-	 DPy5CpA5VDac12wamqfryaS57Ib1WIO9KQ9amhBl/yg5OY9Py9b2M6yQNc2z4q/ucv
-	 WAQiW6zR0Ooug==
+	b=DLwn2qeaXXg7Z1JAyX+XncKWYMnsaPSFX6NgnJMygXUq8X0ZJhunG5aABOqSBCFw9
+	 4IXenByviZQbHdNzUY3opiA/6+BZS1rRo7/2n0rhMPHvWjYTMQfrbKCm6312F6u7yU
+	 g0fv+A2zH71O+elwBnT0BvbvYJ6Q3TfvVV+p6c0c56i+QyvajfxCnhMXJ7SjO8GW+o
+	 PymucFWy+T1NbHrFIvRhz+KtHZfEx14uD2MXSShftY1Z/rclZsG/TRlvaKG5gBGhaq
+	 gn68oXa/hYzyMiorWq6B6EvC3KAg9NKVXZ/ZstoM9eQDTFrIg+NXWGOM4pSrscp/EU
+	 YnkEvOobYSSKQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 199493930F87;
-	Thu, 11 Jun 2026 17:58:10 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 198FB3930FAD;
+	Thu, 11 Jun 2026 22:30:17 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
@@ -37,45 +37,43 @@ List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] 6lowpan: fix off-by-one in multicast context address
- compression
-From: patchwork-bot+bluetooth@kernel.org
+Subject: Re: [PATCH] 6lowpan: fix NHC entry use-after-free on error path
+From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <178120068868.286318.1150941519711898889.git-patchwork-notify@kernel.org>
-Date: Thu, 11 Jun 2026 17:58:08 +0000
-References: <20260527081806.42747-1-zhaoyz24@mails.tsinghua.edu.cn>
-In-Reply-To: <20260527081806.42747-1-zhaoyz24@mails.tsinghua.edu.cn>
+ <178121701563.389578.2230008630812658511.git-patchwork-notify@kernel.org>
+Date: Thu, 11 Jun 2026 22:30:15 +0000
+References: <20260609080054.4541-1-zhaoyz24@mails.tsinghua.edu.cn>
+In-Reply-To: <20260609080054.4541-1-zhaoyz24@mails.tsinghua.edu.cn>
 To: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
-Cc: netdev@vger.kernel.org, alex.aring@gmail.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
+Cc: linux-bluetooth@vger.kernel.org, alex.aring@gmail.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ horms@kernel.org, linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
  linux-kernel@vger.kernel.org, yangyx22@mails.tsinghua.edu.cn,
  wangao@seu.edu.cn, fengxw06@126.com, qli01@tsinghua.edu.cn,
- xuke@tsinghua.edu.cn
+ xuke@tsinghua.edu.cn, stable@vger.kernel.org
 
 Hello:
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
+This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 27 May 2026 16:18:01 +0800 you wrote:
-> The second memcpy in lowpan_iphc_mcast_ctx_addr_compress() uses
-> &data[1] as destination and &ipaddr->s6_addr[11] as source, but
-> both should be offset by one: &data[2] and &ipaddr->s6_addr[12]
-> respectively.
+On Tue,  9 Jun 2026 16:00:52 +0800 you wrote:
+> lowpan_nhc_do_uncompression() looks up an NHC descriptor while holding
+> lowpan_nhc_lock.  If the descriptor has no uncompress callback, the error
+> path drops the lock before printing nhc->name.
 > 
-> This off-by-one has two consequences:
-> 1. data[1] is overwritten with s6_addr[11], corrupting the RIID
->    field in the compressed multicast address
-> 2. data[5] is never written, so uninitialized kernel stack memory
->    is transmitted over the network via lowpan_push_hc_data(),
->    leaking kernel stack contents
+> lowpan_nhc_del() removes descriptors under the same lock and then relies
+> on synchronize_net() before the owning module can be unloaded.  That only
+> waits for net RX RCU readers.  lowpan_header_decompress() is also exported
+> and can be reached from callers that are not necessarily covered by the net
+> core RX critical section, for example the Bluetooth 6LoWPAN L2CAP receive
+> path.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] 6lowpan: fix off-by-one in multicast context address compression
-    https://git.kernel.org/bluetooth/bluetooth-next/c/2a58899d1100
+  - 6lowpan: fix NHC entry use-after-free on error path
+    https://git.kernel.org/netdev/net/c/1720db928e5a
 
 You are awesome, thank you!
 -- 
