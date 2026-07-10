@@ -1,80 +1,57 @@
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from sender-op-o17.zoho.eu (sender-op-o17.zoho.eu [136.143.169.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 951743D813D
-	for <linux-wpan@vger.kernel.org>; Thu,  9 Jul 2026 22:19:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783635546; cv=none; b=McfLvRrMYX8RRTnctEovoS5yuauEBuiQAEoh+/6itQYyMu6SBIMQksS16wFFNzDAGr0goahzSR3AeV7JDW83Con/twoDD3zsJOXawb0DJ2iN2PKa7Zm7TKzU0dvI2Wb8cQWA6pcUGjBwj1IAiULmAERHSRzuMJXW9/GQAM/MaT0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783635546; c=relaxed/simple;
-	bh=Z8Zh1AJp/esp9tFm2eyTQefg9Fl7D1o7AgqFROZ1ab8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dj0G5BZcvlJznzAx5Z5xKAdeRziSV7kS6uEH2W/hjyIOLXAF5FbgWGPttRrwjMxDwLCT69AXrgEPt1k2XJ7h0dUrSEu0PKy2gVbBoqL4DaM3rM9drkrFBZp71LwGdfDeRma+JmwDAWG0Y6XBVL8R36yIEdcJlgCCKK0HedbUbSs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cc1B51YO; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ED12413245;
+	Fri, 10 Jul 2026 11:14:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.169.17
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783682089; cv=pass; b=oMnMHucRoZTFBRV+uvr86qsyH2S3sWF82K8TOco27NO2pNb0fFhg2QIf6vAtA1WHi+Ch8LD2x6UDAAzAEarPWC7rj3nVKJqkeSb0C5O4vL/JMm28lx1kZAzbnSsvud8DGQ6tkivYdYmb2pNkNAbTxROR4Co3kZuAPoeofSNHl8Y=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783682089; c=relaxed/simple;
+	bh=F1KTYWnq+9g4j5MHk+R0ILEhmbsbyeXojT5qMs9y8d0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qoAmLSE9ORrH0Ri8EWjxyM+KAt94flR0A3TcR8D1tG/VS4XSfpACOYSn6I9lWE+7O08HE4FyyuW0ZvCIgXe6FWhmRjPihKZs9UMiUq/vVGTj5ocno74pJYTMP8Df8ZEr01AHjYOb26h2BhMRMWYcEL5F8Dkb5tjdwsr8u4wP6kk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=auditcode.ai; spf=pass smtp.mailfrom=auditcode.ai; dkim=pass (1024-bit key) header.d=auditcode.ai header.i=security@auditcode.ai header.b=laKUEiYk; arc=pass smtp.client-ip=136.143.169.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=auditcode.ai
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=auditcode.ai
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cc1B51YO"
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-493b7612475so2239295e9.3
-        for <linux-wpan@vger.kernel.org>; Thu, 09 Jul 2026 15:19:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783635543; x=1784240343; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=BqQgw4jCCe/BvKpqMgYyZ70b1id8WmzXWyq/OSrYdlk=;
-        b=cc1B51YOtA/6A1kmzmBig9+12v9yAztZhxpH3H685lT903ZqlkL2wm+Z+wm8vttkNz
-         lKgMwnobY/phweGr4fHRs3TCP7u/azwuLQKW9j6RVCIAdpb/B+4KCLFGi7eYUWwyheeZ
-         kCJvPXXEXeKY1dNFWGsgriCdwpRga/x143RZZyYpSE8TtbNnTHsfir8emVgSpy0itoRj
-         rTUOM3248rbSnl1CdISiqEGI5QPVkI6886LwIDY6pBeBfmelDt3wl/g7Hn8gAITPi8E5
-         Evy5a50r9+WdNzdetE6fAp/LgF08xbgfvu/RL+uaZOXXc1GKv4CP53bNqr+psE/IvXDZ
-         JsHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783635543; x=1784240343;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=BqQgw4jCCe/BvKpqMgYyZ70b1id8WmzXWyq/OSrYdlk=;
-        b=XYeFItZhLAlWQQgnu72zKbpmg9RbAEfBF5zsAqfqmLCET2LqIWNTCsG3c7t8vIM7n6
-         g4wmt5NP66MJuDoxmiexnqK7T5Gi3itJjWtRAeSrI0CvUabBTjhry295LJqZWgrsmJLP
-         4MiYt2aZ0+fx3Q73saL4gO06D+J2Jou94sY/xV37958jar2PxLdczXM+vZWJmMjPSor1
-         EO08AHikRrJel9jcF8KcBEbtsRlFt5hMYBct+kdaxgaqze8bRGLXg7ZRZN6AHQvaaDNi
-         Tf6f8tgaP9KGbbkCUcBQxtJA96OOGDJiDlKJZV88pwy+ooFQE7L/UWI0mQdWFj71p89E
-         tkCQ==
-X-Forwarded-Encrypted: i=1; AHgh+Rq1xboQin7G0S/fqV9S3/1SfkqViD53bWSKaop27DdhvBQvz/8bNcYQ5b/Hymg1dJYFb4MBFa1TNgjF@vger.kernel.org
-X-Gm-Message-State: AOJu0YzNz+7MQWkjP2zq45T4WfaHA7By5sD0Yre4qSTJ+IfyMlKHrNju
-	+1bhqCjdRpteRDU/Sb2eTtkhlNHx7WszQt/yKLyvT+AhCxnmdSg7SpfZ
-X-Gm-Gg: AfdE7cl+vreAtX18JuoX1c2RQF2Pwh+hUSfYgImabgJcdZGd+W/bor6rc+UNQw/tk6o
-	TJYv6QaDGc4LRkAuwdYXP1AuPcfbSL3uMg/VdZhJ906YjGY85rBDJu65ZmqXpDGKSMpZgv+xsiE
-	oAZIWWA/YoveMeE1o8QR+lFD5IQSu2IFcL0DvBOBJzjy731qHkow0/KumXInEYAXYXdNysYGMfK
-	bs+kgyVx69NQ6Wg28C8daOXOz9OLJzpLXpnOQpAY++EBJinbzYNA0vqd8evvVLHouBxsymCNVsh
-	cUkwBADwgtY6U5zmUOj0L3+j3HKIyT5RymK93h0v4B6DeKzJ2QPKVEFmQJpYhn8lfo5e6M1fs/p
-	y7MTkJlRDo/U3qP/47mN3Yn6KZui3UnFisOsGxR93utizEsSVp+o8/4mCL7iXUHZUQ0dlgz9nnR
-	WQRiCfHlj1V/ywOXCpC+DNF7QTDr4zPT4Bw2W3jO0ifMkuuZzdxItQysYi2A3rurNTgnQ7bGBR
-X-Received: by 2002:a05:600c:6211:b0:493:dcad:84da with SMTP id 5b1f17b1804b1-493e683c3b2mr83501675e9.1.1783635542767;
-        Thu, 09 Jul 2026 15:19:02 -0700 (PDT)
-Received: from dohko.chello.ie (188-141-5-72.dynamic.upc.ie. [188.141.5.72])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-493eb6e8844sm102269415e9.10.2026.07.09.15.19.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Jul 2026 15:19:01 -0700 (PDT)
-From: David Carlier <devnexen@gmail.com>
-To: alex.aring@gmail.com
-Cc: stable@vger.kernel.org,
-	syzbot+60332fd095f8bb2946ad@syzkaller.appspotmail.com,
-	David Carlier <devnexen@gmail.com>,
+	dkim=pass (1024-bit key) header.d=auditcode.ai header.i=security@auditcode.ai header.b="laKUEiYk"
+ARC-Seal: i=1; a=rsa-sha256; t=1783682040; cv=none; 
+	d=zohomail.eu; s=zohoarc; 
+	b=cC/ICZXfF1PPaasz/E3BNaljaXN+qnBbr8t0aYdAVdPzQQ3aXMlUSNFjgIpF+Z20jl9E1IDeU7jcX/IUBC+3ujOt07VwRF42Rx8aDZlR2SbuR1wS8IX62zAvyVCBIJmplwwL/uJurHzzQtam8MR7759N3/HqeS+UtO5A9vrmXgY=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.eu; s=zohoarc; 
+	t=1783682040; h=Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=n2VrqkVnW4B7S1gpVF6wwy16uSMDtNg0d+SAjOSYJeg=; 
+	b=GjLHlQ+UiIysAtM4njkWSwm9tnItYHjUy+NXbcJMO33KRJEVxMhf1ugUB9ju8Ebpuu3AwMwznr3nOjYC76fF7QZ1Y4fChrOHneY0x6pc//uYCDItXwdeOrt9uj4EbkxVkOtnT0eU0VwVaPnAi5YHSnu44IdCNpyaaDuhmy9+c6M=
+ARC-Authentication-Results: i=1; mx.zohomail.eu;
+	dkim=pass  header.i=auditcode.ai;
+	spf=pass  smtp.mailfrom=security@auditcode.ai;
+	dmarc=pass header.from=<security@auditcode.ai>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1783682040;
+	s=zmail; d=auditcode.ai; i=security@auditcode.ai;
+	h=From:From:To:To:Cc:Cc:Subject:Subject:Date:Date:Message-ID:MIME-Version:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=n2VrqkVnW4B7S1gpVF6wwy16uSMDtNg0d+SAjOSYJeg=;
+	b=laKUEiYkT5R79MzktC+t7ZYJtdMShEpX7mz1OyZO73MP2eQ9B9tTGGVF2m5I3pwk
+	RRYwoCBaJsTD1M8nUsjbaseGjLQXuDiV8NRj1wp2CLoorN4p8AJvEjODsPYkB6MunsJ
+	NFr6KSTO76R3uxB6ssrBkikSfwwNt93sxX0CcoyQ=
+Received: by mx.zoho.eu with SMTPS id 1783682036480683.9563439480606;
+	Fri, 10 Jul 2026 13:13:56 +0200 (CEST)
+From: Ibrahim Hashimov <security@auditcode.ai>
+To: Alexander Aring <alex.aring@gmail.com>,
 	Stefan Schmidt <stefan@datenfreihafen.org>,
 	Miquel Raynal <miquel.raynal@bootlin.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
+	"David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>,
 	linux-wpan@vger.kernel.org,
 	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] ieee802154: hwsim: serialize pib updates to fix double-free
-Date: Thu,  9 Jul 2026 23:18:58 +0100
-Message-ID: <20260709221858.158063-1-devnexen@gmail.com>
-X-Mailer: git-send-email 2.53.0
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: [PATCH net] mac802154: flush rx_mac_cmd_list before freeing sdata
+Date: Fri, 10 Jul 2026 13:13:53 +0200
+Message-ID: <20260710111353.12138-1-security@auditcode.ai>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
@@ -82,77 +59,206 @@ List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-ZohoMailClient: External
 
-hwsim_update_pib() does an unserialized read-swap-free of phy->pib:
+mac802154_rx_mac_cmd_worker() (net/mac802154/rx.c) is queued on
+local->mac_wq every time a MAC-command frame (assoc req/resp, disassoc
+notify, beacon req) is received on any interface of a given phy. Each
+queued struct cfg802154_mac_pkt stashes a *raw* pointer to the
+receiving interface's ieee802154_sub_if_data (sdata) in
+ieee802154_subif_frame():
 
-	pib_old = rtnl_dereference(phy->pib);
-	...
-	rcu_assign_pointer(phy->pib, pib);
-	kfree_rcu(pib_old, rcu);
+	mac_pkt->sdata = sdata;
+	list_add_tail(&mac_pkt->node, &sdata->local->rx_mac_cmd_list);
+	queue_work(sdata->local->mac_wq, &sdata->local->rx_mac_cmd_work);
 
-It assumes the RTNL is held, but ->set_channel is not always called
-under it: the mac802154 scan worker changes channels via
-drv_set_channel() without the RTNL. Such an update can race an
-RTNL-held one on the same phy; both read the same pib_old and both
-kfree_rcu() it, double-freeing the object. With SLUB percpu sheaves
-batching kfree_rcu(), this surfaces as a KASAN invalid-free in
-rcu_free_sheaf().
+and the worker later dereferences it with no liveness check at all,
+e.g. for IEEE802154_CMD_ASSOCIATION_REQ:
 
-struct hwsim_phy has no lock for pib. Add one and make the swap atomic
-with rcu_replace_pointer() under it, dropping the misleading
-rtnl_dereference().
+	if (mac_pkt->sdata->wpan_dev.iftype != NL802154_IFTYPE_COORD)
 
-Reported-by: syzbot+60332fd095f8bb2946ad@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=60332fd095f8bb2946ad
-Fixes: f25da51fdc38 ("ieee802154: hwsim: add replacement for fakelb")
-Signed-off-by: David Carlier <devnexen@gmail.com>
-Cc: <stable@vger.kernel.org>
+Neither teardown path drains this queue before the sdata it points to
+is freed:
+
+ * ieee802154_if_remove() (net/mac802154/iface.c), reached from the
+   nl802154 NL802154_CMD_DEL_INTERFACE handler, does list_del_rcu() +
+   synchronize_rcu() + unregister_netdevice(sdata->dev) -- which frees
+   sdata via priv_destructor/needs_free_netdev -- without touching
+   local->mac_wq or local->rx_mac_cmd_list at all.
+
+ * ieee802154_unregister_hw() (net/mac802154/main.c) only flushes
+   local->workqueue (the DATA-path queue) before calling
+   ieee802154_remove_interfaces(), which frees every sdata on the
+   phy; local->mac_wq is drained only via destroy_workqueue() much
+   later, after the interfaces (and their sdata) are already gone.
+
+Either way, if mac802154_rx_mac_cmd_worker() is already queued (or
+races back in from a frame received just before teardown), it runs
+after the free and dereferences freed memory -- confirmed under
+KASAN: flooding a victim NODE interface with MAC_CMD frames from a
+MONITOR interface on a sibling phy, then deleting the victim via
+NL802154_CMD_DEL_INTERFACE, reliably produces:
+
+  BUG: KASAN: use-after-free in mac802154_rx_mac_cmd_worker+0x463/0x630 [mac802154]
+  Read of size 4 at addr ffff888004b22a18 by task kworker/u8:1/31
+  Workqueue: phy0-mac-cmds mac802154_rx_mac_cmd_worker [mac802154]
+  Freed by task 498: ... (the DEL_INTERFACE task, ieee802154_if_remove)
+
+Verified on the same v6.19 KASAN stand with this patch applied: the
+identical MONITOR-flood-then-DEL_INTERFACE reproducer no longer trips
+the use-after-free report in mac802154_rx_mac_cmd_worker().
+
+Fix it the same way mac802154_flush_queued_beacons() (net/mac802154/scan.c)
+already flushes local->rx_beacon_list on scan cleanup, plus a
+cancel_work_sync() step: rx_beacon_work's worker never dereferences
+sdata, so the existing sibling doesn't need it, but rx_mac_cmd_work's
+does. Add mac802154_flush_queued_mac_cmds(local, sdata):
+
+ - cancel_work_sync(&local->rx_mac_cmd_work) waits out a run already
+   in flight (still safe -- nothing has been freed yet) and blocks any
+   new run from starting while we hold the RTNL;
+ - every rx_mac_cmd_list entry whose ->sdata matches (or every entry,
+   when called with sdata == NULL for full-teardown) is then dropped,
+   so no future run of the worker can see it;
+ - if entries belonging to *other*, still-live interfaces on the same
+   local remain, the work is re-queued so they still get processed.
+
+Call it from both teardown paths:
+
+ - ieee802154_if_remove(), before unregister_netdevice(sdata->dev),
+   filtered to the sdata being removed (other interfaces on the same
+   phy may have legitimate entries in flight);
+ - ieee802154_unregister_hw(), before ieee802154_remove_interfaces(),
+   with sdata == NULL since every interface on the local is going
+   away and local->workqueue's flush_workqueue() does not cover
+   local->mac_wq.
+
+This mirrors how mac80211 drains per-interface work (e.g. the
+analogous per-sdata work items cancelled from ieee80211_do_stop()
+before an interface is torn down) and the existing mac802154 scan.c
+list-flush idiom, applied to the one rx_mac_cmd_list consumer that
+actually dereferences the freed interface.
+
+Fixes: d021d218f6d9 ("mac802154: Handle received BEACON_REQ")
+Cc: stable@vger.kernel.org
+Signed-off-by: Ibrahim Hashimov <security@auditcode.ai>
+Assisted-by: AuditCode-AI:2026.07
 ---
- drivers/net/ieee802154/mac802154_hwsim.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+ net/mac802154/ieee802154_i.h |  2 ++
+ net/mac802154/iface.c        | 10 +++++++++
+ net/mac802154/main.c         | 11 ++++++++++
+ net/mac802154/rx.c           | 42 ++++++++++++++++++++++++++++++++++++
+ 4 files changed, 65 insertions(+)
 
-diff --git a/drivers/net/ieee802154/mac802154_hwsim.c b/drivers/net/ieee802154/mac802154_hwsim.c
-index 6daa0f198b9f..a9bd1555d2dc 100644
---- a/drivers/net/ieee802154/mac802154_hwsim.c
-+++ b/drivers/net/ieee802154/mac802154_hwsim.c
-@@ -72,6 +72,8 @@ struct hwsim_phy {
- 	struct ieee802154_hw *hw;
- 	u32 idx;
- 
-+	/* Serializes phy->pib_updates. */
-+	spinlock_t pib_lock;
- 	struct hwsim_pib __rcu *pib;
- 
- 	bool suspended;
-@@ -102,8 +104,6 @@ static int hwsim_update_pib(struct ieee802154_hw *hw, u8 page, u8 channel,
- 	if (!pib)
- 		return -ENOMEM;
- 
--	pib_old = rtnl_dereference(phy->pib);
--
- 	pib->page = page;
- 	pib->channel = channel;
- 	pib->filt.short_addr = filt->short_addr;
-@@ -112,7 +112,10 @@ static int hwsim_update_pib(struct ieee802154_hw *hw, u8 page, u8 channel,
- 	pib->filt.pan_coord = filt->pan_coord;
- 	pib->filt_level = filt_level;
- 
--	rcu_assign_pointer(phy->pib, pib);
-+	spin_lock_bh(&phy->pib_lock);
-+	pib_old = rcu_replace_pointer(phy->pib, pib,
-+				      lockdep_is_held(&phy->pib_lock));
-+	spin_unlock_bh(&phy->pib_lock);
- 	kfree_rcu(pib_old, rcu);
- 	return 0;
+diff --git a/net/mac802154/ieee802154_i.h b/net/mac802154/ieee802154_i.h
+index 8f2bff268392..e3c5c8d5b5d0 100644
+--- a/net/mac802154/ieee802154_i.h
++++ b/net/mac802154/ieee802154_i.h
+@@ -300,6 +300,8 @@ static inline bool mac802154_is_beaconing(struct ieee802154_local *local)
  }
-@@ -952,6 +955,7 @@ static int hwsim_add_one(struct genl_info *info, struct device *dev,
- 		goto err_pib;
- 	}
  
-+	spin_lock_init(&phy->pib_lock);
- 	pib->channel = 13;
- 	pib->filt.short_addr = cpu_to_le16(IEEE802154_ADDR_BROADCAST);
- 	pib->filt.pan_id = cpu_to_le16(IEEE802154_PANID_BROADCAST);
+ void mac802154_rx_mac_cmd_worker(struct work_struct *work);
++void mac802154_flush_queued_mac_cmds(struct ieee802154_local *local,
++				     struct ieee802154_sub_if_data *sdata);
+ 
+ int mac802154_perform_association(struct ieee802154_sub_if_data *sdata,
+ 				  struct ieee802154_pan_device *coord,
+diff --git a/net/mac802154/iface.c b/net/mac802154/iface.c
+index 000be60d9580..a5aa213e25a2 100644
+--- a/net/mac802154/iface.c
++++ b/net/mac802154/iface.c
+@@ -694,6 +694,16 @@ void ieee802154_if_remove(struct ieee802154_sub_if_data *sdata)
+ 	mutex_unlock(&sdata->local->iflist_mtx);
+ 
+ 	synchronize_rcu();
++
++	/*
++	 * Drop any rx_mac_cmd_list entry still pointing at this sdata
++	 * before it is freed below: mac802154_rx_mac_cmd_worker() runs
++	 * asynchronously on local->mac_wq and derefs mac_pkt->sdata with
++	 * no liveness check of its own (see mac802154_flush_queued_mac_cmds()
++	 * for details).
++	 */
++	mac802154_flush_queued_mac_cmds(sdata->local, sdata);
++
+ 	unregister_netdevice(sdata->dev);
+ }
+ 
+diff --git a/net/mac802154/main.c b/net/mac802154/main.c
+index ea1efef3572a..2f8c57e78db1 100644
+--- a/net/mac802154/main.c
++++ b/net/mac802154/main.c
+@@ -277,6 +277,17 @@ void ieee802154_unregister_hw(struct ieee802154_hw *hw)
+ 	tasklet_kill(&local->tasklet);
+ 	flush_workqueue(local->workqueue);
+ 
++	/*
++	 * tasklet_kill() above stops any further frame reaching
++	 * ieee802154_subif_frame(), but mac802154_rx_mac_cmd_worker() may
++	 * still be queued/running on local->mac_wq and derefs the sdata of
++	 * every interface ieee802154_remove_interfaces() is about to free
++	 * below. flush_workqueue(local->workqueue) does not cover it --
++	 * that is the DATA workqueue, not local->mac_wq -- so drain it
++	 * explicitly first.
++	 */
++	mac802154_flush_queued_mac_cmds(local, NULL);
++
+ 	rtnl_lock();
+ 
+ 	ieee802154_remove_interfaces(local);
+diff --git a/net/mac802154/rx.c b/net/mac802154/rx.c
+index cd8f2a11920d..0b167f76cb23 100644
+--- a/net/mac802154/rx.c
++++ b/net/mac802154/rx.c
+@@ -128,6 +128,48 @@ out:
+ 	kfree(mac_pkt);
+ }
+ 
++/**
++ * mac802154_flush_queued_mac_cmds - drop pending rx_mac_cmd_list work
++ * @local: the mac802154 device the queue belongs to
++ * @sdata: interface being torn down, or %NULL to flush unconditionally
++ *
++ * Every queued &struct cfg802154_mac_pkt stashes a raw pointer to the
++ * interface it was received on (see ieee802154_subif_frame() below) which
++ * mac802154_rx_mac_cmd_worker() dereferences without ever checking whether
++ * that interface is still alive. Callers must invoke this before freeing
++ * @sdata -- or every interface on @local, when @sdata is %NULL -- so the
++ * worker can never run against freed memory:
++ *
++ *  - cancel_work_sync() waits out a run already in flight. That is still
++ *    safe to let finish because nothing has been freed yet, and it blocks
++ *    any new run from starting for as long as we hold the RTNL.
++ *  - every list entry pointing at @sdata (all of them, if @sdata is NULL)
++ *    is then dropped so no future run of the worker can see it.
++ *
++ * Mirrors mac802154_flush_queued_beacons() in scan.c, which does not need
++ * the cancel_work_sync() step because its worker never dereferences sdata.
++ */
++void mac802154_flush_queued_mac_cmds(struct ieee802154_local *local,
++				     struct ieee802154_sub_if_data *sdata)
++{
++	struct cfg802154_mac_pkt *mac_pkt, *tmp;
++
++	cancel_work_sync(&local->rx_mac_cmd_work);
++
++	list_for_each_entry_safe(mac_pkt, tmp, &local->rx_mac_cmd_list, node) {
++		if (sdata && mac_pkt->sdata != sdata)
++			continue;
++
++		list_del(&mac_pkt->node);
++		kfree_skb(mac_pkt->skb);
++		kfree(mac_pkt);
++	}
++
++	/* Other interfaces on @local may still have entries pending. */
++	if (!list_empty(&local->rx_mac_cmd_list))
++		queue_work(local->mac_wq, &local->rx_mac_cmd_work);
++}
++
+ static int
+ ieee802154_subif_frame(struct ieee802154_sub_if_data *sdata,
+ 		       struct sk_buff *skb, const struct ieee802154_hdr *hdr)
 -- 
-2.53.0
+2.50.1 (Apple Git-155)
 
