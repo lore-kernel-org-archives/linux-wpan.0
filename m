@@ -1,48 +1,83 @@
-Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84FD1429CDD;
-	Thu, 16 Jul 2026 13:24:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07E74207A20
+	for <linux-wpan@vger.kernel.org>; Thu, 16 Jul 2026 19:31:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784208255; cv=none; b=UUCymnBA4NnvzfkEXzUcBgGY8XUf+dqoTOe4WXVNU/BBt7DYBNLTAXfCQk87y1hzyInLF/cbTGNarPTvnhZpqY5k5WnOzHHckGHDRWl4CD/knoCYoB3kbCqKK/Es69aUgTs4uSZyT9MemyOK+9Ip1S4IoaQXwM+qMAUYL61Q40o=
+	t=1784230269; cv=none; b=nXndfcqj2fYnVuo6a4DHOP4hK5vzH3s2R+10z/CmzaeYBRR6ZWaaJ9ue6SLfLznVwyzWTdipwZwI/27cCW+/ZBlxh+uShTtAj2IG/1MK8VSXPMZtco62Z87bOhckx0hzh/T4sxMy3NJbl99pacLOOyuUtpOD7lGLkXYr9nVgE/U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784208255; c=relaxed/simple;
-	bh=Fjgy1z0Z81DUwO8onxh+U/cNhVGjlKnF4EcpganB5kc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GvehRjVqmE3LcnVabNmsSTWhHcypnvjultnlKwN9TuWSu500XRa/27XyLDNXBOdmprhxnSY103BUpnEaAsy2gZZQUKC3p2/42fjb9x5xpgn0ewkJS4XcOb2zUQc/+i8ifa5RwOYyLNPUOxgane2Ur187YZcYUK3AXs9Sryo+GFc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=TJUEXA7E; arc=none smtp.client-ip=82.195.75.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=debian.org
+	s=arc-20240116; t=1784230269; c=relaxed/simple;
+	bh=WshbsU2q6H02/tJXUpUihHfMkSOWE4lYM+P8h5lLdws=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=E7pAcEnHjbhTKBPY7h6mwcuLU0lhJzf21CanhHTaoK0UNlD/Cup4An/c8R81YHTTBcJEUE3W2oHBp/eMFPdTvQ62PjMvUH53QJY9i46H+voWvR/HxxObeoukZzx2Pp1h0xSNy1VbewBoAuGlQeDrZLNUu1npfiN4bb0YTyFqWQ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0sec.ai; spf=pass smtp.mailfrom=0sec.ai; dkim=temperror (0-bit key) header.d=0sec.ai header.i=@0sec.ai header.b=nUFVskNi; arc=none smtp.client-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0sec.ai
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=0sec.ai
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="TJUEXA7E"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
-	s=smtpauto.stravinsky; h=X-Debian-User:In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=/PvATEpeA+fg+mhGDaN27YwObJ/Rtexpnw9c2IPB0rk=; b=TJUEXA7Ei4IbzcqT+QbURJJ8vq
-	hEL8LQTjRH5G5+bV9qthDR89+/0M+hPsOK4IFsTxv+AgVEfKo3oKG2xD8t33QMq8jIJMp8eT+2Z6W
-	7bYzhvvJOqV9HosoRntoe6WWXP2Xz2MKtRmS2ZBEsyoPwgYI7eXEyf0ronfvzrQ3qNejCYtq8c4b3
-	CqITZni+2YfmuFxXJzKNLkPccqV1Am4V1Xu84wPBrZ+SWes8CYv/1eMPG/1NdNZcQm9iF104gJUB0
-	z8h2heq0ItkLDJP8zlmL9o/nKfLe/rSwY6prdQO482UmLTqNG3yDse9yeBcnpQl3eIlWXMPgQzzlW
-	OLNH4u9g==;
-Received: from authenticated-user
-	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.96)
-	(envelope-from <leitao@debian.org>)
-	id 1wkM4H-003qs3-2L;
-	Thu, 16 Jul 2026 13:24:01 +0000
-Date: Thu, 16 Jul 2026 06:23:56 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Doruk Tan Ozturk <doruk@0sec.ai>
-Cc: alex.aring@gmail.com, stefan@datenfreihafen.org, 
-	miquel.raynal@bootlin.com, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, horms@kernel.org, phoebe.buckheister@itwm.fraunhofer.de, 
-	linux-wpan@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	dkim=temperror (0-bit key) header.d=0sec.ai header.i=@0sec.ai header.b="nUFVskNi"
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-493e4ccccc2so43898225e9.2
+        for <linux-wpan@vger.kernel.org>; Thu, 16 Jul 2026 12:31:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=0sec.ai; s=google; t=1784230266; x=1784835066; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=WshbsU2q6H02/tJXUpUihHfMkSOWE4lYM+P8h5lLdws=;
+        b=nUFVskNi1dPSaAVgZsos6K5Gys/P/GX0tr99T3NHFzhcBRNNV7I8B3c79YxdZ34Uza
+         FQKrDpPH+ZXbRQvanM18qTOBBeWcIcJxit/MVPtah5aUP7KORox8/F/WfaST1FYRxz1P
+         zRT944s31yzRsaM7LBQ5lHaPOoIu19YhkhP5mcgwRVx8CjwnD8uDMyowYyUtCLNS6gqG
+         01k5vVKx31C2ryY2C8qkpnhAFlbIQVgwVAItxAXDpURnu5FLYI+nn4vYfCoob6fI3mLP
+         9knjAgJmXNJCTHe1Ol3b5CGTozun+g4TXSasAwhL4JexLMIiBGEhu3YE5THsd5zIMFWw
+         +Kng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784230266; x=1784835066;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=WshbsU2q6H02/tJXUpUihHfMkSOWE4lYM+P8h5lLdws=;
+        b=n/jTk+P3rT0ieyAgWFjTrS+0eWxXF59mg2B0duJXnz7m5swyN/jvFfw4exWrU6+dtE
+         /OhsjUWxADnHWl7HbAUf2Yq2P+r6jj6znJ6F+A7qbsT35yexFf4tJppDnEFz5WDYmemr
+         pITD6AU2EUUk23ipopPl9+8dVteC9I9+97N8lBD6YhoE6tLQ4Fb1oKjCaH5VoDYaXEQZ
+         z5LBJlCXtIHtfUo+Vb9RteVQrR71KHdiinMlfctObuhCjVBLG74THO2+s5DaFu1VT1OR
+         O8joD0a3njG1RCVxoa5viSRceM+ax9XJG92p2Hn2s8JPds7ejOmSyLnQ+qShKHTvp16f
+         3yfA==
+X-Forwarded-Encrypted: i=1; AHgh+Rp1aHNeuxvBNP+OzhMhpiXtziNBgSyqWe1BVu6z6uLHI3oFP3HZLVxWV/zjqEj4jqRDum+viM7GUu2z@vger.kernel.org
+X-Gm-Message-State: AOJu0YxeICVUNuHtYpD3RGi/QW4tqwUPPfCVaGHcP5CBkuiw/xHhQcZ/
+	tojwsL13S9R/Rx0opwTEKzhFDKPNXPQydZ9NnYdyCr+018rpxQ9xMkMzsE/ct9k5pLxw
+X-Gm-Gg: AfdE7cmR8g4TjkaKoHIgS70/WSgxw3tAoY0VbEAX+5F85g5cfGwqiM0H0PXvMyPT4Yp
+	dDMlWCR7ThemVP5oCeI6PrBx781+yFUTcptQLCBxzpla3F+DHGYTbGvJBxp2LD2zhPmV5gMnNes
+	Q7yhSP6BU5CfhNQr1o8QY9FGpCtOHnHX/VlYxzW/gfF/ApVEBaK2bNwEHodubwEocjEL1f7k4W/
+	xAWN4iEEUIH+Tn0RF0Apviw9Zam3asaj/zaEHKvUwhp7QduQkCIHBYu+TcTVyo+ReXfgfIYa2JB
+	NA7UYU1Upc9ilEPjWeSzeIUrPE7sxunxIsCTB77gBB1Z/fUBuoNhYYV4tSKpKS6thBcIlgmSeI7
+	91ciCI6gK+fw32XTvoFRxoyP7SB/KhlZ921qQxn8tmqKHEJLcwGV/aWyoP1kw8P3SNrmjMATMVY
+	QPLLWF7FpQHTRjc3xGxwY7Amb0P5iZYrZjkAJIAfD2dn9zxBu5XktRXoZ4PYXqq+xMpKFzwcx93
+	LDuBzn6w0la99Wa7sz6Sahk
+X-Received: by 2002:a05:600c:83c6:b0:495:3a61:b67e with SMTP id 5b1f17b1804b1-4953a61b766mr125503845e9.23.1784230266106;
+        Thu, 16 Jul 2026 12:31:06 -0700 (PDT)
+Received: from PeakBook-Mini.tail8e484.ts.net ([178.197.218.188])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49541e7f7f7sm77535685e9.2.2026.07.16.12.31.04
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Thu, 16 Jul 2026 12:31:05 -0700 (PDT)
+From: Doruk Tan Ozturk <doruk@0sec.ai>
+To: Breno Leitao <leitao@debian.org>
+Cc: Alexander Aring <alex.aring@gmail.com>,
+	Stefan Schmidt <stefan@datenfreihafen.org>,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	Simon Horman <horms@kernel.org>,
+	linux-wpan@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Subject: Re: [PATCH net] mac802154: llsec: reject frames shorter than the
- authentication tag
-Message-ID: <aljbEr7K3uVRjJNT@gmail.com>
+Subject: Re: [PATCH net] mac802154: llsec: reject frames shorter than the authentication tag
+Date: Thu, 16 Jul 2026 21:31:03 +0200
+Message-ID: <20260716193103.30558-1-doruk@0sec.ai>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260709131246.44517-1-doruk@0sec.ai>
 References: <20260709131246.44517-1-doruk@0sec.ai>
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
@@ -50,42 +85,8 @@ List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260709131246.44517-1-doruk@0sec.ai>
-X-Debian-User: leitao
+Content-Transfer-Encoding: 8bit
 
-On Thu, Jul 09, 2026 at 03:12:46PM +0200, Doruk Tan Ozturk wrote:
+Will do both in v2, thanks.
 
-> Reported-by: Doruk Tan Ozturk <doruk@0sec.ai>
-> Signed-off-by: Doruk Tan Ozturk <doruk@0sec.ai>
-
-Usually you don't have Reported-by if you are fixing something yourself.
-
-> ---
->  net/mac802154/llsec.c | 5 +++++
->  1 file changed, 5 insertions(+)
-> 
-> diff --git a/net/mac802154/llsec.c b/net/mac802154/llsec.c
-> index 5e7cc11fab3a..364a1ac1d771 100644
-> --- a/net/mac802154/llsec.c
-> +++ b/net/mac802154/llsec.c
-> @@ -893,6 +893,11 @@ llsec_do_decrypt_auth(struct sk_buff *skb, const struct mac802154_llsec *sec,
-
-Why not returning here, before sg_init_one()? here you alrady have
-datalen and authlen.
-
->  	sg_init_one(&sg, skb_mac_header(skb), assoclen + datalen);
->  
-> +	if (datalen < authlen) {
-> +		kfree_sensitive(req);
-> +		return -EBADMSG;
-> +	}
-> +
->  	if (!(hdr->sec.level & IEEE802154_SCF_SECLEVEL_ENC)) {
->  		assoclen += datalen - authlen;
->  		datalen = authlen;
-> -- 
-> 2.43.0
-> 
-> 
+-Doruk
