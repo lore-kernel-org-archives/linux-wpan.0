@@ -1,253 +1,130 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C91D41E6CB;
-	Thu, 16 Jul 2026 12:49:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71E273F074A;
+	Thu, 16 Jul 2026 13:01:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784206194; cv=none; b=YVwiBGZFyNwedUVk9kHBY+Q/xBnaX2acGNE7OEc4RvXaM8VZjY7DejgqfL7Y0hVWJBYowNDtl8S74JpvSE3v6VoXXKO18P2E57p0zeHZ0s0AMcxEEm9INmGTd2mI2alzLpsmMWc5Jrm7fTwQB6vcgFAVTy2xQb48Q8L7wY3VDNw=
+	t=1784206915; cv=none; b=AuIXKZNhBjsgEPfdMQ4qhyc3/fI3UT4aMchN1NhE9+Cc48pEfKPpcAFWWK0K/mk0WipXtvaCQZZs4cvCg7hoK3nctm35SdwnkObbXPGSDuSGmvtq99buI2SgwUZTOM1tddVHPB4z4EZC1EgsumszeoQx0yVDvG20Boh/AIzQc4g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784206194; c=relaxed/simple;
-	bh=srIyBDg0zIgsZEktS9hxZD2lKjLh1HP/H77kcG09KzA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=RV8qEfdn7CY6AXKQ0fgdRWOFC86c6Bt6K6CHNF2syMh98nsPJab9SdKhyvE2mfY1rBWnqBkYrDAh0zr9j6Y9Df6onL/vOzPuhj8dRVeCESzQYU7oTTtCzpPQMNWWPE2FRhFO05cQVaBBbIrHU9iIkGuRLxVFdvtfcwXBAWZ6aEA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZM6CxH5j; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1784206915; c=relaxed/simple;
+	bh=U4GAGj2YU4eWmcdtql84XfYU7hSkRNHblJ6pBV62o30=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=k02THZg1DmeXwdRPHakihGqzBYXv/2mIN2aYJCq6CITK4Tc6pay0O22aKyBjuddAG1s+ufjnRvBtcCBEBf3GG6yppxn+S/Z1kQK8G9zb4NECovq6LDcRan9MlPvLLBLXlG2+ZgM9yu3XNzNOxuMbT3RxepliRCB6T1yy/BFA4P4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=vXfhm9wZ; arc=none smtp.client-ip=82.195.75.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=debian.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZM6CxH5j"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 933881F00A3A;
-	Thu, 16 Jul 2026 12:49:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784206193;
-	bh=sRmSoYQ1H3fBB3GhAuOFx+4D+QchTkAKC/wuASYBpj4=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=ZM6CxH5jy48DAmRrE7l+JwcTOqthQhRKOjRZSN2DxfqkeFH/hL75g+YBxtdGGvtl0
-	 5LXZyNY/50Jf2TlAPD84/GsQ/XQm3P0f/mzFwTRS1/1FSAXHbj4g3u5EXnQRpxlHui
-	 HBV2LPUbtZBdvIwEfYPaoS2VFRnE+nq/xDx1nmKbmhBFzfU1rQyWgqcSagdz+hKKdB
-	 AitzLdE4Bs3YzHvKeNfTRjkxUuzs8tNlA5Sa9rln9p09oA1cbrQ0CzfcK1dX3GI0SG
-	 0ssXYwiJ38eXwQtVdn9JK77R2vG+z0cpaIDKKkZ1B8A23wix6UMJ78Ce7GcJDgp61A
-	 ne0Jod7H4XUmw==
-From: Simon Horman <horms@kernel.org>
-To: security@auditcode.ai
-Cc: Simon Horman <horms@kernel.org>,
-	alex.aring@gmail.com,
-	stefan@datenfreihafen.org,
-	miquel.raynal@bootlin.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-wpan@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH net] mac802154: flush rx_mac_cmd_list before freeing sdata
-Date: Thu, 16 Jul 2026 13:49:27 +0100
-Message-ID: <20260716124926.304297-2-horms@kernel.org>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <20260710111353.12138-1-security@auditcode.ai>
-References: <20260710111353.12138-1-security@auditcode.ai>
+	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="vXfhm9wZ"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
+	s=smtpauto.stravinsky; h=X-Debian-User:Cc:To:Content-Transfer-Encoding:
+	Content-Type:MIME-Version:Message-Id:Date:Subject:From:Reply-To:Content-ID:
+	Content-Description:In-Reply-To:References;
+	bh=/hcMmjX6gOl4gfgW6B1YWlbVzKj0O33UhDJ5XPIjAT4=; b=vXfhm9wZN9VRPszj8LUxvvu99U
+	RHCNsreGFDtl9eSyHrp/wzsiX1FAEIe8fb+o7Ww+AuJS6AhhWl3gnu9pZHbKL0ObW0C+YWvLdACzV
+	zTSmzbeZdORRM9D+1MdGbqfqQOG/u3QQ8aGqIT+B6ayuZXaPaNs6DBk0Ht//7s4Puqj1FcbjcPrNV
+	uQJae7hgxNsv8zhF8D7DyMdXY9UheuGtsI8iXiYZ8De4QiAgv7Hou7JkWB8o4lTMAdtEwTtj/fsZh
+	RE4YBUvQJfDrw6K7NgUe3zhLfj16PAfX6P4KApzasVRuyYu+SDaHPMjVjitX/J7VDEvgGyhxNUzSb
+	5tJ8oEVw==;
+Received: from authenticated-user
+	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.96)
+	(envelope-from <leitao@debian.org>)
+	id 1wkLij-003q60-0I;
+	Thu, 16 Jul 2026 13:01:45 +0000
+From: Breno Leitao <leitao@debian.org>
+Subject: [PATCH net-next 0/7] net: convert rawv6, ieee802154, phonet and
+ tls getsockopt to sockopt_t
+Date: Thu, 16 Jul 2026 05:59:58 -0700
+Message-Id: <20260716-getsockopt_phase4-v1-0-4f45cb12dce7@debian.org>
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAM/VWGoC/x3MUQrDIBAFwKss7zvCKmnaepVSithNIgUVV0Ig5
+ O6BzgHmgEpLovB0oMmWNJUMT3YgxDXkRUz6whMcu4nv9mYW6Vrir9T+qWtQGY19sONnnOPEAQO
+ hNpnT/j9fyNJNlr3jfZ4XATjn3G0AAAA=
+X-Change-ID: 20260715-getsockopt_phase4-180209cfc60a
+To: sdf@fomichev.me, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+ Alexander Aring <alex.aring@gmail.com>, 
+ Stefan Schmidt <stefan@datenfreihafen.org>, 
+ Miquel Raynal <miquel.raynal@bootlin.com>, 
+ Remi Denis-Courmont <courmisch@gmail.com>, 
+ =?utf-8?q?R=C3=A9mi_Denis-Courmont?= <remi.denis-courmont@nokia.com>, 
+ John Fastabend <john.fastabend@gmail.com>, 
+ Sabrina Dubroca <sd@queasysnail.net>, Shuah Khan <shuah@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-wpan@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+ Breno Leitao <leitao@debian.org>, kernel-team@meta.com
+X-Mailer: b4 0.16-dev-d5d98
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2226; i=leitao@debian.org;
+ h=from:subject:message-id; bh=U4GAGj2YU4eWmcdtql84XfYU7hSkRNHblJ6pBV62o30=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBqWNY0MNsmeuJOzouE6Lb9bvlX3qczyUYBbuxOk
+ w3GPbAATKiJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaljWNAAKCRA1o5Of/Hh3
+ bWC6D/9Ce+QxfE2apqWaAXFIYHeBF3cU8FTVsNDpSYXAQY1THiYLTVg7EZ2cgKSFsRMuJAhGC96
+ zy7iORE2n5kw9+GbAX7fax1qFwYe8mIplHlIaBclznrAN4Pra/EilWxsxtu0JziMWPcRg0VQTrI
+ 3esdSzkAZsVLNtA1f1HkE4Z7RxCgXujItyaX3sXMQgSt9OavGCxOjtiE2V0z0E117PEDOiS9esS
+ jZ6PM3PhsskTi3KGxtN6te2HepM+hxkD8h6FHeBDUR55ZdYzCORbxBNYtyfGJavFdvDBWeFDWAx
+ pXQ0iIYIZjlQ+gTOEkPp22XrJSIKpQP/TedrtQ5Dx1YoqSoJQb4S8ik0dR6KpdEYtC0bqiI8myk
+ Cx4/oVU1P8PhZ7z4XDa+ZE4abjVZrwWVeIKKr+FMUwBRGr/HokBBm51e2cLotJMLZJWU6Rm4i0g
+ H73sqcNna/GwYrUd0HQpLOtL3IHPYDrR32mGXqqzsZ5Zb0GcqKgEIsqTxEEOlnV69G8rsIhva3J
+ NsZ77klb9K2G8xDUKUhancC8QSm1nDxNB64/IHe76ExA0G5Lt5/no/aDXdm4kV+4t5OtGGWmR0p
+ 5ergg0TzfikPA9coW7YSXYoQIzg7GeMTAu7RwGvksZQH2GATAw9GCe6HImjorNS7zSGsJ/Isq1F
+ Z8lA/KLNInD1uGg==
+X-Developer-Key: i=leitao@debian.org; a=openpgp;
+ fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
+X-Debian-User: leitao
 
-This is an AI-generated review of your patch. The human sending this
-email has considered the AI review valid, or at least plausible.
-https://netdev-ai.bots.linux.dev/sashiko/
+Now that sockopt_init_user() was already merged, builds a user-backed
+sockopt_t from the __user pair. A getsockopt leaf can then take
+a sockopt_t behind a thin __user wrapper: the wrapper builds it, calls
+the leaf, and writes the length back to optlen. The leaf copies with
+copy_to_iter() instead of copy_to_user().
+
+Convert four more leaves the way udp and raw already were: ipv6 raw
+(do_rawv6_getsockopt), ieee802154 dgram, phonet pep, and tls
+(do_tls_getsockopt and its per-option helpers). 
+
+Converting phonet surfaced a pre-existing bug: pep_getsockopt() clamps the
+length it reports but writes a full int with put_user(), overrunning an
+optval buffer shorter than sizeof(int). It is fixed in its own patch, with
+a Fixes: tag, before the phonet conversion, so it can be backported alone.
+
+The last patch adds getsockopt_iter selftest fixtures for rawv6,
+ieee802154, phonet and tls, checking the returned length and errno across
+exact, oversized and short buffers, an unknown optname and a bad level.
+
+For full motivation about these changes, please check the initial thread
+at link
+https://lore.kernel.org/all/20260401-getsockopt-v2-0-611df6771aff@debian.org/#t
+
+Signed-off-by: Breno Leitao <leitao@debian.org>
 ---
-mac802154: flush rx_mac_cmd_list before freeing sdata
+Breno Leitao (7):
+      ipv6: raw: drop unused level argument from do_rawv6_getsockopt
+      ipv6: raw: convert do_rawv6_getsockopt to sockopt_t
+      ieee802154: convert dgram getsockopt to sockopt_t
+      phonet: pep: do not write beyond optlen in getsockopt
+      phonet: pep: convert getsockopt to sockopt_t
+      tls: convert getsockopt to sockopt_t
+      selftests: net: getsockopt_iter: cover rawv6, ieee802154, phonet and tls
 
-This patch adds mac802154_flush_queued_mac_cmds() and calls it from
-ieee802154_if_remove() and ieee802154_unregister_hw() to drain
-local->rx_mac_cmd_list before sdata is freed, aiming to close a KASAN
-use-after-free in mac802154_rx_mac_cmd_worker().
+ net/ieee802154/socket.c                       |  38 ++-
+ net/ipv6/raw.c                                |  27 +-
+ net/phonet/pep.c                              |  36 ++-
+ net/tls/tls_main.c                            |  80 +++--
+ tools/testing/selftests/net/getsockopt_iter.c | 424 ++++++++++++++++++++++++++
+ 5 files changed, 533 insertions(+), 72 deletions(-)
+---
+base-commit: f6f3b36c15ed44de1fbb44e645e4fae8c4a4453e
+change-id: 20260715-getsockopt_phase4-180209cfc60a
 
-> diff --git a/net/mac802154/iface.c b/net/mac802154/iface.c
-> index b823720630e7..59a045cccfe9 100644
-> --- a/net/mac802154/iface.c
-> +++ b/net/mac802154/iface.c
-> @@ -694,6 +694,16 @@ void ieee802154_if_remove(struct ieee802154_sub_if_data *sdata)
->  	mutex_unlock(&sdata->local->iflist_mtx);
->  
->  	synchronize_rcu();
-> +
-> +	/*
-> +	 * Drop any rx_mac_cmd_list entry still pointing at this sdata
-> +	 * before it is freed below: mac802154_rx_mac_cmd_worker() runs
-> +	 * asynchronously on local->mac_wq and derefs mac_pkt->sdata with
-> +	 * no liveness check of its own (see mac802154_flush_queued_mac_cmds()
-> +	 * for details).
-> +	 */
-> +	mac802154_flush_queued_mac_cmds(sdata->local, sdata);
-> +
->  	unregister_netdevice(sdata->dev);
->  }
+Best regards,
+--  
+Breno Leitao <leitao@debian.org>
 
-[High]
-When ieee802154_if_remove() runs to delete one interface, does anything
-stop RX softirq on sibling interfaces of the same phy from concurrently
-enqueueing into local->rx_mac_cmd_list while the flush is walking it?
-
-The producer path is ieee802154_subif_frame(), reached from the RX
-tasklet under rcu_read_lock only, and it unconditionally does:
-
-    mac_pkt->sdata = sdata;
-    list_add_tail(&mac_pkt->node, &sdata->local->rx_mac_cmd_list);
-    queue_work(sdata->local->mac_wq, &sdata->local->rx_mac_cmd_work);
-
-with no lock on rx_mac_cmd_list. list_del_rcu() + synchronize_rcu()
-above only quiesces the sdata being removed; other sdata on the same
-local remain in local->interfaces and can keep receiving MAC-command
-frames on other CPUs throughout the flush.
-
-> diff --git a/net/mac802154/main.c b/net/mac802154/main.c
-> index ea1efef3572a..2f8c57e78db1 100644
-> --- a/net/mac802154/main.c
-> +++ b/net/mac802154/main.c
-> @@ -277,6 +277,17 @@ void ieee802154_unregister_hw(struct ieee802154_hw *hw)
->  	tasklet_kill(&local->tasklet);
->  	flush_workqueue(local->workqueue);
->  
-> +	/*
-> +	 * tasklet_kill() above stops any further frame reaching
-> +	 * ieee802154_subif_frame(), but mac802154_rx_mac_cmd_worker() may
-> +	 * still be queued/running on local->mac_wq and derefs the sdata of
-> +	 * every interface ieee802154_remove_interfaces() is about to free
-> +	 * below. flush_workqueue(local->workqueue) does not cover it --
-> +	 * that is the DATA workqueue, not local->mac_wq -- so drain it
-> +	 * explicitly first.
-> +	 */
-> +	mac802154_flush_queued_mac_cmds(local, NULL);
-> +
->  	rtnl_lock();
->  
->  	ieee802154_remove_interfaces(local);
-
-[High]
-Does tasklet_kill() actually stop any further frame from reaching
-ieee802154_subif_frame() here?
-
-tasklet_kill() clears TASKLET_STATE_SCHED and waits for a running
-instance to finish, but it does not prevent a subsequent
-tasklet_schedule() from a driver's ieee802154_rx_irqsafe() path. If a
-driver interrupt fires between mac802154_flush_queued_mac_cmds(local,
-NULL) and destroy_workqueue(local->mac_wq) further down, a new
-mac_pkt would be added to rx_mac_cmd_list, the worker would be queued
-on local->mac_wq, and it would then run against sdatas already freed
-by ieee802154_remove_interfaces().
-
-Note this call site also runs before rtnl_lock() a few lines below,
-which is relevant to the kernel-doc comment quoted further down.
-
-> diff --git a/net/mac802154/rx.c b/net/mac802154/rx.c
-> index cd8f2a11920d..0b167f76cb23 100644
-> --- a/net/mac802154/rx.c
-> +++ b/net/mac802154/rx.c
-> @@ -128,6 +128,48 @@ void mac802154_rx_mac_cmd_worker(struct work_struct *work)
->  	kfree(mac_pkt);
->  }
->  
-> +/**
-> + * mac802154_flush_queued_mac_cmds - drop pending rx_mac_cmd_list work
-> + * @local: the mac802154 device the queue belongs to
-> + * @sdata: interface being torn down, or %NULL to flush unconditionally
-> + *
-> + * Every queued &struct cfg802154_mac_pkt stashes a raw pointer to the
-> + * interface it was received on (see ieee802154_subif_frame() below) which
-> + * mac802154_rx_mac_cmd_worker() dereferences without ever checking whether
-> + * that interface is still alive. Callers must invoke this before freeing
-> + * @sdata -- or every interface on @local, when @sdata is %NULL -- so the
-> + * worker can never run against freed memory:
-> + *
-> + *  - cancel_work_sync() waits out a run already in flight. That is still
-> + *    safe to let finish because nothing has been freed yet, and it blocks
-> + *    any new run from starting for as long as we hold the RTNL.
-
-[Low]
-Is this description of cancel_work_sync() accurate?
-
-cancel_work_sync() only guarantees the work is not pending or executing
-by the time it returns, and does not itself block future queue_work()
-calls. RTNL is not held at the ieee802154_unregister_hw() call site
-(the flush is invoked before rtnl_lock() there), and at the
-ieee802154_if_remove() site RTNL is a plain mutex that does not disable
-BH and does not serialize with the RX softirq path
-ieee802154_tasklet_handler() -> ieee802154_rx() ->
-__ieee802154_rx_handle_packet() -> ieee802154_subif_frame(), which is
-what enqueues into rx_mac_cmd_list and re-arms rx_mac_cmd_work via
-queue_work(local->mac_wq, ...).
-
-Could this comment be reworded to describe an invariant the code
-actually provides?
-
-> + *  - every list entry pointing at @sdata (all of them, if @sdata is NULL)
-> + *    is then dropped so no future run of the worker can see it.
-> + *
-> + * Mirrors mac802154_flush_queued_beacons() in scan.c, which does not need
-> + * the cancel_work_sync() step because its worker never dereferences sdata.
-> + */
-> +void mac802154_flush_queued_mac_cmds(struct ieee802154_local *local,
-> +				     struct ieee802154_sub_if_data *sdata)
-> +{
-> +	struct cfg802154_mac_pkt *mac_pkt, *tmp;
-> +
-> +	cancel_work_sync(&local->rx_mac_cmd_work);
-> +
-> +	list_for_each_entry_safe(mac_pkt, tmp, &local->rx_mac_cmd_list, node) {
-> +		if (sdata && mac_pkt->sdata != sdata)
-> +			continue;
-> +
-> +		list_del(&mac_pkt->node);
-> +		kfree_skb(mac_pkt->skb);
-> +		kfree(mac_pkt);
-> +	}
-> +
-> +	/* Other interfaces on @local may still have entries pending. */
-> +	if (!list_empty(&local->rx_mac_cmd_list))
-> +		queue_work(local->mac_wq, &local->rx_mac_cmd_work);
-> +}
-
-[High]
-Given that ieee802154_subif_frame() can still be entered from softirq on
-sibling interfaces after cancel_work_sync() returns, what protects
-rx_mac_cmd_list during this iteration?
-
-The producer does:
-
-    list_add_tail(&mac_pkt->node, &sdata->local->rx_mac_cmd_list);
-    queue_work(sdata->local->mac_wq, &sdata->local->rx_mac_cmd_work);
-
-with no lock. cancel_work_sync() does not block a subsequent
-queue_work(), so mac802154_rx_mac_cmd_worker() can start on another CPU
-while this function is still iterating. The worker does
-list_first_entry_or_null() + list_del() on the same list, and the
-iterator here pre-loads tmp = list_next_entry(pos) each round.
-
-Under that shape, could a concurrent list_del() from the worker on the
-head entry (a) target the same entry the flush is about to delete
-(double kfree() of mac_pkt), (b) free the entry that tmp points at
-(use-after-free inside the flush loop), or (c) race with a
-list_add_tail() from the producer softirq and leave neighbour pointers
-inconsistent?
-
-The trailing:
-
-    if (!list_empty(&local->rx_mac_cmd_list))
-        queue_work(local->mac_wq, &local->rx_mac_cmd_work);
-
-also reads list state and re-arms the worker without any lock, which is
-a TOCTOU against a softirq list_add_tail() on the same list.
-
-Would either a spin_lock_bh() around every rx_mac_cmd_list mutation
-plus the queue_work() (matching the softirq producer), or preventing
-new enqueues for the sdata being torn down in ieee802154_subif_frame()
-before the flush runs, close this window?
-
-Also, in the multi-interface case ieee802154_if_remove() only quiesces
-the sdata being removed with synchronize_rcu(); does this fix actually
-address the scenario the commit message describes, where MAC_CMD
-traffic is arriving on a sibling interface of the same phy during
-NL802154_CMD_DEL_INTERFACE?
