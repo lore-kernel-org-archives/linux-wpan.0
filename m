@@ -1,40 +1,40 @@
 Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E094B4218B7;
-	Thu, 16 Jul 2026 13:01:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45329422555;
+	Thu, 16 Jul 2026 13:02:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784206921; cv=none; b=G/OYJTi7vAUb2m8kj43lq88xmjFeHpASufFzy2Lq5gc3c06Jih0fvUbTFhkOrJrQpfpw2vgz6uKu1hcuqamm7MqGPbnlzqB8DbUbTJmXMSHOq4Z7lS1AX9T3LZTcJclYrW770ABzkrtG+qDUyQ/xmrnyqdusQnIUNum4GXcmKAc=
+	t=1784206925; cv=none; b=KltOheNc2oYz3s8ekUNeq4qZdquIbg1q7HLXNLh71pjuNliWCTllf1LsjKrSKlcHZKy/NRgMNsP4s+su+UpZSFGcNKL+iH846Mw0HNbVhIEnTUas/9h0K6wMPNShva74jxMqEnv0Jx8iSDYdUPsBx9FBFacGpv8Q1bMn7wt9AWQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784206921; c=relaxed/simple;
-	bh=uQw9+P8SQcNospiW32OdIyj9mAmuKVQRv/ZlolZJPjE=;
+	s=arc-20240116; t=1784206925; c=relaxed/simple;
+	bh=cAMTjzFtWpssYhGMnYLYloL7+e38m8IMj+86usmagk8=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=IsbwqZnpvJjjiEziskYnkHwgZT1rnIhkmZNLLnKNbESQAHSkG4G6613v9J4t2Prax7fZDAX4leY1MIwLOPBKqGjgN666uDXbP/E22s/SOODH46obyO2bfKE3NDbOZlAamA2n/4kQHmc3foB22Qt4U+VP5WZKD+rceQ6mf8cl4cE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=UFwdLbsE; arc=none smtp.client-ip=82.195.75.108
+	 In-Reply-To:To:Cc; b=Ddm57HfS2tjt9DMando5lmkJ7dBZRLnkH+kzT9kInU3TdZlIeJwgUgR94x+BABb2JGqTJrvdFzHdcNXX//Orz37uew4qO1pGcpjaJL5RhoT439jiSY65l+Z1A+mcyW6p/6KDnnNNmfsch8FgUYqLC1kUiWPs427Vw6uaHsGF7GQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=o2CZB8RX; arc=none smtp.client-ip=82.195.75.108
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=debian.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="UFwdLbsE"
+	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="o2CZB8RX"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
 	s=smtpauto.stravinsky; h=X-Debian-User:Cc:To:In-Reply-To:References:
 	Message-Id:Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:
 	From:Reply-To:Content-ID:Content-Description;
-	bh=p3olImzVCvMhNN+6I0jr7pI95BV7NvZBpFe/CbmtjVI=; b=UFwdLbsExjAVEJpoyhbUk6X0kD
-	/sD1JxfYOPlysOCg3Vb63eOrY67/hmMNQpSIJx72tosjVo8t5MtE3BQfOLvhRSXLtv+BUZGSY0+V+
-	MSy2hN1Y+S5lb6XKv6on+Vo8Wz+BN5TNGqjSnvc5b1xI84GjB+dk30FImkt1R1g3yVjdVqTxUFLxJ
-	mwEeMOXJ1hzRw656p8UyC+SwVS6U9hOHDUrqAm9HxLXp4CnNNS5nAgPLs9et3VZrSS10yq57Bat4w
-	i4F1vH5tYCzLK3FSyNl0cW2Zs3CIAVxXnjm3CGxpBXsdNhdA6zPoAthPOq4PrtC7KzUidNErPc0A7
-	3QhRQErQ==;
+	bh=/ULuSXe8cMJt1jfaDloF8ljpZjBOJlHguRmjs+r/CiQ=; b=o2CZB8RXCyL+1mY6ivSVh1CScu
+	KMYrZeF8IqX0wytJwihn8mxXjCbkISgazGAlHPHiP44KHgIwPBjUMmAWLfvdnuExNPnrepHnHTadO
+	ktaj24cVnUEURRZs+g9rkeu4TRTPmv2p3dQRvSRARF1Q3X8OR8RkAyO5Eyrsx1Ak8kBamRUXNnR7v
+	PotAGdt9mH8qJ3HOREqsSPPNNVUiaDFjJX01ybbU63satV/vpqYLaFBI/fuqgEklFXEcqQ1/zZx8+
+	5v1eQIjnSkM1CDwLR/Zun/RTWIjyl4Q8nPhVw7vIs0jwhOfmuo90BGbODSX2pagrE3yZ1Y9WlJOnC
+	V59MEpAw==;
 Received: from authenticated-user
 	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
 	(Exim 4.96)
 	(envelope-from <leitao@debian.org>)
-	id 1wkLit-003q6V-0j;
-	Thu, 16 Jul 2026 13:01:55 +0000
+	id 1wkLiy-003q6h-0f;
+	Thu, 16 Jul 2026 13:02:00 +0000
 From: Breno Leitao <leitao@debian.org>
-Date: Thu, 16 Jul 2026 06:00:00 -0700
-Subject: [PATCH net-next 2/7] ipv6: raw: convert do_rawv6_getsockopt to
+Date: Thu, 16 Jul 2026 06:00:01 -0700
+Subject: [PATCH net-next 3/7] ieee802154: convert dgram getsockopt to
  sockopt_t
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
@@ -44,7 +44,7 @@ List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260716-getsockopt_phase4-v1-2-4f45cb12dce7@debian.org>
+Message-Id: <20260716-getsockopt_phase4-v1-3-4f45cb12dce7@debian.org>
 References: <20260716-getsockopt_phase4-v1-0-4f45cb12dce7@debian.org>
 In-Reply-To: <20260716-getsockopt_phase4-v1-0-4f45cb12dce7@debian.org>
 To: sdf@fomichev.me, "David S. Miller" <davem@davemloft.net>, 
@@ -61,99 +61,97 @@ Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
  linux-wpan@vger.kernel.org, linux-kselftest@vger.kernel.org, 
  Breno Leitao <leitao@debian.org>, kernel-team@meta.com
 X-Mailer: b4 0.16-dev-d5d98
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2266; i=leitao@debian.org;
- h=from:subject:message-id; bh=uQw9+P8SQcNospiW32OdIyj9mAmuKVQRv/ZlolZJPjE=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBqWNY03APvwX1D7EqMUjHiOoA/gBnHjgZMUrP1U
- jEjneGK6juJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaljWNAAKCRA1o5Of/Hh3
- bYpfD/9xnxHPKs5oBP5XLDv7OiS5ujz/eAUjzMPDI6zQSHGiNKjlv8oaslzWZKvK8Isxx4RIMF+
- BgnonQWyV6WZM5VrI/W2X2RpurIOCZoOrlKCCHJO9mo2mG/6DZaXDjcA4hraAUjFhPcLS4t9NS5
- y0S6cu6MCzoBDJbBkQiVGzZeQAi4n5ppuN2koUM99l/WQHCADqO6oR92PoRp+J6nf28QqBs5o+s
- geFAjch0XBmC7EAmeahMSapt0WMsCgUuexKIPBQpT266VnM608BFyEK7LMZP8FVuzUzFf5FTdNh
- H0BBpEfFbiipDM3RTFMI/x4etdmG7s0bEjmKw0XqO9whv6FF5epNl5HYVpkKuPYdd9Cg2qZXNKg
- Z2BvIqiSGjQ1hae48IuoMY2a/V0ZQWB55+YtMnXzeC/9R1BW0N25cqmaYfpz1rGzJnCYBAWN/Qq
- MEqO1ugWpvS//KXHExoEhBRq4N910Iyaa/5acRjtaU4znskPmvnW5v/PGPTVhwrcRJCylMQoliD
- rGhpWSbgC+T+rDtam41jtSoMAOqhJwHqAXnS8YyfuE6Uirrin5hyjOZGZyNliNfL6PZASGCo+xb
- cCs9tyHp+hPnXRPpym9/UNB4kXLqzQ/VbT8WozWDFuI7OGuI2cDo2ZHdbvr90igul9dY/0ve0aw
- Z68P2hQAtbO8O/A==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1998; i=leitao@debian.org;
+ h=from:subject:message-id; bh=cAMTjzFtWpssYhGMnYLYloL7+e38m8IMj+86usmagk8=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBqWNY0Z2IW793tC3PkXGaq6JPsqxAJ3yimolzQ7
+ WQjXLsQl6KJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaljWNAAKCRA1o5Of/Hh3
+ bfQ1D/0c5UKoMN66y1FjrvjsWn8xg+C2Yqn2/WAorSfPmPiMI+mWsr+n+BPgcVtWEaVLvb2xXNg
+ GnvK5+KGAOzF7j39vGXdGs3eKerGhqkCQW4bEIR6jj4WZsBBQzXCu+kGLxR/k5zHzptc7jJ3Z3M
+ h0ii3I1IB27RxZQmyWXaDzdggcTh59LO+AC399iJT6dxqjhgcpzQd8hlGtN2STGNskCZ5oDFIvt
+ p6icDiczgQOGcFcumEiKL/z8Rv2Ai4ypiyUwmLSOQmyV7TDSZ2KuvOuDY+Gli0yTIWYZzUMLm7V
+ qYiyAmS7Gdv3UmmpEWahWj4Ga4B+g4X+2/y5jf1jAOItmq91zuoVrK0RGgfNcf/mwHpRcOztAMs
+ 6FiVBB6tGGlZdeViXbWV4d9ZhLd5ncwR9cqukOUMQ/p4Yqgid6QcdA3f2pPsBxQRIrtBJY7wbk6
+ TUgFFGU8XHp7KSCHGNYWPAwLQy6rh3yzpjEkJbkW8Jd2/fchDnAraZFGOm23f4I1FkIpHLKnbYc
+ czPcEhtxsPulp/cw4zxLz6nAfZ92580I4ec/DBiByDkvS34oigfbYxkL+Hl4pC+yigNqQR4pwWr
+ 9wcLzWcEyUEoBAybaUMiCpgKcHJM+TU1WmoV0L9ytCWJQ3NUFq4zvI9TcAF85smnzlI+7P0Vsdt
+ GeWZJ26OhTbsvwQ==
 X-Developer-Key: i=leitao@debian.org; a=openpgp;
  fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
 X-Debian-User: leitao
 
-Convert do_rawv6_getsockopt to the new sockopt_t model, mirroring what
-we have in ipv4. The overall goal is to move these callbacks gradually
-from __user points to use sockopt_t, and this part touches
-do_rawv6_getsockopt.
+Continue converting the proto-layer getsockopt callbacks to the sockopt_t
+interface, splitting dgram_getsockopt() into a do_dgram_getsockopt() helper
+that takes a sockopt_t.
 
 No functional change.
 
 Signed-off-by: Breno Leitao <leitao@debian.org>
 ---
- net/ipv6/raw.c | 27 +++++++++++++++++++--------
- 1 file changed, 19 insertions(+), 8 deletions(-)
+ net/ieee802154/socket.c | 38 ++++++++++++++++++++++++++------------
+ 1 file changed, 26 insertions(+), 12 deletions(-)
 
-diff --git a/net/ipv6/raw.c b/net/ipv6/raw.c
-index 99eec36796fb9..1f15942d14163 100644
---- a/net/ipv6/raw.c
-+++ b/net/ipv6/raw.c
-@@ -1051,14 +1051,12 @@ static int rawv6_setsockopt(struct sock *sk, int level, int optname,
- 	return do_rawv6_setsockopt(sk, level, optname, optval, optlen);
+diff --git a/net/ieee802154/socket.c b/net/ieee802154/socket.c
+index 85dce296d7513..763f63e48afe4 100644
+--- a/net/ieee802154/socket.c
++++ b/net/ieee802154/socket.c
+@@ -831,20 +831,12 @@ static int ieee802154_dgram_deliver(struct net_device *dev, struct sk_buff *skb)
+ 	return ret;
  }
  
--static int do_rawv6_getsockopt(struct sock *sk, int optname,
--			       char __user *optval, int __user *optlen)
-+static int do_rawv6_getsockopt(struct sock *sk, int optname, sockopt_t *opt)
+-static int dgram_getsockopt(struct sock *sk, int level, int optname,
+-			    char __user *optval, int __user *optlen)
++static int do_dgram_getsockopt(struct sock *sk, int optname, sockopt_t *opt)
  {
- 	struct raw6_sock *rp = raw6_sk(sk);
+ 	struct dgram_sock *ro = dgram_sk(sk);
+-
  	int val, len;
  
+-	if (level != SOL_IEEE802154)
+-		return -EOPNOTSUPP;
+-
 -	if (get_user(len, optlen))
 -		return -EFAULT;
-+	len = opt->optlen;
+-
+-	len = min_t(unsigned int, len, sizeof(int));
++	len = min_t(unsigned int, opt->optlen, sizeof(int));
  
  	switch (optname) {
- 	case IPV6_HDRINCL:
-@@ -1082,9 +1080,8 @@ static int do_rawv6_getsockopt(struct sock *sk, int optname,
- 
- 	len = min_t(unsigned int, sizeof(int), len);
+ 	case WPAN_WANTACK:
+@@ -871,10 +863,32 @@ static int dgram_getsockopt(struct sock *sk, int level, int optname,
+ 		return -ENOPROTOOPT;
+ 	}
  
 -	if (put_user(len, optlen))
--		return -EFAULT;
--	if (copy_to_user(optval, &val, len))
 +	opt->optlen = len;
 +	if (copy_to_iter(&val, len, &opt->iter_out) != len)
  		return -EFAULT;
- 	return 0;
- }
-@@ -1092,6 +1089,9 @@ static int do_rawv6_getsockopt(struct sock *sk, int optname,
- static int rawv6_getsockopt(struct sock *sk, int level, int optname,
- 			  char __user *optval, int __user *optlen)
- {
+-	if (copy_to_user(optval, &val, len))
++	return 0;
++}
++
++static int dgram_getsockopt(struct sock *sk, int level, int optname,
++			    char __user *optval, int __user *optlen)
++{
 +	sockopt_t opt;
 +	int err;
 +
- 	switch (level) {
- 	case SOL_RAW:
- 		break;
-@@ -1109,7 +1109,18 @@ static int rawv6_getsockopt(struct sock *sk, int level, int optname,
- 		return ipv6_getsockopt(sk, level, optname, optval, optlen);
- 	}
- 
--	return do_rawv6_getsockopt(sk, optname, optval, optlen);
++	if (level != SOL_IEEE802154)
++		return -EOPNOTSUPP;
++
 +	err = sockopt_init_user(&opt, optval, optlen);
 +	if (err)
 +		return err;
 +
-+	err = do_rawv6_getsockopt(sk, optname, &opt);
++	err = do_dgram_getsockopt(sk, optname, &opt);
 +	if (err)
 +		return err;
 +
 +	if (put_user(opt.optlen, optlen))
-+		return -EFAULT;
+ 		return -EFAULT;
 +
-+	return 0;
+ 	return 0;
  }
  
- static int rawv6_ioctl(struct sock *sk, int cmd, int *karg)
 
 -- 
 2.53.0-Meta
