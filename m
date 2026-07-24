@@ -1,88 +1,58 @@
-Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5878A33B97B;
-	Fri, 24 Jul 2026 09:48:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD1E53DAAD4;
+	Fri, 24 Jul 2026 21:58:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784886525; cv=none; b=FDgU6eT45HgV7OPvSSC3UotOR8rpFauEuxo1XgVj0hN7PKf/QgFoUWp86Ngh6LU0kHN9Qk4M3dkeTu1DHC0Ta6wam3wd+cIPn72queZjemyCSRmo8qJor1J7tSlKX67eLibgVfiaivw+pr3NpQ6jHuib69P//ZyqkVub9EsasO4=
+	t=1784930325; cv=none; b=Yq3EVc1ze3MPlgdHcoL1GXwta/HbBsxE3Oh/cno2pM3be+c8nim+GzOIzMGAECkxWpEHT3tvmbwcg16L/uj1MSvKETHqIcP9Hx7HMtPB35kK81K84VGio3Vm3+jIpKwnKSLbkJPuSFTO8R47gse1Ia2UvrTAlmuXZtCEywtHPqY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784886525; c=relaxed/simple;
-	bh=Rwmm4RLX0s7DZN3iaoF/nbtciM9DC980VTjUFsxDE6Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JgYxE4HjCTAkJvF7vWpy7lcyC5WQtj/EKHCDIdZlCItGW63dOD7Y9/cZ4N4rFoyTc/829GvkprcE/9BkzNMNAKMROsjOtT33n+GItPqTpcfcaQn0OejrMhh/WXlbIiiglaGw+//lw9+XQuF09YxwCYTC+dVL/M9yX1HDmcOiX8w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=KMSVSQD6; arc=none smtp.client-ip=82.195.75.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=debian.org
+	s=arc-20240116; t=1784930325; c=relaxed/simple;
+	bh=o9kGb540YenJrByyQX9PxC30FbVDYnlT8RdZtkEkdsg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=gvyBky8PDLGuEQVdxsva3jP7qGU3Yr1i/vvS5Msm6Q5uyHWag5WM6axxHfdjFyE+4kxJeDa0gZql25L5vxZiueZFMyjagK3Qkklgi/nNn98owe98s0IesN2X4xjHWysnvgWVXMT3pcBW03NHR04KG06i5KhcWYaUGWilDEXUqu4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S7jXfd/Z; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="KMSVSQD6"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
-	s=smtpauto.stravinsky; h=X-Debian-User:In-Reply-To:Content-Transfer-Encoding:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
-	Reply-To:Content-ID:Content-Description;
-	bh=CwzCog24SE+SYMPystsC+yIzB2QgOY/HZ1Zz6wBBSmc=; b=KMSVSQD6JKnPeGpHwDYrhG9nGk
-	YpWEXMyGR6zrVni8yeLPbm0P844oZruJMdocJIkcSUQNLMHmw8zi9yoivWmFsoA/qmgz1hVk2AieR
-	Ge+hsVDoOtm6myUglCiRxFO5HUmHfUg9Dqf1qQWF+vpvz3WE2QfEI1pPppafo6KdCjkGIzY+AQ/JJ
-	bGoZ2OxPSYPpouMt28b9W7BsMFN3qgG3Y8nO4estNj/9XKaJG/l1kqCKOoYfjYWOJNR0H7AhtoUMl
-	NB0NpPsrZVxB6AqLHIa8PDksGuGdOMLw5lzjpKjSrdhPP5zsdMMwyYf8Wy6S6UpzRimMTcWbOec2C
-	2aFzhrBQ==;
-Received: from authenticated-user
-	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.96)
-	(envelope-from <leitao@debian.org>)
-	id 1wnCW1-004TDn-25;
-	Fri, 24 Jul 2026 09:48:25 +0000
-Date: Fri, 24 Jul 2026 02:48:20 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: sdf@fomichev.me, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt <stefan@datenfreihafen.org>, 
-	Miquel Raynal <miquel.raynal@bootlin.com>, Remi Denis-Courmont <courmisch@gmail.com>, 
-	=?utf-8?B?UsOpbWk=?= Denis-Courmont <remi.denis-courmont@nokia.com>, John Fastabend <john.fastabend@gmail.com>, 
-	Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-wpan@vger.kernel.org, linux-kselftest@vger.kernel.org, kernel-team@meta.com, 
-	=?utf-8?B?UsOpbWk=?= Denis-Courmont <remi@remlab.net>
-Subject: Re: [PATCH net-next v2 7/7] selftests: net: getsockopt_iter: cover
- rawv6, ieee802154, phonet and tls
-Message-ID: <amM0KRJ0QYnfR8_D@gmail.com>
-References: <20260720-getsockopt_phase4-v2-0-8a08fcfa0d72@debian.org>
- <20260720-getsockopt_phase4-v2-7-8a08fcfa0d72@debian.org>
- <amHs_xGASCAA1J3k@krikkit>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S7jXfd/Z"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48D211F000E9;
+	Fri, 24 Jul 2026 21:58:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1784930315;
+	bh=o9kGb540YenJrByyQX9PxC30FbVDYnlT8RdZtkEkdsg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=S7jXfd/Z5EKxkNaOxsh5P7GgnV/QMQmwJc84c+ASOL3leovskt/e5f4oFy3g7Al5c
+	 gaPxToilAQEkU7O5h3Vl3caNC8FQlgpfxFQgTsy9nYBjhGjA2OmTxL5xw+NREytBWL
+	 uGQ+uqsSUDS129ee//2vaZrorPWx2E8iC1Hqa/kk249eTefxn3FRPOk7snbQI8X0pQ
+	 35rwVf1OKlD6pWr7dmoqRjEbKolHUgI1BkCpznGQXvdEVsW5tj7sdIWzzOsHotg5RD
+	 yBaMu54pa9XS/5e+ds2kFbpJ6cb24BNwjRSz+pySy4pT9J0Qio/QFbYC/7rzjHXXxQ
+	 SdvPw4q37Nu4w==
+Date: Fri, 24 Jul 2026 14:58:34 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Ibrahim Hashimov <security@auditcode.ai>
+Cc: alex.aring@gmail.com, stefan@datenfreihafen.org,
+ miquel.raynal@bootlin.com, horms@kernel.org, linux-wpan@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ stable@vger.kernel.org
+Subject: Re: [PATCH net v2] mac802154: lock rx_mac_cmd_list and drain it
+ before freeing sdata
+Message-ID: <20260724145834.3e0485e6@kernel.org>
+In-Reply-To: <20260722101608.37744-1-security@auditcode.ai>
+References: <20260722101608.37744-1-security@auditcode.ai>
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <amHs_xGASCAA1J3k@krikkit>
-X-Debian-User: leitao
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jul 23, 2026 at 12:29:19PM +0200, Sabrina Dubroca wrote:
+On Wed, 22 Jul 2026 12:16:08 +0200 Ibrahim Hashimov wrote:
+> rx_mac_cmd_list has no locking. The RX softirq producer in
+> ieee802154_subif_frame() list_add_tail()s while the mac_wq worker
+> list_del()s, and the worker dereferences mac_pkt->sdata with no
+> liveness check.
 
-> The TLS tests themselves look good.
-> Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
-
-Thanks for the review!
-
-> I guess there's a question here (for components that already have
-> their own tests, so I think just tls for this patch) about whether
-> getsockopt tests belong with the other component tests (net/tls.c) or
-> in this getsockopt_iter group.
-
-That's a good point. I've kept them together in this group for two reasons:
-
-1) It simplifies cleanup once the full conversion is complete—we can
-   remove the entire group in one go (if needed)
-
-2) It avoids inflating the selftest count, which helps keep NIPA CI
-   runs lean.
-
-That said, I am happy to separate them, in case you think they would fit
-better somewhere else.
-
---breno
+Both sashikos complain about races:
+https://sashiko.dev/#/patchset/20260722101608.37744-1-security@auditcode.ai
+https://netdev-ai.bots.linux.dev/sashiko/#/patchset/20260722101608.37744-1-security@auditcode.ai
