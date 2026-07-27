@@ -1,114 +1,66 @@
-Received: from mail-pz2-f1.google.com (mail-pz2-f1.google.com [74.125.228.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 683BE390C95
-	for <linux-wpan@vger.kernel.org>; Mon, 27 Jul 2026 15:27:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.228.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D9093A9DA3;
+	Mon, 27 Jul 2026 23:16:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785166036; cv=none; b=h0ANfaDk0y7swUwpAGA68mi3r0/qhSpmeGkwawDb4XWyQ46HCOsS614oIGSnk4+oMVqBByYfNtFatSdDdTNJ/JLy+33vJywljVWSP24MiFPMZYxy6Oty8ROyWfKJtOxtQbcgYI85YWjmZ4pa/gjPyAdZdXoUPZPVCIbO5z8i72k=
+	t=1785194214; cv=none; b=mz50OjkF3aQT/VY2r8XJ2bgmUTlz/jmu9vaKBbxY2IqPIJRSJBdOvgXrrjgqJw6BPXaYWL7XFeYVRqgmHh2nZg+K1xYiMjAaKqgodxJX6jgxqWUB3lLfQuuqas1XsDNWsbniv2RhUiSIi04ayjaAAyCdLjsIlhimyenmp55HIws=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785166036; c=relaxed/simple;
-	bh=1XeOmQjiCmitTcAp2U7m3O2xukG+U0k4mys23LN33m8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Y+eqg5qLql96FV7nVI8jRL/VUk+ZjZlRC97Oc96x6vI3DJ7kjBXa7tkMiUBxo+AKSc5gaihQcnYXGtZHUgnA1Ois1ZtPFbWqF7NoJiZi89569zpK77b3mX3vq+k7gZ1NlXo4zEUp4NJkyQn8gRbm4I4EiPy5KWMbI3QpVWkdlfU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XDdCgNVt; arc=none smtp.client-ip=74.125.228.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1785194214; c=relaxed/simple;
+	bh=kZNXlNAfSVusVoPVriJ0v5XAtDbQ3QHe3+Vn4kPRYSA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=BNDA7anV9tb5iNPndyqkyvU6VRjRbW9hkK7CeVKLLgXIqOYpxY7xPAOBOda0QXEIsRyh3BFCcVFW9W7yNNlxs5NtC/HSaRwH4HcdbaTGmHXMaiS96SmM34Khwkc4zqtvFmY2p2w93Ihteoz0IgHd/RYUG99bksE2ce7Qwg6PxWc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RzNM3WgT; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XDdCgNVt"
-Received: by mail-pz2-f1.google.com with SMTP id 41be03b00d2f7-c9fe62e0da3so949738a12.1
-        for <linux-wpan@vger.kernel.org>; Mon, 27 Jul 2026 08:27:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1785166034; x=1785770834; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :content-type:mime-version:references:message-id:subject:cc:to:from
-         :date:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=PA2a81BeXH83G/BeP/kggUZUVWwJJJOgGGWCxqitXXc=;
-        b=XDdCgNVtCzEAe4yqWh+ezwqETD7BGhvrYizMdhpblNwmZRah5lPcDCT4JAmYrLyDJS
-         gi+ESZzsTA13ceDM+gHnIaUNPlQuyZhSUZx8DMJEV0hCtsWtdLSxCGI2CTf4kGBHWumQ
-         mbjp4BbzDqNWx8wY+s5pW8UvEXIlAY9C1Bbhxdo71h6kBDOhVEbqUJqOlsAVLxGSB+X1
-         zO/VJ6Sf3+LpM3IggwbKekKkhAqgsmc9zif2NT4+Ds/2C7t4OVUG8BVuAooF8UhVL9oO
-         eueQO7QcvPz2qaG4aYDdC/aV1W3W0JV6Nrldt55gj+iGNa0KNWSKkYQE7xm4ucKowKJm
-         DA8w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785166034; x=1785770834;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :content-type:mime-version:references:message-id:subject:cc:to:from
-         :date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=PA2a81BeXH83G/BeP/kggUZUVWwJJJOgGGWCxqitXXc=;
-        b=elECHVn6s3hdNUlqeYeiTLhF9YES9977QnSuZbNr20P8LIMqCHlt+eHaVxZaXT68HX
-         U3BxdNt4s6INMVRn2D0R2HnrjK8x9FNQgZpXGh3ihBn0+QpHX8SfLnb0oIUYuzh7xTQB
-         VijHFWacitWxg396AigSj0rl2ouY1NZA+SAWWpmI9HEaLQ4gOXQBODdJF9C3aQrwAYEG
-         h2uUoTf7OIasL8f4BnuoNtYOq4ekMUadj3XDHN+0z6bs4Jbz3RYo/I2elGnWLwezWm/K
-         75vovc+8UDgVl1Gxt4ub2bOrqnrx0yULUUXiiyMe6Kp5TG0UTywtwQurGhQbRgXmktih
-         M0bA==
-X-Forwarded-Encrypted: i=1; AHgh+Rrwe1ZJbbh3hiMA/At3CmWUr1V87dIWTdl6STpXow8HiV/RzTcqlCcY0IGeYOy08B7Cjj30l3AXfQJ6@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx/mwWP9pglYjcbObQ2IckpzqDDmlrGQS8H/DZB6i8tcmGmJYMn
-	v291fFdwOX4wUA5RpTKEvXz4OXVc1+9Bty1Bw6ECoiF3PrnU33saPVWu
-X-Gm-Gg: AR+sD13u+GbWt4dQzmXHXfu3S3NL8KjR8nqv43CfRbLWwtNDxK9ZF3L+1w/4000EM0w
-	O1b2QBNg4ATPXYuYEBtTWAe6Xsl3dTh+GQRZ2IXh0HWLe2TXSPdtj3fnOdxiJ2+g17dWwVwBZoX
-	fwFBbXDcWZUth/UIotYYGW0rdt1wpynHrZCVhAuvenId3GBDW6E4DrtWyWGHGrGOikMnytPbdSG
-	QXuUTX+95pSFm1L5wirZ1yTPaHFXFGwwbJjscgFeNAPchlKryv6JuV432U8aWzPU24GYgYg1HAW
-	YZGoIt2sfUv7VVE8pPZg4R+Ac2oSybmdsNchwPOzGaqKr33bO873XhjDPf+XlLSHETH4xXctdPR
-	yGAdjRil1C3UR2iZFgLFBY8X/uDv+01E0be3oC+5wBElvXt1rB/Y/wvDzzeKdmu/q1cMDvFU=
-X-Received: by 2002:a05:6a00:8018:b0:848:41e1:473c with SMTP id d2e1a72fcca58-84e595d13afmr7024673b3a.72.1785166033675;
-        Mon, 27 Jul 2026 08:27:13 -0700 (PDT)
-Received: from localhost ([2a03:2880:2ff:48::])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-cbbb66b2cc2sm3364331a12.17.2026.07.27.08.27.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Jul 2026 08:27:13 -0700 (PDT)
-Date: Mon, 27 Jul 2026 08:26:16 -0700
-From: Stanislav Fomichev <sdf.kernel@gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RzNM3WgT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A1461F000E9;
+	Mon, 27 Jul 2026 23:16:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1785194213;
+	bh=rHrgozeDMsPrY0ICPPbhjDXHnrKHdRVo/MfyqWmfxWI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=RzNM3WgTC11of8b6sMJWuBJj6bkb4060jsIdJaXI71TBtU/xNIxCs/tBQDWo/riVV
+	 A+v+PA9Jyad7q66wm5U6LYiVT/jtRv7SmK4fBua4LIyJ6IBNvYxk4+S/ImwAkLkRYD
+	 t8QxxE6fGMmOAulciSNfDtvJ3raI8r0Bh/Xb2Sx/fdBrDglOjqCLXmHY35gaUv/qRw
+	 fJfulV5KpE5cpoO5SedoQAtrx1n6U2BHfnnRT5Lcdlymed7iHq4wz4z+7y6yi3C9vo
+	 7TGN0UgHNHfSQk2sZqdvhsUR1YA/bAGWDgsSn+i40V0KsyaQOwDSO1T+PR5qID7JIh
+	 Fi7voY/HT5J1g==
+Date: Mon, 27 Jul 2026 16:16:52 -0700
+From: Jakub Kicinski <kuba@kernel.org>
 To: Breno Leitao <leitao@debian.org>
-Cc: sdf@fomichev.me, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt <stefan@datenfreihafen.org>, 
-	Miquel Raynal <miquel.raynal@bootlin.com>, Remi Denis-Courmont <courmisch@gmail.com>, 
-	=?utf-8?B?UsOpbWk=?= Denis-Courmont <remi.denis-courmont@nokia.com>, John Fastabend <john.fastabend@gmail.com>, 
-	Sabrina Dubroca <sd@queasysnail.net>, Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-wpan@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	kernel-team@meta.com, =?utf-8?B?UsOpbWk=?= Denis-Courmont <remi@remlab.net>, 
-	Joe Damato <joe@dama.to>
+Cc: sdf@fomichev.me, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt
+ <stefan@datenfreihafen.org>, Miquel Raynal <miquel.raynal@bootlin.com>,
+ Remi Denis-Courmont <courmisch@gmail.com>, =?UTF-8?B?UsOpbWk=?=
+ Denis-Courmont <remi.denis-courmont@nokia.com>, John Fastabend
+ <john.fastabend@gmail.com>, Sabrina Dubroca <sd@queasysnail.net>, Shuah
+ Khan <shuah@kernel.org>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-wpan@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, kernel-team@meta.com, =?UTF-8?B?UsOpbWk=?=
+ Denis-Courmont <remi@remlab.net>, Joe Damato <joe@dama.to>
 Subject: Re: [PATCH net-next v3 7/7] selftests: net: getsockopt_iter: cover
  rawv6, ieee802154, phonet and tls
-Message-ID: <amd4ka3u1X80rQsZ@devvm7509.cco0.facebook.com>
+Message-ID: <20260727161652.58de366a@kernel.org>
+In-Reply-To: <20260727-getsockopt_phase4-v3-7-e89627544639@debian.org>
 References: <20260727-getsockopt_phase4-v3-0-e89627544639@debian.org>
- <20260727-getsockopt_phase4-v3-7-e89627544639@debian.org>
+	<20260727-getsockopt_phase4-v3-7-e89627544639@debian.org>
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260727-getsockopt_phase4-v3-7-e89627544639@debian.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On 07/27, Breno Leitao wrote:
-> Add fixtures for the newly converted getsockopt leaves:
-> 
->   - rawv6:      IPV6_HDRINCL / IPV6_CHECKSUM int paths + a SOL_RAW
->                 unknown-optname case that reaches do_rawv6_getsockopt().
+On Mon, 27 Jul 2026 03:06:41 -0700 Breno Leitao wrote:
 >   - ieee802154: WPAN_WANTACK dgram int path + non-SOL_IEEE802154 level
 >                 rejection.
 >   - phonet:     PNPIPE_ENCAP pep int path + non-SOL_PNPIPE level
 >                 rejection.
->   - tls:        TLS_TX_ZEROCOPY_RO, the TLS_TX crypto_info round-trip at
->                 the base and full cipher sizes, the NULL-optval and short
->                 buffer EINVAL paths, and an unknown optname. It skips when
->                 the kernel lacks TLS or AES-GCM.
-> 
-> Each fixture pins the returned-length / errno semantics across exact,
-> oversized and short buffers, an unknown optname and a bogus level. The
-> semantics are unchanged by the sockopt_t conversion, so the tests pass
-> both before and after the leaf conversions.
-> 
-> Acked-by: Rémi Denis-Courmont <remi@remlab.net>
-> Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
-> Reviewed-by: Joe Damato <joe@dama.to>
-> Signed-off-by: Breno Leitao <leitao@debian.org>
 
-Acked-by: Stanislav Fomichev <sdf@fomichev.me>
+The config options for these are not enabled in the config for net
+selftest target. Doesn't look like we're testing anything particularly
+meaningful here, so maybe just drop the cases for these?
