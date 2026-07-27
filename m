@@ -1,428 +1,85 @@
-Received: from sender-op-o17.zoho.eu (sender-op-o17.zoho.eu [136.143.169.17])
+Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D456D30C150;
-	Sat, 25 Jul 2026 13:52:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.169.17
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784987573; cv=pass; b=q+e0U5fnwH3N47ip633rzO3SGWSBLR9yId5qEAUGZriJEoiWFAF1m6G7HRp2cKdTk+XCReAjLRPEoyvAnPxIK3ShizQU2HlWutDNcZbc5JkSts5nBz0J/mpazLmp6TxoDlYv3Dfh3l3dJL6prg5VtUZ9hqUalg/VZ8sDhr2F4oY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784987573; c=relaxed/simple;
-	bh=z44Pb1crQFD03JqAKCMy1w7fKEex8Z93gaQhL33xbXc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XhrF/RTUghuycB9P1BHNzqfiMHvhdChOEx1VAP85+X/uKNPmDO6J5+5Jeegkl0y4MWlOfMWDsYz971JUxW1Kcd9APCHj2ZgHpISYXFmlhATgJXjx912SDCi0vmQLFNlrr/xms2thw9itxjqQXAaaf5oTIyt8eV0dcUBWev5RZes=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=auditcode.ai; spf=pass smtp.mailfrom=auditcode.ai; dkim=pass (1024-bit key) header.d=auditcode.ai header.i=security@auditcode.ai header.b=QC+sagcM; arc=pass smtp.client-ip=136.143.169.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=auditcode.ai
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=auditcode.ai
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35DA13EC2EF;
+	Mon, 27 Jul 2026 09:22:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1785144182; cv=none; b=FMcLqa9h6jgCkCDj+vbITe/mnkn9LSoiXeVQ8hleRttBr6mj7OIwDvsASpeiaE8D+cQduAzcInyI2wuyqKpiM1TmoZKD/OlpDq3aP8d+QvY0FfYUNpxfXD71AiAj63yuAH/+GaO7aJH9Na4KjAxzlaH3HiC/CktbN7g7ohZGlIg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1785144182; c=relaxed/simple;
+	bh=Aq7Xx8RN0Aam4PcHl1ksNog+jw6pV/ux9vUMF4j1NDc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pLUUiUFg4BGswsLXOiCiLygxOzuSDJd6v/LoUHpc4Ba8dmNOw+401KIRYLgjOJK4NRtX9lMphzP+0SvCQ7CFC3Vv4VTvJha2LymkYnNLDv5CdRg2/aPqH63MAzg8psLGfmqvgDV6YrNdC3f6MQ3rYkQmc33BHAtKvwLQLsJ3unY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=fwRDRBhP; arc=none smtp.client-ip=82.195.75.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=debian.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=auditcode.ai header.i=security@auditcode.ai header.b="QC+sagcM"
-ARC-Seal: i=1; a=rsa-sha256; t=1784987519; cv=none; 
-	d=zohomail.eu; s=zohoarc; 
-	b=kCdOLHzyqntwcE1Bp4tLsPd9iwZszhRzir3VM4mr9cTmV7/j4l700ojVG6Q2xdGjDPGZUyejO0X+eOQwbWkt2Jrpo8tBQtFLkAihV1Jp+AB683u1ArorR787eNh3ePJf5d8oSH3wxMvT06d7vfAlDbtcXVpWj2CVR6LW2IhHmnI=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.eu; s=zohoarc; 
-	t=1784987519; h=Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=IhyTpGoxDFbY+RWbyKeiv8Dc+d1t6oiztG0rAsNFj6I=; 
-	b=bAsAIJEJVkXu+lMioOIrs0ZQ7Py7MZ3eaI5lNan2L1sJEDr1qravmFQ1lwe09dLDVwwLOWDi1og6BlCTZIhYZ3bIz9a0JrFFBtG4P0OLvDZhVY2mCCBRiUaPfpUR5WHVwlJpQIi+6z6aCAgmL7zUqkfTFDPaa1ET436EClzcHOw=
-ARC-Authentication-Results: i=1; mx.zohomail.eu;
-	dkim=pass  header.i=auditcode.ai;
-	spf=pass  smtp.mailfrom=security@auditcode.ai;
-	dmarc=pass header.from=<security@auditcode.ai>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1784987519;
-	s=zmail; d=auditcode.ai; i=security@auditcode.ai;
-	h=From:From:To:To:Cc:Cc:Subject:Subject:Date:Date:Message-ID:MIME-Version:Content-Transfer-Encoding:Message-Id:Reply-To;
-	bh=IhyTpGoxDFbY+RWbyKeiv8Dc+d1t6oiztG0rAsNFj6I=;
-	b=QC+sagcM9feDvzRU7U76BrVZEF37LGvZMEevNVRMd9RYshSNNjFjcpcLpsTM/jZT
-	yIoYVRAATqgoBaOWO+HjRfLMFUH/GnC8J6+ROJBNnw05LbVEzGHw6RpjvFR0uHDBwxA
-	7foq5hHy6UWw/Sp+EXZYemL2cpDS8T6+FPJuNnf4=
-Received: by mx.zoho.eu with SMTPS id 1784987517461687.1993605818986;
-	Sat, 25 Jul 2026 15:51:57 +0200 (CEST)
-From: Ibrahim Hashimov <security@auditcode.ai>
-To: miquel.raynal@bootlin.com,
-	alex.aring@gmail.com,
-	stefan@datenfreihafen.org
-Cc: kuba@kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	david.girault@qorvo.com,
-	linux-wpan@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH wpan v3] mac802154: fix use-after-free of sdata via queued RX frames
-Date: Sat, 25 Jul 2026 15:51:54 +0200
-Message-ID: <20260725135154.99876-1-security@auditcode.ai>
-X-Mailer: git-send-email 2.50.1
+	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="fwRDRBhP"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
+	s=smtpauto.stravinsky; h=X-Debian-User:In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=HMDpemX2Wma5wES+uuhA5G3MmPT3N+qWvRq6j+AtLLo=; b=fwRDRBhPm0SWfA97iztHBa523P
+	vZwROc7sW+gj5arfzuC7l2ixLoV9aootpdfPzaHUfs8tUWvHL/U/bGgS0jMCcNBHRg1GJvW0/iX9p
+	OGpYDUErOFIXdeea8WClybs8N3vhecrdaOVNWq2nUwbKznXydpk6pdp9x2MLV7EbAduDgCLz15hTC
+	PDUn4fnkr5m2suFGkx5G2LzIrQ+zRkW2G+CV+/JbskxI2MGFWZNDoJtLjuvyDwoGp8KL2cgqCJrce
+	WhUO56rN/96MeeHLkbQCoD384L4N+OqCOIuf+L6IcJiq5MeNRCbiBajM0PmrEolrrCO5f3I50wNcU
+	F5AVWHAA==;
+Received: from authenticated-user
+	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.96)
+	(envelope-from <leitao@debian.org>)
+	id 1woHXg-006nCm-0s;
+	Mon, 27 Jul 2026 09:22:36 +0000
+Date: Mon, 27 Jul 2026 02:22:30 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Doruk Tan Ozturk <doruk@0sec.ai>
+Cc: alex.aring@gmail.com, stefan@datenfreihafen.org, 
+	miquel.raynal@bootlin.com, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, horms@kernel.org, linux-wpan@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH net v2] mac802154: llsec: reject frames shorter than the
+ authentication tag
+Message-ID: <amcjRpwqwRH7wi9h@gmail.com>
+References: <20260716193423.32498-1-doruk@0sec.ai>
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-ZohoMailClient: External
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260716193423.32498-1-doruk@0sec.ai>
+X-Debian-User: leitao
 
-The RX softirq producer ieee802154_subif_frame() queues received beacon
-and MAC-command frames onto local->rx_beacon_list / rx_mac_cmd_list and
-schedules a process-context worker, storing a raw mac_pkt->sdata (and
-skb->dev == sdata->dev) with neither a reference nor any locking:
+On Thu, Jul 16, 2026 at 09:34:23PM +0200, Doruk Tan Ozturk wrote:
+> llsec_do_decrypt_auth() computes the associated-data length for the
+> AEAD request as
+> 
+> 	assoclen += datalen - authlen;
+> 
+> where datalen is the number of bytes after the MAC header and authlen
+> (4, 8 or 16) is the length of the authentication tag. Nothing verifies
+> that the frame actually carries at least authlen payload bytes. A
+> secured frame whose payload is shorter than the tag makes
+> datalen - authlen negative; assoclen is then passed to
+> aead_request_set_ad() as an unsigned value close to 4 GiB, so
+> crypto_aead_decrypt() walks far off the end of the scatterlist that
+> only spans the real frame.
+> 
+> The frame is fully attacker-controlled and reaches this path from any
+> IEEE 802.15.4 peer in radio range. Reject frames whose payload is
+> shorter than the authentication tag before the subtraction.
+> 
+> Dynamically reproduced on a KASAN kernel as a general-protection-fault
+> in the AEAD scatterwalk, and the fix confirmed.
+> 
+> Fixes: 4c14a2fb5d14 ("mac802154: add llsec decryption method")
+> Cc: stable@vger.kernel.org
+> Assisted-by: 0sec:multi-model
+> Reviewed-by: Simon Horman <horms@kernel.org>
+> Signed-off-by: Doruk Tan Ozturk <doruk@0sec.ai>
 
- - the lists have no lock: the softirq producer list_add_tail()s while the
-   mac_wq worker list_del()s, so sibling interfaces on the same phy corrupt
-   the list;
-
- - the workers dereference the interface after it may have been freed.
-   mac802154_rx_mac_cmd_worker() touches mac_pkt->sdata directly, and
-   mac802154_rx_beacon_worker() -> mac802154_process_beacon() dereferences
-   skb->dev (== sdata->dev). Removing an interface frees its sdata
-   (netdev_priv) while a queued frame still points at it, so a later worker
-   run is a use-after-free.
-
-Reproduced under KASAN by flooding a victim interface with MAC command
-frames and removing it (the beacon path is the same class via skb->dev):
-
-  BUG: KASAN: slab-use-after-free in mac802154_rx_mac_cmd_worker+0x463/0x630 [mac802154]
-  Read of size 4 at addr ffff888002f9ea18 by task kworker/u8:1/31
-  Workqueue: phy0-mac-cmds mac802154_rx_mac_cmd_worker [mac802154]
-  Call Trace:
-   mac802154_rx_mac_cmd_worker+0x463/0x630 [mac802154]
-   process_one_work+0x611/0xe80
-   worker_thread+0x52e/0xdc0
-   kthread+0x30c/0x630
-   ret_from_fork+0x2fd/0x3e0
-
-Fix both lists together:
-
- - add local->rx_lock and take it around every list access: the softirq
-   producer (plain spin_lock, softirq context) and the workers and flush
-   (spin_lock_bh, process context);
-
- - pin the interface for the lifetime of a queued frame with
-   netdev_hold()/netdev_put(), so the worker can safely dereference sdata /
-   skb->dev even while the interface is being removed;
-
- - dequeue under the lock at the head and loop-drain the whole list in the
-   workers (they previously processed one frame per run and relied on a
-   later enqueue to drain the rest);
-
- - drop not-yet-started frames of an interface before it is unregistered,
-   from ieee802154_if_remove() (after the RCU grace period) and from the
-   ieee802154_remove_interfaces() loop -- the latter is the whole-phy
-   teardown path, which does not go through ieee802154_if_remove().
-
-An in-flight worker that already dequeued a frame keeps its own netdev
-reference; unregister_netdevice() then waits it out in netdev_run_todo(),
-which runs at rtnl_unlock() (rtnl released) and after the interface has
-been closed, so it does not pin rtnl. A worker blocked in an association
-TX only delays that one interface's unregister (the usual "waiting for %s
-to become free"), it does not hold rtnl. netdev_hold() is used for this
-reason instead of a cancel_work_sync() under rtnl, which would block on
-the worker's unbounded MLME TX wait via ieee802154_sync_queue().
-
-The mac-command worker additionally skips processing for a stopped
-interface (ieee802154_sdata_running()), avoiding a needless association
-response during teardown.
-
-Fixes: 57588c71177f ("mac802154: Handle passive scanning")
-Cc: stable@vger.kernel.org
-Signed-off-by: Ibrahim Hashimov <security@auditcode.ai>
-Assisted-by: AuditCode-AI:2026.07
----
-v3:
- - Cover rx_beacon_list too: its worker dereferences the interface via
-   skb->dev in mac802154_process_beacon(), so it has the same UAF. v2
-   wrongly stated the beacon worker never touches the interface
-   (raised by Miquel Raynal and by automated race analysis on the list).
- - Use per-frame netdev_hold() instead of drain + cancel_work_sync(). The
-   cancel_work_sync() ran under rtnl in ieee802154_if_remove() and could
-   pin rtnl for the length of an in-flight association TX
-   (ieee802154_sync_queue(), unbounded). The netdev reference is instead
-   waited on in netdev_run_todo(), after rtnl is dropped (raised by
-   Jakub Kicinski and by automated race analysis).
- - Fix whole-phy teardown: v2 drained in ieee802154_unregister_hw() before
-   the interfaces were stopped, so a frame could still be queued after the
-   drain and run against freed sdata. Drain per-interface in the
-   ieee802154_remove_interfaces() loop instead.
- - Loop-drain the workers (also fixes a pre-existing one-frame-per-run
-   stranding); required so queued netdev references cannot be left pending.
- - Include the KASAN splat.
-
-v2: https://lore.kernel.org/all/20260722101608.37744-1-security@auditcode.ai/
-v1: https://lore.kernel.org/all/20260710111353.12138-1-security@auditcode.ai/
-
- include/net/cfg802154.h      |   1 +
- net/mac802154/ieee802154_i.h |   8 +++
- net/mac802154/iface.c        |   6 ++
- net/mac802154/main.c         |   1 +
- net/mac802154/rx.c           | 120 ++++++++++++++++++++++++++++-------
- net/mac802154/scan.c         |  10 +--
- 6 files changed, 117 insertions(+), 29 deletions(-)
-
-diff --git a/include/net/cfg802154.h b/include/net/cfg802154.h
-index 76d2cd2e2b30..2e960441ea49 100644
---- a/include/net/cfg802154.h
-+++ b/include/net/cfg802154.h
-@@ -376,6 +376,7 @@ struct cfg802154_mac_pkt {
- 	struct list_head node;
- 	struct sk_buff *skb;
- 	struct ieee802154_sub_if_data *sdata;
-+	netdevice_tracker dev_tracker;
- 	u8 page;
- 	u8 channel;
- };
-diff --git a/net/mac802154/ieee802154_i.h b/net/mac802154/ieee802154_i.h
-index 8f2bff268392..279ff4e9b11e 100644
---- a/net/mac802154/ieee802154_i.h
-+++ b/net/mac802154/ieee802154_i.h
-@@ -74,6 +74,10 @@ struct ieee802154_local {
- 	struct work_struct rx_beacon_work;
- 	struct list_head rx_mac_cmd_list;
- 	struct work_struct rx_mac_cmd_work;
-+	/* Serializes rx_beacon_list and rx_mac_cmd_list against the RX
-+	 * softirq producer, the mac_wq workers and the teardown flush.
-+	 */
-+	spinlock_t rx_lock;
- 
- 	/* Association */
- 	struct ieee802154_pan_device *assoc_dev;
-@@ -300,6 +304,10 @@ static inline bool mac802154_is_beaconing(struct ieee802154_local *local)
- }
- 
- void mac802154_rx_mac_cmd_worker(struct work_struct *work);
-+void mac802154_flush_list(struct list_head *list,
-+			  struct ieee802154_sub_if_data *sdata);
-+void mac802154_flush_queued_pkts(struct ieee802154_local *local,
-+				 struct ieee802154_sub_if_data *sdata);
- 
- int mac802154_perform_association(struct ieee802154_sub_if_data *sdata,
- 				  struct ieee802154_pan_device *coord,
-diff --git a/net/mac802154/iface.c b/net/mac802154/iface.c
-index b823720630e7..31353795fa24 100644
---- a/net/mac802154/iface.c
-+++ b/net/mac802154/iface.c
-@@ -694,6 +694,7 @@ void ieee802154_if_remove(struct ieee802154_sub_if_data *sdata)
- 	mutex_unlock(&sdata->local->iflist_mtx);
- 
- 	synchronize_rcu();
-+	mac802154_flush_queued_pkts(sdata->local, sdata);
- 	unregister_netdevice(sdata->dev);
- }
- 
-@@ -705,6 +706,11 @@ void ieee802154_remove_interfaces(struct ieee802154_local *local)
- 	list_for_each_entry_safe(sdata, tmp, &local->interfaces, list) {
- 		list_del_rcu(&sdata->list);
- 
-+		/* Best-effort: a frame the RX softirq queues for this sdata
-+		 * after the flush still pins the netdev, so the
-+		 * unregister_netdevice() below waits it out.
-+		 */
-+		mac802154_flush_queued_pkts(local, sdata);
- 		unregister_netdevice(sdata->dev);
- 	}
- 	mutex_unlock(&local->iflist_mtx);
-diff --git a/net/mac802154/main.c b/net/mac802154/main.c
-index ea1efef3572a..386c086c79d1 100644
---- a/net/mac802154/main.c
-+++ b/net/mac802154/main.c
-@@ -91,6 +91,7 @@ ieee802154_alloc_hw(size_t priv_data_len, const struct ieee802154_ops *ops)
- 	INIT_LIST_HEAD(&local->interfaces);
- 	INIT_LIST_HEAD(&local->rx_beacon_list);
- 	INIT_LIST_HEAD(&local->rx_mac_cmd_list);
-+	spin_lock_init(&local->rx_lock);
- 	mutex_init(&local->iflist_mtx);
- 
- 	tasklet_setup(&local->tasklet, ieee802154_tasklet_handler);
-diff --git a/net/mac802154/rx.c b/net/mac802154/rx.c
-index cd8f2a11920d..19b5382e85a8 100644
---- a/net/mac802154/rx.c
-+++ b/net/mac802154/rx.c
-@@ -35,16 +35,23 @@ void mac802154_rx_beacon_worker(struct work_struct *work)
- 		container_of(work, struct ieee802154_local, rx_beacon_work);
- 	struct cfg802154_mac_pkt *mac_pkt;
- 
--	mac_pkt = list_first_entry_or_null(&local->rx_beacon_list,
--					   struct cfg802154_mac_pkt, node);
--	if (!mac_pkt)
--		return;
-+	for (;;) {
-+		spin_lock_bh(&local->rx_lock);
-+		mac_pkt = list_first_entry_or_null(&local->rx_beacon_list,
-+						   struct cfg802154_mac_pkt, node);
-+		if (mac_pkt)
-+			list_del(&mac_pkt->node);
-+		spin_unlock_bh(&local->rx_lock);
-+		if (!mac_pkt)
-+			break;
- 
--	mac802154_process_beacon(local, mac_pkt->skb, mac_pkt->page, mac_pkt->channel);
-+		mac802154_process_beacon(local, mac_pkt->skb,
-+					 mac_pkt->page, mac_pkt->channel);
- 
--	list_del(&mac_pkt->node);
--	kfree_skb(mac_pkt->skb);
--	kfree(mac_pkt);
-+		netdev_put(mac_pkt->sdata->dev, &mac_pkt->dev_tracker);
-+		kfree_skb(mac_pkt->skb);
-+		kfree(mac_pkt);
-+	}
- }
- 
- static bool mac802154_should_answer_beacon_req(struct ieee802154_local *local)
-@@ -68,22 +75,15 @@ static bool mac802154_should_answer_beacon_req(struct ieee802154_local *local)
- 	return interval == IEEE802154_ACTIVE_SCAN_DURATION;
- }
- 
--void mac802154_rx_mac_cmd_worker(struct work_struct *work)
-+static void mac802154_rx_mac_cmd(struct ieee802154_local *local,
-+				 struct cfg802154_mac_pkt *mac_pkt)
- {
--	struct ieee802154_local *local =
--		container_of(work, struct ieee802154_local, rx_mac_cmd_work);
--	struct cfg802154_mac_pkt *mac_pkt;
- 	u8 mac_cmd;
- 	int rc;
- 
--	mac_pkt = list_first_entry_or_null(&local->rx_mac_cmd_list,
--					   struct cfg802154_mac_pkt, node);
--	if (!mac_pkt)
--		return;
--
- 	rc = ieee802154_get_mac_cmd(mac_pkt->skb, &mac_cmd);
- 	if (rc)
--		goto out;
-+		return;
- 
- 	switch (mac_cmd) {
- 	case IEEE802154_CMD_BEACON_REQ:
-@@ -121,11 +121,81 @@ void mac802154_rx_mac_cmd_worker(struct work_struct *work)
- 	default:
- 		break;
- 	}
-+}
- 
--out:
--	list_del(&mac_pkt->node);
--	kfree_skb(mac_pkt->skb);
--	kfree(mac_pkt);
-+void mac802154_rx_mac_cmd_worker(struct work_struct *work)
-+{
-+	struct ieee802154_local *local =
-+		container_of(work, struct ieee802154_local, rx_mac_cmd_work);
-+	struct cfg802154_mac_pkt *mac_pkt;
-+
-+	for (;;) {
-+		spin_lock_bh(&local->rx_lock);
-+		mac_pkt = list_first_entry_or_null(&local->rx_mac_cmd_list,
-+						   struct cfg802154_mac_pkt, node);
-+		if (mac_pkt)
-+			list_del(&mac_pkt->node);
-+		spin_unlock_bh(&local->rx_lock);
-+		if (!mac_pkt)
-+			break;
-+
-+		/* A stopped interface cannot transmit; skipping avoids a
-+		 * needless association response (and the !netif_running()
-+		 * warning it would trip) during teardown. The beacon worker
-+		 * needs no such check as it never transmits.
-+		 */
-+		if (ieee802154_sdata_running(mac_pkt->sdata))
-+			mac802154_rx_mac_cmd(local, mac_pkt);
-+
-+		netdev_put(mac_pkt->sdata->dev, &mac_pkt->dev_tracker);
-+		kfree_skb(mac_pkt->skb);
-+		kfree(mac_pkt);
-+	}
-+}
-+
-+/**
-+ * mac802154_flush_list - free queued RX frames on @list
-+ * @list: rx_beacon_list or rx_mac_cmd_list
-+ * @sdata: only free frames received on this interface, or %NULL for all
-+ *
-+ * Each frame pins the net_device it was received on (via netdev_hold()),
-+ * so release that reference as the frame is dropped. Caller must hold
-+ * local->rx_lock.
-+ */
-+void mac802154_flush_list(struct list_head *list,
-+			  struct ieee802154_sub_if_data *sdata)
-+{
-+	struct cfg802154_mac_pkt *mac_pkt, *tmp;
-+
-+	list_for_each_entry_safe(mac_pkt, tmp, list, node) {
-+		if (sdata && mac_pkt->sdata != sdata)
-+			continue;
-+		list_del(&mac_pkt->node);
-+		netdev_put(mac_pkt->sdata->dev, &mac_pkt->dev_tracker);
-+		kfree_skb(mac_pkt->skb);
-+		kfree(mac_pkt);
-+	}
-+}
-+
-+/**
-+ * mac802154_flush_queued_pkts - drop queued RX work referencing @sdata
-+ * @local: the mac802154 device
-+ * @sdata: interface being removed
-+ *
-+ * The workers dereference the queued frame's interface directly
-+ * (mac_pkt->sdata) or through skb->dev in mac802154_process_beacon(). Drop
-+ * the not-yet-started entries belonging to @sdata before it is unregistered
-+ * so their netdev reference is released; an entry already dequeued by a
-+ * running worker keeps its own reference until the worker completes, which
-+ * unregister_netdevice() then waits out.
-+ */
-+void mac802154_flush_queued_pkts(struct ieee802154_local *local,
-+				 struct ieee802154_sub_if_data *sdata)
-+{
-+	spin_lock_bh(&local->rx_lock);
-+	mac802154_flush_list(&local->rx_beacon_list, sdata);
-+	mac802154_flush_list(&local->rx_mac_cmd_list, sdata);
-+	spin_unlock_bh(&local->rx_lock);
- }
- 
- static int
-@@ -221,7 +291,10 @@ ieee802154_subif_frame(struct ieee802154_sub_if_data *sdata,
- 		mac_pkt->sdata = sdata;
- 		mac_pkt->page = sdata->local->scan_page;
- 		mac_pkt->channel = sdata->local->scan_channel;
-+		netdev_hold(sdata->dev, &mac_pkt->dev_tracker, GFP_ATOMIC);
-+		spin_lock(&sdata->local->rx_lock);
- 		list_add_tail(&mac_pkt->node, &sdata->local->rx_beacon_list);
-+		spin_unlock(&sdata->local->rx_lock);
- 		queue_work(sdata->local->mac_wq, &sdata->local->rx_beacon_work);
- 		return NET_RX_SUCCESS;
- 
-@@ -233,7 +306,10 @@ ieee802154_subif_frame(struct ieee802154_sub_if_data *sdata,
- 
- 		mac_pkt->skb = skb_get(skb);
- 		mac_pkt->sdata = sdata;
-+		netdev_hold(sdata->dev, &mac_pkt->dev_tracker, GFP_ATOMIC);
-+		spin_lock(&sdata->local->rx_lock);
- 		list_add_tail(&mac_pkt->node, &sdata->local->rx_mac_cmd_list);
-+		spin_unlock(&sdata->local->rx_lock);
- 		queue_work(sdata->local->mac_wq, &sdata->local->rx_mac_cmd_work);
- 		return NET_RX_SUCCESS;
- 
-diff --git a/net/mac802154/scan.c b/net/mac802154/scan.c
-index 300d4584533e..245e32970c05 100644
---- a/net/mac802154/scan.c
-+++ b/net/mac802154/scan.c
-@@ -104,13 +104,9 @@ static unsigned int mac802154_scan_get_channel_time(u8 duration_order,
- 
- static void mac802154_flush_queued_beacons(struct ieee802154_local *local)
- {
--	struct cfg802154_mac_pkt *mac_pkt, *tmp;
--
--	list_for_each_entry_safe(mac_pkt, tmp, &local->rx_beacon_list, node) {
--		list_del(&mac_pkt->node);
--		kfree_skb(mac_pkt->skb);
--		kfree(mac_pkt);
--	}
-+	spin_lock_bh(&local->rx_lock);
-+	mac802154_flush_list(&local->rx_beacon_list, NULL);
-+	spin_unlock_bh(&local->rx_lock);
- }
- 
- static void
--- 
-2.50.1 (Apple Git-155)
-
+Reviewed-by: Breno Leitao <leitao@debian.org>
