@@ -1,66 +1,80 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D9093A9DA3;
-	Mon, 27 Jul 2026 23:16:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D44841DEC7;
+	Tue, 28 Jul 2026 10:04:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785194214; cv=none; b=mz50OjkF3aQT/VY2r8XJ2bgmUTlz/jmu9vaKBbxY2IqPIJRSJBdOvgXrrjgqJw6BPXaYWL7XFeYVRqgmHh2nZg+K1xYiMjAaKqgodxJX6jgxqWUB3lLfQuuqas1XsDNWsbniv2RhUiSIi04ayjaAAyCdLjsIlhimyenmp55HIws=
+	t=1785233095; cv=none; b=oYtaLGOXqtLCFjGzLf0A7ruPWRiZ1dKOkQmnvh/JUFfNb6O8/S+rWoDTo+YoyxOn2aR695Sj+0EZW7w97H+q9UkVOkfTgCMuIYHx+bN2U2431BOha0PsOT+Nd/FpMs4mzfeOpWq6GenqgNsBaZpkmHDCjdN0YCeYCGTiNY3oyrg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785194214; c=relaxed/simple;
-	bh=kZNXlNAfSVusVoPVriJ0v5XAtDbQ3QHe3+Vn4kPRYSA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BNDA7anV9tb5iNPndyqkyvU6VRjRbW9hkK7CeVKLLgXIqOYpxY7xPAOBOda0QXEIsRyh3BFCcVFW9W7yNNlxs5NtC/HSaRwH4HcdbaTGmHXMaiS96SmM34Khwkc4zqtvFmY2p2w93Ihteoz0IgHd/RYUG99bksE2ce7Qwg6PxWc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RzNM3WgT; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1785233095; c=relaxed/simple;
+	bh=fldViqCXk7TBmGoVM2Wtji97Bwx+gZkbsvsN1FN8rgQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=o85UdJgVVKPrtuh0mTGO6ktNbUSiyRnOAUTOUzUQT9BwFuY9a/D+YuTI+Y/Tcw7kX2/ro9b6SI6p8ql6XREutHYWtbYwhg0iSE1EI5RFT+Z/MuHOfvE+pvO6wrACLLuRUVVMQoE11DEakmK0CIXDcAbl8UyrXmRUuy5Cjnl5VIM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=IyUA7HGA; arc=none smtp.client-ip=82.195.75.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=debian.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RzNM3WgT"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A1461F000E9;
-	Mon, 27 Jul 2026 23:16:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785194213;
-	bh=rHrgozeDMsPrY0ICPPbhjDXHnrKHdRVo/MfyqWmfxWI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=RzNM3WgTC11of8b6sMJWuBJj6bkb4060jsIdJaXI71TBtU/xNIxCs/tBQDWo/riVV
-	 A+v+PA9Jyad7q66wm5U6LYiVT/jtRv7SmK4fBua4LIyJ6IBNvYxk4+S/ImwAkLkRYD
-	 t8QxxE6fGMmOAulciSNfDtvJ3raI8r0Bh/Xb2Sx/fdBrDglOjqCLXmHY35gaUv/qRw
-	 fJfulV5KpE5cpoO5SedoQAtrx1n6U2BHfnnRT5Lcdlymed7iHq4wz4z+7y6yi3C9vo
-	 7TGN0UgHNHfSQk2sZqdvhsUR1YA/bAGWDgsSn+i40V0KsyaQOwDSO1T+PR5qID7JIh
-	 Fi7voY/HT5J1g==
-Date: Mon, 27 Jul 2026 16:16:52 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: sdf@fomichev.me, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
- <horms@kernel.org>, Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt
- <stefan@datenfreihafen.org>, Miquel Raynal <miquel.raynal@bootlin.com>,
- Remi Denis-Courmont <courmisch@gmail.com>, =?UTF-8?B?UsOpbWk=?=
- Denis-Courmont <remi.denis-courmont@nokia.com>, John Fastabend
- <john.fastabend@gmail.com>, Sabrina Dubroca <sd@queasysnail.net>, Shuah
- Khan <shuah@kernel.org>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-wpan@vger.kernel.org,
- linux-kselftest@vger.kernel.org, kernel-team@meta.com, =?UTF-8?B?UsOpbWk=?=
- Denis-Courmont <remi@remlab.net>, Joe Damato <joe@dama.to>
+	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="IyUA7HGA"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
+	s=smtpauto.stravinsky; h=X-Debian-User:In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=omVkx6ZIAXX4NGOWuVToWaCdJsx8TywMjM/M4ZdteNU=; b=IyUA7HGAE9B6DXIthENMNsN5yv
+	agt4UUQzMY7rpj8+f6kKvzCXQrtBC1QUsNXsZJEURgIqlRK0TpUI4TcsntRxac55o/EaSD5BQQGZ9
+	UKviw5WaelwFblEdUk6X4piuD12gOBQFVlddqTrPb46cUi14L2EjqK76TnNEXE9YErYH8O0maCcAa
+	NxEwMbPyvPVtmdxyIrQ/N/D5VhPybDRbL25h2zpii5B3uxO9I2IJs3vlwgt5Eyeu6U3wpPzLLkPkJ
+	vCWKmysdN6F0ynIU4SlSt6yb66QQ5gwRk8amJ4Be7RmyktYULTacn/AuEWhrcstsMD29S+7bVf2uc
+	zkEaCCGQ==;
+Received: from authenticated-user
+	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.96)
+	(envelope-from <leitao@debian.org>)
+	id 1woefj-007b81-2L;
+	Tue, 28 Jul 2026 10:04:27 +0000
+Date: Tue, 28 Jul 2026 03:04:21 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: sdf@fomichev.me, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt <stefan@datenfreihafen.org>, 
+	Miquel Raynal <miquel.raynal@bootlin.com>, Remi Denis-Courmont <courmisch@gmail.com>, 
+	=?utf-8?B?UsOpbWk=?= Denis-Courmont <remi.denis-courmont@nokia.com>, John Fastabend <john.fastabend@gmail.com>, 
+	Sabrina Dubroca <sd@queasysnail.net>, Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-wpan@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	kernel-team@meta.com, =?utf-8?B?UsOpbWk=?= Denis-Courmont <remi@remlab.net>, 
+	Joe Damato <joe@dama.to>
 Subject: Re: [PATCH net-next v3 7/7] selftests: net: getsockopt_iter: cover
  rawv6, ieee802154, phonet and tls
-Message-ID: <20260727161652.58de366a@kernel.org>
-In-Reply-To: <20260727-getsockopt_phase4-v3-7-e89627544639@debian.org>
+Message-ID: <amh3JXocONXT8Gb7@gmail.com>
 References: <20260727-getsockopt_phase4-v3-0-e89627544639@debian.org>
-	<20260727-getsockopt_phase4-v3-7-e89627544639@debian.org>
+ <20260727-getsockopt_phase4-v3-7-e89627544639@debian.org>
+ <20260727161652.58de366a@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260727161652.58de366a@kernel.org>
+X-Debian-User: leitao
 
-On Mon, 27 Jul 2026 03:06:41 -0700 Breno Leitao wrote:
->   - ieee802154: WPAN_WANTACK dgram int path + non-SOL_IEEE802154 level
->                 rejection.
->   - phonet:     PNPIPE_ENCAP pep int path + non-SOL_PNPIPE level
->                 rejection.
+On Mon, Jul 27, 2026 at 04:16:52PM -0700, Jakub Kicinski wrote:
+> On Mon, 27 Jul 2026 03:06:41 -0700 Breno Leitao wrote:
+> >   - ieee802154: WPAN_WANTACK dgram int path + non-SOL_IEEE802154 level
+> >                 rejection.
+> >   - phonet:     PNPIPE_ENCAP pep int path + non-SOL_PNPIPE level
+> >                 rejection.
+> 
+> The config options for these are not enabled in the config for net
+> selftest target. Doesn't look like we're testing anything particularly
+> meaningful here, so maybe just drop the cases for these?
 
-The config options for these are not enabled in the config for net
-selftest target. Doesn't look like we're testing anything particularly
-meaningful here, so maybe just drop the cases for these?
+Sure. Just to confirm my understanding: you'd like me to keep the
+selftest patch but drop the ieee802154 and phonet test cases, while
+retaining the rawv6 and tls cases. Is that correct?
+
+Thanks
+--breno
