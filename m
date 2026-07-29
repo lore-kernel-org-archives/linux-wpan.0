@@ -1,40 +1,41 @@
 Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0883B416866;
-	Wed, 29 Jul 2026 09:31:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B8713CF694;
+	Wed, 29 Jul 2026 09:31:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785317501; cv=none; b=SfrLNe5KSQywyY/SGErFPNd52sBYCo+GVZ3RokIEYd0rchnPRGWuhp9XRPO+1bNddyaxWmZWBqMZBGz4zXiVfv5Yjt8hjch5Za7Gv76CLGJ6kZAg4c2+cZMH0QCFwhbgkU8dPHt7ESY2ufnC5sBbSpaj1fFuhL5Vv8yNOije0+A=
+	t=1785317510; cv=none; b=fgcvu6wuYeTnwBe+USksIoyEwZO8qvVdDathiHrWS5rAhKJ0yAlXl9RZLdrMLRVY1ZXmMk3ysxcGBcIbe+NYDAfKvDCUUlXppR5Wc+2IJv8b4iWVac5JS1RdzkE+jDGgAeKO8QtQK0Gsl9ecUsUkUvrmNDgOE2a4v0BUKjb6pN8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785317501; c=relaxed/simple;
-	bh=gKuNfxTODiZw8CrrIDbE39oXFzOMjspsI1c0G3Ajc6A=;
+	s=arc-20240116; t=1785317510; c=relaxed/simple;
+	bh=56hgW3H1tbE+xlsJdlAitQA9qB3r18TsIS+HpG7WvnU=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=UZ9h051Qt9owfi9En7qzT6LZnLgjDtApoJw7EGvO4K+i8GXBtW3WSBQQKEvFh5adOr6iJnlVfPCLQdUBQ4Pq95b7A6ms3873tJcDXOT8idW5/3XtOH7sLIiV8DpEUjTtGGrEgxkD6JNlX5vk13NEDIqNn9ZOL43OxM893kXIJFs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=AKM2zqtA; arc=none smtp.client-ip=82.195.75.108
+	 In-Reply-To:To:Cc; b=VVuvLJ+EU0ZS3OmaBgAlfmFiqCkcYEakkzy1UT9lTOQ3i0JOqhBOlC+hh5NK8DYpJVoyEm9wYWchsAs8cyDIlcw6n6Qb3ddPDep2wAMe7MHy3RUH/q2a+eay0FAEBzQgvyg8Fj8Rc/+d8Nw8hUmpKGW16YtwAzBz8W9LIE+Op0A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=Y3sHv+T1; arc=none smtp.client-ip=82.195.75.108
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=debian.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="AKM2zqtA"
+	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="Y3sHv+T1"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
 	s=smtpauto.stravinsky; h=X-Debian-User:Cc:To:In-Reply-To:References:
 	Message-Id:Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:
 	From:Reply-To:Content-ID:Content-Description;
-	bh=mJjQvVWZZYwHOqSv0irzno4Dwl9tdM8w0Bstsr0Lza0=; b=AKM2zqtAie+DjcDoGdgBkO8dKJ
-	r/yZDmxEeMAwrb+BVcz4SkIcJDIXw8d9njzygTqDTn21HNDYmqDhFhYBI4QkVO9sHzMijBkPkkps3
-	nld3hehyGfSnTPXsHrvTziOV37L5bxyo+4bkTbA1+gqyvc3JaakEffXioXzS9hWG8tLUe3BLcZ5go
-	EPUBoIvud0rpNrw5XYh9Z8rv0DQhwBZpXJ1x5sWfo26QI7Ok7RWJgp2SaQ4CPTmmu6lgrNN3FQzO9
-	dAwTYE5x2lWIwgc9JN+afvKs5OKWzoOlzDT1YQ58cuQOPfPIQM/ciGy9yl7NgH6YC6B+p8BcAv2mM
-	SgVoRiDQ==;
+	bh=7zntm6j0Otr6as/RZyHmEd7ZkGoSj8qDBoJ+EEcHlDk=; b=Y3sHv+T1wyVvAbqxS3eMzxPxMe
+	RTysBeb/DHMdNjGuGQGyOnJ9pgpIzA3AHGG5x1aTiOQokjTiNCTReSvOqffijudsvBZAT/kDN3OOE
+	HRPFRD17CvRaETuDM2ZIrFI0q2UxB2uD4CizvkUlKoBfkzQtGkGaQca+GpJMdQTxEzXfIXDnz8cyI
+	os3l9BIKXMog1EA06Ui1rwO5PoGyS68IJq6V+Lcjdu6vV66qlNTeAKV5Co6lS5CbzWAwyRP2ONDWY
+	xXtHYYTQR+bZMUS1+fcc+BeDmHNktkg8ywHt/LddMumvM/rnLwIWxYXtqLMNm+9MbvDG/L57ONJbr
+	RVkzV0ww==;
 Received: from authenticated-user
 	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
 	(Exim 4.96)
 	(envelope-from <leitao@debian.org>)
-	id 1wp0dO-008M0g-3C;
-	Wed, 29 Jul 2026 09:31:31 +0000
+	id 1wp0dU-008M1M-1p;
+	Wed, 29 Jul 2026 09:31:36 +0000
 From: Breno Leitao <leitao@debian.org>
-Date: Wed, 29 Jul 2026 02:29:49 -0700
-Subject: [PATCH net-next v4 6/7] tls: convert getsockopt to sockopt_t
+Date: Wed, 29 Jul 2026 02:29:50 -0700
+Subject: [PATCH net-next v4 7/7] selftests: net: getsockopt_iter: cover
+ rawv6 and tls
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
@@ -42,8 +43,8 @@ List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260729-getsockopt_phase4-v4-6-c44576757c17@debian.org>
+Content-Transfer-Encoding: 8bit
+Message-Id: <20260729-getsockopt_phase4-v4-7-c44576757c17@debian.org>
 References: <20260729-getsockopt_phase4-v4-0-c44576757c17@debian.org>
 In-Reply-To: <20260729-getsockopt_phase4-v4-0-c44576757c17@debian.org>
 To: sdf@fomichev.me, "David S. Miller" <davem@davemloft.net>, 
@@ -59,232 +60,315 @@ To: sdf@fomichev.me, "David S. Miller" <davem@davemloft.net>,
 Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
  linux-wpan@vger.kernel.org, linux-kselftest@vger.kernel.org, 
  Breno Leitao <leitao@debian.org>, kernel-team@meta.com, 
+ =?utf-8?q?R=C3=A9mi_Denis-Courmont?= <remi@remlab.net>, 
  Joe Damato <joe@dama.to>
 X-Mailer: b4 0.16-dev-d5d98
-X-Developer-Signature: v=1; a=openpgp-sha256; l=6438; i=leitao@debian.org;
- h=from:subject:message-id; bh=gKuNfxTODiZw8CrrIDbE39oXFzOMjspsI1c0G3Ajc6A=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBqachLd2oXaOJNHNYxL2nhGodua0Dm7h+rAEe8Q
- BmUahu62ACJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCamnISwAKCRA1o5Of/Hh3
- bYQID/9w09pbv4qvsr7QEjnMrO83rfWq1jBSZj8XRWV6xu7z74ft/3ugE/2d6MAJMR5hsj6XV2s
- DkZRyj1AUsu7Vge54pj3mJ6GAmbN3NKjbhURZIVm6pYWXMN91QaXTBcIkc+a2KJcfym3RNdw2sv
- clCg97JAKqAhw455EMq94CNjOZqB0vMD3uzB58clZmKGxMBMl9A9LV0voRPcsLlh96LYc7EQnkd
- 65qnpKKlsPG4WpaZV46yk+Mcu33splZqMwhNf4qF+voNDIR+nUqmSGiLH0db1utT2ulEA9p2WGV
- STkkCbNKHKf8SisjZbXyn4orRi1e7I4bd+5WJIagKUorq7GmIrJQcYeM9bKWrQYnz5Gv5xDjEAw
- ce4Ew3Aq5IcsEOF/VN1Td7NUYBmAnmdz9dOowH3Aec7MekXMiqjpMYGHsO0ceRbYSLDSTknQtlc
- qeVuIeqNsvNGtxbteAxqek9UlIRPIzMSk+M4hJt+vkdIM4q3F6TBKNoryMrrPVZaXZ9ITixUz4Q
- gv1m4BmhoPALCaGAeFGUQb4ZlBwMFT1HlN90RN9dxFp5nCTLKPTx9Blp6FSk0fdnzE26PZESbwl
- kf4+I5yJG+YbyYkw9lgQFTttZqPt+mONuRY4/QGXzzHziQ3Ktgn8MThufIUrpNSDIlGZjK5lscS
- MtwmUAyaiOg8t6g==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=7734; i=leitao@debian.org;
+ h=from:subject:message-id; bh=56hgW3H1tbE+xlsJdlAitQA9qB3r18TsIS+HpG7WvnU=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBqachLXkJnl88O87bfWhS+SBXnAhantRqWRkuaG
+ 754NosjO1KJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCamnISwAKCRA1o5Of/Hh3
+ baiWD/9mGq66JCUVxjA32OXlikL3sh+w370q54qO/alNsXRC501p19dNEVyEmrbolhSYJrYi8TK
+ UO9lWvVj8beJUNmDqlyOvDetocBijauIfsGZdq4Ia9E8tzBgQFeIY1WWp99t6M5yxYp6OcBvYby
+ kqnPiOgrNYq/Dz8E7GwpuexBWqWoPyg29IBUgBLdDFOJ4Qk14F9rOZYYb7ElGFt7DfOiUTpXV4u
+ fYL50+0JvL5sX/S47DtzUKCbaCl8WnmFFY/2ku2AsEhblyldKkzzVlGbZCZ4F9V9ZhxTdLIgS3e
+ 74Lav+SDDIu/BsCuXTNnAOaXuGfcq+xlWHvCZbCr9ZVY5sw1WyYYetCKFGvQvyYQPK09gZCD9cv
+ P1Qu5HbgFztTNQnNdWpWlzoVN3f0tFxO7KxQMWVtA5Ivgx/0Hcm7QVSDjBR6qjMimceLIYiYvrR
+ LpUcZC5QCiH3sr51muPSEnYcivtyf2NK9TxdnNmz0yccXNkev08+tpQbP2n7NKQFOenol6BaOZc
+ 5ed/1YEPMT900nuVhGF9KrR1W7T4qsRBUl90+JjQ5kGMmnc7hP5hhLLpe4CxzC4sdfrlTwx3i75
+ +TRQhqDnycY8+oYkPMN9yIuVuKcOAL/s8FaO6O357/T0nrAhlJivoiCBlJglOivElw7La0ubeNQ
+ WK30cCG0jFO4ATg==
 X-Developer-Key: i=leitao@debian.org; a=openpgp;
  fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
 X-Debian-User: leitao
 
-Continue converting the proto-layer getsockopt callbacks to the sockopt_t
-interface, converting do_tls_getsockopt() and its per-option helpers to
-take a sockopt_t.
+Add fixtures for the newly converted getsockopt leaves:
 
-The thin tls_getsockopt() wrapper keeps its __user signature for now: it
-builds a user-backed sockopt_t with sockopt_init_user(), calls the helper,
-and writes the returned length back to optlen. The helpers use
-copy_to_iter() instead of copy_to_user(); the NULL optval check in the
-TLS_TX/TLS_RX path is preserved by testing the iterator user buffer.
+  - rawv6:      IPV6_HDRINCL / IPV6_CHECKSUM int paths + a SOL_RAW
+                unknown-optname case that reaches do_rawv6_getsockopt().
+  - tls:        TLS_TX_ZEROCOPY_RO, the TLS_TX crypto_info round-trip at
+                the base and full cipher sizes, the NULL-optval and short
+                buffer EINVAL paths, and an unknown optname. It skips when
+                the kernel lacks TLS or AES-GCM.
 
-No functional change.
+Each fixture pins the returned-length / errno semantics across exact,
+oversized and short buffers and an unknown optname. The semantics are
+unchanged by the sockopt_t conversion, so the tests pass both before and
+after the leaf conversions.
 
+ieee802154 and phonet are not covered: their CONFIG options are absent
+from the net selftest target config, so the cases would only ever skip.
+
+Acked-by: Rémi Denis-Courmont <remi@remlab.net>
 Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
 Reviewed-by: Joe Damato <joe@dama.to>
-Acked-by: Stanislav Fomichev <sdf@fomichev.me>
 Signed-off-by: Breno Leitao <leitao@debian.org>
 ---
- net/tls/tls_main.c | 80 ++++++++++++++++++++++++++----------------------------
- 1 file changed, 38 insertions(+), 42 deletions(-)
+ tools/testing/selftests/net/getsockopt_iter.c | 239 ++++++++++++++++++++++++++
+ 1 file changed, 239 insertions(+)
 
-diff --git a/net/tls/tls_main.c b/net/tls/tls_main.c
-index 8c588cdab733d..fbb274287aa5f 100644
---- a/net/tls/tls_main.c
-+++ b/net/tls/tls_main.c
-@@ -424,20 +424,16 @@ static __poll_t tls_sk_poll(struct file *file, struct socket *sock,
- 	return mask;
+diff --git a/tools/testing/selftests/net/getsockopt_iter.c b/tools/testing/selftests/net/getsockopt_iter.c
+index fe5a5268bc34e..6c2408df46123 100644
+--- a/tools/testing/selftests/net/getsockopt_iter.c
++++ b/tools/testing/selftests/net/getsockopt_iter.c
+@@ -28,7 +28,10 @@
+ #include <linux/vm_sockets.h>
+ #include <linux/icmp.h>
+ #include <netinet/in.h>
++#include <netinet/tcp.h>
++#include <arpa/inet.h>
+ #include <sys/socket.h>
++#include <linux/tls.h>
+ #include "kselftest_harness.h"
+ 
+ #ifndef AF_VSOCK
+@@ -40,6 +43,18 @@
+ #ifndef ICMP_FILTER
+ #define ICMP_FILTER 1
+ #endif
++#ifndef IPV6_HDRINCL
++#define IPV6_HDRINCL 36
++#endif
++#ifndef IPV6_CHECKSUM
++#define IPV6_CHECKSUM 7
++#endif
++#ifndef SOL_TLS
++#define SOL_TLS 282
++#endif
++#ifndef TCP_ULP
++#define TCP_ULP 31
++#endif
+ 
+ /* ---------- netlink ---------- */
+ 
+@@ -394,4 +409,228 @@ TEST_F(raw, bad_optname)
+ 	ASSERT_EQ(sizeof(val), optlen);
  }
  
--static int do_tls_getsockopt_conf(struct sock *sk, char __user *optval,
--				  int __user *optlen, int tx)
-+static int do_tls_getsockopt_conf(struct sock *sk, sockopt_t *opt, int tx)
- {
- 	int rc = 0;
- 	const struct tls_cipher_desc *cipher_desc;
- 	struct tls_context *ctx = tls_get_ctx(sk);
- 	struct tls_crypto_info *crypto_info;
- 	struct cipher_context *cctx;
--	int len;
-+	int len = opt->optlen;
- 
--	if (get_user(len, optlen))
--		return -EFAULT;
--
--	if (!optval || (len < sizeof(*crypto_info))) {
-+	if (!opt->iter_out.ubuf || len < sizeof(*crypto_info)) {
- 		rc = -EINVAL;
- 		goto out;
- 	}
-@@ -462,7 +458,8 @@ static int do_tls_getsockopt_conf(struct sock *sk, char __user *optval,
- 	}
- 
- 	if (len == sizeof(*crypto_info)) {
--		if (copy_to_user(optval, crypto_info, sizeof(*crypto_info)))
-+		if (copy_to_iter(crypto_info, sizeof(*crypto_info),
-+				 &opt->iter_out) != sizeof(*crypto_info))
- 			rc = -EFAULT;
- 		goto out;
- 	}
-@@ -478,44 +475,38 @@ static int do_tls_getsockopt_conf(struct sock *sk, char __user *optval,
- 	memcpy(crypto_info_rec_seq(crypto_info, cipher_desc),
- 	       cctx->rec_seq, cipher_desc->rec_seq);
- 
--	if (copy_to_user(optval, crypto_info, cipher_desc->crypto_info))
-+	if (copy_to_iter(crypto_info, cipher_desc->crypto_info,
-+			 &opt->iter_out) != cipher_desc->crypto_info)
- 		rc = -EFAULT;
- 
- out:
- 	return rc;
- }
- 
--static int do_tls_getsockopt_tx_zc(struct sock *sk, char __user *optval,
--				   int __user *optlen)
-+static int do_tls_getsockopt_tx_zc(struct sock *sk, sockopt_t *opt)
- {
- 	struct tls_context *ctx = tls_get_ctx(sk);
- 	unsigned int value;
--	int len;
--
--	if (get_user(len, optlen))
--		return -EFAULT;
-+	int len = opt->optlen;
- 
- 	if (len != sizeof(value))
- 		return -EINVAL;
- 
- 	value = ctx->zerocopy_sendfile;
--	if (copy_to_user(optval, &value, sizeof(value)))
-+	if (copy_to_iter(&value, sizeof(value), &opt->iter_out) != sizeof(value))
- 		return -EFAULT;
- 
- 	return 0;
- }
- 
--static int do_tls_getsockopt_no_pad(struct sock *sk, char __user *optval,
--				    int __user *optlen)
-+static int do_tls_getsockopt_no_pad(struct sock *sk, sockopt_t *opt)
- {
- 	struct tls_context *ctx = tls_get_ctx(sk);
--	int value, len;
-+	int value, len = opt->optlen;
- 
- 	if (ctx->prot_info.version != TLS_1_3_VERSION)
- 		return -EINVAL;
- 
--	if (get_user(len, optlen))
--		return -EFAULT;
- 	if (len < sizeof(value))
- 		return -EINVAL;
- 
-@@ -525,38 +516,31 @@ static int do_tls_getsockopt_no_pad(struct sock *sk, char __user *optval,
- 	if (value < 0)
- 		return value;
- 
--	if (put_user(sizeof(value), optlen))
--		return -EFAULT;
--	if (copy_to_user(optval, &value, sizeof(value)))
-+	opt->optlen = sizeof(value);
-+	if (copy_to_iter(&value, sizeof(value), &opt->iter_out) != sizeof(value))
- 		return -EFAULT;
- 
- 	return 0;
- }
- 
--static int do_tls_getsockopt_tx_payload_len(struct sock *sk, char __user *optval,
--					    int __user *optlen)
-+static int do_tls_getsockopt_tx_payload_len(struct sock *sk, sockopt_t *opt)
- {
- 	struct tls_context *ctx = tls_get_ctx(sk);
- 	u16 payload_len = ctx->tx_max_payload_len;
--	int len;
--
--	if (get_user(len, optlen))
--		return -EFAULT;
-+	int len = opt->optlen;
- 
- 	if (len < sizeof(payload_len))
- 		return -EINVAL;
- 
--	if (put_user(sizeof(payload_len), optlen))
--		return -EFAULT;
--
--	if (copy_to_user(optval, &payload_len, sizeof(payload_len)))
-+	opt->optlen = sizeof(payload_len);
-+	if (copy_to_iter(&payload_len, sizeof(payload_len),
-+			 &opt->iter_out) != sizeof(payload_len))
- 		return -EFAULT;
- 
- 	return 0;
- }
- 
--static int do_tls_getsockopt(struct sock *sk, int optname,
--			     char __user *optval, int __user *optlen)
-+static int do_tls_getsockopt(struct sock *sk, int optname, sockopt_t *opt)
- {
- 	int rc = 0;
- 
-@@ -565,17 +549,16 @@ static int do_tls_getsockopt(struct sock *sk, int optname,
- 	switch (optname) {
- 	case TLS_TX:
- 	case TLS_RX:
--		rc = do_tls_getsockopt_conf(sk, optval, optlen,
--					    optname == TLS_TX);
-+		rc = do_tls_getsockopt_conf(sk, opt, optname == TLS_TX);
- 		break;
- 	case TLS_TX_ZEROCOPY_RO:
--		rc = do_tls_getsockopt_tx_zc(sk, optval, optlen);
-+		rc = do_tls_getsockopt_tx_zc(sk, opt);
- 		break;
- 	case TLS_RX_EXPECT_NO_PAD:
--		rc = do_tls_getsockopt_no_pad(sk, optval, optlen);
-+		rc = do_tls_getsockopt_no_pad(sk, opt);
- 		break;
- 	case TLS_TX_MAX_PAYLOAD_LEN:
--		rc = do_tls_getsockopt_tx_payload_len(sk, optval, optlen);
-+		rc = do_tls_getsockopt_tx_payload_len(sk, opt);
- 		break;
- 	default:
- 		rc = -ENOPROTOOPT;
-@@ -591,12 +574,25 @@ static int tls_getsockopt(struct sock *sk, int level, int optname,
- 			  char __user *optval, int __user *optlen)
- {
- 	struct tls_context *ctx = tls_get_ctx(sk);
-+	sockopt_t opt;
-+	int err;
- 
- 	if (level != SOL_TLS)
- 		return ctx->sk_proto->getsockopt(sk, level,
- 						 optname, optval, optlen);
- 
--	return do_tls_getsockopt(sk, optname, optval, optlen);
-+	err = sockopt_init_user(&opt, optval, optlen);
-+	if (err)
-+		return err;
++/* ---------- raw (ipv6) ---------- */
 +
-+	err = do_tls_getsockopt(sk, optname, &opt);
-+	if (err)
-+		return err;
++FIXTURE(rawv6)
++{
++	int fd;
++};
 +
-+	if (put_user(opt.optlen, optlen))
-+		return -EFAULT;
++FIXTURE_SETUP(rawv6)
++{
++	self->fd = socket(AF_INET6, SOCK_RAW, IPPROTO_UDP);
++	if (self->fd < 0)
++		SKIP(return, "SOCK_RAW/IPv6 socket: %s", strerror(errno));
++}
 +
-+	return 0;
- }
- 
- static int validate_crypto_info(const struct tls_crypto_info *crypto_info,
++FIXTURE_TEARDOWN(rawv6)
++{
++	if (self->fd >= 0)
++		close(self->fd);
++}
++
++TEST_F(rawv6, hdrincl_exact)
++{
++	socklen_t optlen;
++	int val = -1;
++
++	optlen = sizeof(val);
++
++	ASSERT_EQ(0, getsockopt(self->fd, IPPROTO_IPV6, IPV6_HDRINCL,
++				&val, &optlen));
++	ASSERT_EQ(sizeof(int), optlen);
++	ASSERT_TRUE(val == 0 || val == 1);
++}
++
++TEST_F(rawv6, hdrincl_oversize_clamped)
++{
++	char buf[16] = {};
++	socklen_t optlen = sizeof(buf);
++
++	ASSERT_EQ(0, getsockopt(self->fd, IPPROTO_IPV6, IPV6_HDRINCL,
++				buf, &optlen));
++	ASSERT_EQ(sizeof(int), optlen);
++}
++
++/* Raw int options clamp the reported length down to the user buffer
++ * instead of returning EINVAL on a short buffer.
++ */
++TEST_F(rawv6, hdrincl_undersize_clamped)
++{
++	socklen_t optlen = 2;
++	int val = 0;
++
++	ASSERT_EQ(0, getsockopt(self->fd, IPPROTO_IPV6, IPV6_HDRINCL,
++				&val, &optlen));
++	ASSERT_EQ(2, optlen);
++}
++
++TEST_F(rawv6, checksum_default)
++{
++	socklen_t optlen;
++	int val = 0;
++
++	optlen = sizeof(val);
++
++	/* A non-ICMPv6 raw socket has the checksum disabled, reported as -1. */
++	ASSERT_EQ(0, getsockopt(self->fd, IPPROTO_IPV6, IPV6_CHECKSUM,
++				&val, &optlen));
++	ASSERT_EQ(sizeof(int), optlen);
++	ASSERT_EQ(-1, val);
++}
++
++TEST_F(rawv6, bad_optname)
++{
++	socklen_t optlen;
++	int val;
++
++	optlen = sizeof(val);
++
++	/* SOL_RAW reaches do_rawv6_getsockopt() directly. */
++	ASSERT_EQ(-1, getsockopt(self->fd, SOL_RAW, 0x7fff, &val, &optlen));
++	ASSERT_EQ(ENOPROTOOPT, errno);
++	ASSERT_EQ(sizeof(val), optlen);
++}
++
++/* ---------- tls ---------- */
++
++FIXTURE(tls)
++{
++	int fd;
++	int sfd;
++};
++
++FIXTURE_SETUP(tls)
++{
++	struct sockaddr_in a = {
++		.sin_family = AF_INET,
++		.sin_addr.s_addr = htonl(INADDR_LOOPBACK),
++	};
++	socklen_t alen = sizeof(a);
++	int lfd;
++
++	self->fd = -1;
++	self->sfd = -1;
++
++	lfd = socket(AF_INET, SOCK_STREAM, 0);
++	if (lfd < 0)
++		SKIP(return, "TCP socket: %s", strerror(errno));
++	if (bind(lfd, (struct sockaddr *)&a, sizeof(a)) || listen(lfd, 1) ||
++	    getsockname(lfd, (struct sockaddr *)&a, &alen)) {
++		close(lfd);
++		SKIP(return, "listener setup: %s", strerror(errno));
++	}
++	self->fd = socket(AF_INET, SOCK_STREAM, 0);
++	if (self->fd < 0) {
++		close(lfd);
++		SKIP(return, "TCP socket: %s", strerror(errno));
++	}
++	if (connect(self->fd, (struct sockaddr *)&a, sizeof(a))) {
++		close(lfd);
++		SKIP(return, "connect: %s", strerror(errno));
++	}
++	self->sfd = accept(lfd, NULL, NULL);
++	close(lfd);
++	if (setsockopt(self->fd, IPPROTO_TCP, TCP_ULP, "tls", sizeof("tls")))
++		SKIP(return, "TCP_ULP=tls: %s (built without TLS?)",
++		     strerror(errno));
++}
++
++FIXTURE_TEARDOWN(tls)
++{
++	if (self->fd >= 0)
++		close(self->fd);
++	if (self->sfd >= 0)
++		close(self->sfd);
++}
++
++/* do_tls_getsockopt_tx_zc(): fixed-size int, exact length required. */
++TEST_F(tls, tx_zerocopy_exact)
++{
++	socklen_t optlen = sizeof(int);
++	int val = -1;
++
++	ASSERT_EQ(0, getsockopt(self->fd, SOL_TLS, TLS_TX_ZEROCOPY_RO,
++				&val, &optlen));
++	ASSERT_EQ(sizeof(int), optlen);
++	ASSERT_TRUE(val == 0 || val == 1);
++}
++
++TEST_F(tls, tx_zerocopy_wrong_len)
++{
++	socklen_t optlen = 2;
++	int val;
++
++	ASSERT_EQ(-1, getsockopt(self->fd, SOL_TLS, TLS_TX_ZEROCOPY_RO,
++				 &val, &optlen));
++	ASSERT_EQ(EINVAL, errno);
++}
++
++/* do_tls_getsockopt_conf(): NULL optval still yields EINVAL -- the
++ * converted code tests opt->iter_out.ubuf in place of optval.
++ */
++TEST_F(tls, conf_null_optval)
++{
++	socklen_t optlen = 64;
++
++	ASSERT_EQ(-1, getsockopt(self->fd, SOL_TLS, TLS_TX, NULL, &optlen));
++	ASSERT_EQ(EINVAL, errno);
++}
++
++TEST_F(tls, conf_short)
++{
++	socklen_t optlen = 2;
++	char buf[2];
++
++	ASSERT_EQ(-1, getsockopt(self->fd, SOL_TLS, TLS_TX, buf, &optlen));
++	ASSERT_EQ(EINVAL, errno);
++}
++
++/* TLS_TX before crypto is set reports not-ready. */
++TEST_F(tls, conf_not_ready)
++{
++	struct tls_crypto_info info;
++	socklen_t optlen = sizeof(info);
++
++	ASSERT_EQ(-1, getsockopt(self->fd, SOL_TLS, TLS_TX, &info, &optlen));
++	ASSERT_EQ(EBUSY, errno);
++}
++
++/* Set TX crypto, then read it back at the base and full sizes, exercising
++ * both copy_to_iter() branches. SKIP if AES-GCM is unavailable.
++ */
++TEST_F(tls, conf_crypto_roundtrip)
++{
++	struct tls12_crypto_info_aes_gcm_128 tx = {
++		.info.version = TLS_1_2_VERSION,
++		.info.cipher_type = TLS_CIPHER_AES_GCM_128,
++	};
++	struct tls12_crypto_info_aes_gcm_128 full;
++	struct tls_crypto_info base;
++	socklen_t optlen;
++
++	if (setsockopt(self->fd, SOL_TLS, TLS_TX, &tx, sizeof(tx)))
++		SKIP(return, "set TLS_TX aes_gcm_128: %s", strerror(errno));
++
++	optlen = sizeof(base);
++	ASSERT_EQ(0, getsockopt(self->fd, SOL_TLS, TLS_TX, &base, &optlen));
++	ASSERT_EQ(sizeof(base), optlen);
++	ASSERT_EQ(TLS_1_2_VERSION, base.version);
++	ASSERT_EQ(TLS_CIPHER_AES_GCM_128, base.cipher_type);
++
++	optlen = sizeof(full);
++	ASSERT_EQ(0, getsockopt(self->fd, SOL_TLS, TLS_TX, &full, &optlen));
++	ASSERT_EQ(sizeof(full), optlen);
++	ASSERT_EQ(TLS_CIPHER_AES_GCM_128, full.info.cipher_type);
++}
++
++TEST_F(tls, bad_optname)
++{
++	socklen_t optlen = sizeof(int);
++	int val;
++
++	ASSERT_EQ(-1, getsockopt(self->fd, SOL_TLS, 0x7fff, &val, &optlen));
++	ASSERT_EQ(ENOPROTOOPT, errno);
++}
++
+ TEST_HARNESS_MAIN
 
 -- 
 2.53.0-Meta
