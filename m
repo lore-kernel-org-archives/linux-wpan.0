@@ -1,82 +1,35 @@
-Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 809F73955CC
-	for <linux-wpan@vger.kernel.org>; Sun,  2 Aug 2026 09:24:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27AAC37F75B;
+	Tue,  4 Aug 2026 00:40:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785662657; cv=none; b=ojhO6r2yWohu6ZaE1cqDwn3mZHoWw5obHLflkeqH54pegDOGDwGk7ghOkQRzmEQT5vGiFIjwOmR/n1AjpHIMfnSonpuqjOqCrBmpEC27UohoPtniAmiNkfBmcgTTMqAA7VztTmDXHqFW8z1nxtLE0uvJn4oSKpvMnZQQi2LVdyI=
+	t=1785804060; cv=none; b=MOs03fz2u/d8tuerNV1GxeazWlkoxU7fWLueIRtJGYVV928hVxhrBfDZvm3MCa0zQh4N7Tr2HZBE/WRFXXYOZ+VbZPS2ntINYI7AoA+YKHHwttfDuX9VKKn/INLXpO8yaq84ycJ4+5aKC+0Ij6w9P11TuQPxG43OoJJoOiMhrVc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785662657; c=relaxed/simple;
-	bh=9f04z2+fz2qu8sHxFaO1amcu5gUQRTCYK3gRGCdsc14=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NpQ52qNg50STp9NVtla1E6jIFMS83KGOKVZ0yupWnyVZMf0PZ1T537HHrb2lJ+pExvB8SYQuDIQ8+Z8yXz2vP07uLKbvIdDxYWV00kVK9SsRnW5+BfFfXX6Ma/ww75V0UpOv3GT+fwnwcUoyeqnlKtr5zvLr7uGU58zx1GkSrAQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=nebusec.ai; spf=pass smtp.mailfrom=nebusec.ai; dkim=pass (2048-bit key) header.d=nebusec.ai header.i=@nebusec.ai header.b=AWWDe8il; arc=none smtp.client-ip=209.85.216.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=nebusec.ai
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nebusec.ai
+	s=arc-20240116; t=1785804060; c=relaxed/simple;
+	bh=XZuIyhDNwBk9Eyv+la6sPhj7BVxhXavKiUQ++AeVIrQ=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=XGmvJ6xWL+2af1o6tPvl/yBIorT8n7J8wdexVbczH05j8ynDNp0Rl3n2b51r7i5EQTQNATTy6ud9CMukYFgNuREPQmnMDyS5WZu1e8NIUOEOPbcDsMEhNB0OfXfjm8wkznl8WUj425RHvL5xtwMIB7i5jpOVIsNmfDKfLwkuKdw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T/rCJ+RL; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nebusec.ai header.i=@nebusec.ai header.b="AWWDe8il"
-Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-3856d6fbcb3so1653349a91.2
-        for <linux-wpan@vger.kernel.org>; Sun, 02 Aug 2026 02:24:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=nebusec.ai; s=google; t=1785662656; x=1786267456; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=ceUadGwYvW5886Ohy9WYdANAvpKRZkwCFtMGWcPPY8c=;
-        b=AWWDe8ilJL3A7q1y9UN8NmUtUWnAbN6A8kVYF+AlW16Vb27bdnJquN6KbNTvW8kIVQ
-         kFjtuYHEyNEvo5AvOPzAlg7FXoKfqyjVc9nsPvJpc6Sp6lAf9vDUg5ki+iUPgAio/tnq
-         yuG/Bhnw3jvlijlmKo25wy5X7vd+YNvrX3m/QULzlWPuUq2KNUgKYdhbwQTiitCfpEeE
-         NU1f+Cyfl/IoMqgT6zZo0yZPS1bj5LB0zhSUSzdK1ItUkKdK6XpiCQzE2A7VjioaQOEd
-         ujS2w7PfQd9nZbxLAUfcrEYTq2m/3tiURcjonhOQPJkM1dtcitHAN3MmyM2KfuNIFdUX
-         fkOA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785662656; x=1786267456;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=ceUadGwYvW5886Ohy9WYdANAvpKRZkwCFtMGWcPPY8c=;
-        b=cgy6Uhyj7sdjfD8dHiITUNC2qNB2rBwrN/CSnANsl7IRaW2I6kAIAPzUBRROqNJMst
-         Quio8IV7LKY2PR2NWQxQejuzeFErUB4OGBmp7KnvqInDl/S6qMyrdgi/ngiNraUY2Vwd
-         4scHrUE0/4d2voqwX9QJleaHsBr+gJrmI2yoT2MLtTEwUhpP/sTXGv4VYdacjWAuXm2Z
-         l3KkZFqC5kUGkETXb9s2lVwyNTcie98seTpKgFzpo4EMCiwQSwBp0qIClazBPB6T7AuK
-         7ZGMKYZGJ1p5+caMUpjjJMZ16I10ivOC0sDuiA3ITWttDrdRGanvmndoeYowczWa3yJu
-         9K4Q==
-X-Gm-Message-State: AOJu0Yy0mqbLpBSdhGBgLH78xtfer6Vl4ANzy5/Hzo6Vwl2eV4RqKtyu
-	BssZxo2F8AmcFFJmJlr+5CtpaI9coaclkvA+FSEMUdqktFCwSJ/kFhYexfPUbdY2n0zThFeLih3
-	tHJBKETQO
-X-Gm-Gg: AR+sD11VYNRHzQua1T+IIlzOJQisCvOhkUPMNn+2UIRIB3K0nyYmSuETtTmmmpkIi3W
-	Z+vOzZF1sgiAgOnSBLMYNS4U8pmcb4P2v6V2MfaLeOsi0D7rl1hxVNbXu7zb+8PJbZTB/RyTq4P
-	sTM1qW2XYWJDmtwfFVm1bGkQ7jL/+BXIrNBD6DYYYObd5Vo8zusy+A1PtiT+H9+ZTThEUFq7qZ4
-	miBVFAYxENx+utM3ywL41kgKyICQzB6lj5L9xrmmdQ4foIDyF3/g7RReMSaBLw/BQ8/W3OZC8q5
-	1DpFR0y1UNmUD/BGq1a7bkqplPMZ188S2wqnKQas0uUf7/Js+raIsPYyl7XWAf5/QDicDMIr/0i
-	KWLrfpAzlWO+3DhxdbGrTuHwpvXvsf1dd133h24rINOhhH+yTG6yVpSWI6M/hL4bRj2qiii/2l4
-	OzC/VewPU1JsTUaTjrhhFelz4Bq4IrglJNI4XORv1K05MRM0O3hf/ralaoRvWpQM3Vpgz0NQ==
-X-Received: by 2002:a17:90a:d004:b0:37e:10d1:c05b with SMTP id 98e67ed59e1d1-38fbc4da0a8mr5614092a91.22.1785662655734;
-        Sun, 02 Aug 2026 02:24:15 -0700 (PDT)
-Received: from localhost.localdomain ([115.192.251.96])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-38fb30a3c75sm2655325a91.9.2026.08.02.02.24.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 02 Aug 2026 02:24:15 -0700 (PDT)
-From: Zihan Xi <zihanx@nebusec.ai>
-To: linux-wpan@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: alex.aring@gmail.com,
-	stefan@datenfreihafen.org,
-	miquel.raynal@bootlin.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	david.girault@qorvo.com,
-	vega@nebusec.ai,
-	zihanx@nebusec.ai
-Subject: [PATCH net 1/1] mac802154: fix netdev use-after-free in beacon worker
-Date: Sun,  2 Aug 2026 09:23:34 +0000
-Message-ID: <e9a3909c7a6281967961773ca841e860b8ecf40e.1785596603.git.zihanx@nebusec.ai>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <cover.1785596603.git.zihanx@nebusec.ai>
-References: <cover.1785596603.git.zihanx@nebusec.ai>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T/rCJ+RL"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B36541F000E9;
+	Tue,  4 Aug 2026 00:40:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1785804058;
+	bh=+PZgqEv1Au8SDYqdzdFIk7I+j3Y9scLbRGeASAO9kFY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=T/rCJ+RLl1/g2aBac/QefbFAx/GUqhZ9E4DdGq1LxCmulk89mmh8I6P1np/vrESIN
+	 8hFPHX1dly/sySiICzP2RC9mCDwtCZjkt6Zg64uMAajO8iRE4IEpK1Chm0HUJJdTNI
+	 HvmO1dWHXiTGih/4rM7S59BI7VECHjLKA8vLCQze7qPeYb8G3oXJvmhWTnJEZ8jE0K
+	 js0AXWyajqzO5OxdVCtBiCB0Lh8K+T3S4jAdi0Bhvjnn5qk3h9c4xk1oOCjEIsC1sY
+	 ZtGFIRaltEUnNypUEWL43OD1jWvyi1R2L1RGuw0fOicRBVG9o2lwuu6Yi0ES0MZHHb
+	 eGP0PZed+BmpQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id D0B563924467;
+	Tue,  4 Aug 2026 00:40:20 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
@@ -84,65 +37,61 @@ List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v4 0/7] net: convert rawv6, ieee802154,
+ phonet and
+ tls getsockopt to sockopt_t
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <178580401944.2893509.4047199420753049273.git-patchwork-notify@kernel.org>
+Date: Tue, 04 Aug 2026 00:40:19 +0000
+References: <20260729-getsockopt_phase4-v4-0-c44576757c17@debian.org>
+In-Reply-To: <20260729-getsockopt_phase4-v4-0-c44576757c17@debian.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: sdf@fomichev.me, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, alex.aring@gmail.com,
+ stefan@datenfreihafen.org, miquel.raynal@bootlin.com, courmisch@gmail.com,
+ remi.denis-courmont@nokia.com, john.fastabend@gmail.com, sd@queasysnail.net,
+ shuah@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-wpan@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ kernel-team@meta.com, joe@dama.to, remi@remlab.net
 
-mac802154_beacon_worker() reads local->beacon_req under RCU and derives
-the sub-interface from the request, but then drops the RCU read lock and
-continues to use both sdata and the embedded wpan_dev.
+Hello:
 
-mac802154_stop_beacons_locked() cancels only pending beacon work, clears
-local->beacon_req and frees the request.  A beacon worker that is already
-running can therefore continue after interface teardown and dereference
-the freed netdev private area.
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-The scan worker already pins the netdev before leaving RCU.  Apply the
-same lifetime rule to the beacon worker: take a netdev reference while
-the request is still protected by RCU, and release it on all paths that
-continue after the reference is acquired.
+On Wed, 29 Jul 2026 02:29:43 -0700 you wrote:
+> Now that sockopt_init_user() was already merged, builds a user-backed
+> sockopt_t from the __user pair. A getsockopt leaf can then take
+> a sockopt_t behind a thin __user wrapper: the wrapper builds it, calls
+> the leaf, and writes the length back to optlen. The leaf copies with
+> copy_to_iter() instead of copy_to_user().
+> 
+> Convert four more leaves the way udp and raw already were: ipv6 raw
+> (do_rawv6_getsockopt), ieee802154 dgram, phonet pep, and tls
+> (do_tls_getsockopt and its per-option helpers).
+> 
+> [...]
 
-Fixes: 3accf4762734 ("mac802154: Handle basic beaconing")
-Cc: stable@vger.kernel.org
-Reported-by: Vega <vega@nebusec.ai>
-Assisted-by: Codex:gpt-5.4
-Signed-off-by: Zihan Xi <zihanx@nebusec.ai>
----
- net/mac802154/scan.c | 4 ++++
- 1 file changed, 4 insertions(+)
+Here is the summary with links:
+  - [net-next,v4,1/7] ipv6: raw: drop unused level argument from do_rawv6_getsockopt
+    https://git.kernel.org/netdev/net-next/c/aee44196d216
+  - [net-next,v4,2/7] ipv6: raw: convert do_rawv6_getsockopt to sockopt_t
+    https://git.kernel.org/netdev/net-next/c/8472b68c2497
+  - [net-next,v4,3/7] ieee802154: convert dgram getsockopt to sockopt_t
+    https://git.kernel.org/netdev/net-next/c/6cd4e6c0449e
+  - [net-next,v4,4/7] phonet: pep: do not write beyond optlen in getsockopt
+    https://git.kernel.org/netdev/net-next/c/77e5eb0e192a
+  - [net-next,v4,5/7] phonet: pep: convert getsockopt to sockopt_t
+    https://git.kernel.org/netdev/net-next/c/d05a7f0ab550
+  - [net-next,v4,6/7] tls: convert getsockopt to sockopt_t
+    https://git.kernel.org/netdev/net-next/c/c7049902075a
+  - [net-next,v4,7/7] selftests: net: getsockopt_iter: cover rawv6 and tls
+    https://git.kernel.org/netdev/net-next/c/6b21a3ac84c9
 
-diff --git a/net/mac802154/scan.c b/net/mac802154/scan.c
-index 65089826f..ebd092d40 100644
---- a/net/mac802154/scan.c
-+++ b/net/mac802154/scan.c
-@@ -416,6 +416,7 @@ void mac802154_beacon_worker(struct work_struct *work)
- 	struct cfg802154_beacon_request *beacon_req;
- 	struct ieee802154_sub_if_data *sdata;
- 	struct wpan_dev *wpan_dev;
-+	netdevice_tracker dev_tracker;
- 	u8 interval;
- 	int ret;
- 
-@@ -427,12 +428,14 @@ void mac802154_beacon_worker(struct work_struct *work)
- 	}
- 
- 	sdata = IEEE802154_WPAN_DEV_TO_SUB_IF(beacon_req->wpan_dev);
-+	netdev_hold(sdata->dev, &dev_tracker, GFP_ATOMIC);
- 
- 	/* Wait an arbitrary amount of time in case we cannot use the device */
- 	if (local->suspended || !ieee802154_sdata_running(sdata)) {
- 		rcu_read_unlock();
- 		queue_delayed_work(local->mac_wq, &local->beacon_work,
- 				   msecs_to_jiffies(1000));
-+		netdev_put(sdata->dev, &dev_tracker);
- 		return;
- 	}
- 
-@@ -450,6 +453,7 @@ void mac802154_beacon_worker(struct work_struct *work)
- 	if (interval < IEEE802154_ACTIVE_SCAN_DURATION)
- 		queue_delayed_work(local->mac_wq, &local->beacon_work,
- 				   local->beacon_interval);
-+	netdev_put(sdata->dev, &dev_tracker);
- }
- 
- int mac802154_stop_beacons_locked(struct ieee802154_local *local,
+You are awesome, thank you!
 -- 
-2.43.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
