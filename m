@@ -1,85 +1,97 @@
-Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1A69424D5A;
-	Thu,  6 Aug 2026 09:11:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B616E4756A5;
+	Fri,  7 Aug 2026 12:39:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786007464; cv=none; b=O3NIPDIeYLG2StjXHA0FS4susPnpYggaqwo23Yx/DM8yvxmAicDkC2C9eAjeGgvnLjaKfEfPUbYYZalsbR8dFxp3EWMBR/PinMFxeY1fp3MWngT0UtOiwvcU1IQdY0UrFKTiqPEAnHnsj0lu3U5y2K+OV3FyRbhoOz2rM7hd8Og=
+	t=1786106396; cv=none; b=jkYeJ3RGCY+nimf4QUsKDB9vIBtkrcpi2T827dv1rsVJtWFou6ypVytN7/yb5rE1GV2cr874zFsS/nIVeg04o1VjBdgC9HPfOmQYToi6yDfWIsCM6rCM7SepQ2mIzVhKhc80ndzIaF0n5lN5uIvnhl9qvap7fnZfwI7BTUaes2M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786007464; c=relaxed/simple;
-	bh=8s6dCWuFC+TpGJZv41eYNJKgCDWdc+b0YrdI8p9Ehcc=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=XF42VC5J8KuXNbGVg0MGpRepyNlapR39kyq6CbfWb5hGZVBP2OpgQ9iTPhLCyKUDgeVPIxLQB//1Ae0xafE5z909LxBL5eMS7okHJ7PG8F8uq7/UxVluXVIqZOrqItoOmcxiwAIsLPX7acy1A37rCaVBoXwP/EIM1fYu+QTclcI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=jjM8X07y; arc=none smtp.client-ip=91.218.175.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1786106396; c=relaxed/simple;
+	bh=gUztX7aVlm0QkztdNBiRFkWvXDdxFPmm50jIYqOP9UM=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=cnzDK8VLA0DPXd6YxODXE8uuy9JAE4nG0v6+qn5cXxYMXc2O4E0Mk8QWH2JF1lJGtzVcEcZ6Fm1yoguyqS5kG3MkGa9W1TwoiHig9dYdxUpR1FFHk4CJIZp3ly+uaVJcGyKnL09Orqkms9hJi4DLIth5eOjuAq2qEJqCY5BBsyQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=AY3FcVR0; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="jjM8X07y"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1786007458;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=YapwMKwSVO2/dyW1mRwCG7PatlF3pwcpq8mLo3b37FQ=;
-	b=jjM8X07yiZwdkV172nBurV6mjt7/ymYtXdjy1AAwelhbeycqpTD+t6/eiQVr5XGSkahzSP
-	JwuYMeywgH65yk7qt0Cd2fl5iOPnmiToKPHsQHNc23QggeOPzETcNOu3iWUr5mKnYaZheq
-	lrMq1hMHiRRctsxT13gtiFQzPfEtGS4=
-From: Chenguang Zhao <chenguang.zhao@linux.dev>
-To: alex.aring@gmail.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: horms@kernel.org,
-	linux-bluetooth@vger.kernel.org,
-	linux-wpan@vger.kernel.org,
-	netdev@vger.kernel.org,
-	chenguang.zhao@linux.dev,
-	Chenguang Zhao <zhaochenguang@kylinos.cn>
-Subject: [PATCH net] net: 6lowpan: fix mismatched comments
-Date: Thu,  6 Aug 2026 17:10:45 +0800
-Message-Id: <20260806091045.1701326-1-chenguang.zhao@linux.dev>
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="AY3FcVR0"
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id A147B1A148B;
+	Fri,  7 Aug 2026 12:39:31 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 606B9603F0;
+	Fri,  7 Aug 2026 12:39:31 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 7914111C3779F;
+	Fri,  7 Aug 2026 14:39:18 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1786106366; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=9cjfll9Ld3UQKLhTcpG7qSNojtvD2IM9y5+iFB7Ik9o=;
+	b=AY3FcVR0fopvVNiK4+vWCM3zx6O5OT9G0ygM5ThrXIOxu5/KexxdWs1hkCwFl1plYDbf0u
+	MNRJTkPdp801gl8PD2PsTAbKSUNgb/Z32A9N3wzIZq/UtqZyzNRmQKxUO3CLhLYjjyIUrU
+	6/jFyRHmlDp1GbndZb0I4ovYxpr7JApmw4qNvv7Nskx0H8c3fnF6p80iobad7SSY2wAZtz
+	/xXmOsZ/Vk6SWd5760ghB4lc0gjEIwd75xOPGWkURtGDgiLhi+BnwdQ5WsgTHPWpO8a8Fj
+	K1qSOmko1I2bjeue/Ys+WfyOSU83d30G1QQ7+xFNsGN0BJJr8pBho+z+S33bVA==
+From: Miquel Raynal <miquel.raynal@bootlin.com>
+To: Fan Wu <fanwu01@zju.edu.cn>
+Cc: linux-wpan@vger.kernel.org,  Stefan Schmidt <stefan@datenfreihafen.org>,
+  Alexander Aring <alex.aring@gmail.com>,  Varka Bhadram <varkab@cdac.in>,
+  Andrew Lunn <andrew+netdev@lunn.ch>,  "David S . Miller"
+ <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Jakub
+ Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,
+  netdev@vger.kernel.org,  linux-kernel@vger.kernel.org,
+  stable@vger.kernel.org
+Subject: Re: [PATCH] ieee802154: cc2520: fix FIFOP work use-after-free
+In-Reply-To: <20260806050328.422480-1-fanwu01@zju.edu.cn> (Fan Wu's message of
+	"Thu, 6 Aug 2026 05:03:28 +0000")
+References: <20260806050328.422480-1-fanwu01@zju.edu.cn>
+User-Agent: mu4e 1.12.12; emacs 30.2
+Date: Fri, 07 Aug 2026 14:39:18 +0200
+Message-ID: <87pkzucdft.fsf@bootlin.com>
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Last-TLS-Session-Version: TLSv1.3
 
-From: Chenguang Zhao <zhaochenguang@kylinos.cn>
+Hi Fan,
 
-Rename @_nexthdrlen to @_hdrlen and drop stale @nhc from
-lowpan_nhc_do_uncompression docs
+On 06/08/2026 at 05:03:28 GMT, Fan Wu <fanwu01@zju.edu.cn> wrote:
 
-Signed-off-by: Chenguang Zhao <zhaochenguang@kylinos.cn>
----
- net/6lowpan/nhc.h | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+> The FIFOP interrupt handler queues cc2520_fifop_irqwork.  On
+> removal, cc2520_remove() only flushes the work.  The devm-managed
+> FIFOP IRQ remains active until after ->remove() returns and can queue
+> the work again after that flush, allowing it to run after the private
+> data is released.
+>
+> Release the FIFOP IRQ and cancel the work before unregistering and
+> freeing the hardware.  Keep the SFD IRQ active while
+> ieee802154_unregister_hw() flushes the mac802154 workqueue: synchronous
+> TX waits in cc2520_tx() for the completion signalled by the SFD handler.
+> Release the SFD IRQ afterwards.  Destroy buffer_mutex last, since
+> unregistering can invoke the driver's stop callback, which uses it.
+>
+> Install the SFD IRQ before cc2520_register(), so it is available when
+> the netdev becomes visible.  Install the FIFOP IRQ afterwards, so a
+> registration failure cannot schedule RX work while its hardware is
+> being released.  Move ieee802154_free_hw() to the probe cleanup.
+>
+> Found by an in-house static analysis tool.
+>
+> Fixes: 0da6bc8cc341 ("ieee802154: cc2520: adds driver for TI CC2520 radio=
+")
+> Cc: stable@vger.kernel.org
+> Assisted-by: Codex:gpt-5.6
+> Signed-off-by: Fan Wu <fanwu01@zju.edu.cn>
 
-diff --git a/net/6lowpan/nhc.h b/net/6lowpan/nhc.h
-index ab7b4977c32b..c995029696d0 100644
---- a/net/6lowpan/nhc.h
-+++ b/net/6lowpan/nhc.h
-@@ -15,7 +15,7 @@
-  * @__nhc: variable name of the lowpan_nhc struct.
-  * @_name: const char * of common header compression name.
-  * @_nexthdr: ipv6 nexthdr field for the header compression.
-- * @_nexthdrlen: ipv6 nexthdr len for the reserved space.
-+ * @_hdrlen: ipv6 nexthdr len for the reserved space.
-  * @_id: one byte nhc id value.
-  * @_idmask: one byte nhc id mask value.
-  * @_uncompress: callback for uncompression call.
-@@ -102,7 +102,6 @@ int lowpan_nhc_do_compression(struct sk_buff *skb, const struct ipv6hdr *hdr,
- /**
-  * lowpan_nhc_do_uncompression - calling uncompress callback for nhc
-  *
-- * @nhc: 6LoWPAN nhc context, get by lowpan_nhc_by_ functions.
-  * @skb: skb of 6LoWPAN header, skb->data should be pointed to nhc id value.
-  * @dev: netdevice for print logging information.
-  * @hdr: ipv6hdr for setting nexthdr value.
--- 
-2.25.1
+While I may agree on the problem, I don't like the solution. It is
+overly complex. If the problem is the fact that we might queue works,
+what about disable_work[_sync]() ?
 
+Thanks,
+Miqu=C3=A8l
