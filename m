@@ -1,77 +1,115 @@
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6805537C90A;
-	Tue, 11 Aug 2026 13:14:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [52.187.6.220])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF3623546EC;
+	Wed, 12 Aug 2026 06:19:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.187.6.220
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786454086; cv=none; b=Kqjo52Tljx6ktXT093Nn4fsBixLdbcbJg97Rrv9jCxUW3/d9WMl+KI4vdvNW+VpwB7n7Gd04aGEhd66qPULxYdRjznf2x4MD9q2SsbOZgncVoLXDnKpE+Z483DvF+U71qRqFL5pONhPo1VQsG2teF4fB/4N6lRHMPgU3FB6ibDI=
+	t=1786515559; cv=none; b=Pgw88t8UitIhQ+VmfvSQN6mtBl/jMP24LZngbaQkmnyXPI5tR/aPUsajP0YnjvldcG8I7YbdP3MnW2Pz8ymNuFWMxzuhdFcl73H7hQNwwkxitjurUQ+TdtlSSzRAPmlcLeCN2k4jZKLnKMORNLzxaGPEp+skdZAM7idNWusTb/A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786454086; c=relaxed/simple;
-	bh=x0M2ebb4YGCTw57vP6EAz1gS4hevjwIbdS/kTKIzesU=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=sYsE28AbtCibs+EfehIjrA+q+Ut/e/QDKyYEjONG2Voju7SVU2K1Huzibx14TIiDh+i+em7Js6s8ZQveOvuYOls4j+TY0r8qdGsb9I3wH2uSK7b+5ztC5mK3/9duxd1YwTfIxumzmpc7GEIOVwOjmvOYr+ZALFE1MRjlit7QTSw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=TxsyJp6v; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="TxsyJp6v"
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 7A3A71A1570;
-	Tue, 11 Aug 2026 13:14:36 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 4B0EF6033C;
-	Tue, 11 Aug 2026 13:14:36 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 5489911C48B99;
-	Tue, 11 Aug 2026 15:14:28 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1786454075; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=x0M2ebb4YGCTw57vP6EAz1gS4hevjwIbdS/kTKIzesU=;
-	b=TxsyJp6vpip6ZK2Pwk+FYoiRoecSZpKedunO4WsL9GFo+87sJE32da2w779sqlYoYr0bjS
-	6lxfY2bzYXm79nN8QqlCtRYzffUmGCtf4sVXbVxykg2ljgL8pN4OPGdXqVwXBhdNvWkosM
-	J0UcXIaHvLFEqe8I91e/dIPreK0F6HdlaevWZS/fkMMC5k7cPiBpKEoklcOAPr1VmZutKJ
-	awvnFL0l150nFR6mDgmEI/qE+Rz42tfR3IfwIjLyEpz0MmPiP0SV8/prdU9vRz/ssBHo33
-	s0Awr6+rYqNQY8ZexMNjIxKKrP2JR0CZ5XZY5Ch2DBLq+lh94QH4VeVKFanVJw==
-From: Miquel Raynal <miquel.raynal@bootlin.com>
-To: Fan Wu <12321260@zju.edu.cn>
-Cc: Fan Wu <fanwu01@zju.edu.cn>,  linux-wpan@vger.kernel.org,  Stefan
- Schmidt <stefan@datenfreihafen.org>,  Alexander Aring
- <alex.aring@gmail.com>,  Varka Bhadram <varkab@cdac.in>,  Andrew Lunn
- <andrew+netdev@lunn.ch>,  "David S . Miller" <davem@davemloft.net>,  Eric
- Dumazet <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Paolo
- Abeni <pabeni@redhat.com>,  netdev@vger.kernel.org,
-  linux-kernel@vger.kernel.org,  stable@vger.kernel.org
-Subject: Re: [PATCH v3 2/2] ieee802154: cc2520: fix RX tasklet use-after-free
-In-Reply-To: <491F951B-3C7A-45AF-8842-C581A2BA6ED4@zju.edu.cn> (Fan Wu's
-	message of "Tue, 11 Aug 2026 17:48:26 +0800")
-References: <20260811010359.131381-1-fanwu01@zju.edu.cn>
-	<20260811010359.131381-3-fanwu01@zju.edu.cn>
-	<87ik5hoycq.fsf@bootlin.com>
-	<491F951B-3C7A-45AF-8842-C581A2BA6ED4@zju.edu.cn>
-User-Agent: mu4e 1.12.12; emacs 30.2
-Date: Tue, 11 Aug 2026 15:14:27 +0200
-Message-ID: <87v79gol3g.fsf@bootlin.com>
+	s=arc-20240116; t=1786515559; c=relaxed/simple;
+	bh=LCaEUuOJiTj6+hJornfvF+VnclshgN42o9A3eu0zfXU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=IgAxnrE7c8F+KkgTOdov5y5kgsT+z2N8LKuA7zdeP4fMA1xUjtsC5FRVyJ/deCMm7bhv73EbOPNgQX2R8oE3Dp5wVLDJqS0J/Y3zvseLn7d0ybt4BnPc9HhhgnZL70ZsKUqnGP6Sf9yy3Em7ebq0WFKdCB9noTIuFmlo14W1cq8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn; spf=pass smtp.mailfrom=zju.edu.cn; arc=none smtp.client-ip=52.187.6.220
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
+Received: from zju.edu.cn (unknown [10.98.66.117])
+	by mtasvr (Coremail) with SMTP id _____wDHGLQ6EHxqN2qIAA--.4260S3;
+	Wed, 12 Aug 2026 14:18:35 +0800 (CST)
+Received: from localhost.localdomain (unknown [10.98.66.117])
+	by mail-app2 (Coremail) with SMTP id zC_KCgD3idA5EHxqOs3NAw--.22002S2;
+	Wed, 12 Aug 2026 14:18:34 +0800 (CST)
+From: Fan Wu <fanwu01@zju.edu.cn>
+To: linux-wpan@vger.kernel.org
+Cc: Stefan Schmidt <stefan@datenfreihafen.org>,
+	Alexander Aring <alex.aring@gmail.com>,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	Varka Bhadram <varkab@cdac.in>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: [PATCH v4] ieee802154: cc2520: fix FIFOP work use-after-free
+Date: Wed, 12 Aug 2026 06:17:14 +0000
+Message-Id: <20260812061714.175966-1-fanwu01@zju.edu.cn>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:zC_KCgD3idA5EHxqOs3NAw--.22002S2
+X-CM-SenderInfo: qrstjiaswqq6lmxovvfxof0/
+X-CM-DELIVERINFO: =?B?azZAqQXKKxbFmtjJiESix3B1w3vZ3A9ovKVTomAyoQazvoRs/NHSP8GI2EvgeEEW7R
+	sfncGSG+szpQCInt5Y8rbJUI2AgQX3/lbIcyXttSixiVoBhjmswoE08wIHC61l3FrvXk//
+	5s2u2sFZqPjKKbxUREap9E6mavGmQbzmcFsnzP86
+X-Coremail-Antispam: 1Uk129KBj93XoW7uFWDJFy3KrWxWw4ruw15trc_yoW8Aw45pF
+	ZxWwn7GrW8W3Wjka17Jr18WF95Jan8GayUu34xG3Z3urnxZFyUWrZ2yF10qFy5JFWv9ayS
+	vFyqvr45Z3Z8AFgCm3ZEXasCq-sJn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUP0b4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AK
+	xVW0oVCq3wAac4AC62xK8xCEY4vEwIxC4wAS0I0E0xvYzxvE52x082IY62kv0487Mc804V
+	CY07AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AK
+	xVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48Icx
+	kI7VAKI48JM4x0Y48IcxkI7VAKI48G6xCjnVAKz4kxM4IIrI8v6xkF7I0E8cxan2IY04v7
+	MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr
+	0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0E
+	wIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JV
+	WxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAI
+	cVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU85l1PUUUUU==
 
-Hi,
+The FIFOP interrupt handler queues cc2520_fifop_irqwork.  On removal,
+cc2520_remove() only flushes the work.  The devm-managed FIFOP IRQ
+remains active until after ->remove() returns and can queue the work
+again after that flush, allowing it to run after the private data is
+released.
 
-On 11/08/2026 at 17:48:26 +08, Fan Wu <12321260@zju.edu.cn> wrote:
+Disable the work with disable_work_sync() instead of flushing it, so
+the handler can no longer queue it once removal begins.  Destroy the
+buffer mutex last, since the worker and the stop callback invoked
+through ieee802154_unregister_hw() both take it.
 
-> You're right. I failed to trace the receive-enable path, please drop patch
-> 2/2. Patch 1/2 is unchanged.
->
-> Sorry for the noise, and thanks for catching this.
+Found by an in-house static analysis tool.
 
-Please send a v4 with a single patch.
+Fixes: 0da6bc8cc341 ("ieee802154: cc2520: adds driver for TI CC2520 radio")
+Cc: stable@vger.kernel.org # v6.10+
+Suggested-by: Miquel Raynal <miquel.raynal@bootlin.com>
+Reviewed-by: Miquel Raynal <miquel.raynal@bootlin.com>
+Assisted-by: Codex:gpt-5.6
+Signed-off-by: Fan Wu <fanwu01@zju.edu.cn>
+---
+Changes in v4:
+- Drop the erroneous registration-failure patch.
+- Keep the unchanged FIFOP removal-path fix.
 
-Thanks,
-Miqu=C3=A8l
+ drivers/net/ieee802154/cc2520.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/ieee802154/cc2520.c b/drivers/net/ieee802154/cc2520.c
+index 2b70341..abfcfe0 100644
+--- a/drivers/net/ieee802154/cc2520.c
++++ b/drivers/net/ieee802154/cc2520.c
+@@ -1156,11 +1156,10 @@ static void cc2520_remove(struct spi_device *spi)
+ {
+ 	struct cc2520_private *priv = spi_get_drvdata(spi);
+ 
+-	mutex_destroy(&priv->buffer_mutex);
+-	flush_work(&priv->fifop_irqwork);
+-
++	disable_work_sync(&priv->fifop_irqwork);
+ 	ieee802154_unregister_hw(priv->hw);
+ 	ieee802154_free_hw(priv->hw);
++	mutex_destroy(&priv->buffer_mutex);
+ }
+ 
+ static const struct spi_device_id cc2520_ids[] = {
+-- 
+2.34.1
+
