@@ -1,193 +1,166 @@
-Received: from ustc.edu.cn (smtp.ustc.edu.cn [202.38.64.46])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D37E37F320;
-	Mon, 24 Aug 2026 18:00:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.38.64.46
+Received: from fanzine2.igalia.com (fanzine2.igalia.com [213.97.179.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3CDB38E8A7;
+	Mon, 24 Aug 2026 21:04:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.97.179.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787594458; cv=none; b=izim26JqJDJtwnEYJy3F3A9qYJBlfOrGlLFXkiEfJQndhCoG0TWH3HCZtofCMlBEY8pO477YJp/6tCZ+lS97svBiJ/zCWlOX6D+WqEIJWTKvKViv3Q4eQmIcVY/xCKZLh1U9UFSmcj8gLILlbU40qvWaQZQgAn0P7Deg2jGLyRk=
+	t=1787605474; cv=none; b=KMisXyDPE8iQzJgKO4IoXM/RU4TcrkRtJe/1ibppRWAUh3lGF+GVJGFJAQbOIIkJs85X1ZgZ1pL1nkyWzy8QcpPmpiuG9QX2Xn5eb5JOPHbUdNiN3ivkhuEM3ycqQXF3FS4CHvY3O007CYHZ0Q+FN5tWaehWbVY/HmZNF0VHl/4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787594458; c=relaxed/simple;
-	bh=TFnI2k74m5NXMhdD6k0V+J5zTUI3JbFerKb+sRWbnjA=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Id98a0JP9oRV2IivzgvgtO01ky2gyMVr5oJTegvLFQlEfb+jJOjsgENm5sSTL5bUEuS8NgSP5XMr19wjr/mK8gJxgSRYRzl/tn/3ovJ6DvNFVzEBEpV9GijdHxH23gd6S8K8sUO7sKIBP1IZ4qMiOoNNsn9w9cGU1fInRCsW41s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mail.ustc.edu.cn; spf=pass smtp.mailfrom=mail.ustc.edu.cn; dkim=pass (1024-bit key) header.d=mail.ustc.edu.cn header.i=@mail.ustc.edu.cn header.b=lXoZuc+a; arc=none smtp.client-ip=202.38.64.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mail.ustc.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mail.ustc.edu.cn
+	s=arc-20240116; t=1787605474; c=relaxed/simple;
+	bh=lxWgaRS9cMBj7nzIKwYlcYTMb1BOWwOR02+GTkayrjs=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=tOJcsLmxSt32AlM8oGbzxW3CAcfdRTAb+tn11139PffJiCr5hehlx8+2AVFXu30urmDTAvjcAotF+sKrJBLl0x4CiDhdqiuJOBB85wCO54imV5b9COHMGuTK43tM6l2tksifIbWRaBa2PB9gzdd1VLOBn9S1qql6YVhPMuhEsO4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com; spf=pass smtp.mailfrom=igalia.com; dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b=iN4IZpg9; arc=none smtp.client-ip=213.97.179.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=igalia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mail.ustc.edu.cn header.i=@mail.ustc.edu.cn header.b="lXoZuc+a"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=mail.ustc.edu.cn; s=dkim; h=Received:From:To:Cc:Subject:Date:
-	Message-Id:MIME-Version:Content-Transfer-Encoding; bh=yPRFsNqO3M
-	dRSvkCjq6iY4sm1WM52wHzvKYHEk5yraQ=; b=lXoZuc+apKYGggpfJ3w2+KDh1j
-	0QqZAgqsJcRE1g/+OCioBcYJ0cZRdhWnzp3D/WChUSNElxkVg9i6CE2Z6DxWR/VF
-	eXUqHUf3SHnEVX9PmchHViwxfKB6MMx3JHIEeq4qhlEYVN8v8MKfVjfY5ohToCeB
-	cGZI2HjG5WIo3zzPY=
-Received: from skw.ustc.edu.cn (unknown [211.86.152.107])
-	by mailimap2024 (Coremail) with SMTP id 3pYKCgA3OzKLhoxq3p6RAA--.3675S2;
-	Tue, 25 Aug 2026 01:59:47 +0800 (CST)
-From: Kaiwen Shi <skwkevin@mail.ustc.edu.cn>
-To: alex.aring@gmail.com,
-	stefan@datenfreihafen.org,
-	miquel.raynal@bootlin.com,
-	linux-wpan@vger.kernel.org
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Kaiwen Shi <skwkevin@mail.ustc.edu.cn>
-Subject: [PATCH net] mac802154: fix data race and NULL deref on local->assoc_dev
-Date: Tue, 25 Aug 2026 01:59:38 +0800
-Message-Id: <20260824175938.11143-1-skwkevin@mail.ustc.edu.cn>
-X-Mailer: git-send-email 2.34.1
+	dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="iN4IZpg9"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+	s=20170329; h=Content-Transfer-Encoding:Content-Type:Message-ID:Subject:Cc:To
+	:From:Date:MIME-Version:From:Reply-To;
+	bh=8Sz3WqkTSXrjfECQs9syX3OabIkTQfaoXng/2r3y3YI=; b=iN4IZpg94uQW7Qq71fa8RM3vEW
+	kYkZAE7Go3UMAHPCbMam59vi5F2G4bm4hWXaQvDe+IlXyYEvE3ysOyCUtZqscnptJn7q2InbNaFyu
+	soOubYTTGaNo34QYmi9ty2VVZJpRy9sTLLWPw/LK3yUGKpUbS/U50cLhVIERjuM4Ft+aoWfPy9dJE
+	gK9eUfYGXhRTBPX+kELcjgSnMYflg6ghgE0MkoYvLv42MzvqNcu61ANFS228b1Ien6EVqp3z8FXTb
+	NuEjADHZt8gwoX1gXWGgh+2+Dm/yjJ9PlQHQ27wXDkIEUhwmsrSPlTWDbQQk59YiDr1KX9MY2E47t
+	G2P9q0Eg==;
+Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
+	by fanzine2.igalia.com with esmtps 
+	(Cipher TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256) (Exim)
+	id 1wybpt-008hfh-DY; Mon, 24 Aug 2026 23:04:05 +0200
+Received: from webmail.service.igalia.com ([192.168.21.45])
+	by mail.igalia.com with esmtp (Exim)
+	id 1wybps-003b3A-2i; Mon, 24 Aug 2026 23:04:05 +0200
+Received: from localhost ([127.0.0.1] helo=webmail.igalia.com)
+	by webmail.service.igalia.com with esmtp (Exim 4.98.2)
+	(envelope-from <mfo@igalia.com>)
+	id 1wybps-00000003RKa-04eN;
+	Mon, 24 Aug 2026 23:04:03 +0200
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Date: Mon, 24 Aug 2026 18:04:03 -0300
+From: Mauricio Faria de Oliveira <mfo@igalia.com>
+To: =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>
+Cc: Kees Cook <kees@kernel.org>, Joel Granados <joel.granados@kernel.org>,
+ Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon
+ Horman <horms@kernel.org>, kernel-dev@igalia.com,
+ linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+ fsverity@lists.linux.dev, keyrings@vger.kernel.org, bpf@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, linux-kbuild@vger.kernel.org,
+ netdev@vger.kernel.org, linux-wpan@vger.kernel.org,
+ lvs-devel@vger.kernel.org, netfilter-devel@vger.kernel.org,
+ coreteam@netfilter.org, linux-sctp@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
+ bridge@lists.linux.dev, mptcp@lists.linux.dev, rds-devel@oss.oracle.com,
+ virtualization@lists.linux.dev
+Subject: Re: [PATCH RFC v3 03/13] sysctl, mod_devicetable: add macro
+ MODULE_SYSCTL_TABLE
+In-Reply-To: <aotteDcc588iwC6g@monoceros>
+References: <20260819-sysctl-module-aliases-v3-0-aab90569365d@igalia.com>
+ <20260819-sysctl-module-aliases-v3-3-aab90569365d@igalia.com>
+ <aomlfGJM61qZKxx2@monoceros> <4e3eaf1d3419e808be046035f114bf6c@igalia.com>
+ <aotteDcc588iwC6g@monoceros>
+Message-ID: <4aa22e41e8ff4bab6638cf0baaa9d07b@igalia.com>
+X-Sender: mfo@igalia.com
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:3pYKCgA3OzKLhoxq3p6RAA--.3675S2
-X-Coremail-Antispam: 1UD129KBjvJXoW3AryxZw1rWr1fur17uw1DAwb_yoW7Gw4xpF
-	yj9Fn5KFy7JrnxZwn3J3Z5Xry29r48Cw1xur1fAFZxZF1kWF98ZF4aqrnFvFyYqF4kZa4r
-	ZrWDJa15AF1DC37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvm14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26r1I6r4UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
-	6F4UM28EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gr
-	1j6F4UJwAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv
-	7VC0I7IYx2IY67AKxVWUXVWUAwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r
-	1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCY1x0262kKe7AK
-	xVWUAVWUtwCY02Avz4vE14v_GwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJV
-	W8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF
-	1VAFwI0_JF0_Jw1lIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6x
-	IIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvE
-	x4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnU
-	UI43ZEXa7VUjj2NtUUUUU==
-X-CM-SenderInfo: 5vnzyvxylqqzxdloh3xvwfhvlgxou0/
+X-Spam-Report: NO, Score=-2.1, Tests=ALL_TRUSTED=-3,BAYES_50=0.8,KAM_DMARC_NONE=0.125,KAM_DMARC_STATUS=0.005,KAM_SHORT=0.001
+X-Spam-Score: -20
+X-Spam-Bar: --
 
-`local->assoc_dev` is accessed from three places with no common lock
-and, on the read side, no NULL or lifetime guarantee:
+On 2026-08-23 19:12, Uwe Kleine-König wrote:
+> Hello Mauricio,
+> 
+> On Sat, Aug 22, 2026 at 01:57:24PM -0300, Mauricio Faria de Oliveira wrote:
+>> On 2026-08-22 10:41, Uwe Kleine-König wrote:
+>> > On Wed, Aug 19, 2026 at 03:16:16PM -0300, Mauricio Faria de Oliveira wrote:
+>> >> The MODULE_SYSCTL_TABLE macro emits a struct module_sysctl_table variable
+>> >> with pointers to a sysctl table's path and entries, and table/entry sizes.
+>> > 
+>> > That new struct doesn't seem to contain any pointer?
+>> 
+>> The struct module_sysctl_table fields .path and .table are pointers,
+>> although with kernel_ulong_t type so that the same 32/64-bit size is
+>> used in file2alias.c based on KERNEL_ELFCLASS (and not on the host,
+>> which might differ with CROSS_COMPILE).
+> 
+> Cross compilation isn't an issue for the already existing device id
+> structures; many of them also contain pointers.
+> (While modpost doesn't use the pointers, the size of the structures must
+> be known to correctly interpret the arrays.)
 
-  - mac802154_perform_association() stores the coordinator pointer in
-    it, then blocks in wait_for_completion_killable_timeout() for up
-    to 10 s;
+Indeed. I missed some device_id structures with pointers, and that
+devicetable-offsets.c is cross-compiled to generate
+devicetable-offsets.h for file2alias.c to use offsets and sizes of the
+target architecture.
 
-  - its clear_assoc label sets it back to NULL;
+I'll change .path and .table to pointers in the next version.
 
-  - mac802154_process_association_resp(), which runs from the
-    rx_mac_cmd workqueue, dereferences
-    `local->assoc_dev->extended_addr` with neither lock nor NULL
-    check.
+> Also sizeof(long) differs between architectures and I can compile for
+> arm(32) just fine on amd64.
+> 
+> Additionally there is hardware out there that has sizeof(void *) = 16
+> but sizeof(long) = 8. Up until recently I worked on mainlining that (and
+> it has business reasons only I stopped, so I guess and hope I will
+> continue at some point in the future). See
+> https://lwn.net/Articles/1037974/ for some details if you're interested.
 
-The dereference races with both write sites:
+Cool.
 
-  1. NULL dereference: clear_assoc() stores NULL while the RESP
-     handler is between loading and dereferencing the pointer; the
-     subsequent dereference of `->extended_addr` on a NULL pointer
-     faults.
+> 
+> I would be great if your series didn't introduce a new obstacle for
+> that.
 
-  2. use-after-free: mac802154_associate() frees the freshly
-     allocated `parent` in its free_parent path after
-     perform_association() returns an error. If the RESP handler
-     still holds the now-dangling pointer, it reads freed memory.
+Absolutely. I'll be happy to adjust the series and testing for that.
 
-No existing lock serializes these accesses.  The
-wpan_dev->association_lock mutex only guards the coordinator-side
-parent/child list (mac802154_process_association_req() and
-friends), which is a different data structure, and it is not held
-while this device is associating.  The writer blocks in
-wait_for_completion_killable_timeout() for up to 10 s after storing
-assoc_dev, so the reader on the rx_mac_cmd workqueue races with both
-the NULL store in clear_assoc and the kfree() of the leftover
-ieee802154_pan_device in mac802154_associate()'s error path.
+Could you please confirm one should just follow [1], which uses [2] to
+build the LLVM toolchain, and use it to build the kernel [3]?
 
-Add a dedicated assoc_dev_lock and hold it around all three
-accesses; the RESP handler additionally validates the pointer before
-dereferencing it.  This is a per-field lock so it cannot contend
-with the completion logic.
+[1] https://github.com/cheri-linux#building-and-running
+[2] https://github.com/cheri-linux/buildroot
+[3] https://github.com/CHERI-Alliance/linux/tree/codasip-cheri-riscv-7.1
 
-Fixes: fefd19807fe9 ("mac802154: Handle associating")
-Signed-off-by: Kaiwen Shi <skwkevin@mail.ustc.edu.cn>
+>> >> That symbol will be handled by file2alias.c (modpost) with the changes in
+>> >> mod_devicetable.h and devicetable-offsets.c.
+>> >> 
+>> >> The option macros MODULE_SYSCTL_TABLE_{DISABLE,UNIQUE_ID} can be used on
+>> >> a per-file basis to disable the macro and change the symbol name pattern.
+>> >> 
+>> >> Signed-off-by: Mauricio Faria de Oliveira <mfo@igalia.com>
+>> >> ---
+>> >>  include/linux/mod_devicetable.h   |  7 +++++++
+>> >>  include/linux/sysctl.h            | 42 +++++++++++++++++++++++++++++++++++++++
+>> >>  scripts/mod/devicetable-offsets.c |  6 ++++++
+>> >>  3 files changed, 55 insertions(+)
+>> > 
+>> > Please put the new struct in a separate header. Apart from not being
+>> > about a device table, I'm currently work on removing
+>> > <linux/mod_devicetable.h>. See commit
+>> > ad428f5811bd7fb3d91fa002174de533f9da94d7 for more details.
+>> 
+>> Sure; I looked at that earlier (thanks for the instructive commit
+>> message, by the way) and found the new struct to be similar to "struct
+>> cpu_feature isn't really a device_id struct" (not moved), but apparently
+>> missed the trailing "fow now", which is clearer now. Fixed for v4.
+> 
+> Yeah, I didn't move that because it was an outlier in the header as it's
+> not a device id. IMHO it should go to something like
+> include/linux/cpu_feature.h.
 
----
-Best regards,
-Kaiwen Shi
+Ack.
 
- net/mac802154/ieee802154_i.h |  1 +
- net/mac802154/main.c         |  1 +
- net/mac802154/scan.c         | 15 +++++++++++++--
- 3 files changed, 15 insertions(+), 2 deletions(-)
+cheers,
 
-diff --git a/net/mac802154/ieee802154_i.h b/net/mac802154/ieee802154_i.h
-index 8f2bff268392..921712ee2a37 100644
---- a/net/mac802154/ieee802154_i.h
-+++ b/net/mac802154/ieee802154_i.h
-@@ -77,6 +77,7 @@ struct ieee802154_local {
- 
- 	/* Association */
- 	struct ieee802154_pan_device *assoc_dev;
-+	spinlock_t assoc_dev_lock; /* protects assoc_dev */
- 	struct completion assoc_done;
- 	__le16 assoc_addr;
- 	u8 assoc_status;
-diff --git a/net/mac802154/main.c b/net/mac802154/main.c
-index ea1efef3572a..e59f46100203 100644
---- a/net/mac802154/main.c
-+++ b/net/mac802154/main.c
-@@ -104,6 +104,7 @@ ieee802154_alloc_hw(size_t priv_data_len, const struct ieee802154_ops *ops)
- 	INIT_WORK(&local->rx_mac_cmd_work, mac802154_rx_mac_cmd_worker);
- 
- 	init_completion(&local->assoc_done);
-+	spin_lock_init(&local->assoc_dev_lock);
- 
- 	/* init supported flags with 802.15.4 default ranges */
- 	phy->supported.max_minbe = 8;
-diff --git a/net/mac802154/scan.c b/net/mac802154/scan.c
-index 65089826ff59..5ef23a4507ea 100644
---- a/net/mac802154/scan.c
-+++ b/net/mac802154/scan.c
-@@ -574,7 +574,9 @@ int mac802154_perform_association(struct ieee802154_sub_if_data *sdata,
- 		return ret;
- 	}
- 
-+	spin_lock_bh(&local->assoc_dev_lock);
- 	local->assoc_dev = coord;
-+	spin_unlock_bh(&local->assoc_dev_lock);
- 	reinit_completion(&local->assoc_done);
- 	set_bit(IEEE802154_IS_ASSOCIATING, &local->ongoing);
- 
-@@ -613,7 +615,9 @@ int mac802154_perform_association(struct ieee802154_sub_if_data *sdata,
- 
- clear_assoc:
- 	clear_bit(IEEE802154_IS_ASSOCIATING, &local->ongoing);
-+	spin_lock_bh(&local->assoc_dev_lock);
- 	local->assoc_dev = NULL;
-+	spin_unlock_bh(&local->assoc_dev_lock);
- 
- 	return ret;
- }
-@@ -626,6 +630,7 @@ int mac802154_process_association_resp(struct ieee802154_sub_if_data *sdata,
- 	u64 deaddr = swab64((__force u64)dest->extended_addr);
- 	struct ieee802154_local *local = sdata->local;
- 	struct wpan_dev *wpan_dev = &sdata->wpan_dev;
-+	struct ieee802154_pan_device *assoc_dev;
- 	struct ieee802154_assoc_resp_pl resp_pl = {};
- 
- 	if (skb->len != sizeof(resp_pl))
-@@ -635,9 +640,15 @@ int mac802154_process_association_resp(struct ieee802154_sub_if_data *sdata,
- 		     dest->mode != IEEE802154_EXTENDED_ADDRESSING))
- 		return -EINVAL;
- 
--	if (unlikely(dest->extended_addr != wpan_dev->extended_addr ||
--		     src->extended_addr != local->assoc_dev->extended_addr))
-+	spin_lock_bh(&local->assoc_dev_lock);
-+	assoc_dev = local->assoc_dev;
-+	if (unlikely(!assoc_dev ||
-+		     dest->extended_addr != wpan_dev->extended_addr ||
-+		     src->extended_addr != assoc_dev->extended_addr)) {
-+		spin_unlock_bh(&local->assoc_dev_lock);
- 		return -ENODEV;
-+	}
-+	spin_unlock_bh(&local->assoc_dev_lock);
- 
- 	memcpy(&resp_pl, skb->data, sizeof(resp_pl));
- 	local->assoc_addr = resp_pl.short_addr;
+> 
+> Best regards
+> Uwe
+
 -- 
-2.47.0
-
+Mauricio
