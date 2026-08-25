@@ -1,157 +1,200 @@
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from fanzine2.igalia.com (fanzine2.igalia.com [213.97.179.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A087846EF87;
-	Tue, 25 Aug 2026 13:15:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8533A3B6BFE;
+	Tue, 25 Aug 2026 19:10:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.97.179.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787663732; cv=none; b=VG9bcL+psUj3QLoZ1Xw+OqaLCK20cDnAnPZbIPutigHvDtByXL2CYz3eJSGXXieEOXbVeiTIDfcB6PwNwSa/biKl9MjlE1/vxb3rkWCv4hDS5hWgMQRoDUF+31no2YxBdrhwCXKnoql81Yep3vndnZjSAbcy7uNbIV4JKc0g6VU=
+	t=1787685054; cv=none; b=MBPFQ3JgaDmKBiwp2KDEEb4ecL+mLtph2ZDH5dUDq281tYFeEFrYTLqmj0fBsymWglvCHWxzIyTDZH9MReokSD6fJm8HvhUVSdj64YaC6gFEul3gP+c1AhtP9aAPtjK4OhXlImrdGrh8yAEgF7mDS3GGgLhWgOKsl1c6AF3TeI4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787663732; c=relaxed/simple;
-	bh=iFkE1NuK71Wwo+oFT8GDaqnD6eoUzuoarnUlASExOYo=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=bmyGsEPZYYvofp/zQ8+nUMPkgXUyZZYq4dd2jUSK7Ty1dfGaEPQunqJ7JpJKXJmfVbjlXiIKuMDKYyeqnhUoKroWIcG/JNhaOgywfvwdyevvR9B4xbWKoB1Y0ZuqgDrLUm5uZpYUmH8mIvUrQZmzMpZvpad0kSeWkUe3wR4Vf8E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=wdz6UTI/; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+	s=arc-20240116; t=1787685054; c=relaxed/simple;
+	bh=OtchHb6GBRRv68k/gioU/7xbxZ19B8WsvvWJaYWNtpk=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=ipvLNwRYVe5qMCdwNi3DiLYUr8wa3BDCTTRR0oDbzguPyZv8t4cUzxHe9TeftT02dHk+LbW69SxsAwO7zSBhor2O9024k3t1P3Jqc+SNVIrIC9YItyp7L0nInMqvVzRwIKyPuzRPy4Mm4VQ7gBGxSu1mtANzzbw4nfK7j1dIW1A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com; spf=pass smtp.mailfrom=igalia.com; dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b=RHvx1Ado; arc=none smtp.client-ip=213.97.179.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=igalia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="wdz6UTI/"
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id E7F191A176A;
-	Tue, 25 Aug 2026 13:15:27 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id BB49B604C4;
-	Tue, 25 Aug 2026 13:15:27 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 34A1D11C795C7;
-	Tue, 25 Aug 2026 15:15:11 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1787663712; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=rg8ZzhvujBAEPNbXyafXwH9++4nKhKyZjGbNzNeNwQI=;
-	b=wdz6UTI/6YCF8O2X+lb+Vrf14WgjoqgLQa7P4RCYh+TqBMtlz7AFyO00P3xVzmfq/Zi5hS
-	b6XOXcV/wAjy6dkf2RvG3vaRK5DKPGwjQxPvMjVMdZESnqtaNXT4nNr2YnWtrk3DODUXaF
-	gK2PJZGjkwgVxhD6Vt8RNmVbciN2qjJsFwgKumXaPehy9f+qaHdBkHgskqhScxJkKJXjGn
-	K4J8MTmhIY5FDUWhnEChNlpWRVhanIk/01kGJo+vKvm1wRoEbKp+PoElPKbKGZCOjwSOyj
-	DvmxDRTNnCId1h2/6z26oJX+AAfVg0+TRP6N+4bTk5lNGeObroT9C5BiXAvHSw==
-From: Miquel Raynal <miquel.raynal@bootlin.com>
-To: Kaiwen Shi <skwkevin@mail.ustc.edu.cn>
-Cc: alex.aring@gmail.com,  stefan@datenfreihafen.org,
-  linux-wpan@vger.kernel.org,  netdev@vger.kernel.org,
-  linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] mac802154: fix data race and NULL deref on
- local->assoc_dev
-In-Reply-To: <20260824175938.11143-1-skwkevin@mail.ustc.edu.cn> (Kaiwen Shi's
-	message of "Tue, 25 Aug 2026 01:59:38 +0800")
-References: <20260824175938.11143-1-skwkevin@mail.ustc.edu.cn>
-User-Agent: mu4e 1.12.12; emacs 30.2
-Date: Tue, 25 Aug 2026 15:15:10 +0200
-Message-ID: <87ik4ygx41.fsf@bootlin.com>
+	dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="RHvx1Ado"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+	s=20170329; h=Content-Transfer-Encoding:Content-Type:Message-ID:Subject:Cc:To
+	:From:Date:MIME-Version:From:Reply-To;
+	bh=elAJm2a/yvCuwNZQN8cT8iWBlOljI1OpyGvFLYC11uo=; b=RHvx1Ado+WH9EzbHIOX+ZddNR4
+	p497xG/usjgdtyDE/kA/xbjOpyLIBJuOI92EZRwc1yOZOItUmNe5+oSRd4oxCZHOSJIg77xqmE+Tc
+	K5PFV0rWFpwnhQ6m9KAj6Aq1yxVDoopN2BKsaUVqLC48h9H3wG5IGBXSnMlrjvxadR17ZpA62zFv6
+	qnk+hsPSnk1nJmmcLcs7OjTT5cXXOefE42zyl0b94RK82DSvgwElUXWEAW9MTO2l5NBp9Zejkwn6T
+	YNgx8l8tDqfY2WGCtiFY0jVvYc0jEiv34rN7tch6qSf2TkOPn3XRxDKM1uTJZIDi4f2h9zACbsB7B
+	9kW+H63w==;
+Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
+	by fanzine2.igalia.com with esmtps 
+	(Cipher TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256) (Exim)
+	id 1wywXL-009BHb-A7; Tue, 25 Aug 2026 21:10:19 +0200
+Received: from webmail.service.igalia.com ([192.168.21.45])
+	by mail.igalia.com with esmtp (Exim)
+	id 1wywXJ-00530G-Og; Tue, 25 Aug 2026 21:10:19 +0200
+Received: from localhost ([127.0.0.1] helo=webmail.igalia.com)
+	by webmail.service.igalia.com with esmtp (Exim 4.98.2)
+	(envelope-from <mfo@igalia.com>)
+	id 1wywXJ-00000003he5-2ugE;
+	Tue, 25 Aug 2026 21:10:17 +0200
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Last-TLS-Session-Version: TLSv1.3
+Date: Tue, 25 Aug 2026 16:10:17 -0300
+From: Mauricio Faria de Oliveira <mfo@igalia.com>
+To: =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>
+Cc: Kees Cook <kees@kernel.org>, Joel Granados <joel.granados@kernel.org>,
+ Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nsc@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon
+ Horman <horms@kernel.org>, kernel-dev@igalia.com,
+ linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+ fsverity@lists.linux.dev, keyrings@vger.kernel.org, bpf@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, linux-kbuild@vger.kernel.org,
+ netdev@vger.kernel.org, linux-wpan@vger.kernel.org,
+ lvs-devel@vger.kernel.org, netfilter-devel@vger.kernel.org,
+ coreteam@netfilter.org, linux-sctp@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
+ bridge@lists.linux.dev, mptcp@lists.linux.dev, rds-devel@oss.oracle.com,
+ virtualization@lists.linux.dev
+Subject: Re: [PATCH RFC v3 03/13] sysctl, mod_devicetable: add macro
+ MODULE_SYSCTL_TABLE
+In-Reply-To: <ao1P_mEJdyRExG3v@monoceros>
+References: <20260819-sysctl-module-aliases-v3-0-aab90569365d@igalia.com>
+ <20260819-sysctl-module-aliases-v3-3-aab90569365d@igalia.com>
+ <aomlfGJM61qZKxx2@monoceros> <4e3eaf1d3419e808be046035f114bf6c@igalia.com>
+ <aotteDcc588iwC6g@monoceros> <4aa22e41e8ff4bab6638cf0baaa9d07b@igalia.com>
+ <ao1P_mEJdyRExG3v@monoceros>
+Message-ID: <4a7925a800f0c9b36078a70bf35e960d@igalia.com>
+X-Sender: mfo@igalia.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spam-Report: NO, Score=-2.1, Tests=ALL_TRUSTED=-3,BAYES_50=0.8,KAM_DMARC_NONE=0.125,KAM_DMARC_STATUS=0.005
+X-Spam-Score: -20
+X-Spam-Bar: --
 
-Hi Kaiwen,
+On 2026-08-25 05:24, Uwe Kleine-König wrote:
+> Hello,
+> 
+> On Mon, Aug 24, 2026 at 06:04:03PM -0300, Mauricio Faria de Oliveira wrote:
+>> On 2026-08-23 19:12, Uwe Kleine-König wrote:
+>> > On Sat, Aug 22, 2026 at 01:57:24PM -0300, Mauricio Faria de Oliveira wrote:
+>> >> On 2026-08-22 10:41, Uwe Kleine-König wrote:
+>> >> > On Wed, Aug 19, 2026 at 03:16:16PM -0300, Mauricio Faria de Oliveira wrote:
+>> >> >> The MODULE_SYSCTL_TABLE macro emits a struct module_sysctl_table variable
+>> >> >> with pointers to a sysctl table's path and entries, and table/entry sizes.
+>> >> >
+>> >> > That new struct doesn't seem to contain any pointer?
+>> >>
+>> >> The struct module_sysctl_table fields .path and .table are pointers,
+>> >> although with kernel_ulong_t type so that the same 32/64-bit size is
+>> >> used in file2alias.c based on KERNEL_ELFCLASS (and not on the host,
+>> >> which might differ with CROSS_COMPILE).
+>> >
+>> > Cross compilation isn't an issue for the already existing device id
+>> > structures; many of them also contain pointers.
+>> > (While modpost doesn't use the pointers, the size of the structures must
+>> > be known to correctly interpret the arrays.)
+>> 
+>> Indeed. I missed some device_id structures with pointers, and that
+>> devicetable-offsets.c is cross-compiled to generate
+>> devicetable-offsets.h for file2alias.c to use offsets and sizes of the
+>> target architecture.
+>> 
+>> I'll change .path and .table to pointers in the next version.
+> 
+> I *think* the existing device-id structs use char[] for strings that are
+> relevant for modpost. I look forward to you finding out if there is
+> still a justification for that :-D
 
-On 25/08/2026 at 01:59:38 +08, Kaiwen Shi <skwkevin@mail.ustc.edu.cn> wrote:
+AFAICT, an array is simpler to read in file2alias as it is stored
+directly in the symbol:
 
-> `local->assoc_dev` is accessed from three places with no common lock
-> and, on the read side, no NULL or lifetime guarantee:
->
->   - mac802154_perform_association() stores the coordinator pointer in
->     it, then blocks in wait_for_completion_killable_timeout() for up
->     to 10 s;
->
->   - its clear_assoc label sets it back to NULL;
->
->   - mac802154_process_association_resp(), which runs from the
->     rx_mac_cmd workqueue, dereferences
->     `local->assoc_dev->extended_addr` with neither lock nor NULL
->     check.
->
-> The dereference races with both write sites:
->
->   1. NULL dereference: clear_assoc() stores NULL while the RESP
->      handler is between loading and dereferencing the pointer; the
->      subsequent dereference of `->extended_addr` on a NULL pointer
->      faults.
->
->   2. use-after-free: mac802154_associate() frees the freshly
->      allocated `parent` in its free_parent path after
->      perform_association() returns an error. If the RESP handler
->      still holds the now-dangling pointer, it reads freed memory.
->
-> No existing lock serializes these accesses.  The
-> wpan_dev->association_lock mutex only guards the coordinator-side
-> parent/child list (mac802154_process_association_req() and
-> friends), which is a different data structure, and it is not held
-> while this device is associating.  The writer blocks in
-> wait_for_completion_killable_timeout() for up to 10 s after storing
-> assoc_dev, so the reader on the rx_mac_cmd workqueue races with both
-> the NULL store in clear_assoc and the kfree() of the leftover
-> ieee802154_pan_device in mac802154_associate()'s error path.
->
-> Add a dedicated assoc_dev_lock and hold it around all three
-> accesses; the RESP handler additionally validates the pointer before
-> dereferencing it.  This is a per-field lock so it cannot contend
-> with the completion logic.
->
-> Fixes: fefd19807fe9 ("mac802154: Handle associating")
+For example:
 
-This likely deserves a `Cc: stable*` tag.
+@ include/linux/device-id/of.h 
 
-[...]
+	struct of_device_id {
+	...
+		char compatible[128];
+	...
 
-> @@ -613,7 +615,9 @@ int mac802154_perform_association(struct ieee802154_s=
-ub_if_data *sdata,
->=20=20
->  clear_assoc:
->  	clear_bit(IEEE802154_IS_ASSOCIATING, &local->ongoing);
-> +	spin_lock_bh(&local->assoc_dev_lock);
->  	local->assoc_dev =3D NULL;
-> +	spin_unlock_bh(&local->assoc_dev_lock);
+@ drivers/net/ethernet/korina.c
 
-Is _bh really useful here? Isn't the dereferencing always happening in
-process context?
+	static const struct of_device_id korina_match[] = {
+		{
+		        .compatible = "idt,3243x-emac",
+	...
+	MODULE_DEVICE_TABLE(of, korina_match);
 
-> @@ -626,6 +630,7 @@ int mac802154_process_association_resp(struct ieee802=
-154_sub_if_data *sdata,
->  	u64 deaddr =3D swab64((__force u64)dest->extended_addr);
->  	struct ieee802154_local *local =3D sdata->local;
->  	struct wpan_dev *wpan_dev =3D &sdata->wpan_dev;
-> +	struct ieee802154_pan_device *assoc_dev;
+which builds
 
-The below block can be much simpler: just cache the extended addr of the
-assoc device for the time of the check.
+	$ objdump -t drivers/net/ethernet/korina.o | grep __mod_device_table
+	0000000000001020 l     O .rodata	0000000000000190
+__mod_device_table__kmod_korina__of__korina_match
 
->  	struct ieee802154_assoc_resp_pl resp_pl =3D {};
->=20=20
->  	if (skb->len !=3D sizeof(resp_pl))
-> @@ -635,9 +640,15 @@ int mac802154_process_association_resp(struct ieee80=
-2154_sub_if_data *sdata,
->  		     dest->mode !=3D IEEE802154_EXTENDED_ADDRESSING))
->  		return -EINVAL;
->=20=20
-> -	if (unlikely(dest->extended_addr !=3D wpan_dev->extended_addr ||
-> -		     src->extended_addr !=3D local->assoc_dev->extended_addr))
-> +	spin_lock_bh(&local->assoc_dev_lock);
-> +	assoc_dev =3D local->assoc_dev;
-> +	if (unlikely(!assoc_dev ||
-> +		     dest->extended_addr !=3D wpan_dev->extended_addr ||
-> +		     src->extended_addr !=3D assoc_dev->extended_addr)) {
-> +		spin_unlock_bh(&local->assoc_dev_lock);
->  		return -ENODEV;
-> +	}
-> +	spin_unlock_bh(&local->assoc_dev_lock);
+	$ objdump -s -j .rodata --start-address=0x1020
+--stop-address=$((0x1020+0x190)) drivers/net/ethernet/korina.o
+	...
+	 1020 00000000 00000000 00000000 00000000  ................
+	 1030 00000000 00000000 00000000 00000000  ................
+	 1040 00000000 00000000 00000000 00000000  ................
+	 1050 00000000 00000000 00000000 00000000  ................
+	 1060 6964742c 33323433 782d656d 61630000  idt,3243x-emac..
+	 1070 00000000 00000000 00000000 00000000  ................
+	...
 
-Actually, even simpler than using a lock, since the only information we
-use from assoc_dev is the extended address, why not just caching the
-extended address value directly in the local structure?
+@ scripts/mod/file2lias.c
 
-Thanks,
-Miqu=C3=A8l
+	#define DEF_FIELD_ADDR(m, devid, f) \
+		typeof(((struct devid *)0)->f) *f = ((m) + OFF_##devid##_##f)
+
+	static void do_of_entry(struct module *mod, void *symval)
+	{
+	...
+		DEF_FIELD_ADDR(symval, of_device_id, compatible);
+	...
+	
+void handle_moddevtable(struct module *mod, struct elf_info *info,
+                        Elf_Sym *sym, const char *symname)
+{
+        void *symval;
+...
+                symval = sym_get_data(info, sym);
+
+On the other hand, a pointer is stored indirectly through a relocation
+in the symbol, which is not as simple to read (i.e., 1. find the
+relocation section for the symbol's section; 2. find the relocation in
+that section by matching relocation offsets with an offset in the symbol
++ symbol address; 3. finally read the relocation's target).
+
+>> > I would be great if your series didn't introduce a new obstacle for
+>> > [CHERI].
+>> 
+>> Absolutely. I'll be happy to adjust the series and testing for that.
+>> 
+>> Could you please confirm one should just follow [1], which uses [2] to
+>> build the LLVM toolchain, and use it to build the kernel [3]?
+>> 
+>> [1] https://github.com/cheri-linux#building-and-running
+>> [2] https://github.com/cheri-linux/buildroot
+>> [3] https://github.com/CHERI-Alliance/linux/tree/codasip-cheri-riscv-7.1
+> 
+> I used
+> https://github.com/CHERI-Alliance/meta-cheri/tree/codasip-scarthgap and
+> didn't care about toolchain and rootfs. It also has qemu integrated, so
+> you can actually test it.
+
+I'll take a look; thanks!
+
+cheers,
+
+> 
+> Best regards
+> Uwe
+
+-- 
+Mauricio
