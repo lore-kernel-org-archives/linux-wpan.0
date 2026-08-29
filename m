@@ -1,78 +1,49 @@
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 646DE2BDC0F
-	for <linux-wpan@vger.kernel.org>; Sat, 29 Aug 2026 10:07:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+Received: from ustc.edu.cn (smtp.ustc.edu.cn [202.38.64.46])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FCC11D5146;
+	Sat, 29 Aug 2026 23:03:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.38.64.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787998064; cv=none; b=GAECBbeYJF+X6eEt4UodrbMnG4bPPfy7TndVjfiEobGYtYp1SI4pW6a0V4/8qAqfq/FUxq3Xzz7qPqFIPmKJJ8Y8DNysnve6ZNbIRrBXbedG37xPhTbIU2S+ffFTW+4zjIbJh0P18b1nUTYdo5KkvdXBZdUy4JLVO9wUZKyBntA=
+	t=1788044587; cv=none; b=cZFYSwF1N6drSb6zcs7bXbgaQ/P/K4X7HZ74edDpH18h/Ef7Bg0N4yG02Ddaja6RFgAifcHX2ShRFqwa9B/hExpKwXgPYjPQIKNjIJWW+4XVVSQcCK1eJCuL3bXRqh5tTUtk7yeMomeY7X2s0p96G2MH//fp/UXoOTrVEqVnAv4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787998064; c=relaxed/simple;
-	bh=yrjOVnQHXfTVLc31VqvBVnJU3G+wvHNrSuIpysv78LU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dxzCD8X6qC+9mRFgMBpxH5xE19xT+osX68+4pTjdxykMXH2TF9lCVhmKObNWF2s7QPqhaSiEzse4oJLuKl6TQAjeqxWgIj9c8Iogstglv/QfI9o7jLvToZS7AWZYj8/fFt4pz2ismpjAb5yI8/4WZmMGcMC970PJ9UY0gFpDhIw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=nebusec.ai; spf=pass smtp.mailfrom=nebusec.ai; dkim=pass (2048-bit key) header.d=nebusec.ai header.i=@nebusec.ai header.b=STl4LEvt; arc=none smtp.client-ip=209.85.214.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=nebusec.ai
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nebusec.ai
+	s=arc-20240116; t=1788044587; c=relaxed/simple;
+	bh=c39o0ERndxvmvuFitpw15CgstT8hPBsgQAkrVn8bMkA=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=k2DyTVS3j37n5IDNKVfxauaTxj7mWu52Y1Acp62c4FCN15SLOnHMDtHh6c4+oOP6QMO1XD+XSnP1HBG/6FKrIAg+Xh/yQoD0IJE8ee6NxDsYxQt/9wziefzGrfwJq/PAMbVLpcNVQbLNcUvT+KP6t33wQqRaZ0AmQruyOCD1v+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mail.ustc.edu.cn; spf=pass smtp.mailfrom=mail.ustc.edu.cn; dkim=pass (1024-bit key) header.d=mail.ustc.edu.cn header.i=@mail.ustc.edu.cn header.b=Zt5mBzm6; arc=none smtp.client-ip=202.38.64.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mail.ustc.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mail.ustc.edu.cn
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nebusec.ai header.i=@nebusec.ai header.b="STl4LEvt"
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2cf452def93so23815525ad.1
-        for <linux-wpan@vger.kernel.org>; Sat, 29 Aug 2026 03:07:43 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=mail.ustc.edu.cn header.i=@mail.ustc.edu.cn header.b="Zt5mBzm6"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=nebusec.ai; s=google; t=1787998063; x=1788602863; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=2LzNeMEvhTmcCovzQFSGod2aF56vz8lZ3At1nWkywdg=;
-        b=STl4LEvtA5QHjWVxE5TDZmddATPq1vTTFItrhm0KWBPtm7QpFrNq6tWMzVvzy0Pw6F
-         jxRfkIJbbyfMgLz8BFA3CFEDPL/GGVK2ji21Z/5EixZiuyzgVaItu69kARpCZzyhsnGg
-         Luyj617aDbL67bL4SaF/HZ2zf2aOHdlbBm9g2wZR8mos3WO3c22DoxuwRoz57PqhfKht
-         ZB+Obd7RlEvSvcYXJ7OrzH1NmrEneapfAY+9vfTKsoHIsfv4PGA1BZUqoMkS2ATFEKuw
-         l75EGM0PeMtZ4XXEUwpWFQOH5qNJ/92tFlsNkBdrjYliUgefUsYlg/IailxvT7V+YJvS
-         cXYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787998063; x=1788602863;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=2LzNeMEvhTmcCovzQFSGod2aF56vz8lZ3At1nWkywdg=;
-        b=V8A16Wt9Ci5rY1IpN2PjWBManeRalnBeIoNfnRDdKgsQ0PeJZJN0ZgFNuLNP44wjaG
-         B+vt3dpGQo1aDj9NvUmuzJtYIzED+hq8DmEGep4BK+CjiCWpM23Yxgp5ePsEZFcF4JTr
-         r/vs9nKzIKixvHZUu57OKfV2NOzLL9tapz64uB878gvBLVwmHnidATgs73zvneWnWskU
-         incWlFa4X2xgWhxt6UblXf9BC9AE8fkXacB1IEihosIv8VB/Y25Z7BxT0/6BfI5NRo14
-         OrlOO/izhHHmzXL5jrkK95mvyQVldq9sIm/Qv8N1fmEDOuspg95FLfuIxs+WZ+B0j2Pp
-         Svcw==
-X-Gm-Message-State: AFuF++nPJBMhzIvpW5pN+CZYlmT0p4/dvpQyVb34OlenNuNu5P2rJ0Uc
-	r1VZyun6QeHzNR09PY5Qu18xE4MiNQJ4ZbPlUoyq40qUlvm4OVYLxc0Omh1SDlscbrca1G2q+5N
-	8CjzSxfRb
-X-Gm-Gg: AR+sD12Kvjz+2nIZSfej0v62yMuXPULwv+5RbgLK/FtGE1hb8DpkJ/NRvGaIUqaAo94
-	e4B3XqKfFIl5tPK/iDLxzzszcY7JN7RJXebm78H3VPFAfrSd8iEzeSJlO58VhcxLHsx1jNw9HRL
-	x9EE8TRwdQgijFosAIFkbppTHpsuXmNc6hY8kq1p1LotpCrfunNkcz3Vwyx5/pEc5N7zq+YYrrM
-	h69YU1xYRNNVk7ea5ppP7UYISHPCO22SXRV/mlbVVJ2o5kwjZ1QzYPQExZZdhcdol4lNVyr9oD5
-	i8rvmaEC25W8Avd7vV0vWF3ujIat/llFi/qDBW64+ImZvQ6MgXXdw8gmx9WLEJUHTDY5LNUlK4a
-	RQv8yGKDrMSRK3neUemkXuT1WrrqVJLF6oWb0+3gHV/+07EUaR9Nf+v6cldOkddKOcC75Y/4Qdx
-	QMuSBQenlV8of1eO1lbW3yokESPzomGX6cOo0+AW/A7p3wXJqxn0scwseeGjLpqAjfwPIESXiOl
-	ywsEt0=
-X-Received: by 2002:a17:902:ccd0:b0:2bd:2c3a:2a36 with SMTP id d9443c01a7336-2d725acf14bmr252118615ad.0.1787998062665;
-        Sat, 29 Aug 2026 03:07:42 -0700 (PDT)
-Received: from Roxy.localdomain ([2602:feda:30:ae86:295:dff:fe84:68f4])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3286f784857sm14008514eec.3.2026.08.29.03.07.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 29 Aug 2026 03:07:42 -0700 (PDT)
-From: Zhiling Zou <zhilinz@nebusec.ai>
-To: linux-wpan@vger.kernel.org
-Cc: alex.aring@gmail.com,
-	stefan@datenfreihafen.org,
-	miquel.raynal@bootlin.com,
-	marcel@holtmann.org,
-	vega@nebusec.ai,
-	zhilinz@nebusec.ai
-Subject: [PATCH net 1/1] ieee802154: 6lowpan: fix NULL dereference in lowpan_newlink
-Date: Sat, 29 Aug 2026 18:07:23 +0800
-Message-ID: <0b715da69bd15a86ddc47dad5cf12da648211050.1787997209.git.zhilinz@nebusec.ai>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <cover.1787997209.git.zhilinz@nebusec.ai>
-References: <cover.1787997209.git.zhilinz@nebusec.ai>
+	d=mail.ustc.edu.cn; s=dkim; h=Received:From:To:Cc:Subject:Date:
+	Message-Id:In-Reply-To:References:MIME-Version:
+	Content-Transfer-Encoding; bh=c39o0ERndxvmvuFitpw15CgstT8hPBsgQA
+	krVn8bMkA=; b=Zt5mBzm60PJ08v/sG/MB5ifkSqUT9ciMzRUYSecZm9qpl4/EA6
+	Ngvjelu3HwhxjOHPaKsm1pRnYsl64rhPUET+7RYCDxekLzgxNcOTvNpwZskpUcvq
+	D5E2jUxVJ35EYh2skuD2+WZA1bkZVm2SUWtWyOUz/sExQi8cLiTBmKxBw=
+Received: from skw.ustc.edu.cn (unknown [211.86.152.107])
+	by mailimap2024 (Coremail) with SMTP id 3pYKCgCnpCsGZZNqHoG3AA--.2628S2;
+	Sun, 30 Aug 2026 07:02:43 +0800 (CST)
+From: Kaiwen Shi <skwkevin@mail.ustc.edu.cn>
+To: Xuanqiang Luo <xuanqiang.luo@linux.dev>
+Cc: Alexander Aring <alex.aring@gmail.com>,
+	Stefan Schmidt <stefan@datenfreihafen.org>,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	linux-wpan@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Kaiwen Shi <skwkevin@mail.ustc.edu.cn>
+Subject: Re: [PATCH net v3] mac802154: fix data race and NULL deref on local->assoc_dev
+Date: Sun, 30 Aug 2026 07:02:28 +0800
+Message-Id: <20260829230228.1786426-1-skwkevin@mail.ustc.edu.cn>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <7a6ba0f3-efc0-45f1-a372-ced250733b62@linux.dev>
+References: <20260827221339.885245-1-skwkevin@mail.ustc.edu.cn> <7a6ba0f3-efc0-45f1-a372-ced250733b62@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
@@ -80,35 +51,64 @@ List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:3pYKCgCnpCsGZZNqHoG3AA--.2628S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7ur43ZF4rKry7Xw43XryftFb_yoW8Cw18pr
+	Z0qrn8Kw4kKwnIyrs2yr4FyFy3Zr1Sk3y3Xr1YgrW5u3Z8ZF18ZrW0qw1qyFWjyrs5Aa4F
+	qF45WFZ7A3s8XaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUBj14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26r1j6r1xM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
+	6F4UM28EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gr
+	1j6F4UJwAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv
+	7VC0I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r
+	1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02
+	628vn2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCY02Avz4vE14v_uwCF04k20xvY0x0EwI
+	xGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480
+	Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7
+	IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k2
+	6cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxV
+	AFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUVwZcUUUUU=
+X-CM-SenderInfo: 5vnzyvxylqqzxdloh3xvwfhvlgxou0/
 
-TUNSETLINK allows a TUN device to change its link-layer type to
-ARPHRD_IEEE802154 without initializing ieee802154_ptr. lowpan_newlink()
-checks only the device type before dereferencing the pointer, so an
-RTM_NEWLINK request can trigger a NULL pointer dereference.
+Hi Xuanqiang,
 
-Reject devices without ieee802154_ptr along with devices of the wrong type.
+> I think this clear_bit() should be moved to
+> mac802154_process_association_resp(), after saving the first valid
+> response and before calling complete().
+>
+> Clearing it only after wait_for_completion() returns may still leave a
+> window, since the woken waiter may not acquire assoc_lock before the
+> next work item runs. Clearing it earlier in the response handler ensures
+> that subsequent responses fail the in-lock
+> IEEE802154_IS_ASSOCIATING check and cannot overwrite the saved result.
 
-Fixes: 51e0e5d8124e ("ieee802154: 6lowpan: remove multiple lowpan per wpan support")
-Cc: stable@vger.kernel.org
-Reported-by: Vega <vega@nebusec.ai>
-Signed-off-by: Zhiling Zou <zhilinz@nebusec.ai>
----
- net/ieee802154/6lowpan/core.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Good catch, you are right. complete() is issued while the handler still
+holds assoc_lock, so between the wake-up and the waiter taking that lock
+another response can get in, pass the recheck and replace
+assoc_status/assoc_addr before perform_association() has consumed them.
 
-diff --git a/net/ieee802154/6lowpan/core.c b/net/ieee802154/6lowpan/core.c
-index 018929563c6bc..6a8d6852cb930 100644
---- a/net/ieee802154/6lowpan/core.c
-+++ b/net/ieee802154/6lowpan/core.c
-@@ -150,7 +150,7 @@ static int lowpan_newlink(struct net_device *ldev,
- 	wdev = dev_get_by_index(dev_net(ldev), nla_get_u32(tb[IFLA_LINK]));
- 	if (!wdev)
- 		return -ENODEV;
--	if (wdev->type != ARPHRD_IEEE802154) {
-+	if (wdev->type != ARPHRD_IEEE802154 || !wdev->ieee802154_ptr) {
- 		dev_put(wdev);
- 		return -EINVAL;
- 	}
--- 
-2.43.0
+I reproduced it on a debug kernel: on v3 the bit is still set when the
+wait returns, later responses keep being accepted after that point, and
+the association ends up with an address from one of them instead of the
+first one. With the clear_bit() moved, none is accepted.
+
+So v4 does what you suggested: clear_bit() right after the result is
+stored and before complete(), both under assoc_lock. The timeout and error
+paths still clear it under the lock. The success and negative paths do not
+need to any more, because a wait that returns success now means the
+handler has already cleared the bit.
+
+One thing I got wrong earlier, while I am at it. In my v2 reply I said
+wpan_dev->association_lock is not held on either of the two paths
+involved. That was wrong. nl802154_associate() takes it around
+rdev_associate(), so it is held for the whole of
+mac802154_perform_association(), the wait for the response included. That
+rules out reusing it here: the handler would only get that mutex once the
+association has already timed out. The v4 commit message states this
+correctly.
+
+A v4 follows.
+
+Thanks,
+Kaiwen
 
