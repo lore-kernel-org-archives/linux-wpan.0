@@ -1,313 +1,135 @@
-Received: from ustc.edu.cn (smtp.ustc.edu.cn [202.38.64.46])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 711D441CB20;
-	Sat, 29 Aug 2026 23:06:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.38.64.46
+Received: from mta1.migadu.com (out-86.mta1.migadu.com [95.215.58.86])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D633025333F
+	for <linux-wpan@vger.kernel.org>; Sun, 30 Aug 2026 06:54:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.86
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788044782; cv=none; b=NLpz3r4TN3qiX/jr2Zycn9LSi6q9tjaOWYQNkNme5Y9E1SwFQT9jtLRas3nH05esiaKkZYXm6HllARx93gQ6MP/78fwHJL/AnT7BXA+gXhe3eHfPI95TlU2BIL0qy0EZ13s2wEbVH+pRzXFUB9vx/HNc2DQRipKwLQsIIie7zVU=
+	t=1788072863; cv=none; b=kPD8kNK1sorFnYUzj6UCiTrXSytVmYcPl8LGBUVJmmWJMASbrrwj0VN5T5ffCwW3w4V58sSeDY7xFru0AnuLVdeGxcAEfTM7dhgEb1zsqut/GDmsoUdZdDVCYlCMM1XUmeHScNJdS4XJP0sHFI6X/Tu9AA/GGa1rSXVjEuMgqGc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788044782; c=relaxed/simple;
-	bh=coxFC9Jvzwa+3cEeUXWg9Kzs/9GFfoG/2TmGIVDzqwo=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=cw6hDlwp4x5hf7IHOrVD72TTrmxpJht+o1TQAIp+Mjw/BrW8ersyKeMuJlAY6UfjYAykpjNwVeopvzT855Jc+C6NJ93RykzVhDU9Szh17H/HZZaQG65eYEnFlPdwZUC0FPZbhrdNQ6EwX1+qq4Kwmu384oiBVhPY4nv1mC1a2+E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mail.ustc.edu.cn; spf=pass smtp.mailfrom=mail.ustc.edu.cn; dkim=pass (1024-bit key) header.d=mail.ustc.edu.cn header.i=@mail.ustc.edu.cn header.b=AqW8GiOV; arc=none smtp.client-ip=202.38.64.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mail.ustc.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mail.ustc.edu.cn
+	s=arc-20240116; t=1788072863; c=relaxed/simple;
+	bh=CLM1qrAWCRhxzoMBMGkElu+OPpLsLYySo03hiJpSqRM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KsfzWrpfBHc0V73jPKh1a1BAKh05AMMgDDfr+DRzerXpwxN6aj9aKz8EgBD2jFvDByaX880UuZQweoepnbLrAIwisuOha2iBVLJAVmA9ONBjzqAMUF+mj4QjuJajRgDcqROdsaRvjoWWgzyL29EaamqtYSpS6MPJgexeClFtMB8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ikAoBihI; arc=none smtp.client-ip=95.215.58.86
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mail.ustc.edu.cn header.i=@mail.ustc.edu.cn header.b="AqW8GiOV"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=mail.ustc.edu.cn; s=dkim; h=Received:From:To:Cc:Subject:Date:
-	Message-Id:MIME-Version:Content-Transfer-Encoding; bh=xjP/UFJyS+
-	A7gQjIZNcHYCqPTF5l/4vl+KkN4WXx3x0=; b=AqW8GiOVwlMBTOoxASm4fx0KtZ
-	nBRjLsb7kSOzBBAPJDvuu1Crp+CdD/vdaNhgvy1Z+JCBNM6LJ4IU8UBomNtObyP/
-	5OwZSEYFnIgWlplZuuNzfEdQJsVwslNB8iMzO13Xyc6gSIvo/TDR/3uqBPm9Pfx9
-	fpwklxxaw9Vk/kItk=
-Received: from skw.ustc.edu.cn (unknown [211.86.152.107])
-	by mailimap2024 (Coremail) with SMTP id 3pYKCgD3+C_RZZNq3oO3AA--.2566S2;
-	Sun, 30 Aug 2026 07:06:05 +0800 (CST)
-From: Kaiwen Shi <skwkevin@mail.ustc.edu.cn>
-To: Alexander Aring <alex.aring@gmail.com>,
-	Stefan Schmidt <stefan@datenfreihafen.org>,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	linux-wpan@vger.kernel.org
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Kaiwen Shi <skwkevin@mail.ustc.edu.cn>,
-	Xuanqiang Luo <xuanqiang.luo@linux.dev>,
-	stable@vger.kernel.org
-Subject: [PATCH net v4] mac802154: fix data race and NULL deref on local->assoc_dev
-Date: Sun, 30 Aug 2026 07:05:51 +0800
-Message-Id: <20260829230551.1787432-1-skwkevin@mail.ustc.edu.cn>
-X-Mailer: git-send-email 2.34.1
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ikAoBihI"
+X-Envelope-To: linux-wpan@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=CLM1qrAWCRhxzoMBMGkElu+OPpLsLYySo03hiJpSqRM=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1788072857; v=1; x=1788677657;
+ b=ikAoBihI7pkW1+N7aDfekmTZ2TyKMr/byOK0P7j59TMkxnnaSgkgeNiDYb3IVT2eMr1Kc7ip
+ OlQm9gLx83OxYij2k8Lzz1TYBgaB8yUT7m+Xyck/wl4IeKYBQgAKH7nZCNPk/vDLUbOhbf5wpdv
+ k9CF+oPAICjHHkXina+vLqFI=
+X-Envelope-To: linux-wpan@vger.kernel.org
+Received: by smtp.migadu.com with ESMTPS id c1706cd15f3f71d4;
+	Sun, 30 Aug 2026 06:54:07 +0000
+X-Mizu-Trace-ID: c1706cd15f3f71d4
+X-Migadu-Flow: FLOW_OUT
+Message-ID: <3ce53771-fceb-425e-b8e6-2ad0f886643a@linux.dev>
+Date: Sun, 30 Aug 2026 14:53:59 +0800
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v4] mac802154: fix data race and NULL deref on
+ local->assoc_dev
+To: Kaiwen Shi <skwkevin@mail.ustc.edu.cn>
+Cc: "David S . Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ stable@vger.kernel.org, Alexander Aring <alex.aring@gmail.com>,
+ Stefan Schmidt <stefan@datenfreihafen.org>,
+ Miquel Raynal <miquel.raynal@bootlin.com>, linux-wpan@vger.kernel.org
+References: <20260829230551.1787432-1-skwkevin@mail.ustc.edu.cn>
+From: luoxuanqiang <xuanqiang.luo@linux.dev>
+In-Reply-To: <20260829230551.1787432-1-skwkevin@mail.ustc.edu.cn>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:3pYKCgD3+C_RZZNq3oO3AA--.2566S2
-X-Coremail-Antispam: 1UD129KBjvJXoWfGrWrJr4rWr17Gr13JF1UWrg_yoWDWr43pF
-	Wj9ws8KF1DXFnavws7Jw1rtry3Zr48u3y7Gw17XFZ0v3Z8WF1rZr4aqrnFvF1Utr4kZayr
-	ZFWDJay5AF4qk37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBj14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26r1j6r1xM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
-	6F4UM28EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gr
-	1j6F4UJwAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv
-	7VC0I7IYx2IY67AKxVWUXVWUAwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r
-	1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02
-	628vn2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCY02Avz4vE14v_uwCF04k20xvY0x0EwI
-	xGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480
-	Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7
-	IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k2
-	6cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxV
-	AFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JU7xhLUUUUU=
-X-CM-SenderInfo: 5vnzyvxylqqzxdloh3xvwfhvlgxou0/
 
-local->assoc_dev is shared between the association path and the
-association-response worker without common synchronization.
 
-mac802154_perform_association() stores the coordinator pointer and waits
-for a response. Its timeout and error paths clear the pointer and return
-to mac802154_associate(), which may then free the coordinator object.
-Meanwhile, mac802154_rx_mac_cmd_worker() may observe the associating bit
-and enter mac802154_process_association_resp(), which dereferences
-assoc_dev.
+在 2026/8/30 07:05, Kaiwen Shi 写道:
+> local->assoc_dev is shared between the association path and the
+> association-response worker without common synchronization.
+>
+> mac802154_perform_association() stores the coordinator pointer and waits
+> for a response. Its timeout and error paths clear the pointer and return
+> to mac802154_associate(), which may then free the coordinator object.
+> Meanwhile, mac802154_rx_mac_cmd_worker() may observe the associating bit
+> and enter mac802154_process_association_resp(), which dereferences
+> assoc_dev.
+>
+> The worker's bit test and the handler's pointer dereference are not
+> atomic with respect to cleanup. Cleanup can clear assoc_dev between them,
+> causing a NULL dereference, or free the coordinator while the response
+> handler still uses the pointer.
+>
+> The recorded result is exposed to the same window. assoc_status and
+> assoc_addr are written by the handler but read by the association path
+> while the associating bit is still set, so a second response for the same
+> request - a malicious one, for instance - can replace them between those
+> reads and leave the caller with an incoherent status and address pair.
+>
+> The response handler only needs the coordinator extended address.
+> Replace assoc_dev with a cached address, removing the pointer lifetime
+> dependency. Protect the cached address and the associating bit with a
+> dedicated spinlock. A READ_ONCE()/WRITE_ONCE() pair would not guarantee
+> an atomic __le64 access on all 32-bit architectures.
+>
+> wpan_dev->association_lock cannot be reused here: nl802154_associate()
+> holds it across rdev_associate(), hence for the whole of
+> mac802154_perform_association() including the wait for the response.
+> A response handler taking that lock would only get it once the
+> association has already given up.
+>
+> Reset the completion, publish the cached address, and set the associating
+> bit while holding the lock. The response handler takes the lock, rechecks
+> the bit and the cached address, records the response, clears the bit, and
+> only then completes the waiter. Thus cleanup cannot pass the handler
+> between its state check and completion, and the cached 64-bit value
+> cannot tear.
+>
+> The handler clears the bit before completing, not the woken waiter:
+> otherwise complete() is issued under the lock and a second (e.g.
+> malicious) response can reacquire it before the waiter and replace the
+> result. So a wait that returns success implies the bit is already clear,
+> and the success and negative-response paths return directly. The
+> transmit-error and timeout paths still clear it under assoc_lock, which
+> serializes any racing response against the cleanup while the call returns
+> the error it already selected. Both paths snapshot assoc_status and
+> assoc_addr under the same lock.
+>
+> Both users run in process context, so a plain spinlock is sufficient.
+> The lock is not held while waiting for the completion.
+>
+> Suggested-by: Miquel Raynal <miquel.raynal@bootlin.com>
+> Suggested-by: Xuanqiang Luo <xuanqiang.luo@linux.dev>
 
-The worker's bit test and the handler's pointer dereference are not
-atomic with respect to cleanup. Cleanup can clear assoc_dev between them,
-causing a NULL dereference, or free the coordinator while the response
-handler still uses the pointer.
+Thanks for the update.
 
-The recorded result is exposed to the same window. assoc_status and
-assoc_addr are written by the handler but read by the association path
-while the associating bit is still set, so a second response for the same
-request - a malicious one, for instance - can replace them between those
-reads and leave the caller with an incoherent status and address pair.
+I don't think my review warrants a Suggested-by tag here. I only pointed
+out a small issue, which did not alter your original approach.
 
-The response handler only needs the coordinator extended address.
-Replace assoc_dev with a cached address, removing the pointer lifetime
-dependency. Protect the cached address and the associating bit with a
-dedicated spinlock. A READ_ONCE()/WRITE_ONCE() pair would not guarantee
-an atomic __le64 access on all 32-bit architectures.
+Other than that, the current version looks good to me. Please drop my
+Suggested-by tag and feel free to add:
 
-wpan_dev->association_lock cannot be reused here: nl802154_associate()
-holds it across rdev_associate(), hence for the whole of
-mac802154_perform_association() including the wait for the response.
-A response handler taking that lock would only get it once the
-association has already given up.
+Reviewed-by: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
 
-Reset the completion, publish the cached address, and set the associating
-bit while holding the lock. The response handler takes the lock, rechecks
-the bit and the cached address, records the response, clears the bit, and
-only then completes the waiter. Thus cleanup cannot pass the handler
-between its state check and completion, and the cached 64-bit value
-cannot tear.
+Here are some related discussions about when a Suggested-by tag is
+appropriate, for reference:
+https://docs.kernel.org/process/submitting-patches.html#using-reported-by-tested-by-reviewed-by-suggested-by-and-fixes
+https://lore.kernel.org/netdev/20260803190044.274355ea@kernel.org/
+https://lore.kernel.org/netdev/CANn89i+O5b0xfcP5GLtUopqHz2ppewK9zSr4995jsjCPM+3AFQ@mail.gmail.com/
+https://lore.kernel.org/netdev/CAAVpQUDaYX5ZQN+EYL3q4yeu0Ni2cqNODEY--Wb-2+yY650Mbw@mail.gmail.com/
+https://lore.kernel.org/netdev/20251010065515.GA3115768@horms.kernel.org/
 
-The handler clears the bit before completing, not the woken waiter:
-otherwise complete() is issued under the lock and a second (e.g.
-malicious) response can reacquire it before the waiter and replace the
-result. So a wait that returns success implies the bit is already clear,
-and the success and negative-response paths return directly. The
-transmit-error and timeout paths still clear it under assoc_lock, which
-serializes any racing response against the cleanup while the call returns
-the error it already selected. Both paths snapshot assoc_status and
-assoc_addr under the same lock.
-
-Both users run in process context, so a plain spinlock is sufficient.
-The lock is not held while waiting for the completion.
-
-Suggested-by: Miquel Raynal <miquel.raynal@bootlin.com>
-Suggested-by: Xuanqiang Luo <xuanqiang.luo@linux.dev>
-Fixes: fefd19807fe9 ("mac802154: Handle associating")
-Cc: stable@vger.kernel.org
-Signed-off-by: Kaiwen Shi <skwkevin@mail.ustc.edu.cn>
----
-
-v4:
- - move clear_bit(IEEE802154_IS_ASSOCIATING) out of
-   mac802154_perform_association() and into
-   mac802154_process_association_resp(), after the first valid response
-   is saved and before complete(). Clearing it only once the waiter is
-   woken still leaves a window: complete() is issued under assoc_lock,
-   and before the waiter reacquires that lock another response can pass
-   the in-lock recheck and replace the result (Xuanqiang);
- - say in the commit message why wpan_dev->association_lock cannot be
-   reused for this;
- - complete the assoc_lock comment.
-
-v3:
- - clear IEEE802154_IS_ASSOCIATING and snapshot assoc_status/assoc_addr
-   under assoc_lock right after wait_for_completion returns, so a second
-   (e.g. malicious) response can no longer pass the recheck and overwrite
-   them while perform_association() consumes the result (Miquel).
-
-v2:
- - replace assoc_dev with the cached coordinator extended address, as
-   suggested by Miquel;
- - use a plain spinlock instead of spin_lock_bh(), since both users run
-   in process context;
- - protect the cached address and the association-state transitions
-   with the same lock;
- - recheck the association state in the response handler and signal the
-   completion before releasing the lock;
- - add Cc: stable@vger.kernel.org.
-
-Link to v3:
-https://lore.kernel.org/r/20260827221339.885245-1-skwkevin@mail.ustc.edu.cn
-
-Link to v2:
-https://lore.kernel.org/r/20260826225959.682483-1-skwkevin@mail.ustc.edu.cn
-
-Link to v1:
-https://lore.kernel.org/r/20260824175938.11143-1-skwkevin@mail.ustc.edu.cn
- net/mac802154/ieee802154_i.h |  7 ++++-
- net/mac802154/main.c         |  1 +
- net/mac802154/scan.c         | 51 +++++++++++++++++++++++++++---------
- 3 files changed, 45 insertions(+), 14 deletions(-)
-
-diff --git a/net/mac802154/ieee802154_i.h b/net/mac802154/ieee802154_i.h
-index 8f2bff268392..c53aa293a222 100644
---- a/net/mac802154/ieee802154_i.h
-+++ b/net/mac802154/ieee802154_i.h
-@@ -76,7 +76,12 @@ struct ieee802154_local {
- 	struct work_struct rx_mac_cmd_work;
- 
- 	/* Association */
--	struct ieee802154_pan_device *assoc_dev;
-+	/* assoc_lock protects assoc_dev_extended_addr, assoc_addr,
-+	 * assoc_status, the assoc_done reinit/complete pairing and the
-+	 * IEEE802154_IS_ASSOCIATING bit in @ongoing.
-+	 */
-+	spinlock_t assoc_lock;
-+	__le64 assoc_dev_extended_addr;
- 	struct completion assoc_done;
- 	__le16 assoc_addr;
- 	u8 assoc_status;
-diff --git a/net/mac802154/main.c b/net/mac802154/main.c
-index ea1efef3572a..63e89bd586e3 100644
---- a/net/mac802154/main.c
-+++ b/net/mac802154/main.c
-@@ -104,6 +104,7 @@ ieee802154_alloc_hw(size_t priv_data_len, const struct ieee802154_ops *ops)
- 	INIT_WORK(&local->rx_mac_cmd_work, mac802154_rx_mac_cmd_worker);
- 
- 	init_completion(&local->assoc_done);
-+	spin_lock_init(&local->assoc_lock);
- 
- 	/* init supported flags with 802.15.4 default ranges */
- 	phy->supported.max_minbe = 8;
-diff --git a/net/mac802154/scan.c b/net/mac802154/scan.c
-index 005338f89b75..dd156c01ac49 100644
---- a/net/mac802154/scan.c
-+++ b/net/mac802154/scan.c
-@@ -536,7 +536,9 @@ int mac802154_perform_association(struct ieee802154_sub_if_data *sdata,
- 	struct ieee802154_association_req_frame frame = {};
- 	struct ieee802154_local *local = sdata->local;
- 	struct wpan_dev *wpan_dev = &sdata->wpan_dev;
-+	__le16 resp_short_addr;
- 	struct sk_buff *skb;
-+	u8 resp_status;
- 	int ret;
- 
- 	frame.mhr.fc.type = IEEE802154_FC_TYPE_MAC_CMD;
-@@ -578,9 +580,11 @@ int mac802154_perform_association(struct ieee802154_sub_if_data *sdata,
- 		return ret;
- 	}
- 
--	local->assoc_dev = coord;
-+	spin_lock(&local->assoc_lock);
- 	reinit_completion(&local->assoc_done);
-+	local->assoc_dev_extended_addr = coord->extended_addr;
- 	set_bit(IEEE802154_IS_ASSOCIATING, &local->ongoing);
-+	spin_unlock(&local->assoc_lock);
- 
- 	ret = ieee802154_mlme_tx_one_locked(local, sdata, skb);
- 	if (ret) {
-@@ -599,25 +603,37 @@ int mac802154_perform_association(struct ieee802154_sub_if_data *sdata,
- 		goto clear_assoc;
- 	}
- 
--	if (local->assoc_status != IEEE802154_ASSOCIATION_SUCCESSFUL) {
--		if (local->assoc_status == IEEE802154_PAN_AT_CAPACITY)
-+	/* The association is complete: mac802154_process_association_resp()
-+	 * cleared the associating bit before waking us, so a second (e.g.
-+	 * malicious) ASSOC RESP can no longer pass the recheck and overwrite
-+	 * the result.  Snapshot assoc_status/assoc_addr under the lock.
-+	 */
-+	spin_lock(&local->assoc_lock);
-+	resp_status = local->assoc_status;
-+	resp_short_addr = local->assoc_addr;
-+	spin_unlock(&local->assoc_lock);
-+
-+	if (resp_status != IEEE802154_ASSOCIATION_SUCCESSFUL) {
-+		if (resp_status == IEEE802154_PAN_AT_CAPACITY)
- 			ret = -ERANGE;
- 		else
- 			ret = -EPERM;
- 
- 		dev_warn(&sdata->dev->dev,
- 			 "Negative ASSOC RESP received from %8phC: %s\n", &ceaddr,
--			 local->assoc_status == IEEE802154_PAN_AT_CAPACITY ?
-+			 resp_status == IEEE802154_PAN_AT_CAPACITY ?
- 			 "PAN at capacity" : "access denied");
--		goto clear_assoc;
-+		return ret;
- 	}
- 
--	ret = 0;
--	*short_addr = local->assoc_addr;
-+	*short_addr = resp_short_addr;
-+
-+	return 0;
- 
- clear_assoc:
-+	spin_lock(&local->assoc_lock);
- 	clear_bit(IEEE802154_IS_ASSOCIATING, &local->ongoing);
--	local->assoc_dev = NULL;
-+	spin_unlock(&local->assoc_lock);
- 
- 	return ret;
- }
-@@ -639,19 +655,28 @@ int mac802154_process_association_resp(struct ieee802154_sub_if_data *sdata,
- 		     dest->mode != IEEE802154_EXTENDED_ADDRESSING))
- 		return -EINVAL;
- 
--	if (unlikely(dest->extended_addr != wpan_dev->extended_addr ||
--		     src->extended_addr != local->assoc_dev->extended_addr))
-+	spin_lock(&local->assoc_lock);
-+	if (unlikely(!test_bit(IEEE802154_IS_ASSOCIATING, &local->ongoing) ||
-+		     dest->extended_addr != wpan_dev->extended_addr ||
-+		     src->extended_addr != local->assoc_dev_extended_addr)) {
-+		spin_unlock(&local->assoc_lock);
- 		return -ENODEV;
-+	}
- 
- 	memcpy(&resp_pl, skb->data, sizeof(resp_pl));
- 	local->assoc_addr = resp_pl.short_addr;
- 	local->assoc_status = resp_pl.status;
-+	/* Clear the associating bit before waking the waiter: once the result
-+	 * is saved, any subsequent (e.g. malicious) ASSOC RESP must fail the
-+	 * test_bit() recheck above and can no longer overwrite the result.
-+	 */
-+	clear_bit(IEEE802154_IS_ASSOCIATING, &local->ongoing);
-+	complete(&local->assoc_done);
-+	spin_unlock(&local->assoc_lock);
- 
- 	dev_dbg(&skb->dev->dev,
- 		"ASSOC RESP 0x%x received from %8phC, getting short address %04x\n",
--		local->assoc_status, &deaddr, local->assoc_addr);
--
--	complete(&local->assoc_done);
-+		resp_pl.status, &deaddr, resp_pl.short_addr);
- 
- 	return 0;
- }
-base-commit: 8d3ae59288f1e7d58d76558a6ee96d533bc5019f
-
--- 
-2.34.1
+Thanks,
+Xuanqiang
 
