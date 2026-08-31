@@ -1,61 +1,67 @@
-Received: from mta1.migadu.com (out-86.mta1.migadu.com [95.215.58.86])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D633025333F
-	for <linux-wpan@vger.kernel.org>; Sun, 30 Aug 2026 06:54:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.86
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0165030EF63;
+	Mon, 31 Aug 2026 07:45:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788072863; cv=none; b=kPD8kNK1sorFnYUzj6UCiTrXSytVmYcPl8LGBUVJmmWJMASbrrwj0VN5T5ffCwW3w4V58sSeDY7xFru0AnuLVdeGxcAEfTM7dhgEb1zsqut/GDmsoUdZdDVCYlCMM1XUmeHScNJdS4XJP0sHFI6X/Tu9AA/GGa1rSXVjEuMgqGc=
+	t=1788162336; cv=none; b=N76w5oMnam+cYl72L4owa6RZlIPo7TDhx1m+vF4HMUTAuMqaId9OwqIc47oD1Hl+IC/q+2OqvyKotVzUdxtN6L0xY0gKcGZ011hUGRVTcCvG1hJimUTG0jIP1AM9h03urJLkoVos+R6VyQQWVKyCkZDr7c7cn+RNnlwjXaV9XAY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788072863; c=relaxed/simple;
-	bh=CLM1qrAWCRhxzoMBMGkElu+OPpLsLYySo03hiJpSqRM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KsfzWrpfBHc0V73jPKh1a1BAKh05AMMgDDfr+DRzerXpwxN6aj9aKz8EgBD2jFvDByaX880UuZQweoepnbLrAIwisuOha2iBVLJAVmA9ONBjzqAMUF+mj4QjuJajRgDcqROdsaRvjoWWgzyL29EaamqtYSpS6MPJgexeClFtMB8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ikAoBihI; arc=none smtp.client-ip=95.215.58.86
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1788162336; c=relaxed/simple;
+	bh=0C1DpZSex7yIopHmCohYVtHcaaxa74ajHIR5lkcvaIQ=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=qx3G+pfgPJH4r/RedoY9dXHFNtnOb6RTRV8qikHs7qXxi7C6R6dCwka2NE0wBXQePhvaJwWrp9WNEouHpfeWDZi6SnK0yPrcAqHxZpoioZ6kW6TnZBJZQ9+1eMkqsVPMQnNE6jHIy58G9a5cWB8CEq143ihqPW0vXFcuanKpVw0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=wLaMV6nv; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ikAoBihI"
-X-Envelope-To: linux-wpan@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=CLM1qrAWCRhxzoMBMGkElu+OPpLsLYySo03hiJpSqRM=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1788072857; v=1; x=1788677657;
- b=ikAoBihI7pkW1+N7aDfekmTZ2TyKMr/byOK0P7j59TMkxnnaSgkgeNiDYb3IVT2eMr1Kc7ip
- OlQm9gLx83OxYij2k8Lzz1TYBgaB8yUT7m+Xyck/wl4IeKYBQgAKH7nZCNPk/vDLUbOhbf5wpdv
- k9CF+oPAICjHHkXina+vLqFI=
-X-Envelope-To: linux-wpan@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id c1706cd15f3f71d4;
-	Sun, 30 Aug 2026 06:54:07 +0000
-X-Mizu-Trace-ID: c1706cd15f3f71d4
-X-Migadu-Flow: FLOW_OUT
-Message-ID: <3ce53771-fceb-425e-b8e6-2ad0f886643a@linux.dev>
-Date: Sun, 30 Aug 2026 14:53:59 +0800
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="wLaMV6nv"
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 53BB41A18E7;
+	Mon, 31 Aug 2026 07:45:32 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 1DF0F601E1;
+	Mon, 31 Aug 2026 07:45:32 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id B4F9611C783B9;
+	Mon, 31 Aug 2026 09:45:20 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1788162327; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=0C1DpZSex7yIopHmCohYVtHcaaxa74ajHIR5lkcvaIQ=;
+	b=wLaMV6nvma89mGbAdovz6/agGE8q97+IlGEHAUuChQvNIN6cJE7Mqf7wSVSmK/v/jed3K7
+	FwEdYsOB9PsOusIAfGfHUMG0Jr7UK8bcqoRHHDnBxYEb6os7ZjxI+mktIfGaLoLQHyY4oK
+	cUqBRNiVCWQBx7uRMxD8U/z/ckM+AAa0v/aQRlm0laqFYQzWeIJZIo5T/wQOu0CcFVqO8L
+	Fqlz8LpIpQRs+weMyMI6Qvk9y4r3rKZLEqMGjWNUYTOSHNbDgnbJIj85RUivKpBY7mtf8j
+	ZCu/ufza7jEF60YSKSqwvhHzw5cYt1TQBid7EvzQuRP5bFp8xoKWrnpB295PNg==
+From: Miquel Raynal <miquel.raynal@bootlin.com>
+To: Kaiwen Shi <skwkevin@mail.ustc.edu.cn>
+Cc: Alexander Aring <alex.aring@gmail.com>,  Stefan Schmidt
+ <stefan@datenfreihafen.org>,  linux-wpan@vger.kernel.org,  "David S .
+ Miller" <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Jakub
+ Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,  Simon
+ Horman <horms@kernel.org>,  netdev@vger.kernel.org,
+  linux-kernel@vger.kernel.org,  Xuanqiang Luo <xuanqiang.luo@linux.dev>,
+  stable@vger.kernel.org
+Subject: Re: [PATCH net v4] mac802154: fix data race and NULL deref on
+ local->assoc_dev
+In-Reply-To: <20260829230551.1787432-1-skwkevin@mail.ustc.edu.cn> (Kaiwen
+	Shi's message of "Sun, 30 Aug 2026 07:05:51 +0800")
+References: <20260829230551.1787432-1-skwkevin@mail.ustc.edu.cn>
+User-Agent: mu4e 1.12.12; emacs 30.2
+Date: Mon, 31 Aug 2026 09:45:19 +0200
+Message-ID: <877bl6d980.fsf@bootlin.com>
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v4] mac802154: fix data race and NULL deref on
- local->assoc_dev
-To: Kaiwen Shi <skwkevin@mail.ustc.edu.cn>
-Cc: "David S . Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- stable@vger.kernel.org, Alexander Aring <alex.aring@gmail.com>,
- Stefan Schmidt <stefan@datenfreihafen.org>,
- Miquel Raynal <miquel.raynal@bootlin.com>, linux-wpan@vger.kernel.org
-References: <20260829230551.1787432-1-skwkevin@mail.ustc.edu.cn>
-From: luoxuanqiang <xuanqiang.luo@linux.dev>
-In-Reply-To: <20260829230551.1787432-1-skwkevin@mail.ustc.edu.cn>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Last-TLS-Session-Version: TLSv1.3
 
+On 30/08/2026 at 07:05:51 +08, Kaiwen Shi <skwkevin@mail.ustc.edu.cn> wrote:
 
-在 2026/8/30 07:05, Kaiwen Shi 写道:
 > local->assoc_dev is shared between the association path and the
 > association-response worker without common synchronization.
 >
@@ -111,25 +117,12 @@ Content-Transfer-Encoding: 8bit
 >
 > Suggested-by: Miquel Raynal <miquel.raynal@bootlin.com>
 > Suggested-by: Xuanqiang Luo <xuanqiang.luo@linux.dev>
+> Fixes: fefd19807fe9 ("mac802154: Handle associating")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Kaiwen Shi <skwkevin@mail.ustc.edu.cn>
+> ---
 
-Thanks for the update.
-
-I don't think my review warrants a Suggested-by tag here. I only pointed
-out a small issue, which did not alter your original approach.
-
-Other than that, the current version looks good to me. Please drop my
-Suggested-by tag and feel free to add:
-
-Reviewed-by: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
-
-Here are some related discussions about when a Suggested-by tag is
-appropriate, for reference:
-https://docs.kernel.org/process/submitting-patches.html#using-reported-by-tested-by-reviewed-by-suggested-by-and-fixes
-https://lore.kernel.org/netdev/20260803190044.274355ea@kernel.org/
-https://lore.kernel.org/netdev/CANn89i+O5b0xfcP5GLtUopqHz2ppewK9zSr4995jsjCPM+3AFQ@mail.gmail.com/
-https://lore.kernel.org/netdev/CAAVpQUDaYX5ZQN+EYL3q4yeu0Ni2cqNODEY--Wb-2+yY650Mbw@mail.gmail.com/
-https://lore.kernel.org/netdev/20251010065515.GA3115768@horms.kernel.org/
+Reviewed-by: Miquel Raynal <miquel.raynal@bootlin.com>
 
 Thanks,
-Xuanqiang
-
+Miqu=C3=A8l
