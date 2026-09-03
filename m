@@ -1,16 +1,15 @@
 Received: from proxima.lasnet.de (proxima.lasnet.de [78.47.171.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E5BD468C15;
-	Thu,  3 Sep 2026 09:08:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64CBE3D171B;
+	Thu,  3 Sep 2026 09:30:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.47.171.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788426536; cv=none; b=QBpARkY1dReXUv3gBVldnq2s5/agyxsyzRszDUneNs99Ax8H7TESczOdrnDhvFHw+rtoFl7SA8qhmr2sFXii0cP/DQYKSYGwqayO6Th8W1iR8e/t6762/FDB2uIlmq5LM9TfWGQbt0XOAHci+2tHxxHa275myZdXxre5YX3kQvo=
+	t=1788427821; cv=none; b=T+qKDF6bqIJ48PweWXRyUBUblC6x3tT5Fm2cejHUWQ2sjM1Rnt/BH/TOGOEBKgbrBWDaqVgaPE5E4T8suPb/3DyyQcmaPm/BxprGhdmn/cxeYAAb6xFLrycuBUO8oQwhA8hHjRVRf0GqNxPt7vvzB/7SRXtrQa/tcaUfmdoFpdU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788426536; c=relaxed/simple;
-	bh=MPX+WMtGjQc8B1VAZ+9iCbrZvCrmn1A91GaeT9JpBCs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Z6Z4dR42lkLUw7ILXaFGKsiw4XUsbBTZUw9occzgcmcAkc6nWgfjwnbmpEitdATb8QMVONOzEiZS2H87yJVNX/cl8rfpk5T6qkPgcieYzIkyR2BQOpFO68FdjIO21DPye1Aw+85b1JcVpLVhYy2cy8rQNzruLU7iJt+PoBl6PRg=
+	s=arc-20240116; t=1788427821; c=relaxed/simple;
+	bh=0J8GCLUm9ubOSjEaX1FKyqqJ3y70Otfc20i3wAD4Kpc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cfQQMPCNu1Z0tpxycaQnUcDTp5qymAGhJhibvC+rCPgXZLHdDTDANNd3t9Unf6uKeVmbO0QeyV03zIjZB10XkA9cjlB7Zl2weLwWYzBno19+8jhOf0JgBheVUp8wArtVOaW3ITNQGuCg6c7BgKLAaegiE199KcLdMvXZj18ByqQ=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=datenfreihafen.org; spf=pass smtp.mailfrom=datenfreihafen.org; arc=none smtp.client-ip=78.47.171.185
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=datenfreihafen.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=datenfreihafen.org
@@ -19,56 +18,82 @@ Received: from work.datenfreihafen.local (unknown [46.253.254.187])
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: stefan@sostec.de)
-	by proxima.lasnet.de (Postfix) with ESMTPSA id 2E747C0CF2;
-	Thu,  3 Sep 2026 11:08:50 +0200 (CEST)
+	by proxima.lasnet.de (Postfix) with ESMTPSA id D16C7C06F3;
+	Thu,  3 Sep 2026 11:30:15 +0200 (CEST)
 From: Stefan Schmidt <stefan@datenfreihafen.org>
-To: miquel.raynal@bootlin.com,
-	alex.aring@gmail.com,
-	Ibrahim Hashimov <security@auditcode.ai>
-Cc: Stefan Schmidt <stefan@datenfreihafen.org>,
+To: davem@davemloft.net,
 	kuba@kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	david.girault@qorvo.com,
-	linux-wpan@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH wpan v3] mac802154: fix use-after-free of sdata via queued RX frames
-Date: Thu,  3 Sep 2026 11:08:41 +0200
-Message-ID: <178842650120.4023173.10327300985698277463.b4-ty@datenfreihafen.org>
+	pabeni@redhat.com
+Cc: linux-wpan@vger.kernel.org,
+	alex.aring@gmail.com,
+	miquel.raynal@bootlin.com,
+	netdev@vger.kernel.org
+Subject: pull-request: ieee802154 for net 2026-09-03
+Date: Thu,  3 Sep 2026 11:30:12 +0200
+Message-ID: <20260903093012.4032586-1-stefan@datenfreihafen.org>
 X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260725135154.99876-1-security@auditcode.ai>
-References: <20260725135154.99876-1-security@auditcode.ai>
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
-Hello Ibrahim Hashimov.
+Hello Dave, Jakub, Paolo.
 
-On Sat, 25 Jul 2026 15:51:54 +0200, Ibrahim Hashimov wrote:
-> The RX softirq producer ieee802154_subif_frame() queues received beacon
-> and MAC-command frames onto local->rx_beacon_list / rx_mac_cmd_list and
-> schedules a process-context worker, storing a raw mac_pkt->sdata (and
-> skb->dev == sdata->dev) with neither a reference nor any locking:
-> 
->  - the lists have no lock: the softirq producer list_add_tail()s while the
->    mac_wq worker list_del()s, so sibling interfaces on the same phy corrupt
->    the list;
-> 
-> [...]
+An update from ieee802154 for your *net* tree:
 
-Applied to wpan/wpan.git, thanks!
+Zhiling Zou fixed a NULL deref when coming from a TUN device.
 
-[1/1] mac802154: fix use-after-free of sdata via queued RX frames
-      https://git.kernel.org/wpan/wpan/c/2f37fba846c9
+Fan Wu fixed a UAF in the cc2520 driver.
 
-regards,
+Chenguang Zhao fixed up some out of date comments in 6lowpan.
+
+David Carlier fixed a potential double free in the hwsim driver.
+
+Ibrahim Hashimov reworked the queuing in the RX path to fix a UAF on beacon
+and MAC frames.
+
+regards
 Stefan Schmidt
+
+The following changes since commit 70f3995830d3f1e79faa14eb0605914f778feca9:
+
+  bonding: alb: fix uninitialized transport header access in alb_determine_nd() (2026-09-01 16:59:21 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/wpan/wpan.git tags/ieee802154-for-net-2026-09-03
+
+for you to fetch changes up to 2f37fba846c9fdff5fc15b6d93656057ccd13031:
+
+  mac802154: fix use-after-free of sdata via queued RX frames (2026-09-03 11:00:54 +0200)
+
+----------------------------------------------------------------
+Chenguang Zhao (1):
+      net: 6lowpan: fix mismatched comments
+
+David Carlier (1):
+      ieee802154: hwsim: serialize pib updates to fix double-free
+
+Fan Wu (1):
+      ieee802154: cc2520: fix FIFOP work use-after-free
+
+Ibrahim Hashimov (1):
+      mac802154: fix use-after-free of sdata via queued RX frames
+
+Zhiling Zou (1):
+      ieee802154: 6lowpan: fix NULL dereference in lowpan_newlink
+
+ drivers/net/ieee802154/cc2520.c          |   5 +-
+ drivers/net/ieee802154/mac802154_hwsim.c |  10 ++-
+ include/net/cfg802154.h                  |   1 +
+ net/6lowpan/nhc.h                        |   3 +-
+ net/ieee802154/6lowpan/core.c            |   2 +-
+ net/mac802154/ieee802154_i.h             |   8 +++
+ net/mac802154/iface.c                    |   6 ++
+ net/mac802154/main.c                     |   1 +
+ net/mac802154/rx.c                       | 120 +++++++++++++++++++++++++------
+ net/mac802154/scan.c                     |  10 +--
+ 10 files changed, 128 insertions(+), 38 deletions(-)
