@@ -1,191 +1,206 @@
-Received: from mta0.migadu.com (out-86.mta0.migadu.com [91.218.175.86])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74A0D4A4856
-	for <linux-wpan@vger.kernel.org>; Thu,  3 Sep 2026 12:32:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.86
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2C2C4A1DE8;
+	Fri,  4 Sep 2026 13:41:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788438780; cv=none; b=AfU6v8UqjKxDTdrfWA6Xnr8AnoBV9Z1o0QZVJjIKq+j3KdAaJEpbf74LRdmzt9Fq5x3Hz+UZProFcglycN3YziMPTjdQWd/1stz1PZAxDIr/ozMro0frmGTNur/Fsr0aJjYiA9CkfFjrrSCDxcMwTW2yO5umy0IyOePSfFyw8co=
+	t=1788529286; cv=none; b=H9EmPDx8oMcGvDWXOdj5ac4izD0UfDi3JjNy6lTv2D747VzViCDjRt6CF9UIhRBMZw3Er9EuzIGcPYz2c+2CbuLd5FeX7hMT4G98bBy5cRsFqXz8hh2LbXyFV9PHe8KvhcNUy1pfK9gxJIUk81eBDB2FvhrhdVwa8AHEB+9uTYw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788438780; c=relaxed/simple;
-	bh=1iB/o8bZw94ZM1/04pVnXdKi6vlIvmj3KTplXfVEHY8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ry+wEsU9R/PGBOk1h8rGc8BiRbkk/+BHQCHvvNd7zyU0Sjr+WOTN47iXxsfi7ExOhf+zbX14IVaPy+lZNmPzGCZdUOJmVwswF515CQT6b6TGawLUfXhmhKrx5fMEC4m9U5gSEVJMDvk/gr0gjg0XSi6Ad3kNF+CVRc8ki4Zisd0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=GnYSQNz2; arc=none smtp.client-ip=91.218.175.86
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1788529286; c=relaxed/simple;
+	bh=XpJfIMIhQlpWkBS3G8YydbBP5+NYWNB6n3UR3QCht1w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IFfaoYEPtHUkJvOJmefWFUbviSf3neTRZt014Ta5t7PUF0dNvVqnmtPy23xbwOUJSuhWsjIggeA0LV86zPXew/9IBnVtLxvhDHLEVA6ltC6+/RTXzHC1JmA6zYRKHj8eyOLytXndt/WEyN3T0r4bGjK+kOorsV37waGjaCpCEsg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Tl3HNtlX; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="GnYSQNz2"
-X-Envelope-To: linux-wpan@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=1iB/o8bZw94ZM1/04pVnXdKi6vlIvmj3KTplXfVEHY8=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1788438776; v=1; x=1789043576;
- b=GnYSQNz2fQBdKHJRcFxw5U1sEWVwiixC9V32gjo1LlJ39ZAIcQFXVzRgftKIsynpkzKV6N/M
- ITToR34WvDqIdtrTWGvq+VxycuVNQ3H9JVMXPUSr4UglO/hPfoIxtGoq4WrX06opasVv2AvlOmq
- IWlhfn8x7wBYqX59ROL+2Iio=
-X-Envelope-To: linux-wpan@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id 88afac023ae83057;
-	Thu, 03 Sep 2026 12:32:56 +0000
-X-Mizu-Trace-ID: 88afac023ae83057
-X-Migadu-Flow: FLOW_OUT
-From: Xuanqiang Luo <xuanqiang.luo@linux.dev>
-To: linux-wpan@vger.kernel.org
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	alex.aring@gmail.com,
-	stefan@datenfreihafen.org,
-	miquel.raynal@bootlin.com,
-	david.girault@qorvo.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	stable@vger.kernel.org,
-	Xuanqiang Luo <luoxuanqiang@kylinos.cn>
-Subject: [PATCH net v2 2/2] mac802154: pin netdevs for queued RX descriptors
-Date: Thu,  3 Sep 2026 20:32:02 +0800
-Message-ID: <20260903123202.60152-3-xuanqiang.luo@linux.dev>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260903123202.60152-1-xuanqiang.luo@linux.dev>
-References: <20260903123202.60152-1-xuanqiang.luo@linux.dev>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tl3HNtlX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0867A1F00A3E;
+	Fri,  4 Sep 2026 13:41:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1788529284;
+	bh=sdodzR4Na8Sqljw2U9YzO1/rhfdn+6lstjf3xmHL5yY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=Tl3HNtlXjcpki9vJTKEAAdlO/sey7IATDkDXoGNKQfG6pfaXr4LGdJJGRG8VQgzou
+	 M2pMGSsjenEtPt2HYbit8AGm+zwRYU5v9RbQSzJXr8V0rQyNFsminbBOzSV0N/aKVy
+	 T4tc0TMfejuONmEj3jri/Jm7C22kCrbauJZDyv4yvs6lFrYeqtaQ8mYSZwNVYPTehg
+	 cT52vtqmWpeUlt6o2nazGP1yTRVmu/xV1wgVt7M30HHfVo+7BRpk5YyYZU+0oqF4Pn
+	 MWvpnb80OGvr0tGNxDUJrHuklEe72v1ymZTXWjhbrsp5Xlo+jUMr6KkZv93KHG7u4Z
+	 HKQTZQoMlaj1A==
+Date: Fri, 4 Sep 2026 15:41:09 +0200
+From: Joel Granados <joel.granados@kernel.org>
+To: Mauricio Faria de Oliveira <mfo@igalia.com>
+Cc: Kees Cook <kees@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
+	Nicolas Schier <nsc@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, kernel-dev@igalia.com, 
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, fsverity@lists.linux.dev, 
+	keyrings@vger.kernel.org, bpf@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	linux-kbuild@vger.kernel.org, netdev@vger.kernel.org, linux-wpan@vger.kernel.org, 
+	lvs-devel@vger.kernel.org, netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
+	linux-sctp@vger.kernel.org, linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org, 
+	bridge@lists.linux.dev, mptcp@lists.linux.dev, rds-devel@oss.oracle.com, 
+	virtualization@lists.linux.dev
+Subject: Re: [PATCH RFC v3 00/13] sysctl: add module aliases
+Message-ID: <mokz5pdtwswkyab4byfq7q7m6ac2g6ceoi6jflyxmaszaibzqa@su6m4kamtdpy>
+References: <20260819-sysctl-module-aliases-v3-0-aab90569365d@igalia.com>
+ <bpnqwggtidgiec5akns3fa5edbsvl7xf55dxabtwng2xspy4pn@ue554aii2ngk>
+ <53155340c897560bfc67e61ba9568fd6@igalia.com>
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="f2bekayrv5kknxjs"
+Content-Disposition: inline
+In-Reply-To: <53155340c897560bfc67e61ba9568fd6@igalia.com>
 
-From: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
 
-The RX path keeps the receiving sub-interface in queued beacon and MAC
-command descriptors after leaving its RCU read-side critical section. An
-interface can therefore be unregistered and freed before mac_wq consumes
-the descriptor, leading to a use-after-free such as:
+--f2bekayrv5kknxjs
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-  BUG: KASAN: slab-use-after-free in mac802154_rx_mac_cmd_worker+0xc0/0x498 [mac802154]
-  Read of size 8 at addr ffff0000c6db0ba8 by task kworker/u16:3/61
-  ...
-  Call trace:
-   show_stack+0x20/0x38 (C)
-   dump_stack_lvl+0x78/0x90
-   print_address_description.constprop.0+0x88/0x398
-   print_report+0xa8/0x278
-   kasan_report+0xa8/0xf8
-   __asan_load8+0x9c/0xc0
-   mac802154_rx_mac_cmd_worker+0xc0/0x498 [mac802154]
-   process_one_work+0x334/0x8b8
-  ...
-  Allocated by task 630:
-   kasan_save_stack+0x2c/0x58
-   kasan_save_track+0x20/0x40
-   kasan_save_alloc_info+0x40/0x58
-   __kasan_kmalloc+0xa0/0xb8
-   __kvmalloc_node_noprof+0x1e8/0x588
-   alloc_netdev_mqs+0x74/0x7f0
-   ieee802154_if_add+0xac/0x630 [mac802154]
-   ieee802154_register_hw+0x31c/0x3d0 [mac802154]
-   fakelb_add_one+0x250/0x318 [fakelb]
-  ...
-  Freed by task 652:
-   kasan_save_stack+0x2c/0x58
-   kasan_save_track+0x20/0x40
-   kasan_save_free_info+0x4c/0x78
-   __kasan_slab_free+0x60/0x90
-   kfree+0x194/0x478
-   kvfree+0x44/0x60
-   netdev_release+0x4c/0x68
-   device_release+0xac/0x130
-   kobject_cleanup+0x84/0x248
-   kobject_put+0x98/0xf8
-   netdev_run_todo+0x3a0/0x5e0
-   rtnl_unlock+0x18/0x30
-   ieee802154_unregister_hw+0x48/0x90 [mac802154]
-   fakelb_remove+0xe8/0x148 [fakelb]
+On Thu, Aug 20, 2026 at 06:22:13PM -0300, Mauricio Faria de Oliveira wrote:
+> On 2026-08-20 09:51, Joel Granados wrote:
+> > On Wed, Aug 19, 2026 at 03:16:13PM -0300, Mauricio Faria de Oliveira wr=
+ote:
+> >> This series adds 'sysctl:' aliases to modules that register sysctl tab=
+les; e.g.:
+> >>=20
+> >>         $ modinfo ./mpls_router.ko  | grep sysctl:
+> >>         alias:          sysctl:*/net/mpls/conf/*/input
+> >>         alias:          sysctl:*/net/mpls/default_ttl
+> >>         alias:          sysctl:*/net/mpls/ip_ttl_propagate
+> >>         alias:          sysctl:*/net/mpls/platform_labels
+> >>=20
+> >> It provides a trivial way to map /proc/sys files to modules (not trivi=
+al today),
+> >> and for userspace to handle nonexistent /proc/sys files (e.g., procps'=
+s sysctl
+> >> and systemd-sysctl applying tunables) with "modprobe sysctl:<...>" and=
+ a retry.
+> >>=20
+> >> This is done almost automatically with register_sysctl(), register_net=
+_sysctl()
+> >> and friends as wrappers of MODULE_SYSCTL_TABLE (similar to MODULE_DEVI=
+CE_TABLE),
+> >> which emits symbols for file2alias/modpost to find and parse the sysct=
+l tables.
+> >>=20
+> >> The big exception to 'almost' are sysctl tables and paths allocated or=
+ defined
+> >> at runtime (e.g., per-namespace or per-device), as all information is =
+required
+> >> at build-time. Fortunately, such tables and paths are often based on '=
+templates'
+> >> which are static and can be used.
+> >>=20
+> >> This is done by plumbing the template table/path as optional arguments=
+ (macros
+> >> with default values as default_gfp()), so not to create functions for =
+all cases:
+> >>=20
+> >>         register_sysctl(path, table [, table_tmpl [, path_tmpl]]);
+> >>         register_net_sysctl(net, path, table [, table_tmpl[, path_tmpl=
+]]);
+> >>         register_net_sysctl_sz(net, path, table, size [, table_tmpl[, =
+path_tmpl]]);
+> >=20
+> > The "what" is described but I'm missing more clarity on the "why". Why
+> > does this need to be trivial? Where is it that you will know the sysctl
+> > file path of a module and not the module name or alias?
+>=20
+> Thanks for looking at this.
+>=20
+> The problem this feature addresses is sysctl settings not applied
+> because modules aren't yet loaded when systemd-sysctl/procps's sysctl
+> runs on boot, and the usage of /etc/modules as a workaround.
 
-Hold the receiving netdev from before a descriptor is queued until the
-descriptor is released. Since sdata is the netdev's private data, this also
-keeps sdata valid while a worker or scan cleanup accesses the descriptor.
+Sorry for insisting, but is it not possible to set the sysctls after the
+modules have been loaded? Why is the order to first set the sysctl and
+then load the module?
 
-Fixes: 57588c71177f ("mac802154: Handle passive scanning")
-Fixes: d021d218f6d9 ("mac802154: Handle received BEACON_REQ")
-Cc: stable@vger.kernel.org
-Signed-off-by: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
----
- include/net/cfg802154.h | 2 ++
- net/mac802154/rx.c      | 4 ++++
- net/mac802154/scan.c    | 1 +
- 3 files changed, 7 insertions(+)
+>=20
+> This can be addressed with a way for sysctl tools to load the module for
+> a non-existent sysctl file path.
+> For that, the mapping between a sysctl file path (known) and its module
+> (unknown) needs to be trivial.
+This touches on my question. How is the file path known and the module
+not known? The module is the one providing the paths, not the other way
+around. Why choose to just work with sysctl path lists and not include
+the modules that go with them?
 
-diff --git a/include/net/cfg802154.h b/include/net/cfg802154.h
-index 76d2cd2e2b309..57343762d7f0b 100644
---- a/include/net/cfg802154.h
-+++ b/include/net/cfg802154.h
-@@ -369,6 +369,7 @@ struct cfg802154_beacon_request {
-  * @node: MAC packets to process list member
-  * @skb: the received sk_buff
-  * @sdata: the interface on which @skb was received
-+ * @dev_tracker: netdev reference held until the descriptor is released
-  * @page: page configuration when @skb was received
-  * @channel: channel configuration when @skb was received
-  */
-@@ -376,6 +377,7 @@ struct cfg802154_mac_pkt {
- 	struct list_head node;
- 	struct sk_buff *skb;
- 	struct ieee802154_sub_if_data *sdata;
-+	netdevice_tracker dev_tracker;
- 	u8 page;
- 	u8 channel;
- };
-diff --git a/net/mac802154/rx.c b/net/mac802154/rx.c
-index 26da20ea470ef..df2f6128ddd4a 100644
---- a/net/mac802154/rx.c
-+++ b/net/mac802154/rx.c
-@@ -62,6 +62,7 @@ void mac802154_rx_beacon_worker(struct work_struct *work)
- 	mac802154_process_beacon(local, mac_pkt->skb, mac_pkt->page, mac_pkt->channel);
- 
- 	kfree_skb(mac_pkt->skb);
-+	netdev_put(mac_pkt->sdata->dev, &mac_pkt->dev_tracker);
- 	kfree(mac_pkt);
- }
- 
-@@ -141,6 +142,7 @@ void mac802154_rx_mac_cmd_worker(struct work_struct *work)
- 
- out:
- 	kfree_skb(mac_pkt->skb);
-+	netdev_put(mac_pkt->sdata->dev, &mac_pkt->dev_tracker);
- 	kfree(mac_pkt);
- }
- 
-@@ -237,6 +239,7 @@ ieee802154_subif_frame(struct ieee802154_sub_if_data *sdata,
- 		mac_pkt->sdata = sdata;
- 		mac_pkt->page = sdata->local->scan_page;
- 		mac_pkt->channel = sdata->local->scan_channel;
-+		netdev_hold(sdata->dev, &mac_pkt->dev_tracker, GFP_ATOMIC);
- 		spin_lock_bh(&sdata->local->rx_lists_lock);
- 		list_add_tail(&mac_pkt->node, &sdata->local->rx_beacon_list);
- 		queue_work(sdata->local->mac_wq, &sdata->local->rx_beacon_work);
-@@ -251,6 +254,7 @@ ieee802154_subif_frame(struct ieee802154_sub_if_data *sdata,
- 
- 		mac_pkt->skb = skb_get(skb);
- 		mac_pkt->sdata = sdata;
-+		netdev_hold(sdata->dev, &mac_pkt->dev_tracker, GFP_ATOMIC);
- 		spin_lock_bh(&sdata->local->rx_lists_lock);
- 		list_add_tail(&mac_pkt->node, &sdata->local->rx_mac_cmd_list);
- 		queue_work(sdata->local->mac_wq, &sdata->local->rx_mac_cmd_work);
-diff --git a/net/mac802154/scan.c b/net/mac802154/scan.c
-index 5fa98e001a8fb..c3c61ebde1568 100644
---- a/net/mac802154/scan.c
-+++ b/net/mac802154/scan.c
-@@ -114,6 +114,7 @@ static void mac802154_flush_queued_beacons(struct ieee802154_local *local)
- 	list_for_each_entry_safe(mac_pkt, tmp, &mac_pkt_list, node) {
- 		list_del(&mac_pkt->node);
- 		kfree_skb(mac_pkt->skb);
-+		netdev_put(mac_pkt->sdata->dev, &mac_pkt->dev_tracker);
- 		kfree(mac_pkt);
- 	}
- }
--- 
-2.43.0
+>=20
+> It may not seem serious at first, but I've seen this consume significant
+> engineering time and impact production systems, in a previous technical
+> support job.
+> An example: cloud deployments with non-scalable network routing
+> performance due to nf_conntrack_max not applied after reboot or an
+> upgrade because the component which turned out to help with the
+> /etc/modules workaround had its placement changed from network router
+> nodes.
+This is more understandable to me. The issue is that you loose the
+relationship between sysctl paths and modules on updates. Are there
+other cases where the module would not be loaded?
+
+And doesn't it create another problem where you will load modules that
+you don't expect (on the update)?
+
+>=20
+> > Additionally, sysctls are not module specific; they are a way to
+> > read/write kernel variables. Putting a module specific aspect in the
+> > function arguments (that needs to be ignored in non-module cases) seems
+> > wrong. Why not use the module subsys to add sysctl alias instead of the
+> > sysctl subsys?
+>=20
+> Fair point. The current design has 2 reasons:
+>=20
+> 1) Use the 'path' argument (raised in [1]), only available in the
+> register sysctl functions.
+> 2) Use a more implicit/transparent approach, instead of more
+> explicit/declarative approach.=20
+
+I get that the data is there and you would be able to do it, but it
+still seems misplaced. Additionally, are you planning to move all the
+modules to this scheme? If not, does that mean that some modules would
+work and some wouldn't? And how would you make sure that modules would
+use the correct call moving forward?
+
+>=20
+> I guess that a different design could use MODULE_SYSCTL_TABLE() as
+> MODULE_DEVICE_TABLE(), declared per table instead of wrapped into
+> register sysctl functions.
+> However, it seems to require moving the value of the path argument (or
+> its template) into the macro and still referencing it in the function
+> (or its instantiation of the template), which adds obfuscation, to all
+> callers.=20
+>=20
+> What do you think?
+It might be that having it inside the module subsys is more work, but I
+believe that there is the right place to have it. I still don't see that
+adding a module specific arg to the sysctl register is a good thing.
+
+
+Best
+
+--f2bekayrv5kknxjs
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQGzBAABCgAdFiEErkcJVyXmMSXOyyeQupfNUreWQU8FAmqaymwACgkQupfNUreW
+QU+lGQv9G3M3cE2j6nFu2ajfmqXn/HK3F13D57StjtuTwbNUrTKJAl5NYfXzFtv/
+WI0RRjBuOJKO4tZwqjX37MLUYJqa3GYA6eoQ8efnCCygEUInpicx3wittaZqtnv0
+TGnCLpyb4BHmtJRx6lEoZFyU4juYti6APKn4p2+CBQN9jPCn2RbFf8fRCql2G7F2
+LpM/O+tkXTZ8iY6iGjkROFdKmbNXq0JO5m6dOOgtyJt/m4dLF+ivs7HxExEvaAdq
+0vMjANmTDelElI17ouGEstSU8WLY1R+rMEzMbm5Y5lTWK0MxCkReBjJSEx/yAQEZ
+ecNJej849cFo1mun6yzEB6+3tiB1IGZaTerj7LfxHm+Ku9nVZ4p29/emoQ0UzWdd
+SkWXhwUZbVGehFGYaCTT7KVDcv5fZiCr2WBM0POFIXhmSIk0CSLezhFr6JDElVov
+R12dzrMN46WspdvHiWrBWBGMtUh+8hxByKgR+YduWJfKyeKBoQnsai2u+4zJ7Ayp
+sBanGs6K
+=SHqf
+-----END PGP SIGNATURE-----
+
+--f2bekayrv5kknxjs--
