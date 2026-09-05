@@ -1,52 +1,71 @@
-Received: from mta1.migadu.com (out-207.mta1.migadu.com [95.215.58.207])
+Received: from mail-vk1-f179.google.com (mail-vk1-f179.google.com [209.85.221.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDE5033A9D1
-	for <linux-wpan@vger.kernel.org>; Sat,  5 Sep 2026 06:16:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.207
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E54425A655
+	for <linux-wpan@vger.kernel.org>; Sat,  5 Sep 2026 21:20:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788588985; cv=none; b=fLlgtRgEl8l9DJm6mTtgBEUNmL6Qi13SsUEJoe2OX2zadLQAo82J35o9siFw6F/rghL+7JD60ossoPyDpfZBnNU+z+STEChZ93auz68kqtjwRfHImunmUAbJdwESjIgL59QzGu4wAtZ0g06W1lTdRmDyWodF4V7WmIXDs87VRlI=
+	t=1788643216; cv=none; b=Fh8mxdRfbWb1enDj17gLZkO8iigNSiQ++OEZuxveHsKppCppRvwl0E7v6wtmCOs3RaejuQAawxgbKsV4uSqqPi9v5SW/mpeRspP1ccwh+D8/2pkz2c7XUq3+1B97PxFEIbRdhZrLOVXguVpLtqlNEjKg3Kdxbqqyq6fZlF9GnPw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788588985; c=relaxed/simple;
-	bh=wVvQY6FcjQcbsN6NidnWh4uveTQRJ0Nlbs9VKkQ617g=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GKB24DuKP/aK7Ua7qUm0goOuuJJVIvTPnPBo4ppeyRgKoBjZWsPj+vpX/sEAJXfNSC16XiabT2NRgBvAXzWW9U+oobYjmakM1pX18ubv1HxT/5zuEeHdC/3zY/gvyl9GQRiOhEdVd7WFmbbsB918lXo5E28l99zdgMVi55dOz9Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=BJ807yFd; arc=none smtp.client-ip=95.215.58.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1788643216; c=relaxed/simple;
+	bh=+093/8nJcghhGC0+aQbMyB/IiX1dcEQCPmfynuD1PT0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gR8aHUKqeISlhpgOQg/NdAhRCzQs9Jvcamiil7NZR7ycL/vUeX5/pQqL9Q2RSMNWiuB4yNfL3rnD9SDRmzZxRkF7t+slt8L1+X36RdXxKjdx8sHWwDkCbnEVzrqSXMHrLUQIzk+Nj7kGVeDa9dTGVAM8pmt2OdqnV0uBFcyVFI4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Xj8/X2fF; arc=none smtp.client-ip=209.85.221.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="BJ807yFd"
-X-Envelope-To: linux-wpan@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=wVvQY6FcjQcbsN6NidnWh4uveTQRJ0Nlbs9VKkQ617g=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1788588981; v=1; x=1789193781;
- b=BJ807yFd+6B2mldC73pmhoOB1hBovbUNzjx7cyeY/FBRxOgVfD7gJICoGf+UPLOsgZd3NGFT
- IYjhiYd/leVjO+dRQxdRIfPz60MWU9nmv8lY78yuY5ZPfYlFeFeNiu5L/lQ7fEssWMqrx/bu0Bz
- GFdl9iq1i0rzX0cQiLsVr1Zg=
-X-Envelope-To: linux-wpan@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id a0fbfabdf52cb018;
-	Sat, 05 Sep 2026 06:16:21 +0000
-X-Mizu-Trace-ID: a0fbfabdf52cb018
-X-Migadu-Flow: FLOW_OUT
-From: Xuanqiang Luo <xuanqiang.luo@linux.dev>
-To: linux-wpan@vger.kernel.org
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	alex.aring@gmail.com,
-	stefan@datenfreihafen.org,
-	miquel.raynal@bootlin.com,
-	david.girault@qorvo.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	stable@vger.kernel.org,
-	Xuanqiang Luo <luoxuanqiang@kylinos.cn>
-Subject: [PATCH net v1] mac802154: avoid extra skb references in RX queues
-Date: Sat,  5 Sep 2026 14:15:23 +0800
-Message-ID: <20260905061524.91223-1-xuanqiang.luo@linux.dev>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xj8/X2fF"
+Received: by mail-vk1-f179.google.com with SMTP id 71dfb90a1353d-5c7c57e637eso1014263e0c.2
+        for <linux-wpan@vger.kernel.org>; Sat, 05 Sep 2026 14:20:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1788643214; x=1789248014; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=D7FSrd7fhnbDkTGOB44nrfKkV94WPiP6EXXWHoLjWLA=;
+        b=Xj8/X2fFcebo2KtZXAV0JZLEygS4r3qRvEdEy6NIfLBaFDEYitP162XjAyXsp74rG8
+         RtzBRrYRBJ1nIR/RvVGe2DdjagI6/SL/B/W2FQXy90a9DwsU5xO9Qjq6fRzeWHp4XrYJ
+         T2Hch7vYhTqSb/PIFG7L0SKA7/9FmC/V5iaA/7fladLDnKyg0niU9cHkDDBOkYmLNNK4
+         6L2mCodBfq1Sl4SHzfSKywn9kXjTRBKMB4VhaKh5PR1YWakMvn3/MwBF0lTvd1lqlEdC
+         cbFAqy4nh/dzcg2QpJCcSY1qZpLX4HU50tgQ9sdT/++WpEP7VH2zA2izR5SqYufcCkLG
+         DFxw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1788643214; x=1789248014;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=D7FSrd7fhnbDkTGOB44nrfKkV94WPiP6EXXWHoLjWLA=;
+        b=Y/HvVYiD1jTnoCFTWZ+AD2YxJ1xZB8p3K+/gcLzw0GH6PVEIpD9DRrQbfv2F9pZ82u
+         o49FsUQ2/ISf/Jh7FocataUPZ4EsMYSghpZMwAUz50c0VSTgSNNjmKrJY8EAEIywpAda
+         yUsltqr4hiAXcaTxDWM84MC6TakgJQiSrSu5ruV9Q/pkXiDE5DpOj5YFmYvBFXtSHEvk
+         dUaMNPMRqdXEMc/J4cEKzmV8PKQ2rUC5yyvUcKgyjDfUXahK6uH8bhVw3WQfgdVN6L+v
+         aIZTX6BO+jPyw69f/RD7B5W2bcY4IqHwkox4WNgXv9fqzowKvWxWbFJ8tOKP7TOvIcRm
+         55Hw==
+X-Gm-Message-State: AFuF++lz/8hfiKuzjhnIE9DYNJdcIxQ4y+5HjGJ+VaKslVccKfv15NlE
+	3Z3d8MGoipsPpNsUuK+h7KqeI1xBQ2BuiWTvxx0Ktuyht3KqSuN6AjfZ
+X-Gm-Gg: AYBFou3U8xJq4zF3Vo2l5u5iZ6lCISM76IVO3aXAICPY8EyPPE+w9/ZVy1c1IMaw++9
+	Z0UmCX2MrnsN+pT69nvEHNYRoHqSF7B8bXH3XSm6v7LNLIKk4P2xhVhuvSqhJbpmkNJO9SWxc8U
+	CDDJMeNl4sGY5B1TgMAqhP36cpuFnOEHroUFHkP9QoV2aeoRzp37wTj6/OFaxjRGUXmOBXO8F++
+	6zobYNzZrt8mPP476keuWDuBZ+gy385RQF3WBInkrT09L40R4ebO6tNMu95EAghz8B/TMBhckIE
+	Q3rDflzBgyXQKx+YSrj8mautj6p4G+ZS/Y4D7gWNmTuopX8Yk43skV5Cu8mkZ4orBVTDvxkQ+hO
+	6IOT4pmiMaT/ZTMIFvvCzWp24UoroUrMg3ZROyhfO3ePWJZyvw0CljIEoQxD119rcaKoAhLBAIp
+	TmxlU0QSkk0/uWON2M0mD7iC4fr2X8JY6aTaKzzH6Kf/7g6aA7+mmQ
+X-Received: by 2002:a05:6122:8b03:b0:5c0:fb8d:9993 with SMTP id 71dfb90a1353d-5c7ed38607amr5766684e0c.0.1788643214275;
+        Sat, 05 Sep 2026 14:20:14 -0700 (PDT)
+Received: from adriano ([190.215.95.120])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5c7ec1097e5sm4901956e0c.2.2026.09.05.14.20.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 05 Sep 2026 14:20:13 -0700 (PDT)
+From: Adriano Cordova <adrianox@gmail.com>
+To: Alexander Aring <alex.aring@gmail.com>,
+	Stefan Schmidt <stefan@datenfreihafen.org>,
+	Miquel Raynal <miquel.raynal@bootlin.com>
+Cc: linux-wpan@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Adriano Cordova <adrianox@gmail.com>
+Subject: [PATCH 1/2] ieee802154: register a device type for the wpan netdev
+Date: Sat,  5 Sep 2026 17:20:05 -0400
+Message-ID: <20260905212007.304875-1-adrianox@gmail.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
@@ -55,69 +74,42 @@ List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
+The cfg802154 netdev notifier never sets a device type, so wpan
+interfaces lack a sysfs "type". Mirror cfg80211 by calling
+SET_NETDEV_DEVTYPE() in a NETDEV_POST_INIT case with a new
+wpan_dev_type.
 
-__ieee802154_rx_handle_packet() passes each cloned skb to
-ieee802154_subif_frame() and does not release it after the call. The
-callee consumes the skb on every path: it either frees it, hands it to
-the networking stack, or stores it in a queued RX descriptor.
-
-The beacon and MAC command paths nevertheless call skb_get() before
-storing the skb. The worker drops only that additional reference, leaving
-the original clone reference without an owner and leaking every queued
-skb.
-
-kmemleak report:
-
-unreferenced object 0xffff0000c1fcd480 (size 232):
-  comm "softirq", pid 0, jiffies 4295683396
-  hex dump (first 32 bytes):
-    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-    00 60 fd d4 00 00 ff ff 00 00 00 00 00 00 00 00  .`..............
-  backtrace (crc ee03f6a1):
-    kmemleak_alloc+0xcc/0xf8
-    kmem_cache_alloc_noprof+0x240/0x418
-    skb_clone+0x60/0xe0
-    ieee802154_rx+0x19c/0x280 [mac802154]
-    ieee802154_tasklet_handler+0xa8/0xb8 [mac802154]
-    tasklet_action_common+0x148/0x528
-    tasklet_action+0x38/0x50
-    handle_softirqs+0x10c/0x450
-    __do_softirq+0x1c/0x28
-
-Transfer the existing skb reference to the descriptor instead of taking
-another one.
-
-Fixes: 57588c71177f ("mac802154: Handle passive scanning")
-Fixes: d021d218f6d9 ("mac802154: Handle received BEACON_REQ")
-Cc: stable@vger.kernel.org
-Signed-off-by: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
+Signed-off-by: Adriano Cordova <adrianox@gmail.com>
 ---
- net/mac802154/rx.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ net/ieee802154/core.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/net/mac802154/rx.c b/net/mac802154/rx.c
-index 19b5382e85a84..ad602d222e861 100644
---- a/net/mac802154/rx.c
-+++ b/net/mac802154/rx.c
-@@ -287,7 +287,7 @@ ieee802154_subif_frame(struct ieee802154_sub_if_data *sdata,
- 		if (!mac_pkt)
- 			goto fail;
+diff --git a/net/ieee802154/core.c b/net/ieee802154/core.c
+index c0b8712018a1..c6213412d291 100644
+--- a/net/ieee802154/core.c
++++ b/net/ieee802154/core.c
+@@ -272,6 +272,10 @@ void cfg802154_dev_free(struct cfg802154_registered_device *rdev)
+ 	kfree(rdev);
+ }
  
--		mac_pkt->skb = skb_get(skb);
-+		mac_pkt->skb = skb;
- 		mac_pkt->sdata = sdata;
- 		mac_pkt->page = sdata->local->scan_page;
- 		mac_pkt->channel = sdata->local->scan_channel;
-@@ -304,7 +304,7 @@ ieee802154_subif_frame(struct ieee802154_sub_if_data *sdata,
- 		if (!mac_pkt)
- 			goto fail;
++static const struct device_type wpan_dev_type = {
++	.name	= "wpan",
++};
++
+ static void
+ cfg802154_update_iface_num(struct cfg802154_registered_device *rdev,
+ 			   int iftype, int num)
+@@ -296,7 +300,9 @@ static int cfg802154_netdev_notifier_call(struct notifier_block *nb,
+ 	/* TODO WARN_ON unspec type */
  
--		mac_pkt->skb = skb_get(skb);
-+		mac_pkt->skb = skb;
- 		mac_pkt->sdata = sdata;
- 		netdev_hold(sdata->dev, &mac_pkt->dev_tracker, GFP_ATOMIC);
- 		spin_lock(&sdata->local->rx_lock);
+ 	switch (state) {
+-		/* TODO NETDEV_DEVTYPE */
++	case NETDEV_POST_INIT:
++		SET_NETDEV_DEVTYPE(dev, &wpan_dev_type);
++		break;
+ 	case NETDEV_REGISTER:
+ 		dev->netns_immutable = true;
+ 		wpan_dev->identifier = ++rdev->wpan_dev_id;
 -- 
-2.43.0
+2.51.0
 
