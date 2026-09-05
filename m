@@ -1,77 +1,120 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mta0.migadu.com (out-109.mta0.migadu.com [91.218.175.109])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B71244E652;
-	Fri,  4 Sep 2026 22:21:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 958B733DEF7
+	for <linux-wpan@vger.kernel.org>; Sat,  5 Sep 2026 06:02:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.109
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788560483; cv=none; b=hLgMl/YuZ2T9pdFvsb9XGt0DXTJIxd1E3q+vE3Vj4NJh1N4ltzmu8pzculDzGWtCAiZB9dejHyMeTje6i4Z0HhgZoXIjm5i+oMG2w8vqyIaB051IWqibtatJ67/qxxeBkwa+re4kbX/nvRQMNX46FQyAkkwqFoMZc3yVCcufn2M=
+	t=1788588165; cv=none; b=Oj4X7f2Y63WM6+WMk1gmktRQFvCCXV7HzowtVZ4+1rsKdyNxHHUUOBoBD6nHFIv2aVasdZ/62InTm7J3pM86UdoQltufyoLTfBOtG+lLPwNMSDyRNvkK9s8Ww0krJ2439MwOsQRmgAcoMyZ4H6aB1BNpsBhUaRAuPT47GsyCKq4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788560483; c=relaxed/simple;
-	bh=FlrbfR3jV/MNfhkdzPdnZiAgX3jk1Jwfds82HMGKsDk=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=lr1BfjXvTE1abGzTppUxIXAPEhNdA5FzrieSsW2Fmpurp43Bd0/PVQ1BAxUUwAnBjjb0BYQ7QjwGWzw/LJSOf4f7aImr27PyD4y3lNaYsUHLCitXHDzS+QTKvrtCUhnZB/GYpHCRcKRwet162YevmVUWgLErLMP+0LT6rbPu3u4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DxnnVqzU; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1788588165; c=relaxed/simple;
+	bh=g00xPURkl0HXiJrLznFEGazxWq25zrYenZGCIwbXv6A=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=pE3NiCkxX7j9jKedtUmHPbihKrLzK5Ow5PLqS+lEXhZDM8rYHpINE89EqK+pTasx03c+YgYgv5EdR1Vebw7s+olUPuFPVBelMBQWAemEVqU5yxGUT+Vx2V8da5nZ45vMmwe8+LtFI1aT0GRLpSFBD4UUPAP8uyfunh+tKnIxC5o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=FF9XnLYt; arc=none smtp.client-ip=91.218.175.109
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DxnnVqzU"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3A32C1F00A3D;
-	Fri,  4 Sep 2026 22:21:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788560473;
-	bh=nTpNVlI/Ot0nNaTi08bgbwLjehduYjfYTbIjvyWfr74=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=DxnnVqzUAiMSmgwv4ExHgyopZSwneks62rh+vpESIly9QqqUPbtWCgqxCY/LeEGRE
-	 AbjOcA+nt0MLsUTHUsLNO5XCbRNtIQ9wvOJ8Oaqm7IdOw7DtIQaa5mHwHD4r7t5Z8Z
-	 5LVWWMfnHwrczi4j8F5KvYpCHVB7jIebbdETAH2t4TX71GZpnGlirM9wcar1mkTxx2
-	 GgSf6fPJq2I7YZ3GFO/OusBZEvQ3I7YXw8nvekStC/Fm+oIGKh4EKE4HlMWFwqJWC/
-	 iCh5IjESLJjFsx74mUT7B/xSWmtsKUGTsDIDq2j5JOTaAJN8lUlSqszp2Yhp4n6vmF
-	 uK6XRMqztHgSg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 19ADD3924A7E;
-	Fri,  4 Sep 2026 22:20:15 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="FF9XnLYt"
+X-Envelope-To: linux-wpan@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=g00xPURkl0HXiJrLznFEGazxWq25zrYenZGCIwbXv6A=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1788588159; v=1; x=1789192959;
+ b=FF9XnLYtnnKA3CbecClejPl6smZUyKMqoTdRM9OHiXgXuDrlU2KAMpPZwJLfirxhMEK8l6Yk
+ 0yez7C2010Z5f3FThLU5nm94Lqnw430zMb3UwI8vGf/rG8hPSWwMCQ6vX/XWS8Y8urReUY5shEV
+ NDa6Phdy424hhXIQPQmRzoyo=
+X-Envelope-To: linux-wpan@vger.kernel.org
+Received: by smtp.migadu.com with ESMTPS id 6927321ae16174ca;
+	Sat, 05 Sep 2026 06:02:39 +0000
+X-Mizu-Trace-ID: 6927321ae16174ca
+X-Migadu-Flow: FLOW_OUT
+Message-ID: <0bda54a1-7cdc-42c9-89f3-408067b2f8a3@linux.dev>
+Date: Sat, 5 Sep 2026 14:02:30 +0800
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+From: Xuanqiang Luo <xuanqiang.luo@linux.dev>
+Subject: Re: [PATCH net v2 0/2] mac802154: fix queued RX descriptor lifetime
+To: linux-wpan@vger.kernel.org, miquel.raynal@bootlin.com
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ alex.aring@gmail.com, stefan@datenfreihafen.org, david.girault@qorvo.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, stable@vger.kernel.org,
+ Xuanqiang Luo <luoxuanqiang@kylinos.cn>
+References: <20260903123202.60152-1-xuanqiang.luo@linux.dev>
+In-Reply-To: <20260903123202.60152-1-xuanqiang.luo@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: pull-request: ieee802154 for net 2026-09-03
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <178856041367.992241.4070153041479622832.git-patchwork-notify@kernel.org>
-Date: Fri, 04 Sep 2026 22:20:13 +0000
-References: <20260903093012.4032586-1-stefan@datenfreihafen.org>
-In-Reply-To: <20260903093012.4032586-1-stefan@datenfreihafen.org>
-To: Stefan Schmidt <stefan@datenfreihafen.org>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- linux-wpan@vger.kernel.org, alex.aring@gmail.com, miquel.raynal@bootlin.com,
- netdev@vger.kernel.org
 
-Hello:
 
-This pull request was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+在 2026/9/3 20:32, Xuanqiang Luo 写道:
+> From: Xuanqiang Luo<luoxuanqiang@kylinos.cn>
+>
+> mac802154 queues one descriptor per received beacon or MAC command, but
+> each worker invocation dequeues only one. Since queue_work() coalesces
+> attempts to queue the same pending work item, a burst can add more
+> descriptors than scheduled invocations. A later frame may schedule another
+> invocation, but also adds a descriptor, so it does not necessarily reduce
+> the backlog. Descriptors can therefore remain queued indefinitely once
+> reception stops. The RX path, workers, and scan cleanup also access the
+> descriptor lists without common synchronization.
+>
+> A queued descriptor carries its receiving interface beyond the RCU
+> read-side critical section without holding a netdev reference. If the
+> interface is removed first, the worker can dereference freed memory.
+>
+> Protect the descriptor lists with a spinlock and keep the workers running
+> until the queues are empty. Then hold the netdev for the lifetime of each
+> queued descriptor to prevent it from being freed too early.
+>
+> This ordering is required. Without the queue-draining fix, a descriptor
+> stranded by queue_work() coalescing would also strand its netdev reference,
+> as netdev_put() runs only when the descriptor is released, leaving the
+> netdev pinned indefinitely.
+>
+> ---
+> Changes:
+> v2:
+>    Patch 1 (new):
+>    - Serialize descriptor list access and requeue each worker while another
+>      descriptor remains.
+>    - Detach queued beacons under the same lock before scan cleanup frees
+>      them.
+>
+>    Patch 2:
+>    - Replace the v1 drain_workqueue() approach, which does not cover work
+>      queued after the drain or the DEL_INTERFACE path, with a netdev
+>      reference held by each queued descriptor. (Sashiko.)
+>
+> v1:https://lore.kernel.org/all/20260828101905.26865-1-xuanqiang.luo@linux.dev/
+>
+> Xuanqiang Luo (2):
+>    mac802154: serialize and drain queued RX descriptors
+>    mac802154: pin netdevs for queued RX descriptors
+>
+>   include/net/cfg802154.h      |  2 ++
+>   net/mac802154/ieee802154_i.h |  2 ++
+>   net/mac802154/main.c         |  1 +
+>   net/mac802154/rx.c           | 36 ++++++++++++++++++++++++++++++------
+>   net/mac802154/scan.c         |  8 +++++++-
+>   5 files changed, 42 insertions(+), 7 deletions(-)
+>
+>
+> base-commit: dc4b95b8fee95113587e93ca116356032d271371
 
-On Thu,  3 Sep 2026 11:30:12 +0200 you wrote:
-> Hello Dave, Jakub, Paolo.
-> 
-> An update from ieee802154 for your *net* tree:
-> 
-> Zhiling Zou fixed a NULL deref when coming from a TUN device.
-> 
-> Fan Wu fixed a UAF in the cc2520 driver.
-> 
-> [...]
+I realized that the issues addressed by this series appear to have
+already been fixed by:
 
-Here is the summary with links:
-  - pull-request: ieee802154 for net 2026-09-03
-    https://git.kernel.org/netdev/net/c/fb3088dc5811
+https://lore.kernel.org/all/20260725135154.99876-1-security@auditcode.ai/
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+I missed that, so please disregard this one.
 
+Thanks,
+
+pw-bot: rejected
 
