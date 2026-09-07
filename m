@@ -1,123 +1,70 @@
-Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C01F3211A09
-	for <linux-wpan@vger.kernel.org>; Mon,  7 Sep 2026 06:43:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BBA037E5DE;
+	Mon,  7 Sep 2026 08:12:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788763435; cv=none; b=VeKJAXd+TefVG0z2k2D3OrgErrC5DAmD07dfM/TeAj22VdKaXdUTSQx6YbiGk7NO26LMiEHo8xFQEpZWGex1ZpNcIixhUOO7d5QfWvVnxaCX64QP2pnn1D42q5HB5x26mtS0owV2FydqmUOVu6WMS+LzWHbdXMSYhJOtu9d5HPE=
+	t=1788768751; cv=none; b=KGltuTl0Q9i3HaO7xzkW6m9kUxRETXI7GMEsNP8fEN0zZLQIMI58fLgUdNGSoyVjpzYs9yPwh0Wzux3+S2Kj4s2BZ2fOKVsCV3kaq0siZyzlv+AsKj6XOIprjtiEJir067XQ7gYVggbLcFj/diACqEsjiOxPEiautxO/eKYE6Aw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788763435; c=relaxed/simple;
-	bh=YSOgfYZSp8SrbWiZSUofEBzDTvr3+SvBNc0tqAr8jTA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Ao/58KHkKwQ2CToFkq+nrUzy0sBJDe0mVLZRcK3IuWfoZk0Z3BlJijMWr6OP2pU6z3YyRSGkJmicDI1YoBhpDRpcBfV82ZZRUUVrHX2c8CjoThss43YpoMrtYeKU+xEXgJyJcL4NCAIFoaVUIONyS4Xotp+wGhFNm8VE4hub5zQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OaUQXxa0; arc=none smtp.client-ip=209.85.215.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1788768751; c=relaxed/simple;
+	bh=bsUtRBBJyZNJRmHydcAxD93C/4EQEXMHe+HQXEdqUR4=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=eKVRMk7wWzwdgjmfXo8IzaJYGAA45l2cZvIFXthxRHFKNoWl1/OPwgwn5aUU6NPGbXYBuVD6sdPGeS/McIq7Rci+mrshqGlynyk3wPUnq1S7N9hfsl6oYm7KK6QLQpy5ImBzs++eZbYJfaY73dkXAo+AUuQj8xqJET93i5XSZoQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=XedbBzyp; arc=none smtp.client-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OaUQXxa0"
-Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-cc1cb472b76so2555909a12.0
-        for <linux-wpan@vger.kernel.org>; Sun, 06 Sep 2026 23:43:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1788763433; x=1789368233; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=8CFZlOFvP6r7OTGSRxMmbvfbXTssOe5ta1IwHi1yqgQ=;
-        b=OaUQXxa084JHSuiWVj2ZvhicYKuepXIcxzGM5hMiYUJ9EvoUJ3GETU7lBckenl/orf
-         RL+FxwfSg2F1Fj2vARl8IFJDqu4xhZPpgHz9p+FrmvJn6DM+U+U4xDYyOU7X5PMJiP9u
-         0wcTeWAwJK1yog4FxopuET5g4laryRb6LENvNqbgz+b2f3mIsGHGRKaYguvf4SvQqaFK
-         lmVo9jM7LNXh7q+lutYSuFe4+fMFv8yfge2qERbxerxgYBFhyHqb4x8aA2aHDuxcm1oD
-         dbKrDnveiMyrLYLL+CU5+hVLMxWZAP/xHse0tJ31dsY4I9xriObh+HbJma7EvBtXVytm
-         seJA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788763433; x=1789368233;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=8CFZlOFvP6r7OTGSRxMmbvfbXTssOe5ta1IwHi1yqgQ=;
-        b=DKd24MoVvBYacgDe/cZ1Alz6Syux3LZJ3AyMXqyE6ahEYVEhC/hAf1+bOClNkWvOBq
-         VRMFga54R6MUcQtAXSvxHlsMg9ffi8e55i+2590Xrvtd6v1WGcsOxvnOmshwYM97QLfb
-         PHX+MDjuwE6HrKQdFbW27gngnZnP+T2WxxR5Fyl0HLvwu/J9Kobkd6clUE1F+hKlYP7L
-         NiyQLm9uDwkwQ84sKXHcFS8KPqj/gRD54RtXLKvoq1dXa+r7ccmkFPZBDL92a1f+5oAK
-         a/D954a7X/Yffjk4IwEi4AE7sN496xryJVMKWuYCTBrbQCtAzgzf97PfYglhrfCuG5OS
-         jPjQ==
-X-Gm-Message-State: AFuF++lP6+38+qZUZFbLkxllMNxK/KzeVAh9bbJdu/RcHJsv/cjzkp5h
-	xtvO+5uEAYDEKBfJDmot9CTx8jAKp0bhMJ72lvNN2uVHkrcOr4N3Id3v
-X-Gm-Gg: AYBFou2XWgUq72KAcVvYD3UpGn5w3KzNAFuwbqEfoJiHJiYv2ETDMHmB94vW97+Yxdc
-	qTMoCBZWN1EXjSqK4QzTKT8fXQFP5eQ7FS5Xkg18GvcuSLlrLDbeyZXBKeoMce8jDbdZG4StdQV
-	OjU+WF3bNF8R2DWncGMcjJ06qPTIFOceCPaVgV2OqrOB0BzFj2PDN90+YSc3mvBrABUMtqPivCg
-	aEqzKMhhP/Kj1Pg9ft2o6w1CuuIV+827fP+1hen4Ux4MA5dY62Y5DDEGUnQElQ5TrfS31eSZ5LD
-	14jbtyrOWIlVUy25ho4EVDj+zVOK89B/JIxjOtg/3TvhnIuOF7dpDeWMHfffVuT8Qm/buJA+VKv
-	0uN9o3Wy9myeyNIDJrv/vg72Fy9if5rnALJaVrekMU+ROi+SWEp1rUMmvfxGO630DlUmhzIR3n7
-	8rY7crRew9PHtmZ617CGZznhOKUlK7MozOipcgzz/hZoUO2/gznrMWt8uDK5ql2TWEVmC/hKedp
-	4nfKTBYa8ptLg==
-X-Received: by 2002:a05:6a20:9e4e:b0:3d3:ae40:51e0 with SMTP id adf61e73a8af0-3da3a045196mr32280359637.20.1788763433116;
-        Sun, 06 Sep 2026 23:43:53 -0700 (PDT)
-Received: from volcano9f6e-hostos.amd.com ([165.204.217.251])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3339af25062sm39367339eec.16.2026.09.06.23.43.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 06 Sep 2026 23:43:52 -0700 (PDT)
-From: Hemanth Selam <hemanth.selam@gmail.com>
-To: Alexander Aring <alex.aring@gmail.com>,
-	Stefan Schmidt <stefan@datenfreihafen.org>,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>
-Cc: linux-wpan@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] net: fix typos in comments
-Date: Mon,  7 Sep 2026 12:13:46 +0530
-Message-ID: <20260907064346.3288-1-hemanth.selam@gmail.com>
-X-Mailer: git-send-email 2.48.1
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="XedbBzyp"
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id B75594E4155D;
+	Mon,  7 Sep 2026 08:12:26 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 8964360383;
+	Mon,  7 Sep 2026 08:12:26 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 694BE11C79353;
+	Mon,  7 Sep 2026 10:12:18 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1788768741; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 in-reply-to:references; bh=u3z5baxYBQVbuUukNZUTET/Fwc46Vz7f8X06+KaYmRM=;
+	b=XedbBzypA2Oaogm0cjiitegaHkLrmqxQD83ag4efmwVNpaxpp5gM1Z6Dd9FcHA2Fu1rDo9
+	BgPzpNdqQmC4qCiJMy7StecIJLaf1agNlSHzh6uSGp2GDXoaha+pXdDg9O0pfGYK1EeSCG
+	fJZkBjkENlfmxo06iTJPOPhbejymlI8jgws1wvaqP6FJ5nBXuGxxytvMxUOfsOz/kyqJr3
+	p4OdJr4yD+dEgpS76vrTk+JujSX/7LJRh6cqT+ZcWw1H65D2jtYMWUeCZ835g/M502rtr4
+	t0NN6UON57nUaYsJv/6KlP4jU1LepzxAkQlWooR8pPeqos0vQ4aDXyeViAzkHQ==
+From: Miquel Raynal <miquel.raynal@bootlin.com>
+To: Hemanth Selam <hemanth.selam@gmail.com>
+Cc: Alexander Aring <alex.aring@gmail.com>,  Stefan Schmidt
+ <stefan@datenfreihafen.org>,  Andrew Lunn <andrew+netdev@lunn.ch>,  "David
+ S . Miller" <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,
+  Jakub Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,
+  Simon Horman <horms@kernel.org>,  linux-wpan@vger.kernel.org,
+  netdev@vger.kernel.org,  linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: fix typos in comments
+In-Reply-To: <20260907064346.3288-1-hemanth.selam@gmail.com> (Hemanth Selam's
+	message of "Mon, 7 Sep 2026 12:13:46 +0530")
+References: <20260907064346.3288-1-hemanth.selam@gmail.com>
+User-Agent: mu4e 1.12.12; emacs 30.2
+Date: Mon, 07 Sep 2026 10:12:17 +0200
+Message-ID: <874ig1xyxq.fsf@bootlin.com>
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Last-TLS-Session-Version: TLSv1.3
 
-Fix typos in comments, reported by scripts/checkpatch.pl using the
-misspelling list in scripts/spelling.txt.  Only touches comments, no code
-changes.
+On 07/09/2026 at 12:13:46 +0530, Hemanth Selam <hemanth.selam@gmail.com> wrote:
 
-Assisted-by: Cursor:claude-opus-5
-Signed-off-by: Hemanth Selam <hemanth.selam@gmail.com>
----
- drivers/net/ieee802154/at86rf230.c | 2 +-
- net/mac802154/iface.c              | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+> Fix typos in comments, reported by scripts/checkpatch.pl using the
+> misspelling list in scripts/spelling.txt.  Only touches comments, no code
+> changes.
+>
+> Assisted-by: Cursor:claude-opus-5
+> Signed-off-by: Hemanth Selam <hemanth.selam@gmail.com>
 
-diff --git a/drivers/net/ieee802154/at86rf230.c b/drivers/net/ieee802154/at86rf230.c
-index 6156cf379916..f1adca942e3d 100644
---- a/drivers/net/ieee802154/at86rf230.c
-+++ b/drivers/net/ieee802154/at86rf230.c
-@@ -1370,7 +1370,7 @@ static int at86rf230_hw_init(struct at86rf230_local *lp, u8 xtal_trim)
- 	 *	  but this is different on each board setup. You need to fine
- 	 *	  tuning this value via CTRIM.
- 	 * CTRIM = variable capacitor setting. Resolution is 0.3 pF range is
--	 *	   0 pF upto 4.5 pF.
-+	 *	   0 pF up to 4.5 pF.
- 	 *
- 	 * Examples:
- 	 * atben transceiver:
-diff --git a/net/mac802154/iface.c b/net/mac802154/iface.c
-index b823720630e7..ff6e99257bc8 100644
---- a/net/mac802154/iface.c
-+++ b/net/mac802154/iface.c
-@@ -521,7 +521,7 @@ static void ieee802154_if_setup(struct net_device *dev)
- 
- 	/* Let hard_header_len set to IEEE802154_MIN_HEADER_LEN. AF_PACKET
- 	 * will not send frames without any payload, but ack frames
--	 * has no payload, so substract one that we can send a 3 bytes
-+	 * has no payload, so subtract one that we can send a 3 bytes
- 	 * frame. The xmit callback assumes at least a hard header where two
- 	 * bytes fc and sequence field are set.
- 	 */
--- 
-2.48.1
+The subject prefix is incomplete, nevertheless typos are real.
 
+Reviewed-by: Miquel Raynal <miquel.raynal@bootlin.com>
