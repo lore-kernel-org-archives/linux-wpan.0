@@ -1,50 +1,52 @@
 Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 260763B810D;
-	Mon,  7 Sep 2026 06:30:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28F083AD51C
+	for <linux-wpan@vger.kernel.org>; Mon,  7 Sep 2026 06:31:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788762607; cv=none; b=FHcg11q5iBJjxIe63m1rTEZ7gO2ogtqFrh25c+0vBiz+M7R6mJ/BaXrx24boq+pIpqMzWMznANk0DHecvRiMDVvWaRurFEZYh483CgVyspE5OljHUOlAufkIBAE05a71SarEvsiJKNzPHtqcKIhAbl06P5GqK2Gogn1hPG5YURU=
+	t=1788762681; cv=none; b=mZ/qisvAYKju6CfxGQ9eobUjGeHhCPNl/SoLHN5MuRaLoMQRk+2rLxiDkpouW1llF8oA6XaRHSakHCrLbY6pCZXPPvLFREH9ZxPPtjrE3pSm1dymUdmpdBwzM2IUuqjN7wSeaszHUt3EwhZAujhmj06kfBnnMWtw7V7cZoKsLsY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788762607; c=relaxed/simple;
-	bh=XIdFeViXGLgb9+qyAiusxSvZPYTUiIt0+kTETG63yTE=;
+	s=arc-20240116; t=1788762681; c=relaxed/simple;
+	bh=yp8MmPjH3R9x5sDWZdHZKG8Cf/MP3TdFmmuG7mG56/I=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=YfguysWDI3AlHTb5/Zh+7BJOyWRDVRP4Svi1eumQ0KYYjJxEtA45ZAEf3FerWqu4V+HLclDT4XKYWxnXicPbdS5ECSioJSw8s3d4p1kAWNcWqyqKPXXPYcosU0a4mgwv2lfNJeWy7yTAkwqgzsr7r831wdfQN1TUWolAnhntFqk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=opJYTIUp; arc=none smtp.client-ip=185.246.84.56
+	 MIME-Version:Content-Type; b=J6T0gIGrixAvbz3VsxT+2mi+QQeJ546ubjevAkZT3Ss6OSfcmXs2fpORGceogk4IaatIUZJXix43tgcxLf/LsspSyIOahAHcdIKu8HkdHSmWUeygmO3zBy7FtogJCiVxWKT8f1oq5aFR2Z7gaTC3nV44aLCTjI4JiouL5bBePwI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=ZUwwBt68; arc=none smtp.client-ip=185.246.84.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="opJYTIUp"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="ZUwwBt68"
 Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 702F71A1A19;
-	Mon,  7 Sep 2026 06:29:59 +0000 (UTC)
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 63A2B1A1A1B;
+	Mon,  7 Sep 2026 06:31:16 +0000 (UTC)
 Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 3BF8660383;
-	Mon,  7 Sep 2026 06:29:59 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 2EA6611C79FF0;
-	Mon,  7 Sep 2026 08:29:54 +0200 (CEST)
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 284AE60383;
+	Mon,  7 Sep 2026 06:31:16 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 4A59611C79D5B;
+	Mon,  7 Sep 2026 08:30:58 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1788762594; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 in-reply-to:references; bh=XIdFeViXGLgb9+qyAiusxSvZPYTUiIt0+kTETG63yTE=;
-	b=opJYTIUptPSlAaH/ERhrPbRu4l4/JAGiaeUjtxg0JYPEyq4nJnPCfNf+DIU4wfueDsE+qL
-	U52y/yK/rwpLaiBOCUi+4vvsrNABzf1EuQCwv68lXmTOQhBHmresg/PqmbWs4x12Wkmraa
-	hBvz+fGEkas/6chniE42Ct3ds8rbWkTuoRDVjALSCAZFPbEjHq1P8/GfmM6VOBXIjMOCCQ
-	M9+nqrLumzoAwzmXP2UcixPqNY5XHYWqSWz6nJ+A605gCgbthMg4GCIhPeSWB4fwpxoKkS
-	hytZ1Nj4I1bnf1D+YjIu1XKHGFjFcUKr0kGuQRuRX+svlImcNwEu1XVJZt7C6A==
+	t=1788762671; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 in-reply-to:references; bh=yp8MmPjH3R9x5sDWZdHZKG8Cf/MP3TdFmmuG7mG56/I=;
+	b=ZUwwBt68t/0d0NmookVUEIMgZYNO/0xrHsighyyC25OMHU7ijj8FHZFgBgNbfweY8VGuwO
+	w4oshTFAwXHggBZUxqnu4UV2aLqpHgQrgb9jSXjZccjyJRp5ey3U6ei0uP1nLiCSqhXA3t
+	1THFdVbE1ZQ426VJdKULNyve1u2BgOu7ewjs3ssRVr5xQDIbKQDQRwO3ZjtIVJ3OwEbEiD
+	Cn9L0Hq/JKT1ZZwMoR/Eqg2Ao3pVlaacX58/Jn0n6qa8Ej4RyAa18S+TEM9TmmAyraxbEo
+	SFRS+yxpeZIoJ1+oOeGXZIOOKXLOoRCEtb4B/2MPTILT2/E28LLDxvoCFRM8QQ==
 From: Miquel Raynal <miquel.raynal@bootlin.com>
-To: Adriano Cordova <adrianox@gmail.com>
-Cc: Alexander Aring <alex.aring@gmail.com>,  Stefan Schmidt
- <stefan@datenfreihafen.org>,  linux-wpan@vger.kernel.org,
-  netdev@vger.kernel.org
-Subject: Re: [PATCH 2/2] ieee802154: warn on unspecific wpan interface type
-In-Reply-To: <20260905212007.304875-2-adrianox@gmail.com> (Adriano Cordova's
-	message of "Sat, 5 Sep 2026 17:20:06 -0400")
-References: <20260905212007.304875-1-adrianox@gmail.com>
-	<20260905212007.304875-2-adrianox@gmail.com>
+To: Xuanqiang Luo <xuanqiang.luo@linux.dev>
+Cc: linux-wpan@vger.kernel.org,  netdev@vger.kernel.org,
+  linux-kernel@vger.kernel.org,  alex.aring@gmail.com,
+  stefan@datenfreihafen.org,  david.girault@qorvo.com,
+  davem@davemloft.net,  edumazet@google.com,  kuba@kernel.org,
+  pabeni@redhat.com,  horms@kernel.org,  stable@vger.kernel.org,  Xuanqiang
+ Luo <luoxuanqiang@kylinos.cn>
+Subject: Re: [PATCH net v1] mac802154: avoid extra skb references in RX queues
+In-Reply-To: <20260905061524.91223-1-xuanqiang.luo@linux.dev> (Xuanqiang Luo's
+	message of "Sat, 5 Sep 2026 14:15:23 +0800")
+References: <20260905061524.91223-1-xuanqiang.luo@linux.dev>
 User-Agent: mu4e 1.12.12; emacs 30.2
-Date: Mon, 07 Sep 2026 08:29:53 +0200
-Message-ID: <87se3ly3oe.fsf@bootlin.com>
+Date: Mon, 07 Sep 2026 08:30:58 +0200
+Message-ID: <87mrtty3ml.fsf@bootlin.com>
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
@@ -54,11 +56,18 @@ MIME-Version: 1.0
 Content-Type: text/plain
 X-Last-TLS-Session-Version: TLSv1.3
 
-On 05/09/2026 at 17:20:06 -04, Adriano Cordova <adrianox@gmail.com> wrote:
+On 05/09/2026 at 14:15:23 +08, Xuanqiang Luo <xuanqiang.luo@linux.dev> wrote:
 
-> Add the unspec-iftype WARN_ON that cfg80211 has. The iftype is set to a
-> real value in ieee802154_setup_sdata(), so hitting the warning is a bug.
+> From: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
 >
-> Signed-off-by: Adriano Cordova <adrianox@gmail.com>
+> __ieee802154_rx_handle_packet() passes each cloned skb to
+> ieee802154_subif_frame() and does not release it after the call. The
+> callee consumes the skb on every path: it either frees it, hands it to
+> the networking stack, or stores it in a queued RX descriptor.
+>
+> The beacon and MAC command paths nevertheless call skb_get() before
+> storing the skb. The worker drops only that additional reference, leaving
+> the original clone reference without an owner and leaking every queued
+> skb.
 
 Reviewed-by: Miquel Raynal <miquel.raynal@bootlin.com>
