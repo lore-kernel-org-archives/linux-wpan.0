@@ -1,69 +1,127 @@
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A41613A0B24;
-	Wed,  9 Sep 2026 07:52:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 174BD53FD2B;
+	Wed,  9 Sep 2026 14:07:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788940350; cv=none; b=gbTC7frvE5w4YBxZkbOio22GuwOIw4ByvTi+MtFJb6sgA7tFoGlIYjs98siq5dNGSymmjU9hnb5kI3AbhNr6EOteLwSfa1OozaH27TyGuBIqXMWCUVeaNwHS7uzGooWEfoGaHMnblgtoSfBnaAXvYngSOiZZwp/DEgpqHISsxxk=
+	t=1788962836; cv=none; b=ght1u6XJ8lc4XR80otpEYsHwxVNRixJB14aPF77OgeJ9OQDWIZ8Ht/2R1E0ETmOhuN7XAI1slVH2nQ9PNGl4sfdh13ABkyUX3CSlc/+SvFG8v5+2qrl4ZYEXDlB0MOfdfXxnAacYA6fF+dHUTpfv5QwqK0He5toJBuoR8F9bjxY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788940350; c=relaxed/simple;
-	bh=VK56naPTqPrtgsF25m3E+Fv5JbhwuquLuIhx/A7VneM=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=pUKaBJVbkej1ZSphRan+bwNud+W7RCCjJ09PGLImyCwG+IYBPH7ff61P1wMzfGOnrWbwX6nc0AgyB3/crhS7kL3l2jmdHe06UK3FwetbYS0BUlkxM7KtIswL5BOZCqOmVlg30V5TDDBU19RrFzRPIam9FvA2agA/DhZaxNUri5o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=cTorz92V; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+	s=arc-20240116; t=1788962836; c=relaxed/simple;
+	bh=yGxcXMg/VT7JrxWQ7k59cV5n2jK1svswZYlXM2tThIQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CQ2hy6o7XCqnCH34UjaPRZQVTP07GaFw6jaa3DNFXv380uoG0U6IEeS6pul2uXsaIgsqCs3XijKjvVCNQESKe794acUk/PEFj6e/uy3At+Jn8KuCkJixFNLimSw/W6eiignaHL+KIj8NIn6bEgg7Pu5G8RRgzS4+xrKxtVwNCMI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VpvCy6Uw; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="cTorz92V"
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 4308A1A1A73;
-	Wed,  9 Sep 2026 07:52:27 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 16DC460448;
-	Wed,  9 Sep 2026 07:52:27 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id C777111C7AF5E;
-	Wed,  9 Sep 2026 09:52:25 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1788940346; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 in-reply-to:references; bh=VK56naPTqPrtgsF25m3E+Fv5JbhwuquLuIhx/A7VneM=;
-	b=cTorz92VOTcridZGAfPep77gwng7PIt/IUdklLYAnForLkT2irhU6DmlDszIXaRmEMbmyV
-	1YBLxib8yjmf1tj7DTRBZHbhc1zfnG2EruCHv4VjPd+a5n6c13IwjZlhx/WuKW6lnNI4hW
-	77pRIo5bxPL1jbCgyLfAwZ6W8y/7Im7EFmVHnUHiYAYj3j+mv/iVl03IIKbNuM/u7yMRhN
-	lNlhKKwrptizTW8J8tBbUbvy/yNrT86Ijrm+AmwWbdEtvZjXeK7V61YJBO4r7bvbzs5Lrj
-	s/NSc5l2pVqNauVP/FN9xi3WCPGvferXFy38L/LSSXGsbiwkmo8NZybo+xqTuQ==
-From: Miquel Raynal <miquel.raynal@bootlin.com>
-To: Adriano Cordova <adrianox@gmail.com>
-Cc: Alexander Aring <alex.aring@gmail.com>,  Stefan Schmidt
- <stefan@datenfreihafen.org>,  linux-wpan@vger.kernel.org,
-  netdev@vger.kernel.org
-Subject: Re: [PATCH v2] ieee802154: register a device type for the wpan dev
-In-Reply-To: <20260908203533.102378-1-adrianox@gmail.com> (Adriano Cordova's
-	message of "Tue, 8 Sep 2026 17:35:33 -0300")
-References: <20260908203533.102378-1-adrianox@gmail.com>
-User-Agent: mu4e 1.12.12; emacs 30.2
-Date: Wed, 09 Sep 2026 09:52:25 +0200
-Message-ID: <87jyousvye.fsf@bootlin.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VpvCy6Uw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 628091F00A3A;
+	Wed,  9 Sep 2026 14:07:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1788962834;
+	bh=yGxcXMg/VT7JrxWQ7k59cV5n2jK1svswZYlXM2tThIQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=VpvCy6UwudJZRKyHYxBt6LUZKSLzqyeSNPo8wcmuhCq6VuIWbikSim8NAcIVxZdE8
+	 Rr2dWFLy383Dhuh7eMMJ38xof/JHameVOaXR+T3Oz9BdvFb0Mjf5JUjBzSALmUTCYu
+	 VkvaF6rvZECVLdGBKB8OjrZdWoDHc6z4rNutbF/vdkvnn5dV+EGAyvOxEvTE9Zrwn9
+	 5kbIb3SSv8A2THq3Mk3ZUKazodObnYDrfNbLzFzUtxOFWJiM2VcxN5Zf6sI5POERtV
+	 UTAE55cfsVoVsODX4FPbGdSQL0V6DbXl3p6lWexRNY28qtPTAojEgIQp96U1DJPLIX
+	 A+FiqpeFWSKgg==
+Date: Wed, 9 Sep 2026 16:07:09 +0200
+From: Joel Granados <joel.granados@kernel.org>
+To: Mauricio Faria de Oliveira <mfo@igalia.com>
+Cc: Kees Cook <kees@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
+	Nicolas Schier <nsc@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, kernel-dev@igalia.com, 
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, fsverity@lists.linux.dev, 
+	keyrings@vger.kernel.org, bpf@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	linux-kbuild@vger.kernel.org, netdev@vger.kernel.org, linux-wpan@vger.kernel.org, 
+	lvs-devel@vger.kernel.org, netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
+	linux-sctp@vger.kernel.org, linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org, 
+	bridge@lists.linux.dev, mptcp@lists.linux.dev, rds-devel@oss.oracle.com, 
+	virtualization@lists.linux.dev
+Subject: Re: [PATCH RFC v3 00/13] sysctl: add module aliases
+Message-ID: <rywhz6soawf5dzyui5g7dnbufsgpxr7ma7honuhejwgncemzrm@f32at7hl6ugm>
+References: <20260819-sysctl-module-aliases-v3-0-aab90569365d@igalia.com>
+ <bpnqwggtidgiec5akns3fa5edbsvl7xf55dxabtwng2xspy4pn@ue554aii2ngk>
+ <53155340c897560bfc67e61ba9568fd6@igalia.com>
+ <mokz5pdtwswkyab4byfq7q7m6ac2g6ceoi6jflyxmaszaibzqa@su6m4kamtdpy>
+ <b1a6cec17e7c828fcebe310ca2a0d25b@igalia.com>
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="2m5clqoly7vxfssm"
+Content-Disposition: inline
+In-Reply-To: <b1a6cec17e7c828fcebe310ca2a0d25b@igalia.com>
 
-Hi Adriano,
 
-On 08/09/2026 at 17:35:33 -03, Adriano Cordova <adrianox@gmail.com> wrote:
+--2m5clqoly7vxfssm
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> cfg802154 never assigns a device type to wpan interfaces, so their
-> netdev uevent carries no DEVTYPE key. Mirror cfg80211, which calls
-> SET_NETDEV_DEVTYPE() from a NETDEV_POST_INIT case, and set a new
-> wpan_dev_type so the device is typed DEVTYPE=wpan.
->
-> Signed-off-by: Adriano Cordova <adrianox@gmail.com>
-> ---
+On Fri, Sep 04, 2026 at 02:45:23PM -0300, Mauricio Faria de Oliveira wrote:
+> On 2026-09-04 10:41, Joel Granados wrote:
+> > On Thu, Aug 20, 2026 at 06:22:13PM -0300, Mauricio Faria de Oliveira wr=
+ote:
+> >> On 2026-08-20 09:51, Joel Granados wrote:
+> >> > On Wed, Aug 19, 2026 at 03:16:13PM -0300, Mauricio Faria de Oliveira=
+ wrote:
+> >> >> This series adds 'sysctl:' aliases to modules that register sysctl =
+tables; e.g.:
+<... snip ...>
+> > use the correct call moving forward?
+>=20
+> This scheme currently covers all modules, AFAIK, as it is wrapped in the
+> functions that register sysctl tables.
+>=20
+> On moving forward: usage of such functions in a way that breaks a
+> requirement of this series (e.g., failing to specify the template
+> table/path parameter(s), or not having constant initializers) hits a
+> build error, as the requirements are actually from the compiler.
+>=20
+> >> I guess that a different design could use MODULE_SYSCTL_TABLE() as
+> >> MODULE_DEVICE_TABLE(), declared per table instead of wrapped into
+> >> register sysctl functions.
+> >> However, it seems to require moving the value of the path argument (or
+> >> its template) into the macro and still referencing it in the function
+> >> (or its instantiation of the template), which adds obfuscation, to all
+> >> callers.=20
+> >>=20
+> >> What do you think?
+> > It might be that having it inside the module subsys is more work, but I
+> > believe that there is the right place to have it. I still don't see that
+> > adding a module specific arg to the sysctl register is a good thing.
+>=20
+> Ok, cool. I can work on a different design.
+>=20
+> Please just let me know whether you are OK with the remaining (above),
+> and I'll be happy to tackle this.
 
-Diff is identical, why didn't you kept my Rb?
+What is "the remaining"?
 
+Best
+
+--2m5clqoly7vxfssm
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQGzBAABCgAdFiEErkcJVyXmMSXOyyeQupfNUreWQU8FAmqhaAwACgkQupfNUreW
+QU+KhwwAk2Lee/ZoiUFUIogotHEgXdEnbLXsVMd7eYE+yCbFRSeHmKvBS3+HIQKk
+3YwwDiKYy9LoPX/Z8J6u2Xzr6HX2acGjasEgcoVhtZwFfhNXbIhLsKQXuCL5xeP8
+SP94dos6ha2gCbwAasxDxDaxBIeSpiyAojpShoXDz5sWPUp0+CmYPWbFSxvUSIiI
+ky8t15AXflY5CE5Zs1l4rIapiMx4+KY3eP9XUpwYfkuRfqrIcdXpZAQLPEEHlvpI
+YWkeFHLIzcVwQDJMylAIDZXqkqkcPwdT7HhvrtG59h/8S3oIx5d/D6RC03Wgb6Ac
+O03rgV1e427EBuBbAqihY/D46amiR8xQUv+T+jgM+DnKvwGlmiTsIUimaqMrbVkq
+tbmIxW90f2zlalhgxxmLbrnkzOLQ/jL4hz7blCO912BBCLNX40Ed/ZwI2GE+7hWk
+LwqnPJ25U43p9yb5S6lO0E4aXy0oDr1cRrm93HBZeRgkQBJM4L8IttiwgbTEVAGM
+McH2aXN2
+=WiYs
+-----END PGP SIGNATURE-----
+
+--2m5clqoly7vxfssm--
