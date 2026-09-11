@@ -1,143 +1,160 @@
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+Received: from mail-qk2-f12.google.com (mail-qk2-f12.google.com [74.125.230.204])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDAC3357D0D
-	for <linux-wpan@vger.kernel.org>; Thu, 10 Sep 2026 20:31:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A9C42D0292
+	for <linux-wpan@vger.kernel.org>; Fri, 11 Sep 2026 01:17:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.230.204
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789072280; cv=pass; b=AYB7WAyvZ9PGiLCqk7Y7e1bFO7CnteUCeaIfuwhOM1SV4+uOCkaYA8IY3gfoCu+ptIUGChsrJ3hX+mgVspUr6+PaIBZ1O//VHvgexn1q2ZDklYlx3RoJ44tmUpkaTy2xUwsa0KfjAZe6emIamQIjPeEky/c6/iaU9lkTRgXfoa0=
+	t=1789089427; cv=pass; b=kDG8xkOn4BUy7JlUeOl79Oz5Bew5etM452EpTggYwdzIA9r80Qe44yJX+v1DEwNHBOz9EFMcd+dc0YDV9iiEJpcOqdZF5TVG4/RGGwsUA41UlVvALOUi+/UJai8X5O2r2rmweyruxMZ+XY2tWpUpPMcVZCNwIx69O6Lf9vGwMHM=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789072280; c=relaxed/simple;
-	bh=HnpGtnRbnZM4AM/ENNwGiaWU5/n9HHmzlea3vnt2Eao=;
-	h=From:MIME-Version:Date:Message-ID:Subject:To:Cc:Content-Type; b=RUlDiEvhPByVXQfbAwIjCQkXA79WaV4kXSTOhq0f/yEpydxuCrz6EV6pky5azh1N/p4dOqiiQhJkVSmPGjNP0mpsew/F8RDTUfVg6SiGjjeQyDGUHk20d+UXydLFbEqYQRSV/yI0ByToaNjODfLPKvFgclcbzBM0fcW9yO+cDog=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=berkeley.edu; spf=pass smtp.mailfrom=berkeley.edu; dkim=pass (2048-bit key) header.d=berkeley.edu header.i=@berkeley.edu header.b=gWBo/ZXP; arc=pass smtp.client-ip=209.85.210.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=berkeley.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=berkeley.edu
+	s=arc-20240116; t=1789089427; c=relaxed/simple;
+	bh=5q+iL/R4cDrY1TpT6uISBmPsAgAumboJPqFJbP2vER4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=PrevwsB+FMMdngQymduP5dJVPxxuSRslKTfB1m4OJw6+gUGttR52OcWM0VKArXKGEelVg7uICDejccc8wAMEeOzIACbc0B2yvKDqoZKzz1Abm9aBKGnbOTC95nIre+qzX7Ypt2dvy6GG6mh8Xa8gcxHWkQzevqa+8y34PQwY64c=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HijGppF3; arc=pass smtp.client-ip=74.125.230.204
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=berkeley.edu header.i=@berkeley.edu header.b="gWBo/ZXP"
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-853c07a76adso151296b3a.0
-        for <linux-wpan@vger.kernel.org>; Thu, 10 Sep 2026 13:31:17 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1789072277; cv=none;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HijGppF3"
+Received: by mail-qk2-f12.google.com with SMTP id d75a77b69052e-52fb766bfd6so5921491cf.1
+        for <linux-wpan@vger.kernel.org>; Thu, 10 Sep 2026 18:17:04 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1789089424; cv=none;
         d=google.com; s=arc-20260327;
-        b=IvawoKb928Q5F1XphDMFJzRBv51dNI/Xl100PEbQNkBCdqVYR5cw0LH6UcTT508Tum
-         LWLGkYC0OH2XPjHGq2tb07QQvy7CgrcquDdHiuPJVxMLxzu6f7yyzGn+VPNxoWw7TdEZ
-         cIwkefMvlr7+RiY5vCBpOz/WyRUD0pBT7vYQmS1UWwm5evP4FDNlnnusdk1ZRCd3SMX3
-         PtXMLQw/tOt62R09S7eDqiGEVbpQg8aXUQyXC3UJGdfRXklcxtakzMMDplvSq20TMXZO
-         3iSFTJ7cb0Y/jU+VFZx73s7ut2n+9F0bCEp7aRdCOGFcyheIOiWxvTcmHK14RDooInsD
-         iacw==
+        b=MUumW4UPQq3MXcWAH1YN2vCXAof3KnVEzv8ZsoL5izoyjNzXNCSEZzSCsXm1rtrE3y
+         JNIH+UsjAPKpg6zb1Q76NkBqvfPPQX7sh6PGPCHIXEJHgLO15mbzWfsxSz+btVD9vv3s
+         49ehDjaGe6rWI+2E46gTrR78KanTMJWIi1bhAnPQt4c1bjkBItRs/yacYqJeX6hwOZB+
+         wlKNE2DpGdpCjjW2MO3Is3iBCnXwDew0HZcb6T1WvgYjY+LX0zNpMi4otztizUtTBAq8
+         4vnSkf6SUgHU75gR9ubLdpA4ZnabChBH8VWFpK/Ye2otGS6CMxQzJlNJUCQwLEL3dl9/
+         zG+w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=cc:to:subject:message-id:date:mime-version:from:dkim-signature;
-        bh=maCUZCHQL/0Dung/jQglQrSJpIrbe49RGrAjwhWAl9E=;
-        fh=ghQVvrcuDLYsCuw630odtE2tmuoqUWc1Y88KeoOZjHg=;
-        b=pBp3fCsX4mtjYDUSezw52dI82pWvTC+Op5FscGcIhpHxxq4qN3EDUH4R4k+h9e8Rsz
-         XlF6wbPpaYB5TulS06rPNKvk2M/5ND3B3DQaC5Q4MZUpEkzpbhd3efzWxTlKY7pltiNg
-         ViBSuF7Beh7e9UsHeHzXLmhsNug1ILBxourM96VDnctq+xd1e4Y4JdFtcCLxhiXqRNbx
-         PMRMwRLVACvUKGYDp79nAZwV0hlmbgdcXB23KrznaXuf3cBru7BSoWWhMPEXjX1OuIiR
-         o+qhYLU22H+hpU6WKMQWw+ZYoBoEGeJ4agyZHX/cJs039iZy1L+QjHiVD9z5u3y8UefU
-         TuHg==;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=d5p9NQgPpyH0j9JiAgxiWq3LurVs8yYrQVoiE1QcZUw=;
+        fh=ycCw89RRE7nZTpex0acWlcL3Hb9hLB4kDsz4uaAPYqY=;
+        b=gUUfUrGiVR89dCyjCRj4l8L9yGOzFTM7Lz1ifuX3X6ghWmAWpe4uaVUr/93Tc4R/wB
+         M5TsJqKe9oosL9cJ1CJerHICDVr1ddgvWHXM2nBcRy14BPCjWeqsWRG0rRGDKgcGBnAh
+         QHBZ5tWAZPHoYV0UYKt9Hhm1mh82nde5NQG0P5r9/YnXwO3vKwYBbvosT+zn7eHvio4V
+         MK6zfmhHy3BiNaOEVxJLxnafoc2t70s1Kbsv0p66TKU49VKSE6bGhoX1ngo+qF/h3RVj
+         Fe7eWvgdIevlNmADBwyh5wfKysuinzBnZc/R7P/PXK4Umw1SZcmKagYI7oO+pmhvl10g
+         vAhw==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=berkeley.edu; s=google; t=1789072277; x=1789677077; darn=vger.kernel.org;
-        h=content-type:cc:to:subject:message-id:date:mime-version:from:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=maCUZCHQL/0Dung/jQglQrSJpIrbe49RGrAjwhWAl9E=;
-        b=gWBo/ZXPT4YZik/B+Jrmlb2U1l6J+wYXZZoaJDOG8Bn3Jgtf29X7Wyu43Adr3JDxrW
-         veyxYkuPxigA0wYCWvFgvq1x9kg7uApW5OqFhijdUD/JNxROj6JZ+1FLUJS+HTOUQid6
-         ke19X7blz4r5bqBC3IM41a8yXKRU2xlqMl0o/5SB7inuvrAu27CoXUCo6BP1kXXYh7zW
-         x0JpnVCy20WRGC7GkoazdeuY/Mo2Y4b5EJlypHXHQyRE2mub+tE9qTwpNU6Pa8hgPUCs
-         j3cNCEQL//dQnnCFSyXRsJ55hXPliYPCdeH6WDlXHKu9sUaALMSEJLpvmlfHD9+5inG/
-         Xm0A==
+        d=google.com; s=20251104; t=1789089424; x=1789694224; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=d5p9NQgPpyH0j9JiAgxiWq3LurVs8yYrQVoiE1QcZUw=;
+        b=HijGppF3YqI7mjQm+WRnchhbkLIGAn7xuY3LCkZo8iMrhJ1aQ4elSuEjtahnX4xhaZ
+         1o4PGE3JPPQNog2RSzhnr0ZeP+TeGRBy0b8igJr+EByUjDl1S5u5jMiNK/07KSEAYWJ0
+         A3W+cGhtl42Z54+D0OEYIvUPwO5VGMTWxyDkC4JasInYOJPE8gJy1TyFw+z8KWkBc2Xr
+         gmfEWAG4rDDUKOCGHafU8aql42Fqx+lZ6w50GGKHOD285WXr/mOVPJ0XKWG2AHhSHoXv
+         2id6kA0htS1/G1IfTxmv2m3LlCDlhSHd9eeRfJq2YzbXV2TRPYvaGE4MJyZaPMChHPsL
+         OWkg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1789072277; x=1789677077;
-        h=content-type:cc:to:subject:message-id:date:mime-version:from
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=maCUZCHQL/0Dung/jQglQrSJpIrbe49RGrAjwhWAl9E=;
-        b=VHCERVGhYQY2zNw78/ZzxAEW6JNgKdUxue7FlpRVctmHNfN3OWQlxFZsxKwraJB9VS
-         DyBcYG5HCnnojQ9E1cCSn3PhvqKMf+Dqgj0PV3nTqiZuZDHnjCyc3wp8MfYD6wVICp/b
-         4XDB9AyLHW4Wztjkk0TUNr+vjFh/FnNUMMb7q0oPeUKgKlhUIjbRAh6RS4d69RTFbm3S
-         dVn2cdHBluuqHRc6JpfKqKO/i5PvFqmkSubzVrc5BiSHPvRZPlwddulk/J+ZJrtdwjqg
-         MbhG2GvJ4r25P2rlIDlDIwJjdXKv72zR9ft6ldE3MLdkb6R8DZhfSthlrmrwYLS/9J7+
-         CKhQ==
-X-Forwarded-Encrypted: i=1; AKwUvBwsWyrLuHneXeRwW49vW7I5XwBWwHO0jR7pJvamulZzTV1a2HIF5p68G47waEhdPdaM+J6c8+DbAWfo@vger.kernel.org
-X-Gm-Message-State: AFuF++mKP01qE4fxyk9dfZuBSDfaHNROC9w7oJLVWR7k606DaRrUVaTw
-	dk+TyQP14otNR8xtYxpB8TXNGOP5MFeX4MVIVHJ9PbW5Wx+xqXVcXd2eVwL+CBRQ9Kkyxm6yAux
-	GcRQ4ZzD8eijEkbQjNwyEPj24tEWtr/yvmudPRgxs
-X-Gm-Gg: AYBFou2AxhEW2dqixVOUG1NOphidnC1i6Wzy0Z1ptfMFhAPAa9Vk7r4kyUmVO47rXC3
-	71NQJ+u58lEAXfpz2BSY/q+JUoesLBxyIM7bnfRekSSFm1STYUCXLH3MkVZQahPlGwFItwplbyB
-	L8+WIi3fXGdPYP/DDXOFuNU3hsMC6NpkoU/iKuDhC+XUWDCr6VIn2yheLRdBfviUlx4OVSUfZRl
-	Itq7S/dmXDo54r5THZ8JOkIoaOojfTqSneNH6H58EKBurIEK38IiUiootEEmiCC72bXHDKyxiY3
-	lwxq/FyVRQ3PoNnNd22sbkFmJqL11RuATiMlG1+MIZaSpI9owqgxq3L7PTQT1zXn7Lc1mbYgF3K
-	6hqY1rDLmLz85clQR6WhCagovU/CJHJqfe2qFqVi7ZeE=
-X-Received: by 2002:a05:6a00:981:b0:861:2029:4f59 with SMTP id
- d2e1a72fcca58-86b2eaf0dd9mr981631b3a.3.1789072275873; Thu, 10 Sep 2026
- 13:31:15 -0700 (PDT)
-Received: from 474444807712 named unknown by gmailapi.google.com with
- HTTPREST; Thu, 10 Sep 2026 20:31:14 +0000
-Received: from 474444807712 named unknown by gmailapi.google.com with
- HTTPREST; Thu, 10 Sep 2026 20:31:14 +0000
-From: Farhad Alemi <farhad.alemi@berkeley.edu>
-X-Mailer: git-send-email 2.53.0
+        d=1e100.net; s=20251104; t=1789089424; x=1789694224;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=d5p9NQgPpyH0j9JiAgxiWq3LurVs8yYrQVoiE1QcZUw=;
+        b=MGsAMvfVVjybwXLTh/+ZGvo5LswjFKNdBFZbi60FL5JWHM+KpIW3XMpRiUN2oPngW8
+         wsoZWr4o/npEnazeg28MwofbtER4t6N2MYmIQ5CBomOkWObn6jk16PHMqU6frkrErbEN
+         2XALS3EQ5b+4vs9yVIQm/Mg6aBgYtuS/jI9dNHeTjG8AZmYEiFvYIXfLGbKq4D3n1kjP
+         ypLclieMXfYmiTEM9mdhsRaBPfGCTT1cNMfgUXt5cqo7SErFBg4b87SrJkO7oP4KvFAj
+         amyP6HTGlP5HcIl4nhn96mExoQSbFTgsrgfDogoKyv/VtsV5dyJXkHuYJSV9By/2k3xG
+         Aviw==
+X-Forwarded-Encrypted: i=1; AKwUvBxvXbb6Ha4PzBiZ7zq9bpmJjGPTwv+1iD/nbvey/5hkE7bxBC98wP0rWvyovrkB9ZRMnj7I+bq33MiY@vger.kernel.org
+X-Gm-Message-State: AFuF++kf2HnbDrrj7qNyKsFzHtkBBq6MB7/vPf2pvNIGXxVnTGDCsEGw
+	XY4KNXCw4SOVmIG99eqYeXqoFINHzT2J7FrKO/Kjxpd816tqxPw5FSZdHIAhsjiA7XjRNfqdzrj
+	Gw8ewV0vMwqaFMf04p6sjtph0FYo7HtYpEvxDSl09
+X-Gm-Gg: AYBFou1n2I2nFAz/htVY+HQnIb1Bgtu9LAEMajHmRn5WJFV7yqY0Whz8SRajqKs0Rau
+	rnzPaYWI4TMYxYSXCbFZl5qX+ywvM0obADYRdz66G9zxKM6FUBGdK02EaKhIoXIfYMNXIkf9a2m
+	L4zr7OmMHHrnLHUN2SE7+qxZndWoZTYhHFcP7b35K3l5cITmya3uCm/zKhh7gNWJ4xgtHHmZbM2
+	YDZi/ntNt728qomCHKVSgK7tHjgcVt5E/UJP1hyW8YPtvZirvyL+38pm59BCxIjcmiNWNzFBrTu
+	qs/7t9kWJzbzyeBu1LQXjKIGcSjMGHN96cM5YlDcUVemQ9ci8BsfLbUPlarRehuJQKT3VtiZkeY
+	ME2G7uNnPRPT1aK4j9d0e6quT2B0wXthHUSUgggybIffpUDuIGSB6nNFKoNSc42DXS4s0tUAkfn
+	ARsvoGCqNahJicpjVD5UGi1S/1tRN2gg==
+X-Received: by 2002:ac8:6f11:0:b0:52f:64c4:8094 with SMTP id
+ d75a77b69052e-530c87226a9mr49908141cf.39.1789089423282; Thu, 10 Sep 2026
+ 18:17:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Thu, 10 Sep 2026 20:31:14 +0000
-X-Gm-Features: AcwNN1VUXzs2Scd6J6vqkMNAsWPmubZx5Syf8DU19mCYgSWymDz_57w_RDyC_Fc
-Message-ID: <CA+0ovCgMrVBnn+0d198i0th0bcr0EAwNZ=0juh1ug8DdJX5mPw@mail.gmail.com>
-Subject: [PATCH] 6lowpan: do not compress headers that are not fully present
-To: Alexander Aring <alex.aring@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Farhad Alemi <farhad.alemi@berkeley.edu>, falemi@asu.edu, 
+References: <CA+0ovCgMrVBnn+0d198i0th0bcr0EAwNZ=0juh1ug8DdJX5mPw@mail.gmail.com>
+In-Reply-To: <CA+0ovCgMrVBnn+0d198i0th0bcr0EAwNZ=0juh1ug8DdJX5mPw@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 10 Sep 2026 18:16:52 -0700
+X-Gm-Features: AcwNN1VGil1vFMyCvGxTO0Uen3SBrfMM4J1yekoBWYuH_50vYwcqY9LxSE-7cx4
+Message-ID: <CANn89iJg-10Xy_N_h3Et3wTasS_7RMkwxsz3XKmzYc7mLhKa-Q@mail.gmail.com>
+Subject: Re: [PATCH] 6lowpan: do not compress headers that are not fully present
+To: Farhad Alemi <farhad.alemi@berkeley.edu>
+Cc: Alexander Aring <alex.aring@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, falemi@asu.edu, 
 	Simon Horman <horms@kernel.org>, Marcel Holtmann <marcel@holtmann.org>, 
 	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, linux-bluetooth@vger.kernel.org, 
 	linux-wpan@vger.kernel.org, netdev@vger.kernel.org, 
 	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-lowpan_header_compress() pays for the IPHC header it pushes by first
-calling skb_pull(skb, sizeof(struct ipv6hdr)), but that pull is a no-op
-when skb->len is shorter than an IPv6 header, so the unpaid skb_push() can
-drive skb->data below skb->head and into skb_under_panic().
-lowpan_nhc_check_compression() has the same missing length check,
-committing to the next-header compression path without requiring the
-nhc->nexthdrlen transport bytes that nhc->compress() reads and
-lowpan_nhc_do_compression() then pulls.  Return -EINVAL from
-lowpan_header_compress() when pskb_may_pull() cannot produce a full IPv6
-header, and return -ENOENT from lowpan_nhc_check_compression() unless the
-IPv6 header plus nhc->nexthdrlen bytes are present, so that the nexthdr
-falls back to its inline encoding.
+On Thu, Sep 10, 2026 at 1:31=E2=80=AFPM Farhad Alemi <farhad.alemi@berkeley=
+.edu> wrote:
+>
+> lowpan_header_compress() pays for the IPHC header it pushes by first
+> calling skb_pull(skb, sizeof(struct ipv6hdr)), but that pull is a no-op
+> when skb->len is shorter than an IPv6 header, so the unpaid skb_push() ca=
+n
+> drive skb->data below skb->head and into skb_under_panic().
+> lowpan_nhc_check_compression() has the same missing length check,
+> committing to the next-header compression path without requiring the
+> nhc->nexthdrlen transport bytes that nhc->compress() reads and
+> lowpan_nhc_do_compression() then pulls.  Return -EINVAL from
+> lowpan_header_compress() when pskb_may_pull() cannot produce a full IPv6
+> header, and return -ENOENT from lowpan_nhc_check_compression() unless the
+> IPv6 header plus nhc->nexthdrlen bytes are present, so that the nexthdr
+> falls back to its inline encoding.
+>
+> Closes: https://lore.kernel.org/all/CA+0ovCjTsygN76s2o=3DTZqPqW8v2gBhmRnz=
++q6G-NaB3Cq-YPqQ@mail.gmail.com/
+> Signed-off-by: Farhad Alemi <farhad.alemi@berkeley.edu>
 
-Closes: https://lore.kernel.org/all/CA+0ovCjTsygN76s2o=TZqPqW8v2gBhmRnz+q6G-NaB3Cq-YPqQ@mail.gmail.com/
-Signed-off-by: Farhad Alemi <farhad.alemi@berkeley.edu>
----
---- a/net/6lowpan/iphc.c
-+++ b/net/6lowpan/iphc.c
-@@ -1140,6 +1140,10 @@ int lowpan_header_compress(struct sk_buff *skb,
-const struct net_device *dev,
- 	if (skb->protocol != htons(ETH_P_IPV6))
- 		return -EINVAL;
+Notes in a semi random order.
 
-+	/* The IPHC header pushed below is paid for by pulling this header. */
-+	if (!pskb_may_pull(skb, sizeof(struct ipv6hdr)))
-+		return -EINVAL;
-+
- 	hdr = ipv6_hdr(skb);
- 	hc_ptr = head + 2;
+1) You forgot to tag the net tree in your patch.
 
---- a/net/6lowpan/nhc.c
-+++ b/net/6lowpan/nhc.c
-@@ -47,7 +47,9 @@ int lowpan_nhc_check_compression(struct sk_buff *skb,
- 	spin_lock_bh(&lowpan_nhc_lock);
+2) You forgot the Fixes: tag
 
- 	nhc = lowpan_nexthdr_nhcs[hdr->nexthdr];
--	if (!(nhc && nhc->compress))
-+	/* nhc->compress() reads and then pulls nexthdrlen transport bytes. */
-+	if (!(nhc && nhc->compress) ||
-+	    !pskb_may_pull(skb, sizeof(struct ipv6hdr) + nhc->nexthdrlen))
- 		ret = -ENOENT;
+Please look at Documentation/process/maintainer-netdev.rst for more details=
+.
 
- 	spin_unlock_bh(&lowpan_nhc_lock);
+3) In net/6lowpan/nhc.c, calling pskb_may_pull() inside
+lowpan_nhc_check_compression() can reallocate skb->head (via
+pskb_expand_head()).
+When this happens, the 'hdr' pointer in lowpan_header_compress()
+becomes dangling. lowpan_header_compress() continues to dereference
+hdr throughout the rest of the function (hdr->nexthdr, hdr->hop_limit,
+hdr->saddr, hdr->daddr), leading to a use-after-free.
+
+4) Callers of lowpan_header_compress() do not check its return value.
+In net/bluetooth/6lowpan.c (setup_header()) and
+net/ieee802154/6lowpan/tx.c (lowpan_header()), the return code of
+lowpan_header_compress() is completely ignored. If it returns -EINVAL,
+they proceed to transmit the malformed/uncompressed skb anyway.
+
+5) In net/bluetooth/6lowpan.c:setup_header(), there is already an
+out-of-bounds read before lowpan_header_compress() is even called:
+hdr =3D ipv6_hdr(skb);
+...
+memcpy(&ipv6_daddr, &hdr->daddr, sizeof(ipv6_daddr));
+
+If skb->len is less than sizeof(struct ipv6hdr), reading hdr->daddr
+is already out of bounds. The driver's transmit path (bt_xmit /
+setup_header) needs to validate skb length / pskb_may_pull before
+touching the IPv6 header, and must check the return value of
+lowpan_header_compress().
+
+Thanks.
