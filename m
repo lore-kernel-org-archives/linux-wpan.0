@@ -1,160 +1,150 @@
-Received: from mail-qk2-f12.google.com (mail-qk2-f12.google.com [74.125.230.204])
+Received: from mail-oa2-f1.google.com (mail-oa2-f1.google.com [74.125.231.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A9C42D0292
-	for <linux-wpan@vger.kernel.org>; Fri, 11 Sep 2026 01:17:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.230.204
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789089427; cv=pass; b=kDG8xkOn4BUy7JlUeOl79Oz5Bew5etM452EpTggYwdzIA9r80Qe44yJX+v1DEwNHBOz9EFMcd+dc0YDV9iiEJpcOqdZF5TVG4/RGGwsUA41UlVvALOUi+/UJai8X5O2r2rmweyruxMZ+XY2tWpUpPMcVZCNwIx69O6Lf9vGwMHM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789089427; c=relaxed/simple;
-	bh=5q+iL/R4cDrY1TpT6uISBmPsAgAumboJPqFJbP2vER4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PrevwsB+FMMdngQymduP5dJVPxxuSRslKTfB1m4OJw6+gUGttR52OcWM0VKArXKGEelVg7uICDejccc8wAMEeOzIACbc0B2yvKDqoZKzz1Abm9aBKGnbOTC95nIre+qzX7Ypt2dvy6GG6mh8Xa8gcxHWkQzevqa+8y34PQwY64c=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HijGppF3; arc=pass smtp.client-ip=74.125.230.204
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HijGppF3"
-Received: by mail-qk2-f12.google.com with SMTP id d75a77b69052e-52fb766bfd6so5921491cf.1
-        for <linux-wpan@vger.kernel.org>; Thu, 10 Sep 2026 18:17:04 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1789089424; cv=none;
-        d=google.com; s=arc-20260327;
-        b=MUumW4UPQq3MXcWAH1YN2vCXAof3KnVEzv8ZsoL5izoyjNzXNCSEZzSCsXm1rtrE3y
-         JNIH+UsjAPKpg6zb1Q76NkBqvfPPQX7sh6PGPCHIXEJHgLO15mbzWfsxSz+btVD9vv3s
-         49ehDjaGe6rWI+2E46gTrR78KanTMJWIi1bhAnPQt4c1bjkBItRs/yacYqJeX6hwOZB+
-         wlKNE2DpGdpCjjW2MO3Is3iBCnXwDew0HZcb6T1WvgYjY+LX0zNpMi4otztizUtTBAq8
-         4vnSkf6SUgHU75gR9ubLdpA4ZnabChBH8VWFpK/Ye2otGS6CMxQzJlNJUCQwLEL3dl9/
-         zG+w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=d5p9NQgPpyH0j9JiAgxiWq3LurVs8yYrQVoiE1QcZUw=;
-        fh=ycCw89RRE7nZTpex0acWlcL3Hb9hLB4kDsz4uaAPYqY=;
-        b=gUUfUrGiVR89dCyjCRj4l8L9yGOzFTM7Lz1ifuX3X6ghWmAWpe4uaVUr/93Tc4R/wB
-         M5TsJqKe9oosL9cJ1CJerHICDVr1ddgvWHXM2nBcRy14BPCjWeqsWRG0rRGDKgcGBnAh
-         QHBZ5tWAZPHoYV0UYKt9Hhm1mh82nde5NQG0P5r9/YnXwO3vKwYBbvosT+zn7eHvio4V
-         MK6zfmhHy3BiNaOEVxJLxnafoc2t70s1Kbsv0p66TKU49VKSE6bGhoX1ngo+qF/h3RVj
-         Fe7eWvgdIevlNmADBwyh5wfKysuinzBnZc/R7P/PXK4Umw1SZcmKagYI7oO+pmhvl10g
-         vAhw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1789089424; x=1789694224; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=d5p9NQgPpyH0j9JiAgxiWq3LurVs8yYrQVoiE1QcZUw=;
-        b=HijGppF3YqI7mjQm+WRnchhbkLIGAn7xuY3LCkZo8iMrhJ1aQ4elSuEjtahnX4xhaZ
-         1o4PGE3JPPQNog2RSzhnr0ZeP+TeGRBy0b8igJr+EByUjDl1S5u5jMiNK/07KSEAYWJ0
-         A3W+cGhtl42Z54+D0OEYIvUPwO5VGMTWxyDkC4JasInYOJPE8gJy1TyFw+z8KWkBc2Xr
-         gmfEWAG4rDDUKOCGHafU8aql42Fqx+lZ6w50GGKHOD285WXr/mOVPJ0XKWG2AHhSHoXv
-         2id6kA0htS1/G1IfTxmv2m3LlCDlhSHd9eeRfJq2YzbXV2TRPYvaGE4MJyZaPMChHPsL
-         OWkg==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A6EC40DB33
+	for <linux-wpan@vger.kernel.org>; Mon, 14 Sep 2026 09:57:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.231.65
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1789379859; cv=none; b=Gvax+U8HI+Z6OWDxUL47S0lFxqynI22Nvg/vg8Bp4kGCpmEHkqBHvisG1Bewiz+W4737kzoDXGJ7PtAHs7CtOeK0ifu6ePhHnTTzdP2t4iURl1kaOv3uLnw0JEf+FlmE2hmDLYzVFB6dFCQ0A2AIStFCi46t8W7gBfZD+W35zuw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1789379859; c=relaxed/simple;
+	bh=3qiAnH7OuYwzpG0yK4SgScObKktr+6Jrd70bQk5EbQw=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=o/q1OgDU6BDYh2w27atpnIeqluB2U0/rfsaMhAsNwV99BrXRnUGbcfGboY57zKs6z3CNFfbjakHgbfhGdC7DN974L0WAWXg4WVjhqemKLhzRfiHfT/bpqpUt/uguIcQ/mGcb+frdXMliy485IJaQntngSqL3Gcg8vB9I0yK0mD0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=74.125.231.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oa2-f1.google.com with SMTP id 586e51a60fabf-448a12ddfb4so1445667fac.1
+        for <linux-wpan@vger.kernel.org>; Mon, 14 Sep 2026 02:57:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1789089424; x=1789694224;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
+        d=1e100.net; s=20251104; t=1789379857; x=1789984657;
+        h=content-type:to:from:subject:message-id:date:mime-version
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=d5p9NQgPpyH0j9JiAgxiWq3LurVs8yYrQVoiE1QcZUw=;
-        b=MGsAMvfVVjybwXLTh/+ZGvo5LswjFKNdBFZbi60FL5JWHM+KpIW3XMpRiUN2oPngW8
-         wsoZWr4o/npEnazeg28MwofbtER4t6N2MYmIQ5CBomOkWObn6jk16PHMqU6frkrErbEN
-         2XALS3EQ5b+4vs9yVIQm/Mg6aBgYtuS/jI9dNHeTjG8AZmYEiFvYIXfLGbKq4D3n1kjP
-         ypLclieMXfYmiTEM9mdhsRaBPfGCTT1cNMfgUXt5cqo7SErFBg4b87SrJkO7oP4KvFAj
-         amyP6HTGlP5HcIl4nhn96mExoQSbFTgsrgfDogoKyv/VtsV5dyJXkHuYJSV9By/2k3xG
-         Aviw==
-X-Forwarded-Encrypted: i=1; AKwUvBxvXbb6Ha4PzBiZ7zq9bpmJjGPTwv+1iD/nbvey/5hkE7bxBC98wP0rWvyovrkB9ZRMnj7I+bq33MiY@vger.kernel.org
-X-Gm-Message-State: AFuF++kf2HnbDrrj7qNyKsFzHtkBBq6MB7/vPf2pvNIGXxVnTGDCsEGw
-	XY4KNXCw4SOVmIG99eqYeXqoFINHzT2J7FrKO/Kjxpd816tqxPw5FSZdHIAhsjiA7XjRNfqdzrj
-	Gw8ewV0vMwqaFMf04p6sjtph0FYo7HtYpEvxDSl09
-X-Gm-Gg: AYBFou1n2I2nFAz/htVY+HQnIb1Bgtu9LAEMajHmRn5WJFV7yqY0Whz8SRajqKs0Rau
-	rnzPaYWI4TMYxYSXCbFZl5qX+ywvM0obADYRdz66G9zxKM6FUBGdK02EaKhIoXIfYMNXIkf9a2m
-	L4zr7OmMHHrnLHUN2SE7+qxZndWoZTYhHFcP7b35K3l5cITmya3uCm/zKhh7gNWJ4xgtHHmZbM2
-	YDZi/ntNt728qomCHKVSgK7tHjgcVt5E/UJP1hyW8YPtvZirvyL+38pm59BCxIjcmiNWNzFBrTu
-	qs/7t9kWJzbzyeBu1LQXjKIGcSjMGHN96cM5YlDcUVemQ9ci8BsfLbUPlarRehuJQKT3VtiZkeY
-	ME2G7uNnPRPT1aK4j9d0e6quT2B0wXthHUSUgggybIffpUDuIGSB6nNFKoNSc42DXS4s0tUAkfn
-	ARsvoGCqNahJicpjVD5UGi1S/1tRN2gg==
-X-Received: by 2002:ac8:6f11:0:b0:52f:64c4:8094 with SMTP id
- d75a77b69052e-530c87226a9mr49908141cf.39.1789089423282; Thu, 10 Sep 2026
- 18:17:03 -0700 (PDT)
+        bh=W6oIk7l4eRnUyhdSeBU9s1lynDeZBJ7umO0EhfBWYFk=;
+        b=RV7iPgrPPbV85fXUWyu2BuTfFAbpqOAgj7b6DgBWJSWaCHOYLFRGT19kDRxBawPNoY
+         BCqpzWp5N+59nLxjn3owpJhdJi8I/eP0jrN+lglOiVDLNBqS3jV6n0ExPSwybt6RidV9
+         gz90D97wKk4i9mlNkLvMDlKa00xFmGKQutwV+Z5InacaCcqb6hx7RKHX44JY461v3Qpn
+         wUn9B6BQrWWIX5RMRUU5KBB0ujfEFnE/6fJKTUuwj9EeOOhnYxDXJbBY9sACDHpC22xw
+         FX/zCcdh6CMCALO3YIdUozpX9sT0HEEOc1eIt50fQv2HXKy71YuHYMZj77osOZ7NFJ4S
+         uf2g==
+X-Forwarded-Encrypted: i=1; AKwUvBx3Oe+LIOUvwR4r4G+CsG+RlWVMs97L/UacpntPtRVb8RVWomxbzC1qkMjTwpmJr4BqOMiSwEGTjhts@vger.kernel.org
+X-Gm-Message-State: AFuF++mJk215FnfWXtHEQjpECRkC9fCVZ9odXBoLU3eSTyNzgAzDl4fO
+	0yN7Bz++WsolDiBLiG5e5JoFgd8rtMRyJtgXJPn6UGMYWne4qTCXtdmTWGO9BfNQF0kGGe97is0
+	ZU7u9OTUMo6ji651RDvprEJuRvAMLhmYuEFnuBSFYW8huJQ1Sso2uMdyGK4I=
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CA+0ovCgMrVBnn+0d198i0th0bcr0EAwNZ=0juh1ug8DdJX5mPw@mail.gmail.com>
-In-Reply-To: <CA+0ovCgMrVBnn+0d198i0th0bcr0EAwNZ=0juh1ug8DdJX5mPw@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 10 Sep 2026 18:16:52 -0700
-X-Gm-Features: AcwNN1VGil1vFMyCvGxTO0Uen3SBrfMM4J1yekoBWYuH_50vYwcqY9LxSE-7cx4
-Message-ID: <CANn89iJg-10Xy_N_h3Et3wTasS_7RMkwxsz3XKmzYc7mLhKa-Q@mail.gmail.com>
-Subject: Re: [PATCH] 6lowpan: do not compress headers that are not fully present
-To: Farhad Alemi <farhad.alemi@berkeley.edu>
-Cc: Alexander Aring <alex.aring@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, falemi@asu.edu, 
-	Simon Horman <horms@kernel.org>, Marcel Holtmann <marcel@holtmann.org>, 
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, linux-bluetooth@vger.kernel.org, 
-	linux-wpan@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
+X-Received: by 2002:a05:6820:1988:b0:6c1:fd93:5292 with SMTP id
+ 006d021491bc7-6c541d3ff08mr1639726eaf.17.1789379856953; Mon, 14 Sep 2026
+ 02:57:36 -0700 (PDT)
+Date: Mon, 14 Sep 2026 02:57:36 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6aa7c510.4c28b7d0.c1bba.0017.GAE@google.com>
+Subject: [syzbot] [wpan?] WARNING in hwsim_hw_xmit
+From: syzbot <syzbot+adb0bf16414b8bb2d799@syzkaller.appspotmail.com>
+To: alex.aring@gmail.com, andrew+netdev@lunn.ch, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	linux-wpan@vger.kernel.org, miquel.raynal@bootlin.com, netdev@vger.kernel.org, 
+	pabeni@redhat.com, stefan@datenfreihafen.org, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, Sep 10, 2026 at 1:31=E2=80=AFPM Farhad Alemi <farhad.alemi@berkeley=
-.edu> wrote:
->
-> lowpan_header_compress() pays for the IPHC header it pushes by first
-> calling skb_pull(skb, sizeof(struct ipv6hdr)), but that pull is a no-op
-> when skb->len is shorter than an IPv6 header, so the unpaid skb_push() ca=
-n
-> drive skb->data below skb->head and into skb_under_panic().
-> lowpan_nhc_check_compression() has the same missing length check,
-> committing to the next-header compression path without requiring the
-> nhc->nexthdrlen transport bytes that nhc->compress() reads and
-> lowpan_nhc_do_compression() then pulls.  Return -EINVAL from
-> lowpan_header_compress() when pskb_may_pull() cannot produce a full IPv6
-> header, and return -ENOENT from lowpan_nhc_check_compression() unless the
-> IPv6 header plus nhc->nexthdrlen bytes are present, so that the nexthdr
-> falls back to its inline encoding.
->
-> Closes: https://lore.kernel.org/all/CA+0ovCjTsygN76s2o=3DTZqPqW8v2gBhmRnz=
-+q6G-NaB3Cq-YPqQ@mail.gmail.com/
-> Signed-off-by: Farhad Alemi <farhad.alemi@berkeley.edu>
+Hello,
 
-Notes in a semi random order.
+syzbot found the following issue on:
 
-1) You forgot to tag the net tree in your patch.
+HEAD commit:    fd73f4a66598 Linux 7.3-rc3
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=15319905580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=b454dc6b1b7acd30
+dashboard link: https://syzkaller.appspot.com/bug?extid=adb0bf16414b8bb2d799
+compiler:       Debian clang version 22.1.8 (++20260613092233+e80beda6e255-1~exp1~20260613092250.77), Debian LLD 22.1.8
 
-2) You forgot the Fixes: tag
+Unfortunately, I don't have any reproducer for this issue yet.
 
-Please look at Documentation/process/maintainer-netdev.rst for more details=
-.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/03bdb0f533e9/disk-fd73f4a6.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/b8afef97d54e/vmlinux-fd73f4a6.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/c5ec38325318/bzImage-fd73f4a6.xz
 
-3) In net/6lowpan/nhc.c, calling pskb_may_pull() inside
-lowpan_nhc_check_compression() can reallocate skb->head (via
-pskb_expand_head()).
-When this happens, the 'hdr' pointer in lowpan_header_compress()
-becomes dangling. lowpan_header_compress() continues to dereference
-hdr throughout the rest of the function (hdr->nexthdr, hdr->hop_limit,
-hdr->saddr, hdr->daddr), leading to a use-after-free.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+adb0bf16414b8bb2d799@syzkaller.appspotmail.com
 
-4) Callers of lowpan_header_compress() do not check its return value.
-In net/bluetooth/6lowpan.c (setup_header()) and
-net/ieee802154/6lowpan/tx.c (lowpan_header()), the return code of
-lowpan_header_compress() is completely ignored. If it returns -EINVAL,
-they proceed to transmit the malformed/uncompressed skb anyway.
+------------[ cut here ]------------
+current_phy->suspended
+WARNING: drivers/net/ieee802154/mac802154_hwsim.c:266 at hwsim_hw_xmit+0x1606/0x1630 drivers/net/ieee802154/mac802154_hwsim.c:266, CPU#0: syz.5.2158/11621
+Modules linked in:
+CPU: 0 UID: 0 PID: 11621 Comm: syz.5.2158 Tainted: G             L      syzkaller #0 PREEMPT_{RT,(full)} 
+Tainted: [L]=SOFTLOCKUP
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/08/2026
+RIP: 0010:hwsim_hw_xmit+0x1606/0x1630 drivers/net/ieee802154/mac802154_hwsim.c:266
+Code: c6 05 af 7a e6 08 01 48 c7 c7 a0 ae 0c 8c be 0d 01 00 00 48 c7 c2 40 af 0c 8c e8 15 fe ec fa e9 e8 eb ff ff e8 4b 78 11 fb 90 <0f> 0b 90 e9 d2 ea ff ff 89 d9 80 e1 07 38 c1 0f 8c b7 ea ff ff 48
+RSP: 0018:ffffc90004a07280 EFLAGS: 00010283
+RAX: ffffffff86b51de5 RBX: ffff88802592d018 RCX: 0000000000080000
+RDX: ffffc9001660b000 RSI: 00000000000001b2 RDI: 00000000000001b3
+RBP: ffffc90004a073f8 R08: ffff88802592c823 R09: 1ffff11004b25904
+R10: dffffc0000000000 R11: ffffffff86b507e0 R12: dffffc0000000000
+R13: ffff88802592c900 R14: ffff88802592cf80 R15: 1ffff11004b25920
+FS:  00007f56c49766c0(0000) GS:ffff888125bcb000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000001b2d91fff8 CR3: 000000004052a000 CR4: 00000000003526f0
+Call Trace:
+ <TASK>
+ drv_xmit_async net/mac802154/driver-ops.h:16 [inline]
+ ieee802154_tx+0x26d/0x510 net/mac802154/tx.c:89
+ ieee802154_hot_tx net/mac802154/tx.c:207 [inline]
+ ieee802154_subif_start_xmit+0x110/0x190 net/mac802154/tx.c:239
+ __netdev_start_xmit include/linux/netdevice.h:5429 [inline]
+ netdev_start_xmit include/linux/netdevice.h:5438 [inline]
+ xmit_one net/core/dev.c:3937 [inline]
+ dev_hard_start_xmit+0x2df/0x870 net/core/dev.c:3953
+ sch_direct_xmit+0x257/0x4c0 net/sched/sch_generic.c:372
+ __dev_xmit_skb net/core/dev.c:4262 [inline]
+ __dev_queue_xmit+0x16ce/0x3880 net/core/dev.c:4884
+ dev_queue_xmit include/linux/netdevice.h:3461 [inline]
+ raw_sendmsg+0x4a2/0x9c0 net/ieee802154/socket.c:299
+ sock_sendmsg_nosec+0x13a/0x180 net/socket.c:800
+ __sock_sendmsg net/socket.c:815 [inline]
+ ____sys_sendmsg+0x565/0x870 net/socket.c:2713
+ ___sys_sendmsg+0x2a5/0x360 net/socket.c:2767
+ __sys_sendmsg net/socket.c:2799 [inline]
+ __do_sys_sendmsg net/socket.c:2804 [inline]
+ __se_sys_sendmsg net/socket.c:2802 [inline]
+ __x64_sys_sendmsg+0x1b7/0x290 net/socket.c:2802
+ do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
+ do_syscall_64+0x166/0x520 arch/x86/entry/syscall_64.c:84
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f56c671e159
+Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f56c4976028 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007f56c69a5fa0 RCX: 00007f56c671e159
+RDX: 0000000024004014 RSI: 0000200000000080 RDI: 0000000000000005
+RBP: 00007f56c67b503b R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007f56c69a6038 R14: 00007f56c69a5fa0 R15: 00007ffd99396d38
+ </TASK>
 
-5) In net/bluetooth/6lowpan.c:setup_header(), there is already an
-out-of-bounds read before lowpan_header_compress() is even called:
-hdr =3D ipv6_hdr(skb);
-...
-memcpy(&ipv6_daddr, &hdr->daddr, sizeof(ipv6_daddr));
 
-If skb->len is less than sizeof(struct ipv6hdr), reading hdr->daddr
-is already out of bounds. The driver's transmit path (bt_xmit /
-setup_header) needs to validate skb length / pskb_may_pull before
-touching the IPv6 header, and must check the return value of
-lowpan_header_compress().
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-Thanks.
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
