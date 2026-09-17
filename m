@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B65075372F0;
-	Thu, 17 Sep 2026 17:02:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F00B5383CE;
+	Thu, 17 Sep 2026 17:02:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789664564; cv=none; b=UP8+sO3LY0wXaapC0GVhGY0H3CCzMTmH9ew18MIulv3L++0HNv45elSUKI8SE3eircHlDfXRqUVW6WzbiNUE9yyaq6sQCO5ZPwyPe3Dw0b1Xa8IzXolZAq4T/2PJS07exi6E5+IXbZOgVLLCA0k7ajxD9kJeAbwXrSbf7JuHUbY=
+	t=1789664566; cv=none; b=QmFcs1ELqht6AWMV2ZRXyFDCqXSl6oStN5189vJdmu/sBypLa37aZfk0BxhsjQbEMR3uXSyrGHrA2tBgFmiOFka6jMqqp9EisKS+g/CJU1smkheZLmElOznAyOkzl9sqN2WwQhRDJuadfWZ7rYVs4nDFK3DX5aU+qBa9Jhn/ApY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789664564; c=relaxed/simple;
-	bh=r5wQ7Q71ZnW7DtUnZFVpltScTLGufe8Rx4r69gWOfdU=;
+	s=arc-20240116; t=1789664566; c=relaxed/simple;
+	bh=Q2FCzzqX3BpbpN3yzX73NxL81MIs+UH8FlTwH6dFWqM=;
 	h=Subject:From:To:Cc:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=MH2wrgX1tB1pc/RsjFwzHucexemsd6e+T9bWXRCW+jRDc4E2gtXkYgBRGTMQM/D9gJeGs1yhhsPB4+fg3ugNijrhxXNgULY9sDMzCRlAjXmaAlGzHoj/idVFcW/gOL6kmTYtKD59dYYGE/szWoI5EDk3U/NwqWdZLjlAo/X/CZs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F6Hia2gy; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:MIME-Version; b=Vc7/bNIKg/TTw8CYwkdzcW8NMf0Iy84iFb68tpOgSmPJQZHRbDU2VHNVY1NZK1Ip+0LL1qvQ7fU6u1DefDeLWBKuen2dfFM6/aAo4sRFCH0wWQ+cgHGltNKNTvWnkPbGKQAIfDoZJ5mOQcu0SkK0IQJJQAmHLbIiu0xSWg6yCxU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BZUNLTiJ; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F6Hia2gy"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B0041F0089A;
-	Thu, 17 Sep 2026 17:02:41 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BZUNLTiJ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2331E1F000FF;
+	Thu, 17 Sep 2026 17:02:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789664562;
-	bh=9gkUpcacySlNXR9m3jO0DJtl7wJBJZ8H/KILpliZ6mE=;
+	s=k20260515; t=1789664564;
+	bh=sTcKsJpMS3E8tOO3CWvFNL24eVk4OaBicDP6GSIgVCg=;
 	h=Subject:From:To:Cc:Date:In-Reply-To:References;
-	b=F6Hia2gyk69p45JstMH6cQVPw3K78esP4NFUgZ/LMMw8NbZRT1xXgPuJjnfzL2+se
-	 Rc8HyLPCuPAXDUjAaKNsZ1tPyPJq/uGN2ZHbszYYVg9TYKIENl5Ps0WUd59Vzh/EEA
-	 GNJ+QLu9bpGGaS7Po28tmbTfu4ChX2IQhkcamfqs28nHAhuzjHm7fzQAc/yp8NRn8f
-	 UdUxNYpJErjyZ64/1kvWpcE+93vmi7pXJC3HN3SRe0Yvv6WVqDFuFdeXE7RoCEUy4f
-	 KMYaoBJ4bcEWXq5zhsUyfKCZOP4ZflRy5GEtr2DEFnkAcYfZBrNUlUVLyKnlnokOOo
-	 KuuXHheQmch6Q==
-Subject: Re: [PATCH net-next v2 1/2] ipv6: update NUD_FAILED neighbors from NA
- messages
+	b=BZUNLTiJkWghq7bfMpHC1U7mbfGcUz05jpRBZThgB5yG9crc8nTlpyN6qf6J7vt1U
+	 bPZx2ai1mmKAmwQsDlMHStuLWm53cZBZM4b0abWPUXdLMZiOTjsCRnxmZwkUFNQ8kJ
+	 xuVr/ahbo9VpJu6tJiltLkOyUb81iuc+rfsvEF72S7e8Ie7C8nsVO6BURjrO54Vhc+
+	 a29K49xMgyiO1owCV0nmrVlovBMI3Nge1SfoKA1+LsTsi/05/nDKR4XcjTJIIa7O5I
+	 tpZqPyJ2uHvmw/Xhob1LZ3uE9GszW6sM5Ixe9rEUs6rCOs6wpWSDfK7HjS8EXN7E2W
+	 qwE7CFsoU5dmQ==
+Subject: Re: [PATCH net-next v2 2/2] selftests: net: test untracked NA
+ recovery of FAILED neighbors
 From: netdev-bot+sashiko@kernel.org
 To: lfqlee314@gmail.com
 Cc: dsahern@kernel.org, idosch@nvidia.com, davem@davemloft.net,
@@ -38,12 +38,12 @@ Cc: dsahern@kernel.org, idosch@nvidia.com, davem@davemloft.net,
  linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
  alex.aring@gmail.com, linux-wpan@vger.kernel.org,
  linux-bluetooth@vger.kernel.org
-Date: Thu, 17 Sep 2026 17:02:40 +0000
-Message-ID: <178966456087.22033.11671220306303617581@kernel.org>
+Date: Thu, 17 Sep 2026 17:02:42 +0000
+Message-ID: <178966456270.22033.8952247046783062389@kernel.org>
 In-Reply-To:
- <6596966f734f3d416bfa83722f7a595149bcc3f8.1789448374.git.lfqlee314@gmail.com>
+ <3f33052571409614b953a3dc7778114c51c43669.1789448374.git.lfqlee314@gmail.com>
 References:
- <6596966f734f3d416bfa83722f7a595149bcc3f8.1789448374.git.lfqlee314@gmail.com>
+ <3f33052571409614b953a3dc7778114c51c43669.1789448374.git.lfqlee314@gmail.com>
 X-sashiko-severity: Medium
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
@@ -59,162 +59,225 @@ issue(s) to consider:
 
 Critical: 0 · High: 0 · Medium: 1 · Low: 2
 
-- [Medium] net/ipv6/ndisc.c:ndisc_recv_na() now passes two different
-  gateway keys to rt6_clean_tohost() for the very same "router -> host"…
-- [Low] Reported for completeness only; assessed as resolved within this
-  series.
-- [Low] The comment block added at net/ipv6/ndisc.c:985-988, at the top
-  of accept_untracked_na(), is indented with four spaces instead of…
+- [Medium] The new FAILED-seed cases assert an in-place neighbour state
+  transition but the script has no synchronization guaranteeing that the…
+- [Low] The two new `accept_untracked_na=2` cases
+  (`test_unsolicited_na_combination 0 2 1 failed 1` at line 275 and `...…
+- [Low] The new FAILED-neighbor recovery cases verify only the resulting
+  NUD state and the `extern_learn` marker, not that the link-layer…
 
 --
 
-ipv6: update NUD_FAILED neighbors from NA messages
+selftests: net: test untracked NA recovery of FAILED neighbors
 
-This teaches ndisc_recv_na() to treat a neighbour entry in NUD_FAILED the
-same way as a missing entry, so an NA with a target link-layer address
-option moves it to STALE on routers when accept_untracked_na is enabled.
-The ndisc_ops update callback gains a failed_recovery argument and the
-sysctl documentation is reworded accordingly.
+This extends ndisc_unsolicited_na_test.sh with a seeded NUD_FAILED
+neighbour entry and six new matrix rows covering accept_untracked_na modes
+1 and 2 plus the drop_unsolicited_na and forwarding gates. The seed is
+marked extern_learn and ndisc_evict_nocarrier is disabled so the entry
+survives until the advertisement arrives.
 
 Link: https://lore.kernel.org/r/20260813233344.445265-1-lfqlee314@gmail.com
 
-A few questions below.
+A few questions below about the synchronization and the coverage of the new
+rows.
 
-> diff --git a/net/ipv6/ndisc.c b/net/ipv6/ndisc.c
-> index 90cd5d8525698..84d70c09205a2 100644
-> --- a/net/ipv6/ndisc.c
-> +++ b/net/ipv6/ndisc.c
+> diff --git a/tools/testing/selftests/net/ndisc_unsolicited_na_test.sh b/tools/testing/selftests/net/ndisc_unsolicited_na_test.sh
+> index 5db69dad0cfc0..5f4f29f0ac4ab 100755
+> --- a/tools/testing/selftests/net/ndisc_unsolicited_na_test.sh
+> +++ b/tools/testing/selftests/net/ndisc_unsolicited_na_test.sh
 
 [ ... ]
 
-> @@ -972,14 +982,18 @@ static enum skb_drop_reason ndisc_recv_ns(struct sk_buff *skb)
+> @@ -20,7 +26,9 @@ HOST_INTF="veth-host"
+>  ROUTER_INTF="veth-router"
 >  
->  static int accept_untracked_na(struct inet6_dev *idev, struct in6_addr *saddr)
+>  ROUTER_ADDR="2000:20::1"
+> -HOST_ADDR="2000:20::2"
+> +HOST_ADDR_IN_NETWORK="2000:20::2"
+> +HOST_ADDR_OUT_OF_NETWORK="2000:21::2"
+> +HOST_ADDR="${HOST_ADDR_IN_NETWORK}"
+>  SUBNET_WIDTH=64
+>  ROUTER_ADDR_WITH_MASK="${ROUTER_ADDR}/${SUBNET_WIDTH}"
+>  HOST_ADDR_WITH_MASK="${HOST_ADDR}/${SUBNET_WIDTH}"
+
+[ ... ]
+
+> @@ -140,24 +150,77 @@ verify_ndisc() {
+
+[ ... ]
+
+> +	if [ -n "${expected_state}" ]; then
+> +		neigh_show_output=$(${IP_ROUTER} neigh show \
+> +			to "${HOST_ADDR}" dev "${ROUTER_INTF}")
+> +		if [[ " ${neigh_show_output} " != \
+> +				*" ${expected_state} "* ]]; then
+> +			return 1
+> +		fi
+> +		if [ "${initial_state}" = "failed" ]; then
+> +			[[ "${neigh_show_output}" == *"extern_learn"* ]]
+> +		fi
+
+[Severity: Low]
+Should verify_ndisc() also check the link-layer address that the
+advertisement carried?
+
+The seed in test_unsolicited_na_common() deliberately creates the entry
+without one:
+
+	${IP_ROUTER} neigh replace "${HOST_ADDR}" dev "${ROUTER_INTF}" \
+		nud failed extern_learn
+
+while the recovery path in net/ipv6/ndisc.c:ndisc_recv_na() pulls the target
+link-layer address out of the options and passes it down:
+
+	lladdr = ndisc_opt_addr_data(ndopts.nd_opts_tgt_lladdr, dev);
+	...
+	__ndisc_update(dev, neigh, lladdr,
+		       new_state, update_flags, neigh_failed,
+		       NDISC_NEIGHBOUR_ADVERTISEMENT, &ndopts);
+
+Since the only assertions here are the state substring and extern_learn,
+would a change that moves FAILED -> STALE but installs no lladdr, or an
+incorrect one, still report OK?  Comparing the resulting lladdr against the
+host veth MAC would close that gap.
+
+>  	else
+> -		# Neighbour entry expected to be absent for all other cases
+> +		neigh_show_output=$(${IP_ROUTER} neigh show \
+> +			to "${HOST_ADDR}" dev "${ROUTER_INTF}")
+>  		[[ -z ${neigh_show_output} ]]
+>  	fi
+>  }
+>  
+>  test_unsolicited_na_common()
 >  {
-> +    /* For any given neighbor IP address, consider it an untracked neighbor if
-> +     * it is absent from the neighbor cache or if it has a NUD_FAILED entry in
-> +     * the neighbor cache
-> +     */
-        ^^^^
+> +	local same_subnet=${5:-1}
+> +	local neigh_show_output
+> +
+> +	if [ "${same_subnet}" -eq 1 ]; then
+> +		HOST_ADDR="${HOST_ADDR_IN_NETWORK}"
+> +	else
+> +		HOST_ADDR="${HOST_ADDR_OUT_OF_NETWORK}"
+> +	fi
+> +	HOST_ADDR_WITH_MASK="${HOST_ADDR}/${SUBNET_WIDTH}"
 
 [Severity: Low]
-This isn't a bug, but this comment block in accept_untracked_na() is
-indented with spaces while the switch statement right below it uses tabs,
-so checkpatch reports "ERROR: code indent should use tabs where possible".
+Can this switch actually isolate the mode 2 in-prefix gate?
 
-The comment also describes what the caller considers "untracked", based on
-the neighbour cache, but accept_untracked_na() only reads the sysctl value
-and never sees the neighbour entry. Would it fit better next to
+Moving HOST_ADDR from 2000:20::2 to 2000:21::2 changes the source address of
+the advertisement, its target address, and the key of the seeded neighbour
+entry all at once, while the router keeps 2000:20::1/64.
 
-	neigh_untracked = !neigh || neigh_failed;
+The advertisement under test comes from addrconf_dad_completed(), and
+ndisc_send_na() uses the same address for both fields when it is local:
 
-in ndisc_recv_na(), where the RFC 9131 decision table already documents the
-same concept?
+net/ipv6/ndisc.c:ndisc_send_na() {
+	ifp = ipv6_get_ifaddr(dev_net(dev), solicited_addr, dev, 1);
+	if (ifp) {
+		src_addr = solicited_addr;
+	...
+		.target = *solicited_addr,
+}
 
->  	switch (READ_ONCE(idev->cnf.accept_untracked_na)) {
-> -	case 0: /* Don't accept untracked na (absent in neighbor cache) */
-> +	case 0: /* Reject NAs for untracked neighbours */
->  		return 0;
-> -	case 1: /* Create new entries from na if currently untracked */
-> +	case 1: /* Accept NAs for untracked neighbours */
->  		return 1;
+so saddr == target for every packet this test generates.  The kernel gate is
+source based:
+
+net/ipv6/ndisc.c:accept_untracked_na() {
+	case 2:
+		return !!ipv6_chk_prefix(saddr, idev->dev);
+}
+
+and Documentation/networking/ip-sysctl.rst describes mode 2 in terms of "the
+source IP address".  Would a change that tested msg->target instead of saddr
+leave both new mode 2 rows green?  Keeping HOST_ADDR fixed and instead
+varying the prefix configured on the router side would exercise the gate
+without also moving the target and the entry key.
+
+>  
+>  	# Setup the test bed, but keep links down
+> -	setup $1 $2 $3
+> +	setup "$1" "$2" "$3"
+> +
+> +	if [ "${4:-absent}" = "failed" ]; then
+> +		if ! ${IP_ROUTER} neigh replace "${HOST_ADDR}" \
+> +				dev "${ROUTER_INTF}" \
+> +				nud failed extern_learn; then
+> +			echo "Unable to create NUD_FAILED neighbor entry"
+> +			return 1
+> +		fi
 
 [ ... ]
 
-> @@ -1067,32 +1084,41 @@ static enum skb_drop_reason ndisc_recv_na(struct sk_buff *skb)
-
-[ ... ]
-
->  	new_state = msg->icmph.icmp6_solicited ? NUD_REACHABLE : NUD_STALE;
-> -	if (!neigh && lladdr && idev && READ_ONCE(idev->cnf.forwarding)) {
-> -		if (accept_untracked_na(idev, saddr)) {
-> -			neigh = neigh_create(tbl, &msg->target, dev);
-> -			new_state = NUD_STALE;
-> -		}
-> -	}
-> +	neigh_failed = neigh &&
-> +		       (READ_ONCE(neigh->nud_state) & NUD_FAILED);
-> +	neigh_untracked = !neigh || neigh_failed;
-> +	if (neigh_untracked) {
-> +		accept_untracked = lladdr && idev &&
-> +				   READ_ONCE(idev->cnf.forwarding) &&
-> +				   accept_untracked_na(idev, saddr);
-> +		new_state = NUD_STALE;
-> +	}
-> +	if (!neigh && accept_untracked)
-> +		neigh = neigh_create(tbl, &msg->target, dev);
-
-[Severity: Low]
-Is the new FAILED handling covered by an in-tree test at this point in the
-series? As of this commit, ndisc_unsolicited_na_test.sh and
-arp_ndisc_untracked_subnets.sh only seed absent entries, so the whole
-FAILED to STALE half of the knob, including the mode 2 same-subnet
-qualification, would still pass if it were broken.
-
-For the record, this looks resolved later in the same series: the follow-up
-patch "selftests: net: test untracked NA recovery of FAILED neighbors"
-(7be3b5fcfd3f9adb7489aff8013c6d4beacbf20c) seeds entries with
-
-	ip neigh replace ... nud failed extern_learn
-
-and adds the failed combinations covering every row of the new table,
-including the in-prefix and out-of-prefix mode 2 cases. Mentioning it here
-only for completeness.
-
+> @@ -165,22 +228,35 @@ test_unsolicited_na_common()
+>  	# Bring the link up, wait for the NA,
+>  	# and add a delay to ensure neighbour processing is done.
+>  	link_up
+>  	start_tcpdump
 >  
->  	if (neigh && !IS_ERR(neigh)) {
-> +		u32 update_flags;
->  		u8 old_flags = neigh->flags;
->  
-> -		if (READ_ONCE(neigh->nud_state) & NUD_FAILED)
-> +		if (neigh_untracked && !accept_untracked)
->  			goto out;
->  
->  		/*
-> @@ -1108,19 +1134,23 @@ static enum skb_drop_reason ndisc_recv_na(struct sk_buff *skb)
-
-[ ... ]
-
->  		if ((old_flags & ~neigh->flags) & NTF_ROUTER) {
->  			/*
->  			 * Change: router to host
->  			 */
-> -			rt6_clean_tohost(dev_net(dev),  saddr);
-> +			rt6_clean_tohost(net,
-> +					 neigh_failed ? &msg->target : saddr);
->  		}
+>  	# Verify the neighbour table
+> -	verify_ndisc $1 $2 $3
+> +	verify_ndisc "$1" "$2" "$3" "$4" "${same_subnet}"
 
 [Severity: Medium]
-Why does the gateway address handed to rt6_clean_tohost() now depend on the
-previous NUD state of the entry? Before this patch the same "router to
-host" event always flushed routes keyed by saddr.
+The comment says "add a delay to ensure neighbour processing is done", but
+link_up, start_tcpdump and verify_ndisc run back to back with no sleep and no
+retry.  Where is the delay?
 
-fib6_clean_tohost() in net/ipv6/route.c matches the argument against the
-gateway of RA-installed routes and against cached exceptions:
+start_tcpdump() blocks on:
 
-	if (((rt->fib6_flags & RTF_RA_ROUTER) == RTF_RA_ROUTER) &&
-	    nh->fib_nh_gw_family && ipv6_addr_equal(gateway, &nh->fib_nh_gw6))
-		return -1;
+	${IP_ROUTER_EXEC} timeout 15s \
+		tcpdump --immediate-mode -tpni ${ROUTER_INTF} -c 1 \
+		"icmp6 && icmp6[0] == 136 && src ${HOST_ADDR}"
 
-so it expects the address of the node that stopped being a router, which is
-unrelated to whether the cache entry happened to be in NUD_FAILED.
+but the AF_PACKET tap that satisfies -c 1 is fed from ptype_all delivery in
+__netif_receive_skb_core(), which runs ahead of the state change the test
+looks at:
 
-When saddr differs from msg->target, and that is allowed since RFC 4861 4.4
-only requires the NA source to be an address of the sending interface (a
-router advertising a global target from its link-local source, or the proxy
-NA case handled a few lines above via pneigh_lookup()), the FAILED recovery
-path flushes routes keyed by msg->target while every other path flushes
-routes keyed by saddr. Can both be right for the identical event?
+ipv6_rcv() -> icmpv6_rcv() -> ndisc_recv_na() -> __ndisc_update() ->
+neigh_update()
 
-If saddr was the wrong key all along, would it make sense to fix that
-separately for all cases, with a Fixes: tag, rather than changing it only
-for the FAILED path? The changelog describes only the FAILED to STALE
-transition and does not mention this change of key.
+Does tcpdump exiting really order against that update, given verify_ndisc()
+takes a single un-retried snapshot of ip neigh show?
 
->  		reason = SKB_CONSUMED;
->  out:
+There is a second effect for the new rows.  In the four expect-FAILED cases:
 
-Thanks for looking at these.
+	test_unsolicited_na_combination 0 0 1 failed
+	test_unsolicited_na_combination 0 1 0 failed
+	test_unsolicited_na_combination 1 1 1 failed
+	test_unsolicited_na_combination 0 2 1 failed 0
+
+the expected value FAILED is exactly the state the entry was seeded with, so
+"still FAILED" and "the advertisement was never processed" look identical.
+Would a bounded poll for the expected state, or an explicit settle, make
+these rows able to distinguish the two?
+
+Related question on ordering of the capture: tcpdump is started after
+link_up, so can the single unsolicited advertisement emitted at DAD
+completion be missed if the fork and exec are slow?  In that case timeout
+exits 124 while set -e is in effect inside start_tcpdump, which aborts the
+whole script rather than failing one row.  Would arming the capture before
+link_up avoid that?
+
+>  
+>  }
+
+[ ... ]
+
+> @@ -193,6 +269,16 @@ test_unsolicited_na_combinations() {
+>  	test_unsolicited_na_combination 1 0 1
+>  	test_unsolicited_na_combination 1 1 0
+>  	test_unsolicited_na_combination 1 1 1
+> +
+> +	# Expect FAILED entry to become STALE
+> +	test_unsolicited_na_combination 0 1 1 failed
+> +	test_unsolicited_na_combination 0 2 1 failed 1
+> +
+> +	# Expect FAILED entry to remain FAILED
+> +	test_unsolicited_na_combination 0 0 1 failed
+> +	test_unsolicited_na_combination 0 1 0 failed
+> +	test_unsolicited_na_combination 1 1 1 failed
+> +	test_unsolicited_na_combination 0 2 1 failed 0
+>  }
 
 -- 
 Sashiko AI review · https://netdev-ai.bots.linux.dev/sashiko/#/patchset/cover.1789448374.git.lfqlee314%40gmail.com
