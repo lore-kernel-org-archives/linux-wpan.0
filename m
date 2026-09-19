@@ -1,62 +1,62 @@
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+Received: from mail-pz2-f43.google.com (mail-pz2-f43.google.com [74.125.228.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3EB837F8D3
-	for <linux-wpan@vger.kernel.org>; Sat, 19 Sep 2026 22:34:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBD7E3A3826
+	for <linux-wpan@vger.kernel.org>; Sat, 19 Sep 2026 22:34:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.228.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789857279; cv=none; b=Td5jBDW/nO4GgcnDV69aJQ28gU3+rpa35TG7dQASpjzNRcggfeITPP/FSd/T//ZlaDrP35PWiLCi3H0cweaL390vwSX4UJki238v/TWi6cKbj/WQ9hIQF0RjSpSxfeBvMcKZFwvFEyiB5r0iYf5pjHkEBBN8ywAe6pfkjY0w+pk=
+	t=1789857280; cv=none; b=FVwnVRNwYG52pNHbqAZO0GHTZN2CPJtybUX7t3SktOrcwci8VHdLIthSn8DGcJtBRorsi6/S9ogBf5KDSppeYHTQaITQ07PU+vZiOg6sNcjsIbL+mG31zsFxcuc6sD9plA4uvCLnt6Wql5lrIPTI6bIFuBMtutYsEdKeLHQDvis=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789857279; c=relaxed/simple;
-	bh=ft0Di8pJXd1cV0IPnAYGRlU6/sR1zWIgqXD+009XfSM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hT/VF9IovCWKw/X9hAY9vlySCq41mtIYimaMI7sYOHtMFG5eTDhcd9Zs1np/0izD8UQk11FxSn6mvCpb/hcyArmJC3Ya9mMPqLsdKccm9p+4qgw+izD+DDycBjXcLVsHqAfh0RWtgJX8XGzm7CBWqJL4oxEBE8Zd8aKdGD78Dbk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ssyWOiWQ; arc=none smtp.client-ip=209.85.210.169
+	s=arc-20240116; t=1789857280; c=relaxed/simple;
+	bh=YJzIm5QA/CHQO6n6vteWNo/Y1kHnMLjMisvbzcEtMco=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VP3xCrX19SY+5ZfkO1FBrmQlh0V5ifvwqhGtpFd+YLB6numKlC60oAUqi1L3OQgeFyCudNUpYtF9EytOUXDIUfnetrdcOUFDKGl3ZNtwMxliVT7MemJMMLnmGkaK3Om/jJ+50YUX/w/YVp6b0RSoLPUswbxC+w3BDxwavr16udo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=pFFLTC2I; arc=none smtp.client-ip=74.125.228.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ssyWOiWQ"
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-86ec25cf7ecso2685765b3a.1
-        for <linux-wpan@vger.kernel.org>; Sat, 19 Sep 2026 15:34:37 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pFFLTC2I"
+Received: by mail-pz2-f43.google.com with SMTP id d2e1a72fcca58-8692a8568e9so1580516b3a.3
+        for <linux-wpan@vger.kernel.org>; Sat, 19 Sep 2026 15:34:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789857277; x=1790462077; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1789857278; x=1790462078; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=20+tpjFi3yTqUHE14mXh3LEyPwl3PLKFcJJxppA0avk=;
-        b=ssyWOiWQm6fSZGsa41AA70A9EiXrG3z18ZLY6NQP4Khk5VrCRkaXMdKfwd7aeD+YI4
-         k+PWQuCDxZ7e0RCzEy6i8xiCqOk40/iipXGSUcd9M1bkhExBEVybQCE5ZGFScyj4uW2s
-         iNjA9fPsXFeFgBpfIESFd9jxxSKgErAcNaeB9DwXvXke54CpA677lbqeOyPWGpOWCMw4
-         6QThKG98PZLKby5eLeSC9t9s0+W/dHVmaBrHV3jbAMGgPl2DkLcODClfrAbARCWFTIs2
-         hQRfRx+HP+CzhHbPvJauHHV5HuVsDa+v7a2Wzb0s+ZouqGUxWpfN6p2POiLHbNBVG1BJ
-         edQw==
+        bh=ZPaps3uZw3+pSOsVulPRPw9JNmYOgWQLZSyhTH36qMY=;
+        b=pFFLTC2INjED/CG7b4vrIABeK9tfcCeOqbsqZRsl0IlL1uFKuZk4S7pLCGC6+cWLp3
+         Rs8x2D9I1QEmVN/PLwoeXseHE6AYP1z87CmL/4Bo22EjBE8A9BDlqxvHYXTJjoz4Awd9
+         KYKoGIWC6yd3fJgv6q0rO5OYiCe8ijSOO241gdvxaX++AH2BVVv8i5eZ5MB1IrLXGLsZ
+         QFGLRo2Xouj8MyXJb3ak+r+ApwYpeMIU4FT5MEiBARnChf9qJI8HjvbZ88rkgzSz7tT8
+         5cfmYE8JOwRE+dN/PDLDkvr8eI8+pO6h8zWZ9vWvxpQWEplrkVoZwsPGb1yOdnUwtu+D
+         VS5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789857277; x=1790462077;
+        d=1e100.net; s=20260707; t=1789857278; x=1790462078;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=20+tpjFi3yTqUHE14mXh3LEyPwl3PLKFcJJxppA0avk=;
-        b=pE12KYpDiWqE83epJ3C7RiysZgn6XSLMsIs1+o/5h0/2pzbq5aWHv60LRREJF9YFSk
-         yaeMyiq/Iau9Rg5hBBK2JTznmAJNYDDdIhuTKeqT0JS90KTLMPxV5nWVQUfePdPdhwKc
-         GAPMuuzF2AlVpnIV/aWQTvEQPGCLg7kJpyxBru75QmmP19cYj9l0fL3mohR/QcaauD0g
-         /1hpm+uTg6cusueGfEv96LgkqAe9Ewy5UNyabByONiZ8RlO3sAA8MJdC8w0F1Ei8l+V/
-         IF89NGLMH1v4MuH906nt7QBCdRbUez+IYQML8+e88tenNLB5a50CE0J5MFEiHM45jxVI
-         ohfw==
-X-Gm-Message-State: AFuF++lXag8FyycmYQeiWErH3/LXJ6eAecPiOxzty0curg/Yy40BslXG
-	W79X+JlQurN5OrjbJpFK6p92EEYFWpdo3wX2Rip9TxPZvnGqYgVA30+B
-X-Gm-Gg: AYBFou1Pfl0Xb2sGwtE/ychgLyGFB0Gylsv6cywuDWSlm0kyEFBjQG1tUXNJ7a+W5Os
-	E5zTU6k8srUnQeexBIBsQcsSh4Si0ENyDU+a7X5cBJfLWqW4L8R7U2Rqeh4RHKhMY/vc1ct6FRz
-	cTCJ0v09b62Jx6JH8yyoUEBeGxkhc2fL9yBpWOajauhw/IvSG+FXBRqL7RPdgfgdawkkb7yIE1r
-	VrgCCtocEuQ94Wa3xFzibYthNp8sYPEjLWUdtO/EWP9iobRnNvIgu7ADFYwNMsjK7/APFRec73a
-	tnynhdfqVGrYtpakwGobXoErKG362f0BAEDddCVkzoBnKQMB1FPyqe5B38rAeIzRZCgyHuFw3Nq
-	K//OCd1fhM7zxF+EzYPUcINWFsD946TPir3YmipJbVctmhdelli6BGlUEQVz0od2eZ8XZWtntAu
-	xSMgL1I5kv540Qgj5OsUvwPHT+p9J1K7S6181ulk5m7nmN82XdtbGb3o+tqUSlOnSF45j7oP/6Y
-	EzbSy4ToosVfwF6Dma6rTiYJO9adDnFehaNZgu89/fGctyAOeg8YZV7Cw/8wVGJ88IFth9pjAn4
-	4nkR5n/KoA==
-X-Received: by 2002:a05:6a00:194d:b0:858:ea6a:4415 with SMTP id d2e1a72fcca58-87341085f89mr12763659b3a.2.1789857276921;
-        Sat, 19 Sep 2026 15:34:36 -0700 (PDT)
+        bh=ZPaps3uZw3+pSOsVulPRPw9JNmYOgWQLZSyhTH36qMY=;
+        b=1zvqPIE4zs0szwvQ6trK/H1ctB/EHAfiRwjj/0ZlbDUb1ndI5nZNOTgzEVfjETjns/
+         pK6LbMrEr4sCFB56H+Wny3gvcOw3f4tmsduw90GMrQU9EqK+xY52XX+WRvVziFfRH7fk
+         DT2UrA4H8xDH0wzhqH7HhklDL58BgjSCcF5jzpdoLCjUaz0nzjo7YY0uPtCp0DqY/v1H
+         HUo0PlSQLdqNJ30RHK0WHNCJJ9ZWaOGRYH9W3P5gAjlqUS4d/T5xgLoCeSQbRgu+w+DT
+         RcfI14h8L0XlHGQDCHJtcUXM9W4vvCpRODaf4N5NuvERiwELOqItAoIbfXHVK1HRnT3T
+         /MiA==
+X-Gm-Message-State: AFuF++nSIveAYdoaaKDMyHJkcEGdf+EM9HXzX8JDNtWzcpphHc30aZVu
+	uL5tK3UIknCkDxOu8q54+ZI6fjTrDispY97R6wkkpwqo4bxV6Q7XMgLf
+X-Gm-Gg: AYBFou3CHhyfbPf6jyhdbvG9iwfrf5C//MM0CPE/OsKAjEkK9aWipzkTVehbN6RbKyA
+	mYybs1pU3L1zBQxCKEc4EpWSQZS7mqWbBn0Ha902KaMcrfe+Yx4ceIR5FpPaeKXOLSReB1Y09ZN
+	KqiCiCBWsRtHTshCkjywxnRFO+euYjFf3KXZJ87ZISrOFNcbn/IFv+g0Xmw9hO3grc27OHrAUyp
+	zaH5AhLLlBHKS5TBkkDLVvYD9UuI25YNiTLX0UmbR6367PAzBa2oAuCTL8Rg4Ua4fj6jerqjk44
+	/QG+Y1dHtk3IrPQhfL5tmiq6D9lU6jVdMTUZQp3+8MnyZkITJ9MmW57F4xYpEupK2oZPqlRb+KT
+	Q2X5VCmM8SdhqQ+eT3s2XC89LUSbn8AD2JPmC+XpQNeFAVnerSVRHndHNrmqFbeB6KqohC9Uk2a
+	IaWlp/NEXGYeNeLOavqSgboCYZFU+JsnhVju8iOh34RN8Vlw4Jsw3bNgYCqn4Nz62WMHNliY1PI
+	A2UToTcw+rfphtJ7F3tq+Z8YtQkvC4oX1WjRdQdvN3M+Kfyt8zMH3CH8W0SfuzHKHfQvmBWcl7w
+	WyrJOZaVQg==
+X-Received: by 2002:a05:6a00:3982:b0:878:3811:237 with SMTP id d2e1a72fcca58-87838110992mr2854371b3a.51.1789857278259;
+        Sat, 19 Sep 2026 15:34:38 -0700 (PDT)
 Received: from phui-2.c.googlers.com.com (78.123.83.34.bc.googleusercontent.com. [34.83.123.78])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-cc72acd1813sm1361390a12.4.2026.09.19.15.34.36
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-877a94f4a10sm1362241b3a.22.2026.09.19.15.34.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 19 Sep 2026 15:34:36 -0700 (PDT)
+        Sat, 19 Sep 2026 15:34:37 -0700 (PDT)
 From: Hui Peng <benquike@gmail.com>
 To: alex.aring@gmail.com,
 	stefan@datenfreihafen.org,
@@ -68,9 +68,9 @@ To: alex.aring@gmail.com,
 Cc: linux-wpan@vger.kernel.org,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH] ieee802154: ca8210: fix SPI RX length validation and FIFO out-of-bounds read
-Date: Sat, 19 Sep 2026 22:34:35 +0000
-Message-ID: <20260919223435.3883048-1-benquike@gmail.com>
+Subject: [PATCH] ieee802154: cc2520, mcr20a: reject invalid RX frame lengths from SPI FIFO
+Date: Sat, 19 Sep 2026 22:34:37 +0000
+Message-ID: <20260919223437.3883127-1-benquike@gmail.com>
 X-Mailer: git-send-email 2.55.0.1082.g2b9226bbc0-goog
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
@@ -80,101 +80,66 @@ List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-In drivers/net/ieee802154/ca8210.c, validate MAC command/data frame
-lengths received over SPI before copying payload bytes or indexing MAC
-header fields.
+In drivers/net/ieee802154/cc2520.c and drivers/net/ieee802154/mcr20a.c,
+validate the RX frame length byte read from the radio FIFO before
+subtracting the 2-byte FCS or allocating/trimming the skb so len < 2
+cannot underflow.
 
-Fixes: ded845a781a5 ("ieee802154: Add CA8210 IEEE 802.15.4 device driver")
+Fixes: 0da6bc8cc341 ("ieee802154: cc2520: adds driver for TI CC2520 radio")
 Assisted-by: LLM
 Signed-off-by: Hui Peng <benquike@gmail.com>
 ---
-diff --git a/drivers/net/ieee802154/ca8210.c b/drivers/net/ieee802154/ca8210.c
-index 01af4f9cf7f2..d3205275741a 100644
---- a/drivers/net/ieee802154/ca8210.c
-+++ b/drivers/net/ieee802154/ca8210.c
-@@ -697,7 +697,8 @@ static void ca8210_rx_done(struct cas_control *cas_ctl)
+diff --git a/drivers/net/ieee802154/cc2520.c b/drivers/net/ieee802154/cc2520.c
+index abfcfe07246a..d2c8484d8fea 100644
+--- a/drivers/net/ieee802154/cc2520.c
++++ b/drivers/net/ieee802154/cc2520.c
+@@ -482,8 +482,14 @@ cc2520_tx(struct ieee802154_hw *hw, struct sk_buff *skb)
+ 	 * values on RX. This means we need to manually add the CRC on TX.
+ 	 */
+ 	if (priv->promiscuous) {
+-		u16 crc = crc_ccitt(0, skb->data, skb->len);
++		u16 crc;
  
- 	if (buf[0] & SPI_SYN) {
- 		if (priv->sync_command_response) {
--			memcpy(priv->sync_command_response, buf, len);
-+			memcpy(priv->sync_command_response, buf,
-+			       min_t(size_t, len, sizeof(struct mac_message)));
- 			complete(&priv->sync_exchange_complete);
- 		} else {
- 			if (cascoda_api_upstream)
-@@ -1677,6 +1678,9 @@ static u8 hwme_get_request_sync(
- 		return IEEE802154_SYSTEM_ERROR;
- 
- 	if (response.pdata.hwme_get_cnf.status == IEEE802154_SUCCESS) {
-+		if (response.pdata.hwme_get_cnf.hw_attribute_length >
-+		    sizeof(response.pdata.hwme_get_cnf.hw_attribute_value))
-+			return IEEE802154_SYSTEM_ERROR;
- 		*hw_attribute_length =
- 			response.pdata.hwme_get_cnf.hw_attribute_length;
- 		memcpy(
-@@ -1755,13 +1759,17 @@ static int ca8210_skb_rx(
- 	u8                    *data_ind
- )
- {
--	struct ieee802154_hdr hdr;
-+	struct ieee802154_hdr hdr = { };
- 	int msdulen;
- 	int hlen;
--	u8 mpdulinkquality = data_ind[23];
-+	u8 mpdulinkquality;
- 	struct sk_buff *skb;
- 	struct ca8210_priv *priv = hw->priv;
- 
-+	if (len < 30)
-+		return -EINVAL;
-+	mpdulinkquality = data_ind[23];
-+
- 	/* Allocate mtu size buffer for every rx packet */
- 	skb = dev_alloc_skb(IEEE802154_MTU + sizeof(hdr));
- 	if (!skb)
-@@ -1770,7 +1778,7 @@ static int ca8210_skb_rx(
- 	skb_reserve(skb, sizeof(hdr));
- 
- 	msdulen = data_ind[22]; /* msdu_length */
--	if (msdulen > IEEE802154_MTU) {
-+	if (msdulen > IEEE802154_MTU || len < 30 + msdulen) {
- 		dev_err(
- 			&priv->spi->dev,
- 			"received erroneously large msdu length!\n"
-@@ -1787,6 +1795,10 @@ static int ca8210_skb_rx(
- 	hdr.sec.level = data_ind[29 + msdulen];
- 	dev_dbg(&priv->spi->dev, "security level: %#03x\n", hdr.sec.level);
- 	if (hdr.sec.level > 0) {
-+		if (len < 40 + msdulen) {
-+			kfree_skb(skb);
-+			return -EINVAL;
++		if (skb_tailroom(skb) < 2 &&
++		    pskb_expand_head(skb, 0, 2, GFP_KERNEL)) {
++			rc = -ENOMEM;
++			goto err_tx;
 +		}
- 		hdr.sec.key_id_mode = data_ind[30 + msdulen];
- 		memcpy(&hdr.sec.extended_src, &data_ind[31 + msdulen], 8);
- 		hdr.sec.key_id = data_ind[39 + msdulen];
-@@ -1801,6 +1813,7 @@ static int ca8210_skb_rx(
- 	hdr.dest.pan_id = cpu_to_le16(get_unaligned_le16(&data_ind[12]));
- 	dev_dbg(&priv->spi->dev, "dstPanId: %#06x\n", hdr.dest.pan_id);
- 	memcpy(&hdr.dest.extended_addr, &data_ind[14], 8);
-+	hdr.seq = data_ind[24];
++		crc = crc_ccitt(0, skb->data, skb->len);
+ 		put_unaligned_le16(crc, skb_put(skb, 2));
+ 		pkt_len = skb->len;
+ 	} else {
+@@ -1147,8 +1153,8 @@ static int cc2520_probe(struct spi_device *spi)
+ 	return 0;
  
- 	/* Fill in FC implicitly */
- 	hdr.fc.type = 1; /* Data frame */
-@@ -2028,11 +2041,14 @@ static int ca8210_xmit_async(struct ieee802154_hw *hw, struct sk_buff *skb)
- static int ca8210_get_ed(struct ieee802154_hw *hw, u8 *level)
- {
- 	u8 lenvar;
-+	u8 buf[sizeof(((struct hwme_get_confirm_pset *)0)->hw_attribute_value)] = { 0 };
-+	u8 status;
- 	struct ca8210_priv *priv = hw->priv;
- 
--	return link_to_linux_err(
--		hwme_get_request_sync(HWME_EDVALUE, &lenvar, level, priv->spi)
--	);
-+	status = hwme_get_request_sync(HWME_EDVALUE, &lenvar, buf, priv->spi);
-+	if (status == IEEE802154_SUCCESS)
-+		*level = buf[0];
-+	return link_to_linux_err(status);
+ err_hw_init:
+-	mutex_destroy(&priv->buffer_mutex);
+ 	flush_work(&priv->fifop_irqwork);
++	mutex_destroy(&priv->buffer_mutex);
+ 	return ret;
  }
  
- /**
+diff --git a/drivers/net/ieee802154/mcr20a.c b/drivers/net/ieee802154/mcr20a.c
+index 020d392a98b6..d7e076397550 100644
+--- a/drivers/net/ieee802154/mcr20a.c
++++ b/drivers/net/ieee802154/mcr20a.c
+@@ -790,7 +790,8 @@ mcr20a_handle_rx_read_buf_complete(void *context)
+ 
+ 	if (!ieee802154_is_valid_psdu_len(len)) {
+ 		dev_vdbg(&lp->spi->dev, "corrupted frame received\n");
+-		len = IEEE802154_MTU;
++		mcr20a_request_rx(lp);
++		return;
+ 	}
+ 
+ 	len = len - 2;  /* get rid of frame check field */
+@@ -866,8 +867,7 @@ mcr20a_handle_tx(struct mcr20a_local *lp)
+ 	/* add 2 bytes of FCS */
+ 	lp->tx_len[0]		= lp->tx_skb->len + 2;
+ 	lp->tx_xfer_buf.tx_buf	= lp->tx_skb->data;
+-	/* add 1 byte psduLength */
+-	lp->tx_xfer_buf.len	= lp->tx_skb->len + 1;
++	lp->tx_xfer_buf.len	= lp->tx_skb->len;
+ 
+ 	ret = spi_async(lp->spi, &lp->tx_buf_msg);
+ 	if (ret) {
