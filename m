@@ -1,71 +1,52 @@
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mail-4325.protonmail.ch (mail-4325.protonmail.ch [185.70.43.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 958BB47A0DD;
-	Sun, 20 Sep 2026 21:38:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 495C147DF94;
+	Sun, 20 Sep 2026 21:50:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789940308; cv=none; b=YJzRYsWan/DdpGufjNRfoZdugT/mWdka9sQms0MqGtdTpB+ycXSGGUGgK1PN4+qmqQo88fCP7yrrNM/IBs9R+IoylF5bkt5lV6ek0rbrV3Jn7unq2oB7L/Aqa7pBT675EIpHWkEEY9zguTCBnm/Ge1N8fwZ7pvA8Dq/WhQ70Q6s=
+	t=1789941040; cv=none; b=FhOz7oiatX+/DiVfmkX7qWkup9uZiSU/5ezaRAxV0YZQfkhThJau069IZGHiSUmXNN34sv+Vwr8FgTQ14/BJSpzx73O0HrH9eArNw85LXTEp+2N/7sPIk8rS3Lv+tyl2nUALpR5pczE5HUPYmvFMXZ3UwpCBwqRFYYNVyAluszQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789940308; c=relaxed/simple;
-	bh=F6fgMVtA9rU80B+XkqplTdTZoU6FIlA73iGwMG04c1Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=i8MQ01P3MY6R4MDClSHwwLycoCbdXIRCBotgF3sZfdziovBf+e9h2MAE5PZnlbtLJYIHuwzMcrLOblZoNkaBclhWgr6FkDpKBk/iLL3t3YgRDjlHtVDXdaCl0tSaKSlltRCxnS7xm0cW6qdTZ1ZE5as2U0awjRYAmhCxccol/lc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=MOBjwMOM; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+	s=arc-20240116; t=1789941040; c=relaxed/simple;
+	bh=vAEDlOlaE9hxEllWauJno+Rj3sS//dyn+qJAfOKFz54=;
+	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=JQCgJnxdHPZ42Khj1h0cltOs2jvp2gpeSzOkDOgY0abMKWju+Wdg09L3S2VcnVeh7DzYkIDnLbgM4RvnsyZFI342J4N76j+7uXQ/yVYKhp1A9dfbGJd2YgLCVGknM4KIpWDx2LBygq//cRrGV0N/xKJGmKDy/8/25c5/0iMfyeg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=ARmWeqxt; arc=none smtp.client-ip=185.70.43.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="MOBjwMOM"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=k+k36w6dP1JeDN1FZYWXChhVOCoyU3oPvXqYgWAyDgM=; b=MOBjwMOMpAvJKXKMyaJ9FKDvMn
-	fe7gngnv7SOq4t3mdut/J3xMZk0XCPrnE01EOBaDQ1wPFk1Ozzzu1a7b+vg+FVPC7K7lr2E4QXNop
-	qh1uz4zVoeEfi6ENE2/pfx0Bob18M3iTPtzyH9OZk22gLbuaUhDe06oCCOjcu8+PiFH4=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1x8PEm-006D87-Ky; Sun, 20 Sep 2026 23:38:16 +0200
-Date: Sun, 20 Sep 2026 23:38:16 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: "i.n.a" <quiet-daffodil@proton.me>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>
-Subject: Re: [RFC] Appropriate subsystem/UAPI for Semtech SX126x packet radio
- support
-Message-ID: <425865f4-2eb5-4346-a7b4-be89ea7ff8bb@lunn.ch>
-References: <HnbG4UMw_4eCU415RUgCB-SE6LmXjFLinorFY6rJXqP5bO7CJzyxEuuNVgDoA1oVs0c0AaqWcfAQdPRORxpRNmlD1iWUzhXqPtq2qByuJcw=@proton.me>
+	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="ARmWeqxt"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
+	s=protonmail; t=1789941023; x=1790200223;
+	bh=vAEDlOlaE9hxEllWauJno+Rj3sS//dyn+qJAfOKFz54=;
+	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
+	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
+	b=ARmWeqxtCoLapPfWi4ue3DA8+6gg/UwyalZMhAU7atw6K0/bNfH9tBI5KavJcrOqO
+	 tTDruQqALfRy4v7uK8tVAtGrlxoR05V4N9W3bCoJ92nWCE3j+vzCohzgPn5VciwI05
+	 7vMdM5SflalcB+wUcCc9IGcEqNEwN8Ek13JUaX7OhqbQKuNrpf6VB8tzachOB3bMYc
+	 jcTikKYR6y9os30U0xRBGPKjhD8Si54RUrKZMdHO6mZ3cZjqNvnoyjX1NS7eBf07aB
+	 M1cCE2a1Ad0EkbW9raezy/OuulZQAzoy60vGs6a+KsZkDeNjtajqFkGqX3cG0R8BeS
+	 avcI/fmtZa78A==
+Date: Sun, 20 Sep 2026 21:50:17 +0000
+To: "andrew@lunn.ch" <andrew@lunn.ch>
+From: "i.n.a" <quiet-daffodil@proton.me>
+Cc: "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [RFC] Appropriate subsystem/UAPI for Semtech SX126x packet radio support
+Message-ID: <blQUbzijkKTlQdGuLj0o-ZJ_Their5EXvu2RW5b0q-tuU0SBmwqMjpk6HprXKRq0Yn_RHathROFMQ3T8nnPaW3nrq9lQdwIG-cF6YaFIte4=@proton.me>
+Feedback-ID: 199628520:user:proton
+X-Pm-Message-ID: 1c5199131091546dd3b27db0e0d94a7fe5720ac9
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <HnbG4UMw_4eCU415RUgCB-SE6LmXjFLinorFY6rJXqP5bO7CJzyxEuuNVgDoA1oVs0c0AaqWcfAQdPRORxpRNmlD1iWUzhXqPtq2qByuJcw=@proton.me>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Sun, Sep 20, 2026 at 09:15:16PM +0000, i.n.a wrote:
-> Hi,
-> 
-> I'm working on a general-purpose Linux driver for the Semtech SX126x family of sub-GHz radio transceivers, initially targeting the SX1262.
-> 
-> Semtech provides a portable C driver for the radio, with the platform-specific interface abstracted behind read, write, reset and wakeup operations:
-> 
-> https://github.com/Lora-net/sx126x_driver
-> 
-> I'm currently implementing the Linux side using SPI, GPIO and IRQ infrastructure.
-> 
-> The SX126x supports LoRa and (G)FSK packet modes, but isn't inherently tied to a particular higher-level protocol. My intention is therefore to keep protocols such as LoRaWAN, AX.25 and Reticulum outside the hardware driver and expose generic packet TX/RX, PHY configuration, radio state and receive metadata such as RSSI/SNR.
-> 
-> I was considering exposing the radio as a character device, for example `/dev/sx126x0`, with a small userspace API for configuration and packet I/O.
+> You want to make whatever API you design vendor independent.
 
-One thing to keep in mind is that there are other vendors producing similar devices, e.g:
+Thanks, that's a good point. I'll keep the API vendor-independent. Is there=
+ an existing kernel abstraction you'd suggest as a starting point?
 
-https://www.microchip.com/en-us/products/wireless-connectivity/sub-ghz/lora
-https://www.st.com/en/microcontrollers-microprocessors/stm32wl-series.html
-
-You want to make whatever API you design vendor independent.
-
-	Andrew
+Thanks,
+Ina
