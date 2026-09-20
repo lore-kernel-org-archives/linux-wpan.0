@@ -1,51 +1,51 @@
 Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2863234040B;
-	Sun, 20 Sep 2026 13:00:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4F8B44236F;
+	Sun, 20 Sep 2026 13:01:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789909225; cv=none; b=eR7OYBKJzFFoMpeja0+1+ze8TptaxTKoO1QFHumbPJIp2EE5w/4TluHyPVHe+HEGjhy/glmlp75yO4o8yKtoGQP+9zqFDRWxgw7jtp+BQeZ1Q/obeUW0kAgEWVbMZikzBV7RbyKaDY8ec5AISjtozU1L1lkjJi6+SsoAGjmM6rM=
+	t=1789909311; cv=none; b=J7elffdHdLuzzdqfcFsIHwj70FKSf+PIMszljqlCZO0KA2BIKG1i0OWB+sXAhHOe2Yx3W9SCx/8lGjBma3HgrqGZPWPTVYjrAaBfVH4zArP4Vs4wU6hK1r9ZiVpERyc15s36PvxWsUqjtiTno+Wl69JcKoh7I6kdmYaQ3U5uEM8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789909225; c=relaxed/simple;
-	bh=lasNI0XF6JQD/sxcfxiUiaLUADu8T8rlWTae9vYrcGU=;
+	s=arc-20240116; t=1789909311; c=relaxed/simple;
+	bh=NRPSdmAxs42vuKkUCkWoekBy34b6+JlJs8n7dne7H4I=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=pR4VJkGkacZvA/2o6cIspgYHWwI64pBljlFlQbl7LwZV/cCDI6FBwWpzC+k2j2/0Wcp3OMpl3GdELPl431+Zm/fGxoZw/5l11zLXWsGKxPJiQRLbr1+C8l3ZlnHP8YLXX3iqZ7+9nHlZhu1lbD0x2WN0fWjAWZRMt6twIhrSFhs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=PK+DIE8T; arc=none smtp.client-ip=185.246.84.56
+	 MIME-Version:Content-Type; b=SEXs1EwKtqdK0ecGyLYdBQ3r7yBhbjssM8niDtjHEzoBr/y4sQEDLktB6Mv9mI3OQyXfE4cUZIqBkpKE5mnbCh+ZQiE9uFLKVmOXYxMIQZQd4Wcs0SIleaSDFD0U/FFaiMQ3/5/mqUZB9+St72zCqqMpbmlcyecgHgDOTu2M42I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=GvceU5c4; arc=none smtp.client-ip=185.246.84.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="PK+DIE8T"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="GvceU5c4"
 Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id E33B81A0997;
-	Sun, 20 Sep 2026 13:00:06 +0000 (UTC)
+	by smtpout-02.galae.net (Postfix) with ESMTPS id D48891A085A;
+	Sun, 20 Sep 2026 13:01:32 +0000 (UTC)
 Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id AA750604C9;
-	Sun, 20 Sep 2026 13:00:06 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id C281A1032829C;
-	Sun, 20 Sep 2026 15:00:03 +0200 (CEST)
+	by smtpout-01.galae.net (Postfix) with ESMTPS id A9330604C9;
+	Sun, 20 Sep 2026 13:01:32 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 69EB11032829C;
+	Sun, 20 Sep 2026 15:01:30 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1789909205; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 in-reply-to:references; bh=9TKSJfQc5b6cSU+h80ax1oyCCZdgJqDQrglH9SNhSOE=;
-	b=PK+DIE8TDuao7ZdekR6HnYYzlR+lGtEsb3LlztY4jCesWUcCEBsWDtqkVpTAQMBoOZVcWY
-	tGannpgCgMuLeCJFibWR/VmUQtbwiso36aFKj7miWTkv/TY53wES6J048K4+J4vgkKCQMz
-	LVr4Ek57U7vUVpz3y3LKHRkaBoxH6uY54a4CadteofVsX1aLNnFtx1Pt5RdBVuHqtyYovL
-	cVlSv+8miZZo0EIAeM4N1lfw5yeT5ZFNyXibrsIQLvyH8KoO7hVGcgeqoNdV2n0ELLagv4
-	N9X7KeMK9FumLVVOtyAZCkvchQaHk7de4GhtpVHdBeo9f5AwB7olAvz+iPbCPg==
+	t=1789909291; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 in-reply-to:references; bh=NRPSdmAxs42vuKkUCkWoekBy34b6+JlJs8n7dne7H4I=;
+	b=GvceU5c4KTnMX4PzxP+CKRHc2m4KjfXkpI8U+H7cZfuG19pUoq8MrreX+Bmoaeia3ZQUV4
+	2L6LsN8zD7+vUD2G2o/+S7nfFpWZKU2wfug6p32I429nOby+EYExokiqj2a9CpIY+HKc5y
+	Dc7As2nwf80BFqG/74ZlEhU3kw5cJojnsCsxbonve3lCog1vpw3604j8rfo9WUuncvIiiQ
+	XQ70RdNxnOsDmcOdCpejfr2ttwbLo/faHEmRh+5R6oe2jlyJHgr1QPfDhnHY6TQwqM1IVx
+	/BfUl9G5cO/mvlQmEtoasxd5+bpHDUZuoVWt7j3QZO6sYVH2/uckzaWH9gu3Ug==
 From: Miquel Raynal <miquel.raynal@bootlin.com>
 To: Hui Peng <benquike@gmail.com>
 Cc: alex.aring@gmail.com,  stefan@datenfreihafen.org,  davem@davemloft.net,
   edumazet@google.com,  kuba@kernel.org,  pabeni@redhat.com,
   linux-wpan@vger.kernel.org,  netdev@vger.kernel.org,
   linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] ieee802154: ca8210: fix SPI RX length validation and
- FIFO out-of-bounds read
-In-Reply-To: <20260919223435.3883048-1-benquike@gmail.com> (Hui Peng's message
-	of "Sat, 19 Sep 2026 22:34:35 +0000")
-References: <20260919223435.3883048-1-benquike@gmail.com>
+Subject: Re: [PATCH] ieee802154: hwsim: fix edge allocation leak and netlink
+ attribute validation
+In-Reply-To: <20260919223434.3882824-1-benquike@gmail.com> (Hui Peng's message
+	of "Sat, 19 Sep 2026 22:34:34 +0000")
+References: <20260919223434.3882824-1-benquike@gmail.com>
 User-Agent: mu4e 1.12.12; emacs 30.2
-Date: Sun, 20 Sep 2026 15:00:01 +0200
-Message-ID: <871paoaxim.fsf@bootlin.com>
+Date: Sun, 20 Sep 2026 15:01:29 +0200
+Message-ID: <87v7809ivq.fsf@bootlin.com>
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
@@ -55,78 +55,14 @@ MIME-Version: 1.0
 Content-Type: text/plain
 X-Last-TLS-Session-Version: TLSv1.3
 
-Hi Hui,
+On 19/09/2026 at 22:34:34 GMT, Hui Peng <benquike@gmail.com> wrote:
 
->  	u8                    *data_ind
->  )
->  {
-> -	struct ieee802154_hdr hdr;
-> +	struct ieee802154_hdr hdr = { };
->  	int msdulen;
->  	int hlen;
-> -	u8 mpdulinkquality = data_ind[23];
-> +	u8 mpdulinkquality;
->  	struct sk_buff *skb;
->  	struct ca8210_priv *priv = hw->priv;
->  
-> +	if (len < 30)
-> +		return -EINVAL;
-> +	mpdulinkquality = data_ind[23];
-> +
->  	/* Allocate mtu size buffer for every rx packet */
->  	skb = dev_alloc_skb(IEEE802154_MTU + sizeof(hdr));
->  	if (!skb)
-> @@ -1770,7 +1778,7 @@ static int ca8210_skb_rx(
->  	skb_reserve(skb, sizeof(hdr));
->  
->  	msdulen = data_ind[22]; /* msdu_length */
-> -	if (msdulen > IEEE802154_MTU) {
-> +	if (msdulen > IEEE802154_MTU || len < 30 + msdulen) {
->  		dev_err(
->  			&priv->spi->dev,
->  			"received erroneously large msdu length!\n"
-> @@ -1787,6 +1795,10 @@ static int ca8210_skb_rx(
->  	hdr.sec.level = data_ind[29 + msdulen];
->  	dev_dbg(&priv->spi->dev, "security level: %#03x\n", hdr.sec.level);
->  	if (hdr.sec.level > 0) {
-> +		if (len < 40 + msdulen) {
+> In drivers/net/ieee802154/mac802154_hwsim.c, clean up allocated edges
+> and phys on error paths and validate netlink attribute bounds.
+>
+> Fixes: f25da51fdc38 ("ieee802154: hwsim: add replacement for fakelb")
+> Assisted-by: LLM
+> Signed-off-by: Hui Peng <benquike@gmail.com>
 
-Can we have only one place where we make all the checks?
+Reviewed-by: Miquel Raynal <miquel.raynal@bootlin.com>
 
-> +			kfree_skb(skb);
-> +			return -EINVAL;
-> +		}
->  		hdr.sec.key_id_mode = data_ind[30 + msdulen];
->  		memcpy(&hdr.sec.extended_src, &data_ind[31 + msdulen], 8);
->  		hdr.sec.key_id = data_ind[39 + msdulen];
-> @@ -1801,6 +1813,7 @@ static int ca8210_skb_rx(
->  	hdr.dest.pan_id = cpu_to_le16(get_unaligned_le16(&data_ind[12]));
->  	dev_dbg(&priv->spi->dev, "dstPanId: %#06x\n", hdr.dest.pan_id);
->  	memcpy(&hdr.dest.extended_addr, &data_ind[14], 8);
-> +	hdr.seq = data_ind[24];
-
-Where does this come from?
-
->  	/* Fill in FC implicitly */
->  	hdr.fc.type = 1; /* Data frame */
-> @@ -2028,11 +2041,14 @@ static int ca8210_xmit_async(struct ieee802154_hw *hw, struct sk_buff *skb)
->  static int ca8210_get_ed(struct ieee802154_hw *hw, u8 *level)
->  {
->  	u8 lenvar;
-> +	u8 buf[sizeof(((struct hwme_get_confirm_pset *)0)->hw_attribute_value)] = { 0 };
-
-I'm not a fan of this. It is totally unreadable.
-
-> +	u8 status;
->  	struct ca8210_priv *priv = hw->priv;
->  
-> -	return link_to_linux_err(
-> -		hwme_get_request_sync(HWME_EDVALUE, &lenvar, level, priv->spi)
-> -	);
-> +	status = hwme_get_request_sync(HWME_EDVALUE, &lenvar, buf, priv->spi);
-> +	if (status == IEEE802154_SUCCESS)
-> +		*level = buf[0];
-> +	return link_to_linux_err(status);
->  }
->  
->  /**
