@@ -1,52 +1,65 @@
-Received: from mail-4325.protonmail.ch (mail-4325.protonmail.ch [185.70.43.25])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 495C147DF94;
-	Sun, 20 Sep 2026 21:50:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DC2A45C6EA;
+	Sun, 20 Sep 2026 22:15:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789941040; cv=none; b=FhOz7oiatX+/DiVfmkX7qWkup9uZiSU/5ezaRAxV0YZQfkhThJau069IZGHiSUmXNN34sv+Vwr8FgTQ14/BJSpzx73O0HrH9eArNw85LXTEp+2N/7sPIk8rS3Lv+tyl2nUALpR5pczE5HUPYmvFMXZ3UwpCBwqRFYYNVyAluszQ=
+	t=1789942508; cv=none; b=GGxpuN8MSNm50obz/tgBUcsOE7xAM19eVCIIA2rVdjdWfr2OlkybyvThLayZkQkb/VbLBekgUj3n51/Bi8PBcTsmI/hoOnYYuDCc4MQ7UQ0sDeo//tYQcBK4ylS1MEhdwZMoH3wZs3OMUWakRWJ3y7OgLGNYQhfp2pHjtiIo4XI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789941040; c=relaxed/simple;
-	bh=vAEDlOlaE9hxEllWauJno+Rj3sS//dyn+qJAfOKFz54=;
-	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=JQCgJnxdHPZ42Khj1h0cltOs2jvp2gpeSzOkDOgY0abMKWju+Wdg09L3S2VcnVeh7DzYkIDnLbgM4RvnsyZFI342J4N76j+7uXQ/yVYKhp1A9dfbGJd2YgLCVGknM4KIpWDx2LBygq//cRrGV0N/xKJGmKDy/8/25c5/0iMfyeg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=ARmWeqxt; arc=none smtp.client-ip=185.70.43.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
+	s=arc-20240116; t=1789942508; c=relaxed/simple;
+	bh=vzjbQ1Teo1NkTs6feYbq8RmQ9rTfel6wGQSP0V4fstg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=r/T7cwVD6MDh6rgGx3BKXsU8lOVA2jbobpX5SDimOuOGhijwAtv3Np5zKfVgQzFXMHPmbb5EyAp8xYkfhvU0whF8Aiq98RvJLZVWnkwAP7QHCOoTquyNDeKZEIHwivYFFMsDqHo6UMQ7gHzoVhX0O330iW+7Nb1T/W2PrzDkUuc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=u7brwQfz; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="ARmWeqxt"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail; t=1789941023; x=1790200223;
-	bh=vAEDlOlaE9hxEllWauJno+Rj3sS//dyn+qJAfOKFz54=;
-	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
-	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
-	b=ARmWeqxtCoLapPfWi4ue3DA8+6gg/UwyalZMhAU7atw6K0/bNfH9tBI5KavJcrOqO
-	 tTDruQqALfRy4v7uK8tVAtGrlxoR05V4N9W3bCoJ92nWCE3j+vzCohzgPn5VciwI05
-	 7vMdM5SflalcB+wUcCc9IGcEqNEwN8Ek13JUaX7OhqbQKuNrpf6VB8tzachOB3bMYc
-	 jcTikKYR6y9os30U0xRBGPKjhD8Si54RUrKZMdHO6mZ3cZjqNvnoyjX1NS7eBf07aB
-	 M1cCE2a1Ad0EkbW9raezy/OuulZQAzoy60vGs6a+KsZkDeNjtajqFkGqX3cG0R8BeS
-	 avcI/fmtZa78A==
-Date: Sun, 20 Sep 2026 21:50:17 +0000
-To: "andrew@lunn.ch" <andrew@lunn.ch>
-From: "i.n.a" <quiet-daffodil@proton.me>
-Cc: "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [RFC] Appropriate subsystem/UAPI for Semtech SX126x packet radio support
-Message-ID: <blQUbzijkKTlQdGuLj0o-ZJ_Their5EXvu2RW5b0q-tuU0SBmwqMjpk6HprXKRq0Yn_RHathROFMQ3T8nnPaW3nrq9lQdwIG-cF6YaFIte4=@proton.me>
-Feedback-ID: 199628520:user:proton
-X-Pm-Message-ID: 1c5199131091546dd3b27db0e0d94a7fe5720ac9
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="u7brwQfz"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=VzcGzhVxXelUxZV/8Eai14q6xaZB4zeYzYGVKrfKLCg=; b=u7brwQfzzy6m/bd4YnsnfwNVkt
+	fxMH/E+uv+8VulWPeyO0RKYI3s47d8cGn52ioLRdASLSHzF9kVSI1Rg/SpgYYkqy9NidurxCEFhWs
+	Ngnvmpl4IWDfNtBnYoBysLSGWw4/kmeT6jazUn9AxOKl9B91aRezSsE/RlbvrqDbZC+A=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1x8PoP-006DN2-03; Mon, 21 Sep 2026 00:15:05 +0200
+Date: Mon, 21 Sep 2026 00:15:04 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: "i.n.a" <quiet-daffodil@proton.me>
+Cc: "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [RFC] Appropriate subsystem/UAPI for Semtech SX126x packet radio
+ support
+Message-ID: <a809e324-c282-4524-bf3e-95a7583c607b@lunn.ch>
+References: <blQUbzijkKTlQdGuLj0o-ZJ_Their5EXvu2RW5b0q-tuU0SBmwqMjpk6HprXKRq0Yn_RHathROFMQ3T8nnPaW3nrq9lQdwIG-cF6YaFIte4=@proton.me>
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <blQUbzijkKTlQdGuLj0o-ZJ_Their5EXvu2RW5b0q-tuU0SBmwqMjpk6HprXKRq0Yn_RHathROFMQ3T8nnPaW3nrq9lQdwIG-cF6YaFIte4=@proton.me>
 
-> You want to make whatever API you design vendor independent.
+On Sun, Sep 20, 2026 at 09:50:17PM +0000, i.n.a wrote:
+> > You want to make whatever API you design vendor independent.
+> 
 
-Thanks, that's a good point. I'll keep the API vendor-independent. Is there=
- an existing kernel abstraction you'd suggest as a starting point?
+> Thanks, that's a good point. I'll keep the API
+> vendor-independent. Is there an existing kernel abstraction you'd
+> suggest as a starting point?
 
-Thanks,
-Ina
+This is not really my area, but i would look at the ieee802154 code in
+the kernel. They are different technologies, but is the MAC interface
+that different? Both need to pass packets to send, both need to
+receive packets. There needs to be some why to select frequency, etc.
+
+Is stacking protocols on top of the MAC that different to IEEE
+802.15.4?
+
+	Andrew
