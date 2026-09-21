@@ -1,97 +1,120 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 269A44AD4B6;
-	Mon, 21 Sep 2026 15:14:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A895B165F16;
+	Mon, 21 Sep 2026 16:21:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790003678; cv=none; b=tIWXZTbYBnpK9wxUEoxMtKMExpCXYhwD7swminla5gF/HvoyI+BMUB1wcN19YPbCq9X+i/qHujurN2ASwnKOfMQjJxcQ2X4p1Zv8qqagA99/uDGeAJAVmq4sVp7UAY24SJuC9jBXGE89Z5/69fQojHImQJUbUIF0YDp9lclln1w=
+	t=1790007706; cv=none; b=HCZ9KYcIZNKCf9PwY/9g/JdlQINf3IQtEAR7WPxE8eGc7zSmrdA/KEBhPXmjeStq2vNHETHP3gyTpCFY59f7f/nwg5tp3abf77Bb2shd3kvlJfJBX7KIUQafCcskyCrxfMHarf0BUibRtiRxqCdjEUvUOm9rgUZpeNyYCwpBh9M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790003678; c=relaxed/simple;
-	bh=RWwf8iC50Nu4LxiSioY3uxZC8w0VZhuL7G2pvQRCisI=;
+	s=arc-20240116; t=1790007706; c=relaxed/simple;
+	bh=dWJSpmBmlNc1HD+Rs1FKxOP2FfJMXbHmFczCZWSCJvY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OXq+csAxiM+jlGk0OtZ2oShXEIlAcZTSXzQarXfB8iGXwo+/Haw5Avzf7lVHeTsopXWEzJSwxtnFpnWV+1Li0jBf9OdwS0BuY/HtwrSUBc79pi/MS/xkyyeXOi+dVA+sU6IIwuARHvWKCghMLdN7tJW5QV+nyF6UQFLpRAGOjKI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gPEQnjwE; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=GuOSn9Xf/MrtxWiuR7+S9lRfzzGPg3sZjzTsE9C3NlawppY1inrfB7M/XIhyfhqoeGq3SAiqfPbwhuU5aTVsELo4IKmtaKvT3DbuCIf2Gyz9YBjnMiRGpw2A7Q8AqZV5fID4I421k48YrkZx0/D3aoGCkJGppsyxigXZbAFuU48=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kzutaYCg; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gPEQnjwE"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A97A1F000FF;
-	Mon, 21 Sep 2026 15:14:35 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kzutaYCg"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B12A1F000FF;
+	Mon, 21 Sep 2026 16:21:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790003677;
-	bh=boqz8+PMF/1ue5GVjdouEJlWwh/LXzBm76HZYxfbNwU=;
+	s=k20260515; t=1790007705;
+	bh=zpMsW14zEakhSJaSJVRCgedXpLvn9qydb1+Nz4DxJNE=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=gPEQnjwE/pqD8QsFE7EiHsCpXAreNNniFVyRXSeooP24KBsjPTV4VCT0YS0W+t66c
-	 0NYVsuSmJZJCYlluxhBIMcWtOpCFHYEw5c0shyEyqt/T9Vi6pp3F9RvA3XhzJ29ZJQ
-	 9r2863WHnY8BL6aPFvVJbm/iHOvpgCF1wSG6YG3pYDegxDaYKycy15SWYrw0QyRaIr
-	 YSukzi+lzH7t112dXmxKtR61lq4GA0UaZqLXUPnEAYCghPvCJZTdr8JpAH4iOn8WHa
-	 jOVPffI8hpY+uAsXuIlpMnFes8nkqXWgpmowc2/VHK86KwvRK+PlKO9ZxZVvB1IO2w
-	 leW2pGjbkX9EA==
-Date: Mon, 21 Sep 2026 17:14:32 +0200
-From: krzk@kernel.org
-To: Wentao Liang <vulab@iscas.ac.cn>
-Cc: linux-wpan@vger.kernel.org, davem@davemloft.net, andrew+netdev@lunn.ch, 
-	edumazet@google.com, netdev@vger.kernel.org, pabeni@redhat.com, 
-	linux-kernel@vger.kernel.org, stefan@datenfreihafen.org, kuba@kernel.org, 
-	miquel.raynal@bootlin.com, alex.aring@gmail.com, marcel@holtmann.org, 
-	stable@vger.kernel.org
-Subject: Re: [PATCH] ieee802154: atusb: Fix URB reference leak in
- atusb_work_urbs()
-Message-ID: <arFJ1_Cc1EmgAyHS@quoll>
-References: <20260917114821.2149704-1-vulab@iscas.ac.cn>
+	b=kzutaYCgNj99IrvDIPfOyPcIf0zQf+DG/eYyqothuLArEKaLnfeMSV4zSvb54Igxs
+	 7THBqu2G26Y42amLyWjplV/tkKhgSEgGkVF8XgOsEA3s88IdOdWtiZUmvHm3U1W0GB
+	 FjgAK2pXysfh8HJSZxIDxgf3qobdd6Tgawwb5Ul5mLsn9M1rVjKaA35E/WFqbAe8n0
+	 ws8Rc2KdA4kl1QF6jlzcpGDFKA1gvsQg9HKHXb3xvRiYrxKxNWEaM3o/PZlxs87jw2
+	 ql1NtTj1VFtTm/48x7YFi9BhC8Z0GQiJXJaC6+1o2d+aq36vWhxBCh4ua6i2nipTo6
+	 3IWJt7laVgFDg==
+Date: Mon, 21 Sep 2026 17:21:39 +0100
+From: Simon Horman <horms@kernel.org>
+To: "Peng Fan (OSS)" <peng.fan@oss.nxp.com>
+Cc: Alexander Aring <alex.aring@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Ido Schimmel <idosch@nvidia.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	UNGLinuxDriver@microchip.com, Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Samuel Mendoza-Jonas <sam@mendozajonas.com>,
+	Paul Fertser <fercerpav@gmail.com>, Martin Schiller <ms@dev.tdt.de>,
+	linux-kernel@vger.kernel.org, Peng Fan <peng.fan@nxp.com>,
+	linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
+	netdev@vger.kernel.org, bridge@lists.linux.dev,
+	linux-x25@vger.kernel.org
+Subject: Re: [PATCH] net: protocol: use assign_bit() where applicable
+Message-ID: <20260921162139.GW13925@horms.kernel.org>
+References: <20260920022745.3145847-1-peng.fan@oss.nxp.com>
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260917114821.2149704-1-vulab@iscas.ac.cn>
+In-Reply-To: <20260920022745.3145847-1-peng.fan@oss.nxp.com>
 
-
-On Thu, 17 Sep 2026 11:48:21 +0000, Wentao Liang wrote:
-> usb_get_from_anchor() hands over a reference to the URB, which the caller
-> has to release. atusb_work_urbs() never does, so every URB collected from
-> the idle anchor keeps an extra reference: the reference count grows on
-> each retry cycle and the URBs are never freed on disconnect. Drop the
-> reference after a successful submission, and after the URB has been put
-> back on the idle anchor when submission failed, as the HCD holds its own
-> reference while the URB is in flight.
+On Sun, Sep 20, 2026 at 10:27:44AM +0800, Peng Fan (OSS) wrote:
+> From: Peng Fan <peng.fan@nxp.com>
 > 
-> Fixes: 7490b008d123 ("ieee802154: add support for atusb transceiver")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
-> ---
->  drivers/net/ieee802154/atusb.c | 6 ++++++
->  1 file changed, 6 insertions(+)
+> Convert open-coded if/else with set_bit/clear_bit and their
+> non-atomic __set_bit/__clear_bit variants to the assign_bit/__assign_bit
+> API. Where a bit is toggled based on its own value, use change_bit()
+> instead.
 > 
+> Done with Coccinelle semantic patch:
+>     // set_bit -> clear_bit => assign_bit
+> 
+>     @@
+>     expression cond, bit, addr;
+>     @@
+> 
+>     -if (cond)
+>     -        set_bit(bit, addr);
+>     -else
+>     -        clear_bit(bit, addr);
+>     +assign_bit(bit, addr, cond);
+> 
+>     // clear_bit -> set_bit => assign_bit
+> 
+>     @@
+>     expression cond, bit, addr;
+>     @@
+> 
+>     -if (cond)
+>     -        clear_bit(bit, addr);
+>     -else
+>     -        set_bit(bit, addr);
+>     +assign_bit(bit, addr, !cond);
+> 
+>     // __set_bit -> __clear_bit => __assign_bit
+> 
+>     @@
+>     expression cond, bit, addr;
+>     @@
+> 
+>     -if (cond)
+>     -        __set_bit(bit, addr);
+>     -else
+>     -        __clear_bit(bit, addr);
+>     +__assign_bit(bit, addr, cond);
+> 
+>     // __clear_bit -> __set_bit => __assign_bit
+> 
+>     @@
+>     expression cond, bit, addr;
+>     @@
+> 
+>     -if (cond)
+>     -        __clear_bit(bit, addr);
+>     -else
+>     -        __set_bit(bit, addr);
+>     +__assign_bit(bit, addr, !cond);
+> 
+> Signed-off-by: Peng Fan <peng.fan@nxp.com>
 
-
-You sent multiple independent patches, to multiple independent
-subsystems. The amount of these patches clearly suggest this was
-AI generated and most likely not tested.
-
-More importantly, you sent all this work without properly organizing
-relevant patches into patchsets. This makes reviewing difficult
-and might cause multiple reviewers to address the same issue.
-Replying to the entire set is impossible and requires handling each
-patch independently, instead of applying or discarding the set.
-Maintainers also won't see the bigger picture of your work. Quite
-worrying.
-
-This is on the verge of hostile patch: bomb us with so many
-contributions, we won't be able to handle them in efficient manner,
-like responding ONCE to ask you to slow down.  Considering all this
-is untested and LLM generated, I have even more doubts whether this
-should be considered for review.
-
-Please read kernel documentation BEFORE posting more work. It will
-explain you how to identify subsystems, how to organize your work per
-subsystem, how to document usage of LLM and how what you should not
-do if this was posted in a good faith.
-
-Best regards,
-Krzysztof
-
-
+Reviewed-by: Simon Horman <horms@kernel.org>
 
