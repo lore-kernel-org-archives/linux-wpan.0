@@ -1,64 +1,64 @@
-Received: from mail-pz2-f43.google.com (mail-pz2-f43.google.com [74.125.228.43])
+Received: from mail-pz2-f12.google.com (mail-pz2-f12.google.com [74.125.228.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED24B43CE58
-	for <linux-wpan@vger.kernel.org>; Mon, 21 Sep 2026 07:42:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.228.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D067E43CEF3
+	for <linux-wpan@vger.kernel.org>; Mon, 21 Sep 2026 07:42:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.228.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789976531; cv=none; b=XZ9g+088Xpx63qcVjOE9KCAGv8gPL6ZFp7heC5IJ/9tgVpAjyvxGrFFoYNGk5DUN34x7nexNibJiNNDo4vtovNfW2OD8/BMLtGN0uSQP6Iv9cwaMGSMuQmKmYFmBr2qdKeliTH5TimfCM6WSiK8VvzAQwmNUt7bJ/7xVvLPP1yU=
+	t=1789976531; cv=none; b=rSUD+FOrUkVag5mj1xwu/JY6Blq+6ovFvbv4lxQRrGC7AgHz45GYZk0bQccPDPcmrlu3eeusIs0Wx0raz4AtBvki5MG5hXvp6pg0A9byQBsDaYII2dm8nIJfl5CzJVGXqbVjUblrGVNdTs2m6QfVoPb5v+G3Wvp4+oC5ffGO1g8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1789976531; c=relaxed/simple;
-	bh=BbXoi92UlkhlGdeK8JNIhIfmhwJqCOsh6YgHaTnViyY=;
+	bh=HBE/+kSisSLQtTti9PD0IF4r82pEZs1xT/tQKJlZHgo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=SQ9a4fsULk3134quQnC8zxbzONs2RExiAcDX/hNlWhv53dLeFVnxAiznKGQJZDSRGxC4k9tgabSiL+/ll48brSb4bGfWoSFzYtAwZFfIZBOs46dKlDpntK4pjzjHxb4wJLBHjBqSvyoZp6MbWFmOyfkxYr2N7RKxvA7NJI4h6/0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=moi0raPl; arc=none smtp.client-ip=74.125.228.43
+	 MIME-Version; b=gUNPiTMXHFtsSRqmkTxesxTSbqSeHuV5cWH0Z/S+Hl42fn0K/krelO4EMShU7keOAIRqVbG82oGa+OhPCv0o9Dtg9aztroFU/ekWHVVW+rZWBnjzvZQdOdsL4gIzAMBuroh95CiJMvHapt01PHnPJGLKMvcZDqqldQohdKIn/58=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=rDIHpsbK; arc=none smtp.client-ip=74.125.228.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="moi0raPl"
-Received: by mail-pz2-f43.google.com with SMTP id d2e1a72fcca58-868cfc5c244so1367871b3a.3
-        for <linux-wpan@vger.kernel.org>; Mon, 21 Sep 2026 00:42:08 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rDIHpsbK"
+Received: by mail-pz2-f12.google.com with SMTP id d2e1a72fcca58-85469b35611so1672144b3a.0
+        for <linux-wpan@vger.kernel.org>; Mon, 21 Sep 2026 00:42:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789976528; x=1790581328; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1789976529; x=1790581329; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=6lDJohtZHVUp613SJYT+/whB9vC5M06ltf1T0TWT1oQ=;
-        b=moi0raPlQxbFAgSXNf0zQg2PmrJSI1ukF70ufvDo4vFwCYSDkmC/5lRutxILzuk4nf
-         cyXdw6SIT1llOrMsBs9lI3TGDr6XceWtPUdQ/Tbg6Q88I/O5mEXqJ1cuXw2neOZcSrwo
-         l1qoSO1NgEkktM9VQs+tY9i62dy8Vcm9OOM7PTPzciRzLIyoIsKxhV4dDSL/mnlD86x5
-         NrBZARmz3nYuK7jsBsKlKk0HwVlkugL7xzPd5fE/f/j+QC4DXhLevGZiwY1N3yoBWHcA
-         mjyajiBH8A7BknKlNm3s7jc7CmXxPA3mcuWPNAq6ZlvsYKA0BWg+6pasSzbrqdrsl2yk
-         qtnw==
+        bh=EpPg8uLiGCt1nmkqruCW0RWeQqwd9zjhCiMPftKkUsQ=;
+        b=rDIHpsbK0Tl8HpuwCfE4/CmCKps1Zep2g4sz/H9wvWTa8ogLLKX1qn05qcQHaBjC+O
+         b6YK5UlXhSxpiD/mqjHdGsQEvp29yx+wBNsDkM/6K0SdUQCIMAd23w+gGwcwAsC4aDfp
+         gnCOhU5JhFAVvhtjhmyOOIk9Av8ABgooYYYbIkLM1TTQn6OJUwIsJ0Y++v5vkJZVQNYM
+         NZQbNJMRHR0gjevbWrQL09gyOqnOQBKsxa5auG0NcNT3OAsog9GrZejE7oS4mRRtT9Vg
+         KtLvAaeSL2OWXwl309uKiTZ23ntLY6OUQ8MYyIxFa/GNiEqe4/TvauISNVCCiJITvqqj
+         EMew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789976528; x=1790581328;
+        d=1e100.net; s=20260707; t=1789976529; x=1790581329;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=6lDJohtZHVUp613SJYT+/whB9vC5M06ltf1T0TWT1oQ=;
-        b=dOXRoiCOQGK2yDBwdMDMSTfbCFeyhPa5Q+WVGcbvfyoyFCE8rBNtO5kpWickXcliYm
-         Mu52i0T4vSJzZ1PpxVnT3Na9yjn+dfG75d2hlPuzNnjJtdcRW22Dpkb/c7/3GnmrRfny
-         +zaNWxwwZpzq85ZNUXd6yJN7YSGqZjA57KtP1ilmQ8tnEl5aoQhS+AwB25/kAm3lQVGH
-         YQvqypHynEpUJnFFzvdCQuJybXdjSpeVxMnad2mxVTY5I16gnnbti1UlDgBqF+QoePvI
-         YX+9Rt8C8nwqKkeVVHdaBbI4+CZnHu2BluXYM9JeYFXTudY2UuIdhDjlzmte/9Y6AvnY
-         SpoQ==
-X-Gm-Message-State: AFuF++kkOTHYB41PR2iyXXGo9nP47irEi48rT7VvSrqLVIlW+8uDbjlL
-	hE1In1N2nn1MYC+htHKzgRCtXBI7F+/jy3msHjqthtIGhLTqtpdQbG5k
-X-Gm-Gg: AYBFou32oi7bAc4E2KJlETdnvQFQeBK2ofRSwOWGlXtQSKw3rA1HwPp89vVdUHSgF7U
-	U0WYWhv4dzvU0ijg/F7U3JhbfCMVsmSte1tw8xwIh5uZgoZ4OwS4tqeUfaeTTVb1MCJjNr9fu5N
-	7tn4dJRnPenvjOL+bwih4ya+5FnGU0ZP7uSNcStzV4gFN5Y7nUWti6xT04RVKIKDZQpVk6d5jix
-	4lHOE6g3f44hIJTRZKzAmx/9ZYyHxSLIAaPFDoS7qiqxqB4MM5B72YfPQ8wX75QxW0ytmtB2ZSE
-	ahXcX32m77HdgQFAqJy1qC4qpEpqWQVE6xVRjbl+yLF7lLHdg/RfGU8i8HZecscNBICkv+KO6C4
-	54JtwO2EEqitCgddnKq8F6qUpgxeYLq/zgpB5kPc+YHeNRpVYW/PqxCtKRylm/e2XEW3NVyGXcL
-	RI97+95V7/FDZhAxKNhZXgd8ElEvP21TD+//oqhGEi1KR4s23y3RHx7w4hSR2BTJ3ynDMNdkHvh
-	AP8/L9VAXAkQnnO7nL+XlAbBAMOQxFdpNUKDDoDSt727EwokbyAQS8C61sOSEhugRf+4QHezHHY
-	3vV1bu5TIcaFiXiDUO+6
-X-Received: by 2002:a05:6a20:4393:b0:3dd:a00a:7ac6 with SMTP id adf61e73a8af0-3dda00a9e68mr10764183637.51.1789976528200;
+        bh=EpPg8uLiGCt1nmkqruCW0RWeQqwd9zjhCiMPftKkUsQ=;
+        b=gw1rflmUmynszmq3oE9VOvyPPxsH35O6e/3PY9BzZOjK4Xf9ivhcxnD2Lrr55dUWUs
+         s+E5P6qL0U2MlBvsHRcRGZbHrd1fn2hdXxOkJkGhAkzcipTLA6Plif2gyfT07J0IINo6
+         iPoIOT8IPptlghaZoJW1bpVC5KdqHZsfun23uegGbPC2V5kBjXmkY+8fRT4jxuFjZ0ep
+         r3fjL3FcUC+RblTCY65PKhOemUu1w1NE0+3OSN8lbMeXQ1IxbihOQ9+n4Avj9s/gD9p/
+         svCBp/N6RxAkWKiqVzGrt8yCwuXRLisnoY3Ycp0iKyckqNKEmQpjK6W1kCkasmZGjYvy
+         /Z7A==
+X-Gm-Message-State: AFuF++lMz8HPY01IFSYSvTGBgWkehnYxvz1oQesfKDqjASIKhYDN6ye8
+	gVuOmjTsPBWWfDLOja1SXhsvjzImGTdijCRjbxno7wwrLZaJGOUW7Wfm0Yb4CJZW
+X-Gm-Gg: AYBFou1w6k5S9w/rNlY5S3gD0No6xnRXe0946CDZ7QJCd72MaI2Uy7F2yKWGYt+zs1M
+	J3ub4RDlU0kW+O+VJzjTa91wBpZ+uGhGxW2OINFijn5+6mGwIlA2WPBIv4reuPKui7JKrRAuR6e
+	6B2hzSRsxc5b8nDQWy8UwI2ORrmZ90mExHxDp3KT+NN1MH3YAZoX/uIN6sbbXiyFvKdx9BLrVRW
+	ee35QUZJHD+2MVGQWjuW4IdaOsOYXvkYl1J8dc+YKlOkanfrwcdl17vgrTRFoJGbIjZlGsxc7Iy
+	q0jKfVCx09qLlAs0cN5t1lUpexNyL4/1NZmOHHPAOhalpTAvvzTmOPjqXUOiRT09Zt2mTTke1ie
+	4DqFX0LfZmJANBIV6oaEXxOtfBx43wiV3obuBP4OEQMS4RpjdzLbqc0x0uLy+Vs676qwEtQRlQO
+	s72I1Bn9zF/r6QgTqWHpND8na5EkJ131z2SwNhqIIzRPPJL/eROOETLun3vDk4vwpfCE84FOVmJ
+	NzW3aLsGTD44ov05vUqDG7XwEWlKxq4NDjW4/y5njBtSTfMDuq/dNcAh8eQVDpNwDzXegowsJvt
+	hNOonYKbwA==
+X-Received: by 2002:a05:6300:85:b0:3dd:a195:dd57 with SMTP id adf61e73a8af0-3dda195e4bemr10090144637.57.1789976528682;
         Mon, 21 Sep 2026 00:42:08 -0700 (PDT)
 Received: from phui-2.c.googlers.com.com (78.123.83.34.bc.googleusercontent.com. [34.83.123.78])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-cc72ae70637sm3048650a12.6.2026.09.21.00.42.07
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-cc72ae70637sm3048650a12.6.2026.09.21.00.42.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 21 Sep 2026 00:42:07 -0700 (PDT)
+        Mon, 21 Sep 2026 00:42:08 -0700 (PDT)
 From: Hui Peng <benquike@gmail.com>
 To: Alexander Aring <alex.aring@gmail.com>,
 	Miquel Raynal <miquel.raynal@bootlin.com>,
@@ -68,9 +68,9 @@ Cc: linux-wpan@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Hui Peng <benquike@gmail.com>,
 	stable@vger.kernel.org
-Subject: [PATCH net v2 1/4] ieee802154: cc2520: ensure tailroom before skb_put() in promiscuous TX
-Date: Mon, 21 Sep 2026 07:42:04 +0000
-Message-ID: <20260921074207.2289391-1-benquike@gmail.com>
+Subject: [PATCH net v2 2/4] ieee802154: cc2520: flush fifop_irqwork before destroying buffer_mutex in probe
+Date: Mon, 21 Sep 2026 07:42:05 +0000
+Message-ID: <20260921074207.2289391-2-benquike@gmail.com>
 X-Mailer: git-send-email 2.55.0.1082.g2b9226bbc0-goog
 In-Reply-To: <20260919213639.3316625-1-benquike@gmail.com>
 References: <20260919213639.3316625-1-benquike@gmail.com>
@@ -82,58 +82,54 @@ List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-In cc2520_tx(), when priv->promiscuous is enabled, skb_put(skb, 2) is
-called unconditionally to append the 2-byte software CRC without checking
-whether the skb has at least 2 bytes of tailroom, triggering
-skb_over_panic when skb_tailroom(skb) < 2:
+In cc2520_probe()'s err_hw_init path, mutex_destroy(&priv->buffer_mutex)
+is called before flush_work(&priv->fifop_irqwork). If fifop_irq fires
+after devm_request_irq() and schedules priv->fifop_irqwork before probe
+fails, cc2520_fifop_irqwork() can lock priv->buffer_mutex after it has
+already been destroyed:
 
-  skbuff: skb_over_panic: text:ffffffffc080071a len:386 put:2
-  kernel BUG at net/core/skbuff.c:214!
-  Oops: invalid opcode: 0000 [#1] SMP KASAN PTI
-  RIP: 0010:skb_panic+0x170/0x172
+  BUG: KASAN: slab-use-after-free in assign_work+0x2f1/0x340
+  Read of size 8 at addr ffff88800246b0b0 by task kworker/1:1/43
+  Workqueue:  0x0 (events)
   Call Trace:
    <TASK>
-   skb_put.cold+0x23/0x23
-   cc2520_tx.constprop.0.isra.0+0x8a/0x1d0
+   dump_stack_lvl+0x70/0xa0
+   print_report+0x153/0x4c6
+   kasan_report+0xf1/0x120
+   assign_work+0x2f1/0x340
+   worker_thread+0x2b8/0xb70
 
-Ensure at least 2 bytes of tailroom via pskb_expand_head() before calling
-skb_put(skb, 2).
+Flush priv->fifop_irqwork before mutex_destroy(&priv->buffer_mutex),
+matching the teardown order in cc2520_remove().
 
-Tested in QEMU with KASAN enabled by passing a zero-tailroom skb to
-cc2520_tx() with promiscuous mode enabled.
+Tested in QEMU with KASAN enabled by scheduling fifop_irqwork on the
+cc2520_probe() error path.
 
-Fixes: 59869ebfe7a7 ("ieee802154: cc2520: Check CRC & add promiscuous")
+Fixes: ff5891b266a7 ("ieee802154: cc2520: fix FIFOP work use-after-free")
 Cc: stable@vger.kernel.org
 Assisted-by: LLM
 Signed-off-by: Hui Peng <benquike@gmail.com>
 ---
 Changes in v2:
-- Split the cc2520 and mcr20a fixes into four single-issue patches
-  (1/4..4/4) and documented each change in its own commit message as
-  requested by Miquel Raynal.
+- Split out as patch 2/4 and documented the probe cleanup ordering fix and
+  Fixes: tag as requested by Miquel Raynal.
 
- drivers/net/ieee802154/cc2520.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ drivers/net/ieee802154/cc2520.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/net/ieee802154/cc2520.c b/drivers/net/ieee802154/cc2520.c
-index abfcfe0..5454872 100644
+index 5454872..d2c8484 100644
 --- a/drivers/net/ieee802154/cc2520.c
 +++ b/drivers/net/ieee802154/cc2520.c
-@@ -482,8 +482,14 @@ cc2520_tx(struct ieee802154_hw *hw, struct sk_buff *skb)
- 	 * values on RX. This means we need to manually add the CRC on TX.
- 	 */
- 	if (priv->promiscuous) {
--		u16 crc = crc_ccitt(0, skb->data, skb->len);
-+		u16 crc;
+@@ -1153,8 +1153,8 @@ static int cc2520_probe(struct spi_device *spi)
+ 	return 0;
  
-+		if (skb_tailroom(skb) < 2 &&
-+		    pskb_expand_head(skb, 0, 2, GFP_KERNEL)) {
-+			rc = -ENOMEM;
-+			goto err_tx;
-+		}
-+		crc = crc_ccitt(0, skb->data, skb->len);
- 		put_unaligned_le16(crc, skb_put(skb, 2));
- 		pkt_len = skb->len;
- 	} else {
+ err_hw_init:
+-	mutex_destroy(&priv->buffer_mutex);
+ 	flush_work(&priv->fifop_irqwork);
++	mutex_destroy(&priv->buffer_mutex);
+ 	return ret;
+ }
+ 
 -- 
 2.47.3
