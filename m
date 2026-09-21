@@ -1,60 +1,60 @@
 Received: from mail-pz2-f12.google.com (mail-pz2-f12.google.com [74.125.228.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D067E43CEF3
-	for <linux-wpan@vger.kernel.org>; Mon, 21 Sep 2026 07:42:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB8AA43DA5E
+	for <linux-wpan@vger.kernel.org>; Mon, 21 Sep 2026 07:42:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.228.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789976531; cv=none; b=rSUD+FOrUkVag5mj1xwu/JY6Blq+6ovFvbv4lxQRrGC7AgHz45GYZk0bQccPDPcmrlu3eeusIs0Wx0raz4AtBvki5MG5hXvp6pg0A9byQBsDaYII2dm8nIJfl5CzJVGXqbVjUblrGVNdTs2m6QfVoPb5v+G3Wvp4+oC5ffGO1g8=
+	t=1789976533; cv=none; b=a8plB8urzJ8xGjO9FTnzw1gO5P8+cpNEzsy8EvAYzvnV/dd4lFkpElT8tyi1X+Sv3ZlYtSvB2aCM54/EXcmAHHo616lnTt1EeDMBh4gcCsREED4nww1m4dCQJaV6aiVmw/KrkvTjfvKRZcXOpkCeNNzsek0EWRafPGh2CUWp3WA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789976531; c=relaxed/simple;
-	bh=HBE/+kSisSLQtTti9PD0IF4r82pEZs1xT/tQKJlZHgo=;
+	s=arc-20240116; t=1789976533; c=relaxed/simple;
+	bh=+PxWiJGd3qQeg3qY9tqhXy5GvpqL3o3G+lizbAofHcI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=gUNPiTMXHFtsSRqmkTxesxTSbqSeHuV5cWH0Z/S+Hl42fn0K/krelO4EMShU7keOAIRqVbG82oGa+OhPCv0o9Dtg9aztroFU/ekWHVVW+rZWBnjzvZQdOdsL4gIzAMBuroh95CiJMvHapt01PHnPJGLKMvcZDqqldQohdKIn/58=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=rDIHpsbK; arc=none smtp.client-ip=74.125.228.12
+	 MIME-Version; b=f0ILBegWj9OUKtMkGfLIxU/IoNt8R80YcOphOWNhaaRcR8fXlf5foliCiQsub2scmVevNnnVV6prBWprHKX47rqFMI+2z9qhzXC7IKkXZvJCGq0D+OHqkzqOaQImCcm09dsVkpmbO7sFJZmPVoFxrdMpOfR3fGrD/9kM/i4aZ5I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=qtIfeI5A; arc=none smtp.client-ip=74.125.228.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rDIHpsbK"
-Received: by mail-pz2-f12.google.com with SMTP id d2e1a72fcca58-85469b35611so1672144b3a.0
-        for <linux-wpan@vger.kernel.org>; Mon, 21 Sep 2026 00:42:09 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qtIfeI5A"
+Received: by mail-pz2-f12.google.com with SMTP id d2e1a72fcca58-8631d0023daso1906934b3a.2
+        for <linux-wpan@vger.kernel.org>; Mon, 21 Sep 2026 00:42:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20251104; t=1789976529; x=1790581329; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=EpPg8uLiGCt1nmkqruCW0RWeQqwd9zjhCiMPftKkUsQ=;
-        b=rDIHpsbK0Tl8HpuwCfE4/CmCKps1Zep2g4sz/H9wvWTa8ogLLKX1qn05qcQHaBjC+O
-         b6YK5UlXhSxpiD/mqjHdGsQEvp29yx+wBNsDkM/6K0SdUQCIMAd23w+gGwcwAsC4aDfp
-         gnCOhU5JhFAVvhtjhmyOOIk9Av8ABgooYYYbIkLM1TTQn6OJUwIsJ0Y++v5vkJZVQNYM
-         NZQbNJMRHR0gjevbWrQL09gyOqnOQBKsxa5auG0NcNT3OAsog9GrZejE7oS4mRRtT9Vg
-         KtLvAaeSL2OWXwl309uKiTZ23ntLY6OUQ8MYyIxFa/GNiEqe4/TvauISNVCCiJITvqqj
-         EMew==
+        bh=EHgcYtuYemojMdrCO9G6C1IAVKzr+T0NM2HjgpZp/nc=;
+        b=qtIfeI5An/RpD16yzxCT1Sak7grlDcQirLRhUl+uXA4hCdgX1i7mKrpnzOFy5GE9NJ
+         RktAx2RAXnQqqzMZCbNQ+T0yTTce9MmmGrp60VIcqKKflKepAHm3D3TiuvvAFhl+b9XN
+         /eNaY0ZfsR2aff/1vDG0Ylq3eEQ/5jnKdHH8LZ+vFuQoz4Q3pQetRAvL8AyBj09vS9VV
+         kCDtsbeO7ikh3JqnZ/i88YkrZzkVMDLMRGoMUw6eK2e70QjbKh54Mlg7XbPfbQQdoHPE
+         h/xkA7YDYNMe4MkuaONiJgKpXX+136teBj2PAcNbVkglT2TWilmFb4TSivmvVuAKPtnT
+         Jzkg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20260707; t=1789976529; x=1790581329;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=EpPg8uLiGCt1nmkqruCW0RWeQqwd9zjhCiMPftKkUsQ=;
-        b=gw1rflmUmynszmq3oE9VOvyPPxsH35O6e/3PY9BzZOjK4Xf9ivhcxnD2Lrr55dUWUs
-         s+E5P6qL0U2MlBvsHRcRGZbHrd1fn2hdXxOkJkGhAkzcipTLA6Plif2gyfT07J0IINo6
-         iPoIOT8IPptlghaZoJW1bpVC5KdqHZsfun23uegGbPC2V5kBjXmkY+8fRT4jxuFjZ0ep
-         r3fjL3FcUC+RblTCY65PKhOemUu1w1NE0+3OSN8lbMeXQ1IxbihOQ9+n4Avj9s/gD9p/
-         svCBp/N6RxAkWKiqVzGrt8yCwuXRLisnoY3Ycp0iKyckqNKEmQpjK6W1kCkasmZGjYvy
-         /Z7A==
-X-Gm-Message-State: AFuF++lMz8HPY01IFSYSvTGBgWkehnYxvz1oQesfKDqjASIKhYDN6ye8
-	gVuOmjTsPBWWfDLOja1SXhsvjzImGTdijCRjbxno7wwrLZaJGOUW7Wfm0Yb4CJZW
-X-Gm-Gg: AYBFou1w6k5S9w/rNlY5S3gD0No6xnRXe0946CDZ7QJCd72MaI2Uy7F2yKWGYt+zs1M
-	J3ub4RDlU0kW+O+VJzjTa91wBpZ+uGhGxW2OINFijn5+6mGwIlA2WPBIv4reuPKui7JKrRAuR6e
-	6B2hzSRsxc5b8nDQWy8UwI2ORrmZ90mExHxDp3KT+NN1MH3YAZoX/uIN6sbbXiyFvKdx9BLrVRW
-	ee35QUZJHD+2MVGQWjuW4IdaOsOYXvkYl1J8dc+YKlOkanfrwcdl17vgrTRFoJGbIjZlGsxc7Iy
-	q0jKfVCx09qLlAs0cN5t1lUpexNyL4/1NZmOHHPAOhalpTAvvzTmOPjqXUOiRT09Zt2mTTke1ie
-	4DqFX0LfZmJANBIV6oaEXxOtfBx43wiV3obuBP4OEQMS4RpjdzLbqc0x0uLy+Vs676qwEtQRlQO
-	s72I1Bn9zF/r6QgTqWHpND8na5EkJ131z2SwNhqIIzRPPJL/eROOETLun3vDk4vwpfCE84FOVmJ
-	NzW3aLsGTD44ov05vUqDG7XwEWlKxq4NDjW4/y5njBtSTfMDuq/dNcAh8eQVDpNwDzXegowsJvt
-	hNOonYKbwA==
-X-Received: by 2002:a05:6300:85:b0:3dd:a195:dd57 with SMTP id adf61e73a8af0-3dda195e4bemr10090144637.57.1789976528682;
-        Mon, 21 Sep 2026 00:42:08 -0700 (PDT)
+        bh=EHgcYtuYemojMdrCO9G6C1IAVKzr+T0NM2HjgpZp/nc=;
+        b=KyhmLQ1DLw7ZIEFLycYyGZYBW1QRR/ApTOyYkp7TLoYbcTT1XolSh16k4pGNe038Qg
+         ACrZcM7E2VskFiH0hunJs8J3hP+2DKiH5dXIlxzBqkJBezXv9uSmtee0rs/CXgvHupTe
+         iQ14mE7pUh/k/Eqtsjowx2eY63FHoEPfRSDf3CKHYPoRdlrOaV+kQIFt2PtKIpis4IjK
+         3GTYYqhM4cezrJrtQqwI9IfUVPyYf3VzsgxmfUEKnR1kYSxDKy0neMZchGHl1/5QdHH5
+         LOTM/X4zvnpEz/C+RdjwuF87HWrFYPTGdCvvEYPddTQoDbd1tqe2jOkRiCakG3JmMc2a
+         t8yw==
+X-Gm-Message-State: AFuF++lEyP20LYE8/7/rwZY/x2/26qipvbdDWGFZYeT/4zccF5xwu1Ok
+	ftkY62SwE/Tit0cdUCsMR7SNLw+7V8MbE2wMzL4lEMbWaHED3q6daZtlk/7s6Uv4
+X-Gm-Gg: AYBFou2s6btcSVoXFiDUtWFuUJUc2wc7cAMlkaKQPAjolRGlhOlAc1rcYsOVwMTJSwQ
+	qzXdXFOBe2ON+qynhEPhpIuVUjkheBwCWq0PEhqo6Vlb+Udre20ln76PykkFs3xULb8s0f22sKI
+	Ijztm2fgS77ayN7N35ilQvCo2k4Jczg1Qi15eCIDJB70Cm42qtPsOQJjZiWYAUUSts0+ytBEz1U
+	VTIqQUe9HFF6cbcm2NrB4z5NNr+T78dO+GL50d5y96zNaoMuM89l4xe3GXRl364gwzapvBoH+gm
+	zhnR0iPOVZRWlOJ62yafOZXUuah/dCVGqYeJOYmKEuuKvjIUxmT/CZJycsvbt801sIHz9MivBsx
+	e06EubSO62DEpXssOzEm9a0RfMPid9LHVECGuoxVcmBCsbstlf9FaF8lvT/tqcZF7yZqNgpO8zP
+	nQkleqDz+6+bzrm9y3jYGknT6LKBoixLFhARGE0yob5edbyYN2zo1+GMLGyFKP8/modhKsxYgJX
+	3YP39ndBegl8PQQW0Km1z9Lp7kEyckePlncvbks9km+XA+rSnmJcs7nKLWoXs45I/3kfuPzrnby
+	9d8o1z2lYA==
+X-Received: by 2002:a05:6a20:9c8c:b0:3dd:85a9:559d with SMTP id adf61e73a8af0-3dd8c57fe0emr17599249637.31.1789976529153;
+        Mon, 21 Sep 2026 00:42:09 -0700 (PDT)
 Received: from phui-2.c.googlers.com.com (78.123.83.34.bc.googleusercontent.com. [34.83.123.78])
         by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-cc72ae70637sm3048650a12.6.2026.09.21.00.42.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
@@ -68,9 +68,9 @@ Cc: linux-wpan@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Hui Peng <benquike@gmail.com>,
 	stable@vger.kernel.org
-Subject: [PATCH net v2 2/4] ieee802154: cc2520: flush fifop_irqwork before destroying buffer_mutex in probe
-Date: Mon, 21 Sep 2026 07:42:05 +0000
-Message-ID: <20260921074207.2289391-2-benquike@gmail.com>
+Subject: [PATCH net v2 3/4] ieee802154: mcr20a: drop corrupted RX frames instead of reading 125 stale bytes
+Date: Mon, 21 Sep 2026 07:42:06 +0000
+Message-ID: <20260921074207.2289391-3-benquike@gmail.com>
 X-Mailer: git-send-email 2.55.0.1082.g2b9226bbc0-goog
 In-Reply-To: <20260919213639.3316625-1-benquike@gmail.com>
 References: <20260919213639.3316625-1-benquike@gmail.com>
@@ -82,54 +82,60 @@ List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-In cc2520_probe()'s err_hw_init path, mutex_destroy(&priv->buffer_mutex)
-is called before flush_work(&priv->fifop_irqwork). If fifop_irq fires
-after devm_request_irq() and schedules priv->fifop_irqwork before probe
-fails, cc2520_fifop_irqwork() can lock priv->buffer_mutex after it has
-already been destroyed:
+In mcr20a_handle_rx_read_buf_complete(), when
+!ieee802154_is_valid_psdu_len(len) is true, the driver overwrites len
+with IEEE802154_MTU (127) and copies 125 bytes from lp->rx_buf into a new
+skb even though only the original len bytes were transferred over SPI,
+reading past the valid RX data and leaking up to 125 bytes of stale heap
+memory to the network stack:
 
-  BUG: KASAN: slab-use-after-free in assign_work+0x2f1/0x340
-  Read of size 8 at addr ffff88800246b0b0 by task kworker/1:1/43
-  Workqueue:  0x0 (events)
+  BUG: KASAN: slab-out-of-bounds in mcr20a_handle_rx_read_buf_complete.constprop.0+0x91/0xc0
+  Read of size 125 at addr ffff888002853f40 by task init/1
   Call Trace:
    <TASK>
    dump_stack_lvl+0x70/0xa0
    print_report+0x153/0x4c6
    kasan_report+0xf1/0x120
-   assign_work+0x2f1/0x340
-   worker_thread+0x2b8/0xb70
+   kasan_check_range+0x125/0x200
+   __asan_memcpy+0x23/0x60
+   mcr20a_handle_rx_read_buf_complete.constprop.0+0x91/0xc0
+  ...
+  The buggy address belongs to the object at ffff888002853f40
+   which belongs to the cache kmalloc-8 of size 8
+  The buggy address is located 0 bytes inside of
+   allocated 4-byte region [ffff888002853f40, ffff888002853f44)
 
-Flush priv->fifop_irqwork before mutex_destroy(&priv->buffer_mutex),
-matching the teardown order in cc2520_remove().
+Drop the corrupted frame, re-arm reception via mcr20a_request_rx(lp), and
+return early.
 
-Tested in QEMU with KASAN enabled by scheduling fifop_irqwork on the
-cc2520_probe() error path.
+Tested in QEMU with KASAN enabled by passing a corrupted 4-byte RX frame
+length to mcr20a_handle_rx_read_buf_complete().
 
-Fixes: ff5891b266a7 ("ieee802154: cc2520: fix FIFOP work use-after-free")
+Fixes: 8c6ad9cc5157 ("ieee802154: Add NXP MCR20A IEEE 802.15.4 transceiver driver")
 Cc: stable@vger.kernel.org
 Assisted-by: LLM
 Signed-off-by: Hui Peng <benquike@gmail.com>
 ---
 Changes in v2:
-- Split out as patch 2/4 and documented the probe cleanup ordering fix and
-  Fixes: tag as requested by Miquel Raynal.
+- Split out as patch 3/4 covering only the mcr20a RX corrupted frame
+  handling as requested by Miquel Raynal.
 
- drivers/net/ieee802154/cc2520.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/ieee802154/mcr20a.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ieee802154/cc2520.c b/drivers/net/ieee802154/cc2520.c
-index 5454872..d2c8484 100644
---- a/drivers/net/ieee802154/cc2520.c
-+++ b/drivers/net/ieee802154/cc2520.c
-@@ -1153,8 +1153,8 @@ static int cc2520_probe(struct spi_device *spi)
- 	return 0;
+diff --git a/drivers/net/ieee802154/mcr20a.c b/drivers/net/ieee802154/mcr20a.c
+index 020d392a98b6..d01b277d33d2 100644
+--- a/drivers/net/ieee802154/mcr20a.c
++++ b/drivers/net/ieee802154/mcr20a.c
+@@ -790,7 +790,8 @@ mcr20a_handle_rx_read_buf_complete(void *context)
  
- err_hw_init:
--	mutex_destroy(&priv->buffer_mutex);
- 	flush_work(&priv->fifop_irqwork);
-+	mutex_destroy(&priv->buffer_mutex);
- 	return ret;
- }
+ 	if (!ieee802154_is_valid_psdu_len(len)) {
+ 		dev_vdbg(&lp->spi->dev, "corrupted frame received\n");
+-		len = IEEE802154_MTU;
++		mcr20a_request_rx(lp);
++		return;
+ 	}
  
+ 	len = len - 2;  /* get rid of frame check field */
 -- 
 2.47.3
