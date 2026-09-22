@@ -1,63 +1,64 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A895B165F16;
-	Mon, 21 Sep 2026 16:21:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D382D23BD06;
+	Tue, 22 Sep 2026 00:31:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790007706; cv=none; b=HCZ9KYcIZNKCf9PwY/9g/JdlQINf3IQtEAR7WPxE8eGc7zSmrdA/KEBhPXmjeStq2vNHETHP3gyTpCFY59f7f/nwg5tp3abf77Bb2shd3kvlJfJBX7KIUQafCcskyCrxfMHarf0BUibRtiRxqCdjEUvUOm9rgUZpeNyYCwpBh9M=
+	t=1790037093; cv=none; b=ozOFzHmQ8JOsUFnLPyQTOqvVMBBduc5OFLErqfyC5D1YsZ9cGN9dlpdIoG7XBJuT6GXobdkTF1rs0UoeQDfBTG02qwumKd4rvskEh38trdy+z1BPZlpr0qCtLxsxilKQ2WKsh/ajFypknX7EJ3/jc4Zr50x4cWOn4u8h7ZDU0l8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790007706; c=relaxed/simple;
-	bh=dWJSpmBmlNc1HD+Rs1FKxOP2FfJMXbHmFczCZWSCJvY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GuOSn9Xf/MrtxWiuR7+S9lRfzzGPg3sZjzTsE9C3NlawppY1inrfB7M/XIhyfhqoeGq3SAiqfPbwhuU5aTVsELo4IKmtaKvT3DbuCIf2Gyz9YBjnMiRGpw2A7Q8AqZV5fID4I421k48YrkZx0/D3aoGCkJGppsyxigXZbAFuU48=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kzutaYCg; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790037093; c=relaxed/simple;
+	bh=xrAoS2lbPIjmuDo3x75RRez5baTTW8g9IZOVigYYkVI=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=bCQXvVM5f+gJqUGiK1XtBvrQ+rebjt5h+scXoQrIGAQafPvgRQcUY8XnDqE7b5q/vGKTZB7SKjj3KMzBR1Eo1Rya+IajY7xLfYhMhYGNU/NhEL4TYmZy5pb0eJDKJ5cfK+2v5lPXy12qLaSizd4itKEhqJroqIV8mHZzL5PK5cI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gDW8edXQ; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kzutaYCg"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B12A1F000FF;
-	Mon, 21 Sep 2026 16:21:41 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gDW8edXQ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76D271F000FF;
+	Tue, 22 Sep 2026 00:31:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790007705;
-	bh=zpMsW14zEakhSJaSJVRCgedXpLvn9qydb1+Nz4DxJNE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=kzutaYCgNj99IrvDIPfOyPcIf0zQf+DG/eYyqothuLArEKaLnfeMSV4zSvb54Igxs
-	 7THBqu2G26Y42amLyWjplV/tkKhgSEgGkVF8XgOsEA3s88IdOdWtiZUmvHm3U1W0GB
-	 FjgAK2pXysfh8HJSZxIDxgf3qobdd6Tgawwb5Ul5mLsn9M1rVjKaA35E/WFqbAe8n0
-	 ws8Rc2KdA4kl1QF6jlzcpGDFKA1gvsQg9HKHXb3xvRiYrxKxNWEaM3o/PZlxs87jw2
-	 ql1NtTj1VFtTm/48x7YFi9BhC8Z0GQiJXJaC6+1o2d+aq36vWhxBCh4ua6i2nipTo6
-	 3IWJt7laVgFDg==
-Date: Mon, 21 Sep 2026 17:21:39 +0100
-From: Simon Horman <horms@kernel.org>
-To: "Peng Fan (OSS)" <peng.fan@oss.nxp.com>
-Cc: Alexander Aring <alex.aring@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Ido Schimmel <idosch@nvidia.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	UNGLinuxDriver@microchip.com, Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Samuel Mendoza-Jonas <sam@mendozajonas.com>,
-	Paul Fertser <fercerpav@gmail.com>, Martin Schiller <ms@dev.tdt.de>,
-	linux-kernel@vger.kernel.org, Peng Fan <peng.fan@nxp.com>,
-	linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
-	netdev@vger.kernel.org, bridge@lists.linux.dev,
-	linux-x25@vger.kernel.org
-Subject: Re: [PATCH] net: protocol: use assign_bit() where applicable
-Message-ID: <20260921162139.GW13925@horms.kernel.org>
-References: <20260920022745.3145847-1-peng.fan@oss.nxp.com>
+	s=k20260515; t=1790037085;
+	bh=+gylHeSN9wOe1CSp8YJJlUiPkKFBx1Baw+rpY728J/8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=gDW8edXQ0fO4PPQFAyg1k5liJeWB7IeLlMX5Wu5ukbmLFX6XsF8SpHrsBaTCLvWHZ
+	 KQJg3wwbV9h27KVTx+53G5W5n/j2ORLZNNJ8ubAjC0kYWX+ppKodWjJ/v4nRx7f7g3
+	 XDK6sx3temLoti4wCj3s4GBVOE3lK31vpXbQhr+40kv5eleu6ZI3kPlV/+apUZKU8W
+	 mkMTFYvjGt3yiQnnKmuqcmbkmvm2wyDH1J3vcBliAk4oao19bDM0UcWclV02tZzh3T
+	 w8MffvFDJf0S0MkMt2CU/dGKeonF7Ofcy16uxdw1XQ52xMpc/ltbRDdey7eGXZq+xv
+	 /2c7nFH9poZ5w==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 199423930203;
+	Tue, 22 Sep 2026 00:30:18 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] net: protocol: use assign_bit() where applicable
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <179003701664.3305732.17812200087292035808.git-patchwork-notify@kernel.org>
+Date: Tue, 22 Sep 2026 00:30:16 +0000
+References: <20260920022745.3145847-1-peng.fan@oss.nxp.com>
 In-Reply-To: <20260920022745.3145847-1-peng.fan@oss.nxp.com>
+To: Peng Fan <peng.fan@oss.nxp.com>
+Cc: alex.aring@gmail.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, razor@blackwall.org,
+ idosch@nvidia.com, woojung.huh@microchip.com, UNGLinuxDriver@microchip.com,
+ andrew@lunn.ch, olteanv@gmail.com, sam@mendozajonas.com, fercerpav@gmail.com,
+ ms@dev.tdt.de, linux-kernel@vger.kernel.org, peng.fan@nxp.com,
+ linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
+ netdev@vger.kernel.org, bridge@lists.linux.dev, linux-x25@vger.kernel.org
 
-On Sun, Sep 20, 2026 at 10:27:44AM +0800, Peng Fan (OSS) wrote:
+Hello:
+
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Sun, 20 Sep 2026 10:27:44 +0800 you wrote:
 > From: Peng Fan <peng.fan@nxp.com>
 > 
 > Convert open-coded if/else with set_bit/clear_bit and their
@@ -65,56 +66,15 @@ On Sun, Sep 20, 2026 at 10:27:44AM +0800, Peng Fan (OSS) wrote:
 > API. Where a bit is toggled based on its own value, use change_bit()
 > instead.
 > 
-> Done with Coccinelle semantic patch:
->     // set_bit -> clear_bit => assign_bit
-> 
->     @@
->     expression cond, bit, addr;
->     @@
-> 
->     -if (cond)
->     -        set_bit(bit, addr);
->     -else
->     -        clear_bit(bit, addr);
->     +assign_bit(bit, addr, cond);
-> 
->     // clear_bit -> set_bit => assign_bit
-> 
->     @@
->     expression cond, bit, addr;
->     @@
-> 
->     -if (cond)
->     -        clear_bit(bit, addr);
->     -else
->     -        set_bit(bit, addr);
->     +assign_bit(bit, addr, !cond);
-> 
->     // __set_bit -> __clear_bit => __assign_bit
-> 
->     @@
->     expression cond, bit, addr;
->     @@
-> 
->     -if (cond)
->     -        __set_bit(bit, addr);
->     -else
->     -        __clear_bit(bit, addr);
->     +__assign_bit(bit, addr, cond);
-> 
->     // __clear_bit -> __set_bit => __assign_bit
-> 
->     @@
->     expression cond, bit, addr;
->     @@
-> 
->     -if (cond)
->     -        __clear_bit(bit, addr);
->     -else
->     -        __set_bit(bit, addr);
->     +__assign_bit(bit, addr, !cond);
-> 
-> Signed-off-by: Peng Fan <peng.fan@nxp.com>
+> [...]
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Here is the summary with links:
+  - net: protocol: use assign_bit() where applicable
+    https://git.kernel.org/netdev/net-next/c/ab86dbf4a6ad
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
