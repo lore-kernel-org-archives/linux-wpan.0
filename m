@@ -1,171 +1,286 @@
-Received: from mail-wr2-f12.google.com (mail-wr2-f12.google.com [74.125.225.76])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B00F4DEC07
-	for <linux-wpan@vger.kernel.org>; Tue, 22 Sep 2026 09:47:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ED1F4A4848;
+	Wed, 23 Sep 2026 18:36:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790070461; cv=none; b=qK/+eiE3DAjyERAkKLfoV+AjjR+kANyAWZ5p2NtLuwHk03oAQbkgRm5B2/nxPsKIfTsyIbg8uh5LW9bYxmW3QXjNGXidJYALI3IYloH+E0JR7rVPAdf2mpRWesb0KdIVhPtjKZjU2TYY6j0XSvMzhWJNomeUF41u8HhLoJByHmM=
+	t=1790188614; cv=none; b=Qen1z7+pOS2UFB+wNddmL0xRSlalr03peijU6KIUw+5pSjSuM0pUbBdgkzzOVi1MeUHKabGVOchD8hP7CIRIxFBwxi+WJW9x0fXbXdp7V7NGjPsFjkqpTjdqau8hsKQPbCTMzrGLnguv+0PtFBH68B6q9hGMM4I88i9CqNIpEkc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790070461; c=relaxed/simple;
-	bh=2CUH3YGiPlXy555Q9SI3ZYnCZbH8YDJQaUSBvfvqZ6w=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Rfyv77v3l0thOtGykaNoH1n8vSISsmTCpu8JNfacp103JYoERiTZTg/QG10jEMRNff8k0gnG/oD2ZpFDgDAXnVjk4LDEWpOfPV/iE4OEzTXqbssAQE2Ne/cZXzkY8J6CpiiHdM4z1iFdSpzp9QnUuQ0oKsoFK2EwgYArdp2CVIo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UvNBStGl; arc=none smtp.client-ip=74.125.225.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1790188614; c=relaxed/simple;
+	bh=+Jtt1cU4U8k1cpZJK1LQTkB7oIUEVS9l74OTKqgep2E=;
+	h=Subject:From:To:Cc:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=EOjrMfz0WKR0Wdrr4plv07eCTZrB+PwFtObNK1UogoNvoOCUh1lF5nOgcDDK3SdlrWRhlyAMViFmMUSq43woKiit1VQ7ifAkpQtq1E/A+X547iF9oBbrwS6FIYvPlP+hD1b0c1j2gcoIPLGi8+/8+Ay97XUJTbCqo+q3nYpk9LA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Tpe9kFrO; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UvNBStGl"
-Received: by mail-wr2-f12.google.com with SMTP id ffacd0b85a97d-482f633cd80so1873359f8f.2
-        for <linux-wpan@vger.kernel.org>; Tue, 22 Sep 2026 02:47:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790070458; x=1790675258; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:mime-version:references
-         :in-reply-to:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=1mHA714llFxRbL4YpV3zzI7qdHUQEj56NbS4Oyhz2TE=;
-        b=UvNBStGlptbsfoizP0M7WPR8TBH+UhYLVyjoEPDRLeSoLNQuh7GLHz3T5/m0+UmBNZ
-         RHrrzsLV0K/1tL1nA+hHnjigNFBMWMqOHkC2hAp9rehOuAlFe8SvIs8Z6CpW3d6rTbbu
-         qUN4yFety6ERn2Pq27SISc97Qgyi/FNkA/2oV0hESNH3CrGFm1JB7EYRbfKMluJjr8oK
-         ttR4FN9+EvyTCRmk7aGWOVeyliElH3Fme+P3KYATNqyFatLBn3k0NH1gwluMVxzIirTx
-         DTowTIQwxpjvhHhSZOLcG5y2+hQWEt9qDuVNyafBzvAUvmydtwW4n5iPhqIUqR/Rgbej
-         XPqw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790070458; x=1790675258;
-        h=content-transfer-encoding:content-type:mime-version:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=1mHA714llFxRbL4YpV3zzI7qdHUQEj56NbS4Oyhz2TE=;
-        b=OnrU4cH1k09TR56g2pNe4jFhoBLEhmYtlS+m6ei4zh5Wi3xzJ7La58+nrh+i8WvPdg
-         NLeOXB6dJDw+a00fHFL0+VFyQ6z/F7DKhnZSZs2TRfYPoFNor/rF750uI9N493CbEy2B
-         Kb54hcawrgHxFpCfuOCj6QRf4EwuZP94U5lz3rbEwQ1LCLZZWPaiBb7aNB+HQsX33FUs
-         8pyBjRiMHbLP/4QfpcR2oxBAn5SU3qRchRDaRmSAdM7Zw6yLE9XfnIx+3Wicldp4dGVH
-         RSiNUjX/s2ZX8NSw2pegKHqzFApgL+Xex8Jjc5ipnl7cI8Z2Tu0xF6/DZk9fyfKIb+N4
-         Fvpg==
-X-Forwarded-Encrypted: i=1; AKwUvBypcysJyRKSGz2YgAsdshhjJRF9Sq4TcHqFOKy32Fgx9sDgzWfmeCZ77bo77P0lgoLxpIy4ULVJ9O+m@vger.kernel.org
-X-Gm-Message-State: AFuF++lhbOHw9Ml56ieaouyeAnaAK1cCbxJfXa7sIXW321Qg1up3wqeT
-	bp6j3P3kez+2LpFifOzlaMYXgy2njTmbds9/ARmPb/ubyFLJpTcfACb0
-X-Gm-Gg: AYBFou2hZfTuWwC6qQpoOkiUeWOlCHNWOyQRaGxF47gR6HBwEjr9bGuBDqCYvLF2hf8
-	2lAS+2U2HQvHv85Uwlk0FXhP5c/Ndou4W+u0P1KB+S9brECXIAYw940BdwZbCibHji9Yl0AWNCE
-	cB0a+WKH5DIFNnqoGLIDO9kmxtbInz2NEwVMhQYZ/NoAtOxNdVR6BTi32ixtnUzS7xLgl9D29Xf
-	hePmKjIeO/AJHSNkeojm97IMrQWSQam+ZgfV2Wujrb9ug14Ktb+7XWcw6N3zU8LdbyfVUXJS5hP
-	BRmV6URo7wiI1DYeNYgFCABIdM4j8BP1IA3xemeHrz1t/KV1ZNtv9GCqxxFaSCYHYdXrNk/Qefa
-	iMd9WvdeciUrxyPlCjmAubsZkZ70wIpFJR2gatcWb5YU+/fxWEH9YxFMxp9mp8FgVZALDz14qIO
-	gwOsvuCAhHepCOZ4zgEJNKUTdTeGJdx8KJ3no7SRa9J9OydL9Lc/4GK1xsf2Kje9aDy6e3Grtxd
-	jP/ErCyaISwclneEeynaFGOQOAKRYtnXxw=
-X-Received: by 2002:a05:6000:1a8a:b0:487:62d:37dc with SMTP id ffacd0b85a97d-4871e269cd3mr21320913f8f.32.1790070457566;
-        Tue, 22 Sep 2026 02:47:37 -0700 (PDT)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-48862773ee0sm3708938f8f.6.2026.09.22.02.47.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Sep 2026 02:47:37 -0700 (PDT)
-Date: Tue, 22 Sep 2026 10:47:36 +0100
-From: David Laight <david.laight.linux@gmail.com>
-To: Hui Peng <benquike@gmail.com>
-Cc: Harry Morris <h.morris@cascoda.com>, Alexander Aring
- <alex.aring@gmail.com>, Miquel Raynal <miquel.raynal@bootlin.com>, Stefan
- Schmidt <stefan@datenfreihafen.org>, linux-wpan@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- stable@vger.kernel.org
-Subject: Re: [PATCH net v3 2/3] ieee802154: ca8210: prevent stack buffer
- overflow in hwme_get_request_sync()
-Message-ID: <20260922104736.0e7e20f2@pumpkin>
-In-Reply-To: <20260922093126.141969-3-benquike@gmail.com>
-References: <20260922093126.141969-1-benquike@gmail.com>
-	<20260922093126.141969-3-benquike@gmail.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tpe9kFrO"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78D4D1F000FF;
+	Wed, 23 Sep 2026 18:36:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1790188612;
+	bh=gLvEq6x6vlfP6bUwxmnguwF0raKfMv/VOUto/aw7tWE=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References;
+	b=Tpe9kFrOgveGVJYDE0SHuHzT6I5ZN1n9g5G7YDq8mgM4QKUhxb+wDFCJUNeOSEfAT
+	 AfL7mKSJqc0vtgwEVb/58GZWoE3i2rhEvmXA3qpPJs+S6FUDD/nepgUfd2yLyJc7Sp
+	 i/nOCfKIBHdPkt6bQSCLYvkRVNYXuk5Tm+OUV6YDTOMhOa5tzq7HGnyGdXHZLj7yUJ
+	 aAXg3bjwslRnWHKWJngT4UEPNOXYBcaOuDO3HZQDemVC80TMsRKE2TnoOyU+kFQGN3
+	 8voAyqEC6uyQiCAU2NCIoMTKY3pp0JHLq1T+mwGQXtlKIDIMPXV6900jQEMDQQ4UTG
+	 7ObqAosAeASUQ==
+Subject: Re: [PATCH] 6lowpan: add missing pskb_may_pull() checks in IPHC and
+ NHC compression
+From: netdev-bot+sashiko@kernel.org
+To: benquike@gmail.com
+Cc: alex.aring@gmail.com, marcel@holtmann.org, luiz.dentz@gmail.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Date: Wed, 23 Sep 2026 18:36:50 +0000
+Message-ID: <179018861097.2160803.13520936526945055504@kernel.org>
+In-Reply-To: <20260919213638.3314763-1-benquike@gmail.com>
+References: <20260919213638.3314763-1-benquike@gmail.com>
+X-sashiko-severity: High
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
 
-On Tue, 22 Sep 2026 09:30:24 +0000
-Hui Peng <benquike@gmail.com> wrote:
+Thank you for your contribution! Sashiko AI review found 4 potential
+issue(s) to consider.
 
-> In ca8210_get_ed(), an uninitialized u8 lenvar and a pointer to a 1-byte
-> stack buffer (u8 *level) are passed to hwme_get_request_sync(), which
-> unconditionally copies response.pdata.hwme_get_cnf.hw_attribute_length
-> bytes into hw_attribute_value without checking the caller's destination
-> buffer capacity, overflowing level on the stack when hw_attribute_length
-> exceeds 1:
-> 
->   BUG: KASAN: stack-out-of-bounds in hwme_get_request_sync.constprop.0.isra.0+0xf3/0x170
->   Write of size 16 at addr ffff888001907780 by task init/1
->   Call Trace:
->    <TASK>
->    dump_stack_lvl+0x70/0xa0
->    print_report+0x153/0x4c6
->    kasan_report+0xf1/0x120
->    kasan_check_range+0x125/0x200
->    __asan_memcpy+0x3c/0x60
->    hwme_get_request_sync.constprop.0.isra.0+0xf3/0x170
->    ca8210_get_ed+0x9c/0xf0
->   ...
->   The buggy address belongs to stack of task init/1
->    and is located at offset 48 in frame:
->    ca8210_get_ed+0x0/0xf0
->   This frame has 2 objects:
->    [48, 49) 'level'
->    [64, 65) 'lenvar'
-> 
-> Initialize lenvar = 1 in ca8210_get_ed() and return
-> IEEE802154_SYSTEM_ERROR in hwme_get_request_sync() if
-> response.pdata.hwme_get_cnf.hw_attribute_length exceeds
-> *hw_attribute_length.
+Critical: 0 · High: 2 · Medium: 1 · Low: 1
 
-This function is silly.
-There is exactly one caller, the only valid length seems to 1 (is zero valid?),
-not much point using memcpy() either.
+If you believe none of the issues are legitimate, please reply to each
+issue of Medium severity or higher and explain why the AI is wrong.
+If any of them are legitimate and you plan to respin, please let patchwork
+know by including "pw-bot: cr" as a separate line at the end of your reply
+(one such reply per series is enough).
 
-David
+- [High] Incomplete fix: the same unvalidated IPv6-header dereference on
+  the 6LoWPAN transmit path survives in both link-layer callers, which…
+- [High] Both new guards are anchored at skb->data, but the reads they
+  must protect are anchored at header offsets, so the checks can pass…
+- [Medium] The two new pskb_may_pull() failures only produce -EINVAL, and
+  neither in-tree caller honours it, so the malformed frame this patch…
+- [Low] Commit message states the wrong failure mode, but the concern's
+  own mechanism is also disproven.
 
-> 
-> Tested in QEMU with KASAN enabled by passing an oversized
-> hw_attribute_length response into ca8210_get_ed().
-> 
-> Fixes: ded845a781a5 ("ieee802154: Add CA8210 IEEE 802.15.4 device driver")
-> Cc: stable@vger.kernel.org
-> Assisted-by: LLM
-> Signed-off-by: Hui Peng <benquike@gmail.com>
-> ---
-> Changes in v3:
-> - No changes.
-> 
-> Changes in v2:
-> - Split out as patch 2/3.
-> - Replaced the temporary stack buffer in ca8210_get_ed() with lenvar = 1
->   and an upper-bound check against *hw_attribute_length in
->   hwme_get_request_sync() as requested by Miquel Raynal.
-> 
->  drivers/net/ieee802154/ca8210.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ieee802154/ca8210.c b/drivers/net/ieee802154/ca8210.c
-> index a990a0f..8aa7ffe 100644
-> --- a/drivers/net/ieee802154/ca8210.c
-> +++ b/drivers/net/ieee802154/ca8210.c
-> @@ -1677,6 +1677,9 @@ static u8 hwme_get_request_sync(
->  		return IEEE802154_SYSTEM_ERROR;
+--
+
+6lowpan: add missing pskb_may_pull() checks in IPHC and NHC compression
+
+This adds a pskb_may_pull() check for sizeof(struct ipv6hdr) in
+lowpan_header_compress() and for sizeof(struct ipv6hdr) +
+nhc->nexthdrlen in lowpan_nhc_do_compression(), returning -EINVAL when
+the headers are not in the linear area.
+
+A few questions on the changelog and on the placement of the checks.
+
+> 6lowpan: add missing pskb_may_pull() checks in IPHC and NHC compression
+>
+>     When a short or non-linear `ETH_P_IPV6` frame is transmitted over a
+>     6LoWPAN interface (for example, via `AF_PACKET`),
+>     `lowpan_header_compress()` and `lowpan_nhc_do_compression()` read past
+>     `skb_tail_pointer(skb)` and trigger `BUG_ON(skb->len < skb->data_len)`
+>     in `skb_pull()`.
+
+[Severity: Low]
+Is the described failure mode accurate?  skb_pull() is skb_pull_inline():
+
+include/linux/skbuff.h:
+	return unlikely(len > skb->len) ? NULL : __skb_pull(skb, len);
+
+For the reachable case, a short but linear ETH_P_IPV6 frame (skb->len = 6,
+data_len = 0), the skb_pull(skb, sizeof(struct ipv6hdr)) in
+lowpan_header_compress() just returns NULL without touching skb->len, so
+the BUG() inside __skb_pull() cannot be reached.
+
+The non-linear variant also looks unreachable for these two netdevs:
+neither lowpan_setup() (net/ieee802154/6lowpan/core.c) nor netdev_setup()
+(net/bluetooth/6lowpan.c) advertises NETIF_F_SG or NETIF_F_FRAGLIST, so
+skb_needs_linearize() is true and validate_xmit_skb() linearizes or drops
+any paged/fraglist skb before ndo_start_xmit.
+
+Would it be more precise to describe this as an out-of-bounds read of the
+IPv6 header whose bytes are then emitted in the compressed header, rather
+than as a BUG()?
+
+> diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
+> index 37eaff3f7b69..b2be70036ee7 100644
+> --- a/net/6lowpan/iphc.c
+> +++ b/net/6lowpan/iphc.c
+> @@ -1140,6 +1140,9 @@ int lowpan_header_compress(struct sk_buff *skb, const struct net_device *dev,
+>  	if (skb->protocol != htons(ETH_P_IPV6))
+>  		return -EINVAL;
 >  
->  	if (response.pdata.hwme_get_cnf.status == IEEE802154_SUCCESS) {
-> +		if (response.pdata.hwme_get_cnf.hw_attribute_length >
-> +		    *hw_attribute_length)
-> +			return IEEE802154_SYSTEM_ERROR;
->  		*hw_attribute_length =
->  			response.pdata.hwme_get_cnf.hw_attribute_length;
->  		memcpy(
-> @@ -2027,7 +2030,7 @@ static int ca8210_xmit_async(struct ieee802154_hw *hw, struct sk_buff *skb)
->   */
->  static int ca8210_get_ed(struct ieee802154_hw *hw, u8 *level)
->  {
-> -	u8 lenvar;
-> +	u8 lenvar = 1;
->  	struct ca8210_priv *priv = hw->priv;
->  
->  	return link_to_linux_err(
+> +	if (!pskb_may_pull(skb, sizeof(struct ipv6hdr)))
+> +		return -EINVAL;
+> +
 
+[Severity: High]
+Does this cover the whole transmit path?  Both link-layer callers
+dereference the IPv6 header before lowpan_header_compress() is reached.
+
+net/bluetooth/6lowpan.c:setup_header() {
+	...
+	hdr = ipv6_hdr(skb);
+	...
+	memcpy(&ipv6_daddr, &hdr->daddr, sizeof(ipv6_daddr));
+	...
+	lowpan_header_compress(skb, netdev, daddr, dev->netdev->dev_addr);
+}
+
+The memcpy() reads 16 bytes at IPv6 header offsets 24..39 and the result
+feeds ipv6_addr_is_multicast(), BT_DBG("dest IP %pI6c") and
+peer_lookup_dst(), all before the new check runs.  netdev_setup() sets
+hard_header_len = 0 and bt_xmit() only calls skb_unshare(), which
+validates no length, so an AF_PACKET send of 6 bytes with sll_protocol =
+htons(ETH_P_IPV6) makes those bytes land past skb_tail_pointer(skb).
+
+net/ieee802154/6lowpan/tx.c:lowpan_header_create() {
+	const struct ipv6hdr *hdr = ipv6_hdr(skb);
+	...
+	n = neigh_lookup(&nd_tbl, &hdr->daddr, ldev);
+}
+
+This is header_ops->create, called from dev_hard_header() in
+packet_snd() on the SOCK_DGRAM path before skb_copy_datagram_from_iter()
+has copied any payload, with no pskb_may_pull() anywhere.
+
+Should the length and linearity validation happen at the xmit/hard-header
+entry points (bt_xmit()/setup_header() before the daddr read, and
+lowpan_header_create()) instead of only inside the compressor?
+
+[Severity: Medium]
+Who consumes this new -EINVAL?  Neither in-tree caller looks at it.
+
+net/ieee802154/6lowpan/tx.c:lowpan_header() {
+	...
+	lowpan_header_compress(skb, ldev, &info.daddr, &info.saddr);
+
+	*dgram_offset = (*dgram_size - skb->len) + skb_network_header_len(skb);
+}
+
+lowpan_header() returns only wpan_dev_hard_header()'s value, so the
+"if (ret < 0) drop" in lowpan_xmit() is never taken.
+net/bluetooth/6lowpan.c:setup_header() also calls it as a void statement
+and then reports its own unicast/multicast status, so bt_xmit() goes on to
+dev_hard_header()/send_pkt().
+
+Does that mean the frame this patch rejects is still put on the link,
+uncompressed?  Its first byte 0x6x aliases LOWPAN_DISPATCH_IPHC (0x60,
+mask 0xE0), so a receiver would parse it as an IPHC header.
+
+There is a second effect on the ieee802154 path: the aborted compression
+never reaches the skb_pull()/skb_reset_transport_header() at the end of
+lowpan_header_compress(), so skb_network_header_len() is called on an skb
+whose transport header may still be the ~0U sentinel:
+
+include/linux/skbuff.h:skb_network_header_len() {
+	DEBUG_NET_WARN_ON_ONCE(!skb_transport_header_was_set(skb));
+	return skb->transport_header - skb->network_header;
+}
+
+Can this trip the debug warning and produce a garbage *dgram_offset?
+
+For completeness: the stronger claim that lowpan_xmit_fragment() then
+copies past the tail did not hold up — a frame short enough to fail
+pskb_may_pull() always satisfies
+skb_tail_pointer(skb) - skb_network_header(skb) <= max_single and takes
+the single-frame path.
+
+Would it work to have both callers propagate the error and drop the skb,
+or to move the check into lowpan_xmit()/bt_xmit()?
+
+>  	hdr = ipv6_hdr(skb);
+>  	hc_ptr = head + 2;
+>  
+> diff --git a/net/6lowpan/nhc.c b/net/6lowpan/nhc.c
+> index a4dde85664f2..a9bf340c090a 100644
+> --- a/net/6lowpan/nhc.c
+> +++ b/net/6lowpan/nhc.c
+> @@ -79,6 +79,11 @@ int lowpan_nhc_do_compression(struct sk_buff *skb, const struct ipv6hdr *hdr,
+>  		goto out;
+>  	}
+>  
+> +	if (!pskb_may_pull(skb, sizeof(struct ipv6hdr) + nhc->nexthdrlen)) {
+> +		ret = -EINVAL;
+> +		goto out;
+> +	}
+> +
+
+[Severity: High]
+Are these guards anchored at the right pointer?  pskb_may_pull() measures
+from skb->data:
+
+include/linux/skbuff.h:pskb_may_pull_reason() {
+	if (likely(len <= skb_headlen(skb)))
+		return SKB_NOT_DROPPED_YET;
+}
+
+but the reads they protect are anchored at header offsets:
+lowpan_header_compress() uses hdr = ipv6_hdr(skb), i.e.
+skb->head + skb->network_header, and the only in-tree nhc->compress,
+udp_compress() (net/6lowpan/nhc_udp.c), reads
+udp_hdr(skb) == skb->head + skb->transport_header.  When
+skb_network_offset(skb) != 0 the checks validate a different range than
+the one dereferenced.
+
+A fully linear case on an ieee802154 6LoWPAN device (lowpan_setup() sets
+hard_header_len = sizeof(struct ipv6hdr), min_header_len = 0): send exactly
+80 bytes over AF_PACKET SOCK_RAW with sll_protocol = htons(ETH_P_IPV6),
+bytes 40..79 being an IPv6 header with nexthdr = 17.
+
+In packet_snd() reserve = 40, the skb is fully linear,
+skb_reset_network_header() followed by skb_reserve(skb, -40) leaves
+skb_network_offset(skb) == 40, and the
+"len < reserve + sizeof(struct ipv6hdr)" re-reset is skipped since 80 is
+not < 80.  Then:
+
+net/core/flow_dissector.c:__skb_flow_dissect() {
+	key_control->thoff = min_t(u16, nhoff, skb ? skb->len : hlen);
+}
+
+gives thoff = min(80, 80) = 80, so the transport header points exactly at
+skb_tail_pointer(skb).  pskb_may_pull(skb, 40) passes (headlen 80),
+nexthdr 17 selects the UDP NHC, pskb_may_pull(skb, 48) also passes, and
+udp_compress() reads uh->source, uh->dest and uh->check at skb->data +
+80..88.  Does lowpan_push_hc_data() then copy those eight uninitialised
+bytes into the header that is transmitted on the link?
+
+The IPHC guard looks affected the same way by any non-zero network offset,
+e.g. a tc mirred ingress-to-egress redirect that does
+skb_push_rcsum(skb, skb->mac_len) before dev_queue_xmit(), giving
+network_offset 14 and a 14-byte past-tail read of hdr for skb->len in
+40..53.
+
+Would pskb_may_pull(skb, skb_network_offset(skb) + sizeof(struct ipv6hdr))
+and skb_transport_offset(skb) + nhc->nexthdrlen be the right forms here,
+or should a non-zero skb_network_offset(skb) simply be rejected?
+
+>  	/* In the case of RAW sockets the transport header is not set by
+>  	 * the ip6 stack so we must set it ourselves
+>  	 */
+
+On the adjacent pre-existing fixup:
+
+	if (skb->transport_header == skb->network_header)
+		skb_set_transport_header(skb, sizeof(struct ipv6hdr));
+
+This isn't a bug introduced by this patch, but the canonical test for an
+unset transport header is !skb_transport_header_was_set(skb):
+
+include/linux/skbuff.h:skb_transport_header_was_set() {
+	return skb->transport_header != (typeof(skb->transport_header))~0U;
+}
+
+With the equality test above, an skb whose transport header was never set
+escapes the fixup and udp_hdr(skb) resolves to skb->head + 0xFFFF.  Is it
+worth switching to skb_transport_header_was_set() while touching this
+function?
+
+-- 
+Sashiko AI review · https://netdev-ai.bots.linux.dev/sashiko/#/patchset/20260919213638.3314763-1-benquike%40gmail.com
