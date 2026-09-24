@@ -1,188 +1,168 @@
-Received: from mail-pj2-f12.google.com (mail-pj2-f12.google.com [74.125.227.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F131D3438B2
-	for <linux-wpan@vger.kernel.org>; Thu, 24 Sep 2026 06:22:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.140
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E5C240B0FE;
+	Thu, 24 Sep 2026 06:42:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790230970; cv=none; b=Ur45rFD5scvZlUcxQf9ofYv3HVUD7rSspaigfyyb6M6d5qVOnTSVM0X35IlTuV3tIN/hWvx6SkqXUwOm9Zr9vc8F6yGGbwVrz9sIkFM1z/oOVyjlVmgOi6+EMt/U7C179d+xvrWJzbflIx9CoMHM64vPc+sn3A1INRIZkPC8JIo=
+	t=1790232131; cv=none; b=LS6SVelvKs+jDc7JoZqHO4gv8cOjPWmuspe7Lm9svH9R8y/V2yseYEpZk7nyZmvNHQC+fEJ2AW+vvOVH2ouFbsxV+bQHjJe8NnEWRJtQjGr5HlPaGalr/3IAu2t8lvYQO5/pVlH73JybxWE0ih7xPcMr45tfwWDbOeVBVs7f60c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790230970; c=relaxed/simple;
-	bh=Mk3fSgu7F2inklm698FGg8xtY/UC1g+hSJQWE9hH+Ug=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cgXRM4Q/o/pGlUI9y2yXBKbclcpXMok824Ag10ejr9Jrv7liSSTQMjojrxj4U658P6mxD9tGtOrZMgP2zejfDmwn/UXdD4ySOMZsK+hRupqfDsEUsOqA0zRFLg3FVMP7knEEeGJxzGuwDTQD9LY+r8fsFN27osON6VIZesbJG1Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RXLUwcyY; arc=none smtp.client-ip=74.125.227.140
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1790232131; c=relaxed/simple;
+	bh=meTevEAx63VoU8Z84Anl84+Dyomtfyb3OaTgc/fluOs=;
+	h=Subject:From:To:Cc:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=cCmXN+8mhMUv2mKJUIBsQHVnMY4PQ/31gkSIhGmPoFgqhEUA7fVD0DtzLbzn25ztblCuPpxfbwpmSey2MJ8cOWYqNfZle5uCGSk+D3DUpenGw1pFhmC9B2CDZWoALtbSqbS/UzADGV7DQQP47ZK08VHJp3omkj99BpvomSAi0jQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f6MsxWCM; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RXLUwcyY"
-Received: by mail-pj2-f12.google.com with SMTP id d9443c01a7336-2d8fbef5018so12144665ad.0
-        for <linux-wpan@vger.kernel.org>; Wed, 23 Sep 2026 23:22:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790230968; x=1790835768; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=WltmE4hNoTkSsXOgrdp6cz7c6fyzqTtuC0otv1UOPu0=;
-        b=RXLUwcyY11ngfU6rR6/2T7DlRzxh+9CrigcCDJRWkT3YvLgZ5p841K+AzGkJZJsni0
-         ELpVot0+3i38FyUJe5WHt31yJblyEpAG2v4n8/BZRm5UNZ012pKFT8VrzOxgST0eCf07
-         6WmhzmAJr1J71un8VZTSNYc6CE9h2LFhOdTmy3G1dgCwD68QSMD/iAGjzWzFaM4Q+0su
-         ho/R0xJ0jeMdKGIkXUmuUIrJjYAnFwIaxtg7hXChgDtZL1ScD4SlspnV2xp3CWoZmJyz
-         txYzjvPltzW7oAYYhzB24tLh/qc2NvGwKy0v+ycEX2+nbhPRcv7HpNDKOJSAlN3E5IOb
-         kYLw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790230968; x=1790835768;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=WltmE4hNoTkSsXOgrdp6cz7c6fyzqTtuC0otv1UOPu0=;
-        b=Zx8rPGn1Pu8ChjtJosXJrMRyrZzFLzdb2OcrUlSYk2c5R6qIrwU4D904v07fdqCyUd
-         PspR67ElkCFz6J2oQp58YxsxNJpNd9eCcE/Nhrya19A+TsKA7uaqxvxn6c/452NrnjoR
-         G+vXluzDUZnUrle/AN8UWaFb4uBQuDtbkH2zwN+bz+G/SU16SCck3B7wdjX7MjiIMAeO
-         J7XKB1OZc5PeMfrEmLeqW1bJ1zrR81mhh346Elq6Qmbac98Q04q9iSLwjx3Es/GffWp8
-         ZtHnjxokqsk5JX72ozwiOLwE9CAIoqTAPFMpSM/1HEenQPfNVYlaA3ZOiEynRdNUaDqS
-         AVmA==
-X-Forwarded-Encrypted: i=1; AKwUvBwtyj6NDSos9JK6oAH9QyzRhO0fPlR6uzw8dFHlLZk5yejE11GyTUg/e7Tbtz9JwjW72fgW7JdULHxx@vger.kernel.org
-X-Gm-Message-State: AFuF++m1303Wt5V7/pdxmeJ6Q12bI2Z+rbDuWnYDYKeDEQqDT9vgspMo
-	p4/XW7FHRVnPYDptPcSsJQidijc8/CX+WGBraqYESGUzBynctmoYTdFg
-X-Gm-Gg: AYBFou1dP2W5N5u2Sy1LEyjWVis20LT3J9qNaXZk14Z7GpPLFJgFWPxV+ftTZk6rUtb
-	TTRcdNWCQVJYyr0AyjpqTn3cs0QDH8u28KMh8JBpux9z0kxJ4Sm52+zAVLzpOw5x+b60h8FTCap
-	iEshf+xtsGWLSOjquuI+7whNS+2X6Jclrs0WGJ0fbRnFyQshazwp89QoHy/2sVbA+HJMhDMEA4u
-	UvrIvNMJQbHoDoADKxei+bZp8iurmB64LQWR/kKgsVE2ps7YQ+4r7GNPd9YKYvtISjrJ9F3dOgH
-	2kOimddxzoOKmVUH5gQJ3CvWSIoF2SSC5VVZ8yKwdoEdXUS0KTNDFFaziIwXau39zHg1Wg1gZ+l
-	2Uc3gL0ZG81erMuzsIQ72zKhe48m7AFzeZxYCRL7m4Yc/WOYx8ruwf0IlYsiA6v6TDv4NNcIp++
-	zt1pFVKCYTW7nn3ArMW1FDgQK4MRaFTMaLsA7L0kDyb8i2wYk7mlOCqE+p9091vT+oPXvY1TQmX
-	GzopYv24n1emeV6tmfiZCSyXbDCp67SpAkEcGRXNtEBp2AisHwrYnRFEtucBLovdExsBaK4Gt6g
-	h0Y6JQ0ljQ==
-X-Received: by 2002:a17:902:e946:b0:2dd:c100:313d with SMTP id d9443c01a7336-2df7e2530ebmr11495365ad.57.1790230968400;
-        Wed, 23 Sep 2026 23:22:48 -0700 (PDT)
-Received: from phui-2.c.googlers.com.com (67.51.127.34.bc.googleusercontent.com. [34.127.51.67])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2df6a5d7a48sm21220615ad.48.2026.09.23.23.22.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Sep 2026 23:22:48 -0700 (PDT)
-From: Hui Peng <benquike@gmail.com>
-To: h.morris@cascoda.com,
-	alex.aring@gmail.com,
-	miquel.raynal@bootlin.com,
-	stefan@datenfreihafen.org
-Cc: david.laight.linux@gmail.com,
-	linux-wpan@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org,
-	Hui Peng <benquike@gmail.com>
-Subject: [PATCH net v3 3/3] ieee802154: ca8210: validate data_ind length upfront in ca8210_skb_rx()
-Date: Thu, 24 Sep 2026 06:22:44 +0000
-Message-ID: <20260924062244.2444225-4-benquike@gmail.com>
-X-Mailer: git-send-email 2.56.0.rc1.310.g51773c2048-goog
-In-Reply-To: <20260924062244.2444225-1-benquike@gmail.com>
-References: <20260924062244.2444225-1-benquike@gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f6MsxWCM"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 026731F000FF;
+	Thu, 24 Sep 2026 06:42:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1790232126;
+	bh=Hf2kO5YOY3KalHQaeAkcW4ZtTxm5AaXHNpVzUFmNyIo=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References;
+	b=f6MsxWCMyau3S24kpHf0zSYuaTnV/WC0OVIh2Krm1amSYJIl0NBCSSiilZRN8vUTH
+	 HTXK+NRi/mtCUvowFUZ+Dz8k51EgsPIeD/kCa3lu48xqJRzoHwILoCkZbwSZzra84m
+	 r8CgF3j0rzASKyTpCfeljVjFDZViZ+Ea1C057A/vB1lTBQWUqwSTUDRDvsPj4q5+HB
+	 vizMc8AFEEIoDgF8wiNRZI2a3AjpJ7jI0wmY23K9nmDgGKAwlPP6UTc0RsHUZHz0jX
+	 lHpz2yJ4Y3e5LPzSOewGk3zt0EsQvo7PP7S1XqiVRj41Mv2ffACbvW8VV4Dz/7tYII
+	 tAfhgRNez1JKw==
+Subject: Re: [PATCH net v3 2/3] ieee802154: ca8210: prevent stack buffer
+ overflow in hwme_get_request_sync()
+From: netdev-bot+sashiko@kernel.org
+To: benquike@gmail.com
+Cc: h.morris@cascoda.com, alex.aring@gmail.com, miquel.raynal@bootlin.com,
+ stefan@datenfreihafen.org, david.laight.linux@gmail.com,
+ linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org, kuba@kernel.org
+Date: Thu, 24 Sep 2026 06:42:05 +0000
+Message-ID: <179023212547.2160803.17631623699458578311@kernel.org>
+In-Reply-To: <20260922093126.141969-3-benquike@gmail.com>
+References: <20260922093126.141969-3-benquike@gmail.com>
+X-sashiko-severity: Low
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-In ca8210_skb_rx(), data_ind is read at offsets 22 (msdulen), 23
-(mpdulinkquality), 29 + msdulen (hdr.sec.level), 30..39 + msdulen
-(security header), and 29 .. 29 + msdulen (payload) without verifying
-that the received SPI frame length len covers those offsets, causing an
-out-of-bounds read when msdulen exceeds len - 30:
+Thank you for your contribution! Sashiko AI review found more severe
+issue(s) in other patches of this series. This mail is only an FYI, in case
+you want to address the nit picks below when you respin.
 
-  BUG: KASAN: slab-out-of-bounds in ca8210_skb_rx.constprop.0.isra.0+0x137/0x160
-  Read of size 64 at addr ffff888006453ddd by task init/1
-  Call Trace:
-   <TASK>
-   dump_stack_lvl+0x70/0xa0
-   print_report+0x153/0x4c6
-   kasan_report+0xf1/0x120
-   kasan_check_range+0x125/0x200
-   __asan_memcpy+0x23/0x60
-   ca8210_skb_rx.constprop.0.isra.0+0x137/0x160
-   ca8210_net_rx+0x96/0xc0
-  ...
-  The buggy address belongs to the object at ffff888006453dc0
-   which belongs to the cache kmalloc-32 of size 32
-  The buggy address is located 29 bytes inside of
-   allocated 32-byte region [ffff888006453dc0, ffff888006453de0)
+Low priority / nit picks for your consideration:
 
-Consolidate all length and msdulen validations into a single upfront check
-at the beginning of ca8210_skb_rx() before allocating the skb.
+- [Low] hwme_get_request_sync() (drivers/net/ieee802154/ca8210.c:1655) is
+  changed so that *hw_attribute_length becomes a mandatory *input*: line…
 
-Tested in QEMU with KASAN enabled by passing a short data_ind buffer with
-msdulen = 64 and len = 30 into ca8210_skb_rx().
+Pre-existing issues:
+- [Medium] hwme_get_request_sync() validates the device-reported
+  hw_attribute_length only from above; it never checks that the confirm…
 
-Fixes: ded845a781a5 ("ieee802154: Add CA8210 IEEE 802.15.4 device driver")
-Cc: stable@vger.kernel.org
-Assisted-by: LLM
-Signed-off-by: Hui Peng <benquike@gmail.com>
----
-Changes in v3:
-- No changes.
+--
 
-Changes in v2:
-- Split out as patch 3/3.
-- Consolidated all length checks in ca8210_skb_rx() into a single place
-  at the beginning of the function before dev_alloc_skb() and dropped the
-  unrelated hdr.seq assignment as requested by Miquel Raynal.
+ieee802154: ca8210: prevent stack buffer overflow in hwme_get_request_sync()
 
- drivers/net/ieee802154/ca8210.c | 32 ++++++++++++++++++++++----------
- 1 file changed, 22 insertions(+), 10 deletions(-)
+The patch turns the hw_attribute_length argument of
+hwme_get_request_sync() into an in/out parameter: the caller-supplied
+value is now used as the capacity of the destination buffer, and an
+over-long HWME-GET.confirm is rejected with IEEE802154_SYSTEM_ERROR.
+The single caller ca8210_get_ed() initialises lenvar to 1 to match the
+one-byte level buffer.
 
-diff --git a/drivers/net/ieee802154/ca8210.c b/drivers/net/ieee802154/ca8210.c
-index 8aa7ffe..ab245ad 100644
---- a/drivers/net/ieee802154/ca8210.c
-+++ b/drivers/net/ieee802154/ca8210.c
-@@ -1758,19 +1758,15 @@ static int ca8210_skb_rx(
- 	u8                    *data_ind
- )
- {
--	struct ieee802154_hdr hdr;
-+	struct ieee802154_hdr hdr = { };
- 	int msdulen;
- 	int hlen;
--	u8 mpdulinkquality = data_ind[23];
-+	u8 mpdulinkquality;
- 	struct sk_buff *skb;
- 	struct ca8210_priv *priv = hw->priv;
- 
--	/* Allocate mtu size buffer for every rx packet */
--	skb = dev_alloc_skb(IEEE802154_MTU + sizeof(hdr));
--	if (!skb)
--		return -ENOMEM;
--
--	skb_reserve(skb, sizeof(hdr));
-+	if (len < 30)
-+		return -EMSGSIZE;
- 
- 	msdulen = data_ind[22]; /* msdu_length */
- 	if (msdulen > IEEE802154_MTU) {
-@@ -1778,9 +1774,25 @@ static int ca8210_skb_rx(
- 			&priv->spi->dev,
- 			"received erroneously large msdu length!\n"
- 		);
--		kfree_skb(skb);
- 		return -EMSGSIZE;
- 	}
-+
-+	if (len < 30 + msdulen ||
-+	    (!priv->promiscuous && data_ind[29 + msdulen] > 0 &&
-+	     len < 29 + msdulen + sizeof(struct secspec))) {
-+		dev_err(&priv->spi->dev,
-+			"received truncated data indication!\n");
-+		return -EMSGSIZE;
-+	}
-+
-+	mpdulinkquality = data_ind[23];
-+
-+	/* Allocate mtu size buffer for every rx packet */
-+	skb = dev_alloc_skb(IEEE802154_MTU + sizeof(hdr));
-+	if (!skb)
-+		return -ENOMEM;
-+
-+	skb_reserve(skb, sizeof(hdr));
- 	dev_dbg(&priv->spi->dev, "skb buffer length = %d\n", msdulen);
- 
- 	if (priv->promiscuous)
+> diff --git a/drivers/net/ieee802154/ca8210.c b/drivers/net/ieee802154/ca8210.c
+> index a990a0f347ad8..8aa7ffeb22d78 100644
+> --- a/drivers/net/ieee802154/ca8210.c
+> +++ b/drivers/net/ieee802154/ca8210.c
+> @@ -1677,6 +1677,9 @@ static u8 hwme_get_request_sync(
+>  		return IEEE802154_SYSTEM_ERROR;
+>  
+>  	if (response.pdata.hwme_get_cnf.status == IEEE802154_SUCCESS) {
+> +		if (response.pdata.hwme_get_cnf.hw_attribute_length >
+> +		    *hw_attribute_length)
+> +			return IEEE802154_SYSTEM_ERROR;
+
+[Severity: Low]
+This isn't a bug, but should the kernel-doc above hwme_get_request_sync()
+be updated to describe the new contract?  The block still reads:
+
+  /**
+   * hwme_get_request_sync() - HWME_GET_request/confirm according to API Spec
+   * @hw_attribute:        Attribute Number
+   * @hw_attribute_length: Attribute length
+   * @hw_attribute_value:  Pointer to Attribute Value
+   * @device_ref:          Nondescript pointer to target device
+   *
+   * Return: 802.15.4 status code of HWME-GET.confirm
+   */
+
+The @hw_attribute_length wording is word for word the same as the one used
+for hwme_set_request_sync(), where the parameter really is a plain input
+value, and the Return: line no longer covers the new
+IEEE802154_SYSTEM_ERROR case for an over-long reply.
+
+A second call site that follows the current wording and passes the expected
+attribute length (or leaves the variable uninitialised, as ca8210_get_ed()
+did before this patch) would either reintroduce the overflow being fixed
+here or make every valid reply fail.  Would it help to document that the
+caller must pass sizeof(destination buffer) on entry and receives the number
+of bytes written on return?
+
+>  		*hw_attribute_length =
+>  			response.pdata.hwme_get_cnf.hw_attribute_length;
+
+[Severity: Medium]
+This is a pre-existing issue and not introduced by this patch, but since the
+new check sits exactly where a length test belongs: should there also be a
+lower-bound or consistency check here?
+
+Only over-long lengths are rejected, so a confirm with
+status == IEEE802154_SUCCESS and hw_attribute_length == 0 passes, copies
+zero bytes and returns IEEE802154_SUCCESS:
+
+drivers/net/ieee802154/ca8210.c:ca8210_get_ed() {
+	u8 lenvar = 1;
+	...
+	return link_to_linux_err(
+		hwme_get_request_sync(HWME_EDVALUE, &lenvar, level, priv->spi)
+	);
+}
+
+The returned lenvar is ignored, so ca8210_get_ed() reports 0 while *level
+was never written, although struct ieee802154_ops.ed in
+include/net/mac802154.h expects the callback to store the measured energy.
+
+There is a related case for a short confirm.  'struct mac_message response'
+in hwme_get_request_sync() is an uninitialised stack object, and
+ca8210_rx_done() only enforces an upper bound before copying:
+
+drivers/net/ieee802154/ca8210.c:ca8210_rx_done() {
+	buf = cas_ctl->tx_in_buf;
+	len = buf[1] + 2;
+	if (len > sizeof(struct mac_message)) {
+		...
+		goto finish;
+	}
+
+	if (buf[0] & SPI_SYN) {
+		if (priv->sync_command_response) {
+			memcpy(priv->sync_command_response, buf, len);
+	...
+}
+
+If the device answers SPI_HWME_GET_CONFIRM with a length byte that stops
+before the attribute bytes, response.pdata.hwme_get_cnf.hw_attribute_length
+and hw_attribute_value keep whatever was on the stack.  When that stale
+length happens to be 0 or 1 the new check passes, and a stale stack byte is
+copied into *level while success is returned.  Would an exact length test
+for the fixed-width HWME_EDVALUE attribute, plus a check that the confirmed
+attribute length fits within response.length, close both cases?
+
+In the current tree neither variant is reachable from userspace, since ->ed
+has no in-tree caller (net/mac802154/main.c only checks for its presence
+with a WARN_ON, and ED scans are refused in net/mac802154/scan.c).
+
+-- 
+Sashiko AI review · https://netdev-ai.bots.linux.dev/sashiko/#/patchset/20260922093126.141969-1-benquike%40gmail.com
