@@ -1,148 +1,223 @@
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EB5F2673AA;
-	Fri, 25 Sep 2026 09:03:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 453AA305698;
+	Mon, 28 Sep 2026 06:42:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790327012; cv=none; b=a69MZovcMGpN0pdVEdo4M/kIMexvwvYaa+FbeSPvIpIgM8K+9mMTOQdgmQ3Pk6LXORt8cVpvEtBsznlQTLbHoEd/th4fupABuqw4c1STaeNsrRTMiLKXwWdDfBSNWPiAddZfOObrhBshFfZPYHHdPpe9mKw2wiPwMahCZqtqCVo=
+	t=1790577750; cv=none; b=UHzoP2HR0atLT8KXcHm8tv2vPtrlJehjRmbLh3CMMr7lMYoMRaA0mdk/NK+/1zt9MpSOoK7xCQLIKjjJiMd+1AbPHA6eWyR0c5D+AZGG86rutU1a6e8mf/HVHfwGvr7x3Z/C0dbCmZWf7Ev2D6XXQ45hpHQanHBgAV43UC5wtFc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790327012; c=relaxed/simple;
-	bh=P8Aw7juCe2KgMXuQOGximN8nLdja9ugNEdFO7iGcWE0=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=ouvmWVHR2GtV0ZtbzzNKCHenHr79kJ6uMlJZG8kVJOHn0bQ+eQOF7q+uEoyMp0Vq5XgiLWgAatyrh0g5LSdPlnX1UGQUbKhedoscPGncKtDodLArN1NBWTI5AzltD5o1bjUcD2lFfyJyDYVkf0MOT8Mq+qGjYiYCWcORE4ifQqI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=B3UmHtlo; arc=none smtp.client-ip=185.171.202.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+	s=arc-20240116; t=1790577750; c=relaxed/simple;
+	bh=ebBeNbh1qd1uuT6dE4t8UDhbv0yLldqXdRL1Qi9pORw=;
+	h=Subject:From:To:Cc:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=GaSZ9702NmYJSw/Tc80wKwTVEDtloEwiaDX/4lqCplLJTZxkXS/hxbHviXfkh+sOzGyY32R5vfkqX/o//fdBEccdNrPB9hIKuQyMT+yv8WHuieQb62ZVHH+s8GfPpWPQi3OvpZL5eOEvNR58/OishG+jhUzc1mL/400zcDsbwHM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bLcNatKH; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="B3UmHtlo"
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id 7BFD6C211CD;
-	Fri, 25 Sep 2026 09:04:15 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 99CCC6073B;
-	Fri, 25 Sep 2026 09:03:27 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 5B81710329511;
-	Fri, 25 Sep 2026 11:03:25 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1790327007; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=JibZyF/fRehCmboIlM1nNTSQL8f2hKg+pMPROPG2JqE=;
-	b=B3UmHtloWnC+aqmT68I/YIcaq9mGTY44TckiIBeAzpU0V/KrKwlUtbv/t06oxoSW+tAuKK
-	UsiKwh/QN3Vu0br6+Hrq6x0g6QHbmN6BayD9VENobEv9L/jac6QSelzWeK7BVU0FeRkh1r
-	tbO1kCdgFL2miiY23/08iB3nHfE4UTRPYErUBJxGLLkkgoxt9TcqlCwvyhod4s30mt5RRn
-	XCsFJB2dDDk3+8kz4Sppqt5mcbY9phFtFKmVRGX115f5Er+EVG8HKfYMYgoSbrh609NnFq
-	UvafxmgZLJDFdUYgEpjNofvycv4o6kljIcqJfTb9NECa/CIMRyhSDYCRrbg/Cg==
-From: Miquel Raynal <miquel.raynal@bootlin.com>
-To: Adi Prasan <itsadi2409@gmail.com>
-Cc: alex.aring@gmail.com,  stefan@datenfreihafen.org,
-  linux-wpan@vger.kernel.org,  linux-kernel@vger.kernel.org,
-  syzbot+adb0bf16414b8bb2d799@syzkaller.appspotmail.com
-Subject: Re: [PATCH] mac802154: synchronize pending transmissions before
- stopping the hardware
-In-Reply-To: <20260920170655.608419-1-itsadi2409@gmail.com> (Adi Prasan's
-	message of "Sun, 20 Sep 2026 17:06:55 +0000")
-References: <20260920170655.608419-1-itsadi2409@gmail.com>
-User-Agent: mu4e 1.12.12; emacs 30.2
-Date: Fri, 25 Sep 2026 11:03:24 +0200
-Message-ID: <87ik3tn1nn.fsf@bootlin.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bLcNatKH"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B2761F000FF;
+	Mon, 28 Sep 2026 06:42:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1790577748;
+	bh=PR+qD69Mmn3ee91G2H+UEY/KNwLNvbrpeNnSfIqIdhQ=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References;
+	b=bLcNatKHq18iM5FnX0pSZ/JCGbahS6AtzehgZICIY6pemzoi/yOdFGNGSze2rNJPR
+	 OuPk78U9ApvKrstJav2HUFDvplZZVPdiFgMVodcntLurCjBJmGXRgatQjQZhAGRYll
+	 bCJxXmWoknGWdOyij5uLi1shhqHEA/MUwbZu7tDDbNr1Mk1aulaO/HYqqrodvD4AhM
+	 19/W2c8hXPySX5F41LPCdUoDN+t4gTlXpN+N7zoTZ0IqkBfK2y+n70rxIeIIV8eq6f
+	 OnVYhCpqzyoDOepOhLw4RoipvyFBQ2DfhnZ0oCyBGPLIx0xfaMkdpABoLozTPfUWrD
+	 cTfYFy7y0rQOQ==
+Subject: Re: [PATCH net v3 2/3] ieee802154: ca8210: prevent stack buffer
+ overflow in hwme_get_request_sync()
+From: netdev-bot+sashiko@kernel.org
+To: benquike@gmail.com
+Cc: h.morris@cascoda.com, alex.aring@gmail.com, miquel.raynal@bootlin.com,
+ stefan@datenfreihafen.org, david.laight.linux@gmail.com,
+ linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org, kuba@kernel.org
+Date: Mon, 28 Sep 2026 06:42:27 +0000
+Message-ID: <179057774769.3145.8753084259856546356@kernel.org>
+In-Reply-To: <20260924062244.2444225-3-benquike@gmail.com>
+References: <20260924062244.2444225-3-benquike@gmail.com>
+X-sashiko-severity: Low
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Last-TLS-Session-Version: TLSv1.3
 
-Hi Adi,
+Thank you for your contribution! Sashiko AI review found more severe
+issue(s) in other patches of this series. This mail is only an FYI, in case
+you want to address the nit picks below when you respin.
 
-On 20/09/2026 at 17:06:55 GMT, Adi Prasan <itsadi2409@gmail.com> wrote:
+Low priority / nit picks for your consideration:
 
-> From: Adi <itsadi2409@gmail.com>
+- [Low] The commit message reads as if the stack overflow in
+  ca8210_get_ed()/hwme_get_request_sync() can happen at runtime.
+- [Low] The patch turns `hw_attribute_length` in hwme_get_request_sync()
+  into an in/out parameter, but the kernel-doc was not updated.
+
+Pre-existing issues:
+- [High] This problem wasn't introduced by this patch, but it is a real
+  memory-safety race in the same sync-exchange path.
+
+--
+
+ieee802154: ca8210: prevent stack buffer overflow in hwme_get_request_sync()
+
+This patch initializes lenvar to 1 in ca8210_get_ed(). It also makes
+hwme_get_request_sync() return IEEE802154_SYSTEM_ERROR when the device
+reports an hw_attribute_length larger than the caller's buffer. The goal
+is to stop a stack overflow of the 1-byte level buffer in ca8210_get_ed().
+
+> In ca8210_get_ed(), an uninitialized u8 lenvar and a pointer to a 1-byte
+> stack buffer (u8 *level) are passed to hwme_get_request_sync(), which
+> unconditionally copies response.pdata.hwme_get_cnf.hw_attribute_length
+> bytes into hw_attribute_value without checking the caller's destination
+> buffer capacity, overflowing level on the stack when hw_attribute_length
+> exceeds 1:
 >
-> syzbot reports a WARN_ON(current_phy->suspended) splat in
-> mac80211_hwsim's mac802154 counterpart, hwsim_hw_xmit():
+>   BUG: KASAN: stack-out-of-bounds in hwme_get_request_sync.constprop.0.isra.0+0xf3/0x170
+>   Write of size 16 at addr ffff888001907780 by task init/1
+
+[ ... ]
+
+> Tested in QEMU with KASAN enabled by passing an oversized
+> hw_attribute_length response into ca8210_get_ed().
 >
->   WARNING: CPU: 0 PID: 6038 at drivers/net/ieee802154/mac802154_hwsim.c:2=
-66
->   hwsim_hw_xmit+0xcbf/0x1540
->   Call Trace:
->    drv_xmit_async
->    ieee802154_tx
->    ieee802154_subif_start_xmit
->    __netdev_start_xmit
->    ...
->    packet_sendmsg
->
-> mac802154_slave_close() only calls netif_stop_queue() on the closing
-> netdev before tearing the hardware down via ieee802154_stop_device(),
-> which calls straight into drv_stop(). netif_stop_queue() merely marks
-> the queue as stopped; it does not wait for a transmission that a
-> different CPU already passed the "is the queue stopped" check for and
-> is currently executing inside ndo_start_xmit(). That thread can still
-> be inside drv_xmit_async() -> hwsim_hw_xmit() by the time drv_stop()
-> runs and marks the phy suspended, which trips the WARN_ON() (and, on
-> real hardware, could still start a transmission after ->stop() has
-> torn down the transceiver).
->
-> ieee802154_suspend() already knows about this and synchronizes with
-> any in-flight transmission via ieee802154_sync_and_hold_queue() plus
-> synchronize_net() before calling ieee802154_stop_device(), releasing
-> the queue again afterwards. mac802154_slave_close() is missing the
-> same synchronization when the last open interface on a phy is closed.
->
-> Do the same hold/sync/release dance in mac802154_slave_close() so
-> drv_stop() cannot race with a transmission that is already in flight.
->
-> Reported-by: syzbot+adb0bf16414b8bb2d799@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=3Dadb0bf16414b8bb2d799
-> Signed-off-by: Adi <itsadi2409@gmail.com>
+> Fixes: ded845a781a5 ("ieee802154: Add CA8210 IEEE 802.15.4 device driver")
+> Cc: stable@vger.kernel.org
 
-We need your real identify.
+[Severity: Low]
+Can this overflow actually be reached at runtime? The commit message reads
+as if it describes live stack corruption. It shows a splat from task init/1
+and carries a stable tag.
 
-> ---
->  net/mac802154/iface.c | 13 ++++++++++++-
->  1 file changed, 12 insertions(+), 1 deletion(-)
->
-> diff --git a/net/mac802154/iface.c b/net/mac802154/iface.c
-> index 31353795fa24..e29f225c0dd1 100644
-> --- a/net/mac802154/iface.c
-> +++ b/net/mac802154/iface.c
-> @@ -313,8 +313,19 @@ static int mac802154_slave_close(struct net_device *=
-dev)
->=20=20
->  	clear_bit(SDATA_STATE_RUNNING, &sdata->state);
->=20=20
-> -	if (!local->open_count)
-> +	if (!local->open_count) {
-> +		/* Ensure any asynchronous transmission already accepted by
-> +		 * the driver (i.e. past the netif_stop_queue() above) has
-> +		 * fully completed before calling into ->stop(). Otherwise
-> +		 * drv_xmit_async() can race with drv_stop(), which some
-> +		 * drivers (e.g. mac802154_hwsim) do not expect.
+hwme_get_request_sync() is static. Its only caller is ca8210_get_ed(), and
+ca8210_get_ed() is only referenced as the .ed callback in ca8210_phy_ops:
 
-hwsim is for testing purposes, not sure this is a real use case.
+	.ed = ca8210_get_ed,
 
-> This mirrors
-> +		 * the synchronization already done in ieee802154_suspend().
-> +		 */
+As far as I can tell, mac802154 never calls ops->ed. The only reference is
+the NULL check in ieee802154_alloc_hw():
 
-This message is 100% AI generated and can be dropped, unless there is a
-real info carried, but I don't see it.
+net/mac802154/main.c:ieee802154_alloc_hw() {
+	...
+	if (WARN_ON(!ops || !(ops->xmit_async || ops->xmit_sync) || !ops->ed ||
+	...
+}
 
-Yet, if we can get rid of these by just fixing max802154_hwsim, please
-do it.
+nl802154_trigger_scan() also accepts only NL802154_SCAN_ACTIVE and
+NL802154_SCAN_PASSIVE. So an energy-detection scan from userspace can't
+get there either.
 
-> +		ieee802154_sync_and_hold_queue(local);
-> +		synchronize_net();
->  		ieee802154_stop_device(local);
-> +		ieee802154_release_queue(local);
-> +	}
->=20=20
->  	return 0;
->  }
+Even if there were a caller, the device would have to answer
+HWME_GET(HWME_EDVALUE) with hw_attribute_length > 1.
 
-Thanks,
-Miqu=C3=A8l
+Could the commit message say that the .ed op is not currently invoked, and
+that a misbehaving CA8210 would be needed? That would help maintainers
+choose between net and net-next, and decide whether a stable backport is
+needed.
+
+> diff --git a/drivers/net/ieee802154/ca8210.c b/drivers/net/ieee802154/ca8210.c
+> index a990a0f347ad..8aa7ffeb22d7 100644
+> --- a/drivers/net/ieee802154/ca8210.c
+> +++ b/drivers/net/ieee802154/ca8210.c
+> @@ -1677,6 +1677,9 @@ static u8 hwme_get_request_sync(
+>  		return IEEE802154_SYSTEM_ERROR;
+>  
+>  	if (response.pdata.hwme_get_cnf.status == IEEE802154_SUCCESS) {
+> +		if (response.pdata.hwme_get_cnf.hw_attribute_length >
+> +		    *hw_attribute_length)
+> +			return IEEE802154_SYSTEM_ERROR;
+
+[Severity: Low]
+Should the kernel-doc for hwme_get_request_sync() be updated too?
+
+*hw_attribute_length is now read as the size of hw_attribute_value, and
+then overwritten with the copied length. That makes it an in/out
+parameter. The comment still says:
+
+ * @hw_attribute_length: Attribute length
+ ...
+ * Return: 802.15.4 status code of HWME-GET.confirm
+
+Before this patch the argument was only written, which is why
+ca8210_get_ed() could pass an uninitialized lenvar. A future caller that
+follows the kernel-doc and does the same would compare against a random
+value, and the overflow would come back.
+
+The only caller meets the new requirement with a bare "u8 lenvar = 1;".
+Nothing ties that 1 to sizeof(*level).
+
+The Return: text is now also wrong in one more case. This
+IEEE802154_SYSTEM_ERROR comes from the driver, not from the device's
+confirm, and link_to_linux_err() maps it to -EPROTO. Two older
+SYSTEM_ERROR returns had already made that text inaccurate.
+
+>  		*hw_attribute_length =
+>  			response.pdata.hwme_get_cnf.hw_attribute_length;
+>  		memcpy(
+
+[Severity: High]
+This isn't a bug introduced by this patch, but there seems to be a race in
+the sync exchange path that this length check can't protect against.
+
+priv->sync_command_response is per-device state shared by all sync
+callers, and no lock covers it. ca8210_spi_exchange() publishes the
+caller's stack buffer, waits interruptibly with a timeout, and then clears
+the pointer:
+
+drivers/net/ieee802154/ca8210.c:ca8210_spi_exchange() {
+	...
+	if ((buf[0] & SPI_SYN) && response) { /* if sync wait for confirm */
+		reinit_completion(&priv->sync_exchange_complete);
+		priv->sync_command_response = response;
+	}
+	...
+cleanup:
+	priv->sync_command_response = NULL;
+	return status;
+}
+
+ca8210_rx_done() runs from the SPI completion callback
+ca8210_spi_transfer_complete(). It tests the pointer and then copies into
+it, with no lock:
+
+drivers/net/ieee802154/ca8210.c:ca8210_rx_done() {
+	...
+	if (buf[0] & SPI_SYN) {
+		if (priv->sync_command_response) {
+			memcpy(priv->sync_command_response, buf, len);
+			complete(&priv->sync_exchange_complete);
+	...
+}
+
+Suppose the waiter gets -ERESTARTSYS or -ETIME after ca8210_rx_done() has
+loaded the non-NULL pointer but before the memcpy. Can that memcpy then
+write into the stack frame of a caller that has already returned from
+hwme_get_request_sync()?
+
+Sync exchanges also don't appear to be serialized.
+ca8210_mlme_reset_worker() calls mlme_reset_request_sync() from a
+workqueue without rtnl, and ca8210_rx_done() queues it on
+TRANSACTION_OVERFLOW. It can run at the same time as rtnl-held
+ieee802154_ops callbacks such as set_channel or set_txpower, which also
+use the *_request_sync() helpers.
+
+Could two callers overwrite each other's response pointer, or consume each
+other's completion? One caller would get the other command's confirm. The
+other would either time out or return with its response buffer untouched,
+because hwme_get_request_sync() doesn't preset command_id.
+
+Would it make sense to serialize sync exchanges with a mutex? The handoff
+of the response buffer would also need to be synchronized against
+ca8210_rx_done(). Ideally, the confirm ID would also be checked against
+the request that was issued.
+
+[ ... ]
+
+-- 
+Sashiko AI review · https://netdev-ai.bots.linux.dev/sashiko/#/patchset/20260924062244.2444225-1-benquike%40gmail.com
