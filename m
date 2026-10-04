@@ -1,37 +1,38 @@
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FB662405EB;
-	Sun,  4 Oct 2026 21:00:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29D5022FDE6;
+	Sun,  4 Oct 2026 21:03:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791147608; cv=none; b=ZdKSS2vT2KberCrTYYg5md5MKvVaNejNqTpEBarSHip5UPiZGOoC0e+OGi4ZlfSsOLFuFvjsUcrgfMPkD4hAA00PWJwuzvl6xo2HN0sp5xG69Uzc+G9EaT0GisWbEGrP9WBk7acIbGTqSKd3YHh796Zu3NlhTVX/vPPpZ1ySti4=
+	t=1791147820; cv=none; b=SQTCzfDmad0z5gXJjw3/buATVMDGC+sGsHqqoOwFOEFrx4X1NANveg00O79pWmlKrrqFROMOyTPZVszjSxKpDyRm9+CNbqts3S9WFSvmz8N4t26IStB1PWesEd2ikan86Ikf4UttMOh8dsX/GopJwRo3tpZSRJymnQxY4dBY09Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791147608; c=relaxed/simple;
-	bh=doQHPYfst42NgJxu+DUu8YkW7hWEb/b3Ymva6Rl8Lxc=;
+	s=arc-20240116; t=1791147820; c=relaxed/simple;
+	bh=MJhCB7uRhMADT4eh41CKINoVvSDQQtbHuD4lX8vPSK4=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=IPmzn3RKxF58qNnHi0lskcczDEL6q6w6J0bQtoMfvSskea38QOu8arHb7TVhmevAPaaSZ37iLTdyl1xOrKn3uL93QRpfCcOJd41nMQuIOweReAXmKWaOn5+Qa4YjZYmhbE0voGX8zmfQAOMKAQxOoGXGn+zsgEtz3Kbvx6OQjtM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=S56LnjnK; arc=none smtp.client-ip=185.246.84.56
+	 MIME-Version:Content-Type; b=UlWrjekugMgZxIaDIHJm24DHzBi1TfR6w5i6w7xCzHocw7f3hASc74nrDcSBcSCu0oiXvVjSbBgYc03wmdONY6cqBz8Jv1sNY9HbT3kR0chbL70o1Tkm4QfN0hFKVk3rZ0y3gk84P+jq5QDIvdLTHpNELxcHvCYazttdviVtmWk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=hsQ3cvRB; arc=none smtp.client-ip=185.246.85.4
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="S56LnjnK"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="hsQ3cvRB"
 Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id A15B21A113A;
-	Sun,  4 Oct 2026 21:00:05 +0000 (UTC)
+	by smtpout-03.galae.net (Postfix) with ESMTPS id 76FE54E41168;
+	Sun,  4 Oct 2026 21:03:36 +0000 (UTC)
 Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 7472C604FE;
-	Sun,  4 Oct 2026 21:00:05 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 755091032820F;
-	Sun,  4 Oct 2026 23:00:03 +0200 (CEST)
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 304E8604FE;
+	Sun,  4 Oct 2026 21:03:36 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 2088210328384;
+	Sun,  4 Oct 2026 23:03:32 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1791147604; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 in-reply-to:references; bh=doQHPYfst42NgJxu+DUu8YkW7hWEb/b3Ymva6Rl8Lxc=;
-	b=S56LnjnKllcxhoYBtLUKnPk72SveNWUnqXyIy+qeTwmjY7yKspcAhYurAAhl4soK0kHWCN
-	ClL+K0WPCvHYgHQBSi+e7RWY+I5ccoam/Lw+2dDxHP7/Ky84JSl2AXKewkBiqQtghsBMEb
-	hNe4yaQ/QWcdiRGNgsEwkit0pp92/AWm/gLEl7ZJgdmMmlYKLzArvjAweyuTCNKRG2hHxU
-	5VcIiEGM9JypiF8/xDsyBq5VwhSaniTdGvsxmTDAF0N7Kam40mumKv/W7t1Pzzgchm00Du
-	oX+fOUphqV2Mih8ZDDnwsMhdLtPCNTzEfVdhqY7ZQqJI5NSqR73pi5o/Hd7xmA==
+	t=1791147815; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=7pjV1gWlf9aETc+XjjWgbEA19fRIN9x9kDhtbidus5o=;
+	b=hsQ3cvRBkVAPGTOiAm1ZbKxiFVFBP8YlDHA/cUOBFt04VsqYpUOx4izUP0Gc6CO//Qxrec
+	egFUav/rvvqAroNgzZOoJxeNUCblqwNiKo0Y+PNZ9KLwt8HR/qcVT5rxw3nRcVkuKNDvre
+	U3zsO8mqjPjqolluPwdt2VkHmNx3A8qItzxuk/pmhh3I8V5M1O6QM95VK/HNQO18XYHAJT
+	TlI2GIn0eZ1CKZr/raSdXro9EF4VtGMgFbuMQ4oWJXLEyGd0bszew1KY60kkx6UsvgntCl
+	TXnpbpkesL4CzLZg1+AQ5i8fhqBu8MF01kez7rMRwPLobAeIKJ1XB14QUEAy/w==
 From: Miquel Raynal <miquel.raynal@bootlin.com>
 To: Hui Peng <benquike@gmail.com>
 Cc: Harry Morris <h.morris@cascoda.com>,  Alexander Aring
@@ -39,37 +40,69 @@ Cc: Harry Morris <h.morris@cascoda.com>,  Alexander Aring
   David Laight <david.laight.linux@gmail.com>,  linux-wpan@vger.kernel.org,
   netdev@vger.kernel.org,  linux-kernel@vger.kernel.org,
   stable@vger.kernel.org
-Subject: Re: [PATCH net v3 1/3] ieee802154: ca8210: prevent stack buffer
- overflow in ca8210_rx_done()
-In-Reply-To: <20260930071914.421586-2-benquike@gmail.com> (Hui Peng's message
-	of "Wed, 30 Sep 2026 07:19:12 +0000")
+Subject: Re: [PATCH net v3 2/3] ieee802154: ca8210: prevent stack buffer
+ overflow in hwme_get_request_sync()
+In-Reply-To: <20260930071914.421586-3-benquike@gmail.com> (Hui Peng's message
+	of "Wed, 30 Sep 2026 07:19:13 +0000")
 References: <20260930071914.421586-1-benquike@gmail.com>
-	<20260930071914.421586-2-benquike@gmail.com>
+	<20260930071914.421586-3-benquike@gmail.com>
 User-Agent: mu4e 1.12.12; emacs 30.2
-Date: Sun, 04 Oct 2026 23:00:01 +0200
-Message-ID: <87jynxji5q.fsf@bootlin.com>
+Date: Sun, 04 Oct 2026 23:03:31 +0200
+Message-ID: <87ece5jhzw.fsf@bootlin.com>
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-Last-TLS-Session-Version: TLSv1.3
 
 
-> Check len > sizeof(struct mac_message) instead of
-> len > CA8210_SPI_BUF_SIZE in ca8210_rx_done() so that any packet exceeding
-> sizeof(struct mac_message) is logged as erroneously long via dev_crit()
-> and dropped before copying into priv->sync_command_response or passing it
-> to ca8210_net_rx().
->
-> Tested in QEMU with KASAN enabled by passing a 256-byte SPI_SYN response
-> into ca8210_rx_done().
+> Initialize lenvar =3D 1 in ca8210_get_ed() and return
+> IEEE802154_SYSTEM_ERROR in hwme_get_request_sync() if
+> response.pdata.hwme_get_cnf.hw_attribute_length exceeds
+> *hw_attribute_length.
+
+The relationship is not obvious to me.
+
+> Tested in QEMU with KASAN enabled by passing an oversized
+> hw_attribute_length response into ca8210_get_ed().
 >
 > Fixes: ded845a781a5 ("ieee802154: Add CA8210 IEEE 802.15.4 device driver")
 > Cc: stable@vger.kernel.org
 > Assisted-by: LLM
 > Signed-off-by: Hui Peng <benquike@gmail.com>
+> ---
+> Changes in v3:
+> - No changes.
+>
+> Changes in v2:
+> - Split out as patch 2/3.
+> - Replaced the temporary stack buffer in ca8210_get_ed() with lenvar =3D 1
+>   and an upper-bound check against *hw_attribute_length in
+>   hwme_get_request_sync() as requested by Miquel Raynal.
+>
+>  drivers/net/ieee802154/ca8210.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+>
+> diff --git a/drivers/net/ieee802154/ca8210.c b/drivers/net/ieee802154/ca8=
+210.c
+> index a990a0f..8aa7ffe 100644
+> --- a/drivers/net/ieee802154/ca8210.c
+> +++ b/drivers/net/ieee802154/ca8210.c
+> @@ -1677,6 +1677,9 @@ static u8 hwme_get_request_sync(
+>  		return IEEE802154_SYSTEM_ERROR;
+>=20=20
+>  	if (response.pdata.hwme_get_cnf.status =3D=3D IEEE802154_SUCCESS) {
+> +		if (response.pdata.hwme_get_cnf.hw_attribute_length >
+> +		    *hw_attribute_length)
+> +			return IEEE802154_SYSTEM_ERROR;
 
-Reviewed-by: Miquel Raynal <miquel.raynal@bootlin.com>
+Why is hw_attribute_length use here before being set (or re-set) just
+below?
+
+The organization of this patch is weird.
+
+Miqu=C3=A8l
