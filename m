@@ -1,128 +1,242 @@
-Received: from mail-dy2-f43.google.com (mail-dy2-f43.google.com [74.125.229.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5E4310F2
-	for <linux-wpan@vger.kernel.org>; Fri,  2 Oct 2026 14:48:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.229.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5224739CD11;
+	Sun,  4 Oct 2026 07:39:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790952519; cv=none; b=qxka5aWn80XiCPsUE1GVe1MUE3ZrS9D4UfnT1UMTIVA5QHvEuS8w1120pRRTofj/V3jWGhrfjIwq119Lw7KrZNGo29ce9RpjlWhghE0HFW+5joXjCmEjHlHaU3C0j9ZbTBX7kJfvGnUOaP88ROrE7FUPZhpFYIf2AgdjHJaD2l8=
+	t=1791099572; cv=none; b=WJX6KLrr7PkELrK5OATeQlOaIyAJyOTQOv01n8Jt+BcbAkKjGeoG+L1+PYw3nbLK7hN3a+wq1r50wjEI8GBPOMurT2h5DVQNerCrmJ+8RDZxgFYbot8ZhkROJJGITo9a1zYpo8ZGDsgN8jvbXZ66S9kLiml9aRn7Er1CnJ6IDBs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790952519; c=relaxed/simple;
-	bh=3HRpLaud5Q175KJrOtLopzDWyHQITkJEPRA0KEMmP1U=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mF4ldrJDLvjGMb0QzWqoO7gHgdw+YEUh/gE8U9CF+JudckL98go4/YjrBhEDNF0/R50r8/92uEuiHkXTzlyjSV+472dPi1rOLIYg1fVyYVWbCFoBfcdGLoaGgxHxcWapwi1X3jxZa++1zvoCFHgyc76lKDXXJM21VZLNFJ50jo8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PHe3ttcx; arc=none smtp.client-ip=74.125.229.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1791099572; c=relaxed/simple;
+	bh=gVYOp4RmhhHVlPqgKzJFM049Uck5BlbClVJ6IK8BiNs=;
+	h=Subject:From:To:Cc:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=Cv6sBGYxX/0TDUQu4btDQ8mzCMFjQANTdvzAoro/DCqm9TYrQosSiWV2F+JVI/3aKrz3Tq3DfN9xqJ/q2EO6UF3rBVrTzBZb27M0I4x8l8Ez0Lb78fmKBsW53KlzGGfh5YJHP42qubwH0OQhhTzp+rywGjxQUXjHKtRshIEcIbg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y67FxG4H; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PHe3ttcx"
-Received: by mail-dy2-f43.google.com with SMTP id 5a478bee46e88-33bfb26865fso7558503eec.2
-        for <linux-wpan@vger.kernel.org>; Fri, 02 Oct 2026 07:48:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790952516; x=1791557316; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=+qR2bmFpfj/mXdNscyHuDilv95LRNDcT/+z66Xstgtw=;
-        b=PHe3ttcx2R3gN2wdaNQFUBeLOPHTyusHy6/dMr9dLy4qH+K3tKkQzx9G/ndBBmgtui
-         g9LTjjGt728G+YyyaK7WqSDKrMZxkNjq7isNVX0tVazJm10hYyICayRkyy7YqGuUrLer
-         OJxkwlb7zZWu/bbIK/wTZAqlWEN1PuZPDAyLFXK1/ELWd90jf7mM1zG7cXVP0OsEbj6Q
-         mmwfP4MhLkNPpr55FWZ2BlqH4r80WSByDKM6xFiT0/Ax36VZTpZ89bD20bw9c4//oMwf
-         K4jk0iK7ZhbK75Ar6tHoGA+bUALZnWCDPX+JYGAXbS5HhGZQt5TpypC1sqANxtiGBDlS
-         8l4w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790952516; x=1791557316;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=+qR2bmFpfj/mXdNscyHuDilv95LRNDcT/+z66Xstgtw=;
-        b=Ynt4ZhA5hE9f40unetvupvh/NTCLWwlSL9KvxmmgHtIfx/Ry2hL94WihJt+vwpJ68a
-         ObWvE+Tgbl90HQH64mtUp00kX1PHL7nvWgTq7moI7OdZHxwos8G83MboFsLFzjoidZkr
-         QzSuTGfHNqcVY9PEaPI/lDo6jqG9oxRPb99pcXVH+QD9XhQVrA3ah1xgRK9vYXLxn3pD
-         2Pa/9Lciyu6hDy5XXDmdxhTsLeWSWoAVOJG0H9miiCExKv4Rytc10W9doP2lgndt446L
-         Qm8FLTbWmXXa+djGKE2sz+3+m52X42k2BU0uRNG/SCnTMyd0lcQR3kZCg3EbQJfS+gi7
-         URwQ==
-X-Forwarded-Encrypted: i=1; AKwUvBzYAvUj9Gdinx8xAlhXOXgP+buyEksMihK1V9khpibSMtiJd2WuuBVI6mIBCu8oLhYyG33Y5gDC/dno@vger.kernel.org
-X-Gm-Message-State: AFq9FYKp4+Ya2na6Ai5V9zqTOE1o0HePNkTFPoQ91r6dxMwIRhtQ4q41
-	tVkdCbUMm72louaYnM7Pkywk2Rou2SDL0YFEqLzwUwIU901gSaDHss8c
-X-Gm-Gg: AYBFou1HMV/2rXF3PW7gRi35dVCvbB2zlQdIu+AymCRFICx2NQTvZfgDueXTI/w4ogX
-	NHc7ROmLm+/byHyeIT21XglDXxCvuGtjVKQwxuQ4/WLoCKfTbuGnZPVT++1wDYxBJKMbYuabVgG
-	IPQle+PDWGnD+qzqDPyyYoUypMKfnrX0Eh1KiBtxWzSZmdeV/X4ugLkMUcDnTPsLinfaDIGms5H
-	an1cV6jUVRqYZIjMOU3h7cpygj7tjbIbw1V2QuT7/elQgPomKEzi3lzCAn0eqVle+W8sZyoOvsH
-	uZP3XI+d+IS09TTNV807kSOAUa4wk+ePDldHHVU28UvWZPFLr9wwEYYIrWEJcUsYHPKVHM3EOVm
-	q/gpjDETktnbPWXkm6cyMkpxgIKsk/SgZeW7a5PUGql1oSkBBAn3E+kluqzNajHfhkhamveX30I
-	lk3oBADq7HyveH2uzJZoR5Q2L8Bq6mzuBua+eOYHtj1E/F1FHzpSxHnn6vw/e9
-X-Received: by 2002:a05:693c:41d6:20b0:34e:f5f1:2f46 with SMTP id 5a478bee46e88-34f150ab8a3mr3318591eec.6.1790952515558;
-        Fri, 02 Oct 2026 07:48:35 -0700 (PDT)
-Received: from adi.. ([122.171.22.57])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-34f14f9f2afsm16747476eec.18.2026.10.02.07.48.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 Oct 2026 07:48:35 -0700 (PDT)
-From: Adi Prasan <itsadi2409@gmail.com>
-To: Miquel Raynal <miquel.raynal@bootlin.com>
-Cc: alex.aring@gmail.com,
-	stefan@datenfreihafen.org,
-	linux-wpan@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Adi Prasan <itsadi2409@gmail.com>
-Subject: [PATCH v2] net: mac802154: fix race between slave_close() and in-flight async tx
-Date: Fri,  2 Oct 2026 14:48:27 +0000
-Message-ID: <20261002144827.3479-1-itsadi2409@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <87ik3tn1nn.fsf@bootlin.com>
-References: <87ik3tn1nn.fsf@bootlin.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y67FxG4H"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DEE641F00893;
+	Sun,  4 Oct 2026 07:39:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1791099569;
+	bh=P33t5zMpSQrUHCy6tHTxrwX4i5lkx0ERpcv0NVFH1s4=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References;
+	b=Y67FxG4HgJaW/r5jC6YRfJfuE2/Na83jy79zV9iAxTBhZLCwUN0z9uM2qpzWFSp/f
+	 ZJv2HlEWOxNn0e1JkHAPUst2OOgH+wzBZY2IlHbIFRQmewAIMjZ5FS7mREqbunxIun
+	 vuSqC+fpyogmzi1VgmiodnuPoITXC6ii0wZPZ7Px15tHPOA3AkCt4ypobVQ1bqySq1
+	 lilvHMqRTP8fvpQUl45lRySd2PrKFmfj6DBPVmHp5seeqFFKgIBRXrxqt0BUrc6Dp6
+	 KWpwPLWKGN/N+AePLdR5e09c4ZXrOYdtx7rw7bte199G3K/LyeGkZG1v2Fnnumi94Y
+	 q2MDkCD0xrOQQ==
+Subject: Re: [PATCH net v3 2/3] ieee802154: ca8210: prevent stack buffer
+ overflow in hwme_get_request_sync()
+From: netdev-bot+sashiko@kernel.org
+To: benquike@gmail.com
+Cc: h.morris@cascoda.com, alex.aring@gmail.com, miquel.raynal@bootlin.com,
+ stefan@datenfreihafen.org, david.laight.linux@gmail.com,
+ linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org, kuba@kernel.org
+Date: Sun, 04 Oct 2026 07:39:28 +0000
+Message-ID: <179109956850.434549.7143809589105470854@kernel.org>
+In-Reply-To: <20260930071914.421586-3-benquike@gmail.com>
+References: <20260930071914.421586-3-benquike@gmail.com>
+X-sashiko-severity: Low
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-netif_stop_queue() prevents new packets from being sent to the driver,
-but it does not wait for a transmission that is already in progress.
+Thank you for your contribution! Sashiko AI review found more severe
+issue(s) in other patches of this series. This mail is only an FYI, in case
+you want to address the nit picks below when you respin.
 
-drv_xmit_async() can still be running on another CPU when
-mac802154_slave_close() calls drv_stop(). Stopping the queue only
-prevents new transmissions; it does not synchronize with an already
-running tx operation.
+Low priority / nit picks for your consideration:
 
-This was checked against mac802154_hwsim as well. hwsim_hw_xmit() is
-synchronous, while hwsim_hw_stop() only sets a flag, so there is no
-pending work or locking in the driver that needs to be synchronized.
+- [Low] The commit message overstates how reachable the bug is, and the
+  stable backport is not justified.
+- [Low] The patch changes the contract of hwme_get_request_sync(), but
+  its kernel-doc was not updated.
 
-The race is in the core between stopping the queue and an in-flight
-tx operation. The fix therefore belongs in the common mac802154 code,
-using the same handling already used by ieee802154_suspend(): hold and
-synchronize the queue around ieee802154_stop_device().
+Pre-existing issues:
+- [High] This problem wasn't introduced by this patch, but the sync
+  response pointer can be written to after its stack buffer is gone…
+- [Medium] This problem wasn't introduced by this patch, but
+  hwme_get_request_sync() uses a stack 'struct mac_message response'…
 
-Signed-off-by: Adi Prasan <itsadi2409@gmail.com>
----
-v2: Dropped the explanatory code comment per review feedback; expanded
-    the commit message to explain why the fix stays in
-    net/mac802154/iface.c rather than mac802154_hwsim. Fixed the
-    Author/Signed-off-by name.
- net/mac802154/iface.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+--
 
-diff --git a/net/mac802154/iface.c b/net/mac802154/iface.c
-index 31353795fa24..929ccd464772 100644
---- a/net/mac802154/iface.c
-+++ b/net/mac802154/iface.c
-@@ -313,8 +313,12 @@ static int mac802154_slave_close(struct net_device *dev)
- 
- 	clear_bit(SDATA_STATE_RUNNING, &sdata->state);
- 
--	if (!local->open_count)
-+	if (!local->open_count) {
-+		ieee802154_sync_and_hold_queue(local);
-+		synchronize_net();
- 		ieee802154_stop_device(local);
-+		ieee802154_release_queue(local);
-+	}
- 
- 	return 0;
- }
+ieee802154: ca8210: prevent stack buffer overflow in hwme_get_request_sync()
+
+This commit adds an upper-bound check to hwme_get_request_sync(). If a
+HWME-GET confirm reports an hw_attribute_length larger than the
+caller-supplied *hw_attribute_length, the function now returns
+IEEE802154_SYSTEM_ERROR instead of copying past the end of the destination
+buffer. It also sets lenvar to 1 in ca8210_get_ed(), so the size of the
+1-byte level buffer is passed in.
+
+> In ca8210_get_ed(), an uninitialized u8 lenvar and a pointer to a 1-byte
+> stack buffer (u8 *level) are passed to hwme_get_request_sync(), which
+> unconditionally copies response.pdata.hwme_get_cnf.hw_attribute_length
+> bytes into hw_attribute_value without checking the caller's destination
+> buffer capacity, overflowing level on the stack when hw_attribute_length
+> exceeds 1:
+
+[ ... ]
+
+> Tested in QEMU with KASAN enabled by passing an oversized
+> hw_attribute_length response into ca8210_get_ed().
+>
+> Fixes: ded845a781a5 ("ieee802154: Add CA8210 IEEE 802.15.4 device driver")
+> Cc: stable@vger.kernel.org
+
+[Severity: Low]
+Can any in-tree code path reach this overflow?
+
+ca8210_get_ed() is the only caller of hwme_get_request_sync(). The only
+reference to ca8210_get_ed() is the ops table entry:
+
+    .ed = ca8210_get_ed,
+
+In net/mac802154, the only use of ops->ed seems to be the NULL check in
+ieee802154_alloc_hw():
+
+    if (WARN_ON(!ops || !(ops->xmit_async || ops->xmit_sync) || !ops->ed ||
+
+Energy detection scans are also rejected in two places.
+nl802154_trigger_scan() accepts only NL802154_SCAN_ACTIVE and
+NL802154_SCAN_PASSIVE, and mac802154_trigger_scan_locked() has:
+
+    if (request->type != NL802154_SCAN_PASSIVE &&
+        request->type != NL802154_SCAN_ACTIVE)
+        return -EOPNOTSUPP;
+
+The splat shows init/1 calling ca8210_get_ed() directly. Together with the
+testing note quoted above, this looks like it came from a test harness
+rather than a path that exists in the tree.
+
+The code change itself looks correct. Could the commit message call this
+hardening of a callback that has no in-tree caller today? And could the
+Cc: stable tag either be dropped or be given a justification?
+
+> diff --git a/drivers/net/ieee802154/ca8210.c b/drivers/net/ieee802154/ca8210.c
+> index a990a0f347ad8..8aa7ffeb22d78 100644
+> --- a/drivers/net/ieee802154/ca8210.c
+> +++ b/drivers/net/ieee802154/ca8210.c
+> @@ -1677,6 +1677,9 @@ static u8 hwme_get_request_sync(
+>  		return IEEE802154_SYSTEM_ERROR;
+>  
+>  	if (response.pdata.hwme_get_cnf.status == IEEE802154_SUCCESS) {
+> +		if (response.pdata.hwme_get_cnf.hw_attribute_length >
+> +		    *hw_attribute_length)
+> +			return IEEE802154_SYSTEM_ERROR;
+
+[Severity: Low]
+With this check, *hw_attribute_length is now read as the capacity of the
+hw_attribute_value buffer, which makes it an in/out parameter. Should the
+kernel-doc for hwme_get_request_sync() be updated as well? It still says:
+
+ * @hw_attribute_length: Attribute length
+ * @hw_attribute_value:  Pointer to Attribute Value
+
+It doesn't say that callers must set the buffer size before the call. It
+also doesn't mention that a successful confirm with a length that is too
+large now returns IEEE802154_SYSTEM_ERROR.
+
+A future caller that follows the kernel-doc could make the same
+uninitialized lenvar mistake this patch fixes.
+
+>  		*hw_attribute_length =
+>  			response.pdata.hwme_get_cnf.hw_attribute_length;
+>  		memcpy(
+
+[Severity: Medium]
+This is a pre-existing issue, but can a short HWME_GET_CONFIRM make this
+function return success with stale data?
+
+response is an uninitialized struct mac_message on the stack in
+hwme_get_request_sync(). ca8210_rx_done() copies into it only the length
+the device advertises:
+
+    len = buf[1] + 2;
+    ...
+    memcpy(priv->sync_command_response, buf, len);
+
+If the confirm is truncated, hw_attribute_length and hw_attribute_value[0]
+still hold whatever was left on the stack.
+
+A length of 0 passes the new check. Nothing is copied, and SUCCESS is
+returned. ca8210_get_ed() then returns 0 without ever writing *level,
+because it doesn't check lenvar after the call.
+
+A length of 1 in a truncated frame would copy one uninitialized stack byte
+into *level and still report success.
+
+Would it make sense to:
+
+- check that response.length covers the confirm fields and the claimed
+  value,
+- require lenvar == 1 in ca8210_get_ed(), and
+- zero-initialize response?
+
+As noted above, mac802154 doesn't currently call ops->ed.
+
+> @@ -2027,7 +2030,7 @@ static int ca8210_xmit_async(struct ieee802154_hw *hw, struct sk_buff *skb)
+>   */
+>  static int ca8210_get_ed(struct ieee802154_hw *hw, u8 *level)
+>  {
+> -	u8 lenvar;
+> +	u8 lenvar = 1;
+>  	struct ca8210_priv *priv = hw->priv;
+>  
+>  	return link_to_linux_err(
+
+[Severity: High]
+This is a pre-existing issue, but can ca8210_rx_done() write into the
+response buffer in hwme_get_request_sync() after that function has
+returned?
+
+ca8210_spi_exchange() publishes the caller's stack buffer:
+
+    priv->sync_command_response = response;
+
+ca8210_rx_done(), which runs from the SPI completion path, then does:
+
+    if (priv->sync_command_response) {
+        memcpy(priv->sync_command_response, buf, len);
+        complete(&priv->sync_exchange_complete);
+
+It holds no lock and doesn't use READ_ONCE().
+
+The wait on sync_exchange_complete can be interrupted by a signal
+(-ERESTARTSYS) or can time out after CA8210_SYNC_TIMEOUT. In either case,
+ca8210_spi_exchange() does:
+
+cleanup:
+    priv->sync_command_response = NULL;
+    return status;
+
+Nothing waits for an rx_done() that is already running:
+
+CPU1                                  CPU2
+ca8210_spi_exchange()                 ca8210_rx_done()
+                                        if (priv->sync_command_response)
+  wait interrupted or timed out
+  priv->sync_command_response = NULL
+  return
+hwme_get_request_sync() returns
+                                        memcpy(priv->sync_command_response,
+                                               buf, len);
+
+In that case the memcpy() writes up to sizeof(struct mac_message) bytes
+into a stack frame that has already been unwound. If the compiler reloads
+the pointer after it has been cleared, the result is a write through a NULL
+pointer instead.
+
+The same pattern applies to every *_request_sync() helper, for example
+ca8210_set_channel()->mlme_set_request_sync(). Nothing in the driver locks
+sync_command_response, and priv->lock is only used in the TX path.
+
 -- 
-2.43.0
-
+Sashiko AI review · https://netdev-ai.bots.linux.dev/sashiko/#/patchset/20260930071914.421586-1-benquike%40gmail.com
