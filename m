@@ -1,106 +1,80 @@
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92BFC49A3DD
-	for <linux-wpan@vger.kernel.org>; Tue, 13 Oct 2026 17:54:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C9FC414420;
+	Wed, 14 Oct 2026 18:52:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791914067; cv=none; b=IUJwhClcC81pUXseVmFc+/cfMmvYQbXTYJtZGtzo+vooj9UAAkGRdtZCiggU5eESq2OoB4g11oQkTxQeYvmGpGOFU/RPGDZhkpHLqqI+XEZl09p9t1hDq3wjUT5/lETNyXUvivSuiPC9EXSBoJZZVfA7uUhzjX58TWYVg+mqugc=
+	t=1792003930; cv=none; b=XmgTD+aWSyheVtL1Ysu802TfLN+3nsAExPasa/IHYACkTEdCx518maXsDntzIiffdlZMZlNBVtxUenicKBRd6c9mPAitfqDZUhypTpPfCNOOJ5YTcuAIu2zcZoF2MFYivkfTdfOJr9tG30pBobx7GA8OYUd5PwjeuvrUgvbGtls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791914067; c=relaxed/simple;
-	bh=YHRxEnhISzYbhxdYgROze8JOSodjmfiGqLyBf+tRR8k=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=PUmw3uMhB5OGomFu32I077QW9754xOja+Oyuzk2isRfRzapolsiLypusXdsyp22gvYb6EFrMSiiOKH1BToE34QBkFLoL+eu4/YrimVMrQOJcmqV1QVX4cwtxZvc9duBoQ60hU855+ZgcEadXvuUZ/POUQSsu2+iFhaAm2bzM76A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=YueKTQcO; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+	s=arc-20240116; t=1792003930; c=relaxed/simple;
+	bh=kZGH7MMg2Wja19RtiSj+1Amamfv1gUdu4bTkRRmWSj0=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=YQdc7543bqk41bE+Q4uYJj48mUoJHCc/uM9yeMHgAyZ7Fq6MMMBRbOWYA+xjRYWhTK9n1LdundOKJQvs+csCp8/7i076fd3XqbB/75x96pl2nmWhMnTeCXvUM9xQyl7ISUHqK0V3wi2YS17Nu50fjOJ/G4W6Ze15HUCVWpCf0rc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CMQs2zYV; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="YueKTQcO"
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 29F0B1A1215
-	for <linux-wpan@vger.kernel.org>; Tue, 13 Oct 2026 17:54:24 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id F292660362
-	for <linux-wpan@vger.kernel.org>; Tue, 13 Oct 2026 17:54:23 +0000 (UTC)
-Received: by mail.galae.net (Postcow, from userid 0)
-	id 435BF11D703F4; Tue, 13 Oct 2026 19:49:47 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1791914063; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 in-reply-to:references; bh=YHRxEnhISzYbhxdYgROze8JOSodjmfiGqLyBf+tRR8k=;
-	b=YueKTQcOneJj6vdXXZ4cKBeIrQsqzkL8mHfv7LU6zyV7JOXXIhpSiLXyXMxRbkzLx6mYxl
-	Fn0pn6Ray46rY4kHWSBdNmLsdcFUU2bHbhyI28nOHpr/3P4umF+B+M6pcvtkTTxz9KCit3
-	b8IAybJUynGRNpTRH+9Lmp46rNcu60qnRL98graHxzfiT1mxBQTgfCzkk41Evc5vy5CGhT
-	m9P2lMQup51vKUO/4sEpBwTa4pf5yTa4KNPtUuIt79gyuBR6rhvk1BGafa0GW5PWVNFg9F
-	ISVR37u4OMF7C+wtFOtkKbMSmoHWiEGVjbqRXRzwbo6hl8feaXROEA3hSXmsng==
-Authentication-Results: mail.galae.net;
-	none
-From: Miquel Raynal <miquel.raynal@bootlin.com>
-To: Aryan Arora <aryanarora.w1@gmail.com>
-Cc: Alexander Aring <alex.aring@gmail.com>,  Stefan Schmidt
- <stefan@datenfreihafen.org>,  "David S . Miller" <davem@davemloft.net>,
-  Eric Dumazet <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,
-  Paolo Abeni <pabeni@redhat.com>,  Simon Horman <horms@kernel.org>,  David
- Girault <david.girault@qorvo.com>,  linux-wpan@vger.kernel.org,
-  netdev@vger.kernel.org,  linux-kernel@vger.kernel.org,
-  syzbot+19cbce4cc656ecd4febc@syzkaller.appspotmail.com
-Subject: Re: [PATCH] mac802154: Cancel scan work synchronously during
- hardware teardown
-In-Reply-To: <20261012120934.64632-1-aryanarora.w1@gmail.com> (Aryan Arora's
-	message of "Mon, 12 Oct 2026 17:39:34 +0530")
-References: <20261012120934.64632-1-aryanarora.w1@gmail.com>
-User-Agent: mu4e 1.12.12; emacs 30.2
-Date: Mon, 12 Oct 2026 19:00:41 +0200
-Message-ID: <87v77626rq.fsf@bootlin.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CMQs2zYV"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82BFE1F000C4;
+	Wed, 14 Oct 2026 18:52:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1792003928;
+	bh=FbdBpumkp5+TpG0Fvg4ZlYm6pvo7OQXZOJFAULwlruw=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=CMQs2zYVlrOTPI2e3vvIGR/Aqn8snA0+6m88Npnasq9AMvw7t4YuRdgKw3R/7VVFN
+	 pmdQzHku+yQpgYvMb5hl+Me+ObYFMga9pkOx190Z0CFUtkGi/z8JRAjjqRJH7vEmHz
+	 kdRG316YHio7c+yVYgfdgoXpRgstu027FIhR/wDhy/XSjjud1m6fgWvUHEI3r6n+Py
+	 Zfr0ulzUIrYG2+8AMT04kSojpY8UXdpYsSw8joEZ6RPFx1q0krxtmOfEhUXgu1JmM0
+	 ye+JAMS57028W8IHoqzEhVYV93jjddpowM8iIX11HpwVwH/ATX0qbdz+6n8tnxqsfF
+	 zk+lSMb2njXoQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 773CE3A5499A;
+	Wed, 14 Oct 2026 18:52:08 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-TUID: yusUmhSyE7w+
-X-Last-TLS-Session-Version: None
-X-Rspamd-Queue-Id: 435BF11D703F4
-X-Spamd-Result: default: False [2.29 / 30.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	DATE_IN_PAST(1.00)[24];
-	BAYES_HAM(-0.61)[75.95%];
-	R_MISSING_CHARSET(0.50)[];
-	MIME_GOOD(-0.10)[text/plain];
-	TO_MATCH_ENVRCPT_SOME(0.00)[];
-	DKIM_SIGNED(0.00)[bootlin.com:s=dkim];
-	BCC(0.00)[];
-	TAGGED_RCPT(0.00)[19cbce4cc656ecd4febc];
-	ARC_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_ZERO(0.00)[0];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FROM_HAS_DN(0.00)[];
-	URIBL_BLOCKED(0.00)[appspotmail.com:email,bootlin.com:mid,bootlin.com:email,localhost:rdns,localhost:helo,syzkaller.appspot.com:url];
-	FREEMAIL_CC(0.00)[gmail.com,datenfreihafen.org,davemloft.net,google.com,kernel.org,redhat.com,qorvo.com,vger.kernel.org,syzkaller.appspotmail.com];
-	FROM_EQ_ENVFROM(0.00)[];
-	MAILCOW_DOMAIN_HEADER_FROM(0.00)[bootlin.com];
-	TO_DN_SOME(0.00)[];
-	NEURAL_HAM(-0.00)[-1.000];
-	MID_RHS_MATCH_FROM(0.00)[]
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] net: protocol: use assign_bit() where applicable
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <179200392701.2906069.4708864552723867241.git-patchwork-notify@kernel.org>
+Date: Wed, 14 Oct 2026 18:52:07 +0000
+References: <20260920022745.3145847-1-peng.fan@oss.nxp.com>
+In-Reply-To: <20260920022745.3145847-1-peng.fan@oss.nxp.com>
+To: Peng Fan <peng.fan@oss.nxp.com>
+Cc: alex.aring@gmail.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, razor@blackwall.org,
+ idosch@nvidia.com, woojung.huh@microchip.com, UNGLinuxDriver@microchip.com,
+ andrew@lunn.ch, olteanv@gmail.com, sam@mendozajonas.com, fercerpav@gmail.com,
+ ms@dev.tdt.de, linux-kernel@vger.kernel.org, peng.fan@nxp.com,
+ linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
+ netdev@vger.kernel.org, bridge@lists.linux.dev, linux-x25@vger.kernel.org
 
-On 12/10/2026 at 17:39:34 +0530, Aryan Arora <aryanarora.w1@gmail.com> wrote:
+Hello:
 
-> Scan cleanup uses cancel_delayed_work(), which does not wait for a
-> running scan worker. The worker can requeue itself after cancellation,
-> leaving an active delayed-work timer when the PHY allocation is freed.
->
-> Cancel scan work synchronously before destroying the workqueue.
->
-> Fixes: 57588c71177f ("mac802154: Handle passive scanning")
-> Reported-by: syzbot+19cbce4cc656ecd4febc@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=19cbce4cc656ecd4febc
-> Tested-by: syzbot+19cbce4cc656ecd4febc@syzkaller.appspotmail.com
-> Signed-off-by: Aryan Arora <aryanarora.w1@gmail.com>
-> ---
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Jakub Kicinski <kuba@kernel.org>:
 
-I thought this had already been fixed but apparently not.
+On Sun, 20 Sep 2026 10:27:44 +0800 you wrote:
+> From: Peng Fan <peng.fan@nxp.com>
+> 
+> Convert open-coded if/else with set_bit/clear_bit and their
+> non-atomic __set_bit/__clear_bit variants to the assign_bit/__assign_bit
+> API. Where a bit is toggled based on its own value, use change_bit()
+> instead.
+> 
+> [...]
 
-Reviewed-by: Miquel Raynal <miquel.raynal@bootlin.com>
+Here is the summary with links:
+  - net: protocol: use assign_bit() where applicable
+    https://git.kernel.org/bluetooth/bluetooth-next/c/ab86dbf4a6ad
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
