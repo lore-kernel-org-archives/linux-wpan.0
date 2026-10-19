@@ -1,110 +1,136 @@
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.3])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.51
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1792422558;
+	b=BUDOvzsCytzyohQo7OELry7xYCLZoRGnB9PtECeQ2sfbz9c9Fx8ZZ5e/q+P/7ulioz0g
+	 nkdcyZ2Lxln5eKp1uGXaqUq7VQlrrcMec7G7rHBSJDirWg8N/Z6XoV2D0snwjVB803cV2
+	 GfxXj3xQrg00LcYqa4uu9NhDOia6frgVLA7R5ZtUSD4y9LIBmbQYjNi1G/y4HjBCGPhbF
+	 huzLEw00hlPW7cuoQR02hEZP/Q1K4ABuJne1npJFznf5qnHHA89K/J8qaGIt6Q3/lJ2Uo
+	 ZbcMl9xOMvzsU9aCvPkLFdm3kewXvaqLliV3DmXzVLC8PyHg9VjWn4pohb9jcIfPwVQ==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792422558;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:References:
+	 MIME-Version:Content-Transfer-Encoding;
+	bh=ddB4FacqIQ3q4kAqUUsX/lS6szbTGftArKoCUpP16Is=;
+	b=G8jIe9KBo0uZXRoeBIYYJ9Mx1sMe4O/cY1pKfN0edV4wEnx6ltuHvRUVYl7WJq3FTb/H
+	 gZcOnbcVpm2+TnuL8kiswafJ0WlwVxeBxZAuj3UGt0i6xRzyyasIw819O24fDr8lBkey/
+	 /nOGaETTrAkQX7bnqZqaqIkm9FFIji1FN/PsIc4sd8IqRo/EuogARxnRpK4C02f/TuwxF
+	 D4Ib/6B5A0BBfRD/SLm0oXmVY36+POnzeMHQ2yOv+H2ROJ0OiJudf/Htn2cgi012ht+rx
+	 hH8zScyynFFcu7ZS6xXM7zxvY3GR7QdYIGJ9jhYQUMdGN6AxMyvXMlUVnxbQHLk8QpA==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=PQX0gmjX;
+	arc=none smtp.remote-ip=74.125.82.51
+Received: from mail-dl1-f51.google.com (mail-dl1-f51.google.com [74.125.82.51])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DB054E7800
-	for <linux-wpan@vger.kernel.org>; Mon, 19 Oct 2026 11:54:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.3
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792410862; cv=none; b=jg13yUBOX+rE3vtYJhfY4famGbno20AB3bj1pqXjVtKSEjw+R6/S0BsyOX+rZ76mLMPiDPykBXPmD2bebkMfcZCmJnBnVewdXwEgKZAjlfEmPCZuKShk4hqHTw47zSwMiVzT7vQjBS8VsNuwjrG5QCv/CtQPUEfL2S+DjsuYtm4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792410862; c=relaxed/simple;
-	bh=dxfCj+VPnIBCFOexJn0mvdzX5Uv2UReoD8ktHs3FRwg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rlO7vsaIboAysW3S1Dyou5JM1HWU0aG6U/+s8/UE1dfrjvlrKLWCV/hm8B0Dvkf9qf1AmA0HxUq4U+EX6X4hHNhjC9UVno6+pORpf+QIXrZfP2ORGAirLLeouPlIrGw8WnDeWtP8ZafyLyusn09yNvTxox60qpS6OBoZTgM1nM4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=NozX+69/; arc=none smtp.client-ip=220.197.31.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6408C608607D
+	for <linux-wpan@vger.kernel.org>; Mon, 19 Oct 2026 15:09:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6408C608607D
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="NozX+69/"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-ID:MIME-Version; bh=HZ
-	J468QwnyDM7p2YC+09IWPU9FJLSBFijO0ClA/r7RM=; b=NozX+69/f0xQ9eyM8S
-	Q83RQbtON7WLr5bDwTSPyUFKdI6lTI9+NGXhw10WrKLMfzOQtGcK3zKmbf38Vk8W
-	mK23JcKy6PHV9Bo9qS7zzoW0IGytHokbKJMuMwcLIK/kQ/EXWKRSg5YAOA4ggXEn
-	gIIJVycjfa2RF1YOJhQAD29Ac=
-Received: from LAPTOP-137NTCJO (unknown [])
-	by gzga-smtp-mtada-g0-1 (Coremail) with SMTP id _____wDnD8TkBNZqGnzMBA--.61814S2;
-	Mon, 19 Oct 2026 19:54:13 +0800 (CST)
-From: Jiaxin Li <18135327133@163.com>
-To: linux-wpan@vger.kernel.org
-Cc: Jiaxin Li <18135327133@163.com>
-Subject: [PATCH] ieee802154: ca8210: validate received command lengths
-Date: Mon, 19 Oct 2026 19:54:00 +0800
-Message-ID: <20261019115400.459-1-18135327133@163.com>
-X-Mailer: git-send-email 2.56.0.windows.2
-Precedence: bulk
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=PQX0gmjX
+Received: by mail-dl1-f51.google.com with SMTP id a92af1059eb24-17bc533fda3so2485922c88.1
+        for <linux-wpan@vger.kernel.org>; Mon, 19 Oct 2026 08:09:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1792422557; x=1793027357; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=ddB4FacqIQ3q4kAqUUsX/lS6szbTGftArKoCUpP16Is=;
+        b=PQX0gmjXqloOScR31IyWgcireQx9fQT73X3Zpe08XKJbs8GqVMJ4KNbjN8+L60KuXS
+         5Vk10qFz9nXu8jDZwILHl0ivMfQSmgPWmV+ssVfeRAfCsvf6J6Jkoq6OHAfEpBSUCAgU
+         V45rL/7HO/YKrsqIyxvZwkaJ2Meo12GUZ5zSuKBZ0eSiuBjPxy4v/VSaxclARSLcXbxU
+         deApW+wAePATk/kvUdSUJYGKE/9RI9ssbaDtNOaFOKM7Lc54fLOx351BxdQT7Z3/rW6f
+         JCzWV9sfBRW7hpFcyPi330cllnO7OxWGT8RB7z3YI7SknpDdFHJk3AcJyaZlZdP+AprG
+         PD4A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1792422557; x=1793027357;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=ddB4FacqIQ3q4kAqUUsX/lS6szbTGftArKoCUpP16Is=;
+        b=kGYOsiESv248L9DPeiSU045hdLO/h0k/rX4NIKG+7q2dda1ID1GK3FVcWc+CkB+sN6
+         LEjRhbtDFn1KXJxVMowiRm/pguq8lHTpjlIa7rFWGsdWVLwQsbl3pHkUKRxiJE3eB8Ly
+         nOl3UfUHKMkS7hWmsGmHaZyximnZ354XOchuTDHJKhKSOe+SB2cA5xQejac6m/gPq4oo
+         seMZG2fXEwsVvXtS8jTSd8JQRq4tb3/V1l3f8D6TrXIJyZS6MlUCsXKEiqKye5Ql8f02
+         LLgxLr6oNcsJXqeE6brx8BbPe9RK7aic/Oy/ZNyAx5C+SbIHc7+LHqzELofgWmNX1dox
+         M3nA==
+X-Forwarded-Encrypted: i=1; AKwUvBzBb5oP2bhWiWnRTO3T0YdoqK8Mg9UbkqrXmMdSKxd/nFkrGmnmsNNm97rPrGkRdaJnmNYxrHm9xpqX@vger.kernel.org
+X-Gm-Message-State: AFq9FYJn57O5AHpyhJxWdQXouS5O3m9DmIWxCNis00dGr6BJagwtA/5k
+	91H/z6A9UuwaaARSioQ/IyaPzN/wxGyfp7P5jc/4l5lvt2WxShr3J9rd
+X-Gm-Gg: AYBFou0vHvPGYBZ1TXXT3uLGQ2pVGWLewtLgIX0gHWPBzMUbPHG1BvOOHXn3chjCaBV
+	3wTekfvoSJWT/3gdhmfNw0JHL2403D6YNMARs1soPxJwTdHkmx74KCQ9MUQUbT9XjGPds+Mzl0i
+	i10arW1zAGcJJ0SbdTM0J8vGBk5axKT2LlPdx6J18n7U1JMQybt44jVrSJ+FW434TjI84iJD4F/
+	0nBjKDGYqlmKqk/MuEsxF/md2fOi6Zj32AXwPYfgVXecUPGmOGMKclHSPB6TCrtVYX+rI0BN3+F
+	AkDcszyAlHFT09cjPMSbkX/LedhLWwpqY99YRQh1/KtWSGC+TRLN66fBjCFikH5u2HsM/QqAuVm
+	DoA/d/GnFbGz0l6geMlFXJSrfj9S82qLPHMgBPJudUp6voDfgsAt7iseJZynH0UCFwQh65qK3fV
+	Flb2JpenOv4PjgjfJ1fziFLhdkK14ttxMWfChnGvJeWXtB7hbIClveFvstxXbj7OYg3gvnMirQM
+	kunKby48URq47yPCb/37MM=
+X-Received: by 2002:a05:7300:ea8e:b0:360:c266:cdd8 with SMTP id 5a478bee46e88-361a1f5679amr10624281eec.24.1792422557361;
+        Mon, 19 Oct 2026 08:09:17 -0700 (PDT)
+Received: from CHANDRUS-NITRO.localdomain ([106.200.8.36])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-360813b6e33sm34680599eec.7.2026.10.19.08.09.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 19 Oct 2026 08:09:17 -0700 (PDT)
+From: Chandru Gopi <chandru.gopi.dev@gmail.com>
+To: maoyixie.tju@gmail.com
+Cc: alex.aring@gmail.com,
+	linux-wpan@vger.kernel.org,
+	miquel.raynal@bootlin.com,
+	netdev@vger.kernel.org,
+	stefan@datenfreihafen.org
+Subject: Re: nl802154: GET_WPAN_PHY dump resolves NL802154_ATTR_IFINDEX in init_net
+Date: Mon, 19 Oct 2026 15:13:22 +0000
+Message-ID: <20261019151322.8175-1-chandru.gopi.dev@gmail.com>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260920165057.3753458-1-maoyixie.tju@gmail.com>
+References: <20260920165057.3753458-1-maoyixie.tju@gmail.com>
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
+List-Post: <mailto:linux-wpan@vger.kernel.org>
+List-Help: <mailto:linux-wpan+help@vger.kernel.org>
 List-Subscribe: <mailto:linux-wpan+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
+List-Owner: <mailto:linux-wpan+owner@vger.kernel.org>
+Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wDnD8TkBNZqGnzMBA--.61814S2
-X-Coremail-Antispam: 1Uf129KBjvJXoW7Wry7WryxCF1DKw18KrW3ZFb_yoW8KF45pF
-	4aya4jyry8XF1kXan7Ar48XF90v3Wkt34DuFWvgas7CasIqFy5Ga4SkFyxtrWFqFZrXayf
-	CrWDJF13AFZ8AFUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0JUjdgXUUUUU=
-X-CM-SenderInfo: zpryijyvtsliitt6il2tof0z/xtbC6gWKS2rWBOX3iQAA3N
 
-ca8210_rx_done() computes len from buf[1] but only checks the upper
-bound against CA8210_SPI_BUF_SIZE.  The code then reads command bytes
-that are not guaranteed to be present: buf[3] for MCPS-DATA.confirm and
-buf[2] for the HWME wakeup indication.  ca8210_net_rx() similarly reads
-command[26] for MCPS-DATA.indication and command[3] for
-MCPS-DATA.confirm without a lower-bound check.
+On Mon, 21 Sep 2026 00:50:57 +0800, Maoyi Xie wrote:
+> Does this look like a real bug? If it does, I am happy to send a patch,
+> or to leave the fix to you.
 
-Add the missing per-command length checks and drop or ignore short
-messages.
+Yes, I can reproduce it on v7.3-rc7 (58161ead29e5, Oct 16 2026) in
+x86_64 QEMU with two mac802154_hwsim radios. The lookup at
+net/ieee802154/nl802154.c:584 is unchanged, and I did not see a fix on
+the list or in mainline as of today.
 
-Signed-off-by: Jiaxin Li <18135327133@163.com>
----
- drivers/net/ieee802154/ca8210.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
+Setup: wpan0 on phy0 and wpan1 on phy1, both in init_net. phy1 is moved
+into a fresh netns with "iwpan phy phy1 set netns <pid>". From inside
+that netns I send NL802154_CMD_GET_WPAN_PHY dumps:
 
-diff --git a/drivers/net/ieee802154/ca8210.c b/drivers/net/ieee802154/ca8210.c
-index 01af4f9cf..b6f9affee 100644
---- a/drivers/net/ieee802154/ca8210.c
-+++ b/drivers/net/ieee802154/ca8210.c
-@@ -710,7 +710,7 @@ static void ca8210_rx_done(struct cas_control *cas_ctl)
- 	}
- 
- 	ca8210_net_rx(priv->hw, buf, len);
--	if (buf[0] == SPI_MCPS_DATA_CONFIRM) {
-+	if (buf[0] == SPI_MCPS_DATA_CONFIRM && len >= 4) {
- 		if (buf[3] == IEEE802154_TRANSACTION_OVERFLOW) {
- 			dev_info(
- 				&priv->spi->dev,
-@@ -730,7 +730,7 @@ static void ca8210_rx_done(struct cas_control *cas_ctl)
- 			mlme_reset_wpc->priv = priv;
- 			queue_work(priv->mlme_workqueue, &mlme_reset_wpc->work);
- 		}
--	} else if (buf[0] == SPI_HWME_WAKEUP_INDICATION) {
-+	} else if (buf[0] == SPI_HWME_WAKEUP_INDICATION && len >= 3) {
- 		dev_notice(
- 			&priv->spi->dev,
- 			"Wakeup indication received, reason:\n"
-@@ -1859,6 +1859,10 @@ static int ca8210_net_rx(struct ieee802154_hw *hw, u8 *command, size_t len)
- 
- 	if (command[0] == SPI_MCPS_DATA_INDICATION) {
- 		/* Received data */
-+		if (len < 27) {
-+			dev_warn(&priv->spi->dev, "short MCPS-DATA.indication\n");
-+			return -EINVAL;
-+		}
- 		spin_lock_irqsave(&priv->lock, flags);
- 		if (command[26] == priv->last_dsn) {
- 			dev_dbg(
-@@ -1873,6 +1877,10 @@ static int ca8210_net_rx(struct ieee802154_hw *hw, u8 *command, size_t len)
- 		spin_unlock_irqrestore(&priv->lock, flags);
- 		return ca8210_skb_rx(hw, len - 2, command + 2);
- 	} else if (command[0] == SPI_MCPS_DATA_CONFIRM) {
-+		if (len < 4) {
-+			dev_warn(&priv->spi->dev, "short MCPS-DATA.confirm\n");
-+			return -EINVAL;
-+		}
- 		status = command[3];
- 		if (priv->async_tx_pending) {
- 			return ca8210_async_xmit_complete(
+                                          before        after
+  no ifindex filter                       1 phy         1 phy
+  ifindex of wpan1 (in this netns)        ENODEV        1 phy
+  ifindex of wpan0 (only in init_net)     empty dump    ENODEV
 
--- 
-2.34.1
+"after" is with __dev_get_by_index(&init_net, ifidx) replaced by
+__dev_get_by_index(sock_net(skb->sk), ifidx), as you suggested. Both
+cases now return what you described, and the init_net baseline is
+unchanged. No warnings were printed during the netns move.
 
+I used a short static C program with raw generic netlink for this. I
+am happy to turn it into a hwsim-based selftest, and can put it
+wherever you think it belongs.
+
+Are you still planning to send the fix? I can send it, with you as
+Reported-by, or send the selftest alongside yours, whichever you
+prefer.
+
+Thanks,
+Chandru
