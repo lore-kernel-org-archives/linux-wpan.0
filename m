@@ -1,71 +1,66 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=185.171.202.116
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=185.246.84.56
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792484027;
-	b=t0U+QQmSnVoz2bEZQwD9NLVj9BA0wZWrJCSYo2G3YsUR0TdIpie2ofzdRHpTJJhShLK3
-	 VbuBTZIDsFNp3sXdufGbUGbx4Fk24OFPyG2rX6A+9JW0nnKupBeUl028Bvw8scNSUamxp
-	 ATsazgbUPoGZzjytHbIEBg5f9hv39oJN1raZPcfhBhFAyXS98aQLkvhWGRdEZoPq5qhV3
-	 Oe8rIsvY0cAxzkADwP60x8C6Ct/0tOpG8/ANwDAdIJP/VA7515XTkkuTbd54c7anunogm
-	 ogasQKIgn2IaMm/7L691rE/qqb3BxuW7bJ0kWF7kYyJmSruIHexGA+SK2pRGKSRfPJw==
+	t=1792486625;
+	b=E0SGsTdAGJeW/RghlYhYjuREgiEf6ABDTWD9TKdRnmexi7M59M2lraNmnxXTv28YPWDH
+	 R7oaDmk+ybqGOW8CWqoEGC/KxpjHsZ5hICUlYNTB+ShlWnpUUZ0xqJ5JckhXMaODjSmnk
+	 2jMKV6Q/favWIeO0iqlflmlWY+5ZmAbUPDW8ocoLBZRrDPfUOmfd5lTKW6swRpZo/tcAM
+	 Lz7SEw5IOOy5Nw6hyH23eQLmfKVthAs1PtNPPIPRNHfoRVF1n21js8J/jntaOk1kaHH6c
+	 SRKTZ2PJ7bOb1F8LMIA+FXoSk+0Qyv4WNHXo9kKoipU3EA+V8o7l0YcM4CLplmStczw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792484027;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792486625;
 	h=DMARC-Filter:Received:Received:Received:DKIM-Signature:From:To:Cc:
 	 Subject:In-Reply-To:References:User-Agent:Date:Message-ID:
-	 MIME-Version:Content-Type:X-Last-TLS-Session-Version;
-	bh=MN63htuYUqrgFOXv/xwBT/iNnGMFTc69oLMOIWBDMN8=;
-	b=C0fRw7RsQ/+uoMO6Aj0mgq9BVAl9Vo2adh/MWcDh6JiehU+51ARUu5ZxzzvzQPWConHF
-	 Z10WGUDfkVxJySGZJy7KQbNir21LWY+aGvY9VBhW1AI6YHUz7MeU0Ddr4J7PtzfvMGftF
-	 E6tzPaWntjOL3UD2hz56vmXDkOh3SwwYh0wcSqpDxB5U13h4fx3sdx0Bzb8MyojEAvfnX
-	 mNXbytfViBBcLwz9/tdVKsrwcc9iCeY8X3Fs/95jpdv1mQduiDhm5nemJVhVjWAiQoSOY
-	 IhncBF/woBAsy9Y1EkkN+5TdtzmMLP2luW6/xOjLjYqB6/vorKH03qqlBhgr8xmUU0A==
+	 MIME-Version:Content-Type:Content-Transfer-Encoding:
+	 X-Last-TLS-Session-Version;
+	bh=bjU/He36oIo9V2EyitAnUUJoY8mbNPh0cMaL0C3XdC8=;
+	b=sPRbkc45kXnD44fQmkxLvuzZJ0fPMxxDlgbQehS+JFpJg+Ashebc4YL/3Kl19vs938MM
+	 YSubIiGd+G3HuugPha0+gVqV2/b/EIAqh/IuJT+dfs2m2+SQ+paIy4TKP1DbnjNylbSZI
+	 Mxf8qHbBsrDSTCzv6V7C10haVRMDLtqjob1scsug58kH/L/zSPPFZ+WUWYvnJJcGdSmvs
+	 mZlG0gUrWZIP/021lOHD+hacWIXuaPC6iuDAk3LnKA27wM3wJv9B54ahfv4kxTWqUlORW
+	 lonolhTTnz8BYguK+1otTFxndB8B8mVzzWMF1Ow5NzxaGPNMRMOzTUWgZssnBB1U2ZQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=bootlin.com;
 	spf=pass smtp.mailfrom=bootlin.com;
-	dkim=pass header.d=bootlin.com header.i=@bootlin.com header.a=rsa-sha256 header.s=dkim header.b=03OZ40IQ;
-	arc=none smtp.remote-ip=185.171.202.116
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+	dkim=pass header.d=bootlin.com header.i=@bootlin.com header.a=rsa-sha256 header.s=dkim header.b=lp8FbzbB;
+	arc=none smtp.remote-ip=185.246.84.56
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13A0E606A31C
-	for <linux-wpan@vger.kernel.org>; Tue, 20 Oct 2026 08:13:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 13A0E606A31C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8FA0606A31A
+	for <linux-wpan@vger.kernel.org>; Tue, 20 Oct 2026 08:57:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B8FA0606A31A
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=bootlin.com header.i=@bootlin.com header.a=rsa-sha256 header.s=dkim header.b=03OZ40IQ
+	dkim=pass (2048-bit key, unprotected) header.d=bootlin.com header.i=@bootlin.com header.a=rsa-sha256 header.s=dkim header.b=lp8FbzbB
 Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id AD542C63454;
-	Tue, 20 Oct 2026 08:14:43 +0000 (UTC)
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 31B831A12A4
+	for <linux-wpan@vger.kernel.org>; Tue, 20 Oct 2026 08:57:02 +0000 (UTC)
 Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 3C3A060393;
-	Tue, 20 Oct 2026 08:13:45 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 1925D10328A45;
-	Tue, 20 Oct 2026 10:13:40 +0200 (CEST)
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 054E260393;
+	Tue, 20 Oct 2026 08:57:02 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 3427A10328D1B;
+	Tue, 20 Oct 2026 10:56:57 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1792484024; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 in-reply-to:references; bh=MN63htuYUqrgFOXv/xwBT/iNnGMFTc69oLMOIWBDMN8=;
-	b=03OZ40IQu92p+6zcM7lPsTtHDySziOlL6p2l7mREPKNcIKAdggk/zBqFUYfhtfeAL07r3t
-	j0n7+Dj4Rim8EAwgcKN53lOYIl9/Yff5WfFqMUb9aiKsBSfvbDGgqxJiOnLcn6+PgQkVqL
-	6wrdIiWr+5A1I3m7I67WEy034pwF4AGD9osfqoRzr73PpJXMl/jL0ll4aAKo7z5ZPQ24El
-	bw92Xh7KhRxXuz8sJe15OugBJ1GJJk58MokHZdzZImRbTlLhq5zoju5d5adGEbNXgSzaVY
-	+RxZJOfedAiiLWNpcMA0IZI7AajeBFBOdtmGTyZtvWHAmwRXKlG+rvBnwPB4mQ==
+	t=1792486621; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=bjU/He36oIo9V2EyitAnUUJoY8mbNPh0cMaL0C3XdC8=;
+	b=lp8FbzbBite8Qcnb/8KMEd1p4mP4M0ImLt/izimRT05Hi8ZoP8iz88aR7CTuuXVmN95GyP
+	Ff0MYMk4myKoZWi65xV0rih83CfN6C0T75FGrXDpkuMMtsFTdnkD5y4BwLnFFIYU/zBhsJ
+	ccQPvXPXN64PlJHCIFnmmbQYcTQGlCt7Uyc7ySGA3U7sv5aB3NCD65FA9IGleWfHcknY5w
+	OXRQ1GaEtN4Pe1LFbuD5w0gi/22V91VUmp7j0gbxx9u5gO4iEYf9mrfcGaKuLFWh3RoB8+
+	d64yOseodLio2Y19OB051//PLYsktFSaVIHSbAd24fDIZPxYZFvjxkTBq1fL5Q==
 From: Miquel Raynal <miquel.raynal@bootlin.com>
-To: Maoyi Xie <maoyixie.tju@gmail.com>
-Cc: Alexander Aring <alex.aring@gmail.com>,  Stefan Schmidt
- <stefan@datenfreihafen.org>,  "David S . Miller" <davem@davemloft.net>,
-  Eric Dumazet <edumazet@kernel.org>,  Jakub Kicinski <kuba@kernel.org>,
-  Paolo Abeni <pabeni@redhat.com>,  Simon Horman <horms@kernel.org>,
-  Marcel Holtmann <marcel@holtmann.org>,  Chandru Gopi
- <chandru.gopi.dev@gmail.com>,  linux-wpan@vger.kernel.org,
-  netdev@vger.kernel.org,  linux-kernel@vger.kernel.org
-Subject: Re: [PATCH wpan] ieee802154: look up the wpan_phy dump ifindex in
- the caller's netns
-In-Reply-To: <20261020065125.896530-1-maoyixie.tju@gmail.com> (Maoyi Xie's
-	message of "Tue, 20 Oct 2026 14:51:25 +0800")
-References: <20261020065125.896530-1-maoyixie.tju@gmail.com>
+To: Jiaxin Li <18135327133@163.com>
+Cc: linux-wpan@vger.kernel.org
+Subject: Re: [PATCH] ieee802154: ca8210: validate received command lengths
+In-Reply-To: <20261019115400.459-1-18135327133@163.com> (Jiaxin Li's message
+	of "Mon, 19 Oct 2026 19:54:00 +0800")
+References: <20261019115400.459-1-18135327133@163.com>
 User-Agent: mu4e 1.12.12; emacs 30.2
-Date: Tue, 20 Oct 2026 10:13:40 +0200
-Message-ID: <8733u0vlfv.fsf@bootlin.com>
+Date: Tue, 20 Oct 2026 10:56:57 +0200
+Message-ID: <87jyncu4va.fsf@bootlin.com>
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Post: <mailto:linux-wpan@vger.kernel.org>
@@ -75,34 +70,28 @@ List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-wpan+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-Last-TLS-Session-Version: TLSv1.3
 
-On 20/10/2026 at 14:51:25 +08, Maoyi Xie <maoyixie.tju@gmail.com> wrote:
+On 19/10/2026 at 19:54:00 +08, Jiaxin Li <18135327133@163.com> wrote:
 
-> nl802154_dump_wpan_phy_parse() looks up NL802154_ATTR_IFINDEX in
-> init_net, while the dump only returns phys in the caller's netns. For a
-> caller outside init_net, the result depends on what the ifindex is in
-> init_net. If no device there has it, the dump returns -ENODEV, even
-> when the ifindex is one of the caller's own 802.15.4 interfaces. If an
-> 802.15.4 interface there has it, the dump is empty. If any other device
-> there has it, the filter is ignored and the dump returns every phy in
-> the caller's netns.
+> ca8210_rx_done() computes len from buf[1] but only checks the upper
+> bound against CA8210_SPI_BUF_SIZE.  The code then reads command bytes
+> that are not guaranteed to be present: buf[3] for MCPS-DATA.confirm and
+> buf[2] for the HWME wakeup indication.  ca8210_net_rx() similarly reads
+> command[26] for MCPS-DATA.indication and command[3] for
+> MCPS-DATA.confirm without a lower-bound check.
 >
-> GET_WPAN_PHY needs no privilege, so an unprivileged process outside
-> init_net can use this to tell which ifindexes exist in init_net.
+> Add the missing per-command length checks and drop or ignore short
+> messages.
 >
-> Look the ifindex up in sock_net(skb->sk), as nl80211_dump_wiphy_parse()
-> does. Commit 66e5c2672cd1 ("ieee802154: add netns support") added the
-> netns check to the dump loop. It also removed the "TODO netns" comment
-> above this lookup but kept init_net.
->
-> Fixes: 66e5c2672cd1 ("ieee802154: add netns support")
-> Cc: stable@vger.kernel.org # v4.8+
-> Assisted-by: LLM codeql
-> Signed-off-by: Maoyi Xie <maoyixie.tju@gmail.com>
-> ---
+> Signed-off-by: Jiaxin Li <18135327133@163.com>
 
-Seems sensible:
+You are making totally arbitrary bound checks. Yes these checks may be
+relevant, but please go beyond the very single array access that your LLM
+saw and try to make sense out of what is done in the driver. Then
+propose meaningful checks.
 
-Reviewed-by: Miquel Raynal <miquel.raynal@bootlin.com>
+Thanks,
+Miqu=C3=A8l
