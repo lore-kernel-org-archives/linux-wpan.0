@@ -1,53 +1,49 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=220.197.31.3
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792498220;
-	b=FUDY2Paxu8eT+lzCBISNF6L4rOcKdCtpVeLQDqK3cw39XUD/Re1I2wknXlwhUqbpMELS
-	 KDO2qPv3mmn3B/ICAyPp7rOiTxWTnx76n1WVkRcuXnblUXYMXedB5dZT0Q0sFFpRdn3Qk
-	 D11kmo3Dh8jqPJ32AyB+GqKAETm6cUmPB/hALA75Cb6pU0KI0o57NmjckYXLdBU0OCKEF
-	 eSBiTPCkDDzJUT17BuiAPKLYN/vPGiud+dxOVGVBbqz8QsW6cWcjDdlD120l9oxMnFmqX
-	 N/N0tz6eL+FXAYrJ3ZCXqf3Ulu5e8ehzCbA2vicFJ/1gf5lgqAKpe0VZwVVPykcwVcA==
+	t=1792522854;
+	b=ZwEp3xY3vlTV3hI1HwdcL+2MWo5mBBQ0ArOflo2q4aU8bX+QbHHz6TFNRuASvs/I92Nv
+	 3QjmO5zksn6hQJYJ4042cenKYH/WasMQF/xwF/Lk9zUcgVPDfeUzHz1hczp64byxuWG7Q
+	 vEmv6TjIhD4w2s02pJXZlUIdZEeKo/PeWal2XJdyIdsw2QxKotWpT94SXVEDdKswyZBmC
+	 q0AclysG0taySXx0HGwIJucmu8ClkxGKJ1l5HQmVvCWlzV4qMGlsA/YN1el8GIgLr0TfY
+	 VqyOPWK3kSGJZFzjtALE00+PTJ4NiGJRNnRJ/PZPWohCcpO9x88NhlZKdPvzdbbDbEg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792498220;
-	h=DMARC-Filter:DKIM-Signature:Received:From:To:Subject:Date:Message-ID:
-	 X-Mailer:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	 X-CM-TRANSID:X-Coremail-Antispam:X-Originating-IP:X-CM-SenderInfo;
-	bh=mqRwWa47iC3jnswmJX4TwcHEfSIB/sgNieSNJJSfQ3s=;
-	b=zgbtfWDKZayrB5IHSkYEk6Ll7ed0Rjjh9YaX/D4mx5uG+qPBHY5+oDs7KW6zwq0zB1//
-	 pyY4Xh1HfQYw/l8MLRoVAJK1/wDRTV9CjBTgfVPBfZ/aZfZxqmU7AXXwLcg+jNHRI+Ebg
-	 UlFWwpFugxYQL0cX3X+p71Rf+MmP1CXJpegZNXxfnjLtWQO8wsUm5UNC67D1HgDS6VsQ5
-	 R8tNblXJWbpDvxDn2zF3AsguUTPQKwiF29teOPIqnWQ6XdXecZFmcBOcSi4FBlzEd6vPP
-	 hBM9Q6H/B6Y+1UPzijRqY6O1dcBMSJpUgCmmnY5N60u1x6YbBHXUIS2nk6UgHNx08yg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792522854;
+	h=Received:DKIM-Signature:Received:Content-Type:MIME-Version:
+	 Content-Transfer-Encoding:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc;
+	bh=doFwaVtFpS6sC4IuXaKfGyTb696NhEj7zirNI3zBSPk=;
+	b=B1YHYY9fuw6tUC3k7EUj15NCCvtJhsHH+hFV2iNjpB1k4v8Vu6kdCcXbLLiuP6nQFCty
+	 Ty3qI26U2Oktka39lc6fqiY5v7u4divoXWhIYVUAqKUhel/dt9q45LdTG4XZvB1GEaj+0
+	 fUYfesFmMWTpYozTeWVC6Y7nZ+SqbYFUdUPdPK2Lvyo70EOLkvbu7SHrhzfWf28EHvRo+
+	 GHpFkBfCoYDkEPGrVrOg7p/X3kEW/Xry5g4UCVr1wRCyNhv9leZ/zKkJ7iXDJLok3rE2M
+	 nqGZQdqNLWZBDCCOex7f16gj7toWkRWn6dPsisBBlNPS0Gpx4Z7CwCoMdgjC41/SEWg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=163.com;
-	spf=pass smtp.mailfrom=163.com;
-	dkim=pass header.d=163.com header.i=@163.com header.a=rsa-sha256 header.s=s110527 header.b=Pcrz7FwR;
-	arc=none smtp.remote-ip=220.197.31.3
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.3])
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=nFmWSkIZ;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A867F606A319
-	for <linux-wpan@vger.kernel.org>; Tue, 20 Oct 2026 12:10:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A867F606A319
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9CBD606A32E;
+	Tue, 20 Oct 2026 19:00:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=163.com header.i=@163.com header.a=rsa-sha256 header.s=s110527 header.b=Pcrz7FwR
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-ID:MIME-Version:
-	Content-Type; bh=mqRwWa47iC3jnswmJX4TwcHEfSIB/sgNieSNJJSfQ3s=;
-	b=Pcrz7FwRGdHDBNIxRXghDLYVYTCQCx8FRkh+C+D5kP7OuX2iW99hz+U8HHUT+5
-	Ovog/3y4PcziCSvkjASZbq/bPZniQafneGRxPvY//kBG96frkx5j6jxF4fQBBOWU
-	4UpXUsqjV4MwuKw1ZhS1uxHVCHiKaI/2KHk7ffz0kCbUQ=
-Received: from LAPTOP-137NTCJO (unknown [])
-	by gzga-smtp-mtada-g0-1 (Coremail) with SMTP id _____wD3V9IjWtdqwi7WBQ--.40512S2;
-	Tue, 20 Oct 2026 20:10:13 +0800 (CST)
-From: Jiaxin Li <18135327133@163.com>
-To: linux-wpan@vger.kernel.org
-Subject: Re: [PATCH] ieee802154: ca8210: validate received command lengths
-Date: Tue, 20 Oct 2026 20:09:57 +0800
-Message-ID: <20261020121009.731-1-18135327133@163.com>
-X-Mailer: git-send-email 2.56.0.windows.2
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=nFmWSkIZ
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46E321F000C9;
+	Tue, 20 Oct 2026 19:00:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1792522822;
+	bh=doFwaVtFpS6sC4IuXaKfGyTb696NhEj7zirNI3zBSPk=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=nFmWSkIZRpkljVSa23s6GPJ3aVIW5bIoTnLHx11JdS/V7eYtdXgjiNhXDsgVLmC/O
+	 u+AFoyP9sQoc5dZ0l4UCRVYYMNAPcBsoor0gCI7bZIXsBsI+jxaA5fjBNGQoNk/UcA
+	 U0HVGNjRC4Cq6kmD+gWSo9XYiQx3dXVYyZWF61RTmDmq5uPBXwr4iJy+gwCgJN3OQt
+	 zHIlSNFSl9131/EhLdLyd1T6AoUUE9J4kjC9BHVNqhPc2MUle2iBf3bKw4fehQ11gd
+	 ZLpEN5thUzwNIbwODsWVqSmZ3S1RaBdfxycFeTJ3TvcHMUrDUlsLEIzmxrqmFvhK/4
+	 CY+PdAjm1i3Tw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3A4EF3808209;
+	Tue, 20 Oct 2026 19:00:22 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Post: <mailto:linux-wpan@vger.kernel.org>
@@ -57,23 +53,54 @@ List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-wpan+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wD3V9IjWtdqwi7WBQ--.40512S2
-X-Coremail-Antispam: 1Uf129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
-	VFW2AGmfu7bjvjm3AaLaJ3UbIYCTnIWIevJa73UjIFyTuYvj4RmApYUUUUU
-X-CM-SenderInfo: zpryijyvtsliitt6il2tof0z/xtbC6gUw8GrXWiXxhQAA3Z
+Subject: Re: [PATCH net-next] net: rename skb_unshare() to skb_unclone_full()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <179252282077.159319.7792031411876485115.git-patchwork-notify@kernel.org>
+Date: Tue, 20 Oct 2026 19:00:20 +0000
+References: <20261015-nb-skb-unclone-full-v1-1-0dfbf01f60f2@tipi-net.de>
+In-Reply-To: <20261015-nb-skb-unclone-full-v1-1-0dfbf01f60f2@tipi-net.de>
+To: Nicolai Buchwitz <nb@tipi-net.de>
+Cc: Raju.Rangoju@amd.com, PrashanthKumar.K.R@amd.com, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@kernel.org, kuba@kernel.org, pabeni@redhat.com,
+ ioana.ciornei@nxp.com, sgoutham@marvell.com, gakula@marvell.com,
+ rkannoth@marvell.com, sbhatta@marvell.com, bbhushan2@marvell.com,
+ maxime.chevallier@bootlin.com, mcoquelin.stm32@gmail.com,
+ alexandre.torgue@foss.st.com, sd@queasysnail.net, horms@kernel.org,
+ marcel@holtmann.org, luiz.dentz@gmail.com, olteanv@gmail.com,
+ alex.aring@gmail.com, stefan@datenfreihafen.org, miquel.raynal@bootlin.com,
+ jk@codeconstruct.com.au, matt@codeconstruct.com.au,
+ stephen@networkplumber.org, jhs@mojatatu.com, jiri@resnulli.us,
+ marcelo.leitner@gmail.com, lucien.xin@gmail.com, jmaloy@redhat.com,
+ tung.quang.nguyen@est.tech, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-bluetooth@vger.kernel.org,
+ linux-wpan@vger.kernel.org, linux-sctp@vger.kernel.org,
+ tipc-discussion@lists.sourceforge.net
 
-Hi Miquèl,
+Hello:
 
-Thank you for the review. You are right: those per-command checks were
-ad hoc and did not follow the message framing.
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-I see that Hui Peng's series ("ieee802154: ca8210: fix stack and slab
-out-of-bounds accesses") already covers ca8210_rx_done(),
-hwme_get_request_sync(), and ca8210_skb_rx() with message-level length
-validation. Please drop my patch; that series is the proper fix.
+On Thu, 15 Oct 2026 10:16:38 +0200 you wrote:
+> skb_unshare() only copies cloned skbs. A shared skb that is not a clone
+> comes back unchanged, which the name doesn't suggest. The loopback
+> selftest hooks got caught by this and hit BUG_ON(skb_shared()).
+> 
+> Rename it to skb_unclone_full(). Like skb_unclone() it only acts on
+> clones, but it copies the whole skb, not just the head.
+> 
+> [...]
 
-Thanks,
-Jiaxin Li
+Here is the summary with links:
+  - [net-next] net: rename skb_unshare() to skb_unclone_full()
+    https://git.kernel.org/netdev/net-next/c/258c3ae4a4af
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
