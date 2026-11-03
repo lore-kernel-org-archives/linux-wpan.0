@@ -1,56 +1,63 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=159.226.251.81
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793701735;
-	b=xP16u8vmPNeIe1npWlMG0QcFTR062qIaVcIggZ1wq6U2fCTnS+QiyeVhpVLUts6a826+
-	 FDoBgeQRS1bQj3fyBMXEAB1/Pf04w8bbY/3KeEPMIFEszqRDHUN0n0ZQg90PYR05mrp+z
-	 tI3XfJX1YO6HyAVk+zNAENpty/vl6PzIObZBPeLSc305beMrbFz7I49VxeXWD9aOyYmOb
-	 p8Pmbrl+8bO3KlKPX2pnS5aQ2svFA0MRQQ1VNHOgMzlQZMIuutc6AubOZIWAjo2tZguyZ
-	 qzTKjswpC75bkoPIlqM3tQ3eqCqi+jZVM8IBOHTM5XHthINqTaXIpiu2DHEqNAarnVA==
+	t=1793702029;
+	b=j7w9ksninY8bcx//q/Il5lsvK1GCLc7VuZQ+qb4RJGATPZ7ITATC7zHth05DrH03suc8
+	 7Jj13ZtmFgpO4cxw+RjMiUdzAPkR/uahUspanmAXCHTCmllpbXHw0SVqvs6pqORHFPz6z
+	 lR4/lxTzG6dFev0kMBtdQf57t+2vuLofbyR5WMgiGW32kJs5WmWrgs8hOYVZkTm7MtYUK
+	 5nPt8LmOyN6GhPpTwjpepD8PnUHhK7awEzR/rGi5dfducdfEa73Kjj0bBZmdaqDA6uObz
+	 OVVtsnwOM6mr2XiMW1iRH33MMZGPE+Fp4pOUysSvy0pXJrHp8A2ft4OjdJ6Fo+4Sr3g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793701735;
-	h=DMARC-Filter:Received:From:To:Cc:Subject:Date:Message-Id:X-Mailer:
-	 MIME-Version:Content-Transfer-Encoding:X-CM-TRANSID:
-	 X-Coremail-Antispam:X-Originating-IP:X-CM-SenderInfo;
-	bh=GIo5PxjdlqP/Xj3D5eFLFmZ+IhvJb/6GVNVYjGH5TxM=;
-	b=oFAiAKkpqqKmMfKz+A0CP/PN6BV2oCPxqh+oFYQbsGlFB9WrIz2QkjdFDlGjx6oLpZwJ
-	 ZsVGJ7cU6DcyP9amwcdPm6VvKEO4aCDEmLs88wonMT5g2Y6wMOdTG3ifpAMWonsDD+M7v
-	 g8HH/odS9VVeymySRbjuxXCXflf9uRHGrOPgGhE8q8AqIp/eAMhI/Jjh3DD+vupsM92DR
-	 m9Qlv2Wu3J/s1pvk0t1pbVq41BdaUJiy6CXPTaVdbT3y7FCHP7t1sa0aDxIvmupreA7cq
-	 CF3qiDphJUSN/KUkJjUIbPz+ReUQIBfMp1jQfaMDRE864MvI5EXflzY8tHO9KQXLBUw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793702029;
+	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:
+	 In-Reply-To:References:Auto-Submitted:Content-Type:
+	 Content-Transfer-Encoding:MIME-Version;
+	bh=Z9zRtXHe/J1k/4/9wAeq1n+PwAt+ioXmV3zyjSNrjDw=;
+	b=0RTDTlzCg/rBgp3pm8XRGUNB3Gfae67aYoX/olqv1CrFvW2qjwCZlc9iISCCB2hULCZ6
+	 6tMS8zl2sPS61/fItqhGM5g5BKOavYbSY55QgBTiazOIyYdkHheh5Du7dbmo1az4IPryW
+	 Cu6VjcO7GZDQN2toN9aV3sPzBX2PgGYr/4rwt9l2ubTnFScLgegWgNrP6U6De8+4QTW7x
+	 BsEzFlLIANGhmvrZJFUJh25jgpbFdqBG78DhI41LXo8uI0dKN/j2/qnwhxNrUXaTqz6Dr
+	 dYbJFqF61JT9dedb/Vqe7Z9Lie3Y6SVh5AewRgRSeV1AMI5Kq8PJ57mApTnpXoq0Pyw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=none header.from=iscas.ac.cn;
-	spf=pass smtp.mailfrom=iscas.ac.cn;
-	arc=none smtp.remote-ip=159.226.251.81
-Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=DkeSnErc;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4807360A5BFE;
-	Tue,  3 Nov 2026 10:28:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4807360A5BFE
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from dfae2b116770.home.arpa (unknown [36.110.52.2])
-	by APP-03 (Coremail) with SMTP id rQCowADH0JFdt+lqkak7AA--.6524S2;
-	Tue, 03 Nov 2026 18:28:45 +0800 (CST)
-From: Wentao Liang <vulab@iscas.ac.cn>
-To: Alexander Aring <alex.aring@gmail.com>,
-	Stefan Schmidt <stefan@datenfreihafen.org>,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@kernel.org>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: linux-wpan@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Wentao Liang <vulab@iscas.ac.cn>,
-	stable@vger.kernel.org
-Subject: [PATCH] ieee802154: fakelb: release platform device if driver registration fails
-Date: Tue,  3 Nov 2026 10:28:54 +0000
-Message-Id: <20261103102854.1340581-1-vulab@iscas.ac.cn>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2FE060711C3;
+	Tue,  3 Nov 2026 10:33:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=DkeSnErc
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1689C1F00919;
+	Tue,  3 Nov 2026 10:33:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1793702028;
+	bh=Z9zRtXHe/J1k/4/9wAeq1n+PwAt+ioXmV3zyjSNrjDw=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=DkeSnErcN8V5IjQdx8qDnZy5rv9ydNUpG4dp81QYzlI634014mZ92h4UEZpbnomxM
+	 3Jy4Dsel/u5g62wxRx3He3uSLWTlrW3HE8vPa0rFaTeel+rpk/PWAJLRDJACtFC/pm
+	 fbSyA8GHTXLH1Ps3Mnu2aLu8latpnmnD5cnmvH12cnxGIAcH68wMuzGNRZtchK+OiI
+	 GZTqwjD1xqy0nyRPnf4nLAkWtJ8iEwS77A0A2NNKRA8KsDHRsE4YGkpIU96EJ33dDq
+	 4fibLDzrBzzuTtHup6CeiRg2wOwDykXt/ulaJnfxzMiA7BdGmiQTJ09S6R56X09zxP
+	 ArpCl0VQ9hqXw==
+From: netdev-bot+sinfo@kernel.org
+To: Wentao Liang <vulab@iscas.ac.cn>
+Cc: Alexander Aring <alex.aring@gmail.com>,
+ Stefan Schmidt <stefan@datenfreihafen.org>,
+ Miquel Raynal <miquel.raynal@bootlin.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, linux-wpan@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH] ieee802154: fakelb: release platform device if driver
+ registration fails
+Date: Tue, 03 Nov 2026 10:33:47 +0000
+Message-ID: <179370202766.488859.9817846542273017775@kernel.org>
+In-Reply-To: <20261103102854.1340581-1-vulab@iscas.ac.cn>
+References: <20261103102854.1340581-1-vulab@iscas.ac.cn>
+Auto-Submitted: auto-generated
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Post: <mailto:linux-wpan@vger.kernel.org>
@@ -60,70 +67,25 @@ List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-wpan+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:rQCowADH0JFdt+lqkak7AA--.6524S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7WFy7Zr1fur1fAFWkuw4xXrb_yoW8Ar4kpa
-	1UWayrCryUurW2yw4xJ3WxZFy3C3yIg3y09FyxJwnxZw4rZF17CF17Wa9xAF1kJF4kCasI
-	vr4DGr15Can8ZFDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9214x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
-	6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-	I7IYx2IY67AKxVWUtVWrXwAv7VC2z280aVAFwI0_Cr1j6rxdMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
-	Y2ka0xkIwI1lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x
-	0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2
-	zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_JFI_Gr
-	1lIxAIcVC0I7IYx2IY6xkF7I0E14v26F4j6r4UJwCI42IY6xAIw20EY4v20xvaj40_Jr0_
-	JF4lIxAIcVC2z280aVAFwI0_Cr0_Gr1UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Cr1j6rxdYx
-	BIdaVFxhVjvjDU0xZFpf9x0JjU-B_UUUUU=
-X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiCRIAA2rpnIByFQAAsg
 
-fakelb_init_module() registers a platform device and then registers the
-platform driver, returning the result of the latter directly. If driver
-registration fails, module initialization fails and the module exit
-function is never run, so the platform device is never unregistered and
-leaks.
+Hi!
 
-Check the result of platform_driver_register() and unregister the device
-on failure. Also check the device registration result, which can be an
-ERR_PTR, before using the stored pointer.
+This is an automated message. This series looks like a fix, but its
+commit messages seem to be missing some information:
 
-Fixes: e1e49b641387 ("drivers/ieee802154: IEEE 802.15.4 loopback driver")
-Cc: stable@vger.kernel.org
-Assisted-by: DeepSeek-V4.1-Flash and OpenAI Codex
-Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
----
- drivers/net/ieee802154/fakelb.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+ - How the issue was discovered, e.g. hit in production, hit during
+   development, syzbot report, manual code inspection, LLM or static
+   analysis tool scan.
 
-diff --git a/drivers/net/ieee802154/fakelb.c b/drivers/net/ieee802154/fakelb.c
-index e11d8eda85ea..35863c3aff44 100644
---- a/drivers/net/ieee802154/fakelb.c
-+++ b/drivers/net/ieee802154/fakelb.c
-@@ -243,12 +243,20 @@ static struct platform_driver ieee802154fake_driver = {
- 
- static __init int fakelb_init_module(void)
- {
-+	int rc;
-+
- 	ieee802154fake_dev = platform_device_register_simple(
- 			     "ieee802154fakelb", -1, NULL, 0);
-+	if (IS_ERR(ieee802154fake_dev))
-+		return PTR_ERR(ieee802154fake_dev);
- 
- 	pr_warn("fakelb driver is marked as deprecated, please use mac802154_hwsim!\n");
- 
--	return platform_driver_register(&ieee802154fake_driver);
-+	rc = platform_driver_register(&ieee802154fake_driver);
-+	if (rc)
-+		platform_device_unregister(ieee802154fake_dev);
-+
-+	return rc;
- }
- 
- static __exit void fake_remove_module(void)
--- 
-2.34.1
+ - Whether the issue was actually triggered, or is only theoretical
+   (e.g. found by code inspection). If it was triggered please include
+   the symptoms, like the stack trace or error messages.
 
+Please do not repost the series just to address the above. Instead,
+reply to this email with the missing information, so that reviewers
+can take it into account. If the series needs another revision for
+other reasons, please include the information in the commit messages
+then.
+
+The evaluation is done by an LLM so it may be wrong, if you think
+that is the case please reply and explain.
