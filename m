@@ -1,51 +1,60 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=45.254.49.197
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793786231;
-	b=i5JRjOUWPkoDN8bpPgwNbKPLfhvDbJsKxo6R4hnuMFwLMs+9q85Irxte/u4F+bxKqeyW
-	 YumI9GRUW6Qe7mp51Zv71Jv6/JWjcMbVXCd//4mj+ocbABYcZbi9zoc2hwApHYH2ZteKf
-	 xIIAmfQ2WXlnvlQOfIlpQ/A525+s4EBFZzZQGZevTI8WYWlw+3i5ZKwwsZT/QgJ5MS4pZ
-	 G+kRRaaQh5wGxB7wKJp9CTN2BXrxF/r0CRG+2NfsSza33rP6Id/q0CdVh5Mzb0NWIgvcu
-	 2fAdntsERPgAQ/Oc4uVordg69ic/muuJ9qPeRvqhg+12ZI0k4I63ea/NbUOyC8ndnyA==
+	t=1793786586;
+	b=uhGP/dlmQxBbud3dww12rQKq+MrsFb+aE8Xl79hLGTAaSsw2AUIeuUiAMKfckTXl14qQ
+	 UxxKGFJRkXQH9Q0H7jQXIGJgqxCON9wJ01FTNxmMwiR79auvmYj4XlNPd2kJsoOE0unFD
+	 G8S+ZsgcnOCCc7amgkQF/iEYngvLi+dU6z0GyGW+KL6gP3N4eo0XvPotPQ3zPWGBrlRQF
+	 17//BIyUtURqWLOpt8psiUMvS9muy/T65qmk7IXrGF4r5Kg8V29TGO+HbOPWTBsaCTOnP
+	 HFITUAEZh8WP1wvPGqKgZjxynpRJ55608dCbgR9mHD7jgHldWdrqS1/fgnHaZb5CfaQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793786231;
-	h=DMARC-Filter:Received:From:To:Cc:Date:Message-ID:Subject:In-Reply-To:
-	 References:Content-Type:Content-Transfer-Encoding:MIME-Version:
-	 X-HM-Tid:X-HM-MType:X-HM-Spam-Status:DKIM-Signature;
-	bh=a6xsRKL+cULQrPCgB872GUO7WGH3fVoHR5W/L6Dktxc=;
-	b=nvYU4DnlYrg5D69fTlY3P1mVpNqN4MV4a0UB/2pIgRKX7xmpRZS1MYT/4Y7JOpshVVZe
-	 NkxtANZBPeOP8etaK98HGxokuOZ3ISBOpa1317VDQqpK+QgX/EO8y2fGv8FzvrcGPNsoD
-	 Ll09sg5aJSvS0XlfFjIVOc6pS/FCCb0dnD7J+5fOpC5VC+aCRrRuFm0NXj0ikD4d7X5UJ
-	 NZkk7UR2nzjH2Jo6m/YluNksadWRVz4c94bck2HfllDAsFW7bdH+iMgaHSN9Zdqf9ggB2
-	 a7TqPw6zMWBVmr95ilh8OVm0z9M35JbHM9frq8vLNS5EQlydR0W34ku5N3s5chXelZg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793786586;
+	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:
+	 In-Reply-To:References:Auto-Submitted:Content-Type:
+	 Content-Transfer-Encoding:MIME-Version;
+	bh=Z9zRtXHe/J1k/4/9wAeq1n+PwAt+ioXmV3zyjSNrjDw=;
+	b=1uSRjBukXt5Dd5O77lr8PlstNG6LU3yReylREjd+JGMBU4JINM9cfkimA48qojtYNWQP
+	 kuFri0CRgV5InJTuB+GLc7HdSo6taTDYOFXt167fwoPH/XNCbmaoQpTLLMI95HINzvdcg
+	 PoWQY2V4qCWUAWVFe6We1B21vWkZ2EofnzYMuClTrw8ow0vdyEanH5hQFe4nomQYKQgab
+	 rHhTYbJ5cAYvxI3qI7K+R1D0PIj1z3s/205AQL/SYSXRKAMe2b6Kel/bNv8DTaVzJGwQy
+	 Vo8uB+7J1fUQveHTahRr9rGF4b5kGRmW6SxDE/UZ1PQjMER/nvjzQw5cBlQoFBAMQKA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=stu.pku.edu.cn;
-	spf=pass smtp.mailfrom=stu.pku.edu.cn;
-	arc=none smtp.remote-ip=45.254.49.197
-Received: from mail-m49197.qiye.163.com (mail-m49197.qiye.163.com [45.254.49.197])
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Q4hUIRK7;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBC5D606A31B;
-	Wed,  4 Nov 2026 09:57:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org EBC5D606A31B
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=stu.pku.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=stu.pku.edu.cn
-Received: from 1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa (unknown [1.202.162.49])
-	by smtp.qiye.163.com (Hmail) with ESMTP id 5378c9734;
-	Wed, 4 Nov 2026 17:56:53 +0800 (GMT+08:00)
-From: Yifan Zhang <yfzhang23@stu.pku.edu.cn>
-To: linux-wpan@vger.kernel.org, netdev@vger.kernel.org
-Cc: alex.aring@gmail.com, stefan@datenfreihafen.org, miquel.raynal@bootlin.com,
- davem@davemloft.net, edumazet@kernel.org, kuba@kernel.org, pabeni@redhat.com,
- horms@kernel.org, zihanx@nebusec.ai, stable@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Date: Wed, 04 Nov 2026 17:56:53 +0800
-Message-ID: <179378621331.55520.8126896786309171541@stu.pku.edu.cn>
-Subject: [PATCH net v3] mac802154: validate pinned interface before beacon
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 408F7606A328;
+	Wed,  4 Nov 2026 10:03:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Q4hUIRK7
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1DEAB1F000C1;
+	Wed,  4 Nov 2026 10:03:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1793786585;
+	bh=Z9zRtXHe/J1k/4/9wAeq1n+PwAt+ioXmV3zyjSNrjDw=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=Q4hUIRK7lDxlTwiRVNaJGxTPAiN/l7vZNchSOA4DrZa0R96ZY6IrkIqVhRLj0jeb1
+	 gNEEjq1SXvNTbcHawXpC9cWHy2jJN+nGse6jRDawnpk3aDWOD4w5eVS3oI7mtb+dSa
+	 lVkdmCyNIdWKocjbK647dnTrlxEZD4ZoyW07+PAGgK/1N2oxI7+TpmCn3lbrXltCKP
+	 4C1SUxftATUV3v7fwXSffcoQm59l3bN3o5wmUst6CMLC14PDLwbfCDQxMyjTG+1qz6
+	 6ay7L7NHxaDR7MMJoKzqlGWry9URlB4DtWrNBsSfRDe3tVPc07U8CndxCXfzmL9VX1
+	 CmHA3DVSucSXg==
+From: netdev-bot+sinfo@kernel.org
+To: Yifan Zhang <yfzhang23@stu.pku.edu.cn>
+Cc: linux-wpan@vger.kernel.org, netdev@vger.kernel.org, alex.aring@gmail.com,
+ stefan@datenfreihafen.org, miquel.raynal@bootlin.com, davem@davemloft.net,
+ edumazet@kernel.org, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ zihanx@nebusec.ai, stable@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v3] mac802154: validate pinned interface before beacon
  transmission
-In-Reply-To: <179337523079.51423.6573078122047317758@stu.pku.edu.cn>
+Date: Wed, 04 Nov 2026 10:03:04 +0000
+Message-ID: <179378658462.488859.2613991577119336688@kernel.org>
+In-Reply-To: <179378621331.55520.8126896786309171541@stu.pku.edu.cn>
 References: <179337523079.51423.6573078122047317758@stu.pku.edu.cn>
-Content-Type: text/plain; charset="us-ascii"
+ <179378621331.55520.8126896786309171541@stu.pku.edu.cn>
+Auto-Submitted: auto-generated
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
@@ -56,114 +65,25 @@ List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-wpan+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-X-HM-Tid: 0aa1a5fd751103a2kunm548c819715b7c9
-X-HM-MType: 10
-X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
-	tZV1koWUFITzdXWRgWCB1ZQUpXWS1ZQUlXWQ8JGhUIEh9ZQVkZHUlIVh9JGR9DTRhNQxhIT1YeHw
-	5VEwETFhoSFyQUDg9ZV1kYEgtZQVlKVUlLSVVKTUlVT0JZV1kWGg8SFR0UWUFZT0tIVUpLSUJDQ0
-	xVSktLVUtZBg++
-DKIM-Signature: a=rsa-sha256;
-	b=HcdXRJRLjUqPKYOJ0DTRm0wpGM7p/u9thhdHqcbdpobq3OHTLTnharDfUguXFM3WSHSrheVMNd2Z9i71r0NWL9gTS+uf+2ruRkRIeYGWCZt+5CqEOxQARhOjNWSP1ud2QRSbEZtGCX3QRN68ZYZkiY1Dc8+gcE1pX4ZfmLCpQYQ=; s=default; c=relaxed/relaxed; d=stu.pku.edu.cn; v=1;
-	bh=a6xsRKL+cULQrPCgB872GUO7WGH3fVoHR5W/L6Dktxc=;
-	h=date:mime-version:subject:message-id:from;
 
-mac802154_beacon_worker() selects a beacon request under RCU and pins
-the corresponding netdev before dropping the read lock.  The transmit
-helper used to read the request again, so a concurrent interface switch
-could make it dereference an unpinned netdev.
+Hi!
 
-Use the pinned wpan_dev throughout transmission.  Under RTNL, verify that
-the request still belongs to that interface and that the interface is
-running.  Build the beacon from the protected template while still
-holding RTNL, then hand it to the locked MLME transmit helper.  Free the
-skb only on errors before that handoff.
+This is an automated message. This series looks like a fix, but its
+commit messages seem to be missing some information:
 
-This closes the interface-switch use-after-free without transmitting
-through a stopped interface or leaking the skb on the stopped-device
-path.
+ - How the issue was discovered, e.g. hit in production, hit during
+   development, syzbot report, manual code inspection, LLM or static
+   analysis tool scan.
 
-Fixes: 5f26a690e8ef ("mac802154: fix netdev use-after-free in beacon worker")
-Cc: stable@vger.kernel.org
-Signed-off-by: Yifan Zhang <yfzhang23@stu.pku.edu.cn>
----
-Changes in v3:
-- revalidate the request and pinned interface under RTNL
-- serialize beacon template access with request replacement
-- free the skb on every failure before the transmit-path handoff
+ - Whether the issue was actually triggered, or is only theoretical
+   (e.g. found by code inspection). If it was triggered please include
+   the symptoms, like the stack trace or error messages.
 
- net/mac802154/scan.c | 41 +++++++++++++++++++++++------------------
- 1 file changed, 23 insertions(+), 18 deletions(-)
+Please do not repost the series just to address the above. Instead,
+reply to this email with the missing information, so that reviewers
+can take it into account. If the series needs another revision for
+other reasons, please include the information in the commit messages
+then.
 
-diff --git a/net/mac802154/scan.c b/net/mac802154/scan.c
-index d393b1f4e74e4..b3c8076b8057a 100644
---- a/net/mac802154/scan.c
-+++ b/net/mac802154/scan.c
-@@ -354,35 +354,31 @@ static int mac802154_transmit_beacon(struct ieee802154_local *local,
- 				     struct wpan_dev *wpan_dev)
- {
- 	struct cfg802154_beacon_request *beacon_req;
--	struct ieee802154_sub_if_data *sdata;
-+	struct ieee802154_sub_if_data *sdata =
-+		IEEE802154_WPAN_DEV_TO_SUB_IF(wpan_dev);
- 	struct sk_buff *skb;
- 	int ret;
- 
--	/* Update the sequence number */
--	local->beacon.mhr.seq = atomic_inc_return(&wpan_dev->bsn) & 0xFF;
--
- 	skb = alloc_skb(IEEE802154_BEACON_SKB_SZ, GFP_KERNEL);
- 	if (!skb)
- 		return -ENOBUFS;
- 
--	rcu_read_lock();
--	beacon_req = rcu_dereference(local->beacon_req);
--	if (unlikely(!beacon_req)) {
--		rcu_read_unlock();
--		kfree_skb(skb);
--		return -EINVAL;
-+	rtnl_lock();
-+	beacon_req = rtnl_dereference(local->beacon_req);
-+	if (unlikely(!beacon_req || beacon_req->wpan_dev != wpan_dev ||
-+		     !ieee802154_sdata_running(sdata) ||
-+		     !netif_running(sdata->dev))) {
-+		ret = -ECANCELED;
-+		goto out_free;
- 	}
- 
--	sdata = IEEE802154_WPAN_DEV_TO_SUB_IF(beacon_req->wpan_dev);
-+	/* Update the sequence number */
-+	local->beacon.mhr.seq = atomic_inc_return(&wpan_dev->bsn) & 0xFF;
- 	skb->dev = sdata->dev;
- 
--	rcu_read_unlock();
--
- 	ret = ieee802154_beacon_push(skb, &local->beacon);
--	if (ret) {
--		kfree_skb(skb);
--		return ret;
--	}
-+	if (ret)
-+		goto out_free;
- 
- 	/* Using the MLME transmission helper for sending beacons is a bit
- 	 * overkill because we do not really care about the final outcome.
-@@ -402,7 +398,16 @@ static int mac802154_transmit_beacon(struct ieee802154_local *local,
- 	 * transmissions, wich anyway does not have a huge impact on the
- 	 * performances given the current design of the stack.
- 	 */
--	return ieee802154_mlme_tx(local, sdata, skb);
-+	ret = ieee802154_mlme_tx_locked(local, sdata, skb);
-+	rtnl_unlock();
-+
-+	return ret;
-+
-+out_free:
-+	rtnl_unlock();
-+	kfree_skb(skb);
-+
-+	return ret;
- }
- 
- void mac802154_beacon_worker(struct work_struct *work)
--- 
-2.39.5 (Apple Git-154)
+The evaluation is done by an LLM so it may be wrong, if you think
+that is the case please reply and explain.
