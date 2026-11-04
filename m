@@ -1,62 +1,55 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793759568;
-	b=DsrrtL7kbUt/XKaBbRa9ECFd3w9qQd5+uiDV3ixjgrs4KSeTJbrWJ8UonI4B2J1SBe5G
-	 wc73cwqNu0gvAKguCkatYXIYtW7UXgsp895KneGzCrS14jboxzgoP1X/Y440MY7hWAM5J
-	 J8Wo5nhaBedCvUrgzD/ZinKl3eYBW/W1W2i6RXNP1zFlYRN83xKOfRYg4p+Rq25lf+B+r
-	 S7RqNCQYKj4Z8lhhvcfzrjrkkD0WuHWsq9hubTeyhhsBRPL5IjspsvwzsWzUnFIhtw8Nd
-	 knJIGW42YD8uqjRO1bVgbL9rJ3RFckGmqCnkHpMMyPOTbcsKMmDgleBS3oWZ13wxyQQ==
+	t=1793778103;
+	b=XN8/SJvq2tLQdgPoi2o/HyZ4yZSRpwqpOm/ydLXscWbJfYVIwVq9LI1BxZvIfV3VIlxo
+	 vNOTS2dO3kw+LAlMMv3xr5w+PAvImy1+ROHbEgkco+xE3ou5Tst7hnCUbCboxYwfqgsMI
+	 iTWPpJO8GnLGaKSXPjBn5Waiv3n/xuVYxJkW5khYBAz7RDXtKaC/3o4LaX3e+RrR5e/2B
+	 p+uXkZlnQHZbQxh84gkRue19YH+DcxkXMs/jhySudmpJywVj1ouymYftfHqVHL7PLtGnM
+	 oIh/mo8XB1wGCv+HN+a9rObU4/TBQjpTrj5uc4MgasiZgY0vFnOVr+aB5TzbYIdmXqA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793759568;
-	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:
-	 In-Reply-To:References:Auto-Submitted:Content-Type:
-	 Content-Transfer-Encoding:MIME-Version;
-	bh=Z9zRtXHe/J1k/4/9wAeq1n+PwAt+ioXmV3zyjSNrjDw=;
-	b=4F13Vka+bLY1Kqvm7ka9iajlayyOvv+w08EGklhGGHe1fle/o8H8MnmS6L4FG3BSNxwg
-	 wnfM64Kg/LOvPotPPIP9nMpGPt4K1u24sRFs6v3Mcq8zUjD7kRExZG1T1zuy84e92zlCG
-	 9RB39mTZ10OokPEvOSDh/K/+nK6e7L3jTNzLkKKLLHOoUBnxHtPYlOECpdf/tJ/YDVFW/
-	 93ryAo5PPku02nLj61JY8kWXFqWY+WCzcYgjfP5VJSOXw6nBHHDFUmxedt0no4h48D8vr
-	 SyRVZEH4IfT2kQuHyz/2bi5TWVIbspd3ZzKMZr3DJvC2JVQep1VuNzI9eguCABfS1tQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793778103;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
+	bh=orxc0cOYIwRhmILtAs0pWXdJW9rWB8yPgs6rqTd8ufY=;
+	b=zpOwDBtpelF5ZJX2LjRpfkGruZyCt9gVqFbYz9OpX6UXkdm5RA/YYctn+blXtyRx8Gbc
+	 yCQQmuYo+9zCYGKAlxQ1VhiHyPrTwmmjuQTqH8ZP8/DUcOJgcgY44F5WIdQVQHnUcIGo7
+	 /rhwiq/4uNZipJXz2oJKWM0ZaFjeOJ7cqw0I9ijXn5kdjUlIWZzsBn6dPHPhJSh5XQKnx
+	 WOQPFwsHny0Wdn2gv8CCj3m0EqonYsx1ERpS0n/wRVXJxzAs0IwwWY7I1fzOEMjaNjjEe
+	 xy8rbpPLzhL0Vm7V+6r7ru2dp4sZZdCR7Jngz7gCiX8t166Hxgmi6nl7tRGp2n5KvFQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=kg2cnnXj;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="cSa/t5JA";
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C02F0606A332;
-	Wed,  4 Nov 2026 02:32:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB25B606A339;
+	Wed,  4 Nov 2026 07:41:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=kg2cnnXj
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E86C1F000C1;
-	Wed,  4 Nov 2026 02:32:46 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=cSa/t5JA
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB95F1F000C1;
+	Wed,  4 Nov 2026 07:41:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793759567;
-	bh=Z9zRtXHe/J1k/4/9wAeq1n+PwAt+ioXmV3zyjSNrjDw=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=kg2cnnXjNn0iEPgJ1cSTtsPdpbst3N8Z2zS9a0XfHjVht0katkFEOmdACRrz3QXjB
-	 Yc3P9nTLHvxPaT2+8ItSdd4auZEf3QTV2zslQCsrfNi/Zq9qPvdkra47m+bz0qGLvw
-	 ims6IxPakp+e+zARiajMZuwNcfnl3qmdLhDP6wPavZAFWSsnj9pjTbSi4XIvziLb4U
-	 jQGaGpee0iUTWS6Y3WAcKLa7/26j0jjLvaEcRTmZpLQHsD4534Pl2eOSXcvBgVjrn1
-	 MBkYUqjxwyDh1B69CEvUHxGPmlnWWCUzNpZ4mvPRXGZgb4vodwSODQ7Cd3p7JsjODF
-	 S3a+J4Qsigs6A==
-From: netdev-bot+sinfo@kernel.org
+	s=k20260515; t=1793778102;
+	bh=orxc0cOYIwRhmILtAs0pWXdJW9rWB8yPgs6rqTd8ufY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=cSa/t5JAw24C9Yao6g8ttsz5OCtrEowHRhAxKL8CMJ9cWq5nJLL6/YvKyniAE6YX/
+	 +lcyZi5Y/DXzQhzWavv8DfYt+AbJwX3DRTD6wlFllgQ/NoYz2NA0Tz1jWvObIbgMDN
+	 XQ3SIgOKqnOYV4dQ9s20utGB0pj2EjPfqxU9y8dM2UaggNb4F0G2iMIT1q16qZXgzj
+	 CG3ey8eNJyOQ1ewghudKm/PX+L3Xxxko0iWSnOPuTsdJhuXzkXFbNuY7KMCrKCGvAM
+	 Le/0SwEMrEKybQzEXLTChGiZPSRf+B/rDZmbINt4Us6d0j2ks3EGKcxazTUsQOKm+5
+	 TjFj9g7jmIjHA==
+Date: Wed, 4 Nov 2026 08:41:39 +0100
+From: Krzysztof Kozlowski <krzk@kernel.org>
 To: Wentao Liang <vulab@iscas.ac.cn>
-Cc: Alexander Aring <alex.aring@gmail.com>,
- Stefan Schmidt <stefan@datenfreihafen.org>,
- Miquel Raynal <miquel.raynal@bootlin.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@kernel.org>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, linux-wpan@vger.kernel.org,
- netdev@vger.kernel.org
+Cc: netdev@vger.kernel.org, linux-wpan@vger.kernel.org, 
+	Alexander Aring <alex.aring@gmail.com>, Simon Horman <horms@kernel.org>, 
+	Stefan Schmidt <stefan@datenfreihafen.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@kernel.org>, Miquel Raynal <miquel.raynal@bootlin.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>
 Subject: Re: [PATCH] ieee802154: drop the extra phy reference in del_iface
-Date: Wed, 04 Nov 2026 02:32:46 +0000
-Message-ID: <179375956609.488859.5648802157798426072@kernel.org>
-In-Reply-To: <20261104022809.1484165-1-vulab@iscas.ac.cn>
+Message-ID: <20261104-diamond-kittiwake-of-progress-bc547d@quoll>
 References: <20261104022809.1484165-1-vulab@iscas.ac.cn>
-Auto-Submitted: auto-generated
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Post: <mailto:linux-wpan@vger.kernel.org>
@@ -66,25 +59,70 @@ List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-wpan+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20261104022809.1484165-1-vulab@iscas.ac.cn>
 
-Hi!
 
-This is an automated message. This series looks like a fix, but its
-commit messages seem to be missing some information:
+On Wed, 04 Nov 2026 02:28:09 +0000, Wentao Liang wrote:
+> ieee802154_del_iface() takes a reference on the phy of the interface and
+> then looks up the phy named by IEEE802154_ATTR_PHY_NAME, which takes
+> another reference. When the optional attribute names the phy of the
+> interface being deleted, phy and phy2 are the same device, the lookup
+> reference is not dropped and the function later puts the phy only once.
+> Deleting an interface while passing its own phy name therefore leaks a
+> wpan_phy reference.
+> 
+> Put the lookup reference in the matching case as well, leaving only the
+> reference taken from the interface.
+> 
+> Fixes: bb1cafb8fc41 ("ieee802154: add support for creation/removal of logic interfaces")
+> Cc: stable@vger.kernel.org
+> Assisted-by: DeepSeek-V4.1-Flash and OpenAI Codex
+> Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
+> ---
+>  net/ieee802154/nl-phy.c | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
 
- - How the issue was discovered, e.g. hit in production, hit during
-   development, syzbot report, manual code inspection, LLM or static
-   analysis tool scan.
+Multiple things here:
+1. Your team ignored completely previous feedback. Multiple times.
 
- - Whether the issue was actually triggered, or is only theoretical
-   (e.g. found by code inspection). If it was triggered please include
-   the symptoms, like the stack trace or error messages.
+2. You use multiple identities with this email address, thus I doubt that we
+   speak with an actual person.
 
-Please do not repost the series just to address the above. Instead,
-reply to this email with the missing information, so that reviewers
-can take it into account. If the series needs another revision for
-other reasons, please include the information in the commit messages
-then.
+3. Your bot does not even bother running checkpatch, right?
 
-The evaluation is done by an LLM so it may be wrong, if you think
-that is the case please reply and explain.
+4. Nothing of this was reproduced nor tested.
+
+5. Finally, the same feedback:
+You sent multiple independent patches, to multiple independent
+subsystems. The amount of these patches clearly suggest this was
+AI generated and most likely not tested.
+
+More importantly, you sent all this work without properly organizing
+relevant patches into patchsets. This makes reviewing difficult
+and might cause multiple reviewers to address the same issue.
+Replying to the entire set is impossible and requires handling each
+patch independently, instead of applying or discarding the set.
+Maintainers also won't see the bigger picture of your work. Quite
+worrying.
+
+This is on the verge of hostile patch: bomb us with so many
+contributions, we won't be able to handle them in efficient manner,
+like responding ONCE to ask you to slow down.  Considering all this
+is untested and LLM generated, I have even more doubts whether this
+should be considered for review.
+
+Please read kernel documentation BEFORE posting more work. It will
+explain you how to identify subsystems, how to organize your work per
+subsystem (so a patchset grouping multiple patches with a short cover
+letter), how to document the issue discovery method and what was
+or was not tested.
+
+Best regards,
+Krzysztof
+
+
+
+
