@@ -1,60 +1,62 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=109.224.244.17
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794147640;
-	b=o+4drIUwE3NeiuzkVpnxCrTvwrpQWx5cFs7XNIe2yfootiz55tmdEt6aH9n/5Gq5pPn4
-	 0O53Gz8DAyT7OGYFZBvLruTtaD8miHb7fe/JglFs4dNQG3Xa/5tQSG+AmWmB7Hx3Bx7Wi
-	 A1jFVM3lsUAR3sSu2+2xkIxkCSmFMXwxeUnNW6HifPjsrSiDTeUZ3wJtNHbfKyEY0omBy
-	 j1/otaF2qbGZqVOSbv2Qmbz1lGswwq5yTziQBk3qZLDI8TxshSwlCs7Xy7oTGOh3roJZy
-	 1nWWG7fZfwazjnUJwZ/qVQRu93ib+TBHHAhMdFZo9C9Ctax+peVtn+Bu2m1kgQmXUog==
+	t=1794156576;
+	b=kQ6QO4J7ILHqk/EH+tRqbKXpf5SNvbT/1z5Qitbah3y/Cqhf49ulzXsNxOdqMHOcsGox
+	 unBKzTfsTKod51Uon5tvb0hQz0m5+69ISyVG7GfFTpg7oke1FcQkCRhcCTJMmlxa36vg2
+	 RrGYYloPpRXqaNmW5NjGNWZSUOqMUAJSiWIMRV1XxQc/cDX9UIGmcibAYJSkfHHj1hRyG
+	 npe/l1k1JeYQjWO7vY1GDNcQGoWaVqV403F7gbck23rIuU85UTNetifFVZKKPZiZaGmpK
+	 nyGrdaVUtFAvt2r24drfH5NEH17lFJTNQRdfgI8eUHpJbuvFTEBnWzP6orUy69zueSw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794147640;
-	h=DMARC-Filter:DKIM-Signature:Date:To:From:Cc:Subject:Message-ID:
-	 In-Reply-To:References:Feedback-ID:X-Pm-Message-ID:MIME-Version:
-	 Content-Type;
-	bh=It2I1hWua5Tj1m0aBaBWkv2oh3oD0Hzdd+bti3K6A7E=;
-	b=MHkYaJjZ0IfHix5TtuRDi22k0rhdw7+v0cSQpqqhtElDthV6safghu1FVL0C7QiVxIXy
-	 GbbBRRFdKRtXN24lVsuBXLe2jNsWuUZOubB/hTKPj/ZpJZmo6ETz7E+4P8zqODzHidhYn
-	 L4ZPNqdpb7nWY2KMvM+gm++o/uznvfkifL+jJdyfEo2EtbUiO+b8I/1UhIhvXSVG+kgIH
-	 PqzbXVAIJWwVK67+UOdJ/ZnoX5oHY2zAgE5IJjsrrSHnRUwr0wd8MdBC0SiVgwNwChW8r
-	 XTLfCoCezP90EkPZy/fZOxySHq1se/se+qLDQUrF8UjElK41R0SyVgAOCTfMqfn+4Xg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794156576;
+	h=Received:DKIM-Signature:Subject:From:To:Cc:Date:Message-ID:
+	 In-Reply-To:References:X-sashiko-severity:Content-Type:
+	 Content-Transfer-Encoding:MIME-Version;
+	bh=wTb/47UcyVRYUioaA5KlxtEKIzWmzjTjIZZpMNujhtE=;
+	b=5e+APlDbtMbY1Io82mtoIcNg1m4hdiGw68GejK1dXPx9zEOMlBsQx1aKthifOnzoNGmn
+	 aXDDcl1HeF0BTgqjua0sBMM/hEFEVd6s4L677Eq7709qjDgT6bwJGCB5rtSBvuzwOeoFa
+	 5a+B4Rx1bucZzAs07rDaKZFakQZOb4EtK7Wk1LTfXY3QSVwurquVvqKaO1mK+oJ4UDiSE
+	 bz3Gm5b1G30CTa3zFniyxqbLitsLWEU1kQ6ENDIEg/9rNaRPs9wFKmm9pnA6DyiQXvOfs
+	 0ziQnHXFE1UWOFxeM2W4z9+fK9+d2xonqCo7OzOGTX4yTYBN5VQ/e0VihYSL0FxfHPA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=protonmail.com;
-	spf=pass smtp.mailfrom=protonmail.com;
-	dkim=pass header.d=protonmail.com header.i=@protonmail.com header.a=rsa-sha256 header.s=protonmail3 header.b=OEJdGF8s;
-	arc=none smtp.remote-ip=109.224.244.17
-Received: from mail-24417.protonmail.ch (mail-24417.protonmail.ch [109.224.244.17])
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=UYmne0fR;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 474EC606A320;
-	Sun,  8 Nov 2026 14:20:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 474EC606A320
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=protonmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3BCB606A31C;
+	Sun,  8 Nov 2026 16:49:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=protonmail.com header.i=@protonmail.com header.a=rsa-sha256 header.s=protonmail3 header.b=OEJdGF8s
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
-	s=protonmail3; t=1794147636; x=1794406836;
-	bh=It2I1hWua5Tj1m0aBaBWkv2oh3oD0Hzdd+bti3K6A7E=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=OEJdGF8slAMmrQk3xOrwsyQiFc5g/gBS1/3jbiENEu3wkWsw3Or/A+92EXNMe75Mf
-	 zcAwkcJhDymd1fWpn+kAqCiXuEHQIgGFBE/Yzjpt/EPCPF0Ysm2kG0k+8nji8xeC0t
-	 ooqutkvO1sVmn2dx0dArG5Pq31X95eFO3vLd6VJVyUw/YiIihwolbLsUii3FOqir0o
-	 LC4jdFUAoyKOrGKr16C6H1LpSC5c+BhjhSYvjd4kdq2zOVF3swr0ms0EkD55j6rYXP
-	 3pkjErCmztuTN75LIRxdn+0VaFRYW0FEbSWwKujar1/v3Kz56TkPM6k9VFBWyjsRZL
-	 vZsfDr5bJM9ow==
-Date: Sun, 08 Nov 2026 14:20:31 +0000
-To: linux-wpan@vger.kernel.org, netdev@vger.kernel.org
-From: Ryan Prinz <rc4d5a@protonmail.com>
-Cc: Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt <stefan@datenfreihafen.org>, Miquel Raynal <miquel.raynal@bootlin.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@kernel.org>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org, Ryan Prinz <rc4d5a@protonmail.com>
-Subject: [PATCH net RESEND] ieee802154: 6lowpan: validate fragment offset against datagram size
-Message-ID: <20261108142008.758061-1-rc4d5a@protonmail.com>
-In-Reply-To: <20261107223217.718177-1-rc4d5a@protonmail.com>
-References: <20261107223217.718177-1-rc4d5a@protonmail.com>
-Feedback-ID: 190731814:user:proton
-X-Pm-Message-ID: 8417274c5bc59c4d0a564e96dfa557e7058b1e4f
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=UYmne0fR
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B02C51F0089F;
+	Sun,  8 Nov 2026 16:49:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1794156575;
+	bh=wTb/47UcyVRYUioaA5KlxtEKIzWmzjTjIZZpMNujhtE=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References;
+	b=UYmne0fRrzpbw9ka2R/OPaMJhUJCf1NMVPojgiKMkPcpbZje79AQb1SGFpLCXxhkb
+	 wwW2B2lHgHSUxdcxkrj4aJpNE7tlB/5YZRmvm20ggB4wXVVe08RwR8UXVb1xbT/gXr
+	 Hp2n0E+zNHsukXpWGFuV2k3pBR47khWDScvD2fHn1+c8iuYtpw0hV8xbYzy4Z/w5ta
+	 117yOG06CPUazpWj0ajXFeUCNquEox5v2qFxlGNZ+cqym17k4MdO0sPYS1K9wNLNMJ
+	 VragFA13dcXo+wtQ1a1QVugnDT4IFmtCD8S+XBNJCxQz3wHpZZ4aa33FWsOF9GTe05
+	 bVxY+itjoEtBA==
+Subject: Re: [PATCH net v3] tun: disallow setting IEEE 802.15.4 and 6LoWPAN
+ link types via TUNSETLINK
+From: netdev-bot+sashiko@kernel.org
+To: skalpesh942@gmail.com
+Cc: willemdebruijn.kernel@gmail.com, jasowangio@gmail.com,
+ alex.aring@gmail.com, stefan@datenfreihafen.org, miquel.raynal@bootlin.com,
+ davem@davemloft.net, edumazet@kernel.org, kuba@kernel.org, pabeni@redhat.com,
+ andrew+netdev@lunn.ch, linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org,
+ syzbot+9ea34da5ca6100593c90@syzkaller.appspotmail.com
+Date: Sun, 08 Nov 2026 16:49:34 +0000
+Message-ID: <179415657425.994134.6934756504631104238@kernel.org>
+In-Reply-To: <20261107162649.282982-1-skalpesh942@gmail.com>
+References: <20261107162649.282982-1-skalpesh942@gmail.com>
+X-sashiko-severity: High
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Post: <mailto:linux-wpan@vger.kernel.org>
@@ -64,155 +66,116 @@ List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-wpan+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pgp-signature"; micalg=pgp-sha256; boundary="------19cdf1c7d8f42fa0f7e0bcbb2160600e4ee20326ee91871a8f2a9280719425e7"; charset=utf-8
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------19cdf1c7d8f42fa0f7e0bcbb2160600e4ee20326ee91871a8f2a9280719425e7
-Content-Type: multipart/mixed;
- boundary=c36f5401997db1097316905cd00acbd43df74ad8043aac9de08a0aaf9af5
-From: Ryan Prinz <rc4d5a@protonmail.com>
-To: linux-wpan@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: Alexander Aring <alex.aring@gmail.com>,
-	Stefan Schmidt <stefan@datenfreihafen.org>,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@kernel.org>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	linux-kernel@vger.kernel.org,
-	Ryan Prinz <rc4d5a@protonmail.com>
-Subject: [PATCH net RESEND] ieee802154: 6lowpan: validate fragment offset against datagram size
-Date: Sun,  8 Nov 2026 15:20:07 +0100
-Message-ID: <20261108142008.758061-1-rc4d5a@protonmail.com>
-X-Mailer: git-send-email 2.56.0
-In-Reply-To: <20261107223217.718177-1-rc4d5a@protonmail.com>
-References: <20261107223217.718177-1-rc4d5a@protonmail.com>
-MIME-Version: 1.0
+Thank you for your contribution! Sashiko AI review found 2 potential
+issue(s) to consider.
 
---c36f5401997db1097316905cd00acbd43df74ad8043aac9de08a0aaf9af5
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Critical: 0 · High: 1 · Medium: 0 · Low: 1
 
-A 6LoWPAN fragment announces the total size of the datagram it belongs
-to (d_size) and its own offset within that datagram. The reassembly
-code never checks that the offset actually fits inside d_size, so a
-fragment claiming to start far past the end of the datagram is
-accepted the same as a legitimate one, allowing an attacker to forge
-data of another sender.
+If you believe none of the issues are legitimate, please reply to each
+issue of Medium severity or higher and explain why the AI is wrong.
+If any of them are legitimate and you plan to respin, please let patchwork
+know by including "pw-bot: cr" as a separate line at the end of your reply
+(one such reply per series is enough).
 
-lowpan_frag_queue() considers a datagram complete by counting bytes
-received (fq->q.meat) against the declared size (fq->q.len), not by
-verifying the bytes form a contiguous range. A fragment with an
-out-of-range offset still has its length counted toward that total, so
-a legitimate fragment exchange plus an attacker fragment can sum to
-d_size, marking the datagram complete while a gap in the data was
-never filled, and appending the out-of-range fragment's bytes to the
-end of the reassembled buffer as if they were part of the message.
+- [High] The new TUNSETLINK denylist in __tun_chr_ioctl()
+  (drivers/net/tun.c:3365-3368) can be bypassed by setting high bits in…
+- [Low] The commit message gets the root cause wrong.
 
-IPv6's reassembly (net/ipv6/reassembly.c, ip6_frag_queue()) computes
-end = of
-fset + payload length for every fragment and checks end
-against IPV6_MAXPLEN, which bounds offset by construction. 6LoWPAN's
-d_offset and d_size are independent wire fields with no such coupling,
-and no separate bounds check was added for it.
+--
 
-The same class of bug was assigned CVE-2019-8359 (CVSS 9.8) in
-Contiki-NG's 6LoWPAN stack before a 2019 fix; RIOT-OS's implementation
-(gnrc_sixlowpan_frag_rb_add) rejects a fragment once offset + size
-exceeds the reassembly buffer's datagram_size. Linux's 6LoWPAN
-reassembly is the only one of these implementations without an
-equivalent check.
+tun: disallow setting IEEE 802.15.4 and 6LoWPAN link types via TUNSETLINK
 
-Fix by rejecting any fragment whose offset, or offset plus length,
-falls outside [0, d_size).
+This patch makes TUNSETLINK return -EINVAL when the requested link type is
+ARPHRD_IEEE802154, ARPHRD_IEEE802154_MONITOR or ARPHRD_6LOWPAN. The goal is
+to keep code that expects 802.15.4 or 6LoWPAN private data from treating
+TUN devices as those device types.
 
-Reproduced two ways: with a local kernel module calling
-lowpan_frag_rcv() directly, and over mac802154_hwsim with three
-independent processes standing in for sender, receiver and attacker.
-An attacker in radio range who observes one fragment of an
-in-progress transmission reads d_tag, d_size and
- the addressing in the
-clear, then sends a single out-of-range fragment of its own. The
-receiver's reassembly completes with the attacker's bytes appended to
-the legitimate data. Both reproducers were re-run against this fix to
-confirm the out-of-range fragment is now rejected and the datagram no
-longer completes with it included.
+Closes: https://syzkaller.appspot.com/bug?extid=9ea34da5ca6100593c90
 
-AI Disclosure: An AI assistant (Claude) was used to assist with the
-analysis and testing. I have verified the vulnerability, the fix, and
-the test results myself and take responsibility for this contribution,
-per Documentation/process/coding-assistants.rst.
+> A userspace application can set the link type of a TUN/TAP interface
+> to ARPHRD_IEEE802154, ARPHRD_IEEE802154_MONITOR, or ARPHRD_6LOWPAN
+> via ioctl(fd, TUNSETLINK, arg) because tun_get_addr_len() explicitly
+> recognized these types.
 
-Fixes: 7240cdec60b1 ("6lowpan: handling 6lowpan fragmentation via inet_frag api")
-Signed-off-by: Ryan Prinz <rc4d5a@protonmail.com>
----
-Resending with correct tree designator in the subject
+[Severity: Low]
+Is this the actual root cause?
 
- net/ieee802154/6lowpan/reassembly.c | 3 +++
- 1 file changed, 3 insertions(+)
+tun_get_addr_len() only maps a type to an address length. Its default case
+returns 0 for any type it doesn't list, so it never accepts or rejects a
+type.
 
-diff --git a/net/ieee802154/6lowpan/reassembly.c b/net/ieee802154/6lowpan/reassembly.c
-index ddb6a5817d09..905ba5f86
-844 100644
---- a/net/ieee802154/6lowpan/reassembly.c
-+++ b/net/ieee802154/6lowpan/reassembly.c
-@@ -103,6 +103,9 @@ static int lowpan_frag_queue(struct lowpan_frag_queue *fq,
- 	offset = lowpan_802154_cb(skb)->d_offset << 3;
- 	end = lowpan_802154_cb(skb)->d_size;
- 
-+	if (offset > end || skb->len > end - offset)
-+		goto err;
-+
- 	/* Is this the final fragment? */
- 	if (offset + skb->len == end) {
- 		/* If we already have some bits beyond end
+The TUNSETLINK branch in __tun_chr_ioctl() stores whatever value userspace
+passes:
+
+    tun->dev->type = (int) arg;
+
+That means these types could be set the same way before cca8ea3b05c9.
+Would it be more accurate to say that TUNSETLINK accepts arbitrary type
+values?
+
+> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+> index dcec7311e6011..05eb28578b8b0 100644
+> --- a/drivers/net/tun.c
+> +++ b/drivers/net/tun.c
+> @@ -3362,6 +3362,10 @@ static long __tun_chr_ioctl(struct file *file, unsigned int cmd,
+>  			netif_info(tun, drv, tun->dev,
+>  				   "Linktype set failed because interface is up\n");
+>  			ret = -EBUSY;
+> +		} else if (arg == ARPHRD_IEEE802154 ||
+> +			   arg == ARPHRD_IEEE802154_MONITOR ||
+> +			   arg == ARPHRD_6LOWPAN) {
+> +			ret = -EINVAL;
+
+[Severity: High]
+Can this check be bypassed by setting bits above the low 16 bits of arg?
+
+Here arg is an unsigned long. On the compat path it is a 32-bit value,
+because tun_chr_compat_ioctl() only does arg = (compat_ulong_t)arg. But
+net_device::type is an unsigned short:
+
+include/linux/netdevice.h:
+    unsigned short		type;
+
+Later in the same branch, __tun_chr_ioctl() stores the value like this:
+
+    tun->dev->type = (int) arg;
+    tun->dev->addr_len = tun_get_addr_len(tun->dev->type);
+
+With arg = 0x10324, the comparison against ARPHRD_IEEE802154 (0x324) is
+false, so the else branch runs. dev->type then ends up as 0x324, which is
+ARPHRD_IEEE802154, and tun_get_addr_len() returns the 802.15.4 extended
+address length.
+
+0x10325 and 0x10339 work the same way for ARPHRD_IEEE802154_MONITOR and
+ARPHRD_6LOWPAN. This also works from 32-bit userspace through the compat
+path.
+
+The code named in the commit message only checks the 16-bit dev->type.
+Here is ieee802154_llsec_dump_table():
+
+    if (idx < first_dev || dev->type != ARPHRD_IEEE802154)
+        goto skip;
+
+    data.ops = ieee802154_mlme_ops(dev);
+
+And here is lowpan_event() handling NETDEV_DOWN:
+
+    if (dev->type != ARPHRD_6LOWPAN)
+        return NOTIFY_DONE;
+    ...
+    clear_bit(LOWPAN_IPHC_CTX_FLAG_ACTIVE,
+              &lowpan_dev(dev)->ctx.table[i].flags);
+
+So it looks like an unprivileged user in a user+net namespace can still
+trigger both the syzbot NULL dereference and the write into tun_struct
+through lowpan_dev().
+
+v2 had an arg > USHRT_MAX check that covered this case, and v3 dropped it
+as unrelated. Should the comparison use (u16)arg, or should values above
+USHRT_MAX be rejected?
+
+[ ... ]
+
 -- 
-2.51.2
-
---c36f5401997db1097316905cd00acbd43df74ad8043aac9de08a0aaf9af5
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="publickey - rc4d5a@protonmail.com
- - 0xE775BF83.asc"; name="publickey - rc4d5a@protonmail.com -
- 0xE775BF83.asc"
-Content-Type: application/pgp-keys; filename="publickey -
- rc4d5a@protonmail.com - 0xE775BF83.asc"; name="publickey -
- rc4d5a@protonmail.com - 0xE775BF83.asc"
-
-LS0tLS1CRUdJTiBQR1AgUFVCTElDIEtFWSBCTE9DSy0tLS0tCkNvbW1lbnQ6IGh0dHBzOi8vZ29w
-ZW5wZ3Aub3JnClZlcnNpb246IEdvcGVuUEdQIDIuMTAuMAoKeGpNRWFkRFpyUllKS3dZQkJBSGFS
-dzhCQVFkQTFpeGV6cng0ZTBFNWJGcjV6UU8xMitlb20vdWZnUVFTS05jQwpHU1ZjUzlqTkxYSmpO
-R1ExWVVCd2NtOTBiMjV0WVdsc0xtTnZiU0E4Y21NMFpEVmhRSEJ5YjNSdmJtMWhhV3d1ClkyOXRQ
-c0xBRVFRVEZnb0Fnd1dDYWREWnJRTUxDUWNKRUFVYktZOW5tekdRUlJRQUFBQUFBQndBSUhOaGJI
-UkEKYm05MFlYUnBiMjV6TG05d1pXNXdaM0JxY3k1dmNtY21EdVNNSm1tcTJWVDN2aFkzY0JzRDFS
-YUVsZGE2dDdpTwo1S21uZXZwYXhRTVZDZ2dFRmdBQ0FRSVpBUUtiQXdJZUFSWWhCT2QxdjRPUWRH
-ZGFobnFvR0FVYktZOW5tekdRCkFBQmFDUUVBdWxVaElDbmFPSU9DT1d4T3pldUNUZ0dUVGkxM1k4
-WjdVL3pYaER1bmFpa0EvaUJRRVBZOEx5NisKU2RZUnZzekQwcHBsS0M0elB2WkhqRDZaMEo4U2Ir
-RUh6amdFYWREWnJSSUtLd1lCQkFHWFZRRUZBUUVIUUNwbApBSFVLZXNpb25QaGlBVnBvL3dDUFdt
-MnR3SGtpL0tmaUpHQVdlckIxQXdFSUI4SytCQmdXQ2dCd0JZSnAwTm10CkNSQUZHeW1QWjVzeGtF
-VVVBQUFBQUFBY0FDQnpZV3gwUUc1dmRHRjBhVzl1Y3k1dmNHVnVjR2R3YW5NdWIzSm4KNlJuS0R5
-WjJlV1BjOSs3NEJIR3VPM1E1VGVuWFZ6bWRrRjQ3L1lYQUxFOENtd3dXSVFUbmRiK0RrSFJuV29a
-NgpxQmdGR3ltUFo1c3hrQUFBN1RzQS8zRy9hUE9NeGE2MDZxdlh2U3lUOURDNTJCa294ZmlNMk5N
-SFpHK0QwSnVGCkFQMFhXbGRlbEVvTFY1bWNRbXFIVThqMVp2ZzRtT1hWL2owYytPWmRheVhUQnc9
-PQo9VnZDNAotLS0tLUVORCBQR1AgUFVCTElDIEtFWSBCTE9DSy0tLS0t
---c36f5401997db1097316905cd00acbd43df74ad8043aac9de08a0aaf9af5--
-
---------19cdf1c7d8f42fa0f7e0bcbb2160600e4ee20326ee91871a8f2a9280719425e7
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: ProtonMail
-
-wqsEARYIAF0FgmrwhS4JEAUbKY9nmzGQNRQAAAAAABwAEHNhbHRAbm90YXRp
-b25zLm9wZW5wZ3Bqcy5vcmfsZ22onEk7RTLaGmyu4qseFiEE53W/g5B0Z1qG
-eqgYBRspj2ebMZAAADG2APwNNOr3CrZuqj5wdHqqoaLz872ga3L/WMdpU0to
-kckabgEAhGcSMOdHS9xUARmcZDV3Uj5gZTW6vzYx2gFP/S23fg4=
-=0L9K
------END PGP SIGNATURE-----
-
-
---------19cdf1c7d8f42fa0f7e0bcbb2160600e4ee20326ee91871a8f2a9280719425e7--
-
+Sashiko AI review · https://netdev-ai.bots.linux.dev/sashiko/#/patchset/20261107162649.282982-1-skalpesh942%40gmail.com
